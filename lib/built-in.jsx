@@ -126,6 +126,42 @@ native final class Number {
 
 }
 
+// 15.8
+native final class Math {
+	// 15.8.1
+	static const E :number;
+	static const LN10 :number;
+	static const LN2 :number;
+	static const LOG2E :number;
+	static const LOG10E :number;
+	static const PI :number;
+	static const SQRT1_2 :number;
+	static const SQRT2 :number;
+
+	// 15.8.2
+	static function abs(x :number) :number;
+	static function acos(x :number) :number;
+	static function asin(x :number) :number;
+	static function atan(x :number) :number;
+	static function atan2(x :number, x :number) :number;
+	static function ceil(x :number) :number;
+	static function cos(x :number) :number;
+	static function exp(x :number) :number;
+	static function floor(x :number) :number;
+	// FIXME
+	// static function log(x :number) :number;
+	// FIXME: ECMA-262's max() and min() take zero or more arguments
+	static function max(value1 :number, value2 :number) :number;
+	static function min(value1 :number, value2 :number) :number;
+	static function pow(x :number, y :number) :number;
+	static function random() :number;
+	static function round(x :number) :number;
+	static function sin(x :number) :number;
+	static function sqrt(x :number) :number;
+	static function tan(x :number) :number;
+
+}
+
 // 15.9
 native final class Date {
 	// NOTE: these "number"s may be NaN, so it cannot be int.
