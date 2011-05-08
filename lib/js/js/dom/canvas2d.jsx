@@ -2,7 +2,7 @@
 
 // http://www.w3.org/TR/2dcontext/
 
-import "dom.jsx";
+import "js/dom.jsx";
 
 native class CanvasRenderingContext2D implements CanvasRenderingContext
 	/* implements CanvasTransformation, CanvasLineStyles, CanvasPathMethods, CanvasText */ {
@@ -108,7 +108,6 @@ native class CanvasRenderingContext2D implements CanvasRenderingContext
 	function rect(x : number, y : number, radius : number, startAngle : number, endAngle : number) : void;
 }
 
-
 native class TextMetrics {
 	const width : number;
 }
@@ -120,4 +119,11 @@ native class ImageData {
 
 }
 
-// End of CanvasRenderingContext
+native class CanvasPattern {
+	// todo
+}
+
+native class CanvasGradient {
+	// todo
+}
+
