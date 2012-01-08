@@ -441,7 +441,7 @@ native class HTMLCanvasElement extends HTMLElement {
 // http://www.w3.org/TR/Window/
 
 // The Window Interface
-final native class Window {
+final native __fake__ class Window {
 
 	const window :Window;
 	const self :Window;
