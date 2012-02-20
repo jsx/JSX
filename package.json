@@ -1,0 +1,19 @@
+{
+  "name":        "jsx",
+  "version":     "0.0.1",
+  "description": "Better JavaScript alternative",
+  "author": [
+      {
+        "name":  "Fuji, Goro",
+        "email": "fuji.goro@dena.jp"
+      }
+  ],
+  "devDependencies": {
+    "mocha":  "*",
+    "pegjs":  "*",
+    "should": "*"
+  },
+  "engines": {
+    "node": ">= 0.6.0"
+  }
+}
