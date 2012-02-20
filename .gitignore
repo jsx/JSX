@@ -2,4 +2,5 @@
 *.swp
 node_modules/
 blib/
+jsx.js
 
