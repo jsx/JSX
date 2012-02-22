@@ -1,8 +1,12 @@
 {
   "name":        "jsx",
   "version":     "0.0.1",
-  "description": "Better JavaScript alternative",
+  "description": "JSX is Seriously eXciting",
   "author": [
+      {
+        "name":  "Oku, Kazuho",
+        "email": "oku.kazuho@dena.jp"
+      }
       {
         "name":  "Fuji, Goro",
         "email": "fuji.goro@dena.jp"
