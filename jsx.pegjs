@@ -154,12 +154,12 @@ Keyword
       / "void"
       / "while"
       / "with"
+      / "class"
     )
     !IdentifierPart
 
 FutureReservedWord
   = (
-        "class"
       / "const"
       / "enum"
       / "export"
@@ -392,6 +392,7 @@ VarToken        = "var"              !IdentifierPart
 VoidToken       = "void"             !IdentifierPart { return "void"; }
 WhileToken      = "while"            !IdentifierPart
 WithToken       = "with"             !IdentifierPart
+ClassToken      = "class"            !IdentifierPart
 
 /*
  * Unicode Character Categories
@@ -1489,11 +1490,33 @@ FormalParameterList
 FunctionBody
   = elements:SourceElements? { return elements !== "" ? elements : []; }
 
+ClassElement
+  = VariableStatement
+  / FunctionDeclaration
+
+ClassDeclaration
+  = ClassToken __ name:Identifier __
+    "{" tail:(__ ClassElement __)* __ "}" {
+      var elements = [];
+      for (var i = 0; i < tail.length; i++) {
+        elements.push(tail[i][1]);
+      }
+      return {
+        type:     "Class",
+	name:     name,
+	elements: elements
+      };
+    }
+
 Program
-  = elements:SourceElements? {
+  = tail:(__ ClassDeclaration __)* {
+      var elements = [];
+      for (var i = 0; i < tail.length; i++) {
+        elements.push(tail[i][1]);
+      }
       return {
         type:     "Program",
-        elements: elements !== "" ? elements : []
+        elements: elements
       };
     }
 
