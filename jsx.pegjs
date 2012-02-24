@@ -155,6 +155,7 @@ Keyword
       / "while"
       / "with"
       / "class"
+      / "package"
     )
     !IdentifierPart
 
@@ -393,6 +394,7 @@ VoidToken       = "void"             !IdentifierPart { return "void"; }
 WhileToken      = "while"            !IdentifierPart
 WithToken       = "with"             !IdentifierPart
 ClassToken      = "class"            !IdentifierPart
+PackageToken    = "package"          !IdentifierPart
 
 /*
  * Unicode Character Categories
@@ -1490,6 +1492,14 @@ FormalParameterList
 FunctionBody
   = elements:SourceElements? { return elements !== "" ? elements : []; }
 
+PackageStatement
+  = PackageToken __ name:Identifier __ EOS {
+      return {
+        type: "Package",
+        name: name
+      };
+    }
+
 ClassElement
   = VariableStatement
   / FunctionDeclaration
@@ -1509,13 +1519,14 @@ ClassDeclaration
     }
 
 Program
-  = tail:(__ ClassDeclaration __)* {
+  = package:PackageStatement __ tail:(__ ClassDeclaration __)* {
       var elements = [];
       for (var i = 0; i < tail.length; i++) {
         elements.push(tail[i][1]);
       }
       return {
         type:     "Program",
+        package:  package.name,
         elements: elements
       };
     }
