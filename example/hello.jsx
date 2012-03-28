@@ -1,13 +1,8 @@
-// vim: set ft=javascript :
 package com.example.hello;
 
 class Hello {
-    function  main(args) {
-        console.log("Hello, world!");
+    static function main(args : String[]) : Int {
+        log "Hello, world!";
+		return 0;
     }
-    /*
-    public static function  main(args :Array.<String>) :void {
-        console.log("Hello, world!");
-    }
-    */
 }
