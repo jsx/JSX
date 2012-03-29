@@ -2,7 +2,6 @@
 use 5.10.0;
 use strict;
 use warnings;
-use lib::xi;
 use Fatal              qw(chdir);
 use Cwd                qw(getcwd abs_path);
 use File::Basename     qw(dirname);
