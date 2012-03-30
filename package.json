@@ -13,8 +13,8 @@
       }
   ],
   "devDependencies": {
+    "browserbuild": "*",
     "mocha":  "*",
-    "pegjs":  "*",
     "should": "*"
   },
   "engines": {
