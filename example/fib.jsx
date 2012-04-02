@@ -25,4 +25,15 @@ class Fib {
 		}
 		return value;
 	}
+
+	static function fib4(n : Int) : Int {
+		switch (n) {
+		case 1:
+			return 1;
+		case 2:
+			return 1;
+		default:
+			return Fib.fib4(n - 1) + Fib.fib4(n - 2);
+		}
+	}
 }
