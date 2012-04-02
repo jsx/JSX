@@ -1,5 +1,3 @@
-package com.example.fib;
-
 class Fib {
 
 	static function fib1(n : Int) : Int {

@@ -1,5 +1,3 @@
-package com.example.fizzbuzz;
-
 class FizzBuzz {
     static function fizzbuzz() : Int {
         for (var i = 1; i <= 100; ++i) {
