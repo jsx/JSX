@@ -1,6 +1,6 @@
 class Hello {
-    static function main(/* JSX does not yet support array typedefs args : String[] */) : Int {
+    static function main(args : String[]) : int {
         log "Hello, world!";
-		return 0;
+        return 0;
     }
 }
