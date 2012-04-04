@@ -1,9 +1,6 @@
-// vim: set ft=javascript :
-package com.example.hello;
-
 class Hello {
-    var x;
-    static function main(args : String[]) : void {
+    static function main(args : String[]) : int {
         log "Hello, world!";
+        return 0;
     }
 }
