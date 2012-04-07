@@ -134,6 +134,9 @@ test.describe('tokenize numbers', function(t) {
         "0b1010",
         "0B1010",
 
+        "1_2_3",
+        "0xFF_FF_FF",
+
         "0"
         // TODO: list ECMA 262 compatible
     ];
@@ -174,6 +177,70 @@ test.describe('tokenize numbers', function(t) {
                      toBeInstanceOf(Array);
         t.expect(tokens[0] instanceof NumberToken,
                  'not NumberToken').
+                     toBeFalsy();
+    });
+
+    t.done();
+});
+test.describe('tokenize integers', function(t) {
+    var good = [
+        "1",
+        "42",
+        "1234567890",
+        "0xabcdef123",
+        "0XABCDEF123",
+        "0775",
+        "0011",
+        "0b1010",
+        "0B1010",
+
+        "1_2_3",
+        "0xFF_FF_FF",
+
+        "0"
+        // TODO: list ECMA 262 compatible
+    ];
+    var bad = [
+        "3.14",
+        ".012",
+        "0.012",
+        "0.012e8",
+        "0.e8",
+        "1e32",
+        "1E32",
+        "0E0",
+        "0xFFFFFFFF",
+
+        "+"
+    ];
+
+    good.map(function(src) {
+        var lexer = new Lexer(__filename, src);
+        var tokens = lexer.tokenize();
+
+        t.expect(tokens, 'tokanize ' + t.explain(src)).
+            toBeInstanceOf(Array);
+        t.expect(tokens.length).toBe(1);
+        t.expect(tokens[0], 'IntegerToken').
+            toBeInstanceOf(IntegerToken);
+    });
+
+    bad.map(function(src) {
+        var lexer = new Lexer(__filename, src);
+        var tokens;
+
+        try {
+            tokens = lexer.tokenize();
+        }
+        catch(e) {
+            tokens = [];
+        }
+
+        t.expect(tokens,
+                 'tokanize ' + t.explain(src)).
+                     toBeInstanceOf(Array);
+        t.expect(tokens[0] instanceof IntegerToken,
+                 'not IntegerToken').
                      toBeFalsy();
     });
 
