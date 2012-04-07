@@ -1,4 +1,4 @@
-#!psgi
+#!perl
 use 5.10.0;
 use strict;
 use warnings;
@@ -36,12 +36,13 @@ builder {
                 push @files, $_ if $_ =~ /\.js$/;
             },
         }, "$root/../lib";
-        my $cmd = "$build --main Compiler --basepath '$root/../lib/' "
+        my $cmd = "$build --main compiler --basepath '$root/../lib/' "
             . join(' ', map { shell_quote($_) } @files)
-            . " > " . shell_quote("$root/js/compiler.js");
-        #print $cmd, "\n";
+            . " > "
+            . shell_quote("$root/js/compiler.js");
 
-        system $cmd;
+        #print $cmd, "\n";
+        system($cmd) == 0 or die "Failed to build";
 
         return  $js->(@_);;
     };
@@ -68,7 +69,7 @@ __DATA__
         window.addEventListener('load', function(e) {
             var run = document.getElementById('run');
             run.addEventListener('click', function(e) {
-                var c = new Compiler();
+                var c = new compiler();
                 c.addSourceFile('editor');
                 if(c.compile()) {
                     console.log(c);
