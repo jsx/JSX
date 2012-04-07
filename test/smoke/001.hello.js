@@ -1,12 +1,11 @@
 #!/usr/bin/env node
 "use strict";
-// FIXME
-var project_path = __dirname + "/../..";
-module.paths.unshift(project_path + "/lib");
 
 var Test = require("Test");
 
 var Compiler = require("Compiler");
+
+var project_path = __dirname + "/../..";
 
 var test = new Test(__filename);
 
