@@ -1,0 +1,5 @@
+--exec "env NODE_PATH=lib node"
+--timer
+--ext .js
+--jobs 2
+

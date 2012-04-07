@@ -1,5 +1,5 @@
 
 test:
-	prove test/*/*.js
+	prove --recurse test
 
 .PHONY: test
