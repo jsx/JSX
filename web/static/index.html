@@ -31,21 +31,13 @@
 
             input.addEventListener('keyup', function(e) {
                 console.log('compile!');
-                try {
-                    var c = new compiler();
-                    c.addSourceFile('input');
+                output.innerText = '';
+                var c = new compiler();
+                c.addSourceFile('input');
 
-                    if(c.compile()) {
-                        output.innerText = c.getOutput();
-                        console.log(c);
-                    }
-                    else {
-                        output.innerText = '';
-                    }
-                }
-                catch(e) {
-                    output.innerText = e.stack;
-                    console.log(e);
+                if(c.compile()) {
+                    output.innerText = c.getOutput();
+                    console.log(c);
                 }
             });
         });
