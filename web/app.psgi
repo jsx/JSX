@@ -27,7 +27,7 @@ my $example = Plack::App::Directory->new({root => "$root/../example"})->to_app()
 mkdir "$root/js";
 
 my $build = do {
-    local $ENV{PATH} = $ENV{PATH} . ":" . "$root/../node_modules/browserbuild/bin";
+    local $ENV{PATH} = "$root/../node_modules/browserbuild/bin" . ":" . $ENV{PATH};
     which('browserbuild');
 };
 
