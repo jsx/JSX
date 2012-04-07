@@ -12,6 +12,10 @@ For server side tests, just type the following command:
 
     make test
 
+To test a file, you have to set up module paths like:
+
+    NODE_PATH=lib node test/smoke/001.hello.js
+
 WEB INTERFACE
 =======================
 
