@@ -8,7 +8,10 @@
     <script src="js/compiler.js"></script>
     <script type="text/javascript">
         window.addEventListener('load', function(e) {
-            var list = document.getElementById('source-list');
+            var list   = document.getElementById('source-list');
+
+            var input  = document.getElementById('input');
+            var output = document.getElementById('output');
 
             for(var i = 0; i < list.children.length; ++i) {
                 (function(item) {
@@ -19,18 +22,22 @@
                             xhr.open("GET", "example/" + a.innerText, false);
                             xhr.send(null);
 
-                            document.getElementById('input').innerText = xhr.responseText;
+                            input.innerText = xhr.responseText;
+
                             input.dispatchEvent(new Event("keyup"));
                         });
                     }
                 }(list.children[i]));
             }
 
-            var input  = document.getElementById('input');
-            var output = document.getElementById('output');
 
+            var oldInput;
             input.addEventListener('keyup', function(e) {
+                if(oldInput === input.value) return;
+                oldInput = input.value;
+
                 console.log('compile!');
+
                 output.innerText = '';
                 var c = new compiler();
                 c.addSourceFile('input');

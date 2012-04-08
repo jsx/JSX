@@ -14,11 +14,6 @@ use Plack::Builder;
 
 my $root = abs_path(dirname(__FILE__));
 
-my $template = do {
-    open my $fh, '<', "$root/static/index.html";
-    local $/;
-    <$fh>;
-};
 
 my $assets  = Plack::App::Directory->new({root => "$root/assets"})->to_app();
 my $js      = Plack::App::Directory->new({root => "$root/js"})->to_app();
@@ -55,6 +50,12 @@ builder {
     };
 
     mount '/' => sub {
+        my $template = do {
+            open my $fh, '<', "$root/static/index.html";
+            local $/;
+            <$fh>;
+        };
+
         my @examples = map { basename($_) } glob("$root/../example/*.jsx");
 
         my $src_list = join "", map { qq{<li class="source-file"><a href="#$_">$_</a></li>\n} } @examples;
