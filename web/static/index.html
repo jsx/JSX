@@ -13,32 +13,15 @@
             var input  = document.getElementById('input');
             var output = document.getElementById('output');
 
-            for(var i = 0; i < list.children.length; ++i) {
-                (function(item) {
-                    if(item.className === "source-file") {
-                        var a = item.children[0];
-                        a.addEventListener('click', function(event) {
-                            var xhr = new XMLHttpRequest();
-                            xhr.open("GET", "example/" + a.innerText, false);
-                            xhr.send(null);
-
-                            input.innerText = xhr.responseText;
-
-                            input.dispatchEvent(new Event("keyup"));
-                        });
-                    }
-                }(list.children[i]));
-            }
-
-
             var oldInput;
-            input.addEventListener('keyup', function(e) {
+            function compile() {
                 if(oldInput === input.value) return;
                 oldInput = input.value;
 
                 console.log('compile!');
 
                 output.innerText = '';
+
                 var c = new compiler();
                 c.addSourceFile('input');
 
@@ -46,7 +29,38 @@
                     output.innerText = c.getOutput();
                     console.log(c);
                 }
+            }
+
+            function forEach(collection, block) {
+                for(var i = 0; i < collection.length; ++i) {
+                    block(collection[i]);
+                }
+            }
+
+
+            forEach(list.children, function(li) {
+                if(li.className !== "source-file") return;
+
+
+                var a = li.children[0];
+                a.addEventListener('click', function(event) {
+                    var xhr = new XMLHttpRequest();
+                    xhr.open("GET", "example/" + a.innerText, false);
+                    xhr.send(null);
+
+                    input.innerText = xhr.responseText;
+
+                    forEach(list.children, function(li) {
+                        li.className = "";
+                    });
+                    li.className = "active";
+
+                    compile();
+                });
             });
+
+
+            input.addEventListener('keyup', function(e) { compile() });
         });
     </script>
 
