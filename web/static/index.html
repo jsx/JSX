@@ -20,13 +20,13 @@
 
                 console.log('compile!');
 
-                output.innerText = '';
+                output.value = '';
 
                 var c = new compiler();
                 c.addSourceFile('input');
 
                 if(c.compile()) {
-                    output.innerText = c.getOutput();
+                    output.value = c.getOutput();
                     console.log(c);
                 }
             }
@@ -45,17 +45,21 @@
                 var a = li.children[0];
                 a.addEventListener('click', function(event) {
                     var xhr = new XMLHttpRequest();
-                    xhr.open("GET", "example/" + a.innerText, false);
+                    xhr.onreadystatechange = function() {
+                        if(xhr.readyState !== 4)   return;
+                        if(xhr.status     !== 200) return;
+
+                        input.value = xhr.responseText;
+
+                        forEach(list.children, function(li) {
+                            li.className = "";
+                        });
+                        li.className = "active";
+
+                        setTimeout(compile, 0);
+                    };
+                    xhr.open("GET", "example/" + a.innerText);
                     xhr.send(null);
-
-                    input.innerText = xhr.responseText;
-
-                    forEach(list.children, function(li) {
-                        li.className = "";
-                    });
-                    li.className = "active";
-
-                    compile();
                 });
             });
 
