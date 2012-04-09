@@ -37,8 +37,11 @@ test.describe('tokenize identifiers', function(t) {
 
 
 	good.map(function(src) {
-		var lexer = new Lexer(__filename, src);
+		var errors = [];
+		var lexer = new Lexer(__filename, src, errors);
 		var tokens = lexer.tokenize();
+
+		t.expect(JSON.stringify(errors), 'no errors').toBe('[]');
 
 		t.expect(tokens, 'tokanize ' + t.explain(src)).
 			toBeInstanceOf(Array);
@@ -48,15 +51,9 @@ test.describe('tokenize identifiers', function(t) {
 	});
 
 	bad.map(function(src) {
-		var lexer = new Lexer(__filename, src);
-		var tokens;
-
-		try {
-			tokens = lexer.tokenize();
-		}
-		catch(e) {
-			tokens = [];
-		}
+		var errors = [];
+		var lexer = new Lexer(__filename, src, errors);
+		var tokens = lexer.tokenize();
 
 		t.expect(tokens,
 				 'tokanize ' + t.explain(src)).
@@ -82,8 +79,11 @@ test.describe('tokenize keywords', function(t) {
 	];
 
 	good.map(function(src) {
-		var lexer = new Lexer(__filename, src);
+		var errors = [];
+		var lexer = new Lexer(__filename, src, errors);
 		var tokens = lexer.tokenize();
+
+		t.expect(JSON.stringify(errors), 'no errors').toBe('[]');
 
 		t.expect(tokens, 'tokanize ' + t.explain(src)).
 			toBeInstanceOf(Array);
@@ -93,15 +93,9 @@ test.describe('tokenize keywords', function(t) {
 	});
 
 	bad.map(function(src) {
-		var lexer = new Lexer(__filename, src);
-		var tokens;
-
-		try {
-			tokens = lexer.tokenize();
-		}
-		catch(e) {
-			tokens = [];
-		}
+		var errors = [];
+		var lexer = new Lexer(__filename, src, errors);
+		var tokens = lexer.tokenize();
 
 		t.expect(tokens,
 				 'tokanize ' + t.explain(src)).
@@ -129,13 +123,6 @@ test.describe('tokenize numbers', function(t) {
 		"0E0",
 		"0xabcdef123",
 		"0XABCDEF123",
-		"0775",
-		"0011",
-		"0b1010",
-		"0B1010",
-
-		"1_2_3",
-		"0xFF_FF_FF",
 
 		"0"
 		// TODO: list ECMA 262 compatible
@@ -151,8 +138,11 @@ test.describe('tokenize numbers', function(t) {
 	];
 
 	good.map(function(src) {
-		var lexer = new Lexer(__filename, src);
+		var errors = [];
+		var lexer = new Lexer(__filename, src, errors);
 		var tokens = lexer.tokenize();
+
+		t.expect(JSON.stringify(errors), 'no errors').toBe('[]');
 
 		t.expect(tokens, 'tokanize ' + t.explain(src)).
 			toBeInstanceOf(Array);
@@ -162,15 +152,9 @@ test.describe('tokenize numbers', function(t) {
 	});
 
 	bad.map(function(src) {
-		var lexer = new Lexer(__filename, src);
-		var tokens;
-
-		try {
-			tokens = lexer.tokenize();
-		}
-		catch(e) {
-			tokens = [];
-		}
+		var errors = [];
+		var lexer = new Lexer(__filename, src, errors);
+		var tokens = lexer.tokenize();
 
 		t.expect(tokens,
 				 'tokanize ' + t.explain(src)).
@@ -189,13 +173,6 @@ test.describe('tokenize integers', function(t) {
 		"1234567890",
 		"0xabcdef123",
 		"0XABCDEF123",
-		"0775",
-		"0011",
-		"0b1010",
-		"0B1010",
-
-		"1_2_3",
-		"0xFF_FF_FF",
 
 		"0"
 		// TODO: list ECMA 262 compatible
@@ -215,8 +192,11 @@ test.describe('tokenize integers', function(t) {
 	];
 
 	good.map(function(src) {
-		var lexer = new Lexer(__filename, src);
+		var errors = [];
+		var lexer = new Lexer(__filename, src, errors);
 		var tokens = lexer.tokenize();
+
+		t.expect(JSON.stringify(errors), 'no errors').toBe('[]');
 
 		t.expect(tokens, 'tokanize ' + t.explain(src)).
 			toBeInstanceOf(Array);
@@ -226,15 +206,9 @@ test.describe('tokenize integers', function(t) {
 	});
 
 	bad.map(function(src) {
-		var lexer = new Lexer(__filename, src);
-		var tokens;
-
-		try {
-			tokens = lexer.tokenize();
-		}
-		catch(e) {
-			tokens = [];
-		}
+		var errors = [];
+		var lexer = new Lexer(__filename, src, errors);
+		var tokens = lexer.tokenize();
 
 		t.expect(tokens,
 				 'tokanize ' + t.explain(src)).
