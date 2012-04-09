@@ -1,0 +1,86 @@
+#!/usr/bin/env node
+"use strict";
+
+var version = "0.0.1";
+
+var util     = require("util");
+var Compiler = require("../lib/compiler");
+
+var versionMessage = "JSX compiler version " + version;
+var usageMessage   = "Usage: jsx [options] source-file [program-args]";
+
+function main (args) {
+	var compileOnly   = false;
+	var dumpClassdefs = false;
+	var dumpTokens    = false;
+
+	var help = 
+		versionMessage + "\n\n" +
+		usageMessage   + "\n\n" +
+		"--compile-only   compiles a file and output result\n"+
+		"--dump-classdefs compiles a file and output class definitions\n"+
+		"--dump-tokens    compiles a file and output tokens\n"+
+		"--version        displays the version and exit\n"+
+		"--help           displays this help and exit\n"+
+		"";
+
+	while( args.length && args[0].match(/^-/) ) {
+		var o = args.shift();
+
+		switch(o) {
+			case "--compile-only":
+				compileOnly = true;
+				break;
+			case "--dump-classdefs":
+				dumpClassdefs = true;
+				break;
+			case "--dump-tokens":
+				dumpTokens = true;
+				break;
+
+			case "--version":
+				console.log(versionMessage);
+				process.exit(0);
+				break;
+			case "--help":
+				console.log(help);
+				process.exit(0);
+				break;
+			
+			default:
+				console.error("Unknown option: %s", o);
+				break;
+		}
+	}
+
+	if(args.length === 0) {
+		console.error(usageMessage);
+		process.exit(1);
+	}
+
+	var compiler = new Compiler({
+		saveTokens: dumpTokens
+	});
+
+	compiler.addSourceFile(args.shift());
+
+	if(compiler.compile()) {
+		if(compileOnly) {
+			console.log(compiler.getOutput());
+		}
+		if(dumpClassdefs) {
+			console.log(util.inspect(compiler.getClassDefs(), false, 999));
+		}
+		if(dumpTokens) {
+			console.log(util.inspect(compiler.getTokens(), false, 999));
+		}
+	}
+	else {
+		process.exit(1);
+	}
+}
+
+main(process.argv.slice(2));
+
+// vim: set ft=javascript:
+// vim: set noexpandtab:
