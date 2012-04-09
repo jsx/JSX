@@ -46,8 +46,9 @@ test.describe('tokenize identifiers', function(t) {
 		t.expect(tokens, 'tokanize ' + t.explain(src)).
 			toBeInstanceOf(Array);
 		t.expect(tokens.length).toBe(1);
-		t.expect(tokens[0], 'IdentifierToken').
-			toBeInstanceOf(IdentifierToken);
+		t.expect(tokens.length === 1 &&
+				 tokens[0] instanceof IdentifierToken,
+				"single IdentifierToken").toBe(true);
 	});
 
 	bad.map(function(src) {
@@ -58,9 +59,9 @@ test.describe('tokenize identifiers', function(t) {
 		t.expect(tokens,
 				 'tokanize ' + t.explain(src)).
 					 toBeInstanceOf(Array);
-		t.expect(tokens[0] instanceof IdentifierToken,
-				 'not IdentifierToken').
-					 toBeFalsy();
+		t.expect(tokens.length === 1 &&
+				 tokens[0] instanceof IdentifierToken,
+				"not single IdentifierToken").toBe(false);
 	});
 
 	t.done();
@@ -128,9 +129,12 @@ test.describe('tokenize numbers', function(t) {
 		// TODO: list ECMA 262 compatible
 	];
 	var bad = [
-		//"1a2", // TODO?
+		"1a2",
+		"1x2",
 		"foo",
 		"..2",
+		"x2",
+		"!42",
 		//"0xZZ", // TODO?
 		//"088",
 		//"0b1212"
@@ -146,9 +150,8 @@ test.describe('tokenize numbers', function(t) {
 
 		t.expect(tokens, 'tokanize ' + t.explain(src)).
 			toBeInstanceOf(Array);
-		t.expect(tokens.length).toBe(1);
-		t.expect(tokens[0], 'NumberToken').
-			toBeInstanceOf(NumberToken);
+		t.expect(tokens.length === 1 && tokens[0] instanceof NumberToken,
+				"single NumberToken").toBe(true);
 	});
 
 	bad.map(function(src) {
@@ -159,9 +162,8 @@ test.describe('tokenize numbers', function(t) {
 		t.expect(tokens,
 				 'tokanize ' + t.explain(src)).
 					 toBeInstanceOf(Array);
-		t.expect(tokens[0] instanceof NumberToken,
-				 'not NumberToken').
-					 toBeFalsy();
+		t.expect(tokens.length === 1 && tokens[0] instanceof NumberToken,
+				"not single NumberToken").toBe(false);
 	});
 
 	t.done();
