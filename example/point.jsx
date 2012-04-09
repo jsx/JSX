@@ -3,31 +3,31 @@
  *
  * Usage:
  *  var p = new Point(10, 20);
- *  log p.x; // 10
- *  log p.y; // 20
+ *  log p.getX(); // 10
+ *  log p.getY(); // 20
  */
 class Point {
     var _x;
     var _y;
 
-    function initialize(x = 0, y = 0) {
+    function initialize(x, y) {
         this._x = x;
         this._y = y;
     }
 
     // getters
-    function get x() {
+    function getX() {
         return this._x;
     }
-    function get y() {
+    function getY() {
         return this._y;
     }
     
     // setters
-    function set x(value :number) {
+    function setX(value :number) {
         this._x = value;
     }
-    function set y(value :number) {
+    function setY(value :number) {
         this._y = value;
     }
 }
