@@ -7,27 +7,30 @@
  *  log p.getY(); // 20
  */
 class Point {
-    var _x;
-    var _y;
+    var _x : number;
+    var _y : number;
 
-    function initialize(x, y) {
+    function initialize() {
+    }
+
+    function initialize(x:number, y:number) {
         this._x = x;
         this._y = y;
     }
 
     // getters
-    function getX() {
+    function getX():number {
         return this._x;
     }
-    function getY() {
+    function getY():number {
         return this._y;
     }
     
     // setters
-    function setX(value :number) {
+    function setX(value :number):void {
         this._x = value;
     }
-    function setY(value :number) {
+    function setY(value :number):void {
         this._y = value;
     }
 }
