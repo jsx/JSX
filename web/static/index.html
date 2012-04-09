@@ -60,7 +60,7 @@
             });
 
 
-            input.addEventListener('keyup', function(e) { compile() });
+            document.getElementById('run').addEventListener('click', function(e) { compile() });
         });
     </script>
 
@@ -130,6 +130,7 @@
           </div><!--/.well -->
         </div><!--/span-->
         <div class="span9">
+            <div><a class="btn btn-primary btn-large" id="run">run</a></div>
             <div><textarea class="console" id="input">// write source code here</textarea></div>
             <div><textarea class="console" id="output"></textarea></div>
         </div><!--/span-->
