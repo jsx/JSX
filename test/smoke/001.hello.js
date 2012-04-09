@@ -24,10 +24,29 @@ test.describe('new Compiler', function(t) {
     var source = compiler.getOutput();
     t.expect(source, 'output').toBeTruthy();
 
-    var f = new Function(source);
-    t.expect(f).toBeInstanceOf(Function);
+    t.done(source);
+}).next('eval', function(t, source) {
+    var helloMaker = new Function(source + "; return Hello");
+    t.expect(helloMaker, 'new Function').toBeInstanceOf(Function);
 
-    t.done();
+    var hello = helloMaker();
+
+    t.expect(hello, 'Hello').toBeInstanceOf(Function);
+
+    var save = console.log;
+    var capture = "";
+    var ret;
+    console.log = function(s) { capture += s + "\n"; };
+
+    try {
+        ret = hello.main1AS([]);
+    }
+    finally {
+        console.log = save;
+    }
+
+    t.expect(ret, 'retval').toBe(0);
+    t.expect(capture, 'output').toBe("Hello, world!\n");
 });
 
 test.done();
