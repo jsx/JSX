@@ -8,26 +8,36 @@
     <script src="js/compiler.js"></script>
     <script type="text/javascript">
         window.addEventListener('load', function(e) {
-            var list   = document.getElementById('source-list');
+            function element(id) {
+                return document.getElementById(id);
+            }
 
-            var input  = document.getElementById('input');
-            var output = document.getElementById('output');
+            var list   = element('source-list');
 
-            var oldInput;
-            function compile() {
-                if(oldInput === input.value) return;
-                oldInput = input.value;
+            var input  = element('input');
+            var output = element('output');
 
-                console.log('compile!');
+            function compile(options) {
+                console.log('compile with ' + JSON.stringify(options));
 
                 output.value = '';
 
-                var c = new compiler();
+                var c = new compiler({ saveTokens: options.tokens });
                 c.addSourceFile('input');
 
-                if(c.compile()) {
+                var retval = c.compile();
+                console.log(c);
+
+                // TODO: display retval to somewhere
+
+                if(options.compile) {
                     output.value = c.getOutput();
-                    console.log(c);
+                }
+                else if(options.classes) {
+                    output.value = JSON.stringify(c.getClassDefs(), null, 2);
+                }
+                else if(options.tokens) {
+                    output.value = JSON.stringify(c.getTokens(), null, 2);
                 }
             }
 
@@ -37,10 +47,8 @@
                 }
             }
 
-
             forEach(list.children, function(li) {
                 if(li.className !== "source-file") return;
-
 
                 var a = li.children[0];
                 a.addEventListener('click', function(event) {
@@ -56,15 +64,21 @@
                         });
                         li.className = "active";
 
-                        setTimeout(compile, 0);
+                        setTimeout(function() {
+                            compile({ compile: true });
+                        }, 0);
                     };
                     xhr.open("GET", "example/" + a.innerText);
                     xhr.send(null);
                 });
             });
 
-
-            document.getElementById('run').addEventListener('click', function(e) { compile() });
+            element('compile').addEventListener('click',
+                    function(e) { compile({compile: true}) });
+            element('classes').addEventListener('click',
+                    function(e) { compile({classes: true}) });
+            element('tokens').addEventListener('click',
+                    function(e) { compile({tokens: true}) });
         });
     </script>
 
@@ -79,8 +93,8 @@
         padding: 9px 0;
       }
       .console {
-          width:  50em;
-          height: 14em;
+          width:  24em;
+          height: 50em;
       }
 
     </style>
@@ -119,6 +133,12 @@
     </div>
 
     <div class="container-fluid">
+        <div class-"span10">
+          <a class="btn btn-primary btn-large" id="compile" href="#">compile</a>
+          <a class="btn btn-primary btn-large" id="classes" href="#">classes</a>
+          <a class="btn btn-primary btn-large" id="tokens" href="#">tokens</a>
+        </div>
+
       <div class="row-fluid">
         <div class="span3">
           <div class="well sidebar-nav">
@@ -133,10 +153,9 @@
             </ul>
           </div><!--/.well -->
         </div><!--/span-->
-        <div class="span9">
-            <div><a class="btn btn-primary btn-large" id="run">run</a></div>
-            <div><textarea class="console" id="input">// write source code here</textarea></div>
-            <div><textarea class="console" id="output"></textarea></div>
+        <div class="row">
+            <div class="span5"><textarea class="console" id="input">// write source code here</textarea></div>
+            <div class-"span6"><textarea class="console" id="output"></textarea></div>
         </div><!--/span-->
       </div><!--/row-->
 
