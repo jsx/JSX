@@ -7,6 +7,7 @@
 
     <script src="js/compiler.js"></script>
     <script type="text/javascript">
+        "use strict";
         window.addEventListener('load', function(e) {
             function element(id) {
                 return document.getElementById(id);
@@ -22,23 +23,30 @@
 
                 output.value = '';
 
-                var c = new compiler({ saveTokens: options.tokens });
+                var mode;
+                switch(options.mode) {
+                case "compile":
+                    mode = compiler.MODE_COMPILE;
+                    break;
+                case "tokenize":
+                    mode = compiler.MODE_TOKENIZE;
+                    break;
+                case "parse":
+                    mode = compiler.MODE_PARSE;
+                      break;
+                 default:
+                    alert("unknown mode: " + options.mode);
+                    return;
+                }
+
+                var c = new compiler(mode);
                 c.addSourceFile('input');
 
+                // TODO: display retval to somewhere
                 var retval = c.compile();
                 console.log(c);
 
-                // TODO: display retval to somewhere
-
-                if(options.compile) {
-                    output.value = c.getOutput();
-                }
-                else if(options.classes) {
-                    output.value = JSON.stringify(c.getClassDefs(), null, 2);
-                }
-                else if(options.tokens) {
-                    output.value = JSON.stringify(c.getTokens(), null, 2);
-                }
+                output.value = c.getOutput();
             }
 
             function forEach(collection, block) {
@@ -66,7 +74,7 @@
                         li.className = "active";
 
                         setTimeout(function() {
-                            compile({ compile: true });
+                            compile({ mode: "compile" });
                         }, 0);
                     };
                     xhr.open("GET", "example/" + a.innerText);
@@ -92,11 +100,11 @@
             });
 
             element('compile').addEventListener('click',
-                    function(e) { compile({compile: true}) });
-            element('classes').addEventListener('click',
-                    function(e) { compile({classes: true}) });
-            element('tokens').addEventListener('click',
-                    function(e) { compile({tokens: true}) });
+                    function(e) { compile({mode: 'compile'}) });
+            element('parse').addEventListener('click',
+                    function(e) { compile({mode: 'parse'}) });
+            element('tokenize').addEventListener('click',
+                    function(e) { compile({mode: 'tokenize'}) });
         });
     </script>
 
@@ -153,8 +161,8 @@
     <div class="container-fluid">
         <div class-"span10">
           <a class="btn btn-primary btn-large" id="compile" href="#">compile</a>
-          <a class="btn btn-primary btn-large" id="classes" href="#">classes</a>
-          <a class="btn btn-primary btn-large" id="tokens" href="#">tokens</a>
+          <a class="btn btn-primary btn-large" id="parse" href="#">parse</a>
+          <a class="btn btn-primary btn-large" id="tokenize" href="#">tokenize</a>
         </div>
 
       <div class="row-fluid">
