@@ -1,83 +1,102 @@
 #!/usr/bin/env node
+
 "use strict";
 
-var version = "0.0.1";
+var VERSION = "0.0.1";
 
 var util     = require("util");
 var Compiler = require("../lib/compiler");
 
-var versionMessage = "JSX compiler version " + version;
-var usageMessage   = "Usage: jsx [options] source-file [program-args]";
+function printHelp() {
+	console.log(
+		"JSX compiler version " + VERSION + "\n" +
+		"\n" +
+		"Usage: jsx [options] source-files\n" +
+		"\n" +
+		"Options:\n" +
+		"  --mode (compile|tokenize|parse)  compilation mode (default:compile)\n" +
+		"  --version                        displays the version and exits\n" +
+		"  --help                           displays this help and exits\n" +
+		"");
+}
 
-function main (args) {
-	var compileOnly   = false;
-	var dumpClassdefs = false;
-	var dumpTokens    = false;
+function main(args) {
 
-	var help = 
-		versionMessage + "\n\n" +
-		usageMessage   + "\n\n" +
-		"--compile-only   compiles a file and output result\n"+
-		"--dump-classdefs compiles a file and output class definitions\n"+
-		"--dump-tokens    compiles a file and output tokens\n"+
-		"--version        displays the version and exit\n"+
-		"--help           displays this help and exit\n"+
-		"";
+	var argIndex = 0;
+	var getopt = function () {
+		if (args.length <= argIndex)
+			return null;
+		var arg = args[argIndex++];
+		if (arg.match(/^-/))
+			return arg;
+		else if (arg == "--")
+			return null;
+		else {
+			--argIndex;
+			return null;
+		}
+	};
+	var getoptarg = function () {
+		if (args.length <= argIndex) {
+			console.error("option " + args[argIndex - 1] + " requires a value");
+			return null;
+		}
+		return args[argIndex++];
+	};
 
-	while( args.length && args[0].match(/^-/) ) {
-		var o = args.shift();
+	var mode = Compiler.MODE_COMPILE;
 
-		switch(o) {
-			case "--compile-only":
-				compileOnly = true;
+	var opt, optarg;
+	while ((opt = getopt()) != null) {
+		switch (opt) {
+		case "--mode":
+			if ((optarg = getoptarg()) == null)
+				process.exit(1);
+			switch (optarg) {
+			case "compile":
+				mode = Compiler.MODE_COMPILE;
 				break;
-			case "--dump-classdefs":
-				dumpClassdefs = true;
+			case "tokenize":
+				mode = Compiler.MODE_TOKENIZE;
 				break;
-			case "--dump-tokens":
-				dumpTokens = true;
+			case "parse":
+				mode = Compiler.MODE_PARSE;
 				break;
-
-			case "--version":
-				console.log(versionMessage);
-				process.exit(0);
-				break;
-			case "--help":
-				console.log(help);
-				process.exit(0);
-				break;
-			
 			default:
-				console.error("Unknown option: %s", o);
+				console.error("unknown mode: " + optarg);
+				process.exit(1);
 				break;
+			}
+			break;
+		case "--version":
+			console.log(VERSION);
+			process.exit(0);
+			break;
+		case "--help":
+			printHelp();
+			process.exit(0);
+			break;
+		default:
+			console.error("unknown option: " + opt);
+			process.exit(1);
+			break;
 		}
 	}
 
-	if(args.length === 0) {
-		console.error(usageMessage);
+	if (argIndex == args.length) {
+		console.error("no files");
 		process.exit(1);
 	}
 
-	var compiler = new Compiler({
-		saveTokens: dumpTokens
-	});
+	var compiler = new Compiler(mode);
 
-	compiler.addSourceFile(args.shift());
+	for (; argIndex < args.length; ++argIndex)
+		compiler.addSourceFile(args[argIndex]);
 
-	if(compiler.compile()) {
-		if(compileOnly) {
-			console.log(compiler.getOutput());
-		}
-		if(dumpClassdefs) {
-			console.log(util.inspect(compiler.getClassDefs(), false, 999));
-		}
-		if(dumpTokens) {
-			console.log(util.inspect(compiler.getTokens(), false, 999));
-		}
-	}
-	else {
+	if (! compiler.compile())
 		process.exit(1);
-	}
+
+	console.log(compiler.getOutput());
 }
 
 main(process.argv.slice(2));
