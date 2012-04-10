@@ -1,5 +1,5 @@
 
 test:
-	prove --recurse test
+	prove --recurse
 
 .PHONY: test
