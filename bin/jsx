@@ -5,6 +5,7 @@ var VERSION = "0.0.1";
 
 var Class = require("../lib/Class");
 eval(Class.$import("../lib/compiler"));
+eval(Class.$import("../lib/jsemitter"));
 
 "use strict";
 
@@ -18,6 +19,7 @@ var JSX = Class.extend({
 			"\n" +
 			"Options:\n" +
 			"  --mode (compile|tokenize|parse)  compilation mode (default:compile)\n" +
+			"  --target (javascript|c++)        target language (default:javascript)\n" +
 			"  --version                        displays the version and exits\n" +
 			"  --help                           displays this help and exits\n" +
 			"");
@@ -47,7 +49,7 @@ var JSX = Class.extend({
 			return args[argIndex++];
 		};
 
-		var mode = Compiler.MODE_COMPILE;
+		var compiler = new Compiler();
 
 		var opt, optarg;
 		while ((opt = getopt()) != null) {
@@ -57,18 +59,33 @@ var JSX = Class.extend({
 					process.exit(1);
 				switch (optarg) {
 				case "compile":
-					mode = Compiler.MODE_COMPILE;
+					compiler.setMode(Compiler.MODE_COMPILE);
 					break;
 				case "tokenize":
-					mode = Compiler.MODE_TOKENIZE;
+					compiler.setMode(Compiler.MODE_TOKENIZE);
 					break;
 				case "parse":
-					mode = Compiler.MODE_PARSE;
+					compiler.setMode(Compiler.MODE_PARSE);
 					break;
 				default:
 					console.error("unknown mode: " + optarg);
 					process.exit(1);
 					break;
+				}
+				break;
+			case "--target":
+				if ((optarg = getoptarg()) == null)
+					process.exit(1);
+				switch (optarg) {
+				case "javascript":
+					compiler.setEmitter(new JavaScriptEmitter());
+					break;
+				case "c++":
+					throw new Error("FIXME");
+					break;
+				default:
+					console.log("unknown target: " + optarg);
+					process.exit(1);
 				}
 				break;
 			case "--version":
@@ -90,8 +107,6 @@ var JSX = Class.extend({
 			console.error("no files");
 			process.exit(1);
 		}
-
-		var compiler = new Compiler(mode);
 
 		for (; argIndex < args.length; ++argIndex)
 			compiler.addSourceFile(args[argIndex]);
