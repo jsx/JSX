@@ -111,9 +111,6 @@ test.describe('tokenize keywords', function(t) {
 
 test.describe('tokenize numbers', function(t) {
 	var good = [
-		"1",
-		"42",
-		"1234567890",
 		"3.14",
 		".012",
 		"0.012",
@@ -123,9 +120,7 @@ test.describe('tokenize numbers', function(t) {
 		"1E32",
 		"0E0",
 		"0xabcdef123",
-		"0XABCDEF123",
-
-		"0"
+		"0XABCDEF123"
 		// TODO: list ECMA 262 compatible
 	];
 	var bad = [
@@ -173,8 +168,8 @@ test.describe('tokenize integers', function(t) {
 		"1",
 		"42",
 		"1234567890",
-		"0xabcdef123",
-		"0XABCDEF123",
+		"0xabcdef1",
+		"0XABCDEF1",
 
 		"0"
 		// TODO: list ECMA 262 compatible
