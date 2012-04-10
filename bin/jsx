@@ -1,105 +1,110 @@
 #!/usr/bin/env node
 
-"use strict";
 
 var VERSION = "0.0.1";
 
-var util     = require("util");
-var Compiler = require("../lib/compiler");
+var Class = require("../lib/Class");
+eval(Class.$import("../lib/compiler"));
 
-function printHelp() {
-	console.log(
-		"JSX compiler version " + VERSION + "\n" +
-		"\n" +
-		"Usage: jsx [options] source-files\n" +
-		"\n" +
-		"Options:\n" +
-		"  --mode (compile|tokenize|parse)  compilation mode (default:compile)\n" +
-		"  --version                        displays the version and exits\n" +
-		"  --help                           displays this help and exits\n" +
-		"");
-}
+"use strict";
 
-function main(args) {
+var JSX = Class.extend({
 
-	var argIndex = 0;
-	var getopt = function () {
-		if (args.length <= argIndex)
-			return null;
-		var arg = args[argIndex++];
-		if (arg.match(/^-/))
-			return arg;
-		else if (arg == "--")
-			return null;
-		else {
-			--argIndex;
-			return null;
-		}
-	};
-	var getoptarg = function () {
-		if (args.length <= argIndex) {
-			console.error("option " + args[argIndex - 1] + " requires a value");
-			return null;
-		}
-		return args[argIndex++];
-	};
+	$printHelp: function () {
+		console.log(
+			"JSX compiler version " + VERSION + "\n" +
+			"\n" +
+			"Usage: jsx [options] source-files\n" +
+			"\n" +
+			"Options:\n" +
+			"  --mode (compile|tokenize|parse)  compilation mode (default:compile)\n" +
+			"  --version                        displays the version and exits\n" +
+			"  --help                           displays this help and exits\n" +
+			"");
+	},
 
-	var mode = Compiler.MODE_COMPILE;
+	$main: function (args) {
 
-	var opt, optarg;
-	while ((opt = getopt()) != null) {
-		switch (opt) {
-		case "--mode":
-			if ((optarg = getoptarg()) == null)
-				process.exit(1);
-			switch (optarg) {
-			case "compile":
-				mode = Compiler.MODE_COMPILE;
+		var argIndex = 0;
+		var getopt = function () {
+			if (args.length <= argIndex)
+				return null;
+			var arg = args[argIndex++];
+			if (arg.match(/^-/))
+				return arg;
+			else if (arg == "--")
+				return null;
+			else {
+				--argIndex;
+				return null;
+			}
+		};
+		var getoptarg = function () {
+			if (args.length <= argIndex) {
+				console.error("option " + args[argIndex - 1] + " requires a value");
+				return null;
+			}
+			return args[argIndex++];
+		};
+
+		var mode = Compiler.MODE_COMPILE;
+
+		var opt, optarg;
+		while ((opt = getopt()) != null) {
+			switch (opt) {
+			case "--mode":
+				if ((optarg = getoptarg()) == null)
+					process.exit(1);
+				switch (optarg) {
+				case "compile":
+					mode = Compiler.MODE_COMPILE;
+					break;
+				case "tokenize":
+					mode = Compiler.MODE_TOKENIZE;
+					break;
+				case "parse":
+					mode = Compiler.MODE_PARSE;
+					break;
+				default:
+					console.error("unknown mode: " + optarg);
+					process.exit(1);
+					break;
+				}
 				break;
-			case "tokenize":
-				mode = Compiler.MODE_TOKENIZE;
+			case "--version":
+				console.log(VERSION);
+				process.exit(0);
 				break;
-			case "parse":
-				mode = Compiler.MODE_PARSE;
+			case "--help":
+				JSX.printHelp();
+				process.exit(0);
 				break;
 			default:
-				console.error("unknown mode: " + optarg);
+				console.error("unknown option: " + opt);
 				process.exit(1);
 				break;
 			}
-			break;
-		case "--version":
-			console.log(VERSION);
-			process.exit(0);
-			break;
-		case "--help":
-			printHelp();
-			process.exit(0);
-			break;
-		default:
-			console.error("unknown option: " + opt);
-			process.exit(1);
-			break;
 		}
+
+		if (argIndex == args.length) {
+			console.error("no files");
+			process.exit(1);
+		}
+
+		var compiler = new Compiler(mode);
+
+		for (; argIndex < args.length; ++argIndex)
+			compiler.addSourceFile(args[argIndex]);
+
+		if (! compiler.compile())
+			process.exit(1);
+
+		console.log(compiler.getOutput());
 	}
 
-	if (argIndex == args.length) {
-		console.error("no files");
-		process.exit(1);
-	}
+});
 
-	var compiler = new Compiler(mode);
-
-	for (; argIndex < args.length; ++argIndex)
-		compiler.addSourceFile(args[argIndex]);
-
-	if (! compiler.compile())
-		process.exit(1);
-
-	console.log(compiler.getOutput());
-}
-
-main(process.argv.slice(2));
+JSX.main(process.argv.slice(2));
 
 // vim: set ft=javascript:
 // vim: set noexpandtab:
