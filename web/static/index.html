@@ -26,20 +26,20 @@
                 var mode;
                 switch(options.mode) {
                 case "compile":
-                    mode = compiler.MODE_COMPILE;
+                    mode = compiler.Compiler.MODE_COMPILE;
                     break;
                 case "tokenize":
-                    mode = compiler.MODE_TOKENIZE;
+                    mode = compiler.Compiler.MODE_TOKENIZE;
                     break;
                 case "parse":
-                    mode = compiler.MODE_PARSE;
+                    mode = compiler.Compiler.MODE_PARSE;
                       break;
                  default:
                     alert("unknown mode: " + options.mode);
                     return;
                 }
 
-                var c = new compiler(mode);
+                var c = new compiler.Compiler(mode);
                 c.addSourceFile('input');
 
                 // TODO: display retval to somewhere
