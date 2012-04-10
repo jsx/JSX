@@ -47,6 +47,7 @@
                 }
             }
 
+            // set up example souce files
             forEach(list.children, function(li) {
                 if(li.className !== "source-file") return;
 
@@ -71,6 +72,23 @@
                     xhr.open("GET", "example/" + a.innerText);
                     xhr.send(null);
                 });
+            });
+
+            // hack to input TAB by the tab key
+            input.addEventListener('keydown', function(event) {
+                var TAB = "\t"
+                if(event.keyCode === TAB.charCodeAt(0)) {
+                    event.stopPropagation();
+                    event.preventDefault();
+                    var s = input.selectionStart;
+                    var c = input.value;
+
+                    input.value = c.substring(0, s) +
+                                  TAB +
+                                  c.substring(s, c.length);
+                    var pos = s + TAB.length;
+                    input.setSelectionRange(pos, pos);
+                }
             });
 
             element('compile').addEventListener('click',
