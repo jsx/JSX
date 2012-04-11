@@ -1,5 +1,5 @@
 
 test:
-	prove --recurse --timer
+	prove --timer
 
 .PHONY: test

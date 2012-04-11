@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 
-var Class = require("../../lib/Class");
-var Test  = require("../../lib/Test");
+var Class = require("../lib/Class");
+var Test  = require("../lib/Test");
 
-eval(Class.$import("../../lib/lexer"));
-eval(Class.$import("../../lib/token"));
+eval(Class.$import("../lib/lexer"));
+eval(Class.$import("../lib/token"));
 
 "use strict";
 
