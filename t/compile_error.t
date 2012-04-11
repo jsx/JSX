@@ -5,7 +5,9 @@ use warnings;
 use File::Temp qw(tempdir);
 use Test::More;
 
-my @files = grep { $_ !~ /\.skip\.jsx$/ } <t/compile_error/*.jsx>;
+my @files = @ARGV;
+@files = grep { $_ !~ /\.skip\.jsx$/ } <t/compile_error/*.jsx>
+    unless @files;
 
 plan tests => scalar @files;
 
