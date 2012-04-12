@@ -18,10 +18,10 @@ var JSX = Class.extend({
 			"Usage: jsx [options] source-files\n" +
 			"\n" +
 			"Options:\n" +
-			"  --mode (compile|tokenize|parse)  compilation mode (default:compile)\n" +
-			"  --target (javascript|c++)        target language (default:javascript)\n" +
-			"  --version                        displays the version and exits\n" +
-			"  --help                           displays this help and exits\n" +
+			"  --mode (compile|parse)     compilation mode (default:compile)\n" +
+			"  --target (javascript|c++)  target language (default:javascript)\n" +
+			"  --version                  displays the version and exits\n" +
+			"  --help                     displays this help and exits\n" +
 			"");
 	},
 
@@ -60,9 +60,6 @@ var JSX = Class.extend({
 				switch (optarg) {
 				case "compile":
 					compiler.setMode(Compiler.MODE_COMPILE);
-					break;
-				case "tokenize":
-					compiler.setMode(Compiler.MODE_TOKENIZE);
 					break;
 				case "parse":
 					compiler.setMode(Compiler.MODE_PARSE);
