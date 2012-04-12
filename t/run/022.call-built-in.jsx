@@ -3,6 +3,8 @@ hello
 5
 a
 abc
+10
+a
 */
 class Test {
 	static function run() : void {
@@ -13,5 +15,8 @@ class Test {
 		var s = "abc";
 		log s.toString();
 
+		var i = 10;
+		log i.toString(); // overloaded
+		log i.toString(16);
 	}
 }
