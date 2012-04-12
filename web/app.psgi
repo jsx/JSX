@@ -24,7 +24,7 @@ mkdir "$root/js";
 my $build = do {
     local $ENV{PATH} = "$root/../node_modules/browserbuild/bin" . ":" . $ENV{PATH};
     which('browserbuild');
-};
+} or die "Cannot find browserbuild. Please install it with `npm install`\n";
 
 builder {
     mount '/assets'  => $assets; # static css and js
