@@ -1,4 +1,4 @@
-native class String {
+native final class String {
 
 	// 15.5.2
 	function initialize();

@@ -1,4 +1,4 @@
-native class Number {
+native final class Number {
 
 	// 15.7.2
 	function initialize();

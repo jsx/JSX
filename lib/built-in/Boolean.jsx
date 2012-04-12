@@ -1,4 +1,4 @@
-native class Boolean {
+native final class Boolean {
 
 	// 15.6.2
 	function initialize();
