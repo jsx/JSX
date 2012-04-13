@@ -11,7 +11,7 @@ eval(Class.$import("../lib/jsemitter"));
 
 "use strict";
 
-var NodePlatform = Compiler.Platform.extend({
+var NodePlatform = Platform.extend({
 	load: function(filename) {
 		return fs.readFileSync(filename).toString();
 	},
