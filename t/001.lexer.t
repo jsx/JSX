@@ -12,13 +12,19 @@ var TT = _TokenTable;
 function lexerTest(t, rx, good, bad) {
     t.note("matched");
     var i;
+    var matched;
     for(i = 0; i < good.length; ++i) {
-        t.expect(rx.test(good[i]), JSON.stringify(good[i])).toBe(true);
+        matched = good[i].match(rx);
+        t.expect(matched, JSON.stringify(good[i])).toBeInstanceOf(Object);
+        if(matched) {
+            t.expect(matched[0]).toBe(good[i]);
+        }
     }
 
     t.note("not matched");
     for(i = 0; i < bad.length; ++i) {
-        t.expect(rx.test(bad[i]), JSON.stringify(bad[i])).toBe(false);
+        matched = bad[i].match(rx);
+        t.expect(matched, JSON.stringify(bad[i])).toBe(null);
     }
 }
 
@@ -29,6 +35,7 @@ function main() {
     var rxIdent          = TT.rxIdent;
     var rxIntegerLiteral = TT.rxIntegerLiteral;
     var rxNumberLiteral  = TT.rxNumberLiteral;
+    var rxStringLiteral  = TT.rxStringLiteral;
     var rxRegExpLiteral  = TT.rxRegExpLiteral;
     var rxSpace          = TT.rxSpace;
 
@@ -128,6 +135,58 @@ function main() {
         lexerTest(t, rxIntegerLiteral, good, bad);
         t.done();
     });
+
+
+    test.describe("tokenize strings", function(t) {
+        var good = [
+            '"foo"',
+            '"foo bar"',
+            '"foo\\"bar"',
+            '"foo\\n"',
+            '""',
+            "'foo'",
+            "'foo bar'",
+            "'foo\\'bar'",
+            "'foo\\n'",
+            "''"
+        ];
+
+        var bad = [
+            '"',
+            "'",
+            ''
+        ];
+
+        lexerTest(t, rxStringLiteral, good, bad);
+        t.done();
+    });
+
+    test.describe("tokenize regular expressions", function(t) {
+        var good = [
+            '/foo/',
+            '/foo\\/bar/',
+            '/[a-zA-Z]/',
+            '/foo/i',
+            '/foo/m',
+            '/foo/g',
+            '/foo/img',
+            '/foo/igm',
+            '/foo/mgi',
+            '/foo/mgi',
+            '/foo/gim',
+            '/foo/gmi',
+            '/./'
+        ];
+
+        var bad = [
+            "/",
+            " "
+        ];
+
+        lexerTest(t, rxRegExpLiteral, good, bad);
+        t.done();
+    });
+
 
     test.done();
 }
