@@ -16,12 +16,13 @@ mkdir "$root/js";
 my $assets  = Plack::App::Directory->new({root => "$root/assets"})->to_app();
 my $js      = Plack::App::Directory->new({root => "$root/js"})->to_app();
 my $example = Plack::App::Directory->new({root => "$root/../example"})->to_app();
-
+my $lib     = Plack::App::Directory->new({root => "$root/../lib"})->to_app();
 
 my $build = "$root/build.pl";
 
 builder {
     mount '/assets'  => $assets; # static css and js
+    mount '/lib'     => $lib;
     mount '/example' => $example;
     mount '/js'      => sub {
         my($env) = @_;
