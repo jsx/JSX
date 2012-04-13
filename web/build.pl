@@ -50,8 +50,6 @@ HEADER
     }, "$root/lib";
 
     foreach my $file(@files) {
-        print STDOUT "$file\n";
-
         open my $jsx, "<", $file;
 
         my $basename = basename($file);
@@ -86,6 +84,7 @@ FOOTER
 
 sub buildCompilerJS {
     my($root, $build, $target) = @_;
+    say "build $target";
     my @files;
     find {
         no_chdir => 1,

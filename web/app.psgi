@@ -26,7 +26,7 @@ builder {
     mount '/js'      => sub {
         my($env) = @_;
 
-        my @cmd = ($build, "$root/..", "$root/js/compiler.js");
+        my @cmd = ($build, "$root/..", "$root/js/jsx-web.js");
         system(@cmd) == 0 or die "Failed to build: @cmd";
 
         return  $js->(@_);;
