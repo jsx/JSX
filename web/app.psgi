@@ -11,12 +11,12 @@ use Plack::Builder;
 
 my $root = abs_path(dirname(__FILE__));
 
+mkdir "$root/js";
 
 my $assets  = Plack::App::Directory->new({root => "$root/assets"})->to_app();
 my $js      = Plack::App::Directory->new({root => "$root/js"})->to_app();
 my $example = Plack::App::Directory->new({root => "$root/../example"})->to_app();
 
-mkdir "$root/js";
 
 my $build = "$root/build.pl";
 
