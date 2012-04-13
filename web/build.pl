@@ -92,7 +92,7 @@ sub buildCompilerJS {
             push @files, $_ if $_ =~ /\.js$/;
         },
     }, "$root/lib";
-    my $cmd = "$build --main compiler --basepath '$root/lib/' "
+    my $cmd = "$build --main compiler --global jsx --basepath '$root/lib/' "
         . join(' ', map { shell_quote($_) } @files)
         . " > "
         . shell_quote($target);

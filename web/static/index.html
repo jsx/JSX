@@ -8,10 +8,24 @@
     <script src="js/jsx-web.js"></script>
     <script type="text/javascript">
         "use strict";
+
         window.addEventListener('load', function(e) {
             function element(id) {
                 return document.getElementById(id);
             }
+
+            var errors = [];
+            var BrowserPlatform = jsx.Platform.extend({
+                load: function (name) {
+                    return element(name).value;
+                },
+
+                error: function (s) {
+                    console.error(s);
+                    errors.push(s);
+                }
+            });
+            var platform = new BrowserPlatform();
 
             var list   = element('source-list');
 
@@ -23,13 +37,13 @@
 
                 output.value = '';
 
-                var c = new compiler.Compiler();
+                var c = new jsx.Compiler(platform);
                 switch(options.mode) {
                 case "compile":
-                    c.setMode(compiler.Compiler.MODE_COMPILE);
+                    c.setMode(jsx.Compiler.MODE_COMPILE);
                     break;
                 case "parse":
-                    c.setMode(compiler.Compiler.MODE_PARSE);
+                    c.setMode(jsx.Compiler.MODE_PARSE);
                       break;
                  default:
                     alert("unknown mode: " + options.mode);
@@ -38,11 +52,17 @@
 
                 c.addSourceFile('input');
 
-                // TODO: display retval to somewhere
-                var retval = c.compile();
+                var success = c.compile();
                 console.log(c);
 
-                output.value = c.getOutput();
+                if (success) {
+                    output.style.color = "black";
+                    output.value = c.getOutput();
+                }
+                else if(errors.length !== 0){
+                    output.style.color = "red";
+                    output.value = "ERROR!\n\n" + errors.join("\n");
+                }
             }
 
             function forEach(collection, block) {

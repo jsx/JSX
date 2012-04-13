@@ -3,11 +3,19 @@
 
 var VERSION = "0.0.1";
 
+var fs = require("fs");
+
 var Class = require("../lib/Class");
 eval(Class.$import("../lib/compiler"));
 eval(Class.$import("../lib/jsemitter"));
 
 "use strict";
+
+var NodePlatform = Compiler.Platform.extend({
+	load: function(filename) {
+		return fs.readFileSync(filename).toString();
+	},
+});
 
 var JSX = Class.extend({
 
@@ -26,6 +34,8 @@ var JSX = Class.extend({
 	},
 
 	$main: function (args) {
+
+		var platform = new NodePlatform();
 
 		var argIndex = 0;
 		var getopt = function () {
@@ -49,7 +59,7 @@ var JSX = Class.extend({
 			return args[argIndex++];
 		};
 
-		var compiler = new Compiler();
+		var compiler = new Compiler(platform);
 
 		var opt, optarg;
 		while ((opt = getopt()) != null) {
