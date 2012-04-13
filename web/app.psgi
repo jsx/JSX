@@ -6,9 +6,6 @@ use lib::xi "-lextlib";
 use Fatal              qw(chdir open);
 use Cwd                qw(getcwd abs_path);
 use File::Basename     qw(basename dirname);
-use File::Find         qw(find);
-use File::Which        qw(which);
-use String::ShellQuote qw(shell_quote);
 use Plack::App::Directory;
 use Plack::Builder;
 
@@ -21,10 +18,7 @@ my $example = Plack::App::Directory->new({root => "$root/../example"})->to_app()
 
 mkdir "$root/js";
 
-my $build = do {
-    local $ENV{PATH} = "$root/../node_modules/browserbuild/bin" . ":" . $ENV{PATH};
-    which('browserbuild');
-} or die "Cannot find browserbuild. Please install it with `npm install`\n";
+my $build = "$root/build.pl";
 
 builder {
     mount '/assets'  => $assets; # static css and js
@@ -32,19 +26,8 @@ builder {
     mount '/js'      => sub {
         my($env) = @_;
 
-        my @files;
-        find {
-            no_chdir => 1,
-            wanted   => sub {
-                push @files, $_ if $_ =~ /\.js$/;
-            },
-        }, "$root/../lib";
-        my $cmd = "$build --main compiler --basepath '$root/../lib/' "
-            . join(' ', map { shell_quote($_) } @files)
-            . " > "
-            . shell_quote("$root/js/compiler.js");
-
-        system($cmd) == 0 or die "Failed to build: $cmd";
+        my @cmd = ($build, "$root/..", "$root/js/compiler.js");
+        system(@cmd) == 0 or die "Failed to build: @cmd";
 
         return  $js->(@_);;
     };
