@@ -1,8 +1,11 @@
+// This script is deverable
+
 "use strict";
 window.addEventListener('load', function(e) {
 	function element(id) {
 		return document.getElementById(id);
 	}
+
 
 	var errors = [];
 	var BrowserPlatform = jsx.Platform.extend({
@@ -31,8 +34,15 @@ window.addEventListener('load', function(e) {
 	var input  = element('input');
 	var output = element('output');
 
+	var saved = sessionStorage.getItem("source");
+	if(saved != null) {
+		input.value = saved;
+	}
+
 	function compile(options) {
 		console.log('compile with ' + JSON.stringify(options));
+
+		sessionStorage.setItem("source", input.value);
 
 		output.value = '';
 
