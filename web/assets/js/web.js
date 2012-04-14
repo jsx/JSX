@@ -90,6 +90,7 @@ window.addEventListener('load', function(e) {
 		else if(errors.length !== 0){
 			output.style.color = "red";
 			output.value = "ERROR!\n\n" + errors.join("\n");
+			errors.length = 0;
 		}
 	}
 
