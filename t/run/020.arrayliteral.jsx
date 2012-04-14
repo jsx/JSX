@@ -5,6 +5,7 @@
 a
 b
 true
+true
 */
 class Test {
 	static function run() : void {
@@ -16,5 +17,6 @@ class Test {
 		log b[0];
 		log b[1];
 		log b[2] == null;
+		log b[3] == undefined;
 	}
 }
