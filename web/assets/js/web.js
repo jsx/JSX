@@ -34,15 +34,34 @@ window.addEventListener('load', function(e) {
 	var input  = element('input');
 	var output = element('output');
 
-	var saved = sessionStorage.getItem("source");
-	if(saved != null) {
-		input.value = saved;
+	function saveInput(input) {
+			var s = input.selectionStart;
+		var session = {
+			source:         input.value,
+			selectionStart: input.selectionStart,
+			selectionEnd:   input.selectionEnd
+		};
+
+		sessionStorage.setItem("jsx.session", JSON.stringify(session));
+	}
+
+	function retrieveInput(input) {
+		var serializedSession = sessionStorage.getItem("jsx.session");
+		if(serializedSession) {
+			var session = JSON.parse(serializedSession);
+
+			input.value = session.source;
+			input.setSelectionRange(session.selectionStart,
+									session.selectionEnd);
+
+			compile({ mode: 'compile' });
+		}
 	}
 
 	function compile(options) {
 		console.log('compile with ' + JSON.stringify(options));
 
-		sessionStorage.setItem("source", input.value);
+		saveInput(input);
 
 		output.value = '';
 
@@ -124,8 +143,26 @@ window.addEventListener('load', function(e) {
 		}
 	});
 
+	window.addEventListener('keyup', function(event) {
+		if(event.ctrlKey) {
+			var COMPILE_KEY = "C".charCodeAt(0);
+			var PARSE_KEY   = "P".charCodeAt(0);;
+
+			if(event.keyCode === COMPILE_KEY) {
+				compile({ mode: 'compile' });
+			}
+			else if(event.keyCode === PARSE_KEY) {
+				compile({ mode: 'parse' });
+			}
+		}
+	});
+
 	element('compile').addEventListener('click',
 			function(e) { compile({mode: 'compile'}) });
 	element('parse').addEventListener('click',
 			function(e) { compile({mode: 'parse'}) });
+
+	retrieveInput(input);
+
+	input.focus();
 });
