@@ -127,20 +127,27 @@ window.addEventListener('load', function(e) {
 		});
 	});
 
+	function inputStr(event, input, str) {
+		event.stopPropagation();
+		event.preventDefault();
+
+		var s = input.selectionStart;
+		var c = input.value;
+
+		input.value = c.substring(0, s) +
+					  str +
+					  c.substring(s, c.length);
+		s += str.length;
+		input.setSelectionRange(s, s);
+	}
+
 	// hack to input TAB by the tab key
 	input.addEventListener('keydown', function(event) {
-		var TAB = "\t"
-		if(event.keyCode === TAB.charCodeAt(0)) {
-			event.stopPropagation();
-			event.preventDefault();
-			var s = input.selectionStart;
-			var c = input.value;
-
-			input.value = c.substring(0, s) +
-						  TAB +
-						  c.substring(s, c.length);
-			var pos = s + TAB.length;
-			input.setSelectionRange(pos, pos);
+		if(event.keyCode === "\t".charCodeAt(0)) {
+			inputStr(event, input, "\t");
+		}
+		else if(event.keyIdentifier === "U+00A5" /* yen mark */) {
+			inputStr(event, input, "\u005C" /* backslash */);
 		}
 	});
 
