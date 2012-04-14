@@ -1,3 +1,4 @@
+// ECMA 262 3rd
 // 15.9
 native final class Date {
 	// NOTE: those "number"s may be NaN, so it canot be integers.
@@ -25,19 +26,33 @@ native final class Date {
 	function initialize();
 
 	// 15.9.4
-	static function parse(value :Date) :Date;
+	static function parse(value :String) :number;
 
-	//static function UTC(year, month [, dat [, hours [, minutes [, seconds [, ms ]]]]]);
+	static function UTC(year :number, month :number) :Date;
+	static function UTC(year :number, month :number, date :number) :Date;
+	static function UTC(year :number, month :number, date :number,
+						hours :number) :Date;
+	static function UTC(year :number, month :number, date :number,
+						hours :number,  minutes :number) :Date;
+	static function UTC(year :number, month :number, date :number,
+						hours :number,  minutes :number, seconds: number)
+						:Date;
+	static function UTC(year :number, month :number, date :number,
+						hours :number,  minutes :number, seconds: number,
+						ms :number) :Date;
+
 
 	static function now() :number;
 
 	// 15.9.5
+	// NOTE: to*String is implementation-dependent
 	function toString() :String;
 	function toDateString() :String;
 	function toTimeString() :String;
-	function toLocaleStrng() :String;
-	function toLocaleDateStrng() :String;
-	function toLocaleTimeStrng() :String;
+	function toLocaleString() :String;
+	function toLocaleDateString() :String;
+	function toLocaleTimeString() :String;
+
 	function valueOf() :number;
 
 	function getTime() :number;
@@ -74,7 +89,7 @@ native final class Date {
 	function setFullYear(year :number) :number;
 	function setUTCFullYear(year :number) :number;
 
-	// 15.9.5.42-
+	// 15.9.5.42- added in ECMA-262 5th
 	function toUTCString() :String;
 	function toISOString() :String;
 	function toJSON() :String;
