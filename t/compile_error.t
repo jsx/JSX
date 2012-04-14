@@ -2,7 +2,6 @@
 
 use strict;
 use warnings;
-use File::Temp qw(tempdir);
 use Test::More;
 
 my @files = @ARGV;
@@ -12,5 +11,7 @@ my @files = @ARGV;
 plan tests => scalar @files;
 
 for my $file (@files) {
-    ok system("bin/jsx $file > /dev/null 2>&1") != 0, $file;
+    my $err = `bin/jsx $file 2>&1`;
+    isnt $?, 0, $file;
+    note $err;
 }
