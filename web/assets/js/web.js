@@ -61,8 +61,6 @@ window.addEventListener('load', function(e) {
 	function compile(options) {
 		console.log('compile with ' + JSON.stringify(options));
 
-		saveInput(input);
-
 		output.value = '';
 
 		var c = new jsx.Compiler(platform);
@@ -85,7 +83,7 @@ window.addEventListener('load', function(e) {
 
 		if (success) {
 			output.style.color = "black";
-			output.value = c.getOutput();
+			output.value = c.getOutput().replace(/\t/g, "  ");
 		}
 		else if(errors.length !== 0){
 			output.style.color = "red";
@@ -111,7 +109,7 @@ window.addEventListener('load', function(e) {
 				if(xhr.readyState !== 4)   return;
 				if(xhr.status     !== 200) return;
 
-				input.value = xhr.responseText;
+				input.value = xhr.responseText.replace(/\t/g, "  ");
 
 				forEach(list.children, function(li) {
 					li.className = "";
@@ -141,10 +139,17 @@ window.addEventListener('load', function(e) {
 		input.setSelectionRange(s, s);
 	}
 
-	// hack to input TAB by the tab key
+	// hack to input 2 spaces by the tab key
 	input.addEventListener('keydown', function(event) {
 		if(event.keyCode === "\t".charCodeAt(0)) {
-			inputStr(event, input, "\t");
+			inputStr(event, input, "  ");
+		}
+		else if(event.keyCode === "\r".charCodeAt(0)) {
+			// auto indent
+			var s = input.value.substring(0, input.selectionStart);
+			var lastLine = s.split(/^/m).pop();
+			var indent = lastLine.match(/^[ \t]*/)[0];
+			inputStr(event, input, "\n" + indent);
 		}
 		else if(event.keyIdentifier === "U+00A5" /* yen mark */) {
 			inputStr(event, input, "\u005C" /* backslash */);
@@ -163,6 +168,10 @@ window.addEventListener('load', function(e) {
 				compile({ mode: 'parse' });
 			}
 		}
+	});
+
+	window.addEventListener('unload', function(e) {
+		saveInput(input);
 	});
 
 	element('compile').addEventListener('click',
