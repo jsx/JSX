@@ -12,8 +12,8 @@ undefinedundefined
 */
 class Test {
 	static function run() : void {
-		var a : MayBeUndefined<number> = 3;
-		var b : MayBeUndefined<number> = undefined;
+		var a : MayBeUndefined.<number> = 3;
+		var b : MayBeUndefined.<number> = undefined;
 		log a;
 		log a + b;
 		a = undefined;
@@ -21,8 +21,8 @@ class Test {
 		log a + b;
 		log b + a;
 
-		var c : MayBeUndefined<String> = "abc";
-		var d : MayBeUndefined<String> = undefined;
+		var c : MayBeUndefined.<String> = "abc";
+		var d : MayBeUndefined.<String> = undefined;
 		log c;
 		log c + d;
 		c = undefined;
