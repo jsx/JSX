@@ -3,6 +3,11 @@ use 5.10.0;
 use strict;
 use warnings;
 
+use File::Basename qw(dirname);
+use Cwd qw(abs_path);
+use constant ROOT => abs_path(dirname(__FILE__));
+use lib ROOT . "/extlib/lib/perl5";
+
 use SelectSaver;
 use Fatal              qw(open close);
 use File::Find         qw(find);
@@ -62,7 +67,7 @@ HEADER
         my @lines = <$jsx>;
         for(my $i = 0; $i < @lines; ++$i) {
             my $line = $lines[$i];
-            $line =~ s/["']/\\$1/g;
+            $line =~ s/(["'])/\\$1/g;
             $line =~ s/\r/\\r/g;
             $line =~ s/\n/\\n/g;
 

@@ -2,14 +2,17 @@
 use 5.10.0;
 use strict;
 use warnings;
-use lib::xi "-lextlib";
-use Fatal              qw(chdir open);
-use Cwd                qw(getcwd abs_path);
-use File::Basename     qw(basename dirname);
+use Fatal          qw(chdir open);
+use Cwd            qw(getcwd abs_path);
+use File::Basename qw(basename dirname);
+use constant ROOT => abs_path(dirname(__FILE__));
+use lib ROOT . "/extlib/lib/perl5";
+
 use Plack::App::Directory;
 use Plack::Builder;
+use Plack::Runner;
 
-my $root = abs_path(dirname(__FILE__));
+my $root = ROOT;
 
 mkdir "$root/js";
 
@@ -20,7 +23,7 @@ my $lib     = Plack::App::Directory->new({root => "$root/../lib"})->to_app();
 
 my $build = "$root/build.pl";
 
-builder {
+my $app = builder {
     mount '/assets'  => $assets; # static css and js
     mount '/lib'     => $lib;
     mount '/example' => $example;
@@ -57,3 +60,10 @@ builder {
     };
 };
 
+# bootstrap myself
+if(!caller) {
+    Plack::Runner->new()->run($app);
+}
+else {
+    return $app;
+}
