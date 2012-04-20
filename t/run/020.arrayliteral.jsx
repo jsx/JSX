@@ -6,6 +6,12 @@ a
 b
 true
 true
+3
+1
+4
+3
+1
+4
 */
 class Test {
 	static function run() : void {
@@ -18,5 +24,13 @@ class Test {
 		log b[1];
 		log b[2] == null;
 		log b[3] == undefined;
+		var c = [ 3, 1, 4 ] : number[];
+		log c[0];
+		log c[1];
+		log c[2];
+		var d = [ 3, 1, 4 ] : Array.<number>;
+		log d[0];
+		log d[1];
+		log d[2];
 	}
 }
