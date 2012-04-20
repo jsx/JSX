@@ -9,8 +9,14 @@ undefined
 1
 5
 undefined
+0,1,2,3,4,5,6,7
+7,6,5,4,3,2,1,0
 */
 class Test {
+	static function reverse_cmp(x : MayBeUndefined.<number>, y : MayBeUndefined.<number>) : int {
+		return y - x;
+	}
+
 	static function run() : void {
 		log [ 3, 1, 4 ].toString();
 		log [ 1 ].concat([ 2, 3 ]).toString();
@@ -23,5 +29,7 @@ class Test {
 		log a.push(5);
 		log a.shift();
 		log a.shift();
+		log [ 0, 2, 4, 8, 7, 5, 3, 1 ].sort().join();
+		log [ 0, 2, 4, 8, 7, 5, 3, 1 ].sort(Test.reverse_cmp).join();
 	}
 }
