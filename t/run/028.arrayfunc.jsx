@@ -29,7 +29,7 @@ class Test {
 		log a.push(5);
 		log a.shift();
 		log a.shift();
-		log [ 0, 2, 4, 8, 7, 5, 3, 1 ].sort().join();
-		log [ 0, 2, 4, 8, 7, 5, 3, 1 ].sort(Test.reverse_cmp).join();
+		log [ 0, 2, 4, 6, 7, 5, 3, 1 ].sort().join();
+		log [ 0, 2, 4, 6, 7, 5, 3, 1 ].sort(Test.reverse_cmp).join();
 	}
 }
