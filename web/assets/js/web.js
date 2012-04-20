@@ -6,6 +6,51 @@ window.addEventListener('load', function(e) {
 		return document.getElementById(id);
 	}
 
+	function getOptimizationLevel() {
+		var items = document.getElementsByName("optimization-level");
+		for(var i = 0; i < items.length; ++i) {
+			if(items[i].checked) {
+				return items[i].value | 0;
+			}
+		}
+		return 0;
+	}
+
+	function applyClosureCompiler(sourceText, level, cb) {
+		var URL = 'http://closure-compiler.appspot.com/compile';
+		var xhr = new XMLHttpRequest();
+		xhr.open("POST", URL);
+		xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+		
+		xhr.addEventListener("load", function (e) {
+			if (e.target.status === 200) {
+				var out = e.target.responseText;
+				if (!out.match(/[^\r\n\t ]/)) {
+					out = "// Closure Compiler has removed everything";
+				}
+				cb(null, out);
+			}
+			else {
+				cb(e);
+			}
+		});
+		xhr.addEventListener("error", cb);
+
+		var param = {
+			js_code: sourceText,
+			formatting: "pretty_print",
+			compilation_level: level,
+			output_format: "text",
+			output_info: "compiled_code"
+		};
+		var params = [];
+		for(var key in param) {
+			params.push(encodeURIComponent(key) +
+						"=" +
+						encodeURIComponent(param[key]));
+		}
+		xhr.send(params.join("&"));
+	}
 
 	var errors = [];
 	var BrowserPlatform = jsx.Platform.extend({
@@ -39,9 +84,9 @@ window.addEventListener('load', function(e) {
 		var session = {
 			source:         input.value,
 			selectionStart: input.selectionStart,
-			selectionEnd:   input.selectionEnd
+			selectionEnd:   input.selectionEnd,
+			optimizationLevel: getOptimizationLevel()
 		};
-
 		sessionStorage.setItem("jsx.session", JSON.stringify(session));
 	}
 
@@ -53,6 +98,16 @@ window.addEventListener('load', function(e) {
 			input.value = session.source;
 			input.setSelectionRange(session.selectionStart,
 									session.selectionEnd);
+
+			var items = document.getElementsByName("optimization-level");
+			for(var i = 0; i < items.length; ++i) {
+				if(items[i].value === String(session.optimizationLevel)) {
+					items[i].checked = true;
+				}
+				else {
+					items[i].checked = false;
+				}
+			}
 
 			compile({ mode: 'compile' });
 		}
@@ -83,11 +138,32 @@ window.addEventListener('load', function(e) {
 
 		if (success) {
 			output.style.color = "black";
-			output.value = c.getOutput().replace(/\t/g, "  ");
+
+			var out = c.getOutput().replace(/\t/g, "  ");
+
+			var level = getOptimizationLevel();
+			if(level === 0 || options.mode !== "compile") {
+				output.value = out;
+			}
+			else {
+				applyClosureCompiler(out,
+									 level === 1
+										 ? "SIMPLE_OPTIMIZATIONS"
+										 : "ADVANCED_OPTIMIZATIONS",
+									 function (err, src) {
+					if(err) {
+						console.err(err);
+						output.value = err.toString();
+					}
+					else {
+						output.value = src.replace(/\t/g, "  ");
+					}
+				});
+			}
 		}
 		else if(errors.length !== 0){
 			output.style.color = "red";
-			output.value = "ERROR!\n\n" + errors.join("\n");
+			output.value = "ERROR!\n" + errors.join("");
 			errors.length = 0;
 		}
 	}
@@ -105,10 +181,7 @@ window.addEventListener('load', function(e) {
 		var a = li.children[0];
 		a.addEventListener('click', function(event) {
 			var xhr = new XMLHttpRequest();
-			xhr.onreadystatechange = function() {
-				if(xhr.readyState !== 4)   return;
-				if(xhr.status     !== 200) return;
-
+			xhr.addEventListener("load", function(e) {
 				input.value = xhr.responseText.replace(/\t/g, "  ");
 
 				forEach(list.children, function(li) {
@@ -119,7 +192,7 @@ window.addEventListener('load', function(e) {
 				setTimeout(function() {
 					compile({ mode: "compile" });
 				}, 0);
-			};
+			});
 			xhr.open("GET", "example/" + a.innerHTML);
 			xhr.send(null);
 		});
