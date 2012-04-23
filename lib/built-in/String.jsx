@@ -21,7 +21,7 @@ native final class String {
 	// FIXME function match(regexp : RegExp) : String [];
 	function replace(searchValue : String, replaceValue : String) : String;
 	// FIXME function replace(searchValue : String, replaceValue : function) : String;
-	// FIXME function replace(searchValue : RegExp, replaceValue : String) : String;
+	function replace(searchValue : RegExp, replaceValue : String) : String;
 	// FIXME function replace(searchValue : RegExp, replaceValue : function) : String;
 	function search(searchValue : String) : int;
 	// FIXME function search(searchValue : RegExp) : int;
