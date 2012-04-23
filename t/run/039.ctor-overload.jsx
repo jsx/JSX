@@ -1,0 +1,24 @@
+/*EXPECTED
+0,0
+1,2
+*/
+class Point {
+	var _x = 0;
+	var _y = 0;
+	function initialize() {
+	}
+	function initialize(x : number, y : number) {
+		this._x = x;
+		this._y = y;
+	}
+	function say() : void {
+		log this._x.toString() + "," + this._y.toString();
+	}
+}
+
+class Test {
+	static function run() : void {
+		new Point().say();
+		new Point(1, 2).say();
+	}
+}
