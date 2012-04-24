@@ -86,6 +86,8 @@ function main() {
             "1e32",
             "1E32",
             "0E0",
+            "NaN",
+            "Infinity",
             "0.0"
         ];
         var bad = [
@@ -97,6 +99,8 @@ function main() {
             "x2",
             "!42",
             "+",
+            "nan",
+            "infinity",
             " "
         ];
 

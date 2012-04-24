@@ -7,10 +7,11 @@ native final class Number {
 	// 15.7.3
 	static var MAX_VALUE : number;
 	static var MIN_VALUE : number;
-	static var NaN : number;
-	static var NEGATIVE_INFINITY : number;
-	static var POSITIVE_INFINITY : number;
-	
+
+	// NOTE: NaN, POSITIVE_INFINITY and NEGATIVE_INFINITY are
+	//       not provided. Use NaN, +Infinity, and -Infinity literals
+	//       instead.
+
 	// 15.7.4
 	function toString() : string;
 	function toString(radix : int) : string;
