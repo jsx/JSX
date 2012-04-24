@@ -4,8 +4,6 @@
 4
 a
 b
-true
-true
 3
 1
 4
@@ -19,11 +17,9 @@ class Test {
 		log a[0];
 		log a[1];
 		log a[2];
-		var b = [ "a", "b", null ];
+		var b = [ "a", "b" ];
 		log b[0];
 		log b[1];
-		log b[2] == null;
-		log b[3] == undefined;
 		var c = [ 3, 1, 4 ] : number[];
 		log c[0];
 		log c[1];

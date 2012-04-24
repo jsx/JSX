@@ -1,16 +1,12 @@
 /*EXPECTED
 A
 default
-null
 */
 class Test {
-	static function f(s : String) : void {
+	static function f(s : string) : void {
 		switch (s) {
 		case "a":
 			log "A";
-			break;
-		case null:
-			log "null";
 			break;
 		default:
 			log "default";
@@ -20,6 +16,5 @@ class Test {
 	static function run() : void {
 		Test.f("a");
 		Test.f("b");
-		Test.f(null);
 	}
 }

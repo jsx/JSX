@@ -21,8 +21,8 @@ class Test {
 		log a + b;
 		log b + a;
 
-		var c : MayBeUndefined.<String> = "abc";
-		var d : MayBeUndefined.<String> = undefined;
+		var c : MayBeUndefined.<string> = "abc";
+		var d : MayBeUndefined.<string> = undefined;
 		log c;
 		log c + d;
 		c = undefined;

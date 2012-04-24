@@ -5,7 +5,7 @@ native final class Boolean {
 	function initialize(value : boolean);
 
 	// 15.6.4
-	function toString() : String;
+	function toString() : string;
 	function valueOf() : boolean;
 }
 

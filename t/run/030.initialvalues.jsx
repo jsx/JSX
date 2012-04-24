@@ -2,6 +2,7 @@
 false
 0
 0
+
 null
 null
 null
@@ -15,8 +16,10 @@ class Test {
 		log i;
 		var n : number;
 		log n;
-		var s : String;
+		var s : string;
 		log s;
+		var S : String;
+		log S;
 		var a : int[];
 		log a;
 		var o : Test;

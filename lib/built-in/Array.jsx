@@ -1,11 +1,11 @@
 native final class Array.<T> {
 
 	// 15.4.4
-	function toString() : String;
-	function toLocaleString() : String;
+	function toString() : string;
+	function toLocaleString() : string;
 	function concat(a : Array.<T>) : Array.<T>; // FIXME more arguments
-	function join() : String;
-	function join(separator : String) : String;
+	function join() : string;
+	function join(separator : string) : string;
 	function pop() : MayBeUndefined.<T>;
 	function push(item : T) : int; // FIXME more arguments
 	function reverse() : Array.<T>;

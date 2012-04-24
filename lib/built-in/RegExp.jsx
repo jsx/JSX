@@ -1,18 +1,18 @@
 // 15.10 RegExp
 native final class RegExp {
 
-	function initialize(pattern :String, flags :String);
-	function initialize(pattern :String);
+	function initialize(pattern :string, flags :string);
+	function initialize(pattern :string);
 
-	// FIXME: the matched object is a variation of String[],
+	// FIXME: the matched object is a variation of string[],
 	//        but has "index", "input" and "lastIndex" properties
-	function exec(str :String) :String[];
+	function exec(str :string) :string[];
 
-	function test(str :String) :boolean;
+	function test(str :string) :boolean;
 
-	function toString() :String;
+	function toString() :string;
 
-	const var source :String;
+	const var source :string;
 	const var global :boolean;
 	const var ignoreCase :boolean;
 	const var multiline :boolean;

@@ -89,12 +89,12 @@ class Test {
 		log 'UTC6: ' + ((Date.UTC(year, month, date, hour, min, sec)).valueOf()).toString();
 		log 'UTC7: ' + ((Date.UTC(year, month, date, hour, min, sec, ms)).valueOf()).toString();
 
-		log "toString: " + (d.toString() != null).toString();
-		log "toDateString: " + (d.toDateString() != null).toString();
-		log "toTimeString: " + (d.toTimeString() != null).toString();
-		log "toLocaleString: " + (d.toLocaleString() != null).toString();
-		log "toLocaleDateString: " + (d.toLocaleDateString() != null).toString();
-		log "toLocaleTimeString: " + (d.toLocaleTimeString() != null).toString();
+		log "toString: " + (d.toString().length != 0).toString();
+		log "toDateString: " + (d.toDateString().length != 0).toString();
+		log "toTimeString: " + (d.toTimeString().length != 0).toString();
+		log "toLocaleString: " + (d.toLocaleString().length != 0).toString();
+		log "toLocaleDateString: " + (d.toLocaleDateString().length != 0).toString();
+		log "toLocaleTimeString: " + (d.toLocaleTimeString().length != 0).toString();
 
 		log "getTime: " + (d.getTime() == d.valueOf()).toString();
 

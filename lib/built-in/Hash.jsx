@@ -1,7 +1,7 @@
 native final class Hash.<T> {
 
 	// 15.2.4
-	function hasOwnProperty(key : String) : boolean;
+	function hasOwnProperty(key : string) : boolean;
 
 }
 

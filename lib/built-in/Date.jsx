@@ -18,7 +18,7 @@ native final class Date {
 						hours :number, minutes :number, seconds :number,
 						ms :number);
 
-	function initialize(value :String);
+	function initialize(value :string);
 	function initialize(value :number);
 	// not defined in ECMA-262, but JS's new Date(new Date) works
 	function initialize(value :Date);
@@ -26,7 +26,7 @@ native final class Date {
 	function initialize();
 
 	// 15.9.4
-	static function parse(value :String) :number;
+	static function parse(value :string) :number;
 
 	static function UTC(year :number, month :number) :Date;
 	static function UTC(year :number, month :number, date :number) :Date;
@@ -46,12 +46,12 @@ native final class Date {
 
 	// 15.9.5
 	// NOTE: to*String is implementation-dependent
-	function toString() :String;
-	function toDateString() :String;
-	function toTimeString() :String;
-	function toLocaleString() :String;
-	function toLocaleDateString() :String;
-	function toLocaleTimeString() :String;
+	function toString() :string;
+	function toDateString() :string;
+	function toTimeString() :string;
+	function toLocaleString() :string;
+	function toLocaleDateString() :string;
+	function toLocaleTimeString() :string;
 
 	function valueOf() :number;
 
@@ -90,10 +90,10 @@ native final class Date {
 	function setUTCFullYear(year :number) :number;
 
 	// 15.9.5.42- added in ECMA-262 5th
-	function toUTCString() :String;
-	function toISOString() :String;
-	function toJSON() :String;
-	function toJSON(key :String) :String; // key is given but ignored
+	function toUTCString() :string;
+	function toISOString() :string;
+	function toJSON() :string;
+	function toJSON(key :string) :string; // key is given but ignored
 }
 
 // vim: set noexpandtab:

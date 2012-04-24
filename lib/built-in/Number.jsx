@@ -12,13 +12,13 @@ native final class Number {
 	static var POSITIVE_INFINITY : number;
 	
 	// 15.7.4
-	function toString() : String;
-	function toString(radix : int) : String;
-	function toLocaleString() : String;
+	function toString() : string;
+	function toString(radix : int) : string;
+	function toLocaleString() : string;
 	function valueOf() : number;
-	function toFixed(fractionDigits : int) : String;
-	function toExpotential(fractionDigits : int) : String;
-	function toPrecision(precision : int) : String;
+	function toFixed(fractionDigits : int) : string;
+	function toExpotential(fractionDigits : int) : string;
+	function toPrecision(precision : int) : string;
 }
 
 // vim: set noexpandtab:

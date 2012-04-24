@@ -46,9 +46,9 @@ class Test {
 		log "1.5" as number;
 		log "aaa" as number;
 		log "";
-		log (false as String).split("").join(",");
-		log (true as String).split("").join(",");
-		log (1.5 as String).split("").join(",");
-		log ("abc" as String).split("").join(",");
+		log (false as string).split("").join(",");
+		log (true as string).split("").join(",");
+		log (1.5 as string).split("").join(",");
+		log ("abc" as string).split("").join(",");
 	}
 }
