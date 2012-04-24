@@ -85,7 +85,7 @@ var JSX = Class.extend({
 					process.exit(1);
 				switch (optarg) {
 				case "javascript":
-					compiler.setEmitter(new JavaScriptEmitter());
+					// it's the only interface, so skip for now
 					break;
 				case "c++":
 					throw new Error("FIXME");
