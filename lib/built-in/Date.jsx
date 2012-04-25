@@ -46,7 +46,7 @@ native final class Date {
 
 	// 15.9.5
 	// NOTE: to*String is implementation-dependent
-	function toString() :string;
+	override function toString() :string;
 	function toDateString() :string;
 	function toTimeString() :string;
 	function toLocaleString() :string;

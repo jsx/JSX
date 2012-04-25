@@ -9,7 +9,7 @@ native final class String {
 	static function fromCharCode(char0 : int) : string; // FIXME support vararg
 
 	// 15.5.4
-	function toString() : string;
+	override function toString() : string;
 	function valueOf() : string;
 	function charAt(pos : int) : string;
 	function charCodeAt(pos : int) : int;

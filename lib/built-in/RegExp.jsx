@@ -10,7 +10,7 @@ native final class RegExp {
 
 	function test(str :string) :boolean;
 
-	function toString() :string;
+	override function toString() :string;
 
 	const var source :string;
 	const var global :boolean;

@@ -13,7 +13,7 @@ native final class Number {
 	//       instead.
 
 	// 15.7.4
-	function toString() : string;
+	override function toString() : string;
 	function toString(radix : int) : string;
 	function toLocaleString() : string;
 	function valueOf() : number;

@@ -1,7 +1,7 @@
 native final class Array.<T> {
 
 	// 15.4.4
-	function toString() : string;
+	override function toString() : string;
 	function toLocaleString() : string;
 	function concat(a : Array.<T>) : Array.<T>; // FIXME more arguments
 	function join() : string;
