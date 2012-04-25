@@ -120,6 +120,7 @@ window.addEventListener('load', function(e) {
 
 		var c = new jsx.Compiler(platform);
 		switch(options.mode) {
+		case "run":
 		case "compile":
 			c.setMode(jsx.Compiler.MODE_COMPILE);
 			break;
@@ -160,6 +161,11 @@ window.addEventListener('load', function(e) {
 					}
 				});
 			}
+			if(options.mode === "run") {
+				console.log("run:");
+				var f = new Function(output.value + "Test.run0()");
+				f();
+			}
 		}
 		else if(errors.length !== 0){
 			output.style.color = "red";
@@ -180,6 +186,9 @@ window.addEventListener('load', function(e) {
 
 		var a = li.children[0];
 		a.addEventListener('click', function(event) {
+			event.preventDefault();
+
+			var url = a.href;
 			var xhr = new XMLHttpRequest();
 			xhr.addEventListener("load", function(e) {
 				input.value = xhr.responseText.replace(/\t/g, "  ");
@@ -193,7 +202,7 @@ window.addEventListener('load', function(e) {
 					compile({ mode: "compile" });
 				}, 0);
 			});
-			xhr.open("GET", "example/" + a.innerHTML);
+			xhr.open("GET", url);
 			xhr.send(null);
 		});
 	});
@@ -231,10 +240,14 @@ window.addEventListener('load', function(e) {
 
 	window.addEventListener('keyup', function(event) {
 		if(event.ctrlKey) {
+			var RUN_KEY     = "R".charCodeAt(0);
 			var COMPILE_KEY = "C".charCodeAt(0);
 			var PARSE_KEY   = "P".charCodeAt(0);;
 
-			if(event.keyCode === COMPILE_KEY) {
+			if(event.keyCode === RUN_KEY) {
+				compile({ mode: 'run' });
+			}
+			else if(event.keyCode === COMPILE_KEY) {
 				compile({ mode: 'compile' });
 			}
 			else if(event.keyCode === PARSE_KEY) {
@@ -247,6 +260,8 @@ window.addEventListener('load', function(e) {
 		saveInput(input);
 	});
 
+	element('run').addEventListener('click',
+			function(e) { compile({mode: 'run'}) });
 	element('compile').addEventListener('click',
 			function(e) { compile({mode: 'compile'}) });
 	element('parse').addEventListener('click',

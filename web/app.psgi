@@ -18,15 +18,23 @@ mkdir "$root/js";
 
 my $assets  = Plack::App::Directory->new({root => "$root/assets"})->to_app();
 my $js      = Plack::App::Directory->new({root => "$root/js"})->to_app();
-my $example = Plack::App::Directory->new({root => "$root/../example"})->to_app();
+my $src     = Plack::App::Directory->new({root => "$root/.."})->to_app();
 my $lib     = Plack::App::Directory->new({root => "$root/../lib"})->to_app();
 
 my $build = "$root/build.pl";
 
+sub make_list {
+    my($prefix) = @_;
+    return join "",
+        qq{<li class="nav-header">$prefix</li>\n},
+        map { qq{<li class="source-file"><a href="src/$prefix/$_">$_</a></li>\n} }
+        map { basename($_) } glob("$root/../$prefix/*.jsx");
+}
+
 my $app = builder {
     mount '/assets'  => $assets; # static css and js
     mount '/lib'     => $lib;
-    mount '/example' => $example;
+    mount '/src'     => $src;
     mount '/js'      => sub {
         my($env) = @_;
 
@@ -43,11 +51,11 @@ my $app = builder {
             <$fh>;
         };
 
-        my @examples = map { basename($_) } glob("$root/../example/*.jsx");
+        # listing tests
+        my $run = make_list("t/run");
+        my $err = make_list("t/compile_error");
 
-        my $src_list = join "", map { qq{<li class="source-file"><a href="#$_">$_</a></li>\n} } @examples;
-
-        (my $main = $template) =~ s{<!-- \s* source-list \s* -->(.*)<!-- \s* /source-list \s* -->}{$src_list}xmsg;
+        (my $main = $template) =~ s{<!-- \s* source-list \s* -->(.*)<!-- \s* /source-list \s* -->}{$run$err}xmsg;
 
         return [
             200,
