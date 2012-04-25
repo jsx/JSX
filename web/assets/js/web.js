@@ -2,6 +2,9 @@
 
 "use strict";
 window.addEventListener('load', function(e) {
+	require.paths.unshift("lib");
+	var jsx = require("compiler");
+
 	function element(id) {
 		return document.getElementById(id);
 	}

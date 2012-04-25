@@ -13,7 +13,6 @@
       }
   ],
   "devDependencies": {
-    "browserbuild": "*"
   },
   "engines": {
     "node": ">= 0.6.0"
