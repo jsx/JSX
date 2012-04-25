@@ -16,25 +16,12 @@ window.addEventListener('load', function(e) {
 		return 0;
 	}
 
-	function applyClosureCompiler(sourceText, level, cb) {
+	function applyClosureCompiler(sourceText, level) {
 		var URL = 'http://closure-compiler.appspot.com/compile';
 		var xhr = new XMLHttpRequest();
-		xhr.open("POST", URL);
-		xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-		
-		xhr.addEventListener("load", function (e) {
-			if (e.target.status === 200) {
-				var out = e.target.responseText;
-				if (!out.match(/[^\r\n\t ]/)) {
-					out = "// Closure Compiler has removed everything";
-				}
-				cb(null, out);
-			}
-			else {
-				cb(e);
-			}
-		});
-		xhr.addEventListener("error", cb);
+		xhr.open("POST", URL, false);
+		xhr.setRequestHeader("Content-Type",
+							 "application/x-www-form-urlencoded");
 
 		var param = {
 			js_code: sourceText,
@@ -50,6 +37,7 @@ window.addEventListener('load', function(e) {
 						encodeURIComponent(param[key]));
 		}
 		xhr.send(params.join("&"));
+		return xhr.responseText;
 	}
 
 	var errors = [];
@@ -142,28 +130,22 @@ window.addEventListener('load', function(e) {
 
 			var out = c.getOutput().replace(/\t/g, "  ");
 
+			if(options.mode !== 'parse') {
+				out += "Test.run0();\n";
+			}
+
 			var level = getOptimizationLevel();
-			if(level === 0 || options.mode !== "compile") {
-				output.value = out;
-			}
-			else {
-				applyClosureCompiler(out,
-									 level === 1
+			if(level > 0 && options.mode !== 'parse') {
+				out = applyClosureCompiler(out, level === 1
 										 ? "SIMPLE_OPTIMIZATIONS"
-										 : "ADVANCED_OPTIMIZATIONS",
-									 function (err, src) {
-					if(err) {
-						console.err(err);
-						output.value = err.toString();
-					}
-					else {
-						output.value = src.replace(/\t/g, "  ");
-					}
-				});
+										 : "ADVANCED_OPTIMIZATIONS");
 			}
-			if(options.mode === "run") {
-				console.log("run:");
-				var f = new Function(output.value + "Test.run0()");
+
+			output.value = out;
+
+			if(options.mode === 'run') {
+				console.log('run:');
+				var f = new Function(output.value);
 				f();
 			}
 		}
