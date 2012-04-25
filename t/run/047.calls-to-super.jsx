@@ -10,6 +10,9 @@ class Point {
 		this._x = x;
 		this._y = y;
 	}
+	override function toString() : string {
+		return this._x.toString() + "," + this._y.toString();
+	}
 }
 
 class Pixel extends Point {
@@ -22,17 +25,16 @@ class Pixel extends Point {
 		Point(x, y); // call-by-name
 		this._color = "black";
 	}
-	function say() : void {
-		// FIXME call super.say()
-		log this._x.toString() + "," + this._y.toString() + "," + this._color;
+	override function toString() : string {
+		return super.toString() + "," + this._color;
 	}
 }
 
 class Test {
 	static function run() : void {
 		var p = new Pixel(1, 2, "red");
-		p.say();
+		log p.toString();
 		p = new Pixel(3, 4);
-		p.say();
+		log p.toString();
 	}
 }
