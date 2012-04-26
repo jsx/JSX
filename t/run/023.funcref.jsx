@@ -19,9 +19,9 @@ class Test {
 		f();
 		f = Test.bar;
 		f();
-		var g : static function () : void = Test.foo;
+		var g : function () : void = Test.foo;
 		g();
-		var h : static function (:int):void = Test.bar;
+		var h : function (:int):void = Test.bar;
 		h(0);
 	}
 }

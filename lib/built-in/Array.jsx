@@ -13,7 +13,7 @@ native final class Array.<T> {
 	function slice(start : int) : Array.<T>;
 	function slice(start : int, end : int) : Array.<T>;
 	function sort() : Array.<T>;
-	function sort(comparefn : static function (x : MayBeUndefined.<T>, y : MayBeUndefined.<T>) : int) : Array.<T>;
+	function sort(comparefn : function (x : MayBeUndefined.<T>, y : MayBeUndefined.<T>) : int) : Array.<T>;
 	function splice(start : int, deleteCount : int) : Array.<T>; // FIXME more arguments
 	function unshift(item : T) : int; // FIXME more arguments
 

@@ -4,7 +4,7 @@
 */
 
 class Test {
-	static function lambda(x : number) : static function (: number) : number {
+	static function lambda(x : number) : function (: number) : number {
 		return function (y : number) : number {
 			return x + y;
 		};

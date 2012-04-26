@@ -6,7 +6,7 @@
 
 class Test {
 	var n = 0;
-	function adder() : static function (: number) : void {
+	function adder() : function (: number) : void {
 		return function (x : number) : void {
 			this.n += x;
 		};
