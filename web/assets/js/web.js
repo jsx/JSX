@@ -1,10 +1,8 @@
-// This script is deverable
+// JSX front-end for browsers
 
-"use strict";
 window.addEventListener('load', function(e) {
-	require.paths.unshift("lib");
-	var jsx = require("compiler");
-
+	"use strict";
+	
 	function element(id) {
 		return document.getElementById(id);
 	}
