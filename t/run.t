@@ -27,7 +27,7 @@ sub run {
     {
         open my $fh, ">>", "$tempdir/compiled.js"
             or die "failed to open file:$tempdir/compiled.js:$!";
-        print $fh "\nTest.run0();\n";
+        print $fh "\nTest.run\$();\n";
     }
 
     # execute compiled node

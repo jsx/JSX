@@ -132,7 +132,7 @@ window.addEventListener('load', function(e) {
 			var out = c.getOutput().replace(/\t/g, "  ");
 
 			if(options.mode !== 'parse') {
-				out += "Test.run0();\n";
+				out += "Test.run$();\n";
 			}
 
 			var level = getOptimizationLevel();
