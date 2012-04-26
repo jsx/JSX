@@ -2,4 +2,10 @@
 test:
 	prove --timer
 
-.PHONY: test
+web:
+	perl web/build.pl
+
+server:
+	plackup web/app.psgi
+
+.PHONY: test web server
