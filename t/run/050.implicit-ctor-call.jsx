@@ -1,6 +1,5 @@
 /*EXPECTED
 C#initialize
-C#initialize
 M#initialize
 */
 class C {
