@@ -11,12 +11,12 @@ function main() {
     var test = new Test(__filename);
 
 	test.describe('Util.format', function (t) {
-		t.expect( Util.format("foo") ).toBe("foo");
-		t.expect( Util.format("foo %s", ["bar"]) , '%s').toBe("foo bar");
-		t.expect( Util.format("foo %j", ["bar"]) , '%j').toBe('foo "bar"');
-		t.expect( Util.format("foo %2:s %1:s", ["bar", "baz"]) ).
+		t.expect( Util.format("foo", []) ).toBe("foo");
+		t.expect( Util.format("foo %1", ["bar"])).toBe("foo bar");
+		t.expect( Util.format("foo %1 %1", ["bar"])).toBe("foo bar bar");
+		t.expect( Util.format("foo %2 %1", ["bar", "baz"]) ).
 			toBe('foo baz bar');
-		t.expect( Util.format("100%%s %s", ["foo"]) ).toBe("100%s foo");
+		t.expect( Util.format("100%%1 %1", ["foo"]) ).toBe("100%1 foo");
 	});
 
 	test.describe('Util.repeat', function (t) {
