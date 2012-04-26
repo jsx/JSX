@@ -6,14 +6,14 @@ interface Say {
 	abstract function say() : void;
 }
 
-mixin SayName implements Say {
+mixin SayName {
 	abstract var _name : string;
 	override function say() : void {
 		log "I am " + this._name;
 	}
 }
 
-class Human implements SayName {
+class Human implements Say, SayName {
 	var _name : string;
 	function initialize(name : string) {
 		this._name = name;
