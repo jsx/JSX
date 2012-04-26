@@ -5,7 +5,7 @@ woof
 mew
 */
 
-class Animal {
+abstract class Animal {
 	abstract function say() : void;
 }
 
