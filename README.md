@@ -1,9 +1,14 @@
+NAME
+=======================
+
+JSX - Object-oriented, statically-typed programming language for browsers
+
 INSTALLATION
 =======================
 
 Install development tools by the following command:
 
-    npm install .
+    npm install
 
 TESTING
 =======================
@@ -12,16 +17,14 @@ For server side tests, just type the following command:
 
     make test
 
-To test a file, you have to set up module paths like:
-
-    NODE_PATH=lib node test/smoke/001.hello.js
-
 WEB INTERFACE
 =======================
 
-Currently the web interface is written in Perl.
-Installs `lib::xi` and `Plack` by cpanm, and then type the following comand:
+A web interface, which compiles JSX source  on browsers, is
+provided by the following commands.
 
-    plackup web/app.psgi
+    make web # to build web interface (optional)
+
+    make server # to run a HTTP daemon
 
 
