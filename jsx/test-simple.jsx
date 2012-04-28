@@ -1,11 +1,11 @@
 // FIXME: rewirte it with template
 
-class TestSimple_Matcher /* <T> */ {
+class TestCase_Matcher /* <T> */ {
 
-	var _test :TestSimple;
+	var _test :TestCase;
 	var _got  :variant; // FIXME: use T
 
-	function initialize(test :TestSimple, got :variant) {
+	function initialize(test :TestCase, got :variant) {
 		this._test = test;
 		this._got  = got;
 	}
@@ -15,19 +15,18 @@ class TestSimple_Matcher /* <T> */ {
 	}
 }
 
-class TestSimple {
+class TestCase {
 	var _count = 0;
 	var _pass  = 0;
 
-	function initialize(name :string)  {
-	}
+	function initialize() {}
 
 	function done() :void {
 		log "1.." + this._count as string;
 	}
 
-	function expect(value :variant) :TestSimple_Matcher {
-		return new TestSimple_Matcher(this, value);
+	function expect(value :variant) :TestCase_Matcher {
+		return new TestCase_Matcher(this, value);
 	}
 
 	function _ok(value :boolean) :void {

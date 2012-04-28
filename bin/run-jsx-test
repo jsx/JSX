@@ -28,7 +28,9 @@ function main(args) {
 	}
 
 	var output = compiler.getOutput();
-	output += "Test.run$()";
+	output += "(new Test$()).run$();";
+
+	console.log( output.replace(/^/mg, "#") );
 
 	var child = child_process.spawn(process.execPath, ["/dev/stdin"]);
 
