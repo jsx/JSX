@@ -10,6 +10,12 @@ false
 
 class Test {
 	static function run() : void {
+		// local variable named parseInt() etc. are allowed
+		var parseInt = 0;
+		var parseFloat = 0;
+		var isNaN = 0;
+		var isFinite = 0;
+
 		log Number.parseInt("0x10");
 		log Number.parseInt("010", 10);
 		log Number.parseFloat("1e2");
