@@ -20,6 +20,14 @@ native final class Number {
 	function toFixed(fractionDigits : int) : string;
 	function toExpotential(fractionDigits : int) : string;
 	function toPrecision(precision : int) : string;
+
+	// 15.1.2 (Function Properties of the Global Object)
+	static function parseInt(str :string) :number;
+	static function parseInt(str :string, radix :int) :number;
+	static function parseFloat(str :string) :number;
+	static function isNaN(num :number) :boolean;
+	static function isFinite(num :number) :boolean;
+
 }
 
 // vim: set noexpandtab:
