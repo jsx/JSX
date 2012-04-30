@@ -11,8 +11,9 @@ eval(Class.$import("../lib/compiler"));
 
 var NodePlatform = Platform.extend({
 	load: function(filename) {
-		var buff = fs.readFileSync(filename).toString();
-		return buff.replace(/^\#\![^\n]*/, "");
+		//var buff = fs.readFileSync(filename).toString();
+		//return buff.replace(/^\#\![^\n]*/, "");
+		return fs.readFileSync(filename).toString();
 	}
 });
 

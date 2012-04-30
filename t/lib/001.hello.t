@@ -1,4 +1,3 @@
-#!bin/run-jsx-test
 // import "test-simple"
 
 class Test extends TestCase {
