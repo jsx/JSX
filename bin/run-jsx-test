@@ -20,7 +20,7 @@ function main(args) {
 	var platform = new NodePlatform();
 	var compiler = new Compiler(platform);
 
-	compiler.addSourceFile("jsx/test-simple.jsx");
+	compiler.addSourceFile("lib/test.jsx");
 	compiler.addSourceFile(args[0]);
 
 	if(!compiler.compile()) {
