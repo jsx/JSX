@@ -54,23 +54,6 @@ function main() {
 		t.expect(p.line, "offset exceeded").toBe(null);
 	});
 
-	test.describe('Util.decodeStringLiteral', function (t) {
-		t.expect(Util.decodeStringLiteral("''")).toBe("");
-		t.expect(Util.decodeStringLiteral('""')).toBe("");
-		t.expect(Util.decodeStringLiteral("'abc'")).toBe("abc");
-		t.expect(Util.decodeStringLiteral("'\\''")).toBe("'");
-		t.expect(Util.decodeStringLiteral('"\\""')).toBe('"');
-		t.expect(Util.decodeStringLiteral("'\\\\'")).toBe("\\");
-		t.expect(Util.decodeStringLiteral("'\\b'")).toBe("\b");
-		t.expect(Util.decodeStringLiteral("'\\f'")).toBe("\f");
-		t.expect(Util.decodeStringLiteral("'\\n'")).toBe("\n");
-		t.expect(Util.decodeStringLiteral("'\\t'")).toBe("\t");
-		t.expect(Util.decodeStringLiteral("'\\v'")).toBe("\v");
-		t.expect(Util.decodeStringLiteral("'\\u0041'")).toBe("A");
-		t.expect(Util.decodeStringLiteral("'\\0'")).toBe("\0");
-		t.expect(Util.decodeStringLiteral("'!\\u0041!\\0!\\n!'")).toBe("!A!\0!\n!");
-	});
-
     test.done();
 }
 
