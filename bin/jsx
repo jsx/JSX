@@ -116,7 +116,7 @@ var JSX = Class.extend({
 		}
 
 		for (; argIndex < args.length; ++argIndex)
-			compiler.addSourceFile(args[argIndex]);
+			compiler.addSourceFile(null, args[argIndex]);
 
 		if (! compiler.compile())
 			process.exit(1);
