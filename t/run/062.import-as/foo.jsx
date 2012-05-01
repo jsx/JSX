@@ -1,8 +1,11 @@
-class Foo {
+class FooClass {
 	function initialize() {
-		log "Foo#initialize";
+		log "FooClass#initialize";
 	}
 	static function say() : void {
-		log "Foo#say";
+		log "FooClass#say";
 	}
+}
+
+interface FooInterface {
 }
