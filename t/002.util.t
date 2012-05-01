@@ -71,6 +71,17 @@ function main() {
 		t.expect(Util.decodeStringLiteral("'!\\u0041!\\0!\\n!'")).toBe("!A!\0!\n!");
 	});
 
+	test.describe('Util.resolvePath', function (t) {
+		t.expect(Util.resolvePath("a/b/c")).toBe("a/b/c");
+		t.expect(Util.resolvePath("a/./b")).toBe("a/b");
+		t.expect(Util.resolvePath("a/../b")).toBe("b");
+		t.expect(Util.resolvePath("a/../../b")).toBe("../b");
+		t.expect(Util.resolvePath("../../a")).toBe("../../a");
+		t.expect(Util.resolvePath("/a/b/c")).toBe("/a/b/c");
+		t.expect(Util.resolvePath("/a/../b")).toBe("/b");
+		t.expect(Util.resolvePath("/a/../../c")).toBe("/c");
+	});
+
     test.done();
 }
 
