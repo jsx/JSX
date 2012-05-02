@@ -291,12 +291,7 @@ var Compiler = exports.Compiler = Class.extend({
 			}
 		}
 		// emit
-		for (var i = 0; i < classDefs.length; ++i) {
-			if ((classDefs[i].flags() & ClassDefinition.IS_NATIVE) == 0)
-				this._emitter.emitClassDefinition(classDefs[i]);
-		}
-		for (var i = 0; i < classDefs.length; ++i)
-			this._emitter.emitStaticInitializationCode(classDefs[i]);
+		this._emitter.emit(classDefs);
 		this._output = this._emitter.getOutput();
 	},
 

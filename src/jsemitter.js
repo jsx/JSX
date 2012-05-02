@@ -1224,7 +1224,17 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 		return [ "lib/js" ];
 	},
 
-	emitClassDefinition: function (classDef) {
+	emit: function (classDefs) {
+		for (var i = 0; i < classDefs.length; ++i) {
+			if ((classDefs[i].flags() & ClassDefinition.IS_NATIVE) == 0)
+				this._emitClassDefinition(classDefs[i]);
+		}
+		for (var i = 0; i < classDefs.length; ++i)
+			this._emitStaticInitializationCode(classDefs[i]);
+		this._emitClassMap(classDefs);
+	},
+
+	_emitClassDefinition: function (classDef) {
 
 		try {
 			this._emittingClass = classDef;
@@ -1257,7 +1267,7 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 
 	},
 
-	emitStaticInitializationCode: function (classDef) {
+	_emitStaticInitializationCode: function (classDef) {
 		if ((classDef.flags() & ClassDefinition.IS_NATIVE) != 0)
 			return;
 		// special handling for js.jsx
@@ -1274,6 +1284,50 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 				&& (member.flags() & (ClassDefinition.IS_STATIC | ClassDefinition.IS_NATIVE)) == ClassDefinition.IS_STATIC)
 				this._emitMemberVariable(classDef.getOutputClassName(), member);
 		}
+	},
+
+	_emitClassMap: function (classDefs) {
+		classDefs = classDefs.concat([]); // shallow clone
+		// remove the classDefs wo. source token or native
+		for (var i = 0; i < classDefs.length;) {
+			if (classDefs[i].getToken() == null || (classDefs[i].flags() & ClassDefinition.IS_NATIVE) != 0)
+				classDefs.splice(i, 1);
+			else
+				++i;
+		}
+		// start emitting
+		this._emit("var $__jsx_classMap = {\n", null);
+		this._advanceIndent();
+		while (classDefs.length != 0) {
+			// fetch the first classDef, and others that came from the same file
+			var classesOfFile = [ classDefs.shift() ];
+			var filename = classesOfFile[0].getToken().filename;
+			for (var i = 0; i < classDefs.length;) {
+				if (classDefs[i].getToken().filename == filename) {
+					classesOfFile.push(classDefs[i]);
+					classDefs.splice(i, 1);
+				} else {
+					++i;
+				}
+			}
+			// emit the map
+			this._emit("\"" + filename + "\": ", null); // FIXME escape
+			this._emit("{\n", null);
+			this._advanceIndent();
+			for (var i = 0; i < classesOfFile.length; ++i) {
+				this._emit(classesOfFile[i].className() + ": " + classesOfFile[i].getOutputClassName(), null);
+				if (i != classesOfFile.length - 1)
+					this._emit(",", null);
+				this._emit("\n", null);
+			}
+			this._reduceIndent();
+			this._emit("}", null);
+			if (classDefs.length != 0)
+				this._emit(",", null);
+			this._emit("\n", null);
+		}
+		this._reduceIndent();
+		this._emit("};\n\n", null);
 	},
 
 	getOutput: function () {
