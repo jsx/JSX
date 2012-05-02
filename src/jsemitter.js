@@ -1220,6 +1220,10 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 		this._emittingFunction = null;
 	},
 
+	getSearchPaths: function () {
+		return [ "lib/js" ];
+	},
+
 	emitClassDefinition: function (classDef) {
 
 		try {

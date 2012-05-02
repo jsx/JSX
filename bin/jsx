@@ -12,9 +12,20 @@ eval(Class.$import("../src/jsemitter"));
 "use strict";
 
 var NodePlatform = Platform.extend({
+
 	load: function(filename) {
 		return fs.readFileSync(filename).toString();
 	},
+
+	fileExists: function (path) {
+		try {
+			fs.statSync(path);
+			return true;
+		} catch (e) {
+			return false;
+		}
+	}
+
 });
 
 var JSX = Class.extend({

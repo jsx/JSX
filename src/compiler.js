@@ -23,6 +23,7 @@ var Compiler = exports.Compiler = Class.extend({
 		this._output = "";
 		this._parsers = [];
 		this._fileCache = {};
+		this._searchPaths = [ "lib/common" ];
 		// load the built-in classes
 		this.addSourceFile(null, "lib/built-in/Object.jsx");
 		this.addSourceFile(null, "lib/built-in/Boolean.jsx");
@@ -142,12 +143,12 @@ var Compiler = exports.Compiler = Class.extend({
 		// register imported files
 		var imports = parser.getImports();
 		for (var i = 0; i < imports.length; ++i) {
-			var path = Compiler._resolvePath(imports[i].getFilenameToken());
+			var path = this._resolvePath(imports[i].getFilenameToken());
 			if (path == parser.getPath()) {
 				errors.push(new CompileError(imports[i].getFilenameToken(), "cannot import itself"));
 				return false;
 			}
-			this.addSourceFile(imports[i].getFilenameToken(), Compiler._resolvePath(imports[i].getFilenameToken()));
+			this.addSourceFile(imports[i].getFilenameToken(), this._resolvePath(imports[i].getFilenameToken()));
 		}
 		return true;
 	},
@@ -162,7 +163,7 @@ var Compiler = exports.Compiler = Class.extend({
 				// find parser instance for every import, and set source
 				var filenameToken = imports[j].getFilenameToken();
 				if (filenameToken != null) {
-					var path = Compiler._resolvePath(filenameToken);
+					var path = this._resolvePath(filenameToken);
 					for (var k = 0; k < this._parsers.length; ++k)
 						if (this._parsers[k].getPath() == path)
 							break;
@@ -302,9 +303,18 @@ var Compiler = exports.Compiler = Class.extend({
 		}
 	},
 
-	$_resolvePath: function (token) {
+	_resolvePath: function (token) {
+		var tokenPath = Util.decodeStringLiteral(token.getValue());
+		if (tokenPath.match(/^\.{1,2}\//) == null) {
+			var searchPaths = this._searchPaths.concat(this._emitter.getSearchPaths());
+			for (var i = 0; i < searchPaths.length; ++i) {
+				var path = Util.resolvePath(searchPaths[i] + "/" + tokenPath);
+				if (this._platform.fileExists(path))
+					return path;
+			}
+		}
 		var lastSlashAt = token.filename.lastIndexOf("/");
-		var path = Util.resolvePath((lastSlashAt != -1 ? token.filename.substring(0, lastSlashAt + 1) : "") + Util.decodeStringLiteral(token.getValue()));
+		path = Util.resolvePath((lastSlashAt != -1 ? token.filename.substring(0, lastSlashAt + 1) : "") + tokenPath);
 		return path;
 	},
 
