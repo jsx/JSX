@@ -4,6 +4,7 @@ eval(Class.$import("./type"));
 eval(Class.$import("./expression"));
 eval(Class.$import("./statement"));
 eval(Class.$import("./emitter"));
+eval(Class.$import("./jssourcemap"));
 eval(Class.$import("./util"));
 
 "use strict";
@@ -1231,6 +1232,7 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 
 	initialize: function (platform) {
 		this._output = platform.load("src/js/bootstrap.js") + "\n";
+		this._outputFile = null;
 		this._indent = 0;
 		this._emittingClass = null;
 		this._emittingFunction = null;
@@ -1238,6 +1240,21 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 
 	getSearchPaths: function () {
 		return [ "lib/js" ];
+	},
+
+	setOutputFile: function (name) {
+		this._outputFile = name;
+		// FIXME: set correct sourceRoot
+		var sourceRoot = null;
+		this._sourceMapGen = new SourceMapGenerator(name, sourceRoot);
+	},
+
+	saveSourceMappingFile: function (platform) {
+		var gen = this._sourceMapGen;
+		if(gen != null) {
+			platform.save(this._sourceMapGen.getSourceMappingFile(),
+								this._sourceMapGen.generate());
+		}
 	},
 
 	setSourceMapGenerator: function (gen) {
