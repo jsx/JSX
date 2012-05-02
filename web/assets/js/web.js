@@ -53,7 +53,13 @@ window.addEventListener('load', function(e) {
 			var xhr = new XMLHttpRequest();
 			xhr.open("GET", name, false);
 			xhr.send(null);
-			return xhr.responseText;
+
+			if(xhr.status === 200) {
+				return xhr.responseText;
+			}
+			else {
+				throw new Error(xhr.status + " " + xhr.statusText);
+			}
 		},
 
 		getRoot: function () {
@@ -73,7 +79,6 @@ window.addEventListener('load', function(e) {
 	var output = element('output');
 
 	function saveInput(input) {
-			var s = input.selectionStart;
 		var session = {
 			source:         input.value,
 			selectionStart: input.selectionStart,
