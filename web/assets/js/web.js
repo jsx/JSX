@@ -56,6 +56,10 @@ window.addEventListener('load', function(e) {
 			return xhr.responseText;
 		},
 
+		getRoot: function () {
+			return "";
+		},
+
 		error: function (s) {
 			console.error(s);
 			errors.push(s);
@@ -124,7 +128,7 @@ window.addEventListener('load', function(e) {
 			return;
 		}
 
-		c.addSourceFile('input');
+		c.addSourceFile(null, 'input');
 
 		var success = c.compile();
 		console.log(c);
