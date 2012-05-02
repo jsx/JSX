@@ -7,6 +7,8 @@ import "js.jsx"; // FIXME only run this test on js emitter
 import "064.JSX_file/foo.jsx";
 
 class _Private {
+	function initialize(x : number) {
+	}
 	static function say() : void {
 		log "importing#say";
 	}

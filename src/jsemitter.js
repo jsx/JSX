@@ -1344,11 +1344,25 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 		this._advanceIndent();
 		while (classDefs.length != 0) {
 			// fetch the first classDef, and others that came from the same file
-			var classesOfFile = [ classDefs.shift() ];
-			var filename = classesOfFile[0].getToken().getFilename();
+			var list = [];
+			var pushClass = (function (classDef) {
+				var push = function (suffix) {
+					list.push([ classDef.className() + suffix, classDef.getOutputClassName() + suffix ]);
+				};
+				var ctors = this._findFunctions(classDef, "initialize", false);
+				push("");
+				if (ctors.length == 0) {
+					push(this._mangleFunctionArguments([]));
+				} else {
+					for (var i = 0; i < ctors.length; ++i)
+						push(this._mangleFunctionArguments(ctors[i].getArgumentTypes()));
+				}
+			}).bind(this);
+			var filename = classDefs[0].getToken().getFilename();
+			pushClass(classDefs.shift());
 			for (var i = 0; i < classDefs.length;) {
 				if (classDefs[i].getToken().getFilename() == filename) {
-					classesOfFile.push(classDefs[i]);
+					pushClass(classDefs[i]);
 					classDefs.splice(i, 1);
 				} else {
 					++i;
@@ -1360,9 +1374,9 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 			this._emit("\"" + filename + "\": ", null); // FIXME escape
 			this._emit("{\n", null);
 			this._advanceIndent();
-			for (var i = 0; i < classesOfFile.length; ++i) {
-				this._emit(classesOfFile[i].className() + ": " + classesOfFile[i].getOutputClassName(), null);
-				if (i != classesOfFile.length - 1)
+			for (var i = 0; i < list.length; ++i) {
+				this._emit(list[i][0] + ": " + list[i][1], null);
+				if (i != list.length - 1)
 					this._emit(",", null);
 				this._emit("\n", null);
 			}
