@@ -1260,6 +1260,12 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 	emitStaticInitializationCode: function (classDef) {
 		if ((classDef.flags() & ClassDefinition.IS_NATIVE) != 0)
 			return;
+		// special handling for js.jsx
+		if (classDef.getToken().filename == "lib/js/js.jsx") {
+			this._emit("js.global = (function () { return this; }).call(null);\n\n", null);
+			return;
+		}
+		// normal handling
 		var members = classDef.members();
 		// FIXME can we (should we?) automatically resolve dependencies? isn't it impossible?
 		for (var i = 0; i < members.length; ++i) {
