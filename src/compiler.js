@@ -13,7 +13,7 @@ var Compiler = exports.Compiler = Class.extend({
 	$MODE_COMPILE: 0,
 	$MODE_PARSE: 1,
 
-	initialize: function (platform) {
+	constructor: function (platform) {
 		this._platform = platform;
 		this._mode = Compiler.MODE_COMPILE;
 		this._parsers = [];

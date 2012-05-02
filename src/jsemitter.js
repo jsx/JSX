@@ -57,7 +57,7 @@ var _Util = exports._Util = Class.extend({
 
 var _StatementEmitter = exports._StatementEmitter = Class.extend({
 
-	initialize: function (emitter) {
+	constructor: function (emitter) {
 		this._emitter = emitter;
 	}
 
@@ -65,8 +65,8 @@ var _StatementEmitter = exports._StatementEmitter = Class.extend({
 
 var _ConstructorInvocationStatementEmitter = exports._ConstructorInvocationStatementEmitter = _StatementEmitter.extend({
 
-	initialize: function (emitter, statement) {
-		_StatementEmitter.prototype.initialize.call(this, emitter);
+	constructor: function (emitter, statement) {
+		_StatementEmitter.prototype.constructor.call(this, emitter);
 		this._statement = statement;
 	},
 
@@ -86,8 +86,8 @@ var _ConstructorInvocationStatementEmitter = exports._ConstructorInvocationState
 
 var _ExpressionStatementEmitter = exports._ExpressionStatementEmitter = _StatementEmitter.extend({
 
-	initialize: function (emitter, statement) {
-		_StatementEmitter.prototype.initialize.call(this, emitter);
+	constructor: function (emitter, statement) {
+		_StatementEmitter.prototype.constructor.call(this, emitter);
 		this._statement = statement;
 	},
 
@@ -100,8 +100,8 @@ var _ExpressionStatementEmitter = exports._ExpressionStatementEmitter = _Stateme
 
 var _ReturnStatementEmitter = exports._ReturnStatementEmitter = _StatementEmitter.extend({
 
-	initialize: function (emitter, statement) {
-		_StatementEmitter.prototype.initialize.call(this, emitter);
+	constructor: function (emitter, statement) {
+		_StatementEmitter.prototype.constructor.call(this, emitter);
 		this._statement = statement;
 	},
 
@@ -120,8 +120,8 @@ var _ReturnStatementEmitter = exports._ReturnStatementEmitter = _StatementEmitte
 
 var _DeleteStatementEmitter = exports._DeleteStatementEmitter = _StatementEmitter.extend({
 
-	initialize: function (emitter, statement) {
-		_StatementEmitter.prototype.initialize.call(this, emitter);
+	constructor: function (emitter, statement) {
+		_StatementEmitter.prototype.constructor.call(this, emitter);
 		this._statement = statement;
 	},
 
@@ -135,8 +135,8 @@ var _DeleteStatementEmitter = exports._DeleteStatementEmitter = _StatementEmitte
 
 var _BreakStatementEmitter = exports._BreakStatementEmitter = _StatementEmitter.extend({
 
-	initialize: function (emitter, statement) {
-		_StatementEmitter.prototype.initialize.call(this, emitter);
+	constructor: function (emitter, statement) {
+		_StatementEmitter.prototype.constructor.call(this, emitter);
 		this._statement = statement;
 	},
 
@@ -150,8 +150,8 @@ var _BreakStatementEmitter = exports._BreakStatementEmitter = _StatementEmitter.
 
 var _ContinueStatementEmitter = exports._ContinueStatementEmitter = _StatementEmitter.extend({
 
-	initialize: function (emitter, statement) {
-		_StatementEmitter.prototype.initialize.call(this, emitter);
+	constructor: function (emitter, statement) {
+		_StatementEmitter.prototype.constructor.call(this, emitter);
 		this._statement = statement;
 	},
 
@@ -165,8 +165,8 @@ var _ContinueStatementEmitter = exports._ContinueStatementEmitter = _StatementEm
 
 var _LabelStatementEmitter = exports._LabelStatementEmitter = _StatementEmitter.extend({
 
-	initialize: function (emitter, statement) {
-		_StatementEmitter.prototype.initialize.call(this, emitter);
+	constructor: function (emitter, statement) {
+		_StatementEmitter.prototype.constructor.call(this, emitter);
 		this._statement = statement;
 	},
 
@@ -178,8 +178,8 @@ var _LabelStatementEmitter = exports._LabelStatementEmitter = _StatementEmitter.
 
 var _DoWhileStatementEmitter = exports._DoWhileStatementEmitter = _StatementEmitter.extend({
 
-	initialize: function (emitter, statement) {
-		_StatementEmitter.prototype.initialize.call(this, emitter);
+	constructor: function (emitter, statement) {
+		_StatementEmitter.prototype.constructor.call(this, emitter);
 		this._statement = statement;
 	},
 
@@ -195,8 +195,8 @@ var _DoWhileStatementEmitter = exports._DoWhileStatementEmitter = _StatementEmit
 
 var _ForInStatementEmitter = exports._ForInStatementEmitter = _StatementEmitter.extend({
 
-	initialize: function (emitter, statement) {
-		_StatementEmitter.prototype.initialize.call(this, emitter);
+	constructor: function (emitter, statement) {
+		_StatementEmitter.prototype.constructor.call(this, emitter);
 		this._statement = statement;
 	},
 
@@ -208,8 +208,8 @@ var _ForInStatementEmitter = exports._ForInStatementEmitter = _StatementEmitter.
 
 var _ForStatementEmitter = exports._ForStatementEmitter = _StatementEmitter.extend({
 
-	initialize: function (emitter, statement) {
-		_StatementEmitter.prototype.initialize.call(this, emitter);
+	constructor: function (emitter, statement) {
+		_StatementEmitter.prototype.constructor.call(this, emitter);
 		this._statement = statement;
 	},
 
@@ -235,8 +235,8 @@ var _ForStatementEmitter = exports._ForStatementEmitter = _StatementEmitter.exte
 
 var _IfStatementEmitter = exports._IfStatementEmitter = _StatementEmitter.extend({
 
-	initialize: function (emitter, statement) {
-		_StatementEmitter.prototype.initialize.call(this, emitter);
+	constructor: function (emitter, statement) {
+		_StatementEmitter.prototype.constructor.call(this, emitter);
 		this._statement = statement;
 	},
 
@@ -257,8 +257,8 @@ var _IfStatementEmitter = exports._IfStatementEmitter = _StatementEmitter.extend
 
 var _SwitchStatementEmitter = exports._SwitchStatementEmitter = _StatementEmitter.extend({
 
-	initialize: function (emitter, statement) {
-		_StatementEmitter.prototype.initialize.call(this, emitter);
+	constructor: function (emitter, statement) {
+		_StatementEmitter.prototype.constructor.call(this, emitter);
 		this._statement = statement;
 	},
 
@@ -274,8 +274,8 @@ var _SwitchStatementEmitter = exports._SwitchStatementEmitter = _StatementEmitte
 
 var _CaseStatementEmitter = exports._CaseStatementEmitter = _StatementEmitter.extend({
 
-	initialize: function (emitter, statement) {
-		_StatementEmitter.prototype.initialize.call(this, emitter);
+	constructor: function (emitter, statement) {
+		_StatementEmitter.prototype.constructor.call(this, emitter);
 		this._statement = statement;
 	},
 
@@ -291,8 +291,8 @@ var _CaseStatementEmitter = exports._CaseStatementEmitter = _StatementEmitter.ex
 
 var _DefaultStatementEmitter = exports._DefaultStatementEmitter = _StatementEmitter.extend({
 
-	initialize: function (emitter, statement) {
-		_StatementEmitter.prototype.initialize.call(this, emitter);
+	constructor: function (emitter, statement) {
+		_StatementEmitter.prototype.constructor.call(this, emitter);
 		this._statement = statement;
 	},
 
@@ -306,8 +306,8 @@ var _DefaultStatementEmitter = exports._DefaultStatementEmitter = _StatementEmit
 
 var _WhileStatementEmitter = exports._WhileStatementEmitter = _StatementEmitter.extend({
 
-	initialize: function (emitter, statement) {
-		_StatementEmitter.prototype.initialize.call(this, emitter);
+	constructor: function (emitter, statement) {
+		_StatementEmitter.prototype.constructor.call(this, emitter);
 		this._statement = statement;
 	},
 
@@ -323,8 +323,8 @@ var _WhileStatementEmitter = exports._WhileStatementEmitter = _StatementEmitter.
 
 var _TryStatementEmitter = exports._TryStatementEmitter = _StatementEmitter.extend({
 
-	initialize: function (emitter, statement) {
-		_StatementEmitter.prototype.initialize.call(this, emitter);
+	constructor: function (emitter, statement) {
+		_StatementEmitter.prototype.constructor.call(this, emitter);
 		this._statement = statement;
 	},
 
@@ -336,8 +336,8 @@ var _TryStatementEmitter = exports._TryStatementEmitter = _StatementEmitter.exte
 
 var _AssertStatementEmitter = exports._AssertStatementEmitter = _StatementEmitter.extend({
 
-	initialize: function (emitter, statement) {
-		_StatementEmitter.prototype.initialize.call(this, emitter);
+	constructor: function (emitter, statement) {
+		_StatementEmitter.prototype.constructor.call(this, emitter);
 		this._statement = statement;
 	},
 
@@ -349,8 +349,8 @@ var _AssertStatementEmitter = exports._AssertStatementEmitter = _StatementEmitte
 
 var _LogStatementEmitter = exports._LogStatementEmitter = _StatementEmitter.extend({
 
-	initialize: function (emitter, statement) {
-		_StatementEmitter.prototype.initialize.call(this, emitter);
+	constructor: function (emitter, statement) {
+		_StatementEmitter.prototype.constructor.call(this, emitter);
 		this._statement = statement;
 	},
 
@@ -371,7 +371,7 @@ var _LogStatementEmitter = exports._LogStatementEmitter = _StatementEmitter.exte
 
 var _ExpressionEmitter = exports._ExpressionEmitter = Class.extend({
 
-	initialize: function (emitter) {
+	constructor: function (emitter) {
 		this._emitter = emitter;
 	},
 
@@ -389,8 +389,8 @@ var _ExpressionEmitter = exports._ExpressionEmitter = Class.extend({
 
 var _IdentifierExpressionEmitter = exports._IdentifierExpressionEmitter = _ExpressionEmitter.extend({
 
-	initialize: function (emitter, expr) {
-		_ExpressionEmitter.prototype.initialize.call(this, emitter);
+	constructor: function (emitter, expr) {
+		_ExpressionEmitter.prototype.constructor.call(this, emitter);
 		this._expr = expr;
 	},
 
@@ -408,8 +408,8 @@ var _IdentifierExpressionEmitter = exports._IdentifierExpressionEmitter = _Expre
 
 var _UndefinedExpressionEmitter = exports._UndefinedExpressionEmitter = _ExpressionEmitter.extend({
 
-	initialize: function (emitter, expr) {
-		_ExpressionEmitter.prototype.initialize.call(this, emitter);
+	constructor: function (emitter, expr) {
+		_ExpressionEmitter.prototype.constructor.call(this, emitter);
 		this._expr = expr;
 	},
 
@@ -422,8 +422,8 @@ var _UndefinedExpressionEmitter = exports._UndefinedExpressionEmitter = _Express
 
 var _NullExpressionEmitter = exports._NullExpressionEmitter = _ExpressionEmitter.extend({
 
-	initialize: function (emitter, expr) {
-		_ExpressionEmitter.prototype.initialize.call(this, emitter);
+	constructor: function (emitter, expr) {
+		_ExpressionEmitter.prototype.constructor.call(this, emitter);
 		this._expr = expr;
 	},
 
@@ -436,8 +436,8 @@ var _NullExpressionEmitter = exports._NullExpressionEmitter = _ExpressionEmitter
 
 var _BooleanLiteralExpressionEmitter = exports._BooleanLiteralExpressionEmitter = _ExpressionEmitter.extend({
 
-	initialize: function (emitter, expr) {
-		_ExpressionEmitter.prototype.initialize.call(this, emitter);
+	constructor: function (emitter, expr) {
+		_ExpressionEmitter.prototype.constructor.call(this, emitter);
 		this._expr = expr;
 	},
 
@@ -450,8 +450,8 @@ var _BooleanLiteralExpressionEmitter = exports._BooleanLiteralExpressionEmitter 
 
 var _IntegerLiteralExpressionEmitter = exports._IntegerLiteralExpressionEmitter = _ExpressionEmitter.extend({
 
-	initialize: function (emitter, expr) {
-		_ExpressionEmitter.prototype.initialize.call(this, emitter);
+	constructor: function (emitter, expr) {
+		_ExpressionEmitter.prototype.constructor.call(this, emitter);
 		this._expr = expr;
 	},
 
@@ -464,8 +464,8 @@ var _IntegerLiteralExpressionEmitter = exports._IntegerLiteralExpressionEmitter 
 
 var _NumberLiteralExpressionEmitter = exports._NumberLiteralExpressionEmitter = _ExpressionEmitter.extend({
 
-	initialize: function (emitter, expr) {
-		_ExpressionEmitter.prototype.initialize.call(this, emitter);
+	constructor: function (emitter, expr) {
+		_ExpressionEmitter.prototype.constructor.call(this, emitter);
 		this._expr = expr;
 	},
 
@@ -478,8 +478,8 @@ var _NumberLiteralExpressionEmitter = exports._NumberLiteralExpressionEmitter = 
 
 var _StringLiteralExpressionEmitter = exports._StringLiteralExpressionEmitter = _ExpressionEmitter.extend({
 
-	initialize: function (emitter, expr) {
-		_ExpressionEmitter.prototype.initialize.call(this, emitter);
+	constructor: function (emitter, expr) {
+		_ExpressionEmitter.prototype.constructor.call(this, emitter);
 		this._expr = expr;
 	},
 
@@ -493,8 +493,8 @@ var _StringLiteralExpressionEmitter = exports._StringLiteralExpressionEmitter = 
 
 var _RegExpLiteralExpressionEmitter = exports._RegExpLiteralExpressionEmitter = _ExpressionEmitter.extend({
 
-	initialize: function (emitter, expr) {
-		_ExpressionEmitter.prototype.initialize.call(this, emitter);
+	constructor: function (emitter, expr) {
+		_ExpressionEmitter.prototype.constructor.call(this, emitter);
 		this._expr = expr;
 	},
 
@@ -507,8 +507,8 @@ var _RegExpLiteralExpressionEmitter = exports._RegExpLiteralExpressionEmitter = 
 
 var _ArrayLiteralExpressionEmitter = exports._ArrayLiteralExpressionEmitter = _ExpressionEmitter.extend({
 
-	initialize: function (emitter, expr) {
-		_ExpressionEmitter.prototype.initialize.call(this, emitter);
+	constructor: function (emitter, expr) {
+		_ExpressionEmitter.prototype.constructor.call(this, emitter);
 		this._expr = expr;
 	},
 
@@ -527,8 +527,8 @@ var _ArrayLiteralExpressionEmitter = exports._ArrayLiteralExpressionEmitter = _E
 
 var _HashLiteralExpressionEmitter = exports._HashLiteralExpressionEmitter = _ExpressionEmitter.extend({
 
-	initialize: function (emitter, expr) {
-		_ExpressionEmitter.prototype.initialize.call(this, emitter);
+	constructor: function (emitter, expr) {
+		_ExpressionEmitter.prototype.constructor.call(this, emitter);
 		this._expr = expr;
 	},
 
@@ -550,8 +550,8 @@ var _HashLiteralExpressionEmitter = exports._HashLiteralExpressionEmitter = _Exp
 
 var _ThisExpressionEmitter = exports._ThisExpressionEmitter = _ExpressionEmitter.extend({
 
-	initialize: function (emitter, expr) {
-		_ExpressionEmitter.prototype.initialize.call(this, emitter);
+	constructor: function (emitter, expr) {
+		_ExpressionEmitter.prototype.constructor.call(this, emitter);
 		this._expr = expr;
 	},
 
@@ -567,8 +567,8 @@ var _ThisExpressionEmitter = exports._ThisExpressionEmitter = _ExpressionEmitter
 
 var _AsExpressionEmitter = exports._AsExpressionEmitter = _ExpressionEmitter.extend({
 
-	initialize: function (emitter, expr) {
-		_ExpressionEmitter.prototype.initialize.call(this, emitter);
+	constructor: function (emitter, expr) {
+		_ExpressionEmitter.prototype.constructor.call(this, emitter);
 		this._expr = expr;
 	},
 
@@ -808,8 +808,8 @@ var _AsExpressionEmitter = exports._AsExpressionEmitter = _ExpressionEmitter.ext
 
 var _AsNoCheckExpressionEmitter = exports._AsNoCheckExpressionEmitter = _ExpressionEmitter.extend({
 
-	initialize: function (emitter, expr) {
-		_ExpressionEmitter.prototype.initialize.call(this, emitter);
+	constructor: function (emitter, expr) {
+		_ExpressionEmitter.prototype.constructor.call(this, emitter);
 		this._expr = expr;
 	},
 
@@ -821,8 +821,8 @@ var _AsNoCheckExpressionEmitter = exports._AsNoCheckExpressionEmitter = _Express
 
 var _OperatorExpressionEmitter = exports._OperatorExpressionEmitter = _ExpressionEmitter.extend({
 
-	initialize: function (emitter) {
-		_ExpressionEmitter.prototype.initialize.call(this, emitter);
+	constructor: function (emitter) {
+		_ExpressionEmitter.prototype.constructor.call(this, emitter);
 	},
 
 	emit: function (outerOpPrecedence) {
@@ -837,8 +837,8 @@ var _OperatorExpressionEmitter = exports._OperatorExpressionEmitter = _Expressio
 
 var _UnaryExpressionEmitter = exports._UnaryExpressionEmitter = _OperatorExpressionEmitter.extend({
 
-	initialize: function (emitter, expr) {
-		_OperatorExpressionEmitter.prototype.initialize.call(this, emitter);
+	constructor: function (emitter, expr) {
+		_OperatorExpressionEmitter.prototype.constructor.call(this, emitter);
 		this._expr = expr;
 	},
 
@@ -862,8 +862,8 @@ var _UnaryExpressionEmitter = exports._UnaryExpressionEmitter = _OperatorExpress
 
 var _PostfixExpressionEmitter = exports._PostfixExpressionEmitter = _UnaryExpressionEmitter.extend({
 
-	initialize: function (emitter, expr) {
-		_UnaryExpressionEmitter.prototype.initialize.call(this, emitter, expr);
+	constructor: function (emitter, expr) {
+		_UnaryExpressionEmitter.prototype.constructor.call(this, emitter, expr);
 	},
 
 	_emit: function () {
@@ -886,8 +886,8 @@ var _PostfixExpressionEmitter = exports._PostfixExpressionEmitter = _UnaryExpres
 
 var _InstanceofExpressionEmitter = exports._InstanceofExpressionEmitter = _ExpressionEmitter.extend({
 
-	initialize: function (emitter, expr) {
-		_ExpressionEmitter.prototype.initialize.call(this, emitter);
+	constructor: function (emitter, expr) {
+		_ExpressionEmitter.prototype.constructor.call(this, emitter);
 		this._expr = expr;
 	},
 
@@ -917,8 +917,8 @@ var _InstanceofExpressionEmitter = exports._InstanceofExpressionEmitter = _Expre
 
 var _PropertyExpressionEmitter = exports._PropertyExpressionEmitter = _UnaryExpressionEmitter.extend({
 
-	initialize: function (emitter, expr) {
-		_UnaryExpressionEmitter.prototype.initialize.call(this, emitter, expr);
+	constructor: function (emitter, expr) {
+		_UnaryExpressionEmitter.prototype.constructor.call(this, emitter, expr);
 	},
 
 	_emit: function () {
@@ -966,8 +966,8 @@ var _PropertyExpressionEmitter = exports._PropertyExpressionEmitter = _UnaryExpr
 
 var _FunctionExpressionEmitter = exports._FunctionExpressionEmitter = _UnaryExpressionEmitter.extend({
 
-	initialize: function (emitter, expr) {
-		_UnaryExpressionEmitter.prototype.initialize.call(this, emitter, expr);
+	constructor: function (emitter, expr) {
+		_UnaryExpressionEmitter.prototype.constructor.call(this, emitter, expr);
 	},
 
 	_emit: function () {
@@ -1000,8 +1000,8 @@ var _FunctionExpressionEmitter = exports._FunctionExpressionEmitter = _UnaryExpr
 
 var _BinaryExpressionEmitter = exports._BinaryExpressionEmitter = _OperatorExpressionEmitter.extend({
 
-	initialize: function (emitter, expr) {
-		_OperatorExpressionEmitter.prototype.initialize.call(this, emitter);
+	constructor: function (emitter, expr) {
+		_OperatorExpressionEmitter.prototype.constructor.call(this, emitter);
 		this._expr = expr;
 		this._precedence = _BinaryExpressionEmitter._operatorPrecedence[this._expr.getOperatorToken().getValue()];
 	},
@@ -1051,8 +1051,8 @@ var _BinaryExpressionEmitter = exports._BinaryExpressionEmitter = _OperatorExpre
 
 var _ArrayExpressionEmitter = exports._ArrayExpressionEmitter = _OperatorExpressionEmitter.extend({
 
-	initialize: function (emitter, expr) {
-		_OperatorExpressionEmitter.prototype.initialize.call(this, emitter);
+	constructor: function (emitter, expr) {
+		_OperatorExpressionEmitter.prototype.constructor.call(this, emitter);
 		this._expr = expr;
 	},
 
@@ -1077,8 +1077,8 @@ var _ArrayExpressionEmitter = exports._ArrayExpressionEmitter = _OperatorExpress
 
 var _ConditionalExpressionEmitter = exports._ConditionalExpressionEmitter = _OperatorExpressionEmitter.extend({
 
-	initialize: function (emitter, expr) {
-		_OperatorExpressionEmitter.prototype.initialize.call(this, emitter);
+	constructor: function (emitter, expr) {
+		_OperatorExpressionEmitter.prototype.constructor.call(this, emitter);
 		this._expr = expr;
 	},
 
@@ -1112,8 +1112,8 @@ var _ConditionalExpressionEmitter = exports._ConditionalExpressionEmitter = _Ope
 
 var _CallExpressionEmitter = exports._CallExpressionEmitter = _OperatorExpressionEmitter.extend({
 
-	initialize: function (emitter, expr) {
-		_OperatorExpressionEmitter.prototype.initialize.call(this, emitter);
+	constructor: function (emitter, expr) {
+		_OperatorExpressionEmitter.prototype.constructor.call(this, emitter);
 		this._expr = expr;
 	},
 
@@ -1143,8 +1143,8 @@ var _CallExpressionEmitter = exports._CallExpressionEmitter = _OperatorExpressio
 
 var _SuperExpressionEmitter = exports._SuperExpressionEmitter = _OperatorExpressionEmitter.extend({
 
-	initialize: function (emitter, expr) {
-		_OperatorExpressionEmitter.prototype.initialize.call(this, emitter);
+	constructor: function (emitter, expr) {
+		_OperatorExpressionEmitter.prototype.constructor.call(this, emitter);
 		this._expr = expr;
 	},
 
@@ -1175,8 +1175,8 @@ var _SuperExpressionEmitter = exports._SuperExpressionEmitter = _OperatorExpress
 
 var _NewExpressionEmitter = exports._NewExpressionEmitter = _OperatorExpressionEmitter.extend({
 
-	initialize: function (emitter, expr) {
-		_OperatorExpressionEmitter.prototype.initialize.call(this, emitter);
+	constructor: function (emitter, expr) {
+		_OperatorExpressionEmitter.prototype.constructor.call(this, emitter);
 		this._expr = expr;
 	},
 
@@ -1207,8 +1207,8 @@ var _NewExpressionEmitter = exports._NewExpressionEmitter = _OperatorExpressionE
 
 var _CommaExpressionEmitter = exports._CommaExpressionEmitter = _ExpressionEmitter.extend({
 
-	initialize: function (emitter, expr) {
-		_ExpressionEmitter.prototype.initialize.call(this, emitter);
+	constructor: function (emitter, expr) {
+		_ExpressionEmitter.prototype.constructor.call(this, emitter);
 		this._expr = expr;
 	},
 
@@ -1236,7 +1236,7 @@ var _CommaExpressionEmitter = exports._CommaExpressionEmitter = _ExpressionEmitt
 
 var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 
-	initialize: function (platform) {
+	constructor: function (platform) {
 		this._platform = platform;
 		this._output = this._platform.load(platform.getRoot() + "/src/js/bootstrap.js") + "\n";
 		this._outputFile = null;
@@ -1806,7 +1806,7 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 		return functions;
 	},
 
-	$initialize: function () {
+	$constructor: function () {
 		var precedence = [
 			[
 				[ "new",        _NewExpressionEmitter._setOperatorPrecedence ],

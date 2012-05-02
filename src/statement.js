@@ -14,7 +14,7 @@ var Statement = exports.Statement = Class.extend({
 
 var ConstructorInvocationStatement = exports.ConstructorInvocationStatement = Statement.extend({
 
-	initialize: function (qualifiedName, args) {
+	constructor: function (qualifiedName, args) {
 		this._qualifiedName = qualifiedName;
 		this._args = args;
 		this._ctorClassDef = null;
@@ -79,7 +79,7 @@ var ConstructorInvocationStatement = exports.ConstructorInvocationStatement = St
 
 var UnaryExpressionStatement = exports.UnaryExpressionStatement = Statement.extend({
 
-	initialize: function (expr) {
+	constructor: function (expr) {
 		this._expr = expr;
 	},
 
@@ -95,8 +95,8 @@ var UnaryExpressionStatement = exports.UnaryExpressionStatement = Statement.exte
 
 var ExpressionStatement = exports.ExpressionStatement = UnaryExpressionStatement.extend({
 
-	initialize: function (expr) {
-		UnaryExpressionStatement.prototype.initialize.call(this, expr);
+	constructor: function (expr) {
+		UnaryExpressionStatement.prototype.constructor.call(this, expr);
 	},
 
 	serialize: function () {
@@ -110,8 +110,8 @@ var ExpressionStatement = exports.ExpressionStatement = UnaryExpressionStatement
 
 var ReturnStatement = exports.ReturnStatement = UnaryExpressionStatement.extend({
 
-	initialize: function (token, expr) {
-		UnaryExpressionStatement.prototype.initialize.call(this, expr);
+	constructor: function (token, expr) {
+		UnaryExpressionStatement.prototype.constructor.call(this, expr);
 		this._token = token;
 	},
 
@@ -137,8 +137,8 @@ var ReturnStatement = exports.ReturnStatement = UnaryExpressionStatement.extend(
 
 var DeleteStatement = exports.DeleteStatement = UnaryExpressionStatement.extend({
 
-	initialize: function (token, expr) {
-		UnaryExpressionStatement.prototype.initialize.call(this, expr);
+	constructor: function (token, expr) {
+		UnaryExpressionStatement.prototype.constructor.call(this, expr);
 		this._token = token;
 	},
 
@@ -175,7 +175,7 @@ var DeleteStatement = exports.DeleteStatement = UnaryExpressionStatement.extend(
 
 var JumpStatement = exports.JumpStatement = Statement.extend({
 
-	initialize: function (token, label) {
+	constructor: function (token, label) {
 		this._token = token;
 		this._label = label;
 	},
@@ -206,8 +206,8 @@ var JumpStatement = exports.JumpStatement = Statement.extend({
 
 var BreakStatement = exports.BreakStatement = JumpStatement.extend({
 
-	initialize: function (token, label) {
-		JumpStatement.prototype.initialize.call(this, token, label);
+	constructor: function (token, label) {
+		JumpStatement.prototype.constructor.call(this, token, label);
 	},
 
 	_getName: function () {
@@ -240,8 +240,8 @@ var BreakStatement = exports.BreakStatement = JumpStatement.extend({
 
 var ContinueStatement = exports.ContinueStatement = JumpStatement.extend({
 
-	initialize: function (token, label) {
-		JumpStatement.prototype.initialize.call(this, token, label);
+	constructor: function (token, label) {
+		JumpStatement.prototype.constructor.call(this, token, label);
 	},
 
 	_getName: function () {
@@ -276,7 +276,7 @@ var ContinueStatement = exports.ContinueStatement = JumpStatement.extend({
 
 var LabelStatement = exports.LabelStatement = Statement.extend({
 
-	initialize: function (identifier) {
+	constructor: function (identifier) {
 		this._identifier = identifier;
 	},
 
@@ -300,7 +300,7 @@ var LabelStatement = exports.LabelStatement = Statement.extend({
 
 var DoWhileStatement = exports.DoWhileStatement = Statement.extend({
 
-	initialize: function (expr, statements) {
+	constructor: function (expr, statements) {
 		this._expr = expr;
 		this._statements = statements;
 	},
@@ -336,7 +336,7 @@ var DoWhileStatement = exports.DoWhileStatement = Statement.extend({
 
 var ForInStatement = exports.ForInStatement = Statement.extend({
 
-	initialize: function (identifier, expr, statements) {
+	constructor: function (identifier, expr, statements) {
 		this._identifier = identifier;
 		this._expr = expr;
 		this._statements = statements;
@@ -366,7 +366,7 @@ var ForInStatement = exports.ForInStatement = Statement.extend({
 
 var ForStatement = exports.ForStatement = Statement.extend({
 
-	initialize: function (initExpr, condExpr, postExpr, statements) {
+	constructor: function (initExpr, condExpr, postExpr, statements) {
 		this._initExpr = initExpr;
 		this._condExpr = condExpr;
 		this._postExpr = postExpr;
@@ -419,7 +419,7 @@ var ForStatement = exports.ForStatement = Statement.extend({
 
 var IfStatement = exports.IfStatement = Statement.extend({
 
-	initialize: function (expr, onTrueStatements, onFalseStatements) {
+	constructor: function (expr, onTrueStatements, onFalseStatements) {
 		this._expr = expr;
 		this._onTrueStatements = onTrueStatements;
 		this._onFalseStatements = onFalseStatements;
@@ -468,7 +468,7 @@ var IfStatement = exports.IfStatement = Statement.extend({
 
 var SwitchStatement = exports.SwitchStatement = Statement.extend({
 
-	initialize: function (token, expr, statements) {
+	constructor: function (token, expr, statements) {
 		this._token = token;
 		this._expr = expr;
 		this._statements = statements;
@@ -513,7 +513,7 @@ var SwitchStatement = exports.SwitchStatement = Statement.extend({
 
 var CaseStatement = exports.CaseStatement = Statement.extend({
 
-	initialize: function (token, expr) {
+	constructor: function (token, expr) {
 		this._token = token;
 		this._expr = expr;
 	},
@@ -556,7 +556,7 @@ var CaseStatement = exports.CaseStatement = Statement.extend({
 
 var DefaultStatement = exports.DefaultStatement = Statement.extend({
 
-	initialize: function (token) {
+	constructor: function (token) {
 		this._token = token;
 	},
 
@@ -573,7 +573,7 @@ var DefaultStatement = exports.DefaultStatement = Statement.extend({
 
 var WhileStatement = exports.WhileStatement = Statement.extend({
 
-	initialize: function (expr, statements) {
+	constructor: function (expr, statements) {
 		this._expr = expr;
 		this._statements = statements;
 	},
@@ -609,7 +609,7 @@ var WhileStatement = exports.WhileStatement = Statement.extend({
 
 var TryStatement = exports.TryStatement = Statement.extend({
 
-	initialize: function (tryStatements, catchIdentifier, catchStatements, finallyStatements) {
+	constructor: function (tryStatements, catchIdentifier, catchStatements, finallyStatements) {
 		this._tryStatements = tryStatements;
 		this._catchIdentifier = catchIdentifier; // FIXME type?
 		this._catchStatements = catchStatements;
@@ -660,7 +660,7 @@ var TryStatement = exports.TryStatement = Statement.extend({
 
 var InformationStatement = exports.InformationStatement = Statement.extend({
 
-	initialize: function (token, exprs) {
+	constructor: function (token, exprs) {
 		this._token = token;
 		this._exprs = exprs;
 	},
@@ -684,8 +684,8 @@ var InformationStatement = exports.InformationStatement = Statement.extend({
 
 var AssertStatement = exports.AssertStatement = InformationStatement.extend({
 
-	initialize: function (token, exprs) {
-		InformationStatement.prototype.initialize.call(this, token, exprs);
+	constructor: function (token, exprs) {
+		InformationStatement.prototype.constructor.call(this, token, exprs);
 	},
 
 	serialize: function () {
@@ -709,8 +709,8 @@ var AssertStatement = exports.AssertStatement = InformationStatement.extend({
 
 var LogStatement = exports.LogStatement = InformationStatement.extend({
 
-	initialize: function (token, exprs) {
-		InformationStatement.prototype.initialize.call(this, token, exprs);
+	constructor: function (token, exprs) {
+		InformationStatement.prototype.constructor.call(this, token, exprs);
 	},
 
 	serialize: function () {

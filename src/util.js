@@ -132,7 +132,7 @@ var Util = exports.Util = Class.extend({
 
 var TemplateInstantiationRequest = exports.TemplateInstantiationRequest = Class.extend({
 
-	initialize: function (token, className, typeArgs) {
+	constructor: function (token, className, typeArgs) {
 		this._token = token;
 		this._className = className;
 		this._typeArgs = typeArgs;
@@ -154,7 +154,7 @@ var TemplateInstantiationRequest = exports.TemplateInstantiationRequest = Class.
 
 var CompileError = exports.CompileError = Class.extend({
 
-	initialize: function () {
+	constructor: function () {
 		switch (arguments.length) {
 		case 2: // token, text
 			var token = arguments[0];

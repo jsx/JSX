@@ -6,7 +6,7 @@ eval(Class.$import("./util"));
 
 var AnalysisContext = exports.AnalysisContext = Class.extend({
 
-	initialize: function (errors, parser, instantiateTemplate) {
+	constructor: function (errors, parser, instantiateTemplate) {
 		this.errors = errors;
 		this.parser = parser;
 		this.instantiateTemplate = instantiateTemplate;
@@ -41,7 +41,7 @@ var ClassDefinition = exports.ClassDefinition = Class.extend({
 	$IS_INTERFACE: 64,
 	$IS_MIXIN: 128,
 
-	initialize: function (token, className, flags, extendName, implementNames, members, objectTypesUsed) {
+	constructor: function (token, className, flags, extendName, implementNames, members, objectTypesUsed) {
 		this._token = token;
 		this._className = className;
 		this._outputClassName = null;
@@ -500,7 +500,7 @@ var ClassDefinition = exports.ClassDefinition = Class.extend({
 // abstract class deriving Member(Function|Variable)Definition
 var MemberDefinition = exports.MemberDefinition = Class.extend({
 
-	initialize: function (token, nameToken, flags) {
+	constructor: function (token, nameToken, flags) {
 		this._token = token;
 		this._nameToken = nameToken; // may be null
 		if(typeof(nameToken) === "string") throw new Error("nameToken must be a Token object or null!");
@@ -538,7 +538,7 @@ var MemberVariableDefinition = exports.MemberVariableDefinition = MemberDefiniti
 	$ANALYZE_SUCEEDED: 2,
 	$ANALYZE_FAILED: 3,
 
-	initialize: function (token, name, flags, type, initialValue) {
+	constructor: function (token, name, flags, type, initialValue) {
 		MemberDefinition.call(this, token, name, flags);
 		this._type = type; // may be null
 		this._initialValue = initialValue; // may be null
@@ -594,7 +594,7 @@ var MemberVariableDefinition = exports.MemberVariableDefinition = MemberDefiniti
 
 var MemberFunctionDefinition = exports.MemberFunctionDefinition = MemberDefinition.extend({
 
-	initialize: function (token, name, flags, returnType, args, locals, statements, closures) {
+	constructor: function (token, name, flags, returnType, args, locals, statements, closures) {
 		MemberDefinition.call(this, token, name, flags);
 		this._returnType = returnType;
 		this._args = args;
@@ -742,7 +742,7 @@ var MemberFunctionDefinition = exports.MemberFunctionDefinition = MemberDefiniti
 
 var LocalVariable = exports.LocalVariable = Class.extend({
 
-	initialize: function (name, type) {
+	constructor: function (name, type) {
 		this._name = name;
 		this._type = type;
 	},
@@ -778,8 +778,8 @@ var LocalVariable = exports.LocalVariable = Class.extend({
 
 var ArgumentDeclaration = exports.ArgumentDeclaration = LocalVariable.extend({
 
-	initialize: function (name, type) {
-		LocalVariable.prototype.initialize.call(this, name, type);
+	constructor: function (name, type) {
+		LocalVariable.prototype.constructor.call(this, name, type);
 	},
 
 	instantiate: function (instantiationContext) {
@@ -791,7 +791,7 @@ var ArgumentDeclaration = exports.ArgumentDeclaration = LocalVariable.extend({
 
 var TemplateClassDefinition = exports.TemplateClassDefinition = Class.extend({
 
-	initialize: function (className, flags, typeArgs, extendName, implementNames, members, objectTypesUsed) {
+	constructor: function (className, flags, typeArgs, extendName, implementNames, members, objectTypesUsed) {
 		if (extendName != null || implementNames.length != 0)
 			throw new Error("not supported");
 		this._className = className;
@@ -846,8 +846,8 @@ var TemplateClassDefinition = exports.TemplateClassDefinition = Class.extend({
 
 var InstantiatedClassDefinition = exports.InstantiatedClassDefinition = ClassDefinition.extend({
 
-	initialize: function (templateClassName, flags, typeArguments, extendName, implementNames, members, objectTypesUsed) {
-		ClassDefinition.prototype.initialize.call(
+	constructor: function (templateClassName, flags, typeArguments, extendName, implementNames, members, objectTypesUsed) {
+		ClassDefinition.prototype.constructor.call(
 			this,
 			null,
 			Type.Type.templateTypeToString(templateClassName, typeArguments),

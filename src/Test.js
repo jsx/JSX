@@ -33,7 +33,7 @@ var Class = require("./Class");
 var dump  = require("./dump");
 
 var Test = module.exports = Class.extend({
-	initialize: function(filename, parent) {
+	constructor: function(filename, parent) {
 		this._parent  = parent;
 		this._name    = filename;
 		this._count   = 0;
@@ -173,7 +173,7 @@ var Test = module.exports = Class.extend({
 });
 
 Test.Subtest = Class.extend({
-	initialize: function(name, parent) {
+	constructor: function(name, parent) {
 		this._name   = name;
 		this._parent = parent;
 	},
@@ -212,7 +212,7 @@ Test.Subtest = Class.extend({
 });
 
 Test.Matcher = Class.extend({
-	initialize: function(context, id, value, message) {
+	constructor: function(context, id, value, message) {
 		this._context = context;
 		this._id      = id;
 		this._value   = value;

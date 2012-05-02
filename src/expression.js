@@ -23,7 +23,7 @@ var Expression = exports.Expression = Class.extend({
 
 var OperatorExpression = exports.OperatorExpression = Expression.extend({
 
-	initialize: function (operatorToken) {
+	constructor: function (operatorToken) {
 		this._operatorToken = operatorToken;
 	},
 
@@ -48,7 +48,7 @@ var OperatorExpression = exports.OperatorExpression = Expression.extend({
 
 var IdentifierExpression = exports.IdentifierExpression = Expression.extend({
 
-	initialize: function (identifierToken) {
+	constructor: function (identifierToken) {
 		this._identifierToken = identifierToken;
 		this._local = null;
 		this._classDefType = null;
@@ -115,7 +115,7 @@ var IdentifierExpression = exports.IdentifierExpression = Expression.extend({
 
 var UndefinedExpression = exports.UndefinedExpression = Expression.extend({
 
-	initialize: function (token) {
+	constructor: function (token) {
 		this._token = token;
 	},
 
@@ -142,7 +142,7 @@ var UndefinedExpression = exports.UndefinedExpression = Expression.extend({
 
 var NullExpression = exports.NullExpression = Expression.extend({
 
-	initialize: function (token) {
+	constructor: function (token) {
 		this._token = token;
 	},
 
@@ -169,7 +169,7 @@ var NullExpression = exports.NullExpression = Expression.extend({
 
 var BooleanLiteralExpression = exports.BooleanLiteralExpression = Expression.extend({
 
-	initialize: function (token) {
+	constructor: function (token) {
 		this._token = token;
 	},
 
@@ -196,7 +196,7 @@ var BooleanLiteralExpression = exports.BooleanLiteralExpression = Expression.ext
 
 var IntegerLiteralExpression = exports.IntegerLiteralExpression = Expression.extend({
 
-	initialize: function (token) {
+	constructor: function (token) {
 		this._token = token;
 	},
 
@@ -224,7 +224,7 @@ var IntegerLiteralExpression = exports.IntegerLiteralExpression = Expression.ext
 
 var NumberLiteralExpression = exports.NumberLiteralExpression = Expression.extend({
 
-	initialize: function (token) {
+	constructor: function (token) {
 		this._token = token;
 	},
 
@@ -251,7 +251,7 @@ var NumberLiteralExpression = exports.NumberLiteralExpression = Expression.exten
 
 var StringLiteralExpression = exports.StringLiteralExpression = Expression.extend({
 
-	initialize: function (token) {
+	constructor: function (token) {
 		this._token = token;
 	},
 
@@ -278,7 +278,7 @@ var StringLiteralExpression = exports.StringLiteralExpression = Expression.exten
 
 var RegExpLiteralExpression = exports.RegExpLiteralExpression = Expression.extend({
 
-	initialize: function (token) {
+	constructor: function (token) {
 		this._token = token;
 		this._type = null;
 	},
@@ -310,7 +310,7 @@ var RegExpLiteralExpression = exports.RegExpLiteralExpression = Expression.exten
 
 var ArrayLiteralExpression = exports.ArrayLiteralExpression = Expression.extend({
 
-	initialize: function (token, exprs, type) {
+	constructor: function (token, exprs, type) {
 		this._token = token;
 		this._exprs = exprs;
 		this._type = type; // optional at this moment
@@ -392,7 +392,7 @@ var ArrayLiteralExpression = exports.ArrayLiteralExpression = Expression.extend(
 
 var HashLiteralElement = exports.HashLiteralElement = Class.extend({
 
-	initialize: function (key, expr) {
+	constructor: function (key, expr) {
 		this._key = key;
 		this._expr = expr;
 	},
@@ -409,7 +409,7 @@ var HashLiteralElement = exports.HashLiteralElement = Class.extend({
 
 var HashLiteralExpression = exports.HashLiteralExpression = Expression.extend({
 
-	initialize: function (token, elements, type) {
+	constructor: function (token, elements, type) {
 		this._token = token;
 		this._elements = elements;
 		this._type = type; // optional at this moment
@@ -491,7 +491,7 @@ var HashLiteralExpression = exports.HashLiteralExpression = Expression.extend({
 
 var ThisExpression = exports.ThisExpression = Expression.extend({
 
-	initialize: function (token) {
+	constructor: function (token) {
 		this._token = token;
 		this._classDef = null;
 	},
@@ -528,7 +528,7 @@ var ThisExpression = exports.ThisExpression = Expression.extend({
 
 var FunctionExpression = exports.FunctionExpression = Expression.extend({
 
-	initialize: function (funcDef) {
+	constructor: function (funcDef) {
 		this._funcDef = funcDef;
 	},
 
@@ -558,8 +558,8 @@ var FunctionExpression = exports.FunctionExpression = Expression.extend({
 
 var UnaryExpression = exports.UnaryExpression = OperatorExpression.extend({
 
-	initialize: function (operatorToken, expr) {
-		OperatorExpression.prototype.initialize.call(this, operatorToken);
+	constructor: function (operatorToken, expr) {
+		OperatorExpression.prototype.constructor.call(this, operatorToken);
 		this._expr = expr;
 	},
 
@@ -589,8 +589,8 @@ var UnaryExpression = exports.UnaryExpression = OperatorExpression.extend({
 
 var BitwiseNotExpression = exports.BitwiseNotExpression = UnaryExpression.extend({
 
-	initialize: function (operatorToken, expr) {
-		UnaryExpression.prototype.initialize.call(this, operatorToken, expr);
+	constructor: function (operatorToken, expr) {
+		UnaryExpression.prototype.constructor.call(this, operatorToken, expr);
 	},
 
 	getType: function () {
@@ -601,8 +601,8 @@ var BitwiseNotExpression = exports.BitwiseNotExpression = UnaryExpression.extend
 
 var InstanceofExpression = exports.InstanceofExpression = UnaryExpression.extend({
 
-	initialize: function (operatorToken, expr, expectedType) {
-		UnaryExpression.prototype.initialize.call(this, operatorToken, expr);
+	constructor: function (operatorToken, expr, expectedType) {
+		UnaryExpression.prototype.constructor.call(this, operatorToken, expr);
 		this._expectedType = expectedType;
 	},
 
@@ -636,8 +636,8 @@ var InstanceofExpression = exports.InstanceofExpression = UnaryExpression.extend
 
 var AsExpression = exports.AsExpression = UnaryExpression.extend({
 
-	initialize: function (operatorToken, expr, type) {
-		UnaryExpression.prototype.initialize.call(this, operatorToken, expr);
+	constructor: function (operatorToken, expr, type) {
+		UnaryExpression.prototype.constructor.call(this, operatorToken, expr);
 		this._type = type;
 	},
 
@@ -692,8 +692,8 @@ var AsExpression = exports.AsExpression = UnaryExpression.extend({
 
 var AsNoCheckExpression = exports.AsNoCheckExpression = UnaryExpression.extend({
 
-	initialize: function (operatorToken, expr, type) {
-		UnaryExpression.prototype.initialize.call(this, operatorToken, expr);
+	constructor: function (operatorToken, expr, type) {
+		UnaryExpression.prototype.constructor.call(this, operatorToken, expr);
 		this._type = type;
 	},
 
@@ -713,8 +713,8 @@ var AsNoCheckExpression = exports.AsNoCheckExpression = UnaryExpression.extend({
 
 var LogicalNotExpression = exports.LogicalNotExpression = UnaryExpression.extend({
 
-	initialize: function (operatorToken, expr) {
-		UnaryExpression.prototype.initialize.call(this, operatorToken, expr);
+	constructor: function (operatorToken, expr) {
+		UnaryExpression.prototype.constructor.call(this, operatorToken, expr);
 	},
 
 	analyze: function (context) {
@@ -733,8 +733,8 @@ var LogicalNotExpression = exports.LogicalNotExpression = UnaryExpression.extend
 
 var IncrementExpression = exports.IncrementExpression = UnaryExpression.extend({
 
-	initialize: function (operatorToken, expr) {
-		UnaryExpression.prototype.initialize.call(this, operatorToken, expr);
+	constructor: function (operatorToken, expr) {
+		UnaryExpression.prototype.constructor.call(this, operatorToken, expr);
 	},
 
 	serialize: function () {
@@ -769,8 +769,8 @@ var IncrementExpression = exports.IncrementExpression = UnaryExpression.extend({
 
 var PostIncrementExpression = exports.PostIncrementExpression = IncrementExpression.extend({
 
-	initialize: function (operatorToken, expr) {
-		IncrementExpression.prototype.initialize.call(this, operatorToken, expr);
+	constructor: function (operatorToken, expr) {
+		IncrementExpression.prototype.constructor.call(this, operatorToken, expr);
 	},
 
 	_getClassName: function() {
@@ -781,8 +781,8 @@ var PostIncrementExpression = exports.PostIncrementExpression = IncrementExpress
 
 var PreIncrementExpression = exports.PreIncrementExpression = IncrementExpression.extend({
 
-	initialize: function (operatorToken, expr) {
-		IncrementExpression.prototype.initialize.call(this, operatorToken, expr);
+	constructor: function (operatorToken, expr) {
+		IncrementExpression.prototype.constructor.call(this, operatorToken, expr);
 	},
 
 	_getClassName: function() {
@@ -793,8 +793,8 @@ var PreIncrementExpression = exports.PreIncrementExpression = IncrementExpressio
 
 var PropertyExpression = exports.PropertyExpression = UnaryExpression.extend({
 
-	initialize: function (operatorToken, expr1, identifierToken) {
-		UnaryExpression.prototype.initialize.call(this, operatorToken, expr1);
+	constructor: function (operatorToken, expr1, identifierToken) {
+		UnaryExpression.prototype.constructor.call(this, operatorToken, expr1);
 		this._identifierToken = identifierToken;
 		this._type = null;
 	},
@@ -885,8 +885,8 @@ var PropertyExpression = exports.PropertyExpression = UnaryExpression.extend({
 
 var TypeofExpression = exports.TypeofExpression = UnaryExpression.extend({
 
-	initialize: function (operatorToken, expr) {
-		UnaryExpression.prototype.initialize.call(this, operatorToken, expr);
+	constructor: function (operatorToken, expr) {
+		UnaryExpression.prototype.constructor.call(this, operatorToken, expr);
 	},
 
 	analyze: function (context) {
@@ -897,8 +897,8 @@ var TypeofExpression = exports.TypeofExpression = UnaryExpression.extend({
 
 var SignExpression = exports.SignExpression = UnaryExpression.extend({
 
-	initialize: function (operatorToken, expr) {
-		UnaryExpression.prototype.initialize.call(this, operatorToken, expr);
+	constructor: function (operatorToken, expr) {
+		UnaryExpression.prototype.constructor.call(this, operatorToken, expr);
 	},
 
 	analyze: function (context) {
@@ -922,8 +922,8 @@ var SignExpression = exports.SignExpression = UnaryExpression.extend({
 
 var BinaryExpression = exports.BinaryExpression = OperatorExpression.extend({
 
-	initialize: function (operatorToken, expr1, expr2) {
-		OperatorExpression.prototype.initialize.call(this, operatorToken);
+	constructor: function (operatorToken, expr1, expr2) {
+		OperatorExpression.prototype.constructor.call(this, operatorToken);
 		this._expr1 = expr1;
 		this._expr2 = expr2;
 	},
@@ -958,8 +958,8 @@ var BinaryExpression = exports.BinaryExpression = OperatorExpression.extend({
 
 var AdditiveExpression = exports.AdditiveExpression = BinaryExpression.extend({
 
-	initialize: function (operatorToken, expr1, expr2) {
-		BinaryExpression.prototype.initialize.call(this, operatorToken, expr1, expr2);
+	constructor: function (operatorToken, expr1, expr2) {
+		BinaryExpression.prototype.constructor.call(this, operatorToken, expr1, expr2);
 		this._type = null;
 	},
 
@@ -992,8 +992,8 @@ var AdditiveExpression = exports.AdditiveExpression = BinaryExpression.extend({
 
 var ArrayExpression = exports.ArrayExpression = BinaryExpression.extend({
 
-	initialize: function (operatorToken, expr1, expr2) {
-		BinaryExpression.prototype.initialize.call(this, operatorToken, expr1, expr2);
+	constructor: function (operatorToken, expr1, expr2) {
+		BinaryExpression.prototype.constructor.call(this, operatorToken, expr1, expr2);
 		this._type = null;
 	},
 
@@ -1032,8 +1032,8 @@ var ArrayExpression = exports.ArrayExpression = BinaryExpression.extend({
 
 var AssignmentExpression = exports.AssignmentExpression = BinaryExpression.extend({
 
-	initialize: function (operatorToken, expr1, expr2) {
-		BinaryExpression.prototype.initialize.call(this, operatorToken, expr1, expr2);
+	constructor: function (operatorToken, expr1, expr2) {
+		BinaryExpression.prototype.constructor.call(this, operatorToken, expr1, expr2);
 	},
 
 	analyze: function (context) {
@@ -1088,8 +1088,8 @@ var AssignmentExpression = exports.AssignmentExpression = BinaryExpression.exten
 // + - * / % < <= > >= & | ^
 var BinaryNumberExpression = exports.BinaryNumberExpression = BinaryExpression.extend({
 
-	initialize: function (operatorToken, expr1, expr2) {
-		BinaryExpression.prototype.initialize.call(this, operatorToken, expr1, expr2);
+	constructor: function (operatorToken, expr1, expr2) {
+		BinaryExpression.prototype.constructor.call(this, operatorToken, expr1, expr2);
 	},
 
 	analyze: function (context) {
@@ -1134,8 +1134,8 @@ var BinaryNumberExpression = exports.BinaryNumberExpression = BinaryExpression.e
 
 var EqualityExpression = exports.EqualityExpression = BinaryExpression.extend({
 
-	initialize: function (operatorToken, expr1, expr2) {
-		BinaryExpression.prototype.initialize.call(this, operatorToken, expr1, expr2);
+	constructor: function (operatorToken, expr1, expr2) {
+		BinaryExpression.prototype.constructor.call(this, operatorToken, expr1, expr2);
 	},
 
 	analyze: function (context) {
@@ -1165,7 +1165,7 @@ var EqualityExpression = exports.EqualityExpression = BinaryExpression.extend({
 
 var InExpression = exports.InExpression = BinaryExpression.extend({
 
-	initialize: function (operatorToken, expr1, expr2) {
+	constructor: function (operatorToken, expr1, expr2) {
 		throw new Error("FIXME");
 	},
 
@@ -1177,8 +1177,8 @@ var InExpression = exports.InExpression = BinaryExpression.extend({
 
 var LogicalExpression = exports.LogicalExpression = BinaryExpression.extend({
 
-	initialize: function (operatorToken, expr1, expr2) {
-		BinaryExpression.prototype.initialize.call(this, operatorToken, expr1, expr2);
+	constructor: function (operatorToken, expr1, expr2) {
+		BinaryExpression.prototype.constructor.call(this, operatorToken, expr1, expr2);
 	},
 
 	analyze: function (context) {
@@ -1199,8 +1199,8 @@ var LogicalExpression = exports.LogicalExpression = BinaryExpression.extend({
 
 var ShiftExpression = exports.ShiftExpression = BinaryExpression.extend({
 
-	initialize: function (operatorToken, expr1, expr2) {
-		BinaryExpression.prototype.initialize.call(this, operatorToken, expr1, expr2);
+	constructor: function (operatorToken, expr1, expr2) {
+		BinaryExpression.prototype.constructor.call(this, operatorToken, expr1, expr2);
 	},
 
 	analyze: function (context) {
@@ -1223,8 +1223,8 @@ var ShiftExpression = exports.ShiftExpression = BinaryExpression.extend({
 
 var ConditionalExpression = exports.ConditionalExpression = OperatorExpression.extend({
 
-	initialize: function (operatorToken, condExpr, ifTrueExpr, ifFalseExpr) {
-		OperatorExpression.prototype.initialize.call(this, operatorToken);
+	constructor: function (operatorToken, condExpr, ifTrueExpr, ifFalseExpr) {
+		OperatorExpression.prototype.constructor.call(this, operatorToken);
 		this._condExpr = condExpr;
 		this._ifTrueExpr = ifTrueExpr;
 		this._ifFalseExpr = ifFalseExpr;
@@ -1296,8 +1296,8 @@ var ConditionalExpression = exports.ConditionalExpression = OperatorExpression.e
 
 var CallExpression = exports.CallExpression = OperatorExpression.extend({
 
-	initialize: function (operatorToken, expr, args) {
-		OperatorExpression.prototype.initialize.call(this, operatorToken);
+	constructor: function (operatorToken, expr, args) {
+		OperatorExpression.prototype.constructor.call(this, operatorToken);
 		this._expr = expr;
 		this._args = args;
 	},
@@ -1344,8 +1344,8 @@ var CallExpression = exports.CallExpression = OperatorExpression.extend({
 
 var SuperExpression = exports.SuperExpression = OperatorExpression.extend({
 
-	initialize: function (operatorToken, name, args) {
-		OperatorExpression.prototype.initialize.call(this, operatorToken);
+	constructor: function (operatorToken, name, args) {
+		OperatorExpression.prototype.constructor.call(this, operatorToken);
 		this._name = name;
 		this._args = args;
 		this._funcType = null;
@@ -1405,8 +1405,8 @@ var SuperExpression = exports.SuperExpression = OperatorExpression.extend({
 
 var NewExpression = exports.NewExpression = OperatorExpression.extend({
 
-	initialize: function (operatorToken, qualifiedName, args) {
-		OperatorExpression.prototype.initialize.call(this, operatorToken);
+	constructor: function (operatorToken, qualifiedName, args) {
+		OperatorExpression.prototype.constructor.call(this, operatorToken);
 		this._qualifiedName = qualifiedName;
 		this._args = args;
 		this._constructor = null; // may be null if zero constructors exist for the class
@@ -1470,7 +1470,7 @@ var NewExpression = exports.NewExpression = OperatorExpression.extend({
 
 var CommaExpression = exports.CommaExpression = Expression.extend({
 
-	initialize: function (expr1, expr2) {
+	constructor: function (expr1, expr2) {
 		this._expr1 = expr1;
 		this._expr2 = expr2;
 	},
