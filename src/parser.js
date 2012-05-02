@@ -793,7 +793,8 @@ var Parser = exports.Parser = Class.extend({
 		}
 
 		// check name conflicts
-		if (this._filename.match(/^lib\/built-in\//) == null && Parser._isReservedClassName(className.getValue())) {
+		if ((flags & ClassDefinition.IS_NATIVE) == 0 && Parser._isReservedClassName(className.getValue())) {
+			// any better way to check that we are parsing a built-in file?
 			this._errors.push(new CompileError(className, "cannot re-define a built-in class"));
 			success = false;
 		} else {

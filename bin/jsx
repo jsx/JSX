@@ -14,8 +14,12 @@ eval(Class.$import("../src/jsemitter"));
 
 var NodePlatform = Platform.extend({
 
-	load: function(filename) {
-		return fs.readFileSync(filename).toString();
+	getRoot: function () {
+		return __dirname.replace(/\/bin\/?$/, "");
+	},
+
+	load: function(path) {
+		return fs.readFileSync(path).toString();
 	},
 
 	save: function (outputFile, content) {

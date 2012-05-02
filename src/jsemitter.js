@@ -1237,7 +1237,8 @@ var _CommaExpressionEmitter = exports._CommaExpressionEmitter = _ExpressionEmitt
 var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 
 	initialize: function (platform) {
-		this._output = platform.load("src/js/bootstrap.js") + "\n";
+		this._platform = platform;
+		this._output = this._platform.load(platform.getRoot() + "/src/js/bootstrap.js") + "\n";
 		this._outputFile = null;
 		this._indent = 0;
 		this._emittingClass = null;
@@ -1245,7 +1246,7 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 	},
 
 	getSearchPaths: function () {
-		return [ "lib/js" ];
+		return [ this._platform.getRoot() + "/lib/js" ];
 	},
 
 	setOutputFile: function (name) {
@@ -1314,8 +1315,8 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 		if ((classDef.flags() & ClassDefinition.IS_NATIVE) != 0)
 			return;
 		// special handling for js.jsx
-		if (classDef.getToken().getFilename() == "lib/js/js.jsx") {
-			this._emit("js.global = (function () { return this; }).call(null);\n\n", null);
+		if (classDef.getToken().getFilename() == this._platform.getRoot() + "/lib/js/js.jsx") {
+			this._emit("js.global = (function () { return this; })();\n\n", null);
 			return;
 		}
 		// normal handling
@@ -1354,6 +1355,8 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 				}
 			}
 			// emit the map
+			if (filename.indexOf(this._platform.getRoot() + "/") == 0)
+				filename = "system:" + filename.substring(this._platform.getRoot().length + 1);
 			this._emit("\"" + filename + "\": ", null); // FIXME escape
 			this._emit("{\n", null);
 			this._advanceIndent();

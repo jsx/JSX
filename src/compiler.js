@@ -18,16 +18,16 @@ var Compiler = exports.Compiler = Class.extend({
 		this._mode = Compiler.MODE_COMPILE;
 		this._parsers = [];
 		this._fileCache = {};
-		this._searchPaths = [ "lib/common" ];
+		this._searchPaths = [ this._platform.getRoot() + "/lib/common" ];
 		// load the built-in classes
-		this.addSourceFile(null, "lib/built-in/Object.jsx");
-		this.addSourceFile(null, "lib/built-in/Boolean.jsx");
-		this.addSourceFile(null, "lib/built-in/Number.jsx");
-		this.addSourceFile(null, "lib/built-in/String.jsx");
-		this.addSourceFile(null, "lib/built-in/RegExp.jsx");
-		this.addSourceFile(null, "lib/built-in/Date.jsx");
-		this.addSourceFile(null, "lib/built-in/Array.jsx");
-		this.addSourceFile(null, "lib/built-in/Hash.jsx");
+		this.addSourceFile(null, this._platform.getRoot() + "/lib/built-in/Object.jsx");
+		this.addSourceFile(null, this._platform.getRoot() + "/lib/built-in/Boolean.jsx");
+		this.addSourceFile(null, this._platform.getRoot() + "/lib/built-in/Number.jsx");
+		this.addSourceFile(null, this._platform.getRoot() + "/lib/built-in/String.jsx");
+		this.addSourceFile(null, this._platform.getRoot() + "/lib/built-in/RegExp.jsx");
+		this.addSourceFile(null, this._platform.getRoot() + "/lib/built-in/Date.jsx");
+		this.addSourceFile(null, this._platform.getRoot() + "/lib/built-in/Array.jsx");
+		this.addSourceFile(null, this._platform.getRoot() + "/lib/built-in/Hash.jsx");
 		this._builtinParsers = this._parsers.concat([]); // shallow clone
 	},
 
@@ -83,9 +83,9 @@ var Compiler = exports.Compiler = Class.extend({
 			return false;
 		}
 		// register backing class for primitives
-		BooleanType._classDef = this.findParser("lib/built-in/Boolean.jsx").lookup(errors, null, "Boolean");
-		NumberType._classDef = this.findParser("lib/built-in/Number.jsx").lookup(errors, null, "Number");
-		StringType._classDef = this.findParser("lib/built-in/String.jsx").lookup(errors, null, "String");
+		BooleanType._classDef = this.findParser(this._platform.getRoot() + "/lib/built-in/Boolean.jsx").lookup(errors, null, "Boolean");
+		NumberType._classDef = this.findParser(this._platform.getRoot() + "/lib/built-in/Number.jsx").lookup(errors, null, "Number");
+		StringType._classDef = this.findParser(this._platform.getRoot() + "/lib/built-in/String.jsx").lookup(errors, null, "String");
 		if (errors.length != 0) {
 			this._printErrors(errors);
 			return false;
