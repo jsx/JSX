@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 var fs = require("fs");
+var child_process = require("child_process");
 
 var Class = require("../src/Class");
 eval(Class.$import("../src/compiler"));
@@ -26,8 +27,17 @@ var NodePlatform = Platform.extend({
 		else {
 			fs.writeFileSync(outputFile, content);
 		}
-	}
+	},
 
+	// called from JavaScriptEmitter
+	addLauncher: function (emitter, targetCode, entrypoint) {
+		if(emitter instanceof JavaScriptEmitter) {
+			return targetCode + entrypoint + ".run$();\n";
+		}
+		else {
+			throw new Error("FIXME");
+		}
+	}
 });
 
 var JSX = Class.extend({
@@ -48,6 +58,8 @@ var JSX = Class.extend({
 			"Usage: jsx [options] source-files\n" +
 			"\n" +
 			"Options:\n" +
+			"  --run Class                runs Class.main(:string[]):void after compiling\n" +
+			"  --test                     runs _Test.run():void after compiling\n" +
 			"  --output file              output file (default:stdout)\n" +
 			"  --mode (compile|parse)     compilation mode (default:compile)\n" +
 			"  --target (javascript|c++)  target language (default:javascript)\n" +
@@ -86,6 +98,7 @@ var JSX = Class.extend({
 
 		var emitter = null;
 		var outputFile = null;
+		var run = null;
 		var opt, optarg;
 		while ((opt = getopt()) != null) {
 			switch (opt) {
@@ -123,6 +136,14 @@ var JSX = Class.extend({
 					console.log("unknown target: " + optarg);
 					process.exit(1);
 				}
+				break;
+			case "--test":
+				run = "_Test";
+				break;
+			case "--run":
+				if ((optarg = getoptarg()) == null)
+					process.exit(1);
+				run = optarg;
 				break;
 			case "--version":
 				console.log(JSX.meta("version"));
@@ -169,7 +190,7 @@ var JSX = Class.extend({
 		if (! compiler.compile())
 			process.exit(1);
 
-		platform.save(outputFile, emitter.getOutput());
+		platform.save(outputFile, emitter.getOutput(run));
 
 		if (emitter instanceof JavaScriptEmitter) {
 			emitter.saveSourceMappingFile(platform);

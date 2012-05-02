@@ -16,10 +16,10 @@ var $__jsx_isNaN = isNaN;
 var $__jsx_isFinite = isFinite;
 
 /*
- * public interface to JSX
+ * public interface to JSX (global symbol)
  */
-function JSX() {
-}
+(function () { return this; })().JSX = {};
+
 
 JSX.require = function (path) {
 	var m = $__jsx_classMap[path];
