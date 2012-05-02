@@ -32,7 +32,7 @@ var NodePlatform = Platform.extend({
 	// called from JavaScriptEmitter
 	addLauncher: function (emitter, targetCode, entrypoint) {
 		if(emitter instanceof JavaScriptEmitter) {
-			return targetCode + entrypoint + ".run$();\n";
+			return targetCode + entrypoint + ".main$();\n";
 		}
 		else {
 			throw new Error("FIXME");
@@ -190,10 +190,35 @@ var JSX = Class.extend({
 		if (! compiler.compile())
 			process.exit(1);
 
-		platform.save(outputFile, emitter.getOutput(run));
+		var output = emitter.getOutput(run);
 
-		if (emitter instanceof JavaScriptEmitter) {
-			emitter.saveSourceMappingFile(platform);
+		if (run == null) {
+
+			platform.save(outputFile, emitter.getOutput(run));
+
+			if (emitter instanceof JavaScriptEmitter) {
+				emitter.saveSourceMappingFile(platform);
+			}
+
+		}
+		else if(emitter instanceof JavaScriptEmitter) {
+			var child = child_process.spawn(process.execPath, []);
+
+			child.stdin.write(output);
+			child.stdin.end();
+
+			child.stdout.on("data", function (data) {
+				process.stdout.write(data);
+			});
+			child.stderr.on("data", function (data) {
+				process.stderr.write(data);
+			});
+			child.on("exit", function (status) {
+				process.exit(status);
+			});
+		}
+		else {
+			throw new Error("FIXME: run C+++ code");
 		}
 	}
 
