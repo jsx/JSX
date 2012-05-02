@@ -1287,7 +1287,7 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 			this._emitClassObject(classDef);
 
 			// emit constructors
-			var ctors = this._findFunctions(classDef, "initialize", false);
+			var ctors = this._findFunctions(classDef, "constructor", false);
 			if (ctors.length == 0)
 				this._emitConstructor(classDef, null);
 			else
@@ -1299,7 +1299,7 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 			for (var i = 0; i < members.length; ++i) {
 				var member = members[i];
 				if (member instanceof MemberFunctionDefinition) {
-					if (! (member.name() == "initialize" && (member.flags() & ClassDefinition.IS_STATIC) == 0) && member.getStatements() != null) {
+					if (! (member.name() == "constructor" && (member.flags() & ClassDefinition.IS_STATIC) == 0) && member.getStatements() != null) {
 						this._emitFunction(member);
 					}
 				}
@@ -1349,7 +1349,7 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 				var push = function (suffix) {
 					list.push([ classDef.className() + suffix, classDef.getOutputClassName() + suffix ]);
 				};
-				var ctors = this._findFunctions(classDef, "initialize", false);
+				var ctors = this._findFunctions(classDef, "constructor", false);
 				push("");
 				if (ctors.length == 0) {
 					push(this._mangleFunctionArguments([]));

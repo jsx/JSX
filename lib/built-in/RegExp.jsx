@@ -1,8 +1,8 @@
 // 15.10 RegExp
 native final class RegExp {
 
-	function initialize(pattern :string, flags :string);
-	function initialize(pattern :string);
+	function constructor(pattern :string, flags :string);
+	function constructor(pattern :string);
 
 	// FIXME: the matched object is a variation of string[],
 	//        but has "index", "input" and "lastIndex" properties

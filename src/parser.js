@@ -922,7 +922,7 @@ var Parser = exports.Parser = Class.extend({
 		var name = this._expectIdentifier();
 		if (name == null)
 			return null;
-		if (name.getValue() == "initialize") {
+		if (name.getValue() == "constructor") {
 			if ((classFlags & ClassDefinition.IS_INTERFACE) != 0) {
 				this._newError("interface cannot have a constructor");
 				return null;
@@ -940,7 +940,7 @@ var Parser = exports.Parser = Class.extend({
 			return null;
 		// return type
 		var returnType;
-		if (name.getValue() == "initialize") {
+		if (name.getValue() == "constructor") {
 			// no return type
 			returnType = Type.voidType;
 		} else {
@@ -969,7 +969,7 @@ var Parser = exports.Parser = Class.extend({
 		this._locals = [];
 		this._statements = [];
 		this._closures = [];
-		if (name.getValue() == "initialize")
+		if (name.getValue() == "constructor")
 			this._initializeBlock();
 		else
 			this._block();

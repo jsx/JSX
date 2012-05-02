@@ -1,9 +1,9 @@
 native final class String {
 
 	// 15.5.2
-	function initialize();
-	function initialize(s : string);
-	function initialize(s : String);
+	function constructor();
+	function constructor(s : string);
+	function constructor(s : String);
 
 	// 15.5.3
 	static function fromCharCode(char0 : int) : string; // FIXME support vararg

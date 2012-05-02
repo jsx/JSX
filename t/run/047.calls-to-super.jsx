@@ -6,7 +6,7 @@
 class Point {
 	var _x : number;
 	var _y : number;
-	function initialize(x : number, y : number) {
+	function constructor(x : number, y : number) {
 		this._x = x;
 		this._y = y;
 	}
@@ -17,11 +17,11 @@ class Point {
 
 class Pixel extends Point {
 	var _color : string;
-	function initialize(x : number, y : number, color : string) {
+	function constructor(x : number, y : number, color : string) {
 		super(x, y); // call-by-keyword
 		this._color = color;
 	}
-	function initialize(x : number, y : number) {
+	function constructor(x : number, y : number) {
 		Point(x, y); // call-by-name
 		this._color = "black";
 	}

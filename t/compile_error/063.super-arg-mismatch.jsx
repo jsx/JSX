@@ -1,5 +1,5 @@
 class T {
-	function initialize() {
+	function constructor() {
 		super(555);
 	}
 }

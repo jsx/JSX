@@ -375,7 +375,7 @@ var ClassDefinition = exports.ClassDefinition = Class.extend({
 	},
 
 	_assertMemberFunctionIsDefinable: function (context, member, memberClassDef, token, reportOverridesAsWell) {
-		if (member.name() == "initialize")
+		if (member.name() == "constructor")
 			return true;
 		for (var i = 0; i < this._members.length; ++i) {
 			if (this._members[i].name() != member.name())
@@ -486,7 +486,7 @@ var ClassDefinition = exports.ClassDefinition = Class.extend({
 		var hasCtorWithArgs = false;
 		for (var i = 0; i < this._members.length; ++i) {
 			var member = this._members[i];
-			if (member.name() == "initialize" && (member.flags() & ClassDefinition.IS_STATIC) == 0 && member instanceof MemberFunctionDefinition) {
+			if (member.name() == "constructor" && (member.flags() & ClassDefinition.IS_STATIC) == 0 && member instanceof MemberFunctionDefinition) {
 				if (member.getArguments().length == 0)
 					return true;
 				hasCtorWithArgs = true;
@@ -648,7 +648,7 @@ var MemberFunctionDefinition = exports.MemberFunctionDefinition = MemberDefiniti
 
 		// check that from the constructor, all constructors with non-zero
 		// arguments are called, and that the calls are in the implemented order
-		if (this.getNameToken() == null || this.name() != "initialize")
+		if (this.getNameToken() == null || this.name() != "constructor")
 			return;
 
 		// constructor

@@ -1,6 +1,6 @@
 class FooClass {
-	function initialize() {
-		log "FooClass#initialize";
+	function constructor() {
+		log "FooClass#constructor";
 	}
 	static function say() : void {
 		log "FooClass#say";

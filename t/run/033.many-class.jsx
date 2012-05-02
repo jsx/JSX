@@ -3,7 +3,7 @@
 3
 */
 class A {
-	function initialize(a : int) {
+	function constructor(a : int) {
 		this._a = a;
 	}
 	function get() : int {

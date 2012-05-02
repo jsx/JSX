@@ -5,7 +5,7 @@ class Base {
 interface Interface {
 }
 class Test extends Base implements Interface {
-	function initialize() {
+	function constructor() {
 		Base();
 		Interface();
 	}

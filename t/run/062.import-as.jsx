@@ -1,13 +1,13 @@
 /*EXPECTED
-FooClass#initialize
-FooClass#initialize
+FooClass#constructor
+FooClass#constructor
 FooClass#say
 */
 
 import "062.import-as/foo.jsx" as foo;
 
 class Test extends foo.FooClass implements foo.FooInterface {
-	function initialize() {
+	function constructor() {
 		foo.FooClass();
 	}
 	static function run() : void {

@@ -1445,7 +1445,7 @@ var NewExpression = exports.NewExpression = OperatorExpression.extend({
 		var argTypes = Util.analyzeArgs(context, this._args);
 		if (argTypes == null)
 			return false;
-		var ctors = classDef.getMemberTypeByName(context.errors, context.classDefs, "initialize", ClassDefinition.GET_MEMBER_MODE_CLASS_ONLY);
+		var ctors = classDef.getMemberTypeByName(context.errors, context.classDefs, "constructor", ClassDefinition.GET_MEMBER_MODE_CLASS_ONLY);
 		if (ctors != null) {
 			if ((this._constructor = ctors.deduceByArgumentTypes(context, this._operatorToken, argTypes, false)) == null) {
 				context.errors.push(new CompileError(this._operatorToken, "cannot create an object of type '" + this._qualifiedName.getToken().getValue() + "', arguments mismatch"));

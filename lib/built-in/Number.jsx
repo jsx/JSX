@@ -1,8 +1,8 @@
 native final class Number {
 
 	// 15.7.2
-	function initialize();
-	function initialize(value : number);
+	function constructor();
+	function constructor(value : number);
 
 	// 15.7.3
 	static var MAX_VALUE : number;
