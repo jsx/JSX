@@ -66,8 +66,7 @@ var ConstructorInvocationStatement = exports.ConstructorInvocationStatement = St
 				context.errors.push(new CompileError(this._qualifiedName.getToken(), "no function with matching arguments"));
 				return;
 			}
-		}
-		if ((ctorType = ctorType.deduceByArgumentTypes(context, this._qualifiedName.getToken(), argTypes, false)) == null) {
+		} else if ((ctorType = ctorType.deduceByArgumentTypes(context, this._qualifiedName.getToken(), argTypes, false)) == null) {
 			// error is reported by callee
 			return;
 		}
