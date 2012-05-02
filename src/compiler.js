@@ -20,14 +20,7 @@ var Compiler = exports.Compiler = Class.extend({
 		this._fileCache = {};
 		this._searchPaths = [ this._platform.getRoot() + "/lib/common" ];
 		// load the built-in classes
-		this.addSourceFile(null, this._platform.getRoot() + "/lib/built-in/Object.jsx");
-		this.addSourceFile(null, this._platform.getRoot() + "/lib/built-in/Boolean.jsx");
-		this.addSourceFile(null, this._platform.getRoot() + "/lib/built-in/Number.jsx");
-		this.addSourceFile(null, this._platform.getRoot() + "/lib/built-in/String.jsx");
-		this.addSourceFile(null, this._platform.getRoot() + "/lib/built-in/RegExp.jsx");
-		this.addSourceFile(null, this._platform.getRoot() + "/lib/built-in/Date.jsx");
-		this.addSourceFile(null, this._platform.getRoot() + "/lib/built-in/Array.jsx");
-		this.addSourceFile(null, this._platform.getRoot() + "/lib/built-in/Hash.jsx");
+		this.addSourceFile(null, this._platform.getRoot() + "/lib/built-in.jsx");
 		this._builtinParsers = this._parsers.concat([]); // shallow clone
 	},
 
@@ -83,9 +76,10 @@ var Compiler = exports.Compiler = Class.extend({
 			return false;
 		}
 		// register backing class for primitives
-		BooleanType._classDef = this.findParser(this._platform.getRoot() + "/lib/built-in/Boolean.jsx").lookup(errors, null, "Boolean");
-		NumberType._classDef = this.findParser(this._platform.getRoot() + "/lib/built-in/Number.jsx").lookup(errors, null, "Number");
-		StringType._classDef = this.findParser(this._platform.getRoot() + "/lib/built-in/String.jsx").lookup(errors, null, "String");
+		var builtins = this.findParser(this._platform.getRoot() + "/lib/built-in.jsx");
+		BooleanType._classDef = builtins.lookup(errors, null, "Boolean");
+		NumberType._classDef = builtins.lookup(errors, null, "Number");
+		StringType._classDef = builtins.lookup(errors, null, "String");
 		if (errors.length != 0) {
 			this._printErrors(errors);
 			return false;
