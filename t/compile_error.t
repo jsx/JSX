@@ -12,6 +12,6 @@ plan tests => scalar @files;
 
 for my $file (@files) {
     my $err = `bin/jsx $file 2>&1`;
-    isnt $?, 0, $file;
+    ok $? != 0 && $err !~ /process\.nextTick error/, $file;
     note $err;
 }
