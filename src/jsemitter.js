@@ -33,6 +33,17 @@ var _Util = exports._Util = Class.extend({
 		return null;
 	},
 
+	$getInstanceofNameFromClassDef: function (classDef) {
+		if (classDef instanceof InstantiatedClassDefinition) {
+			var name = classDef.getTemplateClassName();
+			if (name == "Hash")
+				name = "Object";
+		} else {
+			name = classDef.getOutputClassName();
+		}
+		return name;
+	},
+
 	$buildAnnotation: function (template, type) {
 		var closureType = this.toClosureType(type);
 		if (closureType == null)
@@ -568,13 +579,8 @@ var _AsExpressionEmitter = exports._AsExpressionEmitter = _ExpressionEmitter.ext
 			if (destType instanceof ObjectType) {
 				// unsafe cast
 				if ((destType.getClassDef().flags() & (ClassDefinition.IS_INTERFACE | ClassDefinition.IS_MIXIN)) == 0) {
-					var destTypeStr = destType.getClassDef().getOutputClassName();
-					if (destTypeStr.match(/^Array\.</) != null)
-						destTypeStr = "Array"; // FIXME implement safe cast to Array.<T>
-					else if (destTypeStr.match(/^Hash\.</) != null)
-						destTypeStr = "Object"; // FIXME is it possible to implement safe cast to Hash.<T>?
 					this.emitWithPrecedence(outerOpPrecedence, _CallExpressionEmitter._operatorPrecedence, (function () {
-						this._emitter._emit("(function (o) { return o instanceof " + destTypeStr + " ? o : null; })(", this._expr.getOperatorToken());
+						this._emitter._emit("(function (o) { return o instanceof " + _Util.getInstanceofNameFromClassDef(destType.getClassDef()) + " ? o : null; })(", this._expr.getOperatorToken());
 						this._emitter._getExpressionEmitterFor(this._expr.getExpr()).emit(0);
 						this._emitter._emit(")", this._expr.getOperatorToken());
 					}).bind(this));
@@ -890,7 +896,7 @@ var _InstanceofExpressionEmitter = exports._InstanceofExpressionEmitter = _Expre
 		if ((expectedType.getClassDef().flags() & (ClassDefinition.IS_INTERFACE | ClassDefinition.IS_MIXIN)) == 0) {
 			this.emitWithPrecedence(outerOpPrecedence, _InstanceofExpressionEmitter._operatorPrecedence, (function () {
 				this._emitter._getExpressionEmitterFor(this._expr.getExpr()).emit(_InstanceofExpressionEmitter._operatorPrecedence);
-				this._emitter._emit(" instanceof " + expectedType.getClassDef().getOutputClassName(), null);
+				this._emitter._emit(" instanceof " + _Util.getInstanceofNameFromClassDef(expectedType.getClassDef()), null);
 			}).bind(this));
 		} else {
 			this.emitWithPrecedence(outerOpPrecedence, _CallExpressionEmitter._operatorPrecedence, (function () {
