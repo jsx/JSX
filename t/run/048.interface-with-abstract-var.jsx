@@ -15,7 +15,7 @@ mixin SayName {
 
 class Human implements Say, SayName {
 	var _name : string;
-	function initialize(name : string) {
+	function constructor(name : string) {
 		this._name = name;
 	}
 }

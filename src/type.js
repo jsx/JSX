@@ -258,7 +258,7 @@ var UndefinedType = exports.UndefinedType = Type.extend({
 
 var MayBeUndefinedType = exports.MayBeUndefinedType = Type.extend({
 
-	initialize: function (type) {
+	constructor: function (type) {
 		if (type.equals(Type.variantType))
 			throw new Error("logic error, cannot create MayBeUndefined.<variant>");
 		this._baseType = type instanceof MayBeUndefinedType ? type._baseType : type;
@@ -295,7 +295,7 @@ var MayBeUndefinedType = exports.MayBeUndefinedType = Type.extend({
 
 var ClassDefType = exports.ClassDefType = Type.extend({
 
-	initialize: function (classDef) {
+	constructor: function (classDef) {
 		this._classDef = classDef;
 	},
 
@@ -323,7 +323,7 @@ var ClassDefType = exports.ClassDefType = Type.extend({
 
 var ObjectType = exports.ObjectType = Type.extend({
 
-	initialize: function (classDef) {
+	constructor: function (classDef) {
 		this._classDef = classDef;
 	},
 
@@ -362,8 +362,8 @@ var ObjectType = exports.ObjectType = Type.extend({
 
 var ParsedObjectType = exports.ParsedObjectType = ObjectType.extend({
 
-	initialize: function (className, typeArgs, token) {
-		ObjectType.prototype.initialize.call(this, null);
+	constructor: function (className, typeArgs, token) {
+		ObjectType.prototype.constructor.call(this, null);
 		this._className = className;
 		this._typeArguments = typeArgs;
 		this._token = token;
@@ -404,7 +404,7 @@ var FunctionType = exports.FunctionType = Type.extend({
 
 var FunctionChoiceType = exports.FunctionChoiceType = FunctionType.extend({
 
-	initialize: function (types) {
+	constructor: function (types) {
 		this._types = types;
 	},
 
@@ -451,7 +451,7 @@ var FunctionChoiceType = exports.FunctionChoiceType = FunctionType.extend({
 
 var ResolvedFunctionType = exports.ResolvedFunctionType = FunctionType.extend({
 
-	initialize: function (returnType, argTypes, isAssignable) {
+	constructor: function (returnType, argTypes, isAssignable) {
 		this._returnType = returnType;
 		this._argTypes = argTypes;
 		this._isAssignable = isAssignable;
@@ -519,8 +519,8 @@ var ResolvedFunctionType = exports.ResolvedFunctionType = FunctionType.extend({
 
 var StaticFunctionType = exports.StaticFunctionType = ResolvedFunctionType.extend({
 
-	initialize: function (returnType, argTypes, isAssignable) {
-		ResolvedFunctionType.prototype.initialize.call(this, returnType, argTypes, isAssignable);
+	constructor: function (returnType, argTypes, isAssignable) {
+		ResolvedFunctionType.prototype.constructor.call(this, returnType, argTypes, isAssignable);
 	},
 
 	instantiate: function (instantiationContext) {
@@ -555,8 +555,8 @@ var StaticFunctionType = exports.StaticFunctionType = ResolvedFunctionType.exten
 
 var MemberFunctionType = exports.MemberFunctionType = ResolvedFunctionType.extend({
 
-	initialize: function (objectType, returnType, argTypes, isAssignable) {
-		ResolvedFunctionType.prototype.initialize.call(this, returnType, argTypes, isAssignable);
+	constructor: function (objectType, returnType, argTypes, isAssignable) {
+		ResolvedFunctionType.prototype.constructor.call(this, returnType, argTypes, isAssignable);
 		this._objectType = objectType;
 	},
 

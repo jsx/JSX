@@ -1,17 +1,17 @@
 /*EXPECTED
 importing:say
 imported:say
-importing:initialize
-importing:initialize
-imported:initialize
-imported:initialize
+importing:constructor
+importing:constructor
+imported:constructor
+imported:constructor
 */
 
 import "060.private-class/imported.jsx";
 
 class _Private {
-	function initialize() {
-		log "importing:initialize";
+	function constructor() {
+		log "importing:constructor";
 	}
 	static function say() : void {
 		log "importing:say";

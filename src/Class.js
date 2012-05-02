@@ -4,10 +4,10 @@ var Class = module.exports = function () {
 };
 
 Class.extend = function (properties) {
-	var ctor = properties.initialize;
-	if (typeof ctor === "undefined") {
-		var superCtor = this.prototype.initialize;
-		ctor = properties.initialize = function () {
+	var ctor = properties.constructor;
+	if (ctor === Object) {
+		var superCtor = this.prototype.constructor;
+		ctor = properties.constructor = function () {
 			superCtor.call(this);
 		};
 	}
@@ -23,13 +23,13 @@ Class.extend = function (properties) {
 			ctor.prototype[k] = properties[k];
 		}
 	}
-	if (typeof ctor.initialize === "function") {
-		ctor.initialize();
+	if (typeof ctor.constructor === "function") {
+		ctor.constructor();
 	}
 	return ctor;
 };
 
-Class.prototype.initialize = function () {
+Class.prototype.constructor = function () {
 };
 
 Class.$import = function (name) {

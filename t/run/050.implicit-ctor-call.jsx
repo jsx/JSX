@@ -1,17 +1,17 @@
 /*EXPECTED
-C#initialize
-M#initialize
+C#constructor
+M#constructor
 */
 class C {
-	function initialize() {
-		log "C#initialize";
+	function constructor() {
+		log "C#constructor";
 	}
 }
 interface I {
 }
 mixin M {
-	function initialize() {
-		log "M#initialize";
+	function constructor() {
+		log "M#constructor";
 	}
 }
 class Test extends C implements I, M {

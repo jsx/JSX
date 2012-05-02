@@ -1,13 +1,13 @@
 mixin M1 {
-	function initialize() {
+	function constructor() {
 	}
 }
 mixin M2 {
-	function initialize() {
+	function constructor() {
 	}
 }
 class T implements M1, M2 {
-	function initialize() {
+	function constructor() {
 		M2();
 		M1();
 	}

@@ -1,6 +1,6 @@
 class _Private {
-	function initialize() {
-		log "imported:initialize";
+	function constructor() {
+		log "imported:constructor";
 	}
 	static function say() : void {
 		log "imported:say";

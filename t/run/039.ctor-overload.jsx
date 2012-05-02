@@ -5,9 +5,9 @@
 class Point {
 	var _x = 0;
 	var _y = 0;
-	function initialize() {
+	function constructor() {
 	}
-	function initialize(x : number, y : number) {
+	function constructor(x : number, y : number) {
 		this._x = x;
 		this._y = y;
 	}

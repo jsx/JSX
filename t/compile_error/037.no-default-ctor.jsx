@@ -1,8 +1,8 @@
 class Base {
-	function initialize(x : number) {
+	function constructor(x : number) {
 	}
 }
 class Derived extends Base {
-	function initialize() {
+	function constructor() {
 	}
 }

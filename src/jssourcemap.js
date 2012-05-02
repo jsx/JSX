@@ -10,7 +10,7 @@ sourceMap.SourceMapGenerator.prototype._validateMapping = function () {};
 
 var SourceMapGenerator = exports.SourceMapGenerator = Class.extend({
 
-	initialize: function (outputFile, sourceRoot) {
+	constructor: function (outputFile, sourceRoot) {
 		this._outputFile = outputFile;
 		this._impl = new sourceMap.SourceMapGenerator({
 			file: outputFile,

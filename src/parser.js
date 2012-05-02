@@ -9,7 +9,7 @@ eval(Class.$import("./util"));
 
 var Token = exports.Token = Class.extend({
 
-	initialize: function (value, isIdentifier, filename, lineNumber, columnNumber) {
+	constructor: function (value, isIdentifier, filename, lineNumber, columnNumber) {
 		this._value = value;
 		this._isIdentifier = isIdentifier;
 		this._filename = filename;
@@ -69,7 +69,7 @@ var _Lexer = exports._TokenTable = Class.extend({
 	},
 
 	// static variables
-	$initialize: function () {
+	$constructor: function () {
 		var ident         = " [a-zA-Z_] [a-zA-Z0-9_]* ";
 		var doubleQuoted  = ' "  [^"\\\\]* (?: \\\\. [^"\\\\]* )* " ';
 		var singleQuoted  = " '  [^'\\\\]* (?: \\\\. [^'\\\\]* )* ' ";
@@ -149,7 +149,7 @@ var _Lexer = exports._TokenTable = Class.extend({
 
 var Import = exports.Import = Class.extend({
 
-	initialize: function () {
+	constructor: function () {
 		switch (arguments.length) {
 		case 1:
 			// for built-in classes
@@ -248,7 +248,7 @@ var Import = exports.Import = Class.extend({
 
 var QualifiedName = exports.QualifiedName = Class.extend({
 
-	initialize: function (token, imprt) {
+	constructor: function (token, imprt) {
 		this._token = token;
 		this._import = imprt;
 	},
@@ -289,7 +289,7 @@ var QualifiedName = exports.QualifiedName = Class.extend({
 
 var Parser = exports.Parser = Class.extend({
 
-	initialize: function (sourceToken, filename) {
+	constructor: function (sourceToken, filename) {
 		this._sourceToken = sourceToken;
 		this._filename = filename;
 	},
@@ -922,7 +922,7 @@ var Parser = exports.Parser = Class.extend({
 		var name = this._expectIdentifier();
 		if (name == null)
 			return null;
-		if (name.getValue() == "initialize") {
+		if (name.getValue() == "constructor") {
 			if ((classFlags & ClassDefinition.IS_INTERFACE) != 0) {
 				this._newError("interface cannot have a constructor");
 				return null;
@@ -940,7 +940,7 @@ var Parser = exports.Parser = Class.extend({
 			return null;
 		// return type
 		var returnType;
-		if (name.getValue() == "initialize") {
+		if (name.getValue() == "constructor") {
 			// no return type
 			returnType = Type.voidType;
 		} else {
@@ -969,7 +969,7 @@ var Parser = exports.Parser = Class.extend({
 		this._locals = [];
 		this._statements = [];
 		this._closures = [];
-		if (name.getValue() == "initialize")
+		if (name.getValue() == "constructor")
 			this._initializeBlock();
 		else
 			this._block();

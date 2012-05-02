@@ -6,24 +6,24 @@ native final class Date {
 	// TODO: complete all the methods
 
 	// 15.9.3
-	function initialize(year :number, month :number);
-	function initialize(year :number, month :number, date :number);
-	function initialize(year :number, month :number, date :number,
+	function constructor(year :number, month :number);
+	function constructor(year :number, month :number, date :number);
+	function constructor(year :number, month :number, date :number,
 						hours :number);
-	function initialize(year :number, month :number, date :number,
+	function constructor(year :number, month :number, date :number,
 						hours :number, minutes :number);
-	function initialize(year :number, month :number, date :number,
+	function constructor(year :number, month :number, date :number,
 						hours :number, minutes :number, seconds :number);
-	function initialize(year :number, month :number, date :number,
+	function constructor(year :number, month :number, date :number,
 						hours :number, minutes :number, seconds :number,
 						ms :number);
 
-	function initialize(value :string);
-	function initialize(value :number);
+	function constructor(value :string);
+	function constructor(value :number);
 	// not defined in ECMA-262, but JS's new Date(new Date) works
-	function initialize(value :Date);
+	function constructor(value :Date);
 
-	function initialize();
+	function constructor();
 
 	// 15.9.4
 	static function parse(value :string) :number;

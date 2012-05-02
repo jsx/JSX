@@ -8,7 +8,7 @@ interface HasName {
 
 class Cat implements HasName {
 	var _name : string;
-	function initialize(name : string) {
+	function constructor(name : string) {
 		this._name = name;
 	}
 }

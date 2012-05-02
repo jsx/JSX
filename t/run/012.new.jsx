@@ -5,7 +5,7 @@ class Test {
 
 	var _n : number;
 
-	function initialize(n : number) {
+	function constructor(n : number) {
 		this._n = n;
 	}
 
