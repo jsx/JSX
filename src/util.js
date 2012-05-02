@@ -157,13 +157,19 @@ var CompileError = exports.CompileError = Class.extend({
 	initialize: function () {
 		switch (arguments.length) {
 		case 2: // token, text
-			var token = arguments[0];
-			this._filename = token.getFilename();
-			this._lineNumber = token.getLineNumber();
-			this._columnNumber = token.getColumnNumber();
-			// FIXME: deal with visual width
-			this._size = token.getValue().length;
-			this._message = arguments[1];
+			if(token != null) {
+				var token = arguments[0];
+				this._filename = token.getFilename();
+				this._lineNumber = token.getLineNumber();
+				this._columnNumber = token.getColumnNumber();
+				// FIXME: deal with visual width
+				this._size = token.getValue().length;
+				this._message = arguments[1];
+			}
+			else {
+				CompileError.call(this, "(unknown)", 0, 0, arguments[1]);
+				return;
+			}
 			break;
 		case 4: // filename, lineNumber, columnNumber, text
 			this._filename = arguments[0];
