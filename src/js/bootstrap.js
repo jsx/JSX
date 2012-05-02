@@ -14,3 +14,14 @@ var $__jsx_parseInt = parseInt;
 var $__jsx_parseFloat = parseFloat;
 var $__jsx_isNaN = isNaN;
 var $__jsx_isFinite = isFinite;
+
+/*
+ * public interface to JSX
+ */
+function JSX() {
+}
+
+JSX.file = function (path) {
+	var m = $__jsx_classMap[path];
+	return m !== undefined ? m : null;
+}

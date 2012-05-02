@@ -44,6 +44,7 @@ var ClassDefinition = exports.ClassDefinition = Class.extend({
 	initialize: function (token, className, flags, extendName, implementNames, members, objectTypesUsed) {
 		this._token = token;
 		this._className = className;
+		this._outputClassName = null;
 		this._flags = flags;
 		this._extendName = extendName;
 		this._extendClassDef = null;
@@ -80,8 +81,12 @@ var ClassDefinition = exports.ClassDefinition = Class.extend({
 		return this._className;
 	},
 
-	alterClassName: function (name) {
-		this._className = name;
+	setOutputClassName: function (name) {
+		this._outputClassName = name;
+	},
+
+	getOutputClassName: function () {
+		return this._outputClassName;
 	},
 
 	flags: function () {

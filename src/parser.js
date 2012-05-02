@@ -619,7 +619,7 @@ var Parser = exports.Parser = Class.extend({
 		if (this._expect(";") == null)
 			return false;
 		// check conflict
-		if (alias != null && Parser._isBuiltinClassName(alias.getValue())) {
+		if (alias != null && Parser._isReservedClassName(alias.getValue())) {
 			this._errors.push(new CompileError(alias, "cannot use name of a built-in class as an alias"));
 			return false;
 		}
@@ -761,7 +761,7 @@ var Parser = exports.Parser = Class.extend({
 		}
 
 		// check name conflicts
-		if (this._filename.match(/^lib\/built-in\//) == null && Parser._isBuiltinClassName(className.getValue())) {
+		if (this._filename.match(/^lib\/built-in\//) == null && Parser._isReservedClassName(className.getValue())) {
 			this._errors.push(new CompileError(className, "cannot re-define a built-in class"));
 			success = false;
 		} else {
@@ -1951,8 +1951,8 @@ var Parser = exports.Parser = Class.extend({
 		return args;
 	},
 
-	$_isBuiltinClassName: function (name) {
-		return name.match(/^(Array|Boolean|Date|Hash|Number|Object|RegExp|String)$/) != null;
+	$_isReservedClassName: function (name) {
+		return name.match(/^(Array|Boolean|Date|Hash|Number|Object|RegExp|String|JSX)$/) != null;
 	}
 
 });
