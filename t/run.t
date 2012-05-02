@@ -60,7 +60,7 @@ sub get_expected {
         local $/;
         join '', <$fh>;
     };
-    $content =~ m{/\*EXPECTED\n(.*?\n)\*/}s
+    $content =~ m{/\*EXPECTED\n(.*?\n|)\*/}s
         or die "could not find EXPECTED in file:$file\n";
     $1;
 }

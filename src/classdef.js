@@ -667,7 +667,7 @@ var MemberFunctionDefinition = exports.MemberFunctionDefinition = MemberDefiniti
 					context.errors.push(new CompileError(statement.getQualifiedName().getToken(), "constructor of class '" + baseClassDef.className() + "' should be called prior to the statement"));
 			}
 			if (nextConstructorIndex == this._classDef.implementClassDefs().length) {
-				context.errors.push(new CompileError(statement.getQualifiedName().getToken(), "constructors should be called in the order they are implemented"));
+				context.errors.push(new CompileError(statement.getQualifiedName().getToken(), "constructors should be called in the order the base classes are extended / implemented"));
 				break;
 			}
 			++nextConstructorIndex;
