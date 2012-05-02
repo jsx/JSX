@@ -2,14 +2,6 @@
 
 var Class = require("./Class");
 
-var SourcePosition = Class.extend({
-	initialize: function (row, col, line) {
-		this.row  = row;
-		this.col  = col;
-		this.line = line;
-	}
-});
-
 var Util = exports.Util = Class.extend({
 
 	$serializeArray: function (a) {
@@ -50,42 +42,6 @@ var Util = exports.Util = Class.extend({
 				return args[parseInt(f) - 1];
 			}
 		});
-	},
-
-	$calculateSourcePosition: function (lines, offset) {
-		var c   = 0;
-		var row = 0;
-
-		while(row < lines.length) {
-			var lineLen = lines[row].length;
-			if((c + lineLen) > offset) break;
-			c += lineLen;
-
-			++row;
-		}
-		var col = offset - c;
-
-		// adjust the visual width
-		// TODO: support Unicode EAST ASIAN WIDTH characters
-		//       see alco http://unicode.org/reports/tr11/
-		var line = lines[row];
-
-		if(line == null) { // over EOF
-			return new SourcePosition(row, col, null);
-		}
-
-		var TAB_WIDTH = 4;
-
-		var tabs = line.slice(0, col).match(/\t/g);
-		if(tabs != null) {
-			col += (TAB_WIDTH-1) * tabs.length;
-		}
-
-		line = line.
-			replace(/\t/g, Util.repeat(" ", TAB_WIDTH)).
-			replace(/(?:\r?\n)?$/, "\n"); // make sure it ends with a newline
-
-		return new SourcePosition(row, col, line);
 	},
 
 	$analyzeArgs: function (context, args) {
@@ -202,57 +158,57 @@ var CompileError = exports.CompileError = Class.extend({
 		switch (arguments.length) {
 		case 2: // token, text
 			var token = arguments[0];
-			if(token != null) {
-				this._filename = token.filename;
-				this._pos = token.pos;
-				this._size = token.getValue().length;
-			}
-			else {
-				this._filename = null; // may become null
-				this._pos = 0;
-				this._size = 1;
-			}
+			this._filename = token.getFilename();
+			this._lineNumber = token.getLineNumber();
+			this._columnNumber = token.getColumnNumber();
+			// FIXME: deal with visual width
+			this._size = token.getValue().length;
 			this._message = arguments[1];
 			break;
-		case 3: // filename, pos, text
+		case 4: // filename, lineNumber, columnNumber, text
 			this._filename = arguments[0];
-			this._pos = arguments[1];
-			this._message = arguments[2];
+			this._lineNumber = arguments[1];
+			this._columnNumber = arguments[2];
+			this._message = arguments[3];
 			this._size = 1;
 			break;
 		default:
 			throw new Error("Unrecognized arguments for CompileError: " + JSON.stringify( Array.prototype.slice.call(arguments) ));
+
 		}
-	},
-
-	getFilename: function () {
-		return this._filename;
-	},
-
-	getPosition: function () {
-		return this._pos;
+		if(typeof(this._filename) !== "string")
+			throw new Error("filename is not a string");
+		if(typeof(this._lineNumber) !== "number")
+			throw new Error("lineNumber is not a number");
+		if(typeof(this._columnNumber) !== "number")
+			throw new Error("columnNumber is not a number");
 	},
 
 	format: function (compiler) {
-		var prefix = "";
-		var sourceLine = "";
-
-		if (this._filename != null) {
-			// obtain the file content and position info.
-			var content = compiler.getPlatform().load(this._filename);
-			var lines = content.split(/^/m); // TODO: cache it
-			var position = Util.calculateSourcePosition(lines, this._pos);
-			// setup prefix
-			prefix = "[" + this._filename + ":" + (position.row + 1) + "] ";
-			// setup source and cursor
-			if (position.line != null) {
-				sourceLine = "\n"
-					+ position.line // ends with a newline
-					+ Util.repeat(" ", position.col) + Util.repeat("^", this._size);
-			}
+		if (this._filename == null) {
+			return this._message + "\n";
+		}
+		else if (this._lineNumber === 0) {
+			return Util.format("[%1] %2\n", [ this._filename, this._message ]);
 		}
 
-		return prefix + this._message + sourceLine + "\n";
+		var content = compiler.getFileContent([] /* ignore errors */, null, this._filename);
+		var sourceLine = content.split(/^/m)[ this._lineNumber - 1 ];
+
+		// fix visual width
+		var col = this._columnNumber;
+		var TAB_WIDTH = 4;
+		var tabs = sourceLine.slice(0, col).match(/\t/g);
+		if(tabs != null) {
+			col += (TAB_WIDTH-1) * tabs.length;
+		}
+
+		sourceLine  = sourceLine.replace(/\t/g, Util.repeat(" ", TAB_WIDTH));
+		sourceLine += Util.repeat(" ", col);
+		sourceLine += Util.repeat("^", this._size);
+
+		return Util.format("[%1:%2] %3\n%4\n",
+						   [this._filename, this._lineNumber, this._message, sourceLine]);
 	}
 
 });

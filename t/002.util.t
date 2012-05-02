@@ -25,35 +25,6 @@ function main() {
 		t.expect( Util.repeat("z", 0) ).toBe("");
 	});
 
-	test.describe('Util.calculateSourcePosition', function (t) {
-		var lines = [
-			"foo\n",
-			"\t\tbar\n",
-			"baz" ];
-		var content = lines.join("");
-
-		var p= Util.calculateSourcePosition(lines, 0);
-
-		t.expect(p.row).toBe(0);
-		t.expect(p.col).toBe(0);
-		t.expect(p.line).toBe("foo\n");
-
-		p = Util.calculateSourcePosition(lines, content.indexOf("bar"));
-		t.expect(p.row).toBe(1);
-		t.expect(p.col, 'tab is replaced with 4 spaces').toBe(8);
-		t.expect(p.line).toBe("        bar\n");
-
-		p = Util.calculateSourcePosition(lines, content.indexOf("z"));
-		t.expect(p.row).toBe(2);
-		t.expect(p.col).toBe(2);
-		t.expect(p.line, "end withs a new line").toBe("baz\n");
-
-		p = Util.calculateSourcePosition(lines, content.length);
-		t.expect(p.row).toBe(3);
-		t.expect(p.col).toBe(0);
-		t.expect(p.line, "offset exceeded").toBe(null);
-	});
-
 	test.describe('Util.decodeStringLiteral', function (t) {
 		t.expect(Util.decodeStringLiteral("''")).toBe("");
 		t.expect(Util.decodeStringLiteral('""')).toBe("");

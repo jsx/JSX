@@ -108,6 +108,9 @@ window.addEventListener('load', function(e) {
 		output.value = '';
 
 		var c = new jsx.Compiler(platform);
+		var emitter = new jsx.JavaScriptEmitter(platform);
+		c.setEmitter(emitter);
+
 		switch(options.mode) {
 		case "run":
 		case "compile":
@@ -129,11 +132,13 @@ window.addEventListener('load', function(e) {
 		if (success) {
 			output.style.color = "black";
 
-			var out = c.getOutput().replace(/\t/g, "  ");
-
-			if(options.mode !== 'parse') {
-				out += "Test.run$();\n";
+			if (options.mode === 'parse') {
+				output.value = c.getAST();
+				return;
 			}
+
+			var out = emitter.getOutput().replace(/\t/g, "  ");
+			out += "Test.run$();\n";
 
 			var level = getOptimizationLevel();
 			if(level > 0 && options.mode !== 'parse') {

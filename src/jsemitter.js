@@ -6,6 +6,8 @@ eval(Class.$import("./statement"));
 eval(Class.$import("./emitter"));
 eval(Class.$import("./util"));
 
+"use strict";
+
 var _Util = exports._Util = Class.extend({
 
 	$toClosureType: function (type) {
@@ -1238,6 +1240,10 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 		return [ "lib/js" ];
 	},
 
+	setSourceMapGenerator: function (gen) {
+		this._sourceMapGen = gen;
+	},
+
 	emit: function (classDefs) {
 		for (var i = 0; i < classDefs.length; ++i) {
 			if ((classDefs[i].flags() & ClassDefinition.IS_NATIVE) == 0)
@@ -1345,7 +1351,10 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 	},
 
 	getOutput: function () {
-		return this._output;
+		if (this._sourceMapGen)
+			return this._output + this._sourceMapGen.magicToken();
+		else
+			return this._output;
 	},
 
 	_emitClassObject: function (classDef) {
@@ -1378,7 +1387,8 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 		if (funcDef != null)
 			this._emitFunctionArgumentAnnotations(funcDef);
 		this._emit(" */\n", null);
-		this._emit("function " + funcName + "(", null);
+		this._emit("function ", null);
+		this._emit(funcName + "(", classDef.getToken());
 		if (funcDef != null)
 			this._emitFunctionArguments(funcDef);
 		this._emit(") {\n", null);
@@ -1406,10 +1416,11 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 		this._emitFunctionArgumentAnnotations(funcDef);
 		this._emit(_Util.buildAnnotation(" * @return {%1}\n", funcDef.getReturnType()), null);
 		this._emit(" */\n", null);
-		this._emit(funcDef.getClassDef().getOutputClassName(), null);
+		this._emit(funcDef.getClassDef().getOutputClassName() + ".", null);
 		if ((funcDef.flags() & ClassDefinition.IS_STATIC) == 0)
-			this._emit(".prototype", null);
-		this._emit("." + this._mangleFunctionName(funcDef.name(), funcDef.getArgumentTypes()) + " = function (", null);
+			this._emit("prototype.", null);
+		this._emit(this._mangleFunctionName(funcDef.name(), funcDef.getArgumentTypes()) + " = ", funcDef.getToken());
+		this._emit("function (", null);
 		this._emitFunctionArguments(funcDef);
 		this._emit(") {\n", null);
 		this._advanceIndent();
@@ -1429,7 +1440,8 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 		for (var i = 0; i < args.length; ++i) {
 			if (i != 0)
 				this._emit(", ");
-			this._emit(args[i].getName().getValue());
+			var name = args[i].getName();
+			this._emit(name.getValue(), name);
 		}
 	},
 
@@ -1478,7 +1490,9 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 			var locals = funcDef.getLocals();
 			for (var i = 0; i < locals.length; ++i) {
 				this._emit(_Util.buildAnnotation("/** @type {%1} */\n", locals[i].getType()), null);
-				this._emit("var " + locals[i].getName().getValue() + " = ");
+				this._emit("var ", null);
+				var name = locals[i].getName();
+				this._emit(name.getValue() + " = ", name);
 				this._emitDefaultValueOf(locals[i].getType());
 				this._emit(";\n", null)
 			}
@@ -1494,7 +1508,8 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 	},
 
 	_emitMemberVariable: function (holder, variable) {
-		this._emit(holder + "." + variable.name() + " = ", null);
+		this._emit(holder + ".", null);
+		this._emit(variable.name() + " = ", variable.getToken());
 		var initialValue = variable.getInitialValue();
 		if (initialValue != null)
 			this._getExpressionEmitterFor(initialValue).emit(0);
@@ -1528,6 +1543,24 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 			return;
 		if (this._output.match(/\n$/))
 			this._output += this._getIndent();
+		// optional source map
+		if(this._sourceMapGen != null && token != null) {
+			var outputLines = this._output.split(/^/m);
+			var genPos = {
+				line: outputLines.length,
+				column: outputLines[outputLines.length-1].length - 1,
+			};
+			// XXX: original pos seems zero-origin
+			var origPos = {
+				line: token.lineNumber - 1,
+				column: token.columnNumber
+			};
+			var tokenValue = token.isIdentifier()
+				? token.getValue()
+				: null;
+			this._sourceMapGen.add(genPos, origPos,
+								   token.filename, tokenValue);
+		}
 		this._output += str.replace(/\n(.)/g, (function (a, m) { return "\n" + this._getIndent() + m; }).bind(this));
 	},
 

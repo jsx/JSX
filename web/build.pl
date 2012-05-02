@@ -15,7 +15,7 @@ my $root = ROOT;
 my $template_dir = "$root/template";
 
 process_top_page("$root/template/index.tmpl", "$root/index.html");
-process_jsx("$root/../lib", "$root/jsx.combined.js");
+process_jsx("$root/../src", "$root/jsx.combined.js");
 
 sub make_list {
     my($prefix) = @_;
@@ -65,7 +65,7 @@ sub process_jsx {
             push @files, $_ if $_ =~ /\.js$/;
         },
     }, $src;
-    my $cmd = "$build --main compiler --global jsx --basepath '$src/' "
+    my $cmd = "$build --main web-interface --global jsx --basepath '$src/' "
         . join(' ', map { shell_quote($_) } @files)
         . " > "
         . shell_quote($dest);
