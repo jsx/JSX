@@ -157,8 +157,8 @@ var CompileError = exports.CompileError = Class.extend({
 	initialize: function () {
 		switch (arguments.length) {
 		case 2: // token, text
+			var token = arguments[0];
 			if(token != null) {
-				var token = arguments[0];
 				this._filename = token.getFilename();
 				this._lineNumber = token.getLineNumber();
 				this._columnNumber = token.getColumnNumber();
@@ -167,7 +167,7 @@ var CompileError = exports.CompileError = Class.extend({
 				this._message = arguments[1];
 			}
 			else {
-				CompileError.call(this, "(unknown)", 0, 0, arguments[1]);
+				CompileError.call(this, null, 0, 0, arguments[1]);
 				return;
 			}
 			break;
@@ -182,8 +182,8 @@ var CompileError = exports.CompileError = Class.extend({
 			throw new Error("Unrecognized arguments for CompileError: " + JSON.stringify( Array.prototype.slice.call(arguments) ));
 
 		}
-		if(typeof(this._filename) !== "string")
-			throw new Error("filename is not a string");
+		if(!(this._filename == null || typeof(this._filename) === "string"))
+			throw new Error("filename is not a string nor null");
 		if(typeof(this._lineNumber) !== "number")
 			throw new Error("lineNumber is not a number");
 		if(typeof(this._columnNumber) !== "number")
