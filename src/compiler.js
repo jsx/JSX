@@ -281,11 +281,14 @@ var Compiler = exports.Compiler = Class.extend({
 		}
 		// rename the classes with conflicting names
 		for (var i = 0; i < classDefs.length; ++i) {
-			var className = classDefs[i].className();
-			var suffix = 0;
-			for (var j = i + 1; j < classDefs.length; ++j)
-				if (classDefs[j].className() == className)
-					classDefs[j].alterClassName(className + "$" + suffix++);
+			if (classDefs[i].getOutputClassName() == null) {
+				var className = classDefs[i].className();
+				var suffix = 0;
+				for (var j = i + 1; j < classDefs.length; ++j)
+					if (classDefs[j].className() == className)
+						classDefs[j].setOutputClassName(className + "$" + suffix++);
+				classDefs[i].setOutputClassName(className);
+			}
 		}
 		// emit
 		for (var i = 0; i < classDefs.length; ++i) {

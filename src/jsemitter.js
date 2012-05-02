@@ -24,7 +24,7 @@ var _Util = exports._Util = Class.extend({
 			} else if (classDef instanceof InstantiatedClassDefinition && classDef.getTemplateClassName() == "Hash") {
 				return "Object.<undefined|" + this.toClosureType(classDef.getTypeArguments()[0]) + ">";
 			} else {
-				return classDef.className();
+				return classDef.getOutputClassName();
 			}
 		}
 		return null;
@@ -383,7 +383,7 @@ var _IdentifierExpressionEmitter = exports._IdentifierExpressionEmitter = _Expre
 	emit: function (outerOpPrecedence) {
 		var type = this._expr.getType();
 		if (type instanceof ClassDefType) {
-			this._emitter._emit(type.getClassDef().className(), null);
+			this._emitter._emit(type.getClassDef().getOutputClassName(), null);
 		} else {
 			var ident = this._expr._identifierToken.getValue();
 			this._emitter._emit(ident, null);
@@ -904,7 +904,7 @@ var _PropertyExpressionEmitter = exports._PropertyExpressionEmitter = _UnaryExpr
 		var identifierToken = this._expr.getIdentifierToken();
 		// special handling for import ... as
 		if (exprType instanceof ClassDefType) {
-			this._emitter._emit(exprType.getClassDef().className(), identifierToken);
+			this._emitter._emit(exprType.getClassDef().getOutputClassName(), identifierToken);
 			return;
 		}
 		// replace methods to global function (e.g. Number.isNaN to isNaN)
@@ -1127,7 +1127,7 @@ var _SuperExpressionEmitter = exports._SuperExpressionEmitter = _OperatorExpress
 
 	_emit: function () {
 		var funcType = this._expr.getFunctionType();
-		var className = funcType.getObjectType().getClassDef().className();
+		var className = funcType.getObjectType().getClassDef().getOutputClassName();
 		var mangledFuncName = this._emitter._mangleFunctionName(this._expr.getName().getValue(), funcType.getArgumentTypes());
 		this._emitter._emit(className + ".prototype." + mangledFuncName + ".call(this", this._expr.getOperatorToken());
 		var args = this._expr.getArguments();
@@ -1272,7 +1272,7 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 			var member = members[i];
 			if ((member instanceof MemberVariableDefinition)
 				&& (member.flags() & (ClassDefinition.IS_STATIC | ClassDefinition.IS_NATIVE)) == ClassDefinition.IS_STATIC)
-				this._emitMemberVariable(classDef.className(), member);
+				this._emitMemberVariable(classDef.getOutputClassName(), member);
 		}
 	},
 
@@ -1283,23 +1283,23 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 	_emitClassObject: function (classDef) {
 		this._emit(
 			"/**\n" +
-			" * class " + classDef.className() +
-			" extends " + classDef.extendClassDef().className() + "\n" +
+			" * class " + classDef.getOutputClassName() +
+			" extends " + classDef.extendClassDef().getOutputClassName() + "\n" +
 			" * @constructor\n" +
 			" */\n" +
-			"function " + classDef.className() + "() {\n" +
+			"function " + classDef.getOutputClassName() + "() {\n" +
 			"}\n" +
 			"\n",
 			null);
-		this._emit(classDef.className() + ".prototype = new " + classDef.extendClassDef().className() + ";\n", null);
+		this._emit(classDef.getOutputClassName() + ".prototype = new " + classDef.extendClassDef().getOutputClassName() + ";\n", null);
 		if (classDef.implementClassDefs().length != 0) {
 			var interfaceDefs = classDef.implementClassDefs();
 			for (var i = 0; i < interfaceDefs.length; ++i)
-				this._emit("$__jsx_merge_interface(" + classDef.className() + ", " + interfaceDefs[i].className() + ");\n", null);
+				this._emit("$__jsx_merge_interface(" + classDef.getOutputClassName() + ", " + interfaceDefs[i].getOutputClassName() + ");\n", null);
 			this._emit("\n", null);
 		}
 		if ((classDef.flags() & (ClassDefinition.IS_INTERFACE | ClassDefinition.IS_MIXIN)) != 0)
-			this._emit(classDef.className() + ".prototype.$__jsx_implements_" + classDef.className() + " = true;\n\n", null);
+			this._emit(classDef.getOutputClassName() + ".prototype.$__jsx_implements_" + classDef.getOutputClassName() + " = true;\n\n", null);
 	},
 
 	_emitConstructor: function (classDef, funcDef) {
@@ -1330,7 +1330,7 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 		// emit epilogue
 		this._reduceIndent();
 		this._emit("};\n\n", null);
-		this._emit(funcName + ".prototype = new " + classDef.className() + ";\n\n", null);
+		this._emit(funcName + ".prototype = new " + classDef.getOutputClassName() + ";\n\n", null);
 	},
 
 	_emitFunction: function (funcDef) {
@@ -1338,7 +1338,7 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 		this._emitFunctionArgumentAnnotations(funcDef);
 		this._emit(_Util.buildAnnotation(" * @return {%1}\n", funcDef.getReturnType()), null);
 		this._emit(" */\n", null);
-		this._emit(funcDef.getClassDef().className(), null);
+		this._emit(funcDef.getClassDef().getOutputClassName(), null);
 		if ((funcDef.flags() & ClassDefinition.IS_STATIC) == 0)
 			this._emit(".prototype", null);
 		this._emit("." + this._mangleFunctionName(funcDef.name(), funcDef.getArgumentTypes()) + " = function (", null);
@@ -1594,7 +1594,7 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 	_mangleConstructorName: function (classDef, argTypes) {
 		if ((classDef.flags() & ClassDefinition.IS_NATIVE) != 0)
 			return classDef.className();
-		return classDef.className() + this._mangleFunctionArguments(argTypes);
+		return classDef.getOutputClassName() + this._mangleFunctionArguments(argTypes);
 	},
 
 	_mangleFunctionName: function (name, argTypes) {
