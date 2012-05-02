@@ -26,15 +26,6 @@ var NodePlatform = Platform.extend({
 		else {
 			fs.writeFileSync(outputFile, content);
 		}
-	},
-
-	fileExists: function (path) {
-		try {
-			fs.statSync(path);
-			return true;
-		} catch (e) {
-			return false;
-		}
 	}
 
 });
