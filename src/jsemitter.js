@@ -565,7 +565,7 @@ var _AsExpressionEmitter = exports._AsExpressionEmitter = _ExpressionEmitter.ext
 			if (destType instanceof ObjectType) {
 				// unsafe cast
 				if ((destType.getClassDef().flags() & (ClassDefinition.IS_INTERFACE | ClassDefinition.IS_MIXIN)) == 0) {
-					var destTypeStr = destType.toString();
+					var destTypeStr = destType.getClassDef().getOutputClassName();
 					if (destTypeStr.match(/^Array\.</) != null)
 						destTypeStr = "Array"; // FIXME implement safe cast to Array.<T>
 					else if (destTypeStr.match(/^Hash\.</) != null)
@@ -577,7 +577,7 @@ var _AsExpressionEmitter = exports._AsExpressionEmitter = _ExpressionEmitter.ext
 					}).bind(this));
 				} else {
 					this.emitWithPrecedence(outerOpPrecedence, _CallExpressionEmitter._operatorPrecedence, (function () {
-						this._emitter._emit("(function (o) { return o && o.$__jsx_implements_" + destType.toString() + " ? o : null; })(", this._expr.getOperatorToken());
+						this._emitter._emit("(function (o) { return o && o.$__jsx_implements_" + destType.getClassDef().getOutputClassName() + " ? o : null; })(", this._expr.getOperatorToken());
 						this._emitter._getExpressionEmitterFor(this._expr.getExpr()).emit(0);
 						this._emitter._emit(")", this._expr.getOperatorToken());
 					}).bind(this));
@@ -887,11 +887,11 @@ var _InstanceofExpressionEmitter = exports._InstanceofExpressionEmitter = _Expre
 		if ((expectedType.getClassDef().flags() & (ClassDefinition.IS_INTERFACE | ClassDefinition.IS_MIXIN)) == 0) {
 			this.emitWithPrecedence(outerOpPrecedence, _InstanceofExpressionEmitter._operatorPrecedence, (function () {
 				this._emitter._getExpressionEmitterFor(this._expr.getExpr()).emit(_InstanceofExpressionEmitter._operatorPrecedence);
-				this._emitter._emit(" instanceof " + expectedType.toString(), null);
+				this._emitter._emit(" instanceof " + expectedType.getClassDef().getOutputClassName(), null);
 			}).bind(this));
 		} else {
 			this.emitWithPrecedence(outerOpPrecedence, _CallExpressionEmitter._operatorPrecedence, (function () {
-				this._emitter._emit("(function (o) { return !! (o && o.$__jsx_implements_" + expectedType.toString() + "); })(", this._expr.getOperatorToken());
+				this._emitter._emit("(function (o) { return !! (o && o.$__jsx_implements_" + expectedType.getClassDef().getOutputClassName() + "); })(", this._expr.getOperatorToken());
 				this._emitter._getExpressionEmitterFor(this._expr.getExpr()).emit(0);
 				this._emitter._emit(")", this._expr.getOperatorToken());
 			}).bind(this));
@@ -1693,7 +1693,7 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 				s += "$";
 				return s;
 			}
-			return "L" + type.toString() + "$";
+			return "L" + type.getClassDef().getOutputClassName() + "$";
 		} else if (type instanceof StaticFunctionType)
 			return "F" + this._mangleFunctionArguments(type.getArgumentTypes()) + "$";
 		else if (type instanceof MemberFunctionType)
