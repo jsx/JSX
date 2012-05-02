@@ -1,5 +1,5 @@
 class FizzBuzz {
-	static function fizzbuzz() : int {
+	static function main() : void {
 		for (var i = 1; i <= 100; ++i) {
 			if (i % 15 == 0)
 				log "FizzBuzz";

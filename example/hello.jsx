@@ -1,6 +1,5 @@
 class Hello {
-	static function main(args : String[]) : int {
+	static function main() :void {
 		log "Hello, world!";
-		return 0;
 	}
 }

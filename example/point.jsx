@@ -25,7 +25,7 @@ class Point {
 	function getY():number {
 		return this._y;
 	}
-	
+
 	// setters
 	function setX(value :number):void {
 		this._x = value;
@@ -34,4 +34,12 @@ class Point {
 		this._y = value;
 	}
 }
-// vim: set ft=javascript:
+
+class _Test {
+	static function main() :void {
+		var p = new Point(10, 20);
+
+		log "x=" + p.getX() as string;
+		log "y=" + p.getY() as string;
+	}
+}
