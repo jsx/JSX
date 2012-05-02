@@ -21,7 +21,7 @@ var $__jsx_isFinite = isFinite;
 function JSX() {
 }
 
-JSX.file = function (path) {
+JSX.require = function (path) {
 	var m = $__jsx_classMap[path];
 	return m !== undefined ? m : null;
 }

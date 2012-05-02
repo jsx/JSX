@@ -16,9 +16,9 @@ class Test {
 	static function run() : void {
 		var doit = (function () : function (: string) : void {
 			var jsx = js.global["JSX"] as Hash.<variant>;
-			var fileFunc = jsx["file"] as function (: string) : Hash.<variant>;
+			var require = jsx["require"] as function (: string) : Hash.<variant>;
 			return function (path : string) : void {
-				var klass = fileFunc(path)["_Private"] as Hash.<variant>;
+				var klass = require(path)["_Private"] as Hash.<variant>;
 				var say = klass["say$"] as function () : void;
 				say();
 			};
