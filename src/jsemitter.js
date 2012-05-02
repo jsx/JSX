@@ -1291,7 +1291,7 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 		if ((classDef.flags() & ClassDefinition.IS_NATIVE) != 0)
 			return;
 		// special handling for js.jsx
-		if (classDef.getToken().filename == "lib/js/js.jsx") {
+		if (classDef.getToken().getFilename() == "lib/js/js.jsx") {
 			this._emit("js.global = (function () { return this; }).call(null);\n\n", null);
 			return;
 		}
@@ -1321,9 +1321,9 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 		while (classDefs.length != 0) {
 			// fetch the first classDef, and others that came from the same file
 			var classesOfFile = [ classDefs.shift() ];
-			var filename = classesOfFile[0].getToken().filename;
+			var filename = classesOfFile[0].getToken().getFilename();
 			for (var i = 0; i < classDefs.length;) {
-				if (classDefs[i].getToken().filename == filename) {
+				if (classDefs[i].getToken().getFilename() == filename) {
 					classesOfFile.push(classDefs[i]);
 					classDefs.splice(i, 1);
 				} else {
@@ -1559,7 +1559,7 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 				? token.getValue()
 				: null;
 			this._sourceMapGen.add(genPos, origPos,
-								   token.filename, tokenValue);
+								   token.getFilename(), tokenValue);
 		}
 		this._output += str.replace(/\n(.)/g, (function (a, m) { return "\n" + this._getIndent() + m; }).bind(this));
 	},

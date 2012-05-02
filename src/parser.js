@@ -44,6 +44,7 @@ var Token = exports.Token = Class.extend({
 	}
 
 });
+Token.prototype.__defineGetter__("filename", function () { throw new Error("Token#filename is removed. Use Token#getFilename() instead") });
 
 var _Lexer = exports._TokenTable = Class.extend({
 
