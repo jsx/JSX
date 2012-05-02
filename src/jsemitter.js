@@ -1390,10 +1390,11 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 			" extends " + classDef.extendClassDef().getOutputClassName() + "\n" +
 			" * @constructor\n" +
 			" */\n" +
-			"function " + classDef.getOutputClassName() + "() {\n" +
+			"function ", null);
+		this._emit(classDef.getOutputClassName() + "() {\n" +
 			"}\n" +
 			"\n",
-			null);
+			classDef.getToken());
 		this._emit(classDef.getOutputClassName() + ".prototype = new " + classDef.extendClassDef().getOutputClassName() + ";\n", null);
 		if (classDef.implementClassDefs().length != 0) {
 			var interfaceDefs = classDef.implementClassDefs();
@@ -1445,8 +1446,8 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 		this._emit(funcDef.getClassDef().getOutputClassName() + ".", null);
 		if ((funcDef.flags() & ClassDefinition.IS_STATIC) == 0)
 			this._emit("prototype.", null);
-		this._emit(this._mangleFunctionName(funcDef.name(), funcDef.getArgumentTypes()) + " = ", funcDef.getToken());
-		this._emit("function (", null);
+		this._emit(this._mangleFunctionName(funcDef.name(), funcDef.getArgumentTypes()) + " = ", funcDef.getNameToken());
+		this._emit("function (", funcDef.getToken());
 		this._emitFunctionArguments(funcDef);
 		this._emit(") {\n", null);
 		this._advanceIndent();
@@ -1534,8 +1535,8 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 	},
 
 	_emitMemberVariable: function (holder, variable) {
-		this._emit(holder + ".", null);
-		this._emit(variable.name() + " = ", variable.getToken());
+		this._emit(holder + ".", variable.getToken());
+		this._emit(variable.name() + " = ", variable.getNameToken());
 		var initialValue = variable.getInitialValue();
 		if (initialValue != null)
 			this._getExpressionEmitterFor(initialValue).emit(0);
@@ -1576,10 +1577,10 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 				line: outputLines.length,
 				column: outputLines[outputLines.length-1].length - 1,
 			};
-			// XXX: original pos seems zero-origin
+			// XXX: 'line' of original pos seems zero-origin (gfx suspects it's a bug of mozilla/source-map)
 			var origPos = {
-				line: token.lineNumber - 1,
-				column: token.columnNumber
+				line: token.getLineNumber() - 1,
+				column: token.getColumnNumber()
 			};
 			var tokenValue = token.isIdentifier()
 				? token.getValue()
