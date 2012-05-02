@@ -1743,11 +1743,14 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 			var classDef = type.getClassDef();
 			if (classDef instanceof InstantiatedClassDefinition) {
 				var typeArgs = classDef.getTypeArguments();
-				var s = "T" + classDef.getTemplateClassName() + "$";
-				for (var i = 0; i < typeArgs.length; ++i)
-					s += this._mangleTypeName(typeArgs[i]);
-				s += "$";
-				return s;
+				switch (classDef.getTemplateClassName()) {
+				case "Array":
+					return "A" + this._mangleTypeName(typeArgs[0]);
+				case "Hash":
+					return "H" + this._mangleTypeName(typeArgs[0]);
+				default:
+					throw new Error("unexpected template type: " + classDef.getTemplateClassName());
+				}
 			}
 			return "L" + type.getClassDef().getOutputClassName() + "$";
 		} else if (type instanceof StaticFunctionType)
@@ -1757,7 +1760,7 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 		else if (type instanceof MayBeUndefinedType)
 			return "U" + this._mangleTypeName(type.getBaseType());
 		else if (type.equals(Type.variantType))
-			return "A";
+			return "X";
 		else
 			throw new Error("FIXME " + type.toString());
 	},
