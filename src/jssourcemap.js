@@ -1,16 +1,15 @@
 
-var sourceMap = require("source-map");
-
-var Class = require("../src/Class");
+var Class = require("./Class");
 
 "use strict";
-
-// XXX: monkey-patch to avoid source-map (0.1.0)'s bug
-sourceMap.SourceMapGenerator.prototype._validateMapping = function () {};
 
 var SourceMapGenerator = exports.SourceMapGenerator = Class.extend({
 
 	constructor: function (outputFile, sourceRoot) {
+		var sourceMap = require("source-map"); // lazy load for web
+		// XXX: monkey-patch to avoid source-map (0.1.0)'s bug
+		sourceMap.SourceMapGenerator.prototype._validateMapping = function () {};
+
 		this._outputFile = outputFile;
 		this._impl = new sourceMap.SourceMapGenerator({
 			file: outputFile,
