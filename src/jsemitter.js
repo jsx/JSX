@@ -561,22 +561,36 @@ var _AsExpressionEmitter = exports._AsExpressionEmitter = _ExpressionEmitter.ext
 	emit: function (outerOpPrecedence) {
 		var srcType = this._expr.getExpr().getType();
 		var destType = this._expr.getType();
-		if (srcType.resolveIfMayBeUndefined() instanceof ObjectType && destType instanceof ObjectType) {
-			// downcast
-			if ((destType.getClassDef().flags() & (ClassDefinition.IS_INTERFACE | ClassDefinition.IS_MIXIN)) == 0) {
-				this.emitWithPrecedence(outerOpPrecedence, _CallExpressionEmitter._operatorPrecedence, (function () {
-					this._emitter._emit("(function (o) { return o instanceof " + destType.toString() + " ? o : null; })(", this._expr.getOperatorToken());
-					this._emitter._getExpressionEmitterFor(this._expr.getExpr()).emit(0);
-					this._emitter._emit(")", this._expr.getOperatorToken());
-				}).bind(this));
-			} else {
-				this.emitWithPrecedence(outerOpPrecedence, _CallExpressionEmitter._operatorPrecedence, (function () {
-					this._emitter._emit("(function (o) { return o && o.$__jsx_implements_" + destType.toString() + " ? o : null; })(", this._expr.getOperatorToken());
-					this._emitter._getExpressionEmitterFor(this._expr.getExpr()).emit(0);
-					this._emitter._emit(")", this._expr.getOperatorToken());
-				}).bind(this));
+		if (srcType.resolveIfMayBeUndefined() instanceof ObjectType || srcType.equals(Type.variantType)) {
+			if (destType instanceof ObjectType) {
+				// unsafe cast
+				if ((destType.getClassDef().flags() & (ClassDefinition.IS_INTERFACE | ClassDefinition.IS_MIXIN)) == 0) {
+					var destTypeStr = destType.toString();
+					if (destTypeStr.match(/^Array\.</) != null)
+						destTypeStr = "Array"; // FIXME implement safe cast to Array.<T>
+					else if (destTypeStr.match(/^Hash\.</) != null)
+						destTypeStr = "Object"; // FIXME is it possible to implement safe cast to Hash.<T>?
+					this.emitWithPrecedence(outerOpPrecedence, _CallExpressionEmitter._operatorPrecedence, (function () {
+						this._emitter._emit("(function (o) { return o instanceof " + destTypeStr + " ? o : null; })(", this._expr.getOperatorToken());
+						this._emitter._getExpressionEmitterFor(this._expr.getExpr()).emit(0);
+						this._emitter._emit(")", this._expr.getOperatorToken());
+					}).bind(this));
+				} else {
+					this.emitWithPrecedence(outerOpPrecedence, _CallExpressionEmitter._operatorPrecedence, (function () {
+						this._emitter._emit("(function (o) { return o && o.$__jsx_implements_" + destType.toString() + " ? o : null; })(", this._expr.getOperatorToken());
+						this._emitter._getExpressionEmitterFor(this._expr.getExpr()).emit(0);
+						this._emitter._emit(")", this._expr.getOperatorToken());
+					}).bind(this));
+				}
+				return true;
 			}
-			return true;
+			if (destType instanceof FunctionType) {
+				// cast to function
+				this._emitter._emit("(function (o) { return typeof(o) === \"function\" ? o : null; })(", this._expr.getOperatorToken());
+				this._emitter._getExpressionEmitterFor(this._expr.getExpr()).emit(0);
+				this._emitter._emit(")", this._expr.getOperatorToken());
+				return true;
+			}
 		}
 		if (srcType.equals(Type.booleanType)) {
 			// from boolean

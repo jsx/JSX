@@ -15,11 +15,11 @@ class _Private {
 class Test {
 	static function run() : void {
 		var doit = (function () : function (: string) : void {
-			var jsx = js.global["JSX"] as __nocheck__ Hash.<variant>;
-			var fileFunc = jsx["file"] as __nocheck__ function (: string) : Hash.<variant>;
+			var jsx = js.global["JSX"] as Hash.<variant>;
+			var fileFunc = jsx["file"] as function (: string) : Hash.<variant>;
 			return function (path : string) : void {
-				var klass = fileFunc(path)["_Private"] as __nocheck__ Hash.<variant>;
-				var say = klass["say$"] as __nocheck__ function () : void;
+				var klass = fileFunc(path)["_Private"] as Hash.<variant>;
+				var say = klass["say$"] as function () : void;
 				say();
 			};
 		})();
