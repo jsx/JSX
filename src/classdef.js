@@ -110,10 +110,10 @@ var ClassDefinition = exports.ClassDefinition = Class.extend({
 	$GET_MEMBER_MODE_SUPER: 2, // looks for functions with body in super classes
 	$GET_MEMBER_MODE_FUNCTION_WITH_BODY: 3, // looks for function with body
 	
-	getMemberTypeByName: function (errors, classDefs, name, mode) {
+	getMemberTypeByName: function (name, mode) {
 		// returns an array to support function overloading
 		var types = [];
-		this._getMemberTypesByName(errors, classDefs, types, name, mode);
+		this._getMemberTypesByName(types, name, mode);
 		switch (types.length) {
 		case 0:
 			return null;
@@ -124,14 +124,14 @@ var ClassDefinition = exports.ClassDefinition = Class.extend({
 		}
 	},
 
-	_getMemberTypesByName: function (errors, classDefs, types, name, mode) {
+	_getMemberTypesByName: function (types, name, mode) {
 		if (mode != ClassDefinition.GET_MEMBER_MODE_SUPER) {
 			for (var i = 0; i < this._members.length; ++i) {
 				var member = this._members[i];
 				if (name == member.name()) {
 					if (member instanceof MemberVariableDefinition) {
 						if ((member.flags() & ClassDefinition.IS_OVERRIDE) == 0) {
-							var type = member.getType(errors, classDefs);
+							var type = member.getType();
 							// ignore member variables that failed in type deduction (already reported as a compile error)
 							// it is guranteed by _assertMemberVariableIsDefinable that there would not be a property with same name using different type, so we can use the first one (declarations might be found more than once using the "abstract" attribute)
 							if (type != null && types.length == 0)
@@ -157,9 +157,9 @@ var ClassDefinition = exports.ClassDefinition = Class.extend({
 		}
 		if (mode != ClassDefinition.GET_MEMBER_MODE_CLASS_ONLY) {
 			if (this._extendClassDef != null)
-				this._extendClassDef._getMemberTypesByName(errors, classDefs, types, name, mode);
+				this._extendClassDef._getMemberTypesByName(types, name, mode);
 			for (var i = 0; i < this._implementClassDefs.length; ++i)
-				this._implementClassDefs[i]._getMemberTypesByName(errors, classDefs, types, name, mode);
+				this._implementClassDefs[i]._getMemberTypesByName(types, name, mode);
 		}
 	},
 
@@ -209,8 +209,13 @@ var ClassDefinition = exports.ClassDefinition = Class.extend({
 	},
 
 	analyze: function (context) {
-		for (var i = 0; i < this._members.length; ++i)
-			this._members[i]._classDef = this;
+		// prepare
+		for (var i = 0; i < this._members.length; ++i) {
+			var member = this._members[i];
+			member.setClassDef(this);
+			if (member instanceof MemberVariableDefinition)
+				member.setAnalysisContext(context);
+		}
 		// check that the class may be extended
 		if (! this._assertInheritanceIsNotInLoop(context, null, this.getToken()))
 			return false;
@@ -527,6 +532,10 @@ var MemberDefinition = exports.MemberDefinition = Class.extend({
 
 	getClassDef: function () {
 		return this._classDef;
+	},
+
+	setClassDef: function (classDef) {
+		this._classDef = classDef;
 	}
 
 });
@@ -543,6 +552,7 @@ var MemberVariableDefinition = exports.MemberVariableDefinition = MemberDefiniti
 		this._type = type; // may be null
 		this._initialValue = initialValue; // may be null
 		this._analyzeState = MemberVariableDefinition.NOT_ANALYZED;
+		this._analysisContext = null;
 	},
 
 	serialize: function () {
@@ -554,13 +564,17 @@ var MemberVariableDefinition = exports.MemberVariableDefinition = MemberDefiniti
 		};
 	},
 
-	getType: function (errors, classDefs) {
+	setAnalysisContext: function (context) {
+		this._analysisContext = context;
+	},
+
+	getType: function () {
 		switch (this._analyzeState) {
 		case MemberVariableDefinition.NOT_ANALYZED:
 			try {
 				this._analyzeState = MemberVariableDefinition.IS_ANALYZING;
 				if (this._initialValue != null) {
-					if (! this._initialValue.analyze(new AnalysisContext(errors, classDefs, null)))
+					if (! this._initialValue.analyze(this._analysisContext))
 						return;
 					var ivType = this._initialValue.getType();
 					if (this._type == null) {

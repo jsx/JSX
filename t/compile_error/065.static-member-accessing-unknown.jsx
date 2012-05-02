@@ -1,11 +1,6 @@
-/*EXPECTED
-10
-10
-*/
-
 class Test {
-	static var foo = 10;
-	static var bar = foo as int;
+	static var foo = Test.x;
+	static var bar = Unknown;
 
 	static function run() : void {
 		log Test.foo;

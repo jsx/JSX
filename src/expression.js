@@ -75,16 +75,19 @@ var IdentifierExpression = exports.IdentifierExpression = Expression.extend({
 	},
 
 	analyze: function (context) {
-		if ((this._local = context.funcDef.getLocal(this._identifierToken.getValue())) != null) {
-			// ok
-		} else {
-			var classDef = context.parser.lookup(context.errors, this._identifierToken, this._identifierToken.getValue());
-			if (classDef == null) {
+		// if it is an access to local variable, return ok
+		if (context.funcDef != null && (this._local = context.funcDef.getLocal(this._identifierToken.getValue())) != null)
+			return true;
+		// access to class
+		var classDef = context.parser.lookup(context.errors, this._identifierToken, this._identifierToken.getValue());
+		if (classDef == null) {
+			if (context.funcDef != null)
 				context.errors.push(new CompileError(this._identifierToken, "local variable '" + this._identifierToken.getValue() + "' is not declared"));
-				return false;
-			}
-			this._classDefType = new ClassDefType(classDef);
+			else
+				context.errors.push(new CompileError(this._identifierToken, "could not find definition of class '" + this._identifierToken.getValue() + "'"));
+			return false;
 		}
+		this._classDefType = new ClassDefType(classDef);
 		return true;
 	},
 
@@ -843,7 +846,7 @@ var PropertyExpression = exports.PropertyExpression = UnaryExpression.extend({
 			return false;
 		}
 		this._type = classDef.getMemberTypeByName(
-			context.errors, context.classDefs, this._identifierToken.getValue(),
+			this._identifierToken.getValue(),
 			(exprType instanceof ClassDefType) ? ClassDefinition.GET_MEMBER_MODE_CLASS_ONLY : ClassDefinition.GET_MEMBER_MODE_ALL);
 		if (this._type == null) {
 			context.errors.push(new CompileError(this._identifierToken, "'" + exprType.toString() + "' does not have a property named '" + this._identifierToken.getValue() + "'"));
@@ -1386,7 +1389,7 @@ var SuperExpression = exports.SuperExpression = OperatorExpression.extend({
 			return false;
 		// lookup function
 		var funcType = null;
-		if ((funcType = classDef.getMemberTypeByName(context.errors, context.classDefs, this._name.getValue(), ClassDefinition.GET_MEMBER_MODE_SUPER)) == null) {
+		if ((funcType = classDef.getMemberTypeByName(this._name.getValue(), ClassDefinition.GET_MEMBER_MODE_SUPER)) == null) {
 			context.errors.push(new CompileError(this._token, "could not find a member function with given name in super classes of class '" + classDef.className() + "'"));
 			return false;
 		}
@@ -1445,7 +1448,7 @@ var NewExpression = exports.NewExpression = OperatorExpression.extend({
 		var argTypes = Util.analyzeArgs(context, this._args);
 		if (argTypes == null)
 			return false;
-		var ctors = classDef.getMemberTypeByName(context.errors, context.classDefs, "constructor", ClassDefinition.GET_MEMBER_MODE_CLASS_ONLY);
+		var ctors = classDef.getMemberTypeByName("constructor", ClassDefinition.GET_MEMBER_MODE_CLASS_ONLY);
 		if (ctors != null) {
 			if ((this._constructor = ctors.deduceByArgumentTypes(context, this._operatorToken, argTypes, false)) == null) {
 				context.errors.push(new CompileError(this._operatorToken, "cannot create an object of type '" + this._qualifiedName.getToken().getValue() + "', arguments mismatch"));
