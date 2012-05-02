@@ -5,9 +5,9 @@ var VERSION = "0.0.1";
 
 var fs = require("fs");
 
-var Class = require("../lib/Class");
-eval(Class.$import("../lib/compiler"));
-eval(Class.$import("../lib/jsemitter"));
+var Class = require("../src/Class");
+eval(Class.$import("../src/compiler"));
+eval(Class.$import("../src/jsemitter"));
 
 "use strict";
 

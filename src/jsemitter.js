@@ -1214,7 +1214,7 @@ var _CommaExpressionEmitter = exports._CommaExpressionEmitter = _ExpressionEmitt
 var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 
 	initialize: function (platform) {
-		this._output = platform.load("lib/js/bootstrap.js") + "\n";
+		this._output = platform.load("src/js/bootstrap.js") + "\n";
 		this._indent = 0;
 		this._emittingClass = null;
 		this._emittingFunction = null;

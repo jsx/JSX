@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 
-var Class = require("../lib/Class");
-var Test  = require("../lib/Test");
+var Class = require("../src/Class");
+var Test  = require("../src/Test");
 
-eval(Class.$import("../lib/util"));
+eval(Class.$import("../src/util"));
 
 "use strict";
 
