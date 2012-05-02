@@ -600,6 +600,9 @@ var Parser = exports.Parser = Class.extend({
 		var matched = this._input.substring(this._pos).match(/^.*(?:\r\n?|\n|$)/);
 		this._pos += matched[0].length;
 		this._tokenLength = 0;
+
+		// count newlines
+		this._lineNumber += matched[0].split(_Lexer.rxNewline).length - 1;
 	},
 
 	_qualifiedName: function (allowSuper) {
