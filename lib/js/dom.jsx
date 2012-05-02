@@ -1,3 +1,16 @@
+/*
+
+The JSX DOM module consists of three part of submodules:
+Core, HTML, and Browser
+
+Core - DOM Level 2 Core
+HTML - DOM Level 2 HTML
+Browser - Window, XHR, HTML5 components and misellaneous stuff
+
+*/
+
+// DOM-Core
+
 // Document Object Model Level 2 Core
 // http://www.w3.org/TR/DOM-Level-2-Core/
 
@@ -149,18 +162,141 @@ native class Document extends Node {
 	function getElementById(elementId :string) :Element;
 }
 
+// DOM-HTML
+// http://www.w3.org/TR/DOM-Level-2-HTML/
 
-final native class DOMWindow {
-	const var document :Document;
+native class HTMLCollection {
+	const var length :int;
+	function item(index :int) :Node;
+	function namedItem(name :string) :Node;
 }
 
-final class dom {
+native class HTMLDocument extends Document {
+	var title :string;
 
-	static function getWindow() :DOMWindow{
-		// DOMWindow doesn't exist; it's a virtual class.
-		return js.global["window"] as __nocheck__ DOMWindow;
-	}
-	static function getDocument() :Document {
-		return dom.getWindow().document;
+	const var referrer :string;
+	const var domain :string;
+	const var URL :string;
+	const var body :HTMLElement;
+
+	const var images :HTMLCollection;
+	const var applets :HTMLCollection;
+	const var links :HTMLCollection;
+	const var forms :HTMLCollection;
+	const var anchors :HTMLCollection;
+
+	var cookie :string;
+
+	function open() :void;
+	function close() :void;
+
+	function write(text :string) :void;
+	function writeln(text :string) :void;
+
+	function getElementsByName(elementName :string) :NodeList;
+}
+
+native class HTMLElement extends Element {
+	var id :string;
+	var title :string;
+	var lang :string;
+	var dir :string;
+	var className :string;
+}
+
+native class HTMLHtmlElement extends HTMLElement {
+	var version :string;
+}
+
+native class HTMLHeadElement extends HTMLElement {
+	var profile :string;
+}
+
+native class HTMLLinkElement extends HTMLElement {
+	// TODO
+}
+
+native class HTMLTitleElement extends HTMLElement {
+	// TODO
+}
+
+native class HTMLMetaElement extends HTMLElement {
+	// TODO
+}
+
+native class HTMLBaseElement extends HTMLElement {
+	// TODO
+}
+
+// TODO...
+
+// DOM-Browser
+
+// http://www.w3.org/TR/Window/
+
+// The Window Interface
+final native class Window {
+
+	const var window :Window;
+	const var self :Window;
+
+	var location :Location;
+
+	var name :string;
+	const var parent :Window;
+	const var top :Window;
+	const var frameElement :Element;
+
+	// timers
+
+	function setTimeout(listener : function():void, milliseconds :int) :int;
+	function clearTimeout(timerID :int) :void;
+	function setInterval(listener : function():void, milliseconds :int) :int;
+	function clearInterval(timerID :int) :void;
+
+	// browser-defined properties
+
+	const var document :Document;
+	const var navigator :variant; // FIXME
+
+	function alert(message :string) :void;
+}
+
+// The Location Interface
+final native class Location {
+	var href :string;
+	var hash :string;
+	var host :string;
+	var hostname :string;
+	var pathname :string;
+	var port :string;
+	var protocol :string;
+	var search :string;
+
+	function assign(url :string) :void;
+	function replace(url :string) :void;
+	function reload() :void;
+
+	override
+	function toString() :string;
+}
+
+// XHR
+// http://www.w3.org/TR/XMLHttpRequest/
+
+class XMLHttpRequestEventTarget /* extends EventTarget */ {
+	// TODO
+}
+
+native class XMLHttpRequest extends XMLHttpRequestEventTarget {
+	// TODO
+}
+
+// JSX interface to DOM
+
+final class dom {
+	static function getWindow() :Window{
+		// NOTE: Window doesn't exist; it's a virtual class.
+		return js.global["window"] as __nocheck__ Window;
 	}
 }
