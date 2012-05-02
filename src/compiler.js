@@ -309,7 +309,8 @@ var Compiler = exports.Compiler = Class.extend({
 			var searchPaths = this._searchPaths.concat(this._emitter.getSearchPaths());
 			for (var i = 0; i < searchPaths.length; ++i) {
 				var path = Util.resolvePath(searchPaths[i] + "/" + tokenPath);
-				if (this._platform.fileExists(path))
+				// check the existence of the file, at the same time filling the cache
+				if (this.getFileContent([], null, path) != null)
 					return path;
 			}
 		}

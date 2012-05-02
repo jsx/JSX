@@ -8,8 +8,6 @@ var Platform = exports.Platform = Class.extend({
 	//      browsers read it from DOM
 	// load(name : string)
 
-	// fileExists(name : string) : boolean
-
 	log: function (s) {
 		console.log(s);
 	},
