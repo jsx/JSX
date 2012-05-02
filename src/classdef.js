@@ -497,21 +497,28 @@ var ClassDefinition = exports.ClassDefinition = Class.extend({
 
 });
 
+// abstract class deriving Member(Function|Variable)Definition
 var MemberDefinition = exports.MemberDefinition = Class.extend({
 
-	initialize: function (token, name, flags) {
+	initialize: function (token, nameToken, flags) {
 		this._token = token;
-		this._name = name;
+		this._nameToken = nameToken; // may be null
+		if(typeof(nameToken) === "string") throw new Error("nameToken must be a Token object or null!");
 		this._flags = flags;
 		this._classDef = null;
 	},
 
+	// token of "function" or "var"
 	getToken: function () {
 		return this._token;
 	},
 
+	getNameToken: function () {
+		return this._nameToken;
+	},
+
 	name: function () {
-		return this._name;
+		return this._nameToken.getValue();
 	},
 
 	flags: function () {
@@ -560,7 +567,7 @@ var MemberVariableDefinition = exports.MemberVariableDefinition = MemberDefiniti
 						this._type = ivType;
 					} else if (! this._type.equals(ivType)) {
 						errors.push(new CompileError(this._initialValue,
-							"conflicting types for variable '" + this.name + "', expected '" + this._type.toString(), "' but got '" + ivType.toString()));
+							"conflicting types for variable '" + this.name() + "', expected '" + this._type.toString(), "' but got '" + ivType.toString()));
 					}
 				}
 				this._analyzeState = MemberVariableDefinition.ANALYZE_SUCEEDED;
@@ -571,7 +578,7 @@ var MemberVariableDefinition = exports.MemberVariableDefinition = MemberDefiniti
 			break;
 		case MemberVariableDefinition.IS_ANALYZING:
 			errors.push(new CompileError(this._token,
-				"please declare type of variable '" + this._token.getValue() + "' (detected recursion while trying to reduce type)"));
+				"please declare type of variable '" + this.name() + "' (detected recursion while trying to reduce type)"));
 			break;
 		default:
 			break;
@@ -615,7 +622,7 @@ var MemberFunctionDefinition = exports.MemberFunctionDefinition = MemberDefiniti
 				return null;
 			args[i] = arg;
 		}
-		return new MemberFunctionDefinition(this._token, this._name, this._flags, returnType, args, null, null);
+		return new MemberFunctionDefinition(this._token, this._nameToken, this._flags, returnType, args, null, null);
 	},
 
 	serialize: function () {
@@ -639,9 +646,12 @@ var MemberFunctionDefinition = exports.MemberFunctionDefinition = MemberDefiniti
 		for (var i = 0; i < this._statements.length; ++i)
 			this._statements[i].analyze(context);
 
-		// check that from the constructor, all constructors with non-zero arguments are called, and that the calls are in the implemented order
-		if (this.name() != "initialize")
+		// check that from the constructor, all constructors with non-zero
+		// arguments are called, and that the calls are in the implemented order
+		if (this.getNameToken() == null || this.name() != "initialize")
 			return;
+
+		// constructor
 		var Statement = require("./statement"); // seems that we need to delay the load
 		var nextConstructorIndex = -1;
 		for (var i = 0; i < this._statements.length; ++i) {
@@ -654,10 +664,10 @@ var MemberFunctionDefinition = exports.MemberFunctionDefinition = MemberDefiniti
 					break;
 				// constructor of baseClassDef is not called; assert that it has a zero-argument constructor (or has no constructor at all)
 				if (! baseClassDef.hasDefaultConstructor())
-					context.errors.push(new CompileError(statement.getToken(), "constructor of class '" + baseClassDef.className() + "' should be called prior to the statement"));
+					context.errors.push(new CompileError(statement.getQualifiedName().getToken(), "constructor of class '" + baseClassDef.className() + "' should be called prior to the statement"));
 			}
 			if (nextConstructorIndex == this._classDef.implementClassDefs().length) {
-				context.errors.push(new CompileError(statement.getToken(), "constructors should be called in the order they are implemented"));
+				context.errors.push(new CompileError(statement.getQualifiedName().getToken(), "constructors should be called in the order they are implemented"));
 				break;
 			}
 			++nextConstructorIndex;

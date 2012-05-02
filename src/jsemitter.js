@@ -4,7 +4,10 @@ eval(Class.$import("./type"));
 eval(Class.$import("./expression"));
 eval(Class.$import("./statement"));
 eval(Class.$import("./emitter"));
+eval(Class.$import("./jssourcemap"));
 eval(Class.$import("./util"));
+
+"use strict";
 
 var _Util = exports._Util = Class.extend({
 
@@ -1229,6 +1232,7 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 
 	initialize: function (platform) {
 		this._output = platform.load("src/js/bootstrap.js") + "\n";
+		this._outputFile = null;
 		this._indent = 0;
 		this._emittingClass = null;
 		this._emittingFunction = null;
@@ -1236,6 +1240,25 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 
 	getSearchPaths: function () {
 		return [ "lib/js" ];
+	},
+
+	setOutputFile: function (name) {
+		this._outputFile = name;
+		// FIXME: set correct sourceRoot
+		var sourceRoot = null;
+		this._sourceMapGen = new SourceMapGenerator(name, sourceRoot);
+	},
+
+	saveSourceMappingFile: function (platform) {
+		var gen = this._sourceMapGen;
+		if(gen != null) {
+			platform.save(this._sourceMapGen.getSourceMappingFile(),
+								this._sourceMapGen.generate());
+		}
+	},
+
+	setSourceMapGenerator: function (gen) {
+		this._sourceMapGen = gen;
 	},
 
 	emit: function (classDefs) {
@@ -1285,7 +1308,7 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 		if ((classDef.flags() & ClassDefinition.IS_NATIVE) != 0)
 			return;
 		// special handling for js.jsx
-		if (classDef.getToken().filename == "lib/js/js.jsx") {
+		if (classDef.getToken().getFilename() == "lib/js/js.jsx") {
 			this._emit("js.global = (function () { return this; }).call(null);\n\n", null);
 			return;
 		}
@@ -1315,9 +1338,9 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 		while (classDefs.length != 0) {
 			// fetch the first classDef, and others that came from the same file
 			var classesOfFile = [ classDefs.shift() ];
-			var filename = classesOfFile[0].getToken().filename;
+			var filename = classesOfFile[0].getToken().getFilename();
 			for (var i = 0; i < classDefs.length;) {
-				if (classDefs[i].getToken().filename == filename) {
+				if (classDefs[i].getToken().getFilename() == filename) {
 					classesOfFile.push(classDefs[i]);
 					classDefs.splice(i, 1);
 				} else {
@@ -1345,7 +1368,10 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 	},
 
 	getOutput: function () {
-		return this._output;
+		if (this._sourceMapGen)
+			return this._output + this._sourceMapGen.magicToken();
+		else
+			return this._output;
 	},
 
 	_emitClassObject: function (classDef) {
@@ -1378,7 +1404,8 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 		if (funcDef != null)
 			this._emitFunctionArgumentAnnotations(funcDef);
 		this._emit(" */\n", null);
-		this._emit("function " + funcName + "(", null);
+		this._emit("function ", null);
+		this._emit(funcName + "(", classDef.getToken());
 		if (funcDef != null)
 			this._emitFunctionArguments(funcDef);
 		this._emit(") {\n", null);
@@ -1406,10 +1433,11 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 		this._emitFunctionArgumentAnnotations(funcDef);
 		this._emit(_Util.buildAnnotation(" * @return {%1}\n", funcDef.getReturnType()), null);
 		this._emit(" */\n", null);
-		this._emit(funcDef.getClassDef().getOutputClassName(), null);
+		this._emit(funcDef.getClassDef().getOutputClassName() + ".", null);
 		if ((funcDef.flags() & ClassDefinition.IS_STATIC) == 0)
-			this._emit(".prototype", null);
-		this._emit("." + this._mangleFunctionName(funcDef.name(), funcDef.getArgumentTypes()) + " = function (", null);
+			this._emit("prototype.", null);
+		this._emit(this._mangleFunctionName(funcDef.name(), funcDef.getArgumentTypes()) + " = ", funcDef.getToken());
+		this._emit("function (", null);
 		this._emitFunctionArguments(funcDef);
 		this._emit(") {\n", null);
 		this._advanceIndent();
@@ -1429,7 +1457,8 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 		for (var i = 0; i < args.length; ++i) {
 			if (i != 0)
 				this._emit(", ");
-			this._emit(args[i].getName().getValue());
+			var name = args[i].getName();
+			this._emit(name.getValue(), name);
 		}
 	},
 
@@ -1478,7 +1507,9 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 			var locals = funcDef.getLocals();
 			for (var i = 0; i < locals.length; ++i) {
 				this._emit(_Util.buildAnnotation("/** @type {%1} */\n", locals[i].getType()), null);
-				this._emit("var " + locals[i].getName().getValue() + " = ");
+				this._emit("var ", null);
+				var name = locals[i].getName();
+				this._emit(name.getValue() + " = ", name);
 				this._emitDefaultValueOf(locals[i].getType());
 				this._emit(";\n", null)
 			}
@@ -1494,7 +1525,8 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 	},
 
 	_emitMemberVariable: function (holder, variable) {
-		this._emit(holder + "." + variable.name() + " = ", null);
+		this._emit(holder + ".", null);
+		this._emit(variable.name() + " = ", variable.getToken());
 		var initialValue = variable.getInitialValue();
 		if (initialValue != null)
 			this._getExpressionEmitterFor(initialValue).emit(0);
@@ -1528,6 +1560,24 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 			return;
 		if (this._output.match(/\n$/))
 			this._output += this._getIndent();
+		// optional source map
+		if(this._sourceMapGen != null && token != null) {
+			var outputLines = this._output.split(/^/m);
+			var genPos = {
+				line: outputLines.length,
+				column: outputLines[outputLines.length-1].length - 1,
+			};
+			// XXX: original pos seems zero-origin
+			var origPos = {
+				line: token.lineNumber - 1,
+				column: token.columnNumber
+			};
+			var tokenValue = token.isIdentifier()
+				? token.getValue()
+				: null;
+			this._sourceMapGen.add(genPos, origPos,
+								   token.getFilename(), tokenValue);
+		}
 		this._output += str.replace(/\n(.)/g, (function (a, m) { return "\n" + this._getIndent() + m; }).bind(this));
 	},
 

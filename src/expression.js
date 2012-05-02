@@ -1435,11 +1435,11 @@ var NewExpression = exports.NewExpression = OperatorExpression.extend({
 		if (classDef == null)
 			return false;
 		if ((classDef.flags() & (ClassDefinition.IS_INTERFACE | ClassDefinition.IS_MIXIN)) != 0) {
-			context.errors.push(new CompileError(this._qualifiedName, "cannot instantiate an interface or a mixin"));
+			context.errors.push(new CompileError(this._qualifiedName.getToken(), "cannot instantiate an interface or a mixin"));
 			return false;
 		}
 		if ((classDef.flags() & ClassDefinition.IS_ABSTRACT) != 0) {
-			context.errors.push(new CompileError(this._qualifiedName, "cannot instantiate an abstract class"));
+			context.errors.push(new CompileError(this._qualifiedName.getToken(), "cannot instantiate an abstract class"));
 			return false;
 		}
 		var argTypes = Util.analyzeArgs(context, this._args);

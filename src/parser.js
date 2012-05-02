@@ -9,25 +9,42 @@ eval(Class.$import("./util"));
 
 var Token = exports.Token = Class.extend({
 
-	initialize: function (value, filename, pos) {
+	initialize: function (value, isIdentifier, filename, lineNumber, columnNumber) {
 		this._value = value;
-		this.filename = filename;
-		this.pos = pos;
+		this._isIdentifier = isIdentifier;
+		this._filename = filename;
+		this._lineNumber = lineNumber;
+		this._columnNumber = columnNumber;
 	},
 
 	getValue: function () {
 		return this._value;
 	},
+	isIdentifier: function () {
+		return this._isIdentifier;
+	},
+	getFilename: function () {
+		return this._filename;
+	},
+	getLineNumber: function () {
+		return this._lineNumber;
+	},
+	getColumnNumber: function () {
+		return this._columnNumber;
+	},
 
 	serialize: function () {
 		return [
-			this.filename,
-			this.pos,
-			this._value
+			this._value,
+			this._isIdentifier,
+			this._filename,
+			this._lineNumber,
+			this._columnNumber
 		];
 	}
 
 });
+Token.prototype.__defineGetter__("filename", function () { throw new Error("Token#filename is removed. Use Token#getFilename() instead") });
 
 var _Lexer = exports._TokenTable = Class.extend({
 
@@ -87,7 +104,8 @@ var _Lexer = exports._TokenTable = Class.extend({
 		this.rxNumberLiteral  = this.rx("^" + numberLiteral);
 		this.rxIntegerLiteral = this.rx("^" + integerLiteral);
 		this.rxRegExpLiteral  = this.rx("^" + regexpLiteral);
-		this.rxSpace          = this.rx("^" + this.makeAlt([comment, whiteSpace]));
+		this.rxSpace          = this.rx("^" + this.makeAlt([comment, whiteSpace]) + "+");
+		this.rxNewline        = /(?:\r\n?|\n)/;
 
 		// blacklists of identifiers
 		this.keywords = this.asHash([
@@ -281,6 +299,8 @@ var Parser = exports.Parser = Class.extend({
 		this._input = input;
 		this._pos = 0;
 		this._tokenLength = 0;
+		// for source map
+		this._lineNumber = 1;
 		// output
 		this._errors = errors;
 		this._templateClassDefs = [];
@@ -433,6 +453,7 @@ var Parser = exports.Parser = Class.extend({
 		return {
 			// lexer properties
 			pos: this._pos,
+			lineNumber: this._lineNumber,
 			tokenLength: this._tokenLength,
 			// errors
 			numErrors: this._errors.length
@@ -441,20 +462,31 @@ var Parser = exports.Parser = Class.extend({
 
 	_restoreState: function (state) {
 		this._pos = state.pos;
+		this._lineNumber = state.lineNumber;
 		this._tokenLength = state.tokenLength;
 		this._errors.length = state.numErrors;
 	},
 
+	_getColumn: function () {
+		var part = this._input.substring(0, this._pos);
+		var lastNewline = part.lastIndexOf("\n");
+		return part.length - lastNewline - 1;
+	},
+
 	_newError: function (message) {
-		this._errors.push(new CompileError(this._filename, this._pos, message));
+		this._errors.push(new CompileError(this._filename, this._lineNumber, this._getColumn(), message));
 	},
 
 	_advanceToken: function () {
 		this._pos += this._tokenLength;
 		this._tokenLength = 0;
-		var matched;
-		while ((matched = this._input.substring(this._pos).match(_Lexer.rxSpace)) != null)
+
+		// skip whitespaces
+		var matched = this._input.substring(this._pos).match(_Lexer.rxSpace);
+		if(matched != null) {
 			this._pos += matched[0].length;
+			this._lineNumber += matched[0].split(_Lexer.rxNewline).length - 1;
+		}
 	},
 
 	_isEOF: function () {
@@ -483,7 +515,7 @@ var Parser = exports.Parser = Class.extend({
 				} else {
 					// found
 					this._tokenLength = expected[i].length;
-					return new Token(expected[i], this._filename, this._pos);
+					return new Token(expected[i], false, this._filename, this._lineNumber, this._getColumn());
 				}
 			}
 		}
@@ -516,7 +548,7 @@ var Parser = exports.Parser = Class.extend({
 			return null;
 		}
 		this._tokenLength = matched[0].length;
-		return new Token(matched[0], this._filename, this._pos);
+		return new Token(matched[0], true, this._filename, this._lineNumber, this._getColumn());
 	},
 
 	_expectIdentifier: function () {
@@ -533,7 +565,7 @@ var Parser = exports.Parser = Class.extend({
 		if (matched == null)
 			return null;
 		this._tokenLength = matched[0].length;
-		return new Token(matched[0], this._filename, this._pos);
+		return new Token(matched[0], false, this._filename, this._lineNumber, this._getColumn());
 	},
 
 	_expectStringLiteral: function () {
@@ -552,7 +584,7 @@ var Parser = exports.Parser = Class.extend({
 		if (matched == null)
 			return null;
 		this._tokenLength = matched[0].length;
-		return new Token(matched[0], this._filename, this._pos);
+		return new Token(matched[0], false, this._filename, this._lineNumber, this._getColumn());
 	},
 
 	_expectRegExpLiteralOpt: function () {
@@ -561,7 +593,7 @@ var Parser = exports.Parser = Class.extend({
 		if (matched == null)
 			return null;
 		this._tokenLength = matched[0].length;
-		return new Token(matched[0], this._filename, this._pos);
+		return new Token(matched[0], false, this._filename, this._lineNumber, this._getColumn());
 	},
 
 	_skipLine: function () {
@@ -877,7 +909,7 @@ var Parser = exports.Parser = Class.extend({
 		}
 		if (! this._expect(";"))
 			return null;
-		return new MemberVariableDefinition(token, name.getValue(), flags, type, initialValue);
+		return new MemberVariableDefinition(token, name, flags, type, initialValue);
 	},
 
 	_functionDefinition: function (token, flags, classFlags) {
@@ -921,13 +953,13 @@ var Parser = exports.Parser = Class.extend({
 		if ((flags & ClassDefinition.IS_NATIVE) != 0 || (classFlags & ClassDefinition.IS_INTERFACE) != 0) {
 			if (this._expect(";") == null)
 				return null;
-			return new MemberFunctionDefinition(token, name.getValue(), flags, returnType, args, null, null, null);
+			return new MemberFunctionDefinition(token, name, flags, returnType, args, null, null, null);
 		} else if ((flags & ClassDefinition.IS_ABSTRACT) != 0) {
 			var token = this._expect([ ";", "{" ]);
 			if (token == null)
 				return null;
 			if (token.getValue() == ";")
-				return new MemberFunctionDefinition(token, name.getValue(), flags, returnType, args, null, null, null);
+				return new MemberFunctionDefinition(token, name, flags, returnType, args, null, null, null);
 		} else {
 			if (this._expect("{") == null)
 				return null;
@@ -941,7 +973,7 @@ var Parser = exports.Parser = Class.extend({
 		else
 			this._block();
 		// done
-		return new MemberFunctionDefinition(token, name.getValue(), flags, returnType, args, this._locals, this._statements, this._closures);
+		return new MemberFunctionDefinition(token, name, flags, returnType, args, this._locals, this._statements, this._closures);
 	},
 
 	_typeDeclaration: function (allowVoid) {

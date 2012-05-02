@@ -7,6 +7,7 @@ var fs = require("fs");
 
 var Class = require("../src/Class");
 eval(Class.$import("../src/compiler"));
+eval(Class.$import("../src/platform"));
 eval(Class.$import("../src/jsemitter"));
 
 "use strict";
@@ -15,6 +16,15 @@ var NodePlatform = Platform.extend({
 
 	load: function(filename) {
 		return fs.readFileSync(filename).toString();
+	},
+
+	save: function (outputFile, content) {
+		if (outputFile == null) {
+			process.stdout.write(content);
+		}
+		else {
+			fs.writeFileSync(outputFile, content);
+		}
 	}
 
 });
@@ -28,6 +38,7 @@ var JSX = Class.extend({
 			"Usage: jsx [options] source-files\n" +
 			"\n" +
 			"Options:\n" +
+			"  --output file              output file (default:stdout)\n" +
 			"  --mode (compile|parse)     compilation mode (default:compile)\n" +
 			"  --target (javascript|c++)  target language (default:javascript)\n" +
 			"  --version                  displays the version and exits\n" +
@@ -63,9 +74,15 @@ var JSX = Class.extend({
 
 		var compiler = new Compiler(platform);
 
+		var emitter = null;
+		var outputFile = null;
 		var opt, optarg;
 		while ((opt = getopt()) != null) {
 			switch (opt) {
+			case "--output":
+				if((outputFile = getoptarg()) == null)
+					process.exit(1);
+				break;
 			case "--mode":
 				if ((optarg = getoptarg()) == null)
 					process.exit(1);
@@ -87,7 +104,7 @@ var JSX = Class.extend({
 					process.exit(1);
 				switch (optarg) {
 				case "javascript":
-					// it's the only interface, so skip for now
+					emitter = new JavaScriptEmitter(platform);
 					break;
 				case "c++":
 					throw new Error("FIXME");
@@ -120,10 +137,33 @@ var JSX = Class.extend({
 		for (; argIndex < args.length; ++argIndex)
 			compiler.addSourceFile(null, args[argIndex]);
 
+		if(compiler.getMode() === Compiler.MODE_PARSE) {
+			if (compiler.compile()) {
+				platform.save(outputFile, compiler.getAST());
+				process.exit(0);
+			}
+			else
+				process.exit(1);
+		}
+
+		// MODE_COMPILE
+		if (emitter == null)
+			emitter = new JavaScriptEmitter(platform);
+
+		if (outputFile != null) {
+			emitter.setOutputFile(outputFile);
+		}
+
+		compiler.setEmitter(emitter);
+
 		if (! compiler.compile())
 			process.exit(1);
 
-		console.log(compiler.getOutput());
+		platform.save(outputFile, emitter.getOutput());
+
+		if (emitter instanceof JavaScriptEmitter) {
+			emitter.saveSourceMappingFile(platform);
+		}
 	}
 
 });

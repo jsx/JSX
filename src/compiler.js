@@ -2,14 +2,11 @@ var Class = require("./Class");
 eval(Class.$import("./parser"));
 eval(Class.$import("./classdef"));
 eval(Class.$import("./type"));
-eval(Class.$import("./jsemitter"));
+eval(Class.$import("./emitter"));
 eval(Class.$import("./platform"));
 eval(Class.$import("./util"));
 
 "use strict";
-
-// for front-end driver
-exports.Platform = Platform;
 
 var Compiler = exports.Compiler = Class.extend({
 
@@ -19,8 +16,6 @@ var Compiler = exports.Compiler = Class.extend({
 	initialize: function (platform) {
 		this._platform = platform;
 		this._mode = Compiler.MODE_COMPILE;
-		this._emitter = new JavaScriptEmitter(platform);
-		this._output = "";
 		this._parsers = [];
 		this._fileCache = {};
 		this._searchPaths = [ "lib/common" ];
@@ -38,6 +33,10 @@ var Compiler = exports.Compiler = Class.extend({
 
 	getPlatform: function () {
 		return this._platform;
+	},
+
+	getMode: function () {
+		return this._mode;
 	},
 
 	setMode: function (mode) {
@@ -75,7 +74,6 @@ var Compiler = exports.Compiler = Class.extend({
 		}
 		switch (this._mode) {
 		case Compiler.MODE_PARSE:
-			this._output = ClassDefinition.serialize(this._classDefs);
 			return true;
 		}
 		// resolve imports
@@ -115,8 +113,8 @@ var Compiler = exports.Compiler = Class.extend({
 		return true;
 	},
 
-	getOutput: function() {
-		return this._output;
+	getAST: function() {
+		return ClassDefinition.serialize(this._classDefs);
 	},
 
 	getFileContent: function (errors, sourceToken, path) {
@@ -312,8 +310,8 @@ var Compiler = exports.Compiler = Class.extend({
 					return path;
 			}
 		}
-		var lastSlashAt = token.filename.lastIndexOf("/");
-		path = Util.resolvePath((lastSlashAt != -1 ? token.filename.substring(0, lastSlashAt + 1) : "") + tokenPath);
+		var lastSlashAt = token.getFilename().lastIndexOf("/");
+		path = Util.resolvePath((lastSlashAt != -1 ? token.getFilename().substring(0, lastSlashAt + 1) : "") + tokenPath);
 		return path;
 	},
 
