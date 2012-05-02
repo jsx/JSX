@@ -565,7 +565,7 @@ var MemberVariableDefinition = exports.MemberVariableDefinition = MemberDefiniti
 	},
 
 	setAnalysisContext: function (context) {
-		this._analysisContext = context;
+		this._analysisContext = context.clone();
 	},
 
 	getType: function () {
