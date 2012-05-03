@@ -1,5 +1,5 @@
-class FizzBuzz {
-	static function main() : void {
+class _Main {
+	static function main(args :string[]) : void {
 		for (var i = 1; i <= 100; ++i) {
 			if (i % 15 == 0)
 				log "FizzBuzz";

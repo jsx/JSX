@@ -35,8 +35,8 @@ class Point {
 	}
 }
 
-class _Test {
-	static function main() :void {
+class _Main {
+	static function main(args : string[]) : void {
 		var p = new Point(10, 20);
 
 		log "x=" + p.getX() as string;
