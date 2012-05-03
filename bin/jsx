@@ -1,8 +1,5 @@
 #!/usr/bin/env node
 
-
-var VERSION = "0.0.1";
-
 var fs = require("fs");
 
 var Class = require("../src/Class");
@@ -34,10 +31,19 @@ var NodePlatform = Platform.extend({
 });
 
 var JSX = Class.extend({
+	$_meta: null,
+
+	$meta: function (name) {
+		if (JSX._meta === null) {
+			var j = fs.readFileSync( __dirname + "/../package.json" );
+			JSX._meta = JSON.parse(j);
+		}
+		return JSX._meta[name];
+	},
 
 	$printHelp: function () {
 		console.log(
-			"JSX compiler version " + VERSION + "\n" +
+			"JSX compiler version " + JSX.meta("version") + "\n" +
 			"\n" +
 			"Usage: jsx [options] source-files\n" +
 			"\n" +
@@ -119,7 +125,7 @@ var JSX = Class.extend({
 				}
 				break;
 			case "--version":
-				console.log(VERSION);
+				console.log(JSX.meta("version"));
 				process.exit(0);
 				break;
 			case "--help":
