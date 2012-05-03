@@ -135,6 +135,8 @@ var JSX = Class.extend({
 
 		var compiler = new Compiler(platform);
 
+		var tasks = [];
+
 		var emitter = null;
 		var outputFile = null;
 		var executable = false;
@@ -145,6 +147,9 @@ var JSX = Class.extend({
 			case "--output":
 				if((outputFile = getoptarg()) == null)
 					process.exit(1);
+				tasks.push(function() {
+					emitter.setOutputFile(outputFile);
+				});
 				break;
 			case "--mode":
 				if ((optarg = getoptarg()) == null)
@@ -228,9 +233,7 @@ var JSX = Class.extend({
 		if (emitter == null)
 			emitter = new JavaScriptEmitter(platform);
 
-		if (outputFile != null) {
-			emitter.setOutputFile(outputFile);
-		}
+		tasks.forEach(function(proc) { proc(); });
 
 		compiler.setEmitter(emitter);
 
