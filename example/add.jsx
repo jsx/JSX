@@ -6,3 +6,7 @@ class _Main {
 		log x + y;
 	}
 }
+
+/*EXPECTED
+30
+*/

@@ -36,6 +36,12 @@ class Fib {
 	}
 }
 
+class _Main {
+	static function main(args : string[]) : void {
+		log Fib.fib1(10);
+	}
+}
+
 class _Test {
 	function test_fib1() : void {
 		log "fib1(10) = " + Fib.fib1(10).toString();

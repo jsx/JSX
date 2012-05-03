@@ -3,3 +3,7 @@ class _Main {
 		log "Hello, world!";
 	}
 }
+
+/*EXPECTED
+Hello, world!
+*/

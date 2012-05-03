@@ -7,6 +7,7 @@ var Class = require("../src/Class");
 eval(Class.$import("../src/compiler"));
 eval(Class.$import("../src/platform"));
 eval(Class.$import("../src/jsemitter"));
+eval(Class.$import("../src/util"));
 
 "use strict";
 
@@ -30,22 +31,26 @@ var NodePlatform = Platform.extend({
 	},
 
 	// called from JavaScriptEmitter
-	addLauncher: function (emitter, targetCode, entryPoint) {
+	addLauncher: function (emitter, sourceFile, targetCode, entryPoint) {
 		if(emitter instanceof JavaScriptEmitter) {
+
+			var entryPointClass = Util.format("(JSX.require('%1').%2)",
+											 [ sourceFile, entryPoint ]);
 			switch(entryPoint) {
 			case "_Main":
 				return targetCode +
-					"_Main.main$AS(process.argv.slice(2));\n";
+					entryPointClass + ".main$AS(process.argv.slice(2));\n";
 			case "_Test":
 				return targetCode +
-					"if (typeof(_Test) !== 'undefined')\n"+
-					"  (function (t) {\n"+
-					"    for (var m in t) {\n"+
-					"      if (/^test.*[$]/.test(m)) {\n"+
-					"        t[m]();\n"+
-					"       }\n"+
-					"    }\n"+
-					"  }(new _Test));\n";
+					"(function (c) {\n"+
+					"  if(!c) return;\n"+ // skip if there's no _Test
+					"  var t = new c;\n"+
+					"  for (var m in c.prototype) {\n"+
+					"    if (c.prototype.hasOwnProperty(m) && /^test.*[$]$/.test(m)) {\n"+
+					"      t[m]();\n"+
+					"     }\n"+
+					"  }\n"+
+					"}("+entryPointClass+"));\n";
 			default:
 				throw new Error("Unknown entry point type: " +
 								entryPoint);
@@ -68,11 +73,10 @@ var JSX = Class.extend({
 		return JSX._meta[name];
 	},
 
-	$execNodeJS: function (script) {
-		var child = child_process.spawn(process.execPath, []);
-
-		child.stdin.write(script);
-		child.stdin.end();
+	$execNodeJS: function (script, args) {
+		// XXX: node.js (0.6.x) doesn't suport "--" option :(
+		var argv = ["-e", script].concat(args);
+		var child = child_process.spawn(process.execPath, argv);
 
 		child.stdout.on("data", function (data) {
 			process.stdout.write(data);
@@ -92,8 +96,9 @@ var JSX = Class.extend({
 			"Usage: jsx [options] source-files\n" +
 			"\n" +
 			"Options:\n" +
-			"  --run Class                runs Class.main(:string[]):void after compiling\n" +
-			"  --test                     runs _Test.run():void after compiling\n" +
+			"  --executable               compiles as an CLI executable, calling _Main.main(:string[]):void\n" +
+			"  --run                      runs _Main.main(:string[]):void after compiling\n" +
+			"  --test                     runs _Test#test*():void after compiling\n" +
 			"  --output file              output file (default:stdout)\n" +
 			"  --mode (compile|parse)     compilation mode (default:compile)\n" +
 			"  --target (javascript|c++)  target language (default:javascript)\n" +
@@ -132,6 +137,7 @@ var JSX = Class.extend({
 
 		var emitter = null;
 		var outputFile = null;
+		var executable = false;
 		var run = null;
 		var opt, optarg;
 		while ((opt = getopt()) != null) {
@@ -171,11 +177,15 @@ var JSX = Class.extend({
 					process.exit(1);
 				}
 				break;
-			case "--test":
-				run = "_Test";
+			case "--executable":
+				executable = true;
+				run = "_Main";
 				break;
 			case "--run":
 				run = "_Main";
+				break;
+			case "--test":
+				run = "_Test";
 				break;
 			case "--version":
 				console.log(JSX.meta("version"));
@@ -197,8 +207,13 @@ var JSX = Class.extend({
 			process.exit(1);
 		}
 
-		for (; argIndex < args.length; ++argIndex)
-			compiler.addSourceFile(null, args[argIndex]);
+		if(executable && outputFile == null) {
+			console.error("--executable requires --output to be specified");
+			process.exit(1);
+		}
+
+		var sourceFile = args[argIndex++];
+		compiler.addSourceFile(null, sourceFile);
 
 		if(compiler.getMode() === Compiler.MODE_PARSE) {
 			if (compiler.compile()) {
@@ -222,18 +237,28 @@ var JSX = Class.extend({
 		if (! compiler.compile())
 			process.exit(1);
 
-		var output = emitter.getOutput(run);
+		var output = emitter.getOutput(sourceFile, run);
 
-		if (run == null) { // compile
-			platform.save(outputFile, emitter.getOutput(run));
+		if (run == null || executable) { // compile and save
+			if(emitter instanceof JavaScriptEmitter && executable) {
+				// for CLI executable
+				output =  "#!" + process.execPath + "\n" + output;
+			}
+
+			platform.save(outputFile, output);
 
 			if (emitter instanceof JavaScriptEmitter) {
 				emitter.saveSourceMappingFile(platform);
+			
+				if (executable) {
+					fs.chmodSync(outputFile, "0755");
+				}
 			}
+
 		}
-		else { // compile and run
+		else { // compile and run immediately
 			if(emitter instanceof JavaScriptEmitter) {
-				JSX.execNodeJS(output);
+				JSX.execNodeJS(output, args.slice(argIndex));
 			}
 			else {
 				throw new Error("FIXME: run C+++ code");

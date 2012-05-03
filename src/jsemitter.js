@@ -1390,9 +1390,9 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 		this._emit("};\n\n", null);
 	},
 
-	getOutput: function (entrypoint) {
-		var output = entrypoint != null
-			? this._platform.addLauncher(this, this._output, entrypoint)
+	getOutput: function (sourceFile, entryPoint) {
+		var output = entryPoint != null
+			? this._platform.addLauncher(this, sourceFile, this._output, entryPoint)
 			: this._output;
 		if (this._sourceMapGen)
 			return output + this._sourceMapGen.magicToken();
