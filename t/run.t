@@ -31,12 +31,12 @@ sub run {
         open my $fh, ">>", "$tempdir/compiled.js"
             or die "failed to open file:$tempdir/compiled.js:$!";
         print $fh <<'EOT';
-// workaround for node.js to set JSX to global
+// workaround for node.js to set "JSX" to global
 (function () { return this; })().JSX = JSX;
 // invoke the test
 Test.run$();
 EOT
-;
+
     }
 
     # execute compiled node

@@ -30,9 +30,26 @@ var NodePlatform = Platform.extend({
 	},
 
 	// called from JavaScriptEmitter
-	addLauncher: function (emitter, targetCode, entrypoint) {
+	addLauncher: function (emitter, targetCode, entryPoint) {
 		if(emitter instanceof JavaScriptEmitter) {
-			return targetCode + entrypoint + ".main$();\n";
+			switch(entryPoint) {
+			case "_Main":
+				return targetCode +
+					"_Main.main$AS(process.argv.slice(2));\n";
+			case "_Test":
+				return targetCode +
+					"if (typeof(_Test) !== 'undefined')\n"+
+					"  (function (t) {\n"+
+					"    for (var m in t) {\n"+
+					"      if (/^test.*[$]/.test(m)) {\n"+
+					"        t[m]();\n"+
+					"       }\n"+
+					"    }\n"+
+					"  }(new _Test));\n";
+			default:
+				throw new Error("Unknown entry point type: " +
+								entryPoint);
+			}
 		}
 		else {
 			throw new Error("FIXME");
@@ -49,6 +66,23 @@ var JSX = Class.extend({
 			JSX._meta = JSON.parse(j);
 		}
 		return JSX._meta[name];
+	},
+
+	$execNodeJS: function (script) {
+		var child = child_process.spawn(process.execPath, []);
+
+		child.stdin.write(script);
+		child.stdin.end();
+
+		child.stdout.on("data", function (data) {
+			process.stdout.write(data);
+		});
+		child.stderr.on("data", function (data) {
+			process.stderr.write(data);
+		});
+		child.on("exit", function (status) {
+			process.exit(status);
+		});
 	},
 
 	$printHelp: function () {
@@ -141,9 +175,7 @@ var JSX = Class.extend({
 				run = "_Test";
 				break;
 			case "--run":
-				if ((optarg = getoptarg()) == null)
-					process.exit(1);
-				run = optarg;
+				run = "_Main";
 				break;
 			case "--version":
 				console.log(JSX.meta("version"));
@@ -192,33 +224,20 @@ var JSX = Class.extend({
 
 		var output = emitter.getOutput(run);
 
-		if (run == null) {
-
+		if (run == null) { // compile
 			platform.save(outputFile, emitter.getOutput(run));
 
 			if (emitter instanceof JavaScriptEmitter) {
 				emitter.saveSourceMappingFile(platform);
 			}
-
 		}
-		else if(emitter instanceof JavaScriptEmitter) {
-			var child = child_process.spawn(process.execPath, []);
-
-			child.stdin.write(output);
-			child.stdin.end();
-
-			child.stdout.on("data", function (data) {
-				process.stdout.write(data);
-			});
-			child.stderr.on("data", function (data) {
-				process.stderr.write(data);
-			});
-			child.on("exit", function (status) {
-				process.exit(status);
-			});
-		}
-		else {
-			throw new Error("FIXME: run C+++ code");
+		else { // compile and run
+			if(emitter instanceof JavaScriptEmitter) {
+				JSX.execNodeJS(output);
+			}
+			else {
+				throw new Error("FIXME: run C+++ code");
+			}
 		}
 	}
 
