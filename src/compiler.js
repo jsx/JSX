@@ -112,7 +112,7 @@ var Compiler = exports.Compiler = Class.extend({
 	},
 
 	getFileContent: function (errors, sourceToken, path) {
-		if(!(path in this._fileCache)) {
+		if(this._fileCache[path] == null) {
 			try {
 				this._fileCache[path] = this._platform.load(path);
 			} catch (e) {
