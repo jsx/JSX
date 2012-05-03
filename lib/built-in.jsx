@@ -32,6 +32,8 @@ native final class Array.<T> {
 	function splice(start : int, deleteCount : int) : Array.<T>; // FIXME more arguments
 	function unshift(item : T) : int; // FIXME more arguments
 
+	// 15.4.5
+	var length : int;
 }
 
 // 15.5

@@ -555,6 +555,11 @@ var MemberVariableDefinition = exports.MemberVariableDefinition = MemberDefiniti
 		this._analysisContext = null;
 	},
 
+	instantiate: function (instantiationContext) {
+		var type = this._type.instantiate(instantiationContext);
+		return new MemberVariableDefinition(this._token, this._nameToken, this._flags, type, this._initialValue);
+	},
+
 	serialize: function () {
 		return {
 			"name"         : this.name(),
