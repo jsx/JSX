@@ -223,19 +223,26 @@ var Compiler = exports.Compiler = Class.extend({
 	},
 
 	_analyze: function (errors) {
-		for (var i = 0; i < this._parsers.length; ++i) {
-			var parser = this._parsers[i];
-			var classDefs = parser.getClassDefs();
-			for (var j = 0; j < classDefs.length; ++j) {
-				classDefs[j].analyze(
-					new AnalysisContext(
-						errors,
-						parser,
-						(function (errors, request) {
-							return this._instantiateTemplate(errors, parser, request, true);
-						}).bind(this)));
+		var analyzeClassDef = (function (f) {
+			for (var i = 0; i < this._parsers.length; ++i) {
+				var parser = this._parsers[i];
+				var classDefs = parser.getClassDefs();
+				for (var j = 0; j < classDefs.length; ++j) {
+					f(parser, classDefs[j]);
+				}
 			}
-		}
+		}).bind(this);
+		analyzeClassDef((function (parser, classDef) {
+			classDef.analyze(new AnalysisContext(
+				errors,
+				parser,
+				(function (errors, request) {
+					return this._instantiateTemplate(errors, parser, request, true);
+				}).bind(this)));
+		}).bind(this));
+		analyzeClassDef((function (parser, classDef) {
+			classDef.analyzeUnusedVariables();
+		}).bind(this));
 	},
 
 	_generateCode: function () {

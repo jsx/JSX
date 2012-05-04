@@ -297,6 +297,14 @@ var ClassDefinition = exports.ClassDefinition = Class.extend({
 		}
 	},
 
+	analyzeUnusedVariables: function () {
+		for (var i = 0; i < this._members.length; ++i) {
+			var member = this._members[i];
+			if (member instanceof MemberVariableDefinition)
+				member.getType();
+		}
+	},
+
 	isConvertibleTo: function (classDef) {
 		if (this == classDef)
 			return true;
