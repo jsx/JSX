@@ -909,6 +909,7 @@ var SignExpression = exports.SignExpression = UnaryExpression.extend({
 			return false;
 		if (! this.assertIsConvertibleTo(context, this._expr, Type.numberType, true))
 			return false;
+		return true;
 	},
 
 	getType: function () {
