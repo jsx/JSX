@@ -556,7 +556,7 @@ var _ThisExpressionEmitter = exports._ThisExpressionEmitter = _ExpressionEmitter
 	},
 
 	emit: function (outerOpPrecedence) {
-		var emittingFunction = this._emitter._emittingFunction;
+		var emittingFunction = this._emitter._emittingFunctionStack[ this._emitter._emittingFunctionStack.length - 1 ];
 		if ((emittingFunction.flags() & ClassDefinition.IS_STATIC) != 0)
 			this._emitter._emit("$this", this._expr.getToken());
 		else
@@ -1242,7 +1242,7 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 		this._outputFile = null;
 		this._indent = 0;
 		this._emittingClass = null;
-		this._emittingFunction = null;
+		this._emittingFunctionStack = [];
 	},
 
 	getSearchPaths: function () {
@@ -1491,7 +1491,7 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 
 	_emitConstructorCalls: function (classDef, funcDef) {
 		try {
-			this._emittingFunction = funcDef;
+			this._emittingFunctionStack.push(funcDef);
 
 			var statementIndex = 0;
 			if (classDef.extendClassDef() != null) {
@@ -1503,7 +1503,9 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 					++statementIndex;
 
 		} finally {
-			this._emittingFunction = null;
+			if (this._emittingFunctionStack.pop() !== funcDef) {
+				throw new Error("Assertion failed: mismatched funcDef");
+			}
 		}
 	},
 
@@ -1525,7 +1527,7 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 
 	_emitFunctionBody: function (funcDef) {
 		try {
-			this._emittingFunction = funcDef;
+			this._emittingFunctionStack.push(funcDef);
 
 			// emit reference to this for closures
 			if (funcDef.getClosures().length != 0)
@@ -1547,7 +1549,9 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 					this._getStatementEmitterFor(statements[i]).emit();
 
 		} finally {
-			this._emittingFunction = null;
+			if (this._emittingFunctionStack.pop() !== funcDef) {
+				throw new Error("Assertion failed: mismatched funcDef");
+			}
 		}
 	},
 
