@@ -14,11 +14,12 @@ See also:
 	http://dev.w3.org/html5/spec/
 */
 
+import "js.jsx";
+
 // DOM-Core
 
 // http://www.w3.org/TR/DOM-Level-3-Core/
 
-import "js.jsx";
 
 native class DOMException {
 	var code : int;
@@ -215,7 +216,7 @@ native class ProcessingInstruction extends Node {
 
 native class DocumentFragment extends Node { }
 
-native class Document extends Node {
+native class Document extends Node /* implements DocumentEvent */ {
 	const var doctype : DocumentType;
 	const var implementation : DOMImplementation;
 	const var documentElement : Element;
@@ -255,6 +256,9 @@ native class Document extends Node {
 	const var domConfig : DOMConfiguration;
 	function normalizeDocument() : void;
 	function renameNode(n : Node, namespaceURI : string, qualifiedName : string) : Node;
+
+	// implements interface DocumentEvent
+	function createEvent(eventInterface : string) : Event;
 }
 
 // DOM-HTML
@@ -314,6 +318,20 @@ native class CSSStyleDeclaration {
 	// TODO
 }
 
+native class ClientRect {
+	const var top : number;
+	const var right : number;
+	const var bottom : number;
+	const var left : number;
+	const var width : number;
+	const var height : number;
+}
+
+native class ClientRectList {
+	// TODO
+}
+
+
 // http://dev.w3.org/html5/spec/elements.html#htmlelement
 native class HTMLElement extends Element {
 	// metadata attributes
@@ -360,6 +378,10 @@ native class HTMLElement extends Element {
 
 	// HTML5
 	var innerHTML : string;
+
+	// CSSOM
+	function getBoundingClientRect() : ClientRect;
+	function getClientRects() : ClientRectList;
 }
 
 native class HTMLHtmlElement extends HTMLElement {
@@ -465,8 +487,18 @@ final native class Location {
 	function toString() :string;
 }
 
-// Event
-// http://www.w3.org/TR/DOM-Level-3-Events/#interface-Event
+// DOM level 2 Views
+// http://www.w3.org/TR/DOM-Level-2-Views/
+
+interface AbstractView {
+	// TODO
+}
+interface DocumentView {
+	// TODO
+}
+
+// DOM  Events
+// http://www.w3.org/TR/DOM-Level-3-Events/
 
 native class Event {
 	static const var CAPTURING_PHASE : int;
@@ -492,6 +524,10 @@ native class Event {
 	const var isTrusted : boolean;
 }
 
+native class CustomEvent extends Event {
+	// TODO
+}
+
 native class EventTarget {
 	// TODO
 
@@ -502,6 +538,102 @@ native class EventTarget {
 	function removeEventListener(target : string, listener : function(:Event):void, useCapture : boolean) : void;
 
 	function dispatchEvent(evt : Event) : void;
+}
+
+native class UIEvent extends Event {
+	// TODO
+}
+
+native class ForcusEvent extends UIEvent {
+	// TODO
+}
+
+native class MouseEvent extends UIEvent {
+	const var screenX : int;
+	const var screenY : int;
+	const var clientX : int;
+	const var clientY : int;
+	const var ctrlKey : boolean;
+	const var shiftKey : boolean;
+	const var altKey : boolean;
+	const var metaKey : boolean;
+	const var button : int;
+	const var buttons : int;
+	const var relatedTarget : EventTarget;
+
+	function initMouseEvent(
+		typeArg : string,
+		canBubbleArg : boolean,
+		cancelableArg : boolean,
+		viewArg : AbstractView,
+		detailArg : int,
+		screenYArg : int,
+		screenYArg : int,
+		clientXArg : int,
+		clientYArg : int,
+		ctrlKeyArg : boolean,
+		altKeyArg : boolean,
+		shiftKeyArg : boolean,
+		metaKeyArg : boolean,
+		buttonArg : int,
+		relatedTargetArg : EventTarget ) : void;
+
+	function getModifierState(keyArg : string) : boolean;
+}
+
+native class WheelEvent extends MouseEvent {
+	// TODO
+}
+
+native class TextEvent extends UIEvent {
+	// TODO
+}
+
+native class KeyboardEvent extends UIEvent {
+	// TODO
+}
+
+native class CompositionEvent extends UIEvent {
+	// TODO
+}
+
+native class MutationEvent extends Event {
+	// TODO
+}
+
+native class MutationNameEvent extends MutationEvent {
+	// TODO
+}
+
+// http://www.w3.org/TR/touch-events/
+
+native class Touch {
+	const var identifier : int;
+	const var target : EventTarget;
+	const var screenX : int;
+	const var screenY : int;
+	const var clientX : int;
+	const var clientY : int;
+	const var pageX : int;
+	const var pageY : int;
+}
+
+/*
+native class TouchList {
+	const var length : int;
+	function item(index : int) : Touch;
+	function identifiedTouch(identifier : int) : Touch;
+}
+*/
+
+native class TouchEvent extends UIEvent {
+	const var touches : Touch[];
+	const var targetTouches : Touch[];
+	const var changedTouches : Touch[];
+	const var altKey : boolean;
+	const var metaKey : boolean;
+	const var ctrlKey : boolean;
+	const var shiftKey : boolean;
 }
 
 // XHR
