@@ -1,6 +1,7 @@
 
 test:
 	prove --timer
+	prove --timer --exec "bin/jsx --test" t/lib/*.jsx
 
 web:
 	perl web/build.pl
