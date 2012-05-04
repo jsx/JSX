@@ -8,17 +8,35 @@ Event - DOM Level 3 Event (Low level event model)
 XHR - XMLHttpRequest
 Window - The DOM Window
 
+See also:
+	http://www.w3.org/TR/DOM-Level-2-Core/
+	http://www.w3.org/TR/DOM-Level-3-Core/
+	http://dev.w3.org/html5/spec/
 */
 
 // DOM-Core
 
-// Document Object Model Level 2 Core
-// http://www.w3.org/TR/DOM-Level-2-Core/
+// http://www.w3.org/TR/DOM-Level-3-Core/
 
 import "js.jsx";
 
-native class DOMImplementation {
+native class DOMException {
+	var code : int;
+}
+
+native class DOMImplementationList {
 	// TODO
+}
+native class DOMImplementationSource {
+	// TODO
+}
+
+native class DOMImplementation {
+	function hasFeature(feature : string, version : string) : boolean;
+	function createDocumentType(qualifiedName : string, publicId : string, systemId : string) :DocumentType;
+	function createDocument(namespaceURI : string, qualifiedName : string, docType : string) :Document;
+	function getFeature(feature : string, version : string) : Object;
+
 }
 
 native class Node {
@@ -36,6 +54,8 @@ native class Node {
 	static const var NOTATION_NODE : int;
 
 	const var nodeName : string;
+	var nodeValue : string;
+	const var nodeType : int;
 	const var parentNode : string;
 	const var childNodes : NodeList;
 	const var firstChild : Node;
@@ -52,14 +72,37 @@ native class Node {
 	function hasChildNodes() : boolean;
 	function cloneNode(deep : boolean) : Node;
 
-	// modified in DOM level 2
 	function normalize() : void;
 
-	// introduced in DOM level 2
 	function isSupported(feature : string, version : string) : boolean;
+	const var namespaceURI : string;
 	const var prefix : string;
 	const var localName : string;
 	function hasAttributes() : boolean;
+	const var baseURI : string;
+
+	// DocumentPosition
+	static const var DOCUMENT_POSITION_DISCONNECTED : int;
+	static const var DOCUMENT_POSITION_PRECEDING : int;
+	static const var DOCUMENT_POSITION_FOLLOWING : int;
+	static const var DOCUMENT_POSITION_CONTAINS : int;
+	static const var DOCUMENT_POSITION_CONTAINED_BY : int;
+	static const var DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC : int;
+	function compareDocumentPosition(other : Node) : int;
+
+	var textContent : string;
+
+	function isSameNode(other : Node) : boolean;
+	function lookupPrefix(namespaceURI : string) : string;
+	function isDefaultNamespace(namespaceURI : string) : string;
+	function lookupNamespaceURI(prefix : string) : string;
+	function isEqualNode(arg : Node) : boolean;
+	function getFeature(feature : string, version : string) : Object;
+
+	// See also UserDataHandler
+	function setUserData(key : string, data : variant, handler: function(:int,:string,:variant,:Node,:Node):void) : variant;
+	function getUserData(key : string) : variant;
+
 }
 
 native class NodeList {
@@ -76,6 +119,15 @@ native class CharacterData extends Node {
 }
 
 native class Attr extends Node {
+	const var name : string;
+	const var specified : boolean;
+	const var value : string;
+	const var ownerElement : Element;
+	const var schemaTypeInfo : TypeInfo;
+	const var isId : boolean;
+}
+
+native class TypeInfo {
 	// TODO
 }
 
@@ -104,14 +156,41 @@ native class Element extends Node {
 
 	function hasAttribute(name : string) : boolean;
 	function hasAttributeNS(namespaceURI : string, name : string) : boolean;
+
+	// introduced in DOM level 3
+	const var schemaTypeInfo : TypeInfo;
+	function setIdAttribute(name : string, isId : boolean) : void;
+	function setIdAttributeNS(namespaceURI : string, localName : string, isId : boolean) : void;
+	function setIdAttributeNode(idAttr : Attr, isId : boolean) : void;
 }
 
 
 native class Text extends CharacterData {
 	function splitText(offset : number) : Text;
+	// TODO
 }
 
 native class Comment extends CharacterData { }
+
+native class UserDataHandler {
+	static const var NODE_CLONED : int;
+	static const var NODE_IMPORTED : int;
+	static const var NODE_DELETED : int;
+	static const var NODE_RENAMED : int;
+	static const var NODE_ADOPTED : int;
+}
+
+native class DOMError {
+	// TODO
+}
+
+native class DOMLocator {
+	// TODO
+}
+native class DOMConfiguration {
+	// TODO
+}
+
 native class CDATASection extends Text { }
 
 native class DocumentType extends Node {
@@ -159,12 +238,28 @@ native class Document extends Node {
 	function createElementNS(namespaceURI : string, qualifiedName : string) : Element;
 	function createAttributeNS(namespaceURI : string, qualifiedName : string) : Attr;
 
-	function getElementsByTagName(namespaceURI : string, localName : string) : NodeList;
+	function getElementsByTagNameNS(namespaceURI : string, localName : string) : NodeList;
 	function getElementById(elementId : string) : Element;
+
+	// introduced in DOM level 3
+
+	const var inputEncoding : string;
+	const var xmlEncoding : string; // FIXME: Chrome may return null
+	var xmlStandalone : boolean;
+	var xmlVersion : string;
+	var strictErrorChecking : boolean;
+	var documentURI : string;
+
+	function adoptNode(source : Node) : Node;
+
+	const var domConfig : DOMConfiguration;
+	function normalizeDocument() : void;
+	function renameNode(n : Node, namespaceURI : string, qualifiedName : string) : Node;
 }
 
 // DOM-HTML
 // http: //www.w3.org/TR/DOM-Level-2-HTML/
+// (cf. http://www.w3.org/TR/html5-author/)
 
 native class HTMLCollection {
 	const var length : int;
@@ -200,15 +295,21 @@ native class HTMLDocument extends Document {
 native class DOMTokenList {
 	// TODO
 }
+
 native class DOMSettableTokenList {
 	// TODO
 }
+
 native class DOMStringList {
-	// TODO
+	function item(index : int) : string;
+	const var length : int;
+	function contains(str : string) : boolean;
 }
+
 native class DOMStringMap {
 	// TODO
 }
+
 native class CSSStyleDeclaration {
 	// TODO
 }
@@ -256,6 +357,9 @@ native class HTMLElement extends Element {
 
 	// event handler attributes
 	// TODO
+
+	// HTML5
+	var innerHTML : string;
 }
 
 native class HTMLHtmlElement extends HTMLElement {
