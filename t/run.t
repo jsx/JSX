@@ -4,6 +4,7 @@ use strict;
 use warnings;
 use File::Temp qw(tempdir);
 use Test::More;
+use t::util::Util;
 
 my @files = @ARGV;
 
@@ -19,7 +20,8 @@ sub run {
     my $file = shift;
     local $TODO = 'not yet' if  ($file =~ /\.todo\.jsx$/);
 
-    my $expected = get_expected($file);
+    defined(my $expected = get_expected($file))
+        or die "could not find EXPECTED in file:$file\n";
     my $tempdir = tempdir(CLEANUP => 1);
 
     # compile (FIXME support C++)
@@ -31,12 +33,12 @@ sub run {
         open my $fh, ">>", "$tempdir/compiled.js"
             or die "failed to open file:$tempdir/compiled.js:$!";
         print $fh <<'EOT';
-// workaround for node.js to set "JSX to global
+// workaround for node.js to set "JSX" to global
 (function () { return this; })().JSX = JSX;
 // invoke the test
 Test.run$();
 EOT
-;
+
     }
 
     # execute compiled node
@@ -55,15 +57,3 @@ EOT
     is $output, $expected, $file;
 }
 
-sub get_expected {
-    my $file = shift;
-    my $content = do {
-        open my $fh, "<", $file
-            or die "failed to open $file:$!";
-        local $/;
-        <$fh>;
-    };
-    $content =~ m{/\*EXPECTED\n(.*?\n|)\*/}s
-        or die "could not find EXPECTED in file:$file\n";
-    $1;
-}

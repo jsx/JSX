@@ -1,6 +1,9 @@
-class Hello {
-	static function main(args : String[]) : int {
+class _Main {
+	static function main(args : string[]) :void {
 		log "Hello, world!";
-		return 0;
 	}
 }
+
+/*EXPECTED
+Hello, world!
+*/

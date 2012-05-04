@@ -10,10 +10,10 @@ class Point {
 	var _x : number;
 	var _y : number;
 
-	function initialize() {
+	function constructor() {
 	}
 
-	function initialize(x:number, y:number) {
+	function constructor(x:number, y:number) {
 		this._x = x;
 		this._y = y;
 	}
@@ -25,7 +25,7 @@ class Point {
 	function getY():number {
 		return this._y;
 	}
-	
+
 	// setters
 	function setX(value :number):void {
 		this._x = value;
@@ -34,4 +34,16 @@ class Point {
 		this._y = value;
 	}
 }
-// vim: set ft=javascript:
+
+class _Main {
+	static function main(args : string[]) : void {
+		var p = new Point(10, 20);
+
+		log "x=" + p.getX() as string;
+		log "y=" + p.getY() as string;
+	}
+}
+/*EXPECTED
+x=10
+y=20
+*/
