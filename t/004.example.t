@@ -7,7 +7,7 @@ use File::Temp qw(tempdir);
 use t::util::Util;
 
 my @files = <example/*.jsx>;
-plan tests => 4 * scalar @files;
+plan tests => 2 * scalar @files;
 
 my $workdir = tempdir(CLEANUP => 1);
 
@@ -21,12 +21,6 @@ for my $file(@files) {
         my $got = `$cmd`;
 
         is $?, 0, $cmd;
-        if(defined $expected) {
-            is $got, $expected, "output";
-        }
-        else {
-            pass "skipped output test";
-        }
     }
 
     {
@@ -36,13 +30,6 @@ for my $file(@files) {
         system $cmd;
 
         is $?, 0, $cmd;
-
-        if(defined $expected) {
-            is scalar(`$workdir/compiled`), $expected, "output";
-        }
-        else {
-            pass "skip output test";
-        }
     }
 }
 

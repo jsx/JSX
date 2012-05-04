@@ -1,4 +1,3 @@
-
 import "fib.jsx";
 
 class _Main {
@@ -13,7 +12,3 @@ class _Test {
 		log "ok 1";
 	}
 }
-
-/*EXPECTED
-fib(10)=55
-*/

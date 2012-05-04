@@ -43,7 +43,3 @@ class _Main {
 		log "y=" + p.getY() as string;
 	}
 }
-/*EXPECTED
-x=10
-y=20
-*/
