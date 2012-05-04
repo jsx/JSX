@@ -23,23 +23,28 @@ function $__jsx_runTests(testClass, tests) {
 
 	var test = new testClass();
 
-	test.beforeClass$AS(tests);
-	
-	for(var i = 0; i < tests.length; ++i) {
+	if (test.beforeClass$AS != null)
+		test.beforeClass$AS(tests);
+
+	for (var i = 0; i < tests.length; ++i) {
 		(function (m) {
 			tasks.push(function() {
+				if (test.before$S != null)
+					test.before$S(m);
+
 				test.done$ = function () {
-					test.after$S(m);
+					if (test.after$S != null) 
+						test.after$S(m);
 					if (tasks.length !== 0) {
 						var next = tasks.shift();
 						next();
 					}
 					else { // all the tasks finished
-						test.afterClass$();
+						if (test.afterClass$ != null)
+							test.afterClass$();
 					}
 				};
 
-				test.before$S(m);
 				test[m]();
 			});
 		}(tests[i]));
