@@ -178,7 +178,7 @@ var CompileError = exports.CompileError = Class.extend({
 			this._size = 1;
 			break;
 		default:
-			throw new Error("Unrecognized arguments for CompileError: " + JSON.stringify( Array.prototype.slice.call(arguments) ));
+			throw new Error("Unrecognized arguments for CompileError: " + Array.prototype.join.call(arguments, ", ") );
 
 		}
 	},
