@@ -1530,7 +1530,8 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 			this._emittingFunctionStack.push(funcDef);
 
 			// emit reference to this for closures
-			if (funcDef.getClosures().length != 0)
+			// if funDef is NOT in another closure
+			if (funcDef.getClosures().length != 0 && (funcDef.flags() & ClassDefinition.IS_STATIC) == 0)
 				this._emit("var $this = this;\n", null);
 			// emit local variable declarations
 			var locals = funcDef.getLocals();
