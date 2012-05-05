@@ -58,7 +58,7 @@ var Util = exports.Util = Class.extend({
 		if (x.length != y.length)
 			return false;
 		for (var i = 0; i < x.length; ++i)
-			if (! x[i].equals(y))
+			if (! x[i].equals(y[i]))
 				return false;
 		return true;
 	},
