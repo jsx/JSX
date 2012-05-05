@@ -1725,7 +1725,7 @@ var Parser = exports.Parser = Class.extend({
 		// simply remove "void"
 		this._expectOpt("void");
 		// read other unary operators
-		var op = this._expectOpt([ "++", "--", "+", "-", "~", "!" ]);
+		var op = this._expectOpt([ "++", "--", "+", "-", "~", "!", "typeof" ]);
 		if (op == null)
 			return this._postfixExpr();
 		var expr = this._unaryExpr();
@@ -1742,6 +1742,8 @@ var Parser = exports.Parser = Class.extend({
 			return new BitwiseNotExpression(op, expr);
 		case "!":
 			return new LogicalNotExpression(op, expr);
+		case "typeof":
+			return new TypeofExpression(op, expr);
 		}
 	},
 

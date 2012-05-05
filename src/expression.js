@@ -893,8 +893,18 @@ var TypeofExpression = exports.TypeofExpression = UnaryExpression.extend({
 	},
 
 	analyze: function (context) {
-		throw new Error("FIXME");
+		if (! UnaryExpression.prototype.analyze.call(this, context))
+			return false;
+		if (! this._expr.getType().equals(Type.variantType)) {
+			context.errors.push(new CompileError(this._operatorToken, "cannot apply operator 'typeof' to '" + this._expr.getType().toString() + "'"));
+			return false;
+		}
+		return true;
 	},
+
+	getType: function () {
+		return Type.stringType;
+	}
 
 });
 

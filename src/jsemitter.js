@@ -844,7 +844,7 @@ var _UnaryExpressionEmitter = exports._UnaryExpressionEmitter = _OperatorExpress
 
 	_emit: function () {
 		var opToken = this._expr.getOperatorToken();
-		this._emitter._emit(opToken.getValue(), opToken);
+		this._emitter._emit(opToken.getValue() + " ", opToken);
 		this._emitter._getExpressionEmitterFor(this._expr.getExpr()).emit(this._getPrecedence());
 	},
 
@@ -1702,6 +1702,8 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 			return new _AsNoCheckExpressionEmitter(this, expr);
 		else if (expr instanceof LogicalNotExpression)
 			return new _UnaryExpressionEmitter(this, expr);
+		else if (expr instanceof TypeofExpression)
+			return new _UnaryExpressionEmitter(this, expr);
 		else if (expr instanceof PostIncrementExpression)
 			return new _PostfixExpressionEmitter(this, expr);
 		else if (expr instanceof PreIncrementExpression)
@@ -1829,7 +1831,7 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 			], [
 				// delete is not used by JSX
 				[ "void",       _UnaryExpressionEmitter._setOperatorPrecedence ],
-				// typeof is not used by JSX
+				[ "typeof",     _UnaryExpressionEmitter._setOperatorPrecedence ],
 				[ "++",         _UnaryExpressionEmitter._setOperatorPrecedence ],
 				[ "--",         _UnaryExpressionEmitter._setOperatorPrecedence ],
 				[ "+",          _UnaryExpressionEmitter._setOperatorPrecedence ],
