@@ -18,9 +18,6 @@ function $__jsx_runTests(testClass, tests) {
 		return;
 	}
 
-	var tasks = [];
-
-
 	var test = new testClass();
 
 	if (test.beforeClass$AS != null)
@@ -28,28 +25,10 @@ function $__jsx_runTests(testClass, tests) {
 
 	for (var i = 0; i < tests.length; ++i) {
 		(function (m) {
-			tasks.push(function() {
-				if (test.before$S != null)
-					test.before$S(m);
-
-				test.done$ = function () {
-					if (test.after$S != null) 
-						test.after$S(m);
-					if (tasks.length !== 0) {
-						var next = tasks.shift();
-						next();
-					}
-					else { // all the tasks finished
-						if (test.afterClass$ != null)
-							test.afterClass$();
-					}
-				};
-
-				test[m]();
-			});
+			test.run$SF$$(m, function() { test[m](); });
 		}(tests[i]));
 	}
 
-	var start = tasks.shift();
-	start();
+	if (test.afterClass$ != null)
+		test.afterClass$();
 }

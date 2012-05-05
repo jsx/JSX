@@ -1,7 +1,7 @@
 import "test-case.jsx";
 import "timer.jsx";
 
-class _Test extends TestCase {
+class _Test extends AsyncTestCase {
 
 	function test_setTimeout200() : void {
 		var to = 200;

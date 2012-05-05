@@ -60,19 +60,27 @@ class TestCase {
 	var _pass  = 0;
 	var _tests : string[];
 
+	/* hooks called by src/js/runtests.js */
+
 	function beforeClass(tests : string[]) : void {
 		this._tests = tests;
 		log "1.." + this._tests.length.toString();
 	}
 
-	function afterClass() : void {
-		if(this._totalCount != this._totalPass) {
-			this.diag("tests failed!");
-		}
+	function run(name : string, testFunction : function():void) : void {
+		// FIXME: catch exception
+
+		testFunction();
+
+		this.after(name);
 	}
 
-	function before(name : string) : void {
+	function afterClass() : void {
+		this.finish();
 	}
+
+	/* implementation */
+
 	function after(name : string) : void {
 		log "\t" + "1.." + this._count.toString();
 		var name = this._tests[ this._totalCount++ ].replace(/[$].*/, "");
@@ -88,8 +96,11 @@ class TestCase {
 		this._pass  = 0;
 	}
 
-	function done() : void { } // placeholder
-
+	function finish() : void {
+		if(this._totalCount != this._totalPass) {
+			this.diag("tests failed!");
+		}
+	}
 
 	function expect(value : variant) : TestMatcher {
 		++this._count;
@@ -134,5 +145,44 @@ class TestCase {
 		else { // before boforeClass()
 			return "TestCase";
 		}
+	}
+}
+
+class AsyncTestCase extends TestCase {
+	var _tasks = [] : Array.<function():void>;
+	var _doneClosure : function():void;
+
+	override
+	function run(name : string, testFunction : function():void) : void {
+		this._tasks.push(function() : void {
+			this._doneClosure = function () : void {
+				this.after(name);
+
+				if(this._tasks.length != 0) {
+					var next = this._tasks.shift() as function():void;
+					next();
+				}
+				else {
+					this.finish();
+				}
+			};
+
+			testFunction();
+		});
+	}
+
+	function done() : void {
+		(this._doneClosure as function():void)();
+	}
+
+	override
+	function afterClass() : void{
+		var start = this._tasks.shift() as function():void;
+		start();
+	}
+
+	override
+	function toString() : string {
+		return "Async" + super.toString();
 	}
 }
