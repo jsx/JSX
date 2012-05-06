@@ -1138,9 +1138,25 @@ var Parser = exports.Parser = Class.extend({
 	},
 
 	_statement: function () {
+		// has a label?
+		var state = this._preserveState();
+		var label = this._expectIdentifierOpt();
+		if (label != null && this._expectOpt(":") != null) {
+			// within a label
+		} else {
+			this._restoreState(state);
+			label = null;
+		}
+		// parse the statement
 		var token = this._expectOpt([
 			"{", "var", ";", "if", "do", "while", "for", "continue", "break", "return", "switch", "throw", "try", "assert", "log", "delete"
 		]);
+		if (label != null) {
+			if (! (token != null && token.getValue().match(/^(?:do|while|for|switch)$/) != null)) {
+				this._newError("only blocks, iteration statements, and switch statements are allowed after a label");
+				return false;
+			}
+		}
 		if (token != null) {
 			switch (token.getValue()) {
 			case "{":
@@ -1152,11 +1168,11 @@ var Parser = exports.Parser = Class.extend({
 			case "if":
 				return this._ifStatement();
 			case "do":
-				return this._doWhileStatement();
+				return this._doWhileStatement(label);
 			case "while":
-				return this._whileStatement();
+				return this._whileStatement(label);
 			case "for":
-				return this._forStatement();
+				return this._forStatement(label);
 			case "continue":
 				return this._continueStatement(token);
 			case "break":
@@ -1164,7 +1180,7 @@ var Parser = exports.Parser = Class.extend({
 			case "return":
 				return this._returnStatement(token);
 			case "switch":
-				return this._switchStatement(token);
+				return this._switchStatement(token, label);
 			case "throw":
 				return this._throwStatement();
 			case "try":
@@ -1179,15 +1195,6 @@ var Parser = exports.Parser = Class.extend({
 				throw new "logic flaw, got " + token.getValue();
 			}
 		}
-		// labelled or expression statement
-		var state = this._preserveState();
-		var identifier = this._expectIdentifierOpt();
-		if (identifier != null && this._expectOpt(":") != null) {
-			// label is treated as a separate statement (FIXME should label be an attribute of a statement?)
-			this._statements.push(new LabelStatement(identifier));
-			return true;
-		}
-		this._restoreState(state);
 		// expression statement
 		var expr = this._expr(false);
 		if (expr == null)
@@ -1260,7 +1267,7 @@ var Parser = exports.Parser = Class.extend({
 		return true;
 	},
 
-	_doWhileStatement: function () {
+	_doWhileStatement: function (label) {
 		var statements = this._subStatements();
 		if (this._expect("while") == null)
 			return false;
@@ -1271,11 +1278,11 @@ var Parser = exports.Parser = Class.extend({
 			return false;
 		if (this._expect(")") == null)
 			return false;
-		this._statements.push(new DoWhileStatement(expr, statements));
+		this._statements.push(new DoWhileStatement(label, expr, statements));
 		return true;
 	},
 
-	_whileStatement: function () {
+	_whileStatement: function (label) {
 		if (this._expect("(") == null)
 			return false;
 		var expr = this._expr(false);
@@ -1284,14 +1291,14 @@ var Parser = exports.Parser = Class.extend({
 		if (this._expect(")") == null)
 			return false;
 		var statements = this._subStatements();
-		this._statements.push(new WhileStatement(expr, statements));
+		this._statements.push(new WhileStatement(label, expr, statements));
 		return true;
 	},
 
-	_forStatement: function () {
+	_forStatement: function (label) {
 		var state = this._preserveState();
 		// first try to parse as for .. in, and fallback to the other
-		switch (this._forInStatement()) {
+		switch (this._forInStatement(label)) {
 		case -1: // try for (;;)
 			break;
 		case 0: // error
@@ -1342,11 +1349,11 @@ var Parser = exports.Parser = Class.extend({
 		}
 		// statements
 		var statements = this._subStatements();
-		this._statements.push(new ForStatement(initExpr, condExpr, postExpr, statements));
+		this._statements.push(new ForStatement(label, initExpr, condExpr, postExpr, statements));
 		return true;
 	},
 
-	_forInStatement: function () {
+	_forInStatement: function (label) {
 		if (! this._expect("(") == null)
 			return 0; // failure
 		var lhsExpr;
@@ -1365,7 +1372,7 @@ var Parser = exports.Parser = Class.extend({
 		if (this._expect(")") != null)
 			return 0;
 		var statements = this._subStatements();
-		this._statements.push(new ForInStatement(identifier, expr, statements));
+		this._statements.push(new ForInStatement(label, identifier, expr, statements));
 		return 1;
 	},
 
@@ -1395,7 +1402,7 @@ var Parser = exports.Parser = Class.extend({
 		return true;
 	},
 
-	_switchStatement: function (token) {
+	_switchStatement: function (token, label) {
 		if (this._expect("(") == null)
 			return false;
 		var expr = this._expr(false);
@@ -1453,7 +1460,7 @@ var Parser = exports.Parser = Class.extend({
 			}
 		}
 		// done
-		this._statements.push(new SwitchStatement(token, expr, this._statements.splice(startStatementIndex)));
+		this._statements.push(new SwitchStatement(label, token, expr, this._statements.splice(startStatementIndex)));
 		return true;
 	},
 

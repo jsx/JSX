@@ -49,6 +49,15 @@ var _Util = exports._Util = Class.extend({
 		if (closureType == null)
 			return "";
 		return Util.format(template, [closureType]);
+	},
+
+	$emitLabelOfStatement: function (emitter, statement) {
+		var label = statement.getLabel();
+		if (label != null) {
+			emitter._reduceIndent();
+			emitter._emit(label.getValue() + ":\n", label);
+			emitter._advanceIndent();
+		}
 	}
 
 });
@@ -142,8 +151,9 @@ var _BreakStatementEmitter = exports._BreakStatementEmitter = _StatementEmitter.
 
 	emit: function () {
 		if (this._statement.getLabel() != null)
-			throw new Error("FIXME _BreakStatementEmitter.emit (no support for labels)");
-		this._emitter._emit("break;\n", this._statement.getToken());
+			this._emitter._emit("break " + this._statement.getLabel().getValue() + ";\n", this._statement.getToken());
+		else
+			this._emitter._emit("break;\n", this._statement.getToken());
 	}
 
 });
@@ -157,21 +167,9 @@ var _ContinueStatementEmitter = exports._ContinueStatementEmitter = _StatementEm
 
 	emit: function () {
 		if (this._statement.getLabel() != null)
-			throw new Error("FIXME _ContinueStatementEmitter.emit (no support for labels)");
-		this._emitter._emit("continue;\n", this._statement.getToken());
-	}
-
-});
-
-var _LabelStatementEmitter = exports._LabelStatementEmitter = _StatementEmitter.extend({
-
-	constructor: function (emitter, statement) {
-		_StatementEmitter.prototype.constructor.call(this, emitter);
-		this._statement = statement;
-	},
-
-	emit: function () {
-		throw new Error("FIXME _LabelStatementEmitter.emit");
+			this._emitter._emit("continue " + this._statement.getLabel().getValue() + ";\n", this._statement.getToken());
+		else
+			this._emitter._emit("continue;\n", this._statement.getToken());
 	}
 
 });
@@ -184,6 +182,7 @@ var _DoWhileStatementEmitter = exports._DoWhileStatementEmitter = _StatementEmit
 	},
 
 	emit: function () {
+		_Util.emitLabelOfStatement(this._emitter, this._statement);
 		this._emitter._emit("do {\n", null);
 		this._emitter._emitStatements(this._statement.getStatements());
 		this._emitter._emit("} while (", null);
@@ -214,6 +213,7 @@ var _ForStatementEmitter = exports._ForStatementEmitter = _StatementEmitter.exte
 	},
 
 	emit: function () {
+		_Util.emitLabelOfStatement(this._emitter, this._statement);
 		this._emitter._emit("for (", null);
 		var initExpr = this._statement.getInitExpr();
 		if (initExpr != null)
@@ -263,6 +263,7 @@ var _SwitchStatementEmitter = exports._SwitchStatementEmitter = _StatementEmitte
 	},
 
 	emit: function () {
+		_Util.emitLabelOfStatement(this._emitter, this._statement);
 		this._emitter._emit("switch (", null);
 		this._emitter._getExpressionEmitterFor(this._statement.getExpr()).emit(0);
 		this._emitter._emit(") {\n", null);
@@ -312,6 +313,7 @@ var _WhileStatementEmitter = exports._WhileStatementEmitter = _StatementEmitter.
 	},
 
 	emit: function () {
+		_Util.emitLabelOfStatement(this._emitter, this._statement);
 		this._emitter._emit("while (", null);
 		this._emitter._getExpressionEmitterFor(this._statement.getExpr()).emit(0);
 		this._emitter._emit(") {\n", null);
@@ -1640,8 +1642,6 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 			return new _BreakStatementEmitter(this, statement);
 		else if (statement instanceof ContinueStatement)
 			return new _ContinueStatementEmitter(this, statement);
-		else if (statement instanceof LabelStatement)
-			return new _LabelStatementEmitter(this, statement);
 		else if (statement instanceof DoWhileStatement)
 			return new _DoWhileStatementEmitter(this, statement);
 		else if (statement instanceof ForInStatement)

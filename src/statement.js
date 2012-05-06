@@ -197,9 +197,18 @@ var JumpStatement = exports.JumpStatement = Statement.extend({
 	},
 
 	_assertIsJumpable: function (context) {
-		if (this._label != null)
-			throw new Error("FIXME");
-		return true;
+		if (this._label == null)
+			return true;
+		for (var i = context.blockStack.length - 1; i >= 0; --i) {
+			var statement = context.blockStack[i];
+			if (statement instanceof LabellableStatement) {
+				var statementLabel = statement.getLabel();
+				if (statementLabel != null && statementLabel.getValue() == this._label.getValue())
+					return true;
+			}
+		}
+		context.errors.push(new CompileError(this._label, "label '" + this._label.getValue() + "' is either not defined or invalid as the destination"));
+		return false;
 	}
 
 });
@@ -233,7 +242,7 @@ var BreakStatement = exports.BreakStatement = JumpStatement.extend({
 			return;
 		}
 		// check that it is possible to jump to the labelled statement
-		this._assertIsJumpable();
+		this._assertIsJumpable(context);
 	}
 
 });
@@ -267,40 +276,35 @@ var ContinueStatement = exports.ContinueStatement = JumpStatement.extend({
 			return;
 		}
 		// check that it is possible to jump to the labelled statement
-		this._assertIsJumpable();
-	}
-
-});
-
-// label
-
-var LabelStatement = exports.LabelStatement = Statement.extend({
-
-	constructor: function (identifier) {
-		this._identifier = identifier;
-	},
-
-	getIdentifier: function () {
-		return this._identifier;
-	},
-
-	serialize: function () {
-		return [
-			"LabelStatement",
-			this._identifier.serialize()
-		];
-	},
-
-	analyze: function (context) {
+		this._assertIsJumpable(context);
 	}
 
 });
 
 // control flow statements
 
-var DoWhileStatement = exports.DoWhileStatement = Statement.extend({
+var LabellableStatement = exports.LabellableStatement = Statement.extend({
 
-	constructor: function (expr, statements) {
+	constructor: function (label) {
+		this._label = label;
+	},
+
+	getLabel: function () {
+		return this._label;
+	},
+
+	_serialize: function () {
+		return [
+			Util.serializeNullable(this._label)
+		];
+	}
+
+});
+
+var DoWhileStatement = exports.DoWhileStatement = LabellableStatement.extend({
+
+	constructor: function (label, expr, statements) {
+		LabellableStatement.prototype.constructor.call(this, label);
 		this._expr = expr;
 		this._statements = statements;
 	},
@@ -315,10 +319,11 @@ var DoWhileStatement = exports.DoWhileStatement = Statement.extend({
 
 	serialize: function () {
 		return [
-			"DoWhileStatement",
+			"DoWhileStatement"
+		].concat(this._serialize()).concat([
 			this._expr.serialize(),
 			Util.serializeArray(this._statements)
-		];
+		]);
 	},
 
 	analyze: function (context) {
@@ -334,9 +339,10 @@ var DoWhileStatement = exports.DoWhileStatement = Statement.extend({
 
 });
 
-var ForInStatement = exports.ForInStatement = Statement.extend({
+var ForInStatement = exports.ForInStatement = LabellableStatement.extend({
 
-	constructor: function (identifier, expr, statements) {
+	constructor: function (label, identifier, expr, statements) {
+		LabellableStatement.prototype.constructor.call(this, label);
 		this._identifier = identifier;
 		this._expr = expr;
 		this._statements = statements;
@@ -345,10 +351,11 @@ var ForInStatement = exports.ForInStatement = Statement.extend({
 	serialize: function () {
 		return [
 			"ForInStatement",
+		].concat(this._serialize()).concat([
 			this._identifier.serialize(),
 			this._expr.serialize(),
 			Util.serializeArray(this._statements)
-		];
+		]);
 	},
 
 	analyze: function (context) {
@@ -364,9 +371,10 @@ var ForInStatement = exports.ForInStatement = Statement.extend({
 
 });
 
-var ForStatement = exports.ForStatement = Statement.extend({
+var ForStatement = exports.ForStatement = LabellableStatement.extend({
 
-	constructor: function (initExpr, condExpr, postExpr, statements) {
+	constructor: function (label, initExpr, condExpr, postExpr, statements) {
+		LabellableStatement.prototype.constructor.call(this, label);
 		this._initExpr = initExpr;
 		this._condExpr = condExpr;
 		this._postExpr = postExpr;
@@ -392,11 +400,12 @@ var ForStatement = exports.ForStatement = Statement.extend({
 	serialize: function () {
 		return [
 			"ForStatement",
+		].concat(this._serialize()).concat([
 			Util.serializeNullable(this._initExpr),
 			Util.serializeNullable(this._condExpr),
 			Util.serializeNullable(this._postExpr),
 			Util.serializeArray(this._statements)
-		];
+		]);
 	},
 
 	analyze: function (context) {
@@ -466,9 +475,10 @@ var IfStatement = exports.IfStatement = Statement.extend({
 
 });
 
-var SwitchStatement = exports.SwitchStatement = Statement.extend({
+var SwitchStatement = exports.SwitchStatement = LabellableStatement.extend({
 
-	constructor: function (token, expr, statements) {
+	constructor: function (label, token, expr, statements) {
+		LabellableStatement.prototype.constructor.call(this, label);
 		this._token = token;
 		this._expr = expr;
 		this._statements = statements;
@@ -485,9 +495,10 @@ var SwitchStatement = exports.SwitchStatement = Statement.extend({
 	serialize: function () {
 		return [
 			"SwitchStatement",
+		].concat(this._serialize()).concat([
 			this._expr.serialize(),
 			Util.serializeArray(this._statements)
-		];
+		]);
 	},
 
 	analyze: function (context) {
@@ -571,9 +582,10 @@ var DefaultStatement = exports.DefaultStatement = Statement.extend({
 
 });
 
-var WhileStatement = exports.WhileStatement = Statement.extend({
+var WhileStatement = exports.WhileStatement = LabellableStatement.extend({
 
-	constructor: function (expr, statements) {
+	constructor: function (label, expr, statements) {
+		LabellableStatement.prototype.constructor.call(this, label);
 		this._expr = expr;
 		this._statements = statements;
 	},
@@ -589,9 +601,10 @@ var WhileStatement = exports.WhileStatement = Statement.extend({
 	serialize: function () {
 		return [
 			"WhileStatement",
+		].concat(this._serialize()).concat([
 			this._expr.serialize(),
 			Util.serializeArray(this._statements)
-		];
+		]);
 	},
 
 	analyze: function (context) {
