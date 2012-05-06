@@ -556,7 +556,7 @@ var _ThisExpressionEmitter = exports._ThisExpressionEmitter = _ExpressionEmitter
 	},
 
 	emit: function (outerOpPrecedence) {
-		var emittingFunction = this._emitter._emittingFunctionStack[ this._emitter._emittingFunctionStack.length - 1 ];
+		var emittingFunction = this._emitter._emittingFunction;
 		if ((emittingFunction.flags() & ClassDefinition.IS_STATIC) != 0)
 			this._emitter._emit("$this", this._expr.getToken());
 		else
@@ -1242,7 +1242,7 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 		this._outputFile = null;
 		this._indent = 0;
 		this._emittingClass = null;
-		this._emittingFunctionStack = [];
+		this._emittingFunction = null;
 	},
 
 	getSearchPaths: function () {
@@ -1490,8 +1490,9 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 	},
 
 	_emitConstructorCalls: function (classDef, funcDef) {
+		var prevEmittingFunction = this._emittingFunction;
 		try {
-			this._emittingFunctionStack.push(funcDef);
+			this._emittingFunction = funcDef;
 
 			var statementIndex = 0;
 			if (classDef.extendClassDef() != null) {
@@ -1503,9 +1504,7 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 					++statementIndex;
 
 		} finally {
-			if (this._emittingFunctionStack.pop() !== funcDef) {
-				throw new Error("Assertion failed: mismatched funcDef");
-			}
+			this._emittingFunction = prevEmittingFunction;
 		}
 	},
 
@@ -1526,8 +1525,9 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 	},
 
 	_emitFunctionBody: function (funcDef) {
+		var prevEmittingFunction = this._emittingFunction;
 		try {
-			this._emittingFunctionStack.push(funcDef);
+			this._emittingFunction = funcDef;
 
 			// emit reference to this for closures
 			// if funDef is NOT in another closure
@@ -1550,9 +1550,7 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 					this._getStatementEmitterFor(statements[i]).emit();
 
 		} finally {
-			if (this._emittingFunctionStack.pop() !== funcDef) {
-				throw new Error("Assertion failed: mismatched funcDef");
-			}
+			this._emittingFunction = prevEmittingFunction;
 		}
 	},
 
