@@ -593,8 +593,8 @@ var MemberVariableDefinition = exports.MemberVariableDefinition = MemberDefiniti
 					if (this._type == null) {
 						this._type = ivType;
 					} else if (! this._type.equals(ivType)) {
-						errors.push(new CompileError(this._initialValue,
-							"conflicting types for variable '" + this.name() + "', expected '" + this._type.toString(), "' but got '" + ivType.toString()));
+						this._analysisContext.errors.push(new CompileError(this._nameToken,
+							"the variable is declared as '" + this._type.toString() + "' but initial value is '" + ivType.toString() + "'"));
 					}
 				}
 				this._analyzeState = MemberVariableDefinition.ANALYZE_SUCEEDED;
