@@ -1784,18 +1784,21 @@ var Parser = exports.Parser = Class.extend({
 			case "super":
 				return this._superExpr();
 			case "function":
-				return this._functionExpr();
-			default:
+				expr = this._functionExpr();
 				break;
+			case "new":
+				// new pression
+				var qualifiedName = this._qualifiedName(false);
+				if (this._expect("(") == null)
+					return null;
+				var args = this._argsExpr();
+				if (args == null)
+					return null;
+				expr = new NewExpression(token, qualifiedName, args);
+				break;
+			default:
+				throw new Error("logic flaw");
 			}
-			// new pression
-			var qualifiedName = this._qualifiedName(false);
-			if (this._expect("(") == null)
-				return null;
-			var args = this._argsExpr();
-			if (args == null)
-				return null;
-			expr = new NewExpression(token, qualifiedName, args);
 		} else {
 			expr = this._primaryExpr();
 		}
