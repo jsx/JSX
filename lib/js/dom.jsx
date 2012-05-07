@@ -41,29 +41,29 @@ native class DOMImplementation {
 }
 
 native class Node {
-	static const var ELEMENT_NODE : int;
-	static const var ATTRIBUTE_NODE : int;
-	static const var TEXT_NODE : int;
-	static const var CDATA_SECTION_NODE : int;
-	static const var ENTITY_REFERENCE_NODE : int;
-	static const var ENTITY_NODE : int;
-	static const var PROCESSING_INSTRUCTION_NODE : int;
-	static const var COMMENT_NODE : int;
-	static const var DOCUMENT_NODE : int;
-	static const var DOCUMENT_TYPE_NODE : int;
-	static const var DOCUMENT_FRAGMENT_NODE : int;
-	static const var NOTATION_NODE : int;
+	static const ELEMENT_NODE : int;
+	static const ATTRIBUTE_NODE : int;
+	static const TEXT_NODE : int;
+	static const CDATA_SECTION_NODE : int;
+	static const ENTITY_REFERENCE_NODE : int;
+	static const ENTITY_NODE : int;
+	static const PROCESSING_INSTRUCTION_NODE : int;
+	static const COMMENT_NODE : int;
+	static const DOCUMENT_NODE : int;
+	static const DOCUMENT_TYPE_NODE : int;
+	static const DOCUMENT_FRAGMENT_NODE : int;
+	static const NOTATION_NODE : int;
 
-	const var nodeName : string;
+	const nodeName : string;
 	var nodeValue : string;
-	const var nodeType : int;
-	const var parentNode : string;
-	const var childNodes : NodeList;
-	const var firstChild : Node;
-	const var lastChild : Node;
-	const var previousSibling : Node;
-	const var nextSibling : Node;
-	const var attributes : NamedNodeMap;
+	const nodeType : int;
+	const parentNode : string;
+	const childNodes : NodeList;
+	const firstChild : Node;
+	const lastChild : Node;
+	const previousSibling : Node;
+	const nextSibling : Node;
+	const attributes : NamedNodeMap;
 
 	function insertBefore(newChild : Node, refChild : Node) : Node;
 	function replaceChild(newChild : Node, oldChild : Node) : Node;
@@ -76,19 +76,19 @@ native class Node {
 	function normalize() : void;
 
 	function isSupported(feature : string, version : string) : boolean;
-	const var namespaceURI : string;
-	const var prefix : string;
-	const var localName : string;
+	const namespaceURI : string;
+	const prefix : string;
+	const localName : string;
 	function hasAttributes() : boolean;
-	const var baseURI : string;
+	const baseURI : string;
 
 	// DocumentPosition
-	static const var DOCUMENT_POSITION_DISCONNECTED : int;
-	static const var DOCUMENT_POSITION_PRECEDING : int;
-	static const var DOCUMENT_POSITION_FOLLOWING : int;
-	static const var DOCUMENT_POSITION_CONTAINS : int;
-	static const var DOCUMENT_POSITION_CONTAINED_BY : int;
-	static const var DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC : int;
+	static const DOCUMENT_POSITION_DISCONNECTED : int;
+	static const DOCUMENT_POSITION_PRECEDING : int;
+	static const DOCUMENT_POSITION_FOLLOWING : int;
+	static const DOCUMENT_POSITION_CONTAINS : int;
+	static const DOCUMENT_POSITION_CONTAINED_BY : int;
+	static const DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC : int;
 	function compareDocumentPosition(other : Node) : int;
 
 	var textContent : string;
@@ -108,7 +108,7 @@ native class Node {
 
 native class NodeList {
 	function item(index : int) : Node;
-	const var length : int;
+	const length : int;
 }
 
 native class NamedNodeMap {
@@ -120,12 +120,12 @@ native class CharacterData extends Node {
 }
 
 native class Attr extends Node {
-	const var name : string;
-	const var specified : boolean;
-	const var value : string;
-	const var ownerElement : Element;
-	const var schemaTypeInfo : TypeInfo;
-	const var isId : boolean;
+	const name : string;
+	const specified : boolean;
+	const value : string;
+	const ownerElement : Element;
+	const schemaTypeInfo : TypeInfo;
+	const isId : boolean;
 }
 
 native class TypeInfo {
@@ -133,7 +133,7 @@ native class TypeInfo {
 }
 
 native class Element extends Node {
-	const var tagName : string;
+	const tagName : string;
 
 	function getAttribute(name : string) : string;
 	function setAttribute(name : string, value : string) : void;
@@ -159,7 +159,7 @@ native class Element extends Node {
 	function hasAttributeNS(namespaceURI : string, name : string) : boolean;
 
 	// introduced in DOM level 3
-	const var schemaTypeInfo : TypeInfo;
+	const schemaTypeInfo : TypeInfo;
 	function setIdAttribute(name : string, isId : boolean) : void;
 	function setIdAttributeNS(namespaceURI : string, localName : string, isId : boolean) : void;
 	function setIdAttributeNode(idAttr : Attr, isId : boolean) : void;
@@ -174,11 +174,11 @@ native class Text extends CharacterData {
 native class Comment extends CharacterData { }
 
 native class UserDataHandler {
-	static const var NODE_CLONED : int;
-	static const var NODE_IMPORTED : int;
-	static const var NODE_DELETED : int;
-	static const var NODE_RENAMED : int;
-	static const var NODE_ADOPTED : int;
+	static const NODE_CLONED : int;
+	static const NODE_IMPORTED : int;
+	static const NODE_DELETED : int;
+	static const NODE_RENAMED : int;
+	static const NODE_ADOPTED : int;
 }
 
 native class DOMError {
@@ -217,9 +217,9 @@ native class ProcessingInstruction extends Node {
 native class DocumentFragment extends Node { }
 
 native class Document extends Node /* implements DocumentEvent */ {
-	const var doctype : DocumentType;
-	const var implementation : DOMImplementation;
-	const var documentElement : Element;
+	const doctype : DocumentType;
+	const implementation : DOMImplementation;
+	const documentElement : Element;
 
 	function createElement(tagname : string) : Element;
 	function createDocumentFragment() : DocumentFragment;
@@ -244,8 +244,8 @@ native class Document extends Node /* implements DocumentEvent */ {
 
 	// introduced in DOM level 3
 
-	const var inputEncoding : string;
-	const var xmlEncoding : string; // FIXME: Chrome may return null
+	const inputEncoding : string;
+	const xmlEncoding : string; // FIXME: Chrome may return null
 	var xmlStandalone : boolean;
 	var xmlVersion : string;
 	var strictErrorChecking : boolean;
@@ -253,7 +253,7 @@ native class Document extends Node /* implements DocumentEvent */ {
 
 	function adoptNode(source : Node) : Node;
 
-	const var domConfig : DOMConfiguration;
+	const domConfig : DOMConfiguration;
 	function normalizeDocument() : void;
 	function renameNode(n : Node, namespaceURI : string, qualifiedName : string) : Node;
 
@@ -266,7 +266,7 @@ native class Document extends Node /* implements DocumentEvent */ {
 // (cf. http://www.w3.org/TR/html5-author/)
 
 native class HTMLCollection {
-	const var length : int;
+	const length : int;
 	function item(index : int) : Node;
 	function namedItem(name : string) : Node;
 }
@@ -274,16 +274,16 @@ native class HTMLCollection {
 native class HTMLDocument extends Document {
 	var title : string;
 
-	const var referrer : string;
-	const var domain : string;
-	const var URL : string;
-	const var body : HTMLElement;
+	const referrer : string;
+	const domain : string;
+	const URL : string;
+	const body : HTMLElement;
 
-	const var images : HTMLCollection;
-	const var applets : HTMLCollection;
-	const var links : HTMLCollection;
-	const var forms : HTMLCollection;
-	const var anchors : HTMLCollection;
+	const images : HTMLCollection;
+	const applets : HTMLCollection;
+	const links : HTMLCollection;
+	const forms : HTMLCollection;
+	const anchors : HTMLCollection;
 
 	var cookie : string;
 
@@ -306,7 +306,7 @@ native class DOMSettableTokenList {
 
 native class DOMStringList {
 	function item(index : int) : string;
-	const var length : int;
+	const length : int;
 	function contains(str : string) : boolean;
 }
 
@@ -319,12 +319,12 @@ native class CSSStyleDeclaration {
 }
 
 native class ClientRect {
-	const var top : number;
-	const var right : number;
-	const var bottom : number;
-	const var left : number;
-	const var width : number;
-	const var height : number;
+	const top : number;
+	const right : number;
+	const bottom : number;
+	const left : number;
+	const width : number;
+	const height : number;
 }
 
 native class ClientRectList {
@@ -350,11 +350,11 @@ native class HTMLElement extends Element {
 	var hidden : boolean;
 	var tabIndex : int;
 	var accesKey : string;
-	const var accessKeyLabel : string;
+	const accessKeyLabel : string;
 	var draggable : boolean;
-	const var dropzone : DOMSettableTokenList;
+	const dropzone : DOMSettableTokenList;
 	var contentEditable : string;
-	const var isContentEditable : boolean;
+	const isContentEditable : boolean;
 	var contextMenu : MayBeUndefined.<HTMLMenuElement>;
 	var spellcheck : boolean;
 
@@ -363,15 +363,15 @@ native class HTMLElement extends Element {
 	function blur() : void;
 
 	// command API
-	const var commandType : MayBeUndefined.<string>;
-	const var commandLabel : MayBeUndefined.<string>;
-	const var commandIcon : MayBeUndefined.<string>;
-	const var commandHidden : MayBeUndefined.<boolean>;
-	const var commandDisabled : MayBeUndefined.<boolean>;
-	const var commandChecked : MayBeUndefined.<boolean>;
+	const commandType : MayBeUndefined.<string>;
+	const commandLabel : MayBeUndefined.<string>;
+	const commandIcon : MayBeUndefined.<string>;
+	const commandHidden : MayBeUndefined.<boolean>;
+	const commandDisabled : MayBeUndefined.<boolean>;
+	const commandChecked : MayBeUndefined.<boolean>;
 
 	// styling
-	const var style : CSSStyleDeclaration;
+	const style : CSSStyleDeclaration;
 
 	// event handler attributes
 	// TODO
@@ -443,15 +443,15 @@ native class HTMLCanvasElement extends HTMLElement {
 // The Window Interface
 final native class Window {
 
-	const var window :Window;
-	const var self :Window;
+	const window :Window;
+	const self :Window;
 
 	var location :Location;
 
 	var name :string;
-	const var parent :Window;
-	const var top :Window;
-	const var frameElement :Element;
+	const parent :Window;
+	const top :Window;
+	const frameElement :Element;
 
 	// timers
 
@@ -462,8 +462,8 @@ final native class Window {
 
 	// browser-defined properties
 
-	const var document :Document;
-	const var navigator :variant; // FIXME
+	const document :Document;
+	const navigator :variant; // FIXME
 
 	function alert(message :string) :void;
 }
@@ -501,17 +501,17 @@ interface DocumentView {
 // http://www.w3.org/TR/DOM-Level-3-Events/
 
 native class Event {
-	static const var CAPTURING_PHASE : int;
-	static const var AT_TARGET : int;
-	static const var BUBBLING_PHASE : int;
+	static const CAPTURING_PHASE : int;
+	static const AT_TARGET : int;
+	static const BUBBLING_PHASE : int;
 
-	const var type : string;
-	const var target : EventTarget;
-	const var currentTarget : EventTarget;
-	const var eventPhase : int;
-	const var bubbles : boolean;
-	const var cancelable : boolean;
-	const var timeStamp : int;
+	const type : string;
+	const target : EventTarget;
+	const currentTarget : EventTarget;
+	const eventPhase : int;
+	const bubbles : boolean;
+	const cancelable : boolean;
+	const timeStamp : int;
 
 	function stopPropagation() : void;
 	function preventDefault() : void;
@@ -520,8 +520,8 @@ native class Event {
 	// DOM level 3
 
 	function stopImmediatePropagation() : void;
-	const var defaultPrevented : boolean;
-	const var isTrusted : boolean;
+	const defaultPrevented : boolean;
+	const isTrusted : boolean;
 }
 
 native class CustomEvent extends Event {
@@ -544,22 +544,22 @@ native class UIEvent extends Event {
 	// TODO
 }
 
-native class ForcusEvent extends UIEvent {
+native class FocusEvent extends UIEvent {
 	// TODO
 }
 
 native class MouseEvent extends UIEvent {
-	const var screenX : int;
-	const var screenY : int;
-	const var clientX : int;
-	const var clientY : int;
-	const var ctrlKey : boolean;
-	const var shiftKey : boolean;
-	const var altKey : boolean;
-	const var metaKey : boolean;
-	const var button : int;
-	const var buttons : int;
-	const var relatedTarget : EventTarget;
+	const screenX : int;
+	const screenY : int;
+	const clientX : int;
+	const clientY : int;
+	const ctrlKey : boolean;
+	const shiftKey : boolean;
+	const altKey : boolean;
+	const metaKey : boolean;
+	const button : int;
+	const buttons : int;
+	const relatedTarget : EventTarget;
 
 	function initMouseEvent(
 		typeArg : string,
@@ -608,32 +608,32 @@ native class MutationNameEvent extends MutationEvent {
 // http://www.w3.org/TR/touch-events/
 
 native class Touch {
-	const var identifier : int;
-	const var target : EventTarget;
-	const var screenX : int;
-	const var screenY : int;
-	const var clientX : int;
-	const var clientY : int;
-	const var pageX : int;
-	const var pageY : int;
+	const identifier : int;
+	const target : EventTarget;
+	const screenX : int;
+	const screenY : int;
+	const clientX : int;
+	const clientY : int;
+	const pageX : int;
+	const pageY : int;
 }
 
 /*
 native class TouchList {
-	const var length : int;
+	const length : int;
 	function item(index : int) : Touch;
 	function identifiedTouch(identifier : int) : Touch;
 }
 */
 
 native class TouchEvent extends UIEvent {
-	const var touches : Touch[];
-	const var targetTouches : Touch[];
-	const var changedTouches : Touch[];
-	const var altKey : boolean;
-	const var metaKey : boolean;
-	const var ctrlKey : boolean;
-	const var shiftKey : boolean;
+	const touches : Touch[];
+	const targetTouches : Touch[];
+	const changedTouches : Touch[];
+	const altKey : boolean;
+	const metaKey : boolean;
+	const ctrlKey : boolean;
+	const shiftKey : boolean;
 }
 
 // XHR
@@ -648,15 +648,15 @@ native class XMLHttpRequestUpload extends XMLHttpRequestEventTarget {
 }
 
 native class XMLHttpRequest extends XMLHttpRequestEventTarget {
-	static const var UNSENT : int;
-	static const var OPENED : int;
-	static const var HEADERS_RECEIVED : int;
-	static const var LOADING : int;
-	static const var DONE : int;
+	static const UNSENT : int;
+	static const OPENED : int;
+	static const HEADERS_RECEIVED : int;
+	static const LOADING : int;
+	static const DONE : int;
 
 	function constructor();
 
-	const var readyState :int;
+	const readyState :int;
 
 	// request
 
@@ -665,7 +665,7 @@ native class XMLHttpRequest extends XMLHttpRequestEventTarget {
 
 	function setRequestHeader(header : string, value : string) : void;
 
-	const var upload : XMLHttpRequestUpload;
+	const upload : XMLHttpRequestUpload;
 
 	function send() : void;
 	function send(data : string) : void;
@@ -673,15 +673,15 @@ native class XMLHttpRequest extends XMLHttpRequestEventTarget {
 
 	// response
 
-	const var status : int;
-	const var statusText : string;
+	const status : int;
+	const statusText : string;
 	function getResponseHeader(header : string) : string;
 	function getAllResponseHeaders() : string;
 	function overrideMimeType(mime : string) :void;
-	const var responseType : string;
-	const var response : variant;
-	const var responseText : string;
-	const var responseXML : Document;
+	const responseType : string;
+	const response : variant;
+	const responseText : string;
+	const responseXML : Document;
 }
 
 // CanvasRenderingContext
@@ -693,7 +693,7 @@ native class CanvasRenderingContext { }
 native class CanvasRenderingContext2D extends CanvasRenderingContext
 	/* implements CanvasTransformation, CanvasLineStyles, CanvasPathMethods, CanvasText */ {
 	// back-reference to the canvas
-	const var canvas : HTMLCanvasElement;
+	const canvas : HTMLCanvasElement;
 
 	// state
 	function save() : void;
@@ -734,10 +734,10 @@ native class CanvasRenderingContext2D extends CanvasRenderingContext
 	function isPointInPath(x : number, y : number) : void;
 
 	// text (see also CanvasText interface)
-	function fillTdxt(text : string, x : number, y : number) : void;
-	function fillTdxt(text : string, x : number, y : number, maxWidth : number) : void;
-	function fillTdxt(text : string, x : number, y : number) : void;
-	function fillTdxt(text : string, x : number, y : number, maxWidth : number) : void;
+	function fillText(text : string, x : number, y : number) : void;
+	function fillText(text : string, x : number, y : number, maxWidth : number) : void;
+	function fillText(text : string, x : number, y : number) : void;
+	function fillText(text : string, x : number, y : number, maxWidth : number) : void;
 	function measureText(text : string) : TextMetrics;
 
 	// drawing images
@@ -759,14 +759,25 @@ native class CanvasRenderingContext2D extends CanvasRenderingContext
 	function createImageData(imageData : ImageData) : ImageData;
 	function putImageData(imageData : ImageData, dx : number, dy : number) : ImageData;
 	function putImageData(imageData : ImageData, dx : number, dy : number, dirtyX : number, dirtyY : number, dirtyWidth : number, dirtyHeight : number) : ImageData;
-}
 
-native class CanvasTransformation {
+	// implements CanvasTransformation
+
 	function scale(x : number, y : number) : void;
 	function rotate(angle : number) : void;
 	function translate(x : number, y : number) : void;
 	function transform(a : number, b : number, c : number, d : number, e : number, f : number) : void;
-	function SetTransform(a : number, b : number, c : number, d : number, e : number, f : number) : void;
+	function setTransform(a : number, b : number, c : number, d : number, e : number, f : number) : void;
+
+	// implements CanvasLineStyles
+
+
+	// implements CanvasPathMethods
+
+
+	// implements CanvasText
+}
+
+native class CanvasTransformation {
 }
 
 native class CanvasPathMethods {
@@ -794,7 +805,11 @@ native class ImageData {
 // JSX interface to DOM
 
 final class dom {
-	static const var window = js.global["window"] as __nocheck__ Window;
+	static const window = js.global["window"] as __nocheck__ Window;
+
+	static function getWindow() : Window {
+		return js.global["window"] as __nocheck__ Window;
+	}
 
 	static function id(identifier : string) : HTMLElement {
 		return dom.window.document.getElementById(identifier)
