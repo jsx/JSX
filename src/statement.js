@@ -80,6 +80,8 @@ var ConstructorInvocationStatement = exports.ConstructorInvocationStatement = St
 var UnaryExpressionStatement = exports.UnaryExpressionStatement = Statement.extend({
 
 	constructor: function (expr) {
+		if (expr == null)
+			throw new Error("logic flaw");
 		this._expr = expr;
 	},
 

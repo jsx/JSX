@@ -1238,15 +1238,14 @@ var Parser = exports.Parser = Class.extend({
 	},
 
 	_variableStatement: function () {
-		var exprs = this._variableDeclarations(false);
-		if (exprs == null)
+		var succeeded = [ false ];
+		var expr = this._variableDeclarations(false, succeeded);
+		if (! succeeded[0])
 			return false;
 		if (this._expect(";") == null)
 			return false;
-		var mergedExpr = this._mergeExprs(exprs);
-		if (mergedExpr == null)
-			return true;
-		this._statements.push(new ExpressionStatement(mergedExpr));
+		if (expr != null)
+			this._statements.push(new ExpressionStatement(expr));
 		return true;
 	},
 
@@ -1314,13 +1313,12 @@ var Parser = exports.Parser = Class.extend({
 		if (this._expectOpt(";") != null) {
 			// empty expression
 		} else if (this._expectOpt("var") != null) {
-			var exprs = this._variableDeclarations(true);
-			if (exprs == null)
+			var succeeded = [ false ];
+			initExpr = this._variableDeclarations(true, succeeded);
+			if (! succeeded[0])
 				return false;
 			if (this._expect(";") == null)
 				return false;
-			if (exprs.length != 0)
-				initExpr = this._mergeExprs(exprs);
 		} else {
 			if ((initExpr = this._expr(true)) == null)
 				return false;
@@ -1512,13 +1510,20 @@ var Parser = exports.Parser = Class.extend({
 	},
 
 	_logStatement: function (token) {
-		var expr = this._commaSeparatedExprs(false);
-		if (expr == null) {
+		var exprs = [];
+		do {
+			var expr = this._assignExpr(false);
+			if (expr == null)
+				return false;
+			exprs.push(expr);
+		} while (this._expectOpt(",") != null);
+		if (this._expect(";") == null)
+			return false;
+		if (exprs.length == 0) {
+			this._newError("no arguments");
 			return false;
 		}
-		if (this._expect(";") == null)
-			return null;
-		this._statements.push(new LogStatement(token, expr));
+		this._statements.push(new LogStatement(token, exprs));
 		return true;
 	},
 
@@ -1539,17 +1544,20 @@ var Parser = exports.Parser = Class.extend({
 		return this._statements.splice(statementIndex);
 	},
 
-	_variableDeclarations: function (noIn) {
-		var exprs = [];
+	_variableDeclarations: function (noIn, isSuccess) {
+		isSuccess[0] = false;
+		var expr = null;
+		var commaToken = null;
 		do {
-			var expr = this._variableDeclaration(noIn);
-			if (expr == null)
+			var declExpr = this._variableDeclaration(noIn);
+			if (declExpr == null)
 				return null;
 			// do not push variable declarations wo. assignment
-			if (! (expr instanceof IdentifierExpression))
-				exprs.push(expr);
-		} while (this._expectOpt(",") != null);
-		return exprs;
+			if (! (declExpr instanceof IdentifierExpression))
+				expr = expr != null ? CommaExpression(commaToken, expr, declExpr) : declExpr;
+		} while ((commaToken = this._expectOpt(",")) != null);
+		isSuccess[0] = true;
+		return expr;
 	},
 
 	_variableDeclaration: function (noIn) {
@@ -1572,33 +1580,17 @@ var Parser = exports.Parser = Class.extend({
 		return expr;
 	},
 
-	_mergeExprs: function (exprs) {
-		if (exprs.length == 0)
-			return null;
-		var expr = exprs.shift();
-		while (exprs.length != 0)
-			expr = new CommaExpression(expr, exprs.shift());
-		return expr;
-	},
-
 	_expr: function (noIn) {
-		var exprs = this._commaSeparatedExprs(noIn);
-		if (exprs == null)
-			return exprs;
-		var expr = exprs.shift();
-		while (exprs.length != 0)
-			expr = new CommaExpression(expr, exprs.shift());
-		return expr;
-	},
-
-	_commaSeparatedExprs: function (noIn) {
-		var expr = [];
-		do {
+		var expr = this._assignExpr(noIn);
+		if (expr == null)
+			return null;
+		var commaToken;
+		while ((commaToken = this._expectOpt(",")) != null) {
 			var assignExpr = this._assignExpr(noIn);
 			if (assignExpr == null)
 				return null;
-			expr.push(assignExpr);
-		} while (this._expectOpt(",") != null);
+			expr = new CommaExpression(commaToken, expr, assignExpr);
+		}
 		return expr;
 	},
 
@@ -1784,7 +1776,7 @@ var Parser = exports.Parser = Class.extend({
 			case "super":
 				return this._superExpr();
 			case "function":
-				expr = this._functionExpr();
+				expr = this._functionExpr(token);
 				break;
 			case "new":
 				// new pression
@@ -1868,7 +1860,7 @@ var Parser = exports.Parser = Class.extend({
 		var funcDef = new MemberFunctionDefinition(token, null, ClassDefinition.IS_STATIC, returnType, args, this._locals, this._statements, this._closures);
 		this._restoreFunctionState(state);
 		this._closures.push(funcDef);
-		return new FunctionExpression(funcDef);
+		return new FunctionExpression(token, funcDef);
 	},
 
 	_primaryExpr: function () {

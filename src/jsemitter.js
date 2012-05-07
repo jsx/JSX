@@ -401,7 +401,7 @@ var _IdentifierExpressionEmitter = exports._IdentifierExpressionEmitter = _Expre
 		if (type instanceof ClassDefType) {
 			this._emitter._emit(type.getClassDef().getOutputClassName(), null);
 		} else {
-			var ident = this._expr._identifierToken.getValue();
+			var ident = this._expr.getToken().getValue();
 			this._emitter._emit(ident, null);
 		}
 	}
@@ -582,24 +582,24 @@ var _AsExpressionEmitter = exports._AsExpressionEmitter = _ExpressionEmitter.ext
 				// unsafe cast
 				if ((destType.getClassDef().flags() & (ClassDefinition.IS_INTERFACE | ClassDefinition.IS_MIXIN)) == 0) {
 					this.emitWithPrecedence(outerOpPrecedence, _CallExpressionEmitter._operatorPrecedence, (function () {
-						this._emitter._emit("(function (o) { return o instanceof " + _Util.getInstanceofNameFromClassDef(destType.getClassDef()) + " ? o : null; })(", this._expr.getOperatorToken());
+						this._emitter._emit("(function (o) { return o instanceof " + _Util.getInstanceofNameFromClassDef(destType.getClassDef()) + " ? o : null; })(", this._expr.getToken());
 						this._emitter._getExpressionEmitterFor(this._expr.getExpr()).emit(0);
-						this._emitter._emit(")", this._expr.getOperatorToken());
+						this._emitter._emit(")", this._expr.getToken());
 					}).bind(this));
 				} else {
 					this.emitWithPrecedence(outerOpPrecedence, _CallExpressionEmitter._operatorPrecedence, (function () {
-						this._emitter._emit("(function (o) { return o && o.$__jsx_implements_" + destType.getClassDef().getOutputClassName() + " ? o : null; })(", this._expr.getOperatorToken());
+						this._emitter._emit("(function (o) { return o && o.$__jsx_implements_" + destType.getClassDef().getOutputClassName() + " ? o : null; })(", this._expr.getToken());
 						this._emitter._getExpressionEmitterFor(this._expr.getExpr()).emit(0);
-						this._emitter._emit(")", this._expr.getOperatorToken());
+						this._emitter._emit(")", this._expr.getToken());
 					}).bind(this));
 				}
 				return true;
 			}
 			if (destType instanceof FunctionType) {
 				// cast to function
-				this._emitter._emit("(function (o) { return typeof(o) === \"function\" ? o : null; })(", this._expr.getOperatorToken());
+				this._emitter._emit("(function (o) { return typeof(o) === \"function\" ? o : null; })(", this._expr.getToken());
 				this._emitter._getExpressionEmitterFor(this._expr.getExpr()).emit(0);
-				this._emitter._emit(")", this._expr.getOperatorToken());
+				this._emitter._emit(")", this._expr.getToken());
 				return true;
 			}
 		}
@@ -798,10 +798,10 @@ var _AsExpressionEmitter = exports._AsExpressionEmitter = _ExpressionEmitter.ext
 		if (opPrecedence > outerOpPrecedence)
 			this._emitter._emit("(", null);
 		if (prefix != null)
-			this._emitter._emit(prefix, this._expr.getOperatorToken());
+			this._emitter._emit(prefix, this._expr.getToken());
 		this._emitter._getExpressionEmitterFor(this._expr.getExpr()).emit(innerOpPrecedence);
 		if (postfix != null)
-			this._emitter._emit(postfix, this._expr.getOperatorToken());
+			this._emitter._emit(postfix, this._expr.getToken());
 		if (opPrecedence > outerOpPrecedence)
 			this._emitter._emit(")", null);
 	}
@@ -845,13 +845,13 @@ var _UnaryExpressionEmitter = exports._UnaryExpressionEmitter = _OperatorExpress
 	},
 
 	_emit: function () {
-		var opToken = this._expr.getOperatorToken();
+		var opToken = this._expr.getToken();
 		this._emitter._emit(opToken.getValue() + " ", opToken);
 		this._emitter._getExpressionEmitterFor(this._expr.getExpr()).emit(this._getPrecedence());
 	},
 
 	_getPrecedence: function () {
-		return _UnaryExpressionEmitter._operatorPrecedence[this._expr.getOperatorToken().getValue()];
+		return _UnaryExpressionEmitter._operatorPrecedence[this._expr.getToken().getValue()];
 	},
 
 	$_operatorPrecedence: {},
@@ -869,13 +869,13 @@ var _PostfixExpressionEmitter = exports._PostfixExpressionEmitter = _UnaryExpres
 	},
 
 	_emit: function () {
-		var opToken = this._expr.getOperatorToken();
+		var opToken = this._expr.getToken();
 		this._emitter._getExpressionEmitterFor(this._expr.getExpr()).emit(this._getPrecedence());
 		this._emitter._emit(opToken.getValue(), opToken);
 	},
 
 	_getPrecedence: function () {
-		return _PostfixExpressionEmitter._operatorPrecedence[this._expr.getOperatorToken().getValue()];
+		return _PostfixExpressionEmitter._operatorPrecedence[this._expr.getToken().getValue()];
 	},
 
 	$_operatorPrecedence: {},
@@ -902,9 +902,9 @@ var _InstanceofExpressionEmitter = exports._InstanceofExpressionEmitter = _Expre
 			}).bind(this));
 		} else {
 			this.emitWithPrecedence(outerOpPrecedence, _CallExpressionEmitter._operatorPrecedence, (function () {
-				this._emitter._emit("(function (o) { return !! (o && o.$__jsx_implements_" + expectedType.getClassDef().getOutputClassName() + "); })(", this._expr.getOperatorToken());
+				this._emitter._emit("(function (o) { return !! (o && o.$__jsx_implements_" + expectedType.getClassDef().getOutputClassName() + "); })(", this._expr.getToken());
 				this._emitter._getExpressionEmitterFor(this._expr.getExpr()).emit(0);
-				this._emitter._emit(")", this._expr.getOperatorToken());
+				this._emitter._emit(")", this._expr.getToken());
 			}).bind(this));
 		}
 	},
@@ -1005,11 +1005,11 @@ var _BinaryExpressionEmitter = exports._BinaryExpressionEmitter = _OperatorExpre
 	constructor: function (emitter, expr) {
 		_OperatorExpressionEmitter.prototype.constructor.call(this, emitter);
 		this._expr = expr;
-		this._precedence = _BinaryExpressionEmitter._operatorPrecedence[this._expr.getOperatorToken().getValue()];
+		this._precedence = _BinaryExpressionEmitter._operatorPrecedence[this._expr.getToken().getValue()];
 	},
 
 	_emit: function () {
-		var opToken = this._expr.getOperatorToken();
+		var opToken = this._expr.getToken();
 		var firstExpr = this._expr.getFirstExpr();
 		var firstExprType = firstExpr.getType();
 		var secondExpr = this._expr.getSecondExpr();
@@ -1060,7 +1060,7 @@ var _ArrayExpressionEmitter = exports._ArrayExpressionEmitter = _OperatorExpress
 
 	_emit: function () {
 		this._emitter._getExpressionEmitterFor(this._expr.getFirstExpr()).emit(_ArrayExpressionEmitter._operatorPrecedence);
-		this._emitter._emit("[", this._expr.getOperatorToken());
+		this._emitter._emit("[", this._expr.getToken());
 		this._emitter._getExpressionEmitterFor(this._expr.getSecondExpr()).emit(_ArrayExpressionEmitter._operatorPrecedence);
 		this._emitter._emit("]", null);
 	},
@@ -1121,14 +1121,14 @@ var _CallExpressionEmitter = exports._CallExpressionEmitter = _OperatorExpressio
 
 	_emit: function () {
 		this._emitter._getExpressionEmitterFor(this._expr.getExpr()).emit(_CallExpressionEmitter._operatorPrecedence);
-		this._emitter._emit("(", this._expr.getOperatorToken());
+		this._emitter._emit("(", this._expr.getToken());
 		var args = this._expr.getArguments();
 		for (var i = 0; i < args.length; ++i) {
 			if (i != 0)
 				this._emitter._emit(", ", null);
 			this._emitter._getExpressionEmitterFor(args[i]).emit(0);
 		}
-		this._emitter._emit(")", this._expr.getOperatorToken());
+		this._emitter._emit(")", this._expr.getToken());
 	},
 
 	_getPrecedence: function () {
@@ -1154,13 +1154,13 @@ var _SuperExpressionEmitter = exports._SuperExpressionEmitter = _OperatorExpress
 		var funcType = this._expr.getFunctionType();
 		var className = funcType.getObjectType().getClassDef().getOutputClassName();
 		var mangledFuncName = this._emitter._mangleFunctionName(this._expr.getName().getValue(), funcType.getArgumentTypes());
-		this._emitter._emit(className + ".prototype." + mangledFuncName + ".call(this", this._expr.getOperatorToken());
+		this._emitter._emit(className + ".prototype." + mangledFuncName + ".call(this", this._expr.getToken());
 		var args = this._expr.getArguments();
 		for (var i = 0; i < args.length; ++i) {
 			this._emitter._emit(", ", null);
 			this._emitter._getExpressionEmitterFor(args[i]).emit(0);
 		}
-		this._emitter._emit(")", this._expr.getOperatorToken());
+		this._emitter._emit(")", this._expr.getToken());
 	},
 
 	_getPrecedence: function () {
@@ -1185,14 +1185,14 @@ var _NewExpressionEmitter = exports._NewExpressionEmitter = _OperatorExpressionE
 	emit: function (outerOpPrecedence) {
 		var classDef = this._expr.getType().getClassDef();
 		var ctor = this._expr.getConstructor();
-		this._emitter._emit("new " + this._emitter._mangleConstructorName(classDef, ctor != null ? ctor.getArgumentTypes() : []) + "(", this._expr.getOperatorToken());
+		this._emitter._emit("new " + this._emitter._mangleConstructorName(classDef, ctor != null ? ctor.getArgumentTypes() : []) + "(", this._expr.getToken());
 		var args = this._expr.getArguments();
 		for (var i = 0; i < args.length; ++i) {
 			if (i != 0)
 				this._emitter._emit(", ", null);
 			this._emitter._getExpressionEmitterFor(args[i]).emit(0);
 		}
-		this._emitter._emit(")", this._expr.getOperatorToken());
+		this._emitter._emit(")", this._expr.getToken());
 	},
 
 	_getPrecedence: function () {
