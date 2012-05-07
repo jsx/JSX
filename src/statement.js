@@ -221,8 +221,9 @@ var JumpStatement = exports.JumpStatement = Statement.extend({
 	_assertIsJumpable: function (context) {
 		if (this._label == null)
 			return true;
-		for (var i = context.blockStack.length - 1; i >= 0; --i) {
-			var statement = context.blockStack[i];
+		// iterate to the one before the last, which is function scope
+		for (var i = context.blockStack.length - 1; i > 0; --i) {
+			var statement = context.blockStack[i].statement;
 			if (statement instanceof LabellableStatement) {
 				var statementLabel = statement.getLabel();
 				if (statementLabel != null && statementLabel.getValue() == this._label.getValue())
@@ -248,8 +249,9 @@ var BreakStatement = exports.BreakStatement = JumpStatement.extend({
 	doAnalyze: function (context) {
 		// check if the statement may appear
 		var allowed = false;
-		for (var i = context.blockStack.length - 1; i >= 0; --i) {
-			var statement = context.blockStack[i];
+		// iterate to the one before the last, which is function scope
+		for (var i = context.blockStack.length - 1; i > 0; --i) {
+			var statement = context.blockStack[i].statement;
 			if (statement instanceof ForInStatement
 				|| statement instanceof ForStatement
 				|| statement instanceof DoWhileStatement
@@ -283,8 +285,9 @@ var ContinueStatement = exports.ContinueStatement = JumpStatement.extend({
 	doAnalyze: function (context) {
 		// check if the statement may appear
 		var allowed = false;
-		for (var i = context.blockStack.length - 1; i >= 0; --i) {
-			var statement = context.blockStack[i];
+		// iterate to the one before the last, which is function scope
+		for (var i = context.blockStack.length - 1; i > 0; --i) {
+			var statement = context.blockStack[i].statement;
 			if (statement instanceof ForInStatement
 				|| statement instanceof ForStatement
 				|| statement instanceof DoWhileStatement
@@ -356,7 +359,7 @@ var DoWhileStatement = exports.DoWhileStatement = LabellableStatement.extend({
 	doAnalyze: function (context) {
 		this._expr.analyze(context);
 		try {
-			context.blockStack.push(this);
+			context.blockStack.push(new BlockContext(context.getTopBlock().localVariableStatuses.clone(), this));
 			for (var i = 0; i < this._statements.length; ++i)
 				this._statements[i].analyze(context);
 		} finally {
@@ -388,7 +391,7 @@ var ForInStatement = exports.ForInStatement = LabellableStatement.extend({
 	doAnalyze: function (context) {
 		this._expr.analyze(context);
 		try {
-			context.blockStack.push(this);
+			context.blockStack.push(new BlockContext(context.getTopBlock().localVariableStatuses.clone(), this));
 			for (var i = 0; i < this._statements.length; ++i)
 				this._statements[i].analyze(context);
 		} finally {
@@ -443,7 +446,7 @@ var ForStatement = exports.ForStatement = LabellableStatement.extend({
 		if (this._postExpr != null)
 			this._postExpr.analyze(context);
 		try {
-			context.blockStack.push(this);
+			context.blockStack.push(new BlockContext(context.getTopBlock().localVariableStatuses.clone(), this));
 			for (var i = 0; i < this._statements.length; ++i)
 				this._statements[i].analyze(context);
 		} finally {
@@ -490,14 +493,14 @@ var IfStatement = exports.IfStatement = Statement.extend({
 	doAnalyze: function (context) {
 		this._expr.analyze(context);
 		try {
-			context.blockStack.push(this);
+			context.blockStack.push(new BlockContext(context.getTopBlock().localVariableStatuses.clone(), this));
 			for (var i = 0; i < this._onTrueStatements.length; ++i)
 				this._onTrueStatements[i].analyze(context);
 		} finally {
 			context.blockStack.pop();
 		}
 		try {
-			context.blockStack.push(this);
+			context.blockStack.push(new BlockContext(context.getTopBlock().localVariableStatuses.clone(), this));
 			for (var i = 0; i < this._onFalseStatements.length; ++i)
 				this._onFalseStatements[i].analyze(context);
 		} finally {
@@ -543,7 +546,7 @@ var SwitchStatement = exports.SwitchStatement = LabellableStatement.extend({
 			return;
 		}
 		try {
-			context.blockStack.push(this);
+			context.blockStack.push(new BlockContext(context.getTopBlock().localVariableStatuses.clone(), this));
 			for (var i = 0; i < this._statements.length; ++i)
 				this._statements[i].analyze(context);
 		} finally {
@@ -578,7 +581,7 @@ var CaseStatement = exports.CaseStatement = Statement.extend({
 	doAnalyze: function (context) {
 		if (! this._expr.analyze(context))
 			return false;
-		var statement = context.blockStack[context.blockStack.length - 1];
+		var statement = context.getTopBlock().statement;
 		if (! (statement instanceof SwitchStatement))
 			throw new Error("logic flaw");
 		var expectedType = statement.getExpr().getType();
@@ -649,7 +652,7 @@ var WhileStatement = exports.WhileStatement = LabellableStatement.extend({
 	doAnalyze: function (context) {
 		this._expr.analyze(context);
 		try {
-			context.blockStack.push(this);
+			context.blockStack.push(new BlockContext(context.getTopBlock().localVariableStatuses.clone(), this));
 			for (var i = 0; i < this._statements.length; ++i)
 				this._statements[i].analyze(context);
 		} finally {
@@ -685,7 +688,7 @@ var TryStatement = exports.TryStatement = Statement.extend({
 
 	doAnalyze: function (context) {
 		try {
-			context.blockStack.push(this);
+			context.blockStack.push(new BlockContext(context.getTopBlock().localVariableStatuses.clone(), this));
 			for (var i = 0; i < this._tryStatements.length; ++i)
 				this._tryStatements[i].analyze(context);
 		} finally {
@@ -693,7 +696,7 @@ var TryStatement = exports.TryStatement = Statement.extend({
 		}
 		if (this._catchStatements != null) {
 			try {
-				context.blockStack.push(this);
+				context.blockStack.push(new BlockContext(context.getTopBlock().localVariableStatuses.clone(), this));
 				for (var i = 0; i < this._catchStatements.length; ++i)
 					this._catchStatements[i].analyze(context);
 			} finally {
@@ -702,7 +705,7 @@ var TryStatement = exports.TryStatement = Statement.extend({
 		}
 		if (this._finallyStatements != null) {
 			try {
-				context.blockStack.push(this);
+				context.blockStack.push(new BlockContext(context.getTopBlock().localVariableStatuses.clone(), this));
 				for (var i = 0; i < this._finallyStatements.length; ++i)
 					this._finallyStatements[i].analyze(context);
 			} finally {

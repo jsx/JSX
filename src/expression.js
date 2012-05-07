@@ -15,7 +15,7 @@ var Expression = exports.Expression = Class.extend({
 		return this._token;
 	},
 
-	analyze: null, // bool analyze(context)
+	analyze: null, // bool analyze(context, isAssignment)
 
 	getType: null, // string getType()
 
@@ -75,7 +75,7 @@ var IdentifierExpression = exports.IdentifierExpression = Expression.extend({
 			];
 	},
 
-	analyze: function (context) {
+	analyze: function (context, isAssignment) {
 		// if it is an access to local variable, return ok
 		if (context.funcDef != null && (this._local = context.funcDef.getLocal(this._token.getValue())) != null)
 			return true;
@@ -134,7 +134,7 @@ var UndefinedExpression = exports.UndefinedExpression = Expression.extend({
 		];
 	},
 
-	analyze: function (context) {
+	analyze: function (context, isAssignment) {
 		return true;
 	},
 
@@ -157,7 +157,7 @@ var NullExpression = exports.NullExpression = Expression.extend({
 		];
 	},
 
-	analyze: function (context) {
+	analyze: function (context, isAssignment) {
 		return true;
 	},
 
@@ -180,7 +180,7 @@ var BooleanLiteralExpression = exports.BooleanLiteralExpression = Expression.ext
 		];
 	},
 
-	analyze: function (context) {
+	analyze: function (context, isAssignment) {
 		return true;
 	},
 
@@ -203,7 +203,7 @@ var IntegerLiteralExpression = exports.IntegerLiteralExpression = Expression.ext
 		];
 	},
 
-	analyze: function (context) {
+	analyze: function (context, isAssignment) {
 		return true;
 	},
 
@@ -227,7 +227,7 @@ var NumberLiteralExpression = exports.NumberLiteralExpression = Expression.exten
 		];
 	},
 
-	analyze: function (context) {
+	analyze: function (context, isAssignment) {
 		return true;
 	},
 
@@ -250,7 +250,7 @@ var StringLiteralExpression = exports.StringLiteralExpression = Expression.exten
 		];
 	},
 
-	analyze: function (context) {
+	analyze: function (context, isAssignment) {
 		return true;
 	},
 
@@ -274,7 +274,7 @@ var RegExpLiteralExpression = exports.RegExpLiteralExpression = Expression.exten
 		];
 	},
 
-	analyze: function (context) {
+	analyze: function (context, isAssignment) {
 		var classDef = context.parser.lookup(context.errors, this._token, "RegExp");
 		if (classDef == null)
 			throw new Error("could not find definition for RegExp");
@@ -313,11 +313,11 @@ var ArrayLiteralExpression = exports.ArrayLiteralExpression = Expression.extend(
 		];
 	},
 
-	analyze: function (context) {
+	analyze: function (context, isAssignment) {
 		// analyze all elements
 		var succeeded = true;
 		for (var i = 0; i < this._exprs.length; ++i) {
-			if (! this._exprs[i].analyze(context)) {
+			if (! this._exprs[i].analyze(context, false)) {
 				succeeded = false;
 			} else if (this._exprs[i].getType().equals(Type.voidType)) {
 				 // FIXME the location of the error would be strange; we deseparately need expr.getToken()
@@ -408,11 +408,11 @@ var HashLiteralExpression = exports.HashLiteralExpression = Expression.extend({
 		];
 	},
 
-	analyze: function (context) {
+	analyze: function (context, isAssignment) {
 		// analyze all elements
 		var succeeded = true;
 		for (var i = 0; i < this._elements.length; ++i) {
-			if (! this._elements[i].getExpr().analyze(context)) {
+			if (! this._elements[i].getExpr().analyze(context, false)) {
 				succeeded = false;
 			} else if (this._elements[i].getExpr().getType().equals(Type.voidType)) {
 				 // FIXME the location of the error would be strange; we deseparately need expr.getToken()
@@ -476,7 +476,7 @@ var ThisExpression = exports.ThisExpression = Expression.extend({
 		];
 	},
 
-	analyze: function (context) {
+	analyze: function (context, isAssignment) {
 		var rootFuncDef = context.funcDef;
 		while (rootFuncDef.getParent() != null)
 			rootFuncDef = rootFuncDef.getParent();
@@ -512,7 +512,7 @@ var FunctionExpression = exports.FunctionExpression = Expression.extend({
 		];
 	},
 
-	analyze: function (context) {
+	analyze: function (context, isAssignment) {
 		this._funcDef.analyze(context);
 		return true; // return true since everything is resolved correctly even if analysis of the function definition failed
 	},
@@ -544,8 +544,8 @@ var UnaryExpression = exports.UnaryExpression = OperatorExpression.extend({
 		];
 	},
 
-	analyze: function (context) {
-		if (! this._expr.analyze(context))
+	_analyze: function (context, isAssignment) {
+		if (! this._expr.analyze(context, false))
 			return false;
 		if (this._expr.getType().equals(Type.voidType)) {
 			context.errors.push(new CompileError(this._token, "cannot apply operator '" + this._token.getValue() + "' against void"));
@@ -562,8 +562,8 @@ var BitwiseNotExpression = exports.BitwiseNotExpression = UnaryExpression.extend
 		UnaryExpression.prototype.constructor.call(this, operatorToken, expr);
 	},
 
-	analyze: function (context) {
-		if (! UnaryExpression.prototype.analyze.call(this, context))
+	analyze: function (context, isAssignment) {
+		if (! this._analyze(context, false))
 			return false;
 		if (! this.assertIsConvertibleTo(context, this._expr, Type.numberType, false))
 			return false;
@@ -595,8 +595,8 @@ var InstanceofExpression = exports.InstanceofExpression = UnaryExpression.extend
 		];
 	},
 
-	analyze: function (context) {
-		if (! UnaryExpression.prototype.analyze.call(this, context))
+	analyze: function (context, isAssignment) {
+		if (! this._analyze(context, false))
 			return false;
 		if (! (this._expr.getType() instanceof ObjectType)) {
 			context.errors.push(new CompileError(this._token, "operator 'instanceof' is only applicable to an object"));
@@ -626,8 +626,8 @@ var AsExpression = exports.AsExpression = UnaryExpression.extend({
 		];
 	},
 
-	analyze: function (context) {
-		if (! UnaryExpression.prototype.analyze.call(this, context))
+	analyze: function (context, isAssignment) {
+		if (! this._analyze(context, false))
 			return false;
 		if (this._type instanceof MayBeUndefinedType) {
 			context.errors.push(new CompileError(this._token, "right operand of 'as' expression cannot be a MayBeUndefined<T> type"));
@@ -682,6 +682,10 @@ var AsNoCheckExpression = exports.AsNoCheckExpression = UnaryExpression.extend({
 		];
 	},
 
+	analyze: function (context, isAssignment) {
+		return this._analyze(context, false);
+	},
+
 	getType: function () {
 		return this._type;
 	}
@@ -694,8 +698,8 @@ var LogicalNotExpression = exports.LogicalNotExpression = UnaryExpression.extend
 		UnaryExpression.prototype.constructor.call(this, operatorToken, expr);
 	},
 
-	analyze: function (context) {
-		if (! UnaryExpression.prototype.analyze.call(this, context))
+	analyze: function (context, isAssignment) {
+		if (! this._analyze(context, false))
 			return false;
 		if (! this.assertIsConvertibleTo(context, this._expr, Type.booleanType, false))
 			return false;
@@ -722,8 +726,8 @@ var IncrementExpression = exports.IncrementExpression = UnaryExpression.extend({
 		];
 	},
 
-	analyze: function (context) {
-		if (! UnaryExpression.prototype.analyze.call(this, context))
+	analyze: function (context, isAssignment) {
+		if (! this._analyze(context, true))
 			return false;
 		var exprType = this._expr.getType();
 		if (exprType == null) {
@@ -791,7 +795,7 @@ var PropertyExpression = exports.PropertyExpression = UnaryExpression.extend({
 		];
 	},
 
-	analyze: function (context) {
+	analyze: function (context, isAssignment) {
 		// special handling for import ... as
 		var imprt;
 		if (this._expr instanceof IdentifierExpression
@@ -805,7 +809,7 @@ var PropertyExpression = exports.PropertyExpression = UnaryExpression.extend({
 			return true;
 		}
 		// normal handling
-		if (! UnaryExpression.prototype.analyze.call(this, context))
+		if (! this._analyze(context, false))
 			return false;
 		var exprType = this._expr.getType();
 		if (exprType.equals(Type.voidType)) {
@@ -872,8 +876,8 @@ var TypeofExpression = exports.TypeofExpression = UnaryExpression.extend({
 		UnaryExpression.prototype.constructor.call(this, operatorToken, expr);
 	},
 
-	analyze: function (context) {
-		if (! UnaryExpression.prototype.analyze.call(this, context))
+	analyze: function (context, isAssignment) {
+		if (! this._analyze(context, false))
 			return false;
 		if (! this._expr.getType().equals(Type.variantType)) {
 			context.errors.push(new CompileError(this._token, "cannot apply operator 'typeof' to '" + this._expr.getType().toString() + "'"));
@@ -894,8 +898,8 @@ var SignExpression = exports.SignExpression = UnaryExpression.extend({
 		UnaryExpression.prototype.constructor.call(this, operatorToken, expr);
 	},
 
-	analyze: function (context) {
-		if (! UnaryExpression.prototype.analyze.call(this, context))
+	analyze: function (context, isAssignment) {
+		if (! this._analyze(context, false))
 			return false;
 		if (! this.assertIsConvertibleTo(context, this._expr, Type.numberType, true))
 			return false;
@@ -940,10 +944,10 @@ var BinaryExpression = exports.BinaryExpression = OperatorExpression.extend({
 		];
 	},
 
-	analyze: function (context) {
-		if (! this._expr1.analyze(context))
+	_analyze: function (context, lhsIsAssignment) {
+		if (! this._expr1.analyze(context, lhsIsAssignment))
 			return false;
-		if (! this._expr2.analyze(context))
+		if (! this._expr2.analyze(context, false))
 			return false;
 		return true;
 	}
@@ -957,8 +961,8 @@ var AdditiveExpression = exports.AdditiveExpression = BinaryExpression.extend({
 		this._type = null;
 	},
 
-	analyze: function (context) {
-		if (! BinaryExpression.prototype.analyze.call(this, context))
+	analyze: function (context, isAssignment) {
+		if (! this._analyze(context, false))
 			return false;
 		var expr1Type = this._expr1.getType().resolveIfMayBeUndefined();
 		var expr2Type = this._expr2.getType().resolveIfMayBeUndefined();
@@ -991,8 +995,8 @@ var ArrayExpression = exports.ArrayExpression = BinaryExpression.extend({
 		this._type = null;
 	},
 
-	analyze: function (context) {
-		if (! BinaryExpression.prototype.analyze.call(this, context))
+	analyze: function (context, isAssignment) {
+		if (! this._analyze(context, false))
 			return false;
 		if (this._expr1.getType() == null) {
 			context.errors.push(new CompileError(this._token, "cannot determine type due to preceding errors"));
@@ -1030,8 +1034,8 @@ var AssignmentExpression = exports.AssignmentExpression = BinaryExpression.exten
 		BinaryExpression.prototype.constructor.call(this, operatorToken, expr1, expr2);
 	},
 
-	analyze: function (context) {
-		if (! BinaryExpression.prototype.analyze.call(this, context))
+	analyze: function (context, isAssignment) {
+		if (! this._analyze(context, false))
 			return false;
 		var rhsType = this._expr2.getType();
 		if (rhsType == null)
@@ -1080,8 +1084,8 @@ var BinaryNumberExpression = exports.BinaryNumberExpression = BinaryExpression.e
 		BinaryExpression.prototype.constructor.call(this, operatorToken, expr1, expr2);
 	},
 
-	analyze: function (context) {
-		if (! BinaryExpression.prototype.analyze.call(this, context))
+	analyze: function (context, isAssignment) {
+		if (! this._analyze(context, false))
 			return false;
 		var expr1Type = this._expr1.getType().resolveIfMayBeUndefined();
 		if (! this.assertIsConvertibleTo(context, this._expr1, Type.numberType, true))
@@ -1126,8 +1130,8 @@ var EqualityExpression = exports.EqualityExpression = BinaryExpression.extend({
 		BinaryExpression.prototype.constructor.call(this, operatorToken, expr1, expr2);
 	},
 
-	analyze: function (context) {
-		if (! BinaryExpression.prototype.analyze.call(this, context))
+	analyze: function (context, isAssignment) {
+		if (! this._analyze(context, false))
 			return false;
 		var expr1Type = this._expr1.getType();
 		var expr2Type = this._expr2.getType();
@@ -1169,8 +1173,8 @@ var LogicalExpression = exports.LogicalExpression = BinaryExpression.extend({
 		BinaryExpression.prototype.constructor.call(this, operatorToken, expr1, expr2);
 	},
 
-	analyze: function (context) {
-		if (! BinaryExpression.prototype.analyze.call(this, context))
+	analyze: function (context, isAssignment) {
+		if (! this._analyze(context, false))
 			return false;
 		if (! this.assertIsConvertibleTo(context, this._expr1, Type.booleanType, false))
 			return false;
@@ -1191,8 +1195,8 @@ var ShiftExpression = exports.ShiftExpression = BinaryExpression.extend({
 		BinaryExpression.prototype.constructor.call(this, operatorToken, expr1, expr2);
 	},
 
-	analyze: function (context) {
-		if (! BinaryExpression.prototype.analyze.call(this, context))
+	analyze: function (context, isAssignment) {
+		if (! this._analyze(context, false))
 			return false;
 		if (! this.assertIsConvertibleTo(context, this._expr1, Type.integerType, true))
 			return false;
@@ -1241,8 +1245,8 @@ var ConditionalExpression = exports.ConditionalExpression = OperatorExpression.e
 		];
 	},
 
-	analyze: function (context) {
-		if (! this._condExpr.analyze(context))
+	analyze: function (context, isAssignment) {
+		if (! this._condExpr.analyze(context, false))
 			return false;
 		var condExprType = this._condExpr.getType();
 		if (! condExprType.isConvertibleTo(Type.booleanType)) {
@@ -1251,13 +1255,13 @@ var ConditionalExpression = exports.ConditionalExpression = OperatorExpression.e
 		}
 		var typeIfTrue;
 		if (this._ifTrueExpr != null) {
-			if (! this._ifTrueExpr.analyze(context))
+			if (! this._ifTrueExpr.analyze(context, false))
 				return false;
 			typeIfTrue = this._ifTrueExpr.getType();
 		} else {
 			typeIfTrue = condExprType;
 		}
-		if (! this._ifFalseExpr.analyze(context))
+		if (! this._ifFalseExpr.analyze(context, false))
 			return false;
 		var typeIfFalse = this._ifFalseExpr.getType();
 		// FIXME how should we handle undefined?
@@ -1307,8 +1311,8 @@ var CallExpression = exports.CallExpression = OperatorExpression.extend({
 		];
 	},
 
-	analyze: function (context) {
-		if (! this._expr.analyze(context))
+	analyze: function (context, isAssignment) {
+		if (! this._expr.analyze(context, false))
 			return false;
 		var argTypes = Util.analyzeArgs(context, this._args);
 		if (argTypes == null)
@@ -1361,7 +1365,7 @@ var SuperExpression = exports.SuperExpression = OperatorExpression.extend({
 		];
 	},
 
-	analyze: function (context) {
+	analyze: function (context, isAssignment) {
 		// obtain class definition
 		if ((context.funcDef.flags() & ClassDefinition.IS_STATIC) != 0) {
 			context.errors.push(new CompileError(this._token, "cannot use 'super' keyword in a static function"));
@@ -1418,7 +1422,7 @@ var NewExpression = exports.NewExpression = OperatorExpression.extend({
 		];
 	},
 
-	analyze: function (context) {
+	analyze: function (context, isAssignment) {
 		var classDef = this._qualifiedName.getClass(context);
 		if (classDef == null)
 			return false;
@@ -1480,9 +1484,9 @@ var CommaExpression = exports.CommaExpression = Expression.extend({
 		];
 	},
 
-	analyze: function (context) {
-		return this._expr1.analyze(context)
-			&& this._expr2.analyze(context);
+	analyze: function (context, isAssignment) {
+		return this._expr1.analyze(context, false)
+			&& this._expr2.analyze(context, false);
 	},
 
 	getType: function () {

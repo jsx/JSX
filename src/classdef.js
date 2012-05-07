@@ -4,6 +4,15 @@ eval(Class.$import("./util"));
 
 "use strict";
 
+var BlockContext = exports.BlockContext = Class.extend({
+
+	constructor: function (localVariableStatuses, statement) {
+		this.localVariableStatuses = localVariableStatuses;
+		this.statement = statement;
+	}
+
+});
+
 var AnalysisContext = exports.AnalysisContext = Class.extend({
 
 	constructor: function (errors, parser, instantiateTemplate) {
@@ -15,7 +24,8 @@ var AnalysisContext = exports.AnalysisContext = Class.extend({
 	},
 
 	clone: function () {
-		return new AnalysisContext(this.errors, this.parser, this.instantiateTemplate).setFuncDef(this.funcDef).setBlockStack(this.blockStack);
+		// NOTE: does not clone the blockStack for now (since there is no such use case)
+		return new AnalysisContext(this.errors, this.parser, this.instantiateTemplate).setFuncDef(this.funcDef);
 	},
 
 	setFuncDef: function (funcDef) {
@@ -23,9 +33,13 @@ var AnalysisContext = exports.AnalysisContext = Class.extend({
 		return this;
 	},
 
-	setBlockStack: function (blockStack) {
-		this.blockStack = blockStack;
+	initBlockStack: function (localVariableStatuses) {
+		this.blockStack = [ new BlockContext(localVariableStatuses, null) ];
 		return this;
+	},
+
+	getTopBlock: function () {
+		return this.blockStack[this.blockStack.length - 1];
 	}
 
 });
@@ -669,7 +683,7 @@ var MemberFunctionDefinition = exports.MemberFunctionDefinition = MemberDefiniti
 			return;
 
 		// do the checks
-		context = context.clone().setFuncDef(this).setBlockStack([]); // FIXME push something onto the block stack as an initial value?
+		context = context.clone().setFuncDef(this).initBlockStack(new LocalVariableStatuses(this));
 		for (var i = 0; i < this._statements.length; ++i)
 			this._statements[i].analyze(context);
 
@@ -812,6 +826,42 @@ var ArgumentDeclaration = exports.ArgumentDeclaration = LocalVariable.extend({
 	instantiate: function (instantiationContext) {
 		var type = this._type.instantiate(instantiationContext);
 		return new ArgumentDeclaration(this._name, type);
+	}
+
+});
+
+var LocalVariableStatuses = exports.LocalVariableStatuses = Class.extend({
+
+	$UNSET: 0,
+	$ISSET: 1,
+	$MAYBESET: 2,
+
+	constructor: function (x) {
+		this._statuses = {};
+		if (x instanceof MemberFunctionDefinition) {
+			var funcDef = x;
+			var args = funcDef.getArguments();
+			for (var i = 0; i < args.length; ++i)
+				this._statuses[args[i].getName()] = LocalVariableStatuses.SET;
+			var locals = funcDef.getLocals();
+			for (var i = 0; i < locals.length; ++i)
+				this._statuses[locals[i].getName()] = LocalVariableStatuses.UNSET;
+		} else if (x instanceof LocalVariableStatuses) {
+			for (var k in x._statuses)
+				this._statuses[k] = x._statuses[k];
+		}
+	},
+
+	clone: function () {
+		return new LocalVariableStatuses(this);
+	},
+
+	setStatus: function (local) {
+		this._statuses[local.getName()] = LocalVariableStatuses.ISSET;
+	},
+
+	getStatus: function (local) {
+		return this._statuses[local.getName()];
 	}
 
 });
