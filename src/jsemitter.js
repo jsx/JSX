@@ -1539,11 +1539,8 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 			var locals = funcDef.getLocals();
 			for (var i = 0; i < locals.length; ++i) {
 				this._emit(_Util.buildAnnotation("/** @type {%1} */\n", locals[i].getType()), null);
-				this._emit("var ", null);
 				var name = locals[i].getName();
-				this._emit(name.getValue() + " = ", name);
-				this._emitDefaultValueOf(locals[i].getType());
-				this._emit(";\n", null)
+				this._emit("var " + name.getValue() + ";\n", name);
 			}
 			// emit code
 			var statements = funcDef.getStatements();
