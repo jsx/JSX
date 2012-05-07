@@ -237,11 +237,11 @@ native final class RegExp {
 
 	override function toString() :string;
 
-	const var source :string;
-	const var global :boolean;
-	const var ignoreCase :boolean;
-	const var multiline :boolean;
-	const var lastIndex :int;
+	const source :string;
+	const global :boolean;
+	const ignoreCase :boolean;
+	const multiline :boolean;
+	const lastIndex :int;
 
 }
 
