@@ -840,7 +840,11 @@ var Parser = exports.Parser = Class.extend({
 			var token = this._expect([ "function", "var", "static", "abstract", "override", "final", "const" ]);
 			if (token == null)
 				return null;
-			if (token.getValue() == "function" || token.getValue() == "var")
+			if (token.getValue() == "const") {
+				newFlag = ClassDefinition.IS_CONST;
+				break;
+			}
+			else if (token.getValue() == "function" || token.getValue() == "var")
 				break;
 			var newFlag = 0;
 			switch (token.getValue()) {
@@ -867,9 +871,6 @@ var Parser = exports.Parser = Class.extend({
 					return null;
 				}
 				newFlag = ClassDefinition.IS_FINAL;
-				break;
-			case "const":
-				newFlag = ClassDefinition.IS_CONST;
 				break;
 			default:
 				throw new Error("logic flaw");
@@ -917,10 +918,6 @@ var Parser = exports.Parser = Class.extend({
 	},
 
 	_functionDefinition: function (token, flags, classFlags) {
-		if ((flags & ClassDefinition.IS_CONST) != 0) {
-			this._newError("cannot declare a const function");
-			return null;
-		}
 		// name
 		var name = this._expectIdentifier();
 		if (name == null)
