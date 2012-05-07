@@ -189,7 +189,7 @@ var CompileError = exports.CompileError = Class.extend({
 		}
 
 		var content = compiler.getFileContent([] /* ignore errors */, null, this._filename);
-		var sourceLine = content.split(/^/m)[ this._lineNumber - 1 ];
+		var sourceLine = (content).split(/\n/)[ this._lineNumber - 1 ];
 
 		// fix visual width
 		var col = this._columnNumber;
