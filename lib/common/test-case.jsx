@@ -1,3 +1,5 @@
+import "timer.jsx";
+
 class TestMatcher {
 
 	var _test : TestCase;
@@ -53,12 +55,17 @@ class TestMatcher {
 	}
 }
 
+
 class TestCase {
 	var _totalCount = 0;
 	var _totalPass  = 0;
 	var _count = 0;
 	var _pass  = 0;
 	var _tests : string[];
+
+	// async stuff
+	var _currentName : MayBeUndefined.<string>;
+	var _tasks = [] : Array.<function():void>; // async tasks
 
 	/* hooks called by src/js/runtests.js */
 
@@ -68,22 +75,36 @@ class TestCase {
 	}
 
 	function run(name : string, testFunction : function():void) : void {
+		name = name.replace(/[$].*$/, "");
 		// FIXME: catch exception
+
+		var numAsyncTasks = this._tasks.length;
+		this._currentName = name;
 
 		testFunction();
 
-		this.after(name);
+		if(numAsyncTasks == this._tasks.length) { // synchronous
+			this.after(name);
+		}
+		else { // asynchronous
+		}
 	}
 
 	function afterClass() : void {
-		this.finish();
+		if(this._tasks.length == 0) { // synchronous
+			this.finish();
+		}
+		else { // asynchronous
+			var next = this._tasks.shift() as function():void;
+			next();
+		}
 	}
 
 	/* implementation */
 
 	function after(name : string) : void {
+		++this._totalCount;
 		log "\t" + "1.." + this._count.toString();
-		var name = this._tests[ this._totalCount++ ].replace(/[$].*/, "");
 
 		if(this._count == this._pass) {
 			++this._totalPass;
@@ -101,6 +122,19 @@ class TestCase {
 			this.diag("tests failed!");
 		}
 	}
+
+	/* async test stuff */
+
+	function async(testBody : function(:AsyncHandle):void, timeoutHandler : function(:AsyncHandle):void,  timeoutMS : int) : void {
+
+		var async = new AsyncHandle(this, this._currentName, timeoutHandler, timeoutMS);
+
+		this._tasks.push(function() : void {
+			testBody(async);
+		});
+	}
+
+	/* matcher factory */
 
 	function expect(value : variant) : TestMatcher {
 		++this._count;
@@ -148,41 +182,36 @@ class TestCase {
 	}
 }
 
-class AsyncTestCase extends TestCase {
-	var _tasks = [] : Array.<function():void>;
-	var _doneClosure : function():void;
+class AsyncHandle {
 
-	override
-	function run(name : string, testFunction : function():void) : void {
-		this._tasks.push(function() : void {
-			this._doneClosure = function () : void {
-				this.after(name);
+	var _test : TestCase;
+	var _name : string;
+	var _timerId : TimerHandle;
 
-				if(this._tasks.length != 0) {
-					var next = this._tasks.shift() as function():void;
-					next();
-				}
-				else {
-					this.finish();
-				}
-			};
+	function constructor(test : TestCase, name : string, timeoutHandler : function(:AsyncHandle):void, timeoutMS : int) {
+		this._test = test;
+		this._name = name;
 
-			testFunction();
-		});
+		var id = Timer.setTimeout(function() : void {
+			timeoutHandler(this);
+		}, timeoutMS);
+
+		this._timerId = id;
 	}
+
+	function name() : string { return this._name; }
 
 	function done() : void {
-		(this._doneClosure as function():void)();
-	}
+		Timer.clearTimeout(this._timerId);
 
-	override
-	function afterClass() : void{
-		var start = this._tasks.shift() as function():void;
-		start();
-	}
+		this._test.after(this._name);
 
-	override
-	function toString() : string {
-		return "Async" + super.toString();
+		if(this._test._tasks.length != 0) {
+			var next = this._test._tasks.shift() as function():void;
+			next();
+		}
+		else {
+			this._test.finish();
+		}
 	}
 }
