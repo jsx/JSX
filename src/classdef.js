@@ -604,7 +604,7 @@ var MemberVariableDefinition = exports.MemberVariableDefinition = MemberDefiniti
 			}
 			break;
 		case MemberVariableDefinition.IS_ANALYZING:
-			errors.push(new CompileError(this._token,
+			this._analysisContext.errors.push(new CompileError(this._token,
 				"please declare type of variable '" + this.name() + "' (detected recursion while trying to reduce type)"));
 			break;
 		default:
