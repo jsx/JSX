@@ -128,7 +128,7 @@ native final class Number {
 
 // 15.9
 native final class Date {
-	// NOTE: these "number"s may be NaN, so it canot be integers.
+	// NOTE: these "number"s may be NaN, so it cannot be int.
 
 	// TODO: complete all the methods
 
@@ -155,18 +155,18 @@ native final class Date {
 	// 15.9.4
 	static function parse(value :string) :number;
 
-	static function UTC(year :number, month :number) :Date;
-	static function UTC(year :number, month :number, date :number) :Date;
+	static function UTC(year :number, month :number) : number;
+	static function UTC(year :number, month :number, date :number) : number;
 	static function UTC(year :number, month :number, date :number,
-						hours :number) :Date;
+						hours :number) : number;
 	static function UTC(year :number, month :number, date :number,
-						hours :number,  minutes :number) :Date;
+						hours :number,  minutes :number) : number;
 	static function UTC(year :number, month :number, date :number,
 						hours :number,  minutes :number, seconds: number)
-						:Date;
+						: number;
 	static function UTC(year :number, month :number, date :number,
 						hours :number,  minutes :number, seconds: number,
-						ms :number) :Date;
+						ms :number) : number;
 
 
 	static function now() :number;
