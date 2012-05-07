@@ -455,7 +455,9 @@ var DoWhileStatement = exports.DoWhileStatement = ContinuableStatement.extend({
 			this._restoreContinueVariableStatuses(context);
 			if (! Statement.assertIsReachable(context, this._expr.getToken()))
 				return false;
-			this._expr.analyze(context, null);
+			if (this._expr.analyze(context, null))
+				if (! this._expr.getType().equals(Type.booleanType))
+					context.errors.push(new CompileError(this._expr.getToken(), "expression of the while statement should return a boolean"));
 			this.registerVariableStatusesOnBreak(context.getTopBlock().localVariableStatuses);
 			this._finalizeBlockAnalysis(context);
 		} catch (e) {
@@ -545,7 +547,9 @@ var ForStatement = exports.ForStatement = ContinuableStatement.extend({
 		if (this._initExpr != null)
 			this._initExpr.analyze(context, null);
 		if (this._condExpr != null)
-			this._condExpr.analyze(context, null);
+			if (this._condExpr.analyze(context, null))
+				if (! this._condExpr.getType().equals(Type.booleanType))
+					context.errors.push(new CompileError(this._condExpr.getToken(), "condition expression of the for statement should return a boolean"));
 		this._prepareBlockAnalysis(context);
 		try {
 			for (var i = 0; i < this._statements.length; ++i)
@@ -797,7 +801,9 @@ var WhileStatement = exports.WhileStatement = ContinuableStatement.extend({
 	},
 
 	doAnalyze: function (context) {
-		this._expr.analyze(context, null);
+		if (this._expr.analyze(context, null))
+			if (! this._expr.getType().equals(Type.booleanType))
+				context.errors.push(new CompileError(this._expr.getToken(), "expression of the while statement should return a boolean"));
 		this._prepareBlockAnalysis(context);
 		try {
 			for (var i = 0; i < this._statements.length; ++i)
