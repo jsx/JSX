@@ -562,8 +562,16 @@ var BitwiseNotExpression = exports.BitwiseNotExpression = UnaryExpression.extend
 		UnaryExpression.prototype.constructor.call(this, operatorToken, expr);
 	},
 
+	analyze: function (context) {
+		if (! UnaryExpression.prototype.analyze.call(this, context))
+			return false;
+		if (! this.assertIsConvertibleTo(context, this._expr, Type.numberType, false))
+			return false;
+		return true;
+	},
+
 	getType: function () {
-		return Type.booleanType;
+		return Type.integerType;
 	}
 
 });
