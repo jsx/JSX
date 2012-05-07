@@ -15,7 +15,7 @@ var Expression = exports.Expression = Class.extend({
 		return this._token;
 	},
 
-	analyze: null, // bool analyze(context, isAssignment)
+	analyze: null, // bool analyze(context, parentExpr)
 
 	getType: null, // string getType()
 
@@ -75,10 +75,28 @@ var IdentifierExpression = exports.IdentifierExpression = Expression.extend({
 			];
 	},
 
-	analyze: function (context, isAssignment) {
+	analyze: function (context, parentExpr) {
 		// if it is an access to local variable, return ok
-		if (context.funcDef != null && (this._local = context.funcDef.getLocal(this._token.getValue())) != null)
+		if (context.funcDef != null && (this._local = context.funcDef.getLocal(this._token.getValue())) != null) {
+			if (parentExpr instanceof AssignmentExpression && parentExpr.getFirstExpr() == this) {
+				context.getTopBlock().localVariableStatuses.setStatus(this._local, LocalVariableStatuses.ISSET);
+			} else {
+				switch (context.getTopBlock().localVariableStatuses.getStatus(this._local)) {
+				case LocalVariableStatuses.ISSET:
+					// ok
+					break;
+				case LocalVariableStatuses.UNSET:
+					context.errors.push(new CompileError(this._token, "variable is not initialized"));
+					break;
+				case LocalVariableStatuses.MAYBESET:
+					context.errors.push(new CompileError(this._token, "variable may not be initialized"));
+					break;
+				default:
+					throw new Error("logic flaw");
+				}
+			}
 			return true;
+		}
 		// access to class
 		var classDef = context.parser.lookup(context.errors, this._token, this._token.getValue());
 		if (classDef == null) {
@@ -134,7 +152,7 @@ var UndefinedExpression = exports.UndefinedExpression = Expression.extend({
 		];
 	},
 
-	analyze: function (context, isAssignment) {
+	analyze: function (context, parentExpr) {
 		return true;
 	},
 
@@ -157,7 +175,7 @@ var NullExpression = exports.NullExpression = Expression.extend({
 		];
 	},
 
-	analyze: function (context, isAssignment) {
+	analyze: function (context, parentExpr) {
 		return true;
 	},
 
@@ -180,7 +198,7 @@ var BooleanLiteralExpression = exports.BooleanLiteralExpression = Expression.ext
 		];
 	},
 
-	analyze: function (context, isAssignment) {
+	analyze: function (context, parentExpr) {
 		return true;
 	},
 
@@ -203,7 +221,7 @@ var IntegerLiteralExpression = exports.IntegerLiteralExpression = Expression.ext
 		];
 	},
 
-	analyze: function (context, isAssignment) {
+	analyze: function (context, parentExpr) {
 		return true;
 	},
 
@@ -227,7 +245,7 @@ var NumberLiteralExpression = exports.NumberLiteralExpression = Expression.exten
 		];
 	},
 
-	analyze: function (context, isAssignment) {
+	analyze: function (context, parentExpr) {
 		return true;
 	},
 
@@ -250,7 +268,7 @@ var StringLiteralExpression = exports.StringLiteralExpression = Expression.exten
 		];
 	},
 
-	analyze: function (context, isAssignment) {
+	analyze: function (context, parentExpr) {
 		return true;
 	},
 
@@ -274,7 +292,7 @@ var RegExpLiteralExpression = exports.RegExpLiteralExpression = Expression.exten
 		];
 	},
 
-	analyze: function (context, isAssignment) {
+	analyze: function (context, parentExpr) {
 		var classDef = context.parser.lookup(context.errors, this._token, "RegExp");
 		if (classDef == null)
 			throw new Error("could not find definition for RegExp");
@@ -313,7 +331,7 @@ var ArrayLiteralExpression = exports.ArrayLiteralExpression = Expression.extend(
 		];
 	},
 
-	analyze: function (context, isAssignment) {
+	analyze: function (context, parentExpr) {
 		// analyze all elements
 		var succeeded = true;
 		for (var i = 0; i < this._exprs.length; ++i) {
@@ -408,7 +426,7 @@ var HashLiteralExpression = exports.HashLiteralExpression = Expression.extend({
 		];
 	},
 
-	analyze: function (context, isAssignment) {
+	analyze: function (context, parentExpr) {
 		// analyze all elements
 		var succeeded = true;
 		for (var i = 0; i < this._elements.length; ++i) {
@@ -476,7 +494,7 @@ var ThisExpression = exports.ThisExpression = Expression.extend({
 		];
 	},
 
-	analyze: function (context, isAssignment) {
+	analyze: function (context, parentExpr) {
 		var rootFuncDef = context.funcDef;
 		while (rootFuncDef.getParent() != null)
 			rootFuncDef = rootFuncDef.getParent();
@@ -512,7 +530,7 @@ var FunctionExpression = exports.FunctionExpression = Expression.extend({
 		];
 	},
 
-	analyze: function (context, isAssignment) {
+	analyze: function (context, parentExpr) {
 		this._funcDef.analyze(context);
 		return true; // return true since everything is resolved correctly even if analysis of the function definition failed
 	},
@@ -544,8 +562,8 @@ var UnaryExpression = exports.UnaryExpression = OperatorExpression.extend({
 		];
 	},
 
-	_analyze: function (context, isAssignment) {
-		if (! this._expr.analyze(context, false))
+	_analyze: function (context) {
+		if (! this._expr.analyze(context, this))
 			return false;
 		if (this._expr.getType().equals(Type.voidType)) {
 			context.errors.push(new CompileError(this._token, "cannot apply operator '" + this._token.getValue() + "' against void"));
@@ -562,8 +580,8 @@ var BitwiseNotExpression = exports.BitwiseNotExpression = UnaryExpression.extend
 		UnaryExpression.prototype.constructor.call(this, operatorToken, expr);
 	},
 
-	analyze: function (context, isAssignment) {
-		if (! this._analyze(context, false))
+	analyze: function (context, parentExpr) {
+		if (! this._analyze(context))
 			return false;
 		if (! this.assertIsConvertibleTo(context, this._expr, Type.numberType, false))
 			return false;
@@ -595,8 +613,8 @@ var InstanceofExpression = exports.InstanceofExpression = UnaryExpression.extend
 		];
 	},
 
-	analyze: function (context, isAssignment) {
-		if (! this._analyze(context, false))
+	analyze: function (context, parentExpr) {
+		if (! this._analyze(context))
 			return false;
 		if (! (this._expr.getType() instanceof ObjectType)) {
 			context.errors.push(new CompileError(this._token, "operator 'instanceof' is only applicable to an object"));
@@ -626,8 +644,8 @@ var AsExpression = exports.AsExpression = UnaryExpression.extend({
 		];
 	},
 
-	analyze: function (context, isAssignment) {
-		if (! this._analyze(context, false))
+	analyze: function (context, parentExpr) {
+		if (! this._analyze(context))
 			return false;
 		if (this._type instanceof MayBeUndefinedType) {
 			context.errors.push(new CompileError(this._token, "right operand of 'as' expression cannot be a MayBeUndefined<T> type"));
@@ -682,8 +700,8 @@ var AsNoCheckExpression = exports.AsNoCheckExpression = UnaryExpression.extend({
 		];
 	},
 
-	analyze: function (context, isAssignment) {
-		return this._analyze(context, false);
+	analyze: function (context, parentExpr) {
+		return this._analyze(context);
 	},
 
 	getType: function () {
@@ -698,8 +716,8 @@ var LogicalNotExpression = exports.LogicalNotExpression = UnaryExpression.extend
 		UnaryExpression.prototype.constructor.call(this, operatorToken, expr);
 	},
 
-	analyze: function (context, isAssignment) {
-		if (! this._analyze(context, false))
+	analyze: function (context, parentExpr) {
+		if (! this._analyze(context))
 			return false;
 		if (! this.assertIsConvertibleTo(context, this._expr, Type.booleanType, false))
 			return false;
@@ -726,8 +744,8 @@ var IncrementExpression = exports.IncrementExpression = UnaryExpression.extend({
 		];
 	},
 
-	analyze: function (context, isAssignment) {
-		if (! this._analyze(context, true))
+	analyze: function (context, parentExpr) {
+		if (! this._analyze(context))
 			return false;
 		var exprType = this._expr.getType();
 		if (exprType == null) {
@@ -795,7 +813,7 @@ var PropertyExpression = exports.PropertyExpression = UnaryExpression.extend({
 		];
 	},
 
-	analyze: function (context, isAssignment) {
+	analyze: function (context, parentExpr) {
 		// special handling for import ... as
 		var imprt;
 		if (this._expr instanceof IdentifierExpression
@@ -809,7 +827,7 @@ var PropertyExpression = exports.PropertyExpression = UnaryExpression.extend({
 			return true;
 		}
 		// normal handling
-		if (! this._analyze(context, false))
+		if (! this._analyze(context))
 			return false;
 		var exprType = this._expr.getType();
 		if (exprType.equals(Type.voidType)) {
@@ -876,8 +894,8 @@ var TypeofExpression = exports.TypeofExpression = UnaryExpression.extend({
 		UnaryExpression.prototype.constructor.call(this, operatorToken, expr);
 	},
 
-	analyze: function (context, isAssignment) {
-		if (! this._analyze(context, false))
+	analyze: function (context, parentExpr) {
+		if (! this._analyze(context))
 			return false;
 		if (! this._expr.getType().equals(Type.variantType)) {
 			context.errors.push(new CompileError(this._token, "cannot apply operator 'typeof' to '" + this._expr.getType().toString() + "'"));
@@ -898,8 +916,8 @@ var SignExpression = exports.SignExpression = UnaryExpression.extend({
 		UnaryExpression.prototype.constructor.call(this, operatorToken, expr);
 	},
 
-	analyze: function (context, isAssignment) {
-		if (! this._analyze(context, false))
+	analyze: function (context, parentExpr) {
+		if (! this._analyze(context))
 			return false;
 		if (! this.assertIsConvertibleTo(context, this._expr, Type.numberType, true))
 			return false;
@@ -944,10 +962,10 @@ var BinaryExpression = exports.BinaryExpression = OperatorExpression.extend({
 		];
 	},
 
-	_analyze: function (context, lhsIsAssignment) {
-		if (! this._expr1.analyze(context, lhsIsAssignment))
+	_analyze: function (context) {
+		if (! this._expr1.analyze(context, this))
 			return false;
-		if (! this._expr2.analyze(context, false))
+		if (! this._expr2.analyze(context, this))
 			return false;
 		return true;
 	}
@@ -961,8 +979,8 @@ var AdditiveExpression = exports.AdditiveExpression = BinaryExpression.extend({
 		this._type = null;
 	},
 
-	analyze: function (context, isAssignment) {
-		if (! this._analyze(context, false))
+	analyze: function (context, parentExpr) {
+		if (! this._analyze(context))
 			return false;
 		var expr1Type = this._expr1.getType().resolveIfMayBeUndefined();
 		var expr2Type = this._expr2.getType().resolveIfMayBeUndefined();
@@ -995,8 +1013,8 @@ var ArrayExpression = exports.ArrayExpression = BinaryExpression.extend({
 		this._type = null;
 	},
 
-	analyze: function (context, isAssignment) {
-		if (! this._analyze(context, false))
+	analyze: function (context, parentExpr) {
+		if (! this._analyze(context))
 			return false;
 		if (this._expr1.getType() == null) {
 			context.errors.push(new CompileError(this._token, "cannot determine type due to preceding errors"));
@@ -1034,8 +1052,8 @@ var AssignmentExpression = exports.AssignmentExpression = BinaryExpression.exten
 		BinaryExpression.prototype.constructor.call(this, operatorToken, expr1, expr2);
 	},
 
-	analyze: function (context, isAssignment) {
-		if (! this._analyze(context, false))
+	analyze: function (context, parentExpr) {
+		if (! this._analyze(context))
 			return false;
 		var rhsType = this._expr2.getType();
 		if (rhsType == null)
@@ -1084,8 +1102,8 @@ var BinaryNumberExpression = exports.BinaryNumberExpression = BinaryExpression.e
 		BinaryExpression.prototype.constructor.call(this, operatorToken, expr1, expr2);
 	},
 
-	analyze: function (context, isAssignment) {
-		if (! this._analyze(context, false))
+	analyze: function (context, parentExpr) {
+		if (! this._analyze(context))
 			return false;
 		var expr1Type = this._expr1.getType().resolveIfMayBeUndefined();
 		if (! this.assertIsConvertibleTo(context, this._expr1, Type.numberType, true))
@@ -1130,8 +1148,8 @@ var EqualityExpression = exports.EqualityExpression = BinaryExpression.extend({
 		BinaryExpression.prototype.constructor.call(this, operatorToken, expr1, expr2);
 	},
 
-	analyze: function (context, isAssignment) {
-		if (! this._analyze(context, false))
+	analyze: function (context, parentExpr) {
+		if (! this._analyze(context))
 			return false;
 		var expr1Type = this._expr1.getType();
 		var expr2Type = this._expr2.getType();
@@ -1173,8 +1191,8 @@ var LogicalExpression = exports.LogicalExpression = BinaryExpression.extend({
 		BinaryExpression.prototype.constructor.call(this, operatorToken, expr1, expr2);
 	},
 
-	analyze: function (context, isAssignment) {
-		if (! this._analyze(context, false))
+	analyze: function (context, parentExpr) {
+		if (! this._analyze(context))
 			return false;
 		if (! this.assertIsConvertibleTo(context, this._expr1, Type.booleanType, false))
 			return false;
@@ -1195,8 +1213,8 @@ var ShiftExpression = exports.ShiftExpression = BinaryExpression.extend({
 		BinaryExpression.prototype.constructor.call(this, operatorToken, expr1, expr2);
 	},
 
-	analyze: function (context, isAssignment) {
-		if (! this._analyze(context, false))
+	analyze: function (context, parentExpr) {
+		if (! this._analyze(context))
 			return false;
 		if (! this.assertIsConvertibleTo(context, this._expr1, Type.integerType, true))
 			return false;
@@ -1245,7 +1263,7 @@ var ConditionalExpression = exports.ConditionalExpression = OperatorExpression.e
 		];
 	},
 
-	analyze: function (context, isAssignment) {
+	analyze: function (context, parentExpr) {
 		if (! this._condExpr.analyze(context, false))
 			return false;
 		var condExprType = this._condExpr.getType();
@@ -1311,7 +1329,7 @@ var CallExpression = exports.CallExpression = OperatorExpression.extend({
 		];
 	},
 
-	analyze: function (context, isAssignment) {
+	analyze: function (context, parentExpr) {
 		if (! this._expr.analyze(context, false))
 			return false;
 		var argTypes = Util.analyzeArgs(context, this._args);
@@ -1365,7 +1383,7 @@ var SuperExpression = exports.SuperExpression = OperatorExpression.extend({
 		];
 	},
 
-	analyze: function (context, isAssignment) {
+	analyze: function (context, parentExpr) {
 		// obtain class definition
 		if ((context.funcDef.flags() & ClassDefinition.IS_STATIC) != 0) {
 			context.errors.push(new CompileError(this._token, "cannot use 'super' keyword in a static function"));
@@ -1422,7 +1440,7 @@ var NewExpression = exports.NewExpression = OperatorExpression.extend({
 		];
 	},
 
-	analyze: function (context, isAssignment) {
+	analyze: function (context, parentExpr) {
 		var classDef = this._qualifiedName.getClass(context);
 		if (classDef == null)
 			return false;
@@ -1484,7 +1502,7 @@ var CommaExpression = exports.CommaExpression = Expression.extend({
 		];
 	},
 
-	analyze: function (context, isAssignment) {
+	analyze: function (context, parentExpr) {
 		return this._expr1.analyze(context, false)
 			&& this._expr2.analyze(context, false);
 	},

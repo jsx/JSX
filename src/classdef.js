@@ -842,10 +842,10 @@ var LocalVariableStatuses = exports.LocalVariableStatuses = Class.extend({
 			var funcDef = x;
 			var args = funcDef.getArguments();
 			for (var i = 0; i < args.length; ++i)
-				this._statuses[args[i].getName()] = LocalVariableStatuses.SET;
+				this._statuses[args[i].getName().getValue()] = LocalVariableStatuses.ISSET;
 			var locals = funcDef.getLocals();
 			for (var i = 0; i < locals.length; ++i)
-				this._statuses[locals[i].getName()] = LocalVariableStatuses.UNSET;
+				this._statuses[locals[i].getName().getValue()] = LocalVariableStatuses.UNSET;
 		} else if (x instanceof LocalVariableStatuses) {
 			for (var k in x._statuses)
 				this._statuses[k] = x._statuses[k];
@@ -856,12 +856,33 @@ var LocalVariableStatuses = exports.LocalVariableStatuses = Class.extend({
 		return new LocalVariableStatuses(this);
 	},
 
+	merge: function (that) {
+		var ret = this.clone();
+		for (var k in ret._statuses) {
+			if (ret._statuses[k] == LocalVariableStatuses.UNSET && that._statuses[k] == LocalVariableStatuses.UNSET) {
+				// UNSET
+			} else if (ret._statuses[k] == LocalVariableStatuses.ISSET && that._statuses[k] == LocalVariableStatuses.ISSET) {
+				// ISSET
+			} else {
+				// MAYBESET
+				ret._statuses[k] = LocalVariableStatuses.MAYBESET;
+			}
+		}
+		return ret;
+	},
+
 	setStatus: function (local) {
-		this._statuses[local.getName()] = LocalVariableStatuses.ISSET;
+		var name = local.getName().getValue();
+		if (this._statuses[name] === undefined)
+			throw new Error("logic flaw, could not find status for local variable: " + name);
+		this._statuses[name] = LocalVariableStatuses.ISSET;
 	},
 
 	getStatus: function (local) {
-		return this._statuses[local.getName()];
+		var name = local.getName().getValue();
+		if (this._statuses[name] === undefined)
+			throw new Error("logic flaw, could not find status for local variable: " + name);
+		return this._statuses[name];
 	}
 
 });

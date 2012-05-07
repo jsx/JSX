@@ -110,7 +110,7 @@ var UnaryExpressionStatement = exports.UnaryExpressionStatement = Statement.exte
 	},
 
 	doAnalyze: function (context) {
-		this._expr.analyze(context);
+		this._expr.analyze(context, null);
 	}
 
 });
@@ -145,7 +145,7 @@ var ReturnStatement = exports.ReturnStatement = UnaryExpressionStatement.extend(
 	},
 
 	doAnalyze: function (context) {
-		if (! this._expr.analyze(context))
+		if (! this._expr.analyze(context, null))
 			return;
 		var exprType = this._expr.getType();
 		if (exprType == null)
@@ -176,7 +176,7 @@ var DeleteStatement = exports.DeleteStatement = UnaryExpressionStatement.extend(
 	},
 
 	doAnalyze: function (context) {
-		if (! this._expr.analyze(context))
+		if (! this._expr.analyze(context, null))
 			return;
 		if (! (this._expr instanceof ArrayExpression)) {
 			context.errors.push(new CompileError(this._token, "only properties of a hash object can be deleted"));
@@ -218,20 +218,35 @@ var JumpStatement = exports.JumpStatement = Statement.extend({
 		];
 	},
 
-	_assertIsJumpable: function (context) {
-		if (this._label == null)
-			return true;
-		// iterate to the one before the last, which is function scope
+	_determineDestination: function (context) {
+		// find the destination by iterate to the one before the last, which is function scope
 		for (var i = context.blockStack.length - 1; i > 0; --i) {
 			var statement = context.blockStack[i].statement;
-			if (statement instanceof LabellableStatement) {
+			// continue unless we are at the destination level
+			if (! (statement instanceof LabellableStatement))
+				continue;
+			if (this._label != null) {
 				var statementLabel = statement.getLabel();
-				if (statementLabel != null && statementLabel.getValue() == this._label.getValue())
-					return true;
+				if (statementLabel != null && statementLabel.getValue() == this._label.getValue()) {
+					if (this._token.getValue() == "continue" && statement instanceof SwitchStatement) {
+						context.errors.push(new CompileError(this._token, "cannot 'continue' to a switch statement"));
+						return null;
+					}
+				} else {
+					continue;
+				}
+			} else {
+				if (this._token.getValue() == "continue" && statement instanceof SwitchStatement)
+					continue;
 			}
+			// found the destination
+			return context.blockStack[i];
 		}
-		context.errors.push(new CompileError(this._label, "label '" + this._label.getValue() + "' is either not defined or invalid as the destination"));
-		return false;
+		if (this._label != null)
+			context.errors.push(new CompileError(this._label, "label '" + this._label.getValue() + "' is either not defined or invalid as the destination"));
+		else
+			context.errors.push(new CompileError(this._token, "cannot '" + this._token.getValue() + "' at this point"));
+		return null;
 	}
 
 });
@@ -247,26 +262,10 @@ var BreakStatement = exports.BreakStatement = JumpStatement.extend({
 	},
 
 	doAnalyze: function (context) {
-		// check if the statement may appear
-		var allowed = false;
-		// iterate to the one before the last, which is function scope
-		for (var i = context.blockStack.length - 1; i > 0; --i) {
-			var statement = context.blockStack[i].statement;
-			if (statement instanceof ForInStatement
-				|| statement instanceof ForStatement
-				|| statement instanceof DoWhileStatement
-				|| statement instanceof WhileStatement
-				|| statement instanceof SwitchStatement) {
-				allowed = true;
-				break;
-			}
-		}
-		if (! allowed) {
-			context.errors.push(new CompileError(this._token, "cannot break (a break statement is only allowed within the following statements: for/do-while/while/switch)"));
+		var targetBlock = this._determineDestination(context);
+		if (targetBlock == null)
 			return;
-		}
-		// check that it is possible to jump to the labelled statement
-		this._assertIsJumpable(context);
+		targetBlock.statement.registerVariableStatusesOnExit(context.getTopBlock().localVariableStatuses);
 	}
 
 });
@@ -283,25 +282,10 @@ var ContinueStatement = exports.ContinueStatement = JumpStatement.extend({
 
 
 	doAnalyze: function (context) {
-		// check if the statement may appear
-		var allowed = false;
-		// iterate to the one before the last, which is function scope
-		for (var i = context.blockStack.length - 1; i > 0; --i) {
-			var statement = context.blockStack[i].statement;
-			if (statement instanceof ForInStatement
-				|| statement instanceof ForStatement
-				|| statement instanceof DoWhileStatement
-				|| statement instanceof WhileStatement) {
-				allowed = true;
-				break;
-			}
-		}
-		if (! allowed) {
-			context.errors.push(new CompileError(this._token, "cannot continue (a continue statement is only allowed within the following statements: for/do-while/while)"));
+		var targetBlock = this._determineDestination(context);
+		if (targetBlock == null)
 			return;
-		}
-		// check that it is possible to jump to the labelled statement
-		this._assertIsJumpable(context);
+		targetBlock.statement.registerVariableStatusesOnExit(context.getTopBlock().localVariableStatuses);
 	}
 
 });
@@ -327,6 +311,24 @@ var LabellableStatement = exports.LabellableStatement = Statement.extend({
 		return [
 			Util.serializeNullable(this._label)
 		];
+	},
+
+	_prepareBlockAnalysis: function (context) {
+		context.blockStack.push(new BlockContext(context.getTopBlock().localVariableStatuses.clone(), this));
+		this._lvStatusesOnExit = null;
+	},
+
+	_finalizeBlockAnalysis: function (context) {
+		context.blockStack.pop();
+		context.getTopBlock().localVariableStatuses = this._lvStatusesOnExit;
+		this._lvStatusesOnExit = null;
+	},
+
+	registerVariableStatusesOnExit: function (statuses) {
+		if (this._lvStatusesOnExit == null)
+			this._lvStatusesOnExit = statuses.clone();
+		else
+			this._lvStatusesOnExit = this._lvStatusesOnExit.merge(statuses);
 	}
 
 });
@@ -357,13 +359,14 @@ var DoWhileStatement = exports.DoWhileStatement = LabellableStatement.extend({
 	},
 
 	doAnalyze: function (context) {
-		this._expr.analyze(context);
+		this._prepareBlockAnalysis(context);
 		try {
-			context.blockStack.push(new BlockContext(context.getTopBlock().localVariableStatuses.clone(), this));
 			for (var i = 0; i < this._statements.length; ++i)
 				this._statements[i].analyze(context);
+			this._expr.analyze(context, null);
+			this.registerVariableStatusesOnExit(context.getTopBlock().localVariableStatuses);
 		} finally {
-			context.blockStack.pop();
+			this._finalizeBlockAnalysis(context);
 		}
 	}
 
@@ -389,13 +392,14 @@ var ForInStatement = exports.ForInStatement = LabellableStatement.extend({
 	},
 
 	doAnalyze: function (context) {
-		this._expr.analyze(context);
+		this._expr.analyze(context, null);
+		this._prepareBlockAnalysis(context);
 		try {
-			context.blockStack.push(new BlockContext(context.getTopBlock().localVariableStatuses.clone(), this));
 			for (var i = 0; i < this._statements.length; ++i)
 				this._statements[i].analyze(context);
+			this.registerVariableStatusesOnExit(context.getTopBlock().localVariableStatuses);
 		} finally {
-			context.blockStack.pop();
+			this._finalizeBlockAnalysis(context);
 		}
 	}
 
@@ -440,17 +444,18 @@ var ForStatement = exports.ForStatement = LabellableStatement.extend({
 
 	doAnalyze: function (context) {
 		if (this._initExpr != null)
-			this._initExpr.analyze(context);
+			this._initExpr.analyze(context, null);
 		if (this._condExpr != null)
-			this._condExpr.analyze(context);
-		if (this._postExpr != null)
-			this._postExpr.analyze(context);
+			this._condExpr.analyze(context, null);
+		this._prepareBlockAnalysis(context);
 		try {
-			context.blockStack.push(new BlockContext(context.getTopBlock().localVariableStatuses.clone(), this));
 			for (var i = 0; i < this._statements.length; ++i)
 				this._statements[i].analyze(context);
+			if (this._postExpr != null)
+				this._postExpr.analyze(context, null);
+			this.registerVariableStatusesOnExit(context.getTopBlock().localVariableStatuses);
 		} finally {
-			context.blockStack.pop();
+			this._finalizeBlockAnalysis(context);
 		}
 	}
 
@@ -491,21 +496,27 @@ var IfStatement = exports.IfStatement = Statement.extend({
 	},
 
 	doAnalyze: function (context) {
-		this._expr.analyze(context);
+		this._expr.analyze(context, null);
+		// if the expr is true
+		var lvStatusesOnTrueStmts = context.getTopBlock().localVariableStatuses.clone();
+		context.blockStack.push(new BlockContext(lvStatusesOnTrueStmts, this));
 		try {
-			context.blockStack.push(new BlockContext(context.getTopBlock().localVariableStatuses.clone(), this));
 			for (var i = 0; i < this._onTrueStatements.length; ++i)
 				this._onTrueStatements[i].analyze(context);
 		} finally {
 			context.blockStack.pop();
 		}
+		// if the expr is false
+		var lvStatusesOnFalseStmts = context.getTopBlock().localVariableStatuses.clone();
 		try {
-			context.blockStack.push(new BlockContext(context.getTopBlock().localVariableStatuses.clone(), this));
+			context.blockStack.push(new BlockContext(lvStatusesOnFalseStmts, this));
 			for (var i = 0; i < this._onFalseStatements.length; ++i)
 				this._onFalseStatements[i].analyze(context);
 		} finally {
 			context.blockStack.pop();
 		}
+		// merge the variable statuses
+		context.getTopBlock().localVariableStatuses = lvStatusesOnTrueStmts.merge(lvStatusesOnFalseStmts);
 	}
 
 });
@@ -536,7 +547,7 @@ var SwitchStatement = exports.SwitchStatement = LabellableStatement.extend({
 	},
 
 	doAnalyze: function (context) {
-		if (! this._expr.analyze(context))
+		if (! this._expr.analyze(context, null))
 			return;
 		var exprType = this._expr.getType();
 		if (exprType == null)
@@ -545,13 +556,24 @@ var SwitchStatement = exports.SwitchStatement = LabellableStatement.extend({
 			context.errors.push(new CompileError(this._token, "switch statement only accepts boolean, number, or string expressions"));
 			return;
 		}
+		this._prepareBlockAnalysis(context);
 		try {
-			context.blockStack.push(new BlockContext(context.getTopBlock().localVariableStatuses.clone(), this));
-			for (var i = 0; i < this._statements.length; ++i)
-				this._statements[i].analyze(context);
+			var hasDefaultLabel = false;
+			for (var i = 0; i < this._statements.length; ++i) {
+				var statement = this._statements[i];
+				statement.analyze(context);
+				if (statement instanceof DefaultStatement)
+					hasDefaultLabel = true;
+			}
+			if (! hasDefaultLabel)
+				this.registerVariableStatusesOnExit(context.blockStack[context.blockStack.length - 2].localVariableStatuses);
 		} finally {
-			context.blockStack.pop();
+			this._finalizeBlockAnalysis(context);
 		}
+	},
+
+	$resetLocalVariableStatuses: function (context) {
+		context.getTopBlock().localVariableStatuses = context.blockStack[context.blockStack.length - 2].localVariableStatuses.clone();
 	}
 
 });
@@ -579,8 +601,8 @@ var CaseStatement = exports.CaseStatement = Statement.extend({
 	},
 
 	doAnalyze: function (context) {
-		if (! this._expr.analyze(context))
-			return false;
+		if (! this._expr.analyze(context, null))
+			return;
 		var statement = context.getTopBlock().statement;
 		if (! (statement instanceof SwitchStatement))
 			throw new Error("logic flaw");
@@ -599,6 +621,8 @@ var CaseStatement = exports.CaseStatement = Statement.extend({
 		} else {
 			context.errors.push(new CompileError(this._token, "type mismatch; expected type was '" + expectedType.toString() + "' but got '" + exprType + "'"));
 		}
+		// reset local variable statuses
+		SwitchStatement.resetLocalVariableStatuses(context);
 	}
 
 });
@@ -620,6 +644,7 @@ var DefaultStatement = exports.DefaultStatement = Statement.extend({
 	},
 
 	doAnalyze: function (context) {
+		SwitchStatement.resetLocalVariableStatuses(context);
 	}
 
 });
@@ -650,13 +675,14 @@ var WhileStatement = exports.WhileStatement = LabellableStatement.extend({
 	},
 
 	doAnalyze: function (context) {
-		this._expr.analyze(context);
+		this._expr.analyze(context, null);
+		this._prepareBlockAnalysis(context);
 		try {
-			context.blockStack.push(new BlockContext(context.getTopBlock().localVariableStatuses.clone(), this));
 			for (var i = 0; i < this._statements.length; ++i)
 				this._statements[i].analyze(context);
+			this.registerVariableStatusesOnExit(context.getTopBlock().localVariableStatuses);
 		} finally {
-			context.blockStack.pop();
+			this._finalizeBlockAnalysis(context);
 		}
 	}
 
@@ -735,7 +761,7 @@ var InformationStatement = exports.InformationStatement = Statement.extend({
 
 	_analyzeExprs: function (context) {
 		for (var i = 0; i < this._exprs.length; ++i)
-			if (! this._exprs[i].analyze(context))
+			if (! this._exprs[i].analyze(context, null))
 				return false;
 		return true;
 	}
