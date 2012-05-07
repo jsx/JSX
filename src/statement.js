@@ -607,7 +607,9 @@ var IfStatement = exports.IfStatement = Statement.extend({
 	},
 
 	doAnalyze: function (context) {
-		this._expr.analyze(context, null);
+		if (this._expr.analyze(context, null))
+			if (! this._expr.getType().equals(Type.booleanType))
+				context.errors.push(new CompileError(this._expr.getToken(), "expression of the if statement should return a boolean"));
 		// if the expr is true
 		context.blockStack.push(new BlockContext(context.getTopBlock().localVariableStatuses.clone(), this));
 		try {
