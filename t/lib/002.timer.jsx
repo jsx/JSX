@@ -14,9 +14,6 @@ class _Test extends TestCase {
 
 				async.done();
 			}, to);
-		}, function(async : AsyncHandle) : void {
-			this.fail("TIMEOUT: " + async.name());
-			async.done();
 		}, 1000);
 	}
 
@@ -31,9 +28,6 @@ class _Test extends TestCase {
 
 				async.done();
 			}, to);
-		}, function(async : AsyncHandle) : void {
-			this.fail("TIMEOUT: " + async.name());
-			async.done();
 		}, 1000);
 	}
 
@@ -61,9 +55,6 @@ class _Test extends TestCase {
 				}
 
 			}, interval);
-		}, function(async : AsyncHandle) : void {
-			this.fail("TIMEOUT: " + async.name());
-			async.done();
 		}, 1000);
 	}
 }

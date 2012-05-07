@@ -125,13 +125,20 @@ class TestCase {
 
 	/* async test stuff */
 
-	function async(testBody : function(:AsyncHandle):void, timeoutHandler : function(:AsyncHandle):void,  timeoutMS : int) : void {
+	function async(testBody : function(:AsyncHandle):void, timeoutHandler : function(:AsyncHandle):void, timeoutMS : int) : void {
 
 		var async = new AsyncHandle(this, this._currentName, timeoutHandler, timeoutMS);
 
 		this._tasks.push(function() : void {
 			testBody(async);
 		});
+	}
+
+	function async(testBody : function(:AsyncHandle):void, timeoutMS : int) : void {
+		this.async(testBody, function(async : AsyncHandle) : void {
+			this.fail("TIMEOUT: " + async.name());
+			async.done();
+		}, timeoutMS);
 	}
 
 	/* matcher factory */
