@@ -794,13 +794,10 @@ native class ImageData {
 // JSX interface to DOM
 
 final class dom {
-	static function getWindow() :Window{
-		// NOTE: the symbol Window doesn't exist; it's a virtual class.
-		return js.global["window"] as __nocheck__ Window;
-	}
+	static const var window = js.global["window"] as __nocheck__ Window;
 
 	static function id(identifier : string) : HTMLElement {
-		return dom.getWindow().document.getElementById(identifier)
+		return dom.window.document.getElementById(identifier)
 			as __nocheck__ HTMLElement;
 	}
 }
