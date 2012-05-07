@@ -1165,13 +1165,13 @@ var Parser = exports.Parser = Class.extend({
 			case ";":
 				return true;
 			case "if":
-				return this._ifStatement();
+				return this._ifStatement(token);
 			case "do":
-				return this._doWhileStatement(label);
+				return this._doWhileStatement(token, label);
 			case "while":
-				return this._whileStatement(label);
+				return this._whileStatement(token, label);
 			case "for":
-				return this._forStatement(label);
+				return this._forStatement(token, label);
 			case "continue":
 				return this._continueStatement(token);
 			case "break":
@@ -1183,7 +1183,7 @@ var Parser = exports.Parser = Class.extend({
 			case "throw":
 				return this._throwStatement();
 			case "try":
-				return this._tryStatement();
+				return this._tryStatement(token);
 			case "assert":
 				return this._assertStatement(token);
 			case "log":
@@ -1248,7 +1248,7 @@ var Parser = exports.Parser = Class.extend({
 		return true;
 	},
 
-	_ifStatement: function () {
+	_ifStatement: function (token) {
 		if (this._expect("(") == null)
 			return false;
 		var expr = this._expr(false);
@@ -1261,11 +1261,11 @@ var Parser = exports.Parser = Class.extend({
 		if (this._expectOpt("else") != null) {
 			onFalseStatements = this._subStatements();
 		}
-		this._statements.push(new IfStatement(expr, onTrueStatements, onFalseStatements));
+		this._statements.push(new IfStatement(token, expr, onTrueStatements, onFalseStatements));
 		return true;
 	},
 
-	_doWhileStatement: function (label) {
+	_doWhileStatement: function (token, label) {
 		var statements = this._subStatements();
 		if (this._expect("while") == null)
 			return false;
@@ -1276,11 +1276,11 @@ var Parser = exports.Parser = Class.extend({
 			return false;
 		if (this._expect(")") == null)
 			return false;
-		this._statements.push(new DoWhileStatement(label, expr, statements));
+		this._statements.push(new DoWhileStatement(token, label, expr, statements));
 		return true;
 	},
 
-	_whileStatement: function (label) {
+	_whileStatement: function (token, label) {
 		if (this._expect("(") == null)
 			return false;
 		var expr = this._expr(false);
@@ -1289,14 +1289,14 @@ var Parser = exports.Parser = Class.extend({
 		if (this._expect(")") == null)
 			return false;
 		var statements = this._subStatements();
-		this._statements.push(new WhileStatement(label, expr, statements));
+		this._statements.push(new WhileStatement(token, label, expr, statements));
 		return true;
 	},
 
-	_forStatement: function (label) {
+	_forStatement: function (token, label) {
 		var state = this._preserveState();
 		// first try to parse as for .. in, and fallback to the other
-		switch (this._forInStatement(label)) {
+		switch (this._forInStatement(token, label)) {
 		case -1: // try for (;;)
 			break;
 		case 0: // error
@@ -1346,11 +1346,11 @@ var Parser = exports.Parser = Class.extend({
 		}
 		// statements
 		var statements = this._subStatements();
-		this._statements.push(new ForStatement(label, initExpr, condExpr, postExpr, statements));
+		this._statements.push(new ForStatement(token, label, initExpr, condExpr, postExpr, statements));
 		return true;
 	},
 
-	_forInStatement: function (label) {
+	_forInStatement: function (token, label) {
 		if (! this._expect("(") == null)
 			return 0; // failure
 		var lhsExpr;
@@ -1369,7 +1369,7 @@ var Parser = exports.Parser = Class.extend({
 		if (this._expect(")") != null)
 			return 0;
 		var statements = this._subStatements();
-		this._statements.push(new ForInStatement(label, identifier, expr, statements));
+		this._statements.push(new ForInStatement(token, label, identifier, expr, statements));
 		return 1;
 	},
 
@@ -1457,7 +1457,7 @@ var Parser = exports.Parser = Class.extend({
 			}
 		}
 		// done
-		this._statements.push(new SwitchStatement(label, token, expr, this._statements.splice(startStatementIndex)));
+		this._statements.push(new SwitchStatement(token, label, expr, this._statements.splice(startStatementIndex)));
 		return true;
 	},
 
@@ -1469,7 +1469,7 @@ var Parser = exports.Parser = Class.extend({
 		return true;
 	},
 
-	_tryStatement: function () {
+	_tryStatement: function (token) {
 		if (this._expect("{") == null)
 			return false;
 		var startIndex = this._statements.length;
@@ -1494,7 +1494,7 @@ var Parser = exports.Parser = Class.extend({
 				return false;
 			finallyStatements = this._statements.splice(startIndex);
 		}
-		this._statements.push(new TryStatement(tryStatements, catchIdentifier, catchStatements, finallyStatements));
+		this._statements.push(new TryStatement(token, tryStatements, catchIdentifier, catchStatements, finallyStatements));
 		return true;
 	},
 

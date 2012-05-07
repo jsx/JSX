@@ -8,7 +8,19 @@ eval(Class.$import("./util"));
 
 var Statement = exports.Statement = Class.extend({
 
-	analyze: null, // void analyze(context)
+	analyze: function (context) {
+		try {
+			this.doAnalyze(context);
+		} catch (e) {
+			var token = this.getToken();
+			console.log("fatal error while compiling statement at file: " + token.getFilename() + ", line " + token.getLineNumber());
+			throw e;
+		}
+	},
+
+	getToken: null, // returns a token of the statement
+
+	doAnalyze: null, // void doAnalyze(context)
 	serialize: null
 });
 
@@ -19,6 +31,10 @@ var ConstructorInvocationStatement = exports.ConstructorInvocationStatement = St
 		this._args = args;
 		this._ctorClassDef = null;
 		this._ctorType = null;
+	},
+
+	getToken: function () {
+		return this._qualifiedName.getToken();
 	},
 
 	serialize: function () {
@@ -45,7 +61,7 @@ var ConstructorInvocationStatement = exports.ConstructorInvocationStatement = St
 		return this._ctorType;
 	},
 
-	analyze: function (context) {
+	doAnalyze: function (context) {
 		if (this._qualifiedName.getImport() == null && this._qualifiedName.getToken().getValue() == "super") {
 			this._ctorClassDef = context.funcDef.getClassDef().extendClassDef();
 		} else {
@@ -85,11 +101,15 @@ var UnaryExpressionStatement = exports.UnaryExpressionStatement = Statement.exte
 		this._expr = expr;
 	},
 
+	getToken: function () {
+		return this._expr.getToken();
+	},
+
 	getExpr: function () {
 		return this._expr;
 	},
 
-	analyze: function (context) {
+	doAnalyze: function (context) {
 		this._expr.analyze(context);
 	}
 
@@ -124,7 +144,7 @@ var ReturnStatement = exports.ReturnStatement = UnaryExpressionStatement.extend(
 		];
 	},
 
-	analyze: function (context) {
+	doAnalyze: function (context) {
 		if (! this._expr.analyze(context))
 			return;
 		var exprType = this._expr.getType();
@@ -155,7 +175,7 @@ var DeleteStatement = exports.DeleteStatement = UnaryExpressionStatement.extend(
 		];
 	},
 
-	analyze: function (context) {
+	doAnalyze: function (context) {
 		if (! this._expr.analyze(context))
 			return;
 		if (! (this._expr instanceof ArrayExpression)) {
@@ -225,7 +245,7 @@ var BreakStatement = exports.BreakStatement = JumpStatement.extend({
 		return "BreakStatement";
 	},
 
-	analyze: function (context) {
+	doAnalyze: function (context) {
 		// check if the statement may appear
 		var allowed = false;
 		for (var i = context.blockStack.length - 1; i >= 0; --i) {
@@ -260,7 +280,7 @@ var ContinueStatement = exports.ContinueStatement = JumpStatement.extend({
 	},
 
 
-	analyze: function (context) {
+	doAnalyze: function (context) {
 		// check if the statement may appear
 		var allowed = false;
 		for (var i = context.blockStack.length - 1; i >= 0; --i) {
@@ -287,8 +307,13 @@ var ContinueStatement = exports.ContinueStatement = JumpStatement.extend({
 
 var LabellableStatement = exports.LabellableStatement = Statement.extend({
 
-	constructor: function (label) {
+	constructor: function (token, label) {
+		this._token = token;
 		this._label = label;
+	},
+
+	getToken: function () {
+		return this._token;
 	},
 
 	getLabel: function () {
@@ -305,8 +330,8 @@ var LabellableStatement = exports.LabellableStatement = Statement.extend({
 
 var DoWhileStatement = exports.DoWhileStatement = LabellableStatement.extend({
 
-	constructor: function (label, expr, statements) {
-		LabellableStatement.prototype.constructor.call(this, label);
+	constructor: function (token, label, expr, statements) {
+		LabellableStatement.prototype.constructor.call(this, token, label);
 		this._expr = expr;
 		this._statements = statements;
 	},
@@ -328,7 +353,7 @@ var DoWhileStatement = exports.DoWhileStatement = LabellableStatement.extend({
 		]);
 	},
 
-	analyze: function (context) {
+	doAnalyze: function (context) {
 		this._expr.analyze(context);
 		try {
 			context.blockStack.push(this);
@@ -343,8 +368,8 @@ var DoWhileStatement = exports.DoWhileStatement = LabellableStatement.extend({
 
 var ForInStatement = exports.ForInStatement = LabellableStatement.extend({
 
-	constructor: function (label, identifier, expr, statements) {
-		LabellableStatement.prototype.constructor.call(this, label);
+	constructor: function (token, label, identifier, expr, statements) {
+		LabellableStatement.prototype.constructor.call(this, token, label);
 		this._identifier = identifier;
 		this._expr = expr;
 		this._statements = statements;
@@ -360,7 +385,7 @@ var ForInStatement = exports.ForInStatement = LabellableStatement.extend({
 		]);
 	},
 
-	analyze: function (context) {
+	doAnalyze: function (context) {
 		this._expr.analyze(context);
 		try {
 			context.blockStack.push(this);
@@ -375,8 +400,8 @@ var ForInStatement = exports.ForInStatement = LabellableStatement.extend({
 
 var ForStatement = exports.ForStatement = LabellableStatement.extend({
 
-	constructor: function (label, initExpr, condExpr, postExpr, statements) {
-		LabellableStatement.prototype.constructor.call(this, label);
+	constructor: function (token, label, initExpr, condExpr, postExpr, statements) {
+		LabellableStatement.prototype.constructor.call(this, token, label);
 		this._initExpr = initExpr;
 		this._condExpr = condExpr;
 		this._postExpr = postExpr;
@@ -410,7 +435,7 @@ var ForStatement = exports.ForStatement = LabellableStatement.extend({
 		]);
 	},
 
-	analyze: function (context) {
+	doAnalyze: function (context) {
 		if (this._initExpr != null)
 			this._initExpr.analyze(context);
 		if (this._condExpr != null)
@@ -430,10 +455,15 @@ var ForStatement = exports.ForStatement = LabellableStatement.extend({
 
 var IfStatement = exports.IfStatement = Statement.extend({
 
-	constructor: function (expr, onTrueStatements, onFalseStatements) {
+	constructor: function (token, expr, onTrueStatements, onFalseStatements) {
+		this._token = token;
 		this._expr = expr;
 		this._onTrueStatements = onTrueStatements;
 		this._onFalseStatements = onFalseStatements;
+	},
+
+	getToken: function () {
+		return this._token;
 	},
 
 	getExpr: function () {
@@ -457,7 +487,7 @@ var IfStatement = exports.IfStatement = Statement.extend({
 		];
 	},
 
-	analyze: function (context) {
+	doAnalyze: function (context) {
 		this._expr.analyze(context);
 		try {
 			context.blockStack.push(this);
@@ -479,9 +509,8 @@ var IfStatement = exports.IfStatement = Statement.extend({
 
 var SwitchStatement = exports.SwitchStatement = LabellableStatement.extend({
 
-	constructor: function (label, token, expr, statements) {
-		LabellableStatement.prototype.constructor.call(this, label);
-		this._token = token;
+	constructor: function (token, label, expr, statements) {
+		LabellableStatement.prototype.constructor.call(this, token, label);
 		this._expr = expr;
 		this._statements = statements;
 	},
@@ -503,7 +532,7 @@ var SwitchStatement = exports.SwitchStatement = LabellableStatement.extend({
 		]);
 	},
 
-	analyze: function (context) {
+	doAnalyze: function (context) {
 		if (! this._expr.analyze(context))
 			return;
 		var exprType = this._expr.getType();
@@ -531,6 +560,10 @@ var CaseStatement = exports.CaseStatement = Statement.extend({
 		this._expr = expr;
 	},
 
+	getToken: function () {
+		return this._token;
+	},
+
 	getExpr: function () {
 		return this._expr;
 	},
@@ -542,7 +575,7 @@ var CaseStatement = exports.CaseStatement = Statement.extend({
 		];
 	},
 
-	analyze: function (context) {
+	doAnalyze: function (context) {
 		if (! this._expr.analyze(context))
 			return false;
 		var statement = context.blockStack[context.blockStack.length - 1];
@@ -573,21 +606,25 @@ var DefaultStatement = exports.DefaultStatement = Statement.extend({
 		this._token = token;
 	},
 
+	getToken: function () {
+		return this._token;
+	},
+
 	serialize: function () {
 		return [
 			"DefaultStatement"
 		];
 	},
 
-	analyze: function (context) {
+	doAnalyze: function (context) {
 	}
 
 });
 
 var WhileStatement = exports.WhileStatement = LabellableStatement.extend({
 
-	constructor: function (label, expr, statements) {
-		LabellableStatement.prototype.constructor.call(this, label);
+	constructor: function (token, label, expr, statements) {
+		LabellableStatement.prototype.constructor.call(this, token, label);
 		this._expr = expr;
 		this._statements = statements;
 	},
@@ -609,7 +646,7 @@ var WhileStatement = exports.WhileStatement = LabellableStatement.extend({
 		]);
 	},
 
-	analyze: function (context) {
+	doAnalyze: function (context) {
 		this._expr.analyze(context);
 		try {
 			context.blockStack.push(this);
@@ -624,11 +661,16 @@ var WhileStatement = exports.WhileStatement = LabellableStatement.extend({
 
 var TryStatement = exports.TryStatement = Statement.extend({
 
-	constructor: function (tryStatements, catchIdentifier, catchStatements, finallyStatements) {
+	constructor: function (token, tryStatements, catchIdentifier, catchStatements, finallyStatements) {
+		this._token = token;
 		this._tryStatements = tryStatements;
 		this._catchIdentifier = catchIdentifier; // FIXME type?
 		this._catchStatements = catchStatements;
 		this._finallyStatements = finallyStatements;
+	},
+
+	getToken: function () {
+		return this._token;
 	},
 
 	serialize: function () {
@@ -641,7 +683,7 @@ var TryStatement = exports.TryStatement = Statement.extend({
 		];
 	},
 
-	analyze: function (context) {
+	doAnalyze: function (context) {
 		try {
 			context.blockStack.push(this);
 			for (var i = 0; i < this._tryStatements.length; ++i)
@@ -710,7 +752,7 @@ var AssertStatement = exports.AssertStatement = InformationStatement.extend({
 		];
 	},
 
-	analyze: function (context) {
+	doAnalyze: function (context) {
 		if (! this._analyzeExprs(context))
 			return;
 		var exprType = this._exprs[this._exprs.length - 1].getType();
@@ -735,7 +777,7 @@ var LogStatement = exports.LogStatement = InformationStatement.extend({
 		];
 	},
 
-	analyze: function (context) {
+	doAnalyze: function (context) {
 		if (! this._analyzeExprs(context))
 			return;
 		for (var i = 0; i < this._exprs.length; ++i) {
