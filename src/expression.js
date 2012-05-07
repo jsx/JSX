@@ -23,7 +23,8 @@ var Expression = exports.Expression = Class.extend({
 		return null;
 	},
 
-	isAssignable: function (type) {
+	assertIsAssignable: function (errors, token, type) {
+		errors.push(new CompileError(token, "left-hand-side expression is not assignable"));
 		return false;
 	}
 
@@ -98,18 +99,22 @@ var IdentifierExpression = exports.IdentifierExpression = Expression.extend({
 			return this._classDefType;
 	},
 
-	isAssignable: function (type) {
+	assertIsAssignable: function (errors, token, type) {
 		if (this._local != null) {
 			if (this._local.getType() == null) {
-				if (type.equals(Type.undefinedType))
+				if (type.equals(Type.undefinedType)) {
+					errors.push(new CompileError(token, "cannot assign an undefined type to a value of undetermined type"));
 					return false;
+				}
 				this._local.setType(type.asAssignableType());
 				return true;
 			} else if (! type.isConvertibleTo(this._local.getType())) {
+				errors.push(new CompileError(token, "cannot assign a value of type '" + type.toString() + "' to '" + this._local.getType() + "'"));
 				return false;
 			}
 		} else {
-			return this._classDefType.isAssignable();
+			errors.push(new CompileError(token, "cannot modify a class definition"));
+			return false;
 		}
 		return true;
 	}
@@ -722,6 +727,8 @@ var IncrementExpression = exports.IncrementExpression = UnaryExpression.extend({
 			context.errors.push(new CompileError(this._token, "cannot apply operator '" + this._token.getValue() + "' to a non-number"));
 			return false;
 		}
+		if (! this._expr.assertIsAssignable(context.errors, this._token, exprType))
+			return false;
 		return true;
 	},
 
@@ -829,11 +836,15 @@ var PropertyExpression = exports.PropertyExpression = UnaryExpression.extend({
 		return type;
 	},
 
-	isAssignable: function (type) {
-		if (! this._type.isAssignable())
+	assertIsAssignable: function (errors, token, type) {
+		if (! this._type.isAssignable()) {
+			errors.push(new CompileError("left-hand-side expression is not assignable"));
 			return false;
-		if (! type.isConvertibleTo(this._type))
+		}
+		if (! type.isConvertibleTo(this._type)) {
+			errors.push(new CompileError(token, "cannot assign a value of type '" + type.toString() + "' to '" + this._type.toString() + "'"));
 			return false;
+		}
 		return true;
 	},
 
@@ -1043,14 +1054,8 @@ var AssignmentExpression = exports.AssignmentExpression = BinaryExpression.exten
 				return false;
 			}
 		}
-		if (! this._expr1.isAssignable(rhsType)) {
-			var lhsType = this._expr1.getType();
-			if (lhsType != null)
-				context.errors.push(new CompileError(this._token, "cannot assign '" + rhsType.toString() + "' to '" + lhsType.toString() + "'"));
-			else
-				context.errors.push(new CompileError(this._token, "cannot assign '" + rhsType.toString() + "' to an undetermined type"));
+		if (! this._expr1.assertIsAssignable(context.errors, this._token, rhsType))
 			return false;
-		}
 		return true;
 	},
 
