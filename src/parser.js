@@ -502,7 +502,7 @@ var Parser = exports.Parser = Class.extend({
 		return true;
 	},
 
-	_expectOpt: function (expected) {
+	_expectOpt: function (expected, excludePattern) {
 		if (! (expected instanceof Array))
 			expected = [ expected ];
 
@@ -512,6 +512,8 @@ var Parser = exports.Parser = Class.extend({
 				if (expected[i].match(_Lexer.rxIdent) != null
 					&& this._input.substring(this._pos).match(_Lexer.rxIdent)[0].length != expected[i].length) {
 					// part of a longer token
+				} else if (excludePattern != null && this._input.substring(this._pos).match(excludePattern) != null) {
+					// skip if the token matches the exclude pattern
 				} else {
 					// found
 					this._tokenLength = expected[i].length;
@@ -1631,12 +1633,12 @@ var Parser = exports.Parser = Class.extend({
 		return new ConditionalExpression(operatorToken, lorExpr, ifTrueExpr, ifFalseExpr);
 	},
 
-	_binaryOpExpr: function (ops, parseFunc, noIn, builderFunc) {
+	_binaryOpExpr: function (ops, excludePattern, parseFunc, noIn, builderFunc) {
 		var expr = parseFunc.call(this, noIn);
 		if (expr == null)
 			return null;
 		while (true) {
-			var op = this._expectOpt(ops);
+			var op = this._expectOpt(ops, excludePattern);
 			if (op == null)
 				break;
 			var rightExpr = parseFunc.call(this);
@@ -1648,37 +1650,37 @@ var Parser = exports.Parser = Class.extend({
 	},
 
 	_lorExpr: function (noIn) {
-		return this._binaryOpExpr([ "||" ], this._landExpr, noIn, function (op, e1, e2) {
+		return this._binaryOpExpr([ "||" ], null, this._landExpr, noIn, function (op, e1, e2) {
 			return new LogicalExpression(op, e1, e2);
 		});
 	},
 
 	_landExpr: function (noIn) {
-		return this._binaryOpExpr([ "&&" ], this._borExpr, noIn, function (op, e1, e2) {
+		return this._binaryOpExpr([ "&&" ], null, this._borExpr, noIn, function (op, e1, e2) {
 			return new LogicalExpression(op, e1, e2);
 		});
 	},
 
 	_borExpr: function (noIn) {
-		return this._binaryOpExpr([ "|" ], this._bxorExpr, noIn, function (op, e1, e2) {
+		return this._binaryOpExpr([ "|" ], /^\|\|/, this._bxorExpr, noIn, function (op, e1, e2) {
 			return new BinaryNumberExpression(op, e1, e2);
 		});
 	},
 
 	_bxorExpr: function (noIn) {
-		return this._binaryOpExpr([ "^" ], this._bandExpr, noIn, function (op, e1, e2) {
+		return this._binaryOpExpr([ "^" ], null, this._bandExpr, noIn, function (op, e1, e2) {
 			return new BinaryNumberExpression(op, e1, e2);
 		});
 	},
 
 	_bandExpr: function (noIn) {
-		return this._binaryOpExpr([ "&" ], this._eqExpr, noIn, function (op, e1, e2) {
+		return this._binaryOpExpr([ "&" ], /^&&/, this._eqExpr, noIn, function (op, e1, e2) {
 			return new BinaryNumberExpression(op, e1, e2);
 		});
 	},
 
 	_eqExpr: function (noIn) {
-		return this._binaryOpExpr([ "==", "!=" ], this._relExpr, noIn, function (op, e1, e2) {
+		return this._binaryOpExpr([ "==", "!=" ], null, this._relExpr, noIn, function (op, e1, e2) {
 			return new EqualityExpression(op, e1, e2);
 		});
 	},
@@ -1687,7 +1689,7 @@ var Parser = exports.Parser = Class.extend({
 		var ops = [ "<=", ">=", "<", ">" ];
 		if (! noIn)
 			ops.push("in");
-		return this._binaryOpExpr(ops, this._shiftExpr, noIn, function (op, e1, e2) {
+		return this._binaryOpExpr(ops, null, this._shiftExpr, noIn, function (op, e1, e2) {
 			if (op.getValue() == "in")
 				return new InExpression(op, e1, e2);
 			else
@@ -1696,14 +1698,14 @@ var Parser = exports.Parser = Class.extend({
 	},
 
 	_shiftExpr: function () {
-		var expr = this._binaryOpExpr([ ">>>", "<<", ">>" ], this._addExpr, false, function (op, e1, e2) {
+		var expr = this._binaryOpExpr([ ">>>", "<<", ">>" ], null, this._addExpr, false, function (op, e1, e2) {
 			return new ShiftExpression(op, e1, e2);
 		});
 		return expr;
 	},
 
 	_addExpr: function () {
-		return this._binaryOpExpr([ "+", "-" ], this._mulExpr, false, function (op, e1, e2) {
+		return this._binaryOpExpr([ "+", "-" ], /^[+-]{2}/, this._mulExpr, false, function (op, e1, e2) {
 			if (op.getValue() == "+")
 				return new AdditiveExpression(op, e1, e2);
 			else
@@ -1712,7 +1714,7 @@ var Parser = exports.Parser = Class.extend({
 	},
 
 	_mulExpr: function () {
-		return this._binaryOpExpr([ "*", "/", "%" ], this._unaryExpr, false, function (op, e1, e2) {
+		return this._binaryOpExpr([ "*", "/", "%" ], null, this._unaryExpr, false, function (op, e1, e2) {
 			return new BinaryNumberExpression(op, e1, e2);
 		});
 	},
