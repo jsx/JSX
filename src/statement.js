@@ -8,9 +8,12 @@ eval(Class.$import("./util"));
 
 var Statement = exports.Statement = Class.extend({
 
+	// returns whether or not to continue analysing the following statements
 	analyze: function (context) {
+		if (! Statement.assertIsReachable(context, this.getToken()))
+			return false;
 		try {
-			this.doAnalyze(context);
+			return this.doAnalyze(context);
 		} catch (e) {
 			var token = this.getToken();
 			console.log("fatal error while compiling statement at file: " + token.getFilename() + ", line " + token.getLineNumber());
@@ -20,8 +23,18 @@ var Statement = exports.Statement = Class.extend({
 
 	getToken: null, // returns a token of the statement
 
-	doAnalyze: null, // void doAnalyze(context)
-	serialize: null
+	serialize: null,
+
+	doAnalyze: null, // void doAnalyze(context), returns whether or not to continue analysing the following statements
+
+	$assertIsReachable: function (context, token) {
+		if (context.getTopBlock().localVariableStatuses == null) {
+			context.errors.push(new CompileError(token, "the code is unreachable"));
+			return false;
+		}
+		return true;
+	}
+
 });
 
 var ConstructorInvocationStatement = exports.ConstructorInvocationStatement = Statement.extend({
@@ -67,26 +80,27 @@ var ConstructorInvocationStatement = exports.ConstructorInvocationStatement = St
 		} else {
 			if ((this._ctorClassDef = this._qualifiedName.getClass(context)) == null) {
 				// error should have been reported already
-				return;
+				return true;
 			}
 		}
 		// analyze args
-		var argTypes = Util.analyzeArgs(context, this._args);
+		var argTypes = Util.analyzeArgs(context, this._args, null);
 		if (argTypes == null) {
 			// error is reported by callee
-			return;
+			return true;
 		}
 		var ctorType = this._ctorClassDef.getMemberTypeByName("constructor", ClassDefinition.GET_MEMBER_MODE_CLASS_ONLY);
 		if (ctorType == null) {
 			if (this._args.length != 0) {
 				context.errors.push(new CompileError(this._qualifiedName.getToken(), "no function with matching arguments"));
-				return;
+				return true;
 			}
 		} else if ((ctorType = ctorType.deduceByArgumentTypes(context, this._qualifiedName.getToken(), argTypes, false)) == null) {
 			// error is reported by callee
-			return;
+			return true;
 		}
 		this._ctorType = ctorType;
+		return true;
 	}
 
 });
@@ -111,6 +125,7 @@ var UnaryExpressionStatement = exports.UnaryExpressionStatement = Statement.exte
 
 	doAnalyze: function (context) {
 		this._expr.analyze(context, null);
+		return true;
 	}
 
 });
@@ -146,13 +161,14 @@ var ReturnStatement = exports.ReturnStatement = UnaryExpressionStatement.extend(
 
 	doAnalyze: function (context) {
 		if (! this._expr.analyze(context, null))
-			return;
+			return true;
 		var exprType = this._expr.getType();
 		if (exprType == null)
-			return;
+			return true;
 		var returnType = context.funcDef.getReturnType();
 		if (! exprType.isConvertibleTo(returnType))
 			context.errors.push(new CompileError(this._token, "cannot convert '" + exprType.toString() + "' to return type '" + returnType.toString() + "'"));
+		return true;
 	}
 
 });
@@ -177,18 +193,19 @@ var DeleteStatement = exports.DeleteStatement = UnaryExpressionStatement.extend(
 
 	doAnalyze: function (context) {
 		if (! this._expr.analyze(context, null))
-			return;
+			return true;
 		if (! (this._expr instanceof ArrayExpression)) {
 			context.errors.push(new CompileError(this._token, "only properties of a hash object can be deleted"));
-			return;
+			return true;
 		}
 		var secondExprType = this._expr.getSecondExpr().getType();
 		if (secondExprType == null)
-			return; // error should have been already reported
+			return true; // error should have been already reported
 		if (! secondExprType.resolveIfMayBeUndefined().equals(Type.stringType)) {
 			context.errors.push(new CompileError(this._token, "only properties of a hash object can be deleted"));
-			return;
+			return true;
 		}
+		return true;
 	}
 
 });
@@ -216,6 +233,19 @@ var JumpStatement = exports.JumpStatement = Statement.extend({
 			this._token.serialize(),
 			Util.serializeNullable(this._label)
 		];
+	},
+
+	doAnalyze: function (context) {
+		var targetBlock = this._determineDestination(context);
+		if (targetBlock == null)
+			return true;
+		if (this instanceof BreakStatement)
+			targetBlock.statement.registerVariableStatusesOnBreak(context.getTopBlock().localVariableStatuses);
+		else
+			targetBlock.statement.registerVariableStatusesOnContinue(context.getTopBlock().localVariableStatuses);
+		if (! (context.getTopBlock().statement instanceof SwitchStatement))
+			context.getTopBlock().localVariableStatuses = null;
+		return true;
 	},
 
 	_determineDestination: function (context) {
@@ -259,13 +289,6 @@ var BreakStatement = exports.BreakStatement = JumpStatement.extend({
 
 	_getName: function () {
 		return "BreakStatement";
-	},
-
-	doAnalyze: function (context) {
-		var targetBlock = this._determineDestination(context);
-		if (targetBlock == null)
-			return;
-		targetBlock.statement.registerVariableStatusesOnExit(context.getTopBlock().localVariableStatuses);
 	}
 
 });
@@ -278,14 +301,6 @@ var ContinueStatement = exports.ContinueStatement = JumpStatement.extend({
 
 	_getName: function () {
 		return "ContinueStatement";
-	},
-
-
-	doAnalyze: function (context) {
-		var targetBlock = this._determineDestination(context);
-		if (targetBlock == null)
-			return;
-		targetBlock.statement.registerVariableStatusesOnExit(context.getTopBlock().localVariableStatuses);
 	}
 
 });
@@ -315,28 +330,77 @@ var LabellableStatement = exports.LabellableStatement = Statement.extend({
 
 	_prepareBlockAnalysis: function (context) {
 		context.blockStack.push(new BlockContext(context.getTopBlock().localVariableStatuses.clone(), this));
-		this._lvStatusesOnExit = null;
+		this._lvStatusesOnBreak = null;
+	},
+
+	_abortBlockAnalysis: function (context) {
+		context.blockStack.pop();
+		this._lvStatusesOnBreak = null;
 	},
 
 	_finalizeBlockAnalysis: function (context) {
 		context.blockStack.pop();
-		context.getTopBlock().localVariableStatuses = this._lvStatusesOnExit;
-		this._lvStatusesOnExit = null;
+		context.getTopBlock().localVariableStatuses = this._lvStatusesOnBreak;
+		this._lvStatusesOnBreak = null;
 	},
 
-	registerVariableStatusesOnExit: function (statuses) {
-		if (this._lvStatusesOnExit == null)
-			this._lvStatusesOnExit = statuses.clone();
-		else
-			this._lvStatusesOnExit = this._lvStatusesOnExit.merge(statuses);
+	registerVariableStatusesOnBreak: function (statuses) {
+		if (statuses != null) {
+			if (this._lvStatusesOnBreak == null)
+				this._lvStatusesOnBreak = statuses.clone();
+			else
+				this._lvStatusesOnBreak = this._lvStatusesOnBreak.merge(statuses);
+		}
 	}
 
 });
 
-var DoWhileStatement = exports.DoWhileStatement = LabellableStatement.extend({
+var ContinuableStatement = exports.ContinuableStatement = LabellableStatement.extend({
+
+	constructor: function (token, label) {
+		LabellableStatement.prototype.constructor.call(this, token, label);
+	},
+
+	_prepareBlockAnalysis: function (context) {
+		LabellableStatement.prototype._prepareBlockAnalysis.call(this, context);
+		this._lvStatusesOnContinue = null;
+	},
+
+	_abortBlockAnalysis: function (context) {
+		LabellableStatement.prototype._abortBlockAnalysis.call(this, context);
+		this._lvStatusesOnContinue = null;
+	},
+
+	_finalizeBlockAnalysis: function (context) {
+		LabellableStatement.prototype._finalizeBlockAnalysis.call(this, context);
+		this._restoreContinueVariableStatuses(context);
+	},
+
+	_restoreContinueVariableStatuses: function (context) {
+		if (this._lvStatusesOnContinue != null) {
+			if (context.getTopBlock().localVariableStatuses != null)
+				context.getTopBlock().localVariableStatuses = context.getTopBlock().localVariableStatuses.merge(this._lvStatusesOnContinue);
+			else
+				context.getTopBlock().localVariableStatuses = this._lvStatusesOnContinue;
+			this._lvStatusesOnContinue = null;
+		}
+	},
+
+	registerVariableStatusesOnContinue: function (statuses) {
+		if (statuses != null) {
+			if (this._lvStatusesOnContinue == null)
+				this._lvStatusesOnContinue = statuses.clone();
+			else
+				this._lvStatusesOnContinue = this._lvStatusesOnContinue.merge(statuses);
+		}
+	}
+
+});
+
+var DoWhileStatement = exports.DoWhileStatement = ContinuableStatement.extend({
 
 	constructor: function (token, label, expr, statements) {
-		LabellableStatement.prototype.constructor.call(this, token, label);
+		ContinuableStatement.prototype.constructor.call(this, token, label);
 		this._expr = expr;
 		this._statements = statements;
 	},
@@ -362,20 +426,27 @@ var DoWhileStatement = exports.DoWhileStatement = LabellableStatement.extend({
 		this._prepareBlockAnalysis(context);
 		try {
 			for (var i = 0; i < this._statements.length; ++i)
-				this._statements[i].analyze(context);
+				if (! this._statements[i].analyze(context))
+					return false;
+			this._restoreContinueVariableStatuses(context);
+			if (! Statement.assertIsReachable(context, this._expr.getToken()))
+				return false;
 			this._expr.analyze(context, null);
-			this.registerVariableStatusesOnExit(context.getTopBlock().localVariableStatuses);
-		} finally {
+			this.registerVariableStatusesOnBreak(context.getTopBlock().localVariableStatuses);
 			this._finalizeBlockAnalysis(context);
+		} catch (e) {
+			this._abortBlockAnalysis(context);
+			throw e;
 		}
+		return true;
 	}
 
 });
 
-var ForInStatement = exports.ForInStatement = LabellableStatement.extend({
+var ForInStatement = exports.ForInStatement = ContinuableStatement.extend({
 
 	constructor: function (token, label, identifier, expr, statements) {
-		LabellableStatement.prototype.constructor.call(this, token, label);
+		ContinuableStatement.prototype.constructor.call(this, token, label);
 		this._identifier = identifier;
 		this._expr = expr;
 		this._statements = statements;
@@ -396,19 +467,23 @@ var ForInStatement = exports.ForInStatement = LabellableStatement.extend({
 		this._prepareBlockAnalysis(context);
 		try {
 			for (var i = 0; i < this._statements.length; ++i)
-				this._statements[i].analyze(context);
-			this.registerVariableStatusesOnExit(context.getTopBlock().localVariableStatuses);
-		} finally {
+				if (! this._statements[i].analyze(context))
+					return false;
+			this.registerVariableStatusesOnContinue(context.getTopBlock().localVariableStatuses);
 			this._finalizeBlockAnalysis(context);
+		} catch (e) {
+			this._abortBlockAnalysis(context);
+			throw e;
 		}
+		return true;
 	}
 
 });
 
-var ForStatement = exports.ForStatement = LabellableStatement.extend({
+var ForStatement = exports.ForStatement = ContinuableStatement.extend({
 
 	constructor: function (token, label, initExpr, condExpr, postExpr, statements) {
-		LabellableStatement.prototype.constructor.call(this, token, label);
+		ContinuableStatement.prototype.constructor.call(this, token, label);
 		this._initExpr = initExpr;
 		this._condExpr = condExpr;
 		this._postExpr = postExpr;
@@ -450,13 +525,21 @@ var ForStatement = exports.ForStatement = LabellableStatement.extend({
 		this._prepareBlockAnalysis(context);
 		try {
 			for (var i = 0; i < this._statements.length; ++i)
-				this._statements[i].analyze(context);
-			if (this._postExpr != null)
+				if (! this._statements[i].analyze(context))
+					return false;
+			this._restoreContinueVariableStatuses(context);
+			if (this._postExpr != null) {
+				if (! Statement.assertIsReachable(context, this._postExpr.getToken()))
+					return false;
 				this._postExpr.analyze(context, null);
-			this.registerVariableStatusesOnExit(context.getTopBlock().localVariableStatuses);
-		} finally {
+				this.registerVariableStatusesOnBreak(context.getTopBlock().localVariableStatuses);
+			}
 			this._finalizeBlockAnalysis(context);
+		} catch (e) {
+			this._abortBlockAnalysis(context);
+			throw e;
 		}
+		return true;
 	}
 
 });
@@ -498,25 +581,34 @@ var IfStatement = exports.IfStatement = Statement.extend({
 	doAnalyze: function (context) {
 		this._expr.analyze(context, null);
 		// if the expr is true
-		var lvStatusesOnTrueStmts = context.getTopBlock().localVariableStatuses.clone();
-		context.blockStack.push(new BlockContext(lvStatusesOnTrueStmts, this));
+		context.blockStack.push(new BlockContext(context.getTopBlock().localVariableStatuses.clone(), this));
 		try {
 			for (var i = 0; i < this._onTrueStatements.length; ++i)
-				this._onTrueStatements[i].analyze(context);
+				if (! this._onTrueStatements[i].analyze(context))
+					return false;
+			var lvStatusesOnTrueStmts = context.getTopBlock().localVariableStatuses;
 		} finally {
 			context.blockStack.pop();
 		}
 		// if the expr is false
-		var lvStatusesOnFalseStmts = context.getTopBlock().localVariableStatuses.clone();
 		try {
-			context.blockStack.push(new BlockContext(lvStatusesOnFalseStmts, this));
+			context.blockStack.push(new BlockContext(context.getTopBlock().localVariableStatuses.clone(), this));
 			for (var i = 0; i < this._onFalseStatements.length; ++i)
-				this._onFalseStatements[i].analyze(context);
+				if (! this._onFalseStatements[i].analyze(context))
+					return false;
+			var lvStatusesOnFalseStmts = context.getTopBlock().localVariableStatuses;
 		} finally {
 			context.blockStack.pop();
 		}
 		// merge the variable statuses
-		context.getTopBlock().localVariableStatuses = lvStatusesOnTrueStmts.merge(lvStatusesOnFalseStmts);
+		if (lvStatusesOnTrueStmts != null)
+			if (lvStatusesOnFalseStmts != null)
+				context.getTopBlock().localVariableStatuses = lvStatusesOnTrueStmts.merge(lvStatusesOnFalseStmts);
+			else
+				context.getTopBlock().localVariableStatuses = lvStatusesOnTrueStmts;
+		else
+			context.getTopBlock().localVariableStatuses = lvStatusesOnFalseStmts;
+		return true;
 	}
 
 });
@@ -548,28 +640,32 @@ var SwitchStatement = exports.SwitchStatement = LabellableStatement.extend({
 
 	doAnalyze: function (context) {
 		if (! this._expr.analyze(context, null))
-			return;
+			return true;
 		var exprType = this._expr.getType();
 		if (exprType == null)
-			return;
+			return true;
 		if (! (exprType.equals(Type.booleanType) || exprType.equals(Type.integerType) || exprType.equals(Type.numberType) || exprType.equals(Type.stringType))) {
 			context.errors.push(new CompileError(this._token, "switch statement only accepts boolean, number, or string expressions"));
-			return;
+			return true;
 		}
 		this._prepareBlockAnalysis(context);
 		try {
 			var hasDefaultLabel = false;
 			for (var i = 0; i < this._statements.length; ++i) {
 				var statement = this._statements[i];
-				statement.analyze(context);
+				if (! statement.analyze(context))
+					return false;
 				if (statement instanceof DefaultStatement)
 					hasDefaultLabel = true;
 			}
 			if (! hasDefaultLabel)
-				this.registerVariableStatusesOnExit(context.blockStack[context.blockStack.length - 2].localVariableStatuses);
-		} finally {
+				this.registerVariableStatusesOnBreak(context.blockStack[context.blockStack.length - 2].localVariableStatuses);
 			this._finalizeBlockAnalysis(context);
+		} catch (e) {
+			this._abortBlockAnalysis(context);
+			throw e;
 		}
+		return true;
 	},
 
 	$resetLocalVariableStatuses: function (context) {
@@ -602,16 +698,16 @@ var CaseStatement = exports.CaseStatement = Statement.extend({
 
 	doAnalyze: function (context) {
 		if (! this._expr.analyze(context, null))
-			return;
+			return true;
 		var statement = context.getTopBlock().statement;
 		if (! (statement instanceof SwitchStatement))
 			throw new Error("logic flaw");
 		var expectedType = statement.getExpr().getType();
 		if (expectedType == null)
-			return;
+			return true;
 		var exprType = this._expr.getType();
 		if (exprType == null)
-			return;
+			return true;
 		if (exprType.equals(expectedType)) {
 			// ok
 		} else if (Type.isIntegerOrNumber(exprType) && Type.isIntegerOrNumber(expectedType)) {
@@ -623,6 +719,7 @@ var CaseStatement = exports.CaseStatement = Statement.extend({
 		}
 		// reset local variable statuses
 		SwitchStatement.resetLocalVariableStatuses(context);
+		return true;
 	}
 
 });
@@ -645,14 +742,15 @@ var DefaultStatement = exports.DefaultStatement = Statement.extend({
 
 	doAnalyze: function (context) {
 		SwitchStatement.resetLocalVariableStatuses(context);
+		return true;
 	}
 
 });
 
-var WhileStatement = exports.WhileStatement = LabellableStatement.extend({
+var WhileStatement = exports.WhileStatement = ContinuableStatement.extend({
 
 	constructor: function (token, label, expr, statements) {
-		LabellableStatement.prototype.constructor.call(this, token, label);
+		ContinuableStatement.prototype.constructor.call(this, token, label);
 		this._expr = expr;
 		this._statements = statements;
 	},
@@ -679,11 +777,15 @@ var WhileStatement = exports.WhileStatement = LabellableStatement.extend({
 		this._prepareBlockAnalysis(context);
 		try {
 			for (var i = 0; i < this._statements.length; ++i)
-				this._statements[i].analyze(context);
-			this.registerVariableStatusesOnExit(context.getTopBlock().localVariableStatuses);
-		} finally {
+				if (! this._statements[i].analyze(context))
+					return false;
+			this.registerVariableStatusesOnContinue(context.getTopBlock().localVariableStatuses);
 			this._finalizeBlockAnalysis(context);
+		} catch (e) {
+			this._abortBlockAnalysis(context);
+			throw e;
 		}
+		return true;
 	}
 
 });
@@ -716,7 +818,8 @@ var TryStatement = exports.TryStatement = Statement.extend({
 		try {
 			context.blockStack.push(new BlockContext(context.getTopBlock().localVariableStatuses.clone(), this));
 			for (var i = 0; i < this._tryStatements.length; ++i)
-				this._tryStatements[i].analyze(context);
+				if (! this._tryStatements[i].analyze(context))
+					return false;
 		} finally {
 			context.blockStack.pop();
 		}
@@ -724,7 +827,8 @@ var TryStatement = exports.TryStatement = Statement.extend({
 			try {
 				context.blockStack.push(new BlockContext(context.getTopBlock().localVariableStatuses.clone(), this));
 				for (var i = 0; i < this._catchStatements.length; ++i)
-					this._catchStatements[i].analyze(context);
+					if (! this._catchStatements[i].analyze(context))
+						return false;
 			} finally {
 				context.blockStack.pop();
 			}
@@ -733,11 +837,13 @@ var TryStatement = exports.TryStatement = Statement.extend({
 			try {
 				context.blockStack.push(new BlockContext(context.getTopBlock().localVariableStatuses.clone(), this));
 				for (var i = 0; i < this._finallyStatements.length; ++i)
-					this._finallyStatements[i].analyze(context);
+					if (! this._finallyStatements[i].analyze(context))
+						return false;
 			} finally {
 				context.blockStack.pop();
 			}
 		}
+		return true;
 	}
 
 });
@@ -783,12 +889,13 @@ var AssertStatement = exports.AssertStatement = InformationStatement.extend({
 
 	doAnalyze: function (context) {
 		if (! this._analyzeExprs(context))
-			return;
+			return true;
 		var exprType = this._exprs[this._exprs.length - 1].getType();
 		if (exprType.equals(Type.voidType))
 			context.errors.push(new CompileError(this._token, "cannot assert type void"));
 		else if (exprType.equals(Type.nullType))
 			context.errors.push(new CompileError(this._token, "assertion never succeeds"));
+		return true;
 	}
 
 });
@@ -812,12 +919,13 @@ var LogStatement = exports.LogStatement = InformationStatement.extend({
 		for (var i = 0; i < this._exprs.length; ++i) {
 			var exprType = this._exprs[i].getType();
 			if (exprType == null)
-				return;
+				return true;
 			if (exprType.equals(Type.voidType)) {
 				context.errors.push(new CompileError(this._token, "cannot log a void expression"));
 				break;
 			}
 		}
+		return true;
 	}
 
 });

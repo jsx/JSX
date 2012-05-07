@@ -682,10 +682,14 @@ var MemberFunctionDefinition = exports.MemberFunctionDefinition = MemberDefiniti
 		if (this._statements == null)
 			return;
 
+		// setup context
+		var context = context.clone().setFuncDef(this)
+			.initBlockStack(new LocalVariableStatuses(this, this._parent != null ? context.getTopBlock().localVariableStatuses : null));
+
 		// do the checks
-		context = context.clone().setFuncDef(this).initBlockStack(new LocalVariableStatuses(this));
 		for (var i = 0; i < this._statements.length; ++i)
-			this._statements[i].analyze(context);
+			if (! this._statements[i].analyze(context))
+				break;
 
 		// check that from the constructor, all constructors with non-zero
 		// arguments are called, and that the calls are in the implemented order
@@ -836,19 +840,30 @@ var LocalVariableStatuses = exports.LocalVariableStatuses = Class.extend({
 	$ISSET: 1,
 	$MAYBESET: 2,
 
-	constructor: function (x) {
+	constructor: function () {
 		this._statuses = {};
-		if (x instanceof MemberFunctionDefinition) {
-			var funcDef = x;
+
+		switch (arguments.length) {
+
+		case 2: // (funcDef : MemberFunctionDefinition, baseStatuses : LocalVariableStatuses)
+			var funcDef = arguments[0];
+			var base = arguments[1];
+			if (base != null)
+				this._copyFrom(base);
 			var args = funcDef.getArguments();
 			for (var i = 0; i < args.length; ++i)
 				this._statuses[args[i].getName().getValue()] = LocalVariableStatuses.ISSET;
 			var locals = funcDef.getLocals();
 			for (var i = 0; i < locals.length; ++i)
 				this._statuses[locals[i].getName().getValue()] = LocalVariableStatuses.UNSET;
-		} else if (x instanceof LocalVariableStatuses) {
-			for (var k in x._statuses)
-				this._statuses[k] = x._statuses[k];
+			break;
+
+		case 1: // (srcStatus : LocalVariableStatus)
+			this._copyFrom(arguments[0]);
+			break;
+
+		default:
+			throw new Error("logic flaw");
 		}
 	},
 
@@ -883,6 +898,11 @@ var LocalVariableStatuses = exports.LocalVariableStatuses = Class.extend({
 		if (this._statuses[name] === undefined)
 			throw new Error("logic flaw, could not find status for local variable: " + name);
 		return this._statuses[name];
+	},
+
+	_copyFrom: function (that) {
+		for (var k in that._statuses)
+			this._statuses[k] = that._statuses[k];
 	}
 
 });

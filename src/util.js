@@ -44,10 +44,10 @@ var Util = exports.Util = Class.extend({
 		});
 	},
 
-	$analyzeArgs: function (context, args) {
+	$analyzeArgs: function (context, args, parentExpr) {
 		var argTypes = [];
 		for (var i = 0; i < args.length; ++i) {
-			if (! args[i].analyze(context))
+			if (! args[i].analyze(context, parentExpr))
 				return null;
 			argTypes[i] = args[i].getType();
 		}

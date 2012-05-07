@@ -14,12 +14,12 @@ class Test {
 	static function _for() : void {
 	l:	for (var i = 0; i < 2; ++i) {
 			log i;
-			break l;
+			if (true) break l;
 		}
 	l2:	for (var i = 0; i < 2; ++i) {
 			for (var j = 3; j < 4; ++j) {
 				log j;
-				break l2;
+				if (true) break l2;
 			}
 		}
 	}
@@ -27,12 +27,12 @@ class Test {
 	static function _dowhile() : void {
 	l: 	do {
 			log "a";
-			break l;
+			if (true) break l;
 		} while (true);
 	l2:	do {
 			do {
 				log "b";
-				break l2;
+				if (true) break l2;
 			} while (true);
 		} while (true);
 	}

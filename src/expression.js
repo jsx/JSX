@@ -335,7 +335,7 @@ var ArrayLiteralExpression = exports.ArrayLiteralExpression = Expression.extend(
 		// analyze all elements
 		var succeeded = true;
 		for (var i = 0; i < this._exprs.length; ++i) {
-			if (! this._exprs[i].analyze(context, false)) {
+			if (! this._exprs[i].analyze(context, this)) {
 				succeeded = false;
 			} else if (this._exprs[i].getType().equals(Type.voidType)) {
 				 // FIXME the location of the error would be strange; we deseparately need expr.getToken()
@@ -430,7 +430,7 @@ var HashLiteralExpression = exports.HashLiteralExpression = Expression.extend({
 		// analyze all elements
 		var succeeded = true;
 		for (var i = 0; i < this._elements.length; ++i) {
-			if (! this._elements[i].getExpr().analyze(context, false)) {
+			if (! this._elements[i].getExpr().analyze(context, this)) {
 				succeeded = false;
 			} else if (this._elements[i].getExpr().getType().equals(Type.voidType)) {
 				 // FIXME the location of the error would be strange; we deseparately need expr.getToken()
@@ -947,6 +947,7 @@ var BinaryExpression = exports.BinaryExpression = OperatorExpression.extend({
 	getFirstExpr: function() {
 		return this._expr1;
 	},
+
 	getSecondExpr: function() {
 		return this._expr2;
 	},
@@ -1264,7 +1265,7 @@ var ConditionalExpression = exports.ConditionalExpression = OperatorExpression.e
 	},
 
 	analyze: function (context, parentExpr) {
-		if (! this._condExpr.analyze(context, false))
+		if (! this._condExpr.analyze(context, this))
 			return false;
 		var condExprType = this._condExpr.getType();
 		if (! condExprType.isConvertibleTo(Type.booleanType)) {
@@ -1273,13 +1274,13 @@ var ConditionalExpression = exports.ConditionalExpression = OperatorExpression.e
 		}
 		var typeIfTrue;
 		if (this._ifTrueExpr != null) {
-			if (! this._ifTrueExpr.analyze(context, false))
+			if (! this._ifTrueExpr.analyze(context, this))
 				return false;
 			typeIfTrue = this._ifTrueExpr.getType();
 		} else {
 			typeIfTrue = condExprType;
 		}
-		if (! this._ifFalseExpr.analyze(context, false))
+		if (! this._ifFalseExpr.analyze(context, this))
 			return false;
 		var typeIfFalse = this._ifFalseExpr.getType();
 		// FIXME how should we handle undefined?
@@ -1330,9 +1331,9 @@ var CallExpression = exports.CallExpression = OperatorExpression.extend({
 	},
 
 	analyze: function (context, parentExpr) {
-		if (! this._expr.analyze(context, false))
+		if (! this._expr.analyze(context, this))
 			return false;
-		var argTypes = Util.analyzeArgs(context, this._args);
+		var argTypes = Util.analyzeArgs(context, this._args, this);
 		if (argTypes == null)
 			return false;
 		var exprType = this._expr.getType();
@@ -1391,7 +1392,7 @@ var SuperExpression = exports.SuperExpression = OperatorExpression.extend({
 		}
 		var classDef = context.funcDef.getClassDef();
 		// analyze args
-		var argTypes = Util.analyzeArgs(context, this._args);
+		var argTypes = Util.analyzeArgs(context, this._args, this);
 		if (argTypes == null)
 			return false;
 		// lookup function
@@ -1503,8 +1504,8 @@ var CommaExpression = exports.CommaExpression = Expression.extend({
 	},
 
 	analyze: function (context, parentExpr) {
-		return this._expr1.analyze(context, false)
-			&& this._expr2.analyze(context, false);
+		return this._expr1.analyze(context, this)
+			&& this._expr2.analyze(context, this);
 	},
 
 	getType: function () {

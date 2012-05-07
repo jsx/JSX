@@ -6,7 +6,9 @@
 1
 3
 0
+default
 1
+default
 */
 
 class Test {
@@ -14,14 +16,14 @@ class Test {
 	static function _for() : void {
 	l:	for (var i = 0; i < 2; ++i) {
 			log i;
-			continue l;
+			if (true) continue l;
 			log "bad";
 		}
 	l2:	for (var i = 0; i < 2; ++i) {
 			for (var j = 3; j < 4; ++j) {
 				log i;
 				log j;
-				continue l2;
+				if (true) continue l2;
 				log "bad";
 			}
 		}
@@ -29,12 +31,12 @@ class Test {
 
 	static function _switch() : void {
 	l:	for (var i = 0; i < 2; ++i) {
+			log i;
 			switch (1) {
 			default:
-				log i;
-				continue l;
+				log "default";
+				if (true) continue l;
 			}
-			log "bad";
 		}
 	}
 
