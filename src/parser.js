@@ -972,11 +972,11 @@ var Parser = exports.Parser = Class.extend({
 		this._statements = [];
 		this._closures = [];
 		if (name.getValue() == "constructor")
-			this._initializeBlock();
+			var lastToken = this._initializeBlock();
 		else
-			this._block();
+			lastToken = this._block();
 		// done
-		return new MemberFunctionDefinition(token, name, flags, returnType, args, this._locals, this._statements, this._closures);
+		return new MemberFunctionDefinition(token, name, flags, returnType, args, this._locals, this._statements, this._closures, lastToken);
 	},
 
 	_typeDeclaration: function (allowVoid) {
@@ -1117,23 +1117,26 @@ var Parser = exports.Parser = Class.extend({
 	},
 
 	_initializeBlock: function () {
-		while (this._expectOpt("}") == null) {
+		var token;
+		while ((token = this._expectOpt("}")) == null) {
 			var state = this._preserveState();
 			if (! this._constructorInvocationStatement()) {
 				this._restoreState(state);
 				return this._block();
 			}
 		}
+		return token;
 	},
 
 	_block: function () {
-		while (this._expectOpt("}") == null) {
+		var token;
+		while ((token = this._expectOpt("}")) == null) {
 			if (! this._expectIsNotEOF())
 				return false;
 			if (! this._statement())
 				this._skipLine();
 		}
-		return true;
+		return token;
 	},
 
 	_statement: function () {
@@ -1159,7 +1162,7 @@ var Parser = exports.Parser = Class.extend({
 		if (token != null) {
 			switch (token.getValue()) {
 			case "{":
-				return this._block();
+				return this._block() != null;
 			case "var":
 				return this._variableStatement();
 			case ";":
@@ -1390,11 +1393,13 @@ var Parser = exports.Parser = Class.extend({
 	},
 
 	_returnStatement: function (token) {
-		var expr = this._expr(false);
-		if (expr == null)
-			return false;
-		if (this._expect(";") == null)
-			return null;
+		var expr = null;
+		if (this._expectOpt(";") == null) {
+			if ((expr = this._expr(false)) == null)
+				return false;
+			if (this._expect(";") == null)
+				return false;
+		}
 		this._statements.push(new ReturnStatement(token, expr));
 		return true;
 	},
@@ -1473,7 +1478,7 @@ var Parser = exports.Parser = Class.extend({
 		if (this._expect("{") == null)
 			return false;
 		var startIndex = this._statements.length;
-		if (! this._block())
+		if (this._block() == null)
 			return false;
 		var tryStatements = this._statements.splice(startIndex);
 		var catchIdentifier = null;
@@ -1484,7 +1489,7 @@ var Parser = exports.Parser = Class.extend({
 				|| this._expect(")") == null
 				|| this._expect("{") == null)
 				return false;
-			if (! this._block())
+			if (this._block() == null)
 				return false;
 			catchStatements = this._statements.splice(startIndex);
 		}
@@ -1852,11 +1857,12 @@ var Parser = exports.Parser = Class.extend({
 			return null;
 		// parse function block
 		var state = this._pushFunctionState();
-		if (! this._block()) {
+		var lastToken = this._block();
+		if (lastToken == null) {
 			this._restoreFunctionState(state);
 			return null;
 		}
-		var funcDef = new MemberFunctionDefinition(token, null, ClassDefinition.IS_STATIC, returnType, args, this._locals, this._statements, this._closures);
+		var funcDef = new MemberFunctionDefinition(token, null, ClassDefinition.IS_STATIC, returnType, args, this._locals, this._statements, this._closures, lastToken);
 		this._restoreFunctionState(state);
 		this._closures.push(funcDef);
 		return new FunctionExpression(token, funcDef);

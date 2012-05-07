@@ -10,8 +10,9 @@ var Statement = exports.Statement = Class.extend({
 
 	// returns whether or not to continue analysing the following statements
 	analyze: function (context) {
-		if (! Statement.assertIsReachable(context, this.getToken()))
-			return false;
+		if (! (this instanceof CaseStatement || this instanceof DefaultStatement))
+			if (! Statement.assertIsReachable(context, this.getToken()))
+				return false;
 		try {
 			return this.doAnalyze(context);
 		} catch (e) {
@@ -145,29 +146,53 @@ var ExpressionStatement = exports.ExpressionStatement = UnaryExpressionStatement
 
 });
 
-var ReturnStatement = exports.ReturnStatement = UnaryExpressionStatement.extend({
+var ReturnStatement = exports.ReturnStatement = Statement.extend({
 
 	constructor: function (token, expr) {
-		UnaryExpressionStatement.prototype.constructor.call(this, expr);
 		this._token = token;
+		this._expr = expr; // nullable
+	},
+
+	getToken: function () {
+		return this._token;
+	},
+
+	getExpr: function () {
+		return this._expr;
 	},
 
 	serialize: function () {
 		return [
 			"ReturnStatement",
-			this._expr.serialize()
+			Util.serializeNullable(this._expr)
 		];
 	},
 
 	doAnalyze: function (context) {
-		if (! this._expr.analyze(context, null))
-			return true;
-		var exprType = this._expr.getType();
-		if (exprType == null)
-			return true;
 		var returnType = context.funcDef.getReturnType();
-		if (! exprType.isConvertibleTo(returnType))
-			context.errors.push(new CompileError(this._token, "cannot convert '" + exprType.toString() + "' to return type '" + returnType.toString() + "'"));
+		if (returnType.equals(Type.voidType)) {
+			// handle return(void);
+			if (this._expr != null) {
+				context.errors.push(new CompileError(this._token, "cannot return a value from a void function"));
+				return true;
+			}
+		} else {
+			// handle return of values
+			if (this._expr == null) {
+				context.errors.push(new CompileError(this._token, "cannot return void, the function is declared to return a value of type '" + returnType.toString() + "'"));
+				return true;
+			}
+			if (! this._expr.analyze(context, null))
+				return true;
+			var exprType = this._expr != null ? this._expr.getType() : Type.voidType;
+			if (exprType == null)
+				return true;
+			if (! exprType.isConvertibleTo(returnType)) {
+				context.errors.push(new CompileError(this._token, "cannot convert '" + exprType.toString() + "' to return type '" + returnType.toString() + "'"));
+				return false;
+			}
+		}
+		context.getTopBlock().localVariableStatuses = null;
 		return true;
 	}
 
@@ -243,8 +268,7 @@ var JumpStatement = exports.JumpStatement = Statement.extend({
 			targetBlock.statement.registerVariableStatusesOnBreak(context.getTopBlock().localVariableStatuses);
 		else
 			targetBlock.statement.registerVariableStatusesOnContinue(context.getTopBlock().localVariableStatuses);
-		if (! (context.getTopBlock().statement instanceof SwitchStatement))
-			context.getTopBlock().localVariableStatuses = null;
+		context.getTopBlock().localVariableStatuses = null;
 		return true;
 	},
 

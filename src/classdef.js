@@ -635,13 +635,14 @@ var MemberVariableDefinition = exports.MemberVariableDefinition = MemberDefiniti
 
 var MemberFunctionDefinition = exports.MemberFunctionDefinition = MemberDefinition.extend({
 
-	constructor: function (token, name, flags, returnType, args, locals, statements, closures) {
+	constructor: function (token, name, flags, returnType, args, locals, statements, closures, lastTokenOfBody) {
 		MemberDefinition.call(this, token, name, flags);
 		this._returnType = returnType;
 		this._args = args;
 		this._locals = locals;
 		this._statements = statements;
 		this._closures = closures;
+		this._lastTokenOfBody = lastTokenOfBody;
 		this._parent = null;
 		this._classDef = null;
 		if (this._closures != null) {
@@ -690,6 +691,8 @@ var MemberFunctionDefinition = exports.MemberFunctionDefinition = MemberDefiniti
 		for (var i = 0; i < this._statements.length; ++i)
 			if (! this._statements[i].analyze(context))
 				break;
+		if (! this._returnType.equals(Type.Type.voidType) && context.getTopBlock().localVariableStatuses != null)
+			context.errors.push(new CompileError(this._lastTokenOfBody, "missing return statement"));
 
 		// check that from the constructor, all constructors with non-zero
 		// arguments are called, and that the calls are in the implemented order
