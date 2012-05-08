@@ -152,7 +152,6 @@ native class Element extends Node {
 	function removeAttributeNS(namespaceURI : string, localName : string) : string;
 	function getAttributeNodeNS(namespaceURI : string, localName : string) : string;
 	function setAttributeNS(newAttr : Attr) : Attr;
-	function removeAttributeNS(namespaceURI : string, localName : string) : string;
 	function getElementsByTagNameNS(namespaceURI : string, localName : string) : NodeList;
 
 	function hasAttribute(name : string) : boolean;

@@ -789,9 +789,21 @@ var Parser = exports.Parser = Class.extend({
 			if (member != null) {
 				for (var i = 0; i < members.length; ++i) {
 					if (member.name() == members[i].name()
-						&& (member instanceof MemberVariableDefinition || members[i] instanceof MemberVariableDefinition)) {
-						this._errors.push(new CompileError(member.getToken(), "a property with the same name already exists; only functions may be overloaded"));
-						success = false;
+						&& (member.flags() & ClassDefinition.IS_STATIC) == (members[i].flags() & ClassDefinition.IS_STATIC)) {
+						if (member instanceof MemberFunctionDefinition && members[i] instanceof MemberFunctionDefinition) {
+							if (Util.typesAreEqual(member.getArgumentTypes(), members[i].getArgumentTypes())) {
+								this._errors.push(new CompileError(
+									member.getToken(),
+									"a " + ((member.flags() & ClassDefinition.IS_STATIC) != 0 ? "static" : "member")
+									+ " function with same name and arguments is already defined"));
+								success = false;
+								break;
+							}
+						} else {
+							this._errors.push(new CompileError(member.getToken(), "a property with same name already exists; only functions may be overloaded"));
+							success = false;
+							break;
+						}
 					}
 				}
 				members.push(member);

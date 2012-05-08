@@ -51,8 +51,8 @@ native class CanvasRenderingContext2D implements CanvasRenderingContext
 	// text (see also CanvasText interface)
 	function fillText(text : string, x : number, y : number) : void;
 	function fillText(text : string, x : number, y : number, maxWidth : number) : void;
-	function fillText(text : string, x : number, y : number) : void;
-	function fillText(text : string, x : number, y : number, maxWidth : number) : void;
+	function strokeText(text : string, x : number, y : number) : void;
+	function strokeText(text : string, x : number, y : number, maxWidth : number) : void;
 	function measureText(text : string) : TextMetrics;
 
 	// drawing images
