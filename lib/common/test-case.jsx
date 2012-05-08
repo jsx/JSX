@@ -1,6 +1,6 @@
 import "timer.jsx";
 
-class TestMatcher {
+class _TestMatcher {
 
 	var _test : TestCase;
 	var _got  : variant;
@@ -143,13 +143,13 @@ class TestCase {
 
 	/* matcher factory */
 
-	function expect(value : variant) : TestMatcher {
+	function expect(value : variant) : _TestMatcher {
 		++this._count;
-		return new TestMatcher(this, value);
+		return new _TestMatcher(this, value);
 	}
-	function expect(value : variant, message : string) : TestMatcher {
+	function expect(value : variant, message : string) : _TestMatcher {
 		++this._count;
-		return new TestMatcher(this, value, message);
+		return new _TestMatcher(this, value, message);
 	}
 
 	function _ok(name : MayBeUndefined.<string>) : void {
