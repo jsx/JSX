@@ -112,7 +112,11 @@ var Compiler = exports.Compiler = Class.extend({
 	},
 
 	getAST: function() {
-		return ClassDefinition.serialize(this._classDefs);
+		var classDefs = [];
+		for (var i = 0; i < this._parsers.length; ++i) {
+			classDefs = classDefs.concat(this._parsers[i].getClassDefs());
+		}
+		return ClassDefinition.serialize(classDefs);
 	},
 
 	getFileContent: function (errors, sourceToken, path) {
