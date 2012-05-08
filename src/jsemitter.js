@@ -820,7 +820,70 @@ var _AsNoCheckExpressionEmitter = exports._AsNoCheckExpressionEmitter = _Express
 	},
 
 	emit: function (outerOpPrecedence) {
-		return this._emitter._getExpressionEmitterFor(this._expr.getExpr()).emit(outerOpPrecedence);
+		if (this._emitter._enableRunTimeTypeCheck) {
+			var destType = this._expr.getType();
+			if (destType instanceof VariantType) {
+				this._emitter._getExpressionEmitterFor(this._expr.getExpr()).emit(outerOpPrecedence);
+				return;
+			}
+			var emitWithAssertion = function (emitCheckExpr, message) {
+				var token = this._expr.getToken();
+				this._emitter._emit("function (v) {\n", token);
+				this._emitter._advanceIndent();
+				this._emitter._emitAssertion(emitCheckExpr, token, message);
+				this._emitter._emit("return v;\n", token);
+				this._emitter._reduceIndent();
+				this._emitter._emit("}(", token);
+				this._emitter._getExpressionEmitterFor(this._expr.getExpr()).emit(0);
+				this._emitter._emit(")", token);
+			}.bind(this);
+			if (destType.equals(Type.booleanType)) {
+				emitWithAssertion(function () {
+					this._emitter._emit("typeof v === \"boolean\"", this._expr.getToken());
+				}.bind(this), "detected invalid cast, value is not a boolean");
+				return;
+			}
+			if (destType.equals(Type.integerType) || destType.equals(Type.numberType)) {
+				emitWithAssertion(function () {
+					this._emitter._emit("typeof v === \"number\"", this._expr.getToken());
+				}.bind(this), "detected invalid cast, value is not a number");
+				return;
+			}
+			if (destType.equals(Type.stringType)) {
+				emitWithAssertion(function () {
+					this._emitter._emit("typeof v === \"string\"", this._expr.getToken());
+				}.bind(this), "detected invalid cast, value is not a string");
+				return;
+			}
+			if (destType instanceof FunctionType) {
+				emitWithAssertion(function () {
+					this._emitter._emit("v === null || typeof v === \"function\"", this._expr.getToken());
+				}.bind(this), "detected invalid cast, value is not a function or null");
+				return;
+			}
+			if (destType instanceof ObjectType) {
+				var destClassDef = destType.getClassDef();
+				if (destClassDef instanceof InstantiatedClassDefinition && destClassDef.getTemplateClassName() == "Array") {
+					emitWithAssertion(function () {
+						this._emitter._emit("v === null || v instanceof Array", this._expr.getToken());
+					}.bind(this), "detected invalid cast, value is not an Array or null");
+					return;
+				}
+				if (destClassDef instanceof InstantiatedClassDefinition && destClassDef.getTemplateClassName() == "Hash") {
+					emitWithAssertion(function () {
+						this._emitter._emit("v === null || typeof v === \"object\"", this._expr.getToken());
+					}.bind(this), "detected invalid cast, value is not a Hash or null");
+					return;
+				}
+				emitWithAssertion(function () {
+					this._emitter._emit("v === null || v instanceof " + destClassDef.getOutputClassName(), this._expr.getToken());
+				}.bind(this), "detected invalid cast, value is not an instance of the designated type or null");
+				return;
+			}
+		} else {
+			this._emitter._getExpressionEmitterFor(this._expr.getExpr()).emit(outerOpPrecedence);
+			return;
+		}
 	}
 
 });
