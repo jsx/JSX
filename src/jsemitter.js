@@ -1855,9 +1855,9 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 			}
 			return "L" + type.getClassDef().getOutputClassName() + "$";
 		} else if (type instanceof StaticFunctionType)
-			return "F" + this._mangleFunctionArguments(type.getArgumentTypes()) + "$";
+			return "F" + this._mangleFunctionArguments(type.getArgumentTypes()) + this._mangleTypeName(type.getReturnType()) + "$";
 		else if (type instanceof MemberFunctionType)
-			return "M" + this._mangleTypeName(type.getObjectType()) + this._mangleFunctionArguments(type.getArgumentTypes()) + "$";
+			return "M" + this._mangleTypeName(type.getObjectType()) + this._mangleFunctionArguments(type.getArgumentTypes()) + this._mangleTypeName(type.getReturnType()) + "$";
 		else if (type instanceof MayBeUndefinedType)
 			return "U" + this._mangleTypeName(type.getBaseType());
 		else if (type.equals(Type.variantType))
