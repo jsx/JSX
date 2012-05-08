@@ -1538,7 +1538,11 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 			// emit local variable declarations
 			var locals = funcDef.getLocals();
 			for (var i = 0; i < locals.length; ++i) {
-				this._emit(_Util.buildAnnotation("/** @type {%1} */\n", locals[i].getType()), null);
+				// FIXME unused variables should never be emitted by the compiler
+				var type = locals[i].getType();
+				if (type == null)
+					continue;
+				this._emit(_Util.buildAnnotation("/** @type {%1} */\n", type), null);
 				var name = locals[i].getName();
 				this._emit("var " + name.getValue() + ";\n", name);
 			}
