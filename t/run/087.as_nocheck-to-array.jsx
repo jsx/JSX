@@ -8,7 +8,7 @@ class Test {
 		return [ 1, 2, 3 ];
 	}
 	static function ng() : variant {
-		return {} : Hash.<string>;
+		return {} : Map.<string>;
 	}
 	static function say(a : number[]) : void {
 		log a.join(",");

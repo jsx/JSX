@@ -17,10 +17,10 @@ class _Private {
 class Test {
 	static function run() : void {
 		var doit = (function () : function (: string) : void {
-			var jsx = js.global["JSX"] as Hash.<variant>;
-			var require = jsx["require"] as function (: string) : Hash.<variant>;
+			var jsx = js.global["JSX"] as Map.<variant>;
+			var require = jsx["require"] as function (: string) : Map.<variant>;
 			return function (path : string) : void {
-				var klass = require(path)["_Private"] as Hash.<variant>;
+				var klass = require(path)["_Private"] as Map.<variant>;
 				var say = klass["say$"] as function () : void;
 				say();
 			};

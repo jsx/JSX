@@ -10,7 +10,7 @@ class Test {
 		};
 	}
 	static function ng() : variant {
-		return {} : Hash.<string>;
+		return {} : Map.<string>;
 	}
 	static function say(f : function () : void) : void {
 		f();

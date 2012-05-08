@@ -31,7 +31,7 @@ class Test {
 			x: new String("a"),
 			y: new String("b"),
 			z: null
-		} : Hash.<String>;
+		} : Map.<String>;
 		log c["x"].toString();
 		log c["y"].toString();
 		log c["z"] == null;

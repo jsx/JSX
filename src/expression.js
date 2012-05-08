@@ -368,7 +368,7 @@ var ArrayLiteralExpression = exports.ArrayLiteralExpression = Expression.extend(
 
 });
 
-var HashLiteralElement = exports.HashLiteralElement = Class.extend({
+var MapLiteralElement = exports.MapLiteralElement = Class.extend({
 
 	constructor: function (key, expr) {
 		this._key = key;
@@ -385,7 +385,7 @@ var HashLiteralElement = exports.HashLiteralElement = Class.extend({
 
 });
 
-var HashLiteralExpression = exports.HashLiteralExpression = Expression.extend({
+var MapLiteralExpression = exports.MapLiteralExpression = Expression.extend({
 
 	constructor: function (token, elements, type) {
 		Expression.prototype.constructor.call(this, token);
@@ -403,7 +403,7 @@ var HashLiteralExpression = exports.HashLiteralExpression = Expression.extend({
 
 	serialize: function () {
 		return [
-			"HashLiteralExpression",
+			"MapLiteralExpression",
 			this._token.serialize(),
 			Util.serializeArray(this._elements),
 			Util.serializeNullable(this._type)
@@ -427,7 +427,7 @@ var HashLiteralExpression = exports.HashLiteralExpression = Expression.extend({
 		// determine the type from the array members if the type was not specified
 		if (this._type != null) {
 			var classDef = this._type.getClassDef();
-			if (! (classDef instanceof InstantiatedClassDefinition && classDef.getTemplateClassName() == "Hash")) {
+			if (! (classDef instanceof InstantiatedClassDefinition && classDef.getTemplateClassName() == "Map")) {
 				context.errors.push(new CompileError(this._token, "specified type is not a hash type"));
 				return false;
 			}
@@ -437,7 +437,7 @@ var HashLiteralExpression = exports.HashLiteralExpression = Expression.extend({
 				if (! elementType.equals(Type.nullType)) {
 					if (elementType.equals(Type.integerType))
 						elementType = Type.numberType;
-					var instantiatedClass = context.instantiateTemplate(context.errors, new TemplateInstantiationRequest(this._token, "Hash", [ elementType ]));
+					var instantiatedClass = context.instantiateTemplate(context.errors, new TemplateInstantiationRequest(this._token, "Map", [ elementType ]));
 					if (instantiatedClass == null)
 						return false;
 					this._type = new ObjectType(instantiatedClass);
@@ -1012,7 +1012,7 @@ var ArrayExpression = exports.ArrayExpression = BinaryExpression.extend({
 				return false;
 			}
 			this._type = expr1ClassDef.getTypeArguments()[0].toMayBeUndefinedType();
-		} else if (expr1ClassDef instanceof InstantiatedClassDefinition && expr1ClassDef.getTemplateClassName() == "Hash") {
+		} else if (expr1ClassDef instanceof InstantiatedClassDefinition && expr1ClassDef.getTemplateClassName() == "Map") {
 			if (! this._expr2.getType().isConvertibleTo(Type.stringType)) {
 				context.errors.push(new CompileError(this._token, "hash key should be a string"));
 				return false;

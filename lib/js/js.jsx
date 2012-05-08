@@ -2,9 +2,9 @@
  * Usage:
  * 
  * import "js.jsx";
- * var window = js.global["window"] as __nocheck__ Hash.<variant>;
+ * var window = js.global["window"] as __nocheck__ Map.<variant>;
  */
 
 final class js {
-	static var global : Hash.<variant>;
+	static var global : Map.<variant>;
 }

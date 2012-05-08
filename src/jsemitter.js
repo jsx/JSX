@@ -24,7 +24,7 @@ var _Util = exports._Util = Class.extend({
 			var classDef = type.getClassDef();
 			if (classDef instanceof InstantiatedClassDefinition && classDef.getTemplateClassName() == "Array") {
 				return "Array.<undefined|" + this.toClosureType(classDef.getTypeArguments()[0]) + ">";
-			} else if (classDef instanceof InstantiatedClassDefinition && classDef.getTemplateClassName() == "Hash") {
+			} else if (classDef instanceof InstantiatedClassDefinition && classDef.getTemplateClassName() == "Map") {
 				return "Object.<undefined|" + this.toClosureType(classDef.getTypeArguments()[0]) + ">";
 			} else {
 				return classDef.getOutputClassName();
@@ -36,7 +36,7 @@ var _Util = exports._Util = Class.extend({
 	$getInstanceofNameFromClassDef: function (classDef) {
 		if (classDef instanceof InstantiatedClassDefinition) {
 			var name = classDef.getTemplateClassName();
-			if (name == "Hash")
+			if (name == "Map")
 				name = "Object";
 		} else {
 			name = classDef.getOutputClassName();
@@ -531,7 +531,7 @@ var _ArrayLiteralExpressionEmitter = exports._ArrayLiteralExpressionEmitter = _E
 
 });
 
-var _HashLiteralExpressionEmitter = exports._HashLiteralExpressionEmitter = _ExpressionEmitter.extend({
+var _MapLiteralExpressionEmitter = exports._MapLiteralExpressionEmitter = _ExpressionEmitter.extend({
 
 	constructor: function (emitter, expr) {
 		_ExpressionEmitter.prototype.constructor.call(this, emitter);
@@ -864,10 +864,10 @@ var _AsNoCheckExpressionEmitter = exports._AsNoCheckExpressionEmitter = _Express
 						this._emitter._emit("v === null || v instanceof Array", this._expr.getToken());
 					}.bind(this), "detected invalid cast, value is not an Array or null");
 					return;
-				} else if (destClassDef instanceof InstantiatedClassDefinition && destClassDef.getTemplateClassName() == "Hash") {
+				} else if (destClassDef instanceof InstantiatedClassDefinition && destClassDef.getTemplateClassName() == "Map") {
 					emitWithAssertion(function () {
 						this._emitter._emit("v === null || typeof v === \"object\"", this._expr.getToken());
-					}.bind(this), "detected invalid cast, value is not a Hash or null");
+					}.bind(this), "detected invalid cast, value is not a Map or null");
 					return;
 				} else {
 					emitWithAssertion(function () {
@@ -1757,8 +1757,8 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 			return new _RegExpLiteralExpressionEmitter(this, expr);
 		else if (expr instanceof ArrayLiteralExpression)
 			return new _ArrayLiteralExpressionEmitter(this, expr);
-		else if (expr instanceof HashLiteralExpression)
-			return new _HashLiteralExpressionEmitter(this, expr);
+		else if (expr instanceof MapLiteralExpression)
+			return new _MapLiteralExpressionEmitter(this, expr);
 		else if (expr instanceof ThisExpression)
 			return new _ThisExpressionEmitter(this, expr);
 		else if (expr instanceof BitwiseNotExpression)
@@ -1843,7 +1843,7 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 				switch (classDef.getTemplateClassName()) {
 				case "Array":
 					return "A" + this._mangleTypeName(typeArgs[0]);
-				case "Hash":
+				case "Map":
 					return "H" + this._mangleTypeName(typeArgs[0]);
 				default:
 					throw new Error("unexpected template type: " + classDef.getTemplateClassName());

@@ -56,7 +56,7 @@ var _Lexer = exports._TokenTable = Class.extend({
 		return pattern.replace(/([^0-9A-Za-z_])/g, '\\$1');
 	},
 
-	$asHash: function (array) {
+	$asMap: function (array) {
 		var hash = {};
 		for (var i = 0; i < array.length; ++i)
 			hash[array[i]] = 1;
@@ -108,7 +108,7 @@ var _Lexer = exports._TokenTable = Class.extend({
 		this.rxNewline        = /(?:\r\n?|\n)/;
 
 		// blacklists of identifiers
-		this.keywords = this.asHash([
+		this.keywords = this.asMap([
 			// literals shared with ECMA 262
 			"null",     "true",     "false",
 			"NaN",      "Infinity",
@@ -128,7 +128,7 @@ var _Lexer = exports._TokenTable = Class.extend({
 			"__FILE__",  "__LINE__",
 			"undefined"
 		]);
-		this.reserved = this.asHash([
+		this.reserved = this.asMap([
 			// literals of ECMA 262 but not used by JSX
 			"debugger", "with",
 			// future reserved words of ECMA 262
@@ -1948,7 +1948,7 @@ var Parser = exports.Parser = Class.extend({
 				var expr = this._assignExpr();
 				if (expr == null)
 					return null;
-				elements.push(new HashLiteralElement(keyToken, expr));
+				elements.push(new MapLiteralElement(keyToken, expr));
 				// separator
 				if ((token = this._expect([ ",", "}" ])) == null)
 					return null;
@@ -1958,7 +1958,7 @@ var Parser = exports.Parser = Class.extend({
 		if (this._expectOpt(":") != null)
 			if ((type = this._typeDeclaration(false)) == null)
 				return null;
-		return new HashLiteralExpression(token, elements, type);
+		return new MapLiteralExpression(token, elements, type);
 	},
 
 	_functionArgumentsExpr: function () {
@@ -2000,7 +2000,7 @@ var Parser = exports.Parser = Class.extend({
 	},
 
 	$_isReservedClassName: function (name) {
-		return name.match(/^(Array|Boolean|Date|Hash|Number|Object|RegExp|String|JSX)$/) != null;
+		return name.match(/^(Array|Boolean|Date|Map|Number|Object|RegExp|String|JSX)$/) != null;
 	}
 
 });

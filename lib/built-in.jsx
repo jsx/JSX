@@ -5,7 +5,7 @@ native class Object {
 }
 
 // 15.2
-native final class Hash.<T> {
+native final class Map.<T> {
 
 	// 15.2.4
 	function hasOwnProperty(key : string) : boolean;
