@@ -344,7 +344,20 @@ var _AssertStatementEmitter = exports._AssertStatementEmitter = _StatementEmitte
 	},
 
 	emit: function () {
-		throw new Error("FIXME _AssertStatementEmitter.emit");
+		// FIXME omit assertions when a specific optimization flag is enabled
+		var condExpr = this._statement._expr;
+
+		this._emitter._emit("if (! (", this._statement.getToken());
+		this._emitter._getExpressionEmitterFor(condExpr).emit(0);
+		this._emitter._emit(")) {\n", null);
+		this._emitter._advanceIndent();
+		this._emitter._emit("debugger;\n", null);
+		// FIXME make the expression source and throw a fit exception class
+		var err = Util.format('throw new Error("[%1:%2] Assertion failed");\n',
+							  [condExpr.getToken().getFilename(), condExpr.getToken().getLineNumber()]);
+		this._emitter._emit(err, null);
+		this._emitter._reduceIndent();
+		this._emitter._emit("}\n", null);
 	}
 
 });
