@@ -6,7 +6,7 @@ import "js/dom.jsx";
 
 native class CanvasRenderingContext2D implements CanvasRenderingContext
 	/* implements CanvasTransformation, CanvasLineStyles, CanvasPathMethods, CanvasText */ {
-	
+
 	// back-reference to the canvas
 	const canvas : HTMLCanvasElement;
 
@@ -104,8 +104,9 @@ native class CanvasRenderingContext2D implements CanvasRenderingContext
 	function quadraticCurveTo(cpx : number, cpy : number, x : number, y : number) : void;
 	function bezierCurveTo(cp1x : number, cp1y : number, dp2x : number, cp2y : number, x : number, y : number) : void;
 	function arcTo(x1 : number, y1 : number, x2 : number, y2 : number, radius : number) : void;
-	function rect(x : number, y : number, radius : number, startAngle : number, endAngle : number, anticlockwise : boolean) : void;
-	function rect(x : number, y : number, radius : number, startAngle : number, endAngle : number) : void;
+	function rect(x : number, y : number, w : number, h : number);
+	function arc(x : number, y : number, radius : number, startAngle : number, endAngle : number, anticlockwise : boolean) : void;
+	function arc(x : number, y : number, radius : number, startAngle : number, endAngle : number) : void;
 }
 
 native class TextMetrics {
