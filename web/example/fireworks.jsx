@@ -44,10 +44,8 @@ class Spark {
 
 		// returns true if this spark lives
 		if(this.size <= 0.1) return false;
-		if(this.posX <= 0) return false;
-		if(this.posY <= 0) return false;
-		if(this.posX >= view.width) return false;
-		if(this.posY >= view.height) return false;
+		if(this.posX <= 0 || this.posY <= 0) return false;
+		if(this.posX >= view.width || this.posY >= view.height) return false;
 		return true;
 	}
 }
@@ -132,7 +130,7 @@ class FireworkView {
 			var fw = this.fireworks[i];
 
 			if(fw.update()) {
-				this.numSparks = fw.sparks.length;
+				this.numSparks += fw.sparks.length;
 			}
 			else {
 				this.fireworks.splice(i, 1);
@@ -149,25 +147,22 @@ class FPSWatcher {
 	var start = Date.now();
 	var fps = 0;
 
-	function constructor() {
-	}
-
 	function update(numSparks : int) : void {
 		++this.fps;
 
 		if((Date.now() - this.start) >= 1000) {
 			var message = "FPS: " + this.fps as string +
 				" (sparks: " + numSparks as string + ")";
-				dom.id("fps").innerHTML = message;
-				if(numSparks > 0) log message;
+			dom.id("fps").innerHTML = message;
+			if(numSparks > 0) log message;
 
-				this.start = 0;
-				this.fps = 0;
+			this.start = Date.now();
+			this.fps = 0;
 		}
 	}
 }
 
-class WebApplication {
+class Application {
 	static function main() : void {
 		var canvas = dom.id("night-sky") as HTMLCanvasElement;
 
@@ -177,7 +172,7 @@ class WebApplication {
 		dom.getWindow().setInterval( function() : void {
 			view.update();
 			watcher.update(view.numSparks);
-		}, 1000 / 60);
+		}, 0);
 	}
 }
 
