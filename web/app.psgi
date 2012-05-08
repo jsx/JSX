@@ -21,7 +21,8 @@ my $app = sub {
         $env->{PATH_INFO}   = 'web/index.html';
     }
 
-    if($env->{PATH_INFO} =~ /index\.html$/) {
+    if($env->{PATH_INFO} =~ /\.html$/) {
+        say "build web";
         system($^X, "$root/build.pl") == 0
             or die "Cannot build index.html";
     }

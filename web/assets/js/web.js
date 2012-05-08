@@ -41,37 +41,6 @@ window.addEventListener('load', function(e) {
 		return xhr.responseText;
 	}
 
-	var errors = [];
-	var BrowserPlatform = jsx.Platform.extend({
-		load: function (name) {
-			var src = element(name);
-			if(src != null) {
-				return src.value;
-			}
-
-			// synchronous XHR
-			var xhr = new XMLHttpRequest();
-			xhr.open("GET", name, false);
-			xhr.send(null);
-
-			if(xhr.status === 200) {
-				return xhr.responseText;
-			}
-			else {
-				throw new Error(xhr.status + " " + xhr.statusText);
-			}
-		},
-
-		getRoot: function () {
-			return "";
-		},
-
-		error: function (s) {
-			console.error(s);
-			errors.push(s);
-		}
-	});
-	var platform = new BrowserPlatform();
 
 	var list   = element('source-list');
 
@@ -115,6 +84,9 @@ window.addEventListener('load', function(e) {
 		console.log('compile with ' + JSON.stringify(options));
 
 		output.value = '';
+
+		var platform = new BrowserPlatform("");
+		platform.setContent("input", element("input").value);
 
 		var c = new jsx.Compiler(platform);
 		var emitter = new jsx.JavaScriptEmitter(platform);
@@ -164,10 +136,9 @@ window.addEventListener('load', function(e) {
 				f();
 			}
 		}
-		else if(errors.length !== 0){
+		else if(platform.getErrors().length !== 0){
 			output.style.color = "red";
-			output.value = "ERROR!\n" + errors.join("");
-			errors.length = 0;
+			output.value = "ERROR!\n" + platform.getErrors().join("");
 		}
 	}
 
