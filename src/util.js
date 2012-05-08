@@ -63,6 +63,21 @@ var Util = exports.Util = Class.extend({
 		return true;
 	},
 
+	$encodeStringLiteral: function (str) {
+		var escaped = str.replace(/[\0- '"\\\u007f-\uffff]/g, function (ch) {
+			if (ch == "\0") {
+				return "\\0";
+			} else if (ch == "'" || ch == "\"" || ch == "\\") {
+				return "\\" + ch;
+			} else {
+				var t = "000" + ch.charCodeAt(0).toString(16);
+				t = t.substring(t.length - 4);
+				return "\\u" + t;
+			}
+		});
+		return "\"" + escaped + "\"";
+	},
+
 	$decodeStringLiteral: function (literal) {
 		var matched = literal.match(/^([\'\"]).*([\'\"])$/);
 		if (matched == null || matched[1] != matched[2])

@@ -25,6 +25,15 @@ function main() {
 		t.expect( Util.repeat("z", 0) ).toBe("");
 	});
 
+	test.describe('Util.encodeStringLiteral', function (t) {
+		t.expect(Util.encodeStringLiteral("")).toBe('""');
+		t.expect(Util.encodeStringLiteral("abc")).toBe('"abc"');
+		t.expect(Util.encodeStringLiteral('"')).toBe('"\\""');
+		t.expect(Util.encodeStringLiteral('\0')).toBe('"\\0"');
+		t.expect(Util.encodeStringLiteral('\\')).toBe('"\\\\"');
+		t.expect(Util.encodeStringLiteral('\u0345')).toBe('"\\u0345"');
+	});
+
 	test.describe('Util.decodeStringLiteral', function (t) {
 		t.expect(Util.decodeStringLiteral("''")).toBe("");
 		t.expect(Util.decodeStringLiteral('""')).toBe("");
