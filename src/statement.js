@@ -884,46 +884,40 @@ var TryStatement = exports.TryStatement = Statement.extend({
 
 var InformationStatement = exports.InformationStatement = Statement.extend({
 
-	constructor: function (token, exprs) {
+	constructor: function (token) {
 		this._token = token;
-		this._exprs = exprs;
 	},
 
 	getToken: function () {
 		return this._token;
 	},
 
-	getExprs: function () {
-		return this._exprs;
-	},
-
-	_analyzeExprs: function (context) {
-		for (var i = 0; i < this._exprs.length; ++i)
-			if (! this._exprs[i].analyze(context, null))
-				return false;
-		return true;
-	}
-
 });
 
 var AssertStatement = exports.AssertStatement = InformationStatement.extend({
 
 	constructor: function (token, expr) {
-		InformationStatement.prototype.constructor.call(this, token, [expr]);
+		InformationStatement.prototype.constructor.call(this, token);
+		this._expr = expr;
+	},
+
+	getExpr: function () {
+		return this._expr;
 	},
 
 	serialize: function () {
 		return [
 			"AssertStatement",
-			Util.serializeArray(this._exprs)
+			this._token.serialize(),
+			Util.serializeArray(this._expr)
 		];
 	},
 
 	doAnalyze: function (context) {
-		if (! this._analyzeExprs(context))
-			return true;
-		var exprType = this._exprs[0].getType();
-		if (!exprType.equals(Type.booleanType))
+		if (! this._expr.analyze(context, null))
+			return false;
+		var exprType = this._expr.getType();
+		if (! exprType.equals(Type.booleanType))
 			context.errors.push(new CompileError(this._exprs[0].getToken(), "cannot assert type " + exprType.serialize()));
 		return true;
 	}
@@ -933,20 +927,26 @@ var AssertStatement = exports.AssertStatement = InformationStatement.extend({
 var LogStatement = exports.LogStatement = InformationStatement.extend({
 
 	constructor: function (token, exprs) {
-		InformationStatement.prototype.constructor.call(this, token, exprs);
+		InformationStatement.prototype.constructor.call(this, token);
+		this._exprs = exprs;
+	},
+
+	getExprs: function () {
+		return this._exprs;
 	},
 
 	serialize: function () {
 		return [
 			"LogStatement",
+			this._token.serialize(),
 			Util.serializeArray(this._exprs)
 		];
 	},
 
 	doAnalyze: function (context) {
-		if (! this._analyzeExprs(context))
-			return;
 		for (var i = 0; i < this._exprs.length; ++i) {
+			if (! this._exprs[i].analyze(context, null))
+				return false;
 			var exprType = this._exprs[i].getType();
 			if (exprType == null)
 				return true;

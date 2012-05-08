@@ -345,9 +345,9 @@ var _AssertStatementEmitter = exports._AssertStatementEmitter = _StatementEmitte
 
 	emit: function () {
 		// FIXME omit assertions when a specific optimization flag is enabled
-		var condExpr = this._statement._exprs[0];
+		var condExpr = this._statement._expr;
 
-		this._emitter._emit("if (!(", this._statement.getToken());
+		this._emitter._emit("if (! (", this._statement.getToken());
 		this._emitter._getExpressionEmitterFor(condExpr).emit(0);
 		this._emitter._emit(")) {\n", null);
 		this._emitter._advanceIndent();
