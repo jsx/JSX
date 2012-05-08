@@ -1,15 +1,16 @@
-import "dom.jsx";
+import "js/dom.jsx";
+import "js/dom/canvas2d.jsx";
 
 class Config {
-	static const var quantity = 360;
-	static const var size     = 2.0;
-	static const var decay    = 0.98;
-	static const var speed    = 6.0;
+	static const quantity = 360;
+	static const size     = 2.0;
+	static const decay    = 0.98;
+	static const speed    = 6.0;
 }
 
 
 class Spark {
-	static const var rad = Math.PI * 2;
+	static const rad = Math.PI * 2;
 
 	var posX : number;
 	var posY : number;
