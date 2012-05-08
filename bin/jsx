@@ -96,6 +96,7 @@ var JSX = Class.extend({
 			"Usage: jsx [options] source-files\n" +
 			"\n" +
 			"Options:\n" +
+			"  --add-search-path path     add a path to library search paths" +
 			"  --executable               compiles as an CLI executable, calling _Main.main(:string[]):void\n" +
 			"  --run                      runs _Main.main(:string[]):void after compiling\n" +
 			"  --test                     runs _Test#test*():void after compiling\n" +
@@ -145,6 +146,11 @@ var JSX = Class.extend({
 		var opt, optarg;
 		while ((opt = getopt()) != null) {
 			switch (opt) {
+			case "--add-search-path":
+				if((optarg= getoptarg()) == null)
+					process.exit(1);
+				compiler.addSearchPath(optarg);
+				break;
 			case "--output":
 				if((outputFile = getoptarg()) == null)
 					process.exit(1);

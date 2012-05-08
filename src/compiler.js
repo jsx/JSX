@@ -24,6 +24,10 @@ var Compiler = exports.Compiler = Class.extend({
 		this._builtinParsers = this._parsers.concat([]); // shallow clone
 	},
 
+	addSearchPath: function(path) {
+		this._searchPaths.unshift(path);
+	},
+
 	getPlatform: function () {
 		return this._platform;
 	},
