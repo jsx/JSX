@@ -40,7 +40,7 @@ native class DOMImplementation {
 
 }
 
-native class Node {
+native class Node extends EventTarget {
 	static const ELEMENT_NODE : int;
 	static const ATTRIBUTE_NODE : int;
 	static const TEXT_NODE : int;
@@ -431,6 +431,9 @@ native class HTMLCanvasElement extends HTMLElement {
 	function toBlob(callback : function(data :string):void, type : string) :void;
 
 	function getContext(contextId : string) : MayBeUndefined.<CanvasRenderingContext>;
+
+	function addEventListener(type : string, listener : function(:MouseEvent):void) : void;
+	function addEventListener(type : string, listener : function(:TouchEvent):void) : void;
 }
 
 // TODO a lot of HTML element classes!
