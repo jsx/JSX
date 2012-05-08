@@ -908,8 +908,8 @@ var InformationStatement = exports.InformationStatement = Statement.extend({
 
 var AssertStatement = exports.AssertStatement = InformationStatement.extend({
 
-	constructor: function (token, exprs) {
-		InformationStatement.prototype.constructor.call(this, token, exprs);
+	constructor: function (token, expr) {
+		InformationStatement.prototype.constructor.call(this, token, [expr]);
 	},
 
 	serialize: function () {
@@ -922,11 +922,9 @@ var AssertStatement = exports.AssertStatement = InformationStatement.extend({
 	doAnalyze: function (context) {
 		if (! this._analyzeExprs(context))
 			return true;
-		var exprType = this._exprs[this._exprs.length - 1].getType();
-		if (exprType.equals(Type.voidType))
-			context.errors.push(new CompileError(this._token, "cannot assert type void"));
-		else if (exprType.equals(Type.nullType))
-			context.errors.push(new CompileError(this._token, "assertion never succeeds"));
+		var exprType = this._exprs[0].getType();
+		if (!exprType.equals(Type.booleanType))
+			context.errors.push(new CompileError(this._exprs[0].getToken(), "cannot assert type " + exprType.serialize()));
 		return true;
 	}
 
