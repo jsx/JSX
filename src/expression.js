@@ -549,6 +549,10 @@ var UnaryExpression = exports.UnaryExpression = OperatorExpression.extend({
 	_analyze: function (context) {
 		if (! this._expr.analyze(context, this))
 			return false;
+		var exprType = this._expr.getType();
+		if (exprType == null) {
+			return false;
+		}
 		if (this._expr.getType().equals(Type.voidType)) {
 			context.errors.push(new CompileError(this._token, "cannot apply operator '" + this._token.getValue() + "' against void"));
 			return false;
