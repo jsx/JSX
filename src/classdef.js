@@ -67,6 +67,8 @@ var ClassDefinition = exports.ClassDefinition = Class.extend({
 		this._implementClassDefs = [];
 		this._members = members;
 		this._objectTypesUsed = objectTypesUsed;
+		for (var i = 0; i < this._members.length; ++i)
+			this._members[i].setClassDef(this);
 	},
 
 	serialize: function () {
@@ -227,7 +229,6 @@ var ClassDefinition = exports.ClassDefinition = Class.extend({
 		// prepare
 		for (var i = 0; i < this._members.length; ++i) {
 			var member = this._members[i];
-			member.setClassDef(this);
 			if (member instanceof MemberVariableDefinition)
 				member.setAnalysisContext(context);
 		}
