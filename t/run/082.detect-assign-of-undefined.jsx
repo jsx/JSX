@@ -1,6 +1,6 @@
 /*EXPECTED
 undefined
-detected assignment of 'undefined' to type 'MayBeUndefined.<number>'
+detected assignment of 'undefined' to type 'number'
 */
 
 class Test {

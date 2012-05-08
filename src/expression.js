@@ -1320,7 +1320,7 @@ var CallExpression = exports.CallExpression = OperatorExpression.extend({
 		var argTypes = Util.analyzeArgs(context, this._args, this);
 		if (argTypes == null)
 			return false;
-		var exprType = this._expr.getType();
+		var exprType = this._expr.getType().resolveIfMayBeUndefined();
 		if (! (exprType instanceof FunctionType)) {
 			context.errors.push(new CompileError(this._token, "cannot call a non-function"));
 			return false;

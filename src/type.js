@@ -548,7 +548,7 @@ var StaticFunctionType = exports.StaticFunctionType = ResolvedFunctionType.exten
 	},
 
 	_toStringPrefix: function () {
-		return "static ";
+		return "";
 	}
 
 });

@@ -1189,8 +1189,12 @@ var _CallExpressionEmitter = exports._CallExpressionEmitter = _OperatorExpressio
 	},
 
 	_emit: function () {
-		this._emitter._getExpressionEmitterFor(this._expr.getExpr()).emit(_CallExpressionEmitter._operatorPrecedence);
-		this._emitter._emitCallArguments(this._expr.getToken(), "(", this._expr.getArguments(), this._expr.getExpr().getType().getArgumentTypes());
+		var calleeExpr = this._expr.getExpr();
+		if (this._emitter._enableRunTimeTypeCheck && calleeExpr.getType() instanceof MayBeUndefinedType)
+			this._emitter._emitExpressionWithUndefinedAssertion(calleeExpr);
+		else
+			this._emitter._getExpressionEmitterFor(calleeExpr).emit(_CallExpressionEmitter._operatorPrecedence);
+		this._emitter._emitCallArguments(this._expr.getToken(), "(", this._expr.getArguments(), this._expr.getExpr().getType().resolveIfMayBeUndefined().getArgumentTypes());
 	},
 
 	_getPrecedence: function () {
@@ -1917,16 +1921,16 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 
 	_emitExpressionWithUndefinedAssertion: function (expr) {
 		var token = expr.getToken();
-		this._emit("function (v) {\n", token);
+		this._emit("(function (v) {\n", token);
 		this._advanceIndent();
 		this._emitAssertion(function () {
 			this._emit("typeof v !== \"undefined\"", token);
-		}.bind(this), token, "detected assignment of 'undefined' to type '" + expr.getType().toString() + "'");
+		}.bind(this), token, "detected assignment of 'undefined' to type '" + expr.getType().resolveIfMayBeUndefined().toString() + "'");
 		this._emit("return v;\n", token);
 		this._reduceIndent();
 		this._emit("}(", token);
 		this._getExpressionEmitterFor(expr).emit(0);
-		this._emit(")", token);
+		this._emit("))", token);
 	},
 
 	$constructor: function () {
