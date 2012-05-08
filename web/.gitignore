@@ -2,4 +2,5 @@ jsx-web.js
 extlib
 index.html
 *.combined.js
-
+*.generated.js
+source-map
