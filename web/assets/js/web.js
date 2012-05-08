@@ -208,18 +208,16 @@ window.addEventListener('load', function(e) {
 
 	window.addEventListener('keyup', function(event) {
 		if(event.ctrlKey) {
+			event.preventDefault();
+			event.stopPropagation();
 			var RUN_KEY     = "R".charCodeAt(0);
 			var COMPILE_KEY = "C".charCodeAt(0);
-			var AST_KEY     = "T".charCodeAt(0);;
 
 			if(event.keyCode === RUN_KEY) {
 				compile({ mode: 'run' });
 			}
 			else if(event.keyCode === COMPILE_KEY) {
 				compile({ mode: 'compile' });
-			}
-			else if(event.keyCode === AST_KEY) {
-				compile({ mode: 'parse' });
 			}
 		}
 	});
