@@ -1788,11 +1788,13 @@ var Parser = exports.Parser = Class.extend({
 			case "new":
 				// new pression
 				var qualifiedName = this._qualifiedName(false);
-				if (this._expect("(") == null)
-					return null;
-				var args = this._argsExpr();
-				if (args == null)
-					return null;
+				if (this._expectOpt("(") != null) {
+					var args = this._argsExpr();
+					if (args == null)
+						return null;
+				} else {
+					args = [];
+				}
 				expr = new NewExpression(token, qualifiedName, args);
 				break;
 			default:
