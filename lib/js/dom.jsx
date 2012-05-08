@@ -770,34 +770,39 @@ native class CanvasRenderingContext2D extends CanvasRenderingContext
 
 	// implements CanvasLineStyles
 
+	var lineWidth : number;
+	var lineCap : string;
+	var lineJoin : string;
+	var miterLimit : string;
+
+	// implements CanvasText
+
+	var font : string;
+	var textAlign : string;
+	var textBaseline : string;
 
 	// implements CanvasPathMethods
 
-
-	// implements CanvasText
+	function closePath() : void;
+	function moveTo(x : number, y : number) : void;
+	function lineTo(x : number, y : number) : void;
+	function quadraticCurveTo(cpx : number, cpy : number, x : number, y : number) : void;
+	function bezierCurveTo(cp1x : number, cp1y : number, dp2x : number, cp2y : number, x : number, y : number) : void;
+	function arcTo(x1 : number, y1 : number, x2 : number, y2 : number, radius : number) : void;
+	function rect(x : number, y : number, radius : number, startAngle : number, endAngle : number, anticlockwise : boolean) : void;
+	function rect(x : number, y : number, radius : number, startAngle : number, endAngle : number) : void;
 }
 
-native class CanvasTransformation {
-}
-
-native class CanvasPathMethods {
-	// TODO
-}
-
-native class CanvasGradient {
-	// TODO
-}
-
-native class CanvasPattern {
-	// TODO
-}
 
 native class TextMetrics {
-	// TODO
+	const width : number;
 }
 
 native class ImageData {
-	// TODO
+	const width : int;
+	const height : int;
+	const data : Array.<int>; // Uint8ClampedArray in reality
+
 }
 
 // End of CanvasRenderingContext
