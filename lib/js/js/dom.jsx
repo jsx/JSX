@@ -567,7 +567,7 @@ native class MouseEvent extends UIEvent {
 		cancelableArg : boolean,
 		viewArg : AbstractView,
 		detailArg : int,
-		screenYArg : int,
+		screenXArg : int,
 		screenYArg : int,
 		clientXArg : int,
 		clientYArg : int,

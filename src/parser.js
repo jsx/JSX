@@ -1975,6 +1975,12 @@ var Parser = exports.Parser = Class.extend({
 				var argType = this._typeDeclaration(false);
 				if (argType == null)
 					return null;
+				for (var i = 0; i < args.length; ++i) {
+					if (args[i].getName().getValue() == argName.getValue()) {
+						this._errors.push(new CompileError(argName, "cannot declare an argument with the same name twice"));
+						return null;
+					}
+				}
 				// FIXME KAZUHO support default arguments
 				args.push(new ArgumentDeclaration(argName, argType));
 				var token = this._expect([ ")", "," ]);

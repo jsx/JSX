@@ -143,7 +143,7 @@ native final class Math {
 	static function acos(x :number) :number;
 	static function asin(x :number) :number;
 	static function atan(x :number) :number;
-	static function atan2(x :number, x :number) :number;
+	static function atan2(y :number, x :number) :number;
 	static function ceil(x :number) :number;
 	static function cos(x :number) :number;
 	static function exp(x :number) :number;
