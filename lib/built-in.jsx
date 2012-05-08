@@ -281,4 +281,17 @@ native final class RegExp {
 
 }
 
+// 5.12
+
+native class JSON {
+
+	static function parse(text : string) : variant;
+	static function parse(text : string, reviver : function(key:string, value:variant):variant) : variant;
+
+	static function stringify(value : variant) : string;
+	static function stringify(value : variant, replacer : function(key:string,value:variant):variant) : string;
+	static function stringify(value : variant, replacer : function(key:string,value:variant):variant, space : int) : string;
+
+}
+
 // vim: set noexpandtab:
