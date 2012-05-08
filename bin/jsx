@@ -102,6 +102,7 @@ var JSX = Class.extend({
 			"  --output file              output file (default:stdout)\n" +
 			"  --mode (compile|parse)     compilation mode (default:compile)\n" +
 			"  --target (javascript|c++)  target language (default:javascript)\n" +
+			"  --release                  omits the debugging features from the generated code (run-time type checking, logging, assertion)\n" +
 			"  --version                  displays the version and exits\n" +
 			"  --help                     displays this help and exits\n" +
 			"");
@@ -181,6 +182,13 @@ var JSX = Class.extend({
 					console.log("unknown target: " + optarg);
 					process.exit(1);
 				}
+				break;
+			case "--release":
+				tasks.push(function () {
+					emitter.setEnableAssertion(false);
+					emitter.setEnableLogging(false);
+					emitter.setEnableRunTimeTypeCheck(false);
+				});
 				break;
 			case "--executable":
 				executable = true;

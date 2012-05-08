@@ -36,7 +36,11 @@ sub run {
 // workaround for node.js to set "JSX" to global
 (function () { return this; })().JSX = JSX;
 // invoke the test
-Test.run$();
+try {
+    Test.run$();
+} catch (e) {
+    console.log(e.message.replace(/^\[.*?\]\s*/, ""));
+}
 EOT
 
     }

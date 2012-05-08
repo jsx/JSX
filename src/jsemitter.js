@@ -81,14 +81,11 @@ var _ConstructorInvocationStatementEmitter = exports._ConstructorInvocationState
 
 	emit: function () {
 		var ctorType = this._statement.getConstructorType();
-		var ctorName = this._emitter._mangleConstructorName(this._statement.getConstructingClassDef(), ctorType != null ? ctorType.getArgumentTypes() : []);
-		this._emitter._emit(ctorName + ".call(this", this._statement.getQualifiedName().getToken());
-		var args = this._statement.getArguments();
-		for (var i = 0; i < args.length; ++i) {
-			this._emitter._emit(", ", null);
-			this._emitter._getExpressionEmitterFor(args[i]).emit(0);
-		}
-		this._emitter._emit(");\n", this._statement.getQualifiedName().getToken());
+		var argTypes = ctorType != null ? ctorType.getArgumentTypes() : [];
+		var ctorName = this._emitter._mangleConstructorName(this._statement.getConstructingClassDef(), argTypes);
+		var token = this._statement.getQualifiedName().getToken();
+		this._emitter._emitCallArguments(token, ctorName + ".call(this", this._statement.getArguments(), argTypes);
+		this._emitter._emit(";\n", token);
 	}
 
 });
@@ -344,20 +341,12 @@ var _AssertStatementEmitter = exports._AssertStatementEmitter = _StatementEmitte
 	},
 
 	emit: function () {
-		// FIXME omit assertions when a specific optimization flag is enabled
+		if (! this._emitter._enableAssertion)
+			return;
 		var condExpr = this._statement._expr;
-
-		this._emitter._emit("if (! (", this._statement.getToken());
-		this._emitter._getExpressionEmitterFor(condExpr).emit(0);
-		this._emitter._emit(")) {\n", null);
-		this._emitter._advanceIndent();
-		this._emitter._emit("debugger;\n", null);
-		// FIXME make the expression source and throw a fit exception class
-		var err = Util.format('throw new Error("[%1:%2] Assertion failed");\n',
-							  [condExpr.getToken().getFilename(), condExpr.getToken().getLineNumber()]);
-		this._emitter._emit(err, null);
-		this._emitter._reduceIndent();
-		this._emitter._emit("}\n", null);
+		this._emitter._emitAssertion(function () {
+			this._emitter._getExpressionEmitterFor(condExpr).emit(0);
+		}.bind(this), this._statement.getToken(), "assertion failure");
 	}
 
 });
@@ -370,6 +359,8 @@ var _LogStatementEmitter = exports._LogStatementEmitter = _StatementEmitter.exte
 	},
 
 	emit: function () {
+		if (! this._emitter._enableLogging)
+			return;
 		this._emitter._emit("console.log(", null);
 		var exprs = this._statement.getExprs();
 		for (var i = 0; i < exprs.length; ++i) {
@@ -1048,7 +1039,14 @@ var _BinaryExpressionEmitter = exports._BinaryExpressionEmitter = _OperatorExpre
 			this._emitter._getExpressionEmitterFor(secondExpr).emit(_BinaryExpressionEmitter._operatorPrecedence["|"]);
 			this._emitter._emit(" | 0", opToken);
 		} else {
-			this._emitter._getExpressionEmitterFor(secondExpr).emit(this._precedence);
+			if (this._expr instanceof AssignmentExpression
+				&& this._emitter._enableRunTimeTypeCheck
+				&& ! (firstExprType instanceof MayBeUndefinedType || firstExprType.equals(Type.variantType))
+				&& secondExprType instanceof MayBeUndefinedType) {
+				this._emitter._emitExpressionWithUndefinedAssertion(secondExpr);
+			} else {
+				this._emitter._getExpressionEmitterFor(secondExpr).emit(this._precedence);
+			}
 		}
 	},
 
@@ -1134,14 +1132,7 @@ var _CallExpressionEmitter = exports._CallExpressionEmitter = _OperatorExpressio
 
 	_emit: function () {
 		this._emitter._getExpressionEmitterFor(this._expr.getExpr()).emit(_CallExpressionEmitter._operatorPrecedence);
-		this._emitter._emit("(", this._expr.getToken());
-		var args = this._expr.getArguments();
-		for (var i = 0; i < args.length; ++i) {
-			if (i != 0)
-				this._emitter._emit(", ", null);
-			this._emitter._getExpressionEmitterFor(args[i]).emit(0);
-		}
-		this._emitter._emit(")", this._expr.getToken());
+		this._emitter._emitCallArguments(this._expr.getToken(), "(", this._expr.getArguments(), this._expr.getExpr().getType().getArgumentTypes());
 	},
 
 	_getPrecedence: function () {
@@ -1166,14 +1157,9 @@ var _SuperExpressionEmitter = exports._SuperExpressionEmitter = _OperatorExpress
 	_emit: function () {
 		var funcType = this._expr.getFunctionType();
 		var className = funcType.getObjectType().getClassDef().getOutputClassName();
-		var mangledFuncName = this._emitter._mangleFunctionName(this._expr.getName().getValue(), funcType.getArgumentTypes());
-		this._emitter._emit(className + ".prototype." + mangledFuncName + ".call(this", this._expr.getToken());
-		var args = this._expr.getArguments();
-		for (var i = 0; i < args.length; ++i) {
-			this._emitter._emit(", ", null);
-			this._emitter._getExpressionEmitterFor(args[i]).emit(0);
-		}
-		this._emitter._emit(")", this._expr.getToken());
+		var argTypes = funcType.getArgumentTypes();
+		var mangledFuncName = this._emitter._mangleFunctionName(this._expr.getName().getValue(), argTypes);
+		this._emitter._emitCallArguments(this._expr.getToken(), className + ".prototype." + mangledFuncName + ".call(this", this._expr.getArguments(), argTypes);
 	},
 
 	_getPrecedence: function () {
@@ -1198,14 +1184,12 @@ var _NewExpressionEmitter = exports._NewExpressionEmitter = _OperatorExpressionE
 	emit: function (outerOpPrecedence) {
 		var classDef = this._expr.getType().getClassDef();
 		var ctor = this._expr.getConstructor();
-		this._emitter._emit("new " + this._emitter._mangleConstructorName(classDef, ctor != null ? ctor.getArgumentTypes() : []) + "(", this._expr.getToken());
-		var args = this._expr.getArguments();
-		for (var i = 0; i < args.length; ++i) {
-			if (i != 0)
-				this._emitter._emit(", ", null);
-			this._emitter._getExpressionEmitterFor(args[i]).emit(0);
-		}
-		this._emitter._emit(")", this._expr.getToken());
+		var argTypes = ctor != null ? ctor.getArgumentTypes() : [];
+		this._emitter._emitCallArguments(
+			this._expr.getToken(),
+			"new " + this._emitter._mangleConstructorName(classDef, argTypes) + "(",
+			this._expr.getArguments(),
+			argTypes);
 	},
 
 	_getPrecedence: function () {
@@ -1258,6 +1242,9 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 		this._indent = 0;
 		this._emittingClass = null;
 		this._emittingFunction = null;
+		this._enableAssertion = true;
+		this._enableLogging = true;
+		this._enableRunTimeTypeCheck = true;
 	},
 
 	getSearchPaths: function () {
@@ -1281,6 +1268,18 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 
 	setSourceMapGenerator: function (gen) {
 		this._sourceMapGen = gen;
+	},
+
+	setEnableAssertion: function (enable) {
+		this._enableAssertion = enable;
+	},
+
+	setEnableLogging: function (enable) {
+		this._enableLogging = enable;
+	},
+
+	setEnableRunTimeTypeCheck: function (enable) {
+		this._enableRunTimeTypeCheck = enable;
 	},
 
 	emit: function (classDefs) {
@@ -1826,6 +1825,50 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 				functions.push(member);
 		}
 		return functions;
+	},
+
+	_emitCallArguments: function (token, prefix, args, argTypes) {
+		this._emit(prefix, token);
+		for (var i = 0; i < args.length; ++i) {
+			if (i != 0 || prefix[prefix.length - 1] != '(')
+				this._emit(", ", null);
+			if (this._enableRunTimeTypeCheck
+				&& args[i].getType() instanceof MayBeUndefinedType
+				&& ! (argTypes[i] instanceof MayBeUndefinedType || argTypes[i] instanceof VariantType)) {
+				this._emitExpressionWithUndefinedAssertion(args[i]);
+			} else {
+				this._getExpressionEmitterFor(args[i]).emit(0);
+			}
+		}
+		this._emit(")", token);
+	},
+
+	_emitAssertion: function (emitTestExpr, token, message) {
+		this._emit("if (! (", token);
+		emitTestExpr();
+		this._emit(")) {\n", null);
+		this._advanceIndent();
+		this._emit("debugger;\n", null);
+		// FIXME make the expression source and throw a fit exception class
+		var err = Util.format('throw new Error("[%1:%2] %3");\n',
+							  [token.getFilename(), token.getLineNumber(), message]);
+		this._emit(err, null);
+		this._reduceIndent();
+		this._emit("}\n", null);
+	},
+
+	_emitExpressionWithUndefinedAssertion: function (expr) {
+		var token = expr.getToken();
+		this._emit("function (v) {\n", token);
+		this._advanceIndent();
+		this._emitAssertion(function () {
+			this._emit("typeof v !== \"undefined\"", token);
+		}.bind(this), token, "detected assignment of 'undefined' to type '" + expr.getType().toString() + "'");
+		this._emit("return v;\n", token);
+		this._reduceIndent();
+		this._emit("}(", token);
+		this._getExpressionEmitterFor(expr).emit(0);
+		this._emit(")", token);
 	},
 
 	$constructor: function () {
