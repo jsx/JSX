@@ -167,7 +167,7 @@ window.addEventListener('load', function(e) {
 				li.className = "active";
 
 				setTimeout(function() {
-					compile({ mode: "compile" });
+					compile({ mode: "run" });
 				}, 0);
 			});
 			xhr.open("GET", url);
@@ -210,7 +210,7 @@ window.addEventListener('load', function(e) {
 		if(event.ctrlKey) {
 			var RUN_KEY     = "R".charCodeAt(0);
 			var COMPILE_KEY = "C".charCodeAt(0);
-			var PARSE_KEY   = "P".charCodeAt(0);;
+			var AST_KEY     = "T".charCodeAt(0);;
 
 			if(event.keyCode === RUN_KEY) {
 				compile({ mode: 'run' });
@@ -218,7 +218,7 @@ window.addEventListener('load', function(e) {
 			else if(event.keyCode === COMPILE_KEY) {
 				compile({ mode: 'compile' });
 			}
-			else if(event.keyCode === PARSE_KEY) {
+			else if(event.keyCode === AST_KEY) {
 				compile({ mode: 'parse' });
 			}
 		}
@@ -232,7 +232,7 @@ window.addEventListener('load', function(e) {
 			function(e) { compile({mode: 'run'}) });
 	element('compile').addEventListener('click',
 			function(e) { compile({mode: 'compile'}) });
-	element('parse').addEventListener('click',
+	element('ast').addEventListener('click',
 			function(e) { compile({mode: 'parse'}) });
 
 	retrieveInput(input);
