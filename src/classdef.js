@@ -54,6 +54,7 @@ var ClassDefinition = exports.ClassDefinition = Class.extend({
 	$IS_OVERRIDE: 32,
 	$IS_INTERFACE: 64,
 	$IS_MIXIN: 128,
+	$IS_FAKE: 256, // used for marking a JS non-class object that should be treated like a JSX class instance (e.g. window)
 
 	constructor: function (token, className, flags, extendName, implementNames, members, objectTypesUsed) {
 		this._token = token;

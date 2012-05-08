@@ -693,7 +693,7 @@ var Parser = exports.Parser = Class.extend({
 		// attributes* class
 		var flags = 0;
 		while (true) {
-			var token = this._expect([ "class", "interface", "mixin", "abstract", "final", "native" ]);
+			var token = this._expect([ "class", "interface", "mixin", "abstract", "final", "native", "__fake__" ]);
 			if (token == null)
 				return false;
 			if (token.getValue() == "class")
@@ -724,6 +724,9 @@ var Parser = exports.Parser = Class.extend({
 				break;
 			case "native":
 				newFlag = ClassDefinition.IS_NATIVE;
+				break;
+			case "__fake__":
+				newFlag = ClassDefinition.IS_FAKE;
 				break;
 			default:
 				throw new Error("logic flaw");
