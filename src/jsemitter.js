@@ -812,7 +812,7 @@ var _AsExpressionEmitter = exports._AsExpressionEmitter = _ExpressionEmitter.ext
 
 });
 
-var _AsNoCheckExpressionEmitter = exports._AsNoCheckExpressionEmitter = _ExpressionEmitter.extend({
+var _AsNoConvertExpressionEmitter = exports._AsNoConvertExpressionEmitter = _ExpressionEmitter.extend({
 
 	constructor: function (emitter, expr) {
 		_ExpressionEmitter.prototype.constructor.call(this, emitter);
@@ -1767,8 +1767,8 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 			return new _InstanceofExpressionEmitter(this, expr);
 		else if (expr instanceof AsExpression)
 			return new _AsExpressionEmitter(this, expr);
-		else if (expr instanceof AsNoCheckExpression)
-			return new _AsNoCheckExpressionEmitter(this, expr);
+		else if (expr instanceof AsNoConvertExpression)
+			return new _AsNoConvertExpressionEmitter(this, expr);
 		else if (expr instanceof LogicalNotExpression)
 			return new _UnaryExpressionEmitter(this, expr);
 		else if (expr instanceof TypeofExpression)

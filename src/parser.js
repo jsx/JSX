@@ -1765,11 +1765,11 @@ var Parser = exports.Parser = Class.extend({
 				return null;
 			return new InstanceofExpression(op, expr, type);
 		case "as":
-			var noCheck = this._expectOpt("__nocheck__");
+			var noConvert = this._expectOpt("__noconvert__");
 			var type = this._typeDeclaration(false);
 			if (type == null)
 				return null;
-			return noCheck ? new AsNoCheckExpression(op, expr, type) : new AsExpression(op, expr, type);
+			return noConvert ? new AsNoConvertExpression(op, expr, type) : new AsExpression(op, expr, type);
 		default:
 			return new PostIncrementExpression(op, expr);
 		}

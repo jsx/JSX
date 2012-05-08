@@ -14,7 +14,7 @@ class Test {
 		log h["hello"];
 	}
 	static function run() : void {
-		Test.say(Test.ok() as __nocheck__ Map.<string>);
-		Test.say(Test.ng() as __nocheck__ Map.<string>);
+		Test.say(Test.ok() as __noconvert__ Map.<string>);
+		Test.say(Test.ng() as __noconvert__ Map.<string>);
 	}
 }

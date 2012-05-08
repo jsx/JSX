@@ -669,7 +669,7 @@ var AsExpression = exports.AsExpression = UnaryExpression.extend({
 
 });
 
-var AsNoCheckExpression = exports.AsNoCheckExpression = UnaryExpression.extend({
+var AsNoConvertExpression = exports.AsNoConvertExpression = UnaryExpression.extend({
 
 	constructor: function (operatorToken, expr, type) {
 		UnaryExpression.prototype.constructor.call(this, operatorToken, expr);
@@ -678,7 +678,7 @@ var AsNoCheckExpression = exports.AsNoCheckExpression = UnaryExpression.extend({
 
 	serialize: function () {
 		return [
-			"AsNoCheckExpression",
+			"AsNoConvertExpression",
 			this._expr.serialize(),
 			this._type.serialize()
 		];

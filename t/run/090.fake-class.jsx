@@ -8,7 +8,7 @@ native __fake__ class Foo {
 
 class Test {
 	static function run() : void {
-		var f : Foo = { name: "hello" } as __nocheck__ Foo;
+		var f : Foo = { name: "hello" } as __noconvert__ Foo;
 		log f.name;
 	}
 }

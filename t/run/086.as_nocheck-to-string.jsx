@@ -14,7 +14,7 @@ class Test {
 		log s;
 	}
 	static function run() : void {
-		Test.say(Test.ok() as __nocheck__ string);
-		Test.say(Test.ng() as __nocheck__ string);
+		Test.say(Test.ok() as __noconvert__ string);
+		Test.say(Test.ng() as __noconvert__ string);
 	}
 }

@@ -16,7 +16,7 @@ class Test {
 		f();
 	}
 	static function run() : void {
-		Test.say(Test.ok() as __nocheck__ function () : void);
-		Test.say(Test.ng() as __nocheck__ function () : void);
+		Test.say(Test.ok() as __noconvert__ function () : void);
+		Test.say(Test.ng() as __noconvert__ function () : void);
 	}
 }
