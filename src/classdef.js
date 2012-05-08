@@ -819,6 +819,26 @@ var LocalVariable = exports.LocalVariable = Class.extend({
 		this._type = type;
 	},
 
+	touchVariable: function (context, token, isAssignment) {
+		if (isAssignment) {
+			context.getTopBlock().localVariableStatuses.setStatus(this, LocalVariableStatuses.ISSET);
+		} else {
+			switch (context.getTopBlock().localVariableStatuses.getStatus(this)) {
+			case LocalVariableStatuses.ISSET:
+				// ok
+				break;
+			case LocalVariableStatuses.UNSET:
+				context.errors.push(new CompileError(this._token, "variable is not initialized"));
+				break;
+			case LocalVariableStatuses.MAYBESET:
+				context.errors.push(new CompileError(this._token, "variable may not be initialized"));
+				break;
+			default:
+				throw new Error("logic flaw");
+			}
+		}
+	},
+
 	toString: function () {
 		return this._name + " : " + this._type;
 	}

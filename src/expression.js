@@ -78,23 +78,7 @@ var IdentifierExpression = exports.IdentifierExpression = Expression.extend({
 	analyze: function (context, parentExpr) {
 		// if it is an access to local variable, return ok
 		if (context.funcDef != null && (this._local = context.funcDef.getLocal(this._token.getValue())) != null) {
-			if (parentExpr instanceof AssignmentExpression && parentExpr.getFirstExpr() == this) {
-				context.getTopBlock().localVariableStatuses.setStatus(this._local, LocalVariableStatuses.ISSET);
-			} else {
-				switch (context.getTopBlock().localVariableStatuses.getStatus(this._local)) {
-				case LocalVariableStatuses.ISSET:
-					// ok
-					break;
-				case LocalVariableStatuses.UNSET:
-					context.errors.push(new CompileError(this._token, "variable is not initialized"));
-					break;
-				case LocalVariableStatuses.MAYBESET:
-					context.errors.push(new CompileError(this._token, "variable may not be initialized"));
-					break;
-				default:
-					throw new Error("logic flaw");
-				}
-			}
+			this._local.touchVariable(context, this._token, parentExpr instanceof AssignmentExpression && parentExpr.getFirstExpr() == this);
 			return true;
 		}
 		// access to class
