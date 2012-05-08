@@ -5,6 +5,7 @@ class Config {
 	static const quantity = 360;
 	static const size     = 2.0;
 	static const decay    = 0.98;
+	static const gravity  = 2.0;
 	static const speed    = 6.0;
 }
 
@@ -19,25 +20,25 @@ class Spark {
 	var size : number;
 
 	function constructor(posX : number, posY : number, size : number) {
-		var angle    = Math.random() * rad;
-		var velocity = Math.random() * speed;
+		var angle    = Math.random() * Spark.rad;
+		var velocity = Math.random() * Config.speed;
 
 		this.velX = Math.cos(angle) * velocity;
 		this.velY = Math.sin(angle) * velocity;
 	}
 
 	function draw(view : FireworkView, color : string) : boolean {
-		this.posX += velX;
-		this.posY += velY;
+		this.posX += this.velX;
+		this.posY += this.velY;
 
 		this.velX *= Config.decay;
 		this.velY *= Config.decay;
 		this.size *= Config.decay;
 
-		posY += Config.gravity;
+		this.posY += Config.gravity;
 
 		view.cx.beginPath();
-		view.cx.arc(this.posX, this.posY, size, 0, rad, true);
+		view.cx.arc(this.posX, this.posY, this.size, 0, Spark.rad, true);
 		view.cx.fillStyle = color;
 		view.cx.fill();
 
@@ -57,17 +58,20 @@ class Firework {
 	var view : FireworkView;
 
 	static function randomColor() : string {
-		var rbg = [] : int[];
+		var rgb = [] : int[];
 		for (var i = 0; i < 3; ++i) {
-			rbg[i] = (Math.random() * 0xFF + 60) as int;
+			rgb.push( (Math.random() * 0xFF + 60) as int );
 		}
-		return "rbg(" + rgb[0] + "," + rgv[1] + "," + rgv[2] + ")";
+		return "rgb(" +
+			rgb[0] as string + "," +
+			rgb[1] as string + "," +
+			rgb[2] as string + ")";
 	}
 
 	function constructor(view : FireworkView, x : int, y : int) {
 		this.view = view;
 		this.color = Firework.randomColor();
-		this.sparks = [ ];
+		this.sparks = [ ] : Spark[];
 
 		for (var i = 0; i < Config.quantity; ++i) {
 			this.sparks.push(new Spark(x, y, Config.size));
@@ -78,7 +82,7 @@ class Firework {
 		for(var i = 0; i < this.sparks.length; ++i) {
 			var s = this.sparks[i];
 			if (! s.draw(this.view, this.color)) {
-				sparks.splice(i, 1);
+				this.sparks.splice(i, 1);
 			}
 		}
 		return this.sparks.length > 0;
@@ -97,13 +101,13 @@ class FireworkView {
 	var numSparks = 0;
 
 	function constructor(canvas : HTMLCanvasElement) {
-		this.fireworks = [];
+		this.fireworks = [] : Firework[];
 		this.cx = canvas.getContext("2d") as CanvasRenderingContext2D;
 
 		this.width  = canvas.width;
 		this.height = canvas.height;
 
-		var rect = canvas.getBoundingRect();
+		var rect = canvas.getBoundingClientRect();
 		this.left = rect.left;
 		this.top  = rect.top;
 
@@ -120,7 +124,7 @@ class FireworkView {
 	}
 
 	function update() : void {
-		if (this.fireworks.length == 0) return undefined;
+		if (this.fireworks.length == 0) return;
 
 		this.numSparks = 0;
 
@@ -136,7 +140,7 @@ class FireworkView {
 		}
 
 		this.cx.fillStyle = "rbga(0, 0, 0, 0.3)";
-		this.fillRect(0, 0, this.width, this.height);
+		this.cx.fillRect(0, 0, this.width, this.height);
 	}
 
 }
@@ -149,16 +153,16 @@ class FPSWatcher {
 	}
 
 	function update(numSparks : int) : void {
-		++fps;
+		++this.fps;
 
 		if((Date.now() - this.start) >= 1000) {
-			var message = "FPS: " + fps as string +
-				" (sparks: " + numSparks + ")";
+			var message = "FPS: " + this.fps as string +
+				" (sparks: " + numSparks as string + ")";
 				dom.id("fps").innerHTML = message;
 				if(numSparks > 0) log message;
 
-				start = 0;
-				fps = 0;
+				this.start = 0;
+				this.fps = 0;
 		}
 	}
 }
@@ -170,9 +174,9 @@ class WebApplication {
 		var view = new FireworkView(canvas);
 		var watcher = new FPSWatcher();
 
-		dom.window.setInterval( function() : void {
+		dom.getWindow().setInterval( function() : void {
 			view.update();
-			watcherupdate(view.numSparks);
+			watcher.update(view.numSparks);
 		}, 1000 / 60);
 	}
 }
