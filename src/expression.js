@@ -23,8 +23,8 @@ var Expression = exports.Expression = Class.extend({
 		return null;
 	},
 
-	assertIsAssignable: function (errors, token, type) {
-		errors.push(new CompileError(token, "left-hand-side expression is not assignable"));
+	assertIsAssignable: function (context, token, type) {
+		context.errors.push(new CompileError(token, "left-hand-side expression is not assignable"));
 		return false;
 	}
 
@@ -78,7 +78,11 @@ var IdentifierExpression = exports.IdentifierExpression = Expression.extend({
 	analyze: function (context, parentExpr) {
 		// if it is an access to local variable, return ok
 		if (context.funcDef != null && (this._local = context.funcDef.getLocal(this._token.getValue())) != null) {
-			this._local.touchVariable(context, this._token, parentExpr instanceof AssignmentExpression && parentExpr.getFirstExpr() == this);
+			// check that the variable is readable
+			if (! (parentExpr instanceof AssignmentExpression && parentExpr.getFirstExpr() == this)) {
+				if (! this._local.touchVariable(context, this._token, false))
+					return false;
+			}
 			return true;
 		}
 		// access to class
@@ -101,19 +105,19 @@ var IdentifierExpression = exports.IdentifierExpression = Expression.extend({
 			return this._classDefType;
 	},
 
-	assertIsAssignable: function (errors, token, type) {
+	assertIsAssignable: function (context, token, type) {
 		if (this._local != null) {
 			if (this._local.getType() == null) {
 				if (type.equals(Type.undefinedType)) {
-					errors.push(new CompileError(token, "cannot assign an undefined type to a value of undetermined type"));
+					context.errors.push(new CompileError(token, "cannot assign an undefined type to a value of undetermined type"));
 					return false;
 				}
 				this._local.setType(type.asAssignableType());
-				return true;
 			} else if (! type.isConvertibleTo(this._local.getType())) {
-				errors.push(new CompileError(token, "cannot assign a value of type '" + type.toString() + "' to '" + this._local.getType() + "'"));
+				context.errors.push(new CompileError(token, "cannot assign a value of type '" + type.toString() + "' to '" + this._local.getType() + "'"));
 				return false;
 			}
+			this._local.touchVariable(context, this._token, true);
 		} else {
 			errors.push(new CompileError(token, "cannot modify a class definition"));
 			return false;
@@ -549,10 +553,6 @@ var UnaryExpression = exports.UnaryExpression = OperatorExpression.extend({
 	_analyze: function (context) {
 		if (! this._expr.analyze(context, this))
 			return false;
-		var exprType = this._expr.getType();
-		if (exprType == null) {
-			return false;
-		}
 		if (this._expr.getType().equals(Type.voidType)) {
 			context.errors.push(new CompileError(this._token, "cannot apply operator '" + this._token.getValue() + "' against void"));
 			return false;
@@ -736,16 +736,13 @@ var IncrementExpression = exports.IncrementExpression = UnaryExpression.extend({
 		if (! this._analyze(context))
 			return false;
 		var exprType = this._expr.getType();
-		if (exprType == null) {
-			context.errors.push(new CompileError(this._token, "type unknown"));
-			return false;
-		} else if (exprType.resolveIfMayBeUndefined().equals(Type.integerType) || exprType.resolveIfMayBeUndefined().equals(Type.numberType)) {
+		if (exprType.resolveIfMayBeUndefined().equals(Type.integerType) || exprType.resolveIfMayBeUndefined().equals(Type.numberType)) {
 			// ok
 		} else {
 			context.errors.push(new CompileError(this._token, "cannot apply operator '" + this._token.getValue() + "' to a non-number"));
 			return false;
 		}
-		if (! this._expr.assertIsAssignable(context.errors, this._token, exprType))
+		if (! this._expr.assertIsAssignable(context, this._token, exprType))
 			return false;
 		return true;
 	},
@@ -854,13 +851,13 @@ var PropertyExpression = exports.PropertyExpression = UnaryExpression.extend({
 		return type;
 	},
 
-	assertIsAssignable: function (errors, token, type) {
+	assertIsAssignable: function (context, token, type) {
 		if (! this._type.isAssignable()) {
-			errors.push(new CompileError("left-hand-side expression is not assignable"));
+			context.errors.push(new CompileError("left-hand-side expression is not assignable"));
 			return false;
 		}
 		if (! type.isConvertibleTo(this._type)) {
-			errors.push(new CompileError(token, "cannot assign a value of type '" + type.toString() + "' to '" + this._type.toString() + "'"));
+			context.errors.push(new CompileError(token, "cannot assign a value of type '" + type.toString() + "' to '" + this._type.toString() + "'"));
 			return false;
 		}
 		return true;
@@ -1073,7 +1070,7 @@ var AssignmentExpression = exports.AssignmentExpression = BinaryExpression.exten
 				return false;
 			}
 		}
-		if (! this._expr1.assertIsAssignable(context.errors, this._token, rhsType))
+		if (! this._expr1.assertIsAssignable(context, this._token, rhsType))
 			return false;
 		return true;
 	},

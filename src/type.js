@@ -501,8 +501,6 @@ var ResolvedFunctionType = exports.ResolvedFunctionType = FunctionType.extend({
 			} else {
 				if (exact)
 					return false;
-				if (argTypes[i] == null)
-					return false;
 				if (! argTypes[i].isConvertibleTo(this._argTypes[i]))
 					return false;
 			}

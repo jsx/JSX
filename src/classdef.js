@@ -830,15 +830,16 @@ var LocalVariable = exports.LocalVariable = Class.extend({
 				// ok
 				break;
 			case LocalVariableStatuses.UNSET:
-				context.errors.push(new CompileError(this._token, "variable is not initialized"));
-				break;
+				context.errors.push(new CompileError(token, "variable is not initialized"));
+				return false;
 			case LocalVariableStatuses.MAYBESET:
-				context.errors.push(new CompileError(this._token, "variable may not be initialized"));
-				break;
+				context.errors.push(new CompileError(token, "variable may not be initialized"));
+				return false;
 			default:
 				throw new Error("logic flaw");
 			}
 		}
+		return true;
 	},
 
 	toString: function () {
