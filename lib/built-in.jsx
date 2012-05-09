@@ -58,26 +58,36 @@ native final class String {
 	function lastIndexOf(searchString : string) : int;
 	function lastIndexOf(searchString : string, position : int) : int;
 	// FIXME localeCompare?
-	// FIXME function match(regexp : RegExp) : string [];
+	function match(regexp : RegExp) : string [];
 	function replace(searchValue : string, replaceValue : string) : string;
-	// FIXME function replace(searchValue : string, replaceValue : function) : string;
 	function replace(searchValue : RegExp, replaceValue : string) : string;
-	// FIXME function replace(searchValue : RegExp, replaceValue : function) : string;
+	// FIXME 15.5.4.11
+	function replace(searchValue : string, replaceValue : function(matched :string):string) : string;
+	function replace(searchValue : RegExp, replaceValue : function(matched :string):string) : string;
 	function search(searchValue : string) : int;
-	// FIXME function search(searchValue : RegExp) : int;
+	function search(searchValue : RegExp) : int;
+	function slice(start : int) : string;
 	function slice(start : int, end : int) : string;
 	function split(separator : string) : string [];
 	function split(separator : string, limit : int) : string [];
-	// FIXME function split(separator : RegExp) : string [];
-	// FIXME function split(separator : RegExp, limit : int) : string [];
+	function split(separator : RegExp) : string [];
+	function split(separator : RegExp, limit : int) : string [];
+	function substring(start : int) : string;
 	function substring(start : int, end : int) : string;
 	function toLowerCase() : string;
 	function toLocaleLowerCase() : string;
 	function toUpperCase() : string;
 	function toLocaleUpperCase() : string;
 
+	function trim() : string;
+
 	// 15.5.5
 	var length : int;
+
+	// non-standard members
+
+	function substr(start : int) : string;
+	function substr(start : int, length : int) : string;
 }
 
 // 15.6
