@@ -197,7 +197,14 @@ var _ForInStatementEmitter = exports._ForInStatementEmitter = _StatementEmitter.
 	},
 
 	emit: function () {
-		throw new Error("FIXME _ForInStatementEmitter.emit");
+		_Util.emitLabelOfStatement(this._emitter, this._statement);
+		this._emitter._emit("for (", null);
+		this._emitter._getExpressionEmitterFor(this._statement.getLHSExpr()).emit(0);
+		this._emitter._emit(" in ", null);
+		this._emitter._getExpressionEmitterFor(this._statement.getListExpr()).emit(0);
+		this._emitter._emit(") {\n", null);
+		this._emitter._emitStatements(this._statement.getStatements());
+		this._emitter._emit("}\n", null);
 	}
 
 });

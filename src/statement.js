@@ -28,6 +28,17 @@ var Statement = exports.Statement = Class.extend({
 
 	doAnalyze: null, // void doAnalyze(context), returns whether or not to continue analysing the following statements
 
+	_analyzeExpr: function (context, expr) {
+		if (context.statement != null)
+			throw new Error("logic flaw");
+		context.statement = this;
+		try {
+			return expr.analyze(context, null);
+		} finally {
+			context.statement = null;
+		}
+	},
+
 	$assertIsReachable: function (context, token) {
 		if (context.getTopBlock().localVariableStatuses == null) {
 			context.errors.push(new CompileError(token, "the code is unreachable"));
@@ -125,7 +136,7 @@ var UnaryExpressionStatement = exports.UnaryExpressionStatement = Statement.exte
 	},
 
 	doAnalyze: function (context) {
-		this._expr.analyze(context, null);
+		this._analyzeExpr(context, this._expr);
 		return true;
 	}
 
@@ -182,7 +193,7 @@ var ReturnStatement = exports.ReturnStatement = Statement.extend({
 				context.errors.push(new CompileError(this._token, "cannot return void, the function is declared to return a value of type '" + returnType.toString() + "'"));
 				return true;
 			}
-			if (! this._expr.analyze(context, null))
+			if (! this._analyzeExpr(context, this._expr))
 				return true;
 			var exprType = this._expr != null ? this._expr.getType() : Type.voidType;
 			if (exprType == null)
@@ -217,7 +228,7 @@ var DeleteStatement = exports.DeleteStatement = UnaryExpressionStatement.extend(
 	},
 
 	doAnalyze: function (context) {
-		if (! this._expr.analyze(context, null))
+		if (! this._analyzeExpr(context, this._expr))
 			return true;
 		if (! (this._expr instanceof ArrayExpression)) {
 			context.errors.push(new CompileError(this._token, "only properties of a hash object can be deleted"));
@@ -455,7 +466,7 @@ var DoWhileStatement = exports.DoWhileStatement = ContinuableStatement.extend({
 			this._restoreContinueVariableStatuses(context);
 			if (! Statement.assertIsReachable(context, this._expr.getToken()))
 				return false;
-			if (this._expr.analyze(context, null))
+			if (this._analyzeExpr(context, this._expr))
 				if (! this._expr.getType().equals(Type.booleanType))
 					context.errors.push(new CompileError(this._expr.getToken(), "expression of the while statement should return a boolean"));
 			this.registerVariableStatusesOnBreak(context.getTopBlock().localVariableStatuses);
@@ -471,27 +482,54 @@ var DoWhileStatement = exports.DoWhileStatement = ContinuableStatement.extend({
 
 var ForInStatement = exports.ForInStatement = ContinuableStatement.extend({
 
-	constructor: function (token, label, identifier, expr, statements) {
+	constructor: function (token, label, lhsExpr, listExpr, statements) {
 		ContinuableStatement.prototype.constructor.call(this, token, label);
-		this._identifier = identifier;
-		this._expr = expr;
+		this._lhsExpr = lhsExpr;
+		this._listExpr = listExpr;
 		this._statements = statements;
+	},
+
+	getLHSExpr: function () {
+		return this._lhsExpr;
+	},
+
+	getListExpr: function () {
+		return this._listExpr;
+	},
+
+	getStatements: function () {
+		return this._statements;
 	},
 
 	serialize: function () {
 		return [
 			"ForInStatement",
 		].concat(this._serialize()).concat([
-			this._identifier.serialize(),
-			this._expr.serialize(),
+			this._lhsExpr.serialize(),
+			this._listExpr.serialize(),
 			Util.serializeArray(this._statements)
 		]);
 	},
 
 	doAnalyze: function (context) {
-		this._expr.analyze(context, null);
+		if (! this._analyzeExpr(context, this._listExpr))
+			return true;
+		var listType = this._listExpr.getType().resolveIfMayBeUndefined();
+		var listClassDef;
+		var listTypeName;
+		if (listType instanceof ObjectType
+			&& (listClassDef = listType.getClassDef()) instanceof InstantiatedClassDefinition
+			&& ((listTypeName = listClassDef.getTemplateClassName()) == "Array" || listTypeName == "Map")) {
+			// ok
+		} else {
+			context.errors.push(new CompileError(this.getToken(), "list expression of the for..in statement should be an array or a map"));
+			return true;
+		}
 		this._prepareBlockAnalysis(context);
 		try {
+			this._analyzeExpr(context, this._lhsExpr);
+			if (! this._lhsExpr.assertIsAssignable(context, this._token, listTypeName == "Array" ? Type.numberType : Type.stringType))
+				return false;
 			for (var i = 0; i < this._statements.length; ++i)
 				if (! this._statements[i].analyze(context))
 					return false;
@@ -545,9 +583,9 @@ var ForStatement = exports.ForStatement = ContinuableStatement.extend({
 
 	doAnalyze: function (context) {
 		if (this._initExpr != null)
-			this._initExpr.analyze(context, null);
+			this._analyzeExpr(context, this._initExpr);
 		if (this._condExpr != null)
-			if (this._condExpr.analyze(context, null))
+			if (this._analyzeExpr(context, this._condExpr))
 				if (! this._condExpr.getType().equals(Type.booleanType))
 					context.errors.push(new CompileError(this._condExpr.getToken(), "condition expression of the for statement should return a boolean"));
 		this._prepareBlockAnalysis(context);
@@ -559,7 +597,7 @@ var ForStatement = exports.ForStatement = ContinuableStatement.extend({
 			if (this._postExpr != null) {
 				if (! Statement.assertIsReachable(context, this._postExpr.getToken()))
 					return false;
-				this._postExpr.analyze(context, null);
+				this._analyzeExpr(context, this._postExpr);
 				this.registerVariableStatusesOnBreak(context.getTopBlock().localVariableStatuses);
 			}
 			this._finalizeBlockAnalysis(context);
@@ -607,7 +645,7 @@ var IfStatement = exports.IfStatement = Statement.extend({
 	},
 
 	doAnalyze: function (context) {
-		if (this._expr.analyze(context, null))
+		if (this._analyzeExpr(context, this._expr))
 			if (! this._expr.getType().equals(Type.booleanType))
 				context.errors.push(new CompileError(this._expr.getToken(), "expression of the if statement should return a boolean"));
 		// if the expr is true
@@ -669,7 +707,7 @@ var SwitchStatement = exports.SwitchStatement = LabellableStatement.extend({
 	},
 
 	doAnalyze: function (context) {
-		if (! this._expr.analyze(context, null))
+		if (! this._analyzeExpr(context, this._expr))
 			return true;
 		var exprType = this._expr.getType();
 		if (exprType == null)
@@ -727,7 +765,7 @@ var CaseStatement = exports.CaseStatement = Statement.extend({
 	},
 
 	doAnalyze: function (context) {
-		if (! this._expr.analyze(context, null))
+		if (! this._analyzeExpr(context, this._expr))
 			return true;
 		var statement = context.getTopBlock().statement;
 		if (! (statement instanceof SwitchStatement))
@@ -803,7 +841,7 @@ var WhileStatement = exports.WhileStatement = ContinuableStatement.extend({
 	},
 
 	doAnalyze: function (context) {
-		if (this._expr.analyze(context, null))
+		if (this._analyzeExpr(context, this._expr))
 			if (! this._expr.getType().equals(Type.booleanType))
 				context.errors.push(new CompileError(this._expr.getToken(), "expression of the while statement should return a boolean"));
 		this._prepareBlockAnalysis(context);
@@ -914,7 +952,7 @@ var AssertStatement = exports.AssertStatement = InformationStatement.extend({
 	},
 
 	doAnalyze: function (context) {
-		if (! this._expr.analyze(context, null))
+		if (! this._analyzeExpr(context, this._expr))
 			return false;
 		var exprType = this._expr.getType();
 		if (! exprType.equals(Type.booleanType))
@@ -945,7 +983,7 @@ var LogStatement = exports.LogStatement = InformationStatement.extend({
 
 	doAnalyze: function (context) {
 		for (var i = 0; i < this._exprs.length; ++i) {
-			if (! this._exprs[i].analyze(context, null))
+			if (! this._analyzeExpr(context, this._exprs[i]))
 				return false;
 			var exprType = this._exprs[i].getType();
 			if (exprType == null)

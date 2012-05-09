@@ -21,6 +21,7 @@ var AnalysisContext = exports.AnalysisContext = Class.extend({
 		this.instantiateTemplate = instantiateTemplate;
 		this.funcDef = null;
 		this.blockStack = null;
+		this.statement = null;
 	},
 
 	clone: function () {

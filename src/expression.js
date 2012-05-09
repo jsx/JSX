@@ -2,6 +2,7 @@ var Class = require("./Class");
 eval(Class.$import("./classdef"));
 eval(Class.$import("./type"));
 eval(Class.$import("./util"));
+var Statement = require("./statement");
 
 "use strict";
 
@@ -91,7 +92,10 @@ var IdentifierExpression = exports.IdentifierExpression = Expression.extend({
 		// if it is an access to local variable, return ok
 		if (context.funcDef != null && (this._local = context.funcDef.getLocal(this._token.getValue())) != null) {
 			// check that the variable is readable
-			if (! (parentExpr instanceof AssignmentExpression && parentExpr.getFirstExpr() == this)) {
+			if ((parentExpr instanceof AssignmentExpression && parentExpr.getFirstExpr() == this)
+				|| (parentExpr == null && context.statement instanceof Statement.ForInStatement && context.statement.getLHSExpr() == this)) {
+				// is LHS
+			} else {
 				this._local.touchVariable(context, this._token, false);
 				if (this._local.getType() == null)
 					return false;
