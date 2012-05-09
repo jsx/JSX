@@ -80,7 +80,8 @@ var IdentifierExpression = exports.IdentifierExpression = Expression.extend({
 		if (context.funcDef != null && (this._local = context.funcDef.getLocal(this._token.getValue())) != null) {
 			// check that the variable is readable
 			if (! (parentExpr instanceof AssignmentExpression && parentExpr.getFirstExpr() == this)) {
-				if (! this._local.touchVariable(context, this._token, false))
+				this._local.touchVariable(context, this._token, false);
+				if (this._local.getType() == null)
 					return false;
 			}
 			return true;
