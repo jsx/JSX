@@ -582,6 +582,15 @@ var _AsExpressionEmitter = exports._AsExpressionEmitter = _ExpressionEmitter.ext
 		var srcType = this._expr.getExpr().getType();
 		var destType = this._expr.getType();
 		if (srcType.resolveIfMayBeUndefined() instanceof ObjectType || srcType.equals(Type.variantType)) {
+			if (srcType.resolveIfMayBeUndefined().isConvertibleTo(destType)) {
+				if (srcType instanceof MayBeUndefinedType) {
+					var prec = _BinaryExpressionEmitter._operatorPrecedence["||"];
+					this._emitter._emitWithParens(outerOpPrecedence, prec, prec, null, "|| null");
+				} else {
+					this._emitter._getExpressionEmitterFor(this._expr.getExpr()).emit(outerOpPrecedence);
+				}
+				return true;
+			}
 			if (destType instanceof ObjectType) {
 				// unsafe cast
 				if ((destType.getClassDef().flags() & (ClassDefinition.IS_INTERFACE | ClassDefinition.IS_MIXIN)) == 0) {
@@ -851,8 +860,13 @@ var _AsNoConvertExpressionEmitter = exports._AsNoConvertExpressionEmitter = _Exp
 				this._emitter._getExpressionEmitterFor(this._expr.getExpr()).emit(0);
 				this._emitter._emit(")", token);
 			}.bind(this);
+			var srcType = this._expr.getExpr().getType();
 			var destType = this._expr.getType();
-			if (destType instanceof VariantType) {
+			if (srcType.equals(destType) || srcType.equals(destType.resolveIfMayBeUndefined)) {
+				// skip
+			} else if (destType instanceof VariantType) {
+				// skip
+			} else if (srcType instanceof ObjectType && srcType.isConvertibleTo(destType)) {
 				// skip
 			} else if (destType.equals(Type.booleanType)) {
 				emitWithAssertion(function () {
