@@ -482,27 +482,54 @@ var DoWhileStatement = exports.DoWhileStatement = ContinuableStatement.extend({
 
 var ForInStatement = exports.ForInStatement = ContinuableStatement.extend({
 
-	constructor: function (token, label, identifier, expr, statements) {
+	constructor: function (token, label, lhsExpr, listExpr, statements) {
 		ContinuableStatement.prototype.constructor.call(this, token, label);
-		this._identifier = identifier;
-		this._expr = expr;
+		this._lhsExpr = lhsExpr;
+		this._listExpr = listExpr;
 		this._statements = statements;
+	},
+
+	getLHSExpr: function () {
+		return this._lhsExpr;
+	},
+
+	getListExpr: function () {
+		return this._listExpr;
+	},
+
+	getStatements: function () {
+		return this._statements;
 	},
 
 	serialize: function () {
 		return [
 			"ForInStatement",
 		].concat(this._serialize()).concat([
-			this._identifier.serialize(),
-			this._expr.serialize(),
+			this._lhsExpr.serialize(),
+			this._listExpr.serialize(),
 			Util.serializeArray(this._statements)
 		]);
 	},
 
 	doAnalyze: function (context) {
-		this._analyzeExpr(context, this._expr);
+		if (! this._analyzeExpr(context, this._listExpr))
+			return true;
+		var listType = this._listExpr.getType().resolveIfMayBeUndefined();
+		var listClassDef;
+		var listTypeName;
+		if (listType instanceof ObjectType
+			&& (listClassDef = listType.getClassDef()) instanceof InstantiatedClassDefinition
+			&& ((listTypeName = listClassDef.getTemplateClassName()) == "Array" || listTypeName == "Map")) {
+			// ok
+		} else {
+			context.errors.push(new CompileError(this.getToken(), "list expression of the for..in statement should be an array or a map"));
+			return true;
+		}
 		this._prepareBlockAnalysis(context);
 		try {
+			this._analyzeExpr(context, this._lhsExpr);
+			if (! this._lhsExpr.assertIsAssignable(context, this._token, listTypeName == "Array" ? Type.numberType : Type.stringType))
+				return false;
 			for (var i = 0; i < this._statements.length; ++i)
 				if (! this._statements[i].analyze(context))
 					return false;

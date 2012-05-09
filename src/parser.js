@@ -1381,13 +1381,13 @@ var Parser = exports.Parser = Class.extend({
 		}
 		if (this._expect("in") == null)
 			return -1; // retry the other
-		var expr = this._expr(false);
-		if (expr == null)
+		var listExpr = this._expr(false);
+		if (listExpr == null)
 			return 0;
-		if (this._expect(")") != null)
+		if (this._expect(")") == null)
 			return 0;
 		var statements = this._subStatements();
-		this._statements.push(new ForInStatement(token, label, identifier, expr, statements));
+		this._statements.push(new ForInStatement(token, label, lhsExpr, listExpr, statements));
 		return 1;
 	},
 
