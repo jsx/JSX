@@ -165,14 +165,16 @@ var UndefinedExpression = exports.UndefinedExpression = Expression.extend({
 
 var NullExpression = exports.NullExpression = Expression.extend({
 
-	constructor: function (token) {
+	constructor: function (token, type) {
 		Expression.prototype.constructor.call(this, token);
+		this._type = type;
 	},
 
 	serialize: function () {
 		return [
 			"NullExpression",
-			this._token.serialize()
+			this._token.serialize(),
+			this._type.serialize()
 		];
 	},
 
@@ -181,7 +183,7 @@ var NullExpression = exports.NullExpression = Expression.extend({
 	},
 
 	getType: function () {
-		return Type.nullType;
+		return this._type;
 	}
 
 });
@@ -658,12 +660,22 @@ var AsExpression = exports.AsExpression = UnaryExpression.extend({
 		// possibly unsafe conversions
 		var exprType = this._expr.getType().resolveIfMayBeUndefined();
 		var success = false;
-		if (exprType instanceof PrimitiveType) {
+		if (exprType.equals(Type.undefinedType)) {
+			if (this._type instanceof MayBeUndefinedType || this._type.equals(Type.variantType)) {
+				// ok
+				success = true;
+			}
+		} else if (exprType.equals(Type.nullType)) {
+			if (this._type instanceof ObjectType || this._type instanceof FunctionType) {
+				// ok
+				success = true;
+			}
+		} else if (exprType instanceof PrimitiveType) {
 			if (this._type instanceof PrimitiveType) {
 				// ok: primitive => primitive
 				success = true;
 			}
-		} else if (exprType instanceof VariantType) {
+		} else if (exprType.equals(Type.variantType)) {
 			// ok, variant is convertible to all types of objects
 			success = true;
 		} else if (exprType instanceof ObjectType) {

@@ -607,6 +607,25 @@ var _AsExpressionEmitter = exports._AsExpressionEmitter = _ExpressionEmitter.ext
 				return true;
 			}
 		}
+		if (srcType.equals(Type.nullType)) {
+			// from null
+			if (destType.equals(Type.booleanType)) {
+				this._emitter._emit("false", this._expr.getToken());
+				return true;
+			}
+			if (destType.equals(Type.integerType) || destType.equals(Type.numberType)) {
+				this._emitter._emit("0", this._expr.getToken());
+				return true;
+			}
+			if (destType.equals(Type.stringType)) {
+				this._emitter._emit("\"null\"", this._expr.getToken());
+				return true;
+			}
+			if (destType instanceof ObjectType || destType instanceof FunctionType) {
+				this._emitter._emit("null", this._expr.getToken());
+				return true;
+			}
+		}
 		if (srcType.equals(Type.booleanType)) {
 			// from boolean
 			if (destType.equals(Type.integerType) || destType.equals(Type.numberType)) {

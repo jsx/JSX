@@ -1894,7 +1894,7 @@ var Parser = exports.Parser = Class.extend({
 			case "undefined":
 				return new UndefinedExpression(token);
 			case "null":
-				return new NullExpression(token);
+				return this._nullLiteral(token);
 			case "false":
 				return new BooleanLiteralExpression(token);
 			case "true":
@@ -1920,6 +1920,21 @@ var Parser = exports.Parser = Class.extend({
 		} else {
 			this._newError("expected primary expression");
 		}
+	},
+
+	_nullLiteral: function (token) {
+		var type = Type.nullType;
+		if (this._expectOpt(":") != null) {
+			if ((type = this._typeDeclaration(false)) == null)
+				return null;
+			if (type.equals(Type.variantType) || type instanceof ObjectType || type instanceof StaticFunctionType) {
+				// ok
+			} else {
+				this._newError("type '" + type.toString() + "' is not nullable");
+				return null;
+			}
+		}
+		return new NullExpression(token, type);
 	},
 
 	_arrayLiteral: function (token) {

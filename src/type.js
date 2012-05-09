@@ -100,7 +100,7 @@ var NullType = exports.NullType = Type.extend({
 
 	isConvertibleTo: function (type) {
 		type = type.resolveIfMayBeUndefined();
-		return type instanceof ObjectType || type instanceof VariantType;
+		return type instanceof ObjectType || type instanceof VariantType || type instanceof StaticFunctionType;
 	},
 
 	getClassDef: function () {
