@@ -58,6 +58,11 @@ var _Util = exports._Util = Class.extend({
 			emitter._emit(label.getValue() + ":\n", label);
 			emitter._advanceIndent();
 		}
+	},
+
+	$shouldInlineFunction: function (funcDef) {
+		return (funcDef.flags() & (ClassDefinition.IS_FINAL | ClassDefinition.IS_NATIVE)) == ClassDefinition.IS_FINAL
+			&& funcDef.getStatements().length < 3;
 	}
 
 });
@@ -84,7 +89,23 @@ var _ConstructorInvocationStatementEmitter = exports._ConstructorInvocationState
 		var argTypes = ctorType != null ? ctorType.getArgumentTypes() : [];
 		var ctorName = this._emitter._mangleConstructorName(this._statement.getConstructingClassDef(), argTypes);
 		var token = this._statement.getQualifiedName().getToken();
-		this._emitter._emitCallArguments(token, ctorName + ".call(this", this._statement.getArguments(), argTypes);
+		var shouldInline = false;
+		if (this._emitter._enableInlining) {
+			if (ctorType != null) {
+				var funcDef = this._emitter._findFunction(this._statement.getConstructingClassDef(), "constructor", argTypes, false);
+				shouldInline = _Util.shouldInlineFunction(funcDef);
+			} else {
+				// always inline the implicitly-created constructor
+				shouldInline = true;
+			}
+		}
+		if (shouldInline) {
+			// FIXME do not emit an empty inline function (though not essential since it will be omitted by Closure Compiler
+			this._emitConstructorInline(this._statement.getConstructingClassDef(), funcDef);
+		} else {
+			this._emitter._emit(ctorName, token);
+		}
+		this._emitter._emitCallArguments(token, ".call(this", this._statement.getArguments(), argTypes);
 		this._emitter._emit(";\n", token);
 	}
 
@@ -1324,11 +1345,11 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 		this._output = this._platform.load(platform.getRoot() + "/src/js/bootstrap.js") + "\n";
 		this._outputFile = null;
 		this._indent = 0;
-		this._emittingClass = null;
 		this._emittingFunction = null;
 		this._enableAssertion = true;
 		this._enableLogging = true;
 		this._enableRunTimeTypeCheck = true;
+		this._enableInlining = false;
 	},
 
 	getSearchPaths: function () {
@@ -1366,6 +1387,10 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 		this._enableRunTimeTypeCheck = enable;
 	},
 
+	setEnableInlining: function (enable) {
+		this._enableInlining = enable;
+	},
+
 	emit: function (classDefs) {
 		for (var i = 0; i < classDefs.length; ++i) {
 			if ((classDefs[i].flags() & ClassDefinition.IS_NATIVE) == 0)
@@ -1377,36 +1402,27 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 	},
 
 	_emitClassDefinition: function (classDef) {
+		// emit class object
+		this._emitClassObject(classDef);
 
-		try {
-			this._emittingClass = classDef;
+		// emit constructors
+		var ctors = this._findFunctions(classDef, "constructor", false);
+		if (ctors.length == 0)
+			this._emitConstructor(classDef, null);
+		else
+			for (var i = 0; i < ctors.length; ++i)
+				this._emitConstructor(classDef, ctors[i]);
 
-			// emit class object
-			this._emitClassObject(classDef);
-
-			// emit constructors
-			var ctors = this._findFunctions(classDef, "constructor", false);
-			if (ctors.length == 0)
-				this._emitConstructor(classDef, null);
-			else
-				for (var i = 0; i < ctors.length; ++i)
-					this._emitConstructor(classDef, ctors[i]);
-
-			// emit functions
-			var members = classDef.members();
-			for (var i = 0; i < members.length; ++i) {
-				var member = members[i];
-				if (member instanceof MemberFunctionDefinition) {
-					if (! (member.name() == "constructor" && (member.flags() & ClassDefinition.IS_STATIC) == 0) && member.getStatements() != null) {
-						this._emitFunction(member);
-					}
+		// emit functions
+		var members = classDef.members();
+		for (var i = 0; i < members.length; ++i) {
+			var member = members[i];
+			if (member instanceof MemberFunctionDefinition) {
+				if (! (member.name() == "constructor" && (member.flags() & ClassDefinition.IS_STATIC) == 0) && member.getStatements() != null) {
+					this._emitFunction(member);
 				}
 			}
-
-		} finally {
-			this._emittingClass = null;
 		}
-
 	},
 
 	_emitStaticInitializationCode: function (classDef) {
@@ -1523,14 +1539,27 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 
 	_emitConstructor: function (classDef, funcDef) {
 		var funcName = this._mangleConstructorName(classDef, funcDef != null ? funcDef.getArgumentTypes() : []);
-		// emit prologue
 		this._emit("/**\n", null);
 		this._emit(" * @constructor\n", null);
 		if (funcDef != null)
 			this._emitFunctionArgumentAnnotations(funcDef);
 		this._emit(" */\n", null);
+		this._emitConstructorCore(classDef, funcDef, funcName);
+		this._emit(";\n\n", null);
+		this._emit(funcName + ".prototype = new " + classDef.getOutputClassName() + ";\n\n", null);
+	},
+
+	_emitConstructorInline: function (classDef, funcDef) {
+		this._emit("(", classDef.getToken());
+		this._emitConstructorCore(classDef, funcDef, null);
+		this._emit(")", null);
+	},
+
+	_emitConstructorCore: function (classDef, funcDef, funcName /* null if inline */) {
 		this._emit("function ", null);
-		this._emit(funcName + "(", classDef.getToken());
+		if (funcName != null)
+			this._emit(funcName, classDef.getToken());
+		this._emit("(", classDef.getToken());
 		if (funcDef != null)
 			this._emitFunctionArguments(funcDef);
 		this._emit(") {\n", null);
@@ -1549,8 +1578,7 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 			this._emitFunctionBody(funcDef);
 		// emit epilogue
 		this._reduceIndent();
-		this._emit("};\n\n", null);
-		this._emit(funcName + ".prototype = new " + classDef.getOutputClassName() + ";\n\n", null);
+		this._emit("}", null);
 	},
 
 	_emitFunction: function (funcDef) {
@@ -1617,8 +1645,15 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 			return true;
 		}
 		// emit call to the zero-argument ctor
-		if (classDef.className() != "Object")
-			this._emit(this._mangleConstructorName(classDef, []) + ".call(this);\n", null);
+		if (classDef.className() != "Object") {
+			if (this._enableInlining
+				&& ((ctorDef = this._findFunction(classDef, "constructor", [], false)) == null || _Util.shouldInlineFunction(ctorDef))) {
+				this._emitConstructorInline(classDef, ctorDef);
+			} else {
+				this._emit(this._mangleConstructorName(classDef, []), null);
+			}
+			this._emit(".call(this);\n", null);
+		}
 		return false;
 	},
 
@@ -1909,6 +1944,18 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 				functions.push(member);
 		}
 		return functions;
+	},
+
+	_findFunction: function (classDef, name, argTypes, isStatic) {
+		var members = classDef.members();
+		for (var i = 0; i < members.length; ++i) {
+			var member = members[i];
+			if ((member instanceof MemberFunctionDefinition) && member.name() == name
+				&& (member.flags() & ClassDefinition.IS_STATIC) == (isStatic ? ClassDefinition.IS_STATIC : 0)
+				&& Util.typesAreEqual(argTypes, member.getArgumentTypes()))
+				return member;
+		}
+		return null;
 	},
 
 	_emitFunctionInline: function (funcDef) {

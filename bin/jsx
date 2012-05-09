@@ -104,6 +104,10 @@ var JSX = Class.extend({
 			"  --mode (compile|parse)     compilation mode (default:compile)\n" +
 			"  --target (javascript|c++)  target language (default:javascript)\n" +
 			"  --release                  omits the debugging features from the generated code (run-time type checking, logging, assertion)\n" +
+			"  --enable-assert            enables the 'assert' statement\n" +
+			"  --enable-inline            enables function inlining\n" +
+			"  --enable-log               enables the 'log' statement\n" +
+			"  --enable-type-check        enables run-time type checking\n" +
 			"  --version                  displays the version and exits\n" +
 			"  --help                     displays this help and exits\n" +
 			"");
@@ -145,6 +149,7 @@ var JSX = Class.extend({
 		var run = null;
 		var opt, optarg;
 		while ((opt = getopt()) != null) {
+		NEXTOPT:
 			switch (opt) {
 			case "--add-search-path":
 				if((optarg= getoptarg()) == null)
@@ -194,6 +199,7 @@ var JSX = Class.extend({
 					emitter.setEnableAssertion(false);
 					emitter.setEnableLogging(false);
 					emitter.setEnableRunTimeTypeCheck(false);
+					emitter.setEnableInlining(true);
 				});
 				break;
 			case "--executable":
@@ -215,6 +221,34 @@ var JSX = Class.extend({
 				process.exit(0);
 				break;
 			default:
+				var switchOpt = opt.match("^--(enable|disable)-(.*)$");
+				if (switchOpt != null) {
+					var mode = switchOpt[1] == "enable";
+					switch (switchOpt[2]) {
+					case "assert":
+						tasks.push(function () {
+							emitter.setEnableAssertion(mode);
+						});
+						break NEXTOPT;
+					case "inline":
+						tasks.push(function () {
+							emitter.setEnableInlining(mode);
+						});
+						break NEXTOPT;
+					case "log":
+						tasks.push(function () {
+							emitter.setEnableLogging(mode);
+						});
+						break NEXTOPT;
+					case "type-check":
+						tasks.push(function () {
+							emitter.setEnableRunTimeTypeCheck(mode);
+						});
+						break NEXTOPT;
+					default:
+						break;
+					}
+				}
 				console.error("unknown option: " + opt);
 				process.exit(1);
 				break;
