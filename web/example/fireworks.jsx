@@ -2,7 +2,7 @@ import "js/dom.jsx";
 import "js/dom/canvas2d.jsx";
 
 class Config {
-	static const quantity = 360;
+	static const quantity = 2000;
 	static const size     = 2.0;
 	static const decay    = 0.98;
 	static const gravity  = 2.0;
@@ -20,6 +20,10 @@ class Spark {
 	var size : number;
 
 	function constructor(posX : number, posY : number, size : number) {
+		this.posX = posX;
+		this.posY = posY;
+		this.size = size;
+
 		var angle    = Math.random() * Spark.rad;
 		var velocity = Math.random() * Config.speed;
 
@@ -51,8 +55,8 @@ class Spark {
 }
 
 class Firework {
-	var color : string;
-	var sparks : Spark[];
+	var color = Firework.randomColor();
+	var sparks = [] : Spark[];
 	var view : FireworkView;
 
 	static function randomColor() : string {
@@ -68,8 +72,6 @@ class Firework {
 
 	function constructor(view : FireworkView, x : int, y : int) {
 		this.view = view;
-		this.color = Firework.randomColor();
-		this.sparks = [ ] : Spark[];
 
 		for (var i = 0; i < Config.quantity; ++i) {
 			this.sparks.push(new Spark(x, y, Config.size));
@@ -94,12 +96,11 @@ class FireworkView {
 	var left : int;
 	var top : int;
 
-	var fireworks : Firework[];
+	var fireworks = [] : Firework[];
 
 	var numSparks = 0;
 
 	function constructor(canvas : HTMLCanvasElement) {
-		this.fireworks = [] : Firework[];
 		this.cx = canvas.getContext("2d") as CanvasRenderingContext2D;
 
 		this.width  = canvas.width;
@@ -115,6 +116,9 @@ class FireworkView {
 		canvas.addEventListener("touchstart", function (e : TouchEvent) : void {
 			this.explode(e.touches[0].pageX, e.touches[0].pageY);
 		});
+
+		// initial one
+		this.explode(this.width / 2 + this.left, this.height / 3);
 	}
 
 	function explode(x : int, y : int) : void {
@@ -137,7 +141,7 @@ class FireworkView {
 			}
 		}
 
-		this.cx.fillStyle = "rbga(0, 0, 0, 0.3)";
+		this.cx.fillStyle = "rgba(0, 0, 0, 0.3)";
 		this.cx.fillRect(0, 0, this.width, this.height);
 	}
 
