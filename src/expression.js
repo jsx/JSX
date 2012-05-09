@@ -26,6 +26,18 @@ var Expression = exports.Expression = Class.extend({
 	assertIsAssignable: function (context, token, type) {
 		context.errors.push(new CompileError(token, "left-hand-side expression is not assignable"));
 		return false;
+	},
+
+	$assertIsAssignable: function (context, token, lhsType, rhsType) {
+		if (! lhsType.isAssignable()) {
+			context.errors.push(new CompileError("left-hand-side expression is not assignable"));
+			return false;
+		}
+		if (! rhsType.isConvertibleTo(lhsType)) {
+			context.errors.push(new CompileError(token, "cannot assign a value of type '" + rhsType.toString() + "' to '" + lhsType.toString() + "'"));
+			return false;
+		}
+		return true;
 	}
 
 });
@@ -853,15 +865,7 @@ var PropertyExpression = exports.PropertyExpression = UnaryExpression.extend({
 	},
 
 	assertIsAssignable: function (context, token, type) {
-		if (! this._type.isAssignable()) {
-			context.errors.push(new CompileError("left-hand-side expression is not assignable"));
-			return false;
-		}
-		if (! type.isConvertibleTo(this._type)) {
-			context.errors.push(new CompileError(token, "cannot assign a value of type '" + type.toString() + "' to '" + this._type.toString() + "'"));
-			return false;
-		}
-		return true;
+		return Expression.assertIsAssignable(context, token, this._type, type);
 	},
 
 	deduceByArgumentTypes: function (context, operatorToken, argTypes, isStatic) {
@@ -1029,6 +1033,10 @@ var ArrayExpression = exports.ArrayExpression = BinaryExpression.extend({
 
 	getType: function () {
 		return this._type;
+	},
+
+	assertIsAssignable: function (context, token, type) {
+		return Expression.assertIsAssignable(context, token, this._type, type);
 	}
 
 });
