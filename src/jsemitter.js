@@ -1069,18 +1069,7 @@ var _FunctionExpressionEmitter = exports._FunctionExpressionEmitter = _UnaryExpr
 
 	_emit: function () {
 		var funcDef = this._expr.getFuncDef();
-		this._emitter._emit("(function (", funcDef.getToken());
-		var args = funcDef.getArguments();
-		for (var i = 0; i < args.length; ++i) {
-			if (i != 0)
-				this._emitter._emit(", ", funcDef.getToken());
-			this._emitter._emit(args[i].getName().getValue(), funcDef.getToken());
-		}
-		this._emitter._emit(") {\n", funcDef.getToken());
-		this._emitter._advanceIndent();
-		this._emitter._emitFunctionBody(funcDef);
-		this._emitter._reduceIndent();
-		this._emitter._emit("})", funcDef.getToken())
+		this._emitter._emitFunctionInline(funcDef);
 	},
 
 	_getPrecedence: function () {
@@ -1920,6 +1909,21 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 				functions.push(member);
 		}
 		return functions;
+	},
+
+	_emitFunctionInline: function (funcDef) {
+		this._emit("(function (", funcDef.getToken());
+		var args = funcDef.getArguments();
+		for (var i = 0; i < args.length; ++i) {
+			if (i != 0)
+				this._emit(", ", funcDef.getToken());
+			this._emit(args[i].getName().getValue(), funcDef.getToken());
+		}
+		this._emit(") {\n", funcDef.getToken());
+		this._advanceIndent();
+		this._emitFunctionBody(funcDef);
+		this._reduceIndent();
+		this._emit("})", funcDef.getToken());
 	},
 
 	_emitCallArguments: function (token, prefix, args, argTypes) {
