@@ -1478,7 +1478,7 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 				}
 			}
 			// emit the map
-			this._emit("\"" + this._encodeFile(filename) + "\": ", null); // FIXME escape
+			this._emit("\"" + this._encodeFilename(filename) + "\": ", null); // FIXME escape
 			this._emit("{\n", null);
 			this._advanceIndent();
 			for (var i = 0; i < list.length; ++i) {
@@ -1497,7 +1497,7 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 		this._emit("};\n\n", null);
 	},
 
-	_encodeFile: function (filename) {
+	_encodeFilename: function (filename) {
 		if (filename.indexOf(this._platform.getRoot() + "/") == 0)
 			filename = "system:" + filename.substring(this._platform.getRoot().length + 1);
 		return filename;
@@ -1505,7 +1505,7 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 
 	getOutput: function (sourceFile, entryPoint) {
 		var output = entryPoint != null
-			? this._platform.addLauncher(this, this._encodeFile(sourceFile), this._output, entryPoint)
+			? this._platform.addLauncher(this, this._encodeFilename(sourceFile), this._output, entryPoint)
 			: this._output;
 		if (this._sourceMapGen)
 			return output + this._sourceMapGen.magicToken();
