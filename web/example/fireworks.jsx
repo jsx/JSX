@@ -2,11 +2,11 @@ import "js/dom.jsx";
 import "js/dom/canvas2d.jsx";
 
 class Config {
-	static const quantity = 2000;
-	static const size     = 2.0;
-	static const decay    = 0.98;
-	static const gravity  = 2.0;
-	static const speed    = 6.0;
+	static var quantity = 360;
+	static var size     = 2.0;
+	static var decay    = 0.98;
+	static var gravity  = 2.0;
+	static var speed    = 6.0;
 }
 
 
@@ -61,7 +61,7 @@ class Spark {
 
 	function _isLiving(view : FireworkView) : boolean {
 		if(this.size <= 0.01) return false;
-		if(this.posX <= 0 || this.posY <= 0) return false;
+		if(this.posX <= 0) return false;
 		if(this.posX >= view.width || this.posY >= view.height) return false;
 		return true;
 	}
@@ -194,7 +194,9 @@ class FPSWatcher {
 }
 
 class Application {
-	static function main(canvasId : string, fpsId : string) : void {
+	static function main(canvasId : string, fpsId : string, quantity : int) : void {
+		Config.quantity = quantity;
+
 		var canvas = dom.id(canvasId) as HTMLCanvasElement;
 
 		var view = new FireworkView(canvas);

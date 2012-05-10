@@ -2,7 +2,7 @@
 "use strict";
 
 var Config = {
-	quantity : 2000,
+	quantity : 360,
 	size     : 2.0,
 	decay    : 0.98,
 	gravity  : 2.0,
@@ -85,7 +85,7 @@ var Spark = Class.extend({
 
 	_isLiving: function (view) {
 		if(this.size <= 0.01) return false;
-		if(this.posX <= 0 || this.posY <= 0) return false;
+		if(this.posX <= 0) return false;
 		if(this.posX >= view.width || this.posY >= view.height) return false;
 		return true;
 	},
@@ -211,7 +211,9 @@ var FPSWatcher = Class.extend({
 });
 
 exports.FireworkApplication = Class.extend({
-	$main: function (canvasId, fpsId) {
+	$main: function (canvasId, fpsId, quantity) {
+		Config.quantity = quantity;
+
 		var canvas = document.getElementById(canvasId);
 
 		var view = new FireworkView(canvas);
