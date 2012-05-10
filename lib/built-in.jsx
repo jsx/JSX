@@ -96,6 +96,7 @@ native final class Boolean {
 	// 15.6.2
 	function constructor();
 	function constructor(value : boolean);
+	function constructor(value : Boolean);
 
 	// 15.6.4
 	override function toString() : string;
@@ -109,6 +110,7 @@ native final class Number {
 	// 15.7.2
 	function constructor();
 	function constructor(value : number);
+	function constructor(value : Number);
 
 	// 15.7.3
 	static var MAX_VALUE : number;
@@ -274,6 +276,7 @@ native final class RegExp {
 
 	function constructor(pattern :string, flags :string);
 	function constructor(pattern :string);
+	function constructor(pattern :RegExp);
 
 	// FIXME: the matched object is a variation of string[],
 	//        but has "index", "input" and "lastIndex" properties
