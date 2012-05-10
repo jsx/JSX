@@ -1,21 +1,66 @@
 <html>
   <head>
     <title>Fireworks</title>
-    <link rel="stylesheet" type="text/css" href="night.css" />
+    <style>
+      body {
+        background-color: #222;
+        padding: 0;
+        margin: 0;
+        overflow: hidden;
+      }
 
+      canvas {
+        position: absolute;
+        background-color: #000;
+        top: 30px;
+      }
+
+      #night-sky {
+        left: 30px;
+      }
+      #night-sky2 {
+        left: 450px;
+      }
+
+      .status {
+        position: absolute;
+        top: 0;
+        padding: 5px;
+        margin: 0;
+        font-size: 20px;
+        color: #fff;
+      }
+
+      #fps {
+        left: 30px;
+      }
+      #fps2 {
+        left: 450px;
+      }
+    </style>
     <script src="../jsx.combined.js"></script>
     <script src="../assets/js/jsx-browser-platform.js"></script>
-    <script>jsx.enableOptimizations = true;</script>
+    <script>
+      jsx.enableOptimizations = true;
+    </script>
     <script src="../assets/js/jsx-script-loader.js"></script>
     <script type="application/jsx" src="fireworks.jsx"></script>
+    <script src="fireworks.js"></script>
     <script>
       window.addEventListener("DOMContentLoaded", function(e) {
-        JSX.require("fireworks.jsx").Application.main$();
+        JSX.require("fireworks.jsx").Application.main$SS("night-sky", "fps");
+        FireworkApplication.main("night-sky2", "fps2");
       });
     </script>
   </head>
   <body>
+  <div>
     <canvas id="night-sky" width="400" height="400"></canvas>
-    <p id="fps">not running</p>
+    <p class="status" id="fps">not running</p>
+  </div>
+  <div>
+    <canvas id="night-sky2" width="400" height="400"></canvas>
+    <p class="status" id="fps2">not running</p>
+  </div>
   </body>
 </html>

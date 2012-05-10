@@ -29,7 +29,7 @@ window.addEventListener("DOMContentLoaded", function(e) {
 			}
 
 			var output = emitter.getOutput();
-	
+
 			if(jsx.enableOptimizations) {
 				output = platform.applyClosureCompiler(output, "SIMPLE_OPTIMIZATIONS");
 			}

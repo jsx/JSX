@@ -17,7 +17,7 @@ var _Util = exports._Util = Class.extend({
 		} else if (type.equals(Type.integerType) || type.equals(Type.numberType)) {
 			return "!number";
 		} else if (type.equals(Type.stringType)) {
-			return "?string";
+			return "!string";
 		} else if (type instanceof MayBeUndefinedType) {
 			return "undefined|" + this.toClosureType(type.getBaseType());
 		} else if (type instanceof ObjectType) {
@@ -25,10 +25,12 @@ var _Util = exports._Util = Class.extend({
 			if (classDef instanceof InstantiatedClassDefinition && classDef.getTemplateClassName() == "Array") {
 				return "Array.<undefined|" + this.toClosureType(classDef.getTypeArguments()[0]) + ">";
 			} else if (classDef instanceof InstantiatedClassDefinition && classDef.getTemplateClassName() == "Map") {
-				return "Object.<undefined|" + this.toClosureType(classDef.getTypeArguments()[0]) + ">";
+				return "Object.<string, undefined|" + this.toClosureType(classDef.getTypeArguments()[0]) + ">";
 			} else {
 				return classDef.getOutputClassName();
 			}
+		} else if (type instanceof VariantType) {
+			return "*";
 		}
 		return null;
 	},

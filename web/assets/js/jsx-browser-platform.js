@@ -55,7 +55,7 @@ var BrowserPlatform = jsx.Platform.extend({
 			param.formatting = "pretty_print";
 		}
 		if(level === "ADVANCED_OPTIMIZATIONS") {
-			param.js_externs = "function JSX() { }";
+			param.js_externs = "";
 		}
 		var params = [];
 		for(var key in param) {
