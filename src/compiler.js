@@ -238,21 +238,29 @@ var Compiler = exports.Compiler = Class.extend({
 	},
 
 	_analyze: function (errors) {
-		// analyze every classdef
-		this.forEachClassDef(function (parser, classDef) {
-			classDef.analyze(new AnalysisContext(
+		var createContext = function (parser) {
+			return new AnalysisContext(
 				errors,
 				parser,
 				function (errors, request) {
 					return this._instantiateTemplate(errors, parser, request, true);
-				}.bind(this)));
+				}.bind(this));
+		}.bind(this);
+		// set analyzation context of every variable
+		this.forEachClassDef(function (parser, classDef) {
+			classDef.setAnalysisContextOfVariables(createContext(parser));
 			return true;
 		}.bind(this));
-		// analyze unused variables in evry classdef
-		this.forEachClassDef((function (parser, classDef) {
+		// analyze every classdef
+		this.forEachClassDef(function (parser, classDef) {
+			classDef.analyze(createContext(parser));
+			return true;
+		}.bind(this));
+		// analyze unused variables in every classdef
+		this.forEachClassDef(function (parser, classDef) {
 			classDef.analyzeUnusedVariables();
 			return true;
-		}).bind(this));
+		}.bind(this));
 	},
 
 	_generateCode: function () {

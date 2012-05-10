@@ -226,13 +226,15 @@ var ClassDefinition = exports.ClassDefinition = Class.extend({
 			this._objectTypesUsed[i].resolveType(context);
 	},
 
-	analyze: function (context) {
-		// prepare
+	setAnalysisContextOfVariables: function (context) {
 		for (var i = 0; i < this._members.length; ++i) {
 			var member = this._members[i];
 			if (member instanceof MemberVariableDefinition)
 				member.setAnalysisContext(context);
 		}
+	},
+
+	analyze: function (context) {
 		// check that the class may be extended
 		if (! this._assertInheritanceIsNotInLoop(context, null, this.getToken()))
 			return false;
