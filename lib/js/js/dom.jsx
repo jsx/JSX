@@ -639,11 +639,11 @@ native class TouchEvent extends UIEvent {
 // http://www.w3.org/TR/XMLHttpRequest/
 
 native class XMLHttpRequestEventTarget extends EventTarget {
-	// TODO
+	function addEventListener(target : string, listener : function(:ProgressEvent):void) : void;
+	function removeEventListener(target : string, listener : function(:ProgressEvent):void) : void;
 }
 
 native class XMLHttpRequestUpload extends XMLHttpRequestEventTarget {
-	// TODO
 }
 
 native class XMLHttpRequest extends XMLHttpRequestEventTarget {
@@ -668,6 +668,12 @@ native class XMLHttpRequest extends XMLHttpRequestEventTarget {
 
 	function send() : void;
 	function send(data : string) : void;
+	function send(data : String) : void;
+	// FIXME function send(data : ArrayBuffer) : void;
+	// FIXME function send(data : Blob) : void;
+	function send(data : Document) : void;
+	// FIXME function send(data : FormData) : void;
+
 	function abort() : void;
 
 	// response
@@ -682,6 +688,16 @@ native class XMLHttpRequest extends XMLHttpRequestEventTarget {
 	const responseText : string;
 	const responseXML : Document;
 }
+
+// http://dvcs.w3.org/hg/progress/raw-file/tip/Overview.html#progressevent
+
+native class ProgressEvent extends Event {
+	const lengthComputable : boolean;
+	const loaded : number;
+	const total : number;
+}
+
+// Canvas
 
 interface CanvasRenderingContext { }
 
