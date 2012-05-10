@@ -1,0 +1,21 @@
+<html>
+  <head>
+    <title>Fireworks</title>
+    <link rel="stylesheet" type="text/css" href="night.css" />
+
+    <script src="../jsx.combined.js"></script>
+    <script src="../assets/js/jsx-browser-platform.js"></script>
+    <script>jsx.enableOptimizations = true;</script>
+    <script src="../assets/js/jsx-script-loader.js"></script>
+    <script type="application/jsx" src="fireworks.jsx"></script>
+    <script>
+      window.addEventListener("DOMContentLoaded", function(e) {
+        JSX.require("fireworks.jsx").Application.main$();
+      });
+    </script>
+  </head>
+  <body>
+    <canvas id="night-sky" width="400" height="400"></canvas>
+    <p id="fps">not running</p>
+  </body>
+</html>

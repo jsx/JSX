@@ -17,31 +17,6 @@ window.addEventListener('load', function(e) {
 		return 0;
 	}
 
-	function applyClosureCompiler(sourceText, level) {
-		var URL = 'http://closure-compiler.appspot.com/compile';
-		var xhr = new XMLHttpRequest();
-		xhr.open("POST", URL, false);
-		xhr.setRequestHeader("Content-Type",
-							 "application/x-www-form-urlencoded");
-
-		var param = {
-			js_code: sourceText,
-			formatting: "pretty_print",
-			compilation_level: level,
-			output_format: "text",
-			output_info: "compiled_code"
-		};
-		var params = [];
-		for(var key in param) {
-			params.push(encodeURIComponent(key) +
-						"=" +
-						encodeURIComponent(param[key]));
-		}
-		xhr.send(params.join("&"));
-		return xhr.responseText;
-	}
-
-
 	var list   = element('source-list');
 
 	var input  = element('input');
@@ -123,7 +98,7 @@ window.addEventListener('load', function(e) {
 
 			var level = getOptimizationLevel();
 			if(level > 0 && options.mode !== 'parse') {
-				out = applyClosureCompiler(out, level === 1
+				out = platform.applyClosureCompiler(out, level === 1
 										 ? "SIMPLE_OPTIMIZATIONS"
 										 : "ADVANCED_OPTIMIZATIONS");
 			}
