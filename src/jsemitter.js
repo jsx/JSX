@@ -1677,7 +1677,8 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 
 	_emitMemberVariable: function (holder, variable) {
 		var initialValue = variable.getInitialValue();
-		if (initialValue != null
+		if ((variable.flags() & ClassDefinition.IS_STATIC) != 0
+			&& initialValue != null
 			&& ! (initialValue instanceof UndefinedExpression
 				|| initialValue instanceof NullExpression
 				|| initialValue instanceof BooleanLiteralExpression
