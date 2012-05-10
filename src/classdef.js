@@ -123,6 +123,60 @@ var ClassDefinition = exports.ClassDefinition = Class.extend({
 		return this._members;
 	},
 
+	forEachClassToBase: function (cb) {
+		if (! cb(this))
+			return false;
+		for (var i = this._implementClassDefs.length - 1; i >= 0; --i) {
+			if (! cb(this._implementClassDefs[i]))
+				return false;
+		}
+		if (this._extendClassDef._className != "Object")
+			if (! this._extendClassDef.forEachClassToBase(cb))
+				return false;
+		return true;
+	},
+
+	forEachClassFromBase: function (cb) {
+		if (this._extendClassDef._className != "Object")
+			if (! this._extendClassDef.forEachClassFromBase(cb))
+				return false;
+		for (var i = 0; i < this._implementClassDefs.length; ++i) {
+			if (! cb(this._implementClassDefs[i]))
+				return false;
+		}
+		if (! cb(this))
+			return false;
+		return true;
+	},
+
+	forEachMember: function (cb) {
+		for (var i = 0; i < this._members.length; ++i) {
+			if (! cb(this._members[i]))
+				return false;
+		}
+		return true;
+	},
+
+	forEachMemberVariable: function (cb) {
+		for (var i = 0; i < this._members.length; ++i) {
+			if (this._members[i] instanceof MemberVariableDefinition) {
+				if (! cb(this._members[i]))
+					return false;
+			}
+		}
+		return true;
+	},
+
+	forEachMemberFunction: function (cb) {
+		for (var i = 0; i < this._members.length; ++i) {
+			if (this._members[i] instanceof MemberFunctionDefinition) {
+				if (! cb(this._members[i]))
+					return false;
+			}
+		}
+		return true;
+	},
+
 	$GET_MEMBER_MODE_ALL: 0, // looks for functions or variables from the class and all super classes
 	$GET_MEMBER_MODE_CLASS_ONLY: 1, // looks for functions or variables within the class
 	$GET_MEMBER_MODE_SUPER: 2, // looks for functions with body in super classes
@@ -323,6 +377,89 @@ var ClassDefinition = exports.ClassDefinition = Class.extend({
 			if (member instanceof MemberVariableDefinition)
 				member.getType();
 		}
+	},
+
+	determineCallees: function () {
+		var Expression = require("./expression");
+		var Statement = require("./statement");
+
+		var findCallingFunctionInClass = function (classDef, funcName, argTypes, isStatic) {
+			var found = null;
+			classDef.forEachMemberFunction(function (funcDef) {
+				if (isStatic == ((funcDef.flags() & ClassDefinition.IS_STATIC) != 0)
+					&& funcDef.name() == funcName
+					&& Util.typesAreEqual(funcDef.getArgumentTypes(), argTypes)) {
+					found = funcDef;
+					return false;
+				}
+				return true;
+			});
+			// only return if the found function is final
+			if (found != null) {
+				if ((found.flags() & (ClassDefinition.IS_STATIC | ClassDefinition.IS_FINAL)) == 0)
+					found = null;
+			}
+			return found;
+		};
+		var findCallingFunction = function (classDef, funcName, argTypes, isStatic) {
+			var found = null;
+			// find the first declaration
+			classDef.forEachClassToBase(function (classDef) {
+				if ((found = findCallingFunctionInClass(classDef, funcName, argTypes, isStatic)) != null)
+					return false;
+				return true;
+			});
+			return found;
+		};
+
+		// iterate
+		this.forEachMemberFunction(function onElement(element) {
+
+			if (element instanceof Statement.ConstructorInvocationStatement) {
+
+				// invocation of super-class ctor
+				var ctorType = element.getConstructorType();
+				if (ctorType != null) {
+					// FIXME we should better create an empty ctor for classes with no ctor
+					var callingFuncDef = findCallingFunctionInClass(
+						element.getConstructingClassDef(),
+						"constructor",
+						ctorType.getArgumentTypes(),
+						false);
+					if (callingFuncDef == null)
+						throw new Error("could not determine the associated parent ctor");
+					element.setCallingFuncDef(callingFuncDef);
+				}
+
+			} else if (element instanceof Expression.CallExpression) {
+
+				// call expression
+				var calleeExpr = element.getExpr();
+				if (0 && calleeExpr instanceof Expression.PropertyExpression && ! calleeExpr.getType().isAssignable()) {
+					// is referring to function (not a value of function type)
+					var holderType = calleeExpr.getHolderType();
+					var callingFuncDef = findCallingFunction(
+							holderType.getClassDef(),
+							calleeExpr.getIdentifierToken().getValue(),
+							calleeExpr.getType().getArgumentTypes(),
+							holderType instanceof Type.ClassDefType);
+					element.setCallingFuncDef(callingFuncDef);
+				}
+
+			} else if (element instanceof Expression.NewExpression) {
+
+				/*
+					For now we do not do anything here, since all objects should be created by the JS new operator,
+					or will fail in operations like obj.func().
+				*/
+
+			}
+
+			// iterate
+			element.forEachCodeElement(onElement);
+			return true;
+
+		}.bind(this));
 	},
 
 	isConvertibleTo: function (classDef) {
@@ -790,6 +927,10 @@ var MemberFunctionDefinition = exports.MemberFunctionDefinition = MemberDefiniti
 		return (this._flags & ClassDefinition.IS_STATIC) != 0
 			? new Type.StaticFunctionType(this._returnType, this.getArgumentTypes(), false)
 			: new Type.MemberFunctionType(new Type.ObjectType(this._classDef), this._returnType, this.getArgumentTypes(), false);
+	},
+
+	forEachCodeElement: function (cb) {
+		return Util.forEachCodeElement(cb, this._statements);
 	}
 
 });

@@ -105,7 +105,12 @@ var Compiler = exports.Compiler = Class.extend({
 			this._printErrors(errors);
 			return false;
 		}
-		// TODO optimize
+		// determine callees (for optimization and code generation)
+		this._determineCallees();
+		// optimization
+		if (this._enableInlining)
+			this._inlineFunctions();
+		// TODO peep-hole and dead store optimizations, etc.
 		this._generateCode();
 		return true;
 	},
@@ -158,9 +163,10 @@ var Compiler = exports.Compiler = Class.extend({
 			var classDefs = parser.getClassDefs();
 			for (var j = 0; j < classDefs.length; ++j) {
 				if (! f(parser, classDefs[j]))
-					return;
+					return false;
 			}
 		}
+		return true;
 	},
 
 	_resolveImports: function (errors) {
@@ -259,6 +265,13 @@ var Compiler = exports.Compiler = Class.extend({
 		// analyze unused variables in every classdef
 		this.forEachClassDef(function (parser, classDef) {
 			classDef.analyzeUnusedVariables();
+			return true;
+		}.bind(this));
+	},
+
+	_determineCallees: function () {
+		this.forEachClassDef(function (parser, classDef) {
+			classDef.determineCallees();
 			return true;
 		}.bind(this));
 	},

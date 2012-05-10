@@ -24,6 +24,8 @@ var Expression = exports.Expression = Class.extend({
 		return null;
 	},
 
+	forEachCodeElement: null, // function forEachCodeElement(cb : function (expr)) : boolean
+
 	assertIsAssignable: function (context, token, type) {
 		context.errors.push(new CompileError(token, "left-hand-side expression is not assignable"));
 		return false;
@@ -38,6 +40,18 @@ var Expression = exports.Expression = Class.extend({
 			context.errors.push(new CompileError(token, "cannot assign a value of type '" + rhsType.toString() + "' to '" + lhsType.toString() + "'"));
 			return false;
 		}
+		return true;
+	}
+
+});
+
+var LeafExpression = exports.LeafExpression = Expression.extend({
+
+	constructor: function (token) {
+		Expression.prototype.constructor.call(this, token);
+	},
+
+	forEachCodeElement: function (cb) {
 		return true;
 	}
 
@@ -64,10 +78,10 @@ var OperatorExpression = exports.OperatorExpression = Expression.extend({
 
 // primary expressions
 
-var IdentifierExpression = exports.IdentifierExpression = Expression.extend({
+var IdentifierExpression = exports.IdentifierExpression = LeafExpression.extend({
 
 	constructor: function (token) {
-		Expression.prototype.constructor.call(this, token);
+		LeafExpression.prototype.constructor.call(this, token);
 		this._local = null;
 		this._classDefType = null;
 	},
@@ -144,10 +158,10 @@ var IdentifierExpression = exports.IdentifierExpression = Expression.extend({
 
 });
 
-var UndefinedExpression = exports.UndefinedExpression = Expression.extend({
+var UndefinedExpression = exports.UndefinedExpression = LeafExpression.extend({
 
 	constructor: function (token) {
-		Expression.prototype.constructor.call(this, token);
+		LeafExpression.prototype.constructor.call(this, token);
 	},
 
 	serialize: function () {
@@ -167,10 +181,10 @@ var UndefinedExpression = exports.UndefinedExpression = Expression.extend({
 
 });
 
-var NullExpression = exports.NullExpression = Expression.extend({
+var NullExpression = exports.NullExpression = LeafExpression.extend({
 
 	constructor: function (token, type) {
-		Expression.prototype.constructor.call(this, token);
+		LeafExpression.prototype.constructor.call(this, token);
 		this._type = type;
 	},
 
@@ -192,10 +206,10 @@ var NullExpression = exports.NullExpression = Expression.extend({
 
 });
 
-var BooleanLiteralExpression = exports.BooleanLiteralExpression = Expression.extend({
+var BooleanLiteralExpression = exports.BooleanLiteralExpression = LeafExpression.extend({
 
 	constructor: function (token) {
-		Expression.prototype.constructor.call(this, token);
+		LeafExpression.prototype.constructor.call(this, token);
 	},
 
 	serialize: function () {
@@ -215,10 +229,10 @@ var BooleanLiteralExpression = exports.BooleanLiteralExpression = Expression.ext
 
 });
 
-var IntegerLiteralExpression = exports.IntegerLiteralExpression = Expression.extend({
+var IntegerLiteralExpression = exports.IntegerLiteralExpression = LeafExpression.extend({
 
 	constructor: function (token) {
-		Expression.prototype.constructor.call(this, token);
+		LeafExpression.prototype.constructor.call(this, token);
 	},
 
 	serialize: function () {
@@ -239,10 +253,10 @@ var IntegerLiteralExpression = exports.IntegerLiteralExpression = Expression.ext
 });
 
 
-var NumberLiteralExpression = exports.NumberLiteralExpression = Expression.extend({
+var NumberLiteralExpression = exports.NumberLiteralExpression = LeafExpression.extend({
 
 	constructor: function (token) {
-		Expression.prototype.constructor.call(this, token);
+		LeafExpression.prototype.constructor.call(this, token);
 	},
 
 	serialize: function () {
@@ -262,10 +276,10 @@ var NumberLiteralExpression = exports.NumberLiteralExpression = Expression.exten
 
 });
 
-var StringLiteralExpression = exports.StringLiteralExpression = Expression.extend({
+var StringLiteralExpression = exports.StringLiteralExpression = LeafExpression.extend({
 
 	constructor: function (token) {
-		Expression.prototype.constructor.call(this, token);
+		LeafExpression.prototype.constructor.call(this, token);
 	},
 
 	serialize: function () {
@@ -285,10 +299,10 @@ var StringLiteralExpression = exports.StringLiteralExpression = Expression.exten
 
 });
 
-var RegExpLiteralExpression = exports.RegExpLiteralExpression = Expression.extend({
+var RegExpLiteralExpression = exports.RegExpLiteralExpression = LeafExpression.extend({
 
 	constructor: function (token) {
-		Expression.prototype.constructor.call(this, token);
+		LeafExpression.prototype.constructor.call(this, token);
 		this._type = null;
 	},
 
@@ -387,6 +401,12 @@ var ArrayLiteralExpression = exports.ArrayLiteralExpression = Expression.extend(
 			}
 		}
 		return succeeded;
+	},
+
+	forEachCodeElement: function (cb) {
+		if (! Util.forEachCodeElement(cb, this._exprs))
+			return false;
+		return true;
 	}
 
 });
@@ -482,6 +502,13 @@ var MapLiteralExpression = exports.MapLiteralExpression = Expression.extend({
 			}
 		}
 		return succeeded;
+	},
+
+	forEachCodeElement: function (cb) {
+		for (var i = 0; i < this._elements.length; ++i)
+			if (! cb(this._elements[i].getExpr()))
+				return false;
+		return true;
 	}
 
 });
@@ -515,6 +542,10 @@ var ThisExpression = exports.ThisExpression = Expression.extend({
 
 	getType: function () {
 		return new ObjectType(this._classDef);
+	},
+
+	forEachCodeElement: function (cb) {
+		return true;
 	}
 
 });
@@ -544,6 +575,10 @@ var FunctionExpression = exports.FunctionExpression = Expression.extend({
 
 	getType: function () {
 		return new StaticFunctionType(this._funcDef.getReturnType(), this._funcDef.getArgumentTypes(), false);
+	},
+
+	forEachCodeElement: function (cb) {
+		return cb(this._funcDef);
 	}
 
 });
@@ -577,6 +612,10 @@ var UnaryExpression = exports.UnaryExpression = OperatorExpression.extend({
 			return false;
 		}
 		return true;
+	},
+
+	forEachCodeElement: function (cb) {
+		return cb(this._expr);
 	}
 
 });
@@ -984,6 +1023,14 @@ var BinaryExpression = exports.BinaryExpression = OperatorExpression.extend({
 		if (! this._expr2.analyze(context, this))
 			return false;
 		return true;
+	},
+
+	forEachCodeElement: function (cb) {
+		if (! cb(this._expr1))
+			return false;
+		if (! cb(this._expr2))
+			return false;
+		return true;
 	}
 
 });
@@ -1019,7 +1066,6 @@ var AdditiveExpression = exports.AdditiveExpression = BinaryExpression.extend({
 	getType: function () {
 		return this._type;
 	}
-
 });
 
 var ArrayExpression = exports.ArrayExpression = BinaryExpression.extend({
@@ -1318,6 +1364,16 @@ var ConditionalExpression = exports.ConditionalExpression = OperatorExpression.e
 
 	getType: function () {
 		return this._type;
+	},
+
+	forEachCodeElement: function (cb) {
+		if (! cb(this._condExpr))
+			return false;
+		if (this._ifTrueExpr != null && ! cb(this._ifTrueExpr))
+			return false;
+		if (! cb(this._ifFalseExpr))
+			return false;
+		return true;
 	}
 
 });
@@ -1330,6 +1386,7 @@ var CallExpression = exports.CallExpression = OperatorExpression.extend({
 		OperatorExpression.prototype.constructor.call(this, operatorToken);
 		this._expr = expr;
 		this._args = args;
+		this._callingFuncDef = null; // should become an interface, see ConstructorInvocationStatement
 	},
 
 	getExpr: function () {
@@ -1338,6 +1395,14 @@ var CallExpression = exports.CallExpression = OperatorExpression.extend({
 
 	getArguments: function () {
 		return this._args;
+	},
+
+	getCallingFuncDef: function () {
+		return this._callingFuncDef;
+	},
+
+	setCallingFuncDef: function (funcDef) {
+		this._callingFuncDef = funcDef;
 	},
 
 	serialize: function () {
@@ -1369,6 +1434,14 @@ var CallExpression = exports.CallExpression = OperatorExpression.extend({
 
 	getType: function () {
 		return this._expr.getType().getReturnType();
+	},
+
+	forEachCodeElement: function (cb) {
+		if (! cb(this._expr))
+			return false;
+		if (! Util.forEachCodeElement(this._args))
+			return false;
+		return true;
 	}
 
 });
@@ -1430,6 +1503,12 @@ var SuperExpression = exports.SuperExpression = OperatorExpression.extend({
 
 	getType: function () {
 		return this._funcType.getReturnType();
+	},
+
+	forEachCodeElement: function (cb) {
+		if (! Util.forEachCodeElement(this._args))
+			return false;
+		return true;
 	}
 
 });
@@ -1493,6 +1572,12 @@ var NewExpression = exports.NewExpression = OperatorExpression.extend({
 
 	getConstructor: function () {
 		return this._constructor;
+	},
+
+	forEachCodeElement: function (cb) {
+		if (! Util.forEachCodeElement(this._args))
+			return false;
+		return true;
 	}
 
 });
@@ -1530,6 +1615,14 @@ var CommaExpression = exports.CommaExpression = Expression.extend({
 
 	getType: function () {
 		return this._expr2.getType();
+	},
+
+	forEachCodeElement: function (cb) {
+		if (! cb(this._expr1))
+			return false;
+		if (! cb(this._expr2))
+			return false;
+		return true;
 	}
 
 });
