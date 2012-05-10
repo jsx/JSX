@@ -31,7 +31,7 @@ window.addEventListener("DOMContentLoaded", function(e) {
 			var output = emitter.getOutput();
 	
 			if(jsx.enableOptimizations) {
-				//output = platform.applyClosureCompiler(output, "SIMPLE_OPTIMIZATIONS");
+				output = platform.applyClosureCompiler(output, "SIMPLE_OPTIMIZATIONS");
 			}
 
 			var compiledScript = document.createElement("script");
