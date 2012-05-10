@@ -20,7 +20,7 @@ window.addEventListener("DOMContentLoaded", function(e) {
 
 			if(jsx.enableOptimizations) {
 				emitter.setEnableAssertion(false);
-				emitter.setEnableLogging(false);
+				//emitter.setEnableLogging(false);
 				emitter.setEnableRunTimeTypeCheck(false);
 			}
 
@@ -31,7 +31,7 @@ window.addEventListener("DOMContentLoaded", function(e) {
 			var output = emitter.getOutput();
 	
 			if(jsx.enableOptimizations) {
-				output = platform.applyClosureCompiler(output, "SIMPLE_OPTIMIZATIONS");
+				//output = platform.applyClosureCompiler(output, "SIMPLE_OPTIMIZATIONS");
 			}
 
 			var compiledScript = document.createElement("script");
