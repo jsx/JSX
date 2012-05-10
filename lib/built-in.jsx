@@ -84,10 +84,9 @@ native final class String {
 	// 15.5.5
 	var length : int;
 
-	// non-standard members
-
-	function substr(start : int) : string;
-	function substr(start : int, length : int) : string;
+	// removed: use substring() instead
+	// function substr(start : int) : string;
+	// function substr(start : int, length : int) : string;
 }
 
 // 15.6
