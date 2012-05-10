@@ -1360,6 +1360,7 @@ var CallExpression = exports.CallExpression = OperatorExpression.extend({
 			return false;
 		}
 		if (this._expr instanceof PropertyExpression
+			&& ! exprType.isAssignable()
 			&& this._expr.deduceByArgumentTypes(context, this._token, argTypes, (this._expr.getHolderType() instanceof ClassDefType)) == null)
 			return false;
 		return true;
