@@ -544,6 +544,8 @@ var StaticFunctionType = exports.StaticFunctionType = ResolvedFunctionType.exten
 			return true;
 		if (! (type instanceof StaticFunctionType))
 			return false;
+		if (! this._returnType.equals(type.getReturnType()))
+			return false;
 		return this._deduceByArgumentTypes(type.getArgumentTypes(), true, true);
 	},
 
