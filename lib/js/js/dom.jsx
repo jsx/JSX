@@ -688,7 +688,7 @@ interface CanvasRenderingContext { }
 // JSX interface to DOM
 
 final class dom {
-	//static const window = js.global["window"] as __noconvert__ Window;
+	static const window = js.global["window"] as __noconvert__ Window;
 
 	static function getWindow() : Window {
 		return js.global["window"] as __noconvert__ Window;
