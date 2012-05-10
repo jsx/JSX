@@ -128,10 +128,10 @@ var ClassDefinition = exports.ClassDefinition = Class.extend({
 	$GET_MEMBER_MODE_SUPER: 2, // looks for functions with body in super classes
 	$GET_MEMBER_MODE_FUNCTION_WITH_BODY: 3, // looks for function with body
 	
-	getMemberTypeByName: function (name, mode) {
+	getMemberTypeByName: function (name, isStatic, mode) {
 		// returns an array to support function overloading
 		var types = [];
-		this._getMemberTypesByName(types, name, mode);
+		this._getMemberTypesByName(types, name, isStatic, mode);
 		switch (types.length) {
 		case 0:
 			return null;
@@ -142,11 +142,12 @@ var ClassDefinition = exports.ClassDefinition = Class.extend({
 		}
 	},
 
-	_getMemberTypesByName: function (types, name, mode) {
+	_getMemberTypesByName: function (types, name, isStatic, mode) {
 		if (mode != ClassDefinition.GET_MEMBER_MODE_SUPER) {
 			for (var i = 0; i < this._members.length; ++i) {
 				var member = this._members[i];
-				if (name == member.name()) {
+				if (isStatic == ((member.flags() & ClassDefinition.IS_STATIC) != 0)
+					&& name == member.name()) {
 					if (member instanceof MemberVariableDefinition) {
 						if ((member.flags() & ClassDefinition.IS_OVERRIDE) == 0) {
 							var type = member.getType();
@@ -175,9 +176,9 @@ var ClassDefinition = exports.ClassDefinition = Class.extend({
 		}
 		if (mode != ClassDefinition.GET_MEMBER_MODE_CLASS_ONLY) {
 			if (this._extendClassDef != null)
-				this._extendClassDef._getMemberTypesByName(types, name, mode);
+				this._extendClassDef._getMemberTypesByName(types, name, isStatic, mode);
 			for (var i = 0; i < this._implementClassDefs.length; ++i)
-				this._implementClassDefs[i]._getMemberTypesByName(types, name, mode);
+				this._implementClassDefs[i]._getMemberTypesByName(types, name, isStatic, mode);
 		}
 	},
 
