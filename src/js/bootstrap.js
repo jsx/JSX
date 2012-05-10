@@ -7,6 +7,27 @@ function $__jsx_merge_interface(target, source) {
 			target.prototype[k] = source.prototype[k];
 }
 
+/**
+ * defers the initialization of the property
+ */
+function $__jsx_lazy_init(obj, prop, func) {
+	Object.defineProperty(obj, prop, {
+		get: function () {
+			return this.p = func();
+		},
+		set: function (v) {
+			Object.defineProperty(obj, prop, {
+				value: v,
+				enumerable: true,
+				writable: true,
+				configurable: true
+			});
+		},
+		enumerable: true,
+		configurable: true
+	});
+}
+
 /*
  * global functions called by JSX as Number.* (renamed so that they do not conflict with local variable names)
  */

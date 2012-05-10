@@ -1676,14 +1676,31 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 	},
 
 	_emitMemberVariable: function (holder, variable) {
-		this._emit(holder + ".", variable.getToken());
-		this._emit(variable.name() + " = ", variable.getNameToken());
 		var initialValue = variable.getInitialValue();
-		if (initialValue != null)
+		if (initialValue != null
+			&& ! (initialValue instanceof UndefinedExpression
+				|| initialValue instanceof NullExpression
+				|| initialValue instanceof BooleanLiteralExpression
+				|| initialValue instanceof IntegerLiteralExpression
+				|| initialValue instanceof NumberLiteralExpression
+				|| initialValue instanceof StringLiteralExpression
+				|| initialValue instanceof RegExpLiteralExpression)) {
+			// use deferred initialization
+			this._emit("$__jsx_lazy_init(" + holder + ", \"" + variable.name() + "\", function () {\n", variable.getNameToken());
+			this._advanceIndent();
+			this._emit("return ", variable.getNameToken());
 			this._getExpressionEmitterFor(initialValue).emit(0);
-		else
-			this._emitDefaultValueOf(variable.getType());
-		this._emit(";\n", null);
+			this._emit(";\n", variable.getNameToken());
+			this._reduceIndent();
+			this._emit("});\n", variable.getNameToken());
+		} else {
+			this._emit(holder + "." + variable.name() + " = ", variable.getNameToken());
+			if (initialValue != null)
+				this._getExpressionEmitterFor(initialValue).emit(0);
+			else
+				this._emitDefaultValueOf(variable.getType());
+			this._emit(";\n", null);
+		}
 	},
 
 	_emitDefaultValueOf: function (type) {
