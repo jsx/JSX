@@ -524,11 +524,11 @@ var Parser = exports.Parser = Class.extend({
 		return null;
 	},
 
-	_expect: function (expected) {
+	_expect: function (expected, excludePattern) {
 		if (! (expected instanceof Array))
 			expected = [ expected ];
 
-		var token = this._expectOpt(expected);
+		var token = this._expectOpt(expected, excludePattern);
 		if (token == null) {
 			this._newError("expected keyword: " + expected.join(" "));
 			return null;
@@ -1619,11 +1619,12 @@ var Parser = exports.Parser = Class.extend({
 		// lhs
 		var lhsExpr = this._lhsExpr();
 		if (lhsExpr != null) {
-			var op = this._expect([ "=", "*=", "/=", "%=", "+=", "-=", "<<=", ">>=", ">>>=", "&=", "^=", "|=" ]);
+			var op = this._expect([ "=", "*=", "/=", "%=", "+=", "-=", "<<=", ">>=", ">>>=", "&=", "^=", "|=" ], /^==/);
 			if (op != null) {
 				var assignExpr = this._assignExpr(noIn);
-				if (assignExpr != null)
-					return new AssignmentExpression(op, lhsExpr, assignExpr);
+				if (assignExpr == null)
+					return null;
+				return new AssignmentExpression(op, lhsExpr, assignExpr);
 			}
 		}
 		// failed to parse as lhs op assignExpr, try condExpr
