@@ -105,7 +105,6 @@ var Compiler = exports.Compiler = Class.extend({
 			this._printErrors(errors);
 			return false;
 		}
-		// TODO control flow analysis
 		// TODO optimize
 		this._generateCode();
 		return true;
@@ -151,6 +150,17 @@ var Compiler = exports.Compiler = Class.extend({
 			this.addSourceFile(imports[i].getFilenameToken(), this._resolvePath(imports[i].getFilenameToken()));
 		}
 		return true;
+	},
+
+	forEachClassDef: function (f) {
+		for (var i = 0; i < this._parsers.length; ++i) {
+			var parser = this._parsers[i];
+			var classDefs = parser.getClassDefs();
+			for (var j = 0; j < classDefs.length; ++j) {
+				if (! f(parser, classDefs[j]))
+					return;
+			}
+		}
 	},
 
 	_resolveImports: function (errors) {
@@ -215,41 +225,33 @@ var Compiler = exports.Compiler = Class.extend({
 	},
 
 	_resolveTypes: function (errors) {
-		for (var i = 0; i < this._parsers.length; ++i) {
-			var parser = this._parsers[i];
-			var classDefs = parser.getClassDefs();
-			for (var j = 0; j < classDefs.length; ++j) {
-				classDefs[j].resolveTypes(
-					new AnalysisContext(
-						errors,
-						parser,
-						(function (errors, request) {
-							return this._instantiateTemplate(errors, parser, request, false);
-						}).bind(this)));
-			}
-		}
+		this.forEachClassDef(function (parser, classDef) {
+			classDef.resolveTypes(
+				new AnalysisContext(
+					errors,
+					parser,
+					(function (errors, request) {
+						return this._instantiateTemplate(errors, parser, request, false);
+					}).bind(this)));
+			return true;
+		}.bind(this));
 	},
 
 	_analyze: function (errors) {
-		var analyzeClassDef = (function (f) {
-			for (var i = 0; i < this._parsers.length; ++i) {
-				var parser = this._parsers[i];
-				var classDefs = parser.getClassDefs();
-				for (var j = 0; j < classDefs.length; ++j) {
-					f(parser, classDefs[j]);
-				}
-			}
-		}).bind(this);
-		analyzeClassDef((function (parser, classDef) {
+		// analyze every classdef
+		this.forEachClassDef(function (parser, classDef) {
 			classDef.analyze(new AnalysisContext(
 				errors,
 				parser,
-				(function (errors, request) {
+				function (errors, request) {
 					return this._instantiateTemplate(errors, parser, request, true);
-				}).bind(this)));
-		}).bind(this));
-		analyzeClassDef((function (parser, classDef) {
+				}.bind(this)));
+			return true;
+		}.bind(this));
+		// analyze unused variables in evry classdef
+		this.forEachClassDef((function (parser, classDef) {
 			classDef.analyzeUnusedVariables();
+			return true;
 		}).bind(this));
 	},
 
