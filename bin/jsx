@@ -34,23 +34,16 @@ var NodePlatform = Platform.extend({
 	addLauncher: function (emitter, sourceFile, targetCode, entryPoint) {
 		if(emitter instanceof JavaScriptEmitter) {
 
-			var entryPointClass = Util.format("(JSX.require('%1').%2)",
+			var entryPointClass = Util.format("JSX.require('%1').%2",
 											 [ sourceFile, entryPoint ]);
 			switch(entryPoint) {
 			case "_Main":
 				return targetCode +
 					entryPointClass + ".main$AS(process.argv.slice(2));\n";
 			case "_Test":
-				return targetCode +
-					"(function (c) {\n"+
-					"  if(!c) return;\n"+ // skip if there's no _Test
-					"  var t = new c;\n"+
-					"  for (var m in c.prototype) {\n"+
-					"    if (c.prototype.hasOwnProperty(m) && /^test.*[$]$/.test(m)) {\n"+
-					"      t[m]();\n"+
-					"     }\n"+
-					"  }\n"+
-					"}("+entryPointClass+"));\n";
+				var s = this.load(this.getRoot() + "/src/js/runtest.js");
+				return targetCode + s +
+					Util.format("$__jsx_runTests(%1$, process.argv.slice(2))", [entryPointClass]);
 			default:
 				throw new Error("Unknown entry point type: " +
 								entryPoint);
