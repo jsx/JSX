@@ -1,6 +1,6 @@
 import "timer.jsx";
 
-class _TestMatcher {
+class _Matcher {
 
 	var _test : TestCase;
 	var _got  : variant;
@@ -17,7 +17,7 @@ class _TestMatcher {
 		this._name = name;
 	}
 
-	function _match(value : boolean, got : variant, expected : variant, op : string) :string {
+	function _match(value : boolean, got : variant, expected : variant, op : string) : void {
 		if(value) {
 			this._test._ok(this._name);
 		}
@@ -125,17 +125,17 @@ class TestCase {
 
 	/* async test stuff */
 
-	function async(testBody : function(:AsyncHandle):void, timeoutHandler : function(:AsyncHandle):void, timeoutMS : int) : void {
+	function async(testBody : function(:AsyncContext):void, timeoutHandler : function(:AsyncContext):void, timeoutMS : int) : void {
 
-		var async = new AsyncHandle(this, this._currentName, timeoutHandler, timeoutMS);
+		var async = new AsyncContext(this, this._currentName, timeoutHandler, timeoutMS);
 
 		this._tasks.push(function() : void {
 			testBody(async);
 		});
 	}
 
-	function async(testBody : function(:AsyncHandle):void, timeoutMS : int) : void {
-		this.async(testBody, function(async : AsyncHandle) : void {
+	function async(testBody : function(:AsyncContext):void, timeoutMS : int) : void {
+		this.async(testBody, function(async : AsyncContext) : void {
 			this.fail("TIMEOUT: " + async.name());
 			async.done();
 		}, timeoutMS);
@@ -143,13 +143,13 @@ class TestCase {
 
 	/* matcher factory */
 
-	function expect(value : variant) : _TestMatcher {
+	function expect(value : variant) : _Matcher {
 		++this._count;
-		return new _TestMatcher(this, value);
+		return new _Matcher(this, value);
 	}
-	function expect(value : variant, message : string) : _TestMatcher {
+	function expect(value : variant, message : string) : _Matcher {
 		++this._count;
-		return new _TestMatcher(this, value, message);
+		return new _Matcher(this, value, message);
 	}
 
 	function _ok(name : MayBeUndefined.<string>) : void {
@@ -189,13 +189,13 @@ class TestCase {
 	}
 }
 
-class AsyncHandle {
+class AsyncContext {
 
 	var _test : TestCase;
 	var _name : string;
 	var _timerId : TimerHandle;
 
-	function constructor(test : TestCase, name : string, timeoutHandler : function(:AsyncHandle):void, timeoutMS : int) {
+	function constructor(test : TestCase, name : string, timeoutHandler : function(:AsyncContext):void, timeoutMS : int) {
 		this._test = test;
 		this._name = name;
 

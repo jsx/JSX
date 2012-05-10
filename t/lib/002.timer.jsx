@@ -4,7 +4,7 @@ import "timer.jsx";
 class _Test extends TestCase {
 
 	function test_setTimeout200() : void {
-		this.async(function(async : AsyncHandle) : void {
+		this.async(function(async : AsyncContext) : void {
 			var to = 200;
 			var t0 = Date.now();
 			Timer.setTimeout(function() : void {
@@ -18,7 +18,7 @@ class _Test extends TestCase {
 	}
 
 	function test_setTimeout100() : void {
-		this.async(function(async : AsyncHandle) : void {
+		this.async(function(async : AsyncContext) : void {
 			var to = 100;
 			var t0 = Date.now();
 			Timer.setTimeout(function() : void {
@@ -41,10 +41,10 @@ class _Test extends TestCase {
 	}
 
 	function test_setInterval() : void {
-		this.async(function(async : AsyncHandle) : void {
+		this.async(function(async : AsyncContext) : void {
 			var interval = 10;
 			var count = 3;
-			var id : TimerHandle;
+			var id : MayBeUndefined.<TimerHandle> = undefined;
 			id = Timer.setInterval(function() : void {
 				--count;
 				this.expect(count, "setInterval " + count as string).toBeGE(0);

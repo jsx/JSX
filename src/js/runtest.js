@@ -25,7 +25,7 @@ function $__jsx_runTests(testClass, tests) {
 
 	for (var i = 0; i < tests.length; ++i) {
 		(function (m) {
-			test.run$SF$$(m, function() { test[m](); });
+			test.run$SF$V$(m, function() { test[m](); });
 		}(tests[i]));
 	}
 
