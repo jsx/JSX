@@ -1,6 +1,6 @@
 /*EXPECTED
 hello
-detected assignment of 'undefined' to type 'function () : void'
+detected misuse of 'undefined' as type 'function () : void'
 */
 
 class Test {
