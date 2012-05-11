@@ -271,7 +271,12 @@ var _SwitchStatementEmitter = exports._SwitchStatementEmitter = _StatementEmitte
 	emit: function () {
 		_Util.emitLabelOfStatement(this._emitter, this._statement);
 		this._emitter._emit("switch (", null);
-		this._emitter._getExpressionEmitterFor(this._statement.getExpr()).emit(0);
+		var expr = this._statement.getExpr();
+		if (this._emitter._enableRunTimeTypeCheck && expr.getType() instanceof MayBeUndefinedType) {
+			this._emitter._emitExpressionWithUndefinedAssertion(expr);
+		} else {
+			this._emitter._getExpressionEmitterFor(this._statement.getExpr()).emit(0);
+		}
 		this._emitter._emit(") {\n", null);
 		this._emitter._emitStatements(this._statement.getStatements());
 		this._emitter._emit("}\n", null);
@@ -2004,7 +2009,7 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 		this._advanceIndent();
 		this._emitAssertion(function () {
 			this._emit("typeof v !== \"undefined\"", token);
-		}.bind(this), token, "detected assignment of 'undefined' to type '" + expr.getType().resolveIfMayBeUndefined().toString() + "'");
+		}.bind(this), token, "detected misuse of 'undefined' as type '" + expr.getType().resolveIfMayBeUndefined().toString() + "'");
 		this._emit("return v;\n", token);
 		this._reduceIndent();
 		this._emit("}(", token);
