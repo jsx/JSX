@@ -775,6 +775,7 @@ var CaseStatement = exports.CaseStatement = Statement.extend({
 		var exprType = this._expr.getType();
 		if (exprType == null)
 			return true;
+		exprType = exprType.resolveIfMayBeUndefined();
 		if (exprType.equals(expectedType)) {
 			// ok
 		} else if (Type.isIntegerOrNumber(exprType) && Type.isIntegerOrNumber(expectedType)) {

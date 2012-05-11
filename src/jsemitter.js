@@ -275,7 +275,7 @@ var _SwitchStatementEmitter = exports._SwitchStatementEmitter = _StatementEmitte
 		if (this._emitter._enableRunTimeTypeCheck && expr.getType() instanceof MayBeUndefinedType) {
 			this._emitter._emitExpressionWithUndefinedAssertion(expr);
 		} else {
-			this._emitter._getExpressionEmitterFor(this._statement.getExpr()).emit(0);
+			this._emitter._getExpressionEmitterFor(expr).emit(0);
 		}
 		this._emitter._emit(") {\n", null);
 		this._emitter._emitStatements(this._statement.getStatements());
@@ -294,7 +294,12 @@ var _CaseStatementEmitter = exports._CaseStatementEmitter = _StatementEmitter.ex
 	emit: function () {
 		this._emitter._reduceIndent();
 		this._emitter._emit("case ", null);
-		this._emitter._getExpressionEmitterFor(this._statement.getExpr()).emit(0);
+		var expr = this._statement.getExpr();
+		if (this._emitter._enableRunTimeTypeCheck && expr.getType() instanceof MayBeUndefinedType) {
+			this._emitter._emitExpressionWithUndefinedAssertion(expr);
+		} else {
+			this._emitter._getExpressionEmitterFor(expr).emit(0);
+		}
 		this._emitter._emit(":\n", null);
 		this._emitter._advanceIndent();
 	}
