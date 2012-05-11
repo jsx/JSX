@@ -1450,15 +1450,6 @@ var Parser = exports.Parser = Class.extend({
 					var labelExpr = this._expr();
 					if (labelExpr == null)
 						return false;
-					// FIXME check if expression is a constant known at compile time
-					if (! (labelExpr instanceof NullExpression
-						|| labelExpr instanceof BooleanLiteralExpression
-						|| labelExpr instanceof IntegerLiteralExpression
-						|| labelExpr instanceof NumberLiteralExpression
-						|| labelExpr instanceof StringLiteralExpression)) {
-						this._newError("case label is not a constant");
-						return false;
-					}
 					if (this._expect(":") == null)
 						return false;
 					this._statements.push(new CaseStatement(caseOrDefaultToken, labelExpr));

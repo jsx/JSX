@@ -12,7 +12,7 @@ class Test {
 		var ret;
 		switch (n) {
 		case 1:
-		case 2:
+		case 1 + 1:
 			ret = 1;
 			break;
 		default:
