@@ -1203,7 +1203,7 @@ var InExpression = exports.InExpression = BinaryExpression.extend({
 		if (! this._analyze(context))
 			return false;
 		if (! this._expr1.getType().resolveIfMayBeUndefined().equals(Type.stringType)) {
-			context.errors.push(new CompileError("left operand of 'in' expression should be a string"));
+			context.errors.push(new CompileError(this._token, "left operand of 'in' expression should be a string"));
 			return false;
 		}
 		var expr2Type;
@@ -1213,7 +1213,7 @@ var InExpression = exports.InExpression = BinaryExpression.extend({
 			&& expr2ClassDef.getTemplateClassName() == "Map") {
 			// ok
 		} else {
-			context.errors.push(new CompileError("right operand of 'in' expression should be a map"));
+			context.errors.push(new CompileError(this._token, "right operand of 'in' expression should be a map"));
 			return false;
 		}
 		return true;
