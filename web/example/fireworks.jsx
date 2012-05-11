@@ -10,7 +10,7 @@ class Config {
 }
 
 
-class Spark {
+final class Spark {
 	static const rad = Math.PI * 2;
 
 	var posX : number;
@@ -47,7 +47,7 @@ class Spark {
 		}
 	}
 
-	function _move() : void {
+	final function _move() : void {
 		this.posX += this.velX + (Math.random() - 0.5);
 		this.posY += this.velY + (Math.random() - 0.5) + Config.gravity;
 	}
@@ -75,7 +75,7 @@ class Spark {
 	}
 }
 
-class Firework {
+final class Firework {
 	var sparks = [] : Spark[];
 	var view : FireworkView;
 
@@ -112,7 +112,7 @@ class Firework {
 	}
 }
 
-class FireworkView {
+final class FireworkView {
 	var cx : CanvasRenderingContext2D;
 	var width : int;
 	var height : int;
@@ -169,7 +169,7 @@ class FireworkView {
 
 }
 
-class FPSWatcher {
+final class FPSWatcher {
 	var elementId : string;
 	var start = Date.now();
 	var frameCount = 0;
@@ -189,7 +189,7 @@ class FPSWatcher {
 	}
 }
 
-class Application {
+final class Application {
 	static function main(canvasId : string, fpsId : string, quantity : int) : void {
 		Config.quantity = quantity;
 
