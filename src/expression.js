@@ -1196,7 +1196,27 @@ var EqualityExpression = exports.EqualityExpression = BinaryExpression.extend({
 var InExpression = exports.InExpression = BinaryExpression.extend({
 
 	constructor: function (operatorToken, expr1, expr2) {
-		throw new Error("FIXME");
+		BinaryExpression.prototype.constructor.call(this, operatorToken, expr1, expr2);
+	},
+
+	analyze: function (context, parentExpr) {
+		if (! this._analyze(context))
+			return false;
+		if (! this._expr1.getType().resolveIfMayBeUndefined().equals(Type.stringType)) {
+			context.errors.push(new CompileError("left operand of 'in' expression should be a string"));
+			return false;
+		}
+		var expr2Type;
+		var expr2ClassDef;
+		if ((expr2Type = this._expr2.getType().resolveIfMayBeUndefined()) instanceof ObjectType
+			&& (expr2ClassDef = expr2Type.getClassDef()) instanceof InstantiatedClassDefinition
+			&& expr2ClassDef.getTemplateClassName() == "Map") {
+			// ok
+		} else {
+			context.errors.push(new CompileError("right operand of 'in' expression should be a map"));
+			return false;
+		}
+		return true;
 	},
 
 	getType: function () {
