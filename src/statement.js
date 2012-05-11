@@ -709,9 +709,7 @@ var SwitchStatement = exports.SwitchStatement = LabellableStatement.extend({
 	doAnalyze: function (context) {
 		if (! this._analyzeExpr(context, this._expr))
 			return true;
-		var exprType = this._expr.getType();
-		if (exprType == null)
-			return true;
+		var exprType = this._expr.getType().resolveIfMayBeUndefined();
 		if (! (exprType.equals(Type.booleanType) || exprType.equals(Type.integerType) || exprType.equals(Type.numberType) || exprType.equals(Type.stringType))) {
 			context.errors.push(new CompileError(this._token, "switch statement only accepts boolean, number, or string expressions"));
 			return true;
@@ -773,6 +771,7 @@ var CaseStatement = exports.CaseStatement = Statement.extend({
 		var expectedType = statement.getExpr().getType();
 		if (expectedType == null)
 			return true;
+		expectedType = expectedType.resolveIfMayBeUndefined();
 		var exprType = this._expr.getType();
 		if (exprType == null)
 			return true;
