@@ -997,3 +997,15 @@ var LogStatement = exports.LogStatement = InformationStatement.extend({
 	}
 
 });
+
+var DebuggerStatement = exports.DebuggerStatement = InformationStatement.extend({
+
+	constructor: function (token) {
+		InformationStatement.prototype.constructor.call(this, token);
+	},
+
+	doAnalyze: function (context) {
+		return true;
+	}
+
+});

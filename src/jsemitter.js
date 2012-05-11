@@ -382,6 +382,19 @@ var _LogStatementEmitter = exports._LogStatementEmitter = _StatementEmitter.exte
 
 });
 
+var _DebuggerStatementEmitter = exports._DebuggerStatementEmitter = _StatementEmitter.extend({
+
+	constructor: function (emitter, statement) {
+		_StatementEmitter.prototype.constructor.call(this, emitter);
+		this._statement = statement;
+	},
+
+	emit: function () {
+		this._emitter._emit("debugger;\n", this._statement.getToken());
+	}
+
+});
+
 // expression emitter
 
 var _ExpressionEmitter = exports._ExpressionEmitter = Class.extend({
@@ -1803,6 +1816,8 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 			return new _AssertStatementEmitter(this, statement);
 		else if (statement instanceof LogStatement)
 			return new _LogStatementEmitter(this, statement);
+		else if (statement instanceof DebuggerStatement)
+			return new _DebuggerStatementEmitter(this, statement);
 		throw new Error("got unexpected type of statement: " + JSON.stringify(statement.serialize()));
 	},
 

@@ -1166,7 +1166,7 @@ var Parser = exports.Parser = Class.extend({
 		}
 		// parse the statement
 		var token = this._expectOpt([
-			"{", "var", ";", "if", "do", "while", "for", "continue", "break", "return", "switch", "throw", "try", "assert", "log", "delete"
+			"{", "var", ";", "if", "do", "while", "for", "continue", "break", "return", "switch", "throw", "try", "assert", "log", "delete", "debugger"
 		]);
 		if (label != null) {
 			if (! (token != null && token.getValue().match(/^(?:do|while|for|switch)$/) != null)) {
@@ -1208,6 +1208,8 @@ var Parser = exports.Parser = Class.extend({
 				return this._logStatement(token);
 			case "delete":
 				return this._deleteStatement(token);
+			case "debugger":
+				return this._debuggerStatement(token);
 			default:
 				throw new "logic flaw, got " + token.getValue();
 			}
@@ -1553,6 +1555,11 @@ var Parser = exports.Parser = Class.extend({
 		if (this._expect(";") == null)
 			return false;
 		this._statements.push(new DeleteStatement(token, expr));
+		return true;
+	},
+
+	_debuggerStatement: function (token) {
+		this._statements.push(new DebuggerStatement(token));
 		return true;
 	},
 
