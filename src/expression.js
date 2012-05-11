@@ -860,6 +860,10 @@ var PropertyExpression = exports.PropertyExpression = UnaryExpression.extend({
 			context.errors.push(new CompileError(this._identifierToken, "cannot obtain a member of null"));
 			return false;
 		}
+		if (exprType.resolveIfMayBeUndefined().equals(Type.variantType)) {
+			context.errors.push(new CompileError(this._identifierToken, "cannot obtain a member of variant, use: (<<expr>> as Map.<type>)[<<name>>]"));
+			return false;
+		}
 		var classDef = exprType.getClassDef();
 		if (classDef == null) {
 			context.errors.push(new CompileError(this._identifierToken, "cannot determine type due to preceding errors"));
