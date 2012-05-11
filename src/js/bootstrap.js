@@ -13,7 +13,7 @@ function $__jsx_merge_interface(target, source) {
 function $__jsx_lazy_init(obj, prop, func) {
 	Object.defineProperty(obj, prop, {
 		get: function () {
-			return this.p = func();
+			return obj.p = func();
 		},
 		set: function (v) {
 			Object.defineProperty(obj, prop, {
