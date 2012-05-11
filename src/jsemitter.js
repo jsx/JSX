@@ -1266,7 +1266,7 @@ var _CallExpressionEmitter = exports._CallExpressionEmitter = _OperatorExpressio
 					calleeExpr.getIdentifierToken().getValue(),
 					calleeExpr.getType().getArgumentTypes(), 
 					isStatic);
-				if (_Util.shouldInlineFunction(funcDef)) {
+				if (funcDef != null && _Util.shouldInlineFunction(funcDef)) {
 					this._emitter._emitFunctionInline(funcDef);
 					if (! isStatic) {
 						this._emitter._emit(".call", this._expr.getToken());
