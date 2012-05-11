@@ -770,7 +770,19 @@ var MemberFunctionDefinition = exports.MemberFunctionDefinition = MemberDefiniti
 	},
 
 	// return an argument or a local variable
-	getLocal: function (name) {
+	getLocal: function (context, name) {
+		var Statement = require("./statement");
+		// for the current function, check the caught variables
+		if (context != null) {
+			for (var i = context.blockStack.length - 1; i > 0 /* bottommost block is function */; --i) {
+				var statement = context.blockStack[i].statement;
+				if (statement instanceof Statement.CatchStatement) {
+					var local = statement.getLocal();
+					if (local.getName().getValue() == name)
+						return local;
+				}
+			}
+		}
 		for (var i = 0; i < this._locals.length; ++i) {
 			var local = this._locals[i];
 			if (local.getName().getValue() == name)
@@ -782,7 +794,7 @@ var MemberFunctionDefinition = exports.MemberFunctionDefinition = MemberDefiniti
 				return arg;
 		}
 		if (this._parent != null)
-			return this._parent.getLocal(name);
+			return this._parent.getLocal(null, name);
 		return null;
 	},
 
@@ -849,6 +861,18 @@ var LocalVariable = exports.LocalVariable = Class.extend({
 	toString: function () {
 		return this._name + " : " + this._type;
 	}
+});
+
+var CaughtVariable = exports.CaughtVariable = LocalVariable.extend({
+
+	constructor: function (name, type) {
+		LocalVariable.prototype.constructor.call(this, name, type);
+	},
+
+	touchVariable: function (context, token, isAssignment) {
+		return true;
+	}
+
 });
 
 var ArgumentDeclaration = exports.ArgumentDeclaration = LocalVariable.extend({

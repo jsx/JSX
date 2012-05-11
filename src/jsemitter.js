@@ -347,7 +347,68 @@ var _TryStatementEmitter = exports._TryStatementEmitter = _StatementEmitter.exte
 	},
 
 	emit: function () {
-		throw new Error("FIXME _TryStatementEmitter.emit");
+		this._emitter._emit("try {\n", this._statement.getToken());
+		this._emitter._emitStatements(this._statement.getTryStatements());
+		this._emitter._emit("}", null);
+		var catchStatements = this._statement.getCatchStatements();
+		if (catchStatements.length != 0) {
+			this._emitter._emit(" catch ($__jsx_caught) {\n", null);
+			this._emitter._emitStatements(catchStatements);
+			if (! catchStatements[catchStatements.length - 1].getLocal().getType().equals(Type.variantType)) {
+				this._emitter._advanceIndent();
+				this._emitter._emit("{\n", null);
+				this._emitter._advanceIndent();
+				this._emitter._emit("throw $__jsx_caught;\n", null);
+				this._emitter._reduceIndent();
+				this._emitter._emit("}\n", null);
+				this._emitter._reduceIndent();
+			}
+			this._emitter._emit("}", null);
+		}
+		var finallyStatements = this._statement.getFinallyStatements();
+		if (finallyStatements.length != 0) {
+			this._emitter._emit(" finally {\n", null);
+			this._emitter._emitStatements(finallyStatements);
+			this._emitter._emit("}", null);
+		}
+		this._emitter._emit("\n", null);
+	}
+
+});
+
+var _CatchStatementEmitter = exports._CatchStatementEmitter = _StatementEmitter.extend({
+
+	constructor: function (emitter, statement) {
+		_StatementEmitter.prototype.constructor.call(this, emitter);
+		this._statement = statement;
+	},
+
+	emit: function () {
+		var localType = this._statement.getLocal().getType();
+		if (localType instanceof ObjectType) {
+			this._emitter._emit("if ($__jsx_caught instanceof " + localType.getClassDef().getOutputClassName() + ") {\n", this._statement.getToken());
+			this._emitter._emitStatements(this._statement.getStatements());
+			this._emitter._emit("} else ", null);
+		} else {
+			this._emitter._emit("{\n", null);
+			this._emitter._emitStatements(this._statement.getStatements());
+			this._emitter._emit("}\n", null);
+		}
+	}
+
+});
+
+var _ThrowStatementEmitter = exports._ThrowStatementEmitter = _StatementEmitter.extend({
+
+	constructor: function (emitter, statement) {
+		_StatementEmitter.prototype.constructor.call(this, emitter);
+		this._statement = statement;
+	},
+
+	emit: function () {
+		this._emitter._emit("throw ", this._statement.getToken());
+		this._emitter._getExpressionEmitterFor(this._statement.getExpr()).emit(0);
+		this._emitter._emit(";\n", null);
 	}
 
 });
@@ -437,8 +498,8 @@ var _IdentifierExpressionEmitter = exports._IdentifierExpressionEmitter = _Expre
 		if (type instanceof ClassDefType) {
 			this._emitter._emit(type.getClassDef().getOutputClassName(), null);
 		} else {
-			var ident = this._expr.getToken().getValue();
-			this._emitter._emit(ident, null);
+			var local = this._expr.getLocal();
+			this._emitter._emit(local instanceof CaughtVariable ? "$__jsx_caught" : local.getName().getValue(), this._expr.getToken());
 		}
 	}
 
@@ -1822,6 +1883,10 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 			return new _WhileStatementEmitter(this, statement);
 		else if (statement instanceof TryStatement)
 			return new _TryStatementEmitter(this, statement);
+		else if (statement instanceof CatchStatement)
+			return new _CatchStatementEmitter(this, statement);
+		else if (statement instanceof ThrowStatement)
+			return new _ThrowStatementEmitter(this, statement);
 		else if (statement instanceof AssertStatement)
 			return new _AssertStatementEmitter(this, statement);
 		else if (statement instanceof LogStatement)

@@ -294,6 +294,17 @@ native final class RegExp {
 
 }
 
+// 15.11 Error
+native class Error {
+
+	function constructor();
+	function constructor(message : string);
+
+	var name : string;
+	var message : string;
+
+}
+
 // 5.12
 
 native class JSON {
