@@ -156,9 +156,6 @@ var FireworkView = Class.extend({
 		canvas.addEventListener("touchstart", function (e) {
 			$this.explode(e.touches[0].pageX, e.touches[0].pageY);
 		});
-
-		// initial one
-		this.explode(this.width / 2 + this.left, this.height / 3);
 	},
 
 	explode: function (x, y) {
@@ -166,7 +163,10 @@ var FireworkView = Class.extend({
 	},
 
 	update: function () {
-		if (this.fireworks.length == 0) return;
+		if (this.fireworks.length == 0) {
+			// first one
+			this.explode(this.width / 2 + this.left, this.height / 3);
+		}
 
 		this.numSparks = 0;
 
@@ -190,22 +190,18 @@ var FireworkView = Class.extend({
 var FPSWatcher = Class.extend({
 	constructor: function (elementId) {
 		this.start = Date.now();
-		this.fps = 0;
+		this.frameCount = 0;
 
 		this.elementId = elementId;
 	},
 
 	update: function(numSparks) {
-		++this.fps;
+		++this.frameCount;
 
-		if((Date.now() - this.start) >= 1000) {
-			var message = "FPS: " + this.fps +
+		if(this.frameCount % 100 == 0) {
+			var message = "FPS: " + ((this.frameCount / (Date.now() - this.start) * 1000) | 0) +
 				" (sparks: " + numSparks + ")";
 			document.getElementById(this.elementId).innerHTML = message;
-			if(numSparks > 0) console.log(message);
-
-			this.start = Date.now();
-			this.fps = 0;
 		}
 	}
 });
