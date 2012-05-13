@@ -2,7 +2,7 @@
 
 window.addEventListener('load', function(e) {
 	"use strict";
-	
+
 	function element(id) {
 		return document.getElementById(id);
 	}
@@ -133,7 +133,9 @@ window.addEventListener('load', function(e) {
 
 			var url = a.href;
 			var xhr = new XMLHttpRequest();
-			xhr.addEventListener("load", function(e) {
+			xhr.onreadystatechange = function(e) {
+				if (xhr.readyState !== 4) return;
+
 				input.value = xhr.responseText.replace(/\t/g, "  ");
 
 				forEach(list.children, function(li) {
@@ -141,10 +143,8 @@ window.addEventListener('load', function(e) {
 				});
 				li.className = "active";
 
-				setTimeout(function() {
-					compile({ mode: "run" });
-				}, 0);
-			});
+				compile({ mode: "run" });
+			};
 			xhr.open("GET", url);
 			xhr.send(null);
 		});

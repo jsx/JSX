@@ -1446,7 +1446,11 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 				}
 			}
 
-		} finally {
+		}
+		catch (e) {
+			console.error(e);
+		}
+		finally {
 			this._emittingClass = null;
 		}
 
