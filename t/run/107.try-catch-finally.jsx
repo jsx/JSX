@@ -1,3 +1,8 @@
+/*EXPECTED
+Hi!
+hello
+*/
+
 class MyError1 extends Error {
 	function constructor(message : string) {
 		super(message);
@@ -12,11 +17,13 @@ class MyError2 extends MyError1 {
 
 class Test {
 	static function run() : void {
+		// simple
 		try {
 			throw new Error("Hi!");
 		} catch (e : Error) {
 			log e.message;
 		}
+		// should catch MyError1
 		try {
 			throw new MyError1("hello");
 		} catch (e : MyError2) {
