@@ -97,7 +97,7 @@ var _ConstructorInvocationStatementEmitter = exports._ConstructorInvocationState
 			*/
 			this._emitter._emit("Error.call(this);\n", token);
 			this._emitter._emit("this.message = ", token);
-			this._emitter._getExpressionEmitterFor(this._statement.getArguments()[0]).emit(0);
+			this._emitter._getExpressionEmitterFor(this._statement.getArguments()[0]).emit(_BinaryExpressionEmitter._operatorPrecedence["="]);
 		} else {
 			this._emitter._emitCallArguments(token, ctorName + ".call(this", this._statement.getArguments(), argTypes);
 			this._emitter._emit(";\n", token);
@@ -1834,7 +1834,7 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 		} else {
 			this._emit(holder + "." + variable.name() + " = ", variable.getNameToken());
 			if (initialValue != null)
-				this._getExpressionEmitterFor(initialValue).emit(0);
+				this._getExpressionEmitterFor(initialValue).emit(_BinaryExpressionEmitter._operatorPrecedence["="]);
 			else
 				this._emitDefaultValueOf(variable.getType());
 			this._emit(";\n", null);
