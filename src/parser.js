@@ -261,6 +261,14 @@ var QualifiedName = exports.QualifiedName = Class.extend({
 		return this._import;
 	},
 
+	serialize: function () {
+		return [
+			"QualifiedName",
+			this._token.serialize(),
+			Util.serializeNullable(this._import)
+		];
+	},
+
 	equals: function (x) {
 		if (x == null)
 			return false;
@@ -1199,7 +1207,7 @@ var Parser = exports.Parser = Class.extend({
 			case "switch":
 				return this._switchStatement(token, label);
 			case "throw":
-				return this._throwStatement();
+				return this._throwStatement(token);
 			case "try":
 				return this._tryStatement(token);
 			case "assert":
@@ -1474,40 +1482,52 @@ var Parser = exports.Parser = Class.extend({
 		return true;
 	},
 
-	_throwStatement: function () {
+	_throwStatement: function (token) {
 		var expr = this._expr();
 		if (expr == null)
 			return false;
-		this._statements.push(new ThrowStatement(expr));
+		this._statements.push(new ThrowStatement(token, expr));
 		return true;
 	},
 
-	_tryStatement: function (token) {
+	_tryStatement: function (tryToken) {
 		if (this._expect("{") == null)
 			return false;
 		var startIndex = this._statements.length;
 		if (this._block() == null)
 			return false;
 		var tryStatements = this._statements.splice(startIndex);
-		var catchIdentifier = null;
-		var catchStatements = null;
-		if (this._expectOpt("catch") != null) {
+		var catchStatements = [];
+		var catchOrFinallyToken = this._expect([ "catch", "finally" ]);
+		if (catchOrFinallyToken == null)
+			return false;
+		for (;
+			catchOrFinallyToken != null && catchOrFinallyToken.getValue() == "catch";
+			catchOrFinallyToken = this._expectOpt([ "catch", "finally" ])) {
+			var catchIdentifier;
+			var catchType;
 			if (this._expect("(") == null
 				|| (catchIdentifier = this._expectIdentifier()) == null
+				|| this._expect(":") == null
+				|| (catchType = this._typeDeclaration(false)) == null
 				|| this._expect(")") == null
 				|| this._expect("{") == null)
 				return false;
 			if (this._block() == null)
 				return false;
-			catchStatements = this._statements.splice(startIndex);
+			catchStatements.push(new CatchStatement(catchOrFinallyToken, new CaughtVariable(catchIdentifier, catchType), this._statements.splice(startIndex)));
 		}
-		var finallyStatements = null;
-		if (this._expectOpt("finally") != null) {
+		if (catchOrFinallyToken != null) {
+			// finally
 			if (this._expect("{") == null)
 				return false;
-			finallyStatements = this._statements.splice(startIndex);
+			if (this._block() == null)
+				return false;
+			var finallyStatements = this._statements.splice(startIndex);
+		} else {
+			finallyStatements = [];
 		}
-		this._statements.push(new TryStatement(token, tryStatements, catchIdentifier, catchStatements, finallyStatements));
+		this._statements.push(new TryStatement(tryToken, tryStatements, catchStatements, finallyStatements));
 		return true;
 	},
 

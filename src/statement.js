@@ -284,8 +284,7 @@ var JumpStatement = exports.JumpStatement = Statement.extend({
 	},
 
 	_determineDestination: function (context) {
-		// find the destination by iterate to the one before the last, which is function scope
-		for (var i = context.blockStack.length - 1; i > 0; --i) {
+		for (var i = context.blockStack.length - 1; ! (context.blockStack[i].statement instanceof MemberFunctionDefinition); --i) {
 			var statement = context.blockStack[i].statement;
 			// continue unless we are at the destination level
 			if (! (statement instanceof LabellableStatement))
@@ -862,16 +861,27 @@ var WhileStatement = exports.WhileStatement = ContinuableStatement.extend({
 
 var TryStatement = exports.TryStatement = Statement.extend({
 
-	constructor: function (token, tryStatements, catchIdentifier, catchStatements, finallyStatements) {
+	constructor: function (token, tryStatements, catchStatements, finallyStatements) {
 		this._token = token;
 		this._tryStatements = tryStatements;
-		this._catchIdentifier = catchIdentifier; // FIXME type?
 		this._catchStatements = catchStatements;
 		this._finallyStatements = finallyStatements;
 	},
 
 	getToken: function () {
 		return this._token;
+	},
+
+	getTryStatements: function () {
+		return this._tryStatements;
+	},
+
+	getCatchStatements: function () {
+		return this._catchStatements;
+	},
+
+	getFinallyStatements: function () {
+		return this._finallyStatements;
 	},
 
 	serialize: function () {
@@ -885,33 +895,126 @@ var TryStatement = exports.TryStatement = Statement.extend({
 	},
 
 	doAnalyze: function (context) {
+		// try
+		context.blockStack.push(new BlockContext(context.getTopBlock().localVariableStatuses.clone(), this));
 		try {
-			context.blockStack.push(new BlockContext(context.getTopBlock().localVariableStatuses.clone(), this));
 			for (var i = 0; i < this._tryStatements.length; ++i)
 				if (! this._tryStatements[i].analyze(context))
 					return false;
+			// change the statuses to may (since they might be left uninitialized due to an exception)
+			var lvStatusesAfterTry = context.getTopBlock().localVariableStatuses;
 		} finally {
 			context.blockStack.pop();
 		}
-		if (this._catchStatements != null) {
-			try {
-				context.blockStack.push(new BlockContext(context.getTopBlock().localVariableStatuses.clone(), this));
-				for (var i = 0; i < this._catchStatements.length; ++i)
-					if (! this._catchStatements[i].analyze(context))
-						return false;
-			} finally {
-				context.blockStack.pop();
-			}
+		context.getTopBlock().localVariableStatuses = context.getTopBlock().localVariableStatuses.merge(lvStatusesAfterTry);
+		// catch
+		for (var i = 0; i < this._catchStatements.length; ++i) {
+			if (! this._catchStatements[i].analyze(context))
+				return false;
 		}
-		if (this._finallyStatements != null) {
-			try {
-				context.blockStack.push(new BlockContext(context.getTopBlock().localVariableStatuses.clone(), this));
-				for (var i = 0; i < this._finallyStatements.length; ++i)
-					if (! this._finallyStatements[i].analyze(context))
-						return false;
-			} finally {
-				context.blockStack.pop();
+		// finally
+		for (var i = 0; i < this._finallyStatements.length; ++i)
+			if (! this._finallyStatements[i].analyze(context))
+				return false;
+		return true;
+	}
+
+});
+
+var CatchStatement = exports.CatchStatement = Statement.extend({
+
+	constructor: function (token, local, statements) {
+		this._token = token;
+		this._local = local;
+		this._statements = statements;
+	},
+
+	getToken: function () {
+		return this._token;
+	},
+
+	getLocal: function () {
+		return this._local;
+	},
+
+	getStatements: function () {
+		return this._statements;
+	},
+
+	serialize: function () {
+		return [
+			"CatchStatement",
+			this._token.serialize(),
+			this._local.serialize(),
+			Util.serializeArray(this._statements)
+		];
+	},
+
+	doAnalyze: function (context) {
+		// check the catch type
+		var catchType = this.getLocal().getType();
+		if (catchType instanceof ObjectType || catchType.equals(Type.variantType)) {
+			for (var j = 0; j < i; ++j) {
+				var prevCatchType = this._catchStatements[j].getLocal().getType();
+				if (catchType.isConvertibleTo(prevCatchType)) {
+					context.errors.push(new CompileError(
+						this._token,
+						"code is unreachable, a broader catch statement for type '" + prevCatchType.toString() + "' already exists"));
+					break;
+				}
 			}
+		} else {
+			context.errors.push(new CompileError(this._token, "only objects or a variant may be caught"));
+		}
+		// analyze the statements
+		context.blockStack.push(new BlockContext(context.getTopBlock().localVariableStatuses.clone(), this));
+		try {
+			for (var i = 0; i < this._statements.length; ++i) {
+				if (! this._statements[i].analyze(context))
+					return false;
+			}
+			var lvStatusesAfterCatch = context.getTopBlock().localVariableStatuses;
+		} finally {
+			context.blockStack.pop();
+		}
+		context.getTopBlock().localVariableStatuses = context.getTopBlock().localVariableStatuses.merge(lvStatusesAfterCatch);
+		return true;
+	}
+
+});
+
+var ThrowStatement = exports.ThrowStatement = Statement.extend({
+
+	constructor: function (token, expr) {
+		this._token = token;
+		this._expr = expr;
+	},
+
+	getToken: function () {
+		return this._token;
+	},
+
+	getExpr: function () {
+		return this._expr;
+	},
+
+	serialize: function () {
+		return [
+			"ThrowStatement",
+			this._token.serialize(),
+			this._expr.serialize()
+		];
+	},
+
+	doAnalyze: function (context) {
+		if (! this._analyzeExpr(context, this._expr))
+			return true;
+		var errorClassDef = context.parser.lookup(context.errors, this._token, "Error");
+		if (errorClassDef == null)
+			throw new Error("could not find definition for Error");
+		if (this._expr.getType().equals(Type.voidType)) {
+			context.errors.push(new CompileError(this._token, "cannot throw 'void'"));
+			return true;
 		}
 		return true;
 	}
@@ -953,7 +1056,7 @@ var AssertStatement = exports.AssertStatement = InformationStatement.extend({
 
 	doAnalyze: function (context) {
 		if (! this._analyzeExpr(context, this._expr))
-			return false;
+			return true;
 		var exprType = this._expr.getType();
 		if (! exprType.equals(Type.booleanType))
 			context.errors.push(new CompileError(this._exprs[0].getToken(), "cannot assert type " + exprType.serialize()));
@@ -984,7 +1087,7 @@ var LogStatement = exports.LogStatement = InformationStatement.extend({
 	doAnalyze: function (context) {
 		for (var i = 0; i < this._exprs.length; ++i) {
 			if (! this._analyzeExpr(context, this._exprs[i]))
-				return false;
+				return true;
 			var exprType = this._exprs[i].getType();
 			if (exprType == null)
 				return true;

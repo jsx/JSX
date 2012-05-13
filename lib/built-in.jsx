@@ -294,6 +294,32 @@ native final class RegExp {
 
 }
 
+// 15.11 Error
+native class Error {
+
+	function constructor();
+	function constructor(message : string);
+
+	var name : string;
+	var message : string;
+
+}
+
+native class EvalError extends Error {
+}
+
+native class RangeError extends Error {
+}
+
+native class ReferenceError extends Error {
+}
+
+native class SyntaxError extends Error {
+}
+
+native class TypeError extends Error {
+}
+
 // 5.12
 
 native class JSON {

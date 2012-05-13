@@ -86,8 +86,22 @@ var _ConstructorInvocationStatementEmitter = exports._ConstructorInvocationState
 		var argTypes = ctorType != null ? ctorType.getArgumentTypes() : [];
 		var ctorName = this._emitter._mangleConstructorName(this._statement.getConstructingClassDef(), argTypes);
 		var token = this._statement.getQualifiedName().getToken();
-		this._emitter._emitCallArguments(token, ctorName + ".call(this", this._statement.getArguments(), argTypes);
-		this._emitter._emit(";\n", token);
+		if (ctorName == "Error" && this._statement.getArguments().length == 1) {
+			/*
+				At least v8 does not support "Error.call(this, message)"; it not only does not setup the stacktrace but also does
+				not set the message property.  So we set the message property.
+				We continue to call "Error" hoping that it would have some positive effect on other platforms (like setting the
+				stacktrace, etc.).
+
+				FIXME check that doing  "Error.call(this);" does not have any negative effect on other platforms
+			*/
+			this._emitter._emit("Error.call(this);\n", token);
+			this._emitter._emit("this.message = ", token);
+			this._emitter._getExpressionEmitterFor(this._statement.getArguments()[0]).emit(0);
+		} else {
+			this._emitter._emitCallArguments(token, ctorName + ".call(this", this._statement.getArguments(), argTypes);
+			this._emitter._emit(";\n", token);
+		}
 	}
 
 });
@@ -344,10 +358,98 @@ var _TryStatementEmitter = exports._TryStatementEmitter = _StatementEmitter.exte
 	constructor: function (emitter, statement) {
 		_StatementEmitter.prototype.constructor.call(this, emitter);
 		this._statement = statement;
+		var outerCatchStatements = 0;
+		for (var i = 0; i < this._emitter._emittingStatementStack.length; ++i) {
+			if (this._emitter._emittingStatementStack[i] instanceof _TryStatementEmitter)
+				++outerCatchStatements;
+		}
+		this._emittingLocalName = "$__jsx_catch_" + outerCatchStatements;
 	},
 
 	emit: function () {
-		throw new Error("FIXME _TryStatementEmitter.emit");
+		this._emitter._emit("try {\n", this._statement.getToken());
+		this._emitter._emitStatements(this._statement.getTryStatements());
+		this._emitter._emit("}", null);
+		var catchStatements = this._statement.getCatchStatements();
+		if (catchStatements.length != 0) {
+			this._emitter._emit(" catch (" + this._emittingLocalName + ") {\n", null);
+			this._emitter._emitStatements(catchStatements);
+			if (! catchStatements[catchStatements.length - 1].getLocal().getType().equals(Type.variantType)) {
+				this._emitter._advanceIndent();
+				this._emitter._emit("{\n", null);
+				this._emitter._advanceIndent();
+				this._emitter._emit("throw " + this._emittingLocalName + ";\n", null);
+				this._emitter._reduceIndent();
+				this._emitter._emit("}\n", null);
+				this._emitter._reduceIndent();
+			}
+			this._emitter._emit("}", null);
+		}
+		var finallyStatements = this._statement.getFinallyStatements();
+		if (finallyStatements.length != 0) {
+			this._emitter._emit(" finally {\n", null);
+			this._emitter._emitStatements(finallyStatements);
+			this._emitter._emit("}", null);
+		}
+		this._emitter._emit("\n", null);
+	},
+
+	getEmittingLocalName: function () {
+		return this._emittingLocalName;
+	}
+
+});
+
+var _CatchStatementEmitter = exports._CatchStatementEmitter = _StatementEmitter.extend({
+
+	constructor: function (emitter, statement) {
+		_StatementEmitter.prototype.constructor.call(this, emitter);
+		this._statement = statement;
+	},
+
+	emit: function () {
+		var localType = this._statement.getLocal().getType();
+		if (localType instanceof ObjectType) {
+			var tryStatement = this._emitter._emittingStatementStack[this._emitter._emittingStatementStack.length - 2];
+			var localName = tryStatement.getEmittingLocalName();
+			this._emitter._emit("if (" + localName + " instanceof " + localType.getClassDef().getOutputClassName() + ") {\n", this._statement.getToken());
+			this._emitter._emitStatements(this._statement.getStatements());
+			this._emitter._emit("} else ", null);
+		} else {
+			this._emitter._emit("{\n", null);
+			this._emitter._emitStatements(this._statement.getStatements());
+			this._emitter._emit("}\n", null);
+		}
+	},
+
+	$getLocalNameFor: function (emitter, name) {
+		for (var i = emitter._emittingStatementStack.length - 1; i >= 0; --i) {
+			if (! (emitter._emittingStatementStack[i] instanceof _CatchStatementEmitter))
+				continue;
+			var catchStatement = emitter._emittingStatementStack[i];
+			if (catchStatement._statement.getLocal().getName().getValue() == name) {
+				var tryEmitter = emitter._emittingStatementStack[i - 1];
+				if (! (tryEmitter instanceof _TryStatementEmitter))
+					throw new Error("logic flaw");
+				return tryEmitter.getEmittingLocalName();
+			}
+		}
+		throw new Error("logic flaw");
+	}
+
+});
+
+var _ThrowStatementEmitter = exports._ThrowStatementEmitter = _StatementEmitter.extend({
+
+	constructor: function (emitter, statement) {
+		_StatementEmitter.prototype.constructor.call(this, emitter);
+		this._statement = statement;
+	},
+
+	emit: function () {
+		this._emitter._emit("throw ", this._statement.getToken());
+		this._emitter._getExpressionEmitterFor(this._statement.getExpr()).emit(0);
+		this._emitter._emit(";\n", null);
 	}
 
 });
@@ -437,8 +539,12 @@ var _IdentifierExpressionEmitter = exports._IdentifierExpressionEmitter = _Expre
 		if (type instanceof ClassDefType) {
 			this._emitter._emit(type.getClassDef().getOutputClassName(), null);
 		} else {
-			var ident = this._expr.getToken().getValue();
-			this._emitter._emit(ident, null);
+			var local = this._expr.getLocal();
+			var localName = local.getName().getValue();
+			if (local instanceof CaughtVariable) {
+				localName = _CatchStatementEmitter.getLocalNameFor(this._emitter, localName);
+			}
+			this._emitter._emit(localName, this._expr.getToken());
 		}
 	}
 
@@ -1369,6 +1475,7 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 		this._indent = 0;
 		this._emittingClass = null;
 		this._emittingFunction = null;
+		this._emittingStatementStack = [];
 		this._enableAssertion = true;
 		this._enableLogging = true;
 		this._enableRunTimeTypeCheck = true;
@@ -1664,7 +1771,7 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 			&& statementIndex < statements.length
 			&& statements[statementIndex] instanceof ConstructorInvocationStatement
 			&& statements[statementIndex].getConstructingClassDef() == classDef) {
-			this._getStatementEmitterFor(statements[statementIndex]).emit();
+			this._emitStatement(statements[statementIndex]);
 			return true;
 		}
 		// emit call to the zero-argument ctor
@@ -1697,7 +1804,7 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 			var statements = funcDef.getStatements();
 			for (var i = 0; i < statements.length; ++i)
 				if (! (statements[i] instanceof ConstructorInvocationStatement))
-					this._getStatementEmitterFor(statements[i]).emit();
+					this._emitStatement(statements[i]);
 
 		} finally {
 			this._emittingFunction = prevEmittingFunction;
@@ -1749,8 +1856,18 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 	_emitStatements: function (statements) {
 		this._advanceIndent();
 		for (var i = 0; i < statements.length; ++i)
-			this._getStatementEmitterFor(statements[i]).emit();
+			this._emitStatement(statements[i]);
 		this._reduceIndent();
+	},
+
+	_emitStatement: function (statement) {
+		var emitter = this._getStatementEmitterFor(statement);
+		this._emittingStatementStack.push(emitter);
+		try {
+			emitter.emit();
+		} finally {
+			this._emittingStatementStack.pop();
+		}
 	},
 
 	_emit: function (str, token) {
@@ -1826,6 +1943,10 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 			return new _WhileStatementEmitter(this, statement);
 		else if (statement instanceof TryStatement)
 			return new _TryStatementEmitter(this, statement);
+		else if (statement instanceof CatchStatement)
+			return new _CatchStatementEmitter(this, statement);
+		else if (statement instanceof ThrowStatement)
+			return new _ThrowStatementEmitter(this, statement);
 		else if (statement instanceof AssertStatement)
 			return new _AssertStatementEmitter(this, statement);
 		else if (statement instanceof LogStatement)
