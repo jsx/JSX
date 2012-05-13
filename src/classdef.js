@@ -20,12 +20,30 @@ var AnalysisContext = exports.AnalysisContext = Class.extend({
 		this.parser = parser;
 		this.instantiateTemplate = instantiateTemplate;
 		this.funcDef = null;
+		/*
+			blockStack is a stack of blocks:
+
+			function f() { // pushes [ localVariableStatutes, funcDef ]
+				...
+				for (...) { // pushes [ localVariableStatuses, forStatement ]
+					...
+				}
+				try { // pushes [ localVariableStatuses, tryStatement ]
+					...
+				} catch (e : Error) { // pushes [ localVariableStatuses, catchStatement ]
+					...
+					function () { // pushes [ localVariableStatuses, funcDef ]
+						...
+					}
+				}
+			}
+		*/
 		this.blockStack = null;
 		this.statement = null;
 	},
 
 	clone: function () {
-		// NOTE: does not clone the blockStack for now (since there is no such use case)
+		// NOTE: does not clone the blockStack (call setBlockStack)
 		return new AnalysisContext(this.errors, this.parser, this.instantiateTemplate).setFuncDef(this.funcDef);
 	},
 
@@ -34,8 +52,8 @@ var AnalysisContext = exports.AnalysisContext = Class.extend({
 		return this;
 	},
 
-	initBlockStack: function (localVariableStatuses) {
-		this.blockStack = [ new BlockContext(localVariableStatuses, null) ];
+	setBlockStack: function (stack) {
+		this.blockStack = stack;
 		return this;
 	},
 
@@ -684,53 +702,65 @@ var MemberFunctionDefinition = exports.MemberFunctionDefinition = MemberDefiniti
 		};
 	},
 
-	analyze: function (context) {
+	analyze: function (outerContext) {
 		// return if is abtract (wo. function body) or is native
 		if (this._statements == null)
 			return;
 
 		// setup context
-		var context = context.clone().setFuncDef(this)
-			.initBlockStack(new LocalVariableStatuses(this, this._parent != null ? context.getTopBlock().localVariableStatuses : null));
+		var context = outerContext.clone().setFuncDef(this);
+		if (this._parent == null) {
+			context.setBlockStack([ new BlockContext(new LocalVariableStatuses(this, null), this) ]);
+		} else {
+			context.setBlockStack(outerContext.blockStack);
+			context.blockStack.push(new BlockContext(new LocalVariableStatuses(this, outerContext.getTopBlock().localVariableStatuses), this));
+		}
 
-		// do the checks
-		for (var i = 0; i < this._statements.length; ++i)
-			if (! this._statements[i].analyze(context))
-				break;
-		if (! this._returnType.equals(Type.Type.voidType) && context.getTopBlock().localVariableStatuses != null)
-			context.errors.push(new CompileError(this._lastTokenOfBody, "missing return statement"));
+		try {
 
-		// check that from the constructor, all constructors with non-zero
-		// arguments are called, and that the calls are in the implemented order
-		if (this.getNameToken() == null || this.name() != "constructor")
-			return;
+			// do the checks
+			for (var i = 0; i < this._statements.length; ++i)
+				if (! this._statements[i].analyze(context))
+					break;
+			if (! this._returnType.equals(Type.Type.voidType) && context.getTopBlock().localVariableStatuses != null)
+				context.errors.push(new CompileError(this._lastTokenOfBody, "missing return statement"));
 
-		// constructor
-		var Statement = require("./statement"); // seems that we need to delay the load
-		var nextConstructorIndex = -1;
-		for (var i = 0; i < this._statements.length; ++i) {
-			var statement = this._statements[i];
-			if (! (statement instanceof Statement.ConstructorInvocationStatement))
-				break;
+			// check that from the constructor, all constructors with non-zero
+			// arguments are called, and that the calls are in the implemented order
+			if (this.getNameToken() == null || this.name() != "constructor")
+				return;
+
+			// constructor
+			var Statement = require("./statement"); // seems that we need to delay the load
+			var nextConstructorIndex = -1;
+			for (var i = 0; i < this._statements.length; ++i) {
+				var statement = this._statements[i];
+				if (! (statement instanceof Statement.ConstructorInvocationStatement))
+					break;
+				for (; nextConstructorIndex < this._classDef.implementClassDefs().length; ++nextConstructorIndex) {
+					var baseClassDef = nextConstructorIndex == -1 ? this._classDef.extendClassDef() : this._classDef.implementClassDefs()[nextConstructorIndex];
+					if (baseClassDef == statement.getConstructingClassDef())
+						break;
+					// constructor of baseClassDef is not called; assert that it has a zero-argument constructor (or has no constructor at all)
+					if (! baseClassDef.hasDefaultConstructor())
+						context.errors.push(new CompileError(statement.getQualifiedName().getToken(), "constructor of class '" + baseClassDef.className() + "' should be called prior to the statement"));
+				}
+				if (nextConstructorIndex == this._classDef.implementClassDefs().length) {
+					context.errors.push(new CompileError(statement.getQualifiedName().getToken(), "constructors should be called in the order the base classes are extended / implemented"));
+					break;
+				}
+				++nextConstructorIndex;
+			}
 			for (; nextConstructorIndex < this._classDef.implementClassDefs().length; ++nextConstructorIndex) {
 				var baseClassDef = nextConstructorIndex == -1 ? this._classDef.extendClassDef() : this._classDef.implementClassDefs()[nextConstructorIndex];
-				if (baseClassDef == statement.getConstructingClassDef())
-					break;
-				// constructor of baseClassDef is not called; assert that it has a zero-argument constructor (or has no constructor at all)
 				if (! baseClassDef.hasDefaultConstructor())
-					context.errors.push(new CompileError(statement.getQualifiedName().getToken(), "constructor of class '" + baseClassDef.className() + "' should be called prior to the statement"));
+						context.errors.push(new CompileError(this._token, "constructor of class '" + baseClassDef.className() + "' should be called explicitely"));
 			}
-			if (nextConstructorIndex == this._classDef.implementClassDefs().length) {
-				context.errors.push(new CompileError(statement.getQualifiedName().getToken(), "constructors should be called in the order the base classes are extended / implemented"));
-				break;
-			}
-			++nextConstructorIndex;
+
+		} finally {
+			context.blockStack.pop();
 		}
-		for (; nextConstructorIndex < this._classDef.implementClassDefs().length; ++nextConstructorIndex) {
-			var baseClassDef = nextConstructorIndex == -1 ? this._classDef.extendClassDef() : this._classDef.implementClassDefs()[nextConstructorIndex];
-			if (! baseClassDef.hasDefaultConstructor())
-					context.errors.push(new CompileError(this._token, "constructor of class '" + baseClassDef.className() + "' should be called explicitely"));
-		}
+
 	},
 
 	getReturnType: function () {
@@ -773,28 +803,27 @@ var MemberFunctionDefinition = exports.MemberFunctionDefinition = MemberDefiniti
 	getLocal: function (context, name) {
 		var Statement = require("./statement");
 		// for the current function, check the caught variables
-		if (context != null) {
-			for (var i = context.blockStack.length - 1; i > 0 /* bottommost block is function */; --i) {
-				var statement = context.blockStack[i].statement;
-				if (statement instanceof Statement.CatchStatement) {
-					var local = statement.getLocal();
+		for (var i = context.blockStack.length - 1; i >= 0; --i) {
+			var block = context.blockStack[i].statement;
+			if (block instanceof MemberFunctionDefinition) {
+				// function scope
+				for (var j = 0; j < block._locals.length; ++j) {
+					var local = block._locals[j];
 					if (local.getName().getValue() == name)
 						return local;
 				}
+				for (var j = 0; j < block._args.length; ++j) {
+					var arg = block._args[j];
+					if (arg.getName().getValue() == name)
+						return arg;
+				}
+			} else if (block instanceof Statement.CatchStatement) {
+				// catch statement
+				var local = block.getLocal();
+				if (local.getName().getValue() == name)
+					return local;
 			}
 		}
-		for (var i = 0; i < this._locals.length; ++i) {
-			var local = this._locals[i];
-			if (local.getName().getValue() == name)
-				return local;
-		}
-		for (var i = 0; i < this._args.length; ++i) {
-			var arg = this._args[i];
-			if (arg.getName().getValue() == name)
-				return arg;
-		}
-		if (this._parent != null)
-			return this._parent.getLocal(null, name);
 		return null;
 	},
 

@@ -284,8 +284,7 @@ var JumpStatement = exports.JumpStatement = Statement.extend({
 	},
 
 	_determineDestination: function (context) {
-		// find the destination by iterate to the one before the last, which is function scope
-		for (var i = context.blockStack.length - 1; i > 0; --i) {
+		for (var i = context.blockStack.length - 1; ! (context.blockStack[i].statement instanceof MemberFunctionDefinition); --i) {
 			var statement = context.blockStack[i].statement;
 			// continue unless we are at the destination level
 			if (! (statement instanceof LabellableStatement))
