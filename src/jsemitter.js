@@ -358,6 +358,12 @@ var _TryStatementEmitter = exports._TryStatementEmitter = _StatementEmitter.exte
 	constructor: function (emitter, statement) {
 		_StatementEmitter.prototype.constructor.call(this, emitter);
 		this._statement = statement;
+		var outerCatchStatements = 0;
+		for (var i = 0; i < this._emitter._emittingStatementStack.length; ++i) {
+			if (this._emitter._emittingStatementStack[i] instanceof _TryStatementEmitter)
+				++outerCatchStatements;
+		}
+		this._emittingLocalName = "$__jsx_catch_" + outerCatchStatements;
 	},
 
 	emit: function () {
@@ -366,13 +372,13 @@ var _TryStatementEmitter = exports._TryStatementEmitter = _StatementEmitter.exte
 		this._emitter._emit("}", null);
 		var catchStatements = this._statement.getCatchStatements();
 		if (catchStatements.length != 0) {
-			this._emitter._emit(" catch ($__jsx_caught) {\n", null);
+			this._emitter._emit(" catch (" + this._emittingLocalName + ") {\n", null);
 			this._emitter._emitStatements(catchStatements);
 			if (! catchStatements[catchStatements.length - 1].getLocal().getType().equals(Type.variantType)) {
 				this._emitter._advanceIndent();
 				this._emitter._emit("{\n", null);
 				this._emitter._advanceIndent();
-				this._emitter._emit("throw $__jsx_caught;\n", null);
+				this._emitter._emit("throw " + this._emittingLocalName + ";\n", null);
 				this._emitter._reduceIndent();
 				this._emitter._emit("}\n", null);
 				this._emitter._reduceIndent();
@@ -386,6 +392,10 @@ var _TryStatementEmitter = exports._TryStatementEmitter = _StatementEmitter.exte
 			this._emitter._emit("}", null);
 		}
 		this._emitter._emit("\n", null);
+	},
+
+	getEmittingLocalName: function () {
+		return this._emittingLocalName;
 	}
 
 });
@@ -400,7 +410,9 @@ var _CatchStatementEmitter = exports._CatchStatementEmitter = _StatementEmitter.
 	emit: function () {
 		var localType = this._statement.getLocal().getType();
 		if (localType instanceof ObjectType) {
-			this._emitter._emit("if ($__jsx_caught instanceof " + localType.getClassDef().getOutputClassName() + ") {\n", this._statement.getToken());
+			var tryStatement = this._emitter._emittingStatementStack[this._emitter._emittingStatementStack.length - 2];
+			var localName = tryStatement.getEmittingLocalName();
+			this._emitter._emit("if (" + localName + " instanceof " + localType.getClassDef().getOutputClassName() + ") {\n", this._statement.getToken());
 			this._emitter._emitStatements(this._statement.getStatements());
 			this._emitter._emit("} else ", null);
 		} else {
@@ -408,6 +420,21 @@ var _CatchStatementEmitter = exports._CatchStatementEmitter = _StatementEmitter.
 			this._emitter._emitStatements(this._statement.getStatements());
 			this._emitter._emit("}\n", null);
 		}
+	},
+
+	$getLocalNameFor: function (emitter, name) {
+		for (var i = emitter._emittingStatementStack.length - 1; i >= 0; --i) {
+			if (! (emitter._emittingStatementStack[i] instanceof _CatchStatementEmitter))
+				continue;
+			var catchStatement = emitter._emittingStatementStack[i];
+			if (catchStatement._statement.getLocal().getName().getValue() == name) {
+				var tryEmitter = emitter._emittingStatementStack[i - 1];
+				if (! (tryEmitter instanceof _TryStatementEmitter))
+					throw new Error("logic flaw");
+				return tryEmitter.getEmittingLocalName();
+			}
+		}
+		throw new Error("logic flaw");
 	}
 
 });
@@ -513,7 +540,11 @@ var _IdentifierExpressionEmitter = exports._IdentifierExpressionEmitter = _Expre
 			this._emitter._emit(type.getClassDef().getOutputClassName(), null);
 		} else {
 			var local = this._expr.getLocal();
-			this._emitter._emit(local instanceof CaughtVariable ? "$__jsx_caught" : local.getName().getValue(), this._expr.getToken());
+			var localName = local.getName().getValue();
+			if (local instanceof CaughtVariable) {
+				localName = _CatchStatementEmitter.getLocalNameFor(this._emitter, localName);
+			}
+			this._emitter._emit(localName, this._expr.getToken());
 		}
 	}
 
@@ -1444,6 +1475,7 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 		this._indent = 0;
 		this._emittingClass = null;
 		this._emittingFunction = null;
+		this._emittingStatementStack = [];
 		this._enableAssertion = true;
 		this._enableLogging = true;
 		this._enableRunTimeTypeCheck = true;
@@ -1735,7 +1767,7 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 			&& statementIndex < statements.length
 			&& statements[statementIndex] instanceof ConstructorInvocationStatement
 			&& statements[statementIndex].getConstructingClassDef() == classDef) {
-			this._getStatementEmitterFor(statements[statementIndex]).emit();
+			this._emitStatement(statements[statementIndex]);
 			return true;
 		}
 		// emit call to the zero-argument ctor
@@ -1768,7 +1800,7 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 			var statements = funcDef.getStatements();
 			for (var i = 0; i < statements.length; ++i)
 				if (! (statements[i] instanceof ConstructorInvocationStatement))
-					this._getStatementEmitterFor(statements[i]).emit();
+					this._emitStatement(statements[i]);
 
 		} finally {
 			this._emittingFunction = prevEmittingFunction;
@@ -1820,8 +1852,18 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 	_emitStatements: function (statements) {
 		this._advanceIndent();
 		for (var i = 0; i < statements.length; ++i)
-			this._getStatementEmitterFor(statements[i]).emit();
+			this._emitStatement(statements[i]);
 		this._reduceIndent();
+	},
+
+	_emitStatement: function (statement) {
+		var emitter = this._getStatementEmitterFor(statement);
+		this._emittingStatementStack.push(emitter);
+		try {
+			emitter.emit();
+		} finally {
+			this._emittingStatementStack.pop();
+		}
 	},
 
 	_emit: function (str, token) {
