@@ -878,8 +878,11 @@ var LocalVariableStatuses = exports.LocalVariableStatuses = Class.extend({
 		case 2: // (funcDef : MemberFunctionDefinition, baseStatuses : LocalVariableStatuses)
 			var funcDef = arguments[0];
 			var base = arguments[1];
-			if (base != null)
-				this._copyFrom(base);
+			if (base != null) {
+				// FIXME the analysis of the closures should be delayed to either of: first being used, or return is called, to minimize the appearance of the "not initialized" error
+				for (var k in base._statuses)
+					this._statuses[k] = base._statuses[k] == LocalVariableStatuses.UNSET ? LocalVariableStatuses.MAYBESET : base._statuses[k];
+			}
 			var args = funcDef.getArguments();
 			for (var i = 0; i < args.length; ++i)
 				this._statuses[args[i].getName().getValue()] = LocalVariableStatuses.ISSET;
