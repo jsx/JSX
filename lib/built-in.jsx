@@ -305,6 +305,21 @@ native class Error {
 
 }
 
+native class EvalError extends Error {
+}
+
+native class RangeError extends Error {
+}
+
+native class ReferenceError extends Error {
+}
+
+native class SyntaxError extends Error {
+}
+
+native class TypeError extends Error {
+}
+
 // 5.12
 
 native class JSON {
