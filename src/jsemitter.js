@@ -965,14 +965,15 @@ var _AsExpressionEmitter = exports._AsExpressionEmitter = _ExpressionEmitter.ext
 	},
 
 	_emitWithParens: function (outerOpPrecedence, opPrecedence, innerOpPrecedence, prefix, postfix) {
-		if (opPrecedence > outerOpPrecedence)
+		// in contrast to _ExpressionEmitter#emitWithPrecedence the comparison op. is >=, since the conversion should have higher precedence than the outer op. (see t/run/110)
+		if (opPrecedence >= outerOpPrecedence)
 			this._emitter._emit("(", null);
 		if (prefix != null)
 			this._emitter._emit(prefix, this._expr.getToken());
 		this._emitter._getExpressionEmitterFor(this._expr.getExpr()).emit(innerOpPrecedence);
 		if (postfix != null)
 			this._emitter._emit(postfix, this._expr.getToken());
-		if (opPrecedence > outerOpPrecedence)
+		if (opPrecedence >= outerOpPrecedence)
 			this._emitter._emit(")", null);
 	}
 
