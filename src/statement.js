@@ -1013,8 +1013,8 @@ var ThrowStatement = exports.ThrowStatement = Statement.extend({
 		var errorClassDef = context.parser.lookup(context.errors, this._token, "Error");
 		if (errorClassDef == null)
 			throw new Error("could not find definition for Error");
-		if (! (this._expr.getType() instanceof ObjectType && this._expr.getType().isConvertibleTo(new ObjectType(errorClassDef)))) {
-			context.errors.push(new CompileError(this._token, "only objects of type 'Error' or extending classes of the type may be thrown"));
+		if (this._expr.getType().equals(Type.voidType)) {
+			context.errors.push(new CompileError(this._token, "cannot throw 'void'"));
 			return true;
 		}
 		return true;
