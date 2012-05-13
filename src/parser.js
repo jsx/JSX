@@ -1498,7 +1498,7 @@ var Parser = exports.Parser = Class.extend({
 			return false;
 		var tryStatements = this._statements.splice(startIndex);
 		var catchStatements = [];
-		var catchOrFinallyToken = this._expect([ "catch", "finally "]);
+		var catchOrFinallyToken = this._expect([ "catch", "finally" ]);
 		if (catchOrFinallyToken == null)
 			return false;
 		for (;

@@ -3,6 +3,9 @@
 Hi!
 hello
 string:all your base are belongs to us
+in finally
+finally after rethrow
+from the deepness
 */
 
 class MyError1 extends Error {
@@ -52,5 +55,25 @@ class Test {
 			log typeof e + ":" + e as string;
 		}
 
+		// try-finally
+		var a;
+		try {
+		} finally {
+			a = "in finally";
+		}
+		log a;
+
+		// rethrow
+		try {
+			try {
+				throw new Error("from the deepness");
+			} catch (e : Error) {
+				throw e;
+			} finally {
+				log "finally after rethrow";
+			}
+		} catch (e : Error) {
+			log e.message;
+		}
 	}
 }
