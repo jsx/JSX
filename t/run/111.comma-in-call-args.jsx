@@ -1,5 +1,5 @@
 /*EXPECTED
-2,4
+2 4
 */
 
 class Test {
