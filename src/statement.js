@@ -17,7 +17,7 @@ var Statement = exports.Statement = Class.extend({
 			return this.doAnalyze(context);
 		} catch (e) {
 			var token = this.getToken();
-			console.log("fatal error while compiling statement at file: " + token.getFilename() + ", line " + token.getLineNumber());
+			console.error("fatal error while compiling statement at file: " + token.getFilename() + ", line " + token.getLineNumber());
 			throw e;
 		}
 	},
