@@ -7,6 +7,8 @@ native class Object {
 // 15.2
 native final class Map.<T> {
 
+	function __native_index_operator__(key : string) : MayBeUndefined.<T>;
+
 	// 15.2.4
 	function hasOwnProperty(key : string) : boolean;
 
@@ -19,6 +21,8 @@ native final class Function {
 
 // 15.4
 native final class Array.<T> {
+
+	function __native_index_operator__(n : number) : MayBeUndefined.<T>;
 
 	// 15.4.4
 	override function toString() : string;
