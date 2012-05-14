@@ -400,6 +400,13 @@ var ParsedObjectType = exports.ParsedObjectType = ObjectType.extend({
 // function types
 
 var FunctionType = exports.FunctionType = Type.extend({
+
+	$_classDef: null,
+
+	getClassDef: function () {
+		return FunctionType._classDef;
+	}
+
 });
 
 var FunctionChoiceType = exports.FunctionChoiceType = FunctionType.extend({
@@ -414,10 +421,6 @@ var FunctionChoiceType = exports.FunctionChoiceType = FunctionType.extend({
 
 	asAssignableType: function () {
 		throw new Error("logic flaw");
-	},
-
-	getClassDef: function () {
-		throw new Error("FIXME");
 	},
 
 	deduceByArgumentTypes: function (context, operatorToken, argTypes, isStatic) {
@@ -468,10 +471,6 @@ var ResolvedFunctionType = exports.ResolvedFunctionType = FunctionType.extend({
 
 	asAssignableType: function () {
 		return this._clone().setIsAssignable(true);
-	},
-
-	getClassDef: function () {
-		throw new Error("FIXME");
 	},
 
 	getReturnType: function () {

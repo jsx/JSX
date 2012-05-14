@@ -12,6 +12,11 @@ native final class Map.<T> {
 
 }
 
+// 15.3
+native final class Function {
+	// JSX does not support call() or apply(), since it is a statically-typed language
+}
+
 // 15.4
 native final class Array.<T> {
 

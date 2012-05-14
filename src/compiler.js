@@ -84,6 +84,7 @@ var Compiler = exports.Compiler = Class.extend({
 		BooleanType._classDef = builtins.lookup(errors, null, "Boolean");
 		NumberType._classDef = builtins.lookup(errors, null, "Number");
 		StringType._classDef = builtins.lookup(errors, null, "String");
+		FunctionType._classDef = builtins.lookup(errors, null, "Function");
 		if (errors.length != 0) {
 			this._printErrors(errors);
 			return false;

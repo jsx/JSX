@@ -2063,7 +2063,7 @@ var Parser = exports.Parser = Class.extend({
 	},
 
 	$_isReservedClassName: function (name) {
-		return name.match(/^(Array|Boolean|Date|Map|Number|Object|RegExp|String|JSX)$/) != null;
+		return name.match(/^(Array|Boolean|Date|Function|Map|Number|Object|RegExp|String|Error|EvalError|RangeError|ReferenceError|SyntaxError|TypeError|JSX)$/) != null;
 	}
 
 });
