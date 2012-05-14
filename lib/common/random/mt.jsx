@@ -83,21 +83,22 @@ final class MT implements RandomGenerator {
 		return (((a1 * b2 + a2 * b1) << 16) + a2 * b2) >>> 0;
 	}
 
+	// TODO use Uint32Array if possible
 	var _mt = [] : number[]; // the state vector
-	var _mti = 0;          // mti == N+1 means mt[N] is not initialized
+	var _mti = 0;            // mti == N+1 means mt[N] is not initialized
 
 	function constructor() {
-		this.init(5489); // default initial seed
+		this.initialize(Date.now());
 	}
 
 	function constructor(seed : number) {
-		this.init(seed);
+		this.initialize(seed);
 	}
 	function constructor(seeds : number[]) {
-		this.init(seeds);
+		this.initialize(seeds);
 	}
 
-	function init(s : number) : void {
+	function initialize(s : number) : void {
 		var mt = this._mt;
 		mt[0] = s >>> 0;
 
@@ -107,8 +108,8 @@ final class MT implements RandomGenerator {
 		this._mti = i;
 	}
 
-	function init(seeds : number[]) : void {
-		this.init(19650218);
+	function initialize(seeds : number[]) : void {
+		this.initialize(19650218);
 
 		var mt = this._mt;
 
