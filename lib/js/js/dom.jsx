@@ -318,6 +318,23 @@ native class DOMStringMap {
 }
 
 native class CSSStyleDeclaration {
+	var cssText : string;
+	function getPropertyValue(propertyName : string) : string;
+	function getPropertyCSSValue(propertyName : string) : CSSValue;
+	function removePropertyValue(propertyName : string) : string;
+	function getPropertyPriority(propertyName : string) : string;
+	function setProperty(propertyName : string, value : string) : void;
+	function setProperty(propertyName : string, value : string, priority : string) : void;
+	const length : int;
+	function item(index : int) : string;
+	const parentRule : CSSRule;
+}
+
+native class CSSValue {
+	// TODO
+}
+
+native class CSSRule {
 	// TODO
 }
 
@@ -866,9 +883,10 @@ native class HTMLCanvasElement extends HTMLElement {
 // DOM-Browser
 
 // http://www.w3.org/TR/Window/
+// https://developer.mozilla.org/en/DOM/window
 
 // The Window Interface
-final native __fake__ class Window {
+final native __fake__ class Window extends EventTarget {
 
 	const window :Window;
 	const self :Window;
@@ -887,12 +905,96 @@ final native __fake__ class Window {
 	function setInterval(listener : function():void, milliseconds :int) :int;
 	function clearInterval(timerID :int) :void;
 
-	// browser-defined properties
-
-	const document :Document;
-	const navigator :variant; // FIXME
+	const applicationCache : DOMApplicationCache;
+	const closed : boolean;
+	const content : HTMLElement;
+	const crypto : Crypto;
+	const document :HTMLDocument;
+	const defaultStatus : string;
+	const history : History;
+	const innerHeight : int;
+	const innerWidth : int;
+	const length : int;
+	const locationbar : BarInfo;
+	const localStorage : Storage;
+	const menubar : boolean;
+	const navigator :Navigator;
+	const opener : Window;
+	const outerHeight : int;
+	const outerWidth : int;
+	const pageXOffset : int;
+	const pageYOffset : int;
+	const performance : Performance;
+	const personalbar : BarInfo;
+	const screen : Screen;
+	const screenX : int;
+	const screenY : int;
+	const scrollbars : BarInfo;
+	const scrollX : int;
+	const sessionStorage : Storage;
+	const status : string;
+	const statusbar : BarInfo;
+	const toolbar : BarInfo;
 
 	function alert(message :string) :void;
+	function atob(base64encoded : string) : string;
+	function blur() : void;
+	function btoa(binary : string) : string;
+	function close() : void;
+	function confirm(message : string) : boolean;
+	function find(str : string) : boolean;
+	function focus() : void;
+	function matchMedia(mediaQueryString : string) : MediaQueryList;
+	function moveBy(deltaX : int, deltaY : int) : void;
+	function moveTo(x : int, y : int) : void;
+	function open(url : string) : Window;
+	function open(url : string, windowName : string) : Window;
+	function open(url : string, windowName : string, windowFutures : string) : Window;
+	function postMessage(message : string, targetOrigin : string) : void;
+	function print() : void;
+	function prompt(text : string, value : string) : string;
+	function resizeBy(deltaX : int, deltaY : int) : void;
+	function resizeTo(x : int, y : int) : void;
+	function scrollBy(deltaX : int, deltaY : int) : void;
+	function showModalDialog(uri : string, args : variant, options : variant) : variant; // FIXME
+	function stop() : void;
+
+}
+
+native __fake__ class DOMApplicationCache {
+	// TODO
+}
+
+native __fake__ class Crypto {
+	// TODO
+}
+
+native __fake__ class BarInfo {
+	const visible : boolean;
+}
+
+native class Storage {
+	// TODO
+}
+
+native __fake__ class History {
+	// TODO
+}
+
+native __fake__ class Navigator {
+	// TODO
+}
+
+native __fake__ class Performance {
+	// TODO
+}
+
+native __fake__ class Screen {
+	// TODO
+}
+
+native __fake__ class MediaQueryList {
+	// TODO
 }
 
 // The Location Interface
