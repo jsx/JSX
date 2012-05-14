@@ -1457,7 +1457,7 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 			var member = members[i];
 			if ((member instanceof MemberVariableDefinition)
 				&& (member.flags() & (ClassDefinition.IS_STATIC | ClassDefinition.IS_NATIVE)) == ClassDefinition.IS_STATIC)
-				this._emitMemberVariable(classDef.getOutputClassName(), member);
+				this._emitStaticMemberVariable(classDef.getOutputClassName(), member);
 		}
 	},
 
@@ -1572,14 +1572,30 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 			this._emitFunctionArguments(funcDef);
 		this._emit(") {\n", null);
 		this._advanceIndent();
-		// emit constructor invocation statements
-		this._emitConstructorCalls(classDef, funcDef);
 		// emit member variable initialization code
 		var members = classDef.members();
 		for (var i = 0; i < members.length; ++i) {
 			var member = members[i];
-			if ((member instanceof MemberVariableDefinition) && (member.flags() & (ClassDefinition.IS_STATIC | ClassDefinition.IS_ABSTRACT)) == 0)
-				this._emitMemberVariable("this", member);
+			if ((member instanceof MemberVariableDefinition)
+				&& (member.flags() & (ClassDefinition.IS_STATIC | ClassDefinition.IS_ABSTRACT)) == 0) {
+				this._emit("this." + member.name() + " = ", member.getNameToken());
+				this._emitDefaultValueOf(member.getType());
+				this._emit(";\n", null);
+			}
+		}
+		// emit constructor invocation statements
+		this._emitConstructorCalls(classDef, funcDef);
+		// initialize member variables with initializers
+		for (var i = 0; i < members.length; ++i) {
+			var member = members[i];
+			var initialValue;
+			if ((member instanceof MemberVariableDefinition)
+				&& (member.flags() & (ClassDefinition.IS_STATIC | ClassDefinition.IS_ABSTRACT)) == 0
+				&& (initialValue= member.getInitialValue()) != null) {
+				this._emit("this." + member.name() + " = ", member.getNameToken());
+				this._getExpressionEmitterFor(initialValue).emit(_BinaryExpressionEmitter._operatorPrecedence["="]);
+				this._emit(";\n", null);
+			}
 		}
 		// emit function body
 		if (funcDef != null)
@@ -1690,10 +1706,9 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 		}
 	},
 
-	_emitMemberVariable: function (holder, variable) {
+	_emitStaticMemberVariable: function (holder, variable) {
 		var initialValue = variable.getInitialValue();
-		if ((variable.flags() & ClassDefinition.IS_STATIC) != 0
-			&& initialValue != null
+		if (initialValue != null
 			&& ! (initialValue instanceof UndefinedExpression
 				|| initialValue instanceof NullExpression
 				|| initialValue instanceof BooleanLiteralExpression
