@@ -140,14 +140,16 @@ var Compiler = exports.Compiler = Class.extend({
 		if (errors.length != 0)
 			return false;
 		// register imported files
-		var imports = parser.getImports();
-		for (var i = 0; i < imports.length; ++i) {
-			var path = this._resolvePath(imports[i].getFilenameToken());
-			if (path == parser.getPath()) {
-				errors.push(new CompileError(imports[i].getFilenameToken(), "cannot import itself"));
-				return false;
+		if (this._mode != Compiler.MODE_PARSE) {
+			var imports = parser.getImports();
+			for (var i = 0; i < imports.length; ++i) {
+				var path = this._resolvePath(imports[i].getFilenameToken());
+				if (path == parser.getPath()) {
+					errors.push(new CompileError(imports[i].getFilenameToken(), "cannot import itself"));
+					return false;
+				}
+				this.addSourceFile(imports[i].getFilenameToken(), this._resolvePath(imports[i].getFilenameToken()));
 			}
-			this.addSourceFile(imports[i].getFilenameToken(), this._resolvePath(imports[i].getFilenameToken()));
 		}
 		return true;
 	},
