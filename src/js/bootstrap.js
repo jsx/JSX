@@ -11,17 +11,22 @@ function $__jsx_merge_interface(target, source) {
  * defers the initialization of the property
  */
 function $__jsx_lazy_init(obj, prop, func) {
+	function reset(obj, prop, value) {
+		Object.defineProperty(obj, prop, {
+			value: value, 
+			enumerable: true,
+			writable: true,
+			configurable: true
+		});
+		return value;
+	}
+
 	Object.defineProperty(obj, prop, {
 		get: function () {
-			return obj.p = func();
+			return reset(obj, prop, func());
 		},
 		set: function (v) {
-			Object.defineProperty(obj, prop, {
-				value: v,
-				enumerable: true,
-				writable: true,
-				configurable: true
-			});
+			reset(obj, prop, v);
 		},
 		enumerable: true,
 		configurable: true
