@@ -1671,7 +1671,7 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 		}
 		// emit call to the zero-argument ctor
 		if (classDef.className() != "Object")
-			this._emit(this._mangleConstructorName(classDef, []) + ".call(this);\n", null);
+			throw new Error("FIXME ctor call is missing for:" + this._mangleConstructorName(classDef, []));
 		return false;
 	},
 

@@ -111,8 +111,16 @@ var ClassDefinition = exports.ClassDefinition = Class.extend({
 		return this._flags;
 	},
 
+	extendName: function () {
+		return this._extendName;
+	},
+
 	extendClassDef: function () {
 		return this._extendClassDef;
+	},
+
+	implementNames: function () {
+		return this._implementNames;
 	},
 
 	implementClassDefs: function () {
@@ -290,6 +298,19 @@ var ClassDefinition = exports.ClassDefinition = Class.extend({
 	},
 
 	analyze: function (context) {
+		// create default constructor if no constructors exist
+		if (this.forEachMemberFunction(function (funcDef) { return funcDef.name() != "constructor"; })) {
+			var Parser = require("./parser");
+			var func = new MemberFunctionDefinition(
+				this._token,
+				new Parser.Token("constructor", true, null, 0, 0), // FIXME
+				ClassDefinition.IS_FINAL,
+				Type.Type.voidType,
+				[], [], [], [],
+				this._token /* FIXME */);
+			func.setClassDef(this);
+			this._members.push(func);
+		}
 		// check that the class may be extended
 		if (! this._assertInheritanceIsNotInLoop(context, null, this.getToken()))
 			return false;
@@ -831,6 +852,8 @@ var MemberFunctionDefinition = exports.MemberFunctionDefinition = MemberDefiniti
 	},
 
 	analyze: function (context) {
+		var Statement = require("./statement"); // seems that we need to delay the load
+
 		// return if is abtract (wo. function body) or is native
 		if (this._statements == null)
 			return;
@@ -852,30 +875,41 @@ var MemberFunctionDefinition = exports.MemberFunctionDefinition = MemberDefiniti
 			return;
 
 		// constructor
-		var Statement = require("./statement"); // seems that we need to delay the load
-		var nextConstructorIndex = -1;
-		for (var i = 0; i < this._statements.length; ++i) {
-			var statement = this._statements[i];
-			if (! (statement instanceof Statement.ConstructorInvocationStatement))
-				break;
-			for (; nextConstructorIndex < this._classDef.implementClassDefs().length; ++nextConstructorIndex) {
-				var baseClassDef = nextConstructorIndex == -1 ? this._classDef.extendClassDef() : this._classDef.implementClassDefs()[nextConstructorIndex];
-				if (baseClassDef == statement.getConstructingClassDef())
-					break;
-				// constructor of baseClassDef is not called; assert that it has a zero-argument constructor (or has no constructor at all)
-				if (! baseClassDef.hasDefaultConstructor())
-					context.errors.push(new CompileError(statement.getQualifiedName().getToken(), "constructor of class '" + baseClassDef.className() + "' should be called prior to the statement"));
+		var stmtIndex = 0;
+		for (var baseIndex = 0; baseIndex <= this._classDef.implementClassDefs().length; ++baseIndex) {
+			var baseClassDef = baseIndex == 0 ? this._classDef.extendClassDef() : this._classDef.implementClassDefs()[baseIndex - 1];
+			if (stmtIndex < this._statements.length
+				&& this._statements[stmtIndex] instanceof Statement.ConstructorInvocationStatement
+				&& baseClassDef == this._statements[stmtIndex].getConstructingClassDef()) {
+				// explicit call to the base class, no need to complement
+				if (baseClassName == "Object")
+					this._statements.splice(stmtIndex, 1);
+				else
+					++stmtIndex;
+			} else {
+				// insert call to the default constructor
+				var baseClassName = baseIndex == 0 ? this._classDef.extendName() : this._classDef.implementNames()[baseIndex - 1];
+				if (baseClassName == null || baseClassName.getToken().getValue() == "Object") {
+					// we can omit the call
+				} else if (baseClassDef.hasDefaultConstructor()) {
+					var ctorStmt = new Statement.ConstructorInvocationStatement(baseClassName, []);
+					this._statements.splice(stmtIndex, 0, ctorStmt);
+					if (! ctorStmt.analyze(context))
+						throw new Error("logic flaw");
+					++stmtIndex;
+				} else {
+					if (stmtIndex < this._statements.length) {
+						context.errors.push(new CompileError(this._statements[stmtIndex].getToken(), "constructor of class '" + baseClassName.getToken().getValue() + "' should be called prior to the statement"));
+					} else {
+						context.errors.push(new CompileError(this._token, "super class '" + baseClassName.getToken().getValue() + "' should be initialized explicitely (no default constructor)"));
+					}
+				}
 			}
-			if (nextConstructorIndex == this._classDef.implementClassDefs().length) {
-				context.errors.push(new CompileError(statement.getQualifiedName().getToken(), "constructors should be called in the order the base classes are extended / implemented"));
-				break;
-			}
-			++nextConstructorIndex;
 		}
-		for (; nextConstructorIndex < this._classDef.implementClassDefs().length; ++nextConstructorIndex) {
-			var baseClassDef = nextConstructorIndex == -1 ? this._classDef.extendClassDef() : this._classDef.implementClassDefs()[nextConstructorIndex];
-			if (! baseClassDef.hasDefaultConstructor())
-					context.errors.push(new CompileError(this._token, "constructor of class '" + baseClassDef.className() + "' should be called explicitely"));
+		for (; stmtIndex < this._statements.length; ++stmtIndex) {
+			if (! (this._statements[stmtIndex] instanceof Statement.ConstructorInvocationStatement))
+				break;
+			context.errors.push(new CompileError(this._statements[stmtIndex].getToken(), "constructors should be invoked in the order they are implemented"));
 		}
 	},
 
