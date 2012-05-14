@@ -803,12 +803,8 @@ var _AsExpressionEmitter = exports._AsExpressionEmitter = _ExpressionEmitter.ext
 				return true;
 			}
 			if (destType.equals(Type.stringType)) {
-				this._emitWithParens(
-					outerOpPrecedence,
-					_BinaryExpressionEmitter._operatorPrecedence["+"],
-					_BinaryExpressionEmitter._operatorPrecedence["||"],
-					"(",
-					" || false) + \"\"");
+				var prec = _BinaryExpressionEmitter._operatorPrecedence["+"];
+				this._emitWithParens(outerOpPrecedence, prec, prec, null, " + \"\"");
 				return true;
 			}
 		}
@@ -842,12 +838,8 @@ var _AsExpressionEmitter = exports._AsExpressionEmitter = _ExpressionEmitter.ext
 				return true;
 			}
 			if (destType.equals(Type.stringType)) {
-				this._emitWithParens(
-					outerOpPrecedence,
-					_BinaryExpressionEmitter._operatorPrecedence["+"],
-					_BinaryExpressionEmitter._operatorPrecedence["|"],
-					"(",
-					" | 0) + \"\"");
+				var prec = _BinaryExpressionEmitter._operatorPrecedence["+"];
+				this._emitWithParens(outerOpPrecedence, prec, prec, null, " + \"\"");
 				return true;
 			}
 		}
@@ -888,7 +880,7 @@ var _AsExpressionEmitter = exports._AsExpressionEmitter = _ExpressionEmitter.ext
 			}
 			if (destType.equals(Type.stringType)) {
 				var prec = _BinaryExpressionEmitter._operatorPrecedence["+"];
-				this._emitWithParens(outerOpPrecedence, prec, prec, "+", " + \"\"");
+				this._emitWithParens(outerOpPrecedence, prec, prec, null, " + \"\"");
 				return true;
 			}
 		}

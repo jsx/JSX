@@ -3,7 +3,7 @@ undefined
 false
 0
 0
-false
+undefined
 
 false
 false
@@ -21,7 +21,7 @@ undefined
 false
 0
 0
-0
+undefined
 
 0
 false
@@ -39,7 +39,7 @@ undefined
 false
 0
 NaN
-NaN
+undefined
 
 0
 false
