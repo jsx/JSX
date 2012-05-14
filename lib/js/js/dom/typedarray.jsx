@@ -1,14 +1,32 @@
 interface ArrayBuffer {}
-interface ArrayBufferView {}
+interface ArrayBufferView {
+	abstract const length : number;
+}
 
 // TypedArray
-class Int8Array implements ArrayBufferView {}
-class Uint8Array implements ArrayBufferView {}
-class Int16Array implements ArrayBufferView {}
-class Uint16Array implements ArrayBufferView {}
-class Int32Array implements ArrayBufferView {}
-class Uint32Array implements ArrayBufferView {}
-class Float32Array implements ArrayBufferView {}
-class Float64Array implements ArrayBufferView {}
+native class Int8Array implements ArrayBufferView {
+	const length : number;
+}
+native class Uint8Array implements ArrayBufferView {
+	const length : number;
+}
+native class Int16Array implements ArrayBufferView {
+	const length : number;
+}
+native class Uint16Array implements ArrayBufferView {
+	const length : number;
+}
+native class Int32Array implements ArrayBufferView {
+	const length : number;
+}
+native class Uint32Array implements ArrayBufferView {
+	const length : number;
+}
+native class Float32Array implements ArrayBufferView {
+	const length : number;
+}
+native class Float64Array implements ArrayBufferView {
+	const length : number;
+}
 
 

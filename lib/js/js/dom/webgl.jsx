@@ -11,6 +11,10 @@ native class WebGLRenderingContext implements CanvasRenderingContext {
 	 // constants
 	//================
 
+	const DEPTH_BUFFER_BIT : number/*GLenum*/;
+	const STENCIL_BUFFER_BIT : number/*GLenum*/;
+	const COLOR_BUFFER_BIT : number/*GLenum*/;
+
 	const POINTS : number/*GLenum*/;
 	const LINES : number/*GLenum*/;
 	const LINE_LOOP : number/*GLenum*/;
