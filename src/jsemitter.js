@@ -266,7 +266,7 @@ var _IfStatementEmitter = exports._IfStatementEmitter = _StatementEmitter.extend
 		this._emitter._emit(") {\n", null);
 		this._emitter._emitStatements(this._statement.getOnTrueStatements());
 		var ifFalseStatements = this._statement.getOnFalseStatements();
-		if (ifFalseStatements != null) {
+		if (ifFalseStatements.length != 0) {
 			this._emitter._emit("} else {\n", null);
 			this._emitter._emitStatements(ifFalseStatements);
 		}
