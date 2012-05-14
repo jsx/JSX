@@ -852,8 +852,6 @@ var MemberFunctionDefinition = exports.MemberFunctionDefinition = MemberDefiniti
 	},
 
 	analyze: function (context) {
-		var Statement = require("./statement"); // seems that we need to delay the load
-
 		// return if is abtract (wo. function body) or is native
 		if (this._statements == null)
 			return;
@@ -871,11 +869,15 @@ var MemberFunctionDefinition = exports.MemberFunctionDefinition = MemberDefiniti
 
 		// check that from the constructor, all constructors with non-zero
 		// arguments are called, and that the calls are in the implemented order
-		if (this.getNameToken() == null || this.name() != "constructor")
-			return;
+		if (this.getNameToken() != null && this.name() == "constructor")
+			this._fixupConstructor(context);
+	},
 
-		// constructor
+	_fixupConstructor: function (context) {
+		var Statement = require("./statement"); // seems that we need to delay the load
+
 		var stmtIndex = 0;
+		// make implicit calls to default constructor explicit
 		for (var baseIndex = 0; baseIndex <= this._classDef.implementClassDefs().length; ++baseIndex) {
 			var baseClassDef = baseIndex == 0 ? this._classDef.extendClassDef() : this._classDef.implementClassDefs()[baseIndex - 1];
 			if (stmtIndex < this._statements.length
