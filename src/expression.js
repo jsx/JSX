@@ -428,6 +428,13 @@ var MapLiteralElement = exports.MapLiteralElement = Class.extend({
 
 	getExpr: function () {
 		return this._expr;
+	},
+
+	serialize: function () {
+		return [
+			this._key.serialize(),
+			this._expr.serialize()
+		];
 	}
 
 });

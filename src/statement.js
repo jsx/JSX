@@ -1236,6 +1236,13 @@ var DebuggerStatement = exports.DebuggerStatement = InformationStatement.extend(
 		InformationStatement.prototype.constructor.call(this, token);
 	},
 
+	serialize: function () {
+		return [
+			"DebuggerStatement",
+			this._token.serialize()
+		];
+	},
+
 	doAnalyze: function (context) {
 		return true;
 	},

@@ -184,6 +184,15 @@ var Import = exports.Import = Class.extend({
 		return names;
 	},
 
+	serialize: function () {
+		return [
+			"Import",
+			Util.serializeNullable(this._filenameToken),
+			Util.serializeNullable(this._aliasToken),
+			Util.serializeArray(this._classNames)
+		];
+	},
+
 	checkNameConflict: function (errors, nameToken) {
 		if (this._aliasToken != null) {
 			if (this._aliasToken.getValue() == nameToken.getValue()) {
