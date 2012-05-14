@@ -89,7 +89,7 @@ var JSX = Class.extend({
 			"Usage: jsx [options] source-files\n" +
 			"\n" +
 			"Options:\n" +
-			"  --add-search-path path     add a path to library search paths" +
+			"  --add-search-path path     add a path to library search paths\n" +
 			"  --executable               compiles as an CLI executable, calling _Main.main(:string[]):void\n" +
 			"  --run                      runs _Main.main(:string[]):void after compiling\n" +
 			"  --test                     runs _Test#test*():void after compiling\n" +
