@@ -1,5 +1,5 @@
 import "test-case.jsx";
-import "random/mt.jsx";
+import "experimental/random/mt.jsx";
 
 class _Test extends TestCase {
 
