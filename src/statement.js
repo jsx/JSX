@@ -22,6 +22,8 @@ var Statement = exports.Statement = Class.extend({
 		}
 	},
 
+	forEachCodeElement: null, // iterates through the statements / expressions, returns bool
+
 	getToken: null, // returns a token of the statement
 
 	serialize: null,
@@ -56,18 +58,11 @@ var ConstructorInvocationStatement = exports.ConstructorInvocationStatement = St
 		this._args = args;
 		this._ctorClassDef = null;
 		this._ctorType = null;
+		this._callingFuncDef = null; // should become an interface, see CallExpression
 	},
 
 	getToken: function () {
 		return this._qualifiedName.getToken();
-	},
-
-	serialize: function () {
-		return [
-			"ConstructorInvocationStatement",
-			this._qualifiedName.serialize(),
-			Util.serializeArray(this._args)
-		];
 	},
 
 	getQualifiedName: function () {
@@ -84,6 +79,22 @@ var ConstructorInvocationStatement = exports.ConstructorInvocationStatement = St
 
 	getConstructorType: function () {
 		return this._ctorType;
+	},
+
+	getCallingFuncDef: function () {
+		return this._callingFuncDef;
+	},
+
+	setCallingFuncDef: function (funcDef) {
+		this._callingFuncDef = funcDef;
+	},
+
+	serialize: function () {
+		return [
+			"ConstructorInvocationStatement",
+			this._qualifiedName.serialize(),
+			Util.serializeArray(this._args)
+		];
 	},
 
 	doAnalyze: function (context) {
@@ -113,6 +124,10 @@ var ConstructorInvocationStatement = exports.ConstructorInvocationStatement = St
 		}
 		this._ctorType = ctorType;
 		return true;
+	},
+
+	forEachCodeElement: function (cb) {
+		return Util.forEachCodeElement(cb, this._args);
 	}
 
 });
@@ -138,6 +153,10 @@ var UnaryExpressionStatement = exports.UnaryExpressionStatement = Statement.exte
 	doAnalyze: function (context) {
 		this._analyzeExpr(context, this._expr);
 		return true;
+	},
+
+	forEachCodeElement: function (cb) {
+		return cb(this._expr);
 	}
 
 });
@@ -204,6 +223,12 @@ var ReturnStatement = exports.ReturnStatement = Statement.extend({
 			}
 		}
 		context.getTopBlock().localVariableStatuses = null;
+		return true;
+	},
+
+	forEachCodeElement: function (cb) {
+		if (this._expr != null && ! cb(this._expr))
+			return false;
 		return true;
 	}
 
@@ -311,6 +336,10 @@ var JumpStatement = exports.JumpStatement = Statement.extend({
 		else
 			context.errors.push(new CompileError(this._token, "cannot '" + this._token.getValue() + "' at this point"));
 		return null;
+	},
+
+	forEachCodeElement: function (cb) {
+		return true;
 	}
 
 });
@@ -323,6 +352,10 @@ var BreakStatement = exports.BreakStatement = JumpStatement.extend({
 
 	_getName: function () {
 		return "BreakStatement";
+	},
+
+	forEachCodeElement: function (cb) {
+		return true;
 	}
 
 });
@@ -335,6 +368,10 @@ var ContinueStatement = exports.ContinueStatement = JumpStatement.extend({
 
 	_getName: function () {
 		return "ContinueStatement";
+	},
+
+	forEachCodeElement: function (cb) {
+		return true;
 	}
 
 });
@@ -360,6 +397,10 @@ var LabellableStatement = exports.LabellableStatement = Statement.extend({
 		return [
 			Util.serializeNullable(this._label)
 		];
+	},
+
+	forEachCodeElement: function (cb) {
+		return true;
 	},
 
 	_prepareBlockAnalysis: function (context) {
@@ -475,6 +516,14 @@ var DoWhileStatement = exports.DoWhileStatement = ContinuableStatement.extend({
 			throw e;
 		}
 		return true;
+	},
+
+	forEachCodeElement: function (cb) {
+		if (! cb(this._expr))
+			return false;
+		if (! Util.forEachCodeElement(cb, this._statements))
+			return false;
+		return true;
 	}
 
 });
@@ -538,6 +587,16 @@ var ForInStatement = exports.ForInStatement = ContinuableStatement.extend({
 			this._abortBlockAnalysis(context);
 			throw e;
 		}
+		return true;
+	},
+
+	forEachCodeElement: function (cb) {
+		if (! cb(this._lhsExpr))
+			return false;
+		if (! cb(this._listExpr))
+			return false;
+		if (! Util.forEachCodeElement(cb, this._statements))
+			return false;
 		return true;
 	}
 
@@ -604,6 +663,18 @@ var ForStatement = exports.ForStatement = ContinuableStatement.extend({
 			this._abortBlockAnalysis(context);
 			throw e;
 		}
+		return true;
+	},
+
+	forEachCodeElement: function (cb) {
+		if (this._initExpr != null && ! cb(this._initExpr))
+			return false;
+		if (this._condExpr != null && ! cb(this._condExpr))
+			return false;
+		if (this._postExpr != null && ! cb(this._postExpr))
+			return false;
+		if (! Util.forEachCodeElement(cb, this._statements))
+			return false;
 		return true;
 	}
 
@@ -676,6 +747,14 @@ var IfStatement = exports.IfStatement = Statement.extend({
 		else
 			context.getTopBlock().localVariableStatuses = lvStatusesOnFalseStmts;
 		return true;
+	},
+
+	forEachCodeElement: function (cb) {
+		if (! Util.forEachCodeElement(cb, this._onTrueStatements))
+			return false;
+		if (! Util.forEachCodeElement(cb, this._onFalseStatements))
+			return false;
+		return true;
 	}
 
 });
@@ -733,6 +812,14 @@ var SwitchStatement = exports.SwitchStatement = LabellableStatement.extend({
 		return true;
 	},
 
+	forEachCodeElement: function (cb) {
+		if (! cb(this._expr))
+			return false;
+		if (! Util.forEachCodeElement(cb, this._statements))
+			return false;
+		return true;
+	},
+
 	$resetLocalVariableStatuses: function (context) {
 		context.getTopBlock().localVariableStatuses = context.blockStack[context.blockStack.length - 2].localVariableStatuses.clone();
 	}
@@ -787,6 +874,10 @@ var CaseStatement = exports.CaseStatement = Statement.extend({
 		// reset local variable statuses
 		SwitchStatement.resetLocalVariableStatuses(context);
 		return true;
+	},
+
+	forEachCodeElement: function (cb) {
+		return cb(this._expr);
 	}
 
 });
@@ -809,6 +900,10 @@ var DefaultStatement = exports.DefaultStatement = Statement.extend({
 
 	doAnalyze: function (context) {
 		SwitchStatement.resetLocalVariableStatuses(context);
+		return true;
+	},
+
+	forEachCodeElement: function (cb) {
 		return true;
 	}
 
@@ -854,6 +949,14 @@ var WhileStatement = exports.WhileStatement = ContinuableStatement.extend({
 			this._abortBlockAnalysis(context);
 			throw e;
 		}
+		return true;
+	},
+
+	forEachCodeElement: function (cb) {
+		if (! cb(this._expr))
+			return false;
+		if (! Util.forEachCodeElement(cb, this._statements))
+			return false;
 		return true;
 	}
 
@@ -917,6 +1020,16 @@ var TryStatement = exports.TryStatement = Statement.extend({
 			if (! this._finallyStatements[i].analyze(context))
 				return false;
 		return true;
+	},
+
+	forEachCodeElement: function (cb) {
+		if (! Util.forEachCodeElement(cb, this._statements))
+			return false;
+		if (! Util.forEachCodeElement(cb, this._catchStatements))
+			return false;
+		if (! Util.forEachCodeElement(cb, this._finallyStatements))
+			return false;
+		return true;
 	}
 
 });
@@ -979,6 +1092,10 @@ var CatchStatement = exports.CatchStatement = Statement.extend({
 		}
 		context.getTopBlock().localVariableStatuses = context.getTopBlock().localVariableStatuses.merge(lvStatusesAfterCatch);
 		return true;
+	},
+
+	forEachCodeElement: function (cb) {
+		return Util.forEachCodeElement(cb, this._statements);
 	}
 
 });
@@ -1017,6 +1134,10 @@ var ThrowStatement = exports.ThrowStatement = Statement.extend({
 			return true;
 		}
 		return true;
+	},
+
+	forEachCodeElement: function (cb) {
+		return cb(this._expr);
 	}
 
 });
@@ -1061,6 +1182,10 @@ var AssertStatement = exports.AssertStatement = InformationStatement.extend({
 		if (! exprType.equals(Type.booleanType))
 			context.errors.push(new CompileError(this._exprs[0].getToken(), "cannot assert type " + exprType.serialize()));
 		return true;
+	},
+
+	forEachCodeElement: function (cb) {
+		return cb(this._expr);
 	}
 
 });
@@ -1097,6 +1222,10 @@ var LogStatement = exports.LogStatement = InformationStatement.extend({
 			}
 		}
 		return true;
+	},
+
+	forEachCodeElement: function (cb) {
+		return Util.forEachCodeElement(cb, this._exprs);
 	}
 
 });
@@ -1108,6 +1237,10 @@ var DebuggerStatement = exports.DebuggerStatement = InformationStatement.extend(
 	},
 
 	doAnalyze: function (context) {
+		return true;
+	},
+
+	forEachCodeElement: function (cb) {
 		return true;
 	}
 

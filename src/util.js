@@ -63,6 +63,14 @@ var Util = exports.Util = Class.extend({
 		return true;
 	},
 
+	$forEachCodeElement: function (cb, elements) {
+		if (elements != null)
+			for (var i = 0; i < elements.length; ++i)
+				if (! cb(elements[i]))
+					return false;
+		return true;
+	},
+
 	$encodeStringLiteral: function (str) {
 		var escaped = str.replace(/[\0- '"\\\u007f-\uffff]/g, function (ch) {
 			if (ch == "\0") {
