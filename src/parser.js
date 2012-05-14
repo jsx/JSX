@@ -909,7 +909,6 @@ var Parser = exports.Parser = Class.extend({
 		if ((classFlags & ClassDefinition.IS_INTERFACE) != 0)
 			flags |= ClassDefinition.IS_ABSTRACT;
 		if (token.getValue() == "function") {
-			flags |= classFlags & ClassDefinition.IS_NATIVE;
 			return this._functionDefinition(token, flags, classFlags);
 		}
 		// member variable decl.
@@ -956,7 +955,9 @@ var Parser = exports.Parser = Class.extend({
 				this._newError("constructor cannot be declared as 'abstract' or 'final'");
 				return null;
 			}
+			flags |= ClassDefinition.IS_FINAL;
 		}
+		flags |= classFlags & (ClassDefinition.IS_NATIVE | ClassDefinition.IS_FINAL);
 		if (this._expect("(") == null)
 			return null;
 		// arguments
