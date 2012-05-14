@@ -990,14 +990,14 @@ var _AsNoConvertExpressionEmitter = exports._AsNoConvertExpressionEmitter = _Exp
 		if (this._emitter._enableRunTimeTypeCheck) {
 			var emitWithAssertion = function (emitCheckExpr, message) {
 				var token = this._expr.getToken();
-				this._emitter._emit("function (v) {\n", token);
+				this._emitter._emit("(function (v) {\n", token);
 				this._emitter._advanceIndent();
 				this._emitter._emitAssertion(emitCheckExpr, token, message);
 				this._emitter._emit("return v;\n", token);
 				this._emitter._reduceIndent();
 				this._emitter._emit("}(", token);
 				this._emitter._getExpressionEmitterFor(this._expr.getExpr()).emit(0);
-				this._emitter._emit(")", token);
+				this._emitter._emit("))", token);
 			}.bind(this);
 			var srcType = this._expr.getExpr().getType();
 			var destType = this._expr.getType();
