@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Hello, WebGL!</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <!-- Le styles -->
+    <link href="../assets/css/bootstrap.css" rel="stylesheet">
+    <link href="../assets/css/bootstrap-responsive.css" rel="stylesheet">
+    <style type="text/css">
+      body {
+        padding-top: 60px;
+        padding-bottom: 40px;
+      }
+    </style>
+
+    <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <script src="../jsx.combined.js"></script>
+    <script src="../assets/js/jsx-browser-platform.js"></script>
+    <script src="../assets/js/jsx-script-loader.js"></script>
+    <script type="application/jsx" src="hello-webgl.jsx"></script>
+    <script>
+      window.addEventListener("DOMContentLoaded", function(e) {
+        document.getElementById("run").addEventListener("click", function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          JSX.require("hello-webgl.jsx").Hello.main$();
+        });
+      });
+    </script>
+
+  </head>
+
+  <body>
+
+    <div class="navbar navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container-fluid">
+          <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </a>
+          <a class="brand" href="/">JSX</a>
+          <div class="nav-collapse">
+            <ul class="nav">
+              <li><a href="/">Home</a></li>
+            </ul>
+          </div><!--/.nav-collapse -->
+        </div>
+      </div>
+    </div>
+
+    <div class="container">
+      <div class="row">
+        <div class="span8">
+          <h2>Hello, WebGL!</h2>
+        </div>
+      </div>
+      <div class="row">
+        <div class="span8">
+          <p><a class="btn btn-primary btn-large" id="run">Run the script</a></p>
+        </div>
+      </div>
+
+      <hr>
+
+      <footer>
+        <p>&copy; 2012, DeNA, Co., Ltd.</p>
+      </footer>
+
+    </div> <!-- /container -->
+
+	<!-- for WebGL -->
+<canvas id='webgl-canvas' width='256px' height='256px'></canvas>
+<script id='vshader' type='x-shader/x-vertex'>
+precision mediump float;
+
+attribute vec3 position;
+attribute vec4 color;
+
+varying vec4 f_color;
+
+void main() {
+	f_color = color;
+	gl_Position = vec4(position, 1.0);
+}
+</script>
+<script id='fshader' type='x-shader/x-fragment'>
+precision mediump float;
+
+varying vec4 f_color;
+
+void main() {
+	gl_FragColor = f_color;
+}
+</script>
+
+  </body>
+</html>
