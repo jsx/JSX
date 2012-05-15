@@ -217,19 +217,25 @@ var JSX = Class.extend({
 					var mode = switchOpt[1] == "enable";
 					switch (switchOpt[2]) {
 					case "assert":
-						tasks.push(function () {
-							emitter.setEnableAssertion(mode);
-						});
+						tasks.push(function (mode) {
+							return function () {
+								emitter.setEnableAssertion(mode);
+							};
+						}(mode));
 						break NEXTOPT;
 					case "log":
-						tasks.push(function () {
-							emitter.setEnableLogging(mode);
-						});
+						tasks.push(function (mode) {
+							return function () {
+								emitter.setEnableLogging(mode);
+							};
+						}(mode));
 						break NEXTOPT;
 					case "type-check":
-						tasks.push(function () {
-							emitter.setEnableRunTimeTypeCheck(mode);
-						});
+						tasks.push(function (mode) {
+							return function () {
+								emitter.setEnableRunTimeTypeCheck(mode);
+							};
+						}(mode));
 						break NEXTOPT;
 					default:
 						break;
