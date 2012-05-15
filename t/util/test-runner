@@ -1,0 +1,111 @@
+#!/usr/bin/perl
+use 5.10.0;
+use strict;
+use warnings;
+use Test::More;
+use t::util::Util;
+
+main(@ARGV);
+exit;
+
+sub main {
+    my($file) = @_ or die "no args";
+
+    local $TODO = 'not yet' if ($file =~ /\.todo\.jsx$/);
+
+    if(my @shebang = get_shebang($file)) {
+        exec @shebang, $file;
+    }
+    elsif($file =~ m{ /run/ }xms) {
+        compile_and_run($file);
+    }
+    elsif($file =~ m{ /compile_error/ }xms) {
+        expect_compile_error($file);
+    }
+    elsif($file =~ m{ /lib/ }xms) {
+        run_test($file);
+    }
+    else {
+        pass "(unknown file: $file)";
+    }
+    done_testing;
+}
+
+sub get_shebang {
+    my($file) = @_;
+
+    open my($fh), "<", $file or die "Cannot open $file for reading: $!";
+    my $first = <$fh>;
+    close $fh;
+
+    return grep { defined } $first =~ /\A \#\! \s* (\S+) (?: \s+ (\S+) )* /xmsg;
+}
+
+sub compile_and_run {
+    my($file) = @_;
+
+    plan tests => 1;
+
+    defined(my $expected = get_expected($file))
+        or die "could not find EXPECTED in file:$file\n";
+
+    require File::Temp;
+
+    # compile (FIXME support C++)
+    my $src = `bin/jsx $file`;
+    if($? != 0) {
+        fail("compile '$file' failed: $?");
+        return;
+    }
+
+    # add the bootstrap code
+    $src .= <<'EOT';
+// workaround for node.js to set "JSX" to global
+(function () { return this; })().JSX = JSX;
+// invoke the test
+try {
+    Test.run$();
+} catch (e) {
+    console.log(e.message.replace(/^\[.*?\]\s*/, ""));
+}
+EOT
+
+    # write to temp file
+    my $temp = File::Temp->new(SUFFIX => ".js");
+    $temp->print($src);
+    $temp->close();
+
+    # execute compiled node
+    my $output = do {
+        open my $fh, "-|", "node $temp"
+            or die "failed to invoke node:$!";
+        local $/;
+        my $ret = <$fh>;
+        close $fh;
+        return fail "failed to execute compiled script"
+            if $? != 0;
+        $ret;
+    };
+
+    # compare the results
+    is $output, $expected, $file;
+}
+
+sub expect_compile_error {
+    my($file) = @_;
+
+    plan tests => 2;
+
+
+    my $err = `bin/jsx $file 2>&1`;
+    isnt $?, 0, "compiling $file failed with non-zero status";
+    unlike $err, qr/process\.nextTick error/, "... without compiler clash";
+    note $err;
+}
+
+sub run_test {
+    my($file) = @_;
+
+    exec("bin/jsx", "--test", $file) == 0
+        or die "Cannot exec bin/jsx --test $file";
+}
