@@ -4,6 +4,8 @@
 
 native class ArrayBuffer {
 	const length : number;
+
+	function constructor(size : int);
 }
 
 native __fake__ class ArrayBufferView {
@@ -15,112 +17,152 @@ native __fake__ class ArrayBufferView {
 }
 
 native class DataView extends ArrayBufferView {
-    // TODO
+	function constructor(buffer : ArrayBuffer);
+	function constructor(buffer : ArrayBuffer, byteOffset : int);
+	function constructor(buffer : ArrayBuffer, byteOffset : int, byteLength : int);
+
+	function getInt8(byteOffset : int) : int;
+	function getUint8(byteOffset : int) : int;
+	function getInt16(byteOffset : int) : int;
+	function getInt16(byteOffset : int, littleEndian : boolean) : int;
+	function getUint16(byteOffset : int) : int;
+	function getUint16(byteOffset : int, littleEndian : boolean) : int;
+	function getInt32(byteOffset : int) : int;
+	function getInt32(byteOffset : int, littleEndian : boolean) : int;
+	function getUint32(byteOffset : int) : int;
+	function getUint32(byteOffset : int, littleEndian : boolean) : int;
+	function getFloat32(byteOffset : int) : number;
+	function getFloat32(byteOffset : int, littleEndian : boolean) : number;
+	function getFloat64(byteOffset : int) : number;
+	function getFloat64(byteOffset : int, littleEndian : boolean) : number;
+
+	function setInt8(byteOffset : int, value : int) : void;
+	function setUint8(byteOffset : int, value : int) : void;
+	function setInt16(byteOffset : int, value : int) : void;
+	function setInt16(byteOffset : int, value : int, littleEndian : boolean) : void;
+	function setUint16(byteOffset : int, value : int, littleEndian : boolean) : void;
+	function setUint16(byteOffset : int, value : int) : void;
+	function setInt32(byteOffset : int, value : int) : void;
+	function setInt32(byteOffset : int, value : int, littleEndian : boolean) : void;
+	function setUint32(byteOffset : int, value : int) : void;
+	function setUint32(byteOffset : int, value : int, littleEndian : boolean) : void;
+	function setFloat32(byteOffset : int, value : number) : void;
+	function setFloat32(byteOffset : int, value : number, littleEndian : boolean) : void;
+	function setFloat64(byteOffset : int, value : number) : void;
+	function setFloat64(byteOffset : int, value : number, littleEndian : boolean) : void;
+
 }
 
 // TypedArray
+
 native class Int8Array extends ArrayBufferView {
-	static const BYTES_PER_ELEMENT : number;
+	static const BYTES_PER_ELEMENT : int;
 
-	const length : number;
+	const length : int;
 
-	function constructor(size : number);
+	function constructor(size : int);
 	function constructor(array : Int8Array);
 	function constructor(array : number[]);
 	function constructor(array : int[]);
 	function constructor(buffer : ArrayBuffer);
-	function constructor(buffer : ArrayBuffer, byteOffset : number);
-	function constructor(buffer : ArrayBuffer, byteOffset : number, length : number); 
+	function constructor(buffer : ArrayBuffer, byteOffset : int);
+	function constructor(buffer : ArrayBuffer, byteOffset : int, length : int);
 }
+
 native class Uint8Array extends ArrayBufferView {
-	static const BYTES_PER_ELEMENT : number;
+	static const BYTES_PER_ELEMENT : int;
 
-	const length : number;
+	const length : int;
 
-	function constructor(size : number);
+	function constructor(size : int);
 	function constructor(array : Uint8Array);
 	function constructor(array : number[]);
 	function constructor(array : int[]);
 	function constructor(buffer : ArrayBuffer);
-	function constructor(buffer : ArrayBuffer, byteOffset : number);
-	function constructor(buffer : ArrayBuffer, byteOffset : number, length : number); 
+	function constructor(buffer : ArrayBuffer, byteOffset : int);
+	function constructor(buffer : ArrayBuffer, byteOffset : int, length : int);
 }
+
 native class Int16Array extends ArrayBufferView {
-	static const BYTES_PER_ELEMENT : number;
+	static const BYTES_PER_ELEMENT : int;
 
-	const length : number;
+	const length : int;
 
-	function constructor(size : number);
+	function constructor(size : int);
 	function constructor(array : Int16Array);
 	function constructor(array : number[]);
 	function constructor(array : int[]);
 	function constructor(buffer : ArrayBuffer);
-	function constructor(buffer : ArrayBuffer, byteOffset : number);
-	function constructor(buffer : ArrayBuffer, byteOffset : number, length : number); 
+	function constructor(buffer : ArrayBuffer, byteOffset : int);
+	function constructor(buffer : ArrayBuffer, byteOffset : int, length : int);
 }
+
 native class Uint16Array extends ArrayBufferView {
-	static const BYTES_PER_ELEMENT : number;
+	static const BYTES_PER_ELEMENT : int;
 
-	const length : number;
+	const length : int;
 
-	function constructor(size : number);
+	function constructor(size : int);
 	function constructor(array : Uint16Array);
 	function constructor(array : number[]);
 	function constructor(array : int[]);
 	function constructor(buffer : ArrayBuffer);
-	function constructor(buffer : ArrayBuffer, byteOffset : number);
-	function constructor(buffer : ArrayBuffer, byteOffset : number, length : number); 
+	function constructor(buffer : ArrayBuffer, byteOffset : int);
+	function constructor(buffer : ArrayBuffer, byteOffset : int, length : int);
 }
+
 native class Int32Array extends ArrayBufferView {
-	static const BYTES_PER_ELEMENT : number;
+	static const BYTES_PER_ELEMENT : int;
 
-	const length : number;
+	const length : int;
 
-	function constructor(size : number);
+	function constructor(size : int);
 	function constructor(array : Int32Array);
-	function constructor(array : number[]);
 	function constructor(array : int[]);
+	function constructor(array : number[]);
 	function constructor(buffer : ArrayBuffer);
-	function constructor(buffer : ArrayBuffer, byteOffset : number);
-	function constructor(buffer : ArrayBuffer, byteOffset : number, length : number); 
+	function constructor(buffer : ArrayBuffer, byteOffset : int);
+	function constructor(buffer : ArrayBuffer, byteOffset : int, length : int);
 }
+
 native class Uint32Array extends ArrayBufferView {
-	static const BYTES_PER_ELEMENT : number;
+	static const BYTES_PER_ELEMENT : int;
 
-	const length : number;
+	const length : int;
 
-	function constructor(size : number);
+	function constructor(size : int);
 	function constructor(array : Uint32Array);
 	function constructor(array : number[]);
 	function constructor(array : int[]);
 	function constructor(buffer : ArrayBuffer);
-	function constructor(buffer : ArrayBuffer, byteOffset : number);
-	function constructor(buffer : ArrayBuffer, byteOffset : number, length : number); 
+	function constructor(buffer : ArrayBuffer, byteOffset : int);
+	function constructor(buffer : ArrayBuffer, byteOffset : int, length : int);
 }
+
 native class Float32Array extends ArrayBufferView {
-	static const BYTES_PER_ELEMENT : number;
+	static const BYTES_PER_ELEMENT : int;
 
-	const length : number;
+	const length : int;
 
-	function constructor(size : number);
+	function constructor(size : int);
 	function constructor(array : Float32Array);
 	function constructor(array : number[]);
 	function constructor(array : int[]);
 	function constructor(buffer : ArrayBuffer);
-	function constructor(buffer : ArrayBuffer, byteOffset : number);
-	function constructor(buffer : ArrayBuffer, byteOffset : number, length : number); 
+	function constructor(buffer : ArrayBuffer, byteOffset : int);
+	function constructor(buffer : ArrayBuffer, byteOffset : int, length : int);
 }
 native class Float64Array extends ArrayBufferView {
 	static const BYTES_PER_ELEMENT : number;
 
-	const length : number;
+	const length : int;
 
-	function constructor(size : number);
+	function constructor(size : int);
 	function constructor(array : Float64Array);
 	function constructor(array : number[]);
 	function constructor(array : int[]);
 	function constructor(buffer : ArrayBuffer);
-	function constructor(buffer : ArrayBuffer, byteOffset : number);
-	function constructor(buffer : ArrayBuffer, byteOffset : number, length : number); 
+	function constructor(buffer : ArrayBuffer, byteOffset : int);
+	function constructor(buffer : ArrayBuffer, byteOffset : int, length : int);
 }
 

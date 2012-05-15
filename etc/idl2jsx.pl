@@ -9,13 +9,22 @@ my $content = do {
     <>;
 };
 
-my $rx_type = qr/(?: long \s+ long | unsigned \s+ (?: short | int | long | char) | \S+)/xms;
+my $rx_type = qr{
+    (?: \w+ (?: \s+ \w+)* )
+}xms;
 
 my %typemap = (
    DOMString => 'string',
-   long      => 'int',
-   'unsigned long' => 'int',
    'long long' => 'number',
+   byte  => 'int',
+   short => 'int',
+   long  => 'int',
+   'unsigned byte' => 'int',
+   'unsigned short' => 'int',
+   'unsigned int' => 'int',
+   'unsigned long' => 'int',
+   'float' => 'number',
+   'double' => 'number',
 );
 
 while($content =~ m{interface \s+ (?<class> \S+) \s+ (?: : \s+ (?<base> \S+) \s+) \{ (?<members> .+?) \}}xmsg) {
@@ -23,7 +32,7 @@ while($content =~ m{interface \s+ (?<class> \S+) \s+ (?: : \s+ (?<base> \S+) \s+
 
     foreach my $member(split /;/, $+{members}) {
         $member =~ s{//[^\n]*}{}g;
-        if($member =~ m{
+        if($member =~ m{ # member var
                 (?<readonly> readonly \s+)? attribute
                 \s+ (?<type> $rx_type) \s+ (?<ident> \S+)
             }xms) {
@@ -40,12 +49,13 @@ while($content =~ m{interface \s+ (?<class> \S+) \s+ (?: : \s+ (?<base> \S+) \s+
                 \(
                     (?<params> .*?)
                 \)
-            }xms) {
+            }xms) { # member function
             my $ident = $+{ident};
-            my $ret_type= $+{ret_type};
+            my $ret_type= $typemap{$+{ret_type}} // $+{ret_type} ;
 
             my $params = join ", ", map {
-                my($type, $id) = /(?: in \s+) ( \S+ ) \s+ ($rx_type) /xms;
+                my($type, $id) = /(?: (?: in | optional ) \s+)* ($rx_type) \s+ (\w+) /xms
+                    or die "Cannot parse line:  $_";
                 "$id : " . ($typemap{$type} // $type);
             } split /,/, $+{params};
             say "\t", "function $ident($params) : $ret_type;";
