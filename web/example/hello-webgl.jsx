@@ -1,7 +1,7 @@
 import 'js/dom.jsx';
 import 'js/dom/canvas2d.jsx';
 import 'js/dom/webgl.jsx';
-import 'js/dom/typedarray.jsx';
+import 'typedarray.jsx';
 
 class Hello {
 
