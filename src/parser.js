@@ -405,9 +405,11 @@ var Parser = exports.Parser = Class.extend({
 		// classnames within the imported files may conflict
 		var found = [];
 		for (var i = 0; i < this._imports.length; ++i) {
-			var f = this._imports[i].getClass(name);
-			if (f != null)
-				found.push(f);
+			if (this._imports[i].getAlias() == null) {
+				var f = this._imports[i].getClass(name);
+				if (f != null)
+					found.push(f);
+			}
 		}
 		if (found.length == 1)
 			return found[0];
