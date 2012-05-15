@@ -122,4 +122,27 @@ class _Test extends TestCase {
 		this.expect(a[0]).toBe(0);
 	}
 
+	function test_DataView() : void {
+		var b = new Uint8Array([0x10, 0x20, 0x30, 0x40, 0, 0, 0, 0]);
+		var v = new DataView(b.buffer);
+
+		this.expect(v.getInt8(0), 'getInt8').toBe(0x10);
+		this.expect(v.getUint8(0), 'getUint8').toBe(0x10);
+
+		this.expect(v.getInt16(0), 'getInt16/BE').toBe(0x1020);
+		this.expect(v.getInt16(0, true), 'getInt16/LE').toBe(0x2010);
+		this.expect(v.getUint16(0), 'getUint16/BE').toBe(0x1020);
+		this.expect(v.getUint16(0, true), 'getUint16/LE').toBe(0x2010);
+
+		this.expect(v.getInt32(0), 'getInt32/BE').toBe(0x10203040);
+		this.expect(v.getInt32(0, true), 'getInt32/LE').toBe(0x40302010);
+		this.expect(v.getUint32(0), 'getUint32/BE').toBe(0x10203040);
+		this.expect(v.getUint32(0, true), 'getUint32/LE').toBe(0x40302010);
+
+		v.setFloat32(0, 123.456);
+		this.expect( Math.abs(v.getFloat32(0) - 123.456 ), 'getFloat32').toBeLT(0.001);
+
+		v.setFloat64(0, 123.456);
+		this.expect(v.getFloat64(0), 'getFloat64').toBe(123.456);
+	}
 }
