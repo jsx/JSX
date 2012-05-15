@@ -16,6 +16,7 @@ var Compiler = exports.Compiler = Class.extend({
 	constructor: function (platform) {
 		this._platform = platform;
 		this._mode = Compiler.MODE_COMPILE;
+		this._enableInlining = false;
 		this._parsers = [];
 		this._fileCache = {};
 		this._searchPaths = [ this._platform.getRoot() + "/lib/common" ];
@@ -43,6 +44,10 @@ var Compiler = exports.Compiler = Class.extend({
 
 	setEmitter: function (emitter) {
 		this._emitter = emitter;
+	},
+
+	setEnableInlining: function (mode) {
+		this._enableInlining = mode;
 	},
 
 	addSourceFile: function (token, path) {
@@ -110,8 +115,7 @@ var Compiler = exports.Compiler = Class.extend({
 		// determine callees (for optimization and code generation)
 		this._determineCallees();
 		// optimization
-		if (this._enableInlining)
-			this._inlineFunctions();
+		this._optimize();
 		// TODO peep-hole and dead store optimizations, etc.
 		this._generateCode();
 		return true;
@@ -302,6 +306,13 @@ var Compiler = exports.Compiler = Class.extend({
 			classDef.determineCallees();
 			return true;
 		}.bind(this));
+	},
+
+	_optimize: function () {
+		var Optimizer = require("./optimizer");
+		if (this._enableInlining) {
+			new Optimizer.InlineOptimizer(this).performOptimization();
+		}
 	},
 
 	_generateCode: function () {

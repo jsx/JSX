@@ -12,6 +12,8 @@ var Expression = exports.Expression = Class.extend({
 		this._token = token;
 	},
 
+	clone: null,
+
 	getToken: function () {
 		return this._token;
 	},
@@ -24,7 +26,7 @@ var Expression = exports.Expression = Class.extend({
 		return null;
 	},
 
-	forEachCodeElement: null, // function forEachCodeElement(cb : function (expr)) : boolean
+	forEachCodeElement: null, // function forEachCodeElement(cb : function (expr, replaceCb: function (expr) : void) : boolean
 
 	assertIsAssignable: function (context, token, type) {
 		context.errors.push(new CompileError(token, "left-hand-side expression is not assignable"));
@@ -99,6 +101,13 @@ var IdentifierExpression = exports.IdentifierExpression = LeafExpression.extend(
 		LeafExpression.prototype.constructor.call(this, token);
 		this._local = null;
 		this._classDefType = null;
+	},
+
+	clone: function () {
+		var ret = new IdentifierExpression(this._token);
+		ret._local = this._local;
+		ret._classDefType = this._classDefType;
+		return ret;
 	},
 
 	getLocal: function () {
@@ -183,6 +192,10 @@ var UndefinedExpression = exports.UndefinedExpression = LeafExpression.extend({
 		LeafExpression.prototype.constructor.call(this, token);
 	},
 
+	clone: function () {
+		return new UndefinedExpression(this._token);
+	},
+
 	serialize: function () {
 		return [
 			"UndefinedExpression",
@@ -205,6 +218,10 @@ var NullExpression = exports.NullExpression = LeafExpression.extend({
 	constructor: function (token, type) {
 		LeafExpression.prototype.constructor.call(this, token);
 		this._type = type;
+	},
+
+	clone: function () {
+		return new NullExpression(this._token, this._type);
 	},
 
 	serialize: function () {
@@ -231,6 +248,10 @@ var BooleanLiteralExpression = exports.BooleanLiteralExpression = LeafExpression
 		LeafExpression.prototype.constructor.call(this, token);
 	},
 
+	clone: function () {
+		return new BooleanLiteralExpression(this._token);
+	},
+
 	serialize: function () {
 		return [
 			"BooleanLiteralExpression",
@@ -252,6 +273,10 @@ var IntegerLiteralExpression = exports.IntegerLiteralExpression = LeafExpression
 
 	constructor: function (token) {
 		LeafExpression.prototype.constructor.call(this, token);
+	},
+
+	clone: function () {
+		return new IntegerLiteralExpression(this._token);
 	},
 
 	serialize: function () {
@@ -278,6 +303,10 @@ var NumberLiteralExpression = exports.NumberLiteralExpression = LeafExpression.e
 		LeafExpression.prototype.constructor.call(this, token);
 	},
 
+	clone: function () {
+		return new NumberLiteralExpression(this._token);
+	},
+
 	serialize: function () {
 		return [
 			"NumberLiteralExpression",
@@ -299,6 +328,10 @@ var StringLiteralExpression = exports.StringLiteralExpression = LeafExpression.e
 
 	constructor: function (token) {
 		LeafExpression.prototype.constructor.call(this, token);
+	},
+
+	clone: function () {
+		return new StringLiteralExpression(this._token);
 	},
 
 	serialize: function () {
@@ -323,6 +356,10 @@ var RegExpLiteralExpression = exports.RegExpLiteralExpression = LeafExpression.e
 	constructor: function (token) {
 		LeafExpression.prototype.constructor.call(this, token);
 		this._type = null;
+	},
+
+	clone: function () {
+		return new RegExpLiteralExpression(this._token);
 	},
 
 	serialize: function () {
@@ -352,6 +389,10 @@ var ArrayLiteralExpression = exports.ArrayLiteralExpression = Expression.extend(
 		Expression.prototype.constructor.call(this, token);
 		this._exprs = exprs;
 		this._type = type; // optional at this moment
+	},
+
+	clone: function () {
+		return new ArrayLiteralExpression(this._token, Util.cloneArray(this._exprs), this._type);
 	},
 
 	getExprs: function () {
@@ -445,6 +486,10 @@ var MapLiteralElement = exports.MapLiteralElement = Class.extend({
 		return this._expr;
 	},
 
+	setExpr: function (expr) {
+		this._expr = expr;
+	},
+
 	serialize: function () {
 		return [
 			this._key.serialize(),
@@ -460,6 +505,13 @@ var MapLiteralExpression = exports.MapLiteralExpression = Expression.extend({
 		Expression.prototype.constructor.call(this, token);
 		this._elements = elements;
 		this._type = type; // optional at this moment
+	},
+
+	clone: function () {
+		var ret = new MapLiteralExpression(this._token, [], this._type);
+		for (var i = 0; i < this._elements.length; ++i)
+			ret._elements[i] = new MapLiteralExpression(this._elements[i].getKey(), this._elements[i].getExpr().clone());
+		return ret;
 	},
 
 	getElements: function () {
@@ -532,7 +584,7 @@ var MapLiteralExpression = exports.MapLiteralExpression = Expression.extend({
 
 	forEachCodeElement: function (cb) {
 		for (var i = 0; i < this._elements.length; ++i)
-			if (! cb(this._elements[i].getExpr()))
+			if (! cb(this._elements[i].getExpr(), function (expr) { this._elements[i].setExpr(expr); }.bind(this)))
 				return false;
 		return true;
 	}
@@ -544,6 +596,12 @@ var ThisExpression = exports.ThisExpression = Expression.extend({
 	constructor: function (token) {
 		Expression.prototype.constructor.call(this, token);
 		this._classDef = null;
+	},
+
+	clone: function () {
+		var ret = new ThisExpression(this._token);
+		ret._classDef = this._classDef;
+		return ret;
 	},
 
 	serialize: function () {
@@ -583,6 +641,10 @@ var FunctionExpression = exports.FunctionExpression = Expression.extend({
 		this._funcDef = funcDef;
 	},
 
+	clone: function () {
+		throw new Error("not yet implemented");
+	},
+
 	getFuncDef: function () {
 		return this._funcDef;
 	},
@@ -604,7 +666,7 @@ var FunctionExpression = exports.FunctionExpression = Expression.extend({
 	},
 
 	forEachCodeElement: function (cb) {
-		return cb(this._funcDef);
+		return cb(this._funcDef, function (expr) { throw new Error("not yet implemented"); });
 	}
 
 });
@@ -641,7 +703,7 @@ var UnaryExpression = exports.UnaryExpression = OperatorExpression.extend({
 	},
 
 	forEachCodeElement: function (cb) {
-		return cb(this._expr);
+		return cb(this._expr, function (expr) { this._expr = expr; }.bind(this));
 	}
 
 });
@@ -650,6 +712,10 @@ var BitwiseNotExpression = exports.BitwiseNotExpression = UnaryExpression.extend
 
 	constructor: function (operatorToken, expr) {
 		UnaryExpression.prototype.constructor.call(this, operatorToken, expr);
+	},
+
+	clone: function () {
+		return new BitwiseNotExpression(this._token, this._expr.clone());
 	},
 
 	analyze: function (context, parentExpr) {
@@ -671,6 +737,10 @@ var InstanceofExpression = exports.InstanceofExpression = UnaryExpression.extend
 	constructor: function (operatorToken, expr, expectedType) {
 		UnaryExpression.prototype.constructor.call(this, operatorToken, expr);
 		this._expectedType = expectedType;
+	},
+
+	clone: function () {
+		return new InstanceofExpression(this._token, this._expr.clone(), this._expectedType);
 	},
 
 	getExpectedType: function () {
@@ -706,6 +776,10 @@ var AsExpression = exports.AsExpression = UnaryExpression.extend({
 	constructor: function (operatorToken, expr, type) {
 		UnaryExpression.prototype.constructor.call(this, operatorToken, expr);
 		this._type = type;
+	},
+
+	clone: function () {
+		return new AsExpression(tihs._token, this._expr.clone(), this._type);
 	},
 
 	serialize: function () {
@@ -774,6 +848,10 @@ var AsNoConvertExpression = exports.AsNoConvertExpression = UnaryExpression.exte
 		this._type = type;
 	},
 
+	clone: function () {
+		return new AsNoConvertExpression(this._token, this._expr.clone(), this._type);
+	},
+
 	serialize: function () {
 		return [
 			"AsNoConvertExpression",
@@ -804,6 +882,10 @@ var LogicalNotExpression = exports.LogicalNotExpression = UnaryExpression.extend
 
 	constructor: function (operatorToken, expr) {
 		UnaryExpression.prototype.constructor.call(this, operatorToken, expr);
+	},
+
+	clone: function () {
+		return new LogicalNotExpression(this._token, this._expr.clone());
 	},
 
 	analyze: function (context, parentExpr) {
@@ -861,6 +943,10 @@ var PostIncrementExpression = exports.PostIncrementExpression = IncrementExpress
 		IncrementExpression.prototype.constructor.call(this, operatorToken, expr);
 	},
 
+	clone: function () {
+		return new PostIncrementExpression(this._token, this._expr.clone());
+	},
+
 	_getClassName: function() {
 		return "PostIncrementExpression";
 	}
@@ -871,6 +957,10 @@ var PreIncrementExpression = exports.PreIncrementExpression = IncrementExpressio
 
 	constructor: function (operatorToken, expr) {
 		IncrementExpression.prototype.constructor.call(this, operatorToken, expr);
+	},
+
+	clone: function () {
+		return new PreIncrementExpression(this._token, this._expr.clone());
 	},
 
 	_getClassName: function() {
@@ -886,6 +976,10 @@ var PropertyExpression = exports.PropertyExpression = UnaryExpression.extend({
 		this._identifierToken = identifierToken;
 		// fourth parameter is optional
 		this._type = type !== undefined ? type : null;
+	},
+
+	clone: function () {
+		return new PropertyExpression(this._token, this._expr.clone(), this._identifierToken, this._type);
 	},
 
 	getIdentifierToken: function () {
@@ -986,6 +1080,10 @@ var TypeofExpression = exports.TypeofExpression = UnaryExpression.extend({
 		UnaryExpression.prototype.constructor.call(this, operatorToken, expr);
 	},
 
+	clone: function () {
+		return new TypeofExpression(this._token, this._expr);
+	},
+
 	analyze: function (context, parentExpr) {
 		if (! this._analyze(context))
 			return false;
@@ -1006,6 +1104,10 @@ var SignExpression = exports.SignExpression = UnaryExpression.extend({
 
 	constructor: function (operatorToken, expr) {
 		UnaryExpression.prototype.constructor.call(this, operatorToken, expr);
+	},
+
+	clone: function () {
+		return new SignExpression(this._token, this._expr);
 	},
 
 	analyze: function (context, parentExpr) {
@@ -1064,9 +1166,9 @@ var BinaryExpression = exports.BinaryExpression = OperatorExpression.extend({
 	},
 
 	forEachCodeElement: function (cb) {
-		if (! cb(this._expr1))
+		if (! cb(this._expr1, function (expr) { this._expr1 = expr; }.bind(this)))
 			return false;
-		if (! cb(this._expr2))
+		if (! cb(this._expr2, function (expr) { this._expr2 = expr; }.bind(this)))
 			return false;
 		return true;
 	}
@@ -1078,6 +1180,12 @@ var AdditiveExpression = exports.AdditiveExpression = BinaryExpression.extend({
 	constructor: function (operatorToken, expr1, expr2) {
 		BinaryExpression.prototype.constructor.call(this, operatorToken, expr1, expr2);
 		this._type = null;
+	},
+
+	clone: function () {
+		var ret = new AdditiveExpression(this._token, this._expr1, this._expr2);
+		ret._type = this._type;
+		return ret;
 	},
 
 	analyze: function (context, parentExpr) {
@@ -1111,6 +1219,12 @@ var ArrayExpression = exports.ArrayExpression = BinaryExpression.extend({
 	constructor: function (operatorToken, expr1, expr2) {
 		BinaryExpression.prototype.constructor.call(this, operatorToken, expr1, expr2);
 		this._type = null;
+	},
+
+	clone: function () {
+		var ret = new ArrayExpression(this._token, this._expr1, this._expr2);
+		ret._type = this._type;
+		return ret;
 	},
 
 	analyze: function (context, parentExpr) {
@@ -1167,6 +1281,10 @@ var AssignmentExpression = exports.AssignmentExpression = BinaryExpression.exten
 		BinaryExpression.prototype.constructor.call(this, operatorToken, expr1, expr2);
 	},
 
+	clone: function () {
+		return new AssignmentExpression(this._token, this._expr1, this._expr2);
+	},
+
 	analyze: function (context, parentExpr) {
 		if (! this._analyze(context))
 			return false;
@@ -1217,6 +1335,10 @@ var BinaryNumberExpression = exports.BinaryNumberExpression = BinaryExpression.e
 		BinaryExpression.prototype.constructor.call(this, operatorToken, expr1, expr2);
 	},
 
+	clone: function () {
+		return new BinaryNumberExpression(this._token, this._expr1, this._expr2);
+	},
+
 	analyze: function (context, parentExpr) {
 		if (! this._analyze(context))
 			return false;
@@ -1263,6 +1385,10 @@ var EqualityExpression = exports.EqualityExpression = BinaryExpression.extend({
 		BinaryExpression.prototype.constructor.call(this, operatorToken, expr1, expr2);
 	},
 
+	clone: function () {
+		return new EqualityExpression(this._token, this._expr1, this._expr2);
+	},
+
 	analyze: function (context, parentExpr) {
 		if (! this._analyze(context))
 			return false;
@@ -1292,6 +1418,10 @@ var InExpression = exports.InExpression = BinaryExpression.extend({
 
 	constructor: function (operatorToken, expr1, expr2) {
 		BinaryExpression.prototype.constructor.call(this, operatorToken, expr1, expr2);
+	},
+
+	clone: function () {
+		return new InExpression(this._token, this._expr1, this._expr2);
 	},
 
 	analyze: function (context, parentExpr) {
@@ -1326,6 +1456,10 @@ var LogicalExpression = exports.LogicalExpression = BinaryExpression.extend({
 		BinaryExpression.prototype.constructor.call(this, operatorToken, expr1, expr2);
 	},
 
+	clone: function () {
+		return new LogicalExpression(this._token, this._expr1, this._expr2);
+	},
+
 	analyze: function (context, parentExpr) {
 		if (! this._analyze(context))
 			return false;
@@ -1346,6 +1480,10 @@ var ShiftExpression = exports.ShiftExpression = BinaryExpression.extend({
 
 	constructor: function (operatorToken, expr1, expr2) {
 		BinaryExpression.prototype.constructor.call(this, operatorToken, expr1, expr2);
+	},
+
+	clone: function () {
+		return new ShiftExpression(this._token, this._expr1, this._expr2);
 	},
 
 	analyze: function (context, parentExpr) {
@@ -1374,6 +1512,12 @@ var ConditionalExpression = exports.ConditionalExpression = OperatorExpression.e
 		this._ifTrueExpr = ifTrueExpr;
 		this._ifFalseExpr = ifFalseExpr;
 		this._type = null;
+	},
+
+	clone: function () {
+		var ret = new ConditionalExpression(this._condExpr.clone(), this._ifTrueExpr != null ? this._ifTrueExpr.clone() : null, this._ifFalseExpr.clone());
+		ret._type = this._type;
+		return ret;
 	},
 
 	getCondExpr: function () {
@@ -1447,11 +1591,11 @@ var ConditionalExpression = exports.ConditionalExpression = OperatorExpression.e
 	},
 
 	forEachCodeElement: function (cb) {
-		if (! cb(this._condExpr))
+		if (! cb(this._condExpr, function (expr) { this._condExpr = expr; }.bind(this)))
 			return false;
-		if (this._ifTrueExpr != null && ! cb(this._ifTrueExpr))
+		if (this._ifTrueExpr != null && ! cb(this._ifTrueExpr, function (expr) { this._ifTrueExpr = expr; }.bind(this)))
 			return false;
-		if (! cb(this._ifFalseExpr))
+		if (! cb(this._ifFalseExpr, function (expr) { this._ifFalseExpr = expr; }.bind(this)))
 			return false;
 		return true;
 	}
@@ -1467,6 +1611,12 @@ var CallExpression = exports.CallExpression = OperatorExpression.extend({
 		this._expr = expr;
 		this._args = args;
 		this._callingFuncDef = null; // should become an interface, see ConstructorInvocationStatement
+	},
+
+	clone: function () {
+		var ret = new CallExpression(this._token, this._expr.clone(), Util.cloneArray(this._args));
+		ret._callingFuncDef = this._callingFuncDef;
+		return ret;
 	},
 
 	getExpr: function () {
@@ -1517,7 +1667,7 @@ var CallExpression = exports.CallExpression = OperatorExpression.extend({
 	},
 
 	forEachCodeElement: function (cb) {
-		if (! cb(this._expr))
+		if (! cb(this._expr, function (expr) { this._expr = expr; }.bind(this)))
 			return false;
 		if (! Util.forEachCodeElement(this._args))
 			return false;
@@ -1533,6 +1683,12 @@ var SuperExpression = exports.SuperExpression = OperatorExpression.extend({
 		this._name = name;
 		this._args = args;
 		this._funcType = null;
+	},
+
+	clone: function () {
+		var ret = new SuperExpression(this._token, this._name, Util.cloneArray(this._args));
+		ret._funcType = this._funcType;
+		return ret;
 	},
 
 	getName: function () {
@@ -1599,8 +1755,15 @@ var NewExpression = exports.NewExpression = OperatorExpression.extend({
 		OperatorExpression.prototype.constructor.call(this, operatorToken);
 		this._qualifiedName = qualifiedName;
 		this._args = args;
-		this._constructor = null; // may be null if zero constructors exist for the class
+		this._constructor = null; // may be null if zero constructors exist for the class (FIXME update comment? should never happen now that we are generating them? 2011/05/16)
 		this._type = null;
+	},
+
+	clone: function () {
+		var ret = new NewExpression(this._token, this._qualifiedName, Util.cloneArray(this._args));
+		ret._constructor = this._constructor;
+		ret._type = this._type;
+		return ret;
 	},
 
 	getQualifiedName: function () {
@@ -1672,6 +1835,10 @@ var CommaExpression = exports.CommaExpression = Expression.extend({
 		this._expr2 = expr2;
 	},
 
+	clone: function () {
+		return new CommaExpression(this._token, this._expr1.clone(), this._expr2.clone());
+	},
+
 	getFirstExpr: function () {
 		return this._expr1;
 	},
@@ -1698,9 +1865,9 @@ var CommaExpression = exports.CommaExpression = Expression.extend({
 	},
 
 	forEachCodeElement: function (cb) {
-		if (! cb(this._expr1))
+		if (! cb(this._expr1, function (expr) { this._expr1 = expr; }.bind(this)))
 			return false;
-		if (! cb(this._expr2))
+		if (! cb(this._expr2, function (expr) { this._expr2 = expr; }.bind(this)))
 			return false;
 		return true;
 	}

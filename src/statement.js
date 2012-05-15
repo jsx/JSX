@@ -432,8 +432,13 @@ var LabellableStatement = exports.LabellableStatement = Statement.extend({
 
 var ContinuableStatement = exports.ContinuableStatement = LabellableStatement.extend({
 
-	constructor: function (token, label) {
+	constructor: function (token, label, statements) {
 		LabellableStatement.prototype.constructor.call(this, token, label);
+		this._statements = statements;
+	},
+
+	getStatements: function () {
+		return this._statements;
 	},
 
 	_prepareBlockAnalysis: function (context) {
@@ -475,17 +480,12 @@ var ContinuableStatement = exports.ContinuableStatement = LabellableStatement.ex
 var DoWhileStatement = exports.DoWhileStatement = ContinuableStatement.extend({
 
 	constructor: function (token, label, expr, statements) {
-		ContinuableStatement.prototype.constructor.call(this, token, label);
+		ContinuableStatement.prototype.constructor.call(this, token, label, statements);
 		this._expr = expr;
-		this._statements = statements;
 	},
 
 	getExpr: function () {
 		return this._expr;
-	},
-
-	getStatements: function () {
-		return this._statements;
 	},
 
 	serialize: function () {
@@ -531,10 +531,9 @@ var DoWhileStatement = exports.DoWhileStatement = ContinuableStatement.extend({
 var ForInStatement = exports.ForInStatement = ContinuableStatement.extend({
 
 	constructor: function (token, label, lhsExpr, listExpr, statements) {
-		ContinuableStatement.prototype.constructor.call(this, token, label);
+		ContinuableStatement.prototype.constructor.call(this, token, label, statements);
 		this._lhsExpr = lhsExpr;
 		this._listExpr = listExpr;
-		this._statements = statements;
 	},
 
 	getLHSExpr: function () {
@@ -605,11 +604,10 @@ var ForInStatement = exports.ForInStatement = ContinuableStatement.extend({
 var ForStatement = exports.ForStatement = ContinuableStatement.extend({
 
 	constructor: function (token, label, initExpr, condExpr, postExpr, statements) {
-		ContinuableStatement.prototype.constructor.call(this, token, label);
+		ContinuableStatement.prototype.constructor.call(this, token, label, statements);
 		this._initExpr = initExpr;
 		this._condExpr = condExpr;
 		this._postExpr = postExpr;
-		this._statements = statements;
 	},
 
 	getInitExpr: function () {
@@ -912,9 +910,8 @@ var DefaultStatement = exports.DefaultStatement = Statement.extend({
 var WhileStatement = exports.WhileStatement = ContinuableStatement.extend({
 
 	constructor: function (token, label, expr, statements) {
-		ContinuableStatement.prototype.constructor.call(this, token, label);
+		ContinuableStatement.prototype.constructor.call(this, token, label, statements);
 		this._expr = expr;
-		this._statements = statements;
 	},
 
 	getExpr: function () {

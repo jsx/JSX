@@ -836,6 +836,7 @@ var MemberFunctionDefinition = exports.MemberFunctionDefinition = MemberDefiniti
 		this._lastTokenOfBody = lastTokenOfBody;
 		this._parent = null;
 		this._classDef = null;
+		this._optimizerStash = {};
 		if (this._closures != null) {
 			for (var i = 0; i < this._closures.length; ++i)
 				this._closures[i].setParent(this);
@@ -966,6 +967,10 @@ var MemberFunctionDefinition = exports.MemberFunctionDefinition = MemberDefiniti
 				break;
 			var canContinue = this._statements[i].forEachCodeElement(function onElement(element) {
 				var lhsExpr;
+				/*
+					FIXME if the class is extending a native class and the expression is setting a property of the native class,
+					then we should break, since it might have side effects (e.g. the property might be defined as a setter)
+				*/
 				if (element instanceof Expression.AssignmentExpression
 					&& element.getToken().getValue() == "="
 					&& (lhsExpr = element.getFirstExpr()) instanceof Expression.PropertyExpression
@@ -1040,6 +1045,10 @@ var MemberFunctionDefinition = exports.MemberFunctionDefinition = MemberDefiniti
 			break;
 		}
 		return this._callDepth;
+	},
+
+	getOptimizerStash: function () {
+		return this._optimizerStash;
 	},
 
 	getReturnType: function () {
