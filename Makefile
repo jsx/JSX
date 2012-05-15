@@ -1,6 +1,9 @@
 
+J:=4
+
+# e.g. make test J=2
 test:
-	prove -j2 --exec t/util/test-runner t/*.t t/*/*.jsx
+	prove -j$(J) t/*.t t/*/*.jsx
 
 web:
 	perl web/build.pl
