@@ -12,10 +12,10 @@ SYNOPSIS:
 	mt.initalize(Date.now());
 	mt.initialize([Date.now(), Date.now()]);
 
-	// get the next 32-bit integer (0 < x < 0xffffffff)
+	// get the next 32-bit integer (0 <= x < 0xffffffff)
 	log mt.nextInt32();
 
-	// get the next 53-bit floating point number (0.0 < x < 1.0)
+	// get the next 53-bit floating point number (0.0 <= x < 1.0)
 	log mt.nextReal53();
 
  */

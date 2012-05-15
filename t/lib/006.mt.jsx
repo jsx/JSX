@@ -6,9 +6,9 @@ class _Test extends TestCase {
 	function test_api() : void {
 		var mt = new MT;
 
-		this.expect(mt.nextInt32(), "nextInt32").toBeGT(0);
-		this.expect(mt.nextReal32(), "nextReal32").toBeGT(0);
-		this.expect(mt.nextReal53(), "nextReal53").toBeGT(0);
+		this.expect(mt.nextInt32(), "nextInt32").toBeGE(0);
+		this.expect(mt.nextReal32(), "nextReal32").toBeGE(0);
+		this.expect(mt.nextReal53(), "nextReal53").toBeGE(0);
 	}
 
 	function test_nextInt32() : void {
@@ -34,7 +34,7 @@ class _Test extends TestCase {
 		var mt = new MT(seed);
 		var r = mt.nextReal32();
 
-		this.expect(r).toBeGT(0);
+		this.expect(r).toBeGE(0.0);
 
 		mt.initialize(seed);
 
