@@ -6,6 +6,10 @@ var Platform = exports.Platform = Class.extend({
 	// returns root directory of JSX
 	// getRoot() : string
 
+	// fileExists(path : string) : bool
+
+	// getFilesInDirectory(path: string) : string [] (throws an exception on error)
+
 	// load a content by name (throws an exception on error)
 	// e.g. node.js reads it from files
 	//      browsers read it from DOM

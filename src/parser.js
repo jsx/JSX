@@ -161,13 +161,13 @@ var Import = exports.Import = Class.extend({
 			this._filenameToken = null;
 			this._aliasToken = null;
 			this._classNames = null;
-			this._sourceParser = arguments[0];
+			this._sourceParsers = [ arguments[0] ];
 			break;
 		case 3:
 			this._filenameToken = arguments[0];
 			this._aliasToken = arguments[1];
 			this._classNames = arguments[2];
-			this._sourceParser = null;
+			this._sourceParsers = [];
 			break;
 		default:
 			throw new Error("logic flaw");
@@ -217,45 +217,100 @@ var Import = exports.Import = Class.extend({
 		return true;
 	},
 
-	setupSource: function (errors, parser) {
-		this._sourceParser = parser;
+	addSource: function (parser) {
+		this._sourceParsers.push(parser);
+	},
+
+	assertExistenceOfNamedClasses: function (errors) {
 		if (this._classNames != null) {
-			for (var i = 0; i < this._classNames.length; ++i)
-				if (this.getClass(this._classNames[i].getValue()) == null)
-					errors.push(new CompileError(this._classNames[i], "no definition for class '" + this._classNames[i].getValue() + "' in file '" + this._filenameToken.getValue() + "'"));
+			for (var i = 0; i < this._classNames.length; ++i) {
+				switch (this.getClasses(this._classNames[i].getValue()).length) {
+				case 0:
+					errors.push(new CompileError(this._classNames[i], "no definition for class '" + this._classNames[i].getValue() + "'"));
+					break;
+				case 1:
+					// ok
+					break;
+				default:
+					errors.push(new CompileError(this._classNames[i], "multiple candidates for class '" + this._classNames[i].getValue() + "'"));
+					break;
+				}
+			}
 		}
 	},
 
-	getClass: function (name) {
+	getClasses: function (name) {
 		// filter by classNames, if set
 		if (this._classNames != null) {
 			for (var i = 0; i < this._classNames.length; ++i)
 				if (this._classNames[i].getValue() == name)
 					break;
 			if (i == this._classNames.length)
-				return null;
+				return [];
 		} else {
 			if (name.charAt(0) == '_')
-				return null;
+				return [];
 		}
 		// lookup
-		var classDefs = this._sourceParser.getClassDefs();
-		for (var i = 0; i < classDefs.length; ++i) {
-			var className = classDefs[i].className();
-			if (className == name)
-				return classDefs[i];
+		var found = [];
+		for (var i = 0; i < this._sourceParsers.length; ++i) {
+			var classDefs = this._sourceParsers[i].getClassDefs();
+			for (var j = 0; j < classDefs.length; ++j) {
+				var className = classDefs[j].className();
+				if (className == name) {
+					found.push(classDefs[j]);
+					break;
+				}
+			}
 		}
-		return null;
+		return found;
 	},
 
-	getTemplateClass: function (name) {
-		var classDefs = this._sourceParser.getTemplateClassDefs();
-		for (var i = 0; i < classDefs.length; ++i) {
-			var className = classDefs[i].className();
-			if (className.charAt(0) != '_' && className == name)
-				return classDefs[i];
+	getTemplateClasses: function (name) {
+		var found = [];
+		for (var i = 0; i < this._sourceParsers.length; ++i) {
+			var classDefs = this._sourceParsers[i].getTemplateClassDefs();
+			for (var j = 0; j < classDefs.length; ++j) {
+				var className = classDefs[j].className();
+				if (className.charAt(0) != '_' && className == name) {
+					found.push(classDefs[j]);
+					break;
+				}
+			}
 		}
-		return null;
+		return found;
+	},
+
+	$create: function (errors, filenameToken, aliasToken, classNames) {
+		var filename = Util.decodeStringLiteral(filenameToken.getValue());
+		if (filename.indexOf("*") != -1) {
+			// read the files from a directory
+			var match = filename.match(/^([^\*]*)\/\*(\.[^\/\*]*)$/);
+			if (match == null) {
+				errors.push(new CompileError(imprt.getFilenameToken(), "invalid use of wildcard"));
+				return null;
+			}
+			return new WildcardImport(filenameToken, aliasToken, classNames, match[1], match[2]);
+		}
+		return new Import(filenameToken, aliasToken, classNames);
+	}
+
+});
+
+var WildcardImport = exports.WildcardImport = Import.extend({
+
+	constructor: function (filenameToken, aliasToken, classNames, directory, suffix) {
+		Import.prototype.constructor.call(this, filenameToken, aliasToken, classNames);
+		this._directory = directory;
+		this._suffix = suffix;
+	},
+
+	getDirectory: function () {
+		return this._directory;
+	},
+
+	getSuffix: function () {
+		return this._suffix;
 	}
 
 });
@@ -295,9 +350,16 @@ var QualifiedName = exports.QualifiedName = Class.extend({
 
 	getClass: function (context) {
 		if (this._import != null) {
-			var classDef = this._import.getClass(this._token.getValue());
-			if (classDef == null) {
+			var classDefs = this._import.getClasses(this._token.getValue());
+			switch (classDefs.length) {
+			case 1:
+				var classDef = classDefs[0];
+				break;
+			case 0:
 				context.errors.push(new CompileError(this._token, "no definition for class '" + this._token.getValue() + "' in file '" + this._import.getFilenameToken().getValue() + "'"));
+				return null;
+			default:
+				context.errors.push(new CompileError(this._token, "multiple candidates"));
 				return null;
 			}
 		} else if ((classDef = context.parser.lookup(context.errors, this._token, this._token.getValue())) == null) {
@@ -405,11 +467,8 @@ var Parser = exports.Parser = Class.extend({
 		// classnames within the imported files may conflict
 		var found = [];
 		for (var i = 0; i < this._imports.length; ++i) {
-			if (this._imports[i].getAlias() == null) {
-				var f = this._imports[i].getClass(name);
-				if (f != null)
-					found.push(f);
-			}
+			if (this._imports[i].getAlias() == null)
+				found = found.concat(this._imports[i].getClasses(name));
 		}
 		if (found.length == 1)
 			return found[0];
@@ -427,9 +486,7 @@ var Parser = exports.Parser = Class.extend({
 		// classnames within the imported files may conflict
 		var found = [];
 		for (var i = 0; i < this._imports.length; ++i) {
-			var f = this._imports[i].getTemplateClass(name);
-			if (f != null)
-				found.push(f);
+			found = found.concat(this._imports[i].getTemplateClasses(name));
 		}
 		if (found.length == 1)
 			return found[0];
@@ -706,7 +763,10 @@ var Parser = exports.Parser = Class.extend({
 			}
 		}
 		// push
-		this._imports.push(new Import(filenameToken, alias, classes));
+		var imprt = Import.create(this._errors, filenameToken, alias, classes);
+		if (imprt == null)
+			return false;
+		this._imports.push(imprt);
 		return true;
 	},
 

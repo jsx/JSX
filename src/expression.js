@@ -906,12 +906,19 @@ var PropertyExpression = exports.PropertyExpression = UnaryExpression.extend({
 		var imprt;
 		if (this._expr instanceof IdentifierExpression
 			&& (imprt = context.parser.lookupImportAlias(this._expr.getToken().getValue())) != null) {
-			var classDef = imprt.getClass(this._identifierToken.getValue());
-			if (classDef == null) {
+			var classDefs = imprt.getClasses(this._identifierToken.getValue());
+			switch (classDefs.length) {
+			case 1:
+				// ok
+				break;
+			case 0:
 				context.errors.push(new CompileError(this._identifierToken, "could not resolve class '" + this._expr.getToken().getValue() + "'"));
 				return null;
+			default:
+				context.errors.push(new CompileError(this._identifierToken, "multiple candidates"));
+				return null;
 			}
-			this._type = new ClassDefType(classDef);
+			this._type = new ClassDefType(classDefs[0]);
 			return true;
 		}
 		// normal handling

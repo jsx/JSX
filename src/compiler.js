@@ -46,11 +46,12 @@ var Compiler = exports.Compiler = Class.extend({
 	},
 
 	addSourceFile: function (token, path) {
-		// return immediately if the file is already in list
-		if (this.findParser(path) != null)
-			return;
-		// add the file
-		this._parsers.push(new Parser(token, path));
+		var parser;
+		if ((parser = this.findParser(path)) == null) {
+			parser = new Parser(token, path);
+			this._parsers.push(parser);
+		}
+		return parser;
 	},
 
 	findParser: function (path) {
@@ -149,13 +150,47 @@ var Compiler = exports.Compiler = Class.extend({
 		if (this._mode != Compiler.MODE_PARSE) {
 			var imports = parser.getImports();
 			for (var i = 0; i < imports.length; ++i) {
-				var path = this._resolvePath(imports[i].getFilenameToken());
-				if (path == parser.getPath()) {
-					errors.push(new CompileError(imports[i].getFilenameToken(), "cannot import itself"));
+				if (! this._handleImport(errors, parser, imports[i]))
 					return false;
-				}
-				this.addSourceFile(imports[i].getFilenameToken(), this._resolvePath(imports[i].getFilenameToken()));
 			}
+		}
+		return true;
+	},
+
+	_handleImport: function (errors, parser, imprt) {
+		if (imprt instanceof WildcardImport) {
+			// read the files from a directory
+			var resolvedDir = this._resolvePath(imprt.getFilenameToken().getFilename(), imprt.getDirectory());
+			try {
+				var files = this._platform.getFilesInDirectory(resolvedDir);
+			} catch (e) {
+				errors.push(new CompileError(imprt.getFilenameToken(), "could not read files in directory: " + resolvedDir + ", " + e.toString()));
+				return false;
+			}
+			var found = false;
+			for (var i = 0; i < files.length; ++i) {
+				if (files[i].length >= imprt.getSuffix().length && files[i].substring(files[i].length - imprt.getSuffix().length) == imprt.getSuffix()) {
+					var path = resolvedDir + "/" + files[i];
+					if (path != parser.getPath()) {
+						var parser = this.addSourceFile(imprt.getFilenameToken(), resolvedDir + "/" + files[i]);
+						imprt.addSource(parser);
+						found = true;
+					}
+				}
+			}
+			if (! found) {
+				errors.push(new CompileError(imprt.getFilenameToken(), "no matching files found in directory: " + resolvedDir));
+				return false;
+			}
+		} else {
+			// read one file
+			var path = this._resolvePath(imprt.getFilenameToken().getFilename(), Util.decodeStringLiteral(imprt.getFilenameToken().getValue()));
+			if (path == parser.getPath()) {
+				errors.push(new CompileError(imprt.getFilenameToken(), "cannot import itself"));
+				return false;
+			}
+			var parser = this.addSourceFile(imprt.getFilenameToken(), path);
+			imprt.addSource(parser);
 		}
 		return true;
 	},
@@ -179,17 +214,7 @@ var Compiler = exports.Compiler = Class.extend({
 			// set source of every import
 			var imports = this._parsers[i].getImports();
 			for (var j = 0; j < imports.length; ++j) {
-				// find parser instance for every import, and set source
-				var filenameToken = imports[j].getFilenameToken();
-				if (filenameToken != null) {
-					var path = this._resolvePath(filenameToken);
-					for (var k = 0; k < this._parsers.length; ++k)
-						if (this._parsers[k].getPath() == path)
-							break;
-					if (k == this._parsers.length)
-						throw new Error("could not find parsed data for file: " + path);
-					imports[j].setupSource(errors, this._parsers[k]);
-				}
+				imports[j].assertExistenceOfNamedClasses(errors);
 			}
 		}
 	},
@@ -334,19 +359,18 @@ var Compiler = exports.Compiler = Class.extend({
 		}
 	},
 
-	_resolvePath: function (token) {
-		var tokenPath = Util.decodeStringLiteral(token.getValue());
-		if (tokenPath.match(/^\.{1,2}\//) == null) {
+	_resolvePath: function (srcPath, givenPath) {
+		if (givenPath.match(/^\.{1,2}\//) == null) {
 			var searchPaths = this._searchPaths.concat(this._emitter.getSearchPaths());
 			for (var i = 0; i < searchPaths.length; ++i) {
-				var path = Util.resolvePath(searchPaths[i] + "/" + tokenPath);
+				var path = Util.resolvePath(searchPaths[i] + "/" + givenPath);
 				// check the existence of the file, at the same time filling the cache
-				if (this.getFileContent([], null, path) != null)
+				if (this._platform.fileExists(path))
 					return path;
 			}
 		}
-		var lastSlashAt = token.getFilename().lastIndexOf("/");
-		path = Util.resolvePath((lastSlashAt != -1 ? token.getFilename().substring(0, lastSlashAt + 1) : "") + tokenPath);
+		var lastSlashAt = srcPath.lastIndexOf("/");
+		path = Util.resolvePath((lastSlashAt != -1 ? srcPath.substring(0, lastSlashAt + 1) : "") + givenPath);
 		return path;
 	},
 

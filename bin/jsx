@@ -17,7 +17,20 @@ var NodePlatform = Platform.extend({
 		return __dirname.replace(/\/bin\/?$/, "");
 	},
 
-	load: function(path) {
+	fileExists: function (path) {
+		try {
+			fs.statSync(path);
+			return true;
+		} catch (e) {
+			return false;
+		}
+	},
+
+	getFilesInDirectory: function (path) {
+		return fs.readdirSync(path);
+	},
+
+	load: function (path) {
 		return fs.readFileSync(path).toString();
 	},
 
