@@ -1,9 +1,9 @@
 
-J:=4
+JOBS:=4
 
-# e.g. make test J=2
+# e.g. make test JOBS=2
 test:
-	prove -j$(J) t/*.t t/*/*.jsx
+	prove --jobs "$(JOBS) t/*.t t/*/*.jsx
 
 web:
 	perl web/build.pl

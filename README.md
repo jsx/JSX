@@ -16,6 +16,8 @@ TESTING
 For server side tests, just type the following command:
 
     make test
+    # or
+    make test JOBS=2
 
 WEB INTERFACE
 =======================
