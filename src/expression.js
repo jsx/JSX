@@ -1098,11 +1098,12 @@ var ArrayExpression = exports.ArrayExpression = BinaryExpression.extend({
 			return false;
 		}
 		// obtain classDef
-		if (! (this._expr1.getType() instanceof ObjectType)) {
+		var expr1Type = this._expr1.getType().resolveIfMayBeUndefined();
+		if (! (expr1Type instanceof ObjectType)) {
 			context.errors.push(new CompileError(this._token, "cannot apply operator[] against a non-object"));
 			return false;
 		}
-		var expr1ClassDef = this._expr1.getType().getClassDef();
+		var expr1ClassDef = expr1Type.getClassDef();;
 		// obtain type of operator []
 		var accessorType = expr1ClassDef.getMemberTypeByName("__native_index_operator__", false, ClassDefinition.GET_MEMBER_MODE_ALL);
 		if (accessorType == null) {
