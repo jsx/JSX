@@ -2,13 +2,15 @@
 use 5.10.0;
 use strict;
 use warnings;
-use Fatal          qw(open close);
 use Cwd            qw(abs_path);
 use File::Basename qw(basename dirname);
+use constant ROOT => abs_path(dirname(__FILE__));
+use lib ROOT . "/extlib/lib/perl5";
+
+use Fatal          qw(open close);
 use File::Find     qw(find);
 use File::Which    qw(which);
 use String::ShellQuote qw(shell_quote);
-use constant ROOT => abs_path(dirname(__FILE__));
 
 
 my $root = ROOT;

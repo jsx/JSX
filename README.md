@@ -20,11 +20,13 @@ For server side tests, just type the following command:
 WEB INTERFACE
 =======================
 
-A web interface, which compiles JSX source  on browsers, is
+A web interface, which compiles JSX source on browsers, is
 provided by the following commands.
 
-    make web # to build web interface (optional)
+    # setup at the first time
+    perl web/setup.pl
 
+    make web
     make server # to run a HTTP daemon
-
+    open http://localhost:5000/
 
