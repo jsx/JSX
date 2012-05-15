@@ -1,7 +1,9 @@
 
+J:=4
+
+# e.g. make test J=2
 test:
-	prove --timer
-	prove --timer --exec "bin/jsx --test" t/lib/*.jsx
+	prove -j$(J) t/*.t t/*/*.jsx
 
 web:
 	perl web/build.pl
