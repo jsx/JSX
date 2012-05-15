@@ -30,3 +30,8 @@ provided by the following commands.
     make server # to run a HTTP daemon
     open http://localhost:5000/
 
+EXAMPLES
+=======================
+
+There are examples in `example/` and `web/example/`.
+
