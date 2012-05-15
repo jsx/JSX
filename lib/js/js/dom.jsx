@@ -15,6 +15,7 @@ See also:
 */
 
 import "js.jsx";
+import "css.jsx";
 
 // DOM-Core
 
@@ -314,27 +315,6 @@ native class DOMStringList {
 }
 
 native class DOMStringMap {
-	// TODO
-}
-
-native class CSSStyleDeclaration {
-	var cssText : string;
-	function getPropertyValue(propertyName : string) : string;
-	function getPropertyCSSValue(propertyName : string) : CSSValue;
-	function removePropertyValue(propertyName : string) : string;
-	function getPropertyPriority(propertyName : string) : string;
-	function setProperty(propertyName : string, value : string) : void;
-	function setProperty(propertyName : string, value : string, priority : string) : void;
-	const length : int;
-	function item(index : int) : string;
-	const parentRule : CSSRule;
-}
-
-native class CSSValue {
-	// TODO
-}
-
-native class CSSRule {
 	// TODO
 }
 
