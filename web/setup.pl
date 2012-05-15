@@ -13,6 +13,7 @@ my @modules = qw(
     Plack
     File::Which
     String::ShellQuote
+    JSON
 );
 
 system("curl -L $cpanm | $^X - --notest '-l$root/extlib' @modules") == 0 or die "Cannot setup!";

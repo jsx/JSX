@@ -3,6 +3,33 @@ var BrowserPlatform = jsx.Platform.extend({
 		this._root = root;
 		this._errors = [];
 		this._content = {};
+
+		this._map = JSON.parse(this.load("web/tree.generated.json"));
+	},
+
+	getRoot: function () {
+		return this._root;
+	},
+
+	fileExists: function (path) {
+		console.log([path, path in this._map]);
+		return path in this._map;
+	},
+
+	getFilesInDirectory: function (path) {
+		var d = this._map[path];
+		if(d instanceof Object) {
+			var a = [];
+			for(var k in d) {
+				if(typeof(d[k]) === "string") {
+					a.push(k);
+				}
+			}
+			return a;
+		}
+		else {
+			throw new Error("not a directory");
+		}
 	},
 
 	setContent: function (name, content) {
@@ -10,7 +37,7 @@ var BrowserPlatform = jsx.Platform.extend({
 	},
 
 	load: function (name) {
-		if(this._content[name] != null) {
+		if(name in this._content) {
 			return this._content[name];
 		}
 		// synchronous XHR
@@ -23,10 +50,6 @@ var BrowserPlatform = jsx.Platform.extend({
 		else {
 			throw new Error(xhr.status + " " + xhr.statusText + ": " + name);
 		}
-	},
-
-	getRoot: function () {
-		return this._root;
 	},
 
 	error: function (s) {

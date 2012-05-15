@@ -11,13 +11,14 @@ use Fatal          qw(open close);
 use File::Find     qw(find);
 use File::Which    qw(which);
 use String::ShellQuote qw(shell_quote);
-
+use JSON qw();
 
 my $root = ROOT;
 my $template_dir = "$root/template";
 
 process_top_page("$root/template/index.tmpl", "$root/index.html");
 process_jsx("$root/../src", "$root/jsx.combined.js");
+process_tree(["$root/../example", "$root/../lib", "$root/../src", "$root/../t"], "$root/tree.generated.json");
 
 sub make_list {
     my($prefix) = @_;
@@ -74,3 +75,39 @@ sub process_jsx {
 
     system($cmd) == 0 or die "Failed to build jsx-web.js: $cmd\n";
 }
+
+sub process_tree {
+    my($src, $dest) = @_;
+
+    my %tree;
+    find {
+        no_chdir => 1,
+        wanted   => sub {
+            return if /~$/;
+            return if /\.swp$/;
+            return if -d $_;
+
+            my $f = $_;
+            $f =~ s{\\}{/}g;
+            $f =~ s{^\Q$root/..}{};
+
+            my @parts = split(qr{/}, $f);
+            my $basename = pop @parts;
+
+            return if $basename =~ /^\./;
+
+            my $dir = \%tree;
+            while(@parts) {
+                my $d = shift @parts;
+                $dir = $dir->{$d} //= {};
+            }
+            $dir->{$basename} = $f;
+            $tree{$f} = JSON::true;
+        },
+    }, @{$src};
+
+    open my($fh), ">", $dest;
+    print $fh JSON->new->utf8->pretty->encode(\%tree);
+    close $fh;
+}
+
