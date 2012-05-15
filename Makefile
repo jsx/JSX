@@ -3,7 +3,7 @@ JOBS:=4
 
 # e.g. make test JOBS=2
 test:
-	prove --jobs "$(JOBS) t/*.t t/*/*.jsx
+	prove --jobs "$(JOBS)" t/*.t t/*/*.jsx
 
 web:
 	perl web/build.pl
