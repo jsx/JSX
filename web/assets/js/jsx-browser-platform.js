@@ -4,7 +4,7 @@ var BrowserPlatform = jsx.Platform.extend({
 		this._errors = [];
 		this._content = {};
 
-		this._map = JSON.parse(this.load("web/tree.generated.json"));
+		this._map = JSON.parse(this.load("/web/tree.generated.json"));
 	},
 
 	getRoot: function () {
@@ -12,7 +12,8 @@ var BrowserPlatform = jsx.Platform.extend({
 	},
 
 	fileExists: function (path) {
-		console.log([path, path in this._map]);
+		path = path.replace(this._root, "");
+		//console.log([this._root, path, path in this._map]);
 		return path in this._map;
 	},
 
