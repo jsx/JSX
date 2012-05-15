@@ -1430,6 +1430,11 @@ var ConditionalExpression = exports.ConditionalExpression = OperatorExpression.e
 			&& Type.isIntegerOrNumber(typeIfFalse.resolveIfMayBeUndefined())) {
 			// special case to handle number == integer
 			this._type = typeIfTrue instanceof MayBeUndefinedType ? new MayBeUndefinedType(Type.numberType) : Type.numberType;
+		} else if (this._ifTrueExpr == null
+			&& (typeIfTrue.resolveIfMayBeUndefined().equals(typeIfFalse)
+				|| (Type.isIntegerOrNumber(typeIfTrue.resolveIfMayBeUndefined()) && Type.isIntegerOrNumber(typeIfFalse)))) {
+			// on ?: expr (wo. true expr), left hand can be maybeundefined.<right>
+			this._type = typeIfFalse;
 		} else {
 			context.errors.push(new CompileError(this._token, "returned types should be the same for operator ?: but got '" + typeIfTrue.toString() + "' and '" + typeIfFalse.toString() + "'"));
 			return false;
