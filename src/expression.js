@@ -1097,23 +1097,33 @@ var ArrayExpression = exports.ArrayExpression = BinaryExpression.extend({
 			context.errors.push(new CompileError(this._token, "cannot determine type due to preceding errors"));
 			return false;
 		}
-		var expr1ClassDef = this._expr1.getType().getClassDef();
-		if (expr1ClassDef instanceof InstantiatedClassDefinition && expr1ClassDef.getTemplateClassName() == "Array") {
-			if (! this._expr2.getType().isConvertibleTo(Type.integerType)) {
-				context.errors.push(new CompileError(this._token, "array index should be a number"));
-				return false;
-			}
-			this._type = expr1ClassDef.getTypeArguments()[0].toMayBeUndefinedType();
-		} else if (expr1ClassDef instanceof InstantiatedClassDefinition && expr1ClassDef.getTemplateClassName() == "Map") {
-			if (! this._expr2.getType().isConvertibleTo(Type.stringType)) {
-				context.errors.push(new CompileError(this._token, "hash key should be a string"));
-				return false;
-			}
-			this._type = expr1ClassDef.getTypeArguments()[0].toMayBeUndefinedType();
-		} else {
-			context.errors.push(new CompileError(this._token, "cannot apply operator '[]' (only applicable to an array or a hash)"));
+		// obtain classDef
+		if (! (this._expr1.getType() instanceof ObjectType)) {
+			context.errors.push(new CompileError(this._token, "cannot apply operator[] against a non-object"));
 			return false;
 		}
+		var expr1ClassDef = this._expr1.getType().getClassDef();
+		// obtain type of operator []
+		var accessorType = expr1ClassDef.getMemberTypeByName("__native_index_operator__", false, ClassDefinition.GET_MEMBER_MODE_ALL);
+		if (accessorType == null) {
+			context.errors.push(new CompileError(this._token, "cannot apply operator[] on an instance of class '" + expr1ClassDef.className() + "'"));
+			return false;
+		}
+		if (accessorType instanceof FunctionChoiceType) {
+			context.errors.push(new CompileError(this._token, "override of '__native_index_operator__' is not supported"));
+			return false;
+		}
+		if (accessorType.getArgumentTypes().length != 1) {
+			context.errors.push(new CompileError(this._token, "unexpected number of arguments taken by '__native_index_operator__'"));
+			return false;
+		}
+		// check type of expr2
+		if (! this._expr2.getType().isConvertibleTo(accessorType.getArgumentTypes()[0])) {
+			context.errors.push(new CompileError(this._token, "index type is incompatible (expected '" + accessorType.getArgumentTypes()[0].toString() + "', got '" + this._expr2.getType().toString() + "'"));
+			return false;
+		}
+		// set type of the expression
+		this._type = accessorType.getReturnType();
 		return true;
 	},
 
