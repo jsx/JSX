@@ -41,6 +41,21 @@ var Expression = exports.Expression = Class.extend({
 			return false;
 		}
 		return true;
+	},
+
+	$getDefaultValueExpressionOf: function (type) {
+		var Parser = require("./parser");
+
+		if (type.equals(Type.booleanType))
+			return new BooleanLiteralExpression(new Parser.Token("false", false));
+		else if (type.equals(Type.integerType) || type.equals(Type.numberType))
+			return new NumberLiteralExpression(new Parser.Token("0", false));
+		else if (type.equals(Type.stringType))
+			return new StringLiteralExpression(new Parser.Token("\"\"", false));
+		else if (type instanceof MayBeUndefinedType)
+			return new UndefinedExpression(new Parser.Token("undefined", false));
+		else
+			return new NullExpression(new Parser.Token("null", false), type);
 	}
 
 });
@@ -866,10 +881,11 @@ var PreIncrementExpression = exports.PreIncrementExpression = IncrementExpressio
 
 var PropertyExpression = exports.PropertyExpression = UnaryExpression.extend({
 
-	constructor: function (operatorToken, expr1, identifierToken) {
+	constructor: function (operatorToken, expr1, identifierToken, type) {
 		UnaryExpression.prototype.constructor.call(this, operatorToken, expr1);
 		this._identifierToken = identifierToken;
-		this._type = null;
+		// fourth parameter is optional
+		this._type = type !== undefined ? type : null;
 	},
 
 	getIdentifierToken: function () {

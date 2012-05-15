@@ -1520,9 +1520,8 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 	},
 
 	_emitClassDefinition: function (classDef) {
-
+		this._emittingClass = classDef;
 		try {
-			this._emittingClass = classDef;
 
 			// emit class object
 			this._emitClassObject(classDef);
@@ -1543,11 +1542,7 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 				}
 			}
 
-		}
-		catch (e) {
-			console.error(e);
-		}
-		finally {
+		} finally {
 			this._emittingClass = null;
 		}
 
@@ -1682,93 +1677,6 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 		this._emitFunctionArguments(funcDef);
 		this._emit(") {\n", null);
 		this._advanceIndent();
-
-		// emit constructor calls and member initializers
-		this._emittingFunction = funcDef;
-		try {
-			var statements = funcDef.getStatements();
-			if (statements.length != 0 && statements[0] instanceof ConstructorInvocationStatement) {
-				// slow path
-				// emit member variable initialization code to default values
-				funcDef.getClassDef().forEachMemberVariable(function (member) {
-					if ((member.flags() & (ClassDefinition.IS_STATIC | ClassDefinition.IS_ABSTRACT)) == 0) {
-						this._emit("this." + member.name() + " = ", member.getNameToken());
-						this._emitDefaultValueOf(member.getType());
-						this._emit(";\n", null);
-					}
-					return true;
-				}.bind(this));
-				// emit super class constructor invocation statements
-				for (var i = 0; i < statements.length; ++i) {
-					if (! (statements[i] instanceof ConstructorInvocationStatement))
-						break;
-					this._emitStatement(statements[i]);
-				}
-				// emit member variable initialzation code with initialization expressions
-				funcDef.getClassDef().forEachMemberVariable(function (member) {
-					var initialValue;
-					if ((member.flags() & (ClassDefinition.IS_STATIC | ClassDefinition.IS_ABSTRACT)) == 0
-						&& (initialValue = member.getInitialValue()) != null) {
-						this._emit("this." + member.name() + " = ", member.getNameToken());
-						this._getExpressionEmitterFor(initialValue).emit(_BinaryExpressionEmitter._operatorPrecedence["="]);
-						this._emit(";\n", null);
-					}
-					return true;
-				}.bind(this));
-			} else {
-				/*
-					fast path (FIXME better optimization)
-
-					The algorithm tries to find initialization statements of member properties so as to eliminate dead
-					stores (of initial values), by looking for assignments to the properties, only for the first expression
-					statements, and only until first use of "this" (other than assignment to the properties) appears.
-				*/
-				var initProperties = {};
-				funcDef.getClassDef().forEachMemberVariable(function (member) {
-					if ((member.flags() & (ClassDefinition.IS_STATIC | ClassDefinition.IS_ABSTRACT)) == 0)
-						initProperties[member.name()] = true;
-					return true;
-				}.bind(this));
-				for (var i = 0; i < statements.length; ++i) {
-					if (! (statements[i] instanceof ExpressionStatement))
-						break;
-					var canContinue = statements[i].forEachCodeElement(function onElement(element) {
-						var lhsExpr;
-						if (element instanceof AssignmentExpression
-							&& element.getToken().getValue() == "="
-							&& (lhsExpr = element.getFirstExpr()) instanceof PropertyExpression
-							&& lhsExpr.getExpr() instanceof ThisExpression) {
-							initProperties[lhsExpr.getIdentifierToken().getValue()] = false;
-							return true;
-						} else if (element instanceof ThisExpression) {
-							return false;
-						}
-						return element.forEachCodeElement(onElement.bind(this));
-					}.bind(this));
-					if (! canContinue)
-						break;
-				}
-				// emit the initializers
-				funcDef.getClassDef().forEachMemberVariable(function (member) {
-					if ((member.flags() & (ClassDefinition.IS_STATIC | ClassDefinition.IS_ABSTRACT)) == 0) {
-						if (initProperties[member.name()]) {
-							this._emit("this." + member.name() + " = ", member.getNameToken());
-							var initialValue = member.getInitialValue();
-							if (initialValue != null) {
-								this._getExpressionEmitterFor(initialValue).emit(_BinaryExpressionEmitter._operatorPrecedence["="]);
-							} else {
-								this._emitDefaultValueOf(member.getType());
-							}
-							this._emit(";\n", null);
-						}
-					}
-					return true;
-				}.bind(this));
-			}
-		} finally {
-			this._emittingFunction = null;
-		}
-
 		// emit body
 		this._emitFunctionBody(funcDef);
 		// emit epilogue
@@ -1834,8 +1742,7 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 			// emit code
 			var statements = funcDef.getStatements();
 			for (var i = 0; i < statements.length; ++i)
-				if (! (statements[i] instanceof ConstructorInvocationStatement))
-					this._emitStatement(statements[i]);
+				this._emitStatement(statements[i]);
 
 		} finally {
 			this._emittingFunction = prevEmittingFunction;

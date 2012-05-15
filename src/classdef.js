@@ -317,12 +317,13 @@ var ClassDefinition = exports.ClassDefinition = Class.extend({
 
 	analyze: function (context) {
 		// create default constructor if no constructors exist
-		if (this.forEachMemberFunction(function (funcDef) { return funcDef.name() != "constructor"; })) {
+		if ((this.flags() & ClassDefinition.IS_NATIVE) == 0
+			&& this.forEachMemberFunction(function (funcDef) { return funcDef.name() != "constructor"; })) {
 			var Parser = require("./parser");
 			var func = new MemberFunctionDefinition(
 				this._token,
-				new Parser.Token("constructor", true, null, 0, 0), // FIXME
-				ClassDefinition.IS_FINAL,
+				new Parser.Token("constructor", true),
+				ClassDefinition.IS_FINAL | (this.flags() & ClassDefinition.IS_NATIVE),
 				Type.Type.voidType,
 				[], [], [], [],
 				this._token /* FIXME */);
@@ -903,10 +904,14 @@ var MemberFunctionDefinition = exports.MemberFunctionDefinition = MemberDefiniti
 	},
 
 	_fixupConstructor: function (context) {
-		var Statement = require("./statement"); // seems that we need to delay the load
+		var Parser = require("./parser");
+		var Expression = require("./expression");
+		var Statement = require("./statement");
 
+		var success = true;
+
+		// make implicit calls to default constructor explicit as well as checking the invocation order
 		var stmtIndex = 0;
-		// make implicit calls to default constructor explicit
 		for (var baseIndex = 0; baseIndex <= this._classDef.implementClassDefs().length; ++baseIndex) {
 			var baseClassDef = baseIndex == 0 ? this._classDef.extendClassDef() : this._classDef.implementClassDefs()[baseIndex - 1];
 			if (stmtIndex < this._statements.length
@@ -934,6 +939,7 @@ var MemberFunctionDefinition = exports.MemberFunctionDefinition = MemberDefiniti
 					} else {
 						context.errors.push(new CompileError(this._token, "super class '" + baseClassName.getToken().getValue() + "' should be initialized explicitely (no default constructor)"));
 					}
+					success = false;
 				}
 			}
 		}
@@ -941,7 +947,56 @@ var MemberFunctionDefinition = exports.MemberFunctionDefinition = MemberDefiniti
 			if (! (this._statements[stmtIndex] instanceof Statement.ConstructorInvocationStatement))
 				break;
 			context.errors.push(new CompileError(this._statements[stmtIndex].getToken(), "constructors should be invoked in the order they are implemented"));
+			success = false;
 		}
+		// NOTE: it is asserted by the parser that ConstructorInvocationStatements precede other statements
+		if (! success)
+			return;
+		var normalStatementFromIndex = stmtIndex;
+
+		// find out the properties that need to be initialized (that are not initialized by the ctor explicitely before completion or being used)
+		var initProperties = {};
+		this._classDef.forEachMemberVariable(function (member) {
+			if ((member.flags() & (ClassDefinition.IS_STATIC | ClassDefinition.IS_ABSTRACT)) == 0)
+				initProperties[member.name()] = true;
+			return true;
+		}.bind(this));
+		for (var i = normalStatementFromIndex; i < this._statements.length; ++i) {
+			if (! (this._statements[i] instanceof Statement.ExpressionStatement))
+				break;
+			var canContinue = this._statements[i].forEachCodeElement(function onElement(element) {
+				var lhsExpr;
+				if (element instanceof Expression.AssignmentExpression
+					&& element.getToken().getValue() == "="
+					&& (lhsExpr = element.getFirstExpr()) instanceof Expression.PropertyExpression
+					&& lhsExpr.getExpr() instanceof Expression.ThisExpression) {
+					initProperties[lhsExpr.getIdentifierToken().getValue()] = false;
+					return true;
+				} else if (element instanceof Expression.ThisExpression) {
+					return false;
+				}
+				return element.forEachCodeElement(onElement.bind(this));
+			}.bind(this));
+			if (! canContinue)
+				break;
+		}
+		// insert the initializers
+		var insertStmtAt = normalStatementFromIndex;
+		this._classDef.forEachMemberVariable(function (member) {
+			if ((member.flags() & (ClassDefinition.IS_STATIC | ClassDefinition.IS_ABSTRACT)) == 0) {
+				if (initProperties[member.name()]) {
+					var initExpr = member.getInitialValue();
+					var stmt = new Statement.ExpressionStatement(
+						new Expression.AssignmentExpression(new Parser.Token("=", false),
+							new Expression.PropertyExpression(new Parser.Token(".", false),
+								new Expression.ThisExpression(new Parser.Token("this", false), new Type.ObjectType(this._classDef)),
+								member.getNameToken(), member.getType()),
+							initExpr != null ? initExpr : Expression.Expression.getDefaultValueExpressionOf(member.getType())));
+					this._statements.splice(insertStmtAt++, 0, stmt);
+				}
+			}
+			return true;
+		}.bind(this));
 	},
 
 	getCallDepth: function () {

@@ -12,23 +12,28 @@ var Token = exports.Token = Class.extend({
 	constructor: function (value, isIdentifier, filename, lineNumber, columnNumber) {
 		this._value = value;
 		this._isIdentifier = isIdentifier;
-		this._filename = filename;
-		this._lineNumber = lineNumber;
-		this._columnNumber = columnNumber;
+		// two args or five args
+		this._filename = filename || null;
+		this._lineNumber = lineNumber || NaN;
+		this._columnNumber = columnNumber || NaN;
 	},
 
 	getValue: function () {
 		return this._value;
 	},
+
 	isIdentifier: function () {
 		return this._isIdentifier;
 	},
+
 	getFilename: function () {
 		return this._filename;
 	},
+
 	getLineNumber: function () {
 		return this._lineNumber;
 	},
+
 	getColumnNumber: function () {
 		return this._columnNumber;
 	},
