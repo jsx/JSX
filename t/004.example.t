@@ -15,8 +15,6 @@ for my $file(@files) {
     my $expected = get_expected($file); # may be undef
 
     {
-        note '--run';
-
         my $cmd = qq{bin/jsx --run "$file"};
         my $got = `$cmd`;
 
@@ -24,8 +22,6 @@ for my $file(@files) {
     }
 
     {
-        note '--executable';
-
         my $cmd = qq{bin/jsx --executable --output $workdir/compiled "$file"};
         system $cmd;
 

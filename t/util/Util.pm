@@ -2,7 +2,7 @@ package t::util::Util;
 use strict;
 use warnings;
 
-use parent qw(Exporter);
+use base qw(Exporter);
 our @EXPORT = qw(slurp get_expected);
 
 sub slurp {

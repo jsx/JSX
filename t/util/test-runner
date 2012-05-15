@@ -8,6 +8,17 @@ use t::util::Util;
 main(@ARGV);
 exit;
 
+BEGIN { # XXX older version of Test::More has no note()
+    if(not defined &note) {
+        if(-t STDOUT) {
+            *note = \&diag;
+        }
+        else {
+            *note = sub { };
+        }
+    }
+}
+
 sub main {
     my($file) = @_ or die "no args";
 
@@ -26,9 +37,9 @@ sub main {
         run_test($file);
     }
     else {
+        plan tests => 1;
         pass "(unknown file: $file)";
     }
-    done_testing;
 }
 
 sub get_shebang {
