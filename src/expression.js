@@ -1399,31 +1399,37 @@ var ConditionalExpression = exports.ConditionalExpression = OperatorExpression.e
 	},
 
 	analyze: function (context, parentExpr) {
+		// analyze the three expressions
 		if (! this._condExpr.analyze(context, this))
 			return false;
-		var condExprType = this._condExpr.getType();
-		if (! condExprType.isConvertibleTo(Type.booleanType)) {
-			context.errors.push(new CompileError(this._token, "condition should be convertible to bool"));
+		if (this._ifTrueExpr != null && ! this._ifTrueExpr.analyze(context, this))
 			return false;
-		}
-		var typeIfTrue;
-		if (this._ifTrueExpr != null) {
-			if (! this._ifTrueExpr.analyze(context, this))
-				return false;
-			typeIfTrue = this._ifTrueExpr.getType();
-		} else {
-			typeIfTrue = condExprType;
-		}
 		if (! this._ifFalseExpr.analyze(context, this))
 			return false;
+		// check the types
+		if (this._ifTrueExpr != null) {
+			if (! this._condExpr.getType().isConvertibleTo(Type.booleanType)) {
+				context.errors.push(new CompileError(this._token, "condition should be convertible to bool"));
+				return false;
+			}
+			var typeIfTrue = this._ifTrueExpr.getType();
+		} else {
+			typeIfTrue = this._condExpr.getType();
+			if (typeIfTrue.equals(Type.voidType)) {
+				context.errors.push(new CompileError(this._token, "condition cannot be void"));
+				return false;
+			}
+		}
 		var typeIfFalse = this._ifFalseExpr.getType();
-		// FIXME how should we handle undefined?
 		if (typeIfTrue.equals(typeIfFalse)) {
 			// ok
 			this._type = typeIfTrue;
-		} else if (Type.isIntegerOrNumber(typeIfTrue) && Type.isIntegerOrNumber(typeIfFalse)) {
-			// specal case
-			this._type = Type.numberType;
+		} else if (
+			(typeIfTrue instanceof MayBeUndefinedType) == (typeIfFalse instanceof MayBeUndefinedType)
+			&& Type.isIntegerOrNumber(typeIfTrue.resolveIfMayBeUndefined())
+			&& Type.isIntegerOrNumber(typeIfFalse.resolveIfMayBeUndefined())) {
+			// special case to handle number == integer
+			this._type = typeIfTrue instanceof MayBeUndefinedType ? new MayBeUndefinedType(Type.numberType) : Type.numberType;
 		} else {
 			context.errors.push(new CompileError(this._token, "returned types should be the same for operator ?: but got '" + typeIfTrue.toString() + "' and '" + typeIfFalse.toString() + "'"));
 			return false;
