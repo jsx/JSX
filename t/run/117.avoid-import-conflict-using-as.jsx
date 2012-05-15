@@ -8,7 +8,7 @@ bar.jsx
 */
 
 import "117.avoid-import-conflict-using-as/foo.jsx";
-import "117.avoid-import-conflict-using-as/bar.jsx" as Bar;
+import "117.avoid-import-conflict-using-as/bar.jsx" into Bar;
 
 class Test {
 	static function run() : void {

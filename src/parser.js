@@ -673,7 +673,7 @@ var Parser = exports.Parser = Class.extend({
 		if (filenameToken == null)
 			return false;
 		var alias = null;
-		if (this._expectOpt("as") != null) {
+		if (this._expectOpt("into") != null) {
 			if ((alias = this._expectIdentifier()) == null)
 				return false;
 		}
