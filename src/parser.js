@@ -1104,7 +1104,8 @@ var Parser = exports.Parser = Class.extend({
 				typeDecl = baseType.toMayBeUndefinedType();
 				break;
 			case "variant":
-				return Type.variantType;
+				typeDecl = Type.variantType;
+				break;
 			default:
 				throw new Error("logic flaw");
 			}
