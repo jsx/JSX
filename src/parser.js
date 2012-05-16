@@ -287,7 +287,7 @@ var Import = exports.Import = Class.extend({
 			// read the files from a directory
 			var match = filename.match(/^([^\*]*)\/\*(\.[^\/\*]*)$/);
 			if (match == null) {
-				errors.push(new CompileError(imprt.getFilenameToken(), "invalid use of wildcard"));
+				errors.push(new CompileError(filenameToken, "invalid use of wildcard"));
 				return null;
 			}
 			return new WildcardImport(filenameToken, aliasToken, classNames, match[1], match[2]);
