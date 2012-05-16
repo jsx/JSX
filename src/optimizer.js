@@ -296,7 +296,9 @@ var InlineOptimizer = exports.InlineOptimizer = FunctionOptimizer.extend({
 
 });
 
-
+/*
+	for the reasoning of this optimization see http://jsperf.com/if-vs-condexpr
+*/
 var ReturnIfOptimizer = exports.ReturnIfOptimizer = FunctionOptimizer.extend({
 
 	constructor: function () {
