@@ -502,12 +502,6 @@ var ClassDefinition = exports.ClassDefinition = Class.extend({
 			return true;
 
 		}.bind(this));
-
-		// calculate call depth of each function
-		this.forEachMemberFunction(function (funcDef) {
-			funcDef.getCallDepth();
-			return true;
-		});
 	},
 
 	isConvertibleTo: function (classDef) {
@@ -841,7 +835,6 @@ var MemberFunctionDefinition = exports.MemberFunctionDefinition = MemberDefiniti
 			for (var i = 0; i < this._closures.length; ++i)
 				this._closures[i].setParent(this);
 		}
-		this._callDepth = -1; // -1 => undetermined, 0 if not inlinable (= leaf), 1 => calls a leaf function, 2...
 	},
 
 	instantiate: function (instantiationContext) {
@@ -1002,49 +995,6 @@ var MemberFunctionDefinition = exports.MemberFunctionDefinition = MemberDefiniti
 			}
 			return true;
 		}.bind(this));
-	},
-
-	getCallDepth: function () {
-		var Expression = require("./expression");
-		var Statement = require("./statement");
-
-		switch (this._callDepth) {
-		case -1: // not ready
-			/*
-				Change this._callDepth to -2 to indicate that the analysis of the function has started.
-				The depth is calculated using the local variable "depth", and upon completion, stores the value to this._callDepth if no loop was detected.
-				If a loop is detected, this_callDepth is set to zero at the very moment.
-			*/
-			this._callDepth = -2; // used to indicate a loop
-			var depth = -1;
-			this.forEachCodeElement(function onElement(element) {
-				if (element instanceof Expression.CallExpression || element instanceof Statement.ConstructorInvocationStatement) {
-					var callee = element.getCallingFuncDef();
-					if (callee != null) {
-						var depthOfCallee = callee.getCallDepth();
-						if (depth == -1) {
-							depth = depthOfCallee + 1;
-						} else {
-							depth = Math.min(this._callDepth, depthOfCallee + 1);
-						}
-					}
-				}
-				// skip the closures
-				if (! (element instanceof Expression.FunctionExpression)) {
-					element.forEachCodeElement(onElement.bind(this));
-				}
-				return true;
-			}.bind(this));
-			if (this._callDepth == -2)
-				this._callDepth = depth;
-			break;
-		case -2: // looping
-			this._callDepth = 0;
-			break;
-		default: // already calculated
-			break;
-		}
-		return this._callDepth;
 	},
 
 	getOptimizerStash: function () {
