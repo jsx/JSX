@@ -311,6 +311,7 @@ var Compiler = exports.Compiler = Class.extend({
 	_optimize: function () {
 		var Optimizer = require("./optimizer");
 		if (this._enableInlining) {
+			new Optimizer.ReturnIfOptimizer().init(this).performOptimization();
 			new Optimizer.InlineOptimizer().init(this).performOptimization();
 		}
 	},

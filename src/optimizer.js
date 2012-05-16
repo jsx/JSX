@@ -1,5 +1,6 @@
 var Class = require("./Class");
 eval(Class.$import("./classdef"));
+eval(Class.$import("./parser"));
 eval(Class.$import("./expression"));
 eval(Class.$import("./statement"));
 eval(Class.$import("./type"));
@@ -75,7 +76,10 @@ var Optimizer = exports.Optimizer = Class.extend({
 	},
 
 	$getFuncName : function (funcDef) {
-		var s = funcDef.getClassDef().className() + ((funcDef.flags() & ClassDefinition.IS_STATIC) != 0 ? "." : "#") + funcDef.name() + "(";
+		var classDef = funcDef.getClassDef();
+		var s = (classDef != null ? classDef.className(): "<<unknown>>");
+		s += (funcDef.flags() & ClassDefinition.IS_STATIC) != 0 ? "." : "#";
+		s += funcDef.getNameToken() != null ? funcDef.name() : "<<unknown>>";
 		var argTypes = funcDef.getArgumentTypes();
 		for (var i = 0; i < argTypes.length; ++i) {
 			if (i != 0)
@@ -151,7 +155,7 @@ var InlineOptimizer = exports.InlineOptimizer = FunctionOptimizer.extend({
 
 	_handleStatement: function (statements, stmtIndex) {
 		var statement = statements[stmtIndex];
-		if (statement instanceof ExpressionStatement) {
+		if (statement instanceof ExpressionStatement || statement instanceof ReturnStatement) {
 			var expr = statement.getExpr();
 			if (expr instanceof CallExpression) {
 				// inline if the entire statement is a single call expression
@@ -159,9 +163,9 @@ var InlineOptimizer = exports.InlineOptimizer = FunctionOptimizer.extend({
 				if (args != null) {
 					statements.splice(stmtIndex, 1);
 					stmtIndex = this._expandCallingFunction(statements, stmtIndex, expr.getCallingFuncDef(), args);
-					if (expr.getCallingFuncDef().getStatements().length != 0
-						&& statements[stmtIndex - 1] instanceof ReturnStatement)
-						statements[stmtIndex - 1] = new ExpressionStatement(statements[stmtIndex - 1].getExpr());
+					if (statement instanceof ReturnStatement) {
+						statements[stmtIndex - 1] = new ReturnStatement(statement.getToken(), statements[stmtIndex - 1].getExpr());
+					}
 				}
 			} else if (expr instanceof AssignmentExpression
 				&& this._lhsHasNoSideEffects(expr.getFirstExpr())
@@ -171,11 +175,13 @@ var InlineOptimizer = exports.InlineOptimizer = FunctionOptimizer.extend({
 				if (args != null) {
 					statements.splice(stmtIndex, 1);
 					stmtIndex = this._expandCallingFunction(statements, stmtIndex, expr.getSecondExpr().getCallingFuncDef(), args);
-					statements[stmtIndex - 1] = new ExpressionStatement(
-						new AssignmentExpression(
-							expr.getToken(),
-							expr.getFirstExpr(),
-							statements[stmtIndex - 1].getExpr()));
+					var lastExpr = new AssignmentExpression(
+						expr.getToken(),
+						expr.getFirstExpr(),
+						statements[stmtIndex - 1].getExpr());
+					statements[stmtIndex - 1] = statement instanceof ExpressionStatement
+						? new ExpressionStatement(lastExpr)
+						: new ReturnStatement(lastExpr);
 				}
 			}
 		} else {
@@ -285,6 +291,73 @@ var InlineOptimizer = exports.InlineOptimizer = FunctionOptimizer.extend({
 			// insert the statement
 			statements.splice(stmtIndex++, 0, statement);
 		}
+		return stmtIndex;
+	}
+
+});
+
+
+var ReturnIfOptimizer = exports.ReturnIfOptimizer = FunctionOptimizer.extend({
+
+	constructor: function () {
+		FunctionOptimizer.prototype.constructor.call(this, "return-if");
+	},
+
+	_optimizeFunction: function (funcDef) {
+		if (funcDef.getReturnType().equals(Type.voidType))
+			return;
+		this._optimizeStatements(funcDef.getStatements());
+	},
+
+	_statementsCanBeReturnExpr: function (statements) {
+		if (statements.length == 1 && statements[0] instanceof ReturnStatement)
+			return true;
+		this._optimizeStatements(statements);
+		if (statements.length == 1 && statements[0] instanceof ReturnStatement)
+			return true;
+		return false;
+	},
+
+	_optimizeStatements: function (statements) {
+		if (statements.length >= 1
+			&& statements[statements.length - 1] instanceof IfStatement) {
+			var ifStatement = statements[statements.length - 1];
+			if (this._statementsCanBeReturnExpr(ifStatement.getOnTrueStatements())
+				&& this._statementsCanBeReturnExpr(ifStatement.getOnFalseStatements())) {
+				statements[statements.length - 1] = this._createReturnStatement(
+					ifStatement.getToken(),
+					ifStatement.getExpr(),
+					ifStatement.getOnTrueStatements()[0].getExpr(),
+					ifStatement.getOnFalseStatements()[0].getExpr());
+				this._optimizeStatements(statements);
+			}
+		} else if (statements.length >= 2
+			&& statements[statements.length - 1] instanceof ReturnStatement
+			&& statements[statements.length - 2] instanceof IfStatement) {
+			var ifStatement = statements[statements.length - 2];
+			if (ifStatement.getOnFalseStatements().length == 0
+				&& this._statementsCanBeReturnExpr(ifStatement.getOnTrueStatements())) {
+				statements.splice(
+					statements.length - 2,
+					2,
+					this._createReturnStatement(
+						ifStatement.getToken(),
+						ifStatement.getExpr(),
+						ifStatement.getOnTrueStatements()[0].getExpr(),
+						statements[statements.length - 1].getExpr()));
+				this._optimizeStatements(statements);
+			}
+		}
+	},
+
+	_createReturnStatement: function (token, condExpr, trueExpr, falseExpr) {
+		return new ReturnStatement(
+			token,
+			new ConditionalExpression(
+				new Token("?", false),
+				condExpr,
+				trueExpr,
+				falseExpr));
 	}
 
 });

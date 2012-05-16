@@ -1512,10 +1512,12 @@ var ConditionalExpression = exports.ConditionalExpression = OperatorExpression.e
 		this._ifTrueExpr = ifTrueExpr;
 		this._ifFalseExpr = ifFalseExpr;
 		this._type = null;
+		if (this._ifFalseExpr == null)
+			throw new Error("eee");
 	},
 
 	clone: function () {
-		var ret = new ConditionalExpression(this._condExpr.clone(), this._ifTrueExpr != null ? this._ifTrueExpr.clone() : null, this._ifFalseExpr.clone());
+		var ret = new ConditionalExpression(this._token, this._condExpr.clone(), this._ifTrueExpr != null ? this._ifTrueExpr.clone() : null, this._ifFalseExpr.clone());
 		ret._type = this._type;
 		return ret;
 	},

@@ -2000,7 +2000,7 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 			return new _FunctionExpressionEmitter(this, expr);
 		else if (expr instanceof CommaExpression)
 			return new _CommaExpressionEmitter(this, expr);
-		throw new Error("got unexpected type of expression: " + JSON.stringify(expr.serialize()));
+		throw new Error("got unexpected type of expression: " + (expr != null ? JSON.stringify(expr.serialize()) : expr));
 	},
 
 	_mangleConstructorName: function (classDef, argTypes) {
