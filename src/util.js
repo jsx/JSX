@@ -4,6 +4,13 @@ var Class = require("./Class");
 
 var Util = exports.Util = Class.extend({
 
+	$cloneArray: function (a) {
+		var r = [];
+		for (var i = 0; i < a.length; ++i)
+			r[i] = a[i].clone();
+		return r;
+	},
+
 	$serializeArray: function (a) {
 		if (a == null)
 			return null;
@@ -66,7 +73,7 @@ var Util = exports.Util = Class.extend({
 	$forEachCodeElement: function (cb, elements) {
 		if (elements != null)
 			for (var i = 0; i < elements.length; ++i)
-				if (! cb(elements[i]))
+				if (! cb(elements[i], function (expr) { elements[i] = expr; }))
 					return false;
 		return true;
 	},

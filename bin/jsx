@@ -111,6 +111,7 @@ var JSX = Class.extend({
 			"  --target (javascript|c++)  target language (default:javascript)\n" +
 			"  --release                  omits the debugging features from the generated code (run-time type checking, logging, assertion)\n" +
 			"  --enable-assert            enables the 'assert' statement\n" +
+			"  --enable-inline            enables function inlining\n" +
 			"  --enable-log               enables the 'log' statement\n" +
 			"  --enable-type-check        enables run-time type checking\n" +
 			"  --version                  displays the version and exits\n" +
@@ -204,6 +205,7 @@ var JSX = Class.extend({
 					emitter.setEnableAssertion(false);
 					emitter.setEnableLogging(false);
 					emitter.setEnableRunTimeTypeCheck(false);
+					compiler.setEnableInlining(true);
 				});
 				break;
 			case "--executable":
@@ -233,6 +235,13 @@ var JSX = Class.extend({
 						tasks.push(function (mode) {
 							return function () {
 								emitter.setEnableAssertion(mode);
+							};
+						}(mode));
+						break NEXTOPT;
+					case "inline":
+						tasks.push(function (mode) {
+							return function () {
+								compiler.setEnableInlining(mode);
 							};
 						}(mode));
 						break NEXTOPT;
@@ -324,7 +333,14 @@ var JSX = Class.extend({
 
 });
 
-JSX.main(process.argv.slice(2));
+function getEnvOpts() {
+	var opts = process.env["JSX_OPTS"];
+	if (! opts)
+		return [];
+	return opts.split(/\s+/);
+}
+
+JSX.main(getEnvOpts().concat(process.argv.slice(2)));
 
 // vim: set ft=javascript:
 // vim: set noexpandtab:
