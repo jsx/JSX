@@ -333,7 +333,14 @@ var JSX = Class.extend({
 
 });
 
-JSX.main(process.argv.slice(2));
+function getEnvOpts() {
+	var opts = process.env["JSX_OPTS"];
+	if (! opts)
+		return [];
+	return opts.split(/\s+/);
+}
+
+JSX.main(getEnvOpts().concat(process.argv.slice(2)));
 
 // vim: set ft=javascript:
 // vim: set noexpandtab:
