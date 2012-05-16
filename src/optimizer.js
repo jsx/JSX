@@ -103,7 +103,7 @@ var InlineOptimizer = exports.InlineOptimizer = Optimizer.extend({
 						statements[stmtIndex - 1] = new ExpressionStatement(statements[stmtIndex - 1].getExpr());
 				}
 			} else if (expr instanceof AssignmentExpression
-				&& expr.getFirstExpr() instanceof IdentifierExpression
+				&& this._lhsHasNoSideEffects(expr.getFirstExpr())
 				&& expr.getSecondExpr() instanceof CallExpression) {
 				// inline if the statement is an assignment of a single call expression into a local variable
 				var args = this._getArgumentsIfCallExpressionIsInlineable(expr.getSecondExpr());
@@ -120,6 +120,20 @@ var InlineOptimizer = exports.InlineOptimizer = Optimizer.extend({
 		} else {
 			Optimizer.handleSubStatements(this._handleStatement.bind(this), statement);
 		}
+	},
+
+	_lhsHasNoSideEffects: function (lhsExpr) {
+		// FIXME may have side effects if is a native type (or extends a native type)
+		if (lhsExpr instanceof IdentifierExpression)
+			return true;
+		if (lhsExpr instanceof PropertyExpression) {
+			var holderExpr = lhsExpr.getExpr();
+			if (holderExpr instanceof ThisExpression)
+				return true;
+			if (holderExpr instanceof IdentifierExpression)
+				return true;
+		}
+		return false;
 	},
 
 	_getArgumentsIfCallExpressionIsInlineable: function (callExpr) {
