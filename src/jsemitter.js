@@ -1353,6 +1353,9 @@ var _CallExpressionEmitter = exports._CallExpressionEmitter = _OperatorExpressio
 	},
 
 	_emit: function () {
+		if (this._emitIfIsInvoke())
+			return;
+		// normal case
 		var calleeExpr = this._expr.getExpr();
 		if (this._emitter._enableRunTimeTypeCheck && calleeExpr.getType() instanceof MayBeUndefinedType)
 			this._emitter._emitExpressionWithUndefinedAssertion(calleeExpr);
@@ -1369,6 +1372,39 @@ var _CallExpressionEmitter = exports._CallExpressionEmitter = _OperatorExpressio
 
 	$_setOperatorPrecedence: function (op, precedence) {
 		_CallExpressionEmitter._operatorPrecedence = precedence;
+	},
+
+	_emitIfIsInvoke: function () {
+		// return false if is not js.apply
+		var calleeExpr = this._expr.getExpr();
+		if (! (calleeExpr instanceof PropertyExpression))
+			return false;
+		if (! (calleeExpr.getType() instanceof StaticFunctionType))
+			return false;
+		if (calleeExpr.getIdentifierToken().getValue() != "invoke")
+			return false;
+		var classDef = calleeExpr.getExpr().getType().getClassDef();
+		if (! (classDef.className() == "js" && classDef.getToken().getFilename() == this._emitter._platform.getRoot() + "/lib/js/js.jsx"))
+			return false;
+		// emit
+		var args = this._expr.getArguments();
+		if (args[2] instanceof ArrayLiteralExpression) {
+			this._emitter._getExpressionEmitterFor(args[0]).emit(_PropertyExpressionEmitter._operatorPrecedence);
+			// FIXME emit as property expression if possible
+			this._emitter._emit("[", calleeExpr.getToken());
+			this._emitter._getExpressionEmitterFor(args[1]).emit(0);
+			this._emitter._emit("]", calleeExpr.getToken());
+			this._emitter._emitCallArguments(this._expr.getToken(), "(", args[2].getExprs(), null);
+		} else {
+			this._emitter._emit("(function (o, p, a) { return o[p].apply(o, a); }(", calleeExpr.getToken());
+			this._emitter._getExpressionEmitterFor(args[0]).emit(0);
+			this._emitter._emit(", ", this._expr.getToken());
+			this._emitter._getExpressionEmitterFor(args[1]).emit(0);
+			this._emitter._emit(", ", this._expr.getToken());
+			this._emitter._getExpressionEmitterFor(args[2]).emit(0);
+			this._emitter._emit("))", this._expr.getToken());
+		}
+		return true;
 	}
 
 });
@@ -2045,7 +2081,8 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 		for (var i = 0; i < args.length; ++i) {
 			if (i != 0 || prefix[prefix.length - 1] != '(')
 				this._emit(", ", null);
-			if (this._enableRunTimeTypeCheck
+			if (argTypes != null
+				&& this._enableRunTimeTypeCheck
 				&& args[i].getType() instanceof MayBeUndefinedType
 				&& ! (argTypes[i] instanceof MayBeUndefinedType || argTypes[i] instanceof VariantType)) {
 				this._emitExpressionWithUndefinedAssertion(args[i]);

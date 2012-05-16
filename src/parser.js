@@ -938,7 +938,7 @@ var Parser = exports.Parser = Class.extend({
 	_memberDefinition: function (classFlags) {
 		var flags = 0;
 		while (true) {
-			var token = this._expect([ "function", "var", "static", "abstract", "override", "final", "const" ]);
+			var token = this._expect([ "function", "var", "static", "abstract", "override", "final", "const", "native" ]);
 			if (token == null)
 				return null;
 			if (token.getValue() == "const") {
@@ -972,6 +972,9 @@ var Parser = exports.Parser = Class.extend({
 					return null;
 				}
 				newFlag = ClassDefinition.IS_FINAL;
+				break;
+			case "native":
+				newFlag = ClassDefinition.IS_NATIVE;
 				break;
 			default:
 				throw new Error("logic flaw");

@@ -6,5 +6,9 @@
  */
 
 final class js {
+
 	static var global : Map.<variant>;
+
+	static native function invoke(obj : variant, funcName : string, args : Array.<variant>) : variant;
+
 }
