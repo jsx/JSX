@@ -1495,7 +1495,7 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 
 	constructor: function (platform) {
 		this._platform = platform;
-		this._output = this._platform.load(platform.getRoot() + "/src/js/bootstrap.js") + "\n";
+		this._output = "";
 		this._outputFile = null;
 		this._indent = 0;
 		this._emittingClass = null;
@@ -1654,13 +1654,16 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 	},
 
 	getOutput: function (sourceFile, entryPoint) {
-		var output = entryPoint != null
-			? this._platform.addLauncher(this, this._encodeFilename(sourceFile), this._output, entryPoint)
-			: this._output;
-		if (this._sourceMapGen)
-			return output + this._sourceMapGen.magicToken();
-		else
-			return output;
+		var output = this._platform.load(this._platform.getRoot() + "/src/js/bootstrap.js") + "\n" +
+			this._output + "\n" +
+			"}());\n";
+		if (entryPoint != null) {
+			output = this._platform.addLauncher(this, this._encodeFilename(sourceFile), output, entryPoint);
+		}
+		if (this._sourceMapGen) {
+			output += this._sourceMapGen.magicToken();
+		}
+		return output;
 	},
 
 	_emitClassObject: function (classDef) {

@@ -1,3 +1,6 @@
+var JSX = {};
+(function () {
+
 /**
  * copies the implementations from source interface to target
  */
@@ -44,8 +47,6 @@ var $__jsx_isFinite = isFinite;
 /*
  * public interface to JSX code
  */
-var JSX = {};
-
 JSX.require = function (path) {
 	var m = $__jsx_classMap[path];
 	return m !== undefined ? m : null;

@@ -66,17 +66,17 @@ sub compile_to_run {
 }
 
 sub run_compiled {
-    my ($src) = @_;
+    my ($filename, $src) = @_;
 
     require File::Temp;
 
     # add the bootstrap code
-    $src .= <<'EOT';
+    $src .= sprintf <<'EOT', $filename;
 // workaround for node.js to set "JSX" to global
 (function () { return this; })().JSX = JSX;
 // invoke the test
 try {
-    Test.run$();
+    JSX.require("%s").Test.run$();
 } catch (e) {
     console.log(e.message.replace(/^\[.*?\]\s*/, ""));
 }
@@ -113,7 +113,7 @@ sub compile_and_run {
         return;
     };
     # run
-    defined (my $output = run_compiled($src)) or do {
+    defined (my $output = run_compiled($file, $src)) or do {
         fail "failed to execute compiled script";
         return;
     };
@@ -140,7 +140,7 @@ sub optimize_and_compare {
         fail "compile '$file' failed: $?";
         return;
     };
-    defined (my $output = run_compiled($src)) or do {
+    defined (my $output = run_compiled($file, $src)) or do {
         fail "failed to execute compiled script";
         return;
     };
@@ -159,7 +159,7 @@ sub optimize_and_compare {
         fail "no change by optimization found in the generated code";
         return;
     }
-    defined ($output = run_compiled($src_optimized)) or do {
+    defined ($output = run_compiled($file, $src_optimized)) or do {
         fail "failed to execute compiled script with optimization: $opts";
         return;
     };
