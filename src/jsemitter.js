@@ -1377,7 +1377,7 @@ var _CallExpressionEmitter = exports._CallExpressionEmitter = _OperatorExpressio
 			return false;
 		if (this._emitIfJsInvoke(calleeExpr))
 			return true;
-		else if (this._emitIfObjectHasOwnProperty(calleeExpr))
+		else if (this._emitCallsToMap(calleeExpr))
 			return true;
 		return false;
 	},
@@ -1411,24 +1411,29 @@ var _CallExpressionEmitter = exports._CallExpressionEmitter = _OperatorExpressio
 		return true;
 	},
 
-	_emitIfObjectHasOwnProperty: function (calleeExpr) {
+	_emitCallsToMap: function (calleeExpr) {
 		// NOTE once we support member function references, we need to add special handling in _PropertyExpressionEmitter as well
 		if (calleeExpr.getType() instanceof StaticFunctionType)
-			return false;
-		if (calleeExpr.getIdentifierToken().getValue() != "hasOwnProperty")
 			return false;
 		var classDef = calleeExpr.getExpr().getType().getClassDef();
 		if (! (classDef instanceof InstantiatedClassDefinition))
 			return false;
 		if (classDef.getTemplateClassName() != "Map")
 			return false;
-		// emit
-		this._emitter._emit("$__jsx_hasOwnProperty.call(", calleeExpr.getToken());
-		this._emitter._getExpressionEmitterFor(calleeExpr.getExpr()).emit(0);
-		this._emitter._emit(", ", calleeExpr.getToken());
-		this._emitter._getExpressionEmitterFor(this._expr.getArguments()[0]).emit(0);
-		this._emitter._emit(")", calleeExpr.getToken());
-		return true;
+		switch (calleeExpr.getIdentifierToken().getValue()) {
+		case "toString":
+			this._emitter._emitCallArguments(
+				calleeExpr.getToken(), "$__jsx_ObjectToString.call(", [ calleeExpr.getExpr() ], [ new ObjectType(classDef) ]);
+			return true;
+		case "hasOwnProperty":
+			this._emitter._emitCallArguments(
+				calleeExpr.getToken(), "$__jsx_ObjectHasOwnProperty.call(",
+				[ calleeExpr.getExpr(), this._expr.getArguments()[0] ],
+				[ new ObjectType(classDef), Type.stringType ]);
+			return true;
+		default:
+			return false;
+		}
 	}
 
 });
