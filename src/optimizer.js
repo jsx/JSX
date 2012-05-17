@@ -113,6 +113,15 @@ var _OptimizeCommand = exports._OptimizeCommand = Class.extend({
 		return command;
 	},
 
+	$numberOfStatements: function (statements) {
+		var n = 0;
+		Util.forEachStatement(function onStatement(statement) {
+			++n;
+			return statement.forEachStatement(onStatement.bind(this));
+		});
+		return n;
+	},
+
 	$handleSubStatements: function (cb, statement) {
 		var ret = false;
 		if (statement instanceof ContinuableStatement) {
@@ -367,7 +376,7 @@ var _InlineOptimizeCommand = exports._InlineOptimizeCommand = _FunctionOptimizeC
 				var statements = funcDef.getStatements();
 				if (statements == null)
 					return false;
-				if (statements.length >= 5)
+				if (_OptimizeCommand.numberOfStatements(statements) >= 5)
 					return false;
 				if (funcDef.getLocals().length != 0)
 					return false;
