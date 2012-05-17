@@ -457,17 +457,20 @@ var _ReturnIfOptimizeCommand = exports._ReturnIfOptimizeCommand = _FunctionOptim
 	},
 
 	_statementsCanBeReturnExpr: function (statements) {
-		if (statements.length == 1 && statements[0] instanceof ReturnStatement)
+		if (statements.length == 1 && statements[0] instanceof ReturnStatement) {
 			return true;
+		}
 		this._optimizeStatements(statements);
-		if (statements.length == 1 && statements[0] instanceof ReturnStatement)
+		if (statements.length == 1 && statements[0] instanceof ReturnStatement) {
 			return true;
+		}
 		return false;
 	},
 
 	_optimizeStatements: function (statements) {
 		if (statements.length >= 1
 			&& statements[statements.length - 1] instanceof IfStatement) {
+			// optimize: if (x) return y; else return z;
 			var ifStatement = statements[statements.length - 1];
 			if (this._statementsCanBeReturnExpr(ifStatement.getOnTrueStatements())
 				&& this._statementsCanBeReturnExpr(ifStatement.getOnFalseStatements())) {
@@ -483,19 +486,40 @@ var _ReturnIfOptimizeCommand = exports._ReturnIfOptimizeCommand = _FunctionOptim
 			&& statements[statements.length - 1] instanceof ReturnStatement
 			&& statements[statements.length - 2] instanceof IfStatement) {
 			var ifStatement = statements[statements.length - 2];
-			if (ifStatement.getOnFalseStatements().length == 0
-				&& this._statementsCanBeReturnExpr(ifStatement.getOnTrueStatements())) {
-				statements.splice(
-					statements.length - 2,
-					2,
-					this._createReturnStatement(
-						ifStatement.getToken(),
-						ifStatement.getExpr(),
-						ifStatement.getOnTrueStatements()[0].getExpr(),
-						statements[statements.length - 1].getExpr()));
-				this._altered = true;
-				this._optimizeStatements(statements);
+			if (this._statementsCanBeReturnExpr(ifStatement.getOnTrueStatements())) {
+				// optimize: if (x) return y; return z;
+				var onFalseStatements = ifStatement.getOnFalseStatements();
+				if (onFalseStatements.length == 0) {
+					statements.splice(
+						statements.length - 2,
+						2,
+						this._createReturnStatement(
+							ifStatement.getToken(),
+							ifStatement.getExpr(),
+							ifStatement.getOnTrueStatements()[0].getExpr(),
+							statements[statements.length - 1].getExpr()));
+					this._altered = true;
+					this._optimizeStatements(statements);
+				} else if (onFalseStatements.length == 1
+						&& onFalseStatements[0] instanceof IfStatement
+						&& onFalseStatements[0].getOnFalseStatements().length == 0) {
+					/*
+						handles the case below, by moving the last return statement into the (unseen) else clause
+							if (x) {
+								return 0;
+							} else if (y) {
+								return 1;
+							}
+							return 2;
+					*/
+					onFalseStatements[0].getOnFalseStatements().push(statements[statements.length - 1]);
+					statements.pop();
+					this._altered = true;
+					this._optimizeStatements(statements);
+				}
 			}
+		} else if (statements.length != 4) {
+			this.log([ "OH!", statements.length, statements[0] instanceof IfStatement, statements[1] instanceof ReturnStatement ].join(","));
 		}
 	},
 
