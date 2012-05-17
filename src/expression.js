@@ -158,7 +158,6 @@ var IdentifierExpression = exports.IdentifierExpression = LeafExpression.extend(
 	},
 
 	getType: function () {
-if (this._token.getValue() == "testBody" && this._local == null) throw new Error("Hmm");
 		if (this._local != null)
 			return this._local.getType();
 		else
