@@ -124,6 +124,9 @@ sub compile_and_run {
 sub optimize_and_compare {
     my ($file) = @_;
 
+    plan skip_all => 'environment variable JSX_OPTS is set'
+        if defined $ENV{JSX_OPTS};
+
     plan tests => 1;
 
     defined(my $expected = get_section($file, "EXPECTED"))
