@@ -113,6 +113,7 @@ var JSX = Class.extend({
 			"  --release                  omits the debugging features from the generated code (run-time type checking, logging, assertion)\n" +
 			"  --optimize cmd1,cmd2,...   list of optimize commands (no-assert, no-log, inline, return-if)\n" +
 			"  --enable-type-check        enables run-time type checking\n" +
+			"  --enable-source-map        enables source map debugging info\n" +
 			"  --version                  displays the version and exits\n" +
 			"  --help                     displays this help and exits\n" +
 			"");
@@ -238,6 +239,13 @@ var JSX = Class.extend({
 						tasks.push(function (mode) {
 							return function () {
 								emitter.setEnableRunTimeTypeCheck(mode);
+							};
+						}(mode));
+						break NEXTOPT;
+					case "source-map":
+						tasks.push(function (mode) {
+							return function () {
+								emitter.setEnableSourceMap(mode);
 							};
 						}(mode));
 						break NEXTOPT;

@@ -1510,9 +1510,12 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 
 	setOutputFile: function (name) {
 		this._outputFile = name;
-		// FIXME: set correct sourceRoot
-		var sourceRoot = null;
-		this._sourceMapGen = new SourceMapGenerator(name, sourceRoot);
+
+		if(this._enableSourceMap) {
+			// FIXME: set correct sourceRoot
+			var sourceRoot = null;
+			this._sourceMapGen = new SourceMapGenerator(name, sourceRoot);
+		}
 	},
 
 	saveSourceMappingFile: function (platform) {
@@ -1529,6 +1532,9 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 
 	setEnableRunTimeTypeCheck: function (enable) {
 		this._enableRunTimeTypeCheck = enable;
+	},
+	setEnableSourceMap : function (enable) {
+		this._enableSourceMap = enable;
 	},
 
 	emit: function (classDefs) {

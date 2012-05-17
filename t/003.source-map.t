@@ -33,7 +33,7 @@ function main() {
 			return;
 		}
 
-		execFile("bin/jsx", ["--output", "t/source-map/hello.compiled.js", "t/source-map/hello.jsx"], {}, function (code, stdout, stderr) {
+		execFile("bin/jsx", ["--enable-source-map", "--output", "t/source-map/hello.compiled.js", "t/source-map/hello.jsx"], {}, function (code, stdout, stderr) {
 			t.expect(code, "error code").toBe(null);
 			t.expect(stderr, "stderr").toBe("");
 			t.expect(stderr, "stdout").toBe("");
