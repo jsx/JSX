@@ -14,6 +14,7 @@ var Optimizer = exports.Optimizer = Class.extend({
 		this._compiler = null;
 		this._commands = [];
 		this._log = [];
+		this._dumpLogs = false;
 	},
 
 	setup: function (cmds) {
@@ -27,6 +28,8 @@ var Optimizer = exports.Optimizer = Class.extend({
 				this._commands.push(new _InlineOptimizeCommand());
 			} else if (cmd == "return-if") {
 				this._commands.push(new _ReturnIfOptimizeCommand());
+			} else if (cmd == "dump-logs") {
+				this._dumpLogs = true;
 			} else {
 				return "unknown optimization command: " + cmd;
 			}
@@ -46,16 +49,17 @@ var Optimizer = exports.Optimizer = Class.extend({
 	performOptimization: function () {
 		for (var i = 0; i < this._commands.length; ++i) {
 			try {
-				this.log("starting optimizer: " + this._identifier);
-				this._commands[i].setOptimizer(this).performOptimization();
-				this.log("finished optimizer: " + this._identifier);
+				this.log("starting optimizer: " + this._commands[i]._identifier);
+				this._commands[i].setup(this).performOptimization();
+				this.log("finished optimizer: " + this._commands[i]._identifier);
 			} catch (e) {
 				console.error("optimizer '" + this._identifier + "' died unexpectedly, dumping the logs");
 				this.dumpLogs(this._log);
 				throw e;
 			}
 		}
-		//this.dumpLogs();
+		if (this._dumpLogs)
+			this.dumpLogs();
 	},
 
 	log: function (message) {
@@ -77,7 +81,7 @@ var _OptimizeCommand = exports._OptimizeCommand = Class.extend({
 		this._optimizer = null;
 	},
 
-	setOptimizer: function (optimizer) {
+	setup: function (optimizer) {
 		this._optimizer = optimizer;
 		return this;
 	},
@@ -101,24 +105,39 @@ var _OptimizeCommand = exports._OptimizeCommand = Class.extend({
 	},
 
 	log: function (message) {
-		this._optimizer.log(message);
+		this._optimizer.log("[" + this._identifier + "] " + message);
+	},
+
+	setupCommand: function (command) {
+		command.setup(this._optimizer);
+		return command;
 	},
 
 	$handleSubStatements: function (cb, statement) {
+		var ret = false;
 		if (statement instanceof ContinuableStatement) {
-			cb(statement.getStatements());
+			if (cb(statement.getStatements()))
+				ret = true;
 		} else if (statement instanceof IfStatement) {
-			cb(statement.getOnTrueStatements());
-			cb(statement.getOnFalseStatements());
+			if (cb(statement.getOnTrueStatements()))
+				ret = true;
+			if (cb(statement.getOnFalseStatements()))
+				ret = true;
 		} else if (statement instanceof SwitchStatement) {
-			cb(statement.getStatements());
+			if (cb(statement.getStatements()))
+				ret = true;
 		} else if (statement instanceof TryStatement) {
-			cb(statement.getTryStatements());
-			cb(statement.getCatchStatements());
-			cb(statement.getFinallyStatements());
+			if (cb(statement.getTryStatements()))
+				ret = true;
+			if (cb(statement.getCatchStatements()))
+				ret = true;
+			if (cb(statement.getFinallyStatements()))
+				ret = true;
 		} else if (statement instanceof CatchStatement) {
-			cb(statement.getStatements());
+			if (cb(statement.getStatements()))
+				ret = true;
 		}
+		return ret;
 	},
 
 	$getFuncName : function (funcDef) {
@@ -126,6 +145,7 @@ var _OptimizeCommand = exports._OptimizeCommand = Class.extend({
 		var s = (classDef != null ? classDef.className(): "<<unknown>>");
 		s += (funcDef.flags() & ClassDefinition.IS_STATIC) != 0 ? "." : "#";
 		s += funcDef.getNameToken() != null ? funcDef.name() : "<<unknown>>";
+		s += "(";
 		var argTypes = funcDef.getArgumentTypes();
 		for (var i = 0; i < argTypes.length; ++i) {
 			if (i != 0)
@@ -150,7 +170,7 @@ var _FunctionOptimizeCommand = exports._FunctionOptimizeCommand = _OptimizeComma
 				classDef.forEachMemberFunction(function (funcDef) {
 					if ((funcDef.flags() & (ClassDefinition.IS_NATIVE | ClassDefinition.IS_ABSTRACT)) == 0) {
 						this.log("starting optimization of " + _OptimizeCommand.getFuncName(funcDef));
-						this._optimizeFunction(funcDef);
+						this.optimizeFunction(funcDef);
 						this.log("finished optimization of " + _OptimizeCommand.getFuncName(funcDef));
 					}
 					return true;
@@ -160,7 +180,7 @@ var _FunctionOptimizeCommand = exports._FunctionOptimizeCommand = _OptimizeComma
 		}.bind(this));
 	},
 
-	_optimizeFunction: null // function (:MemberFunctionDefinition) : void
+	optimizeFunction: null // function (:MemberFunctionDefinition) : void
 
 });
 
@@ -170,7 +190,7 @@ var _NoAssertCommand = exports._NoAssertCommand = _FunctionOptimizeCommand.exten
 		_FunctionOptimizeCommand.prototype.constructor.call(this, "no-assert");
 	},
 
-	_optimizeFunction: function (funcDef) {
+	optimizeFunction: function (funcDef) {
 		this._optimizeStatements(funcDef.getStatements());
 	},
 
@@ -193,7 +213,7 @@ var _NoLogCommand = exports._NoAssertCommand = _FunctionOptimizeCommand.extend({
 		_FunctionOptimizeCommand.prototype.constructor.call(this, "no-log");
 	},
 
-	_optimizeFunction: function (funcDef) {
+	optimizeFunction: function (funcDef) {
 		this._optimizeStatements(funcDef.getStatements());
 	},
 
@@ -223,7 +243,7 @@ var _InlineOptimizeCommand = exports._InlineOptimizeCommand = _FunctionOptimizeC
 		};
 	},
 
-	_optimizeFunction: function (funcDef) {
+	optimizeFunction: function (funcDef) {
 		// use flag, since functions might recurse
 		if (this.getStash(funcDef).isOptimized)
 			return;
@@ -233,19 +253,30 @@ var _InlineOptimizeCommand = exports._InlineOptimizeCommand = _FunctionOptimizeC
 		if ((funcDef.flags() & (ClassDefinition.IS_NATIVE | ClassDefinition.IS_ABSTRACT)) != 0)
 			return;
 		this.log("* starting optimization of " + _OptimizeCommand.getFuncName(funcDef));
-		this._handleStatements(funcDef.getStatements());
+		var altered = false;
+		while (true) {
+			if (! this._handleStatements(funcDef.getStatements()))
+				break;
+			altered = true;
+			if (! this.setupCommand(new _ReturnIfOptimizeCommand()).optimizeFunction(funcDef))
+				break;
+		}
 		this.log("* finished optimization of " + _OptimizeCommand.getFuncName(funcDef));
 	},
 
 	_handleStatements: function (statements) {
+		var altered = false;
 		for (var i = 0; i < statements.length; ++i) {
 			var left = statements.length - i;
-			this._handleStatement(statements, i);
+			if (this._handleStatement(statements, i))
+				altered = true;
 			i = statements.length - left;
 		}
+		return altered;
 	},
 
 	_handleStatement: function (statements, stmtIndex) {
+		var altered = false;
 		var statement = statements[stmtIndex];
 		if (statement instanceof ExpressionStatement || statement instanceof ReturnStatement) {
 			var expr = statement.getExpr();
@@ -258,6 +289,7 @@ var _InlineOptimizeCommand = exports._InlineOptimizeCommand = _FunctionOptimizeC
 					if (statement instanceof ReturnStatement) {
 						statements[stmtIndex - 1] = new ReturnStatement(statement.getToken(), statements[stmtIndex - 1].getExpr());
 					}
+					altered = true;
 				}
 			} else if (expr instanceof AssignmentExpression
 				&& this._lhsHasNoSideEffects(expr.getFirstExpr())
@@ -274,11 +306,13 @@ var _InlineOptimizeCommand = exports._InlineOptimizeCommand = _FunctionOptimizeC
 					statements[stmtIndex - 1] = statement instanceof ExpressionStatement
 						? new ExpressionStatement(lastExpr)
 						: new ReturnStatement(lastExpr);
+					altered = true;
 				}
 			}
 		} else {
-			_OptimizeCommand.handleSubStatements(this._handleStatement.bind(this), statement);
+			altered = _OptimizeCommand.handleSubStatements(this._handleStatement.bind(this), statement);
 		}
+		return altered;
 	},
 
 	_lhsHasNoSideEffects: function (lhsExpr) {
@@ -301,7 +335,7 @@ var _InlineOptimizeCommand = exports._InlineOptimizeCommand = _FunctionOptimizeC
 		if (callingFuncDef == null)
 			return null;
 		// optimize the calling function prior to testing the conditions
-		this._optimizeFunction(callingFuncDef);
+		this.optimizeFunction(callingFuncDef);
 		// only allow static function or member function using "this" as the receiver (FIXME we can easily handle receiver being a local variable as well?)
 		if ((callingFuncDef.flags() & ClassDefinition.IS_STATIC) != 0) {
 			// ok
@@ -399,10 +433,14 @@ var _ReturnIfOptimizeCommand = exports._ReturnIfOptimizeCommand = _FunctionOptim
 		_OptimizeCommand.prototype.constructor.call(this, "return-if");
 	},
 
-	_optimizeFunction: function (funcDef) {
+	optimizeFunction: function (funcDef) {
 		if (funcDef.getReturnType().equals(Type.voidType))
 			return;
+
+		this._altered = false;
 		this._optimizeStatements(funcDef.getStatements());
+		this.log(_OptimizeCommand.getFuncName(funcDef) + " " + (this._altered ? "Y" : "N"));
+		return this._altered;
 	},
 
 	_statementsCanBeReturnExpr: function (statements) {
@@ -425,6 +463,7 @@ var _ReturnIfOptimizeCommand = exports._ReturnIfOptimizeCommand = _FunctionOptim
 					ifStatement.getExpr(),
 					ifStatement.getOnTrueStatements()[0].getExpr(),
 					ifStatement.getOnFalseStatements()[0].getExpr());
+				this._altered = true;
 				this._optimizeStatements(statements);
 			}
 		} else if (statements.length >= 2
@@ -441,6 +480,7 @@ var _ReturnIfOptimizeCommand = exports._ReturnIfOptimizeCommand = _FunctionOptim
 						ifStatement.getExpr(),
 						ifStatement.getOnTrueStatements()[0].getExpr(),
 						statements[statements.length - 1].getExpr()));
+				this._altered = true;
 				this._optimizeStatements(statements);
 			}
 		}
