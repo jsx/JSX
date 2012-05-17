@@ -36,6 +36,9 @@ sub main {
     elsif($file =~ m{ /lib/ }xms) {
         run_test($file);
     }
+    elsif($file =~ m{ /optimize/ }xms) {
+        optimize_and_compare($file);
+    }
     else {
         plan tests => 1;
         pass "(unknown file: $file)";
@@ -101,7 +104,7 @@ sub compile_and_run {
 
     plan tests => 1;
 
-    defined(my $expected = get_expected($file))
+    defined(my $expected = get_section($file, "EXPECTED"))
         or die "could not find EXPECTED in file:$file\n";
 
     # compile (FIXME support C++)
@@ -115,6 +118,48 @@ sub compile_and_run {
         return;
     };
     # compare the results
+    is $output, $expected, $file;
+}
+
+sub optimize_and_compare {
+    my ($file) = @_;
+
+    plan tests => 1;
+
+    defined(my $expected = get_section($file, "EXPECTED"))
+        or die "could not find EXPECTED in file:$file\n";
+    defined(my $opts = get_section($file, "JSX_OPTS"))
+        or die "cloud not ifnd JSX_OPTIONS in file:$file\n";
+    chomp $opts;
+
+    # compile, run, and check (wo. optimization)
+    my $src = compile_to_run($file) or do {
+        fail "compile '$file' failed: $?";
+        return;
+    };
+    defined (my $output = run_compiled($src)) or do {
+        fail "failed to execute compiled script";
+        return;
+    };
+    if ($output ne $expected) {
+        # do not continue if the result is wrong
+        is $output, $expected, "$file (not optimized)";
+        return;
+    }
+
+    # compile, run, and check (w. optimization)
+    my $src_optimized = compile_to_run($file, $opts) or do {
+        fail "compile '$file' with '$opts' failed: $?";
+        return;
+    };
+    if ($src eq $src_optimized) {
+        fail "no change by optimization found in the generated code";
+        return;
+    }
+    defined ($output = run_compiled($src_optimized)) or do {
+        fail "failed to execute compiled script with optimization: $opts";
+        return;
+    };
     is $output, $expected, $file;
 }
 

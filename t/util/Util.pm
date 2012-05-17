@@ -3,7 +3,7 @@ use strict;
 use warnings;
 
 use base qw(Exporter);
-our @EXPORT = qw(slurp get_expected);
+our @EXPORT = qw(slurp get_section);
 
 sub slurp {
     my($file) = @_;
@@ -13,10 +13,10 @@ sub slurp {
     return <$fh>;
 }
 
-sub get_expected {
-    my $file = shift;
+
+sub get_section {
+    my ($file, $name) = @_;
     my $content = slurp($file);
-    my($expected) = $content =~ m{/\*EXPECTED\n(.*?\n|)\*/}s;
+    my($expected) = $content =~ m{/\*$name\n(|.*?\n)\*/}s;
     return $expected;
 }
-
