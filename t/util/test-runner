@@ -52,22 +52,20 @@ sub get_shebang {
     return grep { defined } $first =~ /\A \#\! \s* (\S+) (?: \s+ (\S+) )* /xmsg;
 }
 
-sub compile_and_run {
-    my($file) = @_;
+sub compile_to_run {
+    my ($file, $opts) = @_;
+    $opts ||= "";
 
-    plan tests => 1;
+    my $src = `bin/jsx $opts $file`;
+    return if $? != 0;
 
-    defined(my $expected = get_expected($file))
-        or die "could not find EXPECTED in file:$file\n";
+    return $src;
+}
+
+sub run_compiled {
+    my ($src) = @_;
 
     require File::Temp;
-
-    # compile (FIXME support C++)
-    my $src = `bin/jsx $file`;
-    if($? != 0) {
-        fail("compile '$file' failed: $?");
-        return;
-    }
 
     # add the bootstrap code
     $src .= <<'EOT';
@@ -87,17 +85,35 @@ EOT
     $temp->close();
 
     # execute compiled node
-    my $output = do {
-        open my $fh, "-|", "node $temp"
-            or die "failed to invoke node:$!";
-        local $/;
-        my $ret = <$fh>;
-        close $fh;
-        return fail "failed to execute compiled script"
-            if $? != 0;
-        $ret;
-    };
+    open my $fh, "-|", "node $temp"
+        or die "failed to invoke node:$!";
+    local $/;
+    my $output = <$fh>;
+    close $fh;
 
+    return if $? != 0;
+
+    return $output;
+}
+
+sub compile_and_run {
+    my($file) = @_;
+
+    plan tests => 1;
+
+    defined(my $expected = get_expected($file))
+        or die "could not find EXPECTED in file:$file\n";
+
+    # compile (FIXME support C++)
+    my $src = compile_to_run($file) or do {
+        fail "compile '$file' failed: $?";
+        return;
+    };
+    # run
+    defined (my $output = run_compiled($src)) or do {
+        fail "failed to execute compiled script";
+        return;
+    };
     # compare the results
     is $output, $expected, $file;
 }
