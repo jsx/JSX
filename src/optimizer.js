@@ -294,10 +294,13 @@ var _InlineOptimizeCommand = exports._InlineOptimizeCommand = _FunctionOptimizeC
 				if (! (i == statements.length || (i == statements.length - 1 && statements[i] instanceof ReturnStatement)))
 					return false;
 				// no function expression
-				var hasFuncExpr = ! Util.forEachCodeElement(function onElement(element) {
-					if (element instanceof FunctionExpression)
-						return false;
-					return element.forEachCodeElement(onElement.bind(this));
+				var hasFuncExpr = ! Util.forEachStatement(function onStatement(statement) {
+					var onExpr = function onExpr(expr) {
+						if (expr instanceof FunctionExpression)
+							return false;
+						return expr.forEachExpression(onExpr.bind(this));
+					};
+					return statement.forEachExpression(onExpr.bind(this));
 				}.bind(this), statements);
 				if (hasFuncExpr) {
 					return false;
@@ -317,7 +320,7 @@ var _InlineOptimizeCommand = exports._InlineOptimizeCommand = _FunctionOptimizeC
 			// clone the statement
 			var statement = new ExpressionStatement(callingStatements[i].getExpr().clone());
 			// replace the arguments with actual arguments
-			statement.forEachCodeElement(function onExpr(expr, replaceCb) {
+			statement.forEachExpression(function onExpr(expr, replaceCb) {
 				if (expr instanceof IdentifierExpression && expr.getLocal() != null) {
 					for (var j = 0; j < args.length; ++j) {
 						if (callingFuncDef.getArguments()[j].getName().getValue() == expr.getToken().getValue())
@@ -327,8 +330,7 @@ var _InlineOptimizeCommand = exports._InlineOptimizeCommand = _FunctionOptimizeC
 						throw new Error("logic flaw, could not find formal parameter named " + expr.getToken().getValue());
 					replaceCb(args[j].clone());
 				}
-				expr.forEachCodeElement(onExpr.bind(this));
-				return true;
+				return expr.forEachExpression(onExpr.bind(this));
 			}.bind(this));
 			// insert the statement
 			statements.splice(stmtIndex++, 0, statement);

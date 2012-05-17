@@ -453,52 +453,56 @@ var ClassDefinition = exports.ClassDefinition = Class.extend({
 		};
 
 		// iterate
-		this.forEachMemberFunction(function onElement(element) {
+		this.forEachMemberFunction(function onFunction(funcDef) {
 
-			if (element instanceof Statement.ConstructorInvocationStatement) {
+			funcDef.forEachClosure(onFunction.bind(this));
 
-				// invocation of super-class ctor
-				var ctorType = element.getConstructorType();
-				if (ctorType != null) {
-					// FIXME we should better create an empty ctor for classes with no ctor
-					var callingFuncDef = findCallingFunctionInClass(
-						element.getConstructingClassDef(),
-						"constructor",
-						ctorType.getArgumentTypes(),
-						false);
-					if (callingFuncDef == null)
-						throw new Error("could not determine the associated parent ctor");
-					element.setCallingFuncDef(callingFuncDef);
+			funcDef.forEachStatement(function onStatement(statement) {
+
+				if (statement instanceof Statement.ConstructorInvocationStatement) {
+					// invocation of super-class ctor
+					var ctorType = statement.getConstructorType();
+					if (ctorType != null) {
+						// FIXME we should better create an empty ctor for classes with no ctor
+						var callingFuncDef = findCallingFunctionInClass(
+							statement.getConstructingClassDef(),
+							"constructor",
+							ctorType.getArgumentTypes(),
+							false);
+						if (callingFuncDef == null)
+							throw new Error("could not determine the associated parent ctor");
+						statement.setCallingFuncDef(callingFuncDef);
+					}
 				}
 
-			} else if (element instanceof Expression.CallExpression) {
+				statement.forEachExpression(function onExpr(expr) {
+					if (expr instanceof Expression.CallExpression) {
+						// call expression
+						var calleeExpr = expr.getExpr();
+						if (calleeExpr instanceof Expression.PropertyExpression && ! calleeExpr.getType().isAssignable()) {
+							// is referring to function (not a value of function type)
+							var holderType = calleeExpr.getHolderType();
+							var callingFuncDef = findCallingFunction(
+									holderType.getClassDef(),
+									calleeExpr.getIdentifierToken().getValue(),
+									calleeExpr.getType().getArgumentTypes(),
+									holderType instanceof Type.ClassDefType);
+							expr.setCallingFuncDef(callingFuncDef);
+						} else if (calleeExpr instanceof Expression.FunctionExpression) {
+							expr.setCallingFuncDef(calleeExpr.getFuncDef());
+						}
+					} else if (expr instanceof Expression.NewExpression) {
+						/*
+							For now we do not do anything here, since all objects should be created by the JS new operator,
+							or will fail in operations like obj.func().
+						*/
+					}
+					return expr.forEachExpression(onExpr.bind(this));
+				});
 
-				// call expression
-				var calleeExpr = element.getExpr();
-				if (calleeExpr instanceof Expression.PropertyExpression && ! calleeExpr.getType().isAssignable()) {
-					// is referring to function (not a value of function type)
-					var holderType = calleeExpr.getHolderType();
-					var callingFuncDef = findCallingFunction(
-							holderType.getClassDef(),
-							calleeExpr.getIdentifierToken().getValue(),
-							calleeExpr.getType().getArgumentTypes(),
-							holderType instanceof Type.ClassDefType);
-					element.setCallingFuncDef(callingFuncDef);
-				} else if (calleeExpr instanceof Expression.FunctionExpression) {
-					element.setCallingFuncDef(calleeExpr.getFuncDef());
-				}
+				return statement.forEachStatement(onStatement.bind(this));
+			});
 
-			} else if (element instanceof Expression.NewExpression) {
-
-				/*
-					For now we do not do anything here, since all objects should be created by the JS new operator,
-					or will fail in operations like obj.func().
-				*/
-
-			}
-
-			// iterate
-			element.forEachCodeElement(onElement);
 			return true;
 
 		}.bind(this));
@@ -958,22 +962,23 @@ var MemberFunctionDefinition = exports.MemberFunctionDefinition = MemberDefiniti
 		for (var i = normalStatementFromIndex; i < this._statements.length; ++i) {
 			if (! (this._statements[i] instanceof Statement.ExpressionStatement))
 				break;
-			var canContinue = this._statements[i].forEachCodeElement(function onElement(element) {
+			var canContinue = this._statements[i].forEachExpression(function onExpr(expr) {
 				var lhsExpr;
 				/*
 					FIXME if the class is extending a native class and the expression is setting a property of the native class,
 					then we should break, since it might have side effects (e.g. the property might be defined as a setter)
 				*/
-				if (element instanceof Expression.AssignmentExpression
-					&& element.getToken().getValue() == "="
-					&& (lhsExpr = element.getFirstExpr()) instanceof Expression.PropertyExpression
+				if (expr instanceof Expression.AssignmentExpression
+					&& expr.getToken().getValue() == "="
+					&& (lhsExpr = expr.getFirstExpr()) instanceof Expression.PropertyExpression
 					&& lhsExpr.getExpr() instanceof Expression.ThisExpression) {
 					initProperties[lhsExpr.getIdentifierToken().getValue()] = false;
 					return true;
-				} else if (element instanceof Expression.ThisExpression) {
+				} else if (expr instanceof Expression.ThisExpression
+					|| expr instanceof Expression.FunctionExpression) {
 					return false;
 				}
-				return element.forEachCodeElement(onElement.bind(this));
+				return expr.forEachExpression(onExpr.bind(this));
 			}.bind(this));
 			if (! canContinue)
 				break;
@@ -1071,8 +1076,16 @@ var MemberFunctionDefinition = exports.MemberFunctionDefinition = MemberDefiniti
 			: new Type.MemberFunctionType(new Type.ObjectType(this._classDef), this._returnType, this.getArgumentTypes(), false);
 	},
 
-	forEachCodeElement: function (cb) {
-		return Util.forEachCodeElement(cb, this._statements);
+	forEachStatement: function (cb) {
+		return Util.forEachStatement(cb, this._statements);
+	},
+
+	forEachClosure: function (cb) {
+		if (this._closures != null)
+			for (var i = 0; i < this._closures.length; ++i)
+				if (! cb(this._closures[i]))
+					return false;
+		return true;
 	}
 
 });

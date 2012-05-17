@@ -22,7 +22,11 @@ var Statement = exports.Statement = Class.extend({
 		}
 	},
 
-	forEachCodeElement: null, // iterates through the statements / expressions, returns bool
+	forEachStatement: function (cb) {
+		return true;
+	},
+
+	forEachExpression: null, // function forEachExpression(cb : function (expr, replaceCb) : boolean) : boolean
 
 	getToken: null, // returns a token of the statement
 
@@ -126,8 +130,10 @@ var ConstructorInvocationStatement = exports.ConstructorInvocationStatement = St
 		return true;
 	},
 
-	forEachCodeElement: function (cb) {
-		return Util.forEachCodeElement(cb, this._args);
+	forEachExpression: function (cb) {
+		if (! Util.forEachExpression(cb, this._args))
+			return false;
+		return true;
 	}
 
 });
@@ -155,8 +161,10 @@ var UnaryExpressionStatement = exports.UnaryExpressionStatement = Statement.exte
 		return true;
 	},
 
-	forEachCodeElement: function (cb) {
-		return cb(this._expr);
+	forEachExpression: function (cb) {
+		if (! cb(this._expr, function (expr) { this._expr = expr; }.bind(this)))
+			return false;
+		return true;
 	}
 
 });
@@ -226,8 +234,8 @@ var ReturnStatement = exports.ReturnStatement = Statement.extend({
 		return true;
 	},
 
-	forEachCodeElement: function (cb) {
-		if (this._expr != null && ! cb(this._expr))
+	forEachExpression: function (cb) {
+		if (this._expr != null && ! cb(this._expr, function (expr) { this._expr = expr; }.bind(this)))
 			return false;
 		return true;
 	}
@@ -338,7 +346,7 @@ var JumpStatement = exports.JumpStatement = Statement.extend({
 		return null;
 	},
 
-	forEachCodeElement: function (cb) {
+	forEachExpression: function (cb) {
 		return true;
 	}
 
@@ -354,7 +362,7 @@ var BreakStatement = exports.BreakStatement = JumpStatement.extend({
 		return "BreakStatement";
 	},
 
-	forEachCodeElement: function (cb) {
+	forEachExpression: function (cb) {
 		return true;
 	}
 
@@ -370,7 +378,7 @@ var ContinueStatement = exports.ContinueStatement = JumpStatement.extend({
 		return "ContinueStatement";
 	},
 
-	forEachCodeElement: function (cb) {
+	forEachExpression: function (cb) {
 		return true;
 	}
 
@@ -397,10 +405,6 @@ var LabellableStatement = exports.LabellableStatement = Statement.extend({
 		return [
 			Util.serializeNullable(this._label)
 		];
-	},
-
-	forEachCodeElement: function (cb) {
-		return true;
 	},
 
 	_prepareBlockAnalysis: function (context) {
@@ -518,10 +522,14 @@ var DoWhileStatement = exports.DoWhileStatement = ContinuableStatement.extend({
 		return true;
 	},
 
-	forEachCodeElement: function (cb) {
-		if (! cb(this._expr))
+	forEachStatement: function (cb) {
+		if (! Util.forEachStatement(cb, this._statements))
 			return false;
-		if (! Util.forEachCodeElement(cb, this._statements))
+		return true;
+	},
+
+	forEachExpression: function (cb) {
+		if (! cb(this._expr, function (expr) { this._expr = expr; }.bind(this)))
 			return false;
 		return true;
 	}
@@ -589,12 +597,16 @@ var ForInStatement = exports.ForInStatement = ContinuableStatement.extend({
 		return true;
 	},
 
-	forEachCodeElement: function (cb) {
-		if (! cb(this._lhsExpr))
+	forEachStatement: function (cb) {
+		if (! Util.forEachStatement(cb, this._statements))
 			return false;
-		if (! cb(this._listExpr))
+		return true;
+	},
+
+	forEachExpression: function (cb) {
+		if (! cb(this._lhsExpr, function (expr) { this._lhsExpr = expr; }.bind(this)))
 			return false;
-		if (! Util.forEachCodeElement(cb, this._statements))
+		if (! cb(this._listExpr, function (expr) { this._listExpr = expr; }.bind(this)))
 			return false;
 		return true;
 	}
@@ -664,14 +676,18 @@ var ForStatement = exports.ForStatement = ContinuableStatement.extend({
 		return true;
 	},
 
-	forEachCodeElement: function (cb) {
-		if (this._initExpr != null && ! cb(this._initExpr))
+	forEachStatement: function (cb) {
+		if (! Util.forEachStatement(cb, this._statements))
 			return false;
-		if (this._condExpr != null && ! cb(this._condExpr))
+		return true;
+	},
+
+	forEachExpression: function (cb) {
+		if (this._initExpr != null && ! cb(this._initExpr, function (expr) { this._initExpr = expr; }.bind(this)))
 			return false;
-		if (this._postExpr != null && ! cb(this._postExpr))
+		if (this._condExpr != null && ! cb(this._condExpr, function (expr) { this._condExpr = expr; }.bind(this)))
 			return false;
-		if (! Util.forEachCodeElement(cb, this._statements))
+		if (this._postExpr != null && ! cb(this._postExpr, function (expr) { this._postExpr = expr; }.bind(this)))
 			return false;
 		return true;
 	}
@@ -747,10 +763,16 @@ var IfStatement = exports.IfStatement = Statement.extend({
 		return true;
 	},
 
-	forEachCodeElement: function (cb) {
-		if (! Util.forEachCodeElement(cb, this._onTrueStatements))
+	forEachStatement: function (cb) {
+		if (! Util.forEachStatement(cb, this._onTrueStatements))
 			return false;
-		if (! Util.forEachCodeElement(cb, this._onFalseStatements))
+		if (! Util.forEachStatement(cb, this._onFalseStatements))
+			return false;
+		return true;
+	},
+
+	forEachExpression: function (cb) {
+		if (! cb(this._expr, function (expr) { this._expr = expr; }.bind(this)))
 			return false;
 		return true;
 	}
@@ -810,10 +832,14 @@ var SwitchStatement = exports.SwitchStatement = LabellableStatement.extend({
 		return true;
 	},
 
-	forEachCodeElement: function (cb) {
-		if (! cb(this._expr))
+	forEachStatement: function (cb) {
+		if (! Util.forEachStatement(cb, this._statements))
 			return false;
-		if (! Util.forEachCodeElement(cb, this._statements))
+		return true;
+	},
+
+	forEachExpression: function (cb) {
+		if (! cb(this._expr, function (expr) { this._expr = expr; }.bind(this)))
 			return false;
 		return true;
 	},
@@ -874,8 +900,10 @@ var CaseStatement = exports.CaseStatement = Statement.extend({
 		return true;
 	},
 
-	forEachCodeElement: function (cb) {
-		return cb(this._expr);
+	forEachExpression: function (cb) {
+		if (! cb(this._expr, function (expr) { this._expr = expr; }.bind(this)))
+			return false;
+		return true;
 	}
 
 });
@@ -901,7 +929,7 @@ var DefaultStatement = exports.DefaultStatement = Statement.extend({
 		return true;
 	},
 
-	forEachCodeElement: function (cb) {
+	forEachExpression: function (cb) {
 		return true;
 	}
 
@@ -949,10 +977,14 @@ var WhileStatement = exports.WhileStatement = ContinuableStatement.extend({
 		return true;
 	},
 
-	forEachCodeElement: function (cb) {
-		if (! cb(this._expr))
+	forEachStatement: function (cb) {
+		if (! Util.forEachStatement(cb, this._statements))
 			return false;
-		if (! Util.forEachCodeElement(cb, this._statements))
+		return true;
+	},
+
+	forEachExpression: function (cb) {
+		if (! cb(this._expr, function (expr) { this._expr = expr; }.bind(this)))
 			return false;
 		return true;
 	}
@@ -1019,13 +1051,17 @@ var TryStatement = exports.TryStatement = Statement.extend({
 		return true;
 	},
 
-	forEachCodeElement: function (cb) {
-		if (! Util.forEachCodeElement(cb, this._statements))
+	forEachStatement: function (cb) {
+		if (! Util.forEachStatement(cb, this._tryStatements))
 			return false;
-		if (! Util.forEachCodeElement(cb, this._catchStatements))
+		if (! Util.forEachStatement(cb, this._catchStatements))
 			return false;
-		if (! Util.forEachCodeElement(cb, this._finallyStatements))
+		if (! Util.forEachStatement(cb, this._finallyStatements))
 			return false;
+		return true;
+	},
+
+	forEachExpression: function (cb) {
 		return true;
 	}
 
@@ -1091,8 +1127,12 @@ var CatchStatement = exports.CatchStatement = Statement.extend({
 		return true;
 	},
 
-	forEachCodeElement: function (cb) {
-		return Util.forEachCodeElement(cb, this._statements);
+	forEachStatement: function (cb) {
+		return Util.forEachStatement(cb, this._statements);
+	},
+
+	forEachExpression: function (cb) {
+		return true;
 	}
 
 });
@@ -1133,8 +1173,10 @@ var ThrowStatement = exports.ThrowStatement = Statement.extend({
 		return true;
 	},
 
-	forEachCodeElement: function (cb) {
-		return cb(this._expr);
+	forEachExpression: function (cb) {
+		if (! cb(this._expr, function (expr) { this._expr = expr; }.bind(this)))
+			return false;
+		return true;
 	}
 
 });
@@ -1181,8 +1223,10 @@ var AssertStatement = exports.AssertStatement = InformationStatement.extend({
 		return true;
 	},
 
-	forEachCodeElement: function (cb) {
-		return cb(this._expr);
+	forEachExpression: function (cb) {
+		if (! cb(this._expr, function (expr) { this._expr = expr; }.bind(this)))
+			return false;
+		return true;
 	}
 
 });
@@ -1221,8 +1265,8 @@ var LogStatement = exports.LogStatement = InformationStatement.extend({
 		return true;
 	},
 
-	forEachCodeElement: function (cb) {
-		return Util.forEachCodeElement(cb, this._exprs);
+	forEachExpression: function (cb) {
+		return Util.forEachExpression(cb, this._exprs);
 	}
 
 });
@@ -1244,7 +1288,7 @@ var DebuggerStatement = exports.DebuggerStatement = InformationStatement.extend(
 		return true;
 	},
 
-	forEachCodeElement: function (cb) {
+	forEachExpression: function (cb) {
 		return true;
 	}
 

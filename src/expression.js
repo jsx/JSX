@@ -26,7 +26,7 @@ var Expression = exports.Expression = Class.extend({
 		return null;
 	},
 
-	forEachCodeElement: null, // function forEachCodeElement(cb : function (expr, replaceCb: function (expr) : void) : boolean
+	forEachExpression: null, // function forEachExpression(cb : function (expr, replaceCb: function (expr) : void) : boolean
 
 	assertIsAssignable: function (context, token, type) {
 		context.errors.push(new CompileError(token, "left-hand-side expression is not assignable"));
@@ -68,7 +68,7 @@ var LeafExpression = exports.LeafExpression = Expression.extend({
 		Expression.prototype.constructor.call(this, token);
 	},
 
-	forEachCodeElement: function (cb) {
+	forEachExpression: function (cb) {
 		return true;
 	}
 
@@ -158,6 +158,7 @@ var IdentifierExpression = exports.IdentifierExpression = LeafExpression.extend(
 	},
 
 	getType: function () {
+if (this._token.getValue() == "testBody" && this._local == null) throw new Error("Hmm");
 		if (this._local != null)
 			return this._local.getType();
 		else
@@ -463,8 +464,8 @@ var ArrayLiteralExpression = exports.ArrayLiteralExpression = Expression.extend(
 		return succeeded;
 	},
 
-	forEachCodeElement: function (cb) {
-		if (! Util.forEachCodeElement(cb, this._exprs))
+	forEachExpression: function (cb) {
+		if (! Util.forEachExpression(cb, this._exprs))
 			return false;
 		return true;
 	}
@@ -582,7 +583,7 @@ var MapLiteralExpression = exports.MapLiteralExpression = Expression.extend({
 		return succeeded;
 	},
 
-	forEachCodeElement: function (cb) {
+	forEachExpression: function (cb) {
 		for (var i = 0; i < this._elements.length; ++i)
 			if (! cb(this._elements[i].getExpr(), function (expr) { this._elements[i].setExpr(expr); }.bind(this)))
 				return false;
@@ -628,7 +629,7 @@ var ThisExpression = exports.ThisExpression = Expression.extend({
 		return new ObjectType(this._classDef);
 	},
 
-	forEachCodeElement: function (cb) {
+	forEachExpression: function (cb) {
 		return true;
 	}
 
@@ -657,7 +658,7 @@ var FunctionExpression = exports.FunctionExpression = Expression.extend({
 	},
 
 	analyze: function (context, parentExpr) {
-		this._funcDef.analyze(context);
+		var ret = this._funcDef.analyze(context);
 		return true; // return true since everything is resolved correctly even if analysis of the function definition failed
 	},
 
@@ -665,8 +666,8 @@ var FunctionExpression = exports.FunctionExpression = Expression.extend({
 		return new StaticFunctionType(this._funcDef.getReturnType(), this._funcDef.getArgumentTypes(), false);
 	},
 
-	forEachCodeElement: function (cb) {
-		return cb(this._funcDef, function (expr) { throw new Error("not yet implemented"); });
+	forEachExpression: function (cb) {
+		return true;
 	}
 
 });
@@ -702,7 +703,7 @@ var UnaryExpression = exports.UnaryExpression = OperatorExpression.extend({
 		return true;
 	},
 
-	forEachCodeElement: function (cb) {
+	forEachExpression: function (cb) {
 		return cb(this._expr, function (expr) { this._expr = expr; }.bind(this));
 	}
 
@@ -1165,7 +1166,7 @@ var BinaryExpression = exports.BinaryExpression = OperatorExpression.extend({
 		return true;
 	},
 
-	forEachCodeElement: function (cb) {
+	forEachExpression: function (cb) {
 		if (! cb(this._expr1, function (expr) { this._expr1 = expr; }.bind(this)))
 			return false;
 		if (! cb(this._expr2, function (expr) { this._expr2 = expr; }.bind(this)))
@@ -1592,7 +1593,7 @@ var ConditionalExpression = exports.ConditionalExpression = OperatorExpression.e
 		return this._type;
 	},
 
-	forEachCodeElement: function (cb) {
+	forEachExpression: function (cb) {
 		if (! cb(this._condExpr, function (expr) { this._condExpr = expr; }.bind(this)))
 			return false;
 		if (this._ifTrueExpr != null && ! cb(this._ifTrueExpr, function (expr) { this._ifTrueExpr = expr; }.bind(this)))
@@ -1668,10 +1669,10 @@ var CallExpression = exports.CallExpression = OperatorExpression.extend({
 		return this._expr.getType().getReturnType();
 	},
 
-	forEachCodeElement: function (cb) {
+	forEachExpression: function (cb) {
 		if (! cb(this._expr, function (expr) { this._expr = expr; }.bind(this)))
 			return false;
-		if (! Util.forEachCodeElement(this._args))
+		if (! Util.forEachExpression(this._args))
 			return false;
 		return true;
 	}
@@ -1743,8 +1744,8 @@ var SuperExpression = exports.SuperExpression = OperatorExpression.extend({
 		return this._funcType.getReturnType();
 	},
 
-	forEachCodeElement: function (cb) {
-		if (! Util.forEachCodeElement(this._args))
+	forEachExpression: function (cb) {
+		if (! Util.forEachExpression(this._args))
 			return false;
 		return true;
 	}
@@ -1819,8 +1820,8 @@ var NewExpression = exports.NewExpression = OperatorExpression.extend({
 		return this._constructor;
 	},
 
-	forEachCodeElement: function (cb) {
-		if (! Util.forEachCodeElement(this._args))
+	forEachExpression: function (cb) {
+		if (! Util.forEachExpression(this._args))
 			return false;
 		return true;
 	}
@@ -1866,7 +1867,7 @@ var CommaExpression = exports.CommaExpression = Expression.extend({
 		return this._expr2.getType();
 	},
 
-	forEachCodeElement: function (cb) {
+	forEachExpression: function (cb) {
 		if (! cb(this._expr1, function (expr) { this._expr1 = expr; }.bind(this)))
 			return false;
 		if (! cb(this._expr2, function (expr) { this._expr2 = expr; }.bind(this)))

@@ -70,10 +70,18 @@ var Util = exports.Util = Class.extend({
 		return true;
 	},
 
-	$forEachCodeElement: function (cb, elements) {
-		if (elements != null)
-			for (var i = 0; i < elements.length; ++i)
-				if (! cb(elements[i], function (expr) { elements[i] = expr; }))
+	$forEachStatement: function (cb, statements) {
+		if (statements != null)
+			for (var i = 0; i < statements.length; ++i)
+				if (! cb(statements[i]))
+					return false;
+		return true;
+	},
+
+	$forEachExpression: function (cb, exprs) {
+		if (exprs != null)
+			for (var i = 0; i < exprs.length; ++i)
+				if (! cb(exprs[i], function (expr) { exprs[i] = expr; }.bind(this)))
 					return false;
 		return true;
 	},
