@@ -295,7 +295,7 @@ var _InlineOptimizeCommand = exports._InlineOptimizeCommand = _FunctionOptimizeC
 			var expr = statement.getExpr();
 			if (expr instanceof CallExpression) {
 				// inline if the entire statement is a single call expression
-				var args = this._getArgumentsIfCallExpressionIsInlineable(expr);
+				var args = this._getArgsAndThisIfCallExprIsInlineable(expr);
 				if (args != null) {
 					statements.splice(stmtIndex, 1);
 					stmtIndex = this._expandCallingFunction(statements, stmtIndex, expr.getCallingFuncDef(), args);
@@ -308,7 +308,7 @@ var _InlineOptimizeCommand = exports._InlineOptimizeCommand = _FunctionOptimizeC
 				&& this._lhsHasNoSideEffects(expr.getFirstExpr())
 				&& expr.getSecondExpr() instanceof CallExpression) {
 				// inline if the statement is an assignment of a single call expression into a local variable
-				var args = this._getArgumentsIfCallExpressionIsInlineable(expr.getSecondExpr());
+				var args = this._getArgsAndThisIfCallExprIsInlineable(expr.getSecondExpr());
 				if (args != null) {
 					statements.splice(stmtIndex, 1);
 					stmtIndex = this._expandCallingFunction(statements, stmtIndex, expr.getSecondExpr().getCallingFuncDef(), args);
@@ -342,7 +342,7 @@ var _InlineOptimizeCommand = exports._InlineOptimizeCommand = _FunctionOptimizeC
 		return false;
 	},
 
-	_getArgumentsIfCallExpressionIsInlineable: function (callExpr) {
+	_getArgsAndThisIfCallExprIsInlineable: function (callExpr) {
 		// determine the function that will be called
 		var callingFuncDef = callExpr.getCallingFuncDef();
 		if (callingFuncDef == null)
@@ -356,21 +356,28 @@ var _InlineOptimizeCommand = exports._InlineOptimizeCommand = _FunctionOptimizeC
 			var calleeExpr = callExpr.getExpr();
 			if (! (calleeExpr instanceof PropertyExpression))
 				throw new Error("unexpected type of expression");
-			if (! (calleeExpr.getExpr() instanceof ThisExpression))
+			var receiverExpr = calleeExpr.getExpr();
+			if (receiverExpr instanceof IdentifierExpression
+				|| receiverExpr instanceof ThisExpression) {
+				// ok
+			} else {
 				return null;
+			}
 		}
 		// check that the function may be inlined
 		if (! this._canInlineFunction(callingFuncDef))
 			return null;
 		// and the args passed can be inlined (types should match exactly (or emitters may insert additional code))
-		var args = callExpr.getArguments();
-		for (var i = 0; i < args.length; ++i) {
-			if (! (args[i] instanceof LeafExpression))
+		var argsAndThis = callExpr.getArguments();
+		for (var i = 0; i < argsAndThis.length; ++i) {
+			if (! (argsAndThis[i] instanceof LeafExpression))
 				return null;
-			if (! args[i].getType().equals(callingFuncDef.getArgumentTypes()[i]))
+			if (! argsAndThis[i].getType().equals(callingFuncDef.getArgumentTypes()[i]))
 				return null;
 		}
-		return args;
+		if ((callingFuncDef.flags() & ClassDefinition.IS_STATIC) == 0)
+			argsAndThis.push(receiverExpr);
+		return argsAndThis;
 	},
 
 	_canInlineFunction: function (funcDef) {
@@ -421,7 +428,7 @@ var _InlineOptimizeCommand = exports._InlineOptimizeCommand = _FunctionOptimizeC
 		return this.getStash(funcDef).isInlineable;
 	},
 
-	_expandCallingFunction: function (statements, stmtIndex, callingFuncDef, args) {
+	_expandCallingFunction: function (statements, stmtIndex, callingFuncDef, argsAndThis) {
 		// clone statements of the calling function, while rewriting the identifiers with actual arguments
 		this.log("expanding " + _Util.getFuncName(callingFuncDef));
 		var callingStatements = callingFuncDef.getStatements();
@@ -431,13 +438,16 @@ var _InlineOptimizeCommand = exports._InlineOptimizeCommand = _FunctionOptimizeC
 			// replace the arguments with actual arguments
 			statement.forEachExpression(function onExpr(expr, replaceCb) {
 				if (expr instanceof IdentifierExpression && expr.getLocal() != null) {
-					for (var j = 0; j < args.length; ++j) {
-						if (callingFuncDef.getArguments()[j].getName().getValue() == expr.getToken().getValue())
+					var formalArgs = callingFuncDef.getArguments();
+					for (var j = 0; j < formalArgs.length; ++j) {
+						if (formalArgs[j].getName().getValue() == expr.getToken().getValue())
 							break;
 					}
-					if (j == args.length)
+					if (j == formalArgs.length)
 						throw new Error("logic flaw, could not find formal parameter named " + expr.getToken().getValue());
-					replaceCb(args[j].clone());
+					replaceCb(argsAndThis[j].clone());
+				} else if (expr instanceof ThisExpression) {
+					replaceCb(argsAndThis[argsAndThis.length - 1].clone());
 				}
 				return expr.forEachExpression(onExpr.bind(this));
 			}.bind(this));
