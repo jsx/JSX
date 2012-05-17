@@ -390,6 +390,18 @@ var _InlineOptimizeCommand = exports._InlineOptimizeCommand = _FunctionOptimizeC
 				}
 				if (! (i == statements.length || (i == statements.length - 1 && statements[i] instanceof ReturnStatement)))
 					return false;
+				// no modification of arguments
+				var modifiesArgs = ! Util.forEachStatement(function onStatement(statement) {
+					var onExpr = function onExpr(expr) {
+						if (expr instanceof AssignmentExpression && expr.getFirstExpr() instanceof IdentifierExpression)
+							return false;
+						return expr.forEachExpression(onExpr.bind(this));
+					};
+					return statement.forEachExpression(onExpr.bind(this));
+				}, statements);
+				if (modifiesArgs) {
+					return false;
+				}
 				// no function expression
 				var hasFuncExpr = ! Util.forEachStatement(function onStatement(statement) {
 					var onExpr = function onExpr(expr) {
