@@ -19,7 +19,11 @@ var Optimizer = exports.Optimizer = Class.extend({
 	setup: function (cmds) {
 		for (var i = 0; i < cmds.length; ++i) {
 			var cmd = cmds[i];
-			if (cmd == "inline") {
+			if (cmd == "no-assert") {
+				this._commands.push(new _NoAssertCommand());
+			} else if (cmd == "no-log") {
+				this._commands.push(new _NoLogCommand());
+			} else if (cmd == "inline") {
 				this._commands.push(new _InlineOptimizeCommand());
 			} else if (cmd == "return-if") {
 				this._commands.push(new _ReturnIfOptimizeCommand());
@@ -160,10 +164,56 @@ var _FunctionOptimizeCommand = exports._FunctionOptimizeCommand = _OptimizeComma
 
 });
 
+var _NoAssertCommand = exports._NoAssertCommand = _FunctionOptimizeCommand.extend({
+
+	constructor: function () {
+		_FunctionOptimizeCommand.prototype.constructor.call(this, "no-assert");
+	},
+
+	_optimizeFunction: function (funcDef) {
+		this._optimizeStatements(funcDef.getStatements());
+	},
+
+	_optimizeStatements: function (statements) {
+		for (var i = 0; i < statements.length;) {
+			if (statements[i] instanceof AssertStatement) {
+				statements.splice(i, 1);
+			} else {
+				_OptimizeCommand.handleSubStatements(this._optimizeStatements.bind(this), statements[i]);
+				++i;
+			}
+		}
+	}
+
+});
+
+var _NoLogCommand = exports._NoAssertCommand = _FunctionOptimizeCommand.extend({
+
+	constructor: function () {
+		_FunctionOptimizeCommand.prototype.constructor.call(this, "no-log");
+	},
+
+	_optimizeFunction: function (funcDef) {
+		this._optimizeStatements(funcDef.getStatements());
+	},
+
+	_optimizeStatements: function (statements) {
+		for (var i = 0; i < statements.length;) {
+			if (statements[i] instanceof LogStatement) {
+				statements.splice(i, 1);
+			} else {
+				_OptimizeCommand.handleSubStatements(this._optimizeStatements.bind(this), statements[i]);
+				++i;
+			}
+		}
+	}
+
+});
+
 var _InlineOptimizeCommand = exports._InlineOptimizeCommand = _FunctionOptimizeCommand.extend({
 
 	constructor: function () {
-		_OptimizeCommand.prototype.constructor.call(this, "inline");
+		_FunctionOptimizeCommand.prototype.constructor.call(this, "inline");
 	},
 
 	_createStash: function () {

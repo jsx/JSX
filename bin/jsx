@@ -111,9 +111,7 @@ var JSX = Class.extend({
 			"  --mode (compile|parse)     compilation mode (default:compile)\n" +
 			"  --target (javascript|c++)  target language (default:javascript)\n" +
 			"  --release                  omits the debugging features from the generated code (run-time type checking, logging, assertion)\n" +
-			"  --optimize cmd1,cmd2,...   list of optimize commands (inline, return-if)\n" +
-			"  --enable-assert            enables the 'assert' statement\n" +
-			"  --enable-log               enables the 'log' statement\n" +
+			"  --optimize cmd1,cmd2,...   list of optimize commands (no-assert, no-log, inline, return-if)\n" +
 			"  --enable-type-check        enables run-time type checking\n" +
 			"  --version                  displays the version and exits\n" +
 			"  --help                     displays this help and exits\n" +
@@ -204,11 +202,9 @@ var JSX = Class.extend({
 				break;
 			case "--release":
 				tasks.push(function () {
-					emitter.setEnableAssertion(false);
-					emitter.setEnableLogging(false);
 					emitter.setEnableRunTimeTypeCheck(false);
 				});
-				optimizeCommands = [ "return-if", "inline" ];
+				optimizeCommands = [ "no-assert", "no-log", "return-if", "inline" ];
 				break;
 			case "--optimize":
 				if ((optarg = getoptarg()) == null)
@@ -238,20 +234,6 @@ var JSX = Class.extend({
 				if (switchOpt != null) {
 					var mode = switchOpt[1] == "enable";
 					switch (switchOpt[2]) {
-					case "assert":
-						tasks.push(function (mode) {
-							return function () {
-								emitter.setEnableAssertion(mode);
-							};
-						}(mode));
-						break NEXTOPT;
-					case "log":
-						tasks.push(function (mode) {
-							return function () {
-								emitter.setEnableLogging(mode);
-							};
-						}(mode));
-						break NEXTOPT;
 					case "type-check":
 						tasks.push(function (mode) {
 							return function () {

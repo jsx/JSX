@@ -462,8 +462,6 @@ var _AssertStatementEmitter = exports._AssertStatementEmitter = _StatementEmitte
 	},
 
 	emit: function () {
-		if (! this._emitter._enableAssertion)
-			return;
 		var condExpr = this._statement._expr;
 		this._emitter._emitAssertion(function () {
 			this._emitter._getExpressionEmitterFor(condExpr).emit(0);
@@ -480,8 +478,6 @@ var _LogStatementEmitter = exports._LogStatementEmitter = _StatementEmitter.exte
 	},
 
 	emit: function () {
-		if (! this._emitter._enableLogging)
-			return;
 		this._emitter._emit("console.log(", null);
 		var exprs = this._statement.getExprs();
 		for (var i = 0; i < exprs.length; ++i) {
@@ -1505,8 +1501,6 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 		this._emittingClass = null;
 		this._emittingFunction = null;
 		this._emittingStatementStack = [];
-		this._enableAssertion = true;
-		this._enableLogging = true;
 		this._enableRunTimeTypeCheck = true;
 	},
 
@@ -1531,14 +1525,6 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 
 	setSourceMapGenerator: function (gen) {
 		this._sourceMapGen = gen;
-	},
-
-	setEnableAssertion: function (enable) {
-		this._enableAssertion = enable;
-	},
-
-	setEnableLogging: function (enable) {
-		this._enableLogging = enable;
 	},
 
 	setEnableRunTimeTypeCheck: function (enable) {

@@ -8,10 +8,6 @@ var Emitter = exports.Emitter = Class.extend({
 
 	setOutputFile: null, // abstract function setOutputFile(:string) :void
 
-	setEnableAssertion: null, // abstract function setEnableAssertion(: boolean) : void
-
-	setEnableLogging: null, // abstract function setEnableLogging(: boolean) : void
-
 	setEnableRunTimeTypeCheck: null, // abstract function setEnableRunTimeTypeCheck(: boolean) : void
 
 	emit: null, // abstract function emitClassDefinition(:ClassDefinition[]):void
