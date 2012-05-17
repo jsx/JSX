@@ -323,7 +323,7 @@ var _InlineOptimizeCommand = exports._InlineOptimizeCommand = _FunctionOptimizeC
 				}
 			}
 		} else {
-			altered = _Util.handleSubStatements(this._handleStatement.bind(this), statement);
+			altered = _Util.handleSubStatements(this._handleStatements.bind(this), statement);
 		}
 		return altered;
 	},
