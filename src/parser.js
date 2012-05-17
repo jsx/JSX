@@ -537,7 +537,9 @@ var Parser = exports.Parser = Class.extend({
 			lineNumber: this._lineNumber,
 			tokenLength: this._tokenLength,
 			// errors
-			numErrors: this._errors.length
+			numErrors: this._errors.length,
+			// closures
+			numClosures: this._closures.length,
 		};
 	},
 
@@ -546,6 +548,7 @@ var Parser = exports.Parser = Class.extend({
 		this._lineNumber = state.lineNumber;
 		this._tokenLength = state.tokenLength;
 		this._errors.length = state.numErrors;
+		this._closures.splice(state.numClosures);
 	},
 
 	_getColumn: function () {
