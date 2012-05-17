@@ -44,6 +44,8 @@ var $__jsx_parseFloat = parseFloat;
 var $__jsx_isNaN = isNaN;
 var $__jsx_isFinite = isFinite;
 
+var $__jsx_hasOwnProperty = Object.prototype.hasOwnProperty;
+
 /*
  * public interface to JSX code
  */

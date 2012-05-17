@@ -1349,7 +1349,7 @@ var _CallExpressionEmitter = exports._CallExpressionEmitter = _OperatorExpressio
 	},
 
 	_emit: function () {
-		if (this._emitIfIsInvoke())
+		if (this._emitSpecial())
 			return;
 		// normal case
 		var calleeExpr = this._expr.getExpr();
@@ -1370,11 +1370,19 @@ var _CallExpressionEmitter = exports._CallExpressionEmitter = _OperatorExpressio
 		_CallExpressionEmitter._operatorPrecedence = precedence;
 	},
 
-	_emitIfIsInvoke: function () {
+	_emitSpecial: function () {
 		// return false if is not js.apply
 		var calleeExpr = this._expr.getExpr();
 		if (! (calleeExpr instanceof PropertyExpression))
 			return false;
+		if (this._emitIfJsInvoke(calleeExpr))
+			return true;
+		else if (this._emitIfObjectHasOwnProperty(calleeExpr))
+			return true;
+		return false;
+	},
+
+	_emitIfJsInvoke: function (calleeExpr) {
 		if (! (calleeExpr.getType() instanceof StaticFunctionType))
 			return false;
 		if (calleeExpr.getIdentifierToken().getValue() != "invoke")
@@ -1400,6 +1408,26 @@ var _CallExpressionEmitter = exports._CallExpressionEmitter = _OperatorExpressio
 			this._emitter._getExpressionEmitterFor(args[2]).emit(0);
 			this._emitter._emit("))", this._expr.getToken());
 		}
+		return true;
+	},
+
+	_emitIfObjectHasOwnProperty: function (calleeExpr) {
+		// NOTE once we support member function references, we need to add special handling in _PropertyExpressionEmitter as well
+		if (calleeExpr.getType() instanceof StaticFunctionType)
+			return false;
+		if (calleeExpr.getIdentifierToken().getValue() != "hasOwnProperty")
+			return false;
+		var classDef = calleeExpr.getExpr().getType().getClassDef();
+		if (! (classDef instanceof InstantiatedClassDefinition))
+			return false;
+		if (classDef.getTemplateClassName() != "Map")
+			return false;
+		// emit
+		this._emitter._emit("$__jsx_hasOwnProperty.call(", calleeExpr.getToken());
+		this._emitter._getExpressionEmitterFor(calleeExpr.getExpr()).emit(0);
+		this._emitter._emit(", ", calleeExpr.getToken());
+		this._emitter._getExpressionEmitterFor(this._expr.getArguments()[0]).emit(0);
+		this._emitter._emit(")", calleeExpr.getToken());
 		return true;
 	}
 
