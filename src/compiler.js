@@ -16,7 +16,7 @@ var Compiler = exports.Compiler = Class.extend({
 	constructor: function (platform) {
 		this._platform = platform;
 		this._mode = Compiler.MODE_COMPILE;
-		this._enableInlining = false;
+		this._optimizer = null;
 		this._parsers = [];
 		this._fileCache = {};
 		this._searchPaths = [ this._platform.getRoot() + "/lib/common" ];
@@ -44,6 +44,10 @@ var Compiler = exports.Compiler = Class.extend({
 
 	setEmitter: function (emitter) {
 		this._emitter = emitter;
+	},
+
+	setOptimizer: function (optimizer) {
+		this._optimizer = optimizer;
 	},
 
 	setEnableInlining: function (mode) {
@@ -309,11 +313,8 @@ var Compiler = exports.Compiler = Class.extend({
 	},
 
 	_optimize: function () {
-		var Optimizer = require("./optimizer");
-		if (this._enableInlining) {
-			new Optimizer.ReturnIfOptimizer().init(this).performOptimization();
-			new Optimizer.InlineOptimizer().init(this).performOptimization();
-		}
+		if (this._optimizer != null)
+			this._optimizer.setCompiler(this).performOptimization();
 	},
 
 	_generateCode: function () {

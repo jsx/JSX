@@ -10,31 +10,79 @@ eval(Class.$import("./util"));
 
 var Optimizer = exports.Optimizer = Class.extend({
 
-	constructor: function (identifier) {
-		this._identifier = identifier;
+	constructor: function () {
 		this._compiler = null;
+		this._commands = [];
 		this._log = [];
 	},
 
-	init: function (compiler) {
+	setup: function (cmds) {
+		for (var i = 0; i < cmds.length; ++i) {
+			var cmd = cmds[i];
+			if (cmd == "inline") {
+				this._commands.push(new _InlineOptimizeCommand());
+			} else if (cmd == "return-if") {
+				this._commands.push(new _ReturnIfOptimizeCommand());
+			} else {
+				return "unknown optimization command: " + cmd;
+			}
+		}
+		return null;
+	},
+
+	setCompiler: function (compiler) {
 		this._compiler = compiler;
 		return this;
 	},
 
+	getCompiler: function () {
+		return this._compiler;
+	},
+
 	performOptimization: function () {
-		try {
-			this.log("starting optimizer: " + this._identifier);
-			this.doPerformOptimization();
-			this.log("finished optimizer: " + this._identifier);
-		} catch (e) {
-			console.error("optimizer '" + this._identifier + "' died unexpectedly, dumping the logs");
-			this.dumpLogs(this._log);
-			throw e;
+		for (var i = 0; i < this._commands.length; ++i) {
+			try {
+				this.log("starting optimizer: " + this._identifier);
+				this._commands[i].setOptimizer(this).performOptimization();
+				this.log("finished optimizer: " + this._identifier);
+			} catch (e) {
+				console.error("optimizer '" + this._identifier + "' died unexpectedly, dumping the logs");
+				this.dumpLogs(this._log);
+				throw e;
+			}
 		}
 		//this.dumpLogs();
 	},
 
-	doPerformOptimization: null, // function doPerformOptimization() : void
+	log: function (message) {
+		this._log.push(message);
+	},
+
+	dumpLogs: function () {
+		for (var i = 0; i < this._log.length; ++i) {
+			console.error(this._log[i]);
+		}
+	}
+
+});
+
+var _OptimizeCommand = exports._OptimizeCommand = Class.extend({
+
+	constructor: function (identifier) {
+		this._identifier = identifier;
+		this._optimizer = null;
+	},
+
+	setOptimizer: function (optimizer) {
+		this._optimizer = optimizer;
+		return this;
+	},
+
+	getCompiler: function () {
+		return this._optimizer.getCompiler();
+	},
+
+	performOptimization: null, // function performOptimization() : void
 
 	getStash: function (stashable) {
 		var stash = stashable.getOptimizerStash();
@@ -49,13 +97,7 @@ var Optimizer = exports.Optimizer = Class.extend({
 	},
 
 	log: function (message) {
-		this._log.push(message);
-	},
-
-	dumpLogs: function () {
-		for (var i = 0; i < this._log.length; ++i) {
-			console.error(this._log[i]);
-		}
+		this._optimizer.log(message);
 	},
 
 	$handleSubStatements: function (cb, statement) {
@@ -92,20 +134,20 @@ var Optimizer = exports.Optimizer = Class.extend({
 
 });
 
-var FunctionOptimizer = exports.FunctionOptimizer = Optimizer.extend({
+var _FunctionOptimizeCommand = exports._FunctionOptimizeCommand = _OptimizeCommand.extend({
 
 	constructor: function (identifier) {
-		Optimizer.prototype.constructor.call(this, identifier);
+		_OptimizeCommand.prototype.constructor.call(this, identifier);
 	},
 
-	doPerformOptimization: function () {
-		this._compiler.forEachClassDef(function (parser, classDef) {
+	performOptimization: function () {
+		this.getCompiler().forEachClassDef(function (parser, classDef) {
 			if ((classDef.flags() & ClassDefinition.IS_NATIVE) == 0) {
 				classDef.forEachMemberFunction(function (funcDef) {
 					if ((funcDef.flags() & (ClassDefinition.IS_NATIVE | ClassDefinition.IS_ABSTRACT)) == 0) {
-						this.log("starting optimization of " + Optimizer.getFuncName(funcDef));
+						this.log("starting optimization of " + _OptimizeCommand.getFuncName(funcDef));
 						this._optimizeFunction(funcDef);
-						this.log("finished optimization of " + Optimizer.getFuncName(funcDef));
+						this.log("finished optimization of " + _OptimizeCommand.getFuncName(funcDef));
 					}
 					return true;
 				}.bind(this));
@@ -118,10 +160,10 @@ var FunctionOptimizer = exports.FunctionOptimizer = Optimizer.extend({
 
 });
 
-var InlineOptimizer = exports.InlineOptimizer = FunctionOptimizer.extend({
+var _InlineOptimizeCommand = exports._InlineOptimizeCommand = _FunctionOptimizeCommand.extend({
 
 	constructor: function () {
-		FunctionOptimizer.prototype.constructor.call(this, "inline");
+		_OptimizeCommand.prototype.constructor.call(this, "inline");
 	},
 
 	_createStash: function () {
@@ -140,9 +182,9 @@ var InlineOptimizer = exports.InlineOptimizer = FunctionOptimizer.extend({
 		// we need to the check here since functions might recurse
 		if ((funcDef.flags() & (ClassDefinition.IS_NATIVE | ClassDefinition.IS_ABSTRACT)) != 0)
 			return;
-		this.log("* starting optimization of " + Optimizer.getFuncName(funcDef));
+		this.log("* starting optimization of " + _OptimizeCommand.getFuncName(funcDef));
 		this._handleStatements(funcDef.getStatements());
-		this.log("* finished optimization of " + Optimizer.getFuncName(funcDef));
+		this.log("* finished optimization of " + _OptimizeCommand.getFuncName(funcDef));
 	},
 
 	_handleStatements: function (statements) {
@@ -185,7 +227,7 @@ var InlineOptimizer = exports.InlineOptimizer = FunctionOptimizer.extend({
 				}
 			}
 		} else {
-			Optimizer.handleSubStatements(this._handleStatement.bind(this), statement);
+			_OptimizeCommand.handleSubStatements(this._handleStatement.bind(this), statement);
 		}
 	},
 
@@ -262,14 +304,14 @@ var InlineOptimizer = exports.InlineOptimizer = FunctionOptimizer.extend({
 				}
 				return true;
 			}.call(this);
-			this.log(Optimizer.getFuncName(funcDef) + (this.getStash(funcDef).isInlineable ? " is" : " is not") + " inlineable");
+			this.log(_OptimizeCommand.getFuncName(funcDef) + (this.getStash(funcDef).isInlineable ? " is" : " is not") + " inlineable");
 		}
 		return this.getStash(funcDef).isInlineable;
 	},
 
 	_expandCallingFunction: function (statements, stmtIndex, callingFuncDef, args) {
 		// clone statements of the calling function, while rewriting the identifiers with actual arguments
-		this.log("expanding " + Optimizer.getFuncName(callingFuncDef));
+		this.log("expanding " + _OptimizeCommand.getFuncName(callingFuncDef));
 		var callingStatements = callingFuncDef.getStatements();
 		for (var i = 0; i < callingStatements.length; ++i) {
 			// clone the statement
@@ -299,10 +341,10 @@ var InlineOptimizer = exports.InlineOptimizer = FunctionOptimizer.extend({
 /*
 	for the reasoning of this optimization see http://jsperf.com/if-vs-condexpr
 */
-var ReturnIfOptimizer = exports.ReturnIfOptimizer = FunctionOptimizer.extend({
+var _ReturnIfOptimizeCommand = exports._ReturnIfOptimizeCommand = _FunctionOptimizeCommand.extend({
 
 	constructor: function () {
-		FunctionOptimizer.prototype.constructor.call(this, "return-if");
+		_OptimizeCommand.prototype.constructor.call(this, "return-if");
 	},
 
 	_optimizeFunction: function (funcDef) {

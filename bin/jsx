@@ -7,6 +7,7 @@ var Class = require("../src/Class");
 eval(Class.$import("../src/compiler"));
 eval(Class.$import("../src/platform"));
 eval(Class.$import("../src/jsemitter"));
+eval(Class.$import("../src/optimizer"));
 eval(Class.$import("../src/util"));
 
 "use strict";
@@ -110,8 +111,8 @@ var JSX = Class.extend({
 			"  --mode (compile|parse)     compilation mode (default:compile)\n" +
 			"  --target (javascript|c++)  target language (default:javascript)\n" +
 			"  --release                  omits the debugging features from the generated code (run-time type checking, logging, assertion)\n" +
+			"  --optimize cmd1,cmd2,...   list of optimize commands (inline, return-if)\n" +
 			"  --enable-assert            enables the 'assert' statement\n" +
-			"  --enable-inline            enables function inlining\n" +
 			"  --enable-log               enables the 'log' statement\n" +
 			"  --enable-type-check        enables run-time type checking\n" +
 			"  --version                  displays the version and exits\n" +
@@ -153,6 +154,7 @@ var JSX = Class.extend({
 		var outputFile = null;
 		var executable = false;
 		var run = null;
+		var optimizeCommands = [];
 		var opt, optarg;
 		while ((opt = getopt()) != null) {
 		NEXTOPT:
@@ -205,8 +207,13 @@ var JSX = Class.extend({
 					emitter.setEnableAssertion(false);
 					emitter.setEnableLogging(false);
 					emitter.setEnableRunTimeTypeCheck(false);
-					compiler.setEnableInlining(true);
 				});
+				optimizeCommands = [ "return-if", "inline" ];
+				break;
+			case "--optimize":
+				if ((optarg = getoptarg()) == null)
+					process.exit(1);
+				optimizeCommands = optarg.split(",");
 				break;
 			case "--executable":
 				executable = true;
@@ -235,13 +242,6 @@ var JSX = Class.extend({
 						tasks.push(function (mode) {
 							return function () {
 								emitter.setEnableAssertion(mode);
-							};
-						}(mode));
-						break NEXTOPT;
-					case "inline":
-						tasks.push(function (mode) {
-							return function () {
-								compiler.setEnableInlining(mode);
 							};
 						}(mode));
 						break NEXTOPT;
@@ -298,6 +298,14 @@ var JSX = Class.extend({
 		tasks.forEach(function(proc) { proc(); });
 
 		compiler.setEmitter(emitter);
+
+		var optimizer = new Optimizer();
+		var err = optimizer.setup(optimizeCommands);
+		if (err != null) {
+			console.error(err);
+			process.exit(1);
+		}
+		compiler.setOptimizer(optimizer);
 
 		if (! compiler.compile())
 			process.exit(1);
