@@ -1495,7 +1495,7 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 
 	constructor: function (platform) {
 		this._platform = platform;
-		this._output = "";
+		this._output = this._platform.load(this._platform.getRoot() + "/src/js/bootstrap.js");
 		this._outputFile = null;
 		this._indent = 0;
 		this._emittingClass = null;
@@ -1654,8 +1654,7 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 	},
 
 	getOutput: function (sourceFile, entryPoint) {
-		var output = this._platform.load(this._platform.getRoot() + "/src/js/bootstrap.js") + "\n" +
-			this._output + "\n" +
+		var output = this._output + "\n" +
 			"}());\n";
 		if (entryPoint != null) {
 			output = this._platform.addLauncher(this, this._encodeFilename(sourceFile), output, entryPoint);
