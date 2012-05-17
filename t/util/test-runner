@@ -19,6 +19,14 @@ BEGIN { # XXX older version of Test::More has no note()
     }
 }
 
+sub bench {
+    my ($f) = @_;
+    require Time::HiRes;
+    my $start = Time::HiRes::time();
+    my $ret = $f->();
+    return ($ret, Time::HiRes::time() - $start);
+}
+
 sub main {
     my($file) = @_ or die "no args";
 
@@ -38,6 +46,9 @@ sub main {
     }
     elsif($file =~ m{ /optimize/ }xms) {
         optimize_and_compare($file);
+    }
+    elsif($file =~ m{ /optimize-bench/ }xms) {
+        optimize_and_compare($file, 1);
     }
     else {
         plan tests => 1;
@@ -122,7 +133,7 @@ sub compile_and_run {
 }
 
 sub optimize_and_compare {
-    my ($file) = @_;
+    my ($file, $do_bench) = @_;
 
     plan skip_all => 'environment variable JSX_OPTS is set'
         if defined $ENV{JSX_OPTS};
@@ -133,6 +144,7 @@ sub optimize_and_compare {
         or die "could not find EXPECTED in file:$file\n";
     defined(my $opts = get_section($file, "JSX_OPTS"))
         or die "cloud not ifnd JSX_OPTIONS in file:$file\n";
+
     chomp $opts;
 
     # compile, run, and check (wo. optimization)
@@ -140,7 +152,8 @@ sub optimize_and_compare {
         fail "compile '$file' failed: $?";
         return;
     };
-    defined (my $output = run_compiled($file, $src)) or do {
+    my ($output, $elapsed) = bench(sub { run_compiled($file, $src) });
+    defined $output or do {
         fail "failed to execute compiled script";
         return;
     };
@@ -159,11 +172,30 @@ sub optimize_and_compare {
         fail "no change by optimization found in the generated code";
         return;
     }
-    defined ($output = run_compiled($file, $src_optimized)) or do {
+    ($output, my $elapsed_optimized) = bench(sub { run_compiled($file, $src_optimized) });
+    defined $output or do {
         fail "failed to execute compiled script with optimization: $opts";
         return;
     };
-    is $output, $expected, $file;
+    if (! $do_bench || $output ne $expected) {
+        is $output, $expected, $file;
+        return;
+    }
+
+    # check the times
+    if ($do_bench) {
+        if ($elapsed < 0.5) {
+            fail "$file (unoptimized) exited too early ($elapsed seconds)";
+            return;
+        }
+        if ($elapsed_optimized < 0.5) {
+            fail "$file (optimized) exited too early ($elapsed_optimized seconds)";
+            return;
+        }
+        my $ratio = ($elapsed / $elapsed_optimized) * 100 - 100;
+        cmp_ok $ratio, '>=', 5, "$file - $ratio\% faster by optimization";
+        diag "$file - $ratio\% faster by optimization";
+    }
 }
 
 sub expect_compile_error {

@@ -1,9 +1,14 @@
 
 JOBS:=4
 
+all:
+
 # e.g. make test JOBS=2
 test:
 	prove --jobs "$(JOBS)" t/*.t t/*/*.jsx
+
+optimize-bench:
+	prove xt/optimize-bench/*.jsx
 
 web:
 	perl web/build.pl
