@@ -7,6 +7,7 @@ window.addEventListener("DOMContentLoaded", function(e) {
 		if(script.type === "application/jsx") {
 			var platform = new BrowserPlatform("../..");
 			var c = new jsx.Compiler(platform);
+			var o = new jsx.Optimizer();
 			var emitter = new jsx.JavaScriptEmitter(platform);
 			c.setEmitter(emitter);
 
@@ -19,10 +20,11 @@ window.addEventListener("DOMContentLoaded", function(e) {
 			}
 
 			if(jsx.enableOptimizations) {
-				emitter.setEnableAssertion(false);
-				//emitter.setEnableLogging(false);
+				o.setup([ "no-assert", "return-if", "inline" ]);
 				emitter.setEnableRunTimeTypeCheck(false);
 			}
+
+			c.setOptimizer(o);
 
 			if(! c.compile()) {
 				throw new Error("Failed to compile!");

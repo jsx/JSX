@@ -65,7 +65,9 @@ window.addEventListener('load', function(e) {
 
 		var c = new jsx.Compiler(platform);
 		var emitter = new jsx.JavaScriptEmitter(platform);
+		var o = new jsx.Optimizer();
 		c.setEmitter(emitter);
+		c.setOptimizer(o);
 
 		switch(options.mode) {
 		case "run":
@@ -94,7 +96,7 @@ window.addEventListener('load', function(e) {
 			}
 
 			var out = emitter.getOutput().replace(/\t/g, "  ");
-			out += "Test.run$();\n";
+			out += "JSX.require('input').Test.run$();\n";
 
 			var level = getOptimizationLevel();
 			if(level > 0 && options.mode !== 'parse') {

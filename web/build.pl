@@ -61,13 +61,7 @@ sub process_jsx {
     } or die "Cannot find browserbuild."
        . " Please install it with `npm install`\n";
 
-   my @files;
-   find {
-        no_chdir => 1,
-        wanted   => sub {
-            push @files, $_ if $_ =~ /\.js$/;
-        },
-    }, $src;
+    my @files = glob("$src/*.js");
     my $cmd = "$build --main web-interface --global jsx --basepath '$src/' "
         . join(' ', map { shell_quote($_) } @files)
         . " > "
