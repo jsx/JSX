@@ -24,6 +24,6 @@ web:
 	cp example/fib.jsx web/source-map/example/
 
 server:
-	perl web/app.psgi
+	node web/server.js
 
 .PHONY: test web server

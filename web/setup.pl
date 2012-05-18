@@ -10,11 +10,10 @@ my $root = ROOT;
 my $cpanm = 'http://cpanmin.us/';
 
 my @modules = qw(
-    Plack
-    File::Which
     String::ShellQuote
     JSON::PP
 );
 
-system("curl -L $cpanm | $^X - --notest '-l$root/extlib' @modules") == 0 or die "Cannot setup!";
+system("curl -L $cpanm | $^X - --notest '-l$root/extlib' @modules") == 0
+    or die "Failed to setup!";
 

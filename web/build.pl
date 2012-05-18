@@ -9,7 +9,6 @@ use lib ROOT . "/extlib/lib/perl5";
 
 use Fatal          qw(open close);
 use File::Find     qw(find);
-use File::Which    qw(which);
 use String::ShellQuote qw(shell_quote);
 use JSON::PP qw();
 
@@ -54,15 +53,11 @@ sub process_top_page {
 
 sub process_jsx {
     my($src, $dest) = @_;
-    my $build = do {
-        local $ENV{PATH} = "node_modules/browserbuild/bin"
-                           . ":" . $ENV{PATH};
-        which('browserbuild');
-    } or die "Cannot find browserbuild."
-       . " Please install it with `npm install`\n";
+    local $ENV{PATH} = "node_modules/browserbuild/bin"
+                       . ":" . $ENV{PATH};
 
     my @files = glob("$src/*.js");
-    my $cmd = "$build --main web-interface --global jsx --basepath '$src/' "
+    my $cmd = "browserbuild --main web-interface --global jsx --basepath '$src/' "
         . join(' ', map { shell_quote($_) } @files)
         . " > "
         . shell_quote($dest);
