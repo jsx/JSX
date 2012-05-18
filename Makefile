@@ -12,7 +12,7 @@ optimize-bench:
 
 web:
 	perl web/build.pl
-	bin/jsx --output fib.js example/fib.jsx
+	bin/jsx --enable-source-map --output fib.js example/fib.jsx
 	mkdir -p web/source-map
 	mv fib.js web/source-map/
 	mv fib.js.mapping web/source-map/
