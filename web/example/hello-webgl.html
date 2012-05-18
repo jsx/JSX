@@ -68,6 +68,30 @@
           <p><a class="btn btn-primary btn-large" id="run">Run the script</a></p>
         </div>
       </div>
+      <!-- for WebGL -->
+      <canvas id='webgl-canvas' width='256px' height='256px'></canvas>
+      <script id='vshader' type='x-shader/x-vertex'>
+        precision mediump float;
+
+        attribute vec3 position;
+        attribute vec4 color;
+
+        varying vec4 f_color;
+
+        void main() {
+          f_color = color;
+          gl_Position = vec4(position, 1.0);
+        }
+      </script>
+      <script id='fshader' type='x-shader/x-fragment'>
+        precision mediump float;
+
+        varying vec4 f_color;
+
+        void main() {
+          gl_FragColor = f_color;
+        }
+      </script>
 
       <hr>
 
@@ -76,31 +100,5 @@
       </footer>
 
     </div> <!-- /container -->
-
-	<!-- for WebGL -->
-<canvas id='webgl-canvas' width='256px' height='256px'></canvas>
-<script id='vshader' type='x-shader/x-vertex'>
-precision mediump float;
-
-attribute vec3 position;
-attribute vec4 color;
-
-varying vec4 f_color;
-
-void main() {
-	f_color = color;
-	gl_Position = vec4(position, 1.0);
-}
-</script>
-<script id='fshader' type='x-shader/x-fragment'>
-precision mediump float;
-
-varying vec4 f_color;
-
-void main() {
-	gl_FragColor = f_color;
-}
-</script>
-
   </body>
 </html>
