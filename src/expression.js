@@ -50,7 +50,9 @@ var Expression = exports.Expression = Class.extend({
 
 		if (type.equals(Type.booleanType))
 			return new BooleanLiteralExpression(new Parser.Token("false", false));
-		else if (type.equals(Type.integerType) || type.equals(Type.numberType))
+		else if (type.equals(Type.integerType))
+			return new IntegerLiteralExpression(new Parser.Token("0", false));
+		else if (type.equals(Type.numberType))
 			return new NumberLiteralExpression(new Parser.Token("0", false));
 		else if (type.equals(Type.stringType))
 			return new StringLiteralExpression(new Parser.Token("\"\"", false));

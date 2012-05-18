@@ -1,13 +1,14 @@
 /*EXPECTED
-1
+3
 */
 /*JSX_OPTS
 --optimize fold-const
 */
 
 class Test {
-	static const i = 1;
+	static const i : int = 3.3;
 	static function run() : void {
-		log Test.i;
+		var n : number = Test.i;
+		log n;
 	}
 }
