@@ -3,6 +3,10 @@ JOBS:=4
 
 all:
 
+setup:
+	npm install
+	perl web/setup.pl
+
 # e.g. make test JOBS=2
 test:
 	prove --jobs "$(JOBS)" t/*.t t/*/*.jsx
