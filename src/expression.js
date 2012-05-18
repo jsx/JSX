@@ -1063,24 +1063,40 @@ var PropertyExpression = exports.PropertyExpression = UnaryExpression.extend({
 	assertIsAssignable: function (context, token, type) {
 		if (! Expression.assertIsAssignable(context, token, this._type, type))
 			return false;
-		// check constness (note: a possible assignable property is always a member variable)
+		// check constness (note: a possibly assignable property is always a member variable)
 		var holderType = this.getHolderType();
-		if (holderType instanceof ObjectType)
-			return true; // const member variables are not (yet) being supported
-		var classDef = holderType.getClassDef();
-		var isAssignable = false;
-		if (classDef.forEachMemberVariable(function (varDef) {
-				if (varDef.name() == this._identifierToken.getValue()) {
-					// found
-					isAssignable = (varDef.flags() & ClassDefinition.IS_CONST) == 0;
-					return false;
-				}
-				return true;
-		}.bind(this))) {
-			throw new Error("logic flaw, could not find definition for " + classDef.className() + "#" + this._identifierToken.getValue());
+		var varFlags = 0;
+		if (holderType instanceof ObjectType) {
+			if (holderType.getClassDef().forEachClassToBase(function (classDef) {
+				return classDef.forEachMemberVariable(function (varDef) {
+					if (varDef.name() == this._identifierToken.getValue()) {
+						// found
+						varFlags = varDef.flags();
+						return false;
+					}
+					return true;
+				}.bind(this));
+			}.bind(this))) {
+				throw new Error("logic flaw, could not find definition for " + holderType.getClassDef().className() + "#" + this._identifierToken.getValue());
+			}
+		} else {
+			var classDef = holderType.getClassDef();
+			if (classDef.forEachMemberVariable(function (varDef) {
+					if (varDef.name() == this._identifierToken.getValue()) {
+						// found
+						varFlags = varDef.flags();
+						return false;
+					}
+					return true;
+			}.bind(this))) {
+				throw new Error("logic flaw, could not find definition for " + classDef.className() + "#" + this._identifierToken.getValue());
+			}
 		}
-		if (! isAssignable) {
+		if ((varFlags & ClassDefinition.IS_CONST) != 0) {
 			context.errors.push(new CompileError(token, "cannot modify a constant"));
+			return false;
+		} else if ((varFlags & ClassDefinition.IS_READONLY) != 0) {
+			context.errors.push(new CompileError(token, "cannot modify a readonly variable"));
 			return false;
 		}
 		return true;
