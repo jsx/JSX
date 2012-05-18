@@ -1061,7 +1061,29 @@ var PropertyExpression = exports.PropertyExpression = UnaryExpression.extend({
 	},
 
 	assertIsAssignable: function (context, token, type) {
-		return Expression.assertIsAssignable(context, token, this._type, type);
+		if (! Expression.assertIsAssignable(context, token, this._type, type))
+			return false;
+		// check constness (note: a possible assignable property is always a member variable)
+		var holderType = this.getHolderType();
+		if (holderType instanceof ObjectType)
+			return true; // const member variables are not (yet) being supported
+		var classDef = holderType.getClassDef();
+		var isAssignable = false;
+		if (classDef.forEachMemberVariable(function (varDef) {
+				if (varDef.name() == this._identifierToken.getValue()) {
+					// found
+					isAssignable = (varDef.flags() & ClassDefinition.IS_CONST) == 0;
+					return false;
+				}
+				return true;
+		}.bind(this))) {
+			throw new Error("logic flaw, could not find definition for " + classDef.className() + "#" + this._identifierToken.getValue());
+		}
+		if (! isAssignable) {
+			context.errors.push(new CompileError(token, "cannot modify a constant"));
+			return false;
+		}
+		return true;
 	},
 
 	deduceByArgumentTypes: function (context, operatorToken, argTypes, isStatic) {
