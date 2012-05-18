@@ -11,25 +11,41 @@ var BrowserPlatform = jsx.Platform.extend({
 		return this._root;
 	},
 
+	_findPath: function (path) {
+		var parts = path.split('/');
+		var cur = this._map;
+		while(parts.length > 0) {
+			var t = cur[parts.shift()];
+			if(t === undefined) {
+				return undefined;
+			}
+			cur = t;
+		}
+		return cur;
+	},
+
 	fileExists: function (path) {
-		path = path.replace(this._root, "");
-		//console.log([this._root, path, path in this._map]);
-		return path in this._map;
+		return this._findPath(path) !== undefined;
 	},
 
 	getFilesInDirectory: function (path) {
-		var d = this._map[path];
+		var d = this._findPath(path);
 		if(d instanceof Object) {
 			var a = [];
 			for(var k in d) {
-				if(typeof(d[k]) === "string") {
+				if(typeof(d[k]) === "string") { // leaf node
 					a.push(k);
 				}
 			}
 			return a;
 		}
 		else {
-			throw new Error("not a directory");
+			if(d === undefined) {
+				throw new Error("no such file or directory");
+			}
+			else {
+				throw new Error("not a directory");
+			}
 		}
 	},
 

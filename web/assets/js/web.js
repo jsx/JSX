@@ -24,6 +24,7 @@ window.addEventListener('load', function(e) {
 
 	function saveInput(input) {
 		var session = {
+			inputPath:      input.dataset["path"],
 			source:         input.value,
 			selectionStart: input.selectionStart,
 			selectionEnd:   input.selectionEnd,
@@ -37,6 +38,7 @@ window.addEventListener('load', function(e) {
 		if(serializedSession) {
 			var session = JSON.parse(serializedSession);
 
+			input.dataset["path"] = session.inputPath;
 			input.value = session.source;
 			input.setSelectionRange(session.selectionStart,
 									session.selectionEnd);
@@ -59,9 +61,10 @@ window.addEventListener('load', function(e) {
 		console.log('compile with ' + JSON.stringify(options));
 
 		output.value = '';
+		var path = input.dataset["path"];
 
 		var platform = new BrowserPlatform("");
-		platform.setContent("input", element("input").value);
+		platform.setContent(path, input.value);
 
 		var c = new jsx.Compiler(platform);
 		var emitter = new jsx.JavaScriptEmitter(platform);
@@ -82,7 +85,7 @@ window.addEventListener('load', function(e) {
 			return;
 		}
 
-		c.addSourceFile(null, 'input');
+		c.addSourceFile(null, path);
 
 		var success = c.compile();
 		console.log(c);
@@ -96,7 +99,7 @@ window.addEventListener('load', function(e) {
 			}
 
 			var out = emitter.getOutput().replace(/\t/g, "  ");
-			out += "JSX.require('input').Test.run$();\n";
+			out += "JSX.require('"+path+"').Test.run$();\n";
 
 			var level = getOptimizationLevel();
 			if(level > 0 && options.mode !== 'parse') {
@@ -132,6 +135,8 @@ window.addEventListener('load', function(e) {
 		var a = li.children[0];
 		a.addEventListener('click', function(event) {
 			event.preventDefault();
+
+			input.dataset["path"] = a.dataset["path"];
 
 			var url = a.href;
 			var xhr = new XMLHttpRequest();

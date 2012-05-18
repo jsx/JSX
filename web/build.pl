@@ -24,7 +24,7 @@ sub make_list {
     my($prefix) = @_;
     return join "",
         qq{<li class="nav-header">$prefix</li>\n},
-        map { qq{<li class="source-file"><a href="$prefix/$_">$_</a></li>\n} }
+        map { qq{<li class="source-file"><a href="$prefix/$_" data-path="$prefix/$_">$_</a></li>\n} }
         map { basename($_) } glob("$root/../$prefix/*.jsx");
 }
 
@@ -96,7 +96,6 @@ sub process_tree {
                 $dir = $dir->{$d} //= {};
             }
             $dir->{$basename} = $f;
-            $tree{$f} = JSON::true;
         },
     }, @{$src};
 

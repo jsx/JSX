@@ -5,14 +5,15 @@ window.addEventListener("DOMContentLoaded", function(e) {
 	for (var i = 0; i < scripts.length; ++i) {
 		var script = scripts[i];
 		if(script.type === "application/jsx") {
-			var platform = new BrowserPlatform("../..");
+			var platform = new BrowserPlatform("");
 			var c = new jsx.Compiler(platform);
 			var o = new jsx.Optimizer();
 			var emitter = new jsx.JavaScriptEmitter(platform);
 			c.setEmitter(emitter);
 
 			if(script.src) {
-				c.addSourceFile(null, script.src.replace(/^.*\//, ""));
+				var file = script.src.replace(/^.*\//, "");
+				c.addSourceFile(null, file);
 			}
 			else {
 				platform.setContent("in-line-script", script.innerHTML);
