@@ -11,7 +11,7 @@ use Fatal          qw(open close);
 use File::Find     qw(find);
 use File::Which    qw(which);
 use String::ShellQuote qw(shell_quote);
-use JSON qw();
+use JSON::PP qw();
 
 my $root = ROOT;
 my $template_dir = "$root/template";
@@ -100,7 +100,7 @@ sub process_tree {
     }, @{$src};
 
     open my($fh), ">", $dest;
-    print $fh JSON->new->utf8->pretty->encode(\%tree);
+    print $fh JSON::PP->new->utf8->pretty->encode(\%tree);
     close $fh;
 }
 
