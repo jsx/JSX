@@ -36,13 +36,28 @@ function finish(response, uri, status, content_type, content) {
 }
 
 function serveFile(response, uri, filename) {
-	fs.readFile(filename, "binary", function(err, file) {
-		if(err) {
-			finish(response, uri, 500, "text/plain", err + "\n");
+	path.exists(filename, function(exists) {
+		if(!exists) {
+			finish(response, uri, 404, "text/plain", "404 Not Found\n");
 			return;
 		}
 
-		finish(response, uri, 200, undefined, file);
+		if(uri === "/") {
+			filename += "web/index.html";
+		}
+
+		if (fs.statSync(filename).isDirectory()) {
+			filename += '/index.html';
+		}
+
+		fs.readFile(filename, "binary", function(err, file) {
+			if(err) {
+				finish(response, uri, 500, "text/plain", err + "\n");
+				return;
+			}
+
+			finish(response, uri, 200, undefined, file);
+		});
 	});
 }
 
@@ -53,35 +68,20 @@ function main(args) {
 		var uri = url.parse(request.url).pathname;
 		var filename = path.join(process.cwd(), uri);
 
-		path.exists(filename, function(exists) {
-			if(!exists) {
-				finish(response, uri, 404, "text/plain", "404 Not Found\n");
-				return;
-			}
-
-			if(uri === "/") {
-				filename += "web/index.html";
-			}
-
-			if (fs.statSync(filename).isDirectory()) {
-				filename += '/index.html';
-			}
-
-			if(/\.htm$/.test(filename)) {
-				child_process.execFile(
-					"perl", ["web/build.pl"],
-					function(error, stdout, stderr) {
-						if(error) {
-							finish(response, uri, 500, error + "\n");
-							return;
-						}
-						serveFile(response, uri, filename);
-				});;
-			}
-			else {
-				serveFile(response, uri, filename);
-			}
-		});
+		if(/\.htm$/.test(filename)) {
+			child_process.execFile(
+				"perl", ["web/build.pl"],
+				function(error, stdout, stderr) {
+					if(error) {
+						finish(response, uri, 500, error + "\n");
+						return;
+					}
+					serveFile(response, uri, filename);
+			});;
+		}
+		else {
+			serveFile(response, uri, filename);
+		}
 	}).listen(parseInt(port, 10));
 
 	console.log("Open http://localhost:" + port + "/");
