@@ -8,7 +8,7 @@ native class CanvasRenderingContext2D implements CanvasRenderingContext
 	/* implements CanvasTransformation, CanvasLineStyles, CanvasPathMethods, CanvasText */ {
 
 	// back-reference to the canvas
-	const canvas : HTMLCanvasElement;
+	__readonly__ var canvas : HTMLCanvasElement;
 
 	// state
 	function save() : void;
@@ -110,13 +110,13 @@ native class CanvasRenderingContext2D implements CanvasRenderingContext
 }
 
 native class TextMetrics {
-	const width : number;
+	__readonly__ var width : number;
 }
 
 native class ImageData {
-	const width : int;
-	const height : int;
-	const data : Array.<int>; // Uint8ClampedArray in reality
+	__readonly__ var width : int;
+	__readonly__ var height : int;
+	__readonly__ var data : Array.<int>; // Uint8ClampedArray in reality
 
 }
 
