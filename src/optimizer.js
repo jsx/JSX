@@ -540,8 +540,6 @@ var _ReturnIfOptimizeCommand = exports._ReturnIfOptimizeCommand = _FunctionOptim
 					this._optimizeStatements(statements);
 				}
 			}
-		} else if (statements.length != 4) {
-			this.log([ "OH!", statements.length, statements[0] instanceof IfStatement, statements[1] instanceof ReturnStatement ].join(","));
 		}
 	},
 
