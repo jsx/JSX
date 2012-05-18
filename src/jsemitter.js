@@ -1253,18 +1253,42 @@ var _BinaryExpressionEmitter = exports._BinaryExpressionEmitter = _OperatorExpre
 		this._emitter._getExpressionEmitterFor(firstExpr).emit(this._precedence);
 		this._emitter._emit(" " + op + " ", opToken);
 		// special handling for assignment to int
-		if (op == "=" && firstExprType.equals(Type.integerType) && secondExprType.equals(Type.numberType)) {
-			this._emitter._getExpressionEmitterFor(secondExpr).emit(_BinaryExpressionEmitter._operatorPrecedence["|"]);
-			this._emitter._emit(" | 0", opToken);
-		} else {
-			if (this._expr instanceof AssignmentExpression
-				&& this._emitter._enableRunTimeTypeCheck
-				&& ! (firstExprType instanceof MayBeUndefinedType || firstExprType.equals(Type.variantType))
-				&& secondExprType instanceof MayBeUndefinedType) {
-				this._emitter._emitExpressionWithUndefinedAssertion(secondExpr);
-			} else {
-				this._emitter._getExpressionEmitterFor(secondExpr).emit(this._precedence);
+		if (this._expr instanceof AssignmentExpression) {
+			// FIXME what happens if the op is /= or %= ?
+			if (firstExprType.resolveIfMayBeUndefined().equals(Type.integerType) && secondExprType.equals(Type.numberType)) {
+				this._emitter._emit("(", opToken);
+				this._emitter._getExpressionEmitterFor(secondExpr).emit(_BinaryExpressionEmitter._operatorPrecedence["|"]);
+				this._emitter._emit(" | 0)", opToken);
+				return;
 			}
+			if (firstExprType.equals(Type.integerType)
+				&& (secondExprType instanceof MayBeUndefinedType && secondExprType.getBaseType().equals(Type.numberType))) {
+				this._emitter._emit("(", opToken);
+				if (this._emitter._enableRunTimeTypeCheck) {
+					this._emitter._emitExpressionWithUndefinedAssertion(secondExpr);
+				} else {
+					this._emitter._getExpressionEmitterFor(secondExpr).emit(_BinaryExpressionEmitter._operatorPrecedence["|"]);
+				}
+				this._emitter._emit(" | 0)", opToken);
+				return;
+			}
+			if ((firstExprType instanceof MayBeUndefinedType && firstExprType.getBaseType().equals(Type.integerType))
+				&& (secondExprType instanceof MayBeUndefinedType && secondExprType.getBaseType().equals(Type.numberType))) {
+				// NOTE this is very slow, but such an operation would practically not be found
+				this._emitter._emit("(function (v) { return v !== undefined ? v | 0 : v; })(", opToken);
+				this._emitter._getExpressionEmitterFor(secondExpr).emit(0);
+				this._emitter._emit(")", opToken);
+				return;
+			}
+		}
+		// normal mode
+		if (this._expr instanceof AssignmentExpression
+			&& this._emitter._enableRunTimeTypeCheck
+			&& ! (firstExprType instanceof MayBeUndefinedType || firstExprType.equals(Type.variantType))
+			&& secondExprType instanceof MayBeUndefinedType) {
+			this._emitter._emitExpressionWithUndefinedAssertion(secondExpr);
+		} else {
+			this._emitter._getExpressionEmitterFor(secondExpr).emit(this._precedence);
 		}
 	},
 
