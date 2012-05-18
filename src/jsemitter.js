@@ -1252,41 +1252,8 @@ var _BinaryExpressionEmitter = exports._BinaryExpressionEmitter = _OperatorExpre
 		}
 		this._emitter._getExpressionEmitterFor(firstExpr).emit(this._precedence);
 		this._emitter._emit(" " + op + " ", opToken);
-		// special handling for assignment to int
 		if (this._expr instanceof AssignmentExpression) {
-			// FIXME what happens if the op is /= or %= ?
-			if (firstExprType.resolveIfMayBeUndefined().equals(Type.integerType) && secondExprType.equals(Type.numberType)) {
-				this._emitter._emit("(", opToken);
-				this._emitter._getExpressionEmitterFor(secondExpr).emit(_BinaryExpressionEmitter._operatorPrecedence["|"]);
-				this._emitter._emit(" | 0)", opToken);
-				return;
-			}
-			if (firstExprType.equals(Type.integerType)
-				&& (secondExprType instanceof MayBeUndefinedType && secondExprType.getBaseType().equals(Type.numberType))) {
-				this._emitter._emit("(", opToken);
-				if (this._emitter._enableRunTimeTypeCheck) {
-					this._emitter._emitExpressionWithUndefinedAssertion(secondExpr);
-				} else {
-					this._emitter._getExpressionEmitterFor(secondExpr).emit(_BinaryExpressionEmitter._operatorPrecedence["|"]);
-				}
-				this._emitter._emit(" | 0)", opToken);
-				return;
-			}
-			if ((firstExprType instanceof MayBeUndefinedType && firstExprType.getBaseType().equals(Type.integerType))
-				&& (secondExprType instanceof MayBeUndefinedType && secondExprType.getBaseType().equals(Type.numberType))) {
-				// NOTE this is very slow, but such an operation would practically not be found
-				this._emitter._emit("(function (v) { return v !== undefined ? v | 0 : v; })(", opToken);
-				this._emitter._getExpressionEmitterFor(secondExpr).emit(0);
-				this._emitter._emit(")", opToken);
-				return;
-			}
-		}
-		// normal mode
-		if (this._expr instanceof AssignmentExpression
-			&& this._emitter._enableRunTimeTypeCheck
-			&& ! (firstExprType instanceof MayBeUndefinedType || firstExprType.equals(Type.variantType))
-			&& secondExprType instanceof MayBeUndefinedType) {
-			this._emitter._emitExpressionWithUndefinedAssertion(secondExpr);
+			this._emitter._emitRHSOfAssignment(secondExpr, firstExprType);
 		} else {
 			this._emitter._getExpressionEmitterFor(secondExpr).emit(this._precedence);
 		}
@@ -1850,17 +1817,14 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 			this._emit("$__jsx_lazy_init(" + holder + ", \"" + variable.name() + "\", function () {\n", variable.getNameToken());
 			this._advanceIndent();
 			this._emit("return ", variable.getNameToken());
-			this._getExpressionEmitterFor(initialValue).emit(0);
+			this._emitRHSOfAssignment(initialValue, variable.getType());
 			this._emit(";\n", variable.getNameToken());
 			this._reduceIndent();
 			this._emit("});\n", variable.getNameToken());
 		} else {
 			this._emit(holder + "." + variable.name() + " = ", variable.getNameToken());
-			if (initialValue != null)
-				this._getExpressionEmitterFor(initialValue).emit(_BinaryExpressionEmitter._operatorPrecedence["="]);
-			else
-				this._emitDefaultValueOf(variable.getType());
-			this._emit(";\n", null);
+			this._emitRHSOfAssignment(initialValue, variable.getType());
+			this._emit(";\n", initialValue.getToken());
 		}
 	},
 
@@ -2170,6 +2134,44 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 		this._emit("}(", token);
 		this._getExpressionEmitterFor(expr).emit(0);
 		this._emit("))", token);
+	},
+
+	_emitRHSOfAssignment: function (expr, lhsType) {
+		var exprType = expr.getType();
+		// FIXME what happens if the op is /= or %= ?
+		if (lhsType.resolveIfMayBeUndefined().equals(Type.integerType) && exprType.equals(Type.numberType)) {
+			this._emit("(", expr.getToken());
+			this._getExpressionEmitterFor(expr).emit(_BinaryExpressionEmitter._operatorPrecedence["|"]);
+			this._emit(" | 0)", expr.getToken());
+			return;
+		}
+		if (lhsType.equals(Type.integerType)
+			&& (exprType instanceof MayBeUndefinedType && exprType.getBaseType().equals(Type.numberType))) {
+			this._emit("(", expr.getToken());
+			if (this._enableRunTimeTypeCheck) {
+				this._emitExpressionWithUndefinedAssertion(expr);
+			} else {
+				this._getExpressionEmitterFor(expr).emit(_BinaryExpressionEmitter._operatorPrecedence["|"]);
+			}
+			this._emit(" | 0)", expr.getToken());
+			return;
+		}
+		if ((lhsType instanceof MayBeUndefinedType && lhsType.getBaseType().equals(Type.integerType))
+			&& (exprType instanceof MayBeUndefinedType && exprType.getBaseType().equals(Type.numberType))) {
+			// NOTE this is very slow, but such an operation would practically not be found
+			this._emit("(function (v) { return v !== undefined ? v | 0 : v; })(", expr.getToken());
+			this._getExpressionEmitterFor(expr).emit(0);
+			this._emit(")", expr.getToken());
+			return;
+		}
+		// normal mode
+		if (this._enableRunTimeTypeCheck
+			&& ! (lhsType instanceof MayBeUndefinedType || lhsType.equals(Type.variantType))
+			&& exprType instanceof MayBeUndefinedType) {
+			this._emitExpressionWithUndefinedAssertion(expr);
+		} else {
+			this._getExpressionEmitterFor(expr).emit(_BinaryExpressionEmitter._operatorPrecedence["="]);
+		}
 	},
 
 	$constructor: function () {
