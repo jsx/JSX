@@ -42,10 +42,6 @@ function serveFile(response, uri, filename) {
 			return;
 		}
 
-		if(uri === "/") {
-			filename += "web/index.html";
-		}
-
 		if (fs.statSync(filename).isDirectory()) {
 			filename += '/index.html';
 		}
@@ -68,6 +64,10 @@ function main(args) {
 		var uri = url.parse(request.url).pathname;
 		var filename = path.join(process.cwd(), uri);
 
+		if(uri === "/") {
+			filename += "web/index.html";
+		}
+
 		if(/\.htm$/.test(filename)) {
 			child_process.execFile(
 				"perl", ["web/build.pl"],
@@ -77,7 +77,7 @@ function main(args) {
 						return;
 					}
 					serveFile(response, uri, filename);
-			});;
+			});
 		}
 		else {
 			serveFile(response, uri, filename);
