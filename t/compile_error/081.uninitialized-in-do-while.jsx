@@ -5,7 +5,7 @@ class T {
 			if (n != 0)
 				break;
 			ret = true;
-		} while (0);
+		} while (false);
 		return ret;
 	}
 }
