@@ -12,6 +12,9 @@
         "email": "fuji.goro@dena.jp"
       }
   ],
+  "bin" : {
+      "jsx" : "./bin/jsx"
+  },
   "devDependencies": {
       "browserbuild": "*",
       "source-map": "*"
