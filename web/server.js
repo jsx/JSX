@@ -8,12 +8,15 @@ var http = require("http"),
 function finish(response, uri, status, content_type, content) {
 	var len = Buffer.byteLength(content);
 
-	var headers = {"Content-Length" : len};
+	var headers = {
+		"Cache-Control" : "no-cache",
+		"Content-Length" : len
+	};
 	if(content_type) {
 		headers["Content-Type"] = content_type;
 	}
 	else if(/\.jsx$/.test(uri)) {
-		headers["Content-Type"] = "application/jsx";
+		headers["Content-Type"] = "text/plain";
 	}
 	else if(/\.js$/.test(uri)) {
 		headers["Content-Type"] = "application/javascript";
