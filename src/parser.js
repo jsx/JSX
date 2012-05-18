@@ -1031,6 +1031,8 @@ var Parser = exports.Parser = Class.extend({
 		}
 		if (! this._expect(";"))
 			return null;
+		if (initialValue == null)
+			initialValue = Expression.getDefaultValueExpressionOf(type);
 		return new MemberVariableDefinition(token, name, flags, type, initialValue);
 	},
 

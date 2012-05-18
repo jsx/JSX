@@ -6,8 +6,9 @@
 */
 
 class Test {
-	static const i = 1;
+	static const ZERO : int = 0;
+	static const ONE : int = Test.ZERO + 1;
 	static function run() : void {
-		log Test.i;
+		log Test.ONE;
 	}
 }
