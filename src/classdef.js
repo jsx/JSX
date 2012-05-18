@@ -723,6 +723,7 @@ var MemberDefinition = exports.MemberDefinition = Class.extend({
 		if(typeof(nameToken) === "string") throw new Error("nameToken must be a Token object or null!");
 		this._flags = flags;
 		this._classDef = null;
+		this._optimizerStash = {};
 	},
 
 	// token of "function" or "var"
@@ -748,6 +749,10 @@ var MemberDefinition = exports.MemberDefinition = Class.extend({
 
 	setClassDef: function (classDef) {
 		this._classDef = classDef;
+	},
+
+	getOptimizerStash: function () {
+		return this._optimizerStash;
 	}
 
 });
@@ -796,7 +801,7 @@ var MemberVariableDefinition = exports.MemberVariableDefinition = MemberDefiniti
 					var ivType = this._initialValue.getType();
 					if (this._type == null) {
 						this._type = ivType;
-					} else if (! this._type.equals(ivType)) {
+					} else if (! ivType.isConvertibleTo(this._type)) {
 						this._analysisContext.errors.push(new CompileError(this._nameToken,
 							"the variable is declared as '" + this._type.toString() + "' but initial value is '" + ivType.toString() + "'"));
 					}
@@ -819,6 +824,10 @@ var MemberVariableDefinition = exports.MemberVariableDefinition = MemberDefiniti
 
 	getInitialValue: function () {
 		return this._initialValue;
+	},
+
+	setInitialValue: function (initialValue) {
+		this._initialValue = initialValue;
 	}
 
 });
@@ -835,7 +844,6 @@ var MemberFunctionDefinition = exports.MemberFunctionDefinition = MemberDefiniti
 		this._lastTokenOfBody = lastTokenOfBody;
 		this._parent = null;
 		this._classDef = null;
-		this._optimizerStash = {};
 		if (this._closures != null) {
 			for (var i = 0; i < this._closures.length; ++i)
 				this._closures[i].setParent(this);
@@ -989,22 +997,17 @@ var MemberFunctionDefinition = exports.MemberFunctionDefinition = MemberDefiniti
 		this._classDef.forEachMemberVariable(function (member) {
 			if ((member.flags() & (ClassDefinition.IS_STATIC | ClassDefinition.IS_ABSTRACT)) == 0) {
 				if (initProperties[member.name()]) {
-					var initExpr = member.getInitialValue();
 					var stmt = new Statement.ExpressionStatement(
 						new Expression.AssignmentExpression(new Parser.Token("=", false),
 							new Expression.PropertyExpression(new Parser.Token(".", false),
 								new Expression.ThisExpression(new Parser.Token("this", false), new Type.ObjectType(this._classDef)),
 								member.getNameToken(), member.getType()),
-							initExpr != null ? initExpr : Expression.Expression.getDefaultValueExpressionOf(member.getType())));
+							member.getInitialValue()));
 					this._statements.splice(insertStmtAt++, 0, stmt);
 				}
 			}
 			return true;
 		}.bind(this));
-	},
-
-	getOptimizerStash: function () {
-		return this._optimizerStash;
 	},
 
 	getReturnType: function () {

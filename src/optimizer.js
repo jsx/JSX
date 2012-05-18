@@ -80,6 +80,8 @@ var Optimizer = exports.Optimizer = Class.extend({
 				this._commands.push(new _NoAssertCommand());
 			} else if (cmd == "no-log") {
 				this._commands.push(new _NoLogCommand());
+			} else if (cmd == "fold-const") {
+				this._commands.push(new _FoldConstantCommand());
 			} else if (cmd == "inline") {
 				this._commands.push(new _InlineOptimizeCommand());
 			} else if (cmd == "return-if") {
@@ -239,6 +241,112 @@ var _NoLogCommand = exports._NoAssertCommand = _FunctionOptimizeCommand.extend({
 				++i;
 			}
 		}
+	}
+
+});
+
+// propagates constants
+var _FoldConstantCommand = exports.__FoldConstantCommand = _FunctionOptimizeCommand.extend({
+
+	constructor: function () {
+		_FunctionOptimizeCommand.prototype.constructor.call(this, "fold-const");
+	},
+
+	_createStash: function () {
+		return {
+			isOptimized: false // boolean
+		};
+	},
+
+	optimizeFunction: function (funcDef) {
+		funcDef.forEachStatement(function onStatement(statement) {
+			statement.forEachStatement(onStatement.bind(this));
+			statement.forEachExpression(this._optimizeExpression.bind(this));
+			return true;
+		}.bind(this));
+		funcDef.forEachClosure(function (funcDef) {
+			this.optimizeFunction(funcDef);
+			return true;
+		}.bind(this));
+	},
+
+	_optimizeExpression: function (expr, replaceCb) {
+		// optimize subexprs
+		expr.forEachExpression(this._optimizeExpression.bind(this));
+		// propagate const
+		if (expr instanceof PropertyExpression) {
+			var holderType = expr.getHolderType();
+			if (holderType instanceof ClassDefType) {
+				var member = null;
+				holderType.getClassDef().forEachMemberVariable(function (m) {
+					if (m instanceof MemberVariableDefinition && m.name() == expr.getIdentifierToken().getValue())
+						member = m;
+					return member == null;
+				});
+				if (member != null && (member.flags() & ClassDefinition.IS_CONST) != 0) {
+					this._foldStaticConst(member);
+					var foldedExpr = this._toFoldedExpr(member.getInitialValue(), member.getType());
+					if (foldedExpr != null) {
+						foldedExpr = this._toFoldedExpr(foldedExpr, expr.getType());
+						if (foldedExpr != null) {
+							replaceCb(foldedExpr);
+						}
+					}
+				}
+			}
+		} else if (expr instanceof AdditiveExpression) {
+			var firstExpr = expr.getFirstExpr();
+			var secondExpr = expr.getSecondExpr();
+			if ((firstExpr instanceof NumberLiteralExpression || firstExpr instanceof IntegerLiteralExpression)
+				&& (secondExpr instanceof NumberLiteralExpression || secondExpr instanceof IntegerLiteralExpression)) {
+				var value = +firstExpr.getToken().getValue() + +secondExpr.getToken().getValue();
+				if (firstExpr instanceof IntegerLiteralExpression && secondExpr instanceof IntegerLiteralExpression) {
+					var expr = new IntegerLiteralExpression(new Token("" + (value | 0)), null);
+				} else {
+					expr = new NumberLiteralExpression(new Token("" + value), 0);
+				}
+				replaceCb(expr);
+			} else if (firstExpr instanceof StringLiteralExpression && secondExpr instanceof StringLiteralExpression) {
+				replaceCb(
+					new StringLiteralExpression(
+						new Token(
+							Util.encodeStringLiteral(
+								Util.decodeStringLiteral(firstExpr.getToken().getValue()) +
+								Util.decodeStringLiteral(secondExpr.getToken().getValue())),
+							null)));
+			}
+		}
+		return true;
+	},
+
+	_foldStaticConst: function (member) {
+		// optimize only once
+		if (this.getStash(member).isOptimized)
+			return;
+		this.getStash(member).isOptimized = true;
+		// optimize
+		this._optimizeExpression(member.getInitialValue(), function (expr) { member.setInitialValue(expr); });
+	},
+
+	_toFoldedExpr: function (expr, type) {
+		if (expr instanceof UndefinedExpression) {
+			return expr;
+		} else if (expr instanceof NullExpression) {
+			return expr;
+		} else if (expr instanceof BooleanLiteralExpression) {
+			return expr;
+		} else if (expr instanceof IntegerLiteralExpression) {
+			return expr;
+		} else if (expr instanceof NumberLiteralExpression) {
+			if (type.resolveIfMayBeUndefined().equals(Type.integerType)) {
+				// cast to integer
+				return new IntegerLiteralExpression(new Token((expr.getToken().getValue() | 0).toString(), null));
+			}
+			return expr;
+		} else if (expr instanceof StringLiteralExpression) {
+			return expr;
+		}
+		return null;
 	}
 
 });
