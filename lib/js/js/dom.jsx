@@ -55,16 +55,16 @@ native class Node extends EventTarget {
 	static const DOCUMENT_FRAGMENT_NODE : int;
 	static const NOTATION_NODE : int;
 
-	const nodeName : string;
+	__readonly__ var nodeName : string;
 	var nodeValue : string;
-	const nodeType : int;
-	const parentNode : string;
-	const childNodes : NodeList;
-	const firstChild : Node;
-	const lastChild : Node;
-	const previousSibling : Node;
-	const nextSibling : Node;
-	const attributes : NamedNodeMap;
+	__readonly__ var nodeType : int;
+	__readonly__ var parentNode : string;
+	__readonly__ var childNodes : NodeList;
+	__readonly__ var firstChild : Node;
+	__readonly__ var lastChild : Node;
+	__readonly__ var previousSibling : Node;
+	__readonly__ var nextSibling : Node;
+	__readonly__ var attributes : NamedNodeMap;
 
 	function insertBefore(newChild : Node, refChild : Node) : Node;
 	function replaceChild(newChild : Node, oldChild : Node) : Node;
@@ -77,11 +77,11 @@ native class Node extends EventTarget {
 	function normalize() : void;
 
 	function isSupported(feature : string, version : string) : boolean;
-	const namespaceURI : string;
-	const prefix : string;
-	const localName : string;
+	__readonly__ var namespaceURI : string;
+	__readonly__ var prefix : string;
+	__readonly__ var localName : string;
 	function hasAttributes() : boolean;
-	const baseURI : string;
+	__readonly__ var baseURI : string;
 
 	// DocumentPosition
 	static const DOCUMENT_POSITION_DISCONNECTED : int;
@@ -109,7 +109,7 @@ native class Node extends EventTarget {
 
 native class NodeList {
 	function item(index : int) : Node;
-	const length : int;
+	__readonly__ var length : int;
 }
 
 native class NamedNodeMap {
@@ -121,12 +121,12 @@ native class CharacterData extends Node {
 }
 
 native class Attr extends Node {
-	const name : string;
-	const specified : boolean;
-	const value : string;
-	const ownerElement : Element;
-	const schemaTypeInfo : TypeInfo;
-	const isId : boolean;
+	__readonly__ var name : string;
+	__readonly__ var specified : boolean;
+	__readonly__ var value : string;
+	__readonly__ var ownerElement : Element;
+	__readonly__ var schemaTypeInfo : TypeInfo;
+	__readonly__ var isId : boolean;
 }
 
 native class TypeInfo {
@@ -134,7 +134,7 @@ native class TypeInfo {
 }
 
 native class Element extends Node {
-	const tagName : string;
+	__readonly__ var tagName : string;
 
 	function getAttribute(name : string) : string;
 	function setAttribute(name : string, value : string) : void;
@@ -159,7 +159,7 @@ native class Element extends Node {
 	function hasAttributeNS(namespaceURI : string, name : string) : boolean;
 
 	// introduced in DOM level 3
-	const schemaTypeInfo : TypeInfo;
+	__readonly__ var schemaTypeInfo : TypeInfo;
 	function setIdAttribute(name : string, isId : boolean) : void;
 	function setIdAttributeNS(namespaceURI : string, localName : string, isId : boolean) : void;
 	function setIdAttributeNode(idAttr : Attr, isId : boolean) : void;
@@ -217,9 +217,9 @@ native class ProcessingInstruction extends Node {
 native class DocumentFragment extends Node { }
 
 native class Document extends Node /* implements DocumentEvent */ {
-	const doctype : DocumentType;
-	const implementation : DOMImplementation;
-	const documentElement : Element;
+	__readonly__ var doctype : DocumentType;
+	__readonly__ var implementation : DOMImplementation;
+	__readonly__ var documentElement : Element;
 
 	function createElement(tagname : string) : Element;
 	function createDocumentFragment() : DocumentFragment;
@@ -244,8 +244,8 @@ native class Document extends Node /* implements DocumentEvent */ {
 
 	// introduced in DOM level 3
 
-	const inputEncoding : string;
-	const xmlEncoding : string; // FIXME: Chrome may return null
+	__readonly__ var inputEncoding : string;
+	__readonly__ var xmlEncoding : string; // FIXME: Chrome may return null
 	var xmlStandalone : boolean;
 	var xmlVersion : string;
 	var strictErrorChecking : boolean;
@@ -253,7 +253,7 @@ native class Document extends Node /* implements DocumentEvent */ {
 
 	function adoptNode(source : Node) : Node;
 
-	const domConfig : DOMConfiguration;
+	__readonly__ var domConfig : DOMConfiguration;
 	function normalizeDocument() : void;
 	function renameNode(n : Node, namespaceURI : string, qualifiedName : string) : Node;
 
@@ -266,7 +266,7 @@ native class Document extends Node /* implements DocumentEvent */ {
 // (cf. http://www.w3.org/TR/html5-author/)
 
 native class HTMLCollection {
-	const length : int;
+	__readonly__ var length : int;
 	function item(index : int) : Node;
 	function namedItem(name : string) : Node;
 }
@@ -278,16 +278,16 @@ native class HTMLOptionsCollection {
 native class HTMLDocument extends Document {
 	var title : string;
 
-	const referrer : string;
-	const domain : string;
-	const URL : string;
-	const body : HTMLElement;
+	__readonly__ var referrer : string;
+	__readonly__ var domain : string;
+	__readonly__ var URL : string;
+	__readonly__ var body : HTMLElement;
 
-	const images : HTMLCollection;
-	const applets : HTMLCollection;
-	const links : HTMLCollection;
-	const forms : HTMLCollection;
-	const anchors : HTMLCollection;
+	__readonly__ var images : HTMLCollection;
+	__readonly__ var applets : HTMLCollection;
+	__readonly__ var links : HTMLCollection;
+	__readonly__ var forms : HTMLCollection;
+	__readonly__ var anchors : HTMLCollection;
 
 	var cookie : string;
 
@@ -310,7 +310,7 @@ native class DOMSettableTokenList {
 
 native class DOMStringList {
 	function item(index : int) : string;
-	const length : int;
+	__readonly__ var length : int;
 	function contains(str : string) : boolean;
 }
 
@@ -319,12 +319,12 @@ native class DOMStringMap {
 }
 
 native class ClientRect {
-	const top : number;
-	const right : number;
-	const bottom : number;
-	const left : number;
-	const width : number;
-	const height : number;
+	__readonly__ var top : number;
+	__readonly__ var right : number;
+	__readonly__ var bottom : number;
+	__readonly__ var left : number;
+	__readonly__ var width : number;
+	__readonly__ var height : number;
 }
 
 native class ClientRectList {
@@ -350,11 +350,11 @@ native class HTMLElement extends Element {
 	var hidden : boolean;
 	var tabIndex : int;
 	var accesKey : string;
-	const accessKeyLabel : string;
+	__readonly__ var accessKeyLabel : string;
 	var draggable : boolean;
-	const dropzone : DOMSettableTokenList;
+	__readonly__ var dropzone : DOMSettableTokenList;
 	var contentEditable : string;
-	const isContentEditable : boolean;
+	__readonly__ var isContentEditable : boolean;
 	var contextMenu : MayBeUndefined.<HTMLMenuElement>;
 	var spellcheck : boolean;
 
@@ -363,15 +363,15 @@ native class HTMLElement extends Element {
 	function blur() : void;
 
 	// command API
-	const commandType : MayBeUndefined.<string>;
-	const commandLabel : MayBeUndefined.<string>;
-	const commandIcon : MayBeUndefined.<string>;
-	const commandHidden : MayBeUndefined.<boolean>;
-	const commandDisabled : MayBeUndefined.<boolean>;
-	const commandChecked : MayBeUndefined.<boolean>;
+	__readonly__ var commandType : MayBeUndefined.<string>;
+	__readonly__ var commandLabel : MayBeUndefined.<string>;
+	__readonly__ var commandIcon : MayBeUndefined.<string>;
+	__readonly__ var commandHidden : MayBeUndefined.<boolean>;
+	__readonly__ var commandDisabled : MayBeUndefined.<boolean>;
+	__readonly__ var commandChecked : MayBeUndefined.<boolean>;
 
 	// styling
-	const style : CSSStyleDeclaration;
+	__readonly__ var style : CSSStyleDeclaration;
 
 	// event handler attributes
 	// TODO
@@ -424,7 +424,7 @@ native class HTMLBaseElement extends HTMLElement {
 }
 
 native class HTMLIsIndexElement extends HTMLElement {
-	const form : HTMLFormElement;
+	__readonly__ var form : HTMLFormElement;
 	var prompt : string;
 }
 
@@ -444,8 +444,8 @@ native class HTMLBodyElement extends HTMLElement {
 }
 
 native class HTMLFormElement extends HTMLElement {
-	const elements : HTMLCollection;
-	const length : int;
+	__readonly__ var elements : HTMLCollection;
+	__readonly__ var length : int;
 	var name : string;
 	var acceptCharset : string;
 	var action : string;
@@ -457,12 +457,12 @@ native class HTMLFormElement extends HTMLElement {
 }
 
 native class HTMLSelectElement extends HTMLElement {
-	const type : string;
+	__readonly__ var type : string;
 	var selectedIndex : int;
 	var value : string;
 	var length : int;
-	const form : HTMLFormElement;
-	const options : HTMLOptionsCollection;
+	__readonly__ var form : HTMLFormElement;
+	__readonly__ var options : HTMLOptionsCollection;
 	var disabled : boolean;
 	var multiple : boolean;
 	var name : string;
@@ -477,10 +477,10 @@ native class HTMLOptGroupElement extends HTMLElement {
 }
 
 native class HTMLOptionElement extends HTMLElement {
-	const form : HTMLFormElement;
+	__readonly__ var form : HTMLFormElement;
 	var defaultSelected : boolean;
-	const text : string;
-	const index : int;
+	__readonly__ var text : string;
+	__readonly__ var index : int;
 	var disabled : boolean;
 	var label : string;
 	var selected : boolean;
@@ -490,7 +490,7 @@ native class HTMLOptionElement extends HTMLElement {
 native class HTMLInputElement extends HTMLElement {
 	var defaultValue : string;
 	var defaultChecked : boolean;
-	const form : HTMLFormElement;
+	__readonly__ var form : HTMLFormElement;
 	var accept : string;
 	var accessKey : string;
 	var align : string;
@@ -510,39 +510,39 @@ native class HTMLInputElement extends HTMLElement {
 
 native class HTMLTextAreaElement extends HTMLElement {
 	var defaultValue : string;
-	const form : HTMLFormElement;
+	__readonly__ var form : HTMLFormElement;
 	var accessKey : string;
 	var cols : int;
 	var disabled : boolean;
 	var name : string;
 	var readOnly : boolean;
 	var rows : int;
-	const type : string;
+	__readonly__ var type : string;
 	var value : string;
 	function select() : void;
 }
 
 native class HTMLButtonElement extends HTMLElement {
-	const form : HTMLFormElement;
+	__readonly__ var form : HTMLFormElement;
 	var accessKey : string;
 	var disabled : boolean;
 	var name : string;
-	const type : string;
+	__readonly__ var type : string;
 	var value : string;
 }
 
 native class HTMLLabelElement extends HTMLElement {
-	const form : HTMLFormElement;
+	__readonly__ var form : HTMLFormElement;
 	var accessKey : string;
 	var htmlFor : string;
 }
 
 native class HTMLFieldSetElement extends HTMLElement {
-	const form : HTMLFormElement;
+	__readonly__ var form : HTMLFormElement;
 }
 
 native class HTMLLegendElement extends HTMLElement {
-	const form : HTMLFormElement;
+	__readonly__ var form : HTMLFormElement;
 	var accessKey : string;
 	var align : string;
 }
@@ -653,13 +653,13 @@ native class HTMLImageElement extends HTMLElement {
 
 	// HTML5
 	var crossOrigin : MayBeUndefined.<string>;
-	const naturalWidth: MayBeUndefined.<int>;
-	const naturalHeight: MayBeUndefined.<int>;
-	const complete :MayBeUndefined.<int>;
+	__readonly__ var naturalWidth: MayBeUndefined.<int>;
+	__readonly__ var naturalHeight: MayBeUndefined.<int>;
+	__readonly__ var complete :MayBeUndefined.<int>;
 }
 
 native class HTMLObjectElement extends HTMLElement {
-	const form : HTMLFormElement;
+	__readonly__ var form : HTMLFormElement;
 	var code : string;
 	var align : string;
 	var archive : string;
@@ -676,7 +676,7 @@ native class HTMLObjectElement extends HTMLElement {
 	var useMap : string;
 	var vspace : int;
 	var width : string;
-	const contentDocument : Document;
+	__readonly__ var contentDocument : Document;
 }
 
 native class HTMLParamElement extends HTMLElement {
@@ -701,7 +701,7 @@ native class HTMLAppletElement extends HTMLElement {
 }
 
 native class HTMLMapElement extends HTMLElement {
-	const areas : HTMLCollection;
+	__readonly__ var areas : HTMLCollection;
 	var name : string;
 }
 
@@ -729,8 +729,8 @@ native class HTMLTableElement extends HTMLElement {
 	var caption : HTMLTableCaptionElement;
 	var tHead : HTMLTableSectionElement;
 	var tFoot : HTMLTableSectionElement;
-	const rows : HTMLCollection;
-	const tBodies : HTMLCollection;
+	__readonly__ var rows : HTMLCollection;
+	__readonly__ var tBodies : HTMLCollection;
 	var align : string;
 	var bgColor : string;
 	var border : string;
@@ -768,15 +768,15 @@ native class HTMLTableSectionElement extends HTMLElement {
 	var ch : string;
 	var chOff : string;
 	var vAlign : string;
-	const rows : HTMLCollection;
+	__readonly__ var rows : HTMLCollection;
 	function insertRow(index : int) : HTMLElement;
 	function deleteRow(index : int) : void;
 }
 
 native class HTMLTableRowElement extends HTMLElement {
-	const rowIndex : int;
-	const sectionRowIndex : int;
-	const cells : HTMLCollection;
+	__readonly__ var rowIndex : int;
+	__readonly__ var sectionRowIndex : int;
+	__readonly__ var cells : HTMLCollection;
 	var align : string;
 	var bgColor : string;
 	var ch : string;
@@ -787,7 +787,7 @@ native class HTMLTableRowElement extends HTMLElement {
 }
 
 native class HTMLTableCellElement extends HTMLElement {
-	const cellIndex : int;
+	__readonly__ var cellIndex : int;
 	var abbr : string;
 	var align : string;
 	var axis : string;
@@ -818,7 +818,7 @@ native class HTMLFrameElement extends HTMLElement {
 	var noResize : boolean;
 	var scrolling : string;
 	var src : string;
-	const contentDocument : Document;
+	__readonly__ var contentDocument : Document;
 }
 
 native class HTMLIFrameElement extends HTMLElement {
@@ -832,7 +832,7 @@ native class HTMLIFrameElement extends HTMLElement {
 	var scrolling : string;
 	var src : string;
 	var width : string;
-	const contentDocument : Document;
+	__readonly__ var contentDocument : Document;
 }
 
 
@@ -868,15 +868,15 @@ native class HTMLCanvasElement extends HTMLElement {
 // The Window Interface
 final native __fake__ class Window extends EventTarget {
 
-	const window :Window;
-	const self :Window;
+	__readonly__ var window :Window;
+	__readonly__ var self :Window;
 
 	var location :Location;
 
 	var name :string;
-	const parent :Window;
-	const top :Window;
-	const frameElement :Element;
+	__readonly__ var parent :Window;
+	__readonly__ var top :Window;
+	__readonly__ var frameElement :Element;
 
 	// timers
 
@@ -885,36 +885,36 @@ final native __fake__ class Window extends EventTarget {
 	function setInterval(listener : function():void, milliseconds :int) :int;
 	function clearInterval(timerID :int) :void;
 
-	const applicationCache : DOMApplicationCache;
-	const closed : boolean;
-	const content : HTMLElement;
-	const crypto : Crypto;
-	const document :HTMLDocument;
-	const defaultStatus : string;
-	const history : History;
-	const innerHeight : int;
-	const innerWidth : int;
-	const length : int;
-	const locationbar : BarInfo;
-	const localStorage : Storage;
-	const menubar : boolean;
-	const navigator :Navigator;
-	const opener : Window;
-	const outerHeight : int;
-	const outerWidth : int;
-	const pageXOffset : int;
-	const pageYOffset : int;
-	const performance : Performance;
-	const personalbar : BarInfo;
-	const screen : Screen;
-	const screenX : int;
-	const screenY : int;
-	const scrollbars : BarInfo;
-	const scrollX : int;
-	const sessionStorage : Storage;
-	const status : string;
-	const statusbar : BarInfo;
-	const toolbar : BarInfo;
+	__readonly__ var applicationCache : DOMApplicationCache;
+	__readonly__ var closed : boolean;
+	__readonly__ var content : HTMLElement;
+	__readonly__ var crypto : Crypto;
+	__readonly__ var document :HTMLDocument;
+	__readonly__ var defaultStatus : string;
+	__readonly__ var history : History;
+	__readonly__ var innerHeight : int;
+	__readonly__ var innerWidth : int;
+	__readonly__ var length : int;
+	__readonly__ var locationbar : BarInfo;
+	__readonly__ var localStorage : Storage;
+	__readonly__ var menubar : boolean;
+	__readonly__ var navigator :Navigator;
+	__readonly__ var opener : Window;
+	__readonly__ var outerHeight : int;
+	__readonly__ var outerWidth : int;
+	__readonly__ var pageXOffset : int;
+	__readonly__ var pageYOffset : int;
+	__readonly__ var performance : Performance;
+	__readonly__ var personalbar : BarInfo;
+	__readonly__ var screen : Screen;
+	__readonly__ var screenX : int;
+	__readonly__ var screenY : int;
+	__readonly__ var scrollbars : BarInfo;
+	__readonly__ var scrollX : int;
+	__readonly__ var sessionStorage : Storage;
+	__readonly__ var status : string;
+	__readonly__ var statusbar : BarInfo;
+	__readonly__ var toolbar : BarInfo;
 
 	function alert(message :string) :void;
 	function atob(base64encoded : string) : string;
@@ -950,7 +950,7 @@ native __fake__ class Crypto {
 }
 
 native __fake__ class BarInfo {
-	const visible : boolean;
+	__readonly__ var visible : boolean;
 }
 
 native class Storage {
@@ -1014,13 +1014,13 @@ native class Event {
 	static const AT_TARGET : int;
 	static const BUBBLING_PHASE : int;
 
-	const type : string;
-	const target : EventTarget;
-	const currentTarget : EventTarget;
-	const eventPhase : int;
-	const bubbles : boolean;
-	const cancelable : boolean;
-	const timeStamp : int;
+	__readonly__ var type : string;
+	__readonly__ var target : EventTarget;
+	__readonly__ var currentTarget : EventTarget;
+	__readonly__ var eventPhase : int;
+	__readonly__ var bubbles : boolean;
+	__readonly__ var cancelable : boolean;
+	__readonly__ var timeStamp : int;
 
 	function stopPropagation() : void;
 	function preventDefault() : void;
@@ -1029,8 +1029,8 @@ native class Event {
 	// DOM level 3
 
 	function stopImmediatePropagation() : void;
-	const defaultPrevented : boolean;
-	const isTrusted : boolean;
+	__readonly__ var defaultPrevented : boolean;
+	__readonly__ var isTrusted : boolean;
 }
 
 native class CustomEvent extends Event {
@@ -1058,17 +1058,17 @@ native class FocusEvent extends UIEvent {
 }
 
 native class MouseEvent extends UIEvent {
-	const screenX : int;
-	const screenY : int;
-	const clientX : int;
-	const clientY : int;
-	const ctrlKey : boolean;
-	const shiftKey : boolean;
-	const altKey : boolean;
-	const metaKey : boolean;
-	const button : int;
-	const buttons : int;
-	const relatedTarget : EventTarget;
+	__readonly__ var screenX : int;
+	__readonly__ var screenY : int;
+	__readonly__ var clientX : int;
+	__readonly__ var clientY : int;
+	__readonly__ var ctrlKey : boolean;
+	__readonly__ var shiftKey : boolean;
+	__readonly__ var altKey : boolean;
+	__readonly__ var metaKey : boolean;
+	__readonly__ var button : int;
+	__readonly__ var buttons : int;
+	__readonly__ var relatedTarget : EventTarget;
 
 	function initMouseEvent(
 		typeArg : string,
@@ -1117,32 +1117,32 @@ native class MutationNameEvent extends MutationEvent {
 // http://www.w3.org/TR/touch-events/
 
 native class Touch {
-	const identifier : int;
-	const target : EventTarget;
-	const screenX : int;
-	const screenY : int;
-	const clientX : int;
-	const clientY : int;
-	const pageX : int;
-	const pageY : int;
+	__readonly__ var identifier : int;
+	__readonly__ var target : EventTarget;
+	__readonly__ var screenX : int;
+	__readonly__ var screenY : int;
+	__readonly__ var clientX : int;
+	__readonly__ var clientY : int;
+	__readonly__ var pageX : int;
+	__readonly__ var pageY : int;
 }
 
 /*
 native class TouchList {
-	const length : int;
+	__readonly__ var length : int;
 	function item(index : int) : Touch;
 	function identifiedTouch(identifier : int) : Touch;
 }
 */
 
 native class TouchEvent extends UIEvent {
-	const touches : Touch[];
-	const targetTouches : Touch[];
-	const changedTouches : Touch[];
-	const altKey : boolean;
-	const metaKey : boolean;
-	const ctrlKey : boolean;
-	const shiftKey : boolean;
+	__readonly__ var touches : Touch[];
+	__readonly__ var targetTouches : Touch[];
+	__readonly__ var changedTouches : Touch[];
+	__readonly__ var altKey : boolean;
+	__readonly__ var metaKey : boolean;
+	__readonly__ var ctrlKey : boolean;
+	__readonly__ var shiftKey : boolean;
 }
 
 // XHR
@@ -1165,7 +1165,7 @@ native class XMLHttpRequest extends XMLHttpRequestEventTarget {
 
 	function constructor();
 
-	const readyState :int;
+	__readonly__ var readyState :int;
 
 	// request
 
@@ -1174,7 +1174,7 @@ native class XMLHttpRequest extends XMLHttpRequestEventTarget {
 
 	function setRequestHeader(header : string, value : string) : void;
 
-	const upload : XMLHttpRequestUpload;
+	__readonly__ var upload : XMLHttpRequestUpload;
 
 	function send() : void;
 	function send(data : string) : void;
@@ -1188,23 +1188,23 @@ native class XMLHttpRequest extends XMLHttpRequestEventTarget {
 
 	// response
 
-	const status : int;
-	const statusText : string;
+	__readonly__ var status : int;
+	__readonly__ var statusText : string;
 	function getResponseHeader(header : string) : string;
 	function getAllResponseHeaders() : string;
 	function overrideMimeType(mime : string) :void;
-	const responseType : string;
-	const response : variant;
-	const responseText : string;
-	const responseXML : Document;
+	__readonly__ var responseType : string;
+	__readonly__ var response : variant;
+	__readonly__ var responseText : string;
+	__readonly__ var responseXML : Document;
 }
 
 // http://dvcs.w3.org/hg/progress/raw-file/tip/Overview.html#progressevent
 
 native class ProgressEvent extends Event {
-	const lengthComputable : boolean;
-	const loaded : number;
-	const total : number;
+	__readonly__ var lengthComputable : boolean;
+	__readonly__ var loaded : number;
+	__readonly__ var total : number;
 }
 
 // Canvas

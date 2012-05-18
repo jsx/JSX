@@ -3,15 +3,15 @@
 // (cf. https://developer.mozilla.org/en/javascript_typed_arrays/ArrayBuffer)
 
 native class ArrayBuffer {
-	const length : number;
+	__readonly__ /* should be const */ var length : number;
 
 	function constructor(size : int);
 }
 
 native __fake__ class ArrayBufferView {
-    const buffer : ArrayBuffer;
-    const byteOffset : number;
-	const byteLength : number;
+    __readonly__ /* should be const */ var buffer : ArrayBuffer;
+    __readonly__ /* should be const */ var byteOffset : number;
+	__readonly__ /* should be const */ var byteLength : number;
 
     function __native_index_operator__(n : number) : MayBeUndefined.<number>;
 }
@@ -58,7 +58,7 @@ native class DataView extends ArrayBufferView {
 native class Int8Array extends ArrayBufferView {
 	static const BYTES_PER_ELEMENT : int;
 
-	const length : int;
+	__readonly__ /* should be const */ var length : int;
 
 	function constructor(size : int);
 	function constructor(array : Int8Array);
@@ -72,7 +72,7 @@ native class Int8Array extends ArrayBufferView {
 native class Uint8Array extends ArrayBufferView {
 	static const BYTES_PER_ELEMENT : int;
 
-	const length : int;
+	__readonly__ /* should be const */ var length : int;
 
 	function constructor(size : int);
 	function constructor(array : Uint8Array);
@@ -86,7 +86,7 @@ native class Uint8Array extends ArrayBufferView {
 native class Int16Array extends ArrayBufferView {
 	static const BYTES_PER_ELEMENT : int;
 
-	const length : int;
+	__readonly__ /* should be const */ var length : int;
 
 	function constructor(size : int);
 	function constructor(array : Int16Array);
@@ -100,7 +100,7 @@ native class Int16Array extends ArrayBufferView {
 native class Uint16Array extends ArrayBufferView {
 	static const BYTES_PER_ELEMENT : int;
 
-	const length : int;
+	__readonly__ /* should be const */ var length : int;
 
 	function constructor(size : int);
 	function constructor(array : Uint16Array);
@@ -114,7 +114,7 @@ native class Uint16Array extends ArrayBufferView {
 native class Int32Array extends ArrayBufferView {
 	static const BYTES_PER_ELEMENT : int;
 
-	const length : int;
+	__readonly__ /* should be const */ var length : int;
 
 	function constructor(size : int);
 	function constructor(array : Int32Array);
@@ -128,7 +128,7 @@ native class Int32Array extends ArrayBufferView {
 native class Uint32Array extends ArrayBufferView {
 	static const BYTES_PER_ELEMENT : int;
 
-	const length : int;
+	__readonly__ /* should be const */ var length : int;
 
 	function constructor(size : int);
 	function constructor(array : Uint32Array);
@@ -142,7 +142,7 @@ native class Uint32Array extends ArrayBufferView {
 native class Float32Array extends ArrayBufferView {
 	static const BYTES_PER_ELEMENT : int;
 
-	const length : int;
+	__readonly__ /* should be const */ var length : int;
 
 	function constructor(size : int);
 	function constructor(array : Float32Array);
@@ -155,7 +155,7 @@ native class Float32Array extends ArrayBufferView {
 native class Float64Array extends ArrayBufferView {
 	static const BYTES_PER_ELEMENT : number;
 
-	const length : int;
+	__readonly__ /* should be const */ var length : int;
 
 	function constructor(size : int);
 	function constructor(array : Float64Array);

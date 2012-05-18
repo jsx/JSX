@@ -53,9 +53,9 @@ native class CSSValueList extends CSSValue {
 }
 
 native class RGBColor {
-	const red : CSSPrimitiveValue;
-	const green : CSSPrimitiveValue;
-	const blue : CSSPrimitiveValue;
+	__readonly__ var red : CSSPrimitiveValue;
+	__readonly__ var green : CSSPrimitiveValue;
+	__readonly__ var blue : CSSPrimitiveValue;
 }
 
 native class Rect {
