@@ -109,10 +109,12 @@ native class Node extends EventTarget {
 
 native class NodeList {
 	function item(index : int) : Node;
+	function __native_index_operator__(index : int) : Node;
 	__readonly__ var length : int;
 }
 
 native class NamedNodeMap {
+	function __native_index_operator__(key : string) : Node;
 	// TODO
 }
 
@@ -268,6 +270,7 @@ native class Document extends Node /* implements DocumentEvent */ {
 native class HTMLCollection {
 	__readonly__ var length : int;
 	function item(index : int) : Node;
+	function __native_index_operator__(index : int) : Node;
 	function namedItem(name : string) : Node;
 }
 
@@ -301,21 +304,30 @@ native class HTMLDocument extends Document {
 }
 
 native class DOMTokenList {
-	// TODO
+	__readonly__ var length : number;
+	function __native_index_operator__(index : int) : String;
+	function item(index : int) : String;
+	function contains(value : string) : boolean;
+	function add(token : string) : void;
+	function remove(token : string) : void;
+	function toggle(token : string) : boolean;
+
+	override function toString() : string;
 }
 
-native class DOMSettableTokenList {
-	// TODO
+native class DOMSettableTokenList extends DOMTokenList {
+	var value : string;
 }
 
 native class DOMStringList {
-	function item(index : int) : string;
-	__readonly__ var length : int;
+	__readonly__ var length : number;
+	function __native_index_operator__(index : int) : String;
+	function item(index : int) : String;
 	function contains(str : string) : boolean;
 }
 
 native class DOMStringMap {
-	// TODO
+	function __native_index_operator__(key : string) : MayBeUndefined.<string>;
 }
 
 native class ClientRect {
