@@ -80,6 +80,8 @@ var Optimizer = exports.Optimizer = Class.extend({
 				this._commands.push(new _NoAssertCommand());
 			} else if (cmd == "no-log") {
 				this._commands.push(new _NoLogCommand());
+			} else if (cmd == "fold-const") {
+				this._commands.push(new _FoldConstantCommand());
 			} else if (cmd == "inline") {
 				this._commands.push(new _InlineOptimizeCommand());
 			} else if (cmd == "return-if") {
@@ -239,6 +241,69 @@ var _NoLogCommand = exports._NoAssertCommand = _FunctionOptimizeCommand.extend({
 				++i;
 			}
 		}
+	}
+
+});
+
+// propagates constants
+var _FoldConstantCommand = exports.__FoldConstantCommand = _FunctionOptimizeCommand.extend({
+
+	constructor: function () {
+		_FunctionOptimizeCommand.prototype.constructor.call(this, "fold-const");
+	},
+
+	optimizeFunction: function (funcDef) {
+		funcDef.forEachStatement(function onStatement(statement) {
+			statement.forEachStatement(onStatement.bind(this));
+			statement.forEachExpression(function onExpr(expr, replaceCb) {
+				expr.forEachExpression(onExpr.bind(this));
+				this._optimizeExpression(expr, replaceCb);
+				return true;
+			}.bind(this));
+			return true;
+		}.bind(this));
+		funcDef.forEachClosure(function (funcDef) {
+			this.optimizeFunction(funcDef);
+			return true;
+		}.bind(this));
+	},
+
+	_optimizeExpression: function (expr, replaceCb) {
+		// subexprs are already optimized
+
+		if (expr instanceof PropertyExpression) {
+			var holderType = expr.getHolderType();
+			if (holderType instanceof ClassDefType) {
+				var member = null;
+				holderType.getClassDef().forEachMemberVariable(function (m) {
+					if (m instanceof MemberVariableDefinition && m.name() == expr.getIdentifierToken().getValue())
+						member = m;
+					return member != null;
+				});
+				if (member != null && (member.flags() & ClassDefinition.IS_CONST) != 0) {
+					this._foldStaticConst(member);
+					var initialValue = member.getInitialValue();
+					if (this._exprIsFoldable(initialValue)) {
+						replaceCb(initialValue);
+					}
+				}
+			}
+		}
+	},
+
+	_foldStaticConst: function (member) {
+		// FIXME fold the constants recursively
+	},
+
+	_exprIsFoldable: function (expr) {
+		if (expr instanceof UndefinedExpression
+			|| expr instanceof NullExpression
+			|| expr instanceof BooleanLiteralExpression
+			|| expr instanceof IntegerLiteralExpression
+			|| expr instanceof NumberLiteralExpression
+			|| expr instanceof StringLiteralExpression)
+			return true;
+		return false;
 	}
 
 });
