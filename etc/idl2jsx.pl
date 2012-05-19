@@ -68,12 +68,30 @@ my %typemap = (
 
     # http://www.w3.org/TR/DOM-Level-3-Core/idl-definitions.html
     'UserDataHandler' => 'function(operation:int,key:string,data:variant,src:Node,dst:Node):void',
+
+    # https://www.khronos.org/registry/webgl/specs/1.0/
+    'GLenum' => 'int',
+    'GLboolean' => 'boolean',
+    'GLbitfield' => 'int',
+    'GLbyte' => 'int',
+    'GLshort' => 'int',
+    'GLint' => 'int',
+    'GLsizei' => 'int',
+    'GLintptr' => 'number',
+    'GLsizeiptr' => 'number',
+    'GLubyte' => 'int',
+    'GLushort' => 'int',
+    'GLuint' => 'int',
+    'GLfloat' => 'number',
+    'GLclampf' => 'number',
+    # typo of DOMObject?
+    'object' => 'Object',
 );
 
 sub to_jsx_type {
     my($idl_type, $may_be_undefined) = @_;
     $idl_type =~ s/.+://; # remove namespace
-    $idl_type  =~ s/(?<array> (?: \[\] )? )\z//xms;
+    $idl_type  =~ s/(?<array> (?: \[ \s* \] )? )\z//xms;
 
     my $type;
     if(exists $typemap{$idl_type}) {
@@ -106,7 +124,7 @@ my $rx_simple_type = qr{
         (?:
             \? # nullable
             |
-            \[\] # array
+            \[ \s* \] # array
         )?
     )
 }xms;
@@ -162,7 +180,8 @@ while($content =~ m{(?<constructors> $rx_constructors )? (?:interface|exception)
     }
 
     foreach my $member(split /;/, $+{members}) {
-        $member =~ s{(//[^\n]*)}{say "\t", $1; ""}ge; # remove comments
+        $member =~ s{(//[^\n]*)}{say "\t", $1; ""}xmsge; # remove comments
+        $member =~ s{(/\* .*? \*/)}{say "\t", $1; ""}xmsge; # remove comments
         $member =~ s{\s+}{ }g; # compress extra spaces
 
         if($member !~ /\S/) {
