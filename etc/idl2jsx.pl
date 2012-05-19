@@ -4,6 +4,8 @@ use strict;
 use warnings;
 use Fatal qw(open);
 
+# see http://dev.w3.org/2006/webapi/WebIDL/
+
 say "// generated from $_" for @ARGV;
 
 @ARGV = map {
@@ -28,7 +30,11 @@ my %skip = (
 # NOTE: JSX's int is signed 32 bit integer
 my %typemap = (
    'DOMString' => 'string',
+   # WebIDL says, "Note also that null is not a value of type DOMString.
+   # To allow null, a nullable DOMString, written as DOMString? in IDL,
+   # needs to be used."
    'DOMString?' => 'String',
+
    'DOMTimeStamp'=> 'number',
    'byte'  => 'int',
    'short' => 'int',
@@ -66,7 +72,7 @@ my $rx_type = qr{
 
 my %seen;
 
-while($content =~ m{interface \s+ (?<class> \S+) \s+ (?: : \s+ (?<base> \S+) \s+)? \{ (?<members> .+?) \}}xmsg) {
+while($content =~ m{(?:interface|exception) \s+ (?<class> \S+) \s+ (?: : \s+ (?<base> \S+) \s+)? \{ (?<members> .+?) \}}xmsg) {
     my $class = $+{class};
 
     if($skip{$class}) {
@@ -121,6 +127,9 @@ while($content =~ m{interface \s+ (?<class> \S+) \s+ (?: : \s+ (?<base> \S+) \s+
         }
         # member function
         elsif($member =~ m{
+                (?<property>
+                    (?: (?:getter | setter | creator | deleter) \s+ )*
+                )
                 (?<ret_type> $rx_type)
                 \s+
                 (?<ident> \S+)
@@ -130,6 +139,7 @@ while($content =~ m{interface \s+ (?<class> \S+) \s+ (?: : \s+ (?<base> \S+) \s+
                 \)
             }xms) { # member function
 
+            my $prop = $+{property};
             my $ident = $+{ident};
             my $ret_type = to_jsx_type($+{ret_type});
 
@@ -149,6 +159,7 @@ while($content =~ m{interface \s+ (?<class> \S+) \s+ (?: : \s+ (?<base> \S+) \s+
                 $line .= $params . "\n";
                 $line .= "\t) : $ret_type;";
             }
+            say "\t// $prop" if $prop;
             say $line;
         }
         else {
