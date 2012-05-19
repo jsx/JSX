@@ -1061,6 +1061,14 @@ native class EventTarget {
 	// Modified in DOM Level 3:
 	function addEventListener(
 		type : string/*DOMString*/,
+		listener : function(:Event):void/*EventListener*/
+	) : void;
+	function removeEventListener(
+		type : string/*DOMString*/,
+		listener : function(:Event):void/*EventListener*/
+	) : void;
+	function addEventListener(
+		type : string/*DOMString*/,
 		listener : function(:Event):void/*EventListener*/,
 		useCapture : boolean
 	) : void;
