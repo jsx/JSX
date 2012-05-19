@@ -965,8 +965,21 @@ native __fake__ class BarInfo {
 	__readonly__ var visible : boolean;
 }
 
+// generated from http://www.w3.org/TR/webstorage/
 native class Storage {
-	// TODO
+	__readonly__ var length : int/*unsigned long*/;
+	function key(index : int/*unsigned long*/) : String/*DOMString?*/;
+	// XXX: DOM spec says getImte() returns not null, but Chrome does.
+	// getter
+	function getItem(key : string/*DOMString*/) : String/*DOMString*/;
+	// setter creator
+	function setItem(
+		key : string/*DOMString*/,
+		value : string/*DOMString*/
+	) : void;
+	// deleter
+	function removeItem(key : string/*DOMString*/) : void;
+	function clear() : void;
 }
 
 native __fake__ class History {
