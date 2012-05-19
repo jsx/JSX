@@ -3,7 +3,7 @@ import "test-case.jsx";
 
 class _Test extends TestCase {
 	function test_Int8Array() : void {
-		var a = new Int8Array([10, 20, 30]);
+		var a = new Int8Array([10, 20, 30] : int[]);
 		this.expect(a.length).toBe(3);
 		this.expect(a[0]).toBe(10);
 		this.expect(a[1]).toBe(20);
@@ -18,7 +18,7 @@ class _Test extends TestCase {
 	}
 
 	function test_Uint8Array() : void {
-		var a = new Uint8Array([10, 20, 30]);
+		var a = new Uint8Array([10, 20, 30] : int[]);
 		this.expect(a.length).toBe(3);
 		this.expect(a[0]).toBe(10);
 		this.expect(a[1]).toBe(20);
@@ -33,7 +33,7 @@ class _Test extends TestCase {
 	}
 
 	function test_Int16Array() : void {
-		var a = new Int16Array([10, 20, 30]);
+		var a = new Int16Array([10, 20, 30] : int[]);
 		this.expect(a.length).toBe(3);
 		this.expect(a[0]).toBe(10);
 		this.expect(a[1]).toBe(20);
@@ -48,7 +48,7 @@ class _Test extends TestCase {
 	}
 
 	function test_Uint16Array() : void {
-		var a = new Uint16Array([10, 20, 30]);
+		var a = new Uint16Array([10, 20, 30] : int[]);
 		this.expect(a.length).toBe(3);
 		this.expect(a[0]).toBe(10);
 		this.expect(a[1]).toBe(20);
@@ -63,7 +63,7 @@ class _Test extends TestCase {
 	}
 
 	function test_Int32Array() : void {
-		var a = new Int32Array([10, 20, 30]);
+		var a = new Int32Array([10, 20, 30] : int[]);
 		this.expect(a.length).toBe(3);
 		this.expect(a[0]).toBe(10);
 		this.expect(a[1]).toBe(20);
@@ -78,7 +78,7 @@ class _Test extends TestCase {
 	}
 
 	function test_Uint32Array() : void {
-		var a = new Uint32Array([10, 20, 30]);
+		var a = new Uint32Array([10, 20, 30] : int[]);
 		this.expect(a.length).toBe(3);
 		this.expect(a[0]).toBe(10);
 		this.expect(a[1]).toBe(20);
@@ -123,7 +123,7 @@ class _Test extends TestCase {
 	}
 
 	function test_DataView() : void {
-		var b = new Uint8Array([0x10, 0x20, 0x30, 0x40, 0, 0, 0, 0]);
+		var b = new Uint8Array([0x10, 0x20, 0x30, 0x40, 0, 0, 0, 0] : int[]);
 		var v = new DataView(b.buffer);
 
 		this.expect(v.getInt8(0), 'getInt8').toBe(0x10);
