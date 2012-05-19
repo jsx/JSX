@@ -3,10 +3,10 @@ import "js/dom/canvas2d.jsx";
 
 class Config {
 	static var quantity = 360;
-	static var size     = 2.0;
-	static var decay    = 0.98;
-	static var gravity  = 2.0;
-	static var speed    = 6.0;
+	static const size     = 2.0;
+	static const decay    = 0.98;
+	static const gravity  = 2.0;
+	static const speed    = 6.0;
 }
 
 
@@ -47,7 +47,7 @@ final class Spark {
 		}
 	}
 
-	final function _move() : void {
+	function _move() : void {
 		this.posX += this.velX + (Math.random() - 0.5);
 		this.posY += this.velY + (Math.random() - 0.5) + Config.gravity;
 	}
