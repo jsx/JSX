@@ -16,6 +16,7 @@ See also:
 
 import "js.jsx";
 import "css.jsx";
+import "typedarray.jsx";
 
 // DOM-Core
 
@@ -261,6 +262,19 @@ native class Document extends Node /* implements DocumentEvent */ {
 
 	// implements interface DocumentEvent
 	function createEvent(eventInterface : string) : Event;
+
+	// touch events
+	function createTouch(
+		view : AbstractView,
+		target : EventTarget,
+		identifier : int/*long*/,
+		pageX : int/*long*/,
+		pageY : int/*long*/,
+		screenX : int/*long*/,
+		screenY : int/*long*/
+	) : Touch;
+	function createTouchList(touches : Touch[]) : TouchList;
+	function createTouchList(touch : Touch) : TouchList;
 }
 
 // DOM-HTML
@@ -1291,37 +1305,42 @@ native class MutationNameEvent extends MutationEvent {
 	) : void;
 }
 
-
-// http://www.w3.org/TR/touch-events/
-
+// generated from http://www.w3.org/TR/touch-events/
 native class Touch {
-	__readonly__ var identifier : int;
+	// FIXME: delete function constructor();
+	__readonly__ var identifier : int/*long*/;
 	__readonly__ var target : EventTarget;
-	__readonly__ var screenX : int;
-	__readonly__ var screenY : int;
-	__readonly__ var clientX : int;
-	__readonly__ var clientY : int;
-	__readonly__ var pageX : int;
-	__readonly__ var pageY : int;
+	__readonly__ var screenX : int/*long*/;
+	__readonly__ var screenY : int/*long*/;
+	__readonly__ var clientX : int/*long*/;
+	__readonly__ var clientY : int/*long*/;
+	__readonly__ var pageX : int/*long*/;
+	__readonly__ var pageY : int/*long*/;
 }
 
-/*
 native class TouchList {
-	__readonly__ var length : int;
-	function item(index : int) : Touch;
-	function identifiedTouch(identifier : int) : Touch;
+	// FIXME: delete function constructor();
+	__readonly__ var length : int/*unsigned long*/;
+	function __native_index_operator__(
+		index : int/*unsigned long*/
+	) : MayBeUndefined.<Touch>;
+	function /* getter */ item(
+		index : int/*unsigned long*/
+	) : MayBeUndefined.<Touch>;
+	function identifiedTouch(identifier : int/*long*/) : Touch;
 }
-*/
 
 native class TouchEvent extends UIEvent {
-	__readonly__ var touches : Touch[];
-	__readonly__ var targetTouches : Touch[];
-	__readonly__ var changedTouches : Touch[];
+	// FIXME: delete function constructor();
+	__readonly__ var touches : TouchList;
+	__readonly__ var targetTouches : TouchList;
+	__readonly__ var changedTouches : TouchList;
 	__readonly__ var altKey : boolean;
 	__readonly__ var metaKey : boolean;
 	__readonly__ var ctrlKey : boolean;
 	__readonly__ var shiftKey : boolean;
 }
+
 
 // XHR Level 2
 // generated from http://www.w3.org/TR/XMLHttpRequest/
@@ -1384,7 +1403,7 @@ native class XMLHttpRequest extends XMLHttpRequestEventTarget {
 	var withCredentials : boolean;
 	__readonly__ var upload : XMLHttpRequestUpload;
 	function send() : void;
-	// FIXME function send(data : ArrayBuffer) : void;
+	function send(data : ArrayBuffer) : void;
 	function send(data : Blob) : void;
 	function send(data : Document) : void;
 	function send(data : string/*DOMString*/) : void;
@@ -1480,7 +1499,7 @@ native class WebSocket extends EventTarget {
 	var onmessage : function(:Event):void/*Function?*/;
 	var binaryType : string/*DOMString*/;
 	function send(data : string/*DOMString*/) : void;
-	//FIXME function send(data : ArrayBuffer) : void;
+	function send(data : ArrayBuffer) : void;
 	function send(data : Blob) : void;
 }
 
