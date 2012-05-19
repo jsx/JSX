@@ -1711,7 +1711,7 @@ var CallExpression = exports.CallExpression = OperatorExpression.extend({
 	forEachExpression: function (cb) {
 		if (! cb(this._expr, function (expr) { this._expr = expr; }.bind(this)))
 			return false;
-		if (! Util.forEachExpression(this._args))
+		if (! Util.forEachExpression(cb, this._args))
 			return false;
 		return true;
 	}
@@ -1784,7 +1784,7 @@ var SuperExpression = exports.SuperExpression = OperatorExpression.extend({
 	},
 
 	forEachExpression: function (cb) {
-		if (! Util.forEachExpression(this._args))
+		if (! Util.forEachExpression(cb, this._args))
 			return false;
 		return true;
 	}
@@ -1860,7 +1860,7 @@ var NewExpression = exports.NewExpression = OperatorExpression.extend({
 	},
 
 	forEachExpression: function (cb) {
-		if (! Util.forEachExpression(this._args))
+		if (! Util.forEachExpression(cb, this._args))
 			return false;
 		return true;
 	}
