@@ -12,6 +12,9 @@ See also:
 	http://www.w3.org/TR/DOM-Level-2-Core/
 	http://www.w3.org/TR/DOM-Level-3-Core/
 	http://dev.w3.org/html5/spec/
+
+	cf.
+	http://es-operating-system.googlecode.com/svn/trunk/esidl/dom/html5.idl
 */
 
 import "js.jsx";

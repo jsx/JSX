@@ -30,17 +30,26 @@ my %skip = (
     EventListener => 1,
     DOMErrorHandler => 1,
     UserDataHandler => 1,
+    Example => 1,
+    Function => 1,
 );
 
 # NOTE: JSX's int is signed 32 bit integer
+
+# WebIDL says, "Note also that null is not a value of type DOMString.
+# To allow null, a nullable DOMString, written as DOMString? in IDL,
+# needs to be used."
+my %nullable = (
+    string => 'String',
+    number => 'Number',
+    int    => 'Number',
+    boolean => 'Boolean',
+);
+
 my %typemap = (
     'DOMObject' => 'Object',
     'DOMUserData' => 'variant',
     'DOMString' => 'string',
-    # WebIDL says, "Note also that null is not a value of type DOMString.
-    # To allow null, a nullable DOMString, written as DOMString? in IDL,
-    # needs to be used."
-    'DOMString?' => 'String',
 
     'DOMTimeStamp'=> 'number',
     'octet' => 'int',
@@ -62,6 +71,7 @@ my %typemap = (
 
     # http://www.w3.org/TR/websockets/
     'Function?' => 'function(:Event):void',
+    'Function' => 'function(:Event):void',
 
     # http://www.w3.org/TR/XMLHttpRequest/
     'XMLHttpRequestResponseType' => 'string', # enum
@@ -91,14 +101,29 @@ my %typemap = (
 sub to_jsx_type {
     my($idl_type, $may_be_undefined) = @_;
     $idl_type =~ s/.+://; # remove namespace
-    $idl_type  =~ s/(?<array> (?: \[ \s* \] )? )\z//xms;
+    $idl_type  =~ s{
+        (?:
+            (?<array> \[ \s* \] )
+            |
+            (?<vararg> \.\.\. )
+            |
+            (?<nullabble> \? )
+        )*
+        \z
+    }{}xms;
+    my $array = $+{array} // "";
+    my $vararg = $+{vararg} // ""; # not used yet
+    my $nullable = $+{nullable} // "";
 
     my $type;
-    if(exists $typemap{$idl_type}) {
-        $type = $typemap{$idl_type} . $+{array} . "/*$idl_type$+{array}*/";
+    if(my $t = $typemap{$idl_type}) {
+        $t = $nullable{$t} if $nullable && exists $nullable{$t};
+        $type = $t . $array . "/*$idl_type$array*/";
     }
     else {
-        $type = $idl_type . $+{array};
+        my $t = $idl_type;
+        $t = $nullable{$t} if $nullable && exists $nullable{$t};
+        $type = $t . $array;
     }
 
     if($may_be_undefined) {
@@ -125,6 +150,8 @@ my $rx_simple_type = qr{
             \? # nullable
             |
             \[ \s* \] # array
+            |
+            \.\.\. # vararg
         )?
     )
 }xms;
@@ -140,7 +167,10 @@ my $rx_type = qr{
 
 my %seen;
 
-while($content =~ m{(?<constructors> $rx_constructors )? (?:interface|exception) \s+ (?<class> \S+) \s+ (?: : \s+ (?<base> \S+) \s+)? \{ (?<members> .+?) \}}xmsg) {
+while($content =~ m{
+        (?<constructors> $rx_constructors )?
+        ^ \s* (?:interface|exception) \s+ (?<class> \S+) \s+
+        (?: : \s+ (?<base> \S+) \s+)? \{ (?<members> .*?) \}}xmsg) {
     my $class = $+{class};
 
     if($skip{$class}) {
@@ -191,28 +221,35 @@ while($content =~ m{(?<constructors> $rx_constructors )? (?:interface|exception)
         # member function
         if($member =~ m{
                 (?<property>
-                    (?: (?:getter | setter | creator | deleter) \s+ )*
+                    (?: (?: stringifier | legacycaller | getter | setter | creator | deleter) \s+ )*
                 )
                 (?<ret_type> $rx_type)
                 \s+
-                (?<ident> \w+)
+                (?<ident> \w*)
                 \s*
                 \(
                     (?<params> .*)
                 \)
             }xms) { # member function
 
-            my $prop = trim($+{property});
             my $name = $+{ident};
+            my $prop = trim($+{property});
             my $ret_type_may_be_undefined = 0;
             if($prop) {
-                $name = "/* $prop */ $name";
-                if($prop eq "getter") {
+                if(index($prop, "getter") != -1) {
                     $ret_type_may_be_undefined = 1;
                     write_functions("__native_index_operator__",
                         $+{ret_type}, $+{params},
                         $ret_type_may_be_undefined);
                 }
+                if(!$name) {
+                    warn "no name for $member, skipped.\n";
+                    next;
+                }
+                $name = "/* $prop */ $name";
+            }
+            if(!$name) {
+                die "unexpected no name for $member.\n";
             }
             write_functions($name, $+{ret_type}, $+{params},
                 $ret_type_may_be_undefined);
@@ -228,6 +265,7 @@ while($content =~ m{(?<constructors> $rx_constructors )? (?:interface|exception)
         }
         # member var
         elsif($member =~ m{
+                (?: \bstringifier\b \s+ )?
                 (?<readonly> \breadonly\b \s+)? (?: \battribute\b \s+)?
                 (?<type> $rx_type) \s+ (?<ident> \w+)
             }xms) {
