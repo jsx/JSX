@@ -21,43 +21,53 @@ my $content = do {
 my %fake = (
     Window => 1,
     DocumentEvent => 1,
+    DOMLocator => 1,
+    DOMConfiguration => 1,
+    TypeInfo => 1,
 );
 
 my %skip = (
     EventListener => 1,
+    DOMErrorHandler => 1,
+    UserDataHandler => 1,
 );
 
 # NOTE: JSX's int is signed 32 bit integer
 my %typemap = (
-   'DOMString' => 'string',
-   # WebIDL says, "Note also that null is not a value of type DOMString.
-   # To allow null, a nullable DOMString, written as DOMString? in IDL,
-   # needs to be used."
-   'DOMString?' => 'String',
+    'DOMObject' => 'Object',
+    'DOMUserData' => 'variant',
+    'DOMString' => 'string',
+    # WebIDL says, "Note also that null is not a value of type DOMString.
+    # To allow null, a nullable DOMString, written as DOMString? in IDL,
+    # needs to be used."
+    'DOMString?' => 'String',
 
-   'DOMTimeStamp'=> 'number',
-   'octet' => 'int',
-   'byte'  => 'int',
-   'short' => 'int',
-   'long'  => 'int',
-   'long long' => 'number',
-   'unsigned byte' => 'int',
-   'unsigned short' => 'int',
-   'unsigned int' => 'int',
-   'unsigned long' => 'int',
-   'unsigned long long' => 'number',
-   'float' => 'number',
-   'double' => 'number',
+    'DOMTimeStamp'=> 'number',
+    'octet' => 'int',
+    'byte'  => 'int',
+    'short' => 'int',
+    'long'  => 'int',
+    'long long' => 'number',
+    'unsigned byte' => 'int',
+    'unsigned short' => 'int',
+    'unsigned int' => 'int',
+    'unsigned long' => 'int',
+    'unsigned long long' => 'number',
+    'float' => 'number',
+    'double' => 'number',
 
-   'any' => 'variant',
+    'any' => 'variant',
 
-   'EventListener' => 'function(:Event):void',
+    'EventListener' => 'function(:Event):void',
 
     # http://www.w3.org/TR/websockets/
-   'Function?' => 'function(:Event):void',
+    'Function?' => 'function(:Event):void',
 
-   # http://www.w3.org/TR/XMLHttpRequest/
-   'XMLHttpRequestResponseType' => 'string', # enum
+    # http://www.w3.org/TR/XMLHttpRequest/
+    'XMLHttpRequestResponseType' => 'string', # enum
+
+    # http://www.w3.org/TR/DOM-Level-3-Core/idl-definitions.html
+    'UserDataHandler' => 'function(operation:int,key:string,data:variant,src:Node,dst:Node):void',
 );
 
 sub to_jsx_type {
@@ -159,29 +169,8 @@ while($content =~ m{(?<constructors> $rx_constructors )? (?:interface|exception)
             next;
         }
 
-        # member var
-        if($member =~ m{
-                (?<readonly> readonly \s+)? attribute
-                \s+ (?<type> $rx_type) \s+ (?<ident> \w+)
-            }xms) {
-
-            my $decl = "var";
-            if($+{readonly}) {
-                $decl = "__readonly__ $decl";
-            }
-            my $type = to_jsx_type($+{type});
-            say "\t", "$decl $+{ident} : $type;";
-        }
-        # member constant
-        elsif($member =~ m{
-                const \s+ (?<type> $rx_type) \s+ (?<ident> \w+)
-            }xms) {
-
-            my $type = to_jsx_type($+{type});
-            say "\t", "static const $+{ident} : $type;";
-        }
         # member function
-        elsif($member =~ m{
+        if($member =~ m{
                 (?<property>
                     (?: (?:getter | setter | creator | deleter) \s+ )*
                 )
@@ -208,6 +197,28 @@ while($content =~ m{(?<constructors> $rx_constructors )? (?:interface|exception)
             }
             write_functions($name, $+{ret_type}, $+{params},
                 $ret_type_may_be_undefined);
+        }
+        # member constant
+        elsif($member =~ m{
+                const \s+ (?<type> $rx_type) \s+ (?<ident> \w+)
+            }xms) {
+
+            my $type = to_jsx_type($+{type});
+            say "\t", "static const     $+{ident} : $type;";
+            say "\t", "__readonly__ var $+{ident} : $type;";
+        }
+        # member var
+        elsif($member =~ m{
+                (?<readonly> \breadonly\b \s+)? (?: \battribute\b \s+)?
+                (?<type> $rx_type) \s+ (?<ident> \w+)
+            }xms) {
+
+            my $decl = "var";
+            if($+{readonly}) {
+                $decl = "__readonly__ $decl";
+            }
+            my $type = to_jsx_type($+{type});
+            say "\t", "$decl $+{ident} : $type;";
         }
         else {
             die "[BUG] canot parse member: $member\n";
