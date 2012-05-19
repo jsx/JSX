@@ -1021,110 +1021,255 @@ interface DocumentView {
 // DOM  Events
 // http://www.w3.org/TR/DOM-Level-3-Events/
 
+// generated from http://www.w3.org/TR/DOM-Level-3-Events/
 native class Event {
-	static const CAPTURING_PHASE : int;
-	static const AT_TARGET : int;
-	static const BUBBLING_PHASE : int;
-
-	__readonly__ var type : string;
+	// PhaseType
+	static const CAPTURING_PHASE : int/*unsigned short*/;
+	static const AT_TARGET : int/*unsigned short*/;
+	static const BUBBLING_PHASE : int/*unsigned short*/;
+	__readonly__ var type : string/*DOMString*/;
 	__readonly__ var target : EventTarget;
 	__readonly__ var currentTarget : EventTarget;
-	__readonly__ var eventPhase : int;
+	__readonly__ var eventPhase : int/*unsigned short*/;
 	__readonly__ var bubbles : boolean;
 	__readonly__ var cancelable : boolean;
-	__readonly__ var timeStamp : int;
-
+	__readonly__ var timeStamp : number/*DOMTimeStamp*/;
 	function stopPropagation() : void;
 	function preventDefault() : void;
-	function initEvent(eventTypeArg : string, canBubbleArg : boolean, cancelableArg : boolean) : void;
-
-	// DOM level 3
-
+	function initEvent(
+		eventTypeArg : string/*DOMString*/,
+		canBubbleArg : boolean,
+		cancelableArg : boolean
+	) : void;
+	// Introduced in DOM Level 3:
 	function stopImmediatePropagation() : void;
 	__readonly__ var defaultPrevented : boolean;
 	__readonly__ var isTrusted : boolean;
 }
 
 native class CustomEvent extends Event {
-	// TODO
+	__readonly__ var detail : variant/*any*/;
+	function initCustomEvent(
+		typeArg : string/*DOMString*/,
+		canBubbleArg : boolean,
+		cancelableArg : boolean,
+		detailArg : variant/*any*/
+	) : void;
 }
 
 native class EventTarget {
-	// TODO
+	// Modified in DOM Level 3:
+	function addEventListener(
+		type : string/*DOMString*/,
+		listener : function(:Event):void/*EventListener*/,
+		useCapture : boolean
+	) : void;
+	function removeEventListener(
+		type : string/*DOMString*/,
+		listener : function(:Event):void/*EventListener*/,
+		useCapture : boolean
+	) : void;
+	function dispatchEvent(evt : Event) : boolean;
+}
 
-	function addEventListener(target : string, listener : function(:Event):void) : void;
-	function addEventListener(target : string, listener : function(:Event):void, useCapture : boolean) : void;
-
-	function removeEventListener(target : string, listener : function(:Event):void) : void;
-	function removeEventListener(target : string, listener : function(:Event):void, useCapture : boolean) : void;
-
-	function dispatchEvent(evt : Event) : void;
+native __fake__ class DocumentEvent {
+	// Modified in DOM Level 3:
+	function createEvent(eventInterface : string/*DOMString*/) : Event;
 }
 
 native class UIEvent extends Event {
-	// TODO
+	__readonly__ var view : AbstractView;
+	__readonly__ var detail : int/*long*/;
+	function initUIEvent(
+		typeArg : string/*DOMString*/,
+		canBubbleArg : boolean,
+		cancelableArg : boolean,
+		viewArg : AbstractView,
+		detailArg : int/*long*/
+	) : void;
 }
 
 native class FocusEvent extends UIEvent {
-	// TODO
+	__readonly__ var relatedTarget : EventTarget;
+	function initFocusEvent(
+		typeArg : string/*DOMString*/,
+		canBubbleArg : boolean,
+		cancelableArg : boolean,
+		viewArg : AbstractView,
+		detailArg : int/*long*/,
+		relatedTargetArg : EventTarget
+	) : void;
 }
 
 native class MouseEvent extends UIEvent {
-	__readonly__ var screenX : int;
-	__readonly__ var screenY : int;
-	__readonly__ var clientX : int;
-	__readonly__ var clientY : int;
+	__readonly__ var screenX : int/*long*/;
+	__readonly__ var screenY : int/*long*/;
+	__readonly__ var clientX : int/*long*/;
+	__readonly__ var clientY : int/*long*/;
 	__readonly__ var ctrlKey : boolean;
 	__readonly__ var shiftKey : boolean;
 	__readonly__ var altKey : boolean;
 	__readonly__ var metaKey : boolean;
-	__readonly__ var button : int;
-	__readonly__ var buttons : int;
+	__readonly__ var button : int/*unsigned short*/;
+	__readonly__ var buttons : int/*unsigned short*/;
 	__readonly__ var relatedTarget : EventTarget;
-
 	function initMouseEvent(
-		typeArg : string,
+		typeArg : string/*DOMString*/,
 		canBubbleArg : boolean,
 		cancelableArg : boolean,
 		viewArg : AbstractView,
-		detailArg : int,
-		screenXArg : int,
-		screenYArg : int,
-		clientXArg : int,
-		clientYArg : int,
+		detailArg : int/*long*/,
+		screenXArg : int/*long*/,
+		screenYArg : int/*long*/,
+		clientXArg : int/*long*/,
+		clientYArg : int/*long*/,
 		ctrlKeyArg : boolean,
 		altKeyArg : boolean,
 		shiftKeyArg : boolean,
 		metaKeyArg : boolean,
-		buttonArg : int,
-		relatedTargetArg : EventTarget ) : void;
-
-	function getModifierState(keyArg : string) : boolean;
+		buttonArg : int/*unsigned short*/,
+		relatedTargetArg : EventTarget
+	) : void;
+	// Introduced in DOM Level 3:
+	function getModifierState(keyArg : string/*DOMString*/) : boolean;
 }
 
 native class WheelEvent extends MouseEvent {
-	// TODO
+	// DeltaModeCode
+	static const DOM_DELTA_PIXEL : int/*unsigned long*/;
+	static const DOM_DELTA_LINE : int/*unsigned long*/;
+	static const DOM_DELTA_PAGE : int/*unsigned long*/;
+	__readonly__ var deltaX : number/*float*/;
+	__readonly__ var deltaY : number/*float*/;
+	__readonly__ var deltaZ : number/*float*/;
+	__readonly__ var deltaMode : int/*unsigned long*/;
+	function initWheelEvent(
+		typeArg : string/*DOMString*/,
+		canBubbleArg : boolean,
+		cancelableArg : boolean,
+		viewArg : AbstractView,
+		detailArg : int/*long*/,
+		screenXArg : int/*long*/,
+		screenYArg : int/*long*/,
+		clientXArg : int/*long*/,
+		clientYArg : int/*long*/,
+		buttonArg : int/*unsigned short*/,
+		relatedTargetArg : EventTarget,
+		modifiersListArg : string/*DOMString*/,
+		deltaXArg : number/*float*/,
+		deltaYArg : number/*float*/,
+		deltaZArg : number/*float*/,
+		deltaMode : int/*unsigned long*/
+	) : void;
 }
 
 native class TextEvent extends UIEvent {
-	// TODO
+	// InputMethodCode
+	static const DOM_INPUT_METHOD_UNKNOWN : int/*unsigned long*/;
+	static const DOM_INPUT_METHOD_KEYBOARD : int/*unsigned long*/;
+	static const DOM_INPUT_METHOD_PASTE : int/*unsigned long*/;
+	static const DOM_INPUT_METHOD_DROP : int/*unsigned long*/;
+	static const DOM_INPUT_METHOD_IME : int/*unsigned long*/;
+	static const DOM_INPUT_METHOD_OPTION : int/*unsigned long*/;
+	static const DOM_INPUT_METHOD_HANDWRITING : int/*unsigned long*/;
+	static const DOM_INPUT_METHOD_VOICE : int/*unsigned long*/;
+	static const DOM_INPUT_METHOD_MULTIMODAL : int/*unsigned long*/;
+	static const DOM_INPUT_METHOD_SCRIPT : int/*unsigned long*/;
+	__readonly__ var data : string/*DOMString*/;
+	__readonly__ var inputMethod : int/*unsigned long*/;
+	__readonly__ var locale : string/*DOMString*/;
+	function initTextEvent(
+		typeArg : string/*DOMString*/,
+		canBubbleArg : boolean,
+		cancelableArg : boolean,
+		viewArg : AbstractView,
+		dataArg : string/*DOMString*/,
+		inputMethod : int/*unsigned long*/,
+		localeArg : string/*DOMString*/
+	) : void;
 }
 
 native class KeyboardEvent extends UIEvent {
-	// TODO
+	// KeyLocationCode
+	static const DOM_KEY_LOCATION_STANDARD : int/*unsigned long*/;
+	static const DOM_KEY_LOCATION_LEFT : int/*unsigned long*/;
+	static const DOM_KEY_LOCATION_RIGHT : int/*unsigned long*/;
+	static const DOM_KEY_LOCATION_NUMPAD : int/*unsigned long*/;
+	static const DOM_KEY_LOCATION_MOBILE : int/*unsigned long*/;
+	static const DOM_KEY_LOCATION_JOYSTICK : int/*unsigned long*/;
+	__readonly__ var char : string/*DOMString*/;
+	__readonly__ var key : string/*DOMString*/;
+	__readonly__ var location : int/*unsigned long*/;
+	__readonly__ var ctrlKey : boolean;
+	__readonly__ var shiftKey : boolean;
+	__readonly__ var altKey : boolean;
+	__readonly__ var metaKey : boolean;
+	__readonly__ var repeat : boolean;
+	__readonly__ var locale : string/*DOMString*/;
+	function getModifierState(keyArg : string/*DOMString*/) : boolean;
+	function initKeyboardEvent(
+		typeArg : string/*DOMString*/,
+		canBubbleArg : boolean,
+		cancelableArg : boolean,
+		viewArg : AbstractView,
+		charArg : string/*DOMString*/,
+		keyArg : string/*DOMString*/,
+		locationArg : int/*unsigned long*/,
+		modifiersListArg : string/*DOMString*/,
+		repeat : boolean,
+		localeArg : string/*DOMString*/
+	) : void;
 }
 
 native class CompositionEvent extends UIEvent {
-	// TODO
+	__readonly__ var data : string/*DOMString*/;
+	__readonly__ var locale : string/*DOMString*/;
+	function initCompositionEvent(
+		typeArg : string/*DOMString*/,
+		canBubbleArg : boolean,
+		cancelableArg : boolean,
+		viewArg : AbstractView,
+		dataArg : string/*DOMString*/,
+		localeArg : string/*DOMString*/
+	) : void;
 }
 
 native class MutationEvent extends Event {
-	// TODO
+	// attrChangeType
+	static const MODIFICATION : int/*unsigned short*/;
+	static const ADDITION : int/*unsigned short*/;
+	static const REMOVAL : int/*unsigned short*/;
+	__readonly__ var relatedNode : Node;
+	__readonly__ var prevValue : string/*DOMString*/;
+	__readonly__ var newValue : string/*DOMString*/;
+	__readonly__ var attrName : string/*DOMString*/;
+	__readonly__ var attrChange : int/*unsigned short*/;
+	function initMutationEvent(
+		typeArg : string/*DOMString*/,
+		canBubbleArg : boolean,
+		cancelableArg : boolean,
+		relatedNodeArg : Node,
+		prevValueArg : string/*DOMString*/,
+		newValueArg : string/*DOMString*/,
+		attrNameArg : string/*DOMString*/,
+		attrChangeArg : int/*unsigned short*/
+	) : void;
 }
 
 native class MutationNameEvent extends MutationEvent {
-	// TODO
+	__readonly__ var prevNamespaceURI : string/*DOMString*/;
+	__readonly__ var prevNodeName : string/*DOMString*/;
+	// Introduced in DOM Level 3:
+	function initMutationNameEvent(
+		typeArg : string/*DOMString*/,
+		canBubbleArg : boolean,
+		cancelableArg : boolean,
+		relatedNodeArg : Node,
+		prevNamespaceURIArg : string/*DOMString*/,
+		prevNodeNameArg : string/*DOMString*/
+	) : void;
 }
+
 
 // http://www.w3.org/TR/touch-events/
 
@@ -1229,11 +1374,11 @@ final class dom {
 	static const window = js.global["window"] as __noconvert__ Window;
 
 	static function getWindow() : Window {
-		return js.global["window"] as __noconvert__ Window;
+		return dom.window;
 	}
 
 	static function id(identifier : string) : HTMLElement {
-		return dom.getWindow().document.getElementById(identifier)
+		return dom.window.document.getElementById(identifier)
 			as __noconvert__ HTMLElement;
 	}
 }
