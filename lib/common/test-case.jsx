@@ -1,4 +1,5 @@
 import "timer.jsx";
+import "console.jsx";
 
 class _Matcher {
 
@@ -170,12 +171,12 @@ class TestCase {
 	}
 
 	function diag(message : string) : void {
-		log message.replace(/^/mg, "# ");
+		console.warn(message.replace(/^/mg, "# "));
 	}
 
 	function note(message : string) : void {
 		// TODO skip if the process has no tty
-		log message.replace(/^/mg, "# ");
+		console.info(message.replace(/^/mg, "# "));
 	}
 
 	override
