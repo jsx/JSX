@@ -30,13 +30,13 @@ my %skip = (
 # NOTE: JSX's int is signed 32 bit integer
 my %typemap = (
    'DOMString' => 'string',
-   'DOMString[]' => 'string[]',
    # WebIDL says, "Note also that null is not a value of type DOMString.
    # To allow null, a nullable DOMString, written as DOMString? in IDL,
    # needs to be used."
    'DOMString?' => 'String',
 
    'DOMTimeStamp'=> 'number',
+   'octet' => 'int',
    'byte'  => 'int',
    'short' => 'int',
    'long'  => 'int',
@@ -61,13 +61,23 @@ my %typemap = (
 );
 
 sub to_jsx_type {
-    my($idl_type) = @_;
+    my($idl_type, $may_be_undefined) = @_;
     $idl_type =~ s/.+://; # remove namespace
+    $idl_type  =~ s/(?<array> (?: \[\] )? )\z//xms;
+
+    my $type;
     if(exists $typemap{$idl_type}) {
-        return $typemap{$idl_type} . "/*$idl_type*/";
+        $type = $typemap{$idl_type} . $+{array} . "/*$idl_type$+{array}*/";
     }
     else {
-        return $idl_type;
+        $type = $idl_type . $+{array};
+    }
+
+    if($may_be_undefined) {
+        return "MayBeUndefined.<$type>";
+    }
+    else {
+        return $type;
     }
 }
 
@@ -81,10 +91,24 @@ my $rx_constructors = qr{
 }xms;
 
 # the last ? means "nullable"
-my $rx_type = qr{
-    (?: [\:\w]+ (?: \s+ \w+)* (?: \? | \[\] )? )
+my $rx_simple_type = qr{
+    (?: [\:\w]+ (?: \s+ \w+)*
+        (?:
+            \? # nullable
+            |
+            \[\] # array
+        )?
+    )
 }xms;
-
+my $rx_type = qr{
+    (?:
+        (?:
+            \( \s* $rx_simple_type (?: \s+ or \s+ $rx_simple_type \s*)+ \)
+        )
+        |
+        $rx_simple_type
+    )
+}xms;
 
 my %seen;
 
@@ -111,6 +135,7 @@ while($content =~ m{(?<constructors> $rx_constructors )? (?:interface|exception)
     }
 
     say "$classdecl {";
+    my @member_funcs;
 
     if(my $constructors = $+{constructors}) {
         while($constructors =~ m{
@@ -118,7 +143,7 @@ while($content =~ m{(?<constructors> $rx_constructors )? (?:interface|exception)
                 (?<params> .*?)
             \) )?
         }xmsg) {
-            write_function("constructor", undef, $+{params});
+            write_functions("constructor", undef, $+{params});
         }
         say "";
     }
@@ -162,16 +187,27 @@ while($content =~ m{(?<constructors> $rx_constructors )? (?:interface|exception)
                 )
                 (?<ret_type> $rx_type)
                 \s+
-                (?<ident> \S+)
+                (?<ident> \w+)
                 \s*
                 \(
-                    (?<params> .*?)
+                    (?<params> .*)
                 \)
             }xms) { # member function
 
-            my $prop = $+{property};
-            say "\t// $prop" if $prop;
-            write_function($+{ident}, $+{ret_type}, $+{params});
+            my $prop = trim($+{property});
+            my $name = $+{ident};
+            my $ret_type_may_be_undefined = 0;
+            if($prop) {
+                $name = "/* $prop */ $name";
+                if($prop eq "getter") {
+                    $ret_type_may_be_undefined = 1;
+                    write_functions("__native_index_operator__",
+                        $+{ret_type}, $+{params},
+                        $ret_type_may_be_undefined);
+                }
+            }
+            write_functions($name, $+{ret_type}, $+{params},
+                $ret_type_may_be_undefined);
         }
         else {
             die "[BUG] canot parse member: $member\n";
@@ -181,50 +217,97 @@ while($content =~ m{(?<constructors> $rx_constructors )? (?:interface|exception)
     say "}\n";
 }
 
-sub write_function {
-    my($name, $ret_type, $src_params) = @_;
+sub write_functions {
+    my($name, $ret_type, $src_params, $ret_type_may_be_undefined) = @_;
 
     my $ret_type_decl = defined($ret_type)
-        ? " : " . to_jsx_type($ret_type)
+        ? " : " . to_jsx_type($ret_type, $ret_type_may_be_undefined)
         : "";
 
-    my @params = map {
+    my @unresolved_params = map {
         m{
             (?:
-                (?: in | (?<optional> optional) \s+)*
+                (?: \b (?: in | (?<optional> optional)) \b \s+ )*
                 (?<type> $rx_type) \s+
                 (?<ident> \w+)
             )
         }xms or die "Cannot parse line:  $_";
 
         +{
-            decl => "$+{ident} : " . to_jsx_type($+{type}),
+            name => $+{ident},
+            type => $+{type},
             optional => !!$+{optional},
         };
     } split /,/, $src_params // "";
 
     my @funcs;
 
-    while(1) {
-        my $p = join ", ", map { $_->{decl} } @params;
+    foreach my $params_ref(resolve_overload(@unresolved_params)) {
+        # resolve optional args
+        my @optionals;
+        while(1) {
+            my $p = join ", ", map {
+                "$_->{name} : " . to_jsx_type($_->{type})
+            } @{$params_ref};
 
-        my $line = "\t" . "function $name($p)$ret_type_decl;";
-        if(length $line > 70) { # prettify
-            $p =~ s/, \s+/,\n/xmsg;
-            $p =~ s/^/\t\t/xmsg;
-            $line = "\t" . "function $name(\n";
-            $line .= $p . "\n";
-            $line .= "\t)$ret_type_decl;";
+            my $line = "\t" . "function $name($p)$ret_type_decl;";
+            if(length $line > 70) { # prettify
+                $p =~ s/, \s+/,\n/xmsg;
+                $p =~ s/^/\t\t/xmsg;
+                $line = "\t" . "function $name(\n";
+                $line .= $p . "\n";
+                $line .= "\t)$ret_type_decl;";
+            }
+            unshift @optionals, $line;
+
+            my $last = pop @{$params_ref};
+            if(not defined $last or not $last->{optional}) {
+                last;
+            }
         }
-        push @funcs, $line;
+        push @funcs, @optionals;
+    }
 
-        my $last = pop @params;
-        if(not defined $last or not $last->{optional}) {
-            last;
-        }
-    };
-
-    my $seen;
-    say for reverse grep { !$seen{$_}++ } @funcs;
+    say for uniq(@funcs);
 }
 
+sub resolve_overload {
+    my @params = @_;
+
+    my @o;
+    if(@params) {
+        my $head = shift @params;
+
+        my $type = $head->{type};
+        $type =~ s/\A \s* \(//xms;
+        $type =~ s/\) \s* \z//xms;
+
+        my @types = map { trim($_) } split /\b or \b/xms, $type;
+
+        my @resolved = resolve_overload(@params);
+        foreach my $t(@types) {
+            my $p = {
+                type => $t,
+                name => $head->{name},
+                optional => $head->{optional},
+            };
+            push @o, map { [ $p, @{$_} ] } @resolved;
+        }
+    }
+    else {
+        push @o, \@params;
+    }
+    return @o;
+}
+
+sub trim {
+    my($s) = @_;
+    $s =~ s/\A \s+//xms;
+    $s =~ s/\s+ \z//xms;
+    return $s;
+}
+
+sub uniq {
+    my %seen;
+    return grep { !$seen{$_}++ } @_;
+}
