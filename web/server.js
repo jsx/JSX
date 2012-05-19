@@ -68,7 +68,7 @@ function main(args) {
 			filename += "web/index.html";
 		}
 
-		if(/\.htm$/.test(filename)) {
+		if(/\.html$/.test(filename)) {
 			child_process.execFile(
 				"perl", ["web/build.pl"],
 				function(error, stdout, stderr) {
