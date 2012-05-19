@@ -30,6 +30,7 @@ my %skip = (
 # NOTE: JSX's int is signed 32 bit integer
 my %typemap = (
    'DOMString' => 'string',
+   'DOMString[]' => 'string[]',
    # WebIDL says, "Note also that null is not a value of type DOMString.
    # To allow null, a nullable DOMString, written as DOMString? in IDL,
    # needs to be used."
@@ -51,6 +52,12 @@ my %typemap = (
    'any' => 'variant',
 
    'EventListener' => 'function(:Event):void',
+
+    # http://www.w3.org/TR/websockets/
+   'Function?' => 'function(:Event):void',
+
+   # http://www.w3.org/TR/XMLHttpRequest/
+   'XMLHttpRequestResponseType' => 'string', # enum
 );
 
 sub to_jsx_type {
@@ -64,15 +71,24 @@ sub to_jsx_type {
     }
 }
 
+my $rx_constructors = qr{
+    \[
+        \s*
+        (?: Constructor (?:\( [^\)]* \) )? )
+        (?: \s* , \s* Constructor\( [^\)]* \) )*
+        \s*
+    \] \s*
+}xms;
+
 # the last ? means "nullable"
 my $rx_type = qr{
-    (?: [\:\w]+ (?: \s+ \w+)* [?]? )
+    (?: [\:\w]+ (?: \s+ \w+)* (?: \? | \[\] )? )
 }xms;
 
 
 my %seen;
 
-while($content =~ m{(?:interface|exception) \s+ (?<class> \S+) \s+ (?: : \s+ (?<base> \S+) \s+)? \{ (?<members> .+?) \}}xmsg) {
+while($content =~ m{(?<constructors> $rx_constructors )? (?:interface|exception) \s+ (?<class> \S+) \s+ (?: : \s+ (?<base> \S+) \s+)? \{ (?<members> .+?) \}}xmsg) {
     my $class = $+{class};
 
     if($skip{$class}) {
@@ -95,6 +111,20 @@ while($content =~ m{(?:interface|exception) \s+ (?<class> \S+) \s+ (?: : \s+ (?<
     }
 
     say "$classdecl {";
+
+    if(my $constructors = $+{constructors}) {
+        while($constructors =~ m{
+            Constructor \s* (?: \(
+                (?<params> .*?)
+            \) )?
+        }xmsg) {
+            write_function("constructor", undef, $+{params});
+        }
+        say "";
+    }
+    else {
+        say "\t", "// FIXME: delete function constructor();";
+    }
 
     foreach my $member(split /;/, $+{members}) {
         $member =~ s{(//[^\n]*)}{say "\t", $1; ""}ge; # remove comments
@@ -140,27 +170,8 @@ while($content =~ m{(?:interface|exception) \s+ (?<class> \S+) \s+ (?: : \s+ (?<
             }xms) { # member function
 
             my $prop = $+{property};
-            my $ident = $+{ident};
-            my $ret_type = to_jsx_type($+{ret_type});
-
-            my $params = join ", ", map {
-                my($type, $id) = /(?: (?: in | optional ) \s+)* ($rx_type) \s+ (\w+) /xms
-                    or die "Cannot parse line:  $_";
-                "$id : " . to_jsx_type($type);
-            } split /,/, $+{params};
-
-
-            # prettify if needed
-            my $line = "\t" . "function $ident($params) : $ret_type;";
-            if(length $line > 70) {
-                $params =~ s/, \s+/,\n/xmsg;
-                $params =~ s/^/\t\t/xmsg;
-                $line = "\t" . "function $ident(\n";
-                $line .= $params . "\n";
-                $line .= "\t) : $ret_type;";
-            }
             say "\t// $prop" if $prop;
-            say $line;
+            write_function($+{ident}, $+{ret_type}, $+{params});
         }
         else {
             die "[BUG] canot parse member: $member\n";
@@ -168,5 +179,52 @@ while($content =~ m{(?:interface|exception) \s+ (?<class> \S+) \s+ (?: : \s+ (?<
     }
 
     say "}\n";
+}
+
+sub write_function {
+    my($name, $ret_type, $src_params) = @_;
+
+    my $ret_type_decl = defined($ret_type)
+        ? " : " . to_jsx_type($ret_type)
+        : "";
+
+    my @params = map {
+        m{
+            (?:
+                (?: in | (?<optional> optional) \s+)*
+                (?<type> $rx_type) \s+
+                (?<ident> \w+)
+            )
+        }xms or die "Cannot parse line:  $_";
+
+        +{
+            decl => "$+{ident} : " . to_jsx_type($+{type}),
+            optional => !!$+{optional},
+        };
+    } split /,/, $src_params // "";
+
+    my @funcs;
+
+    while(1) {
+        my $p = join ", ", map { $_->{decl} } @params;
+
+        my $line = "\t" . "function $name($p)$ret_type_decl;";
+        if(length $line > 70) { # prettify
+            $p =~ s/, \s+/,\n/xmsg;
+            $p =~ s/^/\t\t/xmsg;
+            $line = "\t" . "function $name(\n";
+            $line .= $p . "\n";
+            $line .= "\t)$ret_type_decl;";
+        }
+        push @funcs, $line;
+
+        my $last = pop @params;
+        if(not defined $last or not $last->{optional}) {
+            last;
+        }
+    };
+
+    my $seen;
+    say for reverse grep { !$seen{$_}++ } @funcs;
 }
 
