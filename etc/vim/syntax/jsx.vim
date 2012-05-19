@@ -38,7 +38,7 @@ syn keyword jsxConditional	if else switch
 syn keyword jsxRepeat		while for do in
 syn keyword jsxBranch		break continue
 syn keyword jsxOperator		new delete instanceof typeof as __noconvert__
-syn keyword jsxType		Array boolean Boolean Date number Number int Object string String RegExp JSON MayBeUndefined void
+syn keyword jsxType		Array boolean Boolean Date number Number int Object string String RegExp JSON MayBeUndefined variant void
 syn keyword jsxStatement	return
 syn keyword jsxBoolean		true false
 syn keyword jsxNull		null undefined
@@ -47,7 +47,7 @@ syn keyword jsxLabel		case default
 syn keyword jsxException	try catch finally throw
 syn keyword jsxMessage		log
 syn keyword jsxClass		class interface mixin
-syn keyword jsxModifiers	final native __fake__ extends abstract static implements
+syn keyword jsxModifiers	final override native __fake__ extends abstract static implements
 syn keyword jsxImport		import from
 syn keyword jsxEntryPoint	_Main _Test main
 syn keyword jsxReserved		byte char double enum export float goto import long package private protected public short synchronized throws transient volatile arguments
