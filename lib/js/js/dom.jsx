@@ -1323,59 +1323,107 @@ native class TouchEvent extends UIEvent {
 	__readonly__ var shiftKey : boolean;
 }
 
-// XHR
-// http://www.w3.org/TR/XMLHttpRequest/
-
+// XHR Level 2
+// generated from http://www.w3.org/TR/XMLHttpRequest/
 native class XMLHttpRequestEventTarget extends EventTarget {
-	function addEventListener(target : string, listener : function(:ProgressEvent):void) : void;
-	function removeEventListener(target : string, listener : function(:ProgressEvent):void) : void;
+	// FIXME: delete function constructor();
+	// event handlers
+	var onloadstart : function(:Event):void/*Function?*/;
+	var onprogress : function(:Event):void/*Function?*/;
+	var onabort : function(:Event):void/*Function?*/;
+	var onerror : function(:Event):void/*Function?*/;
+	var onload : function(:Event):void/*Function?*/;
+	var ontimeout : function(:Event):void/*Function?*/;
+	var onloadend : function(:Event):void/*Function?*/;
 }
 
 native class XMLHttpRequestUpload extends XMLHttpRequestEventTarget {
+	// FIXME: delete function constructor();
 }
 
 native class XMLHttpRequest extends XMLHttpRequestEventTarget {
-	static const UNSENT : int;
-	static const OPENED : int;
-	static const HEADERS_RECEIVED : int;
-	static const LOADING : int;
-	static const DONE : int;
-
 	function constructor();
 
-	__readonly__ var readyState :int;
-
+	// event handler
+	var onreadystatechange : function(:Event):void/*Function?*/;
+	// states
+	static const UNSENT : int/*unsigned short*/;
+	static const OPENED : int/*unsigned short*/;
+	static const HEADERS_RECEIVED : int/*unsigned short*/;
+	static const LOADING : int/*unsigned short*/;
+	static const DONE : int/*unsigned short*/;
+	__readonly__ var readyState : int/*unsigned short*/;
 	// request
-
-	function open(method : string, url : string) : void;
-	function open(method : string, url : string, async : boolean) : void;
-
-	function setRequestHeader(header : string, value : string) : void;
-
+	function open(
+		method : string/*DOMString*/,
+		url : string/*DOMString*/
+	) : void;
+	function open(
+		method : string/*DOMString*/,
+		url : string/*DOMString*/,
+		async : boolean
+	) : void;
+	function open(
+		method : string/*DOMString*/,
+		url : string/*DOMString*/,
+		async : boolean,
+		user : String/*DOMString?*/
+	) : void;
+	function open(
+		method : string/*DOMString*/,
+		url : string/*DOMString*/,
+		async : boolean,
+		user : String/*DOMString?*/,
+		password : String/*DOMString?*/
+	) : void;
+	function setRequestHeader(
+		header : string/*DOMString*/,
+		value : string/*DOMString*/
+	) : void;
+	var timeout : int/*unsigned long*/;
+	var withCredentials : boolean;
 	__readonly__ var upload : XMLHttpRequestUpload;
-
 	function send() : void;
-	function send(data : string) : void;
-	function send(data : String) : void;
 	// FIXME function send(data : ArrayBuffer) : void;
-	// FIXME function send(data : Blob) : void;
+	function send(data : Blob) : void;
 	function send(data : Document) : void;
-	// FIXME function send(data : FormData) : void;
-
+	function send(data : string/*DOMString*/) : void;
+	function send(data : String/*DOMString?*/) : void;
+	function send(data : FormData) : void;
 	function abort() : void;
-
 	// response
-
-	__readonly__ var status : int;
-	__readonly__ var statusText : string;
-	function getResponseHeader(header : string) : string;
-	function getAllResponseHeaders() : string;
-	function overrideMimeType(mime : string) :void;
-	__readonly__ var responseType : string;
-	__readonly__ var response : variant;
-	__readonly__ var responseText : string;
+	__readonly__ var status : int/*unsigned short*/;
+	__readonly__ var statusText : string/*DOMString*/;
+	function getResponseHeader(
+		header : string/*DOMString*/
+	) : string/*DOMString*/;
+	function getAllResponseHeaders() : string/*DOMString*/;
+	function overrideMimeType(mime : string/*DOMString*/) : void;
+	var responseType : string/*XMLHttpRequestResponseType*/;
+	__readonly__ var response : variant/*any*/;
+	__readonly__ var responseText : string/*DOMString*/;
 	__readonly__ var responseXML : Document;
 }
+
+native class AnonXMLHttpRequest extends XMLHttpRequest {
+
+}
+
+native class FormData {
+	function constructor(form : HTMLFormElement);
+
+	function append(name : string/*DOMString*/, value : Blob) : void;
+	function append(
+		name : string/*DOMString*/,
+		value : Blob,
+		filename : string/*DOMString*/
+	) : void;
+	function append(
+		name : string/*DOMString*/,
+		value : string/*DOMString*/
+	) : void;
+}
+
 
 // http://dvcs.w3.org/hg/progress/raw-file/tip/Overview.html#progressevent
 
@@ -1388,6 +1436,66 @@ native class ProgressEvent extends Event {
 // Canvas
 
 interface CanvasRenderingContext { }
+
+// FileAPI
+
+native class Blob {
+	// TODO
+}
+
+// WebSocket
+// generated from http://www.w3.org/TR/websockets/
+native class WebSocket extends EventTarget {
+	function constructor(url : string/*DOMString*/);
+	function constructor(
+		url : string/*DOMString*/,
+		protocols : string/*DOMString*/
+	);
+	function constructor(
+		url : string/*DOMString*/,
+		protocols : string[]/*DOMString[]*/
+	);
+
+	__readonly__ var url : string/*DOMString*/;
+	// ready state
+	static const CONNECTING : int/*unsigned short*/;
+	static const OPEN : int/*unsigned short*/;
+	static const CLOSING : int/*unsigned short*/;
+	static const CLOSED : int/*unsigned short*/;
+	__readonly__ var readyState : int/*unsigned short*/;
+	__readonly__ var bufferedAmount : int/*unsigned long*/;
+	// networking
+	var onopen : function(:Event):void/*Function?*/;
+	var onerror : function(:Event):void/*Function?*/;
+	var onclose : function(:Event):void/*Function?*/;
+	__readonly__ var extensions : string/*DOMString*/;
+	__readonly__ var protocol : string/*DOMString*/;
+	function close() : void;
+	function close(code : int/*unsigned short*/) : void;
+	function close(
+		code : int/*unsigned short*/,
+		reason : string/*DOMString*/
+	) : void;
+	// messaging
+	var onmessage : function(:Event):void/*Function?*/;
+	var binaryType : string/*DOMString*/;
+	function send(data : string/*DOMString*/) : void;
+	//FIXME function send(data : ArrayBuffer) : void;
+	function send(data : Blob) : void;
+}
+
+native class CloseEvent extends Event {
+	function constructor(type : string/*DOMString*/);
+	//function constructor(
+	//	type : string/*DOMString*/,
+	//	eventInitDict : CloseEventInit
+	//);
+
+	__readonly__ var wasClean : boolean;
+	__readonly__ var code : int/*unsigned short*/;
+	__readonly__ var reason : string/*DOMString*/;
+}
+
 
 // JSX interface to DOM
 
