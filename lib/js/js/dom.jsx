@@ -22,248 +22,534 @@ import "typedarray.jsx";
 
 // http://www.w3.org/TR/DOM-Level-3-Core/
 
-
+// generated from http://www.w3.org/TR/DOM-Level-3-Core/idl-definitions.html
 native class DOMException {
-	var code : int;
+	// FIXME: delete function constructor();
+	var code : int/*unsigned short*/;
+}
+
+native class DOMStringList {
+	// FIXME: delete function constructor();
+	function item(index : int/*unsigned long*/) : string/*DOMString*/;
+	__readonly__ var length : int/*unsigned long*/;
+	function contains(str : string/*DOMString*/) : boolean;
+}
+
+native class NameList {
+	// FIXME: delete function constructor();
+	function getName(index : int/*unsigned long*/) : string/*DOMString*/;
+	function getNamespaceURI(
+		index : int/*unsigned long*/
+	) : string/*DOMString*/;
+	__readonly__ var length : int/*unsigned long*/;
+	function contains(str : string/*DOMString*/) : boolean;
+	function containsNS(
+		namespaceURI : string/*DOMString*/,
+		name : string/*DOMString*/
+	) : boolean;
 }
 
 native class DOMImplementationList {
-	// TODO
+	// FIXME: delete function constructor();
+	function item(index : int/*unsigned long*/) : DOMImplementation;
+	__readonly__ var length : int/*unsigned long*/;
 }
+
 native class DOMImplementationSource {
-	// TODO
+	// FIXME: delete function constructor();
+	function getDOMImplementation(
+		features : string/*DOMString*/
+	) : DOMImplementation;
+	function getDOMImplementationList(
+		features : string/*DOMString*/
+	) : DOMImplementationList;
 }
 
 native class DOMImplementation {
-	function hasFeature(feature : string, version : string) : boolean;
-	function createDocumentType(qualifiedName : string, publicId : string, systemId : string) :DocumentType;
-	function createDocument(namespaceURI : string, qualifiedName : string, docType : string) :Document;
-	function getFeature(feature : string, version : string) : Object;
-
+	// FIXME: delete function constructor();
+	function hasFeature(
+		feature : string/*DOMString*/,
+		version : string/*DOMString*/
+	) : boolean;
+	// Introduced in DOM Level 2:
+	function createDocumentType(
+		qualifiedName : string/*DOMString*/,
+		publicId : string/*DOMString*/,
+		systemId : string/*DOMString*/
+	) : DocumentType;
+	// Introduced in DOM Level 2:
+	function createDocument(
+		namespaceURI : string/*DOMString*/,
+		qualifiedName : string/*DOMString*/,
+		doctype : DocumentType
+	) : Document;
+	// Introduced in DOM Level 3:
+	function getFeature(
+		feature : string/*DOMString*/,
+		version : string/*DOMString*/
+	) : Object/*DOMObject*/;
 }
 
-native class Node extends EventTarget {
-	static const ELEMENT_NODE : int;
-	static const ATTRIBUTE_NODE : int;
-	static const TEXT_NODE : int;
-	static const CDATA_SECTION_NODE : int;
-	static const ENTITY_REFERENCE_NODE : int;
-	static const ENTITY_NODE : int;
-	static const PROCESSING_INSTRUCTION_NODE : int;
-	static const COMMENT_NODE : int;
-	static const DOCUMENT_NODE : int;
-	static const DOCUMENT_TYPE_NODE : int;
-	static const DOCUMENT_FRAGMENT_NODE : int;
-	static const NOTATION_NODE : int;
-
-	__readonly__ var nodeName : string;
-	var nodeValue : string;
-	__readonly__ var nodeType : int;
-	__readonly__ var parentNode : string;
+native class Node {
+	// FIXME: delete function constructor();
+	// NodeType
+	static const     ELEMENT_NODE : int/*unsigned short*/;
+	__readonly__ var ELEMENT_NODE : int/*unsigned short*/;
+	static const     ATTRIBUTE_NODE : int/*unsigned short*/;
+	__readonly__ var ATTRIBUTE_NODE : int/*unsigned short*/;
+	static const     TEXT_NODE : int/*unsigned short*/;
+	__readonly__ var TEXT_NODE : int/*unsigned short*/;
+	static const     CDATA_SECTION_NODE : int/*unsigned short*/;
+	__readonly__ var CDATA_SECTION_NODE : int/*unsigned short*/;
+	static const     ENTITY_REFERENCE_NODE : int/*unsigned short*/;
+	__readonly__ var ENTITY_REFERENCE_NODE : int/*unsigned short*/;
+	static const     ENTITY_NODE : int/*unsigned short*/;
+	__readonly__ var ENTITY_NODE : int/*unsigned short*/;
+	static const     PROCESSING_INSTRUCTION_NODE : int/*unsigned short*/;
+	__readonly__ var PROCESSING_INSTRUCTION_NODE : int/*unsigned short*/;
+	static const     COMMENT_NODE : int/*unsigned short*/;
+	__readonly__ var COMMENT_NODE : int/*unsigned short*/;
+	static const     DOCUMENT_NODE : int/*unsigned short*/;
+	__readonly__ var DOCUMENT_NODE : int/*unsigned short*/;
+	static const     DOCUMENT_TYPE_NODE : int/*unsigned short*/;
+	__readonly__ var DOCUMENT_TYPE_NODE : int/*unsigned short*/;
+	static const     DOCUMENT_FRAGMENT_NODE : int/*unsigned short*/;
+	__readonly__ var DOCUMENT_FRAGMENT_NODE : int/*unsigned short*/;
+	static const     NOTATION_NODE : int/*unsigned short*/;
+	__readonly__ var NOTATION_NODE : int/*unsigned short*/;
+	__readonly__ var nodeName : string/*DOMString*/;
+	var nodeValue : string/*DOMString*/;
+	// raises(DOMException) on setting
+	// raises(DOMException) on retrieval
+	__readonly__ var nodeType : int/*unsigned short*/;
+	__readonly__ var parentNode : Node;
 	__readonly__ var childNodes : NodeList;
 	__readonly__ var firstChild : Node;
 	__readonly__ var lastChild : Node;
 	__readonly__ var previousSibling : Node;
 	__readonly__ var nextSibling : Node;
 	__readonly__ var attributes : NamedNodeMap;
-
+	// Modified in DOM Level 2:
+	__readonly__ var ownerDocument : Document;
+	// Modified in DOM Level 3:
 	function insertBefore(newChild : Node, refChild : Node) : Node;
+	// Modified in DOM Level 3:
 	function replaceChild(newChild : Node, oldChild : Node) : Node;
+	// Modified in DOM Level 3:
 	function removeChild(oldChild : Node) : Node;
+	// Modified in DOM Level 3:
 	function appendChild(newChild : Node) : Node;
-
 	function hasChildNodes() : boolean;
 	function cloneNode(deep : boolean) : Node;
-
+	// Modified in DOM Level 3:
 	function normalize() : void;
-
-	function isSupported(feature : string, version : string) : boolean;
-	__readonly__ var namespaceURI : string;
-	__readonly__ var prefix : string;
-	__readonly__ var localName : string;
+	// Introduced in DOM Level 2:
+	function isSupported(
+		feature : string/*DOMString*/,
+		version : string/*DOMString*/
+	) : boolean;
+	// Introduced in DOM Level 2:
+	__readonly__ var namespaceURI : string/*DOMString*/;
+	// Introduced in DOM Level 2:
+	var prefix : string/*DOMString*/;
+	// raises(DOMException) on setting
+	// Introduced in DOM Level 2:
+	__readonly__ var localName : string/*DOMString*/;
+	// Introduced in DOM Level 2:
 	function hasAttributes() : boolean;
-	__readonly__ var baseURI : string;
-
+	// Introduced in DOM Level 3:
+	__readonly__ var baseURI : string/*DOMString*/;
 	// DocumentPosition
-	static const DOCUMENT_POSITION_DISCONNECTED : int;
-	static const DOCUMENT_POSITION_PRECEDING : int;
-	static const DOCUMENT_POSITION_FOLLOWING : int;
-	static const DOCUMENT_POSITION_CONTAINS : int;
-	static const DOCUMENT_POSITION_CONTAINED_BY : int;
-	static const DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC : int;
-	function compareDocumentPosition(other : Node) : int;
-
-	var textContent : string;
-
+	static const     DOCUMENT_POSITION_DISCONNECTED : int/*unsigned short*/;
+	__readonly__ var DOCUMENT_POSITION_DISCONNECTED : int/*unsigned short*/;
+	static const     DOCUMENT_POSITION_PRECEDING : int/*unsigned short*/;
+	__readonly__ var DOCUMENT_POSITION_PRECEDING : int/*unsigned short*/;
+	static const     DOCUMENT_POSITION_FOLLOWING : int/*unsigned short*/;
+	__readonly__ var DOCUMENT_POSITION_FOLLOWING : int/*unsigned short*/;
+	static const     DOCUMENT_POSITION_CONTAINS : int/*unsigned short*/;
+	__readonly__ var DOCUMENT_POSITION_CONTAINS : int/*unsigned short*/;
+	static const     DOCUMENT_POSITION_CONTAINED_BY : int/*unsigned short*/;
+	__readonly__ var DOCUMENT_POSITION_CONTAINED_BY : int/*unsigned short*/;
+	static const     DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC : int/*unsigned short*/;
+	__readonly__ var DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC : int/*unsigned short*/;
+	// Introduced in DOM Level 3:
+	function compareDocumentPosition(
+		other : Node
+	) : int/*unsigned short*/;
+	// Introduced in DOM Level 3:
+	var textContent : string/*DOMString*/;
+	// raises(DOMException) on setting
+	// raises(DOMException) on retrieval
+	// Introduced in DOM Level 3:
 	function isSameNode(other : Node) : boolean;
-	function lookupPrefix(namespaceURI : string) : string;
-	function isDefaultNamespace(namespaceURI : string) : string;
-	function lookupNamespaceURI(prefix : string) : string;
+	// Introduced in DOM Level 3:
+	function lookupPrefix(
+		namespaceURI : string/*DOMString*/
+	) : string/*DOMString*/;
+	// Introduced in DOM Level 3:
+	function isDefaultNamespace(
+		namespaceURI : string/*DOMString*/
+	) : boolean;
+	// Introduced in DOM Level 3:
+	function lookupNamespaceURI(
+		prefix : string/*DOMString*/
+	) : string/*DOMString*/;
+	// Introduced in DOM Level 3:
 	function isEqualNode(arg : Node) : boolean;
-	function getFeature(feature : string, version : string) : Object;
-
-	// See also UserDataHandler
-	function setUserData(key : string, data : variant, handler: function(:int,:string,:variant,:Node,:Node):void) : variant;
-	function getUserData(key : string) : variant;
-
+	// Introduced in DOM Level 3:
+	function getFeature(
+		feature : string/*DOMString*/,
+		version : string/*DOMString*/
+	) : Object/*DOMObject*/;
+	// Introduced in DOM Level 3:
+	function setUserData(
+		key : string/*DOMString*/,
+		data : variant/*DOMUserData*/,
+		handler : function(operation:int,key:string,data:variant,src:Node,dst:Node):void/*UserDataHandler*/
+	) : variant/*DOMUserData*/;
+	// Introduced in DOM Level 3:
+	function getUserData(
+		key : string/*DOMString*/
+	) : variant/*DOMUserData*/;
 }
 
 native class NodeList {
-	function item(index : int) : Node;
-	function __native_index_operator__(index : int) : Node;
-	__readonly__ var length : int;
+	// FIXME: delete function constructor();
+	function item(index : int/*unsigned long*/) : Node;
+	__readonly__ var length : int/*unsigned long*/;
 }
 
 native class NamedNodeMap {
-	function __native_index_operator__(key : string) : Node;
-	// TODO
+	// FIXME: delete function constructor();
+	function getNamedItem(name : string/*DOMString*/) : Node;
+	function setNamedItem(arg : Node) : Node;
+	function removeNamedItem(name : string/*DOMString*/) : Node;
+	function item(index : int/*unsigned long*/) : Node;
+	__readonly__ var length : int/*unsigned long*/;
+	// Introduced in DOM Level 2:
+	function getNamedItemNS(
+		namespaceURI : string/*DOMString*/,
+		localName : string/*DOMString*/
+	) : Node;
+	// Introduced in DOM Level 2:
+	function setNamedItemNS(arg : Node) : Node;
+	// Introduced in DOM Level 2:
+	function removeNamedItemNS(
+		namespaceURI : string/*DOMString*/,
+		localName : string/*DOMString*/
+	) : Node;
 }
 
 native class CharacterData extends Node {
-	// TODO
+	// FIXME: delete function constructor();
+	var data : string/*DOMString*/;
+	// raises(DOMException) on setting
+	// raises(DOMException) on retrieval
+	__readonly__ var length : int/*unsigned long*/;
+	function substringData(
+		offset : int/*unsigned long*/,
+		count : int/*unsigned long*/
+	) : string/*DOMString*/;
+	function appendData(arg : string/*DOMString*/) : void;
+	function insertData(
+		offset : int/*unsigned long*/,
+		arg : string/*DOMString*/
+	) : void;
+	function deleteData(
+		offset : int/*unsigned long*/,
+		count : int/*unsigned long*/
+	) : void;
+	function replaceData(
+		offset : int/*unsigned long*/,
+		count : int/*unsigned long*/,
+		arg : string/*DOMString*/
+	) : void;
 }
 
 native class Attr extends Node {
-	__readonly__ var name : string;
+	// FIXME: delete function constructor();
+	__readonly__ var name : string/*DOMString*/;
 	__readonly__ var specified : boolean;
-	__readonly__ var value : string;
+	var value : string/*DOMString*/;
+	// raises(DOMException) on setting
+	// Introduced in DOM Level 2:
 	__readonly__ var ownerElement : Element;
+	// Introduced in DOM Level 3:
 	__readonly__ var schemaTypeInfo : TypeInfo;
+	// Introduced in DOM Level 3:
 	__readonly__ var isId : boolean;
 }
 
-native class TypeInfo {
-	// TODO
-}
-
 native class Element extends Node {
-	__readonly__ var tagName : string;
-
-	function getAttribute(name : string) : string;
-	function setAttribute(name : string, value : string) : void;
-	function removeAttribute(name : string) : void;
-
-	function getAttributeNode(name : string) : Attr;
+	// FIXME: delete function constructor();
+	__readonly__ var tagName : string/*DOMString*/;
+	function getAttribute(
+		name : string/*DOMString*/
+	) : string/*DOMString*/;
+	function setAttribute(
+		name : string/*DOMString*/,
+		value : string/*DOMString*/
+	) : void;
+	function removeAttribute(name : string/*DOMString*/) : void;
+	function getAttributeNode(name : string/*DOMString*/) : Attr;
 	function setAttributeNode(newAttr : Attr) : Attr;
 	function removeAttributeNode(oldAttr : Attr) : Attr;
-
-	function getElementsByTagName(name : string) : NodeList;
-
-	// introduced in DOM level 2
-
-	function getAttributeNS(namespaceURI : string, localName : string) : string;
-	function setAttributeNS(namespaceURI : string, qualifiedName : string, value : string) : void;
-	function removeAttributeNS(namespaceURI : string, localName : string) : string;
-	function getAttributeNodeNS(namespaceURI : string, localName : string) : string;
-	function setAttributeNS(newAttr : Attr) : Attr;
-	function getElementsByTagNameNS(namespaceURI : string, localName : string) : NodeList;
-
-	function hasAttribute(name : string) : boolean;
-	function hasAttributeNS(namespaceURI : string, name : string) : boolean;
-
-	// introduced in DOM level 3
+	function getElementsByTagName(name : string/*DOMString*/) : NodeList;
+	// Introduced in DOM Level 2:
+	function getAttributeNS(
+		namespaceURI : string/*DOMString*/,
+		localName : string/*DOMString*/
+	) : string/*DOMString*/;
+	// Introduced in DOM Level 2:
+	function setAttributeNS(
+		namespaceURI : string/*DOMString*/,
+		qualifiedName : string/*DOMString*/,
+		value : string/*DOMString*/
+	) : void;
+	// Introduced in DOM Level 2:
+	function removeAttributeNS(
+		namespaceURI : string/*DOMString*/,
+		localName : string/*DOMString*/
+	) : void;
+	// Introduced in DOM Level 2:
+	function getAttributeNodeNS(
+		namespaceURI : string/*DOMString*/,
+		localName : string/*DOMString*/
+	) : Attr;
+	// Introduced in DOM Level 2:
+	function setAttributeNodeNS(newAttr : Attr) : Attr;
+	// Introduced in DOM Level 2:
+	function getElementsByTagNameNS(
+		namespaceURI : string/*DOMString*/,
+		localName : string/*DOMString*/
+	) : NodeList;
+	// Introduced in DOM Level 2:
+	function hasAttribute(name : string/*DOMString*/) : boolean;
+	// Introduced in DOM Level 2:
+	function hasAttributeNS(
+		namespaceURI : string/*DOMString*/,
+		localName : string/*DOMString*/
+	) : boolean;
+	// Introduced in DOM Level 3:
 	__readonly__ var schemaTypeInfo : TypeInfo;
-	function setIdAttribute(name : string, isId : boolean) : void;
-	function setIdAttributeNS(namespaceURI : string, localName : string, isId : boolean) : void;
+	// Introduced in DOM Level 3:
+	function setIdAttribute(
+		name : string/*DOMString*/,
+		isId : boolean
+	) : void;
+	// Introduced in DOM Level 3:
+	function setIdAttributeNS(
+		namespaceURI : string/*DOMString*/,
+		localName : string/*DOMString*/,
+		isId : boolean
+	) : void;
+	// Introduced in DOM Level 3:
 	function setIdAttributeNode(idAttr : Attr, isId : boolean) : void;
 }
 
-
 native class Text extends CharacterData {
-	function splitText(offset : number) : Text;
-	// TODO
+	// FIXME: delete function constructor();
+	function splitText(offset : int/*unsigned long*/) : Text;
+	// Introduced in DOM Level 3:
+	__readonly__ var isElementContentWhitespace : boolean;
+	// Introduced in DOM Level 3:
+	__readonly__ var wholeText : string/*DOMString*/;
+	// Introduced in DOM Level 3:
+	function replaceWholeText(content : string/*DOMString*/) : Text;
 }
 
-native class Comment extends CharacterData { }
+native class Comment extends CharacterData {
+	// FIXME: delete function constructor();
+}
 
-native class UserDataHandler {
-	static const NODE_CLONED : int;
-	static const NODE_IMPORTED : int;
-	static const NODE_DELETED : int;
-	static const NODE_RENAMED : int;
-	static const NODE_ADOPTED : int;
+native __fake__ class TypeInfo {
+	// FIXME: delete function constructor();
+	__readonly__ var typeName : string/*DOMString*/;
+	__readonly__ var typeNamespace : string/*DOMString*/;
+	// DerivationMethods
+	static const     DERIVATION_RESTRICTION : int/*unsigned long*/;
+	__readonly__ var DERIVATION_RESTRICTION : int/*unsigned long*/;
+	static const     DERIVATION_EXTENSION : int/*unsigned long*/;
+	__readonly__ var DERIVATION_EXTENSION : int/*unsigned long*/;
+	static const     DERIVATION_UNION : int/*unsigned long*/;
+	__readonly__ var DERIVATION_UNION : int/*unsigned long*/;
+	static const     DERIVATION_LIST : int/*unsigned long*/;
+	__readonly__ var DERIVATION_LIST : int/*unsigned long*/;
+	function isDerivedFrom(
+		typeNamespaceArg : string/*DOMString*/,
+		typeNameArg : string/*DOMString*/,
+		derivationMethod : int/*unsigned long*/
+	) : boolean;
 }
 
 native class DOMError {
-	// TODO
+	// FIXME: delete function constructor();
+	// ErrorSeverity
+	static const     SEVERITY_WARNING : int/*unsigned short*/;
+	__readonly__ var SEVERITY_WARNING : int/*unsigned short*/;
+	static const     SEVERITY_ERROR : int/*unsigned short*/;
+	__readonly__ var SEVERITY_ERROR : int/*unsigned short*/;
+	static const     SEVERITY_FATAL_ERROR : int/*unsigned short*/;
+	__readonly__ var SEVERITY_FATAL_ERROR : int/*unsigned short*/;
+	__readonly__ var severity : int/*unsigned short*/;
+	__readonly__ var message : string/*DOMString*/;
+	__readonly__ var type : string/*DOMString*/;
+	__readonly__ var relatedException : Object/*DOMObject*/;
+	__readonly__ var relatedData : Object/*DOMObject*/;
+	__readonly__ var location : DOMLocator;
 }
 
-native class DOMLocator {
-	// TODO
-}
-native class DOMConfiguration {
-	// TODO
+native __fake__ class DOMLocator {
+	// FIXME: delete function constructor();
+	__readonly__ var lineNumber : int/*long*/;
+	__readonly__ var columnNumber : int/*long*/;
+	__readonly__ var byteOffset : int/*long*/;
+	__readonly__ var utf16Offset : int/*long*/;
+	__readonly__ var relatedNode : Node;
+	__readonly__ var uri : string/*DOMString*/;
 }
 
-native class CDATASection extends Text { }
+native __fake__ class DOMConfiguration {
+	// FIXME: delete function constructor();
+	function setParameter(
+		name : string/*DOMString*/,
+		value : variant/*DOMUserData*/
+	) : void;
+	function getParameter(
+		name : string/*DOMString*/
+	) : variant/*DOMUserData*/;
+	function canSetParameter(
+		name : string/*DOMString*/,
+		value : variant/*DOMUserData*/
+	) : boolean;
+	__readonly__ var parameterNames : DOMStringList;
+}
+
+native class CDATASection extends Text {
+	// FIXME: delete function constructor();
+}
 
 native class DocumentType extends Node {
-	// TODO
+	// FIXME: delete function constructor();
+	__readonly__ var name : string/*DOMString*/;
+	__readonly__ var entities : NamedNodeMap;
+	__readonly__ var notations : NamedNodeMap;
+	// Introduced in DOM Level 2:
+	__readonly__ var publicId : string/*DOMString*/;
+	// Introduced in DOM Level 2:
+	__readonly__ var systemId : string/*DOMString*/;
+	// Introduced in DOM Level 2:
+	__readonly__ var internalSubset : string/*DOMString*/;
 }
 
 native class Notation extends Node {
-	// TODO
+	// FIXME: delete function constructor();
+	__readonly__ var publicId : string/*DOMString*/;
+	__readonly__ var systemId : string/*DOMString*/;
 }
 
 native class Entity extends Node {
-	// TODO
+	// FIXME: delete function constructor();
+	__readonly__ var publicId : string/*DOMString*/;
+	__readonly__ var systemId : string/*DOMString*/;
+	__readonly__ var notationName : string/*DOMString*/;
+	// Introduced in DOM Level 3:
+	__readonly__ var inputEncoding : string/*DOMString*/;
+	// Introduced in DOM Level 3:
+	__readonly__ var xmlEncoding : string/*DOMString*/;
+	// Introduced in DOM Level 3:
+	__readonly__ var xmlVersion : string/*DOMString*/;
 }
 
 native class EntityReference extends Node {
-	// TODO
+	// FIXME: delete function constructor();
 }
 
 native class ProcessingInstruction extends Node {
-	// TODO
+	// FIXME: delete function constructor();
+	__readonly__ var target : string/*DOMString*/;
+	var data : string/*DOMString*/;
+	// raises(DOMException) on setting
 }
 
-native class DocumentFragment extends Node { }
+native class DocumentFragment extends Node {
+	// FIXME: delete function constructor();
+}
 
-native class Document extends Node /* implements DocumentEvent */ {
+native class Document extends Node {
+	// FIXME: delete function constructor();
+	// Modified in DOM Level 3:
 	__readonly__ var doctype : DocumentType;
 	__readonly__ var implementation : DOMImplementation;
 	__readonly__ var documentElement : Element;
-
-	function createElement(tagname : string) : Element;
+	function createElement(tagName : string/*DOMString*/) : Element;
 	function createDocumentFragment() : DocumentFragment;
-	function createTextNode(data : string) : Text;
-	function createComment(data : string) : Comment;
-	function createCDATASection(data : string) : CDATASection;
-	function createProcessingInstruction(target : string, data : string) : ProcessingInstruction;
-	function createAttribute(name : string) : Attr;
-	function createEntityReference(name : string) : EntityReference;
-
-	function getElementsByTagName(tagname : string) : NodeList;
-
-	// introduced in DOM level 2
-
+	function createTextNode(data : string/*DOMString*/) : Text;
+	function createComment(data : string/*DOMString*/) : Comment;
+	function createCDATASection(
+		data : string/*DOMString*/
+	) : CDATASection;
+	function createProcessingInstruction(
+		target : string/*DOMString*/,
+		data : string/*DOMString*/
+	) : ProcessingInstruction;
+	function createAttribute(name : string/*DOMString*/) : Attr;
+	function createEntityReference(
+		name : string/*DOMString*/
+	) : EntityReference;
+	function getElementsByTagName(
+		tagname : string/*DOMString*/
+	) : NodeList;
+	// Introduced in DOM Level 2:
 	function importNode(importedNode : Node, deep : boolean) : Node;
-
-	function createElementNS(namespaceURI : string, qualifiedName : string) : Element;
-	function createAttributeNS(namespaceURI : string, qualifiedName : string) : Attr;
-
-	function getElementsByTagNameNS(namespaceURI : string, localName : string) : NodeList;
-	function getElementById(elementId : string) : Element;
-
-	// introduced in DOM level 3
-
-	__readonly__ var inputEncoding : string;
-	__readonly__ var xmlEncoding : string; // FIXME: Chrome may return null
+	// Introduced in DOM Level 2:
+	function createElementNS(
+		namespaceURI : string/*DOMString*/,
+		qualifiedName : string/*DOMString*/
+	) : Element;
+	// Introduced in DOM Level 2:
+	function createAttributeNS(
+		namespaceURI : string/*DOMString*/,
+		qualifiedName : string/*DOMString*/
+	) : Attr;
+	// Introduced in DOM Level 2:
+	function getElementsByTagNameNS(
+		namespaceURI : string/*DOMString*/,
+		localName : string/*DOMString*/
+	) : NodeList;
+	// Introduced in DOM Level 2:
+	function getElementById(elementId : string/*DOMString*/) : Element;
+	// Introduced in DOM Level 3:
+	__readonly__ var inputEncoding : string/*DOMString*/;
+	// Introduced in DOM Level 3:
+	__readonly__ var xmlEncoding : string/*DOMString*/;
+	// Introduced in DOM Level 3:
 	var xmlStandalone : boolean;
-	var xmlVersion : string;
+	// raises(DOMException) on setting
+	// Introduced in DOM Level 3:
+	var xmlVersion : string/*DOMString*/;
+	// raises(DOMException) on setting
+	// Introduced in DOM Level 3:
 	var strictErrorChecking : boolean;
-	var documentURI : string;
-
+	// Introduced in DOM Level 3:
+	var documentURI : string/*DOMString*/;
+	// Introduced in DOM Level 3:
 	function adoptNode(source : Node) : Node;
-
+	// Introduced in DOM Level 3:
 	__readonly__ var domConfig : DOMConfiguration;
+	// Introduced in DOM Level 3:
 	function normalizeDocument() : void;
-	function renameNode(n : Node, namespaceURI : string, qualifiedName : string) : Node;
+	// Introduced in DOM Level 3:
+	function renameNode(
+		n : Node,
+		namespaceURI : string/*DOMString*/,
+		qualifiedName : string/*DOMString*/
+	) : Node;
 
 	// implements interface DocumentEvent
 	function createEvent(eventInterface : string) : Event;
 
-	// touch events
+	// implements touch events
 	function createTouch(
 		view : AbstractView,
 		target : EventTarget,
@@ -331,13 +617,6 @@ native class DOMTokenList {
 
 native class DOMSettableTokenList extends DOMTokenList {
 	var value : string;
-}
-
-native class DOMStringList {
-	__readonly__ var length : number;
-	function __native_index_operator__(index : int) : String;
-	function item(index : int) : String;
-	function contains(str : string) : boolean;
 }
 
 native class DOMStringMap {
@@ -1038,11 +1317,11 @@ final native class Location {
 // DOM level 2 Views
 // http://www.w3.org/TR/DOM-Level-2-Views/
 
-interface AbstractView {
-	// TODO
+native __fake__ class AbstractView {
+	__readonly__ var docunent : DocumentView;
 }
-interface DocumentView {
-	// TODO
+native __fake__ class DocumentView {
+	__readonly__ var defaultView : AbstractView;
 }
 
 // DOM  Events
