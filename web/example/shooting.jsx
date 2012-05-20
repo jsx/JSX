@@ -9,7 +9,7 @@
 import 'js/dom.jsx';
 import 'js/dom/canvas2d.jsx';
 
-class Config {
+final class Config {
 	static const cols = 10;
 	static const rows = 15;
 	static const cellWidth  = 32;
@@ -79,7 +79,7 @@ abstract class MovingObject implements Sprite {
 	}
 }
 
-class Bullet extends MovingObject {
+final class Bullet extends MovingObject {
 	var width : number  = Config.bulletWidth;
 	var height : number = Config.bulletHeight;
 
@@ -118,7 +118,7 @@ class Bullet extends MovingObject {
 	}
 }
 
-class Rock extends MovingObject {
+final class Rock extends MovingObject {
 	var width  = Config.cellWidth;
 	var height = Config.cellHeight;
 
@@ -165,7 +165,7 @@ class Rock extends MovingObject {
 	}
 }
 
-class Status implements Sprite {
+final class Status implements Sprite {
 	/* Sprite */
 	var x : number;
 	var y : number;
@@ -529,7 +529,7 @@ class Status implements Sprite {
 
 }
 
-class _Main {
+final class _Main {
 	static function main(args : string[]) : void {
 		var stage = dom.id(args[0]) as __noconvert__ HTMLCanvasElement;
 		var scoreboard = dom.id(args[1]);
