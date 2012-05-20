@@ -19,6 +19,7 @@ final class Config {
 	static const bulletHeight = 4;
 	static const bulletSpeed = 20;
 	static const reloadCount = 3;
+	static const initialNumRocks = 5;
 
 	static const FPS = (1000 / 30) as int;
 
@@ -97,21 +98,21 @@ final class Bullet extends MovingObject {
 			var rock = st.rocks[rockKey];
 
 			if(this.detectCollision(rock)) {
+				if(rock.hp == 0) return false;
 
-				if(rock.hp > 0) {
-					inDisplay = false;
+				inDisplay = false;
 
-					if(--rock.hp == 0) {
-						st.score = Math.min(st.score + rock.score, 999999999);
+				if(--rock.hp == 0) {
+					st.score = Math.min(st.score + rock.score, 999999999);
 
-						st.updateScore();
+					st.updateScore();
 
-						rock.dx = rock.dy = 0;
-						rock.state = "bomb1";
-					}
-					else {
-						rock.state = (rock.state as string + "w").substring(0, 6);
-					}
+					rock.dx = rock.dy = 0;
+					rock.setState(st, "bomb1");
+				}
+				else {
+					var newState = (rock.state +  "w").substring(0, 6);
+					rock.setState(st, newState);
 				}
 			}
 		}
@@ -149,13 +150,11 @@ final class Rock extends MovingObject {
 				return false;
 			}
 			else {
-				this.state = "bomb" + next as string;
-				this.image = st.images[this.state];
+				this.setState(st, "bomb" + next as string);
 			}
 		}
 		else {
-			this.state = this.state.substring(0, 5);
-			this.image = st.images[this.state];
+			this.setState(st, this.state.substring(0, 5));
 
 			if(st.isGaming() && this.detectCollision(st.ship)) {
 				st.changeStateToBeDying();
@@ -163,6 +162,11 @@ final class Rock extends MovingObject {
 			}
 		}
 		return inDisplay;
+	}
+
+	function setState(stage : Stage, state : string) : void {
+		this.state = state;
+		this.image = stage.images[state];
 	}
 }
 
@@ -236,6 +240,10 @@ final class Stage {
 		return this.state == "gameover";
 	}
 
+	function level() : int {
+		return this.frameCount / 500;
+	}
+
 
 	function drawBackground() : void {
 		var bottom = Config.height + Config.cellHeight - this.currentTop;
@@ -287,7 +295,7 @@ final class Stage {
 	}
 
 	function createRock() : Rock {
-		var level = (this.frameCount / 500) as int;
+		var level = this.level();
 
 		var px = this.ship.x + Math.random() * 100 - 50;
 		var py = this.ship.y + Math.random() * 100 - 50;
@@ -348,7 +356,7 @@ final class Stage {
 			this.bullets[fc + "e"] = this.createBullet( 1,  1);
 		}
 
-		if(this.numRocks < (5 + this.frameCount / 500)) {
+		if(this.numRocks < (Config.initialNumRocks + this.level())) {
 			this.rocks[fc + "r"] = this.createRock();
 			++this.numRocks;
 		}
