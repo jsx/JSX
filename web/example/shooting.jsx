@@ -8,6 +8,7 @@
 */
 import 'js/dom.jsx';
 import 'js/dom/canvas2d.jsx';
+import 'console.jsx';
 
 final class Config {
 	static const cols = 10;
@@ -87,7 +88,7 @@ final class Bullet extends MovingObject {
 		super(x, y, dx, dy, image);
 	}
 
-	function update(st : Status) : boolean {
+	function update(st : Stage) : boolean {
 		var inDisplay = super.update();
 
 		this.draw(st.ctx);
@@ -137,7 +138,7 @@ final class Rock extends MovingObject {
 		this.state = state;
 	}
 
-	function update(st : Status) : boolean {
+	function update(st : Stage) : boolean {
 		var inDisplay = super.update();
 
 		this.draw(st.ctx);
@@ -156,7 +157,7 @@ final class Rock extends MovingObject {
 			this.state = this.state.substring(0, 5);
 			this.image = st.images[this.state];
 
-			if(st.isGaming() && this.detectCollision(st)) {
+			if(st.isGaming() && this.detectCollision(st.ship)) {
 				st.changeStateToBeDying();
 				st.dying = 1;
 			}
@@ -165,8 +166,7 @@ final class Rock extends MovingObject {
 	}
 }
 
-final class Status implements Sprite {
-	/* Sprite */
+final class SpaceShip implements Sprite {
 	var x : number;
 	var y : number;
 
@@ -175,19 +175,27 @@ final class Status implements Sprite {
 
 	var image : HTMLCanvasElement;
 
-	/* Status */
+	function constructor(x : number, y : number, image : HTMLCanvasElement) {
+		this.x = x;
+		this.y = y;
+		this.image = image;
+	}
+}
+
+final class Stage {
 
 	var imageName : Array.<string>;
 	var images : Map.<HTMLCanvasElement>;
 
 	var state = "loading";
 
+	var ship : SpaceShip;
+	var dying = 0;
+
 	var lastX : number = -1;
 	var lastY : number = -1;
 	var frameCount : number;
 	var currentTop : number;
-
-	var dying : number;
 
 	var ctx   : CanvasRenderingContext2D;
 	var bgCtx : CanvasRenderingContext2D;
@@ -243,20 +251,19 @@ final class Status implements Sprite {
 	function draw() : void {
 		this.drawBackground();
 
+		var ship = this.ship;
+
 		if(this.isGaming()) {
-			this.image = this.images["my"];
+			ship.draw(this.ctx);
 		}
 		else if(this.isDying()) {
-			this.image = this.images["bomb" + this.dying as string];
+			ship.image = this.images["bomb" + this.dying as string];
+			ship.draw(this.ctx);
+
 			if(++this.dying > 10) {
 				this.changeStateToBeGameOver();
 			}
 		}
-		else { // not in gaming nor dying
-			return;
-		}
-
-		super.draw(this.ctx);
 	}
 
 	function drawSpace(px : number, py : number) : void {
@@ -272,7 +279,7 @@ final class Status implements Sprite {
 
 	function createBullet(dx : number, dy : number) : Bullet {
 		return new Bullet(
-			this.x, this.y,
+			this.ship.x, this.ship.y,
 			dx * Config.bulletSpeed,
 			dy * Config.bulletSpeed,
 			this.images["bullet"]
@@ -282,8 +289,8 @@ final class Status implements Sprite {
 	function createRock() : Rock {
 		var level = (this.frameCount / 500) as int;
 
-		var px = this.x + Math.random() * 100 - 50;
-		var py = this.y + Math.random() * 100 - 50;
+		var px = this.ship.x + Math.random() * 100 - 50;
+		var py = this.ship.y + Math.random() * 100 - 50;
 		var fx = Math.random() * Config.width;
 		var fy = (level >= 4) ? (Math.random() * 2) * Config.height : 0;
 
@@ -374,6 +381,7 @@ final class Status implements Sprite {
 			canvas.width  = Config.cellWidth;
 			canvas.height = Config.cellHeight;
 
+			// prepare flashing rock images
 			var rctx = canvas.getContext("2d") as CanvasRenderingContext2D;
 			assert rctx != null;
 
@@ -387,8 +395,11 @@ final class Status implements Sprite {
 
 		this.currentTop = Config.height + Config.cellHeight;
 
-		this.x =  Config.width >> 2;
-		this.y = (Config.height * 3 / 4) as int;
+		this.ship = new SpaceShip(
+			 Config.width >> 2,
+			(Config.height * 3/4) as int,
+			this.images["my"]);
+
 		this.frameCount = 0;
 		this.score      = 0;
 
@@ -403,7 +414,7 @@ final class Status implements Sprite {
 		}, 250);
 	}
 
-	function constructor(stage : HTMLCanvasElement, scoreboard : HTMLElement) {
+	function constructor(stageCanvas : HTMLCanvasElement, scoreboard : HTMLElement) {
 		// initialize properties
 		this.changeStateToBeLoading();
 
@@ -413,9 +424,9 @@ final class Status implements Sprite {
 		scoreboard.style.width = Config.width as string + "px";
 		this.scoreElement = scoreboard;
 
-		stage.width  = Config.width;
-		stage.height = Config.height;
-		this.ctx = stage.getContext("2d") as __noconvert__ CanvasRenderingContext2D;
+		stageCanvas.width  = Config.width;
+		stageCanvas.height = Config.height;
+		this.ctx = stageCanvas.getContext("2d") as __noconvert__ CanvasRenderingContext2D;
 
 		var bg = dom.createCanvas();
 		bg.width  = Config.width;
@@ -474,14 +485,15 @@ final class Status implements Sprite {
 			var p = this.getPoint(e);
 
 			if(this.isGaming() && this.lastX != -1) {
-				this.x += ((p[0] - this.lastX) * 2.5) as int;
-				this.y += ((p[1] - this.lastY) * 3.0) as int;
+				var ship = this.ship;
+				ship.x += ((p[0] - this.lastX) * 2.5) as int;
+				ship.y += ((p[1] - this.lastY) * 3.0) as int;
 
-				this.x = Math.max(this.x, 0);
-				this.x = Math.min(this.x, Config.width);
+				ship.x = Math.max(ship.x, 0);
+				ship.x = Math.min(ship.x, Config.width);
 
-				this.y = Math.max(this.y, 0);
-				this.y = Math.min(this.y, Config.height);
+				ship.y = Math.max(ship.y, 0);
+				ship.y = Math.min(ship.y, Config.height);
 			}
 
 			this.lastX = p[0];
@@ -495,15 +507,15 @@ final class Status implements Sprite {
 	function getPoint(e : Event/*UIEvent*/) : number[] {
 		var px : number;
 		var py : number;
-		if(e instanceof TouchEvent) {
-			var te = e as __noconvert__ TouchEvent;
-			px = te.touches[0].pageX;
-			py = te.touches[0].pageY;
-		}
-		else {
+		if(e instanceof MouseEvent) {
 			var me = e as __noconvert__ MouseEvent;
 			px = me.clientX;
 			py = me.clientY;
+		}
+		else {
+			var te = e as __noconvert__ TouchEvent;
+			px = te.touches[0].pageX;
+			py = te.touches[0].pageY;
 		}
 		return [ px, py ];
 	}
@@ -531,9 +543,9 @@ final class Status implements Sprite {
 
 final class _Main {
 	static function main(args : string[]) : void {
-		var stage = dom.id(args[0]) as __noconvert__ HTMLCanvasElement;
+		var stageCanvas = dom.id(args[0]) as __noconvert__ HTMLCanvasElement;
 		var scoreboard = dom.id(args[1]);
-		var status = new Status(stage, scoreboard);
-		status.tick();
+		var stage = new Stage(stageCanvas, scoreboard);
+		stage.tick();
 	}
 }
