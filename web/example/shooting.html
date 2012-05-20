@@ -1,0 +1,39 @@
+<html>
+  <head>
+    <title>Shooting Game in JSX</title>
+    <meta name="viewport" content="width=device-width,user-scalable=no" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+    <style>
+      body {
+        margin: 0;
+      }
+      #scoreboard {
+        position: absolute;
+        left: 0;
+        top: 0;
+        font-size: 18px;
+        color: #fff;
+        text-align: right;
+      }
+    </style>
+    <script src="../jsx.combined.js"></script>
+    <script src="../assets/js/jsx-browser-platform.js"></script>
+    <script>
+      //jsx.enableOptimizations = true;
+    </script>
+    <script src="../assets/js/jsx-script-loader.js"></script>
+    <script type="application/jsx" src="shooting.jsx"></script>
+    <script>
+      window.addEventListener("load", function(e) {
+        var shooting = JSX.require("shooting.jsx");
+        shooting._Main.main$AS(["stage", "scoreboard"]);
+      });
+    </script>
+  </head>
+  <body>
+  <canvas id="stage"></canvas>
+  <div id="scoreboard">000000000<br/>0 FPS</div>
+  </body>
+<html>
