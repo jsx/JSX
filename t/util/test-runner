@@ -22,9 +22,9 @@ BEGIN { # XXX older version of Test::More has no note()
 sub bench {
     my ($f) = @_;
     require Time::HiRes;
-    my $start = Time::HiRes::time();
+    my $start = [Time::HiRes::gettimeofday()];
     my $ret = $f->();
-    return ($ret, Time::HiRes::time() - $start);
+    return ($ret, Time::HiRes::tv_interval($start));
 }
 
 sub main {
