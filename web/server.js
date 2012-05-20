@@ -6,7 +6,7 @@ var http = require("http"),
 	fs = require("fs");
 
 function finish(response, uri, status, content_type, content) {
-	var len = Buffer.byteLength(content);
+	var len = content.length;
 
 	var headers = {
 		"Cache-Control" : "no-cache",
@@ -23,6 +23,9 @@ function finish(response, uri, status, content_type, content) {
 	}
 	else if(/\.css$/.test(uri)) {
 		headers["Content-Type"] = "text/css";
+	}
+	else if(/\.png/.test(uri)) {
+		headers["Content-Type"] = "image/png";
 	}
 	else if(/\//.test(uri) || /\.html$/.test(uri)) {
 		headers["Content-Type"] = "text/html";
@@ -46,13 +49,13 @@ function serveFile(response, uri, filename) {
 			filename += '/index.html';
 		}
 
-		fs.readFile(filename, "binary", function(err, file) {
+		fs.readFile(filename, "binary", function(err, content) {
 			if(err) {
 				finish(response, uri, 500, "text/plain", err + "\n");
 				return;
 			}
 
-			finish(response, uri, 200, undefined, file);
+			finish(response, uri, 200, undefined, content);
 		});
 	});
 }
@@ -60,7 +63,7 @@ function serveFile(response, uri, filename) {
 function main(args) {
 	var port = args[0] || "5000";
 
-	http.createServer(function(request, response) {
+	var httpd = http.createServer(function(request, response) {
 		var uri = url.parse(request.url).pathname;
 		var filename = path.join(process.cwd(), uri);
 
@@ -82,7 +85,8 @@ function main(args) {
 		else {
 			serveFile(response, uri, filename);
 		}
-	}).listen(parseInt(port, 10));
+	});
+	httpd.listen(parseInt(port, 10));
 
 	console.log("Open http://localhost:" + port + "/");
 }
