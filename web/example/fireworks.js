@@ -211,6 +211,9 @@ exports.FireworkApplication = Class.extend({
 		Config.quantity = quantity;
 
 		var canvas = document.getElementById(canvasId);
+		if(!canvas) {
+			throw new Error("No such element: " + canvasId);
+		}
 
 		var view = new FireworkView(canvas);
 		var watcher = new FPSWatcher(fpsId);
