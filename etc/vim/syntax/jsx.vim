@@ -38,7 +38,7 @@ syn keyword jsxConditional	if else switch
 syn keyword jsxRepeat		while for do in
 syn keyword jsxBranch		break continue
 syn keyword jsxOperator		new delete instanceof typeof as __noconvert__
-syn keyword jsxType		Array boolean Boolean Date number Number int Object string String RegExp JSON MayBeUndefined variant void
+syn keyword jsxType		Array boolean Boolean Date number Number Map int Object string String RegExp JSON MayBeUndefined variant void
 syn keyword jsxStatement	return
 syn keyword jsxBoolean		true false
 syn keyword jsxNull		null undefined
@@ -94,7 +94,7 @@ if version >= 508 || !exists("did_jsx_syn_inits")
   HiLink jsxStringD		String
   "HiLink jsxCharacter		Character
   HiLink jsxSpecialCharacter	jsxSpecial
-  HiLink jsxNumber		jsxValue
+  HiLink jsxNumber		Number
   HiLink jsxSpecialNumbers	Constant
   HiLink jsxConditional		Conditional
   HiLink jsxRepeat		Repeat
