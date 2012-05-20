@@ -93,7 +93,7 @@ native class DOMImplementation {
 	) : Object/*DOMObject*/;
 }
 
-native class Node {
+native class Node extends EventTarget {
 	// FIXME: delete function constructor();
 	// NodeType
 	static const     ELEMENT_NODE : int/*unsigned short*/;
@@ -959,6 +959,8 @@ native class HTMLImageElement extends HTMLElement {
 	var vspace : int;
 	var width : int;
 
+	var onload : function(:Event):void;
+
 	// HTML5
 	var crossOrigin : MayBeUndefined.<string>;
 	__readonly__ var naturalWidth: MayBeUndefined.<int>;
@@ -1160,7 +1162,8 @@ native class HTMLCanvasElement extends HTMLElement {
 	function toBlob(callback : function(data :string):void) : void;
 	function toBlob(callback : function(data :string):void, type : string) :void;
 
-	function getContext(contextId : string) : MayBeUndefined.<CanvasRenderingContext>;
+	// getContext() returns null if the contextId is not supported
+	function getContext(contextId : string) : CanvasRenderingContext;
 
 	function addEventListener(type : string, listener : function(:MouseEvent):void) : void;
 	function addEventListener(type : string, listener : function(:TouchEvent):void) : void;
@@ -1244,6 +1247,7 @@ final native __fake__ class Window extends EventTarget {
 	function resizeBy(deltaX : int, deltaY : int) : void;
 	function resizeTo(x : int, y : int) : void;
 	function scrollBy(deltaX : int, deltaY : int) : void;
+	function scrollTo(x : int, y : int) : void;
 	function showModalDialog(uri : string, args : variant, options : variant) : variant; // FIXME
 	function stop() : void;
 
@@ -1810,5 +1814,14 @@ final class dom {
 	static function id(identifier : string) : HTMLElement {
 		return dom.window.document.getElementById(identifier)
 			as __noconvert__ HTMLElement;
+	}
+
+	static function createCanvas() : HTMLCanvasElement {
+		return dom.window.document.createElement("canvas")
+			as __noconvert__ HTMLCanvasElement;
+	}
+	static function createImage() : HTMLImageElement {
+		return dom.window.document.createElement("img")
+			as __noconvert__ HTMLImageElement;
 	}
 }
