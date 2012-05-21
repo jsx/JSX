@@ -1107,7 +1107,7 @@ var TypeofExpression = exports.TypeofExpression = UnaryExpression.extend({
 	},
 
 	clone: function () {
-		return new TypeofExpression(this._token, this._expr);
+		return new TypeofExpression(this._token, this._expr.clone());
 	},
 
 	analyze: function (context, parentExpr) {
@@ -1133,7 +1133,7 @@ var SignExpression = exports.SignExpression = UnaryExpression.extend({
 	},
 
 	clone: function () {
-		return new SignExpression(this._token, this._expr);
+		return new SignExpression(this._token, this._expr.clone());
 	},
 
 	analyze: function (context, parentExpr) {
@@ -1209,7 +1209,7 @@ var AdditiveExpression = exports.AdditiveExpression = BinaryExpression.extend({
 	},
 
 	clone: function () {
-		var ret = new AdditiveExpression(this._token, this._expr1, this._expr2);
+		var ret = new AdditiveExpression(this._token, this._expr1.clone(), this._expr2.clone());
 		ret._type = this._type;
 		return ret;
 	},
@@ -1248,7 +1248,7 @@ var ArrayExpression = exports.ArrayExpression = BinaryExpression.extend({
 	},
 
 	clone: function () {
-		var ret = new ArrayExpression(this._token, this._expr1, this._expr2);
+		var ret = new ArrayExpression(this._token, this._expr1.clone(), this._expr2.clone());
 		ret._type = this._type;
 		return ret;
 	},
@@ -1308,7 +1308,7 @@ var AssignmentExpression = exports.AssignmentExpression = BinaryExpression.exten
 	},
 
 	clone: function () {
-		return new AssignmentExpression(this._token, this._expr1, this._expr2);
+		return new AssignmentExpression(this._token, this._expr1.clone(), this._expr2.clone());
 	},
 
 	analyze: function (context, parentExpr) {
@@ -1362,7 +1362,7 @@ var BinaryNumberExpression = exports.BinaryNumberExpression = BinaryExpression.e
 	},
 
 	clone: function () {
-		return new BinaryNumberExpression(this._token, this._expr1, this._expr2);
+		return new BinaryNumberExpression(this._token, this._expr1.clone(), this._expr2.clone());
 	},
 
 	analyze: function (context, parentExpr) {
@@ -1412,7 +1412,7 @@ var EqualityExpression = exports.EqualityExpression = BinaryExpression.extend({
 	},
 
 	clone: function () {
-		return new EqualityExpression(this._token, this._expr1, this._expr2);
+		return new EqualityExpression(this._token, this._expr1.clone(), this._expr2.clone());
 	},
 
 	analyze: function (context, parentExpr) {
@@ -1447,7 +1447,7 @@ var InExpression = exports.InExpression = BinaryExpression.extend({
 	},
 
 	clone: function () {
-		return new InExpression(this._token, this._expr1, this._expr2);
+		return new InExpression(this._token, this._expr1.clone(), this._expr2.clone());
 	},
 
 	analyze: function (context, parentExpr) {
@@ -1483,7 +1483,7 @@ var LogicalExpression = exports.LogicalExpression = BinaryExpression.extend({
 	},
 
 	clone: function () {
-		return new LogicalExpression(this._token, this._expr1, this._expr2);
+		return new LogicalExpression(this._token, this._expr1.clone(), this._expr2.clone());
 	},
 
 	analyze: function (context, parentExpr) {
@@ -1509,7 +1509,7 @@ var ShiftExpression = exports.ShiftExpression = BinaryExpression.extend({
 	},
 
 	clone: function () {
-		return new ShiftExpression(this._token, this._expr1, this._expr2);
+		return new ShiftExpression(this._token, this._expr1.clone(), this._expr2.clone());
 	},
 
 	analyze: function (context, parentExpr) {
