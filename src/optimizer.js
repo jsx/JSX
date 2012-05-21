@@ -501,7 +501,18 @@ var _InlineOptimizeCommand = exports._InlineOptimizeCommand = _FunctionOptimizeC
 	_handleStatement: function (statements, stmtIndex) {
 		var altered = false;
 		var statement = statements[stmtIndex];
-		if (statement instanceof ExpressionStatement || statement instanceof ReturnStatement) {
+
+		if (statement instanceof ConstructorInvocationStatement) {
+
+			var callingFuncDef = statement.getCallingFuncDef();
+			this.optimizeFunction(callingFuncDef);
+			if (this._functionIsInlineable(callingFuncDef) && this._argsAreInlineable(callingFuncDef, statement.getArguments())) {
+				statements.splice(stmtIndex, 1);
+				this._expandCallingFunction(statements, stmtIndex, callingFuncDef, statement.getArguments().concat([ new ThisExpression(null) ]));
+			}
+
+		} else if (statement instanceof ExpressionStatement || statement instanceof ReturnStatement) {
+
 			var expr = statement.getExpr();
 			if (expr instanceof CallExpression) {
 				// inline if the entire statement is a single call expression
@@ -532,9 +543,13 @@ var _InlineOptimizeCommand = exports._InlineOptimizeCommand = _FunctionOptimizeC
 					altered = true;
 				}
 			}
+
 		} else {
+
 			altered = _Util.handleSubStatements(this._handleStatements.bind(this), statement);
+
 		}
+
 		return altered;
 	},
 
@@ -575,22 +590,32 @@ var _InlineOptimizeCommand = exports._InlineOptimizeCommand = _FunctionOptimizeC
 			}
 		}
 		// check that the function may be inlined
-		if (! this._canInlineFunction(callingFuncDef))
+		if (! this._functionIsInlineable(callingFuncDef))
 			return null;
 		// and the args passed can be inlined (types should match exactly (or emitters may insert additional code))
-		var argsAndThis = callExpr.getArguments();
-		for (var i = 0; i < argsAndThis.length; ++i) {
-			if (! (argsAndThis[i] instanceof LeafExpression))
-				return null;
-			if (! argsAndThis[i].getType().equals(callingFuncDef.getArgumentTypes()[i]))
-				return null;
-		}
+		if (! this._argsAreInlineable(callingFuncDef, callExpr.getArguments()))
+			return null;
+		// build list of arguments (and this)
+		var argsAndThis = callExpr.getArguments().concat([]);
 		if ((callingFuncDef.flags() & ClassDefinition.IS_STATIC) == 0)
 			argsAndThis.push(receiverExpr);
 		return argsAndThis;
 	},
 
-	_canInlineFunction: function (funcDef) {
+	_argsAreInlineable: function (callingFuncDef, actualArgs) {
+		var formalArgs = callingFuncDef.getArgumentTypes();
+		if (actualArgs.length != formalArgs.length)
+			throw new "number of arguments mismatch";
+		for (var i = 0; i < actualArgs.length; ++i) {
+			if (! (actualArgs[i] instanceof LeafExpression))
+				return false;
+			if (! actualArgs[i].getType().equals(formalArgs[i]))
+				return false;
+		}
+		return true;
+	},
+
+	_functionIsInlineable: function (funcDef) {
 		if (typeof this.getStash(funcDef).isInlineable != "boolean") {
 			this.getStash(funcDef).isInlineable = function () {
 				// only inline function that are short, has no branches (last statement may be a return), has no local variables (excluding arguments)
