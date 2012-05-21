@@ -781,7 +781,7 @@ var AsExpression = exports.AsExpression = UnaryExpression.extend({
 	},
 
 	clone: function () {
-		return new AsExpression(tihs._token, this._expr.clone(), this._type);
+		return new AsExpression(this._token, this._expr.clone(), this._type);
 	},
 
 	serialize: function () {
