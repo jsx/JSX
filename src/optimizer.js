@@ -341,6 +341,18 @@ var _FoldConstantCommand = exports.__FoldConstantCommand = _FunctionOptimizeComm
 			// binary number (or shift) expression
 			this._foldNumericBinaryExpression(expr, replaceCb);
 
+		} else if (expr instanceof AsExpression) {
+
+			// convert "literal as string"
+			if (expr.getType().equals(Type.stringType)) {
+				var baseExpr = expr.getExpr();
+				if (baseExpr instanceof BooleanLiteralExpression || baseExpr instanceof NumberLiteralExpression || baseExpr instanceof IntegerLiteralExpression) {
+					replaceCb(
+						new StringLiteralExpression(
+							new Token(Util.encodeStringLiteral(baseExpr.getToken().getValue()), null)));
+				}
+			}
+
 		}
 
 		return true;
