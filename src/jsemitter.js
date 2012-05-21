@@ -611,7 +611,12 @@ var _NumberLiteralExpressionEmitter = exports._NumberLiteralExpressionEmitter = 
 
 	emit: function (outerOpPrecedence) {
 		var token = this._expr.getToken();
-		this._emitter._emit("" + token.getValue(), token);
+		var str = token.getValue();
+		if (outerOpPrecedence == _PropertyExpressionEmitter._operatorPrecedence && str.indexOf(".") == -1) {
+			this._emitter._emit("(" + token.getValue() + ")", token);
+		} else {
+			this._emitter._emit("" + token.getValue(), token);
+		}
 	}
 
 });

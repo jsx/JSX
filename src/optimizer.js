@@ -271,10 +271,15 @@ var _FoldConstantCommand = exports.__FoldConstantCommand = _FunctionOptimizeComm
 	},
 
 	_optimizeExpression: function (expr, replaceCb) {
+
 		// optimize subexprs
 		expr.forEachExpression(this._optimizeExpression.bind(this));
+
 		// propagate const
+
 		if (expr instanceof PropertyExpression) {
+
+			// property expression
 			var holderType = expr.getHolderType();
 			if (holderType instanceof ClassDefType) {
 				var member = null;
@@ -294,18 +299,33 @@ var _FoldConstantCommand = exports.__FoldConstantCommand = _FunctionOptimizeComm
 					}
 				}
 			}
+
+		} else if (expr instanceof SignExpression) {
+
+			// sign expression
+			var calculateCb;
+			switch (expr.getToken().getValue()) {
+			case "+": calculateCb = function (x) { return +x; }; break;
+			case "-": calculateCb = function (x) { return -x; }; break;
+			default:
+				return;
+			}
+			this.log("folding operator '" + expr.getToken().getValue() + "' at '" + expr.getToken().getFilename() + ":" + expr.getToken().getLineNumber());
+			var baseExpr = expr.getExpr();
+			if (baseExpr instanceof IntegerLiteralExpression) {
+				replaceCb(new IntegerLiteralExpression(new Token(calculateCb(+baseExpr.getToken().getValue()), null)));
+			} else if (baseExpr instanceof NumberLiteralExpression) {
+				replaceCb(new NumberLiteralExpression(new Token(calculateCb(+baseExpr.getToken().getValue()), null)));
+			}
+
 		} else if (expr instanceof AdditiveExpression) {
+
+			// additive expression
 			var firstExpr = expr.getFirstExpr();
 			var secondExpr = expr.getSecondExpr();
-			if ((firstExpr instanceof NumberLiteralExpression || firstExpr instanceof IntegerLiteralExpression)
-				&& (secondExpr instanceof NumberLiteralExpression || secondExpr instanceof IntegerLiteralExpression)) {
-				var value = +firstExpr.getToken().getValue() + +secondExpr.getToken().getValue();
-				if (firstExpr instanceof IntegerLiteralExpression && secondExpr instanceof IntegerLiteralExpression) {
-					var expr = new IntegerLiteralExpression(new Token("" + (value | 0)), null);
-				} else {
-					expr = new NumberLiteralExpression(new Token("" + value), 0);
-				}
-				replaceCb(expr);
+			if (this._isIntegerOrNumberLiteralExpression(firstExpr)) {
+				// type of second expr is checked by the callee
+				this._foldNumericBinaryExpression(expr, replaceCb);
 			} else if (firstExpr instanceof StringLiteralExpression && secondExpr instanceof StringLiteralExpression) {
 				replaceCb(
 					new StringLiteralExpression(
@@ -315,8 +335,55 @@ var _FoldConstantCommand = exports.__FoldConstantCommand = _FunctionOptimizeComm
 								Util.decodeStringLiteral(secondExpr.getToken().getValue())),
 							null)));
 			}
+
+		} else if (expr instanceof BinaryNumberExpression || expr instanceof ShiftExpression) {
+
+			// binary number (or shift) expression
+			this._foldNumericBinaryExpression(expr, replaceCb);
+
 		}
+
 		return true;
+	},
+
+	_foldNumericBinaryExpression: function (expr, replaceCb) {
+		// handles BinaryNumberExpression _and_ AdditiveExpression of numbers or integers
+		if (this._isIntegerOrNumberLiteralExpression(expr.getFirstExpr())
+			&& this._isIntegerOrNumberLiteralExpression(expr.getSecondExpr())) {
+			// ok
+		} else {
+			return;
+		}
+		var calculateCb;
+		var resultIsInt = undefined;
+		switch (expr.getToken().getValue()) {
+		case "*": calculateCb = function (x, y) { return x * y; }; break;
+		case "/": calculateCb = function (x, y) { return x / y; }; resultIsInt = false; break;
+		case "%": calculateCb = function (x, y) { return x % y; }; resultIsInt = false; break;
+		case "+": calculateCb = function (x, y) { return x + y; }; break;
+		case "-": calculateCb = function (x, y) { return x - y; }; break;
+		case ">>>": calculateCb = function (x, y) { return x >>> y; }; resultIsInt = true; break;
+		case ">>": calculateCb = function (x, y) { return x >> y; }; resultIsInt = true; break;
+		case "<<": calculateCb = function (x, y) { return x << y; }; resultIsInt = true; break;
+		default:
+			return;
+		}
+		this.log("folding operator '" + expr.getToken().getValue() + "' at '" + expr.getToken().getFilename() + ":" + expr.getToken().getLineNumber());
+		if (resultIsInt === undefined) {
+			resultIsInt = expr.getFirstExpr() instanceof IntegerLiteralExpression
+				&& expr.getSecondExpr() instanceof IntegerLiteralExpression;
+		}
+		var value = calculateCb(+expr.getFirstExpr().getToken().getValue(), +expr.getSecondExpr().getToken().getValue());
+		if (resultIsInt) {
+			var expr = new IntegerLiteralExpression(new Token("" + (value | 0)), null);
+		} else {
+			expr = new NumberLiteralExpression(new Token("" + value), 0);
+		}
+		replaceCb(expr);
+	},
+
+	_isIntegerOrNumberLiteralExpression: function (expr) {
+		return expr instanceof NumberLiteralExpression || expr instanceof IntegerLiteralExpression;
 	},
 
 	_foldStaticConst: function (member) {
@@ -325,7 +392,9 @@ var _FoldConstantCommand = exports.__FoldConstantCommand = _FunctionOptimizeComm
 			return;
 		this.getStash(member).isOptimized = true;
 		// optimize
-		this._optimizeExpression(member.getInitialValue(), function (expr) { member.setInitialValue(expr); });
+		var initialValue = member.getInitialValue();
+		if (initialValue != null)
+			this._optimizeExpression(initialValue, function (expr) { member.setInitialValue(expr); });
 	},
 
 	_toFoldedExpr: function (expr, type) {
