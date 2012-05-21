@@ -366,32 +366,53 @@ var _FoldConstantCommand = exports.__FoldConstantCommand = _FunctionOptimizeComm
 		} else {
 			return;
 		}
-		var calculateCb;
-		var resultIsInt = undefined;
+
 		switch (expr.getToken().getValue()) {
-		case "*": calculateCb = function (x, y) { return x * y; }; break;
-		case "/": calculateCb = function (x, y) { return x / y; }; resultIsInt = false; break;
-		case "%": calculateCb = function (x, y) { return x % y; }; resultIsInt = false; break;
-		case "+": calculateCb = function (x, y) { return x + y; }; break;
-		case "-": calculateCb = function (x, y) { return x - y; }; break;
-		case ">>>": calculateCb = function (x, y) { return x >>> y; }; resultIsInt = true; break;
-		case ">>": calculateCb = function (x, y) { return x >> y; }; resultIsInt = true; break;
-		case "<<": calculateCb = function (x, y) { return x << y; }; resultIsInt = true; break;
-		default:
-			return;
+
+		// expressions that return number or integer depending on their types
+		case "*": this._foldNumericBinaryExpressionAsNumeric(expr, replaceCb, function (x, y) { return x * y; }); break;
+		case "+": this._foldNumericBinaryExpressionAsNumeric(expr, replaceCb, function (x, y) { return x + y; }); break;
+		case "-": this._foldNumericBinaryExpressionAsNumeric(expr, replaceCb, function (x, y) { return x - y; }); break;
+
+		// expressions that always return number
+		case "/": this._foldNumericBinaryExpressionAsNumber(expr, replaceCb, function (x, y) { return x / y; }); break;
+		case "%": this._foldNumericBinaryExpressionAsNumber(expr, replaceCb, function (x, y) { return x % y; }); break;
+
+		// expressions that always return integer
+		case ">>>": this._foldNumericBinaryExpressionAsInteger(expr, replaceCb, function (x, y) { return x >>> y; }); break;
+		case ">>": this._foldNumericBinaryExpressionAsInteger(expr, replaceCb, function (x, y) { return x >> y; }); break;
+		case "<<": this._foldNumericBinaryExpressionAsInteger(expr, replaceCb, function (x, y) { return x << y; }); break;
+		case "&": this._foldNumericBinaryExpressionAsInteger(expr, replaceCb, function (x, y) { return x & y; }); break;
+		case "|": this._foldNumericBinaryExpressionAsInteger(expr, replaceCb, function (x, y) { return x | y; }); break;
+		case "^": this._foldNumericBinaryExpressionAsInteger(expr, replaceCb, function (x, y) { return x ^ y; }); break;
+
 		}
-		this.log("folding operator '" + expr.getToken().getValue() + "' at '" + expr.getToken().getFilename() + ":" + expr.getToken().getLineNumber());
-		if (resultIsInt === undefined) {
-			resultIsInt = expr.getFirstExpr() instanceof IntegerLiteralExpression
-				&& expr.getSecondExpr() instanceof IntegerLiteralExpression;
-		}
-		var value = calculateCb(+expr.getFirstExpr().getToken().getValue(), +expr.getSecondExpr().getToken().getValue());
-		if (resultIsInt) {
-			var expr = new IntegerLiteralExpression(new Token("" + (value | 0)), null);
+	},
+
+	_foldNumericBinaryExpressionAsNumeric: function (expr, replaceCb, calcCb) {
+		if (expr.getFirstExpr() instanceof IntegerLiteralExpression && expr.getSecondExpr() instanceof IntegerLiteralExpression) {
+			return this._foldNumericBinaryExpressionAsInteger(expr, replaceCb, calcCb);
 		} else {
-			expr = new NumberLiteralExpression(new Token("" + value), 0);
+			return this._foldNumericBinaryExpressionAsNumber(expr, replaceCb, calcCb);
 		}
-		replaceCb(expr);
+	},
+
+	_foldNumericBinaryExpressionAsInteger: function (expr, replaceCb, calcCb) {
+		var value = calcCb(+expr.getFirstExpr().getToken().getValue(), +expr.getSecondExpr().getToken().getValue());
+		this.log(
+			"folding operator '" + expr.getToken().getValue() + "' at " + expr.getToken().getFilename() + ":" + expr.getToken().getLineNumber() +
+			" to int: " + value);
+		if (value % 1 != 0)
+			throw new Error("value is not an integer");
+		replaceCb(new IntegerLiteralExpression(new Token(value + "", null)));
+	},
+
+	_foldNumericBinaryExpressionAsNumber: function (expr, replaceCb, calcCb) {
+		var value = calcCb(+expr.getFirstExpr().getToken().getValue(), +expr.getSecondExpr().getToken().getValue());
+		this.log(
+			"folding operator '" + expr.getToken().getValue() + "' at " + expr.getToken().getFilename() + ":" + expr.getToken().getLineNumber() +
+			" to number: " + value);
+		replaceCb(new NumberLiteralExpression(new Token(value + "", null)));
 	},
 
 	_isIntegerOrNumberLiteralExpression: function (expr) {

@@ -4,6 +4,7 @@
 -1
 4
 0.5
+1
 */
 /*JSX_OPTS
 --optimize fold-const
@@ -19,6 +20,6 @@ class Test {
 		log Test.ONE - Test.TWO;
 		log Test.TWO * Test.TWO;
 		log Test.ONE / Test.TWO; // / and % operations return floating point
-
+		log Test.ONE % Test.TWO;
 	}
 }

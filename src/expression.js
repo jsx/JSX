@@ -1382,13 +1382,14 @@ var BinaryNumberExpression = exports.BinaryNumberExpression = BinaryExpression.e
 		case "+":
 		case "-":
 		case "*":
-		case "/":
-		case "%":
 			if (this._expr1.getType().resolveIfMayBeUndefined().equals(Type.numberType) || this._expr2.getType().resolveIfMayBeUndefined().equals(Type.numberType))
 				return Type.numberType;
 			else
 				return Type.integerType;
 			break;
+		case "/":
+		case "%":
+			return Type.numberType;
 		case "<":
 		case "<=":
 		case ">":
