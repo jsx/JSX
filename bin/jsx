@@ -205,7 +205,7 @@ var JSX = Class.extend({
 				tasks.push(function () {
 					emitter.setEnableRunTimeTypeCheck(false);
 				});
-				optimizeCommands = [ "no-assert", "no-log", "return-if", "inline" ];
+				optimizeCommands = [ "no-assert", "no-log", "fold-const", "return-if", "inline", "fold-const" ];
 				break;
 			case "--optimize":
 				if ((optarg = getoptarg()) == null)
