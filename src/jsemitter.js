@@ -2145,9 +2145,14 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 		var exprType = expr.getType();
 		// FIXME what happens if the op is /= or %= ?
 		if (lhsType.resolveIfMayBeUndefined().equals(Type.integerType) && exprType.equals(Type.numberType)) {
-			this._emit("(", expr.getToken());
-			this._getExpressionEmitterFor(expr).emit(_BinaryExpressionEmitter._operatorPrecedence["|"]);
-			this._emit(" | 0)", expr.getToken());
+			if (expr instanceof NumberLiteralExpression
+				|| expr instanceof IntegerLiteralExpression) {
+				this._emit((expr.getToken().getValue() | 0).toString(), expr.getToken());
+			} else {
+				this._emit("(", expr.getToken());
+				this._getExpressionEmitterFor(expr).emit(_BinaryExpressionEmitter._operatorPrecedence["|"]);
+				this._emit(" | 0)", expr.getToken());
+			}
 			return;
 		}
 		if (lhsType.equals(Type.integerType)
