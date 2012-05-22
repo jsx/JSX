@@ -116,8 +116,6 @@ var Compiler = exports.Compiler = Class.extend({
 			this._printErrors(errors);
 			return false;
 		}
-		// determine callees (for optimization and code generation)
-		this._determineCallees();
 		// optimization
 		this._optimize();
 		// TODO peep-hole and dead store optimizations, etc.
@@ -301,13 +299,6 @@ var Compiler = exports.Compiler = Class.extend({
 		// analyze unused variables in every classdef
 		this.forEachClassDef(function (parser, classDef) {
 			classDef.analyzeUnusedVariables();
-			return true;
-		}.bind(this));
-	},
-
-	_determineCallees: function () {
-		this.forEachClassDef(function (parser, classDef) {
-			classDef.determineCallees();
 			return true;
 		}.bind(this));
 	},

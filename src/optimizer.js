@@ -74,6 +74,16 @@ var Optimizer = exports.Optimizer = Class.extend({
 	},
 
 	setup: function (cmds) {
+
+		// insert determine callee
+		var insertDetermineCalleeCommand = function () {
+			for (var i = 0; i < this._commands.length; ++i)
+				if (this._commands[i] instanceof _DetermineCalleeCommand)
+					break;
+			if (i == this._commands.length)
+				this._commands.unshift(new _DetermineCalleeCommand());
+		}.bind(this);
+
 		for (var i = 0; i < cmds.length; ++i) {
 			var cmd = cmds[i];
 			if (cmd == "no-assert") {
@@ -83,6 +93,7 @@ var Optimizer = exports.Optimizer = Class.extend({
 			} else if (cmd == "fold-const") {
 				this._commands.push(new _FoldConstantCommand());
 			} else if (cmd == "inline") {
+				insertDetermineCalleeCommand();
 				this._commands.push(new _InlineOptimizeCommand());
 			} else if (cmd == "return-if") {
 				this._commands.push(new _ReturnIfOptimizeCommand());
@@ -152,10 +163,10 @@ var _OptimizeCommand = exports._OptimizeCommand = Class.extend({
 
 	getStash: function (stashable) {
 		var stash = stashable.getOptimizerStash();
-		if (stashable[this._identifier] == null) {
-			stashable[this._identifier] = this._createStash();
+		if (stash[this._identifier] == null) {
+			stash[this._identifier] = this._createStash();
 		}
-		return stashable[this._identifier];
+		return stash[this._identifier];
 	},
 
 	_createStash: function () {
@@ -245,8 +256,115 @@ var _NoLogCommand = exports._NoAssertCommand = _FunctionOptimizeCommand.extend({
 
 });
 
+var _DetermineCalleeCommand = exports._DetermineCalleeCommand = _FunctionOptimizeCommand.extend({
+
+	$IDENTIFIER: "determine-callee",
+
+	constructor: function () {
+		_FunctionOptimizeCommand.prototype.constructor.call(this, _DetermineCalleeCommand.IDENTIFIER);
+	},
+
+	_createStash: function () {
+		return {
+			callingFuncDef: null
+		};
+	},
+
+	optimizeFunction: function (funcDef) {
+		funcDef.forEachClosure(function (funcDef) {
+			this.optimizeFunction(funcDef);
+		}.bind(this));
+
+		funcDef.forEachStatement(function onStatement(statement) {
+
+			if (statement instanceof ConstructorInvocationStatement) {
+				// invocation of super-class ctor
+				var callingFuncDef = _DetermineCalleeCommand.findCallingFunctionInClass(
+					statement.getConstructingClassDef(),
+					"constructor",
+					statement.getConstructorType().getArgumentTypes(),
+					false);
+				if (callingFuncDef == null)
+					throw new Error("could not determine the associated parent ctor");
+				this._setCallingFuncDef(statement, callingFuncDef);
+			}
+
+			statement.forEachExpression(function onExpr(expr) {
+				if (expr instanceof CallExpression) {
+					// call expression
+					var calleeExpr = expr.getExpr();
+					if (calleeExpr instanceof PropertyExpression && ! calleeExpr.getType().isAssignable()) {
+						// is referring to function (not a value of function type)
+						var holderType = calleeExpr.getHolderType();
+						var callingFuncDef = _DetermineCalleeCommand.findCallingFunction(
+								holderType.getClassDef(),
+								calleeExpr.getIdentifierToken().getValue(),
+								calleeExpr.getType().getArgumentTypes(),
+								holderType instanceof ClassDefType);
+						this._setCallingFuncDef(expr, callingFuncDef);
+					} else if (calleeExpr instanceof FunctionExpression) {
+						this._setCallingFuncDef(expr, calleeExpr.getFuncDef());
+					} else {
+						this._setCallingFuncDef(expr, null);
+					}
+				} else if (expr instanceof NewExpression) {
+					/*
+						For now we do not do anything here, since all objects should be created by the JS new operator,
+						or will fail in operations like obj.func().
+					*/
+				}
+				return expr.forEachExpression(onExpr.bind(this));
+			}.bind(this));
+
+			return statement.forEachStatement(onStatement.bind(this));
+		}.bind(this));
+	},
+
+	_setCallingFuncDef: function (stashable, funcDef) {
+		this.getStash(stashable).callingFuncDef = funcDef;
+	},
+
+	$findCallingFunctionInClass: function (classDef, funcName, argTypes, isStatic) {
+		var found = null;
+		classDef.forEachMemberFunction(function (funcDef) {
+			if (isStatic == ((funcDef.flags() & ClassDefinition.IS_STATIC) != 0)
+				&& funcDef.name() == funcName
+				&& Util.typesAreEqual(funcDef.getArgumentTypes(), argTypes)) {
+				found = funcDef;
+				return false;
+			}
+			return true;
+		});
+		// only return if the found function is final
+		if (found != null) {
+			if ((found.flags() & (ClassDefinition.IS_STATIC | ClassDefinition.IS_FINAL)) == 0)
+				found = null;
+		}
+		return found;
+	},
+
+	$findCallingFunction: function (classDef, funcName, argTypes, isStatic) {
+		var found = null;
+		// find the first declaration
+		classDef.forEachClassToBase(function (classDef) {
+			if ((found = _DetermineCalleeCommand.findCallingFunctionInClass(classDef, funcName, argTypes, isStatic)) != null)
+				return false;
+			return true;
+		});
+		return found;
+	},
+
+	$getCallingFuncDef: function (stashable) {
+		var stash = stashable.getOptimizerStash()[_DetermineCalleeCommand.IDENTIFIER];
+		if (stash === undefined)
+			throw new Error("callee not searched");
+		return stash.callingFuncDef;
+	}
+
+});
+
 // propagates constants
-var _FoldConstantCommand = exports.__FoldConstantCommand = _FunctionOptimizeCommand.extend({
+var _FoldConstantCommand = exports._FoldConstantCommand = _FunctionOptimizeCommand.extend({
 
 	constructor: function () {
 		_FunctionOptimizeCommand.prototype.constructor.call(this, "fold-const");
@@ -504,7 +622,7 @@ var _InlineOptimizeCommand = exports._InlineOptimizeCommand = _FunctionOptimizeC
 
 		if (statement instanceof ConstructorInvocationStatement) {
 
-			var callingFuncDef = statement.getCallingFuncDef();
+			var callingFuncDef = _DetermineCalleeCommand.getCallingFuncDef(statement);
 			this.optimizeFunction(callingFuncDef);
 			if (this._functionIsInlineable(callingFuncDef) && this._argsAreInlineable(callingFuncDef, statement.getArguments())) {
 				statements.splice(stmtIndex, 1);
@@ -519,7 +637,7 @@ var _InlineOptimizeCommand = exports._InlineOptimizeCommand = _FunctionOptimizeC
 				var args = this._getArgsAndThisIfCallExprIsInlineable(expr);
 				if (args != null) {
 					statements.splice(stmtIndex, 1);
-					stmtIndex = this._expandCallingFunction(statements, stmtIndex, expr.getCallingFuncDef(), args);
+					stmtIndex = this._expandCallingFunction(statements, stmtIndex, _DetermineCalleeCommand.getCallingFuncDef(expr), args);
 					if (statement instanceof ReturnStatement) {
 						statements[stmtIndex - 1] = new ReturnStatement(statement.getToken(), statements[stmtIndex - 1].getExpr());
 					}
@@ -532,7 +650,7 @@ var _InlineOptimizeCommand = exports._InlineOptimizeCommand = _FunctionOptimizeC
 				var args = this._getArgsAndThisIfCallExprIsInlineable(expr.getSecondExpr());
 				if (args != null) {
 					statements.splice(stmtIndex, 1);
-					stmtIndex = this._expandCallingFunction(statements, stmtIndex, expr.getSecondExpr().getCallingFuncDef(), args);
+					stmtIndex = this._expandCallingFunction(statements, stmtIndex, _DetermineCalleeCommand.getCallingFuncDef(expr.getSecondExpr()), args);
 					var lastExpr = new AssignmentExpression(
 						expr.getToken(),
 						expr.getFirstExpr(),
@@ -569,7 +687,7 @@ var _InlineOptimizeCommand = exports._InlineOptimizeCommand = _FunctionOptimizeC
 
 	_getArgsAndThisIfCallExprIsInlineable: function (callExpr) {
 		// determine the function that will be called
-		var callingFuncDef = callExpr.getCallingFuncDef();
+		var callingFuncDef = _DetermineCalleeCommand.getCallingFuncDef(callExpr);
 		if (callingFuncDef == null)
 			return null;
 		// optimize the calling function prior to testing the conditions

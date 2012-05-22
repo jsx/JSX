@@ -10,6 +10,7 @@ var Expression = exports.Expression = Class.extend({
 
 	constructor: function (token) {
 		this._token = token;
+		this._optimizerStash = {};
 	},
 
 	clone: null,
@@ -31,6 +32,19 @@ var Expression = exports.Expression = Class.extend({
 	assertIsAssignable: function (context, token, type) {
 		context.errors.push(new CompileError(token, "left-hand-side expression is not assignable"));
 		return false;
+	},
+
+	getOptimizerStash: function () {
+		return this._optimizerStash;
+	},
+
+	_cloneOptimizerStashHack: function (src) {
+		/*
+			FIXME this is a very dirty hack that clones the optimizer stack.
+			We should define copy constructors and use them once we migrate to self-hosted
+		*/
+		for (var k in src._optimizerStash)
+			this._optimizerStash[k] = src._optimizerStash[k];
 	},
 
 	$assertIsAssignable: function (context, token, lhsType, rhsType) {
@@ -1639,12 +1653,11 @@ var CallExpression = exports.CallExpression = OperatorExpression.extend({
 		OperatorExpression.prototype.constructor.call(this, operatorToken);
 		this._expr = expr;
 		this._args = args;
-		this._callingFuncDef = null; // should become an interface, see ConstructorInvocationStatement
 	},
 
 	clone: function () {
 		var ret = new CallExpression(this._token, this._expr.clone(), Util.cloneArray(this._args));
-		ret._callingFuncDef = this._callingFuncDef;
+		ret._cloneOptimizerStashHack(this);
 		return ret;
 	},
 
@@ -1654,14 +1667,6 @@ var CallExpression = exports.CallExpression = OperatorExpression.extend({
 
 	getArguments: function () {
 		return this._args;
-	},
-
-	getCallingFuncDef: function () {
-		return this._callingFuncDef;
-	},
-
-	setCallingFuncDef: function (funcDef) {
-		this._callingFuncDef = funcDef;
 	},
 
 	serialize: function () {
@@ -1717,6 +1722,7 @@ var SuperExpression = exports.SuperExpression = OperatorExpression.extend({
 	clone: function () {
 		var ret = new SuperExpression(this._token, this._name, Util.cloneArray(this._args));
 		ret._funcType = this._funcType;
+		ret._cloneOptimizerStashHack(this);
 		return ret;
 	},
 

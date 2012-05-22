@@ -8,6 +8,10 @@ eval(Class.$import("./util"));
 
 var Statement = exports.Statement = Class.extend({
 
+	constructor: function () {
+		this._optimizerStash = {};
+	},
+
 	// returns whether or not to continue analysing the following statements
 	analyze: function (context) {
 		if (! (this instanceof CaseStatement || this instanceof DefaultStatement))
@@ -45,6 +49,10 @@ var Statement = exports.Statement = Class.extend({
 		}
 	},
 
+	getOptimizerStash: function () {
+		return this._optimizerStash;
+	},
+
 	$assertIsReachable: function (context, token) {
 		if (context.getTopBlock().localVariableStatuses == null) {
 			context.errors.push(new CompileError(token, "the code is unreachable"));
@@ -58,11 +66,11 @@ var Statement = exports.Statement = Class.extend({
 var ConstructorInvocationStatement = exports.ConstructorInvocationStatement = Statement.extend({
 
 	constructor: function (qualifiedName, args) {
+		Statement.prototype.constructor.call(this);
 		this._qualifiedName = qualifiedName;
 		this._args = args;
 		this._ctorClassDef = null;
 		this._ctorType = null;
-		this._callingFuncDef = null; // should become an interface, see CallExpression
 	},
 
 	getToken: function () {
@@ -83,14 +91,6 @@ var ConstructorInvocationStatement = exports.ConstructorInvocationStatement = St
 
 	getConstructorType: function () {
 		return this._ctorType;
-	},
-
-	getCallingFuncDef: function () {
-		return this._callingFuncDef;
-	},
-
-	setCallingFuncDef: function (funcDef) {
-		this._callingFuncDef = funcDef;
 	},
 
 	serialize: function () {
@@ -122,6 +122,7 @@ var ConstructorInvocationStatement = exports.ConstructorInvocationStatement = St
 				context.errors.push(new CompileError(this._qualifiedName.getToken(), "no function with matching arguments"));
 				return true;
 			}
+			ctorType = new ResolvedFunctionType(Type.voidType, [], false); // implicit constructor
 		} else if ((ctorType = ctorType.deduceByArgumentTypes(context, this._qualifiedName.getToken(), argTypes, false)) == null) {
 			// error is reported by callee
 			return true;
@@ -143,6 +144,7 @@ var ConstructorInvocationStatement = exports.ConstructorInvocationStatement = St
 var UnaryExpressionStatement = exports.UnaryExpressionStatement = Statement.extend({
 
 	constructor: function (expr) {
+		Statement.prototype.constructor.call(this);
 		if (expr == null)
 			throw new Error("logic flaw");
 		this._expr = expr;
@@ -187,6 +189,7 @@ var ExpressionStatement = exports.ExpressionStatement = UnaryExpressionStatement
 var ReturnStatement = exports.ReturnStatement = Statement.extend({
 
 	constructor: function (token, expr) {
+		Statement.prototype.constructor.call(this);
 		this._token = token;
 		this._expr = expr; // nullable
 	},
@@ -284,6 +287,7 @@ var DeleteStatement = exports.DeleteStatement = UnaryExpressionStatement.extend(
 var JumpStatement = exports.JumpStatement = Statement.extend({
 
 	constructor: function (token, label) {
+		Statement.prototype.constructor.call(this);
 		this._token = token;
 		this._label = label;
 	},
@@ -389,6 +393,7 @@ var ContinueStatement = exports.ContinueStatement = JumpStatement.extend({
 var LabellableStatement = exports.LabellableStatement = Statement.extend({
 
 	constructor: function (token, label) {
+		Statement.prototype.constructor.call(this);
 		this._token = token;
 		this._label = label;
 	},
@@ -697,6 +702,7 @@ var ForStatement = exports.ForStatement = ContinuableStatement.extend({
 var IfStatement = exports.IfStatement = Statement.extend({
 
 	constructor: function (token, expr, onTrueStatements, onFalseStatements) {
+		Statement.prototype.constructor.call(this);
 		this._token = token;
 		this._expr = expr;
 		this._onTrueStatements = onTrueStatements;
@@ -853,6 +859,7 @@ var SwitchStatement = exports.SwitchStatement = LabellableStatement.extend({
 var CaseStatement = exports.CaseStatement = Statement.extend({
 
 	constructor: function (token, expr) {
+		Statement.prototype.constructor.call(this);
 		this._token = token;
 		this._expr = expr;
 	},
@@ -911,6 +918,7 @@ var CaseStatement = exports.CaseStatement = Statement.extend({
 var DefaultStatement = exports.DefaultStatement = Statement.extend({
 
 	constructor: function (token) {
+		Statement.prototype.constructor.call(this);
 		this._token = token;
 	},
 
@@ -994,6 +1002,7 @@ var WhileStatement = exports.WhileStatement = ContinuableStatement.extend({
 var TryStatement = exports.TryStatement = Statement.extend({
 
 	constructor: function (token, tryStatements, catchStatements, finallyStatements) {
+		Statement.prototype.constructor.call(this);
 		this._token = token;
 		this._tryStatements = tryStatements;
 		this._catchStatements = catchStatements;
@@ -1070,6 +1079,7 @@ var TryStatement = exports.TryStatement = Statement.extend({
 var CatchStatement = exports.CatchStatement = Statement.extend({
 
 	constructor: function (token, local, statements) {
+		Statement.prototype.constructor.call(this);
 		this._token = token;
 		this._local = local;
 		this._statements = statements;
@@ -1140,6 +1150,7 @@ var CatchStatement = exports.CatchStatement = Statement.extend({
 var ThrowStatement = exports.ThrowStatement = Statement.extend({
 
 	constructor: function (token, expr) {
+		Statement.prototype.constructor.call(this);
 		this._token = token;
 		this._expr = expr;
 	},
@@ -1186,6 +1197,7 @@ var ThrowStatement = exports.ThrowStatement = Statement.extend({
 var InformationStatement = exports.InformationStatement = Statement.extend({
 
 	constructor: function (token) {
+		Statement.prototype.constructor.call(this);
 		this._token = token;
 	},
 
