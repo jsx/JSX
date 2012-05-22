@@ -87,6 +87,7 @@ var ClassDefinition = exports.ClassDefinition = Class.extend({
 		this._implementClassDefs = [];
 		this._members = members;
 		this._objectTypesUsed = objectTypesUsed;
+		this._optimizerStash = {};
 		for (var i = 0; i < this._members.length; ++i)
 			this._members[i].setClassDef(this);
 	},
@@ -128,6 +129,10 @@ var ClassDefinition = exports.ClassDefinition = Class.extend({
 
 	flags: function () {
 		return this._flags;
+	},
+
+	setFlags: function (flags) {
+		this._flags = flags;
 	},
 
 	extendName: function () {
@@ -621,6 +626,10 @@ var ClassDefinition = exports.ClassDefinition = Class.extend({
 			}
 		}
 		return ! hasCtorWithArgs;
+	},
+
+	getOptimizerStash: function () {
+		return this._optimizerStash;
 	}
 
 });
@@ -652,6 +661,10 @@ var MemberDefinition = exports.MemberDefinition = Class.extend({
 
 	flags: function () {
 		return this._flags;
+	},
+
+	setFlags: function (flags) {
+		this._flags = flags;
 	},
 
 	getClassDef: function () {

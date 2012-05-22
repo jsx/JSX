@@ -77,16 +77,24 @@ var Optimizer = exports.Optimizer = Class.extend({
 
 		// insert determine callee
 		var insertDetermineCalleeCommand = function () {
+			// return if the command is already inserted
 			for (var i = 0; i < this._commands.length; ++i)
 				if (this._commands[i] instanceof _DetermineCalleeCommand)
 					break;
-			if (i == this._commands.length)
-				this._commands.unshift(new _DetermineCalleeCommand());
+			if (i != this._commands.length)
+				return;
+			// insert the command after DetermineCalleeCommand
+			for (var i = 0; i < this._commands.length; ++i)
+				if (! (this._commands[i] instanceof _LinkTimeOptimizationCommand))
+					break;
+			this._commands.splice(i, 0, new _DetermineCalleeCommand());
 		}.bind(this);
 
 		for (var i = 0; i < cmds.length; ++i) {
 			var cmd = cmds[i];
-			if (cmd == "no-assert") {
+			if (cmd == "lto") {
+				this._commands.push(new _LinkTimeOptimizationCommand());
+			} else if (cmd == "no-assert") {
 				this._commands.push(new _NoAssertCommand());
 			} else if (cmd == "no-log") {
 				this._commands.push(new _NoLogCommand());
@@ -207,6 +215,100 @@ var _FunctionOptimizeCommand = exports._FunctionOptimizeCommand = _OptimizeComma
 	},
 
 	optimizeFunction: null // function (:MemberFunctionDefinition) : void
+
+});
+
+var _LinkTimeOptimizationCommand = exports._LinkTimeOptimizationCommand = _OptimizeCommand.extend({
+
+	$IDENTIFIER: "lto",
+
+	constructor: function () {
+		_OptimizeCommand.prototype.constructor.call(this, _LinkTimeOptimizationCommand.IDENTIFIER);
+	},
+
+	_createStash: function () {
+		return {
+			extendedBy: []
+		};
+	},
+
+	performOptimization: function () {
+		// set extendedBy for every class
+		this.getCompiler().forEachClassDef(function (parser, classDef) {
+			if (classDef.extendClassDef() != null)
+				this.getStash(classDef.extendClassDef()).extendedBy.push(classDef);
+			for (var i = 0; i < classDef.implementClassDefs().length; ++i)
+				this.getStash(classDef.implementClassDefs()[i]).extendedBy.push(classDef);
+			return true;
+		}.bind(this));
+		// mark classes / functions that are not derived / overridden as final
+		this.getCompiler().forEachClassDef(function (parser, classDef) {
+
+			if ((classDef.flags() & (ClassDefinition.IS_INTERFACE | ClassDefinition.IS_MIXIN | ClassDefinition.IS_NATIVE | ClassDefinition.IS_FINAL)) == 0
+				&& this.getStash(classDef).extendedBy.length == 0) {
+
+				// found a class that is not extended, mark it and its functions as final
+				this.log("marking class as final: " + classDef.className());
+				classDef.setFlags(classDef.flags() | ClassDefinition.IS_FINAL);
+				classDef.forEachMemberFunction(function (funcDef) {
+					if ((funcDef.flags() & (ClassDefinition.IS_STATIC | ClassDefinition.IS_FINAL)) == 0)
+						funcDef.setFlags(funcDef.flags() | ClassDefinition.IS_FINAL);
+					return true;
+				}.bind(this));
+
+			} else if ((classDef.flags() & (ClassDefinition.IS_NATIVE | ClassDefinition.IS_FINAL)) == 0) {
+
+				// adjust flags of functions
+				classDef.forEachMemberFunction(function (funcDef) {
+					if ((funcDef.flags() & (ClassDefinition.IS_STATIC | ClassDefinition.IS_NATIVE | ClassDefinition.IS_FINAL)) != 0) {
+						// ignore static, native, or final functions
+					} else if ((funcDef.flags() & ClassDefinition.IS_ABSTRACT) == 0) {
+						// mark functions that are not being overridden as final
+						if (funcDef.getStatements() == null)
+							throw new Error("a non-native, non-abstract function with out function body?");
+						var overrides = this._getOverrides(this.getStash(classDef).extendedBy, funcDef.name(), funcDef.getArgumentTypes());
+						if (overrides.length == 0) {
+							this.log("marking function as final: " + classDef.className() + "#" + funcDef.name());
+							funcDef.setFlags(funcDef.flags() | ClassDefinition.IS_FINAL);
+						} else {
+							this.log("function has overrides, not marking as final: " + classDef.className() + "#" + funcDef.name());
+						}
+					} else if ((funcDef.flags() & ClassDefinition.IS_ABSTRACT) != 0) {
+						/*
+							FIXME determine if there is only one implementation, and if so, inline the calls to the function.
+							Note that  the implementation of the function may exist in the base classes of one of the classes that
+							implement the interface, or in the mixins that are implemented by the extending class.
+						*/
+					}
+					return true;
+				}.bind(this));
+			}
+
+			return true;
+
+		}.bind(this));
+	},
+
+	_getOverrides: function (classDefs, name, argTypes) {
+		var overrides = [];
+		for (var i = 0; i < classDefs.length; ++i)
+			overrides = overrides.concat(this._getOverridesByClass(classDefs[i], name, argTypes));
+		return overrides;
+	},
+
+	_getOverridesByClass: function (classDef, name, argTypes) {
+		var overrides = this._getOverrides(this.getStash(classDef).extendedBy, name, argTypes);
+		classDef.forEachMemberFunction(function (funcDef) {
+			if (funcDef.name() == name
+				&& (funcDef.flags() & ClassDefinition.IS_ABSTRACT) == 0
+				&& Util.typesAreEqual(funcDef.getArgumentTypes(), argTypes)) {
+				overrides.push(funcDef);
+				return false; // finish looking into the class
+			}
+			return true;
+		}.bind(this));
+		return overrides;
+	}
 
 });
 
