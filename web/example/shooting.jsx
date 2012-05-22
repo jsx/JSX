@@ -434,12 +434,14 @@ final class Stage {
 
 		stageCanvas.width  = Config.width;
 		stageCanvas.height = Config.height;
-		this.ctx = stageCanvas.getContext("2d") as __noconvert__ CanvasRenderingContext2D;
+		this.ctx = stageCanvas.getContext("2d") as CanvasRenderingContext2D;
+        assert this.ctx != null;
 
 		var bg = dom.createCanvas();
 		bg.width  = Config.width;
 		bg.height = Config.height + Config.cellHeight;
-		this.bgCtx = bg.getContext("2d") as __noconvert__ CanvasRenderingContext2D;
+		this.bgCtx = bg.getContext("2d") as CanvasRenderingContext2D;
+        assert this.bgCtx != null;
 
 		for(var i = 0; i < 10; ++i) {
 			this.imageName.push("space" + (i + 1) as string);
@@ -449,11 +451,12 @@ final class Stage {
 		// preload
 		var loadedCount = 0;
 		var checkLoad = function(e : Event) : void {
-			var image = e.target as __noconvert__ HTMLImageElement;
+			var image = e.target as HTMLImageElement;
+            assert image != null;
 
 			var canvas = dom.createCanvas();
-			var cx = canvas.getContext("2d")
-					as __noconvert__ CanvasRenderingContext2D;
+			var cx = canvas.getContext("2d") as CanvasRenderingContext2D;
+            assert cx != null;
 			cx.drawImage(image, 0, 0);
 			this.images[image.dataset["name"]] = canvas;
 
@@ -513,15 +516,15 @@ final class Stage {
 	}
 
 	function getPoint(e : Event/*UIEvent*/) : number[] {
-		var px : number;
-		var py : number;
+		var px = 0;
+		var py = 0;
 		if(e instanceof MouseEvent) {
-			var me = e as __noconvert__ MouseEvent;
+			var me = e as MouseEvent;
 			px = me.clientX;
 			py = me.clientY;
 		}
-		else {
-			var te = e as __noconvert__ TouchEvent;
+		else if(e instanceof TouchEvent) {
+			var te = e as TouchEvent;
 			px = te.touches[0].pageX;
 			py = te.touches[0].pageY;
 		}
@@ -551,8 +554,11 @@ final class Stage {
 
 final class _Main {
 	static function main(args : string[]) : void {
-		var stageCanvas = dom.id(args[0]) as __noconvert__ HTMLCanvasElement;
+		var stageCanvas = dom.id(args[0]) as HTMLCanvasElement;
+        assert stageCanvas != null;
 		var scoreboard = dom.id(args[1]);
+        assert scoreboard != null;
+
 		var stage = new Stage(stageCanvas, scoreboard);
 		stage.tick();
 	}
