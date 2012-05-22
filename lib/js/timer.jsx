@@ -1,10 +1,10 @@
 import "js.jsx";
 
-class TimerHandle {
+final class TimerHandle {
 	// implementation-defined object which identify listeners
 }
 
-class Timer {
+final class Timer {
 	static function setTimeout(listener : function():void, milliseconds :int) : TimerHandle {
 		var f = js.global["setTimeout"] as function(:function():void, :int): TimerHandle;
 		return f(listener, milliseconds);

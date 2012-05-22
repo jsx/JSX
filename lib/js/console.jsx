@@ -1,6 +1,6 @@
 
 // common in both browsers and nodejs
-native class console {
+final native class console {
 	// static function log(value : variant) : void;
 	static function info(value : variant) : void;
 	static function warn(value : variant) : void;
