@@ -68,8 +68,20 @@ window.addEventListener('load', function(e) {
 
 		var c = new jsx.Compiler(platform);
 		var emitter = new jsx.JavaScriptEmitter(platform);
-		var o = new jsx.Optimizer();
 		c.setEmitter(emitter);
+
+		var o = new jsx.Optimizer();
+
+		if(getOptimizationLevel() > 0) {
+			o.setup([
+					"lto",
+					"no-assert",
+					"fold-const",
+					"return-if",
+					"inline",
+					"fold-const"
+			]);
+		}
 		c.setOptimizer(o);
 
 		switch(options.mode) {
