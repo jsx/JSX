@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 var fs = require("fs");
+var path = require("path");
 var child_process = require("child_process");
 
 var Class = require("../src/Class");
@@ -13,9 +14,13 @@ eval(Class.$import("../src/util"));
 "use strict";
 
 var NodePlatform = Platform.extend({
+	constructor: function() {
+		var root = path.dirname(__dirname);
+		this._root = root.replace(/\\/g, "/");
+	},
 
 	getRoot: function () {
-		return __dirname.replace(/\/bin\/?$/, "");
+		return this._root;
 	},
 
 	fileExists: function (path) {
