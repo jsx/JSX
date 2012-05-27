@@ -64,7 +64,7 @@ var _Lexer = exports._TokenTable = Class.extend({
 	$asMap: function (array) {
 		var hash = {};
 		for (var i = 0; i < array.length; ++i)
-			hash[array[i]] = 1;
+			hash[array[i]] = true;
 		return hash;
 	},
 
