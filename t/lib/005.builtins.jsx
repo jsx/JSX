@@ -90,5 +90,6 @@ class _Test extends TestCase {
 		this.expect(Math.sqrt(9), "sqrt").toBe(3);
 		this.expect(Math.tan(0), "tan").toBe(0);
 
+		this.expect(Math.log(1), "log").toBe(0);
 	}
 }
