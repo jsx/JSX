@@ -30,6 +30,8 @@ my @specs = (
 
         'http://www.w3.org/TR/XMLHttpRequest/',
 
+        'http://www.w3.org/TR/selectors-api/',
+
         # there're syntax errors in the IDL!
         #'http://html5labs.interoperabilitybridges.com/dom4events/',
 
