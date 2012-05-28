@@ -7,9 +7,11 @@ use File::Path qw(mkpath);
 use Data::Section::Simple;
 use Fatal qw(open close);
 use File::Basename qw(dirname);
+use Storable qw(lock_retrieve);
+use Tie::IxHash;
 
-my $lib = "lib/js/web-core";
-mkpath "$lib/old";
+my $lib = "lib/js/js";
+mkpath $lib;
 
 # the order is important!
 
@@ -17,48 +19,35 @@ my $root = dirname(__FILE__);
 unlink "$root/.idl2jsx.bin";
 
 my @specs = (
-    ['dom.jsx' =>
-        'http://www.w3.org/TR/dom/'
-    ],
-    ['views.jsx' =>
+    ['web.jsx' =>
+        # DOM spec
+        #'http://www.w3.org/TR/DOM-Level-3-Core/idl/dom.idl',
+        'http://www.w3.org/TR/dom/',
         'http://www.w3.org/TR/DOM-Level-2-Views/idl/views.idl',
-    ],
-    ['events.jsx' =>
         'http://www.w3.org/TR/DOM-Level-3-Events/',
         "$root/extra/events.idl",
+        'http://www.w3.org/TR/html5/single-page.html',
+
+        'http://www.w3.org/TR/XMLHttpRequest/',
+
         # there're syntax errors in the IDL!
         #'http://html5labs.interoperabilitybridges.com/dom4events/',
-    ],
-    ['css.jsx' =>
+
         'http://dev.w3.org/csswg/cssom/',
         'http://dev.w3.org/csswg/cssom-view/',
         "$root/extra/chrome.idl",
         "$root/extra/firefox.idl",
-    ],
-    [ 'file.jsx' =>
+
+        # HTML5
         'http://www.w3.org/TR/FileAPI/',
         "$root/extra/file.idl",
-    ],
-    [ 'xhr.jsx' =>
-        'http://www.w3.org/TR/XMLHttpRequest/',
-    ],
-    ['html.jsx' =>
-        'http://www.w3.org/TR/html5/single-page.html',
-    ],
-    ['typedarray.jsx' =>
-        'https://www.khronos.org/registry/typedarray/specs/latest/typedarray.idl',
-    ],
-    ['canvas2d.jsx' =>
-        # latest editor's draft
-        'http://dev.w3.org/html5/2dcontext/',
-    ],
-    ['webgl.jsx' =>
-        'https://www.khronos.org/registry/webgl/specs/latest/webgl.idl',
-    ],
 
-    # deprecated
-    ['old/dom3.jsx' =>
-        'http://www.w3.org/TR/DOM-Level-3-Core/idl/dom.idl',
+        "http://html5.org/specs/dom-parsing.html",
+
+        # graphics
+        'https://www.khronos.org/registry/typedarray/specs/latest/typedarray.idl',
+        'http://dev.w3.org/html5/2dcontext/',
+        'https://www.khronos.org/registry/webgl/specs/latest/webgl.idl',
     ],
 );
 
@@ -85,6 +74,15 @@ foreach my $spec(@specs) {
         die "Cannot convert @idls to JSX.\n";
     }
 
+    $param{classdef} = lock_retrieve("$root/.idl2jsx.bin");
+    $param{html_elements} = [
+        map  {
+            ($_->{func_name} = $_->{name}) =~ s/^HTML//;
+            ($_->{tag_name} = lc $_->{func_name}) =~ s/element$//;
+            $_; }
+        grep { $_->{base} ~~ "HTMLElement"  } values %{ $param{classdef} },
+    ];
+
     my $src = $xslate->render($file, \%param);
 
     open my($fh), ">", "$lib/$file";
@@ -94,143 +92,35 @@ foreach my $spec(@specs) {
 }
 
 __DATA__
-@@ dom.jsx
+@@ web.jsx
 /**
 
-Document Object Model Level 4 Core
+Web Browser Interface
 
-Specification:
-    http://www.w3.org/TR/dom/
 */
+import "js.jsx";
 
-: $idl
+final class web {
+	static const window = js.global["window"] as __noconvert__ Window;
 
-@@ views.jsx
-: $idl
+	static function id(id : string) : HTMLElement {
+		return web.window.document.getElementById(id) as HTMLElement;
+	}
 
-@@ events.jsx
-/**
+	// type-safe API for createElement() and getElementById()
 
-Document Object Model Events
+: for $html_elements -> $class {
+	static function create<: $class.func_name :>() : <: $class.name :> {
+		return web.window.document.createElement("<: $class.tag_name :>")
+			as __noconvert__ <: $class.name :>;
+	}
+	static function get<: $class.func_name :>ById(id : string) : <: $class.name :> {
+		return web.window.document.getElementById(id)
+			as <: $class.name :>;
+	}
+: }
 
-Specification:
-    http://www.w3.org/TR/DOM-Level-3-Events/
-*/
-
-import "./dom.jsx";
-import "./views.jsx";
-
-: $idl
-
-@@ old/dom3.jsx
-/**
-
-Document Object Model Level 3 Core
-
-Specification:
-    http://www.w3.org/TR/DOM-Level-3-Core/
-*/
-
-: $idl
-
-@@ css.jsx
-/*
-
-CSS Object Model View
-
-Specification:
-    http://dev.w3.org/csswg/cssom-view/
-    http://www.w3.org/TR/cssom-view/
-*/
-
-import "./dom.jsx";
-
-: $idl
-
-@@ file.jsx
-
-import "./dom.jsx";
-import "./typedarray.jsx";
-
-: $idl
-
-@@ xhr.jsx
-/**
-
-XMLHttpReqeust Level 2
-
-Specification:
-    http://www.w3.org/TR/XMLHttpRequest/
-*/
-
-import "./dom.jsx";
-import "./events.jsx";
-import "./html.jsx";
-import "./file.jsx";
-import "./typedarray.jsx";
-
-: $idl
-
-@@ html.jsx
-/**
-
-A vocabulary and associated APIs for HTML and XHTML
-
-Specification:
-    http://www.w3.org/TR/html5/
-*/
-
-import "./dom.jsx";
-import "./css.jsx";
-import "./events.jsx";
-import "./file.jsx";
-
-: $idl
-
-@@ canvas2d.jsx
-/**
-
-HTML Canvas 2D Context
-
-Specification:
-    http://dev.w3.org/html5/2dcontext/
-    http://www.w3.org/TR/2dcontext/
-*/
-
-import "./dom.jsx";
-import "./html.jsx";
-import "./typedarray.jsx";
-
-: $idl
-
-@@ webgl.jsx
-
-/**
-
-WebGL - OpenGL ES 2.0 for the Web
-
-Specification:
-    http://www.khronos.org/webgl/
-    https://www.khronos.org/registry/webgl/specs/latest/
-*/
-
-import "./dom.jsx";
-import "./html.jsx";
-import "./canvas2d.jsx";
-import "./typedarray.jsx";
-
-: $idl
-
-@@ typedarray.jsx
-
-/**
-
-Typed Arrays
-
-Specification and Reference:
-    http://www.khronos.org/registry/typedarray/specs/latest/
-    https://developer.mozilla.org/en/javascript_typed_arrays/ArrayBuffer
-*/
+}
 
 : $idl
 

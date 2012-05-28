@@ -18,9 +18,6 @@ my $db = dirname(__FILE__) . '/.idl2jsx.bin';
 
 my @files = @ARGV;
 
-# XXX: spec bug?
-my $Document_is_HTMLDocument = ("@files" =~ / \b html5 \b/xms);
-
 my %fake = (
     Window => 1,
     DocumentEvent => 1,
@@ -107,9 +104,11 @@ my %typemap = (
     # http://dev.w3.org/2009/dap/file-system/file-dir-sys.html
     'FileCallback' => 'function(:File):void',
 
+    # http://html5.org/specs/dom-parsing.html#insertadjacenthtml()
+    'SupportedType' => 'string', # enum
+    'insertAdjacentHTMLPosition' => 'string', # enum
 );
 
-$typemap{Document} = "HTMLDocument" if $Document_is_HTMLDocument;
 
 
 sub info {
@@ -161,6 +160,11 @@ tie %classdef, 'Tie::IxHash';
 foreach my $file(@files) {
     info "parsing $file";
 
+    # XXX: spec bug?
+    my $Document_is_HTMLDocument = ($file =~ / \b html5 \b/xms);
+
+    local $typemap{Document} = "HTMLDocument" if $Document_is_HTMLDocument;
+
     my $content = do {
         my $arg = $file;
         if($arg =~ /^https?:/) {
@@ -210,6 +214,7 @@ foreach my $file(@files) {
         if($Document_is_HTMLDocument && $class eq 'Document') {
             $type =~ s/partial \s+//xms;
             $class = "HTMLDocument";
+            $base  = "Document";
         }
 
         info $type, $class;
@@ -483,6 +488,8 @@ foreach my $def(values %classdef) {
                         $s = "override $s";
                     }
                 }
+                my $t = $s; # used to remove duplicated things
+
                 if(length $s > WIDTH) {
                     $s =~ s/ \( (.+) \) /prettify_params($1)/xmse;
                 }
@@ -492,7 +499,12 @@ foreach my $def(values %classdef) {
                     next if $seen{ $member->{id} }++;
                 }
 
-                next if $seen{$s}++;
+                $t =~ s/$rx_comments//xmsg;
+                $t =~ s/\s+/ /g;
+                if($t !~ /\b var \b/xms) {
+                    $t =~ s/\w+ \s* :/:/xmsg; # remove parameter names
+                }
+                next if $seen{$t}++;
             }
             else {
                 $s = $member;

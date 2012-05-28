@@ -27,7 +27,7 @@ server:
 	node web/server.js
 
 # for authors
-web-core:
+web.jsx:
 	idl2jsx/build.pl
 
 .PHONY: test web server
