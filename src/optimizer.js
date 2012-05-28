@@ -558,6 +558,10 @@ var _FoldConstantCommand = exports._FoldConstantCommand = _FunctionOptimizeComma
 							null)));
 			}
 
+		} else if (expr instanceof EqualityExpression) {
+
+			this._foldEqualityExpression(expr, replaceCb);
+
 		} else if (expr instanceof BinaryNumberExpression || expr instanceof ShiftExpression) {
 
 			// binary number (or shift) expression
@@ -578,6 +582,22 @@ var _FoldConstantCommand = exports._FoldConstantCommand = _FunctionOptimizeComma
 		}
 
 		return true;
+	},
+
+	_foldEqualityExpression: function (expr, replaceCb) {
+		var firstExpr = expr.getFirstExpr();
+		var secondExpr = expr.getSecondExpr();
+		var isEqual = undefined; // tri-state
+		if (firstExpr instanceof StringLiteralExpression && secondExpr instanceof StringLiteralExpression) {
+			isEqual = Util.decodeStringLiteral(firstExpr.getToken().getValue()) == Util.decodeStringLiteral(secondExpr.getToken().getValue());
+		} else if (this._isIntegerOrNumberLiteralExpression(firstExpr) && this._isIntegerOrNumberLiteralExpression(secondExpr)) {
+			isEqual = +firstExpr.getToken().getValue() == +secondExpr.getToken().getValue();
+			console.log(+firstExpr.getToken().getValue() + " == " + +secondExpr.getToken().getValue() + " => " + isEqual);
+		}
+		if (isEqual !== undefined) {
+			var result = expr.getToken().getValue() == "==" ? isEqual : ! isEqual;
+			replaceCb(new BooleanLiteralExpression(new Token(result ? "true" : "false", false)));
+		}
 	},
 
 	_foldNumericBinaryExpression: function (expr, replaceCb) {
