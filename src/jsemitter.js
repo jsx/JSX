@@ -1375,6 +1375,8 @@ var _CallExpressionEmitter = exports._CallExpressionEmitter = _OperatorExpressio
 			return true;
 		else if (this._emitCallsToMap(calleeExpr))
 			return true;
+		else if (this._emitIfMathAbs(calleeExpr))
+			return true;
 		return false;
 	},
 
@@ -1430,6 +1432,53 @@ var _CallExpressionEmitter = exports._CallExpressionEmitter = _OperatorExpressio
 		default:
 			return false;
 		}
+	},
+
+	_emitIfMathAbs: function (calleeExpr) {
+		if (! _CallExpressionEmitter._calleeIsMathAbs(calleeExpr))
+			return false;
+		var argExpr = this._expr.getArguments()[0];
+		if (argExpr instanceof LeafExpression) {
+			this._emitter._emit("(", this._expr.getToken());
+			this._emitter._getExpressionEmitterFor(argExpr).emit(0);
+			this._emitter._emit(" >= 0 ? ", this._expr.getToken());
+			this._emitter._getExpressionEmitterFor(argExpr).emit(0);
+			this._emitter._emit(" : -", this._expr.getToken());
+			this._emitter._getExpressionEmitterFor(argExpr).emit(0);
+			this._emitter._emit(")", this._expr.getToken());
+		} else {
+			this._emitter._emit("(($math_abs_t = ", this._expr.getToken());
+			this._emitter._getExpressionEmitterFor(argExpr).emit(_BinaryExpressionEmitter._operatorPrecedence["="]);
+			this._emitter._emit(") >= 0 ? $math_abs_t : -$math_abs_t)", this._expr.getToken());
+		}
+		return true;
+	},
+
+	$_calleeIsMathAbs: function (calleeExpr) {
+		if (! (calleeExpr.getType() instanceof StaticFunctionType))
+			return false;
+		if (calleeExpr.getIdentifierToken().getValue() != "abs")
+			return false;
+		if (calleeExpr.getExpr().getType().getClassDef().className() != "Math")
+			return false;
+		return true;
+	},
+
+	$mathAbsUsesTemporary: function (funcDef) {
+		return ! funcDef.forEachStatement(function onStatement(statement) {
+			if (! statement.forEachExpression(function onExpr(expr) {
+				var calleeExpr;
+				if (expr instanceof CallExpression
+					&& (calleeExpr = expr.getExpr()) instanceof PropertyExpression
+					&& _CallExpressionEmitter._calleeIsMathAbs(calleeExpr)
+					&& ! (expr.getArguments()[0] instanceof LeafExpression))
+					return false;
+				return expr.forEachExpression(onExpr);
+			})) {
+				return false;
+			}
+			return statement.forEachStatement(onStatement);
+		});
 	}
 
 });
@@ -1787,6 +1836,10 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 			// if funDef is NOT in another closure
 			if (funcDef.getClosures().length != 0 && (funcDef.flags() & ClassDefinition.IS_STATIC) == 0)
 				this._emit("var $this = this;\n", null);
+			// emit helper variable for Math.abs
+			if (_CallExpressionEmitter.mathAbsUsesTemporary(funcDef)) {
+				this._emit("var $math_abs_t;\n", null);
+			}
 			// emit local variable declarations
 			var locals = funcDef.getLocals();
 			for (var i = 0; i < locals.length; ++i) {
