@@ -1,5 +1,4 @@
 #!/usr/bin/env perl
-
 use 5.10.0;
 use strict;
 #use warnings FATAL => 'all';
@@ -10,6 +9,7 @@ use Data::Dumper;
 use File::Basename qw(dirname);
 use Storable qw(lock_retrieve lock_store);
 use constant WIDTH => 68;
+
 # see http://dev.w3.org/2006/webapi/WebIDL/
 
 my $continuous = ($ARGV[0] ~~ "--continuous" && shift @ARGV);
@@ -242,6 +242,8 @@ foreach my $file(@files) {
             decl    => {},
         };
 
+        $def->{skip} = 1 if $skip{$class};
+
         my $members_ref = $def->{members};
 
         # name to array of members; to resolve override
@@ -253,8 +255,10 @@ foreach my $file(@files) {
                     (?<params> .*?)
                 \) )?
             }xmsg) {
-                push @{$members_ref},
-                    make_functions("constructor", undef, $+{params});
+                make_functions(
+                    $decl_ref, $members_ref,
+                    "constructor",
+                    undef, $+{params});
             }
         }
 
@@ -312,45 +316,30 @@ foreach my $file(@files) {
 
                 my $ret_type_may_be_undefined = 0;
 
-                my $name = $id;
-
                 if($prop) {
                     if(index($prop, "getter") != -1) {
                         $ret_type_may_be_undefined = 1;
                         my $id = "__native_index_operator__";
-                        my @funcs = make_functions($id,
+                        make_functions(
+                                $decl_ref, $members_ref,
+                                $id,
                                 $ret_type, $params,
                                 $ret_type_may_be_undefined);
-
-                        $decl_ref->{$id} //= [];
-                        push @{$decl_ref->{$id}}, @funcs;
-                        push @{$members_ref}, map {
-                            +{
-                                id => $id,
-                                decl => $_,
-                            }
-                        } @funcs;
                     }
-                    if(!$name) {
+                    if(!$id) {
                         # no name
                         next;
                     }
-                    $name = "/* $prop */ $name";
+                    push @{$members_ref}, "/* $prop */";
                 }
-                if(!$name) {
+                elsif(!$id) {
                     die "unexpected no name for $member.\n";
                 }
-                my @funcs =  make_functions($name, $ret_type, $params,
+                make_functions(
+                    $decl_ref, $members_ref,
+                    $id,
+                    $ret_type, $params,
                     $ret_type_may_be_undefined, $static);
-
-                $decl_ref->{$id} //= [];
-                push @{$decl_ref->{$id}}, @funcs;
-                push @{$members_ref}, map {
-                    +{
-                        id => $id,
-                        decl=> $_,
-                    };
-                } @funcs;
             }
             # member constant
             elsif($member =~ m{
@@ -362,18 +351,23 @@ foreach my $file(@files) {
 
                 # WebIDL's constants are available both as class members
                 # and instance members
-                my @v;
-                push @v, "static const     $id : $type;";
-                push @v, "__readonly__ var $id : $type;";
+                my $static_const = "static const     $id : $type;";
+                my $readonly_var = "__readonly__ var $id : $type;";
 
                 $decl_ref->{$id} //= [];
-                push @{$decl_ref->{$id}}, @v;
-                push @{$members_ref}, map {
-                    +{
-                        id => $id,
-                        decl => $_,
-                    };
-                } @v;
+                push @{$decl_ref->{$id}}, ($static_const, $readonly_var);
+                push @{$members_ref}, {
+                    id => $id,
+                    decl => $static_const,
+                    type => $type,
+                    static => 1,
+                };
+                push @{$members_ref}, {
+                    id => $id,
+                    decl => $readonly_var,
+                    type => $type,
+                    static => 0,
+                };
             }
             # member var
             elsif($member =~ m{
@@ -398,6 +392,8 @@ foreach my $file(@files) {
                 push @{$members_ref}, {
                     id   => $id,
                     decl => $decl,
+                    type => $type,
+                    static => 0,
                 };
             }
             elsif($member =~ m{stringifier;}) {
@@ -442,7 +438,7 @@ if(@files) {
     say "*/";
 }
 foreach my $def(values %classdef) {
-    if($skip{$def->{name}} or $def->{skip}) {
+    if($def->{skip} or $def->{done}) {
         next;
     }
 
@@ -451,7 +447,7 @@ foreach my $def(values %classdef) {
         next;
     }
 
-    $def->{skip} = 1 if $continuous;
+    $def->{done} = 1 if $continuous;
 
     my %seen;
 
@@ -469,18 +465,20 @@ foreach my $def(values %classdef) {
         foreach my $member(@members) {
             my $s;
 
-            if(ref $member) {
+            if(ref $member) { # var or func
+                my $is_func = exists $member->{param_types};
+
                 $s = $member->{decl};
 
-                my @m = find_member_from_bases($def, $member->{id});
-
-                if(@m) {
-                    if($s =~ /\b var \b/xms) {
+                if(my @m = find_member_from_bases($def, $member->{id})) {
+                    if(!$is_func) {
                         # cannot override member variables
+                        say "\t", "/* inherits $s */";
                         next;
                     }
                     elsif(grep { $s eq $_ } @m) {
                         # ignore completely the same declaration
+                        say "\t", "/* inherits $s */";
                         next;
                     }
                     elsif(grep { function_params($s) eq function_params($_) } @m) {
@@ -488,25 +486,28 @@ foreach my $def(values %classdef) {
                         $s = "override $s";
                     }
                 }
-                my $t = $s; # used to remove duplicated things
 
-                if(length $s > WIDTH) {
-                    $s =~ s/ \( (.+) \) /prettify_params($1)/xmse;
+                if($is_func) {
+                    # used to remove duplicated things
+                    my $serialized = join ";",
+                        $member->{id}, $member->{ret_type_decl}, @{$member->{param_types}};
+
+                    $serialized =~ s/$rx_comments//xmsg;
+                    $serialized  =~ s/\s+/ /g;
+                    next if $seen{$serialized}++;
+
+                    # prettify if needed
+                    if(length $s > WIDTH) {
+                        $s =~ s/ \( (.+) \) /prettify_params($1)/xmse;
+                    }
+
                 }
-
-                if($s =~ /\bvar\b/) {
+                else {
                     # skip if it is already defined
-                    next if $seen{ $member->{id} }++;
+                    next if $seen{ join(";", $member->{id}, $member->{static}) }++;
                 }
-
-                $t =~ s/$rx_comments//xmsg;
-                $t =~ s/\s+/ /g;
-                if($t !~ /\b var \b/xms) {
-                    $t =~ s/\w+ \s* :/:/xmsg; # remove parameter names
-                }
-                next if $seen{$t}++;
             }
-            else {
+            else { # comments, etc.
                 $s = $member;
             }
 
@@ -592,14 +593,15 @@ sub to_jsx_type {
 }
 
 sub make_functions {
-    my($name, $ret_type, $src_params, $ret_type_may_be_undefined, $static) = @_;
+    my($decl_ref, $members_ref, $name, $ret_type, $src_params, $ret_type_may_be_undefined, $static) = @_;
 
     my $ret_type_decl = defined($ret_type)
         ? " : " . to_jsx_type($ret_type, $ret_type_may_be_undefined)
         : "";
 
-    my @unresolved_params = map {
-        m{
+    my @unresolved_params;
+    foreach my $param(split /,/, $src_params // "") {
+        $param =~ m{
             (?:
                 (?: \b (?: in | (?<optional> optional)) \b \s+ )*
                 (?<type> $rx_type) \s+
@@ -612,35 +614,53 @@ sub make_functions {
             type => $+{type},
             optional => !!$+{optional},
         );
-        $t{optional} = 1 if $t{type} =~ /\.\.\. \z/xms;
-        \%t
-    } split /,/, $src_params // "";
 
+        # FIXME: support varargs
+        $t{optional} = 1 if $t{type} =~ /\.\.\. \z/xms;
+
+        push @unresolved_params, \%t;
+    }
+
+    my @decls;
     my @funcs;
 
     foreach my $params_ref(resolve_overload(@unresolved_params)) {
         # resolve optional args
-        my @optionals;
+        my @d;
+        my @f;
         while(1) {
             my $p = join ", ", map {
-                "$_->{name} : " . to_jsx_type($_->{type})
+                "$_->{name} : $_->{jsx_type}"
             } @{$params_ref};
 
-            my $d = "function $name($p)$ret_type_decl;";
+            my $f = "function $name($p)$ret_type_decl;";
             if($static) {
-                $d = "static $d";
+                $f = "static $f";
             }
-            unshift @optionals, $d;
+
+            unshift @d, $f;
+            unshift @f, {
+                id            => $name,
+                decl          => $f,
+                param_types   => [ map { $_->{jsx_type} } @{$params_ref} ],
+                ret_type_decl => $ret_type_decl,
+                static        => $static ? 1 : 0,
+            };
 
             my $last = pop @{$params_ref};
             if(not defined $last or not $last->{optional}) {
                 last;
             }
         }
-        push @funcs, @optionals;
+        push @decls, @d;
+        push @funcs, @f;
     }
 
-    return uniq(@funcs);
+    $decl_ref->{$name} //= [];
+    push @{$decl_ref->{$name}}, @decls;
+    push @{$members_ref},       @funcs;
+
+    return;
 }
 
 sub resolve_overload {
@@ -664,8 +684,9 @@ sub resolve_overload {
         my @resolved = resolve_overload(@params);
         foreach my $t(@types) {
             my $p = {
-                type => $t,
-                name => $head->{name},
+                type      => $t,
+                jsx_type => to_jsx_type($t),
+                name     => $head->{name},
                 optional => $head->{optional},
             };
             push @o, map { [ $p, @{$_} ] } @resolved;
@@ -674,11 +695,14 @@ sub resolve_overload {
     else {
         push @o, \@params;
     }
+
     return @o;
 }
 
 sub find_member_from_bases {
     my($def, $id) = @_;
+
+    return if $id eq 'constructor';
 
     my @m;
     my $base = $def->{base};
@@ -709,7 +733,8 @@ sub function_params {
     my($params) = $decl =~ /\( (.*) \)/xms;
 
     # remove names
-    $params =~ s/\w+ \s* ://xmsg;
+    $params =~ s/\w+ \s* :/:/xmsg;
+
     # remove spaces
     $params =~ s/\s+//xmsg;
 
@@ -721,10 +746,5 @@ sub trim {
     $s =~ s/\A \s+//xms;
     $s =~ s/\s+ \z//xms;
     return $s;
-}
-
-sub uniq {
-    my %seen;
-    return grep { !$seen{$_}++ } @_;
 }
 
