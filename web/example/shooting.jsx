@@ -198,7 +198,7 @@ final class Stage {
 
 	var lastX : number = -1;
 	var lastY : number = -1;
-	var frameCount : number;
+	var frameCount : number = 0;
 	var currentTop : number;
 
 	var ctx   : CanvasRenderingContext2D;
@@ -269,7 +269,8 @@ final class Stage {
 			ship.draw(this.ctx);
 
 			if(++this.dying > 10) {
-				this.changeStateToBeGameOver();
+				this.initialize(); // restart the game
+				//this.changeStateToBeGameOver();
 			}
 		}
 	}
@@ -408,7 +409,6 @@ final class Stage {
 			(Config.height * 3/4) as int,
 			this.images["my"]);
 
-		this.frameCount = 0;
 		this.score      = 0;
 
 		this.bullets = {} : Map.<Bullet>;
