@@ -209,6 +209,7 @@ var JSX = Class.extend({
 			case "--release":
 				tasks.push(function () {
 					emitter.setEnableRunTimeTypeCheck(false);
+					optimizer.setEnableRunTimeTypeCheck(false);
 				});
 				optimizeCommands = [ "lto", "no-assert", "no-log", "fold-const", "return-if", "inline", "fold-const" ];
 				break;
