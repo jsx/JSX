@@ -1326,6 +1326,10 @@ var AssignmentExpression = exports.AssignmentExpression = BinaryExpression.exten
 	},
 
 	analyze: function (context, parentExpr) {
+		// special handling for v = function () ...
+		if (this._expr2 instanceof FunctionExpression)
+			return this._analyzeFunctionExpressionAssignment(context, parentExpr);
+		// normal handling
 		if (! this._analyze(context))
 			return false;
 		var rhsType = this._expr2.getType();
@@ -1358,6 +1362,17 @@ var AssignmentExpression = exports.AssignmentExpression = BinaryExpression.exten
 			}
 		}
 		if (! this._expr1.assertIsAssignable(context, this._token, rhsType))
+			return false;
+		return true;
+	},
+
+	_analyzeFunctionExpressionAssignment: function (context, parentExpr) {
+		// analyze from left to right to avoid "variable may not be defined" error in case the function calls itself
+		if (! this._expr1.analyze(context, this))
+			return false;
+		if (! this._expr1.assertIsAssignable(context, this._token, this._expr2.getType()))
+			return false;
+		if (! this._expr2.analyze(context, this))
 			return false;
 		return true;
 	},
