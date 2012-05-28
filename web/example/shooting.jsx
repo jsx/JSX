@@ -322,8 +322,10 @@ final class Stage {
 		);
 	}
 
-
+	var millisTook = 0;
 	function tick() : void {
+		var start = Date.now();
+
 		++this.frameCount;
 
 		dom.window.setTimeout(function() : void {
@@ -374,6 +376,8 @@ final class Stage {
 				--this.numRocks;
 			}
 		}
+
+		this.millisTook += Date.now() - start;
 	}
 
 	function initialize() : void {
@@ -547,7 +551,8 @@ final class Stage {
 		);
 		this.scoreElement.innerHTML
 			= fillz + scoreStr + "<br/>\n"
-			+ this.fps as string + " FPS";
+			+ this.fps as string + " FPS"
+			+ ":" + (this.millisTook / this.frameCount * 1000) as int as string;
 	}
 
 }
