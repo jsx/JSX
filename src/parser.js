@@ -123,7 +123,8 @@ var _Lexer = exports._TokenTable = Class.extend({
 			"catch",    "finally",  "return",     "void",
 			"continue", "for",      "switch",     "while",
 			"function", "this",
-			"default",  "if",       "throw",
+			/* "default", */ // contextual keywords
+			"if",       "throw",
 			/* "assert",    "log", // contextual keywords */
 			"delete",   "in",       "try",
 			// keywords of JSX
