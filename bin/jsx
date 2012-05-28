@@ -244,6 +244,7 @@ var JSX = Class.extend({
 						tasks.push(function (mode) {
 							return function () {
 								emitter.setEnableRunTimeTypeCheck(mode);
+								optimizer.setEnableRunTimeTypeCheck(mode);
 							};
 						}(mode));
 						break NEXTOPT;
@@ -289,17 +290,16 @@ var JSX = Class.extend({
 		// MODE_COMPILE
 		if (emitter == null)
 			emitter = new JavaScriptEmitter(platform);
-
-		tasks.forEach(function(proc) { proc(); });
-
-		compiler.setEmitter(emitter);
-
 		var optimizer = new Optimizer();
 		var err = optimizer.setup(optimizeCommands);
 		if (err != null) {
 			console.error(err);
 			process.exit(1);
 		}
+
+		tasks.forEach(function(proc) { proc(); });
+
+		compiler.setEmitter(emitter);
 		compiler.setOptimizer(optimizer);
 
 		if (! compiler.compile())

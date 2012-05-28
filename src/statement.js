@@ -717,6 +717,10 @@ var IfStatement = exports.IfStatement = Statement.extend({
 		return this._expr;
 	},
 
+	setExpr: function (expr) {
+		this._expr = expr;
+	},
+
 	getOnTrueStatements: function () {
 		return this._onTrueStatements;
 	},

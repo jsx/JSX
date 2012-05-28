@@ -71,24 +71,10 @@ var Optimizer = exports.Optimizer = Class.extend({
 		this._commands = [];
 		this._log = [];
 		this._dumpLogs = false;
+		this._enableRunTimeTypeCheck = true;
 	},
 
 	setup: function (cmds) {
-
-		// insert determine callee
-		var insertDetermineCalleeCommand = function () {
-			// return if the command is already inserted
-			for (var i = 0; i < this._commands.length; ++i)
-				if (this._commands[i] instanceof _DetermineCalleeCommand)
-					break;
-			if (i != this._commands.length)
-				return;
-			// insert the command after DetermineCalleeCommand
-			for (var i = 0; i < this._commands.length; ++i)
-				if (! (this._commands[i] instanceof _LinkTimeOptimizationCommand))
-					break;
-			this._commands.splice(i, 0, new _DetermineCalleeCommand());
-		}.bind(this);
 
 		for (var i = 0; i < cmds.length; ++i) {
 			var cmd = cmds[i];
@@ -101,7 +87,7 @@ var Optimizer = exports.Optimizer = Class.extend({
 			} else if (cmd == "fold-const") {
 				this._commands.push(new _FoldConstantCommand());
 			} else if (cmd == "inline") {
-				insertDetermineCalleeCommand();
+				this._commands.push(new _DetermineCalleeCommand());
 				this._commands.push(new _InlineOptimizeCommand());
 			} else if (cmd == "return-if") {
 				this._commands.push(new _ReturnIfOptimizeCommand());
@@ -111,7 +97,23 @@ var Optimizer = exports.Optimizer = Class.extend({
 				return "unknown optimization command: " + cmd;
 			}
 		}
+
+		// move lto to top
+		for (var i = 0; i < this._commands.length; ++i)
+			if (this._commands[i] instanceof _LinkTimeOptimizationCommand)
+				break;
+		if (i != this._commands.length)
+			this._commands.unshift(this._commands.splice(i, 1)[0]);
+
 		return null;
+	},
+
+	enableRuntimeTypeCheck: function () {
+		return this._enableRunTimeTypeCheck;
+	},
+
+	setEnableRunTimeTypeCheck: function (mode) {
+		this._enableRunTimeTypeCheck = mode;
 	},
 
 	setCompiler: function (compiler) {
@@ -733,32 +735,44 @@ var _InlineOptimizeCommand = exports._InlineOptimizeCommand = _FunctionOptimizeC
 
 		} else if (statement instanceof ExpressionStatement) {
 
-			if ((stmtIndex = this._expandStatementExpression(statements, stmtIndex, statement.getExpr())) != -1) {
+			altered = this._expandStatementExpression(statements, stmtIndex, statement.getExpr(), function (stmtIndex) {
 				statements.splice(stmtIndex, 1);
-				altered = true;
-			}
+			}.bind(this));
 
 		} else if (statement instanceof ReturnStatement) {
 
-			if ((stmtIndex = this._expandStatementExpression(statements, stmtIndex, statement.getExpr())) != -1) {
+			altered = this._expandStatementExpression(statements, stmtIndex, statement.getExpr(), function (stmtIndex) {
 				statements.splice(stmtIndex, 1);
 				statements[stmtIndex - 1] = new ReturnStatement(statement.getToken(), statements[stmtIndex - 1].getExpr());
+			}.bind(this));
+
+		} else if (statement instanceof IfStatement) {
+
+			altered = this._expandStatementExpression(statements, stmtIndex, statement.getExpr(), function (stmtIndex) {
+				statement.setExpr(statements[stmtIndex - 1].getExpr());
+				statements.splice(stmtIndex - 1, 1);
+			}.bind(this));
+			if (this._handleSubStatements(funcDef, statement)) {
 				altered = true;
 			}
 
 		} else {
 
-			altered = _Util.handleSubStatements(function (statements) {
-				return this._handleStatements(funcDef, statements);
-			}.bind(this), statement);
+			altered = this._handleSubStatements(funcDef, statement);
 
 		}
 
 		return altered;
 	},
 
-	// expands an expression at given location, if possible (returns the index after the expanded statements, or -1 if not altered)
-	_expandStatementExpression: function (statements, stmtIndex, expr) {
+	_handleSubStatements: function (funcDef, statement) {
+		return _Util.handleSubStatements(function (statements) {
+			return this._handleStatements(funcDef, statements);
+		}.bind(this), statement);
+	},
+
+	// expands an expression at given location, if possible
+	_expandStatementExpression: function (statements, stmtIndex, expr, cb) {
 
 		if (expr instanceof CallExpression) {
 
@@ -766,7 +780,8 @@ var _InlineOptimizeCommand = exports._InlineOptimizeCommand = _FunctionOptimizeC
 			var args = this._getArgsAndThisIfCallExprIsInlineable(expr);
 			if (args != null) {
 				stmtIndex = this._expandCallingFunction(statements, stmtIndex, _DetermineCalleeCommand.getCallingFuncDef(expr), args);
-				return stmtIndex;
+				cb(stmtIndex);
+				return true;
 			}
 
 		} else if (expr instanceof AssignmentExpression
@@ -782,12 +797,13 @@ var _InlineOptimizeCommand = exports._InlineOptimizeCommand = _FunctionOptimizeC
 					expr.getFirstExpr(),
 					statements[stmtIndex - 1].getExpr());
 				statements[stmtIndex - 1] = new ExpressionStatement(lastExpr);
-				return stmtIndex;
+				cb(stmtIndex);
+				return true;
 			}
 
 		}
 
-		return -1;
+		return false;
 	},
 
 	_lhsHasNoSideEffects: function (lhsExpr) {
@@ -840,16 +856,34 @@ var _InlineOptimizeCommand = exports._InlineOptimizeCommand = _FunctionOptimizeC
 	},
 
 	_argsAreInlineable: function (callingFuncDef, actualArgs) {
-		var formalArgs = callingFuncDef.getArgumentTypes();
-		if (actualArgs.length != formalArgs.length)
+		var formalArgsTypes = callingFuncDef.getArgumentTypes();
+		if (actualArgs.length != formalArgsTypes.length)
 			throw new "number of arguments mismatch";
 		for (var i = 0; i < actualArgs.length; ++i) {
 			if (! (actualArgs[i] instanceof LeafExpression))
 				return false;
-			if (! actualArgs[i].getType().equals(formalArgs[i]))
+			if (! this._argIsInlineable(actualArgs[i].getType(), formalArgsTypes[i]))
 				return false;
 		}
 		return true;
+	},
+
+	_argIsInlineable: function (actualType, formalType) {
+		if (this._optimizer.enableRuntimeTypeCheck()) {
+			if (actualType instanceof MayBeUndefinedType && ! (formalType instanceof MayBeUndefinedType)) {
+				return false;
+			}
+		}
+		// strip the MayBeUndefined wrapper and continue the comparison, or return
+		actualType = actualType.resolveIfMayBeUndefined();
+		formalType = formalType.resolveIfMayBeUndefined();
+		if (actualType instanceof ObjectType && formalType instanceof ObjectType) {
+			// if both types are object types, allow upcast
+			return actualType.isConvertibleTo(formalType);
+		} else {
+			// perform strict type comparison, since implicit cast change their meaning (while being substituted)
+			return actualType.equals(formalType);
+		}
 	},
 
 	_functionIsInlineable: function (funcDef) {
