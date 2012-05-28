@@ -149,8 +149,8 @@ import "./dom.jsx";
 
 @@ file.jsx
 
-import './dom.jsx';
-import './typedarray.jsx';
+import "./dom.jsx";
+import "./typedarray.jsx";
 
 : $idl
 
@@ -162,6 +162,12 @@ XMLHttpReqeust Level 2
 Specification:
     http://www.w3.org/TR/XMLHttpRequest/
 */
+
+import "./dom.jsx";
+import "./events.jsx";
+import "./html.jsx";
+import "./file.jsx";
+import "./typedarray.jsx";
 
 : $idl
 
@@ -191,8 +197,8 @@ Specification:
     http://www.w3.org/TR/2dcontext/
 */
 
+import "./dom.jsx";
 import "./html.jsx";
-import "./canvas2d.jsx";
 import "./typedarray.jsx";
 
 : $idl
@@ -208,6 +214,7 @@ Specification:
     https://www.khronos.org/registry/webgl/specs/latest/
 */
 
+import "./dom.jsx";
 import "./html.jsx";
 import "./canvas2d.jsx";
 import "./typedarray.jsx";
