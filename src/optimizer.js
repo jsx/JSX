@@ -592,7 +592,6 @@ var _FoldConstantCommand = exports._FoldConstantCommand = _FunctionOptimizeComma
 			isEqual = Util.decodeStringLiteral(firstExpr.getToken().getValue()) == Util.decodeStringLiteral(secondExpr.getToken().getValue());
 		} else if (this._isIntegerOrNumberLiteralExpression(firstExpr) && this._isIntegerOrNumberLiteralExpression(secondExpr)) {
 			isEqual = +firstExpr.getToken().getValue() == +secondExpr.getToken().getValue();
-			console.log(+firstExpr.getToken().getValue() + " == " + +secondExpr.getToken().getValue() + " => " + isEqual);
 		}
 		if (isEqual !== undefined) {
 			var result = expr.getToken().getValue() == "==" ? isEqual : ! isEqual;
@@ -744,6 +743,27 @@ var _InlineOptimizeCommand = exports._InlineOptimizeCommand = _FunctionOptimizeC
 		var altered = false;
 		var statement = statements[stmtIndex];
 
+		// expand single-statement functions that return a value
+		statement.forEachExpression(function onExpr(expr, replaceCb) {
+			expr.forEachExpression(onExpr.bind(this));
+			if (expr instanceof CallExpression) {
+				var args = this._getArgsAndThisIfCallExprIsInlineable(expr, true);
+				if (args != null) {
+					var callingFuncDef = _DetermineCalleeCommand.getCallingFuncDef(expr);
+					this.log("expanding " + _Util.getFuncName(callingFuncDef) + " as expression");
+					var clonedExpr = callingFuncDef.getStatements()[0].getExpr().clone();
+					this._rewriteExpression(
+						clonedExpr,
+						function (expr) { clonedExpr = expr; },
+						args,
+						callingFuncDef.getArguments());
+					replaceCb(clonedExpr);
+				}
+			}
+			return true;
+		}.bind(this));
+
+		// expand more complicated functions
 		if (statement instanceof ConstructorInvocationStatement) {
 
 			var callingFuncDef = _DetermineCalleeCommand.getCallingFuncDef(statement);
@@ -755,30 +775,38 @@ var _InlineOptimizeCommand = exports._InlineOptimizeCommand = _FunctionOptimizeC
 
 		} else if (statement instanceof ExpressionStatement) {
 
-			altered = this._expandStatementExpression(statements, stmtIndex, statement.getExpr(), function (stmtIndex) {
+			if (this._expandStatementExpression(statements, stmtIndex, statement.getExpr(), function (stmtIndex) {
 				statements.splice(stmtIndex, 1);
-			}.bind(this));
+			}.bind(this))) {
+				altered = true;
+			}
 
 		} else if (statement instanceof ReturnStatement) {
 
-			altered = this._expandStatementExpression(statements, stmtIndex, statement.getExpr(), function (stmtIndex) {
+			if (this._expandStatementExpression(statements, stmtIndex, statement.getExpr(), function (stmtIndex) {
 				statements.splice(stmtIndex, 1);
 				statements[stmtIndex - 1] = new ReturnStatement(statement.getToken(), statements[stmtIndex - 1].getExpr());
-			}.bind(this));
+			}.bind(this))) {
+				altered = true;
+			}
 
 		} else if (statement instanceof IfStatement) {
 
-			altered = this._expandStatementExpression(statements, stmtIndex, statement.getExpr(), function (stmtIndex) {
+			if (this._expandStatementExpression(statements, stmtIndex, statement.getExpr(), function (stmtIndex) {
 				statement.setExpr(statements[stmtIndex - 1].getExpr());
 				statements.splice(stmtIndex - 1, 1);
-			}.bind(this));
+			}.bind(this))) {
+				altered = true;
+			}
 			if (this._handleSubStatements(funcDef, statement)) {
 				altered = true;
 			}
 
 		} else {
 
-			altered = this._handleSubStatements(funcDef, statement);
+			if (this._handleSubStatements(funcDef, statement)) {
+				altered = true;
+			}
 
 		}
 
@@ -797,7 +825,7 @@ var _InlineOptimizeCommand = exports._InlineOptimizeCommand = _FunctionOptimizeC
 		if (expr instanceof CallExpression) {
 
 			// inline if the entire statement is a single call expression
-			var args = this._getArgsAndThisIfCallExprIsInlineable(expr);
+			var args = this._getArgsAndThisIfCallExprIsInlineable(expr, false);
 			if (args != null) {
 				stmtIndex = this._expandCallingFunction(statements, stmtIndex, _DetermineCalleeCommand.getCallingFuncDef(expr), args);
 				cb(stmtIndex);
@@ -809,7 +837,7 @@ var _InlineOptimizeCommand = exports._InlineOptimizeCommand = _FunctionOptimizeC
 			&& expr.getSecondExpr() instanceof CallExpression) {
 
 			// inline if the statement is an assignment of a single call expression into a local variable
-			var args = this._getArgsAndThisIfCallExprIsInlineable(expr.getSecondExpr());
+			var args = this._getArgsAndThisIfCallExprIsInlineable(expr.getSecondExpr(), false);
 			if (args != null) {
 				stmtIndex = this._expandCallingFunction(statements, stmtIndex, _DetermineCalleeCommand.getCallingFuncDef(expr.getSecondExpr()), args);
 				var lastExpr = new AssignmentExpression(
@@ -840,7 +868,7 @@ var _InlineOptimizeCommand = exports._InlineOptimizeCommand = _FunctionOptimizeC
 		return false;
 	},
 
-	_getArgsAndThisIfCallExprIsInlineable: function (callExpr) {
+	_getArgsAndThisIfCallExprIsInlineable: function (callExpr, asExpression) {
 		// determine the function that will be called
 		var callingFuncDef = _DetermineCalleeCommand.getCallingFuncDef(callExpr);
 		if (callingFuncDef == null)
@@ -864,6 +892,9 @@ var _InlineOptimizeCommand = exports._InlineOptimizeCommand = _FunctionOptimizeC
 		}
 		// check that the function may be inlined
 		if (! this._functionIsInlineable(callingFuncDef))
+			return null;
+		// FIXME we could handle statements.length == 0 as well
+		if (asExpression && callingFuncDef.getStatements().length != 1)
 			return null;
 		// and the args passed can be inlined (types should match exactly (or emitters may insert additional code))
 		if (! this._argsAreInlineable(callingFuncDef, callExpr.getArguments()))
@@ -935,16 +966,18 @@ var _InlineOptimizeCommand = exports._InlineOptimizeCommand = _FunctionOptimizeC
 				if (modifiesArgs) {
 					return false;
 				}
-				// no function expression
-				var hasFuncExpr = ! Util.forEachStatement(function onStatement(statement) {
+				// no function nor super expression
+				var hasNonInlineableExpr = ! Util.forEachStatement(function onStatement(statement) {
 					var onExpr = function onExpr(expr) {
 						if (expr instanceof FunctionExpression)
+							return false;
+						if (expr instanceof SuperExpression)
 							return false;
 						return expr.forEachExpression(onExpr.bind(this));
 					};
 					return statement.forEachExpression(onExpr.bind(this));
 				}.bind(this), statements);
-				if (hasFuncExpr) {
+				if (hasNonInlineableExpr) {
 					return false;
 				}
 				return true;
@@ -963,24 +996,30 @@ var _InlineOptimizeCommand = exports._InlineOptimizeCommand = _FunctionOptimizeC
 			var statement = new ExpressionStatement(callingStatements[i].getExpr().clone());
 			// replace the arguments with actual arguments
 			statement.forEachExpression(function onExpr(expr, replaceCb) {
-				if (expr instanceof IdentifierExpression && expr.getLocal() != null) {
-					var formalArgs = callingFuncDef.getArguments();
-					for (var j = 0; j < formalArgs.length; ++j) {
-						if (formalArgs[j].getName().getValue() == expr.getToken().getValue())
-							break;
-					}
-					if (j == formalArgs.length)
-						throw new Error("logic flaw, could not find formal parameter named " + expr.getToken().getValue());
-					replaceCb(argsAndThis[j].clone());
-				} else if (expr instanceof ThisExpression) {
-					replaceCb(argsAndThis[argsAndThis.length - 1].clone());
-				}
-				return expr.forEachExpression(onExpr.bind(this));
+				return this._rewriteExpression(expr, replaceCb, argsAndThis, callingFuncDef.getArguments());
 			}.bind(this));
 			// insert the statement
 			statements.splice(stmtIndex++, 0, statement);
 		}
 		return stmtIndex;
+	},
+
+	_rewriteExpression: function (expr, replaceCb, argsAndThis, formalArgs) {
+		if (expr instanceof IdentifierExpression && expr.getLocal() != null) {
+			for (var j = 0; j < formalArgs.length; ++j) {
+				if (formalArgs[j].getName().getValue() == expr.getToken().getValue())
+					break;
+			}
+			if (j == formalArgs.length)
+				throw new Error("logic flaw, could not find formal parameter named " + expr.getToken().getValue());
+			replaceCb(argsAndThis[j].clone());
+		} else if (expr instanceof ThisExpression) {
+			replaceCb(argsAndThis[argsAndThis.length - 1].clone());
+		}
+		expr.forEachExpression(function (expr, replaceCb) {
+			return this._rewriteExpression(expr, replaceCb, argsAndThis, formalArgs);
+		}.bind(this));
+		return true;
 	}
 
 });

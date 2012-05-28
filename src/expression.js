@@ -526,7 +526,7 @@ var MapLiteralExpression = exports.MapLiteralExpression = Expression.extend({
 	clone: function () {
 		var ret = new MapLiteralExpression(this._token, [], this._type);
 		for (var i = 0; i < this._elements.length; ++i)
-			ret._elements[i] = new MapLiteralExpression(this._elements[i].getKey(), this._elements[i].getExpr().clone());
+			ret._elements[i] = new MapLiteralElement(this._elements[i].getKey(), this._elements[i].getExpr().clone());
 		return ret;
 	},
 
@@ -599,9 +599,10 @@ var MapLiteralExpression = exports.MapLiteralExpression = Expression.extend({
 	},
 
 	forEachExpression: function (cb) {
-		for (var i = 0; i < this._elements.length; ++i)
+		for (var i = 0; i < this._elements.length; ++i) {
 			if (! cb(this._elements[i].getExpr(), function (expr) { this._elements[i].setExpr(expr); }.bind(this)))
 				return false;
+		}
 		return true;
 	}
 
