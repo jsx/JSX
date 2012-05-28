@@ -6,19 +6,59 @@ use Text::Xslate;
 use File::Path qw(mkpath);
 use Data::Section::Simple;
 use Fatal qw(open close);
+use File::Basename qw(dirname);
 
-mkpath "lib/js/js/browser";
+my $lib = "lib/js/web-core";
+mkpath "$lib/old";
+
+# the order is important!
+
+my $root = dirname(__FILE__);
+unlink "$root/.idl2jsx.bin";
 
 my @specs = (
-    ['js/browser/canvas2d.jsx' =>
-        # latest editor's draft
-        'http://dev.w3.org/html5/2dcontext/',
+    ['dom.jsx' =>
+        'http://www.w3.org/TR/dom/'
     ],
-    ['js/browser/webgl.jsx' =>
-        'https://www.khronos.org/registry/webgl/specs/latest/webgl.idl',
+    ['views.jsx' =>
+        'http://www.w3.org/TR/DOM-Level-2-Views/idl/views.idl',
+    ],
+    ['events.jsx' =>
+        'http://www.w3.org/TR/DOM-Level-3-Events/',
+        "$root/extra/events.idl",
+        # there're syntax errors in the IDL!
+        #'http://html5labs.interoperabilitybridges.com/dom4events/',
+    ],
+    ['css.jsx' =>
+        'http://dev.w3.org/csswg/cssom/',
+        'http://dev.w3.org/csswg/cssom-view/',
+        "$root/extra/chrome.idl",
+        "$root/extra/firefox.idl",
+    ],
+    [ 'file.jsx' =>
+        'http://www.w3.org/TR/FileAPI/',
+        "$root/extra/file.idl",
+    ],
+    [ 'xhr.jsx' =>
+        'http://www.w3.org/TR/XMLHttpRequest/',
+    ],
+    ['html.jsx' =>
+        'http://www.w3.org/TR/html5/single-page.html',
     ],
     ['typedarray.jsx' =>
         'https://www.khronos.org/registry/typedarray/specs/latest/typedarray.idl',
+    ],
+    ['canvas2d.jsx' =>
+        # latest editor's draft
+        'http://dev.w3.org/html5/2dcontext/',
+    ],
+    ['webgl.jsx' =>
+        'https://www.khronos.org/registry/webgl/specs/latest/webgl.idl',
+    ],
+
+    # deprecated
+    ['old/dom3.jsx' =>
+        'http://www.w3.org/TR/DOM-Level-3-Core/idl/dom.idl',
     ],
 );
 
@@ -31,10 +71,6 @@ my $xslate = Text::Xslate->new(
     type => "text",
 
     function => {
-        idl2jsx => sub {
-            my($idl) = @_;
-            return scalar(`idl2jsx/idl2jsx.pl '$idl'`);
-        },
     },
 );
 
@@ -43,18 +79,109 @@ foreach my $spec(@specs) {
     say "generate $file from ", join ",", @idls;
 
     my %param = (
-        idls => \@idls,
+        idl => scalar(`idl2jsx/idl2jsx.pl --continuous @idls`),
     );
+    if($? != 0) {
+        die "Cannot convert @idls to JSX.\n";
+    }
 
     my $src = $xslate->render($file, \%param);
 
-    open my($fh), ">", "lib/js/$file";
+    open my($fh), ">", "$lib/$file";
+    print $fh $HEADER;
     print $fh $src;
     close $fh;
 }
 
 __DATA__
-@@ js/browser/canvas2d.jsx
+@@ dom.jsx
+/**
+
+Document Object Model Level 4 Core
+
+Specification:
+    http://www.w3.org/TR/dom/
+*/
+
+: $idl
+
+@@ views.jsx
+: $idl
+
+@@ events.jsx
+/**
+
+Document Object Model Events
+
+Specification:
+    http://www.w3.org/TR/DOM-Level-3-Events/
+*/
+
+import "./dom.jsx";
+import "./views.jsx";
+
+: $idl
+
+@@ old/dom3.jsx
+/**
+
+Document Object Model Level 3 Core
+
+Specification:
+    http://www.w3.org/TR/DOM-Level-3-Core/
+*/
+
+: $idl
+
+@@ css.jsx
+/*
+
+CSS Object Model View
+
+Specification:
+    http://dev.w3.org/csswg/cssom-view/
+    http://www.w3.org/TR/cssom-view/
+*/
+
+import "./dom.jsx";
+
+: $idl
+
+@@ file.jsx
+
+import './dom.jsx';
+import './typedarray.jsx';
+
+: $idl
+
+@@ xhr.jsx
+/**
+
+XMLHttpReqeust Level 2
+
+Specification:
+    http://www.w3.org/TR/XMLHttpRequest/
+*/
+
+: $idl
+
+@@ html.jsx
+/**
+
+A vocabulary and associated APIs for HTML and XHTML
+
+Specification:
+    http://www.w3.org/TR/html5/
+*/
+
+import "./dom.jsx";
+import "./css.jsx";
+import "./events.jsx";
+import "./file.jsx";
+
+: $idl
+
+@@ canvas2d.jsx
 /**
 
 HTML Canvas 2D Context
@@ -64,15 +191,13 @@ Specification:
     http://www.w3.org/TR/2dcontext/
 */
 
-import "js/browser/html.jsx";
-import "js/browser/canvas2d.jsx";
-import "typedarray.jsx";
+import "./html.jsx";
+import "./canvas2d.jsx";
+import "./typedarray.jsx";
 
-: for $idls -> $idl {
-:   idl2jsx($idl);
-: }
+: $idl
 
-@@ js/browser/webgl.jsx
+@@ webgl.jsx
 
 /**
 
@@ -83,13 +208,11 @@ Specification:
     https://www.khronos.org/registry/webgl/specs/latest/
 */
 
-import "js/browser/html.jsx";
-import "js/browser/canvas2d.jsx";
-import "typedarray.jsx";
+import "./html.jsx";
+import "./canvas2d.jsx";
+import "./typedarray.jsx";
 
-: for $idls -> $idl {
-:   idl2jsx($idl);
-: }
+: $idl
 
 @@ typedarray.jsx
 
@@ -102,7 +225,5 @@ Specification and Reference:
     https://developer.mozilla.org/en/javascript_typed_arrays/ArrayBuffer
 */
 
-: for $idls -> $idl {
-:   idl2jsx($idl);
-: }
+: $idl
 
