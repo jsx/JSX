@@ -190,8 +190,7 @@ foreach my $file(@files) {
             ;
         }xmsg) {
 
-        $typemap{$+{new_type}} = to_jsx_type($+{existing_type});
-
+        ($typemap{$+{new_type}} = to_jsx_type($+{existing_type})) =~ s/$rx_comments//xms;
     }
 
     # class definition
@@ -473,12 +472,12 @@ foreach my $def(values %classdef) {
                 if(my @m = find_member_from_bases($def, $member->{id})) {
                     if(!$is_func) {
                         # cannot override member variables
-                        say "\t", "/* inherits $s */";
+                        say "\t", "// inherits $s";
                         next;
                     }
                     elsif(grep { $s eq $_ } @m) {
                         # ignore completely the same declaration
-                        say "\t", "/* inherits $s */";
+                        say "\t", "// inherits $s";
                         next;
                     }
                     elsif(grep { function_params($s) eq function_params($_) } @m) {
@@ -684,7 +683,7 @@ sub resolve_overload {
         my @resolved = resolve_overload(@params);
         foreach my $t(@types) {
             my $p = {
-                type      => $t,
+                type     => $t,
                 jsx_type => to_jsx_type($t),
                 name     => $head->{name},
                 optional => $head->{optional},
