@@ -698,7 +698,7 @@ var _InlineOptimizeCommand = exports._InlineOptimizeCommand = _FunctionOptimizeC
 		this.log("* starting optimization of " + _Util.getFuncName(funcDef));
 		var altered = false;
 		while (true) {
-			if (! this._handleStatements(funcDef.getStatements()))
+			if (! this._handleStatements(funcDef, funcDef.getStatements()))
 				break;
 			altered = true;
 			if (! this.setupCommand(new _ReturnIfOptimizeCommand()).optimizeFunction(funcDef))
@@ -707,18 +707,18 @@ var _InlineOptimizeCommand = exports._InlineOptimizeCommand = _FunctionOptimizeC
 		this.log("* finished optimization of " + _Util.getFuncName(funcDef));
 	},
 
-	_handleStatements: function (statements) {
+	_handleStatements: function (funcDef, statements) {
 		var altered = false;
 		for (var i = 0; i < statements.length; ++i) {
 			var left = statements.length - i;
-			if (this._handleStatement(statements, i))
+			if (this._handleStatement(funcDef, statements, i))
 				altered = true;
 			i = statements.length - left;
 		}
 		return altered;
 	},
 
-	_handleStatement: function (statements, stmtIndex) {
+	_handleStatement: function (funcDef, statements, stmtIndex) {
 		var altered = false;
 		var statement = statements[stmtIndex];
 
@@ -728,7 +728,7 @@ var _InlineOptimizeCommand = exports._InlineOptimizeCommand = _FunctionOptimizeC
 			this.optimizeFunction(callingFuncDef);
 			if (this._functionIsInlineable(callingFuncDef) && this._argsAreInlineable(callingFuncDef, statement.getArguments())) {
 				statements.splice(stmtIndex, 1);
-				this._expandCallingFunction(statements, stmtIndex, callingFuncDef, statement.getArguments().concat([ new ThisExpression(null) ]));
+				this._expandCallingFunction(statements, stmtIndex, callingFuncDef, statement.getArguments().concat([ new ThisExpression(null, funcDef.getClassDef()) ]));
 			}
 
 		} else if (statement instanceof ExpressionStatement || statement instanceof ReturnStatement) {
@@ -766,7 +766,9 @@ var _InlineOptimizeCommand = exports._InlineOptimizeCommand = _FunctionOptimizeC
 
 		} else {
 
-			altered = _Util.handleSubStatements(this._handleStatements.bind(this), statement);
+			altered = _Util.handleSubStatements(function (statements) {
+				return this._handleStatements(funcDef, statements);
+			}.bind(this), statement);
 
 		}
 

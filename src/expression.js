@@ -609,14 +609,13 @@ var MapLiteralExpression = exports.MapLiteralExpression = Expression.extend({
 
 var ThisExpression = exports.ThisExpression = Expression.extend({
 
-	constructor: function (token) {
+	constructor: function (token, classDef) {
 		Expression.prototype.constructor.call(this, token);
-		this._classDef = null;
+		this._classDef = classDef;
 	},
 
 	clone: function () {
-		var ret = new ThisExpression(this._token);
-		ret._classDef = this._classDef;
+		return new ThisExpression(this._token, this._classDef);
 		return ret;
 	},
 

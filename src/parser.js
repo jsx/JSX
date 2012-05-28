@@ -2016,7 +2016,7 @@ var Parser = exports.Parser = Class.extend({
 		if ((token = this._expectOpt([ "this", "undefined", "null", "false", "true", "[", "{", "(" ])) != null) {
 			switch (token.getValue()) {
 			case "this":
-				return new ThisExpression(token);
+				return new ThisExpression(token, null);
 			case "undefined":
 				return new UndefinedExpression(token);
 			case "null":
