@@ -731,37 +731,19 @@ var _InlineOptimizeCommand = exports._InlineOptimizeCommand = _FunctionOptimizeC
 				this._expandCallingFunction(statements, stmtIndex, callingFuncDef, statement.getArguments().concat([ new ThisExpression(null, funcDef.getClassDef()) ]));
 			}
 
-		} else if (statement instanceof ExpressionStatement || statement instanceof ReturnStatement) {
+		} else if (statement instanceof ExpressionStatement) {
 
-			var expr = statement.getExpr();
-			if (expr instanceof CallExpression) {
-				// inline if the entire statement is a single call expression
-				var args = this._getArgsAndThisIfCallExprIsInlineable(expr);
-				if (args != null) {
-					statements.splice(stmtIndex, 1);
-					stmtIndex = this._expandCallingFunction(statements, stmtIndex, _DetermineCalleeCommand.getCallingFuncDef(expr), args);
-					if (statement instanceof ReturnStatement) {
-						statements[stmtIndex - 1] = new ReturnStatement(statement.getToken(), statements[stmtIndex - 1].getExpr());
-					}
-					altered = true;
-				}
-			} else if (expr instanceof AssignmentExpression
-				&& this._lhsHasNoSideEffects(expr.getFirstExpr())
-				&& expr.getSecondExpr() instanceof CallExpression) {
-				// inline if the statement is an assignment of a single call expression into a local variable
-				var args = this._getArgsAndThisIfCallExprIsInlineable(expr.getSecondExpr());
-				if (args != null) {
-					statements.splice(stmtIndex, 1);
-					stmtIndex = this._expandCallingFunction(statements, stmtIndex, _DetermineCalleeCommand.getCallingFuncDef(expr.getSecondExpr()), args);
-					var lastExpr = new AssignmentExpression(
-						expr.getToken(),
-						expr.getFirstExpr(),
-						statements[stmtIndex - 1].getExpr());
-					statements[stmtIndex - 1] = statement instanceof ExpressionStatement
-						? new ExpressionStatement(lastExpr)
-						: new ReturnStatement(lastExpr);
-					altered = true;
-				}
+			if ((stmtIndex = this._expandStatementExpression(statements, stmtIndex, statement.getExpr())) != -1) {
+				statements.splice(stmtIndex, 1);
+				altered = true;
+			}
+
+		} else if (statement instanceof ReturnStatement) {
+
+			if ((stmtIndex = this._expandStatementExpression(statements, stmtIndex, statement.getExpr())) != -1) {
+				statements.splice(stmtIndex, 1);
+				statements[stmtIndex - 1] = new ReturnStatement(statement.getToken(), statements[stmtIndex - 1].getExpr());
+				altered = true;
 			}
 
 		} else {
@@ -773,6 +755,39 @@ var _InlineOptimizeCommand = exports._InlineOptimizeCommand = _FunctionOptimizeC
 		}
 
 		return altered;
+	},
+
+	// expands an expression at given location, if possible (returns the index after the expanded statements, or -1 if not altered)
+	_expandStatementExpression: function (statements, stmtIndex, expr) {
+
+		if (expr instanceof CallExpression) {
+
+			// inline if the entire statement is a single call expression
+			var args = this._getArgsAndThisIfCallExprIsInlineable(expr);
+			if (args != null) {
+				stmtIndex = this._expandCallingFunction(statements, stmtIndex, _DetermineCalleeCommand.getCallingFuncDef(expr), args);
+				return stmtIndex;
+			}
+
+		} else if (expr instanceof AssignmentExpression
+			&& this._lhsHasNoSideEffects(expr.getFirstExpr())
+			&& expr.getSecondExpr() instanceof CallExpression) {
+
+			// inline if the statement is an assignment of a single call expression into a local variable
+			var args = this._getArgsAndThisIfCallExprIsInlineable(expr.getSecondExpr());
+			if (args != null) {
+				stmtIndex = this._expandCallingFunction(statements, stmtIndex, _DetermineCalleeCommand.getCallingFuncDef(expr.getSecondExpr()), args);
+				var lastExpr = new AssignmentExpression(
+					expr.getToken(),
+					expr.getFirstExpr(),
+					statements[stmtIndex - 1].getExpr());
+				statements[stmtIndex - 1] = new ExpressionStatement(lastExpr);
+				return stmtIndex;
+			}
+
+		}
+
+		return -1;
 	},
 
 	_lhsHasNoSideEffects: function (lhsExpr) {
