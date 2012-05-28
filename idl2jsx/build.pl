@@ -102,22 +102,27 @@ Web Browser Interface
 */
 import "js.jsx";
 
-final class web {
+/**
+
+Document Object Model in Web Browsers
+
+*/
+final class dom {
 	static const window = js.global["window"] as __noconvert__ Window;
 
 	static function id(id : string) : HTMLElement {
-		return web.window.document.getElementById(id) as HTMLElement;
+		return dom.window.document.getElementById(id) as HTMLElement;
 	}
 
 	// type-safe API for createElement() and getElementById()
 
 : for $html_elements -> $class {
 	static function create<: $class.func_name :>() : <: $class.name :> {
-		return web.window.document.createElement("<: $class.tag_name :>")
+		return dom.window.document.createElement("<: $class.tag_name :>")
 			as __noconvert__ <: $class.name :>;
 	}
 	static function get<: $class.func_name :>ById(id : string) : <: $class.name :> {
-		return web.window.document.getElementById(id)
+		return dom.window.document.getElementById(id)
 			as <: $class.name :>;
 	}
 : }
