@@ -6,91 +6,118 @@
 	http://homepage2.nifty.com/hamcorossam/
 	Copyright (c) 2012, HamCorossam. All rights reserved.
 */
-import 'js/dom.jsx';
-import 'js/dom/canvas2d.jsx';
-import 'console.jsx';
 
-final class Config {
-	static const cols = 10;
-	static const rows = 15;
-	static const cellWidth  = 32;
-	static const cellHeight = 32;
-	static const bulletWidth  = 4;
-	static const bulletHeight = 4;
-	static const bulletSpeed = 20;
-	static const reloadCount = 3;
-	static const initialNumRocks = 5;
+var Config = {
+	cols: 10,
+	rows: 15,
+	cellWidth : 32,
+	cellHeight: 32,
+	bulletWidth : 4,
+	bulletHeight: 4,
+	bulletSpeed: 20,
+	reloadCount: 3,
+	initialNumRocks: 5,
 
-	static const FPS = 30;
+	FPS: 30,
 
-	static const width  = Config.cols * Config.cellWidth;
-	static const height = Config.rows * Config.cellHeight;
 
-	static const imagePath = "img";
-}
+	imagePath: "img"
+};
+Config.width  = Config.cols * Config.cellWidth;
+Config.height = Config.rows * Config.cellHeight;
 
-mixin Sprite {
-	abstract var x : number;
-	abstract var y : number;
+var Class = function () { };
 
-	abstract var width : number;
-	abstract var height : number;
+Class.extend = function (properties) {
+	var ctor = properties.constructor;
+	if (ctor === Object) {
+		var superCtor = this.prototype.constructor;
+		ctor = properties.constructor = function () {
+			superCtor.call(this);
+		};
+	}
+	function tmp() {}
+	tmp.prototype = this.prototype;
+	ctor.prototype = new tmp();
+	ctor.extend = Class.extend;
+	// assign properties
+	for (var k in properties) {
+		if (k.charAt(0) == '$') {
+			ctor[k.substring(1)] = properties[k];
+		} else {
+			ctor.prototype[k] = properties[k];
+		}
+	}
+	if (typeof ctor.constructor === "function") {
+		ctor.constructor();
+	}
+	return ctor;
+};
 
-	abstract var image : HTMLCanvasElement;
+Class.prototype.constructor = function () { };
 
-	function detectCollision(other : Sprite) : boolean {
+var Sprite = Class.extend({
+	x : 0,
+	y : 0,
+
+	width : 0,
+	height : 0,
+
+	image : null,
+
+	detectCollision: function (other) {
 		return Math.abs(this.x - other.x) < (Config.cellWidth  >> 1)
 			&& Math.abs(this.y - other.y) < (Config.cellHeight >> 1);
 
-	}
+	},
 
-	function draw(context : CanvasRenderingContext2D) : void {
+	draw : function (context) {
 		context.drawImage(this.image,
 			this.x - (this.width  >> 1),
 			this.y - (this.height >> 1));
 	}
-}
+});
 
-abstract class MovingObject implements Sprite {
-	var x : number;
-	var y : number;
+var MovingObject = Sprite.extend({
+	x : 0,
+	y : 0,
 
-	var dx : number;
-	var dy : number;
+	dx : 0,
+	dy : 0,
 
-	var image : HTMLCanvasElement;
+	image : null,
 
-	function constructor(x : number, y : number, dx : number, dy : number, image : HTMLCanvasElement) {
+	constructor : function (x, y, dx, dy, image) {
 		this.x = x;
 		this.y = y;
 		this.dx = dx;
 		this.dy = dy;
 		this.image = image;
-	}
+	},
 
-	function update() : boolean {
+	update : function () {
 		this.x += this.dx;
 		this.y += this.dy;
 		return this._inDisplay();
-	}
+	},
 
-	function _inDisplay() : boolean {
+	_inDisplay : function () {
 		return !( this.x <= 0 || this.x >= Config.width
 			|| this.y <= 0 || this.y >= Config.height);
 
-	}
-}
+	},
+});
 
-final class Bullet extends MovingObject {
-	var width : number  = Config.bulletWidth;
-	var height : number = Config.bulletHeight;
+var Bullet = MovingObject.extend({
+	width : 0,
+	height : 0,
 
-	function constructor(x : number, y : number, dx : number, dy : number, image : HTMLCanvasElement) {
-		super(x, y, dx, dy, image);
-	}
+	constructor : function (x, y, dx, dy, image) {
+		MovingObject.call(this, x, y, dx, dy, image);
+	},
 
-	function update(st : Stage) : boolean {
-		var inDisplay = super.update();
+	update : function (st) {
+		var inDisplay = MovingObject.prototype.update.call(this);
 
 		this.draw(st.ctx);
 
@@ -118,39 +145,39 @@ final class Bullet extends MovingObject {
 		}
 		return inDisplay;
 	}
-}
+});
 
-final class Rock extends MovingObject {
-	var width  = Config.cellWidth;
-	var height = Config.cellHeight;
+var Rock = MovingObject.extend({
+	width : Config.cellWidth,
+	height : Config.cellHeight,
 
-	var hp : number;
-	var score : number;
-	var state : string;
+	hp : 0,
+	score : 0,
+	state : "",
 
-	function constructor(
-		x : number, y : number, dx : number, dy : number,
-		hp : number, score : number, state : string,
-		image : HTMLCanvasElement
+	constructor : function (
+		x, y, dx, dy,
+		hp, score, state,
+		image
 		) {
-		super(x, y, dx, dy, image);
+		MovingObject.call(this, x, y, dx, dy, image);
 		this.hp = hp;
 		this.score = score;
 		this.state = state;
-	}
+	},
 
-	function update(st : Stage) : boolean {
-		var inDisplay = super.update();
+	update : function (st) {
+		var inDisplay = MovingObject.prototype.update.call(this);
 
 		this.draw(st.ctx);
 
 		if(this.hp == 0) {
-			var next = (this.state.substring(4) as int) + 1;
+			var next = (this.state.substring(4) | 0) + 1;
 			if(next > 10) {
 				return false;
 			}
 			else {
-				this.setState(st, "bomb" + next as string);
+				this.setState(st, "bomb" + next);
 			}
 		}
 		else {
@@ -162,90 +189,90 @@ final class Rock extends MovingObject {
 			}
 		}
 		return inDisplay;
-	}
+	},
 
-	function setState(stage : Stage, state : string) : void {
+	setState : function (stage, state) {
 		this.state = state;
 		this.image = stage.images[state];
 	}
-}
+});
 
-final class SpaceShip implements Sprite {
-	var x : number;
-	var y : number;
+var SpaceShip = Sprite.extend({
+	x : 0,
+	y : 0,
 
-	var width  = Config.cellWidth;
-	var height = Config.cellHeight;
+	width  : Config.cellWidth,
+	height : Config.cellHeight,
 
-	var image : HTMLCanvasElement;
+	image : null,
 
-	function constructor(x : number, y : number, image : HTMLCanvasElement) {
+	constructor : function (x, y, image) {
 		this.x = x;
 		this.y = y;
 		this.image = image;
 	}
-}
+});
 
-final class Stage {
+var Stage = Class.extend({
 
-	var imageName : Array.<string>;
-	var images : Map.<HTMLCanvasElement>;
+	imageName : null,
+	images : null,
 
-	var state = "loading";
+	state : "loading",
 
-	var ship : SpaceShip;
-	var dying = 0;
+	ship : null,
+	dying : 0,
 
-	var lastX : number = -1;
-	var lastY : number = -1;
-	var frameCount : number = 0;
-	var currentTop : number;
+	lastX : -1,
+	lastY : -1,
+	frameCount : 0,
+	currentTop : 0,
 
-	var ctx   : CanvasRenderingContext2D;
-	var bgCtx : CanvasRenderingContext2D;
+	ctx   : null,
+	bgCtx : null,
 
-	var bullets : Map.<Bullet>;
+	bullets : null,
 
-	var rocks : Map.<Rock>;
-	var numRocks : number;
+	rocks : null,
+	numRocks : 0,
 
-	var score : number;
-	var scoreElement : HTMLElement;
+	score : 0,
+	scoreElement : null,
 
-	function changeStateToBeLoading() : void {
+	changeStateToBeLoading : function () {
 		this.state = "loading";
-	}
-	function isLoading() : boolean {
+	},
+	isLoading : function () {
 		return this.state == "loading";
-	}
+	},
 
-	function changeStateToBeGaming() : void {
+	changeStateToBeGaming : function () {
 		this.state = "gaming";
-	}
-	function isGaming() : boolean {
+	},
+	isGaming : function () {
 		return this.state == "gaming";
-	}
+	},
 
-	function changeStateToBeDying() : void {
+	changeStateToBeDying : function () {
 		this.state = "dying";
-	}
-	function isDying() : boolean {
+	},
+	isDying : function () {
 		return this.state == "dying";
-	}
+	},
 
-	function changeStateToBeGameOver() : void {
+	changeStateToBeGameOver : function () {
 		this.state = "gameover";
-	}
-	function isGameOver() : boolean {
+	},
+	isGameOver : function () {
 		return this.state == "gameover";
-	}
+	},
 
-	function level() : int {
+	level : function () {
 		return this.frameCount / 500;
-	}
+	},
 
 
-	function drawBackground() : void {
+	drawBackground : function () {
 		var bottom = Config.height + Config.cellHeight - this.currentTop;
 		if(bottom > 0) {
 			this.ctx.drawImage(this.bgCtx.canvas, 0, this.currentTop,
@@ -254,9 +281,9 @@ final class Stage {
 		if(Math.abs(Config.height - bottom) > 0) {
 			this.ctx.drawImage(this.bgCtx.canvas, 0, bottom);
 		}
-	}
+	},
 
-	function draw() : void {
+	draw : function () {
 		this.drawBackground();
 
 		var ship = this.ship;
@@ -265,7 +292,7 @@ final class Stage {
 			ship.draw(this.ctx);
 		}
 		else if(this.isDying()) {
-			ship.image = this.images["bomb" + this.dying as string];
+			ship.image = this.images["bomb" + this.dying];
 			ship.draw(this.ctx);
 
 			if(++this.dying > 10) {
@@ -273,29 +300,27 @@ final class Stage {
 				//this.changeStateToBeGameOver();
 			}
 		}
-	}
+	},
 
-	function drawSpace(px : number, py : number) : void {
-		var spaceType = (Math.random() * 10 + 1) as int as string;
+	drawSpace : function (px, py) {
+		var spaceType = (Math.random() * 10 + 1) | 0;
 		var image = this.images["space" + spaceType];
-
-		assert image != null;
 
 		this.bgCtx.drawImage(image,
 			px * Config.cellWidth,
 			py * Config.cellHeight);
-	}
+	},
 
-	function createBullet(dx : number, dy : number) : Bullet {
+	createBullet : function (dx, dy) {
 		return new Bullet(
 			this.ship.x, this.ship.y,
 			dx * Config.bulletSpeed,
 			dy * Config.bulletSpeed,
 			this.images["bullet"]
 		);
-	}
+	},
 
-	function createRock() : Rock {
+	createRock : function () {
 		var level = this.level();
 
 		var px = this.ship.x + Math.random() * 100 - 50;
@@ -306,10 +331,9 @@ final class Stage {
 		var r = Math.atan2(py - fy, px - fx);
 		var d = Math.max(Math.random() * (5.5 + level) + 1.5, 10);
 
-		var hp = (Math.random() * Math.random()
-			* ((5 + level / 4) as int)) | 1;
+		var hp = (Math.random() * Math.random() * ((5 + level / 4) | 0)) | 1;
 
-		var rockId = (Math.random() * 3 + 1) as int as string;
+		var rockId = (Math.random() * 3 + 1) | 0;
 		return new Rock(
 			fx,
 			fy,
@@ -320,15 +344,14 @@ final class Stage {
 			"rock" + rockId,
 			this.images["rock" + rockId]
 		);
-	}
+	},
 
-
-	function tick() : void {
+	tick : function () {
 		++this.frameCount;
 
-		dom.window.setTimeout(function() : void {
+		window.setTimeout(function() {
 			this.tick();
-		}, (1000 / Config.FPS) | 0);
+		}.bind(this), (1000 / Config.FPS) | 0);
 
 		this.watchFPS();
 
@@ -348,7 +371,7 @@ final class Stage {
 
 		this.draw();
 
-		var fc = this.frameCount as string;
+		var fc = this.frameCount;
 		if(this.isGaming() && (this.frameCount % Config.reloadCount) == 0) {
 			this.bullets[fc + "a"] = this.createBullet(-1, -1);
 			this.bullets[fc + "b"] = this.createBullet( 0, -1);
@@ -374,9 +397,9 @@ final class Stage {
 				--this.numRocks;
 			}
 		}
-	}
+	},
 
-	function initialize() : void {
+	initialize : function () {
 
 		for(var px = 0; px < Config.cols; ++px) {
 			for(var py = 0; py < Config.rows + 1; ++py) {
@@ -385,16 +408,15 @@ final class Stage {
 		}
 
 		for(var i = 0; i < 3; ++i) {
-			var canvas = dom.createCanvas();
+			var canvas = window.document.createElement("canvas");
 
 			canvas.width  = Config.cellWidth;
 			canvas.height = Config.cellHeight;
 
 			// prepare flashing rock images
-			var rctx = canvas.getContext("2d") as CanvasRenderingContext2D;
-			assert rctx != null;
+			var rctx = canvas.getContext("2d");
 
-			var k = "rock" + (i+1) as string;
+			var k = "rock" + (i+1);
 			rctx.drawImage(this.images[k], 0, 0);
 			rctx.globalCompositeOperation = "source-in";
 			rctx.fillStyle = "#fff";
@@ -406,73 +428,69 @@ final class Stage {
 
 		this.ship = new SpaceShip(
 			 Config.width >> 2,
-			(Config.height * 3/4) as int,
+			(Config.height * 3/4) | 0,
 			this.images["my"]);
 
 		this.score      = 0;
 
-		this.bullets = {} : Map.<Bullet>;
-		this.rocks   = {} : Map.<Rock>;
+		this.bullets = {};
+		this.rocks   = {};
 		this.numRocks = 0;
 
 		this.changeStateToBeGaming();
 
-		dom.window.setTimeout(function() : void {
-			dom.window.scrollTo(0, 0);
+		window.setTimeout(function() {
+			window.scrollTo(0, 0);
 		}, 250);
-	}
+	},
 
-	function constructor(stageCanvas : HTMLCanvasElement, scoreboard : HTMLElement) {
+	constructor : function (stageCanvas, scoreboard) {
 		// initialize properties
 		this.changeStateToBeLoading();
 
 		this.imageName = ["my", "bullet", "rock1", "rock2", "rock3"];
-		this.images    = {} : Map.<HTMLCanvasElement>;
+		this.images    = {};
 
-		scoreboard.style.width = Config.width as string + "px";
+		scoreboard.style.width = Config.width + "px";
 		this.scoreElement = scoreboard;
 
 		stageCanvas.width  = Config.width;
 		stageCanvas.height = Config.height;
-		this.ctx = stageCanvas.getContext("2d") as CanvasRenderingContext2D;
-        assert this.ctx != null;
+		this.ctx = stageCanvas.getContext("2d");
 
-		var bg = dom.createCanvas();
+		var bg = window.document.createElement("canvas");
 		bg.width  = Config.width;
 		bg.height = Config.height + Config.cellHeight;
-		this.bgCtx = bg.getContext("2d") as CanvasRenderingContext2D;
-        assert this.bgCtx != null;
+		this.bgCtx = bg.getContext("2d");
 
 		for(var i = 0; i < 10; ++i) {
-			this.imageName.push("space" + (i + 1) as string);
-			this.imageName.push("bomb"  + (i + 1) as string);
+			this.imageName.push("space" + (i + 1));
+			this.imageName.push("bomb"  + (i + 1));
 		}
 
 		// preload
 		var loadedCount = 0;
-		var checkLoad = function(e : Event) : void {
-			var image = e.target as HTMLImageElement;
-            assert image != null;
+		var checkLoad = function(e) {
+			var image = e.target;
 
-			var canvas = dom.createCanvas();
-			var cx = canvas.getContext("2d") as CanvasRenderingContext2D;
-            assert cx != null;
+			var canvas = window.document.createElement("canvas");
+			var cx = canvas.getContext("2d");
 			cx.drawImage(image, 0, 0);
 			this.images[image.dataset["name"]] = canvas;
 
 			if(++loadedCount == this.imageName.length) {
 				this.initialize();
 			}
-		};
+		}.bind(this);
 		for(var i = 0; i < this.imageName.length; ++i) {
 			var name = this.imageName[i];
-			var image = dom.createImage();
+			var image = window.document.createElement("img");
 			image.addEventListener("load", checkLoad);
 			image.src = Config.imagePath + "/" + name + ".png";
 			image.dataset["name"] = name;
 		}
 
-		var touchStart = function(e : Event) : void {
+		var touchStart = function(e) {
 			e.preventDefault();
 
 			var p = this.getPoint(e);
@@ -483,22 +501,22 @@ final class Stage {
 			if(this.isGameOver()) {
 				this.initialize();
 			}
-		};
+		}.bind(this);
 
-		var body = dom.window.document.body;
+		var body = window.document.body;
 
 		body.addEventListener("mousedown",  touchStart);
 		body.addEventListener("touchstart", touchStart);
 
-		var touchMove = function(e : Event) : void {
+		var touchMove = function(e) {
 			e.preventDefault();
 
 			var p = this.getPoint(e);
 
 			if(this.isGaming() && this.lastX != -1) {
 				var ship = this.ship;
-				ship.x += ((p[0] - this.lastX) * 2.5) as int;
-				ship.y += ((p[1] - this.lastY) * 3.0) as int;
+				ship.x += ((p[0] - this.lastX) * 2.5) | 0;
+				ship.y += ((p[1] - this.lastY) * 3.0) | 0;
 
 				ship.x = Math.max(ship.x, 0);
 				ship.x = Math.min(ship.x, Config.width);
@@ -509,59 +527,52 @@ final class Stage {
 
 			this.lastX = p[0];
 			this.lastY = p[1];
-		};
+		}.bind(this);
 
 		body.addEventListener("mousemove", touchMove);
 		body.addEventListener("touchmove", touchMove);
-	}
+	},
 
-	function getPoint(e : Event/*UIEvent*/) : number[] {
+	getPoint : function (e) {
 		var px = 0;
 		var py = 0;
 		if(e instanceof MouseEvent) {
-			var me = e as MouseEvent;
-			px = me.clientX;
-			py = me.clientY;
+			px = e.clientX;
+			py = e.clientY;
 		}
 		else if(e instanceof TouchEvent) {
-			var te = e as TouchEvent;
-			px = te.touches[0].pageX;
-			py = te.touches[0].pageY;
+			px = e.touches[0].pageX;
+			py = e.touches[0].pageY;
 		}
 		return [ px, py ];
-	}
+	},
 
-	var start = Date.now();
-	var fps = 0;
-	function watchFPS() : void {
+	start : Date.now(),
+	fps : 0,
+	watchFPS : function () {
 		if((this.frameCount % Config.FPS) == 0) {
-			this.fps = (this.frameCount / (Date.now() - this.start) * 1000) as int;
+			this.fps = (this.frameCount / (Date.now() - this.start) * 1000) | 0;
 			this.updateScore();
 		}
-	}
+	},
 
-	function updateScore() : void {
-		var scoreStr = this.score as string;
+	updateScore : function () {
+		var scoreStr = this.score + "";
 		var fillz = "000000000".substring(
 			0, 9 - scoreStr.length
 		);
-		this.scoreElement.innerHTML
-			= fillz + scoreStr + "<br/>\n"
-			+ this.fps as string + " FPS";
+		this.scoreElement.innerHTML = fillz + scoreStr + "<br/>\n" + this.fps + " FPS";
 	}
 
-}
+});
 
-final class _Main {
-	static function main(args : string[]) : void {
-        log "shooting.jsx";
-
-		var stageCanvas = dom.id(args[0]) as HTMLCanvasElement;
-        assert stageCanvas != null;
-		var scoreboard = dom.id(args[1]);
-        assert scoreboard != null;
+var _Main = Class.extend({
+	$main : function (args) {
+		console.log("shooting.js");
+		var stageCanvas = document.getElementById(args[0]);
+		var scoreboard  = document.getElementById(args[1]);
 
 		var stage = new Stage(stageCanvas, scoreboard);
 		stage.tick();
 	}
-}
+});

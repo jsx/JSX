@@ -25,10 +25,16 @@
     </script>
     <script src="../assets/js/jsx-script-loader.js"></script>
     <script type="application/jsx" src="shooting.jsx"></script>
+    <script src="shooting.js"></script>
     <script>
       window.addEventListener("load", function(e) {
-        var shooting = JSX.require("shooting.jsx");
-        shooting._Main.main$AS(["stage", "scoreboard"]);
+        if(location.hash === "#js") {
+          _Main.main(["stage", "scoreboard"]);
+        }
+        else {
+          var shooting = JSX.require("shooting.jsx");
+          shooting._Main.main$AS(["stage", "scoreboard"]);
+        }
       });
     </script>
   </head>
