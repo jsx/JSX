@@ -14,10 +14,10 @@ my @classes;
 my %used_type;
 
 # prepare
-my $i = 0;
 while(my($class, $def) = each %{$classdef}) {
     next if $def->{skip};
 
+    my $i = 0;
     push @classes, $def;
 
     my @tests;
@@ -108,7 +108,7 @@ import "js/web.jsx";
 class _Test extends TestCase {
 
 : for $classes -> $class {
-
+    // #<: $~class.count :>
     function compile_<: $class.name :>(o : <: $class.name :>) : void {
     : for $class.tests -> $statement {
         <: $statement :>
