@@ -1443,7 +1443,7 @@ var _CallExpressionEmitter = exports._CallExpressionEmitter = _OperatorExpressio
 			this._emitter._getExpressionEmitterFor(argExpr).emit(0);
 			this._emitter._emit(" >= 0 ? ", this._expr.getToken());
 			this._emitter._getExpressionEmitterFor(argExpr).emit(0);
-			this._emitter._emit(" : -", this._expr.getToken());
+			this._emitter._emit(" : - ", this._expr.getToken());
 			this._emitter._getExpressionEmitterFor(argExpr).emit(0);
 			this._emitter._emit(")", this._expr.getToken());
 		} else {
