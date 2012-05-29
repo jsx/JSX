@@ -75,6 +75,8 @@ my %typemap = (
     'unsigned long long' => 'number',
     'float' => 'number',
     'double' => 'number',
+    'unrestricted float'  => 'number',
+    'unrestricted double' => 'number',
 
     'object' => 'Object',
 
@@ -125,16 +127,25 @@ my $rx_constructors = qr{
     \] \s*
 }xms;
 
-# the last ? means "nullable"
+my $rx_multiword_types = join("|", map { quotemeta($_) }
+    'unsigned long long',
+    'unsigned byte',
+    'unsigned short',
+    'unsigned int',
+    'unsigned long',
+
+    'long long',
+
+    'unrestricted float',
+    'unrestricted double',
+);
+
 my $rx_simple_type = qr{
-    (?: [\:\w]+ (?: \s+ \w+)* (?: < .*? > )?
-        (?:
-            \? # nullable
-            |
-            \[ \s* \] # array
-            |
-            \.\.\. # vararg
-        )?
+    (?:
+        \b
+        (?: \w+ :: )? # optional namespace
+        (?: (?:$rx_multiword_types) | \w+)
+        (?: < [^>]+ > )? # type parameter
     )
 }xms;
 
@@ -142,11 +153,23 @@ my $rx_type = qr{
     (?:
         (?:
             # union type
-            \( \s* $rx_simple_type (?: \s+ or \s+ $rx_simple_type \s*)+ \)
+            \(
+                \s*
+                $rx_simple_type
+                (?: \s+ or \s+ $rx_simple_type)+
+                \s*
+            \)
         )
         |
         $rx_simple_type
     )
+    (?:
+        \? # nullable
+        |
+        \[ \s* \] # array
+        |
+        \.\.\. # vararg
+    )?
 }xms;
 
 my $rx_comments = qr{
@@ -258,6 +281,10 @@ foreach my $file(@files) {
                     $decl_ref, $members_ref,
                     "constructor",
                     undef, $+{params});
+            }
+
+            if($attrs =~ /\b NoInterfaceObject \b/xms) {
+                #$def->{skip} = 1;
             }
         }
 
@@ -670,8 +697,9 @@ sub resolve_overload {
         my $head = shift @params;
 
         my $type = $head->{type};
-        $type =~ s/\A \s* \(//xms;
-        $type =~ s/\) \s* \z//xms;
+        if($type =~ / \( (.+) \) /xms) {
+            $type = $1;
+        }
 
         my @types = split /\b or \b/xms, $type;
 
