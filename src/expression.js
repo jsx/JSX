@@ -113,9 +113,16 @@ var OperatorExpression = exports.OperatorExpression = Expression.extend({
 
 var IdentifierExpression = exports.IdentifierExpression = LeafExpression.extend({
 
-	constructor: function (token) {
-		LeafExpression.prototype.constructor.call(this, token);
-		this._local = null;
+	constructor: function (arg1) {
+		var Parser = require("./parser");
+		if (arg1 instanceof Parser.Token) {
+			LeafExpression.prototype.constructor.call(this, arg1);
+			this._local = null;
+		} else {
+			// local var
+			LeafExpression.prototype.constructor.call(this, arg1.getName());
+			this._local = arg1;
+		}
 		this._classDefType = null;
 	},
 
