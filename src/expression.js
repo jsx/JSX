@@ -1827,23 +1827,21 @@ var SuperExpression = exports.SuperExpression = OperatorExpression.extend({
 
 var NewExpression = exports.NewExpression = OperatorExpression.extend({
 
-	constructor: function (operatorToken, qualifiedName, args) {
+	constructor: function (operatorToken, type, args) {
 		OperatorExpression.prototype.constructor.call(this, operatorToken);
-		this._qualifiedName = qualifiedName;
+		this._type = type;
 		this._args = args;
-		this._constructor = null; // may be null if zero constructors exist for the class (FIXME update comment? should never happen now that we are generating them? 2011/05/16)
-		this._type = null;
+		this._constructor = null;
 	},
 
 	clone: function () {
-		var ret = new NewExpression(this._token, this._qualifiedName, Util.cloneArray(this._args));
+		var ret = new NewExpression(this._token, this._type, Util.cloneArray(this._args));
 		ret._constructor = this._constructor;
-		ret._type = this._type;
 		return ret;
 	},
 
 	getQualifiedName: function () {
-		return this._name;
+		throw new Error("will be removed");
 	},
 
 	getArguments: function () {
@@ -1854,34 +1852,31 @@ var NewExpression = exports.NewExpression = OperatorExpression.extend({
 		return [
 			"NewExpression",
 			this._token.serialize(),
-			this._qualifiedName.serialize(),
+			this._type.serialize(),
 			Util.serializeArray(this._args)
 		];
 	},
 
 	analyze: function (context, parentExpr) {
-		var classDef = this._qualifiedName.getClass(context);
+		var classDef = this._type.getClassDef();
 		if (classDef == null)
 			return false;
 		if ((classDef.flags() & (ClassDefinition.IS_INTERFACE | ClassDefinition.IS_MIXIN)) != 0) {
-			context.errors.push(new CompileError(this._qualifiedName.getToken(), "cannot instantiate an interface or a mixin"));
+			context.errors.push(new CompileError(this._token, "cannot instantiate an interface or a mixin"));
 			return false;
 		}
 		if ((classDef.flags() & ClassDefinition.IS_ABSTRACT) != 0) {
-			context.errors.push(new CompileError(this._qualifiedName.getToken(), "cannot instantiate an abstract class"));
+			context.errors.push(new CompileError(this._token, "cannot instantiate an abstract class"));
 			return false;
 		}
 		var argTypes = Util.analyzeArgs(context, this._args);
 		if (argTypes == null)
 			return false;
 		var ctors = classDef.getMemberTypeByName("constructor", false, ClassDefinition.GET_MEMBER_MODE_CLASS_ONLY);
-		if (ctors != null) {
-			if ((this._constructor = ctors.deduceByArgumentTypes(context, this._token, argTypes, false)) == null) {
-				context.errors.push(new CompileError(this._token, "cannot create an object of type '" + this._qualifiedName.getToken().getValue() + "', arguments mismatch"));
-				return false;
-			}
+		if ((this._constructor = ctors.deduceByArgumentTypes(context, this._token, argTypes, false)) == null) {
+			context.errors.push(new CompileError(this._token, "cannot create an object of type '" + this._type.toString() + "', arguments mismatch"));
+			return false;
 		}
-		this._type = new ObjectType(classDef);
 		return true;
 	},
 

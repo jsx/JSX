@@ -1527,7 +1527,7 @@ var _NewExpressionEmitter = exports._NewExpressionEmitter = _OperatorExpressionE
 	emit: function (outerOpPrecedence) {
 		var classDef = this._expr.getType().getClassDef();
 		var ctor = this._expr.getConstructor();
-		var argTypes = ctor != null ? ctor.getArgumentTypes() : [];
+		var argTypes = ctor.getArgumentTypes();
 		this._emitter._emitCallArguments(
 			this._expr.getToken(),
 			"new " + this._emitter._mangleConstructorName(classDef, argTypes) + "(",
@@ -2089,8 +2089,17 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 	},
 
 	_mangleConstructorName: function (classDef, argTypes) {
-		if ((classDef.flags() & ClassDefinition.IS_NATIVE) != 0)
-			return classDef.className();
+		if ((classDef.flags() & ClassDefinition.IS_NATIVE) != 0) {
+			if (classDef instanceof InstantiatedClassDefinition) {
+				if (classDef.getTemplateClassName() == "Map") {
+					return "Object";
+				} else {
+					return classDef.getTemplateClassName();
+				}
+			} else {
+				return classDef.className();
+			}
+		}
 		return classDef.getOutputClassName() + this._mangleFunctionArguments(argTypes);
 	},
 

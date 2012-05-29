@@ -1161,7 +1161,7 @@ var Parser = exports.Parser = Class.extend({
 	},
 
 	_objectTypeDeclaration: function () {
-		var qualifiedName = this._qualifiedName();
+		var qualifiedName = this._qualifiedName(false);
 		if (qualifiedName == null)
 			return null;
 		if (this._expectOpt(".") != null) {
@@ -1921,7 +1921,9 @@ var Parser = exports.Parser = Class.extend({
 				break;
 			case "new":
 				// new pression
-				var qualifiedName = this._qualifiedName(false);
+				var objectType = this._objectTypeDeclaration();
+				if (objectType == null)
+					return null;
 				if (this._expectOpt("(") != null) {
 					var args = this._argsExpr();
 					if (args == null)
@@ -1929,7 +1931,7 @@ var Parser = exports.Parser = Class.extend({
 				} else {
 					args = [];
 				}
-				expr = new NewExpression(token, qualifiedName, args);
+				expr = new NewExpression(token, objectType, args);
 				break;
 			default:
 				throw new Error("logic flaw");

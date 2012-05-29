@@ -311,17 +311,6 @@ var ClassDefinition = exports.ClassDefinition = Class.extend({
 		// resolve types used
 		for (var i = 0; i < this._objectTypesUsed.length; ++i)
 			this._objectTypesUsed[i].resolveType(context);
-	},
-
-	setAnalysisContextOfVariables: function (context) {
-		for (var i = 0; i < this._members.length; ++i) {
-			var member = this._members[i];
-			if (member instanceof MemberVariableDefinition)
-				member.setAnalysisContext(context);
-		}
-	},
-
-	analyze: function (context) {
 		// create default constructor if no constructors exist
 		if ((this.flags() & ClassDefinition.IS_NATIVE) == 0
 			&& this.forEachMemberFunction(function (funcDef) { return funcDef.name() != "constructor"; })) {
@@ -336,6 +325,17 @@ var ClassDefinition = exports.ClassDefinition = Class.extend({
 			func.setClassDef(this);
 			this._members.push(func);
 		}
+	},
+
+	setAnalysisContextOfVariables: function (context) {
+		for (var i = 0; i < this._members.length; ++i) {
+			var member = this._members[i];
+			if (member instanceof MemberVariableDefinition)
+				member.setAnalysisContext(context);
+		}
+	},
+
+	analyze: function (context) {
 		// check that the class may be extended
 		if (! this._assertInheritanceIsNotInLoop(context, null, this.getToken()))
 			return false;
