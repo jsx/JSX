@@ -87,6 +87,8 @@ my %typemap = (
     # http://www.w3.org/TR/dom/
     'MutationCallback' => 'function(:MutationRecord[],:MutationObserver):void',
 
+    # http://dev.w3.org/html5/spec/single-page.html
+    'TextTrackMode' => 'string', # enum
 
     'EventListener' => 'function(:Event):void',
 

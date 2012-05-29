@@ -29,9 +29,7 @@ my @specs = (
 
         'http://www.w3.org/TR/XMLHttpRequest/',
 
-
-        # there're syntax errors in the IDL!
-        #'http://html5labs.interoperabilitybridges.com/dom4events/',
+        #'http://html5labs.interoperabilitybridges.com/dom4events/', # no correct IDL
 
         # CSS
         'http://dev.w3.org/csswg/cssom/',
@@ -39,19 +37,27 @@ my @specs = (
         "$root/extra/chrome.idl",
         "$root/extra/firefox.idl",
 
+        # SVG
+        #"http://www.w3.org/TR/2011/REC-SVG11-20110816/svg.idl",
+
         # HTML5
-        # 'http://dev.w3.org/html5/spec/single-page.html',
+        #'http://dev.w3.org/html5/spec/single-page.html', # too new
         'http://www.w3.org/TR/html5/single-page.html',
         'http://www.w3.org/TR/FileAPI/',
         "$root/extra/file.idl",
 
-        #"http://www.w3.org/TR/webaudio/",
+        #"http://www.w3.org/TR/webaudio/", # no correct IDL
         "http://www.w3.org/TR/touch-events/",
         "http://dev.w3.org/html5/websockets/",
         "http://dev.w3.org/geo/api/spec-source-v2.html",
-        "http://dev.w3.org/2011/webrtc/editor/webrtc.html",
         "http://dev.w3.org/html5/webstorage/",
         'http://www.w3.org/TR/selectors-api/',
+
+        # WebRTC has no correct IDL
+        #"http://dev.w3.org/2011/webrtc/editor/webrtc.html",
+        #"http://dev.w3.org/2011/webrtc/editor/getusermedia.html",
+
+        # by html5.org
         "http://html5.org/specs/dom-parsing.html",
 
         # graphics
@@ -59,15 +65,6 @@ my @specs = (
         'http://dev.w3.org/html5/2dcontext/',
         'https://www.khronos.org/registry/webgl/specs/latest/webgl.idl',
     ],
-);
-
-my %element2tag = (
-    #FIXME heading => [ map { "h$_" } 1 .. 6 ],
-    paragraph => 'p',
-    olist  => 'ol',
-    ulist  => 'ul',
-    imag   => 'img',
-    anchor => 'a',
 );
 
 my $HEADER = <<'T';
@@ -99,7 +96,7 @@ foreach my $spec(@specs) {
             ($_->{func_name} = $_->{name}) =~ s/^HTML//;
             my $tag_name = lc $_->{func_name};
             $tag_name =~ s/element$//;
-            $_->{tag_name} = $element2tag{$tag_name} // $tag_name;
+            $_->{tag_name} = $tag_name;
             $_; }
         grep { $_->{base} ~~ "HTMLElement"  } values %{ $param{classdef} },
     ];
@@ -129,17 +126,19 @@ Document Object Model in Web Browsers
 final class dom {
 	static const window = js.global["window"] as __noconvert__ Window;
 
+
+	/** alias to <code>dom.window.document.getElementById(id) as HTMLElement</code> */
 	static function id(id : string) : HTMLElement {
 		return dom.window.document.getElementById(id) as HTMLElement;
+	}
+	/** alias to <code>dom.window.document.createElement(id) as HTMLElement</code> */
+	static function createElement(tag : string) : HTMLElement {
+		return dom.window.document.createElement(tag) as __noconvert__ HTMLElement;
 	}
 
 	// type-safe API for createElement() and getElementById()
 
 : for $html_elements -> $class {
-	static function create<: $class.func_name :>() : <: $class.name :> {
-		return dom.window.document.createElement("<: $class.tag_name :>")
-			as __noconvert__ <: $class.name :>;
-	}
 	static function get<: $class.func_name :>ById(id : string) : <: $class.name :> {
 		return dom.window.document.getElementById(id)
 			as <: $class.name :>;
