@@ -1,5 +1,4 @@
-import "js/dom.jsx";
-import "js/dom/canvas2d.jsx";
+import "js/web.jsx";
 
 class Config {
 	static var quantity = 360;

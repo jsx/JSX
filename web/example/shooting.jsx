@@ -6,9 +6,7 @@
 	http://homepage2.nifty.com/hamcorossam/
 	Copyright (c) 2012, HamCorossam. All rights reserved.
 */
-import 'js/dom.jsx';
-import 'js/dom/canvas2d.jsx';
-import 'console.jsx';
+import 'js/web.jsx';
 
 final class Config {
 	static const cols = 10;

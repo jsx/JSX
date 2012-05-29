@@ -1,6 +1,6 @@
 
 import "test-case.jsx";
-import "js/dom.jsx";
+import "js/web.jsx";
 
 class _Test extends TestCase {
 
