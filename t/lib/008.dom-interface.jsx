@@ -14,17 +14,6 @@ class _Test extends TestCase {
 			var target = e.target as HTMLElement;
 			target.style.color = "red";
 		});
-
-		var canvas = dom.createCanvas();
-		var cx = canvas.getContext("2d");
-		assert cx != null;
-		log canvas.width;
-		log canvas.height;
-
-		var image = dom.createImage();
-		image.src = "bar.png";
-		log image.width;
-		log image.height;
 	}
 
 

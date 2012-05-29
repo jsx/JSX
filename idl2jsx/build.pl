@@ -64,6 +64,9 @@ my @specs = (
         'https://www.khronos.org/registry/typedarray/specs/latest/typedarray.idl',
         'http://dev.w3.org/html5/2dcontext/',
         'https://www.khronos.org/registry/webgl/specs/latest/webgl.idl',
+
+        # additionals
+        "$root/extra/timers.idl",
     ],
 );
 

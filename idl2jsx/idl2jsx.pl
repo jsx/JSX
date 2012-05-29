@@ -41,6 +41,8 @@ my %skip = (
 
     Example => 1,
     Function => 1,
+
+    WindowTimers => 1, # use JSXTimers instead
 );
 
 my %has_definition;
@@ -81,6 +83,8 @@ my %typemap = (
     'object' => 'Object',
 
     'any' => 'variant',
+
+    'TimerHandler' => 'function():void',
 
     'WindowProxy' => 'Window',
 
@@ -442,6 +446,9 @@ foreach my $file(@files) {
             }xmsg) {
             my $def       = $classdef{$+{class}};
             my $interface = $classdef{$+{interface}};
+
+            next if $interface->{name} eq 'WindowTimers';
+
             info "$def->{name} implements $interface->{name}";
 
             # FIXME

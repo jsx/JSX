@@ -320,6 +320,7 @@ automatically generated from:
 	https://www.khronos.org/registry/typedarray/specs/latest/typedarray.idl
 	http://dev.w3.org/html5/2dcontext/
 	https://www.khronos.org/registry/webgl/specs/latest/webgl.idl
+	idl2jsx/extra/timers.idl
 */
 native class DOMException {
 
@@ -2382,55 +2383,6 @@ native __fake__ class Window extends EventTarget {
 	function btoa(btoa : string/*DOMString*/) : string/*DOMString*/;
 	function atob(atob : string/*DOMString*/) : string/*DOMString*/;
 
-	// implements WindowTimers
-
-	function setTimeout(
-		handler : function(:Event):void/*Function*/
-	) : int/*long*/;
-	function setTimeout(
-		handler : function(:Event):void/*Function*/,
-		timeout : int/*long*/
-	) : int/*long*/;
-	function setTimeout(
-		handler : function(:Event):void/*Function*/,
-		timeout : int/*long*/,
-		args : variant/*any...*/
-	) : int/*long*/;
-	function setTimeout(handler : string/*DOMString*/) : int/*long*/;
-	function setTimeout(
-		handler : string/*DOMString*/,
-		timeout : int/*long*/
-	) : int/*long*/;
-	function setTimeout(
-		handler : string/*DOMString*/,
-		timeout : int/*long*/,
-		args : variant/*any...*/
-	) : int/*long*/;
-	function clearTimeout(handle : int/*long*/) : void;
-	function setInterval(
-		handler : function(:Event):void/*Function*/
-	) : int/*long*/;
-	function setInterval(
-		handler : function(:Event):void/*Function*/,
-		timeout : int/*long*/
-	) : int/*long*/;
-	function setInterval(
-		handler : function(:Event):void/*Function*/,
-		timeout : int/*long*/,
-		args : variant/*any...*/
-	) : int/*long*/;
-	function setInterval(handler : string/*DOMString*/) : int/*long*/;
-	function setInterval(
-		handler : string/*DOMString*/,
-		timeout : int/*long*/
-	) : int/*long*/;
-	function setInterval(
-		handler : string/*DOMString*/,
-		timeout : int/*long*/,
-		args : variant/*any...*/
-	) : int/*long*/;
-	function clearInterval(handle : int/*long*/) : void;
-
 	// implements WindowSessionStorage
 
 	__readonly__ var sessionStorage : Storage;
@@ -2438,6 +2390,23 @@ native __fake__ class Window extends EventTarget {
 	// implements WindowLocalStorage
 
 	__readonly__ var localStorage : Storage;
+
+	function setTimeout(
+		handler : function():void/*TimerHandler*/
+	) : int/*long*/;
+	function setTimeout(
+		handler : function():void/*TimerHandler*/,
+		timeout : int/*long*/
+	) : int/*long*/;
+	function clearTimeout(handle : int/*long*/) : void;
+	function setInterval(
+		handler : function():void/*TimerHandler*/
+	) : int/*long*/;
+	function setInterval(
+		handler : function():void/*TimerHandler*/,
+		timeout : int/*long*/
+	) : int/*long*/;
+	function clearInterval(handle : int/*long*/) : void;
 
 } // end of Window
 
@@ -4159,57 +4128,6 @@ native __fake__ class WindowBase64 {
 	function atob(atob : string/*DOMString*/) : string/*DOMString*/;
 
 } // end of WindowBase64
-
-native __fake__ class WindowTimers {
-
-	function setTimeout(
-		handler : function(:Event):void/*Function*/
-	) : int/*long*/;
-	function setTimeout(
-		handler : function(:Event):void/*Function*/,
-		timeout : int/*long*/
-	) : int/*long*/;
-	function setTimeout(
-		handler : function(:Event):void/*Function*/,
-		timeout : int/*long*/,
-		args : variant/*any...*/
-	) : int/*long*/;
-	function setTimeout(handler : string/*DOMString*/) : int/*long*/;
-	function setTimeout(
-		handler : string/*DOMString*/,
-		timeout : int/*long*/
-	) : int/*long*/;
-	function setTimeout(
-		handler : string/*DOMString*/,
-		timeout : int/*long*/,
-		args : variant/*any...*/
-	) : int/*long*/;
-	function clearTimeout(handle : int/*long*/) : void;
-	function setInterval(
-		handler : function(:Event):void/*Function*/
-	) : int/*long*/;
-	function setInterval(
-		handler : function(:Event):void/*Function*/,
-		timeout : int/*long*/
-	) : int/*long*/;
-	function setInterval(
-		handler : function(:Event):void/*Function*/,
-		timeout : int/*long*/,
-		args : variant/*any...*/
-	) : int/*long*/;
-	function setInterval(handler : string/*DOMString*/) : int/*long*/;
-	function setInterval(
-		handler : string/*DOMString*/,
-		timeout : int/*long*/
-	) : int/*long*/;
-	function setInterval(
-		handler : string/*DOMString*/,
-		timeout : int/*long*/,
-		args : variant/*any...*/
-	) : int/*long*/;
-	function clearInterval(handle : int/*long*/) : void;
-
-} // end of WindowTimers
 
 native class WindowModal {
 
@@ -7256,5 +7174,6 @@ end of generated files from:
 	https://www.khronos.org/registry/typedarray/specs/latest/typedarray.idl
 	http://dev.w3.org/html5/2dcontext/
 	https://www.khronos.org/registry/webgl/specs/latest/webgl.idl
+	idl2jsx/extra/timers.idl
 */
 

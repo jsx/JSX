@@ -383,7 +383,7 @@ final class Stage {
 		}
 
 		for(var i = 0; i < 3; ++i) {
-			var canvas = dom.createCanvas();
+			var canvas = dom.createElement("canvas") as HTMLCanvasElement;
 
 			canvas.width  = Config.cellWidth;
 			canvas.height = Config.cellHeight;
@@ -435,7 +435,7 @@ final class Stage {
 		this.ctx = stageCanvas.getContext("2d") as CanvasRenderingContext2D;
         assert this.ctx != null;
 
-		var bg = dom.createCanvas();
+		var bg = dom.createElement("canvas") as HTMLCanvasElement;
 		bg.width  = Config.width;
 		bg.height = Config.height + Config.cellHeight;
 		this.bgCtx = bg.getContext("2d") as CanvasRenderingContext2D;
@@ -452,7 +452,7 @@ final class Stage {
 			var image = e.target as HTMLImageElement;
             assert image != null;
 
-			var canvas = dom.createCanvas();
+			var canvas = dom.createElement("canvas") as HTMLCanvasElement;
 			var cx = canvas.getContext("2d") as CanvasRenderingContext2D;
             assert cx != null;
 			cx.drawImage(image, 0, 0);
@@ -464,7 +464,7 @@ final class Stage {
 		};
 		for(var i = 0; i < this.imageName.length; ++i) {
 			var name = this.imageName[i];
-			var image = dom.createImage();
+			var image = dom.createElement("img") as HTMLImageElement;
 			image.addEventListener("load", checkLoad);
 			image.src = Config.imagePath + "/" + name + ".png";
 			image.dataset["name"] = name;

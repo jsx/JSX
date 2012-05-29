@@ -1938,28 +1938,20 @@ class _Test extends TestCase {
         var v1508 : function(:Event):void/*Function?*/ = o.onwaiting;
         var f1509 : string/*DOMString*/ = o.btoa(X.getstring());
         var f1510 : string/*DOMString*/ = o.atob(X.getstring());
-        var f1511 : int/*long*/ = o.setTimeout(X.getfunction__Event__void());
-        var f1512 : int/*long*/ = o.setTimeout(X.getfunction__Event__void(), X.getint());
-        var f1513 : int/*long*/ = o.setTimeout(X.getfunction__Event__void(), X.getint(), X.getvariant());
-        var f1514 : int/*long*/ = o.setTimeout(X.getstring());
-        var f1515 : int/*long*/ = o.setTimeout(X.getstring(), X.getint());
-        var f1516 : int/*long*/ = o.setTimeout(X.getstring(), X.getint(), X.getvariant());
+        var v1511 : Storage = o.sessionStorage;
+        var v1512 : Storage = o.localStorage;
+        var f1513 : int/*long*/ = o.setTimeout(X.getfunction___void());
+        var f1514 : int/*long*/ = o.setTimeout(X.getfunction___void(), X.getint());
         o.clearTimeout(X.getint());
-        var f1517 : int/*long*/ = o.setInterval(X.getfunction__Event__void());
-        var f1518 : int/*long*/ = o.setInterval(X.getfunction__Event__void(), X.getint());
-        var f1519 : int/*long*/ = o.setInterval(X.getfunction__Event__void(), X.getint(), X.getvariant());
-        var f1520 : int/*long*/ = o.setInterval(X.getstring());
-        var f1521 : int/*long*/ = o.setInterval(X.getstring(), X.getint());
-        var f1522 : int/*long*/ = o.setInterval(X.getstring(), X.getint(), X.getvariant());
+        var f1515 : int/*long*/ = o.setInterval(X.getfunction___void());
+        var f1516 : int/*long*/ = o.setInterval(X.getfunction___void(), X.getint());
         o.clearInterval(X.getint());
-        var v1523 : Storage = o.sessionStorage;
-        var v1524 : Storage = o.localStorage;
     } // Window
 
 
     function compile_MediaQueryList(o : MediaQueryList) : void {
-        var v1525 : string/*DOMString*/ = o.media;
-        var v1526 : boolean = o.matches;
+        var v1517 : string/*DOMString*/ = o.media;
+        var v1518 : boolean = o.matches;
         o.addListener(X.getfunction__MediaQueryList__void());
         o.removeListener(X.getfunction__MediaQueryList__void());
     } // MediaQueryList
@@ -1971,150 +1963,150 @@ class _Test extends TestCase {
 
 
     function compile_Screen(o : Screen) : void {
-        var v1527 : int/*unsigned long*/ = o.availWidth;
-        var v1528 : int/*unsigned long*/ = o.availHeight;
-        var v1529 : int/*unsigned long*/ = o.width;
-        var v1530 : int/*unsigned long*/ = o.height;
-        var v1531 : int/*unsigned long*/ = o.colorDepth;
-        var v1532 : int/*unsigned long*/ = o.pixelDepth;
+        var v1519 : int/*unsigned long*/ = o.availWidth;
+        var v1520 : int/*unsigned long*/ = o.availHeight;
+        var v1521 : int/*unsigned long*/ = o.width;
+        var v1522 : int/*unsigned long*/ = o.height;
+        var v1523 : int/*unsigned long*/ = o.colorDepth;
+        var v1524 : int/*unsigned long*/ = o.pixelDepth;
     } // Screen
 
 
     function compile_CaretPosition(o : CaretPosition) : void {
-        var v1533 : Node = o.offsetNode;
-        var v1534 : int/*unsigned long*/ = o.offset;
+        var v1525 : Node = o.offsetNode;
+        var v1526 : int/*unsigned long*/ = o.offset;
     } // CaretPosition
 
 
     function compile_HTMLElement(o : HTMLElement) : void {
-        var v1535 : Element = o.offsetParent;
-        var v1536 : int/*long*/ = o.offsetTop;
-        var v1537 : int/*long*/ = o.offsetLeft;
-        var v1538 : int/*long*/ = o.offsetWidth;
-        var v1539 : int/*long*/ = o.offsetHeight;
-        var v1540 : string/*DOMString*/ = o.title;
-        var v1541 : string/*DOMString*/ = o.lang;
-        var v1542 : boolean = o.translate;
-        var v1543 : string/*DOMString*/ = o.dir;
-        var v1544 : string/*DOMString*/ = o.className;
-        var v1545 : DOMTokenList = o.classList;
-        var v1546 : DOMStringMap = o.dataset;
-        var v1547 : boolean = o.hidden;
+        var v1527 : Element = o.offsetParent;
+        var v1528 : int/*long*/ = o.offsetTop;
+        var v1529 : int/*long*/ = o.offsetLeft;
+        var v1530 : int/*long*/ = o.offsetWidth;
+        var v1531 : int/*long*/ = o.offsetHeight;
+        var v1532 : string/*DOMString*/ = o.title;
+        var v1533 : string/*DOMString*/ = o.lang;
+        var v1534 : boolean = o.translate;
+        var v1535 : string/*DOMString*/ = o.dir;
+        var v1536 : string/*DOMString*/ = o.className;
+        var v1537 : DOMTokenList = o.classList;
+        var v1538 : DOMStringMap = o.dataset;
+        var v1539 : boolean = o.hidden;
         o.click();
-        var v1548 : int/*long*/ = o.tabIndex;
+        var v1540 : int/*long*/ = o.tabIndex;
         o.focus();
         o.blur();
-        var v1549 : string/*DOMString*/ = o.accessKey;
-        var v1550 : string/*DOMString*/ = o.accessKeyLabel;
-        var v1551 : boolean = o.draggable;
-        var v1552 : DOMSettableTokenList = o.dropzone;
-        var v1553 : string/*DOMString*/ = o.contentEditable;
-        var v1554 : boolean = o.isContentEditable;
-        var v1555 : HTMLMenuElement = o.contextMenu;
-        var v1556 : boolean = o.spellcheck;
-        var v1557 : string/*DOMString?*/ = o.commandType;
-        var v1558 : string/*DOMString?*/ = o.commandLabel;
-        var v1559 : string/*DOMString?*/ = o.commandIcon;
-        var v1560 : boolean = o.commandHidden;
-        var v1561 : boolean = o.commandDisabled;
-        var v1562 : boolean = o.commandChecked;
-        var v1563 : CSSStyleDeclaration = o.style;
-        var v1564 : function(:Event):void/*Function?*/ = o.onabort;
-        var v1565 : function(:Event):void/*Function?*/ = o.onblur;
-        var v1566 : function(:Event):void/*Function?*/ = o.oncanplay;
-        var v1567 : function(:Event):void/*Function?*/ = o.oncanplaythrough;
-        var v1568 : function(:Event):void/*Function?*/ = o.onchange;
-        var v1569 : function(:Event):void/*Function?*/ = o.onclick;
-        var v1570 : function(:Event):void/*Function?*/ = o.oncontextmenu;
-        var v1571 : function(:Event):void/*Function?*/ = o.oncuechange;
-        var v1572 : function(:Event):void/*Function?*/ = o.ondblclick;
-        var v1573 : function(:Event):void/*Function?*/ = o.ondrag;
-        var v1574 : function(:Event):void/*Function?*/ = o.ondragend;
-        var v1575 : function(:Event):void/*Function?*/ = o.ondragenter;
-        var v1576 : function(:Event):void/*Function?*/ = o.ondragleave;
-        var v1577 : function(:Event):void/*Function?*/ = o.ondragover;
-        var v1578 : function(:Event):void/*Function?*/ = o.ondragstart;
-        var v1579 : function(:Event):void/*Function?*/ = o.ondrop;
-        var v1580 : function(:Event):void/*Function?*/ = o.ondurationchange;
-        var v1581 : function(:Event):void/*Function?*/ = o.onemptied;
-        var v1582 : function(:Event):void/*Function?*/ = o.onended;
-        var v1583 : function(:Event):void/*Function?*/ = o.onerror;
-        var v1584 : function(:Event):void/*Function?*/ = o.onfocus;
-        var v1585 : function(:Event):void/*Function?*/ = o.oninput;
-        var v1586 : function(:Event):void/*Function?*/ = o.oninvalid;
-        var v1587 : function(:Event):void/*Function?*/ = o.onkeydown;
-        var v1588 : function(:Event):void/*Function?*/ = o.onkeypress;
-        var v1589 : function(:Event):void/*Function?*/ = o.onkeyup;
-        var v1590 : function(:Event):void/*Function?*/ = o.onload;
-        var v1591 : function(:Event):void/*Function?*/ = o.onloadeddata;
-        var v1592 : function(:Event):void/*Function?*/ = o.onloadedmetadata;
-        var v1593 : function(:Event):void/*Function?*/ = o.onloadstart;
-        var v1594 : function(:Event):void/*Function?*/ = o.onmousedown;
-        var v1595 : function(:Event):void/*Function?*/ = o.onmousemove;
-        var v1596 : function(:Event):void/*Function?*/ = o.onmouseout;
-        var v1597 : function(:Event):void/*Function?*/ = o.onmouseover;
-        var v1598 : function(:Event):void/*Function?*/ = o.onmouseup;
-        var v1599 : function(:Event):void/*Function?*/ = o.onmousewheel;
-        var v1600 : function(:Event):void/*Function?*/ = o.onpause;
-        var v1601 : function(:Event):void/*Function?*/ = o.onplay;
-        var v1602 : function(:Event):void/*Function?*/ = o.onplaying;
-        var v1603 : function(:Event):void/*Function?*/ = o.onprogress;
-        var v1604 : function(:Event):void/*Function?*/ = o.onratechange;
-        var v1605 : function(:Event):void/*Function?*/ = o.onreset;
-        var v1606 : function(:Event):void/*Function?*/ = o.onscroll;
-        var v1607 : function(:Event):void/*Function?*/ = o.onseeked;
-        var v1608 : function(:Event):void/*Function?*/ = o.onseeking;
-        var v1609 : function(:Event):void/*Function?*/ = o.onselect;
-        var v1610 : function(:Event):void/*Function?*/ = o.onshow;
-        var v1611 : function(:Event):void/*Function?*/ = o.onstalled;
-        var v1612 : function(:Event):void/*Function?*/ = o.onsubmit;
-        var v1613 : function(:Event):void/*Function?*/ = o.onsuspend;
-        var v1614 : function(:Event):void/*Function?*/ = o.ontimeupdate;
-        var v1615 : function(:Event):void/*Function?*/ = o.onvolumechange;
-        var v1616 : function(:Event):void/*Function?*/ = o.onwaiting;
+        var v1541 : string/*DOMString*/ = o.accessKey;
+        var v1542 : string/*DOMString*/ = o.accessKeyLabel;
+        var v1543 : boolean = o.draggable;
+        var v1544 : DOMSettableTokenList = o.dropzone;
+        var v1545 : string/*DOMString*/ = o.contentEditable;
+        var v1546 : boolean = o.isContentEditable;
+        var v1547 : HTMLMenuElement = o.contextMenu;
+        var v1548 : boolean = o.spellcheck;
+        var v1549 : string/*DOMString?*/ = o.commandType;
+        var v1550 : string/*DOMString?*/ = o.commandLabel;
+        var v1551 : string/*DOMString?*/ = o.commandIcon;
+        var v1552 : boolean = o.commandHidden;
+        var v1553 : boolean = o.commandDisabled;
+        var v1554 : boolean = o.commandChecked;
+        var v1555 : CSSStyleDeclaration = o.style;
+        var v1556 : function(:Event):void/*Function?*/ = o.onabort;
+        var v1557 : function(:Event):void/*Function?*/ = o.onblur;
+        var v1558 : function(:Event):void/*Function?*/ = o.oncanplay;
+        var v1559 : function(:Event):void/*Function?*/ = o.oncanplaythrough;
+        var v1560 : function(:Event):void/*Function?*/ = o.onchange;
+        var v1561 : function(:Event):void/*Function?*/ = o.onclick;
+        var v1562 : function(:Event):void/*Function?*/ = o.oncontextmenu;
+        var v1563 : function(:Event):void/*Function?*/ = o.oncuechange;
+        var v1564 : function(:Event):void/*Function?*/ = o.ondblclick;
+        var v1565 : function(:Event):void/*Function?*/ = o.ondrag;
+        var v1566 : function(:Event):void/*Function?*/ = o.ondragend;
+        var v1567 : function(:Event):void/*Function?*/ = o.ondragenter;
+        var v1568 : function(:Event):void/*Function?*/ = o.ondragleave;
+        var v1569 : function(:Event):void/*Function?*/ = o.ondragover;
+        var v1570 : function(:Event):void/*Function?*/ = o.ondragstart;
+        var v1571 : function(:Event):void/*Function?*/ = o.ondrop;
+        var v1572 : function(:Event):void/*Function?*/ = o.ondurationchange;
+        var v1573 : function(:Event):void/*Function?*/ = o.onemptied;
+        var v1574 : function(:Event):void/*Function?*/ = o.onended;
+        var v1575 : function(:Event):void/*Function?*/ = o.onerror;
+        var v1576 : function(:Event):void/*Function?*/ = o.onfocus;
+        var v1577 : function(:Event):void/*Function?*/ = o.oninput;
+        var v1578 : function(:Event):void/*Function?*/ = o.oninvalid;
+        var v1579 : function(:Event):void/*Function?*/ = o.onkeydown;
+        var v1580 : function(:Event):void/*Function?*/ = o.onkeypress;
+        var v1581 : function(:Event):void/*Function?*/ = o.onkeyup;
+        var v1582 : function(:Event):void/*Function?*/ = o.onload;
+        var v1583 : function(:Event):void/*Function?*/ = o.onloadeddata;
+        var v1584 : function(:Event):void/*Function?*/ = o.onloadedmetadata;
+        var v1585 : function(:Event):void/*Function?*/ = o.onloadstart;
+        var v1586 : function(:Event):void/*Function?*/ = o.onmousedown;
+        var v1587 : function(:Event):void/*Function?*/ = o.onmousemove;
+        var v1588 : function(:Event):void/*Function?*/ = o.onmouseout;
+        var v1589 : function(:Event):void/*Function?*/ = o.onmouseover;
+        var v1590 : function(:Event):void/*Function?*/ = o.onmouseup;
+        var v1591 : function(:Event):void/*Function?*/ = o.onmousewheel;
+        var v1592 : function(:Event):void/*Function?*/ = o.onpause;
+        var v1593 : function(:Event):void/*Function?*/ = o.onplay;
+        var v1594 : function(:Event):void/*Function?*/ = o.onplaying;
+        var v1595 : function(:Event):void/*Function?*/ = o.onprogress;
+        var v1596 : function(:Event):void/*Function?*/ = o.onratechange;
+        var v1597 : function(:Event):void/*Function?*/ = o.onreset;
+        var v1598 : function(:Event):void/*Function?*/ = o.onscroll;
+        var v1599 : function(:Event):void/*Function?*/ = o.onseeked;
+        var v1600 : function(:Event):void/*Function?*/ = o.onseeking;
+        var v1601 : function(:Event):void/*Function?*/ = o.onselect;
+        var v1602 : function(:Event):void/*Function?*/ = o.onshow;
+        var v1603 : function(:Event):void/*Function?*/ = o.onstalled;
+        var v1604 : function(:Event):void/*Function?*/ = o.onsubmit;
+        var v1605 : function(:Event):void/*Function?*/ = o.onsuspend;
+        var v1606 : function(:Event):void/*Function?*/ = o.ontimeupdate;
+        var v1607 : function(:Event):void/*Function?*/ = o.onvolumechange;
+        var v1608 : function(:Event):void/*Function?*/ = o.onwaiting;
     } // HTMLElement
 
 
     function compile_ClientRectList(o : ClientRectList) : void {
-        var v1617 : int/*unsigned long*/ = o.length;
-        var f1618 : MayBeUndefined.<ClientRect> = o.__native_index_operator__(X.getint());
-        var f1619 : MayBeUndefined.<ClientRect> = o.item(X.getint());
+        var v1609 : int/*unsigned long*/ = o.length;
+        var f1610 : MayBeUndefined.<ClientRect> = o.__native_index_operator__(X.getint());
+        var f1611 : MayBeUndefined.<ClientRect> = o.item(X.getint());
     } // ClientRectList
 
 
     function compile_ClientRect(o : ClientRect) : void {
-        var v1620 : number/*float*/ = o.top;
-        var v1621 : number/*float*/ = o.right;
-        var v1622 : number/*float*/ = o.bottom;
-        var v1623 : number/*float*/ = o.left;
-        var v1624 : number/*float*/ = o.width;
-        var v1625 : number/*float*/ = o.height;
+        var v1612 : number/*float*/ = o.top;
+        var v1613 : number/*float*/ = o.right;
+        var v1614 : number/*float*/ = o.bottom;
+        var v1615 : number/*float*/ = o.left;
+        var v1616 : number/*float*/ = o.width;
+        var v1617 : number/*float*/ = o.height;
     } // ClientRect
 
 
     function compile_HTMLAllCollection(o : HTMLAllCollection) : void {
-        var f1626 : Object/*object?*/ = o.item(X.getstring());
-        var f1627 : MayBeUndefined.<Object/*object?*/> = o.__native_index_operator__(X.getstring());
-        var f1628 : MayBeUndefined.<Object/*object?*/> = o.namedItem(X.getstring());
-        var f1629 : HTMLAllCollection = o.tags(X.getstring());
+        var f1618 : Object/*object?*/ = o.item(X.getstring());
+        var f1619 : MayBeUndefined.<Object/*object?*/> = o.__native_index_operator__(X.getstring());
+        var f1620 : MayBeUndefined.<Object/*object?*/> = o.namedItem(X.getstring());
+        var f1621 : HTMLAllCollection = o.tags(X.getstring());
     } // HTMLAllCollection
 
 
     function compile_HTMLFormControlsCollection(o : HTMLFormControlsCollection) : void {
-        var f1630 : MayBeUndefined.<Object/*object?*/> = o.__native_index_operator__(X.getstring());
-        var f1631 : MayBeUndefined.<Object/*object?*/> = o.namedItem(X.getstring());
+        var f1622 : MayBeUndefined.<Object/*object?*/> = o.__native_index_operator__(X.getstring());
+        var f1623 : MayBeUndefined.<Object/*object?*/> = o.namedItem(X.getstring());
     } // HTMLFormControlsCollection
 
 
     function compile_RadioNodeList(o : RadioNodeList) : void {
-        var v1632 : string/*DOMString*/ = o.value;
+        var v1624 : string/*DOMString*/ = o.value;
     } // RadioNodeList
 
 
     function compile_HTMLOptionsCollection(o : HTMLOptionsCollection) : void {
-        var v1633 : int/*unsigned long*/ = o.length;
-        var f1634 : MayBeUndefined.<Object/*object?*/> = o.__native_index_operator__(X.getstring());
-        var f1635 : MayBeUndefined.<Object/*object?*/> = o.namedItem(X.getstring());
+        var v1625 : int/*unsigned long*/ = o.length;
+        var f1626 : MayBeUndefined.<Object/*object?*/> = o.__native_index_operator__(X.getstring());
+        var f1627 : MayBeUndefined.<Object/*object?*/> = o.namedItem(X.getstring());
         o.add(X.getHTMLOptionElement());
         o.add(X.getHTMLOptionElement(), X.getHTMLElement());
         o.add(X.getHTMLOptionElement());
@@ -2124,12 +2116,12 @@ class _Test extends TestCase {
         o.add(X.getHTMLOptGroupElement());
         o.add(X.getHTMLOptGroupElement(), X.getint());
         o.remove(X.getint());
-        var v1636 : int/*long*/ = o.selectedIndex;
+        var v1628 : int/*long*/ = o.selectedIndex;
     } // HTMLOptionsCollection
 
 
     function compile_DOMStringMap(o : DOMStringMap) : void {
-        var f1637 : MayBeUndefined.<string/*DOMString*/> = o.__native_index_operator__(X.getstring());
+        var f1629 : MayBeUndefined.<string/*DOMString*/> = o.__native_index_operator__(X.getstring());
     } // DOMStringMap
 
 
@@ -2138,111 +2130,111 @@ class _Test extends TestCase {
 
 
     function compile_HTMLDocument(o : HTMLDocument) : void {
-        var v1638 : Location = o.location;
-        var v1639 : string/*DOMString*/ = o.URL;
-        var v1640 : string/*DOMString*/ = o.domain;
-        var v1641 : string/*DOMString*/ = o.referrer;
-        var v1642 : string/*DOMString*/ = o.cookie;
-        var v1643 : string/*DOMString*/ = o.lastModified;
-        var v1644 : string/*DOMString*/ = o.readyState;
-        var f1645 : MayBeUndefined.<Object/*object*/> = o.__native_index_operator__(X.getstring());
-        var v1646 : string/*DOMString*/ = o.title;
-        var v1647 : string/*DOMString*/ = o.dir;
-        var v1648 : HTMLElement = o.body;
-        var v1649 : HTMLHeadElement = o.head;
-        var v1650 : HTMLCollection = o.images;
-        var v1651 : HTMLCollection = o.embeds;
-        var v1652 : HTMLCollection = o.plugins;
-        var v1653 : HTMLCollection = o.links;
-        var v1654 : HTMLCollection = o.forms;
-        var v1655 : HTMLCollection = o.scripts;
-        var f1656 : NodeList = o.getElementsByName(X.getstring());
-        var f1657 : HTMLDocument/*Document*/ = o.open();
-        var f1658 : HTMLDocument/*Document*/ = o.open(X.getstring());
-        var f1659 : HTMLDocument/*Document*/ = o.open(X.getstring(), X.getstring());
-        var f1660 : Window/*WindowProxy*/ = o.open(X.getstring(), X.getstring(), X.getstring());
-        var f1661 : Window/*WindowProxy*/ = o.open(X.getstring(), X.getstring(), X.getstring(), X.getboolean());
+        var v1630 : Location = o.location;
+        var v1631 : string/*DOMString*/ = o.URL;
+        var v1632 : string/*DOMString*/ = o.domain;
+        var v1633 : string/*DOMString*/ = o.referrer;
+        var v1634 : string/*DOMString*/ = o.cookie;
+        var v1635 : string/*DOMString*/ = o.lastModified;
+        var v1636 : string/*DOMString*/ = o.readyState;
+        var f1637 : MayBeUndefined.<Object/*object*/> = o.__native_index_operator__(X.getstring());
+        var v1638 : string/*DOMString*/ = o.title;
+        var v1639 : string/*DOMString*/ = o.dir;
+        var v1640 : HTMLElement = o.body;
+        var v1641 : HTMLHeadElement = o.head;
+        var v1642 : HTMLCollection = o.images;
+        var v1643 : HTMLCollection = o.embeds;
+        var v1644 : HTMLCollection = o.plugins;
+        var v1645 : HTMLCollection = o.links;
+        var v1646 : HTMLCollection = o.forms;
+        var v1647 : HTMLCollection = o.scripts;
+        var f1648 : NodeList = o.getElementsByName(X.getstring());
+        var f1649 : HTMLDocument/*Document*/ = o.open();
+        var f1650 : HTMLDocument/*Document*/ = o.open(X.getstring());
+        var f1651 : HTMLDocument/*Document*/ = o.open(X.getstring(), X.getstring());
+        var f1652 : Window/*WindowProxy*/ = o.open(X.getstring(), X.getstring(), X.getstring());
+        var f1653 : Window/*WindowProxy*/ = o.open(X.getstring(), X.getstring(), X.getstring(), X.getboolean());
         o.close();
         o.write();
         o.write(X.getstring());
         o.writeln();
         o.writeln(X.getstring());
-        var v1662 : Window/*WindowProxy?*/ = o.defaultView;
-        var v1663 : Element = o.activeElement;
-        var f1664 : boolean = o.hasFocus();
-        var v1665 : string/*DOMString*/ = o.designMode;
-        var f1666 : boolean = o.execCommand(X.getstring());
-        var f1667 : boolean = o.execCommand(X.getstring(), X.getboolean());
-        var f1668 : boolean = o.execCommand(X.getstring(), X.getboolean(), X.getstring());
-        var f1669 : boolean = o.queryCommandEnabled(X.getstring());
-        var f1670 : boolean = o.queryCommandIndeterm(X.getstring());
-        var f1671 : boolean = o.queryCommandState(X.getstring());
-        var f1672 : boolean = o.queryCommandSupported(X.getstring());
-        var f1673 : string/*DOMString*/ = o.queryCommandValue(X.getstring());
-        var v1674 : HTMLCollection = o.commands;
-        var v1675 : function(:Event):void/*Function?*/ = o.onabort;
-        var v1676 : function(:Event):void/*Function?*/ = o.onblur;
-        var v1677 : function(:Event):void/*Function?*/ = o.oncanplay;
-        var v1678 : function(:Event):void/*Function?*/ = o.oncanplaythrough;
-        var v1679 : function(:Event):void/*Function?*/ = o.onchange;
-        var v1680 : function(:Event):void/*Function?*/ = o.onclick;
-        var v1681 : function(:Event):void/*Function?*/ = o.oncontextmenu;
-        var v1682 : function(:Event):void/*Function?*/ = o.oncuechange;
-        var v1683 : function(:Event):void/*Function?*/ = o.ondblclick;
-        var v1684 : function(:Event):void/*Function?*/ = o.ondrag;
-        var v1685 : function(:Event):void/*Function?*/ = o.ondragend;
-        var v1686 : function(:Event):void/*Function?*/ = o.ondragenter;
-        var v1687 : function(:Event):void/*Function?*/ = o.ondragleave;
-        var v1688 : function(:Event):void/*Function?*/ = o.ondragover;
-        var v1689 : function(:Event):void/*Function?*/ = o.ondragstart;
-        var v1690 : function(:Event):void/*Function?*/ = o.ondrop;
-        var v1691 : function(:Event):void/*Function?*/ = o.ondurationchange;
-        var v1692 : function(:Event):void/*Function?*/ = o.onemptied;
-        var v1693 : function(:Event):void/*Function?*/ = o.onended;
-        var v1694 : function(:Event):void/*Function?*/ = o.onerror;
-        var v1695 : function(:Event):void/*Function?*/ = o.onfocus;
-        var v1696 : function(:Event):void/*Function?*/ = o.oninput;
-        var v1697 : function(:Event):void/*Function?*/ = o.oninvalid;
-        var v1698 : function(:Event):void/*Function?*/ = o.onkeydown;
-        var v1699 : function(:Event):void/*Function?*/ = o.onkeypress;
-        var v1700 : function(:Event):void/*Function?*/ = o.onkeyup;
-        var v1701 : function(:Event):void/*Function?*/ = o.onload;
-        var v1702 : function(:Event):void/*Function?*/ = o.onloadeddata;
-        var v1703 : function(:Event):void/*Function?*/ = o.onloadedmetadata;
-        var v1704 : function(:Event):void/*Function?*/ = o.onloadstart;
-        var v1705 : function(:Event):void/*Function?*/ = o.onmousedown;
-        var v1706 : function(:Event):void/*Function?*/ = o.onmousemove;
-        var v1707 : function(:Event):void/*Function?*/ = o.onmouseout;
-        var v1708 : function(:Event):void/*Function?*/ = o.onmouseover;
-        var v1709 : function(:Event):void/*Function?*/ = o.onmouseup;
-        var v1710 : function(:Event):void/*Function?*/ = o.onmousewheel;
-        var v1711 : function(:Event):void/*Function?*/ = o.onpause;
-        var v1712 : function(:Event):void/*Function?*/ = o.onplay;
-        var v1713 : function(:Event):void/*Function?*/ = o.onplaying;
-        var v1714 : function(:Event):void/*Function?*/ = o.onprogress;
-        var v1715 : function(:Event):void/*Function?*/ = o.onratechange;
-        var v1716 : function(:Event):void/*Function?*/ = o.onreset;
-        var v1717 : function(:Event):void/*Function?*/ = o.onscroll;
-        var v1718 : function(:Event):void/*Function?*/ = o.onseeked;
-        var v1719 : function(:Event):void/*Function?*/ = o.onseeking;
-        var v1720 : function(:Event):void/*Function?*/ = o.onselect;
-        var v1721 : function(:Event):void/*Function?*/ = o.onshow;
-        var v1722 : function(:Event):void/*Function?*/ = o.onstalled;
-        var v1723 : function(:Event):void/*Function?*/ = o.onsubmit;
-        var v1724 : function(:Event):void/*Function?*/ = o.onsuspend;
-        var v1725 : function(:Event):void/*Function?*/ = o.ontimeupdate;
-        var v1726 : function(:Event):void/*Function?*/ = o.onvolumechange;
-        var v1727 : function(:Event):void/*Function?*/ = o.onwaiting;
-        var v1728 : function(:Event):void/*Function?*/ = o.onreadystatechange;
-        var v1729 : string/*DOMString*/ = o.fgColor;
-        var v1730 : string/*DOMString*/ = o.linkColor;
-        var v1731 : string/*DOMString*/ = o.vlinkColor;
-        var v1732 : string/*DOMString*/ = o.alinkColor;
-        var v1733 : string/*DOMString*/ = o.bgColor;
-        var v1734 : HTMLCollection = o.anchors;
-        var v1735 : HTMLCollection = o.applets;
+        var v1654 : Window/*WindowProxy?*/ = o.defaultView;
+        var v1655 : Element = o.activeElement;
+        var f1656 : boolean = o.hasFocus();
+        var v1657 : string/*DOMString*/ = o.designMode;
+        var f1658 : boolean = o.execCommand(X.getstring());
+        var f1659 : boolean = o.execCommand(X.getstring(), X.getboolean());
+        var f1660 : boolean = o.execCommand(X.getstring(), X.getboolean(), X.getstring());
+        var f1661 : boolean = o.queryCommandEnabled(X.getstring());
+        var f1662 : boolean = o.queryCommandIndeterm(X.getstring());
+        var f1663 : boolean = o.queryCommandState(X.getstring());
+        var f1664 : boolean = o.queryCommandSupported(X.getstring());
+        var f1665 : string/*DOMString*/ = o.queryCommandValue(X.getstring());
+        var v1666 : HTMLCollection = o.commands;
+        var v1667 : function(:Event):void/*Function?*/ = o.onabort;
+        var v1668 : function(:Event):void/*Function?*/ = o.onblur;
+        var v1669 : function(:Event):void/*Function?*/ = o.oncanplay;
+        var v1670 : function(:Event):void/*Function?*/ = o.oncanplaythrough;
+        var v1671 : function(:Event):void/*Function?*/ = o.onchange;
+        var v1672 : function(:Event):void/*Function?*/ = o.onclick;
+        var v1673 : function(:Event):void/*Function?*/ = o.oncontextmenu;
+        var v1674 : function(:Event):void/*Function?*/ = o.oncuechange;
+        var v1675 : function(:Event):void/*Function?*/ = o.ondblclick;
+        var v1676 : function(:Event):void/*Function?*/ = o.ondrag;
+        var v1677 : function(:Event):void/*Function?*/ = o.ondragend;
+        var v1678 : function(:Event):void/*Function?*/ = o.ondragenter;
+        var v1679 : function(:Event):void/*Function?*/ = o.ondragleave;
+        var v1680 : function(:Event):void/*Function?*/ = o.ondragover;
+        var v1681 : function(:Event):void/*Function?*/ = o.ondragstart;
+        var v1682 : function(:Event):void/*Function?*/ = o.ondrop;
+        var v1683 : function(:Event):void/*Function?*/ = o.ondurationchange;
+        var v1684 : function(:Event):void/*Function?*/ = o.onemptied;
+        var v1685 : function(:Event):void/*Function?*/ = o.onended;
+        var v1686 : function(:Event):void/*Function?*/ = o.onerror;
+        var v1687 : function(:Event):void/*Function?*/ = o.onfocus;
+        var v1688 : function(:Event):void/*Function?*/ = o.oninput;
+        var v1689 : function(:Event):void/*Function?*/ = o.oninvalid;
+        var v1690 : function(:Event):void/*Function?*/ = o.onkeydown;
+        var v1691 : function(:Event):void/*Function?*/ = o.onkeypress;
+        var v1692 : function(:Event):void/*Function?*/ = o.onkeyup;
+        var v1693 : function(:Event):void/*Function?*/ = o.onload;
+        var v1694 : function(:Event):void/*Function?*/ = o.onloadeddata;
+        var v1695 : function(:Event):void/*Function?*/ = o.onloadedmetadata;
+        var v1696 : function(:Event):void/*Function?*/ = o.onloadstart;
+        var v1697 : function(:Event):void/*Function?*/ = o.onmousedown;
+        var v1698 : function(:Event):void/*Function?*/ = o.onmousemove;
+        var v1699 : function(:Event):void/*Function?*/ = o.onmouseout;
+        var v1700 : function(:Event):void/*Function?*/ = o.onmouseover;
+        var v1701 : function(:Event):void/*Function?*/ = o.onmouseup;
+        var v1702 : function(:Event):void/*Function?*/ = o.onmousewheel;
+        var v1703 : function(:Event):void/*Function?*/ = o.onpause;
+        var v1704 : function(:Event):void/*Function?*/ = o.onplay;
+        var v1705 : function(:Event):void/*Function?*/ = o.onplaying;
+        var v1706 : function(:Event):void/*Function?*/ = o.onprogress;
+        var v1707 : function(:Event):void/*Function?*/ = o.onratechange;
+        var v1708 : function(:Event):void/*Function?*/ = o.onreset;
+        var v1709 : function(:Event):void/*Function?*/ = o.onscroll;
+        var v1710 : function(:Event):void/*Function?*/ = o.onseeked;
+        var v1711 : function(:Event):void/*Function?*/ = o.onseeking;
+        var v1712 : function(:Event):void/*Function?*/ = o.onselect;
+        var v1713 : function(:Event):void/*Function?*/ = o.onshow;
+        var v1714 : function(:Event):void/*Function?*/ = o.onstalled;
+        var v1715 : function(:Event):void/*Function?*/ = o.onsubmit;
+        var v1716 : function(:Event):void/*Function?*/ = o.onsuspend;
+        var v1717 : function(:Event):void/*Function?*/ = o.ontimeupdate;
+        var v1718 : function(:Event):void/*Function?*/ = o.onvolumechange;
+        var v1719 : function(:Event):void/*Function?*/ = o.onwaiting;
+        var v1720 : function(:Event):void/*Function?*/ = o.onreadystatechange;
+        var v1721 : string/*DOMString*/ = o.fgColor;
+        var v1722 : string/*DOMString*/ = o.linkColor;
+        var v1723 : string/*DOMString*/ = o.vlinkColor;
+        var v1724 : string/*DOMString*/ = o.alinkColor;
+        var v1725 : string/*DOMString*/ = o.bgColor;
+        var v1726 : HTMLCollection = o.anchors;
+        var v1727 : HTMLCollection = o.applets;
         o.clear();
-        var v1736 : HTMLAllCollection = o.all;
+        var v1728 : HTMLAllCollection = o.all;
     } // HTMLDocument
 
 
@@ -2251,7 +2243,7 @@ class _Test extends TestCase {
 
 
     function compile_HTMLHtmlElement(o : HTMLHtmlElement) : void {
-        var v1737 : string/*DOMString*/ = o.version;
+        var v1729 : string/*DOMString*/ = o.version;
     } // HTMLHtmlElement
 
 
@@ -2260,174 +2252,174 @@ class _Test extends TestCase {
 
 
     function compile_HTMLTitleElement(o : HTMLTitleElement) : void {
-        var v1738 : string/*DOMString*/ = o.text;
+        var v1730 : string/*DOMString*/ = o.text;
     } // HTMLTitleElement
 
 
     function compile_HTMLBaseElement(o : HTMLBaseElement) : void {
-        var v1739 : string/*DOMString*/ = o.href;
-        var v1740 : string/*DOMString*/ = o.target;
+        var v1731 : string/*DOMString*/ = o.href;
+        var v1732 : string/*DOMString*/ = o.target;
     } // HTMLBaseElement
 
 
     function compile_HTMLLinkElement(o : HTMLLinkElement) : void {
-        var v1741 : boolean = o.disabled;
-        var v1742 : string/*DOMString*/ = o.href;
-        var v1743 : string/*DOMString*/ = o.rel;
-        var v1744 : DOMTokenList = o.relList;
-        var v1745 : string/*DOMString*/ = o.media;
-        var v1746 : string/*DOMString*/ = o.hreflang;
-        var v1747 : string/*DOMString*/ = o.type;
-        var v1748 : DOMSettableTokenList = o.sizes;
-        var v1749 : string/*DOMString*/ = o.charset;
-        var v1750 : string/*DOMString*/ = o.rev;
-        var v1751 : string/*DOMString*/ = o.target;
-        var v1752 : StyleSheet = o.sheet;
+        var v1733 : boolean = o.disabled;
+        var v1734 : string/*DOMString*/ = o.href;
+        var v1735 : string/*DOMString*/ = o.rel;
+        var v1736 : DOMTokenList = o.relList;
+        var v1737 : string/*DOMString*/ = o.media;
+        var v1738 : string/*DOMString*/ = o.hreflang;
+        var v1739 : string/*DOMString*/ = o.type;
+        var v1740 : DOMSettableTokenList = o.sizes;
+        var v1741 : string/*DOMString*/ = o.charset;
+        var v1742 : string/*DOMString*/ = o.rev;
+        var v1743 : string/*DOMString*/ = o.target;
+        var v1744 : StyleSheet = o.sheet;
     } // HTMLLinkElement
 
 
     function compile_HTMLMetaElement(o : HTMLMetaElement) : void {
-        var v1753 : string/*DOMString*/ = o.name;
-        var v1754 : string/*DOMString*/ = o.httpEquiv;
-        var v1755 : string/*DOMString*/ = o.content;
-        var v1756 : string/*DOMString*/ = o.scheme;
+        var v1745 : string/*DOMString*/ = o.name;
+        var v1746 : string/*DOMString*/ = o.httpEquiv;
+        var v1747 : string/*DOMString*/ = o.content;
+        var v1748 : string/*DOMString*/ = o.scheme;
     } // HTMLMetaElement
 
 
     function compile_HTMLStyleElement(o : HTMLStyleElement) : void {
-        var v1757 : boolean = o.disabled;
-        var v1758 : string/*DOMString*/ = o.media;
-        var v1759 : string/*DOMString*/ = o.type;
-        var v1760 : boolean = o.scoped;
-        var v1761 : StyleSheet = o.sheet;
+        var v1749 : boolean = o.disabled;
+        var v1750 : string/*DOMString*/ = o.media;
+        var v1751 : string/*DOMString*/ = o.type;
+        var v1752 : boolean = o.scoped;
+        var v1753 : StyleSheet = o.sheet;
     } // HTMLStyleElement
 
 
     function compile_HTMLScriptElement(o : HTMLScriptElement) : void {
-        var v1762 : string/*DOMString*/ = o.src;
-        var v1763 : boolean = o.async;
-        var v1764 : boolean = o.defer;
-        var v1765 : string/*DOMString*/ = o.type;
-        var v1766 : string/*DOMString*/ = o.charset;
-        var v1767 : string/*DOMString*/ = o.text;
-        var v1768 : string/*DOMString*/ = o.event;
-        var v1769 : string/*DOMString*/ = o.htmlFor;
+        var v1754 : string/*DOMString*/ = o.src;
+        var v1755 : boolean = o.async;
+        var v1756 : boolean = o.defer;
+        var v1757 : string/*DOMString*/ = o.type;
+        var v1758 : string/*DOMString*/ = o.charset;
+        var v1759 : string/*DOMString*/ = o.text;
+        var v1760 : string/*DOMString*/ = o.event;
+        var v1761 : string/*DOMString*/ = o.htmlFor;
     } // HTMLScriptElement
 
 
     function compile_HTMLBodyElement(o : HTMLBodyElement) : void {
-        var v1770 : function(:Event):void/*Function?*/ = o.onafterprint;
-        var v1771 : function(:Event):void/*Function?*/ = o.onbeforeprint;
-        var v1772 : function(:Event):void/*Function?*/ = o.onbeforeunload;
-        var v1773 : function(:Event):void/*Function?*/ = o.onblur;
-        var v1774 : function(:Event):void/*Function?*/ = o.onerror;
-        var v1775 : function(:Event):void/*Function?*/ = o.onfocus;
-        var v1776 : function(:Event):void/*Function?*/ = o.onhashchange;
-        var v1777 : function(:Event):void/*Function?*/ = o.onload;
-        var v1778 : function(:Event):void/*Function?*/ = o.onmessage;
-        var v1779 : function(:Event):void/*Function?*/ = o.onoffline;
-        var v1780 : function(:Event):void/*Function?*/ = o.ononline;
-        var v1781 : function(:Event):void/*Function?*/ = o.onpopstate;
-        var v1782 : function(:Event):void/*Function?*/ = o.onpagehide;
-        var v1783 : function(:Event):void/*Function?*/ = o.onpageshow;
-        var v1784 : function(:Event):void/*Function?*/ = o.onresize;
-        var v1785 : function(:Event):void/*Function?*/ = o.onscroll;
-        var v1786 : function(:Event):void/*Function?*/ = o.onstorage;
-        var v1787 : function(:Event):void/*Function?*/ = o.onunload;
-        var v1788 : string/*DOMString*/ = o.text;
-        var v1789 : string/*DOMString*/ = o.link;
-        var v1790 : string/*DOMString*/ = o.vLink;
-        var v1791 : string/*DOMString*/ = o.aLink;
-        var v1792 : string/*DOMString*/ = o.bgColor;
-        var v1793 : string/*DOMString*/ = o.background;
+        var v1762 : function(:Event):void/*Function?*/ = o.onafterprint;
+        var v1763 : function(:Event):void/*Function?*/ = o.onbeforeprint;
+        var v1764 : function(:Event):void/*Function?*/ = o.onbeforeunload;
+        var v1765 : function(:Event):void/*Function?*/ = o.onblur;
+        var v1766 : function(:Event):void/*Function?*/ = o.onerror;
+        var v1767 : function(:Event):void/*Function?*/ = o.onfocus;
+        var v1768 : function(:Event):void/*Function?*/ = o.onhashchange;
+        var v1769 : function(:Event):void/*Function?*/ = o.onload;
+        var v1770 : function(:Event):void/*Function?*/ = o.onmessage;
+        var v1771 : function(:Event):void/*Function?*/ = o.onoffline;
+        var v1772 : function(:Event):void/*Function?*/ = o.ononline;
+        var v1773 : function(:Event):void/*Function?*/ = o.onpopstate;
+        var v1774 : function(:Event):void/*Function?*/ = o.onpagehide;
+        var v1775 : function(:Event):void/*Function?*/ = o.onpageshow;
+        var v1776 : function(:Event):void/*Function?*/ = o.onresize;
+        var v1777 : function(:Event):void/*Function?*/ = o.onscroll;
+        var v1778 : function(:Event):void/*Function?*/ = o.onstorage;
+        var v1779 : function(:Event):void/*Function?*/ = o.onunload;
+        var v1780 : string/*DOMString*/ = o.text;
+        var v1781 : string/*DOMString*/ = o.link;
+        var v1782 : string/*DOMString*/ = o.vLink;
+        var v1783 : string/*DOMString*/ = o.aLink;
+        var v1784 : string/*DOMString*/ = o.bgColor;
+        var v1785 : string/*DOMString*/ = o.background;
     } // HTMLBodyElement
 
 
     function compile_HTMLHeadingElement(o : HTMLHeadingElement) : void {
-        var v1794 : string/*DOMString*/ = o.align;
+        var v1786 : string/*DOMString*/ = o.align;
     } // HTMLHeadingElement
 
 
     function compile_HTMLParagraphElement(o : HTMLParagraphElement) : void {
-        var v1795 : string/*DOMString*/ = o.align;
+        var v1787 : string/*DOMString*/ = o.align;
     } // HTMLParagraphElement
 
 
     function compile_HTMLHRElement(o : HTMLHRElement) : void {
-        var v1796 : string/*DOMString*/ = o.align;
-        var v1797 : string/*DOMString*/ = o.color;
-        var v1798 : boolean = o.noShade;
-        var v1799 : string/*DOMString*/ = o.size;
-        var v1800 : string/*DOMString*/ = o.width;
+        var v1788 : string/*DOMString*/ = o.align;
+        var v1789 : string/*DOMString*/ = o.color;
+        var v1790 : boolean = o.noShade;
+        var v1791 : string/*DOMString*/ = o.size;
+        var v1792 : string/*DOMString*/ = o.width;
     } // HTMLHRElement
 
 
     function compile_HTMLPreElement(o : HTMLPreElement) : void {
-        var v1801 : int/*long*/ = o.width;
+        var v1793 : int/*long*/ = o.width;
     } // HTMLPreElement
 
 
     function compile_HTMLQuoteElement(o : HTMLQuoteElement) : void {
-        var v1802 : string/*DOMString*/ = o.cite;
+        var v1794 : string/*DOMString*/ = o.cite;
     } // HTMLQuoteElement
 
 
     function compile_HTMLOListElement(o : HTMLOListElement) : void {
-        var v1803 : boolean = o.reversed;
-        var v1804 : int/*long*/ = o.start;
-        var v1805 : string/*DOMString*/ = o.type;
-        var v1806 : boolean = o.compact;
+        var v1795 : boolean = o.reversed;
+        var v1796 : int/*long*/ = o.start;
+        var v1797 : string/*DOMString*/ = o.type;
+        var v1798 : boolean = o.compact;
     } // HTMLOListElement
 
 
     function compile_HTMLUListElement(o : HTMLUListElement) : void {
-        var v1807 : boolean = o.compact;
-        var v1808 : string/*DOMString*/ = o.type;
+        var v1799 : boolean = o.compact;
+        var v1800 : string/*DOMString*/ = o.type;
     } // HTMLUListElement
 
 
     function compile_HTMLLIElement(o : HTMLLIElement) : void {
-        var v1809 : int/*long*/ = o.value;
-        var v1810 : string/*DOMString*/ = o.type;
+        var v1801 : int/*long*/ = o.value;
+        var v1802 : string/*DOMString*/ = o.type;
     } // HTMLLIElement
 
 
     function compile_HTMLDListElement(o : HTMLDListElement) : void {
-        var v1811 : boolean = o.compact;
+        var v1803 : boolean = o.compact;
     } // HTMLDListElement
 
 
     function compile_HTMLDivElement(o : HTMLDivElement) : void {
-        var v1812 : string/*DOMString*/ = o.align;
+        var v1804 : string/*DOMString*/ = o.align;
     } // HTMLDivElement
 
 
     function compile_HTMLAnchorElement(o : HTMLAnchorElement) : void {
-        var v1813 : string/*DOMString*/ = o.href;
-        var v1814 : string/*DOMString*/ = o.target;
-        var v1815 : string/*DOMString*/ = o.rel;
-        var v1816 : DOMTokenList = o.relList;
-        var v1817 : string/*DOMString*/ = o.media;
-        var v1818 : string/*DOMString*/ = o.hreflang;
-        var v1819 : string/*DOMString*/ = o.type;
-        var v1820 : string/*DOMString*/ = o.text;
-        var v1821 : string/*DOMString*/ = o.protocol;
-        var v1822 : string/*DOMString*/ = o.host;
-        var v1823 : string/*DOMString*/ = o.hostname;
-        var v1824 : string/*DOMString*/ = o.port;
-        var v1825 : string/*DOMString*/ = o.pathname;
-        var v1826 : string/*DOMString*/ = o.search;
-        var v1827 : string/*DOMString*/ = o.hash;
-        var v1828 : string/*DOMString*/ = o.coords;
-        var v1829 : string/*DOMString*/ = o.charset;
-        var v1830 : string/*DOMString*/ = o.name;
-        var v1831 : string/*DOMString*/ = o.rev;
-        var v1832 : string/*DOMString*/ = o.shape;
+        var v1805 : string/*DOMString*/ = o.href;
+        var v1806 : string/*DOMString*/ = o.target;
+        var v1807 : string/*DOMString*/ = o.rel;
+        var v1808 : DOMTokenList = o.relList;
+        var v1809 : string/*DOMString*/ = o.media;
+        var v1810 : string/*DOMString*/ = o.hreflang;
+        var v1811 : string/*DOMString*/ = o.type;
+        var v1812 : string/*DOMString*/ = o.text;
+        var v1813 : string/*DOMString*/ = o.protocol;
+        var v1814 : string/*DOMString*/ = o.host;
+        var v1815 : string/*DOMString*/ = o.hostname;
+        var v1816 : string/*DOMString*/ = o.port;
+        var v1817 : string/*DOMString*/ = o.pathname;
+        var v1818 : string/*DOMString*/ = o.search;
+        var v1819 : string/*DOMString*/ = o.hash;
+        var v1820 : string/*DOMString*/ = o.coords;
+        var v1821 : string/*DOMString*/ = o.charset;
+        var v1822 : string/*DOMString*/ = o.name;
+        var v1823 : string/*DOMString*/ = o.rev;
+        var v1824 : string/*DOMString*/ = o.shape;
     } // HTMLAnchorElement
 
 
     function compile_HTMLTimeElement(o : HTMLTimeElement) : void {
-        var v1833 : string/*DOMString*/ = o.datetime;
+        var v1825 : string/*DOMString*/ = o.datetime;
     } // HTMLTimeElement
 
 
@@ -2436,108 +2428,108 @@ class _Test extends TestCase {
 
 
     function compile_HTMLBRElement(o : HTMLBRElement) : void {
-        var v1834 : string/*DOMString*/ = o.clear;
+        var v1826 : string/*DOMString*/ = o.clear;
     } // HTMLBRElement
 
 
     function compile_HTMLModElement(o : HTMLModElement) : void {
-        var v1835 : string/*DOMString*/ = o.cite;
-        var v1836 : string/*DOMString*/ = o.dateTime;
+        var v1827 : string/*DOMString*/ = o.cite;
+        var v1828 : string/*DOMString*/ = o.dateTime;
     } // HTMLModElement
 
 
     function compile_HTMLImageElement(o : HTMLImageElement) : void {
-        var v1837 : string/*DOMString*/ = o.alt;
-        var v1838 : string/*DOMString*/ = o.src;
-        var v1839 : string/*DOMString*/ = o.crossOrigin;
-        var v1840 : string/*DOMString*/ = o.useMap;
-        var v1841 : boolean = o.isMap;
-        var v1842 : int/*unsigned long*/ = o.width;
-        var v1843 : int/*unsigned long*/ = o.height;
-        var v1844 : int/*unsigned long*/ = o.naturalWidth;
-        var v1845 : int/*unsigned long*/ = o.naturalHeight;
-        var v1846 : boolean = o.complete;
-        var v1847 : string/*DOMString*/ = o.name;
-        var v1848 : string/*DOMString*/ = o.align;
-        var v1849 : int/*unsigned long*/ = o.hspace;
-        var v1850 : int/*unsigned long*/ = o.vspace;
-        var v1851 : string/*DOMString*/ = o.longDesc;
-        var v1852 : string/*DOMString*/ = o.border;
+        var v1829 : string/*DOMString*/ = o.alt;
+        var v1830 : string/*DOMString*/ = o.src;
+        var v1831 : string/*DOMString*/ = o.crossOrigin;
+        var v1832 : string/*DOMString*/ = o.useMap;
+        var v1833 : boolean = o.isMap;
+        var v1834 : int/*unsigned long*/ = o.width;
+        var v1835 : int/*unsigned long*/ = o.height;
+        var v1836 : int/*unsigned long*/ = o.naturalWidth;
+        var v1837 : int/*unsigned long*/ = o.naturalHeight;
+        var v1838 : boolean = o.complete;
+        var v1839 : string/*DOMString*/ = o.name;
+        var v1840 : string/*DOMString*/ = o.align;
+        var v1841 : int/*unsigned long*/ = o.hspace;
+        var v1842 : int/*unsigned long*/ = o.vspace;
+        var v1843 : string/*DOMString*/ = o.longDesc;
+        var v1844 : string/*DOMString*/ = o.border;
     } // HTMLImageElement
 
 
     function compile_HTMLIFrameElement(o : HTMLIFrameElement) : void {
-        var v1853 : string/*DOMString*/ = o.src;
-        var v1854 : string/*DOMString*/ = o.srcdoc;
-        var v1855 : string/*DOMString*/ = o.name;
-        var v1856 : DOMSettableTokenList = o.sandbox;
-        var v1857 : boolean = o.seamless;
-        var v1858 : string/*DOMString*/ = o.width;
-        var v1859 : string/*DOMString*/ = o.height;
-        var v1860 : HTMLDocument/*Document?*/ = o.contentDocument;
-        var v1861 : Window/*WindowProxy?*/ = o.contentWindow;
-        var v1862 : string/*DOMString*/ = o.align;
-        var v1863 : string/*DOMString*/ = o.scrolling;
-        var v1864 : string/*DOMString*/ = o.frameBorder;
-        var v1865 : string/*DOMString*/ = o.longDesc;
-        var v1866 : string/*DOMString*/ = o.marginHeight;
-        var v1867 : string/*DOMString*/ = o.marginWidth;
+        var v1845 : string/*DOMString*/ = o.src;
+        var v1846 : string/*DOMString*/ = o.srcdoc;
+        var v1847 : string/*DOMString*/ = o.name;
+        var v1848 : DOMSettableTokenList = o.sandbox;
+        var v1849 : boolean = o.seamless;
+        var v1850 : string/*DOMString*/ = o.width;
+        var v1851 : string/*DOMString*/ = o.height;
+        var v1852 : HTMLDocument/*Document?*/ = o.contentDocument;
+        var v1853 : Window/*WindowProxy?*/ = o.contentWindow;
+        var v1854 : string/*DOMString*/ = o.align;
+        var v1855 : string/*DOMString*/ = o.scrolling;
+        var v1856 : string/*DOMString*/ = o.frameBorder;
+        var v1857 : string/*DOMString*/ = o.longDesc;
+        var v1858 : string/*DOMString*/ = o.marginHeight;
+        var v1859 : string/*DOMString*/ = o.marginWidth;
     } // HTMLIFrameElement
 
 
     function compile_HTMLEmbedElement(o : HTMLEmbedElement) : void {
-        var v1868 : string/*DOMString*/ = o.src;
-        var v1869 : string/*DOMString*/ = o.type;
-        var v1870 : string/*DOMString*/ = o.width;
-        var v1871 : string/*DOMString*/ = o.height;
-        var v1872 : string/*DOMString*/ = o.align;
-        var v1873 : string/*DOMString*/ = o.name;
+        var v1860 : string/*DOMString*/ = o.src;
+        var v1861 : string/*DOMString*/ = o.type;
+        var v1862 : string/*DOMString*/ = o.width;
+        var v1863 : string/*DOMString*/ = o.height;
+        var v1864 : string/*DOMString*/ = o.align;
+        var v1865 : string/*DOMString*/ = o.name;
     } // HTMLEmbedElement
 
 
     function compile_HTMLObjectElement(o : HTMLObjectElement) : void {
-        var v1874 : string/*DOMString*/ = o.data;
-        var v1875 : string/*DOMString*/ = o.type;
-        var v1876 : boolean = o.typeMustMatch;
-        var v1877 : string/*DOMString*/ = o.name;
-        var v1878 : string/*DOMString*/ = o.useMap;
-        var v1879 : HTMLFormElement = o.form;
-        var v1880 : string/*DOMString*/ = o.width;
-        var v1881 : string/*DOMString*/ = o.height;
-        var v1882 : HTMLDocument/*Document?*/ = o.contentDocument;
-        var v1883 : Window/*WindowProxy?*/ = o.contentWindow;
-        var v1884 : boolean = o.willValidate;
-        var v1885 : ValidityState = o.validity;
-        var v1886 : string/*DOMString*/ = o.validationMessage;
-        var f1887 : boolean = o.checkValidity();
+        var v1866 : string/*DOMString*/ = o.data;
+        var v1867 : string/*DOMString*/ = o.type;
+        var v1868 : boolean = o.typeMustMatch;
+        var v1869 : string/*DOMString*/ = o.name;
+        var v1870 : string/*DOMString*/ = o.useMap;
+        var v1871 : HTMLFormElement = o.form;
+        var v1872 : string/*DOMString*/ = o.width;
+        var v1873 : string/*DOMString*/ = o.height;
+        var v1874 : HTMLDocument/*Document?*/ = o.contentDocument;
+        var v1875 : Window/*WindowProxy?*/ = o.contentWindow;
+        var v1876 : boolean = o.willValidate;
+        var v1877 : ValidityState = o.validity;
+        var v1878 : string/*DOMString*/ = o.validationMessage;
+        var f1879 : boolean = o.checkValidity();
         o.setCustomValidity(X.getstring());
-        var v1888 : string/*DOMString*/ = o.align;
-        var v1889 : string/*DOMString*/ = o.archive;
-        var v1890 : string/*DOMString*/ = o.code;
-        var v1891 : boolean = o.declare;
-        var v1892 : int/*unsigned long*/ = o.hspace;
-        var v1893 : string/*DOMString*/ = o.standby;
-        var v1894 : int/*unsigned long*/ = o.vspace;
-        var v1895 : string/*DOMString*/ = o.codeBase;
-        var v1896 : string/*DOMString*/ = o.codeType;
-        var v1897 : string/*DOMString*/ = o.border;
+        var v1880 : string/*DOMString*/ = o.align;
+        var v1881 : string/*DOMString*/ = o.archive;
+        var v1882 : string/*DOMString*/ = o.code;
+        var v1883 : boolean = o.declare;
+        var v1884 : int/*unsigned long*/ = o.hspace;
+        var v1885 : string/*DOMString*/ = o.standby;
+        var v1886 : int/*unsigned long*/ = o.vspace;
+        var v1887 : string/*DOMString*/ = o.codeBase;
+        var v1888 : string/*DOMString*/ = o.codeType;
+        var v1889 : string/*DOMString*/ = o.border;
     } // HTMLObjectElement
 
 
     function compile_HTMLParamElement(o : HTMLParamElement) : void {
-        var v1898 : string/*DOMString*/ = o.name;
-        var v1899 : string/*DOMString*/ = o.value;
-        var v1900 : string/*DOMString*/ = o.type;
-        var v1901 : string/*DOMString*/ = o.valueType;
+        var v1890 : string/*DOMString*/ = o.name;
+        var v1891 : string/*DOMString*/ = o.value;
+        var v1892 : string/*DOMString*/ = o.type;
+        var v1893 : string/*DOMString*/ = o.valueType;
     } // HTMLParamElement
 
 
     function compile_HTMLVideoElement(o : HTMLVideoElement) : void {
-        var v1902 : int/*unsigned long*/ = o.width;
-        var v1903 : int/*unsigned long*/ = o.height;
-        var v1904 : int/*unsigned long*/ = o.videoWidth;
-        var v1905 : int/*unsigned long*/ = o.videoHeight;
-        var v1906 : string/*DOMString*/ = o.poster;
+        var v1894 : int/*unsigned long*/ = o.width;
+        var v1895 : int/*unsigned long*/ = o.height;
+        var v1896 : int/*unsigned long*/ = o.videoWidth;
+        var v1897 : int/*unsigned long*/ = o.videoHeight;
+        var v1898 : string/*DOMString*/ = o.poster;
     } // HTMLVideoElement
 
 
@@ -2546,349 +2538,349 @@ class _Test extends TestCase {
 
 
     function compile_HTMLSourceElement(o : HTMLSourceElement) : void {
-        var v1907 : string/*DOMString*/ = o.src;
-        var v1908 : string/*DOMString*/ = o.type;
-        var v1909 : string/*DOMString*/ = o.media;
+        var v1899 : string/*DOMString*/ = o.src;
+        var v1900 : string/*DOMString*/ = o.type;
+        var v1901 : string/*DOMString*/ = o.media;
     } // HTMLSourceElement
 
 
     function compile_HTMLTrackElement(o : HTMLTrackElement) : void {
-        var v1910 : string/*DOMString*/ = o.kind;
-        var v1911 : string/*DOMString*/ = o.src;
-        var v1912 : string/*DOMString*/ = o.srclang;
-        var v1913 : string/*DOMString*/ = o.label;
-        var v1914 : boolean = o.default;
-        var v1915 : int/*unsigned short*/ = HTMLTrackElement.NONE;
-        var v1916 : int/*unsigned short*/ = o.NONE;
-        var v1917 : int/*unsigned short*/ = HTMLTrackElement.LOADING;
-        var v1918 : int/*unsigned short*/ = o.LOADING;
-        var v1919 : int/*unsigned short*/ = HTMLTrackElement.LOADED;
-        var v1920 : int/*unsigned short*/ = o.LOADED;
-        var v1921 : int/*unsigned short*/ = HTMLTrackElement.ERROR;
-        var v1922 : int/*unsigned short*/ = o.ERROR;
-        var v1923 : int/*unsigned short*/ = o.readyState;
-        var v1924 : TextTrack = o.track;
+        var v1902 : string/*DOMString*/ = o.kind;
+        var v1903 : string/*DOMString*/ = o.src;
+        var v1904 : string/*DOMString*/ = o.srclang;
+        var v1905 : string/*DOMString*/ = o.label;
+        var v1906 : boolean = o.default;
+        var v1907 : int/*unsigned short*/ = HTMLTrackElement.NONE;
+        var v1908 : int/*unsigned short*/ = o.NONE;
+        var v1909 : int/*unsigned short*/ = HTMLTrackElement.LOADING;
+        var v1910 : int/*unsigned short*/ = o.LOADING;
+        var v1911 : int/*unsigned short*/ = HTMLTrackElement.LOADED;
+        var v1912 : int/*unsigned short*/ = o.LOADED;
+        var v1913 : int/*unsigned short*/ = HTMLTrackElement.ERROR;
+        var v1914 : int/*unsigned short*/ = o.ERROR;
+        var v1915 : int/*unsigned short*/ = o.readyState;
+        var v1916 : TextTrack = o.track;
     } // HTMLTrackElement
 
 
     function compile_HTMLMediaElement(o : HTMLMediaElement) : void {
-        var v1925 : MediaError = o.error;
-        var v1926 : string/*DOMString*/ = o.src;
-        var v1927 : string/*DOMString*/ = o.currentSrc;
-        var v1928 : string/*DOMString*/ = o.crossOrigin;
-        var v1929 : int/*unsigned short*/ = HTMLMediaElement.NETWORK_EMPTY;
-        var v1930 : int/*unsigned short*/ = o.NETWORK_EMPTY;
-        var v1931 : int/*unsigned short*/ = HTMLMediaElement.NETWORK_IDLE;
-        var v1932 : int/*unsigned short*/ = o.NETWORK_IDLE;
-        var v1933 : int/*unsigned short*/ = HTMLMediaElement.NETWORK_LOADING;
-        var v1934 : int/*unsigned short*/ = o.NETWORK_LOADING;
-        var v1935 : int/*unsigned short*/ = HTMLMediaElement.NETWORK_NO_SOURCE;
-        var v1936 : int/*unsigned short*/ = o.NETWORK_NO_SOURCE;
-        var v1937 : int/*unsigned short*/ = o.networkState;
-        var v1938 : string/*DOMString*/ = o.preload;
-        var v1939 : TimeRanges = o.buffered;
+        var v1917 : MediaError = o.error;
+        var v1918 : string/*DOMString*/ = o.src;
+        var v1919 : string/*DOMString*/ = o.currentSrc;
+        var v1920 : string/*DOMString*/ = o.crossOrigin;
+        var v1921 : int/*unsigned short*/ = HTMLMediaElement.NETWORK_EMPTY;
+        var v1922 : int/*unsigned short*/ = o.NETWORK_EMPTY;
+        var v1923 : int/*unsigned short*/ = HTMLMediaElement.NETWORK_IDLE;
+        var v1924 : int/*unsigned short*/ = o.NETWORK_IDLE;
+        var v1925 : int/*unsigned short*/ = HTMLMediaElement.NETWORK_LOADING;
+        var v1926 : int/*unsigned short*/ = o.NETWORK_LOADING;
+        var v1927 : int/*unsigned short*/ = HTMLMediaElement.NETWORK_NO_SOURCE;
+        var v1928 : int/*unsigned short*/ = o.NETWORK_NO_SOURCE;
+        var v1929 : int/*unsigned short*/ = o.networkState;
+        var v1930 : string/*DOMString*/ = o.preload;
+        var v1931 : TimeRanges = o.buffered;
         o.load();
-        var f1940 : string/*DOMString*/ = o.canPlayType(X.getstring());
-        var v1941 : int/*unsigned short*/ = HTMLMediaElement.HAVE_NOTHING;
-        var v1942 : int/*unsigned short*/ = o.HAVE_NOTHING;
-        var v1943 : int/*unsigned short*/ = HTMLMediaElement.HAVE_METADATA;
-        var v1944 : int/*unsigned short*/ = o.HAVE_METADATA;
-        var v1945 : int/*unsigned short*/ = HTMLMediaElement.HAVE_CURRENT_DATA;
-        var v1946 : int/*unsigned short*/ = o.HAVE_CURRENT_DATA;
-        var v1947 : int/*unsigned short*/ = HTMLMediaElement.HAVE_FUTURE_DATA;
-        var v1948 : int/*unsigned short*/ = o.HAVE_FUTURE_DATA;
-        var v1949 : int/*unsigned short*/ = HTMLMediaElement.HAVE_ENOUGH_DATA;
-        var v1950 : int/*unsigned short*/ = o.HAVE_ENOUGH_DATA;
-        var v1951 : int/*unsigned short*/ = o.readyState;
-        var v1952 : boolean = o.seeking;
-        var v1953 : number/*double*/ = o.currentTime;
-        var v1954 : number/*double*/ = o.initialTime;
-        var v1955 : number/*double*/ = o.duration;
-        var v1956 : Date = o.startOffsetTime;
-        var v1957 : boolean = o.paused;
-        var v1958 : number/*double*/ = o.defaultPlaybackRate;
-        var v1959 : number/*double*/ = o.playbackRate;
-        var v1960 : TimeRanges = o.played;
-        var v1961 : TimeRanges = o.seekable;
-        var v1962 : boolean = o.ended;
-        var v1963 : boolean = o.autoplay;
-        var v1964 : boolean = o.loop;
+        var f1932 : string/*DOMString*/ = o.canPlayType(X.getstring());
+        var v1933 : int/*unsigned short*/ = HTMLMediaElement.HAVE_NOTHING;
+        var v1934 : int/*unsigned short*/ = o.HAVE_NOTHING;
+        var v1935 : int/*unsigned short*/ = HTMLMediaElement.HAVE_METADATA;
+        var v1936 : int/*unsigned short*/ = o.HAVE_METADATA;
+        var v1937 : int/*unsigned short*/ = HTMLMediaElement.HAVE_CURRENT_DATA;
+        var v1938 : int/*unsigned short*/ = o.HAVE_CURRENT_DATA;
+        var v1939 : int/*unsigned short*/ = HTMLMediaElement.HAVE_FUTURE_DATA;
+        var v1940 : int/*unsigned short*/ = o.HAVE_FUTURE_DATA;
+        var v1941 : int/*unsigned short*/ = HTMLMediaElement.HAVE_ENOUGH_DATA;
+        var v1942 : int/*unsigned short*/ = o.HAVE_ENOUGH_DATA;
+        var v1943 : int/*unsigned short*/ = o.readyState;
+        var v1944 : boolean = o.seeking;
+        var v1945 : number/*double*/ = o.currentTime;
+        var v1946 : number/*double*/ = o.initialTime;
+        var v1947 : number/*double*/ = o.duration;
+        var v1948 : Date = o.startOffsetTime;
+        var v1949 : boolean = o.paused;
+        var v1950 : number/*double*/ = o.defaultPlaybackRate;
+        var v1951 : number/*double*/ = o.playbackRate;
+        var v1952 : TimeRanges = o.played;
+        var v1953 : TimeRanges = o.seekable;
+        var v1954 : boolean = o.ended;
+        var v1955 : boolean = o.autoplay;
+        var v1956 : boolean = o.loop;
         o.play();
         o.pause();
-        var v1965 : string/*DOMString*/ = o.mediaGroup;
-        var v1966 : MediaController = o.controller;
-        var v1967 : boolean = o.controls;
-        var v1968 : number/*double*/ = o.volume;
-        var v1969 : boolean = o.muted;
-        var v1970 : boolean = o.defaultMuted;
-        var v1971 : AudioTrackList = o.audioTracks;
-        var v1972 : VideoTrackList = o.videoTracks;
-        var v1973 : TextTrackList = o.textTracks;
-        var f1974 : TextTrack = o.addTextTrack(X.getstring());
-        var f1975 : TextTrack = o.addTextTrack(X.getstring(), X.getstring());
-        var f1976 : TextTrack = o.addTextTrack(X.getstring(), X.getstring(), X.getstring());
+        var v1957 : string/*DOMString*/ = o.mediaGroup;
+        var v1958 : MediaController = o.controller;
+        var v1959 : boolean = o.controls;
+        var v1960 : number/*double*/ = o.volume;
+        var v1961 : boolean = o.muted;
+        var v1962 : boolean = o.defaultMuted;
+        var v1963 : AudioTrackList = o.audioTracks;
+        var v1964 : VideoTrackList = o.videoTracks;
+        var v1965 : TextTrackList = o.textTracks;
+        var f1966 : TextTrack = o.addTextTrack(X.getstring());
+        var f1967 : TextTrack = o.addTextTrack(X.getstring(), X.getstring());
+        var f1968 : TextTrack = o.addTextTrack(X.getstring(), X.getstring(), X.getstring());
     } // HTMLMediaElement
 
 
     function compile_MediaError(o : MediaError) : void {
-        var v1977 : int/*unsigned short*/ = MediaError.MEDIA_ERR_ABORTED;
-        var v1978 : int/*unsigned short*/ = o.MEDIA_ERR_ABORTED;
-        var v1979 : int/*unsigned short*/ = MediaError.MEDIA_ERR_NETWORK;
-        var v1980 : int/*unsigned short*/ = o.MEDIA_ERR_NETWORK;
-        var v1981 : int/*unsigned short*/ = MediaError.MEDIA_ERR_DECODE;
-        var v1982 : int/*unsigned short*/ = o.MEDIA_ERR_DECODE;
-        var v1983 : int/*unsigned short*/ = MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED;
-        var v1984 : int/*unsigned short*/ = o.MEDIA_ERR_SRC_NOT_SUPPORTED;
-        var v1985 : int/*unsigned short*/ = o.code;
+        var v1969 : int/*unsigned short*/ = MediaError.MEDIA_ERR_ABORTED;
+        var v1970 : int/*unsigned short*/ = o.MEDIA_ERR_ABORTED;
+        var v1971 : int/*unsigned short*/ = MediaError.MEDIA_ERR_NETWORK;
+        var v1972 : int/*unsigned short*/ = o.MEDIA_ERR_NETWORK;
+        var v1973 : int/*unsigned short*/ = MediaError.MEDIA_ERR_DECODE;
+        var v1974 : int/*unsigned short*/ = o.MEDIA_ERR_DECODE;
+        var v1975 : int/*unsigned short*/ = MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED;
+        var v1976 : int/*unsigned short*/ = o.MEDIA_ERR_SRC_NOT_SUPPORTED;
+        var v1977 : int/*unsigned short*/ = o.code;
     } // MediaError
 
 
     function compile_AudioTrackList(o : AudioTrackList) : void {
-        var v1986 : int/*unsigned long*/ = o.length;
-        var f1987 : MayBeUndefined.<AudioTrack> = o.__native_index_operator__(X.getint());
-        var f1988 : AudioTrack = o.getTrackById(X.getstring());
-        var v1989 : function(:Event):void/*Function?*/ = o.onchange;
-        var v1990 : function(:Event):void/*Function?*/ = o.onaddtrack;
+        var v1978 : int/*unsigned long*/ = o.length;
+        var f1979 : MayBeUndefined.<AudioTrack> = o.__native_index_operator__(X.getint());
+        var f1980 : AudioTrack = o.getTrackById(X.getstring());
+        var v1981 : function(:Event):void/*Function?*/ = o.onchange;
+        var v1982 : function(:Event):void/*Function?*/ = o.onaddtrack;
     } // AudioTrackList
 
 
     function compile_AudioTrack(o : AudioTrack) : void {
-        var v1991 : string/*DOMString*/ = o.id;
-        var v1992 : string/*DOMString*/ = o.kind;
-        var v1993 : string/*DOMString*/ = o.label;
-        var v1994 : string/*DOMString*/ = o.language;
-        var v1995 : boolean = o.enabled;
+        var v1983 : string/*DOMString*/ = o.id;
+        var v1984 : string/*DOMString*/ = o.kind;
+        var v1985 : string/*DOMString*/ = o.label;
+        var v1986 : string/*DOMString*/ = o.language;
+        var v1987 : boolean = o.enabled;
     } // AudioTrack
 
 
     function compile_VideoTrackList(o : VideoTrackList) : void {
-        var v1996 : int/*unsigned long*/ = o.length;
-        var f1997 : MayBeUndefined.<VideoTrack> = o.__native_index_operator__(X.getint());
-        var f1998 : VideoTrack = o.getTrackById(X.getstring());
-        var v1999 : int/*long*/ = o.selectedIndex;
-        var v2000 : function(:Event):void/*Function?*/ = o.onchange;
-        var v2001 : function(:Event):void/*Function?*/ = o.onaddtrack;
+        var v1988 : int/*unsigned long*/ = o.length;
+        var f1989 : MayBeUndefined.<VideoTrack> = o.__native_index_operator__(X.getint());
+        var f1990 : VideoTrack = o.getTrackById(X.getstring());
+        var v1991 : int/*long*/ = o.selectedIndex;
+        var v1992 : function(:Event):void/*Function?*/ = o.onchange;
+        var v1993 : function(:Event):void/*Function?*/ = o.onaddtrack;
     } // VideoTrackList
 
 
     function compile_VideoTrack(o : VideoTrack) : void {
-        var v2002 : string/*DOMString*/ = o.id;
-        var v2003 : string/*DOMString*/ = o.kind;
-        var v2004 : string/*DOMString*/ = o.label;
-        var v2005 : string/*DOMString*/ = o.language;
-        var v2006 : boolean = o.selected;
+        var v1994 : string/*DOMString*/ = o.id;
+        var v1995 : string/*DOMString*/ = o.kind;
+        var v1996 : string/*DOMString*/ = o.label;
+        var v1997 : string/*DOMString*/ = o.language;
+        var v1998 : boolean = o.selected;
     } // VideoTrack
 
 
     function compile_MediaController(o : MediaController) : void {
-        var v2007 : TimeRanges = o.buffered;
-        var v2008 : TimeRanges = o.seekable;
-        var v2009 : number/*double*/ = o.duration;
-        var v2010 : number/*double*/ = o.currentTime;
-        var v2011 : boolean = o.paused;
-        var v2012 : TimeRanges = o.played;
+        var v1999 : TimeRanges = o.buffered;
+        var v2000 : TimeRanges = o.seekable;
+        var v2001 : number/*double*/ = o.duration;
+        var v2002 : number/*double*/ = o.currentTime;
+        var v2003 : boolean = o.paused;
+        var v2004 : TimeRanges = o.played;
         o.play();
         o.pause();
-        var v2013 : number/*double*/ = o.defaultPlaybackRate;
-        var v2014 : number/*double*/ = o.playbackRate;
-        var v2015 : number/*double*/ = o.volume;
-        var v2016 : boolean = o.muted;
-        var v2017 : function(:Event):void/*Function?*/ = o.onemptied;
-        var v2018 : function(:Event):void/*Function?*/ = o.onloadedmetadata;
-        var v2019 : function(:Event):void/*Function?*/ = o.onloadeddata;
-        var v2020 : function(:Event):void/*Function?*/ = o.oncanplay;
-        var v2021 : function(:Event):void/*Function?*/ = o.oncanplaythrough;
-        var v2022 : function(:Event):void/*Function?*/ = o.onplaying;
-        var v2023 : function(:Event):void/*Function?*/ = o.onended;
-        var v2024 : function(:Event):void/*Function?*/ = o.onwaiting;
-        var v2025 : function(:Event):void/*Function?*/ = o.ondurationchange;
-        var v2026 : function(:Event):void/*Function?*/ = o.ontimeupdate;
-        var v2027 : function(:Event):void/*Function?*/ = o.onplay;
-        var v2028 : function(:Event):void/*Function?*/ = o.onpause;
-        var v2029 : function(:Event):void/*Function?*/ = o.onratechange;
-        var v2030 : function(:Event):void/*Function?*/ = o.onvolumechange;
+        var v2005 : number/*double*/ = o.defaultPlaybackRate;
+        var v2006 : number/*double*/ = o.playbackRate;
+        var v2007 : number/*double*/ = o.volume;
+        var v2008 : boolean = o.muted;
+        var v2009 : function(:Event):void/*Function?*/ = o.onemptied;
+        var v2010 : function(:Event):void/*Function?*/ = o.onloadedmetadata;
+        var v2011 : function(:Event):void/*Function?*/ = o.onloadeddata;
+        var v2012 : function(:Event):void/*Function?*/ = o.oncanplay;
+        var v2013 : function(:Event):void/*Function?*/ = o.oncanplaythrough;
+        var v2014 : function(:Event):void/*Function?*/ = o.onplaying;
+        var v2015 : function(:Event):void/*Function?*/ = o.onended;
+        var v2016 : function(:Event):void/*Function?*/ = o.onwaiting;
+        var v2017 : function(:Event):void/*Function?*/ = o.ondurationchange;
+        var v2018 : function(:Event):void/*Function?*/ = o.ontimeupdate;
+        var v2019 : function(:Event):void/*Function?*/ = o.onplay;
+        var v2020 : function(:Event):void/*Function?*/ = o.onpause;
+        var v2021 : function(:Event):void/*Function?*/ = o.onratechange;
+        var v2022 : function(:Event):void/*Function?*/ = o.onvolumechange;
     } // MediaController
 
 
     function compile_TextTrackList(o : TextTrackList) : void {
-        var v2031 : int/*unsigned long*/ = o.length;
-        var f2032 : MayBeUndefined.<TextTrack> = o.__native_index_operator__(X.getint());
-        var v2033 : function(:Event):void/*Function?*/ = o.onaddtrack;
+        var v2023 : int/*unsigned long*/ = o.length;
+        var f2024 : MayBeUndefined.<TextTrack> = o.__native_index_operator__(X.getint());
+        var v2025 : function(:Event):void/*Function?*/ = o.onaddtrack;
     } // TextTrackList
 
 
     function compile_TextTrack(o : TextTrack) : void {
-        var v2034 : string/*DOMString*/ = o.kind;
-        var v2035 : string/*DOMString*/ = o.label;
-        var v2036 : string/*DOMString*/ = o.language;
-        var v2037 : int/*unsigned short*/ = TextTrack.DISABLED;
-        var v2038 : int/*unsigned short*/ = o.DISABLED;
-        var v2039 : int/*unsigned short*/ = TextTrack.HIDDEN;
-        var v2040 : int/*unsigned short*/ = o.HIDDEN;
-        var v2041 : int/*unsigned short*/ = TextTrack.SHOWING;
-        var v2042 : int/*unsigned short*/ = o.SHOWING;
-        var v2043 : int/*unsigned short*/ = o.mode;
-        var v2044 : TextTrackCueList = o.cues;
-        var v2045 : TextTrackCueList = o.activeCues;
+        var v2026 : string/*DOMString*/ = o.kind;
+        var v2027 : string/*DOMString*/ = o.label;
+        var v2028 : string/*DOMString*/ = o.language;
+        var v2029 : int/*unsigned short*/ = TextTrack.DISABLED;
+        var v2030 : int/*unsigned short*/ = o.DISABLED;
+        var v2031 : int/*unsigned short*/ = TextTrack.HIDDEN;
+        var v2032 : int/*unsigned short*/ = o.HIDDEN;
+        var v2033 : int/*unsigned short*/ = TextTrack.SHOWING;
+        var v2034 : int/*unsigned short*/ = o.SHOWING;
+        var v2035 : int/*unsigned short*/ = o.mode;
+        var v2036 : TextTrackCueList = o.cues;
+        var v2037 : TextTrackCueList = o.activeCues;
         o.addCue(X.getTextTrackCue());
         o.removeCue(X.getTextTrackCue());
-        var v2046 : function(:Event):void/*Function?*/ = o.oncuechange;
+        var v2038 : function(:Event):void/*Function?*/ = o.oncuechange;
     } // TextTrack
 
 
     function compile_TextTrackCueList(o : TextTrackCueList) : void {
-        var v2047 : int/*unsigned long*/ = o.length;
-        var f2048 : MayBeUndefined.<TextTrackCue> = o.__native_index_operator__(X.getint());
-        var f2049 : TextTrackCue = o.getCueById(X.getstring());
+        var v2039 : int/*unsigned long*/ = o.length;
+        var f2040 : MayBeUndefined.<TextTrackCue> = o.__native_index_operator__(X.getint());
+        var f2041 : TextTrackCue = o.getCueById(X.getstring());
     } // TextTrackCueList
 
 
     function compile_TextTrackCue(o : TextTrackCue) : void {
-        var v2050 : TextTrack = o.track;
-        var v2051 : string/*DOMString*/ = o.id;
-        var v2052 : number/*double*/ = o.startTime;
-        var v2053 : number/*double*/ = o.endTime;
-        var v2054 : boolean = o.pauseOnExit;
-        var v2055 : string/*DOMString*/ = o.vertical;
-        var v2056 : boolean = o.snapToLines;
-        var v2057 : int/*long*/ = o.line;
-        var v2058 : int/*long*/ = o.position;
-        var v2059 : int/*long*/ = o.size;
-        var v2060 : string/*DOMString*/ = o.align;
-        var v2061 : string/*DOMString*/ = o.text;
-        var f2062 : DocumentFragment = o.getCueAsHTML();
-        var v2063 : function(:Event):void/*Function?*/ = o.onenter;
-        var v2064 : function(:Event):void/*Function?*/ = o.onexit;
+        var v2042 : TextTrack = o.track;
+        var v2043 : string/*DOMString*/ = o.id;
+        var v2044 : number/*double*/ = o.startTime;
+        var v2045 : number/*double*/ = o.endTime;
+        var v2046 : boolean = o.pauseOnExit;
+        var v2047 : string/*DOMString*/ = o.vertical;
+        var v2048 : boolean = o.snapToLines;
+        var v2049 : int/*long*/ = o.line;
+        var v2050 : int/*long*/ = o.position;
+        var v2051 : int/*long*/ = o.size;
+        var v2052 : string/*DOMString*/ = o.align;
+        var v2053 : string/*DOMString*/ = o.text;
+        var f2054 : DocumentFragment = o.getCueAsHTML();
+        var v2055 : function(:Event):void/*Function?*/ = o.onenter;
+        var v2056 : function(:Event):void/*Function?*/ = o.onexit;
     } // TextTrackCue
 
 
     function compile_TimeRanges(o : TimeRanges) : void {
-        var v2065 : int/*unsigned long*/ = o.length;
-        var f2066 : number/*double*/ = o.start(X.getint());
-        var f2067 : number/*double*/ = o.end(X.getint());
+        var v2057 : int/*unsigned long*/ = o.length;
+        var f2058 : number/*double*/ = o.start(X.getint());
+        var f2059 : number/*double*/ = o.end(X.getint());
     } // TimeRanges
 
 
     function compile_TrackEvent(o : TrackEvent) : void {
-        var v2068 : Object/*object?*/ = o.track;
+        var v2060 : Object/*object?*/ = o.track;
     } // TrackEvent
 
 
     function compile_TrackEventInit(o : TrackEventInit) : void {
-        var v2069 : Object/*object?*/ = o.track;
+        var v2061 : Object/*object?*/ = o.track;
     } // TrackEventInit
 
 
     function compile_HTMLCanvasElement(o : HTMLCanvasElement) : void {
-        var v2070 : int/*unsigned long*/ = o.width;
-        var v2071 : int/*unsigned long*/ = o.height;
-        var f2072 : string/*DOMString*/ = o.toDataURL();
-        var f2073 : string/*DOMString*/ = o.toDataURL(X.getstring());
-        var f2074 : string/*DOMString*/ = o.toDataURL(X.getstring(), X.getvariant());
+        var v2062 : int/*unsigned long*/ = o.width;
+        var v2063 : int/*unsigned long*/ = o.height;
+        var f2064 : string/*DOMString*/ = o.toDataURL();
+        var f2065 : string/*DOMString*/ = o.toDataURL(X.getstring());
+        var f2066 : string/*DOMString*/ = o.toDataURL(X.getstring(), X.getvariant());
         o.toBlob(X.getfunction__File__void());
         o.toBlob(X.getfunction__File__void(), X.getstring());
         o.toBlob(X.getfunction__File__void(), X.getstring(), X.getvariant());
-        var f2075 : Object/*object?*/ = o.getContext(X.getstring());
-        var f2076 : Object/*object?*/ = o.getContext(X.getstring(), X.getvariant());
+        var f2067 : Object/*object?*/ = o.getContext(X.getstring());
+        var f2068 : Object/*object?*/ = o.getContext(X.getstring(), X.getvariant());
     } // HTMLCanvasElement
 
 
     function compile_HTMLMapElement(o : HTMLMapElement) : void {
-        var v2077 : string/*DOMString*/ = o.name;
-        var v2078 : HTMLCollection = o.areas;
-        var v2079 : HTMLCollection = o.images;
+        var v2069 : string/*DOMString*/ = o.name;
+        var v2070 : HTMLCollection = o.areas;
+        var v2071 : HTMLCollection = o.images;
     } // HTMLMapElement
 
 
     function compile_HTMLAreaElement(o : HTMLAreaElement) : void {
-        var v2080 : string/*DOMString*/ = o.alt;
-        var v2081 : string/*DOMString*/ = o.coords;
-        var v2082 : string/*DOMString*/ = o.shape;
-        var v2083 : string/*DOMString*/ = o.href;
-        var v2084 : string/*DOMString*/ = o.target;
-        var v2085 : string/*DOMString*/ = o.rel;
-        var v2086 : DOMTokenList = o.relList;
-        var v2087 : string/*DOMString*/ = o.media;
-        var v2088 : string/*DOMString*/ = o.hreflang;
-        var v2089 : string/*DOMString*/ = o.type;
-        var v2090 : string/*DOMString*/ = o.protocol;
-        var v2091 : string/*DOMString*/ = o.host;
-        var v2092 : string/*DOMString*/ = o.hostname;
-        var v2093 : string/*DOMString*/ = o.port;
-        var v2094 : string/*DOMString*/ = o.pathname;
-        var v2095 : string/*DOMString*/ = o.search;
-        var v2096 : string/*DOMString*/ = o.hash;
-        var v2097 : boolean = o.noHref;
+        var v2072 : string/*DOMString*/ = o.alt;
+        var v2073 : string/*DOMString*/ = o.coords;
+        var v2074 : string/*DOMString*/ = o.shape;
+        var v2075 : string/*DOMString*/ = o.href;
+        var v2076 : string/*DOMString*/ = o.target;
+        var v2077 : string/*DOMString*/ = o.rel;
+        var v2078 : DOMTokenList = o.relList;
+        var v2079 : string/*DOMString*/ = o.media;
+        var v2080 : string/*DOMString*/ = o.hreflang;
+        var v2081 : string/*DOMString*/ = o.type;
+        var v2082 : string/*DOMString*/ = o.protocol;
+        var v2083 : string/*DOMString*/ = o.host;
+        var v2084 : string/*DOMString*/ = o.hostname;
+        var v2085 : string/*DOMString*/ = o.port;
+        var v2086 : string/*DOMString*/ = o.pathname;
+        var v2087 : string/*DOMString*/ = o.search;
+        var v2088 : string/*DOMString*/ = o.hash;
+        var v2089 : boolean = o.noHref;
     } // HTMLAreaElement
 
 
     function compile_HTMLTableElement(o : HTMLTableElement) : void {
-        var v2098 : HTMLTableCaptionElement = o.caption;
-        var f2099 : HTMLElement = o.createCaption();
+        var v2090 : HTMLTableCaptionElement = o.caption;
+        var f2091 : HTMLElement = o.createCaption();
         o.deleteCaption();
-        var v2100 : HTMLTableSectionElement = o.tHead;
-        var f2101 : HTMLElement = o.createTHead();
+        var v2092 : HTMLTableSectionElement = o.tHead;
+        var f2093 : HTMLElement = o.createTHead();
         o.deleteTHead();
-        var v2102 : HTMLTableSectionElement = o.tFoot;
-        var f2103 : HTMLElement = o.createTFoot();
+        var v2094 : HTMLTableSectionElement = o.tFoot;
+        var f2095 : HTMLElement = o.createTFoot();
         o.deleteTFoot();
-        var v2104 : HTMLCollection = o.tBodies;
-        var f2105 : HTMLElement = o.createTBody();
-        var v2106 : HTMLCollection = o.rows;
-        var f2107 : HTMLElement = o.insertRow();
-        var f2108 : HTMLElement = o.insertRow(X.getint());
+        var v2096 : HTMLCollection = o.tBodies;
+        var f2097 : HTMLElement = o.createTBody();
+        var v2098 : HTMLCollection = o.rows;
+        var f2099 : HTMLElement = o.insertRow();
+        var f2100 : HTMLElement = o.insertRow(X.getint());
         o.deleteRow(X.getint());
-        var v2109 : string/*DOMString*/ = o.border;
-        var v2110 : string/*DOMString*/ = o.align;
-        var v2111 : string/*DOMString*/ = o.frame;
-        var v2112 : string/*DOMString*/ = o.rules;
-        var v2113 : string/*DOMString*/ = o.summary;
-        var v2114 : string/*DOMString*/ = o.width;
-        var v2115 : string/*DOMString*/ = o.bgColor;
-        var v2116 : string/*DOMString*/ = o.cellPadding;
-        var v2117 : string/*DOMString*/ = o.cellSpacing;
+        var v2101 : string/*DOMString*/ = o.border;
+        var v2102 : string/*DOMString*/ = o.align;
+        var v2103 : string/*DOMString*/ = o.frame;
+        var v2104 : string/*DOMString*/ = o.rules;
+        var v2105 : string/*DOMString*/ = o.summary;
+        var v2106 : string/*DOMString*/ = o.width;
+        var v2107 : string/*DOMString*/ = o.bgColor;
+        var v2108 : string/*DOMString*/ = o.cellPadding;
+        var v2109 : string/*DOMString*/ = o.cellSpacing;
     } // HTMLTableElement
 
 
     function compile_HTMLTableCaptionElement(o : HTMLTableCaptionElement) : void {
-        var v2118 : string/*DOMString*/ = o.align;
+        var v2110 : string/*DOMString*/ = o.align;
     } // HTMLTableCaptionElement
 
 
     function compile_HTMLTableColElement(o : HTMLTableColElement) : void {
-        var v2119 : int/*unsigned long*/ = o.span;
-        var v2120 : string/*DOMString*/ = o.align;
-        var v2121 : string/*DOMString*/ = o.ch;
-        var v2122 : string/*DOMString*/ = o.chOff;
-        var v2123 : string/*DOMString*/ = o.vAlign;
-        var v2124 : string/*DOMString*/ = o.width;
+        var v2111 : int/*unsigned long*/ = o.span;
+        var v2112 : string/*DOMString*/ = o.align;
+        var v2113 : string/*DOMString*/ = o.ch;
+        var v2114 : string/*DOMString*/ = o.chOff;
+        var v2115 : string/*DOMString*/ = o.vAlign;
+        var v2116 : string/*DOMString*/ = o.width;
     } // HTMLTableColElement
 
 
     function compile_HTMLTableSectionElement(o : HTMLTableSectionElement) : void {
-        var v2125 : HTMLCollection = o.rows;
-        var f2126 : HTMLElement = o.insertRow();
-        var f2127 : HTMLElement = o.insertRow(X.getint());
+        var v2117 : HTMLCollection = o.rows;
+        var f2118 : HTMLElement = o.insertRow();
+        var f2119 : HTMLElement = o.insertRow(X.getint());
         o.deleteRow(X.getint());
-        var v2128 : string/*DOMString*/ = o.align;
-        var v2129 : string/*DOMString*/ = o.ch;
-        var v2130 : string/*DOMString*/ = o.chOff;
-        var v2131 : string/*DOMString*/ = o.vAlign;
+        var v2120 : string/*DOMString*/ = o.align;
+        var v2121 : string/*DOMString*/ = o.ch;
+        var v2122 : string/*DOMString*/ = o.chOff;
+        var v2123 : string/*DOMString*/ = o.vAlign;
     } // HTMLTableSectionElement
 
 
     function compile_HTMLTableRowElement(o : HTMLTableRowElement) : void {
-        var v2132 : int/*long*/ = o.rowIndex;
-        var v2133 : int/*long*/ = o.sectionRowIndex;
-        var v2134 : HTMLCollection = o.cells;
-        var f2135 : HTMLElement = o.insertCell();
-        var f2136 : HTMLElement = o.insertCell(X.getint());
+        var v2124 : int/*long*/ = o.rowIndex;
+        var v2125 : int/*long*/ = o.sectionRowIndex;
+        var v2126 : HTMLCollection = o.cells;
+        var f2127 : HTMLElement = o.insertCell();
+        var f2128 : HTMLElement = o.insertCell(X.getint());
         o.deleteCell(X.getint());
-        var v2137 : string/*DOMString*/ = o.align;
-        var v2138 : string/*DOMString*/ = o.ch;
-        var v2139 : string/*DOMString*/ = o.chOff;
-        var v2140 : string/*DOMString*/ = o.vAlign;
-        var v2141 : string/*DOMString*/ = o.bgColor;
+        var v2129 : string/*DOMString*/ = o.align;
+        var v2130 : string/*DOMString*/ = o.ch;
+        var v2131 : string/*DOMString*/ = o.chOff;
+        var v2132 : string/*DOMString*/ = o.vAlign;
+        var v2133 : string/*DOMString*/ = o.bgColor;
     } // HTMLTableRowElement
 
 
@@ -2897,168 +2889,168 @@ class _Test extends TestCase {
 
 
     function compile_HTMLTableHeaderCellElement(o : HTMLTableHeaderCellElement) : void {
-        var v2142 : string/*DOMString*/ = o.scope;
+        var v2134 : string/*DOMString*/ = o.scope;
     } // HTMLTableHeaderCellElement
 
 
     function compile_HTMLTableCellElement(o : HTMLTableCellElement) : void {
-        var v2143 : int/*unsigned long*/ = o.colSpan;
-        var v2144 : int/*unsigned long*/ = o.rowSpan;
-        var v2145 : DOMSettableTokenList = o.headers;
-        var v2146 : int/*long*/ = o.cellIndex;
-        var v2147 : string/*DOMString*/ = o.abbr;
-        var v2148 : string/*DOMString*/ = o.align;
-        var v2149 : string/*DOMString*/ = o.axis;
-        var v2150 : string/*DOMString*/ = o.height;
-        var v2151 : string/*DOMString*/ = o.width;
-        var v2152 : string/*DOMString*/ = o.ch;
-        var v2153 : string/*DOMString*/ = o.chOff;
-        var v2154 : boolean = o.noWrap;
-        var v2155 : string/*DOMString*/ = o.vAlign;
-        var v2156 : string/*DOMString*/ = o.bgColor;
+        var v2135 : int/*unsigned long*/ = o.colSpan;
+        var v2136 : int/*unsigned long*/ = o.rowSpan;
+        var v2137 : DOMSettableTokenList = o.headers;
+        var v2138 : int/*long*/ = o.cellIndex;
+        var v2139 : string/*DOMString*/ = o.abbr;
+        var v2140 : string/*DOMString*/ = o.align;
+        var v2141 : string/*DOMString*/ = o.axis;
+        var v2142 : string/*DOMString*/ = o.height;
+        var v2143 : string/*DOMString*/ = o.width;
+        var v2144 : string/*DOMString*/ = o.ch;
+        var v2145 : string/*DOMString*/ = o.chOff;
+        var v2146 : boolean = o.noWrap;
+        var v2147 : string/*DOMString*/ = o.vAlign;
+        var v2148 : string/*DOMString*/ = o.bgColor;
     } // HTMLTableCellElement
 
 
     function compile_HTMLFormElement(o : HTMLFormElement) : void {
-        var v2157 : string/*DOMString*/ = o.acceptCharset;
-        var v2158 : string/*DOMString*/ = o.action;
-        var v2159 : string/*DOMString*/ = o.autocomplete;
-        var v2160 : string/*DOMString*/ = o.enctype;
-        var v2161 : string/*DOMString*/ = o.encoding;
-        var v2162 : string/*DOMString*/ = o.method;
-        var v2163 : string/*DOMString*/ = o.name;
-        var v2164 : boolean = o.noValidate;
-        var v2165 : string/*DOMString*/ = o.target;
-        var v2166 : HTMLFormControlsCollection = o.elements;
-        var v2167 : int/*long*/ = o.length;
-        var f2168 : MayBeUndefined.<Element> = o.__native_index_operator__(X.getint());
-        var f2169 : MayBeUndefined.<Object/*object*/> = o.__native_index_operator__(X.getstring());
+        var v2149 : string/*DOMString*/ = o.acceptCharset;
+        var v2150 : string/*DOMString*/ = o.action;
+        var v2151 : string/*DOMString*/ = o.autocomplete;
+        var v2152 : string/*DOMString*/ = o.enctype;
+        var v2153 : string/*DOMString*/ = o.encoding;
+        var v2154 : string/*DOMString*/ = o.method;
+        var v2155 : string/*DOMString*/ = o.name;
+        var v2156 : boolean = o.noValidate;
+        var v2157 : string/*DOMString*/ = o.target;
+        var v2158 : HTMLFormControlsCollection = o.elements;
+        var v2159 : int/*long*/ = o.length;
+        var f2160 : MayBeUndefined.<Element> = o.__native_index_operator__(X.getint());
+        var f2161 : MayBeUndefined.<Object/*object*/> = o.__native_index_operator__(X.getstring());
         o.submit();
         o.reset();
-        var f2170 : boolean = o.checkValidity();
+        var f2162 : boolean = o.checkValidity();
     } // HTMLFormElement
 
 
     function compile_HTMLFieldSetElement(o : HTMLFieldSetElement) : void {
-        var v2171 : boolean = o.disabled;
-        var v2172 : HTMLFormElement = o.form;
-        var v2173 : string/*DOMString*/ = o.name;
-        var v2174 : string/*DOMString*/ = o.type;
-        var v2175 : HTMLFormControlsCollection = o.elements;
-        var v2176 : boolean = o.willValidate;
-        var v2177 : ValidityState = o.validity;
-        var v2178 : string/*DOMString*/ = o.validationMessage;
-        var f2179 : boolean = o.checkValidity();
+        var v2163 : boolean = o.disabled;
+        var v2164 : HTMLFormElement = o.form;
+        var v2165 : string/*DOMString*/ = o.name;
+        var v2166 : string/*DOMString*/ = o.type;
+        var v2167 : HTMLFormControlsCollection = o.elements;
+        var v2168 : boolean = o.willValidate;
+        var v2169 : ValidityState = o.validity;
+        var v2170 : string/*DOMString*/ = o.validationMessage;
+        var f2171 : boolean = o.checkValidity();
         o.setCustomValidity(X.getstring());
     } // HTMLFieldSetElement
 
 
     function compile_HTMLLegendElement(o : HTMLLegendElement) : void {
-        var v2180 : HTMLFormElement = o.form;
-        var v2181 : string/*DOMString*/ = o.align;
+        var v2172 : HTMLFormElement = o.form;
+        var v2173 : string/*DOMString*/ = o.align;
     } // HTMLLegendElement
 
 
     function compile_HTMLLabelElement(o : HTMLLabelElement) : void {
-        var v2182 : HTMLFormElement = o.form;
-        var v2183 : string/*DOMString*/ = o.htmlFor;
-        var v2184 : HTMLElement = o.control;
+        var v2174 : HTMLFormElement = o.form;
+        var v2175 : string/*DOMString*/ = o.htmlFor;
+        var v2176 : HTMLElement = o.control;
     } // HTMLLabelElement
 
 
     function compile_HTMLInputElement(o : HTMLInputElement) : void {
-        var v2185 : string/*DOMString*/ = o.accept;
-        var v2186 : string/*DOMString*/ = o.alt;
-        var v2187 : string/*DOMString*/ = o.autocomplete;
-        var v2188 : boolean = o.autofocus;
-        var v2189 : boolean = o.defaultChecked;
-        var v2190 : boolean = o.checked;
-        var v2191 : string/*DOMString*/ = o.dirName;
-        var v2192 : boolean = o.disabled;
-        var v2193 : HTMLFormElement = o.form;
-        var v2194 : FileList = o.files;
-        var v2195 : string/*DOMString*/ = o.formAction;
-        var v2196 : string/*DOMString*/ = o.formEnctype;
-        var v2197 : string/*DOMString*/ = o.formMethod;
-        var v2198 : boolean = o.formNoValidate;
-        var v2199 : string/*DOMString*/ = o.formTarget;
-        var v2200 : int/*unsigned long*/ = o.height;
-        var v2201 : boolean = o.indeterminate;
-        var v2202 : HTMLElement = o.list;
-        var v2203 : string/*DOMString*/ = o.max;
-        var v2204 : int/*long*/ = o.maxLength;
-        var v2205 : string/*DOMString*/ = o.min;
-        var v2206 : boolean = o.multiple;
-        var v2207 : string/*DOMString*/ = o.name;
-        var v2208 : string/*DOMString*/ = o.pattern;
-        var v2209 : string/*DOMString*/ = o.placeholder;
-        var v2210 : boolean = o.readOnly;
-        var v2211 : boolean = o.required;
-        var v2212 : int/*unsigned long*/ = o.size;
-        var v2213 : string/*DOMString*/ = o.src;
-        var v2214 : string/*DOMString*/ = o.step;
-        var v2215 : string/*DOMString*/ = o.type;
-        var v2216 : string/*DOMString*/ = o.defaultValue;
-        var v2217 : string/*DOMString*/ = o.value;
-        var v2218 : Date = o.valueAsDate;
-        var v2219 : number/*double*/ = o.valueAsNumber;
-        var v2220 : int/*unsigned long*/ = o.width;
+        var v2177 : string/*DOMString*/ = o.accept;
+        var v2178 : string/*DOMString*/ = o.alt;
+        var v2179 : string/*DOMString*/ = o.autocomplete;
+        var v2180 : boolean = o.autofocus;
+        var v2181 : boolean = o.defaultChecked;
+        var v2182 : boolean = o.checked;
+        var v2183 : string/*DOMString*/ = o.dirName;
+        var v2184 : boolean = o.disabled;
+        var v2185 : HTMLFormElement = o.form;
+        var v2186 : FileList = o.files;
+        var v2187 : string/*DOMString*/ = o.formAction;
+        var v2188 : string/*DOMString*/ = o.formEnctype;
+        var v2189 : string/*DOMString*/ = o.formMethod;
+        var v2190 : boolean = o.formNoValidate;
+        var v2191 : string/*DOMString*/ = o.formTarget;
+        var v2192 : int/*unsigned long*/ = o.height;
+        var v2193 : boolean = o.indeterminate;
+        var v2194 : HTMLElement = o.list;
+        var v2195 : string/*DOMString*/ = o.max;
+        var v2196 : int/*long*/ = o.maxLength;
+        var v2197 : string/*DOMString*/ = o.min;
+        var v2198 : boolean = o.multiple;
+        var v2199 : string/*DOMString*/ = o.name;
+        var v2200 : string/*DOMString*/ = o.pattern;
+        var v2201 : string/*DOMString*/ = o.placeholder;
+        var v2202 : boolean = o.readOnly;
+        var v2203 : boolean = o.required;
+        var v2204 : int/*unsigned long*/ = o.size;
+        var v2205 : string/*DOMString*/ = o.src;
+        var v2206 : string/*DOMString*/ = o.step;
+        var v2207 : string/*DOMString*/ = o.type;
+        var v2208 : string/*DOMString*/ = o.defaultValue;
+        var v2209 : string/*DOMString*/ = o.value;
+        var v2210 : Date = o.valueAsDate;
+        var v2211 : number/*double*/ = o.valueAsNumber;
+        var v2212 : int/*unsigned long*/ = o.width;
         o.stepUp();
         o.stepUp(X.getint());
         o.stepDown();
         o.stepDown(X.getint());
-        var v2221 : boolean = o.willValidate;
-        var v2222 : ValidityState = o.validity;
-        var v2223 : string/*DOMString*/ = o.validationMessage;
-        var f2224 : boolean = o.checkValidity();
+        var v2213 : boolean = o.willValidate;
+        var v2214 : ValidityState = o.validity;
+        var v2215 : string/*DOMString*/ = o.validationMessage;
+        var f2216 : boolean = o.checkValidity();
         o.setCustomValidity(X.getstring());
-        var v2225 : NodeList = o.labels;
+        var v2217 : NodeList = o.labels;
         o.select();
-        var v2226 : int/*unsigned long*/ = o.selectionStart;
-        var v2227 : int/*unsigned long*/ = o.selectionEnd;
-        var v2228 : string/*DOMString*/ = o.selectionDirection;
+        var v2218 : int/*unsigned long*/ = o.selectionStart;
+        var v2219 : int/*unsigned long*/ = o.selectionEnd;
+        var v2220 : string/*DOMString*/ = o.selectionDirection;
         o.setSelectionRange(X.getint(), X.getint());
         o.setSelectionRange(X.getint(), X.getint(), X.getstring());
-        var v2229 : string/*DOMString*/ = o.align;
-        var v2230 : string/*DOMString*/ = o.useMap;
+        var v2221 : string/*DOMString*/ = o.align;
+        var v2222 : string/*DOMString*/ = o.useMap;
     } // HTMLInputElement
 
 
     function compile_HTMLButtonElement(o : HTMLButtonElement) : void {
-        var v2231 : boolean = o.autofocus;
-        var v2232 : boolean = o.disabled;
-        var v2233 : HTMLFormElement = o.form;
-        var v2234 : string/*DOMString*/ = o.formAction;
-        var v2235 : string/*DOMString*/ = o.formEnctype;
-        var v2236 : string/*DOMString*/ = o.formMethod;
-        var v2237 : boolean = o.formNoValidate;
-        var v2238 : string/*DOMString*/ = o.formTarget;
-        var v2239 : string/*DOMString*/ = o.name;
-        var v2240 : string/*DOMString*/ = o.type;
-        var v2241 : string/*DOMString*/ = o.value;
-        var v2242 : boolean = o.willValidate;
-        var v2243 : ValidityState = o.validity;
-        var v2244 : string/*DOMString*/ = o.validationMessage;
-        var f2245 : boolean = o.checkValidity();
+        var v2223 : boolean = o.autofocus;
+        var v2224 : boolean = o.disabled;
+        var v2225 : HTMLFormElement = o.form;
+        var v2226 : string/*DOMString*/ = o.formAction;
+        var v2227 : string/*DOMString*/ = o.formEnctype;
+        var v2228 : string/*DOMString*/ = o.formMethod;
+        var v2229 : boolean = o.formNoValidate;
+        var v2230 : string/*DOMString*/ = o.formTarget;
+        var v2231 : string/*DOMString*/ = o.name;
+        var v2232 : string/*DOMString*/ = o.type;
+        var v2233 : string/*DOMString*/ = o.value;
+        var v2234 : boolean = o.willValidate;
+        var v2235 : ValidityState = o.validity;
+        var v2236 : string/*DOMString*/ = o.validationMessage;
+        var f2237 : boolean = o.checkValidity();
         o.setCustomValidity(X.getstring());
-        var v2246 : NodeList = o.labels;
+        var v2238 : NodeList = o.labels;
     } // HTMLButtonElement
 
 
     function compile_HTMLSelectElement(o : HTMLSelectElement) : void {
-        var v2247 : boolean = o.autofocus;
-        var v2248 : boolean = o.disabled;
-        var v2249 : HTMLFormElement = o.form;
-        var v2250 : boolean = o.multiple;
-        var v2251 : string/*DOMString*/ = o.name;
-        var v2252 : boolean = o.required;
-        var v2253 : int/*unsigned long*/ = o.size;
-        var v2254 : string/*DOMString*/ = o.type;
-        var v2255 : HTMLOptionsCollection = o.options;
-        var v2256 : int/*unsigned long*/ = o.length;
-        var f2257 : MayBeUndefined.<Element> = o.__native_index_operator__(X.getint());
-        var f2258 : MayBeUndefined.<Element> = o.item(X.getint());
-        var f2259 : Object/*object*/ = o.namedItem(X.getstring());
+        var v2239 : boolean = o.autofocus;
+        var v2240 : boolean = o.disabled;
+        var v2241 : HTMLFormElement = o.form;
+        var v2242 : boolean = o.multiple;
+        var v2243 : string/*DOMString*/ = o.name;
+        var v2244 : boolean = o.required;
+        var v2245 : int/*unsigned long*/ = o.size;
+        var v2246 : string/*DOMString*/ = o.type;
+        var v2247 : HTMLOptionsCollection = o.options;
+        var v2248 : int/*unsigned long*/ = o.length;
+        var f2249 : MayBeUndefined.<Element> = o.__native_index_operator__(X.getint());
+        var f2250 : MayBeUndefined.<Element> = o.item(X.getint());
+        var f2251 : Object/*object*/ = o.namedItem(X.getstring());
         o.add(X.getHTMLOptionElement());
         o.add(X.getHTMLOptionElement(), X.getHTMLElement());
         o.add(X.getHTMLOptionElement());
@@ -3068,169 +3060,169 @@ class _Test extends TestCase {
         o.add(X.getHTMLOptGroupElement());
         o.add(X.getHTMLOptGroupElement(), X.getint());
         o.remove(X.getint());
-        var v2260 : HTMLCollection = o.selectedOptions;
-        var v2261 : int/*long*/ = o.selectedIndex;
-        var v2262 : string/*DOMString*/ = o.value;
-        var v2263 : boolean = o.willValidate;
-        var v2264 : ValidityState = o.validity;
-        var v2265 : string/*DOMString*/ = o.validationMessage;
-        var f2266 : boolean = o.checkValidity();
+        var v2252 : HTMLCollection = o.selectedOptions;
+        var v2253 : int/*long*/ = o.selectedIndex;
+        var v2254 : string/*DOMString*/ = o.value;
+        var v2255 : boolean = o.willValidate;
+        var v2256 : ValidityState = o.validity;
+        var v2257 : string/*DOMString*/ = o.validationMessage;
+        var f2258 : boolean = o.checkValidity();
         o.setCustomValidity(X.getstring());
-        var v2267 : NodeList = o.labels;
+        var v2259 : NodeList = o.labels;
     } // HTMLSelectElement
 
 
     function compile_HTMLDataListElement(o : HTMLDataListElement) : void {
-        var v2268 : HTMLCollection = o.options;
+        var v2260 : HTMLCollection = o.options;
     } // HTMLDataListElement
 
 
     function compile_HTMLOptGroupElement(o : HTMLOptGroupElement) : void {
-        var v2269 : boolean = o.disabled;
-        var v2270 : string/*DOMString*/ = o.label;
+        var v2261 : boolean = o.disabled;
+        var v2262 : string/*DOMString*/ = o.label;
     } // HTMLOptGroupElement
 
 
     function compile_HTMLOptionElement(o : HTMLOptionElement) : void {
-        var v2271 : boolean = o.disabled;
-        var v2272 : HTMLFormElement = o.form;
-        var v2273 : string/*DOMString*/ = o.label;
-        var v2274 : boolean = o.defaultSelected;
-        var v2275 : boolean = o.selected;
-        var v2276 : string/*DOMString*/ = o.value;
-        var v2277 : string/*DOMString*/ = o.text;
-        var v2278 : int/*long*/ = o.index;
+        var v2263 : boolean = o.disabled;
+        var v2264 : HTMLFormElement = o.form;
+        var v2265 : string/*DOMString*/ = o.label;
+        var v2266 : boolean = o.defaultSelected;
+        var v2267 : boolean = o.selected;
+        var v2268 : string/*DOMString*/ = o.value;
+        var v2269 : string/*DOMString*/ = o.text;
+        var v2270 : int/*long*/ = o.index;
     } // HTMLOptionElement
 
 
     function compile_HTMLTextAreaElement(o : HTMLTextAreaElement) : void {
-        var v2279 : boolean = o.autofocus;
-        var v2280 : int/*unsigned long*/ = o.cols;
-        var v2281 : string/*DOMString*/ = o.dirName;
-        var v2282 : boolean = o.disabled;
-        var v2283 : HTMLFormElement = o.form;
-        var v2284 : int/*long*/ = o.maxLength;
-        var v2285 : string/*DOMString*/ = o.name;
-        var v2286 : string/*DOMString*/ = o.placeholder;
-        var v2287 : boolean = o.readOnly;
-        var v2288 : boolean = o.required;
-        var v2289 : int/*unsigned long*/ = o.rows;
-        var v2290 : string/*DOMString*/ = o.wrap;
-        var v2291 : string/*DOMString*/ = o.type;
-        var v2292 : string/*DOMString*/ = o.defaultValue;
-        var v2293 : string/*DOMString*/ = o.value;
-        var v2294 : int/*unsigned long*/ = o.textLength;
-        var v2295 : boolean = o.willValidate;
-        var v2296 : ValidityState = o.validity;
-        var v2297 : string/*DOMString*/ = o.validationMessage;
-        var f2298 : boolean = o.checkValidity();
+        var v2271 : boolean = o.autofocus;
+        var v2272 : int/*unsigned long*/ = o.cols;
+        var v2273 : string/*DOMString*/ = o.dirName;
+        var v2274 : boolean = o.disabled;
+        var v2275 : HTMLFormElement = o.form;
+        var v2276 : int/*long*/ = o.maxLength;
+        var v2277 : string/*DOMString*/ = o.name;
+        var v2278 : string/*DOMString*/ = o.placeholder;
+        var v2279 : boolean = o.readOnly;
+        var v2280 : boolean = o.required;
+        var v2281 : int/*unsigned long*/ = o.rows;
+        var v2282 : string/*DOMString*/ = o.wrap;
+        var v2283 : string/*DOMString*/ = o.type;
+        var v2284 : string/*DOMString*/ = o.defaultValue;
+        var v2285 : string/*DOMString*/ = o.value;
+        var v2286 : int/*unsigned long*/ = o.textLength;
+        var v2287 : boolean = o.willValidate;
+        var v2288 : ValidityState = o.validity;
+        var v2289 : string/*DOMString*/ = o.validationMessage;
+        var f2290 : boolean = o.checkValidity();
         o.setCustomValidity(X.getstring());
-        var v2299 : NodeList = o.labels;
+        var v2291 : NodeList = o.labels;
         o.select();
-        var v2300 : int/*unsigned long*/ = o.selectionStart;
-        var v2301 : int/*unsigned long*/ = o.selectionEnd;
-        var v2302 : string/*DOMString*/ = o.selectionDirection;
+        var v2292 : int/*unsigned long*/ = o.selectionStart;
+        var v2293 : int/*unsigned long*/ = o.selectionEnd;
+        var v2294 : string/*DOMString*/ = o.selectionDirection;
         o.setSelectionRange(X.getint(), X.getint());
         o.setSelectionRange(X.getint(), X.getint(), X.getstring());
     } // HTMLTextAreaElement
 
 
     function compile_HTMLKeygenElement(o : HTMLKeygenElement) : void {
-        var v2303 : boolean = o.autofocus;
-        var v2304 : string/*DOMString*/ = o.challenge;
-        var v2305 : boolean = o.disabled;
-        var v2306 : HTMLFormElement = o.form;
-        var v2307 : string/*DOMString*/ = o.keytype;
-        var v2308 : string/*DOMString*/ = o.name;
-        var v2309 : string/*DOMString*/ = o.type;
-        var v2310 : boolean = o.willValidate;
-        var v2311 : ValidityState = o.validity;
-        var v2312 : string/*DOMString*/ = o.validationMessage;
-        var f2313 : boolean = o.checkValidity();
+        var v2295 : boolean = o.autofocus;
+        var v2296 : string/*DOMString*/ = o.challenge;
+        var v2297 : boolean = o.disabled;
+        var v2298 : HTMLFormElement = o.form;
+        var v2299 : string/*DOMString*/ = o.keytype;
+        var v2300 : string/*DOMString*/ = o.name;
+        var v2301 : string/*DOMString*/ = o.type;
+        var v2302 : boolean = o.willValidate;
+        var v2303 : ValidityState = o.validity;
+        var v2304 : string/*DOMString*/ = o.validationMessage;
+        var f2305 : boolean = o.checkValidity();
         o.setCustomValidity(X.getstring());
-        var v2314 : NodeList = o.labels;
+        var v2306 : NodeList = o.labels;
     } // HTMLKeygenElement
 
 
     function compile_HTMLOutputElement(o : HTMLOutputElement) : void {
-        var v2315 : DOMSettableTokenList = o.htmlFor;
-        var v2316 : HTMLFormElement = o.form;
-        var v2317 : string/*DOMString*/ = o.name;
-        var v2318 : string/*DOMString*/ = o.type;
-        var v2319 : string/*DOMString*/ = o.defaultValue;
-        var v2320 : string/*DOMString*/ = o.value;
-        var v2321 : boolean = o.willValidate;
-        var v2322 : ValidityState = o.validity;
-        var v2323 : string/*DOMString*/ = o.validationMessage;
-        var f2324 : boolean = o.checkValidity();
+        var v2307 : DOMSettableTokenList = o.htmlFor;
+        var v2308 : HTMLFormElement = o.form;
+        var v2309 : string/*DOMString*/ = o.name;
+        var v2310 : string/*DOMString*/ = o.type;
+        var v2311 : string/*DOMString*/ = o.defaultValue;
+        var v2312 : string/*DOMString*/ = o.value;
+        var v2313 : boolean = o.willValidate;
+        var v2314 : ValidityState = o.validity;
+        var v2315 : string/*DOMString*/ = o.validationMessage;
+        var f2316 : boolean = o.checkValidity();
         o.setCustomValidity(X.getstring());
-        var v2325 : NodeList = o.labels;
+        var v2317 : NodeList = o.labels;
     } // HTMLOutputElement
 
 
     function compile_HTMLProgressElement(o : HTMLProgressElement) : void {
-        var v2326 : number/*double*/ = o.value;
-        var v2327 : number/*double*/ = o.max;
-        var v2328 : number/*double*/ = o.position;
-        var v2329 : NodeList = o.labels;
+        var v2318 : number/*double*/ = o.value;
+        var v2319 : number/*double*/ = o.max;
+        var v2320 : number/*double*/ = o.position;
+        var v2321 : NodeList = o.labels;
     } // HTMLProgressElement
 
 
     function compile_HTMLMeterElement(o : HTMLMeterElement) : void {
-        var v2330 : number/*double*/ = o.value;
-        var v2331 : number/*double*/ = o.min;
-        var v2332 : number/*double*/ = o.max;
-        var v2333 : number/*double*/ = o.low;
-        var v2334 : number/*double*/ = o.high;
-        var v2335 : number/*double*/ = o.optimum;
-        var v2336 : NodeList = o.labels;
+        var v2322 : number/*double*/ = o.value;
+        var v2323 : number/*double*/ = o.min;
+        var v2324 : number/*double*/ = o.max;
+        var v2325 : number/*double*/ = o.low;
+        var v2326 : number/*double*/ = o.high;
+        var v2327 : number/*double*/ = o.optimum;
+        var v2328 : NodeList = o.labels;
     } // HTMLMeterElement
 
 
     function compile_ValidityState(o : ValidityState) : void {
-        var v2337 : boolean = o.valueMissing;
-        var v2338 : boolean = o.typeMismatch;
-        var v2339 : boolean = o.patternMismatch;
-        var v2340 : boolean = o.tooLong;
-        var v2341 : boolean = o.rangeUnderflow;
-        var v2342 : boolean = o.rangeOverflow;
-        var v2343 : boolean = o.stepMismatch;
-        var v2344 : boolean = o.customError;
-        var v2345 : boolean = o.valid;
+        var v2329 : boolean = o.valueMissing;
+        var v2330 : boolean = o.typeMismatch;
+        var v2331 : boolean = o.patternMismatch;
+        var v2332 : boolean = o.tooLong;
+        var v2333 : boolean = o.rangeUnderflow;
+        var v2334 : boolean = o.rangeOverflow;
+        var v2335 : boolean = o.stepMismatch;
+        var v2336 : boolean = o.customError;
+        var v2337 : boolean = o.valid;
     } // ValidityState
 
 
     function compile_HTMLDetailsElement(o : HTMLDetailsElement) : void {
-        var v2346 : boolean = o.open;
+        var v2338 : boolean = o.open;
     } // HTMLDetailsElement
 
 
     function compile_HTMLCommandElement(o : HTMLCommandElement) : void {
-        var v2347 : string/*DOMString*/ = o.type;
-        var v2348 : string/*DOMString*/ = o.label;
-        var v2349 : string/*DOMString*/ = o.icon;
-        var v2350 : boolean = o.disabled;
-        var v2351 : boolean = o.checked;
-        var v2352 : string/*DOMString*/ = o.radiogroup;
-        var v2353 : HTMLElement = o.command;
+        var v2339 : string/*DOMString*/ = o.type;
+        var v2340 : string/*DOMString*/ = o.label;
+        var v2341 : string/*DOMString*/ = o.icon;
+        var v2342 : boolean = o.disabled;
+        var v2343 : boolean = o.checked;
+        var v2344 : string/*DOMString*/ = o.radiogroup;
+        var v2345 : HTMLElement = o.command;
     } // HTMLCommandElement
 
 
     function compile_HTMLMenuElement(o : HTMLMenuElement) : void {
-        var v2354 : string/*DOMString*/ = o.type;
-        var v2355 : string/*DOMString*/ = o.label;
-        var v2356 : boolean = o.compact;
+        var v2346 : string/*DOMString*/ = o.type;
+        var v2347 : string/*DOMString*/ = o.label;
+        var v2348 : boolean = o.compact;
     } // HTMLMenuElement
 
 
     function compile_BarProp(o : BarProp) : void {
-        var v2357 : boolean = o.visible;
+        var v2349 : boolean = o.visible;
     } // BarProp
 
 
     function compile_History(o : History) : void {
-        var v2358 : int/*long*/ = o.length;
-        var v2359 : variant/*any*/ = o.state;
+        var v2350 : int/*long*/ = o.length;
+        var v2351 : variant/*any*/ = o.state;
         o.go();
         o.go(X.getint());
         o.back();
@@ -3243,150 +3235,132 @@ class _Test extends TestCase {
 
 
     function compile_Location(o : Location) : void {
-        var v2360 : string/*DOMString*/ = o.href;
+        var v2352 : string/*DOMString*/ = o.href;
         o.assign(X.getstring());
         o.replace(X.getstring());
         o.reload();
-        var v2361 : string/*DOMString*/ = o.protocol;
-        var v2362 : string/*DOMString*/ = o.host;
-        var v2363 : string/*DOMString*/ = o.hostname;
-        var v2364 : string/*DOMString*/ = o.port;
-        var v2365 : string/*DOMString*/ = o.pathname;
-        var v2366 : string/*DOMString*/ = o.search;
-        var v2367 : string/*DOMString*/ = o.hash;
+        var v2353 : string/*DOMString*/ = o.protocol;
+        var v2354 : string/*DOMString*/ = o.host;
+        var v2355 : string/*DOMString*/ = o.hostname;
+        var v2356 : string/*DOMString*/ = o.port;
+        var v2357 : string/*DOMString*/ = o.pathname;
+        var v2358 : string/*DOMString*/ = o.search;
+        var v2359 : string/*DOMString*/ = o.hash;
     } // Location
 
 
     function compile_PopStateEvent(o : PopStateEvent) : void {
-        var v2368 : variant/*any*/ = o.state;
+        var v2360 : variant/*any*/ = o.state;
     } // PopStateEvent
 
 
     function compile_PopStateEventInit(o : PopStateEventInit) : void {
-        var v2369 : variant/*any*/ = o.state;
+        var v2361 : variant/*any*/ = o.state;
     } // PopStateEventInit
 
 
     function compile_HashChangeEvent(o : HashChangeEvent) : void {
-        var v2370 : string/*DOMString*/ = o.oldURL;
-        var v2371 : string/*DOMString*/ = o.newURL;
+        var v2362 : string/*DOMString*/ = o.oldURL;
+        var v2363 : string/*DOMString*/ = o.newURL;
     } // HashChangeEvent
 
 
     function compile_HashChangeEventInit(o : HashChangeEventInit) : void {
-        var v2372 : string/*DOMString*/ = o.oldURL;
-        var v2373 : string/*DOMString*/ = o.newURL;
+        var v2364 : string/*DOMString*/ = o.oldURL;
+        var v2365 : string/*DOMString*/ = o.newURL;
     } // HashChangeEventInit
 
 
     function compile_PageTransitionEvent(o : PageTransitionEvent) : void {
-        var v2374 : boolean = o.persisted;
+        var v2366 : boolean = o.persisted;
     } // PageTransitionEvent
 
 
     function compile_PageTransitionEventInit(o : PageTransitionEventInit) : void {
-        var v2375 : boolean = o.persisted;
+        var v2367 : boolean = o.persisted;
     } // PageTransitionEventInit
 
 
     function compile_BeforeUnloadEvent(o : BeforeUnloadEvent) : void {
-        var v2376 : string/*DOMString*/ = o.returnValue;
+        var v2368 : string/*DOMString*/ = o.returnValue;
     } // BeforeUnloadEvent
 
 
     function compile_ApplicationCache(o : ApplicationCache) : void {
-        var v2377 : int/*unsigned short*/ = ApplicationCache.UNCACHED;
-        var v2378 : int/*unsigned short*/ = o.UNCACHED;
-        var v2379 : int/*unsigned short*/ = ApplicationCache.IDLE;
-        var v2380 : int/*unsigned short*/ = o.IDLE;
-        var v2381 : int/*unsigned short*/ = ApplicationCache.CHECKING;
-        var v2382 : int/*unsigned short*/ = o.CHECKING;
-        var v2383 : int/*unsigned short*/ = ApplicationCache.DOWNLOADING;
-        var v2384 : int/*unsigned short*/ = o.DOWNLOADING;
-        var v2385 : int/*unsigned short*/ = ApplicationCache.UPDATEREADY;
-        var v2386 : int/*unsigned short*/ = o.UPDATEREADY;
-        var v2387 : int/*unsigned short*/ = ApplicationCache.OBSOLETE;
-        var v2388 : int/*unsigned short*/ = o.OBSOLETE;
-        var v2389 : int/*unsigned short*/ = o.status;
+        var v2369 : int/*unsigned short*/ = ApplicationCache.UNCACHED;
+        var v2370 : int/*unsigned short*/ = o.UNCACHED;
+        var v2371 : int/*unsigned short*/ = ApplicationCache.IDLE;
+        var v2372 : int/*unsigned short*/ = o.IDLE;
+        var v2373 : int/*unsigned short*/ = ApplicationCache.CHECKING;
+        var v2374 : int/*unsigned short*/ = o.CHECKING;
+        var v2375 : int/*unsigned short*/ = ApplicationCache.DOWNLOADING;
+        var v2376 : int/*unsigned short*/ = o.DOWNLOADING;
+        var v2377 : int/*unsigned short*/ = ApplicationCache.UPDATEREADY;
+        var v2378 : int/*unsigned short*/ = o.UPDATEREADY;
+        var v2379 : int/*unsigned short*/ = ApplicationCache.OBSOLETE;
+        var v2380 : int/*unsigned short*/ = o.OBSOLETE;
+        var v2381 : int/*unsigned short*/ = o.status;
         o.update();
         o.abort();
         o.swapCache();
-        var v2390 : function(:Event):void/*Function?*/ = o.onchecking;
-        var v2391 : function(:Event):void/*Function?*/ = o.onerror;
-        var v2392 : function(:Event):void/*Function?*/ = o.onnoupdate;
-        var v2393 : function(:Event):void/*Function?*/ = o.ondownloading;
-        var v2394 : function(:Event):void/*Function?*/ = o.onprogress;
-        var v2395 : function(:Event):void/*Function?*/ = o.onupdateready;
-        var v2396 : function(:Event):void/*Function?*/ = o.oncached;
-        var v2397 : function(:Event):void/*Function?*/ = o.onobsolete;
+        var v2382 : function(:Event):void/*Function?*/ = o.onchecking;
+        var v2383 : function(:Event):void/*Function?*/ = o.onerror;
+        var v2384 : function(:Event):void/*Function?*/ = o.onnoupdate;
+        var v2385 : function(:Event):void/*Function?*/ = o.ondownloading;
+        var v2386 : function(:Event):void/*Function?*/ = o.onprogress;
+        var v2387 : function(:Event):void/*Function?*/ = o.onupdateready;
+        var v2388 : function(:Event):void/*Function?*/ = o.oncached;
+        var v2389 : function(:Event):void/*Function?*/ = o.onobsolete;
     } // ApplicationCache
 
 
     function compile_NavigatorOnLine(o : NavigatorOnLine) : void {
-        var v2398 : boolean = o.onLine;
+        var v2390 : boolean = o.onLine;
     } // NavigatorOnLine
 
 
     function compile_WindowBase64(o : WindowBase64) : void {
-        var f2399 : string/*DOMString*/ = o.btoa(X.getstring());
-        var f2400 : string/*DOMString*/ = o.atob(X.getstring());
+        var f2391 : string/*DOMString*/ = o.btoa(X.getstring());
+        var f2392 : string/*DOMString*/ = o.atob(X.getstring());
     } // WindowBase64
 
 
-    function compile_WindowTimers(o : WindowTimers) : void {
-        var f2401 : int/*long*/ = o.setTimeout(X.getfunction__Event__void());
-        var f2402 : int/*long*/ = o.setTimeout(X.getfunction__Event__void(), X.getint());
-        var f2403 : int/*long*/ = o.setTimeout(X.getfunction__Event__void(), X.getint(), X.getvariant());
-        var f2404 : int/*long*/ = o.setTimeout(X.getstring());
-        var f2405 : int/*long*/ = o.setTimeout(X.getstring(), X.getint());
-        var f2406 : int/*long*/ = o.setTimeout(X.getstring(), X.getint(), X.getvariant());
-        o.clearTimeout(X.getint());
-        var f2407 : int/*long*/ = o.setInterval(X.getfunction__Event__void());
-        var f2408 : int/*long*/ = o.setInterval(X.getfunction__Event__void(), X.getint());
-        var f2409 : int/*long*/ = o.setInterval(X.getfunction__Event__void(), X.getint(), X.getvariant());
-        var f2410 : int/*long*/ = o.setInterval(X.getstring());
-        var f2411 : int/*long*/ = o.setInterval(X.getstring(), X.getint());
-        var f2412 : int/*long*/ = o.setInterval(X.getstring(), X.getint(), X.getvariant());
-        o.clearInterval(X.getint());
-    } // WindowTimers
-
-
     function compile_WindowModal(o : WindowModal) : void {
-        var v2413 : variant/*any*/ = o.dialogArguments;
-        var v2414 : string/*DOMString*/ = o.returnValue;
+        var v2393 : variant/*any*/ = o.dialogArguments;
+        var v2394 : string/*DOMString*/ = o.returnValue;
     } // WindowModal
 
 
     function compile_Navigator(o : Navigator) : void {
-        var v2415 : string/*DOMString*/ = o.appName;
-        var v2416 : string/*DOMString*/ = o.appVersion;
-        var v2417 : string/*DOMString*/ = o.platform;
-        var v2418 : string/*DOMString*/ = o.userAgent;
-        var v2419 : boolean = o.onLine;
+        var v2395 : string/*DOMString*/ = o.appName;
+        var v2396 : string/*DOMString*/ = o.appVersion;
+        var v2397 : string/*DOMString*/ = o.platform;
+        var v2398 : string/*DOMString*/ = o.userAgent;
+        var v2399 : boolean = o.onLine;
         o.registerProtocolHandler(X.getstring(), X.getstring(), X.getstring());
         o.registerContentHandler(X.getstring(), X.getstring(), X.getstring());
-        var f2420 : string/*DOMString*/ = o.isProtocolHandlerRegistered(X.getstring(), X.getstring());
-        var f2421 : string/*DOMString*/ = o.isContentHandlerRegistered(X.getstring(), X.getstring());
+        var f2400 : string/*DOMString*/ = o.isProtocolHandlerRegistered(X.getstring(), X.getstring());
+        var f2401 : string/*DOMString*/ = o.isContentHandlerRegistered(X.getstring(), X.getstring());
         o.unregisterProtocolHandler(X.getstring(), X.getstring());
         o.unregisterContentHandler(X.getstring(), X.getstring());
         o.yieldForStorageUpdates();
-        var v2422 : Geolocation = o.geolocation;
+        var v2402 : Geolocation = o.geolocation;
     } // Navigator
 
 
     function compile_NavigatorID(o : NavigatorID) : void {
-        var v2423 : string/*DOMString*/ = o.appName;
-        var v2424 : string/*DOMString*/ = o.appVersion;
-        var v2425 : string/*DOMString*/ = o.platform;
-        var v2426 : string/*DOMString*/ = o.userAgent;
+        var v2403 : string/*DOMString*/ = o.appName;
+        var v2404 : string/*DOMString*/ = o.appVersion;
+        var v2405 : string/*DOMString*/ = o.platform;
+        var v2406 : string/*DOMString*/ = o.userAgent;
     } // NavigatorID
 
 
     function compile_NavigatorContentUtils(o : NavigatorContentUtils) : void {
         o.registerProtocolHandler(X.getstring(), X.getstring(), X.getstring());
         o.registerContentHandler(X.getstring(), X.getstring(), X.getstring());
-        var f2427 : string/*DOMString*/ = o.isProtocolHandlerRegistered(X.getstring(), X.getstring());
-        var f2428 : string/*DOMString*/ = o.isContentHandlerRegistered(X.getstring(), X.getstring());
+        var f2407 : string/*DOMString*/ = o.isProtocolHandlerRegistered(X.getstring(), X.getstring());
+        var f2408 : string/*DOMString*/ = o.isContentHandlerRegistered(X.getstring(), X.getstring());
         o.unregisterProtocolHandler(X.getstring(), X.getstring());
         o.unregisterContentHandler(X.getstring(), X.getstring());
     } // NavigatorContentUtils
@@ -3399,39 +3373,39 @@ class _Test extends TestCase {
 
     function compile_External(o : External) : void {
         o.AddSearchProvider(X.getstring());
-        var f2429 : int/*unsigned long*/ = o.IsSearchProviderInstalled(X.getstring());
+        var f2409 : int/*unsigned long*/ = o.IsSearchProviderInstalled(X.getstring());
     } // External
 
 
     function compile_DataTransfer(o : DataTransfer) : void {
-        var v2430 : string/*DOMString*/ = o.dropEffect;
-        var v2431 : string/*DOMString*/ = o.effectAllowed;
-        var v2432 : DataTransferItemList = o.items;
+        var v2410 : string/*DOMString*/ = o.dropEffect;
+        var v2411 : string/*DOMString*/ = o.effectAllowed;
+        var v2412 : DataTransferItemList = o.items;
         o.setDragImage(X.getElement(), X.getint(), X.getint());
         o.addElement(X.getElement());
-        var v2433 : DOMStringList = o.types;
-        var f2434 : string/*DOMString*/ = o.getData(X.getstring());
+        var v2413 : DOMStringList = o.types;
+        var f2414 : string/*DOMString*/ = o.getData(X.getstring());
         o.setData(X.getstring(), X.getstring());
         o.clearData();
         o.clearData(X.getstring());
-        var v2435 : FileList = o.files;
+        var v2415 : FileList = o.files;
     } // DataTransfer
 
 
     function compile_DataTransferItemList(o : DataTransferItemList) : void {
-        var v2436 : int/*unsigned long*/ = o.length;
-        var f2437 : MayBeUndefined.<DataTransferItem> = o.__native_index_operator__(X.getint());
+        var v2416 : int/*unsigned long*/ = o.length;
+        var f2417 : MayBeUndefined.<DataTransferItem> = o.__native_index_operator__(X.getint());
         o.clear();
-        var f2438 : DataTransferItem = o.add(X.getstring(), X.getstring());
-        var f2439 : DataTransferItem = o.add(X.getFile());
+        var f2418 : DataTransferItem = o.add(X.getstring(), X.getstring());
+        var f2419 : DataTransferItem = o.add(X.getFile());
     } // DataTransferItemList
 
 
     function compile_DataTransferItem(o : DataTransferItem) : void {
-        var v2440 : string/*DOMString*/ = o.kind;
-        var v2441 : string/*DOMString*/ = o.type;
+        var v2420 : string/*DOMString*/ = o.kind;
+        var v2421 : string/*DOMString*/ = o.type;
         o.getAsString(X.getFunctionStringCallback());
-        var f2442 : File = o.getAsFile();
+        var f2422 : File = o.getAsFile();
     } // DataTransferItem
 
 
@@ -3441,127 +3415,127 @@ class _Test extends TestCase {
 
 
     function compile_DragEvent(o : DragEvent) : void {
-        var v2443 : DataTransfer = o.dataTransfer;
+        var v2423 : DataTransfer = o.dataTransfer;
     } // DragEvent
 
 
     function compile_DragEventInit(o : DragEventInit) : void {
-        var v2444 : DataTransfer = o.dataTransfer;
+        var v2424 : DataTransfer = o.dataTransfer;
     } // DragEventInit
 
 
     function compile_HTMLAppletElement(o : HTMLAppletElement) : void {
-        var v2445 : string/*DOMString*/ = o.align;
-        var v2446 : string/*DOMString*/ = o.alt;
-        var v2447 : string/*DOMString*/ = o.archive;
-        var v2448 : string/*DOMString*/ = o.code;
-        var v2449 : string/*DOMString*/ = o.codeBase;
-        var v2450 : string/*DOMString*/ = o.height;
-        var v2451 : int/*unsigned long*/ = o.hspace;
-        var v2452 : string/*DOMString*/ = o.name;
-        var v2453 : string/*DOMString*/ = o._object;
-        var v2454 : int/*unsigned long*/ = o.vspace;
-        var v2455 : string/*DOMString*/ = o.width;
+        var v2425 : string/*DOMString*/ = o.align;
+        var v2426 : string/*DOMString*/ = o.alt;
+        var v2427 : string/*DOMString*/ = o.archive;
+        var v2428 : string/*DOMString*/ = o.code;
+        var v2429 : string/*DOMString*/ = o.codeBase;
+        var v2430 : string/*DOMString*/ = o.height;
+        var v2431 : int/*unsigned long*/ = o.hspace;
+        var v2432 : string/*DOMString*/ = o.name;
+        var v2433 : string/*DOMString*/ = o._object;
+        var v2434 : int/*unsigned long*/ = o.vspace;
+        var v2435 : string/*DOMString*/ = o.width;
     } // HTMLAppletElement
 
 
     function compile_HTMLMarqueeElement(o : HTMLMarqueeElement) : void {
-        var v2456 : string/*DOMString*/ = o.behavior;
-        var v2457 : string/*DOMString*/ = o.bgColor;
-        var v2458 : string/*DOMString*/ = o.direction;
-        var v2459 : string/*DOMString*/ = o.height;
-        var v2460 : int/*unsigned long*/ = o.hspace;
-        var v2461 : int/*long*/ = o.loop;
-        var v2462 : int/*unsigned long*/ = o.scrollAmount;
-        var v2463 : int/*unsigned long*/ = o.scrollDelay;
-        var v2464 : boolean = o.trueSpeed;
-        var v2465 : int/*unsigned long*/ = o.vspace;
-        var v2466 : string/*DOMString*/ = o.width;
-        var v2467 : function(:Event):void/*Function?*/ = o.onbounce;
-        var v2468 : function(:Event):void/*Function?*/ = o.onfinish;
-        var v2469 : function(:Event):void/*Function?*/ = o.onstart;
+        var v2436 : string/*DOMString*/ = o.behavior;
+        var v2437 : string/*DOMString*/ = o.bgColor;
+        var v2438 : string/*DOMString*/ = o.direction;
+        var v2439 : string/*DOMString*/ = o.height;
+        var v2440 : int/*unsigned long*/ = o.hspace;
+        var v2441 : int/*long*/ = o.loop;
+        var v2442 : int/*unsigned long*/ = o.scrollAmount;
+        var v2443 : int/*unsigned long*/ = o.scrollDelay;
+        var v2444 : boolean = o.trueSpeed;
+        var v2445 : int/*unsigned long*/ = o.vspace;
+        var v2446 : string/*DOMString*/ = o.width;
+        var v2447 : function(:Event):void/*Function?*/ = o.onbounce;
+        var v2448 : function(:Event):void/*Function?*/ = o.onfinish;
+        var v2449 : function(:Event):void/*Function?*/ = o.onstart;
         o.start();
         o.stop();
     } // HTMLMarqueeElement
 
 
     function compile_HTMLFrameSetElement(o : HTMLFrameSetElement) : void {
-        var v2470 : string/*DOMString*/ = o.cols;
-        var v2471 : string/*DOMString*/ = o.rows;
-        var v2472 : function(:Event):void/*Function?*/ = o.onafterprint;
-        var v2473 : function(:Event):void/*Function?*/ = o.onbeforeprint;
-        var v2474 : function(:Event):void/*Function?*/ = o.onbeforeunload;
-        var v2475 : function(:Event):void/*Function?*/ = o.onblur;
-        var v2476 : function(:Event):void/*Function?*/ = o.onerror;
-        var v2477 : function(:Event):void/*Function?*/ = o.onfocus;
-        var v2478 : function(:Event):void/*Function?*/ = o.onhashchange;
-        var v2479 : function(:Event):void/*Function?*/ = o.onload;
-        var v2480 : function(:Event):void/*Function?*/ = o.onmessage;
-        var v2481 : function(:Event):void/*Function?*/ = o.onoffline;
-        var v2482 : function(:Event):void/*Function?*/ = o.ononline;
-        var v2483 : function(:Event):void/*Function?*/ = o.onpagehide;
-        var v2484 : function(:Event):void/*Function?*/ = o.onpageshow;
-        var v2485 : function(:Event):void/*Function?*/ = o.onpopstate;
-        var v2486 : function(:Event):void/*Function?*/ = o.onresize;
-        var v2487 : function(:Event):void/*Function?*/ = o.onscroll;
-        var v2488 : function(:Event):void/*Function?*/ = o.onstorage;
-        var v2489 : function(:Event):void/*Function?*/ = o.onunload;
+        var v2450 : string/*DOMString*/ = o.cols;
+        var v2451 : string/*DOMString*/ = o.rows;
+        var v2452 : function(:Event):void/*Function?*/ = o.onafterprint;
+        var v2453 : function(:Event):void/*Function?*/ = o.onbeforeprint;
+        var v2454 : function(:Event):void/*Function?*/ = o.onbeforeunload;
+        var v2455 : function(:Event):void/*Function?*/ = o.onblur;
+        var v2456 : function(:Event):void/*Function?*/ = o.onerror;
+        var v2457 : function(:Event):void/*Function?*/ = o.onfocus;
+        var v2458 : function(:Event):void/*Function?*/ = o.onhashchange;
+        var v2459 : function(:Event):void/*Function?*/ = o.onload;
+        var v2460 : function(:Event):void/*Function?*/ = o.onmessage;
+        var v2461 : function(:Event):void/*Function?*/ = o.onoffline;
+        var v2462 : function(:Event):void/*Function?*/ = o.ononline;
+        var v2463 : function(:Event):void/*Function?*/ = o.onpagehide;
+        var v2464 : function(:Event):void/*Function?*/ = o.onpageshow;
+        var v2465 : function(:Event):void/*Function?*/ = o.onpopstate;
+        var v2466 : function(:Event):void/*Function?*/ = o.onresize;
+        var v2467 : function(:Event):void/*Function?*/ = o.onscroll;
+        var v2468 : function(:Event):void/*Function?*/ = o.onstorage;
+        var v2469 : function(:Event):void/*Function?*/ = o.onunload;
     } // HTMLFrameSetElement
 
 
     function compile_HTMLFrameElement(o : HTMLFrameElement) : void {
-        var v2490 : string/*DOMString*/ = o.name;
-        var v2491 : string/*DOMString*/ = o.scrolling;
-        var v2492 : string/*DOMString*/ = o.src;
-        var v2493 : string/*DOMString*/ = o.frameBorder;
-        var v2494 : string/*DOMString*/ = o.longDesc;
-        var v2495 : boolean = o.noResize;
-        var v2496 : HTMLDocument/*Document?*/ = o.contentDocument;
-        var v2497 : Window/*WindowProxy?*/ = o.contentWindow;
-        var v2498 : string/*DOMString*/ = o.marginHeight;
-        var v2499 : string/*DOMString*/ = o.marginWidth;
+        var v2470 : string/*DOMString*/ = o.name;
+        var v2471 : string/*DOMString*/ = o.scrolling;
+        var v2472 : string/*DOMString*/ = o.src;
+        var v2473 : string/*DOMString*/ = o.frameBorder;
+        var v2474 : string/*DOMString*/ = o.longDesc;
+        var v2475 : boolean = o.noResize;
+        var v2476 : HTMLDocument/*Document?*/ = o.contentDocument;
+        var v2477 : Window/*WindowProxy?*/ = o.contentWindow;
+        var v2478 : string/*DOMString*/ = o.marginHeight;
+        var v2479 : string/*DOMString*/ = o.marginWidth;
     } // HTMLFrameElement
 
 
     function compile_HTMLBaseFontElement(o : HTMLBaseFontElement) : void {
-        var v2500 : string/*DOMString*/ = o.color;
-        var v2501 : string/*DOMString*/ = o.face;
-        var v2502 : int/*long*/ = o.size;
+        var v2480 : string/*DOMString*/ = o.color;
+        var v2481 : string/*DOMString*/ = o.face;
+        var v2482 : int/*long*/ = o.size;
     } // HTMLBaseFontElement
 
 
     function compile_HTMLDirectoryElement(o : HTMLDirectoryElement) : void {
-        var v2503 : boolean = o.compact;
+        var v2483 : boolean = o.compact;
     } // HTMLDirectoryElement
 
 
     function compile_HTMLFontElement(o : HTMLFontElement) : void {
-        var v2504 : string/*DOMString*/ = o.color;
-        var v2505 : string/*DOMString*/ = o.face;
-        var v2506 : string/*DOMString*/ = o.size;
+        var v2484 : string/*DOMString*/ = o.color;
+        var v2485 : string/*DOMString*/ = o.face;
+        var v2486 : string/*DOMString*/ = o.size;
     } // HTMLFontElement
 
 
     function compile_FileList(o : FileList) : void {
-        var f2507 : MayBeUndefined.<File> = o.__native_index_operator__(X.getint());
-        var f2508 : MayBeUndefined.<File> = o.item(X.getint());
-        var v2509 : int/*unsigned long*/ = o.length;
+        var f2487 : MayBeUndefined.<File> = o.__native_index_operator__(X.getint());
+        var f2488 : MayBeUndefined.<File> = o.item(X.getint());
+        var v2489 : int/*unsigned long*/ = o.length;
     } // FileList
 
 
     function compile_Blob(o : Blob) : void {
-        var v2510 : number/*unsigned long long*/ = o.size;
-        var v2511 : string/*DOMString*/ = o.type;
-        var f2512 : Blob = o.slice();
-        var f2513 : Blob = o.slice(X.getnumber());
-        var f2514 : Blob = o.slice(X.getnumber(), X.getnumber());
-        var f2515 : Blob = o.slice(X.getnumber(), X.getnumber(), X.getstring());
+        var v2490 : number/*unsigned long long*/ = o.size;
+        var v2491 : string/*DOMString*/ = o.type;
+        var f2492 : Blob = o.slice();
+        var f2493 : Blob = o.slice(X.getnumber());
+        var f2494 : Blob = o.slice(X.getnumber(), X.getnumber());
+        var f2495 : Blob = o.slice(X.getnumber(), X.getnumber(), X.getstring());
     } // Blob
 
 
     function compile_File(o : File) : void {
-        var v2516 : string/*DOMString*/ = o.name;
-        var v2517 : Date = o.lastModifiedDate;
+        var v2496 : string/*DOMString*/ = o.name;
+        var v2497 : Date = o.lastModifiedDate;
     } // File
 
 
@@ -3572,35 +3546,35 @@ class _Test extends TestCase {
         o.readAsText(X.getBlob(), X.getstring());
         o.readAsDataURL(X.getBlob());
         o.abort();
-        var v2518 : int/*unsigned short*/ = FileReader.EMPTY;
-        var v2519 : int/*unsigned short*/ = o.EMPTY;
-        var v2520 : int/*unsigned short*/ = FileReader.LOADING;
-        var v2521 : int/*unsigned short*/ = o.LOADING;
-        var v2522 : int/*unsigned short*/ = FileReader.DONE;
-        var v2523 : int/*unsigned short*/ = o.DONE;
-        var v2524 : int/*unsigned short*/ = o.readyState;
-        var v2525 : variant/*any*/ = o.result;
-        var v2526 : DOMError = o.error;
-        var v2527 : function(:Event):void/*Function?*/ = o.onloadstart;
-        var v2528 : function(:Event):void/*Function?*/ = o.onprogress;
-        var v2529 : function(:Event):void/*Function?*/ = o.onload;
-        var v2530 : function(:Event):void/*Function?*/ = o.onabort;
-        var v2531 : function(:Event):void/*Function?*/ = o.onerror;
-        var v2532 : function(:Event):void/*Function?*/ = o.onloadend;
+        var v2498 : int/*unsigned short*/ = FileReader.EMPTY;
+        var v2499 : int/*unsigned short*/ = o.EMPTY;
+        var v2500 : int/*unsigned short*/ = FileReader.LOADING;
+        var v2501 : int/*unsigned short*/ = o.LOADING;
+        var v2502 : int/*unsigned short*/ = FileReader.DONE;
+        var v2503 : int/*unsigned short*/ = o.DONE;
+        var v2504 : int/*unsigned short*/ = o.readyState;
+        var v2505 : variant/*any*/ = o.result;
+        var v2506 : DOMError = o.error;
+        var v2507 : function(:Event):void/*Function?*/ = o.onloadstart;
+        var v2508 : function(:Event):void/*Function?*/ = o.onprogress;
+        var v2509 : function(:Event):void/*Function?*/ = o.onload;
+        var v2510 : function(:Event):void/*Function?*/ = o.onabort;
+        var v2511 : function(:Event):void/*Function?*/ = o.onerror;
+        var v2512 : function(:Event):void/*Function?*/ = o.onloadend;
     } // FileReader
 
 
     function compile_FileReaderSync(o : FileReaderSync) : void {
-        var f2533 : ArrayBuffer = o.readAsArrayBuffer(X.getBlob());
-        var f2534 : string/*DOMString*/ = o.readAsBinaryString(X.getBlob());
-        var f2535 : string/*DOMString*/ = o.readAsText(X.getBlob());
-        var f2536 : string/*DOMString*/ = o.readAsText(X.getBlob(), X.getstring());
-        var f2537 : string/*DOMString*/ = o.readAsDataURL(X.getBlob());
+        var f2513 : ArrayBuffer = o.readAsArrayBuffer(X.getBlob());
+        var f2514 : string/*DOMString*/ = o.readAsBinaryString(X.getBlob());
+        var f2515 : string/*DOMString*/ = o.readAsText(X.getBlob());
+        var f2516 : string/*DOMString*/ = o.readAsText(X.getBlob(), X.getstring());
+        var f2517 : string/*DOMString*/ = o.readAsDataURL(X.getBlob());
     } // FileReaderSync
 
 
     function compile_URL(o : URL) : void {
-        var f2538 : string/*DOMString*/ = URL.createObjectURL(X.getBlob());
+        var f2518 : string/*DOMString*/ = URL.createObjectURL(X.getBlob());
         URL.revokeObjectURL(X.getstring());
     } // URL
 
@@ -3610,58 +3584,58 @@ class _Test extends TestCase {
 
 
     function compile_Touch(o : Touch) : void {
-        var v2539 : int/*long*/ = o.identifier;
-        var v2540 : EventTarget = o.target;
-        var v2541 : int/*long*/ = o.screenX;
-        var v2542 : int/*long*/ = o.screenY;
-        var v2543 : int/*long*/ = o.clientX;
-        var v2544 : int/*long*/ = o.clientY;
-        var v2545 : int/*long*/ = o.pageX;
-        var v2546 : int/*long*/ = o.pageY;
+        var v2519 : int/*long*/ = o.identifier;
+        var v2520 : EventTarget = o.target;
+        var v2521 : int/*long*/ = o.screenX;
+        var v2522 : int/*long*/ = o.screenY;
+        var v2523 : int/*long*/ = o.clientX;
+        var v2524 : int/*long*/ = o.clientY;
+        var v2525 : int/*long*/ = o.pageX;
+        var v2526 : int/*long*/ = o.pageY;
     } // Touch
 
 
     function compile_TouchList(o : TouchList) : void {
-        var v2547 : int/*unsigned long*/ = o.length;
-        var f2548 : MayBeUndefined.<Touch> = o.__native_index_operator__(X.getint());
-        var f2549 : MayBeUndefined.<Touch> = o.item(X.getint());
-        var f2550 : Touch = o.identifiedTouch(X.getint());
+        var v2527 : int/*unsigned long*/ = o.length;
+        var f2528 : MayBeUndefined.<Touch> = o.__native_index_operator__(X.getint());
+        var f2529 : MayBeUndefined.<Touch> = o.item(X.getint());
+        var f2530 : Touch = o.identifiedTouch(X.getint());
     } // TouchList
 
 
     function compile_TouchEvent(o : TouchEvent) : void {
-        var v2551 : TouchList = o.touches;
-        var v2552 : TouchList = o.targetTouches;
-        var v2553 : TouchList = o.changedTouches;
-        var v2554 : boolean = o.altKey;
-        var v2555 : boolean = o.metaKey;
-        var v2556 : boolean = o.ctrlKey;
-        var v2557 : boolean = o.shiftKey;
+        var v2531 : TouchList = o.touches;
+        var v2532 : TouchList = o.targetTouches;
+        var v2533 : TouchList = o.changedTouches;
+        var v2534 : boolean = o.altKey;
+        var v2535 : boolean = o.metaKey;
+        var v2536 : boolean = o.ctrlKey;
+        var v2537 : boolean = o.shiftKey;
     } // TouchEvent
 
 
     function compile_WebSocket(o : WebSocket) : void {
-        var v2558 : string/*DOMString*/ = o.url;
-        var v2559 : int/*unsigned short*/ = WebSocket.CONNECTING;
-        var v2560 : int/*unsigned short*/ = o.CONNECTING;
-        var v2561 : int/*unsigned short*/ = WebSocket.OPEN;
-        var v2562 : int/*unsigned short*/ = o.OPEN;
-        var v2563 : int/*unsigned short*/ = WebSocket.CLOSING;
-        var v2564 : int/*unsigned short*/ = o.CLOSING;
-        var v2565 : int/*unsigned short*/ = WebSocket.CLOSED;
-        var v2566 : int/*unsigned short*/ = o.CLOSED;
-        var v2567 : int/*unsigned short*/ = o.readyState;
-        var v2568 : int/*unsigned long*/ = o.bufferedAmount;
-        var v2569 : function(:Event):void/*Function?*/ = o.onopen;
-        var v2570 : function(:Event):void/*Function?*/ = o.onerror;
-        var v2571 : function(:Event):void/*Function?*/ = o.onclose;
-        var v2572 : string/*DOMString*/ = o.extensions;
-        var v2573 : string/*DOMString*/ = o.protocol;
+        var v2538 : string/*DOMString*/ = o.url;
+        var v2539 : int/*unsigned short*/ = WebSocket.CONNECTING;
+        var v2540 : int/*unsigned short*/ = o.CONNECTING;
+        var v2541 : int/*unsigned short*/ = WebSocket.OPEN;
+        var v2542 : int/*unsigned short*/ = o.OPEN;
+        var v2543 : int/*unsigned short*/ = WebSocket.CLOSING;
+        var v2544 : int/*unsigned short*/ = o.CLOSING;
+        var v2545 : int/*unsigned short*/ = WebSocket.CLOSED;
+        var v2546 : int/*unsigned short*/ = o.CLOSED;
+        var v2547 : int/*unsigned short*/ = o.readyState;
+        var v2548 : int/*unsigned long*/ = o.bufferedAmount;
+        var v2549 : function(:Event):void/*Function?*/ = o.onopen;
+        var v2550 : function(:Event):void/*Function?*/ = o.onerror;
+        var v2551 : function(:Event):void/*Function?*/ = o.onclose;
+        var v2552 : string/*DOMString*/ = o.extensions;
+        var v2553 : string/*DOMString*/ = o.protocol;
         o.close();
         o.close(X.getint());
         o.close(X.getint(), X.getstring());
-        var v2574 : function(:Event):void/*Function?*/ = o.onmessage;
-        var v2575 : string/*DOMString*/ = o.binaryType;
+        var v2554 : function(:Event):void/*Function?*/ = o.onmessage;
+        var v2555 : string/*DOMString*/ = o.binaryType;
         o.send(X.getstring());
         o.send(X.getArrayBufferView());
         o.send(X.getBlob());
@@ -3669,21 +3643,21 @@ class _Test extends TestCase {
 
 
     function compile_CloseEvent(o : CloseEvent) : void {
-        var v2576 : boolean = o.wasClean;
-        var v2577 : int/*unsigned short*/ = o.code;
-        var v2578 : string/*DOMString*/ = o.reason;
+        var v2556 : boolean = o.wasClean;
+        var v2557 : int/*unsigned short*/ = o.code;
+        var v2558 : string/*DOMString*/ = o.reason;
     } // CloseEvent
 
 
     function compile_CloseEventInit(o : CloseEventInit) : void {
-        var v2579 : boolean = o.wasClean;
-        var v2580 : int/*unsigned short*/ = o.code;
-        var v2581 : string/*DOMString*/ = o.reason;
+        var v2559 : boolean = o.wasClean;
+        var v2560 : int/*unsigned short*/ = o.code;
+        var v2561 : string/*DOMString*/ = o.reason;
     } // CloseEventInit
 
 
     function compile_NavigatorGeolocation(o : NavigatorGeolocation) : void {
-        var v2582 : Geolocation = o.geolocation;
+        var v2562 : Geolocation = o.geolocation;
     } // NavigatorGeolocation
 
 
@@ -3691,9 +3665,9 @@ class _Test extends TestCase {
         o.getCurrentPosition(X.getPositionCallback());
         o.getCurrentPosition(X.getPositionCallback(), X.getPositionErrorCallback());
         o.getCurrentPosition(X.getPositionCallback(), X.getPositionErrorCallback(), X.getPositionOptions());
-        var f2583 : int/*long*/ = o.watchPosition(X.getPositionCallback());
-        var f2584 : int/*long*/ = o.watchPosition(X.getPositionCallback(), X.getPositionErrorCallback());
-        var f2585 : int/*long*/ = o.watchPosition(X.getPositionCallback(), X.getPositionErrorCallback(), X.getPositionOptions());
+        var f2563 : int/*long*/ = o.watchPosition(X.getPositionCallback());
+        var f2564 : int/*long*/ = o.watchPosition(X.getPositionCallback(), X.getPositionErrorCallback());
+        var f2565 : int/*long*/ = o.watchPosition(X.getPositionCallback(), X.getPositionErrorCallback(), X.getPositionOptions());
         o.clearWatch(X.getint());
     } // Geolocation
 
@@ -3709,62 +3683,62 @@ class _Test extends TestCase {
 
 
     function compile_PositionOptions(o : PositionOptions) : void {
-        var v2586 : boolean = o.enableHighAccuracy;
-        var v2587 : int/*long*/ = o.timeout;
-        var v2588 : int/*long*/ = o.maximumAge;
-        var v2589 : boolean = o.requireCoords;
-        var v2590 : boolean = o.requestAddress;
+        var v2566 : boolean = o.enableHighAccuracy;
+        var v2567 : int/*long*/ = o.timeout;
+        var v2568 : int/*long*/ = o.maximumAge;
+        var v2569 : boolean = o.requireCoords;
+        var v2570 : boolean = o.requestAddress;
     } // PositionOptions
 
 
     function compile_Position(o : Position) : void {
-        var v2591 : Coordinates = o.coords;
-        var v2592 : Address = o.address;
-        var v2593 : number/*DOMTimeStamp*/ = o.timestamp;
+        var v2571 : Coordinates = o.coords;
+        var v2572 : Address = o.address;
+        var v2573 : number/*DOMTimeStamp*/ = o.timestamp;
     } // Position
 
 
     function compile_Coordinates(o : Coordinates) : void {
-        var v2594 : number/*double?*/ = o.latitude;
-        var v2595 : number/*double?*/ = o.longitude;
-        var v2596 : number/*double?*/ = o.altitude;
-        var v2597 : number/*double?*/ = o.accuracy;
-        var v2598 : number/*double?*/ = o.altitudeAccuracy;
-        var v2599 : number/*double?*/ = o.heading;
-        var v2600 : number/*double?*/ = o.speed;
-        var v2601 : number/*double?*/ = o.verticalSpeed;
+        var v2574 : number/*double?*/ = o.latitude;
+        var v2575 : number/*double?*/ = o.longitude;
+        var v2576 : number/*double?*/ = o.altitude;
+        var v2577 : number/*double?*/ = o.accuracy;
+        var v2578 : number/*double?*/ = o.altitudeAccuracy;
+        var v2579 : number/*double?*/ = o.heading;
+        var v2580 : number/*double?*/ = o.speed;
+        var v2581 : number/*double?*/ = o.verticalSpeed;
     } // Coordinates
 
 
     function compile_Address(o : Address) : void {
-        var v2602 : string/*DOMString?*/ = o.country;
-        var v2603 : string/*DOMString?*/ = o.region;
-        var v2604 : string/*DOMString?*/ = o.county;
-        var v2605 : string/*DOMString?*/ = o.city;
-        var v2606 : string/*DOMString?*/ = o.street;
-        var v2607 : string/*DOMString?*/ = o.streetNumber;
-        var v2608 : string/*DOMString?*/ = o.premises;
-        var v2609 : string/*DOMString?*/ = o.postalCode;
+        var v2582 : string/*DOMString?*/ = o.country;
+        var v2583 : string/*DOMString?*/ = o.region;
+        var v2584 : string/*DOMString?*/ = o.county;
+        var v2585 : string/*DOMString?*/ = o.city;
+        var v2586 : string/*DOMString?*/ = o.street;
+        var v2587 : string/*DOMString?*/ = o.streetNumber;
+        var v2588 : string/*DOMString?*/ = o.premises;
+        var v2589 : string/*DOMString?*/ = o.postalCode;
     } // Address
 
 
     function compile_PositionError(o : PositionError) : void {
-        var v2610 : int/*unsigned short*/ = PositionError.PERMISSION_DENIED;
-        var v2611 : int/*unsigned short*/ = o.PERMISSION_DENIED;
-        var v2612 : int/*unsigned short*/ = PositionError.POSITION_UNAVAILABLE;
-        var v2613 : int/*unsigned short*/ = o.POSITION_UNAVAILABLE;
-        var v2614 : int/*unsigned short*/ = PositionError.TIMEOUT;
-        var v2615 : int/*unsigned short*/ = o.TIMEOUT;
-        var v2616 : int/*unsigned short*/ = o.code;
-        var v2617 : string/*DOMString*/ = o.message;
+        var v2590 : int/*unsigned short*/ = PositionError.PERMISSION_DENIED;
+        var v2591 : int/*unsigned short*/ = o.PERMISSION_DENIED;
+        var v2592 : int/*unsigned short*/ = PositionError.POSITION_UNAVAILABLE;
+        var v2593 : int/*unsigned short*/ = o.POSITION_UNAVAILABLE;
+        var v2594 : int/*unsigned short*/ = PositionError.TIMEOUT;
+        var v2595 : int/*unsigned short*/ = o.TIMEOUT;
+        var v2596 : int/*unsigned short*/ = o.code;
+        var v2597 : string/*DOMString*/ = o.message;
     } // PositionError
 
 
     function compile_Storage(o : Storage) : void {
-        var v2618 : int/*unsigned long*/ = o.length;
-        var f2619 : string/*DOMString?*/ = o.key(X.getint());
-        var f2620 : MayBeUndefined.<string/*DOMString*/> = o.__native_index_operator__(X.getstring());
-        var f2621 : MayBeUndefined.<string/*DOMString*/> = o.getItem(X.getstring());
+        var v2598 : int/*unsigned long*/ = o.length;
+        var f2599 : string/*DOMString?*/ = o.key(X.getint());
+        var f2600 : MayBeUndefined.<string/*DOMString*/> = o.__native_index_operator__(X.getstring());
+        var f2601 : MayBeUndefined.<string/*DOMString*/> = o.getItem(X.getstring());
         o.setItem(X.getstring(), X.getstring());
         o.removeItem(X.getstring());
         o.clear();
@@ -3772,69 +3746,69 @@ class _Test extends TestCase {
 
 
     function compile_WindowSessionStorage(o : WindowSessionStorage) : void {
-        var v2622 : Storage = o.sessionStorage;
+        var v2602 : Storage = o.sessionStorage;
     } // WindowSessionStorage
 
 
     function compile_WindowLocalStorage(o : WindowLocalStorage) : void {
-        var v2623 : Storage = o.localStorage;
+        var v2603 : Storage = o.localStorage;
     } // WindowLocalStorage
 
 
     function compile_StorageEvent(o : StorageEvent) : void {
-        var v2624 : string/*DOMString?*/ = o.key;
-        var v2625 : string/*DOMString?*/ = o.oldValue;
-        var v2626 : string/*DOMString?*/ = o.newValue;
-        var v2627 : string/*DOMString*/ = o.url;
-        var v2628 : Storage = o.storageArea;
+        var v2604 : string/*DOMString?*/ = o.key;
+        var v2605 : string/*DOMString?*/ = o.oldValue;
+        var v2606 : string/*DOMString?*/ = o.newValue;
+        var v2607 : string/*DOMString*/ = o.url;
+        var v2608 : Storage = o.storageArea;
     } // StorageEvent
 
 
     function compile_StorageEventInit(o : StorageEventInit) : void {
-        var v2629 : string/*DOMString?*/ = o.key;
-        var v2630 : string/*DOMString?*/ = o.oldValue;
-        var v2631 : string/*DOMString?*/ = o.newValue;
-        var v2632 : string/*DOMString*/ = o.url;
-        var v2633 : Storage = o.storageArea;
+        var v2609 : string/*DOMString?*/ = o.key;
+        var v2610 : string/*DOMString?*/ = o.oldValue;
+        var v2611 : string/*DOMString?*/ = o.newValue;
+        var v2612 : string/*DOMString*/ = o.url;
+        var v2613 : Storage = o.storageArea;
     } // StorageEventInit
 
 
     function compile_NodeSelector(o : NodeSelector) : void {
-        var f2634 : Element = o.querySelector(X.getstring());
-        var f2635 : NodeList = o.querySelectorAll(X.getstring());
+        var f2614 : Element = o.querySelector(X.getstring());
+        var f2615 : NodeList = o.querySelectorAll(X.getstring());
     } // NodeSelector
 
 
     function compile_DOMParser(o : DOMParser) : void {
-        var f2636 : HTMLDocument/*Document*/ = o.parseFromString(X.getstring(), X.getstring());
+        var f2616 : HTMLDocument/*Document*/ = o.parseFromString(X.getstring(), X.getstring());
     } // DOMParser
 
 
     function compile_XMLSerializer(o : XMLSerializer) : void {
-        var f2637 : string/*DOMString*/ = o.serializeToString(X.getNode());
+        var f2617 : string/*DOMString*/ = o.serializeToString(X.getNode());
     } // XMLSerializer
 
 
     function compile_ArrayBuffer(o : ArrayBuffer) : void {
-        var v2638 : int/*unsigned long*/ = o.byteLength;
-        var f2639 : ArrayBuffer = o.slice(X.getint());
-        var f2640 : ArrayBuffer = o.slice(X.getint(), X.getint());
+        var v2618 : int/*unsigned long*/ = o.byteLength;
+        var f2619 : ArrayBuffer = o.slice(X.getint());
+        var f2620 : ArrayBuffer = o.slice(X.getint(), X.getint());
     } // ArrayBuffer
 
 
     function compile_ArrayBufferView(o : ArrayBufferView) : void {
-        var v2641 : ArrayBuffer = o.buffer;
-        var v2642 : int/*unsigned long*/ = o.byteOffset;
-        var v2643 : int/*unsigned long*/ = o.byteLength;
+        var v2621 : ArrayBuffer = o.buffer;
+        var v2622 : int/*unsigned long*/ = o.byteOffset;
+        var v2623 : int/*unsigned long*/ = o.byteLength;
     } // ArrayBufferView
 
 
     function compile_Int8Array(o : Int8Array) : void {
-        var v2644 : int/*long*/ = Int8Array.BYTES_PER_ELEMENT;
-        var v2645 : int/*long*/ = o.BYTES_PER_ELEMENT;
-        var v2646 : int/*unsigned long*/ = o.length;
-        var f2647 : MayBeUndefined.<int/*byte*/> = o.__native_index_operator__(X.getint());
-        var f2648 : MayBeUndefined.<int/*byte*/> = o.get(X.getint());
+        var v2624 : int/*long*/ = Int8Array.BYTES_PER_ELEMENT;
+        var v2625 : int/*long*/ = o.BYTES_PER_ELEMENT;
+        var v2626 : int/*unsigned long*/ = o.length;
+        var f2627 : MayBeUndefined.<int/*byte*/> = o.__native_index_operator__(X.getint());
+        var f2628 : MayBeUndefined.<int/*byte*/> = o.get(X.getint());
         o.set(X.getint(), X.getint());
         o.set(X.getInt8Array());
         o.set(X.getInt8Array(), X.getint());
@@ -3842,16 +3816,16 @@ class _Test extends TestCase {
         o.set(X.getint__(), X.getint());
         o.set(X.getnumber__());
         o.set(X.getnumber__(), X.getint());
-        var f2649 : Int8Array = o.subarray(X.getint(), X.getint());
+        var f2629 : Int8Array = o.subarray(X.getint(), X.getint());
     } // Int8Array
 
 
     function compile_Uint8Array(o : Uint8Array) : void {
-        var v2650 : int/*long*/ = Uint8Array.BYTES_PER_ELEMENT;
-        var v2651 : int/*long*/ = o.BYTES_PER_ELEMENT;
-        var v2652 : int/*unsigned long*/ = o.length;
-        var f2653 : MayBeUndefined.<int/*octet*/> = o.__native_index_operator__(X.getint());
-        var f2654 : MayBeUndefined.<int/*octet*/> = o.get(X.getint());
+        var v2630 : int/*long*/ = Uint8Array.BYTES_PER_ELEMENT;
+        var v2631 : int/*long*/ = o.BYTES_PER_ELEMENT;
+        var v2632 : int/*unsigned long*/ = o.length;
+        var f2633 : MayBeUndefined.<int/*octet*/> = o.__native_index_operator__(X.getint());
+        var f2634 : MayBeUndefined.<int/*octet*/> = o.get(X.getint());
         o.set(X.getint(), X.getint());
         o.set(X.getUint8Array());
         o.set(X.getUint8Array(), X.getint());
@@ -3859,7 +3833,7 @@ class _Test extends TestCase {
         o.set(X.getint__(), X.getint());
         o.set(X.getnumber__());
         o.set(X.getnumber__(), X.getint());
-        var f2655 : Uint8Array = o.subarray(X.getint(), X.getint());
+        var f2635 : Uint8Array = o.subarray(X.getint(), X.getint());
     } // Uint8Array
 
 
@@ -3871,16 +3845,16 @@ class _Test extends TestCase {
         o.set(X.getint__(), X.getint());
         o.set(X.getnumber__());
         o.set(X.getnumber__(), X.getint());
-        var f2656 : Uint8ClampedArray = o.subarray(X.getint(), X.getint());
+        var f2636 : Uint8ClampedArray = o.subarray(X.getint(), X.getint());
     } // Uint8ClampedArray
 
 
     function compile_Int16Array(o : Int16Array) : void {
-        var v2657 : int/*long*/ = Int16Array.BYTES_PER_ELEMENT;
-        var v2658 : int/*long*/ = o.BYTES_PER_ELEMENT;
-        var v2659 : int/*unsigned long*/ = o.length;
-        var f2660 : MayBeUndefined.<int/*short*/> = o.__native_index_operator__(X.getint());
-        var f2661 : MayBeUndefined.<int/*short*/> = o.get(X.getint());
+        var v2637 : int/*long*/ = Int16Array.BYTES_PER_ELEMENT;
+        var v2638 : int/*long*/ = o.BYTES_PER_ELEMENT;
+        var v2639 : int/*unsigned long*/ = o.length;
+        var f2640 : MayBeUndefined.<int/*short*/> = o.__native_index_operator__(X.getint());
+        var f2641 : MayBeUndefined.<int/*short*/> = o.get(X.getint());
         o.set(X.getint(), X.getint());
         o.set(X.getInt16Array());
         o.set(X.getInt16Array(), X.getint());
@@ -3888,16 +3862,16 @@ class _Test extends TestCase {
         o.set(X.getint__(), X.getint());
         o.set(X.getnumber__());
         o.set(X.getnumber__(), X.getint());
-        var f2662 : Int16Array = o.subarray(X.getint(), X.getint());
+        var f2642 : Int16Array = o.subarray(X.getint(), X.getint());
     } // Int16Array
 
 
     function compile_Uint16Array(o : Uint16Array) : void {
-        var v2663 : int/*long*/ = Uint16Array.BYTES_PER_ELEMENT;
-        var v2664 : int/*long*/ = o.BYTES_PER_ELEMENT;
-        var v2665 : int/*unsigned long*/ = o.length;
-        var f2666 : MayBeUndefined.<int/*unsigned short*/> = o.__native_index_operator__(X.getint());
-        var f2667 : MayBeUndefined.<int/*unsigned short*/> = o.get(X.getint());
+        var v2643 : int/*long*/ = Uint16Array.BYTES_PER_ELEMENT;
+        var v2644 : int/*long*/ = o.BYTES_PER_ELEMENT;
+        var v2645 : int/*unsigned long*/ = o.length;
+        var f2646 : MayBeUndefined.<int/*unsigned short*/> = o.__native_index_operator__(X.getint());
+        var f2647 : MayBeUndefined.<int/*unsigned short*/> = o.get(X.getint());
         o.set(X.getint(), X.getint());
         o.set(X.getUint16Array());
         o.set(X.getUint16Array(), X.getint());
@@ -3905,16 +3879,16 @@ class _Test extends TestCase {
         o.set(X.getint__(), X.getint());
         o.set(X.getnumber__());
         o.set(X.getnumber__(), X.getint());
-        var f2668 : Uint16Array = o.subarray(X.getint(), X.getint());
+        var f2648 : Uint16Array = o.subarray(X.getint(), X.getint());
     } // Uint16Array
 
 
     function compile_Int32Array(o : Int32Array) : void {
-        var v2669 : int/*long*/ = Int32Array.BYTES_PER_ELEMENT;
-        var v2670 : int/*long*/ = o.BYTES_PER_ELEMENT;
-        var v2671 : int/*unsigned long*/ = o.length;
-        var f2672 : MayBeUndefined.<int/*long*/> = o.__native_index_operator__(X.getint());
-        var f2673 : MayBeUndefined.<int/*long*/> = o.get(X.getint());
+        var v2649 : int/*long*/ = Int32Array.BYTES_PER_ELEMENT;
+        var v2650 : int/*long*/ = o.BYTES_PER_ELEMENT;
+        var v2651 : int/*unsigned long*/ = o.length;
+        var f2652 : MayBeUndefined.<int/*long*/> = o.__native_index_operator__(X.getint());
+        var f2653 : MayBeUndefined.<int/*long*/> = o.get(X.getint());
         o.set(X.getint(), X.getint());
         o.set(X.getInt32Array());
         o.set(X.getInt32Array(), X.getint());
@@ -3922,16 +3896,16 @@ class _Test extends TestCase {
         o.set(X.getint__(), X.getint());
         o.set(X.getnumber__());
         o.set(X.getnumber__(), X.getint());
-        var f2674 : Int32Array = o.subarray(X.getint(), X.getint());
+        var f2654 : Int32Array = o.subarray(X.getint(), X.getint());
     } // Int32Array
 
 
     function compile_Uint32Array(o : Uint32Array) : void {
-        var v2675 : int/*long*/ = Uint32Array.BYTES_PER_ELEMENT;
-        var v2676 : int/*long*/ = o.BYTES_PER_ELEMENT;
-        var v2677 : int/*unsigned long*/ = o.length;
-        var f2678 : MayBeUndefined.<int/*unsigned long*/> = o.__native_index_operator__(X.getint());
-        var f2679 : MayBeUndefined.<int/*unsigned long*/> = o.get(X.getint());
+        var v2655 : int/*long*/ = Uint32Array.BYTES_PER_ELEMENT;
+        var v2656 : int/*long*/ = o.BYTES_PER_ELEMENT;
+        var v2657 : int/*unsigned long*/ = o.length;
+        var f2658 : MayBeUndefined.<int/*unsigned long*/> = o.__native_index_operator__(X.getint());
+        var f2659 : MayBeUndefined.<int/*unsigned long*/> = o.get(X.getint());
         o.set(X.getint(), X.getint());
         o.set(X.getUint32Array());
         o.set(X.getUint32Array(), X.getint());
@@ -3939,55 +3913,55 @@ class _Test extends TestCase {
         o.set(X.getint__(), X.getint());
         o.set(X.getnumber__());
         o.set(X.getnumber__(), X.getint());
-        var f2680 : Uint32Array = o.subarray(X.getint(), X.getint());
+        var f2660 : Uint32Array = o.subarray(X.getint(), X.getint());
     } // Uint32Array
 
 
     function compile_Float32Array(o : Float32Array) : void {
-        var v2681 : int/*long*/ = Float32Array.BYTES_PER_ELEMENT;
-        var v2682 : int/*long*/ = o.BYTES_PER_ELEMENT;
-        var v2683 : int/*unsigned long*/ = o.length;
-        var f2684 : MayBeUndefined.<number/*float*/> = o.__native_index_operator__(X.getint());
-        var f2685 : MayBeUndefined.<number/*float*/> = o.get(X.getint());
+        var v2661 : int/*long*/ = Float32Array.BYTES_PER_ELEMENT;
+        var v2662 : int/*long*/ = o.BYTES_PER_ELEMENT;
+        var v2663 : int/*unsigned long*/ = o.length;
+        var f2664 : MayBeUndefined.<number/*float*/> = o.__native_index_operator__(X.getint());
+        var f2665 : MayBeUndefined.<number/*float*/> = o.get(X.getint());
         o.set(X.getint(), X.getnumber());
         o.set(X.getFloat32Array());
         o.set(X.getFloat32Array(), X.getint());
         o.set(X.getnumber__());
         o.set(X.getnumber__(), X.getint());
-        var f2686 : Float32Array = o.subarray(X.getint(), X.getint());
+        var f2666 : Float32Array = o.subarray(X.getint(), X.getint());
     } // Float32Array
 
 
     function compile_Float64Array(o : Float64Array) : void {
-        var v2687 : int/*long*/ = Float64Array.BYTES_PER_ELEMENT;
-        var v2688 : int/*long*/ = o.BYTES_PER_ELEMENT;
-        var v2689 : int/*unsigned long*/ = o.length;
-        var f2690 : MayBeUndefined.<number/*double*/> = o.__native_index_operator__(X.getint());
-        var f2691 : MayBeUndefined.<number/*double*/> = o.get(X.getint());
+        var v2667 : int/*long*/ = Float64Array.BYTES_PER_ELEMENT;
+        var v2668 : int/*long*/ = o.BYTES_PER_ELEMENT;
+        var v2669 : int/*unsigned long*/ = o.length;
+        var f2670 : MayBeUndefined.<number/*double*/> = o.__native_index_operator__(X.getint());
+        var f2671 : MayBeUndefined.<number/*double*/> = o.get(X.getint());
         o.set(X.getint(), X.getnumber());
         o.set(X.getFloat64Array());
         o.set(X.getFloat64Array(), X.getint());
         o.set(X.getnumber__());
         o.set(X.getnumber__(), X.getint());
-        var f2692 : Float64Array = o.subarray(X.getint(), X.getint());
+        var f2672 : Float64Array = o.subarray(X.getint(), X.getint());
     } // Float64Array
 
 
     function compile_DataView(o : DataView) : void {
-        var f2693 : int/*byte*/ = o.getInt8(X.getint());
-        var f2694 : int/*octet*/ = o.getUint8(X.getint());
-        var f2695 : int/*short*/ = o.getInt16(X.getint());
-        var f2696 : int/*short*/ = o.getInt16(X.getint(), X.getboolean());
-        var f2697 : int/*unsigned short*/ = o.getUint16(X.getint());
-        var f2698 : int/*unsigned short*/ = o.getUint16(X.getint(), X.getboolean());
-        var f2699 : int/*long*/ = o.getInt32(X.getint());
-        var f2700 : int/*long*/ = o.getInt32(X.getint(), X.getboolean());
-        var f2701 : int/*unsigned long*/ = o.getUint32(X.getint());
-        var f2702 : int/*unsigned long*/ = o.getUint32(X.getint(), X.getboolean());
-        var f2703 : number/*float*/ = o.getFloat32(X.getint());
-        var f2704 : number/*float*/ = o.getFloat32(X.getint(), X.getboolean());
-        var f2705 : number/*double*/ = o.getFloat64(X.getint());
-        var f2706 : number/*double*/ = o.getFloat64(X.getint(), X.getboolean());
+        var f2673 : int/*byte*/ = o.getInt8(X.getint());
+        var f2674 : int/*octet*/ = o.getUint8(X.getint());
+        var f2675 : int/*short*/ = o.getInt16(X.getint());
+        var f2676 : int/*short*/ = o.getInt16(X.getint(), X.getboolean());
+        var f2677 : int/*unsigned short*/ = o.getUint16(X.getint());
+        var f2678 : int/*unsigned short*/ = o.getUint16(X.getint(), X.getboolean());
+        var f2679 : int/*long*/ = o.getInt32(X.getint());
+        var f2680 : int/*long*/ = o.getInt32(X.getint(), X.getboolean());
+        var f2681 : int/*unsigned long*/ = o.getUint32(X.getint());
+        var f2682 : int/*unsigned long*/ = o.getUint32(X.getint(), X.getboolean());
+        var f2683 : number/*float*/ = o.getFloat32(X.getint());
+        var f2684 : number/*float*/ = o.getFloat32(X.getint(), X.getboolean());
+        var f2685 : number/*double*/ = o.getFloat64(X.getint());
+        var f2686 : number/*double*/ = o.getFloat64(X.getint(), X.getboolean());
         o.setInt8(X.getint(), X.getint());
         o.setUint8(X.getint(), X.getint());
         o.setInt16(X.getint(), X.getint());
@@ -4006,22 +3980,22 @@ class _Test extends TestCase {
 
 
     function compile_CanvasRenderingContext2D(o : CanvasRenderingContext2D) : void {
-        var v2707 : HTMLCanvasElement = o.canvas;
+        var v2687 : HTMLCanvasElement = o.canvas;
         o.save();
         o.restore();
-        var v2708 : number/*double*/ = o.globalAlpha;
-        var v2709 : string/*DOMString*/ = o.globalCompositeOperation;
-        var v2710 : variant/*any*/ = o.strokeStyle;
-        var v2711 : variant/*any*/ = o.fillStyle;
-        var f2712 : CanvasGradient = o.createLinearGradient(X.getnumber(), X.getnumber(), X.getnumber(), X.getnumber());
-        var f2713 : CanvasGradient = o.createRadialGradient(X.getnumber(), X.getnumber(), X.getnumber(), X.getnumber(), X.getnumber(), X.getnumber());
-        var f2714 : CanvasPattern = o.createPattern(X.getHTMLImageElement(), X.getstring());
-        var f2715 : CanvasPattern = o.createPattern(X.getHTMLCanvasElement(), X.getstring());
-        var f2716 : CanvasPattern = o.createPattern(X.getHTMLVideoElement(), X.getstring());
-        var v2717 : number/*double*/ = o.shadowOffsetX;
-        var v2718 : number/*double*/ = o.shadowOffsetY;
-        var v2719 : number/*double*/ = o.shadowBlur;
-        var v2720 : string/*DOMString*/ = o.shadowColor;
+        var v2688 : number/*double*/ = o.globalAlpha;
+        var v2689 : string/*DOMString*/ = o.globalCompositeOperation;
+        var v2690 : variant/*any*/ = o.strokeStyle;
+        var v2691 : variant/*any*/ = o.fillStyle;
+        var f2692 : CanvasGradient = o.createLinearGradient(X.getnumber(), X.getnumber(), X.getnumber(), X.getnumber());
+        var f2693 : CanvasGradient = o.createRadialGradient(X.getnumber(), X.getnumber(), X.getnumber(), X.getnumber(), X.getnumber(), X.getnumber());
+        var f2694 : CanvasPattern = o.createPattern(X.getHTMLImageElement(), X.getstring());
+        var f2695 : CanvasPattern = o.createPattern(X.getHTMLCanvasElement(), X.getstring());
+        var f2696 : CanvasPattern = o.createPattern(X.getHTMLVideoElement(), X.getstring());
+        var v2697 : number/*double*/ = o.shadowOffsetX;
+        var v2698 : number/*double*/ = o.shadowOffsetY;
+        var v2699 : number/*double*/ = o.shadowBlur;
+        var v2700 : string/*DOMString*/ = o.shadowColor;
         o.clearRect(X.getnumber(), X.getnumber(), X.getnumber(), X.getnumber());
         o.fillRect(X.getnumber(), X.getnumber(), X.getnumber(), X.getnumber());
         o.strokeRect(X.getnumber(), X.getnumber(), X.getnumber(), X.getnumber());
@@ -4029,15 +4003,15 @@ class _Test extends TestCase {
         o.fill();
         o.stroke();
         o.drawSystemFocusRing(X.getElement());
-        var f2721 : boolean = o.drawCustomFocusRing(X.getElement());
+        var f2701 : boolean = o.drawCustomFocusRing(X.getElement());
         o.scrollPathIntoView();
         o.clip();
-        var f2722 : boolean = o.isPointInPath(X.getnumber(), X.getnumber());
+        var f2702 : boolean = o.isPointInPath(X.getnumber(), X.getnumber());
         o.fillText(X.getstring(), X.getnumber(), X.getnumber());
         o.fillText(X.getstring(), X.getnumber(), X.getnumber(), X.getnumber());
         o.strokeText(X.getstring(), X.getnumber(), X.getnumber());
         o.strokeText(X.getstring(), X.getnumber(), X.getnumber(), X.getnumber());
-        var f2723 : TextMetrics = o.measureText(X.getstring());
+        var f2703 : TextMetrics = o.measureText(X.getstring());
         o.drawImage(X.getHTMLImageElement(), X.getnumber(), X.getnumber());
         o.drawImage(X.getHTMLCanvasElement(), X.getnumber(), X.getnumber());
         o.drawImage(X.getHTMLVideoElement(), X.getnumber(), X.getnumber());
@@ -4047,9 +4021,9 @@ class _Test extends TestCase {
         o.drawImage(X.getHTMLImageElement(), X.getnumber(), X.getnumber(), X.getnumber(), X.getnumber(), X.getnumber(), X.getnumber(), X.getnumber(), X.getnumber());
         o.drawImage(X.getHTMLCanvasElement(), X.getnumber(), X.getnumber(), X.getnumber(), X.getnumber(), X.getnumber(), X.getnumber(), X.getnumber(), X.getnumber());
         o.drawImage(X.getHTMLVideoElement(), X.getnumber(), X.getnumber(), X.getnumber(), X.getnumber(), X.getnumber(), X.getnumber(), X.getnumber(), X.getnumber());
-        var f2724 : ImageData = o.createImageData(X.getnumber(), X.getnumber());
-        var f2725 : ImageData = o.createImageData(X.getImageData());
-        var f2726 : ImageData = o.getImageData(X.getnumber(), X.getnumber(), X.getnumber(), X.getnumber());
+        var f2704 : ImageData = o.createImageData(X.getnumber(), X.getnumber());
+        var f2705 : ImageData = o.createImageData(X.getImageData());
+        var f2706 : ImageData = o.getImageData(X.getnumber(), X.getnumber(), X.getnumber(), X.getnumber());
         o.putImageData(X.getImageData(), X.getnumber(), X.getnumber());
         o.putImageData(X.getImageData(), X.getnumber(), X.getnumber(), X.getnumber(), X.getnumber(), X.getnumber(), X.getnumber());
         o.scale(X.getnumber(), X.getnumber());
@@ -4057,10 +4031,10 @@ class _Test extends TestCase {
         o.translate(X.getnumber(), X.getnumber());
         o.transform(X.getnumber(), X.getnumber(), X.getnumber(), X.getnumber(), X.getnumber(), X.getnumber());
         o.setTransform(X.getnumber(), X.getnumber(), X.getnumber(), X.getnumber(), X.getnumber(), X.getnumber());
-        var v2727 : number/*double*/ = o.lineWidth;
-        var v2728 : string/*DOMString*/ = o.lineCap;
-        var v2729 : string/*DOMString*/ = o.lineJoin;
-        var v2730 : number/*double*/ = o.miterLimit;
+        var v2707 : number/*double*/ = o.lineWidth;
+        var v2708 : string/*DOMString*/ = o.lineCap;
+        var v2709 : string/*DOMString*/ = o.lineJoin;
+        var v2710 : number/*double*/ = o.miterLimit;
         o.closePath();
         o.moveTo(X.getnumber(), X.getnumber());
         o.lineTo(X.getnumber(), X.getnumber());
@@ -4070,9 +4044,9 @@ class _Test extends TestCase {
         o.rect(X.getnumber(), X.getnumber(), X.getnumber(), X.getnumber());
         o.arc(X.getnumber(), X.getnumber(), X.getnumber(), X.getnumber(), X.getnumber());
         o.arc(X.getnumber(), X.getnumber(), X.getnumber(), X.getnumber(), X.getnumber(), X.getboolean());
-        var v2731 : string/*DOMString*/ = o.font;
-        var v2732 : string/*DOMString*/ = o.textAlign;
-        var v2733 : string/*DOMString*/ = o.textBaseline;
+        var v2711 : string/*DOMString*/ = o.font;
+        var v2712 : string/*DOMString*/ = o.textAlign;
+        var v2713 : string/*DOMString*/ = o.textBaseline;
     } // CanvasRenderingContext2D
 
 
@@ -4086,17 +4060,17 @@ class _Test extends TestCase {
 
 
     function compile_CanvasLineStyles(o : CanvasLineStyles) : void {
-        var v2734 : number/*double*/ = o.lineWidth;
-        var v2735 : string/*DOMString*/ = o.lineCap;
-        var v2736 : string/*DOMString*/ = o.lineJoin;
-        var v2737 : number/*double*/ = o.miterLimit;
+        var v2714 : number/*double*/ = o.lineWidth;
+        var v2715 : string/*DOMString*/ = o.lineCap;
+        var v2716 : string/*DOMString*/ = o.lineJoin;
+        var v2717 : number/*double*/ = o.miterLimit;
     } // CanvasLineStyles
 
 
     function compile_CanvasText(o : CanvasText) : void {
-        var v2738 : string/*DOMString*/ = o.font;
-        var v2739 : string/*DOMString*/ = o.textAlign;
-        var v2740 : string/*DOMString*/ = o.textBaseline;
+        var v2718 : string/*DOMString*/ = o.font;
+        var v2719 : string/*DOMString*/ = o.textAlign;
+        var v2720 : string/*DOMString*/ = o.textBaseline;
     } // CanvasText
 
 
@@ -4123,24 +4097,24 @@ class _Test extends TestCase {
 
 
     function compile_TextMetrics(o : TextMetrics) : void {
-        var v2741 : number/*double*/ = o.width;
+        var v2721 : number/*double*/ = o.width;
     } // TextMetrics
 
 
     function compile_ImageData(o : ImageData) : void {
-        var v2742 : int/*unsigned long*/ = o.width;
-        var v2743 : int/*unsigned long*/ = o.height;
-        var v2744 : Uint8ClampedArray = o.data;
+        var v2722 : int/*unsigned long*/ = o.width;
+        var v2723 : int/*unsigned long*/ = o.height;
+        var v2724 : Uint8ClampedArray = o.data;
     } // ImageData
 
 
     function compile_WebGLContextAttributes(o : WebGLContextAttributes) : void {
-        var v2745 : boolean = o.alpha;
-        var v2746 : boolean = o.depth;
-        var v2747 : boolean = o.stencil;
-        var v2748 : boolean = o.antialias;
-        var v2749 : boolean = o.premultipliedAlpha;
-        var v2750 : boolean = o.preserveDrawingBuffer;
+        var v2725 : boolean = o.alpha;
+        var v2726 : boolean = o.depth;
+        var v2727 : boolean = o.stencil;
+        var v2728 : boolean = o.antialias;
+        var v2729 : boolean = o.premultipliedAlpha;
+        var v2730 : boolean = o.preserveDrawingBuffer;
     } // WebGLContextAttributes
 
 
@@ -4177,617 +4151,617 @@ class _Test extends TestCase {
 
 
     function compile_WebGLActiveInfo(o : WebGLActiveInfo) : void {
-        var v2751 : int/*GLint*/ = o.size;
-        var v2752 : int/*GLenum*/ = o.type;
-        var v2753 : string/*DOMString*/ = o.name;
+        var v2731 : int/*GLint*/ = o.size;
+        var v2732 : int/*GLenum*/ = o.type;
+        var v2733 : string/*DOMString*/ = o.name;
     } // WebGLActiveInfo
 
 
     function compile_WebGLShaderPrecisionFormat(o : WebGLShaderPrecisionFormat) : void {
-        var v2754 : int/*GLint*/ = o.rangeMin;
-        var v2755 : int/*GLint*/ = o.rangeMax;
-        var v2756 : int/*GLint*/ = o.precision;
+        var v2734 : int/*GLint*/ = o.rangeMin;
+        var v2735 : int/*GLint*/ = o.rangeMax;
+        var v2736 : int/*GLint*/ = o.precision;
     } // WebGLShaderPrecisionFormat
 
 
     function compile_WebGLRenderingContext(o : WebGLRenderingContext) : void {
-        var v2757 : int/*GLenum*/ = WebGLRenderingContext.DEPTH_BUFFER_BIT;
-        var v2758 : int/*GLenum*/ = o.DEPTH_BUFFER_BIT;
-        var v2759 : int/*GLenum*/ = WebGLRenderingContext.STENCIL_BUFFER_BIT;
-        var v2760 : int/*GLenum*/ = o.STENCIL_BUFFER_BIT;
-        var v2761 : int/*GLenum*/ = WebGLRenderingContext.COLOR_BUFFER_BIT;
-        var v2762 : int/*GLenum*/ = o.COLOR_BUFFER_BIT;
-        var v2763 : int/*GLenum*/ = WebGLRenderingContext.POINTS;
-        var v2764 : int/*GLenum*/ = o.POINTS;
-        var v2765 : int/*GLenum*/ = WebGLRenderingContext.LINES;
-        var v2766 : int/*GLenum*/ = o.LINES;
-        var v2767 : int/*GLenum*/ = WebGLRenderingContext.LINE_LOOP;
-        var v2768 : int/*GLenum*/ = o.LINE_LOOP;
-        var v2769 : int/*GLenum*/ = WebGLRenderingContext.LINE_STRIP;
-        var v2770 : int/*GLenum*/ = o.LINE_STRIP;
-        var v2771 : int/*GLenum*/ = WebGLRenderingContext.TRIANGLES;
-        var v2772 : int/*GLenum*/ = o.TRIANGLES;
-        var v2773 : int/*GLenum*/ = WebGLRenderingContext.TRIANGLE_STRIP;
-        var v2774 : int/*GLenum*/ = o.TRIANGLE_STRIP;
-        var v2775 : int/*GLenum*/ = WebGLRenderingContext.TRIANGLE_FAN;
-        var v2776 : int/*GLenum*/ = o.TRIANGLE_FAN;
-        var v2777 : int/*GLenum*/ = WebGLRenderingContext.ZERO;
-        var v2778 : int/*GLenum*/ = o.ZERO;
-        var v2779 : int/*GLenum*/ = WebGLRenderingContext.ONE;
-        var v2780 : int/*GLenum*/ = o.ONE;
-        var v2781 : int/*GLenum*/ = WebGLRenderingContext.SRC_COLOR;
-        var v2782 : int/*GLenum*/ = o.SRC_COLOR;
-        var v2783 : int/*GLenum*/ = WebGLRenderingContext.ONE_MINUS_SRC_COLOR;
-        var v2784 : int/*GLenum*/ = o.ONE_MINUS_SRC_COLOR;
-        var v2785 : int/*GLenum*/ = WebGLRenderingContext.SRC_ALPHA;
-        var v2786 : int/*GLenum*/ = o.SRC_ALPHA;
-        var v2787 : int/*GLenum*/ = WebGLRenderingContext.ONE_MINUS_SRC_ALPHA;
-        var v2788 : int/*GLenum*/ = o.ONE_MINUS_SRC_ALPHA;
-        var v2789 : int/*GLenum*/ = WebGLRenderingContext.DST_ALPHA;
-        var v2790 : int/*GLenum*/ = o.DST_ALPHA;
-        var v2791 : int/*GLenum*/ = WebGLRenderingContext.ONE_MINUS_DST_ALPHA;
-        var v2792 : int/*GLenum*/ = o.ONE_MINUS_DST_ALPHA;
-        var v2793 : int/*GLenum*/ = WebGLRenderingContext.DST_COLOR;
-        var v2794 : int/*GLenum*/ = o.DST_COLOR;
-        var v2795 : int/*GLenum*/ = WebGLRenderingContext.ONE_MINUS_DST_COLOR;
-        var v2796 : int/*GLenum*/ = o.ONE_MINUS_DST_COLOR;
-        var v2797 : int/*GLenum*/ = WebGLRenderingContext.SRC_ALPHA_SATURATE;
-        var v2798 : int/*GLenum*/ = o.SRC_ALPHA_SATURATE;
-        var v2799 : int/*GLenum*/ = WebGLRenderingContext.FUNC_ADD;
-        var v2800 : int/*GLenum*/ = o.FUNC_ADD;
-        var v2801 : int/*GLenum*/ = WebGLRenderingContext.BLEND_EQUATION;
-        var v2802 : int/*GLenum*/ = o.BLEND_EQUATION;
-        var v2803 : int/*GLenum*/ = WebGLRenderingContext.BLEND_EQUATION_RGB;
-        var v2804 : int/*GLenum*/ = o.BLEND_EQUATION_RGB;
-        var v2805 : int/*GLenum*/ = WebGLRenderingContext.BLEND_EQUATION_ALPHA;
-        var v2806 : int/*GLenum*/ = o.BLEND_EQUATION_ALPHA;
-        var v2807 : int/*GLenum*/ = WebGLRenderingContext.FUNC_SUBTRACT;
-        var v2808 : int/*GLenum*/ = o.FUNC_SUBTRACT;
-        var v2809 : int/*GLenum*/ = WebGLRenderingContext.FUNC_REVERSE_SUBTRACT;
-        var v2810 : int/*GLenum*/ = o.FUNC_REVERSE_SUBTRACT;
-        var v2811 : int/*GLenum*/ = WebGLRenderingContext.BLEND_DST_RGB;
-        var v2812 : int/*GLenum*/ = o.BLEND_DST_RGB;
-        var v2813 : int/*GLenum*/ = WebGLRenderingContext.BLEND_SRC_RGB;
-        var v2814 : int/*GLenum*/ = o.BLEND_SRC_RGB;
-        var v2815 : int/*GLenum*/ = WebGLRenderingContext.BLEND_DST_ALPHA;
-        var v2816 : int/*GLenum*/ = o.BLEND_DST_ALPHA;
-        var v2817 : int/*GLenum*/ = WebGLRenderingContext.BLEND_SRC_ALPHA;
-        var v2818 : int/*GLenum*/ = o.BLEND_SRC_ALPHA;
-        var v2819 : int/*GLenum*/ = WebGLRenderingContext.CONSTANT_COLOR;
-        var v2820 : int/*GLenum*/ = o.CONSTANT_COLOR;
-        var v2821 : int/*GLenum*/ = WebGLRenderingContext.ONE_MINUS_CONSTANT_COLOR;
-        var v2822 : int/*GLenum*/ = o.ONE_MINUS_CONSTANT_COLOR;
-        var v2823 : int/*GLenum*/ = WebGLRenderingContext.CONSTANT_ALPHA;
-        var v2824 : int/*GLenum*/ = o.CONSTANT_ALPHA;
-        var v2825 : int/*GLenum*/ = WebGLRenderingContext.ONE_MINUS_CONSTANT_ALPHA;
-        var v2826 : int/*GLenum*/ = o.ONE_MINUS_CONSTANT_ALPHA;
-        var v2827 : int/*GLenum*/ = WebGLRenderingContext.BLEND_COLOR;
-        var v2828 : int/*GLenum*/ = o.BLEND_COLOR;
-        var v2829 : int/*GLenum*/ = WebGLRenderingContext.ARRAY_BUFFER;
-        var v2830 : int/*GLenum*/ = o.ARRAY_BUFFER;
-        var v2831 : int/*GLenum*/ = WebGLRenderingContext.ELEMENT_ARRAY_BUFFER;
-        var v2832 : int/*GLenum*/ = o.ELEMENT_ARRAY_BUFFER;
-        var v2833 : int/*GLenum*/ = WebGLRenderingContext.ARRAY_BUFFER_BINDING;
-        var v2834 : int/*GLenum*/ = o.ARRAY_BUFFER_BINDING;
-        var v2835 : int/*GLenum*/ = WebGLRenderingContext.ELEMENT_ARRAY_BUFFER_BINDING;
-        var v2836 : int/*GLenum*/ = o.ELEMENT_ARRAY_BUFFER_BINDING;
-        var v2837 : int/*GLenum*/ = WebGLRenderingContext.STREAM_DRAW;
-        var v2838 : int/*GLenum*/ = o.STREAM_DRAW;
-        var v2839 : int/*GLenum*/ = WebGLRenderingContext.STATIC_DRAW;
-        var v2840 : int/*GLenum*/ = o.STATIC_DRAW;
-        var v2841 : int/*GLenum*/ = WebGLRenderingContext.DYNAMIC_DRAW;
-        var v2842 : int/*GLenum*/ = o.DYNAMIC_DRAW;
-        var v2843 : int/*GLenum*/ = WebGLRenderingContext.BUFFER_SIZE;
-        var v2844 : int/*GLenum*/ = o.BUFFER_SIZE;
-        var v2845 : int/*GLenum*/ = WebGLRenderingContext.BUFFER_USAGE;
-        var v2846 : int/*GLenum*/ = o.BUFFER_USAGE;
-        var v2847 : int/*GLenum*/ = WebGLRenderingContext.CURRENT_VERTEX_ATTRIB;
-        var v2848 : int/*GLenum*/ = o.CURRENT_VERTEX_ATTRIB;
-        var v2849 : int/*GLenum*/ = WebGLRenderingContext.FRONT;
-        var v2850 : int/*GLenum*/ = o.FRONT;
-        var v2851 : int/*GLenum*/ = WebGLRenderingContext.BACK;
-        var v2852 : int/*GLenum*/ = o.BACK;
-        var v2853 : int/*GLenum*/ = WebGLRenderingContext.FRONT_AND_BACK;
-        var v2854 : int/*GLenum*/ = o.FRONT_AND_BACK;
-        var v2855 : int/*GLenum*/ = WebGLRenderingContext.CULL_FACE;
-        var v2856 : int/*GLenum*/ = o.CULL_FACE;
-        var v2857 : int/*GLenum*/ = WebGLRenderingContext.BLEND;
-        var v2858 : int/*GLenum*/ = o.BLEND;
-        var v2859 : int/*GLenum*/ = WebGLRenderingContext.DITHER;
-        var v2860 : int/*GLenum*/ = o.DITHER;
-        var v2861 : int/*GLenum*/ = WebGLRenderingContext.STENCIL_TEST;
-        var v2862 : int/*GLenum*/ = o.STENCIL_TEST;
-        var v2863 : int/*GLenum*/ = WebGLRenderingContext.DEPTH_TEST;
-        var v2864 : int/*GLenum*/ = o.DEPTH_TEST;
-        var v2865 : int/*GLenum*/ = WebGLRenderingContext.SCISSOR_TEST;
-        var v2866 : int/*GLenum*/ = o.SCISSOR_TEST;
-        var v2867 : int/*GLenum*/ = WebGLRenderingContext.POLYGON_OFFSET_FILL;
-        var v2868 : int/*GLenum*/ = o.POLYGON_OFFSET_FILL;
-        var v2869 : int/*GLenum*/ = WebGLRenderingContext.SAMPLE_ALPHA_TO_COVERAGE;
-        var v2870 : int/*GLenum*/ = o.SAMPLE_ALPHA_TO_COVERAGE;
-        var v2871 : int/*GLenum*/ = WebGLRenderingContext.SAMPLE_COVERAGE;
-        var v2872 : int/*GLenum*/ = o.SAMPLE_COVERAGE;
-        var v2873 : int/*GLenum*/ = WebGLRenderingContext.NO_ERROR;
-        var v2874 : int/*GLenum*/ = o.NO_ERROR;
-        var v2875 : int/*GLenum*/ = WebGLRenderingContext.INVALID_ENUM;
-        var v2876 : int/*GLenum*/ = o.INVALID_ENUM;
-        var v2877 : int/*GLenum*/ = WebGLRenderingContext.INVALID_VALUE;
-        var v2878 : int/*GLenum*/ = o.INVALID_VALUE;
-        var v2879 : int/*GLenum*/ = WebGLRenderingContext.INVALID_OPERATION;
-        var v2880 : int/*GLenum*/ = o.INVALID_OPERATION;
-        var v2881 : int/*GLenum*/ = WebGLRenderingContext.OUT_OF_MEMORY;
-        var v2882 : int/*GLenum*/ = o.OUT_OF_MEMORY;
-        var v2883 : int/*GLenum*/ = WebGLRenderingContext.CW;
-        var v2884 : int/*GLenum*/ = o.CW;
-        var v2885 : int/*GLenum*/ = WebGLRenderingContext.CCW;
-        var v2886 : int/*GLenum*/ = o.CCW;
-        var v2887 : int/*GLenum*/ = WebGLRenderingContext.LINE_WIDTH;
-        var v2888 : int/*GLenum*/ = o.LINE_WIDTH;
-        var v2889 : int/*GLenum*/ = WebGLRenderingContext.ALIASED_POINT_SIZE_RANGE;
-        var v2890 : int/*GLenum*/ = o.ALIASED_POINT_SIZE_RANGE;
-        var v2891 : int/*GLenum*/ = WebGLRenderingContext.ALIASED_LINE_WIDTH_RANGE;
-        var v2892 : int/*GLenum*/ = o.ALIASED_LINE_WIDTH_RANGE;
-        var v2893 : int/*GLenum*/ = WebGLRenderingContext.CULL_FACE_MODE;
-        var v2894 : int/*GLenum*/ = o.CULL_FACE_MODE;
-        var v2895 : int/*GLenum*/ = WebGLRenderingContext.FRONT_FACE;
-        var v2896 : int/*GLenum*/ = o.FRONT_FACE;
-        var v2897 : int/*GLenum*/ = WebGLRenderingContext.DEPTH_RANGE;
-        var v2898 : int/*GLenum*/ = o.DEPTH_RANGE;
-        var v2899 : int/*GLenum*/ = WebGLRenderingContext.DEPTH_WRITEMASK;
-        var v2900 : int/*GLenum*/ = o.DEPTH_WRITEMASK;
-        var v2901 : int/*GLenum*/ = WebGLRenderingContext.DEPTH_CLEAR_VALUE;
-        var v2902 : int/*GLenum*/ = o.DEPTH_CLEAR_VALUE;
-        var v2903 : int/*GLenum*/ = WebGLRenderingContext.DEPTH_FUNC;
-        var v2904 : int/*GLenum*/ = o.DEPTH_FUNC;
-        var v2905 : int/*GLenum*/ = WebGLRenderingContext.STENCIL_CLEAR_VALUE;
-        var v2906 : int/*GLenum*/ = o.STENCIL_CLEAR_VALUE;
-        var v2907 : int/*GLenum*/ = WebGLRenderingContext.STENCIL_FUNC;
-        var v2908 : int/*GLenum*/ = o.STENCIL_FUNC;
-        var v2909 : int/*GLenum*/ = WebGLRenderingContext.STENCIL_FAIL;
-        var v2910 : int/*GLenum*/ = o.STENCIL_FAIL;
-        var v2911 : int/*GLenum*/ = WebGLRenderingContext.STENCIL_PASS_DEPTH_FAIL;
-        var v2912 : int/*GLenum*/ = o.STENCIL_PASS_DEPTH_FAIL;
-        var v2913 : int/*GLenum*/ = WebGLRenderingContext.STENCIL_PASS_DEPTH_PASS;
-        var v2914 : int/*GLenum*/ = o.STENCIL_PASS_DEPTH_PASS;
-        var v2915 : int/*GLenum*/ = WebGLRenderingContext.STENCIL_REF;
-        var v2916 : int/*GLenum*/ = o.STENCIL_REF;
-        var v2917 : int/*GLenum*/ = WebGLRenderingContext.STENCIL_VALUE_MASK;
-        var v2918 : int/*GLenum*/ = o.STENCIL_VALUE_MASK;
-        var v2919 : int/*GLenum*/ = WebGLRenderingContext.STENCIL_WRITEMASK;
-        var v2920 : int/*GLenum*/ = o.STENCIL_WRITEMASK;
-        var v2921 : int/*GLenum*/ = WebGLRenderingContext.STENCIL_BACK_FUNC;
-        var v2922 : int/*GLenum*/ = o.STENCIL_BACK_FUNC;
-        var v2923 : int/*GLenum*/ = WebGLRenderingContext.STENCIL_BACK_FAIL;
-        var v2924 : int/*GLenum*/ = o.STENCIL_BACK_FAIL;
-        var v2925 : int/*GLenum*/ = WebGLRenderingContext.STENCIL_BACK_PASS_DEPTH_FAIL;
-        var v2926 : int/*GLenum*/ = o.STENCIL_BACK_PASS_DEPTH_FAIL;
-        var v2927 : int/*GLenum*/ = WebGLRenderingContext.STENCIL_BACK_PASS_DEPTH_PASS;
-        var v2928 : int/*GLenum*/ = o.STENCIL_BACK_PASS_DEPTH_PASS;
-        var v2929 : int/*GLenum*/ = WebGLRenderingContext.STENCIL_BACK_REF;
-        var v2930 : int/*GLenum*/ = o.STENCIL_BACK_REF;
-        var v2931 : int/*GLenum*/ = WebGLRenderingContext.STENCIL_BACK_VALUE_MASK;
-        var v2932 : int/*GLenum*/ = o.STENCIL_BACK_VALUE_MASK;
-        var v2933 : int/*GLenum*/ = WebGLRenderingContext.STENCIL_BACK_WRITEMASK;
-        var v2934 : int/*GLenum*/ = o.STENCIL_BACK_WRITEMASK;
-        var v2935 : int/*GLenum*/ = WebGLRenderingContext.VIEWPORT;
-        var v2936 : int/*GLenum*/ = o.VIEWPORT;
-        var v2937 : int/*GLenum*/ = WebGLRenderingContext.SCISSOR_BOX;
-        var v2938 : int/*GLenum*/ = o.SCISSOR_BOX;
-        var v2939 : int/*GLenum*/ = WebGLRenderingContext.COLOR_CLEAR_VALUE;
-        var v2940 : int/*GLenum*/ = o.COLOR_CLEAR_VALUE;
-        var v2941 : int/*GLenum*/ = WebGLRenderingContext.COLOR_WRITEMASK;
-        var v2942 : int/*GLenum*/ = o.COLOR_WRITEMASK;
-        var v2943 : int/*GLenum*/ = WebGLRenderingContext.UNPACK_ALIGNMENT;
-        var v2944 : int/*GLenum*/ = o.UNPACK_ALIGNMENT;
-        var v2945 : int/*GLenum*/ = WebGLRenderingContext.PACK_ALIGNMENT;
-        var v2946 : int/*GLenum*/ = o.PACK_ALIGNMENT;
-        var v2947 : int/*GLenum*/ = WebGLRenderingContext.MAX_TEXTURE_SIZE;
-        var v2948 : int/*GLenum*/ = o.MAX_TEXTURE_SIZE;
-        var v2949 : int/*GLenum*/ = WebGLRenderingContext.MAX_VIEWPORT_DIMS;
-        var v2950 : int/*GLenum*/ = o.MAX_VIEWPORT_DIMS;
-        var v2951 : int/*GLenum*/ = WebGLRenderingContext.SUBPIXEL_BITS;
-        var v2952 : int/*GLenum*/ = o.SUBPIXEL_BITS;
-        var v2953 : int/*GLenum*/ = WebGLRenderingContext.RED_BITS;
-        var v2954 : int/*GLenum*/ = o.RED_BITS;
-        var v2955 : int/*GLenum*/ = WebGLRenderingContext.GREEN_BITS;
-        var v2956 : int/*GLenum*/ = o.GREEN_BITS;
-        var v2957 : int/*GLenum*/ = WebGLRenderingContext.BLUE_BITS;
-        var v2958 : int/*GLenum*/ = o.BLUE_BITS;
-        var v2959 : int/*GLenum*/ = WebGLRenderingContext.ALPHA_BITS;
-        var v2960 : int/*GLenum*/ = o.ALPHA_BITS;
-        var v2961 : int/*GLenum*/ = WebGLRenderingContext.DEPTH_BITS;
-        var v2962 : int/*GLenum*/ = o.DEPTH_BITS;
-        var v2963 : int/*GLenum*/ = WebGLRenderingContext.STENCIL_BITS;
-        var v2964 : int/*GLenum*/ = o.STENCIL_BITS;
-        var v2965 : int/*GLenum*/ = WebGLRenderingContext.POLYGON_OFFSET_UNITS;
-        var v2966 : int/*GLenum*/ = o.POLYGON_OFFSET_UNITS;
-        var v2967 : int/*GLenum*/ = WebGLRenderingContext.POLYGON_OFFSET_FACTOR;
-        var v2968 : int/*GLenum*/ = o.POLYGON_OFFSET_FACTOR;
-        var v2969 : int/*GLenum*/ = WebGLRenderingContext.TEXTURE_BINDING_2D;
-        var v2970 : int/*GLenum*/ = o.TEXTURE_BINDING_2D;
-        var v2971 : int/*GLenum*/ = WebGLRenderingContext.SAMPLE_BUFFERS;
-        var v2972 : int/*GLenum*/ = o.SAMPLE_BUFFERS;
-        var v2973 : int/*GLenum*/ = WebGLRenderingContext.SAMPLES;
-        var v2974 : int/*GLenum*/ = o.SAMPLES;
-        var v2975 : int/*GLenum*/ = WebGLRenderingContext.SAMPLE_COVERAGE_VALUE;
-        var v2976 : int/*GLenum*/ = o.SAMPLE_COVERAGE_VALUE;
-        var v2977 : int/*GLenum*/ = WebGLRenderingContext.SAMPLE_COVERAGE_INVERT;
-        var v2978 : int/*GLenum*/ = o.SAMPLE_COVERAGE_INVERT;
-        var v2979 : int/*GLenum*/ = WebGLRenderingContext.COMPRESSED_TEXTURE_FORMATS;
-        var v2980 : int/*GLenum*/ = o.COMPRESSED_TEXTURE_FORMATS;
-        var v2981 : int/*GLenum*/ = WebGLRenderingContext.DONT_CARE;
-        var v2982 : int/*GLenum*/ = o.DONT_CARE;
-        var v2983 : int/*GLenum*/ = WebGLRenderingContext.FASTEST;
-        var v2984 : int/*GLenum*/ = o.FASTEST;
-        var v2985 : int/*GLenum*/ = WebGLRenderingContext.NICEST;
-        var v2986 : int/*GLenum*/ = o.NICEST;
-        var v2987 : int/*GLenum*/ = WebGLRenderingContext.GENERATE_MIPMAP_HINT;
-        var v2988 : int/*GLenum*/ = o.GENERATE_MIPMAP_HINT;
-        var v2989 : int/*GLenum*/ = WebGLRenderingContext.BYTE;
-        var v2990 : int/*GLenum*/ = o.BYTE;
-        var v2991 : int/*GLenum*/ = WebGLRenderingContext.UNSIGNED_BYTE;
-        var v2992 : int/*GLenum*/ = o.UNSIGNED_BYTE;
-        var v2993 : int/*GLenum*/ = WebGLRenderingContext.SHORT;
-        var v2994 : int/*GLenum*/ = o.SHORT;
-        var v2995 : int/*GLenum*/ = WebGLRenderingContext.UNSIGNED_SHORT;
-        var v2996 : int/*GLenum*/ = o.UNSIGNED_SHORT;
-        var v2997 : int/*GLenum*/ = WebGLRenderingContext.INT;
-        var v2998 : int/*GLenum*/ = o.INT;
-        var v2999 : int/*GLenum*/ = WebGLRenderingContext.UNSIGNED_INT;
-        var v3000 : int/*GLenum*/ = o.UNSIGNED_INT;
-        var v3001 : int/*GLenum*/ = WebGLRenderingContext.FLOAT;
-        var v3002 : int/*GLenum*/ = o.FLOAT;
-        var v3003 : int/*GLenum*/ = WebGLRenderingContext.DEPTH_COMPONENT;
-        var v3004 : int/*GLenum*/ = o.DEPTH_COMPONENT;
-        var v3005 : int/*GLenum*/ = WebGLRenderingContext.ALPHA;
-        var v3006 : int/*GLenum*/ = o.ALPHA;
-        var v3007 : int/*GLenum*/ = WebGLRenderingContext.RGB;
-        var v3008 : int/*GLenum*/ = o.RGB;
-        var v3009 : int/*GLenum*/ = WebGLRenderingContext.RGBA;
-        var v3010 : int/*GLenum*/ = o.RGBA;
-        var v3011 : int/*GLenum*/ = WebGLRenderingContext.LUMINANCE;
-        var v3012 : int/*GLenum*/ = o.LUMINANCE;
-        var v3013 : int/*GLenum*/ = WebGLRenderingContext.LUMINANCE_ALPHA;
-        var v3014 : int/*GLenum*/ = o.LUMINANCE_ALPHA;
-        var v3015 : int/*GLenum*/ = WebGLRenderingContext.UNSIGNED_SHORT_4_4_4_4;
-        var v3016 : int/*GLenum*/ = o.UNSIGNED_SHORT_4_4_4_4;
-        var v3017 : int/*GLenum*/ = WebGLRenderingContext.UNSIGNED_SHORT_5_5_5_1;
-        var v3018 : int/*GLenum*/ = o.UNSIGNED_SHORT_5_5_5_1;
-        var v3019 : int/*GLenum*/ = WebGLRenderingContext.UNSIGNED_SHORT_5_6_5;
-        var v3020 : int/*GLenum*/ = o.UNSIGNED_SHORT_5_6_5;
-        var v3021 : int/*GLenum*/ = WebGLRenderingContext.FRAGMENT_SHADER;
-        var v3022 : int/*GLenum*/ = o.FRAGMENT_SHADER;
-        var v3023 : int/*GLenum*/ = WebGLRenderingContext.VERTEX_SHADER;
-        var v3024 : int/*GLenum*/ = o.VERTEX_SHADER;
-        var v3025 : int/*GLenum*/ = WebGLRenderingContext.MAX_VERTEX_ATTRIBS;
-        var v3026 : int/*GLenum*/ = o.MAX_VERTEX_ATTRIBS;
-        var v3027 : int/*GLenum*/ = WebGLRenderingContext.MAX_VERTEX_UNIFORM_VECTORS;
-        var v3028 : int/*GLenum*/ = o.MAX_VERTEX_UNIFORM_VECTORS;
-        var v3029 : int/*GLenum*/ = WebGLRenderingContext.MAX_VARYING_VECTORS;
-        var v3030 : int/*GLenum*/ = o.MAX_VARYING_VECTORS;
-        var v3031 : int/*GLenum*/ = WebGLRenderingContext.MAX_COMBINED_TEXTURE_IMAGE_UNITS;
-        var v3032 : int/*GLenum*/ = o.MAX_COMBINED_TEXTURE_IMAGE_UNITS;
-        var v3033 : int/*GLenum*/ = WebGLRenderingContext.MAX_VERTEX_TEXTURE_IMAGE_UNITS;
-        var v3034 : int/*GLenum*/ = o.MAX_VERTEX_TEXTURE_IMAGE_UNITS;
-        var v3035 : int/*GLenum*/ = WebGLRenderingContext.MAX_TEXTURE_IMAGE_UNITS;
-        var v3036 : int/*GLenum*/ = o.MAX_TEXTURE_IMAGE_UNITS;
-        var v3037 : int/*GLenum*/ = WebGLRenderingContext.MAX_FRAGMENT_UNIFORM_VECTORS;
-        var v3038 : int/*GLenum*/ = o.MAX_FRAGMENT_UNIFORM_VECTORS;
-        var v3039 : int/*GLenum*/ = WebGLRenderingContext.SHADER_TYPE;
-        var v3040 : int/*GLenum*/ = o.SHADER_TYPE;
-        var v3041 : int/*GLenum*/ = WebGLRenderingContext.DELETE_STATUS;
-        var v3042 : int/*GLenum*/ = o.DELETE_STATUS;
-        var v3043 : int/*GLenum*/ = WebGLRenderingContext.LINK_STATUS;
-        var v3044 : int/*GLenum*/ = o.LINK_STATUS;
-        var v3045 : int/*GLenum*/ = WebGLRenderingContext.VALIDATE_STATUS;
-        var v3046 : int/*GLenum*/ = o.VALIDATE_STATUS;
-        var v3047 : int/*GLenum*/ = WebGLRenderingContext.ATTACHED_SHADERS;
-        var v3048 : int/*GLenum*/ = o.ATTACHED_SHADERS;
-        var v3049 : int/*GLenum*/ = WebGLRenderingContext.ACTIVE_UNIFORMS;
-        var v3050 : int/*GLenum*/ = o.ACTIVE_UNIFORMS;
-        var v3051 : int/*GLenum*/ = WebGLRenderingContext.ACTIVE_ATTRIBUTES;
-        var v3052 : int/*GLenum*/ = o.ACTIVE_ATTRIBUTES;
-        var v3053 : int/*GLenum*/ = WebGLRenderingContext.SHADING_LANGUAGE_VERSION;
-        var v3054 : int/*GLenum*/ = o.SHADING_LANGUAGE_VERSION;
-        var v3055 : int/*GLenum*/ = WebGLRenderingContext.CURRENT_PROGRAM;
-        var v3056 : int/*GLenum*/ = o.CURRENT_PROGRAM;
-        var v3057 : int/*GLenum*/ = WebGLRenderingContext.NEVER;
-        var v3058 : int/*GLenum*/ = o.NEVER;
-        var v3059 : int/*GLenum*/ = WebGLRenderingContext.LESS;
-        var v3060 : int/*GLenum*/ = o.LESS;
-        var v3061 : int/*GLenum*/ = WebGLRenderingContext.EQUAL;
-        var v3062 : int/*GLenum*/ = o.EQUAL;
-        var v3063 : int/*GLenum*/ = WebGLRenderingContext.LEQUAL;
-        var v3064 : int/*GLenum*/ = o.LEQUAL;
-        var v3065 : int/*GLenum*/ = WebGLRenderingContext.GREATER;
-        var v3066 : int/*GLenum*/ = o.GREATER;
-        var v3067 : int/*GLenum*/ = WebGLRenderingContext.NOTEQUAL;
-        var v3068 : int/*GLenum*/ = o.NOTEQUAL;
-        var v3069 : int/*GLenum*/ = WebGLRenderingContext.GEQUAL;
-        var v3070 : int/*GLenum*/ = o.GEQUAL;
-        var v3071 : int/*GLenum*/ = WebGLRenderingContext.ALWAYS;
-        var v3072 : int/*GLenum*/ = o.ALWAYS;
-        var v3073 : int/*GLenum*/ = WebGLRenderingContext.KEEP;
-        var v3074 : int/*GLenum*/ = o.KEEP;
-        var v3075 : int/*GLenum*/ = WebGLRenderingContext.REPLACE;
-        var v3076 : int/*GLenum*/ = o.REPLACE;
-        var v3077 : int/*GLenum*/ = WebGLRenderingContext.INCR;
-        var v3078 : int/*GLenum*/ = o.INCR;
-        var v3079 : int/*GLenum*/ = WebGLRenderingContext.DECR;
-        var v3080 : int/*GLenum*/ = o.DECR;
-        var v3081 : int/*GLenum*/ = WebGLRenderingContext.INVERT;
-        var v3082 : int/*GLenum*/ = o.INVERT;
-        var v3083 : int/*GLenum*/ = WebGLRenderingContext.INCR_WRAP;
-        var v3084 : int/*GLenum*/ = o.INCR_WRAP;
-        var v3085 : int/*GLenum*/ = WebGLRenderingContext.DECR_WRAP;
-        var v3086 : int/*GLenum*/ = o.DECR_WRAP;
-        var v3087 : int/*GLenum*/ = WebGLRenderingContext.VENDOR;
-        var v3088 : int/*GLenum*/ = o.VENDOR;
-        var v3089 : int/*GLenum*/ = WebGLRenderingContext.RENDERER;
-        var v3090 : int/*GLenum*/ = o.RENDERER;
-        var v3091 : int/*GLenum*/ = WebGLRenderingContext.VERSION;
-        var v3092 : int/*GLenum*/ = o.VERSION;
-        var v3093 : int/*GLenum*/ = WebGLRenderingContext.NEAREST;
-        var v3094 : int/*GLenum*/ = o.NEAREST;
-        var v3095 : int/*GLenum*/ = WebGLRenderingContext.LINEAR;
-        var v3096 : int/*GLenum*/ = o.LINEAR;
-        var v3097 : int/*GLenum*/ = WebGLRenderingContext.NEAREST_MIPMAP_NEAREST;
-        var v3098 : int/*GLenum*/ = o.NEAREST_MIPMAP_NEAREST;
-        var v3099 : int/*GLenum*/ = WebGLRenderingContext.LINEAR_MIPMAP_NEAREST;
-        var v3100 : int/*GLenum*/ = o.LINEAR_MIPMAP_NEAREST;
-        var v3101 : int/*GLenum*/ = WebGLRenderingContext.NEAREST_MIPMAP_LINEAR;
-        var v3102 : int/*GLenum*/ = o.NEAREST_MIPMAP_LINEAR;
-        var v3103 : int/*GLenum*/ = WebGLRenderingContext.LINEAR_MIPMAP_LINEAR;
-        var v3104 : int/*GLenum*/ = o.LINEAR_MIPMAP_LINEAR;
-        var v3105 : int/*GLenum*/ = WebGLRenderingContext.TEXTURE_MAG_FILTER;
-        var v3106 : int/*GLenum*/ = o.TEXTURE_MAG_FILTER;
-        var v3107 : int/*GLenum*/ = WebGLRenderingContext.TEXTURE_MIN_FILTER;
-        var v3108 : int/*GLenum*/ = o.TEXTURE_MIN_FILTER;
-        var v3109 : int/*GLenum*/ = WebGLRenderingContext.TEXTURE_WRAP_S;
-        var v3110 : int/*GLenum*/ = o.TEXTURE_WRAP_S;
-        var v3111 : int/*GLenum*/ = WebGLRenderingContext.TEXTURE_WRAP_T;
-        var v3112 : int/*GLenum*/ = o.TEXTURE_WRAP_T;
-        var v3113 : int/*GLenum*/ = WebGLRenderingContext.TEXTURE_2D;
-        var v3114 : int/*GLenum*/ = o.TEXTURE_2D;
-        var v3115 : int/*GLenum*/ = WebGLRenderingContext.TEXTURE;
-        var v3116 : int/*GLenum*/ = o.TEXTURE;
-        var v3117 : int/*GLenum*/ = WebGLRenderingContext.TEXTURE_CUBE_MAP;
-        var v3118 : int/*GLenum*/ = o.TEXTURE_CUBE_MAP;
-        var v3119 : int/*GLenum*/ = WebGLRenderingContext.TEXTURE_BINDING_CUBE_MAP;
-        var v3120 : int/*GLenum*/ = o.TEXTURE_BINDING_CUBE_MAP;
-        var v3121 : int/*GLenum*/ = WebGLRenderingContext.TEXTURE_CUBE_MAP_POSITIVE_X;
-        var v3122 : int/*GLenum*/ = o.TEXTURE_CUBE_MAP_POSITIVE_X;
-        var v3123 : int/*GLenum*/ = WebGLRenderingContext.TEXTURE_CUBE_MAP_NEGATIVE_X;
-        var v3124 : int/*GLenum*/ = o.TEXTURE_CUBE_MAP_NEGATIVE_X;
-        var v3125 : int/*GLenum*/ = WebGLRenderingContext.TEXTURE_CUBE_MAP_POSITIVE_Y;
-        var v3126 : int/*GLenum*/ = o.TEXTURE_CUBE_MAP_POSITIVE_Y;
-        var v3127 : int/*GLenum*/ = WebGLRenderingContext.TEXTURE_CUBE_MAP_NEGATIVE_Y;
-        var v3128 : int/*GLenum*/ = o.TEXTURE_CUBE_MAP_NEGATIVE_Y;
-        var v3129 : int/*GLenum*/ = WebGLRenderingContext.TEXTURE_CUBE_MAP_POSITIVE_Z;
-        var v3130 : int/*GLenum*/ = o.TEXTURE_CUBE_MAP_POSITIVE_Z;
-        var v3131 : int/*GLenum*/ = WebGLRenderingContext.TEXTURE_CUBE_MAP_NEGATIVE_Z;
-        var v3132 : int/*GLenum*/ = o.TEXTURE_CUBE_MAP_NEGATIVE_Z;
-        var v3133 : int/*GLenum*/ = WebGLRenderingContext.MAX_CUBE_MAP_TEXTURE_SIZE;
-        var v3134 : int/*GLenum*/ = o.MAX_CUBE_MAP_TEXTURE_SIZE;
-        var v3135 : int/*GLenum*/ = WebGLRenderingContext.TEXTURE0;
-        var v3136 : int/*GLenum*/ = o.TEXTURE0;
-        var v3137 : int/*GLenum*/ = WebGLRenderingContext.TEXTURE1;
-        var v3138 : int/*GLenum*/ = o.TEXTURE1;
-        var v3139 : int/*GLenum*/ = WebGLRenderingContext.TEXTURE2;
-        var v3140 : int/*GLenum*/ = o.TEXTURE2;
-        var v3141 : int/*GLenum*/ = WebGLRenderingContext.TEXTURE3;
-        var v3142 : int/*GLenum*/ = o.TEXTURE3;
-        var v3143 : int/*GLenum*/ = WebGLRenderingContext.TEXTURE4;
-        var v3144 : int/*GLenum*/ = o.TEXTURE4;
-        var v3145 : int/*GLenum*/ = WebGLRenderingContext.TEXTURE5;
-        var v3146 : int/*GLenum*/ = o.TEXTURE5;
-        var v3147 : int/*GLenum*/ = WebGLRenderingContext.TEXTURE6;
-        var v3148 : int/*GLenum*/ = o.TEXTURE6;
-        var v3149 : int/*GLenum*/ = WebGLRenderingContext.TEXTURE7;
-        var v3150 : int/*GLenum*/ = o.TEXTURE7;
-        var v3151 : int/*GLenum*/ = WebGLRenderingContext.TEXTURE8;
-        var v3152 : int/*GLenum*/ = o.TEXTURE8;
-        var v3153 : int/*GLenum*/ = WebGLRenderingContext.TEXTURE9;
-        var v3154 : int/*GLenum*/ = o.TEXTURE9;
-        var v3155 : int/*GLenum*/ = WebGLRenderingContext.TEXTURE10;
-        var v3156 : int/*GLenum*/ = o.TEXTURE10;
-        var v3157 : int/*GLenum*/ = WebGLRenderingContext.TEXTURE11;
-        var v3158 : int/*GLenum*/ = o.TEXTURE11;
-        var v3159 : int/*GLenum*/ = WebGLRenderingContext.TEXTURE12;
-        var v3160 : int/*GLenum*/ = o.TEXTURE12;
-        var v3161 : int/*GLenum*/ = WebGLRenderingContext.TEXTURE13;
-        var v3162 : int/*GLenum*/ = o.TEXTURE13;
-        var v3163 : int/*GLenum*/ = WebGLRenderingContext.TEXTURE14;
-        var v3164 : int/*GLenum*/ = o.TEXTURE14;
-        var v3165 : int/*GLenum*/ = WebGLRenderingContext.TEXTURE15;
-        var v3166 : int/*GLenum*/ = o.TEXTURE15;
-        var v3167 : int/*GLenum*/ = WebGLRenderingContext.TEXTURE16;
-        var v3168 : int/*GLenum*/ = o.TEXTURE16;
-        var v3169 : int/*GLenum*/ = WebGLRenderingContext.TEXTURE17;
-        var v3170 : int/*GLenum*/ = o.TEXTURE17;
-        var v3171 : int/*GLenum*/ = WebGLRenderingContext.TEXTURE18;
-        var v3172 : int/*GLenum*/ = o.TEXTURE18;
-        var v3173 : int/*GLenum*/ = WebGLRenderingContext.TEXTURE19;
-        var v3174 : int/*GLenum*/ = o.TEXTURE19;
-        var v3175 : int/*GLenum*/ = WebGLRenderingContext.TEXTURE20;
-        var v3176 : int/*GLenum*/ = o.TEXTURE20;
-        var v3177 : int/*GLenum*/ = WebGLRenderingContext.TEXTURE21;
-        var v3178 : int/*GLenum*/ = o.TEXTURE21;
-        var v3179 : int/*GLenum*/ = WebGLRenderingContext.TEXTURE22;
-        var v3180 : int/*GLenum*/ = o.TEXTURE22;
-        var v3181 : int/*GLenum*/ = WebGLRenderingContext.TEXTURE23;
-        var v3182 : int/*GLenum*/ = o.TEXTURE23;
-        var v3183 : int/*GLenum*/ = WebGLRenderingContext.TEXTURE24;
-        var v3184 : int/*GLenum*/ = o.TEXTURE24;
-        var v3185 : int/*GLenum*/ = WebGLRenderingContext.TEXTURE25;
-        var v3186 : int/*GLenum*/ = o.TEXTURE25;
-        var v3187 : int/*GLenum*/ = WebGLRenderingContext.TEXTURE26;
-        var v3188 : int/*GLenum*/ = o.TEXTURE26;
-        var v3189 : int/*GLenum*/ = WebGLRenderingContext.TEXTURE27;
-        var v3190 : int/*GLenum*/ = o.TEXTURE27;
-        var v3191 : int/*GLenum*/ = WebGLRenderingContext.TEXTURE28;
-        var v3192 : int/*GLenum*/ = o.TEXTURE28;
-        var v3193 : int/*GLenum*/ = WebGLRenderingContext.TEXTURE29;
-        var v3194 : int/*GLenum*/ = o.TEXTURE29;
-        var v3195 : int/*GLenum*/ = WebGLRenderingContext.TEXTURE30;
-        var v3196 : int/*GLenum*/ = o.TEXTURE30;
-        var v3197 : int/*GLenum*/ = WebGLRenderingContext.TEXTURE31;
-        var v3198 : int/*GLenum*/ = o.TEXTURE31;
-        var v3199 : int/*GLenum*/ = WebGLRenderingContext.ACTIVE_TEXTURE;
-        var v3200 : int/*GLenum*/ = o.ACTIVE_TEXTURE;
-        var v3201 : int/*GLenum*/ = WebGLRenderingContext.REPEAT;
-        var v3202 : int/*GLenum*/ = o.REPEAT;
-        var v3203 : int/*GLenum*/ = WebGLRenderingContext.CLAMP_TO_EDGE;
-        var v3204 : int/*GLenum*/ = o.CLAMP_TO_EDGE;
-        var v3205 : int/*GLenum*/ = WebGLRenderingContext.MIRRORED_REPEAT;
-        var v3206 : int/*GLenum*/ = o.MIRRORED_REPEAT;
-        var v3207 : int/*GLenum*/ = WebGLRenderingContext.FLOAT_VEC2;
-        var v3208 : int/*GLenum*/ = o.FLOAT_VEC2;
-        var v3209 : int/*GLenum*/ = WebGLRenderingContext.FLOAT_VEC3;
-        var v3210 : int/*GLenum*/ = o.FLOAT_VEC3;
-        var v3211 : int/*GLenum*/ = WebGLRenderingContext.FLOAT_VEC4;
-        var v3212 : int/*GLenum*/ = o.FLOAT_VEC4;
-        var v3213 : int/*GLenum*/ = WebGLRenderingContext.INT_VEC2;
-        var v3214 : int/*GLenum*/ = o.INT_VEC2;
-        var v3215 : int/*GLenum*/ = WebGLRenderingContext.INT_VEC3;
-        var v3216 : int/*GLenum*/ = o.INT_VEC3;
-        var v3217 : int/*GLenum*/ = WebGLRenderingContext.INT_VEC4;
-        var v3218 : int/*GLenum*/ = o.INT_VEC4;
-        var v3219 : int/*GLenum*/ = WebGLRenderingContext.BOOL;
-        var v3220 : int/*GLenum*/ = o.BOOL;
-        var v3221 : int/*GLenum*/ = WebGLRenderingContext.BOOL_VEC2;
-        var v3222 : int/*GLenum*/ = o.BOOL_VEC2;
-        var v3223 : int/*GLenum*/ = WebGLRenderingContext.BOOL_VEC3;
-        var v3224 : int/*GLenum*/ = o.BOOL_VEC3;
-        var v3225 : int/*GLenum*/ = WebGLRenderingContext.BOOL_VEC4;
-        var v3226 : int/*GLenum*/ = o.BOOL_VEC4;
-        var v3227 : int/*GLenum*/ = WebGLRenderingContext.FLOAT_MAT2;
-        var v3228 : int/*GLenum*/ = o.FLOAT_MAT2;
-        var v3229 : int/*GLenum*/ = WebGLRenderingContext.FLOAT_MAT3;
-        var v3230 : int/*GLenum*/ = o.FLOAT_MAT3;
-        var v3231 : int/*GLenum*/ = WebGLRenderingContext.FLOAT_MAT4;
-        var v3232 : int/*GLenum*/ = o.FLOAT_MAT4;
-        var v3233 : int/*GLenum*/ = WebGLRenderingContext.SAMPLER_2D;
-        var v3234 : int/*GLenum*/ = o.SAMPLER_2D;
-        var v3235 : int/*GLenum*/ = WebGLRenderingContext.SAMPLER_CUBE;
-        var v3236 : int/*GLenum*/ = o.SAMPLER_CUBE;
-        var v3237 : int/*GLenum*/ = WebGLRenderingContext.VERTEX_ATTRIB_ARRAY_ENABLED;
-        var v3238 : int/*GLenum*/ = o.VERTEX_ATTRIB_ARRAY_ENABLED;
-        var v3239 : int/*GLenum*/ = WebGLRenderingContext.VERTEX_ATTRIB_ARRAY_SIZE;
-        var v3240 : int/*GLenum*/ = o.VERTEX_ATTRIB_ARRAY_SIZE;
-        var v3241 : int/*GLenum*/ = WebGLRenderingContext.VERTEX_ATTRIB_ARRAY_STRIDE;
-        var v3242 : int/*GLenum*/ = o.VERTEX_ATTRIB_ARRAY_STRIDE;
-        var v3243 : int/*GLenum*/ = WebGLRenderingContext.VERTEX_ATTRIB_ARRAY_TYPE;
-        var v3244 : int/*GLenum*/ = o.VERTEX_ATTRIB_ARRAY_TYPE;
-        var v3245 : int/*GLenum*/ = WebGLRenderingContext.VERTEX_ATTRIB_ARRAY_NORMALIZED;
-        var v3246 : int/*GLenum*/ = o.VERTEX_ATTRIB_ARRAY_NORMALIZED;
-        var v3247 : int/*GLenum*/ = WebGLRenderingContext.VERTEX_ATTRIB_ARRAY_POINTER;
-        var v3248 : int/*GLenum*/ = o.VERTEX_ATTRIB_ARRAY_POINTER;
-        var v3249 : int/*GLenum*/ = WebGLRenderingContext.VERTEX_ATTRIB_ARRAY_BUFFER_BINDING;
-        var v3250 : int/*GLenum*/ = o.VERTEX_ATTRIB_ARRAY_BUFFER_BINDING;
-        var v3251 : int/*GLenum*/ = WebGLRenderingContext.COMPILE_STATUS;
-        var v3252 : int/*GLenum*/ = o.COMPILE_STATUS;
-        var v3253 : int/*GLenum*/ = WebGLRenderingContext.LOW_FLOAT;
-        var v3254 : int/*GLenum*/ = o.LOW_FLOAT;
-        var v3255 : int/*GLenum*/ = WebGLRenderingContext.MEDIUM_FLOAT;
-        var v3256 : int/*GLenum*/ = o.MEDIUM_FLOAT;
-        var v3257 : int/*GLenum*/ = WebGLRenderingContext.HIGH_FLOAT;
-        var v3258 : int/*GLenum*/ = o.HIGH_FLOAT;
-        var v3259 : int/*GLenum*/ = WebGLRenderingContext.LOW_INT;
-        var v3260 : int/*GLenum*/ = o.LOW_INT;
-        var v3261 : int/*GLenum*/ = WebGLRenderingContext.MEDIUM_INT;
-        var v3262 : int/*GLenum*/ = o.MEDIUM_INT;
-        var v3263 : int/*GLenum*/ = WebGLRenderingContext.HIGH_INT;
-        var v3264 : int/*GLenum*/ = o.HIGH_INT;
-        var v3265 : int/*GLenum*/ = WebGLRenderingContext.FRAMEBUFFER;
-        var v3266 : int/*GLenum*/ = o.FRAMEBUFFER;
-        var v3267 : int/*GLenum*/ = WebGLRenderingContext.RENDERBUFFER;
-        var v3268 : int/*GLenum*/ = o.RENDERBUFFER;
-        var v3269 : int/*GLenum*/ = WebGLRenderingContext.RGBA4;
-        var v3270 : int/*GLenum*/ = o.RGBA4;
-        var v3271 : int/*GLenum*/ = WebGLRenderingContext.RGB5_A1;
-        var v3272 : int/*GLenum*/ = o.RGB5_A1;
-        var v3273 : int/*GLenum*/ = WebGLRenderingContext.RGB565;
-        var v3274 : int/*GLenum*/ = o.RGB565;
-        var v3275 : int/*GLenum*/ = WebGLRenderingContext.DEPTH_COMPONENT16;
-        var v3276 : int/*GLenum*/ = o.DEPTH_COMPONENT16;
-        var v3277 : int/*GLenum*/ = WebGLRenderingContext.STENCIL_INDEX;
-        var v3278 : int/*GLenum*/ = o.STENCIL_INDEX;
-        var v3279 : int/*GLenum*/ = WebGLRenderingContext.STENCIL_INDEX8;
-        var v3280 : int/*GLenum*/ = o.STENCIL_INDEX8;
-        var v3281 : int/*GLenum*/ = WebGLRenderingContext.DEPTH_STENCIL;
-        var v3282 : int/*GLenum*/ = o.DEPTH_STENCIL;
-        var v3283 : int/*GLenum*/ = WebGLRenderingContext.RENDERBUFFER_WIDTH;
-        var v3284 : int/*GLenum*/ = o.RENDERBUFFER_WIDTH;
-        var v3285 : int/*GLenum*/ = WebGLRenderingContext.RENDERBUFFER_HEIGHT;
-        var v3286 : int/*GLenum*/ = o.RENDERBUFFER_HEIGHT;
-        var v3287 : int/*GLenum*/ = WebGLRenderingContext.RENDERBUFFER_INTERNAL_FORMAT;
-        var v3288 : int/*GLenum*/ = o.RENDERBUFFER_INTERNAL_FORMAT;
-        var v3289 : int/*GLenum*/ = WebGLRenderingContext.RENDERBUFFER_RED_SIZE;
-        var v3290 : int/*GLenum*/ = o.RENDERBUFFER_RED_SIZE;
-        var v3291 : int/*GLenum*/ = WebGLRenderingContext.RENDERBUFFER_GREEN_SIZE;
-        var v3292 : int/*GLenum*/ = o.RENDERBUFFER_GREEN_SIZE;
-        var v3293 : int/*GLenum*/ = WebGLRenderingContext.RENDERBUFFER_BLUE_SIZE;
-        var v3294 : int/*GLenum*/ = o.RENDERBUFFER_BLUE_SIZE;
-        var v3295 : int/*GLenum*/ = WebGLRenderingContext.RENDERBUFFER_ALPHA_SIZE;
-        var v3296 : int/*GLenum*/ = o.RENDERBUFFER_ALPHA_SIZE;
-        var v3297 : int/*GLenum*/ = WebGLRenderingContext.RENDERBUFFER_DEPTH_SIZE;
-        var v3298 : int/*GLenum*/ = o.RENDERBUFFER_DEPTH_SIZE;
-        var v3299 : int/*GLenum*/ = WebGLRenderingContext.RENDERBUFFER_STENCIL_SIZE;
-        var v3300 : int/*GLenum*/ = o.RENDERBUFFER_STENCIL_SIZE;
-        var v3301 : int/*GLenum*/ = WebGLRenderingContext.FRAMEBUFFER_ATTACHMENT_OBJECT_TYPE;
-        var v3302 : int/*GLenum*/ = o.FRAMEBUFFER_ATTACHMENT_OBJECT_TYPE;
-        var v3303 : int/*GLenum*/ = WebGLRenderingContext.FRAMEBUFFER_ATTACHMENT_OBJECT_NAME;
-        var v3304 : int/*GLenum*/ = o.FRAMEBUFFER_ATTACHMENT_OBJECT_NAME;
-        var v3305 : int/*GLenum*/ = WebGLRenderingContext.FRAMEBUFFER_ATTACHMENT_TEXTURE_LEVEL;
-        var v3306 : int/*GLenum*/ = o.FRAMEBUFFER_ATTACHMENT_TEXTURE_LEVEL;
-        var v3307 : int/*GLenum*/ = WebGLRenderingContext.FRAMEBUFFER_ATTACHMENT_TEXTURE_CUBE_MAP_FACE;
-        var v3308 : int/*GLenum*/ = o.FRAMEBUFFER_ATTACHMENT_TEXTURE_CUBE_MAP_FACE;
-        var v3309 : int/*GLenum*/ = WebGLRenderingContext.COLOR_ATTACHMENT0;
-        var v3310 : int/*GLenum*/ = o.COLOR_ATTACHMENT0;
-        var v3311 : int/*GLenum*/ = WebGLRenderingContext.DEPTH_ATTACHMENT;
-        var v3312 : int/*GLenum*/ = o.DEPTH_ATTACHMENT;
-        var v3313 : int/*GLenum*/ = WebGLRenderingContext.STENCIL_ATTACHMENT;
-        var v3314 : int/*GLenum*/ = o.STENCIL_ATTACHMENT;
-        var v3315 : int/*GLenum*/ = WebGLRenderingContext.DEPTH_STENCIL_ATTACHMENT;
-        var v3316 : int/*GLenum*/ = o.DEPTH_STENCIL_ATTACHMENT;
-        var v3317 : int/*GLenum*/ = WebGLRenderingContext.NONE;
-        var v3318 : int/*GLenum*/ = o.NONE;
-        var v3319 : int/*GLenum*/ = WebGLRenderingContext.FRAMEBUFFER_COMPLETE;
-        var v3320 : int/*GLenum*/ = o.FRAMEBUFFER_COMPLETE;
-        var v3321 : int/*GLenum*/ = WebGLRenderingContext.FRAMEBUFFER_INCOMPLETE_ATTACHMENT;
-        var v3322 : int/*GLenum*/ = o.FRAMEBUFFER_INCOMPLETE_ATTACHMENT;
-        var v3323 : int/*GLenum*/ = WebGLRenderingContext.FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT;
-        var v3324 : int/*GLenum*/ = o.FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT;
-        var v3325 : int/*GLenum*/ = WebGLRenderingContext.FRAMEBUFFER_INCOMPLETE_DIMENSIONS;
-        var v3326 : int/*GLenum*/ = o.FRAMEBUFFER_INCOMPLETE_DIMENSIONS;
-        var v3327 : int/*GLenum*/ = WebGLRenderingContext.FRAMEBUFFER_UNSUPPORTED;
-        var v3328 : int/*GLenum*/ = o.FRAMEBUFFER_UNSUPPORTED;
-        var v3329 : int/*GLenum*/ = WebGLRenderingContext.FRAMEBUFFER_BINDING;
-        var v3330 : int/*GLenum*/ = o.FRAMEBUFFER_BINDING;
-        var v3331 : int/*GLenum*/ = WebGLRenderingContext.RENDERBUFFER_BINDING;
-        var v3332 : int/*GLenum*/ = o.RENDERBUFFER_BINDING;
-        var v3333 : int/*GLenum*/ = WebGLRenderingContext.MAX_RENDERBUFFER_SIZE;
-        var v3334 : int/*GLenum*/ = o.MAX_RENDERBUFFER_SIZE;
-        var v3335 : int/*GLenum*/ = WebGLRenderingContext.INVALID_FRAMEBUFFER_OPERATION;
-        var v3336 : int/*GLenum*/ = o.INVALID_FRAMEBUFFER_OPERATION;
-        var v3337 : int/*GLenum*/ = WebGLRenderingContext.UNPACK_FLIP_Y_WEBGL;
-        var v3338 : int/*GLenum*/ = o.UNPACK_FLIP_Y_WEBGL;
-        var v3339 : int/*GLenum*/ = WebGLRenderingContext.UNPACK_PREMULTIPLY_ALPHA_WEBGL;
-        var v3340 : int/*GLenum*/ = o.UNPACK_PREMULTIPLY_ALPHA_WEBGL;
-        var v3341 : int/*GLenum*/ = WebGLRenderingContext.CONTEXT_LOST_WEBGL;
-        var v3342 : int/*GLenum*/ = o.CONTEXT_LOST_WEBGL;
-        var v3343 : int/*GLenum*/ = WebGLRenderingContext.UNPACK_COLORSPACE_CONVERSION_WEBGL;
-        var v3344 : int/*GLenum*/ = o.UNPACK_COLORSPACE_CONVERSION_WEBGL;
-        var v3345 : int/*GLenum*/ = WebGLRenderingContext.BROWSER_DEFAULT_WEBGL;
-        var v3346 : int/*GLenum*/ = o.BROWSER_DEFAULT_WEBGL;
-        var v3347 : HTMLCanvasElement = o.canvas;
-        var v3348 : int/*GLsizei*/ = o.drawingBufferWidth;
-        var v3349 : int/*GLsizei*/ = o.drawingBufferHeight;
-        var f3350 : WebGLContextAttributes = o.getContextAttributes();
-        var f3351 : boolean = o.isContextLost();
-        var f3352 : string[]/*sequence<DOMString>?*/ = o.getSupportedExtensions();
-        var f3353 : Object/*object?*/ = o.getExtension(X.getstring());
+        var v2737 : int/*GLenum*/ = WebGLRenderingContext.DEPTH_BUFFER_BIT;
+        var v2738 : int/*GLenum*/ = o.DEPTH_BUFFER_BIT;
+        var v2739 : int/*GLenum*/ = WebGLRenderingContext.STENCIL_BUFFER_BIT;
+        var v2740 : int/*GLenum*/ = o.STENCIL_BUFFER_BIT;
+        var v2741 : int/*GLenum*/ = WebGLRenderingContext.COLOR_BUFFER_BIT;
+        var v2742 : int/*GLenum*/ = o.COLOR_BUFFER_BIT;
+        var v2743 : int/*GLenum*/ = WebGLRenderingContext.POINTS;
+        var v2744 : int/*GLenum*/ = o.POINTS;
+        var v2745 : int/*GLenum*/ = WebGLRenderingContext.LINES;
+        var v2746 : int/*GLenum*/ = o.LINES;
+        var v2747 : int/*GLenum*/ = WebGLRenderingContext.LINE_LOOP;
+        var v2748 : int/*GLenum*/ = o.LINE_LOOP;
+        var v2749 : int/*GLenum*/ = WebGLRenderingContext.LINE_STRIP;
+        var v2750 : int/*GLenum*/ = o.LINE_STRIP;
+        var v2751 : int/*GLenum*/ = WebGLRenderingContext.TRIANGLES;
+        var v2752 : int/*GLenum*/ = o.TRIANGLES;
+        var v2753 : int/*GLenum*/ = WebGLRenderingContext.TRIANGLE_STRIP;
+        var v2754 : int/*GLenum*/ = o.TRIANGLE_STRIP;
+        var v2755 : int/*GLenum*/ = WebGLRenderingContext.TRIANGLE_FAN;
+        var v2756 : int/*GLenum*/ = o.TRIANGLE_FAN;
+        var v2757 : int/*GLenum*/ = WebGLRenderingContext.ZERO;
+        var v2758 : int/*GLenum*/ = o.ZERO;
+        var v2759 : int/*GLenum*/ = WebGLRenderingContext.ONE;
+        var v2760 : int/*GLenum*/ = o.ONE;
+        var v2761 : int/*GLenum*/ = WebGLRenderingContext.SRC_COLOR;
+        var v2762 : int/*GLenum*/ = o.SRC_COLOR;
+        var v2763 : int/*GLenum*/ = WebGLRenderingContext.ONE_MINUS_SRC_COLOR;
+        var v2764 : int/*GLenum*/ = o.ONE_MINUS_SRC_COLOR;
+        var v2765 : int/*GLenum*/ = WebGLRenderingContext.SRC_ALPHA;
+        var v2766 : int/*GLenum*/ = o.SRC_ALPHA;
+        var v2767 : int/*GLenum*/ = WebGLRenderingContext.ONE_MINUS_SRC_ALPHA;
+        var v2768 : int/*GLenum*/ = o.ONE_MINUS_SRC_ALPHA;
+        var v2769 : int/*GLenum*/ = WebGLRenderingContext.DST_ALPHA;
+        var v2770 : int/*GLenum*/ = o.DST_ALPHA;
+        var v2771 : int/*GLenum*/ = WebGLRenderingContext.ONE_MINUS_DST_ALPHA;
+        var v2772 : int/*GLenum*/ = o.ONE_MINUS_DST_ALPHA;
+        var v2773 : int/*GLenum*/ = WebGLRenderingContext.DST_COLOR;
+        var v2774 : int/*GLenum*/ = o.DST_COLOR;
+        var v2775 : int/*GLenum*/ = WebGLRenderingContext.ONE_MINUS_DST_COLOR;
+        var v2776 : int/*GLenum*/ = o.ONE_MINUS_DST_COLOR;
+        var v2777 : int/*GLenum*/ = WebGLRenderingContext.SRC_ALPHA_SATURATE;
+        var v2778 : int/*GLenum*/ = o.SRC_ALPHA_SATURATE;
+        var v2779 : int/*GLenum*/ = WebGLRenderingContext.FUNC_ADD;
+        var v2780 : int/*GLenum*/ = o.FUNC_ADD;
+        var v2781 : int/*GLenum*/ = WebGLRenderingContext.BLEND_EQUATION;
+        var v2782 : int/*GLenum*/ = o.BLEND_EQUATION;
+        var v2783 : int/*GLenum*/ = WebGLRenderingContext.BLEND_EQUATION_RGB;
+        var v2784 : int/*GLenum*/ = o.BLEND_EQUATION_RGB;
+        var v2785 : int/*GLenum*/ = WebGLRenderingContext.BLEND_EQUATION_ALPHA;
+        var v2786 : int/*GLenum*/ = o.BLEND_EQUATION_ALPHA;
+        var v2787 : int/*GLenum*/ = WebGLRenderingContext.FUNC_SUBTRACT;
+        var v2788 : int/*GLenum*/ = o.FUNC_SUBTRACT;
+        var v2789 : int/*GLenum*/ = WebGLRenderingContext.FUNC_REVERSE_SUBTRACT;
+        var v2790 : int/*GLenum*/ = o.FUNC_REVERSE_SUBTRACT;
+        var v2791 : int/*GLenum*/ = WebGLRenderingContext.BLEND_DST_RGB;
+        var v2792 : int/*GLenum*/ = o.BLEND_DST_RGB;
+        var v2793 : int/*GLenum*/ = WebGLRenderingContext.BLEND_SRC_RGB;
+        var v2794 : int/*GLenum*/ = o.BLEND_SRC_RGB;
+        var v2795 : int/*GLenum*/ = WebGLRenderingContext.BLEND_DST_ALPHA;
+        var v2796 : int/*GLenum*/ = o.BLEND_DST_ALPHA;
+        var v2797 : int/*GLenum*/ = WebGLRenderingContext.BLEND_SRC_ALPHA;
+        var v2798 : int/*GLenum*/ = o.BLEND_SRC_ALPHA;
+        var v2799 : int/*GLenum*/ = WebGLRenderingContext.CONSTANT_COLOR;
+        var v2800 : int/*GLenum*/ = o.CONSTANT_COLOR;
+        var v2801 : int/*GLenum*/ = WebGLRenderingContext.ONE_MINUS_CONSTANT_COLOR;
+        var v2802 : int/*GLenum*/ = o.ONE_MINUS_CONSTANT_COLOR;
+        var v2803 : int/*GLenum*/ = WebGLRenderingContext.CONSTANT_ALPHA;
+        var v2804 : int/*GLenum*/ = o.CONSTANT_ALPHA;
+        var v2805 : int/*GLenum*/ = WebGLRenderingContext.ONE_MINUS_CONSTANT_ALPHA;
+        var v2806 : int/*GLenum*/ = o.ONE_MINUS_CONSTANT_ALPHA;
+        var v2807 : int/*GLenum*/ = WebGLRenderingContext.BLEND_COLOR;
+        var v2808 : int/*GLenum*/ = o.BLEND_COLOR;
+        var v2809 : int/*GLenum*/ = WebGLRenderingContext.ARRAY_BUFFER;
+        var v2810 : int/*GLenum*/ = o.ARRAY_BUFFER;
+        var v2811 : int/*GLenum*/ = WebGLRenderingContext.ELEMENT_ARRAY_BUFFER;
+        var v2812 : int/*GLenum*/ = o.ELEMENT_ARRAY_BUFFER;
+        var v2813 : int/*GLenum*/ = WebGLRenderingContext.ARRAY_BUFFER_BINDING;
+        var v2814 : int/*GLenum*/ = o.ARRAY_BUFFER_BINDING;
+        var v2815 : int/*GLenum*/ = WebGLRenderingContext.ELEMENT_ARRAY_BUFFER_BINDING;
+        var v2816 : int/*GLenum*/ = o.ELEMENT_ARRAY_BUFFER_BINDING;
+        var v2817 : int/*GLenum*/ = WebGLRenderingContext.STREAM_DRAW;
+        var v2818 : int/*GLenum*/ = o.STREAM_DRAW;
+        var v2819 : int/*GLenum*/ = WebGLRenderingContext.STATIC_DRAW;
+        var v2820 : int/*GLenum*/ = o.STATIC_DRAW;
+        var v2821 : int/*GLenum*/ = WebGLRenderingContext.DYNAMIC_DRAW;
+        var v2822 : int/*GLenum*/ = o.DYNAMIC_DRAW;
+        var v2823 : int/*GLenum*/ = WebGLRenderingContext.BUFFER_SIZE;
+        var v2824 : int/*GLenum*/ = o.BUFFER_SIZE;
+        var v2825 : int/*GLenum*/ = WebGLRenderingContext.BUFFER_USAGE;
+        var v2826 : int/*GLenum*/ = o.BUFFER_USAGE;
+        var v2827 : int/*GLenum*/ = WebGLRenderingContext.CURRENT_VERTEX_ATTRIB;
+        var v2828 : int/*GLenum*/ = o.CURRENT_VERTEX_ATTRIB;
+        var v2829 : int/*GLenum*/ = WebGLRenderingContext.FRONT;
+        var v2830 : int/*GLenum*/ = o.FRONT;
+        var v2831 : int/*GLenum*/ = WebGLRenderingContext.BACK;
+        var v2832 : int/*GLenum*/ = o.BACK;
+        var v2833 : int/*GLenum*/ = WebGLRenderingContext.FRONT_AND_BACK;
+        var v2834 : int/*GLenum*/ = o.FRONT_AND_BACK;
+        var v2835 : int/*GLenum*/ = WebGLRenderingContext.CULL_FACE;
+        var v2836 : int/*GLenum*/ = o.CULL_FACE;
+        var v2837 : int/*GLenum*/ = WebGLRenderingContext.BLEND;
+        var v2838 : int/*GLenum*/ = o.BLEND;
+        var v2839 : int/*GLenum*/ = WebGLRenderingContext.DITHER;
+        var v2840 : int/*GLenum*/ = o.DITHER;
+        var v2841 : int/*GLenum*/ = WebGLRenderingContext.STENCIL_TEST;
+        var v2842 : int/*GLenum*/ = o.STENCIL_TEST;
+        var v2843 : int/*GLenum*/ = WebGLRenderingContext.DEPTH_TEST;
+        var v2844 : int/*GLenum*/ = o.DEPTH_TEST;
+        var v2845 : int/*GLenum*/ = WebGLRenderingContext.SCISSOR_TEST;
+        var v2846 : int/*GLenum*/ = o.SCISSOR_TEST;
+        var v2847 : int/*GLenum*/ = WebGLRenderingContext.POLYGON_OFFSET_FILL;
+        var v2848 : int/*GLenum*/ = o.POLYGON_OFFSET_FILL;
+        var v2849 : int/*GLenum*/ = WebGLRenderingContext.SAMPLE_ALPHA_TO_COVERAGE;
+        var v2850 : int/*GLenum*/ = o.SAMPLE_ALPHA_TO_COVERAGE;
+        var v2851 : int/*GLenum*/ = WebGLRenderingContext.SAMPLE_COVERAGE;
+        var v2852 : int/*GLenum*/ = o.SAMPLE_COVERAGE;
+        var v2853 : int/*GLenum*/ = WebGLRenderingContext.NO_ERROR;
+        var v2854 : int/*GLenum*/ = o.NO_ERROR;
+        var v2855 : int/*GLenum*/ = WebGLRenderingContext.INVALID_ENUM;
+        var v2856 : int/*GLenum*/ = o.INVALID_ENUM;
+        var v2857 : int/*GLenum*/ = WebGLRenderingContext.INVALID_VALUE;
+        var v2858 : int/*GLenum*/ = o.INVALID_VALUE;
+        var v2859 : int/*GLenum*/ = WebGLRenderingContext.INVALID_OPERATION;
+        var v2860 : int/*GLenum*/ = o.INVALID_OPERATION;
+        var v2861 : int/*GLenum*/ = WebGLRenderingContext.OUT_OF_MEMORY;
+        var v2862 : int/*GLenum*/ = o.OUT_OF_MEMORY;
+        var v2863 : int/*GLenum*/ = WebGLRenderingContext.CW;
+        var v2864 : int/*GLenum*/ = o.CW;
+        var v2865 : int/*GLenum*/ = WebGLRenderingContext.CCW;
+        var v2866 : int/*GLenum*/ = o.CCW;
+        var v2867 : int/*GLenum*/ = WebGLRenderingContext.LINE_WIDTH;
+        var v2868 : int/*GLenum*/ = o.LINE_WIDTH;
+        var v2869 : int/*GLenum*/ = WebGLRenderingContext.ALIASED_POINT_SIZE_RANGE;
+        var v2870 : int/*GLenum*/ = o.ALIASED_POINT_SIZE_RANGE;
+        var v2871 : int/*GLenum*/ = WebGLRenderingContext.ALIASED_LINE_WIDTH_RANGE;
+        var v2872 : int/*GLenum*/ = o.ALIASED_LINE_WIDTH_RANGE;
+        var v2873 : int/*GLenum*/ = WebGLRenderingContext.CULL_FACE_MODE;
+        var v2874 : int/*GLenum*/ = o.CULL_FACE_MODE;
+        var v2875 : int/*GLenum*/ = WebGLRenderingContext.FRONT_FACE;
+        var v2876 : int/*GLenum*/ = o.FRONT_FACE;
+        var v2877 : int/*GLenum*/ = WebGLRenderingContext.DEPTH_RANGE;
+        var v2878 : int/*GLenum*/ = o.DEPTH_RANGE;
+        var v2879 : int/*GLenum*/ = WebGLRenderingContext.DEPTH_WRITEMASK;
+        var v2880 : int/*GLenum*/ = o.DEPTH_WRITEMASK;
+        var v2881 : int/*GLenum*/ = WebGLRenderingContext.DEPTH_CLEAR_VALUE;
+        var v2882 : int/*GLenum*/ = o.DEPTH_CLEAR_VALUE;
+        var v2883 : int/*GLenum*/ = WebGLRenderingContext.DEPTH_FUNC;
+        var v2884 : int/*GLenum*/ = o.DEPTH_FUNC;
+        var v2885 : int/*GLenum*/ = WebGLRenderingContext.STENCIL_CLEAR_VALUE;
+        var v2886 : int/*GLenum*/ = o.STENCIL_CLEAR_VALUE;
+        var v2887 : int/*GLenum*/ = WebGLRenderingContext.STENCIL_FUNC;
+        var v2888 : int/*GLenum*/ = o.STENCIL_FUNC;
+        var v2889 : int/*GLenum*/ = WebGLRenderingContext.STENCIL_FAIL;
+        var v2890 : int/*GLenum*/ = o.STENCIL_FAIL;
+        var v2891 : int/*GLenum*/ = WebGLRenderingContext.STENCIL_PASS_DEPTH_FAIL;
+        var v2892 : int/*GLenum*/ = o.STENCIL_PASS_DEPTH_FAIL;
+        var v2893 : int/*GLenum*/ = WebGLRenderingContext.STENCIL_PASS_DEPTH_PASS;
+        var v2894 : int/*GLenum*/ = o.STENCIL_PASS_DEPTH_PASS;
+        var v2895 : int/*GLenum*/ = WebGLRenderingContext.STENCIL_REF;
+        var v2896 : int/*GLenum*/ = o.STENCIL_REF;
+        var v2897 : int/*GLenum*/ = WebGLRenderingContext.STENCIL_VALUE_MASK;
+        var v2898 : int/*GLenum*/ = o.STENCIL_VALUE_MASK;
+        var v2899 : int/*GLenum*/ = WebGLRenderingContext.STENCIL_WRITEMASK;
+        var v2900 : int/*GLenum*/ = o.STENCIL_WRITEMASK;
+        var v2901 : int/*GLenum*/ = WebGLRenderingContext.STENCIL_BACK_FUNC;
+        var v2902 : int/*GLenum*/ = o.STENCIL_BACK_FUNC;
+        var v2903 : int/*GLenum*/ = WebGLRenderingContext.STENCIL_BACK_FAIL;
+        var v2904 : int/*GLenum*/ = o.STENCIL_BACK_FAIL;
+        var v2905 : int/*GLenum*/ = WebGLRenderingContext.STENCIL_BACK_PASS_DEPTH_FAIL;
+        var v2906 : int/*GLenum*/ = o.STENCIL_BACK_PASS_DEPTH_FAIL;
+        var v2907 : int/*GLenum*/ = WebGLRenderingContext.STENCIL_BACK_PASS_DEPTH_PASS;
+        var v2908 : int/*GLenum*/ = o.STENCIL_BACK_PASS_DEPTH_PASS;
+        var v2909 : int/*GLenum*/ = WebGLRenderingContext.STENCIL_BACK_REF;
+        var v2910 : int/*GLenum*/ = o.STENCIL_BACK_REF;
+        var v2911 : int/*GLenum*/ = WebGLRenderingContext.STENCIL_BACK_VALUE_MASK;
+        var v2912 : int/*GLenum*/ = o.STENCIL_BACK_VALUE_MASK;
+        var v2913 : int/*GLenum*/ = WebGLRenderingContext.STENCIL_BACK_WRITEMASK;
+        var v2914 : int/*GLenum*/ = o.STENCIL_BACK_WRITEMASK;
+        var v2915 : int/*GLenum*/ = WebGLRenderingContext.VIEWPORT;
+        var v2916 : int/*GLenum*/ = o.VIEWPORT;
+        var v2917 : int/*GLenum*/ = WebGLRenderingContext.SCISSOR_BOX;
+        var v2918 : int/*GLenum*/ = o.SCISSOR_BOX;
+        var v2919 : int/*GLenum*/ = WebGLRenderingContext.COLOR_CLEAR_VALUE;
+        var v2920 : int/*GLenum*/ = o.COLOR_CLEAR_VALUE;
+        var v2921 : int/*GLenum*/ = WebGLRenderingContext.COLOR_WRITEMASK;
+        var v2922 : int/*GLenum*/ = o.COLOR_WRITEMASK;
+        var v2923 : int/*GLenum*/ = WebGLRenderingContext.UNPACK_ALIGNMENT;
+        var v2924 : int/*GLenum*/ = o.UNPACK_ALIGNMENT;
+        var v2925 : int/*GLenum*/ = WebGLRenderingContext.PACK_ALIGNMENT;
+        var v2926 : int/*GLenum*/ = o.PACK_ALIGNMENT;
+        var v2927 : int/*GLenum*/ = WebGLRenderingContext.MAX_TEXTURE_SIZE;
+        var v2928 : int/*GLenum*/ = o.MAX_TEXTURE_SIZE;
+        var v2929 : int/*GLenum*/ = WebGLRenderingContext.MAX_VIEWPORT_DIMS;
+        var v2930 : int/*GLenum*/ = o.MAX_VIEWPORT_DIMS;
+        var v2931 : int/*GLenum*/ = WebGLRenderingContext.SUBPIXEL_BITS;
+        var v2932 : int/*GLenum*/ = o.SUBPIXEL_BITS;
+        var v2933 : int/*GLenum*/ = WebGLRenderingContext.RED_BITS;
+        var v2934 : int/*GLenum*/ = o.RED_BITS;
+        var v2935 : int/*GLenum*/ = WebGLRenderingContext.GREEN_BITS;
+        var v2936 : int/*GLenum*/ = o.GREEN_BITS;
+        var v2937 : int/*GLenum*/ = WebGLRenderingContext.BLUE_BITS;
+        var v2938 : int/*GLenum*/ = o.BLUE_BITS;
+        var v2939 : int/*GLenum*/ = WebGLRenderingContext.ALPHA_BITS;
+        var v2940 : int/*GLenum*/ = o.ALPHA_BITS;
+        var v2941 : int/*GLenum*/ = WebGLRenderingContext.DEPTH_BITS;
+        var v2942 : int/*GLenum*/ = o.DEPTH_BITS;
+        var v2943 : int/*GLenum*/ = WebGLRenderingContext.STENCIL_BITS;
+        var v2944 : int/*GLenum*/ = o.STENCIL_BITS;
+        var v2945 : int/*GLenum*/ = WebGLRenderingContext.POLYGON_OFFSET_UNITS;
+        var v2946 : int/*GLenum*/ = o.POLYGON_OFFSET_UNITS;
+        var v2947 : int/*GLenum*/ = WebGLRenderingContext.POLYGON_OFFSET_FACTOR;
+        var v2948 : int/*GLenum*/ = o.POLYGON_OFFSET_FACTOR;
+        var v2949 : int/*GLenum*/ = WebGLRenderingContext.TEXTURE_BINDING_2D;
+        var v2950 : int/*GLenum*/ = o.TEXTURE_BINDING_2D;
+        var v2951 : int/*GLenum*/ = WebGLRenderingContext.SAMPLE_BUFFERS;
+        var v2952 : int/*GLenum*/ = o.SAMPLE_BUFFERS;
+        var v2953 : int/*GLenum*/ = WebGLRenderingContext.SAMPLES;
+        var v2954 : int/*GLenum*/ = o.SAMPLES;
+        var v2955 : int/*GLenum*/ = WebGLRenderingContext.SAMPLE_COVERAGE_VALUE;
+        var v2956 : int/*GLenum*/ = o.SAMPLE_COVERAGE_VALUE;
+        var v2957 : int/*GLenum*/ = WebGLRenderingContext.SAMPLE_COVERAGE_INVERT;
+        var v2958 : int/*GLenum*/ = o.SAMPLE_COVERAGE_INVERT;
+        var v2959 : int/*GLenum*/ = WebGLRenderingContext.COMPRESSED_TEXTURE_FORMATS;
+        var v2960 : int/*GLenum*/ = o.COMPRESSED_TEXTURE_FORMATS;
+        var v2961 : int/*GLenum*/ = WebGLRenderingContext.DONT_CARE;
+        var v2962 : int/*GLenum*/ = o.DONT_CARE;
+        var v2963 : int/*GLenum*/ = WebGLRenderingContext.FASTEST;
+        var v2964 : int/*GLenum*/ = o.FASTEST;
+        var v2965 : int/*GLenum*/ = WebGLRenderingContext.NICEST;
+        var v2966 : int/*GLenum*/ = o.NICEST;
+        var v2967 : int/*GLenum*/ = WebGLRenderingContext.GENERATE_MIPMAP_HINT;
+        var v2968 : int/*GLenum*/ = o.GENERATE_MIPMAP_HINT;
+        var v2969 : int/*GLenum*/ = WebGLRenderingContext.BYTE;
+        var v2970 : int/*GLenum*/ = o.BYTE;
+        var v2971 : int/*GLenum*/ = WebGLRenderingContext.UNSIGNED_BYTE;
+        var v2972 : int/*GLenum*/ = o.UNSIGNED_BYTE;
+        var v2973 : int/*GLenum*/ = WebGLRenderingContext.SHORT;
+        var v2974 : int/*GLenum*/ = o.SHORT;
+        var v2975 : int/*GLenum*/ = WebGLRenderingContext.UNSIGNED_SHORT;
+        var v2976 : int/*GLenum*/ = o.UNSIGNED_SHORT;
+        var v2977 : int/*GLenum*/ = WebGLRenderingContext.INT;
+        var v2978 : int/*GLenum*/ = o.INT;
+        var v2979 : int/*GLenum*/ = WebGLRenderingContext.UNSIGNED_INT;
+        var v2980 : int/*GLenum*/ = o.UNSIGNED_INT;
+        var v2981 : int/*GLenum*/ = WebGLRenderingContext.FLOAT;
+        var v2982 : int/*GLenum*/ = o.FLOAT;
+        var v2983 : int/*GLenum*/ = WebGLRenderingContext.DEPTH_COMPONENT;
+        var v2984 : int/*GLenum*/ = o.DEPTH_COMPONENT;
+        var v2985 : int/*GLenum*/ = WebGLRenderingContext.ALPHA;
+        var v2986 : int/*GLenum*/ = o.ALPHA;
+        var v2987 : int/*GLenum*/ = WebGLRenderingContext.RGB;
+        var v2988 : int/*GLenum*/ = o.RGB;
+        var v2989 : int/*GLenum*/ = WebGLRenderingContext.RGBA;
+        var v2990 : int/*GLenum*/ = o.RGBA;
+        var v2991 : int/*GLenum*/ = WebGLRenderingContext.LUMINANCE;
+        var v2992 : int/*GLenum*/ = o.LUMINANCE;
+        var v2993 : int/*GLenum*/ = WebGLRenderingContext.LUMINANCE_ALPHA;
+        var v2994 : int/*GLenum*/ = o.LUMINANCE_ALPHA;
+        var v2995 : int/*GLenum*/ = WebGLRenderingContext.UNSIGNED_SHORT_4_4_4_4;
+        var v2996 : int/*GLenum*/ = o.UNSIGNED_SHORT_4_4_4_4;
+        var v2997 : int/*GLenum*/ = WebGLRenderingContext.UNSIGNED_SHORT_5_5_5_1;
+        var v2998 : int/*GLenum*/ = o.UNSIGNED_SHORT_5_5_5_1;
+        var v2999 : int/*GLenum*/ = WebGLRenderingContext.UNSIGNED_SHORT_5_6_5;
+        var v3000 : int/*GLenum*/ = o.UNSIGNED_SHORT_5_6_5;
+        var v3001 : int/*GLenum*/ = WebGLRenderingContext.FRAGMENT_SHADER;
+        var v3002 : int/*GLenum*/ = o.FRAGMENT_SHADER;
+        var v3003 : int/*GLenum*/ = WebGLRenderingContext.VERTEX_SHADER;
+        var v3004 : int/*GLenum*/ = o.VERTEX_SHADER;
+        var v3005 : int/*GLenum*/ = WebGLRenderingContext.MAX_VERTEX_ATTRIBS;
+        var v3006 : int/*GLenum*/ = o.MAX_VERTEX_ATTRIBS;
+        var v3007 : int/*GLenum*/ = WebGLRenderingContext.MAX_VERTEX_UNIFORM_VECTORS;
+        var v3008 : int/*GLenum*/ = o.MAX_VERTEX_UNIFORM_VECTORS;
+        var v3009 : int/*GLenum*/ = WebGLRenderingContext.MAX_VARYING_VECTORS;
+        var v3010 : int/*GLenum*/ = o.MAX_VARYING_VECTORS;
+        var v3011 : int/*GLenum*/ = WebGLRenderingContext.MAX_COMBINED_TEXTURE_IMAGE_UNITS;
+        var v3012 : int/*GLenum*/ = o.MAX_COMBINED_TEXTURE_IMAGE_UNITS;
+        var v3013 : int/*GLenum*/ = WebGLRenderingContext.MAX_VERTEX_TEXTURE_IMAGE_UNITS;
+        var v3014 : int/*GLenum*/ = o.MAX_VERTEX_TEXTURE_IMAGE_UNITS;
+        var v3015 : int/*GLenum*/ = WebGLRenderingContext.MAX_TEXTURE_IMAGE_UNITS;
+        var v3016 : int/*GLenum*/ = o.MAX_TEXTURE_IMAGE_UNITS;
+        var v3017 : int/*GLenum*/ = WebGLRenderingContext.MAX_FRAGMENT_UNIFORM_VECTORS;
+        var v3018 : int/*GLenum*/ = o.MAX_FRAGMENT_UNIFORM_VECTORS;
+        var v3019 : int/*GLenum*/ = WebGLRenderingContext.SHADER_TYPE;
+        var v3020 : int/*GLenum*/ = o.SHADER_TYPE;
+        var v3021 : int/*GLenum*/ = WebGLRenderingContext.DELETE_STATUS;
+        var v3022 : int/*GLenum*/ = o.DELETE_STATUS;
+        var v3023 : int/*GLenum*/ = WebGLRenderingContext.LINK_STATUS;
+        var v3024 : int/*GLenum*/ = o.LINK_STATUS;
+        var v3025 : int/*GLenum*/ = WebGLRenderingContext.VALIDATE_STATUS;
+        var v3026 : int/*GLenum*/ = o.VALIDATE_STATUS;
+        var v3027 : int/*GLenum*/ = WebGLRenderingContext.ATTACHED_SHADERS;
+        var v3028 : int/*GLenum*/ = o.ATTACHED_SHADERS;
+        var v3029 : int/*GLenum*/ = WebGLRenderingContext.ACTIVE_UNIFORMS;
+        var v3030 : int/*GLenum*/ = o.ACTIVE_UNIFORMS;
+        var v3031 : int/*GLenum*/ = WebGLRenderingContext.ACTIVE_ATTRIBUTES;
+        var v3032 : int/*GLenum*/ = o.ACTIVE_ATTRIBUTES;
+        var v3033 : int/*GLenum*/ = WebGLRenderingContext.SHADING_LANGUAGE_VERSION;
+        var v3034 : int/*GLenum*/ = o.SHADING_LANGUAGE_VERSION;
+        var v3035 : int/*GLenum*/ = WebGLRenderingContext.CURRENT_PROGRAM;
+        var v3036 : int/*GLenum*/ = o.CURRENT_PROGRAM;
+        var v3037 : int/*GLenum*/ = WebGLRenderingContext.NEVER;
+        var v3038 : int/*GLenum*/ = o.NEVER;
+        var v3039 : int/*GLenum*/ = WebGLRenderingContext.LESS;
+        var v3040 : int/*GLenum*/ = o.LESS;
+        var v3041 : int/*GLenum*/ = WebGLRenderingContext.EQUAL;
+        var v3042 : int/*GLenum*/ = o.EQUAL;
+        var v3043 : int/*GLenum*/ = WebGLRenderingContext.LEQUAL;
+        var v3044 : int/*GLenum*/ = o.LEQUAL;
+        var v3045 : int/*GLenum*/ = WebGLRenderingContext.GREATER;
+        var v3046 : int/*GLenum*/ = o.GREATER;
+        var v3047 : int/*GLenum*/ = WebGLRenderingContext.NOTEQUAL;
+        var v3048 : int/*GLenum*/ = o.NOTEQUAL;
+        var v3049 : int/*GLenum*/ = WebGLRenderingContext.GEQUAL;
+        var v3050 : int/*GLenum*/ = o.GEQUAL;
+        var v3051 : int/*GLenum*/ = WebGLRenderingContext.ALWAYS;
+        var v3052 : int/*GLenum*/ = o.ALWAYS;
+        var v3053 : int/*GLenum*/ = WebGLRenderingContext.KEEP;
+        var v3054 : int/*GLenum*/ = o.KEEP;
+        var v3055 : int/*GLenum*/ = WebGLRenderingContext.REPLACE;
+        var v3056 : int/*GLenum*/ = o.REPLACE;
+        var v3057 : int/*GLenum*/ = WebGLRenderingContext.INCR;
+        var v3058 : int/*GLenum*/ = o.INCR;
+        var v3059 : int/*GLenum*/ = WebGLRenderingContext.DECR;
+        var v3060 : int/*GLenum*/ = o.DECR;
+        var v3061 : int/*GLenum*/ = WebGLRenderingContext.INVERT;
+        var v3062 : int/*GLenum*/ = o.INVERT;
+        var v3063 : int/*GLenum*/ = WebGLRenderingContext.INCR_WRAP;
+        var v3064 : int/*GLenum*/ = o.INCR_WRAP;
+        var v3065 : int/*GLenum*/ = WebGLRenderingContext.DECR_WRAP;
+        var v3066 : int/*GLenum*/ = o.DECR_WRAP;
+        var v3067 : int/*GLenum*/ = WebGLRenderingContext.VENDOR;
+        var v3068 : int/*GLenum*/ = o.VENDOR;
+        var v3069 : int/*GLenum*/ = WebGLRenderingContext.RENDERER;
+        var v3070 : int/*GLenum*/ = o.RENDERER;
+        var v3071 : int/*GLenum*/ = WebGLRenderingContext.VERSION;
+        var v3072 : int/*GLenum*/ = o.VERSION;
+        var v3073 : int/*GLenum*/ = WebGLRenderingContext.NEAREST;
+        var v3074 : int/*GLenum*/ = o.NEAREST;
+        var v3075 : int/*GLenum*/ = WebGLRenderingContext.LINEAR;
+        var v3076 : int/*GLenum*/ = o.LINEAR;
+        var v3077 : int/*GLenum*/ = WebGLRenderingContext.NEAREST_MIPMAP_NEAREST;
+        var v3078 : int/*GLenum*/ = o.NEAREST_MIPMAP_NEAREST;
+        var v3079 : int/*GLenum*/ = WebGLRenderingContext.LINEAR_MIPMAP_NEAREST;
+        var v3080 : int/*GLenum*/ = o.LINEAR_MIPMAP_NEAREST;
+        var v3081 : int/*GLenum*/ = WebGLRenderingContext.NEAREST_MIPMAP_LINEAR;
+        var v3082 : int/*GLenum*/ = o.NEAREST_MIPMAP_LINEAR;
+        var v3083 : int/*GLenum*/ = WebGLRenderingContext.LINEAR_MIPMAP_LINEAR;
+        var v3084 : int/*GLenum*/ = o.LINEAR_MIPMAP_LINEAR;
+        var v3085 : int/*GLenum*/ = WebGLRenderingContext.TEXTURE_MAG_FILTER;
+        var v3086 : int/*GLenum*/ = o.TEXTURE_MAG_FILTER;
+        var v3087 : int/*GLenum*/ = WebGLRenderingContext.TEXTURE_MIN_FILTER;
+        var v3088 : int/*GLenum*/ = o.TEXTURE_MIN_FILTER;
+        var v3089 : int/*GLenum*/ = WebGLRenderingContext.TEXTURE_WRAP_S;
+        var v3090 : int/*GLenum*/ = o.TEXTURE_WRAP_S;
+        var v3091 : int/*GLenum*/ = WebGLRenderingContext.TEXTURE_WRAP_T;
+        var v3092 : int/*GLenum*/ = o.TEXTURE_WRAP_T;
+        var v3093 : int/*GLenum*/ = WebGLRenderingContext.TEXTURE_2D;
+        var v3094 : int/*GLenum*/ = o.TEXTURE_2D;
+        var v3095 : int/*GLenum*/ = WebGLRenderingContext.TEXTURE;
+        var v3096 : int/*GLenum*/ = o.TEXTURE;
+        var v3097 : int/*GLenum*/ = WebGLRenderingContext.TEXTURE_CUBE_MAP;
+        var v3098 : int/*GLenum*/ = o.TEXTURE_CUBE_MAP;
+        var v3099 : int/*GLenum*/ = WebGLRenderingContext.TEXTURE_BINDING_CUBE_MAP;
+        var v3100 : int/*GLenum*/ = o.TEXTURE_BINDING_CUBE_MAP;
+        var v3101 : int/*GLenum*/ = WebGLRenderingContext.TEXTURE_CUBE_MAP_POSITIVE_X;
+        var v3102 : int/*GLenum*/ = o.TEXTURE_CUBE_MAP_POSITIVE_X;
+        var v3103 : int/*GLenum*/ = WebGLRenderingContext.TEXTURE_CUBE_MAP_NEGATIVE_X;
+        var v3104 : int/*GLenum*/ = o.TEXTURE_CUBE_MAP_NEGATIVE_X;
+        var v3105 : int/*GLenum*/ = WebGLRenderingContext.TEXTURE_CUBE_MAP_POSITIVE_Y;
+        var v3106 : int/*GLenum*/ = o.TEXTURE_CUBE_MAP_POSITIVE_Y;
+        var v3107 : int/*GLenum*/ = WebGLRenderingContext.TEXTURE_CUBE_MAP_NEGATIVE_Y;
+        var v3108 : int/*GLenum*/ = o.TEXTURE_CUBE_MAP_NEGATIVE_Y;
+        var v3109 : int/*GLenum*/ = WebGLRenderingContext.TEXTURE_CUBE_MAP_POSITIVE_Z;
+        var v3110 : int/*GLenum*/ = o.TEXTURE_CUBE_MAP_POSITIVE_Z;
+        var v3111 : int/*GLenum*/ = WebGLRenderingContext.TEXTURE_CUBE_MAP_NEGATIVE_Z;
+        var v3112 : int/*GLenum*/ = o.TEXTURE_CUBE_MAP_NEGATIVE_Z;
+        var v3113 : int/*GLenum*/ = WebGLRenderingContext.MAX_CUBE_MAP_TEXTURE_SIZE;
+        var v3114 : int/*GLenum*/ = o.MAX_CUBE_MAP_TEXTURE_SIZE;
+        var v3115 : int/*GLenum*/ = WebGLRenderingContext.TEXTURE0;
+        var v3116 : int/*GLenum*/ = o.TEXTURE0;
+        var v3117 : int/*GLenum*/ = WebGLRenderingContext.TEXTURE1;
+        var v3118 : int/*GLenum*/ = o.TEXTURE1;
+        var v3119 : int/*GLenum*/ = WebGLRenderingContext.TEXTURE2;
+        var v3120 : int/*GLenum*/ = o.TEXTURE2;
+        var v3121 : int/*GLenum*/ = WebGLRenderingContext.TEXTURE3;
+        var v3122 : int/*GLenum*/ = o.TEXTURE3;
+        var v3123 : int/*GLenum*/ = WebGLRenderingContext.TEXTURE4;
+        var v3124 : int/*GLenum*/ = o.TEXTURE4;
+        var v3125 : int/*GLenum*/ = WebGLRenderingContext.TEXTURE5;
+        var v3126 : int/*GLenum*/ = o.TEXTURE5;
+        var v3127 : int/*GLenum*/ = WebGLRenderingContext.TEXTURE6;
+        var v3128 : int/*GLenum*/ = o.TEXTURE6;
+        var v3129 : int/*GLenum*/ = WebGLRenderingContext.TEXTURE7;
+        var v3130 : int/*GLenum*/ = o.TEXTURE7;
+        var v3131 : int/*GLenum*/ = WebGLRenderingContext.TEXTURE8;
+        var v3132 : int/*GLenum*/ = o.TEXTURE8;
+        var v3133 : int/*GLenum*/ = WebGLRenderingContext.TEXTURE9;
+        var v3134 : int/*GLenum*/ = o.TEXTURE9;
+        var v3135 : int/*GLenum*/ = WebGLRenderingContext.TEXTURE10;
+        var v3136 : int/*GLenum*/ = o.TEXTURE10;
+        var v3137 : int/*GLenum*/ = WebGLRenderingContext.TEXTURE11;
+        var v3138 : int/*GLenum*/ = o.TEXTURE11;
+        var v3139 : int/*GLenum*/ = WebGLRenderingContext.TEXTURE12;
+        var v3140 : int/*GLenum*/ = o.TEXTURE12;
+        var v3141 : int/*GLenum*/ = WebGLRenderingContext.TEXTURE13;
+        var v3142 : int/*GLenum*/ = o.TEXTURE13;
+        var v3143 : int/*GLenum*/ = WebGLRenderingContext.TEXTURE14;
+        var v3144 : int/*GLenum*/ = o.TEXTURE14;
+        var v3145 : int/*GLenum*/ = WebGLRenderingContext.TEXTURE15;
+        var v3146 : int/*GLenum*/ = o.TEXTURE15;
+        var v3147 : int/*GLenum*/ = WebGLRenderingContext.TEXTURE16;
+        var v3148 : int/*GLenum*/ = o.TEXTURE16;
+        var v3149 : int/*GLenum*/ = WebGLRenderingContext.TEXTURE17;
+        var v3150 : int/*GLenum*/ = o.TEXTURE17;
+        var v3151 : int/*GLenum*/ = WebGLRenderingContext.TEXTURE18;
+        var v3152 : int/*GLenum*/ = o.TEXTURE18;
+        var v3153 : int/*GLenum*/ = WebGLRenderingContext.TEXTURE19;
+        var v3154 : int/*GLenum*/ = o.TEXTURE19;
+        var v3155 : int/*GLenum*/ = WebGLRenderingContext.TEXTURE20;
+        var v3156 : int/*GLenum*/ = o.TEXTURE20;
+        var v3157 : int/*GLenum*/ = WebGLRenderingContext.TEXTURE21;
+        var v3158 : int/*GLenum*/ = o.TEXTURE21;
+        var v3159 : int/*GLenum*/ = WebGLRenderingContext.TEXTURE22;
+        var v3160 : int/*GLenum*/ = o.TEXTURE22;
+        var v3161 : int/*GLenum*/ = WebGLRenderingContext.TEXTURE23;
+        var v3162 : int/*GLenum*/ = o.TEXTURE23;
+        var v3163 : int/*GLenum*/ = WebGLRenderingContext.TEXTURE24;
+        var v3164 : int/*GLenum*/ = o.TEXTURE24;
+        var v3165 : int/*GLenum*/ = WebGLRenderingContext.TEXTURE25;
+        var v3166 : int/*GLenum*/ = o.TEXTURE25;
+        var v3167 : int/*GLenum*/ = WebGLRenderingContext.TEXTURE26;
+        var v3168 : int/*GLenum*/ = o.TEXTURE26;
+        var v3169 : int/*GLenum*/ = WebGLRenderingContext.TEXTURE27;
+        var v3170 : int/*GLenum*/ = o.TEXTURE27;
+        var v3171 : int/*GLenum*/ = WebGLRenderingContext.TEXTURE28;
+        var v3172 : int/*GLenum*/ = o.TEXTURE28;
+        var v3173 : int/*GLenum*/ = WebGLRenderingContext.TEXTURE29;
+        var v3174 : int/*GLenum*/ = o.TEXTURE29;
+        var v3175 : int/*GLenum*/ = WebGLRenderingContext.TEXTURE30;
+        var v3176 : int/*GLenum*/ = o.TEXTURE30;
+        var v3177 : int/*GLenum*/ = WebGLRenderingContext.TEXTURE31;
+        var v3178 : int/*GLenum*/ = o.TEXTURE31;
+        var v3179 : int/*GLenum*/ = WebGLRenderingContext.ACTIVE_TEXTURE;
+        var v3180 : int/*GLenum*/ = o.ACTIVE_TEXTURE;
+        var v3181 : int/*GLenum*/ = WebGLRenderingContext.REPEAT;
+        var v3182 : int/*GLenum*/ = o.REPEAT;
+        var v3183 : int/*GLenum*/ = WebGLRenderingContext.CLAMP_TO_EDGE;
+        var v3184 : int/*GLenum*/ = o.CLAMP_TO_EDGE;
+        var v3185 : int/*GLenum*/ = WebGLRenderingContext.MIRRORED_REPEAT;
+        var v3186 : int/*GLenum*/ = o.MIRRORED_REPEAT;
+        var v3187 : int/*GLenum*/ = WebGLRenderingContext.FLOAT_VEC2;
+        var v3188 : int/*GLenum*/ = o.FLOAT_VEC2;
+        var v3189 : int/*GLenum*/ = WebGLRenderingContext.FLOAT_VEC3;
+        var v3190 : int/*GLenum*/ = o.FLOAT_VEC3;
+        var v3191 : int/*GLenum*/ = WebGLRenderingContext.FLOAT_VEC4;
+        var v3192 : int/*GLenum*/ = o.FLOAT_VEC4;
+        var v3193 : int/*GLenum*/ = WebGLRenderingContext.INT_VEC2;
+        var v3194 : int/*GLenum*/ = o.INT_VEC2;
+        var v3195 : int/*GLenum*/ = WebGLRenderingContext.INT_VEC3;
+        var v3196 : int/*GLenum*/ = o.INT_VEC3;
+        var v3197 : int/*GLenum*/ = WebGLRenderingContext.INT_VEC4;
+        var v3198 : int/*GLenum*/ = o.INT_VEC4;
+        var v3199 : int/*GLenum*/ = WebGLRenderingContext.BOOL;
+        var v3200 : int/*GLenum*/ = o.BOOL;
+        var v3201 : int/*GLenum*/ = WebGLRenderingContext.BOOL_VEC2;
+        var v3202 : int/*GLenum*/ = o.BOOL_VEC2;
+        var v3203 : int/*GLenum*/ = WebGLRenderingContext.BOOL_VEC3;
+        var v3204 : int/*GLenum*/ = o.BOOL_VEC3;
+        var v3205 : int/*GLenum*/ = WebGLRenderingContext.BOOL_VEC4;
+        var v3206 : int/*GLenum*/ = o.BOOL_VEC4;
+        var v3207 : int/*GLenum*/ = WebGLRenderingContext.FLOAT_MAT2;
+        var v3208 : int/*GLenum*/ = o.FLOAT_MAT2;
+        var v3209 : int/*GLenum*/ = WebGLRenderingContext.FLOAT_MAT3;
+        var v3210 : int/*GLenum*/ = o.FLOAT_MAT3;
+        var v3211 : int/*GLenum*/ = WebGLRenderingContext.FLOAT_MAT4;
+        var v3212 : int/*GLenum*/ = o.FLOAT_MAT4;
+        var v3213 : int/*GLenum*/ = WebGLRenderingContext.SAMPLER_2D;
+        var v3214 : int/*GLenum*/ = o.SAMPLER_2D;
+        var v3215 : int/*GLenum*/ = WebGLRenderingContext.SAMPLER_CUBE;
+        var v3216 : int/*GLenum*/ = o.SAMPLER_CUBE;
+        var v3217 : int/*GLenum*/ = WebGLRenderingContext.VERTEX_ATTRIB_ARRAY_ENABLED;
+        var v3218 : int/*GLenum*/ = o.VERTEX_ATTRIB_ARRAY_ENABLED;
+        var v3219 : int/*GLenum*/ = WebGLRenderingContext.VERTEX_ATTRIB_ARRAY_SIZE;
+        var v3220 : int/*GLenum*/ = o.VERTEX_ATTRIB_ARRAY_SIZE;
+        var v3221 : int/*GLenum*/ = WebGLRenderingContext.VERTEX_ATTRIB_ARRAY_STRIDE;
+        var v3222 : int/*GLenum*/ = o.VERTEX_ATTRIB_ARRAY_STRIDE;
+        var v3223 : int/*GLenum*/ = WebGLRenderingContext.VERTEX_ATTRIB_ARRAY_TYPE;
+        var v3224 : int/*GLenum*/ = o.VERTEX_ATTRIB_ARRAY_TYPE;
+        var v3225 : int/*GLenum*/ = WebGLRenderingContext.VERTEX_ATTRIB_ARRAY_NORMALIZED;
+        var v3226 : int/*GLenum*/ = o.VERTEX_ATTRIB_ARRAY_NORMALIZED;
+        var v3227 : int/*GLenum*/ = WebGLRenderingContext.VERTEX_ATTRIB_ARRAY_POINTER;
+        var v3228 : int/*GLenum*/ = o.VERTEX_ATTRIB_ARRAY_POINTER;
+        var v3229 : int/*GLenum*/ = WebGLRenderingContext.VERTEX_ATTRIB_ARRAY_BUFFER_BINDING;
+        var v3230 : int/*GLenum*/ = o.VERTEX_ATTRIB_ARRAY_BUFFER_BINDING;
+        var v3231 : int/*GLenum*/ = WebGLRenderingContext.COMPILE_STATUS;
+        var v3232 : int/*GLenum*/ = o.COMPILE_STATUS;
+        var v3233 : int/*GLenum*/ = WebGLRenderingContext.LOW_FLOAT;
+        var v3234 : int/*GLenum*/ = o.LOW_FLOAT;
+        var v3235 : int/*GLenum*/ = WebGLRenderingContext.MEDIUM_FLOAT;
+        var v3236 : int/*GLenum*/ = o.MEDIUM_FLOAT;
+        var v3237 : int/*GLenum*/ = WebGLRenderingContext.HIGH_FLOAT;
+        var v3238 : int/*GLenum*/ = o.HIGH_FLOAT;
+        var v3239 : int/*GLenum*/ = WebGLRenderingContext.LOW_INT;
+        var v3240 : int/*GLenum*/ = o.LOW_INT;
+        var v3241 : int/*GLenum*/ = WebGLRenderingContext.MEDIUM_INT;
+        var v3242 : int/*GLenum*/ = o.MEDIUM_INT;
+        var v3243 : int/*GLenum*/ = WebGLRenderingContext.HIGH_INT;
+        var v3244 : int/*GLenum*/ = o.HIGH_INT;
+        var v3245 : int/*GLenum*/ = WebGLRenderingContext.FRAMEBUFFER;
+        var v3246 : int/*GLenum*/ = o.FRAMEBUFFER;
+        var v3247 : int/*GLenum*/ = WebGLRenderingContext.RENDERBUFFER;
+        var v3248 : int/*GLenum*/ = o.RENDERBUFFER;
+        var v3249 : int/*GLenum*/ = WebGLRenderingContext.RGBA4;
+        var v3250 : int/*GLenum*/ = o.RGBA4;
+        var v3251 : int/*GLenum*/ = WebGLRenderingContext.RGB5_A1;
+        var v3252 : int/*GLenum*/ = o.RGB5_A1;
+        var v3253 : int/*GLenum*/ = WebGLRenderingContext.RGB565;
+        var v3254 : int/*GLenum*/ = o.RGB565;
+        var v3255 : int/*GLenum*/ = WebGLRenderingContext.DEPTH_COMPONENT16;
+        var v3256 : int/*GLenum*/ = o.DEPTH_COMPONENT16;
+        var v3257 : int/*GLenum*/ = WebGLRenderingContext.STENCIL_INDEX;
+        var v3258 : int/*GLenum*/ = o.STENCIL_INDEX;
+        var v3259 : int/*GLenum*/ = WebGLRenderingContext.STENCIL_INDEX8;
+        var v3260 : int/*GLenum*/ = o.STENCIL_INDEX8;
+        var v3261 : int/*GLenum*/ = WebGLRenderingContext.DEPTH_STENCIL;
+        var v3262 : int/*GLenum*/ = o.DEPTH_STENCIL;
+        var v3263 : int/*GLenum*/ = WebGLRenderingContext.RENDERBUFFER_WIDTH;
+        var v3264 : int/*GLenum*/ = o.RENDERBUFFER_WIDTH;
+        var v3265 : int/*GLenum*/ = WebGLRenderingContext.RENDERBUFFER_HEIGHT;
+        var v3266 : int/*GLenum*/ = o.RENDERBUFFER_HEIGHT;
+        var v3267 : int/*GLenum*/ = WebGLRenderingContext.RENDERBUFFER_INTERNAL_FORMAT;
+        var v3268 : int/*GLenum*/ = o.RENDERBUFFER_INTERNAL_FORMAT;
+        var v3269 : int/*GLenum*/ = WebGLRenderingContext.RENDERBUFFER_RED_SIZE;
+        var v3270 : int/*GLenum*/ = o.RENDERBUFFER_RED_SIZE;
+        var v3271 : int/*GLenum*/ = WebGLRenderingContext.RENDERBUFFER_GREEN_SIZE;
+        var v3272 : int/*GLenum*/ = o.RENDERBUFFER_GREEN_SIZE;
+        var v3273 : int/*GLenum*/ = WebGLRenderingContext.RENDERBUFFER_BLUE_SIZE;
+        var v3274 : int/*GLenum*/ = o.RENDERBUFFER_BLUE_SIZE;
+        var v3275 : int/*GLenum*/ = WebGLRenderingContext.RENDERBUFFER_ALPHA_SIZE;
+        var v3276 : int/*GLenum*/ = o.RENDERBUFFER_ALPHA_SIZE;
+        var v3277 : int/*GLenum*/ = WebGLRenderingContext.RENDERBUFFER_DEPTH_SIZE;
+        var v3278 : int/*GLenum*/ = o.RENDERBUFFER_DEPTH_SIZE;
+        var v3279 : int/*GLenum*/ = WebGLRenderingContext.RENDERBUFFER_STENCIL_SIZE;
+        var v3280 : int/*GLenum*/ = o.RENDERBUFFER_STENCIL_SIZE;
+        var v3281 : int/*GLenum*/ = WebGLRenderingContext.FRAMEBUFFER_ATTACHMENT_OBJECT_TYPE;
+        var v3282 : int/*GLenum*/ = o.FRAMEBUFFER_ATTACHMENT_OBJECT_TYPE;
+        var v3283 : int/*GLenum*/ = WebGLRenderingContext.FRAMEBUFFER_ATTACHMENT_OBJECT_NAME;
+        var v3284 : int/*GLenum*/ = o.FRAMEBUFFER_ATTACHMENT_OBJECT_NAME;
+        var v3285 : int/*GLenum*/ = WebGLRenderingContext.FRAMEBUFFER_ATTACHMENT_TEXTURE_LEVEL;
+        var v3286 : int/*GLenum*/ = o.FRAMEBUFFER_ATTACHMENT_TEXTURE_LEVEL;
+        var v3287 : int/*GLenum*/ = WebGLRenderingContext.FRAMEBUFFER_ATTACHMENT_TEXTURE_CUBE_MAP_FACE;
+        var v3288 : int/*GLenum*/ = o.FRAMEBUFFER_ATTACHMENT_TEXTURE_CUBE_MAP_FACE;
+        var v3289 : int/*GLenum*/ = WebGLRenderingContext.COLOR_ATTACHMENT0;
+        var v3290 : int/*GLenum*/ = o.COLOR_ATTACHMENT0;
+        var v3291 : int/*GLenum*/ = WebGLRenderingContext.DEPTH_ATTACHMENT;
+        var v3292 : int/*GLenum*/ = o.DEPTH_ATTACHMENT;
+        var v3293 : int/*GLenum*/ = WebGLRenderingContext.STENCIL_ATTACHMENT;
+        var v3294 : int/*GLenum*/ = o.STENCIL_ATTACHMENT;
+        var v3295 : int/*GLenum*/ = WebGLRenderingContext.DEPTH_STENCIL_ATTACHMENT;
+        var v3296 : int/*GLenum*/ = o.DEPTH_STENCIL_ATTACHMENT;
+        var v3297 : int/*GLenum*/ = WebGLRenderingContext.NONE;
+        var v3298 : int/*GLenum*/ = o.NONE;
+        var v3299 : int/*GLenum*/ = WebGLRenderingContext.FRAMEBUFFER_COMPLETE;
+        var v3300 : int/*GLenum*/ = o.FRAMEBUFFER_COMPLETE;
+        var v3301 : int/*GLenum*/ = WebGLRenderingContext.FRAMEBUFFER_INCOMPLETE_ATTACHMENT;
+        var v3302 : int/*GLenum*/ = o.FRAMEBUFFER_INCOMPLETE_ATTACHMENT;
+        var v3303 : int/*GLenum*/ = WebGLRenderingContext.FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT;
+        var v3304 : int/*GLenum*/ = o.FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT;
+        var v3305 : int/*GLenum*/ = WebGLRenderingContext.FRAMEBUFFER_INCOMPLETE_DIMENSIONS;
+        var v3306 : int/*GLenum*/ = o.FRAMEBUFFER_INCOMPLETE_DIMENSIONS;
+        var v3307 : int/*GLenum*/ = WebGLRenderingContext.FRAMEBUFFER_UNSUPPORTED;
+        var v3308 : int/*GLenum*/ = o.FRAMEBUFFER_UNSUPPORTED;
+        var v3309 : int/*GLenum*/ = WebGLRenderingContext.FRAMEBUFFER_BINDING;
+        var v3310 : int/*GLenum*/ = o.FRAMEBUFFER_BINDING;
+        var v3311 : int/*GLenum*/ = WebGLRenderingContext.RENDERBUFFER_BINDING;
+        var v3312 : int/*GLenum*/ = o.RENDERBUFFER_BINDING;
+        var v3313 : int/*GLenum*/ = WebGLRenderingContext.MAX_RENDERBUFFER_SIZE;
+        var v3314 : int/*GLenum*/ = o.MAX_RENDERBUFFER_SIZE;
+        var v3315 : int/*GLenum*/ = WebGLRenderingContext.INVALID_FRAMEBUFFER_OPERATION;
+        var v3316 : int/*GLenum*/ = o.INVALID_FRAMEBUFFER_OPERATION;
+        var v3317 : int/*GLenum*/ = WebGLRenderingContext.UNPACK_FLIP_Y_WEBGL;
+        var v3318 : int/*GLenum*/ = o.UNPACK_FLIP_Y_WEBGL;
+        var v3319 : int/*GLenum*/ = WebGLRenderingContext.UNPACK_PREMULTIPLY_ALPHA_WEBGL;
+        var v3320 : int/*GLenum*/ = o.UNPACK_PREMULTIPLY_ALPHA_WEBGL;
+        var v3321 : int/*GLenum*/ = WebGLRenderingContext.CONTEXT_LOST_WEBGL;
+        var v3322 : int/*GLenum*/ = o.CONTEXT_LOST_WEBGL;
+        var v3323 : int/*GLenum*/ = WebGLRenderingContext.UNPACK_COLORSPACE_CONVERSION_WEBGL;
+        var v3324 : int/*GLenum*/ = o.UNPACK_COLORSPACE_CONVERSION_WEBGL;
+        var v3325 : int/*GLenum*/ = WebGLRenderingContext.BROWSER_DEFAULT_WEBGL;
+        var v3326 : int/*GLenum*/ = o.BROWSER_DEFAULT_WEBGL;
+        var v3327 : HTMLCanvasElement = o.canvas;
+        var v3328 : int/*GLsizei*/ = o.drawingBufferWidth;
+        var v3329 : int/*GLsizei*/ = o.drawingBufferHeight;
+        var f3330 : WebGLContextAttributes = o.getContextAttributes();
+        var f3331 : boolean = o.isContextLost();
+        var f3332 : string[]/*sequence<DOMString>?*/ = o.getSupportedExtensions();
+        var f3333 : Object/*object?*/ = o.getExtension(X.getstring());
         o.activeTexture(X.getint());
         o.attachShader(X.getWebGLProgram(), X.getWebGLShader());
         o.bindAttribLocation(X.getWebGLProgram(), X.getint(), X.getstring());
@@ -4805,7 +4779,7 @@ class _Test extends TestCase {
         o.bufferData(X.getint(), X.getArrayBuffer(), X.getint());
         o.bufferSubData(X.getint(), X.getnumber(), X.getArrayBufferView());
         o.bufferSubData(X.getint(), X.getnumber(), X.getArrayBuffer());
-        var f3354 : int/*GLenum*/ = o.checkFramebufferStatus(X.getint());
+        var f3334 : int/*GLenum*/ = o.checkFramebufferStatus(X.getint());
         o.clear(X.getint());
         o.clearColor(X.getnumber(), X.getnumber(), X.getnumber(), X.getnumber());
         o.clearDepth(X.getnumber());
@@ -4816,12 +4790,12 @@ class _Test extends TestCase {
         o.compressedTexSubImage2D(X.getint(), X.getint(), X.getint(), X.getint(), X.getint(), X.getint(), X.getint(), X.getArrayBufferView());
         o.copyTexImage2D(X.getint(), X.getint(), X.getint(), X.getint(), X.getint(), X.getint(), X.getint(), X.getint());
         o.copyTexSubImage2D(X.getint(), X.getint(), X.getint(), X.getint(), X.getint(), X.getint(), X.getint(), X.getint());
-        var f3355 : WebGLBuffer = o.createBuffer();
-        var f3356 : WebGLFramebuffer = o.createFramebuffer();
-        var f3357 : WebGLProgram = o.createProgram();
-        var f3358 : WebGLRenderbuffer = o.createRenderbuffer();
-        var f3359 : WebGLShader = o.createShader(X.getint());
-        var f3360 : WebGLTexture = o.createTexture();
+        var f3335 : WebGLBuffer = o.createBuffer();
+        var f3336 : WebGLFramebuffer = o.createFramebuffer();
+        var f3337 : WebGLProgram = o.createProgram();
+        var f3338 : WebGLRenderbuffer = o.createRenderbuffer();
+        var f3339 : WebGLShader = o.createShader(X.getint());
+        var f3340 : WebGLTexture = o.createTexture();
         o.cullFace(X.getint());
         o.deleteBuffer(X.getWebGLBuffer());
         o.deleteFramebuffer(X.getWebGLFramebuffer());
@@ -4845,34 +4819,34 @@ class _Test extends TestCase {
         o.framebufferTexture2D(X.getint(), X.getint(), X.getint(), X.getWebGLTexture(), X.getint());
         o.frontFace(X.getint());
         o.generateMipmap(X.getint());
-        var f3361 : WebGLActiveInfo = o.getActiveAttrib(X.getWebGLProgram(), X.getint());
-        var f3362 : WebGLActiveInfo = o.getActiveUniform(X.getWebGLProgram(), X.getint());
-        var f3363 : WebGLShader[] = o.getAttachedShaders(X.getWebGLProgram());
-        var f3364 : int/*GLint*/ = o.getAttribLocation(X.getWebGLProgram(), X.getstring());
-        var f3365 : variant/*any*/ = o.getBufferParameter(X.getint(), X.getint());
-        var f3366 : variant/*any*/ = o.getParameter(X.getint());
-        var f3367 : int/*GLenum*/ = o.getError();
-        var f3368 : variant/*any*/ = o.getFramebufferAttachmentParameter(X.getint(), X.getint(), X.getint());
-        var f3369 : variant/*any*/ = o.getProgramParameter(X.getWebGLProgram(), X.getint());
-        var f3370 : string/*DOMString?*/ = o.getProgramInfoLog(X.getWebGLProgram());
-        var f3371 : variant/*any*/ = o.getRenderbufferParameter(X.getint(), X.getint());
-        var f3372 : variant/*any*/ = o.getShaderParameter(X.getWebGLShader(), X.getint());
-        var f3373 : WebGLShaderPrecisionFormat = o.getShaderPrecisionFormat(X.getint(), X.getint());
-        var f3374 : string/*DOMString?*/ = o.getShaderInfoLog(X.getWebGLShader());
-        var f3375 : string/*DOMString?*/ = o.getShaderSource(X.getWebGLShader());
-        var f3376 : variant/*any*/ = o.getTexParameter(X.getint(), X.getint());
-        var f3377 : variant/*any*/ = o.getUniform(X.getWebGLProgram(), X.getWebGLUniformLocation());
-        var f3378 : WebGLUniformLocation = o.getUniformLocation(X.getWebGLProgram(), X.getstring());
-        var f3379 : variant/*any*/ = o.getVertexAttrib(X.getint(), X.getint());
-        var f3380 : number/*GLsizeiptr*/ = o.getVertexAttribOffset(X.getint(), X.getint());
+        var f3341 : WebGLActiveInfo = o.getActiveAttrib(X.getWebGLProgram(), X.getint());
+        var f3342 : WebGLActiveInfo = o.getActiveUniform(X.getWebGLProgram(), X.getint());
+        var f3343 : WebGLShader[] = o.getAttachedShaders(X.getWebGLProgram());
+        var f3344 : int/*GLint*/ = o.getAttribLocation(X.getWebGLProgram(), X.getstring());
+        var f3345 : variant/*any*/ = o.getBufferParameter(X.getint(), X.getint());
+        var f3346 : variant/*any*/ = o.getParameter(X.getint());
+        var f3347 : int/*GLenum*/ = o.getError();
+        var f3348 : variant/*any*/ = o.getFramebufferAttachmentParameter(X.getint(), X.getint(), X.getint());
+        var f3349 : variant/*any*/ = o.getProgramParameter(X.getWebGLProgram(), X.getint());
+        var f3350 : string/*DOMString?*/ = o.getProgramInfoLog(X.getWebGLProgram());
+        var f3351 : variant/*any*/ = o.getRenderbufferParameter(X.getint(), X.getint());
+        var f3352 : variant/*any*/ = o.getShaderParameter(X.getWebGLShader(), X.getint());
+        var f3353 : WebGLShaderPrecisionFormat = o.getShaderPrecisionFormat(X.getint(), X.getint());
+        var f3354 : string/*DOMString?*/ = o.getShaderInfoLog(X.getWebGLShader());
+        var f3355 : string/*DOMString?*/ = o.getShaderSource(X.getWebGLShader());
+        var f3356 : variant/*any*/ = o.getTexParameter(X.getint(), X.getint());
+        var f3357 : variant/*any*/ = o.getUniform(X.getWebGLProgram(), X.getWebGLUniformLocation());
+        var f3358 : WebGLUniformLocation = o.getUniformLocation(X.getWebGLProgram(), X.getstring());
+        var f3359 : variant/*any*/ = o.getVertexAttrib(X.getint(), X.getint());
+        var f3360 : number/*GLsizeiptr*/ = o.getVertexAttribOffset(X.getint(), X.getint());
         o.hint(X.getint(), X.getint());
-        var f3381 : boolean/*GLboolean*/ = o.isBuffer(X.getWebGLBuffer());
-        var f3382 : boolean/*GLboolean*/ = o.isEnabled(X.getint());
-        var f3383 : boolean/*GLboolean*/ = o.isFramebuffer(X.getWebGLFramebuffer());
-        var f3384 : boolean/*GLboolean*/ = o.isProgram(X.getWebGLProgram());
-        var f3385 : boolean/*GLboolean*/ = o.isRenderbuffer(X.getWebGLRenderbuffer());
-        var f3386 : boolean/*GLboolean*/ = o.isShader(X.getWebGLShader());
-        var f3387 : boolean/*GLboolean*/ = o.isTexture(X.getWebGLTexture());
+        var f3361 : boolean/*GLboolean*/ = o.isBuffer(X.getWebGLBuffer());
+        var f3362 : boolean/*GLboolean*/ = o.isEnabled(X.getint());
+        var f3363 : boolean/*GLboolean*/ = o.isFramebuffer(X.getWebGLFramebuffer());
+        var f3364 : boolean/*GLboolean*/ = o.isProgram(X.getWebGLProgram());
+        var f3365 : boolean/*GLboolean*/ = o.isRenderbuffer(X.getWebGLRenderbuffer());
+        var f3366 : boolean/*GLboolean*/ = o.isShader(X.getWebGLShader());
+        var f3367 : boolean/*GLboolean*/ = o.isTexture(X.getWebGLTexture());
         o.lineWidth(X.getnumber());
         o.linkProgram(X.getWebGLProgram());
         o.pixelStorei(X.getint(), X.getint());
@@ -4954,12 +4928,12 @@ class _Test extends TestCase {
 
 
     function compile_WebGLContextEvent(o : WebGLContextEvent) : void {
-        var v3388 : string/*DOMString*/ = o.statusMessage;
+        var v3368 : string/*DOMString*/ = o.statusMessage;
     } // WebGLContextEvent
 
 
     function compile_WebGLContextEventInit(o : WebGLContextEventInit) : void {
-        var v3389 : string/*DOMString*/ = o.statusMessage;
+        var v3369 : string/*DOMString*/ = o.statusMessage;
     } // WebGLContextEventInit
 
 
@@ -5111,6 +5085,7 @@ native class X {
     static function getfunction__Event__void() : function(:Event):void/*Function?*/;
     static function getfunction__File__void() : function(:File):void/*FileCallback?*/;
     static function getfunction__MediaQueryList__void() : function(:MediaQueryList):void/*MediaQueryListListener*/;
+    static function getfunction___void() : function():void/*TimerHandler*/;
     static function getint() : int/*GLsizei*/;
     static function getint__() : int[]/*sequence<long>*/;
     static function getnumber() : number/*GLintptr*/;
