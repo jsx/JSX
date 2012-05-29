@@ -423,6 +423,10 @@ var FunctionChoiceType = exports.FunctionChoiceType = FunctionType.extend({
 		throw new Error("logic flaw");
 	},
 
+	isConvertibleTo: function (type) {
+		return false;
+	},
+
 	deduceByArgumentTypes: function (context, operatorToken, argTypes, isStatic) {
 		// try an exact match
 		for (var i = 0; i < this._types.length; ++i)

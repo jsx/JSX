@@ -850,9 +850,17 @@ var AsExpression = exports.AsExpression = UnaryExpression.extend({
 				// is down-cast, maybe unsafe
 				success = true;
 			}
+		} else if (exprType instanceof FunctionType && this._type instanceof StaticFunctionType) {
+			var deducedType = this._expr.deduceByArgumentTypes(context, this._token, this._type.getArgumentTypes(), true);
+			if (deducedType != null) {
+				exprType = deducedType;
+				if (deducedType.getReturnType().equals(this._type.getReturnType())) {
+					success = true;
+				}
+			}
 		}
 		if (! success) {
-			context.errors.push(new CompileError(this._token, "cannot convert a value of type '" + this._expr.getType().toString() + "' to '" + this._type.toString() + "'"));
+			context.errors.push(new CompileError(this._token, "cannot convert a value of type '" + exprType.toString() + "' to '" + this._type.toString() + "'"));
 			return false;
 		}
 		return true;
@@ -1112,6 +1120,12 @@ var PropertyExpression = exports.PropertyExpression = UnaryExpression.extend({
 	},
 
 	deduceByArgumentTypes: function (context, operatorToken, argTypes, isStatic) {
+		for (var i = 0; i < argTypes.length; ++i) {
+			if (argTypes[i] instanceof FunctionChoiceType) {
+				context.errors.push(new CompileError(operatorToken, "type deduction of overloaded function passed in as an argument is not supported; use 'as' to specify the function"));
+				return null;
+			}
+		}
 		var rhsType = this._type.deduceByArgumentTypes(context, operatorToken, argTypes, isStatic);
 		if (rhsType == null)
 			return null;
