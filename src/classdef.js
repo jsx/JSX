@@ -1186,6 +1186,7 @@ var TemplateClassDefinition = exports.TemplateClassDefinition = Class.extend({
 		this._typeArgs = typeArgs;
 		this._members = members;
 		this._objectTypesUsed = objectTypesUsed;
+		this._instantiatedDefs = [];
 	},
 
 	className: function () {
@@ -1197,6 +1198,12 @@ var TemplateClassDefinition = exports.TemplateClassDefinition = Class.extend({
 		if (this._typeArgs.length != request.getTypeArguments().length) {
 			errors.push(new CompileError(request.getToken(), "wrong number of template arguments (expected " + this._typeArgs.length + ", got " + request.getTypes().length));
 			return null;
+		}
+		// return one, if already instantiated
+		for (var i = 0; i < this._instantiatedDefs.length; ++i) {
+			if (this._instantiatedDefs[i].typeArgumentsAreEqual(request.getTypeArguments())) {
+				return this._instantiatedDefs[i];
+			}
 		}
 		// build context
 		var instantiationContext = {
@@ -1219,7 +1226,7 @@ var TemplateClassDefinition = exports.TemplateClassDefinition = Class.extend({
 		// done
 		if (! succeeded)
 			return null;
-		return new InstantiatedClassDefinition(
+		var instantiatedDef = new InstantiatedClassDefinition(
 			this._className,
 			this._flags,
 			request.getTypeArguments(),
@@ -1227,6 +1234,8 @@ var TemplateClassDefinition = exports.TemplateClassDefinition = Class.extend({
 			[],
 			members,
 			instantiationContext.objectTypesUsed);
+		this._instantiatedDefs.push(instantiatedDef);
+		return instantiatedDef;
 	}
 
 });
@@ -1253,6 +1262,16 @@ var InstantiatedClassDefinition = exports.InstantiatedClassDefinition = ClassDef
 
 	getTypeArguments: function () {
 		return this._typeArguments;
+	},
+
+	typeArgumentsAreEqual: function (typeArgs) {
+		if (! this._typeArguments.length == typeArgs.length)
+			return false;
+		for (var i = 0; i < typeArgs.length; ++i) {
+			if (! this._typeArguments[i].equals(typeArgs[i]))
+				return false;
+		}
+		return true;
 	}
 
 });
