@@ -1378,9 +1378,14 @@ var AssignmentExpression = exports.AssignmentExpression = BinaryExpression.exten
 				if ((rhsType = this._expr2.deduceByArgumentTypes(context, this._token, lhsType.getArgumentTypes(), lhsType instanceof StaticFunctionType)) == null)
 					return false;
 			} else {
-				context.errors.push(new CompileError(this._token, "function reference is ambigous"));
+				context.errors.push(new CompileError(this._token, "function reference is ambiguous"));
 				return false;
 			}
+		}
+		// assert that rhs type is not a member function, after resolving the function
+		if (rhsType instanceof MemberFunctionType) {
+			context.errors.push(new CompileError(this._token, "cannot assign a member function"));
+			return false;
 		}
 		if (! this._expr1.assertIsAssignable(context, this._token, rhsType))
 			return false;
