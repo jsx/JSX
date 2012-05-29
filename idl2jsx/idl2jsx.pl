@@ -221,7 +221,7 @@ foreach my $file(@files) {
                 (?<attrs> (?: \[ [^\]]+ \] \s+)* )
                 (?<type> (?:partial \s+)? interface | exception | dictionary)
                 \s+ (?<name> \w+)
-                (?: \s* : \s* (?<base> \w+) )?
+                (?: \s* : \s* (?<base> [\w:]+) )?
                 \s*
                 \{ (?<members> [^\}]*? ) \}
                 \s* ;
@@ -309,60 +309,10 @@ foreach my $file(@files) {
             # compress extra spaces
             $member =~ s{\s+}{ }g;
 
-            # member function
-            if($member =~ m{
-                    (?<property>
-                        (?: (?: stringifier | legacycaller | getter | setter | creator | deleter) \s+ )*
-                    )
-                    (?<static> \b static \b \s+)?
-                    (?<ret_type> $rx_type)
-                    \s+
-                    (?<ident> \w*)
-                    \s*
-                    \(
-                        (?<params> .*)
-                    \)
-                    ;
-                }xms) { # member function
-
-                my $id       = $+{ident};
-                my $prop     = trim($+{property});
-                my $static   = $+{static};
-                my $ret_type = $+{ret_type};
-                my $params   = $+{params};
-
-                $params =~ s/\b raises \s* \( [^\)]+ \s* \z//xms;
-
-                my $ret_type_may_be_undefined = 0;
-
-                if($prop) {
-                    if(index($prop, "getter") != -1) {
-                        $ret_type_may_be_undefined = 1;
-                        my $id = "__native_index_operator__";
-                        make_functions(
-                                $decl_ref, $members_ref,
-                                $id,
-                                $ret_type, $params,
-                                $ret_type_may_be_undefined);
-                    }
-                    if(!$id) {
-                        # no name
-                        next;
-                    }
-                    push @{$members_ref}, "/* $prop */";
-                }
-                elsif(!$id) {
-                    die "unexpected no name for $member.\n";
-                }
-                make_functions(
-                    $decl_ref, $members_ref,
-                    $id,
-                    $ret_type, $params,
-                    $ret_type_may_be_undefined, $static);
-            }
             # member constant
-            elsif($member =~ m{
-                    const \s+ (?<type> $rx_type) \s+ (?<ident> \w+)
+            if($member =~ m{
+                    \b const \s+ (?<type> $rx_type) \s+ (?<ident> \w+)
+                    [^;\(\)]* ;
                 }xms) {
                 my $id = $+{ident};
 
@@ -395,7 +345,10 @@ foreach my $file(@files) {
                     (?: \battribute\b \s+)?
                     (?: \[ [^\]]+ \])?
                     (?<type> $rx_type) \s+ (?<ident> \w+)
+                    (?: \s+ setraises\( [^\)]+ \) )?
+                    [^;\(\)]* ;
                 }xms) {
+
                 my $id = $+{ident};
 
                 my $decl = "var";
@@ -414,6 +367,57 @@ foreach my $file(@files) {
                     type => $type,
                     static => 0,
                 };
+            }
+            # member function
+            elsif($member =~ m{
+                    (?<property>
+                        (?: (?: stringifier | legacycaller | getter | setter | creator | deleter) \s+ )*
+                    )
+                    (?<static> \b static \b \s+)?
+                    (?<ret_type> $rx_type)
+                    \s+
+                    (?<ident> \w*)
+                    \s*
+                    \(
+                        (?<params> .*)
+                    \)
+                    ;
+                }xms) { # member function
+
+                my $id       = $+{ident};
+                my $prop     = trim($+{property});
+                my $static   = $+{static};
+                my $ret_type = $+{ret_type};
+                my $params   = $+{params};
+
+                $params =~ s/\) \s* raises \b .+//xms;
+
+                my $ret_type_may_be_undefined = 0;
+
+                if($prop) {
+                    if(index($prop, "getter") != -1) {
+                        $ret_type_may_be_undefined = 1;
+                        my $id = "__native_index_operator__";
+                        make_functions(
+                                $decl_ref, $members_ref,
+                                $id,
+                                $ret_type, $params,
+                                $ret_type_may_be_undefined);
+                    }
+                    if(!$id) {
+                        # no name
+                        next;
+                    }
+                    push @{$members_ref}, "/* $prop */";
+                }
+                elsif(!$id) {
+                    die "unexpected no name for $member.\n";
+                }
+                make_functions(
+                    $decl_ref, $members_ref,
+                    $id,
+                    $ret_type, $params,
+                    $ret_type_may_be_undefined, $static);
             }
             elsif($member =~ m{stringifier;}) {
                 # ignore
@@ -638,7 +642,7 @@ sub make_functions {
                 (?<type> $rx_type) \s+
                 (?<ident> \w+)
             )
-        }xms or die "Cannot parse line:  $_\n";
+        }xms or die "Cannot parse line:  '$src_params'\n";
 
         my %t = (
             name => $+{ident},
