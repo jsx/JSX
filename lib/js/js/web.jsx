@@ -14,543 +14,281 @@ Document Object Model in Web Browsers
 final class dom {
 	static const window = js.global["window"] as __noconvert__ Window;
 
+
+	/** alias to <code>dom.window.document.getElementById(id) as HTMLElement</code> */
 	static function id(id : string) : HTMLElement {
 		return dom.window.document.getElementById(id) as HTMLElement;
+	}
+	/** alias to <code>dom.window.document.createElement(id) as HTMLElement</code> */
+	static function createElement(tag : string) : HTMLElement {
+		return dom.window.document.createElement(tag) as __noconvert__ HTMLElement;
 	}
 
 	// type-safe API for createElement() and getElementById()
 
-	static function createUnknownElement() : HTMLUnknownElement {
-		return dom.window.document.createElement("unknown")
-			as __noconvert__ HTMLUnknownElement;
-	}
 	static function getUnknownElementById(id : string) : HTMLUnknownElement {
 		return dom.window.document.getElementById(id)
 			as HTMLUnknownElement;
-	}
-	static function createHtmlElement() : HTMLHtmlElement {
-		return dom.window.document.createElement("html")
-			as __noconvert__ HTMLHtmlElement;
 	}
 	static function getHtmlElementById(id : string) : HTMLHtmlElement {
 		return dom.window.document.getElementById(id)
 			as HTMLHtmlElement;
 	}
-	static function createHeadElement() : HTMLHeadElement {
-		return dom.window.document.createElement("head")
-			as __noconvert__ HTMLHeadElement;
-	}
 	static function getHeadElementById(id : string) : HTMLHeadElement {
 		return dom.window.document.getElementById(id)
 			as HTMLHeadElement;
-	}
-	static function createTitleElement() : HTMLTitleElement {
-		return dom.window.document.createElement("title")
-			as __noconvert__ HTMLTitleElement;
 	}
 	static function getTitleElementById(id : string) : HTMLTitleElement {
 		return dom.window.document.getElementById(id)
 			as HTMLTitleElement;
 	}
-	static function createBaseElement() : HTMLBaseElement {
-		return dom.window.document.createElement("base")
-			as __noconvert__ HTMLBaseElement;
-	}
 	static function getBaseElementById(id : string) : HTMLBaseElement {
 		return dom.window.document.getElementById(id)
 			as HTMLBaseElement;
-	}
-	static function createLinkElement() : HTMLLinkElement {
-		return dom.window.document.createElement("link")
-			as __noconvert__ HTMLLinkElement;
 	}
 	static function getLinkElementById(id : string) : HTMLLinkElement {
 		return dom.window.document.getElementById(id)
 			as HTMLLinkElement;
 	}
-	static function createMetaElement() : HTMLMetaElement {
-		return dom.window.document.createElement("meta")
-			as __noconvert__ HTMLMetaElement;
-	}
 	static function getMetaElementById(id : string) : HTMLMetaElement {
 		return dom.window.document.getElementById(id)
 			as HTMLMetaElement;
-	}
-	static function createStyleElement() : HTMLStyleElement {
-		return dom.window.document.createElement("style")
-			as __noconvert__ HTMLStyleElement;
 	}
 	static function getStyleElementById(id : string) : HTMLStyleElement {
 		return dom.window.document.getElementById(id)
 			as HTMLStyleElement;
 	}
-	static function createScriptElement() : HTMLScriptElement {
-		return dom.window.document.createElement("script")
-			as __noconvert__ HTMLScriptElement;
-	}
 	static function getScriptElementById(id : string) : HTMLScriptElement {
 		return dom.window.document.getElementById(id)
 			as HTMLScriptElement;
-	}
-	static function createBodyElement() : HTMLBodyElement {
-		return dom.window.document.createElement("body")
-			as __noconvert__ HTMLBodyElement;
 	}
 	static function getBodyElementById(id : string) : HTMLBodyElement {
 		return dom.window.document.getElementById(id)
 			as HTMLBodyElement;
 	}
-	static function createHeadingElement() : HTMLHeadingElement {
-		return dom.window.document.createElement("heading")
-			as __noconvert__ HTMLHeadingElement;
-	}
 	static function getHeadingElementById(id : string) : HTMLHeadingElement {
 		return dom.window.document.getElementById(id)
 			as HTMLHeadingElement;
-	}
-	static function createParagraphElement() : HTMLParagraphElement {
-		return dom.window.document.createElement("p")
-			as __noconvert__ HTMLParagraphElement;
 	}
 	static function getParagraphElementById(id : string) : HTMLParagraphElement {
 		return dom.window.document.getElementById(id)
 			as HTMLParagraphElement;
 	}
-	static function createHRElement() : HTMLHRElement {
-		return dom.window.document.createElement("hr")
-			as __noconvert__ HTMLHRElement;
-	}
 	static function getHRElementById(id : string) : HTMLHRElement {
 		return dom.window.document.getElementById(id)
 			as HTMLHRElement;
-	}
-	static function createPreElement() : HTMLPreElement {
-		return dom.window.document.createElement("pre")
-			as __noconvert__ HTMLPreElement;
 	}
 	static function getPreElementById(id : string) : HTMLPreElement {
 		return dom.window.document.getElementById(id)
 			as HTMLPreElement;
 	}
-	static function createQuoteElement() : HTMLQuoteElement {
-		return dom.window.document.createElement("quote")
-			as __noconvert__ HTMLQuoteElement;
-	}
 	static function getQuoteElementById(id : string) : HTMLQuoteElement {
 		return dom.window.document.getElementById(id)
 			as HTMLQuoteElement;
-	}
-	static function createOListElement() : HTMLOListElement {
-		return dom.window.document.createElement("ol")
-			as __noconvert__ HTMLOListElement;
 	}
 	static function getOListElementById(id : string) : HTMLOListElement {
 		return dom.window.document.getElementById(id)
 			as HTMLOListElement;
 	}
-	static function createUListElement() : HTMLUListElement {
-		return dom.window.document.createElement("ul")
-			as __noconvert__ HTMLUListElement;
-	}
 	static function getUListElementById(id : string) : HTMLUListElement {
 		return dom.window.document.getElementById(id)
 			as HTMLUListElement;
-	}
-	static function createLIElement() : HTMLLIElement {
-		return dom.window.document.createElement("li")
-			as __noconvert__ HTMLLIElement;
 	}
 	static function getLIElementById(id : string) : HTMLLIElement {
 		return dom.window.document.getElementById(id)
 			as HTMLLIElement;
 	}
-	static function createDListElement() : HTMLDListElement {
-		return dom.window.document.createElement("dlist")
-			as __noconvert__ HTMLDListElement;
-	}
 	static function getDListElementById(id : string) : HTMLDListElement {
 		return dom.window.document.getElementById(id)
 			as HTMLDListElement;
-	}
-	static function createDivElement() : HTMLDivElement {
-		return dom.window.document.createElement("div")
-			as __noconvert__ HTMLDivElement;
 	}
 	static function getDivElementById(id : string) : HTMLDivElement {
 		return dom.window.document.getElementById(id)
 			as HTMLDivElement;
 	}
-	static function createAnchorElement() : HTMLAnchorElement {
-		return dom.window.document.createElement("a")
-			as __noconvert__ HTMLAnchorElement;
-	}
 	static function getAnchorElementById(id : string) : HTMLAnchorElement {
 		return dom.window.document.getElementById(id)
 			as HTMLAnchorElement;
-	}
-	static function createTimeElement() : HTMLTimeElement {
-		return dom.window.document.createElement("time")
-			as __noconvert__ HTMLTimeElement;
 	}
 	static function getTimeElementById(id : string) : HTMLTimeElement {
 		return dom.window.document.getElementById(id)
 			as HTMLTimeElement;
 	}
-	static function createSpanElement() : HTMLSpanElement {
-		return dom.window.document.createElement("span")
-			as __noconvert__ HTMLSpanElement;
-	}
 	static function getSpanElementById(id : string) : HTMLSpanElement {
 		return dom.window.document.getElementById(id)
 			as HTMLSpanElement;
-	}
-	static function createBRElement() : HTMLBRElement {
-		return dom.window.document.createElement("br")
-			as __noconvert__ HTMLBRElement;
 	}
 	static function getBRElementById(id : string) : HTMLBRElement {
 		return dom.window.document.getElementById(id)
 			as HTMLBRElement;
 	}
-	static function createModElement() : HTMLModElement {
-		return dom.window.document.createElement("mod")
-			as __noconvert__ HTMLModElement;
-	}
 	static function getModElementById(id : string) : HTMLModElement {
 		return dom.window.document.getElementById(id)
 			as HTMLModElement;
-	}
-	static function createImageElement() : HTMLImageElement {
-		return dom.window.document.createElement("image")
-			as __noconvert__ HTMLImageElement;
 	}
 	static function getImageElementById(id : string) : HTMLImageElement {
 		return dom.window.document.getElementById(id)
 			as HTMLImageElement;
 	}
-	static function createIFrameElement() : HTMLIFrameElement {
-		return dom.window.document.createElement("iframe")
-			as __noconvert__ HTMLIFrameElement;
-	}
 	static function getIFrameElementById(id : string) : HTMLIFrameElement {
 		return dom.window.document.getElementById(id)
 			as HTMLIFrameElement;
-	}
-	static function createEmbedElement() : HTMLEmbedElement {
-		return dom.window.document.createElement("embed")
-			as __noconvert__ HTMLEmbedElement;
 	}
 	static function getEmbedElementById(id : string) : HTMLEmbedElement {
 		return dom.window.document.getElementById(id)
 			as HTMLEmbedElement;
 	}
-	static function createObjectElement() : HTMLObjectElement {
-		return dom.window.document.createElement("object")
-			as __noconvert__ HTMLObjectElement;
-	}
 	static function getObjectElementById(id : string) : HTMLObjectElement {
 		return dom.window.document.getElementById(id)
 			as HTMLObjectElement;
-	}
-	static function createParamElement() : HTMLParamElement {
-		return dom.window.document.createElement("param")
-			as __noconvert__ HTMLParamElement;
 	}
 	static function getParamElementById(id : string) : HTMLParamElement {
 		return dom.window.document.getElementById(id)
 			as HTMLParamElement;
 	}
-	static function createSourceElement() : HTMLSourceElement {
-		return dom.window.document.createElement("source")
-			as __noconvert__ HTMLSourceElement;
-	}
 	static function getSourceElementById(id : string) : HTMLSourceElement {
 		return dom.window.document.getElementById(id)
 			as HTMLSourceElement;
-	}
-	static function createTrackElement() : HTMLTrackElement {
-		return dom.window.document.createElement("track")
-			as __noconvert__ HTMLTrackElement;
 	}
 	static function getTrackElementById(id : string) : HTMLTrackElement {
 		return dom.window.document.getElementById(id)
 			as HTMLTrackElement;
 	}
-	static function createMediaElement() : HTMLMediaElement {
-		return dom.window.document.createElement("media")
-			as __noconvert__ HTMLMediaElement;
-	}
 	static function getMediaElementById(id : string) : HTMLMediaElement {
 		return dom.window.document.getElementById(id)
 			as HTMLMediaElement;
-	}
-	static function createCanvasElement() : HTMLCanvasElement {
-		return dom.window.document.createElement("canvas")
-			as __noconvert__ HTMLCanvasElement;
 	}
 	static function getCanvasElementById(id : string) : HTMLCanvasElement {
 		return dom.window.document.getElementById(id)
 			as HTMLCanvasElement;
 	}
-	static function createMapElement() : HTMLMapElement {
-		return dom.window.document.createElement("map")
-			as __noconvert__ HTMLMapElement;
-	}
 	static function getMapElementById(id : string) : HTMLMapElement {
 		return dom.window.document.getElementById(id)
 			as HTMLMapElement;
-	}
-	static function createAreaElement() : HTMLAreaElement {
-		return dom.window.document.createElement("area")
-			as __noconvert__ HTMLAreaElement;
 	}
 	static function getAreaElementById(id : string) : HTMLAreaElement {
 		return dom.window.document.getElementById(id)
 			as HTMLAreaElement;
 	}
-	static function createTableElement() : HTMLTableElement {
-		return dom.window.document.createElement("table")
-			as __noconvert__ HTMLTableElement;
-	}
 	static function getTableElementById(id : string) : HTMLTableElement {
 		return dom.window.document.getElementById(id)
 			as HTMLTableElement;
-	}
-	static function createTableCaptionElement() : HTMLTableCaptionElement {
-		return dom.window.document.createElement("tablecaption")
-			as __noconvert__ HTMLTableCaptionElement;
 	}
 	static function getTableCaptionElementById(id : string) : HTMLTableCaptionElement {
 		return dom.window.document.getElementById(id)
 			as HTMLTableCaptionElement;
 	}
-	static function createTableColElement() : HTMLTableColElement {
-		return dom.window.document.createElement("tablecol")
-			as __noconvert__ HTMLTableColElement;
-	}
 	static function getTableColElementById(id : string) : HTMLTableColElement {
 		return dom.window.document.getElementById(id)
 			as HTMLTableColElement;
-	}
-	static function createTableSectionElement() : HTMLTableSectionElement {
-		return dom.window.document.createElement("tablesection")
-			as __noconvert__ HTMLTableSectionElement;
 	}
 	static function getTableSectionElementById(id : string) : HTMLTableSectionElement {
 		return dom.window.document.getElementById(id)
 			as HTMLTableSectionElement;
 	}
-	static function createTableRowElement() : HTMLTableRowElement {
-		return dom.window.document.createElement("tablerow")
-			as __noconvert__ HTMLTableRowElement;
-	}
 	static function getTableRowElementById(id : string) : HTMLTableRowElement {
 		return dom.window.document.getElementById(id)
 			as HTMLTableRowElement;
-	}
-	static function createTableCellElement() : HTMLTableCellElement {
-		return dom.window.document.createElement("tablecell")
-			as __noconvert__ HTMLTableCellElement;
 	}
 	static function getTableCellElementById(id : string) : HTMLTableCellElement {
 		return dom.window.document.getElementById(id)
 			as HTMLTableCellElement;
 	}
-	static function createFormElement() : HTMLFormElement {
-		return dom.window.document.createElement("form")
-			as __noconvert__ HTMLFormElement;
-	}
 	static function getFormElementById(id : string) : HTMLFormElement {
 		return dom.window.document.getElementById(id)
 			as HTMLFormElement;
-	}
-	static function createFieldSetElement() : HTMLFieldSetElement {
-		return dom.window.document.createElement("fieldset")
-			as __noconvert__ HTMLFieldSetElement;
 	}
 	static function getFieldSetElementById(id : string) : HTMLFieldSetElement {
 		return dom.window.document.getElementById(id)
 			as HTMLFieldSetElement;
 	}
-	static function createLegendElement() : HTMLLegendElement {
-		return dom.window.document.createElement("legend")
-			as __noconvert__ HTMLLegendElement;
-	}
 	static function getLegendElementById(id : string) : HTMLLegendElement {
 		return dom.window.document.getElementById(id)
 			as HTMLLegendElement;
-	}
-	static function createLabelElement() : HTMLLabelElement {
-		return dom.window.document.createElement("label")
-			as __noconvert__ HTMLLabelElement;
 	}
 	static function getLabelElementById(id : string) : HTMLLabelElement {
 		return dom.window.document.getElementById(id)
 			as HTMLLabelElement;
 	}
-	static function createInputElement() : HTMLInputElement {
-		return dom.window.document.createElement("input")
-			as __noconvert__ HTMLInputElement;
-	}
 	static function getInputElementById(id : string) : HTMLInputElement {
 		return dom.window.document.getElementById(id)
 			as HTMLInputElement;
-	}
-	static function createButtonElement() : HTMLButtonElement {
-		return dom.window.document.createElement("button")
-			as __noconvert__ HTMLButtonElement;
 	}
 	static function getButtonElementById(id : string) : HTMLButtonElement {
 		return dom.window.document.getElementById(id)
 			as HTMLButtonElement;
 	}
-	static function createSelectElement() : HTMLSelectElement {
-		return dom.window.document.createElement("select")
-			as __noconvert__ HTMLSelectElement;
-	}
 	static function getSelectElementById(id : string) : HTMLSelectElement {
 		return dom.window.document.getElementById(id)
 			as HTMLSelectElement;
-	}
-	static function createDataListElement() : HTMLDataListElement {
-		return dom.window.document.createElement("datalist")
-			as __noconvert__ HTMLDataListElement;
 	}
 	static function getDataListElementById(id : string) : HTMLDataListElement {
 		return dom.window.document.getElementById(id)
 			as HTMLDataListElement;
 	}
-	static function createOptGroupElement() : HTMLOptGroupElement {
-		return dom.window.document.createElement("optgroup")
-			as __noconvert__ HTMLOptGroupElement;
-	}
 	static function getOptGroupElementById(id : string) : HTMLOptGroupElement {
 		return dom.window.document.getElementById(id)
 			as HTMLOptGroupElement;
-	}
-	static function createOptionElement() : HTMLOptionElement {
-		return dom.window.document.createElement("option")
-			as __noconvert__ HTMLOptionElement;
 	}
 	static function getOptionElementById(id : string) : HTMLOptionElement {
 		return dom.window.document.getElementById(id)
 			as HTMLOptionElement;
 	}
-	static function createTextAreaElement() : HTMLTextAreaElement {
-		return dom.window.document.createElement("textarea")
-			as __noconvert__ HTMLTextAreaElement;
-	}
 	static function getTextAreaElementById(id : string) : HTMLTextAreaElement {
 		return dom.window.document.getElementById(id)
 			as HTMLTextAreaElement;
-	}
-	static function createKeygenElement() : HTMLKeygenElement {
-		return dom.window.document.createElement("keygen")
-			as __noconvert__ HTMLKeygenElement;
 	}
 	static function getKeygenElementById(id : string) : HTMLKeygenElement {
 		return dom.window.document.getElementById(id)
 			as HTMLKeygenElement;
 	}
-	static function createOutputElement() : HTMLOutputElement {
-		return dom.window.document.createElement("output")
-			as __noconvert__ HTMLOutputElement;
-	}
 	static function getOutputElementById(id : string) : HTMLOutputElement {
 		return dom.window.document.getElementById(id)
 			as HTMLOutputElement;
-	}
-	static function createProgressElement() : HTMLProgressElement {
-		return dom.window.document.createElement("progress")
-			as __noconvert__ HTMLProgressElement;
 	}
 	static function getProgressElementById(id : string) : HTMLProgressElement {
 		return dom.window.document.getElementById(id)
 			as HTMLProgressElement;
 	}
-	static function createMeterElement() : HTMLMeterElement {
-		return dom.window.document.createElement("meter")
-			as __noconvert__ HTMLMeterElement;
-	}
 	static function getMeterElementById(id : string) : HTMLMeterElement {
 		return dom.window.document.getElementById(id)
 			as HTMLMeterElement;
-	}
-	static function createDetailsElement() : HTMLDetailsElement {
-		return dom.window.document.createElement("details")
-			as __noconvert__ HTMLDetailsElement;
 	}
 	static function getDetailsElementById(id : string) : HTMLDetailsElement {
 		return dom.window.document.getElementById(id)
 			as HTMLDetailsElement;
 	}
-	static function createCommandElement() : HTMLCommandElement {
-		return dom.window.document.createElement("command")
-			as __noconvert__ HTMLCommandElement;
-	}
 	static function getCommandElementById(id : string) : HTMLCommandElement {
 		return dom.window.document.getElementById(id)
 			as HTMLCommandElement;
-	}
-	static function createMenuElement() : HTMLMenuElement {
-		return dom.window.document.createElement("menu")
-			as __noconvert__ HTMLMenuElement;
 	}
 	static function getMenuElementById(id : string) : HTMLMenuElement {
 		return dom.window.document.getElementById(id)
 			as HTMLMenuElement;
 	}
-	static function createAppletElement() : HTMLAppletElement {
-		return dom.window.document.createElement("applet")
-			as __noconvert__ HTMLAppletElement;
-	}
 	static function getAppletElementById(id : string) : HTMLAppletElement {
 		return dom.window.document.getElementById(id)
 			as HTMLAppletElement;
-	}
-	static function createMarqueeElement() : HTMLMarqueeElement {
-		return dom.window.document.createElement("marquee")
-			as __noconvert__ HTMLMarqueeElement;
 	}
 	static function getMarqueeElementById(id : string) : HTMLMarqueeElement {
 		return dom.window.document.getElementById(id)
 			as HTMLMarqueeElement;
 	}
-	static function createFrameSetElement() : HTMLFrameSetElement {
-		return dom.window.document.createElement("frameset")
-			as __noconvert__ HTMLFrameSetElement;
-	}
 	static function getFrameSetElementById(id : string) : HTMLFrameSetElement {
 		return dom.window.document.getElementById(id)
 			as HTMLFrameSetElement;
-	}
-	static function createFrameElement() : HTMLFrameElement {
-		return dom.window.document.createElement("frame")
-			as __noconvert__ HTMLFrameElement;
 	}
 	static function getFrameElementById(id : string) : HTMLFrameElement {
 		return dom.window.document.getElementById(id)
 			as HTMLFrameElement;
 	}
-	static function createBaseFontElement() : HTMLBaseFontElement {
-		return dom.window.document.createElement("basefont")
-			as __noconvert__ HTMLBaseFontElement;
-	}
 	static function getBaseFontElementById(id : string) : HTMLBaseFontElement {
 		return dom.window.document.getElementById(id)
 			as HTMLBaseFontElement;
 	}
-	static function createDirectoryElement() : HTMLDirectoryElement {
-		return dom.window.document.createElement("directory")
-			as __noconvert__ HTMLDirectoryElement;
-	}
 	static function getDirectoryElementById(id : string) : HTMLDirectoryElement {
 		return dom.window.document.getElementById(id)
 			as HTMLDirectoryElement;
-	}
-	static function createFontElement() : HTMLFontElement {
-		return dom.window.document.createElement("font")
-			as __noconvert__ HTMLFontElement;
 	}
 	static function getFontElementById(id : string) : HTMLFontElement {
 		return dom.window.document.getElementById(id)
