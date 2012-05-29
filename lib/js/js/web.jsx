@@ -6,549 +6,554 @@ Web Browser Interface
 */
 import "js.jsx";
 
-final class web {
+/**
+
+Document Object Model in Web Browsers
+
+*/
+final class dom {
 	static const window = js.global["window"] as __noconvert__ Window;
 
 	static function id(id : string) : HTMLElement {
-		return web.window.document.getElementById(id) as HTMLElement;
+		return dom.window.document.getElementById(id) as HTMLElement;
 	}
 
 	// type-safe API for createElement() and getElementById()
 
 	static function createUnknownElement() : HTMLUnknownElement {
-		return web.window.document.createElement("unknown")
+		return dom.window.document.createElement("unknown")
 			as __noconvert__ HTMLUnknownElement;
 	}
 	static function getUnknownElementById(id : string) : HTMLUnknownElement {
-		return web.window.document.getElementById(id)
+		return dom.window.document.getElementById(id)
 			as HTMLUnknownElement;
 	}
 	static function createHtmlElement() : HTMLHtmlElement {
-		return web.window.document.createElement("html")
+		return dom.window.document.createElement("html")
 			as __noconvert__ HTMLHtmlElement;
 	}
 	static function getHtmlElementById(id : string) : HTMLHtmlElement {
-		return web.window.document.getElementById(id)
+		return dom.window.document.getElementById(id)
 			as HTMLHtmlElement;
 	}
 	static function createHeadElement() : HTMLHeadElement {
-		return web.window.document.createElement("head")
+		return dom.window.document.createElement("head")
 			as __noconvert__ HTMLHeadElement;
 	}
 	static function getHeadElementById(id : string) : HTMLHeadElement {
-		return web.window.document.getElementById(id)
+		return dom.window.document.getElementById(id)
 			as HTMLHeadElement;
 	}
 	static function createTitleElement() : HTMLTitleElement {
-		return web.window.document.createElement("title")
+		return dom.window.document.createElement("title")
 			as __noconvert__ HTMLTitleElement;
 	}
 	static function getTitleElementById(id : string) : HTMLTitleElement {
-		return web.window.document.getElementById(id)
+		return dom.window.document.getElementById(id)
 			as HTMLTitleElement;
 	}
 	static function createBaseElement() : HTMLBaseElement {
-		return web.window.document.createElement("base")
+		return dom.window.document.createElement("base")
 			as __noconvert__ HTMLBaseElement;
 	}
 	static function getBaseElementById(id : string) : HTMLBaseElement {
-		return web.window.document.getElementById(id)
+		return dom.window.document.getElementById(id)
 			as HTMLBaseElement;
 	}
 	static function createLinkElement() : HTMLLinkElement {
-		return web.window.document.createElement("link")
+		return dom.window.document.createElement("link")
 			as __noconvert__ HTMLLinkElement;
 	}
 	static function getLinkElementById(id : string) : HTMLLinkElement {
-		return web.window.document.getElementById(id)
+		return dom.window.document.getElementById(id)
 			as HTMLLinkElement;
 	}
 	static function createMetaElement() : HTMLMetaElement {
-		return web.window.document.createElement("meta")
+		return dom.window.document.createElement("meta")
 			as __noconvert__ HTMLMetaElement;
 	}
 	static function getMetaElementById(id : string) : HTMLMetaElement {
-		return web.window.document.getElementById(id)
+		return dom.window.document.getElementById(id)
 			as HTMLMetaElement;
 	}
 	static function createStyleElement() : HTMLStyleElement {
-		return web.window.document.createElement("style")
+		return dom.window.document.createElement("style")
 			as __noconvert__ HTMLStyleElement;
 	}
 	static function getStyleElementById(id : string) : HTMLStyleElement {
-		return web.window.document.getElementById(id)
+		return dom.window.document.getElementById(id)
 			as HTMLStyleElement;
 	}
 	static function createScriptElement() : HTMLScriptElement {
-		return web.window.document.createElement("script")
+		return dom.window.document.createElement("script")
 			as __noconvert__ HTMLScriptElement;
 	}
 	static function getScriptElementById(id : string) : HTMLScriptElement {
-		return web.window.document.getElementById(id)
+		return dom.window.document.getElementById(id)
 			as HTMLScriptElement;
 	}
 	static function createBodyElement() : HTMLBodyElement {
-		return web.window.document.createElement("body")
+		return dom.window.document.createElement("body")
 			as __noconvert__ HTMLBodyElement;
 	}
 	static function getBodyElementById(id : string) : HTMLBodyElement {
-		return web.window.document.getElementById(id)
+		return dom.window.document.getElementById(id)
 			as HTMLBodyElement;
 	}
 	static function createHeadingElement() : HTMLHeadingElement {
-		return web.window.document.createElement("heading")
+		return dom.window.document.createElement("heading")
 			as __noconvert__ HTMLHeadingElement;
 	}
 	static function getHeadingElementById(id : string) : HTMLHeadingElement {
-		return web.window.document.getElementById(id)
+		return dom.window.document.getElementById(id)
 			as HTMLHeadingElement;
 	}
 	static function createParagraphElement() : HTMLParagraphElement {
-		return web.window.document.createElement("paragraph")
+		return dom.window.document.createElement("p")
 			as __noconvert__ HTMLParagraphElement;
 	}
 	static function getParagraphElementById(id : string) : HTMLParagraphElement {
-		return web.window.document.getElementById(id)
+		return dom.window.document.getElementById(id)
 			as HTMLParagraphElement;
 	}
 	static function createHRElement() : HTMLHRElement {
-		return web.window.document.createElement("hr")
+		return dom.window.document.createElement("hr")
 			as __noconvert__ HTMLHRElement;
 	}
 	static function getHRElementById(id : string) : HTMLHRElement {
-		return web.window.document.getElementById(id)
+		return dom.window.document.getElementById(id)
 			as HTMLHRElement;
 	}
 	static function createPreElement() : HTMLPreElement {
-		return web.window.document.createElement("pre")
+		return dom.window.document.createElement("pre")
 			as __noconvert__ HTMLPreElement;
 	}
 	static function getPreElementById(id : string) : HTMLPreElement {
-		return web.window.document.getElementById(id)
+		return dom.window.document.getElementById(id)
 			as HTMLPreElement;
 	}
 	static function createQuoteElement() : HTMLQuoteElement {
-		return web.window.document.createElement("quote")
+		return dom.window.document.createElement("quote")
 			as __noconvert__ HTMLQuoteElement;
 	}
 	static function getQuoteElementById(id : string) : HTMLQuoteElement {
-		return web.window.document.getElementById(id)
+		return dom.window.document.getElementById(id)
 			as HTMLQuoteElement;
 	}
 	static function createOListElement() : HTMLOListElement {
-		return web.window.document.createElement("olist")
+		return dom.window.document.createElement("ol")
 			as __noconvert__ HTMLOListElement;
 	}
 	static function getOListElementById(id : string) : HTMLOListElement {
-		return web.window.document.getElementById(id)
+		return dom.window.document.getElementById(id)
 			as HTMLOListElement;
 	}
 	static function createUListElement() : HTMLUListElement {
-		return web.window.document.createElement("ulist")
+		return dom.window.document.createElement("ul")
 			as __noconvert__ HTMLUListElement;
 	}
 	static function getUListElementById(id : string) : HTMLUListElement {
-		return web.window.document.getElementById(id)
+		return dom.window.document.getElementById(id)
 			as HTMLUListElement;
 	}
 	static function createLIElement() : HTMLLIElement {
-		return web.window.document.createElement("li")
+		return dom.window.document.createElement("li")
 			as __noconvert__ HTMLLIElement;
 	}
 	static function getLIElementById(id : string) : HTMLLIElement {
-		return web.window.document.getElementById(id)
+		return dom.window.document.getElementById(id)
 			as HTMLLIElement;
 	}
 	static function createDListElement() : HTMLDListElement {
-		return web.window.document.createElement("dlist")
+		return dom.window.document.createElement("dlist")
 			as __noconvert__ HTMLDListElement;
 	}
 	static function getDListElementById(id : string) : HTMLDListElement {
-		return web.window.document.getElementById(id)
+		return dom.window.document.getElementById(id)
 			as HTMLDListElement;
 	}
 	static function createDivElement() : HTMLDivElement {
-		return web.window.document.createElement("div")
+		return dom.window.document.createElement("div")
 			as __noconvert__ HTMLDivElement;
 	}
 	static function getDivElementById(id : string) : HTMLDivElement {
-		return web.window.document.getElementById(id)
+		return dom.window.document.getElementById(id)
 			as HTMLDivElement;
 	}
 	static function createAnchorElement() : HTMLAnchorElement {
-		return web.window.document.createElement("anchor")
+		return dom.window.document.createElement("a")
 			as __noconvert__ HTMLAnchorElement;
 	}
 	static function getAnchorElementById(id : string) : HTMLAnchorElement {
-		return web.window.document.getElementById(id)
+		return dom.window.document.getElementById(id)
 			as HTMLAnchorElement;
 	}
 	static function createTimeElement() : HTMLTimeElement {
-		return web.window.document.createElement("time")
+		return dom.window.document.createElement("time")
 			as __noconvert__ HTMLTimeElement;
 	}
 	static function getTimeElementById(id : string) : HTMLTimeElement {
-		return web.window.document.getElementById(id)
+		return dom.window.document.getElementById(id)
 			as HTMLTimeElement;
 	}
 	static function createSpanElement() : HTMLSpanElement {
-		return web.window.document.createElement("span")
+		return dom.window.document.createElement("span")
 			as __noconvert__ HTMLSpanElement;
 	}
 	static function getSpanElementById(id : string) : HTMLSpanElement {
-		return web.window.document.getElementById(id)
+		return dom.window.document.getElementById(id)
 			as HTMLSpanElement;
 	}
 	static function createBRElement() : HTMLBRElement {
-		return web.window.document.createElement("br")
+		return dom.window.document.createElement("br")
 			as __noconvert__ HTMLBRElement;
 	}
 	static function getBRElementById(id : string) : HTMLBRElement {
-		return web.window.document.getElementById(id)
+		return dom.window.document.getElementById(id)
 			as HTMLBRElement;
 	}
 	static function createModElement() : HTMLModElement {
-		return web.window.document.createElement("mod")
+		return dom.window.document.createElement("mod")
 			as __noconvert__ HTMLModElement;
 	}
 	static function getModElementById(id : string) : HTMLModElement {
-		return web.window.document.getElementById(id)
+		return dom.window.document.getElementById(id)
 			as HTMLModElement;
 	}
 	static function createImageElement() : HTMLImageElement {
-		return web.window.document.createElement("image")
+		return dom.window.document.createElement("image")
 			as __noconvert__ HTMLImageElement;
 	}
 	static function getImageElementById(id : string) : HTMLImageElement {
-		return web.window.document.getElementById(id)
+		return dom.window.document.getElementById(id)
 			as HTMLImageElement;
 	}
 	static function createIFrameElement() : HTMLIFrameElement {
-		return web.window.document.createElement("iframe")
+		return dom.window.document.createElement("iframe")
 			as __noconvert__ HTMLIFrameElement;
 	}
 	static function getIFrameElementById(id : string) : HTMLIFrameElement {
-		return web.window.document.getElementById(id)
+		return dom.window.document.getElementById(id)
 			as HTMLIFrameElement;
 	}
 	static function createEmbedElement() : HTMLEmbedElement {
-		return web.window.document.createElement("embed")
+		return dom.window.document.createElement("embed")
 			as __noconvert__ HTMLEmbedElement;
 	}
 	static function getEmbedElementById(id : string) : HTMLEmbedElement {
-		return web.window.document.getElementById(id)
+		return dom.window.document.getElementById(id)
 			as HTMLEmbedElement;
 	}
 	static function createObjectElement() : HTMLObjectElement {
-		return web.window.document.createElement("object")
+		return dom.window.document.createElement("object")
 			as __noconvert__ HTMLObjectElement;
 	}
 	static function getObjectElementById(id : string) : HTMLObjectElement {
-		return web.window.document.getElementById(id)
+		return dom.window.document.getElementById(id)
 			as HTMLObjectElement;
 	}
 	static function createParamElement() : HTMLParamElement {
-		return web.window.document.createElement("param")
+		return dom.window.document.createElement("param")
 			as __noconvert__ HTMLParamElement;
 	}
 	static function getParamElementById(id : string) : HTMLParamElement {
-		return web.window.document.getElementById(id)
+		return dom.window.document.getElementById(id)
 			as HTMLParamElement;
 	}
 	static function createSourceElement() : HTMLSourceElement {
-		return web.window.document.createElement("source")
+		return dom.window.document.createElement("source")
 			as __noconvert__ HTMLSourceElement;
 	}
 	static function getSourceElementById(id : string) : HTMLSourceElement {
-		return web.window.document.getElementById(id)
+		return dom.window.document.getElementById(id)
 			as HTMLSourceElement;
 	}
 	static function createTrackElement() : HTMLTrackElement {
-		return web.window.document.createElement("track")
+		return dom.window.document.createElement("track")
 			as __noconvert__ HTMLTrackElement;
 	}
 	static function getTrackElementById(id : string) : HTMLTrackElement {
-		return web.window.document.getElementById(id)
+		return dom.window.document.getElementById(id)
 			as HTMLTrackElement;
 	}
 	static function createMediaElement() : HTMLMediaElement {
-		return web.window.document.createElement("media")
+		return dom.window.document.createElement("media")
 			as __noconvert__ HTMLMediaElement;
 	}
 	static function getMediaElementById(id : string) : HTMLMediaElement {
-		return web.window.document.getElementById(id)
+		return dom.window.document.getElementById(id)
 			as HTMLMediaElement;
 	}
 	static function createCanvasElement() : HTMLCanvasElement {
-		return web.window.document.createElement("canvas")
+		return dom.window.document.createElement("canvas")
 			as __noconvert__ HTMLCanvasElement;
 	}
 	static function getCanvasElementById(id : string) : HTMLCanvasElement {
-		return web.window.document.getElementById(id)
+		return dom.window.document.getElementById(id)
 			as HTMLCanvasElement;
 	}
 	static function createMapElement() : HTMLMapElement {
-		return web.window.document.createElement("map")
+		return dom.window.document.createElement("map")
 			as __noconvert__ HTMLMapElement;
 	}
 	static function getMapElementById(id : string) : HTMLMapElement {
-		return web.window.document.getElementById(id)
+		return dom.window.document.getElementById(id)
 			as HTMLMapElement;
 	}
 	static function createAreaElement() : HTMLAreaElement {
-		return web.window.document.createElement("area")
+		return dom.window.document.createElement("area")
 			as __noconvert__ HTMLAreaElement;
 	}
 	static function getAreaElementById(id : string) : HTMLAreaElement {
-		return web.window.document.getElementById(id)
+		return dom.window.document.getElementById(id)
 			as HTMLAreaElement;
 	}
 	static function createTableElement() : HTMLTableElement {
-		return web.window.document.createElement("table")
+		return dom.window.document.createElement("table")
 			as __noconvert__ HTMLTableElement;
 	}
 	static function getTableElementById(id : string) : HTMLTableElement {
-		return web.window.document.getElementById(id)
+		return dom.window.document.getElementById(id)
 			as HTMLTableElement;
 	}
 	static function createTableCaptionElement() : HTMLTableCaptionElement {
-		return web.window.document.createElement("tablecaption")
+		return dom.window.document.createElement("tablecaption")
 			as __noconvert__ HTMLTableCaptionElement;
 	}
 	static function getTableCaptionElementById(id : string) : HTMLTableCaptionElement {
-		return web.window.document.getElementById(id)
+		return dom.window.document.getElementById(id)
 			as HTMLTableCaptionElement;
 	}
 	static function createTableColElement() : HTMLTableColElement {
-		return web.window.document.createElement("tablecol")
+		return dom.window.document.createElement("tablecol")
 			as __noconvert__ HTMLTableColElement;
 	}
 	static function getTableColElementById(id : string) : HTMLTableColElement {
-		return web.window.document.getElementById(id)
+		return dom.window.document.getElementById(id)
 			as HTMLTableColElement;
 	}
 	static function createTableSectionElement() : HTMLTableSectionElement {
-		return web.window.document.createElement("tablesection")
+		return dom.window.document.createElement("tablesection")
 			as __noconvert__ HTMLTableSectionElement;
 	}
 	static function getTableSectionElementById(id : string) : HTMLTableSectionElement {
-		return web.window.document.getElementById(id)
+		return dom.window.document.getElementById(id)
 			as HTMLTableSectionElement;
 	}
 	static function createTableRowElement() : HTMLTableRowElement {
-		return web.window.document.createElement("tablerow")
+		return dom.window.document.createElement("tablerow")
 			as __noconvert__ HTMLTableRowElement;
 	}
 	static function getTableRowElementById(id : string) : HTMLTableRowElement {
-		return web.window.document.getElementById(id)
+		return dom.window.document.getElementById(id)
 			as HTMLTableRowElement;
 	}
 	static function createTableCellElement() : HTMLTableCellElement {
-		return web.window.document.createElement("tablecell")
+		return dom.window.document.createElement("tablecell")
 			as __noconvert__ HTMLTableCellElement;
 	}
 	static function getTableCellElementById(id : string) : HTMLTableCellElement {
-		return web.window.document.getElementById(id)
+		return dom.window.document.getElementById(id)
 			as HTMLTableCellElement;
 	}
 	static function createFormElement() : HTMLFormElement {
-		return web.window.document.createElement("form")
+		return dom.window.document.createElement("form")
 			as __noconvert__ HTMLFormElement;
 	}
 	static function getFormElementById(id : string) : HTMLFormElement {
-		return web.window.document.getElementById(id)
+		return dom.window.document.getElementById(id)
 			as HTMLFormElement;
 	}
 	static function createFieldSetElement() : HTMLFieldSetElement {
-		return web.window.document.createElement("fieldset")
+		return dom.window.document.createElement("fieldset")
 			as __noconvert__ HTMLFieldSetElement;
 	}
 	static function getFieldSetElementById(id : string) : HTMLFieldSetElement {
-		return web.window.document.getElementById(id)
+		return dom.window.document.getElementById(id)
 			as HTMLFieldSetElement;
 	}
 	static function createLegendElement() : HTMLLegendElement {
-		return web.window.document.createElement("legend")
+		return dom.window.document.createElement("legend")
 			as __noconvert__ HTMLLegendElement;
 	}
 	static function getLegendElementById(id : string) : HTMLLegendElement {
-		return web.window.document.getElementById(id)
+		return dom.window.document.getElementById(id)
 			as HTMLLegendElement;
 	}
 	static function createLabelElement() : HTMLLabelElement {
-		return web.window.document.createElement("label")
+		return dom.window.document.createElement("label")
 			as __noconvert__ HTMLLabelElement;
 	}
 	static function getLabelElementById(id : string) : HTMLLabelElement {
-		return web.window.document.getElementById(id)
+		return dom.window.document.getElementById(id)
 			as HTMLLabelElement;
 	}
 	static function createInputElement() : HTMLInputElement {
-		return web.window.document.createElement("input")
+		return dom.window.document.createElement("input")
 			as __noconvert__ HTMLInputElement;
 	}
 	static function getInputElementById(id : string) : HTMLInputElement {
-		return web.window.document.getElementById(id)
+		return dom.window.document.getElementById(id)
 			as HTMLInputElement;
 	}
 	static function createButtonElement() : HTMLButtonElement {
-		return web.window.document.createElement("button")
+		return dom.window.document.createElement("button")
 			as __noconvert__ HTMLButtonElement;
 	}
 	static function getButtonElementById(id : string) : HTMLButtonElement {
-		return web.window.document.getElementById(id)
+		return dom.window.document.getElementById(id)
 			as HTMLButtonElement;
 	}
 	static function createSelectElement() : HTMLSelectElement {
-		return web.window.document.createElement("select")
+		return dom.window.document.createElement("select")
 			as __noconvert__ HTMLSelectElement;
 	}
 	static function getSelectElementById(id : string) : HTMLSelectElement {
-		return web.window.document.getElementById(id)
+		return dom.window.document.getElementById(id)
 			as HTMLSelectElement;
 	}
 	static function createDataListElement() : HTMLDataListElement {
-		return web.window.document.createElement("datalist")
+		return dom.window.document.createElement("datalist")
 			as __noconvert__ HTMLDataListElement;
 	}
 	static function getDataListElementById(id : string) : HTMLDataListElement {
-		return web.window.document.getElementById(id)
+		return dom.window.document.getElementById(id)
 			as HTMLDataListElement;
 	}
 	static function createOptGroupElement() : HTMLOptGroupElement {
-		return web.window.document.createElement("optgroup")
+		return dom.window.document.createElement("optgroup")
 			as __noconvert__ HTMLOptGroupElement;
 	}
 	static function getOptGroupElementById(id : string) : HTMLOptGroupElement {
-		return web.window.document.getElementById(id)
+		return dom.window.document.getElementById(id)
 			as HTMLOptGroupElement;
 	}
 	static function createOptionElement() : HTMLOptionElement {
-		return web.window.document.createElement("option")
+		return dom.window.document.createElement("option")
 			as __noconvert__ HTMLOptionElement;
 	}
 	static function getOptionElementById(id : string) : HTMLOptionElement {
-		return web.window.document.getElementById(id)
+		return dom.window.document.getElementById(id)
 			as HTMLOptionElement;
 	}
 	static function createTextAreaElement() : HTMLTextAreaElement {
-		return web.window.document.createElement("textarea")
+		return dom.window.document.createElement("textarea")
 			as __noconvert__ HTMLTextAreaElement;
 	}
 	static function getTextAreaElementById(id : string) : HTMLTextAreaElement {
-		return web.window.document.getElementById(id)
+		return dom.window.document.getElementById(id)
 			as HTMLTextAreaElement;
 	}
 	static function createKeygenElement() : HTMLKeygenElement {
-		return web.window.document.createElement("keygen")
+		return dom.window.document.createElement("keygen")
 			as __noconvert__ HTMLKeygenElement;
 	}
 	static function getKeygenElementById(id : string) : HTMLKeygenElement {
-		return web.window.document.getElementById(id)
+		return dom.window.document.getElementById(id)
 			as HTMLKeygenElement;
 	}
 	static function createOutputElement() : HTMLOutputElement {
-		return web.window.document.createElement("output")
+		return dom.window.document.createElement("output")
 			as __noconvert__ HTMLOutputElement;
 	}
 	static function getOutputElementById(id : string) : HTMLOutputElement {
-		return web.window.document.getElementById(id)
+		return dom.window.document.getElementById(id)
 			as HTMLOutputElement;
 	}
 	static function createProgressElement() : HTMLProgressElement {
-		return web.window.document.createElement("progress")
+		return dom.window.document.createElement("progress")
 			as __noconvert__ HTMLProgressElement;
 	}
 	static function getProgressElementById(id : string) : HTMLProgressElement {
-		return web.window.document.getElementById(id)
+		return dom.window.document.getElementById(id)
 			as HTMLProgressElement;
 	}
 	static function createMeterElement() : HTMLMeterElement {
-		return web.window.document.createElement("meter")
+		return dom.window.document.createElement("meter")
 			as __noconvert__ HTMLMeterElement;
 	}
 	static function getMeterElementById(id : string) : HTMLMeterElement {
-		return web.window.document.getElementById(id)
+		return dom.window.document.getElementById(id)
 			as HTMLMeterElement;
 	}
 	static function createDetailsElement() : HTMLDetailsElement {
-		return web.window.document.createElement("details")
+		return dom.window.document.createElement("details")
 			as __noconvert__ HTMLDetailsElement;
 	}
 	static function getDetailsElementById(id : string) : HTMLDetailsElement {
-		return web.window.document.getElementById(id)
+		return dom.window.document.getElementById(id)
 			as HTMLDetailsElement;
 	}
 	static function createCommandElement() : HTMLCommandElement {
-		return web.window.document.createElement("command")
+		return dom.window.document.createElement("command")
 			as __noconvert__ HTMLCommandElement;
 	}
 	static function getCommandElementById(id : string) : HTMLCommandElement {
-		return web.window.document.getElementById(id)
+		return dom.window.document.getElementById(id)
 			as HTMLCommandElement;
 	}
 	static function createMenuElement() : HTMLMenuElement {
-		return web.window.document.createElement("menu")
+		return dom.window.document.createElement("menu")
 			as __noconvert__ HTMLMenuElement;
 	}
 	static function getMenuElementById(id : string) : HTMLMenuElement {
-		return web.window.document.getElementById(id)
+		return dom.window.document.getElementById(id)
 			as HTMLMenuElement;
 	}
 	static function createAppletElement() : HTMLAppletElement {
-		return web.window.document.createElement("applet")
+		return dom.window.document.createElement("applet")
 			as __noconvert__ HTMLAppletElement;
 	}
 	static function getAppletElementById(id : string) : HTMLAppletElement {
-		return web.window.document.getElementById(id)
+		return dom.window.document.getElementById(id)
 			as HTMLAppletElement;
 	}
 	static function createMarqueeElement() : HTMLMarqueeElement {
-		return web.window.document.createElement("marquee")
+		return dom.window.document.createElement("marquee")
 			as __noconvert__ HTMLMarqueeElement;
 	}
 	static function getMarqueeElementById(id : string) : HTMLMarqueeElement {
-		return web.window.document.getElementById(id)
+		return dom.window.document.getElementById(id)
 			as HTMLMarqueeElement;
 	}
 	static function createFrameSetElement() : HTMLFrameSetElement {
-		return web.window.document.createElement("frameset")
+		return dom.window.document.createElement("frameset")
 			as __noconvert__ HTMLFrameSetElement;
 	}
 	static function getFrameSetElementById(id : string) : HTMLFrameSetElement {
-		return web.window.document.getElementById(id)
+		return dom.window.document.getElementById(id)
 			as HTMLFrameSetElement;
 	}
 	static function createFrameElement() : HTMLFrameElement {
-		return web.window.document.createElement("frame")
+		return dom.window.document.createElement("frame")
 			as __noconvert__ HTMLFrameElement;
 	}
 	static function getFrameElementById(id : string) : HTMLFrameElement {
-		return web.window.document.getElementById(id)
+		return dom.window.document.getElementById(id)
 			as HTMLFrameElement;
 	}
 	static function createBaseFontElement() : HTMLBaseFontElement {
-		return web.window.document.createElement("basefont")
+		return dom.window.document.createElement("basefont")
 			as __noconvert__ HTMLBaseFontElement;
 	}
 	static function getBaseFontElementById(id : string) : HTMLBaseFontElement {
-		return web.window.document.getElementById(id)
+		return dom.window.document.getElementById(id)
 			as HTMLBaseFontElement;
 	}
 	static function createDirectoryElement() : HTMLDirectoryElement {
-		return web.window.document.createElement("directory")
+		return dom.window.document.createElement("directory")
 			as __noconvert__ HTMLDirectoryElement;
 	}
 	static function getDirectoryElementById(id : string) : HTMLDirectoryElement {
-		return web.window.document.getElementById(id)
+		return dom.window.document.getElementById(id)
 			as HTMLDirectoryElement;
 	}
 	static function createFontElement() : HTMLFontElement {
-		return web.window.document.createElement("font")
+		return dom.window.document.createElement("font")
 			as __noconvert__ HTMLFontElement;
 	}
 	static function getFontElementById(id : string) : HTMLFontElement {
-		return web.window.document.getElementById(id)
+		return dom.window.document.getElementById(id)
 			as HTMLFontElement;
 	}
 
@@ -560,15 +565,19 @@ automatically generated from:
 	http://www.w3.org/TR/DOM-Level-2-Views/idl/views.idl
 	http://www.w3.org/TR/DOM-Level-3-Events/
 	idl2jsx/extra/events.idl
-	http://www.w3.org/TR/html5/single-page.html
 	http://www.w3.org/TR/XMLHttpRequest/
-	http://www.w3.org/TR/selectors-api/
 	http://dev.w3.org/csswg/cssom/
 	http://dev.w3.org/csswg/cssom-view/
 	idl2jsx/extra/chrome.idl
 	idl2jsx/extra/firefox.idl
+	http://www.w3.org/TR/html5/single-page.html
 	http://www.w3.org/TR/FileAPI/
 	idl2jsx/extra/file.idl
+	http://www.w3.org/TR/touch-events/
+	http://dev.w3.org/html5/websockets/
+	http://dev.w3.org/geo/api/spec-source-v2.html
+	http://dev.w3.org/html5/webstorage/
+	http://www.w3.org/TR/selectors-api/
 	http://html5.org/specs/dom-parsing.html
 	https://www.khronos.org/registry/typedarray/specs/latest/typedarray.idl
 	http://dev.w3.org/html5/2dcontext/
@@ -925,21 +934,18 @@ native class Document extends Node {
 		filter : NodeFilter
 	) : TreeWalker;
 	// NEW
-	function prepend(DOMString : Node) : void;
-	function append(DOMString : Node) : void;
+	function prepend() : void;
+	function prepend(nodes : Node) : void;
+	function prepend(nodes : string/*DOMString*/) : void;
+	function append() : void;
+	function append(nodes : Node) : void;
+	function append(nodes : string/*DOMString*/) : void;
 
 	// implements DocumentEvent
 
 	// Modified in DOM Level 3:
 
 	// Modified in DOM Level 3:
-
-	// implements NodeSelector
-
-	function querySelector(selectors : string/*DOMString*/) : Element;
-	function querySelectorAll(
-		selectors : string/*DOMString*/
-	) : NodeList;
 
 	__readonly__ var styleSheets : StyleSheet[]/*StyleSheetList*/;
 	var selectedStyleSheetSet : string/*DOMString?*/;
@@ -958,6 +964,25 @@ native class Document extends Node {
 		x : number/*float*/,
 		y : number/*float*/
 	) : CaretPosition;
+
+	function createTouch(
+		view : AbstractView,
+		target : EventTarget,
+		identifier : int/*long*/,
+		pageX : int/*long*/,
+		pageY : int/*long*/,
+		screenX : int/*long*/,
+		screenY : int/*long*/
+	) : Touch;
+	function createTouchList(touches : Touch[]) : TouchList;
+	function createTouchList(touch : Touch) : TouchList;
+
+	// implements NodeSelector
+
+	function querySelector(selectors : string/*DOMString*/) : Element;
+	function querySelectorAll(
+		selectors : string/*DOMString*/
+	) : NodeList;
 
 } // end of Document
 
@@ -990,8 +1015,12 @@ native class DOMImplementation {
 native class DocumentFragment extends Node {
 
 	// NEW
-	function prepend(DOMString : Node) : void;
-	function append(DOMString : Node) : void;
+	function prepend() : void;
+	function prepend(nodes : Node) : void;
+	function prepend(nodes : string/*DOMString*/) : void;
+	function append() : void;
+	function append(nodes : Node) : void;
+	function append(nodes : string/*DOMString*/) : void;
 
 	// implements NodeSelector
 
@@ -1008,9 +1037,15 @@ native class DocumentType extends Node {
 	__readonly__ var publicId : string/*DOMString*/;
 	__readonly__ var systemId : string/*DOMString*/;
 	// NEW
-	function before(DOMString : Node) : void;
-	function after(DOMString : Node) : void;
-	function replace(DOMString : Node) : void;
+	function before() : void;
+	function before(nodes : Node) : void;
+	function before(nodes : string/*DOMString*/) : void;
+	function after() : void;
+	function after(nodes : Node) : void;
+	function after(nodes : string/*DOMString*/) : void;
+	function replace() : void;
+	function replace(nodes : Node) : void;
+	function replace(nodes : string/*DOMString*/) : void;
 	function remove() : void;
 
 } // end of DocumentType
@@ -1068,19 +1103,22 @@ native class Element extends Node {
 	__readonly__ var nextElementSibling : Element;
 	__readonly__ var childElementCount : int/*unsigned long*/;
 	// NEW
-	function prepend(DOMString : Node) : void;
-	function append(DOMString : Node) : void;
-	function before(DOMString : Node) : void;
-	function after(DOMString : Node) : void;
-	function replace(DOMString : Node) : void;
+	function prepend() : void;
+	function prepend(nodes : Node) : void;
+	function prepend(nodes : string/*DOMString*/) : void;
+	function append() : void;
+	function append(nodes : Node) : void;
+	function append(nodes : string/*DOMString*/) : void;
+	function before() : void;
+	function before(nodes : Node) : void;
+	function before(nodes : string/*DOMString*/) : void;
+	function after() : void;
+	function after(nodes : Node) : void;
+	function after(nodes : string/*DOMString*/) : void;
+	function replace() : void;
+	function replace(nodes : Node) : void;
+	function replace(nodes : string/*DOMString*/) : void;
 	function remove() : void;
-
-	// implements NodeSelector
-
-	function querySelector(selectors : string/*DOMString*/) : Element;
-	function querySelectorAll(
-		selectors : string/*DOMString*/
-	) : NodeList;
 
 	function getClientRects() : ClientRectList;
 	function getBoundingClientRect() : ClientRect;
@@ -1097,6 +1135,13 @@ native class Element extends Node {
 	__readonly__ var clientLeft : int/*long*/;
 	__readonly__ var clientWidth : int/*long*/;
 	__readonly__ var clientHeight : int/*long*/;
+
+	// implements NodeSelector
+
+	function querySelector(selectors : string/*DOMString*/) : Element;
+	function querySelectorAll(
+		selectors : string/*DOMString*/
+	) : NodeList;
 
 	var innerHTML : string/*DOMString*/;
 	var outerHTML : string/*DOMString*/;
@@ -1140,9 +1185,15 @@ native class CharacterData extends Node {
 		data : string/*DOMString*/
 	) : void;
 	// NEW
-	function before(DOMString : Node) : void;
-	function after(DOMString : Node) : void;
-	function replace(DOMString : Node) : void;
+	function before() : void;
+	function before(nodes : Node) : void;
+	function before(nodes : string/*DOMString*/) : void;
+	function after() : void;
+	function after(nodes : Node) : void;
+	function after(nodes : string/*DOMString*/) : void;
+	function replace() : void;
+	function replace(nodes : Node) : void;
+	function replace(nodes : string/*DOMString*/) : void;
 	function remove() : void;
 
 } // end of CharacterData
@@ -1401,6 +1452,15 @@ native class EventException {
 	// Introduced in DOM Level 3:
 
 } // end of EventException
+
+native __fake__ class DocumentEvent {
+
+	// Modified in DOM Level 3:
+	function createEvent(eventInterface : string/*DOMString*/) : Event;
+
+	// Modified in DOM Level 3:
+
+} // end of DocumentEvent
 
 native class UIEvent extends Event {
 
@@ -1667,6 +1727,1139 @@ native class UIEventInit extends EventInit {
 native class MouseEventInit extends UIEventInit {
 }
 
+native __fake__ class XMLHttpRequestEventTarget extends EventTarget {
+
+	// event handlers
+	var onloadstart : function(:Event):void/*Function?*/;
+	var onprogress : function(:Event):void/*Function?*/;
+	var onabort : function(:Event):void/*Function?*/;
+	var onerror : function(:Event):void/*Function?*/;
+	var onload : function(:Event):void/*Function?*/;
+	var ontimeout : function(:Event):void/*Function?*/;
+	var onloadend : function(:Event):void/*Function?*/;
+
+} // end of XMLHttpRequestEventTarget
+
+native class XMLHttpRequestUpload extends XMLHttpRequestEventTarget {
+}
+
+native class XMLHttpRequest extends XMLHttpRequestEventTarget {
+
+	function constructor();
+
+	// event handler
+	var onreadystatechange : function(:Event):void/*Function?*/;
+	// states
+	static const     UNSENT : int/*unsigned short*/;
+	__readonly__ var UNSENT : int/*unsigned short*/;
+	static const     OPENED : int/*unsigned short*/;
+	__readonly__ var OPENED : int/*unsigned short*/;
+	static const     HEADERS_RECEIVED : int/*unsigned short*/;
+	__readonly__ var HEADERS_RECEIVED : int/*unsigned short*/;
+	static const     LOADING : int/*unsigned short*/;
+	__readonly__ var LOADING : int/*unsigned short*/;
+	static const     DONE : int/*unsigned short*/;
+	__readonly__ var DONE : int/*unsigned short*/;
+	__readonly__ var readyState : int/*unsigned short*/;
+	// request
+	function open(
+		method : string/*DOMString*/,
+		url : string/*DOMString*/
+	) : void;
+	function open(
+		method : string/*DOMString*/,
+		url : string/*DOMString*/,
+		async : boolean
+	) : void;
+	function open(
+		method : string/*DOMString*/,
+		url : string/*DOMString*/,
+		async : boolean,
+		user : string/*DOMString?*/
+	) : void;
+	function open(
+		method : string/*DOMString*/,
+		url : string/*DOMString*/,
+		async : boolean,
+		user : string/*DOMString?*/,
+		password : string/*DOMString?*/
+	) : void;
+	function setRequestHeader(
+		header : string/*DOMString*/,
+		value : string/*DOMString*/
+	) : void;
+	var timeout : int/*unsigned long*/;
+	var withCredentials : boolean;
+	__readonly__ var upload : XMLHttpRequestUpload;
+	function send() : void;
+	function send(data : ArrayBuffer) : void;
+	function send(data : Blob) : void;
+	function send(data : Document) : void;
+	function send(data : string/*DOMString?*/) : void;
+	function send(data : FormData) : void;
+	function abort() : void;
+	// response
+	__readonly__ var status : int/*unsigned short*/;
+	__readonly__ var statusText : string/*DOMString*/;
+	function getResponseHeader(
+		header : string/*DOMString*/
+	) : string/*DOMString*/;
+	function getAllResponseHeaders() : string/*DOMString*/;
+	function overrideMimeType(mime : string/*DOMString*/) : void;
+	var responseType : string/*XMLHttpRequestResponseType*/;
+	__readonly__ var response : variant/*any*/;
+	__readonly__ var responseText : string/*DOMString*/;
+	__readonly__ var responseXML : Document;
+
+} // end of XMLHttpRequest
+
+native class AnonXMLHttpRequest extends XMLHttpRequest {
+
+	function constructor();
+
+} // end of AnonXMLHttpRequest
+
+native class FormData {
+
+	function constructor();
+	function constructor(form : HTMLFormElement);
+
+	function append(name : string/*DOMString*/, value : Blob) : void;
+	function append(
+		name : string/*DOMString*/,
+		value : Blob,
+		filename : string/*DOMString*/
+	) : void;
+	function append(
+		name : string/*DOMString*/,
+		value : string/*DOMString*/
+	) : void;
+
+} // end of FormData
+
+native class MediaList {
+
+	var mediaText : string/*DOMString*/;
+	__readonly__ var length : int/*unsigned long*/;
+	function __native_index_operator__(
+		index : int/*unsigned long*/
+	) : MayBeUndefined.<string/*DOMString*/>;
+	/* getter */
+	function item(
+		index : int/*unsigned long*/
+	) : MayBeUndefined.<string/*DOMString*/>;
+	function appendMedium(medium : string/*DOMString*/) : void;
+	function deleteMedium(medium : string/*DOMString*/) : void;
+
+} // end of MediaList
+
+native class StyleSheet {
+
+	__readonly__ var type : string/*DOMString*/;
+	__readonly__ var href : string/*DOMString*/;
+	__readonly__ var ownerNode : Node;
+	__readonly__ var parentStyleSheet : StyleSheet;
+	__readonly__ var title : string/*DOMString*/;
+	__readonly__ var media : MediaList;
+	var disabled : boolean;
+
+} // end of StyleSheet
+
+native class CSSStyleSheet extends StyleSheet {
+
+	__readonly__ var ownerRule : CSSRule;
+	__readonly__ var cssRules : CSSRule[]/*CSSRuleList*/;
+	function insertRule(
+		rule : string/*DOMString*/,
+		index : int/*unsigned long*/
+	) : int/*unsigned long*/;
+	function deleteRule(index : int/*unsigned long*/) : void;
+
+} // end of CSSStyleSheet
+
+native __fake__ class LinkStyle {
+
+	__readonly__ var sheet : StyleSheet;
+
+} // end of LinkStyle
+
+native class CSSRule {
+
+	// Types
+	static const     STYLE_RULE : int/*unsigned short*/;
+	__readonly__ var STYLE_RULE : int/*unsigned short*/;
+	static const     IMPORT_RULE : int/*unsigned short*/;
+	__readonly__ var IMPORT_RULE : int/*unsigned short*/;
+	static const     MEDIA_RULE : int/*unsigned short*/;
+	__readonly__ var MEDIA_RULE : int/*unsigned short*/;
+	static const     FONT_FACE_RULE : int/*unsigned short*/;
+	__readonly__ var FONT_FACE_RULE : int/*unsigned short*/;
+	static const     PAGE_RULE : int/*unsigned short*/;
+	__readonly__ var PAGE_RULE : int/*unsigned short*/;
+	static const     NAMESPACE_RULE : int/*unsigned short*/;
+	__readonly__ var NAMESPACE_RULE : int/*unsigned short*/;
+	__readonly__ var type : int/*unsigned short*/;
+	// Parsing and serialization
+	var cssText : string/*DOMString*/;
+	// Context
+	__readonly__ var parentRule : CSSRule;
+	__readonly__ var parentStyleSheet : CSSStyleSheet;
+
+} // end of CSSRule
+
+native class CSSStyleRule extends CSSRule {
+
+	var selectorText : string/*DOMString*/;
+	__readonly__ var style : CSSStyleDeclaration;
+
+} // end of CSSStyleRule
+
+native class CSSImportRule extends CSSRule {
+
+	__readonly__ var href : string/*DOMString*/;
+	__readonly__ var media : MediaList;
+	__readonly__ var styleSheet : CSSStyleSheet;
+
+} // end of CSSImportRule
+
+native class CSSMediaRule extends CSSRule {
+
+	__readonly__ var media : MediaList;
+	__readonly__ var cssRules : CSSRule[]/*CSSRuleList*/;
+	function insertRule(
+		rule : string/*DOMString*/,
+		index : int/*unsigned long*/
+	) : int/*unsigned long*/;
+	function deleteRule(index : int/*unsigned long*/) : void;
+
+} // end of CSSMediaRule
+
+native class CSSFontFaceRule extends CSSRule {
+
+	__readonly__ var style : CSSStyleDeclaration;
+
+} // end of CSSFontFaceRule
+
+native class CSSPageRule extends CSSRule {
+
+	var selectorText : string/*DOMString*/;
+	__readonly__ var style : CSSStyleDeclaration;
+
+} // end of CSSPageRule
+
+native class CSSNamespaceRule extends CSSRule {
+
+	__readonly__ var namespaceURI : string/*DOMString*/;
+	__readonly__ var prefix : string/*DOMString?*/;
+
+} // end of CSSNamespaceRule
+
+native class CSSStyleDeclaration {
+
+	var cssText : string/*DOMString*/;
+	__readonly__ var length : int/*unsigned long*/;
+	function item(index : int/*unsigned long*/) : string/*DOMString*/;
+	function getPropertyValue(
+		property : string/*DOMString*/
+	) : string/*DOMString*/;
+	function getPropertyPriority(
+		property : string/*DOMString*/
+	) : string/*DOMString*/;
+	function setProperty(
+		property : string/*DOMString*/,
+		value : string/*DOMString*/
+	) : void;
+	function setProperty(
+		property : string/*DOMString*/,
+		value : string/*DOMString*/,
+		priority : string/*DOMString*/
+	) : void;
+	function removeProperty(
+		property : string/*DOMString*/
+	) : string/*DOMString*/;
+	__readonly__ var parentRule : CSSRule;
+	// CSS Properties
+	var azimuth : string/*DOMString*/;
+	var background : string/*DOMString*/;
+	var backgroundAttachment : string/*DOMString*/;
+	var backgroundColor : string/*DOMString*/;
+	var backgroundImage : string/*DOMString*/;
+	var backgroundPosition : string/*DOMString*/;
+	var backgroundRepeat : string/*DOMString*/;
+	var border : string/*DOMString*/;
+	var borderCollapse : string/*DOMString*/;
+	var borderColor : string/*DOMString*/;
+	var borderSpacing : string/*DOMString*/;
+	var borderStyle : string/*DOMString*/;
+	var borderTop : string/*DOMString*/;
+	var borderRight : string/*DOMString*/;
+	var borderBottom : string/*DOMString*/;
+	var borderLeft : string/*DOMString*/;
+	var borderTopColor : string/*DOMString*/;
+	var borderRightColor : string/*DOMString*/;
+	var borderBottomColor : string/*DOMString*/;
+	var borderLeftColor : string/*DOMString*/;
+	var borderTopStyle : string/*DOMString*/;
+	var borderRightStyle : string/*DOMString*/;
+	var borderBottomStyle : string/*DOMString*/;
+	var borderLeftStyle : string/*DOMString*/;
+	var borderTopWidth : string/*DOMString*/;
+	var borderRightWidth : string/*DOMString*/;
+	var borderBottomWidth : string/*DOMString*/;
+	var borderLeftWidth : string/*DOMString*/;
+	var borderWidth : string/*DOMString*/;
+	var bottom : string/*DOMString*/;
+	var captionSide : string/*DOMString*/;
+	var clear : string/*DOMString*/;
+	var clip : string/*DOMString*/;
+	var color : string/*DOMString*/;
+	var content : string/*DOMString*/;
+	var counterIncrement : string/*DOMString*/;
+	var counterReset : string/*DOMString*/;
+	var cue : string/*DOMString*/;
+	var cueAfter : string/*DOMString*/;
+	var cueBefore : string/*DOMString*/;
+	var cursor : string/*DOMString*/;
+	var direction : string/*DOMString*/;
+	var display : string/*DOMString*/;
+	var elevation : string/*DOMString*/;
+	var emptyCells : string/*DOMString*/;
+	var cssFloat : string/*DOMString*/;
+	var font : string/*DOMString*/;
+	var fontFamily : string/*DOMString*/;
+	var fontSize : string/*DOMString*/;
+	var fontSizeAdjust : string/*DOMString*/;
+	var fontStretch : string/*DOMString*/;
+	var fontStyle : string/*DOMString*/;
+	var fontVariant : string/*DOMString*/;
+	var fontWeight : string/*DOMString*/;
+	var height : string/*DOMString*/;
+	var left : string/*DOMString*/;
+	var letterSpacing : string/*DOMString*/;
+	var lineHeight : string/*DOMString*/;
+	var listStyle : string/*DOMString*/;
+	var listStyleImage : string/*DOMString*/;
+	var listStylePosition : string/*DOMString*/;
+	var listStyleType : string/*DOMString*/;
+	var margin : string/*DOMString*/;
+	var marginTop : string/*DOMString*/;
+	var marginRight : string/*DOMString*/;
+	var marginBottom : string/*DOMString*/;
+	var marginLeft : string/*DOMString*/;
+	var markerOffset : string/*DOMString*/;
+	var marks : string/*DOMString*/;
+	var maxHeight : string/*DOMString*/;
+	var maxWidth : string/*DOMString*/;
+	var minHeight : string/*DOMString*/;
+	var minWidth : string/*DOMString*/;
+	var orphans : string/*DOMString*/;
+	var outline : string/*DOMString*/;
+	var outlineColor : string/*DOMString*/;
+	var outlineStyle : string/*DOMString*/;
+	var outlineWidth : string/*DOMString*/;
+	var overflow : string/*DOMString*/;
+	var padding : string/*DOMString*/;
+	var paddingTop : string/*DOMString*/;
+	var paddingRight : string/*DOMString*/;
+	var paddingBottom : string/*DOMString*/;
+	var paddingLeft : string/*DOMString*/;
+	var page : string/*DOMString*/;
+	var pageBreakAfter : string/*DOMString*/;
+	var pageBreakBefore : string/*DOMString*/;
+	var pageBreakInside : string/*DOMString*/;
+	var pause : string/*DOMString*/;
+	var pauseAfter : string/*DOMString*/;
+	var pauseBefore : string/*DOMString*/;
+	var pitch : string/*DOMString*/;
+	var pitchRange : string/*DOMString*/;
+	var playDuring : string/*DOMString*/;
+	var position : string/*DOMString*/;
+	var quotes : string/*DOMString*/;
+	var richness : string/*DOMString*/;
+	var right : string/*DOMString*/;
+	var size : string/*DOMString*/;
+	var speak : string/*DOMString*/;
+	var speakHeader : string/*DOMString*/;
+	var speakNumeral : string/*DOMString*/;
+	var speakPunctuation : string/*DOMString*/;
+	var speechRate : string/*DOMString*/;
+	var stress : string/*DOMString*/;
+	var tableLayout : string/*DOMString*/;
+	var textAlign : string/*DOMString*/;
+	var textDecoration : string/*DOMString*/;
+	var textIndent : string/*DOMString*/;
+	var textShadow : string/*DOMString*/;
+	var textTransform : string/*DOMString*/;
+	var top : string/*DOMString*/;
+	var unicodeBidi : string/*DOMString*/;
+	var verticalAlign : string/*DOMString*/;
+	var visibility : string/*DOMString*/;
+	var voiceFamily : string/*DOMString*/;
+	var volume : string/*DOMString*/;
+	var whiteSpace : string/*DOMString*/;
+	var widows : string/*DOMString*/;
+	var width : string/*DOMString*/;
+	var wordSpacing : string/*DOMString*/;
+	var zIndex : string/*DOMString*/;
+
+	var alignmentBaseline : MayBeUndefined.<string>;
+	var backgroundClip : MayBeUndefined.<string>;
+	var backgroundOrigin : MayBeUndefined.<string>;
+	var backgroundPositionX : MayBeUndefined.<string>;
+	var backgroundPositionY : MayBeUndefined.<string>;
+	var backgroundRepeatX : MayBeUndefined.<string>;
+	var backgroundRepeatY : MayBeUndefined.<string>;
+	var backgroundSize : MayBeUndefined.<string>;
+	var baselineShift : MayBeUndefined.<string>;
+	var borderBottomLeftRadius : MayBeUndefined.<string>;
+	var borderBottomRightRadius : MayBeUndefined.<string>;
+	var borderImage : MayBeUndefined.<string>;
+	var borderImageOutset : MayBeUndefined.<string>;
+	var borderImageRepeat : MayBeUndefined.<string>;
+	var borderImageSlice : MayBeUndefined.<string>;
+	var borderImageSource : MayBeUndefined.<string>;
+	var borderImageWidth : MayBeUndefined.<string>;
+	var borderRadius : MayBeUndefined.<string>;
+	var borderTopLeftRadius : MayBeUndefined.<string>;
+	var borderTopRightRadius : MayBeUndefined.<string>;
+	var boxShadow : MayBeUndefined.<string>;
+	var boxSizing : MayBeUndefined.<string>;
+	var clipPath : MayBeUndefined.<string>;
+	var clipRule : MayBeUndefined.<string>;
+	var colorInterpolation : MayBeUndefined.<string>;
+	var colorInterpolationFilters : MayBeUndefined.<string>;
+	var colorProfile : MayBeUndefined.<string>;
+	var colorRendering : MayBeUndefined.<string>;
+	var dominantBaseline : MayBeUndefined.<string>;
+	var enableBackground : MayBeUndefined.<string>;
+	var fill : MayBeUndefined.<string>;
+	var fillOpacity : MayBeUndefined.<string>;
+	var fillRule : MayBeUndefined.<string>;
+	var filter : MayBeUndefined.<string>;
+	var float : MayBeUndefined.<string>;
+	var floodColor : MayBeUndefined.<string>;
+	var floodOpacity : MayBeUndefined.<string>;
+	var glyphOrientationHorizontal : MayBeUndefined.<string>;
+	var glyphOrientationVertical : MayBeUndefined.<string>;
+	var imageRendering : MayBeUndefined.<string>;
+	var kerning : MayBeUndefined.<string>;
+	var lightingColor : MayBeUndefined.<string>;
+	var marker : MayBeUndefined.<string>;
+	var markerEnd : MayBeUndefined.<string>;
+	var markerMid : MayBeUndefined.<string>;
+	var markerStart : MayBeUndefined.<string>;
+	var mask : MayBeUndefined.<string>;
+	var opacity : MayBeUndefined.<string>;
+	var outlineOffset : MayBeUndefined.<string>;
+	var overflowX : MayBeUndefined.<string>;
+	var overflowY : MayBeUndefined.<string>;
+	var pointerEvents : MayBeUndefined.<string>;
+	var resize : MayBeUndefined.<string>;
+	var shapeRendering : MayBeUndefined.<string>;
+	var src : MayBeUndefined.<string>;
+	var stopColor : MayBeUndefined.<string>;
+	var stopOpacity : MayBeUndefined.<string>;
+	var stroke : MayBeUndefined.<string>;
+	var strokeDasharray : MayBeUndefined.<string>;
+	var strokeDashoffset : MayBeUndefined.<string>;
+	var strokeLinecap : MayBeUndefined.<string>;
+	var strokeLinejoin : MayBeUndefined.<string>;
+	var strokeMiterlimit : MayBeUndefined.<string>;
+	var strokeOpacity : MayBeUndefined.<string>;
+	var strokeWidth : MayBeUndefined.<string>;
+	var textAnchor : MayBeUndefined.<string>;
+	var textLineThrough : MayBeUndefined.<string>;
+	var textLineThroughColor : MayBeUndefined.<string>;
+	var textLineThroughMode : MayBeUndefined.<string>;
+	var textLineThroughStyle : MayBeUndefined.<string>;
+	var textLineThroughWidth : MayBeUndefined.<string>;
+	var textOverflow : MayBeUndefined.<string>;
+	var textOverline : MayBeUndefined.<string>;
+	var textOverlineColor : MayBeUndefined.<string>;
+	var textOverlineMode : MayBeUndefined.<string>;
+	var textOverlineStyle : MayBeUndefined.<string>;
+	var textOverlineWidth : MayBeUndefined.<string>;
+	var textRendering : MayBeUndefined.<string>;
+	var textUnderline : MayBeUndefined.<string>;
+	var textUnderlineColor : MayBeUndefined.<string>;
+	var textUnderlineMode : MayBeUndefined.<string>;
+	var textUnderlineStyle : MayBeUndefined.<string>;
+	var textUnderlineWidth : MayBeUndefined.<string>;
+	var unicodeRange : MayBeUndefined.<string>;
+	var vectorEffect : MayBeUndefined.<string>;
+	var webkitAnimation : MayBeUndefined.<string>;
+	var webkitAnimationDelay : MayBeUndefined.<string>;
+	var webkitAnimationDirection : MayBeUndefined.<string>;
+	var webkitAnimationDuration : MayBeUndefined.<string>;
+	var webkitAnimationFillMode : MayBeUndefined.<string>;
+	var webkitAnimationIterationCount : MayBeUndefined.<string>;
+	var webkitAnimationName : MayBeUndefined.<string>;
+	var webkitAnimationPlayState : MayBeUndefined.<string>;
+	var webkitAnimationTimingFunction : MayBeUndefined.<string>;
+	var webkitAppearance : MayBeUndefined.<string>;
+	var webkitAspectRatio : MayBeUndefined.<string>;
+	var webkitBackfaceVisibility : MayBeUndefined.<string>;
+	var webkitBackgroundClip : MayBeUndefined.<string>;
+	var webkitBackgroundComposite : MayBeUndefined.<string>;
+	var webkitBackgroundOrigin : MayBeUndefined.<string>;
+	var webkitBackgroundSize : MayBeUndefined.<string>;
+	var webkitBorderAfter : MayBeUndefined.<string>;
+	var webkitBorderAfterColor : MayBeUndefined.<string>;
+	var webkitBorderAfterStyle : MayBeUndefined.<string>;
+	var webkitBorderAfterWidth : MayBeUndefined.<string>;
+	var webkitBorderBefore : MayBeUndefined.<string>;
+	var webkitBorderBeforeColor : MayBeUndefined.<string>;
+	var webkitBorderBeforeStyle : MayBeUndefined.<string>;
+	var webkitBorderBeforeWidth : MayBeUndefined.<string>;
+	var webkitBorderEnd : MayBeUndefined.<string>;
+	var webkitBorderEndColor : MayBeUndefined.<string>;
+	var webkitBorderEndStyle : MayBeUndefined.<string>;
+	var webkitBorderEndWidth : MayBeUndefined.<string>;
+	var webkitBorderFit : MayBeUndefined.<string>;
+	var webkitBorderHorizontalSpacing : MayBeUndefined.<string>;
+	var webkitBorderImage : MayBeUndefined.<string>;
+	var webkitBorderRadius : MayBeUndefined.<string>;
+	var webkitBorderStart : MayBeUndefined.<string>;
+	var webkitBorderStartColor : MayBeUndefined.<string>;
+	var webkitBorderStartStyle : MayBeUndefined.<string>;
+	var webkitBorderStartWidth : MayBeUndefined.<string>;
+	var webkitBorderVerticalSpacing : MayBeUndefined.<string>;
+	var webkitBoxAlign : MayBeUndefined.<string>;
+	var webkitBoxDirection : MayBeUndefined.<string>;
+	var webkitBoxFlex : MayBeUndefined.<string>;
+	var webkitBoxFlexGroup : MayBeUndefined.<string>;
+	var webkitBoxLines : MayBeUndefined.<string>;
+	var webkitBoxOrdinalGroup : MayBeUndefined.<string>;
+	var webkitBoxOrient : MayBeUndefined.<string>;
+	var webkitBoxPack : MayBeUndefined.<string>;
+	var webkitBoxReflect : MayBeUndefined.<string>;
+	var webkitBoxShadow : MayBeUndefined.<string>;
+	var webkitColorCorrection : MayBeUndefined.<string>;
+	var webkitColumnAxis : MayBeUndefined.<string>;
+	var webkitColumnBreakAfter : MayBeUndefined.<string>;
+	var webkitColumnBreakBefore : MayBeUndefined.<string>;
+	var webkitColumnBreakInside : MayBeUndefined.<string>;
+	var webkitColumnCount : MayBeUndefined.<string>;
+	var webkitColumnGap : MayBeUndefined.<string>;
+	var webkitColumnRule : MayBeUndefined.<string>;
+	var webkitColumnRuleColor : MayBeUndefined.<string>;
+	var webkitColumnRuleStyle : MayBeUndefined.<string>;
+	var webkitColumnRuleWidth : MayBeUndefined.<string>;
+	var webkitColumnSpan : MayBeUndefined.<string>;
+	var webkitColumnWidth : MayBeUndefined.<string>;
+	var webkitColumns : MayBeUndefined.<string>;
+	var webkitFilter : MayBeUndefined.<string>;
+	var webkitFlexAlign : MayBeUndefined.<string>;
+	var webkitFlexDirection : MayBeUndefined.<string>;
+	var webkitFlexFlow : MayBeUndefined.<string>;
+	var webkitFlexItemAlign : MayBeUndefined.<string>;
+	var webkitFlexLinePack : MayBeUndefined.<string>;
+	var webkitFlexOrder : MayBeUndefined.<string>;
+	var webkitFlexPack : MayBeUndefined.<string>;
+	var webkitFlexWrap : MayBeUndefined.<string>;
+	var webkitFlowFrom : MayBeUndefined.<string>;
+	var webkitFlowInto : MayBeUndefined.<string>;
+	var webkitFontFeatureSettings : MayBeUndefined.<string>;
+	var webkitFontKerning : MayBeUndefined.<string>;
+	var webkitFontSizeDelta : MayBeUndefined.<string>;
+	var webkitFontSmoothing : MayBeUndefined.<string>;
+	var webkitFontVariantLigatures : MayBeUndefined.<string>;
+	var webkitHighlight : MayBeUndefined.<string>;
+	var webkitHyphenateCharacter : MayBeUndefined.<string>;
+	var webkitHyphenateLimitAfter : MayBeUndefined.<string>;
+	var webkitHyphenateLimitBefore : MayBeUndefined.<string>;
+	var webkitHyphenateLimitLines : MayBeUndefined.<string>;
+	var webkitHyphens : MayBeUndefined.<string>;
+	var webkitLineAlign : MayBeUndefined.<string>;
+	var webkitLineBoxContain : MayBeUndefined.<string>;
+	var webkitLineBreak : MayBeUndefined.<string>;
+	var webkitLineClamp : MayBeUndefined.<string>;
+	var webkitLineGrid : MayBeUndefined.<string>;
+	var webkitLineSnap : MayBeUndefined.<string>;
+	var webkitLocale : MayBeUndefined.<string>;
+	var webkitLogicalHeight : MayBeUndefined.<string>;
+	var webkitLogicalWidth : MayBeUndefined.<string>;
+	var webkitMarginAfter : MayBeUndefined.<string>;
+	var webkitMarginAfterCollapse : MayBeUndefined.<string>;
+	var webkitMarginBefore : MayBeUndefined.<string>;
+	var webkitMarginBeforeCollapse : MayBeUndefined.<string>;
+	var webkitMarginBottomCollapse : MayBeUndefined.<string>;
+	var webkitMarginCollapse : MayBeUndefined.<string>;
+	var webkitMarginEnd : MayBeUndefined.<string>;
+	var webkitMarginStart : MayBeUndefined.<string>;
+	var webkitMarginTopCollapse : MayBeUndefined.<string>;
+	var webkitMarquee : MayBeUndefined.<string>;
+	var webkitMarqueeDirection : MayBeUndefined.<string>;
+	var webkitMarqueeIncrement : MayBeUndefined.<string>;
+	var webkitMarqueeRepetition : MayBeUndefined.<string>;
+	var webkitMarqueeSpeed : MayBeUndefined.<string>;
+	var webkitMarqueeStyle : MayBeUndefined.<string>;
+	var webkitMask : MayBeUndefined.<string>;
+	var webkitMaskAttachment : MayBeUndefined.<string>;
+	var webkitMaskBoxImage : MayBeUndefined.<string>;
+	var webkitMaskBoxImageOutset : MayBeUndefined.<string>;
+	var webkitMaskBoxImageRepeat : MayBeUndefined.<string>;
+	var webkitMaskBoxImageSlice : MayBeUndefined.<string>;
+	var webkitMaskBoxImageSource : MayBeUndefined.<string>;
+	var webkitMaskBoxImageWidth : MayBeUndefined.<string>;
+	var webkitMaskClip : MayBeUndefined.<string>;
+	var webkitMaskComposite : MayBeUndefined.<string>;
+	var webkitMaskImage : MayBeUndefined.<string>;
+	var webkitMaskOrigin : MayBeUndefined.<string>;
+	var webkitMaskPosition : MayBeUndefined.<string>;
+	var webkitMaskPositionX : MayBeUndefined.<string>;
+	var webkitMaskPositionY : MayBeUndefined.<string>;
+	var webkitMaskRepeat : MayBeUndefined.<string>;
+	var webkitMaskRepeatX : MayBeUndefined.<string>;
+	var webkitMaskRepeatY : MayBeUndefined.<string>;
+	var webkitMaskSize : MayBeUndefined.<string>;
+	var webkitMatchNearestMailBlockquoteColor : MayBeUndefined.<string>;
+	var webkitMaxLogicalHeight : MayBeUndefined.<string>;
+	var webkitMaxLogicalWidth : MayBeUndefined.<string>;
+	var webkitMinLogicalHeight : MayBeUndefined.<string>;
+	var webkitMinLogicalWidth : MayBeUndefined.<string>;
+	var webkitNbspMode : MayBeUndefined.<string>;
+	var webkitOverflowScrolling : MayBeUndefined.<string>;
+	var webkitPaddingAfter : MayBeUndefined.<string>;
+	var webkitPaddingBefore : MayBeUndefined.<string>;
+	var webkitPaddingEnd : MayBeUndefined.<string>;
+	var webkitPaddingStart : MayBeUndefined.<string>;
+	var webkitPerspective : MayBeUndefined.<string>;
+	var webkitPerspectiveOrigin : MayBeUndefined.<string>;
+	var webkitPerspectiveOriginX : MayBeUndefined.<string>;
+	var webkitPerspectiveOriginY : MayBeUndefined.<string>;
+	var webkitPrintColorAdjust : MayBeUndefined.<string>;
+	var webkitRegionBreakAfter : MayBeUndefined.<string>;
+	var webkitRegionBreakBefore : MayBeUndefined.<string>;
+	var webkitRegionBreakInside : MayBeUndefined.<string>;
+	var webkitRegionOverflow : MayBeUndefined.<string>;
+	var webkitRtlOrdering : MayBeUndefined.<string>;
+	var webkitSvgShadow : MayBeUndefined.<string>;
+	var webkitTapHighlightColor : MayBeUndefined.<string>;
+	var webkitTextCombine : MayBeUndefined.<string>;
+	var webkitTextDecorationsInEffect : MayBeUndefined.<string>;
+	var webkitTextEmphasis : MayBeUndefined.<string>;
+	var webkitTextEmphasisColor : MayBeUndefined.<string>;
+	var webkitTextEmphasisPosition : MayBeUndefined.<string>;
+	var webkitTextEmphasisStyle : MayBeUndefined.<string>;
+	var webkitTextFillColor : MayBeUndefined.<string>;
+	var webkitTextOrientation : MayBeUndefined.<string>;
+	var webkitTextSecurity : MayBeUndefined.<string>;
+	var webkitTextSizeAdjust : MayBeUndefined.<string>;
+	var webkitTextStroke : MayBeUndefined.<string>;
+	var webkitTextStrokeColor : MayBeUndefined.<string>;
+	var webkitTextStrokeWidth : MayBeUndefined.<string>;
+	var webkitTransform : MayBeUndefined.<string>;
+	var webkitTransformOrigin : MayBeUndefined.<string>;
+	var webkitTransformOriginX : MayBeUndefined.<string>;
+	var webkitTransformOriginY : MayBeUndefined.<string>;
+	var webkitTransformOriginZ : MayBeUndefined.<string>;
+	var webkitTransformStyle : MayBeUndefined.<string>;
+	var webkitTransition : MayBeUndefined.<string>;
+	var webkitTransitionDelay : MayBeUndefined.<string>;
+	var webkitTransitionDuration : MayBeUndefined.<string>;
+	var webkitTransitionProperty : MayBeUndefined.<string>;
+	var webkitTransitionTimingFunction : MayBeUndefined.<string>;
+	var webkitUserDrag : MayBeUndefined.<string>;
+	var webkitUserModify : MayBeUndefined.<string>;
+	var webkitUserSelect : MayBeUndefined.<string>;
+	var webkitWrap : MayBeUndefined.<string>;
+	var webkitWrapFlow : MayBeUndefined.<string>;
+	var webkitWrapMargin : MayBeUndefined.<string>;
+	var webkitWrapPadding : MayBeUndefined.<string>;
+	var webkitWrapShapeInside : MayBeUndefined.<string>;
+	var webkitWrapShapeOutside : MayBeUndefined.<string>;
+	var webkitWrapThrough : MayBeUndefined.<string>;
+	var webkitWritingMode : MayBeUndefined.<string>;
+	var wordBreak : MayBeUndefined.<string>;
+	var wordWrap : MayBeUndefined.<string>;
+	var writingMode : MayBeUndefined.<string>;
+	var zoom : MayBeUndefined.<string>;
+
+	var MozAnimation : MayBeUndefined.<string>;
+	var MozAnimationDelay : MayBeUndefined.<string>;
+	var MozAnimationDirection : MayBeUndefined.<string>;
+	var MozAnimationDuration : MayBeUndefined.<string>;
+	var MozAnimationFillMode : MayBeUndefined.<string>;
+	var MozAnimationIterationCount : MayBeUndefined.<string>;
+	var MozAnimationName : MayBeUndefined.<string>;
+	var MozAnimationPlayState : MayBeUndefined.<string>;
+	var MozAnimationTimingFunction : MayBeUndefined.<string>;
+	var MozAppearance : MayBeUndefined.<string>;
+	var MozBackfaceVisibility : MayBeUndefined.<string>;
+	var MozBackgroundInlinePolicy : MayBeUndefined.<string>;
+	var MozBinding : MayBeUndefined.<string>;
+	var MozBorderBottomColors : MayBeUndefined.<string>;
+	var MozBorderEnd : MayBeUndefined.<string>;
+	var MozBorderEndColor : MayBeUndefined.<string>;
+	var MozBorderEndStyle : MayBeUndefined.<string>;
+	var MozBorderEndWidth : MayBeUndefined.<string>;
+	var MozBorderImage : MayBeUndefined.<string>;
+	var MozBorderLeftColors : MayBeUndefined.<string>;
+	var MozBorderRightColors : MayBeUndefined.<string>;
+	var MozBorderStart : MayBeUndefined.<string>;
+	var MozBorderStartColor : MayBeUndefined.<string>;
+	var MozBorderStartStyle : MayBeUndefined.<string>;
+	var MozBorderStartWidth : MayBeUndefined.<string>;
+	var MozBorderTopColors : MayBeUndefined.<string>;
+	var MozBoxAlign : MayBeUndefined.<string>;
+	var MozBoxDirection : MayBeUndefined.<string>;
+	var MozBoxFlex : MayBeUndefined.<string>;
+	var MozBoxOrdinalGroup : MayBeUndefined.<string>;
+	var MozBoxOrient : MayBeUndefined.<string>;
+	var MozBoxPack : MayBeUndefined.<string>;
+	var MozBoxSizing : MayBeUndefined.<string>;
+	var MozColumnCount : MayBeUndefined.<string>;
+	var MozColumnGap : MayBeUndefined.<string>;
+	var MozColumnRule : MayBeUndefined.<string>;
+	var MozColumnRuleColor : MayBeUndefined.<string>;
+	var MozColumnRuleStyle : MayBeUndefined.<string>;
+	var MozColumnRuleWidth : MayBeUndefined.<string>;
+	var MozColumnWidth : MayBeUndefined.<string>;
+	var MozColumns : MayBeUndefined.<string>;
+	var MozFloatEdge : MayBeUndefined.<string>;
+	var MozFontFeatureSettings : MayBeUndefined.<string>;
+	var MozFontLanguageOverride : MayBeUndefined.<string>;
+	var MozForceBrokenImageIcon : MayBeUndefined.<string>;
+	var MozHyphens : MayBeUndefined.<string>;
+	var MozImageRegion : MayBeUndefined.<string>;
+	var MozMarginEnd : MayBeUndefined.<string>;
+	var MozMarginStart : MayBeUndefined.<string>;
+	var MozOpacity : MayBeUndefined.<string>;
+	var MozOrient : MayBeUndefined.<string>;
+	var MozOutline : MayBeUndefined.<string>;
+	var MozOutlineColor : MayBeUndefined.<string>;
+	var MozOutlineOffset : MayBeUndefined.<string>;
+	var MozOutlineRadius : MayBeUndefined.<string>;
+	var MozOutlineRadiusBottomleft : MayBeUndefined.<string>;
+	var MozOutlineRadiusBottomright : MayBeUndefined.<string>;
+	var MozOutlineRadiusTopleft : MayBeUndefined.<string>;
+	var MozOutlineRadiusTopright : MayBeUndefined.<string>;
+	var MozOutlineStyle : MayBeUndefined.<string>;
+	var MozOutlineWidth : MayBeUndefined.<string>;
+	var MozPaddingEnd : MayBeUndefined.<string>;
+	var MozPaddingStart : MayBeUndefined.<string>;
+	var MozPerspective : MayBeUndefined.<string>;
+	var MozPerspectiveOrigin : MayBeUndefined.<string>;
+	var MozStackSizing : MayBeUndefined.<string>;
+	var MozTabSize : MayBeUndefined.<string>;
+	var MozTextAlignLast : MayBeUndefined.<string>;
+	var MozTextBlink : MayBeUndefined.<string>;
+	var MozTextDecorationColor : MayBeUndefined.<string>;
+	var MozTextDecorationLine : MayBeUndefined.<string>;
+	var MozTextDecorationStyle : MayBeUndefined.<string>;
+	var MozTextSizeAdjust : MayBeUndefined.<string>;
+	var MozTransform : MayBeUndefined.<string>;
+	var MozTransformOrigin : MayBeUndefined.<string>;
+	var MozTransformStyle : MayBeUndefined.<string>;
+	var MozTransition : MayBeUndefined.<string>;
+	var MozTransitionDelay : MayBeUndefined.<string>;
+	var MozTransitionDuration : MayBeUndefined.<string>;
+	var MozTransitionProperty : MayBeUndefined.<string>;
+	var MozTransitionTimingFunction : MayBeUndefined.<string>;
+	var MozUserFocus : MayBeUndefined.<string>;
+	var MozUserInput : MayBeUndefined.<string>;
+	var MozUserModify : MayBeUndefined.<string>;
+	var MozUserSelect : MayBeUndefined.<string>;
+	var MozWindowShadow : MayBeUndefined.<string>;
+	var imeMode : MayBeUndefined.<string>;
+
+} // end of CSSStyleDeclaration
+
+native class ElementCSSInlineStyle {
+
+	__readonly__ var style : CSSStyleDeclaration;
+
+} // end of ElementCSSInlineStyle
+
+native __fake__ class Window extends EventTarget {
+
+	function getComputedStyle(elt : Element) : CSSStyleDeclaration;
+	function getComputedStyle(
+		elt : Element,
+		pseudoElt : string/*DOMString*/
+	) : CSSStyleDeclaration;
+
+	function matchMedia(
+		media_query_list : string/*DOMString*/
+	) : MediaQueryList;
+	__readonly__ var screen : Screen;
+	// viewport
+	__readonly__ var innerWidth : int/*long*/;
+	__readonly__ var innerHeight : int/*long*/;
+	// viewport scrolling
+	__readonly__ var scrollX : int/*long*/;
+	__readonly__ var pageXOffset : int/*long*/;
+	__readonly__ var scrollY : int/*long*/;
+	__readonly__ var pageYOffset : int/*long*/;
+	function scroll(x : int/*long*/, y : int/*long*/) : void;
+	function scrollTo(x : int/*long*/, y : int/*long*/) : void;
+	function scrollBy(x : int/*long*/, y : int/*long*/) : void;
+	// client
+	__readonly__ var screenX : int/*long*/;
+	__readonly__ var screenY : int/*long*/;
+	__readonly__ var outerWidth : int/*long*/;
+	__readonly__ var outerHeight : int/*long*/;
+
+	// the current browsing context
+	__readonly__ var window : Window/*WindowProxy*/;
+	__readonly__ var self : Window/*WindowProxy*/;
+	__readonly__ var document : HTMLDocument/*Document*/;
+	var name : string/*DOMString*/;
+	__readonly__ var location : Location;
+	__readonly__ var history : History;
+	__readonly__ var locationbar : BarProp;
+	__readonly__ var menubar : BarProp;
+	__readonly__ var personalbar : BarProp;
+	__readonly__ var scrollbars : BarProp;
+	__readonly__ var statusbar : BarProp;
+	__readonly__ var toolbar : BarProp;
+	var status : string/*DOMString*/;
+	function close() : void;
+	function stop() : void;
+	function focus() : void;
+	function blur() : void;
+	// other browsing contexts
+	__readonly__ var frames : Window/*WindowProxy*/;
+	__readonly__ var length : int/*unsigned long*/;
+	__readonly__ var top : Window/*WindowProxy*/;
+	var opener : Window/*WindowProxy?*/;
+	__readonly__ var parent : Window/*WindowProxy*/;
+	__readonly__ var frameElement : Element;
+	function open() : Window/*WindowProxy*/;
+	function open(url : string/*DOMString*/) : Window/*WindowProxy*/;
+	function open(
+		url : string/*DOMString*/,
+		target : string/*DOMString*/
+	) : Window/*WindowProxy*/;
+	function open(
+		url : string/*DOMString*/,
+		target : string/*DOMString*/,
+		features : string/*DOMString*/
+	) : Window/*WindowProxy*/;
+	function open(
+		url : string/*DOMString*/,
+		target : string/*DOMString*/,
+		features : string/*DOMString*/,
+		replace : boolean
+	) : Window/*WindowProxy*/;
+	function __native_index_operator__(
+		index : int/*unsigned long*/
+	) : MayBeUndefined.<Window/*WindowProxy*/>;
+	function __native_index_operator__(
+		name : string/*DOMString*/
+	) : MayBeUndefined.<Object/*object*/>;
+	// the user agent
+	__readonly__ var navigator : Navigator;
+	__readonly__ var external : External;
+	__readonly__ var applicationCache : ApplicationCache;
+	// user prompts
+	function alert(message : string/*DOMString*/) : void;
+	function confirm(message : string/*DOMString*/) : boolean;
+	function prompt(
+		message : string/*DOMString*/
+	) : string/*DOMString?*/;
+	function prompt(
+		message : string/*DOMString*/,
+		default : string/*DOMString*/
+	) : string/*DOMString?*/;
+	function print() : void;
+	function showModalDialog(
+		url : string/*DOMString*/
+	) : variant/*any*/;
+	function showModalDialog(
+		url : string/*DOMString*/,
+		argument : variant/*any*/
+	) : variant/*any*/;
+	// event handler IDL attributes
+	var onabort : function(:Event):void/*Function?*/;
+	var onafterprint : function(:Event):void/*Function?*/;
+	var onbeforeprint : function(:Event):void/*Function?*/;
+	var onbeforeunload : function(:Event):void/*Function?*/;
+	var onblur : function(:Event):void/*Function?*/;
+	var oncanplay : function(:Event):void/*Function?*/;
+	var oncanplaythrough : function(:Event):void/*Function?*/;
+	var onchange : function(:Event):void/*Function?*/;
+	var onclick : function(:Event):void/*Function?*/;
+	var oncontextmenu : function(:Event):void/*Function?*/;
+	var oncuechange : function(:Event):void/*Function?*/;
+	var ondblclick : function(:Event):void/*Function?*/;
+	var ondrag : function(:Event):void/*Function?*/;
+	var ondragend : function(:Event):void/*Function?*/;
+	var ondragenter : function(:Event):void/*Function?*/;
+	var ondragleave : function(:Event):void/*Function?*/;
+	var ondragover : function(:Event):void/*Function?*/;
+	var ondragstart : function(:Event):void/*Function?*/;
+	var ondrop : function(:Event):void/*Function?*/;
+	var ondurationchange : function(:Event):void/*Function?*/;
+	var onemptied : function(:Event):void/*Function?*/;
+	var onended : function(:Event):void/*Function?*/;
+	var onerror : function(:Event):void/*Function?*/;
+	var onfocus : function(:Event):void/*Function?*/;
+	var onhashchange : function(:Event):void/*Function?*/;
+	var oninput : function(:Event):void/*Function?*/;
+	var oninvalid : function(:Event):void/*Function?*/;
+	var onkeydown : function(:Event):void/*Function?*/;
+	var onkeypress : function(:Event):void/*Function?*/;
+	var onkeyup : function(:Event):void/*Function?*/;
+	var onload : function(:Event):void/*Function?*/;
+	var onloadeddata : function(:Event):void/*Function?*/;
+	var onloadedmetadata : function(:Event):void/*Function?*/;
+	var onloadstart : function(:Event):void/*Function?*/;
+	var onmessage : function(:Event):void/*Function?*/;
+	var onmousedown : function(:Event):void/*Function?*/;
+	var onmousemove : function(:Event):void/*Function?*/;
+	var onmouseout : function(:Event):void/*Function?*/;
+	var onmouseover : function(:Event):void/*Function?*/;
+	var onmouseup : function(:Event):void/*Function?*/;
+	var onmousewheel : function(:Event):void/*Function?*/;
+	var onoffline : function(:Event):void/*Function?*/;
+	var ononline : function(:Event):void/*Function?*/;
+	var onpause : function(:Event):void/*Function?*/;
+	var onplay : function(:Event):void/*Function?*/;
+	var onplaying : function(:Event):void/*Function?*/;
+	var onpagehide : function(:Event):void/*Function?*/;
+	var onpageshow : function(:Event):void/*Function?*/;
+	var onpopstate : function(:Event):void/*Function?*/;
+	var onprogress : function(:Event):void/*Function?*/;
+	var onratechange : function(:Event):void/*Function?*/;
+	var onreset : function(:Event):void/*Function?*/;
+	var onresize : function(:Event):void/*Function?*/;
+	var onscroll : function(:Event):void/*Function?*/;
+	var onseeked : function(:Event):void/*Function?*/;
+	var onseeking : function(:Event):void/*Function?*/;
+	var onselect : function(:Event):void/*Function?*/;
+	var onshow : function(:Event):void/*Function?*/;
+	var onstalled : function(:Event):void/*Function?*/;
+	var onstorage : function(:Event):void/*Function?*/;
+	var onsubmit : function(:Event):void/*Function?*/;
+	var onsuspend : function(:Event):void/*Function?*/;
+	var ontimeupdate : function(:Event):void/*Function?*/;
+	var onunload : function(:Event):void/*Function?*/;
+	var onvolumechange : function(:Event):void/*Function?*/;
+	var onwaiting : function(:Event):void/*Function?*/;
+
+	// implements WindowBase64
+
+	function btoa(btoa : string/*DOMString*/) : string/*DOMString*/;
+	function atob(atob : string/*DOMString*/) : string/*DOMString*/;
+
+	// implements WindowTimers
+
+	function setTimeout(
+		handler : function(:Event):void/*Function*/
+	) : int/*long*/;
+	function setTimeout(
+		handler : function(:Event):void/*Function*/,
+		timeout : int/*long*/
+	) : int/*long*/;
+	function setTimeout(
+		handler : function(:Event):void/*Function*/,
+		timeout : int/*long*/,
+		args : variant/*any...*/
+	) : int/*long*/;
+	function setTimeout(handler : string/*DOMString*/) : int/*long*/;
+	function setTimeout(
+		handler : string/*DOMString*/,
+		timeout : int/*long*/
+	) : int/*long*/;
+	function setTimeout(
+		handler : string/*DOMString*/,
+		timeout : int/*long*/,
+		args : variant/*any...*/
+	) : int/*long*/;
+	function clearTimeout(handle : int/*long*/) : void;
+	function setInterval(
+		handler : function(:Event):void/*Function*/
+	) : int/*long*/;
+	function setInterval(
+		handler : function(:Event):void/*Function*/,
+		timeout : int/*long*/
+	) : int/*long*/;
+	function setInterval(
+		handler : function(:Event):void/*Function*/,
+		timeout : int/*long*/,
+		args : variant/*any...*/
+	) : int/*long*/;
+	function setInterval(handler : string/*DOMString*/) : int/*long*/;
+	function setInterval(
+		handler : string/*DOMString*/,
+		timeout : int/*long*/
+	) : int/*long*/;
+	function setInterval(
+		handler : string/*DOMString*/,
+		timeout : int/*long*/,
+		args : variant/*any...*/
+	) : int/*long*/;
+	function clearInterval(handle : int/*long*/) : void;
+
+	// implements WindowSessionStorage
+
+	__readonly__ var sessionStorage : Storage;
+
+	// implements WindowLocalStorage
+
+	__readonly__ var localStorage : Storage;
+
+} // end of Window
+
+native class MediaQueryList {
+
+	__readonly__ var media : string/*DOMString*/;
+	__readonly__ var matches : boolean;
+	function addListener(
+		listener : function(:MediaQueryList):void/*MediaQueryListListener*/
+	) : void;
+	function removeListener(
+		listener : function(:MediaQueryList):void/*MediaQueryListListener*/
+	) : void;
+
+} // end of MediaQueryList
+
+native class MediaQueryListListener {
+
+	function handleChange(mql : MediaQueryList) : void;
+
+} // end of MediaQueryListListener
+
+native class Screen {
+
+	__readonly__ var availWidth : int/*unsigned long*/;
+	__readonly__ var availHeight : int/*unsigned long*/;
+	__readonly__ var width : int/*unsigned long*/;
+	__readonly__ var height : int/*unsigned long*/;
+	__readonly__ var colorDepth : int/*unsigned long*/;
+	__readonly__ var pixelDepth : int/*unsigned long*/;
+
+} // end of Screen
+
+native class CaretPosition {
+
+	__readonly__ var offsetNode : Node;
+	__readonly__ var offset : int/*unsigned long*/;
+
+} // end of CaretPosition
+
+native class HTMLElement extends Element {
+
+	__readonly__ var offsetParent : Element;
+	__readonly__ var offsetTop : int/*long*/;
+	__readonly__ var offsetLeft : int/*long*/;
+	__readonly__ var offsetWidth : int/*long*/;
+	__readonly__ var offsetHeight : int/*long*/;
+
+	// metadata attributes
+	var title : string/*DOMString*/;
+	var lang : string/*DOMString*/;
+	var translate : boolean;
+	var dir : string/*DOMString*/;
+	// inherits var className : string/*DOMString*/;
+	// inherits __readonly__ var classList : DOMTokenList;
+	__readonly__ var dataset : DOMStringMap;
+	// user interaction
+	var hidden : boolean;
+	function click() : void;
+	var tabIndex : int/*long*/;
+	function focus() : void;
+	function blur() : void;
+	var accessKey : string/*DOMString*/;
+	__readonly__ var accessKeyLabel : string/*DOMString*/;
+	var draggable : boolean;
+	__readonly__ var dropzone : DOMSettableTokenList;
+	var contentEditable : string/*DOMString*/;
+	__readonly__ var isContentEditable : boolean;
+	var contextMenu : HTMLMenuElement;
+	var spellcheck : boolean;
+	// command API
+	__readonly__ var commandType : string/*DOMString?*/;
+	__readonly__ var commandLabel : string/*DOMString?*/;
+	__readonly__ var commandIcon : string/*DOMString?*/;
+	__readonly__ var commandHidden : boolean;
+	__readonly__ var commandDisabled : boolean;
+	__readonly__ var commandChecked : boolean;
+	// styling
+	__readonly__ var style : CSSStyleDeclaration;
+	// event handler IDL attributes
+	var onabort : function(:Event):void/*Function?*/;
+	var onblur : function(:Event):void/*Function?*/;
+	var oncanplay : function(:Event):void/*Function?*/;
+	var oncanplaythrough : function(:Event):void/*Function?*/;
+	var onchange : function(:Event):void/*Function?*/;
+	var onclick : function(:Event):void/*Function?*/;
+	var oncontextmenu : function(:Event):void/*Function?*/;
+	var oncuechange : function(:Event):void/*Function?*/;
+	var ondblclick : function(:Event):void/*Function?*/;
+	var ondrag : function(:Event):void/*Function?*/;
+	var ondragend : function(:Event):void/*Function?*/;
+	var ondragenter : function(:Event):void/*Function?*/;
+	var ondragleave : function(:Event):void/*Function?*/;
+	var ondragover : function(:Event):void/*Function?*/;
+	var ondragstart : function(:Event):void/*Function?*/;
+	var ondrop : function(:Event):void/*Function?*/;
+	var ondurationchange : function(:Event):void/*Function?*/;
+	var onemptied : function(:Event):void/*Function?*/;
+	var onended : function(:Event):void/*Function?*/;
+	var onerror : function(:Event):void/*Function?*/;
+	var onfocus : function(:Event):void/*Function?*/;
+	var oninput : function(:Event):void/*Function?*/;
+	var oninvalid : function(:Event):void/*Function?*/;
+	var onkeydown : function(:Event):void/*Function?*/;
+	var onkeypress : function(:Event):void/*Function?*/;
+	var onkeyup : function(:Event):void/*Function?*/;
+	var onload : function(:Event):void/*Function?*/;
+	var onloadeddata : function(:Event):void/*Function?*/;
+	var onloadedmetadata : function(:Event):void/*Function?*/;
+	var onloadstart : function(:Event):void/*Function?*/;
+	var onmousedown : function(:Event):void/*Function?*/;
+	var onmousemove : function(:Event):void/*Function?*/;
+	var onmouseout : function(:Event):void/*Function?*/;
+	var onmouseover : function(:Event):void/*Function?*/;
+	var onmouseup : function(:Event):void/*Function?*/;
+	var onmousewheel : function(:Event):void/*Function?*/;
+	var onpause : function(:Event):void/*Function?*/;
+	var onplay : function(:Event):void/*Function?*/;
+	var onplaying : function(:Event):void/*Function?*/;
+	var onprogress : function(:Event):void/*Function?*/;
+	var onratechange : function(:Event):void/*Function?*/;
+	var onreset : function(:Event):void/*Function?*/;
+	var onscroll : function(:Event):void/*Function?*/;
+	var onseeked : function(:Event):void/*Function?*/;
+	var onseeking : function(:Event):void/*Function?*/;
+	var onselect : function(:Event):void/*Function?*/;
+	var onshow : function(:Event):void/*Function?*/;
+	var onstalled : function(:Event):void/*Function?*/;
+	var onsubmit : function(:Event):void/*Function?*/;
+	var onsuspend : function(:Event):void/*Function?*/;
+	var ontimeupdate : function(:Event):void/*Function?*/;
+	var onvolumechange : function(:Event):void/*Function?*/;
+	var onwaiting : function(:Event):void/*Function?*/;
+
+} // end of HTMLElement
+
+native class ClientRectList {
+
+	__readonly__ var length : int/*unsigned long*/;
+	function __native_index_operator__(
+		index : int/*unsigned long*/
+	) : MayBeUndefined.<ClientRect>;
+	/* getter */
+	function item(
+		index : int/*unsigned long*/
+	) : MayBeUndefined.<ClientRect>;
+
+} // end of ClientRectList
+
+native class ClientRect {
+
+	__readonly__ var top : number/*float*/;
+	__readonly__ var right : number/*float*/;
+	__readonly__ var bottom : number/*float*/;
+	__readonly__ var left : number/*float*/;
+	__readonly__ var width : number/*float*/;
+	__readonly__ var height : number/*float*/;
+
+} // end of ClientRect
+
 native class HTMLAllCollection extends HTMLCollection {
 
 	// inherits length and item(unsigned long index)
@@ -1704,13 +2897,23 @@ native class HTMLOptionsCollection extends HTMLCollection {
 	/* legacycaller getter */
 	// inherits function namedItem(name : string/*DOMString*/) : MayBeUndefined.<Object/*object?*/>;
 	// overrides inherited namedItem()
+	function add(element : HTMLOptionElement) : void;
 	function add(
 		element : HTMLOptionElement,
-		long : HTMLElement
+		before : HTMLElement
+	) : void;
+	function add(
+		element : HTMLOptionElement,
+		before : int/*long*/
+	) : void;
+	function add(element : HTMLOptGroupElement) : void;
+	function add(
+		element : HTMLOptGroupElement,
+		before : HTMLElement
 	) : void;
 	function add(
 		element : HTMLOptGroupElement,
-		long : HTMLElement
+		before : int/*long*/
 	) : void;
 	function remove(index : int/*long*/) : void;
 	var selectedIndex : int/*long*/;
@@ -1724,6 +2927,9 @@ native class DOMStringMap {
 	) : MayBeUndefined.<string/*DOMString*/>;
 
 } // end of DOMStringMap
+
+native __fake__ class Transferable {
+}
 
 native class HTMLDocument extends Document {
 
@@ -1877,102 +3083,6 @@ native class HTMLDocument extends Document {
 
 } // end of HTMLDocument
 
-native class HTMLElement extends Element {
-
-	// metadata attributes
-	var title : string/*DOMString*/;
-	var lang : string/*DOMString*/;
-	var translate : boolean;
-	var dir : string/*DOMString*/;
-	// inherits var className : string/*DOMString*/;
-	// inherits __readonly__ var classList : DOMTokenList;
-	__readonly__ var dataset : DOMStringMap;
-	// user interaction
-	var hidden : boolean;
-	function click() : void;
-	var tabIndex : int/*long*/;
-	function focus() : void;
-	function blur() : void;
-	var accessKey : string/*DOMString*/;
-	__readonly__ var accessKeyLabel : string/*DOMString*/;
-	var draggable : boolean;
-	__readonly__ var dropzone : DOMSettableTokenList;
-	var contentEditable : string/*DOMString*/;
-	__readonly__ var isContentEditable : boolean;
-	var contextMenu : HTMLMenuElement;
-	var spellcheck : boolean;
-	// command API
-	__readonly__ var commandType : string/*DOMString?*/;
-	__readonly__ var commandLabel : string/*DOMString?*/;
-	__readonly__ var commandIcon : string/*DOMString?*/;
-	__readonly__ var commandHidden : boolean;
-	__readonly__ var commandDisabled : boolean;
-	__readonly__ var commandChecked : boolean;
-	// styling
-	__readonly__ var style : CSSStyleDeclaration;
-	// event handler IDL attributes
-	var onabort : function(:Event):void/*Function?*/;
-	var onblur : function(:Event):void/*Function?*/;
-	var oncanplay : function(:Event):void/*Function?*/;
-	var oncanplaythrough : function(:Event):void/*Function?*/;
-	var onchange : function(:Event):void/*Function?*/;
-	var onclick : function(:Event):void/*Function?*/;
-	var oncontextmenu : function(:Event):void/*Function?*/;
-	var oncuechange : function(:Event):void/*Function?*/;
-	var ondblclick : function(:Event):void/*Function?*/;
-	var ondrag : function(:Event):void/*Function?*/;
-	var ondragend : function(:Event):void/*Function?*/;
-	var ondragenter : function(:Event):void/*Function?*/;
-	var ondragleave : function(:Event):void/*Function?*/;
-	var ondragover : function(:Event):void/*Function?*/;
-	var ondragstart : function(:Event):void/*Function?*/;
-	var ondrop : function(:Event):void/*Function?*/;
-	var ondurationchange : function(:Event):void/*Function?*/;
-	var onemptied : function(:Event):void/*Function?*/;
-	var onended : function(:Event):void/*Function?*/;
-	var onerror : function(:Event):void/*Function?*/;
-	var onfocus : function(:Event):void/*Function?*/;
-	var oninput : function(:Event):void/*Function?*/;
-	var oninvalid : function(:Event):void/*Function?*/;
-	var onkeydown : function(:Event):void/*Function?*/;
-	var onkeypress : function(:Event):void/*Function?*/;
-	var onkeyup : function(:Event):void/*Function?*/;
-	var onload : function(:Event):void/*Function?*/;
-	var onloadeddata : function(:Event):void/*Function?*/;
-	var onloadedmetadata : function(:Event):void/*Function?*/;
-	var onloadstart : function(:Event):void/*Function?*/;
-	var onmousedown : function(:Event):void/*Function?*/;
-	var onmousemove : function(:Event):void/*Function?*/;
-	var onmouseout : function(:Event):void/*Function?*/;
-	var onmouseover : function(:Event):void/*Function?*/;
-	var onmouseup : function(:Event):void/*Function?*/;
-	var onmousewheel : function(:Event):void/*Function?*/;
-	var onpause : function(:Event):void/*Function?*/;
-	var onplay : function(:Event):void/*Function?*/;
-	var onplaying : function(:Event):void/*Function?*/;
-	var onprogress : function(:Event):void/*Function?*/;
-	var onratechange : function(:Event):void/*Function?*/;
-	var onreset : function(:Event):void/*Function?*/;
-	var onscroll : function(:Event):void/*Function?*/;
-	var onseeked : function(:Event):void/*Function?*/;
-	var onseeking : function(:Event):void/*Function?*/;
-	var onselect : function(:Event):void/*Function?*/;
-	var onshow : function(:Event):void/*Function?*/;
-	var onstalled : function(:Event):void/*Function?*/;
-	var onsubmit : function(:Event):void/*Function?*/;
-	var onsuspend : function(:Event):void/*Function?*/;
-	var ontimeupdate : function(:Event):void/*Function?*/;
-	var onvolumechange : function(:Event):void/*Function?*/;
-	var onwaiting : function(:Event):void/*Function?*/;
-
-	__readonly__ var offsetParent : Element;
-	__readonly__ var offsetTop : int/*long*/;
-	__readonly__ var offsetLeft : int/*long*/;
-	__readonly__ var offsetWidth : int/*long*/;
-	__readonly__ var offsetHeight : int/*long*/;
-
-} // end of HTMLElement
-
 native class HTMLUnknownElement extends HTMLElement {
 }
 
@@ -2013,6 +3123,10 @@ native class HTMLLinkElement extends HTMLElement {
 	var rev : string/*DOMString*/;
 	var target : string/*DOMString*/;
 
+	// implements LinkStyle
+
+	__readonly__ var sheet : StyleSheet;
+
 } // end of HTMLLinkElement
 
 native class HTMLMetaElement extends HTMLElement {
@@ -2031,6 +3145,10 @@ native class HTMLStyleElement extends HTMLElement {
 	var media : string/*DOMString*/;
 	var type : string/*DOMString*/;
 	var scoped : boolean;
+
+	// implements LinkStyle
+
+	__readonly__ var sheet : StyleSheet;
 
 } // end of HTMLStyleElement
 
@@ -2951,13 +4069,23 @@ native class HTMLSelectElement extends HTMLElement {
 		index : int/*unsigned long*/
 	) : MayBeUndefined.<Element>;
 	function namedItem(name : string/*DOMString*/) : Object/*object*/;
+	function add(element : HTMLOptionElement) : void;
 	function add(
 		element : HTMLOptionElement,
-		long : HTMLElement
+		before : HTMLElement
+	) : void;
+	function add(
+		element : HTMLOptionElement,
+		before : int/*long*/
+	) : void;
+	function add(element : HTMLOptGroupElement) : void;
+	function add(
+		element : HTMLOptGroupElement,
+		before : HTMLElement
 	) : void;
 	function add(
 		element : HTMLOptGroupElement,
-		long : HTMLElement
+		before : int/*long*/
 	) : void;
 	function remove(index : int/*long*/) : void;
 	__readonly__ var selectedOptions : HTMLCollection;
@@ -3135,229 +4263,6 @@ native class HTMLMenuElement extends HTMLElement {
 
 } // end of HTMLMenuElement
 
-native __fake__ class Window extends EventTarget {
-
-	// the current browsing context
-	__readonly__ var window : Window/*WindowProxy*/;
-	__readonly__ var self : Window/*WindowProxy*/;
-	__readonly__ var document : HTMLDocument/*Document*/;
-	var name : string/*DOMString*/;
-	__readonly__ var location : Location;
-	__readonly__ var history : History;
-	__readonly__ var locationbar : BarProp;
-	__readonly__ var menubar : BarProp;
-	__readonly__ var personalbar : BarProp;
-	__readonly__ var scrollbars : BarProp;
-	__readonly__ var statusbar : BarProp;
-	__readonly__ var toolbar : BarProp;
-	var status : string/*DOMString*/;
-	function close() : void;
-	function stop() : void;
-	function focus() : void;
-	function blur() : void;
-	// other browsing contexts
-	__readonly__ var frames : Window/*WindowProxy*/;
-	__readonly__ var length : int/*unsigned long*/;
-	__readonly__ var top : Window/*WindowProxy*/;
-	var opener : Window/*WindowProxy?*/;
-	__readonly__ var parent : Window/*WindowProxy*/;
-	__readonly__ var frameElement : Element;
-	function open() : Window/*WindowProxy*/;
-	function open(url : string/*DOMString*/) : Window/*WindowProxy*/;
-	function open(
-		url : string/*DOMString*/,
-		target : string/*DOMString*/
-	) : Window/*WindowProxy*/;
-	function open(
-		url : string/*DOMString*/,
-		target : string/*DOMString*/,
-		features : string/*DOMString*/
-	) : Window/*WindowProxy*/;
-	function open(
-		url : string/*DOMString*/,
-		target : string/*DOMString*/,
-		features : string/*DOMString*/,
-		replace : boolean
-	) : Window/*WindowProxy*/;
-	function __native_index_operator__(
-		index : int/*unsigned long*/
-	) : MayBeUndefined.<Window/*WindowProxy*/>;
-	function __native_index_operator__(
-		name : string/*DOMString*/
-	) : MayBeUndefined.<Object/*object*/>;
-	// the user agent
-	__readonly__ var navigator : Navigator;
-	__readonly__ var external : External;
-	__readonly__ var applicationCache : ApplicationCache;
-	// user prompts
-	function alert(message : string/*DOMString*/) : void;
-	function confirm(message : string/*DOMString*/) : boolean;
-	function prompt(
-		message : string/*DOMString*/
-	) : string/*DOMString?*/;
-	function prompt(
-		message : string/*DOMString*/,
-		default : string/*DOMString*/
-	) : string/*DOMString?*/;
-	function print() : void;
-	function showModalDialog(
-		url : string/*DOMString*/
-	) : variant/*any*/;
-	function showModalDialog(
-		url : string/*DOMString*/,
-		argument : variant/*any*/
-	) : variant/*any*/;
-	// event handler IDL attributes
-	var onabort : function(:Event):void/*Function?*/;
-	var onafterprint : function(:Event):void/*Function?*/;
-	var onbeforeprint : function(:Event):void/*Function?*/;
-	var onbeforeunload : function(:Event):void/*Function?*/;
-	var onblur : function(:Event):void/*Function?*/;
-	var oncanplay : function(:Event):void/*Function?*/;
-	var oncanplaythrough : function(:Event):void/*Function?*/;
-	var onchange : function(:Event):void/*Function?*/;
-	var onclick : function(:Event):void/*Function?*/;
-	var oncontextmenu : function(:Event):void/*Function?*/;
-	var oncuechange : function(:Event):void/*Function?*/;
-	var ondblclick : function(:Event):void/*Function?*/;
-	var ondrag : function(:Event):void/*Function?*/;
-	var ondragend : function(:Event):void/*Function?*/;
-	var ondragenter : function(:Event):void/*Function?*/;
-	var ondragleave : function(:Event):void/*Function?*/;
-	var ondragover : function(:Event):void/*Function?*/;
-	var ondragstart : function(:Event):void/*Function?*/;
-	var ondrop : function(:Event):void/*Function?*/;
-	var ondurationchange : function(:Event):void/*Function?*/;
-	var onemptied : function(:Event):void/*Function?*/;
-	var onended : function(:Event):void/*Function?*/;
-	var onerror : function(:Event):void/*Function?*/;
-	var onfocus : function(:Event):void/*Function?*/;
-	var onhashchange : function(:Event):void/*Function?*/;
-	var oninput : function(:Event):void/*Function?*/;
-	var oninvalid : function(:Event):void/*Function?*/;
-	var onkeydown : function(:Event):void/*Function?*/;
-	var onkeypress : function(:Event):void/*Function?*/;
-	var onkeyup : function(:Event):void/*Function?*/;
-	var onload : function(:Event):void/*Function?*/;
-	var onloadeddata : function(:Event):void/*Function?*/;
-	var onloadedmetadata : function(:Event):void/*Function?*/;
-	var onloadstart : function(:Event):void/*Function?*/;
-	var onmessage : function(:Event):void/*Function?*/;
-	var onmousedown : function(:Event):void/*Function?*/;
-	var onmousemove : function(:Event):void/*Function?*/;
-	var onmouseout : function(:Event):void/*Function?*/;
-	var onmouseover : function(:Event):void/*Function?*/;
-	var onmouseup : function(:Event):void/*Function?*/;
-	var onmousewheel : function(:Event):void/*Function?*/;
-	var onoffline : function(:Event):void/*Function?*/;
-	var ononline : function(:Event):void/*Function?*/;
-	var onpause : function(:Event):void/*Function?*/;
-	var onplay : function(:Event):void/*Function?*/;
-	var onplaying : function(:Event):void/*Function?*/;
-	var onpagehide : function(:Event):void/*Function?*/;
-	var onpageshow : function(:Event):void/*Function?*/;
-	var onpopstate : function(:Event):void/*Function?*/;
-	var onprogress : function(:Event):void/*Function?*/;
-	var onratechange : function(:Event):void/*Function?*/;
-	var onreset : function(:Event):void/*Function?*/;
-	var onresize : function(:Event):void/*Function?*/;
-	var onscroll : function(:Event):void/*Function?*/;
-	var onseeked : function(:Event):void/*Function?*/;
-	var onseeking : function(:Event):void/*Function?*/;
-	var onselect : function(:Event):void/*Function?*/;
-	var onshow : function(:Event):void/*Function?*/;
-	var onstalled : function(:Event):void/*Function?*/;
-	var onstorage : function(:Event):void/*Function?*/;
-	var onsubmit : function(:Event):void/*Function?*/;
-	var onsuspend : function(:Event):void/*Function?*/;
-	var ontimeupdate : function(:Event):void/*Function?*/;
-	var onunload : function(:Event):void/*Function?*/;
-	var onvolumechange : function(:Event):void/*Function?*/;
-	var onwaiting : function(:Event):void/*Function?*/;
-
-	// implements WindowBase64
-
-	function btoa(btoa : string/*DOMString*/) : string/*DOMString*/;
-	function atob(atob : string/*DOMString*/) : string/*DOMString*/;
-
-	// implements WindowTimers
-
-	function setTimeout(
-		handler : function(:Event):void/*Function*/
-	) : int/*long*/;
-	function setTimeout(
-		handler : function(:Event):void/*Function*/,
-		timeout : int/*long*/
-	) : int/*long*/;
-	function setTimeout(
-		handler : function(:Event):void/*Function*/,
-		timeout : int/*long*/,
-		args : variant/*any...*/
-	) : int/*long*/;
-	function setTimeout(handler : string/*DOMString*/) : int/*long*/;
-	function setTimeout(
-		handler : string/*DOMString*/,
-		timeout : int/*long*/
-	) : int/*long*/;
-	function setTimeout(
-		handler : string/*DOMString*/,
-		timeout : int/*long*/,
-		args : variant/*any...*/
-	) : int/*long*/;
-	function clearTimeout(handle : int/*long*/) : void;
-	function setInterval(
-		handler : function(:Event):void/*Function*/
-	) : int/*long*/;
-	function setInterval(
-		handler : function(:Event):void/*Function*/,
-		timeout : int/*long*/
-	) : int/*long*/;
-	function setInterval(
-		handler : function(:Event):void/*Function*/,
-		timeout : int/*long*/,
-		args : variant/*any...*/
-	) : int/*long*/;
-	function setInterval(handler : string/*DOMString*/) : int/*long*/;
-	function setInterval(
-		handler : string/*DOMString*/,
-		timeout : int/*long*/
-	) : int/*long*/;
-	function setInterval(
-		handler : string/*DOMString*/,
-		timeout : int/*long*/,
-		args : variant/*any...*/
-	) : int/*long*/;
-	function clearInterval(handle : int/*long*/) : void;
-
-	function getComputedStyle(elt : Element) : CSSStyleDeclaration;
-	function getComputedStyle(
-		elt : Element,
-		pseudoElt : string/*DOMString*/
-	) : CSSStyleDeclaration;
-
-	function matchMedia(
-		media_query_list : string/*DOMString*/
-	) : MediaQueryList;
-	__readonly__ var screen : Screen;
-	// viewport
-	__readonly__ var innerWidth : int/*long*/;
-	__readonly__ var innerHeight : int/*long*/;
-	// viewport scrolling
-	__readonly__ var scrollX : int/*long*/;
-	__readonly__ var pageXOffset : int/*long*/;
-	__readonly__ var scrollY : int/*long*/;
-	__readonly__ var pageYOffset : int/*long*/;
-	function scroll(x : int/*long*/, y : int/*long*/) : void;
-	function scrollTo(x : int/*long*/, y : int/*long*/) : void;
-	function scrollBy(x : int/*long*/, y : int/*long*/) : void;
-	// client
-	__readonly__ var screenX : int/*long*/;
-	__readonly__ var screenY : int/*long*/;
-	__readonly__ var outerWidth : int/*long*/;
-	__readonly__ var outerHeight : int/*long*/;
-
-} // end of Window
-
 native class BarProp {
 
 	var visible : boolean;
@@ -3504,6 +4409,70 @@ native class ApplicationCache extends EventTarget {
 
 } // end of ApplicationCache
 
+native __fake__ class NavigatorOnLine {
+
+	__readonly__ var onLine : boolean;
+
+} // end of NavigatorOnLine
+
+native __fake__ class WindowBase64 {
+
+	function btoa(btoa : string/*DOMString*/) : string/*DOMString*/;
+	function atob(atob : string/*DOMString*/) : string/*DOMString*/;
+
+} // end of WindowBase64
+
+native __fake__ class WindowTimers {
+
+	function setTimeout(
+		handler : function(:Event):void/*Function*/
+	) : int/*long*/;
+	function setTimeout(
+		handler : function(:Event):void/*Function*/,
+		timeout : int/*long*/
+	) : int/*long*/;
+	function setTimeout(
+		handler : function(:Event):void/*Function*/,
+		timeout : int/*long*/,
+		args : variant/*any...*/
+	) : int/*long*/;
+	function setTimeout(handler : string/*DOMString*/) : int/*long*/;
+	function setTimeout(
+		handler : string/*DOMString*/,
+		timeout : int/*long*/
+	) : int/*long*/;
+	function setTimeout(
+		handler : string/*DOMString*/,
+		timeout : int/*long*/,
+		args : variant/*any...*/
+	) : int/*long*/;
+	function clearTimeout(handle : int/*long*/) : void;
+	function setInterval(
+		handler : function(:Event):void/*Function*/
+	) : int/*long*/;
+	function setInterval(
+		handler : function(:Event):void/*Function*/,
+		timeout : int/*long*/
+	) : int/*long*/;
+	function setInterval(
+		handler : function(:Event):void/*Function*/,
+		timeout : int/*long*/,
+		args : variant/*any...*/
+	) : int/*long*/;
+	function setInterval(handler : string/*DOMString*/) : int/*long*/;
+	function setInterval(
+		handler : string/*DOMString*/,
+		timeout : int/*long*/
+	) : int/*long*/;
+	function setInterval(
+		handler : string/*DOMString*/,
+		timeout : int/*long*/,
+		args : variant/*any...*/
+	) : int/*long*/;
+	function clearInterval(handle : int/*long*/) : void;
+
+} // end of WindowTimers
+
 native class WindowModal {
 
 	__readonly__ var dialogArguments : variant/*any*/;
@@ -3560,7 +4529,58 @@ native class Navigator {
 
 	function yieldForStorageUpdates() : void;
 
+	// implements NavigatorGeolocation
+
+	__readonly__ var geolocation : Geolocation;
+
 } // end of Navigator
+
+native __fake__ class NavigatorID {
+
+	__readonly__ var appName : string/*DOMString*/;
+	__readonly__ var appVersion : string/*DOMString*/;
+	__readonly__ var platform : string/*DOMString*/;
+	__readonly__ var userAgent : string/*DOMString*/;
+
+} // end of NavigatorID
+
+native __fake__ class NavigatorContentUtils {
+
+	// content handler registration
+	function registerProtocolHandler(
+		scheme : string/*DOMString*/,
+		url : string/*DOMString*/,
+		title : string/*DOMString*/
+	) : void;
+	function registerContentHandler(
+		mimeType : string/*DOMString*/,
+		url : string/*DOMString*/,
+		title : string/*DOMString*/
+	) : void;
+	function isProtocolHandlerRegistered(
+		scheme : string/*DOMString*/,
+		url : string/*DOMString*/
+	) : string/*DOMString*/;
+	function isContentHandlerRegistered(
+		mimeType : string/*DOMString*/,
+		url : string/*DOMString*/
+	) : string/*DOMString*/;
+	function unregisterProtocolHandler(
+		scheme : string/*DOMString*/,
+		url : string/*DOMString*/
+	) : void;
+	function unregisterContentHandler(
+		mimeType : string/*DOMString*/,
+		url : string/*DOMString*/
+	) : void;
+
+} // end of NavigatorContentUtils
+
+native __fake__ class NavigatorStorageUtils {
+
+	function yieldForStorageUpdates() : void;
+
+} // end of NavigatorStorageUtils
 
 native class External {
 
@@ -3745,806 +4765,6 @@ native class HTMLFontElement extends HTMLElement {
 
 } // end of HTMLFontElement
 
-native __fake__ class XMLHttpRequestEventTarget extends EventTarget {
-
-	// event handlers
-	var onloadstart : function(:Event):void/*Function?*/;
-	var onprogress : function(:Event):void/*Function?*/;
-	var onabort : function(:Event):void/*Function?*/;
-	var onerror : function(:Event):void/*Function?*/;
-	var onload : function(:Event):void/*Function?*/;
-	var ontimeout : function(:Event):void/*Function?*/;
-	var onloadend : function(:Event):void/*Function?*/;
-
-} // end of XMLHttpRequestEventTarget
-
-native class XMLHttpRequestUpload extends XMLHttpRequestEventTarget {
-}
-
-native class XMLHttpRequest extends XMLHttpRequestEventTarget {
-
-	function constructor();
-
-	// event handler
-	var onreadystatechange : function(:Event):void/*Function?*/;
-	// states
-	static const     UNSENT : int/*unsigned short*/;
-	__readonly__ var UNSENT : int/*unsigned short*/;
-	static const     OPENED : int/*unsigned short*/;
-	__readonly__ var OPENED : int/*unsigned short*/;
-	static const     HEADERS_RECEIVED : int/*unsigned short*/;
-	__readonly__ var HEADERS_RECEIVED : int/*unsigned short*/;
-	static const     LOADING : int/*unsigned short*/;
-	__readonly__ var LOADING : int/*unsigned short*/;
-	static const     DONE : int/*unsigned short*/;
-	__readonly__ var DONE : int/*unsigned short*/;
-	__readonly__ var readyState : int/*unsigned short*/;
-	// request
-	function open(
-		method : string/*DOMString*/,
-		url : string/*DOMString*/
-	) : void;
-	function open(
-		method : string/*DOMString*/,
-		url : string/*DOMString*/,
-		async : boolean
-	) : void;
-	function open(
-		method : string/*DOMString*/,
-		url : string/*DOMString*/,
-		async : boolean,
-		user : string/*DOMString?*/
-	) : void;
-	function open(
-		method : string/*DOMString*/,
-		url : string/*DOMString*/,
-		async : boolean,
-		user : string/*DOMString?*/,
-		password : string/*DOMString?*/
-	) : void;
-	function setRequestHeader(
-		header : string/*DOMString*/,
-		value : string/*DOMString*/
-	) : void;
-	var timeout : int/*unsigned long*/;
-	var withCredentials : boolean;
-	__readonly__ var upload : XMLHttpRequestUpload;
-	function send() : void;
-	function send(data : ArrayBuffer) : void;
-	function send(data : Blob) : void;
-	function send(data : Document) : void;
-	function send(data : string/*DOMString?*/) : void;
-	function send(data : FormData) : void;
-	function abort() : void;
-	// response
-	__readonly__ var status : int/*unsigned short*/;
-	__readonly__ var statusText : string/*DOMString*/;
-	function getResponseHeader(
-		header : string/*DOMString*/
-	) : string/*DOMString*/;
-	function getAllResponseHeaders() : string/*DOMString*/;
-	function overrideMimeType(mime : string/*DOMString*/) : void;
-	var responseType : string/*XMLHttpRequestResponseType*/;
-	__readonly__ var response : variant/*any*/;
-	__readonly__ var responseText : string/*DOMString*/;
-	__readonly__ var responseXML : Document;
-
-} // end of XMLHttpRequest
-
-native class AnonXMLHttpRequest extends XMLHttpRequest {
-
-	function constructor();
-
-} // end of AnonXMLHttpRequest
-
-native class FormData {
-
-	function constructor();
-	function constructor(form : HTMLFormElement);
-
-	function append(name : string/*DOMString*/, value : Blob) : void;
-	function append(
-		name : string/*DOMString*/,
-		value : Blob,
-		filename : string/*DOMString*/
-	) : void;
-	function append(
-		name : string/*DOMString*/,
-		value : string/*DOMString*/
-	) : void;
-
-} // end of FormData
-
-native class MediaList {
-
-	var mediaText : string/*DOMString*/;
-	__readonly__ var length : int/*unsigned long*/;
-	function __native_index_operator__(
-		index : int/*unsigned long*/
-	) : MayBeUndefined.<string/*DOMString*/>;
-	/* getter */
-	function item(
-		index : int/*unsigned long*/
-	) : MayBeUndefined.<string/*DOMString*/>;
-	function appendMedium(medium : string/*DOMString*/) : void;
-	function deleteMedium(medium : string/*DOMString*/) : void;
-
-} // end of MediaList
-
-native class StyleSheet {
-
-	__readonly__ var type : string/*DOMString*/;
-	__readonly__ var href : string/*DOMString*/;
-	__readonly__ var ownerNode : Node;
-	__readonly__ var parentStyleSheet : StyleSheet;
-	__readonly__ var title : string/*DOMString*/;
-	__readonly__ var media : MediaList;
-	var disabled : boolean;
-
-} // end of StyleSheet
-
-native class CSSStyleSheet extends StyleSheet {
-
-	__readonly__ var ownerRule : CSSRule;
-	__readonly__ var cssRules : CSSRule[]/*CSSRuleList*/;
-	function insertRule(
-		rule : string/*DOMString*/,
-		index : int/*unsigned long*/
-	) : int/*unsigned long*/;
-	function deleteRule(index : int/*unsigned long*/) : void;
-
-} // end of CSSStyleSheet
-
-native class CSSRule {
-
-	// Types
-	static const     STYLE_RULE : int/*unsigned short*/;
-	__readonly__ var STYLE_RULE : int/*unsigned short*/;
-	static const     IMPORT_RULE : int/*unsigned short*/;
-	__readonly__ var IMPORT_RULE : int/*unsigned short*/;
-	static const     MEDIA_RULE : int/*unsigned short*/;
-	__readonly__ var MEDIA_RULE : int/*unsigned short*/;
-	static const     FONT_FACE_RULE : int/*unsigned short*/;
-	__readonly__ var FONT_FACE_RULE : int/*unsigned short*/;
-	static const     PAGE_RULE : int/*unsigned short*/;
-	__readonly__ var PAGE_RULE : int/*unsigned short*/;
-	static const     NAMESPACE_RULE : int/*unsigned short*/;
-	__readonly__ var NAMESPACE_RULE : int/*unsigned short*/;
-	__readonly__ var type : int/*unsigned short*/;
-	// Parsing and serialization
-	var cssText : string/*DOMString*/;
-	// Context
-	__readonly__ var parentRule : CSSRule;
-	__readonly__ var parentStyleSheet : CSSStyleSheet;
-
-} // end of CSSRule
-
-native class CSSStyleRule extends CSSRule {
-
-	var selectorText : string/*DOMString*/;
-	__readonly__ var style : CSSStyleDeclaration;
-
-} // end of CSSStyleRule
-
-native class CSSImportRule extends CSSRule {
-
-	__readonly__ var href : string/*DOMString*/;
-	__readonly__ var media : MediaList;
-	__readonly__ var styleSheet : CSSStyleSheet;
-
-} // end of CSSImportRule
-
-native class CSSMediaRule extends CSSRule {
-
-	__readonly__ var media : MediaList;
-	__readonly__ var cssRules : CSSRule[]/*CSSRuleList*/;
-	function insertRule(
-		rule : string/*DOMString*/,
-		index : int/*unsigned long*/
-	) : int/*unsigned long*/;
-	function deleteRule(index : int/*unsigned long*/) : void;
-
-} // end of CSSMediaRule
-
-native class CSSFontFaceRule extends CSSRule {
-
-	__readonly__ var style : CSSStyleDeclaration;
-
-} // end of CSSFontFaceRule
-
-native class CSSPageRule extends CSSRule {
-
-	var selectorText : string/*DOMString*/;
-	__readonly__ var style : CSSStyleDeclaration;
-
-} // end of CSSPageRule
-
-native class CSSNamespaceRule extends CSSRule {
-
-	__readonly__ var namespaceURI : string/*DOMString*/;
-	__readonly__ var prefix : string/*DOMString?*/;
-
-} // end of CSSNamespaceRule
-
-native class CSSStyleDeclaration {
-
-	var cssText : string/*DOMString*/;
-	__readonly__ var length : int/*unsigned long*/;
-	function item(index : int/*unsigned long*/) : string/*DOMString*/;
-	function getPropertyValue(
-		property : string/*DOMString*/
-	) : string/*DOMString*/;
-	function getPropertyPriority(
-		property : string/*DOMString*/
-	) : string/*DOMString*/;
-	function setProperty(
-		property : string/*DOMString*/,
-		value : string/*DOMString*/
-	) : void;
-	function setProperty(
-		property : string/*DOMString*/,
-		value : string/*DOMString*/,
-		priority : string/*DOMString*/
-	) : void;
-	function removeProperty(
-		property : string/*DOMString*/
-	) : string/*DOMString*/;
-	__readonly__ var parentRule : CSSRule;
-	// CSS Properties
-	var azimuth : string/*DOMString*/;
-	var background : string/*DOMString*/;
-	var backgroundAttachment : string/*DOMString*/;
-	var backgroundColor : string/*DOMString*/;
-	var backgroundImage : string/*DOMString*/;
-	var backgroundPosition : string/*DOMString*/;
-	var backgroundRepeat : string/*DOMString*/;
-	var border : string/*DOMString*/;
-	var borderCollapse : string/*DOMString*/;
-	var borderColor : string/*DOMString*/;
-	var borderSpacing : string/*DOMString*/;
-	var borderStyle : string/*DOMString*/;
-	var borderTop : string/*DOMString*/;
-	var borderRight : string/*DOMString*/;
-	var borderBottom : string/*DOMString*/;
-	var borderLeft : string/*DOMString*/;
-	var borderTopColor : string/*DOMString*/;
-	var borderRightColor : string/*DOMString*/;
-	var borderBottomColor : string/*DOMString*/;
-	var borderLeftColor : string/*DOMString*/;
-	var borderTopStyle : string/*DOMString*/;
-	var borderRightStyle : string/*DOMString*/;
-	var borderBottomStyle : string/*DOMString*/;
-	var borderLeftStyle : string/*DOMString*/;
-	var borderTopWidth : string/*DOMString*/;
-	var borderRightWidth : string/*DOMString*/;
-	var borderBottomWidth : string/*DOMString*/;
-	var borderLeftWidth : string/*DOMString*/;
-	var borderWidth : string/*DOMString*/;
-	var bottom : string/*DOMString*/;
-	var captionSide : string/*DOMString*/;
-	var clear : string/*DOMString*/;
-	var clip : string/*DOMString*/;
-	var color : string/*DOMString*/;
-	var content : string/*DOMString*/;
-	var counterIncrement : string/*DOMString*/;
-	var counterReset : string/*DOMString*/;
-	var cue : string/*DOMString*/;
-	var cueAfter : string/*DOMString*/;
-	var cueBefore : string/*DOMString*/;
-	var cursor : string/*DOMString*/;
-	var direction : string/*DOMString*/;
-	var display : string/*DOMString*/;
-	var elevation : string/*DOMString*/;
-	var emptyCells : string/*DOMString*/;
-	var cssFloat : string/*DOMString*/;
-	var font : string/*DOMString*/;
-	var fontFamily : string/*DOMString*/;
-	var fontSize : string/*DOMString*/;
-	var fontSizeAdjust : string/*DOMString*/;
-	var fontStretch : string/*DOMString*/;
-	var fontStyle : string/*DOMString*/;
-	var fontVariant : string/*DOMString*/;
-	var fontWeight : string/*DOMString*/;
-	var height : string/*DOMString*/;
-	var left : string/*DOMString*/;
-	var letterSpacing : string/*DOMString*/;
-	var lineHeight : string/*DOMString*/;
-	var listStyle : string/*DOMString*/;
-	var listStyleImage : string/*DOMString*/;
-	var listStylePosition : string/*DOMString*/;
-	var listStyleType : string/*DOMString*/;
-	var margin : string/*DOMString*/;
-	var marginTop : string/*DOMString*/;
-	var marginRight : string/*DOMString*/;
-	var marginBottom : string/*DOMString*/;
-	var marginLeft : string/*DOMString*/;
-	var markerOffset : string/*DOMString*/;
-	var marks : string/*DOMString*/;
-	var maxHeight : string/*DOMString*/;
-	var maxWidth : string/*DOMString*/;
-	var minHeight : string/*DOMString*/;
-	var minWidth : string/*DOMString*/;
-	var orphans : string/*DOMString*/;
-	var outline : string/*DOMString*/;
-	var outlineColor : string/*DOMString*/;
-	var outlineStyle : string/*DOMString*/;
-	var outlineWidth : string/*DOMString*/;
-	var overflow : string/*DOMString*/;
-	var padding : string/*DOMString*/;
-	var paddingTop : string/*DOMString*/;
-	var paddingRight : string/*DOMString*/;
-	var paddingBottom : string/*DOMString*/;
-	var paddingLeft : string/*DOMString*/;
-	var page : string/*DOMString*/;
-	var pageBreakAfter : string/*DOMString*/;
-	var pageBreakBefore : string/*DOMString*/;
-	var pageBreakInside : string/*DOMString*/;
-	var pause : string/*DOMString*/;
-	var pauseAfter : string/*DOMString*/;
-	var pauseBefore : string/*DOMString*/;
-	var pitch : string/*DOMString*/;
-	var pitchRange : string/*DOMString*/;
-	var playDuring : string/*DOMString*/;
-	var position : string/*DOMString*/;
-	var quotes : string/*DOMString*/;
-	var richness : string/*DOMString*/;
-	var right : string/*DOMString*/;
-	var size : string/*DOMString*/;
-	var speak : string/*DOMString*/;
-	var speakHeader : string/*DOMString*/;
-	var speakNumeral : string/*DOMString*/;
-	var speakPunctuation : string/*DOMString*/;
-	var speechRate : string/*DOMString*/;
-	var stress : string/*DOMString*/;
-	var tableLayout : string/*DOMString*/;
-	var textAlign : string/*DOMString*/;
-	var textDecoration : string/*DOMString*/;
-	var textIndent : string/*DOMString*/;
-	var textShadow : string/*DOMString*/;
-	var textTransform : string/*DOMString*/;
-	var top : string/*DOMString*/;
-	var unicodeBidi : string/*DOMString*/;
-	var verticalAlign : string/*DOMString*/;
-	var visibility : string/*DOMString*/;
-	var voiceFamily : string/*DOMString*/;
-	var volume : string/*DOMString*/;
-	var whiteSpace : string/*DOMString*/;
-	var widows : string/*DOMString*/;
-	var width : string/*DOMString*/;
-	var wordSpacing : string/*DOMString*/;
-	var zIndex : string/*DOMString*/;
-
-	var alignmentBaseline : MayBeUndefined.<string>;
-	var backgroundClip : MayBeUndefined.<string>;
-	var backgroundOrigin : MayBeUndefined.<string>;
-	var backgroundPositionX : MayBeUndefined.<string>;
-	var backgroundPositionY : MayBeUndefined.<string>;
-	var backgroundRepeatX : MayBeUndefined.<string>;
-	var backgroundRepeatY : MayBeUndefined.<string>;
-	var backgroundSize : MayBeUndefined.<string>;
-	var baselineShift : MayBeUndefined.<string>;
-	var borderBottomLeftRadius : MayBeUndefined.<string>;
-	var borderBottomRightRadius : MayBeUndefined.<string>;
-	var borderImage : MayBeUndefined.<string>;
-	var borderImageOutset : MayBeUndefined.<string>;
-	var borderImageRepeat : MayBeUndefined.<string>;
-	var borderImageSlice : MayBeUndefined.<string>;
-	var borderImageSource : MayBeUndefined.<string>;
-	var borderImageWidth : MayBeUndefined.<string>;
-	var borderRadius : MayBeUndefined.<string>;
-	var borderTopLeftRadius : MayBeUndefined.<string>;
-	var borderTopRightRadius : MayBeUndefined.<string>;
-	var boxShadow : MayBeUndefined.<string>;
-	var boxSizing : MayBeUndefined.<string>;
-	var clipPath : MayBeUndefined.<string>;
-	var clipRule : MayBeUndefined.<string>;
-	var colorInterpolation : MayBeUndefined.<string>;
-	var colorInterpolationFilters : MayBeUndefined.<string>;
-	var colorProfile : MayBeUndefined.<string>;
-	var colorRendering : MayBeUndefined.<string>;
-	var dominantBaseline : MayBeUndefined.<string>;
-	var enableBackground : MayBeUndefined.<string>;
-	var fill : MayBeUndefined.<string>;
-	var fillOpacity : MayBeUndefined.<string>;
-	var fillRule : MayBeUndefined.<string>;
-	var filter : MayBeUndefined.<string>;
-	var float : MayBeUndefined.<string>;
-	var floodColor : MayBeUndefined.<string>;
-	var floodOpacity : MayBeUndefined.<string>;
-	var glyphOrientationHorizontal : MayBeUndefined.<string>;
-	var glyphOrientationVertical : MayBeUndefined.<string>;
-	var imageRendering : MayBeUndefined.<string>;
-	var kerning : MayBeUndefined.<string>;
-	var lightingColor : MayBeUndefined.<string>;
-	var marker : MayBeUndefined.<string>;
-	var markerEnd : MayBeUndefined.<string>;
-	var markerMid : MayBeUndefined.<string>;
-	var markerStart : MayBeUndefined.<string>;
-	var mask : MayBeUndefined.<string>;
-	var opacity : MayBeUndefined.<string>;
-	var outlineOffset : MayBeUndefined.<string>;
-	var overflowX : MayBeUndefined.<string>;
-	var overflowY : MayBeUndefined.<string>;
-	var pointerEvents : MayBeUndefined.<string>;
-	var resize : MayBeUndefined.<string>;
-	var shapeRendering : MayBeUndefined.<string>;
-	var src : MayBeUndefined.<string>;
-	var stopColor : MayBeUndefined.<string>;
-	var stopOpacity : MayBeUndefined.<string>;
-	var stroke : MayBeUndefined.<string>;
-	var strokeDasharray : MayBeUndefined.<string>;
-	var strokeDashoffset : MayBeUndefined.<string>;
-	var strokeLinecap : MayBeUndefined.<string>;
-	var strokeLinejoin : MayBeUndefined.<string>;
-	var strokeMiterlimit : MayBeUndefined.<string>;
-	var strokeOpacity : MayBeUndefined.<string>;
-	var strokeWidth : MayBeUndefined.<string>;
-	var textAnchor : MayBeUndefined.<string>;
-	var textLineThrough : MayBeUndefined.<string>;
-	var textLineThroughColor : MayBeUndefined.<string>;
-	var textLineThroughMode : MayBeUndefined.<string>;
-	var textLineThroughStyle : MayBeUndefined.<string>;
-	var textLineThroughWidth : MayBeUndefined.<string>;
-	var textOverflow : MayBeUndefined.<string>;
-	var textOverline : MayBeUndefined.<string>;
-	var textOverlineColor : MayBeUndefined.<string>;
-	var textOverlineMode : MayBeUndefined.<string>;
-	var textOverlineStyle : MayBeUndefined.<string>;
-	var textOverlineWidth : MayBeUndefined.<string>;
-	var textRendering : MayBeUndefined.<string>;
-	var textUnderline : MayBeUndefined.<string>;
-	var textUnderlineColor : MayBeUndefined.<string>;
-	var textUnderlineMode : MayBeUndefined.<string>;
-	var textUnderlineStyle : MayBeUndefined.<string>;
-	var textUnderlineWidth : MayBeUndefined.<string>;
-	var unicodeRange : MayBeUndefined.<string>;
-	var vectorEffect : MayBeUndefined.<string>;
-	var webkitAnimation : MayBeUndefined.<string>;
-	var webkitAnimationDelay : MayBeUndefined.<string>;
-	var webkitAnimationDirection : MayBeUndefined.<string>;
-	var webkitAnimationDuration : MayBeUndefined.<string>;
-	var webkitAnimationFillMode : MayBeUndefined.<string>;
-	var webkitAnimationIterationCount : MayBeUndefined.<string>;
-	var webkitAnimationName : MayBeUndefined.<string>;
-	var webkitAnimationPlayState : MayBeUndefined.<string>;
-	var webkitAnimationTimingFunction : MayBeUndefined.<string>;
-	var webkitAppearance : MayBeUndefined.<string>;
-	var webkitAspectRatio : MayBeUndefined.<string>;
-	var webkitBackfaceVisibility : MayBeUndefined.<string>;
-	var webkitBackgroundClip : MayBeUndefined.<string>;
-	var webkitBackgroundComposite : MayBeUndefined.<string>;
-	var webkitBackgroundOrigin : MayBeUndefined.<string>;
-	var webkitBackgroundSize : MayBeUndefined.<string>;
-	var webkitBorderAfter : MayBeUndefined.<string>;
-	var webkitBorderAfterColor : MayBeUndefined.<string>;
-	var webkitBorderAfterStyle : MayBeUndefined.<string>;
-	var webkitBorderAfterWidth : MayBeUndefined.<string>;
-	var webkitBorderBefore : MayBeUndefined.<string>;
-	var webkitBorderBeforeColor : MayBeUndefined.<string>;
-	var webkitBorderBeforeStyle : MayBeUndefined.<string>;
-	var webkitBorderBeforeWidth : MayBeUndefined.<string>;
-	var webkitBorderEnd : MayBeUndefined.<string>;
-	var webkitBorderEndColor : MayBeUndefined.<string>;
-	var webkitBorderEndStyle : MayBeUndefined.<string>;
-	var webkitBorderEndWidth : MayBeUndefined.<string>;
-	var webkitBorderFit : MayBeUndefined.<string>;
-	var webkitBorderHorizontalSpacing : MayBeUndefined.<string>;
-	var webkitBorderImage : MayBeUndefined.<string>;
-	var webkitBorderRadius : MayBeUndefined.<string>;
-	var webkitBorderStart : MayBeUndefined.<string>;
-	var webkitBorderStartColor : MayBeUndefined.<string>;
-	var webkitBorderStartStyle : MayBeUndefined.<string>;
-	var webkitBorderStartWidth : MayBeUndefined.<string>;
-	var webkitBorderVerticalSpacing : MayBeUndefined.<string>;
-	var webkitBoxAlign : MayBeUndefined.<string>;
-	var webkitBoxDirection : MayBeUndefined.<string>;
-	var webkitBoxFlex : MayBeUndefined.<string>;
-	var webkitBoxFlexGroup : MayBeUndefined.<string>;
-	var webkitBoxLines : MayBeUndefined.<string>;
-	var webkitBoxOrdinalGroup : MayBeUndefined.<string>;
-	var webkitBoxOrient : MayBeUndefined.<string>;
-	var webkitBoxPack : MayBeUndefined.<string>;
-	var webkitBoxReflect : MayBeUndefined.<string>;
-	var webkitBoxShadow : MayBeUndefined.<string>;
-	var webkitColorCorrection : MayBeUndefined.<string>;
-	var webkitColumnAxis : MayBeUndefined.<string>;
-	var webkitColumnBreakAfter : MayBeUndefined.<string>;
-	var webkitColumnBreakBefore : MayBeUndefined.<string>;
-	var webkitColumnBreakInside : MayBeUndefined.<string>;
-	var webkitColumnCount : MayBeUndefined.<string>;
-	var webkitColumnGap : MayBeUndefined.<string>;
-	var webkitColumnRule : MayBeUndefined.<string>;
-	var webkitColumnRuleColor : MayBeUndefined.<string>;
-	var webkitColumnRuleStyle : MayBeUndefined.<string>;
-	var webkitColumnRuleWidth : MayBeUndefined.<string>;
-	var webkitColumnSpan : MayBeUndefined.<string>;
-	var webkitColumnWidth : MayBeUndefined.<string>;
-	var webkitColumns : MayBeUndefined.<string>;
-	var webkitFilter : MayBeUndefined.<string>;
-	var webkitFlexAlign : MayBeUndefined.<string>;
-	var webkitFlexDirection : MayBeUndefined.<string>;
-	var webkitFlexFlow : MayBeUndefined.<string>;
-	var webkitFlexItemAlign : MayBeUndefined.<string>;
-	var webkitFlexLinePack : MayBeUndefined.<string>;
-	var webkitFlexOrder : MayBeUndefined.<string>;
-	var webkitFlexPack : MayBeUndefined.<string>;
-	var webkitFlexWrap : MayBeUndefined.<string>;
-	var webkitFlowFrom : MayBeUndefined.<string>;
-	var webkitFlowInto : MayBeUndefined.<string>;
-	var webkitFontFeatureSettings : MayBeUndefined.<string>;
-	var webkitFontKerning : MayBeUndefined.<string>;
-	var webkitFontSizeDelta : MayBeUndefined.<string>;
-	var webkitFontSmoothing : MayBeUndefined.<string>;
-	var webkitFontVariantLigatures : MayBeUndefined.<string>;
-	var webkitHighlight : MayBeUndefined.<string>;
-	var webkitHyphenateCharacter : MayBeUndefined.<string>;
-	var webkitHyphenateLimitAfter : MayBeUndefined.<string>;
-	var webkitHyphenateLimitBefore : MayBeUndefined.<string>;
-	var webkitHyphenateLimitLines : MayBeUndefined.<string>;
-	var webkitHyphens : MayBeUndefined.<string>;
-	var webkitLineAlign : MayBeUndefined.<string>;
-	var webkitLineBoxContain : MayBeUndefined.<string>;
-	var webkitLineBreak : MayBeUndefined.<string>;
-	var webkitLineClamp : MayBeUndefined.<string>;
-	var webkitLineGrid : MayBeUndefined.<string>;
-	var webkitLineSnap : MayBeUndefined.<string>;
-	var webkitLocale : MayBeUndefined.<string>;
-	var webkitLogicalHeight : MayBeUndefined.<string>;
-	var webkitLogicalWidth : MayBeUndefined.<string>;
-	var webkitMarginAfter : MayBeUndefined.<string>;
-	var webkitMarginAfterCollapse : MayBeUndefined.<string>;
-	var webkitMarginBefore : MayBeUndefined.<string>;
-	var webkitMarginBeforeCollapse : MayBeUndefined.<string>;
-	var webkitMarginBottomCollapse : MayBeUndefined.<string>;
-	var webkitMarginCollapse : MayBeUndefined.<string>;
-	var webkitMarginEnd : MayBeUndefined.<string>;
-	var webkitMarginStart : MayBeUndefined.<string>;
-	var webkitMarginTopCollapse : MayBeUndefined.<string>;
-	var webkitMarquee : MayBeUndefined.<string>;
-	var webkitMarqueeDirection : MayBeUndefined.<string>;
-	var webkitMarqueeIncrement : MayBeUndefined.<string>;
-	var webkitMarqueeRepetition : MayBeUndefined.<string>;
-	var webkitMarqueeSpeed : MayBeUndefined.<string>;
-	var webkitMarqueeStyle : MayBeUndefined.<string>;
-	var webkitMask : MayBeUndefined.<string>;
-	var webkitMaskAttachment : MayBeUndefined.<string>;
-	var webkitMaskBoxImage : MayBeUndefined.<string>;
-	var webkitMaskBoxImageOutset : MayBeUndefined.<string>;
-	var webkitMaskBoxImageRepeat : MayBeUndefined.<string>;
-	var webkitMaskBoxImageSlice : MayBeUndefined.<string>;
-	var webkitMaskBoxImageSource : MayBeUndefined.<string>;
-	var webkitMaskBoxImageWidth : MayBeUndefined.<string>;
-	var webkitMaskClip : MayBeUndefined.<string>;
-	var webkitMaskComposite : MayBeUndefined.<string>;
-	var webkitMaskImage : MayBeUndefined.<string>;
-	var webkitMaskOrigin : MayBeUndefined.<string>;
-	var webkitMaskPosition : MayBeUndefined.<string>;
-	var webkitMaskPositionX : MayBeUndefined.<string>;
-	var webkitMaskPositionY : MayBeUndefined.<string>;
-	var webkitMaskRepeat : MayBeUndefined.<string>;
-	var webkitMaskRepeatX : MayBeUndefined.<string>;
-	var webkitMaskRepeatY : MayBeUndefined.<string>;
-	var webkitMaskSize : MayBeUndefined.<string>;
-	var webkitMatchNearestMailBlockquoteColor : MayBeUndefined.<string>;
-	var webkitMaxLogicalHeight : MayBeUndefined.<string>;
-	var webkitMaxLogicalWidth : MayBeUndefined.<string>;
-	var webkitMinLogicalHeight : MayBeUndefined.<string>;
-	var webkitMinLogicalWidth : MayBeUndefined.<string>;
-	var webkitNbspMode : MayBeUndefined.<string>;
-	var webkitOverflowScrolling : MayBeUndefined.<string>;
-	var webkitPaddingAfter : MayBeUndefined.<string>;
-	var webkitPaddingBefore : MayBeUndefined.<string>;
-	var webkitPaddingEnd : MayBeUndefined.<string>;
-	var webkitPaddingStart : MayBeUndefined.<string>;
-	var webkitPerspective : MayBeUndefined.<string>;
-	var webkitPerspectiveOrigin : MayBeUndefined.<string>;
-	var webkitPerspectiveOriginX : MayBeUndefined.<string>;
-	var webkitPerspectiveOriginY : MayBeUndefined.<string>;
-	var webkitPrintColorAdjust : MayBeUndefined.<string>;
-	var webkitRegionBreakAfter : MayBeUndefined.<string>;
-	var webkitRegionBreakBefore : MayBeUndefined.<string>;
-	var webkitRegionBreakInside : MayBeUndefined.<string>;
-	var webkitRegionOverflow : MayBeUndefined.<string>;
-	var webkitRtlOrdering : MayBeUndefined.<string>;
-	var webkitSvgShadow : MayBeUndefined.<string>;
-	var webkitTapHighlightColor : MayBeUndefined.<string>;
-	var webkitTextCombine : MayBeUndefined.<string>;
-	var webkitTextDecorationsInEffect : MayBeUndefined.<string>;
-	var webkitTextEmphasis : MayBeUndefined.<string>;
-	var webkitTextEmphasisColor : MayBeUndefined.<string>;
-	var webkitTextEmphasisPosition : MayBeUndefined.<string>;
-	var webkitTextEmphasisStyle : MayBeUndefined.<string>;
-	var webkitTextFillColor : MayBeUndefined.<string>;
-	var webkitTextOrientation : MayBeUndefined.<string>;
-	var webkitTextSecurity : MayBeUndefined.<string>;
-	var webkitTextSizeAdjust : MayBeUndefined.<string>;
-	var webkitTextStroke : MayBeUndefined.<string>;
-	var webkitTextStrokeColor : MayBeUndefined.<string>;
-	var webkitTextStrokeWidth : MayBeUndefined.<string>;
-	var webkitTransform : MayBeUndefined.<string>;
-	var webkitTransformOrigin : MayBeUndefined.<string>;
-	var webkitTransformOriginX : MayBeUndefined.<string>;
-	var webkitTransformOriginY : MayBeUndefined.<string>;
-	var webkitTransformOriginZ : MayBeUndefined.<string>;
-	var webkitTransformStyle : MayBeUndefined.<string>;
-	var webkitTransition : MayBeUndefined.<string>;
-	var webkitTransitionDelay : MayBeUndefined.<string>;
-	var webkitTransitionDuration : MayBeUndefined.<string>;
-	var webkitTransitionProperty : MayBeUndefined.<string>;
-	var webkitTransitionTimingFunction : MayBeUndefined.<string>;
-	var webkitUserDrag : MayBeUndefined.<string>;
-	var webkitUserModify : MayBeUndefined.<string>;
-	var webkitUserSelect : MayBeUndefined.<string>;
-	var webkitWrap : MayBeUndefined.<string>;
-	var webkitWrapFlow : MayBeUndefined.<string>;
-	var webkitWrapMargin : MayBeUndefined.<string>;
-	var webkitWrapPadding : MayBeUndefined.<string>;
-	var webkitWrapShapeInside : MayBeUndefined.<string>;
-	var webkitWrapShapeOutside : MayBeUndefined.<string>;
-	var webkitWrapThrough : MayBeUndefined.<string>;
-	var webkitWritingMode : MayBeUndefined.<string>;
-	var wordBreak : MayBeUndefined.<string>;
-	var wordWrap : MayBeUndefined.<string>;
-	var writingMode : MayBeUndefined.<string>;
-	var zoom : MayBeUndefined.<string>;
-
-	var MozAnimation : MayBeUndefined.<string>;
-	var MozAnimationDelay : MayBeUndefined.<string>;
-	var MozAnimationDirection : MayBeUndefined.<string>;
-	var MozAnimationDuration : MayBeUndefined.<string>;
-	var MozAnimationFillMode : MayBeUndefined.<string>;
-	var MozAnimationIterationCount : MayBeUndefined.<string>;
-	var MozAnimationName : MayBeUndefined.<string>;
-	var MozAnimationPlayState : MayBeUndefined.<string>;
-	var MozAnimationTimingFunction : MayBeUndefined.<string>;
-	var MozAppearance : MayBeUndefined.<string>;
-	var MozBackfaceVisibility : MayBeUndefined.<string>;
-	var MozBackgroundInlinePolicy : MayBeUndefined.<string>;
-	var MozBinding : MayBeUndefined.<string>;
-	var MozBorderBottomColors : MayBeUndefined.<string>;
-	var MozBorderEnd : MayBeUndefined.<string>;
-	var MozBorderEndColor : MayBeUndefined.<string>;
-	var MozBorderEndStyle : MayBeUndefined.<string>;
-	var MozBorderEndWidth : MayBeUndefined.<string>;
-	var MozBorderImage : MayBeUndefined.<string>;
-	var MozBorderLeftColors : MayBeUndefined.<string>;
-	var MozBorderRightColors : MayBeUndefined.<string>;
-	var MozBorderStart : MayBeUndefined.<string>;
-	var MozBorderStartColor : MayBeUndefined.<string>;
-	var MozBorderStartStyle : MayBeUndefined.<string>;
-	var MozBorderStartWidth : MayBeUndefined.<string>;
-	var MozBorderTopColors : MayBeUndefined.<string>;
-	var MozBoxAlign : MayBeUndefined.<string>;
-	var MozBoxDirection : MayBeUndefined.<string>;
-	var MozBoxFlex : MayBeUndefined.<string>;
-	var MozBoxOrdinalGroup : MayBeUndefined.<string>;
-	var MozBoxOrient : MayBeUndefined.<string>;
-	var MozBoxPack : MayBeUndefined.<string>;
-	var MozBoxSizing : MayBeUndefined.<string>;
-	var MozColumnCount : MayBeUndefined.<string>;
-	var MozColumnGap : MayBeUndefined.<string>;
-	var MozColumnRule : MayBeUndefined.<string>;
-	var MozColumnRuleColor : MayBeUndefined.<string>;
-	var MozColumnRuleStyle : MayBeUndefined.<string>;
-	var MozColumnRuleWidth : MayBeUndefined.<string>;
-	var MozColumnWidth : MayBeUndefined.<string>;
-	var MozColumns : MayBeUndefined.<string>;
-	var MozFloatEdge : MayBeUndefined.<string>;
-	var MozFontFeatureSettings : MayBeUndefined.<string>;
-	var MozFontLanguageOverride : MayBeUndefined.<string>;
-	var MozForceBrokenImageIcon : MayBeUndefined.<string>;
-	var MozHyphens : MayBeUndefined.<string>;
-	var MozImageRegion : MayBeUndefined.<string>;
-	var MozMarginEnd : MayBeUndefined.<string>;
-	var MozMarginStart : MayBeUndefined.<string>;
-	var MozOpacity : MayBeUndefined.<string>;
-	var MozOrient : MayBeUndefined.<string>;
-	var MozOutline : MayBeUndefined.<string>;
-	var MozOutlineColor : MayBeUndefined.<string>;
-	var MozOutlineOffset : MayBeUndefined.<string>;
-	var MozOutlineRadius : MayBeUndefined.<string>;
-	var MozOutlineRadiusBottomleft : MayBeUndefined.<string>;
-	var MozOutlineRadiusBottomright : MayBeUndefined.<string>;
-	var MozOutlineRadiusTopleft : MayBeUndefined.<string>;
-	var MozOutlineRadiusTopright : MayBeUndefined.<string>;
-	var MozOutlineStyle : MayBeUndefined.<string>;
-	var MozOutlineWidth : MayBeUndefined.<string>;
-	var MozPaddingEnd : MayBeUndefined.<string>;
-	var MozPaddingStart : MayBeUndefined.<string>;
-	var MozPerspective : MayBeUndefined.<string>;
-	var MozPerspectiveOrigin : MayBeUndefined.<string>;
-	var MozStackSizing : MayBeUndefined.<string>;
-	var MozTabSize : MayBeUndefined.<string>;
-	var MozTextAlignLast : MayBeUndefined.<string>;
-	var MozTextBlink : MayBeUndefined.<string>;
-	var MozTextDecorationColor : MayBeUndefined.<string>;
-	var MozTextDecorationLine : MayBeUndefined.<string>;
-	var MozTextDecorationStyle : MayBeUndefined.<string>;
-	var MozTextSizeAdjust : MayBeUndefined.<string>;
-	var MozTransform : MayBeUndefined.<string>;
-	var MozTransformOrigin : MayBeUndefined.<string>;
-	var MozTransformStyle : MayBeUndefined.<string>;
-	var MozTransition : MayBeUndefined.<string>;
-	var MozTransitionDelay : MayBeUndefined.<string>;
-	var MozTransitionDuration : MayBeUndefined.<string>;
-	var MozTransitionProperty : MayBeUndefined.<string>;
-	var MozTransitionTimingFunction : MayBeUndefined.<string>;
-	var MozUserFocus : MayBeUndefined.<string>;
-	var MozUserInput : MayBeUndefined.<string>;
-	var MozUserModify : MayBeUndefined.<string>;
-	var MozUserSelect : MayBeUndefined.<string>;
-	var MozWindowShadow : MayBeUndefined.<string>;
-	var imeMode : MayBeUndefined.<string>;
-
-} // end of CSSStyleDeclaration
-
-native class ElementCSSInlineStyle {
-
-	__readonly__ var style : CSSStyleDeclaration;
-
-} // end of ElementCSSInlineStyle
-
-native class MediaQueryList {
-
-	__readonly__ var media : string/*DOMString*/;
-	__readonly__ var matches : boolean;
-	function addListener(
-		listener : function(:MediaQueryList):void/*MediaQueryListListener*/
-	) : void;
-	function removeListener(
-		listener : function(:MediaQueryList):void/*MediaQueryListListener*/
-	) : void;
-
-} // end of MediaQueryList
-
-native class MediaQueryListListener {
-
-	function handleChange(mql : MediaQueryList) : void;
-
-} // end of MediaQueryListListener
-
-native class Screen {
-
-	__readonly__ var availWidth : int/*unsigned long*/;
-	__readonly__ var availHeight : int/*unsigned long*/;
-	__readonly__ var width : int/*unsigned long*/;
-	__readonly__ var height : int/*unsigned long*/;
-	__readonly__ var colorDepth : int/*unsigned long*/;
-	__readonly__ var pixelDepth : int/*unsigned long*/;
-
-} // end of Screen
-
-native class CaretPosition {
-
-	__readonly__ var offsetNode : Node;
-	__readonly__ var offset : int/*unsigned long*/;
-
-} // end of CaretPosition
-
-native class ClientRectList {
-
-	__readonly__ var length : int/*unsigned long*/;
-	function __native_index_operator__(
-		index : int/*unsigned long*/
-	) : MayBeUndefined.<ClientRect>;
-	/* getter */
-	function item(
-		index : int/*unsigned long*/
-	) : MayBeUndefined.<ClientRect>;
-
-} // end of ClientRectList
-
-native class ClientRect {
-
-	__readonly__ var top : number/*float*/;
-	__readonly__ var right : number/*float*/;
-	__readonly__ var bottom : number/*float*/;
-	__readonly__ var left : number/*float*/;
-	__readonly__ var width : number/*float*/;
-	__readonly__ var height : number/*float*/;
-
-} // end of ClientRect
-
 native class FileList {
 
 	function __native_index_operator__(
@@ -4644,6 +4864,276 @@ native class URL {
 
 native class webkitURL extends URL {
 }
+
+native class Touch {
+
+	__readonly__ var identifier : int/*long*/;
+	__readonly__ var target : EventTarget;
+	__readonly__ var screenX : int/*long*/;
+	__readonly__ var screenY : int/*long*/;
+	__readonly__ var clientX : int/*long*/;
+	__readonly__ var clientY : int/*long*/;
+	__readonly__ var pageX : int/*long*/;
+	__readonly__ var pageY : int/*long*/;
+
+} // end of Touch
+
+native class TouchList {
+
+	__readonly__ var length : int/*unsigned long*/;
+	function __native_index_operator__(
+		index : int/*unsigned long*/
+	) : MayBeUndefined.<Touch>;
+	/* getter */
+	function item(
+		index : int/*unsigned long*/
+	) : MayBeUndefined.<Touch>;
+	function identifiedTouch(identifier : int/*long*/) : Touch;
+
+} // end of TouchList
+
+native class TouchEvent extends UIEvent {
+
+	__readonly__ var touches : TouchList;
+	__readonly__ var targetTouches : TouchList;
+	__readonly__ var changedTouches : TouchList;
+	__readonly__ var altKey : boolean;
+	__readonly__ var metaKey : boolean;
+	__readonly__ var ctrlKey : boolean;
+	__readonly__ var shiftKey : boolean;
+
+} // end of TouchEvent
+
+native class WebSocket extends EventTarget {
+
+	__readonly__ var url : string/*DOMString*/;
+	// ready state
+	static const     CONNECTING : int/*unsigned short*/;
+	__readonly__ var CONNECTING : int/*unsigned short*/;
+	static const     OPEN : int/*unsigned short*/;
+	__readonly__ var OPEN : int/*unsigned short*/;
+	static const     CLOSING : int/*unsigned short*/;
+	__readonly__ var CLOSING : int/*unsigned short*/;
+	static const     CLOSED : int/*unsigned short*/;
+	__readonly__ var CLOSED : int/*unsigned short*/;
+	__readonly__ var readyState : int/*unsigned short*/;
+	__readonly__ var bufferedAmount : int/*unsigned long*/;
+	// networking
+	var onopen : function(:Event):void/*Function?*/;
+	var onerror : function(:Event):void/*Function?*/;
+	var onclose : function(:Event):void/*Function?*/;
+	__readonly__ var extensions : string/*DOMString*/;
+	__readonly__ var protocol : string/*DOMString*/;
+	function close() : void;
+	function close(code : int/*unsigned short*/) : void;
+	function close(
+		code : int/*unsigned short*/,
+		reason : string/*DOMString*/
+	) : void;
+	// messaging
+	var onmessage : function(:Event):void/*Function?*/;
+	var binaryType : string/*DOMString*/;
+	function send(data : string/*DOMString*/) : void;
+	function send(data : ArrayBufferView) : void;
+	function send(data : Blob) : void;
+
+} // end of WebSocket
+
+native class CloseEvent extends Event {
+
+	function constructor(type : string/*DOMString*/);
+	function constructor(
+		type : string/*DOMString*/,
+		eventInitDict : CloseEventInit
+	);
+
+	__readonly__ var wasClean : boolean;
+	__readonly__ var code : int/*unsigned short*/;
+	__readonly__ var reason : string/*DOMString*/;
+
+} // end of CloseEvent
+
+native class CloseEventInit extends EventInit {
+
+	var wasClean : boolean;
+	var code : int/*unsigned short*/;
+	var reason : string/*DOMString*/;
+
+} // end of CloseEventInit
+
+native __fake__ class NavigatorGeolocation {
+
+	__readonly__ var geolocation : Geolocation;
+
+} // end of NavigatorGeolocation
+
+native class Geolocation {
+
+	function getCurrentPosition(
+		successCallback : PositionCallback
+	) : void;
+	function getCurrentPosition(
+		successCallback : PositionCallback,
+		errorCallback : PositionErrorCallback
+	) : void;
+	function getCurrentPosition(
+		successCallback : PositionCallback,
+		errorCallback : PositionErrorCallback,
+		options : PositionOptions
+	) : void;
+	function watchPosition(
+		successCallback : PositionCallback
+	) : int/*long*/;
+	function watchPosition(
+		successCallback : PositionCallback,
+		errorCallback : PositionErrorCallback
+	) : int/*long*/;
+	function watchPosition(
+		successCallback : PositionCallback,
+		errorCallback : PositionErrorCallback,
+		options : PositionOptions
+	) : int/*long*/;
+	function clearWatch(watchId : int/*long*/) : void;
+
+} // end of Geolocation
+
+native class PositionCallback {
+
+	function handleEvent(position : Position) : void;
+
+} // end of PositionCallback
+
+native class PositionErrorCallback {
+
+	function handleEvent(error : PositionError) : void;
+
+} // end of PositionErrorCallback
+
+native class PositionOptions {
+
+	var enableHighAccuracy : boolean;
+	var timeout : int/*long*/;
+	var maximumAge : int/*long*/;
+	var requireCoords : boolean;
+	var requestAddress : boolean;
+
+} // end of PositionOptions
+
+native class Position {
+
+	__readonly__ var coords : Coordinates;
+	__readonly__ var address : Address;
+	__readonly__ var timestamp : number/*DOMTimeStamp*/;
+
+} // end of Position
+
+native class Coordinates {
+
+	__readonly__ var latitude : number/*double?*/;
+	__readonly__ var longitude : number/*double?*/;
+	__readonly__ var altitude : number/*double?*/;
+	__readonly__ var accuracy : number/*double?*/;
+	__readonly__ var altitudeAccuracy : number/*double?*/;
+	__readonly__ var heading : number/*double?*/;
+	__readonly__ var speed : number/*double?*/;
+	__readonly__ var verticalSpeed : number/*double?*/;
+
+} // end of Coordinates
+
+native class Address {
+
+	__readonly__ var country : string/*DOMString?*/;
+	__readonly__ var region : string/*DOMString?*/;
+	__readonly__ var county : string/*DOMString?*/;
+	__readonly__ var city : string/*DOMString?*/;
+	__readonly__ var street : string/*DOMString?*/;
+	__readonly__ var streetNumber : string/*DOMString?*/;
+	__readonly__ var premises : string/*DOMString?*/;
+	__readonly__ var postalCode : string/*DOMString?*/;
+
+} // end of Address
+
+native class PositionError {
+
+	static const     PERMISSION_DENIED : int/*unsigned short*/;
+	__readonly__ var PERMISSION_DENIED : int/*unsigned short*/;
+	static const     POSITION_UNAVAILABLE : int/*unsigned short*/;
+	__readonly__ var POSITION_UNAVAILABLE : int/*unsigned short*/;
+	static const     TIMEOUT : int/*unsigned short*/;
+	__readonly__ var TIMEOUT : int/*unsigned short*/;
+	__readonly__ var code : int/*unsigned short*/;
+	__readonly__ var message : string/*DOMString*/;
+
+} // end of PositionError
+
+native class Storage {
+
+	__readonly__ var length : int/*unsigned long*/;
+	function key(index : int/*unsigned long*/) : string/*DOMString?*/;
+	function __native_index_operator__(
+		key : string/*DOMString*/
+	) : MayBeUndefined.<string/*DOMString*/>;
+	/* getter */
+	function getItem(
+		key : string/*DOMString*/
+	) : MayBeUndefined.<string/*DOMString*/>;
+	/* setter creator */
+	function setItem(
+		key : string/*DOMString*/,
+		value : string/*DOMString*/
+	) : void;
+	/* deleter */
+	function removeItem(key : string/*DOMString*/) : void;
+	function clear() : void;
+
+} // end of Storage
+
+native __fake__ class WindowSessionStorage {
+
+	__readonly__ var sessionStorage : Storage;
+
+} // end of WindowSessionStorage
+
+native __fake__ class WindowLocalStorage {
+
+	__readonly__ var localStorage : Storage;
+
+} // end of WindowLocalStorage
+
+native class StorageEvent extends Event {
+
+	function constructor(type : string/*DOMString*/);
+	function constructor(
+		type : string/*DOMString*/,
+		eventInitDict : StorageEventInit
+	);
+
+	__readonly__ var key : string/*DOMString?*/;
+	__readonly__ var oldValue : string/*DOMString?*/;
+	__readonly__ var newValue : string/*DOMString?*/;
+	__readonly__ var url : string/*DOMString*/;
+	__readonly__ var storageArea : Storage;
+
+} // end of StorageEvent
+
+native class StorageEventInit extends EventInit {
+
+	var key : string/*DOMString?*/;
+	var oldValue : string/*DOMString?*/;
+	var newValue : string/*DOMString?*/;
+	var url : string/*DOMString*/;
+	var storageArea : Storage;
+
+} // end of StorageEventInit
+
+native __fake__ class NodeSelector {
+
+	function querySelector(selectors : string/*DOMString*/) : Element;
+	function querySelectorAll(
+		selectors : string/*DOMString*/
+	) : NodeList;
+
+} // end of NodeSelector
 
 native class DOMParser {
 
@@ -5455,6 +5945,111 @@ native class CanvasRenderingContext2D {
 	// "top", "hanging", "middle", "alphabetic", "ideographic", "bottom" (default: "alphabetic")
 
 } // end of CanvasRenderingContext2D
+
+native __fake__ class CanvasTransformation {
+
+	// transformations (default transform is the identity matrix)
+	function scale(x : number/*double*/, y : number/*double*/) : void;
+	function rotate(angle : number/*double*/) : void;
+	function translate(
+		x : number/*double*/,
+		y : number/*double*/
+	) : void;
+	function transform(
+		a : number/*double*/,
+		b : number/*double*/,
+		c : number/*double*/,
+		d : number/*double*/,
+		e : number/*double*/,
+		f : number/*double*/
+	) : void;
+	function setTransform(
+		a : number/*double*/,
+		b : number/*double*/,
+		c : number/*double*/,
+		d : number/*double*/,
+		e : number/*double*/,
+		f : number/*double*/
+	) : void;
+
+} // end of CanvasTransformation
+
+native __fake__ class CanvasLineStyles {
+
+	// line caps/joins
+	var lineWidth : number/*double*/;
+	// (default 1)
+	var lineCap : string/*DOMString*/;
+	// "butt", "round", "square" (default "butt")
+	var lineJoin : string/*DOMString*/;
+	// "round", "bevel", "miter" (default "miter")
+	var miterLimit : number/*double*/;
+	// (default 10)
+
+} // end of CanvasLineStyles
+
+native __fake__ class CanvasText {
+
+	// text
+	var font : string/*DOMString*/;
+	// (default 10px sans-serif)
+	var textAlign : string/*DOMString*/;
+	// "start", "end", "left", "right", "center" (default: "start")
+	var textBaseline : string/*DOMString*/;
+	// "top", "hanging", "middle", "alphabetic", "ideographic", "bottom" (default: "alphabetic")
+
+} // end of CanvasText
+
+native __fake__ class CanvasPathMethods {
+
+	// shared path API methods
+	function closePath() : void;
+	function moveTo(x : number/*double*/, y : number/*double*/) : void;
+	function lineTo(x : number/*double*/, y : number/*double*/) : void;
+	function quadraticCurveTo(
+		cpx : number/*double*/,
+		cpy : number/*double*/,
+		x : number/*double*/,
+		y : number/*double*/
+	) : void;
+	function bezierCurveTo(
+		cp1x : number/*double*/,
+		cp1y : number/*double*/,
+		cp2x : number/*double*/,
+		cp2y : number/*double*/,
+		x : number/*double*/,
+		y : number/*double*/
+	) : void;
+	function arcTo(
+		x1 : number/*double*/,
+		y1 : number/*double*/,
+		x2 : number/*double*/,
+		y2 : number/*double*/,
+		radius : number/*double*/
+	) : void;
+	function rect(
+		x : number/*double*/,
+		y : number/*double*/,
+		w : number/*double*/,
+		h : number/*double*/
+	) : void;
+	function arc(
+		x : number/*double*/,
+		y : number/*double*/,
+		radius : number/*double*/,
+		startAngle : number/*double*/,
+		endAngle : number/*double*/
+	) : void;
+	function arc(
+		x : number/*double*/,
+		y : number/*double*/,
+		radius : number/*double*/,
+		startAngle : number/*double*/,
+		endAngle : number/*double*/,
+		anticlockwise : boolean
+	) : void;
+
+} // end of CanvasPathMethods
 
 native class CanvasGradient {
 
@@ -6906,15 +7501,19 @@ end of generated files from:
 	http://www.w3.org/TR/DOM-Level-2-Views/idl/views.idl
 	http://www.w3.org/TR/DOM-Level-3-Events/
 	idl2jsx/extra/events.idl
-	http://www.w3.org/TR/html5/single-page.html
 	http://www.w3.org/TR/XMLHttpRequest/
-	http://www.w3.org/TR/selectors-api/
 	http://dev.w3.org/csswg/cssom/
 	http://dev.w3.org/csswg/cssom-view/
 	idl2jsx/extra/chrome.idl
 	idl2jsx/extra/firefox.idl
+	http://www.w3.org/TR/html5/single-page.html
 	http://www.w3.org/TR/FileAPI/
 	idl2jsx/extra/file.idl
+	http://www.w3.org/TR/touch-events/
+	http://dev.w3.org/html5/websockets/
+	http://dev.w3.org/geo/api/spec-source-v2.html
+	http://dev.w3.org/html5/webstorage/
+	http://www.w3.org/TR/selectors-api/
 	http://html5.org/specs/dom-parsing.html
 	https://www.khronos.org/registry/typedarray/specs/latest/typedarray.idl
 	http://dev.w3.org/html5/2dcontext/
