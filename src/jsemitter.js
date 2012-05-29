@@ -1172,13 +1172,20 @@ var _PropertyExpressionEmitter = exports._PropertyExpressionEmitter = _UnaryExpr
 			}
 		}
 		this._emitter._getExpressionEmitterFor(expr.getExpr()).emit(this._getPrecedence());
-		this._emitter._emit(".", identifierToken);
 		// mangle the name if necessary
 		if (exprType instanceof FunctionType && ! exprType.isAssignable()
-			&& (expr.getHolderType().getClassDef().flags() & ClassDefinition.IS_NATIVE) == 0)
+			&& (expr.getHolderType().getClassDef().flags() & ClassDefinition.IS_NATIVE) == 0) {
+			if (expr.getExpr()._classDefType instanceof ClassDefType) {
+				// do not use "." notation for static functions, but use class$name
+				this._emitter._emit("$", identifierToken);
+			} else {
+				this._emitter._emit(".", identifierToken);
+			}
 			this._emitter._emit(this._emitter._mangleFunctionName(identifierToken.getValue(), exprType.getArgumentTypes()), identifierToken);
-		else
+		} else {
+			this._emitter._emit(".", identifierToken);
 			this._emitter._emit(identifierToken.getValue(), identifierToken);
+		}
 	},
 
 	_getPrecedence: function () {
@@ -1794,14 +1801,17 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 	},
 
 	_emitFunction: function (funcDef) {
+		var className = funcDef.getClassDef().getOutputClassName();
+		var funcName = this._mangleFunctionName(funcDef.name(), funcDef.getArgumentTypes());
+		// emit
 		this._emit("/**\n", null);
 		this._emitFunctionArgumentAnnotations(funcDef);
 		this._emit(_Util.buildAnnotation(" * @return {%1}\n", funcDef.getReturnType()), null);
 		this._emit(" */\n", null);
-		this._emit(funcDef.getClassDef().getOutputClassName() + ".", null);
+		this._emit(className + ".", null);
 		if ((funcDef.flags() & ClassDefinition.IS_STATIC) == 0)
 			this._emit("prototype.", null);
-		this._emit(this._mangleFunctionName(funcDef.name(), funcDef.getArgumentTypes()) + " = ", funcDef.getNameToken());
+		this._emit(funcName + " = ", funcDef.getNameToken());
 		this._emit("function (", funcDef.getToken());
 		this._emitFunctionArguments(funcDef);
 		this._emit(") {\n", null);
@@ -1809,6 +1819,8 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 		this._emitFunctionBody(funcDef);
 		this._reduceIndent();
 		this._emit("};\n\n", null);
+		if ((funcDef.flags() & ClassDefinition.IS_STATIC) != 0)
+			this._emit(className + "$" + funcName + " = " + className + "." + funcName + ";\n\n", null);
 	},
 
 	_emitFunctionArgumentAnnotations: function (funcDef) {
