@@ -875,19 +875,17 @@ var _InlineOptimizeCommand = exports._InlineOptimizeCommand = _FunctionOptimizeC
 			return null;
 		// optimize the calling function prior to testing the conditions
 		this.optimizeFunction(callingFuncDef);
-		// only allow static function or member function using "this" as the receiver (FIXME we can easily handle receiver being a local variable as well?)
-		if ((callingFuncDef.flags() & ClassDefinition.IS_STATIC) != 0) {
-			// ok
-		} else {
+		// obtain receiver expression
+		if ((callingFuncDef.flags() & ClassDefinition.IS_STATIC) == 0) {
 			var calleeExpr = callExpr.getExpr();
 			if (! (calleeExpr instanceof PropertyExpression))
 				throw new Error("unexpected type of expression");
 			var receiverExpr = calleeExpr.getExpr();
-			if (receiverExpr instanceof IdentifierExpression
-				|| receiverExpr instanceof ThisExpression) {
-				// ok
-			} else {
-				return null;
+			if (asExpression) {
+				// receiver should not have side effecets
+				if (! (receiverExpr instanceof IdentifierExpression || receiverExpr instanceof ThisExpression)) {
+					return null;
+				}
 			}
 		}
 		// check that the function may be inlined
