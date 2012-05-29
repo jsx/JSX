@@ -220,8 +220,8 @@ foreach my $file(@files) {
     while($content =~ m{
                 (?<attrs> (?: \[ [^\]]+ \] \s+)* )
                 (?<type> (?:partial \s+)? interface | exception | dictionary)
-                \s+ (?<name> \S+)
-                (?: \s* : \s* (?<base> \S+) )?
+                \s+ (?<name> \w+)
+                (?: \s* : \s* (?<base> \w+) )?
                 \s*
                 \{ (?<members> [^\}]*? ) \}
                 \s* ;
@@ -239,28 +239,23 @@ foreach my $file(@files) {
             $base  = "Document";
         }
 
-        info $type, $class;
+        info $type, $class, ($base ? ": $base" : ());
 
         if($type !~ /\b partial \b/xms) {
             $has_definition{$class} = 1;
         }
 
-        my $classdecl = "native";
-        $classdecl .= " class $class";
-
-        if($base) {
-            $classdecl .= " extends $base";
-        }
 
         my $def = $classdef{$class} //= {
             attrs => $attrs,
             name  => $class,
-            base  => $base,
-            classdecl => $classdecl,
+            implements => [],
             members => [],
             decl    => {},
-            fake    => 0,
+            fake    => $fake{$class},
         };
+
+        $def->{base} //= $base if $base;
 
         $def->{skip} = 1 if $skip{$class};
 
@@ -476,9 +471,18 @@ foreach my $def(values %classdef) {
 
     my %seen;
 
-    my $classdecl = $def->{classdecl};
-    $classdecl =~ s/native class/native __fake__ class/ if $def->{fake};
+    my $classdecl = "native";
+    if($def->{fake}) {
+        $classdecl .= " __fake__";
+    }
+    $classdecl .= " class $def->{name}";
+
+    if($def->{base}) {
+        $classdecl .= " extends $def->{base}";
+    }
+
     say $classdecl, " {";
+
     my @members = @{$def->{members}};
 
     # trim
