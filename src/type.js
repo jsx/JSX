@@ -362,16 +362,15 @@ var ObjectType = exports.ObjectType = Type.extend({
 
 var ParsedObjectType = exports.ParsedObjectType = ObjectType.extend({
 
-	constructor: function (className, typeArgs, token) {
+	constructor: function (qualifiedName, typeArgs) {
 		ObjectType.prototype.constructor.call(this, null);
-		this._className = className;
+		this._qualifiedName = qualifiedName;
 		this._typeArguments = typeArgs;
-		this._token = token;
 	},
 
 	instantiate: function (instantiationContext) {
 		if (this._typeArguments.length == 0) {
-			var actualType = instantiationContext.typemap[this._className];
+			var actualType = instantiationContext.typemap[this._qualifiedName.getToken().getValue()];
 			if (actualType != undefined)
 				return actualType;
 		}
@@ -380,19 +379,25 @@ var ParsedObjectType = exports.ParsedObjectType = ObjectType.extend({
 			var actualType = instantiationContext.typemap[this._typeArguments[i].toString()];
 			typeArgs[i] = actualType != undefined ? actualType : this._typeArguments[i];
 		}
-		var objectType = new ParsedObjectType(this._className, typeArgs, this._token);
+		var objectType = new ParsedObjectType(this._qualifiedName, typeArgs);
 		instantiationContext.objectTypesUsed.push(objectType);
 		return objectType;
 	},
 
 	resolveType: function (context) {
-		if (this._classDef == null)
-			if ((this._classDef = context.parser.lookup(context.errors, this._token, this.toString())) == null)
-				context.errors.push(new CompileError(this._token, "'" + this.toString() + "' is not defined"));
+		if (this._classDef == null) {
+			if (this._typeArguments.length == 0) {
+				this._classDef = this._qualifiedName.getClass(context);
+			} else {
+				// get the already-instantiated class (FIXME refactor, or should we move QualifiedName#getClass to somewhere else?)
+				if ((this._classDef = context.parser.lookup(context.errors, this._qualifiedName.getToken(), this.toString())) == null)
+					context.errors.push(new CompileError(this._token, "'" + this.toString() + "' is not defined"));
+			}
+		}
 	},
 
 	toString: function () {
-		return this._typeArguments.length != 0 ? Type.templateTypeToString(this._className, this._typeArguments) : this._className;
+		return this._typeArguments.length != 0 ? Type.templateTypeToString(this._qualifiedName.getToken().getValue(), this._typeArguments) : this._qualifiedName.getToken().getValue();
 	}
 
 });

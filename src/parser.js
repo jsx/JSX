@@ -700,12 +700,10 @@ var Parser = exports.Parser = Class.extend({
 		}
 		if ((token = this._expectIdentifier()) == null)
 			return null;
-		var imprt = null;
-		if (this._expectOpt(".") != null) {
-			if ((imprt = this.lookupImportAlias(token.getValue())) == null) {
-				this._newError("no importation to symbol '" + token.getValue() + "'");
+		var imprt = this.lookupImportAlias(token.getValue());
+		if (imprt != null) {
+			if (this._expect(".") == null)
 				return null;
-			}
 			token = this._expectIdentifier();
 			if (token == null)
 				return null;
@@ -1134,57 +1132,55 @@ var Parser = exports.Parser = Class.extend({
 			if ((token = this._expect("]")) == null)
 				return false;
 			this._templateInstantiationRequests.push(new TemplateInstantiationRequest(token, "Array", [ typeDecl ]));
-			typeDecl = new ParsedObjectType("Array", [ typeDecl ], token);
+			typeDecl = new ParsedObjectType(new QualifiedName(new Token("Array", true), null), [ typeDecl ], token);
 			this._objectTypesUsed.push(typeDecl);
 		}
 		return typeDecl;
 	},
 	
 	_primaryTypeDeclaration: function () {
-		if (this._expectOpt("function") != null)
-			return this._functionTypeDeclaration(null);
-		var identifierToken = this._expectIdentifier();
-		if (identifierToken == null)
-			return null;
-		switch (identifierToken.getValue()) {
-		case "boolean":
-			return Type.booleanType;
-		case "int":
-			return Type.integerType;
-		case "number":
-			return Type.numberType;
-		case "string":
-			return Type.stringType;
-		default:
-			// is a object (may be a template object), or a member function
-			var className = identifierToken.getValue();
-			var objectType;
-			if (this._expectOpt(".") != null) {
-				var keywordToken;
-				if ((keywordToken = this._expect([ "function", "<" ])) == null)
-					return null; // nested types not yet supported
-				switch (keywordToken.getValue()) {
-				case "function":
-					// member function
-					objectType = new ParsedObjectType(className, [], identifierToken);
-					this._objectTypesUsed.push(objectType);
-					return this._functionTypeDeclaration(objectType);
-				case "<":
-					// template object
-					return this._templateTypeDeclaration(className, identifierToken);
-				default:
-					throw new Error("logic flaw");
-				}
-			} else {
-				// object
-				var objectType = new ParsedObjectType(className, [], identifierToken);
-				this._objectTypesUsed.push(objectType);
-				return objectType;
+		var token = this._expectOpt([ "function", "boolean", "int", "number", "string" ]);
+		if (token != null) {
+			switch (token.getValue()) {
+			case "function":
+				return this._functionTypeDeclaration(null);
+			case "boolean":
+				return Type.booleanType;
+			case "int":
+				return Type.integerType;
+			case "number":
+				return Type.numberType;
+			case "string":
+				return Type.stringType;
+			default:
+				throw new Error("logic flaw");
 			}
+		} else {
+			return this._objectTypeDeclaration();
 		}
 	},
 
-	_templateTypeDeclaration: function (className, identifierToken) {
+	_objectTypeDeclaration: function () {
+		var qualifiedName = this._qualifiedName();
+		if (qualifiedName == null)
+			return null;
+		if (this._expectOpt(".") != null) {
+			if (this._expect("<") == null)
+				return null; // nested types not yet supported
+			return this._templateTypeDeclaration(qualifiedName);
+		} else {
+			// object
+			var objectType = new ParsedObjectType(qualifiedName, []);
+			this._objectTypesUsed.push(objectType);
+			return objectType;
+		}
+	},
+
+	_templateTypeDeclaration: function (qualifiedName) {
+		if (qualifiedName.getImport() != null) {
+			this._newError("template class with namespace not supported");
+			return null;
+		}
 		// parse
 		var types = [];
 		do {
@@ -1197,9 +1193,9 @@ var Parser = exports.Parser = Class.extend({
 				return null;
 		} while (token.getValue() == ",");
 		// request template instantiation (deferred)
-		this._templateInstantiationRequests.push(new TemplateInstantiationRequest(token, className, types));
+		this._templateInstantiationRequests.push(new TemplateInstantiationRequest(token, qualifiedName.getToken().getValue(), types));
 		// return object type
-		var objectType = new ParsedObjectType(className, types, identifierToken);
+		var objectType = new ParsedObjectType(qualifiedName, types);
 		this._objectTypesUsed.push(objectType);
 		return objectType;
 	},
