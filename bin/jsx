@@ -87,8 +87,17 @@ var JSX = Class.extend({
 
 	$execNodeJS: function (script, args) {
 		// XXX: node.js (0.6.x) doesn't suport "--" option :(
-		var argv = ["-e", script].concat(args);
-		var child = child_process.spawn(process.execPath, argv);
+		var tmpdir = process.env.TMPDIR || "/tmp";
+		var tmpfile = Util.format("%1/jsx.%2.%3.js", [
+			tmpdir, process.pid.toString(), Date.now().toString(16)
+		]);
+
+		fs.writeFileSync(tmpfile, script);
+		process.on("exit", function() {
+			fs.unlinkSync(tmpfile);
+		});
+
+		var child = child_process.spawn(process.execPath, [tmpfile].concat(args));
 
 		child.stdout.on("data", function (data) {
 			process.stdout.write(data);
