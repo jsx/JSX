@@ -26,24 +26,32 @@ my @specs = (
         'http://www.w3.org/TR/DOM-Level-2-Views/idl/views.idl',
         'http://www.w3.org/TR/DOM-Level-3-Events/',
         "$root/extra/events.idl",
-        'http://www.w3.org/TR/html5/single-page.html',
 
         'http://www.w3.org/TR/XMLHttpRequest/',
 
-        'http://www.w3.org/TR/selectors-api/',
 
         # there're syntax errors in the IDL!
         #'http://html5labs.interoperabilitybridges.com/dom4events/',
 
+        # CSS
         'http://dev.w3.org/csswg/cssom/',
         'http://dev.w3.org/csswg/cssom-view/',
         "$root/extra/chrome.idl",
         "$root/extra/firefox.idl",
 
         # HTML5
+        # 'http://dev.w3.org/html5/spec/single-page.html',
+        'http://www.w3.org/TR/html5/single-page.html',
         'http://www.w3.org/TR/FileAPI/',
         "$root/extra/file.idl",
 
+        #"http://www.w3.org/TR/webaudio/",
+        "http://www.w3.org/TR/touch-events/",
+        "http://dev.w3.org/html5/websockets/",
+        "http://dev.w3.org/geo/api/spec-source-v2.html",
+        "http://dev.w3.org/2011/webrtc/editor/webrtc.html",
+        "http://dev.w3.org/html5/webstorage/",
+        'http://www.w3.org/TR/selectors-api/',
         "http://html5.org/specs/dom-parsing.html",
 
         # graphics
@@ -51,6 +59,15 @@ my @specs = (
         'http://dev.w3.org/html5/2dcontext/',
         'https://www.khronos.org/registry/webgl/specs/latest/webgl.idl',
     ],
+);
+
+my %element2tag = (
+    #FIXME heading => [ map { "h$_" } 1 .. 6 ],
+    paragraph => 'p',
+    olist  => 'ol',
+    ulist  => 'ul',
+    imag   => 'img',
+    anchor => 'a',
 );
 
 my $HEADER = <<'T';
@@ -80,7 +97,9 @@ foreach my $spec(@specs) {
     $param{html_elements} = [
         map  {
             ($_->{func_name} = $_->{name}) =~ s/^HTML//;
-            ($_->{tag_name} = lc $_->{func_name}) =~ s/element$//;
+            my $tag_name = lc $_->{func_name};
+            $tag_name =~ s/element$//;
+            $_->{tag_name} = $element2tag{$tag_name} // $tag_name;
             $_; }
         grep { $_->{base} ~~ "HTMLElement"  } values %{ $param{classdef} },
     ];

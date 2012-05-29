@@ -29,8 +29,7 @@ while(my($class, $def) = each %{$classdef}) {
             $receiver = $class;
         }
         else {
-            $receiver = "X.get$class()";
-            $used_type{type2id($class)} = $class;
+            $receiver = "o";
         }
 
         my $decl = $member->{decl};

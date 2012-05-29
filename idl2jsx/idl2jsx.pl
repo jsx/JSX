@@ -246,9 +246,6 @@ foreach my $file(@files) {
         }
 
         my $classdecl = "native";
-        if($fake{$class}) {
-            $classdecl .= " __fake__";
-        }
         $classdecl .= " class $class";
 
         if($base) {
@@ -262,6 +259,7 @@ foreach my $file(@files) {
             classdecl => $classdecl,
             members => [],
             decl    => {},
+            fake    => 0,
         };
 
         $def->{skip} = 1 if $skip{$class};
@@ -445,12 +443,13 @@ foreach my $file(@files) {
             my $interface = $classdef{$+{interface}};
             info "$def->{name} implements $interface->{name}";
 
+            # FIXME
             push @{ $def->{members} },
                 "",
                 "// implements $interface->{name}",
                 @{$interface->{members}};
 
-            $interface->{skip} = 1;
+            $interface->{fake} = 1;
         }
     }
 }
@@ -477,7 +476,9 @@ foreach my $def(values %classdef) {
 
     my %seen;
 
-    say $def->{classdecl}, " {";
+    my $classdecl = $def->{classdecl};
+    $classdecl =~ s/native class/native __fake__ class/ if $def->{fake};
+    say $classdecl, " {";
     my @members = @{$def->{members}};
 
     # trim
