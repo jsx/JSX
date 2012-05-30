@@ -4579,6 +4579,16 @@ native class TouchEvent extends UIEvent {
 
 native class WebSocket extends EventTarget {
 
+	function constructor(url : string/*DOMString*/);
+	function constructor(
+		url : string/*DOMString*/,
+		protocols : string/*DOMString*/
+	);
+	function constructor(
+		url : string/*DOMString*/,
+		protocols : string[]/*DOMString[]*/
+	);
+
 	__readonly__ var url : string/*DOMString*/;
 	// ready state
 	static const     CONNECTING : int/*unsigned short*/;
@@ -4852,6 +4862,21 @@ native class ArrayBufferView {
 
 native class Int8Array extends ArrayBufferView {
 
+	function constructor(length : int/*unsigned long*/);
+	function constructor(array : Int8Array);
+	function constructor(array : int[]/*byte[]*/);
+	function constructor(array : number[]);
+	function constructor(buffer : ArrayBuffer);
+	function constructor(
+		buffer : ArrayBuffer,
+		byteOffset : int/*unsigned long*/
+	);
+	function constructor(
+		buffer : ArrayBuffer,
+		byteOffset : int/*unsigned long*/,
+		length : int/*unsigned long*/
+	);
+
 	static const     BYTES_PER_ELEMENT : int/*long*/;
 	__readonly__ var BYTES_PER_ELEMENT : int/*long*/;
 	__readonly__ var length : int/*unsigned long*/;
@@ -4890,6 +4915,21 @@ native class Int8Array extends ArrayBufferView {
 } // end of Int8Array
 
 native class Uint8Array extends ArrayBufferView {
+
+	function constructor(length : int/*unsigned long*/);
+	function constructor(array : Uint8Array);
+	function constructor(array : int[]/*octet[]*/);
+	function constructor(array : number[]);
+	function constructor(buffer : ArrayBuffer);
+	function constructor(
+		buffer : ArrayBuffer,
+		byteOffset : int/*unsigned long*/
+	);
+	function constructor(
+		buffer : ArrayBuffer,
+		byteOffset : int/*unsigned long*/,
+		length : int/*unsigned long*/
+	);
 
 	static const     BYTES_PER_ELEMENT : int/*long*/;
 	__readonly__ var BYTES_PER_ELEMENT : int/*long*/;
@@ -4930,6 +4970,22 @@ native class Uint8Array extends ArrayBufferView {
 
 native class Uint8ClampedArray extends Uint8Array {
 
+	function constructor(length : int/*unsigned long*/);
+	function constructor(array : Uint8ClampedArray);
+	function constructor(array : Uint8Array);
+	function constructor(array : int[]/*octet[]*/);
+	function constructor(array : number[]);
+	function constructor(buffer : ArrayBuffer);
+	function constructor(
+		buffer : ArrayBuffer,
+		byteOffset : int/*unsigned long*/
+	);
+	function constructor(
+		buffer : ArrayBuffer,
+		byteOffset : int/*unsigned long*/,
+		length : int/*unsigned long*/
+	);
+
 	/* setter */
 	// inherits function set(index : int/*unsigned long*/, value : int/*octet*/) : void;
 	function set(array : Uint8ClampedArray) : void;
@@ -4949,6 +5005,21 @@ native class Uint8ClampedArray extends Uint8Array {
 } // end of Uint8ClampedArray
 
 native class Int16Array extends ArrayBufferView {
+
+	function constructor(length : int/*unsigned long*/);
+	function constructor(array : Int16Array);
+	function constructor(array : int[]/*short[]*/);
+	function constructor(array : number[]);
+	function constructor(buffer : ArrayBuffer);
+	function constructor(
+		buffer : ArrayBuffer,
+		byteOffset : int/*unsigned long*/
+	);
+	function constructor(
+		buffer : ArrayBuffer,
+		byteOffset : int/*unsigned long*/,
+		length : int/*unsigned long*/
+	);
 
 	static const     BYTES_PER_ELEMENT : int/*long*/;
 	__readonly__ var BYTES_PER_ELEMENT : int/*long*/;
@@ -4989,6 +5060,21 @@ native class Int16Array extends ArrayBufferView {
 
 native class Uint16Array extends ArrayBufferView {
 
+	function constructor(length : int/*unsigned long*/);
+	function constructor(array : Uint16Array);
+	function constructor(array : int[]/*unsigned short[]*/);
+	function constructor(array : number[]);
+	function constructor(buffer : ArrayBuffer);
+	function constructor(
+		buffer : ArrayBuffer,
+		byteOffset : int/*unsigned long*/
+	);
+	function constructor(
+		buffer : ArrayBuffer,
+		byteOffset : int/*unsigned long*/,
+		length : int/*unsigned long*/
+	);
+
 	static const     BYTES_PER_ELEMENT : int/*long*/;
 	__readonly__ var BYTES_PER_ELEMENT : int/*long*/;
 	__readonly__ var length : int/*unsigned long*/;
@@ -5027,6 +5113,21 @@ native class Uint16Array extends ArrayBufferView {
 } // end of Uint16Array
 
 native class Int32Array extends ArrayBufferView {
+
+	function constructor(length : int/*unsigned long*/);
+	function constructor(array : Int32Array);
+	function constructor(array : int[]/*long[]*/);
+	function constructor(array : number[]);
+	function constructor(buffer : ArrayBuffer);
+	function constructor(
+		buffer : ArrayBuffer,
+		byteOffset : int/*unsigned long*/
+	);
+	function constructor(
+		buffer : ArrayBuffer,
+		byteOffset : int/*unsigned long*/,
+		length : int/*unsigned long*/
+	);
 
 	static const     BYTES_PER_ELEMENT : int/*long*/;
 	__readonly__ var BYTES_PER_ELEMENT : int/*long*/;
@@ -5067,6 +5168,21 @@ native class Int32Array extends ArrayBufferView {
 
 native class Uint32Array extends ArrayBufferView {
 
+	function constructor(length : int/*unsigned long*/);
+	function constructor(array : Uint32Array);
+	function constructor(array : int[]/*unsigned long[]*/);
+	function constructor(array : number[]);
+	function constructor(buffer : ArrayBuffer);
+	function constructor(
+		buffer : ArrayBuffer,
+		byteOffset : int/*unsigned long*/
+	);
+	function constructor(
+		buffer : ArrayBuffer,
+		byteOffset : int/*unsigned long*/,
+		length : int/*unsigned long*/
+	);
+
 	static const     BYTES_PER_ELEMENT : int/*long*/;
 	__readonly__ var BYTES_PER_ELEMENT : int/*long*/;
 	__readonly__ var length : int/*unsigned long*/;
@@ -5106,6 +5222,20 @@ native class Uint32Array extends ArrayBufferView {
 
 native class Float32Array extends ArrayBufferView {
 
+	function constructor(length : int/*unsigned long*/);
+	function constructor(array : Float32Array);
+	function constructor(array : number[]/*float[]*/);
+	function constructor(buffer : ArrayBuffer);
+	function constructor(
+		buffer : ArrayBuffer,
+		byteOffset : int/*unsigned long*/
+	);
+	function constructor(
+		buffer : ArrayBuffer,
+		byteOffset : int/*unsigned long*/,
+		length : int/*unsigned long*/
+	);
+
 	static const     BYTES_PER_ELEMENT : int/*long*/;
 	__readonly__ var BYTES_PER_ELEMENT : int/*long*/;
 	__readonly__ var length : int/*unsigned long*/;
@@ -5139,6 +5269,20 @@ native class Float32Array extends ArrayBufferView {
 } // end of Float32Array
 
 native class Float64Array extends ArrayBufferView {
+
+	function constructor(length : int/*unsigned long*/);
+	function constructor(array : Float64Array);
+	function constructor(array : number[]/*double[]*/);
+	function constructor(buffer : ArrayBuffer);
+	function constructor(
+		buffer : ArrayBuffer,
+		byteOffset : int/*unsigned long*/
+	);
+	function constructor(
+		buffer : ArrayBuffer,
+		byteOffset : int/*unsigned long*/,
+		length : int/*unsigned long*/
+	);
 
 	static const     BYTES_PER_ELEMENT : int/*long*/;
 	__readonly__ var BYTES_PER_ELEMENT : int/*long*/;
