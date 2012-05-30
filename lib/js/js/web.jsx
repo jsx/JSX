@@ -325,60 +325,60 @@ automatically generated from:
 */
 native class DOMException {
 
-	static const     INDEX_SIZE_ERR : int/*unsigned short*/;
-	__readonly__ var INDEX_SIZE_ERR : int/*unsigned short*/;
-	static const     DOMSTRING_SIZE_ERR : int/*unsigned short*/;
-	__readonly__ var DOMSTRING_SIZE_ERR : int/*unsigned short*/;
+	static __readonly__ var INDEX_SIZE_ERR : int/*unsigned short*/;
+	       __readonly__ var INDEX_SIZE_ERR : int/*unsigned short*/;
+	static __readonly__ var DOMSTRING_SIZE_ERR : int/*unsigned short*/;
+	       __readonly__ var DOMSTRING_SIZE_ERR : int/*unsigned short*/;
 	// historical
-	static const     HIERARCHY_REQUEST_ERR : int/*unsigned short*/;
-	__readonly__ var HIERARCHY_REQUEST_ERR : int/*unsigned short*/;
-	static const     WRONG_DOCUMENT_ERR : int/*unsigned short*/;
-	__readonly__ var WRONG_DOCUMENT_ERR : int/*unsigned short*/;
-	static const     INVALID_CHARACTER_ERR : int/*unsigned short*/;
-	__readonly__ var INVALID_CHARACTER_ERR : int/*unsigned short*/;
-	static const     NO_DATA_ALLOWED_ERR : int/*unsigned short*/;
-	__readonly__ var NO_DATA_ALLOWED_ERR : int/*unsigned short*/;
+	static __readonly__ var HIERARCHY_REQUEST_ERR : int/*unsigned short*/;
+	       __readonly__ var HIERARCHY_REQUEST_ERR : int/*unsigned short*/;
+	static __readonly__ var WRONG_DOCUMENT_ERR : int/*unsigned short*/;
+	       __readonly__ var WRONG_DOCUMENT_ERR : int/*unsigned short*/;
+	static __readonly__ var INVALID_CHARACTER_ERR : int/*unsigned short*/;
+	       __readonly__ var INVALID_CHARACTER_ERR : int/*unsigned short*/;
+	static __readonly__ var NO_DATA_ALLOWED_ERR : int/*unsigned short*/;
+	       __readonly__ var NO_DATA_ALLOWED_ERR : int/*unsigned short*/;
 	// historical
-	static const     NO_MODIFICATION_ALLOWED_ERR : int/*unsigned short*/;
-	__readonly__ var NO_MODIFICATION_ALLOWED_ERR : int/*unsigned short*/;
-	static const     NOT_FOUND_ERR : int/*unsigned short*/;
-	__readonly__ var NOT_FOUND_ERR : int/*unsigned short*/;
-	static const     NOT_SUPPORTED_ERR : int/*unsigned short*/;
-	__readonly__ var NOT_SUPPORTED_ERR : int/*unsigned short*/;
-	static const     INUSE_ATTRIBUTE_ERR : int/*unsigned short*/;
-	__readonly__ var INUSE_ATTRIBUTE_ERR : int/*unsigned short*/;
+	static __readonly__ var NO_MODIFICATION_ALLOWED_ERR : int/*unsigned short*/;
+	       __readonly__ var NO_MODIFICATION_ALLOWED_ERR : int/*unsigned short*/;
+	static __readonly__ var NOT_FOUND_ERR : int/*unsigned short*/;
+	       __readonly__ var NOT_FOUND_ERR : int/*unsigned short*/;
+	static __readonly__ var NOT_SUPPORTED_ERR : int/*unsigned short*/;
+	       __readonly__ var NOT_SUPPORTED_ERR : int/*unsigned short*/;
+	static __readonly__ var INUSE_ATTRIBUTE_ERR : int/*unsigned short*/;
+	       __readonly__ var INUSE_ATTRIBUTE_ERR : int/*unsigned short*/;
 	// historical
-	static const     INVALID_STATE_ERR : int/*unsigned short*/;
-	__readonly__ var INVALID_STATE_ERR : int/*unsigned short*/;
-	static const     SYNTAX_ERR : int/*unsigned short*/;
-	__readonly__ var SYNTAX_ERR : int/*unsigned short*/;
-	static const     INVALID_MODIFICATION_ERR : int/*unsigned short*/;
-	__readonly__ var INVALID_MODIFICATION_ERR : int/*unsigned short*/;
-	static const     NAMESPACE_ERR : int/*unsigned short*/;
-	__readonly__ var NAMESPACE_ERR : int/*unsigned short*/;
-	static const     INVALID_ACCESS_ERR : int/*unsigned short*/;
-	__readonly__ var INVALID_ACCESS_ERR : int/*unsigned short*/;
-	static const     VALIDATION_ERR : int/*unsigned short*/;
-	__readonly__ var VALIDATION_ERR : int/*unsigned short*/;
+	static __readonly__ var INVALID_STATE_ERR : int/*unsigned short*/;
+	       __readonly__ var INVALID_STATE_ERR : int/*unsigned short*/;
+	static __readonly__ var SYNTAX_ERR : int/*unsigned short*/;
+	       __readonly__ var SYNTAX_ERR : int/*unsigned short*/;
+	static __readonly__ var INVALID_MODIFICATION_ERR : int/*unsigned short*/;
+	       __readonly__ var INVALID_MODIFICATION_ERR : int/*unsigned short*/;
+	static __readonly__ var NAMESPACE_ERR : int/*unsigned short*/;
+	       __readonly__ var NAMESPACE_ERR : int/*unsigned short*/;
+	static __readonly__ var INVALID_ACCESS_ERR : int/*unsigned short*/;
+	       __readonly__ var INVALID_ACCESS_ERR : int/*unsigned short*/;
+	static __readonly__ var VALIDATION_ERR : int/*unsigned short*/;
+	       __readonly__ var VALIDATION_ERR : int/*unsigned short*/;
 	// historical
-	static const     TYPE_MISMATCH_ERR : int/*unsigned short*/;
-	__readonly__ var TYPE_MISMATCH_ERR : int/*unsigned short*/;
-	static const     SECURITY_ERR : int/*unsigned short*/;
-	__readonly__ var SECURITY_ERR : int/*unsigned short*/;
-	static const     NETWORK_ERR : int/*unsigned short*/;
-	__readonly__ var NETWORK_ERR : int/*unsigned short*/;
-	static const     ABORT_ERR : int/*unsigned short*/;
-	__readonly__ var ABORT_ERR : int/*unsigned short*/;
-	static const     URL_MISMATCH_ERR : int/*unsigned short*/;
-	__readonly__ var URL_MISMATCH_ERR : int/*unsigned short*/;
-	static const     QUOTA_EXCEEDED_ERR : int/*unsigned short*/;
-	__readonly__ var QUOTA_EXCEEDED_ERR : int/*unsigned short*/;
-	static const     TIMEOUT_ERR : int/*unsigned short*/;
-	__readonly__ var TIMEOUT_ERR : int/*unsigned short*/;
-	static const     INVALID_NODE_TYPE_ERR : int/*unsigned short*/;
-	__readonly__ var INVALID_NODE_TYPE_ERR : int/*unsigned short*/;
-	static const     DATA_CLONE_ERR : int/*unsigned short*/;
-	__readonly__ var DATA_CLONE_ERR : int/*unsigned short*/;
+	static __readonly__ var TYPE_MISMATCH_ERR : int/*unsigned short*/;
+	       __readonly__ var TYPE_MISMATCH_ERR : int/*unsigned short*/;
+	static __readonly__ var SECURITY_ERR : int/*unsigned short*/;
+	       __readonly__ var SECURITY_ERR : int/*unsigned short*/;
+	static __readonly__ var NETWORK_ERR : int/*unsigned short*/;
+	       __readonly__ var NETWORK_ERR : int/*unsigned short*/;
+	static __readonly__ var ABORT_ERR : int/*unsigned short*/;
+	       __readonly__ var ABORT_ERR : int/*unsigned short*/;
+	static __readonly__ var URL_MISMATCH_ERR : int/*unsigned short*/;
+	       __readonly__ var URL_MISMATCH_ERR : int/*unsigned short*/;
+	static __readonly__ var QUOTA_EXCEEDED_ERR : int/*unsigned short*/;
+	       __readonly__ var QUOTA_EXCEEDED_ERR : int/*unsigned short*/;
+	static __readonly__ var TIMEOUT_ERR : int/*unsigned short*/;
+	       __readonly__ var TIMEOUT_ERR : int/*unsigned short*/;
+	static __readonly__ var INVALID_NODE_TYPE_ERR : int/*unsigned short*/;
+	       __readonly__ var INVALID_NODE_TYPE_ERR : int/*unsigned short*/;
+	static __readonly__ var DATA_CLONE_ERR : int/*unsigned short*/;
+	       __readonly__ var DATA_CLONE_ERR : int/*unsigned short*/;
 	var code : int/*unsigned short*/;
 
 } // end of DOMException
@@ -400,12 +400,12 @@ native class Event {
 	__readonly__ var type : string/*DOMString*/;
 	__readonly__ var target : EventTarget;
 	__readonly__ var currentTarget : EventTarget;
-	static const     CAPTURING_PHASE : int/*unsigned short*/;
-	__readonly__ var CAPTURING_PHASE : int/*unsigned short*/;
-	static const     AT_TARGET : int/*unsigned short*/;
-	__readonly__ var AT_TARGET : int/*unsigned short*/;
-	static const     BUBBLING_PHASE : int/*unsigned short*/;
-	__readonly__ var BUBBLING_PHASE : int/*unsigned short*/;
+	static __readonly__ var CAPTURING_PHASE : int/*unsigned short*/;
+	       __readonly__ var CAPTURING_PHASE : int/*unsigned short*/;
+	static __readonly__ var AT_TARGET : int/*unsigned short*/;
+	       __readonly__ var AT_TARGET : int/*unsigned short*/;
+	static __readonly__ var BUBBLING_PHASE : int/*unsigned short*/;
+	       __readonly__ var BUBBLING_PHASE : int/*unsigned short*/;
 	__readonly__ var eventPhase : int/*unsigned short*/;
 	function stopPropagation() : void;
 	function stopImmediatePropagation() : void;
@@ -533,34 +533,34 @@ native class MutationRecord {
 
 native class Node extends EventTarget {
 
-	static const     ELEMENT_NODE : int/*unsigned short*/;
-	__readonly__ var ELEMENT_NODE : int/*unsigned short*/;
-	static const     ATTRIBUTE_NODE : int/*unsigned short*/;
-	__readonly__ var ATTRIBUTE_NODE : int/*unsigned short*/;
+	static __readonly__ var ELEMENT_NODE : int/*unsigned short*/;
+	       __readonly__ var ELEMENT_NODE : int/*unsigned short*/;
+	static __readonly__ var ATTRIBUTE_NODE : int/*unsigned short*/;
+	       __readonly__ var ATTRIBUTE_NODE : int/*unsigned short*/;
 	// historical
-	static const     TEXT_NODE : int/*unsigned short*/;
-	__readonly__ var TEXT_NODE : int/*unsigned short*/;
-	static const     CDATA_SECTION_NODE : int/*unsigned short*/;
-	__readonly__ var CDATA_SECTION_NODE : int/*unsigned short*/;
+	static __readonly__ var TEXT_NODE : int/*unsigned short*/;
+	       __readonly__ var TEXT_NODE : int/*unsigned short*/;
+	static __readonly__ var CDATA_SECTION_NODE : int/*unsigned short*/;
+	       __readonly__ var CDATA_SECTION_NODE : int/*unsigned short*/;
 	// historical
-	static const     ENTITY_REFERENCE_NODE : int/*unsigned short*/;
-	__readonly__ var ENTITY_REFERENCE_NODE : int/*unsigned short*/;
+	static __readonly__ var ENTITY_REFERENCE_NODE : int/*unsigned short*/;
+	       __readonly__ var ENTITY_REFERENCE_NODE : int/*unsigned short*/;
 	// historical
-	static const     ENTITY_NODE : int/*unsigned short*/;
-	__readonly__ var ENTITY_NODE : int/*unsigned short*/;
+	static __readonly__ var ENTITY_NODE : int/*unsigned short*/;
+	       __readonly__ var ENTITY_NODE : int/*unsigned short*/;
 	// historical
-	static const     PROCESSING_INSTRUCTION_NODE : int/*unsigned short*/;
-	__readonly__ var PROCESSING_INSTRUCTION_NODE : int/*unsigned short*/;
-	static const     COMMENT_NODE : int/*unsigned short*/;
-	__readonly__ var COMMENT_NODE : int/*unsigned short*/;
-	static const     DOCUMENT_NODE : int/*unsigned short*/;
-	__readonly__ var DOCUMENT_NODE : int/*unsigned short*/;
-	static const     DOCUMENT_TYPE_NODE : int/*unsigned short*/;
-	__readonly__ var DOCUMENT_TYPE_NODE : int/*unsigned short*/;
-	static const     DOCUMENT_FRAGMENT_NODE : int/*unsigned short*/;
-	__readonly__ var DOCUMENT_FRAGMENT_NODE : int/*unsigned short*/;
-	static const     NOTATION_NODE : int/*unsigned short*/;
-	__readonly__ var NOTATION_NODE : int/*unsigned short*/;
+	static __readonly__ var PROCESSING_INSTRUCTION_NODE : int/*unsigned short*/;
+	       __readonly__ var PROCESSING_INSTRUCTION_NODE : int/*unsigned short*/;
+	static __readonly__ var COMMENT_NODE : int/*unsigned short*/;
+	       __readonly__ var COMMENT_NODE : int/*unsigned short*/;
+	static __readonly__ var DOCUMENT_NODE : int/*unsigned short*/;
+	       __readonly__ var DOCUMENT_NODE : int/*unsigned short*/;
+	static __readonly__ var DOCUMENT_TYPE_NODE : int/*unsigned short*/;
+	       __readonly__ var DOCUMENT_TYPE_NODE : int/*unsigned short*/;
+	static __readonly__ var DOCUMENT_FRAGMENT_NODE : int/*unsigned short*/;
+	       __readonly__ var DOCUMENT_FRAGMENT_NODE : int/*unsigned short*/;
+	static __readonly__ var NOTATION_NODE : int/*unsigned short*/;
+	       __readonly__ var NOTATION_NODE : int/*unsigned short*/;
 	// historical
 	__readonly__ var nodeType : int/*unsigned short*/;
 	__readonly__ var nodeName : string/*DOMString*/;
@@ -574,18 +574,18 @@ native class Node extends EventTarget {
 	__readonly__ var lastChild : Node;
 	__readonly__ var previousSibling : Node;
 	__readonly__ var nextSibling : Node;
-	static const     DOCUMENT_POSITION_DISCONNECTED : int/*unsigned short*/;
-	__readonly__ var DOCUMENT_POSITION_DISCONNECTED : int/*unsigned short*/;
-	static const     DOCUMENT_POSITION_PRECEDING : int/*unsigned short*/;
-	__readonly__ var DOCUMENT_POSITION_PRECEDING : int/*unsigned short*/;
-	static const     DOCUMENT_POSITION_FOLLOWING : int/*unsigned short*/;
-	__readonly__ var DOCUMENT_POSITION_FOLLOWING : int/*unsigned short*/;
-	static const     DOCUMENT_POSITION_CONTAINS : int/*unsigned short*/;
-	__readonly__ var DOCUMENT_POSITION_CONTAINS : int/*unsigned short*/;
-	static const     DOCUMENT_POSITION_CONTAINED_BY : int/*unsigned short*/;
-	__readonly__ var DOCUMENT_POSITION_CONTAINED_BY : int/*unsigned short*/;
-	static const     DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC : int/*unsigned short*/;
-	__readonly__ var DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC : int/*unsigned short*/;
+	static __readonly__ var DOCUMENT_POSITION_DISCONNECTED : int/*unsigned short*/;
+	       __readonly__ var DOCUMENT_POSITION_DISCONNECTED : int/*unsigned short*/;
+	static __readonly__ var DOCUMENT_POSITION_PRECEDING : int/*unsigned short*/;
+	       __readonly__ var DOCUMENT_POSITION_PRECEDING : int/*unsigned short*/;
+	static __readonly__ var DOCUMENT_POSITION_FOLLOWING : int/*unsigned short*/;
+	       __readonly__ var DOCUMENT_POSITION_FOLLOWING : int/*unsigned short*/;
+	static __readonly__ var DOCUMENT_POSITION_CONTAINS : int/*unsigned short*/;
+	       __readonly__ var DOCUMENT_POSITION_CONTAINS : int/*unsigned short*/;
+	static __readonly__ var DOCUMENT_POSITION_CONTAINED_BY : int/*unsigned short*/;
+	       __readonly__ var DOCUMENT_POSITION_CONTAINED_BY : int/*unsigned short*/;
+	static __readonly__ var DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC : int/*unsigned short*/;
+	       __readonly__ var DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC : int/*unsigned short*/;
 	// historical
 	function compareDocumentPosition(
 		other : Node
@@ -983,14 +983,14 @@ native class Range {
 	function collapse(toStart : boolean) : void;
 	function selectNode(refNode : Node) : void;
 	function selectNodeContents(refNode : Node) : void;
-	static const     START_TO_START : int/*unsigned short*/;
-	__readonly__ var START_TO_START : int/*unsigned short*/;
-	static const     START_TO_END : int/*unsigned short*/;
-	__readonly__ var START_TO_END : int/*unsigned short*/;
-	static const     END_TO_END : int/*unsigned short*/;
-	__readonly__ var END_TO_END : int/*unsigned short*/;
-	static const     END_TO_START : int/*unsigned short*/;
-	__readonly__ var END_TO_START : int/*unsigned short*/;
+	static __readonly__ var START_TO_START : int/*unsigned short*/;
+	       __readonly__ var START_TO_START : int/*unsigned short*/;
+	static __readonly__ var START_TO_END : int/*unsigned short*/;
+	       __readonly__ var START_TO_END : int/*unsigned short*/;
+	static __readonly__ var END_TO_END : int/*unsigned short*/;
+	       __readonly__ var END_TO_END : int/*unsigned short*/;
+	static __readonly__ var END_TO_START : int/*unsigned short*/;
+	       __readonly__ var END_TO_START : int/*unsigned short*/;
 	function compareBoundaryPoints(
 		how : int/*unsigned short*/,
 		sourceRange : Range
@@ -1053,43 +1053,43 @@ native class TreeWalker {
 native class NodeFilter {
 
 	// Constants for acceptNode()
-	static const     FILTER_ACCEPT : int/*unsigned short*/;
-	__readonly__ var FILTER_ACCEPT : int/*unsigned short*/;
-	static const     FILTER_REJECT : int/*unsigned short*/;
-	__readonly__ var FILTER_REJECT : int/*unsigned short*/;
-	static const     FILTER_SKIP : int/*unsigned short*/;
-	__readonly__ var FILTER_SKIP : int/*unsigned short*/;
+	static __readonly__ var FILTER_ACCEPT : int/*unsigned short*/;
+	       __readonly__ var FILTER_ACCEPT : int/*unsigned short*/;
+	static __readonly__ var FILTER_REJECT : int/*unsigned short*/;
+	       __readonly__ var FILTER_REJECT : int/*unsigned short*/;
+	static __readonly__ var FILTER_SKIP : int/*unsigned short*/;
+	       __readonly__ var FILTER_SKIP : int/*unsigned short*/;
 	// Constants for whatToShow
-	static const     SHOW_ALL : int/*unsigned long*/;
-	__readonly__ var SHOW_ALL : int/*unsigned long*/;
-	static const     SHOW_ELEMENT : int/*unsigned long*/;
-	__readonly__ var SHOW_ELEMENT : int/*unsigned long*/;
-	static const     SHOW_ATTRIBUTE : int/*unsigned long*/;
-	__readonly__ var SHOW_ATTRIBUTE : int/*unsigned long*/;
+	static __readonly__ var SHOW_ALL : int/*unsigned long*/;
+	       __readonly__ var SHOW_ALL : int/*unsigned long*/;
+	static __readonly__ var SHOW_ELEMENT : int/*unsigned long*/;
+	       __readonly__ var SHOW_ELEMENT : int/*unsigned long*/;
+	static __readonly__ var SHOW_ATTRIBUTE : int/*unsigned long*/;
+	       __readonly__ var SHOW_ATTRIBUTE : int/*unsigned long*/;
 	// historical
-	static const     SHOW_TEXT : int/*unsigned long*/;
-	__readonly__ var SHOW_TEXT : int/*unsigned long*/;
-	static const     SHOW_CDATA_SECTION : int/*unsigned long*/;
-	__readonly__ var SHOW_CDATA_SECTION : int/*unsigned long*/;
+	static __readonly__ var SHOW_TEXT : int/*unsigned long*/;
+	       __readonly__ var SHOW_TEXT : int/*unsigned long*/;
+	static __readonly__ var SHOW_CDATA_SECTION : int/*unsigned long*/;
+	       __readonly__ var SHOW_CDATA_SECTION : int/*unsigned long*/;
 	// historical
-	static const     SHOW_ENTITY_REFERENCE : int/*unsigned long*/;
-	__readonly__ var SHOW_ENTITY_REFERENCE : int/*unsigned long*/;
+	static __readonly__ var SHOW_ENTITY_REFERENCE : int/*unsigned long*/;
+	       __readonly__ var SHOW_ENTITY_REFERENCE : int/*unsigned long*/;
 	// historical
-	static const     SHOW_ENTITY : int/*unsigned long*/;
-	__readonly__ var SHOW_ENTITY : int/*unsigned long*/;
+	static __readonly__ var SHOW_ENTITY : int/*unsigned long*/;
+	       __readonly__ var SHOW_ENTITY : int/*unsigned long*/;
 	// historical
-	static const     SHOW_PROCESSING_INSTRUCTION : int/*unsigned long*/;
-	__readonly__ var SHOW_PROCESSING_INSTRUCTION : int/*unsigned long*/;
-	static const     SHOW_COMMENT : int/*unsigned long*/;
-	__readonly__ var SHOW_COMMENT : int/*unsigned long*/;
-	static const     SHOW_DOCUMENT : int/*unsigned long*/;
-	__readonly__ var SHOW_DOCUMENT : int/*unsigned long*/;
-	static const     SHOW_DOCUMENT_TYPE : int/*unsigned long*/;
-	__readonly__ var SHOW_DOCUMENT_TYPE : int/*unsigned long*/;
-	static const     SHOW_DOCUMENT_FRAGMENT : int/*unsigned long*/;
-	__readonly__ var SHOW_DOCUMENT_FRAGMENT : int/*unsigned long*/;
-	static const     SHOW_NOTATION : int/*unsigned long*/;
-	__readonly__ var SHOW_NOTATION : int/*unsigned long*/;
+	static __readonly__ var SHOW_PROCESSING_INSTRUCTION : int/*unsigned long*/;
+	       __readonly__ var SHOW_PROCESSING_INSTRUCTION : int/*unsigned long*/;
+	static __readonly__ var SHOW_COMMENT : int/*unsigned long*/;
+	       __readonly__ var SHOW_COMMENT : int/*unsigned long*/;
+	static __readonly__ var SHOW_DOCUMENT : int/*unsigned long*/;
+	       __readonly__ var SHOW_DOCUMENT : int/*unsigned long*/;
+	static __readonly__ var SHOW_DOCUMENT_TYPE : int/*unsigned long*/;
+	       __readonly__ var SHOW_DOCUMENT_TYPE : int/*unsigned long*/;
+	static __readonly__ var SHOW_DOCUMENT_FRAGMENT : int/*unsigned long*/;
+	       __readonly__ var SHOW_DOCUMENT_FRAGMENT : int/*unsigned long*/;
+	static __readonly__ var SHOW_NOTATION : int/*unsigned long*/;
+	       __readonly__ var SHOW_NOTATION : int/*unsigned long*/;
 	// historical
 
 	function acceptNode(node : Node) : int/*unsigned short*/;
@@ -1180,11 +1180,11 @@ native __fake__ class DocumentView {
 native class EventException {
 
 	// EventExceptionCode
-	static const     UNSPECIFIED_EVENT_TYPE_ERR : int/*unsigned short*/;
-	__readonly__ var UNSPECIFIED_EVENT_TYPE_ERR : int/*unsigned short*/;
+	static __readonly__ var UNSPECIFIED_EVENT_TYPE_ERR : int/*unsigned short*/;
+	       __readonly__ var UNSPECIFIED_EVENT_TYPE_ERR : int/*unsigned short*/;
 	// Introduced in DOM Level 3:
-	static const     DISPATCH_REQUEST_ERR : int/*unsigned short*/;
-	__readonly__ var DISPATCH_REQUEST_ERR : int/*unsigned short*/;
+	static __readonly__ var DISPATCH_REQUEST_ERR : int/*unsigned short*/;
+	       __readonly__ var DISPATCH_REQUEST_ERR : int/*unsigned short*/;
 	// Introduced in DOM Level 2:
 	var code : int/*unsigned short*/;
 
@@ -1279,12 +1279,12 @@ native class MouseEvent extends UIEvent {
 native class WheelEvent extends MouseEvent {
 
 	// DeltaModeCode
-	static const     DOM_DELTA_PIXEL : int/*unsigned long*/;
-	__readonly__ var DOM_DELTA_PIXEL : int/*unsigned long*/;
-	static const     DOM_DELTA_LINE : int/*unsigned long*/;
-	__readonly__ var DOM_DELTA_LINE : int/*unsigned long*/;
-	static const     DOM_DELTA_PAGE : int/*unsigned long*/;
-	__readonly__ var DOM_DELTA_PAGE : int/*unsigned long*/;
+	static __readonly__ var DOM_DELTA_PIXEL : int/*unsigned long*/;
+	       __readonly__ var DOM_DELTA_PIXEL : int/*unsigned long*/;
+	static __readonly__ var DOM_DELTA_LINE : int/*unsigned long*/;
+	       __readonly__ var DOM_DELTA_LINE : int/*unsigned long*/;
+	static __readonly__ var DOM_DELTA_PAGE : int/*unsigned long*/;
+	       __readonly__ var DOM_DELTA_PAGE : int/*unsigned long*/;
 	__readonly__ var deltaX : number/*float*/;
 	__readonly__ var deltaY : number/*float*/;
 	__readonly__ var deltaZ : number/*float*/;
@@ -1315,26 +1315,26 @@ native class WheelEvent extends MouseEvent {
 native class TextEvent extends UIEvent {
 
 	// InputMethodCode
-	static const     DOM_INPUT_METHOD_UNKNOWN : int/*unsigned long*/;
-	__readonly__ var DOM_INPUT_METHOD_UNKNOWN : int/*unsigned long*/;
-	static const     DOM_INPUT_METHOD_KEYBOARD : int/*unsigned long*/;
-	__readonly__ var DOM_INPUT_METHOD_KEYBOARD : int/*unsigned long*/;
-	static const     DOM_INPUT_METHOD_PASTE : int/*unsigned long*/;
-	__readonly__ var DOM_INPUT_METHOD_PASTE : int/*unsigned long*/;
-	static const     DOM_INPUT_METHOD_DROP : int/*unsigned long*/;
-	__readonly__ var DOM_INPUT_METHOD_DROP : int/*unsigned long*/;
-	static const     DOM_INPUT_METHOD_IME : int/*unsigned long*/;
-	__readonly__ var DOM_INPUT_METHOD_IME : int/*unsigned long*/;
-	static const     DOM_INPUT_METHOD_OPTION : int/*unsigned long*/;
-	__readonly__ var DOM_INPUT_METHOD_OPTION : int/*unsigned long*/;
-	static const     DOM_INPUT_METHOD_HANDWRITING : int/*unsigned long*/;
-	__readonly__ var DOM_INPUT_METHOD_HANDWRITING : int/*unsigned long*/;
-	static const     DOM_INPUT_METHOD_VOICE : int/*unsigned long*/;
-	__readonly__ var DOM_INPUT_METHOD_VOICE : int/*unsigned long*/;
-	static const     DOM_INPUT_METHOD_MULTIMODAL : int/*unsigned long*/;
-	__readonly__ var DOM_INPUT_METHOD_MULTIMODAL : int/*unsigned long*/;
-	static const     DOM_INPUT_METHOD_SCRIPT : int/*unsigned long*/;
-	__readonly__ var DOM_INPUT_METHOD_SCRIPT : int/*unsigned long*/;
+	static __readonly__ var DOM_INPUT_METHOD_UNKNOWN : int/*unsigned long*/;
+	       __readonly__ var DOM_INPUT_METHOD_UNKNOWN : int/*unsigned long*/;
+	static __readonly__ var DOM_INPUT_METHOD_KEYBOARD : int/*unsigned long*/;
+	       __readonly__ var DOM_INPUT_METHOD_KEYBOARD : int/*unsigned long*/;
+	static __readonly__ var DOM_INPUT_METHOD_PASTE : int/*unsigned long*/;
+	       __readonly__ var DOM_INPUT_METHOD_PASTE : int/*unsigned long*/;
+	static __readonly__ var DOM_INPUT_METHOD_DROP : int/*unsigned long*/;
+	       __readonly__ var DOM_INPUT_METHOD_DROP : int/*unsigned long*/;
+	static __readonly__ var DOM_INPUT_METHOD_IME : int/*unsigned long*/;
+	       __readonly__ var DOM_INPUT_METHOD_IME : int/*unsigned long*/;
+	static __readonly__ var DOM_INPUT_METHOD_OPTION : int/*unsigned long*/;
+	       __readonly__ var DOM_INPUT_METHOD_OPTION : int/*unsigned long*/;
+	static __readonly__ var DOM_INPUT_METHOD_HANDWRITING : int/*unsigned long*/;
+	       __readonly__ var DOM_INPUT_METHOD_HANDWRITING : int/*unsigned long*/;
+	static __readonly__ var DOM_INPUT_METHOD_VOICE : int/*unsigned long*/;
+	       __readonly__ var DOM_INPUT_METHOD_VOICE : int/*unsigned long*/;
+	static __readonly__ var DOM_INPUT_METHOD_MULTIMODAL : int/*unsigned long*/;
+	       __readonly__ var DOM_INPUT_METHOD_MULTIMODAL : int/*unsigned long*/;
+	static __readonly__ var DOM_INPUT_METHOD_SCRIPT : int/*unsigned long*/;
+	       __readonly__ var DOM_INPUT_METHOD_SCRIPT : int/*unsigned long*/;
 	__readonly__ var data : string/*DOMString*/;
 	__readonly__ var inputMethod : int/*unsigned long*/;
 	__readonly__ var locale : string/*DOMString*/;
@@ -1355,18 +1355,18 @@ native class TextEvent extends UIEvent {
 native class KeyboardEvent extends UIEvent {
 
 	// KeyLocationCode
-	static const     DOM_KEY_LOCATION_STANDARD : int/*unsigned long*/;
-	__readonly__ var DOM_KEY_LOCATION_STANDARD : int/*unsigned long*/;
-	static const     DOM_KEY_LOCATION_LEFT : int/*unsigned long*/;
-	__readonly__ var DOM_KEY_LOCATION_LEFT : int/*unsigned long*/;
-	static const     DOM_KEY_LOCATION_RIGHT : int/*unsigned long*/;
-	__readonly__ var DOM_KEY_LOCATION_RIGHT : int/*unsigned long*/;
-	static const     DOM_KEY_LOCATION_NUMPAD : int/*unsigned long*/;
-	__readonly__ var DOM_KEY_LOCATION_NUMPAD : int/*unsigned long*/;
-	static const     DOM_KEY_LOCATION_MOBILE : int/*unsigned long*/;
-	__readonly__ var DOM_KEY_LOCATION_MOBILE : int/*unsigned long*/;
-	static const     DOM_KEY_LOCATION_JOYSTICK : int/*unsigned long*/;
-	__readonly__ var DOM_KEY_LOCATION_JOYSTICK : int/*unsigned long*/;
+	static __readonly__ var DOM_KEY_LOCATION_STANDARD : int/*unsigned long*/;
+	       __readonly__ var DOM_KEY_LOCATION_STANDARD : int/*unsigned long*/;
+	static __readonly__ var DOM_KEY_LOCATION_LEFT : int/*unsigned long*/;
+	       __readonly__ var DOM_KEY_LOCATION_LEFT : int/*unsigned long*/;
+	static __readonly__ var DOM_KEY_LOCATION_RIGHT : int/*unsigned long*/;
+	       __readonly__ var DOM_KEY_LOCATION_RIGHT : int/*unsigned long*/;
+	static __readonly__ var DOM_KEY_LOCATION_NUMPAD : int/*unsigned long*/;
+	       __readonly__ var DOM_KEY_LOCATION_NUMPAD : int/*unsigned long*/;
+	static __readonly__ var DOM_KEY_LOCATION_MOBILE : int/*unsigned long*/;
+	       __readonly__ var DOM_KEY_LOCATION_MOBILE : int/*unsigned long*/;
+	static __readonly__ var DOM_KEY_LOCATION_JOYSTICK : int/*unsigned long*/;
+	       __readonly__ var DOM_KEY_LOCATION_JOYSTICK : int/*unsigned long*/;
 	__readonly__ var char : string/*DOMString*/;
 	__readonly__ var key : string/*DOMString*/;
 	__readonly__ var location : int/*unsigned long*/;
@@ -1417,12 +1417,12 @@ native class CompositionEvent extends UIEvent {
 native class MutationEvent extends Event {
 
 	// attrChangeType
-	static const     MODIFICATION : int/*unsigned short*/;
-	__readonly__ var MODIFICATION : int/*unsigned short*/;
-	static const     ADDITION : int/*unsigned short*/;
-	__readonly__ var ADDITION : int/*unsigned short*/;
-	static const     REMOVAL : int/*unsigned short*/;
-	__readonly__ var REMOVAL : int/*unsigned short*/;
+	static __readonly__ var MODIFICATION : int/*unsigned short*/;
+	       __readonly__ var MODIFICATION : int/*unsigned short*/;
+	static __readonly__ var ADDITION : int/*unsigned short*/;
+	       __readonly__ var ADDITION : int/*unsigned short*/;
+	static __readonly__ var REMOVAL : int/*unsigned short*/;
+	       __readonly__ var REMOVAL : int/*unsigned short*/;
 	__readonly__ var relatedNode : Node;
 	__readonly__ var prevValue : string/*DOMString*/;
 	__readonly__ var newValue : string/*DOMString*/;
@@ -1490,16 +1490,16 @@ native class XMLHttpRequest extends XMLHttpRequestEventTarget {
 	// event handler
 	var onreadystatechange : function(:Event):void/*Function?*/;
 	// states
-	static const     UNSENT : int/*unsigned short*/;
-	__readonly__ var UNSENT : int/*unsigned short*/;
-	static const     OPENED : int/*unsigned short*/;
-	__readonly__ var OPENED : int/*unsigned short*/;
-	static const     HEADERS_RECEIVED : int/*unsigned short*/;
-	__readonly__ var HEADERS_RECEIVED : int/*unsigned short*/;
-	static const     LOADING : int/*unsigned short*/;
-	__readonly__ var LOADING : int/*unsigned short*/;
-	static const     DONE : int/*unsigned short*/;
-	__readonly__ var DONE : int/*unsigned short*/;
+	static __readonly__ var UNSENT : int/*unsigned short*/;
+	       __readonly__ var UNSENT : int/*unsigned short*/;
+	static __readonly__ var OPENED : int/*unsigned short*/;
+	       __readonly__ var OPENED : int/*unsigned short*/;
+	static __readonly__ var HEADERS_RECEIVED : int/*unsigned short*/;
+	       __readonly__ var HEADERS_RECEIVED : int/*unsigned short*/;
+	static __readonly__ var LOADING : int/*unsigned short*/;
+	       __readonly__ var LOADING : int/*unsigned short*/;
+	static __readonly__ var DONE : int/*unsigned short*/;
+	       __readonly__ var DONE : int/*unsigned short*/;
 	__readonly__ var readyState : int/*unsigned short*/;
 	// request
 	function open(
@@ -1626,18 +1626,18 @@ native __fake__ class LinkStyle {
 native class CSSRule {
 
 	// Types
-	static const     STYLE_RULE : int/*unsigned short*/;
-	__readonly__ var STYLE_RULE : int/*unsigned short*/;
-	static const     IMPORT_RULE : int/*unsigned short*/;
-	__readonly__ var IMPORT_RULE : int/*unsigned short*/;
-	static const     MEDIA_RULE : int/*unsigned short*/;
-	__readonly__ var MEDIA_RULE : int/*unsigned short*/;
-	static const     FONT_FACE_RULE : int/*unsigned short*/;
-	__readonly__ var FONT_FACE_RULE : int/*unsigned short*/;
-	static const     PAGE_RULE : int/*unsigned short*/;
-	__readonly__ var PAGE_RULE : int/*unsigned short*/;
-	static const     NAMESPACE_RULE : int/*unsigned short*/;
-	__readonly__ var NAMESPACE_RULE : int/*unsigned short*/;
+	static __readonly__ var STYLE_RULE : int/*unsigned short*/;
+	       __readonly__ var STYLE_RULE : int/*unsigned short*/;
+	static __readonly__ var IMPORT_RULE : int/*unsigned short*/;
+	       __readonly__ var IMPORT_RULE : int/*unsigned short*/;
+	static __readonly__ var MEDIA_RULE : int/*unsigned short*/;
+	       __readonly__ var MEDIA_RULE : int/*unsigned short*/;
+	static __readonly__ var FONT_FACE_RULE : int/*unsigned short*/;
+	       __readonly__ var FONT_FACE_RULE : int/*unsigned short*/;
+	static __readonly__ var PAGE_RULE : int/*unsigned short*/;
+	       __readonly__ var PAGE_RULE : int/*unsigned short*/;
+	static __readonly__ var NAMESPACE_RULE : int/*unsigned short*/;
+	       __readonly__ var NAMESPACE_RULE : int/*unsigned short*/;
 	__readonly__ var type : int/*unsigned short*/;
 	// Parsing and serialization
 	var cssText : string/*DOMString*/;
@@ -3164,14 +3164,14 @@ native class HTMLTrackElement extends HTMLElement {
 	var srclang : string/*DOMString*/;
 	var label : string/*DOMString*/;
 	var default : boolean;
-	static const     NONE : int/*unsigned short*/;
-	__readonly__ var NONE : int/*unsigned short*/;
-	static const     LOADING : int/*unsigned short*/;
-	__readonly__ var LOADING : int/*unsigned short*/;
-	static const     LOADED : int/*unsigned short*/;
-	__readonly__ var LOADED : int/*unsigned short*/;
-	static const     ERROR : int/*unsigned short*/;
-	__readonly__ var ERROR : int/*unsigned short*/;
+	static __readonly__ var NONE : int/*unsigned short*/;
+	       __readonly__ var NONE : int/*unsigned short*/;
+	static __readonly__ var LOADING : int/*unsigned short*/;
+	       __readonly__ var LOADING : int/*unsigned short*/;
+	static __readonly__ var LOADED : int/*unsigned short*/;
+	       __readonly__ var LOADED : int/*unsigned short*/;
+	static __readonly__ var ERROR : int/*unsigned short*/;
+	       __readonly__ var ERROR : int/*unsigned short*/;
 	__readonly__ var readyState : int/*unsigned short*/;
 	__readonly__ var track : TextTrack;
 
@@ -3185,14 +3185,14 @@ native class HTMLMediaElement extends HTMLElement {
 	var src : string/*DOMString*/;
 	__readonly__ var currentSrc : string/*DOMString*/;
 	var crossOrigin : string/*DOMString*/;
-	static const     NETWORK_EMPTY : int/*unsigned short*/;
-	__readonly__ var NETWORK_EMPTY : int/*unsigned short*/;
-	static const     NETWORK_IDLE : int/*unsigned short*/;
-	__readonly__ var NETWORK_IDLE : int/*unsigned short*/;
-	static const     NETWORK_LOADING : int/*unsigned short*/;
-	__readonly__ var NETWORK_LOADING : int/*unsigned short*/;
-	static const     NETWORK_NO_SOURCE : int/*unsigned short*/;
-	__readonly__ var NETWORK_NO_SOURCE : int/*unsigned short*/;
+	static __readonly__ var NETWORK_EMPTY : int/*unsigned short*/;
+	       __readonly__ var NETWORK_EMPTY : int/*unsigned short*/;
+	static __readonly__ var NETWORK_IDLE : int/*unsigned short*/;
+	       __readonly__ var NETWORK_IDLE : int/*unsigned short*/;
+	static __readonly__ var NETWORK_LOADING : int/*unsigned short*/;
+	       __readonly__ var NETWORK_LOADING : int/*unsigned short*/;
+	static __readonly__ var NETWORK_NO_SOURCE : int/*unsigned short*/;
+	       __readonly__ var NETWORK_NO_SOURCE : int/*unsigned short*/;
 	__readonly__ var networkState : int/*unsigned short*/;
 	var preload : string/*DOMString*/;
 	__readonly__ var buffered : TimeRanges;
@@ -3201,16 +3201,16 @@ native class HTMLMediaElement extends HTMLElement {
 		type : string/*DOMString*/
 	) : string/*DOMString*/;
 	// ready state
-	static const     HAVE_NOTHING : int/*unsigned short*/;
-	__readonly__ var HAVE_NOTHING : int/*unsigned short*/;
-	static const     HAVE_METADATA : int/*unsigned short*/;
-	__readonly__ var HAVE_METADATA : int/*unsigned short*/;
-	static const     HAVE_CURRENT_DATA : int/*unsigned short*/;
-	__readonly__ var HAVE_CURRENT_DATA : int/*unsigned short*/;
-	static const     HAVE_FUTURE_DATA : int/*unsigned short*/;
-	__readonly__ var HAVE_FUTURE_DATA : int/*unsigned short*/;
-	static const     HAVE_ENOUGH_DATA : int/*unsigned short*/;
-	__readonly__ var HAVE_ENOUGH_DATA : int/*unsigned short*/;
+	static __readonly__ var HAVE_NOTHING : int/*unsigned short*/;
+	       __readonly__ var HAVE_NOTHING : int/*unsigned short*/;
+	static __readonly__ var HAVE_METADATA : int/*unsigned short*/;
+	       __readonly__ var HAVE_METADATA : int/*unsigned short*/;
+	static __readonly__ var HAVE_CURRENT_DATA : int/*unsigned short*/;
+	       __readonly__ var HAVE_CURRENT_DATA : int/*unsigned short*/;
+	static __readonly__ var HAVE_FUTURE_DATA : int/*unsigned short*/;
+	       __readonly__ var HAVE_FUTURE_DATA : int/*unsigned short*/;
+	static __readonly__ var HAVE_ENOUGH_DATA : int/*unsigned short*/;
+	       __readonly__ var HAVE_ENOUGH_DATA : int/*unsigned short*/;
 	__readonly__ var readyState : int/*unsigned short*/;
 	__readonly__ var seeking : boolean;
 	// playback state
@@ -3255,14 +3255,14 @@ native class HTMLMediaElement extends HTMLElement {
 
 native class MediaError {
 
-	static const     MEDIA_ERR_ABORTED : int/*unsigned short*/;
-	__readonly__ var MEDIA_ERR_ABORTED : int/*unsigned short*/;
-	static const     MEDIA_ERR_NETWORK : int/*unsigned short*/;
-	__readonly__ var MEDIA_ERR_NETWORK : int/*unsigned short*/;
-	static const     MEDIA_ERR_DECODE : int/*unsigned short*/;
-	__readonly__ var MEDIA_ERR_DECODE : int/*unsigned short*/;
-	static const     MEDIA_ERR_SRC_NOT_SUPPORTED : int/*unsigned short*/;
-	__readonly__ var MEDIA_ERR_SRC_NOT_SUPPORTED : int/*unsigned short*/;
+	static __readonly__ var MEDIA_ERR_ABORTED : int/*unsigned short*/;
+	       __readonly__ var MEDIA_ERR_ABORTED : int/*unsigned short*/;
+	static __readonly__ var MEDIA_ERR_NETWORK : int/*unsigned short*/;
+	       __readonly__ var MEDIA_ERR_NETWORK : int/*unsigned short*/;
+	static __readonly__ var MEDIA_ERR_DECODE : int/*unsigned short*/;
+	       __readonly__ var MEDIA_ERR_DECODE : int/*unsigned short*/;
+	static __readonly__ var MEDIA_ERR_SRC_NOT_SUPPORTED : int/*unsigned short*/;
+	       __readonly__ var MEDIA_ERR_SRC_NOT_SUPPORTED : int/*unsigned short*/;
 	__readonly__ var code : int/*unsigned short*/;
 
 } // end of MediaError
@@ -3360,12 +3360,12 @@ native class TextTrack extends EventTarget {
 	__readonly__ var kind : string/*DOMString*/;
 	__readonly__ var label : string/*DOMString*/;
 	__readonly__ var language : string/*DOMString*/;
-	static const     DISABLED : int/*unsigned short*/;
-	__readonly__ var DISABLED : int/*unsigned short*/;
-	static const     HIDDEN : int/*unsigned short*/;
-	__readonly__ var HIDDEN : int/*unsigned short*/;
-	static const     SHOWING : int/*unsigned short*/;
-	__readonly__ var SHOWING : int/*unsigned short*/;
+	static __readonly__ var DISABLED : int/*unsigned short*/;
+	       __readonly__ var DISABLED : int/*unsigned short*/;
+	static __readonly__ var HIDDEN : int/*unsigned short*/;
+	       __readonly__ var HIDDEN : int/*unsigned short*/;
+	static __readonly__ var SHOWING : int/*unsigned short*/;
+	       __readonly__ var SHOWING : int/*unsigned short*/;
 	var mode : int/*unsigned short*/;
 	__readonly__ var cues : TextTrackCueList;
 	__readonly__ var activeCues : TextTrackCueList;
@@ -4104,18 +4104,18 @@ native class BeforeUnloadEvent extends Event {
 native class ApplicationCache extends EventTarget {
 
 	// update status
-	static const     UNCACHED : int/*unsigned short*/;
-	__readonly__ var UNCACHED : int/*unsigned short*/;
-	static const     IDLE : int/*unsigned short*/;
-	__readonly__ var IDLE : int/*unsigned short*/;
-	static const     CHECKING : int/*unsigned short*/;
-	__readonly__ var CHECKING : int/*unsigned short*/;
-	static const     DOWNLOADING : int/*unsigned short*/;
-	__readonly__ var DOWNLOADING : int/*unsigned short*/;
-	static const     UPDATEREADY : int/*unsigned short*/;
-	__readonly__ var UPDATEREADY : int/*unsigned short*/;
-	static const     OBSOLETE : int/*unsigned short*/;
-	__readonly__ var OBSOLETE : int/*unsigned short*/;
+	static __readonly__ var UNCACHED : int/*unsigned short*/;
+	       __readonly__ var UNCACHED : int/*unsigned short*/;
+	static __readonly__ var IDLE : int/*unsigned short*/;
+	       __readonly__ var IDLE : int/*unsigned short*/;
+	static __readonly__ var CHECKING : int/*unsigned short*/;
+	       __readonly__ var CHECKING : int/*unsigned short*/;
+	static __readonly__ var DOWNLOADING : int/*unsigned short*/;
+	       __readonly__ var DOWNLOADING : int/*unsigned short*/;
+	static __readonly__ var UPDATEREADY : int/*unsigned short*/;
+	       __readonly__ var UPDATEREADY : int/*unsigned short*/;
+	static __readonly__ var OBSOLETE : int/*unsigned short*/;
+	       __readonly__ var OBSOLETE : int/*unsigned short*/;
 	__readonly__ var status : int/*unsigned short*/;
 	// updates
 	function update() : void;
@@ -4491,12 +4491,12 @@ native class FileReader extends EventTarget {
 	function readAsDataURL(blob : Blob) : void;
 	function abort() : void;
 	// states
-	static const     EMPTY : int/*unsigned short*/;
-	__readonly__ var EMPTY : int/*unsigned short*/;
-	static const     LOADING : int/*unsigned short*/;
-	__readonly__ var LOADING : int/*unsigned short*/;
-	static const     DONE : int/*unsigned short*/;
-	__readonly__ var DONE : int/*unsigned short*/;
+	static __readonly__ var EMPTY : int/*unsigned short*/;
+	       __readonly__ var EMPTY : int/*unsigned short*/;
+	static __readonly__ var LOADING : int/*unsigned short*/;
+	       __readonly__ var LOADING : int/*unsigned short*/;
+	static __readonly__ var DONE : int/*unsigned short*/;
+	       __readonly__ var DONE : int/*unsigned short*/;
 	__readonly__ var readyState : int/*unsigned short*/;
 	// File or Blob data
 	__readonly__ var result : variant/*any*/;
@@ -4591,14 +4591,14 @@ native class WebSocket extends EventTarget {
 
 	__readonly__ var url : string/*DOMString*/;
 	// ready state
-	static const     CONNECTING : int/*unsigned short*/;
-	__readonly__ var CONNECTING : int/*unsigned short*/;
-	static const     OPEN : int/*unsigned short*/;
-	__readonly__ var OPEN : int/*unsigned short*/;
-	static const     CLOSING : int/*unsigned short*/;
-	__readonly__ var CLOSING : int/*unsigned short*/;
-	static const     CLOSED : int/*unsigned short*/;
-	__readonly__ var CLOSED : int/*unsigned short*/;
+	static __readonly__ var CONNECTING : int/*unsigned short*/;
+	       __readonly__ var CONNECTING : int/*unsigned short*/;
+	static __readonly__ var OPEN : int/*unsigned short*/;
+	       __readonly__ var OPEN : int/*unsigned short*/;
+	static __readonly__ var CLOSING : int/*unsigned short*/;
+	       __readonly__ var CLOSING : int/*unsigned short*/;
+	static __readonly__ var CLOSED : int/*unsigned short*/;
+	       __readonly__ var CLOSED : int/*unsigned short*/;
 	__readonly__ var readyState : int/*unsigned short*/;
 	__readonly__ var bufferedAmount : int/*unsigned long*/;
 	// networking
@@ -4738,12 +4738,12 @@ native class Address {
 
 native class PositionError {
 
-	static const     PERMISSION_DENIED : int/*unsigned short*/;
-	__readonly__ var PERMISSION_DENIED : int/*unsigned short*/;
-	static const     POSITION_UNAVAILABLE : int/*unsigned short*/;
-	__readonly__ var POSITION_UNAVAILABLE : int/*unsigned short*/;
-	static const     TIMEOUT : int/*unsigned short*/;
-	__readonly__ var TIMEOUT : int/*unsigned short*/;
+	static __readonly__ var PERMISSION_DENIED : int/*unsigned short*/;
+	       __readonly__ var PERMISSION_DENIED : int/*unsigned short*/;
+	static __readonly__ var POSITION_UNAVAILABLE : int/*unsigned short*/;
+	       __readonly__ var POSITION_UNAVAILABLE : int/*unsigned short*/;
+	static __readonly__ var TIMEOUT : int/*unsigned short*/;
+	       __readonly__ var TIMEOUT : int/*unsigned short*/;
 	__readonly__ var code : int/*unsigned short*/;
 	__readonly__ var message : string/*DOMString*/;
 
@@ -4877,8 +4877,8 @@ native class Int8Array extends ArrayBufferView {
 		length : int/*unsigned long*/
 	);
 
-	static const     BYTES_PER_ELEMENT : int/*long*/;
-	__readonly__ var BYTES_PER_ELEMENT : int/*long*/;
+	static __readonly__ var BYTES_PER_ELEMENT : int/*long*/;
+	       __readonly__ var BYTES_PER_ELEMENT : int/*long*/;
 	__readonly__ var length : int/*unsigned long*/;
 	function __native_index_operator__(
 		index : int/*unsigned long*/
@@ -4931,8 +4931,8 @@ native class Uint8Array extends ArrayBufferView {
 		length : int/*unsigned long*/
 	);
 
-	static const     BYTES_PER_ELEMENT : int/*long*/;
-	__readonly__ var BYTES_PER_ELEMENT : int/*long*/;
+	static __readonly__ var BYTES_PER_ELEMENT : int/*long*/;
+	       __readonly__ var BYTES_PER_ELEMENT : int/*long*/;
 	__readonly__ var length : int/*unsigned long*/;
 	function __native_index_operator__(
 		index : int/*unsigned long*/
@@ -5021,8 +5021,8 @@ native class Int16Array extends ArrayBufferView {
 		length : int/*unsigned long*/
 	);
 
-	static const     BYTES_PER_ELEMENT : int/*long*/;
-	__readonly__ var BYTES_PER_ELEMENT : int/*long*/;
+	static __readonly__ var BYTES_PER_ELEMENT : int/*long*/;
+	       __readonly__ var BYTES_PER_ELEMENT : int/*long*/;
 	__readonly__ var length : int/*unsigned long*/;
 	function __native_index_operator__(
 		index : int/*unsigned long*/
@@ -5075,8 +5075,8 @@ native class Uint16Array extends ArrayBufferView {
 		length : int/*unsigned long*/
 	);
 
-	static const     BYTES_PER_ELEMENT : int/*long*/;
-	__readonly__ var BYTES_PER_ELEMENT : int/*long*/;
+	static __readonly__ var BYTES_PER_ELEMENT : int/*long*/;
+	       __readonly__ var BYTES_PER_ELEMENT : int/*long*/;
 	__readonly__ var length : int/*unsigned long*/;
 	function __native_index_operator__(
 		index : int/*unsigned long*/
@@ -5129,8 +5129,8 @@ native class Int32Array extends ArrayBufferView {
 		length : int/*unsigned long*/
 	);
 
-	static const     BYTES_PER_ELEMENT : int/*long*/;
-	__readonly__ var BYTES_PER_ELEMENT : int/*long*/;
+	static __readonly__ var BYTES_PER_ELEMENT : int/*long*/;
+	       __readonly__ var BYTES_PER_ELEMENT : int/*long*/;
 	__readonly__ var length : int/*unsigned long*/;
 	function __native_index_operator__(
 		index : int/*unsigned long*/
@@ -5183,8 +5183,8 @@ native class Uint32Array extends ArrayBufferView {
 		length : int/*unsigned long*/
 	);
 
-	static const     BYTES_PER_ELEMENT : int/*long*/;
-	__readonly__ var BYTES_PER_ELEMENT : int/*long*/;
+	static __readonly__ var BYTES_PER_ELEMENT : int/*long*/;
+	       __readonly__ var BYTES_PER_ELEMENT : int/*long*/;
 	__readonly__ var length : int/*unsigned long*/;
 	function __native_index_operator__(
 		index : int/*unsigned long*/
@@ -5236,8 +5236,8 @@ native class Float32Array extends ArrayBufferView {
 		length : int/*unsigned long*/
 	);
 
-	static const     BYTES_PER_ELEMENT : int/*long*/;
-	__readonly__ var BYTES_PER_ELEMENT : int/*long*/;
+	static __readonly__ var BYTES_PER_ELEMENT : int/*long*/;
+	       __readonly__ var BYTES_PER_ELEMENT : int/*long*/;
 	__readonly__ var length : int/*unsigned long*/;
 	function __native_index_operator__(
 		index : int/*unsigned long*/
@@ -5284,8 +5284,8 @@ native class Float64Array extends ArrayBufferView {
 		length : int/*unsigned long*/
 	);
 
-	static const     BYTES_PER_ELEMENT : int/*long*/;
-	__readonly__ var BYTES_PER_ELEMENT : int/*long*/;
+	static __readonly__ var BYTES_PER_ELEMENT : int/*long*/;
+	       __readonly__ var BYTES_PER_ELEMENT : int/*long*/;
 	__readonly__ var length : int/*unsigned long*/;
 	function __native_index_operator__(
 		index : int/*unsigned long*/
@@ -5952,27 +5952,27 @@ native class WebGLShaderPrecisionFormat {
 native class WebGLRenderingContext {
 
 	/* ClearBufferMask */
-	static const     DEPTH_BUFFER_BIT : int/*GLenum*/;
-	__readonly__ var DEPTH_BUFFER_BIT : int/*GLenum*/;
-	static const     STENCIL_BUFFER_BIT : int/*GLenum*/;
-	__readonly__ var STENCIL_BUFFER_BIT : int/*GLenum*/;
-	static const     COLOR_BUFFER_BIT : int/*GLenum*/;
-	__readonly__ var COLOR_BUFFER_BIT : int/*GLenum*/;
+	static __readonly__ var DEPTH_BUFFER_BIT : int/*GLenum*/;
+	       __readonly__ var DEPTH_BUFFER_BIT : int/*GLenum*/;
+	static __readonly__ var STENCIL_BUFFER_BIT : int/*GLenum*/;
+	       __readonly__ var STENCIL_BUFFER_BIT : int/*GLenum*/;
+	static __readonly__ var COLOR_BUFFER_BIT : int/*GLenum*/;
+	       __readonly__ var COLOR_BUFFER_BIT : int/*GLenum*/;
 	/* BeginMode */
-	static const     POINTS : int/*GLenum*/;
-	__readonly__ var POINTS : int/*GLenum*/;
-	static const     LINES : int/*GLenum*/;
-	__readonly__ var LINES : int/*GLenum*/;
-	static const     LINE_LOOP : int/*GLenum*/;
-	__readonly__ var LINE_LOOP : int/*GLenum*/;
-	static const     LINE_STRIP : int/*GLenum*/;
-	__readonly__ var LINE_STRIP : int/*GLenum*/;
-	static const     TRIANGLES : int/*GLenum*/;
-	__readonly__ var TRIANGLES : int/*GLenum*/;
-	static const     TRIANGLE_STRIP : int/*GLenum*/;
-	__readonly__ var TRIANGLE_STRIP : int/*GLenum*/;
-	static const     TRIANGLE_FAN : int/*GLenum*/;
-	__readonly__ var TRIANGLE_FAN : int/*GLenum*/;
+	static __readonly__ var POINTS : int/*GLenum*/;
+	       __readonly__ var POINTS : int/*GLenum*/;
+	static __readonly__ var LINES : int/*GLenum*/;
+	       __readonly__ var LINES : int/*GLenum*/;
+	static __readonly__ var LINE_LOOP : int/*GLenum*/;
+	       __readonly__ var LINE_LOOP : int/*GLenum*/;
+	static __readonly__ var LINE_STRIP : int/*GLenum*/;
+	       __readonly__ var LINE_STRIP : int/*GLenum*/;
+	static __readonly__ var TRIANGLES : int/*GLenum*/;
+	       __readonly__ var TRIANGLES : int/*GLenum*/;
+	static __readonly__ var TRIANGLE_STRIP : int/*GLenum*/;
+	       __readonly__ var TRIANGLE_STRIP : int/*GLenum*/;
+	static __readonly__ var TRIANGLE_FAN : int/*GLenum*/;
+	       __readonly__ var TRIANGLE_FAN : int/*GLenum*/;
 	/* AlphaFunction (not supported in ES20) */
 	/*      NEVER */
 	/*      LESS */
@@ -5984,98 +5984,98 @@ native class WebGLRenderingContext {
 	/*      ALWAYS */
 
 	/* BlendingFactorDest */
-	static const     ZERO : int/*GLenum*/;
-	__readonly__ var ZERO : int/*GLenum*/;
-	static const     ONE : int/*GLenum*/;
-	__readonly__ var ONE : int/*GLenum*/;
-	static const     SRC_COLOR : int/*GLenum*/;
-	__readonly__ var SRC_COLOR : int/*GLenum*/;
-	static const     ONE_MINUS_SRC_COLOR : int/*GLenum*/;
-	__readonly__ var ONE_MINUS_SRC_COLOR : int/*GLenum*/;
-	static const     SRC_ALPHA : int/*GLenum*/;
-	__readonly__ var SRC_ALPHA : int/*GLenum*/;
-	static const     ONE_MINUS_SRC_ALPHA : int/*GLenum*/;
-	__readonly__ var ONE_MINUS_SRC_ALPHA : int/*GLenum*/;
-	static const     DST_ALPHA : int/*GLenum*/;
-	__readonly__ var DST_ALPHA : int/*GLenum*/;
-	static const     ONE_MINUS_DST_ALPHA : int/*GLenum*/;
-	__readonly__ var ONE_MINUS_DST_ALPHA : int/*GLenum*/;
+	static __readonly__ var ZERO : int/*GLenum*/;
+	       __readonly__ var ZERO : int/*GLenum*/;
+	static __readonly__ var ONE : int/*GLenum*/;
+	       __readonly__ var ONE : int/*GLenum*/;
+	static __readonly__ var SRC_COLOR : int/*GLenum*/;
+	       __readonly__ var SRC_COLOR : int/*GLenum*/;
+	static __readonly__ var ONE_MINUS_SRC_COLOR : int/*GLenum*/;
+	       __readonly__ var ONE_MINUS_SRC_COLOR : int/*GLenum*/;
+	static __readonly__ var SRC_ALPHA : int/*GLenum*/;
+	       __readonly__ var SRC_ALPHA : int/*GLenum*/;
+	static __readonly__ var ONE_MINUS_SRC_ALPHA : int/*GLenum*/;
+	       __readonly__ var ONE_MINUS_SRC_ALPHA : int/*GLenum*/;
+	static __readonly__ var DST_ALPHA : int/*GLenum*/;
+	       __readonly__ var DST_ALPHA : int/*GLenum*/;
+	static __readonly__ var ONE_MINUS_DST_ALPHA : int/*GLenum*/;
+	       __readonly__ var ONE_MINUS_DST_ALPHA : int/*GLenum*/;
 	/* BlendingFactorSrc */
 	/*      ZERO */
 	/*      ONE */
-	static const     DST_COLOR : int/*GLenum*/;
-	__readonly__ var DST_COLOR : int/*GLenum*/;
-	static const     ONE_MINUS_DST_COLOR : int/*GLenum*/;
-	__readonly__ var ONE_MINUS_DST_COLOR : int/*GLenum*/;
-	static const     SRC_ALPHA_SATURATE : int/*GLenum*/;
-	__readonly__ var SRC_ALPHA_SATURATE : int/*GLenum*/;
+	static __readonly__ var DST_COLOR : int/*GLenum*/;
+	       __readonly__ var DST_COLOR : int/*GLenum*/;
+	static __readonly__ var ONE_MINUS_DST_COLOR : int/*GLenum*/;
+	       __readonly__ var ONE_MINUS_DST_COLOR : int/*GLenum*/;
+	static __readonly__ var SRC_ALPHA_SATURATE : int/*GLenum*/;
+	       __readonly__ var SRC_ALPHA_SATURATE : int/*GLenum*/;
 	/*      SRC_ALPHA */
 	/*      ONE_MINUS_SRC_ALPHA */
 	/*      DST_ALPHA */
 	/*      ONE_MINUS_DST_ALPHA */
 
 	/* BlendEquationSeparate */
-	static const     FUNC_ADD : int/*GLenum*/;
-	__readonly__ var FUNC_ADD : int/*GLenum*/;
-	static const     BLEND_EQUATION : int/*GLenum*/;
-	__readonly__ var BLEND_EQUATION : int/*GLenum*/;
-	static const     BLEND_EQUATION_RGB : int/*GLenum*/;
-	__readonly__ var BLEND_EQUATION_RGB : int/*GLenum*/;
+	static __readonly__ var FUNC_ADD : int/*GLenum*/;
+	       __readonly__ var FUNC_ADD : int/*GLenum*/;
+	static __readonly__ var BLEND_EQUATION : int/*GLenum*/;
+	       __readonly__ var BLEND_EQUATION : int/*GLenum*/;
+	static __readonly__ var BLEND_EQUATION_RGB : int/*GLenum*/;
+	       __readonly__ var BLEND_EQUATION_RGB : int/*GLenum*/;
 	/* same as BLEND_EQUATION */
-	static const     BLEND_EQUATION_ALPHA : int/*GLenum*/;
-	__readonly__ var BLEND_EQUATION_ALPHA : int/*GLenum*/;
+	static __readonly__ var BLEND_EQUATION_ALPHA : int/*GLenum*/;
+	       __readonly__ var BLEND_EQUATION_ALPHA : int/*GLenum*/;
 	/* BlendSubtract */
-	static const     FUNC_SUBTRACT : int/*GLenum*/;
-	__readonly__ var FUNC_SUBTRACT : int/*GLenum*/;
-	static const     FUNC_REVERSE_SUBTRACT : int/*GLenum*/;
-	__readonly__ var FUNC_REVERSE_SUBTRACT : int/*GLenum*/;
+	static __readonly__ var FUNC_SUBTRACT : int/*GLenum*/;
+	       __readonly__ var FUNC_SUBTRACT : int/*GLenum*/;
+	static __readonly__ var FUNC_REVERSE_SUBTRACT : int/*GLenum*/;
+	       __readonly__ var FUNC_REVERSE_SUBTRACT : int/*GLenum*/;
 	/* Separate Blend Functions */
-	static const     BLEND_DST_RGB : int/*GLenum*/;
-	__readonly__ var BLEND_DST_RGB : int/*GLenum*/;
-	static const     BLEND_SRC_RGB : int/*GLenum*/;
-	__readonly__ var BLEND_SRC_RGB : int/*GLenum*/;
-	static const     BLEND_DST_ALPHA : int/*GLenum*/;
-	__readonly__ var BLEND_DST_ALPHA : int/*GLenum*/;
-	static const     BLEND_SRC_ALPHA : int/*GLenum*/;
-	__readonly__ var BLEND_SRC_ALPHA : int/*GLenum*/;
-	static const     CONSTANT_COLOR : int/*GLenum*/;
-	__readonly__ var CONSTANT_COLOR : int/*GLenum*/;
-	static const     ONE_MINUS_CONSTANT_COLOR : int/*GLenum*/;
-	__readonly__ var ONE_MINUS_CONSTANT_COLOR : int/*GLenum*/;
-	static const     CONSTANT_ALPHA : int/*GLenum*/;
-	__readonly__ var CONSTANT_ALPHA : int/*GLenum*/;
-	static const     ONE_MINUS_CONSTANT_ALPHA : int/*GLenum*/;
-	__readonly__ var ONE_MINUS_CONSTANT_ALPHA : int/*GLenum*/;
-	static const     BLEND_COLOR : int/*GLenum*/;
-	__readonly__ var BLEND_COLOR : int/*GLenum*/;
+	static __readonly__ var BLEND_DST_RGB : int/*GLenum*/;
+	       __readonly__ var BLEND_DST_RGB : int/*GLenum*/;
+	static __readonly__ var BLEND_SRC_RGB : int/*GLenum*/;
+	       __readonly__ var BLEND_SRC_RGB : int/*GLenum*/;
+	static __readonly__ var BLEND_DST_ALPHA : int/*GLenum*/;
+	       __readonly__ var BLEND_DST_ALPHA : int/*GLenum*/;
+	static __readonly__ var BLEND_SRC_ALPHA : int/*GLenum*/;
+	       __readonly__ var BLEND_SRC_ALPHA : int/*GLenum*/;
+	static __readonly__ var CONSTANT_COLOR : int/*GLenum*/;
+	       __readonly__ var CONSTANT_COLOR : int/*GLenum*/;
+	static __readonly__ var ONE_MINUS_CONSTANT_COLOR : int/*GLenum*/;
+	       __readonly__ var ONE_MINUS_CONSTANT_COLOR : int/*GLenum*/;
+	static __readonly__ var CONSTANT_ALPHA : int/*GLenum*/;
+	       __readonly__ var CONSTANT_ALPHA : int/*GLenum*/;
+	static __readonly__ var ONE_MINUS_CONSTANT_ALPHA : int/*GLenum*/;
+	       __readonly__ var ONE_MINUS_CONSTANT_ALPHA : int/*GLenum*/;
+	static __readonly__ var BLEND_COLOR : int/*GLenum*/;
+	       __readonly__ var BLEND_COLOR : int/*GLenum*/;
 	/* Buffer Objects */
-	static const     ARRAY_BUFFER : int/*GLenum*/;
-	__readonly__ var ARRAY_BUFFER : int/*GLenum*/;
-	static const     ELEMENT_ARRAY_BUFFER : int/*GLenum*/;
-	__readonly__ var ELEMENT_ARRAY_BUFFER : int/*GLenum*/;
-	static const     ARRAY_BUFFER_BINDING : int/*GLenum*/;
-	__readonly__ var ARRAY_BUFFER_BINDING : int/*GLenum*/;
-	static const     ELEMENT_ARRAY_BUFFER_BINDING : int/*GLenum*/;
-	__readonly__ var ELEMENT_ARRAY_BUFFER_BINDING : int/*GLenum*/;
-	static const     STREAM_DRAW : int/*GLenum*/;
-	__readonly__ var STREAM_DRAW : int/*GLenum*/;
-	static const     STATIC_DRAW : int/*GLenum*/;
-	__readonly__ var STATIC_DRAW : int/*GLenum*/;
-	static const     DYNAMIC_DRAW : int/*GLenum*/;
-	__readonly__ var DYNAMIC_DRAW : int/*GLenum*/;
-	static const     BUFFER_SIZE : int/*GLenum*/;
-	__readonly__ var BUFFER_SIZE : int/*GLenum*/;
-	static const     BUFFER_USAGE : int/*GLenum*/;
-	__readonly__ var BUFFER_USAGE : int/*GLenum*/;
-	static const     CURRENT_VERTEX_ATTRIB : int/*GLenum*/;
-	__readonly__ var CURRENT_VERTEX_ATTRIB : int/*GLenum*/;
+	static __readonly__ var ARRAY_BUFFER : int/*GLenum*/;
+	       __readonly__ var ARRAY_BUFFER : int/*GLenum*/;
+	static __readonly__ var ELEMENT_ARRAY_BUFFER : int/*GLenum*/;
+	       __readonly__ var ELEMENT_ARRAY_BUFFER : int/*GLenum*/;
+	static __readonly__ var ARRAY_BUFFER_BINDING : int/*GLenum*/;
+	       __readonly__ var ARRAY_BUFFER_BINDING : int/*GLenum*/;
+	static __readonly__ var ELEMENT_ARRAY_BUFFER_BINDING : int/*GLenum*/;
+	       __readonly__ var ELEMENT_ARRAY_BUFFER_BINDING : int/*GLenum*/;
+	static __readonly__ var STREAM_DRAW : int/*GLenum*/;
+	       __readonly__ var STREAM_DRAW : int/*GLenum*/;
+	static __readonly__ var STATIC_DRAW : int/*GLenum*/;
+	       __readonly__ var STATIC_DRAW : int/*GLenum*/;
+	static __readonly__ var DYNAMIC_DRAW : int/*GLenum*/;
+	       __readonly__ var DYNAMIC_DRAW : int/*GLenum*/;
+	static __readonly__ var BUFFER_SIZE : int/*GLenum*/;
+	       __readonly__ var BUFFER_SIZE : int/*GLenum*/;
+	static __readonly__ var BUFFER_USAGE : int/*GLenum*/;
+	       __readonly__ var BUFFER_USAGE : int/*GLenum*/;
+	static __readonly__ var CURRENT_VERTEX_ATTRIB : int/*GLenum*/;
+	       __readonly__ var CURRENT_VERTEX_ATTRIB : int/*GLenum*/;
 	/* CullFaceMode */
-	static const     FRONT : int/*GLenum*/;
-	__readonly__ var FRONT : int/*GLenum*/;
-	static const     BACK : int/*GLenum*/;
-	__readonly__ var BACK : int/*GLenum*/;
-	static const     FRONT_AND_BACK : int/*GLenum*/;
-	__readonly__ var FRONT_AND_BACK : int/*GLenum*/;
+	static __readonly__ var FRONT : int/*GLenum*/;
+	       __readonly__ var FRONT : int/*GLenum*/;
+	static __readonly__ var BACK : int/*GLenum*/;
+	       __readonly__ var BACK : int/*GLenum*/;
+	static __readonly__ var FRONT_AND_BACK : int/*GLenum*/;
+	       __readonly__ var FRONT_AND_BACK : int/*GLenum*/;
 	/* DepthFunction */
 	/*      NEVER */
 	/*      LESS */
@@ -6088,534 +6088,534 @@ native class WebGLRenderingContext {
 
 	/* EnableCap */
 	/* TEXTURE_2D */
-	static const     CULL_FACE : int/*GLenum*/;
-	__readonly__ var CULL_FACE : int/*GLenum*/;
-	static const     BLEND : int/*GLenum*/;
-	__readonly__ var BLEND : int/*GLenum*/;
-	static const     DITHER : int/*GLenum*/;
-	__readonly__ var DITHER : int/*GLenum*/;
-	static const     STENCIL_TEST : int/*GLenum*/;
-	__readonly__ var STENCIL_TEST : int/*GLenum*/;
-	static const     DEPTH_TEST : int/*GLenum*/;
-	__readonly__ var DEPTH_TEST : int/*GLenum*/;
-	static const     SCISSOR_TEST : int/*GLenum*/;
-	__readonly__ var SCISSOR_TEST : int/*GLenum*/;
-	static const     POLYGON_OFFSET_FILL : int/*GLenum*/;
-	__readonly__ var POLYGON_OFFSET_FILL : int/*GLenum*/;
-	static const     SAMPLE_ALPHA_TO_COVERAGE : int/*GLenum*/;
-	__readonly__ var SAMPLE_ALPHA_TO_COVERAGE : int/*GLenum*/;
-	static const     SAMPLE_COVERAGE : int/*GLenum*/;
-	__readonly__ var SAMPLE_COVERAGE : int/*GLenum*/;
+	static __readonly__ var CULL_FACE : int/*GLenum*/;
+	       __readonly__ var CULL_FACE : int/*GLenum*/;
+	static __readonly__ var BLEND : int/*GLenum*/;
+	       __readonly__ var BLEND : int/*GLenum*/;
+	static __readonly__ var DITHER : int/*GLenum*/;
+	       __readonly__ var DITHER : int/*GLenum*/;
+	static __readonly__ var STENCIL_TEST : int/*GLenum*/;
+	       __readonly__ var STENCIL_TEST : int/*GLenum*/;
+	static __readonly__ var DEPTH_TEST : int/*GLenum*/;
+	       __readonly__ var DEPTH_TEST : int/*GLenum*/;
+	static __readonly__ var SCISSOR_TEST : int/*GLenum*/;
+	       __readonly__ var SCISSOR_TEST : int/*GLenum*/;
+	static __readonly__ var POLYGON_OFFSET_FILL : int/*GLenum*/;
+	       __readonly__ var POLYGON_OFFSET_FILL : int/*GLenum*/;
+	static __readonly__ var SAMPLE_ALPHA_TO_COVERAGE : int/*GLenum*/;
+	       __readonly__ var SAMPLE_ALPHA_TO_COVERAGE : int/*GLenum*/;
+	static __readonly__ var SAMPLE_COVERAGE : int/*GLenum*/;
+	       __readonly__ var SAMPLE_COVERAGE : int/*GLenum*/;
 	/* ErrorCode */
-	static const     NO_ERROR : int/*GLenum*/;
-	__readonly__ var NO_ERROR : int/*GLenum*/;
-	static const     INVALID_ENUM : int/*GLenum*/;
-	__readonly__ var INVALID_ENUM : int/*GLenum*/;
-	static const     INVALID_VALUE : int/*GLenum*/;
-	__readonly__ var INVALID_VALUE : int/*GLenum*/;
-	static const     INVALID_OPERATION : int/*GLenum*/;
-	__readonly__ var INVALID_OPERATION : int/*GLenum*/;
-	static const     OUT_OF_MEMORY : int/*GLenum*/;
-	__readonly__ var OUT_OF_MEMORY : int/*GLenum*/;
+	static __readonly__ var NO_ERROR : int/*GLenum*/;
+	       __readonly__ var NO_ERROR : int/*GLenum*/;
+	static __readonly__ var INVALID_ENUM : int/*GLenum*/;
+	       __readonly__ var INVALID_ENUM : int/*GLenum*/;
+	static __readonly__ var INVALID_VALUE : int/*GLenum*/;
+	       __readonly__ var INVALID_VALUE : int/*GLenum*/;
+	static __readonly__ var INVALID_OPERATION : int/*GLenum*/;
+	       __readonly__ var INVALID_OPERATION : int/*GLenum*/;
+	static __readonly__ var OUT_OF_MEMORY : int/*GLenum*/;
+	       __readonly__ var OUT_OF_MEMORY : int/*GLenum*/;
 	/* FrontFaceDirection */
-	static const     CW : int/*GLenum*/;
-	__readonly__ var CW : int/*GLenum*/;
-	static const     CCW : int/*GLenum*/;
-	__readonly__ var CCW : int/*GLenum*/;
+	static __readonly__ var CW : int/*GLenum*/;
+	       __readonly__ var CW : int/*GLenum*/;
+	static __readonly__ var CCW : int/*GLenum*/;
+	       __readonly__ var CCW : int/*GLenum*/;
 	/* GetPName */
-	static const     LINE_WIDTH : int/*GLenum*/;
-	__readonly__ var LINE_WIDTH : int/*GLenum*/;
-	static const     ALIASED_POINT_SIZE_RANGE : int/*GLenum*/;
-	__readonly__ var ALIASED_POINT_SIZE_RANGE : int/*GLenum*/;
-	static const     ALIASED_LINE_WIDTH_RANGE : int/*GLenum*/;
-	__readonly__ var ALIASED_LINE_WIDTH_RANGE : int/*GLenum*/;
-	static const     CULL_FACE_MODE : int/*GLenum*/;
-	__readonly__ var CULL_FACE_MODE : int/*GLenum*/;
-	static const     FRONT_FACE : int/*GLenum*/;
-	__readonly__ var FRONT_FACE : int/*GLenum*/;
-	static const     DEPTH_RANGE : int/*GLenum*/;
-	__readonly__ var DEPTH_RANGE : int/*GLenum*/;
-	static const     DEPTH_WRITEMASK : int/*GLenum*/;
-	__readonly__ var DEPTH_WRITEMASK : int/*GLenum*/;
-	static const     DEPTH_CLEAR_VALUE : int/*GLenum*/;
-	__readonly__ var DEPTH_CLEAR_VALUE : int/*GLenum*/;
-	static const     DEPTH_FUNC : int/*GLenum*/;
-	__readonly__ var DEPTH_FUNC : int/*GLenum*/;
-	static const     STENCIL_CLEAR_VALUE : int/*GLenum*/;
-	__readonly__ var STENCIL_CLEAR_VALUE : int/*GLenum*/;
-	static const     STENCIL_FUNC : int/*GLenum*/;
-	__readonly__ var STENCIL_FUNC : int/*GLenum*/;
-	static const     STENCIL_FAIL : int/*GLenum*/;
-	__readonly__ var STENCIL_FAIL : int/*GLenum*/;
-	static const     STENCIL_PASS_DEPTH_FAIL : int/*GLenum*/;
-	__readonly__ var STENCIL_PASS_DEPTH_FAIL : int/*GLenum*/;
-	static const     STENCIL_PASS_DEPTH_PASS : int/*GLenum*/;
-	__readonly__ var STENCIL_PASS_DEPTH_PASS : int/*GLenum*/;
-	static const     STENCIL_REF : int/*GLenum*/;
-	__readonly__ var STENCIL_REF : int/*GLenum*/;
-	static const     STENCIL_VALUE_MASK : int/*GLenum*/;
-	__readonly__ var STENCIL_VALUE_MASK : int/*GLenum*/;
-	static const     STENCIL_WRITEMASK : int/*GLenum*/;
-	__readonly__ var STENCIL_WRITEMASK : int/*GLenum*/;
-	static const     STENCIL_BACK_FUNC : int/*GLenum*/;
-	__readonly__ var STENCIL_BACK_FUNC : int/*GLenum*/;
-	static const     STENCIL_BACK_FAIL : int/*GLenum*/;
-	__readonly__ var STENCIL_BACK_FAIL : int/*GLenum*/;
-	static const     STENCIL_BACK_PASS_DEPTH_FAIL : int/*GLenum*/;
-	__readonly__ var STENCIL_BACK_PASS_DEPTH_FAIL : int/*GLenum*/;
-	static const     STENCIL_BACK_PASS_DEPTH_PASS : int/*GLenum*/;
-	__readonly__ var STENCIL_BACK_PASS_DEPTH_PASS : int/*GLenum*/;
-	static const     STENCIL_BACK_REF : int/*GLenum*/;
-	__readonly__ var STENCIL_BACK_REF : int/*GLenum*/;
-	static const     STENCIL_BACK_VALUE_MASK : int/*GLenum*/;
-	__readonly__ var STENCIL_BACK_VALUE_MASK : int/*GLenum*/;
-	static const     STENCIL_BACK_WRITEMASK : int/*GLenum*/;
-	__readonly__ var STENCIL_BACK_WRITEMASK : int/*GLenum*/;
-	static const     VIEWPORT : int/*GLenum*/;
-	__readonly__ var VIEWPORT : int/*GLenum*/;
-	static const     SCISSOR_BOX : int/*GLenum*/;
-	__readonly__ var SCISSOR_BOX : int/*GLenum*/;
+	static __readonly__ var LINE_WIDTH : int/*GLenum*/;
+	       __readonly__ var LINE_WIDTH : int/*GLenum*/;
+	static __readonly__ var ALIASED_POINT_SIZE_RANGE : int/*GLenum*/;
+	       __readonly__ var ALIASED_POINT_SIZE_RANGE : int/*GLenum*/;
+	static __readonly__ var ALIASED_LINE_WIDTH_RANGE : int/*GLenum*/;
+	       __readonly__ var ALIASED_LINE_WIDTH_RANGE : int/*GLenum*/;
+	static __readonly__ var CULL_FACE_MODE : int/*GLenum*/;
+	       __readonly__ var CULL_FACE_MODE : int/*GLenum*/;
+	static __readonly__ var FRONT_FACE : int/*GLenum*/;
+	       __readonly__ var FRONT_FACE : int/*GLenum*/;
+	static __readonly__ var DEPTH_RANGE : int/*GLenum*/;
+	       __readonly__ var DEPTH_RANGE : int/*GLenum*/;
+	static __readonly__ var DEPTH_WRITEMASK : int/*GLenum*/;
+	       __readonly__ var DEPTH_WRITEMASK : int/*GLenum*/;
+	static __readonly__ var DEPTH_CLEAR_VALUE : int/*GLenum*/;
+	       __readonly__ var DEPTH_CLEAR_VALUE : int/*GLenum*/;
+	static __readonly__ var DEPTH_FUNC : int/*GLenum*/;
+	       __readonly__ var DEPTH_FUNC : int/*GLenum*/;
+	static __readonly__ var STENCIL_CLEAR_VALUE : int/*GLenum*/;
+	       __readonly__ var STENCIL_CLEAR_VALUE : int/*GLenum*/;
+	static __readonly__ var STENCIL_FUNC : int/*GLenum*/;
+	       __readonly__ var STENCIL_FUNC : int/*GLenum*/;
+	static __readonly__ var STENCIL_FAIL : int/*GLenum*/;
+	       __readonly__ var STENCIL_FAIL : int/*GLenum*/;
+	static __readonly__ var STENCIL_PASS_DEPTH_FAIL : int/*GLenum*/;
+	       __readonly__ var STENCIL_PASS_DEPTH_FAIL : int/*GLenum*/;
+	static __readonly__ var STENCIL_PASS_DEPTH_PASS : int/*GLenum*/;
+	       __readonly__ var STENCIL_PASS_DEPTH_PASS : int/*GLenum*/;
+	static __readonly__ var STENCIL_REF : int/*GLenum*/;
+	       __readonly__ var STENCIL_REF : int/*GLenum*/;
+	static __readonly__ var STENCIL_VALUE_MASK : int/*GLenum*/;
+	       __readonly__ var STENCIL_VALUE_MASK : int/*GLenum*/;
+	static __readonly__ var STENCIL_WRITEMASK : int/*GLenum*/;
+	       __readonly__ var STENCIL_WRITEMASK : int/*GLenum*/;
+	static __readonly__ var STENCIL_BACK_FUNC : int/*GLenum*/;
+	       __readonly__ var STENCIL_BACK_FUNC : int/*GLenum*/;
+	static __readonly__ var STENCIL_BACK_FAIL : int/*GLenum*/;
+	       __readonly__ var STENCIL_BACK_FAIL : int/*GLenum*/;
+	static __readonly__ var STENCIL_BACK_PASS_DEPTH_FAIL : int/*GLenum*/;
+	       __readonly__ var STENCIL_BACK_PASS_DEPTH_FAIL : int/*GLenum*/;
+	static __readonly__ var STENCIL_BACK_PASS_DEPTH_PASS : int/*GLenum*/;
+	       __readonly__ var STENCIL_BACK_PASS_DEPTH_PASS : int/*GLenum*/;
+	static __readonly__ var STENCIL_BACK_REF : int/*GLenum*/;
+	       __readonly__ var STENCIL_BACK_REF : int/*GLenum*/;
+	static __readonly__ var STENCIL_BACK_VALUE_MASK : int/*GLenum*/;
+	       __readonly__ var STENCIL_BACK_VALUE_MASK : int/*GLenum*/;
+	static __readonly__ var STENCIL_BACK_WRITEMASK : int/*GLenum*/;
+	       __readonly__ var STENCIL_BACK_WRITEMASK : int/*GLenum*/;
+	static __readonly__ var VIEWPORT : int/*GLenum*/;
+	       __readonly__ var VIEWPORT : int/*GLenum*/;
+	static __readonly__ var SCISSOR_BOX : int/*GLenum*/;
+	       __readonly__ var SCISSOR_BOX : int/*GLenum*/;
 	/*      SCISSOR_TEST */
-	static const     COLOR_CLEAR_VALUE : int/*GLenum*/;
-	__readonly__ var COLOR_CLEAR_VALUE : int/*GLenum*/;
-	static const     COLOR_WRITEMASK : int/*GLenum*/;
-	__readonly__ var COLOR_WRITEMASK : int/*GLenum*/;
-	static const     UNPACK_ALIGNMENT : int/*GLenum*/;
-	__readonly__ var UNPACK_ALIGNMENT : int/*GLenum*/;
-	static const     PACK_ALIGNMENT : int/*GLenum*/;
-	__readonly__ var PACK_ALIGNMENT : int/*GLenum*/;
-	static const     MAX_TEXTURE_SIZE : int/*GLenum*/;
-	__readonly__ var MAX_TEXTURE_SIZE : int/*GLenum*/;
-	static const     MAX_VIEWPORT_DIMS : int/*GLenum*/;
-	__readonly__ var MAX_VIEWPORT_DIMS : int/*GLenum*/;
-	static const     SUBPIXEL_BITS : int/*GLenum*/;
-	__readonly__ var SUBPIXEL_BITS : int/*GLenum*/;
-	static const     RED_BITS : int/*GLenum*/;
-	__readonly__ var RED_BITS : int/*GLenum*/;
-	static const     GREEN_BITS : int/*GLenum*/;
-	__readonly__ var GREEN_BITS : int/*GLenum*/;
-	static const     BLUE_BITS : int/*GLenum*/;
-	__readonly__ var BLUE_BITS : int/*GLenum*/;
-	static const     ALPHA_BITS : int/*GLenum*/;
-	__readonly__ var ALPHA_BITS : int/*GLenum*/;
-	static const     DEPTH_BITS : int/*GLenum*/;
-	__readonly__ var DEPTH_BITS : int/*GLenum*/;
-	static const     STENCIL_BITS : int/*GLenum*/;
-	__readonly__ var STENCIL_BITS : int/*GLenum*/;
-	static const     POLYGON_OFFSET_UNITS : int/*GLenum*/;
-	__readonly__ var POLYGON_OFFSET_UNITS : int/*GLenum*/;
+	static __readonly__ var COLOR_CLEAR_VALUE : int/*GLenum*/;
+	       __readonly__ var COLOR_CLEAR_VALUE : int/*GLenum*/;
+	static __readonly__ var COLOR_WRITEMASK : int/*GLenum*/;
+	       __readonly__ var COLOR_WRITEMASK : int/*GLenum*/;
+	static __readonly__ var UNPACK_ALIGNMENT : int/*GLenum*/;
+	       __readonly__ var UNPACK_ALIGNMENT : int/*GLenum*/;
+	static __readonly__ var PACK_ALIGNMENT : int/*GLenum*/;
+	       __readonly__ var PACK_ALIGNMENT : int/*GLenum*/;
+	static __readonly__ var MAX_TEXTURE_SIZE : int/*GLenum*/;
+	       __readonly__ var MAX_TEXTURE_SIZE : int/*GLenum*/;
+	static __readonly__ var MAX_VIEWPORT_DIMS : int/*GLenum*/;
+	       __readonly__ var MAX_VIEWPORT_DIMS : int/*GLenum*/;
+	static __readonly__ var SUBPIXEL_BITS : int/*GLenum*/;
+	       __readonly__ var SUBPIXEL_BITS : int/*GLenum*/;
+	static __readonly__ var RED_BITS : int/*GLenum*/;
+	       __readonly__ var RED_BITS : int/*GLenum*/;
+	static __readonly__ var GREEN_BITS : int/*GLenum*/;
+	       __readonly__ var GREEN_BITS : int/*GLenum*/;
+	static __readonly__ var BLUE_BITS : int/*GLenum*/;
+	       __readonly__ var BLUE_BITS : int/*GLenum*/;
+	static __readonly__ var ALPHA_BITS : int/*GLenum*/;
+	       __readonly__ var ALPHA_BITS : int/*GLenum*/;
+	static __readonly__ var DEPTH_BITS : int/*GLenum*/;
+	       __readonly__ var DEPTH_BITS : int/*GLenum*/;
+	static __readonly__ var STENCIL_BITS : int/*GLenum*/;
+	       __readonly__ var STENCIL_BITS : int/*GLenum*/;
+	static __readonly__ var POLYGON_OFFSET_UNITS : int/*GLenum*/;
+	       __readonly__ var POLYGON_OFFSET_UNITS : int/*GLenum*/;
 	/*      POLYGON_OFFSET_FILL */
-	static const     POLYGON_OFFSET_FACTOR : int/*GLenum*/;
-	__readonly__ var POLYGON_OFFSET_FACTOR : int/*GLenum*/;
-	static const     TEXTURE_BINDING_2D : int/*GLenum*/;
-	__readonly__ var TEXTURE_BINDING_2D : int/*GLenum*/;
-	static const     SAMPLE_BUFFERS : int/*GLenum*/;
-	__readonly__ var SAMPLE_BUFFERS : int/*GLenum*/;
-	static const     SAMPLES : int/*GLenum*/;
-	__readonly__ var SAMPLES : int/*GLenum*/;
-	static const     SAMPLE_COVERAGE_VALUE : int/*GLenum*/;
-	__readonly__ var SAMPLE_COVERAGE_VALUE : int/*GLenum*/;
-	static const     SAMPLE_COVERAGE_INVERT : int/*GLenum*/;
-	__readonly__ var SAMPLE_COVERAGE_INVERT : int/*GLenum*/;
+	static __readonly__ var POLYGON_OFFSET_FACTOR : int/*GLenum*/;
+	       __readonly__ var POLYGON_OFFSET_FACTOR : int/*GLenum*/;
+	static __readonly__ var TEXTURE_BINDING_2D : int/*GLenum*/;
+	       __readonly__ var TEXTURE_BINDING_2D : int/*GLenum*/;
+	static __readonly__ var SAMPLE_BUFFERS : int/*GLenum*/;
+	       __readonly__ var SAMPLE_BUFFERS : int/*GLenum*/;
+	static __readonly__ var SAMPLES : int/*GLenum*/;
+	       __readonly__ var SAMPLES : int/*GLenum*/;
+	static __readonly__ var SAMPLE_COVERAGE_VALUE : int/*GLenum*/;
+	       __readonly__ var SAMPLE_COVERAGE_VALUE : int/*GLenum*/;
+	static __readonly__ var SAMPLE_COVERAGE_INVERT : int/*GLenum*/;
+	       __readonly__ var SAMPLE_COVERAGE_INVERT : int/*GLenum*/;
 	/* GetTextureParameter */
 	/*      TEXTURE_MAG_FILTER */
 	/*      TEXTURE_MIN_FILTER */
 	/*      TEXTURE_WRAP_S */
 	/*      TEXTURE_WRAP_T */
 
-	static const     COMPRESSED_TEXTURE_FORMATS : int/*GLenum*/;
-	__readonly__ var COMPRESSED_TEXTURE_FORMATS : int/*GLenum*/;
+	static __readonly__ var COMPRESSED_TEXTURE_FORMATS : int/*GLenum*/;
+	       __readonly__ var COMPRESSED_TEXTURE_FORMATS : int/*GLenum*/;
 	/* HintMode */
-	static const     DONT_CARE : int/*GLenum*/;
-	__readonly__ var DONT_CARE : int/*GLenum*/;
-	static const     FASTEST : int/*GLenum*/;
-	__readonly__ var FASTEST : int/*GLenum*/;
-	static const     NICEST : int/*GLenum*/;
-	__readonly__ var NICEST : int/*GLenum*/;
+	static __readonly__ var DONT_CARE : int/*GLenum*/;
+	       __readonly__ var DONT_CARE : int/*GLenum*/;
+	static __readonly__ var FASTEST : int/*GLenum*/;
+	       __readonly__ var FASTEST : int/*GLenum*/;
+	static __readonly__ var NICEST : int/*GLenum*/;
+	       __readonly__ var NICEST : int/*GLenum*/;
 	/* HintTarget */
-	static const     GENERATE_MIPMAP_HINT : int/*GLenum*/;
-	__readonly__ var GENERATE_MIPMAP_HINT : int/*GLenum*/;
+	static __readonly__ var GENERATE_MIPMAP_HINT : int/*GLenum*/;
+	       __readonly__ var GENERATE_MIPMAP_HINT : int/*GLenum*/;
 	/* DataType */
-	static const     BYTE : int/*GLenum*/;
-	__readonly__ var BYTE : int/*GLenum*/;
-	static const     UNSIGNED_BYTE : int/*GLenum*/;
-	__readonly__ var UNSIGNED_BYTE : int/*GLenum*/;
-	static const     SHORT : int/*GLenum*/;
-	__readonly__ var SHORT : int/*GLenum*/;
-	static const     UNSIGNED_SHORT : int/*GLenum*/;
-	__readonly__ var UNSIGNED_SHORT : int/*GLenum*/;
-	static const     INT : int/*GLenum*/;
-	__readonly__ var INT : int/*GLenum*/;
-	static const     UNSIGNED_INT : int/*GLenum*/;
-	__readonly__ var UNSIGNED_INT : int/*GLenum*/;
-	static const     FLOAT : int/*GLenum*/;
-	__readonly__ var FLOAT : int/*GLenum*/;
+	static __readonly__ var BYTE : int/*GLenum*/;
+	       __readonly__ var BYTE : int/*GLenum*/;
+	static __readonly__ var UNSIGNED_BYTE : int/*GLenum*/;
+	       __readonly__ var UNSIGNED_BYTE : int/*GLenum*/;
+	static __readonly__ var SHORT : int/*GLenum*/;
+	       __readonly__ var SHORT : int/*GLenum*/;
+	static __readonly__ var UNSIGNED_SHORT : int/*GLenum*/;
+	       __readonly__ var UNSIGNED_SHORT : int/*GLenum*/;
+	static __readonly__ var INT : int/*GLenum*/;
+	       __readonly__ var INT : int/*GLenum*/;
+	static __readonly__ var UNSIGNED_INT : int/*GLenum*/;
+	       __readonly__ var UNSIGNED_INT : int/*GLenum*/;
+	static __readonly__ var FLOAT : int/*GLenum*/;
+	       __readonly__ var FLOAT : int/*GLenum*/;
 	/* PixelFormat */
-	static const     DEPTH_COMPONENT : int/*GLenum*/;
-	__readonly__ var DEPTH_COMPONENT : int/*GLenum*/;
-	static const     ALPHA : int/*GLenum*/;
-	__readonly__ var ALPHA : int/*GLenum*/;
-	static const     RGB : int/*GLenum*/;
-	__readonly__ var RGB : int/*GLenum*/;
-	static const     RGBA : int/*GLenum*/;
-	__readonly__ var RGBA : int/*GLenum*/;
-	static const     LUMINANCE : int/*GLenum*/;
-	__readonly__ var LUMINANCE : int/*GLenum*/;
-	static const     LUMINANCE_ALPHA : int/*GLenum*/;
-	__readonly__ var LUMINANCE_ALPHA : int/*GLenum*/;
+	static __readonly__ var DEPTH_COMPONENT : int/*GLenum*/;
+	       __readonly__ var DEPTH_COMPONENT : int/*GLenum*/;
+	static __readonly__ var ALPHA : int/*GLenum*/;
+	       __readonly__ var ALPHA : int/*GLenum*/;
+	static __readonly__ var RGB : int/*GLenum*/;
+	       __readonly__ var RGB : int/*GLenum*/;
+	static __readonly__ var RGBA : int/*GLenum*/;
+	       __readonly__ var RGBA : int/*GLenum*/;
+	static __readonly__ var LUMINANCE : int/*GLenum*/;
+	       __readonly__ var LUMINANCE : int/*GLenum*/;
+	static __readonly__ var LUMINANCE_ALPHA : int/*GLenum*/;
+	       __readonly__ var LUMINANCE_ALPHA : int/*GLenum*/;
 	/* PixelType */
 	/*      UNSIGNED_BYTE */
-	static const     UNSIGNED_SHORT_4_4_4_4 : int/*GLenum*/;
-	__readonly__ var UNSIGNED_SHORT_4_4_4_4 : int/*GLenum*/;
-	static const     UNSIGNED_SHORT_5_5_5_1 : int/*GLenum*/;
-	__readonly__ var UNSIGNED_SHORT_5_5_5_1 : int/*GLenum*/;
-	static const     UNSIGNED_SHORT_5_6_5 : int/*GLenum*/;
-	__readonly__ var UNSIGNED_SHORT_5_6_5 : int/*GLenum*/;
+	static __readonly__ var UNSIGNED_SHORT_4_4_4_4 : int/*GLenum*/;
+	       __readonly__ var UNSIGNED_SHORT_4_4_4_4 : int/*GLenum*/;
+	static __readonly__ var UNSIGNED_SHORT_5_5_5_1 : int/*GLenum*/;
+	       __readonly__ var UNSIGNED_SHORT_5_5_5_1 : int/*GLenum*/;
+	static __readonly__ var UNSIGNED_SHORT_5_6_5 : int/*GLenum*/;
+	       __readonly__ var UNSIGNED_SHORT_5_6_5 : int/*GLenum*/;
 	/* Shaders */
-	static const     FRAGMENT_SHADER : int/*GLenum*/;
-	__readonly__ var FRAGMENT_SHADER : int/*GLenum*/;
-	static const     VERTEX_SHADER : int/*GLenum*/;
-	__readonly__ var VERTEX_SHADER : int/*GLenum*/;
-	static const     MAX_VERTEX_ATTRIBS : int/*GLenum*/;
-	__readonly__ var MAX_VERTEX_ATTRIBS : int/*GLenum*/;
-	static const     MAX_VERTEX_UNIFORM_VECTORS : int/*GLenum*/;
-	__readonly__ var MAX_VERTEX_UNIFORM_VECTORS : int/*GLenum*/;
-	static const     MAX_VARYING_VECTORS : int/*GLenum*/;
-	__readonly__ var MAX_VARYING_VECTORS : int/*GLenum*/;
-	static const     MAX_COMBINED_TEXTURE_IMAGE_UNITS : int/*GLenum*/;
-	__readonly__ var MAX_COMBINED_TEXTURE_IMAGE_UNITS : int/*GLenum*/;
-	static const     MAX_VERTEX_TEXTURE_IMAGE_UNITS : int/*GLenum*/;
-	__readonly__ var MAX_VERTEX_TEXTURE_IMAGE_UNITS : int/*GLenum*/;
-	static const     MAX_TEXTURE_IMAGE_UNITS : int/*GLenum*/;
-	__readonly__ var MAX_TEXTURE_IMAGE_UNITS : int/*GLenum*/;
-	static const     MAX_FRAGMENT_UNIFORM_VECTORS : int/*GLenum*/;
-	__readonly__ var MAX_FRAGMENT_UNIFORM_VECTORS : int/*GLenum*/;
-	static const     SHADER_TYPE : int/*GLenum*/;
-	__readonly__ var SHADER_TYPE : int/*GLenum*/;
-	static const     DELETE_STATUS : int/*GLenum*/;
-	__readonly__ var DELETE_STATUS : int/*GLenum*/;
-	static const     LINK_STATUS : int/*GLenum*/;
-	__readonly__ var LINK_STATUS : int/*GLenum*/;
-	static const     VALIDATE_STATUS : int/*GLenum*/;
-	__readonly__ var VALIDATE_STATUS : int/*GLenum*/;
-	static const     ATTACHED_SHADERS : int/*GLenum*/;
-	__readonly__ var ATTACHED_SHADERS : int/*GLenum*/;
-	static const     ACTIVE_UNIFORMS : int/*GLenum*/;
-	__readonly__ var ACTIVE_UNIFORMS : int/*GLenum*/;
-	static const     ACTIVE_ATTRIBUTES : int/*GLenum*/;
-	__readonly__ var ACTIVE_ATTRIBUTES : int/*GLenum*/;
-	static const     SHADING_LANGUAGE_VERSION : int/*GLenum*/;
-	__readonly__ var SHADING_LANGUAGE_VERSION : int/*GLenum*/;
-	static const     CURRENT_PROGRAM : int/*GLenum*/;
-	__readonly__ var CURRENT_PROGRAM : int/*GLenum*/;
+	static __readonly__ var FRAGMENT_SHADER : int/*GLenum*/;
+	       __readonly__ var FRAGMENT_SHADER : int/*GLenum*/;
+	static __readonly__ var VERTEX_SHADER : int/*GLenum*/;
+	       __readonly__ var VERTEX_SHADER : int/*GLenum*/;
+	static __readonly__ var MAX_VERTEX_ATTRIBS : int/*GLenum*/;
+	       __readonly__ var MAX_VERTEX_ATTRIBS : int/*GLenum*/;
+	static __readonly__ var MAX_VERTEX_UNIFORM_VECTORS : int/*GLenum*/;
+	       __readonly__ var MAX_VERTEX_UNIFORM_VECTORS : int/*GLenum*/;
+	static __readonly__ var MAX_VARYING_VECTORS : int/*GLenum*/;
+	       __readonly__ var MAX_VARYING_VECTORS : int/*GLenum*/;
+	static __readonly__ var MAX_COMBINED_TEXTURE_IMAGE_UNITS : int/*GLenum*/;
+	       __readonly__ var MAX_COMBINED_TEXTURE_IMAGE_UNITS : int/*GLenum*/;
+	static __readonly__ var MAX_VERTEX_TEXTURE_IMAGE_UNITS : int/*GLenum*/;
+	       __readonly__ var MAX_VERTEX_TEXTURE_IMAGE_UNITS : int/*GLenum*/;
+	static __readonly__ var MAX_TEXTURE_IMAGE_UNITS : int/*GLenum*/;
+	       __readonly__ var MAX_TEXTURE_IMAGE_UNITS : int/*GLenum*/;
+	static __readonly__ var MAX_FRAGMENT_UNIFORM_VECTORS : int/*GLenum*/;
+	       __readonly__ var MAX_FRAGMENT_UNIFORM_VECTORS : int/*GLenum*/;
+	static __readonly__ var SHADER_TYPE : int/*GLenum*/;
+	       __readonly__ var SHADER_TYPE : int/*GLenum*/;
+	static __readonly__ var DELETE_STATUS : int/*GLenum*/;
+	       __readonly__ var DELETE_STATUS : int/*GLenum*/;
+	static __readonly__ var LINK_STATUS : int/*GLenum*/;
+	       __readonly__ var LINK_STATUS : int/*GLenum*/;
+	static __readonly__ var VALIDATE_STATUS : int/*GLenum*/;
+	       __readonly__ var VALIDATE_STATUS : int/*GLenum*/;
+	static __readonly__ var ATTACHED_SHADERS : int/*GLenum*/;
+	       __readonly__ var ATTACHED_SHADERS : int/*GLenum*/;
+	static __readonly__ var ACTIVE_UNIFORMS : int/*GLenum*/;
+	       __readonly__ var ACTIVE_UNIFORMS : int/*GLenum*/;
+	static __readonly__ var ACTIVE_ATTRIBUTES : int/*GLenum*/;
+	       __readonly__ var ACTIVE_ATTRIBUTES : int/*GLenum*/;
+	static __readonly__ var SHADING_LANGUAGE_VERSION : int/*GLenum*/;
+	       __readonly__ var SHADING_LANGUAGE_VERSION : int/*GLenum*/;
+	static __readonly__ var CURRENT_PROGRAM : int/*GLenum*/;
+	       __readonly__ var CURRENT_PROGRAM : int/*GLenum*/;
 	/* StencilFunction */
-	static const     NEVER : int/*GLenum*/;
-	__readonly__ var NEVER : int/*GLenum*/;
-	static const     LESS : int/*GLenum*/;
-	__readonly__ var LESS : int/*GLenum*/;
-	static const     EQUAL : int/*GLenum*/;
-	__readonly__ var EQUAL : int/*GLenum*/;
-	static const     LEQUAL : int/*GLenum*/;
-	__readonly__ var LEQUAL : int/*GLenum*/;
-	static const     GREATER : int/*GLenum*/;
-	__readonly__ var GREATER : int/*GLenum*/;
-	static const     NOTEQUAL : int/*GLenum*/;
-	__readonly__ var NOTEQUAL : int/*GLenum*/;
-	static const     GEQUAL : int/*GLenum*/;
-	__readonly__ var GEQUAL : int/*GLenum*/;
-	static const     ALWAYS : int/*GLenum*/;
-	__readonly__ var ALWAYS : int/*GLenum*/;
+	static __readonly__ var NEVER : int/*GLenum*/;
+	       __readonly__ var NEVER : int/*GLenum*/;
+	static __readonly__ var LESS : int/*GLenum*/;
+	       __readonly__ var LESS : int/*GLenum*/;
+	static __readonly__ var EQUAL : int/*GLenum*/;
+	       __readonly__ var EQUAL : int/*GLenum*/;
+	static __readonly__ var LEQUAL : int/*GLenum*/;
+	       __readonly__ var LEQUAL : int/*GLenum*/;
+	static __readonly__ var GREATER : int/*GLenum*/;
+	       __readonly__ var GREATER : int/*GLenum*/;
+	static __readonly__ var NOTEQUAL : int/*GLenum*/;
+	       __readonly__ var NOTEQUAL : int/*GLenum*/;
+	static __readonly__ var GEQUAL : int/*GLenum*/;
+	       __readonly__ var GEQUAL : int/*GLenum*/;
+	static __readonly__ var ALWAYS : int/*GLenum*/;
+	       __readonly__ var ALWAYS : int/*GLenum*/;
 	/* StencilOp */
 	/*      ZERO */
-	static const     KEEP : int/*GLenum*/;
-	__readonly__ var KEEP : int/*GLenum*/;
-	static const     REPLACE : int/*GLenum*/;
-	__readonly__ var REPLACE : int/*GLenum*/;
-	static const     INCR : int/*GLenum*/;
-	__readonly__ var INCR : int/*GLenum*/;
-	static const     DECR : int/*GLenum*/;
-	__readonly__ var DECR : int/*GLenum*/;
-	static const     INVERT : int/*GLenum*/;
-	__readonly__ var INVERT : int/*GLenum*/;
-	static const     INCR_WRAP : int/*GLenum*/;
-	__readonly__ var INCR_WRAP : int/*GLenum*/;
-	static const     DECR_WRAP : int/*GLenum*/;
-	__readonly__ var DECR_WRAP : int/*GLenum*/;
+	static __readonly__ var KEEP : int/*GLenum*/;
+	       __readonly__ var KEEP : int/*GLenum*/;
+	static __readonly__ var REPLACE : int/*GLenum*/;
+	       __readonly__ var REPLACE : int/*GLenum*/;
+	static __readonly__ var INCR : int/*GLenum*/;
+	       __readonly__ var INCR : int/*GLenum*/;
+	static __readonly__ var DECR : int/*GLenum*/;
+	       __readonly__ var DECR : int/*GLenum*/;
+	static __readonly__ var INVERT : int/*GLenum*/;
+	       __readonly__ var INVERT : int/*GLenum*/;
+	static __readonly__ var INCR_WRAP : int/*GLenum*/;
+	       __readonly__ var INCR_WRAP : int/*GLenum*/;
+	static __readonly__ var DECR_WRAP : int/*GLenum*/;
+	       __readonly__ var DECR_WRAP : int/*GLenum*/;
 	/* StringName */
-	static const     VENDOR : int/*GLenum*/;
-	__readonly__ var VENDOR : int/*GLenum*/;
-	static const     RENDERER : int/*GLenum*/;
-	__readonly__ var RENDERER : int/*GLenum*/;
-	static const     VERSION : int/*GLenum*/;
-	__readonly__ var VERSION : int/*GLenum*/;
+	static __readonly__ var VENDOR : int/*GLenum*/;
+	       __readonly__ var VENDOR : int/*GLenum*/;
+	static __readonly__ var RENDERER : int/*GLenum*/;
+	       __readonly__ var RENDERER : int/*GLenum*/;
+	static __readonly__ var VERSION : int/*GLenum*/;
+	       __readonly__ var VERSION : int/*GLenum*/;
 	/* TextureMagFilter */
-	static const     NEAREST : int/*GLenum*/;
-	__readonly__ var NEAREST : int/*GLenum*/;
-	static const     LINEAR : int/*GLenum*/;
-	__readonly__ var LINEAR : int/*GLenum*/;
+	static __readonly__ var NEAREST : int/*GLenum*/;
+	       __readonly__ var NEAREST : int/*GLenum*/;
+	static __readonly__ var LINEAR : int/*GLenum*/;
+	       __readonly__ var LINEAR : int/*GLenum*/;
 	/* TextureMinFilter */
 	/*      NEAREST */
 	/*      LINEAR */
-	static const     NEAREST_MIPMAP_NEAREST : int/*GLenum*/;
-	__readonly__ var NEAREST_MIPMAP_NEAREST : int/*GLenum*/;
-	static const     LINEAR_MIPMAP_NEAREST : int/*GLenum*/;
-	__readonly__ var LINEAR_MIPMAP_NEAREST : int/*GLenum*/;
-	static const     NEAREST_MIPMAP_LINEAR : int/*GLenum*/;
-	__readonly__ var NEAREST_MIPMAP_LINEAR : int/*GLenum*/;
-	static const     LINEAR_MIPMAP_LINEAR : int/*GLenum*/;
-	__readonly__ var LINEAR_MIPMAP_LINEAR : int/*GLenum*/;
+	static __readonly__ var NEAREST_MIPMAP_NEAREST : int/*GLenum*/;
+	       __readonly__ var NEAREST_MIPMAP_NEAREST : int/*GLenum*/;
+	static __readonly__ var LINEAR_MIPMAP_NEAREST : int/*GLenum*/;
+	       __readonly__ var LINEAR_MIPMAP_NEAREST : int/*GLenum*/;
+	static __readonly__ var NEAREST_MIPMAP_LINEAR : int/*GLenum*/;
+	       __readonly__ var NEAREST_MIPMAP_LINEAR : int/*GLenum*/;
+	static __readonly__ var LINEAR_MIPMAP_LINEAR : int/*GLenum*/;
+	       __readonly__ var LINEAR_MIPMAP_LINEAR : int/*GLenum*/;
 	/* TextureParameterName */
-	static const     TEXTURE_MAG_FILTER : int/*GLenum*/;
-	__readonly__ var TEXTURE_MAG_FILTER : int/*GLenum*/;
-	static const     TEXTURE_MIN_FILTER : int/*GLenum*/;
-	__readonly__ var TEXTURE_MIN_FILTER : int/*GLenum*/;
-	static const     TEXTURE_WRAP_S : int/*GLenum*/;
-	__readonly__ var TEXTURE_WRAP_S : int/*GLenum*/;
-	static const     TEXTURE_WRAP_T : int/*GLenum*/;
-	__readonly__ var TEXTURE_WRAP_T : int/*GLenum*/;
+	static __readonly__ var TEXTURE_MAG_FILTER : int/*GLenum*/;
+	       __readonly__ var TEXTURE_MAG_FILTER : int/*GLenum*/;
+	static __readonly__ var TEXTURE_MIN_FILTER : int/*GLenum*/;
+	       __readonly__ var TEXTURE_MIN_FILTER : int/*GLenum*/;
+	static __readonly__ var TEXTURE_WRAP_S : int/*GLenum*/;
+	       __readonly__ var TEXTURE_WRAP_S : int/*GLenum*/;
+	static __readonly__ var TEXTURE_WRAP_T : int/*GLenum*/;
+	       __readonly__ var TEXTURE_WRAP_T : int/*GLenum*/;
 	/* TextureTarget */
-	static const     TEXTURE_2D : int/*GLenum*/;
-	__readonly__ var TEXTURE_2D : int/*GLenum*/;
-	static const     TEXTURE : int/*GLenum*/;
-	__readonly__ var TEXTURE : int/*GLenum*/;
-	static const     TEXTURE_CUBE_MAP : int/*GLenum*/;
-	__readonly__ var TEXTURE_CUBE_MAP : int/*GLenum*/;
-	static const     TEXTURE_BINDING_CUBE_MAP : int/*GLenum*/;
-	__readonly__ var TEXTURE_BINDING_CUBE_MAP : int/*GLenum*/;
-	static const     TEXTURE_CUBE_MAP_POSITIVE_X : int/*GLenum*/;
-	__readonly__ var TEXTURE_CUBE_MAP_POSITIVE_X : int/*GLenum*/;
-	static const     TEXTURE_CUBE_MAP_NEGATIVE_X : int/*GLenum*/;
-	__readonly__ var TEXTURE_CUBE_MAP_NEGATIVE_X : int/*GLenum*/;
-	static const     TEXTURE_CUBE_MAP_POSITIVE_Y : int/*GLenum*/;
-	__readonly__ var TEXTURE_CUBE_MAP_POSITIVE_Y : int/*GLenum*/;
-	static const     TEXTURE_CUBE_MAP_NEGATIVE_Y : int/*GLenum*/;
-	__readonly__ var TEXTURE_CUBE_MAP_NEGATIVE_Y : int/*GLenum*/;
-	static const     TEXTURE_CUBE_MAP_POSITIVE_Z : int/*GLenum*/;
-	__readonly__ var TEXTURE_CUBE_MAP_POSITIVE_Z : int/*GLenum*/;
-	static const     TEXTURE_CUBE_MAP_NEGATIVE_Z : int/*GLenum*/;
-	__readonly__ var TEXTURE_CUBE_MAP_NEGATIVE_Z : int/*GLenum*/;
-	static const     MAX_CUBE_MAP_TEXTURE_SIZE : int/*GLenum*/;
-	__readonly__ var MAX_CUBE_MAP_TEXTURE_SIZE : int/*GLenum*/;
+	static __readonly__ var TEXTURE_2D : int/*GLenum*/;
+	       __readonly__ var TEXTURE_2D : int/*GLenum*/;
+	static __readonly__ var TEXTURE : int/*GLenum*/;
+	       __readonly__ var TEXTURE : int/*GLenum*/;
+	static __readonly__ var TEXTURE_CUBE_MAP : int/*GLenum*/;
+	       __readonly__ var TEXTURE_CUBE_MAP : int/*GLenum*/;
+	static __readonly__ var TEXTURE_BINDING_CUBE_MAP : int/*GLenum*/;
+	       __readonly__ var TEXTURE_BINDING_CUBE_MAP : int/*GLenum*/;
+	static __readonly__ var TEXTURE_CUBE_MAP_POSITIVE_X : int/*GLenum*/;
+	       __readonly__ var TEXTURE_CUBE_MAP_POSITIVE_X : int/*GLenum*/;
+	static __readonly__ var TEXTURE_CUBE_MAP_NEGATIVE_X : int/*GLenum*/;
+	       __readonly__ var TEXTURE_CUBE_MAP_NEGATIVE_X : int/*GLenum*/;
+	static __readonly__ var TEXTURE_CUBE_MAP_POSITIVE_Y : int/*GLenum*/;
+	       __readonly__ var TEXTURE_CUBE_MAP_POSITIVE_Y : int/*GLenum*/;
+	static __readonly__ var TEXTURE_CUBE_MAP_NEGATIVE_Y : int/*GLenum*/;
+	       __readonly__ var TEXTURE_CUBE_MAP_NEGATIVE_Y : int/*GLenum*/;
+	static __readonly__ var TEXTURE_CUBE_MAP_POSITIVE_Z : int/*GLenum*/;
+	       __readonly__ var TEXTURE_CUBE_MAP_POSITIVE_Z : int/*GLenum*/;
+	static __readonly__ var TEXTURE_CUBE_MAP_NEGATIVE_Z : int/*GLenum*/;
+	       __readonly__ var TEXTURE_CUBE_MAP_NEGATIVE_Z : int/*GLenum*/;
+	static __readonly__ var MAX_CUBE_MAP_TEXTURE_SIZE : int/*GLenum*/;
+	       __readonly__ var MAX_CUBE_MAP_TEXTURE_SIZE : int/*GLenum*/;
 	/* TextureUnit */
-	static const     TEXTURE0 : int/*GLenum*/;
-	__readonly__ var TEXTURE0 : int/*GLenum*/;
-	static const     TEXTURE1 : int/*GLenum*/;
-	__readonly__ var TEXTURE1 : int/*GLenum*/;
-	static const     TEXTURE2 : int/*GLenum*/;
-	__readonly__ var TEXTURE2 : int/*GLenum*/;
-	static const     TEXTURE3 : int/*GLenum*/;
-	__readonly__ var TEXTURE3 : int/*GLenum*/;
-	static const     TEXTURE4 : int/*GLenum*/;
-	__readonly__ var TEXTURE4 : int/*GLenum*/;
-	static const     TEXTURE5 : int/*GLenum*/;
-	__readonly__ var TEXTURE5 : int/*GLenum*/;
-	static const     TEXTURE6 : int/*GLenum*/;
-	__readonly__ var TEXTURE6 : int/*GLenum*/;
-	static const     TEXTURE7 : int/*GLenum*/;
-	__readonly__ var TEXTURE7 : int/*GLenum*/;
-	static const     TEXTURE8 : int/*GLenum*/;
-	__readonly__ var TEXTURE8 : int/*GLenum*/;
-	static const     TEXTURE9 : int/*GLenum*/;
-	__readonly__ var TEXTURE9 : int/*GLenum*/;
-	static const     TEXTURE10 : int/*GLenum*/;
-	__readonly__ var TEXTURE10 : int/*GLenum*/;
-	static const     TEXTURE11 : int/*GLenum*/;
-	__readonly__ var TEXTURE11 : int/*GLenum*/;
-	static const     TEXTURE12 : int/*GLenum*/;
-	__readonly__ var TEXTURE12 : int/*GLenum*/;
-	static const     TEXTURE13 : int/*GLenum*/;
-	__readonly__ var TEXTURE13 : int/*GLenum*/;
-	static const     TEXTURE14 : int/*GLenum*/;
-	__readonly__ var TEXTURE14 : int/*GLenum*/;
-	static const     TEXTURE15 : int/*GLenum*/;
-	__readonly__ var TEXTURE15 : int/*GLenum*/;
-	static const     TEXTURE16 : int/*GLenum*/;
-	__readonly__ var TEXTURE16 : int/*GLenum*/;
-	static const     TEXTURE17 : int/*GLenum*/;
-	__readonly__ var TEXTURE17 : int/*GLenum*/;
-	static const     TEXTURE18 : int/*GLenum*/;
-	__readonly__ var TEXTURE18 : int/*GLenum*/;
-	static const     TEXTURE19 : int/*GLenum*/;
-	__readonly__ var TEXTURE19 : int/*GLenum*/;
-	static const     TEXTURE20 : int/*GLenum*/;
-	__readonly__ var TEXTURE20 : int/*GLenum*/;
-	static const     TEXTURE21 : int/*GLenum*/;
-	__readonly__ var TEXTURE21 : int/*GLenum*/;
-	static const     TEXTURE22 : int/*GLenum*/;
-	__readonly__ var TEXTURE22 : int/*GLenum*/;
-	static const     TEXTURE23 : int/*GLenum*/;
-	__readonly__ var TEXTURE23 : int/*GLenum*/;
-	static const     TEXTURE24 : int/*GLenum*/;
-	__readonly__ var TEXTURE24 : int/*GLenum*/;
-	static const     TEXTURE25 : int/*GLenum*/;
-	__readonly__ var TEXTURE25 : int/*GLenum*/;
-	static const     TEXTURE26 : int/*GLenum*/;
-	__readonly__ var TEXTURE26 : int/*GLenum*/;
-	static const     TEXTURE27 : int/*GLenum*/;
-	__readonly__ var TEXTURE27 : int/*GLenum*/;
-	static const     TEXTURE28 : int/*GLenum*/;
-	__readonly__ var TEXTURE28 : int/*GLenum*/;
-	static const     TEXTURE29 : int/*GLenum*/;
-	__readonly__ var TEXTURE29 : int/*GLenum*/;
-	static const     TEXTURE30 : int/*GLenum*/;
-	__readonly__ var TEXTURE30 : int/*GLenum*/;
-	static const     TEXTURE31 : int/*GLenum*/;
-	__readonly__ var TEXTURE31 : int/*GLenum*/;
-	static const     ACTIVE_TEXTURE : int/*GLenum*/;
-	__readonly__ var ACTIVE_TEXTURE : int/*GLenum*/;
+	static __readonly__ var TEXTURE0 : int/*GLenum*/;
+	       __readonly__ var TEXTURE0 : int/*GLenum*/;
+	static __readonly__ var TEXTURE1 : int/*GLenum*/;
+	       __readonly__ var TEXTURE1 : int/*GLenum*/;
+	static __readonly__ var TEXTURE2 : int/*GLenum*/;
+	       __readonly__ var TEXTURE2 : int/*GLenum*/;
+	static __readonly__ var TEXTURE3 : int/*GLenum*/;
+	       __readonly__ var TEXTURE3 : int/*GLenum*/;
+	static __readonly__ var TEXTURE4 : int/*GLenum*/;
+	       __readonly__ var TEXTURE4 : int/*GLenum*/;
+	static __readonly__ var TEXTURE5 : int/*GLenum*/;
+	       __readonly__ var TEXTURE5 : int/*GLenum*/;
+	static __readonly__ var TEXTURE6 : int/*GLenum*/;
+	       __readonly__ var TEXTURE6 : int/*GLenum*/;
+	static __readonly__ var TEXTURE7 : int/*GLenum*/;
+	       __readonly__ var TEXTURE7 : int/*GLenum*/;
+	static __readonly__ var TEXTURE8 : int/*GLenum*/;
+	       __readonly__ var TEXTURE8 : int/*GLenum*/;
+	static __readonly__ var TEXTURE9 : int/*GLenum*/;
+	       __readonly__ var TEXTURE9 : int/*GLenum*/;
+	static __readonly__ var TEXTURE10 : int/*GLenum*/;
+	       __readonly__ var TEXTURE10 : int/*GLenum*/;
+	static __readonly__ var TEXTURE11 : int/*GLenum*/;
+	       __readonly__ var TEXTURE11 : int/*GLenum*/;
+	static __readonly__ var TEXTURE12 : int/*GLenum*/;
+	       __readonly__ var TEXTURE12 : int/*GLenum*/;
+	static __readonly__ var TEXTURE13 : int/*GLenum*/;
+	       __readonly__ var TEXTURE13 : int/*GLenum*/;
+	static __readonly__ var TEXTURE14 : int/*GLenum*/;
+	       __readonly__ var TEXTURE14 : int/*GLenum*/;
+	static __readonly__ var TEXTURE15 : int/*GLenum*/;
+	       __readonly__ var TEXTURE15 : int/*GLenum*/;
+	static __readonly__ var TEXTURE16 : int/*GLenum*/;
+	       __readonly__ var TEXTURE16 : int/*GLenum*/;
+	static __readonly__ var TEXTURE17 : int/*GLenum*/;
+	       __readonly__ var TEXTURE17 : int/*GLenum*/;
+	static __readonly__ var TEXTURE18 : int/*GLenum*/;
+	       __readonly__ var TEXTURE18 : int/*GLenum*/;
+	static __readonly__ var TEXTURE19 : int/*GLenum*/;
+	       __readonly__ var TEXTURE19 : int/*GLenum*/;
+	static __readonly__ var TEXTURE20 : int/*GLenum*/;
+	       __readonly__ var TEXTURE20 : int/*GLenum*/;
+	static __readonly__ var TEXTURE21 : int/*GLenum*/;
+	       __readonly__ var TEXTURE21 : int/*GLenum*/;
+	static __readonly__ var TEXTURE22 : int/*GLenum*/;
+	       __readonly__ var TEXTURE22 : int/*GLenum*/;
+	static __readonly__ var TEXTURE23 : int/*GLenum*/;
+	       __readonly__ var TEXTURE23 : int/*GLenum*/;
+	static __readonly__ var TEXTURE24 : int/*GLenum*/;
+	       __readonly__ var TEXTURE24 : int/*GLenum*/;
+	static __readonly__ var TEXTURE25 : int/*GLenum*/;
+	       __readonly__ var TEXTURE25 : int/*GLenum*/;
+	static __readonly__ var TEXTURE26 : int/*GLenum*/;
+	       __readonly__ var TEXTURE26 : int/*GLenum*/;
+	static __readonly__ var TEXTURE27 : int/*GLenum*/;
+	       __readonly__ var TEXTURE27 : int/*GLenum*/;
+	static __readonly__ var TEXTURE28 : int/*GLenum*/;
+	       __readonly__ var TEXTURE28 : int/*GLenum*/;
+	static __readonly__ var TEXTURE29 : int/*GLenum*/;
+	       __readonly__ var TEXTURE29 : int/*GLenum*/;
+	static __readonly__ var TEXTURE30 : int/*GLenum*/;
+	       __readonly__ var TEXTURE30 : int/*GLenum*/;
+	static __readonly__ var TEXTURE31 : int/*GLenum*/;
+	       __readonly__ var TEXTURE31 : int/*GLenum*/;
+	static __readonly__ var ACTIVE_TEXTURE : int/*GLenum*/;
+	       __readonly__ var ACTIVE_TEXTURE : int/*GLenum*/;
 	/* TextureWrapMode */
-	static const     REPEAT : int/*GLenum*/;
-	__readonly__ var REPEAT : int/*GLenum*/;
-	static const     CLAMP_TO_EDGE : int/*GLenum*/;
-	__readonly__ var CLAMP_TO_EDGE : int/*GLenum*/;
-	static const     MIRRORED_REPEAT : int/*GLenum*/;
-	__readonly__ var MIRRORED_REPEAT : int/*GLenum*/;
+	static __readonly__ var REPEAT : int/*GLenum*/;
+	       __readonly__ var REPEAT : int/*GLenum*/;
+	static __readonly__ var CLAMP_TO_EDGE : int/*GLenum*/;
+	       __readonly__ var CLAMP_TO_EDGE : int/*GLenum*/;
+	static __readonly__ var MIRRORED_REPEAT : int/*GLenum*/;
+	       __readonly__ var MIRRORED_REPEAT : int/*GLenum*/;
 	/* Uniform Types */
-	static const     FLOAT_VEC2 : int/*GLenum*/;
-	__readonly__ var FLOAT_VEC2 : int/*GLenum*/;
-	static const     FLOAT_VEC3 : int/*GLenum*/;
-	__readonly__ var FLOAT_VEC3 : int/*GLenum*/;
-	static const     FLOAT_VEC4 : int/*GLenum*/;
-	__readonly__ var FLOAT_VEC4 : int/*GLenum*/;
-	static const     INT_VEC2 : int/*GLenum*/;
-	__readonly__ var INT_VEC2 : int/*GLenum*/;
-	static const     INT_VEC3 : int/*GLenum*/;
-	__readonly__ var INT_VEC3 : int/*GLenum*/;
-	static const     INT_VEC4 : int/*GLenum*/;
-	__readonly__ var INT_VEC4 : int/*GLenum*/;
-	static const     BOOL : int/*GLenum*/;
-	__readonly__ var BOOL : int/*GLenum*/;
-	static const     BOOL_VEC2 : int/*GLenum*/;
-	__readonly__ var BOOL_VEC2 : int/*GLenum*/;
-	static const     BOOL_VEC3 : int/*GLenum*/;
-	__readonly__ var BOOL_VEC3 : int/*GLenum*/;
-	static const     BOOL_VEC4 : int/*GLenum*/;
-	__readonly__ var BOOL_VEC4 : int/*GLenum*/;
-	static const     FLOAT_MAT2 : int/*GLenum*/;
-	__readonly__ var FLOAT_MAT2 : int/*GLenum*/;
-	static const     FLOAT_MAT3 : int/*GLenum*/;
-	__readonly__ var FLOAT_MAT3 : int/*GLenum*/;
-	static const     FLOAT_MAT4 : int/*GLenum*/;
-	__readonly__ var FLOAT_MAT4 : int/*GLenum*/;
-	static const     SAMPLER_2D : int/*GLenum*/;
-	__readonly__ var SAMPLER_2D : int/*GLenum*/;
-	static const     SAMPLER_CUBE : int/*GLenum*/;
-	__readonly__ var SAMPLER_CUBE : int/*GLenum*/;
+	static __readonly__ var FLOAT_VEC2 : int/*GLenum*/;
+	       __readonly__ var FLOAT_VEC2 : int/*GLenum*/;
+	static __readonly__ var FLOAT_VEC3 : int/*GLenum*/;
+	       __readonly__ var FLOAT_VEC3 : int/*GLenum*/;
+	static __readonly__ var FLOAT_VEC4 : int/*GLenum*/;
+	       __readonly__ var FLOAT_VEC4 : int/*GLenum*/;
+	static __readonly__ var INT_VEC2 : int/*GLenum*/;
+	       __readonly__ var INT_VEC2 : int/*GLenum*/;
+	static __readonly__ var INT_VEC3 : int/*GLenum*/;
+	       __readonly__ var INT_VEC3 : int/*GLenum*/;
+	static __readonly__ var INT_VEC4 : int/*GLenum*/;
+	       __readonly__ var INT_VEC4 : int/*GLenum*/;
+	static __readonly__ var BOOL : int/*GLenum*/;
+	       __readonly__ var BOOL : int/*GLenum*/;
+	static __readonly__ var BOOL_VEC2 : int/*GLenum*/;
+	       __readonly__ var BOOL_VEC2 : int/*GLenum*/;
+	static __readonly__ var BOOL_VEC3 : int/*GLenum*/;
+	       __readonly__ var BOOL_VEC3 : int/*GLenum*/;
+	static __readonly__ var BOOL_VEC4 : int/*GLenum*/;
+	       __readonly__ var BOOL_VEC4 : int/*GLenum*/;
+	static __readonly__ var FLOAT_MAT2 : int/*GLenum*/;
+	       __readonly__ var FLOAT_MAT2 : int/*GLenum*/;
+	static __readonly__ var FLOAT_MAT3 : int/*GLenum*/;
+	       __readonly__ var FLOAT_MAT3 : int/*GLenum*/;
+	static __readonly__ var FLOAT_MAT4 : int/*GLenum*/;
+	       __readonly__ var FLOAT_MAT4 : int/*GLenum*/;
+	static __readonly__ var SAMPLER_2D : int/*GLenum*/;
+	       __readonly__ var SAMPLER_2D : int/*GLenum*/;
+	static __readonly__ var SAMPLER_CUBE : int/*GLenum*/;
+	       __readonly__ var SAMPLER_CUBE : int/*GLenum*/;
 	/* Vertex Arrays */
-	static const     VERTEX_ATTRIB_ARRAY_ENABLED : int/*GLenum*/;
-	__readonly__ var VERTEX_ATTRIB_ARRAY_ENABLED : int/*GLenum*/;
-	static const     VERTEX_ATTRIB_ARRAY_SIZE : int/*GLenum*/;
-	__readonly__ var VERTEX_ATTRIB_ARRAY_SIZE : int/*GLenum*/;
-	static const     VERTEX_ATTRIB_ARRAY_STRIDE : int/*GLenum*/;
-	__readonly__ var VERTEX_ATTRIB_ARRAY_STRIDE : int/*GLenum*/;
-	static const     VERTEX_ATTRIB_ARRAY_TYPE : int/*GLenum*/;
-	__readonly__ var VERTEX_ATTRIB_ARRAY_TYPE : int/*GLenum*/;
-	static const     VERTEX_ATTRIB_ARRAY_NORMALIZED : int/*GLenum*/;
-	__readonly__ var VERTEX_ATTRIB_ARRAY_NORMALIZED : int/*GLenum*/;
-	static const     VERTEX_ATTRIB_ARRAY_POINTER : int/*GLenum*/;
-	__readonly__ var VERTEX_ATTRIB_ARRAY_POINTER : int/*GLenum*/;
-	static const     VERTEX_ATTRIB_ARRAY_BUFFER_BINDING : int/*GLenum*/;
-	__readonly__ var VERTEX_ATTRIB_ARRAY_BUFFER_BINDING : int/*GLenum*/;
+	static __readonly__ var VERTEX_ATTRIB_ARRAY_ENABLED : int/*GLenum*/;
+	       __readonly__ var VERTEX_ATTRIB_ARRAY_ENABLED : int/*GLenum*/;
+	static __readonly__ var VERTEX_ATTRIB_ARRAY_SIZE : int/*GLenum*/;
+	       __readonly__ var VERTEX_ATTRIB_ARRAY_SIZE : int/*GLenum*/;
+	static __readonly__ var VERTEX_ATTRIB_ARRAY_STRIDE : int/*GLenum*/;
+	       __readonly__ var VERTEX_ATTRIB_ARRAY_STRIDE : int/*GLenum*/;
+	static __readonly__ var VERTEX_ATTRIB_ARRAY_TYPE : int/*GLenum*/;
+	       __readonly__ var VERTEX_ATTRIB_ARRAY_TYPE : int/*GLenum*/;
+	static __readonly__ var VERTEX_ATTRIB_ARRAY_NORMALIZED : int/*GLenum*/;
+	       __readonly__ var VERTEX_ATTRIB_ARRAY_NORMALIZED : int/*GLenum*/;
+	static __readonly__ var VERTEX_ATTRIB_ARRAY_POINTER : int/*GLenum*/;
+	       __readonly__ var VERTEX_ATTRIB_ARRAY_POINTER : int/*GLenum*/;
+	static __readonly__ var VERTEX_ATTRIB_ARRAY_BUFFER_BINDING : int/*GLenum*/;
+	       __readonly__ var VERTEX_ATTRIB_ARRAY_BUFFER_BINDING : int/*GLenum*/;
 	/* Shader Source */
-	static const     COMPILE_STATUS : int/*GLenum*/;
-	__readonly__ var COMPILE_STATUS : int/*GLenum*/;
+	static __readonly__ var COMPILE_STATUS : int/*GLenum*/;
+	       __readonly__ var COMPILE_STATUS : int/*GLenum*/;
 	/* Shader Precision-Specified Types */
-	static const     LOW_FLOAT : int/*GLenum*/;
-	__readonly__ var LOW_FLOAT : int/*GLenum*/;
-	static const     MEDIUM_FLOAT : int/*GLenum*/;
-	__readonly__ var MEDIUM_FLOAT : int/*GLenum*/;
-	static const     HIGH_FLOAT : int/*GLenum*/;
-	__readonly__ var HIGH_FLOAT : int/*GLenum*/;
-	static const     LOW_INT : int/*GLenum*/;
-	__readonly__ var LOW_INT : int/*GLenum*/;
-	static const     MEDIUM_INT : int/*GLenum*/;
-	__readonly__ var MEDIUM_INT : int/*GLenum*/;
-	static const     HIGH_INT : int/*GLenum*/;
-	__readonly__ var HIGH_INT : int/*GLenum*/;
+	static __readonly__ var LOW_FLOAT : int/*GLenum*/;
+	       __readonly__ var LOW_FLOAT : int/*GLenum*/;
+	static __readonly__ var MEDIUM_FLOAT : int/*GLenum*/;
+	       __readonly__ var MEDIUM_FLOAT : int/*GLenum*/;
+	static __readonly__ var HIGH_FLOAT : int/*GLenum*/;
+	       __readonly__ var HIGH_FLOAT : int/*GLenum*/;
+	static __readonly__ var LOW_INT : int/*GLenum*/;
+	       __readonly__ var LOW_INT : int/*GLenum*/;
+	static __readonly__ var MEDIUM_INT : int/*GLenum*/;
+	       __readonly__ var MEDIUM_INT : int/*GLenum*/;
+	static __readonly__ var HIGH_INT : int/*GLenum*/;
+	       __readonly__ var HIGH_INT : int/*GLenum*/;
 	/* Framebuffer Object. */
-	static const     FRAMEBUFFER : int/*GLenum*/;
-	__readonly__ var FRAMEBUFFER : int/*GLenum*/;
-	static const     RENDERBUFFER : int/*GLenum*/;
-	__readonly__ var RENDERBUFFER : int/*GLenum*/;
-	static const     RGBA4 : int/*GLenum*/;
-	__readonly__ var RGBA4 : int/*GLenum*/;
-	static const     RGB5_A1 : int/*GLenum*/;
-	__readonly__ var RGB5_A1 : int/*GLenum*/;
-	static const     RGB565 : int/*GLenum*/;
-	__readonly__ var RGB565 : int/*GLenum*/;
-	static const     DEPTH_COMPONENT16 : int/*GLenum*/;
-	__readonly__ var DEPTH_COMPONENT16 : int/*GLenum*/;
-	static const     STENCIL_INDEX : int/*GLenum*/;
-	__readonly__ var STENCIL_INDEX : int/*GLenum*/;
-	static const     STENCIL_INDEX8 : int/*GLenum*/;
-	__readonly__ var STENCIL_INDEX8 : int/*GLenum*/;
-	static const     DEPTH_STENCIL : int/*GLenum*/;
-	__readonly__ var DEPTH_STENCIL : int/*GLenum*/;
-	static const     RENDERBUFFER_WIDTH : int/*GLenum*/;
-	__readonly__ var RENDERBUFFER_WIDTH : int/*GLenum*/;
-	static const     RENDERBUFFER_HEIGHT : int/*GLenum*/;
-	__readonly__ var RENDERBUFFER_HEIGHT : int/*GLenum*/;
-	static const     RENDERBUFFER_INTERNAL_FORMAT : int/*GLenum*/;
-	__readonly__ var RENDERBUFFER_INTERNAL_FORMAT : int/*GLenum*/;
-	static const     RENDERBUFFER_RED_SIZE : int/*GLenum*/;
-	__readonly__ var RENDERBUFFER_RED_SIZE : int/*GLenum*/;
-	static const     RENDERBUFFER_GREEN_SIZE : int/*GLenum*/;
-	__readonly__ var RENDERBUFFER_GREEN_SIZE : int/*GLenum*/;
-	static const     RENDERBUFFER_BLUE_SIZE : int/*GLenum*/;
-	__readonly__ var RENDERBUFFER_BLUE_SIZE : int/*GLenum*/;
-	static const     RENDERBUFFER_ALPHA_SIZE : int/*GLenum*/;
-	__readonly__ var RENDERBUFFER_ALPHA_SIZE : int/*GLenum*/;
-	static const     RENDERBUFFER_DEPTH_SIZE : int/*GLenum*/;
-	__readonly__ var RENDERBUFFER_DEPTH_SIZE : int/*GLenum*/;
-	static const     RENDERBUFFER_STENCIL_SIZE : int/*GLenum*/;
-	__readonly__ var RENDERBUFFER_STENCIL_SIZE : int/*GLenum*/;
-	static const     FRAMEBUFFER_ATTACHMENT_OBJECT_TYPE : int/*GLenum*/;
-	__readonly__ var FRAMEBUFFER_ATTACHMENT_OBJECT_TYPE : int/*GLenum*/;
-	static const     FRAMEBUFFER_ATTACHMENT_OBJECT_NAME : int/*GLenum*/;
-	__readonly__ var FRAMEBUFFER_ATTACHMENT_OBJECT_NAME : int/*GLenum*/;
-	static const     FRAMEBUFFER_ATTACHMENT_TEXTURE_LEVEL : int/*GLenum*/;
-	__readonly__ var FRAMEBUFFER_ATTACHMENT_TEXTURE_LEVEL : int/*GLenum*/;
-	static const     FRAMEBUFFER_ATTACHMENT_TEXTURE_CUBE_MAP_FACE : int/*GLenum*/;
-	__readonly__ var FRAMEBUFFER_ATTACHMENT_TEXTURE_CUBE_MAP_FACE : int/*GLenum*/;
-	static const     COLOR_ATTACHMENT0 : int/*GLenum*/;
-	__readonly__ var COLOR_ATTACHMENT0 : int/*GLenum*/;
-	static const     DEPTH_ATTACHMENT : int/*GLenum*/;
-	__readonly__ var DEPTH_ATTACHMENT : int/*GLenum*/;
-	static const     STENCIL_ATTACHMENT : int/*GLenum*/;
-	__readonly__ var STENCIL_ATTACHMENT : int/*GLenum*/;
-	static const     DEPTH_STENCIL_ATTACHMENT : int/*GLenum*/;
-	__readonly__ var DEPTH_STENCIL_ATTACHMENT : int/*GLenum*/;
-	static const     NONE : int/*GLenum*/;
-	__readonly__ var NONE : int/*GLenum*/;
-	static const     FRAMEBUFFER_COMPLETE : int/*GLenum*/;
-	__readonly__ var FRAMEBUFFER_COMPLETE : int/*GLenum*/;
-	static const     FRAMEBUFFER_INCOMPLETE_ATTACHMENT : int/*GLenum*/;
-	__readonly__ var FRAMEBUFFER_INCOMPLETE_ATTACHMENT : int/*GLenum*/;
-	static const     FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT : int/*GLenum*/;
-	__readonly__ var FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT : int/*GLenum*/;
-	static const     FRAMEBUFFER_INCOMPLETE_DIMENSIONS : int/*GLenum*/;
-	__readonly__ var FRAMEBUFFER_INCOMPLETE_DIMENSIONS : int/*GLenum*/;
-	static const     FRAMEBUFFER_UNSUPPORTED : int/*GLenum*/;
-	__readonly__ var FRAMEBUFFER_UNSUPPORTED : int/*GLenum*/;
-	static const     FRAMEBUFFER_BINDING : int/*GLenum*/;
-	__readonly__ var FRAMEBUFFER_BINDING : int/*GLenum*/;
-	static const     RENDERBUFFER_BINDING : int/*GLenum*/;
-	__readonly__ var RENDERBUFFER_BINDING : int/*GLenum*/;
-	static const     MAX_RENDERBUFFER_SIZE : int/*GLenum*/;
-	__readonly__ var MAX_RENDERBUFFER_SIZE : int/*GLenum*/;
-	static const     INVALID_FRAMEBUFFER_OPERATION : int/*GLenum*/;
-	__readonly__ var INVALID_FRAMEBUFFER_OPERATION : int/*GLenum*/;
+	static __readonly__ var FRAMEBUFFER : int/*GLenum*/;
+	       __readonly__ var FRAMEBUFFER : int/*GLenum*/;
+	static __readonly__ var RENDERBUFFER : int/*GLenum*/;
+	       __readonly__ var RENDERBUFFER : int/*GLenum*/;
+	static __readonly__ var RGBA4 : int/*GLenum*/;
+	       __readonly__ var RGBA4 : int/*GLenum*/;
+	static __readonly__ var RGB5_A1 : int/*GLenum*/;
+	       __readonly__ var RGB5_A1 : int/*GLenum*/;
+	static __readonly__ var RGB565 : int/*GLenum*/;
+	       __readonly__ var RGB565 : int/*GLenum*/;
+	static __readonly__ var DEPTH_COMPONENT16 : int/*GLenum*/;
+	       __readonly__ var DEPTH_COMPONENT16 : int/*GLenum*/;
+	static __readonly__ var STENCIL_INDEX : int/*GLenum*/;
+	       __readonly__ var STENCIL_INDEX : int/*GLenum*/;
+	static __readonly__ var STENCIL_INDEX8 : int/*GLenum*/;
+	       __readonly__ var STENCIL_INDEX8 : int/*GLenum*/;
+	static __readonly__ var DEPTH_STENCIL : int/*GLenum*/;
+	       __readonly__ var DEPTH_STENCIL : int/*GLenum*/;
+	static __readonly__ var RENDERBUFFER_WIDTH : int/*GLenum*/;
+	       __readonly__ var RENDERBUFFER_WIDTH : int/*GLenum*/;
+	static __readonly__ var RENDERBUFFER_HEIGHT : int/*GLenum*/;
+	       __readonly__ var RENDERBUFFER_HEIGHT : int/*GLenum*/;
+	static __readonly__ var RENDERBUFFER_INTERNAL_FORMAT : int/*GLenum*/;
+	       __readonly__ var RENDERBUFFER_INTERNAL_FORMAT : int/*GLenum*/;
+	static __readonly__ var RENDERBUFFER_RED_SIZE : int/*GLenum*/;
+	       __readonly__ var RENDERBUFFER_RED_SIZE : int/*GLenum*/;
+	static __readonly__ var RENDERBUFFER_GREEN_SIZE : int/*GLenum*/;
+	       __readonly__ var RENDERBUFFER_GREEN_SIZE : int/*GLenum*/;
+	static __readonly__ var RENDERBUFFER_BLUE_SIZE : int/*GLenum*/;
+	       __readonly__ var RENDERBUFFER_BLUE_SIZE : int/*GLenum*/;
+	static __readonly__ var RENDERBUFFER_ALPHA_SIZE : int/*GLenum*/;
+	       __readonly__ var RENDERBUFFER_ALPHA_SIZE : int/*GLenum*/;
+	static __readonly__ var RENDERBUFFER_DEPTH_SIZE : int/*GLenum*/;
+	       __readonly__ var RENDERBUFFER_DEPTH_SIZE : int/*GLenum*/;
+	static __readonly__ var RENDERBUFFER_STENCIL_SIZE : int/*GLenum*/;
+	       __readonly__ var RENDERBUFFER_STENCIL_SIZE : int/*GLenum*/;
+	static __readonly__ var FRAMEBUFFER_ATTACHMENT_OBJECT_TYPE : int/*GLenum*/;
+	       __readonly__ var FRAMEBUFFER_ATTACHMENT_OBJECT_TYPE : int/*GLenum*/;
+	static __readonly__ var FRAMEBUFFER_ATTACHMENT_OBJECT_NAME : int/*GLenum*/;
+	       __readonly__ var FRAMEBUFFER_ATTACHMENT_OBJECT_NAME : int/*GLenum*/;
+	static __readonly__ var FRAMEBUFFER_ATTACHMENT_TEXTURE_LEVEL : int/*GLenum*/;
+	       __readonly__ var FRAMEBUFFER_ATTACHMENT_TEXTURE_LEVEL : int/*GLenum*/;
+	static __readonly__ var FRAMEBUFFER_ATTACHMENT_TEXTURE_CUBE_MAP_FACE : int/*GLenum*/;
+	       __readonly__ var FRAMEBUFFER_ATTACHMENT_TEXTURE_CUBE_MAP_FACE : int/*GLenum*/;
+	static __readonly__ var COLOR_ATTACHMENT0 : int/*GLenum*/;
+	       __readonly__ var COLOR_ATTACHMENT0 : int/*GLenum*/;
+	static __readonly__ var DEPTH_ATTACHMENT : int/*GLenum*/;
+	       __readonly__ var DEPTH_ATTACHMENT : int/*GLenum*/;
+	static __readonly__ var STENCIL_ATTACHMENT : int/*GLenum*/;
+	       __readonly__ var STENCIL_ATTACHMENT : int/*GLenum*/;
+	static __readonly__ var DEPTH_STENCIL_ATTACHMENT : int/*GLenum*/;
+	       __readonly__ var DEPTH_STENCIL_ATTACHMENT : int/*GLenum*/;
+	static __readonly__ var NONE : int/*GLenum*/;
+	       __readonly__ var NONE : int/*GLenum*/;
+	static __readonly__ var FRAMEBUFFER_COMPLETE : int/*GLenum*/;
+	       __readonly__ var FRAMEBUFFER_COMPLETE : int/*GLenum*/;
+	static __readonly__ var FRAMEBUFFER_INCOMPLETE_ATTACHMENT : int/*GLenum*/;
+	       __readonly__ var FRAMEBUFFER_INCOMPLETE_ATTACHMENT : int/*GLenum*/;
+	static __readonly__ var FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT : int/*GLenum*/;
+	       __readonly__ var FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT : int/*GLenum*/;
+	static __readonly__ var FRAMEBUFFER_INCOMPLETE_DIMENSIONS : int/*GLenum*/;
+	       __readonly__ var FRAMEBUFFER_INCOMPLETE_DIMENSIONS : int/*GLenum*/;
+	static __readonly__ var FRAMEBUFFER_UNSUPPORTED : int/*GLenum*/;
+	       __readonly__ var FRAMEBUFFER_UNSUPPORTED : int/*GLenum*/;
+	static __readonly__ var FRAMEBUFFER_BINDING : int/*GLenum*/;
+	       __readonly__ var FRAMEBUFFER_BINDING : int/*GLenum*/;
+	static __readonly__ var RENDERBUFFER_BINDING : int/*GLenum*/;
+	       __readonly__ var RENDERBUFFER_BINDING : int/*GLenum*/;
+	static __readonly__ var MAX_RENDERBUFFER_SIZE : int/*GLenum*/;
+	       __readonly__ var MAX_RENDERBUFFER_SIZE : int/*GLenum*/;
+	static __readonly__ var INVALID_FRAMEBUFFER_OPERATION : int/*GLenum*/;
+	       __readonly__ var INVALID_FRAMEBUFFER_OPERATION : int/*GLenum*/;
 	/* WebGL-specific enums */
-	static const     UNPACK_FLIP_Y_WEBGL : int/*GLenum*/;
-	__readonly__ var UNPACK_FLIP_Y_WEBGL : int/*GLenum*/;
-	static const     UNPACK_PREMULTIPLY_ALPHA_WEBGL : int/*GLenum*/;
-	__readonly__ var UNPACK_PREMULTIPLY_ALPHA_WEBGL : int/*GLenum*/;
-	static const     CONTEXT_LOST_WEBGL : int/*GLenum*/;
-	__readonly__ var CONTEXT_LOST_WEBGL : int/*GLenum*/;
-	static const     UNPACK_COLORSPACE_CONVERSION_WEBGL : int/*GLenum*/;
-	__readonly__ var UNPACK_COLORSPACE_CONVERSION_WEBGL : int/*GLenum*/;
-	static const     BROWSER_DEFAULT_WEBGL : int/*GLenum*/;
-	__readonly__ var BROWSER_DEFAULT_WEBGL : int/*GLenum*/;
+	static __readonly__ var UNPACK_FLIP_Y_WEBGL : int/*GLenum*/;
+	       __readonly__ var UNPACK_FLIP_Y_WEBGL : int/*GLenum*/;
+	static __readonly__ var UNPACK_PREMULTIPLY_ALPHA_WEBGL : int/*GLenum*/;
+	       __readonly__ var UNPACK_PREMULTIPLY_ALPHA_WEBGL : int/*GLenum*/;
+	static __readonly__ var CONTEXT_LOST_WEBGL : int/*GLenum*/;
+	       __readonly__ var CONTEXT_LOST_WEBGL : int/*GLenum*/;
+	static __readonly__ var UNPACK_COLORSPACE_CONVERSION_WEBGL : int/*GLenum*/;
+	       __readonly__ var UNPACK_COLORSPACE_CONVERSION_WEBGL : int/*GLenum*/;
+	static __readonly__ var BROWSER_DEFAULT_WEBGL : int/*GLenum*/;
+	       __readonly__ var BROWSER_DEFAULT_WEBGL : int/*GLenum*/;
 	__readonly__ var canvas : HTMLCanvasElement;
 	__readonly__ var drawingBufferWidth : int/*GLsizei*/;
 	__readonly__ var drawingBufferHeight : int/*GLsizei*/;

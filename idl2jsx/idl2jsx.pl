@@ -328,8 +328,8 @@ foreach my $file(@files) {
 
                 # WebIDL's constants are available both as class members
                 # and instance members
-                my $static_const = "static const     $id : $type;";
-                my $readonly_var = "__readonly__ var $id : $type;";
+                my $static_const = "static __readonly__ var $id : $type;";
+                my $readonly_var = "       __readonly__ var $id : $type;";
 
                 $decl_ref->{$id} //= [];
                 push @{$decl_ref->{$id}}, ($static_const, $readonly_var);
