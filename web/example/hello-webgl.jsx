@@ -1,6 +1,15 @@
+import 'timer.jsx';
 import 'js/web.jsx';
 
 class Hello {
+
+	static var gl:WebGLRenderingContext = null;
+	static var program:WebGLProgram = null;
+	static var tex:WebGLTexture = null;
+	static var vbuf:WebGLBuffer = null;
+	static var tbuf:WebGLBuffer = null;
+	static var ibuf:WebGLBuffer = null;
+	static var angle:number = 0;
 
 	static function main() : void {
 		var canvas = dom.id('webgl-canvas') as HTMLCanvasElement;
@@ -8,25 +17,30 @@ class Hello {
 
 		// points of vertices
 		var vertices = [
-			0.0, 0.5, 0.0,
-			0.5, -0.5, 0.0,
-			-0.5, -0.5, 0.0
+			-0.9, -0.9,
+			0.9, -0.9,
+			0.9, 0.9,
+			-0.9, 0.9
 		];
 
 		var vbuf = gl.createBuffer();
 		gl.bindBuffer(gl.ARRAY_BUFFER, vbuf);
 		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
 
-		// colors of verteces
-		var colors = [
-			1.0, 0.0, 0.0, 1.0,
-			0.0, 1.0, 0.0, 1.0,
-			0.0, 0.0, 1.0, 1.0
+		// texture coordinates of verteces
+		var texcs = [
+			0.0, 0.0,
+			1.0, 0.0,
+			1.0, 1.0,
+			0.0, 1.0
 		];
-		var cbuf = gl.createBuffer();
-		gl.bindBuffer(gl.ARRAY_BUFFER, cbuf);
-		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colors), gl.STATIC_DRAW);
-		var indices = [ 0, 1, 2 ];
+		var tbuf = gl.createBuffer();
+		gl.bindBuffer(gl.ARRAY_BUFFER, tbuf);
+		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(texcs), gl.STATIC_DRAW);
+		var indices = [
+			0, 1, 2,
+			2, 3, 0
+		];
 		var ibuf = gl.createBuffer();
 		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ibuf);
 		gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices), gl.STATIC_DRAW);
@@ -50,7 +64,7 @@ class Hello {
 			return;
 		}
 
-
+		// build program
 		var program = gl.createProgram();
 		gl.attachShader(program, vshader);
 		gl.attachShader(program, fshader);
@@ -62,19 +76,44 @@ class Hello {
 			return;
 		}
 
-		// draw
+		// texture
+		var tex = gl.createTexture();
+		var image = dom.window.document.createElement('img') as HTMLImageElement;
+		image.onload = function(e:Event):void{
+			gl.bindTexture(gl.TEXTURE_2D, tex);
+			gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1);
+			gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, image);
+			gl.generateMipmap(gl.TEXTURE_2D);
+			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
+			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+		};
+		image.src = 'img/teko.jpg';
+
+		Hello.gl = gl;
+		Hello.program = program;
+		Hello.vbuf = vbuf;
+		Hello.tbuf = tbuf;
+		Hello.ibuf = ibuf;
+		Timer.setInterval(Hello.draw, 30);
+	}
+
+	static function draw(): void {
+		var gl = Hello.gl;
+		Hello.angle -= 0.005;
+
 		gl.clearColor(0, 0, 0, 1);
 		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 		gl.enable(gl.DEPTH_TEST);
-		gl.useProgram(program);
-		gl.bindBuffer(gl.ARRAY_BUFFER, vbuf);
-		gl.vertexAttribPointer(0, 3, gl.FLOAT, false, 0, 0);
+		gl.useProgram(Hello.program);
+		gl.uniform1f(gl.getUniformLocation(Hello.program, 'angle'), Hello.angle);
+		gl.bindBuffer(gl.ARRAY_BUFFER, Hello.vbuf);
+		gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
 		gl.enableVertexAttribArray(0);
-		gl.bindBuffer(gl.ARRAY_BUFFER, cbuf);
-		gl.vertexAttribPointer(1, 4, gl.FLOAT, false, 0, 0);
+		gl.bindBuffer(gl.ARRAY_BUFFER, Hello.tbuf);
+		gl.vertexAttribPointer(1, 2, gl.FLOAT, false, 0, 0);
 		gl.enableVertexAttribArray(1);
-		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ibuf);
-		gl.drawElements(gl.TRIANGLES, 3, gl.UNSIGNED_SHORT, 0);
+		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, Hello.ibuf);
+		gl.drawElements(gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0);
 		gl.flush();
 	}
 

@@ -72,26 +72,30 @@
       <canvas id='webgl-canvas' width='256px' height='256px'></canvas>
       <script id='vshader' type='x-shader/x-vertex'>
         precision mediump float;
-
-        attribute vec3 position;
-        attribute vec4 color;
-
-        varying vec4 f_color;
+        uniform float angle;
+        attribute vec2 position;
+        attribute vec2 texcoord;
+        varying vec2 v_texcoord;
 
         void main() {
-          f_color = color;
-          gl_Position = vec4(position, 1.0);
+          v_texcoord = texcoord;
+          float x = position.x;
+		  float y = position.y;
+		  float s = sin(angle);
+		  float c = cos(angle);
+          gl_Position = vec4(x*c-y*s, x*s+y*c, 0.0, 1.0);
         }
       </script>
       <script id='fshader' type='x-shader/x-fragment'>
         precision mediump float;
-
-        varying vec4 f_color;
+        uniform sampler2D tex;
+        varying vec2 v_texcoord;
 
         void main() {
-          gl_FragColor = f_color;
+          gl_FragColor = texture2D(tex, v_texcoord.xy);
         }
       </script>
     </div> <!-- /container -->
   </body>
 </html>
+
