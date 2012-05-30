@@ -128,15 +128,6 @@ sub info {
     print STDERR sprintf("[%03d] ", $count++), join(" ", @_), "\n";
 }
 
-my $rx_constructors = qr{
-    \[
-        \s*
-        (?: Constructor (?: \( .*? \) )? )
-        (?: \s* , \s* Constructor \( .*? \) )*
-        \s*
-    \] \s*
-}xms;
-
 my $rx_multiword_types = join("|", map { quotemeta($_) }
     'unsigned long long',
     'unsigned byte',
@@ -159,27 +150,34 @@ my $rx_simple_type = qr{
     )
 }xms;
 
-my $rx_type = qr{
-    (?:
-        (?:
-            # union type
-            \(
-                \s*
-                $rx_simple_type
-                (?: \s+ or \s+ $rx_simple_type)+
-                \s*
-            \)
-        )
-        |
-        $rx_simple_type
-    )
+my $rx_type_modifier = qr{
     (?:
         \? # nullable
         |
         \[ \s* \] # array
         |
         \.\.\. # vararg
-    )?
+    )
+}xms;
+my $rx_type = qr{
+    (?:
+        (?:
+            # union type
+            \(
+                \s*
+                $rx_simple_type $rx_type_modifier?
+                (?: \s+ or \s+ $rx_simple_type $rx_type_modifier? )+
+                \s*
+            \)
+        )
+        |
+        $rx_simple_type
+    )
+    $rx_type_modifier?
+}xms;
+
+my $rx_params = qr{
+    (?: $rx_type | [^\(\)]+ )*
 }xms;
 
 my $rx_comments = qr{
@@ -228,7 +226,7 @@ foreach my $file(@files) {
 
     # class definition
     while($content =~ m{
-                (?<attrs> (?: \[ [^\]]+ \] \s+)* )
+                (?<attrs> (?: \[ (?: [^\]]+ | \[ \s* \])+ \] \s+)* )
                 (?<type> (?:partial \s+)? interface | exception | dictionary)
                 \s+ (?<name> \w+)
                 (?: \s* : \s* (?<base> [\w:]+) )?
@@ -277,7 +275,7 @@ foreach my $file(@files) {
         if($attrs) {
             while($attrs =~ m{
                 \b Constructor \s* (?: \(
-                    (?<params> .*?)
+                    (?<params> $rx_params)
                 \) )?
             }xmsg) {
                 make_functions(
@@ -389,8 +387,9 @@ foreach my $file(@files) {
                     (?<ident> \w*)
                     \s*
                     \(
-                        (?<params> .*)
+                        (?<params> $rx_params)
                     \)
+                    (?: \s* raises \s* \( $rx_params \) )?
                     ;
                 }xms) { # member function
 
@@ -399,8 +398,6 @@ foreach my $file(@files) {
                 my $static   = $+{static};
                 my $ret_type = $+{ret_type};
                 my $params   = $+{params};
-
-                $params =~ s/\) \s* raises \b .+//xms;
 
                 my $ret_type_may_be_undefined = 0;
 
