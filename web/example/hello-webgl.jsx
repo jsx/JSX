@@ -1,6 +1,4 @@
-import 'js/dom.jsx';
-import 'js/dom/webgl.jsx';
-import 'typedarray.jsx';
+import 'js/web.jsx';
 
 class Hello {
 
@@ -28,7 +26,7 @@ class Hello {
 		var cbuf = gl.createBuffer();
 		gl.bindBuffer(gl.ARRAY_BUFFER, cbuf);
 		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colors), gl.STATIC_DRAW);
-		var indices = [ 0, 1, 2 ] : int[];
+		var indices = [ 0, 1, 2 ];
 		var ibuf = gl.createBuffer();
 		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ibuf);
 		gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices), gl.STATIC_DRAW);

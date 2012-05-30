@@ -1,0 +1,12 @@
+// http://www.w3.org/TR/html5/single-page.html
+// JSX cannot represent WindowTimers
+
+partial interface Window {
+    long setTimeout(TimerHandler handler, optional long timeout);
+    void clearTimeout(long handle);
+
+    long setInterval(TimerHandler handler, optional long timeout);
+    void clearInterval(long handle);
+};
+
+

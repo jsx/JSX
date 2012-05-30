@@ -175,8 +175,7 @@ native final class Math {
 	static function cos(x :number) :number;
 	static function exp(x :number) :number;
 	static function floor(x :number) :number;
-	// FIXME
-	// static function log(x :number) :number;
+	static function log(x :number) :number;
 	// FIXME: ECMA-262's max() and min() take zero or more arguments
 	static function max(value1 :number, value2 :number) :number;
 	static function min(value1 :number, value2 :number) :number;

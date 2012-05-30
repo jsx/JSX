@@ -1,4 +1,4 @@
-import "typedarray.jsx";
+import "js/web.jsx";
 import "test-case.jsx";
 
 class _Test extends TestCase {

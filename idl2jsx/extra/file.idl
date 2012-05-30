@@ -1,0 +1,9 @@
+// http://www.w3.org/TR/url/
+
+interface URL {
+
+};
+
+interface webkitURL : URL {
+
+};

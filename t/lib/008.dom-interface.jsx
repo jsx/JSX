@@ -1,8 +1,6 @@
 // make sure the syntax of js/dom* is correct
 import "test-case.jsx";
-import "js/dom.jsx";
-import "js/dom/canvas2d.jsx";
-import "js/dom/webgl.jsx";
+import "js/web.jsx";
 
 class _Test extends TestCase {
 
@@ -16,17 +14,6 @@ class _Test extends TestCase {
 			var target = e.target as HTMLElement;
 			target.style.color = "red";
 		});
-
-		var canvas = dom.createCanvas();
-		var cx = canvas.getContext("2d");
-		assert cx != null;
-		log canvas.width;
-		log canvas.height;
-
-		var image = dom.createImage();
-		image.src = "bar.png";
-		log image.width;
-		log image.height;
 	}
 
 

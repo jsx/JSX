@@ -1,4 +1,4 @@
-import "js/dom.jsx";
+import "js/web.jsx";
 
 class Hello {
 	static function main() : void {

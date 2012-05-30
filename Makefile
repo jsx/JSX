@@ -26,4 +26,9 @@ web:
 server:
 	node web/server.js
 
+# for authors
+web.jsx:
+	idl2jsx/build.pl
+	idl2jsx/maketest.pl > t/lib/010.web.jsx
+
 .PHONY: test web server

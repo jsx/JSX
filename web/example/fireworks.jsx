@@ -1,5 +1,4 @@
-import "js/dom.jsx";
-import "js/dom/canvas2d.jsx";
+import "js/web.jsx";
 
 class Config {
 	static var quantity = 360;
@@ -132,11 +131,15 @@ final class FireworkView {
 		var rect = canvas.getBoundingClientRect();
 		this.left = rect.left;
 		this.top  = rect.top;
-		canvas.addEventListener("mousedown", function (e : MouseEvent) : void {
-			this.explode(e.clientX, e.clientY);
+		canvas.addEventListener("mousedown", function (e : Event) : void {
+            var me = e as MouseEvent;
+            assert me != null;
+			this.explode(me.clientX, me.clientY);
 		});
-		canvas.addEventListener("touchstart", function (e : TouchEvent) : void {
-			this.explode(e.touches[0].pageX, e.touches[0].pageY);
+		canvas.addEventListener("touchstart", function (e : Event) : void {
+            var te = e as TouchEvent;
+            assert te != null;
+			this.explode(te.touches[0].pageX, te.touches[0].pageY);
 		});
 	}
 
@@ -198,7 +201,7 @@ final class Application {
 		var view = new FireworkView(canvas);
 		var watcher = new FPSWatcher(fpsId);
 
-		dom.getWindow().setInterval( function() : void {
+		dom.window.setInterval( function() : void {
 			view.update();
 			watcher.update(view.numSparks);
 		}, 0);

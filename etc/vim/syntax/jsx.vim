@@ -45,13 +45,12 @@ syn keyword jsxNull		null undefined
 syn keyword jsxIdentifier	this var const
 syn keyword jsxLabel		case default
 syn keyword jsxException	try catch finally throw
-syn keyword jsxMessage		log
 syn keyword jsxClass		class interface mixin
 syn keyword jsxModifiers	final override native __fake__ extends abstract static implements
 syn keyword jsxImport		import from
 syn keyword jsxEntryPoint	_Main _Test main
 syn keyword jsxReserved		byte char double enum export float goto import long package private protected public short synchronized throws transient volatile arguments
-syn keyword jsxDebug		debugger assert
+syn keyword jsxDebug		debugger assert log
 
 if exists("jsx_fold")
     syn match	jsxFunction	"\<function\>"
@@ -113,7 +112,6 @@ if version >= 508 || !exists("did_jsx_syn_inits")
   HiLink jsxIdentifier		Identifier
   HiLink jsxLabel		Label
   HiLink jsxException		Exception
-  HiLink jsxMessage		Statement
   HiLink jsxClass		Structure
   HiLink jsxModifiers		Keyword
   HiLink jsxImport		Keyword

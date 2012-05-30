@@ -1,0 +1,14 @@
+// http://html5labs.interoperabilitybridges.com/dom4events/
+
+dictionary EventInit {
+
+};
+
+dictionary UIEventInit : EventInit {
+
+};
+
+dictionary MouseEventInit : UIEventInit {
+
+};
+
