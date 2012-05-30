@@ -321,6 +321,7 @@ automatically generated from:
 	http://dev.w3.org/html5/2dcontext/
 	https://www.khronos.org/registry/webgl/specs/latest/webgl.idl
 	idl2jsx/extra/timers.idl
+	idl2jsx/extra/animation-timing.idl
 */
 native class DOMException {
 
@@ -2407,6 +2408,22 @@ native __fake__ class Window extends EventTarget {
 		timeout : int/*long*/
 	) : int/*long*/;
 	function clearInterval(handle : int/*long*/) : void;
+
+	// implements WindowAnimationTiming
+
+	function requestAnimationFrame(
+		callback : function(:number):void/*FrameRequestCallback*/
+	) : int/*long*/;
+	function cancelAnimationFrame(handle : int/*long*/) : void;
+	// vender's extension
+	function webkitRequestAnimationFrame(
+		callback : function(:number):void/*FrameRequestCallback*/
+	) : int/*long*/;
+	function webkitCancelAnimationFrame(handle : int/*long*/) : void;
+	function mozRequestAnimationFrame(
+		callback : function(:number):void/*FrameRequestCallback*/
+	) : int/*long*/;
+	function mozCancelAnimationFrame(handle : int/*long*/) : void;
 
 } // end of Window
 
@@ -7151,6 +7168,24 @@ native class WebGLContextEventInit extends EventInit {
 
 } // end of WebGLContextEventInit
 
+native __fake__ class WindowAnimationTiming {
+
+	function requestAnimationFrame(
+		callback : function(:number):void/*FrameRequestCallback*/
+	) : int/*long*/;
+	function cancelAnimationFrame(handle : int/*long*/) : void;
+	// vender's extension
+	function webkitRequestAnimationFrame(
+		callback : function(:number):void/*FrameRequestCallback*/
+	) : int/*long*/;
+	function webkitCancelAnimationFrame(handle : int/*long*/) : void;
+	function mozRequestAnimationFrame(
+		callback : function(:number):void/*FrameRequestCallback*/
+	) : int/*long*/;
+	function mozCancelAnimationFrame(handle : int/*long*/) : void;
+
+} // end of WindowAnimationTiming
+
 /*
 end of generated files from:
 	http://www.w3.org/TR/dom/
@@ -7175,5 +7210,6 @@ end of generated files from:
 	http://dev.w3.org/html5/2dcontext/
 	https://www.khronos.org/registry/webgl/specs/latest/webgl.idl
 	idl2jsx/extra/timers.idl
+	idl2jsx/extra/animation-timing.idl
 */
 

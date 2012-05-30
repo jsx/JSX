@@ -38,6 +38,7 @@ my %skip = (
     UserDataHandler => 1,
     MutationCallback => 1,
     FileCallback => 1,
+    FrameRequestCallback => 1,
 
     Example => 1,
     Function => 1,
@@ -115,6 +116,9 @@ my %typemap = (
     # http://html5.org/specs/dom-parsing.html#insertadjacenthtml()
     'SupportedType' => 'string', # enum
     'insertAdjacentHTMLPosition' => 'string', # enum
+
+    # http://www.w3.org/TR/animation-timing/
+    'FrameRequestCallback' => 'function(:number):void',
 );
 
 

@@ -1,0 +1,19 @@
+// http://www.w3.org/TR/animation-timing/
+
+[InterfaceObject]
+interface WindowAnimationTiming {
+    long requestAnimationFrame(FrameRequestCallback callback);
+    void cancelAnimationFrame(long handle);
+
+    // vender's extension
+    long webkitRequestAnimationFrame(FrameRequestCallback callback);
+    void webkitCancelAnimationFrame(long handle);
+
+    long mozRequestAnimationFrame(FrameRequestCallback callback);
+    void mozCancelAnimationFrame(long handle);
+};
+
+Window implements WindowAnimationTiming;
+
+callback FrameRequestCallback = void (DOMTimeStamp time);
+

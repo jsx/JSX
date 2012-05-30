@@ -1946,6 +1946,12 @@ class _Test extends TestCase {
         var f121 : int/*long*/ = o.setInterval(X.getfunction___void());
         var f122 : int/*long*/ = o.setInterval(X.getfunction___void(), X.getint());
         o.clearInterval(X.getint());
+        var f123 : int/*long*/ = o.requestAnimationFrame(X.getfunction__number__void());
+        o.cancelAnimationFrame(X.getint());
+        var f124 : int/*long*/ = o.webkitRequestAnimationFrame(X.getfunction__number__void());
+        o.webkitCancelAnimationFrame(X.getint());
+        var f125 : int/*long*/ = o.mozRequestAnimationFrame(X.getfunction__number__void());
+        o.mozCancelAnimationFrame(X.getint());
     } // Window
 
     // #66
@@ -4936,6 +4942,16 @@ class _Test extends TestCase {
         var v1 : string/*DOMString*/ = o.statusMessage;
     } // WebGLContextEventInit
 
+    // #255
+    function compile_WindowAnimationTiming(o : WindowAnimationTiming) : void {
+        var f1 : int/*long*/ = o.requestAnimationFrame(X.getfunction__number__void());
+        o.cancelAnimationFrame(X.getint());
+        var f2 : int/*long*/ = o.webkitRequestAnimationFrame(X.getfunction__number__void());
+        o.webkitCancelAnimationFrame(X.getint());
+        var f3 : int/*long*/ = o.mozRequestAnimationFrame(X.getfunction__number__void());
+        o.mozCancelAnimationFrame(X.getint());
+    } // WindowAnimationTiming
+
 
     function test_compile() : void {
         this.expect(true).toBe(true);
@@ -5086,7 +5102,8 @@ native class X {
     static function getfunction__File__void() : function(:File):void/*FileCallback?*/;
     static function getfunction__MediaQueryList__void() : function(:MediaQueryList):void/*MediaQueryListListener*/;
     static function getfunction___void() : function():void/*TimerHandler*/;
-    static function getint() : int/*GLsizei*/;
+    static function getfunction__number__void() : function(:number):void/*FrameRequestCallback*/;
+    static function getint() : int/*long*/;
     static function getint__() : int[]/*sequence<long>*/;
     static function getnumber() : number/*GLintptr*/;
     static function getnumber__() : number[]/*sequence<float>*/;
