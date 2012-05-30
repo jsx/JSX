@@ -1,3 +1,5 @@
+import "test-case.jsx";
+
 class Fib {
 
 	static function fib1(n : int) : int {
@@ -38,22 +40,23 @@ class Fib {
 
 class _Main {
 	static function main(args : string[]) : void {
-		log Fib.fib1(10);
+		var n = args.length > 0 ? args[0] as number : 10;
+		log "fib(" + n as string + ") =", Fib.fib1(n);
 	}
 }
 
-class _Test {
-	function test_fib1() : void {
-		log "fib1(10) = " + Fib.fib1(10).toString();
+class _Test extends TestCase {
+	function testFib1() : void {
+		this.expect(Fib.fib1(10)).toBe(55);
 	}
-	function test_fib2() : void {
-		log "fib2(10) = " + Fib.fib2(10).toString();
+	function testFib2() : void {
+		this.expect(Fib.fib2(10)).toBe(55);
 	}
-	function test_fib3() : void {
-		log "fib3(10) = " + Fib.fib3(10).toString();
+	function testFib3() : void {
+		this.expect(Fib.fib3(10)).toBe(55);
 	}
-	function test_fib4() : void {
-		log "fib4(10) = " + Fib.fib4(10).toString();
+	function testFib4() : void {
+		this.expect(Fib.fib4(10)).toBe(55);
 	}
 }
 
