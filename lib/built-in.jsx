@@ -1,14 +1,11 @@
 native class Object {
 
-	function constructor();
 	function toString() : string;
 
 }
 
 // 15.2
 native final class Map.<T> {
-
-	function constructor();
 
 	function __native_index_operator__(key : string) : MayBeUndefined.<T>;
 

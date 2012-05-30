@@ -312,15 +312,18 @@ var ClassDefinition = exports.ClassDefinition = Class.extend({
 		for (var i = 0; i < this._objectTypesUsed.length; ++i)
 			this._objectTypesUsed[i].resolveType(context);
 		// create default constructor if no constructors exist
-		if ((this.flags() & ClassDefinition.IS_NATIVE) == 0
-			&& this.forEachMemberFunction(function (funcDef) { return funcDef.name() != "constructor"; })) {
+		if (this.forEachMemberFunction(function (funcDef) { return funcDef.name() != "constructor"; })) {
 			var Parser = require("./parser");
+			var isNative = (this.flags() & ClassDefinition.IS_NATIVE) != 0;
 			var func = new MemberFunctionDefinition(
 				this._token,
 				new Parser.Token("constructor", true),
 				ClassDefinition.IS_FINAL | (this.flags() & ClassDefinition.IS_NATIVE),
 				Type.Type.voidType,
-				[], [], [], [],
+				[],
+				isNative ? null : [],
+				isNative ? null : [],
+				isNative ? null : [],
 				this._token /* FIXME */);
 			func.setClassDef(this);
 			this._members.push(func);
