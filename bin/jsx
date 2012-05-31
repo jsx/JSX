@@ -109,7 +109,7 @@ var JSX = Class.extend({
 
 	$execNodeJS: function (script, args) {
 		// XXX: node.js (0.6.x) doesn't suport "--" option :(
-		var tmpdir = process.env.TMPDIR || "/tmp";
+		var tmpdir = process.env.TMPDIR || process.env.TMP || "/tmp";
 		var tmpfile = Util.format("%1/jsx.%2.%3.js", [
 			tmpdir, process.pid.toString(), Date.now().toString(16)
 		]);
