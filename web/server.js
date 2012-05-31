@@ -5,6 +5,18 @@ var http = require("http"),
 	child_process = require("child_process"),
 	fs = require("fs");
 
+// version check
+try {
+	var nodeVersionParts = process.version.match(/(\d+)/g);
+	var nodeVersion = (+nodeVersionParts[0]) + (nodeVersionParts[1] / 1000) + (nodeVersionParts[2]/ (1000*1000));
+	if(nodeVersion < 0.006) {
+		throw new Error("Requires nodejs v0.6.0 or later");
+	}
+}
+catch(e) {
+	console.warn("Unexpected node.js version (>=0.6.0 required), because: %s", e.toString());
+}
+
 function finish(response, uri, status, content_type, content) {
 	var len = content.length;
 
