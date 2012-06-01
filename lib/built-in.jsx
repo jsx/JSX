@@ -1,16 +1,16 @@
 /*
  * Copyright (c) 2012 DeNA Co., Ltd.
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to
  * deal in the Software without restriction, including without limitation the
  * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
  * sell copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -66,6 +66,32 @@ native final class Array.<T> {
 	function sort(comparefn : function (x : MayBeUndefined.<T>, y : MayBeUndefined.<T>) : number) : Array.<T>;
 	function splice(start : int, deleteCount : int) : Array.<T>; // FIXME more arguments
 	function unshift(item : T) : int; // FIXME more arguments
+
+	// 15.4.4 (ES5)
+	function indexOf(value : MayBeUndefined.<T>) : number;
+	function indexOf(value : MayBeUndefined.<T>, fromIndex : number) : number;
+	function lastIndexOf(value : MayBeUndefined.<T>) : number;
+	function lastIndexOf(value : MayBeUndefined.<T>, fromIndex : number) : number;
+	function every(callbackfn : function(value : MayBeUndefined.<T>) : boolean) : boolean;
+	function every(callbackfn : function(value : MayBeUndefined.<T>, index : number) : boolean) : boolean;
+	function every(callbackfn : function(value : MayBeUndefined.<T>, index : number, array : Array.<T>) : boolean) : boolean;
+	function some(callbackfn : function(value : MayBeUndefined.<T>) : boolean) : boolean;
+	function some(callbackfn : function(value : MayBeUndefined.<T>, index : number) : boolean) : boolean;
+	function some(callbackfn : function(value : MayBeUndefined.<T>, index : number, array : Array.<T>) : boolean) : boolean;
+	function forEach(callbackfn : function(value : MayBeUndefined.<T>) : void) : void;
+	function forEach(callbackfn : function(value : MayBeUndefined.<T>, index : number) : void) : void;
+	function forEach(callbackfn : function(value : MayBeUndefined.<T>, index : number, array : Array.<T>) : void) : void;
+	function map(callbackfn : function(value : MayBeUndefined.<T>) : MayBeUndefined.<T>) : Array.<T>;
+	function map(callbackfn : function(value : MayBeUndefined.<T>, index : number) : MayBeUndefined.<T>) : Array.<T>;
+	function map(callbackfn : function(value : MayBeUndefined.<T>, index : number, array : Array.<T>) : MayBeUndefined.<T>) : Array.<T>;
+	function filter(callbackfn : function(value : MayBeUndefined.<T>) : boolean) : Array.<T>;
+	function filter(callbackfn : function(value : MayBeUndefined.<T>, index : number) : boolean) : Array.<T>;
+	function filter(callbackfn : function(value : MayBeUndefined.<T>, index : number, array : Array.<T>) : boolean) : Array.<T>;
+
+	function reduce(callbackfn : function(previousValue : MayBeUndefined.<T>, currentValue : MayBeUndefined.<T>) : MayBeUndefined.<T>) : Array.<T>;
+	function reduce(callbackfn : function(previousValue : MayBeUndefined.<T>, currentValue : MayBeUndefined.<T>) : MayBeUndefined.<T>, initialValue : T) : Array.<T>;
+	function reduceRight(callbackfn : function(previousValue : MayBeUndefined.<T>, currentValue : MayBeUndefined.<T>) : MayBeUndefined.<T>) : Array.<T>;
+	function reduceRight(callbackfn : function(previousValue : MayBeUndefined.<T>, currentValue : MayBeUndefined.<T>) : MayBeUndefined.<T>, initialValue : T) : Array.<T>;
 
 	// 15.4.5
 	var length : int;

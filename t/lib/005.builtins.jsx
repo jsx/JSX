@@ -4,7 +4,7 @@ import "test-case.jsx";
 
 class _Test extends TestCase {
 
-	function test_array() : void {
+	function testArrayES3() : void {
 		var a = [1, 3, 2];
 		var d : function(:variant) : string = JSON.stringify;
 
@@ -14,9 +14,68 @@ class _Test extends TestCase {
 		this.expect(d(a.slice(1, 2)), "slice").toBe(d([3]));
 		this.expect(d(a.splice(1, 1)), "splice").toBe(d([3]));
 		this.expect(d(a), "splice").toBe(d([1, 2]));
+
 	}
 
-	function test_string() : void {
+	function testArrayES5() : void {
+		var a = [1, 2, 3, 2, 1];
+
+		this.expect(a.indexOf(2), "lastIndex").toBe(1);
+		this.expect(a.indexOf(2, 2), "lastIndex").toBe(3);
+		this.expect(a.lastIndexOf(2), "lastIndex").toBe(3);
+		this.expect(a.lastIndexOf(2, 2), "lastIndex").toBe(1);
+
+		this.expect(a.every(function(v : MayBeUndefined.<number>) : boolean {
+			return v > 0;
+		})).toBe(true);
+		this.expect(a.every(function(v : MayBeUndefined.<number>) : boolean {
+			return v > 1;
+		})).toBe(false);
+
+		var i = 0;
+		this.expect(a.every(function(v : MayBeUndefined.<number>, index : number) : boolean {
+			this.expect(index).toBe(i++);
+			return true;
+		})).toBe(true);
+
+		this.expect(a.every(function(v : MayBeUndefined.<number>, index : number, array : number[]) : boolean {
+			this.expect(array).toBe(a);
+			return true;
+		})).toBe(true);
+
+		this.expect(a.some(function(v : MayBeUndefined.<number>) : boolean {
+			return v == 3;
+		}), "some").toBe(true);
+
+		i = 0;
+		a.forEach(function(v : MayBeUndefined.<number>) : void {
+			i += v;
+		});
+		this.expect(i, "forEach").toBe(1 + 2 + 3 + 2 + 1);
+
+		var b = a.map(function(v : MayBeUndefined.<number>) : MayBeUndefined.<number> {
+			return -v;
+		});
+		this.expect(JSON.stringify(b), "map").toBe(JSON.stringify([-1, -2, -3, -2, -1]));
+
+		b = a.filter(function(v : MayBeUndefined.<number>) : boolean {
+			return v > 1;
+		});
+		this.expect(JSON.stringify(b), "map").toBe(JSON.stringify([ 2, 3, 2 ]));
+
+		var sum = a.reduce(function(p : MayBeUndefined.<number>, c : MayBeUndefined.<number>) : MayBeUndefined.<number> {
+			return p + c;
+		}, 0);
+		this.expect(i, "reduce").toBe(1 + 2 + 3 + 2 + 1);
+
+
+		sum = a.reduceRight(function(p : MayBeUndefined.<number>, c : MayBeUndefined.<number>) : MayBeUndefined.<number> {
+			return p + c;
+		}, 0);
+		this.expect(i, "reduceRight").toBe(1 + 2 + 3 + 2 + 1);
+	}
+
+	function testString() : void {
 		this.expect(new String(new String("foo")).toString(), "copy constructor").toBe(new String("foo").toString());
 
 		this.expect("foo".match(/bar/), "match -> null").toBe(null);
@@ -35,15 +94,15 @@ class _Test extends TestCase {
 		this.expect("foobar".substring(3, 5), "substring 2").toBe("ba");
 	}
 
-	function test_boolean() : void {
+	function testBoolean() : void {
 		this.expect(new Boolean(new Boolean(true)).toString(), "copy constructor").toBe(new Boolean(true).toString());
 	}
 
-	function test_number() : void {
+	function testNumber() : void {
 		this.expect(new Number(new Number(42)).toString(), "copy constructor").toBe(new Number(42).toString());
 	}
 
-	function test_regexp() : void {
+	function testRegexp() : void {
 		this.expect(new RegExp(/foo/i).toString(), "copy constructor").toBe(/foo/i.toString());
 
 		this.expect(/bar/.test("foo"), "test -> false").toBe(false);
@@ -62,7 +121,7 @@ class _Test extends TestCase {
 
 	}
 
-	function test_math() :void {
+	function testMath() :void {
 		this.expect(Math.E > 0, "E").toBe(true);
 		this.expect(Math.LN10 > 0, "LN10").toBe(true);
 		this.expect(Math.LN2 > 0, "LN2").toBe(true);
