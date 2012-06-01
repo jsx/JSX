@@ -197,7 +197,9 @@ var Compiler = exports.Compiler = Class.extend({
 			}
 			var found = false;
 			for (var i = 0; i < files.length; ++i) {
-				if (files[i].length >= imprt.getSuffix().length && files[i].substring(files[i].length - imprt.getSuffix().length) == imprt.getSuffix()) {
+				if (files[i].length >= imprt.getSuffix().length
+					&& files[i].charAt(0) != "."
+					&& files[i].substring(files[i].length - imprt.getSuffix().length) == imprt.getSuffix()) {
 					var path = resolvedDir + "/" + files[i];
 					if (path != parser.getPath()) {
 						var parser = this.addSourceFile(imprt.getFilenameToken(), resolvedDir + "/" + files[i]);
