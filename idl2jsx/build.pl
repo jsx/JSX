@@ -135,19 +135,16 @@ final class dom {
 	static function id(id : string) : HTMLElement {
 		return dom.window.document.getElementById(id) as HTMLElement;
 	}
+	/** alias to <code>dom.window.document.getElementById(id) as HTMLElement</code> */
+	static function getElementById(id : string) : HTMLElement {
+		return dom.window.document.getElementById(id) as HTMLElement;
+	}
+
+
 	/** alias to <code>dom.window.document.createElement(id) as HTMLElement</code> */
 	static function createElement(tag : string) : HTMLElement {
 		return dom.window.document.createElement(tag) as __noconvert__ HTMLElement;
 	}
-
-	// type-safe API for createElement() and getElementById()
-
-: for $html_elements -> $class {
-	static function get<: $class.func_name :>ById(id : string) : <: $class.name :> {
-		return dom.window.document.getElementById(id)
-			as <: $class.name :>;
-	}
-: }
 
 }
 
