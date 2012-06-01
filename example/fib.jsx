@@ -1,4 +1,3 @@
-import "test-case.jsx";
 
 class Fib {
 
@@ -42,21 +41,6 @@ class _Main {
 	static function main(args : string[]) : void {
 		var n = args.length > 0 ? args[0] as number : 10;
 		log "fib(" + n as string + ") =", Fib.fib1(n);
-	}
-}
-
-class _Test extends TestCase {
-	function testFib1() : void {
-		this.expect(Fib.fib1(10)).toBe(55);
-	}
-	function testFib2() : void {
-		this.expect(Fib.fib2(10)).toBe(55);
-	}
-	function testFib3() : void {
-		this.expect(Fib.fib3(10)).toBe(55);
-	}
-	function testFib4() : void {
-		this.expect(Fib.fib4(10)).toBe(55);
 	}
 }
 
