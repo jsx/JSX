@@ -1,11 +1,18 @@
-class Hello {
-    var foo = 42;
+// for source mapping
 
-    function getFoo() :number {
+class _Main {
+    var foo = 42;
+    static var bar = "hi";
+
+    function getFoo() : number {
         return this.foo;
     }
 
-    static function run() :void {
+    static function run() : void {
         log "Hello, world!";
+    }
+
+    static function main(args : string[]) : void {
+        _Main.run();
     }
 }
