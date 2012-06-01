@@ -1870,24 +1870,9 @@ var Parser = exports.Parser = Class.extend({
 	},
 
 	_mulExpr: function () {
-		return this._binaryOpExpr([ "*", "/", "%" ], null, this._asExpr, false, function (op, e1, e2) {
+		return this._binaryOpExpr([ "*", "/", "%" ], null, this._unaryExpr, false, function (op, e1, e2) {
 			return new BinaryNumberExpression(op, e1, e2);
 		});
-	},
-
-	_asExpr: function () {
-		var expr = this._unaryExpr();
-		if (expr == null)
-			return null;
-		var token;
-		while ((token = this._expectOpt("as")) != null) {
-			var noConvert = this._expectOpt("__noconvert__");
-			var type = this._typeDeclaration(false);
-			if (type == null)
-				return null;
-			expr = noConvert ? new AsNoConvertExpression(token, expr, type) : new AsExpression(token, expr, type);
-		}
-		return expr;
 	},
 
 	_unaryExpr: function () {
@@ -1896,7 +1881,7 @@ var Parser = exports.Parser = Class.extend({
 		// read other unary operators
 		var op = this._expectOpt([ "++", "--", "+", "-", "~", "!", "typeof" ]);
 		if (op == null)
-			return this._postfixExpr();
+			return this._asExpr();
 		var expr = this._unaryExpr();
 		if (expr == null)
 			return null;
@@ -1914,6 +1899,21 @@ var Parser = exports.Parser = Class.extend({
 		case "typeof":
 			return new TypeofExpression(op, expr);
 		}
+	},
+
+	_asExpr: function () {
+		var expr = this._postfixExpr();
+		if (expr == null)
+			return null;
+		var token;
+		while ((token = this._expectOpt("as")) != null) {
+			var noConvert = this._expectOpt("__noconvert__");
+			var type = this._typeDeclaration(false);
+			if (type == null)
+				return null;
+			expr = noConvert ? new AsNoConvertExpression(token, expr, type) : new AsExpression(token, expr, type);
+		}
+		return expr;
 	},
 
 	_postfixExpr: function () {
