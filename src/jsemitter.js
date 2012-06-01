@@ -746,7 +746,7 @@ var _AsExpressionEmitter = exports._AsExpressionEmitter = _ExpressionEmitter.ext
 			if (srcType.resolveIfMayBeUndefined().isConvertibleTo(destType)) {
 				if (srcType instanceof MayBeUndefinedType) {
 					var prec = _BinaryExpressionEmitter._operatorPrecedence["||"];
-					this._emitter._emitWithParens(outerOpPrecedence, prec, prec, null, "|| null");
+					this._emitWithParens(outerOpPrecedence, prec, prec, null, "|| null");
 				} else {
 					this._emitter._getExpressionEmitterFor(this._expr.getExpr()).emit(outerOpPrecedence);
 				}
