@@ -6,7 +6,9 @@ JSX - Object-oriented, statically-typed programming language for browsers
 INSTALLATION
 =======================
 
-Install development tools by the following command:
+The JSX compiler requires `node.js` v0.6.0 or later.
+
+To setup JSX SDK , type the following command:
 
     make setup
 
