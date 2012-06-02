@@ -440,6 +440,13 @@ var Parser = exports.Parser = Class.extend({
 		return true;
 	},
 
+	_getInput: function() {
+		return this._input.substring(this._pos);
+	},
+	_getInputWith: function(size) {
+		return this._input.substring(this._pos, this._pos + size);
+	},
+
 	getSourceToken: function () {
 		return this._sourceToken;
 	},
@@ -589,7 +596,7 @@ var Parser = exports.Parser = Class.extend({
 		this._tokenLength = 0;
 
 		// skip whitespaces
-		var matched = this._input.substring(this._pos).match(_Lexer.rxSpace);
+		var matched = this._getInput().match(_Lexer.rxSpace);
 		if(matched != null) {
 			this._pos += matched[0].length;
 			this._lineNumber += matched[0].split(_Lexer.rxNewline).length - 1;
@@ -615,11 +622,11 @@ var Parser = exports.Parser = Class.extend({
 
 		this._advanceToken();
 		for (var i = 0; i < expected.length; ++i) {
-			if (this._input.substring(this._pos, this._pos + expected[i].length) == expected[i]) {
+			if (this._getInputWith(expected[i].length) == expected[i]) {
 				if (expected[i].match(_Lexer.rxIdent) != null
-					&& this._input.substring(this._pos).match(_Lexer.rxIdent)[0].length != expected[i].length) {
+					&& this._getInput().match(_Lexer.rxIdent)[0].length != expected[i].length) {
 					// part of a longer token
-				} else if (excludePattern != null && this._input.substring(this._pos).match(excludePattern) != null) {
+				} else if (excludePattern != null && this._getInput().match(excludePattern) != null) {
 					// skip if the token matches the exclude pattern
 				} else {
 					// found
@@ -645,7 +652,7 @@ var Parser = exports.Parser = Class.extend({
 
 	_expectIdentifierOpt: function () {
 		this._advanceToken();
-		var matched = this._input.substring(this._pos).match(_Lexer.rxIdent);
+		var matched = this._getInput().match(_Lexer.rxIdent);
 		if (matched == null)
 			return null;
 		if (_Lexer.keywords.hasOwnProperty(matched[0])) {
@@ -670,7 +677,7 @@ var Parser = exports.Parser = Class.extend({
 
 	_expectStringLiteralOpt: function () {
 		this._advanceToken();
-		var matched = this._input.substring(this._pos).match(_Lexer.rxStringLiteral);
+		var matched = this._getInput().match(_Lexer.rxStringLiteral);
 		if (matched == null)
 			return null;
 		this._tokenLength = matched[0].length;
@@ -687,9 +694,9 @@ var Parser = exports.Parser = Class.extend({
 
 	_expectNumberLiteralOpt: function () {
 		this._advanceToken();
-		var matched = this._input.substring(this._pos).match(_Lexer.rxIntegerLiteral);
+		var matched = this._getInput().match(_Lexer.rxIntegerLiteral);
 		if (matched == null)
-			matched = this._input.substring(this._pos).match(_Lexer.rxNumberLiteral);
+			matched = this._getInput().match(_Lexer.rxNumberLiteral);
 		if (matched == null)
 			return null;
 		this._tokenLength = matched[0].length;
@@ -698,7 +705,7 @@ var Parser = exports.Parser = Class.extend({
 
 	_expectRegExpLiteralOpt: function () {
 		this._advanceToken();
-		var matched = this._input.substring(this._pos).match(_Lexer.rxRegExpLiteral);
+		var matched = this._getInput().match(_Lexer.rxRegExpLiteral);
 		if (matched == null)
 			return null;
 		this._tokenLength = matched[0].length;
@@ -706,7 +713,7 @@ var Parser = exports.Parser = Class.extend({
 	},
 
 	_skipLine: function () {
-		var matched = this._input.substring(this._pos).match(/^.*(?:\r\n?|\n|$)/);
+		var matched = this._getInput().match(/^.*(?:\r\n?|\n|$)/);
 		this._pos += matched[0].length;
 		this._tokenLength = 0;
 
