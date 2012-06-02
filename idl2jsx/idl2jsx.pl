@@ -603,7 +603,7 @@ sub to_jsx_type {
             |
             (?<vararg> \.\.\. )
             |
-            (?<nullabble> \? )
+            (?<nullable> \? )
         )*
         \z
     }{}xms;
