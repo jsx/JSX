@@ -10,6 +10,8 @@ The JSX compiler requires `node.js` v0.6.0 or later.
 
 To setup JSX SDK , type the following command:
 
+    git clone git://github.com/jsx/JSX.git
+    cd JSX
     make setup
 
 COMPILATION
@@ -51,4 +53,12 @@ EXAMPLES
 =======================
 
 There are examples in `example/` and `web/example/`.
+
+SUPPORT
+=======================
+
+* JSX web page - http://jsx.github.com/
+* JSX project page - https://github.com/jsx
+* JSX compiler - https://github.com/jsx/JSX
+* Issue Tracker https://github.com/jsx/JSX/issues
 
