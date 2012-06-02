@@ -1,14 +1,16 @@
 {
   "name":        "jsx",
   "version":     "0.0.1",
-  "description": "JSX is Seriously eXciting",
+  "description": "a faster, safer, easier alternative to JavaScript",
+  "homepage": "http://jsx.github.com/",
+  "repository" : "https://gfx@github.com/jsx/JSX.git",
   "author": [
       {
-        "name":  "Oku, Kazuho",
+        "name":  "Kazuho Oku",
         "email": "oku.kazuho@dena.jp"
       },
       {
-        "name":  "Fuji, Goro",
+        "name":  "Goro Fuji (gfx)",
         "email": "fuji.goro@dena.jp"
       }
   ],
