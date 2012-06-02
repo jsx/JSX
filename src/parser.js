@@ -404,7 +404,7 @@ var Parser = exports.Parser = Class.extend({
 	parse: function (input, errors) {
 		// lexer properties
 		this._input = input;
-		this._pos = 0;
+		this._initInput();
 		this._tokenLength = 0;
 		// for source map
 		this._lineNumber = 1;
@@ -438,6 +438,22 @@ var Parser = exports.Parser = Class.extend({
 			return false;
 
 		return true;
+	},
+
+	_initInput: function () {
+		this._inputRest = this._input;
+	},
+	_getPos: function () {
+		return this._input.length - this._inputRest.length;
+	},
+	_getInput: function () {
+		return this._inputRest;
+	},
+	_getInputWith: function (size) {
+		return this._inputRest.substring(0, size);
+	},
+	_forwardPos: function (len) {
+		this._inputRest = this._inputRest.substring(len);
 	},
 
 	getSourceToken: function () {
@@ -556,7 +572,7 @@ var Parser = exports.Parser = Class.extend({
 		// FIXME use class
 		return {
 			// lexer properties
-			pos: this._pos,
+			pos: this._getPos(),
 			lineNumber: this._lineNumber,
 			tokenLength: this._tokenLength,
 			// errors
@@ -567,7 +583,8 @@ var Parser = exports.Parser = Class.extend({
 	},
 
 	_restoreState: function (state) {
-		this._pos = state.pos;
+		this._initInput();
+		this._forwardPos(state.pos);
 		this._lineNumber = state.lineNumber;
 		this._tokenLength = state.tokenLength;
 		this._errors.length = state.numErrors;
@@ -575,9 +592,9 @@ var Parser = exports.Parser = Class.extend({
 	},
 
 	_getColumn: function () {
-		var part = this._input.substring(0, this._pos);
-		var lastNewline = part.lastIndexOf("\n");
-		return part.length - lastNewline - 1;
+		var pos = this._getPos();
+		var lastNewline = this._input.lastIndexOf("\n", pos);
+		return pos - lastNewline - 1;
 	},
 
 	_newError: function (message) {
@@ -585,20 +602,20 @@ var Parser = exports.Parser = Class.extend({
 	},
 
 	_advanceToken: function () {
-		this._pos += this._tokenLength;
+		this._forwardPos(this._tokenLength);
 		this._tokenLength = 0;
 
 		// skip whitespaces
-		var matched = this._input.substring(this._pos).match(_Lexer.rxSpace);
+		var matched = this._getInput().match(_Lexer.rxSpace);
 		if(matched != null) {
-			this._pos += matched[0].length;
+			this._forwardPos(matched[0].length);
 			this._lineNumber += matched[0].split(_Lexer.rxNewline).length - 1;
 		}
 	},
 
 	_isEOF: function () {
 		this._advanceToken();
-		return this._input.length == this._pos;
+		return this._inputRest.length === 0;
 	},
 
 	_expectIsNotEOF: function () {
@@ -615,11 +632,11 @@ var Parser = exports.Parser = Class.extend({
 
 		this._advanceToken();
 		for (var i = 0; i < expected.length; ++i) {
-			if (this._input.substring(this._pos, this._pos + expected[i].length) == expected[i]) {
+			if (this._getInputWith(expected[i].length) == expected[i]) {
 				if (expected[i].match(_Lexer.rxIdent) != null
-					&& this._input.substring(this._pos).match(_Lexer.rxIdent)[0].length != expected[i].length) {
+					&& this._getInput().match(_Lexer.rxIdent)[0].length != expected[i].length) {
 					// part of a longer token
-				} else if (excludePattern != null && this._input.substring(this._pos).match(excludePattern) != null) {
+				} else if (excludePattern != null && this._getInput().match(excludePattern) != null) {
 					// skip if the token matches the exclude pattern
 				} else {
 					// found
@@ -645,7 +662,7 @@ var Parser = exports.Parser = Class.extend({
 
 	_expectIdentifierOpt: function () {
 		this._advanceToken();
-		var matched = this._input.substring(this._pos).match(_Lexer.rxIdent);
+		var matched = this._getInput().match(_Lexer.rxIdent);
 		if (matched == null)
 			return null;
 		if (_Lexer.keywords.hasOwnProperty(matched[0])) {
@@ -670,7 +687,7 @@ var Parser = exports.Parser = Class.extend({
 
 	_expectStringLiteralOpt: function () {
 		this._advanceToken();
-		var matched = this._input.substring(this._pos).match(_Lexer.rxStringLiteral);
+		var matched = this._getInput().match(_Lexer.rxStringLiteral);
 		if (matched == null)
 			return null;
 		this._tokenLength = matched[0].length;
@@ -687,9 +704,9 @@ var Parser = exports.Parser = Class.extend({
 
 	_expectNumberLiteralOpt: function () {
 		this._advanceToken();
-		var matched = this._input.substring(this._pos).match(_Lexer.rxIntegerLiteral);
+		var matched = this._getInput().match(_Lexer.rxIntegerLiteral);
 		if (matched == null)
-			matched = this._input.substring(this._pos).match(_Lexer.rxNumberLiteral);
+			matched = this._getInput().match(_Lexer.rxNumberLiteral);
 		if (matched == null)
 			return null;
 		this._tokenLength = matched[0].length;
@@ -698,7 +715,7 @@ var Parser = exports.Parser = Class.extend({
 
 	_expectRegExpLiteralOpt: function () {
 		this._advanceToken();
-		var matched = this._input.substring(this._pos).match(_Lexer.rxRegExpLiteral);
+		var matched = this._getInput().match(_Lexer.rxRegExpLiteral);
 		if (matched == null)
 			return null;
 		this._tokenLength = matched[0].length;
@@ -706,8 +723,8 @@ var Parser = exports.Parser = Class.extend({
 	},
 
 	_skipLine: function () {
-		var matched = this._input.substring(this._pos).match(/^.*(?:\r\n?|\n|$)/);
-		this._pos += matched[0].length;
+		var matched = this._getInput().match(/^.*(?:\r\n?|\n|$)/);
+		this._forwardPos(matched[0].length);
 		this._tokenLength = 0;
 
 		// count newlines
