@@ -1289,7 +1289,8 @@ var _BinaryExpressionEmitter = exports._BinaryExpressionEmitter = _OperatorExpre
 		if (this._expr instanceof AssignmentExpression) {
 			this._emitter._emitRHSOfAssignment(secondExpr, firstExprType);
 		} else {
-			this._emitter._getExpressionEmitterFor(secondExpr).emit(this._precedence);
+			// RHS should have higher precedence (consider: 1 - (1 + 1))
+			this._emitter._getExpressionEmitterFor(secondExpr).emit(this._precedence - 1);
 		}
 	},
 
