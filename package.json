@@ -15,6 +15,10 @@
   "bin" : {
       "jsx" : "./bin/jsx"
   },
+  "directories": {
+    "bin": "./bin",
+    "lib": "./lib"
+  },
   "devDependencies": {
       "browserbuild": "*",
       "source-map": "*"
