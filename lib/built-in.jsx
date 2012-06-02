@@ -377,6 +377,7 @@ native class SyntaxError extends Error {
 }
 
 native class TypeError extends Error {
+	function constructor(message : string);
 }
 
 // 5.12
