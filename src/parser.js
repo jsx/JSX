@@ -438,19 +438,19 @@ var Parser = exports.Parser = Class.extend({
 	},
 
 	_initInput: function () {
-		this._inputRest = this._input;
+		this._remainingInput = this._input;
 	},
 	_getPos: function () {
-		return this._input.length - this._inputRest.length;
+		return this._input.length - this._remainingInput.length;
 	},
 	_getInput: function () {
-		return this._inputRest;
+		return this._remainingInput;
 	},
-	_getInputWith: function (size) {
-		return this._inputRest.substring(0, size);
+	_getInputByLength: function (length) {
+		return this._remainingInput.substring(0, length);
 	},
 	_forwardPos: function (len) {
-		this._inputRest = this._inputRest.substring(len);
+		this._remainingInput = this._remainingInput.substring(len);
 	},
 
 	getSourceToken: function () {
@@ -612,7 +612,7 @@ var Parser = exports.Parser = Class.extend({
 
 	_isEOF: function () {
 		this._advanceToken();
-		return this._inputRest.length === 0;
+		return this._remainingInput.length === 0;
 	},
 
 	_expectIsNotEOF: function () {
@@ -629,7 +629,7 @@ var Parser = exports.Parser = Class.extend({
 
 		this._advanceToken();
 		for (var i = 0; i < expected.length; ++i) {
-			if (this._getInputWith(expected[i].length) == expected[i]) {
+			if (this._getInputByLength(expected[i].length) == expected[i]) {
 				if (expected[i].match(_Lexer.rxIdent) != null
 					&& this._getInput().match(_Lexer.rxIdent)[0].length != expected[i].length) {
 					// part of a longer token
