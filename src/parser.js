@@ -166,10 +166,7 @@ var _Lexer = exports._TokenTable = Class.extend({
 			"protected",
 
 			// JSX specific reserved words
-			"extern", "native",
-			"trait", "using",
-			"as", "is",
-			"operator", "package"
+			"extern", "native", "as", "operator"
 		]);
 	}
 
