@@ -1,16 +1,16 @@
 /*
  * Copyright (c) 2012 DeNA Co., Ltd.
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to
  * deal in the Software without restriction, including without limitation the
  * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
  * sell copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -45,10 +45,7 @@ class _Matcher {
 			this._test._ok(this._name);
 		}
 		else {
-			var diag = "comparing with " + op + "\n" +
-				"got:      " + got as string + "\n" +
-				"expected: " + expected as string + "\n";
-			this._test._nok(this._name, diag);
+			this._test._nok(this._name, op, got, expected);
 		}
 	}
 
@@ -60,26 +57,29 @@ class _Matcher {
 		this._match(this._got != x,
 			this._got, x, "!=");
 	}
-	function toBeLT(x :  variant) : void {
-		this._match(this._got as number < x as number,
+	function toBeLT(x :  number) : void {
+		this._match(this._got as number < x,
 			this._got, x, "<");
 	}
-	function toBeLE(x :  variant) : void {
-		this._match(this._got as number <= x as number,
+	function toBeLE(x :  number) : void {
+		this._match(this._got as number <= x,
 			this._got, x, "<=");
 	}
-	function toBeGT(x :  variant) : void {
-		this._match(this._got as number > x as number,
+	function toBeGT(x :  number) : void {
+		this._match(this._got as number > x,
 			this._got, x, ">");
 	}
-	function toBeGE(x :  variant) : void {
-		this._match(this._got as number >= x as number,
+	function toBeGE(x :  number) : void {
+		this._match(this._got as number >= x,
 			this._got, x, ">=");
 	}
 }
 
 
 class TestCase {
+	// TODO turn off when the process has no tty
+	static var verbose = true;
+
 	var _totalCount = 0;
 	var _totalPass  = 0;
 	var _count = 0;
@@ -142,7 +142,11 @@ class TestCase {
 
 	function finish() : void {
 		if(this._totalCount != this._totalPass) {
-			this.diag("tests failed!");
+			var failed = this._totalCount - this._totalPass;
+			this.diag("tests failed "
+				+ failed as string
+				+ " of "
+				+ this._totalCount as string);
 		}
 	}
 
@@ -177,28 +181,53 @@ class TestCase {
 
 	function _ok(name : MayBeUndefined.<string>) : void {
 		++this._pass;
-		log "\t" + "ok " + (this._count) as string
-			+ (name != undefined ? " - " + name :  "");
+
+		var s = name != undefined ? " - " + name :  "";
+		this._say("\t" + "ok " + (this._count) as string + s);
 	}
 
-	function _nok(name : MayBeUndefined.<string>, diag : string) : void {
-		log "\t" + "not ok " + (this._count) as string
-			+ (name != undefined ? " - " + name :  "");
-		this.diag(diag);
+	function _nok(
+		name : MayBeUndefined.<string>,
+		op : string,
+		got : variant,
+		expected : variant
+	) : void {
+
+		var s = name != undefined ? " - " + name :  "";
+		this._say("\t" + "not ok " + (this._count) as string + s);
+
+		this.diag("comparing with " + op + s.replace(" - ", " for "));
+		this._dump("got:      ", got);
+		this._dump("expected: ", expected);
 	}
 
 	function fail(reason : string) : void {
-		log "not ok - fail";
+		this._say("not ok - fail");
 		this.diag(reason);
 	}
 
+	function _dump(tag : string, value : variant) : void {
+		if(typeof value == "object" && value as Object != null) {
+			this.diag(tag);
+			console.dir(value);
+		}
+		else { // primitive value
+			this.diag(tag + value as string);
+		}
+	}
+
+	function _say(message : string) : void {
+		console.info(message);
+	}
+
 	function diag(message : string) : void {
-		console.warn(message.replace(/^/mg, "# "));
+		this._say(message.replace(/^/mg, "# "));
 	}
 
 	function note(message : string) : void {
-		// TODO skip if the process has no tty
-		console.info(message.replace(/^/mg, "# "));
+		if(TestCase.verbose) {
+			this._say(message.replace(/^/mg, "# "));
+		}
 	}
 
 	override
