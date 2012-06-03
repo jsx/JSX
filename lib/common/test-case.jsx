@@ -23,59 +23,6 @@
 import "timer.jsx";
 import "console.jsx";
 
-class _Matcher {
-
-	var _test : TestCase;
-	var _got  : variant;
-	var _name : MayBeUndefined.<string>;
-
-	function constructor(test : TestCase, got : variant) {
-		this._test = test;
-		this._got  = got;
-	}
-
-	function constructor(test : TestCase, got : variant, name : string) {
-		this._test = test;
-		this._got  = got;
-		this._name = name;
-	}
-
-	function _match(value : boolean, got : variant, expected : variant, op : string) : void {
-		if(value) {
-			this._test._ok(this._name);
-		}
-		else {
-			this._test._nok(this._name, op, got, expected);
-		}
-	}
-
-	function toBe(x :  variant) : void {
-		this._match(this._got == x,
-			this._got, x, "==");
-	}
-	function notToBe(x :  variant) : void {
-		this._match(this._got != x,
-			this._got, x, "!=");
-	}
-	function toBeLT(x :  number) : void {
-		this._match(this._got as number < x,
-			this._got, x, "<");
-	}
-	function toBeLE(x :  number) : void {
-		this._match(this._got as number <= x,
-			this._got, x, "<=");
-	}
-	function toBeGT(x :  number) : void {
-		this._match(this._got as number > x,
-			this._got, x, ">");
-	}
-	function toBeGE(x :  number) : void {
-		this._match(this._got as number >= x,
-			this._got, x, ">=");
-	}
-}
-
-
 class TestCase {
 	// TODO turn off when the process has no tty
 	static var verbose = true;
@@ -274,3 +221,56 @@ class AsyncContext {
 		}
 	}
 }
+
+class _Matcher {
+
+	var _test : TestCase;
+	var _got  : variant;
+	var _name : MayBeUndefined.<string>;
+
+	function constructor(test : TestCase, got : variant) {
+		this._test = test;
+		this._got  = got;
+	}
+
+	function constructor(test : TestCase, got : variant, name : string) {
+		this._test = test;
+		this._got  = got;
+		this._name = name;
+	}
+
+	function _match(value : boolean, got : variant, expected : variant, op : string) : void {
+		if(value) {
+			this._test._ok(this._name);
+		}
+		else {
+			this._test._nok(this._name, op, got, expected);
+		}
+	}
+
+	function toBe(x :  variant) : void {
+		this._match(this._got == x,
+			this._got, x, "==");
+	}
+	function notToBe(x :  variant) : void {
+		this._match(this._got != x,
+			this._got, x, "!=");
+	}
+	function toBeLT(x :  number) : void {
+		this._match(this._got as number < x,
+			this._got, x, "<");
+	}
+	function toBeLE(x :  number) : void {
+		this._match(this._got as number <= x,
+			this._got, x, "<=");
+	}
+	function toBeGT(x :  number) : void {
+		this._match(this._got as number > x,
+			this._got, x, ">");
+	}
+	function toBeGE(x :  number) : void {
+		this._match(this._got as number >= x,
+			this._got, x, ">=");
+	}
+}
+
