@@ -52,6 +52,8 @@ my @specs = (
         "http://dev.w3.org/geo/api/spec-source-v2.html",
         "http://dev.w3.org/html5/webstorage/",
         'http://www.w3.org/TR/selectors-api/',
+        "http://www.w3.org/TR/webmessaging/",
+        "http://www.w3.org/TR/workers/",
 
         # WebRTC has no correct IDL
         #"http://dev.w3.org/2011/webrtc/editor/webrtc.html",

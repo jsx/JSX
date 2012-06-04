@@ -51,6 +51,8 @@ automatically generated from:
 	http://dev.w3.org/geo/api/spec-source-v2.html
 	http://dev.w3.org/html5/webstorage/
 	http://www.w3.org/TR/selectors-api/
+	http://www.w3.org/TR/webmessaging/
+	http://www.w3.org/TR/workers/
 	http://html5.org/specs/dom-parsing.html
 	https://www.khronos.org/registry/typedarray/specs/latest/typedarray.idl
 	http://dev.w3.org/html5/2dcontext/
@@ -2174,12 +2176,6 @@ native class MediaQueryList {
 	) : void;
 
 } // end of MediaQueryList
-
-native class MediaQueryListListener {
-
-	function handleChange(mql : MediaQueryList) : void;
-
-} // end of MediaQueryListListener
 
 native class Screen {
 
@@ -4552,6 +4548,197 @@ native __fake__ class NodeSelector {
 	) : NodeList;
 
 } // end of NodeSelector
+
+native class MessageEvent extends Event {
+
+	function constructor(type : string/*DOMString*/);
+	function constructor(
+		type : string/*DOMString*/,
+		eventInitDict : MessageEventInit
+	);
+
+	__readonly__ var data : variant/*any*/;
+	__readonly__ var origin : string/*DOMString*/;
+	__readonly__ var lastEventId : string/*DOMString*/;
+	__readonly__ var source : Window/*WindowProxy?*/;
+	__readonly__ var ports : MessagePort[];
+
+} // end of MessageEvent
+
+native class MessageEventInit extends EventInit {
+
+	var data : variant/*any*/;
+	var origin : string/*DOMString*/;
+	var lastEventId : string/*DOMString*/;
+	var source : Window/*WindowProxy?*/;
+	var ports : MessagePort[];
+
+} // end of MessageEventInit
+
+native class MessageChannel {
+
+	function constructor();
+
+	__readonly__ var port1 : MessagePort;
+	__readonly__ var port2 : MessagePort;
+
+} // end of MessageChannel
+
+native class MessagePort extends EventTarget {
+
+	function postMessage(message : variant/*any*/) : void;
+	function postMessage(
+		message : variant/*any*/,
+		transfer : Transferable[]
+	) : void;
+	function start() : void;
+	function close() : void;
+	// event handlers
+	var onmessage : function(:Event):void/*Function?*/;
+
+	// implements Transferable
+
+} // end of MessagePort
+
+native class WorkerGlobalScope extends EventTarget {
+
+	__readonly__ var self : WorkerGlobalScope;
+	__readonly__ var location : WorkerLocation;
+	function close() : void;
+	var onerror : function(:Event):void/*Function?*/;
+	var onoffline : function(:Event):void/*Function?*/;
+	var ononline : function(:Event):void/*Function?*/;
+
+	// implements WorkerUtils
+
+	function importScripts() : void;
+	function importScripts(urls : string/*DOMString...*/) : void;
+	__readonly__ var navigator : WorkerNavigator;
+
+} // end of WorkerGlobalScope
+
+native class DedicatedWorkerGlobalScope extends WorkerGlobalScope {
+
+	function postMessage(message : variant/*any*/) : void;
+	function postMessage(
+		message : variant/*any*/,
+		transfer : Transferable[]
+	) : void;
+	var onmessage : function(:Event):void/*Function?*/;
+
+} // end of DedicatedWorkerGlobalScope
+
+native class SharedWorkerGlobalScope extends WorkerGlobalScope {
+
+	__readonly__ var name : string/*DOMString*/;
+	__readonly__ var applicationCache : ApplicationCache;
+	var onconnect : function(:Event):void/*Function?*/;
+
+} // end of SharedWorkerGlobalScope
+
+native class ErrorEvent extends Event {
+
+	function constructor(type : string/*DOMString*/);
+	function constructor(
+		type : string/*DOMString*/,
+		eventInitDict : ErrorEventInit
+	);
+
+	__readonly__ var message : string/*DOMString*/;
+	__readonly__ var filename : string/*DOMString*/;
+	__readonly__ var lineno : int/*unsigned long*/;
+
+} // end of ErrorEvent
+
+native class ErrorEventInit extends EventInit {
+
+	var message : string/*DOMString*/;
+	var filename : string/*DOMString*/;
+	var lineno : int/*unsigned long*/;
+
+} // end of ErrorEventInit
+
+native __fake__ class AbstractWorker {
+
+	var onerror : function(:Event):void/*Function?*/;
+
+} // end of AbstractWorker
+
+native class Worker extends EventTarget {
+
+	function constructor(scriptURL : string/*DOMString*/);
+
+	function terminate() : void;
+	function postMessage(message : variant/*any*/) : void;
+	function postMessage(
+		message : variant/*any*/,
+		transfer : Transferable[]
+	) : void;
+	var onmessage : function(:Event):void/*Function?*/;
+
+	// implements AbstractWorker
+
+	var onerror : function(:Event):void/*Function?*/;
+
+} // end of Worker
+
+native class SharedWorker extends EventTarget {
+
+	function constructor(scriptURL : string/*DOMString*/);
+	function constructor(
+		scriptURL : string/*DOMString*/,
+		name : string/*DOMString*/
+	);
+
+	__readonly__ var port : MessagePort;
+
+	// implements AbstractWorker
+
+	var onerror : function(:Event):void/*Function?*/;
+
+} // end of SharedWorker
+
+native __fake__ class WorkerUtils {
+
+	function importScripts() : void;
+	function importScripts(urls : string/*DOMString...*/) : void;
+	__readonly__ var navigator : WorkerNavigator;
+
+	// implements WindowBase64
+
+	function btoa(btoa : string/*DOMString*/) : string/*DOMString*/;
+	function atob(atob : string/*DOMString*/) : string/*DOMString*/;
+
+} // end of WorkerUtils
+
+native class WorkerNavigator {
+
+	// implements NavigatorID
+
+	__readonly__ var appName : string/*DOMString*/;
+	__readonly__ var appVersion : string/*DOMString*/;
+	__readonly__ var platform : string/*DOMString*/;
+	__readonly__ var userAgent : string/*DOMString*/;
+
+	// implements NavigatorOnLine
+
+	__readonly__ var onLine : boolean;
+
+} // end of WorkerNavigator
+
+native class WorkerLocation {
+
+	// URL decomposition IDL attributes
+	__readonly__ var href : string/*DOMString*/;
+	__readonly__ var protocol : string/*DOMString*/;
+	__readonly__ var host : string/*DOMString*/;
+	__readonly__ var hostname : string/*DOMString*/;
+	__readonly__ var port : string/*DOMString*/;
+	__readonly__ var pathname : string/*DOMString*/;
+	__readonly__ var search : string/*DOMString*/;
+	__readonly__ var hash : string/*DOMString*/;
+
+} // end of WorkerLocation
 
 native class DOMParser {
 
@@ -7084,6 +7271,8 @@ end of generated files from:
 	http://dev.w3.org/geo/api/spec-source-v2.html
 	http://dev.w3.org/html5/webstorage/
 	http://www.w3.org/TR/selectors-api/
+	http://www.w3.org/TR/webmessaging/
+	http://www.w3.org/TR/workers/
 	http://html5.org/specs/dom-parsing.html
 	https://www.khronos.org/registry/typedarray/specs/latest/typedarray.idl
 	http://dev.w3.org/html5/2dcontext/
