@@ -30,5 +30,6 @@ server:
 web.jsx:
 	idl2jsx/build.pl
 	idl2jsx/maketest.pl > t/lib/010.web.jsx
+	bin/jsx --test t/lib/010.web.jsx
 
 .PHONY: test web server
