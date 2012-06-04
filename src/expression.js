@@ -1081,8 +1081,8 @@ var PropertyExpression = exports.PropertyExpression = UnaryExpression.extend({
 			return false;
 		}
 		if (exprType.resolveIfMayBeUndefined().equals(Type.variantType)) {
-			context.errors.push(new CompileError(this._identifierToken, "cannot obtain a member of variant, use: (<<expr>> as Map.<type>)[<<name>>]"));
-			return false;
+			this._type = Type.variantType;
+			return true;
 		}
 		var classDef = exprType.getClassDef();
 		if (classDef == null) {
@@ -1319,11 +1319,18 @@ var ArrayExpression = exports.ArrayExpression = BinaryExpression.extend({
 		}
 		// obtain classDef
 		var expr1Type = this._expr1.getType().resolveIfMayBeUndefined();
-		if (! (expr1Type instanceof ObjectType)) {
-			context.errors.push(new CompileError(this._token, "cannot apply operator[] against a non-object"));
-			return false;
+		if (expr1Type instanceof ObjectType) {
+			return this._analyzeApplicationOnObject(expr1Type);
+		} else if (expr1Type.equals(Type.variantType)) {
+			return this._analyzeApplicationOnVariant();
+			return true;
 		}
-		var expr1ClassDef = expr1Type.getClassDef();;
+		context.errors.push(new CompileError(this._token, "cannot apply []; the operator is only applicable against an array or an variant"));
+		return false;
+	},
+
+	_analyzeApplicationOnObject: function (expr1Type) {
+		var expr1ClassDef = expr1Type.getClassDef();
 		// obtain type of operator []
 		var accessorType = expr1ClassDef.getMemberTypeByName("__native_index_operator__", false, ClassDefinition.GET_MEMBER_MODE_ALL);
 		if (accessorType == null) {
@@ -1345,6 +1352,16 @@ var ArrayExpression = exports.ArrayExpression = BinaryExpression.extend({
 		}
 		// set type of the expression
 		this._type = accessorType.getReturnType();
+		return true;
+	},
+
+	_analyzeApplicationOnVariant: function () {
+		var expr2Type = this._expr2.getType().resolveIfMayBeUndefined();
+		if (! (expr2Type.equals(Type.stringType) || expr2Type.isConvertibleTo(Type.numberType))) {
+			context.errors.push(new CompileError("the argument of variant[] should be a string or a number"));
+			return false;
+		}
+		this._type = Type.variantType;
 		return true;
 	},
 
