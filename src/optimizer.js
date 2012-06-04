@@ -223,13 +223,20 @@ var _FunctionOptimizeCommand = exports._FunctionOptimizeCommand = _OptimizeComma
 	},
 
 	performOptimization: function () {
+		var doit = function (funcDef) {
+			this.log("starting optimization of " + _Util.getFuncName(funcDef));
+			this.optimizeFunction(funcDef);
+			this.log("finished optimization of " + _Util.getFuncName(funcDef));
+		}.bind(this);
 		this.getCompiler().forEachClassDef(function (parser, classDef) {
 			classDef.forEachMemberFunction(function (funcDef) {
 				if (funcDef.getStatements() != null) {
-					this.log("starting optimization of " + _Util.getFuncName(funcDef));
-					this.optimizeFunction(funcDef);
-					this.log("finished optimization of " + _Util.getFuncName(funcDef));
+					doit(funcDef);
 				}
+				funcDef.forEachClosure(function (funcDef) {
+					doit(funcDef);
+					return true;
+				});
 				return true;
 			}.bind(this));
 			return true;
@@ -395,10 +402,6 @@ var _DetermineCalleeCommand = exports._DetermineCalleeCommand = _FunctionOptimiz
 	},
 
 	optimizeFunction: function (funcDef) {
-		funcDef.forEachClosure(function (funcDef) {
-			this.optimizeFunction(funcDef);
-		}.bind(this));
-
 		funcDef.forEachStatement(function onStatement(statement) {
 
 			if (statement instanceof ConstructorInvocationStatement) {
@@ -504,10 +507,6 @@ var _FoldConstantCommand = exports._FoldConstantCommand = _FunctionOptimizeComma
 		funcDef.forEachStatement(function onStatement(statement) {
 			statement.forEachStatement(onStatement.bind(this));
 			statement.forEachExpression(this._optimizeExpression.bind(this));
-			return true;
-		}.bind(this));
-		funcDef.forEachClosure(function (funcDef) {
-			this.optimizeFunction(funcDef);
 			return true;
 		}.bind(this));
 	},
