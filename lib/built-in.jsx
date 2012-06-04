@@ -222,8 +222,12 @@ native final class Math {
 	static function floor(x :number) :number;
 	static function log(x :number) :number;
 	// FIXME: ECMA-262's max() and min() take zero or more arguments
-	static function max(value1 :number, value2 :number) :number;
-	static function min(value1 :number, value2 :number) :number;
+	static function max(value1 :number, value2 :number) :number {
+		return value1 >= value2 ? value1 : value2;
+	}
+	static function min(value1 :number, value2 :number) :number {
+		return value1 <= value2 ? value1 : value2;
+	}
 	static function pow(x :number, y :number) :number;
 	static function random() :number;
 	static function round(x :number) :number;

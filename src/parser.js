@@ -1108,11 +1108,11 @@ var Parser = exports.Parser = Class.extend({
 				return null;
 		}
 		// take care of abstract function
-		if ((flags & ClassDefinition.IS_NATIVE) != 0 || (classFlags & ClassDefinition.IS_INTERFACE) != 0) {
+		if ((classFlags & ClassDefinition.IS_INTERFACE) != 0) {
 			if (this._expect(";") == null)
 				return null;
 			return new MemberFunctionDefinition(token, name, flags, returnType, args, null, null, null);
-		} else if ((flags & ClassDefinition.IS_ABSTRACT) != 0) {
+		} else if ((flags & (ClassDefinition.IS_ABSTRACT | ClassDefinition.IS_NATIVE)) != 0) {
 			var token = this._expect([ ";", "{" ]);
 			if (token == null)
 				return null;

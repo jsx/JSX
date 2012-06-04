@@ -224,16 +224,14 @@ var _FunctionOptimizeCommand = exports._FunctionOptimizeCommand = _OptimizeComma
 
 	performOptimization: function () {
 		this.getCompiler().forEachClassDef(function (parser, classDef) {
-			if ((classDef.flags() & ClassDefinition.IS_NATIVE) == 0) {
-				classDef.forEachMemberFunction(function (funcDef) {
-					if ((funcDef.flags() & (ClassDefinition.IS_NATIVE | ClassDefinition.IS_ABSTRACT)) == 0) {
-						this.log("starting optimization of " + _Util.getFuncName(funcDef));
-						this.optimizeFunction(funcDef);
-						this.log("finished optimization of " + _Util.getFuncName(funcDef));
-					}
-					return true;
-				}.bind(this));
-			}
+			classDef.forEachMemberFunction(function (funcDef) {
+				if (funcDef.getStatements() != null) {
+					this.log("starting optimization of " + _Util.getFuncName(funcDef));
+					this.optimizeFunction(funcDef);
+					this.log("finished optimization of " + _Util.getFuncName(funcDef));
+				}
+				return true;
+			}.bind(this));
 			return true;
 		}.bind(this));
 	},
@@ -736,7 +734,7 @@ var _InlineOptimizeCommand = exports._InlineOptimizeCommand = _FunctionOptimizeC
 		this.getStash(funcDef).isOptimized = true;
 
 		// we need to the check here since functions might recurse
-		if ((funcDef.flags() & (ClassDefinition.IS_NATIVE | ClassDefinition.IS_ABSTRACT)) != 0)
+		if (funcDef.getStatements() == null)
 			return;
 		this.log("* starting optimization of " + _Util.getFuncName(funcDef));
 		var altered = false;
