@@ -115,7 +115,7 @@ defineCallback(SQLTransactionCallback => 'function(:SQLTransaction):void');
 defineCallback(SQLTransactionErrorCallback => 'function(:SQLError):void');
 defineCallback(SQLStatementCallback => 'function(:SQLTransaction,:SQLResultSet):void');
 defineCallback(SQLStatementErrorCallback => 'function(:SQLTransaction,:SQLError):void');
-defineCallback(SQLTransactionSyncCallback => 'function(:SQLTransactionSyncC):void)');
+defineCallback(SQLTransactionSyncCallback => 'function(:SQLTransactionSync):void');
 
 sub info {
     state $count = 0;
@@ -159,15 +159,15 @@ my $rx_type = qr{
             # union type
             \(
                 \s*
-                $rx_simple_type $rx_type_modifier?
-                (?: \s+ or \s+ $rx_simple_type $rx_type_modifier? )+
+                $rx_simple_type $rx_type_modifier*
+                (?: \s+ or \s+ $rx_simple_type $rx_type_modifier* )+
                 \s*
             \)
         )
         |
         $rx_simple_type
     )
-    $rx_type_modifier?
+    $rx_type_modifier*
 }xms;
 
 my $rx_params = qr{
@@ -626,7 +626,7 @@ sub to_jsx_type {
         }
     }
 
-    if($may_be_undefined) {
+    if($may_be_undefined && $idl_type ne 'any') {
         return "MayBeUndefined.<$type>";
     }
     else {
