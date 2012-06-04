@@ -32,16 +32,7 @@ my %fake = (
 );
 
 my %skip = (
-    EventListener => 1,
-    MediaQueryListener => 1,
-    DOMErrorHandler => 1,
-    UserDataHandler => 1,
-    MutationCallback => 1,
-    FileCallback => 1,
-    FrameRequestCallback => 1,
-
     Example => 1,
-    Function => 1,
 
     WindowTimers => 1, # use JSXTimers instead
 );
@@ -85,43 +76,44 @@ my %typemap = (
 
     'any' => 'variant',
 
-    'TimerHandler' => 'function():void',
-
     'WindowProxy' => 'Window',
-
-    # http://www.w3.org/TR/dom/
-    'MutationCallback' => 'function(:MutationRecord[],:MutationObserver):void',
 
     # http://dev.w3.org/html5/spec/single-page.html
     'TextTrackMode' => 'string', # enum
 
-    'EventListener' => 'function(:Event):void',
-
-    # http://www.w3.org/TR/cssom-view/
-    'MediaQueryListListener' => 'function(:MediaQueryList):void',
-
-    # http://www.w3.org/TR/websockets/
-    'Function?' => 'function(:Event):void',
-    'Function' => 'function(:Event):void',
-
     # http://www.w3.org/TR/XMLHttpRequest/
     'XMLHttpRequestResponseType' => 'string', # enum
-
-    # http://www.w3.org/TR/DOM-Level-3-Core/idl-definitions.html
-    'UserDataHandler' => 'function(operation:int,key:string,data:variant,src:Node,dst:Node):void',
-
-    # http://dev.w3.org/2009/dap/file-system/file-dir-sys.html
-    'FileCallback' => 'function(:File):void',
 
     # http://html5.org/specs/dom-parsing.html#insertadjacenthtml()
     'SupportedType' => 'string', # enum
     'insertAdjacentHTMLPosition' => 'string', # enum
 
-    # http://www.w3.org/TR/animation-timing/
-    'FrameRequestCallback' => 'function(:number):void',
 );
 
+# callbacks / event listeners
 
+defineCallback('Function?' => 'function(:Event):void');
+defineCallback('Function' => 'function(:Event):void');
+defineCallback(TimerHandler => 'function():void');
+defineCallback(EventListener  => 'function(:Event):void');
+# http://www.w3.org/TR/dom/
+defineCallback(MutationCallback => 'function(:MutationRecord[],:MutationObserver):void');
+# http://www.w3.org/TR/DOM-Level-3-Core/idl-definitions.html
+defineCallback(UserDataHandler => 'function(operation:int,key:string,data:variant,src:Node,dst:Node):void');
+# http://www.w3.org/TR/cssom-view/
+defineCallback(MediaQueryListListener => 'function(:MediaQueryList):void');
+# http://dev.w3.org/2009/dap/file-system/file-dir-sys.html
+defineCallback(FileCallback => 'function(:File):void');
+# http://www.w3.org/TR/animation-timing/
+defineCallback(FrameRequestCallback => 'function(:number):void');
+# http://www.w3.org/TR/webdatabase/
+defineCallback(DatabaseCallback => 'function(:Database):void');
+defineCallback(SQLVoidCallback => 'function():void');
+defineCallback(SQLTransactionCallback => 'function(:SQLTransaction):void');
+defineCallback(SQLTransactionErrorCallback => 'function(:SQLError):void');
+defineCallback(SQLStatementCallback => 'function(:SQLTransaction,:SQLResultSet):void');
+defineCallback(SQLStatementErrorCallback => 'function(:SQLTransaction,:SQLError):void');
+defineCallback(SQLTransactionSyncCallback => 'function(:SQLTransactionSyncC):void)');
 
 sub info {
     state $count = 0;
@@ -794,3 +786,8 @@ sub trim {
     return $s;
 }
 
+sub defineCallback {
+    my($name, $definition) = @_;
+    $skip{$name}++;
+    $typemap{$name} = $definition;
+}
