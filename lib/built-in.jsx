@@ -201,14 +201,14 @@ native final class Number {
 // 15.8
 native final class Math {
 	// 15.8.1
-	static const E :number;
-	static const LN10 :number;
-	static const LN2 :number;
-	static const LOG2E :number;
-	static const LOG10E :number;
-	static const PI :number;
-	static const SQRT1_2 :number;
-	static const SQRT2 :number;
+	static const E = 2.718281828459045;
+	static const LN10 = 2.302585092994046;
+	static const LN2 = 0.6931471805599453;
+	static const LOG2E = 1.4426950408889634;
+	static const LOG10E = 0.4342944819032518;
+	static const PI = 3.141592653589793;
+	static const SQRT1_2 = 0.7071067811865476;
+	static const SQRT2 = 1.4142135623730951;
 
 	// 15.8.2
 	static function abs(x :number) :number;
