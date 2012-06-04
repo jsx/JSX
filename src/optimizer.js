@@ -902,11 +902,12 @@ var _InlineOptimizeCommand = exports._InlineOptimizeCommand = _FunctionOptimizeC
 		// optimize the calling function prior to testing the conditions
 		this.optimizeFunction(callingFuncDef);
 		// obtain receiver expression
+		var receiverExpr = null;
 		if ((callingFuncDef.flags() & ClassDefinition.IS_STATIC) == 0) {
 			var calleeExpr = callExpr.getExpr();
 			if (! (calleeExpr instanceof PropertyExpression))
 				throw new Error("unexpected type of expression");
-			var receiverExpr = calleeExpr.getExpr();
+			receiverExpr = calleeExpr.getExpr();
 			if (asExpression) {
 				// receiver should not have side effecets
 				if (! (receiverExpr instanceof IdentifierExpression || receiverExpr instanceof ThisExpression)) {
@@ -939,10 +940,16 @@ var _InlineOptimizeCommand = exports._InlineOptimizeCommand = _FunctionOptimizeC
 			return null;
 		// build list of arguments (and this)
 		var argsAndThis = callExpr.getArguments().concat([]);
-		if ((callingFuncDef.flags() & ClassDefinition.IS_STATIC) == 0)
-			argsAndThis.push(receiverExpr);
-		else
+		if (this._functionHasThis(callingFuncDef)) {
+			if (receiverExpr != null) {
+				argsAndThis.push(receiverExpr);
+			} else {
+				// in case of a closure
+				argsAndThis.push(new ThisExpression(null, callingFuncDef.getClassDef()));
+			}
+		} else {
 			argsAndThis.push(null);
+		}
 		return argsAndThis;
 	},
 
@@ -1120,6 +1127,14 @@ var _InlineOptimizeCommand = exports._InlineOptimizeCommand = _FunctionOptimizeC
 			return this._rewriteExpression(expr, replaceCb, argsAndThisAndLocals, calleeFuncDef);
 		}.bind(this));
 		return true;
+	},
+
+	_functionHasThis: function (funcDef) {
+		do {
+			if ((funcDef.flags() & ClassDefinition.IS_STATIC) == 0)
+				return true;
+		} while ((funcDef = funcDef.getParent()) != null);
+		return false;
 	}
 
 });
