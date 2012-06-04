@@ -886,6 +886,12 @@ var _InlineOptimizeCommand = exports._InlineOptimizeCommand = _FunctionOptimizeC
 				return true;
 			if (holderExpr instanceof IdentifierExpression)
 				return true;
+		} else if (lhsExpr instanceof ArrayExpression) {
+			if (lhsExpr.getFirstExpr() instanceof IdentifierExpression
+				&& (lhsExpr.getSecondExpr() instanceof NumberLiteralExpression
+					|| lhsExpr.getSecondExpr() instanceof StringLiteralExpression
+					|| lhsExpr.getSecondExpr() instanceof IdentifierExpression))
+				return true;
 		}
 		return false;
 	},
