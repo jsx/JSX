@@ -778,7 +778,7 @@ var _InlineOptimizeCommand = exports._InlineOptimizeCommand = _FunctionOptimizeC
 						clonedExpr,
 						function (expr) { clonedExpr = expr; },
 						args,
-						callingFuncDef.getArguments());
+						callingFuncDef);
 					replaceCb(clonedExpr);
 				}
 			}
@@ -920,8 +920,22 @@ var _InlineOptimizeCommand = exports._InlineOptimizeCommand = _FunctionOptimizeC
 		if (! this._functionIsInlineable(callingFuncDef))
 			return null;
 		// FIXME we could handle statements.length == 0 as well
-		if (asExpression && callingFuncDef.getStatements().length != 1)
-			return null;
+		if (asExpression) {
+			if (callingFuncDef.getStatements().length != 1)
+				return null;
+			if (callingFuncDef.getLocals().length != 0)
+				return null;
+			var modifiesArgs = ! Util.forEachStatement(function onStatement(statement) {
+				var onExpr = function onExpr(expr) {
+					if (expr instanceof AssignmentExpression && expr.getFirstExpr() instanceof IdentifierExpression)
+						return false;
+					return expr.forEachExpression(onExpr.bind(this));
+				};
+				return statement.forEachExpression(onExpr.bind(this));
+			}, callingFuncDef.getStatements());
+			if (modifiesArgs)
+				return null;
+		}
 		// and the args passed can be inlined (types should match exactly (or emitters may insert additional code))
 		if (! this._argsAreInlineable(callingFuncDef, callExpr.getArguments(), asExpression))
 			return null;
@@ -929,6 +943,8 @@ var _InlineOptimizeCommand = exports._InlineOptimizeCommand = _FunctionOptimizeC
 		var argsAndThis = callExpr.getArguments().concat([]);
 		if ((callingFuncDef.flags() & ClassDefinition.IS_STATIC) == 0)
 			argsAndThis.push(receiverExpr);
+		else
+			argsAndThis.push(null);
 		return argsAndThis;
 	},
 
@@ -966,13 +982,11 @@ var _InlineOptimizeCommand = exports._InlineOptimizeCommand = _FunctionOptimizeC
 	_functionIsInlineable: function (funcDef) {
 		if (typeof this.getStash(funcDef).isInlineable != "boolean") {
 			this.getStash(funcDef).isInlineable = function () {
-				// only inline function that are short, has no branches (last statement may be a return), has no local variables (excluding arguments)
+				// only inline function that are short, has no branches (last statement may be a return)
 				var statements = funcDef.getStatements();
 				if (statements == null)
 					return false;
 				if (_Util.numberOfStatements(statements) >= 5)
-					return false;
-				if (funcDef.getLocals().length != 0)
 					return false;
 				for (var i = 0; i < statements.length; ++i) {
 					if (! (statements[i] instanceof ExpressionStatement))
@@ -980,18 +994,6 @@ var _InlineOptimizeCommand = exports._InlineOptimizeCommand = _FunctionOptimizeC
 				}
 				if (! (i == statements.length || (i == statements.length - 1 && statements[i] instanceof ReturnStatement)))
 					return false;
-				// no modification of arguments
-				var modifiesArgs = ! Util.forEachStatement(function onStatement(statement) {
-					var onExpr = function onExpr(expr) {
-						if (expr instanceof AssignmentExpression && expr.getFirstExpr() instanceof IdentifierExpression)
-							return false;
-						return expr.forEachExpression(onExpr.bind(this));
-					};
-					return statement.forEachExpression(onExpr.bind(this));
-				}, statements);
-				if (modifiesArgs) {
-					return false;
-				}
 				// no function nor super expression
 				var hasNonInlineableExpr = ! Util.forEachStatement(function onStatement(statement) {
 					var onExpr = function onExpr(expr) {
@@ -1016,14 +1018,15 @@ var _InlineOptimizeCommand = exports._InlineOptimizeCommand = _FunctionOptimizeC
 	_expandCallingFunction: function (callerFuncDef, statements, stmtIndex, calleeFuncDef, argsAndThis) {
 		// clone statements of the calling function, while rewriting the identifiers with actual arguments
 		this.log("expanding " + _Util.getFuncName(calleeFuncDef));
-		stmtIndex = this._createVarsForArgsAndThis(callerFuncDef, statements, stmtIndex, calleeFuncDef, argsAndThis);
+		var argsAndThisAndLocals = argsAndThis.concat([]);
+		stmtIndex = this._createVars(callerFuncDef, statements, stmtIndex, calleeFuncDef, argsAndThisAndLocals);
 		var calleeStatements = calleeFuncDef.getStatements();
 		for (var i = 0; i < calleeStatements.length; ++i) {
 			// clone the statement
 			var statement = new ExpressionStatement(calleeStatements[i].getExpr().clone());
 			// replace the arguments with actual arguments
 			statement.forEachExpression(function onExpr(expr, replaceCb) {
-				return this._rewriteExpression(expr, replaceCb, argsAndThis, calleeFuncDef.getArguments());
+				return this._rewriteExpression(expr, replaceCb, argsAndThisAndLocals, calleeFuncDef);
 			}.bind(this));
 			// insert the statement
 			statements.splice(stmtIndex++, 0, statement);
@@ -1031,22 +1034,29 @@ var _InlineOptimizeCommand = exports._InlineOptimizeCommand = _FunctionOptimizeC
 		return stmtIndex;
 	},
 
-	_createVarsForArgsAndThis: function (callerFuncDef, statements, stmtIndex, calleeFuncDef, argsAndThis) {
+	_createVars: function (callerFuncDef, statements, stmtIndex, calleeFuncDef, argsAndThisAndLocals) {
 		// handle "this" first
 		if ((calleeFuncDef.flags() & ClassDefinition.IS_STATIC) == 0) {
-			var tempVar = this._createVarForArgOrThis(callerFuncDef, statements, stmtIndex, argsAndThis[argsAndThis.length - 1], new ObjectType(calleeFuncDef.getClassDef()), "this");
+			var tempVar = this._createVarForArgOrThis(callerFuncDef, statements, stmtIndex, argsAndThisAndLocals[argsAndThisAndLocals.length - 1], new ObjectType(calleeFuncDef.getClassDef()), "this");
 			if (tempVar != null) {
-				argsAndThis[argsAndThis.length - 1] = tempVar;
+				argsAndThisAndLocals[argsAndThisAndLocals.length - 1] = tempVar;
 				++stmtIndex;
 			}
 		}
+		// handle other arguments
 		var formalArgs = calleeFuncDef.getArguments();
 		for (var i = 0; i < formalArgs.length; ++i) {
-			var tempVar = this._createVarForArgOrThis(callerFuncDef, statements, stmtIndex, argsAndThis[i], formalArgs[i].getType(), formalArgs[i].getName().getValue());
+			var tempVar = this._createVarForArgOrThis(callerFuncDef, statements, stmtIndex, argsAndThisAndLocals[i], formalArgs[i].getType(), formalArgs[i].getName().getValue());
 			if (tempVar != null) {
-				argsAndThis[i] = tempVar;
+				argsAndThisAndLocals[i] = tempVar;
 				++stmtIndex;
 			}
+		}
+		// handle locals
+		var locals = calleeFuncDef.getLocals();
+		for (var i = 0; i < locals.length; ++i) {
+			var tempVar = this._createVar(callerFuncDef, locals[i].getType(), locals[i].getName().getValue());
+			argsAndThisAndLocals.push(new IdentifierExpression(tempVar));
 		}
 		return stmtIndex;
 	},
@@ -1057,6 +1067,19 @@ var _InlineOptimizeCommand = exports._InlineOptimizeCommand = _FunctionOptimizeC
 			return null;
 		}
 		// create a local variable based on the given name
+		var newLocal = this._createVar(callerFuncDef, type, baseName);
+		// insert a statement that initializes the temporary
+		statements.splice(stmtIndex, 0,
+			new ExpressionStatement(
+				new AssignmentExpression(
+					new Token("=", false),
+					new IdentifierExpression(newLocal),
+					expr)));
+		// return an expression referring the the local
+		return new IdentifierExpression(newLocal);
+	},
+
+	_createVar: function (callerFuncDef, type, baseName) {
 		var locals = callerFuncDef.getLocals();
 		var nameExists = function (n) {
 			for (var i = 0; i < locals.length; ++i)
@@ -1069,31 +1092,34 @@ var _InlineOptimizeCommand = exports._InlineOptimizeCommand = _FunctionOptimizeC
 		var newLocal = new LocalVariable(new Token(baseName + "$" + i, true), type);
 		locals.push(newLocal);
 		this.log("rewriting " + baseName + " to " + newLocal.getName().getValue());
-		// insert a statement that initializes the temporary
-		statements.splice(stmtIndex, 0,
-			new ExpressionStatement(
-				new AssignmentExpression(
-					new Token("=", false),
-					new IdentifierExpression(newLocal),
-					expr)));
-		// return an expression referring the the local
-		return new IdentifierExpression(newLocal);
+		return newLocal;
 	},
 
-	_rewriteExpression: function (expr, replaceCb, argsAndThis, formalArgs) {
+	_rewriteExpression: function (expr, replaceCb, argsAndThisAndLocals, calleeFuncDef) {
+		var formalArgs = calleeFuncDef.getArguments();
 		if (expr instanceof IdentifierExpression && expr.getLocal() != null) {
 			for (var j = 0; j < formalArgs.length; ++j) {
 				if (formalArgs[j].getName().getValue() == expr.getToken().getValue())
 					break;
 			}
-			if (j == formalArgs.length)
-				throw new Error("logic flaw, could not find formal parameter named " + expr.getToken().getValue());
-			replaceCb(argsAndThis[j].clone());
+			if (j == formalArgs.length) {
+				++j; // skip this
+				var locals = calleeFuncDef.getLocals();
+				if (locals.length != argsAndThisAndLocals.length - j)
+					throw new Error("logic flaw");
+				for (var k = 0; k < locals.length; ++k, ++j) {
+					if (locals[k].getName().getValue() == expr.getToken().getValue())
+						break;
+				}
+				if (j == argsAndThisAndLocals.length)
+					throw new Error("logic flaw, could not find formal parameter named " + expr.getToken().getValue());
+			}
+			replaceCb(argsAndThisAndLocals[j].clone());
 		} else if (expr instanceof ThisExpression) {
-			replaceCb(argsAndThis[argsAndThis.length - 1].clone());
+			replaceCb(argsAndThisAndLocals[formalArgs.length].clone());
 		}
 		expr.forEachExpression(function (expr, replaceCb) {
-			return this._rewriteExpression(expr, replaceCb, argsAndThis, formalArgs);
+			return this._rewriteExpression(expr, replaceCb, argsAndThisAndLocals, calleeFuncDef);
 		}.bind(this));
 		return true;
 	}
