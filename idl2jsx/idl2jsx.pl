@@ -44,11 +44,13 @@ my %has_definition;
 # WebIDL says, "Note also that null is not a value of type DOMString.
 # To allow null, a nullable DOMString, written as DOMString? in IDL,
 # needs to be used."
+
+# FIXME: how to define?
 my %nullable = (
-    string => 'String',
-    number => 'Number',
-    int    => 'Number',
-    boolean => 'Boolean',
+#    string => 'String',
+#    number => 'Number',
+#    int    => 'Number',
+#    boolean => 'Boolean',
 );
 
 my %typemap = (
@@ -574,7 +576,10 @@ lock_store(\%classdef, $db) if $continuous;
 exit;
 
 sub to_jsx_type {
-    my($idl_type, $may_be_undefined) = @_;
+    my($idl_type, %attr) = @_;
+
+    my $may_be_undefined = $attr{may_be_undefined};
+
     $idl_type = trim($idl_type);
 
     my $original = $idl_type;
@@ -633,7 +638,7 @@ sub make_functions {
     my($decl_ref, $members_ref, $name, $ret_type, $src_params, $ret_type_may_be_undefined, $static) = @_;
 
     my $ret_type_decl = defined($ret_type)
-        ? " : " . to_jsx_type($ret_type, $ret_type_may_be_undefined)
+        ? " : " . to_jsx_type($ret_type, may_be_undefined => $ret_type_may_be_undefined)
         : "";
 
     my @unresolved_params;
