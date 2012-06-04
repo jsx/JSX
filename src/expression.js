@@ -1320,16 +1320,16 @@ var ArrayExpression = exports.ArrayExpression = BinaryExpression.extend({
 		// obtain classDef
 		var expr1Type = this._expr1.getType().resolveIfMayBeUndefined();
 		if (expr1Type instanceof ObjectType) {
-			return this._analyzeApplicationOnObject(expr1Type);
+			return this._analyzeApplicationOnObject(context, expr1Type);
 		} else if (expr1Type.equals(Type.variantType)) {
-			return this._analyzeApplicationOnVariant();
+			return this._analyzeApplicationOnVariant(context);
 			return true;
 		}
 		context.errors.push(new CompileError(this._token, "cannot apply []; the operator is only applicable against an array or an variant"));
 		return false;
 	},
 
-	_analyzeApplicationOnObject: function (expr1Type) {
+	_analyzeApplicationOnObject: function (context, expr1Type) {
 		var expr1ClassDef = expr1Type.getClassDef();
 		// obtain type of operator []
 		var accessorType = expr1ClassDef.getMemberTypeByName("__native_index_operator__", false, ClassDefinition.GET_MEMBER_MODE_ALL);
@@ -1347,7 +1347,7 @@ var ArrayExpression = exports.ArrayExpression = BinaryExpression.extend({
 		}
 		// check type of expr2
 		if (! this._expr2.getType().isConvertibleTo(accessorType.getArgumentTypes()[0])) {
-			context.errors.push(new CompileError(this._token, "index type is incompatible (expected '" + accessorType.getArgumentTypes()[0].toString() + "', got '" + this._expr2.getType().toString() + "'"));
+			context.errors.push(new CompileError(this._token, "index type is incompatible (expected '" + accessorType.getArgumentTypes()[0].toString() + "', got '" + this._expr2.getType().toString() + "')"));
 			return false;
 		}
 		// set type of the expression
@@ -1355,7 +1355,7 @@ var ArrayExpression = exports.ArrayExpression = BinaryExpression.extend({
 		return true;
 	},
 
-	_analyzeApplicationOnVariant: function () {
+	_analyzeApplicationOnVariant: function (context) {
 		var expr2Type = this._expr2.getType().resolveIfMayBeUndefined();
 		if (! (expr2Type.equals(Type.stringType) || expr2Type.isConvertibleTo(Type.numberType))) {
 			context.errors.push(new CompileError("the argument of variant[] should be a string or a number"));
