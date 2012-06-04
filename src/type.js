@@ -287,7 +287,7 @@ var MayBeUndefinedType = exports.MayBeUndefinedType = Type.extend({
 	},
 
 	instantiate: function (instantiationContext) {
-		var baseType = this._baseType.instantiate(instantiationContext);
+		var baseType = this._baseType.resolveIfMayBeUndefined().instantiate(instantiationContext);
 		return baseType.toMayBeUndefinedType();
 	},
 

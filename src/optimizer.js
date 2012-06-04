@@ -1027,7 +1027,7 @@ var _InlineOptimizeCommand = exports._InlineOptimizeCommand = _FunctionOptimizeC
 		var calleeStatements = calleeFuncDef.getStatements();
 		for (var i = 0; i < calleeStatements.length; ++i) {
 			// clone the statement
-			var statement = new ExpressionStatement(calleeStatements[i].getExpr().clone());
+			var statement = calleeStatements[i].clone();
 			// replace the arguments with actual arguments
 			statement.forEachExpression(function onExpr(expr, replaceCb) {
 				return this._rewriteExpression(expr, replaceCb, argsAndThisAndLocals, calleeFuncDef);

@@ -722,8 +722,12 @@ var MemberVariableDefinition = exports.MemberVariableDefinition = MemberDefiniti
 	},
 
 	instantiate: function (instantiationContext) {
+		var Expression = require("./expression");
 		var type = this._type.instantiate(instantiationContext);
-		return new MemberVariableDefinition(this._token, this._nameToken, this._flags, type, this._initialValue);
+		var initialValue = this._initialValue;
+		if (initialValue == null)
+			initialValue = Expression.Expression.getDefaultValueExpressionOf(type);
+		return new MemberVariableDefinition(this._token, this._nameToken, this._flags, type, initialValue);
 	},
 
 	serialize: function () {
@@ -800,8 +804,45 @@ var MemberFunctionDefinition = exports.MemberFunctionDefinition = MemberDefiniti
 	},
 
 	instantiate: function (instantiationContext) {
-		if (this._statements != null)
-			throw new Error("template instantiation of function body is not supported (yet)");
+		var Expression = require("./expression.js");
+		if (this._statements != null) {
+			// clone and rewrite the types of local variables
+			var locals = [];
+			for (var i = 0; i < this._locals.length; ++i) {
+				var srcType = this._locals[i].getType();
+				locals[i] = new LocalVariable(this._locals[i].getName(), srcType != null ? srcType.instantiate(instantiationContext) : null);
+			}
+			// clone and rewrite the types of the statements
+			var statements = [];
+			for (var i = 0; i < this._statements.length; ++i)
+				statements[i] = this._statements[i].clone();
+			this.forEachStatement(function onStatement(statement) {
+				statement.forEachExpression(function onExpr(expr) {
+					if (expr instanceof Expression.NewExpression
+						|| expr instanceof Expression.ArrayLiteralExpression
+						|| expr instanceof Expression.MapLiteralExpression
+						|| expr instanceof Expression.AsExpression
+						|| expr instanceof Expression.AsNoConvertExpression
+						|| expr instanceof Expression.NewExpression) {
+						var srcType = expr.getType();
+						if (srcType != null) {
+							expr.setType(srcType.instantiate(instantiationContext));
+						}
+					}
+					return expr.forEachExpression(onExpr);
+				}.bind(this));
+				return statement.forEachStatement(onStatement.bind(this));
+			}.bind(this));
+			// clone and rewrite the types of closures
+			var closures = [];
+			for (var i = 0; i < this._closures.length; ++i) {
+				closures[i] = this._closures[i].instantiate(instantiationContext);
+			}
+		} else {
+			locals = null;
+			statements = null;
+			closures = null;
+		}
 		var returnType = this._returnType.instantiate(instantiationContext);
 		if (returnType == null)
 			return null;
@@ -812,7 +853,7 @@ var MemberFunctionDefinition = exports.MemberFunctionDefinition = MemberDefiniti
 				return null;
 			args[i] = arg;
 		}
-		return new MemberFunctionDefinition(this._token, this._nameToken, this._flags, returnType, args, null, null);
+		return new MemberFunctionDefinition(this._token, this._nameToken, this._flags, returnType, args, locals, statements, closures, null);
 	},
 
 	serialize: function () {
@@ -850,8 +891,9 @@ var MemberFunctionDefinition = exports.MemberFunctionDefinition = MemberDefiniti
 			if (! this._returnType.equals(Type.Type.voidType) && context.getTopBlock().localVariableStatuses != null)
 				context.errors.push(new CompileError(this._lastTokenOfBody, "missing return statement"));
 
-			if (this.getNameToken() != null && this.name() == "constructor")
+			if (this.getNameToken() != null && this.name() == "constructor") {
 				this._fixupConstructor(context);
+			}
 
 		} finally {
 			context.blockStack.pop();
@@ -1048,6 +1090,10 @@ var LocalVariable = exports.LocalVariable = Class.extend({
 	constructor: function (name, type) {
 		this._name = name;
 		this._type = type;
+	},
+
+	clone: function () {
+		var that = new LocalVariable(this._name, this._type);
 	},
 
 	serialize: function () {

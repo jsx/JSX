@@ -907,7 +907,7 @@ var Parser = exports.Parser = Class.extend({
 		while (this._expectOpt("}") == null) {
 			if (! this._expectIsNotEOF())
 				return false;
-			var member = this._memberDefinition(flags);
+			var member = this._memberDefinition(flags, typeArgs != null);
 			if (member != null) {
 				for (var i = 0; i < members.length; ++i) {
 					if (member.name() == members[i].name()
@@ -973,7 +973,7 @@ var Parser = exports.Parser = Class.extend({
 		return true;
 	},
 
-	_memberDefinition: function (classFlags) {
+	_memberDefinition: function (classFlags, isTemplate) {
 		var flags = 0;
 		while (true) {
 			var token = this._expect([ "function", "var", "static", "abstract", "override", "final", "const", "native", "__readonly__" ]);
@@ -1066,8 +1066,8 @@ var Parser = exports.Parser = Class.extend({
 		}
 		if (! this._expect(";"))
 			return null;
-		// all non-native values have initial value
-		if (initialValue == null && (classFlags & ClassDefinition.IS_NATIVE) == 0)
+		// all non-native, non-template values have initial value
+		if (! isTemplate && initialValue == null && (classFlags & ClassDefinition.IS_NATIVE) == 0)
 			initialValue = Expression.getDefaultValueExpressionOf(type);
 		return new MemberVariableDefinition(token, name, flags, type, initialValue);
 	},
