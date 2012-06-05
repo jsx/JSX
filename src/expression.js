@@ -1773,7 +1773,7 @@ var CallExpression = exports.CallExpression = OperatorExpression.extend({
 			if (! this._expr.deduceByArgumentTypes(context, this._token, argTypes, (this._expr.getHolderType() instanceof ClassDefType)) == null)
 				return false;
 		} else {
-			if (this._expr.getType().deduceByArgumentTypes(context, this._token, argTypes, true) == null)
+			if (this._expr.getType().resolveIfMayBeUndefined().deduceByArgumentTypes(context, this._token, argTypes, true) == null)
 				return false;
 		}
 		return true;
