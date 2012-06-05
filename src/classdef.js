@@ -1114,10 +1114,6 @@ var LocalVariable = exports.LocalVariable = Class.extend({
 		this._instantiated = [];
 	},
 
-	clone: function () {
-		return new LocalVariable(this._name, this._type);
-	},
-
 	serialize: function () {
 		return [
 			this._name,
@@ -1205,10 +1201,6 @@ var ArgumentDeclaration = exports.ArgumentDeclaration = LocalVariable.extend({
 
 	constructor: function (name, type) {
 		LocalVariable.prototype.constructor.call(this, name, type);
-	},
-
-	clone: function () {
-		return new ArgumentDeclaration(this._name, this._type);
 	},
 
 	instantiate: function (instantiationContext) {
