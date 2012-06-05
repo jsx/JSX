@@ -15,12 +15,8 @@ function $__jsx_merge_interface(target, source) {
  */
 function $__jsx_lazy_init(obj, prop, func) {
 	function reset(obj, prop, value) {
-		Object.defineProperty(obj, prop, {
-			value: value, 
-			enumerable: true,
-			writable: true,
-			configurable: true
-		});
+		delete obj[prop];
+		obj[prop] = value;
 		return value;
 	}
 
