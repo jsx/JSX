@@ -175,8 +175,8 @@ native final class Number {
 	function constructor(value : Number);
 
 	// 15.7.3
-	static var MAX_VALUE : number;
-	static var MIN_VALUE : number;
+	static const MAX_VALUE : number;
+	static const MIN_VALUE : number;
 
 	// NOTE: NaN, POSITIVE_INFINITY and NEGATIVE_INFINITY are
 	//       not provided. Use NaN, +Infinity, and -Infinity literals
