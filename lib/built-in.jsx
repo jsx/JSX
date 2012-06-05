@@ -64,7 +64,9 @@ native final class Array.<T> {
 	function sort() : Array.<T>;
 	function sort(comparefn : function (x : MayBeUndefined.<T>, y : MayBeUndefined.<T>) : int) : Array.<T>;
 	function sort(comparefn : function (x : MayBeUndefined.<T>, y : MayBeUndefined.<T>) : number) : Array.<T>;
-	function splice(start : int, deleteCount : int) : Array.<T>; // FIXME more arguments
+	// FIXME splice(start, deleteCount, items...)
+	function splice(start : int, deleteCount : int) : Array.<T>;
+	function splice(start : int, deleteCount : int, item : T) : Array.<T>;
 	function unshift(item : T) : int; // FIXME more arguments
 
 	// 15.4.4 (ES5)
