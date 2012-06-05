@@ -1140,6 +1140,19 @@ var Parser = exports.Parser = Class.extend({
 			if (token != null)
 				return Type.voidType;
 		}
+		var typeDecl = this._typeDeclarationNoArrayNoVoid();
+		if (typeDecl == null)
+			return null;
+		// []
+		while (this._expectOpt("[") != null) {
+			if ((token = this._expect("]")) == null)
+				return false;
+			typeDecl = this._registerArrayTypeOf(token, typeDecl);
+		}
+		return typeDecl;
+	},
+
+	_typeDeclarationNoArrayNoVoid: function () {
 		var typeDecl;
 		var token = this._expectOpt([ "MayBeUndefined", "variant" ]);
 		if (token != null) {
@@ -1164,17 +1177,9 @@ var Parser = exports.Parser = Class.extend({
 		} else {
 			typeDecl = this._primaryTypeDeclaration();
 		}
-		// []
-		while (this._expectOpt("[") != null) {
-			if ((token = this._expect("]")) == null)
-				return false;
-			this._templateInstantiationRequests.push(new TemplateInstantiationRequest(token, "Array", [ typeDecl ]));
-			typeDecl = new ParsedObjectType(new QualifiedName(new Token("Array", true), null), [ typeDecl ], token);
-			this._objectTypesUsed.push(typeDecl);
-		}
 		return typeDecl;
 	},
-	
+
 	_primaryTypeDeclaration: function () {
 		var token = this._expectOpt([ "function", "boolean", "int", "number", "string" ]);
 		if (token != null) {
@@ -1273,6 +1278,13 @@ var Parser = exports.Parser = Class.extend({
 			return new MemberFunctionType(objectType, returnType, argTypes, true);
 		else
 			return new StaticFunctionType(returnType, argTypes, true);
+	},
+
+	_registerArrayTypeOf: function (token, elementType) {
+		this._templateInstantiationRequests.push(new TemplateInstantiationRequest(token, "Array", [ elementType ]));
+		var arrayType = new ParsedObjectType(new QualifiedName(new Token("Array", true), null), [ elementType ], token);
+		this._objectTypesUsed.push(arrayType);
+		return arrayType;
 	},
 
 	_initializeBlock: function () {
@@ -1962,18 +1974,7 @@ var Parser = exports.Parser = Class.extend({
 				expr = this._functionExpr(token);
 				break;
 			case "new":
-				// new pression
-				var objectType = this._objectTypeDeclaration();
-				if (objectType == null)
-					return null;
-				if (this._expectOpt("(") != null) {
-					var args = this._argsExpr();
-					if (args == null)
-						return null;
-				} else {
-					args = [];
-				}
-				expr = new NewExpression(token, objectType, args);
+				expr = this._newExpr(token);
 				break;
 			default:
 				throw new Error("logic flaw");
@@ -2007,6 +2008,43 @@ var Parser = exports.Parser = Class.extend({
 			}
 		}
 		return expr;
+	},
+
+	_newExpr: function (newToken) {
+		var type = this._typeDeclarationNoArrayNoVoid();
+		if (type == null)
+			return null;
+		// handle [] (if it has an length parameter, that's the last)
+		while (this._expectOpt("[") != null) {
+			if (type.equals(Type.undefinedType) || type.equals(Type.nullType)) {
+				this._newError("cannot instantiate an array of " + type.toString());
+				return null;
+			} else if (type instanceof MayBeUndefinedType) {
+				this._newError("cannot instantiate an array of an MayBeUndefined type");
+				return null;
+			}
+			type = this._registerArrayTypeOf(newToken, type);
+			if (this._expectOpt("]") == null) {
+				var lengthExpr = this._assignExpr(false);
+				if (lengthExpr == null)
+					return null;
+				if (this._expect("]") == null)
+					return null;
+				return new NewExpression(newToken, type, [ lengthExpr ]);
+			}
+		}
+		if (! (type instanceof ParsedObjectType)) {
+			this._newError("cannot instantiate a primitive type '" + type.toString() + "' using 'new'");
+			return null;
+		}
+		if (this._expectOpt("(") != null) {
+			var args = this._argsExpr();
+			if (args == null)
+				return null;
+		} else {
+			args = [];
+		}
+		return new NewExpression(newToken, type, args);
 	},
 
 	_superExpr: function () {
