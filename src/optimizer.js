@@ -427,7 +427,7 @@ var _DetermineCalleeCommand = exports._DetermineCalleeCommand = _FunctionOptimiz
 								holderType.getClassDef(),
 								calleeExpr.getIdentifierToken().getValue(),
 								calleeExpr.getType().getArgumentTypes(),
-								holderType instanceof ClassDefType);
+								calleeExpr.getExpr() instanceof ClassExpression);
 						this._setCallingFuncDef(expr, callingFuncDef);
 					} else if (calleeExpr instanceof FunctionExpression) {
 						this._setCallingFuncDef(expr, calleeExpr.getFuncDef());
@@ -522,7 +522,7 @@ var _FoldConstantCommand = exports._FoldConstantCommand = _FunctionOptimizeComma
 
 			// property expression
 			var holderType = expr.getHolderType();
-			if (holderType instanceof ClassDefType) {
+			if (expr.getExpr() instanceof ClassExpression) {
 				var member = null;
 				holderType.getClassDef().forEachMemberVariable(function (m) {
 					if (m instanceof MemberVariableDefinition && m.name() == expr.getIdentifierToken().getValue())

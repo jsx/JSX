@@ -1210,20 +1210,20 @@ var Parser = exports.Parser = Class.extend({
 				throw new Error("logic flaw");
 			}
 		} else {
-			return this._objectTypeDeclaration();
+			return this._objectTypeDeclaration(null);
 		}
 	},
 
-	_objectTypeDeclaration: function () {
-		var qualifiedName = this._qualifiedName(false);
+	_objectTypeDeclaration: function (firstToken) {
+		var qualifiedName = firstToken !== null ? this._qualifiedNameStartingWith(firstToken) : this._qualifiedName(false);
 		if (qualifiedName == null)
 			return null;
-		if (this._expectOpt(".") != null) {
-			if (this._expect("<") == null)
-				return null; // nested types not yet supported
+		var state = this._preserveState();
+		if (this._expectOpt(".") != null && this._expect("<") != null) {
 			return this._templateTypeDeclaration(qualifiedName);
 		} else {
 			// object
+			this._restoreState(state);
 			var objectType = new ParsedObjectType(qualifiedName, []);
 			this._objectTypesUsed.push(objectType);
 			return objectType;
@@ -1988,7 +1988,7 @@ var Parser = exports.Parser = Class.extend({
 				break;
 			case "new":
 				// new pression
-				var objectType = this._objectTypeDeclaration();
+				var objectType = this._objectTypeDeclaration(null);
 				if (objectType == null)
 					return null;
 				if (this._expectOpt("(") != null) {
@@ -2133,10 +2133,10 @@ var Parser = exports.Parser = Class.extend({
 			if (local != null) {
 				return new LocalExpression(token, local);
 			} else {
-				var qualifiedName = this._qualifiedNameStartingWith(token);
-				if (qualifiedName == null)
+				var parsedType = this._objectTypeDeclaration(token);
+				if (parsedType == null)
 					return null;
-				return new ClassExpression(qualifiedName);
+				return new ClassExpression(parsedType.getToken(), parsedType);
 			}
 		} else if ((token = this._expectStringLiteralOpt()) != null) {
 			return new StringLiteralExpression(token);

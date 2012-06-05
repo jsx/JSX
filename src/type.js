@@ -315,34 +315,6 @@ var MayBeUndefinedType = exports.MayBeUndefinedType = Type.extend({
 
 // class and object types
 
-var ClassDefType = exports.ClassDefType = Type.extend({
-
-	constructor: function (classDef) {
-		this._classDef = classDef;
-	},
-
-	instantiate: function (instantiationContext) {
-		throw new Error("logic flaw; ClassDefType is created during semantic analysis, after template instantiation");
-	},
-
-	isConvertibleTo: function (type) {
-		return false;
-	},
-
-	isAssignable: function () {
-		return false;
-	},
-
-	getClassDef: function () {
-		return this._classDef;
-	},
-
-	toString: function () {
-		return this._classDef.className();
-	}
-
-});
-
 var ObjectType = exports.ObjectType = Type.extend({
 
 	constructor: function (classDef) {
@@ -388,6 +360,10 @@ var ParsedObjectType = exports.ParsedObjectType = ObjectType.extend({
 		ObjectType.prototype.constructor.call(this, null);
 		this._qualifiedName = qualifiedName;
 		this._typeArguments = typeArgs;
+	},
+
+	getToken: function () {
+		return this._qualifiedName.getToken();
 	},
 
 	instantiate: function (instantiationContext) {

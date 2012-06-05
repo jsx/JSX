@@ -198,35 +198,29 @@ var LocalExpression = exports.LocalExpression = LeafExpression.extend({
 
 var ClassExpression = exports.ClassExpression = LeafExpression.extend({
 
-	constructor: function (qualifiedName, classDefType /* optional */) {
-		LeafExpression.prototype.constructor.call(this, qualifiedName.getToken());
-		this._qualifiedName = qualifiedName;
-		this._classDefType = classDefType != null ? classDefType : null;
+	constructor: function (token, parsedType) {
+		LeafExpression.prototype.constructor.call(this, token);
+		this._parsedType = parsedType;
 	},
 
 	clone: function () {
-		return new ClassExpression(this._qualifiedName, this._classDefType);
+		return new ClassExpression(this._token, this._parsedType);
 	},
 
 	serialize: function () {
 		return [
 			"ClassExpression",
-			this._qualifiedName.serialize()
+			this._token.serialize(),
+			this._parsedType.serialize()
 		];
 	},
 
 	analyze: function (context, parentExpr) {
-		var classDef = this._qualifiedName.getClass(context);
-		if (classDef == null) {
-			// FIXME alert the user that the value we have been looking for might be a misspelled local variable
-			return false;
-		}
-		this._classDefType = new ClassDefType(classDef);
 		return true;
 	},
 
 	getType: function () {
-		return this._classDefType;
+		return this._parsedType;
 	},
 
 	assertIsAssignable: function (context, token, type) {
@@ -1077,8 +1071,8 @@ var PropertyExpression = exports.PropertyExpression = UnaryExpression.extend({
 		}
 		this._type = classDef.getMemberTypeByName(
 			this._identifierToken.getValue(),
-			exprType instanceof ClassDefType,
-			(exprType instanceof ClassDefType) ? ClassDefinition.GET_MEMBER_MODE_CLASS_ONLY : ClassDefinition.GET_MEMBER_MODE_ALL);
+			this._expr instanceof ClassExpression,
+			(this._expr instanceof ClassExpression) ? ClassDefinition.GET_MEMBER_MODE_CLASS_ONLY : ClassDefinition.GET_MEMBER_MODE_ALL);
 		if (this._type == null) {
 			context.errors.push(new CompileError(this._identifierToken, "'" + exprType.toString() + "' does not have a property named '" + this._identifierToken.getValue() + "'"));
 			return false;
@@ -1091,8 +1085,6 @@ var PropertyExpression = exports.PropertyExpression = UnaryExpression.extend({
 	},
 
 	getHolderType: function () {
-		if (this._type instanceof ClassDefType)
-			return null;
 		var type = this._expr.getType();
 		if (type instanceof PrimitiveType)
 			type = new ObjectType(type.getClassDef());
@@ -1385,7 +1377,7 @@ var AssignmentExpression = exports.AssignmentExpression = BinaryExpression.exten
 			context.errors.push(new CompileError(this._token, "cannot assign void"));
 			return false;
 		}
-		if (rhsType instanceof ClassDefType) {
+		if (this._expr2 instanceof ClassExpression) {
 			context.errors.push(new CompileError(this._token, "cannot assign a class"));
 			return false;
 		}
@@ -1756,7 +1748,7 @@ var CallExpression = exports.CallExpression = OperatorExpression.extend({
 			return false;
 		}
 		if (this._expr instanceof PropertyExpression && ! exprType.isAssignable()) {
-			if (! this._expr.deduceByArgumentTypes(context, this._token, argTypes, (this._expr.getHolderType() instanceof ClassDefType)) == null)
+			if (! this._expr.deduceByArgumentTypes(context, this._token, argTypes, this._expr.getExpr() instanceof ClassExpression) == null)
 				return false;
 		} else {
 			if (this._expr.getType().resolveIfMayBeUndefined().deduceByArgumentTypes(context, this._token, argTypes, true) == null)

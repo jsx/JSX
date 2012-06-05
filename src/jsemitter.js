@@ -1185,14 +1185,9 @@ var _PropertyExpressionEmitter = exports._PropertyExpressionEmitter = _UnaryExpr
 		var expr = this._expr;
 		var exprType = expr.getType();
 		var identifierToken = this._expr.getIdentifierToken();
-		// special handling for import ... as
-		if (exprType instanceof ClassDefType) {
-			this._emitter._emit(exprType.getClassDef().getOutputClassName(), identifierToken);
-			return;
-		}
 		// replace methods to global function (e.g. Number.isNaN to isNaN)
-		if (expr.getExpr()._classDefType instanceof ClassDefType
-			&& expr.getExpr()._classDefType.getClassDef() === Type.numberType.getClassDef()) {
+		if (expr.getExpr() instanceof ClassExpression
+			&& expr.getExpr().getType().getClassDef() === Type.numberType.getClassDef()) {
 			switch (identifierToken.getValue()) {
 			case "parseInt":
 			case "parseFloat":
@@ -1206,7 +1201,7 @@ var _PropertyExpressionEmitter = exports._PropertyExpressionEmitter = _UnaryExpr
 		// mangle the name if necessary
 		if (exprType instanceof FunctionType && ! exprType.isAssignable()
 			&& (expr.getHolderType().getClassDef().flags() & ClassDefinition.IS_NATIVE) == 0) {
-			if (expr.getExpr()._classDefType instanceof ClassDefType) {
+			if (expr.getExpr() instanceof ClassExpression) {
 				// do not use "." notation for static functions, but use class$name
 				this._emitter._emit("$", identifierToken);
 			} else {
