@@ -145,7 +145,7 @@ native final class String {
 	function trim() : string;
 
 	// 15.5.5
-	var length : int;
+	__readonly__ var length : int;
 
 	// removed: use substring() instead
 	// function substr(start : int) : string;
