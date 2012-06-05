@@ -805,18 +805,33 @@ var MemberFunctionDefinition = exports.MemberFunctionDefinition = MemberDefiniti
 
 	instantiate: function (instantiationContext) {
 		var Expression = require("./expression.js");
+		// rewrite arguments (and push the instantiated args)
+		var args = [];
+		for (var i = 0; i < this._args.length; ++i) {
+			var srcArg = this._args[i];
+			var instantiatedArg = srcArg.instantiate(instantiationContext);
+			if (instantiatedArg == null)
+				return null;
+			instantiatedArg.isInstantiated = true;
+			srcArg.pushInstantiated(instantiatedArg);
+			args[i] = instantiatedArg;
+		}
+		// rewrite function body
 		if (this._statements != null) {
 			// clone and rewrite the types of local variables
 			var locals = [];
 			for (var i = 0; i < this._locals.length; ++i) {
-				var srcType = this._locals[i].getType();
+				var srcLocal = this._locals[i];
+				var srcType = srcLocal.getType();
 				locals[i] = new LocalVariable(this._locals[i].getName(), srcType != null ? srcType.instantiate(instantiationContext) : null);
+				locals[i].isInstantiated = true;
+				srcLocal.pushInstantiated(locals[i]);
 			}
 			// clone and rewrite the types of the statements
 			var statements = [];
 			for (var i = 0; i < this._statements.length; ++i)
 				statements[i] = this._statements[i].clone();
-			this.forEachStatement(function onStatement(statement) {
+			Util.forEachStatement(function onStatement(statement) {
 				statement.forEachExpression(function onExpr(expr) {
 					if (expr instanceof Expression.NewExpression
 						|| expr instanceof Expression.ArrayLiteralExpression
@@ -828,31 +843,37 @@ var MemberFunctionDefinition = exports.MemberFunctionDefinition = MemberDefiniti
 						if (srcType != null) {
 							expr.setType(srcType.instantiate(instantiationContext));
 						}
+					} else if (expr instanceof Expression.LocalExpression) {
+						// update local to the instantiated one
+						expr.setLocal(expr.getLocal().getInstantiated());
 					}
-					return expr.forEachExpression(onExpr);
+					return expr.forEachExpression(onExpr.bind(this));
 				}.bind(this));
 				return statement.forEachStatement(onStatement.bind(this));
-			}.bind(this));
+			}.bind(this), statements);
 			// clone and rewrite the types of closures
 			var closures = [];
 			for (var i = 0; i < this._closures.length; ++i) {
 				closures[i] = this._closures[i].instantiate(instantiationContext);
+			}
+			// pop the instantiated locals
+			for (var i = 0; i < this._locals.length; ++i) {
+				if (this._locals[i].isInstantiated)
+					throw new Error("logic flaw");
+				this._locals[i].popInstantiated();
 			}
 		} else {
 			locals = null;
 			statements = null;
 			closures = null;
 		}
+		// pop the instantiated args
+		for (var i = 0; i < this._args.length; ++i)
+			this._args[i].popInstantiated();
+		// do the rest
 		var returnType = this._returnType.instantiate(instantiationContext);
 		if (returnType == null)
 			return null;
-		var args = [];
-		for (var i = 0; i < this._args.length; ++i) {
-			var arg = this._args[i].instantiate(instantiationContext);
-			if (arg == null)
-				return null;
-			args[i] = arg;
-		}
 		return new MemberFunctionDefinition(this._token, this._nameToken, this._flags, returnType, args, locals, statements, closures, null);
 	},
 
@@ -1090,10 +1111,11 @@ var LocalVariable = exports.LocalVariable = Class.extend({
 	constructor: function (name, type) {
 		this._name = name;
 		this._type = type;
+		this._instantiated = [];
 	},
 
 	clone: function () {
-		var that = new LocalVariable(this._name, this._type);
+		return new LocalVariable(this._name, this._type);
 	},
 
 	serialize: function () {
@@ -1143,13 +1165,34 @@ var LocalVariable = exports.LocalVariable = Class.extend({
 
 	toString: function () {
 		return this._name + " : " + this._type;
+	},
+
+	pushInstantiated: function (instantiated) {
+		this._instantiated.push(instantiated);
+		this._touched = true;
+	},
+
+	popInstantiated: function () {
+		this._instantiated.pop();
+	},
+
+	getInstantiated: function () {
+		if (this._instantiated.length == 0) {
+			throw new Error("logic flaw, no instantiation for " + this._name.getValue() + "," + this.isInstantiated);
+		}
+		return this._instantiated[this._instantiated.length - 1];
 	}
+
 });
 
 var CaughtVariable = exports.CaughtVariable = LocalVariable.extend({
 
 	constructor: function (name, type) {
 		LocalVariable.prototype.constructor.call(this, name, type);
+	},
+
+	clone: function () {
+		return new CaughtVariable(this._name, this._type);
 	},
 
 	touchVariable: function (context, token, isAssignment) {
@@ -1162,6 +1205,10 @@ var ArgumentDeclaration = exports.ArgumentDeclaration = LocalVariable.extend({
 
 	constructor: function (name, type) {
 		LocalVariable.prototype.constructor.call(this, name, type);
+	},
+
+	clone: function () {
+		return new ArgumentDeclaration(this._name, this._type);
 	},
 
 	instantiate: function (instantiationContext) {

@@ -535,23 +535,33 @@ var Parser = exports.Parser = Class.extend({
 		this._classDefs.push(classDef);
 	},
 
-	_pushFunctionState: function () {
-		// FIXME use class
-		var state = {
+	_pushScope: function (args) {
+		this._prevScope = {
+			prev: this._prevScope,
 			locals: this._locals,
-			statements: this._statements,
-			closures: this._closures,
+			arguments: null,
+			statements: null,
+			closures: null
 		};
 		this._locals = [];
-		this._statements = [];
-		this._closures = [];
-		return state;
+		if (args != null) {
+			this._prevScope.arguments = this._arguments;
+			this._arguments = args;
+			this._prevScope.statements = this._statements;
+			this._statements = [];
+			this._prevScope.closures = this._closures;
+			this._closures = [];
+		}
 	},
 
-	_restoreFunctionState: function (state) {
-		this._locals = state.locals;
-		this._statements = state.statements;
-		this._closures = state.closures;
+	_popScope: function () {
+		this._locals = this._prevScope.locals;
+		if (this._prevScope.arguments != null) {
+			this._arguments = this._prevScope.arguments;
+			this._statements = this._prevScope.statements;
+			this._closures = this._prevScope.closures;
+		}
+		this._prevScope = this._prevScope.prev;
 	},
 
 	_registerLocal: function (identifierToken, type) {
@@ -559,10 +569,12 @@ var Parser = exports.Parser = Class.extend({
 			if (this._locals[i].getName().getValue() == identifierToken.getValue()) {
 				if (type != null && ! this._locals[i].getType().equals(type))
 					this._newError("conflicting types for variable " + identifierToken.getValue());
-				return;
+				return this._locals[i];
 			}
 		}
-		this._locals.push(new LocalVariable(identifierToken, type));
+		var newLocal = new LocalVariable(identifierToken, type);
+		this._locals.push(newLocal);
+		return newLocal;
 	},
 
 	_preserveState: function () {
@@ -737,6 +749,10 @@ var Parser = exports.Parser = Class.extend({
 		}
 		if ((token = this._expectIdentifier()) == null)
 			return null;
+		return this._qualifiedNameStartingWith(token);
+	},
+
+	_qualifiedNameStartingWith: function (token) {
 		var imprt = this.lookupImportAlias(token.getValue());
 		if (imprt != null) {
 			if (this._expect(".") == null)
@@ -1123,6 +1139,7 @@ var Parser = exports.Parser = Class.extend({
 				return null;
 		}
 		// body
+		this._arguments = args;
 		this._locals = [];
 		this._statements = [];
 		this._closures = [];
@@ -1649,9 +1666,15 @@ var Parser = exports.Parser = Class.extend({
 				|| this._expect(")") == null
 				|| this._expect("{") == null)
 				return false;
-			if (this._block() == null)
+			var caughtVariable = new CaughtVariable(catchIdentifier, catchType);
+			this._pushScope(null);
+			this._locals.push(caughtVariable);
+			if (this._block() == null) {
+				this._popScope();
 				return false;
-			catchStatements.push(new CatchStatement(catchOrFinallyToken, new CaughtVariable(catchIdentifier, catchType), this._statements.splice(startIndex)));
+			}
+			this._popScope();
+			catchStatements.push(new CatchStatement(catchOrFinallyToken, caughtVariable, this._statements.splice(startIndex)));
 		}
 		if (catchOrFinallyToken != null) {
 			// finally
@@ -1726,8 +1749,8 @@ var Parser = exports.Parser = Class.extend({
 			if (declExpr == null)
 				return null;
 			// do not push variable declarations wo. assignment
-			if (! (declExpr instanceof IdentifierExpression))
-				expr = expr != null ? CommaExpression(commaToken, expr, declExpr) : declExpr;
+			if (! (declExpr instanceof LocalExpression))
+				expr = expr != null ? new CommaExpression(commaToken, expr, declExpr) : declExpr;
 		} while ((commaToken = this._expectOpt(",")) != null);
 		isSuccess[0] = true;
 		return expr;
@@ -1741,13 +1764,15 @@ var Parser = exports.Parser = Class.extend({
 		if (this._expectOpt(":"))
 			if ((type = this._typeDeclaration(false)) == null)
 				return null;
+		// FIXME value should be registered after parsing the initialization expression, but that prevents: var f = function () : void { f(); };
+		var local = this._registerLocal(identifier, type);
+		// parse initial value (optional)
 		var initialValue = null;
 		var assignToken;
 		if ((assignToken = this._expectOpt("=")) != null)
 			if ((initialValue = this._assignExpr(noIn)) == null)
 				return null;
-		this._registerLocal(identifier, type);
-		var expr = new IdentifierExpression(identifier);
+		var expr = new LocalExpression(identifier, local);
 		if (initialValue != null)
 			expr = new AssignmentExpression(assignToken, expr, initialValue);
 		return expr;
@@ -2039,16 +2064,42 @@ var Parser = exports.Parser = Class.extend({
 		if (this._expect("{") == null)
 			return null;
 		// parse function block
-		var state = this._pushFunctionState();
+		var state = this._pushScope(args);
 		var lastToken = this._block();
 		if (lastToken == null) {
-			this._restoreFunctionState(state);
+			this._popScope();
 			return null;
 		}
 		var funcDef = new MemberFunctionDefinition(token, null, ClassDefinition.IS_STATIC, returnType, args, this._locals, this._statements, this._closures, lastToken);
-		this._restoreFunctionState(state);
+		this._popScope();
 		this._closures.push(funcDef);
 		return new FunctionExpression(token, funcDef);
+	},
+
+	_findLocal: function (name) {
+		// helper function
+		var findFromScope = function (locals, args) {
+			for (var i = 0; i < locals.length; ++i) {
+				if (locals[i].getName().getValue() == name)
+					return locals[i];
+			}
+			if (args != null) {
+				for (var i = 0; i < args.length; ++i) {
+					if (args[i].getName().getValue() == name)
+						return args[i];
+				}
+			}
+			return null;
+		};
+		// find
+		var found;
+		if ((found = findFromScope(this._locals, this._arguments)) != null)
+			return found;
+		for (var scope = this._prevScope; scope != null; scope = scope.prev) {
+			if ((found = findFromScope(scope.locals, scope.arguments)) != null)
+				return found;
+		}
+		return null;
 	},
 
 	_primaryExpr: function () {
@@ -2078,7 +2129,15 @@ var Parser = exports.Parser = Class.extend({
 		} else if ((token = this._expectNumberLiteralOpt()) != null) {
 			return new NumberLiteralExpression(token);
 		} else if ((token = this._expectIdentifierOpt()) != null) {
-			return new IdentifierExpression(token);
+			var local = this._findLocal(token.getValue());
+			if (local != null) {
+				return new LocalExpression(token, local);
+			} else {
+				var qualifiedName = this._qualifiedNameStartingWith(token);
+				if (qualifiedName == null)
+					return null;
+				return new ClassExpression(qualifiedName);
+			}
 		} else if ((token = this._expectStringLiteralOpt()) != null) {
 			return new StringLiteralExpression(token);
 		} else if ((token = this._expectRegExpLiteralOpt()) != null) {

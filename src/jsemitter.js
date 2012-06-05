@@ -545,7 +545,25 @@ var _ExpressionEmitter = exports._ExpressionEmitter = Class.extend({
 
 });
 
-var _IdentifierExpressionEmitter = exports._IdentifierExpressionEmitter = _ExpressionEmitter.extend({
+var _LocalExpressionEmitter = exports._LocalExpressionEmitter = _ExpressionEmitter.extend({
+
+	constructor: function (emitter, expr) {
+		_ExpressionEmitter.prototype.constructor.call(this, emitter);
+		this._expr = expr;
+	},
+
+	emit: function (outerOpPrecedence) {
+		var local = this._expr.getLocal();
+		var localName = local.getName().getValue();
+		if (local instanceof CaughtVariable) {
+			localName = _CatchStatementEmitter.getLocalNameFor(this._emitter, localName);
+		}
+		this._emitter._emit(localName, this._expr.getToken());
+	}
+
+});
+
+var _ClassExpressionEmitter = exports._ClassExpressionEmitter = _ExpressionEmitter.extend({
 
 	constructor: function (emitter, expr) {
 		_ExpressionEmitter.prototype.constructor.call(this, emitter);
@@ -554,16 +572,7 @@ var _IdentifierExpressionEmitter = exports._IdentifierExpressionEmitter = _Expre
 
 	emit: function (outerOpPrecedence) {
 		var type = this._expr.getType();
-		if (type instanceof ClassDefType) {
-			this._emitter._emit(type.getClassDef().getOutputClassName(), null);
-		} else {
-			var local = this._expr.getLocal();
-			var localName = local.getName().getValue();
-			if (local instanceof CaughtVariable) {
-				localName = _CatchStatementEmitter.getLocalNameFor(this._emitter, localName);
-			}
-			this._emitter._emit(localName, this._expr.getToken());
-		}
+		this._emitter._emit(type.getClassDef().getOutputClassName(), null);
 	}
 
 });
@@ -2038,8 +2047,10 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 	},
 
 	_getExpressionEmitterFor: function (expr) {
-		if (expr instanceof IdentifierExpression)
-			return new _IdentifierExpressionEmitter(this, expr);
+		if (expr instanceof LocalExpression)
+			return new _LocalExpressionEmitter(this, expr);
+		else if (expr instanceof ClassExpression)
+			return new _ClassExpressionEmitter(this, expr);
 		else if (expr instanceof UndefinedExpression)
 			return new _UndefinedExpressionEmitter(this, expr);
 		else if (expr instanceof NullExpression)
