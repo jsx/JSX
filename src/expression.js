@@ -1769,10 +1769,13 @@ var CallExpression = exports.CallExpression = OperatorExpression.extend({
 			context.errors.push(new CompileError(this._token, "cannot call a non-function"));
 			return false;
 		}
-		if (this._expr instanceof PropertyExpression
-			&& ! exprType.isAssignable()
-			&& this._expr.deduceByArgumentTypes(context, this._token, argTypes, (this._expr.getHolderType() instanceof ClassDefType)) == null)
-			return false;
+		if (this._expr instanceof PropertyExpression && ! exprType.isAssignable()) {
+			if (! this._expr.deduceByArgumentTypes(context, this._token, argTypes, (this._expr.getHolderType() instanceof ClassDefType)) == null)
+				return false;
+		} else {
+			if (this._expr.getType().deduceByArgumentTypes(context, this._token, argTypes, true) == null)
+				return false;
+		}
 		return true;
 	},
 
