@@ -7,8 +7,7 @@ abcdef
 */
 class Adder.<T> {
 	static function f(x : T, y : T) : T {
-		var r = x + y;
-		return r;
+		return x + y;
 	}
 }
 
