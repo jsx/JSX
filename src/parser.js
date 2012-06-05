@@ -1229,6 +1229,11 @@ var Parser = exports.Parser = Class.extend({
 			if (token == null)
 				return null;
 		} while (token.getValue() == ",");
+		// disallow MayBeUndefined in template types (for the only existing types: MayBeUndefined, Array, Map)
+		if (types[0] instanceof MayBeUndefinedType) {
+			this._newError("type argument for class '" + qualifiedName.getToken().getValue() + "' cannot be a MayBeUndefined type");
+			return null;
+		}
 		// request template instantiation (deferred)
 		this._templateInstantiationRequests.push(new TemplateInstantiationRequest(token, qualifiedName.getToken().getValue(), types));
 		// return object type

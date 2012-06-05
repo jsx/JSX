@@ -480,7 +480,7 @@ var ArrayLiteralExpression = exports.ArrayLiteralExpression = Expression.extend(
 			}
 		} else {
 			for (var i = 0; i < this._exprs.length; ++i) {
-				var elementType = this._exprs[i].getType();
+				var elementType = this._exprs[i].getType().resolveIfMayBeUndefined();
 				if (! elementType.equals(Type.nullType)) {
 					if (elementType.equals(Type.integerType))
 						elementType = Type.numberType;
