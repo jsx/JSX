@@ -223,7 +223,7 @@ var IdentifierExpression = exports.IdentifierExpression = LeafExpression.extend(
 			}
 			this._local.touchVariable(context, this._token, true);
 		} else {
-			errors.push(new CompileError(token, "cannot modify a class definition"));
+			context.errors.push(new CompileError(token, "cannot modify a class definition"));
 			return false;
 		}
 		return true;
