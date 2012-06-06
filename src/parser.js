@@ -1739,7 +1739,7 @@ var Parser = exports.Parser = Class.extend({
 				return null;
 			// do not push variable declarations wo. assignment
 			if (! (declExpr instanceof IdentifierExpression))
-				expr = expr != null ? CommaExpression(commaToken, expr, declExpr) : declExpr;
+				expr = expr != null ? new CommaExpression(commaToken, expr, declExpr) : declExpr;
 		} while ((commaToken = this._expectOpt(",")) != null);
 		isSuccess[0] = true;
 		return expr;
