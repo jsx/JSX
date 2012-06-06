@@ -1771,7 +1771,7 @@ var CallExpression = exports.CallExpression = OperatorExpression.extend({
 			return false;
 		}
 		if (this._expr instanceof PropertyExpression && ! exprType.isAssignable()) {
-			if (! this._expr.deduceByArgumentTypes(context, this._token, argTypes, (this._expr.getHolderType() instanceof ClassDefType)) == null)
+			if (this._expr.deduceByArgumentTypes(context, this._token, argTypes, (this._expr.getHolderType() instanceof ClassDefType)) == null)
 				return false;
 		} else {
 			if (this._expr.getType().resolveIfMayBeUndefined().deduceByArgumentTypes(context, this._token, argTypes, true) == null)
