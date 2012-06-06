@@ -873,7 +873,7 @@ var AsExpression = exports.AsExpression = UnaryExpression.extend({
 				// is down-cast, maybe unsafe
 				success = true;
 			}
-		} else if (exprType instanceof FunctionType && this._type instanceof StaticFunctionType) {
+		} else if (this._expr instanceof PropertyExpression && exprType instanceof FunctionType && this._type instanceof StaticFunctionType) {
 			var deducedType = this._expr.deduceByArgumentTypes(context, this._token, this._type.getArgumentTypes(), true);
 			if (deducedType != null) {
 				exprType = deducedType;
