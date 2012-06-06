@@ -264,10 +264,10 @@ var _LinkTimeOptimizationCommand = exports._LinkTimeOptimizationCommand = _Optim
 	performOptimization: function () {
 		// set extendedBy for every class
 		this.getCompiler().forEachClassDef(function (parser, classDef) {
-			if (classDef.extendClassDef() != null)
-				this.getStash(classDef.extendClassDef()).extendedBy.push(classDef);
-			for (var i = 0; i < classDef.implementClassDefs().length; ++i)
-				this.getStash(classDef.implementClassDefs()[i]).extendedBy.push(classDef);
+			if (classDef.extendType() != null)
+				this.getStash(classDef.extendType().getClassDef()).extendedBy.push(classDef);
+			for (var i = 0; i < classDef.implementTypes().length; ++i)
+				this.getStash(classDef.implementTypes()[i].getClassDef()).extendedBy.push(classDef);
 			return true;
 		}.bind(this));
 		// mark classes / functions that are not derived / overridden as final

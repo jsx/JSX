@@ -107,7 +107,7 @@ var _ConstructorInvocationStatementEmitter = exports._ConstructorInvocationState
 		var ctorType = this._statement.getConstructorType();
 		var argTypes = ctorType != null ? ctorType.getArgumentTypes() : [];
 		var ctorName = this._emitter._mangleConstructorName(this._statement.getConstructingClassDef(), argTypes);
-		var token = this._statement.getQualifiedName().getToken();
+		var token = this._statement.getToken();
 		if (ctorName == "Error" && this._statement.getArguments().length == 1) {
 			/*
 				At least v8 does not support "Error.call(this, message)"; it not only does not setup the stacktrace but also does
@@ -1787,7 +1787,7 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 		this._emit(
 			"/**\n" +
 			" * class " + classDef.getOutputClassName() +
-			" extends " + classDef.extendClassDef().getOutputClassName() + "\n" +
+			(classDef.extendType() != null ? " extends " + classDef.extendType().getClassDef().getOutputClassName() + "\n" : "") +
 			" * @constructor\n" +
 			" */\n" +
 			"function ", null);
@@ -1795,11 +1795,12 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 			"}\n" +
 			"\n",
 			classDef.getToken());
-		this._emit(classDef.getOutputClassName() + ".prototype = new " + classDef.extendClassDef().getOutputClassName() + ";\n", null);
-		if (classDef.implementClassDefs().length != 0) {
-			var interfaceDefs = classDef.implementClassDefs();
-			for (var i = 0; i < interfaceDefs.length; ++i)
-				this._emit("$__jsx_merge_interface(" + classDef.getOutputClassName() + ", " + interfaceDefs[i].getOutputClassName() + ");\n", null);
+		if (classDef.extendType() != null)
+			this._emit(classDef.getOutputClassName() + ".prototype = new " + classDef.extendType().getClassDef().getOutputClassName() + ";\n", null);
+		var implementTypes = classDef.implementTypes();
+		if (implementTypes.length != 0) {
+			for (var i = 0; i < implementTypes.length; ++i)
+				this._emit("$__jsx_merge_interface(" + classDef.getOutputClassName() + ", " + implementTypes[i].getClassDef().getOutputClassName() + ");\n", null);
 			this._emit("\n", null);
 		}
 		if ((classDef.flags() & (ClassDefinition.IS_INTERFACE | ClassDefinition.IS_MIXIN)) != 0)

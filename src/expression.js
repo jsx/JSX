@@ -596,6 +596,7 @@ var MapLiteralExpression = exports.MapLiteralExpression = Expression.extend({
 				context.errors.push(new CompileError(this._token, "specified type is not a hash type"));
 				return false;
 			}
+			var expectedType = this._type.getTypeArguments()[0];
 		} else {
 			for (var i = 0; i < this._elements.length; ++i) {
 				var elementType = this._elements[i].getExpr().getType();
@@ -606,6 +607,7 @@ var MapLiteralExpression = exports.MapLiteralExpression = Expression.extend({
 					if (instantiatedClass == null)
 						return false;
 					this._type = new ObjectType(instantiatedClass);
+					expectedType = elementType;
 					break;
 				}
 			}
@@ -615,11 +617,10 @@ var MapLiteralExpression = exports.MapLiteralExpression = Expression.extend({
 			}
 		}
 		// check type of the elements
-		var expectedType = this._type.getClassDef().getTypeArguments()[0];
 		for (var i = 0; i < this._elements.length; ++i) {
 			var elementType = this._elements[i].getExpr().getType();
 			if (! elementType.isConvertibleTo(expectedType)) {
-				context.errors.push(new CompileError(this._token, "cannot assign '" + elementType.toString() + "' to a hash of '" + expectedType.toString() + "'"));
+				context.errors.push(new CompileError(this._token, "cannot assign '" + elementType.toString() + "' to a map of '" + expectedType.toString() + "'"));
 				succeeded = false;
 			}
 		}

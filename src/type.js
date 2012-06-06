@@ -366,11 +366,18 @@ var ParsedObjectType = exports.ParsedObjectType = ObjectType.extend({
 		return this._qualifiedName.getToken();
 	},
 
+	getTypeArguments: function () {
+		return this._typeArguments;
+	},
+
 	instantiate: function (instantiationContext) {
 		if (this._typeArguments.length == 0) {
 			var actualType = instantiationContext.typemap[this._qualifiedName.getToken().getValue()];
 			if (actualType != undefined)
 				return actualType;
+			if (this._classDef == null)
+				instantiationContext.objectTypesUsed.push(this);
+			return this;
 		}
 		var typeArgs = [];
 		for (var i = 0; i < this._typeArguments.length; ++i) {

@@ -36,6 +36,7 @@ var Statement = exports.Statement = Class.extend({
 
 	// returns whether or not to continue analysing the following statements
 	analyze: function (context) {
+		var Parser = require("./parser");
 		if (! (this instanceof CaseStatement || this instanceof DefaultStatement))
 			if (! Statement.assertIsReachable(context, this.getToken()))
 				return false;
@@ -43,7 +44,7 @@ var Statement = exports.Statement = Class.extend({
 			return this.doAnalyze(context);
 		} catch (e) {
 			var token = this.getToken();
-			console.error("fatal error while compiling statement at file: " + token.getFilename() + ", line " + token.getLineNumber());
+			console.error("fatal error while compiling statement" + (token instanceof Parser.Token ? " at file " + token.getFilename() + ", line " + token.getLineNumber() : ""));
 			throw e;
 		}
 	},
@@ -89,26 +90,20 @@ var Statement = exports.Statement = Class.extend({
 
 var ConstructorInvocationStatement = exports.ConstructorInvocationStatement = Statement.extend({
 
-	constructor: function (qualifiedName, args) {
+	constructor: function (token, ctorClassType, args, ctorFunctionType /* optional */) {
 		Statement.prototype.constructor.call(this);
-		this._qualifiedName = qualifiedName;
+		this._token = token;
+		this._ctorClassType = ctorClassType;
 		this._args = args;
-		this._ctorClassDef = null;
-		this._ctorType = null;
+		this._ctorFunctionType = ctorFunctionType != null ? ctorFunctionType : null;
 	},
 
 	clone: function () {
-		var that = new ConstructorInvocationStatement(this._qualifiedName, Util.cloneArray(args));
-		that._ctorClassDef = this._ctorClassDef;
-		that._ctorType = this._ctorType;
+		return new ConstructorInvocationStatement(this._token, this._ctorClassType, Util.cloneArray(this._args), this._ctorFunctionType);
 	},
 
 	getToken: function () {
-		return this._qualifiedName.getToken();
-	},
-
-	getQualifiedName: function () {
-		return this._qualifiedName;
+		return this._token;
 	},
 
 	getArguments: function () {
@@ -116,48 +111,40 @@ var ConstructorInvocationStatement = exports.ConstructorInvocationStatement = St
 	},
 
 	getConstructingClassDef: function () {
-		return this._ctorClassDef;
+		return this._ctorClassType.getClassDef();
 	},
 
 	getConstructorType: function () {
-		return this._ctorType;
+		return this._ctorFunctionType;
 	},
 
 	serialize: function () {
 		return [
 			"ConstructorInvocationStatement",
-			this._qualifiedName.serialize(),
+			this._ctorClassType.serialize(),
 			Util.serializeArray(this._args)
 		];
 	},
 
 	doAnalyze: function (context) {
-		if (this._qualifiedName.getImport() == null && this._qualifiedName.getToken().getValue() == "super") {
-			this._ctorClassDef = context.funcDef.getClassDef().extendClassDef();
-		} else {
-			if ((this._ctorClassDef = this._qualifiedName.getClass(context)) == null) {
-				// error should have been reported already
-				return true;
-			}
-		}
 		// analyze args
 		var argTypes = Util.analyzeArgs(context, this._args, null);
 		if (argTypes == null) {
 			// error is reported by callee
 			return true;
 		}
-		var ctorType = this._ctorClassDef.getMemberTypeByName("constructor", false, ClassDefinition.GET_MEMBER_MODE_CLASS_ONLY);
+		var ctorType = this.getConstructingClassDef().getMemberTypeByName("constructor", false, ClassDefinition.GET_MEMBER_MODE_CLASS_ONLY);
 		if (ctorType == null) {
 			if (this._args.length != 0) {
-				context.errors.push(new CompileError(this._qualifiedName.getToken(), "no function with matching arguments"));
+				context.errors.push(new CompileError(this.getToken().getToken(), "no function with matching arguments"));
 				return true;
 			}
 			ctorType = new ResolvedFunctionType(Type.voidType, [], false); // implicit constructor
-		} else if ((ctorType = ctorType.deduceByArgumentTypes(context, this._qualifiedName.getToken(), argTypes, false)) == null) {
+		} else if ((ctorType = ctorType.deduceByArgumentTypes(context, this.getToken(), argTypes, false)) == null) {
 			// error is reported by callee
 			return true;
 		}
-		this._ctorType = ctorType;
+		this._ctorFunctionType = ctorType;
 		return true;
 	},
 

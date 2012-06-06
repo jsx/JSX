@@ -414,8 +414,8 @@ var Parser = exports.Parser = Class.extend({
 		this._locals = [];
 		this._statements = [];
 		this._closures = [];
-		this._extendName = null;
-		this._implementNames = [];
+		this._extendType = null;
+		this._implementTypes = null;
 		this._objectTypesUsed = [];
 		this._templateInstantiationRequests = [];
 
@@ -588,6 +588,10 @@ var Parser = exports.Parser = Class.extend({
 			numErrors: this._errors.length,
 			// closures
 			numClosures: this._closures.length,
+			// objectTypesUsed
+			numObjectTypesUsed: this._objectTypesUsed.length,
+			// templateInstantiationrequests
+			numTemplateInstantiationRequests: this._templateInstantiationRequests.length
 		};
 	},
 
@@ -598,6 +602,8 @@ var Parser = exports.Parser = Class.extend({
 		this._tokenLength = state.tokenLength;
 		this._errors.length = state.numErrors;
 		this._closures.splice(state.numClosures);
+		this._objectTypesUsed.splice(state.numObjectTypesUsed);
+		this._templateInstantiationRequests.splice(state.numTemplateInstantiationRequests);
 	},
 
 	_getColumn: function () {
@@ -825,8 +831,8 @@ var Parser = exports.Parser = Class.extend({
 	},
 
 	_classDefinition: function () {
-		this._extendName = null;
-		this._implementNames = [];
+		this._extendType = null;
+		this._implementTypes = [];
 		this._objectTypesUsed = [];
 		// attributes* class
 		var flags = 0;
@@ -896,9 +902,13 @@ var Parser = exports.Parser = Class.extend({
 		}
 		// extends
 		if ((flags & (ClassDefinition.IS_INTERFACE | ClassDefinition.IS_MIXIN)) == 0) {
-			if (this._expectOpt("extends") != null)
-				if ((this._extendName = this._qualifiedName(false)) == null)
+			if (this._expectOpt("extends") != null) {
+				if ((this._extendType = this._objectTypeDeclaration(null)) == null)
 					return false;
+			} else if (className.getValue() != "Object") {
+				this._extendType = new ParsedObjectType(new QualifiedName(new Token("Object", true), null), []);
+				this._objectTypesUsed.push(this._extendType);
+			}
 		} else {
 			if ((flags & (ClassDefinition.IS_ABSTRACT | ClassDefinition.IS_FINAL | ClassDefinition.IS_NATIVE)) != 0) {
 				this._newError("interface or mixin cannot have attributes: 'abstract', 'final', 'native");
@@ -908,10 +918,10 @@ var Parser = exports.Parser = Class.extend({
 		// implements
 		if (this._expectOpt("implements") != null) {
 			do {
-				var name = this._qualifiedName(false);
-				if (name == null)
+				var implementType = this._objectTypeDeclaration(null);
+				if (implementType == null)
 					return false;
-				this._implementNames.push(name);
+				this._implementTypes.push(implementType);
 			} while (this._expectOpt(",") != null);
 		}
 		// body
@@ -983,9 +993,9 @@ var Parser = exports.Parser = Class.extend({
 
 		// done
 		if (typeArgs != null)
-			this._templateClassDefs.push(new TemplateClassDefinition(className.getValue(), flags, typeArgs, this._extendName, this._implementNames, members, this._objectTypesUsed));
+			this._templateClassDefs.push(new TemplateClassDefinition(className.getValue(), flags, typeArgs, this._extendType, this._implementTypes, members, this._objectTypesUsed));
 		else
-			this._classDefs.push(new ClassDefinition(className, className.getValue(), flags, this._extendName, this._implementNames, members, this._objectTypesUsed));
+			this._classDefs.push(new ClassDefinition(className, className.getValue(), flags, this._extendType, this._implementTypes, members, this._objectTypesUsed));
 		return true;
 	},
 
@@ -1386,19 +1396,23 @@ var Parser = exports.Parser = Class.extend({
 	},
 
 	_constructorInvocationStatement: function () {
-		// get className
-		var className = this._qualifiedName(true);
-		if (className == null)
-			return false;
-		if (! (className.getImport() == null && className.getToken().getValue() == "super")) {
-			// check if the className token designates the base class or one of the mix-ins
-			if (this._extendName != null ? this._extendName.equals(className) : className.getImport() == null && className.getToken().getValue() == "Object") {
-				// ok, is calling base class
+		// get class
+		var token;
+		if ((token = this._expectOpt("super")) != null) {
+			var classType = this._extendType;
+		} else {
+			if ((classType = this._objectTypeDeclaration(null)) == null)
+				return false;
+			token = classType.getToken();
+			if (this._extendType != null && this._extendType.equals(classType)) {
+				// ok is calling base class
 			} else {
-				for (var i = 0; i < this._implementNames.length; ++i)
-					if (this._implementNames[i].equals(className))
+				for (var i = 0; i < this._implementTypes.length; ++i) {
+					if (this._implementTypes[i].equals(classType)) {
 						break;
-				if (i == this._implementNames.length) {
+					}
+				}
+				if (i == this._implementTypes.length) {
 					// not found (and thus is not treated as a constructor invocation statement)
 					return false;
 				}
@@ -1413,7 +1427,7 @@ var Parser = exports.Parser = Class.extend({
 		if (this._expect(";") == null)
 			return false;
 		// success
-		this._statements.push(new ConstructorInvocationStatement(className, args));
+		this._statements.push(new ConstructorInvocationStatement(token, classType, args));
 		return true;
 	},
 
