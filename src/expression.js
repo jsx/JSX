@@ -659,10 +659,11 @@ var ThisExpression = exports.ThisExpression = Expression.extend({
 
 	analyze: function (context, parentExpr) {
 		var rootFuncDef = context.funcDef;
-		while (rootFuncDef.getParent() != null)
-			rootFuncDef = rootFuncDef.getParent();
-		if ((rootFuncDef.flags() & ClassDefinition.IS_STATIC) != 0) {
-			context.errors.push(new CompileError(this._token, "cannot use 'this' within a static function"));
+		if (rootFuncDef != null)
+			while (rootFuncDef.getParent() != null)
+				rootFuncDef = rootFuncDef.getParent();
+		if (rootFuncDef == null || (rootFuncDef.flags() & ClassDefinition.IS_STATIC) != 0) {
+			context.errors.push(new CompileError(this._token, "cannot use 'this' outside of a member function"));
 			return false;
 		}
 		this._classDef = rootFuncDef.getClassDef();
@@ -1749,7 +1750,7 @@ var CallExpression = exports.CallExpression = OperatorExpression.extend({
 			return false;
 		}
 		if (this._expr instanceof PropertyExpression && ! exprType.isAssignable()) {
-			if (! this._expr.deduceByArgumentTypes(context, this._token, argTypes, this._expr.getExpr() instanceof ClassExpression) == null)
+			if (this._expr.deduceByArgumentTypes(context, this._token, argTypes, this._expr.getExpr() instanceof ClassExpression) == null)
 				return false;
 		} else {
 			if (this._expr.getType().resolveIfMayBeUndefined().deduceByArgumentTypes(context, this._token, argTypes, true) == null)

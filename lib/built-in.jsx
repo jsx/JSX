@@ -64,7 +64,9 @@ native final class Array.<T> {
 	function sort() : Array.<T>;
 	function sort(comparefn : function (x : MayBeUndefined.<T>, y : MayBeUndefined.<T>) : int) : Array.<T>;
 	function sort(comparefn : function (x : MayBeUndefined.<T>, y : MayBeUndefined.<T>) : number) : Array.<T>;
-	function splice(start : int, deleteCount : int) : Array.<T>; // FIXME more arguments
+	// FIXME splice(start, deleteCount, items...)
+	function splice(start : int, deleteCount : int) : Array.<T>;
+	function splice(start : int, deleteCount : int, item : T) : Array.<T>;
 	function unshift(item : T) : int; // FIXME more arguments
 
 	// 15.4.4 (ES5)
@@ -143,7 +145,7 @@ native final class String {
 	function trim() : string;
 
 	// 15.5.5
-	var length : int;
+	__readonly__ var length : int;
 
 	// removed: use substring() instead
 	// function substr(start : int) : string;
@@ -173,8 +175,8 @@ native final class Number {
 	function constructor(value : Number);
 
 	// 15.7.3
-	static var MAX_VALUE : number;
-	static var MIN_VALUE : number;
+	static const MAX_VALUE : number;
+	static const MIN_VALUE : number;
 
 	// NOTE: NaN, POSITIVE_INFINITY and NEGATIVE_INFINITY are
 	//       not provided. Use NaN, +Infinity, and -Infinity literals

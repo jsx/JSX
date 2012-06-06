@@ -15,6 +15,9 @@ class _Test extends TestCase {
 		this.expect(d(a.splice(1, 1)), "splice").toBe(d([3]));
 		this.expect(d(a), "splice").toBe(d([1, 2]));
 
+        a = [1, 2, 3];
+        a.splice(1, 1, 4);
+        this.expect(JSON.stringify(a), "splice with an item").toBe(JSON.stringify([1, 4, 3]));
 	}
 
 	function testArrayES5() : void {
