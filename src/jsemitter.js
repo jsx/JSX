@@ -1314,10 +1314,18 @@ var _ArrayExpressionEmitter = exports._ArrayExpressionEmitter = _OperatorExpress
 	},
 
 	_emit: function () {
-		this._emitter._getExpressionEmitterFor(this._expr.getFirstExpr()).emit(_ArrayExpressionEmitter._operatorPrecedence);
-		this._emitter._emit("[", this._expr.getToken());
-		this._emitter._getExpressionEmitterFor(this._expr.getSecondExpr()).emit(0);
-		this._emitter._emit("]", null);
+		var type = this._expr.getFirstExpr().getType().resolveIfMayBeUndefined();
+		if(type.equals(Type.stringType)) {
+			this._emitter._getExpressionEmitterFor(this._expr.getFirstExpr()).emit(_ArrayExpressionEmitter._operatorPrecedence);
+			this._emitter._emit(".charAt(", this._expr.getToken());
+			this._emitter._getExpressionEmitterFor(this._expr.getSecondExpr()).emit(0);
+			this._emitter._emit(")", null);
+		} else {
+			this._emitter._getExpressionEmitterFor(this._expr.getFirstExpr()).emit(_ArrayExpressionEmitter._operatorPrecedence);
+			this._emitter._emit("[", this._expr.getToken());
+			this._emitter._getExpressionEmitterFor(this._expr.getSecondExpr()).emit(0);
+			this._emitter._emit("]", null);
+		}
 	},
 
 	_getPrecedence: function () {

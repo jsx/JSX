@@ -1325,6 +1325,8 @@ var ArrayExpression = exports.ArrayExpression = BinaryExpression.extend({
 		} else if (expr1Type.equals(Type.variantType)) {
 			return this._analyzeApplicationOnVariant(context);
 			return true;
+		} else if (expr1Type.equals(Type.stringType)) {
+			return this._analyzeApplicationOnString(context);
 		}
 		context.errors.push(new CompileError(this._token, "cannot apply []; the operator is only applicable against an array or an variant"));
 		return false;
@@ -1363,6 +1365,16 @@ var ArrayExpression = exports.ArrayExpression = BinaryExpression.extend({
 			return false;
 		}
 		this._type = Type.variantType;
+		return true;
+	},
+
+	_analyzeApplicationOnString: function (context) {
+		var expr2Type = this._expr2.getType().resolveIfMayBeUndefined();
+		if (! (expr2Type.isConvertibleTo(Type.numberType))) {
+			context.errors.push(new CompileError("the argument of string[] should be a number"));
+			return false;
+		}
+		this._type = Type.stringType;
 		return true;
 	},
 
