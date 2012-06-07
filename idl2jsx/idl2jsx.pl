@@ -279,7 +279,7 @@ foreach my $file(@files) {
             }
 
             if($attrs =~ /\b NoInterfaceObject \b/xms) {
-                #$def->{skip} = 1;
+                $def->{fake} = 1;
             }
         }
 
