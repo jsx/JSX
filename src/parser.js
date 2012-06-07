@@ -2067,12 +2067,22 @@ if (baseType.equals(Type.variantType)) throw new Error("Hmm");
 	},
 
 	_lhsExpr: function () {
+		var state = this._preserveState();
 		var expr;
-		var token = this._expectOpt([ "new", "super", "function" ]);
+		var token = this._expectOpt([ "new", "super", "(", "function" ]);
 		if (token != null) {
 			switch (token.getValue()) {
 			case "super":
 				return this._superExpr();
+			case "(":
+				expr = this._lambdaExpr(token);
+				if (expr == null) {
+					this._restoreState(state);
+					expr = this._primaryExpr();
+					if (expr == null)
+						return null;
+				}
+				break;
 			case "function":
 				expr = this._functionExpr(token);
 				break;
@@ -2164,6 +2174,46 @@ if (baseType.equals(Type.variantType)) throw new Error("Hmm");
 		if (args == null)
 			return null;
 		return new SuperExpression(token, identifier, args);
+	},
+
+	_lambdaExpr: function (token) {
+		var args = this._functionArgumentsExpr();
+		if (args == null)
+			return null;
+		if (this._expect(":") == null)
+			return null;
+		var returnType = this._typeDeclaration(true);
+		if (returnType == null)
+			return null;
+		if (this._expect("->") == null)
+			return null;
+		var funcDef = this._lambdaBody(token, args, returnType);
+		if (funcDef == null)
+			return null;
+		this._closures.push(funcDef);
+		return new FunctionExpression(token, funcDef);
+	},
+
+	_lambdaBody: function (token, args, returnType) {
+		var openBlock = this._expectOpt("{");
+		var state = this._pushScope(args);
+		try {
+			// parse lambda body
+			if (openBlock == null) {
+				var expr = this._expr();
+				this._statements.push(new ReturnStatement(token, expr));
+				return new MemberFunctionDefinition(
+						token, null, ClassDefinition.IS_STATIC, returnType, args, this._locals, this._statements, this._closures, null);
+			} else {
+				var lastToken = this._block();
+				if (lastToken == null)
+					return null;
+				return new MemberFunctionDefinition(
+						token, null, ClassDefinition.IS_STATIC, returnType, args, this._locals, this._statements, this._closures, lastToken);
+			}
+		} finally {
+			this._popScope();
+		}
 	},
 
 	_functionExpr: function (token) {
