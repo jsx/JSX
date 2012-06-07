@@ -1244,9 +1244,11 @@ if (baseType.equals(Type.variantType)) throw new Error("Hmm");
 	},
 
 	_primaryTypeDeclaration: function () {
-		var token = this._expectOpt([ "function", "boolean", "int", "number", "string" ]);
+		var token = this._expectOpt([ "(", "function", "boolean", "int", "number", "string" ]);
 		if (token != null) {
 			switch (token.getValue()) {
+			case "(":
+				return this._lightFunctionTypeDeclaration(null);
 			case "function":
 				return this._functionTypeDeclaration(null);
 			case "boolean":
@@ -1308,6 +1310,32 @@ if (baseType.equals(Type.variantType)) throw new Error("Hmm");
 		var objectType = new ParsedObjectType(qualifiedName, types);
 		this._objectTypesUsed.push(objectType);
 		return objectType;
+	},
+
+	_lightFunctionTypeDeclaration: function (objectType) {
+		// parse args
+		var argTypes = [];
+		if (this._expectOpt(")") == null) {
+			do {
+				var argType = this._typeDeclaration(false);
+				if (argType == null)
+					return null;
+				argTypes.push(argType);
+				var token = this._expect([ ")", "," ]);
+				if (token == null)
+					return null;
+			} while (token.getValue() == ",");
+		}
+		// parse return type
+		if (this._expect("->") == null)
+			return false;
+		var returnType = this._typeDeclaration(true);
+		if (returnType == null)
+			return null;
+		if (objectType != null)
+			return new MemberFunctionType(objectType, returnType, argTypes, true);
+		else
+			return new StaticFunctionType(returnType, argTypes, true);
 	},
 
 	_functionTypeDeclaration: function (objectType) {
