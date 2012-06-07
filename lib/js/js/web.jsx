@@ -59,6 +59,7 @@ automatically generated from:
 	https://www.khronos.org/registry/webgl/specs/latest/webgl.idl
 	idl2jsx/extra/timers.idl
 	idl2jsx/extra/animation-timing.idl
+	idl2jsx/extra/legacy.idl
 */
 native class DOMException {
 
@@ -7252,6 +7253,15 @@ native __fake__ class WindowAnimationTiming {
 
 } // end of WindowAnimationTiming
 
+native class CanvasPixelArray {
+
+	__readonly__ var length : int/*unsigned long*/;
+	function __native_index_operator__(
+		index : int/*unsigned long*/
+	) : MayBeUndefined.<int/*octet*/>;
+
+} // end of CanvasPixelArray
+
 /*
 end of generated files from:
 	http://www.w3.org/TR/dom/
@@ -7279,5 +7289,6 @@ end of generated files from:
 	https://www.khronos.org/registry/webgl/specs/latest/webgl.idl
 	idl2jsx/extra/timers.idl
 	idl2jsx/extra/animation-timing.idl
+	idl2jsx/extra/legacy.idl
 */
 

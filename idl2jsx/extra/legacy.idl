@@ -1,0 +1,9 @@
+// removed classes
+
+// defined in http://www.w3.org/TR/2011/WD-2dcontext-20110525/
+[NoInterfaceObject]
+interface CanvasPixelArray {
+  readonly attribute unsigned long length;
+  getter octet (in unsigned long index);
+  setter void (in unsigned long index, in octet value);
+};

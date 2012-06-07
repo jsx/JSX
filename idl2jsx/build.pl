@@ -70,6 +70,7 @@ my @specs = (
         # additionals
         "$root/extra/timers.idl",
         "$root/extra/animation-timing.idl",
+        "$root/extra/legacy.idl",
     ],
 );
 

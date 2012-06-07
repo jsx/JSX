@@ -5071,6 +5071,12 @@ class _Test extends TestCase {
         o.mozCancelAnimationFrame(X.getint());
     } // WindowAnimationTiming
 
+    // #270
+    function compile_CanvasPixelArray(o : CanvasPixelArray) : void {
+        var v1 : int/*unsigned long*/ = o.length;
+        var f2 : MayBeUndefined.<int/*octet*/> = o.__native_index_operator__(X.getint());
+    } // CanvasPixelArray
+
 
     function test_compile() : void {
         this.expect(true).toBe(true);
@@ -5159,7 +5165,7 @@ native class X {
     static function getMayBeUndefined__Touch_() : MayBeUndefined.<Touch>;
     static function getMayBeUndefined__VideoTrack_() : MayBeUndefined.<VideoTrack>;
     static function getMayBeUndefined__Window_() : MayBeUndefined.<Window/*WindowProxy*/>;
-    static function getMayBeUndefined__int_() : MayBeUndefined.<int/*unsigned long*/>;
+    static function getMayBeUndefined__int_() : MayBeUndefined.<int/*octet*/>;
     static function getMayBeUndefined__number_() : MayBeUndefined.<number/*double*/>;
     static function getMayBeUndefined__string_() : MayBeUndefined.<string/*DOMString*/>;
     static function getMediaController() : MediaController;
@@ -5228,7 +5234,7 @@ native class X {
     static function getfunction__MediaQueryList__void() : function(:MediaQueryList):void/*MediaQueryListListener*/;
     static function getfunction___void() : function():void/*TimerHandler*/;
     static function getfunction__number__void() : function(:number):void/*FrameRequestCallback*/;
-    static function getint() : int/*long*/;
+    static function getint() : int/*unsigned long*/;
     static function getint__() : int[]/*sequence<long>*/;
     static function getnumber() : number/*GLintptr*/;
     static function getnumber__() : number[]/*sequence<float>*/;
