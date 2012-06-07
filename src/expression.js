@@ -1324,7 +1324,6 @@ var ArrayExpression = exports.ArrayExpression = BinaryExpression.extend({
 			return this._analyzeApplicationOnObject(context, expr1Type);
 		} else if (expr1Type.equals(Type.variantType)) {
 			return this._analyzeApplicationOnVariant(context);
-			return true;
 		}
 		context.errors.push(new CompileError(this._token, "cannot apply []; the operator is only applicable against an array or an variant"));
 		return false;
