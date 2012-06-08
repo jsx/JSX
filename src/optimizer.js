@@ -1229,7 +1229,8 @@ var _ReturnIfOptimizeCommand = exports._ReturnIfOptimizeCommand = _FunctionOptim
 				new Token("?", false),
 				condExpr,
 				trueExpr,
-				falseExpr));
+				falseExpr,
+				falseExpr.getType()));
 	}
 
 });
