@@ -59,6 +59,7 @@ automatically generated from:
 	https://www.khronos.org/registry/webgl/specs/latest/webgl.idl
 	idl2jsx/extra/timers.idl
 	idl2jsx/extra/animation-timing.idl
+	idl2jsx/extra/legacy.idl
 */
 native class DOMException {
 
@@ -865,7 +866,7 @@ native class HTMLCollection {
 
 } // end of HTMLCollection
 
-native class DOMStringList {
+native __fake__ class DOMStringList {
 
 	__readonly__ var length : int/*unsigned long*/;
 	function __native_index_operator__(
@@ -1943,7 +1944,7 @@ native class CSSStyleDeclaration {
 
 } // end of CSSStyleDeclaration
 
-native class ElementCSSInlineStyle {
+native __fake__ class ElementCSSInlineStyle {
 
 	__readonly__ var style : CSSStyleDeclaration;
 
@@ -3877,7 +3878,7 @@ native __fake__ class WindowBase64 {
 
 } // end of WindowBase64
 
-native class WindowModal {
+native __fake__ class WindowModal {
 
 	__readonly__ var dialogArguments : variant/*any*/;
 	var returnValue : string/*DOMString*/;
@@ -4045,7 +4046,7 @@ native class DataTransferItem {
 
 } // end of DataTransferItem
 
-native class FunctionStringCallback {
+native __fake__ class FunctionStringCallback {
 
 	function handleEvent(data : string/*DOMString*/) : void;
 
@@ -4381,7 +4382,7 @@ native __fake__ class NavigatorGeolocation {
 
 } // end of NavigatorGeolocation
 
-native class Geolocation {
+native __fake__ class Geolocation {
 
 	function getCurrentPosition(
 		successCallback : PositionCallback
@@ -4411,19 +4412,19 @@ native class Geolocation {
 
 } // end of Geolocation
 
-native class PositionCallback {
+native __fake__ class PositionCallback {
 
 	function handleEvent(position : Position) : void;
 
 } // end of PositionCallback
 
-native class PositionErrorCallback {
+native __fake__ class PositionErrorCallback {
 
 	function handleEvent(error : PositionError) : void;
 
 } // end of PositionErrorCallback
 
-native class PositionOptions {
+native __fake__ class PositionOptions {
 
 	var enableHighAccuracy : boolean;
 	var timeout : int/*long*/;
@@ -4433,7 +4434,7 @@ native class PositionOptions {
 
 } // end of PositionOptions
 
-native class Position {
+native __fake__ class Position {
 
 	__readonly__ var coords : Coordinates;
 	__readonly__ var address : Address;
@@ -4441,7 +4442,7 @@ native class Position {
 
 } // end of Position
 
-native class Coordinates {
+native __fake__ class Coordinates {
 
 	__readonly__ var latitude : number/*double?*/;
 	__readonly__ var longitude : number/*double?*/;
@@ -4454,7 +4455,7 @@ native class Coordinates {
 
 } // end of Coordinates
 
-native class Address {
+native __fake__ class Address {
 
 	__readonly__ var country : string/*DOMString?*/;
 	__readonly__ var region : string/*DOMString?*/;
@@ -4467,7 +4468,7 @@ native class Address {
 
 } // end of Address
 
-native class PositionError {
+native __fake__ class PositionError {
 
 	static __readonly__ var PERMISSION_DENIED : int/*unsigned short*/;
 	       __readonly__ var PERMISSION_DENIED : int/*unsigned short*/;
@@ -7252,6 +7253,15 @@ native __fake__ class WindowAnimationTiming {
 
 } // end of WindowAnimationTiming
 
+native __fake__ class CanvasPixelArray {
+
+	__readonly__ var length : int/*unsigned long*/;
+	function __native_index_operator__(
+		index : int/*unsigned long*/
+	) : MayBeUndefined.<int/*octet*/>;
+
+} // end of CanvasPixelArray
+
 /*
 end of generated files from:
 	http://www.w3.org/TR/dom/
@@ -7279,5 +7289,6 @@ end of generated files from:
 	https://www.khronos.org/registry/webgl/specs/latest/webgl.idl
 	idl2jsx/extra/timers.idl
 	idl2jsx/extra/animation-timing.idl
+	idl2jsx/extra/legacy.idl
 */
 

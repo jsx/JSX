@@ -224,7 +224,7 @@ var ClassExpression = exports.ClassExpression = LeafExpression.extend({
 	},
 
 	assertIsAssignable: function (context, token, type) {
-		errors.push(new CompileError(token, "cannot modify a class definition"));
+		context.errors.push(new CompileError(token, "cannot modify a class definition"));
 		return false;
 	}
 
@@ -873,7 +873,7 @@ var AsExpression = exports.AsExpression = UnaryExpression.extend({
 				// is down-cast, maybe unsafe
 				success = true;
 			}
-		} else if (exprType instanceof FunctionType && this._type instanceof StaticFunctionType) {
+		} else if (this._expr instanceof PropertyExpression && exprType instanceof FunctionType && this._type instanceof StaticFunctionType) {
 			var deducedType = this._expr.deduceByArgumentTypes(context, this._token, this._type.getArgumentTypes(), true);
 			if (deducedType != null) {
 				exprType = deducedType;
@@ -1303,7 +1303,6 @@ var ArrayExpression = exports.ArrayExpression = BinaryExpression.extend({
 			return this._analyzeApplicationOnObject(context, expr1Type);
 		} else if (expr1Type.equals(Type.variantType)) {
 			return this._analyzeApplicationOnVariant(context);
-			return true;
 		}
 		context.errors.push(new CompileError(this._token, "cannot apply []; the operator is only applicable against an array or an variant"));
 		return false;
@@ -1607,20 +1606,16 @@ var ShiftExpression = exports.ShiftExpression = BinaryExpression.extend({
 
 var ConditionalExpression = exports.ConditionalExpression = OperatorExpression.extend({
 
-	constructor: function (operatorToken, condExpr, ifTrueExpr, ifFalseExpr) {
+	constructor: function (operatorToken, condExpr, ifTrueExpr, ifFalseExpr, type /* optional */) {
 		OperatorExpression.prototype.constructor.call(this, operatorToken);
 		this._condExpr = condExpr;
 		this._ifTrueExpr = ifTrueExpr;
 		this._ifFalseExpr = ifFalseExpr;
-		this._type = null;
-		if (this._ifFalseExpr == null)
-			throw new Error("eee");
+		this._type = type != null ? type : null;
 	},
 
 	clone: function () {
-		var ret = new ConditionalExpression(this._token, this._condExpr.clone(), this._ifTrueExpr != null ? this._ifTrueExpr.clone() : null, this._ifFalseExpr.clone());
-		ret._type = this._type;
-		return ret;
+		return new ConditionalExpression(this._token, this._condExpr.clone(), this._ifTrueExpr != null ? this._ifTrueExpr.clone() : null, this._ifFalseExpr.clone(), this._type);
 	},
 
 	getCondExpr: function () {

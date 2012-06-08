@@ -120,18 +120,12 @@ var _Lexer = exports._TokenTable = Class.extend({
 				decimalIntegerLiteral
 			]) + "(?![\\.0-9eE])\\b";
 
-		var multiLineComment  = "(?: /\\* (?: [^*] | (?: \\*+ [^*\\/]) )* \\*+/)";
-		var singleLineComment = "(?: // [^\\r\\n]* )";
-		var comment           = this.makeAlt([multiLineComment, singleLineComment]);
-		var whiteSpace        = "[\\x20\\t\\r\\n]+";
-
 		// regular expressions
 		this.rxIdent          = this.rx("^" + ident);
 		this.rxStringLiteral  = this.rx("^" + stringLiteral);
 		this.rxNumberLiteral  = this.rx("^" + numberLiteral);
 		this.rxIntegerLiteral = this.rx("^" + integerLiteral);
 		this.rxRegExpLiteral  = this.rx("^" + regexpLiteral);
-		this.rxSpace          = this.rx("^" + this.makeAlt([comment, whiteSpace]) + "+");
 		this.rxNewline        = /(?:\r\n?|\n)/;
 
 		// blacklists of identifiers
@@ -401,10 +395,10 @@ var Parser = exports.Parser = Class.extend({
 	parse: function (input, errors) {
 		// lexer properties
 		this._input = input;
-		this._initInput();
+		this._lines = this._input.split(/\n/);
 		this._tokenLength = 0;
-		// for source map
-		this._lineNumber = 1;
+		this._lineNumber = 1; // one origin
+		this._columnOffset = 0; // zero origin
 		// output
 		this._errors = errors;
 		this._templateClassDefs = [];
@@ -437,20 +431,16 @@ var Parser = exports.Parser = Class.extend({
 		return true;
 	},
 
-	_initInput: function () {
-		this._remainingInput = this._input;
-	},
-	_getPos: function () {
-		return this._input.length - this._remainingInput.length;
-	},
 	_getInput: function () {
-		return this._remainingInput;
+		return this._lines[this._lineNumber - 1].substring(this._columnOffset);
 	},
+
 	_getInputByLength: function (length) {
-		return this._remainingInput.substring(0, length);
+		return this._lines[this._lineNumber - 1].substring(this._columnOffset, this._columnOffset + length);
 	},
+
 	_forwardPos: function (len) {
-		this._remainingInput = this._remainingInput.substring(len);
+		this._columnOffset += len;
 	},
 
 	getSourceToken: function () {
@@ -581,8 +571,8 @@ var Parser = exports.Parser = Class.extend({
 		// FIXME use class
 		return {
 			// lexer properties
-			pos: this._getPos(),
 			lineNumber: this._lineNumber,
+			columnOffset: this._columnOffset,
 			tokenLength: this._tokenLength,
 			// errors
 			numErrors: this._errors.length,
@@ -596,9 +586,8 @@ var Parser = exports.Parser = Class.extend({
 	},
 
 	_restoreState: function (state) {
-		this._initInput();
-		this._forwardPos(state.pos);
 		this._lineNumber = state.lineNumber;
+		this._columnOffset = state.columnOffset;
 		this._tokenLength = state.tokenLength;
 		this._errors.length = state.numErrors;
 		this._closures.splice(state.numClosures);
@@ -606,10 +595,9 @@ var Parser = exports.Parser = Class.extend({
 		this._templateInstantiationRequests.splice(state.numTemplateInstantiationRequests);
 	},
 
+	// this is column offset, and is thus zero-origin
 	_getColumn: function () {
-		var pos = this._getPos();
-		var lastNewline = this._input.lastIndexOf("\n", pos);
-		return pos - lastNewline - 1;
+		return this._columnOffset;
 	},
 
 	_newError: function (message) {
@@ -620,17 +608,59 @@ var Parser = exports.Parser = Class.extend({
 		this._forwardPos(this._tokenLength);
 		this._tokenLength = 0;
 
-		// skip whitespaces
-		var matched = this._getInput().match(_Lexer.rxSpace);
-		if(matched != null) {
-			this._forwardPos(matched[0].length);
-			this._lineNumber += matched[0].split(_Lexer.rxNewline).length - 1;
+		while (true) {
+			// skip whitespaces and comments in-line
+			while (true) {
+				var matched = this._getInput().match(/^[ \t]+/);
+				if (matched != null)
+					this._forwardPos(matched[0].length);
+				if (this._columnOffset != this._lines[this._lineNumber - 1].length)
+					break;
+				if (this._lineNumber == this._lines.length)
+					break;
+				this._lineNumber++;
+				this._columnOffset = 0;
+			}
+			switch (this._getInputByLength(2)) {
+			case "/*":
+				if (! this._skipMultilineComment())
+					return;
+				break;
+			case "//":
+				if (this._lineNumber == this._lines.length) {
+					this._columnOffset = this._lines[this._lineNumber - 1].length;
+				} else {
+					this._lineNumber++;
+					this._columnOffset = 0;
+				}
+				break;
+			default:
+				return;
+			}
+		}
+	},
+
+	_skipMultilineComment: function () {
+		var startLineNumber = this._lineNumber;
+		var startColumnOffset = this._columnOffset;
+		while (true) {
+			var endAt = this._getInput(this._columnOffset).indexOf("*/");
+			if (endAt != -1) {
+				this._forwardPos(endAt + 2);
+				return true;
+			}
+			if (this._lineNumber == this._lines.length) {
+				this._columnOffset = this._lines[this._lineNumber - 1].length;
+				this._errors.push(new CompileError(this._filename, startLineNumber, startColumnOffset, "could not find the end of the comment"));
+				return false;
+			}
+			++this._lineNumber;
 		}
 	},
 
 	_isEOF: function () {
 		this._advanceToken();
-		return this._remainingInput.length === 0;
+		return this._lineNumber == this._lines.length && this._columnOffset == this._lines[this._lines.length - 1].length;
 	},
 
 	_expectIsNotEOF: function () {
@@ -738,12 +768,13 @@ var Parser = exports.Parser = Class.extend({
 	},
 
 	_skipLine: function () {
-		var matched = this._getInput().match(/^.*(?:\r\n?|\n|$)/);
-		this._forwardPos(matched[0].length);
+		if (this._lineNumber == this._lines.length) {
+			this._columnOffset = this._lines[this._lineNumber - 1].length;
+		} else {
+			++this._lineNumber;
+			this._columnOffset = 0;
+		}
 		this._tokenLength = 0;
-
-		// count newlines
-		this._lineNumber += matched[0].split(_Lexer.rxNewline).length - 1;
 	},
 
 	_qualifiedName: function (allowSuper) {

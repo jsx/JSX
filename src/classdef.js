@@ -731,7 +731,7 @@ var MemberVariableDefinition = exports.MemberVariableDefinition = MemberDefiniti
 						return;
 					var ivType = this._initialValue.getType();
 					if (this._type == null) {
-						this._type = ivType;
+						this._type = ivType.asAssignableType();
 					} else if (! ivType.isConvertibleTo(this._type)) {
 						this._analysisContext.errors.push(new CompileError(this._nameToken,
 							"the variable is declared as '" + this._type.toString() + "' but initial value is '" + ivType.toString() + "'"));
