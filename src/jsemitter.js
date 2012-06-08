@@ -1196,7 +1196,6 @@ var _PropertyExpressionEmitter = exports._PropertyExpressionEmitter = _UnaryExpr
 		this._emitter._getExpressionEmitterFor(expr.getExpr()).emit(this._getPrecedence());
 		// mangle the name if necessary
 		if (exprType instanceof FunctionType && ! exprType.isAssignable()
-			&& (expr.getHolderType().getClassDef() instanceof InstantiatedClassDefinition)
 			&& (expr.getHolderType().getClassDef().flags() & ClassDefinition.IS_NATIVE) == 0) {
 			if (expr.getExpr()._classDefType instanceof ClassDefType) {
 				// do not use "." notation for static functions, but use class$name
