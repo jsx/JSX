@@ -164,7 +164,7 @@ var LocalExpression = exports.LocalExpression = LeafExpression.extend({
 
 	analyze: function (context, parentExpr) {
 		// check that the variable is readable
-		if ((parentExpr instanceof AssignmentExpression && parentExpr.getFirstExpr() == this)
+		if ((parentExpr instanceof AssignmentExpression && parentExpr.getFirstExpr() == this && parentExpr.getToken().getValue() == "=")
 			|| (parentExpr == null && context.statement instanceof Statement.ForInStatement && context.statement.getLHSExpr() == this)) {
 			// is LHS
 		} else {
