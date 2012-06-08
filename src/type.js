@@ -430,6 +430,11 @@ var FunctionType = exports.FunctionType = Type.extend({
 
 	$_classDef: null,
 
+	isConvertibleTo: function (type) {
+		// functions except StaticFunctionType are unassignable
+		return false;
+	},
+
 	getClassDef: function () {
 		return FunctionType._classDef;
 	}
@@ -448,10 +453,6 @@ var FunctionChoiceType = exports.FunctionChoiceType = FunctionType.extend({
 
 	asAssignableType: function () {
 		throw new Error("logic flaw");
-	},
-
-	isConvertibleTo: function (type) {
-		return false;
 	},
 
 	deduceByArgumentTypes: function (context, operatorToken, argTypes, isStatic) {
