@@ -1315,9 +1315,21 @@ var _ArrayExpressionEmitter = exports._ArrayExpressionEmitter = _OperatorExpress
 
 	_emit: function () {
 		this._emitter._getExpressionEmitterFor(this._expr.getFirstExpr()).emit(_ArrayExpressionEmitter._operatorPrecedence);
-		this._emitter._emit("[", this._expr.getToken());
-		this._emitter._getExpressionEmitterFor(this._expr.getSecondExpr()).emit(0);
-		this._emitter._emit("]", null);
+		var secondExpr = this._expr.getSecondExpr();
+		// property access using . is 4x faster on safari than using [], see http://jsperf.com/access-using-dot-vs-array
+		var emitted = false;
+		if (secondExpr instanceof StringLiteralExpression) {
+			var propertyName = Util.decodeStringLiteral(secondExpr.getToken().getValue());
+			if (propertyName.match(/^[\$_A-Za-z][\$_0-9A-Za-z]*$/) != null) {
+				this._emitter._emit("." + propertyName, this._expr.getToken());
+				emitted = true;
+			}
+		}
+		if (! emitted) {
+			this._emitter._emit("[", this._expr.getToken());
+			this._emitter._getExpressionEmitterFor(this._expr.getSecondExpr()).emit(0);
+			this._emitter._emit("]", null);
+		}
 	},
 
 	_getPrecedence: function () {
