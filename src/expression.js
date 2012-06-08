@@ -1115,17 +1115,19 @@ var PropertyExpression = exports.PropertyExpression = UnaryExpression.extend({
 		// check constness (note: a possibly assignable property is always a member variable)
 		var holderType = this.getHolderType();
 		var varFlags = 0;
-		if (holderType.getClassDef().forEachClassToBase(function (classDef) {
-			return classDef.forEachMemberVariable(function (varDef) {
-				if (varDef.name() == this._identifierToken.getValue()) {
-					// found
-					varFlags = varDef.flags();
-					return false;
-				}
-				return true;
-			}.bind(this));
-		}.bind(this))) {
-			throw new Error("logic flaw, could not find definition for " + holderType.getClassDef().className() + "#" + this._identifierToken.getValue());
+		if (! holderType.equals(Type.variantType)) {
+			if (holderType.getClassDef().forEachClassToBase(function (classDef) {
+				return classDef.forEachMemberVariable(function (varDef) {
+					if (varDef.name() == this._identifierToken.getValue()) {
+						// found
+						varFlags = varDef.flags();
+						return false;
+					}
+					return true;
+				}.bind(this));
+			}.bind(this))) {
+				throw new Error("logic flaw, could not find definition for " + holderType.getClassDef().className() + "#" + this._identifierToken.getValue());
+			}
 		}
 		if ((varFlags & ClassDefinition.IS_CONST) != 0) {
 			context.errors.push(new CompileError(token, "cannot modify a constant"));
