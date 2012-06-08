@@ -371,18 +371,28 @@ native class Error {
 }
 
 native class EvalError extends Error {
+	function constructor();
+	function constructor(message : string);
 }
 
 native class RangeError extends Error {
+	function constructor();
+	function constructor(message : string);
 }
 
 native class ReferenceError extends Error {
+	function constructor();
+	function constructor(message : string);
 }
 
 native class SyntaxError extends Error {
+	function constructor();
+	function constructor(message : string);
 }
 
 native class TypeError extends Error {
+	function constructor();
+	function constructor(message : string);
 }
 
 // 5.12
