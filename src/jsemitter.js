@@ -1954,7 +1954,7 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 	_emit: function (str, token) {
 		if (str == "")
 			return;
-		if (this._output.match(/\n$/))
+		if (this._output.charAt(this._output.length - 1) == "\n")
 			this._output += this._getIndent();
 		// optional source map
 		if(this._sourceMapGen != null && token != null) {
