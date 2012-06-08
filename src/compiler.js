@@ -376,9 +376,7 @@ var Compiler = exports.Compiler = Class.extend({
 				classDefs[i].setOutputClassName(className);
 			}
 		}
-		// emit
 		this._emitter.emit(classDefs);
-		this._output = this._emitter.getOutput();
 	},
 
 	_printErrors: function (errors) {
