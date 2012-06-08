@@ -107,7 +107,7 @@ var _ConstructorInvocationStatementEmitter = exports._ConstructorInvocationState
 		var ctorType = this._statement.getConstructorType();
 		var argTypes = ctorType != null ? ctorType.getArgumentTypes() : [];
 		var ctorName = this._emitter._mangleConstructorName(this._statement.getConstructingClassDef(), argTypes);
-		var token = this._statement.getQualifiedName().getToken();
+		var token = this._statement.getToken();
 		if (ctorName == "Error" && this._statement.getArguments().length == 1) {
 			/*
 				At least v8 does not support "Error.call(this, message)"; it not only does not setup the stacktrace but also does
@@ -545,7 +545,25 @@ var _ExpressionEmitter = exports._ExpressionEmitter = Class.extend({
 
 });
 
-var _IdentifierExpressionEmitter = exports._IdentifierExpressionEmitter = _ExpressionEmitter.extend({
+var _LocalExpressionEmitter = exports._LocalExpressionEmitter = _ExpressionEmitter.extend({
+
+	constructor: function (emitter, expr) {
+		_ExpressionEmitter.prototype.constructor.call(this, emitter);
+		this._expr = expr;
+	},
+
+	emit: function (outerOpPrecedence) {
+		var local = this._expr.getLocal();
+		var localName = local.getName().getValue();
+		if (local instanceof CaughtVariable) {
+			localName = _CatchStatementEmitter.getLocalNameFor(this._emitter, localName);
+		}
+		this._emitter._emit(localName, this._expr.getToken());
+	}
+
+});
+
+var _ClassExpressionEmitter = exports._ClassExpressionEmitter = _ExpressionEmitter.extend({
 
 	constructor: function (emitter, expr) {
 		_ExpressionEmitter.prototype.constructor.call(this, emitter);
@@ -554,16 +572,7 @@ var _IdentifierExpressionEmitter = exports._IdentifierExpressionEmitter = _Expre
 
 	emit: function (outerOpPrecedence) {
 		var type = this._expr.getType();
-		if (type instanceof ClassDefType) {
-			this._emitter._emit(type.getClassDef().getOutputClassName(), null);
-		} else {
-			var local = this._expr.getLocal();
-			var localName = local.getName().getValue();
-			if (local instanceof CaughtVariable) {
-				localName = _CatchStatementEmitter.getLocalNameFor(this._emitter, localName);
-			}
-			this._emitter._emit(localName, this._expr.getToken());
-		}
+		this._emitter._emit(type.getClassDef().getOutputClassName(), null);
 	}
 
 });
@@ -1176,14 +1185,9 @@ var _PropertyExpressionEmitter = exports._PropertyExpressionEmitter = _UnaryExpr
 		var expr = this._expr;
 		var exprType = expr.getType();
 		var identifierToken = this._expr.getIdentifierToken();
-		// special handling for import ... as
-		if (exprType instanceof ClassDefType) {
-			this._emitter._emit(exprType.getClassDef().getOutputClassName(), identifierToken);
-			return;
-		}
 		// replace methods to global function (e.g. Number.isNaN to isNaN)
-		if (expr.getExpr()._classDefType instanceof ClassDefType
-			&& expr.getExpr()._classDefType.getClassDef() === Type.numberType.getClassDef()) {
+		if (expr.getExpr() instanceof ClassExpression
+			&& expr.getExpr().getType().getClassDef() === Type.numberType.getClassDef()) {
 			switch (identifierToken.getValue()) {
 			case "parseInt":
 			case "parseFloat":
@@ -1197,7 +1201,7 @@ var _PropertyExpressionEmitter = exports._PropertyExpressionEmitter = _UnaryExpr
 		// mangle the name if necessary
 		if (exprType instanceof FunctionType && ! exprType.isAssignable()
 			&& (expr.getHolderType().getClassDef().flags() & ClassDefinition.IS_NATIVE) == 0) {
-			if (expr.getExpr()._classDefType instanceof ClassDefType) {
+			if (expr.getExpr() instanceof ClassExpression) {
 				// do not use "." notation for static functions, but use class$name
 				this._emitter._emit("$", identifierToken);
 			} else {
@@ -1701,7 +1705,7 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 		if ((classDef.flags() & ClassDefinition.IS_NATIVE) != 0)
 			return;
 		// special handling for js.jsx
-		if (classDef.getToken().getFilename() == this._platform.getRoot() + "/lib/js/js.jsx") {
+		if (classDef.getToken() != null && classDef.getToken().getFilename() == this._platform.getRoot() + "/lib/js/js.jsx") {
 			this._emit("js.global = (function () { return this; })();\n\n", null);
 			return;
 		}
@@ -1796,7 +1800,7 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 		this._emit(
 			"/**\n" +
 			" * class " + classDef.getOutputClassName() +
-			" extends " + classDef.extendClassDef().getOutputClassName() + "\n" +
+			(classDef.extendType() != null ? " extends " + classDef.extendType().getClassDef().getOutputClassName() + "\n" : "") +
 			" * @constructor\n" +
 			" */\n" +
 			"function ", null);
@@ -1804,11 +1808,12 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 			"}\n" +
 			"\n",
 			classDef.getToken());
-		this._emit(classDef.getOutputClassName() + ".prototype = new " + classDef.extendClassDef().getOutputClassName() + ";\n", null);
-		if (classDef.implementClassDefs().length != 0) {
-			var interfaceDefs = classDef.implementClassDefs();
-			for (var i = 0; i < interfaceDefs.length; ++i)
-				this._emit("$__jsx_merge_interface(" + classDef.getOutputClassName() + ", " + interfaceDefs[i].getOutputClassName() + ");\n", null);
+		if (classDef.extendType() != null)
+			this._emit(classDef.getOutputClassName() + ".prototype = new " + classDef.extendType().getClassDef().getOutputClassName() + ";\n", null);
+		var implementTypes = classDef.implementTypes();
+		if (implementTypes.length != 0) {
+			for (var i = 0; i < implementTypes.length; ++i)
+				this._emit("$__jsx_merge_interface(" + classDef.getOutputClassName() + ", " + implementTypes[i].getClassDef().getOutputClassName() + ");\n", null);
 			this._emit("\n", null);
 		}
 		if ((classDef.flags() & (ClassDefinition.IS_INTERFACE | ClassDefinition.IS_MIXIN)) != 0)
@@ -2055,8 +2060,10 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 	},
 
 	_getExpressionEmitterFor: function (expr) {
-		if (expr instanceof IdentifierExpression)
-			return new _IdentifierExpressionEmitter(this, expr);
+		if (expr instanceof LocalExpression)
+			return new _LocalExpressionEmitter(this, expr);
+		else if (expr instanceof ClassExpression)
+			return new _ClassExpressionEmitter(this, expr);
 		else if (expr instanceof UndefinedExpression)
 			return new _UndefinedExpressionEmitter(this, expr);
 		else if (expr instanceof NullExpression)

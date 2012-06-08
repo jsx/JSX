@@ -287,7 +287,7 @@ var MayBeUndefinedType = exports.MayBeUndefinedType = Type.extend({
 	},
 
 	instantiate: function (instantiationContext) {
-		var baseType = this._baseType.instantiate(instantiationContext);
+		var baseType = this._baseType.resolveIfMayBeUndefined().instantiate(instantiationContext);
 		return baseType.toMayBeUndefinedType();
 	},
 
@@ -314,34 +314,6 @@ var MayBeUndefinedType = exports.MayBeUndefinedType = Type.extend({
 });
 
 // class and object types
-
-var ClassDefType = exports.ClassDefType = Type.extend({
-
-	constructor: function (classDef) {
-		this._classDef = classDef;
-	},
-
-	instantiate: function (instantiationContext) {
-		throw new Error("logic flaw; ClassDefType is created during semantic analysis, after template instantiation");
-	},
-
-	isConvertibleTo: function (type) {
-		return false;
-	},
-
-	isAssignable: function () {
-		return false;
-	},
-
-	getClassDef: function () {
-		return this._classDef;
-	},
-
-	toString: function () {
-		return this._classDef.className();
-	}
-
-});
 
 var ObjectType = exports.ObjectType = Type.extend({
 
@@ -390,11 +362,22 @@ var ParsedObjectType = exports.ParsedObjectType = ObjectType.extend({
 		this._typeArguments = typeArgs;
 	},
 
+	getToken: function () {
+		return this._qualifiedName.getToken();
+	},
+
+	getTypeArguments: function () {
+		return this._typeArguments;
+	},
+
 	instantiate: function (instantiationContext) {
 		if (this._typeArguments.length == 0) {
 			var actualType = instantiationContext.typemap[this._qualifiedName.getToken().getValue()];
 			if (actualType != undefined)
 				return actualType;
+			if (this._classDef == null)
+				instantiationContext.objectTypesUsed.push(this);
+			return this;
 		}
 		var typeArgs = [];
 		for (var i = 0; i < this._typeArguments.length; ++i) {

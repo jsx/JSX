@@ -36,6 +36,7 @@ var Statement = exports.Statement = Class.extend({
 
 	// returns whether or not to continue analysing the following statements
 	analyze: function (context) {
+		var Parser = require("./parser");
 		if (! (this instanceof CaseStatement || this instanceof DefaultStatement))
 			if (! Statement.assertIsReachable(context, this.getToken()))
 				return false;
@@ -43,7 +44,7 @@ var Statement = exports.Statement = Class.extend({
 			return this.doAnalyze(context);
 		} catch (e) {
 			var token = this.getToken();
-			console.error("fatal error while compiling statement at file: " + token.getFilename() + ", line " + token.getLineNumber());
+			console.error("fatal error while compiling statement" + (token instanceof Parser.Token ? " at file " + token.getFilename() + ", line " + token.getLineNumber() : ""));
 			throw e;
 		}
 	},
@@ -51,6 +52,8 @@ var Statement = exports.Statement = Class.extend({
 	forEachStatement: function (cb) {
 		return true;
 	},
+
+	clone: null, // function clone() : Statement
 
 	forEachExpression: null, // function forEachExpression(cb : function (expr, replaceCb) : boolean) : boolean
 
@@ -87,20 +90,20 @@ var Statement = exports.Statement = Class.extend({
 
 var ConstructorInvocationStatement = exports.ConstructorInvocationStatement = Statement.extend({
 
-	constructor: function (qualifiedName, args) {
+	constructor: function (token, ctorClassType, args, ctorFunctionType /* optional */) {
 		Statement.prototype.constructor.call(this);
-		this._qualifiedName = qualifiedName;
+		this._token = token;
+		this._ctorClassType = ctorClassType;
 		this._args = args;
-		this._ctorClassDef = null;
-		this._ctorType = null;
+		this._ctorFunctionType = ctorFunctionType != null ? ctorFunctionType : null;
+	},
+
+	clone: function () {
+		return new ConstructorInvocationStatement(this._token, this._ctorClassType, Util.cloneArray(this._args), this._ctorFunctionType);
 	},
 
 	getToken: function () {
-		return this._qualifiedName.getToken();
-	},
-
-	getQualifiedName: function () {
-		return this._qualifiedName;
+		return this._token;
 	},
 
 	getArguments: function () {
@@ -108,48 +111,40 @@ var ConstructorInvocationStatement = exports.ConstructorInvocationStatement = St
 	},
 
 	getConstructingClassDef: function () {
-		return this._ctorClassDef;
+		return this._ctorClassType.getClassDef();
 	},
 
 	getConstructorType: function () {
-		return this._ctorType;
+		return this._ctorFunctionType;
 	},
 
 	serialize: function () {
 		return [
 			"ConstructorInvocationStatement",
-			this._qualifiedName.serialize(),
+			this._ctorClassType.serialize(),
 			Util.serializeArray(this._args)
 		];
 	},
 
 	doAnalyze: function (context) {
-		if (this._qualifiedName.getImport() == null && this._qualifiedName.getToken().getValue() == "super") {
-			this._ctorClassDef = context.funcDef.getClassDef().extendClassDef();
-		} else {
-			if ((this._ctorClassDef = this._qualifiedName.getClass(context)) == null) {
-				// error should have been reported already
-				return true;
-			}
-		}
 		// analyze args
 		var argTypes = Util.analyzeArgs(context, this._args, null);
 		if (argTypes == null) {
 			// error is reported by callee
 			return true;
 		}
-		var ctorType = this._ctorClassDef.getMemberTypeByName("constructor", false, ClassDefinition.GET_MEMBER_MODE_CLASS_ONLY);
+		var ctorType = this.getConstructingClassDef().getMemberTypeByName("constructor", false, ClassDefinition.GET_MEMBER_MODE_CLASS_ONLY);
 		if (ctorType == null) {
 			if (this._args.length != 0) {
-				context.errors.push(new CompileError(this._qualifiedName.getToken(), "no function with matching arguments"));
+				context.errors.push(new CompileError(this.getToken().getToken(), "no function with matching arguments"));
 				return true;
 			}
 			ctorType = new ResolvedFunctionType(Type.voidType, [], false); // implicit constructor
-		} else if ((ctorType = ctorType.deduceByArgumentTypes(context, this._qualifiedName.getToken(), argTypes, false)) == null) {
+		} else if ((ctorType = ctorType.deduceByArgumentTypes(context, this.getToken(), argTypes, false)) == null) {
 			// error is reported by callee
 			return true;
 		}
-		this._ctorType = ctorType;
+		this._ctorFunctionType = ctorType;
 		return true;
 	},
 
@@ -199,6 +194,10 @@ var ExpressionStatement = exports.ExpressionStatement = UnaryExpressionStatement
 		UnaryExpressionStatement.prototype.constructor.call(this, expr);
 	},
 
+	clone: function () {
+		return new ExpressionStatement(this._expr.clone());
+	},
+
 	serialize: function () {
 		return [
 			"ExpressionStatement",
@@ -214,6 +213,10 @@ var ReturnStatement = exports.ReturnStatement = Statement.extend({
 		Statement.prototype.constructor.call(this);
 		this._token = token;
 		this._expr = expr; // nullable
+	},
+
+	clone: function () {
+		return new ReturnStatement(this._token, this._expr.clone());
 	},
 
 	getToken: function () {
@@ -272,6 +275,10 @@ var DeleteStatement = exports.DeleteStatement = UnaryExpressionStatement.extend(
 	constructor: function (token, expr) {
 		UnaryExpressionStatement.prototype.constructor.call(this, expr);
 		this._token = token;
+	},
+
+	clone: function () {
+		return new DeleteStatement(this._token, this._expr.clone());
 	},
 
 	getToken: function () {
@@ -384,6 +391,10 @@ var BreakStatement = exports.BreakStatement = JumpStatement.extend({
 		JumpStatement.prototype.constructor.call(this, token, label);
 	},
 
+	clone: function () {
+		return new BreakStatement(this._token, this._label);
+	},
+
 	_getName: function () {
 		return "BreakStatement";
 	},
@@ -398,6 +409,10 @@ var ContinueStatement = exports.ContinueStatement = JumpStatement.extend({
 
 	constructor: function (token, label) {
 		JumpStatement.prototype.constructor.call(this, token, label);
+	},
+
+	clone: function () {
+		return new ContinueStatement(this._token, this._label);
 	},
 
 	_getName: function () {
@@ -515,6 +530,10 @@ var DoWhileStatement = exports.DoWhileStatement = ContinuableStatement.extend({
 		this._expr = expr;
 	},
 
+	clone: function () {
+		return new DoWhileStatement(this._token, this._label, this._expr.clone(), Util.cloneArray(this._statements));
+	},
+
 	getExpr: function () {
 		return this._expr;
 	},
@@ -569,6 +588,10 @@ var ForInStatement = exports.ForInStatement = ContinuableStatement.extend({
 		ContinuableStatement.prototype.constructor.call(this, token, label, statements);
 		this._lhsExpr = lhsExpr;
 		this._listExpr = listExpr;
+	},
+
+	clone: function () {
+		return new ForInStatement(this._token, this._label, this._lhsExpr.clone(), this._listExpr.clone(), Util.cloneArray(this._statements));
 	},
 
 	getLHSExpr: function () {
@@ -647,6 +670,10 @@ var ForStatement = exports.ForStatement = ContinuableStatement.extend({
 		this._initExpr = initExpr;
 		this._condExpr = condExpr;
 		this._postExpr = postExpr;
+	},
+
+	clone: function () {
+		return new ForStatement(this._token, this._label, this._initExpr.clone(), this._condExpr.clone(), this._postExpr.clone(), Util.cloneArray(this._statements));
 	},
 
 	getInitExpr: function () {
@@ -729,6 +756,10 @@ var IfStatement = exports.IfStatement = Statement.extend({
 		this._expr = expr;
 		this._onTrueStatements = onTrueStatements;
 		this._onFalseStatements = onFalseStatements;
+	},
+
+	clone: function () {
+		return new IfStatement(this._token, this._expr.clone(), Util.cloneArray(this._onTrueStatements), Util.cloneArray(this._onFalseStatements));
 	},
 
 	getToken: function () {
@@ -819,6 +850,10 @@ var SwitchStatement = exports.SwitchStatement = LabellableStatement.extend({
 		this._statements = statements;
 	},
 
+	clone: function () {
+		return new SwitchStatement(this._token, this._label, this._expr.clone(), Util.cloneARray(this._statements));
+	},
+
 	getExpr: function () {
 		return this._expr;
 	},
@@ -890,6 +925,10 @@ var CaseStatement = exports.CaseStatement = Statement.extend({
 		this._expr = expr;
 	},
 
+	clone: function () {
+		return new CaseStatement(this._token, this._expr.clone());
+	},
+
 	getToken: function () {
 		return this._token;
 	},
@@ -948,6 +987,10 @@ var DefaultStatement = exports.DefaultStatement = Statement.extend({
 		this._token = token;
 	},
 
+	clone: function () {
+		return new DefaultStatement(this._token);
+	},
+
 	getToken: function () {
 		return this._token;
 	},
@@ -974,6 +1017,10 @@ var WhileStatement = exports.WhileStatement = ContinuableStatement.extend({
 	constructor: function (token, label, expr, statements) {
 		ContinuableStatement.prototype.constructor.call(this, token, label, statements);
 		this._expr = expr;
+	},
+
+	clone: function () {
+		return new WhileStatement(this._token, this._label, this._expr.clone(), Util.cloneARray(this._statements));
 	},
 
 	getExpr: function () {
@@ -1033,6 +1080,10 @@ var TryStatement = exports.TryStatement = Statement.extend({
 		this._tryStatements = tryStatements;
 		this._catchStatements = catchStatements;
 		this._finallyStatements = finallyStatements;
+	},
+
+	clone: function () {
+		return new TryStatement(this._token, Util.cloneArray(this._tryStatements), Util.cloneArray(this._catchStatements), Util.cloneArray(this._finallyStatements));
 	},
 
 	getToken: function () {
@@ -1111,6 +1162,10 @@ var CatchStatement = exports.CatchStatement = Statement.extend({
 		this._statements = statements;
 	},
 
+	clone: function () {
+		return new CatchStatement(this._token, this._local.clone(), Util.cloneArray(this._statements));
+	},
+
 	getToken: function () {
 		return this._token;
 	},
@@ -1181,6 +1236,10 @@ var ThrowStatement = exports.ThrowStatement = Statement.extend({
 		this._expr = expr;
 	},
 
+	clone: function () {
+		return new ThrowStatement(this._token, this._expr.clone());
+	},
+
 	getToken: function () {
 		return this._token;
 	},
@@ -1240,6 +1299,10 @@ var AssertStatement = exports.AssertStatement = InformationStatement.extend({
 		this._expr = expr;
 	},
 
+	clone: function () {
+		return new AssertStatement(this._token, this._expr.clone());
+	},
+
 	getExpr: function () {
 		return this._expr;
 	},
@@ -1274,6 +1337,10 @@ var LogStatement = exports.LogStatement = InformationStatement.extend({
 	constructor: function (token, exprs) {
 		InformationStatement.prototype.constructor.call(this, token);
 		this._exprs = exprs;
+	},
+
+	clone: function () {
+		return new LogStatement(this._token, Util.cloneArray(this._exprs));
 	},
 
 	getExprs: function () {
@@ -1313,6 +1380,10 @@ var DebuggerStatement = exports.DebuggerStatement = InformationStatement.extend(
 
 	constructor: function (token) {
 		InformationStatement.prototype.constructor.call(this, token);
+	},
+
+	clone: function () {
+		return new DebuggerStatement(this._token);
 	},
 
 	serialize: function () {

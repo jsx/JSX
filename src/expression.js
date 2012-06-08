@@ -133,100 +133,99 @@ var OperatorExpression = exports.OperatorExpression = Expression.extend({
 
 // primary expressions
 
-var IdentifierExpression = exports.IdentifierExpression = LeafExpression.extend({
+var LocalExpression = exports.LocalExpression = LeafExpression.extend({
 
-	constructor: function (arg1) {
-		var Parser = require("./parser");
-		if (arg1 instanceof Parser.Token) {
-			LeafExpression.prototype.constructor.call(this, arg1);
-			this._local = null;
-		} else {
-			// local var
-			LeafExpression.prototype.constructor.call(this, arg1.getName());
-			this._local = arg1;
-		}
-		this._classDefType = null;
+	constructor: function (token, local) {
+		LeafExpression.prototype.constructor.call(this, token);
+		this._local = local;
 	},
 
 	clone: function () {
-		var ret = new IdentifierExpression(this._token);
-		ret._local = this._local;
-		ret._classDefType = this._classDefType;
-		return ret;
+		var that = new LocalExpression(this._token, this._local);
+		that._cloned = true;
+		return that;
 	},
 
 	getLocal: function () {
 		return this._local;
 	},
 
+	setLocal: function (local) {
+		this._local = local;
+	},
+
 	serialize: function () {
-		if (this._local != null)
-			return [
-				"IdentifierExpression",
-				this._token.serialize(),
-				"local",
-				Util.serializeNullable(this._local)
-			];
-		else
-			return [
-				"IdentifierExpression",
-				this._token.serialize(),
-				"classDef"
-			];
+		return [
+			"LocalExpression",
+			this._token.serialize(),
+			this._local.serialize()
+		];
 	},
 
 	analyze: function (context, parentExpr) {
-		// if it is an access to local variable, return ok
-		if (context.funcDef != null && (this._local = context.funcDef.getLocal(context, this._token.getValue())) != null) {
-			// check that the variable is readable
-			if ((parentExpr instanceof AssignmentExpression && parentExpr.getFirstExpr() == this)
-				|| (parentExpr == null && context.statement instanceof Statement.ForInStatement && context.statement.getLHSExpr() == this)) {
-				// is LHS
-			} else {
-				this._local.touchVariable(context, this._token, false);
-				if (this._local.getType() == null)
-					return false;
-			}
-			return true;
+		// check that the variable is readable
+		if ((parentExpr instanceof AssignmentExpression && parentExpr.getFirstExpr() == this)
+			|| (parentExpr == null && context.statement instanceof Statement.ForInStatement && context.statement.getLHSExpr() == this)) {
+			// is LHS
+		} else {
+			this._local.touchVariable(context, this._token, false);
+			if (this._local.getType() == null)
+				return false;
 		}
-		// access to class
-		var classDef = context.parser.lookup(context.errors, this._token, this._token.getValue());
-		if (classDef == null) {
-			if (context.funcDef != null)
-				context.errors.push(new CompileError(this._token, "local variable '" + this._token.getValue() + "' is not declared"));
-			else
-				context.errors.push(new CompileError(this._token, "could not find definition of class '" + this._token.getValue() + "'"));
-			return false;
-		}
-		this._classDefType = new ClassDefType(classDef);
 		return true;
 	},
 
 	getType: function () {
-		if (this._local != null)
-			return this._local.getType();
-		else
-			return this._classDefType;
+		return this._local.getType();
 	},
 
 	assertIsAssignable: function (context, token, type) {
-		if (this._local != null) {
-			if (this._local.getType() == null) {
-				if (type.equals(Type.undefinedType)) {
-					context.errors.push(new CompileError(token, "cannot assign an undefined type to a value of undetermined type"));
-					return false;
-				}
-				this._local.setType(type.asAssignableType());
-			} else if (! type.isConvertibleTo(this._local.getType())) {
-				context.errors.push(new CompileError(token, "cannot assign a value of type '" + type.toString() + "' to '" + this._local.getType() + "'"));
+		if (this._local.getType() == null) {
+			if (type.equals(Type.undefinedType)) {
+				context.errors.push(new CompileError(token, "cannot assign an undefined type to a value of undetermined type"));
 				return false;
 			}
-			this._local.touchVariable(context, this._token, true);
-		} else {
-			context.errors.push(new CompileError(token, "cannot modify a class definition"));
+			this._local.setType(type.asAssignableType());
+		} else if (! type.isConvertibleTo(this._local.getType())) {
+			context.errors.push(new CompileError(token, "cannot assign a value of type '" + type.toString() + "' to '" + this._local.getType() + "'"));
 			return false;
 		}
+		this._local.touchVariable(context, this._token, true);
 		return true;
+	}
+
+});
+
+var ClassExpression = exports.ClassExpression = LeafExpression.extend({
+
+	constructor: function (token, parsedType) {
+		LeafExpression.prototype.constructor.call(this, token);
+		this._parsedType = parsedType;
+	},
+
+	clone: function () {
+		return new ClassExpression(this._token, this._parsedType);
+	},
+
+	serialize: function () {
+		return [
+			"ClassExpression",
+			this._token.serialize(),
+			this._parsedType.serialize()
+		];
+	},
+
+	analyze: function (context, parentExpr) {
+		return true;
+	},
+
+	getType: function () {
+		return this._parsedType;
+	},
+
+	assertIsAssignable: function (context, token, type) {
+		context.errors.push(new CompileError(token, "cannot modify a class definition"));
+		return false;
 	}
 
 });
@@ -597,6 +596,7 @@ var MapLiteralExpression = exports.MapLiteralExpression = Expression.extend({
 				context.errors.push(new CompileError(this._token, "specified type is not a hash type"));
 				return false;
 			}
+			var expectedType = this._type.getTypeArguments()[0];
 		} else {
 			for (var i = 0; i < this._elements.length; ++i) {
 				var elementType = this._elements[i].getExpr().getType();
@@ -607,6 +607,7 @@ var MapLiteralExpression = exports.MapLiteralExpression = Expression.extend({
 					if (instantiatedClass == null)
 						return false;
 					this._type = new ObjectType(instantiatedClass);
+					expectedType = elementType;
 					break;
 				}
 			}
@@ -616,11 +617,10 @@ var MapLiteralExpression = exports.MapLiteralExpression = Expression.extend({
 			}
 		}
 		// check type of the elements
-		var expectedType = this._type.getClassDef().getTypeArguments()[0];
 		for (var i = 0; i < this._elements.length; ++i) {
 			var elementType = this._elements[i].getExpr().getType();
 			if (! elementType.isConvertibleTo(expectedType)) {
-				context.errors.push(new CompileError(this._token, "cannot assign '" + elementType.toString() + "' to a hash of '" + expectedType.toString() + "'"));
+				context.errors.push(new CompileError(this._token, "cannot assign '" + elementType.toString() + "' to a map of '" + expectedType.toString() + "'"));
 				succeeded = false;
 			}
 		}
@@ -1050,25 +1050,6 @@ var PropertyExpression = exports.PropertyExpression = UnaryExpression.extend({
 	},
 
 	analyze: function (context, parentExpr) {
-		// special handling for import ... as
-		var imprt;
-		if (this._expr instanceof IdentifierExpression
-			&& (imprt = context.parser.lookupImportAlias(this._expr.getToken().getValue())) != null) {
-			var classDefs = imprt.getClasses(this._identifierToken.getValue());
-			switch (classDefs.length) {
-			case 1:
-				// ok
-				break;
-			case 0:
-				context.errors.push(new CompileError(this._identifierToken, "could not resolve class '" + this._expr.getToken().getValue() + "'"));
-				return null;
-			default:
-				context.errors.push(new CompileError(this._identifierToken, "multiple candidates"));
-				return null;
-			}
-			this._type = new ClassDefType(classDefs[0]);
-			return true;
-		}
 		// normal handling
 		if (! this._analyze(context))
 			return false;
@@ -1092,8 +1073,8 @@ var PropertyExpression = exports.PropertyExpression = UnaryExpression.extend({
 		}
 		this._type = classDef.getMemberTypeByName(
 			this._identifierToken.getValue(),
-			exprType instanceof ClassDefType,
-			(exprType instanceof ClassDefType) ? ClassDefinition.GET_MEMBER_MODE_CLASS_ONLY : ClassDefinition.GET_MEMBER_MODE_ALL);
+			this._expr instanceof ClassExpression,
+			(this._expr instanceof ClassExpression) ? ClassDefinition.GET_MEMBER_MODE_CLASS_ONLY : ClassDefinition.GET_MEMBER_MODE_ALL);
 		if (this._type == null) {
 			context.errors.push(new CompileError(this._identifierToken, "'" + exprType.toString() + "' does not have a property named '" + this._identifierToken.getValue() + "'"));
 			return false;
@@ -1106,8 +1087,6 @@ var PropertyExpression = exports.PropertyExpression = UnaryExpression.extend({
 	},
 
 	getHolderType: function () {
-		if (this._type instanceof ClassDefType)
-			return null;
 		var type = this._expr.getType();
 		if (type instanceof PrimitiveType)
 			type = new ObjectType(type.getClassDef());
@@ -1399,7 +1378,7 @@ var AssignmentExpression = exports.AssignmentExpression = BinaryExpression.exten
 			context.errors.push(new CompileError(this._token, "cannot assign void"));
 			return false;
 		}
-		if (rhsType instanceof ClassDefType) {
+		if (this._expr2 instanceof ClassExpression) {
 			context.errors.push(new CompileError(this._token, "cannot assign a class"));
 			return false;
 		}
@@ -1766,7 +1745,7 @@ var CallExpression = exports.CallExpression = OperatorExpression.extend({
 			return false;
 		}
 		if (this._expr instanceof PropertyExpression && ! exprType.isAssignable()) {
-			if (this._expr.deduceByArgumentTypes(context, this._token, argTypes, (this._expr.getHolderType() instanceof ClassDefType)) == null)
+			if (this._expr.deduceByArgumentTypes(context, this._token, argTypes, this._expr.getExpr() instanceof ClassExpression) == null)
 				return false;
 		} else {
 			if (this._expr.getType().resolveIfMayBeUndefined().deduceByArgumentTypes(context, this._token, argTypes, true) == null)

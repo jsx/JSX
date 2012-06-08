@@ -264,10 +264,10 @@ var _LinkTimeOptimizationCommand = exports._LinkTimeOptimizationCommand = _Optim
 	performOptimization: function () {
 		// set extendedBy for every class
 		this.getCompiler().forEachClassDef(function (parser, classDef) {
-			if (classDef.extendClassDef() != null)
-				this.getStash(classDef.extendClassDef()).extendedBy.push(classDef);
-			for (var i = 0; i < classDef.implementClassDefs().length; ++i)
-				this.getStash(classDef.implementClassDefs()[i]).extendedBy.push(classDef);
+			if (classDef.extendType() != null)
+				this.getStash(classDef.extendType().getClassDef()).extendedBy.push(classDef);
+			for (var i = 0; i < classDef.implementTypes().length; ++i)
+				this.getStash(classDef.implementTypes()[i].getClassDef()).extendedBy.push(classDef);
 			return true;
 		}.bind(this));
 		// mark classes / functions that are not derived / overridden as final
@@ -427,7 +427,7 @@ var _DetermineCalleeCommand = exports._DetermineCalleeCommand = _FunctionOptimiz
 								holderType.getClassDef(),
 								calleeExpr.getIdentifierToken().getValue(),
 								calleeExpr.getType().getArgumentTypes(),
-								holderType instanceof ClassDefType);
+								calleeExpr.getExpr() instanceof ClassExpression);
 						this._setCallingFuncDef(expr, callingFuncDef);
 					} else if (calleeExpr instanceof FunctionExpression) {
 						this._setCallingFuncDef(expr, calleeExpr.getFuncDef());
@@ -522,7 +522,7 @@ var _FoldConstantCommand = exports._FoldConstantCommand = _FunctionOptimizeComma
 
 			// property expression
 			var holderType = expr.getHolderType();
-			if (holderType instanceof ClassDefType) {
+			if (expr.getExpr() instanceof ClassExpression) {
 				var member = null;
 				holderType.getClassDef().forEachMemberVariable(function (m) {
 					if (m instanceof MemberVariableDefinition && m.name() == expr.getIdentifierToken().getValue())
@@ -875,19 +875,19 @@ var _InlineOptimizeCommand = exports._InlineOptimizeCommand = _FunctionOptimizeC
 
 	_lhsHasNoSideEffects: function (lhsExpr) {
 		// FIXME may have side effects if is a native type (or extends a native type)
-		if (lhsExpr instanceof IdentifierExpression)
+		if (lhsExpr instanceof LocalExpression)
 			return true;
 		if (lhsExpr instanceof PropertyExpression) {
 			var holderExpr = lhsExpr.getExpr();
 			if (holderExpr instanceof ThisExpression)
 				return true;
-			if (holderExpr instanceof IdentifierExpression)
+			if (holderExpr instanceof LocalExpression || holderExpr instanceof ClassExpression)
 				return true;
 		} else if (lhsExpr instanceof ArrayExpression) {
-			if (lhsExpr.getFirstExpr() instanceof IdentifierExpression
+			if (lhsExpr.getFirstExpr() instanceof LocalExpression
 				&& (lhsExpr.getSecondExpr() instanceof NumberLiteralExpression
 					|| lhsExpr.getSecondExpr() instanceof StringLiteralExpression
-					|| lhsExpr.getSecondExpr() instanceof IdentifierExpression))
+					|| lhsExpr.getSecondExpr() instanceof LocalExpression))
 				return true;
 		}
 		return false;
@@ -909,7 +909,7 @@ var _InlineOptimizeCommand = exports._InlineOptimizeCommand = _FunctionOptimizeC
 			receiverExpr = calleeExpr.getExpr();
 			if (asExpression) {
 				// receiver should not have side effecets
-				if (! (receiverExpr instanceof IdentifierExpression || receiverExpr instanceof ThisExpression)) {
+				if (! (receiverExpr instanceof LocalExpression || receiverExpr instanceof ThisExpression)) {
 					return null;
 				}
 			}
@@ -925,7 +925,7 @@ var _InlineOptimizeCommand = exports._InlineOptimizeCommand = _FunctionOptimizeC
 				return null;
 			var modifiesArgs = ! Util.forEachStatement(function onStatement(statement) {
 				var onExpr = function onExpr(expr) {
-					if (expr instanceof AssignmentExpression && expr.getFirstExpr() instanceof IdentifierExpression)
+					if (expr instanceof AssignmentExpression && expr.getFirstExpr() instanceof LocalExpression)
 						return false;
 					return expr.forEachExpression(onExpr.bind(this));
 				};
@@ -1026,7 +1026,7 @@ var _InlineOptimizeCommand = exports._InlineOptimizeCommand = _FunctionOptimizeC
 		stmtIndex = this._createVars(callerFuncDef, statements, stmtIndex, calleeFuncDef, argsAndThisAndLocals);
 		var calleeStatements = calleeFuncDef.getStatements();
 		for (var i = 0; i < calleeStatements.length; ++i) {
-			// clone the statement
+			// clone the statement (while rewriting last return statement to an expression statement)
 			var statement = new ExpressionStatement(calleeStatements[i].getExpr().clone());
 			// replace the arguments with actual arguments
 			statement.forEachExpression(function onExpr(expr, replaceCb) {
@@ -1060,7 +1060,7 @@ var _InlineOptimizeCommand = exports._InlineOptimizeCommand = _FunctionOptimizeC
 		var locals = calleeFuncDef.getLocals();
 		for (var i = 0; i < locals.length; ++i) {
 			var tempVar = this._createVar(callerFuncDef, locals[i].getType(), locals[i].getName().getValue());
-			argsAndThisAndLocals.push(new IdentifierExpression(tempVar));
+			argsAndThisAndLocals.push(new LocalExpression(tempVar.getName(), tempVar));
 		}
 		return stmtIndex;
 	},
@@ -1077,10 +1077,10 @@ var _InlineOptimizeCommand = exports._InlineOptimizeCommand = _FunctionOptimizeC
 			new ExpressionStatement(
 				new AssignmentExpression(
 					new Token("=", false),
-					new IdentifierExpression(newLocal),
+					new LocalExpression(newLocal.getName(), newLocal),
 					expr)));
 		// return an expression referring the the local
-		return new IdentifierExpression(newLocal);
+		return new LocalExpression(newLocal.getName(), newLocal);
 	},
 
 	_createVar: function (callerFuncDef, type, baseName) {
@@ -1101,7 +1101,7 @@ var _InlineOptimizeCommand = exports._InlineOptimizeCommand = _FunctionOptimizeC
 
 	_rewriteExpression: function (expr, replaceCb, argsAndThisAndLocals, calleeFuncDef) {
 		var formalArgs = calleeFuncDef.getArguments();
-		if (expr instanceof IdentifierExpression && expr.getLocal() != null) {
+		if (expr instanceof LocalExpression) {
 			for (var j = 0; j < formalArgs.length; ++j) {
 				if (formalArgs[j].getName().getValue() == expr.getToken().getValue())
 					break;

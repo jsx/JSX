@@ -354,9 +354,9 @@ var Compiler = exports.Compiler = Class.extend({
 			throw new Error("logic error, could not find class definition of '" + deps[0].className() + "'");
 		};
 		for (var i = 0; i < classDefs.length;) {
-			var deps = classDefs[i].implementClassDefs().concat([]);
-			if (classDefs[i].extendClassDef() != null)
-				deps.unshift(classDefs[i].extendClassDef());
+			var deps = classDefs[i].implementTypes().map(function (t) { return t.getClassDef(); }).concat([]);
+			if (classDefs[i].extendType() != null)
+				deps.unshift(classDefs[i].extendType().getClassDef());
 			var maxIndexOfClasses = getMaxIndexOfClasses(deps);
 			if (maxIndexOfClasses > i) {
 				classDefs.splice(maxIndexOfClasses + 1, 0, classDefs[i]);
@@ -376,6 +376,15 @@ var Compiler = exports.Compiler = Class.extend({
 				classDefs[i].setOutputClassName(className);
 			}
 		}
+		// escape the instantiated class names
+		for (var i = 0; i < classDefs.length; ++i) {
+			if ((classDefs[i].flags() & ClassDefinition.IS_NATIVE) == 0
+				&& classDefs[i] instanceof InstantiatedClassDefinition) {
+				classDefs[i].setOutputClassName(
+					classDefs[i].getOutputClassName().replace(/\.</g, "$$").replace(/>/g, "$E").replace(/,\s*/g,"$"));
+			}
+		}
+		// emit
 		this._emitter.emit(classDefs);
 	},
 

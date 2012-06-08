@@ -408,8 +408,8 @@ var Parser = exports.Parser = Class.extend({
 		this._locals = [];
 		this._statements = [];
 		this._closures = [];
-		this._extendName = null;
-		this._implementNames = [];
+		this._extendType = null;
+		this._implementTypes = null;
 		this._objectTypesUsed = [];
 		this._templateInstantiationRequests = [];
 
@@ -525,23 +525,33 @@ var Parser = exports.Parser = Class.extend({
 		this._classDefs.push(classDef);
 	},
 
-	_pushFunctionState: function () {
-		// FIXME use class
-		var state = {
+	_pushScope: function (args) {
+		this._prevScope = {
+			prev: this._prevScope,
 			locals: this._locals,
-			statements: this._statements,
-			closures: this._closures,
+			arguments: null,
+			statements: null,
+			closures: null
 		};
 		this._locals = [];
-		this._statements = [];
-		this._closures = [];
-		return state;
+		if (args != null) {
+			this._prevScope.arguments = this._arguments;
+			this._arguments = args;
+			this._prevScope.statements = this._statements;
+			this._statements = [];
+			this._prevScope.closures = this._closures;
+			this._closures = [];
+		}
 	},
 
-	_restoreFunctionState: function (state) {
-		this._locals = state.locals;
-		this._statements = state.statements;
-		this._closures = state.closures;
+	_popScope: function () {
+		this._locals = this._prevScope.locals;
+		if (this._prevScope.arguments != null) {
+			this._arguments = this._prevScope.arguments;
+			this._statements = this._prevScope.statements;
+			this._closures = this._prevScope.closures;
+		}
+		this._prevScope = this._prevScope.prev;
 	},
 
 	_registerLocal: function (identifierToken, type) {
@@ -549,10 +559,12 @@ var Parser = exports.Parser = Class.extend({
 			if (this._locals[i].getName().getValue() == identifierToken.getValue()) {
 				if (type != null && ! this._locals[i].getType().equals(type))
 					this._newError("conflicting types for variable " + identifierToken.getValue());
-				return;
+				return this._locals[i];
 			}
 		}
-		this._locals.push(new LocalVariable(identifierToken, type));
+		var newLocal = new LocalVariable(identifierToken, type);
+		this._locals.push(newLocal);
+		return newLocal;
 	},
 
 	_preserveState: function () {
@@ -566,6 +578,10 @@ var Parser = exports.Parser = Class.extend({
 			numErrors: this._errors.length,
 			// closures
 			numClosures: this._closures.length,
+			// objectTypesUsed
+			numObjectTypesUsed: this._objectTypesUsed.length,
+			// templateInstantiationrequests
+			numTemplateInstantiationRequests: this._templateInstantiationRequests.length
 		};
 	},
 
@@ -575,6 +591,8 @@ var Parser = exports.Parser = Class.extend({
 		this._tokenLength = state.tokenLength;
 		this._errors.length = state.numErrors;
 		this._closures.splice(state.numClosures);
+		this._objectTypesUsed.splice(state.numObjectTypesUsed);
+		this._templateInstantiationRequests.splice(state.numTemplateInstantiationRequests);
 	},
 
 	// this is column offset, and is thus zero-origin
@@ -768,6 +786,10 @@ var Parser = exports.Parser = Class.extend({
 		}
 		if ((token = this._expectIdentifier()) == null)
 			return null;
+		return this._qualifiedNameStartingWith(token);
+	},
+
+	_qualifiedNameStartingWith: function (token) {
 		var imprt = this.lookupImportAlias(token.getValue());
 		if (imprt != null) {
 			if (this._expect(".") == null)
@@ -840,8 +862,8 @@ var Parser = exports.Parser = Class.extend({
 	},
 
 	_classDefinition: function () {
-		this._extendName = null;
-		this._implementNames = [];
+		this._extendType = null;
+		this._implementTypes = [];
 		this._objectTypesUsed = [];
 		// attributes* class
 		var flags = 0;
@@ -911,9 +933,13 @@ var Parser = exports.Parser = Class.extend({
 		}
 		// extends
 		if ((flags & (ClassDefinition.IS_INTERFACE | ClassDefinition.IS_MIXIN)) == 0) {
-			if (this._expectOpt("extends") != null)
-				if ((this._extendName = this._qualifiedName(false)) == null)
+			if (this._expectOpt("extends") != null) {
+				if ((this._extendType = this._objectTypeDeclaration(null)) == null)
 					return false;
+			} else if (className.getValue() != "Object") {
+				this._extendType = new ParsedObjectType(new QualifiedName(new Token("Object", true), null), []);
+				this._objectTypesUsed.push(this._extendType);
+			}
 		} else {
 			if ((flags & (ClassDefinition.IS_ABSTRACT | ClassDefinition.IS_FINAL | ClassDefinition.IS_NATIVE)) != 0) {
 				this._newError("interface or mixin cannot have attributes: 'abstract', 'final', 'native");
@@ -923,10 +949,10 @@ var Parser = exports.Parser = Class.extend({
 		// implements
 		if (this._expectOpt("implements") != null) {
 			do {
-				var name = this._qualifiedName(false);
-				if (name == null)
+				var implementType = this._objectTypeDeclaration(null);
+				if (implementType == null)
 					return false;
-				this._implementNames.push(name);
+				this._implementTypes.push(implementType);
 			} while (this._expectOpt(",") != null);
 		}
 		// body
@@ -938,7 +964,7 @@ var Parser = exports.Parser = Class.extend({
 		while (this._expectOpt("}") == null) {
 			if (! this._expectIsNotEOF())
 				return false;
-			var member = this._memberDefinition(flags);
+			var member = this._memberDefinition(flags, typeArgs != null);
 			if (member != null) {
 				for (var i = 0; i < members.length; ++i) {
 					if (member.name() == members[i].name()
@@ -998,13 +1024,13 @@ var Parser = exports.Parser = Class.extend({
 
 		// done
 		if (typeArgs != null)
-			this._templateClassDefs.push(new TemplateClassDefinition(className.getValue(), flags, typeArgs, this._extendName, this._implementNames, members, this._objectTypesUsed));
+			this._templateClassDefs.push(new TemplateClassDefinition(className.getValue(), flags, typeArgs, this._extendType, this._implementTypes, members, this._objectTypesUsed));
 		else
-			this._classDefs.push(new ClassDefinition(className, className.getValue(), flags, this._extendName, this._implementNames, members, this._objectTypesUsed));
+			this._classDefs.push(new ClassDefinition(className, className.getValue(), flags, this._extendType, this._implementTypes, members, this._objectTypesUsed));
 		return true;
 	},
 
-	_memberDefinition: function (classFlags) {
+	_memberDefinition: function (classFlags, isTemplate) {
 		var flags = 0;
 		while (true) {
 			var token = this._expect([ "function", "var", "static", "abstract", "override", "final", "const", "native", "__readonly__" ]);
@@ -1097,8 +1123,8 @@ var Parser = exports.Parser = Class.extend({
 		}
 		if (! this._expect(";"))
 			return null;
-		// all non-native values have initial value
-		if (initialValue == null && (classFlags & ClassDefinition.IS_NATIVE) == 0)
+		// all non-native, non-template values have initial value
+		if (! isTemplate && initialValue == null && (classFlags & ClassDefinition.IS_NATIVE) == 0)
 			initialValue = Expression.getDefaultValueExpressionOf(type);
 		return new MemberVariableDefinition(token, name, flags, type, initialValue);
 	},
@@ -1154,6 +1180,7 @@ var Parser = exports.Parser = Class.extend({
 				return null;
 		}
 		// body
+		this._arguments = args;
 		this._locals = [];
 		this._statements = [];
 		this._closures = [];
@@ -1229,20 +1256,20 @@ var Parser = exports.Parser = Class.extend({
 				throw new Error("logic flaw");
 			}
 		} else {
-			return this._objectTypeDeclaration();
+			return this._objectTypeDeclaration(null);
 		}
 	},
 
-	_objectTypeDeclaration: function () {
-		var qualifiedName = this._qualifiedName(false);
+	_objectTypeDeclaration: function (firstToken) {
+		var qualifiedName = firstToken !== null ? this._qualifiedNameStartingWith(firstToken) : this._qualifiedName(false);
 		if (qualifiedName == null)
 			return null;
-		if (this._expectOpt(".") != null) {
-			if (this._expect("<") == null)
-				return null; // nested types not yet supported
+		var state = this._preserveState();
+		if (this._expectOpt(".") != null && this._expect("<") != null) {
 			return this._templateTypeDeclaration(qualifiedName);
 		} else {
 			// object
+			this._restoreState(state);
 			var objectType = new ParsedObjectType(qualifiedName, []);
 			this._objectTypesUsed.push(objectType);
 			return objectType;
@@ -1412,19 +1439,23 @@ var Parser = exports.Parser = Class.extend({
 	},
 
 	_constructorInvocationStatement: function () {
-		// get className
-		var className = this._qualifiedName(true);
-		if (className == null)
-			return false;
-		if (! (className.getImport() == null && className.getToken().getValue() == "super")) {
-			// check if the className token designates the base class or one of the mix-ins
-			if (this._extendName != null ? this._extendName.equals(className) : className.getImport() == null && className.getToken().getValue() == "Object") {
-				// ok, is calling base class
+		// get class
+		var token;
+		if ((token = this._expectOpt("super")) != null) {
+			var classType = this._extendType;
+		} else {
+			if ((classType = this._objectTypeDeclaration(null)) == null)
+				return false;
+			token = classType.getToken();
+			if (this._extendType != null && this._extendType.equals(classType)) {
+				// ok is calling base class
 			} else {
-				for (var i = 0; i < this._implementNames.length; ++i)
-					if (this._implementNames[i].equals(className))
+				for (var i = 0; i < this._implementTypes.length; ++i) {
+					if (this._implementTypes[i].equals(classType)) {
 						break;
-				if (i == this._implementNames.length) {
+					}
+				}
+				if (i == this._implementTypes.length) {
 					// not found (and thus is not treated as a constructor invocation statement)
 					return false;
 				}
@@ -1439,7 +1470,7 @@ var Parser = exports.Parser = Class.extend({
 		if (this._expect(";") == null)
 			return false;
 		// success
-		this._statements.push(new ConstructorInvocationStatement(className, args));
+		this._statements.push(new ConstructorInvocationStatement(token, classType, args));
 		return true;
 	},
 
@@ -1692,9 +1723,15 @@ var Parser = exports.Parser = Class.extend({
 				|| this._expect(")") == null
 				|| this._expect("{") == null)
 				return false;
-			if (this._block() == null)
+			var caughtVariable = new CaughtVariable(catchIdentifier, catchType);
+			this._pushScope(null);
+			this._locals.push(caughtVariable);
+			if (this._block() == null) {
+				this._popScope();
 				return false;
-			catchStatements.push(new CatchStatement(catchOrFinallyToken, new CaughtVariable(catchIdentifier, catchType), this._statements.splice(startIndex)));
+			}
+			this._popScope();
+			catchStatements.push(new CatchStatement(catchOrFinallyToken, caughtVariable, this._statements.splice(startIndex)));
 		}
 		if (catchOrFinallyToken != null) {
 			// finally
@@ -1769,7 +1806,7 @@ var Parser = exports.Parser = Class.extend({
 			if (declExpr == null)
 				return null;
 			// do not push variable declarations wo. assignment
-			if (! (declExpr instanceof IdentifierExpression))
+			if (! (declExpr instanceof LocalExpression))
 				expr = expr != null ? new CommaExpression(commaToken, expr, declExpr) : declExpr;
 		} while ((commaToken = this._expectOpt(",")) != null);
 		isSuccess[0] = true;
@@ -1784,13 +1821,15 @@ var Parser = exports.Parser = Class.extend({
 		if (this._expectOpt(":"))
 			if ((type = this._typeDeclaration(false)) == null)
 				return null;
+		// FIXME value should be registered after parsing the initialization expression, but that prevents: var f = function () : void { f(); };
+		var local = this._registerLocal(identifier, type);
+		// parse initial value (optional)
 		var initialValue = null;
 		var assignToken;
 		if ((assignToken = this._expectOpt("=")) != null)
 			if ((initialValue = this._assignExpr(noIn)) == null)
 				return null;
-		this._registerLocal(identifier, type);
-		var expr = new IdentifierExpression(identifier);
+		var expr = new LocalExpression(identifier, local);
 		if (initialValue != null)
 			expr = new AssignmentExpression(assignToken, expr, initialValue);
 		return expr;
@@ -2108,16 +2147,42 @@ var Parser = exports.Parser = Class.extend({
 		if (this._expect("{") == null)
 			return null;
 		// parse function block
-		var state = this._pushFunctionState();
+		var state = this._pushScope(args);
 		var lastToken = this._block();
 		if (lastToken == null) {
-			this._restoreFunctionState(state);
+			this._popScope();
 			return null;
 		}
 		var funcDef = new MemberFunctionDefinition(token, null, ClassDefinition.IS_STATIC, returnType, args, this._locals, this._statements, this._closures, lastToken);
-		this._restoreFunctionState(state);
+		this._popScope();
 		this._closures.push(funcDef);
 		return new FunctionExpression(token, funcDef);
+	},
+
+	_findLocal: function (name) {
+		// helper function
+		var findFromScope = function (locals, args) {
+			for (var i = 0; i < locals.length; ++i) {
+				if (locals[i].getName().getValue() == name)
+					return locals[i];
+			}
+			if (args != null) {
+				for (var i = 0; i < args.length; ++i) {
+					if (args[i].getName().getValue() == name)
+						return args[i];
+				}
+			}
+			return null;
+		};
+		// find
+		var found;
+		if ((found = findFromScope(this._locals, this._arguments)) != null)
+			return found;
+		for (var scope = this._prevScope; scope != null; scope = scope.prev) {
+			if ((found = findFromScope(scope.locals, scope.arguments)) != null)
+				return found;
+		}
+		return null;
 	},
 
 	_primaryExpr: function () {
@@ -2147,7 +2212,15 @@ var Parser = exports.Parser = Class.extend({
 		} else if ((token = this._expectNumberLiteralOpt()) != null) {
 			return new NumberLiteralExpression(token);
 		} else if ((token = this._expectIdentifierOpt()) != null) {
-			return new IdentifierExpression(token);
+			var local = this._findLocal(token.getValue());
+			if (local != null) {
+				return new LocalExpression(token, local);
+			} else {
+				var parsedType = this._objectTypeDeclaration(token);
+				if (parsedType == null)
+					return null;
+				return new ClassExpression(parsedType.getToken(), parsedType);
+			}
 		} else if ((token = this._expectStringLiteralOpt()) != null) {
 			return new StringLiteralExpression(token);
 		} else if ((token = this._expectRegExpLiteralOpt()) != null) {
