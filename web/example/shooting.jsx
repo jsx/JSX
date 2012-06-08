@@ -456,7 +456,7 @@ final class Stage {
 			var cx = canvas.getContext("2d") as CanvasRenderingContext2D;
             assert cx != null;
 			cx.drawImage(image, 0, 0);
-			this.images[image.dataset["name"]] = canvas;
+			this.images[image.name] = canvas;
 
 			if(++loadedCount == this.imageName.length) {
 				this.initialize();
@@ -467,7 +467,7 @@ final class Stage {
 			var image = dom.createElement("img") as HTMLImageElement;
 			image.addEventListener("load", checkLoad);
 			image.src = Config.imagePath + "/" + name + ".png";
-			image.dataset["name"] = name;
+			image.name = name;
 		}
 
 		var touchStart = function(e : Event) : void {
