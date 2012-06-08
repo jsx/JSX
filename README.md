@@ -1,4 +1,4 @@
-NAME
+NAME [![Build Status](https://secure.travis-ci.org/jsx/JSX.png)](http://travis-ci.org/jsx/JSX.png)
 =======================
 
 JSX - Object-oriented, statically-typed programming language for browsers
@@ -13,6 +13,9 @@ To setup JSX SDK , type the following command:
     git clone git://github.com/jsx/JSX.git
     cd JSX
     make setup
+
+For JSX developers, you can do `make test` to test the compilers and standard class libraries.
+
 
 COMPILATION
 =======================

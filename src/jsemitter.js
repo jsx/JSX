@@ -1620,6 +1620,7 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 	constructor: function (platform) {
 		this._platform = platform;
 		this._output = this._platform.load(this._platform.getRoot() + "/src/js/bootstrap.js");
+		this._outputEndsWithReturn = this._output.match(/\n$/) != null;
 		this._outputFile = null;
 		this._indent = 0;
 		this._emittingClass = null;
@@ -1971,8 +1972,10 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 	_emit: function (str, token) {
 		if (str == "")
 			return;
-		if (this._output.charAt(this._output.length - 1) == "\n")
+		if (this._outputEndsWithReturn && this._indent != 0) {
 			this._output += this._getIndent();
+			this._outputEndsWithReturn = false;
+		}
 		// optional source map
 		if(this._sourceMapGen != null && token != null) {
 			var outputLines = this._output.split(/^/m);
@@ -1991,7 +1994,9 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 			this._sourceMapGen.add(genPos, origPos,
 								   token.getFilename(), tokenValue);
 		}
-		this._output += str.replace(/\n(.)/g, (function (a, m) { return "\n" + this._getIndent() + m; }).bind(this));
+		str = str.replace(/\n(.)/g, (function (a, m) { return "\n" + this._getIndent() + m; }).bind(this));
+		this._output += str;
+		this._outputEndsWithReturn = str.charAt(str.length - 1) == "\n";
 	},
 
 	_advanceIndent: function () {
