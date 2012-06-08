@@ -1214,7 +1214,8 @@ var CatchStatement = exports.CatchStatement = Statement.extend({
 		} finally {
 			context.blockStack.pop();
 		}
-		context.getTopBlock().localVariableStatuses = context.getTopBlock().localVariableStatuses.merge(lvStatusesAfterCatch);
+		if (lvStatusesAfterCatch != null)
+			context.getTopBlock().localVariableStatuses = context.getTopBlock().localVariableStatuses.merge(lvStatusesAfterCatch);
 		return true;
 	},
 
