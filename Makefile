@@ -11,6 +11,11 @@ setup:
 test:
 	prove --jobs "$(JOBS)" t/*.t t/*/*.jsx
 
+test-optimized:
+		JSX_OPTS="--optimize lto,no-assert,fold-const,return-if,inline" prove --jobs "$(JOBS)" t/*/*.jsx
+
+test-all: test test-optimized
+
 optimize-bench:
 	prove xt/optimize-bench/*.jsx
 
