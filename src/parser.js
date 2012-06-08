@@ -790,6 +790,10 @@ var Parser = exports.Parser = Class.extend({
 	},
 
 	_qualifiedNameStartingWith: function (token) {
+		if (token.getValue() == "variant") {
+			this._errors.push(new CompileError(token, "cannot use 'variant' as a class name"));
+			return null;
+		}
 		var imprt = this.lookupImportAlias(token.getValue());
 		if (imprt != null) {
 			if (this._expect(".") == null)
@@ -1224,6 +1228,7 @@ var Parser = exports.Parser = Class.extend({
 					return null;
 				if (this._expect(">") == null)
 					return null;
+if (baseType.equals(Type.variantType)) throw new Error("Hmm");
 				typeDecl = baseType.toMayBeUndefinedType();
 				break;
 			case "variant":
