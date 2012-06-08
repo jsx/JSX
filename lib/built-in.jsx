@@ -114,7 +114,7 @@ native final class String {
 	override function toString() : string;
 	function valueOf() : string;
 	function charAt(pos : int) : string;
-	function charCodeAt(pos : int) : int;
+	function charCodeAt(pos : int) : number;
 	function concat(string1 : String) : string; // FIXME support vararg
 	function indexOf(searchString : string) : int;
 	function indexOf(searchString : string, position : int) : int;
