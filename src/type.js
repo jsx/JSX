@@ -396,7 +396,7 @@ var ParsedObjectType = exports.ParsedObjectType = ObjectType.extend({
 			} else {
 				// get the already-instantiated class (FIXME refactor, or should we move QualifiedName#getClass to somewhere else?)
 				if ((this._classDef = context.parser.lookup(context.errors, this._qualifiedName.getToken(), this.toString())) == null)
-					context.errors.push(new CompileError(this._token, "'" + this.toString() + "' is not defined"));
+					context.errors.push(new CompileError(this._qualifiedName.getToken(), "'" + this.toString() + "' is not defined"));
 			}
 		}
 	},

@@ -447,6 +447,10 @@ var ArrayLiteralExpression = exports.ArrayLiteralExpression = Expression.extend(
 		return this._type;
 	},
 
+	setType: function (type) {
+		this._type = type;
+	},
+
 	serialize: function () {
 		return [
 			"ArrayLiteralExpression",
@@ -564,6 +568,10 @@ var MapLiteralExpression = exports.MapLiteralExpression = Expression.extend({
 
 	getType: function () {
 		return this._type;
+	},
+
+	setType: function (type) {
+		this._type = type;
 	},
 
 	serialize: function () {
@@ -891,6 +899,10 @@ var AsExpression = exports.AsExpression = UnaryExpression.extend({
 
 	getType: function () {
 		return this._type;
+	},
+
+	setType: function (type) {
+		this._type = type;
 	}
 
 });
@@ -928,6 +940,10 @@ var AsNoConvertExpression = exports.AsNoConvertExpression = UnaryExpression.exte
 
 	getType: function () {
 		return this._type;
+	},
+
+	setType: function (type) {
+		this._type = type;
 	}
 
 });
@@ -1899,6 +1915,10 @@ var NewExpression = exports.NewExpression = OperatorExpression.extend({
 
 	getType: function () {
 		return this._type;
+	},
+
+	setType: function (type) {
+		this._type = type;
 	},
 
 	getConstructor: function () {

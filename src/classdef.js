@@ -922,7 +922,7 @@ var MemberFunctionDefinition = exports.MemberFunctionDefinition = MemberDefiniti
 						++stmtIndex;
 				} else {
 					// insert call to the default constructor
-					if (baseClassType.getClassDef().getToken().getValue() == "Object") {
+					if (baseClassType.getClassDef().className() == "Object") {
 						// we can omit the call
 					} else if (baseClassType.getClassDef().hasDefaultConstructor()) {
 						var ctorStmt = new Statement.ConstructorInvocationStatement(this._token, baseClassType, []);
@@ -1268,8 +1268,6 @@ var LocalVariableStatuses = exports.LocalVariableStatuses = Class.extend({
 var TemplateClassDefinition = exports.TemplateClassDefinition = Class.extend({
 
 	constructor: function (className, flags, typeArgs, extendType, implementTypes, members, objectTypesUsed) {
-		if (extendType.getToken().getValue() != "Object" || implementTypes.length != 0)
-			throw new Error("not supported" + extendType.getToken().getValue());
 		this._className = className;
 		this._flags = flags;
 		this._typeArgs = typeArgs;
