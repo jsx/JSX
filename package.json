@@ -29,6 +29,6 @@
     "node": ">= 0.6.0"
   },
   "scripts" : {
-      "test" : "make test"
+      "test" : "make test-all JOBS=1"
   }
 }
