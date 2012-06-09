@@ -1,6 +1,6 @@
 class T {
 	static function f() : void {
-		if (1)
+		if (T.f())
 			;
 	}
 }

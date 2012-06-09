@@ -793,8 +793,8 @@ var IfStatement = exports.IfStatement = Statement.extend({
 
 	doAnalyze: function (context) {
 		if (this._analyzeExpr(context, this._expr))
-			if (! this._expr.getType().equals(Type.booleanType))
-				context.errors.push(new CompileError(this._expr.getToken(), "expression of the if statement should return a boolean"));
+			if (this._expr.getType().resolveIfMayBeUndefined().equals(Type.voidType))
+				context.errors.push(new CompileError(this._expr.getToken(), "expression of the if statement should not return void"));
 		// if the expr is true
 		context.blockStack.push(new BlockContext(context.getTopBlock().localVariableStatuses.clone(), this));
 		try {

@@ -961,8 +961,10 @@ var LogicalNotExpression = exports.LogicalNotExpression = UnaryExpression.extend
 	analyze: function (context, parentExpr) {
 		if (! this._analyze(context))
 			return false;
-		if (! this.assertIsConvertibleTo(context, this._expr, Type.booleanType, false))
+		if (this._expr.getType().resolveIfMayBeUndefined().equals(Type.voidType)) {
+			context.errors.push(new CompileError(this._token, "cannot apply operator '!' against void"));
 			return false;
+		}
 		return true;
 	},
 
@@ -1594,10 +1596,14 @@ var LogicalExpression = exports.LogicalExpression = BinaryExpression.extend({
 	analyze: function (context, parentExpr) {
 		if (! this._analyze(context))
 			return false;
-		if (! this.assertIsConvertibleTo(context, this._expr1, Type.booleanType, false))
+		if (this._expr1.getType().resolveIfMayBeUndefined().equals(Type.voidType)) {
+			context.errors.push(new CompileError(this._token, "left argument of operator '" + this._token.getValue() + "' cannot be void"));
 			return false;
-		if (! this.assertIsConvertibleTo(context, this._expr2, Type.booleanType, false))
+		}
+		if (this._expr2.getType().resolveIfMayBeUndefined().equals(Type.voidType)) {
+			context.errors.push(new CompileError(this._token, "right argument of operator '" + this._token.getValue() + "' cannot be void"));
 			return false;
+		}
 		return true;
 	},
 

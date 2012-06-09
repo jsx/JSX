@@ -82,6 +82,43 @@ var _Util = exports._Util = Class.extend({
 			emitter._emit(label.getValue() + ":\n", label);
 			emitter._advanceIndent();
 		}
+	},
+
+	$setupBooleanizeFlags: function (funcDef) {
+		funcDef.forEachStatement(function onStatement(statement) {
+			var parentExpr = []; // [0] is stack top
+			statement.forEachExpression(function onExpr(expr) {
+				if (expr instanceof LogicalExpression) {
+					var shouldBooleanize = true;
+					if (parentExpr.length == 0) {
+						if (statement instanceof ExpressionStatement
+							|| statement instanceof IfStatement
+							|| statement instanceof DoWhileStatement
+							|| statement instanceof WhileStatement
+							|| statement instanceof ForStatement) {
+							shouldBooleanize = false;
+						}
+					} else if (parentExpr[0] instanceof LogicalExpression
+						|| parentExpr[0] instanceof LogicalNotExpression) {
+						shouldBooleanize = false;
+					} else if (parentExpr[0] instanceof ConditionalExpression && parentExpr[0].getCondExpr() == expr) {
+						shouldBooleanize = false;
+					}
+					expr.getOptimizerStash()["jsemitter"] = {
+						shouldBooleanize: shouldBooleanize
+					};
+				}
+				parentExpr.unshift(expr);
+				expr.forEachExpression(onExpr.bind(this));
+				parentExpr.shift();
+				return true;
+			});
+			return statement.forEachStatement(onStatement.bind(this));
+		});
+	},
+
+	$shouldBooleanize: function (logicalExpr) {
+		return logicalExpr.getOptimizerStash()["jsemitter"].shouldBooleanize;
 	}
 
 });
@@ -1268,6 +1305,17 @@ var _BinaryExpressionEmitter = exports._BinaryExpressionEmitter = _OperatorExpre
 		this._precedence = _BinaryExpressionEmitter._operatorPrecedence[this._expr.getToken().getValue()];
 	},
 
+	emit: function (outerOpPrecedence) {
+		if (this._expr instanceof LogicalExpression && _Util.shouldBooleanize(this._expr)) {
+			// !! is faster than Boolean, see http://jsperf.com/boolean-vs-notnot
+			this._emitter._emit("!! (", this._expr.getToken());
+			_OperatorExpressionEmitter.prototype.emit.call(this, 0);
+			this._emitter._emit(")", this._expr.getToken());
+		} else {
+			_OperatorExpressionEmitter.prototype.emit.call(this, outerOpPrecedence);
+		}
+	},
+
 	_emit: function () {
 		var opToken = this._expr.getToken();
 		var firstExpr = this._expr.getFirstExpr();
@@ -1674,6 +1722,13 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 	},
 
 	emit: function (classDefs) {
+		for (var i = 0; i < classDefs.length; ++i) {
+			classDefs[i].forEachMemberFunction(function onFuncDef(funcDef) {
+				funcDef.forEachClosure(onFuncDef);
+				_Util.setupBooleanizeFlags(funcDef);
+				return true;
+			});
+		}
 		for (var i = 0; i < classDefs.length; ++i) {
 			if ((classDefs[i].flags() & ClassDefinition.IS_NATIVE) == 0)
 				this._emitClassDefinition(classDefs[i]);
