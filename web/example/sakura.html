@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+  <!-- originated from http://jsdo.it/sasaplus1/yREo -->
+  <head>
+    <title>Curvature Sakura</title>
+    <meta name="viewport" content="width=device-width,user-scalable=no" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+    <style>
+      body {
+        margin: 0;
+      }
+    </style>
+    <script src="../jsx.combined.js"></script>
+    <script src="../assets/js/jsx-browser-platform.js"></script>
+    <script>
+      //jsx.enableOptimizations = true;
+    </script>
+    <script src="../assets/js/jsx-script-loader.js"></script>
+    <script type="application/jsx" src="sakura.jsx"></script>
+    <script>
+      window.addEventListener("load", function(e) {
+        var app = JSX.require("sakura.jsx");
+        app._Main.main$AS([]);
+      });
+    </script>
+  </head>
+  <body>
+  <canvas id="world"></canvas>
+  </body>
+<html>
