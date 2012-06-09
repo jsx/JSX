@@ -85,12 +85,28 @@ var _Util = exports._Util = Class.extend({
 	},
 
 	$setupBooleanizeFlags: function (funcDef) {
+		var exprReturnsBoolean = function (expr) {
+			if (expr instanceof LogicalExpression) {
+				return expr.getOptimizerStash()["jsemitter"].returnsBoolean;
+			} else {
+				return expr.getType().equals(Type.booleanType);
+			}
+		};
 		funcDef.forEachStatement(function onStatement(statement) {
 			var parentExpr = []; // [0] is stack top
 			statement.forEachExpression(function onExpr(expr) {
+				// handle children
+				parentExpr.unshift(expr);
+				expr.forEachExpression(onExpr.bind(this));
+				parentExpr.shift();
+				// check
 				if (expr instanceof LogicalExpression) {
 					var shouldBooleanize = true;
-					if (parentExpr.length == 0) {
+					var returnsBoolean = false;
+					if (exprReturnsBoolean(expr.getFirstExpr()) && exprReturnsBoolean(expr.getSecondExpr())) {
+						returnsBoolean = true;
+						shouldBooleanize = false;
+					} else if (parentExpr.length == 0) {
 						if (statement instanceof ExpressionStatement
 							|| statement instanceof IfStatement
 							|| statement instanceof DoWhileStatement
@@ -105,12 +121,10 @@ var _Util = exports._Util = Class.extend({
 						shouldBooleanize = false;
 					}
 					expr.getOptimizerStash()["jsemitter"] = {
-						shouldBooleanize: shouldBooleanize
+						shouldBooleanize: shouldBooleanize,
+						returnsBoolean: returnsBoolean
 					};
 				}
-				parentExpr.unshift(expr);
-				expr.forEachExpression(onExpr.bind(this));
-				parentExpr.shift();
 				return true;
 			});
 			return statement.forEachStatement(onStatement.bind(this));
