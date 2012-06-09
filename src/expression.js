@@ -1708,6 +1708,10 @@ var ConditionalExpression = exports.ConditionalExpression = OperatorExpression.e
 				|| (Type.isIntegerOrNumber(typeIfTrue.resolveIfMayBeUndefined()) && Type.isIntegerOrNumber(typeIfFalse)))) {
 			// on ?: expr (wo. true expr), left hand can be maybeundefined.<right>
 			this._type = typeIfFalse;
+		} else if (this._ifTrueExpr != null && typeIfTrue.equals(Type.nullType) && typeIfFalse instanceof ObjectType) {
+			this._type = typeIfFalse;
+		} else if (this._ifTrueExpr != null && typeIfTrue instanceof ObjectType && typeIfFalse.equals(Type.nullType)) {
+			this._type = typeIfTrue;
 		} else {
 			context.errors.push(new CompileError(this._token, "returned types should be the same for operator ?: but got '" + typeIfTrue.toString() + "' and '" + typeIfFalse.toString() + "'"));
 			return false;
