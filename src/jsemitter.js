@@ -1288,10 +1288,21 @@ var _BinaryExpressionEmitter = exports._BinaryExpressionEmitter = _OperatorExpre
 				op += "=";
 			break;
 		}
-		this._emitter._getExpressionEmitterFor(firstExpr).emit(this._precedence);
+		// emit left-hand
+		if (this._emitter._enableRunTimeTypeCheck
+			&& firstExpr instanceof MayBeUndefinedType
+			&& ! (this._expr instanceof AssignmentExpression)) {
+			this._emitExpressionWithUndefinedAssertion(firstExpr);
+		} else {
+			this._emitter._getExpressionEmitterFor(firstExpr).emit(this._precedence);
+		}
+		// emit operator
 		this._emitter._emit(" " + op + " ", opToken);
+		// emit right-hand
 		if (this._expr instanceof AssignmentExpression) {
 			this._emitter._emitRHSOfAssignment(secondExpr, firstExprType);
+		} else if (this._emitter._enableRunTimeTypeCheck && secondExpr instanceof MayBeUndefinedType) {
+			this._emitExpressionWithUndefinedAssertion(secondExpr);
 		} else {
 			// RHS should have higher precedence (consider: 1 - (1 + 1))
 			this._emitter._getExpressionEmitterFor(secondExpr).emit(this._precedence - 1);
