@@ -1389,6 +1389,8 @@ var AssignmentExpression = exports.AssignmentExpression = BinaryExpression.exten
 		// normal handling
 		if (! this._analyze(context))
 			return false;
+		if (this._token.getValue() != "=")
+			return this._analyzeFusedAssignment(context);
 		var rhsType = this._expr2.getType();
 		if (rhsType == null)
 			return false;
@@ -1426,6 +1428,17 @@ var AssignmentExpression = exports.AssignmentExpression = BinaryExpression.exten
 		if (! this._expr1.assertIsAssignable(context, this._token, rhsType))
 			return false;
 		return true;
+	},
+
+	_analyzeFusedAssignment: function (context) {
+		var lhsType = this._expr1.getType().resolveIfMayBeUndefined();
+		var rhsType = this._expr2.getType().resolveIfMayBeUndefined();
+		if (this._token.getValue() == "+=" && lhsType.equals(Type.stringType) && rhsType.equals(Type.stringType))
+			return true;
+		if (Type.isIntegerOrNumber(lhsType) && Type.isIntegerOrNumber(rhsType))
+			return true;
+		context.errors.push(new CompileError(this._token, "cannot apply operator '" + this._token.getValue() + "' against '" + this._expr1.getType().toString() + "' and '" + this._expr2.getType().toString() + "'"));
+		return false;
 	},
 
 	_analyzeFunctionExpressionAssignment: function (context, parentExpr) {
