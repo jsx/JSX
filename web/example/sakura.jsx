@@ -3,12 +3,12 @@
 // originated from http://jsdo.it/sasaplus1/yREo,
 // which is forked from http://jsdo.it/totetero/sakura
 
+import "js.jsx";
 import "js/web.jsx";
 
 class Config {
   static const NUMBER_OF_PETALS = 24;
   static const TEXTURE_FILE = "sakura.png";
-  static const FPS = 60;
 
   static const STAGE_WIDTH  = 400; // dom.window.innerWidth  for fullscreen
   static const STAGE_HEIGHT = 400; // dom.window.innerHeight for fullscreen
@@ -299,15 +299,40 @@ final class Stage {
 
     this.context.putImageData(this.canvasdat, 0, 0);
 
-    dom.window.setTimeout(function (): void {
-      this.tick();
-    }, 1000 / Config.FPS);
-
   }
 
 }
 
 final class _Main {
+
+  // hack to use requestAnimationFrame()
+
+  static function getRequestAnimationFrame() : function(tick : function(:number) : void) : void {
+
+    if(js.global["requestAnimationFrame"] != undefined) {
+      return function (tick : function(:number) : void) : void {
+        dom.window.requestAnimationFrame(tick);
+      };
+    }
+    else if(js.global["webkitRequestAnimationFrame"] != undefined) {
+      return function (tick : function(:number) : void) : void {
+        dom.window.webkitRequestAnimationFrame(tick);
+      };
+    }
+    else if(js.global["mozRequestAnimationFrame"] != undefined) {
+      return function (tick : function(:number) : void) : void {
+        dom.window.mozRequestAnimationFrame(tick);
+      };
+    }
+    else {
+      return function (tick : function(:number) : void) : void {
+        dom.window.setTimeout(function() : void { tick(0); }, 1000 / 60);
+      };
+    }
+
+  }
+
+  static const requestAnimationFrame = _Main.getRequestAnimationFrame();
 
   static function main(args : string[]) : void {
 
@@ -325,7 +350,14 @@ final class _Main {
       var texturedat = context.getImageData(0, 0, texture.width, texture.height);
 
       var stage = new Stage(world, texturedat);
-      stage.tick();
+
+      var callTick = function(elapsed : number) : void {
+        stage.tick();
+
+        _Main.requestAnimationFrame(callTick);
+      };
+
+      _Main.requestAnimationFrame(callTick);
 
     };
     img.src = Config.TEXTURE_FILE;
