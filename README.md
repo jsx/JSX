@@ -1,4 +1,4 @@
-NAME [![Build Status](https://secure.travis-ci.org/jsx/JSX.png)](http://travis-ci.org/jsx/JSX.png)
+NAME [![Build Status](https://secure.travis-ci.org/jsx/JSX.png)](http://travis-ci.org/jsx/JSX)
 =======================
 
 JSX - Object-oriented, statically-typed programming language for browsers
