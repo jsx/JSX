@@ -295,7 +295,7 @@ var _LinkTimeOptimizationCommand = exports._LinkTimeOptimizationCommand = _Optim
 						// mark functions that are not being overridden as final
 						if (funcDef.getStatements() == null)
 							throw new Error("a non-native, non-abstract function with out function body?");
-						var overrides = this._getOverrides(this.getStash(classDef).extendedBy, funcDef.name(), funcDef.getArgumentTypes());
+						var overrides = this._getOverrides(classDef, this.getStash(classDef).extendedBy, funcDef.name(), funcDef.getArgumentTypes());
 						if (overrides.length == 0) {
 							this.log("marking function as final: " + classDef.className() + "#" + funcDef.name());
 							funcDef.setFlags(funcDef.flags() | ClassDefinition.IS_FINAL);
@@ -318,15 +318,15 @@ var _LinkTimeOptimizationCommand = exports._LinkTimeOptimizationCommand = _Optim
 		}.bind(this));
 	},
 
-	_getOverrides: function (classDefs, name, argTypes) {
+	_getOverrides: function (srcClassDef, classDefs, name, argTypes) {
 		var overrides = [];
 		for (var i = 0; i < classDefs.length; ++i)
-			overrides = overrides.concat(this._getOverridesByClass(classDefs[i], name, argTypes));
+			overrides = overrides.concat(this._getOverridesByClass(srcClassDef, classDefs[i], name, argTypes));
 		return overrides;
 	},
 
-	_getOverridesByClass: function (classDef, name, argTypes) {
-		var overrides = this._getOverrides(this.getStash(classDef).extendedBy, name, argTypes);
+	_getOverridesByClass: function (srcClassDef, classDef, name, argTypes) {
+		var overrides = this._getOverrides(srcClassDef, this.getStash(classDef).extendedBy, name, argTypes);
 		var addOverride = function (funcDef) {
 			if (funcDef.name() == name
 				&& (funcDef.flags() & ClassDefinition.IS_ABSTRACT) == 0
@@ -339,9 +339,11 @@ var _LinkTimeOptimizationCommand = exports._LinkTimeOptimizationCommand = _Optim
 		classDef.forEachMemberFunction(addOverride);
 		var implementClassDefs = classDef.implementTypes().map(function (type) { return type.getClassDef(); });
 		for (var i = 0; i < implementClassDefs.length; ++i) {
-			implementClassDefs[i].forEachClassToBase(function (classDef) {
-				return classDef.forEachMemberFunction(addOverride);
-			});
+			if (srcClassDef != implementClassDefs[i]) {
+				implementClassDefs[i].forEachClassToBase(function (classDef) {
+					return classDef.forEachMemberFunction(addOverride);
+				});
+			}
 		}
 		return overrides;
 	}
