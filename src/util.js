@@ -215,6 +215,7 @@ var TemplateInstantiationRequest = exports.TemplateInstantiationRequest = Class.
 		this._token = token;
 		this._className = className;
 		this._typeArgs = typeArgs;
+		this._instantiationRequests = [];
 	},
 
 	getToken: function() {
@@ -227,6 +228,10 @@ var TemplateInstantiationRequest = exports.TemplateInstantiationRequest = Class.
 
 	getTypeArguments: function () {
 		return this._typeArgs;
+	},
+
+	getInstantiationRequests: function () {
+		return this._instantiationRequests;
 	}
 
 });

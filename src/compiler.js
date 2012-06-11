@@ -284,6 +284,11 @@ var Compiler = exports.Compiler = Class.extend({
 						return this._instantiateTemplate(errors, request, true);
 					}).bind(this)));
 		}
+		// nested instantiation
+		var requests = request.getInstantiationRequests();
+		for (var i = 0; i < requests.length; ++i) {
+			this._instantiateTemplate(errors, parser, requests[i], resolveImmmediately);
+		}
 		// return
 		return classDef;
 	},

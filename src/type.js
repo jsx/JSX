@@ -419,6 +419,8 @@ var ParsedObjectType = exports.ParsedObjectType = ObjectType.extend({
 			var actualType = instantiationContext.typemap[this._typeArguments[i].toString()];
 			typeArgs[i] = actualType != undefined ? actualType : this._typeArguments[i];
 		}
+		instantiationContext.request.getInstantiationRequests().push(
+			new TemplateInstantiationRequest(this._qualifiedName.getToken(), this._qualifiedName.getToken().getValue(), typeArgs));
 		var objectType = new ParsedObjectType(this._qualifiedName, typeArgs);
 		instantiationContext.objectTypesUsed.push(objectType);
 		return objectType;
