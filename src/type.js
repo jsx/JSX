@@ -557,9 +557,14 @@ var ResolvedFunctionType = exports.ResolvedFunctionType = FunctionType.extend({
 				if (! compareArg(this._argTypes[i], argTypes[i]))
 					return false;
 			}
-			for (; i < argTypes.length; ++i) {
-				if (! compareArg(this._argTypes[this._argTypes.length - 1].getBaseType(), argTypes[i]))
+			if (argTypes[i] instanceof VariableLengthArgumentType && argTypes.length == this._argTypes.length) {
+				if (! compareArg(this._argTypes[i].getBaseType(), argTypes[i].getBaseType()))
 					return false;
+			} else {
+				for (; i < argTypes.length; ++i) {
+					if (! compareArg(this._argTypes[this._argTypes.length - 1].getBaseType(), argTypes[i]))
+						return false;
+				}
 			}
 		} else {
 			// non-vararg function
@@ -575,8 +580,13 @@ var ResolvedFunctionType = exports.ResolvedFunctionType = FunctionType.extend({
 
 	toString: function () {
 		var args = [];
-		for (var i = 0; i < this._argTypes.length; ++i)
-			args[i] = " : " + this._argTypes[i].toString();
+		for (var i = 0; i < this._argTypes.length; ++i) {
+			if (this._argTypes[i] instanceof VariableLengthArgumentType) {
+				args[i] = "... : " + this._argTypes[i].getBaseType().toString();
+			} else {
+				args[i] = " : " + this._argTypes[i].toString();
+			}
+		}
 		return this._toStringPrefix() + "function (" + args.join(", ") + ") : " + this._returnType.toString();
 	}
 

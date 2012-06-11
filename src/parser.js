@@ -1317,9 +1317,16 @@ if (baseType.equals(Type.variantType)) throw new Error("Hmm");
 		var argTypes = [];
 		if (this._expectOpt(")") == null) {
 			do {
+				var isVarArg = this._expectOpt("...") != null;
 				var argType = this._typeDeclaration(false);
 				if (argType == null)
 					return null;
+				if (isVarArg) {
+					argTypes.push(new VariableLengthArgumentType(argType));
+					if (this._expect(")") == null)
+						return null;
+					break;
+				}
 				argTypes.push(argType);
 				var token = this._expect([ ")", "," ]);
 				if (token == null)
@@ -1347,12 +1354,19 @@ if (baseType.equals(Type.variantType)) throw new Error("Hmm");
 		var argTypes = [];
 		if (this._expectOpt(")") == null) {
 			do {
+				var isVarArg = this._expectOpt("...") != null;
 				this._expectIdentifierOpt(); // may have identifiers
 				if (this._expect(":") == null)
 					return null;
 				var argType = this._typeDeclaration(false);
 				if (argType == null)
 					return null;
+				if (isVarArg) {
+					argTypes.push(new VariableLengthArgumentType(argType));
+					if (this._expect(")") == null)
+						return null;
+					break;
+				}
 				argTypes.push(argType);
 				var token = this._expect([ ")", "," ]);
 				if (token == null)
