@@ -1320,14 +1320,26 @@ var _BinaryExpressionEmitter = exports._BinaryExpressionEmitter = _OperatorExpre
 	},
 
 	emit: function (outerOpPrecedence) {
+		// handle the lazy conversion to boolean
 		if (this._expr instanceof LogicalExpression && _Util.shouldBooleanize(this._expr)) {
 			// !! is faster than Boolean, see http://jsperf.com/boolean-vs-notnot
 			this._emitter._emit("!! (", this._expr.getToken());
 			_OperatorExpressionEmitter.prototype.emit.call(this, 0);
 			this._emitter._emit(")", this._expr.getToken());
-		} else {
-			_OperatorExpressionEmitter.prototype.emit.call(this, outerOpPrecedence);
+			return;
 		}
+		// optimization of "1 * x" => x
+		if (this._expr.getToken().getValue() === "*") {
+			// optimize "1 * x" => x
+			if (this._emitIfEitherIs(outerOpPrecedence, function (expr1, expr2) {
+				return ((expr1 instanceof IntegerLiteralExpression || expr1 instanceof NumberLiteralExpression) && +expr1.getToken().getValue() === 1)
+					? expr2 : null;
+			})) {
+				return;
+			}
+		}
+		// normal
+		_OperatorExpressionEmitter.prototype.emit.call(this, outerOpPrecedence);
 	},
 
 	_emit: function () {
@@ -1368,6 +1380,17 @@ var _BinaryExpressionEmitter = exports._BinaryExpressionEmitter = _OperatorExpre
 		} else {
 			// RHS should have higher precedence (consider: 1 - (1 + 1))
 			this._emitter._getExpressionEmitterFor(secondExpr).emit(this._precedence - 1);
+		}
+	},
+
+	_emitIfEitherIs: function (outerOpPrecedence, cb) {
+		var outcomeExpr;
+		if ((outcomeExpr = cb(this._expr.getFirstExpr(), this._expr.getSecondExpr())) != null
+			|| (outcomeExpr = cb(this._expr.getSecondExpr(), this._expr.getFirstExpr())) != null) {
+			this._emitter._getExpressionEmitterFor(outcomeExpr).emit(outerOpPrecedence);
+			return true;
+		} else {
+			return false;
 		}
 	},
 
