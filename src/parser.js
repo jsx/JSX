@@ -1004,21 +1004,18 @@ var Parser = exports.Parser = Class.extend({
 			for (var i = 0; i < this._imports.length; ++i)
 				if (! this._imports[i].checkNameConflict(this._errors, className))
 					success = false;
-			if (typeArgs != null) {
-				for (var i = 0; i < this._templateClassDefs.length; ++i) {
-					if (this._classDefs[i].className() == className.getValue()) {
-						this._errors.push(new CompileError(className, "template class with the name same has been already declared"));
-						success = false;
-						break;
-					}
+			for (var i = 0; i < this._classDefs.length; ++i) {
+				if (this._classDefs[i].className() == className.getValue()) {
+					this._errors.push(new CompileError(className, "a non-template class with the same name has been already declared"));
+					success = false;
+					break;
 				}
-			} else {
-				for (var i = 0; i < this._classDefs.length; ++i) {
-					if (this._classDefs[i].className() == className.getValue()) {
-						this._errors.push(new CompileError(className, "class with the same name has been already declared"));
-						success = false;
-						break;
-					}
+			}
+			for (var i = 0; i < this._templateClassDefs.length; ++i) {
+				if (this._templateClassDefs[i].className() == className.getValue()) {
+					this._errors.push(new CompileError(className, "a template class with the name same has been already declared"));
+					success = false;
+					break;
 				}
 			}
 		}
