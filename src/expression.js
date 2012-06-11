@@ -1474,13 +1474,29 @@ var BinaryNumberExpression = exports.BinaryNumberExpression = BinaryExpression.e
 	analyze: function (context, parentExpr) {
 		if (! this._analyze(context))
 			return false;
-		var expr1Type = this._expr1.getType().resolveIfMayBeUndefined();
-		if (! this.assertIsConvertibleTo(context, this._expr1, Type.numberType, true))
+		switch (this._token.getValue()) {
+		case "<":
+		case "<=":
+		case ">":
+		case ">=":
+			var expr1Type = this._expr1.getType().resolveIfMayBeUndefined();
+			if (expr1Type.isConvertibleTo(Type.numberType)) {
+			  return this.assertIsConvertibleTo(context, this._expr2, Type.numberType, true);
+			}
+			if(expr1Type.isConvertibleTo(Type.stringType)) {
+			  return this.assertIsConvertibleTo(context, this._expr2, Type.stringType, true);
+			}
+			context.errors.push(new CompileError(this._token, "cannot apply operator '" + this._token.getValue() + "' to type '" + expr1Type.toString() + "'"));
 			return false;
-		var expr2Type = this._expr2.getType().resolveIfMayBeUndefined();
-		if (! this.assertIsConvertibleTo(context, this._expr2, Type.numberType, true))
-			return false;
-		return true;
+		default:
+			var expr1Type = this._expr1.getType().resolveIfMayBeUndefined();
+			if (! this.assertIsConvertibleTo(context, this._expr1, Type.numberType, true))
+				return false;
+			var expr2Type = this._expr2.getType().resolveIfMayBeUndefined();
+			if (! this.assertIsConvertibleTo(context, this._expr2, Type.numberType, true))
+				return false;
+			return true;
+		}
 	},
 
 	getType: function () {
