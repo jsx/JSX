@@ -339,26 +339,61 @@ var ClassDefinition = exports.ClassDefinition = Class.extend({
 	},
 
 	analyze: function (context) {
-		// check that the class may be extended
-		if (! this._assertInheritanceIsNotInLoop(context, null, this.getToken()))
-			return false;
-		// check that none of the implemented mixins are implemented by the base classes
-		if ((this.flags() & ClassDefinition.IS_MIXIN) != 0)
-			for (var i = 0; i < this._implementTypes.length; ++i)
-				if (! this._implementTypes[i].getClassDef()._assertMixinIsImplementable(context, this, this.getToken()))
-					break;
-		for (var i = 0; i < this._implementTypes.length; ++i) {
-			if ((this._implementTypes[i].getClassDef().flags() & ClassDefinition.IS_MIXIN) != 0) {
-				if (this._extendType != null && ! this._extendType.getClassDef()._assertMixinIsImplementable(context, this._implementTypes[i].getClassDef(), this._implementTypes[i].getToken())) {
-					// error found and reported
-				} else {
-					for (var j = 0; j < i; ++j) {
-						if (! this._implementTypes[j].getClassDef()._assertMixinIsImplementable(context, this._implementTypes[i].getClassDef(), this._implementTypes[i].getToken())) {
-							// error found and reported
-						}
+		var extendClassDef = this.extendType() != null ? this.extendType().getClassDef() : null;
+		var implementClassDefs = this.implementTypes().map(function (type) {
+			return type.getClassDef();
+		});
+		// check that inheritance is not in loop, and that classes are extended, and interfaces / mixins are implemented
+		if ((this.flags() & (ClassDefinition.IS_INTERFACE | ClassDefinition.IS_MIXIN)) == 0) {
+			if (extendClassDef != null) {
+				if ((extendClassDef.flags() & ClassDefinition.IS_FINAL) != 0) {
+					context.errors.push(new CompileError(this.getToken(), "cannot extend final class '" + this.extendClassDef.className() + "'"));
+					return false;
+				}
+				if ((extendClassDef.flags() & (ClassDefinition.IS_INTERFACE | ClassDefinition.IS_MIXIN)) != 0) {
+					context.errors.push(new CompileError(this.getToken(), "interfaces (or mixins) should be implemented, not extended"));
+					return false;
+				}
+				if (! extendClassDef.forEachClassToBase(function (classDef) {
+					if (this == classDef) {
+						context.errors.push(new CompileError(this.getToken(), "class inheritance is in loop"));
+						return false;
 					}
+					return true;
+				}.bind(this))) {
+					return false;
 				}
 			}
+		} else {
+			for (var i = 0; i < implementClassDefs.length; ++i) {
+				if ((implementClassDefs[i].flags() & (ClassDefinition.IS_INTERFACE | ClassDefinition.IS_MIXIN)) == 0) {
+					context.errors.push(new CompileError(this.getToken(), "class '" + implementClassDefs[i].className() + "' can only be extended, not implemented"));
+					return false;
+				}
+				if (! implementClassDefs[i].forEachClassToBase(function (classDef) {
+					if (this == classDef) {
+						context.errors.push(new CompileError(this.getToken(), "class inheritance is in loop"));
+						return false;
+					}
+					return true;
+				}.bind(this))) {
+					return false;
+				}
+			}
+		}
+		// check that none of the mixins are implemented twice
+		var allMixins = [];
+		if (! this.forEachClassToBase(function (classDef) {
+			if ((classDef.flags() & ClassDefinition.IS_MIXIN) != 0) {
+				if (allMixins.indexOf(classDef) != -1) {
+					context.errors.push(new CompileError(this.getToken(), "mixin '" + classDef.className() + "' is implemented twice"));
+					return false;
+				}
+				allMixins.push(classDef);
+			}
+			return true;
+		}.bind(this))) {
+			return false;
 		}
 		// check that the properties of the class does not conflict with those in base classes or implemented interfaces
 		for (var i = 0; i < this._members.length; ++i) {
@@ -400,8 +435,37 @@ var ClassDefinition = exports.ClassDefinition = Class.extend({
 		// check that there are no "abstract" members for a concrete class
 		if ((this._flags & (ClassDefinition.IS_ABSTRACT | ClassDefinition.IS_INTERFACE | ClassDefinition.IS_MIXIN)) == 0) {
 			var abstractMembers = [];
-			this._getMembers(abstractMembers, false, ClassDefinition.IS_ABSTRACT, ClassDefinition.IS_ABSTRACT);
-			this._filterAbstractMembers(abstractMembers);
+			this.forEachClassToBase(function (classDef) {
+				return classDef.forEachMember(function (member) {
+					if ((member.flags() & ClassDefinition.IS_ABSTRACT) != 0) {
+						for (var i = 0; i < abstractMembers.length; ++i) {
+							if (ClassDefinition.membersAreEqual(abstractMembers[i], member)) {
+								break;
+							}
+						}
+						if (i == abstractMembers.length) {
+							abstractMembers[i] = member;
+						}
+					}
+					return true;
+				}.bind(this));
+			}.bind(this));
+			this.forEachClassToBase(function (classDef) {
+				return classDef.forEachMember(function (member) {
+					if (abstractMembers.length == 0) {
+						return false;
+					}
+					if ((member.flags() & ClassDefinition.IS_ABSTRACT) == 0) {
+						for (var i = 0; i < abstractMembers.length; ++i) {
+							if (ClassDefinition.membersAreEqual(abstractMembers[i], member)) {
+								abstractMembers.splice(i, 1);
+								break;
+							}
+						}
+					}
+					return true;
+				}.bind(this));
+			}.bind(this));
 			if (abstractMembers.length != 0) {
 				var msg = "class should be declared as 'abstract' since the following members do not have concrete definition: ";
 				for (var i = 0; i < abstractMembers.length; ++i) {
@@ -437,31 +501,6 @@ var ClassDefinition = exports.ClassDefinition = Class.extend({
 			if (this._implementTypes[i].getClassDef().isConvertibleTo(classDef))
 				return true;
 		return false;
-	},
-
-	_assertInheritanceIsNotInLoop: function (context, classDef, token) {
-		if (classDef == this) {
-			context.errors.push(new CompileError(token, "class inheritance is in a loop"));
-			return false;
-		}
-		if (classDef == null)
-			classDef = this;
-		if (this._extendType != null && ! this._extendType.getClassDef()._assertInheritanceIsNotInLoop(context, classDef, token))
-			return false;
-		for (var i = 0; i < this._implementTypes.length; ++i)
-			if (! this._implementTypes[i].getClassDef()._assertInheritanceIsNotInLoop(context, classDef, token))
-				return false;
-		return true;
-	},
-
-	_assertMixinIsImplementable: function (context, classDef, token) {
-		for (var i = 0; i < this._implementTypes.length; ++i) {
-			if (this._implementTypes[i].getClassDef() == classDef) {
-				context.errors.push(new CompileError(token, "cannot implement mixin '" + classDef.className() + "' already implemented by '" + this.className() + "'"));
-				return false;
-			}
-		}
-		return true;
 	},
 
 	_assertMemberIsDefinable: function (context, member, memberClassDef, token) {
@@ -595,29 +634,6 @@ var ClassDefinition = exports.ClassDefinition = Class.extend({
 		}
 	},
 
-	_filterAbstractMembers: function (list) {
-		// filter the abstract members by using base classes
-		if (list.length == 0)
-			return;
-		if (this._baseClassDef != null)
-			this._baseClassDef._filterAbstractMembers(list);
-		for (var i = 0; i < this._implementTypes.length; ++i)
-			this._implementTypes[i].getClassDef()._filterAbstractMembers(list);
-		for (var i = 0; i < this._members.length; ++i) {
-			if ((this._members[i].flags() & ClassDefinition.IS_ABSTRACT) != 0)
-				continue;
-			for (var j = 0; j < list.length; ++j)
-				if (list[j].name() == this._members[i].name())
-					if ((list[j] instanceof MemberVariableDefinition) || Util.typesAreEqual(list[j].getArgumentTypes(), this._members[i].getArgumentTypes()))
-						break;
-			if (j != list.length) {
-				list.splice(j, 1);
-				if (list.length == 0)
-					break;
-			}
-		}
-	},
-
 	hasDefaultConstructor: function () {
 		var hasCtorWithArgs = false;
 		for (var i = 0; i < this._members.length; ++i) {
@@ -633,6 +649,21 @@ var ClassDefinition = exports.ClassDefinition = Class.extend({
 
 	getOptimizerStash: function () {
 		return this._optimizerStash;
+	},
+
+	$membersAreEqual: function (x, y) {
+		if (x.name() != y.name())
+			return false;
+		if (x instanceof MemberFunctionDefinition) {
+			if (! (y instanceof MemberFunctionDefinition))
+				return false;
+			if (! Util.typesAreEqual(x.getArgumentTypes(), y.getArgumentTypes()))
+				return false;
+		} else {
+			if (! (y instanceof MemberVariableDefinition))
+				return false;
+		}
+		return true;
 	}
 
 });
