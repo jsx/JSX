@@ -52,11 +52,11 @@ native final class Array.<T> {
 	// 15.4.4
 	override function toString() : string;
 	function toLocaleString() : string;
-	function concat(a : Array.<T>) : Array.<T>; // FIXME more arguments
+	function concat(...a : Array.<T>) : Array.<T>;
 	function join() : string;
 	function join(separator : string) : string;
 	function pop() : MayBeUndefined.<T>;
-	function push(item : T) : int; // FIXME more arguments
+	function push(...item : T) : int;
 	function reverse() : Array.<T>;
 	function shift() : MayBeUndefined.<T>;
 	function slice(start : int) : Array.<T>;
@@ -64,10 +64,8 @@ native final class Array.<T> {
 	function sort() : Array.<T>;
 	function sort(comparefn : function (x : MayBeUndefined.<T>, y : MayBeUndefined.<T>) : int) : Array.<T>;
 	function sort(comparefn : function (x : MayBeUndefined.<T>, y : MayBeUndefined.<T>) : number) : Array.<T>;
-	// FIXME splice(start, deleteCount, items...)
-	function splice(start : int, deleteCount : int) : Array.<T>;
-	function splice(start : int, deleteCount : int, item : T) : Array.<T>;
-	function unshift(item : T) : int; // FIXME more arguments
+	function splice(start : int, deleteCount : int, ...item : T) : Array.<T>;
+	function unshift(...item : T) : int;
 
 	// 15.4.4 (ES5)
 	function indexOf(value : MayBeUndefined.<T>) : number;
@@ -108,14 +106,14 @@ native final class String {
 	function constructor(s : String);
 
 	// 15.5.3
-	static function fromCharCode(char0 : int) : string; // FIXME support vararg
+	static function fromCharCode(...charN : int) : string;
 
 	// 15.5.4
 	override function toString() : string;
 	function valueOf() : string;
 	function charAt(pos : int) : string;
 	function charCodeAt(pos : int) : number;
-	function concat(string1 : String) : string; // FIXME support vararg
+	function concat(...stringN : String) : string;
 	function indexOf(searchString : string) : int;
 	function indexOf(searchString : string, position : int) : int;
 	function lastIndexOf(searchString : string) : int;
@@ -223,13 +221,10 @@ native final class Math {
 	static function exp(x :number) :number;
 	static function floor(x :number) :number;
 	static function log(x :number) :number;
-	// FIXME: ECMA-262's max() and min() take zero or more arguments
-	static function max(value1 :number, value2 :number) :number {
-		return value1 >= value2 ? value1 : value2;
-	}
-	static function min(value1 :number, value2 :number) :number {
-		return value1 <= value2 ? value1 : value2;
-	}
+	static function max(value1 : number, value2 : number, value3 : number, ...valueN : number) : number;
+	static function max(value1 : number) : number;
+	static function min(value1 : number, value2 : number, value3 : number, ...valueN : number) : number;
+	static function min(value1 : number) : number;
 	static function pow(x :number, y :number) :number;
 	static function random() :number;
 	static function round(x :number) :number;
@@ -237,6 +232,13 @@ native final class Math {
 	static function sqrt(x :number) :number;
 	static function tan(x :number) :number;
 
+	// optimized (inlined) version for two-arg min/max
+	static function max(value1 :number, value2 :number) :number {
+		return value1 >= value2 ? value1 : value2;
+	}
+	static function min(value1 :number, value2 :number) :number {
+		return value1 <= value2 ? value1 : value2;
+	}
 }
 
 // 15.9

@@ -313,6 +313,41 @@ var MayBeUndefinedType = exports.MayBeUndefinedType = Type.extend({
 
 });
 
+var VariableLengthArgumentType = exports.VariableLengthArgumentType = Type.extend({
+
+	constructor: function (type) {
+		if (type instanceof VariableLengthArgumentType)
+			throw new Error("logic flaw");
+		this._baseType = type;
+	},
+
+	instantiate: function (instantiationContext) {
+		var baseType = this._baseType.instantiate(instantiationContext);
+		return new VariableLengthArgumentType(baseType);
+	},
+
+	isConvertibleTo: function (type) {
+		throw new Error("logic flaw"); // never becomes LHS
+	},
+
+	isAssignable: function () {
+		throw new Error("logic flaw"); // never becomes LHS
+	},
+
+	getClassDef: function () {
+		throw new Error("logic flaw"); // never becomes LHS
+	},
+
+	getBaseType: function () {
+		return this._baseType;
+	},
+
+	toString: function () {
+		return "..." + this._baseType.toString();
+	}
+
+});
+
 // class and object types
 
 var ObjectType = exports.ObjectType = Type.extend({
@@ -505,17 +540,33 @@ var ResolvedFunctionType = exports.ResolvedFunctionType = FunctionType.extend({
 	},
 
 	_deduceByArgumentTypes: function (argTypes, isStatic, exact) {
+		var compareArg = function (formal, actual) {
+			if (formal.equals(actual))
+				return true;
+			else if (! exact && actual.isConvertibleTo(formal))
+				return true;
+			return false;
+		};
 		if ((this instanceof StaticFunctionType) != isStatic)
 			return false;
-		if (this._argTypes.length != argTypes.length)
-			return false;
-		for (var i = 0; i < argTypes.length; i++) {
-			if (this._argTypes[i].equals(argTypes[i])) {
-				// ok
-			} else {
-				if (exact)
+		if (this._argTypes.length != 0 && this._argTypes[this._argTypes.length - 1] instanceof VariableLengthArgumentType) {
+			// a vararg function
+			if (argTypes.length < this._argTypes.length - 1)
+				return false;
+			for (var i = 0; i < this._argTypes.length - 1; ++i) {
+				if (! compareArg(this._argTypes[i], argTypes[i]))
 					return false;
-				if (! argTypes[i].isConvertibleTo(this._argTypes[i]))
+			}
+			for (; i < argTypes.length; ++i) {
+				if (! compareArg(this._argTypes[this._argTypes.length - 1].getBaseType(), argTypes[i]))
+					return false;
+			}
+		} else {
+			// non-vararg function
+			if (this._argTypes.length != argTypes.length)
+				return false;
+			for (var i = 0; i < argTypes.length; ++i) {
+				if (! compareArg(this._argTypes[i], argTypes[i]))
 					return false;
 			}
 		}

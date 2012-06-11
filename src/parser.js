@@ -1153,7 +1153,7 @@ var Parser = exports.Parser = Class.extend({
 		if (this._expect("(") == null)
 			return null;
 		// arguments
-		var args = this._functionArgumentsExpr();
+		var args = this._functionArgumentsExpr((classFlags & ClassDefinition.IS_NATIVE) != 0);
 		if (args == null)
 			return null;
 		// return type
@@ -2177,7 +2177,7 @@ if (baseType.equals(Type.variantType)) throw new Error("Hmm");
 	},
 
 	_lambdaExpr: function (token) {
-		var args = this._functionArgumentsExpr();
+		var args = this._functionArgumentsExpr(false);
 		if (args == null)
 			return null;
 		if (this._expect(":") == null)
@@ -2219,7 +2219,7 @@ if (baseType.equals(Type.variantType)) throw new Error("Hmm");
 	_functionExpr: function (token) {
 		if (this._expect("(") == null)
 			return null;
-		var args = this._functionArgumentsExpr();
+		var args = this._functionArgumentsExpr(false);
 		if (args == null)
 			return null;
 		if (this._expect(":") == null)
@@ -2381,10 +2381,11 @@ if (baseType.equals(Type.variantType)) throw new Error("Hmm");
 		return new MapLiteralExpression(token, elements, type);
 	},
 
-	_functionArgumentsExpr: function () {
+	_functionArgumentsExpr: function (allowVarArgs) {
 		var args = [];
 		if (this._expectOpt(")") == null) {
 			do {
+				var isVarArg = allowVarArgs && (this._expectOpt("...") != null);
 				var argName = this._expectIdentifier();
 				if (argName == null)
 					return null;
@@ -2398,6 +2399,13 @@ if (baseType.equals(Type.variantType)) throw new Error("Hmm");
 						this._errors.push(new CompileError(argName, "cannot declare an argument with the same name twice"));
 						return null;
 					}
+				}
+				if (isVarArg) {
+					// vararg is the last argument
+					args.push(new ArgumentDeclaration(argName, new VariableLengthArgumentType(argType)));
+					if (this._expect(")") == null)
+						return null;
+					break;
 				}
 				// FIXME KAZUHO support default arguments
 				args.push(new ArgumentDeclaration(argName, argType));
