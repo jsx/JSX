@@ -1435,6 +1435,9 @@ var AssignmentExpression = exports.AssignmentExpression = BinaryExpression.exten
 	_analyzeFusedAssignment: function (context) {
 		var lhsType = this._expr1.getType().resolveIfMayBeUndefined();
 		var rhsType = this._expr2.getType().resolveIfMayBeUndefined();
+		if (! this._expr1.assertIsAssignable(context, this._token, lhsType)) {
+			return false;
+		}
 		if (this._token.getValue() == "+=" && lhsType.equals(Type.stringType) && rhsType.equals(Type.stringType))
 			return true;
 		if (Type.isIntegerOrNumber(lhsType) && Type.isIntegerOrNumber(rhsType))
