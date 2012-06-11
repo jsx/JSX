@@ -711,12 +711,27 @@ var FunctionExpression = exports.FunctionExpression = Expression.extend({
 	},
 
 	analyze: function (context, parentExpr) {
+		if (! this.typesAreIdentified()) {
+			context.errors.push(new CompileError(this._token, "argument / return types were not automatically deductable, please specify them by hand"));
+			return false;
+		}
 		var ret = this._funcDef.analyze(context);
 		return true; // return true since everything is resolved correctly even if analysis of the function definition failed
 	},
 
 	getType: function () {
 		return new StaticFunctionType(this._funcDef.getReturnType(), this._funcDef.getArgumentTypes(), false);
+	},
+
+	typesAreIdentified: function () {
+		var argTypes = this._funcDef.getArgumentTypes();
+		for (var i = 0; i < argTypes.length; ++i) {
+			if (argTypes[i] == null)
+				return false;
+		}
+		if (this._funcDef.getReturnType() == null)
+			return false;
+		return true;
 	},
 
 	forEachExpression: function (cb) {
@@ -1450,6 +1465,15 @@ var AssignmentExpression = exports.AssignmentExpression = BinaryExpression.exten
 		// analyze from left to right to avoid "variable may not be defined" error in case the function calls itself
 		if (! this._expr1.analyze(context, this))
 			return false;
+		if (this._expr1.getType() == null) {
+			if (! this._expr2.typesAreIdentified()) {
+				context.errors.push(new CompileError(this._token, "either side of the operator should be fully type-qualified"));
+				return false;
+			}
+		} else {
+			if (! this._expr2.getFuncDef().deductTypeIfUnknown(context, this._expr1.getType()))
+				return false;
+		}
 		if (! this._expr1.assertIsAssignable(context, this._token, this._expr2.getType()))
 			return false;
 		if (! this._expr2.analyze(context, this))
@@ -1796,19 +1820,23 @@ var CallExpression = exports.CallExpression = OperatorExpression.extend({
 	analyze: function (context, parentExpr) {
 		if (! this._expr.analyze(context, this))
 			return false;
-		var argTypes = Util.analyzeArgs(context, this._args, this);
-		if (argTypes == null)
-			return false;
 		var exprType = this._expr.getType().resolveIfMayBeUndefined();
 		if (! (exprType instanceof FunctionType)) {
 			context.errors.push(new CompileError(this._token, "cannot call a non-function"));
 			return false;
 		}
+		var argTypes = Util.analyzeArgs(
+			context, this._args, this,
+			exprType.getExpectedCallbackTypes(
+				this._args.length,
+				this._expr instanceof PropertyExpression && ! exprType.isAssignable() && this._expr.getExpr() instanceof ClassExpression));
+		if (argTypes == null)
+			return false;
 		if (this._expr instanceof PropertyExpression && ! exprType.isAssignable()) {
 			if (this._expr.deduceByArgumentTypes(context, this._token, argTypes, this._expr.getExpr() instanceof ClassExpression) == null)
 				return false;
 		} else {
-			if (this._expr.getType().resolveIfMayBeUndefined().deduceByArgumentTypes(context, this._token, argTypes, true) == null)
+			if (exprType.deduceByArgumentTypes(context, this._token, argTypes, true) == null)
 				return false;
 		}
 		return true;
@@ -1873,16 +1901,19 @@ var SuperExpression = exports.SuperExpression = OperatorExpression.extend({
 			return false;
 		}
 		var classDef = context.funcDef.getClassDef();
-		// analyze args
-		var argTypes = Util.analyzeArgs(context, this._args, this);
-		if (argTypes == null)
-			return false;
 		// lookup function
 		var funcType = null;
 		if ((funcType = classDef.getMemberTypeByName(this._name.getValue(), false, ClassDefinition.GET_MEMBER_MODE_SUPER)) == null) {
 			context.errors.push(new CompileError(this._token, "could not find a member function with given name in super classes of class '" + classDef.className() + "'"));
 			return false;
 		}
+		// analyze args
+		var argTypes = Util.analyzeArgs(
+			context, this._args, this,
+			funcType.getExpectedCallbackTypes(this._args.length, false));
+		if (argTypes == null)
+			return false;
+		// deduce
 		if ((funcType = funcType.deduceByArgumentTypes(context, this._token, argTypes, false)) == null)
 			return false;
 		// success
@@ -1946,10 +1977,12 @@ var NewExpression = exports.NewExpression = OperatorExpression.extend({
 			context.errors.push(new CompileError(this._token, "cannot instantiate an abstract class"));
 			return false;
 		}
-		var argTypes = Util.analyzeArgs(context, this._args);
+		var ctors = classDef.getMemberTypeByName("constructor", false, ClassDefinition.GET_MEMBER_MODE_CLASS_ONLY);
+		var argTypes = Util.analyzeArgs(
+			context, this._args, this,
+			ctors.getExpectedCallbackTypes(this._args.length, false));
 		if (argTypes == null)
 			return false;
-		var ctors = classDef.getMemberTypeByName("constructor", false, ClassDefinition.GET_MEMBER_MODE_CLASS_ONLY);
 		if ((this._constructor = ctors.deduceByArgumentTypes(context, this._token, argTypes, false)) == null) {
 			context.errors.push(new CompileError(this._token, "cannot create an object of type '" + this._type.toString() + "', arguments mismatch"));
 			return false;

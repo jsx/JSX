@@ -127,12 +127,6 @@ var ConstructorInvocationStatement = exports.ConstructorInvocationStatement = St
 	},
 
 	doAnalyze: function (context) {
-		// analyze args
-		var argTypes = Util.analyzeArgs(context, this._args, null);
-		if (argTypes == null) {
-			// error is reported by callee
-			return true;
-		}
 		var ctorType = this.getConstructingClassDef().getMemberTypeByName("constructor", false, ClassDefinition.GET_MEMBER_MODE_CLASS_ONLY);
 		if (ctorType == null) {
 			if (this._args.length != 0) {
@@ -140,9 +134,19 @@ var ConstructorInvocationStatement = exports.ConstructorInvocationStatement = St
 				return true;
 			}
 			ctorType = new ResolvedFunctionType(Type.voidType, [], false); // implicit constructor
-		} else if ((ctorType = ctorType.deduceByArgumentTypes(context, this.getToken(), argTypes, false)) == null) {
-			// error is reported by callee
-			return true;
+		} else {
+			// analyze args
+			var argTypes = Util.analyzeArgs(
+				context, this._args, null,
+				ctorType.getExpectedCallbackTypes(this._args.length, false));
+			if (argTypes == null) {
+				// error is reported by callee
+				return true;
+			}
+			if ((ctorType = ctorType.deduceByArgumentTypes(context, this.getToken(), argTypes, false)) == null) {
+				// error is reported by callee
+				return true;
+			}
 		}
 		this._ctorFunctionType = ctorType;
 		return true;

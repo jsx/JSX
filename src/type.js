@@ -496,6 +496,14 @@ var FunctionChoiceType = exports.FunctionChoiceType = FunctionType.extend({
 		return null;
 	},
 
+	// used for left to right deduction of callback function types
+	getExpectedCallbackTypes: function (numberOfArgs, isStatic) {
+		var expected = [];
+		for (var i = 0; i < this._types.length; ++i)
+			this._types[i]._getExpectedCallbackTypes(expected, numberOfArgs, isStatic);
+		return expected;
+	},
+
 	toString: function () {
 		return this._types.length == 1 ? this._types[0].toString() : "<<multiple choices>>";
 	}
@@ -576,6 +584,30 @@ var ResolvedFunctionType = exports.ResolvedFunctionType = FunctionType.extend({
 			}
 		}
 		return true;
+	},
+
+	getExpectedCallbackTypes: function (numberOfArgs, isStatic) {
+		var expected = [];
+		this._getExpectedCallbackTypes(expected, numberOfArgs, isStatic);
+		return expected;
+	},
+
+	_getExpectedCallbackTypes: function (expected, numberOfArgs, isStatic) {
+		if ((this instanceof StaticFunctionType) != isStatic)
+			return false;
+		if (this._argTypes.length != numberOfArgs)
+			return false;
+		var hasCallback = false;
+		var callbackArgTypes = this._argTypes.map(function (argType) {
+			if (argType instanceof StaticFunctionType) {
+				hasCallback = true;
+				return argType;
+			} else {
+				return null;
+			}
+		});
+		if (hasCallback)
+			expected.push(callbackArgTypes);
 	},
 
 	toString: function () {

@@ -73,9 +73,28 @@ var Util = exports.Util = Class.extend({
 		});
 	},
 
-	$analyzeArgs: function (context, args, parentExpr) {
+	$analyzeArgs: function (context, args, parentExpr, expectedCallbackTypes) {
+		var Expression = require("./expression");
 		var argTypes = [];
 		for (var i = 0; i < args.length; ++i) {
+			if (args[i] instanceof Expression.FunctionExpression && ! args[i].typesAreIdentified()) {
+				// find the only expected types, by counting the number of arguments
+				var funcDef = args[i].getFuncDef();
+				var expectedCallbackType = null;
+				for (var j = 0; j < expectedCallbackTypes.length; ++j) {
+					if (expectedCallbackTypes[j][i].getArgumentTypes().length == funcDef.getArguments().length) {
+						if (expectedCallbackType != null)
+							break;
+						expectedCallbackType = expectedCallbackTypes[j][i];
+					}
+				}
+				if (j != expectedCallbackTypes.length) {
+					// multiple canditates, skip
+				} else if (expectedCallbackType != null) {
+					if (! funcDef.deductTypeIfUnknown(context, expectedCallbackType))
+						return null;
+				}
+			}
 			if (! args[i].analyze(context, parentExpr))
 				return null;
 			argTypes[i] = args[i].getType();

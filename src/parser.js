@@ -1153,7 +1153,7 @@ var Parser = exports.Parser = Class.extend({
 		if (this._expect("(") == null)
 			return null;
 		// arguments
-		var args = this._functionArgumentsExpr((classFlags & ClassDefinition.IS_NATIVE) != 0);
+		var args = this._functionArgumentsExpr((classFlags & ClassDefinition.IS_NATIVE) != 0, true);
 		if (args == null)
 			return null;
 		// return type
@@ -2191,14 +2191,14 @@ if (baseType.equals(Type.variantType)) throw new Error("Hmm");
 	},
 
 	_lambdaExpr: function (token) {
-		var args = this._functionArgumentsExpr(false);
+		var args = this._functionArgumentsExpr(false, false);
 		if (args == null)
 			return null;
-		if (this._expect(":") == null)
-			return null;
-		var returnType = this._typeDeclaration(true);
-		if (returnType == null)
-			return null;
+		var returnType = null;
+		if (this._expectOpt(":") != null) {
+			if ((returnType = this._typeDeclaration(true)) == null)
+				return null;
+		}
 		if (this._expect("->") == null)
 			return null;
 		var funcDef = this._lambdaBody(token, args, returnType);
@@ -2233,14 +2233,14 @@ if (baseType.equals(Type.variantType)) throw new Error("Hmm");
 	_functionExpr: function (token) {
 		if (this._expect("(") == null)
 			return null;
-		var args = this._functionArgumentsExpr(false);
+		var args = this._functionArgumentsExpr(false, false);
 		if (args == null)
 			return null;
-		if (this._expect(":") == null)
-			return null;
-		var returnType = this._typeDeclaration(true);
-		if (returnType == null)
-			return null;
+		var returnType = null;
+		if (this._expectOpt(":") != null) {
+			if ((returnType = this._typeDeclaration(true)) == null)
+				return null;
+		}
 		if (this._expect("{") == null)
 			return null;
 		// parse function block
@@ -2395,7 +2395,7 @@ if (baseType.equals(Type.variantType)) throw new Error("Hmm");
 		return new MapLiteralExpression(token, elements, type);
 	},
 
-	_functionArgumentsExpr: function (allowVarArgs) {
+	_functionArgumentsExpr: function (allowVarArgs, requireTypeDeclaration) {
 		var args = [];
 		if (this._expectOpt(")") == null) {
 			do {
@@ -2403,11 +2403,18 @@ if (baseType.equals(Type.variantType)) throw new Error("Hmm");
 				var argName = this._expectIdentifier();
 				if (argName == null)
 					return null;
-				if (this._expect(":", "type declarations are mandatory for function arguments") == null)
-					return null;
-				var argType = this._typeDeclaration(false);
-				if (argType == null)
-					return null;
+				var argType = null;
+				if (requireTypeDeclaration) {
+					if (this._expect(":") == null) {
+						this._newError("type declarations are mandatory for non-expression function definition");
+						return null;
+					}
+					if ((argType = this._typeDeclaration(false)) == null)
+						return null;
+				} else if (this._expectOpt(":") != null) {
+					if ((argType = this._typeDeclaration(false)) == null)
+						return null;
+				}
 				for (var i = 0; i < args.length; ++i) {
 					if (args[i].getName().getValue() == argName.getValue()) {
 						this._errors.push(new CompileError(argName, "cannot declare an argument with the same name twice"));
@@ -2416,6 +2423,8 @@ if (baseType.equals(Type.variantType)) throw new Error("Hmm");
 				}
 				if (isVarArg) {
 					// vararg is the last argument
+					if (argType == null && isVarArg)
+						throw new Error("not yet implemented!");
 					args.push(new ArgumentDeclaration(argName, new VariableLengthArgumentType(argType)));
 					if (this._expect(")") == null)
 						return null;
