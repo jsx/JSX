@@ -327,7 +327,7 @@ var _LinkTimeOptimizationCommand = exports._LinkTimeOptimizationCommand = _Optim
 
 	_getOverridesByClass: function (classDef, name, argTypes) {
 		var overrides = this._getOverrides(this.getStash(classDef).extendedBy, name, argTypes);
-		classDef.forEachMemberFunction(function (funcDef) {
+		var addOverride = function (funcDef) {
 			if (funcDef.name() == name
 				&& (funcDef.flags() & ClassDefinition.IS_ABSTRACT) == 0
 				&& Util.typesAreEqual(funcDef.getArgumentTypes(), argTypes)) {
@@ -335,7 +335,14 @@ var _LinkTimeOptimizationCommand = exports._LinkTimeOptimizationCommand = _Optim
 				return false; // finish looking into the class
 			}
 			return true;
-		}.bind(this));
+		}.bind(this);
+		classDef.forEachMemberFunction(addOverride);
+		var implementClassDefs = classDef.implementTypes().map(function (type) { return type.getClassDef(); });
+		for (var i = 0; i < implementClassDefs.length; ++i) {
+			implementClassDefs[i].forEachClassToBase(function (classDef) {
+				return classDef.forEachMemberFunction(addOverride);
+			});
+		}
 		return overrides;
 	}
 
