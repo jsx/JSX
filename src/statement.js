@@ -252,6 +252,10 @@ var ReturnStatement = exports.ReturnStatement = Statement.extend({
 				context.errors.push(new CompileError(this._token, "cannot return void, the function is declared to return a value of type '" + returnType.toString() + "'"));
 				return true;
 			}
+			if (this._expr instanceof FunctionExpression && ! this._expr.typesAreIdentified() && returnType instanceof StaticFunctionType) {
+				if (! this._expr.getFuncDef().deductTypeIfUnknown(context, returnType))
+					return false;
+			}
 			if (! this._analyzeExpr(context, this._expr))
 				return true;
 			var exprType = this._expr != null ? this._expr.getType() : Type.voidType;
