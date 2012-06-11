@@ -633,10 +633,10 @@ var _FoldConstantCommand = exports._FoldConstantCommand = _FunctionOptimizeComma
 		case "*": this._foldNumericBinaryExpressionAsNumeric(expr, replaceCb, function (x, y) { return x * y; }); break;
 		case "+": this._foldNumericBinaryExpressionAsNumeric(expr, replaceCb, function (x, y) { return x + y; }); break;
 		case "-": this._foldNumericBinaryExpressionAsNumeric(expr, replaceCb, function (x, y) { return x - y; }); break;
+		case "%": this._foldNumericBinaryExpressionAsNumeric(expr, replaceCb, function (x, y) { return x % y; }); break;
 
 		// expressions that always return number
 		case "/": this._foldNumericBinaryExpressionAsNumber(expr, replaceCb, function (x, y) { return x / y; }); break;
-		case "%": this._foldNumericBinaryExpressionAsNumber(expr, replaceCb, function (x, y) { return x % y; }); break;
 
 		// expressions that always return integer
 		case ">>>": this._foldNumericBinaryExpressionAsInteger(expr, replaceCb, function (x, y) { return x >>> y; }); break;
