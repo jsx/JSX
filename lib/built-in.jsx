@@ -211,7 +211,9 @@ native final class Math {
 	static const SQRT2 = 1.4142135623730951;
 
 	// 15.8.2
-	static function abs(x :number) :number;
+	static function abs(x :number) :number {
+		return x >= 0 ? x : -x;
+	}
 	static function acos(x :number) :number;
 	static function asin(x :number) :number;
 	static function atan(x :number) :number;
