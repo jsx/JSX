@@ -604,8 +604,8 @@ sub to_jsx_type {
         )*
         \z
     }{}xms;
-    my $vararg   = $+{vararg} // ""; # not used yet
-    my $nullable = $+{nullable} // "";
+    #my $vararg   = $+{vararg};
+    my $nullable = $+{nullable};
     $array //= $+{array};
 
     my $type;
@@ -657,8 +657,7 @@ sub make_functions {
             optional => !!$+{optional},
         );
 
-        # FIXME: support varargs
-        $t{optional} = 1 if $t{type} =~ /\.\.\. \z/xms;
+        $t{vararg} = 1 if $t{type} =~ /\.\.\. \z/xms;
 
         push @unresolved_params, \%t;
     }
@@ -672,7 +671,8 @@ sub make_functions {
         my @f;
         while(1) {
             my $p = join ", ", map {
-                "$_->{name} : $_->{jsx_type}"
+                my $vararg = $_->{vararg} ? "..." : "";
+                "$vararg$_->{name} : $_->{jsx_type}"
             } @{$params_ref};
 
             my $f = "function $name($p)$ret_type_decl;";
@@ -731,6 +731,7 @@ sub resolve_overload {
                 jsx_type => to_jsx_type($t),
                 name     => $head->{name},
                 optional => $head->{optional},
+                vararg   => $head->{vararg},
             };
             push @o, map { [ $p, @{$_} ] } @resolved;
         }

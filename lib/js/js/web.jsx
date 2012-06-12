@@ -412,12 +412,10 @@ native class Document extends Node {
 		filter : NodeFilter
 	) : TreeWalker;
 	// NEW
-	function prepend() : void;
-	function prepend(nodes : Node) : void;
-	function prepend(nodes : string/*DOMString*/) : void;
-	function append() : void;
-	function append(nodes : Node) : void;
-	function append(nodes : string/*DOMString*/) : void;
+	function prepend(...nodes : Node) : void;
+	function prepend(...nodes : string/*DOMString*/) : void;
+	function append(...nodes : Node) : void;
+	function append(...nodes : string/*DOMString*/) : void;
 
 	// implements DocumentEvent
 
@@ -493,12 +491,10 @@ native class DOMImplementation {
 native class DocumentFragment extends Node {
 
 	// NEW
-	function prepend() : void;
-	function prepend(nodes : Node) : void;
-	function prepend(nodes : string/*DOMString*/) : void;
-	function append() : void;
-	function append(nodes : Node) : void;
-	function append(nodes : string/*DOMString*/) : void;
+	function prepend(...nodes : Node) : void;
+	function prepend(...nodes : string/*DOMString*/) : void;
+	function append(...nodes : Node) : void;
+	function append(...nodes : string/*DOMString*/) : void;
 
 	// implements NodeSelector
 
@@ -515,15 +511,12 @@ native class DocumentType extends Node {
 	__readonly__ var publicId : string/*DOMString*/;
 	__readonly__ var systemId : string/*DOMString*/;
 	// NEW
-	function before() : void;
-	function before(nodes : Node) : void;
-	function before(nodes : string/*DOMString*/) : void;
-	function after() : void;
-	function after(nodes : Node) : void;
-	function after(nodes : string/*DOMString*/) : void;
-	function replace() : void;
-	function replace(nodes : Node) : void;
-	function replace(nodes : string/*DOMString*/) : void;
+	function before(...nodes : Node) : void;
+	function before(...nodes : string/*DOMString*/) : void;
+	function after(...nodes : Node) : void;
+	function after(...nodes : string/*DOMString*/) : void;
+	function replace(...nodes : Node) : void;
+	function replace(...nodes : string/*DOMString*/) : void;
 	function remove() : void;
 
 } // end of DocumentType
@@ -581,21 +574,16 @@ native class Element extends Node {
 	__readonly__ var nextElementSibling : Element;
 	__readonly__ var childElementCount : int/*unsigned long*/;
 	// NEW
-	function prepend() : void;
-	function prepend(nodes : Node) : void;
-	function prepend(nodes : string/*DOMString*/) : void;
-	function append() : void;
-	function append(nodes : Node) : void;
-	function append(nodes : string/*DOMString*/) : void;
-	function before() : void;
-	function before(nodes : Node) : void;
-	function before(nodes : string/*DOMString*/) : void;
-	function after() : void;
-	function after(nodes : Node) : void;
-	function after(nodes : string/*DOMString*/) : void;
-	function replace() : void;
-	function replace(nodes : Node) : void;
-	function replace(nodes : string/*DOMString*/) : void;
+	function prepend(...nodes : Node) : void;
+	function prepend(...nodes : string/*DOMString*/) : void;
+	function append(...nodes : Node) : void;
+	function append(...nodes : string/*DOMString*/) : void;
+	function before(...nodes : Node) : void;
+	function before(...nodes : string/*DOMString*/) : void;
+	function after(...nodes : Node) : void;
+	function after(...nodes : string/*DOMString*/) : void;
+	function replace(...nodes : Node) : void;
+	function replace(...nodes : string/*DOMString*/) : void;
 	function remove() : void;
 
 	function getClientRects() : ClientRectList;
@@ -663,15 +651,12 @@ native class CharacterData extends Node {
 		data : string/*DOMString*/
 	) : void;
 	// NEW
-	function before() : void;
-	function before(nodes : Node) : void;
-	function before(nodes : string/*DOMString*/) : void;
-	function after() : void;
-	function after(nodes : Node) : void;
-	function after(nodes : string/*DOMString*/) : void;
-	function replace() : void;
-	function replace(nodes : Node) : void;
-	function replace(nodes : string/*DOMString*/) : void;
+	function before(...nodes : Node) : void;
+	function before(...nodes : string/*DOMString*/) : void;
+	function after(...nodes : Node) : void;
+	function after(...nodes : string/*DOMString*/) : void;
+	function replace(...nodes : Node) : void;
+	function replace(...nodes : string/*DOMString*/) : void;
 	function remove() : void;
 
 } // end of CharacterData
@@ -2435,10 +2420,8 @@ native class HTMLDocument extends Document {
 		replace : boolean
 	) : Window/*WindowProxy*/;
 	function close() : void;
-	function write() : void;
-	function write(text : string/*DOMString...*/) : void;
-	function writeln() : void;
-	function writeln(text : string/*DOMString...*/) : void;
+	function write(...text : string/*DOMString...*/) : void;
+	function writeln(...text : string/*DOMString...*/) : void;
 	// user interaction
 	__readonly__ var defaultView : Window/*WindowProxy?*/;
 	__readonly__ var activeElement : Element;
@@ -3189,32 +3172,18 @@ native class HTMLCanvasElement extends HTMLElement {
 
 	var width : int/*unsigned long*/;
 	var height : int/*unsigned long*/;
-	function toDataURL() : string/*DOMString*/;
-	function toDataURL(
-		type : string/*DOMString*/
-	) : string/*DOMString*/;
 	function toDataURL(
 		type : string/*DOMString*/,
-		args : variant/*any...*/
+		...args : variant/*any...*/
 	) : string/*DOMString*/;
-	function toBlob(
-		_callback : function(:File):void/*FileCallback?*/
-	) : void;
-	function toBlob(
-		_callback : function(:File):void/*FileCallback?*/,
-		type : string/*DOMString*/
-	) : void;
 	function toBlob(
 		_callback : function(:File):void/*FileCallback?*/,
 		type : string/*DOMString*/,
-		args : variant/*any...*/
+		...args : variant/*any...*/
 	) : void;
-	function getContext(
-		contextId : string/*DOMString*/
-	) : Object/*object?*/;
 	function getContext(
 		contextId : string/*DOMString*/,
-		args : variant/*any...*/
+		...args : variant/*any...*/
 	) : Object/*object?*/;
 
 } // end of HTMLCanvasElement
@@ -4612,8 +4581,7 @@ native class WorkerGlobalScope extends EventTarget {
 
 	// implements WorkerUtils
 
-	function importScripts() : void;
-	function importScripts(urls : string/*DOMString...*/) : void;
+	function importScripts(...urls : string/*DOMString...*/) : void;
 	__readonly__ var navigator : WorkerNavigator;
 
 } // end of WorkerGlobalScope
@@ -4701,8 +4669,7 @@ native class SharedWorker extends EventTarget {
 
 native __fake__ class WorkerUtils {
 
-	function importScripts() : void;
-	function importScripts(urls : string/*DOMString...*/) : void;
+	function importScripts(...urls : string/*DOMString...*/) : void;
 	__readonly__ var navigator : WorkerNavigator;
 
 	// implements WindowBase64
