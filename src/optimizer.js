@@ -1000,12 +1000,23 @@ var _InlineOptimizeCommand = exports._InlineOptimizeCommand = _FunctionOptimizeC
 				var statements = funcDef.getStatements();
 				if (statements == null)
 					return false;
-				if (_Util.numberOfStatements(statements) >= 5)
+				var requestsInline = (funcDef.flags() & ClassDefinition.IS_INLINE) != 0;
+				if (requestsInline) {
+					// ok
+				} else if (_Util.numberOfStatements(statements) >= 5) {
 					return false;
+				}
 				// no return in the middle, no function expression or super invocation expression
 				return funcDef.forEachStatement(function onStatement(statement) {
-					if (statement instanceof ExpressionStatement
-						|| statement instanceof ForStatement) {
+					if (statement instanceof ExpressionStatement) {
+						// ok
+					} else if (requestsInline
+						&& (statement instanceof ForStatement
+							|| statement instanceof ForInStatement
+							|| statement instanceof DoWhileStatement
+							|| statement instanceof WhileStatement
+							|| statement instanceof IfStatement
+							|| statement instanceof SwitchStatement)) {
 						// ok
 					} else if (statement instanceof ReturnStatement && statement == funcDef.getStatements()[funcDef.getStatements().length - 1]) {
 						// ok

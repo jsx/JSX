@@ -1034,7 +1034,7 @@ var Parser = exports.Parser = Class.extend({
 	_memberDefinition: function (classFlags, isTemplate) {
 		var flags = 0;
 		while (true) {
-			var token = this._expect([ "function", "var", "static", "abstract", "override", "final", "const", "native", "__readonly__" ]);
+			var token = this._expect([ "function", "var", "static", "abstract", "override", "final", "const", "native", "__readonly__", "inline" ]);
 			if (token == null)
 				return null;
 			if (token.getValue() == "const") {
@@ -1079,6 +1079,9 @@ var Parser = exports.Parser = Class.extend({
 			case "__readonly__":
 				newFlag = ClassDefinition.IS_READONLY;
 				break;
+			case "inline":
+				newFlag = ClassDefinition.IS_INLINE;
+				break;
 			default:
 				throw new Error("logic flaw");
 			}
@@ -1094,7 +1097,7 @@ var Parser = exports.Parser = Class.extend({
 			return this._functionDefinition(token, flags, classFlags);
 		}
 		// member variable decl.
-		if ((flags & ~(ClassDefinition.IS_STATIC | ClassDefinition.IS_ABSTRACT | ClassDefinition.IS_CONST | ClassDefinition.IS_READONLY)) != 0) {
+		if ((flags & ~(ClassDefinition.IS_STATIC | ClassDefinition.IS_ABSTRACT | ClassDefinition.IS_CONST | ClassDefinition.IS_READONLY | ClassDefinition.IS_INLINE)) != 0) {
 			this._newError("variables may only have attributes: static, abstract, const");
 			return null;
 		}
