@@ -731,7 +731,7 @@ var _InlineOptimizeCommand = exports._InlineOptimizeCommand = _FunctionOptimizeC
 	_createStash: function () {
 		return {
 			isOptimized: false, // boolean
-			isInlineable: undefined, // tri-state
+			isInlineable: null, // tri-state (null, false, true)
 		};
 	},
 
@@ -993,7 +993,7 @@ var _InlineOptimizeCommand = exports._InlineOptimizeCommand = _FunctionOptimizeC
 	},
 
 	_functionIsInlineable: function (funcDef) {
-		if (typeof this.getStash(funcDef).isInlineable != "boolean") {
+		if (this.getStash(funcDef).isInlineable === null) {
 			this.getStash(funcDef).isInlineable = function () {
 				// only inline function that are short, has no branches (last statement may be a return)
 				var statements = funcDef.getStatements();
