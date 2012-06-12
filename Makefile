@@ -12,7 +12,7 @@ test:
 	prove --jobs "$(JOBS)" t/*.t t/*/*.jsx
 
 test-optimized:
-		JSX_OPTS="--optimize lto,no-assert,fold-const,return-if,inline" prove --jobs "$(JOBS)" t/*/*.jsx
+		JSX_OPTS="--optimize lto,no-assert,fold-const,return-if,inline,fold-const" prove --jobs "$(JOBS)" t/*/*.jsx
 
 test-all: test test-optimized
 
