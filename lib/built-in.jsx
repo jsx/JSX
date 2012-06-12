@@ -78,7 +78,11 @@ native final class Array.<T> {
 	function some(callbackfn : function(value : MayBeUndefined.<T>) : boolean) : boolean;
 	function some(callbackfn : function(value : MayBeUndefined.<T>, index : number) : boolean) : boolean;
 	function some(callbackfn : function(value : MayBeUndefined.<T>, index : number, array : Array.<T>) : boolean) : boolean;
-	function forEach(callbackfn : function(value : MayBeUndefined.<T>) : void) : void;
+	function forEach(callbackfn : function(value : MayBeUndefined.<T>) : void) : void {
+		for (var i = 0; i < this.length; ++i) {
+			callbackfn(this[i]);
+		}
+	}
 	function forEach(callbackfn : function(value : MayBeUndefined.<T>, index : number) : void) : void;
 	function forEach(callbackfn : function(value : MayBeUndefined.<T>, index : number, array : Array.<T>) : void) : void;
 	function map(callbackfn : function(value : MayBeUndefined.<T>) : MayBeUndefined.<T>) : Array.<T>;
