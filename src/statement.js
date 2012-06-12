@@ -688,6 +688,10 @@ var ForStatement = exports.ForStatement = ContinuableStatement.extend({
 		return this._initExpr;
 	},
 
+	setInitExpr: function (expr) {
+		this._initExpr = expr;
+	},
+
 	getCondExpr: function () {
 		return this._condExpr;
 	},

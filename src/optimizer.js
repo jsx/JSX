@@ -113,6 +113,8 @@ var Optimizer = exports.Optimizer = Class.extend({
 				this._commands.push(new _InlineOptimizeCommand());
 			} else if (cmd == "return-if") {
 				this._commands.push(new _ReturnIfOptimizeCommand());
+			} else if (cmd == "array-length") {
+				this._commands.push(new _ArrayLengthOptimizeCommand());
 			} else if (cmd == "dump-logs") {
 				this._dumpLogs = true;
 			} else {
@@ -203,6 +205,22 @@ var _OptimizeCommand = exports._OptimizeCommand = Class.extend({
 
 	_createStash: function () {
 		throw new Error("if you are going to use the stash, you need to override this function");
+	},
+
+	createVar: function (funcDef, type, baseName) {
+		var locals = funcDef.getLocals();
+		var nameExists = function (n) {
+			for (var i = 0; i < locals.length; ++i)
+				if (locals[i].getName().getValue() == n)
+					return true;
+			return false;
+		}
+		for (var i = 0; nameExists(baseName + "$" + i); ++i)
+			;
+		var newLocal = new LocalVariable(new Token(baseName + "$" + i, true), type);
+		locals.push(newLocal);
+		this.log("rewriting " + baseName + " to " + newLocal.getName().getValue());
+		return newLocal;
 	},
 
 	log: function (message) {
@@ -1092,7 +1110,7 @@ var _InlineOptimizeCommand = exports._InlineOptimizeCommand = _FunctionOptimizeC
 		// handle locals
 		var locals = calleeFuncDef.getLocals();
 		for (var i = 0; i < locals.length; ++i) {
-			var tempVar = this._createVar(callerFuncDef, locals[i].getType(), locals[i].getName().getValue());
+			var tempVar = this.createVar(callerFuncDef, locals[i].getType(), locals[i].getName().getValue());
 			argsAndThisAndLocals.push(new LocalExpression(tempVar.getName(), tempVar));
 		}
 		return stmtIndex;
@@ -1120,7 +1138,7 @@ var _InlineOptimizeCommand = exports._InlineOptimizeCommand = _FunctionOptimizeC
 			return null;
 		}
 		// create a local variable based on the given name
-		var newLocal = this._createVar(callerFuncDef, type, baseName);
+		var newLocal = this.createVar(callerFuncDef, type, baseName);
 		// insert a statement that initializes the temporary
 		statements.splice(stmtIndex, 0,
 			new ExpressionStatement(
@@ -1130,22 +1148,6 @@ var _InlineOptimizeCommand = exports._InlineOptimizeCommand = _FunctionOptimizeC
 					expr)));
 		// return an expression referring the the local
 		return new LocalExpression(newLocal.getName(), newLocal);
-	},
-
-	_createVar: function (callerFuncDef, type, baseName) {
-		var locals = callerFuncDef.getLocals();
-		var nameExists = function (n) {
-			for (var i = 0; i < locals.length; ++i)
-				if (locals[i].getName().getValue() == n)
-					return true;
-			return false;
-		}
-		for (var i = 0; nameExists(baseName + "$" + i); ++i)
-			;
-		var newLocal = new LocalVariable(new Token(baseName + "$" + i, true), type);
-		locals.push(newLocal);
-		this.log("rewriting " + baseName + " to " + newLocal.getName().getValue());
-		return newLocal;
 	},
 
 	_rewriteExpression: function (expr, replaceCb, argsAndThisAndLocals, calleeFuncDef) {
@@ -1283,6 +1285,124 @@ var _ReturnIfOptimizeCommand = exports._ReturnIfOptimizeCommand = _FunctionOptim
 				trueExpr,
 				falseExpr,
 				falseExpr.getType()));
+	}
+
+});
+
+var _ArrayLengthOptimizeCommand = exports._ArrayLengthOptimizeCommand = _FunctionOptimizeCommand.extend({
+
+	constructor: function () {
+		_FunctionOptimizeCommand.prototype.constructor.call(this, "array-length");
+	},
+
+	optimizeFunction: function (funcDef) {
+		funcDef.forEachStatement(function onStatement(statement) {
+			statement.forEachStatement(onStatement.bind(this));
+			if (statement instanceof ForStatement) {
+				var arrayLocal = this._hasLengthExprOfLocalArray(statement.getCondExpr());
+				if (arrayLocal != null) {
+					if (this._lengthIsUnmodifiedInExpr(statement.getCondExpr())
+						&& this._lengthIsUnmodifiedInExpr(statement.getPostExpr())
+						&& statement.forEachStatement(this._lengthIsUnmodifiedInStatement.bind(this))) {
+						// optimize!
+						this.log(_Util.getFuncName(funcDef) + " optimizing .length at line " + statement.getToken().getLineNumber());
+						// create local
+						var lengthLocal = this.createVar(funcDef, Type.integerType, arrayLocal.getName().getValue() + "$len");
+						// assign to the local
+						statement.setInitExpr(
+							new CommaExpression(
+								new Token(",", false),
+								statement.getInitExpr(),
+								new AssignmentExpression(
+									new Token("=", false),
+									new LocalExpression(new Token(lengthLocal.getName(), true), lengthLocal),
+									new PropertyExpression(
+										new Token(".", false),
+										new LocalExpression(new Token(arrayLocal.getName(), true), arrayLocal),
+										new Token("length", true),
+										lengthLocal.getType()))));
+						// rewrite
+						var onExpr = function (expr, replaceCb) {
+							if (expr instanceof PropertyExpression
+								&& expr.getIdentifierToken().getValue() == "length"
+								&& expr.getExpr() instanceof LocalExpression
+								&& expr.getExpr().getLocal() == arrayLocal) {
+								replaceCb(new LocalExpression(new Token(lengthLocal.getName(), true), lengthLocal));
+							} else {
+								expr.forEachExpression(onExpr.bind(this));
+							}
+							return true;
+						}.bind(this);
+						statement.getCondExpr().forEachExpression(onExpr);
+						statement.getPostExpr().forEachExpression(onExpr);
+						statement.forEachStatement(function onStatement(statement) {
+							statement.forEachStatement(onStatement.bind(this));
+							statement.forEachExpression(onExpr);
+							return true;
+						}.bind(this));
+					}
+				}
+			}
+			return true;
+		}.bind(this));
+	},
+
+	_hasLengthExprOfLocalArray: function (expr) {
+		var local = null;
+		expr.forEachExpression(function onExpr(expr) {
+			if (expr instanceof PropertyExpression
+				&& expr.getIdentifierToken().getValue() == "length"
+				&& expr.getExpr() instanceof LocalExpression
+				&& this._typeIsArray(expr.getExpr().getType().resolveIfMayBeUndefined())) {
+				local = expr.getExpr().getLocal();
+				return false;
+			}
+			return expr.forEachExpression(onExpr);
+		}.bind(this));
+		return local;
+	},
+
+	_lengthIsUnmodifiedInStatement: function (statement) {
+		if (! statement.forEachStatement(this._lengthIsUnmodifiedInStatement.bind(this)))
+			return false;
+		return statement.forEachExpression(this._lengthIsUnmodifiedInExpr.bind(this));
+	},
+
+	_lengthIsUnmodifiedInExpr: function (expr) {
+		if (expr instanceof AssignmentExpression) {
+			if (this._lhsMayModifyLength(expr.getFirstExpr())) {
+				return false;
+			}
+		} else if (expr instanceof CallExpression || expr instanceof SuperExpression) {
+			return false;
+		} else if (expr instanceof IncrementExpression) {
+			if (this._lhsMayModifyLength(expr.getExpr())) {
+				return false;
+			}
+		}
+		return true;
+	},
+
+	_lhsMayModifyLength: function (expr) {
+		if (expr instanceof PropertyExpression && expr.getIdentifierToken().getValue() == "length")
+			return true;
+		if (expr instanceof ArrayExpression)
+			return true;
+		var exprType = expr.getType().resolveIfMayBeUndefined();
+		if (exprType.equals(Type.variantType))
+			return true;
+		if (this._typeIsArray(exprType))
+			return true;
+		return false;
+	},
+
+	_typeIsArray: function (type) {
+		if (! (type instanceof ObjectType))
+			return false;
+		var classDef = type.getClassDef();
+		if (! (classDef instanceof InstantiatedClassDefinition))
+			return false;
+		return classDef.getTemplateClassName() == "Array";
 	}
 
 });
