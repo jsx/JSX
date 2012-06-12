@@ -88,7 +88,7 @@ function main(args) {
 				"perl", ["web/build.pl"],
 				function(error, stdout, stderr) {
 					if(error) {
-						finish(response, uri, 500, error + "\n");
+						finish(response, uri, 500, "text/plain", error + "\n");
 						return;
 					}
 					serveFile(response, uri, filename);
