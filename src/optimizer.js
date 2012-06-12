@@ -745,11 +745,12 @@ var _InlineOptimizeCommand = exports._InlineOptimizeCommand = _FunctionOptimizeC
 		if (funcDef.getStatements() == null)
 			return;
 		this.log("* starting optimization of " + _Util.getFuncName(funcDef));
-		var altered = false;
 		while (true) {
-			if (! this._handleStatements(funcDef, funcDef.getStatements()))
-				break;
-			altered = true;
+			while (true) {
+				if (! this._handleStatements(funcDef, funcDef.getStatements()))
+					break;
+				this.setupCommand(new _DetermineCalleeCommand()).optimizeFunction(funcDef);
+			}
 			if (! this.setupCommand(new _ReturnIfOptimizeCommand()).optimizeFunction(funcDef))
 				break;
 		}
@@ -1001,27 +1002,27 @@ var _InlineOptimizeCommand = exports._InlineOptimizeCommand = _FunctionOptimizeC
 					return false;
 				if (_Util.numberOfStatements(statements) >= 5)
 					return false;
-				for (var i = 0; i < statements.length; ++i) {
-					if (! (statements[i] instanceof ExpressionStatement))
-						break;
-				}
-				if (! (i == statements.length || (i == statements.length - 1 && statements[i] instanceof ReturnStatement)))
-					return false;
-				// no function nor super expression
-				var hasNonInlineableExpr = ! Util.forEachStatement(function onStatement(statement) {
-					var onExpr = function onExpr(expr) {
+				// no return in the middle, no function expression or super invocation expression
+				return funcDef.forEachStatement(function onStatement(statement) {
+					if (statement instanceof ExpressionStatement
+						|| statement instanceof ForStatement) {
+						// ok
+					} else if (statement instanceof ReturnStatement && statement == funcDef.getStatements()[funcDef.getStatements().length - 1]) {
+						// ok
+					} else {
+						return false;
+					}
+					if (! statement.forEachExpression(function onExpr(expr) {
 						if (expr instanceof FunctionExpression)
 							return false;
 						if (expr instanceof SuperExpression)
 							return false;
 						return expr.forEachExpression(onExpr.bind(this));
-					};
-					return statement.forEachExpression(onExpr.bind(this));
-				}.bind(this), statements);
-				if (hasNonInlineableExpr) {
-					return false;
-				}
-				return true;
+					})) {
+						return false;
+					}
+					return statement.forEachStatement(onStatement.bind(this));
+				}.bind(this));
 			}.call(this);
 			this.log(_Util.getFuncName(funcDef) + (this.getStash(funcDef).isInlineable ? " is" : " is not") + " inlineable");
 		}
@@ -1036,10 +1037,17 @@ var _InlineOptimizeCommand = exports._InlineOptimizeCommand = _FunctionOptimizeC
 		var calleeStatements = calleeFuncDef.getStatements();
 		for (var i = 0; i < calleeStatements.length; ++i) {
 			// clone the statement (while rewriting last return statement to an expression statement)
-			var statement = new ExpressionStatement(calleeStatements[i].getExpr().clone());
+			var statement = calleeStatements[i] instanceof ReturnStatement
+				? new ExpressionStatement(calleeStatements[i].getExpr().clone())
+				: calleeStatements[i].clone();
 			// replace the arguments with actual arguments
-			statement.forEachExpression(function onExpr(expr, replaceCb) {
+			var onExpr = function onExpr(expr, replaceCb) {
 				return this._rewriteExpression(expr, replaceCb, argsAndThisAndLocals, calleeFuncDef);
+			}.bind(this);
+			statement.forEachExpression(onExpr);
+			statement.forEachStatement(function onStatement(statement) {
+				statement.forEachStatement(onStatement.bind(this));
+				return statement.forEachExpression(onExpr);
 			}.bind(this));
 			// insert the statement
 			statements.splice(stmtIndex++, 0, statement);
@@ -1059,10 +1067,15 @@ var _InlineOptimizeCommand = exports._InlineOptimizeCommand = _FunctionOptimizeC
 		// handle other arguments
 		var formalArgs = calleeFuncDef.getArguments();
 		for (var i = 0; i < formalArgs.length; ++i) {
-			var tempVar = this._createVarForArgOrThis(callerFuncDef, statements, stmtIndex, argsAndThisAndLocals[i], formalArgs[i].getType(), formalArgs[i].getName().getValue());
-			if (tempVar != null) {
-				argsAndThisAndLocals[i] = tempVar;
-				++stmtIndex;
+			if (argsAndThisAndLocals[i] instanceof FunctionExpression && this._getNumberOfTimesArgIsUsed(calleeFuncDef, formalArgs[i]) <= 1) {
+				// if the argument is a function expression that is referred only once, directly spill the function into the inlined function
+				// of if it is never referred to, the function expression will disappear
+			} else {
+				var tempVar = this._createVarForArgOrThis(callerFuncDef, statements, stmtIndex, argsAndThisAndLocals[i], formalArgs[i].getType(), formalArgs[i].getName().getValue());
+				if (tempVar != null) {
+					argsAndThisAndLocals[i] = tempVar;
+					++stmtIndex;
+				}
 			}
 		}
 		// handle locals
@@ -1072,6 +1085,22 @@ var _InlineOptimizeCommand = exports._InlineOptimizeCommand = _FunctionOptimizeC
 			argsAndThisAndLocals.push(new LocalExpression(tempVar.getName(), tempVar));
 		}
 		return stmtIndex;
+	},
+
+	_getNumberOfTimesArgIsUsed: function (funcDef, local) {
+		var count = 0;
+		funcDef.forEachStatement(function onStatement(statement) {
+			statement.forEachStatement(onStatement.bind(this));
+			statement.forEachExpression(function onExpr(expr) {
+				expr.forEachExpression(onExpr.bind(this));
+				if (expr instanceof LocalExpression && expr.getLocal() == local) {
+					++count;
+				}
+				return true;
+			}.bind(this));
+			return true;
+		}.bind(this));
+		return count;
 	},
 
 	_createVarForArgOrThis: function (callerFuncDef, statements, stmtIndex, expr, type, baseName) {
@@ -1124,10 +1153,13 @@ var _InlineOptimizeCommand = exports._InlineOptimizeCommand = _FunctionOptimizeC
 					if (locals[k].getName().getValue() == expr.getToken().getValue())
 						break;
 				}
-				if (j == argsAndThisAndLocals.length)
-					throw new Error("logic flaw, could not find formal parameter named " + expr.getToken().getValue());
 			}
-			replaceCb(argsAndThisAndLocals[j].clone());
+			// replace the local expression (function expression need not (and cannot) be cloned, so it is guaranteed to appear only once, in _createVars)
+			if (j != argsAndThisAndLocals.length) {
+				replaceCb(argsAndThisAndLocals[j] instanceof FunctionExpression ? argsAndThisAndLocals[j] : argsAndThisAndLocals[j].clone());
+			} else {
+				// closure referring to a local variable of outer scope
+			}
 		} else if (expr instanceof ThisExpression) {
 			replaceCb(argsAndThisAndLocals[formalArgs.length].clone());
 		}
