@@ -1843,7 +1843,7 @@ var CallExpression = exports.CallExpression = OperatorExpression.extend({
 	},
 
 	getType: function () {
-		return this._expr.getType().getReturnType();
+		return this._expr.getType().resolveIfMayBeUndefined().getReturnType();
 	},
 
 	forEachExpression: function (cb) {
