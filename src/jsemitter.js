@@ -1964,7 +1964,7 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 		this._reduceIndent();
 		this._emit("};\n\n", null);
 		if ((funcDef.flags() & ClassDefinition.IS_STATIC) != 0)
-			this._emit(className + "$" + funcName + " = " + className + "." + funcName + ";\n\n", null);
+			this._emit("var " + className + "$" + funcName + " = " + className + "." + funcName + ";\n\n", null);
 	},
 
 	_emitFunctionArgumentAnnotations: function (funcDef) {
