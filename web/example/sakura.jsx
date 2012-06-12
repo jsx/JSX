@@ -8,10 +8,16 @@ import "js/web.jsx";
 
 class Config {
   static const NUMBER_OF_PETALS = 24;
+
+  // min/max size of a sakura petal
+  static const MIN_SIZE   =  5;
+  static const SIZE_RANGE = 15;
+
   static const TEXTURE_FILE = "sakura.png";
 
-  static const STAGE_WIDTH  = 400; // dom.window.innerWidth  for fullscreen
-  static const STAGE_HEIGHT = 400; // dom.window.innerHeight for fullscreen
+  static const STAGE_WIDTH  = 400; // dom.window.innerWidth
+  static const STAGE_HEIGHT = 400; // dom.window.innerHeight
+
 }
 
 final class Sakura {
@@ -132,7 +138,7 @@ final class Stage {
 
     for (var i = 0; i < Config.NUMBER_OF_PETALS; ++i) {
       this.sakura[i] = new Sakura((
-        Math.random() * 15 + 5) as int,
+        (Math.random() * Config.SIZE_RANGE) + Config.MIN_SIZE) as int,
         this.width, this.height);
 
       if (this.sakura[i].x > sakuraPosXMax) {
