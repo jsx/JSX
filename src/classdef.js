@@ -1390,7 +1390,7 @@ var TemplateClassDefinition = exports.TemplateClassDefinition = Class.extend({
 			this._className,
 			this._flags,
 			request.getTypeArguments(),
-			this._extendType.instantiate(instantiationContext),
+			this._extendType != null ? this._extendType.instantiate(instantiationContext): null,
 			this._implementTypes.map(function (t) { return t.instantiate(instantiationContext); }),
 			members,
 			instantiationContext.objectTypesUsed);
