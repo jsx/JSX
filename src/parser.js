@@ -655,6 +655,7 @@ var Parser = exports.Parser = Class.extend({
 				return false;
 			}
 			++this._lineNumber;
+			this._columnOffset = 0;
 		}
 	},
 
