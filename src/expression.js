@@ -30,9 +30,17 @@ var Statement = require("./statement");
 
 var Expression = exports.Expression = Class.extend({
 
-	constructor: function (token) {
-		this._token = token;
-		this._optimizerStash = {};
+	constructor: function (tokenOrThat) {
+		if (tokenOrThat instanceof Expression) {
+			var that = tokenOrThat;
+			this._token = that.getToken();
+			this._optimizerStash = {};
+			for (var k in that._optimizerStash)
+				this._optimizerStash[k] = that._optimizerStash[k].clone();
+		} else {
+			this._token = tokenOrThat;
+			this._optimizerStash = {};
+		}
 	},
 
 	clone: null,
@@ -58,26 +66,6 @@ var Expression = exports.Expression = Class.extend({
 
 	getOptimizerStash: function () {
 		return this._optimizerStash;
-	},
-
-	_cloneOptimizerStashHack: function (src) {
-		/*
-			FIXME this is a very dirty hack that clones the optimizer stack.
-			We should define copy constructors and use them once we migrate to self-hosted
-		*/
-		for (var k in src._optimizerStash) {
-			var src = src._optimizerStash[k];
-			var dst;
-			if (typeof src == "object") {
-				dst = {};
-				for (var j in src) {
-					dst[j] = src[j];
-				}
-			} else {
-				dst = src;
-			}
-			this._optimizerStash[k] = dst;
-		}
 	},
 
 	$assertIsAssignable: function (context, token, lhsType, rhsType) {
@@ -125,8 +113,8 @@ var LeafExpression = exports.LeafExpression = Expression.extend({
 
 var OperatorExpression = exports.OperatorExpression = Expression.extend({
 
-	constructor: function (token) {
-		Expression.prototype.constructor.call(this, token);
+	constructor: function (tokenOrThat) {
+		Expression.prototype.constructor.call(this, tokenOrThat);
 	},
 
 	assertIsConvertibleTo: function (context, expr, type, mayUnbox) {
@@ -1799,16 +1787,22 @@ var ConditionalExpression = exports.ConditionalExpression = OperatorExpression.e
 
 var CallExpression = exports.CallExpression = OperatorExpression.extend({
 
-	constructor: function (operatorToken, expr, args) {
-		OperatorExpression.prototype.constructor.call(this, operatorToken);
-		this._expr = expr;
-		this._args = args;
+	constructor: function (tokenOrThat, expr, args) {
+		if (tokenOrThat instanceof CallExpression) {
+			// clone
+			var that = tokenOrThat;
+			OperatorExpression.prototype.constructor.call(this, that);
+			this._expr = that._expr.clone();
+			this._args = Util.cloneArray(that._args);
+		} else {
+			OperatorExpression.prototype.constructor.call(this, tokenOrThat);
+			this._expr = expr;
+			this._args = args;
+		}
 	},
 
 	clone: function () {
-		var ret = new CallExpression(this._token, this._expr.clone(), Util.cloneArray(this._args));
-		ret._cloneOptimizerStashHack(this);
-		return ret;
+		return new CallExpression(this);
 	},
 
 	getExpr: function () {
@@ -1869,18 +1863,23 @@ var CallExpression = exports.CallExpression = OperatorExpression.extend({
 
 var SuperExpression = exports.SuperExpression = OperatorExpression.extend({
 
-	constructor: function (operatorToken, name, args) {
-		OperatorExpression.prototype.constructor.call(this, operatorToken);
-		this._name = name;
-		this._args = args;
-		this._funcType = null;
+	constructor: function (tokenOrThat, name, args) {
+		if (tokenOrThat instanceof SuperExpression) {
+			var that = tokenOrThat;
+			OperatorExpression.prototype.constructor.call(this, that);
+			this._name = that._name;
+			this._args = Util.cloneArray(that._args);
+			this._funcType = that._funcType;
+		} else {
+			OperatorExpression.prototype.constructor.call(this, tokenOrThat);
+			this._name = name;
+			this._args = args;
+			this._funcType = null;
+		}
 	},
 
 	clone: function () {
-		var ret = new SuperExpression(this._token, this._name, Util.cloneArray(this._args));
-		ret._funcType = this._funcType;
-		ret._cloneOptimizerStashHack(this);
-		return ret;
+		return new SuperExpression(this);
 	},
 
 	getName: function () {

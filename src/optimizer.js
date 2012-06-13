@@ -265,6 +265,18 @@ var _FunctionOptimizeCommand = exports._FunctionOptimizeCommand = _OptimizeComma
 
 });
 
+var _LinkTimeOptimizationCommandStash = exports._LinkTimeOptimizationCommandStash = Class.extend({
+
+	constructor: function () {
+		this.extendedBy = [];
+	},
+
+	clone: function () {
+		throw new Error("not supported");
+	}
+
+});
+
 var _LinkTimeOptimizationCommand = exports._LinkTimeOptimizationCommand = _OptimizeCommand.extend({
 
 	$IDENTIFIER: "lto",
@@ -274,9 +286,7 @@ var _LinkTimeOptimizationCommand = exports._LinkTimeOptimizationCommand = _Optim
 	},
 
 	_createStash: function () {
-		return {
-			extendedBy: []
-		};
+		return new _LinkTimeOptimizationCommandStash();
 	},
 
 	performOptimization: function () {
@@ -414,6 +424,18 @@ var _NoLogCommand = exports._NoAssertCommand = _FunctionOptimizeCommand.extend({
 
 });
 
+var _DetermineCalleeCommandStash = exports._DetermineCalleeCommandStash = Class.extend({
+
+	constructor: function (that /* optional */) {
+		this.callingFuncDef = that ? that.callingFuncDef : null;
+	},
+
+	clone: function () {
+		return new _DetermineCalleeCommandStash(this);
+	}
+
+});
+
 var _DetermineCalleeCommand = exports._DetermineCalleeCommand = _FunctionOptimizeCommand.extend({
 
 	$IDENTIFIER: "determine-callee",
@@ -423,9 +445,7 @@ var _DetermineCalleeCommand = exports._DetermineCalleeCommand = _FunctionOptimiz
 	},
 
 	_createStash: function () {
-		return {
-			callingFuncDef: null
-		};
+		return new _DetermineCalleeCommandStash();
 	},
 
 	optimizeFunction: function (funcDef) {
@@ -518,6 +538,19 @@ var _DetermineCalleeCommand = exports._DetermineCalleeCommand = _FunctionOptimiz
 });
 
 // propagates constants
+
+var _FoldConstantCommandStash = exports._FoldConstantCommandStash = Class.extend({
+
+	constructor: function (that /* optional */) {
+		this.isOptimized = that ? that.isOptimized : false; // boolean
+	},
+
+	clone: function () {
+		return new _FoldConstantCommandStash(this);
+	}
+
+});
+
 var _FoldConstantCommand = exports._FoldConstantCommand = _FunctionOptimizeCommand.extend({
 
 	constructor: function () {
@@ -525,9 +558,7 @@ var _FoldConstantCommand = exports._FoldConstantCommand = _FunctionOptimizeComma
 	},
 
 	_createStash: function () {
-		return {
-			isOptimized: false // boolean
-		};
+		return new _FoldConstantCommandStash();
 	},
 
 	optimizeFunction: function (funcDef) {
@@ -740,6 +771,19 @@ var _FoldConstantCommand = exports._FoldConstantCommand = _FunctionOptimizeComma
 
 });
 
+var _InlineOptimizeCommandStash = exports._InlineOptimizeCommandStash = Class.extend({
+
+	constructor: function (that /* optional */) {
+		this.isOptimized = that ? that.isOptimized : false; // boolean
+		this.isInlineable = that ? that.isInlineable : null; // tri-state (null, false, true)
+	},
+
+	clone: function () {
+		return new _InlineOptimizeCommandStash(this);
+	}
+
+});
+
 var _InlineOptimizeCommand = exports._InlineOptimizeCommand = _FunctionOptimizeCommand.extend({
 
 	constructor: function () {
@@ -747,10 +791,7 @@ var _InlineOptimizeCommand = exports._InlineOptimizeCommand = _FunctionOptimizeC
 	},
 
 	_createStash: function () {
-		return {
-			isOptimized: false, // boolean
-			isInlineable: null, // tri-state (null, false, true)
-		};
+		return new _InlineOptimizeCommandStash();
 	},
 
 	optimizeFunction: function (funcDef) {

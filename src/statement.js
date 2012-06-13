@@ -31,6 +31,7 @@ eval(Class.$import("./util"));
 var Statement = exports.Statement = Class.extend({
 
 	constructor: function () {
+		// FIXME clone the stash the right way
 		this._optimizerStash = {};
 	},
 
