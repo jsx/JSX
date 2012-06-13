@@ -1,4 +1,6 @@
-
+/*EXPECTED
+foo
+*/
 interface I.<T> {
 	function f() : T;
 }
