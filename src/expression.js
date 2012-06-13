@@ -1728,18 +1728,14 @@ var ConditionalExpression = exports.ConditionalExpression = OperatorExpression.e
 		if (! this._ifFalseExpr.analyze(context, this))
 			return false;
 		// check the types
+		if (this._condExpr.getType().equals(Type.voidType)) {
+			context.errors.push(new CompileError(this._token, "condition cannot be void"));
+			return false;
+		}
 		if (this._ifTrueExpr != null) {
-			if (! this._condExpr.getType().isConvertibleTo(Type.booleanType)) {
-				context.errors.push(new CompileError(this._token, "condition should be convertible to bool"));
-				return false;
-			}
 			var typeIfTrue = this._ifTrueExpr.getType();
 		} else {
 			typeIfTrue = this._condExpr.getType();
-			if (typeIfTrue.equals(Type.voidType)) {
-				context.errors.push(new CompileError(this._token, "condition cannot be void"));
-				return false;
-			}
 		}
 		var typeIfFalse = this._ifFalseExpr.getType();
 		if (typeIfTrue.equals(typeIfFalse)) {

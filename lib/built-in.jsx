@@ -79,7 +79,7 @@ native final class Array.<T> {
 	function some(callbackfn : function(value : MayBeUndefined.<T>, index : number) : boolean) : boolean;
 	function some(callbackfn : function(value : MayBeUndefined.<T>, index : number, array : Array.<T>) : boolean) : boolean;
 	inline function forEach(callbackfn : function(value : MayBeUndefined.<T>) : void) : void {
-		for (var i = 0, m = this.length; i < m; ++i) {
+		for (var i in this) {
 			callbackfn(this[i]);
 		}
 	}
