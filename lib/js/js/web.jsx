@@ -61,7 +61,7 @@ automatically generated from:
 	idl2jsx/extra/animation-timing.idl
 	idl2jsx/extra/legacy.idl
 */
-native class DOMException {
+native final class DOMException {
 
 	static __readonly__ var INDEX_SIZE_ERR : int/*unsigned short*/;
 	       __readonly__ var INDEX_SIZE_ERR : int/*unsigned short*/;
@@ -121,7 +121,7 @@ native class DOMException {
 
 } // end of DOMException
 
-native class DOMError {
+native final class DOMError {
 
 	__readonly__ var name : string/*DOMString*/;
 
@@ -174,7 +174,7 @@ native class EventInit {
 
 } // end of EventInit
 
-native class CustomEvent extends Event {
+native final class CustomEvent extends Event {
 
 	function constructor(type : string/*DOMString*/);
 	function constructor(
@@ -194,7 +194,7 @@ native class CustomEvent extends Event {
 
 } // end of CustomEvent
 
-native class CustomEventInit extends EventInit {
+native final class CustomEventInit extends EventInit {
 
 	var detail : variant/*any*/;
 
@@ -228,7 +228,7 @@ native __fake__ class EventTarget {
 
 } // end of EventTarget
 
-native class MutationObserver {
+native final class MutationObserver {
 
 	function constructor(
 		callback : function(:MutationRecord[],
@@ -243,7 +243,7 @@ native class MutationObserver {
 
 } // end of MutationObserver
 
-native class MutationObserverInit {
+native final class MutationObserverInit {
 
 	var childList : boolean;
 	var attributes : boolean;
@@ -255,7 +255,7 @@ native class MutationObserverInit {
 
 } // end of MutationObserverInit
 
-native class MutationRecord {
+native final class MutationRecord {
 
 	__readonly__ var type : string/*DOMString*/;
 	__readonly__ var target : Node;
@@ -462,13 +462,13 @@ native class Document extends Node {
 
 } // end of Document
 
-native class XMLDocument extends Document {
+native final class XMLDocument extends Document {
 
 	function load(url : string/*DOMString*/) : boolean;
 
 } // end of XMLDocument
 
-native class DOMImplementation {
+native final class DOMImplementation {
 
 	function createDocumentType(
 		qualifiedName : string/*DOMString*/,
@@ -488,7 +488,7 @@ native class DOMImplementation {
 
 } // end of DOMImplementation
 
-native class DocumentFragment extends Node {
+native final class DocumentFragment extends Node {
 
 	// NEW
 	function prepend(...nodes : Node) : void;
@@ -505,7 +505,7 @@ native class DocumentFragment extends Node {
 
 } // end of DocumentFragment
 
-native class DocumentType extends Node {
+native final class DocumentType extends Node {
 
 	__readonly__ var name : string/*DOMString*/;
 	__readonly__ var publicId : string/*DOMString*/;
@@ -618,7 +618,7 @@ native class Element extends Node {
 
 } // end of Element
 
-native class Attr {
+native final class Attr {
 
 	__readonly__ var name : string/*DOMString*/;
 	var value : string/*DOMString*/;
@@ -661,7 +661,7 @@ native class CharacterData extends Node {
 
 } // end of CharacterData
 
-native class Text extends CharacterData {
+native final class Text extends CharacterData {
 
 	function splitText(offset : int/*unsigned long*/) : Text;
 	__readonly__ var wholeText : string/*DOMString*/;
@@ -670,7 +670,7 @@ native class Text extends CharacterData {
 
 } // end of Text
 
-native class ProcessingInstruction extends CharacterData {
+native final class ProcessingInstruction extends CharacterData {
 
 	__readonly__ var target : string/*DOMString*/;
 
@@ -680,10 +680,10 @@ native class ProcessingInstruction extends CharacterData {
 
 } // end of ProcessingInstruction
 
-native class Comment extends CharacterData {
+native final class Comment extends CharacterData {
 }
 
-native class Range {
+native final class Range {
 
 	__readonly__ var startContainer : Node;
 	__readonly__ var startOffset : int/*unsigned long*/;
@@ -744,7 +744,7 @@ native class Range {
 
 } // end of Range
 
-native class NodeIterator {
+native final class NodeIterator {
 
 	__readonly__ var root : Node;
 	__readonly__ var referenceNode : Node;
@@ -757,7 +757,7 @@ native class NodeIterator {
 
 } // end of NodeIterator
 
-native class TreeWalker {
+native final class TreeWalker {
 
 	__readonly__ var root : Node;
 	__readonly__ var whatToShow : int/*unsigned long*/;
@@ -773,7 +773,7 @@ native class TreeWalker {
 
 } // end of TreeWalker
 
-native class NodeFilter {
+native final class NodeFilter {
 
 	// Constants for acceptNode()
 	static __readonly__ var FILTER_ACCEPT : int/*unsigned short*/;
@@ -851,7 +851,7 @@ native class HTMLCollection {
 
 } // end of HTMLCollection
 
-native __fake__ class DOMStringList {
+native final __fake__ class DOMStringList {
 
 	__readonly__ var length : int/*unsigned long*/;
 	function __native_index_operator__(
@@ -882,25 +882,25 @@ native class DOMTokenList {
 
 } // end of DOMTokenList
 
-native class DOMSettableTokenList extends DOMTokenList {
+native final class DOMSettableTokenList extends DOMTokenList {
 
 	var value : string/*DOMString*/;
 
 } // end of DOMSettableTokenList
 
-native __fake__ class AbstractView {
+native final __fake__ class AbstractView {
 
 	__readonly__ var document : DocumentView;
 
 } // end of AbstractView
 
-native __fake__ class DocumentView {
+native final __fake__ class DocumentView {
 
 	__readonly__ var defaultView : AbstractView;
 
 } // end of DocumentView
 
-native class EventException {
+native final class EventException {
 
 	// EventExceptionCode
 	static __readonly__ var UNSPECIFIED_EVENT_TYPE_ERR : int/*unsigned short*/;
@@ -940,7 +940,7 @@ native class UIEvent extends Event {
 
 } // end of UIEvent
 
-native class FocusEvent extends UIEvent {
+native final class FocusEvent extends UIEvent {
 
 	__readonly__ var relatedTarget : EventTarget;
 	function initFocusEvent(
@@ -999,7 +999,7 @@ native class MouseEvent extends UIEvent {
 
 } // end of MouseEvent
 
-native class WheelEvent extends MouseEvent {
+native final class WheelEvent extends MouseEvent {
 
 	// DeltaModeCode
 	static __readonly__ var DOM_DELTA_PIXEL : int/*unsigned long*/;
@@ -1035,7 +1035,7 @@ native class WheelEvent extends MouseEvent {
 
 } // end of WheelEvent
 
-native class TextEvent extends UIEvent {
+native final class TextEvent extends UIEvent {
 
 	// InputMethodCode
 	static __readonly__ var DOM_INPUT_METHOD_UNKNOWN : int/*unsigned long*/;
@@ -1075,7 +1075,7 @@ native class TextEvent extends UIEvent {
 
 } // end of TextEvent
 
-native class KeyboardEvent extends UIEvent {
+native final class KeyboardEvent extends UIEvent {
 
 	// KeyLocationCode
 	static __readonly__ var DOM_KEY_LOCATION_STANDARD : int/*unsigned long*/;
@@ -1121,7 +1121,7 @@ native class KeyboardEvent extends UIEvent {
 
 } // end of KeyboardEvent
 
-native class CompositionEvent extends UIEvent {
+native final class CompositionEvent extends UIEvent {
 
 	__readonly__ var data : string/*DOMString*/;
 	__readonly__ var locale : string/*DOMString*/;
@@ -1166,7 +1166,7 @@ native class MutationEvent extends Event {
 
 } // end of MutationEvent
 
-native class MutationNameEvent extends MutationEvent {
+native final class MutationNameEvent extends MutationEvent {
 
 	__readonly__ var prevNamespaceURI : string/*DOMString*/;
 	__readonly__ var prevNodeName : string/*DOMString*/;
@@ -1203,7 +1203,7 @@ native __fake__ class XMLHttpRequestEventTarget extends EventTarget {
 
 } // end of XMLHttpRequestEventTarget
 
-native class XMLHttpRequestUpload extends XMLHttpRequestEventTarget {
+native final class XMLHttpRequestUpload extends XMLHttpRequestEventTarget {
 }
 
 native class XMLHttpRequest extends XMLHttpRequestEventTarget {
@@ -1276,13 +1276,13 @@ native class XMLHttpRequest extends XMLHttpRequestEventTarget {
 
 } // end of XMLHttpRequest
 
-native class AnonXMLHttpRequest extends XMLHttpRequest {
+native final class AnonXMLHttpRequest extends XMLHttpRequest {
 
 	function constructor();
 
 } // end of AnonXMLHttpRequest
 
-native class FormData {
+native final class FormData {
 
 	function constructor();
 	function constructor(form : HTMLFormElement);
@@ -1300,7 +1300,7 @@ native class FormData {
 
 } // end of FormData
 
-native class MediaList {
+native final class MediaList {
 
 	var mediaText : string/*DOMString*/;
 	__readonly__ var length : int/*unsigned long*/;
@@ -1328,7 +1328,7 @@ native class StyleSheet {
 
 } // end of StyleSheet
 
-native class CSSStyleSheet extends StyleSheet {
+native final class CSSStyleSheet extends StyleSheet {
 
 	__readonly__ var ownerRule : CSSRule;
 	__readonly__ var cssRules : CSSRule[]/*CSSRuleList*/;
@@ -1370,14 +1370,14 @@ native class CSSRule {
 
 } // end of CSSRule
 
-native class CSSStyleRule extends CSSRule {
+native final class CSSStyleRule extends CSSRule {
 
 	var selectorText : string/*DOMString*/;
 	__readonly__ var style : CSSStyleDeclaration;
 
 } // end of CSSStyleRule
 
-native class CSSImportRule extends CSSRule {
+native final class CSSImportRule extends CSSRule {
 
 	__readonly__ var href : string/*DOMString*/;
 	__readonly__ var media : MediaList;
@@ -1385,7 +1385,7 @@ native class CSSImportRule extends CSSRule {
 
 } // end of CSSImportRule
 
-native class CSSMediaRule extends CSSRule {
+native final class CSSMediaRule extends CSSRule {
 
 	__readonly__ var media : MediaList;
 	__readonly__ var cssRules : CSSRule[]/*CSSRuleList*/;
@@ -1397,27 +1397,27 @@ native class CSSMediaRule extends CSSRule {
 
 } // end of CSSMediaRule
 
-native class CSSFontFaceRule extends CSSRule {
+native final class CSSFontFaceRule extends CSSRule {
 
 	__readonly__ var style : CSSStyleDeclaration;
 
 } // end of CSSFontFaceRule
 
-native class CSSPageRule extends CSSRule {
+native final class CSSPageRule extends CSSRule {
 
 	var selectorText : string/*DOMString*/;
 	__readonly__ var style : CSSStyleDeclaration;
 
 } // end of CSSPageRule
 
-native class CSSNamespaceRule extends CSSRule {
+native final class CSSNamespaceRule extends CSSRule {
 
 	__readonly__ var namespaceURI : string/*DOMString*/;
 	__readonly__ var prefix : string/*DOMString?*/;
 
 } // end of CSSNamespaceRule
 
-native class CSSStyleDeclaration {
+native final class CSSStyleDeclaration {
 
 	var cssText : string/*DOMString*/;
 	__readonly__ var length : int/*unsigned long*/;
@@ -1929,13 +1929,13 @@ native class CSSStyleDeclaration {
 
 } // end of CSSStyleDeclaration
 
-native __fake__ class ElementCSSInlineStyle {
+native final __fake__ class ElementCSSInlineStyle {
 
 	__readonly__ var style : CSSStyleDeclaration;
 
 } // end of ElementCSSInlineStyle
 
-native __fake__ class Window extends EventTarget {
+native final __fake__ class Window extends EventTarget {
 
 	function getComputedStyle(elt : Element) : CSSStyleDeclaration;
 	function getComputedStyle(
@@ -2150,7 +2150,7 @@ native __fake__ class Window extends EventTarget {
 
 } // end of Window
 
-native class MediaQueryList {
+native final class MediaQueryList {
 
 	__readonly__ var media : string/*DOMString*/;
 	__readonly__ var matches : boolean;
@@ -2163,7 +2163,7 @@ native class MediaQueryList {
 
 } // end of MediaQueryList
 
-native class Screen {
+native final class Screen {
 
 	__readonly__ var availWidth : int/*unsigned long*/;
 	__readonly__ var availHeight : int/*unsigned long*/;
@@ -2174,7 +2174,7 @@ native class Screen {
 
 } // end of Screen
 
-native class CaretPosition {
+native final class CaretPosition {
 
 	__readonly__ var offsetNode : Node;
 	__readonly__ var offset : int/*unsigned long*/;
@@ -2277,7 +2277,7 @@ native class HTMLElement extends Element {
 
 } // end of HTMLElement
 
-native class ClientRectList {
+native final class ClientRectList {
 
 	__readonly__ var length : int/*unsigned long*/;
 	function __native_index_operator__(
@@ -2290,7 +2290,7 @@ native class ClientRectList {
 
 } // end of ClientRectList
 
-native class ClientRect {
+native final class ClientRect {
 
 	__readonly__ var top : number/*float*/;
 	__readonly__ var right : number/*float*/;
@@ -2301,7 +2301,7 @@ native class ClientRect {
 
 } // end of ClientRect
 
-native class HTMLAllCollection extends HTMLCollection {
+native final class HTMLAllCollection extends HTMLCollection {
 
 	// inherits length and item(unsigned long index)
 	function item(name : string/*DOMString*/) : Object/*object?*/;
@@ -2313,7 +2313,7 @@ native class HTMLAllCollection extends HTMLCollection {
 
 } // end of HTMLAllCollection
 
-native class HTMLFormControlsCollection extends HTMLCollection {
+native final class HTMLFormControlsCollection extends HTMLCollection {
 
 	// inherits length and item()
 	// inherits function __native_index_operator__(name : string/*DOMString*/) : MayBeUndefined.<Object/*object?*/>;
@@ -2323,13 +2323,13 @@ native class HTMLFormControlsCollection extends HTMLCollection {
 
 } // end of HTMLFormControlsCollection
 
-native class RadioNodeList extends NodeList {
+native final class RadioNodeList extends NodeList {
 
 	var value : string/*DOMString*/;
 
 } // end of RadioNodeList
 
-native class HTMLOptionsCollection extends HTMLCollection {
+native final class HTMLOptionsCollection extends HTMLCollection {
 
 	// inherits item()
 	// inherits var length : int/*unsigned long*/;
@@ -2361,7 +2361,7 @@ native class HTMLOptionsCollection extends HTMLCollection {
 
 } // end of HTMLOptionsCollection
 
-native class DOMStringMap {
+native final class DOMStringMap {
 
 	function __native_index_operator__(
 		name : string/*DOMString*/
@@ -2372,7 +2372,7 @@ native class DOMStringMap {
 native __fake__ class Transferable {
 }
 
-native class HTMLDocument extends Document {
+native final class HTMLDocument extends Document {
 
 	// resource metadata management
 	__readonly__ var location : Location;
@@ -2522,32 +2522,32 @@ native class HTMLDocument extends Document {
 
 } // end of HTMLDocument
 
-native class HTMLUnknownElement extends HTMLElement {
+native final class HTMLUnknownElement extends HTMLElement {
 }
 
-native class HTMLHtmlElement extends HTMLElement {
+native final class HTMLHtmlElement extends HTMLElement {
 
 	var version : string/*DOMString*/;
 
 } // end of HTMLHtmlElement
 
-native class HTMLHeadElement extends HTMLElement {
+native final class HTMLHeadElement extends HTMLElement {
 }
 
-native class HTMLTitleElement extends HTMLElement {
+native final class HTMLTitleElement extends HTMLElement {
 
 	var text : string/*DOMString*/;
 
 } // end of HTMLTitleElement
 
-native class HTMLBaseElement extends HTMLElement {
+native final class HTMLBaseElement extends HTMLElement {
 
 	var href : string/*DOMString*/;
 	var target : string/*DOMString*/;
 
 } // end of HTMLBaseElement
 
-native class HTMLLinkElement extends HTMLElement {
+native final class HTMLLinkElement extends HTMLElement {
 
 	var disabled : boolean;
 	var href : string/*DOMString*/;
@@ -2568,7 +2568,7 @@ native class HTMLLinkElement extends HTMLElement {
 
 } // end of HTMLLinkElement
 
-native class HTMLMetaElement extends HTMLElement {
+native final class HTMLMetaElement extends HTMLElement {
 
 	var name : string/*DOMString*/;
 	var httpEquiv : string/*DOMString*/;
@@ -2578,7 +2578,7 @@ native class HTMLMetaElement extends HTMLElement {
 
 } // end of HTMLMetaElement
 
-native class HTMLStyleElement extends HTMLElement {
+native final class HTMLStyleElement extends HTMLElement {
 
 	var disabled : boolean;
 	var media : string/*DOMString*/;
@@ -2591,7 +2591,7 @@ native class HTMLStyleElement extends HTMLElement {
 
 } // end of HTMLStyleElement
 
-native class HTMLScriptElement extends HTMLElement {
+native final class HTMLScriptElement extends HTMLElement {
 
 	var src : string/*DOMString*/;
 	var async : boolean;
@@ -2605,7 +2605,7 @@ native class HTMLScriptElement extends HTMLElement {
 
 } // end of HTMLScriptElement
 
-native class HTMLBodyElement extends HTMLElement {
+native final class HTMLBodyElement extends HTMLElement {
 
 	var onafterprint : function(:Event):void/*Function?*/;
 	var onbeforeprint : function(:Event):void/*Function?*/;
@@ -2635,19 +2635,19 @@ native class HTMLBodyElement extends HTMLElement {
 
 } // end of HTMLBodyElement
 
-native class HTMLHeadingElement extends HTMLElement {
+native final class HTMLHeadingElement extends HTMLElement {
 
 	var align : string/*DOMString*/;
 
 } // end of HTMLHeadingElement
 
-native class HTMLParagraphElement extends HTMLElement {
+native final class HTMLParagraphElement extends HTMLElement {
 
 	var align : string/*DOMString*/;
 
 } // end of HTMLParagraphElement
 
-native class HTMLHRElement extends HTMLElement {
+native final class HTMLHRElement extends HTMLElement {
 
 	var align : string/*DOMString*/;
 	var color : string/*DOMString*/;
@@ -2657,19 +2657,19 @@ native class HTMLHRElement extends HTMLElement {
 
 } // end of HTMLHRElement
 
-native class HTMLPreElement extends HTMLElement {
+native final class HTMLPreElement extends HTMLElement {
 
 	var width : int/*long*/;
 
 } // end of HTMLPreElement
 
-native class HTMLQuoteElement extends HTMLElement {
+native final class HTMLQuoteElement extends HTMLElement {
 
 	var cite : string/*DOMString*/;
 
 } // end of HTMLQuoteElement
 
-native class HTMLOListElement extends HTMLElement {
+native final class HTMLOListElement extends HTMLElement {
 
 	var reversed : boolean;
 	var start : int/*long*/;
@@ -2679,14 +2679,14 @@ native class HTMLOListElement extends HTMLElement {
 
 } // end of HTMLOListElement
 
-native class HTMLUListElement extends HTMLElement {
+native final class HTMLUListElement extends HTMLElement {
 
 	var compact : boolean;
 	var type : string/*DOMString*/;
 
 } // end of HTMLUListElement
 
-native class HTMLLIElement extends HTMLElement {
+native final class HTMLLIElement extends HTMLElement {
 
 	var value : int/*long*/;
 
@@ -2694,19 +2694,19 @@ native class HTMLLIElement extends HTMLElement {
 
 } // end of HTMLLIElement
 
-native class HTMLDListElement extends HTMLElement {
+native final class HTMLDListElement extends HTMLElement {
 
 	var compact : boolean;
 
 } // end of HTMLDListElement
 
-native class HTMLDivElement extends HTMLElement {
+native final class HTMLDivElement extends HTMLElement {
 
 	var align : string/*DOMString*/;
 
 } // end of HTMLDivElement
 
-native class HTMLAnchorElement extends HTMLElement {
+native final class HTMLAnchorElement extends HTMLElement {
 
 	var href : string/*DOMString*/;
 	var target : string/*DOMString*/;
@@ -2733,29 +2733,29 @@ native class HTMLAnchorElement extends HTMLElement {
 
 } // end of HTMLAnchorElement
 
-native class HTMLTimeElement extends HTMLElement {
+native final class HTMLTimeElement extends HTMLElement {
 
 	var datetime : string/*DOMString*/;
 
 } // end of HTMLTimeElement
 
-native class HTMLSpanElement extends HTMLElement {
+native final class HTMLSpanElement extends HTMLElement {
 }
 
-native class HTMLBRElement extends HTMLElement {
+native final class HTMLBRElement extends HTMLElement {
 
 	var clear : string/*DOMString*/;
 
 } // end of HTMLBRElement
 
-native class HTMLModElement extends HTMLElement {
+native final class HTMLModElement extends HTMLElement {
 
 	var cite : string/*DOMString*/;
 	var dateTime : string/*DOMString*/;
 
 } // end of HTMLModElement
 
-native class HTMLImageElement extends HTMLElement {
+native final class HTMLImageElement extends HTMLElement {
 
 	var alt : string/*DOMString*/;
 	var src : string/*DOMString*/;
@@ -2777,7 +2777,7 @@ native class HTMLImageElement extends HTMLElement {
 
 } // end of HTMLImageElement
 
-native class HTMLIFrameElement extends HTMLElement {
+native final class HTMLIFrameElement extends HTMLElement {
 
 	var src : string/*DOMString*/;
 	var srcdoc : string/*DOMString*/;
@@ -2798,7 +2798,7 @@ native class HTMLIFrameElement extends HTMLElement {
 
 } // end of HTMLIFrameElement
 
-native class HTMLEmbedElement extends HTMLElement {
+native final class HTMLEmbedElement extends HTMLElement {
 
 	var src : string/*DOMString*/;
 	var type : string/*DOMString*/;
@@ -2810,7 +2810,7 @@ native class HTMLEmbedElement extends HTMLElement {
 
 } // end of HTMLEmbedElement
 
-native class HTMLObjectElement extends HTMLElement {
+native final class HTMLObjectElement extends HTMLElement {
 
 	var data : string/*DOMString*/;
 	var type : string/*DOMString*/;
@@ -2841,7 +2841,7 @@ native class HTMLObjectElement extends HTMLElement {
 
 } // end of HTMLObjectElement
 
-native class HTMLParamElement extends HTMLElement {
+native final class HTMLParamElement extends HTMLElement {
 
 	var name : string/*DOMString*/;
 	var value : string/*DOMString*/;
@@ -2851,7 +2851,7 @@ native class HTMLParamElement extends HTMLElement {
 
 } // end of HTMLParamElement
 
-native class HTMLVideoElement extends HTMLMediaElement {
+native final class HTMLVideoElement extends HTMLMediaElement {
 
 	var width : int/*unsigned long*/;
 	var height : int/*unsigned long*/;
@@ -2861,10 +2861,10 @@ native class HTMLVideoElement extends HTMLMediaElement {
 
 } // end of HTMLVideoElement
 
-native class HTMLAudioElement extends HTMLMediaElement {
+native final class HTMLAudioElement extends HTMLMediaElement {
 }
 
-native class HTMLSourceElement extends HTMLElement {
+native final class HTMLSourceElement extends HTMLElement {
 
 	var src : string/*DOMString*/;
 	var type : string/*DOMString*/;
@@ -2872,7 +2872,7 @@ native class HTMLSourceElement extends HTMLElement {
 
 } // end of HTMLSourceElement
 
-native class HTMLTrackElement extends HTMLElement {
+native final class HTMLTrackElement extends HTMLElement {
 
 	var kind : string/*DOMString*/;
 	var src : string/*DOMString*/;
@@ -2968,7 +2968,7 @@ native class HTMLMediaElement extends HTMLElement {
 
 } // end of HTMLMediaElement
 
-native class MediaError {
+native final class MediaError {
 
 	static __readonly__ var MEDIA_ERR_ABORTED : int/*unsigned short*/;
 	       __readonly__ var MEDIA_ERR_ABORTED : int/*unsigned short*/;
@@ -2982,7 +2982,7 @@ native class MediaError {
 
 } // end of MediaError
 
-native class AudioTrackList extends EventTarget {
+native final class AudioTrackList extends EventTarget {
 
 	__readonly__ var length : int/*unsigned long*/;
 	function __native_index_operator__(
@@ -2994,7 +2994,7 @@ native class AudioTrackList extends EventTarget {
 
 } // end of AudioTrackList
 
-native class AudioTrack {
+native final class AudioTrack {
 
 	__readonly__ var id : string/*DOMString*/;
 	__readonly__ var kind : string/*DOMString*/;
@@ -3004,7 +3004,7 @@ native class AudioTrack {
 
 } // end of AudioTrack
 
-native class VideoTrackList extends EventTarget {
+native final class VideoTrackList extends EventTarget {
 
 	__readonly__ var length : int/*unsigned long*/;
 	function __native_index_operator__(
@@ -3017,7 +3017,7 @@ native class VideoTrackList extends EventTarget {
 
 } // end of VideoTrackList
 
-native class VideoTrack {
+native final class VideoTrack {
 
 	__readonly__ var id : string/*DOMString*/;
 	__readonly__ var kind : string/*DOMString*/;
@@ -3027,7 +3027,7 @@ native class VideoTrack {
 
 } // end of VideoTrack
 
-native class MediaController {
+native final class MediaController {
 
 	function constructor();
 
@@ -3060,7 +3060,7 @@ native class MediaController {
 
 } // end of MediaController
 
-native class TextTrackList extends EventTarget {
+native final class TextTrackList extends EventTarget {
 
 	__readonly__ var length : int/*unsigned long*/;
 	function __native_index_operator__(
@@ -3070,7 +3070,7 @@ native class TextTrackList extends EventTarget {
 
 } // end of TextTrackList
 
-native class TextTrack extends EventTarget {
+native final class TextTrack extends EventTarget {
 
 	__readonly__ var kind : string/*DOMString*/;
 	__readonly__ var label : string/*DOMString*/;
@@ -3090,7 +3090,7 @@ native class TextTrack extends EventTarget {
 
 } // end of TextTrack
 
-native class TextTrackCueList {
+native final class TextTrackCueList {
 
 	__readonly__ var length : int/*unsigned long*/;
 	function __native_index_operator__(
@@ -3100,7 +3100,7 @@ native class TextTrackCueList {
 
 } // end of TextTrackCueList
 
-native class TextTrackCue extends EventTarget {
+native final class TextTrackCue extends EventTarget {
 
 	function constructor(
 		id : string/*DOMString*/,
@@ -3142,7 +3142,7 @@ native class TextTrackCue extends EventTarget {
 
 } // end of TextTrackCue
 
-native class TimeRanges {
+native final class TimeRanges {
 
 	__readonly__ var length : int/*unsigned long*/;
 	function start(index : int/*unsigned long*/) : number/*double*/;
@@ -3150,7 +3150,7 @@ native class TimeRanges {
 
 } // end of TimeRanges
 
-native class TrackEvent extends Event {
+native final class TrackEvent extends Event {
 
 	function constructor(type : string/*DOMString*/);
 	function constructor(
@@ -3162,13 +3162,13 @@ native class TrackEvent extends Event {
 
 } // end of TrackEvent
 
-native class TrackEventInit extends EventInit {
+native final class TrackEventInit extends EventInit {
 
 	var track : Object/*object?*/;
 
 } // end of TrackEventInit
 
-native class HTMLCanvasElement extends HTMLElement {
+native final class HTMLCanvasElement extends HTMLElement {
 
 	var width : int/*unsigned long*/;
 	var height : int/*unsigned long*/;
@@ -3188,7 +3188,7 @@ native class HTMLCanvasElement extends HTMLElement {
 
 } // end of HTMLCanvasElement
 
-native class HTMLMapElement extends HTMLElement {
+native final class HTMLMapElement extends HTMLElement {
 
 	var name : string/*DOMString*/;
 	__readonly__ var areas : HTMLCollection;
@@ -3196,7 +3196,7 @@ native class HTMLMapElement extends HTMLElement {
 
 } // end of HTMLMapElement
 
-native class HTMLAreaElement extends HTMLElement {
+native final class HTMLAreaElement extends HTMLElement {
 
 	var alt : string/*DOMString*/;
 	var coords : string/*DOMString*/;
@@ -3221,7 +3221,7 @@ native class HTMLAreaElement extends HTMLElement {
 
 } // end of HTMLAreaElement
 
-native class HTMLTableElement extends HTMLElement {
+native final class HTMLTableElement extends HTMLElement {
 
 	var caption : HTMLTableCaptionElement;
 	function createCaption() : HTMLElement;
@@ -3251,13 +3251,13 @@ native class HTMLTableElement extends HTMLElement {
 
 } // end of HTMLTableElement
 
-native class HTMLTableCaptionElement extends HTMLElement {
+native final class HTMLTableCaptionElement extends HTMLElement {
 
 	var align : string/*DOMString*/;
 
 } // end of HTMLTableCaptionElement
 
-native class HTMLTableColElement extends HTMLElement {
+native final class HTMLTableColElement extends HTMLElement {
 
 	var span : int/*unsigned long*/;
 
@@ -3269,7 +3269,7 @@ native class HTMLTableColElement extends HTMLElement {
 
 } // end of HTMLTableColElement
 
-native class HTMLTableSectionElement extends HTMLElement {
+native final class HTMLTableSectionElement extends HTMLElement {
 
 	__readonly__ var rows : HTMLCollection;
 	function insertRow() : HTMLElement;
@@ -3283,7 +3283,7 @@ native class HTMLTableSectionElement extends HTMLElement {
 
 } // end of HTMLTableSectionElement
 
-native class HTMLTableRowElement extends HTMLElement {
+native final class HTMLTableRowElement extends HTMLElement {
 
 	__readonly__ var rowIndex : int/*long*/;
 	__readonly__ var sectionRowIndex : int/*long*/;
@@ -3300,10 +3300,10 @@ native class HTMLTableRowElement extends HTMLElement {
 
 } // end of HTMLTableRowElement
 
-native class HTMLTableDataCellElement extends HTMLTableCellElement {
+native final class HTMLTableDataCellElement extends HTMLTableCellElement {
 }
 
-native class HTMLTableHeaderCellElement extends HTMLTableCellElement {
+native final class HTMLTableHeaderCellElement extends HTMLTableCellElement {
 
 	var scope : string/*DOMString*/;
 
@@ -3329,7 +3329,7 @@ native class HTMLTableCellElement extends HTMLElement {
 
 } // end of HTMLTableCellElement
 
-native class HTMLFormElement extends HTMLElement {
+native final class HTMLFormElement extends HTMLElement {
 
 	var acceptCharset : string/*DOMString*/;
 	var action : string/*DOMString*/;
@@ -3354,7 +3354,7 @@ native class HTMLFormElement extends HTMLElement {
 
 } // end of HTMLFormElement
 
-native class HTMLFieldSetElement extends HTMLElement {
+native final class HTMLFieldSetElement extends HTMLElement {
 
 	var disabled : boolean;
 	__readonly__ var form : HTMLFormElement;
@@ -3369,7 +3369,7 @@ native class HTMLFieldSetElement extends HTMLElement {
 
 } // end of HTMLFieldSetElement
 
-native class HTMLLegendElement extends HTMLElement {
+native final class HTMLLegendElement extends HTMLElement {
 
 	__readonly__ var form : HTMLFormElement;
 
@@ -3377,7 +3377,7 @@ native class HTMLLegendElement extends HTMLElement {
 
 } // end of HTMLLegendElement
 
-native class HTMLLabelElement extends HTMLElement {
+native final class HTMLLabelElement extends HTMLElement {
 
 	__readonly__ var form : HTMLFormElement;
 	var htmlFor : string/*DOMString*/;
@@ -3385,7 +3385,7 @@ native class HTMLLabelElement extends HTMLElement {
 
 } // end of HTMLLabelElement
 
-native class HTMLInputElement extends HTMLElement {
+native final class HTMLInputElement extends HTMLElement {
 
 	var accept : string/*DOMString*/;
 	var alt : string/*DOMString*/;
@@ -3452,7 +3452,7 @@ native class HTMLInputElement extends HTMLElement {
 
 } // end of HTMLInputElement
 
-native class HTMLButtonElement extends HTMLElement {
+native final class HTMLButtonElement extends HTMLElement {
 
 	var autofocus : boolean;
 	var disabled : boolean;
@@ -3474,7 +3474,7 @@ native class HTMLButtonElement extends HTMLElement {
 
 } // end of HTMLButtonElement
 
-native class HTMLSelectElement extends HTMLElement {
+native final class HTMLSelectElement extends HTMLElement {
 
 	var autofocus : boolean;
 	var disabled : boolean;
@@ -3525,20 +3525,20 @@ native class HTMLSelectElement extends HTMLElement {
 
 } // end of HTMLSelectElement
 
-native class HTMLDataListElement extends HTMLElement {
+native final class HTMLDataListElement extends HTMLElement {
 
 	__readonly__ var options : HTMLCollection;
 
 } // end of HTMLDataListElement
 
-native class HTMLOptGroupElement extends HTMLElement {
+native final class HTMLOptGroupElement extends HTMLElement {
 
 	var disabled : boolean;
 	var label : string/*DOMString*/;
 
 } // end of HTMLOptGroupElement
 
-native class HTMLOptionElement extends HTMLElement {
+native final class HTMLOptionElement extends HTMLElement {
 
 	var disabled : boolean;
 	__readonly__ var form : HTMLFormElement;
@@ -3551,7 +3551,7 @@ native class HTMLOptionElement extends HTMLElement {
 
 } // end of HTMLOptionElement
 
-native class HTMLTextAreaElement extends HTMLElement {
+native final class HTMLTextAreaElement extends HTMLElement {
 
 	var autofocus : boolean;
 	var cols : int/*unsigned long*/;
@@ -3591,7 +3591,7 @@ native class HTMLTextAreaElement extends HTMLElement {
 
 } // end of HTMLTextAreaElement
 
-native class HTMLKeygenElement extends HTMLElement {
+native final class HTMLKeygenElement extends HTMLElement {
 
 	var autofocus : boolean;
 	var challenge : string/*DOMString*/;
@@ -3609,7 +3609,7 @@ native class HTMLKeygenElement extends HTMLElement {
 
 } // end of HTMLKeygenElement
 
-native class HTMLOutputElement extends HTMLElement {
+native final class HTMLOutputElement extends HTMLElement {
 
 	__readonly__ var htmlFor : DOMSettableTokenList;
 	__readonly__ var form : HTMLFormElement;
@@ -3626,7 +3626,7 @@ native class HTMLOutputElement extends HTMLElement {
 
 } // end of HTMLOutputElement
 
-native class HTMLProgressElement extends HTMLElement {
+native final class HTMLProgressElement extends HTMLElement {
 
 	var value : number/*double*/;
 	var max : number/*double*/;
@@ -3635,7 +3635,7 @@ native class HTMLProgressElement extends HTMLElement {
 
 } // end of HTMLProgressElement
 
-native class HTMLMeterElement extends HTMLElement {
+native final class HTMLMeterElement extends HTMLElement {
 
 	var value : number/*double*/;
 	var min : number/*double*/;
@@ -3647,7 +3647,7 @@ native class HTMLMeterElement extends HTMLElement {
 
 } // end of HTMLMeterElement
 
-native class ValidityState {
+native final class ValidityState {
 
 	__readonly__ var valueMissing : boolean;
 	__readonly__ var typeMismatch : boolean;
@@ -3661,13 +3661,13 @@ native class ValidityState {
 
 } // end of ValidityState
 
-native class HTMLDetailsElement extends HTMLElement {
+native final class HTMLDetailsElement extends HTMLElement {
 
 	var open : boolean;
 
 } // end of HTMLDetailsElement
 
-native class HTMLCommandElement extends HTMLElement {
+native final class HTMLCommandElement extends HTMLElement {
 
 	var type : string/*DOMString*/;
 	var label : string/*DOMString*/;
@@ -3679,7 +3679,7 @@ native class HTMLCommandElement extends HTMLElement {
 
 } // end of HTMLCommandElement
 
-native class HTMLMenuElement extends HTMLElement {
+native final class HTMLMenuElement extends HTMLElement {
 
 	var type : string/*DOMString*/;
 	var label : string/*DOMString*/;
@@ -3688,13 +3688,13 @@ native class HTMLMenuElement extends HTMLElement {
 
 } // end of HTMLMenuElement
 
-native class BarProp {
+native final class BarProp {
 
 	var visible : boolean;
 
 } // end of BarProp
 
-native class History {
+native final class History {
 
 	__readonly__ var length : int/*long*/;
 	__readonly__ var state : variant/*any*/;
@@ -3723,7 +3723,7 @@ native class History {
 
 } // end of History
 
-native class Location {
+native final class Location {
 
 	var href : string/*DOMString*/;
 	function assign(url : string/*DOMString*/) : void;
@@ -3740,7 +3740,7 @@ native class Location {
 
 } // end of Location
 
-native class PopStateEvent extends Event {
+native final class PopStateEvent extends Event {
 
 	function constructor(type : string/*DOMString*/);
 	function constructor(
@@ -3752,13 +3752,13 @@ native class PopStateEvent extends Event {
 
 } // end of PopStateEvent
 
-native class PopStateEventInit extends EventInit {
+native final class PopStateEventInit extends EventInit {
 
 	var state : variant/*any*/;
 
 } // end of PopStateEventInit
 
-native class HashChangeEvent extends Event {
+native final class HashChangeEvent extends Event {
 
 	function constructor(type : string/*DOMString*/);
 	function constructor(
@@ -3771,14 +3771,14 @@ native class HashChangeEvent extends Event {
 
 } // end of HashChangeEvent
 
-native class HashChangeEventInit extends EventInit {
+native final class HashChangeEventInit extends EventInit {
 
 	var oldURL : string/*DOMString*/;
 	var newURL : string/*DOMString*/;
 
 } // end of HashChangeEventInit
 
-native class PageTransitionEvent extends Event {
+native final class PageTransitionEvent extends Event {
 
 	function constructor(type : string/*DOMString*/);
 	function constructor(
@@ -3790,19 +3790,19 @@ native class PageTransitionEvent extends Event {
 
 } // end of PageTransitionEvent
 
-native class PageTransitionEventInit extends EventInit {
+native final class PageTransitionEventInit extends EventInit {
 
 	var persisted : boolean;
 
 } // end of PageTransitionEventInit
 
-native class BeforeUnloadEvent extends Event {
+native final class BeforeUnloadEvent extends Event {
 
 	var returnValue : string/*DOMString*/;
 
 } // end of BeforeUnloadEvent
 
-native class ApplicationCache extends EventTarget {
+native final class ApplicationCache extends EventTarget {
 
 	// update status
 	static __readonly__ var UNCACHED : int/*unsigned short*/;
@@ -3847,14 +3847,14 @@ native __fake__ class WindowBase64 {
 
 } // end of WindowBase64
 
-native __fake__ class WindowModal {
+native final __fake__ class WindowModal {
 
 	__readonly__ var dialogArguments : variant/*any*/;
 	var returnValue : string/*DOMString*/;
 
 } // end of WindowModal
 
-native class Navigator {
+native final class Navigator {
 
 	// objects implementing this interface also implement the interfaces given below
 
@@ -3956,7 +3956,7 @@ native __fake__ class NavigatorStorageUtils {
 
 } // end of NavigatorStorageUtils
 
-native class External {
+native final class External {
 
 	function AddSearchProvider(engineURL : string/*DOMString*/) : void;
 	function IsSearchProviderInstalled(
@@ -3965,7 +3965,7 @@ native class External {
 
 } // end of External
 
-native class DataTransfer {
+native final class DataTransfer {
 
 	var dropEffect : string/*DOMString*/;
 	var effectAllowed : string/*DOMString*/;
@@ -3991,7 +3991,7 @@ native class DataTransfer {
 
 } // end of DataTransfer
 
-native class DataTransferItemList {
+native final class DataTransferItemList {
 
 	__readonly__ var length : int/*unsigned long*/;
 	function __native_index_operator__(
@@ -4006,7 +4006,7 @@ native class DataTransferItemList {
 
 } // end of DataTransferItemList
 
-native class DataTransferItem {
+native final class DataTransferItem {
 
 	__readonly__ var kind : string/*DOMString*/;
 	__readonly__ var type : string/*DOMString*/;
@@ -4015,13 +4015,13 @@ native class DataTransferItem {
 
 } // end of DataTransferItem
 
-native __fake__ class FunctionStringCallback {
+native final __fake__ class FunctionStringCallback {
 
 	function handleEvent(data : string/*DOMString*/) : void;
 
 } // end of FunctionStringCallback
 
-native class DragEvent extends MouseEvent {
+native final class DragEvent extends MouseEvent {
 
 	function constructor(type : string/*DOMString*/);
 	function constructor(
@@ -4033,13 +4033,13 @@ native class DragEvent extends MouseEvent {
 
 } // end of DragEvent
 
-native class DragEventInit extends MouseEventInit {
+native final class DragEventInit extends MouseEventInit {
 
 	var dataTransfer : DataTransfer;
 
 } // end of DragEventInit
 
-native class HTMLAppletElement extends HTMLElement {
+native final class HTMLAppletElement extends HTMLElement {
 
 	var align : string/*DOMString*/;
 	var alt : string/*DOMString*/;
@@ -4056,7 +4056,7 @@ native class HTMLAppletElement extends HTMLElement {
 
 } // end of HTMLAppletElement
 
-native class HTMLMarqueeElement extends HTMLElement {
+native final class HTMLMarqueeElement extends HTMLElement {
 
 	var behavior : string/*DOMString*/;
 	var bgColor : string/*DOMString*/;
@@ -4077,7 +4077,7 @@ native class HTMLMarqueeElement extends HTMLElement {
 
 } // end of HTMLMarqueeElement
 
-native class HTMLFrameSetElement extends HTMLElement {
+native final class HTMLFrameSetElement extends HTMLElement {
 
 	var cols : string/*DOMString*/;
 	var rows : string/*DOMString*/;
@@ -4102,7 +4102,7 @@ native class HTMLFrameSetElement extends HTMLElement {
 
 } // end of HTMLFrameSetElement
 
-native class HTMLFrameElement extends HTMLElement {
+native final class HTMLFrameElement extends HTMLElement {
 
 	var name : string/*DOMString*/;
 	var scrolling : string/*DOMString*/;
@@ -4117,7 +4117,7 @@ native class HTMLFrameElement extends HTMLElement {
 
 } // end of HTMLFrameElement
 
-native class HTMLBaseFontElement extends HTMLElement {
+native final class HTMLBaseFontElement extends HTMLElement {
 
 	var color : string/*DOMString*/;
 	var face : string/*DOMString*/;
@@ -4125,13 +4125,13 @@ native class HTMLBaseFontElement extends HTMLElement {
 
 } // end of HTMLBaseFontElement
 
-native class HTMLDirectoryElement extends HTMLElement {
+native final class HTMLDirectoryElement extends HTMLElement {
 
 	var compact : boolean;
 
 } // end of HTMLDirectoryElement
 
-native class HTMLFontElement extends HTMLElement {
+native final class HTMLFontElement extends HTMLElement {
 
 	var color : string/*DOMString*/;
 	var face : string/*DOMString*/;
@@ -4139,7 +4139,7 @@ native class HTMLFontElement extends HTMLElement {
 
 } // end of HTMLFontElement
 
-native class FileList {
+native final class FileList {
 
 	function __native_index_operator__(
 		index : int/*unsigned long*/
@@ -4170,14 +4170,14 @@ native class Blob {
 
 } // end of Blob
 
-native class File extends Blob {
+native final class File extends Blob {
 
 	__readonly__ var name : string/*DOMString*/;
 	__readonly__ var lastModifiedDate : Date;
 
 } // end of File
 
-native class FileReader extends EventTarget {
+native final class FileReader extends EventTarget {
 
 	function constructor();
 
@@ -4212,7 +4212,7 @@ native class FileReader extends EventTarget {
 
 } // end of FileReader
 
-native class FileReaderSync {
+native final class FileReaderSync {
 
 	function constructor();
 
@@ -4236,10 +4236,10 @@ native class URL {
 
 } // end of URL
 
-native class webkitURL extends URL {
+native final class webkitURL extends URL {
 }
 
-native class Touch {
+native final class Touch {
 
 	__readonly__ var identifier : int/*long*/;
 	__readonly__ var target : EventTarget;
@@ -4252,7 +4252,7 @@ native class Touch {
 
 } // end of Touch
 
-native class TouchList {
+native final class TouchList {
 
 	__readonly__ var length : int/*unsigned long*/;
 	function __native_index_operator__(
@@ -4266,7 +4266,7 @@ native class TouchList {
 
 } // end of TouchList
 
-native class TouchEvent extends UIEvent {
+native final class TouchEvent extends UIEvent {
 
 	__readonly__ var touches : TouchList;
 	__readonly__ var targetTouches : TouchList;
@@ -4278,7 +4278,7 @@ native class TouchEvent extends UIEvent {
 
 } // end of TouchEvent
 
-native class WebSocket extends EventTarget {
+native final class WebSocket extends EventTarget {
 
 	function constructor(url : string/*DOMString*/);
 	function constructor(
@@ -4323,7 +4323,7 @@ native class WebSocket extends EventTarget {
 
 } // end of WebSocket
 
-native class CloseEvent extends Event {
+native final class CloseEvent extends Event {
 
 	function constructor(type : string/*DOMString*/);
 	function constructor(
@@ -4337,7 +4337,7 @@ native class CloseEvent extends Event {
 
 } // end of CloseEvent
 
-native class CloseEventInit extends EventInit {
+native final class CloseEventInit extends EventInit {
 
 	var wasClean : boolean;
 	var code : int/*unsigned short*/;
@@ -4351,7 +4351,7 @@ native __fake__ class NavigatorGeolocation {
 
 } // end of NavigatorGeolocation
 
-native __fake__ class Geolocation {
+native final __fake__ class Geolocation {
 
 	function getCurrentPosition(
 		successCallback : PositionCallback
@@ -4381,19 +4381,19 @@ native __fake__ class Geolocation {
 
 } // end of Geolocation
 
-native __fake__ class PositionCallback {
+native final __fake__ class PositionCallback {
 
 	function handleEvent(position : Position) : void;
 
 } // end of PositionCallback
 
-native __fake__ class PositionErrorCallback {
+native final __fake__ class PositionErrorCallback {
 
 	function handleEvent(error : PositionError) : void;
 
 } // end of PositionErrorCallback
 
-native __fake__ class PositionOptions {
+native final __fake__ class PositionOptions {
 
 	var enableHighAccuracy : boolean;
 	var timeout : int/*long*/;
@@ -4403,7 +4403,7 @@ native __fake__ class PositionOptions {
 
 } // end of PositionOptions
 
-native __fake__ class Position {
+native final __fake__ class Position {
 
 	__readonly__ var coords : Coordinates;
 	__readonly__ var address : Address;
@@ -4411,7 +4411,7 @@ native __fake__ class Position {
 
 } // end of Position
 
-native __fake__ class Coordinates {
+native final __fake__ class Coordinates {
 
 	__readonly__ var latitude : number/*double?*/;
 	__readonly__ var longitude : number/*double?*/;
@@ -4424,7 +4424,7 @@ native __fake__ class Coordinates {
 
 } // end of Coordinates
 
-native __fake__ class Address {
+native final __fake__ class Address {
 
 	__readonly__ var country : string/*DOMString?*/;
 	__readonly__ var region : string/*DOMString?*/;
@@ -4437,7 +4437,7 @@ native __fake__ class Address {
 
 } // end of Address
 
-native __fake__ class PositionError {
+native final __fake__ class PositionError {
 
 	static __readonly__ var PERMISSION_DENIED : int/*unsigned short*/;
 	       __readonly__ var PERMISSION_DENIED : int/*unsigned short*/;
@@ -4450,7 +4450,7 @@ native __fake__ class PositionError {
 
 } // end of PositionError
 
-native class Storage {
+native final class Storage {
 
 	__readonly__ var length : int/*unsigned long*/;
 	function key(index : int/*unsigned long*/) : string/*DOMString?*/;
@@ -4484,7 +4484,7 @@ native __fake__ class WindowLocalStorage {
 
 } // end of WindowLocalStorage
 
-native class StorageEvent extends Event {
+native final class StorageEvent extends Event {
 
 	function constructor(type : string/*DOMString*/);
 	function constructor(
@@ -4500,7 +4500,7 @@ native class StorageEvent extends Event {
 
 } // end of StorageEvent
 
-native class StorageEventInit extends EventInit {
+native final class StorageEventInit extends EventInit {
 
 	var key : string/*DOMString?*/;
 	var oldValue : string/*DOMString?*/;
@@ -4519,7 +4519,7 @@ native __fake__ class NodeSelector {
 
 } // end of NodeSelector
 
-native class MessageEvent extends Event {
+native final class MessageEvent extends Event {
 
 	function constructor(type : string/*DOMString*/);
 	function constructor(
@@ -4535,7 +4535,7 @@ native class MessageEvent extends Event {
 
 } // end of MessageEvent
 
-native class MessageEventInit extends EventInit {
+native final class MessageEventInit extends EventInit {
 
 	var data : variant/*any*/;
 	var origin : string/*DOMString*/;
@@ -4545,7 +4545,7 @@ native class MessageEventInit extends EventInit {
 
 } // end of MessageEventInit
 
-native class MessageChannel {
+native final class MessageChannel {
 
 	function constructor();
 
@@ -4554,7 +4554,7 @@ native class MessageChannel {
 
 } // end of MessageChannel
 
-native class MessagePort extends EventTarget {
+native final class MessagePort extends EventTarget {
 
 	function postMessage(message : variant/*any*/) : void;
 	function postMessage(
@@ -4586,7 +4586,7 @@ native class WorkerGlobalScope extends EventTarget {
 
 } // end of WorkerGlobalScope
 
-native class DedicatedWorkerGlobalScope extends WorkerGlobalScope {
+native final class DedicatedWorkerGlobalScope extends WorkerGlobalScope {
 
 	function postMessage(message : variant/*any*/) : void;
 	function postMessage(
@@ -4597,7 +4597,7 @@ native class DedicatedWorkerGlobalScope extends WorkerGlobalScope {
 
 } // end of DedicatedWorkerGlobalScope
 
-native class SharedWorkerGlobalScope extends WorkerGlobalScope {
+native final class SharedWorkerGlobalScope extends WorkerGlobalScope {
 
 	__readonly__ var name : string/*DOMString*/;
 	__readonly__ var applicationCache : ApplicationCache;
@@ -4605,7 +4605,7 @@ native class SharedWorkerGlobalScope extends WorkerGlobalScope {
 
 } // end of SharedWorkerGlobalScope
 
-native class ErrorEvent extends Event {
+native final class ErrorEvent extends Event {
 
 	function constructor(type : string/*DOMString*/);
 	function constructor(
@@ -4619,7 +4619,7 @@ native class ErrorEvent extends Event {
 
 } // end of ErrorEvent
 
-native class ErrorEventInit extends EventInit {
+native final class ErrorEventInit extends EventInit {
 
 	var message : string/*DOMString*/;
 	var filename : string/*DOMString*/;
@@ -4633,7 +4633,7 @@ native __fake__ class AbstractWorker {
 
 } // end of AbstractWorker
 
-native class Worker extends EventTarget {
+native final class Worker extends EventTarget {
 
 	function constructor(scriptURL : string/*DOMString*/);
 
@@ -4651,7 +4651,7 @@ native class Worker extends EventTarget {
 
 } // end of Worker
 
-native class SharedWorker extends EventTarget {
+native final class SharedWorker extends EventTarget {
 
 	function constructor(scriptURL : string/*DOMString*/);
 	function constructor(
@@ -4679,7 +4679,7 @@ native __fake__ class WorkerUtils {
 
 } // end of WorkerUtils
 
-native class WorkerNavigator {
+native final class WorkerNavigator {
 
 	// implements NavigatorID
 
@@ -4694,7 +4694,7 @@ native class WorkerNavigator {
 
 } // end of WorkerNavigator
 
-native class WorkerLocation {
+native final class WorkerLocation {
 
 	// URL decomposition IDL attributes
 	__readonly__ var href : string/*DOMString*/;
@@ -4708,7 +4708,7 @@ native class WorkerLocation {
 
 } // end of WorkerLocation
 
-native class DOMParser {
+native final class DOMParser {
 
 	function constructor();
 
@@ -4719,7 +4719,7 @@ native class DOMParser {
 
 } // end of DOMParser
 
-native class XMLSerializer {
+native final class XMLSerializer {
 
 	function constructor();
 
@@ -4727,7 +4727,7 @@ native class XMLSerializer {
 
 } // end of XMLSerializer
 
-native class ArrayBuffer {
+native final class ArrayBuffer {
 
 	function constructor(length : int/*unsigned long*/);
 
@@ -4750,7 +4750,7 @@ native class ArrayBufferView {
 
 } // end of ArrayBufferView
 
-native class Int8Array extends ArrayBufferView {
+native final class Int8Array extends ArrayBufferView {
 
 	function constructor(length : int/*unsigned long*/);
 	function constructor(array : Int8Array);
@@ -4858,7 +4858,7 @@ native class Uint8Array extends ArrayBufferView {
 
 } // end of Uint8Array
 
-native class Uint8ClampedArray extends Uint8Array {
+native final class Uint8ClampedArray extends Uint8Array {
 
 	function constructor(length : int/*unsigned long*/);
 	function constructor(array : Uint8ClampedArray);
@@ -4894,7 +4894,7 @@ native class Uint8ClampedArray extends Uint8Array {
 
 } // end of Uint8ClampedArray
 
-native class Int16Array extends ArrayBufferView {
+native final class Int16Array extends ArrayBufferView {
 
 	function constructor(length : int/*unsigned long*/);
 	function constructor(array : Int16Array);
@@ -4948,7 +4948,7 @@ native class Int16Array extends ArrayBufferView {
 
 } // end of Int16Array
 
-native class Uint16Array extends ArrayBufferView {
+native final class Uint16Array extends ArrayBufferView {
 
 	function constructor(length : int/*unsigned long*/);
 	function constructor(array : Uint16Array);
@@ -5002,7 +5002,7 @@ native class Uint16Array extends ArrayBufferView {
 
 } // end of Uint16Array
 
-native class Int32Array extends ArrayBufferView {
+native final class Int32Array extends ArrayBufferView {
 
 	function constructor(length : int/*unsigned long*/);
 	function constructor(array : Int32Array);
@@ -5056,7 +5056,7 @@ native class Int32Array extends ArrayBufferView {
 
 } // end of Int32Array
 
-native class Uint32Array extends ArrayBufferView {
+native final class Uint32Array extends ArrayBufferView {
 
 	function constructor(length : int/*unsigned long*/);
 	function constructor(array : Uint32Array);
@@ -5110,7 +5110,7 @@ native class Uint32Array extends ArrayBufferView {
 
 } // end of Uint32Array
 
-native class Float32Array extends ArrayBufferView {
+native final class Float32Array extends ArrayBufferView {
 
 	function constructor(length : int/*unsigned long*/);
 	function constructor(array : Float32Array);
@@ -5158,7 +5158,7 @@ native class Float32Array extends ArrayBufferView {
 
 } // end of Float32Array
 
-native class Float64Array extends ArrayBufferView {
+native final class Float64Array extends ArrayBufferView {
 
 	function constructor(length : int/*unsigned long*/);
 	function constructor(array : Float64Array);
@@ -5206,7 +5206,7 @@ native class Float64Array extends ArrayBufferView {
 
 } // end of Float64Array
 
-native class DataView extends ArrayBufferView {
+native final class DataView extends ArrayBufferView {
 
 	function constructor(buffer : ArrayBuffer);
 	function constructor(
@@ -5345,7 +5345,7 @@ native class DataView extends ArrayBufferView {
 
 } // end of DataView
 
-native class CanvasRenderingContext2D {
+native final class CanvasRenderingContext2D {
 
 	// back-reference to the canvas
 	__readonly__ var canvas : HTMLCanvasElement;
@@ -5758,7 +5758,7 @@ native __fake__ class CanvasPathMethods {
 
 } // end of CanvasPathMethods
 
-native class CanvasGradient {
+native final class CanvasGradient {
 
 	// opaque object
 	function addColorStop(
@@ -5768,19 +5768,19 @@ native class CanvasGradient {
 
 } // end of CanvasGradient
 
-native class CanvasPattern {
+native final class CanvasPattern {
 
 	// opaque object
 
 } // end of CanvasPattern
 
-native class TextMetrics {
+native final class TextMetrics {
 
 	__readonly__ var width : number/*double*/;
 
 } // end of TextMetrics
 
-native class ImageData {
+native final class ImageData {
 
 	__readonly__ var width : int/*unsigned long*/;
 	__readonly__ var height : int/*unsigned long*/;
@@ -5788,7 +5788,7 @@ native class ImageData {
 
 } // end of ImageData
 
-native class WebGLContextAttributes {
+native final class WebGLContextAttributes {
 
 	var alpha : boolean;
 	var depth : boolean;
@@ -5802,28 +5802,28 @@ native class WebGLContextAttributes {
 native class WebGLObject {
 }
 
-native class WebGLBuffer extends WebGLObject {
+native final class WebGLBuffer extends WebGLObject {
 }
 
-native class WebGLFramebuffer extends WebGLObject {
+native final class WebGLFramebuffer extends WebGLObject {
 }
 
-native class WebGLProgram extends WebGLObject {
+native final class WebGLProgram extends WebGLObject {
 }
 
-native class WebGLRenderbuffer extends WebGLObject {
+native final class WebGLRenderbuffer extends WebGLObject {
 }
 
-native class WebGLShader extends WebGLObject {
+native final class WebGLShader extends WebGLObject {
 }
 
-native class WebGLTexture extends WebGLObject {
+native final class WebGLTexture extends WebGLObject {
 }
 
-native class WebGLUniformLocation {
+native final class WebGLUniformLocation {
 }
 
-native class WebGLActiveInfo {
+native final class WebGLActiveInfo {
 
 	__readonly__ var size : int/*GLint*/;
 	__readonly__ var type : int/*GLenum*/;
@@ -5831,7 +5831,7 @@ native class WebGLActiveInfo {
 
 } // end of WebGLActiveInfo
 
-native class WebGLShaderPrecisionFormat {
+native final class WebGLShaderPrecisionFormat {
 
 	__readonly__ var rangeMin : int/*GLint*/;
 	__readonly__ var rangeMax : int/*GLint*/;
@@ -5839,7 +5839,7 @@ native class WebGLShaderPrecisionFormat {
 
 } // end of WebGLShaderPrecisionFormat
 
-native class WebGLRenderingContext {
+native final class WebGLRenderingContext {
 
 	/* ClearBufferMask */
 	static __readonly__ var DEPTH_BUFFER_BIT : int/*GLenum*/;
@@ -7184,7 +7184,7 @@ native class WebGLRenderingContext {
 
 } // end of WebGLRenderingContext
 
-native class WebGLContextEvent extends Event {
+native final class WebGLContextEvent extends Event {
 
 	function constructor(type : string/*DOMString*/);
 	function constructor(
@@ -7196,7 +7196,7 @@ native class WebGLContextEvent extends Event {
 
 } // end of WebGLContextEvent
 
-native class WebGLContextEventInit extends EventInit {
+native final class WebGLContextEventInit extends EventInit {
 
 	var statusMessage : string/*DOMString*/;
 
@@ -7220,7 +7220,7 @@ native __fake__ class WindowAnimationTiming {
 
 } // end of WindowAnimationTiming
 
-native __fake__ class CanvasPixelArray {
+native final __fake__ class CanvasPixelArray {
 
 	__readonly__ var length : int/*unsigned long*/;
 	function __native_index_operator__(

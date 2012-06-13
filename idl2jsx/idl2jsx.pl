@@ -37,6 +37,10 @@ my %skip = (
     WindowTimers => 1, # use JSXTimers instead
 );
 
+# indicates a class has children classes
+# classes which has no child are declared "final"
+my %has_child;
+
 my %has_definition;
 
 # NOTE: JSX's int is signed 32 bit integer
@@ -257,7 +261,10 @@ foreach my $file(@files) {
             fake    => $fake{$class},
         };
 
-        $def->{base} //= $base if $base;
+        if($base) {
+            $def->{base} //= $base;
+            $has_child{$base}++;
+        }
 
         $def->{skip} = 1 if $skip{$class};
 
@@ -446,6 +453,8 @@ foreach my $file(@files) {
 
             info "$def->{name} implements $interface->{name}";
 
+            $has_child{$interface->{name}}++;
+
             # FIXME
             push @{ $def->{members} },
                 "",
@@ -480,6 +489,9 @@ foreach my $def(values %classdef) {
     my %seen;
 
     my $classdecl = "native";
+    if(!$has_child{$def->{name}}) {
+        $classdecl .= " final";
+    }
     if($def->{fake}) {
         $classdecl .= " __fake__";
     }
