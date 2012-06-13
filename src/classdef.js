@@ -733,10 +733,13 @@ var MemberVariableDefinition = exports.MemberVariableDefinition = MemberDefiniti
 
 	instantiate: function (instantiationContext) {
 		var Expression = require("./expression");
-		var type = this._type.instantiate(instantiationContext);
-		var initialValue = this._initialValue;
-		if (initialValue == null)
+		var type = this._type != null ? this._type.instantiate(instantiationContext) : null;
+		if (this._initialValue != null) {
+			var initialValue = this._initialValue.clone();
+			initialValue.instantiate(instantiationContext);
+		} else {
 			initialValue = Expression.Expression.getDefaultValueExpressionOf(type);
+		}
 		return new MemberVariableDefinition(this._token, this._nameToken, this._flags, type, initialValue);
 	},
 
@@ -842,23 +845,9 @@ var MemberFunctionDefinition = exports.MemberFunctionDefinition = MemberDefiniti
 			for (var i = 0; i < this._statements.length; ++i)
 				statements[i] = this._statements[i].clone();
 			Util.forEachStatement(function onStatement(statement) {
-				statement.forEachExpression(function onExpr(expr) {
-					if (expr instanceof Expression.NewExpression
-						|| expr instanceof Expression.ArrayLiteralExpression
-						|| expr instanceof Expression.MapLiteralExpression
-						|| expr instanceof Expression.AsExpression
-						|| expr instanceof Expression.AsNoConvertExpression
-						|| expr instanceof Expression.NewExpression) {
-						var srcType = expr.getType();
-						if (srcType != null) {
-							expr.setType(srcType.instantiate(instantiationContext));
-						}
-					} else if (expr instanceof Expression.LocalExpression) {
-						// update local to the instantiated one
-						expr.setLocal(expr.getLocal().getInstantiated());
-					}
-					return expr.forEachExpression(onExpr.bind(this));
-				}.bind(this));
+				statement.forEachExpression(function (expr) {
+					return expr.instantiate(instantiationContext);
+				});
 				return statement.forEachStatement(onStatement.bind(this));
 			}.bind(this), statements);
 			// clone and rewrite the types of closures

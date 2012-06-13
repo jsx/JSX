@@ -45,6 +45,27 @@ var Expression = exports.Expression = Class.extend({
 
 	clone: null,
 
+	instantiate: function (instantiationContext) {
+		(function onExpr(expr) {
+			if (expr instanceof NewExpression
+				|| expr instanceof ArrayLiteralExpression
+				|| expr instanceof MapLiteralExpression
+				|| expr instanceof AsExpression
+				|| expr instanceof AsNoConvertExpression
+				|| expr instanceof NewExpression
+				|| expr instanceof ClassExpression) {
+				var srcType = expr.getType();
+				if (srcType != null) {
+					expr.setType(srcType.instantiate(instantiationContext));
+				}
+			} else if (expr instanceof LocalExpression) {
+				// update local to the instantiated one
+				expr.setLocal(expr.getLocal().getInstantiated());
+			}
+			return expr.forEachExpression(onExpr);
+		}.call(null, this));
+	},
+
 	getToken: function () {
 		return this._token;
 	},
@@ -220,6 +241,10 @@ var ClassExpression = exports.ClassExpression = LeafExpression.extend({
 
 	getType: function () {
 		return this._parsedType;
+	},
+
+	setType: function (type) {
+		this._parsedType = type;
 	},
 
 	assertIsAssignable: function (context, token, type) {
