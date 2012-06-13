@@ -1,4 +1,8 @@
-class Main {
+/*EXPECTED
+*/
+class Test {
+	static function run() : void {
+	}
  /*
 */
 }
