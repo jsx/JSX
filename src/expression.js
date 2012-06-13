@@ -65,8 +65,19 @@ var Expression = exports.Expression = Class.extend({
 			FIXME this is a very dirty hack that clones the optimizer stack.
 			We should define copy constructors and use them once we migrate to self-hosted
 		*/
-		for (var k in src._optimizerStash)
-			this._optimizerStash[k] = src._optimizerStash[k];
+		for (var k in src._optimizerStash) {
+			var src = src._optimizerStash[k];
+			var dst;
+			if (typeof src == "object") {
+				dst = {};
+				for (var j in src) {
+					dst[j] = src[j];
+				}
+			} else {
+				dst = src;
+			}
+			this._optimizerStash[k] = dst;
+		}
 	},
 
 	$assertIsAssignable: function (context, token, lhsType, rhsType) {

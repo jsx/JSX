@@ -1047,7 +1047,7 @@ var _InlineOptimizeCommand = exports._InlineOptimizeCommand = _FunctionOptimizeC
 						if (expr instanceof SuperExpression)
 							return false;
 						return expr.forEachExpression(onExpr.bind(this));
-					})) {
+					}.bind(this))) {
 						return false;
 					}
 					return statement.forEachStatement(onStatement.bind(this));
@@ -1169,7 +1169,12 @@ var _InlineOptimizeCommand = exports._InlineOptimizeCommand = _FunctionOptimizeC
 			}
 			// replace the local expression (function expression need not (and cannot) be cloned, so it is guaranteed to appear only once, in _createVars)
 			if (j != argsAndThisAndLocals.length) {
-				replaceCb(argsAndThisAndLocals[j] instanceof FunctionExpression ? argsAndThisAndLocals[j] : argsAndThisAndLocals[j].clone());
+				if (argsAndThisAndLocals[j] instanceof FunctionExpression) {
+					replaceCb(argsAndThisAndLocals[j]);
+					argsAndThisAndLocals[j] = null; // just in case
+				} else {
+					replaceCb(argsAndThisAndLocals[j].clone());
+				}
 			} else {
 				// closure referring to a local variable of outer scope
 			}
