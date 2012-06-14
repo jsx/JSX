@@ -727,7 +727,7 @@ var Parser = exports.Parser = Class.extend({
 		if (completionCb != null && this._completionRequest != null) {
 			var offset = this._completionRequest.isInRange(this._lineNumber, this._columnOffset, matched != null ? matched[0].length : 0);
 			if (offset != -1) {
-				this._completionRequest.setCandidates(completionCb(this), offset);
+				this._completionRequest.setCandidates(completionCb(this), matched[0].substring(0, offset));
 			}
 		}
 		if (matched == null)

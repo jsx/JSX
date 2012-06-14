@@ -36,7 +36,7 @@ var CompletionRequest = exports.CompletionRequest = Class.extend({
 		this._lineNumber = lineNumber;
 		this._columnOffest = columnOffset;
 		this._candidates = null;
-		this._candidatesOffset = -1;
+		this._prefix = null;
 	},
 
 	getLineNumber: function () {
@@ -56,17 +56,24 @@ var CompletionRequest = exports.CompletionRequest = Class.extend({
 		return -1;
 	},
 
-	setCandidates: function (candidates, offset) {
+	setCandidates: function (candidates, prefix) {
 		this._candidates = candidates;
-		this._candidatesOffset = offset;
+		this._prefix = prefix;
 	},
 
 	getCandidates: function () {
-		return this._candidates;
-	},
-
-	getCandidatesOffset: function () {
-		return this._candidatesOffset;
+		var candidates = [];
+		if (this._candidates != null) {
+			this._candidates.getCandidates().forEach(function (s) {
+				if (s.substring(0, this._prefix.length) == this._prefix) {
+					var left = s.substring(this._prefix.length);
+					if (left.length != 0) {
+						candidates.push(left);
+					}
+				}
+			}.bind(this));
+		}
+		return candidates;
 	}
 
 });

@@ -362,8 +362,7 @@ var JSX = Class.extend({
 		var result = compiler.compile();
 
 		if (completionRequest != null) {
-			var candidates = completionRequest.getCandidates();
-			console.log(JSON.stringify(candidates != null ? candidates.getCandidates() : []));
+			console.log(JSON.stringify(completionRequest.getCandidates()));
 			process.exit(0);
 		}
 
