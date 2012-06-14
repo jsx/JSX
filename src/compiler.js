@@ -30,10 +30,52 @@ eval(Class.$import("./util"));
 
 "use strict";
 
+var CompletionRequest = exports.CompletionRequest = Class.extend({
+
+	constructor: function (lineNumber, columnOffset) {
+		this._lineNumber = lineNumber;
+		this._columnOffest = columnOffset;
+		this._candidates = null;
+		this._candidatesOffset = -1;
+	},
+
+	getLineNumber: function () {
+		return this._lineNumber;
+	},
+
+	getColumnOffset: function () {
+		return this._columnOffest;
+	},
+
+	isInRange: function (lineNumber, columnOffset, length) {
+		if (lineNumber != this._lineNumber)
+			return -1;
+		if (columnOffset <= this._columnOffest && this._columnOffest <= columnOffset + length) {
+			return this._columnOffest - columnOffset;
+		}
+		return -1;
+	},
+
+	setCandidates: function (candidates, offset) {
+		this._candidates = candidates;
+		this._candidatesOffset = offset;
+	},
+
+	getCandidates: function () {
+		return this._candidates;
+	},
+
+	getCandidatesOffset: function () {
+		return this._candidatesOffset;
+	}
+
+});
+
 var Compiler = exports.Compiler = Class.extend({
 
 	$MODE_COMPILE: 0,
 	$MODE_PARSE: 1,
+	$MODE_COMPLETE: 2,
 
 	constructor: function (platform) {
 		this._platform = platform;
@@ -72,14 +114,10 @@ var Compiler = exports.Compiler = Class.extend({
 		this._optimizer = optimizer;
 	},
 
-	setEnableInlining: function (mode) {
-		this._enableInlining = mode;
-	},
-
-	addSourceFile: function (token, path) {
+	addSourceFile: function (token, path, completionRequest) {
 		var parser;
 		if ((parser = this.findParser(path)) == null) {
-			parser = new Parser(token, path);
+			parser = new Parser(token, path, completionRequest);
 			this._parsers.push(parser);
 		}
 		return parser;
@@ -97,8 +135,8 @@ var Compiler = exports.Compiler = Class.extend({
 		// parse all files
 		for (var i = 0; i < this._parsers.length; ++i) {
 			if (! this.parseFile(errors, this._parsers[i])) {
-				this._printErrors(errors);
-				return false;
+				if (! this._handleErrors(errors))
+					return false;
 			}
 		}
 		switch (this._mode) {
@@ -107,37 +145,29 @@ var Compiler = exports.Compiler = Class.extend({
 		}
 		// resolve imports
 		this._resolveImports(errors);
-		if (errors.length != 0) {
-			this._printErrors(errors);
+		if (! this._handleErrors(errors))
 			return false;
-		}
 		// register backing class for primitives
 		var builtins = this.findParser(this._platform.getRoot() + "/lib/built-in.jsx");
 		BooleanType._classDef = builtins.lookup(errors, null, "Boolean");
 		NumberType._classDef = builtins.lookup(errors, null, "Number");
 		StringType._classDef = builtins.lookup(errors, null, "String");
 		FunctionType._classDef = builtins.lookup(errors, null, "Function");
-		if (errors.length != 0) {
-			this._printErrors(errors);
+		if (! this._handleErrors(errors))
 			return false;
-		}
 		// template instantiation
 		this._instantiateTemplates(errors);
-		if (errors.length != 0) {
-			this._printErrors(errors);
+		if (! this._handleErrors(errors))
 			return false;
-		}
 		// semantic analysis
 		this._resolveTypes(errors);
-		if (errors.length != 0) {
-			this._printErrors(errors);
+		if (! this._handleErrors(errors))
 			return false;
-		}
 		this._analyze(errors);
-		if (errors.length != 0) {
-			this._printErrors(errors);
+		if (! this._handleErrors(errors))
 			return false;
-		}
+		if(this._mode == Compiler.MODE_COMPLETE)
+			return true;
 		// optimization
 		this._optimize();
 		// TODO peep-hole and dead store optimizations, etc.
@@ -172,8 +202,6 @@ var Compiler = exports.Compiler = Class.extend({
 			return false;
 		// parse
 		parser.parse(content, errors);
-		if (errors.length != 0)
-			return false;
 		// register imported files
 		if (this._mode != Compiler.MODE_PARSE) {
 			var imports = parser.getImports();
@@ -202,7 +230,7 @@ var Compiler = exports.Compiler = Class.extend({
 					&& files[i].substring(files[i].length - imprt.getSuffix().length) == imprt.getSuffix()) {
 					var path = resolvedDir + "/" + files[i];
 					if (path != parser.getPath()) {
-						var parser = this.addSourceFile(imprt.getFilenameToken(), resolvedDir + "/" + files[i]);
+						var parser = this.addSourceFile(imprt.getFilenameToken(), resolvedDir + "/" + files[i], null);
 						imprt.addSource(parser);
 						found = true;
 					}
@@ -219,7 +247,7 @@ var Compiler = exports.Compiler = Class.extend({
 				errors.push(new CompileError(imprt.getFilenameToken(), "cannot import itself"));
 				return false;
 			}
-			var parser = this.addSourceFile(imprt.getFilenameToken(), path);
+			var parser = this.addSourceFile(imprt.getFilenameToken(), path, null);
 			imprt.addSource(parser);
 		}
 		return true;
@@ -391,6 +419,14 @@ var Compiler = exports.Compiler = Class.extend({
 		}
 		// emit
 		this._emitter.emit(classDefs);
+	},
+
+	_handleErrors: function (errors) {
+		if (errors.length != 0 && this._mode != Compiler.MODE_COMPLETE) {
+			this._printErrors(errors);
+			return false;
+		}
+		return true;
 	},
 
 	_printErrors: function (errors) {

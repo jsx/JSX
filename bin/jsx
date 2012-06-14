@@ -200,6 +200,7 @@ var JSX = Class.extend({
 
 		var tasks = [];
 
+		var completionRequest = null;
 		var emitter = null;
 		var outputFile = null;
 		var executable = false;
@@ -236,6 +237,15 @@ var JSX = Class.extend({
 					process.exit(1);
 					break;
 				}
+				break;
+			case "--complete":
+				if ((optarg = getoptarg()) == null)
+					process.exit(1);
+				completionRequest = function () {
+					var a = optarg.split(/:/);
+					return new CompletionRequest(a[0], a[1]);
+				}();
+				compiler.setMode(Compiler.MODE_COMPLETE);
 				break;
 			case "--target":
 				if ((optarg = getoptarg()) == null)
@@ -323,18 +333,18 @@ var JSX = Class.extend({
 		}
 
 		var sourceFile = args[argIndex++];
-		compiler.addSourceFile(null, sourceFile);
+		compiler.addSourceFile(null, sourceFile, completionRequest);
 
 		if(compiler.getMode() === Compiler.MODE_PARSE) {
 			if (compiler.compile()) {
 				platform.save(outputFile, compiler.getAST());
 				process.exit(0);
-			}
-			else
+			} else {
 				process.exit(1);
+			}
 		}
 
-		// MODE_COMPILE
+		// MODE_COMPILE || MODE_COMPLETE
 		if (emitter == null)
 			emitter = new JavaScriptEmitter(platform);
 		var optimizer = new Optimizer();
@@ -349,7 +359,15 @@ var JSX = Class.extend({
 		compiler.setEmitter(emitter);
 		compiler.setOptimizer(optimizer);
 
-		if (! compiler.compile())
+		var result = compiler.compile();
+
+		if (completionRequest != null) {
+			var candidates = completionRequest.getCandidates();
+			console.log(JSON.stringify(candidates != null ? candidates.getCandidates() : []));
+			process.exit(0);
+		}
+
+		if (! result)
 			process.exit(1);
 
 		var output = emitter.getOutput(sourceFile, run);

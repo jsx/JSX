@@ -197,6 +197,8 @@ var Import = exports.Import = Class.extend({
 	},
 
 	getClassNames: function () {
+		if (this._classNames == null)
+			return null;
 		var names = [];
 		for (var i = 0; i < this._classNames.length; ++i)
 			names[i] = this._classNames[i].getValue();
@@ -233,6 +235,10 @@ var Import = exports.Import = Class.extend({
 
 	addSource: function (parser) {
 		this._sourceParsers.push(parser);
+	},
+
+	getSources: function () {
+		return this._sourceParsers;
 	},
 
 	assertExistenceOfNamedClasses: function (errors) {
@@ -387,9 +393,10 @@ var QualifiedName = exports.QualifiedName = Class.extend({
 
 var Parser = exports.Parser = Class.extend({
 
-	constructor: function (sourceToken, filename) {
+	constructor: function (sourceToken, filename, completionRequest) {
 		this._sourceToken = sourceToken;
 		this._filename = filename;
+		this._completionRequest = completionRequest;
 	},
 
 	parse: function (input, errors) {
@@ -399,6 +406,14 @@ var Parser = exports.Parser = Class.extend({
 		this._tokenLength = 0;
 		this._lineNumber = 1; // one origin
 		this._columnOffset = 0; // zero origin
+		// insert a marker so that at the completion location we would always get _expectIdentifierOpt called, whenever possible
+		if (this._completionRequest != null) {
+			var compLineNumber = Math.min(this._completionRequest.getLineNumber(), this._lines.length + 1);
+			this._lines[compLineNumber - 1] =
+				this._lines[compLineNumber - 1].substring(0, this._completionRequest.getColumnOffset())
+				+ "Q" + // use a character that is permitted within an identifier, but never appears in keywords
+				this._lines[compLineNumber - 1].substring(this._completionRequest.getColumnOffset());
+		}
 		// output
 		this._errors = errors;
 		this._templateClassDefs = [];
@@ -706,9 +721,15 @@ var Parser = exports.Parser = Class.extend({
 		return token;
 	},
 
-	_expectIdentifierOpt: function () {
+	_expectIdentifierOpt: function (completionCb) {
 		this._advanceToken();
 		var matched = this._getInput().match(_Lexer.rxIdent);
+		if (completionCb != null && this._completionRequest != null) {
+			var offset = this._completionRequest.isInRange(this._lineNumber, this._columnOffset, matched != null ? matched[0].length : 0);
+			if (offset != -1) {
+				this._completionRequest.setCandidates(completionCb(this), offset);
+			}
+		}
 		if (matched == null)
 			return null;
 		if (_Lexer.keywords.hasOwnProperty(matched[0])) {
@@ -723,8 +744,8 @@ var Parser = exports.Parser = Class.extend({
 		return new Token(matched[0], true, this._filename, this._lineNumber, this._getColumn());
 	},
 
-	_expectIdentifier: function () {
-		var token = this._expectIdentifierOpt();
+	_expectIdentifier: function (completionCb) {
+		var token = this._expectIdentifierOpt(completionCb);
 		if (token != null)
 			return token;
 		this._newError("expected an identifier");
@@ -800,7 +821,7 @@ var Parser = exports.Parser = Class.extend({
 			if (token != null)
 				return new QualifiedName(token, null);
 		}
-		if ((token = this._expectIdentifier()) == null)
+		if ((token = this._expectIdentifier(function (self) { return self._getCompletionCandidates(); })) == null)
 			return null;
 		return this._qualifiedNameStartingWith(token);
 	},
@@ -814,7 +835,7 @@ var Parser = exports.Parser = Class.extend({
 		if (imprt != null) {
 			if (this._expect(".") == null)
 				return null;
-			token = this._expectIdentifier();
+			token = this._expectIdentifier(function (self) { return self._getCompletionCandidatesOfNamespace(imprt); });
 			if (token == null)
 				return null;
 		}
@@ -824,7 +845,7 @@ var Parser = exports.Parser = Class.extend({
 	_importStatement: function (importToken) {
 		// parse
 		var classes = null;
-		var token = this._expectIdentifierOpt();
+		var token = this._expectIdentifierOpt(null);
 		if (token != null) {
 			classes = [ token ];
 			while (true) {
@@ -832,7 +853,7 @@ var Parser = exports.Parser = Class.extend({
 					return false;
 				if (token.getValue() == "from")
 					break;
-				if ((token = this._expectIdentifier()) == null)
+				if ((token = this._expectIdentifier(null)) == null)
 					return false;
 				classes.push(token);
 			}
@@ -842,7 +863,7 @@ var Parser = exports.Parser = Class.extend({
 			return false;
 		var alias = null;
 		if (this._expectOpt("into") != null) {
-			if ((alias = this._expectIdentifier()) == null)
+			if ((alias = this._expectIdentifier(null)) == null)
 				return false;
 		}
 		if (this._expect(";") == null)
@@ -932,7 +953,7 @@ var Parser = exports.Parser = Class.extend({
 			}
 			flags |= newFlag;
 		}
-		var className = this._expectIdentifier();
+		var className = this._expectIdentifier(null);
 		if (className == null)
 			return false;
 		// template
@@ -942,7 +963,7 @@ var Parser = exports.Parser = Class.extend({
 				return false;
 			typeArgs = [];
 			do {
-				var typeArg = this._expectIdentifier();
+				var typeArg = this._expectIdentifier(null);
 				if (typeArg == null)
 					return false;
 				typeArgs.push(typeArg);
@@ -1121,7 +1142,7 @@ var Parser = exports.Parser = Class.extend({
 			this._newError("only native classes may use the __readonly__ attribute");
 			return null;
 		}
-		var name = this._expectIdentifier();
+		var name = this._expectIdentifier(null);
 		if (name == null)
 			return null;
 		var type = null;
@@ -1151,7 +1172,7 @@ var Parser = exports.Parser = Class.extend({
 
 	_functionDefinition: function (token, flags, classFlags) {
 		// name
-		var name = this._expectIdentifier();
+		var name = this._expectIdentifier(null);
 		if (name == null)
 			return null;
 		if (name.getValue() == "constructor") {
@@ -1244,7 +1265,6 @@ var Parser = exports.Parser = Class.extend({
 					return null;
 				if (this._expect(">") == null)
 					return null;
-if (baseType.equals(Type.variantType)) throw new Error("Hmm");
 				typeDecl = baseType.toMayBeUndefinedType();
 				break;
 			case "variant":
@@ -1363,7 +1383,7 @@ if (baseType.equals(Type.variantType)) throw new Error("Hmm");
 
 	_functionTypeDeclaration: function (objectType) {
 		// optional function name
-		this._expectIdentifierOpt();
+		this._expectIdentifierOpt(null);
 		// parse args
 		if(this._expect("(") == null)
 			return null;
@@ -1371,7 +1391,7 @@ if (baseType.equals(Type.variantType)) throw new Error("Hmm");
 		if (this._expectOpt(")") == null) {
 			do {
 				var isVarArg = this._expectOpt("...") != null;
-				this._expectIdentifierOpt(); // may have identifiers
+				this._expectIdentifierOpt(null); // may have identifiers
 				if (this._expect(":") == null)
 					return null;
 				var argType = this._typeDeclaration(false);
@@ -1434,7 +1454,7 @@ if (baseType.equals(Type.variantType)) throw new Error("Hmm");
 	_statement: function () {
 		// has a label?
 		var state = this._preserveState();
-		var label = this._expectIdentifierOpt();
+		var label = this._expectIdentifierOpt(null);
 		if (label != null && this._expectOpt(":") != null) {
 			// within a label
 		} else {
@@ -1675,7 +1695,7 @@ if (baseType.equals(Type.variantType)) throw new Error("Hmm");
 	},
 
 	_continueStatement: function (token) {
-		var label = this._expectIdentifierOpt();
+		var label = this._expectIdentifierOpt(null);
 		if (this._expect(";") == null)
 			return false;
 		this._statements.push(new ContinueStatement(token, label));
@@ -1683,7 +1703,7 @@ if (baseType.equals(Type.variantType)) throw new Error("Hmm");
 	},
 
 	_breakStatement: function (token) {
-		var label = this._expectIdentifierOpt();
+		var label = this._expectIdentifierOpt(null);
 		if (this._expect(";") == null)
 			return false;
 		this._statements.push(new BreakStatement(token, label));
@@ -1789,7 +1809,7 @@ if (baseType.equals(Type.variantType)) throw new Error("Hmm");
 			var catchIdentifier;
 			var catchType;
 			if (this._expect("(") == null
-				|| (catchIdentifier = this._expectIdentifier()) == null
+				|| (catchIdentifier = this._expectIdentifier(null)) == null
 				|| this._expect(":") == null
 				|| (catchType = this._typeDeclaration(false)) == null
 				|| this._expect(")") == null
@@ -1886,7 +1906,7 @@ if (baseType.equals(Type.variantType)) throw new Error("Hmm");
 	},
 
 	_variableDeclaration: function (noIn) {
-		var identifier = this._expectIdentifier();
+		var identifier = this._expectIdentifier(null);
 		if (identifier == null)
 			return null;
 		var type = null;
@@ -2152,7 +2172,7 @@ if (baseType.equals(Type.variantType)) throw new Error("Hmm");
 				expr = new ArrayExpression(token, expr, index);
 				break;
 			case ".":
-				var identifier = this._expectIdentifier();
+				var identifier = this._expectIdentifier(function (self) { return self._getCompletionCandidatesOfProperty(expr); });
 				if (identifier == null)
 					return null;
 				expr = new PropertyExpression(token, expr, identifier);
@@ -2202,7 +2222,7 @@ if (baseType.equals(Type.variantType)) throw new Error("Hmm");
 	_superExpr: function () {
 		if (this._expect(".") == null)
 			return null;
-		var identifier = this._expectIdentifier();
+		var identifier = this._expectIdentifier(null /* FIXME */);
 		if (identifier == null)
 			return null;
 		// token of the super expression is set to "(" to mimize the differences bet.compile error messages generated by CallExpression
@@ -2281,30 +2301,38 @@ if (baseType.equals(Type.variantType)) throw new Error("Hmm");
 		return new FunctionExpression(token, funcDef);
 	},
 
+	_forEachScope: function (cb) {
+		if (! cb(this._locals, this._arguments)) {
+			return false;
+		}
+		for (var scope = this._prevScope; scope != null; scope = scope.prev) {
+			if (! cb(scope.locals, scope.arguments)) {
+				return false;
+			}
+		}
+		return true;
+	},
+
 	_findLocal: function (name) {
-		// helper function
-		var findFromScope = function (locals, args) {
+		var found = null;
+		this._forEachScope(function (locals, args) {
 			for (var i = 0; i < locals.length; ++i) {
-				if (locals[i].getName().getValue() == name)
-					return locals[i];
+				if (locals[i].getName().getValue() == name) {
+					found = locals[i];
+					return false;
+				}
 			}
 			if (args != null) {
 				for (var i = 0; i < args.length; ++i) {
-					if (args[i].getName().getValue() == name)
-						return args[i];
+					if (args[i].getName().getValue() == name) {
+						found = args[i];
+						return false;
+					}
 				}
 			}
-			return null;
-		};
-		// find
-		var found;
-		if ((found = findFromScope(this._locals, this._arguments)) != null)
-			return found;
-		for (var scope = this._prevScope; scope != null; scope = scope.prev) {
-			if ((found = findFromScope(scope.locals, scope.arguments)) != null)
-				return found;
-		}
-		return null;
+			return true;
+		});
+		return found;
 	},
 
 	_primaryExpr: function () {
@@ -2333,7 +2361,7 @@ if (baseType.equals(Type.variantType)) throw new Error("Hmm");
 			}
 		} else if ((token = this._expectNumberLiteralOpt()) != null) {
 			return new NumberLiteralExpression(token);
-		} else if ((token = this._expectIdentifierOpt()) != null) {
+		} else if ((token = this._expectIdentifierOpt(function (self) { return self._getCompletionCandidatesWithLocal(); })) != null) {
 			var local = this._findLocal(token.getValue());
 			if (local != null) {
 				return new LocalExpression(token, local);
@@ -2393,7 +2421,7 @@ if (baseType.equals(Type.variantType)) throw new Error("Hmm");
 			do {
 				// obtain key
 				var keyToken;
-				if ((keyToken = this._expectIdentifierOpt()) != null
+				if ((keyToken = this._expectIdentifierOpt(null)) != null
 					|| (keyToken = this._expectNumberLiteralOpt()) != null
 					|| (keyToken = this._expectStringLiteralOpt()) != null) {
 					// ok
@@ -2425,7 +2453,7 @@ if (baseType.equals(Type.variantType)) throw new Error("Hmm");
 		if (this._expectOpt(")") == null) {
 			do {
 				var isVarArg = allowVarArgs && (this._expectOpt("...") != null);
-				var argName = this._expectIdentifier();
+				var argName = this._expectIdentifier(null);
 				if (argName == null)
 					return null;
 				var argType = null;
@@ -2481,8 +2509,148 @@ if (baseType.equals(Type.variantType)) throw new Error("Hmm");
 		return args;
 	},
 
+	_getCompletionCandidates: function () {
+		return new CompletionCandidates(this);
+	},
+
+	_getCompletionCandidatesWithLocal: function () {
+		return new _CompletionCandidatesWithLocal(this);
+	},
+
+	_getCompletionCandidatesOfNamespace: function (imprt) {
+		return new _CompletionCandidatesOfNamespace(this, imprt);
+	},
+
+	_getCompletionCandidatesOfProperty: function (expr) {
+		return new _CompletionCandidatesOfProperty(this, expr);
+	},
+
 	$_isReservedClassName: function (name) {
 		return name.match(/^(Array|Boolean|Date|Function|Map|Number|Object|RegExp|String|Error|EvalError|RangeError|ReferenceError|SyntaxError|TypeError|JSX)$/) != null;
+	}
+
+});
+
+var CompletionCandidates = exports.CompletionCandidates = Class.extend({
+
+	constructor: function (parser) {
+		this._parser = parser;
+	},
+
+	getCandidates: function () {
+		var candidates = [];
+		this._doGetCandidates(candidates);
+		candidates = candidates.sort();
+		// FIXME uniq
+		return candidates;
+	},
+
+	_doGetCandidates: function (candidates) {
+		CompletionCandidates._addClasses(candidates, this._parser);
+		for (var i = 0; i < this._parser._imports.length; ++i) {
+			var imprt = this._parser._imports[i];
+			var alias = imprt.getAlias();
+			if (alias != null) {
+				candidates.push(alias);
+			} else {
+				CompletionCandidates._addImportedClasses(candidates, imprt);
+			}
+		}
+	},
+
+	$_addClasses: function (candidates, parser) {
+		parser.getClassDefs().forEach(function (classDef) {
+			if (classDef instanceof InstantiatedClassDefinition) {
+				// skip
+			} else {
+				candidates.push(classDef.className());
+			}
+		});
+		parser.getTemplateClassDefs().forEach(function (classDef) {
+			candidates.push(classDef.className());
+		});
+	},
+
+	$_addImportedClasses: function (candidates, imprt) {
+		var classNames = imprt.getClassNames();
+		if (classNames != null) {
+			classNames.forEach(function (className) {
+				candidates.push(className);
+			});
+		} else {
+			imprt.getSources().forEach(function (parser) {
+				CompletionCandidates._addClasses(candidates, parser);
+			});
+		}
+	}
+
+});
+
+var _CompletionCandidatesWithLocal = exports._CompletionCandidatesWithLocal = CompletionCandidates.extend({
+
+	constructor: function (parser) {
+		CompletionCandidates.prototype.constructor.call(this, parser);
+		this._locals = [];
+		parser._forEachScope(function (locals, args) {
+			this._locals = this._locals.concat(locals, args);
+			return true;
+		}.bind(this));
+	},
+
+	_doGetCandidates: function (candidates) {
+		this._locals.forEach(function (local) {
+			candidates.push(local.getName().getValue());
+		});
+		CompletionCandidates.prototype._doGetCandidates.call(this, candidates);
+	}
+
+});
+
+var _CompletionCandidatesOfNamespace = exports._CompletionCandidatesOfNamespace = CompletionCandidates.extend({
+
+	constructor: function (parser, imprt) {
+		CompletionCandidates.prototype.constructor.call(this, parser);
+		this._import = imprt;
+	},
+
+	_doGetCandidates: function (candidates) {
+		CompletionCandidates._addImportedClasses(this._import);
+	}
+
+});
+
+var _CompletionCandidatesOfProperty = exports._CompletionCandidatesOfProperty = CompletionCandidates.extend({
+
+	constructor: function (parser, expr) {
+		CompletionCandidates.prototype.constructor.call(this, parser);
+		this._expr = expr;
+	},
+
+	_doGetCandidates: function (candidates) {
+		var type = this._expr.getType();
+		if (type == null)
+			return;
+		type = type.resolveIfMayBeUndefined();
+		if (type.equals(Type.voidType)
+			|| type.equals(Type.nullType)
+			|| type.equals(Type.variantType)
+			|| type.equals(Type.undefinedType))
+			return;
+		// type with classdef
+		var classDef = type.getClassDef();
+		if (classDef == null)
+			return;
+		var isStatic = this._expr instanceof ClassExpression;
+		classDef.forEachMember(function (member) {
+			if (((member.flags() & ClassDefinition.IS_STATIC) != 0) == isStatic) {
+				if (! isStatic && member.name() == "constructor") {
+					// skip
+				} else {
+					candidates.push(member.name());
+				}
+			}
+			return true;
+		});
 	}
 
 });
