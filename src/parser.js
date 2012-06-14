@@ -768,14 +768,29 @@ var Parser = exports.Parser = Class.extend({
 		return new Token(matched[0], false, this._filename, this._lineNumber, this._getColumn());
 	},
 
-	_skipLine: function () {
-		if (this._lineNumber == this._lines.length) {
-			this._columnOffset = this._lines[this._lineNumber - 1].length;
-		} else {
-			++this._lineNumber;
-			this._columnOffset = 0;
+	_skipStatement: function () {
+		var advanced = false;
+		while (! this._isEOF()) {
+			switch (this._getInputByLength(1)) {
+			case ";":
+				// return after the semicolon
+				this._tokenLength = 1;
+				this._advanceToken();
+				return;
+			case "{":
+				if (! advanced) {
+					this._tokenLength = 1;
+					this._advanceToken();
+				}
+				return;
+			case "}":
+				// return before the block token
+				return;
+			}
+			this._tokenLength = 1;
+			this._advanceToken();
+			advanced = true;
 		}
-		this._tokenLength = 0;
 	},
 
 	_qualifiedName: function (allowSuper) {
@@ -992,7 +1007,7 @@ var Parser = exports.Parser = Class.extend({
 				}
 				members.push(member);
 			} else {
-				this._skipLine();
+				this._skipStatement();
 			}
 		}
 
@@ -1411,7 +1426,7 @@ if (baseType.equals(Type.variantType)) throw new Error("Hmm");
 			if (! this._expectIsNotEOF())
 				return false;
 			if (! this._statement())
-				this._skipLine();
+				this._skipStatement();
 		}
 		return token;
 	},
@@ -1706,33 +1721,42 @@ if (baseType.equals(Type.variantType)) throw new Error("Hmm");
 			var caseOrDefaultToken;
 			if (! foundCaseLabel && ! foundDefaultLabel) {
 				// first statement within the block should start with a label
-				if ((caseOrDefaultToken = this._expect([ "case", "default" ])) == null)
-					return false;
+				if ((caseOrDefaultToken = this._expect([ "case", "default" ])) == null) {
+					this._skipStatement();
+					continue;
+				}
 			} else {
 				caseOrDefaultToken = this._expectOpt([ "case", "default" ]);
 			}
 			if (caseOrDefaultToken != null) {
 				if (caseOrDefaultToken.getValue() == "case") {
 					var labelExpr = this._expr();
-					if (labelExpr == null)
-						return false;
-					if (this._expect(":") == null)
-						return false;
+					if (labelExpr == null) {
+						this._skipStatement();
+						continue;
+					}
+					if (this._expect(":") == null) {
+						this._skipStatement();
+						continue;
+					}
 					this._statements.push(new CaseStatement(caseOrDefaultToken, labelExpr));
 					foundCaseLabel = true;
 				} else { // "default"
-					if (this._expect(":") == null)
-						return false;
+					if (this._expect(":") == null) {
+						this._skipStatement();
+						continue;
+					}
 					if (foundDefaultLabel) {
 						this._newError("cannot have more than one default statement within one switch block");
-						return false;
+						this._skipStatement();
+						continue;
 					}
 					this._statements.push(new DefaultStatement(caseOrDefaultToken));
 					foundDefaultLabel = true;
 				}
 			} else {
 				if (! this._statement())
-					this._skipLine();
+					this._skipStatement();
 			}
 		}
 		// done
@@ -1841,7 +1865,7 @@ if (baseType.equals(Type.variantType)) throw new Error("Hmm");
 	_subStatements: function () {
 		var statementIndex = this._statements.length;
 		if (! this._statement())
-			this._skipLine();
+			this._skipStatement();
 		return this._statements.splice(statementIndex);
 	},
 
