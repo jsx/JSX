@@ -411,7 +411,7 @@ var Parser = exports.Parser = Class.extend({
 			var compLineNumber = Math.min(this._completionRequest.getLineNumber(), this._lines.length + 1);
 			this._lines[compLineNumber - 1] =
 				this._lines[compLineNumber - 1].substring(0, this._completionRequest.getColumnOffset())
-				+ "Q" + // use a character that is permitted within an identifier, but never appears in keywords
+				+ "Q," + // use a character that is permitted within an identifier, but never appears in keywords
 				this._lines[compLineNumber - 1].substring(this._completionRequest.getColumnOffset());
 		}
 		// output
@@ -1938,7 +1938,7 @@ var Parser = exports.Parser = Class.extend({
 		while ((commaToken = this._expectOpt(",")) != null) {
 			var assignExpr = this._assignExpr(noIn);
 			if (assignExpr == null)
-				return null;
+				break;
 			expr = new CommaExpression(commaToken, expr, assignExpr);
 		}
 		return expr;
