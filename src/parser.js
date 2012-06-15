@@ -420,8 +420,8 @@ var Parser = exports.Parser = Class.extend({
 		this._classDefs = [];
 		this._imports = [];
 		// use for function parsing
-		this._locals = [];
-		this._statements = [];
+		this._locals = null;
+		this._statements = null;
 		this._closures = [];
 		this._extendType = null;
 		this._implementTypes = null;
@@ -1230,7 +1230,10 @@ var Parser = exports.Parser = Class.extend({
 		else
 			lastToken = this._block();
 		// done
-		return new MemberFunctionDefinition(token, name, flags, returnType, args, this._locals, this._statements, this._closures, lastToken);
+		var funcDef = new MemberFunctionDefinition(token, name, flags, returnType, args, this._locals, this._statements, this._closures, lastToken);
+		this._locals = null;
+		this._statements = null;
+		return funcDef;
 	},
 
 	_typeDeclaration: function (allowVoid) {
@@ -2302,12 +2305,14 @@ var Parser = exports.Parser = Class.extend({
 	},
 
 	_forEachScope: function (cb) {
-		if (! cb(this._locals, this._arguments)) {
-			return false;
-		}
-		for (var scope = this._prevScope; scope != null; scope = scope.prev) {
-			if (! cb(scope.locals, scope.arguments)) {
+		if (this._locals != null) {
+			if (! cb(this._locals, this._arguments)) {
 				return false;
+			}
+			for (var scope = this._prevScope; scope != null; scope = scope.prev) {
+				if (! cb(scope.locals, scope.arguments)) {
+					return false;
+				}
 			}
 		}
 		return true;
