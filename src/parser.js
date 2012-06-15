@@ -1225,6 +1225,7 @@ var Parser = exports.Parser = Class.extend({
 		this._locals = [];
 		this._statements = [];
 		this._closures = [];
+		this._funcFlags = flags;
 		if (name.getValue() == "constructor")
 			var lastToken = this._initializeBlock();
 		else
@@ -1233,6 +1234,7 @@ var Parser = exports.Parser = Class.extend({
 		var funcDef = new MemberFunctionDefinition(token, name, flags, returnType, args, this._locals, this._statements, this._closures, lastToken);
 		this._locals = null;
 		this._statements = null;
+		this._funcFlags = -1;
 		return funcDef;
 	},
 
@@ -2540,6 +2542,7 @@ var CompletionCandidates = exports.CompletionCandidates = Class.extend({
 
 	constructor: function (parser) {
 		this._parser = parser;
+		this._funcFlags = parser._funcFlags;
 	},
 
 	getCandidates: function () {
@@ -2551,6 +2554,9 @@ var CompletionCandidates = exports.CompletionCandidates = Class.extend({
 	},
 
 	_doGetCandidates: function (candidates) {
+		if (this._funcFlags != -1 && (this._funcFlags & ClassDefinition.IS_STATIC) == 0) {
+			candidates.push("this");
+		}
 		CompletionCandidates._addClasses(candidates, this._parser);
 		for (var i = 0; i < this._parser._imports.length; ++i) {
 			var imprt = this._parser._imports[i];
