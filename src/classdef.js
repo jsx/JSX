@@ -348,7 +348,7 @@ var ClassDefinition = exports.ClassDefinition = Class.extend({
 		if ((this.flags() & (ClassDefinition.IS_INTERFACE | ClassDefinition.IS_MIXIN)) == 0) {
 			if (extendClassDef != null) {
 				if ((extendClassDef.flags() & ClassDefinition.IS_FINAL) != 0) {
-					context.errors.push(new CompileError(this.getToken(), "cannot extend final class '" + this.extendClassDef.className() + "'"));
+					context.errors.push(new CompileError(this.getToken(), "cannot extend final class '" + extendClassDef.className() + "'"));
 					return false;
 				}
 				if ((extendClassDef.flags() & (ClassDefinition.IS_INTERFACE | ClassDefinition.IS_MIXIN)) != 0) {

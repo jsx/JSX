@@ -693,6 +693,12 @@ var Parser = exports.Parser = Class.extend({
 
 		this._advanceToken();
 		for (var i = 0; i < expected.length; ++i) {
+			if (this._completionRequest != null) {
+				var offset = this._completionRequest.isInRange(this._lineNumber, this._columnOffset, expected[i].length);
+				if (offset != -1) { //  && expected[i].match(/[A-Za-z]/) != null) {
+					this._completionRequest.pushCandidates(new KeywordCompletionCandidate(expected[i]).setPrefix(this._getInputByLength(offset)));
+				}
+			}
 			if (this._getInputByLength(expected[i].length) == expected[i]) {
 				if (expected[i].match(_Lexer.rxIdent) != null
 					&& this._getInput().match(_Lexer.rxIdent)[0].length != expected[i].length) {
@@ -727,7 +733,7 @@ var Parser = exports.Parser = Class.extend({
 		if (completionCb != null && this._completionRequest != null) {
 			var offset = this._completionRequest.isInRange(this._lineNumber, this._columnOffset, matched != null ? matched[0].length : 0);
 			if (offset != -1) {
-				this._completionRequest.setCandidates(completionCb(this), matched[0].substring(0, offset));
+				this._completionRequest.pushCandidates(completionCb(this).setPrefix(matched[0].substring(0, offset)));
 			}
 		}
 		if (matched == null)
@@ -1716,14 +1722,16 @@ var Parser = exports.Parser = Class.extend({
 	},
 
 	_returnStatement: function (token) {
-		var expr = null;
-		if (this._expectOpt(";") == null) {
-			if ((expr = this._expr(false)) == null)
-				return false;
-			if (this._expect(";") == null)
-				return false;
+		if (this._expectOpt(";") != null) {
+			this._statements.push(new ReturnStatement(token, null));
+			return true;
 		}
+		var expr = this._expr(false);
+		if (expr == null)
+			return false;
 		this._statements.push(new ReturnStatement(token, expr));
+		if (this._expect(";") == null)
+			return false;
 		return true;
 	},
 
@@ -2540,7 +2548,20 @@ var Parser = exports.Parser = Class.extend({
 
 var CompletionCandidates = exports.CompletionCandidates = Class.extend({
 
+	constructor: function () {
+		this._prefix = null;
+	},
+
 	getCandidates: null, // function (string[]) : void
+
+	getPrefix: function () {
+		return this._prefix;
+	},
+
+	setPrefix: function (prefix) {
+		this._prefix = prefix;
+		return this;
+	},
 
 	$_addClasses: function (candidates, parser) {
 		parser.getClassDefs().forEach(function (classDef) {
@@ -2570,9 +2591,23 @@ var CompletionCandidates = exports.CompletionCandidates = Class.extend({
 
 });
 
+var KeywordCompletionCandidate = exports.KeywordCompletionCandidate = CompletionCandidates.extend({
+
+	constructor: function (expected) {
+		CompletionCandidates.prototype.constructor.call(this);
+		this._expected = expected;
+	},
+
+	getCandidates: function (candidates) {
+		candidates.push(this._expected);
+	}
+
+});
+
 var CompletionCandidatesOfTopLevel = exports.CompletionCandidatesOfTopLevel = CompletionCandidates.extend({
 
 	constructor: function (parser) {
+		CompletionCandidates.prototype.constructor.call(this);
 		this._parser = parser;
 	},
 
@@ -2618,6 +2653,7 @@ var _CompletionCandidatesWithLocal = exports._CompletionCandidatesWithLocal = Co
 var _CompletionCandidatesOfNamespace = exports._CompletionCandidatesOfNamespace = CompletionCandidates.extend({
 
 	constructor: function (imprt) {
+		CompletionCandidates.prototype.constructor.call(this);
 		this._import = imprt;
 	},
 
@@ -2630,6 +2666,7 @@ var _CompletionCandidatesOfNamespace = exports._CompletionCandidatesOfNamespace 
 var _CompletionCandidatesOfProperty = exports._CompletionCandidatesOfProperty = CompletionCandidates.extend({
 
 	constructor: function (expr) {
+		CompletionCandidates.prototype.constructor.call(this);
 		this._expr = expr;
 	},
 
