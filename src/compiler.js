@@ -64,7 +64,9 @@ var CompletionRequest = exports.CompletionRequest = Class.extend({
 	getCandidates: function () {
 		var candidates = [];
 		if (this._candidates != null) {
-			this._candidates.getCandidates().forEach(function (s) {
+			var rawCandidates = [];
+			this._candidates.getCandidates(rawCandidates);
+			rawCandidates.forEach(function (s) {
 				if (s.substring(0, this._prefix.length) == this._prefix) {
 					var left = s.substring(this._prefix.length);
 					if (left.length != 0) {

@@ -821,7 +821,7 @@ var Parser = exports.Parser = Class.extend({
 			if (token != null)
 				return new QualifiedName(token, null);
 		}
-		if ((token = this._expectIdentifier(function (self) { return self._getCompletionCandidates(); })) == null)
+		if ((token = this._expectIdentifier(function (self) { return self._getCompletionCandidatesOfTopLevel(); })) == null)
 			return null;
 		return this._qualifiedNameStartingWith(token);
 	},
@@ -2516,8 +2516,8 @@ var Parser = exports.Parser = Class.extend({
 		return args;
 	},
 
-	_getCompletionCandidates: function () {
-		return new CompletionCandidates(this);
+	_getCompletionCandidatesOfTopLevel: function () {
+		return new CompletionCandidatesOfTopLevel(this);
 	},
 
 	_getCompletionCandidatesWithLocal: function () {
@@ -2525,11 +2525,11 @@ var Parser = exports.Parser = Class.extend({
 	},
 
 	_getCompletionCandidatesOfNamespace: function (imprt) {
-		return new _CompletionCandidatesOfNamespace(this, imprt);
+		return new _CompletionCandidatesOfNamespace(imprt);
 	},
 
 	_getCompletionCandidatesOfProperty: function (expr) {
-		return new _CompletionCandidatesOfProperty(this, expr);
+		return new _CompletionCandidatesOfProperty(expr);
 	},
 
 	$_isReservedClassName: function (name) {
@@ -2540,34 +2540,7 @@ var Parser = exports.Parser = Class.extend({
 
 var CompletionCandidates = exports.CompletionCandidates = Class.extend({
 
-	constructor: function (parser) {
-		this._parser = parser;
-		this._funcFlags = parser._funcFlags;
-	},
-
-	getCandidates: function () {
-		var candidates = [];
-		this._doGetCandidates(candidates);
-		candidates = candidates.sort();
-		// FIXME uniq
-		return candidates;
-	},
-
-	_doGetCandidates: function (candidates) {
-		if (this._funcFlags != -1 && (this._funcFlags & ClassDefinition.IS_STATIC) == 0) {
-			candidates.push("this");
-		}
-		CompletionCandidates._addClasses(candidates, this._parser);
-		for (var i = 0; i < this._parser._imports.length; ++i) {
-			var imprt = this._parser._imports[i];
-			var alias = imprt.getAlias();
-			if (alias != null) {
-				candidates.push(alias);
-			} else {
-				CompletionCandidates._addImportedClasses(candidates, imprt);
-			}
-		}
-	},
+	getCandidates: null, // function (string[]) : void
 
 	$_addClasses: function (candidates, parser) {
 		parser.getClassDefs().forEach(function (classDef) {
@@ -2597,34 +2570,58 @@ var CompletionCandidates = exports.CompletionCandidates = Class.extend({
 
 });
 
-var _CompletionCandidatesWithLocal = exports._CompletionCandidatesWithLocal = CompletionCandidates.extend({
+var CompletionCandidatesOfTopLevel = exports.CompletionCandidatesOfTopLevel = CompletionCandidates.extend({
 
 	constructor: function (parser) {
-		CompletionCandidates.prototype.constructor.call(this, parser);
+		this._parser = parser;
+	},
+
+	getCandidates: function (candidates) {
+		CompletionCandidates._addClasses(candidates, this._parser);
+		for (var i = 0; i < this._parser._imports.length; ++i) {
+			var imprt = this._parser._imports[i];
+			var alias = imprt.getAlias();
+			if (alias != null) {
+				candidates.push(alias);
+			} else {
+				CompletionCandidates._addImportedClasses(candidates, imprt);
+			}
+		}
+	}
+
+});
+
+var _CompletionCandidatesWithLocal = exports._CompletionCandidatesWithLocal = CompletionCandidatesOfTopLevel.extend({
+
+	constructor: function (parser) {
+		CompletionCandidatesOfTopLevel.prototype.constructor.call(this, parser);
 		this._locals = [];
+		this._funcFlags = parser._funcFlags;
 		parser._forEachScope(function (locals, args) {
 			this._locals = this._locals.concat(locals, args);
 			return true;
 		}.bind(this));
 	},
 
-	_doGetCandidates: function (candidates) {
+	getCandidates: function (candidates) {
+		if (this._funcFlags != -1 && (this._funcFlags & ClassDefinition.IS_STATIC) == 0) {
+			candidates.push("this");
+		}
 		this._locals.forEach(function (local) {
 			candidates.push(local.getName().getValue());
 		});
-		CompletionCandidates.prototype._doGetCandidates.call(this, candidates);
+		CompletionCandidatesOfTopLevel.prototype.getCandidates.call(this, candidates);
 	}
 
 });
 
 var _CompletionCandidatesOfNamespace = exports._CompletionCandidatesOfNamespace = CompletionCandidates.extend({
 
-	constructor: function (parser, imprt) {
-		CompletionCandidates.prototype.constructor.call(this, parser);
+	constructor: function (imprt) {
 		this._import = imprt;
 	},
 
-	_doGetCandidates: function (candidates) {
+	getCandidates: function (candidates) {
 		CompletionCandidates._addImportedClasses(this._import);
 	}
 
@@ -2632,12 +2629,11 @@ var _CompletionCandidatesOfNamespace = exports._CompletionCandidatesOfNamespace 
 
 var _CompletionCandidatesOfProperty = exports._CompletionCandidatesOfProperty = CompletionCandidates.extend({
 
-	constructor: function (parser, expr) {
-		CompletionCandidates.prototype.constructor.call(this, parser);
+	constructor: function (expr) {
 		this._expr = expr;
 	},
 
-	_doGetCandidates: function (candidates) {
+	getCandidates: function (candidates) {
 		var type = this._expr.getType();
 		if (type == null)
 			return;
