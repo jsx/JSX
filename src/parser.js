@@ -1004,7 +1004,7 @@ var Parser = exports.Parser = Class.extend({
 		var success = true;
 		while (this._expectOpt("}") == null) {
 			if (! this._expectIsNotEOF())
-				return false;
+				break;
 			var member = this._memberDefinition(flags, typeArgs != null);
 			if (member != null) {
 				for (var i = 0; i < members.length; ++i) {
@@ -1444,7 +1444,7 @@ var Parser = exports.Parser = Class.extend({
 		var token;
 		while ((token = this._expectOpt("}")) == null) {
 			if (! this._expectIsNotEOF())
-				return false;
+				return null;
 			if (! this._statement())
 				this._skipStatement();
 		}
@@ -1515,9 +1515,9 @@ var Parser = exports.Parser = Class.extend({
 		var expr = this._expr(false);
 		if (expr == null)
 			return false;
-		if (this._expect(";") == null)
-			return null;
 		this._statements.push(new ExpressionStatement(expr));
+		if (this._expect(";") == null)
+			return false;
 		return true;
 	},
 

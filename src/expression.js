@@ -1869,7 +1869,10 @@ var CallExpression = exports.CallExpression = OperatorExpression.extend({
 	},
 
 	getType: function () {
-		return this._expr.getType().resolveIfMayBeUndefined().getReturnType();
+		var type = this._expr.getType();
+		if (type == null)
+			return null;
+		return type.resolveIfMayBeUndefined().getReturnType();
 	},
 
 	forEachExpression: function (cb) {
