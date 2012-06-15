@@ -243,7 +243,7 @@ var JSX = Class.extend({
 					process.exit(1);
 				completionRequest = function () {
 					var a = optarg.split(/:/);
-					return new CompletionRequest(a[0], a[1]);
+					return new CompletionRequest(a[0], a[1] - 1);
 				}();
 				compiler.setMode(Compiler.MODE_COMPLETE);
 				break;
