@@ -1231,7 +1231,6 @@ var Parser = exports.Parser = Class.extend({
 		this._locals = [];
 		this._statements = [];
 		this._closures = [];
-		this._funcFlags = flags;
 		if (name.getValue() == "constructor")
 			var lastToken = this._initializeBlock();
 		else
@@ -1240,7 +1239,6 @@ var Parser = exports.Parser = Class.extend({
 		var funcDef = new MemberFunctionDefinition(token, name, flags, returnType, args, this._locals, this._statements, this._closures, lastToken);
 		this._locals = null;
 		this._statements = null;
-		this._funcFlags = -1;
 		return funcDef;
 	},
 
@@ -2631,7 +2629,6 @@ var _CompletionCandidatesWithLocal = exports._CompletionCandidatesWithLocal = Co
 	constructor: function (parser) {
 		CompletionCandidatesOfTopLevel.prototype.constructor.call(this, parser);
 		this._locals = [];
-		this._funcFlags = parser._funcFlags;
 		parser._forEachScope(function (locals, args) {
 			this._locals = this._locals.concat(locals, args);
 			return true;
@@ -2639,9 +2636,6 @@ var _CompletionCandidatesWithLocal = exports._CompletionCandidatesWithLocal = Co
 	},
 
 	getCandidates: function (candidates) {
-		if (this._funcFlags != -1 && (this._funcFlags & ClassDefinition.IS_STATIC) == 0) {
-			candidates.push("this");
-		}
 		this._locals.forEach(function (local) {
 			candidates.push(local.getName().getValue());
 		});
