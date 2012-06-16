@@ -27,6 +27,9 @@ There's `bin/jsx` command to compile JSX source code into JavaScript.
 
 Type the following commands and see what happens:
 
+    # run Hello World in JSX
+    bin/jsx --run example/hello.jsx
+
     # display compiled code to stdout
     bin/jsx example/hello.jsx
 
