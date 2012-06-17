@@ -22,18 +22,18 @@
  * IN THE SOFTWARE.
  */
 
+"use strict";
+
 var fs = require("fs");
 var path = require("path");
 var child_process = require("child_process");
 
 var Class = require("../src/Class");
-eval(Class.$import("../src/compiler"));
-eval(Class.$import("../src/platform"));
-eval(Class.$import("../src/jsemitter"));
-eval(Class.$import("../src/optimizer"));
-eval(Class.$import("../src/util"));
-
-"use strict";
+var Compiler = require("../src/compiler").Compiler;
+var Platform = require("../src/platform").Platform;
+var JavaScriptEmitter = require("../src/jsemitter").JavaScriptEmitter;
+var Optimizer = require("../src/optimizer").Optimizer;
+var Util = require("../src/util").Util;
 
 var NodePlatform = Platform.extend({
 	constructor: function() {
