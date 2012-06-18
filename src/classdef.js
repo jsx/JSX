@@ -340,6 +340,11 @@ var ClassDefinition = exports.ClassDefinition = Class.extend({
 	},
 
 	analyze: function (context) {
+		this._analyzeClassDef(context);
+		this._analyzeMemberFunctions(context);
+	},
+
+	_analyzeClassDef: function (context) {
 		var extendClassDef = this.extendType() != null ? this.extendType().getClassDef() : null;
 		var implementClassDefs = this.implementTypes().map(function (type) {
 			return type.getClassDef();
@@ -348,7 +353,7 @@ var ClassDefinition = exports.ClassDefinition = Class.extend({
 		if ((this.flags() & (ClassDefinition.IS_INTERFACE | ClassDefinition.IS_MIXIN)) == 0) {
 			if (extendClassDef != null) {
 				if ((extendClassDef.flags() & ClassDefinition.IS_FINAL) != 0) {
-					context.errors.push(new CompileError(this.getToken(), "cannot extend final class '" + this.extendClassDef.className() + "'"));
+					context.errors.push(new CompileError(this.getToken(), "cannot extend final class '" + extendClassDef.className() + "'"));
 					return false;
 				}
 				if ((extendClassDef.flags() & (ClassDefinition.IS_INTERFACE | ClassDefinition.IS_MIXIN)) != 0) {
@@ -477,6 +482,9 @@ var ClassDefinition = exports.ClassDefinition = Class.extend({
 				context.errors.push(new CompileError(this.getToken(), msg));
 			}
 		}
+	},
+
+	_analyzeMemberFunctions: function (context) {
 		// analyze the member functions, analysis of member variables is performed lazily (and those that where never analyzed will be removed by dead code elimination)
 		for (var i = 0; i < this._members.length; ++i) {
 			var member = this._members[i];
@@ -1347,6 +1355,10 @@ var TemplateClassDefinition = exports.TemplateClassDefinition = Class.extend({
 
 	className: function () {
 		return this._className;
+	},
+
+	flags: function () {
+		return this._flags;
 	},
 
 	instantiate: function (errors, request) {

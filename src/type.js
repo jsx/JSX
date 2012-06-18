@@ -384,7 +384,7 @@ var ObjectType = exports.ObjectType = Type.extend({
 	},
 
 	toString: function () {
-		return this._classDef.className();
+		return this._classDef != null ? this._classDef.className() : "(null)";
 	}
 
 });
