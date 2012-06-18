@@ -1443,7 +1443,7 @@ if (baseType.equals(Type.variantType)) throw new Error("Hmm");
 		}
 		// parse the statement
 		var token = this._expectOpt([
-			"{", "var", ";", "if", "do", "while", "for", "continue", "break", "return", "switch", "throw", "try", "assert", "log", "delete", "debugger"
+			"{", "var", ";", "if", "do", "while", "for", "continue", "break", "return", "switch", "throw", "try", "assert", "log", "delete", "debugger", "function"
 		]);
 		if (label != null) {
 			if (! (token != null && token.getValue().match(/^(?:do|while|for|switch)$/) != null)) {
@@ -1487,6 +1487,11 @@ if (baseType.equals(Type.variantType)) throw new Error("Hmm");
 				return this._deleteStatement(token);
 			case "debugger":
 				return this._debuggerStatement(token);
+			case "function":
+				if(this._functionStatement(token)) { return true; }
+					this._restoreState(state);
+				// maybe function expression
+				break;
 			default:
 				throw new "logic flaw, got " + token.getValue();
 			}
@@ -1546,6 +1551,20 @@ if (baseType.equals(Type.variantType)) throw new Error("Hmm");
 			return false;
 		if (expr != null)
 			this._statements.push(new ExpressionStatement(expr));
+		return true;
+	},
+
+	_functionStatement: function (token) {
+		var name = this._expectIdentifier();
+		if (name == null)
+			return false;
+
+		var funcExpr = this._functionExpr(token, name);
+		var local = this._registerLocal(name, funcExpr.getFuncDef().getType());
+		var expr = new LocalExpression(name, local);
+		var t= new Token("=", true, token._filename, token._lineNumber, token._columnNumber);
+		expr = new AssignmentExpression(t, expr, funcExpr);
+		this._statements.push(new ExpressionStatement(expr));
 		return true;
 	},
 
@@ -2255,7 +2274,7 @@ if (baseType.equals(Type.variantType)) throw new Error("Hmm");
 		}
 	},
 
-	_functionExpr: function (token) {
+	_functionExpr: function (token, name) {
 		if (this._expect("(") == null)
 			return null;
 		var args = this._functionArgumentsExpr(false, false);
@@ -2268,6 +2287,13 @@ if (baseType.equals(Type.variantType)) throw new Error("Hmm");
 		}
 		if (this._expect("{") == null)
 			return null;
+
+		if (name != null) {
+			// add name to current scope for local function declaration
+			var argTypes = args.map(function(arg) { return arg.getType(); });
+			var type = new StaticFunctionType(returnType, argTypes, false);
+			this._registerLocal(name,type);
+		}
 		// parse function block
 		var state = this._pushScope(args);
 		var lastToken = this._block();
