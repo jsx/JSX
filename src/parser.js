@@ -1560,6 +1560,8 @@ if (baseType.equals(Type.variantType)) throw new Error("Hmm");
 			return false;
 
 		var funcExpr = this._functionExpr(token, name);
+		if (funcExpr == null)
+			return false;
 		var local = this._registerLocal(name, funcExpr.getFuncDef().getType());
 		var expr = new LocalExpression(name, local);
 		var t= new Token("=", true, token._filename, token._lineNumber, token._columnNumber);
@@ -2140,7 +2142,7 @@ if (baseType.equals(Type.variantType)) throw new Error("Hmm");
 				}
 				break;
 			case "function":
-				expr = this._functionExpr(token);
+				expr = this._functionExpr(token, null);
 				break;
 			case "new":
 				expr = this._newExpr(token);
@@ -2272,10 +2274,10 @@ if (baseType.equals(Type.variantType)) throw new Error("Hmm");
 		}
 	},
 
-	_functionExpr: function (token, name) {
+	_functionExpr: function (token, nameOfFunctionStatement) {
 		if (this._expect("(") == null)
 			return null;
-		var args = this._functionArgumentsExpr(false, false);
+		var args = this._functionArgumentsExpr(false, nameOfFunctionStatement != null);
 		if (args == null)
 			return null;
 		var returnType = null;
@@ -2286,11 +2288,11 @@ if (baseType.equals(Type.variantType)) throw new Error("Hmm");
 		if (this._expect("{") == null)
 			return null;
 
-		if (name != null) {
+		if (nameOfFunctionStatement != null) {
 			// add name to current scope for local function declaration
 			var argTypes = args.map(function(arg) { return arg.getType(); });
 			var type = new StaticFunctionType(returnType, argTypes, false);
-			this._registerLocal(name,type);
+			this._registerLocal(nameOfFunctionStatement, type);
 		}
 		// parse function block
 		var state = this._pushScope(args);
