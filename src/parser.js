@@ -1443,7 +1443,7 @@ if (baseType.equals(Type.variantType)) throw new Error("Hmm");
 		}
 		// parse the statement
 		var token = this._expectOpt([
-			"{", "var", ";", "if", "do", "while", "for", "continue", "break", "return", "switch", "throw", "try", "assert", "log", "delete", "debugger"
+			"{", "var", ";", "if", "do", "while", "for", "continue", "break", "return", "switch", "throw", "try", "assert", "log", "delete", "debugger", "void"
 		]);
 		if (label != null) {
 			if (! (token != null && token.getValue().match(/^(?:do|while|for|switch)$/) != null)) {
@@ -1487,6 +1487,9 @@ if (baseType.equals(Type.variantType)) throw new Error("Hmm");
 				return this._deleteStatement(token);
 			case "debugger":
 				return this._debuggerStatement(token);
+			case "void":
+				// void is simply skipped
+				break;
 			default:
 				throw new "logic flaw, got " + token.getValue();
 			}
@@ -2049,8 +2052,6 @@ if (baseType.equals(Type.variantType)) throw new Error("Hmm");
 	},
 
 	_unaryExpr: function () {
-		// simply remove "void"
-		this._expectOpt("void");
 		// read other unary operators
 		var op = this._expectOpt([ "++", "--", "+", "-", "~", "!", "typeof" ]);
 		if (op == null)
