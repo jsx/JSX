@@ -1488,10 +1488,7 @@ if (baseType.equals(Type.variantType)) throw new Error("Hmm");
 			case "debugger":
 				return this._debuggerStatement(token);
 			case "function":
-				if(this._functionStatement(token)) { return true; }
-					this._restoreState(state);
-				// maybe function expression
-				break;
+				return this._functionStatement(token);
 			case "void":
 				// void is simply skipped
 				break;
