@@ -678,7 +678,6 @@ var ThisExpression = exports.ThisExpression = Expression.extend({
 
 	clone: function () {
 		return new ThisExpression(this._token, this._classDef);
-		return ret;
 	},
 
 	serialize: function () {
