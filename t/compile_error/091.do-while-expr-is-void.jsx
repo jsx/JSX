@@ -1,6 +1,6 @@
 class T {
 	static function f() : void {
-		for (; 1; )
-			;
+		do {
+		} while (T.f());
 	}
 }

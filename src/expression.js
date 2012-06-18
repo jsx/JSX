@@ -678,7 +678,6 @@ var ThisExpression = exports.ThisExpression = Expression.extend({
 
 	clone: function () {
 		return new ThisExpression(this._token, this._classDef);
-		return ret;
 	},
 
 	serialize: function () {
@@ -1859,7 +1858,12 @@ var CallExpression = exports.CallExpression = OperatorExpression.extend({
 		if (argTypes == null)
 			return false;
 		if (this._expr instanceof PropertyExpression && ! exprType.isAssignable()) {
-			if (this._expr.deduceByArgumentTypes(context, this._token, argTypes, this._expr.getExpr() instanceof ClassExpression) == null)
+			var isCallingStatic = this._expr.getExpr() instanceof ClassExpression;
+			if (! isCallingStatic && this._expr.getIdentifierToken().getValue() == "constructor") {
+				context.errors.push(new CompileError(this._token, "cannot call a constructor other than by using 'new'"));
+				return false;
+			}
+			if (this._expr.deduceByArgumentTypes(context, this._token, argTypes, isCallingStatic) == null)
 				return false;
 		} else {
 			if (exprType.deduceByArgumentTypes(context, this._token, argTypes, true) == null)

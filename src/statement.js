@@ -566,8 +566,8 @@ var DoWhileStatement = exports.DoWhileStatement = ContinuableStatement.extend({
 			if (! Statement.assertIsReachable(context, this._expr.getToken()))
 				return false;
 			if (this._analyzeExpr(context, this._expr))
-				if (! this._expr.getType().equals(Type.booleanType))
-					context.errors.push(new CompileError(this._expr.getToken(), "expression of the while statement should return a boolean"));
+				if (this._expr.getType().resolveIfMayBeUndefined().equals(Type.voidType))
+					context.errors.push(new CompileError(this._expr.getToken(), "expression of the do-while statement should not return void"));
 			this.registerVariableStatusesOnBreak(context.getTopBlock().localVariableStatuses);
 			this._finalizeBlockAnalysis(context);
 		} catch (e) {
@@ -721,8 +721,8 @@ var ForStatement = exports.ForStatement = ContinuableStatement.extend({
 			this._analyzeExpr(context, this._initExpr);
 		if (this._condExpr != null)
 			if (this._analyzeExpr(context, this._condExpr))
-				if (! this._condExpr.getType().equals(Type.booleanType))
-					context.errors.push(new CompileError(this._condExpr.getToken(), "condition expression of the for statement should return a boolean"));
+				if (this._condExpr.getType().resolveIfMayBeUndefined().equals(Type.voidType))
+					context.errors.push(new CompileError(this._condExpr.getToken(), "condition expression of the for statement should not return void"));
 		this._prepareBlockAnalysis(context);
 		try {
 			for (var i = 0; i < this._statements.length; ++i)
@@ -1055,8 +1055,8 @@ var WhileStatement = exports.WhileStatement = ContinuableStatement.extend({
 
 	doAnalyze: function (context) {
 		if (this._analyzeExpr(context, this._expr))
-			if (! this._expr.getType().equals(Type.booleanType))
-				context.errors.push(new CompileError(this._expr.getToken(), "expression of the while statement should return a boolean"));
+			if (this._expr.getType().resolveIfMayBeUndefined().equals(Type.voidType))
+				context.errors.push(new CompileError(this._expr.getToken(), "expression of the while statement should not return void"));
 		this._prepareBlockAnalysis(context);
 		try {
 			for (var i = 0; i < this._statements.length; ++i)
@@ -1333,8 +1333,8 @@ var AssertStatement = exports.AssertStatement = InformationStatement.extend({
 		if (! this._analyzeExpr(context, this._expr))
 			return true;
 		var exprType = this._expr.getType();
-		if (! exprType.equals(Type.booleanType))
-			context.errors.push(new CompileError(this._exprs[0].getToken(), "cannot assert type " + exprType.serialize()));
+		if (exprType.equals(Type.voidType))
+			context.errors.push(new CompileError(this._exprs[0].getToken(), "argument of the assert statement cannot be void"));
 		return true;
 	},
 
