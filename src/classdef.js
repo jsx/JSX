@@ -583,21 +583,29 @@ var ClassDefinition = exports.ClassDefinition = Class.extend({
 		return true;
 	},
 
-	_assertFunctionIsOverridable: function (context, member) {
+	_assertFunctionIsOverridable: function (context, overrideDef) {
 		for (var i = 0; i < this._members.length; ++i) {
-			if (this._members[i].name() == member.name()
+			if (this._members[i].name() == overrideDef.name()
 				&& this._members[i] instanceof MemberFunctionDefinition
 				&& (this._members[i] & ClassDefinition.IS_STATIC) == 0
-				&& Util.typesAreEqual(this._members[i].getArgumentTypes(), member.getArgumentTypes())) {
+				&& Util.typesAreEqual(this._members[i].getArgumentTypes(), overrideDef.getArgumentTypes())) {
 				if ((this._members[i].flags() & ClassDefinition.IS_FINAL) != 0) {
-					context.errors.push(new CompileError(member.getToken(), "cannot override final function defined in class '" + this.className() + "'"));
+					context.errors.push(new CompileError(overrideDef.getToken(), "cannot override final function defined in class '" + this.className() + "'"));
+					return false;
+				}
+				var overrideReturnType = overrideDef.getReturnType();
+				var memberReturnType = this._members[i].getReturnType();
+				if (! (overrideReturnType.equals(memberReturnType) || overrideReturnType.isConvertibleTo(memberReturnType))
+					|| (memberReturnType instanceof Type.MayBeUndefinedType && ! (overrideReturnType instanceof Type.MayBeUndefinedType))) {
+					// only allow narrowing the return type
+					context.errors.push(new CompileError(overrideDef.getToken(), "return type '" + overrideReturnType.toString() + "' is not convertible to '" + memberReturnType.toString() + "'"));
 					return false;
 				} else {
 					return true;
 				}
 			}
 		}
-		return this._assertFunctionIsOverridableInBaseClasses(context, member);
+		return this._assertFunctionIsOverridableInBaseClasses(context, overrideDef);
 	},
 
 	_assertFunctionIsOverridableInBaseClasses: function (context, member) {
