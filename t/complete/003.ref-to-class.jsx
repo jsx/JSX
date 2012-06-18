@@ -1,5 +1,5 @@
 /*EXPECTED
-["!","(","+","++","-","--","A","Array","Boolean","Date","Error","EvalError","Function","JSON","Map","Math","Number","Object","RangeError","ReferenceError","RegExp","String","SyntaxError","TypeError","[","false","function","new","null","super","this","true","typeof","undefined","void","{","~"]
+["!","(","+","++","-","--","A","Array","Boolean","Date","Error","EvalError","Function","JSON","Map","Math","Number","Object","RangeError","ReferenceError","RegExp","String","SyntaxError","TypeError","[","false","function","new","null","super","this","true","typeof","undefined","{","~"]
 */
 /*JSX_OPTS
 --complete 8:18

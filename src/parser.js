@@ -1480,7 +1480,7 @@ var Parser = exports.Parser = Class.extend({
 		}
 		// parse the statement
 		var token = this._expectOpt([
-			"{", "var", ";", "if", "do", "while", "for", "continue", "break", "return", "switch", "throw", "try", "assert", "log", "delete", "debugger"
+			"{", "var", ";", "if", "do", "while", "for", "continue", "break", "return", "switch", "throw", "try", "assert", "log", "delete", "debugger", "function", "void"
 		]);
 		if (label != null) {
 			if (! (token != null && token.getValue().match(/^(?:do|while|for|switch)$/) != null)) {
@@ -1524,6 +1524,11 @@ var Parser = exports.Parser = Class.extend({
 				return this._deleteStatement(token);
 			case "debugger":
 				return this._debuggerStatement(token);
+			case "function":
+				return this._functionStatement(token);
+			case "void":
+				// void is simply skipped
+				break;
 			default:
 				throw new "logic flaw, got " + token.getValue();
 			}
@@ -1583,6 +1588,22 @@ var Parser = exports.Parser = Class.extend({
 			return false;
 		if (expr != null)
 			this._statements.push(new ExpressionStatement(expr));
+		return true;
+	},
+
+	_functionStatement: function (token) {
+		var name = this._expectIdentifier();
+		if (name == null)
+			return false;
+
+		var funcExpr = this._functionExpr(token, name);
+		if (funcExpr == null)
+			return false;
+		var local = this._registerLocal(name, funcExpr.getFuncDef().getType());
+		var expr = new LocalExpression(name, local);
+		var t= new Token("=", true, token._filename, token._lineNumber, token._columnNumber);
+		expr = new AssignmentExpression(t, expr, funcExpr);
+		this._statements.push(new ExpressionStatement(expr));
 		return true;
 	},
 
@@ -2088,8 +2109,6 @@ var Parser = exports.Parser = Class.extend({
 	},
 
 	_unaryExpr: function () {
-		// simply remove "void"
-		this._expectOpt("void");
 		// read other unary operators
 		var op = this._expectOpt([ "++", "--", "+", "-", "~", "!", "typeof" ]);
 		if (op == null)
@@ -2162,7 +2181,7 @@ var Parser = exports.Parser = Class.extend({
 				}
 				break;
 			case "function":
-				expr = this._functionExpr(token);
+				expr = this._functionExpr(token, null);
 				break;
 			case "new":
 				expr = this._newExpr(token);
@@ -2294,10 +2313,10 @@ var Parser = exports.Parser = Class.extend({
 		}
 	},
 
-	_functionExpr: function (token) {
+	_functionExpr: function (token, nameOfFunctionStatement) {
 		if (this._expect("(") == null)
 			return null;
-		var args = this._functionArgumentsExpr(false, false);
+		var args = this._functionArgumentsExpr(false, nameOfFunctionStatement != null);
 		if (args == null)
 			return null;
 		var returnType = null;
@@ -2307,6 +2326,13 @@ var Parser = exports.Parser = Class.extend({
 		}
 		if (this._expect("{") == null)
 			return null;
+
+		if (nameOfFunctionStatement != null) {
+			// add name to current scope for local function declaration
+			var argTypes = args.map(function(arg) { return arg.getType(); });
+			var type = new StaticFunctionType(returnType, argTypes, false);
+			this._registerLocal(nameOfFunctionStatement, type);
+		}
 		// parse function block
 		var state = this._pushScope(args);
 		var lastToken = this._block();

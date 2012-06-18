@@ -1208,7 +1208,8 @@ var TypeofExpression = exports.TypeofExpression = UnaryExpression.extend({
 	analyze: function (context, parentExpr) {
 		if (! this._analyze(context))
 			return false;
-		if (! this._expr.getType().equals(Type.variantType)) {
+		var exprType = this._expr.getType();
+		if (! (exprType.equals(Type.variantType) || exprType instanceof MayBeUndefinedType)) {
 			context.errors.push(new CompileError(this._token, "cannot apply operator 'typeof' to '" + this._expr.getType().toString() + "'"));
 			return false;
 		}
