@@ -340,6 +340,11 @@ var ClassDefinition = exports.ClassDefinition = Class.extend({
 	},
 
 	analyze: function (context) {
+		this._analyzeClassDef(context);
+		this._analyzeMemberFunctions(context);
+	},
+
+	_analyzeClassDef: function (context) {
 		var extendClassDef = this.extendType() != null ? this.extendType().getClassDef() : null;
 		var implementClassDefs = this.implementTypes().map(function (type) {
 			return type.getClassDef();
@@ -477,6 +482,9 @@ var ClassDefinition = exports.ClassDefinition = Class.extend({
 				context.errors.push(new CompileError(this.getToken(), msg));
 			}
 		}
+	},
+
+	_analyzeMemberFunctions: function (context) {
 		// analyze the member functions, analysis of member variables is performed lazily (and those that where never analyzed will be removed by dead code elimination)
 		for (var i = 0; i < this._members.length; ++i) {
 			var member = this._members[i];
