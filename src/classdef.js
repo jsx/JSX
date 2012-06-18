@@ -1357,6 +1357,10 @@ var TemplateClassDefinition = exports.TemplateClassDefinition = Class.extend({
 		return this._className;
 	},
 
+	flags: function () {
+		return this._flags;
+	},
+
 	instantiate: function (errors, request) {
 		var Parser = require("./parser");
 		// check number of type arguments

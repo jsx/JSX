@@ -405,7 +405,7 @@ native class TypeError extends Error {
 
 // 5.12
 
-native class JSON {
+native final class JSON {
 
 	static function parse(text : string) : variant;
 	static function parse(text : string, reviver : function(key:string, value:variant):variant) : variant;

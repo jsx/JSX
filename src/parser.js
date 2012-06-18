@@ -820,19 +820,19 @@ var Parser = exports.Parser = Class.extend({
 		}
 	},
 
-	_qualifiedName: function (allowSuper) {
+	_qualifiedName: function (allowSuper, autoCompleteMatchCb) {
 		// returns a token that contains a qualified name
 		if (allowSuper) {
 			var token = this._expectOpt("super");
 			if (token != null)
 				return new QualifiedName(token, null);
 		}
-		if ((token = this._expectIdentifier(function (self) { return self._getCompletionCandidatesOfTopLevel(); })) == null)
+		if ((token = this._expectIdentifier(function (self) { return self._getCompletionCandidatesOfTopLevel(autoCompleteMatchCb); })) == null)
 			return null;
-		return this._qualifiedNameStartingWith(token);
+		return this._qualifiedNameStartingWith(token, autoCompleteMatchCb);
 	},
 
-	_qualifiedNameStartingWith: function (token) {
+	_qualifiedNameStartingWith: function (token, autoCompleteMatchCb) {
 		if (token.getValue() == "variant") {
 			this._errors.push(new CompileError(token, "cannot use 'variant' as a class name"));
 			return null;
@@ -841,7 +841,7 @@ var Parser = exports.Parser = Class.extend({
 		if (imprt != null) {
 			if (this._expect(".") == null)
 				return null;
-			token = this._expectIdentifier(function (self) { return self._getCompletionCandidatesOfNamespace(imprt); });
+			token = this._expectIdentifier(function (self) { return self._getCompletionCandidatesOfNamespace(imprt, autoCompleteMatchCb); });
 			if (token == null)
 				return null;
 		}
@@ -981,25 +981,33 @@ var Parser = exports.Parser = Class.extend({
 		// extends
 		if ((flags & (ClassDefinition.IS_INTERFACE | ClassDefinition.IS_MIXIN)) == 0) {
 			if (this._expectOpt("extends") != null) {
-				if ((this._extendType = this._objectTypeDeclaration(null)) == null)
-					return false;
-			} else if (className.getValue() != "Object") {
+				this._extendType = this._objectTypeDeclaration(
+					null,
+					function (classDef) {
+						return (classDef.flags() & (ClassDefinition.IS_MIXIN | ClassDefinition.IS_INTERFACE | ClassDefinition.IS_FINAL)) == 0;
+					});
+			}
+			if (this._extendType == null && className.getValue() != "Object") {
 				this._extendType = new ParsedObjectType(new QualifiedName(new Token("Object", true), null), []);
 				this._objectTypesUsed.push(this._extendType);
 			}
 		} else {
 			if ((flags & (ClassDefinition.IS_ABSTRACT | ClassDefinition.IS_FINAL | ClassDefinition.IS_NATIVE)) != 0) {
 				this._newError("interface or mixin cannot have attributes: 'abstract', 'final', 'native");
-				return false;
+				flags &= ~ (ClassDefinition.IS_ABSTRACT | ClassDefinition.IS_FINAL | ClassDefinition.IS_NATIVE); // erase the flags and continue
 			}
 		}
 		// implements
 		if (this._expectOpt("implements") != null) {
 			do {
-				var implementType = this._objectTypeDeclaration(null);
-				if (implementType == null)
-					return false;
-				this._implementTypes.push(implementType);
+				var implementType = this._objectTypeDeclaration(
+					null,
+					function (classDef) {
+						return (classDef.flags() & (ClassDefinition.IS_MIXIN | ClassDefinition.IS_INTERFACE)) != 0;
+					});
+				if (implementType != null) {
+					this._implementTypes.push(implementType);
+				}
 			} while (this._expectOpt(",") != null);
 		}
 		// body
@@ -1308,12 +1316,12 @@ var Parser = exports.Parser = Class.extend({
 				throw new Error("logic flaw");
 			}
 		} else {
-			return this._objectTypeDeclaration(null);
+			return this._objectTypeDeclaration(null, null);
 		}
 	},
 
-	_objectTypeDeclaration: function (firstToken) {
-		var qualifiedName = firstToken !== null ? this._qualifiedNameStartingWith(firstToken) : this._qualifiedName(false);
+	_objectTypeDeclaration: function (firstToken, autoCompleteMatchCb) {
+		var qualifiedName = firstToken !== null ? this._qualifiedNameStartingWith(firstToken, autoCompleteMatchCb) : this._qualifiedName(false, autoCompleteMatchCb);
 		if (qualifiedName == null)
 			return null;
 		var state = this._preserveState();
@@ -2522,16 +2530,16 @@ var Parser = exports.Parser = Class.extend({
 		return args;
 	},
 
-	_getCompletionCandidatesOfTopLevel: function () {
-		return new CompletionCandidatesOfTopLevel(this);
+	_getCompletionCandidatesOfTopLevel: function (autoCompleteMatchCb) {
+		return new CompletionCandidatesOfTopLevel(this, autoCompleteMatchCb);
 	},
 
 	_getCompletionCandidatesWithLocal: function () {
 		return new _CompletionCandidatesWithLocal(this);
 	},
 
-	_getCompletionCandidatesOfNamespace: function (imprt) {
-		return new _CompletionCandidatesOfNamespace(imprt);
+	_getCompletionCandidatesOfNamespace: function (imprt, autoCompleteMatchCb) {
+		return new _CompletionCandidatesOfNamespace(imprt, autoCompleteMatchCb);
 	},
 
 	_getCompletionCandidatesOfProperty: function (expr) {
@@ -2561,28 +2569,33 @@ var CompletionCandidates = exports.CompletionCandidates = Class.extend({
 		return this;
 	},
 
-	$_addClasses: function (candidates, parser) {
+	$_addClasses: function (candidates, parser, autoCompleteMatchCb) {
 		parser.getClassDefs().forEach(function (classDef) {
 			if (classDef instanceof InstantiatedClassDefinition) {
 				// skip
 			} else {
-				candidates.push(classDef.className());
+				if (autoCompleteMatchCb == null || autoCompleteMatchCb(classDef)) {
+					candidates.push(classDef.className());
+				}
 			}
 		});
 		parser.getTemplateClassDefs().forEach(function (classDef) {
-			candidates.push(classDef.className());
+			if (autoCompleteMatchCb == null || autoCompleteMatchCb(classDef)) {
+				candidates.push(classDef.className());
+			}
 		});
 	},
 
-	$_addImportedClasses: function (candidates, imprt) {
+	$_addImportedClasses: function (candidates, imprt, autoCompleteMatchCb) {
 		var classNames = imprt.getClassNames();
 		if (classNames != null) {
 			classNames.forEach(function (className) {
+				// FIXME can we refer to the classdefs of the classnames here?
 				candidates.push(className);
 			});
 		} else {
 			imprt.getSources().forEach(function (parser) {
-				CompletionCandidates._addClasses(candidates, parser);
+				CompletionCandidates._addClasses(candidates, parser, autoCompleteMatchCb);
 			});
 		}
 	}
@@ -2604,20 +2617,21 @@ var KeywordCompletionCandidate = exports.KeywordCompletionCandidate = Completion
 
 var CompletionCandidatesOfTopLevel = exports.CompletionCandidatesOfTopLevel = CompletionCandidates.extend({
 
-	constructor: function (parser) {
+	constructor: function (parser, autoCompleteMatchCb) {
 		CompletionCandidates.prototype.constructor.call(this);
 		this._parser = parser;
+		this._autoCompleteMatchCb = autoCompleteMatchCb;
 	},
 
 	getCandidates: function (candidates) {
-		CompletionCandidates._addClasses(candidates, this._parser);
+		CompletionCandidates._addClasses(candidates, this._parser, this._autoCompleteMatchCb);
 		for (var i = 0; i < this._parser._imports.length; ++i) {
 			var imprt = this._parser._imports[i];
 			var alias = imprt.getAlias();
 			if (alias != null) {
 				candidates.push(alias);
 			} else {
-				CompletionCandidates._addImportedClasses(candidates, imprt);
+				CompletionCandidates._addImportedClasses(candidates, imprt, this._autoCompleteMatchCb);
 			}
 		}
 	}
@@ -2627,7 +2641,7 @@ var CompletionCandidatesOfTopLevel = exports.CompletionCandidatesOfTopLevel = Co
 var _CompletionCandidatesWithLocal = exports._CompletionCandidatesWithLocal = CompletionCandidatesOfTopLevel.extend({
 
 	constructor: function (parser) {
-		CompletionCandidatesOfTopLevel.prototype.constructor.call(this, parser);
+		CompletionCandidatesOfTopLevel.prototype.constructor.call(this, parser, null);
 		this._locals = [];
 		parser._forEachScope(function (locals, args) {
 			this._locals = this._locals.concat(locals, args);
@@ -2646,13 +2660,14 @@ var _CompletionCandidatesWithLocal = exports._CompletionCandidatesWithLocal = Co
 
 var _CompletionCandidatesOfNamespace = exports._CompletionCandidatesOfNamespace = CompletionCandidates.extend({
 
-	constructor: function (imprt) {
+	constructor: function (imprt, autoCompleteMatchCb) {
 		CompletionCandidates.prototype.constructor.call(this);
 		this._import = imprt;
+		this._autoCompleteMatchCb = autoCompleteMatchCb;
 	},
 
 	getCandidates: function (candidates) {
-		CompletionCandidates._addImportedClasses(this._import);
+		CompletionCandidates._addImportedClasses(this._import, this._autoCompleteMatchCb);
 	}
 
 });
