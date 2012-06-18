@@ -7,9 +7,9 @@ class Test {
 		try {
 			throw 123;
 		} catch (e : variant) {
-			function () : void {
+			(function () : void {
 				log e as string;
-			}();
+			})();
 		}
 	}
 }
