@@ -84,10 +84,19 @@ var _Util = exports._Util = Class.extend({
 		}
 	},
 
+	$getStash: function (stashable) {
+		var stashHash = stashable.getOptimizerStash();
+		var stash;
+		if ((stash = stashHash["jsemitter"]) == null) {
+			stash = stashHash["jsemitter"] = {};
+		}
+		return stashHash;
+	},
+
 	$setupBooleanizeFlags: function (funcDef) {
 		var exprReturnsBoolean = function (expr) {
 			if (expr instanceof LogicalExpression) {
-				return expr.getOptimizerStash()["jsemitter"].returnsBoolean;
+				return _Util.getStash(expr).returnsBoolean;
 			} else {
 				return expr.getType().equals(Type.booleanType);
 			}
@@ -120,10 +129,8 @@ var _Util = exports._Util = Class.extend({
 					} else if (parentExpr[0] instanceof ConditionalExpression && parentExpr[0].getCondExpr() == expr) {
 						shouldBooleanize = false;
 					}
-					expr.getOptimizerStash()["jsemitter"] = {
-						shouldBooleanize: shouldBooleanize,
-						returnsBoolean: returnsBoolean
-					};
+					_Util.getStash(expr).shouldBooleanize = shouldBooleanize;
+					_Util.getStash(expr).returnsBoolean = returnsBoolean;
 				}
 				return true;
 			});
@@ -132,7 +139,7 @@ var _Util = exports._Util = Class.extend({
 	},
 
 	$shouldBooleanize: function (logicalExpr) {
-		return logicalExpr.getOptimizerStash()["jsemitter"].shouldBooleanize;
+		return _Util.getStash(logicalExpr).shouldBooleanize;
 	}
 
 });
