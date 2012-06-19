@@ -1291,7 +1291,7 @@ var _PropertyExpressionEmitter = exports._PropertyExpressionEmitter = _UnaryExpr
 		})) {
 			throw new Error("logic flaw, could not find member " + identifierToken.getValue() + " in class " + classDef.clasSName());
 		}
-		this._emitter._emit("[" + index + "]", identifierToken);
+		this._emitter._emit("[" + index + "/*" + identifierToken.getValue() + "*/]", identifierToken);
 	},
 
 	_getPrecedence: function () {
