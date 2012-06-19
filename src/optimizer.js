@@ -395,6 +395,7 @@ var _ArrayizeOptimizationCommand = exports._ArrayizeOptimizationCommand = _Optim
 					& (ClassDefinition.IS_INTERFACE | ClassDefinition.IS_MIXIN | ClassDefinition.IS_FINAL | ClassDefinition.IS_ABSTRACT | ClassDefinition.IS_ARRAY | ClassDefinition.IS_NATIVE))
 					== ClassDefinition.IS_FINAL
 				&& classDef.extendType().getClassDef().className() == "Object"
+				&& classDef.implementTypes().length == 0
 				&& classDef.forEachMemberFunction(function (funcDef) {
 					return (funcDef.flags() & ClassDefinition.IS_OVERRIDE) == 0;
 				})) {
