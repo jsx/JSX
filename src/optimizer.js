@@ -398,6 +398,9 @@ var _ArrayizeOptimizationCommand = exports._ArrayizeOptimizationCommand = _Optim
 				&& classDef.implementTypes().length == 0
 				&& classDef.forEachMemberFunction(function (funcDef) {
 					return (funcDef.flags() & ClassDefinition.IS_OVERRIDE) == 0;
+				})
+				&& classDef.forEachMemberVariable(function (varDef) {
+					return varDef.getType() instanceof PrimitiveType;
 				})) {
 				this.log("converting " + classDef.className() + " to array class");
 				classDef.setFlags(classDef.flags() | ClassDefinition.IS_ARRAY);
