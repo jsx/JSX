@@ -1269,6 +1269,7 @@ var _PropertyExpressionEmitter = exports._PropertyExpressionEmitter = _UnaryExpr
 			this._emitter._emit(this._emitter._mangleFunctionName(identifierToken.getValue(), exprType.getArgumentTypes()), identifierToken);
 		} else {
 			if (! expr.getHolderType().equals(Type.variantType)
+				&& ! (expr.getExpr() instanceof ClassExpression)
 				&& (expr.getHolderType().getClassDef().flags() & ClassDefinition.IS_ARRAY) != 0) {
 				this._emitAccessToArrayClass(expr.getHolderType().getClassDef(), identifierToken);
 			} else {
@@ -1281,8 +1282,12 @@ var _PropertyExpressionEmitter = exports._PropertyExpressionEmitter = _UnaryExpr
 	_emitAccessToArrayClass: function (classDef, identifierToken) {
 		var index = -1;
 		if (classDef.forEachMemberVariable(function (member) {
-			++index;
-			return identifierToken.getValue() != member.name();
+			if ((member.flags() & ClassDefinition.IS_STATIC) == 0) {
+				++index;
+				return identifierToken.getValue() != member.name();
+			} else {
+				return true;
+			}
 		})) {
 			throw new Error("logic flaw, could not find member " + identifierToken.getValue() + " in class " + classDef.clasSName());
 		}
@@ -1945,7 +1950,7 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 		this._emit(
 			"/**\n" +
 			" * class " + classDef.getOutputClassName() +
-			(classDef.extendType() != null ? " extends " + classDef.extendType().getClassDef().getOutputClassName() + "\n" : "") +
+			(classDef.extendType() != null ? " extends " + classDef.extendType().getClassDef().getOutputClassName() : "") + "\n" +
 			" * @constructor\n" +
 			" */\n" +
 			"function ", null);
