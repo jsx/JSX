@@ -854,6 +854,19 @@ var InstanceofExpression = exports.InstanceofExpression = UnaryExpression.extend
 			context.errors.push(new CompileError(this._token, "operator 'instanceof' is only applicable to an object"));
 			return false;
 		}
+		if (! (this._expectedType instanceof ObjectType)) {
+			context.errors.push(new CompileError(this._token, "expected type should be an object"));
+			return false;
+		}
+		var classDef = this._expectedType.getClassDef();
+		if (classDef == null) {
+			// the error should already have been reported
+			return false;
+		}
+		if ((classDef.flags() & ClassDefinition.IS_ARRAY) != 0) {
+			context.errors.push(new CompileError(this._token, "'instanceof' operator cannot be applied against an '__array__' class"));
+			return false;
+		}
 		return true;
 	},
 

@@ -915,7 +915,7 @@ var Parser = exports.Parser = Class.extend({
 		// attributes* class
 		var flags = 0;
 		while (true) {
-			var token = this._expect([ "class", "interface", "mixin", "abstract", "final", "native", "__fake__" ]);
+			var token = this._expect([ "class", "interface", "mixin", "abstract", "final", "native", "__fake__", "__array__" ]);
 			if (token == null)
 				return false;
 			if (token.getValue() == "class")
@@ -949,6 +949,9 @@ var Parser = exports.Parser = Class.extend({
 				break;
 			case "__fake__":
 				newFlag = ClassDefinition.IS_FAKE;
+				break;
+			case "__array__":
+				newFlag = ClassDefinition.IS_ARRAY;
 				break;
 			default:
 				throw new Error("logic flaw");
@@ -1009,6 +1012,18 @@ var Parser = exports.Parser = Class.extend({
 					this._implementTypes.push(implementType);
 				}
 			} while (this._expectOpt(",") != null);
+		}
+		// check flags
+		if ((flags & ClassDefinition.IS_ARRAY) != 0) {
+			if ((flags & (ClassDefinition.IS_INTERFACE | ClassDefinition.IS_MIXIN)) != 0) {
+				this._newError("only a final class extending Object can be attributed as __array__");
+			} else if (this._extendType.getToken().getValue() != "Object") {
+				this._newError("an __array__ class cannot extend a class other than Object");
+			} else if (this._implementTypes.length != 0) {
+				this._newError("an __array__ class cannot implement interfaces");
+			} else if ((flags & ClassDefinition.IS_FINAL) == 0) {
+				this._newError("an __array__ class should be final");
+			}
 		}
 		// body
 		if (this._expect("{") == null)

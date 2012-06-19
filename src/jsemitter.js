@@ -791,7 +791,8 @@ var _ThisExpressionEmitter = exports._ThisExpressionEmitter = _ExpressionEmitter
 
 	emit: function (outerOpPrecedence) {
 		var emittingFunction = this._emitter._emittingFunction;
-		if ((emittingFunction.flags() & ClassDefinition.IS_STATIC) != 0)
+		if ((emittingFunction.flags() & ClassDefinition.IS_STATIC) != 0
+			|| (emittingFunction.getClassDef().flags() & ClassDefinition.IS_ARRAY) != 0)
 			this._emitter._emit("$this", this._expr.getToken());
 		else
 			this._emitter._emit("this", this._expr.getToken());
@@ -1267,9 +1268,25 @@ var _PropertyExpressionEmitter = exports._PropertyExpressionEmitter = _UnaryExpr
 			}
 			this._emitter._emit(this._emitter._mangleFunctionName(identifierToken.getValue(), exprType.getArgumentTypes()), identifierToken);
 		} else {
-			this._emitter._emit(".", identifierToken);
-			this._emitter._emit(identifierToken.getValue(), identifierToken);
+			if (! expr.getHolderType().equals(Type.variantType)
+				&& (expr.getHolderType().getClassDef().flags() & ClassDefinition.IS_ARRAY) != 0) {
+				this._emitAccessToArrayClass(expr.getHolderType().getClassDef(), identifierToken);
+			} else {
+				this._emitter._emit(".", identifierToken);
+				this._emitter._emit(identifierToken.getValue(), identifierToken);
+			}
 		}
+	},
+
+	_emitAccessToArrayClass: function (classDef, identifierToken) {
+		var index = -1;
+		if (classDef.forEachMemberVariable(function (member) {
+			++index;
+			return identifierToken.getValue() != member.name();
+		})) {
+			throw new Error("logic flaw, could not find member " + identifierToken.getValue() + " in class " + classDef.clasSName());
+		}
+		this._emitter._emit("[" + index + "]", identifierToken);
 	},
 
 	_getPrecedence: function () {
@@ -1526,6 +1543,8 @@ var _CallExpressionEmitter = exports._CallExpressionEmitter = _OperatorExpressio
 			return true;
 		else if (this._emitIfMathAbs(calleeExpr))
 			return true;
+		else if (this._emitIfArrayClass(calleeExpr))
+			return true;
 		return false;
 	},
 
@@ -1581,6 +1600,21 @@ var _CallExpressionEmitter = exports._CallExpressionEmitter = _OperatorExpressio
 		default:
 			return false;
 		}
+	},
+
+	_emitIfArrayClass: function (calleeExpr) {
+		if (calleeExpr.getType() instanceof StaticFunctionType)
+			return false;
+		var classDef = calleeExpr.getExpr().getType().getClassDef();
+		if ((classDef.flags() & ClassDefinition.IS_ARRAY) == 0)
+			return false;
+		this._emitter._emit(classDef.getOutputClassName(), calleeExpr.getToken());
+		this._emitter._emitCallArguments(
+			calleeExpr.getToken(),
+			"$$prototype$" + this._emitter._mangleFunctionName(calleeExpr.getIdentifierToken().getValue(), calleeExpr.getType().getArgumentTypes()) + "(",
+			[ calleeExpr.getExpr() ].concat(this._expr.getArguments()),
+			[ new ObjectType(classDef), calleeExpr.getType().getArgumentTypes() ]);
+		return true;
 	},
 
 	_emitIfMathAbs: function (calleeExpr) {
@@ -1672,7 +1706,8 @@ var _NewExpressionEmitter = exports._NewExpressionEmitter = _OperatorExpressionE
 		var argTypes = ctor.getArgumentTypes();
 		this._emitter._emitCallArguments(
 			this._expr.getToken(),
-			"new " + this._emitter._mangleConstructorName(classDef, argTypes) + "(",
+			((classDef.flags() & ClassDefinition.IS_ARRAY) == 0 ? "new " : "")
+				+ this._emitter._mangleConstructorName(classDef, argTypes) + "(",
 			this._expr.getArguments(),
 			argTypes);
 	},
@@ -1935,7 +1970,9 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 
 		// emit prologue
 		this._emit("/**\n", null);
-		this._emit(" * @constructor\n", null);
+		if ((funcDef.getClassDef() & ClassDefinition.IS_ARRAY) == 0) {
+			this._emit(" * @constructor\n", null);
+		}
 		this._emitFunctionArgumentAnnotations(funcDef);
 		this._emit(" */\n", null);
 		this._emit("function ", null);
@@ -1960,8 +1997,13 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 		this._emit(_Util.buildAnnotation(" * @return {%1}\n", funcDef.getReturnType()), null);
 		this._emit(" */\n", null);
 		this._emit(className + ".", null);
-		if ((funcDef.flags() & ClassDefinition.IS_STATIC) == 0)
-			this._emit("prototype.", null);
+		if ((funcDef.flags() & ClassDefinition.IS_STATIC) == 0) {
+			if ((funcDef.getClassDef().flags() & ClassDefinition.IS_ARRAY) == 0) {
+				this._emit("prototype.", null);
+			} else {
+				this._emit("$prototype$", null);
+			}
+		}
 		this._emit(funcName + " = ", funcDef.getNameToken());
 		this._emit("function (", funcDef.getToken());
 		this._emitFunctionArguments(funcDef);
@@ -1970,18 +2012,34 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 		this._emitFunctionBody(funcDef);
 		this._reduceIndent();
 		this._emit("};\n\n", null);
-		if ((funcDef.flags() & ClassDefinition.IS_STATIC) != 0)
+		if ((funcDef.flags() & ClassDefinition.IS_STATIC) != 0) {
 			this._emit("var " + className + "$" + funcName + " = " + className + "." + funcName + ";\n\n", null);
+		} else if ((funcDef.getClassDef().flags() & ClassDefinition.IS_ARRAY) != 0) {
+			this._emit("var " + className + "$$prototype$" + funcName + " = " + className + ".$prototype$" + funcName + ";\n\n", null);
+		}
 	},
 
 	_emitFunctionArgumentAnnotations: function (funcDef) {
 		var args = funcDef.getArguments();
-		for (var i = 0; i < args.length; ++i)
+		if ((funcDef.flags() & ClassDefinition.IS_STATIC) == 0
+			&& (funcDef.getClassDef().flags() & ClassDefinition.IS_ARRAY) != 0
+			&& funcDef.name() != "constructor") {
+			this._emit(_Util.buildAnnotation(" * @param {%1} $this\n", new ObjectType(funcDef.getClassDef())), null);
+		}
+		for (var i = 0; i < args.length; ++i) {
 			this._emit(_Util.buildAnnotation(" * @param {%1} " + args[i].getName().getValue() + "\n", args[i].getType()), null);
+		}
 	},
 
 	_emitFunctionArguments: function (funcDef) {
 		var args = funcDef.getArguments();
+		if ((funcDef.flags() & ClassDefinition.IS_STATIC) == 0
+			&& (funcDef.getClassDef().flags() & ClassDefinition.IS_ARRAY) != 0
+			&& funcDef.name() != "constructor") {
+			this._emit("$this", null);
+			if (args.length != 0)
+				this._emit(", ");
+		}
 		for (var i = 0; i < args.length; ++i) {
 			if (i != 0)
 				this._emit(", ");
@@ -1997,8 +2055,15 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 
 			// emit reference to this for closures
 			// if funDef is NOT in another closure
-			if (funcDef.getClosures().length != 0 && (funcDef.flags() & ClassDefinition.IS_STATIC) == 0)
+			if (funcDef.getClosures().length != 0
+				&& (funcDef.flags() & ClassDefinition.IS_STATIC) == 0
+				&& (funcDef.getClassDef().flags() & ClassDefinition.IS_ARRAY) == 0) {
 				this._emit("var $this = this;\n", null);
+			} else if ((funcDef.flags() & ClassDefinition.IS_STATIC) == 0
+				&& (funcDef.getClassDef().flags() & ClassDefinition.IS_ARRAY) != 0
+				&& funcDef.name() == "constructor") {
+				this._emit("var $this = [];\n", null);
+			}
 			// emit helper variable for Math.abs
 			if (_CallExpressionEmitter.mathAbsUsesTemporary(funcDef)) {
 				this._emit("var $math_abs_t;\n", null);
@@ -2018,6 +2083,12 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 			var statements = funcDef.getStatements();
 			for (var i = 0; i < statements.length; ++i)
 				this._emitStatement(statements[i]);
+			// emit return for array class constructor
+			if ((funcDef.flags() & ClassDefinition.IS_STATIC) == 0
+				&& (funcDef.getClassDef().flags() & ClassDefinition.IS_ARRAY) != 0
+				&& funcDef.name() == "constructor") {
+				this._emit("return $this;\n", null);
+			}
 
 		} finally {
 			this._emittingFunction = prevEmittingFunction;

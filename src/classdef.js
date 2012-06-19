@@ -98,6 +98,7 @@ var ClassDefinition = exports.ClassDefinition = Class.extend({
 	$IS_FAKE: 256, // used for marking a JS non-class object that should be treated like a JSX class instance (e.g. window)
 	$IS_READONLY: 512,
 	$IS_INLINE: 1024,
+	$IS_ARRAY: 2048,
 
 	constructor: function (token, className, flags, extendType, implementTypes, members, objectTypesUsed) {
 		this._token = token;
@@ -109,8 +110,15 @@ var ClassDefinition = exports.ClassDefinition = Class.extend({
 		this._members = members;
 		this._objectTypesUsed = objectTypesUsed;
 		this._optimizerStash = {};
-		for (var i = 0; i < this._members.length; ++i)
+		for (var i = 0; i < this._members.length; ++i) {
 			this._members[i].setClassDef(this);
+			if (this._members[i] instanceof MemberFunctionDefinition) {
+				this._members[i].forEachClosure(function setClassDef(funcDef) {
+					funcDef.setClassDef(this);
+					return funcDef.forEachClosure(setClassDef.bind(this));
+				}.bind(this));
+			}
+		}
 	},
 
 	serialize: function () {
@@ -1028,7 +1036,7 @@ var MemberFunctionDefinition = exports.MemberFunctionDefinition = MemberDefiniti
 					var stmt = new Statement.ExpressionStatement(
 						new Expression.AssignmentExpression(new Parser.Token("=", false),
 							new Expression.PropertyExpression(new Parser.Token(".", false),
-								new Expression.ThisExpression(new Parser.Token("this", false), new Type.ObjectType(this._classDef)),
+								new Expression.ThisExpression(new Parser.Token("this", false), this._classDef),
 								member.getNameToken(), member.getType()),
 							member.getInitialValue()));
 					this._statements.splice(insertStmtAt++, 0, stmt);
