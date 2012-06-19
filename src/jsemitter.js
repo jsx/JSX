@@ -1252,7 +1252,7 @@ var _PropertyExpressionEmitter = exports._PropertyExpressionEmitter = _UnaryExpr
 		// mangle the name if necessary
 		if (exprType instanceof FunctionType && ! exprType.isAssignable()
 			&& (expr.getHolderType().getClassDef().flags() & ClassDefinition.IS_NATIVE) == 0) {
-			if (expr.getExpr() instanceof ClassExpression) {
+			if (0 && expr.getExpr() instanceof ClassExpression) {
 				// do not use "." notation for static functions, but use class$name
 				this._emitter._emit("$", identifierToken);
 			} else {
@@ -1963,7 +1963,7 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 		this._emitFunctionBody(funcDef);
 		this._reduceIndent();
 		this._emit("};\n\n", null);
-		if ((funcDef.flags() & ClassDefinition.IS_STATIC) != 0)
+		if (0 && (funcDef.flags() & ClassDefinition.IS_STATIC) != 0)
 			this._emit("var " + className + "$" + funcName + " = " + className + "." + funcName + ";\n\n", null);
 	},
 
