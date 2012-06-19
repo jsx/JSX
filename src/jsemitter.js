@@ -2067,7 +2067,20 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 			} else if ((funcDef.flags() & ClassDefinition.IS_STATIC) == 0
 				&& (funcDef.getClassDef().flags() & ClassDefinition.IS_ARRAY) != 0
 				&& funcDef.name() == "constructor") {
-				this._emit("var $this = [];\n", null);
+				var numFields = 0;
+				funcDef.getClassDef().forEachMemberVariable(function (member) {
+					if ((member.flags() & ClassDefinition.IS_STATIC) == 0) {
+						++numFields;
+					}
+					return true;
+				});
+				this._emit("var $this = [", null);
+				for (var i = 0; i < numFields; ++i) {
+					if (i != 0)
+						this._emit(", ", null);
+					this._emit("0", null);
+				}
+				this._emit("];\n", null);
 			}
 			// emit helper variable for Math.abs
 			if (_CallExpressionEmitter.mathAbsUsesTemporary(funcDef)) {
