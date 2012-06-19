@@ -27,6 +27,7 @@ my %fake = (
     AbstractView => 1,
     DocumentView => 1,
 
+    EventListener => 1,
     EventTarget => 1,
     XMLHttpRequestEventTarget => 1,
 );
@@ -34,6 +35,7 @@ my %fake = (
 my %skip = (
     Example => 1,
 
+    EventListener => 1,
     WindowTimers => 1, # use JSXTimers instead
 );
 
@@ -98,28 +100,21 @@ my %typemap = (
 
 # callbacks / event listeners
 
-defineCallback('Function?' => 'function(:Event):void');
-defineCallback('Function' => 'function(:Event):void');
-defineCallback(TimerHandler => 'function():void');
-defineCallback(EventListener  => 'function(:Event):void');
-# http://www.w3.org/TR/dom/
-defineCallback(MutationCallback => 'function(:MutationRecord[],:MutationObserver):void');
-# http://www.w3.org/TR/DOM-Level-3-Core/idl-definitions.html
-defineCallback(UserDataHandler => 'function(operation:int,key:string,data:variant,src:Node,dst:Node):void');
-# http://www.w3.org/TR/cssom-view/
-defineCallback(MediaQueryListListener => 'function(:MediaQueryList):void');
-# http://dev.w3.org/2009/dap/file-system/file-dir-sys.html
-defineCallback(FileCallback => 'function(:File):void');
-# http://www.w3.org/TR/animation-timing/
-defineCallback(FrameRequestCallback => 'function(:number):void');
-# http://www.w3.org/TR/webdatabase/
-defineCallback(DatabaseCallback => 'function(:Database):void');
-defineCallback(SQLVoidCallback => 'function():void');
-defineCallback(SQLTransactionCallback => 'function(:SQLTransaction):void');
-defineCallback(SQLTransactionErrorCallback => 'function(:SQLError):void');
-defineCallback(SQLStatementCallback => 'function(:SQLTransaction,:SQLResultSet):void');
-defineCallback(SQLStatementErrorCallback => 'function(:SQLTransaction,:SQLError):void');
-defineCallback(SQLTransactionSyncCallback => 'function(:SQLTransactionSync):void');
+define_alias('Function?' => 'function(:Event):void');
+define_alias('Function' => 'function(:Event):void');
+
+# EventListener is written in legacy IDL
+define_alias('EventListener' => 'function(:Event):void');
+
+# TODO: type resolution process
+
+# for DataTransferItem
+define_alias('FunctionStringCallback' => 'function(:string):void');
+# for MediaQueryList
+define_alias('MediaQueryListListener' => 'function(:MediaQueryList):void');
+
+# http://www.w3.org/TR/file-system-api/
+define_alias('FileCallback' => 'function(:File):void');
 
 sub info {
     state $count = 0;
@@ -209,7 +204,7 @@ foreach my $file(@files) {
         <$fh>;
     };
 
-    # typedef
+    info 'process <typedef>';
     while($content =~ m{
             ^ \s* \b typedef \b
             \s+
@@ -219,10 +214,35 @@ foreach my $file(@files) {
             ;
         }xmsg) {
 
-        ($typemap{$+{new_type}} = to_jsx_type($+{existing_type})) =~ s/$rx_comments//xms;
+        info 'typedef:',
+        my $n = $+{new_type};
+        my $t = to_jsx_type($+{existing_type});
+        $t =~ s/$rx_comments//xms;
+        define_alias($n => $t);
     }
 
-    # class definition
+    info 'process <callback>';
+    {
+        while($content =~ m{
+                ^\s* callback
+                \s+ (?<name> \w+)
+                \s* =
+                \s* (?<ret_type> $rx_simple_type)
+                \s*
+                    \(
+                        (?<params> $rx_params)
+                    \)
+                \s* ;
+            }xmsg) {
+            my $name = $+{name};
+            info 'callback:', $name;
+
+            my $cb_type = make_function_type($+{ret_type}, $+{params});
+            define_callback($name => $cb_type);
+        }
+    }
+
+    info 'process <class>';
     while($content =~ m{
                 (?<attrs> (?: \[ (?: [^\]]+ | \[ \s* \])+ \] \s+)* )
                 (?<type> (?:partial \s+)? interface | exception | dictionary)
@@ -273,6 +293,8 @@ foreach my $file(@files) {
         # name to array of members; to resolve override
         my $decl_ref = $def->{decl};
 
+        my $alias = 0;
+
         if($attrs) {
             while($attrs =~ m{
                 \b Constructor \s* (?: \(
@@ -287,6 +309,9 @@ foreach my $file(@files) {
 
             if($attrs =~ /\b NoInterfaceObject \b/xms) {
                 $def->{fake} = 1;
+            }
+            if($attrs =~ m{\b Callback \b}xms) {
+                $alias = 1;
             }
         }
 
@@ -426,6 +451,12 @@ foreach my $file(@files) {
                     $id,
                     $ret_type, $params,
                     $ret_type_may_be_undefined, $static);
+
+                # redefine it as a callbackdefinition
+                if($alias) {
+                    $def->{alias} = make_function_type($ret_type, $params);
+                    $def->{fake} = 1;
+                }
             }
             elsif($member =~ m{stringifier;}) {
                 # ignore
@@ -436,8 +467,7 @@ foreach my $file(@files) {
         }
     }
 
-    # implements interfaces
-    info 'process implements';
+    info 'process <implements>';
     {
         my $classes = join "|", keys %classdef;
         while($content =~ m{
@@ -478,13 +508,19 @@ foreach my $def(values %classdef) {
     if($def->{skip} or $def->{done}) {
         next;
     }
+    $def->{done} = 1 if $continuous;
+
+    if($def->{alias}) { # type alias (a.k.a. typedef)
+        say "// alias $def->{name} = $def->{alias}";
+        say "";
+
+        next;
+    }
 
     if(!$has_definition{$def->{name}}) {
         # partial class only
         next;
     }
-
-    $def->{done} = 1 if $continuous;
 
     my %seen;
 
@@ -616,34 +652,34 @@ sub to_jsx_type {
         )*
         \z
     }{}xms;
-    #my $vararg   = $+{vararg};
+
     my $nullable = $+{nullable};
     $array //= $+{array};
 
-    my $type;
-    if(my $t = $typemap{$idl_type}) {
-        $t = $nullable{$t} if $nullable && exists $nullable{$t};
-        $type = $t;
-        if($array) {
-            $type .= "[]";
-        }
-        $type .= "/*$original*/";
-    }
-    else {
-        my $t = $idl_type;
-        $t = $nullable{$t} if $nullable && exists $nullable{$t};
-        $type = $t;
-        if($array) {
-            $type .= "[]";
+    my $alias = $typemap{$idl_type};
+    if(!$alias && exists $classdef{$idl_type}) {
+        # callback definition is regarded as aliased type
+        if(my $t = $classdef{$idl_type}{alias}) {
+            $alias = $t;
         }
     }
 
+    my $type = $alias || $idl_type;
+    $type = $nullable{$type} if $nullable && exists $nullable{$type};
+
+    if($array) {
+        $type .= "[]";
+    }
+
+    if($alias) {
+        $type .= "/*$original*/";
+    }
+
     if($may_be_undefined && $idl_type ne 'any') {
-        return "MayBeUndefined.<$type>";
+        $type = "MayBeUndefined.<$type>";
     }
-    else {
-        return $type;
-    }
+
+    return $type;
 }
 
 sub make_functions {
@@ -653,26 +689,7 @@ sub make_functions {
         ? " : " . to_jsx_type($ret_type, may_be_undefined => $ret_type_may_be_undefined)
         : "";
 
-    my @unresolved_params;
-    foreach my $param(split /,/, $src_params // "") {
-        $param =~ m{
-            (?:
-                (?: \b (?: in | (?<optional> optional)) \b \s+ )*
-                (?<type> $rx_type) \s+
-                (?<ident> \w+)
-            )
-        }xms or die "Cannot parse line:  '$src_params'\n";
-
-        my %t = (
-            name => $+{ident},
-            type => $+{type},
-            optional => !!$+{optional},
-        );
-
-        $t{vararg} = 1 if $t{type} =~ /\.\.\. \z/xms;
-
-        push @unresolved_params, \%t;
-    }
+    my @unresolved_params = parse_params($src_params);
 
     my @decls;
     my @funcs;
@@ -715,6 +732,32 @@ sub make_functions {
     push @{$members_ref},       @funcs;
 
     return;
+}
+
+sub parse_params {
+    my($src_params) = @_;
+
+    my @params;
+    foreach my $param(split /,/, $src_params // "") {
+        $param =~ m{
+            (?:
+                (?: \b (?: in | (?<optional> optional)) \b \s+ )*
+                (?<type> $rx_type) \s+
+                (?<ident> \w+)
+            )
+        }xms or die "Cannot parse line:  '$src_params'\n";
+
+        my %t = (
+            name => $+{ident},
+            type => $+{type},
+            optional => !!$+{optional},
+        );
+
+        $t{vararg} = 1 if $t{type} =~ /\.\.\. \z/xms;
+
+        push @params, \%t;
+    }
+    return @params;
 }
 
 sub resolve_overload {
@@ -804,8 +847,24 @@ sub trim {
     return $s;
 }
 
-sub defineCallback {
+sub make_function_type {
+    my($ret_type, $params) = @_;
+    my $callback_params = join ",", map {
+            sprintf '%s:%s', $_->{name}, to_jsx_type($_->{type})
+        } parse_params($params);
+
+    return "function($callback_params):" . to_jsx_type($ret_type);
+}
+
+sub define_alias {
     my($name, $definition) = @_;
-    $skip{$name}++;
     $typemap{$name} = $definition;
+}
+
+sub define_callback {
+    my($name, $definition) = @_;
+    my $def = $classdef{$name} ||= {};
+
+    $def->{name}  = $name;
+    $def->{alias} = $definition;
 }

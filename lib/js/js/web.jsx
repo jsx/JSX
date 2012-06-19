@@ -48,7 +48,7 @@ automatically generated from:
 	idl2jsx/extra/file.idl
 	http://www.w3.org/TR/touch-events/
 	http://dev.w3.org/html5/websockets/
-	http://dev.w3.org/geo/api/spec-source-v2.html
+	http://dev.w3.org/geo/api/spec-source.html
 	http://dev.w3.org/html5/webstorage/
 	http://www.w3.org/TR/selectors-api/
 	http://www.w3.org/TR/webmessaging/
@@ -61,6 +61,8 @@ automatically generated from:
 	idl2jsx/extra/animation-timing.idl
 	idl2jsx/extra/legacy.idl
 */
+// alias MutationCallback = function(mutations:MutationRecord[],observer:MutationObserver):void
+
 native final class DOMException {
 
 	static __readonly__ var INDEX_SIZE_ERR : int/*unsigned short*/;
@@ -235,8 +237,8 @@ native __fake__ class EventTarget {
 native final class MutationObserver {
 
 	function constructor(
-		callback : function(:MutationRecord[],
-		:MutationObserver):void/*MutationCallback*/
+		callback : function(mutations:MutationRecord[],
+		observer:MutationObserver):void/*MutationCallback*/
 	);
 
 	function observe(
@@ -2202,16 +2204,16 @@ native final __fake__ class Window extends EventTarget {
 	// implements WindowAnimationTiming
 
 	function requestAnimationFrame(
-		callback : function(:number):void/*FrameRequestCallback*/
+		callback : function(time:number/*DOMTimeStamp*/):void/*FrameRequestCallback*/
 	) : int/*long*/;
 	function cancelAnimationFrame(handle : int/*long*/) : void;
 	// vender's extension
 	function webkitRequestAnimationFrame(
-		callback : function(:number):void/*FrameRequestCallback*/
+		callback : function(time:number/*DOMTimeStamp*/):void/*FrameRequestCallback*/
 	) : int/*long*/;
 	function webkitCancelAnimationFrame(handle : int/*long*/) : void;
 	function mozRequestAnimationFrame(
-		callback : function(:number):void/*FrameRequestCallback*/
+		callback : function(time:number/*DOMTimeStamp*/):void/*FrameRequestCallback*/
 	) : int/*long*/;
 	function mozCancelAnimationFrame(handle : int/*long*/) : void;
 
@@ -2229,6 +2231,8 @@ native final class MediaQueryList {
 	) : void;
 
 } // end of MediaQueryList
+
+// alias MediaQueryListListener = function(mql:MediaQueryList):void
 
 native final class Screen {
 
@@ -3907,6 +3911,8 @@ native __fake__ class NavigatorOnLine {
 
 } // end of NavigatorOnLine
 
+// alias Function = function(arguments:variant/*any...*/):variant/*any*/
+
 native __fake__ class WindowBase64 {
 
 	function btoa(btoa : string/*DOMString*/) : string/*DOMString*/;
@@ -4077,16 +4083,14 @@ native final class DataTransferItem {
 
 	__readonly__ var kind : string/*DOMString*/;
 	__readonly__ var type : string/*DOMString*/;
-	function getAsString(_callback : FunctionStringCallback) : void;
+	function getAsString(
+		_callback : function(:string):void/*FunctionStringCallback?*/
+	) : void;
 	function getAsFile() : File;
 
 } // end of DataTransferItem
 
-native final __fake__ class FunctionStringCallback {
-
-	function handleEvent(data : string/*DOMString*/) : void;
-
-} // end of FunctionStringCallback
+// alias FunctionStringCallback = function(data:string/*DOMString*/):void
 
 native final class DragEvent extends MouseEvent {
 
@@ -4412,6 +4416,10 @@ native final class CloseEventInit extends EventInit {
 
 } // end of CloseEventInit
 
+// alias PositionCallback = function(position:Position):void
+
+// alias PositionErrorCallback = function(positionError:PositionError):void
+
 native __fake__ class NavigatorGeolocation {
 
 	__readonly__ var geolocation : Geolocation;
@@ -4421,88 +4429,59 @@ native __fake__ class NavigatorGeolocation {
 native final __fake__ class Geolocation {
 
 	function getCurrentPosition(
-		successCallback : PositionCallback
+		successCallback : function(position:Position):void/*PositionCallback*/
 	) : void;
 	function getCurrentPosition(
-		successCallback : PositionCallback,
-		errorCallback : PositionErrorCallback
+		successCallback : function(position:Position):void/*PositionCallback*/,
+		errorCallback : function(positionError:PositionError):void/*PositionErrorCallback*/
 	) : void;
 	function getCurrentPosition(
-		successCallback : PositionCallback,
-		errorCallback : PositionErrorCallback,
+		successCallback : function(position:Position):void/*PositionCallback*/,
+		errorCallback : function(positionError:PositionError):void/*PositionErrorCallback*/,
 		options : PositionOptions
 	) : void;
 	function watchPosition(
-		successCallback : PositionCallback
+		successCallback : function(position:Position):void/*PositionCallback*/
 	) : int/*long*/;
 	function watchPosition(
-		successCallback : PositionCallback,
-		errorCallback : PositionErrorCallback
+		successCallback : function(position:Position):void/*PositionCallback*/,
+		errorCallback : function(positionError:PositionError):void/*PositionErrorCallback*/
 	) : int/*long*/;
 	function watchPosition(
-		successCallback : PositionCallback,
-		errorCallback : PositionErrorCallback,
+		successCallback : function(position:Position):void/*PositionCallback*/,
+		errorCallback : function(positionError:PositionError):void/*PositionErrorCallback*/,
 		options : PositionOptions
 	) : int/*long*/;
 	function clearWatch(watchId : int/*long*/) : void;
 
 } // end of Geolocation
 
-native final __fake__ class PositionCallback {
-
-	function handleEvent(position : Position) : void;
-
-} // end of PositionCallback
-
-native final __fake__ class PositionErrorCallback {
-
-	function handleEvent(error : PositionError) : void;
-
-} // end of PositionErrorCallback
-
 native final __fake__ class PositionOptions {
 
 	var enableHighAccuracy : boolean;
 	var timeout : int/*long*/;
 	var maximumAge : int/*long*/;
-	var requireCoords : boolean;
-	var requestAddress : boolean;
 
 } // end of PositionOptions
 
 native final __fake__ class Position {
 
 	__readonly__ var coords : Coordinates;
-	__readonly__ var address : Address;
 	__readonly__ var timestamp : number/*DOMTimeStamp*/;
 
 } // end of Position
 
 native final __fake__ class Coordinates {
 
-	__readonly__ var latitude : number/*double?*/;
-	__readonly__ var longitude : number/*double?*/;
+	__readonly__ var latitude : number/*double*/;
+	__readonly__ var longitude : number/*double*/;
 	__readonly__ var altitude : number/*double?*/;
-	__readonly__ var accuracy : number/*double?*/;
+	__readonly__ var accuracy : number/*double*/;
 	__readonly__ var altitudeAccuracy : number/*double?*/;
 	__readonly__ var heading : number/*double?*/;
 	__readonly__ var speed : number/*double?*/;
-	__readonly__ var verticalSpeed : number/*double?*/;
 
 } // end of Coordinates
-
-native final __fake__ class Address {
-
-	__readonly__ var country : string/*DOMString?*/;
-	__readonly__ var region : string/*DOMString?*/;
-	__readonly__ var county : string/*DOMString?*/;
-	__readonly__ var city : string/*DOMString?*/;
-	__readonly__ var street : string/*DOMString?*/;
-	__readonly__ var streetNumber : string/*DOMString?*/;
-	__readonly__ var premises : string/*DOMString?*/;
-	__readonly__ var postalCode : string/*DOMString?*/;
-
-} // end of Address
 
 native final __fake__ class PositionError {
 
@@ -7269,19 +7248,23 @@ native final class WebGLContextEventInit extends EventInit {
 
 } // end of WebGLContextEventInit
 
+// alias TimerHandler = function():void
+
+// alias FrameRequestCallback = function(time:number/*DOMTimeStamp*/):void
+
 native __fake__ class WindowAnimationTiming {
 
 	function requestAnimationFrame(
-		callback : function(:number):void/*FrameRequestCallback*/
+		callback : function(time:number/*DOMTimeStamp*/):void/*FrameRequestCallback*/
 	) : int/*long*/;
 	function cancelAnimationFrame(handle : int/*long*/) : void;
 	// vender's extension
 	function webkitRequestAnimationFrame(
-		callback : function(:number):void/*FrameRequestCallback*/
+		callback : function(time:number/*DOMTimeStamp*/):void/*FrameRequestCallback*/
 	) : int/*long*/;
 	function webkitCancelAnimationFrame(handle : int/*long*/) : void;
 	function mozRequestAnimationFrame(
-		callback : function(:number):void/*FrameRequestCallback*/
+		callback : function(time:number/*DOMTimeStamp*/):void/*FrameRequestCallback*/
 	) : int/*long*/;
 	function mozCancelAnimationFrame(handle : int/*long*/) : void;
 
@@ -7312,7 +7295,7 @@ end of generated files from:
 	idl2jsx/extra/file.idl
 	http://www.w3.org/TR/touch-events/
 	http://dev.w3.org/html5/websockets/
-	http://dev.w3.org/geo/api/spec-source-v2.html
+	http://dev.w3.org/geo/api/spec-source.html
 	http://dev.w3.org/html5/webstorage/
 	http://www.w3.org/TR/selectors-api/
 	http://www.w3.org/TR/webmessaging/

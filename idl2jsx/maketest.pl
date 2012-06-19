@@ -16,6 +16,7 @@ my %used_type;
 # prepare
 while(my($class, $def) = each %{$classdef}) {
     next if $def->{skip};
+    next if $def->{alias};
 
     my $i = 0;
     push @classes, $def;

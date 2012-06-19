@@ -1838,11 +1838,11 @@ class _Test extends TestCase {
         var f121 : int/*long*/ = o.setInterval(X.getfunction___void());
         var f122 : int/*long*/ = o.setInterval(X.getfunction___void(), X.getint());
         o.clearInterval(X.getint());
-        var f123 : int/*long*/ = o.requestAnimationFrame(X.getfunction__number__void());
+        var f123 : int/*long*/ = o.requestAnimationFrame(X.getfunction_time_number__void());
         o.cancelAnimationFrame(X.getint());
-        var f124 : int/*long*/ = o.webkitRequestAnimationFrame(X.getfunction__number__void());
+        var f124 : int/*long*/ = o.webkitRequestAnimationFrame(X.getfunction_time_number__void());
         o.webkitCancelAnimationFrame(X.getint());
-        var f125 : int/*long*/ = o.mozRequestAnimationFrame(X.getfunction__number__void());
+        var f125 : int/*long*/ = o.mozRequestAnimationFrame(X.getfunction_time_number__void());
         o.mozCancelAnimationFrame(X.getint());
     } // Window
 
@@ -3290,26 +3290,21 @@ class _Test extends TestCase {
     function compile_DataTransferItem(o : DataTransferItem) : void {
         var v1 : string/*DOMString*/ = o.kind;
         var v2 : string/*DOMString*/ = o.type;
-        o.getAsString(X.getFunctionStringCallback());
+        o.getAsString(X.getfunction__string__void());
         var f3 : File = o.getAsFile();
     } // DataTransferItem
 
     // #180
-    function compile_FunctionStringCallback(o : FunctionStringCallback) : void {
-        o.handleEvent(X.getstring());
-    } // FunctionStringCallback
-
-    // #181
     function compile_DragEvent(o : DragEvent) : void {
         var v1 : DataTransfer = o.dataTransfer;
     } // DragEvent
 
-    // #182
+    // #181
     function compile_DragEventInit(o : DragEventInit) : void {
         var v1 : DataTransfer = o.dataTransfer;
     } // DragEventInit
 
-    // #183
+    // #182
     function compile_HTMLAppletElement(o : HTMLAppletElement) : void {
         var v1 : string/*DOMString*/ = o.align;
         var v2 : string/*DOMString*/ = o.alt;
@@ -3324,7 +3319,7 @@ class _Test extends TestCase {
         var v11 : string/*DOMString*/ = o.width;
     } // HTMLAppletElement
 
-    // #184
+    // #183
     function compile_HTMLMarqueeElement(o : HTMLMarqueeElement) : void {
         var v1 : string/*DOMString*/ = o.behavior;
         var v2 : string/*DOMString*/ = o.bgColor;
@@ -3344,7 +3339,7 @@ class _Test extends TestCase {
         o.stop();
     } // HTMLMarqueeElement
 
-    // #185
+    // #184
     function compile_HTMLFrameSetElement(o : HTMLFrameSetElement) : void {
         var v1 : string/*DOMString*/ = o.cols;
         var v2 : string/*DOMString*/ = o.rows;
@@ -3368,7 +3363,7 @@ class _Test extends TestCase {
         var v20 : function(:Event):void/*Function?*/ = o.onunload;
     } // HTMLFrameSetElement
 
-    // #186
+    // #185
     function compile_HTMLFrameElement(o : HTMLFrameElement) : void {
         var v1 : string/*DOMString*/ = o.name;
         var v2 : string/*DOMString*/ = o.scrolling;
@@ -3382,33 +3377,33 @@ class _Test extends TestCase {
         var v10 : string/*DOMString*/ = o.marginWidth;
     } // HTMLFrameElement
 
-    // #187
+    // #186
     function compile_HTMLBaseFontElement(o : HTMLBaseFontElement) : void {
         var v1 : string/*DOMString*/ = o.color;
         var v2 : string/*DOMString*/ = o.face;
         var v3 : int/*long*/ = o.size;
     } // HTMLBaseFontElement
 
-    // #188
+    // #187
     function compile_HTMLDirectoryElement(o : HTMLDirectoryElement) : void {
         var v1 : boolean = o.compact;
     } // HTMLDirectoryElement
 
-    // #189
+    // #188
     function compile_HTMLFontElement(o : HTMLFontElement) : void {
         var v1 : string/*DOMString*/ = o.color;
         var v2 : string/*DOMString*/ = o.face;
         var v3 : string/*DOMString*/ = o.size;
     } // HTMLFontElement
 
-    // #190
+    // #189
     function compile_FileList(o : FileList) : void {
         var f1 : MayBeUndefined.<File> = o.__native_index_operator__(X.getint());
         var f2 : MayBeUndefined.<File> = o.item(X.getint());
         var v3 : int/*unsigned long*/ = o.length;
     } // FileList
 
-    // #191
+    // #190
     function compile_Blob(o : Blob) : void {
         var v1 : number/*unsigned long long*/ = o.size;
         var v2 : string/*DOMString*/ = o.type;
@@ -3418,13 +3413,13 @@ class _Test extends TestCase {
         var f6 : Blob = o.slice(X.getnumber(), X.getnumber(), X.getstring());
     } // Blob
 
-    // #192
+    // #191
     function compile_File(o : File) : void {
         var v1 : string/*DOMString*/ = o.name;
         var v2 : Date = o.lastModifiedDate;
     } // File
 
-    // #193
+    // #192
     function compile_FileReader(o : FileReader) : void {
         o.readAsArrayBuffer(X.getBlob());
         o.readAsBinaryString(X.getBlob());
@@ -3449,7 +3444,7 @@ class _Test extends TestCase {
         var v15 : function(:Event):void/*Function?*/ = o.onloadend;
     } // FileReader
 
-    // #194
+    // #193
     function compile_FileReaderSync(o : FileReaderSync) : void {
         var f1 : ArrayBuffer = o.readAsArrayBuffer(X.getBlob());
         var f2 : string/*DOMString*/ = o.readAsBinaryString(X.getBlob());
@@ -3458,17 +3453,17 @@ class _Test extends TestCase {
         var f5 : string/*DOMString*/ = o.readAsDataURL(X.getBlob());
     } // FileReaderSync
 
-    // #195
+    // #194
     function compile_URL(o : URL) : void {
         var f1 : string/*DOMString*/ = URL.createObjectURL(X.getBlob());
         URL.revokeObjectURL(X.getstring());
     } // URL
 
-    // #196
+    // #195
     function compile_webkitURL(o : webkitURL) : void {
     } // webkitURL
 
-    // #197
+    // #196
     function compile_Touch(o : Touch) : void {
         var v1 : int/*long*/ = o.identifier;
         var v2 : EventTarget = o.target;
@@ -3480,7 +3475,7 @@ class _Test extends TestCase {
         var v8 : int/*long*/ = o.pageY;
     } // Touch
 
-    // #198
+    // #197
     function compile_TouchList(o : TouchList) : void {
         var v1 : int/*unsigned long*/ = o.length;
         var f2 : MayBeUndefined.<Touch> = o.__native_index_operator__(X.getint());
@@ -3488,7 +3483,7 @@ class _Test extends TestCase {
         var f4 : Touch = o.identifiedTouch(X.getint());
     } // TouchList
 
-    // #199
+    // #198
     function compile_TouchEvent(o : TouchEvent) : void {
         var v1 : TouchList = o.touches;
         var v2 : TouchList = o.targetTouches;
@@ -3499,7 +3494,7 @@ class _Test extends TestCase {
         var v7 : boolean = o.shiftKey;
     } // TouchEvent
 
-    // #200
+    // #199
     function compile_WebSocket(o : WebSocket) : void {
         var v1 : string/*DOMString*/ = o.url;
         var v2 : int/*unsigned short*/ = WebSocket.CONNECTING;
@@ -3527,87 +3522,61 @@ class _Test extends TestCase {
         o.send(X.getBlob());
     } // WebSocket
 
-    // #201
+    // #200
     function compile_CloseEvent(o : CloseEvent) : void {
         var v1 : boolean = o.wasClean;
         var v2 : int/*unsigned short*/ = o.code;
         var v3 : string/*DOMString*/ = o.reason;
     } // CloseEvent
 
-    // #202
+    // #201
     function compile_CloseEventInit(o : CloseEventInit) : void {
         var v1 : boolean = o.wasClean;
         var v2 : int/*unsigned short*/ = o.code;
         var v3 : string/*DOMString*/ = o.reason;
     } // CloseEventInit
 
-    // #203
+    // #202
     function compile_NavigatorGeolocation(o : NavigatorGeolocation) : void {
         var v1 : Geolocation = o.geolocation;
     } // NavigatorGeolocation
 
-    // #204
+    // #203
     function compile_Geolocation(o : Geolocation) : void {
-        o.getCurrentPosition(X.getPositionCallback());
-        o.getCurrentPosition(X.getPositionCallback(), X.getPositionErrorCallback());
-        o.getCurrentPosition(X.getPositionCallback(), X.getPositionErrorCallback(), X.getPositionOptions());
-        var f1 : int/*long*/ = o.watchPosition(X.getPositionCallback());
-        var f2 : int/*long*/ = o.watchPosition(X.getPositionCallback(), X.getPositionErrorCallback());
-        var f3 : int/*long*/ = o.watchPosition(X.getPositionCallback(), X.getPositionErrorCallback(), X.getPositionOptions());
+        o.getCurrentPosition(X.getfunction_position_Position__void());
+        o.getCurrentPosition(X.getfunction_position_Position__void(), X.getfunction_positionError_PositionError__void());
+        o.getCurrentPosition(X.getfunction_position_Position__void(), X.getfunction_positionError_PositionError__void(), X.getPositionOptions());
+        var f1 : int/*long*/ = o.watchPosition(X.getfunction_position_Position__void());
+        var f2 : int/*long*/ = o.watchPosition(X.getfunction_position_Position__void(), X.getfunction_positionError_PositionError__void());
+        var f3 : int/*long*/ = o.watchPosition(X.getfunction_position_Position__void(), X.getfunction_positionError_PositionError__void(), X.getPositionOptions());
         o.clearWatch(X.getint());
     } // Geolocation
 
-    // #205
-    function compile_PositionCallback(o : PositionCallback) : void {
-        o.handleEvent(X.getPosition());
-    } // PositionCallback
-
-    // #206
-    function compile_PositionErrorCallback(o : PositionErrorCallback) : void {
-        o.handleEvent(X.getPositionError());
-    } // PositionErrorCallback
-
-    // #207
+    // #204
     function compile_PositionOptions(o : PositionOptions) : void {
         var v1 : boolean = o.enableHighAccuracy;
         var v2 : int/*long*/ = o.timeout;
         var v3 : int/*long*/ = o.maximumAge;
-        var v4 : boolean = o.requireCoords;
-        var v5 : boolean = o.requestAddress;
     } // PositionOptions
 
-    // #208
+    // #205
     function compile_Position(o : Position) : void {
         var v1 : Coordinates = o.coords;
-        var v2 : Address = o.address;
-        var v3 : number/*DOMTimeStamp*/ = o.timestamp;
+        var v2 : number/*DOMTimeStamp*/ = o.timestamp;
     } // Position
 
-    // #209
+    // #206
     function compile_Coordinates(o : Coordinates) : void {
-        var v1 : number/*double?*/ = o.latitude;
-        var v2 : number/*double?*/ = o.longitude;
+        var v1 : number/*double*/ = o.latitude;
+        var v2 : number/*double*/ = o.longitude;
         var v3 : number/*double?*/ = o.altitude;
-        var v4 : number/*double?*/ = o.accuracy;
+        var v4 : number/*double*/ = o.accuracy;
         var v5 : number/*double?*/ = o.altitudeAccuracy;
         var v6 : number/*double?*/ = o.heading;
         var v7 : number/*double?*/ = o.speed;
-        var v8 : number/*double?*/ = o.verticalSpeed;
     } // Coordinates
 
-    // #210
-    function compile_Address(o : Address) : void {
-        var v1 : string/*DOMString?*/ = o.country;
-        var v2 : string/*DOMString?*/ = o.region;
-        var v3 : string/*DOMString?*/ = o.county;
-        var v4 : string/*DOMString?*/ = o.city;
-        var v5 : string/*DOMString?*/ = o.street;
-        var v6 : string/*DOMString?*/ = o.streetNumber;
-        var v7 : string/*DOMString?*/ = o.premises;
-        var v8 : string/*DOMString?*/ = o.postalCode;
-    } // Address
-
-    // #211
+    // #207
     function compile_PositionError(o : PositionError) : void {
         var v1 : int/*unsigned short*/ = PositionError.PERMISSION_DENIED;
         var v2 : int/*unsigned short*/ = o.PERMISSION_DENIED;
@@ -3619,7 +3588,7 @@ class _Test extends TestCase {
         var v8 : string/*DOMString*/ = o.message;
     } // PositionError
 
-    // #212
+    // #208
     function compile_Storage(o : Storage) : void {
         var v1 : int/*unsigned long*/ = o.length;
         var f2 : string/*DOMString?*/ = o.key(X.getint());
@@ -3630,17 +3599,17 @@ class _Test extends TestCase {
         o.clear();
     } // Storage
 
-    // #213
+    // #209
     function compile_WindowSessionStorage(o : WindowSessionStorage) : void {
         var v1 : Storage = o.sessionStorage;
     } // WindowSessionStorage
 
-    // #214
+    // #210
     function compile_WindowLocalStorage(o : WindowLocalStorage) : void {
         var v1 : Storage = o.localStorage;
     } // WindowLocalStorage
 
-    // #215
+    // #211
     function compile_StorageEvent(o : StorageEvent) : void {
         var v1 : string/*DOMString?*/ = o.key;
         var v2 : string/*DOMString?*/ = o.oldValue;
@@ -3649,7 +3618,7 @@ class _Test extends TestCase {
         var v5 : Storage = o.storageArea;
     } // StorageEvent
 
-    // #216
+    // #212
     function compile_StorageEventInit(o : StorageEventInit) : void {
         var v1 : string/*DOMString?*/ = o.key;
         var v2 : string/*DOMString?*/ = o.oldValue;
@@ -3658,13 +3627,13 @@ class _Test extends TestCase {
         var v5 : Storage = o.storageArea;
     } // StorageEventInit
 
-    // #217
+    // #213
     function compile_NodeSelector(o : NodeSelector) : void {
         var f1 : Element = o.querySelector(X.getstring());
         var f2 : NodeList = o.querySelectorAll(X.getstring());
     } // NodeSelector
 
-    // #218
+    // #214
     function compile_MessageEvent(o : MessageEvent) : void {
         var v1 : variant/*any*/ = o.data;
         var v2 : string/*DOMString*/ = o.origin;
@@ -3673,7 +3642,7 @@ class _Test extends TestCase {
         var v5 : MessagePort[] = o.ports;
     } // MessageEvent
 
-    // #219
+    // #215
     function compile_MessageEventInit(o : MessageEventInit) : void {
         var v1 : variant/*any*/ = o.data;
         var v2 : string/*DOMString*/ = o.origin;
@@ -3682,13 +3651,13 @@ class _Test extends TestCase {
         var v5 : MessagePort[] = o.ports;
     } // MessageEventInit
 
-    // #220
+    // #216
     function compile_MessageChannel(o : MessageChannel) : void {
         var v1 : MessagePort = o.port1;
         var v2 : MessagePort = o.port2;
     } // MessageChannel
 
-    // #221
+    // #217
     function compile_MessagePort(o : MessagePort) : void {
         o.postMessage(X.getvariant());
         o.postMessage(X.getvariant(), X.getTransferable__());
@@ -3697,7 +3666,7 @@ class _Test extends TestCase {
         var v1 : function(:Event):void/*Function?*/ = o.onmessage;
     } // MessagePort
 
-    // #222
+    // #218
     function compile_WorkerGlobalScope(o : WorkerGlobalScope) : void {
         var v1 : WorkerGlobalScope = o.self;
         var v2 : WorkerLocation = o.location;
@@ -3709,40 +3678,40 @@ class _Test extends TestCase {
         var v6 : WorkerNavigator = o.navigator;
     } // WorkerGlobalScope
 
-    // #223
+    // #219
     function compile_DedicatedWorkerGlobalScope(o : DedicatedWorkerGlobalScope) : void {
         o.postMessage(X.getvariant());
         o.postMessage(X.getvariant(), X.getTransferable__());
         var v1 : function(:Event):void/*Function?*/ = o.onmessage;
     } // DedicatedWorkerGlobalScope
 
-    // #224
+    // #220
     function compile_SharedWorkerGlobalScope(o : SharedWorkerGlobalScope) : void {
         var v1 : string/*DOMString*/ = o.name;
         var v2 : ApplicationCache = o.applicationCache;
         var v3 : function(:Event):void/*Function?*/ = o.onconnect;
     } // SharedWorkerGlobalScope
 
-    // #225
+    // #221
     function compile_ErrorEvent(o : ErrorEvent) : void {
         var v1 : string/*DOMString*/ = o.message;
         var v2 : string/*DOMString*/ = o.filename;
         var v3 : int/*unsigned long*/ = o.lineno;
     } // ErrorEvent
 
-    // #226
+    // #222
     function compile_ErrorEventInit(o : ErrorEventInit) : void {
         var v1 : string/*DOMString*/ = o.message;
         var v2 : string/*DOMString*/ = o.filename;
         var v3 : int/*unsigned long*/ = o.lineno;
     } // ErrorEventInit
 
-    // #227
+    // #223
     function compile_AbstractWorker(o : AbstractWorker) : void {
         var v1 : function(:Event):void/*Function?*/ = o.onerror;
     } // AbstractWorker
 
-    // #228
+    // #224
     function compile_Worker(o : Worker) : void {
         o.terminate();
         o.postMessage(X.getvariant());
@@ -3751,13 +3720,13 @@ class _Test extends TestCase {
         var v2 : function(:Event):void/*Function?*/ = o.onerror;
     } // Worker
 
-    // #229
+    // #225
     function compile_SharedWorker(o : SharedWorker) : void {
         var v1 : MessagePort = o.port;
         var v2 : function(:Event):void/*Function?*/ = o.onerror;
     } // SharedWorker
 
-    // #230
+    // #226
     function compile_WorkerUtils(o : WorkerUtils) : void {
         o.importScripts(X.getstring());
         var v1 : WorkerNavigator = o.navigator;
@@ -3765,7 +3734,7 @@ class _Test extends TestCase {
         var f3 : string/*DOMString*/ = o.atob(X.getstring());
     } // WorkerUtils
 
-    // #231
+    // #227
     function compile_WorkerNavigator(o : WorkerNavigator) : void {
         var v1 : string/*DOMString*/ = o.appName;
         var v2 : string/*DOMString*/ = o.appVersion;
@@ -3774,7 +3743,7 @@ class _Test extends TestCase {
         var v5 : boolean = o.onLine;
     } // WorkerNavigator
 
-    // #232
+    // #228
     function compile_WorkerLocation(o : WorkerLocation) : void {
         var v1 : string/*DOMString*/ = o.href;
         var v2 : string/*DOMString*/ = o.protocol;
@@ -3786,31 +3755,31 @@ class _Test extends TestCase {
         var v8 : string/*DOMString*/ = o.hash;
     } // WorkerLocation
 
-    // #233
+    // #229
     function compile_DOMParser(o : DOMParser) : void {
         var f1 : HTMLDocument/*Document*/ = o.parseFromString(X.getstring(), X.getstring());
     } // DOMParser
 
-    // #234
+    // #230
     function compile_XMLSerializer(o : XMLSerializer) : void {
         var f1 : string/*DOMString*/ = o.serializeToString(X.getNode());
     } // XMLSerializer
 
-    // #235
+    // #231
     function compile_ArrayBuffer(o : ArrayBuffer) : void {
         var v1 : int/*unsigned long*/ = o.byteLength;
         var f2 : ArrayBuffer = o.slice(X.getint());
         var f3 : ArrayBuffer = o.slice(X.getint(), X.getint());
     } // ArrayBuffer
 
-    // #236
+    // #232
     function compile_ArrayBufferView(o : ArrayBufferView) : void {
         var v1 : ArrayBuffer = o.buffer;
         var v2 : int/*unsigned long*/ = o.byteOffset;
         var v3 : int/*unsigned long*/ = o.byteLength;
     } // ArrayBufferView
 
-    // #237
+    // #233
     function compile_Int8Array(o : Int8Array) : void {
         var v1 : int/*long*/ = Int8Array.BYTES_PER_ELEMENT;
         var v2 : int/*long*/ = o.BYTES_PER_ELEMENT;
@@ -3827,7 +3796,7 @@ class _Test extends TestCase {
         var f6 : Int8Array = o.subarray(X.getint(), X.getint());
     } // Int8Array
 
-    // #238
+    // #234
     function compile_Uint8Array(o : Uint8Array) : void {
         var v1 : int/*long*/ = Uint8Array.BYTES_PER_ELEMENT;
         var v2 : int/*long*/ = o.BYTES_PER_ELEMENT;
@@ -3844,7 +3813,7 @@ class _Test extends TestCase {
         var f6 : Uint8Array = o.subarray(X.getint(), X.getint());
     } // Uint8Array
 
-    // #239
+    // #235
     function compile_Uint8ClampedArray(o : Uint8ClampedArray) : void {
         o.set(X.getint(), X.getint());
         o.set(X.getUint8ClampedArray());
@@ -3856,7 +3825,7 @@ class _Test extends TestCase {
         var f1 : Uint8ClampedArray = o.subarray(X.getint(), X.getint());
     } // Uint8ClampedArray
 
-    // #240
+    // #236
     function compile_Int16Array(o : Int16Array) : void {
         var v1 : int/*long*/ = Int16Array.BYTES_PER_ELEMENT;
         var v2 : int/*long*/ = o.BYTES_PER_ELEMENT;
@@ -3873,7 +3842,7 @@ class _Test extends TestCase {
         var f6 : Int16Array = o.subarray(X.getint(), X.getint());
     } // Int16Array
 
-    // #241
+    // #237
     function compile_Uint16Array(o : Uint16Array) : void {
         var v1 : int/*long*/ = Uint16Array.BYTES_PER_ELEMENT;
         var v2 : int/*long*/ = o.BYTES_PER_ELEMENT;
@@ -3890,7 +3859,7 @@ class _Test extends TestCase {
         var f6 : Uint16Array = o.subarray(X.getint(), X.getint());
     } // Uint16Array
 
-    // #242
+    // #238
     function compile_Int32Array(o : Int32Array) : void {
         var v1 : int/*long*/ = Int32Array.BYTES_PER_ELEMENT;
         var v2 : int/*long*/ = o.BYTES_PER_ELEMENT;
@@ -3907,7 +3876,7 @@ class _Test extends TestCase {
         var f6 : Int32Array = o.subarray(X.getint(), X.getint());
     } // Int32Array
 
-    // #243
+    // #239
     function compile_Uint32Array(o : Uint32Array) : void {
         var v1 : int/*long*/ = Uint32Array.BYTES_PER_ELEMENT;
         var v2 : int/*long*/ = o.BYTES_PER_ELEMENT;
@@ -3924,7 +3893,7 @@ class _Test extends TestCase {
         var f6 : Uint32Array = o.subarray(X.getint(), X.getint());
     } // Uint32Array
 
-    // #244
+    // #240
     function compile_Float32Array(o : Float32Array) : void {
         var v1 : int/*long*/ = Float32Array.BYTES_PER_ELEMENT;
         var v2 : int/*long*/ = o.BYTES_PER_ELEMENT;
@@ -3939,7 +3908,7 @@ class _Test extends TestCase {
         var f6 : Float32Array = o.subarray(X.getint(), X.getint());
     } // Float32Array
 
-    // #245
+    // #241
     function compile_Float64Array(o : Float64Array) : void {
         var v1 : int/*long*/ = Float64Array.BYTES_PER_ELEMENT;
         var v2 : int/*long*/ = o.BYTES_PER_ELEMENT;
@@ -3954,7 +3923,7 @@ class _Test extends TestCase {
         var f6 : Float64Array = o.subarray(X.getint(), X.getint());
     } // Float64Array
 
-    // #246
+    // #242
     function compile_DataView(o : DataView) : void {
         var f1 : int/*byte*/ = o.getInt8(X.getint());
         var f2 : int/*octet*/ = o.getUint8(X.getint());
@@ -3986,7 +3955,7 @@ class _Test extends TestCase {
         o.setFloat64(X.getint(), X.getnumber(), X.getboolean());
     } // DataView
 
-    // #247
+    // #243
     function compile_CanvasRenderingContext2D(o : CanvasRenderingContext2D) : void {
         var v1 : HTMLCanvasElement = o.canvas;
         o.save();
@@ -4057,7 +4026,7 @@ class _Test extends TestCase {
         var v27 : string/*DOMString*/ = o.textBaseline;
     } // CanvasRenderingContext2D
 
-    // #248
+    // #244
     function compile_CanvasTransformation(o : CanvasTransformation) : void {
         o.scale(X.getnumber(), X.getnumber());
         o.rotate(X.getnumber());
@@ -4066,7 +4035,7 @@ class _Test extends TestCase {
         o.setTransform(X.getnumber(), X.getnumber(), X.getnumber(), X.getnumber(), X.getnumber(), X.getnumber());
     } // CanvasTransformation
 
-    // #249
+    // #245
     function compile_CanvasLineStyles(o : CanvasLineStyles) : void {
         var v1 : number/*double*/ = o.lineWidth;
         var v2 : string/*DOMString*/ = o.lineCap;
@@ -4074,14 +4043,14 @@ class _Test extends TestCase {
         var v4 : number/*double*/ = o.miterLimit;
     } // CanvasLineStyles
 
-    // #250
+    // #246
     function compile_CanvasText(o : CanvasText) : void {
         var v1 : string/*DOMString*/ = o.font;
         var v2 : string/*DOMString*/ = o.textAlign;
         var v3 : string/*DOMString*/ = o.textBaseline;
     } // CanvasText
 
-    // #251
+    // #247
     function compile_CanvasPathMethods(o : CanvasPathMethods) : void {
         o.closePath();
         o.moveTo(X.getnumber(), X.getnumber());
@@ -4094,28 +4063,28 @@ class _Test extends TestCase {
         o.arc(X.getnumber(), X.getnumber(), X.getnumber(), X.getnumber(), X.getnumber(), X.getboolean());
     } // CanvasPathMethods
 
-    // #252
+    // #248
     function compile_CanvasGradient(o : CanvasGradient) : void {
         o.addColorStop(X.getnumber(), X.getstring());
     } // CanvasGradient
 
-    // #253
+    // #249
     function compile_CanvasPattern(o : CanvasPattern) : void {
     } // CanvasPattern
 
-    // #254
+    // #250
     function compile_TextMetrics(o : TextMetrics) : void {
         var v1 : number/*double*/ = o.width;
     } // TextMetrics
 
-    // #255
+    // #251
     function compile_ImageData(o : ImageData) : void {
         var v1 : int/*unsigned long*/ = o.width;
         var v2 : int/*unsigned long*/ = o.height;
         var v3 : Uint8ClampedArray = o.data;
     } // ImageData
 
-    // #256
+    // #252
     function compile_WebGLContextAttributes(o : WebGLContextAttributes) : void {
         var v1 : boolean = o.alpha;
         var v2 : boolean = o.depth;
@@ -4125,53 +4094,53 @@ class _Test extends TestCase {
         var v6 : boolean = o.preserveDrawingBuffer;
     } // WebGLContextAttributes
 
-    // #257
+    // #253
     function compile_WebGLObject(o : WebGLObject) : void {
     } // WebGLObject
 
-    // #258
+    // #254
     function compile_WebGLBuffer(o : WebGLBuffer) : void {
     } // WebGLBuffer
 
-    // #259
+    // #255
     function compile_WebGLFramebuffer(o : WebGLFramebuffer) : void {
     } // WebGLFramebuffer
 
-    // #260
+    // #256
     function compile_WebGLProgram(o : WebGLProgram) : void {
     } // WebGLProgram
 
-    // #261
+    // #257
     function compile_WebGLRenderbuffer(o : WebGLRenderbuffer) : void {
     } // WebGLRenderbuffer
 
-    // #262
+    // #258
     function compile_WebGLShader(o : WebGLShader) : void {
     } // WebGLShader
 
-    // #263
+    // #259
     function compile_WebGLTexture(o : WebGLTexture) : void {
     } // WebGLTexture
 
-    // #264
+    // #260
     function compile_WebGLUniformLocation(o : WebGLUniformLocation) : void {
     } // WebGLUniformLocation
 
-    // #265
+    // #261
     function compile_WebGLActiveInfo(o : WebGLActiveInfo) : void {
         var v1 : int/*GLint*/ = o.size;
         var v2 : int/*GLenum*/ = o.type;
         var v3 : string/*DOMString*/ = o.name;
     } // WebGLActiveInfo
 
-    // #266
+    // #262
     function compile_WebGLShaderPrecisionFormat(o : WebGLShaderPrecisionFormat) : void {
         var v1 : int/*GLint*/ = o.rangeMin;
         var v2 : int/*GLint*/ = o.rangeMax;
         var v3 : int/*GLint*/ = o.precision;
     } // WebGLShaderPrecisionFormat
 
-    // #267
+    // #263
     function compile_WebGLRenderingContext(o : WebGLRenderingContext) : void {
         var v1 : int/*GLenum*/ = WebGLRenderingContext.DEPTH_BUFFER_BIT;
         var v2 : int/*GLenum*/ = o.DEPTH_BUFFER_BIT;
@@ -4934,27 +4903,27 @@ class _Test extends TestCase {
         o.viewport(X.getint(), X.getint(), X.getint(), X.getint());
     } // WebGLRenderingContext
 
-    // #268
+    // #264
     function compile_WebGLContextEvent(o : WebGLContextEvent) : void {
         var v1 : string/*DOMString*/ = o.statusMessage;
     } // WebGLContextEvent
 
-    // #269
+    // #265
     function compile_WebGLContextEventInit(o : WebGLContextEventInit) : void {
         var v1 : string/*DOMString*/ = o.statusMessage;
     } // WebGLContextEventInit
 
-    // #270
+    // #266
     function compile_WindowAnimationTiming(o : WindowAnimationTiming) : void {
-        var f1 : int/*long*/ = o.requestAnimationFrame(X.getfunction__number__void());
+        var f1 : int/*long*/ = o.requestAnimationFrame(X.getfunction_time_number__void());
         o.cancelAnimationFrame(X.getint());
-        var f2 : int/*long*/ = o.webkitRequestAnimationFrame(X.getfunction__number__void());
+        var f2 : int/*long*/ = o.webkitRequestAnimationFrame(X.getfunction_time_number__void());
         o.webkitCancelAnimationFrame(X.getint());
-        var f3 : int/*long*/ = o.mozRequestAnimationFrame(X.getfunction__number__void());
+        var f3 : int/*long*/ = o.mozRequestAnimationFrame(X.getfunction_time_number__void());
         o.mozCancelAnimationFrame(X.getint());
     } // WindowAnimationTiming
 
-    // #271
+    // #267
     function compile_CanvasPixelArray(o : CanvasPixelArray) : void {
         var v1 : int/*unsigned long*/ = o.length;
         var f2 : MayBeUndefined.<int/*octet*/> = o.__native_index_operator__(X.getint());
@@ -4969,7 +4938,6 @@ class _Test extends TestCase {
 
 native class X {
     static function getAbstractView() : AbstractView;
-    static function getAddress() : Address;
     static function getApplicationCache() : ApplicationCache;
     static function getArrayBuffer() : ArrayBuffer;
     static function getArrayBufferView() : ArrayBufferView;
@@ -5012,7 +4980,6 @@ native class X {
     static function getFloat32Array() : Float32Array;
     static function getFloat64Array() : Float64Array;
     static function getFormData() : FormData;
-    static function getFunctionStringCallback() : FunctionStringCallback;
     static function getGeolocation() : Geolocation;
     static function getHTMLAllCollection() : HTMLAllCollection;
     static function getHTMLCanvasElement() : HTMLCanvasElement;
@@ -5064,10 +5031,6 @@ native class X {
     static function getNodeIterator() : NodeIterator;
     static function getNodeList() : NodeList;
     static function getObject() : Object/*object?*/;
-    static function getPosition() : Position;
-    static function getPositionCallback() : PositionCallback;
-    static function getPositionError() : PositionError;
-    static function getPositionErrorCallback() : PositionErrorCallback;
     static function getPositionOptions() : PositionOptions;
     static function getProcessingInstruction() : ProcessingInstruction;
     static function getRange() : Range;
@@ -5116,7 +5079,10 @@ native class X {
     static function getfunction__File__void() : function(:File):void/*FileCallback?*/;
     static function getfunction__MediaQueryList__void() : function(:MediaQueryList):void/*MediaQueryListListener*/;
     static function getfunction___void() : function():void/*TimerHandler*/;
-    static function getfunction__number__void() : function(:number):void/*FrameRequestCallback*/;
+    static function getfunction__string__void() : function(:string):void/*FunctionStringCallback?*/;
+    static function getfunction_positionError_PositionError__void() : function(positionError:PositionError):void/*PositionErrorCallback*/;
+    static function getfunction_position_Position__void() : function(position:Position):void/*PositionCallback*/;
+    static function getfunction_time_number__void() : function(time:number/*DOMTimeStamp*/):void/*FrameRequestCallback*/;
     static function getint() : int/*unsigned long*/;
     static function getint__() : int[]/*sequence<long>*/;
     static function getnumber() : number/*GLintptr*/;
