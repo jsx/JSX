@@ -47,7 +47,7 @@ automatically generated from:
 	http://www.w3.org/TR/FileAPI/
 	idl2jsx/extra/file.idl
 	http://www.w3.org/TR/touch-events/
-	http://dev.w3.org/html5/websockets/
+	http://www.w3.org/TR/websockets/
 	http://dev.w3.org/geo/api/spec-source.html
 	http://dev.w3.org/html5/webstorage/
 	http://www.w3.org/TR/selectors-api/
@@ -7294,7 +7294,7 @@ end of generated files from:
 	http://www.w3.org/TR/FileAPI/
 	idl2jsx/extra/file.idl
 	http://www.w3.org/TR/touch-events/
-	http://dev.w3.org/html5/websockets/
+	http://www.w3.org/TR/websockets/
 	http://dev.w3.org/geo/api/spec-source.html
 	http://dev.w3.org/html5/webstorage/
 	http://www.w3.org/TR/selectors-api/
