@@ -1215,6 +1215,9 @@ var Parser = exports.Parser = Class.extend({
 			}
 			flags |= ClassDefinition.IS_FINAL;
 		}
+		if ((flags & ClassDefinition.IS_OVERRIDE) != 0 && (classFlags & ClassDefinition.IS_ARRAY) != 0) {
+			this._newError("an array-backed class cannot override functions");
+		}
 		flags |= classFlags & (ClassDefinition.IS_NATIVE | ClassDefinition.IS_FINAL);
 		if (this._expect("(") == null)
 			return null;
