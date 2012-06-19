@@ -53,6 +53,7 @@ automatically generated from:
 	http://www.w3.org/TR/selectors-api/
 	http://www.w3.org/TR/webmessaging/
 	http://www.w3.org/TR/workers/
+	http://dev.w3.org/html5/eventsource/
 	http://html5.org/specs/dom-parsing.html
 	https://www.khronos.org/registry/typedarray/specs/latest/typedarray.idl
 	http://dev.w3.org/html5/2dcontext/
@@ -4754,6 +4755,38 @@ native final class WorkerLocation {
 
 } // end of WorkerLocation
 
+native final class EventSource extends EventTarget {
+
+	function constructor(url : string/*DOMString*/);
+	function constructor(
+		url : string/*DOMString*/,
+		eventSourceInitDict : EventSourceInit
+	);
+
+	__readonly__ var url : string/*DOMString*/;
+	__readonly__ var withCredentials : boolean;
+	// ready state
+	static __readonly__ var CONNECTING : int/*unsigned short*/;
+	       __readonly__ var CONNECTING : int/*unsigned short*/;
+	static __readonly__ var OPEN : int/*unsigned short*/;
+	       __readonly__ var OPEN : int/*unsigned short*/;
+	static __readonly__ var CLOSED : int/*unsigned short*/;
+	       __readonly__ var CLOSED : int/*unsigned short*/;
+	__readonly__ var readyState : int/*unsigned short*/;
+	// networking
+	var onopen : function(:Event):void/*Function?*/;
+	var onmessage : function(:Event):void/*Function?*/;
+	var onerror : function(:Event):void/*Function?*/;
+	function close() : void;
+
+} // end of EventSource
+
+native final class EventSourceInit {
+
+	var withCredentials : boolean;
+
+} // end of EventSourceInit
+
 native final class DOMParser {
 
 	function constructor();
@@ -7300,6 +7333,7 @@ end of generated files from:
 	http://www.w3.org/TR/selectors-api/
 	http://www.w3.org/TR/webmessaging/
 	http://www.w3.org/TR/workers/
+	http://dev.w3.org/html5/eventsource/
 	http://html5.org/specs/dom-parsing.html
 	https://www.khronos.org/registry/typedarray/specs/latest/typedarray.idl
 	http://dev.w3.org/html5/2dcontext/

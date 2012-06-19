@@ -3756,30 +3756,52 @@ class _Test extends TestCase {
     } // WorkerLocation
 
     // #229
+    function compile_EventSource(o : EventSource) : void {
+        var v1 : string/*DOMString*/ = o.url;
+        var v2 : boolean = o.withCredentials;
+        var v3 : int/*unsigned short*/ = EventSource.CONNECTING;
+        var v4 : int/*unsigned short*/ = o.CONNECTING;
+        var v5 : int/*unsigned short*/ = EventSource.OPEN;
+        var v6 : int/*unsigned short*/ = o.OPEN;
+        var v7 : int/*unsigned short*/ = EventSource.CLOSED;
+        var v8 : int/*unsigned short*/ = o.CLOSED;
+        var v9 : int/*unsigned short*/ = o.readyState;
+        var v10 : function(:Event):void/*Function?*/ = o.onopen;
+        var v11 : function(:Event):void/*Function?*/ = o.onmessage;
+        var v12 : function(:Event):void/*Function?*/ = o.onerror;
+        o.close();
+    } // EventSource
+
+    // #230
+    function compile_EventSourceInit(o : EventSourceInit) : void {
+        var v1 : boolean = o.withCredentials;
+    } // EventSourceInit
+
+    // #231
     function compile_DOMParser(o : DOMParser) : void {
         var f1 : HTMLDocument/*Document*/ = o.parseFromString(X.getstring(), X.getstring());
     } // DOMParser
 
-    // #230
+    // #232
     function compile_XMLSerializer(o : XMLSerializer) : void {
         var f1 : string/*DOMString*/ = o.serializeToString(X.getNode());
     } // XMLSerializer
 
-    // #231
+    // #233
     function compile_ArrayBuffer(o : ArrayBuffer) : void {
         var v1 : int/*unsigned long*/ = o.byteLength;
         var f2 : ArrayBuffer = o.slice(X.getint());
         var f3 : ArrayBuffer = o.slice(X.getint(), X.getint());
     } // ArrayBuffer
 
-    // #232
+    // #234
     function compile_ArrayBufferView(o : ArrayBufferView) : void {
         var v1 : ArrayBuffer = o.buffer;
         var v2 : int/*unsigned long*/ = o.byteOffset;
         var v3 : int/*unsigned long*/ = o.byteLength;
     } // ArrayBufferView
 
-    // #233
+    // #235
     function compile_Int8Array(o : Int8Array) : void {
         var v1 : int/*long*/ = Int8Array.BYTES_PER_ELEMENT;
         var v2 : int/*long*/ = o.BYTES_PER_ELEMENT;
@@ -3796,7 +3818,7 @@ class _Test extends TestCase {
         var f6 : Int8Array = o.subarray(X.getint(), X.getint());
     } // Int8Array
 
-    // #234
+    // #236
     function compile_Uint8Array(o : Uint8Array) : void {
         var v1 : int/*long*/ = Uint8Array.BYTES_PER_ELEMENT;
         var v2 : int/*long*/ = o.BYTES_PER_ELEMENT;
@@ -3813,7 +3835,7 @@ class _Test extends TestCase {
         var f6 : Uint8Array = o.subarray(X.getint(), X.getint());
     } // Uint8Array
 
-    // #235
+    // #237
     function compile_Uint8ClampedArray(o : Uint8ClampedArray) : void {
         o.set(X.getint(), X.getint());
         o.set(X.getUint8ClampedArray());
@@ -3825,7 +3847,7 @@ class _Test extends TestCase {
         var f1 : Uint8ClampedArray = o.subarray(X.getint(), X.getint());
     } // Uint8ClampedArray
 
-    // #236
+    // #238
     function compile_Int16Array(o : Int16Array) : void {
         var v1 : int/*long*/ = Int16Array.BYTES_PER_ELEMENT;
         var v2 : int/*long*/ = o.BYTES_PER_ELEMENT;
@@ -3842,7 +3864,7 @@ class _Test extends TestCase {
         var f6 : Int16Array = o.subarray(X.getint(), X.getint());
     } // Int16Array
 
-    // #237
+    // #239
     function compile_Uint16Array(o : Uint16Array) : void {
         var v1 : int/*long*/ = Uint16Array.BYTES_PER_ELEMENT;
         var v2 : int/*long*/ = o.BYTES_PER_ELEMENT;
@@ -3859,7 +3881,7 @@ class _Test extends TestCase {
         var f6 : Uint16Array = o.subarray(X.getint(), X.getint());
     } // Uint16Array
 
-    // #238
+    // #240
     function compile_Int32Array(o : Int32Array) : void {
         var v1 : int/*long*/ = Int32Array.BYTES_PER_ELEMENT;
         var v2 : int/*long*/ = o.BYTES_PER_ELEMENT;
@@ -3876,7 +3898,7 @@ class _Test extends TestCase {
         var f6 : Int32Array = o.subarray(X.getint(), X.getint());
     } // Int32Array
 
-    // #239
+    // #241
     function compile_Uint32Array(o : Uint32Array) : void {
         var v1 : int/*long*/ = Uint32Array.BYTES_PER_ELEMENT;
         var v2 : int/*long*/ = o.BYTES_PER_ELEMENT;
@@ -3893,7 +3915,7 @@ class _Test extends TestCase {
         var f6 : Uint32Array = o.subarray(X.getint(), X.getint());
     } // Uint32Array
 
-    // #240
+    // #242
     function compile_Float32Array(o : Float32Array) : void {
         var v1 : int/*long*/ = Float32Array.BYTES_PER_ELEMENT;
         var v2 : int/*long*/ = o.BYTES_PER_ELEMENT;
@@ -3908,7 +3930,7 @@ class _Test extends TestCase {
         var f6 : Float32Array = o.subarray(X.getint(), X.getint());
     } // Float32Array
 
-    // #241
+    // #243
     function compile_Float64Array(o : Float64Array) : void {
         var v1 : int/*long*/ = Float64Array.BYTES_PER_ELEMENT;
         var v2 : int/*long*/ = o.BYTES_PER_ELEMENT;
@@ -3923,7 +3945,7 @@ class _Test extends TestCase {
         var f6 : Float64Array = o.subarray(X.getint(), X.getint());
     } // Float64Array
 
-    // #242
+    // #244
     function compile_DataView(o : DataView) : void {
         var f1 : int/*byte*/ = o.getInt8(X.getint());
         var f2 : int/*octet*/ = o.getUint8(X.getint());
@@ -3955,7 +3977,7 @@ class _Test extends TestCase {
         o.setFloat64(X.getint(), X.getnumber(), X.getboolean());
     } // DataView
 
-    // #243
+    // #245
     function compile_CanvasRenderingContext2D(o : CanvasRenderingContext2D) : void {
         var v1 : HTMLCanvasElement = o.canvas;
         o.save();
@@ -4026,7 +4048,7 @@ class _Test extends TestCase {
         var v27 : string/*DOMString*/ = o.textBaseline;
     } // CanvasRenderingContext2D
 
-    // #244
+    // #246
     function compile_CanvasTransformation(o : CanvasTransformation) : void {
         o.scale(X.getnumber(), X.getnumber());
         o.rotate(X.getnumber());
@@ -4035,7 +4057,7 @@ class _Test extends TestCase {
         o.setTransform(X.getnumber(), X.getnumber(), X.getnumber(), X.getnumber(), X.getnumber(), X.getnumber());
     } // CanvasTransformation
 
-    // #245
+    // #247
     function compile_CanvasLineStyles(o : CanvasLineStyles) : void {
         var v1 : number/*double*/ = o.lineWidth;
         var v2 : string/*DOMString*/ = o.lineCap;
@@ -4043,14 +4065,14 @@ class _Test extends TestCase {
         var v4 : number/*double*/ = o.miterLimit;
     } // CanvasLineStyles
 
-    // #246
+    // #248
     function compile_CanvasText(o : CanvasText) : void {
         var v1 : string/*DOMString*/ = o.font;
         var v2 : string/*DOMString*/ = o.textAlign;
         var v3 : string/*DOMString*/ = o.textBaseline;
     } // CanvasText
 
-    // #247
+    // #249
     function compile_CanvasPathMethods(o : CanvasPathMethods) : void {
         o.closePath();
         o.moveTo(X.getnumber(), X.getnumber());
@@ -4063,28 +4085,28 @@ class _Test extends TestCase {
         o.arc(X.getnumber(), X.getnumber(), X.getnumber(), X.getnumber(), X.getnumber(), X.getboolean());
     } // CanvasPathMethods
 
-    // #248
+    // #250
     function compile_CanvasGradient(o : CanvasGradient) : void {
         o.addColorStop(X.getnumber(), X.getstring());
     } // CanvasGradient
 
-    // #249
+    // #251
     function compile_CanvasPattern(o : CanvasPattern) : void {
     } // CanvasPattern
 
-    // #250
+    // #252
     function compile_TextMetrics(o : TextMetrics) : void {
         var v1 : number/*double*/ = o.width;
     } // TextMetrics
 
-    // #251
+    // #253
     function compile_ImageData(o : ImageData) : void {
         var v1 : int/*unsigned long*/ = o.width;
         var v2 : int/*unsigned long*/ = o.height;
         var v3 : Uint8ClampedArray = o.data;
     } // ImageData
 
-    // #252
+    // #254
     function compile_WebGLContextAttributes(o : WebGLContextAttributes) : void {
         var v1 : boolean = o.alpha;
         var v2 : boolean = o.depth;
@@ -4094,53 +4116,53 @@ class _Test extends TestCase {
         var v6 : boolean = o.preserveDrawingBuffer;
     } // WebGLContextAttributes
 
-    // #253
+    // #255
     function compile_WebGLObject(o : WebGLObject) : void {
     } // WebGLObject
 
-    // #254
+    // #256
     function compile_WebGLBuffer(o : WebGLBuffer) : void {
     } // WebGLBuffer
 
-    // #255
+    // #257
     function compile_WebGLFramebuffer(o : WebGLFramebuffer) : void {
     } // WebGLFramebuffer
 
-    // #256
+    // #258
     function compile_WebGLProgram(o : WebGLProgram) : void {
     } // WebGLProgram
 
-    // #257
+    // #259
     function compile_WebGLRenderbuffer(o : WebGLRenderbuffer) : void {
     } // WebGLRenderbuffer
 
-    // #258
+    // #260
     function compile_WebGLShader(o : WebGLShader) : void {
     } // WebGLShader
 
-    // #259
+    // #261
     function compile_WebGLTexture(o : WebGLTexture) : void {
     } // WebGLTexture
 
-    // #260
+    // #262
     function compile_WebGLUniformLocation(o : WebGLUniformLocation) : void {
     } // WebGLUniformLocation
 
-    // #261
+    // #263
     function compile_WebGLActiveInfo(o : WebGLActiveInfo) : void {
         var v1 : int/*GLint*/ = o.size;
         var v2 : int/*GLenum*/ = o.type;
         var v3 : string/*DOMString*/ = o.name;
     } // WebGLActiveInfo
 
-    // #262
+    // #264
     function compile_WebGLShaderPrecisionFormat(o : WebGLShaderPrecisionFormat) : void {
         var v1 : int/*GLint*/ = o.rangeMin;
         var v2 : int/*GLint*/ = o.rangeMax;
         var v3 : int/*GLint*/ = o.precision;
     } // WebGLShaderPrecisionFormat
 
-    // #263
+    // #265
     function compile_WebGLRenderingContext(o : WebGLRenderingContext) : void {
         var v1 : int/*GLenum*/ = WebGLRenderingContext.DEPTH_BUFFER_BIT;
         var v2 : int/*GLenum*/ = o.DEPTH_BUFFER_BIT;
@@ -4903,17 +4925,17 @@ class _Test extends TestCase {
         o.viewport(X.getint(), X.getint(), X.getint(), X.getint());
     } // WebGLRenderingContext
 
-    // #264
+    // #266
     function compile_WebGLContextEvent(o : WebGLContextEvent) : void {
         var v1 : string/*DOMString*/ = o.statusMessage;
     } // WebGLContextEvent
 
-    // #265
+    // #267
     function compile_WebGLContextEventInit(o : WebGLContextEventInit) : void {
         var v1 : string/*DOMString*/ = o.statusMessage;
     } // WebGLContextEventInit
 
-    // #266
+    // #268
     function compile_WindowAnimationTiming(o : WindowAnimationTiming) : void {
         var f1 : int/*long*/ = o.requestAnimationFrame(X.getfunction_time_number__void());
         o.cancelAnimationFrame(X.getint());
@@ -4923,7 +4945,7 @@ class _Test extends TestCase {
         o.mozCancelAnimationFrame(X.getint());
     } // WindowAnimationTiming
 
-    // #267
+    // #269
     function compile_CanvasPixelArray(o : CanvasPixelArray) : void {
         var v1 : int/*unsigned long*/ = o.length;
         var f2 : MayBeUndefined.<int/*octet*/> = o.__native_index_operator__(X.getint());

@@ -55,6 +55,7 @@ my @specs = (
         'http://www.w3.org/TR/selectors-api/',
         "http://www.w3.org/TR/webmessaging/",
         "http://www.w3.org/TR/workers/",
+        "http://dev.w3.org/html5/eventsource/",
 
         # WebRTC has no correct IDL
         #"http://dev.w3.org/2011/webrtc/editor/webrtc.html",
