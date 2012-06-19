@@ -102,6 +102,8 @@ var Optimizer = exports.Optimizer = Class.extend({
 			var cmd = cmds[i];
 			if (cmd == "lto") {
 				this._commands.push(new _LinkTimeOptimizationCommand());
+			} else if (cmd == "arrayize") {
+				this._commands.push(new _ArrayizeOptimizationCommand());
 			} else if (cmd == "no-assert") {
 				this._commands.push(new _NoAssertCommand());
 			} else if (cmd == "no-log") {
@@ -374,6 +376,33 @@ var _LinkTimeOptimizationCommand = exports._LinkTimeOptimizationCommand = _Optim
 			}
 		}
 		return overrides;
+	}
+
+});
+
+var _ArrayizeOptimizationCommand = exports._ArrayizeOptimizationCommand = _OptimizeCommand.extend({
+
+	$IDENTIFIER: "arrayize",
+
+	constructor: function () {
+		_OptimizeCommand.prototype.constructor.call(this, _ArrayizeOptimizationCommand.IDENTIFIER);
+	},
+
+	performOptimization: function () {
+		this.getCompiler().forEachClassDef(function (parser, classDef) {
+			// a final class extended from Object that has no overrides
+			if ((classDef.flags()
+					& (ClassDefinition.IS_INTERFACE | ClassDefinition.IS_MIXIN | ClassDefinition.IS_FINAL | ClassDefinition.IS_ABSTRACT | ClassDefinition.IS_ARRAY | ClassDefinition.IS_NATIVE))
+					== ClassDefinition.IS_FINAL
+				&& classDef.extendType().getClassDef().className() == "Object"
+				&& classDef.forEachMemberFunction(function (funcDef) {
+					return (funcDef.flags() & ClassDefinition.IS_OVERRIDE) == 0;
+				})) {
+				this.log("converting " + classDef.className() + " to array class");
+				classDef.setFlags(classDef.flags() | ClassDefinition.IS_ARRAY);
+			}
+			return true;
+		}.bind(this));
 	}
 
 });

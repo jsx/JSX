@@ -267,7 +267,7 @@ var JSX = Class.extend({
 					emitter.setEnableRunTimeTypeCheck(false);
 					optimizer.setEnableRunTimeTypeCheck(false);
 				});
-				optimizeCommands = [ "lto", "no-assert", "no-log", "fold-const", "return-if", "inline", "fold-const", "array-length" ];
+				optimizeCommands = [ "lto", "arrayize", "no-assert", "no-log", "fold-const", "return-if", "inline", "fold-const", "array-length" ];
 				break;
 			case "--optimize":
 				if ((optarg = getoptarg()) == null)
