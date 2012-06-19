@@ -160,9 +160,8 @@ native class Event {
 	) : void;
 
 	// PhaseType
-	// Introduced in DOM Level 3:
-
-	// PhaseType
+	static __readonly__ var NONE : int/*unsigned short*/;
+	       __readonly__ var NONE : int/*unsigned short*/;
 	// Introduced in DOM Level 3:
 
 } // end of Event
@@ -171,6 +170,7 @@ native class EventInit {
 
 	var bubbles : boolean;
 	var cancelable : boolean;
+
 
 } // end of EventInit
 
@@ -184,6 +184,8 @@ native final class CustomEvent extends Event {
 
 	__readonly__ var detail : variant/*any*/;
 
+
+	// Originally introduced (and deprecated) in DOM Level 3:
 	function initCustomEvent(
 		typeArg : string/*DOMString*/,
 		canBubbleArg : boolean,
@@ -191,12 +193,16 @@ native final class CustomEvent extends Event {
 		detailArg : variant/*any*/
 	) : void;
 
-
 } // end of CustomEvent
 
 native final class CustomEventInit extends EventInit {
 
 	var detail : variant/*any*/;
+
+	// Attributes from Event:
+	// inherits var bubbles : boolean;
+	// inherits var cancelable : boolean;
+	// Attributes for CustomEvent:
 
 } // end of CustomEventInit
 
@@ -221,8 +227,6 @@ native __fake__ class EventTarget {
 		capture : boolean
 	) : void;
 	function dispatchEvent(event : Event) : boolean;
-
-	// Modified in DOM Level 3:
 
 	// Modified in DOM Level 3:
 
@@ -418,8 +422,6 @@ native class Document extends Node {
 	function append(...nodes : string/*DOMString*/) : void;
 
 	// implements DocumentEvent
-
-	// Modified in DOM Level 3:
 
 	// Modified in DOM Level 3:
 
@@ -900,28 +902,10 @@ native final __fake__ class DocumentView {
 
 } // end of DocumentView
 
-native final class EventException {
-
-	// EventExceptionCode
-	static __readonly__ var UNSPECIFIED_EVENT_TYPE_ERR : int/*unsigned short*/;
-	       __readonly__ var UNSPECIFIED_EVENT_TYPE_ERR : int/*unsigned short*/;
-	// Introduced in DOM Level 3:
-	static __readonly__ var DISPATCH_REQUEST_ERR : int/*unsigned short*/;
-	       __readonly__ var DISPATCH_REQUEST_ERR : int/*unsigned short*/;
-	// Introduced in DOM Level 2:
-	var code : int/*unsigned short*/;
-
-	// EventExceptionCode
-	// Introduced in DOM Level 3:
-
-} // end of EventException
-
 native __fake__ class DocumentEvent {
 
 	// Modified in DOM Level 3:
 	function createEvent(eventInterface : string/*DOMString*/) : Event;
-
-	// Modified in DOM Level 3:
 
 } // end of DocumentEvent
 
@@ -929,6 +913,7 @@ native class UIEvent extends Event {
 
 	__readonly__ var view : AbstractView;
 	__readonly__ var detail : int/*long*/;
+	// Deprecated in DOM Level 3:
 	function initUIEvent(
 		typeArg : string/*DOMString*/,
 		canBubbleArg : boolean,
@@ -936,13 +921,24 @@ native class UIEvent extends Event {
 		viewArg : AbstractView,
 		detailArg : int/*long*/
 	) : void;
-
+	function constructor(typeArg : string/*DOMString*/);
+	function constructor(
+		typeArg : string/*DOMString*/,
+		dictUIEventInit : UIEventInit
+	);
 
 } // end of UIEvent
 
 native final class FocusEvent extends UIEvent {
 
 	__readonly__ var relatedTarget : EventTarget;
+	function constructor(typeArg : string/*DOMString*/);
+	function constructor(
+		typeArg : string/*DOMString*/,
+		focusEventInitDict : FocusEventInit
+	);
+
+	// Originally introduced (and deprecated) in DOM Level 3:
 	function initFocusEvent(
 		typeArg : string/*DOMString*/,
 		canBubbleArg : boolean,
@@ -951,7 +947,6 @@ native final class FocusEvent extends UIEvent {
 		detailArg : int/*long*/,
 		relatedTargetArg : EventTarget
 	) : void;
-
 
 } // end of FocusEvent
 
@@ -968,6 +963,7 @@ native class MouseEvent extends UIEvent {
 	__readonly__ var button : int/*unsigned short*/;
 	__readonly__ var buttons : int/*unsigned short*/;
 	__readonly__ var relatedTarget : EventTarget;
+	// Deprecated in DOM Level 3:
 	function initMouseEvent(
 		typeArg : string/*DOMString*/,
 		canBubbleArg : boolean,
@@ -987,8 +983,12 @@ native class MouseEvent extends UIEvent {
 	) : void;
 	// Introduced in DOM Level 3:
 	function getModifierState(keyArg : string/*DOMString*/) : boolean;
+	function constructor(typeArg : string/*DOMString*/);
+	function constructor(
+		typeArg : string/*DOMString*/,
+		mouseEventInitDict : MouseEventInit
+	);
 
-	// Introduced in DOM Level 3:
 
 	__readonly__ var pageX : int/*long*/;
 	__readonly__ var pageY : int/*long*/;
@@ -1012,6 +1012,13 @@ native final class WheelEvent extends MouseEvent {
 	__readonly__ var deltaY : number/*float*/;
 	__readonly__ var deltaZ : number/*float*/;
 	__readonly__ var deltaMode : int/*unsigned long*/;
+	function constructor(typeArg : string/*DOMString*/);
+	function constructor(
+		typeArg : string/*DOMString*/,
+		wheelEventInitDict : WheelEventInit
+	);
+
+	// Originally introduced (and deprecated) in DOM Level 3:
 	function initWheelEvent(
 		typeArg : string/*DOMString*/,
 		canBubbleArg : boolean,
@@ -1031,49 +1038,7 @@ native final class WheelEvent extends MouseEvent {
 		deltaMode : int/*unsigned long*/
 	) : void;
 
-	// DeltaModeCode
-
 } // end of WheelEvent
-
-native final class TextEvent extends UIEvent {
-
-	// InputMethodCode
-	static __readonly__ var DOM_INPUT_METHOD_UNKNOWN : int/*unsigned long*/;
-	       __readonly__ var DOM_INPUT_METHOD_UNKNOWN : int/*unsigned long*/;
-	static __readonly__ var DOM_INPUT_METHOD_KEYBOARD : int/*unsigned long*/;
-	       __readonly__ var DOM_INPUT_METHOD_KEYBOARD : int/*unsigned long*/;
-	static __readonly__ var DOM_INPUT_METHOD_PASTE : int/*unsigned long*/;
-	       __readonly__ var DOM_INPUT_METHOD_PASTE : int/*unsigned long*/;
-	static __readonly__ var DOM_INPUT_METHOD_DROP : int/*unsigned long*/;
-	       __readonly__ var DOM_INPUT_METHOD_DROP : int/*unsigned long*/;
-	static __readonly__ var DOM_INPUT_METHOD_IME : int/*unsigned long*/;
-	       __readonly__ var DOM_INPUT_METHOD_IME : int/*unsigned long*/;
-	static __readonly__ var DOM_INPUT_METHOD_OPTION : int/*unsigned long*/;
-	       __readonly__ var DOM_INPUT_METHOD_OPTION : int/*unsigned long*/;
-	static __readonly__ var DOM_INPUT_METHOD_HANDWRITING : int/*unsigned long*/;
-	       __readonly__ var DOM_INPUT_METHOD_HANDWRITING : int/*unsigned long*/;
-	static __readonly__ var DOM_INPUT_METHOD_VOICE : int/*unsigned long*/;
-	       __readonly__ var DOM_INPUT_METHOD_VOICE : int/*unsigned long*/;
-	static __readonly__ var DOM_INPUT_METHOD_MULTIMODAL : int/*unsigned long*/;
-	       __readonly__ var DOM_INPUT_METHOD_MULTIMODAL : int/*unsigned long*/;
-	static __readonly__ var DOM_INPUT_METHOD_SCRIPT : int/*unsigned long*/;
-	       __readonly__ var DOM_INPUT_METHOD_SCRIPT : int/*unsigned long*/;
-	__readonly__ var data : string/*DOMString*/;
-	__readonly__ var inputMethod : int/*unsigned long*/;
-	__readonly__ var locale : string/*DOMString*/;
-	function initTextEvent(
-		typeArg : string/*DOMString*/,
-		canBubbleArg : boolean,
-		cancelableArg : boolean,
-		viewArg : AbstractView,
-		dataArg : string/*DOMString*/,
-		inputMethod : int/*unsigned long*/,
-		localeArg : string/*DOMString*/
-	) : void;
-
-	// InputMethodCode
-
-} // end of TextEvent
 
 native final class KeyboardEvent extends UIEvent {
 
@@ -1100,6 +1065,13 @@ native final class KeyboardEvent extends UIEvent {
 	__readonly__ var repeat : boolean;
 	__readonly__ var locale : string/*DOMString*/;
 	function getModifierState(keyArg : string/*DOMString*/) : boolean;
+	function constructor(typeArg : string/*DOMString*/);
+	function constructor(
+		typeArg : string/*DOMString*/,
+		keyboardEventInitDict : KeyboardEventInit
+	);
+
+	// Originally introduced (and deprecated) in DOM Level 3:
 	function initKeyboardEvent(
 		typeArg : string/*DOMString*/,
 		canBubbleArg : boolean,
@@ -1113,31 +1085,36 @@ native final class KeyboardEvent extends UIEvent {
 		localeArg : string/*DOMString*/
 	) : void;
 
+	// The following support legacy user agents:
 	__readonly__ var charCode : int/*unsigned long*/;
 	__readonly__ var keyCode : int/*unsigned long*/;
 	__readonly__ var which : int/*unsigned long*/;
-
-	// KeyLocationCode
 
 } // end of KeyboardEvent
 
 native final class CompositionEvent extends UIEvent {
 
-	__readonly__ var data : string/*DOMString*/;
+	__readonly__ var data : string/*DOMString?*/;
 	__readonly__ var locale : string/*DOMString*/;
+	function constructor(typeArg : string/*DOMString*/);
+	function constructor(
+		typeArg : string/*DOMString*/,
+		compositionEventInitDict : CompositionEventInit
+	);
+
+	// Originally introduced (and deprecated) in DOM Level 3:
 	function initCompositionEvent(
 		typeArg : string/*DOMString*/,
 		canBubbleArg : boolean,
 		cancelableArg : boolean,
 		viewArg : AbstractView,
-		dataArg : string/*DOMString*/,
+		dataArg : string/*DOMString?*/,
 		localeArg : string/*DOMString*/
 	) : void;
 
-
 } // end of CompositionEvent
 
-native class MutationEvent extends Event {
+native final class MutationEvent extends Event {
 
 	// attrChangeType
 	static __readonly__ var MODIFICATION : int/*unsigned short*/;
@@ -1162,33 +1139,123 @@ native class MutationEvent extends Event {
 		attrChangeArg : int/*unsigned short*/
 	) : void;
 
-	// attrChangeType
-
 } // end of MutationEvent
 
-native final class MutationNameEvent extends MutationEvent {
-
-	__readonly__ var prevNamespaceURI : string/*DOMString*/;
-	__readonly__ var prevNodeName : string/*DOMString*/;
-	// Introduced in DOM Level 3:
-	function initMutationNameEvent(
-		typeArg : string/*DOMString*/,
-		canBubbleArg : boolean,
-		cancelableArg : boolean,
-		relatedNodeArg : Node,
-		prevNamespaceURIArg : string/*DOMString*/,
-		prevNodeNameArg : string/*DOMString*/
-	) : void;
-
-	// Introduced in DOM Level 3:
-
-} // end of MutationNameEvent
-
 native class UIEventInit extends EventInit {
-}
+
+	// Attributes from Event:
+	// inherits var bubbles : boolean;
+	// inherits var cancelable : boolean;
+	// Attributes for UIEvent:
+	var view : AbstractView;
+	var detail : int/*long*/;
+
+} // end of UIEventInit
+
+native final class FocusEventInit {
+
+	// Attributes from Event:
+	var bubbles : boolean;
+	var cancelable : boolean;
+	// Attributes from UIEvent:
+	var view : AbstractView;
+	var detail : int/*long*/;
+	// Attributes for FocusEvent:
+	var relatedTarget : EventTarget;
+
+} // end of FocusEventInit
 
 native class MouseEventInit extends UIEventInit {
-}
+
+	// Attributes from Event:
+	// inherits var bubbles : boolean;
+	// inherits var cancelable : boolean;
+	// Attributes from UIEvent:
+	// inherits var view : AbstractView;
+	// inherits var detail : int/*long*/;
+	// Attributes for MouseEvent:
+	var screenX : int/*long*/;
+	var screenY : int/*long*/;
+	var clientX : int/*long*/;
+	var clientY : int/*long*/;
+	var ctrlKey : boolean;
+	var shiftKey : boolean;
+	var altKey : boolean;
+	var metaKey : boolean;
+	var button : int/*unsigned short*/;
+	// Note: "buttons" was not previously initializable through initMouseEvent!
+	var buttons : int/*unsigned short*/;
+	var relatedTarget : EventTarget;
+
+} // end of MouseEventInit
+
+native final class WheelEventInit {
+
+	// Attributes from Event:
+	var bubbles : boolean;
+	var cancelable : boolean;
+	// Attributes from UIEvent:
+	var view : AbstractView;
+	var detail : int/*long*/;
+	// Attributes from MouseEvent:
+	var screenX : int/*long*/;
+	var screenY : int/*long*/;
+	var clientX : int/*long*/;
+	var clientY : int/*long*/;
+	var ctrlKey : boolean;
+	var shiftKey : boolean;
+	var altKey : boolean;
+	var metaKey : boolean;
+	var button : int/*unsigned short*/;
+	// Note: "buttons" was not previously initializable through initMouseEvent!
+	var buttons : int/*unsigned short*/;
+	var relatedTarget : EventTarget;
+	// Attributes for WheelEvent:
+	var deltaX : number/*float*/;
+	var deltaY : number/*float*/;
+	var deltaZ : number/*float*/;
+	var deltaMode : int/*unsigned long*/;
+
+} // end of WheelEventInit
+
+native final class KeyboardEventInit {
+
+	// Attributes from Event:
+	var bubbles : boolean;
+	var cancelable : boolean;
+	// Attributes from UIEvent:
+	var view : AbstractView;
+	var detail : int/*long*/;
+	// Attributes for KeyboardEvent:
+	var char : string/*DOMString*/;
+	var key : string/*DOMString*/;
+	var location : int/*unsigned long*/;
+	var ctrlKey : boolean;
+	var shiftKey : boolean;
+	var altKey : boolean;
+	var metaKey : boolean;
+	var repeat : boolean;
+	var locale : string/*DOMString*/;
+	// (Legacy) key attributes for KeyboardEvent:
+	var charCode : int/*unsigned long*/;
+	var keyCode : int/*unsigned long*/;
+	var which : int/*unsigned long*/;
+
+} // end of KeyboardEventInit
+
+native final class CompositionEventInit {
+
+	// Attributes from Event:
+	var bubbles : boolean;
+	var cancelable : boolean;
+	// Attributes from UIEvent:
+	var view : AbstractView;
+	var detail : int/*long*/;
+	// Attributes for CompositionEvent:
+	var data : string/*DOMString?*/;
+	var locale : string/*DOMString*/;
+
+} // end of CompositionEventInit
 
 native __fake__ class XMLHttpRequestEventTarget extends EventTarget {
 
