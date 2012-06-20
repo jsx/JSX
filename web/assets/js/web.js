@@ -63,7 +63,7 @@ window.addEventListener('load', function(e) {
 		output.value = '';
 		var path = input.dataset["path"];
 
-		var platform = new BrowserPlatform("");
+		var platform = new jsx.BrowserPlatform(".");
 		platform.setContent(path, input.value);
 
 		var c = new jsx.Compiler(platform);
@@ -73,14 +73,9 @@ window.addEventListener('load', function(e) {
 		var o = new jsx.Optimizer();
 
 		if(getOptimizationLevel() > 0) {
-			o.setup([
-					"lto",
-					"no-assert",
-					"fold-const",
-					"return-if",
-					"inline",
-					"fold-const"
-			]);
+			o.setup([ "lto", "no-assert", "fold-const", "return-if", "inline", "fold-const", "array-length" ]);
+			emitter.setEnableRunTimeTypeCheck(false);
+			optimizer.setEnableRunTimeTypeCheck(false);
 		}
 		c.setOptimizer(o);
 

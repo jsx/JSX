@@ -20,16 +20,19 @@
  * IN THE SOFTWARE.
  */
 
-var Class = require("./Class");
-eval(Class.$import("./compiler"));
-eval(Class.$import("./platform"));
-eval(Class.$import("./jsemitter"));
-eval(Class.$import("./optimizer"));
-
 "use strict";
 
-exports.Compiler = Compiler;
-exports.Platform = Platform;
-exports.JavaScriptEmitter = JavaScriptEmitter;
-exports.Optimizer = Optimizer;
+exports.Class             = require("./Class");
+exports.Compiler          = require("./compiler").Compiler;
+exports.JavaScriptEmitter = require("./jsemitter").JavaScriptEmitter;
+exports.Optimizer         = require("./optimizer").Optimizer;
+
+exports.BrowserPlatform   = require("./browser-platform").BrowserPlatform;
+//exports.ScriptLoader      = require("./script-loader").ScriptLoader;
+
+exports.optimizationLevel = 0;
+
+window.addEventListener("load", function(e) {
+	require("./script-loader").ScriptLoader.load("..");
+});
 

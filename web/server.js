@@ -36,14 +36,17 @@ function finish(response, uri, status, content_type, content) {
 	else if(/\.css$/.test(uri)) {
 		headers["Content-Type"] = "text/css";
 	}
-	else if(/\.png/.test(uri)) {
+	else if(/\.png$/.test(uri)) {
 		headers["Content-Type"] = "image/png";
+	}
+	else if(/\.jpe?g$/.test(uri)) {
+		headers["Content-Type"] = "image/jpeg";
 	}
 	else if(/\//.test(uri) || /\.html$/.test(uri)) {
 		headers["Content-Type"] = "text/html";
 	}
 
-	console.log("%s %s %s (%s bytes)", status, headers["Content-Type"] || "(unknown type)", uri, len);
+	console.log("%s %s %s %s (%s bytes)", (new Date()), status, headers["Content-Type"] || "(unknown type)", uri, len);
 
 	response.writeHead(status, headers);
 	response.write(content, "binary");
@@ -77,11 +80,16 @@ function main(args) {
 
 	var httpd = http.createServer(function(request, response) {
 		var uri = url.parse(request.url).pathname;
-		var filename = path.join(process.cwd(), uri);
 
 		if(uri === "/") {
-			filename += "web/index.html";
+			response.writeHead(301, {
+				Location: "try/"
+			});
+			response.end();
+			return;
 		}
+
+		var filename = path.join(process.cwd(), uri);
 
 		if(/\.html$/.test(filename)) {
 			child_process.execFile(

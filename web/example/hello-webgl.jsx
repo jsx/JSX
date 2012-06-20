@@ -1,6 +1,12 @@
 import 'timer.jsx';
 import 'js/web.jsx';
 
+class _Main {
+	static function main(args : string[]) : void {
+		Hello.main();
+	}
+}
+
 class Hello {
 
 	static var gl:WebGLRenderingContext = null;

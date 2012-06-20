@@ -23,16 +23,15 @@
         color: #fff;
       }
     </style>
-    <script src="../jsx.combined.js"></script>
-    <script src="../assets/js/jsx-browser-platform.js"></script>
+    <script src="../build/jsx-compiler.js"></script>
     <script>
-      jsx.enableOptimizations = true;
+      jsx.optimizationLevel = 1;
     </script>
-    <script src="../assets/js/jsx-script-loader.js"></script>
     <script type="application/jsx" src="fireworks.jsx"></script>
     <script>
-      window.addEventListener("DOMContentLoaded", function(e) {
-        JSX.require("fireworks.jsx").Application.main$SSI("night-sky", "fps", 1000);
+      window.addEventListener("load", function(e) {
+        var app = JSX.require("fireworks.jsx");
+        app._Main.main$AS(["night-sky", "fps", "1000"]);
       });
     </script>
   </head>

@@ -21,17 +21,11 @@
       <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
 
-    <script src="../jsx.combined.js"></script>
-    <script src="../assets/js/jsx-browser-platform.js"></script>
-    <script src="../assets/js/jsx-script-loader.js"></script>
+    <script src="../build/jsx-compiler.js"></script>
     <script type="application/jsx" src="hello-webgl.jsx"></script>
     <script>
-      window.addEventListener("DOMContentLoaded", function(e) {
-        document.getElementById("run").addEventListener("click", function(e) {
-          e.preventDefault();
-          e.stopPropagation();
-          JSX.require("hello-webgl.jsx").Hello.main$();
-        });
+      window.addEventListener("load", function(e) {
+        JSX.require("hello-webgl.jsx")._Main.main$AS([]);
       });
     </script>
 
@@ -63,13 +57,10 @@
           <h2>Hello, WebGL!</h2>
         </div>
       </div>
-      <div class="row">
-        <div class="span8">
-          <p><a class="btn btn-primary btn-large" id="run">Run the script</a></p>
-        </div>
-      </div>
       <!-- for WebGL -->
-      <canvas id='webgl-canvas' width='256px' height='256px'></canvas>
+      <div class="row">
+        <canvas id='webgl-canvas' width='256px' height='256px'></canvas>
+      </div>
       <script id='vshader' type='x-shader/x-vertex'>
         precision mediump float;
         uniform float angle;

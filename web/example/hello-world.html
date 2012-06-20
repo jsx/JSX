@@ -21,12 +21,10 @@
       <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
 
-    <script src="../jsx.combined.js"></script>
-    <script src="../assets/js/jsx-browser-platform.js"></script>
-    <script src="../assets/js/jsx-script-loader.js"></script>
+    <script src="../build/jsx-compiler.js"></script>
     <script type="application/jsx" src="hello-world.jsx"></script>
     <script>
-      window.addEventListener("DOMContentLoaded", function(e) {
+      window.addEventListener("load", function(e) {
         document.getElementById("run").addEventListener("click", function(e) {
           e.preventDefault();
           e.stopPropagation();

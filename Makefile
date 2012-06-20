@@ -20,7 +20,7 @@ optimize-bench:
 	prove xt/optimize-bench/*.jsx
 
 web:
-	perl web/build.pl
+	perl web/build.pl --clean
 
 server:
 	node web/server.js

@@ -1,25 +1,72 @@
 #!/usr/bin/perl
+
+=pod
+
+build try/ directry for the web site
+
+    try/
+        t/          (jsx/t/)
+        lib/        (jsx/lib/)
+        example/    (jsx/web/example)
+        assets/     (jsx/web/assets/)
+        example/    (jsx/web/source-map/)
+        source-map/ (jsx/web/source-map/)
+
+=cut
+
 use 5.10.0;
 use strict;
 use warnings;
 use Cwd            qw(abs_path);
 use File::Basename qw(basename dirname);
 use constant ROOT => abs_path(dirname(__FILE__));
-use lib ROOT . "/extlib/lib/perl5";
+use lib ROOT."/extlib/lib/perl5";
 
+use File::Path     qw(rmtree mkpath);
 use File::Copy     qw(move copy);
 use Fatal          qw(open close);
 use File::Find     qw(find);
+use File::stat     qw(stat);
 use String::ShellQuote qw(shell_quote);
 use JSON::PP qw();
 
+my $clean = (grep { $_ eq "--clean" } @ARGV); # clean build
+
 my $root = ROOT;
+my $project_root = "$root/..";
+my $dest_root    = "$project_root/try";
+my $dest_src     = "$dest_root/src";
+my $dest_build   = "$dest_root/build";
+
+if($clean) {
+    info('clean build');
+    rmtree("$dest_root~") if -e "$dest_root~";
+
+    rename $dest_root => "$dest_root~";
+}
+
+mkpath($_) for $dest_src, $dest_build;
+
+copy_r("$root/assets",  "$dest_root/assets");
+copy_r("$root/example", "$dest_root/example");
+
+copy_r("$project_root/t", "$dest_root/t");
+copy_r("$project_root/lib", "$dest_root/lib");
+
 my $template_dir = "$root/template";
 
-process_top_page("$root/template/index.tmpl", "$root/index.html");
-process_jsx("$root/../src", "$root/jsx.combined.js");
-process_tree(["$root/../example", "$root/../lib", "$root/../src", "$root/../t"], "$root/tree.generated.json");
-process_source_map("$root/../example", "$root/source-map");
+process_page("$template_dir/index.tmpl", "$dest_root/index.html");
+
+process_jsx($dest_src, "$dest_build/jsx-compiler.js");
+
+process_source_map("$root/source-map", "$dest_root/source-map");
+
+# process_tree must be called at the end of processes
+process_tree([$dest_root], "$dest_root/tree.generated.json");
+
+sub info {
+    say "[I] ", join " ", @_;
+}
 
 sub make_list {
     my($prefix) = @_;
@@ -29,8 +76,10 @@ sub make_list {
         map { basename($_) } glob("$root/../$prefix/*.jsx");
 }
 
-sub process_top_page {
+sub process_page {
     my($src, $dest) = @_;
+
+    info "process_page: $dest";
 
     my $template = do {
         open my($fh), '<', $src;
@@ -55,11 +104,17 @@ sub process_top_page {
 
 sub process_jsx {
     my($src, $dest) = @_;
-    local $ENV{PATH} = "node_modules/browserbuild/bin"
+
+    info "process_jsx: $dest";
+
+    copy_r("$project_root/src", $dest_src);
+    copy_r("$root/src", $dest_src);
+
+    local $ENV{PATH} = "$project_root/node_modules/browserbuild/bin"
                        . ":" . $ENV{PATH};
 
     my @files = glob("$src/*.js");
-    my $cmd = "browserbuild --main web-interface --global jsx --basepath '$src/' "
+    my $cmd = "browserbuild --main interface --global jsx --basepath '$src/' "
         . join(' ', map { shell_quote($_) } @files)
         . " > "
         . shell_quote($dest);
@@ -69,6 +124,8 @@ sub process_jsx {
 
 sub process_tree {
     my($src, $dest) = @_;
+
+    info "process_tree: $dest";
 
     my %tree;
     find {
@@ -104,15 +161,71 @@ sub process_tree {
 sub process_source_map {
     my($src, $dest) = @_;
 
+    info "process_source_map: $dest";
+
+    mkpath($dest);
+
+    copy_r($src, $dest);
+
     my $old_cwd = Cwd::cwd();
-    chdir $src;
+    chdir "$project_root/example";
     foreach my $jsx_file(glob("*.jsx")) {
-        system "$root/../bin/jsx", "--enable-source-map",
+        next if not modified($jsx_file, "$dest/$jsx_file");
+
+        info "compile $jsx_file with --enable-source-map";
+        system "$root/../bin/jsx",
+            "--enable-source-map",
             "--output", "$jsx_file.js", $jsx_file;
         move($jsx_file . ".js", $dest);
         move($jsx_file . ".js.mapping", $dest);
-        copy($jsx_file, $dest);
-    }
 
+        copy($jsx_file, "$dest/$jsx_file");
+        my $st = stat($jsx_file);
+        utime $st->atime, $st->mtime, "$dest/$jsx_file";
+    }
     chdir $old_cwd;
+}
+
+sub modified {
+    my($src, $dest) = @_;
+    my $s = stat($src);
+    my $d = stat($dest);
+
+    if($s && $d) {
+        return ! ($s->mtime == $d->mtime && $s->size == $d->size);
+    }
+    else {
+        return 1;
+    }
+}
+
+sub copy_r {
+    my($src, $dest) = @_;
+
+    mkpath($dest);
+
+    my $prefix = qr/\A \Q$src\E /xms;
+
+    find {
+        no_chdir => 1,
+        wanted   => sub {
+            return if /~$/;
+            return if /\.swp$/;
+
+            my $d = $_;
+            $d =~ s/$prefix/$dest/xms;
+
+            if(-d $_) {
+                mkdir $d;
+                return;
+            }
+
+            if(modified($_, $d)) {
+                copy($_, $d);
+                my $st = stat($_);
+                utime $st->atime, $st->mtime, $d;
+            }
+        },
+    }, $src;
+
 }

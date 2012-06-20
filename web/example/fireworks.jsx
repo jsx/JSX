@@ -192,9 +192,13 @@ final class FPSWatcher {
 	}
 }
 
-final class Application {
-	static function main(canvasId : string, fpsId : string, quantity : int) : void {
-		Config.quantity = quantity;
+final class _Main {
+	static function main(args : string[]) : void {
+		assert args.length == 3;
+
+		var canvasId    = args[0];
+		var fpsId       = args[1];
+		Config.quantity = args[2] as int;
 
 		var canvas = dom.id(canvasId) as HTMLCanvasElement;
 
