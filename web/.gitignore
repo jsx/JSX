@@ -3,4 +3,3 @@ extlib
 index.html
 *.combined.js
 *.generated.*
-source-map

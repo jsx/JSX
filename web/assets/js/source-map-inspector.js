@@ -8,13 +8,19 @@ window.addEventListener('load', function (e) {
 	var ORIG   = "original";
 	var GEN    = "generated";
 
-	var colorMapping = {
+	var colorMap = {
 		space:      "#ccc", // includes comments
 		identifier: "#333",
 		keyword:    "#09d",
 		string:     "#d70",
 		number:     "#f60",
 		regexp:     "#660"
+	};
+
+	var skipMap = {
+		"(": true,
+		")": true,
+		",": true
 	};
 
 	var DEBUG = false;
@@ -64,7 +70,7 @@ window.addEventListener('load', function (e) {
 
 			var t = tokenObject.type;
 
-			var style = t in colorMapping ? "color:" + colorMapping[t] : "";
+			var style = t in colorMap ? "color:" + colorMap[t] : "";
 
 			return format('<span id="%1%2" style="%3;" class="%4">%5</span>',
 						  prefix, tokenObject.id, style, t, s);
@@ -76,6 +82,10 @@ window.addEventListener('load', function (e) {
 		p.style.padding = "0px";
 		p.style.margin  = "1px";
 		p.style.width = format("%1px", (s.offsetWidth >> 1) - 4);
+
+		// TODO: make panes scrollable
+		//p.style.maxHeight = "800px";
+		//p.style.overflowY = "scroll";
 	}
 
 	var source = element(SOURCE);
@@ -142,43 +152,66 @@ window.addEventListener('load', function (e) {
 		original[tokenObject.line][tokenObject.column] = tokenObject;
 	});
 
-	// draw lines
-	for(var i = 0; i < gen.length; ++i) {
-		(function (genToken) {
-			setTimeout(function() {
-				if(genToken.type === "space") {
-					return;
-				}
+	function getOriginalToken(genToken) {
+		if(genToken.type === "space") {
+			return null;
+		}
+		if(genToken.token in skipMap) {
+			return null;
+		}
 
-				var origPos = consumer.originalPositionFor(genToken);
-				console.assert(origPos);
-				
-				if(! (original[origPos.line] && original[origPos.line][origPos.column])) {
-					return;
-				}
+		var p = consumer.originalPositionFor(genToken);
 
-				var origToken = original[origPos.line][origPos.column];
+		if(! (original[p.line] && original[p.line][p.column])) {
+			return null;
+		}
 
-				if(origToken.done) {
-					return;
-				}
-				origToken.done = true;
-
-				cx.beginPath();
-
-				// left pain
-				var elem  = element(ORIG + origToken.id);
-				var p = elementOffset(elem);
-				cx.moveTo(p.x - basePos.x, p.y - basePos.y);
-
-				// to right pain
-				elem = element(GEN + genToken.id);
-				p = elementOffset(elem);
-				cx.lineTo(p.x - basePos.x, p.y - basePos.y);
-
-				cx.strokeStyle = elem.style.color;
-				cx.stroke();
-			}, i * 2);
-		}(gen[i]));
+		return original[p.line][p.column];
 	}
+
+	var t0 = Date.now();
+
+	var i = 0;
+	function drawLine() {
+
+		var genToken;
+		var origToken;
+
+		do {
+			if(i >= gen.length) {
+				if(DEBUG) {
+					console.debug("finish drawLine by %s ms.", Date.now() - t0);
+				}
+				return;
+			}
+
+			genToken = gen[i++];
+			origToken = getOriginalToken(genToken);
+		} while (origToken=== null);
+
+		setTimeout(drawLine);
+
+		if(origToken.done) {
+			return;
+		}
+		origToken.done = true;
+
+		cx.beginPath();
+
+		// left pane
+		var elem  = element(ORIG + origToken.id);
+		var p = elementOffset(elem);
+		cx.moveTo(p.x - basePos.x, p.y - basePos.y);
+
+		cx.strokeStyle = elem.style.color;
+
+		// to right pane
+		elem = element(GEN + genToken.id);
+		p = elementOffset(elem);
+		cx.lineTo(p.x - basePos.x, p.y - basePos.y);
+
+		cx.stroke();
+	}
+
+	setTimeout(drawLine);
 });

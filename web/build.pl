@@ -7,6 +7,7 @@ use File::Basename qw(basename dirname);
 use constant ROOT => abs_path(dirname(__FILE__));
 use lib ROOT . "/extlib/lib/perl5";
 
+use File::Copy     qw(move copy);
 use Fatal          qw(open close);
 use File::Find     qw(find);
 use String::ShellQuote qw(shell_quote);
@@ -18,6 +19,7 @@ my $template_dir = "$root/template";
 process_top_page("$root/template/index.tmpl", "$root/index.html");
 process_jsx("$root/../src", "$root/jsx.combined.js");
 process_tree(["$root/../example", "$root/../lib", "$root/../src", "$root/../t"], "$root/tree.generated.json");
+process_source_map("$root/../example", "$root/source-map");
 
 sub make_list {
     my($prefix) = @_;
@@ -99,3 +101,18 @@ sub process_tree {
     close $fh;
 }
 
+sub process_source_map {
+    my($src, $dest) = @_;
+
+    my $old_cwd = Cwd::cwd();
+    chdir $src;
+    foreach my $jsx_file(glob("*.jsx")) {
+        system "$root/../bin/jsx", "--enable-source-map",
+            "--output", "$jsx_file.js", $jsx_file;
+        move($jsx_file . ".js", $dest);
+        move($jsx_file . ".js.mapping", $dest);
+        copy($jsx_file, $dest);
+    }
+
+    chdir $old_cwd;
+}

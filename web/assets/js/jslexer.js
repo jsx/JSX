@@ -51,31 +51,15 @@
 		"debugger", "with",
 		"const",    "export",
 		"let",     "private",   "public", "yield",
-		"protected",
-
-		"{",  "}",  "(",  ")",  "[",  "]",
-		".",  ";",  ",",  ":",  "?",
-
-		"<",  ">",  "<=",  ">=",
-		"==", "!=", "===", "!==",
-
-		"=",
-		"+",  "-",  "*",  "/",  "%",
-		"+=", "-=", "*=", "/=", "%=",
-		"&",  "|",  "^",
-		"&=", "|=", "^=",
-		"<<", ">>", ">>>",
-		"~",  "!",
-		"++", "--",
-		"||", "&&"
+		"protected"
 	];
 
 	var rxSpace          = rx("^" + makeAlt([comment, whiteSpace]) + "+");
 	var rxIdent          = rx("^" + ident);
 	var rxStringLiteral  = rx("^" + stringLiteral);
-	var rxNumberLiteral  = rx("^" + makeAlt([numberLiteral, integerLiteral]));
+	var rxNumberLiteral  = rx("^" + makeAlt([numberLiteral, integerLiteral]) + "\\b");
 	var rxRegExpLiteral  = rx("^" + regexpLiteral);
-	var rxKeyword        = rx("^" + makeAlt(keywords.map(quoteMeta)));
+	var rxKeyword        = rx("^" + makeAlt(keywords.map(quoteMeta)) + "\\b");
 
 	var literals = {
 		"null": true,
@@ -110,18 +94,18 @@
 			if( (matched = src.match(rxSpace)) !== null ) {
 				type = "space";
 			}
-			else if( src[0] === "/" ) {
+			else if( src.charAt(0) === "/" ) {
 				if( lastIsPrimaryExpr(tokens) ) {
-					matched = src.match(rxKeyword);
+					matched = src.match(/^./);
 					type = "keyword";
 				}
 				else if( (matched = src.match(rxRegExpLiteral)) !== null ) {
 					type = "regexp";
 				}
 				else {
-					throw new Error("["+fileName+":"+line+":"+col+"] "+
-									"Unexpected character " +
-									JSON.stringify(src[0]));
+					throw new SyntaxError("jslexer: ["+fileName+":"+line+":"+col+"] "+
+									"Unexpected character '" +
+									src.charAt(0) + "'");
 				}
 			}
 			else if( (matched = src.match(rxKeyword)) !== null ) {
@@ -136,10 +120,13 @@
 			else if( (matched = src.match(rxNumberLiteral)) !== null ) {
 				type = "number";
 			}
+			else if( (matched = src.match(/^./)) !== null ) {
+				type = "keyword";
+			}
 			else {
-				throw new Error("["+fileName+":"+line+":"+col+"] "+
-								"Unexpected character " +
-								JSON.stringify(src[0]));
+				throw new SyntaxError("jslexer: ["+fileName+":"+line+":"+col+"] "+
+								"Unexpected character '" +
+								src.charAt(0) + "'");
 			}
 			var token = matched[0];
 
