@@ -3,7 +3,18 @@
  *
  * AUTHOR: Fuji, Goro (gfx) <gfuji@cpan.org>
  * LICENSE: The MIT License
+ *
+ * Usage:
+ *     <script src="require-simple.js"></script>
+ *     <script>
+ *         require.paths.unshift("assets/js");
+ *         var Foo = require("foo");
+ *     </script>
  */
+
+if(typeof(window) === "undefined") {
+	throw new Error("require-simple.js works only on browsers!");
+}
 
 function require(name) {
 	"use strict";
@@ -34,23 +45,33 @@ function require(name) {
 			}
 
 			if(xhr.status !== 404 || (i+1) === paths.length) {
-				throw new Error("Failed to load \"" + name + "\": " +
-								xhr.status + " " + xhr.responseText);
+				throw new Error("Cannot load module \"" + name + "\": " +
+								xhr.status);
 			}
 		}
 	}
+	var module = require.modules[name] = {
+		id: name,
+		exports: {}
+	};
 
 	var src = findModule(require.paths, name);
 
-	/*jslint evil: true */
-	var f = new Function("module", "exports", src);
+	var m = "require.modules['" + name.replace(/'/g, "\\'") + "']";
+	var srcSection = document.createTextNode(
+		"(function (module, exports) { // "+name+".js\n" +
+		src +
+		"}("+m+", "+m+".exports));\n"
+	);
 
-	var module = require.modules[name] = {
-		exports: {}
-	};
-	f(module, module.exports);
+	var script = document.createElement("script");
+	script.appendChild(srcSection);
+
+	document.head.appendChild(script);
+
 	return module.exports;
 }
+
 require.debug = false;
 require.paths = ["."];
 
