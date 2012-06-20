@@ -558,7 +558,7 @@ var _LogStatementEmitter = exports._LogStatementEmitter = _StatementEmitter.exte
 	},
 
 	emit: function () {
-		this._emitter._emit("console.log(", null);
+		this._emitter._emit("console.log(", this._statement.getToken());
 		var exprs = this._statement.getExprs();
 		for (var i = 0; i < exprs.length; ++i) {
 			if (i != 0)
@@ -702,9 +702,9 @@ var _NumberLiteralExpressionEmitter = exports._NumberLiteralExpressionEmitter = 
 		var token = this._expr.getToken();
 		var str = token.getValue();
 		if (outerOpPrecedence == _PropertyExpressionEmitter._operatorPrecedence && str.indexOf(".") == -1) {
-			this._emitter._emit("(" + token.getValue() + ")", token);
+			this._emitter._emit("(" + str + ")", token);
 		} else {
-			this._emitter._emit("" + token.getValue(), token);
+			this._emitter._emit("" + str, token);
 		}
 	}
 
@@ -1428,13 +1428,14 @@ var _ArrayExpressionEmitter = exports._ArrayExpressionEmitter = _OperatorExpress
 		if (secondExpr instanceof StringLiteralExpression) {
 			var propertyName = Util.decodeStringLiteral(secondExpr.getToken().getValue());
 			if (propertyName.match(/^[\$_A-Za-z][\$_0-9A-Za-z]*$/) != null) {
-				this._emitter._emit("." + propertyName, this._expr.getToken());
+				this._emitter._emit(".", this._expr.getToken());
+				this._emitter._emit(propertyName, secondExpr.getToken());
 				emitted = true;
 			}
 		}
 		if (! emitted) {
 			this._emitter._emit("[", this._expr.getToken());
-			this._emitter._getExpressionEmitterFor(this._expr.getSecondExpr()).emit(0);
+			this._emitter._getExpressionEmitterFor(secondExpr).emit(0);
 			this._emitter._emit("]", null);
 		}
 	},
@@ -2012,7 +2013,8 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 					continue;
 				this._emit(_Util.buildAnnotation("/** @type {%1} */\n", type), null);
 				var name = locals[i].getName();
-				this._emit("var " + name.getValue() + ";\n", name);
+				this._emit("var ", null);
+				this._emit(name.getValue() + ";\n", name);
 			}
 			// emit code
 			var statements = funcDef.getStatements();
@@ -2093,9 +2095,8 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 				line: outputLines.length,
 				column: outputLines[outputLines.length-1].length - 1,
 			};
-			// XXX: 'line' of original pos seems zero-origin (gfx suspects it's a bug of mozilla/source-map)
 			var origPos = {
-				line: token.getLineNumber() - 1,
+				line: token.getLineNumber(),
 				column: token.getColumnNumber()
 			};
 			var tokenValue = token.isIdentifier()

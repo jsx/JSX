@@ -53,7 +53,7 @@ function main() {
 			t.note("for literal " + JSON.stringify(source[pos]));
 			orig = consumer.originalPositionFor(source[pos]);
 			t.note(JSON.stringify([source[pos], orig]));
-			t.expect(orig.line, "orig.line").toBe(11);
+			t.expect(orig.line, "orig.line").toBe(12);
 			t.expect(orig.column, "orig.column").toBe(12);
 			t.expect(orig.name, "orig.name").toBe(null);
 
@@ -61,7 +61,7 @@ function main() {
 			t.note("for class " + JSON.stringify(source[pos]));
 			orig = consumer.originalPositionFor(source[pos]);
 			t.note(JSON.stringify([source[pos], orig]));
-			t.expect(orig.line, "orig.line").toBe(2);
+			t.expect(orig.line, "orig.line").toBe(3);
 			t.expect(orig.column, "orig.column").toBe(6);
 			t.expect(orig.name, "orig.name").toBe("_Main");
 
@@ -69,7 +69,7 @@ function main() {
 			t.note("for member function " + JSON.stringify(source[pos]));
 			orig = consumer.originalPositionFor(source[pos]);
 			t.note(JSON.stringify([source[pos], orig]));
-			t.expect(orig.line, "orig.line").toBe(6);
+			t.expect(orig.line, "orig.line").toBe(7);
 			t.expect(orig.column, "orig.column").toBe(13);
 			t.expect(orig.name, "orig.name").toBe("getFoo");
 
@@ -77,7 +77,7 @@ function main() {
 			t.note("for member variable " + JSON.stringify(source[pos]));
 			orig = consumer.originalPositionFor(source[pos]);
 			t.note(JSON.stringify([source[pos], orig]));
-			t.expect(orig.line, "orig.line").toBe(3);
+			t.expect(orig.line, "orig.line").toBe(4);
 			t.expect(orig.column, "orig.column").toBe(8);
 			t.expect(orig.name, "orig.name").toBe("foo");
 
@@ -85,7 +85,7 @@ function main() {
 			t.note("for static member variable " + JSON.stringify(source[pos]));
 			orig = consumer.originalPositionFor(source[pos]);
 			t.note(JSON.stringify([source[pos], orig]));
-			t.expect(orig.line, "orig.line").toBe(4);
+			t.expect(orig.line, "orig.line").toBe(5);
 			t.expect(orig.column, "orig.column").toBe(15);
 			t.expect(orig.name, "orig.name").toBe("bar");
 
@@ -93,7 +93,7 @@ function main() {
 			t.note("for parameters " + JSON.stringify(source[pos]));
 			orig = consumer.originalPositionFor(source[pos]);
 			t.note(JSON.stringify([source[pos], orig]));
-			t.expect(orig.line, "orig.line").toBe(14);
+			t.expect(orig.line, "orig.line").toBe(15);
 			t.expect(orig.column, "orig.column").toBe(25);
 			t.expect(orig.name, "orig.name").toBe("args");
 
@@ -104,7 +104,7 @@ function main() {
 			orig = consumer.originalPositionFor(tokens[0]);
 			if(orig) {
 				t.note(JSON.stringify([tokens[0], orig]));
-				t.expect(orig.line, "orig.line").toBe(10);
+				t.expect(orig.line, "orig.line").toBe(11);
 				t.expect(orig.column, "orig.column").toBe(20);
 				t.expect(orig.name, "orig.name").toBe("run");
 			}

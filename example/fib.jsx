@@ -40,7 +40,10 @@ class Fib {
 class _Main {
 	static function main(args : string[]) : void {
 		var n = args.length > 0 ? args[0] as number : 10;
-		log "fib(" + n as string + ") =", Fib.fib1(n);
+		log "fib1(" + n as string + ") =", Fib.fib1(n);
+		log "fib2(" + n as string + ") =", Fib.fib2(n);
+		log "fib3(" + n as string + ") =", Fib.fib3(n);
+		log "fib4(" + n as string + ") =", Fib.fib4(n);
 	}
 }
 
