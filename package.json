@@ -23,7 +23,7 @@
   },
   "devDependencies": {
       "browserbuild": "*",
-      "source-map": "*"
+      "source-map": "0.1.1"
   },
   "engines": {
     "node": ">= 0.6.0"
