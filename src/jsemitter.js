@@ -211,7 +211,7 @@ var _ReturnStatementEmitter = exports._ReturnStatementEmitter = _StatementEmitte
 		var expr = this._statement.getExpr();
 		if (expr != null) {
 			this._emitter._emit("return ", null);
-			this._emitter._getExpressionEmitterFor(this._statement.getExpr()).emit(0);
+			this._emitter._emitRHSOfAssignment(this._statement.getExpr(), this._emitter._emittingFunction.getReturnType());
 			this._emitter._emit(";\n", null);
 		} else {
 			this._emitter._emit("return;\n", this._statement.getToken());
