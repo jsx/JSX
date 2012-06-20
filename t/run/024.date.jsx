@@ -26,6 +26,7 @@ getTime: true
 getFullYear: 2012
 getMonth: 4
 getDate: 12
+getDay: 6
 getHours: 6
 getMinutes: 50
 getSeconds: 39
@@ -33,6 +34,7 @@ getMilliseconds: 777
 getUTCFullYear: 2012
 getUTCMonth: 4
 getUTCDate: 12
+getUTCDay: 5
 getUTCHours: 6
 getUTCMinutes: 50
 getUTCSeconds: 39
@@ -102,6 +104,8 @@ class Test {
 		log 'getMonth: ' + (d.getMonth()).toString();
 		log 'getDate: ' + (d.getDate()).toString();
 
+		log 'getDay: ' + (d.getDay()).toString();
+
 		log 'getHours: ' + (d.getHours()).toString();
 		log 'getMinutes: ' + (d.getMinutes()).toString();
 		log 'getSeconds: ' + (d.getSeconds()).toString();
@@ -110,6 +114,8 @@ class Test {
 		log 'getUTCFullYear: ' + (u.getUTCFullYear()).toString();
 		log 'getUTCMonth: ' + (u.getUTCMonth()).toString();
 		log 'getUTCDate: ' + (u.getUTCDate()).toString();
+
+		log 'getUTCDay: ' + (d.getUTCDay()).toString();
 
 		log 'getUTCHours: ' + (u.getUTCHours()).toString();
 		log 'getUTCMinutes: ' + (u.getUTCMinutes()).toString();

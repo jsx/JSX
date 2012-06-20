@@ -310,6 +310,8 @@ native final class Date {
 	function getUTCMonth() :number;
 	function getDate() :number;
 	function getUTCDate() :number;
+	function getDay() :number;
+	function getUTCDay() :number;
 	function getHours() :number;
 	function getUTCHours() :number;
 	function getMinutes() :number;
