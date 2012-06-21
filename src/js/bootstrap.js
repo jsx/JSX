@@ -32,6 +32,13 @@ function $__jsx_lazy_init(obj, prop, func) {
 	});
 }
 
+/**
+ * sideeffect().a /= b
+ */
+function $__jsx_div_assign(obj, prop, divisor) {
+	return obj[prop] = (obj[prop] / divisor) | 0;
+}
+
 /*
  * global functions called by JSX as Number.* (renamed so that they do not conflict with local variable names)
  */

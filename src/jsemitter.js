@@ -1344,6 +1344,10 @@ var _BinaryExpressionEmitter = exports._BinaryExpressionEmitter = _OperatorExpre
 			})) {
 				return;
 			}
+		} else if (this._expr.getToken().getValue() === "/="
+			&& this._expr.getFirstExpr().getType().resolveIfMayBeUndefined().equals(Type.integerType)) {
+			this._emitDivAssignToInt(outerOpPrecedence);
+			return;
 		}
 		// normal
 		_OperatorExpressionEmitter.prototype.emit.call(this, outerOpPrecedence);
@@ -1380,7 +1384,7 @@ var _BinaryExpressionEmitter = exports._BinaryExpressionEmitter = _OperatorExpre
 		// emit operator
 		this._emitter._emit(" " + op + " ", opToken);
 		// emit right-hand
-		if (this._expr instanceof AssignmentExpression) {
+		if (this._expr instanceof AssignmentExpression && op != "/=") {
 			this._emitter._emitRHSOfAssignment(secondExpr, firstExprType);
 		} else if (this._emitter._enableRunTimeTypeCheck && secondExpr instanceof MayBeUndefinedType) {
 			this._emitExpressionWithUndefinedAssertion(secondExpr);
@@ -1398,6 +1402,47 @@ var _BinaryExpressionEmitter = exports._BinaryExpressionEmitter = _OperatorExpre
 			return true;
 		} else {
 			return false;
+		}
+	},
+
+	_emitDivAssignToInt: function (outerOpPrecedence) {
+		var firstExpr = this._expr.getFirstExpr();
+		var secondExpr = this._expr.getSecondExpr();
+		if (firstExpr instanceof PropertyExpression || firstExpr instanceof ArrayExpression) {
+			this._emitter._emit("$__jsx_div_assign(", this._expr.getToken());
+			if (firstExpr instanceof PropertyExpression) {
+				this._emitter._getExpressionEmitterFor(firstExpr.getExpr()).emit(0);
+				this._emitter._emit(", ", this._expr.getToken());
+				this._emitter._emit(Util.encodeStringLiteral(firstExpr.getIdentifierToken().getValue()), firstExpr.getIdentifierToken());
+			} else {
+				this._emitter._getExpressionEmitterFor(firstExpr.getFirstExpr()).emit(0);
+				this._emitter._emit(", ", this._expr.getToken());
+				this._emitter._getExpressionEmitterFor(firstExpr.getSecondExpr()).emit(0);
+			}
+			this._emitter._emit(", ", this._expr.getToken());
+			if (this._emitter._enableRunTimeTypeCheck && secondExpr instanceof MayBeUndefinedType) {
+				this._emitExpressionWithUndefinedAssertion(secondExpr);
+			} else {
+				this._emitter._getExpressionEmitterFor(secondExpr).emit(0);
+			}
+			this._emitter._emit(")", this._expr.getToken());
+		} else {
+			this.emitWithPrecedence(outerOpPrecedence, _BinaryExpressionEmitter._operatorPrecedence["="], function () {
+				this._emitter._getExpressionEmitterFor(firstExpr).emit(_BinaryExpressionEmitter._operatorPrecedence["="]);
+				this._emitter._emit(" = (", this._expr.getToken());
+				if (this._emitter._enableRunTimeTypeCheck && firstExpr instanceof MayBeUndefinedType) {
+					this._emitExpressionWithUndefinedAssertion(firstExpr);
+				} else {
+					this._emitter._getExpressionEmitterFor(firstExpr).emit(_BinaryExpressionEmitter._operatorPrecedence["/"]);
+				}
+				this._emitter._emit(" / ", this._expr.getToken());
+				if (this._emitter._enableRunTimeTypeCheck && secondExpr instanceof MayBeUndefinedType) {
+					this._emitExpressionWithUndefinedAssertion(secondExpr);
+				} else {
+					this._emitter._getExpressionEmitterFor(secondExpr).emit(_BinaryExpressionEmitter._operatorPrecedence["/"] - 1);
+				}
+				this._emitter._emit(") | 0", this._expr.getToken());
+			}.bind(this));
 		}
 	},
 
