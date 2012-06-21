@@ -142,6 +142,7 @@ window.addEventListener('load', function(e) {
 		var a = li.children[0];
 		a.addEventListener('click', function(event) {
 			event.preventDefault();
+			event.stopPropagation();
 
 			input.dataset["path"] = a.dataset["path"];
 
@@ -152,10 +153,12 @@ window.addEventListener('load', function(e) {
 
 				input.value = xhr.responseText.replace(/\t/g, "  ");
 
-				forEach(list.children, function(li) {
-					li.className = "";
+				forEach(list.getElementsByTagName("li"), function(li) {
+					if(!li.className.match(/\bsource-file\b/)) return;
+
+					li.className = "source-file";
 				});
-				li.className = "active";
+				li.className = "source-file active";
 
 				compile({ mode: "run" });
 			};
