@@ -91,7 +91,7 @@ function main(args) {
 
 		var filename = path.join(process.cwd(), uri);
 
-		if(/\.html$/.test(filename)) {
+		if(/(?:\.html|\/)$/.test(filename)) {
 			child_process.execFile(
 				"perl", ["web/build.pl"],
 				function(error, stdout, stderr) {
