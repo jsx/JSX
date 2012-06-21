@@ -136,7 +136,7 @@ window.addEventListener('load', function(e) {
 	}
 
 	// set up example souce files
-	forEach(list.children, function(li) {
+	forEach(list.getElementsByTagName("li"), function(li) {
 		if(li.className !== "source-file") return;
 
 		var a = li.children[0];

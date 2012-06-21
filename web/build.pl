@@ -53,9 +53,7 @@ copy_r("$root/example", "$dest_root/example");
 copy_r("$project_root/t", "$dest_root/t");
 copy_r("$project_root/lib", "$dest_root/lib");
 
-my $template_dir = "$root/template";
-
-process_page("$template_dir/index.tmpl", "$dest_root/index.html");
+process_page("$root/index.html", "$dest_root/index.html");
 
 process_jsx($dest_src, "$dest_build/jsx-compiler.js");
 
@@ -70,8 +68,11 @@ sub info {
 
 sub make_list {
     my($prefix) = @_;
+    my $id = $prefix;
+    $id =~ s/\W/-/g;
+
     return join "",
-        qq{<li class="nav-header">$prefix</li>\n},
+        qq{<li id="$id" class="nav-header">$prefix</li>\n},
         map { qq{<li class="source-file"><a href="$prefix/$_" data-path="$prefix/$_">$_</a></li>\n} }
         map { basename($_) } glob("$root/../$prefix/*.jsx");
 }
@@ -89,13 +90,14 @@ sub process_page {
 
     # listing tests
     my $run = make_list("t/run");
+    my $lib = make_list("t/lib");
     my $err = make_list("t/compile_error");
 
     (my $content = $template) =~ s{
         <!-- \s* source-list \s* -->
         (.*)
         <!-- \s* /source-list \s* -->
-    }{$run$err}xmsg;
+    }{$run$lib$err}xmsg;
 
     open my($fh), '>', $dest;
     print $fh $content;
