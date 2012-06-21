@@ -1119,8 +1119,8 @@ var PropertyExpression = exports.PropertyExpression = UnaryExpression.extend({
 			return false;
 		}
 		if (exprType.resolveIfMayBeUndefined().equals(Type.variantType)) {
-			this._type = Type.variantType;
-			return true;
+			context.errors.push(new CompileError(this._identifierToken, "property of a variant should be referred to by using the [] operator"));
+			return false;
 		}
 		var classDef = exprType.getClassDef();
 		if (classDef == null) {

@@ -2,9 +2,6 @@
 1
 hello
 bar
-bar
-bar
-bar
 2
 hello
 world
@@ -22,15 +19,12 @@ class Test {
 				"world"
 			]
 		} : Map.<variant>;
-		log j.n;
+		log j["n"];
 		log j["s"];
-		log j.m.foo;
-		log j.m["foo"];
-		log j["m"].foo;
 		log j["m"]["foo"];
-		log j.a.length;
-		for (var i = 0; i < j.a.length as number; ++i) {
-			log j.a[i];
+		log j["a"]["length"];
+		for (var i = 0; i < j["a"]["length"] as number; ++i) {
+			log j["a"][i];
 		}
 	}
 }
