@@ -1,5 +1,8 @@
+
 (function (exports) {
 	"use strict";
+
+	var DEBUG = false;
 
 	function makeAlt(patterns) {
 		return "(?: \n" + patterns.join("\n | \n") + "\n)\n";
@@ -14,8 +17,8 @@
 	}
 
 	var ident         = " [\\$a-zA-Z_] [\\$a-zA-Z0-9_]* ";
-	var doubleQuoted  = ' "  [^"\\\\]* (?: \\\\. [^"\\\\]* )* " ';
-	var singleQuoted  = " '  [^'\\\\]* (?: \\\\. [^'\\\\]* )* ' ";
+	var doubleQuoted  = ' "  [^"\\n\\\\]* (?: \\\\. [^"\\n\\\\]* )* " ';
+	var singleQuoted  = doubleQuoted.replace(/"/g, "'");
 	var stringLiteral = makeAlt([singleQuoted, doubleQuoted]);
 	var regexpLiteral = doubleQuoted.replace(/"/g, "/") + "[mgi]*";
 
@@ -61,10 +64,12 @@
 	var rxRegExpLiteral  = rx("^" + regexpLiteral);
 	var rxKeyword        = rx("^" + makeAlt(keywords.map(quoteMeta)) + "\\b");
 
-	var literals = {
+	var endOfPrimaryExpr  = {
 		"null": true,
 		"false": true,
-		"true": true
+		"true": true,
+		")": true,
+		"]": true
 	};
 	function lastIsPrimaryExpr(tokens) {
 		var i = tokens.length - 1;
@@ -72,7 +77,7 @@
 			--i;
 		}
 
-		if(tokens[i].token in literals) {
+		if(tokens[i].token in endOfPrimaryExpr) {
 			return true;
 		}
 
@@ -129,6 +134,9 @@
 								src.charAt(0) + "'");
 			}
 			var token = matched[0];
+			if (DEBUG) {
+				console.info(matched);
+			}
 
 			src = src.slice(token.length);
 			tokens.push({
