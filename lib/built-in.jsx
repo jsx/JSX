@@ -418,4 +418,8 @@ native final class JSON {
 
 }
 
+native final class JSX {
+	static function getProfileResults() : variant;
+}
+
 // vim: set noexpandtab:
