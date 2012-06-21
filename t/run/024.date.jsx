@@ -34,7 +34,7 @@ getMilliseconds: 777
 getUTCFullYear: 2012
 getUTCMonth: 4
 getUTCDate: 12
-getUTCDay: 5
+getUTCDay: 6
 getUTCHours: 6
 getUTCMinutes: 50
 getUTCSeconds: 39
@@ -115,7 +115,7 @@ class Test {
 		log 'getUTCMonth: ' + (u.getUTCMonth()).toString();
 		log 'getUTCDate: ' + (u.getUTCDate()).toString();
 
-		log 'getUTCDay: ' + (d.getUTCDay()).toString();
+		log 'getUTCDay: ' + (u.getUTCDay()).toString();
 
 		log 'getUTCHours: ' + (u.getUTCHours()).toString();
 		log 'getUTCMinutes: ' + (u.getUTCMinutes()).toString();
