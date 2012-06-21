@@ -284,6 +284,11 @@ var JSX = Class.extend({
 			case "--test":
 				run = "_Test";
 				break;
+			case "--profile":
+				tasks.push(function () {
+					emitter.setEnableProfiler(true);
+				});
+				break;
 			case "--version":
 				console.log(JSX.meta("version"));
 				process.exit(0);
