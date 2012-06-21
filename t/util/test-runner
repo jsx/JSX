@@ -116,13 +116,20 @@ EOT
 sub compile_and_run {
     my($file) = @_;
 
+    my $opts = get_section($file, "JSX_OPTS");
+    if ($opts) {
+        chomp $opts;
+        plan skip_all => 'environment variable JSX_OPTS is set'
+            if $ENV{JSX_OPTS};
+    }
+
     plan tests => 1;
 
     defined(my $expected = get_section($file, "EXPECTED"))
         or die "could not find EXPECTED in file:$file\n";
 
     # compile (FIXME support C++)
-    my $src = compile_to_run($file) or do {
+    my $src = compile_to_run($file, $opts) or do {
         fail "compile '$file' failed: $?";
         return;
     };
