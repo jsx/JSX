@@ -109,8 +109,15 @@ var ClassDefinition = exports.ClassDefinition = Class.extend({
 		this._members = members;
 		this._objectTypesUsed = objectTypesUsed;
 		this._optimizerStash = {};
-		for (var i = 0; i < this._members.length; ++i)
+		for (var i = 0; i < this._members.length; ++i) {
 			this._members[i].setClassDef(this);
+			if (this._members[i] instanceof MemberFunctionDefinition) {
+				this._members[i].forEachClosure(function setClassDef(funcDef) {
+					funcDef.setClassDef(this);
+					return funcDef.forEachClosure(setClassDef.bind(this));
+				}.bind(this));
+			}
+		}
 	},
 
 	serialize: function () {
