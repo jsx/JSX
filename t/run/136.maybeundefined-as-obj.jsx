@@ -1,6 +1,6 @@
 /*EXPECTED
 abc
-null
+undefined
 */
 class Test {
 	static function run() : void {

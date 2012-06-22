@@ -749,9 +749,7 @@ var _FoldConstantCommand = exports._FoldConstantCommand = _FunctionOptimizeComma
 	},
 
 	_toFoldedExpr: function (expr, type) {
-		if (expr instanceof UndefinedExpression) {
-			return expr;
-		} else if (expr instanceof NullExpression) {
+		if (expr instanceof NullExpression) {
 			return expr;
 		} else if (expr instanceof BooleanLiteralExpression) {
 			return expr;

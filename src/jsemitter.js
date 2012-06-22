@@ -1366,9 +1366,10 @@ var _BinaryExpressionEmitter = exports._BinaryExpressionEmitter = _OperatorExpre
 			break;
 		case "==":
 		case "!=":
-			// equality operators of JSX are strict equality ops in JS (expect if either operand is an object and the other is the primitive counterpart)
-			if ((firstExprType instanceof ObjectType) + (secondExprType instanceof ObjectType) != 1)
+			// NOTE: works for cases where one side is an object and the other is the primitive counterpart
+			if (firstExprType instanceof PrimitiveType && secondExprType instanceof PrimitiveType) {
 				op += "=";
+			}
 			break;
 		}
 		// emit left-hand
