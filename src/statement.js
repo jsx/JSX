@@ -311,7 +311,7 @@ var DeleteStatement = exports.DeleteStatement = UnaryExpressionStatement.extend(
 		var secondExprType = this._expr.getSecondExpr().getType();
 		if (secondExprType == null)
 			return true; // error should have been already reported
-		if (! secondExprType.resolveIfMayBeUndefined().equals(Type.stringType)) {
+		if (! secondExprType.resolveIfNullable().equals(Type.stringType)) {
 			context.errors.push(new CompileError(this._token, "only properties of a hash object can be deleted"));
 			return true;
 		}
@@ -566,7 +566,7 @@ var DoWhileStatement = exports.DoWhileStatement = ContinuableStatement.extend({
 			if (! Statement.assertIsReachable(context, this._expr.getToken()))
 				return false;
 			if (this._analyzeExpr(context, this._expr))
-				if (this._expr.getType().resolveIfMayBeUndefined().equals(Type.voidType))
+				if (this._expr.getType().resolveIfNullable().equals(Type.voidType))
 					context.errors.push(new CompileError(this._expr.getToken(), "expression of the do-while statement should not return void"));
 			this.registerVariableStatusesOnBreak(context.getTopBlock().localVariableStatuses);
 			this._finalizeBlockAnalysis(context);
@@ -628,7 +628,7 @@ var ForInStatement = exports.ForInStatement = ContinuableStatement.extend({
 	doAnalyze: function (context) {
 		if (! this._analyzeExpr(context, this._listExpr))
 			return true;
-		var listType = this._listExpr.getType().resolveIfMayBeUndefined();
+		var listType = this._listExpr.getType().resolveIfNullable();
 		var listClassDef;
 		var listTypeName;
 		if (listType instanceof ObjectType
@@ -721,7 +721,7 @@ var ForStatement = exports.ForStatement = ContinuableStatement.extend({
 			this._analyzeExpr(context, this._initExpr);
 		if (this._condExpr != null)
 			if (this._analyzeExpr(context, this._condExpr))
-				if (this._condExpr.getType().resolveIfMayBeUndefined().equals(Type.voidType))
+				if (this._condExpr.getType().resolveIfNullable().equals(Type.voidType))
 					context.errors.push(new CompileError(this._condExpr.getToken(), "condition expression of the for statement should not return void"));
 		this._prepareBlockAnalysis(context);
 		try {
@@ -806,7 +806,7 @@ var IfStatement = exports.IfStatement = Statement.extend({
 
 	doAnalyze: function (context) {
 		if (this._analyzeExpr(context, this._expr))
-			if (this._expr.getType().resolveIfMayBeUndefined().equals(Type.voidType))
+			if (this._expr.getType().resolveIfNullable().equals(Type.voidType))
 				context.errors.push(new CompileError(this._expr.getToken(), "expression of the if statement should not return void"));
 		// if the expr is true
 		context.blockStack.push(new BlockContext(context.getTopBlock().localVariableStatuses.clone(), this));
@@ -887,7 +887,7 @@ var SwitchStatement = exports.SwitchStatement = LabellableStatement.extend({
 	doAnalyze: function (context) {
 		if (! this._analyzeExpr(context, this._expr))
 			return true;
-		var exprType = this._expr.getType().resolveIfMayBeUndefined();
+		var exprType = this._expr.getType().resolveIfNullable();
 		if (! (exprType.equals(Type.booleanType) || exprType.equals(Type.integerType) || exprType.equals(Type.numberType) || exprType.equals(Type.stringType))) {
 			context.errors.push(new CompileError(this._token, "switch statement only accepts boolean, number, or string expressions"));
 			return true;
@@ -966,11 +966,11 @@ var CaseStatement = exports.CaseStatement = Statement.extend({
 		var expectedType = statement.getExpr().getType();
 		if (expectedType == null)
 			return true;
-		expectedType = expectedType.resolveIfMayBeUndefined();
+		expectedType = expectedType.resolveIfNullable();
 		var exprType = this._expr.getType();
 		if (exprType == null)
 			return true;
-		exprType = exprType.resolveIfMayBeUndefined();
+		exprType = exprType.resolveIfNullable();
 		if (exprType.equals(expectedType)) {
 			// ok
 		} else if (Type.isIntegerOrNumber(exprType) && Type.isIntegerOrNumber(expectedType)) {
@@ -1055,7 +1055,7 @@ var WhileStatement = exports.WhileStatement = ContinuableStatement.extend({
 
 	doAnalyze: function (context) {
 		if (this._analyzeExpr(context, this._expr))
-			if (this._expr.getType().resolveIfMayBeUndefined().equals(Type.voidType))
+			if (this._expr.getType().resolveIfNullable().equals(Type.voidType))
 				context.errors.push(new CompileError(this._expr.getToken(), "expression of the while statement should not return void"));
 		this._prepareBlockAnalysis(context);
 		try {

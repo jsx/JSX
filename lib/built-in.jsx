@@ -29,7 +29,7 @@ native class Object {
 // 15.2
 native final class Map.<T> {
 
-	function __native_index_operator__(key : string) : MayBeUndefined.<T>;
+	function __native_index_operator__(key : string) : Nullable.<T>;
 
 	// 15.2.4
 	function hasOwnProperty(key : string) : boolean;
@@ -47,7 +47,7 @@ native final class Array.<T> {
 	function constructor();
 	function constructor(length : number);
 
-	function __native_index_operator__(n : number) : MayBeUndefined.<T>;
+	function __native_index_operator__(n : number) : Nullable.<T>;
 
 	// 15.4.4
 	override function toString() : string;
@@ -55,47 +55,47 @@ native final class Array.<T> {
 	function concat(...a : Array.<T>) : Array.<T>;
 	function join() : string;
 	function join(separator : string) : string;
-	function pop() : MayBeUndefined.<T>;
+	function pop() : Nullable.<T>;
 	function push(...item : T) : int;
 	function reverse() : Array.<T>;
-	function shift() : MayBeUndefined.<T>;
+	function shift() : Nullable.<T>;
 	function slice(start : int) : Array.<T>;
 	function slice(start : int, end : int) : Array.<T>;
 	function sort() : Array.<T>;
-	function sort(comparefn : function (x : MayBeUndefined.<T>, y : MayBeUndefined.<T>) : int) : Array.<T>;
-	function sort(comparefn : function (x : MayBeUndefined.<T>, y : MayBeUndefined.<T>) : number) : Array.<T>;
+	function sort(comparefn : function (x : Nullable.<T>, y : Nullable.<T>) : int) : Array.<T>;
+	function sort(comparefn : function (x : Nullable.<T>, y : Nullable.<T>) : number) : Array.<T>;
 	function splice(start : int, deleteCount : int, ...item : T) : Array.<T>;
 	function unshift(...item : T) : int;
 
 	// 15.4.4 (ES5)
-	function indexOf(value : MayBeUndefined.<T>) : number;
-	function indexOf(value : MayBeUndefined.<T>, fromIndex : number) : number;
-	function lastIndexOf(value : MayBeUndefined.<T>) : number;
-	function lastIndexOf(value : MayBeUndefined.<T>, fromIndex : number) : number;
-	function every(callbackfn : function(value : MayBeUndefined.<T>) : boolean) : boolean;
-	function every(callbackfn : function(value : MayBeUndefined.<T>, index : number) : boolean) : boolean;
-	function every(callbackfn : function(value : MayBeUndefined.<T>, index : number, array : Array.<T>) : boolean) : boolean;
-	function some(callbackfn : function(value : MayBeUndefined.<T>) : boolean) : boolean;
-	function some(callbackfn : function(value : MayBeUndefined.<T>, index : number) : boolean) : boolean;
-	function some(callbackfn : function(value : MayBeUndefined.<T>, index : number, array : Array.<T>) : boolean) : boolean;
-	inline function forEach(callbackfn : function(value : MayBeUndefined.<T>) : void) : void {
+	function indexOf(value : Nullable.<T>) : number;
+	function indexOf(value : Nullable.<T>, fromIndex : number) : number;
+	function lastIndexOf(value : Nullable.<T>) : number;
+	function lastIndexOf(value : Nullable.<T>, fromIndex : number) : number;
+	function every(callbackfn : function(value : Nullable.<T>) : boolean) : boolean;
+	function every(callbackfn : function(value : Nullable.<T>, index : number) : boolean) : boolean;
+	function every(callbackfn : function(value : Nullable.<T>, index : number, array : Array.<T>) : boolean) : boolean;
+	function some(callbackfn : function(value : Nullable.<T>) : boolean) : boolean;
+	function some(callbackfn : function(value : Nullable.<T>, index : number) : boolean) : boolean;
+	function some(callbackfn : function(value : Nullable.<T>, index : number, array : Array.<T>) : boolean) : boolean;
+	inline function forEach(callbackfn : function(value : Nullable.<T>) : void) : void {
 		for (var i in this) {
 			callbackfn(this[i]);
 		}
 	}
-	function forEach(callbackfn : function(value : MayBeUndefined.<T>, index : number) : void) : void;
-	function forEach(callbackfn : function(value : MayBeUndefined.<T>, index : number, array : Array.<T>) : void) : void;
-	function map(callbackfn : function(value : MayBeUndefined.<T>) : MayBeUndefined.<T>) : Array.<T>;
-	function map(callbackfn : function(value : MayBeUndefined.<T>, index : number) : MayBeUndefined.<T>) : Array.<T>;
-	function map(callbackfn : function(value : MayBeUndefined.<T>, index : number, array : Array.<T>) : MayBeUndefined.<T>) : Array.<T>;
-	function filter(callbackfn : function(value : MayBeUndefined.<T>) : boolean) : Array.<T>;
-	function filter(callbackfn : function(value : MayBeUndefined.<T>, index : number) : boolean) : Array.<T>;
-	function filter(callbackfn : function(value : MayBeUndefined.<T>, index : number, array : Array.<T>) : boolean) : Array.<T>;
+	function forEach(callbackfn : function(value : Nullable.<T>, index : number) : void) : void;
+	function forEach(callbackfn : function(value : Nullable.<T>, index : number, array : Array.<T>) : void) : void;
+	function map(callbackfn : function(value : Nullable.<T>) : Nullable.<T>) : Array.<T>;
+	function map(callbackfn : function(value : Nullable.<T>, index : number) : Nullable.<T>) : Array.<T>;
+	function map(callbackfn : function(value : Nullable.<T>, index : number, array : Array.<T>) : Nullable.<T>) : Array.<T>;
+	function filter(callbackfn : function(value : Nullable.<T>) : boolean) : Array.<T>;
+	function filter(callbackfn : function(value : Nullable.<T>, index : number) : boolean) : Array.<T>;
+	function filter(callbackfn : function(value : Nullable.<T>, index : number, array : Array.<T>) : boolean) : Array.<T>;
 
-	function reduce(callbackfn : function(previousValue : MayBeUndefined.<T>, currentValue : MayBeUndefined.<T>) : MayBeUndefined.<T>) : Array.<T>;
-	function reduce(callbackfn : function(previousValue : MayBeUndefined.<T>, currentValue : MayBeUndefined.<T>) : MayBeUndefined.<T>, initialValue : T) : Array.<T>;
-	function reduceRight(callbackfn : function(previousValue : MayBeUndefined.<T>, currentValue : MayBeUndefined.<T>) : MayBeUndefined.<T>) : Array.<T>;
-	function reduceRight(callbackfn : function(previousValue : MayBeUndefined.<T>, currentValue : MayBeUndefined.<T>) : MayBeUndefined.<T>, initialValue : T) : Array.<T>;
+	function reduce(callbackfn : function(previousValue : Nullable.<T>, currentValue : Nullable.<T>) : Nullable.<T>) : Array.<T>;
+	function reduce(callbackfn : function(previousValue : Nullable.<T>, currentValue : Nullable.<T>) : Nullable.<T>, initialValue : T) : Array.<T>;
+	function reduceRight(callbackfn : function(previousValue : Nullable.<T>, currentValue : Nullable.<T>) : Nullable.<T>) : Array.<T>;
+	function reduceRight(callbackfn : function(previousValue : Nullable.<T>, currentValue : Nullable.<T>) : Nullable.<T>, initialValue : T) : Array.<T>;
 
 	// 15.4.5
 	var length : int;

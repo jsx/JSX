@@ -50,8 +50,8 @@ var Type = exports.Type = Class.extend({
 		return this == x || ((x instanceof Type) && this.toString() == x.toString());
 	},
 
-	resolveIfMayBeUndefined: function () {
-		if (this instanceof MayBeUndefinedType)
+	resolveIfNullable: function () {
+		if (this instanceof NullableType)
 			return this.getBaseType();
 		return this;
 	},
@@ -60,9 +60,9 @@ var Type = exports.Type = Class.extend({
 		return this;
 	},
 
-	toMayBeUndefinedType: function (force) {
+	toNullableType: function (force) {
 		if (force || this instanceof PrimitiveType) {
-			return new MayBeUndefinedType(this);
+			return new NullableType(this);
 		}
 		return this;
 	},
@@ -121,7 +121,7 @@ var NullType = exports.NullType = Type.extend({
 	},
 
 	isConvertibleTo: function (type) {
-		return type instanceof MayBeUndefinedType || type instanceof ObjectType || type instanceof VariantType || type instanceof StaticFunctionType;
+		return type instanceof NullableType || type instanceof ObjectType || type instanceof VariantType || type instanceof StaticFunctionType;
 	},
 
 	getClassDef: function () {
@@ -153,7 +153,7 @@ var BooleanType = exports.BooleanType = PrimitiveType.extend({
 	$_classDef: null,
 
 	isConvertibleTo: function (type) {
-		type = type.resolveIfMayBeUndefined();
+		type = type.resolveIfNullable();
 		return type instanceof BooleanType || type instanceof VariantType;
 	},
 
@@ -172,7 +172,7 @@ var IntegerType = exports.IntegerType = PrimitiveType.extend({
 	$_classDef: null,
 
 	isConvertibleTo: function (type) {
-		type = type.resolveIfMayBeUndefined();
+		type = type.resolveIfNullable();
 		return type instanceof IntegerType || type instanceof NumberType || type instanceof VariantType;
 	},
 
@@ -191,7 +191,7 @@ var NumberType = exports.NumberType = PrimitiveType.extend({
 	$_classDef: null,
 
 	isConvertibleTo: function (type) {
-		type = type.resolveIfMayBeUndefined();
+		type = type.resolveIfNullable();
 		return type instanceof IntegerType || type instanceof NumberType || type instanceof VariantType;
 	},
 
@@ -210,7 +210,7 @@ var StringType = exports.StringType = PrimitiveType.extend({
 	$_classDef: null,
 
 	isConvertibleTo: function (type) {
-		type = type.resolveIfMayBeUndefined();
+		type = type.resolveIfNullable();
 		return type instanceof StringType || type instanceof VariantType;
 	},
 
@@ -236,7 +236,7 @@ var VariantType = exports.VariantType = Type.extend({
 	},
 
 	isConvertibleTo: function (type) {
-		type = type.resolveIfMayBeUndefined();
+		type = type.resolveIfNullable();
 		return type instanceof VariantType;
 	},
 
@@ -250,22 +250,22 @@ var VariantType = exports.VariantType = Type.extend({
 
 });
 
-// MayBeUndefined
-var MayBeUndefinedType = exports.MayBeUndefinedType = Type.extend({
+// Nullable
+var NullableType = exports.NullableType = Type.extend({
 
 	constructor: function (type) {
 		if (type.equals(Type.variantType))
-			throw new Error("logic error, cannot create MayBeUndefined.<variant>");
-		this._baseType = type instanceof MayBeUndefinedType ? type._baseType : type;
+			throw new Error("logic error, cannot create Nullable.<variant>");
+		this._baseType = type instanceof NullableType ? type._baseType : type;
 	},
 
 	instantiate: function (instantiationContext) {
-		var baseType = this._baseType.resolveIfMayBeUndefined().instantiate(instantiationContext);
-		return baseType.toMayBeUndefinedType();
+		var baseType = this._baseType.resolveIfNullable().instantiate(instantiationContext);
+		return baseType.toNullableType();
 	},
 
 	isConvertibleTo: function (type) {
-		return this._baseType.isConvertibleTo(type instanceof MayBeUndefinedType ? type._baseType : type);
+		return this._baseType.isConvertibleTo(type instanceof NullableType ? type._baseType : type);
 	},
 
 	isAssignable: function () {
@@ -281,7 +281,7 @@ var MayBeUndefinedType = exports.MayBeUndefinedType = Type.extend({
 	},
 
 	toString: function () {
-		return "MayBeUndefined.<" + this._baseType.toString() + ">";
+		return "Nullable.<" + this._baseType.toString() + ">";
 	}
 
 });
@@ -339,7 +339,7 @@ var ObjectType = exports.ObjectType = Type.extend({
 	},
 
 	isConvertibleTo: function (type) {
-		type = type.resolveIfMayBeUndefined();
+		type = type.resolveIfNullable();
 		if (type instanceof VariantType)
 			return true;
 		// conversions from Number / String to number / string is handled in each operator (since the behavior differ bet. the operators)
@@ -391,8 +391,8 @@ var ParsedObjectType = exports.ParsedObjectType = ObjectType.extend({
 		for (var i = 0; i < this._typeArguments.length; ++i) {
 			var actualType = instantiationContext.typemap[this._typeArguments[i].toString()];
 			typeArgs[i] = actualType != undefined ? actualType : this._typeArguments[i];
-			// special handling for Array.<T> (T should not be MayBeUndefinedType)
-			if (typeArgs[i] instanceof MayBeUndefinedType && this._qualifiedName.getToken().getValue() == "Array") {
+			// special handling for Array.<T> (T should not be NullableType)
+			if (typeArgs[i] instanceof NullableType && this._qualifiedName.getToken().getValue() == "Array") {
 				typeArgs[i] = typeArgs[i].getBaseType();
 			}
 		}
@@ -625,7 +625,7 @@ var StaticFunctionType = exports.StaticFunctionType = ResolvedFunctionType.exten
 	},
 
 	isConvertibleTo: function (type) {
-		type = type.resolveIfMayBeUndefined();
+		type = type.resolveIfNullable();
 		if (type instanceof VariantType)
 			return true;
 		if (! (type instanceof StaticFunctionType))

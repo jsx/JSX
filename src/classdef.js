@@ -613,7 +613,7 @@ var ClassDefinition = exports.ClassDefinition = Class.extend({
 				var overrideReturnType = overrideDef.getReturnType();
 				var memberReturnType = this._members[i].getReturnType();
 				if (! (overrideReturnType.equals(memberReturnType) || overrideReturnType.isConvertibleTo(memberReturnType))
-					|| (memberReturnType instanceof Type.MayBeUndefinedType && ! (overrideReturnType instanceof Type.MayBeUndefinedType))) {
+					|| (memberReturnType instanceof Type.NullableType && ! (overrideReturnType instanceof Type.NullableType))) {
 					// only allow narrowing the return type
 					context.errors.push(new CompileError(overrideDef.getToken(), "return type '" + overrideReturnType.toString() + "' is not convertible to '" + memberReturnType.toString() + "'"));
 					return false;
