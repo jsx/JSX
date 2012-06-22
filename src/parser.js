@@ -1018,11 +1018,13 @@ var Parser = exports.Parser = Class.extend({
 			return false;
 		var members = [];
 
+		this._templateTypeArgs = typeArgs;
+
 		var success = true;
 		while (this._expectOpt("}") == null) {
 			if (! this._expectIsNotEOF())
 				break;
-			var member = this._memberDefinition(flags, typeArgs != null);
+			var member = this._memberDefinition(flags);
 			if (member != null) {
 				for (var i = 0; i < members.length; ++i) {
 					if (member.name() == members[i].name()
@@ -1085,7 +1087,7 @@ var Parser = exports.Parser = Class.extend({
 		return true;
 	},
 
-	_memberDefinition: function (classFlags, isTemplate) {
+	_memberDefinition: function (classFlags) {
 		var flags = 0;
 		while (true) {
 			var token = this._expect([ "function", "var", "static", "abstract", "override", "final", "const", "native", "__readonly__", "inline" ]);
@@ -1182,7 +1184,7 @@ var Parser = exports.Parser = Class.extend({
 		if (! this._expect(";"))
 			return null;
 		// all non-native, non-template values have initial value
-		if (! isTemplate && initialValue == null && (classFlags & ClassDefinition.IS_NATIVE) == 0)
+		if (this._templateTypeArgs == null && initialValue == null && (classFlags & ClassDefinition.IS_NATIVE) == 0)
 			initialValue = Expression.getDefaultValueExpressionOf(type);
 		return new MemberVariableDefinition(token, name, flags, type, initialValue);
 	},
@@ -1278,29 +1280,34 @@ var Parser = exports.Parser = Class.extend({
 	_typeDeclarationNoArrayNoVoid: function () {
 		var typeDecl;
 		var token = this._expectOpt([ "MayBeUndefined", "variant" ]);
-		if (token != null) {
-			switch (token.getValue()) {
-			case "MayBeUndefined":
-				if (this._expect(".") == null
-					|| this._expect("<") == null)
-					return null;
-				var baseType = this._primaryTypeDeclaration();
-				if (baseType == null)
-					return null;
-				if (this._expect(">") == null)
-					return null;
-				typeDecl = baseType.toMayBeUndefinedType();
-				break;
-			case "variant":
-				typeDecl = Type.variantType;
-				break;
-			default:
-				throw new Error("logic flaw");
-			}
-		} else {
-			typeDecl = this._primaryTypeDeclaration();
+		if (token == null) {
+			return this._primaryTypeDeclaration();
 		}
-		return typeDecl;
+		switch (token.getValue()) {
+		case "MayBeUndefined":
+			if (this._expect(".") == null
+				|| this._expect("<") == null)
+				return null;
+			var baseType = this._primaryTypeDeclaration();
+			if (baseType == null)
+				return null;
+			if (this._expect(">") == null)
+				return null;
+			if (this._templateTypeArgs != null) {
+				for (var i = 0; i < this._templateTypeArgs.length; ++i) {
+					if (baseType.equals(new ParsedObjectType(new QualifiedName(this._templateTypeArgs[i], null), []))) {
+						return baseType.toMayBeUndefinedType(true); // instantiation using template type
+					}
+				}
+			}
+			return baseType.toMayBeUndefinedType();
+			break;
+		case "variant":
+			return Type.variantType;
+			break;
+		default:
+			throw new Error("logic flaw");
+		}
 	},
 
 	_primaryTypeDeclaration: function () {
@@ -2396,7 +2403,6 @@ var Parser = exports.Parser = Class.extend({
 			case "this":
 				return new ThisExpression(token, null);
 			case "undefined":
-				return new UndefinedExpression(token);
 			case "null":
 				return this._nullLiteral(token);
 			case "false":

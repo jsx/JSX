@@ -30,7 +30,6 @@ var Type = exports.Type = Class.extend({
 
 	$_initialize: function () {
 		this.voidType = new VoidType();
-		this.undefinedType = new UndefinedType();
 		this.nullType = new NullType();
 		this.booleanType = new BooleanType();
 		this.integerType = new IntegerType();
@@ -61,10 +60,11 @@ var Type = exports.Type = Class.extend({
 		return this;
 	},
 
-	toMayBeUndefinedType: function () {
-		if (this instanceof MayBeUndefinedType || this instanceof VariantType)
-			return this;
-		return new MayBeUndefinedType(this);
+	toMayBeUndefinedType: function (force) {
+		if (force || this instanceof PrimitiveType) {
+			return new MayBeUndefinedType(this);
+		}
+		return this;
 	},
 
 	$templateTypeToString: function (parameterizedTypeName, typeArgs) {
@@ -121,8 +121,7 @@ var NullType = exports.NullType = Type.extend({
 	},
 
 	isConvertibleTo: function (type) {
-		type = type.resolveIfMayBeUndefined();
-		return type instanceof ObjectType || type instanceof VariantType || type instanceof StaticFunctionType;
+		return type instanceof MayBeUndefinedType || type instanceof ObjectType || type instanceof VariantType || type instanceof StaticFunctionType;
 	},
 
 	getClassDef: function () {
@@ -251,33 +250,7 @@ var VariantType = exports.VariantType = Type.extend({
 
 });
 
-// undefined and MayBeUndefined
-
-var UndefinedType = exports.UndefinedType = Type.extend({
-
-	instantiate: function (instantiationContext) {
-		return this;
-	},
-
-	isAssignable: function () {
-		return false;
-	},
-
-	isConvertibleTo: function (type) {
-		return type instanceof MayBeUndefinedType || type instanceof VariantType;
-	},
-
-	getClassDef: function () {
-		throw new Error("not supported");
-	},
-
-	toString: function () {
-		return "undefined";
-	}
-
-});
-
-
+// MayBeUndefined
 var MayBeUndefinedType = exports.MayBeUndefinedType = Type.extend({
 
 	constructor: function (type) {

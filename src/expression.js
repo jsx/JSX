@@ -112,8 +112,6 @@ var Expression = exports.Expression = Class.extend({
 			return new NumberLiteralExpression(new Parser.Token("0", false));
 		else if (type.equals(Type.stringType))
 			return new StringLiteralExpression(new Parser.Token("\"\"", false));
-		else if (type instanceof MayBeUndefinedType)
-			return new UndefinedExpression(new Parser.Token("undefined", false));
 		else
 			return new NullExpression(new Parser.Token("null", false), type);
 	}
@@ -250,33 +248,6 @@ var ClassExpression = exports.ClassExpression = LeafExpression.extend({
 	assertIsAssignable: function (context, token, type) {
 		context.errors.push(new CompileError(token, "cannot modify a class definition"));
 		return false;
-	}
-
-});
-
-var UndefinedExpression = exports.UndefinedExpression = LeafExpression.extend({
-
-	constructor: function (token) {
-		LeafExpression.prototype.constructor.call(this, token);
-	},
-
-	clone: function () {
-		return new UndefinedExpression(this._token);
-	},
-
-	serialize: function () {
-		return [
-			"UndefinedExpression",
-			this._token.serialize()
-		];
-	},
-
-	analyze: function (context, parentExpr) {
-		return true;
-	},
-
-	getType: function () {
-		return Type.undefinedType;
 	}
 
 });

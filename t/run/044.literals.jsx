@@ -1,5 +1,5 @@
 /*EXPECTED
-null
+undefined
 undefined
 true
 false

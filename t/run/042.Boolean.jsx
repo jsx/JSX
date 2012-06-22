@@ -4,7 +4,7 @@ true
 false
 false
 true
-null
+undefined
 */
 class Test {
 	static function run() : void {

@@ -1,6 +1,6 @@
 /*EXPECTED
-null
-null
+undefined
+undefined
 */
 interface I {
 }

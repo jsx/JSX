@@ -647,20 +647,6 @@ var _ClassExpressionEmitter = exports._ClassExpressionEmitter = _ExpressionEmitt
 
 });
 
-var _UndefinedExpressionEmitter = exports._UndefinedExpressionEmitter = _ExpressionEmitter.extend({
-
-	constructor: function (emitter, expr) {
-		_ExpressionEmitter.prototype.constructor.call(this, emitter);
-		this._expr = expr;
-	},
-
-	emit: function (outerOpPrecedence) {
-		var token = this._expr.getToken();
-		this._emitter._emit("undefined", token);
-	}
-
-});
-
 var _NullExpressionEmitter = exports._NullExpressionEmitter = _ExpressionEmitter.extend({
 
 	constructor: function (emitter, expr) {
@@ -670,7 +656,7 @@ var _NullExpressionEmitter = exports._NullExpressionEmitter = _ExpressionEmitter
 
 	emit: function (outerOpPrecedence) {
 		var token = this._expr.getToken();
-		this._emitter._emit("null", token);
+		this._emitter._emit("undefined", token);
 	}
 
 });
@@ -1118,7 +1104,7 @@ var _AsNoConvertExpressionEmitter = exports._AsNoConvertExpressionEmitter = _Exp
 				return;
 			} else if (destType instanceof FunctionType) {
 				emitWithAssertion(function () {
-					this._emitter._emit("v === null || typeof v === \"function\"", this._expr.getToken());
+					this._emitter._emit("v == null || typeof v === \"function\"", this._expr.getToken());
 				}.bind(this), "detected invalid cast, value is not a function or null");
 				return;
 			} else if (destType instanceof ObjectType) {
@@ -1127,17 +1113,17 @@ var _AsNoConvertExpressionEmitter = exports._AsNoConvertExpressionEmitter = _Exp
 					// skip
 				} else if (destClassDef instanceof InstantiatedClassDefinition && destClassDef.getTemplateClassName() == "Array") {
 					emitWithAssertion(function () {
-						this._emitter._emit("v === null || v instanceof Array", this._expr.getToken());
+						this._emitter._emit("v == null || v instanceof Array", this._expr.getToken());
 					}.bind(this), "detected invalid cast, value is not an Array or null");
 					return;
 				} else if (destClassDef instanceof InstantiatedClassDefinition && destClassDef.getTemplateClassName() == "Map") {
 					emitWithAssertion(function () {
-						this._emitter._emit("v === null || typeof v === \"object\"", this._expr.getToken());
+						this._emitter._emit("v == null || typeof v === \"object\"", this._expr.getToken());
 					}.bind(this), "detected invalid cast, value is not a Map or null");
 					return;
 				} else {
 					emitWithAssertion(function () {
-						this._emitter._emit("v === null || v instanceof " + destClassDef.getOutputClassName(), this._expr.getToken());
+						this._emitter._emit("v == null || v instanceof " + destClassDef.getOutputClassName(), this._expr.getToken());
 					}.bind(this), "detected invalid cast, value is not an instance of the designated type or null");
 					return;
 				}
@@ -2111,8 +2097,7 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 	_emitStaticMemberVariable: function (holder, variable) {
 		var initialValue = variable.getInitialValue();
 		if (initialValue != null
-			&& ! (initialValue instanceof UndefinedExpression
-				|| initialValue instanceof NullExpression
+			&& ! (initialValue instanceof NullExpression
 				|| initialValue instanceof BooleanLiteralExpression
 				|| initialValue instanceof IntegerLiteralExpression
 				|| initialValue instanceof NumberLiteralExpression
@@ -2257,8 +2242,6 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 			return new _LocalExpressionEmitter(this, expr);
 		else if (expr instanceof ClassExpression)
 			return new _ClassExpressionEmitter(this, expr);
-		else if (expr instanceof UndefinedExpression)
-			return new _UndefinedExpressionEmitter(this, expr);
 		else if (expr instanceof NullExpression)
 			return new _NullExpressionEmitter(this, expr);
 		else if (expr instanceof BooleanLiteralExpression)
