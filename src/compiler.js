@@ -441,11 +441,21 @@ var Compiler = exports.Compiler = Class.extend({
 	},
 
 	_handleErrors: function (errors) {
-		if (errors.length != 0 && this._mode != Compiler.MODE_COMPLETE) {
-			this._printErrors(errors);
-			return false;
+		// ignore all messages
+		if (this._mode == Compiler.MODE_COMPLETE) {
+			errors.splice(0, errors.length);
+			return true;
 		}
-		return true;
+		// print issues
+		var isFatal = false;
+		errors.forEach(function (error) {
+			this._platform.error(error.format(this));
+			if (error instanceof CompileError)
+				isFatal = true;
+		}.bind(this));
+		// clear all errors
+		errors.splice(0, errors.length);
+		return ! isFatal;
 	},
 
 	_printErrors: function (errors) {

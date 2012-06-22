@@ -619,6 +619,10 @@ var Parser = exports.Parser = Class.extend({
 		this._errors.push(new CompileError(this._filename, this._lineNumber, this._getColumn(), message));
 	},
 
+	_newDeprecatedWarning: function (message) {
+		this._errors.push(new DeprecatedWarning(this._filename, this._lineNumber, this._getColumn(), message));
+	},
+
 	_advanceToken: function () {
 		this._forwardPos(this._tokenLength);
 		this._tokenLength = 0;
@@ -1285,6 +1289,8 @@ var Parser = exports.Parser = Class.extend({
 		}
 		switch (token.getValue()) {
 		case "MayBeUndefined":
+			this._newDeprecatedWarning("use of 'MayBeUndefined' is deprerated, use 'Nullable' instead");
+			// falls through
 		case "Nullable":
 			if (this._expect(".") == null
 				|| this._expect("<") == null)
@@ -2404,6 +2410,8 @@ var Parser = exports.Parser = Class.extend({
 			case "this":
 				return new ThisExpression(token, null);
 			case "undefined":
+				this._newDeprecatedWarning("use of 'undefined' is deprerated, use 'null' instead");
+				// falls through
 			case "null":
 				return this._nullLiteral(token);
 			case "false":
