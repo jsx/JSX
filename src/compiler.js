@@ -100,6 +100,7 @@ var Compiler = exports.Compiler = Class.extend({
 		this._platform = platform;
 		this._mode = Compiler.MODE_COMPILE;
 		this._optimizer = null;
+		this._warningFilters = [];
 		this._parsers = [];
 		this._fileCache = {};
 		this._searchPaths = [ this._platform.getRoot() + "/lib/common" ];
@@ -131,6 +132,10 @@ var Compiler = exports.Compiler = Class.extend({
 
 	setOptimizer: function (optimizer) {
 		this._optimizer = optimizer;
+	},
+
+	getWarningFilters: function () {
+		return this._warningFilters;
 	},
 
 	addSourceFile: function (token, path, completionRequest) {
@@ -449,9 +454,19 @@ var Compiler = exports.Compiler = Class.extend({
 		// print issues
 		var isFatal = false;
 		errors.forEach(function (error) {
-			this._platform.error(error.format(this));
-			if (error instanceof CompileError)
+			if (error instanceof CompileWarning) {
+				var doWarn = null;
+				for (var i = 0; i < this._warningFilters.length; ++i) {
+					if ((doWarn = this._warningFilters[i](error)) !== null)
+						break;
+				}
+				if (doWarn !== false) {
+					this._platform.error(error.format(this));
+				}
+			} else {
+				this._platform.error(error.format(this));
 				isFatal = true;
+			}
 		}.bind(this));
 		// clear all errors
 		errors.splice(0, errors.length);

@@ -163,6 +163,7 @@ var JSX = Class.extend({
 			"  --target (javascript|c++)  target language (default:javascript)\n" +
 			"  --release                  omits the debugging features from the generated code (run-time type checking, logging, assertion)\n" +
 			"  --optimize cmd1,cmd2,...   list of optimize commands (no-assert, no-log, inline, return-if)\n" +
+			"  --warn type1,type2,...     list types of warnings (all, deprecated, none)\n" +
 			"  --enable-type-check        enables run-time type checking\n" +
 			"  --enable-source-map        enables source map debugging info\n" +
 			"  --version                  displays the version and exits\n" +
@@ -258,7 +259,7 @@ var JSX = Class.extend({
 					throw new Error("FIXME");
 					break;
 				default:
-					console.log("unknown target: " + optarg);
+					console.error("unknown target: " + optarg);
 					process.exit(1);
 				}
 				break;
@@ -273,6 +274,36 @@ var JSX = Class.extend({
 				if ((optarg = getoptarg()) == null)
 					process.exit(1);
 				optimizeCommands = optarg.split(",");
+				break;
+			case "--warn":
+				if ((optarg = getoptarg()) == null)
+					process.exit(1);
+				optarg.split(",").forEach(function (type) {
+					switch (type) {
+					case "none":
+						compiler.getWarningFilters().unshift(function (warning) {
+							return false;
+						});
+						break;
+					case "all":
+						compiler.getWarningFilters().unshift(function (warning) {
+							return true;
+						});
+						break;
+					case "deprecated":
+						compiler.getWarningFilters().unshift(function (warning) {
+							if (warning instanceof DeprecatedWarning) {
+								return true;
+							}
+							return null;
+						});
+						break;
+					default:
+						console.error("unknown warning type: " + type);
+						process.exit(1);
+						break;
+					}
+				});
 				break;
 			case "--executable":
 				executable = true;
