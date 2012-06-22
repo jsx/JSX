@@ -508,7 +508,10 @@ var ArrayLiteralExpression = exports.ArrayLiteralExpression = Expression.extend(
 		} else {
 			for (var i = 0; i < this._exprs.length; ++i) {
 				var elementType = this._exprs[i].getType().resolveIfMayBeUndefined();
-				if (! elementType.equals(Type.nullType)) {
+				if (elementType.equals(Type.nullType)
+					|| elementType.equals(Type.undefinedType)) {
+					// skip
+				} else {
 					if (elementType.equals(Type.integerType))
 						elementType = Type.numberType;
 					var instantiatedClass = context.instantiateTemplate(context.errors, new TemplateInstantiationRequest(this._token, "Array", [ elementType ]));
@@ -524,7 +527,7 @@ var ArrayLiteralExpression = exports.ArrayLiteralExpression = Expression.extend(
 			}
 		}
 		// check type of the elements
-		var expectedType = this._type.getClassDef().getTypeArguments()[0];
+		var expectedType = this._type.getClassDef().getTypeArguments()[0].toMayBeUndefinedType();
 		for (var i = 0; i < this._exprs.length; ++i) {
 			var elementType = this._exprs[i].getType();
 			if (! elementType.isConvertibleTo(expectedType)) {
