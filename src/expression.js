@@ -1183,7 +1183,7 @@ var TypeofExpression = exports.TypeofExpression = UnaryExpression.extend({
 		if (! this._analyze(context))
 			return false;
 		var exprType = this._expr.getType();
-		if (! (exprType.equals(Type.variantType) || exprType instanceof NullableType)) {
+		if (! exprType.equals(Type.variantType)) {
 			context.errors.push(new CompileError(this._token, "cannot apply operator 'typeof' to '" + this._expr.getType().toString() + "'"));
 			return false;
 		}

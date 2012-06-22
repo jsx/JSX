@@ -1,10 +1,10 @@
 /*EXPECTED
-undefined
+true
 */
 
 class Test {
 	static function run() : void {
 		var a = [ 0 ][-1];
-		log typeof a;
+		log a == null;
 	}
 }
