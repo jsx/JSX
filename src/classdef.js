@@ -511,6 +511,8 @@ var ClassDefinition = exports.ClassDefinition = Class.extend({
 	isConvertibleTo: function (classDef) {
 		if (this == classDef)
 			return true;
+		if (classDef.className() == "Object")
+			return true;
 		if (this._extendType != null && this._extendType.getClassDef().isConvertibleTo(classDef))
 			return true;
 		for (var i = 0; i < this._implementTypes.length; ++i)
