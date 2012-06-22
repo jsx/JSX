@@ -836,6 +836,9 @@ var Parser = exports.Parser = Class.extend({
 		if (token.getValue() == "variant") {
 			this._errors.push(new CompileError(token, "cannot use 'variant' as a class name"));
 			return null;
+		} else if (token.getValue() == "MayBeUndefined") {
+			this._errors.push(new CompileError(token, "cannot use 'MayBeUndefined' as a class name"));
+			return null;
 		}
 		var imprt = this.lookupImportAlias(token.getValue());
 		if (imprt != null) {
@@ -1263,6 +1266,10 @@ var Parser = exports.Parser = Class.extend({
 		while (this._expectOpt("[") != null) {
 			if ((token = this._expect("]")) == null)
 				return false;
+			if (typeDecl instanceof MayBeUndefinedType) {
+				this._newError("MayBeUndefined.<T> cannot be an array, should be: T[]");
+				return null;
+			}
 			typeDecl = this._registerArrayTypeOf(token, typeDecl);
 		}
 		return typeDecl;
@@ -1352,10 +1359,10 @@ var Parser = exports.Parser = Class.extend({
 			if (token == null)
 				return null;
 		} while (token.getValue() == ",");
-		// disallow MayBeUndefined in template types (for the only existing types: MayBeUndefined, Array, Map)
-		if (types[0] instanceof MayBeUndefinedType) {
-			this._newError("type argument for class '" + qualifiedName.getToken().getValue() + "' cannot be a MayBeUndefined type");
-			return null;
+		// check
+		if (qualifiedName.getToken().getValue() == "Array" && types[0] instanceof MayBeUndefinedType) {
+			this._newError("cannot declare Array.<MayBeUndefined.<T>>, should be Array.<T>");
+			return false;
 		}
 		// request template instantiation (deferred)
 		this._templateInstantiationRequests.push(new TemplateInstantiationRequest(token, qualifiedName.getToken().getValue(), types));

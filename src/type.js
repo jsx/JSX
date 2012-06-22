@@ -418,6 +418,10 @@ var ParsedObjectType = exports.ParsedObjectType = ObjectType.extend({
 		for (var i = 0; i < this._typeArguments.length; ++i) {
 			var actualType = instantiationContext.typemap[this._typeArguments[i].toString()];
 			typeArgs[i] = actualType != undefined ? actualType : this._typeArguments[i];
+			// special handling for Array.<T> (T should not be MayBeUndefinedType)
+			if (typeArgs[i] instanceof MayBeUndefinedType && this._qualifiedName.getToken().getValue() == "Array") {
+				typeArgs[i] = typeArgs[i].getBaseType();
+			}
 		}
 		instantiationContext.request.getInstantiationRequests().push(
 			new TemplateInstantiationRequest(this._qualifiedName.getToken(), this._qualifiedName.getToken().getValue(), typeArgs));
