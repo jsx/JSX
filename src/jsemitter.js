@@ -2089,8 +2089,8 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 					continue;
 				this._emit(_Util.buildAnnotation("/** @type {%1} */\n", type), null);
 				var name = locals[i].getName();
-				this._emit("var ", null);
-				this._emit(name.getValue() + ";\n", name);
+				// do not pass the token for declaration
+				this._emit("var " + name.getValue() + ";\n", null);
 			}
 			// emit code
 			var statements = funcDef.getStatements();
