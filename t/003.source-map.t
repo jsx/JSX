@@ -36,7 +36,13 @@ function main() {
 		execFile("bin/jsx", ["--enable-source-map", "--output", "t/source-map/hello.compiled.js", "t/source-map/hello.jsx"], {}, function (code, stdout, stderr) {
 			t.expect(code, "error code").toBe(null);
 			t.expect(stderr, "stderr").toBe("");
-			t.expect(stderr, "stdout").toBe("");
+			t.expect(stdout, "stdout").toBe("");
+
+			if(code != null) {
+				t.done();
+				test.done();
+				return;
+			}
 
 			var source = JSLexer.tokenize("hello.compiled.js",
 				fs.readFileSync("t/source-map/hello.compiled.js").toString());
