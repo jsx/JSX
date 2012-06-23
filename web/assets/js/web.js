@@ -75,7 +75,7 @@ window.addEventListener('load', function(e) {
 		if(getOptimizationLevel() > 0) {
 			o.setup([ "lto", "no-assert", "fold-const", "return-if", "inline", "fold-const", "array-length" ]);
 			emitter.setEnableRunTimeTypeCheck(false);
-			optimizer.setEnableRunTimeTypeCheck(false);
+			o.setEnableRunTimeTypeCheck(false);
 		}
 		c.setOptimizer(o);
 
