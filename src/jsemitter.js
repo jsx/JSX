@@ -2172,10 +2172,11 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 		}
 		// optional source map
 		if(this._sourceMapGen != null && token != null) {
-			var outputLines = this._output.split(/^/m);
+			var lastNewLinePos = this._output.lastIndexOf("\n") + 1;
+			var genColumn = (this._output.length - lastNewLinePos) - 1;
 			var genPos = {
-				line: outputLines.length,
-				column: outputLines[outputLines.length-1].length - 1,
+				line: this._output.match(/^/mg).length,
+				column: genColumn,
 			};
 			var origPos = {
 				line: token.getLineNumber(),
@@ -2187,7 +2188,9 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 			this._sourceMapGen.add(genPos, origPos,
 								   token.getFilename(), tokenValue);
 		}
-		str = str.replace(/\n(.)/g, (function (a, m) { return "\n" + this._getIndent() + m; }).bind(this));
+		str = str.replace(/\n(.)/g, (function (a, m) {
+			return "\n" + this._getIndent() + m;
+		}).bind(this));
 		this._output += str;
 		this._outputEndsWithReturn = str.charAt(str.length - 1) == "\n";
 	},
