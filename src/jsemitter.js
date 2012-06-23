@@ -1593,7 +1593,7 @@ var _CallExpressionEmitter = exports._CallExpressionEmitter = _OperatorExpressio
 		if (calleeExpr.getIdentifierToken().getValue() != "invoke")
 			return false;
 		var classDef = calleeExpr.getExpr().getType().getClassDef();
-		if (! (classDef.className() == "js" && classDef.getToken().getFilename() == this._emitter._platform.getRoot() + "/lib/js/js.jsx"))
+		if (! (classDef.className() == "js" && classDef.getToken().getFilename() == Util.resolvePath(this._emitter._platform.getRoot() + "/lib/js/js.jsx")))
 			return false;
 		// emit
 		var args = this._expr.getArguments();
@@ -1878,7 +1878,7 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 		if ((classDef.flags() & ClassDefinition.IS_NATIVE) != 0)
 			return;
 		// special handling for js.jsx
-		if (classDef.getToken() != null && classDef.getToken().getFilename() == this._platform.getRoot() + "/lib/js/js.jsx") {
+		if (classDef.getToken() != null && classDef.getToken().getFilename() == Util.resolvePath(this._platform.getRoot() + "/lib/js/js.jsx")) {
 			this._emit("js.global = (function () { return this; })();\n\n", null);
 			return;
 		}
