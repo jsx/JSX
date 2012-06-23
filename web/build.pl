@@ -29,6 +29,7 @@ use File::Find     qw(find);
 use File::stat     qw(stat);
 use String::ShellQuote qw(shell_quote);
 use JSON::PP qw();
+use Time::HiRes qw();
 
 my $clean = (grep { $_ eq "--clean" } @ARGV); # clean build
 
@@ -174,7 +175,7 @@ sub process_source_map {
     foreach my $jsx_file(glob("*.jsx")) {
         next if not modified($jsx_file, "$dest/$jsx_file");
 
-        info "compile $jsx_file with --enable-source-map";
+        my $t0 = [Time::HiRes::gettimeofday()];
         system "$root/../bin/jsx",
             "--enable-source-map",
             "--output", "$jsx_file.js", $jsx_file;
@@ -184,6 +185,9 @@ sub process_source_map {
         copy($jsx_file, "$dest/$jsx_file");
         my $st = stat($jsx_file);
         utime $st->atime, $st->mtime, "$dest/$jsx_file";
+
+        my $elapsed =  sprintf '%.03f', Time::HiRes::tv_interval($t0);
+        info "compile $jsx_file with --enable-source-map ($elapsed sec.)";
     }
     chdir $old_cwd;
 }
