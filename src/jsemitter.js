@@ -321,7 +321,7 @@ var _ForStatementEmitter = exports._ForStatementEmitter = _StatementEmitter.exte
 
 	emit: function () {
 		_Util.emitLabelOfStatement(this._emitter, this._statement);
-		this._emitter._emit("for (", null);
+		this._emitter._emit("for (", this._statement.getToken());
 		var initExpr = this._statement.getInitExpr();
 		if (initExpr != null)
 			this._emitter._getExpressionEmitterFor(initExpr).emit(0);
@@ -348,7 +348,7 @@ var _IfStatementEmitter = exports._IfStatementEmitter = _StatementEmitter.extend
 	},
 
 	emit: function () {
-		this._emitter._emit("if (", null);
+		this._emitter._emit("if (", this._statement.getToken());
 		this._emitter._getExpressionEmitterFor(this._statement.getExpr()).emit(0);
 		this._emitter._emit(") {\n", null);
 		this._emitter._emitStatements(this._statement.getOnTrueStatements());
@@ -371,7 +371,7 @@ var _SwitchStatementEmitter = exports._SwitchStatementEmitter = _StatementEmitte
 
 	emit: function () {
 		_Util.emitLabelOfStatement(this._emitter, this._statement);
-		this._emitter._emit("switch (", null);
+		this._emitter._emit("switch (", this._statement.getToken());
 		var expr = this._statement.getExpr();
 		if (this._emitter._enableRunTimeTypeCheck && expr.getType() instanceof MayBeUndefinedType) {
 			this._emitter._emitExpressionWithUndefinedAssertion(expr);
@@ -431,7 +431,7 @@ var _WhileStatementEmitter = exports._WhileStatementEmitter = _StatementEmitter.
 
 	emit: function () {
 		_Util.emitLabelOfStatement(this._emitter, this._statement);
-		this._emitter._emit("while (", null);
+		this._emitter._emit("while (", this._statement.getToken());
 		this._emitter._getExpressionEmitterFor(this._statement.getExpr()).emit(0);
 		this._emitter._emit(") {\n", null);
 		this._emitter._emitStatements(this._statement.getStatements());
@@ -2185,8 +2185,13 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 			var tokenValue = token.isIdentifier()
 				? token.getValue()
 				: null;
+			var filename = token.getFilename();
+			var rootDir  = this._platform.getRoot() + "/";
+			if (filename && filename.indexOf(rootDir) === 0) {
+				filename = filename.slice(rootDir.length);
+			}
 			this._sourceMapGen.add(genPos, origPos,
-								   token.getFilename(), tokenValue);
+								   filename, tokenValue);
 		}
 		str = str.replace(/\n(.)/g, (function (a, m) {
 			return "\n" + this._getIndent() + m;

@@ -1,5 +1,7 @@
 // for source mapping
 
+import "timer.jsx";
+
 class _Main {
     var foo = 42;
     static var bar = "hi";
@@ -13,6 +15,8 @@ class _Main {
     }
 
     static function main(args : string[]) : void {
-        _Main.run();
+        Timer.setTimeout(function () : void {
+            _Main.run();
+        }, 0);
     }
 }
