@@ -39,29 +39,35 @@ my $dest_root    = "$project_root/try";
 my $dest_src     = "$dest_root/src";
 my $dest_build   = "$dest_root/build";
 
-if($clean) {
-    info('clean build');
-    rmtree("$dest_root~") if -e "$dest_root~";
+{
+    my $t0 = [Time::HiRes::gettimeofday()];
 
-    rename $dest_root => "$dest_root~";
-}
+    if($clean) {
+        info('clean build');
+        rmtree("$dest_root~") if -e "$dest_root~";
 
-mkpath($_) for $dest_src, $dest_build;
+        rename $dest_root => "$dest_root~";
+    }
 
-copy_r("$root/assets",  "$dest_root/assets");
-copy_r("$root/example", "$dest_root/example");
+    mkpath($_) for $dest_src, $dest_build;
 
-copy_r("$project_root/t", "$dest_root/t");
-copy_r("$project_root/lib", "$dest_root/lib");
+    copy_r("$root/assets",  "$dest_root/assets");
+    copy_r("$root/example", "$dest_root/example");
 
-process_page("$root/index.html", "$dest_root/index.html");
+    copy_r("$project_root/t", "$dest_root/t");
+    copy_r("$project_root/lib", "$dest_root/lib");
 
-process_jsx($dest_src, "$dest_build/jsx-compiler.js");
+    process_page("$root/index.html", "$dest_root/index.html");
 
-process_source_map("$root/source-map", "$dest_root/source-map");
+    process_jsx($dest_src, "$dest_build/jsx-compiler.js");
+
+    process_source_map("$root/source-map", "$dest_root/source-map");
 
 # process_tree must be called at the end of processes
-process_tree([$dest_root], "$dest_root/tree.generated.json");
+    process_tree([$dest_root], "$dest_root/tree.generated.json");
+
+    info(sprintf "done, elapsed %.03f sec.", Time::HiRes::tv_interval($t0));
+}
 
 sub info {
     say "[I] ", join " ", @_;
