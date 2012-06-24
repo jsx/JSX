@@ -1267,6 +1267,18 @@ var _PropertyExpressionEmitter = exports._PropertyExpressionEmitter = _UnaryExpr
 				return;
 			}
 		}
+		else if (expr.getExpr() instanceof ClassExpression
+			&& expr.getExpr().getType().getClassDef() === Type.stringType.getClassDef()) {
+			switch (identifierToken.getValue()) {
+			case "encodeURIComponent":
+			case "decodeURIComponent":
+			case "encodeURI":
+			case "decodeURI":
+				this._emitter._emit('$__jsx_' + identifierToken.getValue(), identifierToken);
+				return;
+			}
+		}
+
 		this._emitter._getExpressionEmitterFor(expr.getExpr()).emit(this._getPrecedence());
 		// mangle the name if necessary
 		if (exprType instanceof FunctionType && ! exprType.isAssignable()

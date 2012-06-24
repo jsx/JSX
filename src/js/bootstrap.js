@@ -40,12 +40,18 @@ function $__jsx_div_assign(obj, prop, divisor) {
 }
 
 /*
- * global functions called by JSX as Number.* (renamed so that they do not conflict with local variable names)
+ * global functions called by JSX
+ * (enamed so that they do not conflict with local variable names)
  */
 var $__jsx_parseInt = parseInt;
 var $__jsx_parseFloat = parseFloat;
 var $__jsx_isNaN = isNaN;
 var $__jsx_isFinite = isFinite;
+
+var $__jsx_encodeURIComponent = encodeURIComponent;
+var $__jsx_decodeURIComponent = decodeURIComponent;
+var $__jsx_encodeURI = encodeURI;
+var $__jsx_decodeURI = decodeURI;
 
 var $__jsx_ObjectToString = Object.prototype.toString;
 var $__jsx_ObjectHasOwnProperty = Object.prototype.hasOwnProperty;
