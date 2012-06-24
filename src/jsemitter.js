@@ -1932,7 +1932,8 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 				}
 			}
 			// emit the map
-			this._emit("\"" + this._encodeFilename(filename) + "\": ", null); // FIXME escape
+			var escapedFilename = JSON.stringify(this._encodeFilename(filename, "system:"));
+			this._emit(escapedFilename  + ": ", null);
 			this._emit("{\n", null);
 			this._advanceIndent();
 			for (var i = 0; i < list.length; ++i) {
@@ -1951,9 +1952,10 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 		this._emit("};\n\n", null);
 	},
 
-	_encodeFilename: function (filename) {
-		if (filename.indexOf(this._platform.getRoot() + "/") == 0)
-			filename = "system:" + filename.substring(this._platform.getRoot().length + 1);
+	_encodeFilename: function (filename, prefix) {
+		var rootDir = this._platform.getRoot() + "/";
+		if (filename.indexOf(rootDir) == 0)
+			filename = prefix + filename.substring(rootDir.length);
 		return filename;
 	},
 
@@ -1964,7 +1966,7 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 		}
 		output += "})();\n";
 		if (entryPoint != null) {
-			output = this._platform.addLauncher(this, this._encodeFilename(sourceFile), output, entryPoint);
+			output = this._platform.addLauncher(this, this._encodeFilename(sourceFile, "system:"), output, entryPoint);
 		}
 		if (this._sourceMapGen) {
 			output += this._sourceMapGen.magicToken();
@@ -2186,9 +2188,8 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 				? token.getValue()
 				: null;
 			var filename = token.getFilename();
-			var rootDir  = this._platform.getRoot() + "/";
-			if (filename && filename.indexOf(rootDir) === 0) {
-				filename = filename.slice(rootDir.length);
+			if (filename != null) {
+				filename = this._encodeFilename(filename, "");
 			}
 			this._sourceMapGen.add(genPos, origPos,
 								   filename, tokenValue);
