@@ -966,16 +966,16 @@ var Parser = exports.Parser = Class.extend({
 		if (className == null)
 			return false;
 		// template
-		var typeArgs = null;
+		this._typeArgs = null;
 		if (this._expectOpt(".") != null) {
 			if (this._expect("<") == null)
 				return false;
-			typeArgs = [];
+			this._typeArgs = [];
 			do {
 				var typeArg = this._expectIdentifier(null);
 				if (typeArg == null)
 					return false;
-				typeArgs.push(typeArg);
+				this._typeArgs.push(typeArg);
 				var token = this._expectOpt([ ",", ">" ]);
 				if (token == null)
 					return false;
@@ -1022,7 +1022,7 @@ var Parser = exports.Parser = Class.extend({
 		while (this._expectOpt("}") == null) {
 			if (! this._expectIsNotEOF())
 				break;
-			var member = this._memberDefinition(flags, typeArgs != null);
+			var member = this._memberDefinition(flags);
 			if (member != null) {
 				for (var i = 0; i < members.length; ++i) {
 					if (member.name() == members[i].name()
@@ -1078,14 +1078,14 @@ var Parser = exports.Parser = Class.extend({
 			return false;
 
 		// done
-		if (typeArgs != null)
-			this._templateClassDefs.push(new TemplateClassDefinition(className.getValue(), flags, typeArgs, this._extendType, this._implementTypes, members, this._objectTypesUsed));
+		if (this._typeArgs != null)
+			this._templateClassDefs.push(new TemplateClassDefinition(className.getValue(), flags, this._typeArgs, this._extendType, this._implementTypes, members, this._objectTypesUsed));
 		else
 			this._classDefs.push(new ClassDefinition(className, className.getValue(), flags, this._extendType, this._implementTypes, members, this._objectTypesUsed));
 		return true;
 	},
 
-	_memberDefinition: function (classFlags, isTemplate) {
+	_memberDefinition: function (classFlags) {
 		var flags = 0;
 		while (true) {
 			var token = this._expect([ "function", "var", "static", "abstract", "override", "final", "const", "native", "__readonly__", "inline" ]);
@@ -1182,7 +1182,7 @@ var Parser = exports.Parser = Class.extend({
 		if (! this._expect(";"))
 			return null;
 		// all non-native, non-template values have initial value
-		if (! isTemplate && initialValue == null && (classFlags & ClassDefinition.IS_NATIVE) == 0)
+		if (this._typeArgs == null && initialValue == null && (classFlags & ClassDefinition.IS_NATIVE) == 0)
 			initialValue = Expression.getDefaultValueExpressionOf(type);
 		return new MemberVariableDefinition(token, name, flags, type, initialValue);
 	},
@@ -1350,11 +1350,14 @@ var Parser = exports.Parser = Class.extend({
 		}
 		// parse
 		var types = [];
+		var typeIsConcrete = true;
 		do {
 			var type = this._typeDeclaration(false);
 			if (type == null)
 				return null;
 			types.push(type);
+			if (this._isPartOfTypeArg(type))
+				typeIsConcrete = false;
 			var token = this._expect([ ">", "," ]);
 			if (token == null)
 				return null;
@@ -1365,7 +1368,9 @@ var Parser = exports.Parser = Class.extend({
 			return false;
 		}
 		// request template instantiation (deferred)
-		this._templateInstantiationRequests.push(new TemplateInstantiationRequest(token, qualifiedName.getToken().getValue(), types));
+		if (typeIsConcrete) {
+			this._templateInstantiationRequests.push(new TemplateInstantiationRequest(token, qualifiedName.getToken().getValue(), types));
+		}
 		// return object type
 		var objectType = new ParsedObjectType(qualifiedName, types);
 		this._objectTypesUsed.push(objectType);
@@ -1446,7 +1451,9 @@ var Parser = exports.Parser = Class.extend({
 	},
 
 	_registerArrayTypeOf: function (token, elementType) {
-		this._templateInstantiationRequests.push(new TemplateInstantiationRequest(token, "Array", [ elementType ]));
+		if (! this._isPartOfTypeArg(elementType)) {
+			this._templateInstantiationRequests.push(new TemplateInstantiationRequest(token, "Array", [ elementType ]));
+		}
 		var arrayType = new ParsedObjectType(new QualifiedName(new Token("Array", true), null), [ elementType ], token);
 		this._objectTypesUsed.push(arrayType);
 		return arrayType;
@@ -2561,6 +2568,16 @@ var Parser = exports.Parser = Class.extend({
 			} while (token.getValue() == ",");
 		}
 		return args;
+	},
+
+	_isPartOfTypeArg: function (type) {
+		if (this._typeArgs == null)
+			return false;
+		for (var i = 0; i < this._typeArgs.length; ++i) {
+			if (this._typeArgs[i].getValue() == type.toString())
+				return true;
+		}
+		return false;
 	},
 
 	_getCompletionCandidatesOfTopLevel: function (autoCompleteMatchCb) {
