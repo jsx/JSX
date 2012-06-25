@@ -722,11 +722,16 @@ var FunctionExpression = exports.FunctionExpression = Expression.extend({
 	},
 
 	clone: function () {
-		throw new Error("not yet implemented");
+		// NOTE: funcDef is not cloned, but is later replaced in MemberFunctionDefitition#instantiate
+		return new FunctionExpression(this._token, this._funcDef);
 	},
 
 	getFuncDef: function () {
 		return this._funcDef;
+	},
+
+	setFuncDef: function (funcDef) {
+		this._funcDef = funcDef;
 	},
 
 	serialize: function () {
