@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>JSX - Profile Results</title>
+    <meta name="robots" content="noindex,nofollow">
+    <link rel="shortcut icon" href="assets/favicon.ico">
+
+    <link href="assets/css/jquery.treeTable.css" rel="stylesheet" type="text/css">
+<style type="text/css">
+body {
+  margin: 0;
+  padding: 0;
+}
+#results {
+  width: 100%;
+  border-collapse: collapse;
+  border: white solid 1px;
+}
+#results th {
+  background: #ddd;
+  border: white solid 1px;
+  white-space: nowrap;
+  padding: 0.2em 1em;
+}
+#results th a {
+  color: black;
+  display: block;
+  text-decoration: none;
+}
+#results td {
+  border-width: 0 0 1px 0;
+  border-color: #ddd;
+  border-style: solid;
+  padding: 0.2em 0.2em;
+}
+#results .symbol {
+  text-overflow: hidden;
+  overflow: hidden;
+}
+#results .number {
+  border-width: 0 0 1px 1px;
+  text-align: right;
+  vertical-align: top;
+}
+</style>
+
+    <script type="text/javascript" src="assets/js/jquery.js"></script>
+    <script type="text/javascript" src="assets/js/jquery.treeTable.js"></script>
+    <script type="text/javascript">
+
+var profileData = function () {
+  var id = location.search.substring(1);
+  if (! id)
+    return;
+  var xhr = new XMLHttpRequest();
+  xhr.open("GET", ".profile/" + id + ".txt", false);
+  xhr.send(null);
+  if (xhr.status != 200) {
+    alert("failed to load profile data from server");
+    return;
+  }
+  return JSON.parse(xhr.responseText);
+}();
+
+function escapeHTML(s) {
+  return s.toString()
+    .replace(/&/g, "&amp;")
+    .replace(/\u0022/g, "&quot;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+}
+
+function insertDecimalSeparator(n) {
+  var s = n.toString();
+  while (true) {
+    var s2 = s.replace(/([0-9])([0-9]{3}(?:,|\.|$))/, function (a, m1, m2) {
+      return m1 + "," + m2;
+    });
+    if (s2 == s)
+      break;
+    s = s2;
+  }
+  return s;
+}
+
+function buildList(comparator) {
+  var list = [];
+  for (var k in profileData.functions) {
+    list.push({
+      name:      k,
+      count:     profileData.functions[k].count,
+      inclusive: profileData.functions[k].inclusive,
+      exclusive: profileData.functions[k].exclusive
+    });
+  }
+  list = list.sort(comparator);
+  var html = "<table id='results'><tr>"
+    + "<th><a href='javascript:updateTable(%22function%22)'>Function</a></th>"
+    + "<th><a href='javascript:updateTable(%22count%22)'>Count</a></th>"
+    + "<th><a href='javascript:updateTable(%22inclusive%22)'>Inclusive (ms)</a></th>"
+    + "<th><a href='javascript:updateTable(%22exclusive%22)'>Exclusive (ms)</a></th>"
+    + "</tr>";
+  list.forEach(function (entry) {
+    html += "<tr>"
+     + "<td class='symbol'>" + escapeHTML(entry.name) + "</td>"
+     + "<td class='number'>" + insertDecimalSeparator(entry.count) + "</td>"
+     + "<td class='number'>" + insertDecimalSeparator(entry.inclusive) + "</td>"
+     + "<td class='number'>" + insertDecimalSeparator(entry.exclusive) + "</td>"
+     + "</tr>";
+  });
+  html += "</table>";
+  $("#results-holder").html(html);
+}
+
+function updateTable(orderBy) {
+  switch (orderBy) {
+  case "function":
+    buildList(function (x, y) {
+      if (x.name == y.name)
+        return 0;
+      else if (x.name < y.name)
+        return -1;
+      else
+        return 1;
+    });
+    break;
+  case "count":
+    buildList(function (x, y) {
+      return y.count - x.count;
+    });
+    break;
+  case "inclusive":
+    buildList(function (x, y) {
+      return y.inclusive - x.inclusive;
+    });
+    break;
+  case "exclusive":
+    buildList(function (x, y) {
+      return y.exclusive - x.exclusive;
+    });
+    break;
+  }
+  $("#results").treeTable();
+}
+
+$(document).ready(function () {
+  updateTable("count");
+});
+
+    </script>
+  </head>
+  <body>
+    <div id="results-holder">
+    </div>
+  </body>
+</html>
