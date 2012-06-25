@@ -221,7 +221,11 @@ var _ReturnStatementEmitter = exports._ReturnStatementEmitter = _StatementEmitte
 			}
 			this._emitter._emit(";\n", null);
 		} else {
-			this._emitter._emit("return;\n", this._statement.getToken());
+			if (this._emitter._enableProfiler) {
+				this._emitter._emit("return $__jsx_profiler.exit();\n", this._statement.getToken());
+			} else {
+				this._emitter._emit("return;\n", this._statement.getToken());
+			}
 		}
 	}
 
