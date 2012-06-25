@@ -63,6 +63,42 @@ var profileData = function () {
   return JSON.parse(xhr.responseText);
 }();
 
+var functions = function () {
+  var map = {};
+  (function doit(name, entry) {
+    for (var k in entry) {
+      if (k.charAt(0) != "$") {
+        doit(k, entry[k]);
+      }
+    }
+    if (name) {
+      if (map[name]) {
+        map[name].count += entry.$count;
+        map[name].inclusive += entry.$inclusive;
+        map[name].exclusive += entry.$exclusive;
+      } else {
+        map[name] = {
+          count:     entry.$count,
+          inclusive: entry.$inclusive,
+          exclusive: entry.$exclusive
+        };
+      }
+    }
+  })(null, profileData);
+  var ret = [];
+  for (var k in map) {
+    if (map[k].count != 0) {
+      ret.push({
+        name:      k,
+        count:     map[k].count,
+        inclusive: map[k].inclusive,
+        exclusive: map[k].exclusive
+      });
+    }
+  }
+  return ret;
+}();
+  
 function escapeHTML(s) {
   return s.toString()
     .replace(/&/g, "&amp;")
@@ -85,16 +121,7 @@ function insertDecimalSeparator(n) {
 }
 
 function buildList(comparator) {
-  var list = [];
-  for (var k in profileData.functions) {
-    list.push({
-      name:      k,
-      count:     profileData.functions[k].count,
-      inclusive: profileData.functions[k].inclusive,
-      exclusive: profileData.functions[k].exclusive
-    });
-  }
-  list = list.sort(comparator);
+  var list = functions.sort(comparator);
   var html = "<table id='results'><tr>"
     + "<th><a href='javascript:updateTable(%22function%22)'>Function</a></th>"
     + "<th><a href='javascript:updateTable(%22count%22)'>Count</a></th>"
