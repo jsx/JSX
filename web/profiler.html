@@ -12,6 +12,11 @@ body {
   margin: 0;
   padding: 0;
 }
+#controller {
+  padding: 1em 0.5em;
+  Background: #ddd;
+  font-weight: bold;
+}
 #results {
   width: 100%;
   border-collapse: collapse;
@@ -37,6 +42,7 @@ body {
 #results .symbol {
   text-overflow: hidden;
   overflow: hidden;
+  padding-left: 2em;
 }
 #results .number {
   border-width: 0 0 1px 1px;
@@ -98,7 +104,26 @@ var functions = function () {
   }
   return ret;
 }();
-  
+
+var tree = function doit(list, entry) {
+  list.push({
+    name:      entry.$name,
+    count:     entry.$count,
+    inclusive: entry.$inclusive,
+    exclusive: entry.$exclusive
+  });
+  var callee = [];
+  for (var k in entry) {
+    if (k.charAt(0) != "$") {
+      doit(callee, entry[k]);
+    }
+  }
+  list[list.length - 1].callee = callee.sort(function (x, y) {
+    return x.inclusive - y.inclusive;
+  });
+  return list;
+}([], profileData);
+
 function escapeHTML(s) {
   return s.toString()
     .replace(/&/g, "&amp;")
@@ -120,64 +145,102 @@ function insertDecimalSeparator(n) {
   return s;
 }
 
-function buildList(comparator) {
-  var list = functions.sort(comparator);
+function buildHeader() {
   var html = "<table id='results'><tr>"
-    + "<th><a href='javascript:updateTable(%22function%22)'>Function</a></th>"
+    + "<th><a href='javascript:updateTable(%22name%22)'>Function</a></th>"
     + "<th><a href='javascript:updateTable(%22count%22)'>Count</a></th>"
     + "<th><a href='javascript:updateTable(%22inclusive%22)'>Inclusive (ms)</a></th>"
     + "<th><a href='javascript:updateTable(%22exclusive%22)'>Exclusive (ms)</a></th>"
     + "</tr>";
-  list.forEach(function (entry) {
-    html += "<tr>"
-     + "<td class='symbol'>" + escapeHTML(entry.name) + "</td>"
-     + "<td class='number'>" + insertDecimalSeparator(entry.count) + "</td>"
-     + "<td class='number'>" + insertDecimalSeparator(entry.inclusive) + "</td>"
-     + "<td class='number'>" + insertDecimalSeparator(entry.exclusive) + "</td>"
+  return html;
+}
+
+function buildRow(id, parentId, name, count, inclusive, exclusive) {
+    return "<tr"
+     + (id != null ? " id='" + id + "'" : "")
+     + (parentId != null ? " class='" + parentId + "'" : "")
+     + "><td class='symbol'>" + escapeHTML(name) + "</td>"
+     + "<td class='number'>" + insertDecimalSeparator(count) + "</td>"
+     + "<td class='number'>" + insertDecimalSeparator(inclusive) + "</td>"
+     + "<td class='number'>" + insertDecimalSeparator(exclusive) + "</td>"
      + "</tr>";
+}
+
+function buildList(comparator) {
+  var list = functions.sort(comparator);
+  var html = buildHeader();
+  list.forEach(function (entry) {
+    html += buildRow(
+      null, null, entry.name, entry.count, entry.inclusive, entry.exclusive);
   });
   html += "</table>";
   $("#results-holder").html(html);
 }
 
-function updateTable(orderBy) {
-  switch (orderBy) {
-  case "function":
-    buildList(function (x, y) {
-      if (x.name == y.name)
-        return 0;
-      else if (x.name < y.name)
-        return -1;
-      else
-        return 1;
-    });
-    break;
-  case "count":
-    buildList(function (x, y) {
-      return y.count - x.count;
-    });
-    break;
-  case "inclusive":
-    buildList(function (x, y) {
-      return y.inclusive - x.inclusive;
-    });
-    break;
-  case "exclusive":
-    buildList(function (x, y) {
-      return y.exclusive - x.exclusive;
-    });
-    break;
-  }
+function buildTree(comparator) {
+  var html = buildHeader();
+  var rowIndex = 1;
+  (function doit(callee, parentRowIndex) {
+    var callee = callee.sort(comparator);
+    for (var i = 0; i < callee.length; ++i) {
+      var theRowIndex = rowIndex++;
+      html += buildRow(
+        "node-" + theRowIndex,
+        parentRowIndex ? "child-of-node-" + parentRowIndex : null,
+        callee[i].name, callee[i].count, callee[i].inclusive,
+        callee[i].exclusive);
+      doit(callee[i].callee, theRowIndex);
+    }
+  })(tree[0].callee, 0);
+  html += "</table>";
+  $("#results-holder").html(html);
   $("#results").treeTable();
 }
 
+function updateTable(orderBy) {
+  switch ($("#mode option:selected").val()) {
+  case "tree":
+    var builder = buildTree;
+    break;
+  case "name":
+    builder = buildList;
+    break;
+  default:
+    throw new Error("unexpected mode");
+  }
+  builder(function (x, y) {
+    var xValue = x[orderBy];
+    var yValue = y[orderBy];
+    if (xValue == yValue)
+      var ret = 0;
+    else if (xValue < yValue)
+      ret = -1;
+    else
+      ret = 1;
+    if (orderBy != "name")
+      ret *= -1;
+    return ret;
+  });
+}
+
 $(document).ready(function () {
+  $("#mode").bind("change", function () {
+    updateTable("count");
+    return true;
+  });
   updateTable("count");
 });
 
     </script>
   </head>
   <body>
+    <div id="controller">
+      Mode:
+      <select id="mode">
+	<option value="tree">Call Tree</option>
+	<option value="name">Functions</option>
+      </select>
+    </div>
     <div id="results-holder">
     </div>
   </body>
