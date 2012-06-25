@@ -97,6 +97,13 @@ class _Test extends TestCase {
 		this.expect("foobar".substring(3, 5), "substring 2").toBe("ba");
 	}
 
+	function testURI() : void {
+		this.expect(String.encodeURIComponent("\tfoo/bar")).toBe("%09foo%2Fbar");
+		this.expect(String.decodeURIComponent("%09foo%2Fbar")).toBe("\tfoo/bar");
+		this.expect(String.encodeURI("\tfoo/bar")).toBe("%09foo/bar");
+		this.expect(String.decodeURI("%09foo/bar")).toBe("\tfoo/bar");
+	}
+
 	function testBoolean() : void {
 		this.expect(new Boolean(new Boolean(true)).toString(), "copy constructor").toBe(new Boolean(true).toString());
 	}

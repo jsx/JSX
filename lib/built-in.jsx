@@ -152,6 +152,13 @@ native final class String {
 	// removed: use substring() instead
 	// function substr(start : int) : string;
 	// function substr(start : int, length : int) : string;
+
+	// 15.1.3 URI Handling Function Properties
+	static function encodeURIComponent(str : string) : string;
+	static function decodeURIComponent(str : string) : string;
+	static function encodeURI(str : string) : string;
+	static function decodeURI(str : string) : string;
+
 }
 
 // 15.6
