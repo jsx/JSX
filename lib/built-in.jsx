@@ -426,7 +426,9 @@ native final class JSON {
 }
 
 native final class JSX {
+	static function profilerIsRunning() : boolean;
 	static function getProfileResults() : variant;
+	static function postProfileResults(url : string) : void;
 }
 
 // vim: set noexpandtab:

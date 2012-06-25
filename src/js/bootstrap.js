@@ -70,6 +70,16 @@ JSX.require = function (path) {
 	return m !== undefined ? m : null;
 };
 
+JSX.profilerIsRunning = function () {
+	return $__jsx_profiler.getResults != null;
+};
+
 JSX.getProfileResults = function () {
 	return ($__jsx_profiler.getResults || function () { return {}; })();
+};
+
+JSX.postProfileResults = function (url) {
+	if ($__jsx_profiler.postResults == null)
+		throw new Error("profiler has not been turned on");
+	return $__jsx_profiler.postResults(url);
 };

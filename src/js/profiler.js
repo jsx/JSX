@@ -52,4 +52,21 @@
 		};
 	};
 
+	Profiler.postResults = function (url) {
+		// post target should support gist-style API
+		var xhr = new XMLHttpRequest();
+		xhr.onreadystatechange = function () {
+			if (xhr.readyState == 4) {
+				if (xhr.status == 200) {
+					console.log(xhr.responseText);
+				} else {
+					console.log("failed to upload profiler results, received " + xhr.status + " response from server");
+				}
+			}
+		};
+		xhr.open("POST", url, true);
+		xhr.setRequestHeader("Content-Type", "application/json");
+		xhr.send(JSON.stringify(Profiler.getResults()));
+	};
+
 })();
