@@ -20,8 +20,8 @@ class Test {
 		Test.f();
 		var m = JSX.getProfileResults();
 		log typeof m["functions"]["Test.f$"];
-		log m["functions"]["Test.f$"]["only"] as number >= 0; // should be 0 or 1 ms
-		log m["functions"]["Test.f$"]["accumulated"] as number != 0; // should take at least 1ms
+		log m["functions"]["Test.f$"]["exclusive"] as number >= 0; // should be 0 or 1 ms
+		log m["functions"]["Test.f$"]["inclusive"] as number != 0; // should take at least 1ms
 		log typeof m["functions"]["Test.<<unnamed>>$"]; // closure should exist
 	}
 }
