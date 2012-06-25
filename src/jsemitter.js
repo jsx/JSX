@@ -2083,9 +2083,18 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 				this._emit(
 					"var $__jsx_profiler_ctx = $__jsx_profiler.enter("
 					+ Util.encodeStringLiteral(
-						(funcDef.getClassDef() != null ? funcDef.getClassDef().getOutputClassName() : "<<unnamed>>")
-						+ ((funcDef.flags() & ClassDefinition.IS_STATIC) != 0 ? "." : ".prototype.")
-						+ this._mangleFunctionName(funcDef.getNameToken() != null ? funcDef.name() : "<<unnamed>>", funcDef.getArgumentTypes()))
+						(funcDef.getClassDef() != null ? funcDef.getClassDef().className() : "<<unnamed>>")
+						+ ((funcDef.flags() & ClassDefinition.IS_STATIC) != 0 ? "." : "#")
+						+ (funcDef.getNameToken() != null ? funcDef.name() : "line_" + funcDef.getToken().getLineNumber())
+						+ "("
+						+ function () {
+							var r = [];
+							funcDef.getArgumentTypes().forEach(function (argType) {
+								r.push(":" + argType.toString());
+							});
+							return r.join(", ");
+						}()
+						+ ")")
 					+ ");\n",
 					null);
 			}
