@@ -1,5 +1,4 @@
 /*EXPECTED
-object
 1
 */
 /*JSX_OPTS
@@ -12,7 +11,6 @@ class Test {
 	static function run() : void {
 		Test.f();
 		var m = JSX.getProfileResults();
-		log typeof m["functions"]["Test.f$"];
-		log m["functions"]["Test.f$"]["count"];
+		log m["Test.run()"]["Test.f()"]["$count"];
 	}
 }
