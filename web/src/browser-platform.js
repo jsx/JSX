@@ -23,6 +23,7 @@
 "use strict";
 
 var Platform = require("./platform").Platform;
+var Util = require("./util").Util;
 
 // Function#bind is used only in the compiler,
 // so it is not required in bootstrap.js
@@ -63,7 +64,10 @@ var BrowserPlatform = exports.BrowserPlatform = Platform.extend({
 
 		this._map = JSON.parse(this.load(root + "/tree.generated.json"));
 
-		this._prefix = document.location.pathname.replace(/\/[^\/]+$/, "");
+		this._prefix = location.pathname.replace(/\/[^\/]*$/, "");
+		if (debug) {
+			console.log({ prefix: this._prefix, root: this._root });
+		}
 	},
 
 	getRoot: function () {
@@ -71,9 +75,12 @@ var BrowserPlatform = exports.BrowserPlatform = Platform.extend({
 	},
 
 	_findPath: function (path) {
-		var absPath = (this._prefix + "/" + path).
-			replace(/[^\/]+\/\.\.\//g, "").
-			replace(/\/\/+/g, "/");
+		var absPath = Util.resolvePath(this._prefix + "/" + path);
+
+		if (debug) {
+			console.debug("[D] find path=%s (absPath=%s)",
+					path, absPath);
+		}
 
 		var parts = absPath.split('/');
 		var cur = this._map;
@@ -85,9 +92,8 @@ var BrowserPlatform = exports.BrowserPlatform = Platform.extend({
 			cur = t;
 		}
 
-		if(debug) {
-			console.debug("[D] find path=%s (absPath=%s) -> %s",
-					path, absPath, JSON.stringify(cur));
+		if (debug) {
+			console.debug("[D] find path --> %s", JSON.stringify(cur));
 		}
 
 		return cur;

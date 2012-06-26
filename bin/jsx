@@ -162,6 +162,7 @@ var JSX = Class.extend({
 			"  --mode (compile|parse)     compilation mode (default:compile)\n" +
 			"  --target (javascript|c++)  target language (default:javascript)\n" +
 			"  --release                  omits the debugging features from the generated code (run-time type checking, logging, assertion)\n" +
+			"  --profile                  enables the profiler (experimental)\n" +
 			"  --optimize cmd1,cmd2,...   list of optimize commands (no-assert, no-log, inline, return-if)\n" +
 			"  --warn type1,type2,...     list types of warnings (all, deprecated, none)\n" +
 			"  --enable-type-check        enables run-time type checking\n" +

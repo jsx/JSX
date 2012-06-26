@@ -886,6 +886,22 @@ var MemberFunctionDefinition = exports.MemberFunctionDefinition = MemberDefiniti
 					throw new Error("logic flaw");
 				this._locals[i].popInstantiated();
 			}
+			// update the link from function expressions to closures
+			Util.forEachStatement(function onStatement(statement) {
+				statement.forEachExpression(function onExpr(expr) {
+					if (expr instanceof Expression.FunctionExpression) {
+						for (var i = 0; i < this._closures.length; ++i) {
+							if (this._closures[i] == expr.getFuncDef())
+								break;
+						}
+						if (i == this._closures.length)
+							throw new Error("logic flaw, cannot find the closure");
+						expr.setFuncDef(closures[i]);
+					}
+					return expr.forEachExpression(onExpr.bind(this));
+				}.bind(this));
+				return statement.forEachStatement(onStatement.bind(this));
+			}.bind(this), statements);
 		} else {
 			locals = null;
 			statements = null;
@@ -895,9 +911,13 @@ var MemberFunctionDefinition = exports.MemberFunctionDefinition = MemberDefiniti
 		for (var i = 0; i < this._args.length; ++i)
 			this._args[i].popInstantiated();
 		// do the rest
-		var returnType = this._returnType.instantiate(instantiationContext);
-		if (returnType == null)
-			return null;
+		if (this._returnType != null) {
+			var returnType = this._returnType.instantiate(instantiationContext);
+			if (returnType == null)
+				return null;
+		} else {
+			returnType = null;
+		}
 		return new MemberFunctionDefinition(this._token, this._nameToken, this._flags, returnType, args, locals, statements, closures, null);
 	},
 
@@ -1266,8 +1286,12 @@ var ArgumentDeclaration = exports.ArgumentDeclaration = LocalVariable.extend({
 		LocalVariable.prototype.constructor.call(this, name, type);
 	},
 
+	clone: function () {
+		return new ArgumentDeclaration(this._name, this._type);
+	},
+
 	instantiate: function (instantiationContext) {
-		var type = this._type.instantiate(instantiationContext);
+		var type = this._type != null ? this._type.instantiate(instantiationContext) : type;
 		return new ArgumentDeclaration(this._name, type);
 	}
 

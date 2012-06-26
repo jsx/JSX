@@ -2,27 +2,41 @@
 
 	var Profiler = $__jsx_profiler;
 
-	var StackEntry = function (name, now) {
-		this.name = name;
-		this.accumulated = now;
-		this.only = now;
-	};
-
-	var stack = [ new StackEntry(null, 0, 0) /* dummy */ ];
-	var functions = {};
+	var stack = [ {
+		$name: "<<root>>",
+		$cur_exclusive: Date.now()
+	} ];
 
 	Profiler.enter = function (name) {
 		var now = Date.now();
-		stack[stack.length - 1].only -= now;
-		stack.push(new StackEntry(name, now));
+		var caller = stack[stack.length - 1];
+		caller.$cur_exclusive -= now;
+		var callee = caller[name];
+		if (callee) {
+			callee.$cur_inclusive = now;
+			callee.$cur_exclusive = now;
+		} else {
+			callee = caller[name] = {
+				$name: name,
+				$cur_inclusive: now,
+				$cur_exclusive: now,
+				$inclusive: 0,
+				$exclusive: 0,
+				$count: 0
+			};
+		}
+		stack.push(callee);
 		return stack.length;
 	};
 
 	Profiler.exit = function (retval) {
-		var entry = stack.pop();
 		var now = Date.now();
-		Profiler._log(entry.name, now - entry.accumulated, now - entry.only);
-		stack[stack.length - 1].only += now;
+		var callee = stack.pop();
+		++callee.$count;
+		callee.$exclusive += now - callee.$cur_exclusive;
+		callee.$inclusive += now - callee.$cur_inclusive;
+		var caller = stack[stack.length - 1];
+		caller.$cur_exclusive += now;
 		return retval;
 	};
 
@@ -32,24 +46,25 @@
 		}
 	};
 
-	Profiler._log = function (name, accumulated, only) {
-		var entry = functions[name];
-		if (entry == null) {
-			entry = functions[name] = {
-				count: 0,
-				accumulated: 0,
-				only: 0
-			};
-		}
-		++entry.count;
-		entry.accumulated += accumulated;
-		entry.only += only;
+	Profiler.getResults = function () {
+		return stack[0];
 	};
 
-	Profiler.getResults = function () {
-		return {
-			functions: functions
+	Profiler.postResults = function (url) {
+		// post target should support gist-style API
+		var xhr = new XMLHttpRequest();
+		xhr.onreadystatechange = function () {
+			if (xhr.readyState == 4) {
+				if (xhr.status == 200) {
+					console.log(xhr.responseText);
+				} else {
+					console.log("failed to upload profiler results, received " + xhr.status + " response from server");
+				}
+			}
 		};
+		xhr.open("POST", url, true);
+		xhr.setRequestHeader("Content-Type", "application/json");
+		xhr.send(JSON.stringify(Profiler.getResults()));
 	};
 
 })();

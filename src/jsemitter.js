@@ -221,7 +221,11 @@ var _ReturnStatementEmitter = exports._ReturnStatementEmitter = _StatementEmitte
 			}
 			this._emitter._emit(";\n", null);
 		} else {
-			this._emitter._emit("return;\n", this._statement.getToken());
+			if (this._emitter._enableProfiler) {
+				this._emitter._emit("return $__jsx_profiler.exit();\n", this._statement.getToken());
+			} else {
+				this._emitter._emit("return;\n", this._statement.getToken());
+			}
 		}
 	}
 
@@ -321,7 +325,7 @@ var _ForStatementEmitter = exports._ForStatementEmitter = _StatementEmitter.exte
 
 	emit: function () {
 		_Util.emitLabelOfStatement(this._emitter, this._statement);
-		this._emitter._emit("for (", null);
+		this._emitter._emit("for (", this._statement.getToken());
 		var initExpr = this._statement.getInitExpr();
 		if (initExpr != null)
 			this._emitter._getExpressionEmitterFor(initExpr).emit(0);
@@ -348,7 +352,7 @@ var _IfStatementEmitter = exports._IfStatementEmitter = _StatementEmitter.extend
 	},
 
 	emit: function () {
-		this._emitter._emit("if (", null);
+		this._emitter._emit("if (", this._statement.getToken());
 		this._emitter._getExpressionEmitterFor(this._statement.getExpr()).emit(0);
 		this._emitter._emit(") {\n", null);
 		this._emitter._emitStatements(this._statement.getOnTrueStatements());
@@ -371,7 +375,7 @@ var _SwitchStatementEmitter = exports._SwitchStatementEmitter = _StatementEmitte
 
 	emit: function () {
 		_Util.emitLabelOfStatement(this._emitter, this._statement);
-		this._emitter._emit("switch (", null);
+		this._emitter._emit("switch (", this._statement.getToken());
 		var expr = this._statement.getExpr();
 		if (this._emitter._enableRunTimeTypeCheck && expr.getType() instanceof NullableType) {
 			this._emitter._emitExpressionWithUndefinedAssertion(expr);
@@ -431,7 +435,7 @@ var _WhileStatementEmitter = exports._WhileStatementEmitter = _StatementEmitter.
 
 	emit: function () {
 		_Util.emitLabelOfStatement(this._emitter, this._statement);
-		this._emitter._emit("while (", null);
+		this._emitter._emit("while (", this._statement.getToken());
 		this._emitter._getExpressionEmitterFor(this._statement.getExpr()).emit(0);
 		this._emitter._emit(") {\n", null);
 		this._emitter._emitStatements(this._statement.getStatements());
@@ -1253,6 +1257,18 @@ var _PropertyExpressionEmitter = exports._PropertyExpressionEmitter = _UnaryExpr
 				return;
 			}
 		}
+		else if (expr.getExpr() instanceof ClassExpression
+			&& expr.getExpr().getType().getClassDef() === Type.stringType.getClassDef()) {
+			switch (identifierToken.getValue()) {
+			case "encodeURIComponent":
+			case "decodeURIComponent":
+			case "encodeURI":
+			case "decodeURI":
+				this._emitter._emit('$__jsx_' + identifierToken.getValue(), identifierToken);
+				return;
+			}
+		}
+
 		this._emitter._getExpressionEmitterFor(expr.getExpr()).emit(this._getPrecedence());
 		// mangle the name if necessary
 		if (exprType instanceof FunctionType && ! exprType.isAssignable()
@@ -1580,7 +1596,7 @@ var _CallExpressionEmitter = exports._CallExpressionEmitter = _OperatorExpressio
 		if (calleeExpr.getIdentifierToken().getValue() != "invoke")
 			return false;
 		var classDef = calleeExpr.getExpr().getType().getClassDef();
-		if (! (classDef.className() == "js" && classDef.getToken().getFilename() == this._emitter._platform.getRoot() + "/lib/js/js.jsx"))
+		if (! (classDef.className() == "js" && classDef.getToken().getFilename() == Util.resolvePath(this._emitter._platform.getRoot() + "/lib/js/js.jsx")))
 			return false;
 		// emit
 		var args = this._expr.getArguments();
@@ -1865,7 +1881,7 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 		if ((classDef.flags() & ClassDefinition.IS_NATIVE) != 0)
 			return;
 		// special handling for js.jsx
-		if (classDef.getToken() != null && classDef.getToken().getFilename() == this._platform.getRoot() + "/lib/js/js.jsx") {
+		if (classDef.getToken() != null && classDef.getToken().getFilename() == Util.resolvePath(this._platform.getRoot() + "/lib/js/js.jsx")) {
 			this._emit("js.global = (function () { return this; })();\n\n", null);
 			return;
 		}
@@ -1919,7 +1935,8 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 				}
 			}
 			// emit the map
-			this._emit("\"" + this._encodeFilename(filename) + "\": ", null); // FIXME escape
+			var escapedFilename = JSON.stringify(this._encodeFilename(filename, "system:"));
+			this._emit(escapedFilename  + ": ", null);
 			this._emit("{\n", null);
 			this._advanceIndent();
 			for (var i = 0; i < list.length; ++i) {
@@ -1938,9 +1955,10 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 		this._emit("};\n\n", null);
 	},
 
-	_encodeFilename: function (filename) {
-		if (filename.indexOf(this._platform.getRoot() + "/") == 0)
-			filename = "system:" + filename.substring(this._platform.getRoot().length + 1);
+	_encodeFilename: function (filename, prefix) {
+		var rootDir = this._platform.getRoot() + "/";
+		if (filename.indexOf(rootDir) == 0)
+			filename = prefix + filename.substring(rootDir.length);
 		return filename;
 	},
 
@@ -1951,7 +1969,7 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 		}
 		output += "})();\n";
 		if (entryPoint != null) {
-			output = this._platform.addLauncher(this, this._encodeFilename(sourceFile), output, entryPoint);
+			output = this._platform.addLauncher(this, this._encodeFilename(sourceFile, "system:"), output, entryPoint);
 		}
 		if (this._sourceMapGen) {
 			output += this._sourceMapGen.magicToken();
@@ -2052,9 +2070,18 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 				this._emit(
 					"var $__jsx_profiler_ctx = $__jsx_profiler.enter("
 					+ Util.encodeStringLiteral(
-						(funcDef.getClassDef() != null ? funcDef.getClassDef().getOutputClassName() : "<<unnamed>>")
-						+ ((funcDef.flags() & ClassDefinition.IS_STATIC) != 0 ? "." : ".prototype.")
-						+ this._mangleFunctionName(funcDef.getNameToken() != null ? funcDef.name() : "<<unnamed>>", funcDef.getArgumentTypes()))
+						(funcDef.getClassDef() != null ? funcDef.getClassDef().className() : "<<unnamed>>")
+						+ ((funcDef.flags() & ClassDefinition.IS_STATIC) != 0 ? "." : "#")
+						+ (funcDef.getNameToken() != null ? funcDef.name() : "line_" + funcDef.getToken().getLineNumber())
+						+ "("
+						+ function () {
+							var r = [];
+							funcDef.getArgumentTypes().forEach(function (argType) {
+								r.push(":" + argType.toString());
+							});
+							return r.join(", ");
+						}()
+						+ ")")
 					+ ");\n",
 					null);
 			}
@@ -2076,8 +2103,8 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 					continue;
 				this._emit(_Util.buildAnnotation("/** @type {%1} */\n", type), null);
 				var name = locals[i].getName();
-				this._emit("var ", null);
-				this._emit(name.getValue() + ";\n", name);
+				// do not pass the token for declaration
+				this._emit("var " + name.getValue() + ";\n", null);
 			}
 			// emit code
 			var statements = funcDef.getStatements();
@@ -2158,10 +2185,11 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 		}
 		// optional source map
 		if(this._sourceMapGen != null && token != null) {
-			var outputLines = this._output.split(/^/m);
+			var lastNewLinePos = this._output.lastIndexOf("\n") + 1;
+			var genColumn = (this._output.length - lastNewLinePos) - 1;
 			var genPos = {
-				line: outputLines.length,
-				column: outputLines[outputLines.length-1].length - 1,
+				line: this._output.match(/^/mg).length,
+				column: genColumn,
 			};
 			var origPos = {
 				line: token.getLineNumber(),
@@ -2170,10 +2198,16 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 			var tokenValue = token.isIdentifier()
 				? token.getValue()
 				: null;
+			var filename = token.getFilename();
+			if (filename != null) {
+				filename = this._encodeFilename(filename, "");
+			}
 			this._sourceMapGen.add(genPos, origPos,
-								   token.getFilename(), tokenValue);
+								   filename, tokenValue);
 		}
-		str = str.replace(/\n(.)/g, (function (a, m) { return "\n" + this._getIndent() + m; }).bind(this));
+		str = str.replace(/\n(.)/g, (function (a, m) {
+			return "\n" + this._getIndent() + m;
+		}).bind(this));
 		this._output += str;
 		this._outputEndsWithReturn = str.charAt(str.length - 1) == "\n";
 	},

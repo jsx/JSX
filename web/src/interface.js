@@ -28,11 +28,7 @@ exports.JavaScriptEmitter = require("./jsemitter").JavaScriptEmitter;
 exports.Optimizer         = require("./optimizer").Optimizer;
 
 exports.BrowserPlatform   = require("./browser-platform").BrowserPlatform;
-//exports.ScriptLoader      = require("./script-loader").ScriptLoader;
+exports.ScriptLoader      = require("./script-loader").ScriptLoader;
 
 exports.optimizationLevel = 0;
-
-window.addEventListener("load", function(e) {
-	require("./script-loader").ScriptLoader.load("..");
-});
 

@@ -75,3 +75,15 @@ function load(root) {
 exports.ScriptLoader = {
 	load: load
 };
+
+window.addEventListener("load", function(e) {
+	var root = "..";
+	try {
+		var matched = location.pathname.match(/\/try(?:-on-web)?\/(.*)\/[^\/]*$/);
+		root = matched[1].replace(/[^\/]+/g, "..");
+
+	} catch (err) { }
+
+	load(root);
+});
+
