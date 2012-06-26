@@ -154,7 +154,7 @@ final class Stage {
       this.sakura[i].x -= sakuraPosXMax + 50;
     }
 
-    this.sakura.sort(function (a: MayBeUndefined.<Sakura>, b: MayBeUndefined.<Sakura>): int {
+    this.sakura.sort(function (a: Sakura, b: Sakura): int {
       return a.size - b.size;
     });
 
@@ -315,17 +315,17 @@ final class _Main {
 
   static function getRequestAnimationFrame() : function(tick : function(:number) : void) : void {
 
-    if(js.global["requestAnimationFrame"] != undefined) {
+    if(js.global["requestAnimationFrame"] != null) {
       return function (tick : function(:number) : void) : void {
         dom.window.requestAnimationFrame(tick);
       };
     }
-    else if(js.global["webkitRequestAnimationFrame"] != undefined) {
+    else if(js.global["webkitRequestAnimationFrame"] != null) {
       return function (tick : function(:number) : void) : void {
         dom.window.webkitRequestAnimationFrame(tick);
       };
     }
-    else if(js.global["mozRequestAnimationFrame"] != undefined) {
+    else if(js.global["mozRequestAnimationFrame"] != null) {
       return function (tick : function(:number) : void) : void {
         dom.window.mozRequestAnimationFrame(tick);
       };
