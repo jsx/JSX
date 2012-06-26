@@ -75,6 +75,61 @@ function serveFile(response, uri, filename) {
 	});
 }
 
+function saveProfile(request, response) {
+	response.setHeader("Access-Control-Allow-Origin", "*");
+	response.setHeader("Access-Control-Allow-Methods", "POST,GET,OPTIONS");
+	response.setHeader("Access-Control-Allow-Headers", "Content-Type,*");
+	if (request.method != "POST") {
+		response.end();
+		return;
+	}
+
+	function twodigits(s) {
+		s = s.toString();
+		while (s.length < 2) {
+			s = "0" + s;
+		}
+		return s;
+	}
+	function YYYYmmddHHMMSS() {
+		var d = new Date();
+		return d.getFullYear() + twodigits(d.getMonth() + 1) + twodigits(d.getDate()) + twodigits(d.getHours()) + twodigits(d.getMinutes()) + twodigits(d.getSeconds());
+	}
+
+	var body = "";
+	// accumulate all data
+	request.on("data", function (data) {
+		body += data;
+	});
+	request.on("end", function () {
+		// parse as JSON
+		try {
+			var json = JSON.parse(body);
+		} catch (e) {
+			response.writeHead(400, "Bad Request", {
+				"Content-Type": "text/plain"
+			});
+			response.write("POST data is corrupt: " + e.toString());
+			response.end();
+			return;
+		}
+		// save
+		try {
+			fs.mkdirSync("web/.profile");
+		} catch (e) {
+			// FIXME ignore EEXIST only, but how?
+		}
+		var id = YYYYmmddHHMMSS();
+		fs.writeFileSync("web/.profile/" + id + ".txt", JSON.stringify(json));
+		// send response
+		response.writeHead(200, "OK", {
+			"Content-Type": "text/plain"
+		});
+		response.write("saved profile at http://" + request.headers.host + "/web/profiler.html?" + id);
+		response.end();
+	});
+}
+
 function main(args) {
 	var port = args[0] || "5000";
 
@@ -87,6 +142,10 @@ function main(args) {
 			});
 			response.end();
 			return;
+		}
+
+		if (uri.match(/^\/post-profile\/?$/) != null) {
+			return saveProfile(request, response);
 		}
 
 		var filename = path.join(process.cwd(), uri);
