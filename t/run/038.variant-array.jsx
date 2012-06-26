@@ -11,7 +11,7 @@ undefined
 */
 class Test {
 	static function run() : void {
-		var a = [ undefined, 3 ] : Array.<variant>;
+		var a = [ null, 3 ] : Array.<variant>;
 		log a[0];
 		log a[1];
 		log a[2];

@@ -73,7 +73,7 @@ abc
 */
 class Test {
 	static function run() : void {
-		var b : MayBeUndefined.<boolean> = undefined;
+		var b : Nullable.<boolean> = null;
 		log b;
 		log b as boolean;
 		log b as int;
@@ -94,7 +94,7 @@ class Test {
 		log b as number;
 		log b as string;
 		log "";
-		var i : MayBeUndefined.<int> = undefined;
+		var i : Nullable.<int> = null;
 		log i;
 		log i as boolean;
 		log i as int;
@@ -115,7 +115,7 @@ class Test {
 		log i as number;
 		log i as string;
 		log "";
-		var n : MayBeUndefined.<number> = undefined;
+		var n : Nullable.<number> = null;
 		log n;
 		log n as boolean;
 		log n as int;
@@ -136,7 +136,7 @@ class Test {
 		log n as number;
 		log n as string;
 		log "";
-		var s : MayBeUndefined.<string> = undefined;
+		var s : Nullable.<string> = null;
 		log s;
 		log s as boolean;
 		log s as int;

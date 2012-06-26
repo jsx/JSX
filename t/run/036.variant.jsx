@@ -31,36 +31,36 @@ abc
 */
 class Test {
 	static function run() : void {
-		var v : variant = undefined;
-		log v == undefined;
+		var v : variant = null;
+		log v == null;
 		log v as boolean;
 		log v as int;
 		log v as number;
 		log (v as string).split("").join(",");
 		log "";
 		v = false;
-		log v == undefined;
+		log v == null;
 		log v as boolean;
 		log v as int;
 		log v as number;
 		log (v as string).split("").join(",");
 		log "";
 		v = true;
-		log v == undefined;
+		log v == null;
 		log v as boolean;
 		log v as int;
 		log v as number;
 		log (v as string).split("").join(",");
 		log "";
 		v = 1.5;
-		log v == undefined;
+		log v == null;
 		log v as boolean;
 		log v as int;
 		log v as number;
 		log (v as string).split("").join(",");
 		log "";
 		v = "abc";
-		log v == undefined;
+		log v == null;
 		log v as boolean;
 		log v as int;
 		log v as number;

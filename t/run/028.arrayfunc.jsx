@@ -13,7 +13,7 @@ undefined
 7,6,5,4,3,2,1,0
 */
 class Test {
-	static function reverse_cmp(x : MayBeUndefined.<number>, y : MayBeUndefined.<number>) : int {
+	static function reverse_cmp(x : Nullable.<number>, y : Nullable.<number>) : int {
 		return y - x;
 	}
 

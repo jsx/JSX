@@ -26,7 +26,7 @@ class Test {
 		};
 		log b["x"];
 		log b["y"];
-		log b["A"] == undefined;
+		log b["A"] == null;
 		var c = {
 			x: new String("a"),
 			y: new String("b"),
@@ -35,6 +35,6 @@ class Test {
 		log c["x"].toString();
 		log c["y"].toString();
 		log c["z"] == null;
-		log c["A"] == undefined;
+		log c["A"] == null;
 	}
 }

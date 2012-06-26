@@ -8,7 +8,7 @@ class Base {
 
 class Test extends Base {
 	static function run() : void {
-		var o : MayBeUndefined.<Test> = new Test;
+		var o : Nullable.<Test> = new Test;
 		o.x = 42;
 		log o.x;
 	}

@@ -12,20 +12,20 @@ undefinedundefined
 */
 class Test {
 	static function run() : void {
-		var a : MayBeUndefined.<number> = 3;
-		var b : MayBeUndefined.<number> = undefined;
+		var a : Nullable.<number> = 3;
+		var b : Nullable.<number> = null;
 		log a;
 		log a + b;
-		a = undefined;
+		a = null;
 		log a;
 		log a + b;
 		log b + a;
 
-		var c : MayBeUndefined.<string> = "abc";
-		var d : MayBeUndefined.<string> = undefined;
+		var c : Nullable.<string> = "abc";
+		var d : Nullable.<string> = null;
 		log c;
 		log c + d;
-		c = undefined;
+		c = null;
 		log c;
 		log c + d;
 		log d + c;

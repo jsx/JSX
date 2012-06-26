@@ -15,7 +15,7 @@ class Test {
 		var n = 20.5;
 		Test.f(n);
 
-		var mn : MayBeUndefined.<number> = 30.5;
+		var mn : Nullable.<number> = 30.5;
 		Test.f(mn);
 	}
 }

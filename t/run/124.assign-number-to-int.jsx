@@ -9,10 +9,10 @@ undefined
 class Test {
 	static function run() : void {
 		var n : number = 1.3;
-		var mn : MayBeUndefined.<number> = 1.3;
-		var un : MayBeUndefined.<number> = undefined;
+		var mn : Nullable.<number> = 1.3;
+		var un : Nullable.<number> = null;
 		var i : int;
-		var mi : MayBeUndefined.<int>;
+		var mi : Nullable.<int>;
 		log (i = n);
 		log (i = mn);
 		// runtime error log (i = un);
