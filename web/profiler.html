@@ -105,7 +105,7 @@ var functions = function () {
   return ret;
 }();
 
-var tree = function doit(list, entry) {
+function createTree(list, entry) {
   list.push({
     name:      entry.$name,
     count:     entry.$count,
@@ -115,14 +115,58 @@ var tree = function doit(list, entry) {
   var callee = [];
   for (var k in entry) {
     if (k.charAt(0) != "$") {
-      doit(callee, entry[k]);
+      createTree(callee, entry[k]);
     }
   }
   list[list.length - 1].callee = callee.sort(function (x, y) {
     return x.inclusive - y.inclusive;
   });
   return list;
-}([], profileData);
+}
+
+var tree = createTree([], profileData);
+var invertedTree = createTree([], function () {
+  function fill(slot, entry) {
+    var t = slot[entry.$name];
+    if (t) {
+      t.$count += entry.$count;
+      t.$inclusive += entry.$inclusive;
+      t.$exclusive += entry.$exclusive;
+    } else {
+      t = slot[entry.$name] = {
+        $name:      entry.$name,
+        $count:     entry.$count,
+        $inclusive: entry.$inclusive,
+        $exclusive: entry.$exclusive,
+      };
+    }
+    return t;
+  }
+  var root = {};
+  function doIt(entry) {
+    var slots = [];
+    for (var k in entry) {
+      if (k.charAt(0) != "$") {
+        slots = slots.concat(doIt(entry[k]));
+      }
+    }
+    if (slots.length == 0) {
+      // is leaf
+      slots.push(fill(root, entry));
+    } else {
+      for (var i = 0; i < slots.length; ++i) {
+        slots[i] = fill(slots[i], entry);
+      }
+    }
+    return slots;
+  }
+  for (var key in profileData) {
+    if (key.charAt(0) != "$") {
+      doIt(profileData[key]);
+    }
+  }
+  return root;
+}());
 
 function escapeHTML(s) {
   return s.toString()
@@ -177,30 +221,35 @@ function buildList(comparator) {
   $("#results-holder").html(html);
 }
 
-function buildTree(comparator) {
-  var html = buildHeader();
-  var rowIndex = 1;
-  (function doit(callee, parentRowIndex) {
-    var callee = callee.sort(comparator);
-    for (var i = 0; i < callee.length; ++i) {
-      var theRowIndex = rowIndex++;
-      html += buildRow(
-        "node-" + theRowIndex,
-        parentRowIndex ? "child-of-node-" + parentRowIndex : null,
-        callee[i].name, callee[i].count, callee[i].inclusive,
-        callee[i].exclusive);
-      doit(callee[i].callee, theRowIndex);
-    }
-  })(tree[0].callee, 0);
-  html += "</table>";
-  $("#results-holder").html(html);
-  $("#results").treeTable();
+function getTreeBuilder(tree) {
+  return function (comparator) {
+    var html = buildHeader();
+    var rowIndex = 1;
+    (function doit(callee, parentRowIndex) {
+      var callee = callee.sort(comparator);
+      for (var i = 0; i < callee.length; ++i) {
+        var theRowIndex = rowIndex++;
+        html += buildRow(
+          "node-" + theRowIndex,
+          parentRowIndex ? "child-of-node-" + parentRowIndex : null,
+          callee[i].name, callee[i].count, callee[i].inclusive,
+          callee[i].exclusive);
+        doit(callee[i].callee, theRowIndex);
+      }
+    })(tree[0].callee, 0);
+    html += "</table>";
+    $("#results-holder").html(html);
+    $("#results").treeTable();
+  };
 }
 
 function updateTable(orderBy) {
   switch ($("#mode option:selected").val()) {
   case "tree":
-    var builder = buildTree;
+    var builder = getTreeBuilder(tree);
+    break;
+  case "invertedTree":
+    builder = getTreeBuilder(invertedTree);
     break;
   case "name":
     builder = buildList;
@@ -208,18 +257,22 @@ function updateTable(orderBy) {
   default:
     throw new Error("unexpected mode");
   }
-  builder(function (x, y) {
-    var xValue = x[orderBy];
-    var yValue = y[orderBy];
-    if (xValue == yValue)
-      var ret = 0;
-    else if (xValue < yValue)
-      ret = -1;
-    else
-      ret = 1;
-    if (orderBy != "name")
+  function compareBy(field, x, y) {
+    if (x[field] == y[field]) {
+      if (field != "name") {
+        return compareBy("name", x, y);
+      } else {
+        return 0;
+      }
+    }
+    var ret = x[field] < y[field] ? -1 : 1;
+    if (field != "name") {
       ret *= -1;
+    }
     return ret;
+  }
+  builder(function comparator(x, y) {
+    return compareBy(orderBy, x, y);
   });
 }
 
@@ -238,6 +291,7 @@ $(document).ready(function () {
       Mode:
       <select id="mode">
 	<option value="tree">Call Tree</option>
+        <option value="invertedTree">Call Tree (inverted)</option>
 	<option value="name">Functions</option>
       </select>
     </div>
