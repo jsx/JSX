@@ -8,7 +8,7 @@ class _Test extends TestCase {
 		this.expect(a[0]).toBe(10);
 		this.expect(a[1]).toBe(20);
 		this.expect(a[2]).toBe(30);
-		this.expect(a[3]).toBe(undefined);
+		this.expect(a[3]).toBe(null);
 
 		this.expect(a.byteLength).toBe(3);
 
@@ -23,7 +23,7 @@ class _Test extends TestCase {
 		this.expect(a[0]).toBe(10);
 		this.expect(a[1]).toBe(20);
 		this.expect(a[2]).toBe(30);
-		this.expect(a[3]).toBe(undefined);
+		this.expect(a[3]).toBe(null);
 
 		this.expect(a.byteLength).toBe(3);
 
@@ -38,7 +38,7 @@ class _Test extends TestCase {
 		this.expect(a[0]).toBe(10);
 		this.expect(a[1]).toBe(20);
 		this.expect(a[2]).toBe(30);
-		this.expect(a[3]).toBe(undefined);
+		this.expect(a[3]).toBe(null);
 
 		this.expect(a.byteLength).toBe(3 * 2);
 
@@ -53,7 +53,7 @@ class _Test extends TestCase {
 		this.expect(a[0]).toBe(10);
 		this.expect(a[1]).toBe(20);
 		this.expect(a[2]).toBe(30);
-		this.expect(a[3]).toBe(undefined);
+		this.expect(a[3]).toBe(null);
 
 		this.expect(a.byteLength).toBe(3 * 2);
 
@@ -68,7 +68,7 @@ class _Test extends TestCase {
 		this.expect(a[0]).toBe(10);
 		this.expect(a[1]).toBe(20);
 		this.expect(a[2]).toBe(30);
-		this.expect(a[3]).toBe(undefined);
+		this.expect(a[3]).toBe(null);
 
 		this.expect(a.byteLength).toBe(3 * 4);
 
@@ -83,7 +83,7 @@ class _Test extends TestCase {
 		this.expect(a[0]).toBe(10);
 		this.expect(a[1]).toBe(20);
 		this.expect(a[2]).toBe(30);
-		this.expect(a[3]).toBe(undefined);
+		this.expect(a[3]).toBe(null);
 
 		this.expect(a.byteLength).toBe(3 * 4);
 
@@ -98,7 +98,7 @@ class _Test extends TestCase {
 		this.expect(a[0]).toBe(10);
 		this.expect(a[1]).toBe(20);
 		this.expect(a[2]).toBe(30);
-		this.expect(a[3]).toBe(undefined);
+		this.expect(a[3]).toBe(null);
 
 		this.expect(a.byteLength).toBe(3 * 4);
 
@@ -113,7 +113,7 @@ class _Test extends TestCase {
 		this.expect(a[0]).toBe(10);
 		this.expect(a[1]).toBe(20);
 		this.expect(a[2]).toBe(30);
-		this.expect(a[3]).toBe(undefined);
+		this.expect(a[3]).toBe(null);
 
 		this.expect(a.byteLength).toBe(3 * 8);
 

@@ -28,51 +28,51 @@ class _Test extends TestCase {
 		this.expect(a.lastIndexOf(2), "lastIndex").toBe(3);
 		this.expect(a.lastIndexOf(2, 2), "lastIndex").toBe(1);
 
-		this.expect(a.every(function(v : MayBeUndefined.<number>) : boolean {
+		this.expect(a.every(function(v : Nullable.<number>) : boolean {
 			return v > 0;
 		})).toBe(true);
-		this.expect(a.every(function(v : MayBeUndefined.<number>) : boolean {
+		this.expect(a.every(function(v : Nullable.<number>) : boolean {
 			return v > 1;
 		})).toBe(false);
 
 		var i = 0;
-		this.expect(a.every(function(v : MayBeUndefined.<number>, index : number) : boolean {
+		this.expect(a.every(function(v : Nullable.<number>, index : number) : boolean {
 			this.expect(index).toBe(i++);
 			return true;
 		})).toBe(true);
 
-		this.expect(a.every(function(v : MayBeUndefined.<number>, index : number, array : number[]) : boolean {
+		this.expect(a.every(function(v : Nullable.<number>, index : number, array : number[]) : boolean {
 			this.expect(array).toBe(a);
 			return true;
 		})).toBe(true);
 
-		this.expect(a.some(function(v : MayBeUndefined.<number>) : boolean {
+		this.expect(a.some(function(v : Nullable.<number>) : boolean {
 			return v == 3;
 		}), "some").toBe(true);
 
 		i = 0;
-		a.forEach(function(v : MayBeUndefined.<number>) : void {
+		a.forEach(function(v : Nullable.<number>) : void {
 			i += v;
 		});
 		this.expect(i, "forEach").toBe(1 + 2 + 3 + 2 + 1);
 
-		var b = a.map(function(v : MayBeUndefined.<number>) : MayBeUndefined.<number> {
+		var b = a.map(function(v : Nullable.<number>) : Nullable.<number> {
 			return -v;
 		});
 		this.expect(JSON.stringify(b), "map").toBe(JSON.stringify([-1, -2, -3, -2, -1]));
 
-		b = a.filter(function(v : MayBeUndefined.<number>) : boolean {
+		b = a.filter(function(v : Nullable.<number>) : boolean {
 			return v > 1;
 		});
 		this.expect(JSON.stringify(b), "map").toBe(JSON.stringify([ 2, 3, 2 ]));
 
-		var sum = a.reduce(function(p : MayBeUndefined.<number>, c : MayBeUndefined.<number>) : MayBeUndefined.<number> {
+		var sum = a.reduce(function(p : Nullable.<number>, c : Nullable.<number>) : Nullable.<number> {
 			return p + c;
 		}, 0);
 		this.expect(i, "reduce").toBe(1 + 2 + 3 + 2 + 1);
 
 
-		sum = a.reduceRight(function(p : MayBeUndefined.<number>, c : MayBeUndefined.<number>) : MayBeUndefined.<number> {
+		sum = a.reduceRight(function(p : Nullable.<number>, c : Nullable.<number>) : Nullable.<number> {
 			return p + c;
 		}, 0);
 		this.expect(i, "reduceRight").toBe(1 + 2 + 3 + 2 + 1);

@@ -44,7 +44,7 @@ class _Test extends TestCase {
 		this.async(function(async : AsyncContext) : void {
 			var interval = 10;
 			var count = 3;
-			var id : MayBeUndefined.<TimerHandle> = undefined;
+			var id : TimerHandle = null;
 			id = Timer.setInterval(function() : void {
 				--count;
 				this.expect(count, "setInterval " + count as string).toBeGE(0);
