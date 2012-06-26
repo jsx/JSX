@@ -69,8 +69,8 @@ class _Test extends TestCase {
     // #3
     function compile_Event(o : Event) : void {
         var v1 : string/*DOMString*/ = o.type;
-        var v2 : Nullable.<EventTarget> = o.target;
-        var v3 : Nullable.<EventTarget> = o.currentTarget;
+        var v2 : EventTarget = o.target;
+        var v3 : EventTarget = o.currentTarget;
         var v4 : int/*unsigned short*/ = Event.CAPTURING_PHASE;
         var v5 : int/*unsigned short*/ = o.CAPTURING_PHASE;
         var v6 : int/*unsigned short*/ = Event.AT_TARGET;
@@ -96,8 +96,8 @@ class _Test extends TestCase {
         var v22 : int/*unsigned short*/ = Event.BUBBLING_PHASE;
         var v23 : int/*unsigned short*/ = o.BUBBLING_PHASE;
         var v24 : string/*DOMString*/ = o.type;
-        var v25 : Nullable.<EventTarget> = o.target;
-        var v26 : Nullable.<EventTarget> = o.currentTarget;
+        var v25 : EventTarget = o.target;
+        var v26 : EventTarget = o.currentTarget;
         var v27 : int/*unsigned short*/ = o.eventPhase;
         var v28 : boolean = o.bubbles;
         var v29 : boolean = o.cancelable;
@@ -135,15 +135,15 @@ class _Test extends TestCase {
 
     // #7
     function compile_EventTarget(o : EventTarget) : void {
-        o.addEventListener(X.getstring(), X.getNullable__function__Event__void_());
-        o.addEventListener(X.getstring(), X.getNullable__function__Event__void_(), X.getboolean());
-        o.removeEventListener(X.getstring(), X.getNullable__function__Event__void_());
-        o.removeEventListener(X.getstring(), X.getNullable__function__Event__void_(), X.getboolean());
+        o.addEventListener(X.getstring(), X.getfunction__Event__void());
+        o.addEventListener(X.getstring(), X.getfunction__Event__void(), X.getboolean());
+        o.removeEventListener(X.getstring(), X.getfunction__Event__void());
+        o.removeEventListener(X.getstring(), X.getfunction__Event__void(), X.getboolean());
         var f1 : boolean = o.dispatchEvent(X.getEvent());
-        o.addEventListener(X.getstring(), X.getNullable__function__Event__void_());
-        o.addEventListener(X.getstring(), X.getNullable__function__Event__void_(), X.getboolean());
-        o.removeEventListener(X.getstring(), X.getNullable__function__Event__void_());
-        o.removeEventListener(X.getstring(), X.getNullable__function__Event__void_(), X.getboolean());
+        o.addEventListener(X.getstring(), X.getfunction__Event__void());
+        o.addEventListener(X.getstring(), X.getfunction__Event__void(), X.getboolean());
+        o.removeEventListener(X.getstring(), X.getfunction__Event__void());
+        o.removeEventListener(X.getstring(), X.getfunction__Event__void(), X.getboolean());
         var f2 : boolean = o.dispatchEvent(X.getEvent());
     } // EventTarget
 
@@ -168,10 +168,10 @@ class _Test extends TestCase {
     function compile_MutationRecord(o : MutationRecord) : void {
         var v1 : string/*DOMString*/ = o.type;
         var v2 : Node = o.target;
-        var v3 : Nullable.<NodeList> = o.addedNodes;
-        var v4 : Nullable.<NodeList> = o.removedNodes;
-        var v5 : Nullable.<Node> = o.previousSibling;
-        var v6 : Nullable.<Node> = o.nextSibling;
+        var v3 : NodeList = o.addedNodes;
+        var v4 : NodeList = o.removedNodes;
+        var v5 : Node = o.previousSibling;
+        var v6 : Node = o.nextSibling;
         var v7 : Nullable.<string>/*DOMString?*/ = o.attributeName;
         var v8 : Nullable.<string>/*DOMString?*/ = o.attributeNamespace;
         var v9 : Nullable.<string>/*DOMString?*/ = o.oldValue;
@@ -206,15 +206,15 @@ class _Test extends TestCase {
         var v25 : int/*unsigned short*/ = o.nodeType;
         var v26 : string/*DOMString*/ = o.nodeName;
         var v27 : Nullable.<string>/*DOMString?*/ = o.baseURI;
-        var v28 : Nullable.<Document> = o.ownerDocument;
-        var v29 : Nullable.<Node> = o.parentNode;
-        var v30 : Nullable.<Element> = o.parentElement;
+        var v28 : Document = o.ownerDocument;
+        var v29 : Node = o.parentNode;
+        var v30 : Element = o.parentElement;
         var f31 : boolean = o.hasChildNodes();
         var v32 : NodeList = o.childNodes;
-        var v33 : Nullable.<Node> = o.firstChild;
-        var v34 : Nullable.<Node> = o.lastChild;
-        var v35 : Nullable.<Node> = o.previousSibling;
-        var v36 : Nullable.<Node> = o.nextSibling;
+        var v33 : Node = o.firstChild;
+        var v34 : Node = o.lastChild;
+        var v35 : Node = o.previousSibling;
+        var v36 : Node = o.nextSibling;
         var v37 : int/*unsigned short*/ = Node.DOCUMENT_POSITION_DISCONNECTED;
         var v38 : int/*unsigned short*/ = o.DOCUMENT_POSITION_DISCONNECTED;
         var v39 : int/*unsigned short*/ = Node.DOCUMENT_POSITION_PRECEDING;
@@ -228,17 +228,17 @@ class _Test extends TestCase {
         var v47 : int/*unsigned short*/ = Node.DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC;
         var v48 : int/*unsigned short*/ = o.DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC;
         var f49 : int/*unsigned short*/ = o.compareDocumentPosition(X.getNode());
-        var f50 : boolean = o.contains(X.getNullable__Node_());
+        var f50 : boolean = o.contains(X.getNode());
         var v51 : Nullable.<string>/*DOMString?*/ = o.nodeValue;
         var v52 : Nullable.<string>/*DOMString?*/ = o.textContent;
-        var f53 : Node = o.insertBefore(X.getNode(), X.getNullable__Node_());
+        var f53 : Node = o.insertBefore(X.getNode(), X.getNode());
         var f54 : Node = o.appendChild(X.getNode());
         var f55 : Node = o.replaceChild(X.getNode(), X.getNode());
         var f56 : Node = o.removeChild(X.getNode());
         o.normalize();
         var f57 : Node = o.cloneNode();
         var f58 : Node = o.cloneNode(X.getboolean());
-        var f59 : boolean = o.isEqualNode(X.getNullable__Node_());
+        var f59 : boolean = o.isEqualNode(X.getNode());
         var f60 : string/*DOMString*/ = o.lookupPrefix(X.getNullable__string_());
         var f61 : string/*DOMString*/ = o.lookupNamespaceURI(X.getNullable__string_());
         var f62 : boolean = o.isDefaultNamespace(X.getNullable__string_());
@@ -252,12 +252,12 @@ class _Test extends TestCase {
         var v4 : string/*DOMString*/ = o.compatMode;
         var v5 : string/*DOMString*/ = o.characterSet;
         var v6 : string/*DOMString*/ = o.contentType;
-        var v7 : Nullable.<DocumentType> = o.doctype;
-        var v8 : Nullable.<Element> = o.documentElement;
+        var v7 : DocumentType = o.doctype;
+        var v8 : Element = o.documentElement;
         var f9 : HTMLCollection = o.getElementsByTagName(X.getstring());
         var f10 : HTMLCollection = o.getElementsByTagNameNS(X.getNullable__string_(), X.getstring());
         var f11 : HTMLCollection = o.getElementsByClassName(X.getstring());
-        var f12 : Nullable.<Element> = o.getElementById(X.getstring());
+        var f12 : Element = o.getElementById(X.getstring());
         var f13 : Element = o.createElement(X.getstring());
         var f14 : Element = o.createElementNS(X.getNullable__string_(), X.getstring());
         var f15 : DocumentFragment = o.createDocumentFragment();
@@ -271,10 +271,10 @@ class _Test extends TestCase {
         var f23 : Range = o.createRange();
         var f24 : NodeIterator = o.createNodeIterator(X.getNode());
         var f25 : NodeIterator = o.createNodeIterator(X.getNode(), X.getint());
-        var f26 : NodeIterator = o.createNodeIterator(X.getNode(), X.getint(), X.getNullable__NodeFilter_());
+        var f26 : NodeIterator = o.createNodeIterator(X.getNode(), X.getint(), X.getNodeFilter());
         var f27 : TreeWalker = o.createTreeWalker(X.getNode());
         var f28 : TreeWalker = o.createTreeWalker(X.getNode(), X.getint());
-        var f29 : TreeWalker = o.createTreeWalker(X.getNode(), X.getint(), X.getNullable__NodeFilter_());
+        var f29 : TreeWalker = o.createTreeWalker(X.getNode(), X.getint(), X.getNodeFilter());
         o.prepend(X.getNode());
         o.prepend(X.getstring());
         o.append(X.getNode());
@@ -286,8 +286,8 @@ class _Test extends TestCase {
         var v34 : Nullable.<string>/*DOMString?*/ = o.preferredStyleSheetSet;
         var v35 : DOMStringList = o.styleSheetSets;
         o.enableStyleSheetsForSet(X.getNullable__string_());
-        var f36 : Nullable.<Element> = o.elementFromPoint(X.getnumber(), X.getnumber());
-        var f37 : Nullable.<CaretPosition> = o.caretPositionFromPoint(X.getnumber(), X.getnumber());
+        var f36 : Element = o.elementFromPoint(X.getnumber(), X.getnumber());
+        var f37 : CaretPosition = o.caretPositionFromPoint(X.getnumber(), X.getnumber());
         var f38 : Touch = o.createTouch(X.getAbstractView(), X.getEventTarget(), X.getint(), X.getint(), X.getint(), X.getint(), X.getint());
         var f39 : TouchList = o.createTouchList(X.getTouch__());
         var f40 : TouchList = o.createTouchList(X.getTouch());
@@ -303,7 +303,7 @@ class _Test extends TestCase {
     // #14
     function compile_DOMImplementation(o : DOMImplementation) : void {
         var f1 : DocumentType = o.createDocumentType(X.getstring(), X.getstring(), X.getstring());
-        var f2 : XMLDocument = o.createDocument(X.getNullable__string_(), X.getstring(), X.getNullable__DocumentType_());
+        var f2 : XMLDocument = o.createDocument(X.getNullable__string_(), X.getstring(), X.getDocumentType());
         var f3 : Document = o.createHTMLDocument(X.getstring());
         var f4 : boolean = o.hasFeature(X.getstring(), X.getstring());
     } // DOMImplementation
@@ -354,10 +354,10 @@ class _Test extends TestCase {
         var f14 : HTMLCollection = o.getElementsByTagNameNS(X.getNullable__string_(), X.getstring());
         var f15 : HTMLCollection = o.getElementsByClassName(X.getstring());
         var v16 : HTMLCollection = o.children;
-        var v17 : Nullable.<Element> = o.firstElementChild;
-        var v18 : Nullable.<Element> = o.lastElementChild;
-        var v19 : Nullable.<Element> = o.previousElementSibling;
-        var v20 : Nullable.<Element> = o.nextElementSibling;
+        var v17 : Element = o.firstElementChild;
+        var v18 : Element = o.lastElementChild;
+        var v19 : Element = o.previousElementSibling;
+        var v20 : Element = o.nextElementSibling;
         var v21 : int/*unsigned long*/ = o.childElementCount;
         o.prepend(X.getNode());
         o.prepend(X.getstring());
@@ -477,12 +477,12 @@ class _Test extends TestCase {
     // #24
     function compile_NodeIterator(o : NodeIterator) : void {
         var v1 : Node = o.root;
-        var v2 : Nullable.<Node> = o.referenceNode;
+        var v2 : Node = o.referenceNode;
         var v3 : boolean = o.pointerBeforeReferenceNode;
         var v4 : int/*unsigned long*/ = o.whatToShow;
-        var v5 : Nullable.<NodeFilter> = o.filter;
-        var f6 : Nullable.<Node> = o.nextNode();
-        var f7 : Nullable.<Node> = o.previousNode();
+        var v5 : NodeFilter = o.filter;
+        var f6 : Node = o.nextNode();
+        var f7 : Node = o.previousNode();
         o.detach();
     } // NodeIterator
 
@@ -490,15 +490,15 @@ class _Test extends TestCase {
     function compile_TreeWalker(o : TreeWalker) : void {
         var v1 : Node = o.root;
         var v2 : int/*unsigned long*/ = o.whatToShow;
-        var v3 : Nullable.<NodeFilter> = o.filter;
+        var v3 : NodeFilter = o.filter;
         var v4 : Node = o.currentNode;
-        var f5 : Nullable.<Node> = o.parentNode();
-        var f6 : Nullable.<Node> = o.firstChild();
-        var f7 : Nullable.<Node> = o.lastChild();
-        var f8 : Nullable.<Node> = o.previousSibling();
-        var f9 : Nullable.<Node> = o.nextSibling();
-        var f10 : Nullable.<Node> = o.previousNode();
-        var f11 : Nullable.<Node> = o.nextNode();
+        var f5 : Node = o.parentNode();
+        var f6 : Node = o.firstChild();
+        var f7 : Node = o.lastChild();
+        var f8 : Node = o.previousSibling();
+        var f9 : Node = o.nextSibling();
+        var f10 : Node = o.previousNode();
+        var f11 : Node = o.nextNode();
     } // TreeWalker
 
     // #26
@@ -540,18 +540,18 @@ class _Test extends TestCase {
 
     // #27
     function compile_NodeList(o : NodeList) : void {
-        var f1 : Nullable.<Node> = o.__native_index_operator__(X.getint());
-        var f2 : Nullable.<Node> = o.item(X.getint());
+        var f1 : Node = o.__native_index_operator__(X.getint());
+        var f2 : Node = o.item(X.getint());
         var v3 : int/*unsigned long*/ = o.length;
     } // NodeList
 
     // #28
     function compile_HTMLCollection(o : HTMLCollection) : void {
         var v1 : int/*unsigned long*/ = o.length;
-        var f2 : Nullable.<Element> = o.__native_index_operator__(X.getint());
-        var f3 : Nullable.<Element> = o.item(X.getint());
-        var f4 : Nullable.<Object>/*object?*/ = o.__native_index_operator__(X.getstring());
-        var f5 : Nullable.<Object>/*object?*/ = o.namedItem(X.getstring());
+        var f2 : Element = o.__native_index_operator__(X.getint());
+        var f3 : Element = o.item(X.getint());
+        var f4 : Object/*object?*/ = o.__native_index_operator__(X.getstring());
+        var f5 : Object/*object?*/ = o.namedItem(X.getstring());
     } // HTMLCollection
 
     // #29
@@ -595,15 +595,15 @@ class _Test extends TestCase {
 
     // #35
     function compile_UIEvent(o : UIEvent) : void {
-        var v1 : Nullable.<AbstractView> = o.view;
+        var v1 : AbstractView = o.view;
         var v2 : int/*long*/ = o.detail;
-        o.initUIEvent(X.getstring(), X.getboolean(), X.getboolean(), X.getNullable__AbstractView_(), X.getint());
+        o.initUIEvent(X.getstring(), X.getboolean(), X.getboolean(), X.getAbstractView(), X.getint());
     } // UIEvent
 
     // #36
     function compile_FocusEvent(o : FocusEvent) : void {
-        var v1 : Nullable.<EventTarget> = o.relatedTarget;
-        o.initFocusEvent(X.getstring(), X.getboolean(), X.getboolean(), X.getNullable__AbstractView_(), X.getint(), X.getNullable__EventTarget_());
+        var v1 : EventTarget = o.relatedTarget;
+        o.initFocusEvent(X.getstring(), X.getboolean(), X.getboolean(), X.getAbstractView(), X.getint(), X.getEventTarget());
     } // FocusEvent
 
     // #37
@@ -618,8 +618,8 @@ class _Test extends TestCase {
         var v8 : boolean = o.metaKey;
         var v9 : int/*unsigned short*/ = o.button;
         var v10 : int/*unsigned short*/ = o.buttons;
-        var v11 : Nullable.<EventTarget> = o.relatedTarget;
-        o.initMouseEvent(X.getstring(), X.getboolean(), X.getboolean(), X.getNullable__AbstractView_(), X.getint(), X.getint(), X.getint(), X.getint(), X.getint(), X.getboolean(), X.getboolean(), X.getboolean(), X.getboolean(), X.getint(), X.getNullable__EventTarget_());
+        var v11 : EventTarget = o.relatedTarget;
+        o.initMouseEvent(X.getstring(), X.getboolean(), X.getboolean(), X.getAbstractView(), X.getint(), X.getint(), X.getint(), X.getint(), X.getint(), X.getboolean(), X.getboolean(), X.getboolean(), X.getboolean(), X.getint(), X.getEventTarget());
         var f12 : boolean = o.getModifierState(X.getstring());
         var v13 : int/*long*/ = o.screenX;
         var v14 : int/*long*/ = o.screenY;
@@ -645,7 +645,7 @@ class _Test extends TestCase {
         var v8 : number/*float*/ = o.deltaY;
         var v9 : number/*float*/ = o.deltaZ;
         var v10 : int/*unsigned long*/ = o.deltaMode;
-        o.initWheelEvent(X.getstring(), X.getboolean(), X.getboolean(), X.getNullable__AbstractView_(), X.getint(), X.getint(), X.getint(), X.getint(), X.getint(), X.getint(), X.getNullable__EventTarget_(), X.getstring(), X.getnumber(), X.getnumber(), X.getnumber(), X.getint());
+        o.initWheelEvent(X.getstring(), X.getboolean(), X.getboolean(), X.getAbstractView(), X.getint(), X.getint(), X.getint(), X.getint(), X.getint(), X.getint(), X.getEventTarget(), X.getstring(), X.getnumber(), X.getnumber(), X.getnumber(), X.getint());
     } // WheelEvent
 
     // #39
@@ -672,7 +672,7 @@ class _Test extends TestCase {
         var v20 : boolean = o.repeat;
         var v21 : string/*DOMString*/ = o.locale;
         var f22 : boolean = o.getModifierState(X.getstring());
-        o.initKeyboardEvent(X.getstring(), X.getboolean(), X.getboolean(), X.getNullable__AbstractView_(), X.getstring(), X.getstring(), X.getint(), X.getstring(), X.getboolean(), X.getstring());
+        o.initKeyboardEvent(X.getstring(), X.getboolean(), X.getboolean(), X.getAbstractView(), X.getstring(), X.getstring(), X.getint(), X.getstring(), X.getboolean(), X.getstring());
         var v23 : int/*unsigned long*/ = o.charCode;
         var v24 : int/*unsigned long*/ = o.keyCode;
         var v25 : int/*unsigned long*/ = o.which;
@@ -682,7 +682,7 @@ class _Test extends TestCase {
     function compile_CompositionEvent(o : CompositionEvent) : void {
         var v1 : Nullable.<string>/*DOMString?*/ = o.data;
         var v2 : string/*DOMString*/ = o.locale;
-        o.initCompositionEvent(X.getstring(), X.getboolean(), X.getboolean(), X.getNullable__AbstractView_(), X.getNullable__string_(), X.getstring());
+        o.initCompositionEvent(X.getstring(), X.getboolean(), X.getboolean(), X.getAbstractView(), X.getNullable__string_(), X.getstring());
     } // CompositionEvent
 
     // #41
@@ -693,19 +693,19 @@ class _Test extends TestCase {
         var v4 : int/*unsigned short*/ = o.ADDITION;
         var v5 : int/*unsigned short*/ = MutationEvent.REMOVAL;
         var v6 : int/*unsigned short*/ = o.REMOVAL;
-        var v7 : Nullable.<Node> = o.relatedNode;
+        var v7 : Node = o.relatedNode;
         var v8 : string/*DOMString*/ = o.prevValue;
         var v9 : string/*DOMString*/ = o.newValue;
         var v10 : string/*DOMString*/ = o.attrName;
         var v11 : int/*unsigned short*/ = o.attrChange;
-        o.initMutationEvent(X.getstring(), X.getboolean(), X.getboolean(), X.getNullable__Node_(), X.getstring(), X.getstring(), X.getstring(), X.getint());
+        o.initMutationEvent(X.getstring(), X.getboolean(), X.getboolean(), X.getNode(), X.getstring(), X.getstring(), X.getstring(), X.getint());
     } // MutationEvent
 
     // #42
     function compile_UIEventInit(o : UIEventInit) : void {
         var v1 : boolean = o.bubbles;
         var v2 : boolean = o.cancelable;
-        var v3 : Nullable.<AbstractView> = o.view;
+        var v3 : AbstractView = o.view;
         var v4 : int/*long*/ = o.detail;
     } // UIEventInit
 
@@ -713,16 +713,16 @@ class _Test extends TestCase {
     function compile_FocusEventInit(o : FocusEventInit) : void {
         var v1 : boolean = o.bubbles;
         var v2 : boolean = o.cancelable;
-        var v3 : Nullable.<AbstractView> = o.view;
+        var v3 : AbstractView = o.view;
         var v4 : int/*long*/ = o.detail;
-        var v5 : Nullable.<EventTarget> = o.relatedTarget;
+        var v5 : EventTarget = o.relatedTarget;
     } // FocusEventInit
 
     // #44
     function compile_MouseEventInit(o : MouseEventInit) : void {
         var v1 : boolean = o.bubbles;
         var v2 : boolean = o.cancelable;
-        var v3 : Nullable.<AbstractView> = o.view;
+        var v3 : AbstractView = o.view;
         var v4 : int/*long*/ = o.detail;
         var v5 : int/*long*/ = o.screenX;
         var v6 : int/*long*/ = o.screenY;
@@ -734,14 +734,14 @@ class _Test extends TestCase {
         var v12 : boolean = o.metaKey;
         var v13 : int/*unsigned short*/ = o.button;
         var v14 : int/*unsigned short*/ = o.buttons;
-        var v15 : Nullable.<EventTarget> = o.relatedTarget;
+        var v15 : EventTarget = o.relatedTarget;
     } // MouseEventInit
 
     // #45
     function compile_WheelEventInit(o : WheelEventInit) : void {
         var v1 : boolean = o.bubbles;
         var v2 : boolean = o.cancelable;
-        var v3 : Nullable.<AbstractView> = o.view;
+        var v3 : AbstractView = o.view;
         var v4 : int/*long*/ = o.detail;
         var v5 : int/*long*/ = o.screenX;
         var v6 : int/*long*/ = o.screenY;
@@ -753,7 +753,7 @@ class _Test extends TestCase {
         var v12 : boolean = o.metaKey;
         var v13 : int/*unsigned short*/ = o.button;
         var v14 : int/*unsigned short*/ = o.buttons;
-        var v15 : Nullable.<EventTarget> = o.relatedTarget;
+        var v15 : EventTarget = o.relatedTarget;
         var v16 : number/*float*/ = o.deltaX;
         var v17 : number/*float*/ = o.deltaY;
         var v18 : number/*float*/ = o.deltaZ;
@@ -764,7 +764,7 @@ class _Test extends TestCase {
     function compile_KeyboardEventInit(o : KeyboardEventInit) : void {
         var v1 : boolean = o.bubbles;
         var v2 : boolean = o.cancelable;
-        var v3 : Nullable.<AbstractView> = o.view;
+        var v3 : AbstractView = o.view;
         var v4 : int/*long*/ = o.detail;
         var v5 : string/*DOMString*/ = o.char;
         var v6 : string/*DOMString*/ = o.key;
@@ -784,7 +784,7 @@ class _Test extends TestCase {
     function compile_CompositionEventInit(o : CompositionEventInit) : void {
         var v1 : boolean = o.bubbles;
         var v2 : boolean = o.cancelable;
-        var v3 : Nullable.<AbstractView> = o.view;
+        var v3 : AbstractView = o.view;
         var v4 : int/*long*/ = o.detail;
         var v5 : Nullable.<string>/*DOMString?*/ = o.data;
         var v6 : string/*DOMString*/ = o.locale;
@@ -792,13 +792,13 @@ class _Test extends TestCase {
 
     // #48
     function compile_XMLHttpRequestEventTarget(o : XMLHttpRequestEventTarget) : void {
-        var v1 : Nullable.<function(:Event):void>/*Function?*/ = o.onloadstart;
-        var v2 : Nullable.<function(:Event):void>/*Function?*/ = o.onprogress;
-        var v3 : Nullable.<function(:Event):void>/*Function?*/ = o.onabort;
-        var v4 : Nullable.<function(:Event):void>/*Function?*/ = o.onerror;
-        var v5 : Nullable.<function(:Event):void>/*Function?*/ = o.onload;
-        var v6 : Nullable.<function(:Event):void>/*Function?*/ = o.ontimeout;
-        var v7 : Nullable.<function(:Event):void>/*Function?*/ = o.onloadend;
+        var v1 : function(:Event):void/*Function?*/ = o.onloadstart;
+        var v2 : function(:Event):void/*Function?*/ = o.onprogress;
+        var v3 : function(:Event):void/*Function?*/ = o.onabort;
+        var v4 : function(:Event):void/*Function?*/ = o.onerror;
+        var v5 : function(:Event):void/*Function?*/ = o.onload;
+        var v6 : function(:Event):void/*Function?*/ = o.ontimeout;
+        var v7 : function(:Event):void/*Function?*/ = o.onloadend;
     } // XMLHttpRequestEventTarget
 
     // #49
@@ -807,7 +807,7 @@ class _Test extends TestCase {
 
     // #50
     function compile_XMLHttpRequest(o : XMLHttpRequest) : void {
-        var v1 : Nullable.<function(:Event):void>/*Function?*/ = o.onreadystatechange;
+        var v1 : function(:Event):void/*Function?*/ = o.onreadystatechange;
         var v2 : int/*unsigned short*/ = XMLHttpRequest.UNSENT;
         var v3 : int/*unsigned short*/ = o.UNSENT;
         var v4 : int/*unsigned short*/ = XMLHttpRequest.OPENED;
@@ -860,8 +860,8 @@ class _Test extends TestCase {
     function compile_MediaList(o : MediaList) : void {
         var v1 : string/*DOMString*/ = o.mediaText;
         var v2 : int/*unsigned long*/ = o.length;
-        var f3 : string/*DOMString*/ = o.__native_index_operator__(X.getint());
-        var f4 : string/*DOMString*/ = o.item(X.getint());
+        var f3 : Nullable.<string>/*DOMString*/ = o.__native_index_operator__(X.getint());
+        var f4 : Nullable.<string>/*DOMString*/ = o.item(X.getint());
         o.appendMedium(X.getstring());
         o.deleteMedium(X.getstring());
     } // MediaList
@@ -1742,9 +1742,9 @@ class _Test extends TestCase {
         var v28 : Window/*WindowProxy*/ = o.frames;
         var v29 : int/*unsigned long*/ = o.length;
         var v30 : Window/*WindowProxy*/ = o.top;
-        var v31 : Nullable.<Window>/*WindowProxy?*/ = o.opener;
+        var v31 : Window/*WindowProxy?*/ = o.opener;
         var v32 : Window/*WindowProxy*/ = o.parent;
-        var v33 : Nullable.<Element> = o.frameElement;
+        var v33 : Element = o.frameElement;
         var f34 : Window/*WindowProxy*/ = o.open();
         var f35 : Window/*WindowProxy*/ = o.open(X.getstring());
         var f36 : Window/*WindowProxy*/ = o.open(X.getstring(), X.getstring());
@@ -1762,72 +1762,72 @@ class _Test extends TestCase {
         o.print();
         var f47 : variant/*any*/ = o.showModalDialog(X.getstring());
         var f48 : variant/*any*/ = o.showModalDialog(X.getstring(), X.getvariant());
-        var v49 : Nullable.<function(:Event):void>/*Function?*/ = o.onabort;
-        var v50 : Nullable.<function(:Event):void>/*Function?*/ = o.onafterprint;
-        var v51 : Nullable.<function(:Event):void>/*Function?*/ = o.onbeforeprint;
-        var v52 : Nullable.<function(:Event):void>/*Function?*/ = o.onbeforeunload;
-        var v53 : Nullable.<function(:Event):void>/*Function?*/ = o.onblur;
-        var v54 : Nullable.<function(:Event):void>/*Function?*/ = o.oncanplay;
-        var v55 : Nullable.<function(:Event):void>/*Function?*/ = o.oncanplaythrough;
-        var v56 : Nullable.<function(:Event):void>/*Function?*/ = o.onchange;
-        var v57 : Nullable.<function(:Event):void>/*Function?*/ = o.onclick;
-        var v58 : Nullable.<function(:Event):void>/*Function?*/ = o.oncontextmenu;
-        var v59 : Nullable.<function(:Event):void>/*Function?*/ = o.oncuechange;
-        var v60 : Nullable.<function(:Event):void>/*Function?*/ = o.ondblclick;
-        var v61 : Nullable.<function(:Event):void>/*Function?*/ = o.ondrag;
-        var v62 : Nullable.<function(:Event):void>/*Function?*/ = o.ondragend;
-        var v63 : Nullable.<function(:Event):void>/*Function?*/ = o.ondragenter;
-        var v64 : Nullable.<function(:Event):void>/*Function?*/ = o.ondragleave;
-        var v65 : Nullable.<function(:Event):void>/*Function?*/ = o.ondragover;
-        var v66 : Nullable.<function(:Event):void>/*Function?*/ = o.ondragstart;
-        var v67 : Nullable.<function(:Event):void>/*Function?*/ = o.ondrop;
-        var v68 : Nullable.<function(:Event):void>/*Function?*/ = o.ondurationchange;
-        var v69 : Nullable.<function(:Event):void>/*Function?*/ = o.onemptied;
-        var v70 : Nullable.<function(:Event):void>/*Function?*/ = o.onended;
-        var v71 : Nullable.<function(:Event):void>/*Function?*/ = o.onerror;
-        var v72 : Nullable.<function(:Event):void>/*Function?*/ = o.onfocus;
-        var v73 : Nullable.<function(:Event):void>/*Function?*/ = o.onhashchange;
-        var v74 : Nullable.<function(:Event):void>/*Function?*/ = o.oninput;
-        var v75 : Nullable.<function(:Event):void>/*Function?*/ = o.oninvalid;
-        var v76 : Nullable.<function(:Event):void>/*Function?*/ = o.onkeydown;
-        var v77 : Nullable.<function(:Event):void>/*Function?*/ = o.onkeypress;
-        var v78 : Nullable.<function(:Event):void>/*Function?*/ = o.onkeyup;
-        var v79 : Nullable.<function(:Event):void>/*Function?*/ = o.onload;
-        var v80 : Nullable.<function(:Event):void>/*Function?*/ = o.onloadeddata;
-        var v81 : Nullable.<function(:Event):void>/*Function?*/ = o.onloadedmetadata;
-        var v82 : Nullable.<function(:Event):void>/*Function?*/ = o.onloadstart;
-        var v83 : Nullable.<function(:Event):void>/*Function?*/ = o.onmessage;
-        var v84 : Nullable.<function(:Event):void>/*Function?*/ = o.onmousedown;
-        var v85 : Nullable.<function(:Event):void>/*Function?*/ = o.onmousemove;
-        var v86 : Nullable.<function(:Event):void>/*Function?*/ = o.onmouseout;
-        var v87 : Nullable.<function(:Event):void>/*Function?*/ = o.onmouseover;
-        var v88 : Nullable.<function(:Event):void>/*Function?*/ = o.onmouseup;
-        var v89 : Nullable.<function(:Event):void>/*Function?*/ = o.onmousewheel;
-        var v90 : Nullable.<function(:Event):void>/*Function?*/ = o.onoffline;
-        var v91 : Nullable.<function(:Event):void>/*Function?*/ = o.ononline;
-        var v92 : Nullable.<function(:Event):void>/*Function?*/ = o.onpause;
-        var v93 : Nullable.<function(:Event):void>/*Function?*/ = o.onplay;
-        var v94 : Nullable.<function(:Event):void>/*Function?*/ = o.onplaying;
-        var v95 : Nullable.<function(:Event):void>/*Function?*/ = o.onpagehide;
-        var v96 : Nullable.<function(:Event):void>/*Function?*/ = o.onpageshow;
-        var v97 : Nullable.<function(:Event):void>/*Function?*/ = o.onpopstate;
-        var v98 : Nullable.<function(:Event):void>/*Function?*/ = o.onprogress;
-        var v99 : Nullable.<function(:Event):void>/*Function?*/ = o.onratechange;
-        var v100 : Nullable.<function(:Event):void>/*Function?*/ = o.onreset;
-        var v101 : Nullable.<function(:Event):void>/*Function?*/ = o.onresize;
-        var v102 : Nullable.<function(:Event):void>/*Function?*/ = o.onscroll;
-        var v103 : Nullable.<function(:Event):void>/*Function?*/ = o.onseeked;
-        var v104 : Nullable.<function(:Event):void>/*Function?*/ = o.onseeking;
-        var v105 : Nullable.<function(:Event):void>/*Function?*/ = o.onselect;
-        var v106 : Nullable.<function(:Event):void>/*Function?*/ = o.onshow;
-        var v107 : Nullable.<function(:Event):void>/*Function?*/ = o.onstalled;
-        var v108 : Nullable.<function(:Event):void>/*Function?*/ = o.onstorage;
-        var v109 : Nullable.<function(:Event):void>/*Function?*/ = o.onsubmit;
-        var v110 : Nullable.<function(:Event):void>/*Function?*/ = o.onsuspend;
-        var v111 : Nullable.<function(:Event):void>/*Function?*/ = o.ontimeupdate;
-        var v112 : Nullable.<function(:Event):void>/*Function?*/ = o.onunload;
-        var v113 : Nullable.<function(:Event):void>/*Function?*/ = o.onvolumechange;
-        var v114 : Nullable.<function(:Event):void>/*Function?*/ = o.onwaiting;
+        var v49 : function(:Event):void/*Function?*/ = o.onabort;
+        var v50 : function(:Event):void/*Function?*/ = o.onafterprint;
+        var v51 : function(:Event):void/*Function?*/ = o.onbeforeprint;
+        var v52 : function(:Event):void/*Function?*/ = o.onbeforeunload;
+        var v53 : function(:Event):void/*Function?*/ = o.onblur;
+        var v54 : function(:Event):void/*Function?*/ = o.oncanplay;
+        var v55 : function(:Event):void/*Function?*/ = o.oncanplaythrough;
+        var v56 : function(:Event):void/*Function?*/ = o.onchange;
+        var v57 : function(:Event):void/*Function?*/ = o.onclick;
+        var v58 : function(:Event):void/*Function?*/ = o.oncontextmenu;
+        var v59 : function(:Event):void/*Function?*/ = o.oncuechange;
+        var v60 : function(:Event):void/*Function?*/ = o.ondblclick;
+        var v61 : function(:Event):void/*Function?*/ = o.ondrag;
+        var v62 : function(:Event):void/*Function?*/ = o.ondragend;
+        var v63 : function(:Event):void/*Function?*/ = o.ondragenter;
+        var v64 : function(:Event):void/*Function?*/ = o.ondragleave;
+        var v65 : function(:Event):void/*Function?*/ = o.ondragover;
+        var v66 : function(:Event):void/*Function?*/ = o.ondragstart;
+        var v67 : function(:Event):void/*Function?*/ = o.ondrop;
+        var v68 : function(:Event):void/*Function?*/ = o.ondurationchange;
+        var v69 : function(:Event):void/*Function?*/ = o.onemptied;
+        var v70 : function(:Event):void/*Function?*/ = o.onended;
+        var v71 : function(:Event):void/*Function?*/ = o.onerror;
+        var v72 : function(:Event):void/*Function?*/ = o.onfocus;
+        var v73 : function(:Event):void/*Function?*/ = o.onhashchange;
+        var v74 : function(:Event):void/*Function?*/ = o.oninput;
+        var v75 : function(:Event):void/*Function?*/ = o.oninvalid;
+        var v76 : function(:Event):void/*Function?*/ = o.onkeydown;
+        var v77 : function(:Event):void/*Function?*/ = o.onkeypress;
+        var v78 : function(:Event):void/*Function?*/ = o.onkeyup;
+        var v79 : function(:Event):void/*Function?*/ = o.onload;
+        var v80 : function(:Event):void/*Function?*/ = o.onloadeddata;
+        var v81 : function(:Event):void/*Function?*/ = o.onloadedmetadata;
+        var v82 : function(:Event):void/*Function?*/ = o.onloadstart;
+        var v83 : function(:Event):void/*Function?*/ = o.onmessage;
+        var v84 : function(:Event):void/*Function?*/ = o.onmousedown;
+        var v85 : function(:Event):void/*Function?*/ = o.onmousemove;
+        var v86 : function(:Event):void/*Function?*/ = o.onmouseout;
+        var v87 : function(:Event):void/*Function?*/ = o.onmouseover;
+        var v88 : function(:Event):void/*Function?*/ = o.onmouseup;
+        var v89 : function(:Event):void/*Function?*/ = o.onmousewheel;
+        var v90 : function(:Event):void/*Function?*/ = o.onoffline;
+        var v91 : function(:Event):void/*Function?*/ = o.ononline;
+        var v92 : function(:Event):void/*Function?*/ = o.onpause;
+        var v93 : function(:Event):void/*Function?*/ = o.onplay;
+        var v94 : function(:Event):void/*Function?*/ = o.onplaying;
+        var v95 : function(:Event):void/*Function?*/ = o.onpagehide;
+        var v96 : function(:Event):void/*Function?*/ = o.onpageshow;
+        var v97 : function(:Event):void/*Function?*/ = o.onpopstate;
+        var v98 : function(:Event):void/*Function?*/ = o.onprogress;
+        var v99 : function(:Event):void/*Function?*/ = o.onratechange;
+        var v100 : function(:Event):void/*Function?*/ = o.onreset;
+        var v101 : function(:Event):void/*Function?*/ = o.onresize;
+        var v102 : function(:Event):void/*Function?*/ = o.onscroll;
+        var v103 : function(:Event):void/*Function?*/ = o.onseeked;
+        var v104 : function(:Event):void/*Function?*/ = o.onseeking;
+        var v105 : function(:Event):void/*Function?*/ = o.onselect;
+        var v106 : function(:Event):void/*Function?*/ = o.onshow;
+        var v107 : function(:Event):void/*Function?*/ = o.onstalled;
+        var v108 : function(:Event):void/*Function?*/ = o.onstorage;
+        var v109 : function(:Event):void/*Function?*/ = o.onsubmit;
+        var v110 : function(:Event):void/*Function?*/ = o.onsuspend;
+        var v111 : function(:Event):void/*Function?*/ = o.ontimeupdate;
+        var v112 : function(:Event):void/*Function?*/ = o.onunload;
+        var v113 : function(:Event):void/*Function?*/ = o.onvolumechange;
+        var v114 : function(:Event):void/*Function?*/ = o.onwaiting;
         var f115 : string/*DOMString*/ = o.btoa(X.getstring());
         var f116 : string/*DOMString*/ = o.atob(X.getstring());
         var v117 : Storage = o.sessionStorage;
@@ -1895,7 +1895,7 @@ class _Test extends TestCase {
         var v18 : DOMSettableTokenList = o.dropzone;
         var v19 : string/*DOMString*/ = o.contentEditable;
         var v20 : boolean = o.isContentEditable;
-        var v21 : Nullable.<HTMLMenuElement> = o.contextMenu;
+        var v21 : HTMLMenuElement = o.contextMenu;
         var v22 : boolean = o.spellcheck;
         var v23 : Nullable.<string>/*DOMString?*/ = o.commandType;
         var v24 : Nullable.<string>/*DOMString?*/ = o.commandLabel;
@@ -1904,59 +1904,59 @@ class _Test extends TestCase {
         var v27 : Nullable.<boolean> = o.commandDisabled;
         var v28 : Nullable.<boolean> = o.commandChecked;
         var v29 : CSSStyleDeclaration = o.style;
-        var v30 : Nullable.<function(:Event):void>/*Function?*/ = o.onabort;
-        var v31 : Nullable.<function(:Event):void>/*Function?*/ = o.onblur;
-        var v32 : Nullable.<function(:Event):void>/*Function?*/ = o.oncanplay;
-        var v33 : Nullable.<function(:Event):void>/*Function?*/ = o.oncanplaythrough;
-        var v34 : Nullable.<function(:Event):void>/*Function?*/ = o.onchange;
-        var v35 : Nullable.<function(:Event):void>/*Function?*/ = o.onclick;
-        var v36 : Nullable.<function(:Event):void>/*Function?*/ = o.oncontextmenu;
-        var v37 : Nullable.<function(:Event):void>/*Function?*/ = o.oncuechange;
-        var v38 : Nullable.<function(:Event):void>/*Function?*/ = o.ondblclick;
-        var v39 : Nullable.<function(:Event):void>/*Function?*/ = o.ondrag;
-        var v40 : Nullable.<function(:Event):void>/*Function?*/ = o.ondragend;
-        var v41 : Nullable.<function(:Event):void>/*Function?*/ = o.ondragenter;
-        var v42 : Nullable.<function(:Event):void>/*Function?*/ = o.ondragleave;
-        var v43 : Nullable.<function(:Event):void>/*Function?*/ = o.ondragover;
-        var v44 : Nullable.<function(:Event):void>/*Function?*/ = o.ondragstart;
-        var v45 : Nullable.<function(:Event):void>/*Function?*/ = o.ondrop;
-        var v46 : Nullable.<function(:Event):void>/*Function?*/ = o.ondurationchange;
-        var v47 : Nullable.<function(:Event):void>/*Function?*/ = o.onemptied;
-        var v48 : Nullable.<function(:Event):void>/*Function?*/ = o.onended;
-        var v49 : Nullable.<function(:Event):void>/*Function?*/ = o.onerror;
-        var v50 : Nullable.<function(:Event):void>/*Function?*/ = o.onfocus;
-        var v51 : Nullable.<function(:Event):void>/*Function?*/ = o.oninput;
-        var v52 : Nullable.<function(:Event):void>/*Function?*/ = o.oninvalid;
-        var v53 : Nullable.<function(:Event):void>/*Function?*/ = o.onkeydown;
-        var v54 : Nullable.<function(:Event):void>/*Function?*/ = o.onkeypress;
-        var v55 : Nullable.<function(:Event):void>/*Function?*/ = o.onkeyup;
-        var v56 : Nullable.<function(:Event):void>/*Function?*/ = o.onload;
-        var v57 : Nullable.<function(:Event):void>/*Function?*/ = o.onloadeddata;
-        var v58 : Nullable.<function(:Event):void>/*Function?*/ = o.onloadedmetadata;
-        var v59 : Nullable.<function(:Event):void>/*Function?*/ = o.onloadstart;
-        var v60 : Nullable.<function(:Event):void>/*Function?*/ = o.onmousedown;
-        var v61 : Nullable.<function(:Event):void>/*Function?*/ = o.onmousemove;
-        var v62 : Nullable.<function(:Event):void>/*Function?*/ = o.onmouseout;
-        var v63 : Nullable.<function(:Event):void>/*Function?*/ = o.onmouseover;
-        var v64 : Nullable.<function(:Event):void>/*Function?*/ = o.onmouseup;
-        var v65 : Nullable.<function(:Event):void>/*Function?*/ = o.onmousewheel;
-        var v66 : Nullable.<function(:Event):void>/*Function?*/ = o.onpause;
-        var v67 : Nullable.<function(:Event):void>/*Function?*/ = o.onplay;
-        var v68 : Nullable.<function(:Event):void>/*Function?*/ = o.onplaying;
-        var v69 : Nullable.<function(:Event):void>/*Function?*/ = o.onprogress;
-        var v70 : Nullable.<function(:Event):void>/*Function?*/ = o.onratechange;
-        var v71 : Nullable.<function(:Event):void>/*Function?*/ = o.onreset;
-        var v72 : Nullable.<function(:Event):void>/*Function?*/ = o.onscroll;
-        var v73 : Nullable.<function(:Event):void>/*Function?*/ = o.onseeked;
-        var v74 : Nullable.<function(:Event):void>/*Function?*/ = o.onseeking;
-        var v75 : Nullable.<function(:Event):void>/*Function?*/ = o.onselect;
-        var v76 : Nullable.<function(:Event):void>/*Function?*/ = o.onshow;
-        var v77 : Nullable.<function(:Event):void>/*Function?*/ = o.onstalled;
-        var v78 : Nullable.<function(:Event):void>/*Function?*/ = o.onsubmit;
-        var v79 : Nullable.<function(:Event):void>/*Function?*/ = o.onsuspend;
-        var v80 : Nullable.<function(:Event):void>/*Function?*/ = o.ontimeupdate;
-        var v81 : Nullable.<function(:Event):void>/*Function?*/ = o.onvolumechange;
-        var v82 : Nullable.<function(:Event):void>/*Function?*/ = o.onwaiting;
+        var v30 : function(:Event):void/*Function?*/ = o.onabort;
+        var v31 : function(:Event):void/*Function?*/ = o.onblur;
+        var v32 : function(:Event):void/*Function?*/ = o.oncanplay;
+        var v33 : function(:Event):void/*Function?*/ = o.oncanplaythrough;
+        var v34 : function(:Event):void/*Function?*/ = o.onchange;
+        var v35 : function(:Event):void/*Function?*/ = o.onclick;
+        var v36 : function(:Event):void/*Function?*/ = o.oncontextmenu;
+        var v37 : function(:Event):void/*Function?*/ = o.oncuechange;
+        var v38 : function(:Event):void/*Function?*/ = o.ondblclick;
+        var v39 : function(:Event):void/*Function?*/ = o.ondrag;
+        var v40 : function(:Event):void/*Function?*/ = o.ondragend;
+        var v41 : function(:Event):void/*Function?*/ = o.ondragenter;
+        var v42 : function(:Event):void/*Function?*/ = o.ondragleave;
+        var v43 : function(:Event):void/*Function?*/ = o.ondragover;
+        var v44 : function(:Event):void/*Function?*/ = o.ondragstart;
+        var v45 : function(:Event):void/*Function?*/ = o.ondrop;
+        var v46 : function(:Event):void/*Function?*/ = o.ondurationchange;
+        var v47 : function(:Event):void/*Function?*/ = o.onemptied;
+        var v48 : function(:Event):void/*Function?*/ = o.onended;
+        var v49 : function(:Event):void/*Function?*/ = o.onerror;
+        var v50 : function(:Event):void/*Function?*/ = o.onfocus;
+        var v51 : function(:Event):void/*Function?*/ = o.oninput;
+        var v52 : function(:Event):void/*Function?*/ = o.oninvalid;
+        var v53 : function(:Event):void/*Function?*/ = o.onkeydown;
+        var v54 : function(:Event):void/*Function?*/ = o.onkeypress;
+        var v55 : function(:Event):void/*Function?*/ = o.onkeyup;
+        var v56 : function(:Event):void/*Function?*/ = o.onload;
+        var v57 : function(:Event):void/*Function?*/ = o.onloadeddata;
+        var v58 : function(:Event):void/*Function?*/ = o.onloadedmetadata;
+        var v59 : function(:Event):void/*Function?*/ = o.onloadstart;
+        var v60 : function(:Event):void/*Function?*/ = o.onmousedown;
+        var v61 : function(:Event):void/*Function?*/ = o.onmousemove;
+        var v62 : function(:Event):void/*Function?*/ = o.onmouseout;
+        var v63 : function(:Event):void/*Function?*/ = o.onmouseover;
+        var v64 : function(:Event):void/*Function?*/ = o.onmouseup;
+        var v65 : function(:Event):void/*Function?*/ = o.onmousewheel;
+        var v66 : function(:Event):void/*Function?*/ = o.onpause;
+        var v67 : function(:Event):void/*Function?*/ = o.onplay;
+        var v68 : function(:Event):void/*Function?*/ = o.onplaying;
+        var v69 : function(:Event):void/*Function?*/ = o.onprogress;
+        var v70 : function(:Event):void/*Function?*/ = o.onratechange;
+        var v71 : function(:Event):void/*Function?*/ = o.onreset;
+        var v72 : function(:Event):void/*Function?*/ = o.onscroll;
+        var v73 : function(:Event):void/*Function?*/ = o.onseeked;
+        var v74 : function(:Event):void/*Function?*/ = o.onseeking;
+        var v75 : function(:Event):void/*Function?*/ = o.onselect;
+        var v76 : function(:Event):void/*Function?*/ = o.onshow;
+        var v77 : function(:Event):void/*Function?*/ = o.onstalled;
+        var v78 : function(:Event):void/*Function?*/ = o.onsubmit;
+        var v79 : function(:Event):void/*Function?*/ = o.onsuspend;
+        var v80 : function(:Event):void/*Function?*/ = o.ontimeupdate;
+        var v81 : function(:Event):void/*Function?*/ = o.onvolumechange;
+        var v82 : function(:Event):void/*Function?*/ = o.onwaiting;
     } // HTMLElement
 
     // #71
@@ -1978,16 +1978,16 @@ class _Test extends TestCase {
 
     // #73
     function compile_HTMLAllCollection(o : HTMLAllCollection) : void {
-        var f1 : Nullable.<Object>/*object?*/ = o.item(X.getstring());
-        var f2 : Nullable.<Object>/*object?*/ = o.__native_index_operator__(X.getstring());
-        var f3 : Nullable.<Object>/*object?*/ = o.namedItem(X.getstring());
+        var f1 : Object/*object?*/ = o.item(X.getstring());
+        var f2 : Object/*object?*/ = o.__native_index_operator__(X.getstring());
+        var f3 : Object/*object?*/ = o.namedItem(X.getstring());
         var f4 : HTMLAllCollection = o.tags(X.getstring());
     } // HTMLAllCollection
 
     // #74
     function compile_HTMLFormControlsCollection(o : HTMLFormControlsCollection) : void {
-        var f1 : Nullable.<Object>/*object?*/ = o.__native_index_operator__(X.getstring());
-        var f2 : Nullable.<Object>/*object?*/ = o.namedItem(X.getstring());
+        var f1 : Object/*object?*/ = o.__native_index_operator__(X.getstring());
+        var f2 : Object/*object?*/ = o.namedItem(X.getstring());
     } // HTMLFormControlsCollection
 
     // #75
@@ -1998,8 +1998,8 @@ class _Test extends TestCase {
     // #76
     function compile_HTMLOptionsCollection(o : HTMLOptionsCollection) : void {
         var v1 : int/*unsigned long*/ = o.length;
-        var f2 : Nullable.<Object>/*object?*/ = o.__native_index_operator__(X.getstring());
-        var f3 : Nullable.<Object>/*object?*/ = o.namedItem(X.getstring());
+        var f2 : Object/*object?*/ = o.__native_index_operator__(X.getstring());
+        var f3 : Object/*object?*/ = o.namedItem(X.getstring());
         o.add(X.getHTMLOptionElement());
         o.add(X.getHTMLOptionElement(), X.getHTMLElement());
         o.add(X.getHTMLOptionElement());
@@ -2014,7 +2014,7 @@ class _Test extends TestCase {
 
     // #77
     function compile_DOMStringMap(o : DOMStringMap) : void {
-        var f1 : string/*DOMString*/ = o.__native_index_operator__(X.getstring());
+        var f1 : Nullable.<string>/*DOMString*/ = o.__native_index_operator__(X.getstring());
     } // DOMStringMap
 
     // #78
@@ -2023,7 +2023,7 @@ class _Test extends TestCase {
 
     // #79
     function compile_HTMLDocument(o : HTMLDocument) : void {
-        var v1 : Nullable.<Location> = o.location;
+        var v1 : Location = o.location;
         var v2 : string/*DOMString*/ = o.URL;
         var v3 : string/*DOMString*/ = o.domain;
         var v4 : string/*DOMString*/ = o.referrer;
@@ -2033,8 +2033,8 @@ class _Test extends TestCase {
         var f8 : Object/*object*/ = o.__native_index_operator__(X.getstring());
         var v9 : string/*DOMString*/ = o.title;
         var v10 : string/*DOMString*/ = o.dir;
-        var v11 : Nullable.<HTMLElement> = o.body;
-        var v12 : Nullable.<HTMLHeadElement> = o.head;
+        var v11 : HTMLElement = o.body;
+        var v12 : HTMLHeadElement = o.head;
         var v13 : HTMLCollection = o.images;
         var v14 : HTMLCollection = o.embeds;
         var v15 : HTMLCollection = o.plugins;
@@ -2050,8 +2050,8 @@ class _Test extends TestCase {
         o.close();
         o.write(X.getstring());
         o.writeln(X.getstring());
-        var v25 : Nullable.<Window>/*WindowProxy?*/ = o.defaultView;
-        var v26 : Nullable.<Element> = o.activeElement;
+        var v25 : Window/*WindowProxy?*/ = o.defaultView;
+        var v26 : Element = o.activeElement;
         var f27 : boolean = o.hasFocus();
         var v28 : string/*DOMString*/ = o.designMode;
         var f29 : boolean = o.execCommand(X.getstring());
@@ -2063,60 +2063,60 @@ class _Test extends TestCase {
         var f35 : boolean = o.queryCommandSupported(X.getstring());
         var f36 : string/*DOMString*/ = o.queryCommandValue(X.getstring());
         var v37 : HTMLCollection = o.commands;
-        var v38 : Nullable.<function(:Event):void>/*Function?*/ = o.onabort;
-        var v39 : Nullable.<function(:Event):void>/*Function?*/ = o.onblur;
-        var v40 : Nullable.<function(:Event):void>/*Function?*/ = o.oncanplay;
-        var v41 : Nullable.<function(:Event):void>/*Function?*/ = o.oncanplaythrough;
-        var v42 : Nullable.<function(:Event):void>/*Function?*/ = o.onchange;
-        var v43 : Nullable.<function(:Event):void>/*Function?*/ = o.onclick;
-        var v44 : Nullable.<function(:Event):void>/*Function?*/ = o.oncontextmenu;
-        var v45 : Nullable.<function(:Event):void>/*Function?*/ = o.oncuechange;
-        var v46 : Nullable.<function(:Event):void>/*Function?*/ = o.ondblclick;
-        var v47 : Nullable.<function(:Event):void>/*Function?*/ = o.ondrag;
-        var v48 : Nullable.<function(:Event):void>/*Function?*/ = o.ondragend;
-        var v49 : Nullable.<function(:Event):void>/*Function?*/ = o.ondragenter;
-        var v50 : Nullable.<function(:Event):void>/*Function?*/ = o.ondragleave;
-        var v51 : Nullable.<function(:Event):void>/*Function?*/ = o.ondragover;
-        var v52 : Nullable.<function(:Event):void>/*Function?*/ = o.ondragstart;
-        var v53 : Nullable.<function(:Event):void>/*Function?*/ = o.ondrop;
-        var v54 : Nullable.<function(:Event):void>/*Function?*/ = o.ondurationchange;
-        var v55 : Nullable.<function(:Event):void>/*Function?*/ = o.onemptied;
-        var v56 : Nullable.<function(:Event):void>/*Function?*/ = o.onended;
-        var v57 : Nullable.<function(:Event):void>/*Function?*/ = o.onerror;
-        var v58 : Nullable.<function(:Event):void>/*Function?*/ = o.onfocus;
-        var v59 : Nullable.<function(:Event):void>/*Function?*/ = o.oninput;
-        var v60 : Nullable.<function(:Event):void>/*Function?*/ = o.oninvalid;
-        var v61 : Nullable.<function(:Event):void>/*Function?*/ = o.onkeydown;
-        var v62 : Nullable.<function(:Event):void>/*Function?*/ = o.onkeypress;
-        var v63 : Nullable.<function(:Event):void>/*Function?*/ = o.onkeyup;
-        var v64 : Nullable.<function(:Event):void>/*Function?*/ = o.onload;
-        var v65 : Nullable.<function(:Event):void>/*Function?*/ = o.onloadeddata;
-        var v66 : Nullable.<function(:Event):void>/*Function?*/ = o.onloadedmetadata;
-        var v67 : Nullable.<function(:Event):void>/*Function?*/ = o.onloadstart;
-        var v68 : Nullable.<function(:Event):void>/*Function?*/ = o.onmousedown;
-        var v69 : Nullable.<function(:Event):void>/*Function?*/ = o.onmousemove;
-        var v70 : Nullable.<function(:Event):void>/*Function?*/ = o.onmouseout;
-        var v71 : Nullable.<function(:Event):void>/*Function?*/ = o.onmouseover;
-        var v72 : Nullable.<function(:Event):void>/*Function?*/ = o.onmouseup;
-        var v73 : Nullable.<function(:Event):void>/*Function?*/ = o.onmousewheel;
-        var v74 : Nullable.<function(:Event):void>/*Function?*/ = o.onpause;
-        var v75 : Nullable.<function(:Event):void>/*Function?*/ = o.onplay;
-        var v76 : Nullable.<function(:Event):void>/*Function?*/ = o.onplaying;
-        var v77 : Nullable.<function(:Event):void>/*Function?*/ = o.onprogress;
-        var v78 : Nullable.<function(:Event):void>/*Function?*/ = o.onratechange;
-        var v79 : Nullable.<function(:Event):void>/*Function?*/ = o.onreset;
-        var v80 : Nullable.<function(:Event):void>/*Function?*/ = o.onscroll;
-        var v81 : Nullable.<function(:Event):void>/*Function?*/ = o.onseeked;
-        var v82 : Nullable.<function(:Event):void>/*Function?*/ = o.onseeking;
-        var v83 : Nullable.<function(:Event):void>/*Function?*/ = o.onselect;
-        var v84 : Nullable.<function(:Event):void>/*Function?*/ = o.onshow;
-        var v85 : Nullable.<function(:Event):void>/*Function?*/ = o.onstalled;
-        var v86 : Nullable.<function(:Event):void>/*Function?*/ = o.onsubmit;
-        var v87 : Nullable.<function(:Event):void>/*Function?*/ = o.onsuspend;
-        var v88 : Nullable.<function(:Event):void>/*Function?*/ = o.ontimeupdate;
-        var v89 : Nullable.<function(:Event):void>/*Function?*/ = o.onvolumechange;
-        var v90 : Nullable.<function(:Event):void>/*Function?*/ = o.onwaiting;
-        var v91 : Nullable.<function(:Event):void>/*Function?*/ = o.onreadystatechange;
+        var v38 : function(:Event):void/*Function?*/ = o.onabort;
+        var v39 : function(:Event):void/*Function?*/ = o.onblur;
+        var v40 : function(:Event):void/*Function?*/ = o.oncanplay;
+        var v41 : function(:Event):void/*Function?*/ = o.oncanplaythrough;
+        var v42 : function(:Event):void/*Function?*/ = o.onchange;
+        var v43 : function(:Event):void/*Function?*/ = o.onclick;
+        var v44 : function(:Event):void/*Function?*/ = o.oncontextmenu;
+        var v45 : function(:Event):void/*Function?*/ = o.oncuechange;
+        var v46 : function(:Event):void/*Function?*/ = o.ondblclick;
+        var v47 : function(:Event):void/*Function?*/ = o.ondrag;
+        var v48 : function(:Event):void/*Function?*/ = o.ondragend;
+        var v49 : function(:Event):void/*Function?*/ = o.ondragenter;
+        var v50 : function(:Event):void/*Function?*/ = o.ondragleave;
+        var v51 : function(:Event):void/*Function?*/ = o.ondragover;
+        var v52 : function(:Event):void/*Function?*/ = o.ondragstart;
+        var v53 : function(:Event):void/*Function?*/ = o.ondrop;
+        var v54 : function(:Event):void/*Function?*/ = o.ondurationchange;
+        var v55 : function(:Event):void/*Function?*/ = o.onemptied;
+        var v56 : function(:Event):void/*Function?*/ = o.onended;
+        var v57 : function(:Event):void/*Function?*/ = o.onerror;
+        var v58 : function(:Event):void/*Function?*/ = o.onfocus;
+        var v59 : function(:Event):void/*Function?*/ = o.oninput;
+        var v60 : function(:Event):void/*Function?*/ = o.oninvalid;
+        var v61 : function(:Event):void/*Function?*/ = o.onkeydown;
+        var v62 : function(:Event):void/*Function?*/ = o.onkeypress;
+        var v63 : function(:Event):void/*Function?*/ = o.onkeyup;
+        var v64 : function(:Event):void/*Function?*/ = o.onload;
+        var v65 : function(:Event):void/*Function?*/ = o.onloadeddata;
+        var v66 : function(:Event):void/*Function?*/ = o.onloadedmetadata;
+        var v67 : function(:Event):void/*Function?*/ = o.onloadstart;
+        var v68 : function(:Event):void/*Function?*/ = o.onmousedown;
+        var v69 : function(:Event):void/*Function?*/ = o.onmousemove;
+        var v70 : function(:Event):void/*Function?*/ = o.onmouseout;
+        var v71 : function(:Event):void/*Function?*/ = o.onmouseover;
+        var v72 : function(:Event):void/*Function?*/ = o.onmouseup;
+        var v73 : function(:Event):void/*Function?*/ = o.onmousewheel;
+        var v74 : function(:Event):void/*Function?*/ = o.onpause;
+        var v75 : function(:Event):void/*Function?*/ = o.onplay;
+        var v76 : function(:Event):void/*Function?*/ = o.onplaying;
+        var v77 : function(:Event):void/*Function?*/ = o.onprogress;
+        var v78 : function(:Event):void/*Function?*/ = o.onratechange;
+        var v79 : function(:Event):void/*Function?*/ = o.onreset;
+        var v80 : function(:Event):void/*Function?*/ = o.onscroll;
+        var v81 : function(:Event):void/*Function?*/ = o.onseeked;
+        var v82 : function(:Event):void/*Function?*/ = o.onseeking;
+        var v83 : function(:Event):void/*Function?*/ = o.onselect;
+        var v84 : function(:Event):void/*Function?*/ = o.onshow;
+        var v85 : function(:Event):void/*Function?*/ = o.onstalled;
+        var v86 : function(:Event):void/*Function?*/ = o.onsubmit;
+        var v87 : function(:Event):void/*Function?*/ = o.onsuspend;
+        var v88 : function(:Event):void/*Function?*/ = o.ontimeupdate;
+        var v89 : function(:Event):void/*Function?*/ = o.onvolumechange;
+        var v90 : function(:Event):void/*Function?*/ = o.onwaiting;
+        var v91 : function(:Event):void/*Function?*/ = o.onreadystatechange;
         var v92 : string/*DOMString*/ = o.fgColor;
         var v93 : string/*DOMString*/ = o.linkColor;
         var v94 : string/*DOMString*/ = o.vlinkColor;
@@ -2199,24 +2199,24 @@ class _Test extends TestCase {
 
     // #89
     function compile_HTMLBodyElement(o : HTMLBodyElement) : void {
-        var v1 : Nullable.<function(:Event):void>/*Function?*/ = o.onafterprint;
-        var v2 : Nullable.<function(:Event):void>/*Function?*/ = o.onbeforeprint;
-        var v3 : Nullable.<function(:Event):void>/*Function?*/ = o.onbeforeunload;
-        var v4 : Nullable.<function(:Event):void>/*Function?*/ = o.onblur;
-        var v5 : Nullable.<function(:Event):void>/*Function?*/ = o.onerror;
-        var v6 : Nullable.<function(:Event):void>/*Function?*/ = o.onfocus;
-        var v7 : Nullable.<function(:Event):void>/*Function?*/ = o.onhashchange;
-        var v8 : Nullable.<function(:Event):void>/*Function?*/ = o.onload;
-        var v9 : Nullable.<function(:Event):void>/*Function?*/ = o.onmessage;
-        var v10 : Nullable.<function(:Event):void>/*Function?*/ = o.onoffline;
-        var v11 : Nullable.<function(:Event):void>/*Function?*/ = o.ononline;
-        var v12 : Nullable.<function(:Event):void>/*Function?*/ = o.onpopstate;
-        var v13 : Nullable.<function(:Event):void>/*Function?*/ = o.onpagehide;
-        var v14 : Nullable.<function(:Event):void>/*Function?*/ = o.onpageshow;
-        var v15 : Nullable.<function(:Event):void>/*Function?*/ = o.onresize;
-        var v16 : Nullable.<function(:Event):void>/*Function?*/ = o.onscroll;
-        var v17 : Nullable.<function(:Event):void>/*Function?*/ = o.onstorage;
-        var v18 : Nullable.<function(:Event):void>/*Function?*/ = o.onunload;
+        var v1 : function(:Event):void/*Function?*/ = o.onafterprint;
+        var v2 : function(:Event):void/*Function?*/ = o.onbeforeprint;
+        var v3 : function(:Event):void/*Function?*/ = o.onbeforeunload;
+        var v4 : function(:Event):void/*Function?*/ = o.onblur;
+        var v5 : function(:Event):void/*Function?*/ = o.onerror;
+        var v6 : function(:Event):void/*Function?*/ = o.onfocus;
+        var v7 : function(:Event):void/*Function?*/ = o.onhashchange;
+        var v8 : function(:Event):void/*Function?*/ = o.onload;
+        var v9 : function(:Event):void/*Function?*/ = o.onmessage;
+        var v10 : function(:Event):void/*Function?*/ = o.onoffline;
+        var v11 : function(:Event):void/*Function?*/ = o.ononline;
+        var v12 : function(:Event):void/*Function?*/ = o.onpopstate;
+        var v13 : function(:Event):void/*Function?*/ = o.onpagehide;
+        var v14 : function(:Event):void/*Function?*/ = o.onpageshow;
+        var v15 : function(:Event):void/*Function?*/ = o.onresize;
+        var v16 : function(:Event):void/*Function?*/ = o.onscroll;
+        var v17 : function(:Event):void/*Function?*/ = o.onstorage;
+        var v18 : function(:Event):void/*Function?*/ = o.onunload;
         var v19 : string/*DOMString*/ = o.text;
         var v20 : string/*DOMString*/ = o.link;
         var v21 : string/*DOMString*/ = o.vLink;
@@ -2357,8 +2357,8 @@ class _Test extends TestCase {
         var v5 : boolean = o.seamless;
         var v6 : string/*DOMString*/ = o.width;
         var v7 : string/*DOMString*/ = o.height;
-        var v8 : Nullable.<HTMLDocument>/*Document?*/ = o.contentDocument;
-        var v9 : Nullable.<Window>/*WindowProxy?*/ = o.contentWindow;
+        var v8 : HTMLDocument/*Document?*/ = o.contentDocument;
+        var v9 : Window/*WindowProxy?*/ = o.contentWindow;
         var v10 : string/*DOMString*/ = o.align;
         var v11 : string/*DOMString*/ = o.scrolling;
         var v12 : string/*DOMString*/ = o.frameBorder;
@@ -2384,11 +2384,11 @@ class _Test extends TestCase {
         var v3 : boolean = o.typeMustMatch;
         var v4 : string/*DOMString*/ = o.name;
         var v5 : string/*DOMString*/ = o.useMap;
-        var v6 : Nullable.<HTMLFormElement> = o.form;
+        var v6 : HTMLFormElement = o.form;
         var v7 : string/*DOMString*/ = o.width;
         var v8 : string/*DOMString*/ = o.height;
-        var v9 : Nullable.<HTMLDocument>/*Document?*/ = o.contentDocument;
-        var v10 : Nullable.<Window>/*WindowProxy?*/ = o.contentWindow;
+        var v9 : HTMLDocument/*Document?*/ = o.contentDocument;
+        var v10 : Window/*WindowProxy?*/ = o.contentWindow;
         var v11 : boolean = o.willValidate;
         var v12 : ValidityState = o.validity;
         var v13 : string/*DOMString*/ = o.validationMessage;
@@ -2455,7 +2455,7 @@ class _Test extends TestCase {
 
     // #114
     function compile_HTMLMediaElement(o : HTMLMediaElement) : void {
-        var v1 : Nullable.<MediaError> = o.error;
+        var v1 : MediaError = o.error;
         var v2 : string/*DOMString*/ = o.src;
         var v3 : string/*DOMString*/ = o.currentSrc;
         var v4 : string/*DOMString*/ = o.crossOrigin;
@@ -2499,7 +2499,7 @@ class _Test extends TestCase {
         o.play();
         o.pause();
         var v41 : string/*DOMString*/ = o.mediaGroup;
-        var v42 : Nullable.<MediaController> = o.controller;
+        var v42 : MediaController = o.controller;
         var v43 : boolean = o.controls;
         var v44 : number/*double*/ = o.volume;
         var v45 : boolean = o.muted;
@@ -2529,9 +2529,9 @@ class _Test extends TestCase {
     function compile_AudioTrackList(o : AudioTrackList) : void {
         var v1 : int/*unsigned long*/ = o.length;
         var f2 : AudioTrack = o.__native_index_operator__(X.getint());
-        var f3 : Nullable.<AudioTrack> = o.getTrackById(X.getstring());
-        var v4 : Nullable.<function(:Event):void>/*Function?*/ = o.onchange;
-        var v5 : Nullable.<function(:Event):void>/*Function?*/ = o.onaddtrack;
+        var f3 : AudioTrack = o.getTrackById(X.getstring());
+        var v4 : function(:Event):void/*Function?*/ = o.onchange;
+        var v5 : function(:Event):void/*Function?*/ = o.onaddtrack;
     } // AudioTrackList
 
     // #117
@@ -2547,10 +2547,10 @@ class _Test extends TestCase {
     function compile_VideoTrackList(o : VideoTrackList) : void {
         var v1 : int/*unsigned long*/ = o.length;
         var f2 : VideoTrack = o.__native_index_operator__(X.getint());
-        var f3 : Nullable.<VideoTrack> = o.getTrackById(X.getstring());
+        var f3 : VideoTrack = o.getTrackById(X.getstring());
         var v4 : int/*long*/ = o.selectedIndex;
-        var v5 : Nullable.<function(:Event):void>/*Function?*/ = o.onchange;
-        var v6 : Nullable.<function(:Event):void>/*Function?*/ = o.onaddtrack;
+        var v5 : function(:Event):void/*Function?*/ = o.onchange;
+        var v6 : function(:Event):void/*Function?*/ = o.onaddtrack;
     } // VideoTrackList
 
     // #119
@@ -2576,27 +2576,27 @@ class _Test extends TestCase {
         var v8 : number/*double*/ = o.playbackRate;
         var v9 : number/*double*/ = o.volume;
         var v10 : boolean = o.muted;
-        var v11 : Nullable.<function(:Event):void>/*Function?*/ = o.onemptied;
-        var v12 : Nullable.<function(:Event):void>/*Function?*/ = o.onloadedmetadata;
-        var v13 : Nullable.<function(:Event):void>/*Function?*/ = o.onloadeddata;
-        var v14 : Nullable.<function(:Event):void>/*Function?*/ = o.oncanplay;
-        var v15 : Nullable.<function(:Event):void>/*Function?*/ = o.oncanplaythrough;
-        var v16 : Nullable.<function(:Event):void>/*Function?*/ = o.onplaying;
-        var v17 : Nullable.<function(:Event):void>/*Function?*/ = o.onended;
-        var v18 : Nullable.<function(:Event):void>/*Function?*/ = o.onwaiting;
-        var v19 : Nullable.<function(:Event):void>/*Function?*/ = o.ondurationchange;
-        var v20 : Nullable.<function(:Event):void>/*Function?*/ = o.ontimeupdate;
-        var v21 : Nullable.<function(:Event):void>/*Function?*/ = o.onplay;
-        var v22 : Nullable.<function(:Event):void>/*Function?*/ = o.onpause;
-        var v23 : Nullable.<function(:Event):void>/*Function?*/ = o.onratechange;
-        var v24 : Nullable.<function(:Event):void>/*Function?*/ = o.onvolumechange;
+        var v11 : function(:Event):void/*Function?*/ = o.onemptied;
+        var v12 : function(:Event):void/*Function?*/ = o.onloadedmetadata;
+        var v13 : function(:Event):void/*Function?*/ = o.onloadeddata;
+        var v14 : function(:Event):void/*Function?*/ = o.oncanplay;
+        var v15 : function(:Event):void/*Function?*/ = o.oncanplaythrough;
+        var v16 : function(:Event):void/*Function?*/ = o.onplaying;
+        var v17 : function(:Event):void/*Function?*/ = o.onended;
+        var v18 : function(:Event):void/*Function?*/ = o.onwaiting;
+        var v19 : function(:Event):void/*Function?*/ = o.ondurationchange;
+        var v20 : function(:Event):void/*Function?*/ = o.ontimeupdate;
+        var v21 : function(:Event):void/*Function?*/ = o.onplay;
+        var v22 : function(:Event):void/*Function?*/ = o.onpause;
+        var v23 : function(:Event):void/*Function?*/ = o.onratechange;
+        var v24 : function(:Event):void/*Function?*/ = o.onvolumechange;
     } // MediaController
 
     // #121
     function compile_TextTrackList(o : TextTrackList) : void {
         var v1 : int/*unsigned long*/ = o.length;
         var f2 : TextTrack = o.__native_index_operator__(X.getint());
-        var v3 : Nullable.<function(:Event):void>/*Function?*/ = o.onaddtrack;
+        var v3 : function(:Event):void/*Function?*/ = o.onaddtrack;
     } // TextTrackList
 
     // #122
@@ -2611,23 +2611,23 @@ class _Test extends TestCase {
         var v8 : int/*unsigned short*/ = TextTrack.SHOWING;
         var v9 : int/*unsigned short*/ = o.SHOWING;
         var v10 : int/*unsigned short*/ = o.mode;
-        var v11 : Nullable.<TextTrackCueList> = o.cues;
-        var v12 : Nullable.<TextTrackCueList> = o.activeCues;
+        var v11 : TextTrackCueList = o.cues;
+        var v12 : TextTrackCueList = o.activeCues;
         o.addCue(X.getTextTrackCue());
         o.removeCue(X.getTextTrackCue());
-        var v13 : Nullable.<function(:Event):void>/*Function?*/ = o.oncuechange;
+        var v13 : function(:Event):void/*Function?*/ = o.oncuechange;
     } // TextTrack
 
     // #123
     function compile_TextTrackCueList(o : TextTrackCueList) : void {
         var v1 : int/*unsigned long*/ = o.length;
         var f2 : TextTrackCue = o.__native_index_operator__(X.getint());
-        var f3 : Nullable.<TextTrackCue> = o.getCueById(X.getstring());
+        var f3 : TextTrackCue = o.getCueById(X.getstring());
     } // TextTrackCueList
 
     // #124
     function compile_TextTrackCue(o : TextTrackCue) : void {
-        var v1 : Nullable.<TextTrack> = o.track;
+        var v1 : TextTrack = o.track;
         var v2 : string/*DOMString*/ = o.id;
         var v3 : number/*double*/ = o.startTime;
         var v4 : number/*double*/ = o.endTime;
@@ -2640,8 +2640,8 @@ class _Test extends TestCase {
         var v11 : string/*DOMString*/ = o.align;
         var v12 : string/*DOMString*/ = o.text;
         var f13 : DocumentFragment = o.getCueAsHTML();
-        var v14 : Nullable.<function(:Event):void>/*Function?*/ = o.onenter;
-        var v15 : Nullable.<function(:Event):void>/*Function?*/ = o.onexit;
+        var v14 : function(:Event):void/*Function?*/ = o.onenter;
+        var v15 : function(:Event):void/*Function?*/ = o.onexit;
     } // TextTrackCue
 
     // #125
@@ -2653,12 +2653,12 @@ class _Test extends TestCase {
 
     // #126
     function compile_TrackEvent(o : TrackEvent) : void {
-        var v1 : Nullable.<Object>/*object?*/ = o.track;
+        var v1 : Object/*object?*/ = o.track;
     } // TrackEvent
 
     // #127
     function compile_TrackEventInit(o : TrackEventInit) : void {
-        var v1 : Nullable.<Object>/*object?*/ = o.track;
+        var v1 : Object/*object?*/ = o.track;
     } // TrackEventInit
 
     // #128
@@ -2666,8 +2666,8 @@ class _Test extends TestCase {
         var v1 : int/*unsigned long*/ = o.width;
         var v2 : int/*unsigned long*/ = o.height;
         var f3 : string/*DOMString*/ = o.toDataURL(X.getstring(), X.getvariant());
-        o.toBlob(X.getNullable__function__File__void_(), X.getstring(), X.getvariant());
-        var f4 : Nullable.<Object>/*object?*/ = o.getContext(X.getstring(), X.getvariant());
+        o.toBlob(X.getfunction__File__void(), X.getstring(), X.getvariant());
+        var f4 : Object/*object?*/ = o.getContext(X.getstring(), X.getvariant());
     } // HTMLCanvasElement
 
     // #129
@@ -2701,13 +2701,13 @@ class _Test extends TestCase {
 
     // #131
     function compile_HTMLTableElement(o : HTMLTableElement) : void {
-        var v1 : Nullable.<HTMLTableCaptionElement> = o.caption;
+        var v1 : HTMLTableCaptionElement = o.caption;
         var f2 : HTMLElement = o.createCaption();
         o.deleteCaption();
-        var v3 : Nullable.<HTMLTableSectionElement> = o.tHead;
+        var v3 : HTMLTableSectionElement = o.tHead;
         var f4 : HTMLElement = o.createTHead();
         o.deleteTHead();
-        var v5 : Nullable.<HTMLTableSectionElement> = o.tFoot;
+        var v5 : HTMLTableSectionElement = o.tFoot;
         var f6 : HTMLElement = o.createTFoot();
         o.deleteTFoot();
         var v7 : HTMLCollection = o.tBodies;
@@ -2819,7 +2819,7 @@ class _Test extends TestCase {
     // #140
     function compile_HTMLFieldSetElement(o : HTMLFieldSetElement) : void {
         var v1 : boolean = o.disabled;
-        var v2 : Nullable.<HTMLFormElement> = o.form;
+        var v2 : HTMLFormElement = o.form;
         var v3 : string/*DOMString*/ = o.name;
         var v4 : string/*DOMString*/ = o.type;
         var v5 : HTMLFormControlsCollection = o.elements;
@@ -2832,15 +2832,15 @@ class _Test extends TestCase {
 
     // #141
     function compile_HTMLLegendElement(o : HTMLLegendElement) : void {
-        var v1 : Nullable.<HTMLFormElement> = o.form;
+        var v1 : HTMLFormElement = o.form;
         var v2 : string/*DOMString*/ = o.align;
     } // HTMLLegendElement
 
     // #142
     function compile_HTMLLabelElement(o : HTMLLabelElement) : void {
-        var v1 : Nullable.<HTMLFormElement> = o.form;
+        var v1 : HTMLFormElement = o.form;
         var v2 : string/*DOMString*/ = o.htmlFor;
-        var v3 : Nullable.<HTMLElement> = o.control;
+        var v3 : HTMLElement = o.control;
     } // HTMLLabelElement
 
     // #143
@@ -2853,8 +2853,8 @@ class _Test extends TestCase {
         var v6 : boolean = o.checked;
         var v7 : string/*DOMString*/ = o.dirName;
         var v8 : boolean = o.disabled;
-        var v9 : Nullable.<HTMLFormElement> = o.form;
-        var v10 : Nullable.<FileList> = o.files;
+        var v9 : HTMLFormElement = o.form;
+        var v10 : FileList = o.files;
         var v11 : string/*DOMString*/ = o.formAction;
         var v12 : string/*DOMString*/ = o.formEnctype;
         var v13 : string/*DOMString*/ = o.formMethod;
@@ -2862,7 +2862,7 @@ class _Test extends TestCase {
         var v15 : string/*DOMString*/ = o.formTarget;
         var v16 : int/*unsigned long*/ = o.height;
         var v17 : boolean = o.indeterminate;
-        var v18 : Nullable.<HTMLElement> = o.list;
+        var v18 : HTMLElement = o.list;
         var v19 : string/*DOMString*/ = o.max;
         var v20 : int/*long*/ = o.maxLength;
         var v21 : string/*DOMString*/ = o.min;
@@ -2878,7 +2878,7 @@ class _Test extends TestCase {
         var v31 : string/*DOMString*/ = o.type;
         var v32 : string/*DOMString*/ = o.defaultValue;
         var v33 : string/*DOMString*/ = o.value;
-        var v34 : Nullable.<Date> = o.valueAsDate;
+        var v34 : Date = o.valueAsDate;
         var v35 : number/*double*/ = o.valueAsNumber;
         var v36 : int/*unsigned long*/ = o.width;
         o.stepUp();
@@ -2905,7 +2905,7 @@ class _Test extends TestCase {
     function compile_HTMLButtonElement(o : HTMLButtonElement) : void {
         var v1 : boolean = o.autofocus;
         var v2 : boolean = o.disabled;
-        var v3 : Nullable.<HTMLFormElement> = o.form;
+        var v3 : HTMLFormElement = o.form;
         var v4 : string/*DOMString*/ = o.formAction;
         var v5 : string/*DOMString*/ = o.formEnctype;
         var v6 : string/*DOMString*/ = o.formMethod;
@@ -2926,7 +2926,7 @@ class _Test extends TestCase {
     function compile_HTMLSelectElement(o : HTMLSelectElement) : void {
         var v1 : boolean = o.autofocus;
         var v2 : boolean = o.disabled;
-        var v3 : Nullable.<HTMLFormElement> = o.form;
+        var v3 : HTMLFormElement = o.form;
         var v4 : boolean = o.multiple;
         var v5 : string/*DOMString*/ = o.name;
         var v6 : boolean = o.required;
@@ -2971,7 +2971,7 @@ class _Test extends TestCase {
     // #148
     function compile_HTMLOptionElement(o : HTMLOptionElement) : void {
         var v1 : boolean = o.disabled;
-        var v2 : Nullable.<HTMLFormElement> = o.form;
+        var v2 : HTMLFormElement = o.form;
         var v3 : string/*DOMString*/ = o.label;
         var v4 : boolean = o.defaultSelected;
         var v5 : boolean = o.selected;
@@ -2986,7 +2986,7 @@ class _Test extends TestCase {
         var v2 : int/*unsigned long*/ = o.cols;
         var v3 : string/*DOMString*/ = o.dirName;
         var v4 : boolean = o.disabled;
-        var v5 : Nullable.<HTMLFormElement> = o.form;
+        var v5 : HTMLFormElement = o.form;
         var v6 : int/*long*/ = o.maxLength;
         var v7 : string/*DOMString*/ = o.name;
         var v8 : string/*DOMString*/ = o.placeholder;
@@ -3017,7 +3017,7 @@ class _Test extends TestCase {
         var v1 : boolean = o.autofocus;
         var v2 : string/*DOMString*/ = o.challenge;
         var v3 : boolean = o.disabled;
-        var v4 : Nullable.<HTMLFormElement> = o.form;
+        var v4 : HTMLFormElement = o.form;
         var v5 : string/*DOMString*/ = o.keytype;
         var v6 : string/*DOMString*/ = o.name;
         var v7 : string/*DOMString*/ = o.type;
@@ -3032,7 +3032,7 @@ class _Test extends TestCase {
     // #151
     function compile_HTMLOutputElement(o : HTMLOutputElement) : void {
         var v1 : DOMSettableTokenList = o.htmlFor;
-        var v2 : Nullable.<HTMLFormElement> = o.form;
+        var v2 : HTMLFormElement = o.form;
         var v3 : string/*DOMString*/ = o.name;
         var v4 : string/*DOMString*/ = o.type;
         var v5 : string/*DOMString*/ = o.defaultValue;
@@ -3090,7 +3090,7 @@ class _Test extends TestCase {
         var v4 : boolean = o.disabled;
         var v5 : boolean = o.checked;
         var v6 : string/*DOMString*/ = o.radiogroup;
-        var v7 : Nullable.<HTMLElement> = o.command;
+        var v7 : HTMLElement = o.command;
     } // HTMLCommandElement
 
     // #157
@@ -3189,14 +3189,14 @@ class _Test extends TestCase {
         o.update();
         o.abort();
         o.swapCache();
-        var v14 : Nullable.<function(:Event):void>/*Function?*/ = o.onchecking;
-        var v15 : Nullable.<function(:Event):void>/*Function?*/ = o.onerror;
-        var v16 : Nullable.<function(:Event):void>/*Function?*/ = o.onnoupdate;
-        var v17 : Nullable.<function(:Event):void>/*Function?*/ = o.ondownloading;
-        var v18 : Nullable.<function(:Event):void>/*Function?*/ = o.onprogress;
-        var v19 : Nullable.<function(:Event):void>/*Function?*/ = o.onupdateready;
-        var v20 : Nullable.<function(:Event):void>/*Function?*/ = o.oncached;
-        var v21 : Nullable.<function(:Event):void>/*Function?*/ = o.onobsolete;
+        var v14 : function(:Event):void/*Function?*/ = o.onchecking;
+        var v15 : function(:Event):void/*Function?*/ = o.onerror;
+        var v16 : function(:Event):void/*Function?*/ = o.onnoupdate;
+        var v17 : function(:Event):void/*Function?*/ = o.ondownloading;
+        var v18 : function(:Event):void/*Function?*/ = o.onprogress;
+        var v19 : function(:Event):void/*Function?*/ = o.onupdateready;
+        var v20 : function(:Event):void/*Function?*/ = o.oncached;
+        var v21 : function(:Event):void/*Function?*/ = o.onobsolete;
     } // ApplicationCache
 
     // #169
@@ -3282,26 +3282,26 @@ class _Test extends TestCase {
         var v1 : int/*unsigned long*/ = o.length;
         var f2 : DataTransferItem = o.__native_index_operator__(X.getint());
         o.clear();
-        var f3 : Nullable.<DataTransferItem> = o.add(X.getstring(), X.getstring());
-        var f4 : Nullable.<DataTransferItem> = o.add(X.getFile());
+        var f3 : DataTransferItem = o.add(X.getstring(), X.getstring());
+        var f4 : DataTransferItem = o.add(X.getFile());
     } // DataTransferItemList
 
     // #179
     function compile_DataTransferItem(o : DataTransferItem) : void {
         var v1 : string/*DOMString*/ = o.kind;
         var v2 : string/*DOMString*/ = o.type;
-        o.getAsString(X.getNullable__function__string__void_());
-        var f3 : Nullable.<File> = o.getAsFile();
+        o.getAsString(X.getfunction__string__void());
+        var f3 : File = o.getAsFile();
     } // DataTransferItem
 
     // #180
     function compile_DragEvent(o : DragEvent) : void {
-        var v1 : Nullable.<DataTransfer> = o.dataTransfer;
+        var v1 : DataTransfer = o.dataTransfer;
     } // DragEvent
 
     // #181
     function compile_DragEventInit(o : DragEventInit) : void {
-        var v1 : Nullable.<DataTransfer> = o.dataTransfer;
+        var v1 : DataTransfer = o.dataTransfer;
     } // DragEventInit
 
     // #182
@@ -3332,9 +3332,9 @@ class _Test extends TestCase {
         var v9 : boolean = o.trueSpeed;
         var v10 : int/*unsigned long*/ = o.vspace;
         var v11 : string/*DOMString*/ = o.width;
-        var v12 : Nullable.<function(:Event):void>/*Function?*/ = o.onbounce;
-        var v13 : Nullable.<function(:Event):void>/*Function?*/ = o.onfinish;
-        var v14 : Nullable.<function(:Event):void>/*Function?*/ = o.onstart;
+        var v12 : function(:Event):void/*Function?*/ = o.onbounce;
+        var v13 : function(:Event):void/*Function?*/ = o.onfinish;
+        var v14 : function(:Event):void/*Function?*/ = o.onstart;
         o.start();
         o.stop();
     } // HTMLMarqueeElement
@@ -3343,24 +3343,24 @@ class _Test extends TestCase {
     function compile_HTMLFrameSetElement(o : HTMLFrameSetElement) : void {
         var v1 : string/*DOMString*/ = o.cols;
         var v2 : string/*DOMString*/ = o.rows;
-        var v3 : Nullable.<function(:Event):void>/*Function?*/ = o.onafterprint;
-        var v4 : Nullable.<function(:Event):void>/*Function?*/ = o.onbeforeprint;
-        var v5 : Nullable.<function(:Event):void>/*Function?*/ = o.onbeforeunload;
-        var v6 : Nullable.<function(:Event):void>/*Function?*/ = o.onblur;
-        var v7 : Nullable.<function(:Event):void>/*Function?*/ = o.onerror;
-        var v8 : Nullable.<function(:Event):void>/*Function?*/ = o.onfocus;
-        var v9 : Nullable.<function(:Event):void>/*Function?*/ = o.onhashchange;
-        var v10 : Nullable.<function(:Event):void>/*Function?*/ = o.onload;
-        var v11 : Nullable.<function(:Event):void>/*Function?*/ = o.onmessage;
-        var v12 : Nullable.<function(:Event):void>/*Function?*/ = o.onoffline;
-        var v13 : Nullable.<function(:Event):void>/*Function?*/ = o.ononline;
-        var v14 : Nullable.<function(:Event):void>/*Function?*/ = o.onpagehide;
-        var v15 : Nullable.<function(:Event):void>/*Function?*/ = o.onpageshow;
-        var v16 : Nullable.<function(:Event):void>/*Function?*/ = o.onpopstate;
-        var v17 : Nullable.<function(:Event):void>/*Function?*/ = o.onresize;
-        var v18 : Nullable.<function(:Event):void>/*Function?*/ = o.onscroll;
-        var v19 : Nullable.<function(:Event):void>/*Function?*/ = o.onstorage;
-        var v20 : Nullable.<function(:Event):void>/*Function?*/ = o.onunload;
+        var v3 : function(:Event):void/*Function?*/ = o.onafterprint;
+        var v4 : function(:Event):void/*Function?*/ = o.onbeforeprint;
+        var v5 : function(:Event):void/*Function?*/ = o.onbeforeunload;
+        var v6 : function(:Event):void/*Function?*/ = o.onblur;
+        var v7 : function(:Event):void/*Function?*/ = o.onerror;
+        var v8 : function(:Event):void/*Function?*/ = o.onfocus;
+        var v9 : function(:Event):void/*Function?*/ = o.onhashchange;
+        var v10 : function(:Event):void/*Function?*/ = o.onload;
+        var v11 : function(:Event):void/*Function?*/ = o.onmessage;
+        var v12 : function(:Event):void/*Function?*/ = o.onoffline;
+        var v13 : function(:Event):void/*Function?*/ = o.ononline;
+        var v14 : function(:Event):void/*Function?*/ = o.onpagehide;
+        var v15 : function(:Event):void/*Function?*/ = o.onpageshow;
+        var v16 : function(:Event):void/*Function?*/ = o.onpopstate;
+        var v17 : function(:Event):void/*Function?*/ = o.onresize;
+        var v18 : function(:Event):void/*Function?*/ = o.onscroll;
+        var v19 : function(:Event):void/*Function?*/ = o.onstorage;
+        var v20 : function(:Event):void/*Function?*/ = o.onunload;
     } // HTMLFrameSetElement
 
     // #185
@@ -3371,8 +3371,8 @@ class _Test extends TestCase {
         var v4 : string/*DOMString*/ = o.frameBorder;
         var v5 : string/*DOMString*/ = o.longDesc;
         var v6 : boolean = o.noResize;
-        var v7 : Nullable.<HTMLDocument>/*Document?*/ = o.contentDocument;
-        var v8 : Nullable.<Window>/*WindowProxy?*/ = o.contentWindow;
+        var v7 : HTMLDocument/*Document?*/ = o.contentDocument;
+        var v8 : Window/*WindowProxy?*/ = o.contentWindow;
         var v9 : string/*DOMString*/ = o.marginHeight;
         var v10 : string/*DOMString*/ = o.marginWidth;
     } // HTMLFrameElement
@@ -3398,8 +3398,8 @@ class _Test extends TestCase {
 
     // #189
     function compile_FileList(o : FileList) : void {
-        var f1 : Nullable.<File> = o.__native_index_operator__(X.getint());
-        var f2 : Nullable.<File> = o.item(X.getint());
+        var f1 : File = o.__native_index_operator__(X.getint());
+        var f2 : File = o.item(X.getint());
         var v3 : int/*unsigned long*/ = o.length;
     } // FileList
 
@@ -3436,12 +3436,12 @@ class _Test extends TestCase {
         var v7 : int/*unsigned short*/ = o.readyState;
         var v8 : variant/*any*/ = o.result;
         var v9 : DOMError = o.error;
-        var v10 : Nullable.<function(:Event):void>/*Function?*/ = o.onloadstart;
-        var v11 : Nullable.<function(:Event):void>/*Function?*/ = o.onprogress;
-        var v12 : Nullable.<function(:Event):void>/*Function?*/ = o.onload;
-        var v13 : Nullable.<function(:Event):void>/*Function?*/ = o.onabort;
-        var v14 : Nullable.<function(:Event):void>/*Function?*/ = o.onerror;
-        var v15 : Nullable.<function(:Event):void>/*Function?*/ = o.onloadend;
+        var v10 : function(:Event):void/*Function?*/ = o.onloadstart;
+        var v11 : function(:Event):void/*Function?*/ = o.onprogress;
+        var v12 : function(:Event):void/*Function?*/ = o.onload;
+        var v13 : function(:Event):void/*Function?*/ = o.onabort;
+        var v14 : function(:Event):void/*Function?*/ = o.onerror;
+        var v15 : function(:Event):void/*Function?*/ = o.onloadend;
     } // FileReader
 
     // #193
@@ -3507,15 +3507,15 @@ class _Test extends TestCase {
         var v9 : int/*unsigned short*/ = o.CLOSED;
         var v10 : int/*unsigned short*/ = o.readyState;
         var v11 : int/*unsigned long*/ = o.bufferedAmount;
-        var v12 : Nullable.<function(:Event):void>/*Function?*/ = o.onopen;
-        var v13 : Nullable.<function(:Event):void>/*Function?*/ = o.onerror;
-        var v14 : Nullable.<function(:Event):void>/*Function?*/ = o.onclose;
+        var v12 : function(:Event):void/*Function?*/ = o.onopen;
+        var v13 : function(:Event):void/*Function?*/ = o.onerror;
+        var v14 : function(:Event):void/*Function?*/ = o.onclose;
         var v15 : string/*DOMString*/ = o.extensions;
         var v16 : string/*DOMString*/ = o.protocol;
         o.close();
         o.close(X.getint());
         o.close(X.getint(), X.getstring());
-        var v17 : Nullable.<function(:Event):void>/*Function?*/ = o.onmessage;
+        var v17 : function(:Event):void/*Function?*/ = o.onmessage;
         var v18 : string/*DOMString*/ = o.binaryType;
         o.send(X.getstring());
         o.send(X.getArrayBufferView());
@@ -3592,8 +3592,8 @@ class _Test extends TestCase {
     function compile_Storage(o : Storage) : void {
         var v1 : int/*unsigned long*/ = o.length;
         var f2 : Nullable.<string>/*DOMString?*/ = o.key(X.getint());
-        var f3 : string/*DOMString*/ = o.__native_index_operator__(X.getstring());
-        var f4 : string/*DOMString*/ = o.getItem(X.getstring());
+        var f3 : Nullable.<string>/*DOMString*/ = o.__native_index_operator__(X.getstring());
+        var f4 : Nullable.<string>/*DOMString*/ = o.getItem(X.getstring());
         o.setItem(X.getstring(), X.getstring());
         o.removeItem(X.getstring());
         o.clear();
@@ -3615,7 +3615,7 @@ class _Test extends TestCase {
         var v2 : Nullable.<string>/*DOMString?*/ = o.oldValue;
         var v3 : Nullable.<string>/*DOMString?*/ = o.newValue;
         var v4 : string/*DOMString*/ = o.url;
-        var v5 : Nullable.<Storage> = o.storageArea;
+        var v5 : Storage = o.storageArea;
     } // StorageEvent
 
     // #212
@@ -3624,7 +3624,7 @@ class _Test extends TestCase {
         var v2 : Nullable.<string>/*DOMString?*/ = o.oldValue;
         var v3 : Nullable.<string>/*DOMString?*/ = o.newValue;
         var v4 : string/*DOMString*/ = o.url;
-        var v5 : Nullable.<Storage> = o.storageArea;
+        var v5 : Storage = o.storageArea;
     } // StorageEventInit
 
     // #213
@@ -3638,7 +3638,7 @@ class _Test extends TestCase {
         var v1 : variant/*any*/ = o.data;
         var v2 : string/*DOMString*/ = o.origin;
         var v3 : string/*DOMString*/ = o.lastEventId;
-        var v4 : Nullable.<Window>/*WindowProxy?*/ = o.source;
+        var v4 : Window/*WindowProxy?*/ = o.source;
         var v5 : MessagePort[] = o.ports;
     } // MessageEvent
 
@@ -3647,7 +3647,7 @@ class _Test extends TestCase {
         var v1 : variant/*any*/ = o.data;
         var v2 : string/*DOMString*/ = o.origin;
         var v3 : string/*DOMString*/ = o.lastEventId;
-        var v4 : Nullable.<Window>/*WindowProxy?*/ = o.source;
+        var v4 : Window/*WindowProxy?*/ = o.source;
         var v5 : MessagePort[] = o.ports;
     } // MessageEventInit
 
@@ -3663,7 +3663,7 @@ class _Test extends TestCase {
         o.postMessage(X.getvariant(), X.getTransferable__());
         o.start();
         o.close();
-        var v1 : Nullable.<function(:Event):void>/*Function?*/ = o.onmessage;
+        var v1 : function(:Event):void/*Function?*/ = o.onmessage;
     } // MessagePort
 
     // #218
@@ -3671,9 +3671,9 @@ class _Test extends TestCase {
         var v1 : WorkerGlobalScope = o.self;
         var v2 : WorkerLocation = o.location;
         o.close();
-        var v3 : Nullable.<function(:Event):void>/*Function?*/ = o.onerror;
-        var v4 : Nullable.<function(:Event):void>/*Function?*/ = o.onoffline;
-        var v5 : Nullable.<function(:Event):void>/*Function?*/ = o.ononline;
+        var v3 : function(:Event):void/*Function?*/ = o.onerror;
+        var v4 : function(:Event):void/*Function?*/ = o.onoffline;
+        var v5 : function(:Event):void/*Function?*/ = o.ononline;
         o.importScripts(X.getstring());
         var v6 : WorkerNavigator = o.navigator;
     } // WorkerGlobalScope
@@ -3682,14 +3682,14 @@ class _Test extends TestCase {
     function compile_DedicatedWorkerGlobalScope(o : DedicatedWorkerGlobalScope) : void {
         o.postMessage(X.getvariant());
         o.postMessage(X.getvariant(), X.getTransferable__());
-        var v1 : Nullable.<function(:Event):void>/*Function?*/ = o.onmessage;
+        var v1 : function(:Event):void/*Function?*/ = o.onmessage;
     } // DedicatedWorkerGlobalScope
 
     // #220
     function compile_SharedWorkerGlobalScope(o : SharedWorkerGlobalScope) : void {
         var v1 : string/*DOMString*/ = o.name;
         var v2 : ApplicationCache = o.applicationCache;
-        var v3 : Nullable.<function(:Event):void>/*Function?*/ = o.onconnect;
+        var v3 : function(:Event):void/*Function?*/ = o.onconnect;
     } // SharedWorkerGlobalScope
 
     // #221
@@ -3708,7 +3708,7 @@ class _Test extends TestCase {
 
     // #223
     function compile_AbstractWorker(o : AbstractWorker) : void {
-        var v1 : Nullable.<function(:Event):void>/*Function?*/ = o.onerror;
+        var v1 : function(:Event):void/*Function?*/ = o.onerror;
     } // AbstractWorker
 
     // #224
@@ -3716,14 +3716,14 @@ class _Test extends TestCase {
         o.terminate();
         o.postMessage(X.getvariant());
         o.postMessage(X.getvariant(), X.getTransferable__());
-        var v1 : Nullable.<function(:Event):void>/*Function?*/ = o.onmessage;
-        var v2 : Nullable.<function(:Event):void>/*Function?*/ = o.onerror;
+        var v1 : function(:Event):void/*Function?*/ = o.onmessage;
+        var v2 : function(:Event):void/*Function?*/ = o.onerror;
     } // Worker
 
     // #225
     function compile_SharedWorker(o : SharedWorker) : void {
         var v1 : MessagePort = o.port;
-        var v2 : Nullable.<function(:Event):void>/*Function?*/ = o.onerror;
+        var v2 : function(:Event):void/*Function?*/ = o.onerror;
     } // SharedWorker
 
     // #226
@@ -3766,9 +3766,9 @@ class _Test extends TestCase {
         var v7 : int/*unsigned short*/ = EventSource.CLOSED;
         var v8 : int/*unsigned short*/ = o.CLOSED;
         var v9 : int/*unsigned short*/ = o.readyState;
-        var v10 : Nullable.<function(:Event):void>/*Function?*/ = o.onopen;
-        var v11 : Nullable.<function(:Event):void>/*Function?*/ = o.onmessage;
-        var v12 : Nullable.<function(:Event):void>/*Function?*/ = o.onerror;
+        var v10 : function(:Event):void/*Function?*/ = o.onopen;
+        var v11 : function(:Event):void/*Function?*/ = o.onmessage;
+        var v12 : function(:Event):void/*Function?*/ = o.onerror;
         o.close();
     } // EventSource
 
@@ -3806,8 +3806,8 @@ class _Test extends TestCase {
         var v1 : int/*long*/ = Int8Array.BYTES_PER_ELEMENT;
         var v2 : int/*long*/ = o.BYTES_PER_ELEMENT;
         var v3 : int/*unsigned long*/ = o.length;
-        var f4 : int/*byte*/ = o.__native_index_operator__(X.getint());
-        var f5 : int/*byte*/ = o.get(X.getint());
+        var f4 : Nullable.<int>/*byte*/ = o.__native_index_operator__(X.getint());
+        var f5 : Nullable.<int>/*byte*/ = o.get(X.getint());
         o.set(X.getint(), X.getint());
         o.set(X.getInt8Array());
         o.set(X.getInt8Array(), X.getint());
@@ -3823,8 +3823,8 @@ class _Test extends TestCase {
         var v1 : int/*long*/ = Uint8Array.BYTES_PER_ELEMENT;
         var v2 : int/*long*/ = o.BYTES_PER_ELEMENT;
         var v3 : int/*unsigned long*/ = o.length;
-        var f4 : int/*octet*/ = o.__native_index_operator__(X.getint());
-        var f5 : int/*octet*/ = o.get(X.getint());
+        var f4 : Nullable.<int>/*octet*/ = o.__native_index_operator__(X.getint());
+        var f5 : Nullable.<int>/*octet*/ = o.get(X.getint());
         o.set(X.getint(), X.getint());
         o.set(X.getUint8Array());
         o.set(X.getUint8Array(), X.getint());
@@ -3852,8 +3852,8 @@ class _Test extends TestCase {
         var v1 : int/*long*/ = Int16Array.BYTES_PER_ELEMENT;
         var v2 : int/*long*/ = o.BYTES_PER_ELEMENT;
         var v3 : int/*unsigned long*/ = o.length;
-        var f4 : int/*short*/ = o.__native_index_operator__(X.getint());
-        var f5 : int/*short*/ = o.get(X.getint());
+        var f4 : Nullable.<int>/*short*/ = o.__native_index_operator__(X.getint());
+        var f5 : Nullable.<int>/*short*/ = o.get(X.getint());
         o.set(X.getint(), X.getint());
         o.set(X.getInt16Array());
         o.set(X.getInt16Array(), X.getint());
@@ -3869,8 +3869,8 @@ class _Test extends TestCase {
         var v1 : int/*long*/ = Uint16Array.BYTES_PER_ELEMENT;
         var v2 : int/*long*/ = o.BYTES_PER_ELEMENT;
         var v3 : int/*unsigned long*/ = o.length;
-        var f4 : int/*unsigned short*/ = o.__native_index_operator__(X.getint());
-        var f5 : int/*unsigned short*/ = o.get(X.getint());
+        var f4 : Nullable.<int>/*unsigned short*/ = o.__native_index_operator__(X.getint());
+        var f5 : Nullable.<int>/*unsigned short*/ = o.get(X.getint());
         o.set(X.getint(), X.getint());
         o.set(X.getUint16Array());
         o.set(X.getUint16Array(), X.getint());
@@ -3886,8 +3886,8 @@ class _Test extends TestCase {
         var v1 : int/*long*/ = Int32Array.BYTES_PER_ELEMENT;
         var v2 : int/*long*/ = o.BYTES_PER_ELEMENT;
         var v3 : int/*unsigned long*/ = o.length;
-        var f4 : int/*long*/ = o.__native_index_operator__(X.getint());
-        var f5 : int/*long*/ = o.get(X.getint());
+        var f4 : Nullable.<int>/*long*/ = o.__native_index_operator__(X.getint());
+        var f5 : Nullable.<int>/*long*/ = o.get(X.getint());
         o.set(X.getint(), X.getint());
         o.set(X.getInt32Array());
         o.set(X.getInt32Array(), X.getint());
@@ -3903,8 +3903,8 @@ class _Test extends TestCase {
         var v1 : int/*long*/ = Uint32Array.BYTES_PER_ELEMENT;
         var v2 : int/*long*/ = o.BYTES_PER_ELEMENT;
         var v3 : int/*unsigned long*/ = o.length;
-        var f4 : int/*unsigned long*/ = o.__native_index_operator__(X.getint());
-        var f5 : int/*unsigned long*/ = o.get(X.getint());
+        var f4 : Nullable.<int>/*unsigned long*/ = o.__native_index_operator__(X.getint());
+        var f5 : Nullable.<int>/*unsigned long*/ = o.get(X.getint());
         o.set(X.getint(), X.getint());
         o.set(X.getUint32Array());
         o.set(X.getUint32Array(), X.getint());
@@ -3920,8 +3920,8 @@ class _Test extends TestCase {
         var v1 : int/*long*/ = Float32Array.BYTES_PER_ELEMENT;
         var v2 : int/*long*/ = o.BYTES_PER_ELEMENT;
         var v3 : int/*unsigned long*/ = o.length;
-        var f4 : number/*float*/ = o.__native_index_operator__(X.getint());
-        var f5 : number/*float*/ = o.get(X.getint());
+        var f4 : Nullable.<number>/*float*/ = o.__native_index_operator__(X.getint());
+        var f5 : Nullable.<number>/*float*/ = o.get(X.getint());
         o.set(X.getint(), X.getnumber());
         o.set(X.getFloat32Array());
         o.set(X.getFloat32Array(), X.getint());
@@ -3935,8 +3935,8 @@ class _Test extends TestCase {
         var v1 : int/*long*/ = Float64Array.BYTES_PER_ELEMENT;
         var v2 : int/*long*/ = o.BYTES_PER_ELEMENT;
         var v3 : int/*unsigned long*/ = o.length;
-        var f4 : number/*double*/ = o.__native_index_operator__(X.getint());
-        var f5 : number/*double*/ = o.get(X.getint());
+        var f4 : Nullable.<number>/*double*/ = o.__native_index_operator__(X.getint());
+        var f5 : Nullable.<number>/*double*/ = o.get(X.getint());
         o.set(X.getint(), X.getnumber());
         o.set(X.getFloat64Array());
         o.set(X.getFloat64Array(), X.getint());
@@ -4760,14 +4760,14 @@ class _Test extends TestCase {
         var f594 : WebGLContextAttributes = o.getContextAttributes();
         var f595 : boolean = o.isContextLost();
         var f596 : string[]/*sequence<DOMString>?*/ = o.getSupportedExtensions();
-        var f597 : Nullable.<Object>/*object?*/ = o.getExtension(X.getstring());
+        var f597 : Object/*object?*/ = o.getExtension(X.getstring());
         o.activeTexture(X.getint());
-        o.attachShader(X.getNullable__WebGLProgram_(), X.getNullable__WebGLShader_());
-        o.bindAttribLocation(X.getNullable__WebGLProgram_(), X.getint(), X.getstring());
-        o.bindBuffer(X.getint(), X.getNullable__WebGLBuffer_());
-        o.bindFramebuffer(X.getint(), X.getNullable__WebGLFramebuffer_());
-        o.bindRenderbuffer(X.getint(), X.getNullable__WebGLRenderbuffer_());
-        o.bindTexture(X.getint(), X.getNullable__WebGLTexture_());
+        o.attachShader(X.getWebGLProgram(), X.getWebGLShader());
+        o.bindAttribLocation(X.getWebGLProgram(), X.getint(), X.getstring());
+        o.bindBuffer(X.getint(), X.getWebGLBuffer());
+        o.bindFramebuffer(X.getint(), X.getWebGLFramebuffer());
+        o.bindRenderbuffer(X.getint(), X.getWebGLRenderbuffer());
+        o.bindTexture(X.getint(), X.getWebGLTexture());
         o.blendColor(X.getnumber(), X.getnumber(), X.getnumber(), X.getnumber());
         o.blendEquation(X.getint());
         o.blendEquationSeparate(X.getint(), X.getint());
@@ -4775,37 +4775,37 @@ class _Test extends TestCase {
         o.blendFuncSeparate(X.getint(), X.getint(), X.getint(), X.getint());
         o.bufferData(X.getint(), X.getnumber(), X.getint());
         o.bufferData(X.getint(), X.getArrayBufferView(), X.getint());
-        o.bufferData(X.getint(), X.getNullable__ArrayBuffer_(), X.getint());
+        o.bufferData(X.getint(), X.getArrayBuffer(), X.getint());
         o.bufferSubData(X.getint(), X.getnumber(), X.getArrayBufferView());
-        o.bufferSubData(X.getint(), X.getnumber(), X.getNullable__ArrayBuffer_());
+        o.bufferSubData(X.getint(), X.getnumber(), X.getArrayBuffer());
         var f598 : int/*GLenum*/ = o.checkFramebufferStatus(X.getint());
         o.clear(X.getint());
         o.clearColor(X.getnumber(), X.getnumber(), X.getnumber(), X.getnumber());
         o.clearDepth(X.getnumber());
         o.clearStencil(X.getint());
         o.colorMask(X.getboolean(), X.getboolean(), X.getboolean(), X.getboolean());
-        o.compileShader(X.getNullable__WebGLShader_());
+        o.compileShader(X.getWebGLShader());
         o.compressedTexImage2D(X.getint(), X.getint(), X.getint(), X.getint(), X.getint(), X.getint(), X.getArrayBufferView());
         o.compressedTexSubImage2D(X.getint(), X.getint(), X.getint(), X.getint(), X.getint(), X.getint(), X.getint(), X.getArrayBufferView());
         o.copyTexImage2D(X.getint(), X.getint(), X.getint(), X.getint(), X.getint(), X.getint(), X.getint(), X.getint());
         o.copyTexSubImage2D(X.getint(), X.getint(), X.getint(), X.getint(), X.getint(), X.getint(), X.getint(), X.getint());
-        var f599 : Nullable.<WebGLBuffer> = o.createBuffer();
-        var f600 : Nullable.<WebGLFramebuffer> = o.createFramebuffer();
-        var f601 : Nullable.<WebGLProgram> = o.createProgram();
-        var f602 : Nullable.<WebGLRenderbuffer> = o.createRenderbuffer();
-        var f603 : Nullable.<WebGLShader> = o.createShader(X.getint());
-        var f604 : Nullable.<WebGLTexture> = o.createTexture();
+        var f599 : WebGLBuffer = o.createBuffer();
+        var f600 : WebGLFramebuffer = o.createFramebuffer();
+        var f601 : WebGLProgram = o.createProgram();
+        var f602 : WebGLRenderbuffer = o.createRenderbuffer();
+        var f603 : WebGLShader = o.createShader(X.getint());
+        var f604 : WebGLTexture = o.createTexture();
         o.cullFace(X.getint());
-        o.deleteBuffer(X.getNullable__WebGLBuffer_());
-        o.deleteFramebuffer(X.getNullable__WebGLFramebuffer_());
-        o.deleteProgram(X.getNullable__WebGLProgram_());
-        o.deleteRenderbuffer(X.getNullable__WebGLRenderbuffer_());
-        o.deleteShader(X.getNullable__WebGLShader_());
-        o.deleteTexture(X.getNullable__WebGLTexture_());
+        o.deleteBuffer(X.getWebGLBuffer());
+        o.deleteFramebuffer(X.getWebGLFramebuffer());
+        o.deleteProgram(X.getWebGLProgram());
+        o.deleteRenderbuffer(X.getWebGLRenderbuffer());
+        o.deleteShader(X.getWebGLShader());
+        o.deleteTexture(X.getWebGLTexture());
         o.depthFunc(X.getint());
         o.depthMask(X.getboolean());
         o.depthRange(X.getnumber(), X.getnumber());
-        o.detachShader(X.getNullable__WebGLProgram_(), X.getNullable__WebGLShader_());
+        o.detachShader(X.getWebGLProgram(), X.getWebGLShader());
         o.disable(X.getint());
         o.disableVertexAttribArray(X.getint());
         o.drawArrays(X.getint(), X.getint(), X.getint());
@@ -4814,101 +4814,101 @@ class _Test extends TestCase {
         o.enableVertexAttribArray(X.getint());
         o.finish();
         o.flush();
-        o.framebufferRenderbuffer(X.getint(), X.getint(), X.getint(), X.getNullable__WebGLRenderbuffer_());
-        o.framebufferTexture2D(X.getint(), X.getint(), X.getint(), X.getNullable__WebGLTexture_(), X.getint());
+        o.framebufferRenderbuffer(X.getint(), X.getint(), X.getint(), X.getWebGLRenderbuffer());
+        o.framebufferTexture2D(X.getint(), X.getint(), X.getint(), X.getWebGLTexture(), X.getint());
         o.frontFace(X.getint());
         o.generateMipmap(X.getint());
-        var f605 : Nullable.<WebGLActiveInfo> = o.getActiveAttrib(X.getNullable__WebGLProgram_(), X.getint());
-        var f606 : Nullable.<WebGLActiveInfo> = o.getActiveUniform(X.getNullable__WebGLProgram_(), X.getint());
-        var f607 : WebGLShader[] = o.getAttachedShaders(X.getNullable__WebGLProgram_());
-        var f608 : int/*GLint*/ = o.getAttribLocation(X.getNullable__WebGLProgram_(), X.getstring());
+        var f605 : WebGLActiveInfo = o.getActiveAttrib(X.getWebGLProgram(), X.getint());
+        var f606 : WebGLActiveInfo = o.getActiveUniform(X.getWebGLProgram(), X.getint());
+        var f607 : WebGLShader[] = o.getAttachedShaders(X.getWebGLProgram());
+        var f608 : int/*GLint*/ = o.getAttribLocation(X.getWebGLProgram(), X.getstring());
         var f609 : variant/*any*/ = o.getBufferParameter(X.getint(), X.getint());
         var f610 : variant/*any*/ = o.getParameter(X.getint());
         var f611 : int/*GLenum*/ = o.getError();
         var f612 : variant/*any*/ = o.getFramebufferAttachmentParameter(X.getint(), X.getint(), X.getint());
-        var f613 : variant/*any*/ = o.getProgramParameter(X.getNullable__WebGLProgram_(), X.getint());
-        var f614 : Nullable.<string>/*DOMString?*/ = o.getProgramInfoLog(X.getNullable__WebGLProgram_());
+        var f613 : variant/*any*/ = o.getProgramParameter(X.getWebGLProgram(), X.getint());
+        var f614 : Nullable.<string>/*DOMString?*/ = o.getProgramInfoLog(X.getWebGLProgram());
         var f615 : variant/*any*/ = o.getRenderbufferParameter(X.getint(), X.getint());
-        var f616 : variant/*any*/ = o.getShaderParameter(X.getNullable__WebGLShader_(), X.getint());
-        var f617 : Nullable.<WebGLShaderPrecisionFormat> = o.getShaderPrecisionFormat(X.getint(), X.getint());
-        var f618 : Nullable.<string>/*DOMString?*/ = o.getShaderInfoLog(X.getNullable__WebGLShader_());
-        var f619 : Nullable.<string>/*DOMString?*/ = o.getShaderSource(X.getNullable__WebGLShader_());
+        var f616 : variant/*any*/ = o.getShaderParameter(X.getWebGLShader(), X.getint());
+        var f617 : WebGLShaderPrecisionFormat = o.getShaderPrecisionFormat(X.getint(), X.getint());
+        var f618 : Nullable.<string>/*DOMString?*/ = o.getShaderInfoLog(X.getWebGLShader());
+        var f619 : Nullable.<string>/*DOMString?*/ = o.getShaderSource(X.getWebGLShader());
         var f620 : variant/*any*/ = o.getTexParameter(X.getint(), X.getint());
-        var f621 : variant/*any*/ = o.getUniform(X.getNullable__WebGLProgram_(), X.getNullable__WebGLUniformLocation_());
-        var f622 : Nullable.<WebGLUniformLocation> = o.getUniformLocation(X.getNullable__WebGLProgram_(), X.getstring());
+        var f621 : variant/*any*/ = o.getUniform(X.getWebGLProgram(), X.getWebGLUniformLocation());
+        var f622 : WebGLUniformLocation = o.getUniformLocation(X.getWebGLProgram(), X.getstring());
         var f623 : variant/*any*/ = o.getVertexAttrib(X.getint(), X.getint());
         var f624 : number/*GLsizeiptr*/ = o.getVertexAttribOffset(X.getint(), X.getint());
         o.hint(X.getint(), X.getint());
-        var f625 : boolean/*GLboolean*/ = o.isBuffer(X.getNullable__WebGLBuffer_());
+        var f625 : boolean/*GLboolean*/ = o.isBuffer(X.getWebGLBuffer());
         var f626 : boolean/*GLboolean*/ = o.isEnabled(X.getint());
-        var f627 : boolean/*GLboolean*/ = o.isFramebuffer(X.getNullable__WebGLFramebuffer_());
-        var f628 : boolean/*GLboolean*/ = o.isProgram(X.getNullable__WebGLProgram_());
-        var f629 : boolean/*GLboolean*/ = o.isRenderbuffer(X.getNullable__WebGLRenderbuffer_());
-        var f630 : boolean/*GLboolean*/ = o.isShader(X.getNullable__WebGLShader_());
-        var f631 : boolean/*GLboolean*/ = o.isTexture(X.getNullable__WebGLTexture_());
+        var f627 : boolean/*GLboolean*/ = o.isFramebuffer(X.getWebGLFramebuffer());
+        var f628 : boolean/*GLboolean*/ = o.isProgram(X.getWebGLProgram());
+        var f629 : boolean/*GLboolean*/ = o.isRenderbuffer(X.getWebGLRenderbuffer());
+        var f630 : boolean/*GLboolean*/ = o.isShader(X.getWebGLShader());
+        var f631 : boolean/*GLboolean*/ = o.isTexture(X.getWebGLTexture());
         o.lineWidth(X.getnumber());
-        o.linkProgram(X.getNullable__WebGLProgram_());
+        o.linkProgram(X.getWebGLProgram());
         o.pixelStorei(X.getint(), X.getint());
         o.polygonOffset(X.getnumber(), X.getnumber());
-        o.readPixels(X.getint(), X.getint(), X.getint(), X.getint(), X.getint(), X.getint(), X.getNullable__ArrayBufferView_());
+        o.readPixels(X.getint(), X.getint(), X.getint(), X.getint(), X.getint(), X.getint(), X.getArrayBufferView());
         o.renderbufferStorage(X.getint(), X.getint(), X.getint(), X.getint());
         o.sampleCoverage(X.getnumber(), X.getboolean());
         o.scissor(X.getint(), X.getint(), X.getint(), X.getint());
-        o.shaderSource(X.getNullable__WebGLShader_(), X.getstring());
+        o.shaderSource(X.getWebGLShader(), X.getstring());
         o.stencilFunc(X.getint(), X.getint(), X.getint());
         o.stencilFuncSeparate(X.getint(), X.getint(), X.getint(), X.getint());
         o.stencilMask(X.getint());
         o.stencilMaskSeparate(X.getint(), X.getint());
         o.stencilOp(X.getint(), X.getint(), X.getint());
         o.stencilOpSeparate(X.getint(), X.getint(), X.getint(), X.getint());
-        o.texImage2D(X.getint(), X.getint(), X.getint(), X.getint(), X.getint(), X.getint(), X.getint(), X.getint(), X.getNullable__ArrayBufferView_());
-        o.texImage2D(X.getint(), X.getint(), X.getint(), X.getint(), X.getint(), X.getNullable__ImageData_());
+        o.texImage2D(X.getint(), X.getint(), X.getint(), X.getint(), X.getint(), X.getint(), X.getint(), X.getint(), X.getArrayBufferView());
+        o.texImage2D(X.getint(), X.getint(), X.getint(), X.getint(), X.getint(), X.getImageData());
         o.texImage2D(X.getint(), X.getint(), X.getint(), X.getint(), X.getint(), X.getHTMLImageElement());
         o.texImage2D(X.getint(), X.getint(), X.getint(), X.getint(), X.getint(), X.getHTMLCanvasElement());
         o.texImage2D(X.getint(), X.getint(), X.getint(), X.getint(), X.getint(), X.getHTMLVideoElement());
         o.texParameterf(X.getint(), X.getint(), X.getnumber());
         o.texParameteri(X.getint(), X.getint(), X.getint());
-        o.texSubImage2D(X.getint(), X.getint(), X.getint(), X.getint(), X.getint(), X.getint(), X.getint(), X.getint(), X.getNullable__ArrayBufferView_());
-        o.texSubImage2D(X.getint(), X.getint(), X.getint(), X.getint(), X.getint(), X.getint(), X.getNullable__ImageData_());
+        o.texSubImage2D(X.getint(), X.getint(), X.getint(), X.getint(), X.getint(), X.getint(), X.getint(), X.getint(), X.getArrayBufferView());
+        o.texSubImage2D(X.getint(), X.getint(), X.getint(), X.getint(), X.getint(), X.getint(), X.getImageData());
         o.texSubImage2D(X.getint(), X.getint(), X.getint(), X.getint(), X.getint(), X.getint(), X.getHTMLImageElement());
         o.texSubImage2D(X.getint(), X.getint(), X.getint(), X.getint(), X.getint(), X.getint(), X.getHTMLCanvasElement());
         o.texSubImage2D(X.getint(), X.getint(), X.getint(), X.getint(), X.getint(), X.getint(), X.getHTMLVideoElement());
-        o.uniform1f(X.getNullable__WebGLUniformLocation_(), X.getnumber());
-        o.uniform1fv(X.getNullable__WebGLUniformLocation_(), X.getFloat32Array());
-        o.uniform1fv(X.getNullable__WebGLUniformLocation_(), X.getnumber__());
-        o.uniform1i(X.getNullable__WebGLUniformLocation_(), X.getint());
-        o.uniform1iv(X.getNullable__WebGLUniformLocation_(), X.getInt32Array());
-        o.uniform1iv(X.getNullable__WebGLUniformLocation_(), X.getint__());
-        o.uniform1iv(X.getNullable__WebGLUniformLocation_(), X.getnumber__());
-        o.uniform2f(X.getNullable__WebGLUniformLocation_(), X.getnumber(), X.getnumber());
-        o.uniform2fv(X.getNullable__WebGLUniformLocation_(), X.getFloat32Array());
-        o.uniform2fv(X.getNullable__WebGLUniformLocation_(), X.getnumber__());
-        o.uniform2i(X.getNullable__WebGLUniformLocation_(), X.getint(), X.getint());
-        o.uniform2iv(X.getNullable__WebGLUniformLocation_(), X.getInt32Array());
-        o.uniform2iv(X.getNullable__WebGLUniformLocation_(), X.getint__());
-        o.uniform2iv(X.getNullable__WebGLUniformLocation_(), X.getnumber__());
-        o.uniform3f(X.getNullable__WebGLUniformLocation_(), X.getnumber(), X.getnumber(), X.getnumber());
-        o.uniform3fv(X.getNullable__WebGLUniformLocation_(), X.getFloat32Array());
-        o.uniform3fv(X.getNullable__WebGLUniformLocation_(), X.getnumber__());
-        o.uniform3i(X.getNullable__WebGLUniformLocation_(), X.getint(), X.getint(), X.getint());
-        o.uniform3iv(X.getNullable__WebGLUniformLocation_(), X.getInt32Array());
-        o.uniform3iv(X.getNullable__WebGLUniformLocation_(), X.getint__());
-        o.uniform3iv(X.getNullable__WebGLUniformLocation_(), X.getnumber__());
-        o.uniform4f(X.getNullable__WebGLUniformLocation_(), X.getnumber(), X.getnumber(), X.getnumber(), X.getnumber());
-        o.uniform4fv(X.getNullable__WebGLUniformLocation_(), X.getFloat32Array());
-        o.uniform4fv(X.getNullable__WebGLUniformLocation_(), X.getnumber__());
-        o.uniform4i(X.getNullable__WebGLUniformLocation_(), X.getint(), X.getint(), X.getint(), X.getint());
-        o.uniform4iv(X.getNullable__WebGLUniformLocation_(), X.getInt32Array());
-        o.uniform4iv(X.getNullable__WebGLUniformLocation_(), X.getint__());
-        o.uniform4iv(X.getNullable__WebGLUniformLocation_(), X.getnumber__());
-        o.uniformMatrix2fv(X.getNullable__WebGLUniformLocation_(), X.getboolean(), X.getFloat32Array());
-        o.uniformMatrix2fv(X.getNullable__WebGLUniformLocation_(), X.getboolean(), X.getnumber__());
-        o.uniformMatrix3fv(X.getNullable__WebGLUniformLocation_(), X.getboolean(), X.getFloat32Array());
-        o.uniformMatrix3fv(X.getNullable__WebGLUniformLocation_(), X.getboolean(), X.getnumber__());
-        o.uniformMatrix4fv(X.getNullable__WebGLUniformLocation_(), X.getboolean(), X.getFloat32Array());
-        o.uniformMatrix4fv(X.getNullable__WebGLUniformLocation_(), X.getboolean(), X.getnumber__());
-        o.useProgram(X.getNullable__WebGLProgram_());
-        o.validateProgram(X.getNullable__WebGLProgram_());
+        o.uniform1f(X.getWebGLUniformLocation(), X.getnumber());
+        o.uniform1fv(X.getWebGLUniformLocation(), X.getFloat32Array());
+        o.uniform1fv(X.getWebGLUniformLocation(), X.getnumber__());
+        o.uniform1i(X.getWebGLUniformLocation(), X.getint());
+        o.uniform1iv(X.getWebGLUniformLocation(), X.getInt32Array());
+        o.uniform1iv(X.getWebGLUniformLocation(), X.getint__());
+        o.uniform1iv(X.getWebGLUniformLocation(), X.getnumber__());
+        o.uniform2f(X.getWebGLUniformLocation(), X.getnumber(), X.getnumber());
+        o.uniform2fv(X.getWebGLUniformLocation(), X.getFloat32Array());
+        o.uniform2fv(X.getWebGLUniformLocation(), X.getnumber__());
+        o.uniform2i(X.getWebGLUniformLocation(), X.getint(), X.getint());
+        o.uniform2iv(X.getWebGLUniformLocation(), X.getInt32Array());
+        o.uniform2iv(X.getWebGLUniformLocation(), X.getint__());
+        o.uniform2iv(X.getWebGLUniformLocation(), X.getnumber__());
+        o.uniform3f(X.getWebGLUniformLocation(), X.getnumber(), X.getnumber(), X.getnumber());
+        o.uniform3fv(X.getWebGLUniformLocation(), X.getFloat32Array());
+        o.uniform3fv(X.getWebGLUniformLocation(), X.getnumber__());
+        o.uniform3i(X.getWebGLUniformLocation(), X.getint(), X.getint(), X.getint());
+        o.uniform3iv(X.getWebGLUniformLocation(), X.getInt32Array());
+        o.uniform3iv(X.getWebGLUniformLocation(), X.getint__());
+        o.uniform3iv(X.getWebGLUniformLocation(), X.getnumber__());
+        o.uniform4f(X.getWebGLUniformLocation(), X.getnumber(), X.getnumber(), X.getnumber(), X.getnumber());
+        o.uniform4fv(X.getWebGLUniformLocation(), X.getFloat32Array());
+        o.uniform4fv(X.getWebGLUniformLocation(), X.getnumber__());
+        o.uniform4i(X.getWebGLUniformLocation(), X.getint(), X.getint(), X.getint(), X.getint());
+        o.uniform4iv(X.getWebGLUniformLocation(), X.getInt32Array());
+        o.uniform4iv(X.getWebGLUniformLocation(), X.getint__());
+        o.uniform4iv(X.getWebGLUniformLocation(), X.getnumber__());
+        o.uniformMatrix2fv(X.getWebGLUniformLocation(), X.getboolean(), X.getFloat32Array());
+        o.uniformMatrix2fv(X.getWebGLUniformLocation(), X.getboolean(), X.getnumber__());
+        o.uniformMatrix3fv(X.getWebGLUniformLocation(), X.getboolean(), X.getFloat32Array());
+        o.uniformMatrix3fv(X.getWebGLUniformLocation(), X.getboolean(), X.getnumber__());
+        o.uniformMatrix4fv(X.getWebGLUniformLocation(), X.getboolean(), X.getFloat32Array());
+        o.uniformMatrix4fv(X.getWebGLUniformLocation(), X.getboolean(), X.getnumber__());
+        o.useProgram(X.getWebGLProgram());
+        o.validateProgram(X.getWebGLProgram());
         o.vertexAttrib1f(X.getint(), X.getnumber());
         o.vertexAttrib1fv(X.getint(), X.getFloat32Array());
         o.vertexAttrib1fv(X.getint(), X.getnumber__());
@@ -4948,7 +4948,7 @@ class _Test extends TestCase {
     // #269
     function compile_CanvasPixelArray(o : CanvasPixelArray) : void {
         var v1 : int/*unsigned long*/ = o.length;
-        var f2 : int/*octet*/ = o.__native_index_operator__(X.getint());
+        var f2 : Nullable.<int>/*octet*/ = o.__native_index_operator__(X.getint());
     } // CanvasPixelArray
 
 
@@ -4974,6 +4974,7 @@ native class X {
     static function getCSSStyleSheet() : CSSStyleSheet;
     static function getCanvasGradient() : CanvasGradient;
     static function getCanvasPattern() : CanvasPattern;
+    static function getCaretPosition() : CaretPosition;
     static function getClientRect() : ClientRect;
     static function getClientRectList() : ClientRectList;
     static function getComment() : Comment;
@@ -4984,6 +4985,7 @@ native class X {
     static function getDOMStringList() : DOMStringList;
     static function getDOMStringMap() : DOMStringMap;
     static function getDOMTokenList() : DOMTokenList;
+    static function getDataTransfer() : DataTransfer;
     static function getDataTransferItem() : DataTransferItem;
     static function getDataTransferItemList() : DataTransferItemList;
     static function getDate() : Date;
@@ -5007,10 +5009,15 @@ native class X {
     static function getHTMLDocument() : HTMLDocument/*Document*/;
     static function getHTMLElement() : HTMLElement;
     static function getHTMLFormControlsCollection() : HTMLFormControlsCollection;
+    static function getHTMLFormElement() : HTMLFormElement;
+    static function getHTMLHeadElement() : HTMLHeadElement;
     static function getHTMLImageElement() : HTMLImageElement;
+    static function getHTMLMenuElement() : HTMLMenuElement;
     static function getHTMLOptGroupElement() : HTMLOptGroupElement;
     static function getHTMLOptionElement() : HTMLOptionElement;
     static function getHTMLOptionsCollection() : HTMLOptionsCollection;
+    static function getHTMLTableCaptionElement() : HTMLTableCaptionElement;
+    static function getHTMLTableSectionElement() : HTMLTableSectionElement;
     static function getHTMLVideoElement() : HTMLVideoElement;
     static function getHistory() : History;
     static function getImageData() : ImageData;
@@ -5018,6 +5025,8 @@ native class X {
     static function getInt32Array() : Int32Array;
     static function getInt8Array() : Int8Array;
     static function getLocation() : Location;
+    static function getMediaController() : MediaController;
+    static function getMediaError() : MediaError;
     static function getMediaList() : MediaList;
     static function getMediaQueryList() : MediaQueryList;
     static function getMessagePort() : MessagePort;
@@ -5025,59 +5034,14 @@ native class X {
     static function getMutationObserverInit() : MutationObserverInit;
     static function getNavigator() : Navigator;
     static function getNode() : Node;
+    static function getNodeFilter() : NodeFilter;
     static function getNodeIterator() : NodeIterator;
     static function getNodeList() : NodeList;
-    static function getNullable__AbstractView_() : Nullable.<AbstractView>;
-    static function getNullable__ArrayBufferView_() : Nullable.<ArrayBufferView>;
-    static function getNullable__ArrayBuffer_() : Nullable.<ArrayBuffer>;
-    static function getNullable__AudioTrack_() : Nullable.<AudioTrack>;
-    static function getNullable__CaretPosition_() : Nullable.<CaretPosition>;
-    static function getNullable__DataTransferItem_() : Nullable.<DataTransferItem>;
-    static function getNullable__DataTransfer_() : Nullable.<DataTransfer>;
-    static function getNullable__Date_() : Nullable.<Date>;
-    static function getNullable__DocumentType_() : Nullable.<DocumentType>;
-    static function getNullable__Document_() : Nullable.<Document>;
-    static function getNullable__Element_() : Nullable.<Element>;
-    static function getNullable__EventTarget_() : Nullable.<EventTarget>;
-    static function getNullable__FileList_() : Nullable.<FileList>;
-    static function getNullable__File_() : Nullable.<File>;
-    static function getNullable__HTMLDocument_() : Nullable.<HTMLDocument>/*Document?*/;
-    static function getNullable__HTMLElement_() : Nullable.<HTMLElement>;
-    static function getNullable__HTMLFormElement_() : Nullable.<HTMLFormElement>;
-    static function getNullable__HTMLHeadElement_() : Nullable.<HTMLHeadElement>;
-    static function getNullable__HTMLMenuElement_() : Nullable.<HTMLMenuElement>;
-    static function getNullable__HTMLTableCaptionElement_() : Nullable.<HTMLTableCaptionElement>;
-    static function getNullable__HTMLTableSectionElement_() : Nullable.<HTMLTableSectionElement>;
-    static function getNullable__ImageData_() : Nullable.<ImageData>;
-    static function getNullable__Location_() : Nullable.<Location>;
-    static function getNullable__MediaController_() : Nullable.<MediaController>;
-    static function getNullable__MediaError_() : Nullable.<MediaError>;
-    static function getNullable__NodeFilter_() : Nullable.<NodeFilter>;
-    static function getNullable__NodeList_() : Nullable.<NodeList>;
-    static function getNullable__Node_() : Nullable.<Node>;
-    static function getNullable__Object_() : Nullable.<Object>/*object?*/;
-    static function getNullable__Storage_() : Nullable.<Storage>;
-    static function getNullable__TextTrackCueList_() : Nullable.<TextTrackCueList>;
-    static function getNullable__TextTrackCue_() : Nullable.<TextTrackCue>;
-    static function getNullable__TextTrack_() : Nullable.<TextTrack>;
-    static function getNullable__VideoTrack_() : Nullable.<VideoTrack>;
-    static function getNullable__WebGLActiveInfo_() : Nullable.<WebGLActiveInfo>;
-    static function getNullable__WebGLBuffer_() : Nullable.<WebGLBuffer>;
-    static function getNullable__WebGLFramebuffer_() : Nullable.<WebGLFramebuffer>;
-    static function getNullable__WebGLProgram_() : Nullable.<WebGLProgram>;
-    static function getNullable__WebGLRenderbuffer_() : Nullable.<WebGLRenderbuffer>;
-    static function getNullable__WebGLShaderPrecisionFormat_() : Nullable.<WebGLShaderPrecisionFormat>;
-    static function getNullable__WebGLShader_() : Nullable.<WebGLShader>;
-    static function getNullable__WebGLTexture_() : Nullable.<WebGLTexture>;
-    static function getNullable__WebGLUniformLocation_() : Nullable.<WebGLUniformLocation>;
-    static function getNullable__Window_() : Nullable.<Window>/*WindowProxy?*/;
     static function getNullable__boolean_() : Nullable.<boolean>;
-    static function getNullable__function__Event__void_() : Nullable.<function(:Event):void>/*Function?*/;
-    static function getNullable__function__File__void_() : Nullable.<function(:File):void>/*FileCallback?*/;
-    static function getNullable__function__string__void_() : Nullable.<function(:string):void>/*FunctionStringCallback?*/;
-    static function getNullable__number_() : Nullable.<number>/*double?*/;
+    static function getNullable__int_() : Nullable.<int>/*octet*/;
+    static function getNullable__number_() : Nullable.<number>/*double*/;
     static function getNullable__string_() : Nullable.<string>/*DOMString?*/;
-    static function getObject() : Object/*object*/;
+    static function getObject() : Object/*object?*/;
     static function getPositionOptions() : PositionOptions;
     static function getProcessingInstruction() : ProcessingInstruction;
     static function getRange() : Range;
@@ -5089,6 +5053,7 @@ native class X {
     static function getTextMetrics() : TextMetrics;
     static function getTextTrack() : TextTrack;
     static function getTextTrackCue() : TextTrackCue;
+    static function getTextTrackCueList() : TextTrackCueList;
     static function getTextTrackList() : TextTrackList;
     static function getTimeRanges() : TimeRanges;
     static function getTouch() : Touch;
@@ -5103,21 +5068,33 @@ native class X {
     static function getValidityState() : ValidityState;
     static function getVideoTrack() : VideoTrack;
     static function getVideoTrackList() : VideoTrackList;
+    static function getWebGLActiveInfo() : WebGLActiveInfo;
+    static function getWebGLBuffer() : WebGLBuffer;
     static function getWebGLContextAttributes() : WebGLContextAttributes;
+    static function getWebGLFramebuffer() : WebGLFramebuffer;
+    static function getWebGLProgram() : WebGLProgram;
+    static function getWebGLRenderbuffer() : WebGLRenderbuffer;
+    static function getWebGLShader() : WebGLShader;
+    static function getWebGLShaderPrecisionFormat() : WebGLShaderPrecisionFormat;
     static function getWebGLShader__() : WebGLShader[];
-    static function getWindow() : Window/*WindowProxy*/;
+    static function getWebGLTexture() : WebGLTexture;
+    static function getWebGLUniformLocation() : WebGLUniformLocation;
+    static function getWindow() : Window/*WindowProxy?*/;
     static function getWorkerGlobalScope() : WorkerGlobalScope;
     static function getWorkerLocation() : WorkerLocation;
     static function getWorkerNavigator() : WorkerNavigator;
     static function getXMLDocument() : XMLDocument;
     static function getXMLHttpRequestUpload() : XMLHttpRequestUpload;
     static function getboolean() : boolean/*GLboolean*/;
+    static function getfunction__Event__void() : function(:Event):void/*Function?*/;
+    static function getfunction__File__void() : function(:File):void/*FileCallback?*/;
     static function getfunction__MediaQueryList__void() : function(:MediaQueryList):void/*MediaQueryListListener*/;
     static function getfunction___void() : function():void/*TimerHandler*/;
+    static function getfunction__string__void() : function(:string):void/*FunctionStringCallback?*/;
     static function getfunction_positionError_PositionError__void() : function(positionError:PositionError):void/*PositionErrorCallback*/;
     static function getfunction_position_Position__void() : function(position:Position):void/*PositionCallback*/;
     static function getfunction_time_number__void() : function(time:number/*DOMTimeStamp*/):void/*FrameRequestCallback*/;
-    static function getint() : int/*octet*/;
+    static function getint() : int/*unsigned long*/;
     static function getint__() : int[]/*sequence<long>*/;
     static function getnumber() : number/*GLintptr*/;
     static function getnumber__() : number[]/*sequence<float>*/;

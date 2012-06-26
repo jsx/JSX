@@ -18,6 +18,13 @@ my $db = dirname(__FILE__) . '/.idl2jsx.bin';
 
 my @files = @ARGV;
 
+my %primitive = (
+    string => 1,
+    number => 1,
+    int => 1,
+    boolean => 1,
+);
+
 my %fake = (
     Window => 1,
     DocumentEvent => 1,
@@ -417,17 +424,17 @@ foreach my $file(@files) {
                 my $ret_type = $+{ret_type};
                 my $params   = $+{params};
 
-                my $ret_type_may_be_undefined = 0;
+                my $ret_type_nullable = 0;
 
                 if($prop) {
                     if(index($prop, "getter") != -1) {
-                        $ret_type_may_be_undefined = 1;
+                        $ret_type_nullable = 1;
                         my $id = "__native_index_operator__";
                         make_functions(
                                 $decl_ref, $members_ref,
                                 $id,
                                 $ret_type, $params,
-                                $ret_type_may_be_undefined);
+                                $ret_type_nullable);
                     }
                     if(!$id) {
                         # no name
@@ -442,7 +449,7 @@ foreach my $file(@files) {
                     $decl_ref, $members_ref,
                     $id,
                     $ret_type, $params,
-                    $ret_type_may_be_undefined, $static);
+                    $ret_type_nullable, $static);
 
                 # redefine it as a callbackdefinition
                 if($alias) {
@@ -618,7 +625,7 @@ exit;
 sub to_jsx_type {
     my($idl_type, %attr) = @_;
 
-    my $may_be_undefined = $attr{may_be_undefined};
+    my $nullable = $attr{nullable};
 
     $idl_type = trim($idl_type);
 
@@ -631,7 +638,7 @@ sub to_jsx_type {
         $array = 1;
     }
     elsif($idl_type =~ s{\A Maybe< (.+?) >  }{$1}xms) { # defined in idl2jsx/extra/*.idl
-        $may_be_undefined = 1;
+        $nullable = 1;
     }
 
     $idl_type  =~ s{
@@ -645,7 +652,7 @@ sub to_jsx_type {
         \z
     }{}xms;
 
-    my $nullable = $+{nullable};
+    $nullable ||= $+{nullable};
     $array //= $+{array};
 
     my $alias = $typemap{$idl_type};
@@ -657,8 +664,9 @@ sub to_jsx_type {
     }
 
     my $type = $alias || $idl_type;
-    $type = "Nullable.<$type>" if $nullable and not $array;
-
+    if ($nullable and not $array and exists $primitive{$type}) {
+        $type = "Nullable.<$type>";
+    }
     if($array) {
         $type .= "[]";
     }
@@ -667,18 +675,14 @@ sub to_jsx_type {
         $type .= "/*$original*/";
     }
 
-    if($may_be_undefined && $idl_type ne 'any' && $type =~ /^(?:boolean|int|number|string)$/) {
-        $type = "Nullable.<$type>";
-    }
-
     return $type;
 }
 
 sub make_functions {
-    my($decl_ref, $members_ref, $name, $ret_type, $src_params, $ret_type_may_be_undefined, $static) = @_;
+    my($decl_ref, $members_ref, $name, $ret_type, $src_params, $ret_type_nullable, $static) = @_;
 
     my $ret_type_decl = defined($ret_type)
-        ? " : " . to_jsx_type($ret_type, may_be_undefined => $ret_type_may_be_undefined)
+        ? " : " . to_jsx_type($ret_type, nullable => $ret_type_nullable)
         : "";
 
     my @unresolved_params = parse_params($src_params);
