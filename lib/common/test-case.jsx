@@ -172,7 +172,7 @@ class TestCase {
 	function _ok(name : Nullable.<string>) : void {
 		++this._pass;
 
-		var s = name != undefined ? " - " + name :  "";
+		var s = name != null ? " - " + name :  "";
 		this._say("\t" + "ok " + (this._count) as string + s);
 	}
 
@@ -183,7 +183,7 @@ class TestCase {
 		expected : variant
 	) : void {
 
-		var s = name != undefined ? " - " + name :  "";
+		var s = name != null ? " - " + name :  "";
 		this._say("\t" + "not ok " + (this._count) as string + s);
 
 		this.diag("comparing with " + op + s.replace(" - ", " for "));
