@@ -51,14 +51,6 @@ my %has_definition;
 # To allow null, a nullable DOMString, written as DOMString? in IDL,
 # needs to be used."
 
-# FIXME: how to define?
-my %nullable = (
-#    string => 'String',
-#    number => 'Number',
-#    int    => 'Number',
-#    boolean => 'Boolean',
-);
-
 my %typemap = (
     'DOMObject' => 'Object',
     'DOMUserData' => 'variant',
@@ -100,7 +92,6 @@ my %typemap = (
 
 # callbacks / event listeners
 
-define_alias('Function?' => 'function(:Event):void');
 define_alias('Function' => 'function(:Event):void');
 
 # EventListener is written in legacy IDL
@@ -152,6 +143,7 @@ my $rx_type_modifier = qr{
         \.\.\. # vararg
     )
 }xms;
+
 my $rx_type = qr{
     (?:
         (?:
@@ -665,7 +657,7 @@ sub to_jsx_type {
     }
 
     my $type = $alias || $idl_type;
-    $type = $nullable{$type} if $nullable && exists $nullable{$type};
+    $type = "Nullable.<$type>" if $nullable and not $array;
 
     if($array) {
         $type .= "[]";
