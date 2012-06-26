@@ -18,7 +18,7 @@ for my $file(@files) {
     }
 
     {
-        my $cmd = qq{bin/jsx --executable --output $workdir/compiled "$file"};
+        my $cmd = qq{bin/jsx --executable node --output $workdir/compiled "$file"};
         system $cmd;
 
         is $?, 0, $cmd;

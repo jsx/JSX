@@ -36,9 +36,9 @@ Type the following commands and see what happens:
     # compile it with fully optimizations
     bin/jsx --release example/hello.jsx
 
-    # compile and execute a program
-    bin/jsx --executable --output hello.js example/hello.jsx
-    node hello.js # displays "Hello, world!"
+    # compile a program for node, execute it later
+    bin/jsx --executable node --output hello.jsx.js example/hello.jsx
+    ./hello.jsx.js # displays "Hello, world!"
 
     # run a test, calling _Test#test*()
     bin/jsx --test example/import.jsx # import.jsx has _Test

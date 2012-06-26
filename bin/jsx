@@ -2,17 +2,17 @@
 
 /*
  * Copyright (c) 2012 DeNA Co., Ltd.
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to
  * deal in the Software without restriction, including without limitation the
  * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
  * sell copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -155,7 +155,7 @@ var JSX = Class.extend({
 			"\n" +
 			"Options:\n" +
 			"  --add-search-path path     add a path to library search paths\n" +
-			"  --executable               compiles as an CLI executable, calling _Main.main(:string[]):void\n" +
+			"  --executable (node|web)    add launcher to call _Main.main(:string[]):void\n" +
 			"  --run                      runs _Main.main(:string[]):void after compiling\n" +
 			"  --test                     runs _Test#test*():void after compiling\n" +
 			"  --output file              output file (default:stdout)\n" +
@@ -205,7 +205,7 @@ var JSX = Class.extend({
 		var completionRequest = null;
 		var emitter = null;
 		var outputFile = null;
-		var executable = false;
+		var executable = null;
 		var run = null;
 		var optimizeCommands = [];
 		var opt, optarg;
@@ -307,7 +307,18 @@ var JSX = Class.extend({
 				});
 				break;
 			case "--executable":
-				executable = true;
+				if ((optarg = getoptarg()) == null)
+					process.exit(1);
+				switch (optarg) {
+				case "web":
+					throw new Error("FIXME: --executable web");
+				case "node":
+					break;
+				default:
+					console.error("unknown executable type (node|web)");
+					process.exit(1);
+				}
+				executable = optarg;
 				run = "_Main";
 				break;
 			case "--run":
@@ -364,11 +375,6 @@ var JSX = Class.extend({
 			process.exit(1);
 		}
 
-		if(executable && outputFile == null) {
-			console.error("--executable requires --output to be specified");
-			process.exit(1);
-		}
-
 		var sourceFile = args[argIndex++];
 		compiler.addSourceFile(null, sourceFile, completionRequest);
 
@@ -408,8 +414,8 @@ var JSX = Class.extend({
 
 		var output = emitter.getOutput(sourceFile, run);
 
-		if (run == null || executable) { // compile and save
-			if(emitter instanceof JavaScriptEmitter && executable) {
+		if (run == null || executable != null) { // compile and save
+			if(emitter instanceof JavaScriptEmitter && executable === "node") {
 				// for CLI executable
 				output =  "#!" + process.execPath + "\n" + output;
 			}
@@ -417,10 +423,12 @@ var JSX = Class.extend({
 			platform.save(outputFile, output);
 
 			if (emitter instanceof JavaScriptEmitter) {
-				emitter.saveSourceMappingFile(platform);
-			
-				if (executable) {
-					fs.chmodSync(outputFile, "0755");
+				if (outputFile !== null) {
+					emitter.saveSourceMappingFile(platform);
+
+					if (executable === "node") {
+						fs.chmodSync(outputFile, "0755");
+					}
 				}
 			}
 
