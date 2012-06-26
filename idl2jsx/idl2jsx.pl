@@ -675,8 +675,8 @@ sub to_jsx_type {
         $type .= "/*$original*/";
     }
 
-    if($may_be_undefined && $idl_type ne 'any') {
-        $type = "MayBeUndefined.<$type>";
+    if($may_be_undefined && $idl_type ne 'any' && $type =~ /^(?:boolean|int|number|string)$/) {
+        $type = "Nullable.<$type>";
     }
 
     return $type;
