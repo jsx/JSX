@@ -5,7 +5,7 @@ oui!
 
 class Test {
 	static function run() : void {
-		var n : MayBeUndefined.<number> = undefined;
+		var n : Nullable.<number> = null;
 		try {
 			n.toString();
 		} catch (e : TypeError) {

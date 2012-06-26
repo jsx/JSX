@@ -8,17 +8,17 @@
 */
 class Test {
 	static function run() : void {
-		var a =  [ 1, 2, undefined ];
+		var a =  [ 1, 2, null ];
 		log a.join(",");
-		a[0] = undefined;
+		a[0] = null;
 		log a.join(",");
-		a = [ 1, 2, undefined ] : number[];
+		a = [ 1, 2, null ] : number[];
 		log a.join(",");
-		a[0] = undefined;
+		a[0] = null;
 		log a.join(",");
-		a = [ 1, 2, undefined ] : Array.<number>;
+		a = [ 1, 2, null ] : Array.<number>;
 		log a.join(",");
-		a[0] = undefined;
+		a[0] = null;
 		log a.join(",");
 	}
 }

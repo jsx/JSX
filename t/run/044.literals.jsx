@@ -1,5 +1,4 @@
 /*EXPECTED
-null
 undefined
 true
 false
@@ -10,7 +9,6 @@ Infinity
 class Test {
 	static function run() : void {
 		log null;
-		log undefined;
 		log true;
 		log false;
 		log NaN;

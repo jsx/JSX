@@ -8,7 +8,7 @@ class K.<T> {
 }
 class Test {
 	static function run() : void {
-		var a : Array.<number> = K.<MayBeUndefined.<number>>.f();
+		var a : Array.<number> = K.<Nullable.<number>>.f();
 		log a.join(",");
 	}
 }

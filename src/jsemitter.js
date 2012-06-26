@@ -40,7 +40,7 @@ var _Util = exports._Util = Class.extend({
 			return "!number";
 		} else if (type.equals(Type.stringType)) {
 			return "!string";
-		} else if (type instanceof MayBeUndefinedType) {
+		} else if (type instanceof NullableType) {
 			return "undefined|" + this.toClosureType(type.getBaseType());
 		} else if (type instanceof ObjectType) {
 			var classDef = type.getClassDef();
@@ -377,7 +377,7 @@ var _SwitchStatementEmitter = exports._SwitchStatementEmitter = _StatementEmitte
 		_Util.emitLabelOfStatement(this._emitter, this._statement);
 		this._emitter._emit("switch (", this._statement.getToken());
 		var expr = this._statement.getExpr();
-		if (this._emitter._enableRunTimeTypeCheck && expr.getType() instanceof MayBeUndefinedType) {
+		if (this._emitter._enableRunTimeTypeCheck && expr.getType() instanceof NullableType) {
 			this._emitter._emitExpressionWithUndefinedAssertion(expr);
 		} else {
 			this._emitter._getExpressionEmitterFor(expr).emit(0);
@@ -400,7 +400,7 @@ var _CaseStatementEmitter = exports._CaseStatementEmitter = _StatementEmitter.ex
 		this._emitter._reduceIndent();
 		this._emitter._emit("case ", null);
 		var expr = this._statement.getExpr();
-		if (this._emitter._enableRunTimeTypeCheck && expr.getType() instanceof MayBeUndefinedType) {
+		if (this._emitter._enableRunTimeTypeCheck && expr.getType() instanceof NullableType) {
 			this._emitter._emitExpressionWithUndefinedAssertion(expr);
 		} else {
 			this._emitter._getExpressionEmitterFor(expr).emit(0);
@@ -651,20 +651,6 @@ var _ClassExpressionEmitter = exports._ClassExpressionEmitter = _ExpressionEmitt
 
 });
 
-var _UndefinedExpressionEmitter = exports._UndefinedExpressionEmitter = _ExpressionEmitter.extend({
-
-	constructor: function (emitter, expr) {
-		_ExpressionEmitter.prototype.constructor.call(this, emitter);
-		this._expr = expr;
-	},
-
-	emit: function (outerOpPrecedence) {
-		var token = this._expr.getToken();
-		this._emitter._emit("undefined", token);
-	}
-
-});
-
 var _NullExpressionEmitter = exports._NullExpressionEmitter = _ExpressionEmitter.extend({
 
 	constructor: function (emitter, expr) {
@@ -674,7 +660,7 @@ var _NullExpressionEmitter = exports._NullExpressionEmitter = _ExpressionEmitter
 
 	emit: function (outerOpPrecedence) {
 		var token = this._expr.getToken();
-		this._emitter._emit("null", token);
+		this._emitter._emit("undefined", token);
 	}
 
 });
@@ -825,9 +811,9 @@ var _AsExpressionEmitter = exports._AsExpressionEmitter = _ExpressionEmitter.ext
 	emit: function (outerOpPrecedence) {
 		var srcType = this._expr.getExpr().getType();
 		var destType = this._expr.getType();
-		if (srcType.resolveIfMayBeUndefined() instanceof ObjectType || srcType.equals(Type.variantType)) {
-			if (srcType.resolveIfMayBeUndefined().isConvertibleTo(destType)) {
-				if (srcType instanceof MayBeUndefinedType) {
+		if (srcType.resolveIfNullable() instanceof ObjectType || srcType.equals(Type.variantType)) {
+			if (srcType.resolveIfNullable().isConvertibleTo(destType)) {
+				if (srcType instanceof NullableType) {
 					var prec = _BinaryExpressionEmitter._operatorPrecedence["||"];
 					this._emitWithParens(outerOpPrecedence, prec, prec, null, "|| null");
 				} else {
@@ -892,8 +878,8 @@ var _AsExpressionEmitter = exports._AsExpressionEmitter = _ExpressionEmitter.ext
 				return true;
 			}
 		}
-		if (srcType instanceof MayBeUndefinedType && srcType.getBaseType().equals(Type.booleanType)) {
-			// from MayBeUndefined.<boolean>
+		if (srcType instanceof NullableType && srcType.getBaseType().equals(Type.booleanType)) {
+			// from Nullable.<boolean>
 			if (destType.equals(Type.booleanType)) {
 				var prec = _BinaryExpressionEmitter._operatorPrecedence["||"];
 				this._emitWithParens(outerOpPrecedence, prec, prec, null, " || false");
@@ -931,8 +917,8 @@ var _AsExpressionEmitter = exports._AsExpressionEmitter = _ExpressionEmitter.ext
 				return true;
 			}
 		}
-		if (srcType instanceof MayBeUndefinedType && srcType.getBaseType().equals(Type.integerType)) {
-			// from MayBeUndefined.<int>
+		if (srcType instanceof NullableType && srcType.getBaseType().equals(Type.integerType)) {
+			// from Nullable.<int>
 			if (destType.equals(Type.booleanType)) {
 				var prec = _UnaryExpressionEmitter._operatorPrecedence["!"];
 				this._emitWithParens(outerOpPrecedence, prec, prec, "!! ", null);
@@ -967,8 +953,8 @@ var _AsExpressionEmitter = exports._AsExpressionEmitter = _ExpressionEmitter.ext
 				return true;
 			}
 		}
-		if (srcType instanceof MayBeUndefinedType && srcType.getBaseType().equals(Type.numberType)) {
-			// from MayBeUndefined.<number>
+		if (srcType instanceof NullableType && srcType.getBaseType().equals(Type.numberType)) {
+			// from Nullable.<number>
 			if (destType.equals(Type.booleanType)) {
 				var prec = _UnaryExpressionEmitter._operatorPrecedence["!"];
 				this._emitWithParens(outerOpPrecedence, prec, prec, "!! ", null);
@@ -1008,8 +994,8 @@ var _AsExpressionEmitter = exports._AsExpressionEmitter = _ExpressionEmitter.ext
 				return true;
 			}
 		}
-		if (srcType instanceof MayBeUndefinedType && srcType.getBaseType().equals(Type.stringType)) {
-			// from MayBeUndefined.<String>
+		if (srcType instanceof NullableType && srcType.getBaseType().equals(Type.stringType)) {
+			// from Nullable.<String>
 			if (destType.equals(Type.booleanType)) {
 				var prec = _UnaryExpressionEmitter._operatorPrecedence["!"];
 				this._emitWithParens(outerOpPrecedence, prec, prec, "!! ", null);
@@ -1099,7 +1085,7 @@ var _AsNoConvertExpressionEmitter = exports._AsNoConvertExpressionEmitter = _Exp
 			}.bind(this);
 			var srcType = this._expr.getExpr().getType();
 			var destType = this._expr.getType();
-			if (srcType.equals(destType) || srcType.equals(destType.resolveIfMayBeUndefined)) {
+			if (srcType.equals(destType) || srcType.equals(destType.resolveIfNullable)) {
 				// skip
 			} else if (destType instanceof VariantType) {
 				// skip
@@ -1122,7 +1108,7 @@ var _AsNoConvertExpressionEmitter = exports._AsNoConvertExpressionEmitter = _Exp
 				return;
 			} else if (destType instanceof FunctionType) {
 				emitWithAssertion(function () {
-					this._emitter._emit("v === null || typeof v === \"function\"", this._expr.getToken());
+					this._emitter._emit("v == null || typeof v === \"function\"", this._expr.getToken());
 				}.bind(this), "detected invalid cast, value is not a function or null");
 				return;
 			} else if (destType instanceof ObjectType) {
@@ -1131,17 +1117,17 @@ var _AsNoConvertExpressionEmitter = exports._AsNoConvertExpressionEmitter = _Exp
 					// skip
 				} else if (destClassDef instanceof InstantiatedClassDefinition && destClassDef.getTemplateClassName() == "Array") {
 					emitWithAssertion(function () {
-						this._emitter._emit("v === null || v instanceof Array", this._expr.getToken());
+						this._emitter._emit("v == null || v instanceof Array", this._expr.getToken());
 					}.bind(this), "detected invalid cast, value is not an Array or null");
 					return;
 				} else if (destClassDef instanceof InstantiatedClassDefinition && destClassDef.getTemplateClassName() == "Map") {
 					emitWithAssertion(function () {
-						this._emitter._emit("v === null || typeof v === \"object\"", this._expr.getToken());
+						this._emitter._emit("v == null || typeof v === \"object\"", this._expr.getToken());
 					}.bind(this), "detected invalid cast, value is not a Map or null");
 					return;
 				} else {
 					emitWithAssertion(function () {
-						this._emitter._emit("v === null || v instanceof " + destClassDef.getOutputClassName(), this._expr.getToken());
+						this._emitter._emit("v == null || v instanceof " + destClassDef.getOutputClassName(), this._expr.getToken());
 					}.bind(this), "detected invalid cast, value is not an instance of the designated type or null");
 					return;
 				}
@@ -1373,7 +1359,7 @@ var _BinaryExpressionEmitter = exports._BinaryExpressionEmitter = _OperatorExpre
 				return;
 			}
 		} else if (this._expr.getToken().getValue() === "/="
-			&& this._expr.getFirstExpr().getType().resolveIfMayBeUndefined().equals(Type.integerType)) {
+			&& this._expr.getFirstExpr().getType().resolveIfNullable().equals(Type.integerType)) {
 			this._emitDivAssignToInt(outerOpPrecedence);
 			return;
 		}
@@ -1390,20 +1376,21 @@ var _BinaryExpressionEmitter = exports._BinaryExpressionEmitter = _OperatorExpre
 		var op = opToken.getValue();
 		switch (op) {
 		case "+":
-			// special handling: (undefined as MayBeUndefined<String>) + (undefined as MayBeUndefined<String>) should produce "undefinedundefined", not NaN
-			if (firstExprType.equals(secondExprType) && firstExprType.equals(Type.stringType.toMayBeUndefinedType()))
+			// special handling: (undefined as Nullable<String>) + (undefined as Nullable<String>) should produce "undefinedundefined", not NaN
+			if (firstExprType.equals(secondExprType) && firstExprType.equals(Type.stringType.toNullableType()))
 				this._emitter._emit("\"\" + ", null);
 			break;
 		case "==":
 		case "!=":
-			// equality operators of JSX are strict equality ops in JS (expect if either operand is an object and the other is the primitive counterpart)
-			if ((firstExprType instanceof ObjectType) + (secondExprType instanceof ObjectType) != 1)
+			// NOTE: works for cases where one side is an object and the other is the primitive counterpart
+			if (firstExprType instanceof PrimitiveType && secondExprType instanceof PrimitiveType) {
 				op += "=";
+			}
 			break;
 		}
 		// emit left-hand
 		if (this._emitter._enableRunTimeTypeCheck
-			&& firstExpr instanceof MayBeUndefinedType
+			&& firstExpr instanceof NullableType
 			&& ! (this._expr instanceof AssignmentExpression)) {
 			this._emitExpressionWithUndefinedAssertion(firstExpr);
 		} else {
@@ -1414,7 +1401,7 @@ var _BinaryExpressionEmitter = exports._BinaryExpressionEmitter = _OperatorExpre
 		// emit right-hand
 		if (this._expr instanceof AssignmentExpression && op != "/=") {
 			this._emitter._emitRHSOfAssignment(secondExpr, firstExprType);
-		} else if (this._emitter._enableRunTimeTypeCheck && secondExpr instanceof MayBeUndefinedType) {
+		} else if (this._emitter._enableRunTimeTypeCheck && secondExpr instanceof NullableType) {
 			this._emitExpressionWithUndefinedAssertion(secondExpr);
 		} else {
 			// RHS should have higher precedence (consider: 1 - (1 + 1))
@@ -1448,7 +1435,7 @@ var _BinaryExpressionEmitter = exports._BinaryExpressionEmitter = _OperatorExpre
 				this._emitter._getExpressionEmitterFor(firstExpr.getSecondExpr()).emit(0);
 			}
 			this._emitter._emit(", ", this._expr.getToken());
-			if (this._emitter._enableRunTimeTypeCheck && secondExpr instanceof MayBeUndefinedType) {
+			if (this._emitter._enableRunTimeTypeCheck && secondExpr instanceof NullableType) {
 				this._emitExpressionWithUndefinedAssertion(secondExpr);
 			} else {
 				this._emitter._getExpressionEmitterFor(secondExpr).emit(0);
@@ -1458,13 +1445,13 @@ var _BinaryExpressionEmitter = exports._BinaryExpressionEmitter = _OperatorExpre
 			this.emitWithPrecedence(outerOpPrecedence, _BinaryExpressionEmitter._operatorPrecedence["="], function () {
 				this._emitter._getExpressionEmitterFor(firstExpr).emit(_BinaryExpressionEmitter._operatorPrecedence["="]);
 				this._emitter._emit(" = (", this._expr.getToken());
-				if (this._emitter._enableRunTimeTypeCheck && firstExpr instanceof MayBeUndefinedType) {
+				if (this._emitter._enableRunTimeTypeCheck && firstExpr instanceof NullableType) {
 					this._emitExpressionWithUndefinedAssertion(firstExpr);
 				} else {
 					this._emitter._getExpressionEmitterFor(firstExpr).emit(_BinaryExpressionEmitter._operatorPrecedence["/"]);
 				}
 				this._emitter._emit(" / ", this._expr.getToken());
-				if (this._emitter._enableRunTimeTypeCheck && secondExpr instanceof MayBeUndefinedType) {
+				if (this._emitter._enableRunTimeTypeCheck && secondExpr instanceof NullableType) {
 					this._emitExpressionWithUndefinedAssertion(secondExpr);
 				} else {
 					this._emitter._getExpressionEmitterFor(secondExpr).emit(_BinaryExpressionEmitter._operatorPrecedence["/"] - 1);
@@ -1572,11 +1559,11 @@ var _CallExpressionEmitter = exports._CallExpressionEmitter = _OperatorExpressio
 			return;
 		// normal case
 		var calleeExpr = this._expr.getExpr();
-		if (this._emitter._enableRunTimeTypeCheck && calleeExpr.getType() instanceof MayBeUndefinedType)
+		if (this._emitter._enableRunTimeTypeCheck && calleeExpr.getType() instanceof NullableType)
 			this._emitter._emitExpressionWithUndefinedAssertion(calleeExpr);
 		else
 			this._emitter._getExpressionEmitterFor(calleeExpr).emit(_CallExpressionEmitter._operatorPrecedence);
-		this._emitter._emitCallArguments(this._expr.getToken(), "(", this._expr.getArguments(), this._expr.getExpr().getType().resolveIfMayBeUndefined().getArgumentTypes());
+		this._emitter._emitCallArguments(this._expr.getToken(), "(", this._expr.getArguments(), this._expr.getExpr().getType().resolveIfNullable().getArgumentTypes());
 	},
 
 	_getPrecedence: function () {
@@ -2138,8 +2125,7 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 	_emitStaticMemberVariable: function (holder, variable) {
 		var initialValue = variable.getInitialValue();
 		if (initialValue != null
-			&& ! (initialValue instanceof UndefinedExpression
-				|| initialValue instanceof NullExpression
+			&& ! (initialValue instanceof NullExpression
 				|| initialValue instanceof BooleanLiteralExpression
 				|| initialValue instanceof IntegerLiteralExpression
 				|| initialValue instanceof NumberLiteralExpression
@@ -2167,7 +2153,7 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 			this._emit("0", null);
 		else if (type.equals(Type.stringType))
 			this._emit("\"\"", null);
-		else if (type instanceof MayBeUndefinedType)
+		else if (type instanceof NullableType)
 			this._emit("undefined", null);
 		else
 			this._emit("null", null);
@@ -2291,8 +2277,6 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 			return new _LocalExpressionEmitter(this, expr);
 		else if (expr instanceof ClassExpression)
 			return new _ClassExpressionEmitter(this, expr);
-		else if (expr instanceof UndefinedExpression)
-			return new _UndefinedExpressionEmitter(this, expr);
 		else if (expr instanceof NullExpression)
 			return new _NullExpressionEmitter(this, expr);
 		else if (expr instanceof BooleanLiteralExpression)
@@ -2413,7 +2397,7 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 			return "F" + this._mangleFunctionArguments(type.getArgumentTypes()) + this._mangleTypeName(type.getReturnType()) + "$";
 		else if (type instanceof MemberFunctionType)
 			return "M" + this._mangleTypeName(type.getObjectType()) + this._mangleFunctionArguments(type.getArgumentTypes()) + this._mangleTypeName(type.getReturnType()) + "$";
-		else if (type instanceof MayBeUndefinedType)
+		else if (type instanceof NullableType)
 			return "U" + this._mangleTypeName(type.getBaseType());
 		else if (type.equals(Type.variantType))
 			return "X";
@@ -2451,8 +2435,8 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 				this._emit(", ", null);
 			if (argTypes != null
 				&& this._enableRunTimeTypeCheck
-				&& args[i].getType() instanceof MayBeUndefinedType
-				&& ! (argTypes[i] instanceof MayBeUndefinedType || argTypes[i] instanceof VariantType)) {
+				&& args[i].getType() instanceof NullableType
+				&& ! (argTypes[i] instanceof NullableType || argTypes[i] instanceof VariantType)) {
 				this._emitExpressionWithUndefinedAssertion(args[i]);
 			} else {
 				this._getExpressionEmitterFor(args[i]).emit(0);
@@ -2481,7 +2465,7 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 		this._advanceIndent();
 		this._emitAssertion(function () {
 			this._emit("typeof v !== \"undefined\"", token);
-		}.bind(this), token, "detected misuse of 'undefined' as type '" + expr.getType().resolveIfMayBeUndefined().toString() + "'");
+		}.bind(this), token, "detected misuse of 'undefined' as type '" + expr.getType().resolveIfNullable().toString() + "'");
 		this._emit("return v;\n", token);
 		this._reduceIndent();
 		this._emit("}(", token);
@@ -2492,7 +2476,7 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 	_emitRHSOfAssignment: function (expr, lhsType) {
 		var exprType = expr.getType();
 		// FIXME what happens if the op is /= or %= ?
-		if (lhsType.resolveIfMayBeUndefined().equals(Type.integerType) && exprType.equals(Type.numberType)) {
+		if (lhsType.resolveIfNullable().equals(Type.integerType) && exprType.equals(Type.numberType)) {
 			if (expr instanceof NumberLiteralExpression
 				|| expr instanceof IntegerLiteralExpression) {
 				this._emit((expr.getToken().getValue() | 0).toString(), expr.getToken());
@@ -2504,7 +2488,7 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 			return;
 		}
 		if (lhsType.equals(Type.integerType)
-			&& (exprType instanceof MayBeUndefinedType && exprType.getBaseType().equals(Type.numberType))) {
+			&& (exprType instanceof NullableType && exprType.getBaseType().equals(Type.numberType))) {
 			this._emit("(", expr.getToken());
 			if (this._enableRunTimeTypeCheck) {
 				this._emitExpressionWithUndefinedAssertion(expr);
@@ -2514,8 +2498,8 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 			this._emit(" | 0)", expr.getToken());
 			return;
 		}
-		if ((lhsType instanceof MayBeUndefinedType && lhsType.getBaseType().equals(Type.integerType))
-			&& (exprType instanceof MayBeUndefinedType && exprType.getBaseType().equals(Type.numberType))) {
+		if ((lhsType instanceof NullableType && lhsType.getBaseType().equals(Type.integerType))
+			&& (exprType instanceof NullableType && exprType.getBaseType().equals(Type.numberType))) {
 			// NOTE this is very slow, but such an operation would practically not be found
 			this._emit("(function (v) { return v !== undefined ? v | 0 : v; })(", expr.getToken());
 			this._getExpressionEmitterFor(expr).emit(0);
@@ -2524,8 +2508,8 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 		}
 		// normal mode
 		if (this._enableRunTimeTypeCheck
-			&& ! (lhsType instanceof MayBeUndefinedType || lhsType.equals(Type.variantType))
-			&& exprType instanceof MayBeUndefinedType) {
+			&& ! (lhsType instanceof NullableType || lhsType.equals(Type.variantType))
+			&& exprType instanceof NullableType) {
 			this._emitExpressionWithUndefinedAssertion(expr);
 		} else {
 			this._getExpressionEmitterFor(expr).emit(_BinaryExpressionEmitter._operatorPrecedence["="]);

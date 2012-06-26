@@ -1,5 +1,5 @@
 /*EXPECTED
-null
+undefined
 g1
 g2
 g1

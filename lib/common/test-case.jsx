@@ -77,7 +77,7 @@ class TestCase {
 	var _tests : string[];
 
 	// async stuff
-	var _currentName : MayBeUndefined.<string>;
+	var _currentName : Nullable.<string>;
 	var _tasks = [] : Array.<function():void>; // async tasks
 
 	/* hooks called by src/js/runtests.js */
@@ -169,21 +169,21 @@ class TestCase {
 		return new _Matcher(this, value, message);
 	}
 
-	function _ok(name : MayBeUndefined.<string>) : void {
+	function _ok(name : Nullable.<string>) : void {
 		++this._pass;
 
-		var s = name != undefined ? " - " + name :  "";
+		var s = name != null ? " - " + name :  "";
 		this._say("\t" + "ok " + (this._count) as string + s);
 	}
 
 	function _nok(
-		name : MayBeUndefined.<string>,
+		name : Nullable.<string>,
 		op : string,
 		got : variant,
 		expected : variant
 	) : void {
 
-		var s = name != undefined ? " - " + name :  "";
+		var s = name != null ? " - " + name :  "";
 		this._say("\t" + "not ok " + (this._count) as string + s);
 
 		this.diag("comparing with " + op + s.replace(" - ", " for "));
@@ -269,7 +269,7 @@ class _Matcher {
 
 	var _test : TestCase;
 	var _got  : variant;
-	var _name : MayBeUndefined.<string>;
+	var _name : Nullable.<string>;
 
 	function constructor(test : TestCase, got : variant) {
 		this._test = test;

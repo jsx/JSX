@@ -828,9 +828,9 @@ native class NodeList {
 
 	function __native_index_operator__(
 		index : int/*unsigned long*/
-	) : MayBeUndefined.<Node>;
+	) : Node;
 	/* getter */
-	function item(index : int/*unsigned long*/) : MayBeUndefined.<Node>;
+	function item(index : int/*unsigned long*/) : Node;
 	__readonly__ var length : int/*unsigned long*/;
 
 } // end of NodeList
@@ -840,18 +840,14 @@ native class HTMLCollection {
 	__readonly__ var length : int/*unsigned long*/;
 	function __native_index_operator__(
 		index : int/*unsigned long*/
-	) : MayBeUndefined.<Element>;
+	) : Element;
 	/* getter */
-	function item(
-		index : int/*unsigned long*/
-	) : MayBeUndefined.<Element>;
+	function item(index : int/*unsigned long*/) : Element;
 	function __native_index_operator__(
 		name : string/*DOMString*/
-	) : MayBeUndefined.<Object/*object?*/>;
+	) : Object/*object?*/;
 	/* getter */
-	function namedItem(
-		name : string/*DOMString*/
-	) : MayBeUndefined.<Object/*object?*/>;
+	function namedItem(name : string/*DOMString*/) : Object/*object?*/;
 	// only returns Element
 
 } // end of HTMLCollection
@@ -861,11 +857,9 @@ native final __fake__ class DOMStringList {
 	__readonly__ var length : int/*unsigned long*/;
 	function __native_index_operator__(
 		index : int/*unsigned long*/
-	) : MayBeUndefined.<string/*DOMString?*/>;
+	) : string/*DOMString?*/;
 	/* getter */
-	function item(
-		index : int/*unsigned long*/
-	) : MayBeUndefined.<string/*DOMString?*/>;
+	function item(index : int/*unsigned long*/) : string/*DOMString?*/;
 	function contains(string : string/*DOMString*/) : boolean;
 
 } // end of DOMStringList
@@ -875,11 +869,9 @@ native class DOMTokenList {
 	__readonly__ var length : int/*unsigned long*/;
 	function __native_index_operator__(
 		index : int/*unsigned long*/
-	) : MayBeUndefined.<string/*DOMString?*/>;
+	) : string/*DOMString?*/;
 	/* getter */
-	function item(
-		index : int/*unsigned long*/
-	) : MayBeUndefined.<string/*DOMString?*/>;
+	function item(index : int/*unsigned long*/) : string/*DOMString?*/;
 	function contains(token : string/*DOMString*/) : boolean;
 	function add(token : string/*DOMString*/) : void;
 	function remove(token : string/*DOMString*/) : void;
@@ -1376,11 +1368,9 @@ native final class MediaList {
 	__readonly__ var length : int/*unsigned long*/;
 	function __native_index_operator__(
 		index : int/*unsigned long*/
-	) : MayBeUndefined.<string/*DOMString*/>;
+	) : string/*DOMString*/;
 	/* getter */
-	function item(
-		index : int/*unsigned long*/
-	) : MayBeUndefined.<string/*DOMString*/>;
+	function item(index : int/*unsigned long*/) : string/*DOMString*/;
 	function appendMedium(medium : string/*DOMString*/) : void;
 	function deleteMedium(medium : string/*DOMString*/) : void;
 
@@ -1635,367 +1625,367 @@ native final class CSSStyleDeclaration {
 	var wordSpacing : string/*DOMString*/;
 	var zIndex : string/*DOMString*/;
 
-	var alignmentBaseline : MayBeUndefined.<string>;
-	var backgroundClip : MayBeUndefined.<string>;
-	var backgroundOrigin : MayBeUndefined.<string>;
-	var backgroundPositionX : MayBeUndefined.<string>;
-	var backgroundPositionY : MayBeUndefined.<string>;
-	var backgroundRepeatX : MayBeUndefined.<string>;
-	var backgroundRepeatY : MayBeUndefined.<string>;
-	var backgroundSize : MayBeUndefined.<string>;
-	var baselineShift : MayBeUndefined.<string>;
-	var borderBottomLeftRadius : MayBeUndefined.<string>;
-	var borderBottomRightRadius : MayBeUndefined.<string>;
-	var borderImage : MayBeUndefined.<string>;
-	var borderImageOutset : MayBeUndefined.<string>;
-	var borderImageRepeat : MayBeUndefined.<string>;
-	var borderImageSlice : MayBeUndefined.<string>;
-	var borderImageSource : MayBeUndefined.<string>;
-	var borderImageWidth : MayBeUndefined.<string>;
-	var borderRadius : MayBeUndefined.<string>;
-	var borderTopLeftRadius : MayBeUndefined.<string>;
-	var borderTopRightRadius : MayBeUndefined.<string>;
-	var boxShadow : MayBeUndefined.<string>;
-	var boxSizing : MayBeUndefined.<string>;
-	var clipPath : MayBeUndefined.<string>;
-	var clipRule : MayBeUndefined.<string>;
-	var colorInterpolation : MayBeUndefined.<string>;
-	var colorInterpolationFilters : MayBeUndefined.<string>;
-	var colorProfile : MayBeUndefined.<string>;
-	var colorRendering : MayBeUndefined.<string>;
-	var dominantBaseline : MayBeUndefined.<string>;
-	var enableBackground : MayBeUndefined.<string>;
-	var fill : MayBeUndefined.<string>;
-	var fillOpacity : MayBeUndefined.<string>;
-	var fillRule : MayBeUndefined.<string>;
-	var filter : MayBeUndefined.<string>;
-	var float : MayBeUndefined.<string>;
-	var floodColor : MayBeUndefined.<string>;
-	var floodOpacity : MayBeUndefined.<string>;
-	var glyphOrientationHorizontal : MayBeUndefined.<string>;
-	var glyphOrientationVertical : MayBeUndefined.<string>;
-	var imageRendering : MayBeUndefined.<string>;
-	var kerning : MayBeUndefined.<string>;
-	var lightingColor : MayBeUndefined.<string>;
-	var marker : MayBeUndefined.<string>;
-	var markerEnd : MayBeUndefined.<string>;
-	var markerMid : MayBeUndefined.<string>;
-	var markerStart : MayBeUndefined.<string>;
-	var mask : MayBeUndefined.<string>;
-	var opacity : MayBeUndefined.<string>;
-	var outlineOffset : MayBeUndefined.<string>;
-	var overflowX : MayBeUndefined.<string>;
-	var overflowY : MayBeUndefined.<string>;
-	var pointerEvents : MayBeUndefined.<string>;
-	var resize : MayBeUndefined.<string>;
-	var shapeRendering : MayBeUndefined.<string>;
-	var src : MayBeUndefined.<string>;
-	var stopColor : MayBeUndefined.<string>;
-	var stopOpacity : MayBeUndefined.<string>;
-	var stroke : MayBeUndefined.<string>;
-	var strokeDasharray : MayBeUndefined.<string>;
-	var strokeDashoffset : MayBeUndefined.<string>;
-	var strokeLinecap : MayBeUndefined.<string>;
-	var strokeLinejoin : MayBeUndefined.<string>;
-	var strokeMiterlimit : MayBeUndefined.<string>;
-	var strokeOpacity : MayBeUndefined.<string>;
-	var strokeWidth : MayBeUndefined.<string>;
-	var textAnchor : MayBeUndefined.<string>;
-	var textLineThrough : MayBeUndefined.<string>;
-	var textLineThroughColor : MayBeUndefined.<string>;
-	var textLineThroughMode : MayBeUndefined.<string>;
-	var textLineThroughStyle : MayBeUndefined.<string>;
-	var textLineThroughWidth : MayBeUndefined.<string>;
-	var textOverflow : MayBeUndefined.<string>;
-	var textOverline : MayBeUndefined.<string>;
-	var textOverlineColor : MayBeUndefined.<string>;
-	var textOverlineMode : MayBeUndefined.<string>;
-	var textOverlineStyle : MayBeUndefined.<string>;
-	var textOverlineWidth : MayBeUndefined.<string>;
-	var textRendering : MayBeUndefined.<string>;
-	var textUnderline : MayBeUndefined.<string>;
-	var textUnderlineColor : MayBeUndefined.<string>;
-	var textUnderlineMode : MayBeUndefined.<string>;
-	var textUnderlineStyle : MayBeUndefined.<string>;
-	var textUnderlineWidth : MayBeUndefined.<string>;
-	var unicodeRange : MayBeUndefined.<string>;
-	var vectorEffect : MayBeUndefined.<string>;
-	var webkitAnimation : MayBeUndefined.<string>;
-	var webkitAnimationDelay : MayBeUndefined.<string>;
-	var webkitAnimationDirection : MayBeUndefined.<string>;
-	var webkitAnimationDuration : MayBeUndefined.<string>;
-	var webkitAnimationFillMode : MayBeUndefined.<string>;
-	var webkitAnimationIterationCount : MayBeUndefined.<string>;
-	var webkitAnimationName : MayBeUndefined.<string>;
-	var webkitAnimationPlayState : MayBeUndefined.<string>;
-	var webkitAnimationTimingFunction : MayBeUndefined.<string>;
-	var webkitAppearance : MayBeUndefined.<string>;
-	var webkitAspectRatio : MayBeUndefined.<string>;
-	var webkitBackfaceVisibility : MayBeUndefined.<string>;
-	var webkitBackgroundClip : MayBeUndefined.<string>;
-	var webkitBackgroundComposite : MayBeUndefined.<string>;
-	var webkitBackgroundOrigin : MayBeUndefined.<string>;
-	var webkitBackgroundSize : MayBeUndefined.<string>;
-	var webkitBorderAfter : MayBeUndefined.<string>;
-	var webkitBorderAfterColor : MayBeUndefined.<string>;
-	var webkitBorderAfterStyle : MayBeUndefined.<string>;
-	var webkitBorderAfterWidth : MayBeUndefined.<string>;
-	var webkitBorderBefore : MayBeUndefined.<string>;
-	var webkitBorderBeforeColor : MayBeUndefined.<string>;
-	var webkitBorderBeforeStyle : MayBeUndefined.<string>;
-	var webkitBorderBeforeWidth : MayBeUndefined.<string>;
-	var webkitBorderEnd : MayBeUndefined.<string>;
-	var webkitBorderEndColor : MayBeUndefined.<string>;
-	var webkitBorderEndStyle : MayBeUndefined.<string>;
-	var webkitBorderEndWidth : MayBeUndefined.<string>;
-	var webkitBorderFit : MayBeUndefined.<string>;
-	var webkitBorderHorizontalSpacing : MayBeUndefined.<string>;
-	var webkitBorderImage : MayBeUndefined.<string>;
-	var webkitBorderRadius : MayBeUndefined.<string>;
-	var webkitBorderStart : MayBeUndefined.<string>;
-	var webkitBorderStartColor : MayBeUndefined.<string>;
-	var webkitBorderStartStyle : MayBeUndefined.<string>;
-	var webkitBorderStartWidth : MayBeUndefined.<string>;
-	var webkitBorderVerticalSpacing : MayBeUndefined.<string>;
-	var webkitBoxAlign : MayBeUndefined.<string>;
-	var webkitBoxDirection : MayBeUndefined.<string>;
-	var webkitBoxFlex : MayBeUndefined.<string>;
-	var webkitBoxFlexGroup : MayBeUndefined.<string>;
-	var webkitBoxLines : MayBeUndefined.<string>;
-	var webkitBoxOrdinalGroup : MayBeUndefined.<string>;
-	var webkitBoxOrient : MayBeUndefined.<string>;
-	var webkitBoxPack : MayBeUndefined.<string>;
-	var webkitBoxReflect : MayBeUndefined.<string>;
-	var webkitBoxShadow : MayBeUndefined.<string>;
-	var webkitColorCorrection : MayBeUndefined.<string>;
-	var webkitColumnAxis : MayBeUndefined.<string>;
-	var webkitColumnBreakAfter : MayBeUndefined.<string>;
-	var webkitColumnBreakBefore : MayBeUndefined.<string>;
-	var webkitColumnBreakInside : MayBeUndefined.<string>;
-	var webkitColumnCount : MayBeUndefined.<string>;
-	var webkitColumnGap : MayBeUndefined.<string>;
-	var webkitColumnRule : MayBeUndefined.<string>;
-	var webkitColumnRuleColor : MayBeUndefined.<string>;
-	var webkitColumnRuleStyle : MayBeUndefined.<string>;
-	var webkitColumnRuleWidth : MayBeUndefined.<string>;
-	var webkitColumnSpan : MayBeUndefined.<string>;
-	var webkitColumnWidth : MayBeUndefined.<string>;
-	var webkitColumns : MayBeUndefined.<string>;
-	var webkitFilter : MayBeUndefined.<string>;
-	var webkitFlexAlign : MayBeUndefined.<string>;
-	var webkitFlexDirection : MayBeUndefined.<string>;
-	var webkitFlexFlow : MayBeUndefined.<string>;
-	var webkitFlexItemAlign : MayBeUndefined.<string>;
-	var webkitFlexLinePack : MayBeUndefined.<string>;
-	var webkitFlexOrder : MayBeUndefined.<string>;
-	var webkitFlexPack : MayBeUndefined.<string>;
-	var webkitFlexWrap : MayBeUndefined.<string>;
-	var webkitFlowFrom : MayBeUndefined.<string>;
-	var webkitFlowInto : MayBeUndefined.<string>;
-	var webkitFontFeatureSettings : MayBeUndefined.<string>;
-	var webkitFontKerning : MayBeUndefined.<string>;
-	var webkitFontSizeDelta : MayBeUndefined.<string>;
-	var webkitFontSmoothing : MayBeUndefined.<string>;
-	var webkitFontVariantLigatures : MayBeUndefined.<string>;
-	var webkitHighlight : MayBeUndefined.<string>;
-	var webkitHyphenateCharacter : MayBeUndefined.<string>;
-	var webkitHyphenateLimitAfter : MayBeUndefined.<string>;
-	var webkitHyphenateLimitBefore : MayBeUndefined.<string>;
-	var webkitHyphenateLimitLines : MayBeUndefined.<string>;
-	var webkitHyphens : MayBeUndefined.<string>;
-	var webkitLineAlign : MayBeUndefined.<string>;
-	var webkitLineBoxContain : MayBeUndefined.<string>;
-	var webkitLineBreak : MayBeUndefined.<string>;
-	var webkitLineClamp : MayBeUndefined.<string>;
-	var webkitLineGrid : MayBeUndefined.<string>;
-	var webkitLineSnap : MayBeUndefined.<string>;
-	var webkitLocale : MayBeUndefined.<string>;
-	var webkitLogicalHeight : MayBeUndefined.<string>;
-	var webkitLogicalWidth : MayBeUndefined.<string>;
-	var webkitMarginAfter : MayBeUndefined.<string>;
-	var webkitMarginAfterCollapse : MayBeUndefined.<string>;
-	var webkitMarginBefore : MayBeUndefined.<string>;
-	var webkitMarginBeforeCollapse : MayBeUndefined.<string>;
-	var webkitMarginBottomCollapse : MayBeUndefined.<string>;
-	var webkitMarginCollapse : MayBeUndefined.<string>;
-	var webkitMarginEnd : MayBeUndefined.<string>;
-	var webkitMarginStart : MayBeUndefined.<string>;
-	var webkitMarginTopCollapse : MayBeUndefined.<string>;
-	var webkitMarquee : MayBeUndefined.<string>;
-	var webkitMarqueeDirection : MayBeUndefined.<string>;
-	var webkitMarqueeIncrement : MayBeUndefined.<string>;
-	var webkitMarqueeRepetition : MayBeUndefined.<string>;
-	var webkitMarqueeSpeed : MayBeUndefined.<string>;
-	var webkitMarqueeStyle : MayBeUndefined.<string>;
-	var webkitMask : MayBeUndefined.<string>;
-	var webkitMaskAttachment : MayBeUndefined.<string>;
-	var webkitMaskBoxImage : MayBeUndefined.<string>;
-	var webkitMaskBoxImageOutset : MayBeUndefined.<string>;
-	var webkitMaskBoxImageRepeat : MayBeUndefined.<string>;
-	var webkitMaskBoxImageSlice : MayBeUndefined.<string>;
-	var webkitMaskBoxImageSource : MayBeUndefined.<string>;
-	var webkitMaskBoxImageWidth : MayBeUndefined.<string>;
-	var webkitMaskClip : MayBeUndefined.<string>;
-	var webkitMaskComposite : MayBeUndefined.<string>;
-	var webkitMaskImage : MayBeUndefined.<string>;
-	var webkitMaskOrigin : MayBeUndefined.<string>;
-	var webkitMaskPosition : MayBeUndefined.<string>;
-	var webkitMaskPositionX : MayBeUndefined.<string>;
-	var webkitMaskPositionY : MayBeUndefined.<string>;
-	var webkitMaskRepeat : MayBeUndefined.<string>;
-	var webkitMaskRepeatX : MayBeUndefined.<string>;
-	var webkitMaskRepeatY : MayBeUndefined.<string>;
-	var webkitMaskSize : MayBeUndefined.<string>;
-	var webkitMatchNearestMailBlockquoteColor : MayBeUndefined.<string>;
-	var webkitMaxLogicalHeight : MayBeUndefined.<string>;
-	var webkitMaxLogicalWidth : MayBeUndefined.<string>;
-	var webkitMinLogicalHeight : MayBeUndefined.<string>;
-	var webkitMinLogicalWidth : MayBeUndefined.<string>;
-	var webkitNbspMode : MayBeUndefined.<string>;
-	var webkitOverflowScrolling : MayBeUndefined.<string>;
-	var webkitPaddingAfter : MayBeUndefined.<string>;
-	var webkitPaddingBefore : MayBeUndefined.<string>;
-	var webkitPaddingEnd : MayBeUndefined.<string>;
-	var webkitPaddingStart : MayBeUndefined.<string>;
-	var webkitPerspective : MayBeUndefined.<string>;
-	var webkitPerspectiveOrigin : MayBeUndefined.<string>;
-	var webkitPerspectiveOriginX : MayBeUndefined.<string>;
-	var webkitPerspectiveOriginY : MayBeUndefined.<string>;
-	var webkitPrintColorAdjust : MayBeUndefined.<string>;
-	var webkitRegionBreakAfter : MayBeUndefined.<string>;
-	var webkitRegionBreakBefore : MayBeUndefined.<string>;
-	var webkitRegionBreakInside : MayBeUndefined.<string>;
-	var webkitRegionOverflow : MayBeUndefined.<string>;
-	var webkitRtlOrdering : MayBeUndefined.<string>;
-	var webkitSvgShadow : MayBeUndefined.<string>;
-	var webkitTapHighlightColor : MayBeUndefined.<string>;
-	var webkitTextCombine : MayBeUndefined.<string>;
-	var webkitTextDecorationsInEffect : MayBeUndefined.<string>;
-	var webkitTextEmphasis : MayBeUndefined.<string>;
-	var webkitTextEmphasisColor : MayBeUndefined.<string>;
-	var webkitTextEmphasisPosition : MayBeUndefined.<string>;
-	var webkitTextEmphasisStyle : MayBeUndefined.<string>;
-	var webkitTextFillColor : MayBeUndefined.<string>;
-	var webkitTextOrientation : MayBeUndefined.<string>;
-	var webkitTextSecurity : MayBeUndefined.<string>;
-	var webkitTextSizeAdjust : MayBeUndefined.<string>;
-	var webkitTextStroke : MayBeUndefined.<string>;
-	var webkitTextStrokeColor : MayBeUndefined.<string>;
-	var webkitTextStrokeWidth : MayBeUndefined.<string>;
-	var webkitTransform : MayBeUndefined.<string>;
-	var webkitTransformOrigin : MayBeUndefined.<string>;
-	var webkitTransformOriginX : MayBeUndefined.<string>;
-	var webkitTransformOriginY : MayBeUndefined.<string>;
-	var webkitTransformOriginZ : MayBeUndefined.<string>;
-	var webkitTransformStyle : MayBeUndefined.<string>;
-	var webkitTransition : MayBeUndefined.<string>;
-	var webkitTransitionDelay : MayBeUndefined.<string>;
-	var webkitTransitionDuration : MayBeUndefined.<string>;
-	var webkitTransitionProperty : MayBeUndefined.<string>;
-	var webkitTransitionTimingFunction : MayBeUndefined.<string>;
-	var webkitUserDrag : MayBeUndefined.<string>;
-	var webkitUserModify : MayBeUndefined.<string>;
-	var webkitUserSelect : MayBeUndefined.<string>;
-	var webkitWrap : MayBeUndefined.<string>;
-	var webkitWrapFlow : MayBeUndefined.<string>;
-	var webkitWrapMargin : MayBeUndefined.<string>;
-	var webkitWrapPadding : MayBeUndefined.<string>;
-	var webkitWrapShapeInside : MayBeUndefined.<string>;
-	var webkitWrapShapeOutside : MayBeUndefined.<string>;
-	var webkitWrapThrough : MayBeUndefined.<string>;
-	var webkitWritingMode : MayBeUndefined.<string>;
-	var wordBreak : MayBeUndefined.<string>;
-	var wordWrap : MayBeUndefined.<string>;
-	var writingMode : MayBeUndefined.<string>;
-	var zoom : MayBeUndefined.<string>;
+	var alignmentBaseline : Nullable.<string>;
+	var backgroundClip : Nullable.<string>;
+	var backgroundOrigin : Nullable.<string>;
+	var backgroundPositionX : Nullable.<string>;
+	var backgroundPositionY : Nullable.<string>;
+	var backgroundRepeatX : Nullable.<string>;
+	var backgroundRepeatY : Nullable.<string>;
+	var backgroundSize : Nullable.<string>;
+	var baselineShift : Nullable.<string>;
+	var borderBottomLeftRadius : Nullable.<string>;
+	var borderBottomRightRadius : Nullable.<string>;
+	var borderImage : Nullable.<string>;
+	var borderImageOutset : Nullable.<string>;
+	var borderImageRepeat : Nullable.<string>;
+	var borderImageSlice : Nullable.<string>;
+	var borderImageSource : Nullable.<string>;
+	var borderImageWidth : Nullable.<string>;
+	var borderRadius : Nullable.<string>;
+	var borderTopLeftRadius : Nullable.<string>;
+	var borderTopRightRadius : Nullable.<string>;
+	var boxShadow : Nullable.<string>;
+	var boxSizing : Nullable.<string>;
+	var clipPath : Nullable.<string>;
+	var clipRule : Nullable.<string>;
+	var colorInterpolation : Nullable.<string>;
+	var colorInterpolationFilters : Nullable.<string>;
+	var colorProfile : Nullable.<string>;
+	var colorRendering : Nullable.<string>;
+	var dominantBaseline : Nullable.<string>;
+	var enableBackground : Nullable.<string>;
+	var fill : Nullable.<string>;
+	var fillOpacity : Nullable.<string>;
+	var fillRule : Nullable.<string>;
+	var filter : Nullable.<string>;
+	var float : Nullable.<string>;
+	var floodColor : Nullable.<string>;
+	var floodOpacity : Nullable.<string>;
+	var glyphOrientationHorizontal : Nullable.<string>;
+	var glyphOrientationVertical : Nullable.<string>;
+	var imageRendering : Nullable.<string>;
+	var kerning : Nullable.<string>;
+	var lightingColor : Nullable.<string>;
+	var marker : Nullable.<string>;
+	var markerEnd : Nullable.<string>;
+	var markerMid : Nullable.<string>;
+	var markerStart : Nullable.<string>;
+	var mask : Nullable.<string>;
+	var opacity : Nullable.<string>;
+	var outlineOffset : Nullable.<string>;
+	var overflowX : Nullable.<string>;
+	var overflowY : Nullable.<string>;
+	var pointerEvents : Nullable.<string>;
+	var resize : Nullable.<string>;
+	var shapeRendering : Nullable.<string>;
+	var src : Nullable.<string>;
+	var stopColor : Nullable.<string>;
+	var stopOpacity : Nullable.<string>;
+	var stroke : Nullable.<string>;
+	var strokeDasharray : Nullable.<string>;
+	var strokeDashoffset : Nullable.<string>;
+	var strokeLinecap : Nullable.<string>;
+	var strokeLinejoin : Nullable.<string>;
+	var strokeMiterlimit : Nullable.<string>;
+	var strokeOpacity : Nullable.<string>;
+	var strokeWidth : Nullable.<string>;
+	var textAnchor : Nullable.<string>;
+	var textLineThrough : Nullable.<string>;
+	var textLineThroughColor : Nullable.<string>;
+	var textLineThroughMode : Nullable.<string>;
+	var textLineThroughStyle : Nullable.<string>;
+	var textLineThroughWidth : Nullable.<string>;
+	var textOverflow : Nullable.<string>;
+	var textOverline : Nullable.<string>;
+	var textOverlineColor : Nullable.<string>;
+	var textOverlineMode : Nullable.<string>;
+	var textOverlineStyle : Nullable.<string>;
+	var textOverlineWidth : Nullable.<string>;
+	var textRendering : Nullable.<string>;
+	var textUnderline : Nullable.<string>;
+	var textUnderlineColor : Nullable.<string>;
+	var textUnderlineMode : Nullable.<string>;
+	var textUnderlineStyle : Nullable.<string>;
+	var textUnderlineWidth : Nullable.<string>;
+	var unicodeRange : Nullable.<string>;
+	var vectorEffect : Nullable.<string>;
+	var webkitAnimation : Nullable.<string>;
+	var webkitAnimationDelay : Nullable.<string>;
+	var webkitAnimationDirection : Nullable.<string>;
+	var webkitAnimationDuration : Nullable.<string>;
+	var webkitAnimationFillMode : Nullable.<string>;
+	var webkitAnimationIterationCount : Nullable.<string>;
+	var webkitAnimationName : Nullable.<string>;
+	var webkitAnimationPlayState : Nullable.<string>;
+	var webkitAnimationTimingFunction : Nullable.<string>;
+	var webkitAppearance : Nullable.<string>;
+	var webkitAspectRatio : Nullable.<string>;
+	var webkitBackfaceVisibility : Nullable.<string>;
+	var webkitBackgroundClip : Nullable.<string>;
+	var webkitBackgroundComposite : Nullable.<string>;
+	var webkitBackgroundOrigin : Nullable.<string>;
+	var webkitBackgroundSize : Nullable.<string>;
+	var webkitBorderAfter : Nullable.<string>;
+	var webkitBorderAfterColor : Nullable.<string>;
+	var webkitBorderAfterStyle : Nullable.<string>;
+	var webkitBorderAfterWidth : Nullable.<string>;
+	var webkitBorderBefore : Nullable.<string>;
+	var webkitBorderBeforeColor : Nullable.<string>;
+	var webkitBorderBeforeStyle : Nullable.<string>;
+	var webkitBorderBeforeWidth : Nullable.<string>;
+	var webkitBorderEnd : Nullable.<string>;
+	var webkitBorderEndColor : Nullable.<string>;
+	var webkitBorderEndStyle : Nullable.<string>;
+	var webkitBorderEndWidth : Nullable.<string>;
+	var webkitBorderFit : Nullable.<string>;
+	var webkitBorderHorizontalSpacing : Nullable.<string>;
+	var webkitBorderImage : Nullable.<string>;
+	var webkitBorderRadius : Nullable.<string>;
+	var webkitBorderStart : Nullable.<string>;
+	var webkitBorderStartColor : Nullable.<string>;
+	var webkitBorderStartStyle : Nullable.<string>;
+	var webkitBorderStartWidth : Nullable.<string>;
+	var webkitBorderVerticalSpacing : Nullable.<string>;
+	var webkitBoxAlign : Nullable.<string>;
+	var webkitBoxDirection : Nullable.<string>;
+	var webkitBoxFlex : Nullable.<string>;
+	var webkitBoxFlexGroup : Nullable.<string>;
+	var webkitBoxLines : Nullable.<string>;
+	var webkitBoxOrdinalGroup : Nullable.<string>;
+	var webkitBoxOrient : Nullable.<string>;
+	var webkitBoxPack : Nullable.<string>;
+	var webkitBoxReflect : Nullable.<string>;
+	var webkitBoxShadow : Nullable.<string>;
+	var webkitColorCorrection : Nullable.<string>;
+	var webkitColumnAxis : Nullable.<string>;
+	var webkitColumnBreakAfter : Nullable.<string>;
+	var webkitColumnBreakBefore : Nullable.<string>;
+	var webkitColumnBreakInside : Nullable.<string>;
+	var webkitColumnCount : Nullable.<string>;
+	var webkitColumnGap : Nullable.<string>;
+	var webkitColumnRule : Nullable.<string>;
+	var webkitColumnRuleColor : Nullable.<string>;
+	var webkitColumnRuleStyle : Nullable.<string>;
+	var webkitColumnRuleWidth : Nullable.<string>;
+	var webkitColumnSpan : Nullable.<string>;
+	var webkitColumnWidth : Nullable.<string>;
+	var webkitColumns : Nullable.<string>;
+	var webkitFilter : Nullable.<string>;
+	var webkitFlexAlign : Nullable.<string>;
+	var webkitFlexDirection : Nullable.<string>;
+	var webkitFlexFlow : Nullable.<string>;
+	var webkitFlexItemAlign : Nullable.<string>;
+	var webkitFlexLinePack : Nullable.<string>;
+	var webkitFlexOrder : Nullable.<string>;
+	var webkitFlexPack : Nullable.<string>;
+	var webkitFlexWrap : Nullable.<string>;
+	var webkitFlowFrom : Nullable.<string>;
+	var webkitFlowInto : Nullable.<string>;
+	var webkitFontFeatureSettings : Nullable.<string>;
+	var webkitFontKerning : Nullable.<string>;
+	var webkitFontSizeDelta : Nullable.<string>;
+	var webkitFontSmoothing : Nullable.<string>;
+	var webkitFontVariantLigatures : Nullable.<string>;
+	var webkitHighlight : Nullable.<string>;
+	var webkitHyphenateCharacter : Nullable.<string>;
+	var webkitHyphenateLimitAfter : Nullable.<string>;
+	var webkitHyphenateLimitBefore : Nullable.<string>;
+	var webkitHyphenateLimitLines : Nullable.<string>;
+	var webkitHyphens : Nullable.<string>;
+	var webkitLineAlign : Nullable.<string>;
+	var webkitLineBoxContain : Nullable.<string>;
+	var webkitLineBreak : Nullable.<string>;
+	var webkitLineClamp : Nullable.<string>;
+	var webkitLineGrid : Nullable.<string>;
+	var webkitLineSnap : Nullable.<string>;
+	var webkitLocale : Nullable.<string>;
+	var webkitLogicalHeight : Nullable.<string>;
+	var webkitLogicalWidth : Nullable.<string>;
+	var webkitMarginAfter : Nullable.<string>;
+	var webkitMarginAfterCollapse : Nullable.<string>;
+	var webkitMarginBefore : Nullable.<string>;
+	var webkitMarginBeforeCollapse : Nullable.<string>;
+	var webkitMarginBottomCollapse : Nullable.<string>;
+	var webkitMarginCollapse : Nullable.<string>;
+	var webkitMarginEnd : Nullable.<string>;
+	var webkitMarginStart : Nullable.<string>;
+	var webkitMarginTopCollapse : Nullable.<string>;
+	var webkitMarquee : Nullable.<string>;
+	var webkitMarqueeDirection : Nullable.<string>;
+	var webkitMarqueeIncrement : Nullable.<string>;
+	var webkitMarqueeRepetition : Nullable.<string>;
+	var webkitMarqueeSpeed : Nullable.<string>;
+	var webkitMarqueeStyle : Nullable.<string>;
+	var webkitMask : Nullable.<string>;
+	var webkitMaskAttachment : Nullable.<string>;
+	var webkitMaskBoxImage : Nullable.<string>;
+	var webkitMaskBoxImageOutset : Nullable.<string>;
+	var webkitMaskBoxImageRepeat : Nullable.<string>;
+	var webkitMaskBoxImageSlice : Nullable.<string>;
+	var webkitMaskBoxImageSource : Nullable.<string>;
+	var webkitMaskBoxImageWidth : Nullable.<string>;
+	var webkitMaskClip : Nullable.<string>;
+	var webkitMaskComposite : Nullable.<string>;
+	var webkitMaskImage : Nullable.<string>;
+	var webkitMaskOrigin : Nullable.<string>;
+	var webkitMaskPosition : Nullable.<string>;
+	var webkitMaskPositionX : Nullable.<string>;
+	var webkitMaskPositionY : Nullable.<string>;
+	var webkitMaskRepeat : Nullable.<string>;
+	var webkitMaskRepeatX : Nullable.<string>;
+	var webkitMaskRepeatY : Nullable.<string>;
+	var webkitMaskSize : Nullable.<string>;
+	var webkitMatchNearestMailBlockquoteColor : Nullable.<string>;
+	var webkitMaxLogicalHeight : Nullable.<string>;
+	var webkitMaxLogicalWidth : Nullable.<string>;
+	var webkitMinLogicalHeight : Nullable.<string>;
+	var webkitMinLogicalWidth : Nullable.<string>;
+	var webkitNbspMode : Nullable.<string>;
+	var webkitOverflowScrolling : Nullable.<string>;
+	var webkitPaddingAfter : Nullable.<string>;
+	var webkitPaddingBefore : Nullable.<string>;
+	var webkitPaddingEnd : Nullable.<string>;
+	var webkitPaddingStart : Nullable.<string>;
+	var webkitPerspective : Nullable.<string>;
+	var webkitPerspectiveOrigin : Nullable.<string>;
+	var webkitPerspectiveOriginX : Nullable.<string>;
+	var webkitPerspectiveOriginY : Nullable.<string>;
+	var webkitPrintColorAdjust : Nullable.<string>;
+	var webkitRegionBreakAfter : Nullable.<string>;
+	var webkitRegionBreakBefore : Nullable.<string>;
+	var webkitRegionBreakInside : Nullable.<string>;
+	var webkitRegionOverflow : Nullable.<string>;
+	var webkitRtlOrdering : Nullable.<string>;
+	var webkitSvgShadow : Nullable.<string>;
+	var webkitTapHighlightColor : Nullable.<string>;
+	var webkitTextCombine : Nullable.<string>;
+	var webkitTextDecorationsInEffect : Nullable.<string>;
+	var webkitTextEmphasis : Nullable.<string>;
+	var webkitTextEmphasisColor : Nullable.<string>;
+	var webkitTextEmphasisPosition : Nullable.<string>;
+	var webkitTextEmphasisStyle : Nullable.<string>;
+	var webkitTextFillColor : Nullable.<string>;
+	var webkitTextOrientation : Nullable.<string>;
+	var webkitTextSecurity : Nullable.<string>;
+	var webkitTextSizeAdjust : Nullable.<string>;
+	var webkitTextStroke : Nullable.<string>;
+	var webkitTextStrokeColor : Nullable.<string>;
+	var webkitTextStrokeWidth : Nullable.<string>;
+	var webkitTransform : Nullable.<string>;
+	var webkitTransformOrigin : Nullable.<string>;
+	var webkitTransformOriginX : Nullable.<string>;
+	var webkitTransformOriginY : Nullable.<string>;
+	var webkitTransformOriginZ : Nullable.<string>;
+	var webkitTransformStyle : Nullable.<string>;
+	var webkitTransition : Nullable.<string>;
+	var webkitTransitionDelay : Nullable.<string>;
+	var webkitTransitionDuration : Nullable.<string>;
+	var webkitTransitionProperty : Nullable.<string>;
+	var webkitTransitionTimingFunction : Nullable.<string>;
+	var webkitUserDrag : Nullable.<string>;
+	var webkitUserModify : Nullable.<string>;
+	var webkitUserSelect : Nullable.<string>;
+	var webkitWrap : Nullable.<string>;
+	var webkitWrapFlow : Nullable.<string>;
+	var webkitWrapMargin : Nullable.<string>;
+	var webkitWrapPadding : Nullable.<string>;
+	var webkitWrapShapeInside : Nullable.<string>;
+	var webkitWrapShapeOutside : Nullable.<string>;
+	var webkitWrapThrough : Nullable.<string>;
+	var webkitWritingMode : Nullable.<string>;
+	var wordBreak : Nullable.<string>;
+	var wordWrap : Nullable.<string>;
+	var writingMode : Nullable.<string>;
+	var zoom : Nullable.<string>;
 
-	var MozAnimation : MayBeUndefined.<string>;
-	var MozAnimationDelay : MayBeUndefined.<string>;
-	var MozAnimationDirection : MayBeUndefined.<string>;
-	var MozAnimationDuration : MayBeUndefined.<string>;
-	var MozAnimationFillMode : MayBeUndefined.<string>;
-	var MozAnimationIterationCount : MayBeUndefined.<string>;
-	var MozAnimationName : MayBeUndefined.<string>;
-	var MozAnimationPlayState : MayBeUndefined.<string>;
-	var MozAnimationTimingFunction : MayBeUndefined.<string>;
-	var MozAppearance : MayBeUndefined.<string>;
-	var MozBackfaceVisibility : MayBeUndefined.<string>;
-	var MozBackgroundInlinePolicy : MayBeUndefined.<string>;
-	var MozBinding : MayBeUndefined.<string>;
-	var MozBorderBottomColors : MayBeUndefined.<string>;
-	var MozBorderEnd : MayBeUndefined.<string>;
-	var MozBorderEndColor : MayBeUndefined.<string>;
-	var MozBorderEndStyle : MayBeUndefined.<string>;
-	var MozBorderEndWidth : MayBeUndefined.<string>;
-	var MozBorderImage : MayBeUndefined.<string>;
-	var MozBorderLeftColors : MayBeUndefined.<string>;
-	var MozBorderRightColors : MayBeUndefined.<string>;
-	var MozBorderStart : MayBeUndefined.<string>;
-	var MozBorderStartColor : MayBeUndefined.<string>;
-	var MozBorderStartStyle : MayBeUndefined.<string>;
-	var MozBorderStartWidth : MayBeUndefined.<string>;
-	var MozBorderTopColors : MayBeUndefined.<string>;
-	var MozBoxAlign : MayBeUndefined.<string>;
-	var MozBoxDirection : MayBeUndefined.<string>;
-	var MozBoxFlex : MayBeUndefined.<string>;
-	var MozBoxOrdinalGroup : MayBeUndefined.<string>;
-	var MozBoxOrient : MayBeUndefined.<string>;
-	var MozBoxPack : MayBeUndefined.<string>;
-	var MozBoxSizing : MayBeUndefined.<string>;
-	var MozColumnCount : MayBeUndefined.<string>;
-	var MozColumnGap : MayBeUndefined.<string>;
-	var MozColumnRule : MayBeUndefined.<string>;
-	var MozColumnRuleColor : MayBeUndefined.<string>;
-	var MozColumnRuleStyle : MayBeUndefined.<string>;
-	var MozColumnRuleWidth : MayBeUndefined.<string>;
-	var MozColumnWidth : MayBeUndefined.<string>;
-	var MozColumns : MayBeUndefined.<string>;
-	var MozFloatEdge : MayBeUndefined.<string>;
-	var MozFontFeatureSettings : MayBeUndefined.<string>;
-	var MozFontLanguageOverride : MayBeUndefined.<string>;
-	var MozForceBrokenImageIcon : MayBeUndefined.<string>;
-	var MozHyphens : MayBeUndefined.<string>;
-	var MozImageRegion : MayBeUndefined.<string>;
-	var MozMarginEnd : MayBeUndefined.<string>;
-	var MozMarginStart : MayBeUndefined.<string>;
-	var MozOpacity : MayBeUndefined.<string>;
-	var MozOrient : MayBeUndefined.<string>;
-	var MozOutline : MayBeUndefined.<string>;
-	var MozOutlineColor : MayBeUndefined.<string>;
-	var MozOutlineOffset : MayBeUndefined.<string>;
-	var MozOutlineRadius : MayBeUndefined.<string>;
-	var MozOutlineRadiusBottomleft : MayBeUndefined.<string>;
-	var MozOutlineRadiusBottomright : MayBeUndefined.<string>;
-	var MozOutlineRadiusTopleft : MayBeUndefined.<string>;
-	var MozOutlineRadiusTopright : MayBeUndefined.<string>;
-	var MozOutlineStyle : MayBeUndefined.<string>;
-	var MozOutlineWidth : MayBeUndefined.<string>;
-	var MozPaddingEnd : MayBeUndefined.<string>;
-	var MozPaddingStart : MayBeUndefined.<string>;
-	var MozPerspective : MayBeUndefined.<string>;
-	var MozPerspectiveOrigin : MayBeUndefined.<string>;
-	var MozStackSizing : MayBeUndefined.<string>;
-	var MozTabSize : MayBeUndefined.<string>;
-	var MozTextAlignLast : MayBeUndefined.<string>;
-	var MozTextBlink : MayBeUndefined.<string>;
-	var MozTextDecorationColor : MayBeUndefined.<string>;
-	var MozTextDecorationLine : MayBeUndefined.<string>;
-	var MozTextDecorationStyle : MayBeUndefined.<string>;
-	var MozTextSizeAdjust : MayBeUndefined.<string>;
-	var MozTransform : MayBeUndefined.<string>;
-	var MozTransformOrigin : MayBeUndefined.<string>;
-	var MozTransformStyle : MayBeUndefined.<string>;
-	var MozTransition : MayBeUndefined.<string>;
-	var MozTransitionDelay : MayBeUndefined.<string>;
-	var MozTransitionDuration : MayBeUndefined.<string>;
-	var MozTransitionProperty : MayBeUndefined.<string>;
-	var MozTransitionTimingFunction : MayBeUndefined.<string>;
-	var MozUserFocus : MayBeUndefined.<string>;
-	var MozUserInput : MayBeUndefined.<string>;
-	var MozUserModify : MayBeUndefined.<string>;
-	var MozUserSelect : MayBeUndefined.<string>;
-	var MozWindowShadow : MayBeUndefined.<string>;
-	var imeMode : MayBeUndefined.<string>;
+	var MozAnimation : Nullable.<string>;
+	var MozAnimationDelay : Nullable.<string>;
+	var MozAnimationDirection : Nullable.<string>;
+	var MozAnimationDuration : Nullable.<string>;
+	var MozAnimationFillMode : Nullable.<string>;
+	var MozAnimationIterationCount : Nullable.<string>;
+	var MozAnimationName : Nullable.<string>;
+	var MozAnimationPlayState : Nullable.<string>;
+	var MozAnimationTimingFunction : Nullable.<string>;
+	var MozAppearance : Nullable.<string>;
+	var MozBackfaceVisibility : Nullable.<string>;
+	var MozBackgroundInlinePolicy : Nullable.<string>;
+	var MozBinding : Nullable.<string>;
+	var MozBorderBottomColors : Nullable.<string>;
+	var MozBorderEnd : Nullable.<string>;
+	var MozBorderEndColor : Nullable.<string>;
+	var MozBorderEndStyle : Nullable.<string>;
+	var MozBorderEndWidth : Nullable.<string>;
+	var MozBorderImage : Nullable.<string>;
+	var MozBorderLeftColors : Nullable.<string>;
+	var MozBorderRightColors : Nullable.<string>;
+	var MozBorderStart : Nullable.<string>;
+	var MozBorderStartColor : Nullable.<string>;
+	var MozBorderStartStyle : Nullable.<string>;
+	var MozBorderStartWidth : Nullable.<string>;
+	var MozBorderTopColors : Nullable.<string>;
+	var MozBoxAlign : Nullable.<string>;
+	var MozBoxDirection : Nullable.<string>;
+	var MozBoxFlex : Nullable.<string>;
+	var MozBoxOrdinalGroup : Nullable.<string>;
+	var MozBoxOrient : Nullable.<string>;
+	var MozBoxPack : Nullable.<string>;
+	var MozBoxSizing : Nullable.<string>;
+	var MozColumnCount : Nullable.<string>;
+	var MozColumnGap : Nullable.<string>;
+	var MozColumnRule : Nullable.<string>;
+	var MozColumnRuleColor : Nullable.<string>;
+	var MozColumnRuleStyle : Nullable.<string>;
+	var MozColumnRuleWidth : Nullable.<string>;
+	var MozColumnWidth : Nullable.<string>;
+	var MozColumns : Nullable.<string>;
+	var MozFloatEdge : Nullable.<string>;
+	var MozFontFeatureSettings : Nullable.<string>;
+	var MozFontLanguageOverride : Nullable.<string>;
+	var MozForceBrokenImageIcon : Nullable.<string>;
+	var MozHyphens : Nullable.<string>;
+	var MozImageRegion : Nullable.<string>;
+	var MozMarginEnd : Nullable.<string>;
+	var MozMarginStart : Nullable.<string>;
+	var MozOpacity : Nullable.<string>;
+	var MozOrient : Nullable.<string>;
+	var MozOutline : Nullable.<string>;
+	var MozOutlineColor : Nullable.<string>;
+	var MozOutlineOffset : Nullable.<string>;
+	var MozOutlineRadius : Nullable.<string>;
+	var MozOutlineRadiusBottomleft : Nullable.<string>;
+	var MozOutlineRadiusBottomright : Nullable.<string>;
+	var MozOutlineRadiusTopleft : Nullable.<string>;
+	var MozOutlineRadiusTopright : Nullable.<string>;
+	var MozOutlineStyle : Nullable.<string>;
+	var MozOutlineWidth : Nullable.<string>;
+	var MozPaddingEnd : Nullable.<string>;
+	var MozPaddingStart : Nullable.<string>;
+	var MozPerspective : Nullable.<string>;
+	var MozPerspectiveOrigin : Nullable.<string>;
+	var MozStackSizing : Nullable.<string>;
+	var MozTabSize : Nullable.<string>;
+	var MozTextAlignLast : Nullable.<string>;
+	var MozTextBlink : Nullable.<string>;
+	var MozTextDecorationColor : Nullable.<string>;
+	var MozTextDecorationLine : Nullable.<string>;
+	var MozTextDecorationStyle : Nullable.<string>;
+	var MozTextSizeAdjust : Nullable.<string>;
+	var MozTransform : Nullable.<string>;
+	var MozTransformOrigin : Nullable.<string>;
+	var MozTransformStyle : Nullable.<string>;
+	var MozTransition : Nullable.<string>;
+	var MozTransitionDelay : Nullable.<string>;
+	var MozTransitionDuration : Nullable.<string>;
+	var MozTransitionProperty : Nullable.<string>;
+	var MozTransitionTimingFunction : Nullable.<string>;
+	var MozUserFocus : Nullable.<string>;
+	var MozUserInput : Nullable.<string>;
+	var MozUserModify : Nullable.<string>;
+	var MozUserSelect : Nullable.<string>;
+	var MozWindowShadow : Nullable.<string>;
+	var imeMode : Nullable.<string>;
 
 } // end of CSSStyleDeclaration
 
@@ -2078,10 +2068,10 @@ native final __fake__ class Window extends EventTarget {
 	) : Window/*WindowProxy*/;
 	function __native_index_operator__(
 		index : int/*unsigned long*/
-	) : MayBeUndefined.<Window/*WindowProxy*/>;
+	) : Window/*WindowProxy*/;
 	function __native_index_operator__(
 		name : string/*DOMString*/
-	) : MayBeUndefined.<Object/*object*/>;
+	) : Object/*object*/;
 	// the user agent
 	__readonly__ var navigator : Navigator;
 	__readonly__ var external : External;
@@ -2354,11 +2344,9 @@ native final class ClientRectList {
 	__readonly__ var length : int/*unsigned long*/;
 	function __native_index_operator__(
 		index : int/*unsigned long*/
-	) : MayBeUndefined.<ClientRect>;
+	) : ClientRect;
 	/* getter */
-	function item(
-		index : int/*unsigned long*/
-	) : MayBeUndefined.<ClientRect>;
+	function item(index : int/*unsigned long*/) : ClientRect;
 
 } // end of ClientRectList
 
@@ -2377,9 +2365,9 @@ native final class HTMLAllCollection extends HTMLCollection {
 
 	// inherits length and item(unsigned long index)
 	function item(name : string/*DOMString*/) : Object/*object?*/;
-	// inherits function __native_index_operator__(name : string/*DOMString*/) : MayBeUndefined.<Object/*object?*/>;
+	// inherits function __native_index_operator__(name : string/*DOMString*/) : Object/*object?*/;
 	/* legacycaller getter */
-	// inherits function namedItem(name : string/*DOMString*/) : MayBeUndefined.<Object/*object?*/>;
+	// inherits function namedItem(name : string/*DOMString*/) : Object/*object?*/;
 	// overrides inherited namedItem()
 	function tags(tagName : string/*DOMString*/) : HTMLAllCollection;
 
@@ -2388,9 +2376,9 @@ native final class HTMLAllCollection extends HTMLCollection {
 native final class HTMLFormControlsCollection extends HTMLCollection {
 
 	// inherits length and item()
-	// inherits function __native_index_operator__(name : string/*DOMString*/) : MayBeUndefined.<Object/*object?*/>;
+	// inherits function __native_index_operator__(name : string/*DOMString*/) : Object/*object?*/;
 	/* legacycaller getter */
-	// inherits function namedItem(name : string/*DOMString*/) : MayBeUndefined.<Object/*object?*/>;
+	// inherits function namedItem(name : string/*DOMString*/) : Object/*object?*/;
 	// overrides inherited namedItem()
 
 } // end of HTMLFormControlsCollection
@@ -2406,9 +2394,9 @@ native final class HTMLOptionsCollection extends HTMLCollection {
 	// inherits item()
 	// inherits var length : int/*unsigned long*/;
 	// overrides inherited length
-	// inherits function __native_index_operator__(name : string/*DOMString*/) : MayBeUndefined.<Object/*object?*/>;
+	// inherits function __native_index_operator__(name : string/*DOMString*/) : Object/*object?*/;
 	/* legacycaller getter */
-	// inherits function namedItem(name : string/*DOMString*/) : MayBeUndefined.<Object/*object?*/>;
+	// inherits function namedItem(name : string/*DOMString*/) : Object/*object?*/;
 	// overrides inherited namedItem()
 	function add(element : HTMLOptionElement) : void;
 	function add(
@@ -2437,7 +2425,7 @@ native final class DOMStringMap {
 
 	function __native_index_operator__(
 		name : string/*DOMString*/
-	) : MayBeUndefined.<string/*DOMString*/>;
+	) : string/*DOMString*/;
 
 } // end of DOMStringMap
 
@@ -2457,7 +2445,7 @@ native final class HTMLDocument extends Document {
 	// DOM tree accessors
 	function __native_index_operator__(
 		name : string/*DOMString*/
-	) : MayBeUndefined.<Object/*object*/>;
+	) : Object/*object*/;
 	var title : string/*DOMString*/;
 	var dir : string/*DOMString*/;
 	var body : HTMLElement;
@@ -3059,7 +3047,7 @@ native final class AudioTrackList extends EventTarget {
 	__readonly__ var length : int/*unsigned long*/;
 	function __native_index_operator__(
 		index : int/*unsigned long*/
-	) : MayBeUndefined.<AudioTrack>;
+	) : AudioTrack;
 	function getTrackById(id : string/*DOMString*/) : AudioTrack;
 	var onchange : function(:Event):void/*Function?*/;
 	var onaddtrack : function(:Event):void/*Function?*/;
@@ -3081,7 +3069,7 @@ native final class VideoTrackList extends EventTarget {
 	__readonly__ var length : int/*unsigned long*/;
 	function __native_index_operator__(
 		index : int/*unsigned long*/
-	) : MayBeUndefined.<VideoTrack>;
+	) : VideoTrack;
 	function getTrackById(id : string/*DOMString*/) : VideoTrack;
 	__readonly__ var selectedIndex : int/*long*/;
 	var onchange : function(:Event):void/*Function?*/;
@@ -3137,7 +3125,7 @@ native final class TextTrackList extends EventTarget {
 	__readonly__ var length : int/*unsigned long*/;
 	function __native_index_operator__(
 		index : int/*unsigned long*/
-	) : MayBeUndefined.<TextTrack>;
+	) : TextTrack;
 	var onaddtrack : function(:Event):void/*Function?*/;
 
 } // end of TextTrackList
@@ -3167,7 +3155,7 @@ native final class TextTrackCueList {
 	__readonly__ var length : int/*unsigned long*/;
 	function __native_index_operator__(
 		index : int/*unsigned long*/
-	) : MayBeUndefined.<TextTrackCue>;
+	) : TextTrackCue;
 	function getCueById(id : string/*DOMString*/) : TextTrackCue;
 
 } // end of TextTrackCueList
@@ -3416,10 +3404,10 @@ native final class HTMLFormElement extends HTMLElement {
 	__readonly__ var length : int/*long*/;
 	function __native_index_operator__(
 		index : int/*unsigned long*/
-	) : MayBeUndefined.<Element>;
+	) : Element;
 	function __native_index_operator__(
 		name : string/*DOMString*/
-	) : MayBeUndefined.<Object/*object*/>;
+	) : Object/*object*/;
 	function submit() : void;
 	function reset() : void;
 	function checkValidity() : boolean;
@@ -3560,11 +3548,9 @@ native final class HTMLSelectElement extends HTMLElement {
 	var length : int/*unsigned long*/;
 	function __native_index_operator__(
 		index : int/*unsigned long*/
-	) : MayBeUndefined.<Element>;
+	) : Element;
 	/* getter */
-	function item(
-		index : int/*unsigned long*/
-	) : MayBeUndefined.<Element>;
+	function item(index : int/*unsigned long*/) : Element;
 	function namedItem(name : string/*DOMString*/) : Object/*object*/;
 	function add(element : HTMLOptionElement) : void;
 	function add(
@@ -4070,7 +4056,7 @@ native final class DataTransferItemList {
 	__readonly__ var length : int/*unsigned long*/;
 	function __native_index_operator__(
 		index : int/*unsigned long*/
-	) : MayBeUndefined.<DataTransferItem>;
+	) : DataTransferItem;
 	function clear() : void;
 	function add(
 		data : string/*DOMString*/,
@@ -4215,9 +4201,9 @@ native final class FileList {
 
 	function __native_index_operator__(
 		index : int/*unsigned long*/
-	) : MayBeUndefined.<File>;
+	) : File;
 	/* getter */
-	function item(index : int/*unsigned long*/) : MayBeUndefined.<File>;
+	function item(index : int/*unsigned long*/) : File;
 	__readonly__ var length : int/*unsigned long*/;
 
 } // end of FileList
@@ -4329,11 +4315,9 @@ native final class TouchList {
 	__readonly__ var length : int/*unsigned long*/;
 	function __native_index_operator__(
 		index : int/*unsigned long*/
-	) : MayBeUndefined.<Touch>;
+	) : Touch;
 	/* getter */
-	function item(
-		index : int/*unsigned long*/
-	) : MayBeUndefined.<Touch>;
+	function item(index : int/*unsigned long*/) : Touch;
 	function identifiedTouch(identifier : int/*long*/) : Touch;
 
 } // end of TouchList
@@ -4503,11 +4487,9 @@ native final class Storage {
 	function key(index : int/*unsigned long*/) : string/*DOMString?*/;
 	function __native_index_operator__(
 		key : string/*DOMString*/
-	) : MayBeUndefined.<string/*DOMString*/>;
+	) : string/*DOMString*/;
 	/* getter */
-	function getItem(
-		key : string/*DOMString*/
-	) : MayBeUndefined.<string/*DOMString*/>;
+	function getItem(key : string/*DOMString*/) : string/*DOMString*/;
 	/* setter creator */
 	function setItem(
 		key : string/*DOMString*/,
@@ -4851,11 +4833,9 @@ native final class Int8Array extends ArrayBufferView {
 	__readonly__ var length : int/*unsigned long*/;
 	function __native_index_operator__(
 		index : int/*unsigned long*/
-	) : MayBeUndefined.<int/*byte*/>;
+	) : int/*byte*/;
 	/* getter */
-	function get(
-		index : int/*unsigned long*/
-	) : MayBeUndefined.<int/*byte*/>;
+	function get(index : int/*unsigned long*/) : int/*byte*/;
 	/* setter */
 	function set(
 		index : int/*unsigned long*/,
@@ -4905,11 +4885,9 @@ native class Uint8Array extends ArrayBufferView {
 	__readonly__ var length : int/*unsigned long*/;
 	function __native_index_operator__(
 		index : int/*unsigned long*/
-	) : MayBeUndefined.<int/*octet*/>;
+	) : int/*octet*/;
 	/* getter */
-	function get(
-		index : int/*unsigned long*/
-	) : MayBeUndefined.<int/*octet*/>;
+	function get(index : int/*unsigned long*/) : int/*octet*/;
 	/* setter */
 	function set(
 		index : int/*unsigned long*/,
@@ -4995,11 +4973,9 @@ native final class Int16Array extends ArrayBufferView {
 	__readonly__ var length : int/*unsigned long*/;
 	function __native_index_operator__(
 		index : int/*unsigned long*/
-	) : MayBeUndefined.<int/*short*/>;
+	) : int/*short*/;
 	/* getter */
-	function get(
-		index : int/*unsigned long*/
-	) : MayBeUndefined.<int/*short*/>;
+	function get(index : int/*unsigned long*/) : int/*short*/;
 	/* setter */
 	function set(
 		index : int/*unsigned long*/,
@@ -5049,11 +5025,9 @@ native final class Uint16Array extends ArrayBufferView {
 	__readonly__ var length : int/*unsigned long*/;
 	function __native_index_operator__(
 		index : int/*unsigned long*/
-	) : MayBeUndefined.<int/*unsigned short*/>;
+	) : int/*unsigned short*/;
 	/* getter */
-	function get(
-		index : int/*unsigned long*/
-	) : MayBeUndefined.<int/*unsigned short*/>;
+	function get(index : int/*unsigned long*/) : int/*unsigned short*/;
 	/* setter */
 	function set(
 		index : int/*unsigned long*/,
@@ -5103,11 +5077,9 @@ native final class Int32Array extends ArrayBufferView {
 	__readonly__ var length : int/*unsigned long*/;
 	function __native_index_operator__(
 		index : int/*unsigned long*/
-	) : MayBeUndefined.<int/*long*/>;
+	) : int/*long*/;
 	/* getter */
-	function get(
-		index : int/*unsigned long*/
-	) : MayBeUndefined.<int/*long*/>;
+	function get(index : int/*unsigned long*/) : int/*long*/;
 	/* setter */
 	function set(
 		index : int/*unsigned long*/,
@@ -5157,11 +5129,9 @@ native final class Uint32Array extends ArrayBufferView {
 	__readonly__ var length : int/*unsigned long*/;
 	function __native_index_operator__(
 		index : int/*unsigned long*/
-	) : MayBeUndefined.<int/*unsigned long*/>;
+	) : int/*unsigned long*/;
 	/* getter */
-	function get(
-		index : int/*unsigned long*/
-	) : MayBeUndefined.<int/*unsigned long*/>;
+	function get(index : int/*unsigned long*/) : int/*unsigned long*/;
 	/* setter */
 	function set(
 		index : int/*unsigned long*/,
@@ -5210,11 +5180,9 @@ native final class Float32Array extends ArrayBufferView {
 	__readonly__ var length : int/*unsigned long*/;
 	function __native_index_operator__(
 		index : int/*unsigned long*/
-	) : MayBeUndefined.<number/*float*/>;
+	) : number/*float*/;
 	/* getter */
-	function get(
-		index : int/*unsigned long*/
-	) : MayBeUndefined.<number/*float*/>;
+	function get(index : int/*unsigned long*/) : number/*float*/;
 	/* setter */
 	function set(
 		index : int/*unsigned long*/,
@@ -5258,11 +5226,9 @@ native final class Float64Array extends ArrayBufferView {
 	__readonly__ var length : int/*unsigned long*/;
 	function __native_index_operator__(
 		index : int/*unsigned long*/
-	) : MayBeUndefined.<number/*double*/>;
+	) : number/*double*/;
 	/* getter */
-	function get(
-		index : int/*unsigned long*/
-	) : MayBeUndefined.<number/*double*/>;
+	function get(index : int/*unsigned long*/) : number/*double*/;
 	/* setter */
 	function set(
 		index : int/*unsigned long*/,
@@ -7308,7 +7274,7 @@ native final __fake__ class CanvasPixelArray {
 	__readonly__ var length : int/*unsigned long*/;
 	function __native_index_operator__(
 		index : int/*unsigned long*/
-	) : MayBeUndefined.<int/*octet*/>;
+	) : int/*octet*/;
 
 } // end of CanvasPixelArray
 

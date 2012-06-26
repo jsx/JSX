@@ -236,7 +236,7 @@ var TemplateInstantiationRequest = exports.TemplateInstantiationRequest = Class.
 
 });
 
-var CompileError = exports.CompileError = Class.extend({
+var CompileIssue = exports.CompileError = Class.extend({
 
 	constructor: function () {
 		switch (arguments.length) {
@@ -287,11 +287,42 @@ var CompileError = exports.CompileError = Class.extend({
 		sourceLine += Util.repeat(" ", col);
 		sourceLine += Util.repeat("^", this._size);
 
-		return Util.format("[%1:%2] %3\n%4\n",
-						   [this._filename, this._lineNumber, this._message, sourceLine]);
+		return Util.format("[%1:%2] %3%4\n%5\n",
+						   [this._filename, this._lineNumber, this.getPrefix(), this._message, sourceLine]);
 	}
 
 });
 
+var CompileError = exports.CompileError = CompileIssue.extend({
+
+	constructor: function () {
+		CompileIssue.prototype.constructor.apply(this, arguments);
+	},
+
+	getPrefix: function () {
+		return "";
+	}
+
+});
+
+var CompileWarning = exports.CompileWarning = CompileIssue.extend({
+
+	constructor: function () {
+		CompileIssue.prototype.constructor.apply(this, arguments);
+	},
+
+	getPrefix: function () {
+		return "Warning: ";
+	}
+
+});
+
+var DeprecatedWarning = exports.DeprecatedWarning = CompileWarning.extend({
+
+	constructor: function () {
+		CompileWarning.prototype.constructor.apply(this, arguments);
+	}
+
+});
 
 // vim: set noexpandtab:

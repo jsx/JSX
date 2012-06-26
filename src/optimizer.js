@@ -749,16 +749,14 @@ var _FoldConstantCommand = exports._FoldConstantCommand = _FunctionOptimizeComma
 	},
 
 	_toFoldedExpr: function (expr, type) {
-		if (expr instanceof UndefinedExpression) {
-			return expr;
-		} else if (expr instanceof NullExpression) {
+		if (expr instanceof NullExpression) {
 			return expr;
 		} else if (expr instanceof BooleanLiteralExpression) {
 			return expr;
 		} else if (expr instanceof IntegerLiteralExpression) {
 			return expr;
 		} else if (expr instanceof NumberLiteralExpression) {
-			if (type.resolveIfMayBeUndefined().equals(Type.integerType)) {
+			if (type.resolveIfNullable().equals(Type.integerType)) {
 				// cast to integer
 				return new IntegerLiteralExpression(new Token((expr.getToken().getValue() | 0).toString(), null));
 			}
@@ -1036,13 +1034,13 @@ var _InlineOptimizeCommand = exports._InlineOptimizeCommand = _FunctionOptimizeC
 
 	_argIsInlineable: function (actualType, formalType) {
 		if (this._optimizer.enableRuntimeTypeCheck()) {
-			if (actualType instanceof MayBeUndefinedType && ! (formalType instanceof MayBeUndefinedType)) {
+			if (actualType instanceof NullableType && ! (formalType instanceof NullableType)) {
 				return false;
 			}
 		}
-		// strip the MayBeUndefined wrapper and continue the comparison, or return
-		actualType = actualType.resolveIfMayBeUndefined();
-		formalType = formalType.resolveIfMayBeUndefined();
+		// strip the Nullable wrapper and continue the comparison, or return
+		actualType = actualType.resolveIfNullable();
+		formalType = formalType.resolveIfNullable();
 		if (actualType instanceof ObjectType && formalType instanceof ObjectType) {
 			// if both types are object types, allow upcast
 			return actualType.isConvertibleTo(formalType);
@@ -1399,7 +1397,7 @@ var _ArrayLengthOptimizeCommand = exports._ArrayLengthOptimizeCommand = _Functio
 			if (expr instanceof PropertyExpression
 				&& expr.getIdentifierToken().getValue() == "length"
 				&& expr.getExpr() instanceof LocalExpression
-				&& this._typeIsArray(expr.getExpr().getType().resolveIfMayBeUndefined())) {
+				&& this._typeIsArray(expr.getExpr().getType().resolveIfNullable())) {
 				local = expr.getExpr().getLocal();
 				return false;
 			}
@@ -1434,7 +1432,7 @@ var _ArrayLengthOptimizeCommand = exports._ArrayLengthOptimizeCommand = _Functio
 			return true;
 		if (expr instanceof ArrayExpression)
 			return true;
-		var exprType = expr.getType().resolveIfMayBeUndefined();
+		var exprType = expr.getType().resolveIfNullable();
 		if (exprType.equals(Type.variantType))
 			return true;
 		if (this._typeIsArray(exprType))

@@ -2,7 +2,7 @@
 1.5
 2.5
 true
-null
+undefined
 false
 3
 2
