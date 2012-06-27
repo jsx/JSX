@@ -183,6 +183,7 @@ sub process_source_map {
 
         my $t0 = [Time::HiRes::gettimeofday()];
         system "$root/../bin/jsx",
+            "--executable", "web",
             "--enable-source-map",
             "--output", "$jsx_file.js", $jsx_file;
         move($jsx_file . ".js", $dest);

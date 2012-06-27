@@ -87,27 +87,39 @@ var NodePlatform = Platform.extend({
 	},
 
 	// called from JavaScriptEmitter
-	addLauncher: function (emitter, sourceFile, targetCode, entryPoint) {
+	addLauncher: function (emitter, sourceFile, targetCode, entryPoint, executableFor) {
 		if(emitter instanceof JavaScriptEmitter) {
+			targetCode += this.load(this.getRoot() + "/src/js/launcher.js");
 
-			var entryPointClass = Util.format("JSX.require('%1').%2",
-											 [ sourceFile, entryPoint ]);
+			var args = (executableFor === "node" ? "process.argv.slice(2)" : "[]");
 			switch(entryPoint) {
 			case "_Main":
-				return targetCode +
-					entryPointClass + ".main$AS(process.argv.slice(2));\n";
+				launcher = "runMain";
+				break;
 			case "_Test":
-				var s = this.load(this.getRoot() + "/src/js/runtest.js");
-				return targetCode + s +
-					Util.format("$__jsx_runTests(%1$, process.argv.slice(2))", [entryPointClass]);
+				launcher = "runTests";
+				break;
 			default:
 				throw new Error("Unknown entry point type: " +
 								entryPoint);
 			}
+			var callEntryPoint = Util.format("JSX.%1(%2, %3)",
+					[launcher, JSON.stringify(sourceFile), args]);
+
+			if (executableFor === "web") {
+				callEntryPoint = this.wrapOnLoad(callEntryPoint);
+			}
+
+			return targetCode + callEntryPoint + "\n";
 		}
 		else {
 			throw new Error("FIXME");
 		}
+	},
+
+	wrapOnLoad: function (code) {
+		var wrapper = this.load(this.getRoot() + "/src/js/web-launcher.js");
+		return wrapper.replace(/\/\/--CODE--\/\//, code);
 	}
 });
 
@@ -308,7 +320,6 @@ var JSX = Class.extend({
 					process.exit(1);
 				switch (optarg) {
 				case "web": // JavaScriptEmitter
-					throw new Error("FIXME: --executable web");
 					break;
 				case "node": // implies JavaScriptEmitter
 					tasks.push(function () {
@@ -416,7 +427,7 @@ var JSX = Class.extend({
 		if (! result)
 			process.exit(1);
 
-		var output = emitter.getOutput(sourceFile, run);
+		var output = emitter.getOutput(sourceFile, run, executable);
 
 		if (emitter instanceof JavaScriptEmitter) {
 			if (run == null || executable != null) { // compile and save

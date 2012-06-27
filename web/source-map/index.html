@@ -33,7 +33,7 @@
           var jsFile = document.getElementById("source").dataset.file;
           console.assert(jsFile);
           var jsxFile = jsFile.replace(/\.js$/, "");
-          JSX.require(jsxFile)._Main.main$AS([]);
+          JSX.runMain(jsxFile, []);
         });
       });
     </script>

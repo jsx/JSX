@@ -1967,13 +1967,13 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 		return filename;
 	},
 
-	getOutput: function (sourceFile, entryPoint) {
+	getOutput: function (sourceFile, entryPoint, executableFor) {
 		var output = this._output + "\n";
 		if (this._enableProfiler) {
 			output += this._platform.load(this._platform.getRoot() + "/src/js/profiler.js");
 		}
 		if (entryPoint != null) {
-			output = this._platform.addLauncher(this, this._encodeFilename(sourceFile, "system:"), output, entryPoint);
+			output = this._platform.addLauncher(this, this._encodeFilename(sourceFile, "system:"), output, entryPoint, executableFor);
 		}
 		output += "})();\n";
 		if (this._sourceMapGen) {
