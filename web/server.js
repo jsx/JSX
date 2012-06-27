@@ -76,6 +76,8 @@ function serveFile(response, uri, filename) {
 }
 
 function saveProfile(request, response) {
+	var profileDir = "web/.profile";
+
 	response.setHeader("Access-Control-Allow-Origin", "*");
 	response.setHeader("Access-Control-Allow-Methods", "POST,GET,OPTIONS");
 	response.setHeader("Access-Control-Allow-Headers", "Content-Type,*");
@@ -115,18 +117,35 @@ function saveProfile(request, response) {
 		}
 		// save
 		try {
-			fs.mkdirSync("web/.profile");
+			fs.mkdirSync(profileDir);
+			fs.writeFileSync(profileDir + "/results.json", "[]");
 		} catch (e) {
 			// FIXME ignore EEXIST only, but how?
 		}
 		var id = YYYYmmddHHMMSS();
-		fs.writeFileSync("web/.profile/" + id + ".txt", JSON.stringify(json));
+
+		fs.writeFileSync(profileDir + "/" + id + ".txt",
+				JSON.stringify(json));
 		// send response
 		response.writeHead(200, "OK", {
 			"Content-Type": "text/plain"
 		});
 		response.write("saved profile at http://" + request.headers.host + "/web/profiler.html?" + id);
 		response.end();
+
+		// update file list
+		var resultList;
+		try {
+			resultlist = JSON.parse(fs.readSync(profileDir + "/results.json").toString());
+		} catch (e) {
+			// FIXME: better error handling
+			resultList = [];
+		}
+		resultList.push(id);
+		fs.writeFileSync(profileDir + "/results.json",
+				JSON.stringify(resultList));
+
+		console.info("[I] saved profile at http://" + request.headers.host + "/web/profiler.html?" + id);
 	});
 }
 

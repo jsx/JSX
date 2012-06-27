@@ -21,6 +21,7 @@ optimize-bench:
 
 web:
 	perl web/build.pl --clean
+	jsx --executable web --profile --output web/profiler/fireworks.jsx.js web/profiler/fireworks.jsx
 
 server:
 	node web/server.js
