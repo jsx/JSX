@@ -1783,7 +1783,7 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 
 	constructor: function (platform) {
 		this._platform = platform;
-		this._output = this._platform.load(this._platform.getRoot() + "/src/js/bootstrap.js");
+		this._output = "";
 		this._outputEndsWithReturn = this._output.match(/\n$/) != null;
 		this._outputFile = null;
 		this._indent = 0;
@@ -1810,8 +1810,7 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 	saveSourceMappingFile: function (platform) {
 		var gen = this._sourceMapGen;
 		if(gen != null) {
-			platform.save(this._sourceMapGen.getSourceMappingFile(),
-								this._sourceMapGen.generate());
+			platform.save(gen.getSourceMappingFile(), gen.generate());
 		}
 	},
 
@@ -1831,7 +1830,13 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 		this._enableProfiler = enable;
 	},
 
+	addHeader: function (header) {
+		this._output += header;
+	},
+
 	emit: function (classDefs) {
+		var bootstrap = this._platform.load(this._platform.getRoot() + "/src/js/bootstrap.js");
+		this._output += bootstrap;
 		for (var i = 0; i < classDefs.length; ++i) {
 			classDefs[i].forEachMemberFunction(function onFuncDef(funcDef) {
 				funcDef.forEachClosure(onFuncDef);

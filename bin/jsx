@@ -220,9 +220,6 @@ var JSX = Class.extend({
 			case "--output":
 				if((outputFile = getoptarg()) == null)
 					process.exit(1);
-				tasks.push(function() {
-					emitter.setOutputFile(outputFile);
-				});
 				break;
 			case "--mode":
 				if ((optarg = getoptarg()) == null)
@@ -310,9 +307,14 @@ var JSX = Class.extend({
 				if ((optarg = getoptarg()) == null)
 					process.exit(1);
 				switch (optarg) {
-				case "web":
+				case "web": // JavaScriptEmitter
 					throw new Error("FIXME: --executable web");
-				case "node":
+					break;
+				case "node": // implies JavaScriptEmitter
+					tasks.push(function () {
+						var shebang =  "#!" + process.execPath + "\n";
+						emitter.addHeader(shebang);
+					});
 					break;
 				default:
 					console.error("unknown executable type (node|web)");
@@ -399,6 +401,8 @@ var JSX = Class.extend({
 
 		tasks.forEach(function(proc) { proc(); });
 
+		emitter.setOutputFile(outputFile);
+
 		compiler.setEmitter(emitter);
 		compiler.setOptimizer(optimizer);
 
@@ -414,32 +418,25 @@ var JSX = Class.extend({
 
 		var output = emitter.getOutput(sourceFile, run);
 
-		if (run == null || executable != null) { // compile and save
-			if(emitter instanceof JavaScriptEmitter && executable === "node") {
-				// for CLI executable
-				output =  "#!" + process.execPath + "\n" + output;
-			}
+		if (emitter instanceof JavaScriptEmitter) {
+			if (run == null || executable != null) { // compile and save
 
-			platform.save(outputFile, output);
-
-			if (emitter instanceof JavaScriptEmitter) {
-				if (outputFile !== null) {
+				platform.save(outputFile, output);
+				if (outputFile != null) {
 					emitter.saveSourceMappingFile(platform);
 
 					if (executable === "node") {
 						fs.chmodSync(outputFile, "0755");
 					}
 				}
-			}
 
-		}
-		else { // compile and run immediately
-			if(emitter instanceof JavaScriptEmitter) {
+			}
+			else { // compile and run immediately
 				JSX.execNodeJS(output, args.slice(argIndex));
 			}
-			else {
-				throw new Error("FIXME: run C+++ code");
-			}
+		}
+		else {
+			throw new Error("FIXME: C++ emitter");
 		}
 	}
 
