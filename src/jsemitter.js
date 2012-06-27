@@ -1972,10 +1972,10 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 		if (this._enableProfiler) {
 			output += this._platform.load(this._platform.getRoot() + "/src/js/profiler.js");
 		}
-		output += "})();\n";
 		if (entryPoint != null) {
 			output = this._platform.addLauncher(this, this._encodeFilename(sourceFile, "system:"), output, entryPoint);
 		}
+		output += "})();\n";
 		if (this._sourceMapGen) {
 			output += this._sourceMapGen.magicToken();
 		}
