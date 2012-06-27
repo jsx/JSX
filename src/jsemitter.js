@@ -1986,7 +1986,7 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 		this._emit(
 			"/**\n" +
 			" * class " + classDef.getOutputClassName() +
-			(classDef.extendType() != null ? " extends " + classDef.extendType().getClassDef().getOutputClassName() + "\n" : "") +
+			(classDef.extendType() != null ? " extends " + classDef.extendType().getClassDef().getOutputClassName() : "") + "\n" +
 			" * @constructor\n" +
 			" */\n" +
 			"function ", null);
