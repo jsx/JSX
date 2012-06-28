@@ -1258,10 +1258,12 @@ var Parser = exports.Parser = Class.extend({
 	},
 
 	_typeDeclaration: function (allowVoid) {
-		if (allowVoid) {
-			var token = this._expectOpt("void");
-			if (token != null)
-				return Type.voidType;
+		if (this._expectOpt("void") != null) {
+			if (! allowVoid) {
+				this._newError("'void' cannot be used here");
+				return null;
+			}
+			return Type.voidType;
 		}
 		var typeDecl = this._typeDeclarationNoArrayNoVoid();
 		if (typeDecl == null)
@@ -1280,39 +1282,47 @@ var Parser = exports.Parser = Class.extend({
 	},
 
 	_typeDeclarationNoArrayNoVoid: function () {
-		var typeDecl;
 		var token = this._expectOpt([ "MayBeUndefined", "Nullable", "variant" ]);
 		if (token == null) {
 			return this._primaryTypeDeclaration();
 		}
 		switch (token.getValue()) {
 		case "MayBeUndefined":
-			this._newDeprecatedWarning("use of 'MayBeUndefined' is deprerated, use 'Nullable' instead");
+			this._newDeprecatedWarning("use of 'MayBeUndefined' is deprecated, use 'Nullable' instead");
 			// falls through
 		case "Nullable":
-			if (this._expect(".") == null
-				|| this._expect("<") == null)
-				return null;
-			var baseType = this._primaryTypeDeclaration();
-			if (baseType == null)
-				return null;
-			if (this._expect(">") == null)
-				return null;
-			if (this._typeArgs != null) {
-				for (var i = 0; i < this._typeArgs.length; ++i) {
-					if (baseType.equals(new ParsedObjectType(new QualifiedName(this._typeArgs[i], null), []))) {
-						return baseType.toNullableType(true); // instantiation using template type
-					}
-				}
-			}
-			return baseType.toNullableType();
-			break;
+			return this._nullableTypeDeclaration();
 		case "variant":
 			return Type.variantType;
-			break;
 		default:
 			throw new Error("logic flaw");
 		}
+	},
+
+	_nullableTypeDeclaration: function () {
+		if (this._expect(".") == null || this._expect("<") == null)
+			return null;
+		var baseType = this._typeDeclaration(false);
+		if (baseType == null)
+			return null;
+		if (this._expect(">") == null)
+			return null;
+		if (baseType.equals(Type.variantType)) {
+			this._newError("variant cannot be declared as nullable (since it is always nullable)");
+			return null;
+		}
+		if (baseType instanceof NullableType) {
+			this._newError("nested Nullable.<T> is forbidden");
+			return null;
+		}
+		if (this._typeArgs != null) {
+			for (var i = 0; i < this._typeArgs.length; ++i) {
+				if (baseType.equals(new ParsedObjectType(new QualifiedName(this._typeArgs[i], null), []))) {
+					return baseType.toNullableType(true);
+				}
+			}
+		}
+		return baseType.toNullableType();
 	},
 
 	_primaryTypeDeclaration: function () {
