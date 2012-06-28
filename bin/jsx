@@ -210,6 +210,7 @@ var JSX = Class.extend({
 		var outputFile = null;
 		var executable = null;
 		var run = null;
+		var runImmediately = false;
 		var optimizeCommands = [];
 		var opt, optarg;
 		while ((opt = getopt()) != null) {
@@ -328,10 +329,12 @@ var JSX = Class.extend({
 			case "--run":
 				run = "_Main";
 				executable = "node";
+				runImmediately = true;
 				break;
 			case "--test":
 				run = "_Test";
 				executable = "node";
+				runImmediately = true;
 				break;
 			case "--profile":
 				tasks.push(function () {
@@ -423,7 +426,7 @@ var JSX = Class.extend({
 		var output = emitter.getOutput(sourceFile, run, executable);
 
 		if (emitter instanceof JavaScriptEmitter) {
-			if (run == null) { // compile and save
+			if (! runImmediately) { // compile and save
 
 				platform.save(outputFile, output);
 				if (outputFile != null) {
