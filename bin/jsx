@@ -24,7 +24,6 @@
 
 var fs = require("fs");
 var path = require("path");
-var child_process = require("child_process");
 
 var Class = require("../src/Class");
 eval(Class.$import("../src/compiler"));
@@ -135,31 +134,19 @@ var JSX = Class.extend({
 	},
 
 	$execNodeJS: function (scriptFile, script, args) {
-		// XXX: node.js (0.6.x) doesn't suport "--" option :(
 		var tmpdir = process.env.TMPDIR || process.env.TMP || "/tmp";
-		var tmpfile = Util.format("%1/%2.%3.%4.js", [
+		var jsFile = Util.format("%1/%2.%3.%4.js", [
 			tmpdir,
 			path.basename(scriptFile || "-"),
 			process.pid.toString(),
 			Date.now().toString(16)
 		]);
-
-		fs.writeFileSync(tmpfile, script);
+		fs.writeFileSync(jsFile, script);
 		process.on("exit", function() {
-			fs.unlinkSync(tmpfile);
+			fs.unlinkSync(jsFile);
 		});
 
-		var child = child_process.spawn(process.execPath, [tmpfile].concat(args));
-
-		child.stdout.on("data", function (data) {
-			process.stdout.write(data);
-		});
-		child.stderr.on("data", function (data) {
-			process.stderr.write(data);
-		});
-		child.on("exit", function (status) {
-			process.exit(status);
-		});
+		require(jsFile); // evaluate it in this process
 	},
 
 	$printHelp: function () {
