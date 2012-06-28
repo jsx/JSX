@@ -188,7 +188,8 @@ foreach my $file(@files) {
 
     local $typemap{Document} = "HTMLDocument" if $Document_is_HTMLDocument;
 
-    my $content = do {
+    my $content;
+    {
         my $arg = $file;
         if($arg =~ /^https?:/) {
             if($arg =~ /\.idl$/) {
@@ -200,8 +201,12 @@ foreach my $file(@files) {
         }
         open my($fh), $arg; # magic open!
         local $/;
-        <$fh>;
-    };
+        $content = <$fh>;
+        close $fh;
+        if ($? != 0) {
+            die "'$arg' exited with non-zero ($?) status";
+        }
+    }
 
     info 'process <typedef>';
     while($content =~ m{
