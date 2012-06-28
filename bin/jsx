@@ -146,6 +146,7 @@ var JSX = Class.extend({
 			fs.unlinkSync(jsFile);
 		});
 
+		process.argv = [null, null].concat(args);
 		require(jsFile); // evaluate it in this process
 	},
 
@@ -326,9 +327,11 @@ var JSX = Class.extend({
 				break;
 			case "--run":
 				run = "_Main";
+				executable = "node";
 				break;
 			case "--test":
 				run = "_Test";
+				executable = "node";
 				break;
 			case "--profile":
 				tasks.push(function () {
@@ -420,7 +423,7 @@ var JSX = Class.extend({
 		var output = emitter.getOutput(sourceFile, run, executable);
 
 		if (emitter instanceof JavaScriptEmitter) {
-			if (run == null || executable != null) { // compile and save
+			if (run == null) { // compile and save
 
 				platform.save(outputFile, output);
 				if (outputFile != null) {
