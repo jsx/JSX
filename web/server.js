@@ -95,7 +95,12 @@ function saveProfile(request, response) {
 	}
 	function YYYYmmddHHMMSS() {
 		var d = new Date();
-		return d.getFullYear() + twodigits(d.getMonth() + 1) + twodigits(d.getDate()) + twodigits(d.getHours()) + twodigits(d.getMinutes()) + twodigits(d.getSeconds());
+		return d.getFullYear() + '-' +
+			twodigits(d.getMonth() + 1) + '-' +
+			twodigits(d.getDate()) + '-' +
+			twodigits(d.getHours()) +
+			twodigits(d.getMinutes()) +
+			twodigits(d.getSeconds());
 	}
 
 	var body = "";
@@ -118,7 +123,6 @@ function saveProfile(request, response) {
 		// save
 		try {
 			fs.mkdirSync(profileDir);
-			fs.writeFileSync(profileDir + "/results.json", "[]");
 		} catch (e) {
 			// FIXME ignore EEXIST only, but how?
 		}
@@ -133,15 +137,11 @@ function saveProfile(request, response) {
 		response.write("saved profile at http://" + request.headers.host + "/web/profiler.html?" + id);
 		response.end();
 
-		// update file list
-		var resultList;
-		try {
-			resultlist = JSON.parse(fs.readSync(profileDir + "/results.json").toString());
-		} catch (e) {
-			// FIXME: better error handling
-			resultList = [];
-		}
-		resultList.push(id);
+		var resultList = fs.readdirSync(profileDir).filter(function (d) {
+			return /^[\d-]+\.txt$/.test(d);
+		}).map(function(d) {
+			return d.replace(/\.txt$/, "");
+		}).sort().reverse();
 		fs.writeFileSync(profileDir + "/results.json",
 				JSON.stringify(resultList));
 
