@@ -53,7 +53,7 @@ automatically generated from:
 	http://www.w3.org/TR/selectors-api/
 	http://www.w3.org/TR/webmessaging/
 	http://www.w3.org/TR/workers/
-	http://dev.w3.org/html5/eventsource/
+	http://www.w3.org/TR/eventsource/
 	http://html5.org/specs/dom-parsing.html
 	https://www.khronos.org/registry/typedarray/specs/latest/typedarray.idl
 	http://dev.w3.org/html5/2dcontext/
@@ -7321,7 +7321,7 @@ end of generated files from:
 	http://www.w3.org/TR/selectors-api/
 	http://www.w3.org/TR/webmessaging/
 	http://www.w3.org/TR/workers/
-	http://dev.w3.org/html5/eventsource/
+	http://www.w3.org/TR/eventsource/
 	http://html5.org/specs/dom-parsing.html
 	https://www.khronos.org/registry/typedarray/specs/latest/typedarray.idl
 	http://dev.w3.org/html5/2dcontext/
