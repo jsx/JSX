@@ -10,9 +10,8 @@ JSX.runMain = function (sourceFile, args) {
 	if (! module._Main.main$AS) {
 		throw new Error("entry point _Main.main(:string[]):void not found in " + sourceFile);
 	}
-
 	module._Main.main$AS(args);
-}
+};
 
 /**
  * launches _Test#test*():void invoked by jsx --test
@@ -46,4 +45,4 @@ JSX.runTests = function (sourceFile, tests) {
 
 	if (test.afterClass$ != null)
 		test.afterClass$();
-}
+};
