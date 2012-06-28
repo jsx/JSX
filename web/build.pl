@@ -182,10 +182,12 @@ sub process_source_map {
         next if not modified($jsx_file, "$dest/$jsx_file");
 
         my $t0 = [Time::HiRes::gettimeofday()];
-        system "$root/../bin/jsx",
+        system("$root/../bin/jsx",
             "--executable", "web",
             "--enable-source-map",
-            "--output", "$jsx_file.js", $jsx_file;
+            "--output", "$jsx_file.js",
+            $jsx_file) == 0 or die;
+
         move($jsx_file . ".js", $dest);
         move($jsx_file . ".js.mapping", $dest);
 
