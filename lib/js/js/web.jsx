@@ -995,6 +995,8 @@ native class MouseEvent extends UIEvent {
 	__readonly__ var y : int/*long*/;
 	__readonly__ var offsetX : int/*long*/;
 	__readonly__ var offsetY : int/*long*/;
+	__readonly__ var layerX : int/*long*/;
+	__readonly__ var layerY : int/*long*/;
 
 } // end of MouseEvent
 
