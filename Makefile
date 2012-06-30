@@ -32,4 +32,25 @@ web.jsx:
 	idl2jsx/maketest.pl > t/lib/010.web.jsx
 	bin/jsx --test t/lib/010.web.jsx
 
+update-assets: update-bootstrap update-codemirror
+
+update-codemirror:
+	curl -LO http://codemirror.net/codemirror.zip
+	unzip -o codemirror.zip
+	cp CodeMirror-*/lib/codemirror.css            web/assets/css
+	cp CodeMirror-*/lib/codemirror.js             web/assets/js
+	cp CodeMirror-*/mode/javascript/javascript.js web/assets/js/mode
+	cp CodeMirror-*/mode/clike/clike.js           web/assets/js/mode
+
+update-bootstrap:
+	curl -LO http://twitter.github.com/bootstrap/assets/bootstrap.zip
+	unzip -o bootstrap.zip
+	cp bootstrap/css/*.* web/assets/css
+	cp bootstrap/img/*.* web/assets/img
+	cp bootstrap/js/*.*  web/assets/js
+
+
+clean:
+	rm -rf CodeMirror-* codemirror.zip
+
 .PHONY: test web server
