@@ -33,6 +33,10 @@ var Util = exports.Util = Class.extend({
 		return r;
 	},
 
+	$cloneNullable: function (o) {
+		return o == null ? null : o.clone();
+	},
+
 	$serializeArray: function (a) {
 		if (a == null)
 			return null;

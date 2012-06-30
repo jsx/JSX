@@ -221,7 +221,7 @@ var ReturnStatement = exports.ReturnStatement = Statement.extend({
 	},
 
 	clone: function () {
-		return new ReturnStatement(this._token, this._expr.clone());
+		return new ReturnStatement(this._token, Util.cloneNullable(this._expr));
 	},
 
 	getToken: function () {
@@ -676,13 +676,13 @@ var ForStatement = exports.ForStatement = ContinuableStatement.extend({
 
 	constructor: function (token, label, initExpr, condExpr, postExpr, statements) {
 		ContinuableStatement.prototype.constructor.call(this, token, label, statements);
-		this._initExpr = initExpr;
-		this._condExpr = condExpr;
-		this._postExpr = postExpr;
+		this._initExpr = initExpr; // nullable
+		this._condExpr = condExpr; // nullable
+		this._postExpr = postExpr; // nullable
 	},
 
 	clone: function () {
-		return new ForStatement(this._token, this._label, this._initExpr.clone(), this._condExpr.clone(), this._postExpr.clone(), Util.cloneArray(this._statements));
+		return new ForStatement(this._token, this._label, Util.cloneNullable(this._initExpr), Util.cloneNullable(this._condExpr), Util.cloneNullable(this._postExpr), Util.cloneArray(this._statements));
 	},
 
 	getInitExpr: function () {
@@ -1033,7 +1033,7 @@ var WhileStatement = exports.WhileStatement = ContinuableStatement.extend({
 	},
 
 	clone: function () {
-		return new WhileStatement(this._token, this._label, this._expr.clone(), Util.cloneARray(this._statements));
+		return new WhileStatement(this._token, this._label, this._expr.clone(), Util.cloneArray(this._statements));
 	},
 
 	getExpr: function () {
