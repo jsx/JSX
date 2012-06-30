@@ -52,5 +52,6 @@ update-bootstrap:
 
 clean:
 	rm -rf CodeMirror-* codemirror.zip
+	rm -rf bootstrap*
 
 .PHONY: test web server
