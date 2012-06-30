@@ -9,6 +9,14 @@
     <!-- Le fav and touch icons -->
     <link rel="shortcut icon" href="assets/favicon.ico">
 
+    <!-- CodeMirror2 settings -->
+    <link href="assets/css/codemirror.css" rel="stylesheet">
+    <script src="assets/js/codemirror.js"></script>
+    <script src="assets/js/mode/javascript.js"></script>
+    <script src="assets/js/mode/clike.js"></script>
+    <script src="assets/js/mode/jsx.js"></script>
+
+    <!-- JSX compiler and web interface -->
     <script src="build/jsx-compiler.js"></script>
     <script src="assets/js/require-simple.js"></script>
     <script src="assets/js/web.js"></script>
@@ -24,9 +32,10 @@
       .sidebar-nav {
         padding: 9px 0;
       }
-      .console {
-        height: 600px;
-        font-family: "Courier New", monospace;
+
+      .CodeMirror-scroll {
+        height: 30em;
+        width:  28em;
       }
 
       #source-list {
@@ -90,31 +99,17 @@
           </div><!--/.well -->
         </div><!--/span-->
         <div class="row">
-            <div class="span5"><textarea class="span5 console" data-path="input" id="input">// write source code here</textarea></div>
-            <div class="span5"><textarea class="span5 console" id="output"></textarea></div>
+          <div class="span5">
+            <textarea data-path="input" id="input">// write source code here</textarea>
+          </div>
+          <div class="span5">
+            <textarea id="output"></textarea>
+          </div>
         </div><!--/span-->
       </div><!--/row-->
 
     </div><!--/.fluid-container-->
 
-    <!-- Le javascript
-    ================================================== -->
-    <!-- Placed at the end of the document so the pages load faster -->
-    <!--
-    <script src="../assets/js/jquery.js"></script>
-    <script src="../assets/js/bootstrap-transition.js"></script>
-    <script src="../assets/js/bootstrap-alert.js"></script>
-    <script src="../assets/js/bootstrap-modal.js"></script>
-    <script src="../assets/js/bootstrap-dropdown.js"></script>
-    <script src="../assets/js/bootstrap-scrollspy.js"></script>
-    <script src="../assets/js/bootstrap-tab.js"></script>
-    <script src="../assets/js/bootstrap-tooltip.js"></script>
-    <script src="../assets/js/bootstrap-popover.js"></script>
-    <script src="../assets/js/bootstrap-button.js"></script>
-    <script src="../assets/js/bootstrap-collapse.js"></script>
-    <script src="../assets/js/bootstrap-carousel.js"></script>
-    <script src="../assets/js/bootstrap-typeahead.js"></script>
-    -->
   </body>
 </html>
 <!-- vim: set tabstop=2 : -->

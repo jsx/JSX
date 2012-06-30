@@ -20,14 +20,34 @@ window.addEventListener('load', function(e) {
 	var list   = element('source-list');
 
 	var input  = element('input');
-	var output = element('output');
+
+	var editor = CodeMirror.fromTextArea(input, {
+		mode: "application/jsx",
+		lineNumbers: true,
+		lineWrapping: true,
+		autofocus: true,
+
+		extraKeys: {
+			"'\u00A5'" /* yen mark */ : function (editor) {
+				editor.replaceSelection("\u005c"); // backslash
+				var cursor = editor.getCursor();
+				editor.setSelection(cursor);
+			}
+		},
+	});
+
+	var output = CodeMirror.fromTextArea(element("output"), {
+		mode: "javascript",
+		lineNumbers: true,
+		lineWrapping: true,
+		readOnly: true
+	});
 
 	function saveInput(input) {
 		var session = {
-			inputPath:      input.dataset["path"],
-			source:         input.value,
-			selectionStart: input.selectionStart,
-			selectionEnd:   input.selectionEnd,
+			inputPath:         input.dataset["path"],
+			source:            editor.getValue(),
+			cursor:            editor.getCursor(),
 			optimizationLevel: getOptimizationLevel()
 		};
 		sessionStorage.setItem("jsx.session", JSON.stringify(session));
@@ -39,9 +59,8 @@ window.addEventListener('load', function(e) {
 			var session = JSON.parse(serializedSession);
 
 			input.dataset["path"] = session.inputPath;
-			input.value = session.source;
-			input.setSelectionRange(session.selectionStart,
-									session.selectionEnd);
+			editor.setValue(session.source);
+			editor.setCursor(session.cursor.line, session.cursor.ch);
 
 			var items = document.getElementsByName("optimization-level");
 			for(var i = 0; i < items.length; ++i) {
@@ -60,11 +79,11 @@ window.addEventListener('load', function(e) {
 	function compile(options) {
 		console.log('compile with ' + JSON.stringify(options));
 
-		output.value = '';
+		output.setValue("");
 		var path = input.dataset["path"];
 
 		var platform = new jsx.BrowserPlatform(".");
-		platform.setContent(path, input.value);
+		platform.setContent(path, editor.getValue());
 
 		var c = new jsx.Compiler(platform);
 		var emitter = new jsx.JavaScriptEmitter(platform);
@@ -98,10 +117,10 @@ window.addEventListener('load', function(e) {
 		console.log(c);
 
 		if (success) {
-			output.style.color = "black";
-
+			output.setOption("mode", "javascript");
+			
 			if (options.mode === 'parse') {
-				output.value = c.getAST();
+				output.setValue(c.getAST());
 				return;
 			}
 
@@ -115,17 +134,16 @@ window.addEventListener('load', function(e) {
 										 : "ADVANCED_OPTIMIZATIONS");
 			}
 
-			output.value = out;
+			output.setValue(out);
 
 			if(options.mode === 'run') {
 				console.log('run:');
-				var f = new Function(output.value);
-				f();
+				eval(output.getValue());
 			}
 		}
 		else if(platform.getErrors().length !== 0){
-			output.style.color = "red";
-			output.value = "ERROR!\n" + platform.getErrors().join("");
+			output.setOption("mode", "");
+			output.setValue("ERROR!\n" + platform.getErrors().join(""));
 		}
 	}
 
@@ -151,7 +169,7 @@ window.addEventListener('load', function(e) {
 			xhr.onreadystatechange = function(e) {
 				if (xhr.readyState !== 4) return;
 
-				input.value = xhr.responseText.replace(/\t/g, "  ");
+				editor.setValue(xhr.responseText.replace(/\t/g, "  "));
 
 				forEach(list.getElementsByTagName("li"), function(li) {
 					if(!li.className.match(/\bsource-file\b/)) return;
@@ -165,37 +183,6 @@ window.addEventListener('load', function(e) {
 			xhr.open("GET", url);
 			xhr.send(null);
 		});
-	});
-
-	function inputStr(event, input, str) {
-		event.stopPropagation();
-		event.preventDefault();
-
-		var s = input.selectionStart;
-		var c = input.value;
-
-		input.value = c.substring(0, s) +
-					  str +
-					  c.substring(s, c.length);
-		s += str.length;
-		input.setSelectionRange(s, s);
-	}
-
-	// hack to input 2 spaces by the tab key
-	input.addEventListener('keydown', function(event) {
-		if(event.keyCode === "\t".charCodeAt(0)) {
-			inputStr(event, input, "  ");
-		}
-		else if(event.keyCode === "\r".charCodeAt(0)) {
-			// auto indent
-			var s = input.value.substring(0, input.selectionStart);
-			var lastLine = s.split(/^/m).pop();
-			var indent = lastLine.match(/^[ \t]*/)[0];
-			inputStr(event, input, "\n" + indent);
-		}
-		else if(event.keyIdentifier === "U+00A5" /* yen mark */) {
-			inputStr(event, input, "\u005C" /* backslash */);
-		}
 	});
 
 	window.addEventListener('keyup', function(event) {
@@ -227,5 +214,4 @@ window.addEventListener('load', function(e) {
 
 	retrieveInput(input);
 
-	input.focus();
 });
