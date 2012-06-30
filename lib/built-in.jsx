@@ -63,7 +63,6 @@ native final class Array.<T> {
 	function slice(start : int, end : int) : Array.<T>;
 	function sort() : Array.<T>;
 	function sort(comparefn : function (x : Nullable.<T>, y : Nullable.<T>) : int) : Array.<T>;
-	function sort(comparefn : function (x : Nullable.<T>, y : Nullable.<T>) : number) : Array.<T>;
 	function splice(start : int, deleteCount : int, ...item : T) : Array.<T>;
 	function unshift(...item : T) : int;
 
