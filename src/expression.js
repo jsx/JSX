@@ -1375,7 +1375,7 @@ var ArrayExpression = exports.ArrayExpression = BinaryExpression.extend({
 	_analyzeApplicationOnVariant: function (context) {
 		var expr2Type = this._expr2.getType().resolveIfNullable();
 		if (! (expr2Type.equals(Type.stringType) || expr2Type.isConvertibleTo(Type.numberType))) {
-			context.errors.push(new CompileError("the argument of variant[] should be a string or a number"));
+			context.errors.push(new CompileError(this._token, "the argument of variant[] should be a string or a number"));
 			return false;
 		}
 		this._type = Type.variantType;
