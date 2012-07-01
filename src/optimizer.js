@@ -1401,7 +1401,7 @@ var _ArrayLengthOptimizeCommand = exports._ArrayLengthOptimizeCommand = _Functio
 				local = expr.getExpr().getLocal();
 				return false;
 			}
-			return expr.forEachExpression(onExpr);
+			return expr.forEachExpression(onExpr.bind(this));
 		}.bind(this));
 		return local;
 	},
