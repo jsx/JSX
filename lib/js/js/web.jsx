@@ -458,8 +458,6 @@ native class Document extends Node {
 	function createTouchList(touches : Touch[]) : TouchList;
 	function createTouchList(touch : Touch) : TouchList;
 
-	// implements NodeSelector
-
 	function querySelector(selectors : string/*DOMString*/) : Element;
 	function querySelectorAll(
 		selectors : string/*DOMString*/
@@ -500,8 +498,6 @@ native final class DocumentFragment extends Node {
 	function prepend(...nodes : string/*DOMString*/) : void;
 	function append(...nodes : Node) : void;
 	function append(...nodes : string/*DOMString*/) : void;
-
-	// implements NodeSelector
 
 	function querySelector(selectors : string/*DOMString*/) : Element;
 	function querySelectorAll(
@@ -606,8 +602,6 @@ native class Element extends Node {
 	__readonly__ var clientLeft : int/*long*/;
 	__readonly__ var clientWidth : int/*long*/;
 	__readonly__ var clientHeight : int/*long*/;
-
-	// implements NodeSelector
 
 	function querySelector(selectors : string/*DOMString*/) : Element;
 	function querySelectorAll(
@@ -4548,15 +4542,6 @@ native final class StorageEventInit extends EventInit {
 	var storageArea : Storage;
 
 } // end of StorageEventInit
-
-native __fake__ class NodeSelector {
-
-	function querySelector(selectors : string/*DOMString*/) : Element;
-	function querySelectorAll(
-		selectors : string/*DOMString*/
-	) : NodeList;
-
-} // end of NodeSelector
 
 native final class MessageEvent extends Event {
 
