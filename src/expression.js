@@ -136,11 +136,15 @@ var OperatorExpression = exports.OperatorExpression = Expression.extend({
 		Expression.prototype.constructor.call(this, tokenOrThat);
 	},
 
-	assertIsConvertibleTo: function (context, expr, type, mayUnbox) {
+	isConvertibleTo: function (context, expr, type, mayUnbox) {
 		var exprType = expr.getType().resolveIfNullable();
 		if (mayUnbox && type instanceof PrimitiveType && exprType instanceof ObjectType && exprType.getClassDef() == type.getClassDef())
 			return true;
-		if (! exprType.isConvertibleTo(type)) {
+		return exprType.isConvertibleTo(type);
+	},
+
+	assertIsConvertibleTo: function (context, expr, type, mayUnbox) {
+		if (! this.isConvertibleTo(context, expr, type, mayUnbox)) {
 			context.errors.push(new CompileError(this._token, "cannot apply operator '" + this._token.getValue() + "' to type '" + exprType.toString() + "'"));
 			return false;
 		}
@@ -1509,11 +1513,10 @@ var BinaryNumberExpression = exports.BinaryNumberExpression = BinaryExpression.e
 		case "<=":
 		case ">":
 		case ">=":
-			var expr1Type = this._expr1.getType().resolveIfNullable();
-			if (expr1Type.isConvertibleTo(Type.numberType)) {
+			if (this.isConvertibleTo(context, this._expr1, Type.numberType, true)) {
 			  return this.assertIsConvertibleTo(context, this._expr2, Type.numberType, true);
 			}
-			if(expr1Type.isConvertibleTo(Type.stringType)) {
+			if (this.isConvertibleTo(context, this._expr1, Type.stringType, true)) {
 			  return this.assertIsConvertibleTo(context, this._expr2, Type.stringType, true);
 			}
 			context.errors.push(new CompileError(this._token, "cannot apply operator '" + this._token.getValue() + "' to type '" + expr1Type.toString() + "'"));
