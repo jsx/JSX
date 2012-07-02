@@ -87,9 +87,14 @@ var Util = exports.Util = Class.extend({
 				var expectedCallbackType = null;
 				for (var j = 0; j < expectedCallbackTypes.length; ++j) {
 					if (expectedCallbackTypes[j][i].getArgumentTypes().length == funcDef.getArguments().length) {
-						if (expectedCallbackType != null)
+						if (expectedCallbackType == null) {
+							expectedCallbackType = expectedCallbackTypes[j][i];
+						} else if (Util.typesAreEqual(expectedCallbackType.getArgumentTypes(), expectedCallbackTypes[j][i].getArgumentTypes())
+							&& expectedCallbackType.getReturnType().equals(expectedCallbackTypes[j][i].getReturnType())) {
+							// function signatures are equal
+						} else {
 							break;
-						expectedCallbackType = expectedCallbackTypes[j][i];
+						}
 					}
 				}
 				if (j != expectedCallbackTypes.length) {
