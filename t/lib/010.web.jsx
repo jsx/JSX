@@ -68,6 +68,8 @@ class _Test extends TestCase {
 
     // #3
     function compile_Event(o : Event) : void {
+        var c1 = new Event(X.getstring());
+        var c2 = new Event(X.getstring(), X.getEventInit());
         var v1 : string/*DOMString*/ = o.type;
         var v2 : EventTarget = o.target;
         var v3 : EventTarget = o.currentTarget;
@@ -89,39 +91,24 @@ class _Test extends TestCase {
         o.initEvent(X.getstring(), X.getboolean(), X.getboolean());
         var v16 : int/*unsigned short*/ = Event.NONE;
         var v17 : int/*unsigned short*/ = o.NONE;
-        var v18 : int/*unsigned short*/ = Event.CAPTURING_PHASE;
-        var v19 : int/*unsigned short*/ = o.CAPTURING_PHASE;
-        var v20 : int/*unsigned short*/ = Event.AT_TARGET;
-        var v21 : int/*unsigned short*/ = o.AT_TARGET;
-        var v22 : int/*unsigned short*/ = Event.BUBBLING_PHASE;
-        var v23 : int/*unsigned short*/ = o.BUBBLING_PHASE;
-        var v24 : string/*DOMString*/ = o.type;
-        var v25 : EventTarget = o.target;
-        var v26 : EventTarget = o.currentTarget;
-        var v27 : int/*unsigned short*/ = o.eventPhase;
-        var v28 : boolean = o.bubbles;
-        var v29 : boolean = o.cancelable;
-        var v30 : number/*DOMTimeStamp*/ = o.timeStamp;
-        o.stopPropagation();
-        o.preventDefault();
         o.initEvent(X.getstring(), X.getboolean(), X.getboolean());
-        o.stopImmediatePropagation();
-        var v31 : boolean = o.defaultPrevented;
-        var v32 : boolean = o.isTrusted;
+        var c3 = new Event(X.getstring());
+        var c4 = new Event(X.getstring(), X.getEventInit());
     } // Event
 
     // #4
     function compile_EventInit(o : EventInit) : void {
         var v1 : boolean = o.bubbles;
         var v2 : boolean = o.cancelable;
-        var v3 : boolean = o.bubbles;
-        var v4 : boolean = o.cancelable;
     } // EventInit
 
     // #5
     function compile_CustomEvent(o : CustomEvent) : void {
+        var c1 = new CustomEvent(X.getstring());
+        var c2 = new CustomEvent(X.getstring(), X.getCustomEventInit());
         var v1 : variant/*any*/ = o.detail;
-        var v2 : variant/*any*/ = o.detail;
+        var c3 = new CustomEvent(X.getstring());
+        var c4 = new CustomEvent(X.getstring(), X.getCustomEventInit());
         o.initCustomEvent(X.getstring(), X.getboolean(), X.getboolean(), X.getvariant());
     } // CustomEvent
 
@@ -130,7 +117,6 @@ class _Test extends TestCase {
         var v1 : variant/*any*/ = o.detail;
         var v2 : boolean = o.bubbles;
         var v3 : boolean = o.cancelable;
-        var v4 : variant/*any*/ = o.detail;
     } // CustomEventInit
 
     // #7
@@ -144,11 +130,11 @@ class _Test extends TestCase {
         o.addEventListener(X.getstring(), X.getfunction__Event__void(), X.getboolean());
         o.removeEventListener(X.getstring(), X.getfunction__Event__void());
         o.removeEventListener(X.getstring(), X.getfunction__Event__void(), X.getboolean());
-        var f2 : boolean = o.dispatchEvent(X.getEvent());
     } // EventTarget
 
     // #8
     function compile_MutationObserver(o : MutationObserver) : void {
+        var c1 = new MutationObserver(X.getfunction_mutations_MutationRecord___observer_MutationObserver__void());
         o.observe(X.getNode(), X.getMutationObserverInit());
         o.disconnect();
     } // MutationObserver
@@ -209,39 +195,39 @@ class _Test extends TestCase {
         var v28 : Document = o.ownerDocument;
         var v29 : Node = o.parentNode;
         var v30 : Element = o.parentElement;
-        var f31 : boolean = o.hasChildNodes();
-        var v32 : NodeList = o.childNodes;
-        var v33 : Node = o.firstChild;
-        var v34 : Node = o.lastChild;
-        var v35 : Node = o.previousSibling;
-        var v36 : Node = o.nextSibling;
-        var v37 : int/*unsigned short*/ = Node.DOCUMENT_POSITION_DISCONNECTED;
-        var v38 : int/*unsigned short*/ = o.DOCUMENT_POSITION_DISCONNECTED;
-        var v39 : int/*unsigned short*/ = Node.DOCUMENT_POSITION_PRECEDING;
-        var v40 : int/*unsigned short*/ = o.DOCUMENT_POSITION_PRECEDING;
-        var v41 : int/*unsigned short*/ = Node.DOCUMENT_POSITION_FOLLOWING;
-        var v42 : int/*unsigned short*/ = o.DOCUMENT_POSITION_FOLLOWING;
-        var v43 : int/*unsigned short*/ = Node.DOCUMENT_POSITION_CONTAINS;
-        var v44 : int/*unsigned short*/ = o.DOCUMENT_POSITION_CONTAINS;
-        var v45 : int/*unsigned short*/ = Node.DOCUMENT_POSITION_CONTAINED_BY;
-        var v46 : int/*unsigned short*/ = o.DOCUMENT_POSITION_CONTAINED_BY;
-        var v47 : int/*unsigned short*/ = Node.DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC;
-        var v48 : int/*unsigned short*/ = o.DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC;
-        var f49 : int/*unsigned short*/ = o.compareDocumentPosition(X.getNode());
-        var f50 : boolean = o.contains(X.getNode());
-        var v51 : Nullable.<string>/*DOMString?*/ = o.nodeValue;
-        var v52 : Nullable.<string>/*DOMString?*/ = o.textContent;
-        var f53 : Node = o.insertBefore(X.getNode(), X.getNode());
-        var f54 : Node = o.appendChild(X.getNode());
-        var f55 : Node = o.replaceChild(X.getNode(), X.getNode());
-        var f56 : Node = o.removeChild(X.getNode());
+        var f1 : boolean = o.hasChildNodes();
+        var v31 : NodeList = o.childNodes;
+        var v32 : Node = o.firstChild;
+        var v33 : Node = o.lastChild;
+        var v34 : Node = o.previousSibling;
+        var v35 : Node = o.nextSibling;
+        var v36 : int/*unsigned short*/ = Node.DOCUMENT_POSITION_DISCONNECTED;
+        var v37 : int/*unsigned short*/ = o.DOCUMENT_POSITION_DISCONNECTED;
+        var v38 : int/*unsigned short*/ = Node.DOCUMENT_POSITION_PRECEDING;
+        var v39 : int/*unsigned short*/ = o.DOCUMENT_POSITION_PRECEDING;
+        var v40 : int/*unsigned short*/ = Node.DOCUMENT_POSITION_FOLLOWING;
+        var v41 : int/*unsigned short*/ = o.DOCUMENT_POSITION_FOLLOWING;
+        var v42 : int/*unsigned short*/ = Node.DOCUMENT_POSITION_CONTAINS;
+        var v43 : int/*unsigned short*/ = o.DOCUMENT_POSITION_CONTAINS;
+        var v44 : int/*unsigned short*/ = Node.DOCUMENT_POSITION_CONTAINED_BY;
+        var v45 : int/*unsigned short*/ = o.DOCUMENT_POSITION_CONTAINED_BY;
+        var v46 : int/*unsigned short*/ = Node.DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC;
+        var v47 : int/*unsigned short*/ = o.DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC;
+        var f2 : int/*unsigned short*/ = o.compareDocumentPosition(X.getNode());
+        var f3 : boolean = o.contains(X.getNode());
+        var v48 : Nullable.<string>/*DOMString?*/ = o.nodeValue;
+        var v49 : Nullable.<string>/*DOMString?*/ = o.textContent;
+        var f4 : Node = o.insertBefore(X.getNode(), X.getNode());
+        var f5 : Node = o.appendChild(X.getNode());
+        var f6 : Node = o.replaceChild(X.getNode(), X.getNode());
+        var f7 : Node = o.removeChild(X.getNode());
         o.normalize();
-        var f57 : Node = o.cloneNode();
-        var f58 : Node = o.cloneNode(X.getboolean());
-        var f59 : boolean = o.isEqualNode(X.getNode());
-        var f60 : string/*DOMString*/ = o.lookupPrefix(X.getNullable__string_());
-        var f61 : string/*DOMString*/ = o.lookupNamespaceURI(X.getNullable__string_());
-        var f62 : boolean = o.isDefaultNamespace(X.getNullable__string_());
+        var f8 : Node = o.cloneNode();
+        var f9 : Node = o.cloneNode(X.getboolean());
+        var f10 : boolean = o.isEqualNode(X.getNode());
+        var f11 : string/*DOMString*/ = o.lookupPrefix(X.getNullable__string_());
+        var f12 : string/*DOMString*/ = o.lookupNamespaceURI(X.getNullable__string_());
+        var f13 : boolean = o.isDefaultNamespace(X.getNullable__string_());
     } // Node
 
     // #12
@@ -254,45 +240,45 @@ class _Test extends TestCase {
         var v6 : string/*DOMString*/ = o.contentType;
         var v7 : DocumentType = o.doctype;
         var v8 : Element = o.documentElement;
-        var f9 : HTMLCollection = o.getElementsByTagName(X.getstring());
-        var f10 : HTMLCollection = o.getElementsByTagNameNS(X.getNullable__string_(), X.getstring());
-        var f11 : HTMLCollection = o.getElementsByClassName(X.getstring());
-        var f12 : Element = o.getElementById(X.getstring());
-        var f13 : Element = o.createElement(X.getstring());
-        var f14 : Element = o.createElementNS(X.getNullable__string_(), X.getstring());
-        var f15 : DocumentFragment = o.createDocumentFragment();
-        var f16 : Text = o.createTextNode(X.getstring());
-        var f17 : Comment = o.createComment(X.getstring());
-        var f18 : ProcessingInstruction = o.createProcessingInstruction(X.getstring(), X.getstring());
-        var f19 : Node = o.importNode(X.getNode());
-        var f20 : Node = o.importNode(X.getNode(), X.getboolean());
-        var f21 : Node = o.adoptNode(X.getNode());
-        var f22 : Event = o.createEvent(X.getstring());
-        var f23 : Range = o.createRange();
-        var f24 : NodeIterator = o.createNodeIterator(X.getNode());
-        var f25 : NodeIterator = o.createNodeIterator(X.getNode(), X.getint());
-        var f26 : NodeIterator = o.createNodeIterator(X.getNode(), X.getint(), X.getNodeFilter());
-        var f27 : TreeWalker = o.createTreeWalker(X.getNode());
-        var f28 : TreeWalker = o.createTreeWalker(X.getNode(), X.getint());
-        var f29 : TreeWalker = o.createTreeWalker(X.getNode(), X.getint(), X.getNodeFilter());
+        var f1 : HTMLCollection = o.getElementsByTagName(X.getstring());
+        var f2 : HTMLCollection = o.getElementsByTagNameNS(X.getNullable__string_(), X.getstring());
+        var f3 : HTMLCollection = o.getElementsByClassName(X.getstring());
+        var f4 : Element = o.getElementById(X.getstring());
+        var f5 : Element = o.createElement(X.getstring());
+        var f6 : Element = o.createElementNS(X.getNullable__string_(), X.getstring());
+        var f7 : DocumentFragment = o.createDocumentFragment();
+        var f8 : Text = o.createTextNode(X.getstring());
+        var f9 : Comment = o.createComment(X.getstring());
+        var f10 : ProcessingInstruction = o.createProcessingInstruction(X.getstring(), X.getstring());
+        var f11 : Node = o.importNode(X.getNode());
+        var f12 : Node = o.importNode(X.getNode(), X.getboolean());
+        var f13 : Node = o.adoptNode(X.getNode());
+        var f14 : Event = o.createEvent(X.getstring());
+        var f15 : Range = o.createRange();
+        var f16 : NodeIterator = o.createNodeIterator(X.getNode());
+        var f17 : NodeIterator = o.createNodeIterator(X.getNode(), X.getint());
+        var f18 : NodeIterator = o.createNodeIterator(X.getNode(), X.getint(), X.getNodeFilter());
+        var f19 : TreeWalker = o.createTreeWalker(X.getNode());
+        var f20 : TreeWalker = o.createTreeWalker(X.getNode(), X.getint());
+        var f21 : TreeWalker = o.createTreeWalker(X.getNode(), X.getint(), X.getNodeFilter());
         o.prepend(X.getNode());
         o.prepend(X.getstring());
         o.append(X.getNode());
         o.append(X.getstring());
-        var f30 : Event = o.createEvent(X.getstring());
-        var v31 : StyleSheet[]/*StyleSheetList*/ = o.styleSheets;
-        var v32 : Nullable.<string>/*DOMString?*/ = o.selectedStyleSheetSet;
-        var v33 : Nullable.<string>/*DOMString?*/ = o.lastStyleSheetSet;
-        var v34 : Nullable.<string>/*DOMString?*/ = o.preferredStyleSheetSet;
-        var v35 : DOMStringList = o.styleSheetSets;
+        var f22 : Event = o.createEvent(X.getstring());
+        var v9 : StyleSheet[]/*StyleSheetList*/ = o.styleSheets;
+        var v10 : Nullable.<string>/*DOMString?*/ = o.selectedStyleSheetSet;
+        var v11 : Nullable.<string>/*DOMString?*/ = o.lastStyleSheetSet;
+        var v12 : Nullable.<string>/*DOMString?*/ = o.preferredStyleSheetSet;
+        var v13 : DOMStringList = o.styleSheetSets;
         o.enableStyleSheetsForSet(X.getNullable__string_());
-        var f36 : Element = o.elementFromPoint(X.getnumber(), X.getnumber());
-        var f37 : CaretPosition = o.caretPositionFromPoint(X.getnumber(), X.getnumber());
-        var f38 : Touch = o.createTouch(X.getAbstractView(), X.getEventTarget(), X.getint(), X.getint(), X.getint(), X.getint(), X.getint());
-        var f39 : TouchList = o.createTouchList(X.getTouch__());
-        var f40 : TouchList = o.createTouchList(X.getTouch());
-        var f41 : Element = o.querySelector(X.getstring());
-        var f42 : NodeList = o.querySelectorAll(X.getstring());
+        var f23 : Element = o.elementFromPoint(X.getnumber(), X.getnumber());
+        var f24 : CaretPosition = o.caretPositionFromPoint(X.getnumber(), X.getnumber());
+        var f25 : Touch = o.createTouch(X.getAbstractView(), X.getEventTarget(), X.getint(), X.getint(), X.getint(), X.getint(), X.getint());
+        var f26 : TouchList = o.createTouchList(X.getTouch__());
+        var f27 : TouchList = o.createTouchList(X.getTouch());
+        var f28 : Element = o.querySelector(X.getstring());
+        var f29 : NodeList = o.querySelectorAll(X.getstring());
     } // Document
 
     // #13
@@ -342,23 +328,23 @@ class _Test extends TestCase {
         var v6 : string/*DOMString*/ = o.className;
         var v7 : DOMTokenList = o.classList;
         var v8 : Attr[] = o.attributes;
-        var f9 : Nullable.<string>/*DOMString?*/ = o.getAttribute(X.getstring());
-        var f10 : Nullable.<string>/*DOMString?*/ = o.getAttributeNS(X.getNullable__string_(), X.getstring());
+        var f1 : Nullable.<string>/*DOMString?*/ = o.getAttribute(X.getstring());
+        var f2 : Nullable.<string>/*DOMString?*/ = o.getAttributeNS(X.getNullable__string_(), X.getstring());
         o.setAttribute(X.getstring(), X.getstring());
         o.setAttributeNS(X.getNullable__string_(), X.getstring(), X.getstring());
         o.removeAttribute(X.getstring());
         o.removeAttributeNS(X.getNullable__string_(), X.getstring());
-        var f11 : boolean = o.hasAttribute(X.getstring());
-        var f12 : boolean = o.hasAttributeNS(X.getNullable__string_(), X.getstring());
-        var f13 : HTMLCollection = o.getElementsByTagName(X.getstring());
-        var f14 : HTMLCollection = o.getElementsByTagNameNS(X.getNullable__string_(), X.getstring());
-        var f15 : HTMLCollection = o.getElementsByClassName(X.getstring());
-        var v16 : HTMLCollection = o.children;
-        var v17 : Element = o.firstElementChild;
-        var v18 : Element = o.lastElementChild;
-        var v19 : Element = o.previousElementSibling;
-        var v20 : Element = o.nextElementSibling;
-        var v21 : int/*unsigned long*/ = o.childElementCount;
+        var f3 : boolean = o.hasAttribute(X.getstring());
+        var f4 : boolean = o.hasAttributeNS(X.getNullable__string_(), X.getstring());
+        var f5 : HTMLCollection = o.getElementsByTagName(X.getstring());
+        var f6 : HTMLCollection = o.getElementsByTagNameNS(X.getNullable__string_(), X.getstring());
+        var f7 : HTMLCollection = o.getElementsByClassName(X.getstring());
+        var v9 : HTMLCollection = o.children;
+        var v10 : Element = o.firstElementChild;
+        var v11 : Element = o.lastElementChild;
+        var v12 : Element = o.previousElementSibling;
+        var v13 : Element = o.nextElementSibling;
+        var v14 : int/*unsigned long*/ = o.childElementCount;
         o.prepend(X.getNode());
         o.prepend(X.getstring());
         o.append(X.getNode());
@@ -370,22 +356,22 @@ class _Test extends TestCase {
         o.replace(X.getNode());
         o.replace(X.getstring());
         o.remove();
-        var f22 : ClientRectList = o.getClientRects();
-        var f23 : ClientRect = o.getBoundingClientRect();
+        var f8 : ClientRectList = o.getClientRects();
+        var f9 : ClientRect = o.getBoundingClientRect();
         o.scrollIntoView();
         o.scrollIntoView(X.getboolean());
-        var v24 : int/*long*/ = o.scrollTop;
-        var v25 : int/*long*/ = o.scrollLeft;
-        var v26 : int/*long*/ = o.scrollWidth;
-        var v27 : int/*long*/ = o.scrollHeight;
-        var v28 : int/*long*/ = o.clientTop;
-        var v29 : int/*long*/ = o.clientLeft;
-        var v30 : int/*long*/ = o.clientWidth;
-        var v31 : int/*long*/ = o.clientHeight;
-        var f32 : Element = o.querySelector(X.getstring());
-        var f33 : NodeList = o.querySelectorAll(X.getstring());
-        var v34 : string/*DOMString*/ = o.innerHTML;
-        var v35 : string/*DOMString*/ = o.outerHTML;
+        var v15 : int/*long*/ = o.scrollTop;
+        var v16 : int/*long*/ = o.scrollLeft;
+        var v17 : int/*long*/ = o.scrollWidth;
+        var v18 : int/*long*/ = o.scrollHeight;
+        var v19 : int/*long*/ = o.clientTop;
+        var v20 : int/*long*/ = o.clientLeft;
+        var v21 : int/*long*/ = o.clientWidth;
+        var v22 : int/*long*/ = o.clientHeight;
+        var f10 : Element = o.querySelector(X.getstring());
+        var f11 : NodeList = o.querySelectorAll(X.getstring());
+        var v23 : string/*DOMString*/ = o.innerHTML;
+        var v24 : string/*DOMString*/ = o.outerHTML;
         o.insertAdjacentHTML(X.getstring(), X.getstring());
     } // Element
 
@@ -402,7 +388,7 @@ class _Test extends TestCase {
     function compile_CharacterData(o : CharacterData) : void {
         var v1 : string/*DOMString*/ = o.data;
         var v2 : int/*unsigned long*/ = o.length;
-        var f3 : string/*DOMString*/ = o.substringData(X.getint(), X.getint());
+        var f1 : string/*DOMString*/ = o.substringData(X.getint(), X.getint());
         o.appendData(X.getstring());
         o.insertData(X.getint(), X.getstring());
         o.deleteData(X.getint(), X.getint());
@@ -419,8 +405,8 @@ class _Test extends TestCase {
     // #20
     function compile_Text(o : Text) : void {
         var f1 : Text = o.splitText(X.getint());
-        var v2 : string/*DOMString*/ = o.wholeText;
-        var v3 : boolean = o.serializeAsCDATA;
+        var v1 : string/*DOMString*/ = o.wholeText;
+        var v2 : boolean = o.serializeAsCDATA;
     } // Text
 
     // #21
@@ -458,20 +444,20 @@ class _Test extends TestCase {
         var v12 : int/*unsigned short*/ = o.END_TO_END;
         var v13 : int/*unsigned short*/ = Range.END_TO_START;
         var v14 : int/*unsigned short*/ = o.END_TO_START;
-        var f15 : int/*short*/ = o.compareBoundaryPoints(X.getint(), X.getRange());
+        var f1 : int/*short*/ = o.compareBoundaryPoints(X.getint(), X.getRange());
         o.deleteContents();
-        var f16 : DocumentFragment = o.extractContents();
-        var f17 : DocumentFragment = o.cloneContents();
+        var f2 : DocumentFragment = o.extractContents();
+        var f3 : DocumentFragment = o.cloneContents();
         o.insertNode(X.getNode());
         o.surroundContents(X.getNode());
-        var f18 : Range = o.cloneRange();
+        var f4 : Range = o.cloneRange();
         o.detach();
-        var f19 : boolean = o.isPointInRange(X.getNode(), X.getint());
-        var f20 : int/*short*/ = o.comparePoint(X.getNode(), X.getint());
-        var f21 : boolean = o.intersectsNode(X.getNode());
-        var f22 : ClientRectList = o.getClientRects();
-        var f23 : ClientRect = o.getBoundingClientRect();
-        var f24 : DocumentFragment = o.createContextualFragment(X.getstring());
+        var f5 : boolean = o.isPointInRange(X.getNode(), X.getint());
+        var f6 : int/*short*/ = o.comparePoint(X.getNode(), X.getint());
+        var f7 : boolean = o.intersectsNode(X.getNode());
+        var f8 : ClientRectList = o.getClientRects();
+        var f9 : ClientRect = o.getBoundingClientRect();
+        var f10 : DocumentFragment = o.createContextualFragment(X.getstring());
     } // Range
 
     // #24
@@ -481,8 +467,8 @@ class _Test extends TestCase {
         var v3 : boolean = o.pointerBeforeReferenceNode;
         var v4 : int/*unsigned long*/ = o.whatToShow;
         var v5 : NodeFilter = o.filter;
-        var f6 : Node = o.nextNode();
-        var f7 : Node = o.previousNode();
+        var f1 : Node = o.nextNode();
+        var f2 : Node = o.previousNode();
         o.detach();
     } // NodeIterator
 
@@ -492,13 +478,13 @@ class _Test extends TestCase {
         var v2 : int/*unsigned long*/ = o.whatToShow;
         var v3 : NodeFilter = o.filter;
         var v4 : Node = o.currentNode;
-        var f5 : Node = o.parentNode();
-        var f6 : Node = o.firstChild();
-        var f7 : Node = o.lastChild();
-        var f8 : Node = o.previousSibling();
-        var f9 : Node = o.nextSibling();
-        var f10 : Node = o.previousNode();
-        var f11 : Node = o.nextNode();
+        var f1 : Node = o.parentNode();
+        var f2 : Node = o.firstChild();
+        var f3 : Node = o.lastChild();
+        var f4 : Node = o.previousSibling();
+        var f5 : Node = o.nextSibling();
+        var f6 : Node = o.previousNode();
+        var f7 : Node = o.nextNode();
     } // TreeWalker
 
     // #26
@@ -535,42 +521,42 @@ class _Test extends TestCase {
         var v30 : int/*unsigned long*/ = o.SHOW_DOCUMENT_FRAGMENT;
         var v31 : int/*unsigned long*/ = NodeFilter.SHOW_NOTATION;
         var v32 : int/*unsigned long*/ = o.SHOW_NOTATION;
-        var f33 : int/*unsigned short*/ = o.acceptNode(X.getNode());
+        var f1 : int/*unsigned short*/ = o.acceptNode(X.getNode());
     } // NodeFilter
 
     // #27
     function compile_NodeList(o : NodeList) : void {
         var f1 : Node = o.__native_index_operator__(X.getint());
         var f2 : Node = o.item(X.getint());
-        var v3 : int/*unsigned long*/ = o.length;
+        var v1 : int/*unsigned long*/ = o.length;
     } // NodeList
 
     // #28
     function compile_HTMLCollection(o : HTMLCollection) : void {
         var v1 : int/*unsigned long*/ = o.length;
-        var f2 : Element = o.__native_index_operator__(X.getint());
-        var f3 : Element = o.item(X.getint());
-        var f4 : Object/*object?*/ = o.__native_index_operator__(X.getstring());
-        var f5 : Object/*object?*/ = o.namedItem(X.getstring());
+        var f1 : Element = o.__native_index_operator__(X.getint());
+        var f2 : Element = o.item(X.getint());
+        var f3 : Object/*object?*/ = o.__native_index_operator__(X.getstring());
+        var f4 : Object/*object?*/ = o.namedItem(X.getstring());
     } // HTMLCollection
 
     // #29
     function compile_DOMStringList(o : DOMStringList) : void {
         var v1 : int/*unsigned long*/ = o.length;
-        var f2 : Nullable.<string>/*DOMString?*/ = o.__native_index_operator__(X.getint());
-        var f3 : Nullable.<string>/*DOMString?*/ = o.item(X.getint());
-        var f4 : boolean = o.contains(X.getstring());
+        var f1 : Nullable.<string>/*DOMString?*/ = o.__native_index_operator__(X.getint());
+        var f2 : Nullable.<string>/*DOMString?*/ = o.item(X.getint());
+        var f3 : boolean = o.contains(X.getstring());
     } // DOMStringList
 
     // #30
     function compile_DOMTokenList(o : DOMTokenList) : void {
         var v1 : int/*unsigned long*/ = o.length;
-        var f2 : Nullable.<string>/*DOMString?*/ = o.__native_index_operator__(X.getint());
-        var f3 : Nullable.<string>/*DOMString?*/ = o.item(X.getint());
-        var f4 : boolean = o.contains(X.getstring());
+        var f1 : Nullable.<string>/*DOMString?*/ = o.__native_index_operator__(X.getint());
+        var f2 : Nullable.<string>/*DOMString?*/ = o.item(X.getint());
+        var f3 : boolean = o.contains(X.getstring());
         o.add(X.getstring());
         o.remove(X.getstring());
-        var f5 : boolean = o.toggle(X.getstring());
+        var f4 : boolean = o.toggle(X.getstring());
     } // DOMTokenList
 
     // #31
@@ -598,11 +584,15 @@ class _Test extends TestCase {
         var v1 : AbstractView = o.view;
         var v2 : int/*long*/ = o.detail;
         o.initUIEvent(X.getstring(), X.getboolean(), X.getboolean(), X.getAbstractView(), X.getint());
+        var c1 = new UIEvent(X.getstring());
+        var c2 = new UIEvent(X.getstring(), X.getUIEventInit());
     } // UIEvent
 
     // #36
     function compile_FocusEvent(o : FocusEvent) : void {
         var v1 : EventTarget = o.relatedTarget;
+        var c1 = new FocusEvent(X.getstring());
+        var c2 = new FocusEvent(X.getstring(), X.getFocusEventInit());
         o.initFocusEvent(X.getstring(), X.getboolean(), X.getboolean(), X.getAbstractView(), X.getint(), X.getEventTarget());
     } // FocusEvent
 
@@ -620,17 +610,15 @@ class _Test extends TestCase {
         var v10 : int/*unsigned short*/ = o.buttons;
         var v11 : EventTarget = o.relatedTarget;
         o.initMouseEvent(X.getstring(), X.getboolean(), X.getboolean(), X.getAbstractView(), X.getint(), X.getint(), X.getint(), X.getint(), X.getint(), X.getboolean(), X.getboolean(), X.getboolean(), X.getboolean(), X.getint(), X.getEventTarget());
-        var f12 : boolean = o.getModifierState(X.getstring());
-        var v13 : int/*long*/ = o.screenX;
-        var v14 : int/*long*/ = o.screenY;
-        var v15 : int/*long*/ = o.pageX;
-        var v16 : int/*long*/ = o.pageY;
-        var v17 : int/*long*/ = o.clientX;
-        var v18 : int/*long*/ = o.clientY;
-        var v19 : int/*long*/ = o.x;
-        var v20 : int/*long*/ = o.y;
-        var v21 : int/*long*/ = o.offsetX;
-        var v22 : int/*long*/ = o.offsetY;
+        var f1 : boolean = o.getModifierState(X.getstring());
+        var c1 = new MouseEvent(X.getstring());
+        var c2 = new MouseEvent(X.getstring(), X.getMouseEventInit());
+        var v12 : int/*long*/ = o.pageX;
+        var v13 : int/*long*/ = o.pageY;
+        var v14 : int/*long*/ = o.x;
+        var v15 : int/*long*/ = o.y;
+        var v16 : int/*long*/ = o.offsetX;
+        var v17 : int/*long*/ = o.offsetY;
     } // MouseEvent
 
     // #38
@@ -645,6 +633,8 @@ class _Test extends TestCase {
         var v8 : number/*float*/ = o.deltaY;
         var v9 : number/*float*/ = o.deltaZ;
         var v10 : int/*unsigned long*/ = o.deltaMode;
+        var c1 = new WheelEvent(X.getstring());
+        var c2 = new WheelEvent(X.getstring(), X.getWheelEventInit());
         o.initWheelEvent(X.getstring(), X.getboolean(), X.getboolean(), X.getAbstractView(), X.getint(), X.getint(), X.getint(), X.getint(), X.getint(), X.getint(), X.getEventTarget(), X.getstring(), X.getnumber(), X.getnumber(), X.getnumber(), X.getint());
     } // WheelEvent
 
@@ -671,17 +661,21 @@ class _Test extends TestCase {
         var v19 : boolean = o.metaKey;
         var v20 : boolean = o.repeat;
         var v21 : string/*DOMString*/ = o.locale;
-        var f22 : boolean = o.getModifierState(X.getstring());
+        var f1 : boolean = o.getModifierState(X.getstring());
+        var c1 = new KeyboardEvent(X.getstring());
+        var c2 = new KeyboardEvent(X.getstring(), X.getKeyboardEventInit());
         o.initKeyboardEvent(X.getstring(), X.getboolean(), X.getboolean(), X.getAbstractView(), X.getstring(), X.getstring(), X.getint(), X.getstring(), X.getboolean(), X.getstring());
-        var v23 : int/*unsigned long*/ = o.charCode;
-        var v24 : int/*unsigned long*/ = o.keyCode;
-        var v25 : int/*unsigned long*/ = o.which;
+        var v22 : int/*unsigned long*/ = o.charCode;
+        var v23 : int/*unsigned long*/ = o.keyCode;
+        var v24 : int/*unsigned long*/ = o.which;
     } // KeyboardEvent
 
     // #40
     function compile_CompositionEvent(o : CompositionEvent) : void {
         var v1 : Nullable.<string>/*DOMString?*/ = o.data;
         var v2 : string/*DOMString*/ = o.locale;
+        var c1 = new CompositionEvent(X.getstring());
+        var c2 = new CompositionEvent(X.getstring(), X.getCompositionEventInit());
         o.initCompositionEvent(X.getstring(), X.getboolean(), X.getboolean(), X.getAbstractView(), X.getNullable__string_(), X.getstring());
     } // CompositionEvent
 
@@ -807,6 +801,7 @@ class _Test extends TestCase {
 
     // #50
     function compile_XMLHttpRequest(o : XMLHttpRequest) : void {
+        var c1 = new XMLHttpRequest();
         var v1 : function(:Event):void/*Function?*/ = o.onreadystatechange;
         var v2 : int/*unsigned short*/ = XMLHttpRequest.UNSENT;
         var v3 : int/*unsigned short*/ = o.UNSENT;
@@ -836,21 +831,24 @@ class _Test extends TestCase {
         o.abort();
         var v16 : int/*unsigned short*/ = o.status;
         var v17 : string/*DOMString*/ = o.statusText;
-        var f18 : string/*DOMString*/ = o.getResponseHeader(X.getstring());
-        var f19 : string/*DOMString*/ = o.getAllResponseHeaders();
+        var f1 : string/*DOMString*/ = o.getResponseHeader(X.getstring());
+        var f2 : string/*DOMString*/ = o.getAllResponseHeaders();
         o.overrideMimeType(X.getstring());
-        var v20 : string/*XMLHttpRequestResponseType*/ = o.responseType;
-        var v21 : variant/*any*/ = o.response;
-        var v22 : string/*DOMString*/ = o.responseText;
-        var v23 : Document = o.responseXML;
+        var v18 : string/*XMLHttpRequestResponseType*/ = o.responseType;
+        var v19 : variant/*any*/ = o.response;
+        var v20 : string/*DOMString*/ = o.responseText;
+        var v21 : Document = o.responseXML;
     } // XMLHttpRequest
 
     // #51
     function compile_AnonXMLHttpRequest(o : AnonXMLHttpRequest) : void {
+        var c1 = new AnonXMLHttpRequest();
     } // AnonXMLHttpRequest
 
     // #52
     function compile_FormData(o : FormData) : void {
+        var c1 = new FormData();
+        var c2 = new FormData(X.getHTMLFormElement());
         o.append(X.getstring(), X.getBlob());
         o.append(X.getstring(), X.getBlob(), X.getstring());
         o.append(X.getstring(), X.getstring());
@@ -860,8 +858,8 @@ class _Test extends TestCase {
     function compile_MediaList(o : MediaList) : void {
         var v1 : string/*DOMString*/ = o.mediaText;
         var v2 : int/*unsigned long*/ = o.length;
-        var f3 : Nullable.<string>/*DOMString*/ = o.__native_index_operator__(X.getint());
-        var f4 : Nullable.<string>/*DOMString*/ = o.item(X.getint());
+        var f1 : Nullable.<string>/*DOMString*/ = o.__native_index_operator__(X.getint());
+        var f2 : Nullable.<string>/*DOMString*/ = o.item(X.getint());
         o.appendMedium(X.getstring());
         o.deleteMedium(X.getstring());
     } // MediaList
@@ -881,7 +879,7 @@ class _Test extends TestCase {
     function compile_CSSStyleSheet(o : CSSStyleSheet) : void {
         var v1 : CSSRule = o.ownerRule;
         var v2 : CSSRule[]/*CSSRuleList*/ = o.cssRules;
-        var f3 : int/*unsigned long*/ = o.insertRule(X.getstring(), X.getint());
+        var f1 : int/*unsigned long*/ = o.insertRule(X.getstring(), X.getint());
         o.deleteRule(X.getint());
     } // CSSStyleSheet
 
@@ -927,7 +925,7 @@ class _Test extends TestCase {
     function compile_CSSMediaRule(o : CSSMediaRule) : void {
         var v1 : MediaList = o.media;
         var v2 : CSSRule[]/*CSSRuleList*/ = o.cssRules;
-        var f3 : int/*unsigned long*/ = o.insertRule(X.getstring(), X.getint());
+        var f1 : int/*unsigned long*/ = o.insertRule(X.getstring(), X.getint());
         o.deleteRule(X.getint());
     } // CSSMediaRule
 
@@ -952,750 +950,601 @@ class _Test extends TestCase {
     function compile_CSSStyleDeclaration(o : CSSStyleDeclaration) : void {
         var v1 : string/*DOMString*/ = o.cssText;
         var v2 : int/*unsigned long*/ = o.length;
-        var f3 : string/*DOMString*/ = o.item(X.getint());
-        var f4 : string/*DOMString*/ = o.getPropertyValue(X.getstring());
-        var f5 : string/*DOMString*/ = o.getPropertyPriority(X.getstring());
+        var f1 : string/*DOMString*/ = o.item(X.getint());
+        var f2 : string/*DOMString*/ = o.getPropertyValue(X.getstring());
+        var f3 : string/*DOMString*/ = o.getPropertyPriority(X.getstring());
         o.setProperty(X.getstring(), X.getstring());
         o.setProperty(X.getstring(), X.getstring(), X.getstring());
-        var f6 : string/*DOMString*/ = o.removeProperty(X.getstring());
-        var v7 : CSSRule = o.parentRule;
-        var v8 : string/*DOMString*/ = o.azimuth;
-        var v9 : string/*DOMString*/ = o.background;
-        var v10 : string/*DOMString*/ = o.backgroundAttachment;
-        var v11 : string/*DOMString*/ = o.backgroundColor;
-        var v12 : string/*DOMString*/ = o.backgroundImage;
-        var v13 : string/*DOMString*/ = o.backgroundPosition;
-        var v14 : string/*DOMString*/ = o.backgroundRepeat;
-        var v15 : string/*DOMString*/ = o.border;
-        var v16 : string/*DOMString*/ = o.borderCollapse;
-        var v17 : string/*DOMString*/ = o.borderColor;
-        var v18 : string/*DOMString*/ = o.borderSpacing;
-        var v19 : string/*DOMString*/ = o.borderStyle;
-        var v20 : string/*DOMString*/ = o.borderTop;
-        var v21 : string/*DOMString*/ = o.borderRight;
-        var v22 : string/*DOMString*/ = o.borderBottom;
-        var v23 : string/*DOMString*/ = o.borderLeft;
-        var v24 : string/*DOMString*/ = o.borderTopColor;
-        var v25 : string/*DOMString*/ = o.borderRightColor;
-        var v26 : string/*DOMString*/ = o.borderBottomColor;
-        var v27 : string/*DOMString*/ = o.borderLeftColor;
-        var v28 : string/*DOMString*/ = o.borderTopStyle;
-        var v29 : string/*DOMString*/ = o.borderRightStyle;
-        var v30 : string/*DOMString*/ = o.borderBottomStyle;
-        var v31 : string/*DOMString*/ = o.borderLeftStyle;
-        var v32 : string/*DOMString*/ = o.borderTopWidth;
-        var v33 : string/*DOMString*/ = o.borderRightWidth;
-        var v34 : string/*DOMString*/ = o.borderBottomWidth;
-        var v35 : string/*DOMString*/ = o.borderLeftWidth;
-        var v36 : string/*DOMString*/ = o.borderWidth;
-        var v37 : string/*DOMString*/ = o.bottom;
-        var v38 : string/*DOMString*/ = o.captionSide;
-        var v39 : string/*DOMString*/ = o.clear;
-        var v40 : string/*DOMString*/ = o.clip;
-        var v41 : string/*DOMString*/ = o.color;
-        var v42 : string/*DOMString*/ = o.content;
-        var v43 : string/*DOMString*/ = o.counterIncrement;
-        var v44 : string/*DOMString*/ = o.counterReset;
-        var v45 : string/*DOMString*/ = o.cue;
-        var v46 : string/*DOMString*/ = o.cueAfter;
-        var v47 : string/*DOMString*/ = o.cueBefore;
-        var v48 : string/*DOMString*/ = o.cursor;
-        var v49 : string/*DOMString*/ = o.direction;
-        var v50 : string/*DOMString*/ = o.display;
-        var v51 : string/*DOMString*/ = o.elevation;
-        var v52 : string/*DOMString*/ = o.emptyCells;
-        var v53 : string/*DOMString*/ = o.cssFloat;
-        var v54 : string/*DOMString*/ = o.font;
-        var v55 : string/*DOMString*/ = o.fontFamily;
-        var v56 : string/*DOMString*/ = o.fontSize;
-        var v57 : string/*DOMString*/ = o.fontSizeAdjust;
-        var v58 : string/*DOMString*/ = o.fontStretch;
-        var v59 : string/*DOMString*/ = o.fontStyle;
-        var v60 : string/*DOMString*/ = o.fontVariant;
-        var v61 : string/*DOMString*/ = o.fontWeight;
-        var v62 : string/*DOMString*/ = o.height;
-        var v63 : string/*DOMString*/ = o.left;
-        var v64 : string/*DOMString*/ = o.letterSpacing;
-        var v65 : string/*DOMString*/ = o.lineHeight;
-        var v66 : string/*DOMString*/ = o.listStyle;
-        var v67 : string/*DOMString*/ = o.listStyleImage;
-        var v68 : string/*DOMString*/ = o.listStylePosition;
-        var v69 : string/*DOMString*/ = o.listStyleType;
-        var v70 : string/*DOMString*/ = o.margin;
-        var v71 : string/*DOMString*/ = o.marginTop;
-        var v72 : string/*DOMString*/ = o.marginRight;
-        var v73 : string/*DOMString*/ = o.marginBottom;
-        var v74 : string/*DOMString*/ = o.marginLeft;
-        var v75 : string/*DOMString*/ = o.markerOffset;
-        var v76 : string/*DOMString*/ = o.marks;
-        var v77 : string/*DOMString*/ = o.maxHeight;
-        var v78 : string/*DOMString*/ = o.maxWidth;
-        var v79 : string/*DOMString*/ = o.minHeight;
-        var v80 : string/*DOMString*/ = o.minWidth;
-        var v81 : string/*DOMString*/ = o.orphans;
-        var v82 : string/*DOMString*/ = o.outline;
-        var v83 : string/*DOMString*/ = o.outlineColor;
-        var v84 : string/*DOMString*/ = o.outlineStyle;
-        var v85 : string/*DOMString*/ = o.outlineWidth;
-        var v86 : string/*DOMString*/ = o.overflow;
-        var v87 : string/*DOMString*/ = o.padding;
-        var v88 : string/*DOMString*/ = o.paddingTop;
-        var v89 : string/*DOMString*/ = o.paddingRight;
-        var v90 : string/*DOMString*/ = o.paddingBottom;
-        var v91 : string/*DOMString*/ = o.paddingLeft;
-        var v92 : string/*DOMString*/ = o.page;
-        var v93 : string/*DOMString*/ = o.pageBreakAfter;
-        var v94 : string/*DOMString*/ = o.pageBreakBefore;
-        var v95 : string/*DOMString*/ = o.pageBreakInside;
-        var v96 : string/*DOMString*/ = o.pause;
-        var v97 : string/*DOMString*/ = o.pauseAfter;
-        var v98 : string/*DOMString*/ = o.pauseBefore;
-        var v99 : string/*DOMString*/ = o.pitch;
-        var v100 : string/*DOMString*/ = o.pitchRange;
-        var v101 : string/*DOMString*/ = o.playDuring;
-        var v102 : string/*DOMString*/ = o.position;
-        var v103 : string/*DOMString*/ = o.quotes;
-        var v104 : string/*DOMString*/ = o.richness;
-        var v105 : string/*DOMString*/ = o.right;
-        var v106 : string/*DOMString*/ = o.size;
-        var v107 : string/*DOMString*/ = o.speak;
-        var v108 : string/*DOMString*/ = o.speakHeader;
-        var v109 : string/*DOMString*/ = o.speakNumeral;
-        var v110 : string/*DOMString*/ = o.speakPunctuation;
-        var v111 : string/*DOMString*/ = o.speechRate;
-        var v112 : string/*DOMString*/ = o.stress;
-        var v113 : string/*DOMString*/ = o.tableLayout;
-        var v114 : string/*DOMString*/ = o.textAlign;
-        var v115 : string/*DOMString*/ = o.textDecoration;
-        var v116 : string/*DOMString*/ = o.textIndent;
-        var v117 : string/*DOMString*/ = o.textShadow;
-        var v118 : string/*DOMString*/ = o.textTransform;
-        var v119 : string/*DOMString*/ = o.top;
-        var v120 : string/*DOMString*/ = o.unicodeBidi;
-        var v121 : string/*DOMString*/ = o.verticalAlign;
-        var v122 : string/*DOMString*/ = o.visibility;
-        var v123 : string/*DOMString*/ = o.voiceFamily;
-        var v124 : string/*DOMString*/ = o.volume;
-        var v125 : string/*DOMString*/ = o.whiteSpace;
-        var v126 : string/*DOMString*/ = o.widows;
-        var v127 : string/*DOMString*/ = o.width;
-        var v128 : string/*DOMString*/ = o.wordSpacing;
-        var v129 : string/*DOMString*/ = o.zIndex;
-        var v130 : Nullable.<number> = o.length;
-        var v131 : Object/*Maybe<object>*/ = o.parentRule;
-        var v132 : Nullable.<string> = o.alignmentBaseline;
-        var v133 : Nullable.<string> = o.background;
-        var v134 : Nullable.<string> = o.backgroundAttachment;
-        var v135 : Nullable.<string> = o.backgroundClip;
-        var v136 : Nullable.<string> = o.backgroundColor;
-        var v137 : Nullable.<string> = o.backgroundImage;
-        var v138 : Nullable.<string> = o.backgroundOrigin;
-        var v139 : Nullable.<string> = o.backgroundPosition;
-        var v140 : Nullable.<string> = o.backgroundPositionX;
-        var v141 : Nullable.<string> = o.backgroundPositionY;
-        var v142 : Nullable.<string> = o.backgroundRepeat;
-        var v143 : Nullable.<string> = o.backgroundRepeatX;
-        var v144 : Nullable.<string> = o.backgroundRepeatY;
-        var v145 : Nullable.<string> = o.backgroundSize;
-        var v146 : Nullable.<string> = o.baselineShift;
-        var v147 : Nullable.<string> = o.border;
-        var v148 : Nullable.<string> = o.borderBottom;
-        var v149 : Nullable.<string> = o.borderBottomColor;
-        var v150 : Nullable.<string> = o.borderBottomLeftRadius;
-        var v151 : Nullable.<string> = o.borderBottomRightRadius;
-        var v152 : Nullable.<string> = o.borderBottomStyle;
-        var v153 : Nullable.<string> = o.borderBottomWidth;
-        var v154 : Nullable.<string> = o.borderCollapse;
-        var v155 : Nullable.<string> = o.borderColor;
-        var v156 : Nullable.<string> = o.borderImage;
-        var v157 : Nullable.<string> = o.borderImageOutset;
-        var v158 : Nullable.<string> = o.borderImageRepeat;
-        var v159 : Nullable.<string> = o.borderImageSlice;
-        var v160 : Nullable.<string> = o.borderImageSource;
-        var v161 : Nullable.<string> = o.borderImageWidth;
-        var v162 : Nullable.<string> = o.borderLeft;
-        var v163 : Nullable.<string> = o.borderLeftColor;
-        var v164 : Nullable.<string> = o.borderLeftStyle;
-        var v165 : Nullable.<string> = o.borderLeftWidth;
-        var v166 : Nullable.<string> = o.borderRadius;
-        var v167 : Nullable.<string> = o.borderRight;
-        var v168 : Nullable.<string> = o.borderRightColor;
-        var v169 : Nullable.<string> = o.borderRightStyle;
-        var v170 : Nullable.<string> = o.borderRightWidth;
-        var v171 : Nullable.<string> = o.borderSpacing;
-        var v172 : Nullable.<string> = o.borderStyle;
-        var v173 : Nullable.<string> = o.borderTop;
-        var v174 : Nullable.<string> = o.borderTopColor;
-        var v175 : Nullable.<string> = o.borderTopLeftRadius;
-        var v176 : Nullable.<string> = o.borderTopRightRadius;
-        var v177 : Nullable.<string> = o.borderTopStyle;
-        var v178 : Nullable.<string> = o.borderTopWidth;
-        var v179 : Nullable.<string> = o.borderWidth;
-        var v180 : Nullable.<string> = o.bottom;
-        var v181 : Nullable.<string> = o.boxShadow;
-        var v182 : Nullable.<string> = o.boxSizing;
-        var v183 : Nullable.<string> = o.captionSide;
-        var v184 : Nullable.<string> = o.clear;
-        var v185 : Nullable.<string> = o.clip;
-        var v186 : Nullable.<string> = o.clipPath;
-        var v187 : Nullable.<string> = o.clipRule;
-        var v188 : Nullable.<string> = o.color;
-        var v189 : Nullable.<string> = o.colorInterpolation;
-        var v190 : Nullable.<string> = o.colorInterpolationFilters;
-        var v191 : Nullable.<string> = o.colorProfile;
-        var v192 : Nullable.<string> = o.colorRendering;
-        var v193 : Nullable.<string> = o.content;
-        var v194 : Nullable.<string> = o.counterIncrement;
-        var v195 : Nullable.<string> = o.counterReset;
-        var v196 : Nullable.<string> = o.cssText;
-        var v197 : Nullable.<string> = o.cursor;
-        var v198 : Nullable.<string> = o.direction;
-        var v199 : Nullable.<string> = o.display;
-        var v200 : Nullable.<string> = o.dominantBaseline;
-        var v201 : Nullable.<string> = o.emptyCells;
-        var v202 : Nullable.<string> = o.enableBackground;
-        var v203 : Nullable.<string> = o.fill;
-        var v204 : Nullable.<string> = o.fillOpacity;
-        var v205 : Nullable.<string> = o.fillRule;
-        var v206 : Nullable.<string> = o.filter;
-        var v207 : Nullable.<string> = o.float;
-        var v208 : Nullable.<string> = o.floodColor;
-        var v209 : Nullable.<string> = o.floodOpacity;
-        var v210 : Nullable.<string> = o.font;
-        var v211 : Nullable.<string> = o.fontFamily;
-        var v212 : Nullable.<string> = o.fontSize;
-        var v213 : Nullable.<string> = o.fontStretch;
-        var v214 : Nullable.<string> = o.fontStyle;
-        var v215 : Nullable.<string> = o.fontVariant;
-        var v216 : Nullable.<string> = o.fontWeight;
-        var v217 : Nullable.<string> = o.glyphOrientationHorizontal;
-        var v218 : Nullable.<string> = o.glyphOrientationVertical;
-        var v219 : Nullable.<string> = o.height;
-        var v220 : Nullable.<string> = o.imageRendering;
-        var v221 : Nullable.<string> = o.kerning;
-        var v222 : Nullable.<string> = o.left;
-        var v223 : Nullable.<string> = o.letterSpacing;
-        var v224 : Nullable.<string> = o.lightingColor;
-        var v225 : Nullable.<string> = o.lineHeight;
-        var v226 : Nullable.<string> = o.listStyle;
-        var v227 : Nullable.<string> = o.listStyleImage;
-        var v228 : Nullable.<string> = o.listStylePosition;
-        var v229 : Nullable.<string> = o.listStyleType;
-        var v230 : Nullable.<string> = o.margin;
-        var v231 : Nullable.<string> = o.marginBottom;
-        var v232 : Nullable.<string> = o.marginLeft;
-        var v233 : Nullable.<string> = o.marginRight;
-        var v234 : Nullable.<string> = o.marginTop;
-        var v235 : Nullable.<string> = o.marker;
-        var v236 : Nullable.<string> = o.markerEnd;
-        var v237 : Nullable.<string> = o.markerMid;
-        var v238 : Nullable.<string> = o.markerStart;
-        var v239 : Nullable.<string> = o.mask;
-        var v240 : Nullable.<string> = o.maxHeight;
-        var v241 : Nullable.<string> = o.maxWidth;
-        var v242 : Nullable.<string> = o.minHeight;
-        var v243 : Nullable.<string> = o.minWidth;
-        var v244 : Nullable.<string> = o.opacity;
-        var v245 : Nullable.<string> = o.orphans;
-        var v246 : Nullable.<string> = o.outline;
-        var v247 : Nullable.<string> = o.outlineColor;
-        var v248 : Nullable.<string> = o.outlineOffset;
-        var v249 : Nullable.<string> = o.outlineStyle;
-        var v250 : Nullable.<string> = o.outlineWidth;
-        var v251 : Nullable.<string> = o.overflow;
-        var v252 : Nullable.<string> = o.overflowX;
-        var v253 : Nullable.<string> = o.overflowY;
-        var v254 : Nullable.<string> = o.padding;
-        var v255 : Nullable.<string> = o.paddingBottom;
-        var v256 : Nullable.<string> = o.paddingLeft;
-        var v257 : Nullable.<string> = o.paddingRight;
-        var v258 : Nullable.<string> = o.paddingTop;
-        var v259 : Nullable.<string> = o.page;
-        var v260 : Nullable.<string> = o.pageBreakAfter;
-        var v261 : Nullable.<string> = o.pageBreakBefore;
-        var v262 : Nullable.<string> = o.pageBreakInside;
-        var v263 : Nullable.<string> = o.pointerEvents;
-        var v264 : Nullable.<string> = o.position;
-        var v265 : Nullable.<string> = o.quotes;
-        var v266 : Nullable.<string> = o.resize;
-        var v267 : Nullable.<string> = o.right;
-        var v268 : Nullable.<string> = o.shapeRendering;
-        var v269 : Nullable.<string> = o.size;
-        var v270 : Nullable.<string> = o.speak;
-        var v271 : Nullable.<string> = o.src;
-        var v272 : Nullable.<string> = o.stopColor;
-        var v273 : Nullable.<string> = o.stopOpacity;
-        var v274 : Nullable.<string> = o.stroke;
-        var v275 : Nullable.<string> = o.strokeDasharray;
-        var v276 : Nullable.<string> = o.strokeDashoffset;
-        var v277 : Nullable.<string> = o.strokeLinecap;
-        var v278 : Nullable.<string> = o.strokeLinejoin;
-        var v279 : Nullable.<string> = o.strokeMiterlimit;
-        var v280 : Nullable.<string> = o.strokeOpacity;
-        var v281 : Nullable.<string> = o.strokeWidth;
-        var v282 : Nullable.<string> = o.tableLayout;
-        var v283 : Nullable.<string> = o.textAlign;
-        var v284 : Nullable.<string> = o.textAnchor;
-        var v285 : Nullable.<string> = o.textDecoration;
-        var v286 : Nullable.<string> = o.textIndent;
-        var v287 : Nullable.<string> = o.textLineThrough;
-        var v288 : Nullable.<string> = o.textLineThroughColor;
-        var v289 : Nullable.<string> = o.textLineThroughMode;
-        var v290 : Nullable.<string> = o.textLineThroughStyle;
-        var v291 : Nullable.<string> = o.textLineThroughWidth;
-        var v292 : Nullable.<string> = o.textOverflow;
-        var v293 : Nullable.<string> = o.textOverline;
-        var v294 : Nullable.<string> = o.textOverlineColor;
-        var v295 : Nullable.<string> = o.textOverlineMode;
-        var v296 : Nullable.<string> = o.textOverlineStyle;
-        var v297 : Nullable.<string> = o.textOverlineWidth;
-        var v298 : Nullable.<string> = o.textRendering;
-        var v299 : Nullable.<string> = o.textShadow;
-        var v300 : Nullable.<string> = o.textTransform;
-        var v301 : Nullable.<string> = o.textUnderline;
-        var v302 : Nullable.<string> = o.textUnderlineColor;
-        var v303 : Nullable.<string> = o.textUnderlineMode;
-        var v304 : Nullable.<string> = o.textUnderlineStyle;
-        var v305 : Nullable.<string> = o.textUnderlineWidth;
-        var v306 : Nullable.<string> = o.top;
-        var v307 : Nullable.<string> = o.unicodeBidi;
-        var v308 : Nullable.<string> = o.unicodeRange;
-        var v309 : Nullable.<string> = o.vectorEffect;
-        var v310 : Nullable.<string> = o.verticalAlign;
-        var v311 : Nullable.<string> = o.visibility;
-        var v312 : Nullable.<string> = o.webkitAnimation;
-        var v313 : Nullable.<string> = o.webkitAnimationDelay;
-        var v314 : Nullable.<string> = o.webkitAnimationDirection;
-        var v315 : Nullable.<string> = o.webkitAnimationDuration;
-        var v316 : Nullable.<string> = o.webkitAnimationFillMode;
-        var v317 : Nullable.<string> = o.webkitAnimationIterationCount;
-        var v318 : Nullable.<string> = o.webkitAnimationName;
-        var v319 : Nullable.<string> = o.webkitAnimationPlayState;
-        var v320 : Nullable.<string> = o.webkitAnimationTimingFunction;
-        var v321 : Nullable.<string> = o.webkitAppearance;
-        var v322 : Nullable.<string> = o.webkitAspectRatio;
-        var v323 : Nullable.<string> = o.webkitBackfaceVisibility;
-        var v324 : Nullable.<string> = o.webkitBackgroundClip;
-        var v325 : Nullable.<string> = o.webkitBackgroundComposite;
-        var v326 : Nullable.<string> = o.webkitBackgroundOrigin;
-        var v327 : Nullable.<string> = o.webkitBackgroundSize;
-        var v328 : Nullable.<string> = o.webkitBorderAfter;
-        var v329 : Nullable.<string> = o.webkitBorderAfterColor;
-        var v330 : Nullable.<string> = o.webkitBorderAfterStyle;
-        var v331 : Nullable.<string> = o.webkitBorderAfterWidth;
-        var v332 : Nullable.<string> = o.webkitBorderBefore;
-        var v333 : Nullable.<string> = o.webkitBorderBeforeColor;
-        var v334 : Nullable.<string> = o.webkitBorderBeforeStyle;
-        var v335 : Nullable.<string> = o.webkitBorderBeforeWidth;
-        var v336 : Nullable.<string> = o.webkitBorderEnd;
-        var v337 : Nullable.<string> = o.webkitBorderEndColor;
-        var v338 : Nullable.<string> = o.webkitBorderEndStyle;
-        var v339 : Nullable.<string> = o.webkitBorderEndWidth;
-        var v340 : Nullable.<string> = o.webkitBorderFit;
-        var v341 : Nullable.<string> = o.webkitBorderHorizontalSpacing;
-        var v342 : Nullable.<string> = o.webkitBorderImage;
-        var v343 : Nullable.<string> = o.webkitBorderRadius;
-        var v344 : Nullable.<string> = o.webkitBorderStart;
-        var v345 : Nullable.<string> = o.webkitBorderStartColor;
-        var v346 : Nullable.<string> = o.webkitBorderStartStyle;
-        var v347 : Nullable.<string> = o.webkitBorderStartWidth;
-        var v348 : Nullable.<string> = o.webkitBorderVerticalSpacing;
-        var v349 : Nullable.<string> = o.webkitBoxAlign;
-        var v350 : Nullable.<string> = o.webkitBoxDirection;
-        var v351 : Nullable.<string> = o.webkitBoxFlex;
-        var v352 : Nullable.<string> = o.webkitBoxFlexGroup;
-        var v353 : Nullable.<string> = o.webkitBoxLines;
-        var v354 : Nullable.<string> = o.webkitBoxOrdinalGroup;
-        var v355 : Nullable.<string> = o.webkitBoxOrient;
-        var v356 : Nullable.<string> = o.webkitBoxPack;
-        var v357 : Nullable.<string> = o.webkitBoxReflect;
-        var v358 : Nullable.<string> = o.webkitBoxShadow;
-        var v359 : Nullable.<string> = o.webkitColorCorrection;
-        var v360 : Nullable.<string> = o.webkitColumnAxis;
-        var v361 : Nullable.<string> = o.webkitColumnBreakAfter;
-        var v362 : Nullable.<string> = o.webkitColumnBreakBefore;
-        var v363 : Nullable.<string> = o.webkitColumnBreakInside;
-        var v364 : Nullable.<string> = o.webkitColumnCount;
-        var v365 : Nullable.<string> = o.webkitColumnGap;
-        var v366 : Nullable.<string> = o.webkitColumnRule;
-        var v367 : Nullable.<string> = o.webkitColumnRuleColor;
-        var v368 : Nullable.<string> = o.webkitColumnRuleStyle;
-        var v369 : Nullable.<string> = o.webkitColumnRuleWidth;
-        var v370 : Nullable.<string> = o.webkitColumnSpan;
-        var v371 : Nullable.<string> = o.webkitColumnWidth;
-        var v372 : Nullable.<string> = o.webkitColumns;
-        var v373 : Nullable.<string> = o.webkitFilter;
-        var v374 : Nullable.<string> = o.webkitFlexAlign;
-        var v375 : Nullable.<string> = o.webkitFlexDirection;
-        var v376 : Nullable.<string> = o.webkitFlexFlow;
-        var v377 : Nullable.<string> = o.webkitFlexItemAlign;
-        var v378 : Nullable.<string> = o.webkitFlexLinePack;
-        var v379 : Nullable.<string> = o.webkitFlexOrder;
-        var v380 : Nullable.<string> = o.webkitFlexPack;
-        var v381 : Nullable.<string> = o.webkitFlexWrap;
-        var v382 : Nullable.<string> = o.webkitFlowFrom;
-        var v383 : Nullable.<string> = o.webkitFlowInto;
-        var v384 : Nullable.<string> = o.webkitFontFeatureSettings;
-        var v385 : Nullable.<string> = o.webkitFontKerning;
-        var v386 : Nullable.<string> = o.webkitFontSizeDelta;
-        var v387 : Nullable.<string> = o.webkitFontSmoothing;
-        var v388 : Nullable.<string> = o.webkitFontVariantLigatures;
-        var v389 : Nullable.<string> = o.webkitHighlight;
-        var v390 : Nullable.<string> = o.webkitHyphenateCharacter;
-        var v391 : Nullable.<string> = o.webkitHyphenateLimitAfter;
-        var v392 : Nullable.<string> = o.webkitHyphenateLimitBefore;
-        var v393 : Nullable.<string> = o.webkitHyphenateLimitLines;
-        var v394 : Nullable.<string> = o.webkitHyphens;
-        var v395 : Nullable.<string> = o.webkitLineAlign;
-        var v396 : Nullable.<string> = o.webkitLineBoxContain;
-        var v397 : Nullable.<string> = o.webkitLineBreak;
-        var v398 : Nullable.<string> = o.webkitLineClamp;
-        var v399 : Nullable.<string> = o.webkitLineGrid;
-        var v400 : Nullable.<string> = o.webkitLineSnap;
-        var v401 : Nullable.<string> = o.webkitLocale;
-        var v402 : Nullable.<string> = o.webkitLogicalHeight;
-        var v403 : Nullable.<string> = o.webkitLogicalWidth;
-        var v404 : Nullable.<string> = o.webkitMarginAfter;
-        var v405 : Nullable.<string> = o.webkitMarginAfterCollapse;
-        var v406 : Nullable.<string> = o.webkitMarginBefore;
-        var v407 : Nullable.<string> = o.webkitMarginBeforeCollapse;
-        var v408 : Nullable.<string> = o.webkitMarginBottomCollapse;
-        var v409 : Nullable.<string> = o.webkitMarginCollapse;
-        var v410 : Nullable.<string> = o.webkitMarginEnd;
-        var v411 : Nullable.<string> = o.webkitMarginStart;
-        var v412 : Nullable.<string> = o.webkitMarginTopCollapse;
-        var v413 : Nullable.<string> = o.webkitMarquee;
-        var v414 : Nullable.<string> = o.webkitMarqueeDirection;
-        var v415 : Nullable.<string> = o.webkitMarqueeIncrement;
-        var v416 : Nullable.<string> = o.webkitMarqueeRepetition;
-        var v417 : Nullable.<string> = o.webkitMarqueeSpeed;
-        var v418 : Nullable.<string> = o.webkitMarqueeStyle;
-        var v419 : Nullable.<string> = o.webkitMask;
-        var v420 : Nullable.<string> = o.webkitMaskAttachment;
-        var v421 : Nullable.<string> = o.webkitMaskBoxImage;
-        var v422 : Nullable.<string> = o.webkitMaskBoxImageOutset;
-        var v423 : Nullable.<string> = o.webkitMaskBoxImageRepeat;
-        var v424 : Nullable.<string> = o.webkitMaskBoxImageSlice;
-        var v425 : Nullable.<string> = o.webkitMaskBoxImageSource;
-        var v426 : Nullable.<string> = o.webkitMaskBoxImageWidth;
-        var v427 : Nullable.<string> = o.webkitMaskClip;
-        var v428 : Nullable.<string> = o.webkitMaskComposite;
-        var v429 : Nullable.<string> = o.webkitMaskImage;
-        var v430 : Nullable.<string> = o.webkitMaskOrigin;
-        var v431 : Nullable.<string> = o.webkitMaskPosition;
-        var v432 : Nullable.<string> = o.webkitMaskPositionX;
-        var v433 : Nullable.<string> = o.webkitMaskPositionY;
-        var v434 : Nullable.<string> = o.webkitMaskRepeat;
-        var v435 : Nullable.<string> = o.webkitMaskRepeatX;
-        var v436 : Nullable.<string> = o.webkitMaskRepeatY;
-        var v437 : Nullable.<string> = o.webkitMaskSize;
-        var v438 : Nullable.<string> = o.webkitMatchNearestMailBlockquoteColor;
-        var v439 : Nullable.<string> = o.webkitMaxLogicalHeight;
-        var v440 : Nullable.<string> = o.webkitMaxLogicalWidth;
-        var v441 : Nullable.<string> = o.webkitMinLogicalHeight;
-        var v442 : Nullable.<string> = o.webkitMinLogicalWidth;
-        var v443 : Nullable.<string> = o.webkitNbspMode;
-        var v444 : Nullable.<string> = o.webkitOverflowScrolling;
-        var v445 : Nullable.<string> = o.webkitPaddingAfter;
-        var v446 : Nullable.<string> = o.webkitPaddingBefore;
-        var v447 : Nullable.<string> = o.webkitPaddingEnd;
-        var v448 : Nullable.<string> = o.webkitPaddingStart;
-        var v449 : Nullable.<string> = o.webkitPerspective;
-        var v450 : Nullable.<string> = o.webkitPerspectiveOrigin;
-        var v451 : Nullable.<string> = o.webkitPerspectiveOriginX;
-        var v452 : Nullable.<string> = o.webkitPerspectiveOriginY;
-        var v453 : Nullable.<string> = o.webkitPrintColorAdjust;
-        var v454 : Nullable.<string> = o.webkitRegionBreakAfter;
-        var v455 : Nullable.<string> = o.webkitRegionBreakBefore;
-        var v456 : Nullable.<string> = o.webkitRegionBreakInside;
-        var v457 : Nullable.<string> = o.webkitRegionOverflow;
-        var v458 : Nullable.<string> = o.webkitRtlOrdering;
-        var v459 : Nullable.<string> = o.webkitSvgShadow;
-        var v460 : Nullable.<string> = o.webkitTapHighlightColor;
-        var v461 : Nullable.<string> = o.webkitTextCombine;
-        var v462 : Nullable.<string> = o.webkitTextDecorationsInEffect;
-        var v463 : Nullable.<string> = o.webkitTextEmphasis;
-        var v464 : Nullable.<string> = o.webkitTextEmphasisColor;
-        var v465 : Nullable.<string> = o.webkitTextEmphasisPosition;
-        var v466 : Nullable.<string> = o.webkitTextEmphasisStyle;
-        var v467 : Nullable.<string> = o.webkitTextFillColor;
-        var v468 : Nullable.<string> = o.webkitTextOrientation;
-        var v469 : Nullable.<string> = o.webkitTextSecurity;
-        var v470 : Nullable.<string> = o.webkitTextSizeAdjust;
-        var v471 : Nullable.<string> = o.webkitTextStroke;
-        var v472 : Nullable.<string> = o.webkitTextStrokeColor;
-        var v473 : Nullable.<string> = o.webkitTextStrokeWidth;
-        var v474 : Nullable.<string> = o.webkitTransform;
-        var v475 : Nullable.<string> = o.webkitTransformOrigin;
-        var v476 : Nullable.<string> = o.webkitTransformOriginX;
-        var v477 : Nullable.<string> = o.webkitTransformOriginY;
-        var v478 : Nullable.<string> = o.webkitTransformOriginZ;
-        var v479 : Nullable.<string> = o.webkitTransformStyle;
-        var v480 : Nullable.<string> = o.webkitTransition;
-        var v481 : Nullable.<string> = o.webkitTransitionDelay;
-        var v482 : Nullable.<string> = o.webkitTransitionDuration;
-        var v483 : Nullable.<string> = o.webkitTransitionProperty;
-        var v484 : Nullable.<string> = o.webkitTransitionTimingFunction;
-        var v485 : Nullable.<string> = o.webkitUserDrag;
-        var v486 : Nullable.<string> = o.webkitUserModify;
-        var v487 : Nullable.<string> = o.webkitUserSelect;
-        var v488 : Nullable.<string> = o.webkitWrap;
-        var v489 : Nullable.<string> = o.webkitWrapFlow;
-        var v490 : Nullable.<string> = o.webkitWrapMargin;
-        var v491 : Nullable.<string> = o.webkitWrapPadding;
-        var v492 : Nullable.<string> = o.webkitWrapShapeInside;
-        var v493 : Nullable.<string> = o.webkitWrapShapeOutside;
-        var v494 : Nullable.<string> = o.webkitWrapThrough;
-        var v495 : Nullable.<string> = o.webkitWritingMode;
-        var v496 : Nullable.<string> = o.whiteSpace;
-        var v497 : Nullable.<string> = o.widows;
-        var v498 : Nullable.<string> = o.width;
-        var v499 : Nullable.<string> = o.wordBreak;
-        var v500 : Nullable.<string> = o.wordSpacing;
-        var v501 : Nullable.<string> = o.wordWrap;
-        var v502 : Nullable.<string> = o.writingMode;
-        var v503 : Nullable.<string> = o.zIndex;
-        var v504 : Nullable.<string> = o.zoom;
-        var v505 : Nullable.<number> = o.length;
-        var v506 : Object/*Maybe<object>*/ = o.parentRule;
-        var v507 : Nullable.<string> = o.MozAnimation;
-        var v508 : Nullable.<string> = o.MozAnimationDelay;
-        var v509 : Nullable.<string> = o.MozAnimationDirection;
-        var v510 : Nullable.<string> = o.MozAnimationDuration;
-        var v511 : Nullable.<string> = o.MozAnimationFillMode;
-        var v512 : Nullable.<string> = o.MozAnimationIterationCount;
-        var v513 : Nullable.<string> = o.MozAnimationName;
-        var v514 : Nullable.<string> = o.MozAnimationPlayState;
-        var v515 : Nullable.<string> = o.MozAnimationTimingFunction;
-        var v516 : Nullable.<string> = o.MozAppearance;
-        var v517 : Nullable.<string> = o.MozBackfaceVisibility;
-        var v518 : Nullable.<string> = o.MozBackgroundInlinePolicy;
-        var v519 : Nullable.<string> = o.MozBinding;
-        var v520 : Nullable.<string> = o.MozBorderBottomColors;
-        var v521 : Nullable.<string> = o.MozBorderEnd;
-        var v522 : Nullable.<string> = o.MozBorderEndColor;
-        var v523 : Nullable.<string> = o.MozBorderEndStyle;
-        var v524 : Nullable.<string> = o.MozBorderEndWidth;
-        var v525 : Nullable.<string> = o.MozBorderImage;
-        var v526 : Nullable.<string> = o.MozBorderLeftColors;
-        var v527 : Nullable.<string> = o.MozBorderRightColors;
-        var v528 : Nullable.<string> = o.MozBorderStart;
-        var v529 : Nullable.<string> = o.MozBorderStartColor;
-        var v530 : Nullable.<string> = o.MozBorderStartStyle;
-        var v531 : Nullable.<string> = o.MozBorderStartWidth;
-        var v532 : Nullable.<string> = o.MozBorderTopColors;
-        var v533 : Nullable.<string> = o.MozBoxAlign;
-        var v534 : Nullable.<string> = o.MozBoxDirection;
-        var v535 : Nullable.<string> = o.MozBoxFlex;
-        var v536 : Nullable.<string> = o.MozBoxOrdinalGroup;
-        var v537 : Nullable.<string> = o.MozBoxOrient;
-        var v538 : Nullable.<string> = o.MozBoxPack;
-        var v539 : Nullable.<string> = o.MozBoxSizing;
-        var v540 : Nullable.<string> = o.MozColumnCount;
-        var v541 : Nullable.<string> = o.MozColumnGap;
-        var v542 : Nullable.<string> = o.MozColumnRule;
-        var v543 : Nullable.<string> = o.MozColumnRuleColor;
-        var v544 : Nullable.<string> = o.MozColumnRuleStyle;
-        var v545 : Nullable.<string> = o.MozColumnRuleWidth;
-        var v546 : Nullable.<string> = o.MozColumnWidth;
-        var v547 : Nullable.<string> = o.MozColumns;
-        var v548 : Nullable.<string> = o.MozFloatEdge;
-        var v549 : Nullable.<string> = o.MozFontFeatureSettings;
-        var v550 : Nullable.<string> = o.MozFontLanguageOverride;
-        var v551 : Nullable.<string> = o.MozForceBrokenImageIcon;
-        var v552 : Nullable.<string> = o.MozHyphens;
-        var v553 : Nullable.<string> = o.MozImageRegion;
-        var v554 : Nullable.<string> = o.MozMarginEnd;
-        var v555 : Nullable.<string> = o.MozMarginStart;
-        var v556 : Nullable.<string> = o.MozOpacity;
-        var v557 : Nullable.<string> = o.MozOrient;
-        var v558 : Nullable.<string> = o.MozOutline;
-        var v559 : Nullable.<string> = o.MozOutlineColor;
-        var v560 : Nullable.<string> = o.MozOutlineOffset;
-        var v561 : Nullable.<string> = o.MozOutlineRadius;
-        var v562 : Nullable.<string> = o.MozOutlineRadiusBottomleft;
-        var v563 : Nullable.<string> = o.MozOutlineRadiusBottomright;
-        var v564 : Nullable.<string> = o.MozOutlineRadiusTopleft;
-        var v565 : Nullable.<string> = o.MozOutlineRadiusTopright;
-        var v566 : Nullable.<string> = o.MozOutlineStyle;
-        var v567 : Nullable.<string> = o.MozOutlineWidth;
-        var v568 : Nullable.<string> = o.MozPaddingEnd;
-        var v569 : Nullable.<string> = o.MozPaddingStart;
-        var v570 : Nullable.<string> = o.MozPerspective;
-        var v571 : Nullable.<string> = o.MozPerspectiveOrigin;
-        var v572 : Nullable.<string> = o.MozStackSizing;
-        var v573 : Nullable.<string> = o.MozTabSize;
-        var v574 : Nullable.<string> = o.MozTextAlignLast;
-        var v575 : Nullable.<string> = o.MozTextBlink;
-        var v576 : Nullable.<string> = o.MozTextDecorationColor;
-        var v577 : Nullable.<string> = o.MozTextDecorationLine;
-        var v578 : Nullable.<string> = o.MozTextDecorationStyle;
-        var v579 : Nullable.<string> = o.MozTextSizeAdjust;
-        var v580 : Nullable.<string> = o.MozTransform;
-        var v581 : Nullable.<string> = o.MozTransformOrigin;
-        var v582 : Nullable.<string> = o.MozTransformStyle;
-        var v583 : Nullable.<string> = o.MozTransition;
-        var v584 : Nullable.<string> = o.MozTransitionDelay;
-        var v585 : Nullable.<string> = o.MozTransitionDuration;
-        var v586 : Nullable.<string> = o.MozTransitionProperty;
-        var v587 : Nullable.<string> = o.MozTransitionTimingFunction;
-        var v588 : Nullable.<string> = o.MozUserFocus;
-        var v589 : Nullable.<string> = o.MozUserInput;
-        var v590 : Nullable.<string> = o.MozUserModify;
-        var v591 : Nullable.<string> = o.MozUserSelect;
-        var v592 : Nullable.<string> = o.MozWindowShadow;
-        var v593 : Nullable.<string> = o.background;
-        var v594 : Nullable.<string> = o.backgroundAttachment;
-        var v595 : Nullable.<string> = o.backgroundClip;
-        var v596 : Nullable.<string> = o.backgroundColor;
-        var v597 : Nullable.<string> = o.backgroundImage;
-        var v598 : Nullable.<string> = o.backgroundOrigin;
-        var v599 : Nullable.<string> = o.backgroundPosition;
-        var v600 : Nullable.<string> = o.backgroundRepeat;
-        var v601 : Nullable.<string> = o.backgroundSize;
-        var v602 : Nullable.<string> = o.border;
-        var v603 : Nullable.<string> = o.borderBottom;
-        var v604 : Nullable.<string> = o.borderBottomColor;
-        var v605 : Nullable.<string> = o.borderBottomLeftRadius;
-        var v606 : Nullable.<string> = o.borderBottomRightRadius;
-        var v607 : Nullable.<string> = o.borderBottomStyle;
-        var v608 : Nullable.<string> = o.borderBottomWidth;
-        var v609 : Nullable.<string> = o.borderCollapse;
-        var v610 : Nullable.<string> = o.borderColor;
-        var v611 : Nullable.<string> = o.borderLeft;
-        var v612 : Nullable.<string> = o.borderLeftColor;
-        var v613 : Nullable.<string> = o.borderLeftStyle;
-        var v614 : Nullable.<string> = o.borderLeftWidth;
-        var v615 : Nullable.<string> = o.borderRadius;
-        var v616 : Nullable.<string> = o.borderRight;
-        var v617 : Nullable.<string> = o.borderRightColor;
-        var v618 : Nullable.<string> = o.borderRightStyle;
-        var v619 : Nullable.<string> = o.borderRightWidth;
-        var v620 : Nullable.<string> = o.borderSpacing;
-        var v621 : Nullable.<string> = o.borderStyle;
-        var v622 : Nullable.<string> = o.borderTop;
-        var v623 : Nullable.<string> = o.borderTopColor;
-        var v624 : Nullable.<string> = o.borderTopLeftRadius;
-        var v625 : Nullable.<string> = o.borderTopRightRadius;
-        var v626 : Nullable.<string> = o.borderTopStyle;
-        var v627 : Nullable.<string> = o.borderTopWidth;
-        var v628 : Nullable.<string> = o.borderWidth;
-        var v629 : Nullable.<string> = o.bottom;
-        var v630 : Nullable.<string> = o.boxShadow;
-        var v631 : Nullable.<string> = o.captionSide;
-        var v632 : Nullable.<string> = o.clear;
-        var v633 : Nullable.<string> = o.clip;
-        var v634 : Nullable.<string> = o.clipPath;
-        var v635 : Nullable.<string> = o.clipRule;
-        var v636 : Nullable.<string> = o.color;
-        var v637 : Nullable.<string> = o.colorInterpolation;
-        var v638 : Nullable.<string> = o.colorInterpolationFilters;
-        var v639 : Nullable.<string> = o.content;
-        var v640 : Nullable.<string> = o.counterIncrement;
-        var v641 : Nullable.<string> = o.counterReset;
-        var v642 : Nullable.<string> = o.cssFloat;
-        var v643 : Nullable.<string> = o.cssText;
-        var v644 : Nullable.<string> = o.cursor;
-        var v645 : Nullable.<string> = o.direction;
-        var v646 : Nullable.<string> = o.display;
-        var v647 : Nullable.<string> = o.dominantBaseline;
-        var v648 : Nullable.<string> = o.emptyCells;
-        var v649 : Nullable.<string> = o.fill;
-        var v650 : Nullable.<string> = o.fillOpacity;
-        var v651 : Nullable.<string> = o.fillRule;
-        var v652 : Nullable.<string> = o.filter;
-        var v653 : Nullable.<string> = o.floodColor;
-        var v654 : Nullable.<string> = o.floodOpacity;
-        var v655 : Nullable.<string> = o.font;
-        var v656 : Nullable.<string> = o.fontFamily;
-        var v657 : Nullable.<string> = o.fontSize;
-        var v658 : Nullable.<string> = o.fontSizeAdjust;
-        var v659 : Nullable.<string> = o.fontStretch;
-        var v660 : Nullable.<string> = o.fontStyle;
-        var v661 : Nullable.<string> = o.fontVariant;
-        var v662 : Nullable.<string> = o.fontWeight;
-        var v663 : Nullable.<string> = o.height;
-        var v664 : Nullable.<string> = o.imageRendering;
-        var v665 : Nullable.<string> = o.imeMode;
-        var v666 : Nullable.<string> = o.left;
-        var v667 : Nullable.<string> = o.letterSpacing;
-        var v668 : Nullable.<string> = o.lightingColor;
-        var v669 : Nullable.<string> = o.lineHeight;
-        var v670 : Nullable.<string> = o.listStyle;
-        var v671 : Nullable.<string> = o.listStyleImage;
-        var v672 : Nullable.<string> = o.listStylePosition;
-        var v673 : Nullable.<string> = o.listStyleType;
-        var v674 : Nullable.<string> = o.margin;
-        var v675 : Nullable.<string> = o.marginBottom;
-        var v676 : Nullable.<string> = o.marginLeft;
-        var v677 : Nullable.<string> = o.marginRight;
-        var v678 : Nullable.<string> = o.marginTop;
-        var v679 : Nullable.<string> = o.marker;
-        var v680 : Nullable.<string> = o.markerEnd;
-        var v681 : Nullable.<string> = o.markerMid;
-        var v682 : Nullable.<string> = o.markerOffset;
-        var v683 : Nullable.<string> = o.markerStart;
-        var v684 : Nullable.<string> = o.marks;
-        var v685 : Nullable.<string> = o.mask;
-        var v686 : Nullable.<string> = o.maxHeight;
-        var v687 : Nullable.<string> = o.maxWidth;
-        var v688 : Nullable.<string> = o.minHeight;
-        var v689 : Nullable.<string> = o.minWidth;
-        var v690 : Nullable.<string> = o.opacity;
-        var v691 : Nullable.<string> = o.orphans;
-        var v692 : Nullable.<string> = o.outline;
-        var v693 : Nullable.<string> = o.outlineColor;
-        var v694 : Nullable.<string> = o.outlineOffset;
-        var v695 : Nullable.<string> = o.outlineStyle;
-        var v696 : Nullable.<string> = o.outlineWidth;
-        var v697 : Nullable.<string> = o.overflow;
-        var v698 : Nullable.<string> = o.overflowX;
-        var v699 : Nullable.<string> = o.overflowY;
-        var v700 : Nullable.<string> = o.padding;
-        var v701 : Nullable.<string> = o.paddingBottom;
-        var v702 : Nullable.<string> = o.paddingLeft;
-        var v703 : Nullable.<string> = o.paddingRight;
-        var v704 : Nullable.<string> = o.paddingTop;
-        var v705 : Nullable.<string> = o.page;
-        var v706 : Nullable.<string> = o.pageBreakAfter;
-        var v707 : Nullable.<string> = o.pageBreakBefore;
-        var v708 : Nullable.<string> = o.pageBreakInside;
-        var v709 : Nullable.<string> = o.pointerEvents;
-        var v710 : Nullable.<string> = o.position;
-        var v711 : Nullable.<string> = o.quotes;
-        var v712 : Nullable.<string> = o.resize;
-        var v713 : Nullable.<string> = o.right;
-        var v714 : Nullable.<string> = o.shapeRendering;
-        var v715 : Nullable.<string> = o.size;
-        var v716 : Nullable.<string> = o.stopColor;
-        var v717 : Nullable.<string> = o.stopOpacity;
-        var v718 : Nullable.<string> = o.stroke;
-        var v719 : Nullable.<string> = o.strokeDasharray;
-        var v720 : Nullable.<string> = o.strokeDashoffset;
-        var v721 : Nullable.<string> = o.strokeLinecap;
-        var v722 : Nullable.<string> = o.strokeLinejoin;
-        var v723 : Nullable.<string> = o.strokeMiterlimit;
-        var v724 : Nullable.<string> = o.strokeOpacity;
-        var v725 : Nullable.<string> = o.strokeWidth;
-        var v726 : Nullable.<string> = o.tableLayout;
-        var v727 : Nullable.<string> = o.textAlign;
-        var v728 : Nullable.<string> = o.textAnchor;
-        var v729 : Nullable.<string> = o.textDecoration;
-        var v730 : Nullable.<string> = o.textIndent;
-        var v731 : Nullable.<string> = o.textOverflow;
-        var v732 : Nullable.<string> = o.textRendering;
-        var v733 : Nullable.<string> = o.textShadow;
-        var v734 : Nullable.<string> = o.textTransform;
-        var v735 : Nullable.<string> = o.top;
-        var v736 : Nullable.<string> = o.unicodeBidi;
-        var v737 : Nullable.<string> = o.verticalAlign;
-        var v738 : Nullable.<string> = o.visibility;
-        var v739 : Nullable.<string> = o.whiteSpace;
-        var v740 : Nullable.<string> = o.widows;
-        var v741 : Nullable.<string> = o.width;
-        var v742 : Nullable.<string> = o.wordSpacing;
-        var v743 : Nullable.<string> = o.wordWrap;
-        var v744 : Nullable.<string> = o.zIndex;
+        var f4 : string/*DOMString*/ = o.removeProperty(X.getstring());
+        var v3 : CSSRule = o.parentRule;
+        var v4 : string/*DOMString*/ = o.azimuth;
+        var v5 : string/*DOMString*/ = o.background;
+        var v6 : string/*DOMString*/ = o.backgroundAttachment;
+        var v7 : string/*DOMString*/ = o.backgroundColor;
+        var v8 : string/*DOMString*/ = o.backgroundImage;
+        var v9 : string/*DOMString*/ = o.backgroundPosition;
+        var v10 : string/*DOMString*/ = o.backgroundRepeat;
+        var v11 : string/*DOMString*/ = o.border;
+        var v12 : string/*DOMString*/ = o.borderCollapse;
+        var v13 : string/*DOMString*/ = o.borderColor;
+        var v14 : string/*DOMString*/ = o.borderSpacing;
+        var v15 : string/*DOMString*/ = o.borderStyle;
+        var v16 : string/*DOMString*/ = o.borderTop;
+        var v17 : string/*DOMString*/ = o.borderRight;
+        var v18 : string/*DOMString*/ = o.borderBottom;
+        var v19 : string/*DOMString*/ = o.borderLeft;
+        var v20 : string/*DOMString*/ = o.borderTopColor;
+        var v21 : string/*DOMString*/ = o.borderRightColor;
+        var v22 : string/*DOMString*/ = o.borderBottomColor;
+        var v23 : string/*DOMString*/ = o.borderLeftColor;
+        var v24 : string/*DOMString*/ = o.borderTopStyle;
+        var v25 : string/*DOMString*/ = o.borderRightStyle;
+        var v26 : string/*DOMString*/ = o.borderBottomStyle;
+        var v27 : string/*DOMString*/ = o.borderLeftStyle;
+        var v28 : string/*DOMString*/ = o.borderTopWidth;
+        var v29 : string/*DOMString*/ = o.borderRightWidth;
+        var v30 : string/*DOMString*/ = o.borderBottomWidth;
+        var v31 : string/*DOMString*/ = o.borderLeftWidth;
+        var v32 : string/*DOMString*/ = o.borderWidth;
+        var v33 : string/*DOMString*/ = o.bottom;
+        var v34 : string/*DOMString*/ = o.captionSide;
+        var v35 : string/*DOMString*/ = o.clear;
+        var v36 : string/*DOMString*/ = o.clip;
+        var v37 : string/*DOMString*/ = o.color;
+        var v38 : string/*DOMString*/ = o.content;
+        var v39 : string/*DOMString*/ = o.counterIncrement;
+        var v40 : string/*DOMString*/ = o.counterReset;
+        var v41 : string/*DOMString*/ = o.cue;
+        var v42 : string/*DOMString*/ = o.cueAfter;
+        var v43 : string/*DOMString*/ = o.cueBefore;
+        var v44 : string/*DOMString*/ = o.cursor;
+        var v45 : string/*DOMString*/ = o.direction;
+        var v46 : string/*DOMString*/ = o.display;
+        var v47 : string/*DOMString*/ = o.elevation;
+        var v48 : string/*DOMString*/ = o.emptyCells;
+        var v49 : string/*DOMString*/ = o.cssFloat;
+        var v50 : string/*DOMString*/ = o.font;
+        var v51 : string/*DOMString*/ = o.fontFamily;
+        var v52 : string/*DOMString*/ = o.fontSize;
+        var v53 : string/*DOMString*/ = o.fontSizeAdjust;
+        var v54 : string/*DOMString*/ = o.fontStretch;
+        var v55 : string/*DOMString*/ = o.fontStyle;
+        var v56 : string/*DOMString*/ = o.fontVariant;
+        var v57 : string/*DOMString*/ = o.fontWeight;
+        var v58 : string/*DOMString*/ = o.height;
+        var v59 : string/*DOMString*/ = o.left;
+        var v60 : string/*DOMString*/ = o.letterSpacing;
+        var v61 : string/*DOMString*/ = o.lineHeight;
+        var v62 : string/*DOMString*/ = o.listStyle;
+        var v63 : string/*DOMString*/ = o.listStyleImage;
+        var v64 : string/*DOMString*/ = o.listStylePosition;
+        var v65 : string/*DOMString*/ = o.listStyleType;
+        var v66 : string/*DOMString*/ = o.margin;
+        var v67 : string/*DOMString*/ = o.marginTop;
+        var v68 : string/*DOMString*/ = o.marginRight;
+        var v69 : string/*DOMString*/ = o.marginBottom;
+        var v70 : string/*DOMString*/ = o.marginLeft;
+        var v71 : string/*DOMString*/ = o.markerOffset;
+        var v72 : string/*DOMString*/ = o.marks;
+        var v73 : string/*DOMString*/ = o.maxHeight;
+        var v74 : string/*DOMString*/ = o.maxWidth;
+        var v75 : string/*DOMString*/ = o.minHeight;
+        var v76 : string/*DOMString*/ = o.minWidth;
+        var v77 : string/*DOMString*/ = o.orphans;
+        var v78 : string/*DOMString*/ = o.outline;
+        var v79 : string/*DOMString*/ = o.outlineColor;
+        var v80 : string/*DOMString*/ = o.outlineStyle;
+        var v81 : string/*DOMString*/ = o.outlineWidth;
+        var v82 : string/*DOMString*/ = o.overflow;
+        var v83 : string/*DOMString*/ = o.padding;
+        var v84 : string/*DOMString*/ = o.paddingTop;
+        var v85 : string/*DOMString*/ = o.paddingRight;
+        var v86 : string/*DOMString*/ = o.paddingBottom;
+        var v87 : string/*DOMString*/ = o.paddingLeft;
+        var v88 : string/*DOMString*/ = o.page;
+        var v89 : string/*DOMString*/ = o.pageBreakAfter;
+        var v90 : string/*DOMString*/ = o.pageBreakBefore;
+        var v91 : string/*DOMString*/ = o.pageBreakInside;
+        var v92 : string/*DOMString*/ = o.pause;
+        var v93 : string/*DOMString*/ = o.pauseAfter;
+        var v94 : string/*DOMString*/ = o.pauseBefore;
+        var v95 : string/*DOMString*/ = o.pitch;
+        var v96 : string/*DOMString*/ = o.pitchRange;
+        var v97 : string/*DOMString*/ = o.playDuring;
+        var v98 : string/*DOMString*/ = o.position;
+        var v99 : string/*DOMString*/ = o.quotes;
+        var v100 : string/*DOMString*/ = o.richness;
+        var v101 : string/*DOMString*/ = o.right;
+        var v102 : string/*DOMString*/ = o.size;
+        var v103 : string/*DOMString*/ = o.speak;
+        var v104 : string/*DOMString*/ = o.speakHeader;
+        var v105 : string/*DOMString*/ = o.speakNumeral;
+        var v106 : string/*DOMString*/ = o.speakPunctuation;
+        var v107 : string/*DOMString*/ = o.speechRate;
+        var v108 : string/*DOMString*/ = o.stress;
+        var v109 : string/*DOMString*/ = o.tableLayout;
+        var v110 : string/*DOMString*/ = o.textAlign;
+        var v111 : string/*DOMString*/ = o.textDecoration;
+        var v112 : string/*DOMString*/ = o.textIndent;
+        var v113 : string/*DOMString*/ = o.textShadow;
+        var v114 : string/*DOMString*/ = o.textTransform;
+        var v115 : string/*DOMString*/ = o.top;
+        var v116 : string/*DOMString*/ = o.unicodeBidi;
+        var v117 : string/*DOMString*/ = o.verticalAlign;
+        var v118 : string/*DOMString*/ = o.visibility;
+        var v119 : string/*DOMString*/ = o.voiceFamily;
+        var v120 : string/*DOMString*/ = o.volume;
+        var v121 : string/*DOMString*/ = o.whiteSpace;
+        var v122 : string/*DOMString*/ = o.widows;
+        var v123 : string/*DOMString*/ = o.width;
+        var v124 : string/*DOMString*/ = o.wordSpacing;
+        var v125 : string/*DOMString*/ = o.zIndex;
+        var v126 : Nullable.<number> = o.length;
+        var v127 : Object/*Maybe<object>*/ = o.parentRule;
+        var v128 : Nullable.<string> = o.alignmentBaseline;
+        var v129 : Nullable.<string> = o.background;
+        var v130 : Nullable.<string> = o.backgroundAttachment;
+        var v131 : Nullable.<string> = o.backgroundClip;
+        var v132 : Nullable.<string> = o.backgroundColor;
+        var v133 : Nullable.<string> = o.backgroundImage;
+        var v134 : Nullable.<string> = o.backgroundOrigin;
+        var v135 : Nullable.<string> = o.backgroundPosition;
+        var v136 : Nullable.<string> = o.backgroundPositionX;
+        var v137 : Nullable.<string> = o.backgroundPositionY;
+        var v138 : Nullable.<string> = o.backgroundRepeat;
+        var v139 : Nullable.<string> = o.backgroundRepeatX;
+        var v140 : Nullable.<string> = o.backgroundRepeatY;
+        var v141 : Nullable.<string> = o.backgroundSize;
+        var v142 : Nullable.<string> = o.baselineShift;
+        var v143 : Nullable.<string> = o.border;
+        var v144 : Nullable.<string> = o.borderBottom;
+        var v145 : Nullable.<string> = o.borderBottomColor;
+        var v146 : Nullable.<string> = o.borderBottomLeftRadius;
+        var v147 : Nullable.<string> = o.borderBottomRightRadius;
+        var v148 : Nullable.<string> = o.borderBottomStyle;
+        var v149 : Nullable.<string> = o.borderBottomWidth;
+        var v150 : Nullable.<string> = o.borderCollapse;
+        var v151 : Nullable.<string> = o.borderColor;
+        var v152 : Nullable.<string> = o.borderImage;
+        var v153 : Nullable.<string> = o.borderImageOutset;
+        var v154 : Nullable.<string> = o.borderImageRepeat;
+        var v155 : Nullable.<string> = o.borderImageSlice;
+        var v156 : Nullable.<string> = o.borderImageSource;
+        var v157 : Nullable.<string> = o.borderImageWidth;
+        var v158 : Nullable.<string> = o.borderLeft;
+        var v159 : Nullable.<string> = o.borderLeftColor;
+        var v160 : Nullable.<string> = o.borderLeftStyle;
+        var v161 : Nullable.<string> = o.borderLeftWidth;
+        var v162 : Nullable.<string> = o.borderRadius;
+        var v163 : Nullable.<string> = o.borderRight;
+        var v164 : Nullable.<string> = o.borderRightColor;
+        var v165 : Nullable.<string> = o.borderRightStyle;
+        var v166 : Nullable.<string> = o.borderRightWidth;
+        var v167 : Nullable.<string> = o.borderSpacing;
+        var v168 : Nullable.<string> = o.borderStyle;
+        var v169 : Nullable.<string> = o.borderTop;
+        var v170 : Nullable.<string> = o.borderTopColor;
+        var v171 : Nullable.<string> = o.borderTopLeftRadius;
+        var v172 : Nullable.<string> = o.borderTopRightRadius;
+        var v173 : Nullable.<string> = o.borderTopStyle;
+        var v174 : Nullable.<string> = o.borderTopWidth;
+        var v175 : Nullable.<string> = o.borderWidth;
+        var v176 : Nullable.<string> = o.bottom;
+        var v177 : Nullable.<string> = o.boxShadow;
+        var v178 : Nullable.<string> = o.boxSizing;
+        var v179 : Nullable.<string> = o.captionSide;
+        var v180 : Nullable.<string> = o.clear;
+        var v181 : Nullable.<string> = o.clip;
+        var v182 : Nullable.<string> = o.clipPath;
+        var v183 : Nullable.<string> = o.clipRule;
+        var v184 : Nullable.<string> = o.color;
+        var v185 : Nullable.<string> = o.colorInterpolation;
+        var v186 : Nullable.<string> = o.colorInterpolationFilters;
+        var v187 : Nullable.<string> = o.colorProfile;
+        var v188 : Nullable.<string> = o.colorRendering;
+        var v189 : Nullable.<string> = o.content;
+        var v190 : Nullable.<string> = o.counterIncrement;
+        var v191 : Nullable.<string> = o.counterReset;
+        var v192 : Nullable.<string> = o.cssText;
+        var v193 : Nullable.<string> = o.cursor;
+        var v194 : Nullable.<string> = o.direction;
+        var v195 : Nullable.<string> = o.display;
+        var v196 : Nullable.<string> = o.dominantBaseline;
+        var v197 : Nullable.<string> = o.emptyCells;
+        var v198 : Nullable.<string> = o.enableBackground;
+        var v199 : Nullable.<string> = o.fill;
+        var v200 : Nullable.<string> = o.fillOpacity;
+        var v201 : Nullable.<string> = o.fillRule;
+        var v202 : Nullable.<string> = o.filter;
+        var v203 : Nullable.<string> = o.float;
+        var v204 : Nullable.<string> = o.floodColor;
+        var v205 : Nullable.<string> = o.floodOpacity;
+        var v206 : Nullable.<string> = o.font;
+        var v207 : Nullable.<string> = o.fontFamily;
+        var v208 : Nullable.<string> = o.fontSize;
+        var v209 : Nullable.<string> = o.fontStretch;
+        var v210 : Nullable.<string> = o.fontStyle;
+        var v211 : Nullable.<string> = o.fontVariant;
+        var v212 : Nullable.<string> = o.fontWeight;
+        var v213 : Nullable.<string> = o.glyphOrientationHorizontal;
+        var v214 : Nullable.<string> = o.glyphOrientationVertical;
+        var v215 : Nullable.<string> = o.height;
+        var v216 : Nullable.<string> = o.imageRendering;
+        var v217 : Nullable.<string> = o.kerning;
+        var v218 : Nullable.<string> = o.left;
+        var v219 : Nullable.<string> = o.letterSpacing;
+        var v220 : Nullable.<string> = o.lightingColor;
+        var v221 : Nullable.<string> = o.lineHeight;
+        var v222 : Nullable.<string> = o.listStyle;
+        var v223 : Nullable.<string> = o.listStyleImage;
+        var v224 : Nullable.<string> = o.listStylePosition;
+        var v225 : Nullable.<string> = o.listStyleType;
+        var v226 : Nullable.<string> = o.margin;
+        var v227 : Nullable.<string> = o.marginBottom;
+        var v228 : Nullable.<string> = o.marginLeft;
+        var v229 : Nullable.<string> = o.marginRight;
+        var v230 : Nullable.<string> = o.marginTop;
+        var v231 : Nullable.<string> = o.marker;
+        var v232 : Nullable.<string> = o.markerEnd;
+        var v233 : Nullable.<string> = o.markerMid;
+        var v234 : Nullable.<string> = o.markerStart;
+        var v235 : Nullable.<string> = o.mask;
+        var v236 : Nullable.<string> = o.maxHeight;
+        var v237 : Nullable.<string> = o.maxWidth;
+        var v238 : Nullable.<string> = o.minHeight;
+        var v239 : Nullable.<string> = o.minWidth;
+        var v240 : Nullable.<string> = o.opacity;
+        var v241 : Nullable.<string> = o.orphans;
+        var v242 : Nullable.<string> = o.outline;
+        var v243 : Nullable.<string> = o.outlineColor;
+        var v244 : Nullable.<string> = o.outlineOffset;
+        var v245 : Nullable.<string> = o.outlineStyle;
+        var v246 : Nullable.<string> = o.outlineWidth;
+        var v247 : Nullable.<string> = o.overflow;
+        var v248 : Nullable.<string> = o.overflowX;
+        var v249 : Nullable.<string> = o.overflowY;
+        var v250 : Nullable.<string> = o.padding;
+        var v251 : Nullable.<string> = o.paddingBottom;
+        var v252 : Nullable.<string> = o.paddingLeft;
+        var v253 : Nullable.<string> = o.paddingRight;
+        var v254 : Nullable.<string> = o.paddingTop;
+        var v255 : Nullable.<string> = o.page;
+        var v256 : Nullable.<string> = o.pageBreakAfter;
+        var v257 : Nullable.<string> = o.pageBreakBefore;
+        var v258 : Nullable.<string> = o.pageBreakInside;
+        var v259 : Nullable.<string> = o.pointerEvents;
+        var v260 : Nullable.<string> = o.position;
+        var v261 : Nullable.<string> = o.quotes;
+        var v262 : Nullable.<string> = o.resize;
+        var v263 : Nullable.<string> = o.right;
+        var v264 : Nullable.<string> = o.shapeRendering;
+        var v265 : Nullable.<string> = o.size;
+        var v266 : Nullable.<string> = o.speak;
+        var v267 : Nullable.<string> = o.src;
+        var v268 : Nullable.<string> = o.stopColor;
+        var v269 : Nullable.<string> = o.stopOpacity;
+        var v270 : Nullable.<string> = o.stroke;
+        var v271 : Nullable.<string> = o.strokeDasharray;
+        var v272 : Nullable.<string> = o.strokeDashoffset;
+        var v273 : Nullable.<string> = o.strokeLinecap;
+        var v274 : Nullable.<string> = o.strokeLinejoin;
+        var v275 : Nullable.<string> = o.strokeMiterlimit;
+        var v276 : Nullable.<string> = o.strokeOpacity;
+        var v277 : Nullable.<string> = o.strokeWidth;
+        var v278 : Nullable.<string> = o.tableLayout;
+        var v279 : Nullable.<string> = o.textAlign;
+        var v280 : Nullable.<string> = o.textAnchor;
+        var v281 : Nullable.<string> = o.textDecoration;
+        var v282 : Nullable.<string> = o.textIndent;
+        var v283 : Nullable.<string> = o.textLineThrough;
+        var v284 : Nullable.<string> = o.textLineThroughColor;
+        var v285 : Nullable.<string> = o.textLineThroughMode;
+        var v286 : Nullable.<string> = o.textLineThroughStyle;
+        var v287 : Nullable.<string> = o.textLineThroughWidth;
+        var v288 : Nullable.<string> = o.textOverflow;
+        var v289 : Nullable.<string> = o.textOverline;
+        var v290 : Nullable.<string> = o.textOverlineColor;
+        var v291 : Nullable.<string> = o.textOverlineMode;
+        var v292 : Nullable.<string> = o.textOverlineStyle;
+        var v293 : Nullable.<string> = o.textOverlineWidth;
+        var v294 : Nullable.<string> = o.textRendering;
+        var v295 : Nullable.<string> = o.textShadow;
+        var v296 : Nullable.<string> = o.textTransform;
+        var v297 : Nullable.<string> = o.textUnderline;
+        var v298 : Nullable.<string> = o.textUnderlineColor;
+        var v299 : Nullable.<string> = o.textUnderlineMode;
+        var v300 : Nullable.<string> = o.textUnderlineStyle;
+        var v301 : Nullable.<string> = o.textUnderlineWidth;
+        var v302 : Nullable.<string> = o.top;
+        var v303 : Nullable.<string> = o.unicodeBidi;
+        var v304 : Nullable.<string> = o.unicodeRange;
+        var v305 : Nullable.<string> = o.vectorEffect;
+        var v306 : Nullable.<string> = o.verticalAlign;
+        var v307 : Nullable.<string> = o.visibility;
+        var v308 : Nullable.<string> = o.webkitAnimation;
+        var v309 : Nullable.<string> = o.webkitAnimationDelay;
+        var v310 : Nullable.<string> = o.webkitAnimationDirection;
+        var v311 : Nullable.<string> = o.webkitAnimationDuration;
+        var v312 : Nullable.<string> = o.webkitAnimationFillMode;
+        var v313 : Nullable.<string> = o.webkitAnimationIterationCount;
+        var v314 : Nullable.<string> = o.webkitAnimationName;
+        var v315 : Nullable.<string> = o.webkitAnimationPlayState;
+        var v316 : Nullable.<string> = o.webkitAnimationTimingFunction;
+        var v317 : Nullable.<string> = o.webkitAppearance;
+        var v318 : Nullable.<string> = o.webkitAspectRatio;
+        var v319 : Nullable.<string> = o.webkitBackfaceVisibility;
+        var v320 : Nullable.<string> = o.webkitBackgroundClip;
+        var v321 : Nullable.<string> = o.webkitBackgroundComposite;
+        var v322 : Nullable.<string> = o.webkitBackgroundOrigin;
+        var v323 : Nullable.<string> = o.webkitBackgroundSize;
+        var v324 : Nullable.<string> = o.webkitBorderAfter;
+        var v325 : Nullable.<string> = o.webkitBorderAfterColor;
+        var v326 : Nullable.<string> = o.webkitBorderAfterStyle;
+        var v327 : Nullable.<string> = o.webkitBorderAfterWidth;
+        var v328 : Nullable.<string> = o.webkitBorderBefore;
+        var v329 : Nullable.<string> = o.webkitBorderBeforeColor;
+        var v330 : Nullable.<string> = o.webkitBorderBeforeStyle;
+        var v331 : Nullable.<string> = o.webkitBorderBeforeWidth;
+        var v332 : Nullable.<string> = o.webkitBorderEnd;
+        var v333 : Nullable.<string> = o.webkitBorderEndColor;
+        var v334 : Nullable.<string> = o.webkitBorderEndStyle;
+        var v335 : Nullable.<string> = o.webkitBorderEndWidth;
+        var v336 : Nullable.<string> = o.webkitBorderFit;
+        var v337 : Nullable.<string> = o.webkitBorderHorizontalSpacing;
+        var v338 : Nullable.<string> = o.webkitBorderImage;
+        var v339 : Nullable.<string> = o.webkitBorderRadius;
+        var v340 : Nullable.<string> = o.webkitBorderStart;
+        var v341 : Nullable.<string> = o.webkitBorderStartColor;
+        var v342 : Nullable.<string> = o.webkitBorderStartStyle;
+        var v343 : Nullable.<string> = o.webkitBorderStartWidth;
+        var v344 : Nullable.<string> = o.webkitBorderVerticalSpacing;
+        var v345 : Nullable.<string> = o.webkitBoxAlign;
+        var v346 : Nullable.<string> = o.webkitBoxDirection;
+        var v347 : Nullable.<string> = o.webkitBoxFlex;
+        var v348 : Nullable.<string> = o.webkitBoxFlexGroup;
+        var v349 : Nullable.<string> = o.webkitBoxLines;
+        var v350 : Nullable.<string> = o.webkitBoxOrdinalGroup;
+        var v351 : Nullable.<string> = o.webkitBoxOrient;
+        var v352 : Nullable.<string> = o.webkitBoxPack;
+        var v353 : Nullable.<string> = o.webkitBoxReflect;
+        var v354 : Nullable.<string> = o.webkitBoxShadow;
+        var v355 : Nullable.<string> = o.webkitColorCorrection;
+        var v356 : Nullable.<string> = o.webkitColumnAxis;
+        var v357 : Nullable.<string> = o.webkitColumnBreakAfter;
+        var v358 : Nullable.<string> = o.webkitColumnBreakBefore;
+        var v359 : Nullable.<string> = o.webkitColumnBreakInside;
+        var v360 : Nullable.<string> = o.webkitColumnCount;
+        var v361 : Nullable.<string> = o.webkitColumnGap;
+        var v362 : Nullable.<string> = o.webkitColumnRule;
+        var v363 : Nullable.<string> = o.webkitColumnRuleColor;
+        var v364 : Nullable.<string> = o.webkitColumnRuleStyle;
+        var v365 : Nullable.<string> = o.webkitColumnRuleWidth;
+        var v366 : Nullable.<string> = o.webkitColumnSpan;
+        var v367 : Nullable.<string> = o.webkitColumnWidth;
+        var v368 : Nullable.<string> = o.webkitColumns;
+        var v369 : Nullable.<string> = o.webkitFilter;
+        var v370 : Nullable.<string> = o.webkitFlexAlign;
+        var v371 : Nullable.<string> = o.webkitFlexDirection;
+        var v372 : Nullable.<string> = o.webkitFlexFlow;
+        var v373 : Nullable.<string> = o.webkitFlexItemAlign;
+        var v374 : Nullable.<string> = o.webkitFlexLinePack;
+        var v375 : Nullable.<string> = o.webkitFlexOrder;
+        var v376 : Nullable.<string> = o.webkitFlexPack;
+        var v377 : Nullable.<string> = o.webkitFlexWrap;
+        var v378 : Nullable.<string> = o.webkitFlowFrom;
+        var v379 : Nullable.<string> = o.webkitFlowInto;
+        var v380 : Nullable.<string> = o.webkitFontFeatureSettings;
+        var v381 : Nullable.<string> = o.webkitFontKerning;
+        var v382 : Nullable.<string> = o.webkitFontSizeDelta;
+        var v383 : Nullable.<string> = o.webkitFontSmoothing;
+        var v384 : Nullable.<string> = o.webkitFontVariantLigatures;
+        var v385 : Nullable.<string> = o.webkitHighlight;
+        var v386 : Nullable.<string> = o.webkitHyphenateCharacter;
+        var v387 : Nullable.<string> = o.webkitHyphenateLimitAfter;
+        var v388 : Nullable.<string> = o.webkitHyphenateLimitBefore;
+        var v389 : Nullable.<string> = o.webkitHyphenateLimitLines;
+        var v390 : Nullable.<string> = o.webkitHyphens;
+        var v391 : Nullable.<string> = o.webkitLineAlign;
+        var v392 : Nullable.<string> = o.webkitLineBoxContain;
+        var v393 : Nullable.<string> = o.webkitLineBreak;
+        var v394 : Nullable.<string> = o.webkitLineClamp;
+        var v395 : Nullable.<string> = o.webkitLineGrid;
+        var v396 : Nullable.<string> = o.webkitLineSnap;
+        var v397 : Nullable.<string> = o.webkitLocale;
+        var v398 : Nullable.<string> = o.webkitLogicalHeight;
+        var v399 : Nullable.<string> = o.webkitLogicalWidth;
+        var v400 : Nullable.<string> = o.webkitMarginAfter;
+        var v401 : Nullable.<string> = o.webkitMarginAfterCollapse;
+        var v402 : Nullable.<string> = o.webkitMarginBefore;
+        var v403 : Nullable.<string> = o.webkitMarginBeforeCollapse;
+        var v404 : Nullable.<string> = o.webkitMarginBottomCollapse;
+        var v405 : Nullable.<string> = o.webkitMarginCollapse;
+        var v406 : Nullable.<string> = o.webkitMarginEnd;
+        var v407 : Nullable.<string> = o.webkitMarginStart;
+        var v408 : Nullable.<string> = o.webkitMarginTopCollapse;
+        var v409 : Nullable.<string> = o.webkitMarquee;
+        var v410 : Nullable.<string> = o.webkitMarqueeDirection;
+        var v411 : Nullable.<string> = o.webkitMarqueeIncrement;
+        var v412 : Nullable.<string> = o.webkitMarqueeRepetition;
+        var v413 : Nullable.<string> = o.webkitMarqueeSpeed;
+        var v414 : Nullable.<string> = o.webkitMarqueeStyle;
+        var v415 : Nullable.<string> = o.webkitMask;
+        var v416 : Nullable.<string> = o.webkitMaskAttachment;
+        var v417 : Nullable.<string> = o.webkitMaskBoxImage;
+        var v418 : Nullable.<string> = o.webkitMaskBoxImageOutset;
+        var v419 : Nullable.<string> = o.webkitMaskBoxImageRepeat;
+        var v420 : Nullable.<string> = o.webkitMaskBoxImageSlice;
+        var v421 : Nullable.<string> = o.webkitMaskBoxImageSource;
+        var v422 : Nullable.<string> = o.webkitMaskBoxImageWidth;
+        var v423 : Nullable.<string> = o.webkitMaskClip;
+        var v424 : Nullable.<string> = o.webkitMaskComposite;
+        var v425 : Nullable.<string> = o.webkitMaskImage;
+        var v426 : Nullable.<string> = o.webkitMaskOrigin;
+        var v427 : Nullable.<string> = o.webkitMaskPosition;
+        var v428 : Nullable.<string> = o.webkitMaskPositionX;
+        var v429 : Nullable.<string> = o.webkitMaskPositionY;
+        var v430 : Nullable.<string> = o.webkitMaskRepeat;
+        var v431 : Nullable.<string> = o.webkitMaskRepeatX;
+        var v432 : Nullable.<string> = o.webkitMaskRepeatY;
+        var v433 : Nullable.<string> = o.webkitMaskSize;
+        var v434 : Nullable.<string> = o.webkitMatchNearestMailBlockquoteColor;
+        var v435 : Nullable.<string> = o.webkitMaxLogicalHeight;
+        var v436 : Nullable.<string> = o.webkitMaxLogicalWidth;
+        var v437 : Nullable.<string> = o.webkitMinLogicalHeight;
+        var v438 : Nullable.<string> = o.webkitMinLogicalWidth;
+        var v439 : Nullable.<string> = o.webkitNbspMode;
+        var v440 : Nullable.<string> = o.webkitOverflowScrolling;
+        var v441 : Nullable.<string> = o.webkitPaddingAfter;
+        var v442 : Nullable.<string> = o.webkitPaddingBefore;
+        var v443 : Nullable.<string> = o.webkitPaddingEnd;
+        var v444 : Nullable.<string> = o.webkitPaddingStart;
+        var v445 : Nullable.<string> = o.webkitPerspective;
+        var v446 : Nullable.<string> = o.webkitPerspectiveOrigin;
+        var v447 : Nullable.<string> = o.webkitPerspectiveOriginX;
+        var v448 : Nullable.<string> = o.webkitPerspectiveOriginY;
+        var v449 : Nullable.<string> = o.webkitPrintColorAdjust;
+        var v450 : Nullable.<string> = o.webkitRegionBreakAfter;
+        var v451 : Nullable.<string> = o.webkitRegionBreakBefore;
+        var v452 : Nullable.<string> = o.webkitRegionBreakInside;
+        var v453 : Nullable.<string> = o.webkitRegionOverflow;
+        var v454 : Nullable.<string> = o.webkitRtlOrdering;
+        var v455 : Nullable.<string> = o.webkitSvgShadow;
+        var v456 : Nullable.<string> = o.webkitTapHighlightColor;
+        var v457 : Nullable.<string> = o.webkitTextCombine;
+        var v458 : Nullable.<string> = o.webkitTextDecorationsInEffect;
+        var v459 : Nullable.<string> = o.webkitTextEmphasis;
+        var v460 : Nullable.<string> = o.webkitTextEmphasisColor;
+        var v461 : Nullable.<string> = o.webkitTextEmphasisPosition;
+        var v462 : Nullable.<string> = o.webkitTextEmphasisStyle;
+        var v463 : Nullable.<string> = o.webkitTextFillColor;
+        var v464 : Nullable.<string> = o.webkitTextOrientation;
+        var v465 : Nullable.<string> = o.webkitTextSecurity;
+        var v466 : Nullable.<string> = o.webkitTextSizeAdjust;
+        var v467 : Nullable.<string> = o.webkitTextStroke;
+        var v468 : Nullable.<string> = o.webkitTextStrokeColor;
+        var v469 : Nullable.<string> = o.webkitTextStrokeWidth;
+        var v470 : Nullable.<string> = o.webkitTransform;
+        var v471 : Nullable.<string> = o.webkitTransformOrigin;
+        var v472 : Nullable.<string> = o.webkitTransformOriginX;
+        var v473 : Nullable.<string> = o.webkitTransformOriginY;
+        var v474 : Nullable.<string> = o.webkitTransformOriginZ;
+        var v475 : Nullable.<string> = o.webkitTransformStyle;
+        var v476 : Nullable.<string> = o.webkitTransition;
+        var v477 : Nullable.<string> = o.webkitTransitionDelay;
+        var v478 : Nullable.<string> = o.webkitTransitionDuration;
+        var v479 : Nullable.<string> = o.webkitTransitionProperty;
+        var v480 : Nullable.<string> = o.webkitTransitionTimingFunction;
+        var v481 : Nullable.<string> = o.webkitUserDrag;
+        var v482 : Nullable.<string> = o.webkitUserModify;
+        var v483 : Nullable.<string> = o.webkitUserSelect;
+        var v484 : Nullable.<string> = o.webkitWrap;
+        var v485 : Nullable.<string> = o.webkitWrapFlow;
+        var v486 : Nullable.<string> = o.webkitWrapMargin;
+        var v487 : Nullable.<string> = o.webkitWrapPadding;
+        var v488 : Nullable.<string> = o.webkitWrapShapeInside;
+        var v489 : Nullable.<string> = o.webkitWrapShapeOutside;
+        var v490 : Nullable.<string> = o.webkitWrapThrough;
+        var v491 : Nullable.<string> = o.webkitWritingMode;
+        var v492 : Nullable.<string> = o.whiteSpace;
+        var v493 : Nullable.<string> = o.widows;
+        var v494 : Nullable.<string> = o.width;
+        var v495 : Nullable.<string> = o.wordBreak;
+        var v496 : Nullable.<string> = o.wordSpacing;
+        var v497 : Nullable.<string> = o.wordWrap;
+        var v498 : Nullable.<string> = o.writingMode;
+        var v499 : Nullable.<string> = o.zIndex;
+        var v500 : Nullable.<string> = o.zoom;
+        var v501 : Nullable.<string> = o.MozAnimation;
+        var v502 : Nullable.<string> = o.MozAnimationDelay;
+        var v503 : Nullable.<string> = o.MozAnimationDirection;
+        var v504 : Nullable.<string> = o.MozAnimationDuration;
+        var v505 : Nullable.<string> = o.MozAnimationFillMode;
+        var v506 : Nullable.<string> = o.MozAnimationIterationCount;
+        var v507 : Nullable.<string> = o.MozAnimationName;
+        var v508 : Nullable.<string> = o.MozAnimationPlayState;
+        var v509 : Nullable.<string> = o.MozAnimationTimingFunction;
+        var v510 : Nullable.<string> = o.MozAppearance;
+        var v511 : Nullable.<string> = o.MozBackfaceVisibility;
+        var v512 : Nullable.<string> = o.MozBackgroundInlinePolicy;
+        var v513 : Nullable.<string> = o.MozBinding;
+        var v514 : Nullable.<string> = o.MozBorderBottomColors;
+        var v515 : Nullable.<string> = o.MozBorderEnd;
+        var v516 : Nullable.<string> = o.MozBorderEndColor;
+        var v517 : Nullable.<string> = o.MozBorderEndStyle;
+        var v518 : Nullable.<string> = o.MozBorderEndWidth;
+        var v519 : Nullable.<string> = o.MozBorderImage;
+        var v520 : Nullable.<string> = o.MozBorderLeftColors;
+        var v521 : Nullable.<string> = o.MozBorderRightColors;
+        var v522 : Nullable.<string> = o.MozBorderStart;
+        var v523 : Nullable.<string> = o.MozBorderStartColor;
+        var v524 : Nullable.<string> = o.MozBorderStartStyle;
+        var v525 : Nullable.<string> = o.MozBorderStartWidth;
+        var v526 : Nullable.<string> = o.MozBorderTopColors;
+        var v527 : Nullable.<string> = o.MozBoxAlign;
+        var v528 : Nullable.<string> = o.MozBoxDirection;
+        var v529 : Nullable.<string> = o.MozBoxFlex;
+        var v530 : Nullable.<string> = o.MozBoxOrdinalGroup;
+        var v531 : Nullable.<string> = o.MozBoxOrient;
+        var v532 : Nullable.<string> = o.MozBoxPack;
+        var v533 : Nullable.<string> = o.MozBoxSizing;
+        var v534 : Nullable.<string> = o.MozColumnCount;
+        var v535 : Nullable.<string> = o.MozColumnGap;
+        var v536 : Nullable.<string> = o.MozColumnRule;
+        var v537 : Nullable.<string> = o.MozColumnRuleColor;
+        var v538 : Nullable.<string> = o.MozColumnRuleStyle;
+        var v539 : Nullable.<string> = o.MozColumnRuleWidth;
+        var v540 : Nullable.<string> = o.MozColumnWidth;
+        var v541 : Nullable.<string> = o.MozColumns;
+        var v542 : Nullable.<string> = o.MozFloatEdge;
+        var v543 : Nullable.<string> = o.MozFontFeatureSettings;
+        var v544 : Nullable.<string> = o.MozFontLanguageOverride;
+        var v545 : Nullable.<string> = o.MozForceBrokenImageIcon;
+        var v546 : Nullable.<string> = o.MozHyphens;
+        var v547 : Nullable.<string> = o.MozImageRegion;
+        var v548 : Nullable.<string> = o.MozMarginEnd;
+        var v549 : Nullable.<string> = o.MozMarginStart;
+        var v550 : Nullable.<string> = o.MozOpacity;
+        var v551 : Nullable.<string> = o.MozOrient;
+        var v552 : Nullable.<string> = o.MozOutline;
+        var v553 : Nullable.<string> = o.MozOutlineColor;
+        var v554 : Nullable.<string> = o.MozOutlineOffset;
+        var v555 : Nullable.<string> = o.MozOutlineRadius;
+        var v556 : Nullable.<string> = o.MozOutlineRadiusBottomleft;
+        var v557 : Nullable.<string> = o.MozOutlineRadiusBottomright;
+        var v558 : Nullable.<string> = o.MozOutlineRadiusTopleft;
+        var v559 : Nullable.<string> = o.MozOutlineRadiusTopright;
+        var v560 : Nullable.<string> = o.MozOutlineStyle;
+        var v561 : Nullable.<string> = o.MozOutlineWidth;
+        var v562 : Nullable.<string> = o.MozPaddingEnd;
+        var v563 : Nullable.<string> = o.MozPaddingStart;
+        var v564 : Nullable.<string> = o.MozPerspective;
+        var v565 : Nullable.<string> = o.MozPerspectiveOrigin;
+        var v566 : Nullable.<string> = o.MozStackSizing;
+        var v567 : Nullable.<string> = o.MozTabSize;
+        var v568 : Nullable.<string> = o.MozTextAlignLast;
+        var v569 : Nullable.<string> = o.MozTextBlink;
+        var v570 : Nullable.<string> = o.MozTextDecorationColor;
+        var v571 : Nullable.<string> = o.MozTextDecorationLine;
+        var v572 : Nullable.<string> = o.MozTextDecorationStyle;
+        var v573 : Nullable.<string> = o.MozTextSizeAdjust;
+        var v574 : Nullable.<string> = o.MozTransform;
+        var v575 : Nullable.<string> = o.MozTransformOrigin;
+        var v576 : Nullable.<string> = o.MozTransformStyle;
+        var v577 : Nullable.<string> = o.MozTransition;
+        var v578 : Nullable.<string> = o.MozTransitionDelay;
+        var v579 : Nullable.<string> = o.MozTransitionDuration;
+        var v580 : Nullable.<string> = o.MozTransitionProperty;
+        var v581 : Nullable.<string> = o.MozTransitionTimingFunction;
+        var v582 : Nullable.<string> = o.MozUserFocus;
+        var v583 : Nullable.<string> = o.MozUserInput;
+        var v584 : Nullable.<string> = o.MozUserModify;
+        var v585 : Nullable.<string> = o.MozUserSelect;
+        var v586 : Nullable.<string> = o.MozWindowShadow;
+        var v587 : Nullable.<string> = o.cssFloat;
+        var v588 : Nullable.<string> = o.fontSizeAdjust;
+        var v589 : Nullable.<string> = o.imeMode;
+        var v590 : Nullable.<string> = o.markerOffset;
+        var v591 : Nullable.<string> = o.marks;
     } // CSSStyleDeclaration
 
     // #65
@@ -1708,141 +1557,141 @@ class _Test extends TestCase {
         var f1 : CSSStyleDeclaration = o.getComputedStyle(X.getElement());
         var f2 : CSSStyleDeclaration = o.getComputedStyle(X.getElement(), X.getstring());
         var f3 : MediaQueryList = o.matchMedia(X.getstring());
-        var v4 : Screen = o.screen;
-        var v5 : int/*long*/ = o.innerWidth;
-        var v6 : int/*long*/ = o.innerHeight;
-        var v7 : int/*long*/ = o.scrollX;
-        var v8 : int/*long*/ = o.pageXOffset;
-        var v9 : int/*long*/ = o.scrollY;
-        var v10 : int/*long*/ = o.pageYOffset;
+        var v1 : Screen = o.screen;
+        var v2 : int/*long*/ = o.innerWidth;
+        var v3 : int/*long*/ = o.innerHeight;
+        var v4 : int/*long*/ = o.scrollX;
+        var v5 : int/*long*/ = o.pageXOffset;
+        var v6 : int/*long*/ = o.scrollY;
+        var v7 : int/*long*/ = o.pageYOffset;
         o.scroll(X.getint(), X.getint());
         o.scrollTo(X.getint(), X.getint());
         o.scrollBy(X.getint(), X.getint());
-        var v11 : int/*long*/ = o.screenX;
-        var v12 : int/*long*/ = o.screenY;
-        var v13 : int/*long*/ = o.outerWidth;
-        var v14 : int/*long*/ = o.outerHeight;
-        var v15 : Window/*WindowProxy*/ = o.window;
-        var v16 : Window/*WindowProxy*/ = o.self;
-        var v17 : HTMLDocument/*Document*/ = o.document;
-        var v18 : string/*DOMString*/ = o.name;
-        var v19 : Location = o.location;
-        var v20 : History = o.history;
-        var v21 : BarProp = o.locationbar;
-        var v22 : BarProp = o.menubar;
-        var v23 : BarProp = o.personalbar;
-        var v24 : BarProp = o.scrollbars;
-        var v25 : BarProp = o.statusbar;
-        var v26 : BarProp = o.toolbar;
-        var v27 : string/*DOMString*/ = o.status;
+        var v8 : int/*long*/ = o.screenX;
+        var v9 : int/*long*/ = o.screenY;
+        var v10 : int/*long*/ = o.outerWidth;
+        var v11 : int/*long*/ = o.outerHeight;
+        var v12 : Window/*WindowProxy*/ = o.window;
+        var v13 : Window/*WindowProxy*/ = o.self;
+        var v14 : HTMLDocument/*Document*/ = o.document;
+        var v15 : string/*DOMString*/ = o.name;
+        var v16 : Location = o.location;
+        var v17 : History = o.history;
+        var v18 : BarProp = o.locationbar;
+        var v19 : BarProp = o.menubar;
+        var v20 : BarProp = o.personalbar;
+        var v21 : BarProp = o.scrollbars;
+        var v22 : BarProp = o.statusbar;
+        var v23 : BarProp = o.toolbar;
+        var v24 : string/*DOMString*/ = o.status;
         o.close();
         o.stop();
         o.focus();
         o.blur();
-        var v28 : Window/*WindowProxy*/ = o.frames;
-        var v29 : int/*unsigned long*/ = o.length;
-        var v30 : Window/*WindowProxy*/ = o.top;
-        var v31 : Window/*WindowProxy?*/ = o.opener;
-        var v32 : Window/*WindowProxy*/ = o.parent;
-        var v33 : Element = o.frameElement;
-        var f34 : Window/*WindowProxy*/ = o.open();
-        var f35 : Window/*WindowProxy*/ = o.open(X.getstring());
-        var f36 : Window/*WindowProxy*/ = o.open(X.getstring(), X.getstring());
-        var f37 : Window/*WindowProxy*/ = o.open(X.getstring(), X.getstring(), X.getstring());
-        var f38 : Window/*WindowProxy*/ = o.open(X.getstring(), X.getstring(), X.getstring(), X.getboolean());
-        var f39 : Window/*WindowProxy*/ = o.__native_index_operator__(X.getint());
-        var f40 : Object/*object*/ = o.__native_index_operator__(X.getstring());
-        var v41 : Navigator = o.navigator;
-        var v42 : External = o.external;
-        var v43 : ApplicationCache = o.applicationCache;
+        var v25 : Window/*WindowProxy*/ = o.frames;
+        var v26 : int/*unsigned long*/ = o.length;
+        var v27 : Window/*WindowProxy*/ = o.top;
+        var v28 : Window/*WindowProxy?*/ = o.opener;
+        var v29 : Window/*WindowProxy*/ = o.parent;
+        var v30 : Element = o.frameElement;
+        var f4 : Window/*WindowProxy*/ = o.open();
+        var f5 : Window/*WindowProxy*/ = o.open(X.getstring());
+        var f6 : Window/*WindowProxy*/ = o.open(X.getstring(), X.getstring());
+        var f7 : Window/*WindowProxy*/ = o.open(X.getstring(), X.getstring(), X.getstring());
+        var f8 : Window/*WindowProxy*/ = o.open(X.getstring(), X.getstring(), X.getstring(), X.getboolean());
+        var f9 : Window/*WindowProxy*/ = o.__native_index_operator__(X.getint());
+        var f10 : Object/*object*/ = o.__native_index_operator__(X.getstring());
+        var v31 : Navigator = o.navigator;
+        var v32 : External = o.external;
+        var v33 : ApplicationCache = o.applicationCache;
         o.alert(X.getstring());
-        var f44 : boolean = o.confirm(X.getstring());
-        var f45 : Nullable.<string>/*DOMString?*/ = o.prompt(X.getstring());
-        var f46 : Nullable.<string>/*DOMString?*/ = o.prompt(X.getstring(), X.getstring());
+        var f11 : boolean = o.confirm(X.getstring());
+        var f12 : Nullable.<string>/*DOMString?*/ = o.prompt(X.getstring());
+        var f13 : Nullable.<string>/*DOMString?*/ = o.prompt(X.getstring(), X.getstring());
         o.print();
-        var f47 : variant/*any*/ = o.showModalDialog(X.getstring());
-        var f48 : variant/*any*/ = o.showModalDialog(X.getstring(), X.getvariant());
-        var v49 : function(:Event):void/*Function?*/ = o.onabort;
-        var v50 : function(:Event):void/*Function?*/ = o.onafterprint;
-        var v51 : function(:Event):void/*Function?*/ = o.onbeforeprint;
-        var v52 : function(:Event):void/*Function?*/ = o.onbeforeunload;
-        var v53 : function(:Event):void/*Function?*/ = o.onblur;
-        var v54 : function(:Event):void/*Function?*/ = o.oncanplay;
-        var v55 : function(:Event):void/*Function?*/ = o.oncanplaythrough;
-        var v56 : function(:Event):void/*Function?*/ = o.onchange;
-        var v57 : function(:Event):void/*Function?*/ = o.onclick;
-        var v58 : function(:Event):void/*Function?*/ = o.oncontextmenu;
-        var v59 : function(:Event):void/*Function?*/ = o.oncuechange;
-        var v60 : function(:Event):void/*Function?*/ = o.ondblclick;
-        var v61 : function(:Event):void/*Function?*/ = o.ondrag;
-        var v62 : function(:Event):void/*Function?*/ = o.ondragend;
-        var v63 : function(:Event):void/*Function?*/ = o.ondragenter;
-        var v64 : function(:Event):void/*Function?*/ = o.ondragleave;
-        var v65 : function(:Event):void/*Function?*/ = o.ondragover;
-        var v66 : function(:Event):void/*Function?*/ = o.ondragstart;
-        var v67 : function(:Event):void/*Function?*/ = o.ondrop;
-        var v68 : function(:Event):void/*Function?*/ = o.ondurationchange;
-        var v69 : function(:Event):void/*Function?*/ = o.onemptied;
-        var v70 : function(:Event):void/*Function?*/ = o.onended;
-        var v71 : function(:Event):void/*Function?*/ = o.onerror;
-        var v72 : function(:Event):void/*Function?*/ = o.onfocus;
-        var v73 : function(:Event):void/*Function?*/ = o.onhashchange;
-        var v74 : function(:Event):void/*Function?*/ = o.oninput;
-        var v75 : function(:Event):void/*Function?*/ = o.oninvalid;
-        var v76 : function(:Event):void/*Function?*/ = o.onkeydown;
-        var v77 : function(:Event):void/*Function?*/ = o.onkeypress;
-        var v78 : function(:Event):void/*Function?*/ = o.onkeyup;
-        var v79 : function(:Event):void/*Function?*/ = o.onload;
-        var v80 : function(:Event):void/*Function?*/ = o.onloadeddata;
-        var v81 : function(:Event):void/*Function?*/ = o.onloadedmetadata;
-        var v82 : function(:Event):void/*Function?*/ = o.onloadstart;
-        var v83 : function(:Event):void/*Function?*/ = o.onmessage;
-        var v84 : function(:Event):void/*Function?*/ = o.onmousedown;
-        var v85 : function(:Event):void/*Function?*/ = o.onmousemove;
-        var v86 : function(:Event):void/*Function?*/ = o.onmouseout;
-        var v87 : function(:Event):void/*Function?*/ = o.onmouseover;
-        var v88 : function(:Event):void/*Function?*/ = o.onmouseup;
-        var v89 : function(:Event):void/*Function?*/ = o.onmousewheel;
-        var v90 : function(:Event):void/*Function?*/ = o.onoffline;
-        var v91 : function(:Event):void/*Function?*/ = o.ononline;
-        var v92 : function(:Event):void/*Function?*/ = o.onpause;
-        var v93 : function(:Event):void/*Function?*/ = o.onplay;
-        var v94 : function(:Event):void/*Function?*/ = o.onplaying;
-        var v95 : function(:Event):void/*Function?*/ = o.onpagehide;
-        var v96 : function(:Event):void/*Function?*/ = o.onpageshow;
-        var v97 : function(:Event):void/*Function?*/ = o.onpopstate;
-        var v98 : function(:Event):void/*Function?*/ = o.onprogress;
-        var v99 : function(:Event):void/*Function?*/ = o.onratechange;
-        var v100 : function(:Event):void/*Function?*/ = o.onreset;
-        var v101 : function(:Event):void/*Function?*/ = o.onresize;
-        var v102 : function(:Event):void/*Function?*/ = o.onscroll;
-        var v103 : function(:Event):void/*Function?*/ = o.onseeked;
-        var v104 : function(:Event):void/*Function?*/ = o.onseeking;
-        var v105 : function(:Event):void/*Function?*/ = o.onselect;
-        var v106 : function(:Event):void/*Function?*/ = o.onshow;
-        var v107 : function(:Event):void/*Function?*/ = o.onstalled;
-        var v108 : function(:Event):void/*Function?*/ = o.onstorage;
-        var v109 : function(:Event):void/*Function?*/ = o.onsubmit;
-        var v110 : function(:Event):void/*Function?*/ = o.onsuspend;
-        var v111 : function(:Event):void/*Function?*/ = o.ontimeupdate;
-        var v112 : function(:Event):void/*Function?*/ = o.onunload;
-        var v113 : function(:Event):void/*Function?*/ = o.onvolumechange;
-        var v114 : function(:Event):void/*Function?*/ = o.onwaiting;
-        var f115 : string/*DOMString*/ = o.btoa(X.getstring());
-        var f116 : string/*DOMString*/ = o.atob(X.getstring());
-        var v117 : Storage = o.sessionStorage;
-        var v118 : Storage = o.localStorage;
-        var f119 : int/*long*/ = o.setTimeout(X.getfunction___void());
-        var f120 : int/*long*/ = o.setTimeout(X.getfunction___void(), X.getint());
+        var f14 : variant/*any*/ = o.showModalDialog(X.getstring());
+        var f15 : variant/*any*/ = o.showModalDialog(X.getstring(), X.getvariant());
+        var v34 : function(:Event):void/*Function?*/ = o.onabort;
+        var v35 : function(:Event):void/*Function?*/ = o.onafterprint;
+        var v36 : function(:Event):void/*Function?*/ = o.onbeforeprint;
+        var v37 : function(:Event):void/*Function?*/ = o.onbeforeunload;
+        var v38 : function(:Event):void/*Function?*/ = o.onblur;
+        var v39 : function(:Event):void/*Function?*/ = o.oncanplay;
+        var v40 : function(:Event):void/*Function?*/ = o.oncanplaythrough;
+        var v41 : function(:Event):void/*Function?*/ = o.onchange;
+        var v42 : function(:Event):void/*Function?*/ = o.onclick;
+        var v43 : function(:Event):void/*Function?*/ = o.oncontextmenu;
+        var v44 : function(:Event):void/*Function?*/ = o.oncuechange;
+        var v45 : function(:Event):void/*Function?*/ = o.ondblclick;
+        var v46 : function(:Event):void/*Function?*/ = o.ondrag;
+        var v47 : function(:Event):void/*Function?*/ = o.ondragend;
+        var v48 : function(:Event):void/*Function?*/ = o.ondragenter;
+        var v49 : function(:Event):void/*Function?*/ = o.ondragleave;
+        var v50 : function(:Event):void/*Function?*/ = o.ondragover;
+        var v51 : function(:Event):void/*Function?*/ = o.ondragstart;
+        var v52 : function(:Event):void/*Function?*/ = o.ondrop;
+        var v53 : function(:Event):void/*Function?*/ = o.ondurationchange;
+        var v54 : function(:Event):void/*Function?*/ = o.onemptied;
+        var v55 : function(:Event):void/*Function?*/ = o.onended;
+        var v56 : function(:Event):void/*Function?*/ = o.onerror;
+        var v57 : function(:Event):void/*Function?*/ = o.onfocus;
+        var v58 : function(:Event):void/*Function?*/ = o.onhashchange;
+        var v59 : function(:Event):void/*Function?*/ = o.oninput;
+        var v60 : function(:Event):void/*Function?*/ = o.oninvalid;
+        var v61 : function(:Event):void/*Function?*/ = o.onkeydown;
+        var v62 : function(:Event):void/*Function?*/ = o.onkeypress;
+        var v63 : function(:Event):void/*Function?*/ = o.onkeyup;
+        var v64 : function(:Event):void/*Function?*/ = o.onload;
+        var v65 : function(:Event):void/*Function?*/ = o.onloadeddata;
+        var v66 : function(:Event):void/*Function?*/ = o.onloadedmetadata;
+        var v67 : function(:Event):void/*Function?*/ = o.onloadstart;
+        var v68 : function(:Event):void/*Function?*/ = o.onmessage;
+        var v69 : function(:Event):void/*Function?*/ = o.onmousedown;
+        var v70 : function(:Event):void/*Function?*/ = o.onmousemove;
+        var v71 : function(:Event):void/*Function?*/ = o.onmouseout;
+        var v72 : function(:Event):void/*Function?*/ = o.onmouseover;
+        var v73 : function(:Event):void/*Function?*/ = o.onmouseup;
+        var v74 : function(:Event):void/*Function?*/ = o.onmousewheel;
+        var v75 : function(:Event):void/*Function?*/ = o.onoffline;
+        var v76 : function(:Event):void/*Function?*/ = o.ononline;
+        var v77 : function(:Event):void/*Function?*/ = o.onpause;
+        var v78 : function(:Event):void/*Function?*/ = o.onplay;
+        var v79 : function(:Event):void/*Function?*/ = o.onplaying;
+        var v80 : function(:Event):void/*Function?*/ = o.onpagehide;
+        var v81 : function(:Event):void/*Function?*/ = o.onpageshow;
+        var v82 : function(:Event):void/*Function?*/ = o.onpopstate;
+        var v83 : function(:Event):void/*Function?*/ = o.onprogress;
+        var v84 : function(:Event):void/*Function?*/ = o.onratechange;
+        var v85 : function(:Event):void/*Function?*/ = o.onreset;
+        var v86 : function(:Event):void/*Function?*/ = o.onresize;
+        var v87 : function(:Event):void/*Function?*/ = o.onscroll;
+        var v88 : function(:Event):void/*Function?*/ = o.onseeked;
+        var v89 : function(:Event):void/*Function?*/ = o.onseeking;
+        var v90 : function(:Event):void/*Function?*/ = o.onselect;
+        var v91 : function(:Event):void/*Function?*/ = o.onshow;
+        var v92 : function(:Event):void/*Function?*/ = o.onstalled;
+        var v93 : function(:Event):void/*Function?*/ = o.onstorage;
+        var v94 : function(:Event):void/*Function?*/ = o.onsubmit;
+        var v95 : function(:Event):void/*Function?*/ = o.onsuspend;
+        var v96 : function(:Event):void/*Function?*/ = o.ontimeupdate;
+        var v97 : function(:Event):void/*Function?*/ = o.onunload;
+        var v98 : function(:Event):void/*Function?*/ = o.onvolumechange;
+        var v99 : function(:Event):void/*Function?*/ = o.onwaiting;
+        var f16 : string/*DOMString*/ = o.btoa(X.getstring());
+        var f17 : string/*DOMString*/ = o.atob(X.getstring());
+        var v100 : Storage = o.sessionStorage;
+        var v101 : Storage = o.localStorage;
+        var f18 : int/*long*/ = o.setTimeout(X.getfunction___void());
+        var f19 : int/*long*/ = o.setTimeout(X.getfunction___void(), X.getint());
         o.clearTimeout(X.getint());
-        var f121 : int/*long*/ = o.setInterval(X.getfunction___void());
-        var f122 : int/*long*/ = o.setInterval(X.getfunction___void(), X.getint());
+        var f20 : int/*long*/ = o.setInterval(X.getfunction___void());
+        var f21 : int/*long*/ = o.setInterval(X.getfunction___void(), X.getint());
         o.clearInterval(X.getint());
-        var f123 : int/*long*/ = o.requestAnimationFrame(X.getfunction_time_number__void());
+        var f22 : int/*long*/ = o.requestAnimationFrame(X.getfunction_time_number__void());
         o.cancelAnimationFrame(X.getint());
-        var f124 : int/*long*/ = o.webkitRequestAnimationFrame(X.getfunction_time_number__void());
+        var f23 : int/*long*/ = o.webkitRequestAnimationFrame(X.getfunction_time_number__void());
         o.webkitCancelAnimationFrame(X.getint());
-        var f125 : int/*long*/ = o.mozRequestAnimationFrame(X.getfunction_time_number__void());
+        var f24 : int/*long*/ = o.mozRequestAnimationFrame(X.getfunction_time_number__void());
         o.mozCancelAnimationFrame(X.getint());
     } // Window
 
@@ -1962,8 +1811,8 @@ class _Test extends TestCase {
     // #71
     function compile_ClientRectList(o : ClientRectList) : void {
         var v1 : int/*unsigned long*/ = o.length;
-        var f2 : ClientRect = o.__native_index_operator__(X.getint());
-        var f3 : ClientRect = o.item(X.getint());
+        var f1 : ClientRect = o.__native_index_operator__(X.getint());
+        var f2 : ClientRect = o.item(X.getint());
     } // ClientRectList
 
     // #72
@@ -1998,18 +1847,16 @@ class _Test extends TestCase {
     // #76
     function compile_HTMLOptionsCollection(o : HTMLOptionsCollection) : void {
         var v1 : int/*unsigned long*/ = o.length;
-        var f2 : Object/*object?*/ = o.__native_index_operator__(X.getstring());
-        var f3 : Object/*object?*/ = o.namedItem(X.getstring());
+        var f1 : Object/*object?*/ = o.__native_index_operator__(X.getstring());
+        var f2 : Object/*object?*/ = o.namedItem(X.getstring());
         o.add(X.getHTMLOptionElement());
         o.add(X.getHTMLOptionElement(), X.getHTMLElement());
-        o.add(X.getHTMLOptionElement());
         o.add(X.getHTMLOptionElement(), X.getint());
         o.add(X.getHTMLOptGroupElement());
         o.add(X.getHTMLOptGroupElement(), X.getHTMLElement());
-        o.add(X.getHTMLOptGroupElement());
         o.add(X.getHTMLOptGroupElement(), X.getint());
         o.remove(X.getint());
-        var v4 : int/*long*/ = o.selectedIndex;
+        var v2 : int/*long*/ = o.selectedIndex;
     } // HTMLOptionsCollection
 
     // #77
@@ -2030,102 +1877,102 @@ class _Test extends TestCase {
         var v5 : string/*DOMString*/ = o.cookie;
         var v6 : string/*DOMString*/ = o.lastModified;
         var v7 : string/*DOMString*/ = o.readyState;
-        var f8 : Object/*object*/ = o.__native_index_operator__(X.getstring());
-        var v9 : string/*DOMString*/ = o.title;
-        var v10 : string/*DOMString*/ = o.dir;
-        var v11 : HTMLElement = o.body;
-        var v12 : HTMLHeadElement = o.head;
-        var v13 : HTMLCollection = o.images;
-        var v14 : HTMLCollection = o.embeds;
-        var v15 : HTMLCollection = o.plugins;
-        var v16 : HTMLCollection = o.links;
-        var v17 : HTMLCollection = o.forms;
-        var v18 : HTMLCollection = o.scripts;
-        var f19 : NodeList = o.getElementsByName(X.getstring());
-        var f20 : HTMLDocument/*Document*/ = o.open();
-        var f21 : HTMLDocument/*Document*/ = o.open(X.getstring());
-        var f22 : HTMLDocument/*Document*/ = o.open(X.getstring(), X.getstring());
-        var f23 : Window/*WindowProxy*/ = o.open(X.getstring(), X.getstring(), X.getstring());
-        var f24 : Window/*WindowProxy*/ = o.open(X.getstring(), X.getstring(), X.getstring(), X.getboolean());
+        var f1 : Object/*object*/ = o.__native_index_operator__(X.getstring());
+        var v8 : string/*DOMString*/ = o.title;
+        var v9 : string/*DOMString*/ = o.dir;
+        var v10 : HTMLElement = o.body;
+        var v11 : HTMLHeadElement = o.head;
+        var v12 : HTMLCollection = o.images;
+        var v13 : HTMLCollection = o.embeds;
+        var v14 : HTMLCollection = o.plugins;
+        var v15 : HTMLCollection = o.links;
+        var v16 : HTMLCollection = o.forms;
+        var v17 : HTMLCollection = o.scripts;
+        var f2 : NodeList = o.getElementsByName(X.getstring());
+        var f3 : HTMLDocument/*Document*/ = o.open();
+        var f4 : HTMLDocument/*Document*/ = o.open(X.getstring());
+        var f5 : HTMLDocument/*Document*/ = o.open(X.getstring(), X.getstring());
+        var f6 : Window/*WindowProxy*/ = o.open(X.getstring(), X.getstring(), X.getstring());
+        var f7 : Window/*WindowProxy*/ = o.open(X.getstring(), X.getstring(), X.getstring(), X.getboolean());
         o.close();
         o.write(X.getstring());
         o.writeln(X.getstring());
-        var v25 : Window/*WindowProxy?*/ = o.defaultView;
-        var v26 : Element = o.activeElement;
-        var f27 : boolean = o.hasFocus();
-        var v28 : string/*DOMString*/ = o.designMode;
-        var f29 : boolean = o.execCommand(X.getstring());
-        var f30 : boolean = o.execCommand(X.getstring(), X.getboolean());
-        var f31 : boolean = o.execCommand(X.getstring(), X.getboolean(), X.getstring());
-        var f32 : boolean = o.queryCommandEnabled(X.getstring());
-        var f33 : boolean = o.queryCommandIndeterm(X.getstring());
-        var f34 : boolean = o.queryCommandState(X.getstring());
-        var f35 : boolean = o.queryCommandSupported(X.getstring());
-        var f36 : string/*DOMString*/ = o.queryCommandValue(X.getstring());
-        var v37 : HTMLCollection = o.commands;
-        var v38 : function(:Event):void/*Function?*/ = o.onabort;
-        var v39 : function(:Event):void/*Function?*/ = o.onblur;
-        var v40 : function(:Event):void/*Function?*/ = o.oncanplay;
-        var v41 : function(:Event):void/*Function?*/ = o.oncanplaythrough;
-        var v42 : function(:Event):void/*Function?*/ = o.onchange;
-        var v43 : function(:Event):void/*Function?*/ = o.onclick;
-        var v44 : function(:Event):void/*Function?*/ = o.oncontextmenu;
-        var v45 : function(:Event):void/*Function?*/ = o.oncuechange;
-        var v46 : function(:Event):void/*Function?*/ = o.ondblclick;
-        var v47 : function(:Event):void/*Function?*/ = o.ondrag;
-        var v48 : function(:Event):void/*Function?*/ = o.ondragend;
-        var v49 : function(:Event):void/*Function?*/ = o.ondragenter;
-        var v50 : function(:Event):void/*Function?*/ = o.ondragleave;
-        var v51 : function(:Event):void/*Function?*/ = o.ondragover;
-        var v52 : function(:Event):void/*Function?*/ = o.ondragstart;
-        var v53 : function(:Event):void/*Function?*/ = o.ondrop;
-        var v54 : function(:Event):void/*Function?*/ = o.ondurationchange;
-        var v55 : function(:Event):void/*Function?*/ = o.onemptied;
-        var v56 : function(:Event):void/*Function?*/ = o.onended;
-        var v57 : function(:Event):void/*Function?*/ = o.onerror;
-        var v58 : function(:Event):void/*Function?*/ = o.onfocus;
-        var v59 : function(:Event):void/*Function?*/ = o.oninput;
-        var v60 : function(:Event):void/*Function?*/ = o.oninvalid;
-        var v61 : function(:Event):void/*Function?*/ = o.onkeydown;
-        var v62 : function(:Event):void/*Function?*/ = o.onkeypress;
-        var v63 : function(:Event):void/*Function?*/ = o.onkeyup;
-        var v64 : function(:Event):void/*Function?*/ = o.onload;
-        var v65 : function(:Event):void/*Function?*/ = o.onloadeddata;
-        var v66 : function(:Event):void/*Function?*/ = o.onloadedmetadata;
-        var v67 : function(:Event):void/*Function?*/ = o.onloadstart;
-        var v68 : function(:Event):void/*Function?*/ = o.onmousedown;
-        var v69 : function(:Event):void/*Function?*/ = o.onmousemove;
-        var v70 : function(:Event):void/*Function?*/ = o.onmouseout;
-        var v71 : function(:Event):void/*Function?*/ = o.onmouseover;
-        var v72 : function(:Event):void/*Function?*/ = o.onmouseup;
-        var v73 : function(:Event):void/*Function?*/ = o.onmousewheel;
-        var v74 : function(:Event):void/*Function?*/ = o.onpause;
-        var v75 : function(:Event):void/*Function?*/ = o.onplay;
-        var v76 : function(:Event):void/*Function?*/ = o.onplaying;
-        var v77 : function(:Event):void/*Function?*/ = o.onprogress;
-        var v78 : function(:Event):void/*Function?*/ = o.onratechange;
-        var v79 : function(:Event):void/*Function?*/ = o.onreset;
-        var v80 : function(:Event):void/*Function?*/ = o.onscroll;
-        var v81 : function(:Event):void/*Function?*/ = o.onseeked;
-        var v82 : function(:Event):void/*Function?*/ = o.onseeking;
-        var v83 : function(:Event):void/*Function?*/ = o.onselect;
-        var v84 : function(:Event):void/*Function?*/ = o.onshow;
-        var v85 : function(:Event):void/*Function?*/ = o.onstalled;
-        var v86 : function(:Event):void/*Function?*/ = o.onsubmit;
-        var v87 : function(:Event):void/*Function?*/ = o.onsuspend;
-        var v88 : function(:Event):void/*Function?*/ = o.ontimeupdate;
-        var v89 : function(:Event):void/*Function?*/ = o.onvolumechange;
-        var v90 : function(:Event):void/*Function?*/ = o.onwaiting;
-        var v91 : function(:Event):void/*Function?*/ = o.onreadystatechange;
-        var v92 : string/*DOMString*/ = o.fgColor;
-        var v93 : string/*DOMString*/ = o.linkColor;
-        var v94 : string/*DOMString*/ = o.vlinkColor;
-        var v95 : string/*DOMString*/ = o.alinkColor;
-        var v96 : string/*DOMString*/ = o.bgColor;
-        var v97 : HTMLCollection = o.anchors;
-        var v98 : HTMLCollection = o.applets;
+        var v18 : Window/*WindowProxy?*/ = o.defaultView;
+        var v19 : Element = o.activeElement;
+        var f8 : boolean = o.hasFocus();
+        var v20 : string/*DOMString*/ = o.designMode;
+        var f9 : boolean = o.execCommand(X.getstring());
+        var f10 : boolean = o.execCommand(X.getstring(), X.getboolean());
+        var f11 : boolean = o.execCommand(X.getstring(), X.getboolean(), X.getstring());
+        var f12 : boolean = o.queryCommandEnabled(X.getstring());
+        var f13 : boolean = o.queryCommandIndeterm(X.getstring());
+        var f14 : boolean = o.queryCommandState(X.getstring());
+        var f15 : boolean = o.queryCommandSupported(X.getstring());
+        var f16 : string/*DOMString*/ = o.queryCommandValue(X.getstring());
+        var v21 : HTMLCollection = o.commands;
+        var v22 : function(:Event):void/*Function?*/ = o.onabort;
+        var v23 : function(:Event):void/*Function?*/ = o.onblur;
+        var v24 : function(:Event):void/*Function?*/ = o.oncanplay;
+        var v25 : function(:Event):void/*Function?*/ = o.oncanplaythrough;
+        var v26 : function(:Event):void/*Function?*/ = o.onchange;
+        var v27 : function(:Event):void/*Function?*/ = o.onclick;
+        var v28 : function(:Event):void/*Function?*/ = o.oncontextmenu;
+        var v29 : function(:Event):void/*Function?*/ = o.oncuechange;
+        var v30 : function(:Event):void/*Function?*/ = o.ondblclick;
+        var v31 : function(:Event):void/*Function?*/ = o.ondrag;
+        var v32 : function(:Event):void/*Function?*/ = o.ondragend;
+        var v33 : function(:Event):void/*Function?*/ = o.ondragenter;
+        var v34 : function(:Event):void/*Function?*/ = o.ondragleave;
+        var v35 : function(:Event):void/*Function?*/ = o.ondragover;
+        var v36 : function(:Event):void/*Function?*/ = o.ondragstart;
+        var v37 : function(:Event):void/*Function?*/ = o.ondrop;
+        var v38 : function(:Event):void/*Function?*/ = o.ondurationchange;
+        var v39 : function(:Event):void/*Function?*/ = o.onemptied;
+        var v40 : function(:Event):void/*Function?*/ = o.onended;
+        var v41 : function(:Event):void/*Function?*/ = o.onerror;
+        var v42 : function(:Event):void/*Function?*/ = o.onfocus;
+        var v43 : function(:Event):void/*Function?*/ = o.oninput;
+        var v44 : function(:Event):void/*Function?*/ = o.oninvalid;
+        var v45 : function(:Event):void/*Function?*/ = o.onkeydown;
+        var v46 : function(:Event):void/*Function?*/ = o.onkeypress;
+        var v47 : function(:Event):void/*Function?*/ = o.onkeyup;
+        var v48 : function(:Event):void/*Function?*/ = o.onload;
+        var v49 : function(:Event):void/*Function?*/ = o.onloadeddata;
+        var v50 : function(:Event):void/*Function?*/ = o.onloadedmetadata;
+        var v51 : function(:Event):void/*Function?*/ = o.onloadstart;
+        var v52 : function(:Event):void/*Function?*/ = o.onmousedown;
+        var v53 : function(:Event):void/*Function?*/ = o.onmousemove;
+        var v54 : function(:Event):void/*Function?*/ = o.onmouseout;
+        var v55 : function(:Event):void/*Function?*/ = o.onmouseover;
+        var v56 : function(:Event):void/*Function?*/ = o.onmouseup;
+        var v57 : function(:Event):void/*Function?*/ = o.onmousewheel;
+        var v58 : function(:Event):void/*Function?*/ = o.onpause;
+        var v59 : function(:Event):void/*Function?*/ = o.onplay;
+        var v60 : function(:Event):void/*Function?*/ = o.onplaying;
+        var v61 : function(:Event):void/*Function?*/ = o.onprogress;
+        var v62 : function(:Event):void/*Function?*/ = o.onratechange;
+        var v63 : function(:Event):void/*Function?*/ = o.onreset;
+        var v64 : function(:Event):void/*Function?*/ = o.onscroll;
+        var v65 : function(:Event):void/*Function?*/ = o.onseeked;
+        var v66 : function(:Event):void/*Function?*/ = o.onseeking;
+        var v67 : function(:Event):void/*Function?*/ = o.onselect;
+        var v68 : function(:Event):void/*Function?*/ = o.onshow;
+        var v69 : function(:Event):void/*Function?*/ = o.onstalled;
+        var v70 : function(:Event):void/*Function?*/ = o.onsubmit;
+        var v71 : function(:Event):void/*Function?*/ = o.onsuspend;
+        var v72 : function(:Event):void/*Function?*/ = o.ontimeupdate;
+        var v73 : function(:Event):void/*Function?*/ = o.onvolumechange;
+        var v74 : function(:Event):void/*Function?*/ = o.onwaiting;
+        var v75 : function(:Event):void/*Function?*/ = o.onreadystatechange;
+        var v76 : string/*DOMString*/ = o.fgColor;
+        var v77 : string/*DOMString*/ = o.linkColor;
+        var v78 : string/*DOMString*/ = o.vlinkColor;
+        var v79 : string/*DOMString*/ = o.alinkColor;
+        var v80 : string/*DOMString*/ = o.bgColor;
+        var v81 : HTMLCollection = o.anchors;
+        var v82 : HTMLCollection = o.applets;
         o.clear();
-        var v99 : HTMLAllCollection = o.all;
+        var v83 : HTMLAllCollection = o.all;
     } // HTMLDocument
 
     // #80
@@ -2392,18 +2239,18 @@ class _Test extends TestCase {
         var v11 : boolean = o.willValidate;
         var v12 : ValidityState = o.validity;
         var v13 : string/*DOMString*/ = o.validationMessage;
-        var f14 : boolean = o.checkValidity();
+        var f1 : boolean = o.checkValidity();
         o.setCustomValidity(X.getstring());
-        var v15 : string/*DOMString*/ = o.align;
-        var v16 : string/*DOMString*/ = o.archive;
-        var v17 : string/*DOMString*/ = o.code;
-        var v18 : boolean = o.declare;
-        var v19 : int/*unsigned long*/ = o.hspace;
-        var v20 : string/*DOMString*/ = o.standby;
-        var v21 : int/*unsigned long*/ = o.vspace;
-        var v22 : string/*DOMString*/ = o.codeBase;
-        var v23 : string/*DOMString*/ = o.codeType;
-        var v24 : string/*DOMString*/ = o.border;
+        var v14 : string/*DOMString*/ = o.align;
+        var v15 : string/*DOMString*/ = o.archive;
+        var v16 : string/*DOMString*/ = o.code;
+        var v17 : boolean = o.declare;
+        var v18 : int/*unsigned long*/ = o.hspace;
+        var v19 : string/*DOMString*/ = o.standby;
+        var v20 : int/*unsigned long*/ = o.vspace;
+        var v21 : string/*DOMString*/ = o.codeBase;
+        var v22 : string/*DOMString*/ = o.codeType;
+        var v23 : string/*DOMString*/ = o.border;
     } // HTMLObjectElement
 
     // #109
@@ -2471,45 +2318,45 @@ class _Test extends TestCase {
         var v14 : string/*DOMString*/ = o.preload;
         var v15 : TimeRanges = o.buffered;
         o.load();
-        var f16 : string/*DOMString*/ = o.canPlayType(X.getstring());
-        var v17 : int/*unsigned short*/ = HTMLMediaElement.HAVE_NOTHING;
-        var v18 : int/*unsigned short*/ = o.HAVE_NOTHING;
-        var v19 : int/*unsigned short*/ = HTMLMediaElement.HAVE_METADATA;
-        var v20 : int/*unsigned short*/ = o.HAVE_METADATA;
-        var v21 : int/*unsigned short*/ = HTMLMediaElement.HAVE_CURRENT_DATA;
-        var v22 : int/*unsigned short*/ = o.HAVE_CURRENT_DATA;
-        var v23 : int/*unsigned short*/ = HTMLMediaElement.HAVE_FUTURE_DATA;
-        var v24 : int/*unsigned short*/ = o.HAVE_FUTURE_DATA;
-        var v25 : int/*unsigned short*/ = HTMLMediaElement.HAVE_ENOUGH_DATA;
-        var v26 : int/*unsigned short*/ = o.HAVE_ENOUGH_DATA;
-        var v27 : int/*unsigned short*/ = o.readyState;
-        var v28 : boolean = o.seeking;
-        var v29 : number/*double*/ = o.currentTime;
-        var v30 : number/*double*/ = o.initialTime;
-        var v31 : number/*double*/ = o.duration;
-        var v32 : Date = o.startOffsetTime;
-        var v33 : boolean = o.paused;
-        var v34 : number/*double*/ = o.defaultPlaybackRate;
-        var v35 : number/*double*/ = o.playbackRate;
-        var v36 : TimeRanges = o.played;
-        var v37 : TimeRanges = o.seekable;
-        var v38 : boolean = o.ended;
-        var v39 : boolean = o.autoplay;
-        var v40 : boolean = o.loop;
+        var f1 : string/*DOMString*/ = o.canPlayType(X.getstring());
+        var v16 : int/*unsigned short*/ = HTMLMediaElement.HAVE_NOTHING;
+        var v17 : int/*unsigned short*/ = o.HAVE_NOTHING;
+        var v18 : int/*unsigned short*/ = HTMLMediaElement.HAVE_METADATA;
+        var v19 : int/*unsigned short*/ = o.HAVE_METADATA;
+        var v20 : int/*unsigned short*/ = HTMLMediaElement.HAVE_CURRENT_DATA;
+        var v21 : int/*unsigned short*/ = o.HAVE_CURRENT_DATA;
+        var v22 : int/*unsigned short*/ = HTMLMediaElement.HAVE_FUTURE_DATA;
+        var v23 : int/*unsigned short*/ = o.HAVE_FUTURE_DATA;
+        var v24 : int/*unsigned short*/ = HTMLMediaElement.HAVE_ENOUGH_DATA;
+        var v25 : int/*unsigned short*/ = o.HAVE_ENOUGH_DATA;
+        var v26 : int/*unsigned short*/ = o.readyState;
+        var v27 : boolean = o.seeking;
+        var v28 : number/*double*/ = o.currentTime;
+        var v29 : number/*double*/ = o.initialTime;
+        var v30 : number/*double*/ = o.duration;
+        var v31 : Date = o.startOffsetTime;
+        var v32 : boolean = o.paused;
+        var v33 : number/*double*/ = o.defaultPlaybackRate;
+        var v34 : number/*double*/ = o.playbackRate;
+        var v35 : TimeRanges = o.played;
+        var v36 : TimeRanges = o.seekable;
+        var v37 : boolean = o.ended;
+        var v38 : boolean = o.autoplay;
+        var v39 : boolean = o.loop;
         o.play();
         o.pause();
-        var v41 : string/*DOMString*/ = o.mediaGroup;
-        var v42 : MediaController = o.controller;
-        var v43 : boolean = o.controls;
-        var v44 : number/*double*/ = o.volume;
-        var v45 : boolean = o.muted;
-        var v46 : boolean = o.defaultMuted;
-        var v47 : AudioTrackList = o.audioTracks;
-        var v48 : VideoTrackList = o.videoTracks;
-        var v49 : TextTrackList = o.textTracks;
-        var f50 : TextTrack = o.addTextTrack(X.getstring());
-        var f51 : TextTrack = o.addTextTrack(X.getstring(), X.getstring());
-        var f52 : TextTrack = o.addTextTrack(X.getstring(), X.getstring(), X.getstring());
+        var v40 : string/*DOMString*/ = o.mediaGroup;
+        var v41 : MediaController = o.controller;
+        var v42 : boolean = o.controls;
+        var v43 : number/*double*/ = o.volume;
+        var v44 : boolean = o.muted;
+        var v45 : boolean = o.defaultMuted;
+        var v46 : AudioTrackList = o.audioTracks;
+        var v47 : VideoTrackList = o.videoTracks;
+        var v48 : TextTrackList = o.textTracks;
+        var f2 : TextTrack = o.addTextTrack(X.getstring());
+        var f3 : TextTrack = o.addTextTrack(X.getstring(), X.getstring());
+        var f4 : TextTrack = o.addTextTrack(X.getstring(), X.getstring(), X.getstring());
     } // HTMLMediaElement
 
     // #115
@@ -2528,10 +2375,10 @@ class _Test extends TestCase {
     // #116
     function compile_AudioTrackList(o : AudioTrackList) : void {
         var v1 : int/*unsigned long*/ = o.length;
-        var f2 : AudioTrack = o.__native_index_operator__(X.getint());
-        var f3 : AudioTrack = o.getTrackById(X.getstring());
-        var v4 : function(:Event):void/*Function?*/ = o.onchange;
-        var v5 : function(:Event):void/*Function?*/ = o.onaddtrack;
+        var f1 : AudioTrack = o.__native_index_operator__(X.getint());
+        var f2 : AudioTrack = o.getTrackById(X.getstring());
+        var v2 : function(:Event):void/*Function?*/ = o.onchange;
+        var v3 : function(:Event):void/*Function?*/ = o.onaddtrack;
     } // AudioTrackList
 
     // #117
@@ -2546,11 +2393,11 @@ class _Test extends TestCase {
     // #118
     function compile_VideoTrackList(o : VideoTrackList) : void {
         var v1 : int/*unsigned long*/ = o.length;
-        var f2 : VideoTrack = o.__native_index_operator__(X.getint());
-        var f3 : VideoTrack = o.getTrackById(X.getstring());
-        var v4 : int/*long*/ = o.selectedIndex;
-        var v5 : function(:Event):void/*Function?*/ = o.onchange;
-        var v6 : function(:Event):void/*Function?*/ = o.onaddtrack;
+        var f1 : VideoTrack = o.__native_index_operator__(X.getint());
+        var f2 : VideoTrack = o.getTrackById(X.getstring());
+        var v2 : int/*long*/ = o.selectedIndex;
+        var v3 : function(:Event):void/*Function?*/ = o.onchange;
+        var v4 : function(:Event):void/*Function?*/ = o.onaddtrack;
     } // VideoTrackList
 
     // #119
@@ -2564,6 +2411,7 @@ class _Test extends TestCase {
 
     // #120
     function compile_MediaController(o : MediaController) : void {
+        var c1 = new MediaController();
         var v1 : TimeRanges = o.buffered;
         var v2 : TimeRanges = o.seekable;
         var v3 : number/*double*/ = o.duration;
@@ -2595,8 +2443,8 @@ class _Test extends TestCase {
     // #121
     function compile_TextTrackList(o : TextTrackList) : void {
         var v1 : int/*unsigned long*/ = o.length;
-        var f2 : TextTrack = o.__native_index_operator__(X.getint());
-        var v3 : function(:Event):void/*Function?*/ = o.onaddtrack;
+        var f1 : TextTrack = o.__native_index_operator__(X.getint());
+        var v2 : function(:Event):void/*Function?*/ = o.onaddtrack;
     } // TextTrackList
 
     // #122
@@ -2621,12 +2469,15 @@ class _Test extends TestCase {
     // #123
     function compile_TextTrackCueList(o : TextTrackCueList) : void {
         var v1 : int/*unsigned long*/ = o.length;
-        var f2 : TextTrackCue = o.__native_index_operator__(X.getint());
-        var f3 : TextTrackCue = o.getCueById(X.getstring());
+        var f1 : TextTrackCue = o.__native_index_operator__(X.getint());
+        var f2 : TextTrackCue = o.getCueById(X.getstring());
     } // TextTrackCueList
 
     // #124
     function compile_TextTrackCue(o : TextTrackCue) : void {
+        var c1 = new TextTrackCue(X.getstring(), X.getnumber(), X.getnumber(), X.getstring());
+        var c2 = new TextTrackCue(X.getstring(), X.getnumber(), X.getnumber(), X.getstring(), X.getstring());
+        var c3 = new TextTrackCue(X.getstring(), X.getnumber(), X.getnumber(), X.getstring(), X.getstring(), X.getboolean());
         var v1 : TextTrack = o.track;
         var v2 : string/*DOMString*/ = o.id;
         var v3 : number/*double*/ = o.startTime;
@@ -2639,20 +2490,22 @@ class _Test extends TestCase {
         var v10 : int/*long*/ = o.size;
         var v11 : string/*DOMString*/ = o.align;
         var v12 : string/*DOMString*/ = o.text;
-        var f13 : DocumentFragment = o.getCueAsHTML();
-        var v14 : function(:Event):void/*Function?*/ = o.onenter;
-        var v15 : function(:Event):void/*Function?*/ = o.onexit;
+        var f1 : DocumentFragment = o.getCueAsHTML();
+        var v13 : function(:Event):void/*Function?*/ = o.onenter;
+        var v14 : function(:Event):void/*Function?*/ = o.onexit;
     } // TextTrackCue
 
     // #125
     function compile_TimeRanges(o : TimeRanges) : void {
         var v1 : int/*unsigned long*/ = o.length;
-        var f2 : number/*double*/ = o.start(X.getint());
-        var f3 : number/*double*/ = o.end(X.getint());
+        var f1 : number/*double*/ = o.start(X.getint());
+        var f2 : number/*double*/ = o.end(X.getint());
     } // TimeRanges
 
     // #126
     function compile_TrackEvent(o : TrackEvent) : void {
+        var c1 = new TrackEvent(X.getstring());
+        var c2 = new TrackEvent(X.getstring(), X.getTrackEventInit());
         var v1 : Object/*object?*/ = o.track;
     } // TrackEvent
 
@@ -2665,9 +2518,9 @@ class _Test extends TestCase {
     function compile_HTMLCanvasElement(o : HTMLCanvasElement) : void {
         var v1 : int/*unsigned long*/ = o.width;
         var v2 : int/*unsigned long*/ = o.height;
-        var f3 : string/*DOMString*/ = o.toDataURL(X.getstring(), X.getvariant());
+        var f1 : string/*DOMString*/ = o.toDataURL(X.getstring(), X.getvariant());
         o.toBlob(X.getfunction__File__void(), X.getstring(), X.getvariant());
-        var f4 : Object/*object?*/ = o.getContext(X.getstring(), X.getvariant());
+        var f2 : Object/*object?*/ = o.getContext(X.getstring(), X.getvariant());
     } // HTMLCanvasElement
 
     // #129
@@ -2702,29 +2555,29 @@ class _Test extends TestCase {
     // #131
     function compile_HTMLTableElement(o : HTMLTableElement) : void {
         var v1 : HTMLTableCaptionElement = o.caption;
-        var f2 : HTMLElement = o.createCaption();
+        var f1 : HTMLElement = o.createCaption();
         o.deleteCaption();
-        var v3 : HTMLTableSectionElement = o.tHead;
-        var f4 : HTMLElement = o.createTHead();
+        var v2 : HTMLTableSectionElement = o.tHead;
+        var f2 : HTMLElement = o.createTHead();
         o.deleteTHead();
-        var v5 : HTMLTableSectionElement = o.tFoot;
-        var f6 : HTMLElement = o.createTFoot();
+        var v3 : HTMLTableSectionElement = o.tFoot;
+        var f3 : HTMLElement = o.createTFoot();
         o.deleteTFoot();
-        var v7 : HTMLCollection = o.tBodies;
-        var f8 : HTMLElement = o.createTBody();
-        var v9 : HTMLCollection = o.rows;
-        var f10 : HTMLElement = o.insertRow();
-        var f11 : HTMLElement = o.insertRow(X.getint());
+        var v4 : HTMLCollection = o.tBodies;
+        var f4 : HTMLElement = o.createTBody();
+        var v5 : HTMLCollection = o.rows;
+        var f5 : HTMLElement = o.insertRow();
+        var f6 : HTMLElement = o.insertRow(X.getint());
         o.deleteRow(X.getint());
-        var v12 : string/*DOMString*/ = o.border;
-        var v13 : string/*DOMString*/ = o.align;
-        var v14 : string/*DOMString*/ = o.frame;
-        var v15 : string/*DOMString*/ = o.rules;
-        var v16 : string/*DOMString*/ = o.summary;
-        var v17 : string/*DOMString*/ = o.width;
-        var v18 : string/*DOMString*/ = o.bgColor;
-        var v19 : string/*DOMString*/ = o.cellPadding;
-        var v20 : string/*DOMString*/ = o.cellSpacing;
+        var v6 : string/*DOMString*/ = o.border;
+        var v7 : string/*DOMString*/ = o.align;
+        var v8 : string/*DOMString*/ = o.frame;
+        var v9 : string/*DOMString*/ = o.rules;
+        var v10 : string/*DOMString*/ = o.summary;
+        var v11 : string/*DOMString*/ = o.width;
+        var v12 : string/*DOMString*/ = o.bgColor;
+        var v13 : string/*DOMString*/ = o.cellPadding;
+        var v14 : string/*DOMString*/ = o.cellSpacing;
     } // HTMLTableElement
 
     // #132
@@ -2745,13 +2598,13 @@ class _Test extends TestCase {
     // #134
     function compile_HTMLTableSectionElement(o : HTMLTableSectionElement) : void {
         var v1 : HTMLCollection = o.rows;
-        var f2 : HTMLElement = o.insertRow();
-        var f3 : HTMLElement = o.insertRow(X.getint());
+        var f1 : HTMLElement = o.insertRow();
+        var f2 : HTMLElement = o.insertRow(X.getint());
         o.deleteRow(X.getint());
-        var v4 : string/*DOMString*/ = o.align;
-        var v5 : string/*DOMString*/ = o.ch;
-        var v6 : string/*DOMString*/ = o.chOff;
-        var v7 : string/*DOMString*/ = o.vAlign;
+        var v2 : string/*DOMString*/ = o.align;
+        var v3 : string/*DOMString*/ = o.ch;
+        var v4 : string/*DOMString*/ = o.chOff;
+        var v5 : string/*DOMString*/ = o.vAlign;
     } // HTMLTableSectionElement
 
     // #135
@@ -2759,14 +2612,14 @@ class _Test extends TestCase {
         var v1 : int/*long*/ = o.rowIndex;
         var v2 : int/*long*/ = o.sectionRowIndex;
         var v3 : HTMLCollection = o.cells;
-        var f4 : HTMLElement = o.insertCell();
-        var f5 : HTMLElement = o.insertCell(X.getint());
+        var f1 : HTMLElement = o.insertCell();
+        var f2 : HTMLElement = o.insertCell(X.getint());
         o.deleteCell(X.getint());
-        var v6 : string/*DOMString*/ = o.align;
-        var v7 : string/*DOMString*/ = o.ch;
-        var v8 : string/*DOMString*/ = o.chOff;
-        var v9 : string/*DOMString*/ = o.vAlign;
-        var v10 : string/*DOMString*/ = o.bgColor;
+        var v4 : string/*DOMString*/ = o.align;
+        var v5 : string/*DOMString*/ = o.ch;
+        var v6 : string/*DOMString*/ = o.chOff;
+        var v7 : string/*DOMString*/ = o.vAlign;
+        var v8 : string/*DOMString*/ = o.bgColor;
     } // HTMLTableRowElement
 
     // #136
@@ -2809,11 +2662,11 @@ class _Test extends TestCase {
         var v9 : string/*DOMString*/ = o.target;
         var v10 : HTMLFormControlsCollection = o.elements;
         var v11 : int/*long*/ = o.length;
-        var f12 : Element = o.__native_index_operator__(X.getint());
-        var f13 : Object/*object*/ = o.__native_index_operator__(X.getstring());
+        var f1 : Element = o.__native_index_operator__(X.getint());
+        var f2 : Object/*object*/ = o.__native_index_operator__(X.getstring());
         o.submit();
         o.reset();
-        var f14 : boolean = o.checkValidity();
+        var f3 : boolean = o.checkValidity();
     } // HTMLFormElement
 
     // #140
@@ -2826,7 +2679,7 @@ class _Test extends TestCase {
         var v6 : boolean = o.willValidate;
         var v7 : ValidityState = o.validity;
         var v8 : string/*DOMString*/ = o.validationMessage;
-        var f9 : boolean = o.checkValidity();
+        var f1 : boolean = o.checkValidity();
         o.setCustomValidity(X.getstring());
     } // HTMLFieldSetElement
 
@@ -2888,17 +2741,17 @@ class _Test extends TestCase {
         var v37 : boolean = o.willValidate;
         var v38 : ValidityState = o.validity;
         var v39 : string/*DOMString*/ = o.validationMessage;
-        var f40 : boolean = o.checkValidity();
+        var f1 : boolean = o.checkValidity();
         o.setCustomValidity(X.getstring());
-        var v41 : NodeList = o.labels;
+        var v40 : NodeList = o.labels;
         o.select();
-        var v42 : int/*unsigned long*/ = o.selectionStart;
-        var v43 : int/*unsigned long*/ = o.selectionEnd;
-        var v44 : string/*DOMString*/ = o.selectionDirection;
+        var v41 : int/*unsigned long*/ = o.selectionStart;
+        var v42 : int/*unsigned long*/ = o.selectionEnd;
+        var v43 : string/*DOMString*/ = o.selectionDirection;
         o.setSelectionRange(X.getint(), X.getint());
         o.setSelectionRange(X.getint(), X.getint(), X.getstring());
-        var v45 : string/*DOMString*/ = o.align;
-        var v46 : string/*DOMString*/ = o.useMap;
+        var v44 : string/*DOMString*/ = o.align;
+        var v45 : string/*DOMString*/ = o.useMap;
     } // HTMLInputElement
 
     // #144
@@ -2917,9 +2770,9 @@ class _Test extends TestCase {
         var v12 : boolean = o.willValidate;
         var v13 : ValidityState = o.validity;
         var v14 : string/*DOMString*/ = o.validationMessage;
-        var f15 : boolean = o.checkValidity();
+        var f1 : boolean = o.checkValidity();
         o.setCustomValidity(X.getstring());
-        var v16 : NodeList = o.labels;
+        var v15 : NodeList = o.labels;
     } // HTMLButtonElement
 
     // #145
@@ -2934,27 +2787,25 @@ class _Test extends TestCase {
         var v8 : string/*DOMString*/ = o.type;
         var v9 : HTMLOptionsCollection = o.options;
         var v10 : int/*unsigned long*/ = o.length;
-        var f11 : Element = o.__native_index_operator__(X.getint());
-        var f12 : Element = o.item(X.getint());
-        var f13 : Object/*object*/ = o.namedItem(X.getstring());
+        var f1 : Element = o.__native_index_operator__(X.getint());
+        var f2 : Element = o.item(X.getint());
+        var f3 : Object/*object*/ = o.namedItem(X.getstring());
         o.add(X.getHTMLOptionElement());
         o.add(X.getHTMLOptionElement(), X.getHTMLElement());
-        o.add(X.getHTMLOptionElement());
         o.add(X.getHTMLOptionElement(), X.getint());
         o.add(X.getHTMLOptGroupElement());
         o.add(X.getHTMLOptGroupElement(), X.getHTMLElement());
-        o.add(X.getHTMLOptGroupElement());
         o.add(X.getHTMLOptGroupElement(), X.getint());
         o.remove(X.getint());
-        var v14 : HTMLCollection = o.selectedOptions;
-        var v15 : int/*long*/ = o.selectedIndex;
-        var v16 : string/*DOMString*/ = o.value;
-        var v17 : boolean = o.willValidate;
-        var v18 : ValidityState = o.validity;
-        var v19 : string/*DOMString*/ = o.validationMessage;
-        var f20 : boolean = o.checkValidity();
+        var v11 : HTMLCollection = o.selectedOptions;
+        var v12 : int/*long*/ = o.selectedIndex;
+        var v13 : string/*DOMString*/ = o.value;
+        var v14 : boolean = o.willValidate;
+        var v15 : ValidityState = o.validity;
+        var v16 : string/*DOMString*/ = o.validationMessage;
+        var f4 : boolean = o.checkValidity();
         o.setCustomValidity(X.getstring());
-        var v21 : NodeList = o.labels;
+        var v17 : NodeList = o.labels;
     } // HTMLSelectElement
 
     // #146
@@ -3001,13 +2852,13 @@ class _Test extends TestCase {
         var v17 : boolean = o.willValidate;
         var v18 : ValidityState = o.validity;
         var v19 : string/*DOMString*/ = o.validationMessage;
-        var f20 : boolean = o.checkValidity();
+        var f1 : boolean = o.checkValidity();
         o.setCustomValidity(X.getstring());
-        var v21 : NodeList = o.labels;
+        var v20 : NodeList = o.labels;
         o.select();
-        var v22 : int/*unsigned long*/ = o.selectionStart;
-        var v23 : int/*unsigned long*/ = o.selectionEnd;
-        var v24 : string/*DOMString*/ = o.selectionDirection;
+        var v21 : int/*unsigned long*/ = o.selectionStart;
+        var v22 : int/*unsigned long*/ = o.selectionEnd;
+        var v23 : string/*DOMString*/ = o.selectionDirection;
         o.setSelectionRange(X.getint(), X.getint());
         o.setSelectionRange(X.getint(), X.getint(), X.getstring());
     } // HTMLTextAreaElement
@@ -3024,9 +2875,9 @@ class _Test extends TestCase {
         var v8 : boolean = o.willValidate;
         var v9 : ValidityState = o.validity;
         var v10 : string/*DOMString*/ = o.validationMessage;
-        var f11 : boolean = o.checkValidity();
+        var f1 : boolean = o.checkValidity();
         o.setCustomValidity(X.getstring());
-        var v12 : NodeList = o.labels;
+        var v11 : NodeList = o.labels;
     } // HTMLKeygenElement
 
     // #151
@@ -3040,9 +2891,9 @@ class _Test extends TestCase {
         var v7 : boolean = o.willValidate;
         var v8 : ValidityState = o.validity;
         var v9 : string/*DOMString*/ = o.validationMessage;
-        var f10 : boolean = o.checkValidity();
+        var f1 : boolean = o.checkValidity();
         o.setCustomValidity(X.getstring());
-        var v11 : NodeList = o.labels;
+        var v10 : NodeList = o.labels;
     } // HTMLOutputElement
 
     // #152
@@ -3136,6 +2987,8 @@ class _Test extends TestCase {
 
     // #161
     function compile_PopStateEvent(o : PopStateEvent) : void {
+        var c1 = new PopStateEvent(X.getstring());
+        var c2 = new PopStateEvent(X.getstring(), X.getPopStateEventInit());
         var v1 : variant/*any*/ = o.state;
     } // PopStateEvent
 
@@ -3146,6 +2999,8 @@ class _Test extends TestCase {
 
     // #163
     function compile_HashChangeEvent(o : HashChangeEvent) : void {
+        var c1 = new HashChangeEvent(X.getstring());
+        var c2 = new HashChangeEvent(X.getstring(), X.getHashChangeEventInit());
         var v1 : string/*DOMString*/ = o.oldURL;
         var v2 : string/*DOMString*/ = o.newURL;
     } // HashChangeEvent
@@ -3158,6 +3013,8 @@ class _Test extends TestCase {
 
     // #165
     function compile_PageTransitionEvent(o : PageTransitionEvent) : void {
+        var c1 = new PageTransitionEvent(X.getstring());
+        var c2 = new PageTransitionEvent(X.getstring(), X.getPageTransitionEventInit());
         var v1 : boolean = o.persisted;
     } // PageTransitionEvent
 
@@ -3225,12 +3082,12 @@ class _Test extends TestCase {
         var v5 : boolean = o.onLine;
         o.registerProtocolHandler(X.getstring(), X.getstring(), X.getstring());
         o.registerContentHandler(X.getstring(), X.getstring(), X.getstring());
-        var f6 : string/*DOMString*/ = o.isProtocolHandlerRegistered(X.getstring(), X.getstring());
-        var f7 : string/*DOMString*/ = o.isContentHandlerRegistered(X.getstring(), X.getstring());
+        var f1 : string/*DOMString*/ = o.isProtocolHandlerRegistered(X.getstring(), X.getstring());
+        var f2 : string/*DOMString*/ = o.isContentHandlerRegistered(X.getstring(), X.getstring());
         o.unregisterProtocolHandler(X.getstring(), X.getstring());
         o.unregisterContentHandler(X.getstring(), X.getstring());
         o.yieldForStorageUpdates();
-        var v8 : Geolocation = o.geolocation;
+        var v6 : Geolocation = o.geolocation;
     } // Navigator
 
     // #173
@@ -3270,20 +3127,20 @@ class _Test extends TestCase {
         o.setDragImage(X.getElement(), X.getint(), X.getint());
         o.addElement(X.getElement());
         var v4 : DOMStringList = o.types;
-        var f5 : string/*DOMString*/ = o.getData(X.getstring());
+        var f1 : string/*DOMString*/ = o.getData(X.getstring());
         o.setData(X.getstring(), X.getstring());
         o.clearData();
         o.clearData(X.getstring());
-        var v6 : FileList = o.files;
+        var v5 : FileList = o.files;
     } // DataTransfer
 
     // #178
     function compile_DataTransferItemList(o : DataTransferItemList) : void {
         var v1 : int/*unsigned long*/ = o.length;
-        var f2 : DataTransferItem = o.__native_index_operator__(X.getint());
+        var f1 : DataTransferItem = o.__native_index_operator__(X.getint());
         o.clear();
-        var f3 : DataTransferItem = o.add(X.getstring(), X.getstring());
-        var f4 : DataTransferItem = o.add(X.getFile());
+        var f2 : DataTransferItem = o.add(X.getstring(), X.getstring());
+        var f3 : DataTransferItem = o.add(X.getFile());
     } // DataTransferItemList
 
     // #179
@@ -3291,11 +3148,13 @@ class _Test extends TestCase {
         var v1 : string/*DOMString*/ = o.kind;
         var v2 : string/*DOMString*/ = o.type;
         o.getAsString(X.getfunction__string__void());
-        var f3 : File = o.getAsFile();
+        var f1 : File = o.getAsFile();
     } // DataTransferItem
 
     // #180
     function compile_DragEvent(o : DragEvent) : void {
+        var c1 = new DragEvent(X.getstring());
+        var c2 = new DragEvent(X.getstring(), X.getDragEventInit());
         var v1 : DataTransfer = o.dataTransfer;
     } // DragEvent
 
@@ -3400,17 +3259,17 @@ class _Test extends TestCase {
     function compile_FileList(o : FileList) : void {
         var f1 : File = o.__native_index_operator__(X.getint());
         var f2 : File = o.item(X.getint());
-        var v3 : int/*unsigned long*/ = o.length;
+        var v1 : int/*unsigned long*/ = o.length;
     } // FileList
 
     // #190
     function compile_Blob(o : Blob) : void {
         var v1 : number/*unsigned long long*/ = o.size;
         var v2 : string/*DOMString*/ = o.type;
-        var f3 : Blob = o.slice();
-        var f4 : Blob = o.slice(X.getnumber());
-        var f5 : Blob = o.slice(X.getnumber(), X.getnumber());
-        var f6 : Blob = o.slice(X.getnumber(), X.getnumber(), X.getstring());
+        var f1 : Blob = o.slice();
+        var f2 : Blob = o.slice(X.getnumber());
+        var f3 : Blob = o.slice(X.getnumber(), X.getnumber());
+        var f4 : Blob = o.slice(X.getnumber(), X.getnumber(), X.getstring());
     } // Blob
 
     // #191
@@ -3421,6 +3280,7 @@ class _Test extends TestCase {
 
     // #192
     function compile_FileReader(o : FileReader) : void {
+        var c1 = new FileReader();
         o.readAsArrayBuffer(X.getBlob());
         o.readAsBinaryString(X.getBlob());
         o.readAsText(X.getBlob());
@@ -3446,6 +3306,7 @@ class _Test extends TestCase {
 
     // #193
     function compile_FileReaderSync(o : FileReaderSync) : void {
+        var c1 = new FileReaderSync();
         var f1 : ArrayBuffer = o.readAsArrayBuffer(X.getBlob());
         var f2 : string/*DOMString*/ = o.readAsBinaryString(X.getBlob());
         var f3 : string/*DOMString*/ = o.readAsText(X.getBlob());
@@ -3478,9 +3339,9 @@ class _Test extends TestCase {
     // #197
     function compile_TouchList(o : TouchList) : void {
         var v1 : int/*unsigned long*/ = o.length;
-        var f2 : Touch = o.__native_index_operator__(X.getint());
-        var f3 : Touch = o.item(X.getint());
-        var f4 : Touch = o.identifiedTouch(X.getint());
+        var f1 : Touch = o.__native_index_operator__(X.getint());
+        var f2 : Touch = o.item(X.getint());
+        var f3 : Touch = o.identifiedTouch(X.getint());
     } // TouchList
 
     // #198
@@ -3496,6 +3357,9 @@ class _Test extends TestCase {
 
     // #199
     function compile_WebSocket(o : WebSocket) : void {
+        var c1 = new WebSocket(X.getstring());
+        var c2 = new WebSocket(X.getstring(), X.getstring());
+        var c3 = new WebSocket(X.getstring(), X.getstring__());
         var v1 : string/*DOMString*/ = o.url;
         var v2 : int/*unsigned short*/ = WebSocket.CONNECTING;
         var v3 : int/*unsigned short*/ = o.CONNECTING;
@@ -3524,6 +3388,8 @@ class _Test extends TestCase {
 
     // #200
     function compile_CloseEvent(o : CloseEvent) : void {
+        var c1 = new CloseEvent(X.getstring());
+        var c2 = new CloseEvent(X.getstring(), X.getCloseEventInit());
         var v1 : boolean = o.wasClean;
         var v2 : int/*unsigned short*/ = o.code;
         var v3 : string/*DOMString*/ = o.reason;
@@ -3591,9 +3457,9 @@ class _Test extends TestCase {
     // #208
     function compile_Storage(o : Storage) : void {
         var v1 : int/*unsigned long*/ = o.length;
-        var f2 : Nullable.<string>/*DOMString?*/ = o.key(X.getint());
-        var f3 : Nullable.<string>/*DOMString*/ = o.__native_index_operator__(X.getstring());
-        var f4 : Nullable.<string>/*DOMString*/ = o.getItem(X.getstring());
+        var f1 : Nullable.<string>/*DOMString?*/ = o.key(X.getint());
+        var f2 : Nullable.<string>/*DOMString*/ = o.__native_index_operator__(X.getstring());
+        var f3 : Nullable.<string>/*DOMString*/ = o.getItem(X.getstring());
         o.setItem(X.getstring(), X.getstring());
         o.removeItem(X.getstring());
         o.clear();
@@ -3611,6 +3477,8 @@ class _Test extends TestCase {
 
     // #211
     function compile_StorageEvent(o : StorageEvent) : void {
+        var c1 = new StorageEvent(X.getstring());
+        var c2 = new StorageEvent(X.getstring(), X.getStorageEventInit());
         var v1 : Nullable.<string>/*DOMString?*/ = o.key;
         var v2 : Nullable.<string>/*DOMString?*/ = o.oldValue;
         var v3 : Nullable.<string>/*DOMString?*/ = o.newValue;
@@ -3629,6 +3497,8 @@ class _Test extends TestCase {
 
     // #213
     function compile_MessageEvent(o : MessageEvent) : void {
+        var c1 = new MessageEvent(X.getstring());
+        var c2 = new MessageEvent(X.getstring(), X.getMessageEventInit());
         var v1 : variant/*any*/ = o.data;
         var v2 : string/*DOMString*/ = o.origin;
         var v3 : string/*DOMString*/ = o.lastEventId;
@@ -3647,6 +3517,7 @@ class _Test extends TestCase {
 
     // #215
     function compile_MessageChannel(o : MessageChannel) : void {
+        var c1 = new MessageChannel();
         var v1 : MessagePort = o.port1;
         var v2 : MessagePort = o.port2;
     } // MessageChannel
@@ -3688,6 +3559,8 @@ class _Test extends TestCase {
 
     // #220
     function compile_ErrorEvent(o : ErrorEvent) : void {
+        var c1 = new ErrorEvent(X.getstring());
+        var c2 = new ErrorEvent(X.getstring(), X.getErrorEventInit());
         var v1 : string/*DOMString*/ = o.message;
         var v2 : string/*DOMString*/ = o.filename;
         var v3 : int/*unsigned long*/ = o.lineno;
@@ -3707,6 +3580,7 @@ class _Test extends TestCase {
 
     // #223
     function compile_Worker(o : Worker) : void {
+        var c1 = new Worker(X.getstring());
         o.terminate();
         o.postMessage(X.getvariant());
         o.postMessage(X.getvariant(), X.getTransferable__());
@@ -3716,6 +3590,8 @@ class _Test extends TestCase {
 
     // #224
     function compile_SharedWorker(o : SharedWorker) : void {
+        var c1 = new SharedWorker(X.getstring());
+        var c2 = new SharedWorker(X.getstring(), X.getstring());
         var v1 : MessagePort = o.port;
         var v2 : function(:Event):void/*Function?*/ = o.onerror;
     } // SharedWorker
@@ -3724,8 +3600,8 @@ class _Test extends TestCase {
     function compile_WorkerUtils(o : WorkerUtils) : void {
         o.importScripts(X.getstring());
         var v1 : WorkerNavigator = o.navigator;
-        var f2 : string/*DOMString*/ = o.btoa(X.getstring());
-        var f3 : string/*DOMString*/ = o.atob(X.getstring());
+        var f1 : string/*DOMString*/ = o.btoa(X.getstring());
+        var f2 : string/*DOMString*/ = o.atob(X.getstring());
     } // WorkerUtils
 
     // #226
@@ -3751,6 +3627,8 @@ class _Test extends TestCase {
 
     // #228
     function compile_EventSource(o : EventSource) : void {
+        var c1 = new EventSource(X.getstring());
+        var c2 = new EventSource(X.getstring(), X.getEventSourceInit());
         var v1 : string/*DOMString*/ = o.url;
         var v2 : boolean = o.withCredentials;
         var v3 : int/*unsigned short*/ = EventSource.CONNECTING;
@@ -3773,19 +3651,22 @@ class _Test extends TestCase {
 
     // #230
     function compile_DOMParser(o : DOMParser) : void {
+        var c1 = new DOMParser();
         var f1 : HTMLDocument/*Document*/ = o.parseFromString(X.getstring(), X.getstring());
     } // DOMParser
 
     // #231
     function compile_XMLSerializer(o : XMLSerializer) : void {
+        var c1 = new XMLSerializer();
         var f1 : string/*DOMString*/ = o.serializeToString(X.getNode());
     } // XMLSerializer
 
     // #232
     function compile_ArrayBuffer(o : ArrayBuffer) : void {
+        var c1 = new ArrayBuffer(X.getint());
         var v1 : int/*unsigned long*/ = o.byteLength;
-        var f2 : ArrayBuffer = o.slice(X.getint());
-        var f3 : ArrayBuffer = o.slice(X.getint(), X.getint());
+        var f1 : ArrayBuffer = o.slice(X.getint());
+        var f2 : ArrayBuffer = o.slice(X.getint(), X.getint());
     } // ArrayBuffer
 
     // #233
@@ -3797,11 +3678,18 @@ class _Test extends TestCase {
 
     // #234
     function compile_Int8Array(o : Int8Array) : void {
+        var c1 = new Int8Array(X.getint());
+        var c2 = new Int8Array(X.getInt8Array());
+        var c3 = new Int8Array(X.getint__());
+        var c4 = new Int8Array(X.getnumber__());
+        var c5 = new Int8Array(X.getArrayBuffer());
+        var c6 = new Int8Array(X.getArrayBuffer(), X.getint());
+        var c7 = new Int8Array(X.getArrayBuffer(), X.getint(), X.getint());
         var v1 : int/*long*/ = Int8Array.BYTES_PER_ELEMENT;
         var v2 : int/*long*/ = o.BYTES_PER_ELEMENT;
         var v3 : int/*unsigned long*/ = o.length;
-        var f4 : Nullable.<int>/*byte*/ = o.__native_index_operator__(X.getint());
-        var f5 : Nullable.<int>/*byte*/ = o.get(X.getint());
+        var f1 : Nullable.<int>/*byte*/ = o.__native_index_operator__(X.getint());
+        var f2 : Nullable.<int>/*byte*/ = o.get(X.getint());
         o.set(X.getint(), X.getint());
         o.set(X.getInt8Array());
         o.set(X.getInt8Array(), X.getint());
@@ -3809,16 +3697,23 @@ class _Test extends TestCase {
         o.set(X.getint__(), X.getint());
         o.set(X.getnumber__());
         o.set(X.getnumber__(), X.getint());
-        var f6 : Int8Array = o.subarray(X.getint(), X.getint());
+        var f3 : Int8Array = o.subarray(X.getint(), X.getint());
     } // Int8Array
 
     // #235
     function compile_Uint8Array(o : Uint8Array) : void {
+        var c1 = new Uint8Array(X.getint());
+        var c2 = new Uint8Array(X.getUint8Array());
+        var c3 = new Uint8Array(X.getint__());
+        var c4 = new Uint8Array(X.getnumber__());
+        var c5 = new Uint8Array(X.getArrayBuffer());
+        var c6 = new Uint8Array(X.getArrayBuffer(), X.getint());
+        var c7 = new Uint8Array(X.getArrayBuffer(), X.getint(), X.getint());
         var v1 : int/*long*/ = Uint8Array.BYTES_PER_ELEMENT;
         var v2 : int/*long*/ = o.BYTES_PER_ELEMENT;
         var v3 : int/*unsigned long*/ = o.length;
-        var f4 : Nullable.<int>/*octet*/ = o.__native_index_operator__(X.getint());
-        var f5 : Nullable.<int>/*octet*/ = o.get(X.getint());
+        var f1 : Nullable.<int>/*octet*/ = o.__native_index_operator__(X.getint());
+        var f2 : Nullable.<int>/*octet*/ = o.get(X.getint());
         o.set(X.getint(), X.getint());
         o.set(X.getUint8Array());
         o.set(X.getUint8Array(), X.getint());
@@ -3826,11 +3721,19 @@ class _Test extends TestCase {
         o.set(X.getint__(), X.getint());
         o.set(X.getnumber__());
         o.set(X.getnumber__(), X.getint());
-        var f6 : Uint8Array = o.subarray(X.getint(), X.getint());
+        var f3 : Uint8Array = o.subarray(X.getint(), X.getint());
     } // Uint8Array
 
     // #236
     function compile_Uint8ClampedArray(o : Uint8ClampedArray) : void {
+        var c1 = new Uint8ClampedArray(X.getint());
+        var c2 = new Uint8ClampedArray(X.getUint8ClampedArray());
+        var c3 = new Uint8ClampedArray(X.getUint8Array());
+        var c4 = new Uint8ClampedArray(X.getint__());
+        var c5 = new Uint8ClampedArray(X.getnumber__());
+        var c6 = new Uint8ClampedArray(X.getArrayBuffer());
+        var c7 = new Uint8ClampedArray(X.getArrayBuffer(), X.getint());
+        var c8 = new Uint8ClampedArray(X.getArrayBuffer(), X.getint(), X.getint());
         o.set(X.getint(), X.getint());
         o.set(X.getUint8ClampedArray());
         o.set(X.getUint8ClampedArray(), X.getint());
@@ -3843,11 +3746,18 @@ class _Test extends TestCase {
 
     // #237
     function compile_Int16Array(o : Int16Array) : void {
+        var c1 = new Int16Array(X.getint());
+        var c2 = new Int16Array(X.getInt16Array());
+        var c3 = new Int16Array(X.getint__());
+        var c4 = new Int16Array(X.getnumber__());
+        var c5 = new Int16Array(X.getArrayBuffer());
+        var c6 = new Int16Array(X.getArrayBuffer(), X.getint());
+        var c7 = new Int16Array(X.getArrayBuffer(), X.getint(), X.getint());
         var v1 : int/*long*/ = Int16Array.BYTES_PER_ELEMENT;
         var v2 : int/*long*/ = o.BYTES_PER_ELEMENT;
         var v3 : int/*unsigned long*/ = o.length;
-        var f4 : Nullable.<int>/*short*/ = o.__native_index_operator__(X.getint());
-        var f5 : Nullable.<int>/*short*/ = o.get(X.getint());
+        var f1 : Nullable.<int>/*short*/ = o.__native_index_operator__(X.getint());
+        var f2 : Nullable.<int>/*short*/ = o.get(X.getint());
         o.set(X.getint(), X.getint());
         o.set(X.getInt16Array());
         o.set(X.getInt16Array(), X.getint());
@@ -3855,16 +3765,23 @@ class _Test extends TestCase {
         o.set(X.getint__(), X.getint());
         o.set(X.getnumber__());
         o.set(X.getnumber__(), X.getint());
-        var f6 : Int16Array = o.subarray(X.getint(), X.getint());
+        var f3 : Int16Array = o.subarray(X.getint(), X.getint());
     } // Int16Array
 
     // #238
     function compile_Uint16Array(o : Uint16Array) : void {
+        var c1 = new Uint16Array(X.getint());
+        var c2 = new Uint16Array(X.getUint16Array());
+        var c3 = new Uint16Array(X.getint__());
+        var c4 = new Uint16Array(X.getnumber__());
+        var c5 = new Uint16Array(X.getArrayBuffer());
+        var c6 = new Uint16Array(X.getArrayBuffer(), X.getint());
+        var c7 = new Uint16Array(X.getArrayBuffer(), X.getint(), X.getint());
         var v1 : int/*long*/ = Uint16Array.BYTES_PER_ELEMENT;
         var v2 : int/*long*/ = o.BYTES_PER_ELEMENT;
         var v3 : int/*unsigned long*/ = o.length;
-        var f4 : Nullable.<int>/*unsigned short*/ = o.__native_index_operator__(X.getint());
-        var f5 : Nullable.<int>/*unsigned short*/ = o.get(X.getint());
+        var f1 : Nullable.<int>/*unsigned short*/ = o.__native_index_operator__(X.getint());
+        var f2 : Nullable.<int>/*unsigned short*/ = o.get(X.getint());
         o.set(X.getint(), X.getint());
         o.set(X.getUint16Array());
         o.set(X.getUint16Array(), X.getint());
@@ -3872,16 +3789,23 @@ class _Test extends TestCase {
         o.set(X.getint__(), X.getint());
         o.set(X.getnumber__());
         o.set(X.getnumber__(), X.getint());
-        var f6 : Uint16Array = o.subarray(X.getint(), X.getint());
+        var f3 : Uint16Array = o.subarray(X.getint(), X.getint());
     } // Uint16Array
 
     // #239
     function compile_Int32Array(o : Int32Array) : void {
+        var c1 = new Int32Array(X.getint());
+        var c2 = new Int32Array(X.getInt32Array());
+        var c3 = new Int32Array(X.getint__());
+        var c4 = new Int32Array(X.getnumber__());
+        var c5 = new Int32Array(X.getArrayBuffer());
+        var c6 = new Int32Array(X.getArrayBuffer(), X.getint());
+        var c7 = new Int32Array(X.getArrayBuffer(), X.getint(), X.getint());
         var v1 : int/*long*/ = Int32Array.BYTES_PER_ELEMENT;
         var v2 : int/*long*/ = o.BYTES_PER_ELEMENT;
         var v3 : int/*unsigned long*/ = o.length;
-        var f4 : Nullable.<int>/*long*/ = o.__native_index_operator__(X.getint());
-        var f5 : Nullable.<int>/*long*/ = o.get(X.getint());
+        var f1 : Nullable.<int>/*long*/ = o.__native_index_operator__(X.getint());
+        var f2 : Nullable.<int>/*long*/ = o.get(X.getint());
         o.set(X.getint(), X.getint());
         o.set(X.getInt32Array());
         o.set(X.getInt32Array(), X.getint());
@@ -3889,16 +3813,23 @@ class _Test extends TestCase {
         o.set(X.getint__(), X.getint());
         o.set(X.getnumber__());
         o.set(X.getnumber__(), X.getint());
-        var f6 : Int32Array = o.subarray(X.getint(), X.getint());
+        var f3 : Int32Array = o.subarray(X.getint(), X.getint());
     } // Int32Array
 
     // #240
     function compile_Uint32Array(o : Uint32Array) : void {
+        var c1 = new Uint32Array(X.getint());
+        var c2 = new Uint32Array(X.getUint32Array());
+        var c3 = new Uint32Array(X.getint__());
+        var c4 = new Uint32Array(X.getnumber__());
+        var c5 = new Uint32Array(X.getArrayBuffer());
+        var c6 = new Uint32Array(X.getArrayBuffer(), X.getint());
+        var c7 = new Uint32Array(X.getArrayBuffer(), X.getint(), X.getint());
         var v1 : int/*long*/ = Uint32Array.BYTES_PER_ELEMENT;
         var v2 : int/*long*/ = o.BYTES_PER_ELEMENT;
         var v3 : int/*unsigned long*/ = o.length;
-        var f4 : Nullable.<int>/*unsigned long*/ = o.__native_index_operator__(X.getint());
-        var f5 : Nullable.<int>/*unsigned long*/ = o.get(X.getint());
+        var f1 : Nullable.<int>/*unsigned long*/ = o.__native_index_operator__(X.getint());
+        var f2 : Nullable.<int>/*unsigned long*/ = o.get(X.getint());
         o.set(X.getint(), X.getint());
         o.set(X.getUint32Array());
         o.set(X.getUint32Array(), X.getint());
@@ -3906,41 +3837,56 @@ class _Test extends TestCase {
         o.set(X.getint__(), X.getint());
         o.set(X.getnumber__());
         o.set(X.getnumber__(), X.getint());
-        var f6 : Uint32Array = o.subarray(X.getint(), X.getint());
+        var f3 : Uint32Array = o.subarray(X.getint(), X.getint());
     } // Uint32Array
 
     // #241
     function compile_Float32Array(o : Float32Array) : void {
+        var c1 = new Float32Array(X.getint());
+        var c2 = new Float32Array(X.getFloat32Array());
+        var c3 = new Float32Array(X.getnumber__());
+        var c4 = new Float32Array(X.getArrayBuffer());
+        var c5 = new Float32Array(X.getArrayBuffer(), X.getint());
+        var c6 = new Float32Array(X.getArrayBuffer(), X.getint(), X.getint());
         var v1 : int/*long*/ = Float32Array.BYTES_PER_ELEMENT;
         var v2 : int/*long*/ = o.BYTES_PER_ELEMENT;
         var v3 : int/*unsigned long*/ = o.length;
-        var f4 : Nullable.<number>/*float*/ = o.__native_index_operator__(X.getint());
-        var f5 : Nullable.<number>/*float*/ = o.get(X.getint());
+        var f1 : Nullable.<number>/*float*/ = o.__native_index_operator__(X.getint());
+        var f2 : Nullable.<number>/*float*/ = o.get(X.getint());
         o.set(X.getint(), X.getnumber());
         o.set(X.getFloat32Array());
         o.set(X.getFloat32Array(), X.getint());
         o.set(X.getnumber__());
         o.set(X.getnumber__(), X.getint());
-        var f6 : Float32Array = o.subarray(X.getint(), X.getint());
+        var f3 : Float32Array = o.subarray(X.getint(), X.getint());
     } // Float32Array
 
     // #242
     function compile_Float64Array(o : Float64Array) : void {
+        var c1 = new Float64Array(X.getint());
+        var c2 = new Float64Array(X.getFloat64Array());
+        var c3 = new Float64Array(X.getnumber__());
+        var c4 = new Float64Array(X.getArrayBuffer());
+        var c5 = new Float64Array(X.getArrayBuffer(), X.getint());
+        var c6 = new Float64Array(X.getArrayBuffer(), X.getint(), X.getint());
         var v1 : int/*long*/ = Float64Array.BYTES_PER_ELEMENT;
         var v2 : int/*long*/ = o.BYTES_PER_ELEMENT;
         var v3 : int/*unsigned long*/ = o.length;
-        var f4 : Nullable.<number>/*double*/ = o.__native_index_operator__(X.getint());
-        var f5 : Nullable.<number>/*double*/ = o.get(X.getint());
+        var f1 : Nullable.<number>/*double*/ = o.__native_index_operator__(X.getint());
+        var f2 : Nullable.<number>/*double*/ = o.get(X.getint());
         o.set(X.getint(), X.getnumber());
         o.set(X.getFloat64Array());
         o.set(X.getFloat64Array(), X.getint());
         o.set(X.getnumber__());
         o.set(X.getnumber__(), X.getint());
-        var f6 : Float64Array = o.subarray(X.getint(), X.getint());
+        var f3 : Float64Array = o.subarray(X.getint(), X.getint());
     } // Float64Array
 
     // #243
     function compile_DataView(o : DataView) : void {
+        var c1 = new DataView(X.getArrayBuffer());
+        var c2 = new DataView(X.getArrayBuffer(), X.getint());
+        var c3 = new DataView(X.getArrayBuffer(), X.getint(), X.getint());
         var f1 : int/*byte*/ = o.getInt8(X.getint());
         var f2 : int/*octet*/ = o.getUint8(X.getint());
         var f3 : int/*short*/ = o.getInt16(X.getint());
@@ -3980,15 +3926,15 @@ class _Test extends TestCase {
         var v3 : string/*DOMString*/ = o.globalCompositeOperation;
         var v4 : variant/*any*/ = o.strokeStyle;
         var v5 : variant/*any*/ = o.fillStyle;
-        var f6 : CanvasGradient = o.createLinearGradient(X.getnumber(), X.getnumber(), X.getnumber(), X.getnumber());
-        var f7 : CanvasGradient = o.createRadialGradient(X.getnumber(), X.getnumber(), X.getnumber(), X.getnumber(), X.getnumber(), X.getnumber());
-        var f8 : CanvasPattern = o.createPattern(X.getHTMLImageElement(), X.getstring());
-        var f9 : CanvasPattern = o.createPattern(X.getHTMLCanvasElement(), X.getstring());
-        var f10 : CanvasPattern = o.createPattern(X.getHTMLVideoElement(), X.getstring());
-        var v11 : number/*double*/ = o.shadowOffsetX;
-        var v12 : number/*double*/ = o.shadowOffsetY;
-        var v13 : number/*double*/ = o.shadowBlur;
-        var v14 : string/*DOMString*/ = o.shadowColor;
+        var f1 : CanvasGradient = o.createLinearGradient(X.getnumber(), X.getnumber(), X.getnumber(), X.getnumber());
+        var f2 : CanvasGradient = o.createRadialGradient(X.getnumber(), X.getnumber(), X.getnumber(), X.getnumber(), X.getnumber(), X.getnumber());
+        var f3 : CanvasPattern = o.createPattern(X.getHTMLImageElement(), X.getstring());
+        var f4 : CanvasPattern = o.createPattern(X.getHTMLCanvasElement(), X.getstring());
+        var f5 : CanvasPattern = o.createPattern(X.getHTMLVideoElement(), X.getstring());
+        var v6 : number/*double*/ = o.shadowOffsetX;
+        var v7 : number/*double*/ = o.shadowOffsetY;
+        var v8 : number/*double*/ = o.shadowBlur;
+        var v9 : string/*DOMString*/ = o.shadowColor;
         o.clearRect(X.getnumber(), X.getnumber(), X.getnumber(), X.getnumber());
         o.fillRect(X.getnumber(), X.getnumber(), X.getnumber(), X.getnumber());
         o.strokeRect(X.getnumber(), X.getnumber(), X.getnumber(), X.getnumber());
@@ -3996,15 +3942,15 @@ class _Test extends TestCase {
         o.fill();
         o.stroke();
         o.drawSystemFocusRing(X.getElement());
-        var f15 : boolean = o.drawCustomFocusRing(X.getElement());
+        var f6 : boolean = o.drawCustomFocusRing(X.getElement());
         o.scrollPathIntoView();
         o.clip();
-        var f16 : boolean = o.isPointInPath(X.getnumber(), X.getnumber());
+        var f7 : boolean = o.isPointInPath(X.getnumber(), X.getnumber());
         o.fillText(X.getstring(), X.getnumber(), X.getnumber());
         o.fillText(X.getstring(), X.getnumber(), X.getnumber(), X.getnumber());
         o.strokeText(X.getstring(), X.getnumber(), X.getnumber());
         o.strokeText(X.getstring(), X.getnumber(), X.getnumber(), X.getnumber());
-        var f17 : TextMetrics = o.measureText(X.getstring());
+        var f8 : TextMetrics = o.measureText(X.getstring());
         o.drawImage(X.getHTMLImageElement(), X.getnumber(), X.getnumber());
         o.drawImage(X.getHTMLCanvasElement(), X.getnumber(), X.getnumber());
         o.drawImage(X.getHTMLVideoElement(), X.getnumber(), X.getnumber());
@@ -4014,9 +3960,9 @@ class _Test extends TestCase {
         o.drawImage(X.getHTMLImageElement(), X.getnumber(), X.getnumber(), X.getnumber(), X.getnumber(), X.getnumber(), X.getnumber(), X.getnumber(), X.getnumber());
         o.drawImage(X.getHTMLCanvasElement(), X.getnumber(), X.getnumber(), X.getnumber(), X.getnumber(), X.getnumber(), X.getnumber(), X.getnumber(), X.getnumber());
         o.drawImage(X.getHTMLVideoElement(), X.getnumber(), X.getnumber(), X.getnumber(), X.getnumber(), X.getnumber(), X.getnumber(), X.getnumber(), X.getnumber());
-        var f18 : ImageData = o.createImageData(X.getnumber(), X.getnumber());
-        var f19 : ImageData = o.createImageData(X.getImageData());
-        var f20 : ImageData = o.getImageData(X.getnumber(), X.getnumber(), X.getnumber(), X.getnumber());
+        var f9 : ImageData = o.createImageData(X.getnumber(), X.getnumber());
+        var f10 : ImageData = o.createImageData(X.getImageData());
+        var f11 : ImageData = o.getImageData(X.getnumber(), X.getnumber(), X.getnumber(), X.getnumber());
         o.putImageData(X.getImageData(), X.getnumber(), X.getnumber());
         o.putImageData(X.getImageData(), X.getnumber(), X.getnumber(), X.getnumber(), X.getnumber(), X.getnumber(), X.getnumber());
         o.scale(X.getnumber(), X.getnumber());
@@ -4024,10 +3970,10 @@ class _Test extends TestCase {
         o.translate(X.getnumber(), X.getnumber());
         o.transform(X.getnumber(), X.getnumber(), X.getnumber(), X.getnumber(), X.getnumber(), X.getnumber());
         o.setTransform(X.getnumber(), X.getnumber(), X.getnumber(), X.getnumber(), X.getnumber(), X.getnumber());
-        var v21 : number/*double*/ = o.lineWidth;
-        var v22 : string/*DOMString*/ = o.lineCap;
-        var v23 : string/*DOMString*/ = o.lineJoin;
-        var v24 : number/*double*/ = o.miterLimit;
+        var v10 : number/*double*/ = o.lineWidth;
+        var v11 : string/*DOMString*/ = o.lineCap;
+        var v12 : string/*DOMString*/ = o.lineJoin;
+        var v13 : number/*double*/ = o.miterLimit;
         o.closePath();
         o.moveTo(X.getnumber(), X.getnumber());
         o.lineTo(X.getnumber(), X.getnumber());
@@ -4037,9 +3983,9 @@ class _Test extends TestCase {
         o.rect(X.getnumber(), X.getnumber(), X.getnumber(), X.getnumber());
         o.arc(X.getnumber(), X.getnumber(), X.getnumber(), X.getnumber(), X.getnumber());
         o.arc(X.getnumber(), X.getnumber(), X.getnumber(), X.getnumber(), X.getnumber(), X.getboolean());
-        var v25 : string/*DOMString*/ = o.font;
-        var v26 : string/*DOMString*/ = o.textAlign;
-        var v27 : string/*DOMString*/ = o.textBaseline;
+        var v14 : string/*DOMString*/ = o.font;
+        var v15 : string/*DOMString*/ = o.textAlign;
+        var v16 : string/*DOMString*/ = o.textBaseline;
     } // CanvasRenderingContext2D
 
     // #245
@@ -4751,10 +4697,10 @@ class _Test extends TestCase {
         var v591 : HTMLCanvasElement = o.canvas;
         var v592 : int/*GLsizei*/ = o.drawingBufferWidth;
         var v593 : int/*GLsizei*/ = o.drawingBufferHeight;
-        var f594 : WebGLContextAttributes = o.getContextAttributes();
-        var f595 : boolean = o.isContextLost();
-        var f596 : string[]/*sequence<DOMString>?*/ = o.getSupportedExtensions();
-        var f597 : Object/*object?*/ = o.getExtension(X.getstring());
+        var f1 : WebGLContextAttributes = o.getContextAttributes();
+        var f2 : boolean = o.isContextLost();
+        var f3 : string[]/*sequence<DOMString>?*/ = o.getSupportedExtensions();
+        var f4 : Object/*object?*/ = o.getExtension(X.getstring());
         o.activeTexture(X.getint());
         o.attachShader(X.getWebGLProgram(), X.getWebGLShader());
         o.bindAttribLocation(X.getWebGLProgram(), X.getint(), X.getstring());
@@ -4772,7 +4718,7 @@ class _Test extends TestCase {
         o.bufferData(X.getint(), X.getArrayBuffer(), X.getint());
         o.bufferSubData(X.getint(), X.getnumber(), X.getArrayBufferView());
         o.bufferSubData(X.getint(), X.getnumber(), X.getArrayBuffer());
-        var f598 : int/*GLenum*/ = o.checkFramebufferStatus(X.getint());
+        var f5 : int/*GLenum*/ = o.checkFramebufferStatus(X.getint());
         o.clear(X.getint());
         o.clearColor(X.getnumber(), X.getnumber(), X.getnumber(), X.getnumber());
         o.clearDepth(X.getnumber());
@@ -4783,12 +4729,12 @@ class _Test extends TestCase {
         o.compressedTexSubImage2D(X.getint(), X.getint(), X.getint(), X.getint(), X.getint(), X.getint(), X.getint(), X.getArrayBufferView());
         o.copyTexImage2D(X.getint(), X.getint(), X.getint(), X.getint(), X.getint(), X.getint(), X.getint(), X.getint());
         o.copyTexSubImage2D(X.getint(), X.getint(), X.getint(), X.getint(), X.getint(), X.getint(), X.getint(), X.getint());
-        var f599 : WebGLBuffer = o.createBuffer();
-        var f600 : WebGLFramebuffer = o.createFramebuffer();
-        var f601 : WebGLProgram = o.createProgram();
-        var f602 : WebGLRenderbuffer = o.createRenderbuffer();
-        var f603 : WebGLShader = o.createShader(X.getint());
-        var f604 : WebGLTexture = o.createTexture();
+        var f6 : WebGLBuffer = o.createBuffer();
+        var f7 : WebGLFramebuffer = o.createFramebuffer();
+        var f8 : WebGLProgram = o.createProgram();
+        var f9 : WebGLRenderbuffer = o.createRenderbuffer();
+        var f10 : WebGLShader = o.createShader(X.getint());
+        var f11 : WebGLTexture = o.createTexture();
         o.cullFace(X.getint());
         o.deleteBuffer(X.getWebGLBuffer());
         o.deleteFramebuffer(X.getWebGLFramebuffer());
@@ -4812,34 +4758,34 @@ class _Test extends TestCase {
         o.framebufferTexture2D(X.getint(), X.getint(), X.getint(), X.getWebGLTexture(), X.getint());
         o.frontFace(X.getint());
         o.generateMipmap(X.getint());
-        var f605 : WebGLActiveInfo = o.getActiveAttrib(X.getWebGLProgram(), X.getint());
-        var f606 : WebGLActiveInfo = o.getActiveUniform(X.getWebGLProgram(), X.getint());
-        var f607 : WebGLShader[] = o.getAttachedShaders(X.getWebGLProgram());
-        var f608 : int/*GLint*/ = o.getAttribLocation(X.getWebGLProgram(), X.getstring());
-        var f609 : variant/*any*/ = o.getBufferParameter(X.getint(), X.getint());
-        var f610 : variant/*any*/ = o.getParameter(X.getint());
-        var f611 : int/*GLenum*/ = o.getError();
-        var f612 : variant/*any*/ = o.getFramebufferAttachmentParameter(X.getint(), X.getint(), X.getint());
-        var f613 : variant/*any*/ = o.getProgramParameter(X.getWebGLProgram(), X.getint());
-        var f614 : Nullable.<string>/*DOMString?*/ = o.getProgramInfoLog(X.getWebGLProgram());
-        var f615 : variant/*any*/ = o.getRenderbufferParameter(X.getint(), X.getint());
-        var f616 : variant/*any*/ = o.getShaderParameter(X.getWebGLShader(), X.getint());
-        var f617 : WebGLShaderPrecisionFormat = o.getShaderPrecisionFormat(X.getint(), X.getint());
-        var f618 : Nullable.<string>/*DOMString?*/ = o.getShaderInfoLog(X.getWebGLShader());
-        var f619 : Nullable.<string>/*DOMString?*/ = o.getShaderSource(X.getWebGLShader());
-        var f620 : variant/*any*/ = o.getTexParameter(X.getint(), X.getint());
-        var f621 : variant/*any*/ = o.getUniform(X.getWebGLProgram(), X.getWebGLUniformLocation());
-        var f622 : WebGLUniformLocation = o.getUniformLocation(X.getWebGLProgram(), X.getstring());
-        var f623 : variant/*any*/ = o.getVertexAttrib(X.getint(), X.getint());
-        var f624 : number/*GLsizeiptr*/ = o.getVertexAttribOffset(X.getint(), X.getint());
+        var f12 : WebGLActiveInfo = o.getActiveAttrib(X.getWebGLProgram(), X.getint());
+        var f13 : WebGLActiveInfo = o.getActiveUniform(X.getWebGLProgram(), X.getint());
+        var f14 : WebGLShader[] = o.getAttachedShaders(X.getWebGLProgram());
+        var f15 : int/*GLint*/ = o.getAttribLocation(X.getWebGLProgram(), X.getstring());
+        var f16 : variant/*any*/ = o.getBufferParameter(X.getint(), X.getint());
+        var f17 : variant/*any*/ = o.getParameter(X.getint());
+        var f18 : int/*GLenum*/ = o.getError();
+        var f19 : variant/*any*/ = o.getFramebufferAttachmentParameter(X.getint(), X.getint(), X.getint());
+        var f20 : variant/*any*/ = o.getProgramParameter(X.getWebGLProgram(), X.getint());
+        var f21 : Nullable.<string>/*DOMString?*/ = o.getProgramInfoLog(X.getWebGLProgram());
+        var f22 : variant/*any*/ = o.getRenderbufferParameter(X.getint(), X.getint());
+        var f23 : variant/*any*/ = o.getShaderParameter(X.getWebGLShader(), X.getint());
+        var f24 : WebGLShaderPrecisionFormat = o.getShaderPrecisionFormat(X.getint(), X.getint());
+        var f25 : Nullable.<string>/*DOMString?*/ = o.getShaderInfoLog(X.getWebGLShader());
+        var f26 : Nullable.<string>/*DOMString?*/ = o.getShaderSource(X.getWebGLShader());
+        var f27 : variant/*any*/ = o.getTexParameter(X.getint(), X.getint());
+        var f28 : variant/*any*/ = o.getUniform(X.getWebGLProgram(), X.getWebGLUniformLocation());
+        var f29 : WebGLUniformLocation = o.getUniformLocation(X.getWebGLProgram(), X.getstring());
+        var f30 : variant/*any*/ = o.getVertexAttrib(X.getint(), X.getint());
+        var f31 : number/*GLsizeiptr*/ = o.getVertexAttribOffset(X.getint(), X.getint());
         o.hint(X.getint(), X.getint());
-        var f625 : boolean/*GLboolean*/ = o.isBuffer(X.getWebGLBuffer());
-        var f626 : boolean/*GLboolean*/ = o.isEnabled(X.getint());
-        var f627 : boolean/*GLboolean*/ = o.isFramebuffer(X.getWebGLFramebuffer());
-        var f628 : boolean/*GLboolean*/ = o.isProgram(X.getWebGLProgram());
-        var f629 : boolean/*GLboolean*/ = o.isRenderbuffer(X.getWebGLRenderbuffer());
-        var f630 : boolean/*GLboolean*/ = o.isShader(X.getWebGLShader());
-        var f631 : boolean/*GLboolean*/ = o.isTexture(X.getWebGLTexture());
+        var f32 : boolean/*GLboolean*/ = o.isBuffer(X.getWebGLBuffer());
+        var f33 : boolean/*GLboolean*/ = o.isEnabled(X.getint());
+        var f34 : boolean/*GLboolean*/ = o.isFramebuffer(X.getWebGLFramebuffer());
+        var f35 : boolean/*GLboolean*/ = o.isProgram(X.getWebGLProgram());
+        var f36 : boolean/*GLboolean*/ = o.isRenderbuffer(X.getWebGLRenderbuffer());
+        var f37 : boolean/*GLboolean*/ = o.isShader(X.getWebGLShader());
+        var f38 : boolean/*GLboolean*/ = o.isTexture(X.getWebGLTexture());
         o.lineWidth(X.getnumber());
         o.linkProgram(X.getWebGLProgram());
         o.pixelStorei(X.getint(), X.getint());
@@ -4921,6 +4867,8 @@ class _Test extends TestCase {
 
     // #265
     function compile_WebGLContextEvent(o : WebGLContextEvent) : void {
+        var c1 = new WebGLContextEvent(X.getstring());
+        var c2 = new WebGLContextEvent(X.getstring(), X.getWebGLContextEventInit());
         var v1 : string/*DOMString*/ = o.statusMessage;
     } // WebGLContextEvent
 
@@ -4942,7 +4890,7 @@ class _Test extends TestCase {
     // #268
     function compile_CanvasPixelArray(o : CanvasPixelArray) : void {
         var v1 : int/*unsigned long*/ = o.length;
-        var f2 : Nullable.<int>/*octet*/ = o.__native_index_operator__(X.getint());
+        var f1 : Nullable.<int>/*octet*/ = o.__native_index_operator__(X.getint());
     } // CanvasPixelArray
 
 
@@ -4963,7 +4911,7 @@ native class X {
     static function getBarProp() : BarProp;
     static function getBlob() : Blob;
     static function getCSSRule() : CSSRule;
-    static function getCSSRule__() : CSSRule[]/*CSSRuleList*/;
+    static function getCSSRule__() : CSSRule[];
     static function getCSSStyleDeclaration() : CSSStyleDeclaration;
     static function getCSSStyleSheet() : CSSStyleSheet;
     static function getCanvasGradient() : CanvasGradient;
@@ -4971,8 +4919,11 @@ native class X {
     static function getCaretPosition() : CaretPosition;
     static function getClientRect() : ClientRect;
     static function getClientRectList() : ClientRectList;
+    static function getCloseEventInit() : CloseEventInit;
     static function getComment() : Comment;
+    static function getCompositionEventInit() : CompositionEventInit;
     static function getCoordinates() : Coordinates;
+    static function getCustomEventInit() : CustomEventInit;
     static function getDOMError() : DOMError;
     static function getDOMImplementation() : DOMImplementation;
     static function getDOMSettableTokenList() : DOMSettableTokenList;
@@ -4987,20 +4938,25 @@ native class X {
     static function getDocumentFragment() : DocumentFragment;
     static function getDocumentType() : DocumentType;
     static function getDocumentView() : DocumentView;
+    static function getDragEventInit() : DragEventInit;
     static function getElement() : Element;
+    static function getErrorEventInit() : ErrorEventInit;
     static function getEvent() : Event;
+    static function getEventInit() : EventInit;
+    static function getEventSourceInit() : EventSourceInit;
     static function getEventTarget() : EventTarget;
     static function getExternal() : External;
     static function getFile() : File;
     static function getFileList() : FileList;
     static function getFloat32Array() : Float32Array;
     static function getFloat64Array() : Float64Array;
+    static function getFocusEventInit() : FocusEventInit;
     static function getFormData() : FormData;
     static function getGeolocation() : Geolocation;
     static function getHTMLAllCollection() : HTMLAllCollection;
     static function getHTMLCanvasElement() : HTMLCanvasElement;
     static function getHTMLCollection() : HTMLCollection;
-    static function getHTMLDocument() : HTMLDocument/*Document*/;
+    static function getHTMLDocument() : HTMLDocument;
     static function getHTMLElement() : HTMLElement;
     static function getHTMLFormControlsCollection() : HTMLFormControlsCollection;
     static function getHTMLFormElement() : HTMLFormElement;
@@ -5013,18 +4969,22 @@ native class X {
     static function getHTMLTableCaptionElement() : HTMLTableCaptionElement;
     static function getHTMLTableSectionElement() : HTMLTableSectionElement;
     static function getHTMLVideoElement() : HTMLVideoElement;
+    static function getHashChangeEventInit() : HashChangeEventInit;
     static function getHistory() : History;
     static function getImageData() : ImageData;
     static function getInt16Array() : Int16Array;
     static function getInt32Array() : Int32Array;
     static function getInt8Array() : Int8Array;
+    static function getKeyboardEventInit() : KeyboardEventInit;
     static function getLocation() : Location;
     static function getMediaController() : MediaController;
     static function getMediaError() : MediaError;
     static function getMediaList() : MediaList;
     static function getMediaQueryList() : MediaQueryList;
+    static function getMessageEventInit() : MessageEventInit;
     static function getMessagePort() : MessagePort;
     static function getMessagePort__() : MessagePort[];
+    static function getMouseEventInit() : MouseEventInit;
     static function getMutationObserverInit() : MutationObserverInit;
     static function getNavigator() : Navigator;
     static function getNode() : Node;
@@ -5032,17 +4992,20 @@ native class X {
     static function getNodeIterator() : NodeIterator;
     static function getNodeList() : NodeList;
     static function getNullable__boolean_() : Nullable.<boolean>;
-    static function getNullable__int_() : Nullable.<int>/*octet*/;
-    static function getNullable__number_() : Nullable.<number>/*double*/;
-    static function getNullable__string_() : Nullable.<string>/*DOMString?*/;
-    static function getObject() : Object/*object?*/;
+    static function getNullable__int_() : Nullable.<int>;
+    static function getNullable__number_() : Nullable.<number>;
+    static function getNullable__string_() : Nullable.<string>;
+    static function getObject() : Object;
+    static function getPageTransitionEventInit() : PageTransitionEventInit;
+    static function getPopStateEventInit() : PopStateEventInit;
     static function getPositionOptions() : PositionOptions;
     static function getProcessingInstruction() : ProcessingInstruction;
     static function getRange() : Range;
     static function getScreen() : Screen;
     static function getStorage() : Storage;
+    static function getStorageEventInit() : StorageEventInit;
     static function getStyleSheet() : StyleSheet;
-    static function getStyleSheet__() : StyleSheet[]/*StyleSheetList*/;
+    static function getStyleSheet__() : StyleSheet[];
     static function getText() : Text;
     static function getTextMetrics() : TextMetrics;
     static function getTextTrack() : TextTrack;
@@ -5053,8 +5016,10 @@ native class X {
     static function getTouch() : Touch;
     static function getTouchList() : TouchList;
     static function getTouch__() : Touch[];
+    static function getTrackEventInit() : TrackEventInit;
     static function getTransferable__() : Transferable[];
     static function getTreeWalker() : TreeWalker;
+    static function getUIEventInit() : UIEventInit;
     static function getUint16Array() : Uint16Array;
     static function getUint32Array() : Uint32Array;
     static function getUint8Array() : Uint8Array;
@@ -5065,6 +5030,7 @@ native class X {
     static function getWebGLActiveInfo() : WebGLActiveInfo;
     static function getWebGLBuffer() : WebGLBuffer;
     static function getWebGLContextAttributes() : WebGLContextAttributes;
+    static function getWebGLContextEventInit() : WebGLContextEventInit;
     static function getWebGLFramebuffer() : WebGLFramebuffer;
     static function getWebGLProgram() : WebGLProgram;
     static function getWebGLRenderbuffer() : WebGLRenderbuffer;
@@ -5073,27 +5039,29 @@ native class X {
     static function getWebGLShader__() : WebGLShader[];
     static function getWebGLTexture() : WebGLTexture;
     static function getWebGLUniformLocation() : WebGLUniformLocation;
-    static function getWindow() : Window/*WindowProxy?*/;
+    static function getWheelEventInit() : WheelEventInit;
+    static function getWindow() : Window;
     static function getWorkerGlobalScope() : WorkerGlobalScope;
     static function getWorkerLocation() : WorkerLocation;
     static function getWorkerNavigator() : WorkerNavigator;
     static function getXMLDocument() : XMLDocument;
     static function getXMLHttpRequestUpload() : XMLHttpRequestUpload;
-    static function getboolean() : boolean/*GLboolean*/;
-    static function getfunction__Event__void() : function(:Event):void/*Function?*/;
-    static function getfunction__File__void() : function(:File):void/*FileCallback?*/;
-    static function getfunction__MediaQueryList__void() : function(:MediaQueryList):void/*MediaQueryListListener*/;
-    static function getfunction___void() : function():void/*TimerHandler*/;
-    static function getfunction__string__void() : function(:string):void/*FunctionStringCallback?*/;
-    static function getfunction_positionError_PositionError__void() : function(positionError:PositionError):void/*PositionErrorCallback*/;
-    static function getfunction_position_Position__void() : function(position:Position):void/*PositionCallback*/;
-    static function getfunction_time_number__void() : function(time:number/*DOMTimeStamp*/):void/*FrameRequestCallback*/;
-    static function getint() : int/*unsigned long*/;
-    static function getint__() : int[]/*sequence<long>*/;
-    static function getnumber() : number/*GLintptr*/;
-    static function getnumber__() : number[]/*sequence<float>*/;
-    static function getstring() : string/*DOMString*/;
-    static function getstring__() : string[]/*sequence<DOMString>?*/;
-    static function getvariant() : variant/*any*/;
+    static function getboolean() : boolean;
+    static function getfunction__Event__void() : function(:Event):void;
+    static function getfunction__File__void() : function(:File):void;
+    static function getfunction__MediaQueryList__void() : function(:MediaQueryList):void;
+    static function getfunction___void() : function():void;
+    static function getfunction__string__void() : function(:string):void;
+    static function getfunction_mutations_MutationRecord___observer_MutationObserver__void() : function(mutations:MutationRecord[],observer:MutationObserver):void;
+    static function getfunction_positionError_PositionError__void() : function(positionError:PositionError):void;
+    static function getfunction_position_Position__void() : function(position:Position):void;
+    static function getfunction_time_number__void() : function(time:number):void;
+    static function getint() : int;
+    static function getint__() : int[];
+    static function getnumber() : number;
+    static function getnumber__() : number[];
+    static function getstring() : string;
+    static function getstring__() : string[];
+    static function getvariant() : variant;
 }
 
