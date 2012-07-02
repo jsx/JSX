@@ -389,7 +389,11 @@ var ParsedObjectType = exports.ParsedObjectType = ObjectType.extend({
 		}
 		var typeArgs = [];
 		for (var i = 0; i < this._typeArguments.length; ++i) {
-			var actualType = instantiationContext.typemap[this._typeArguments[i].toString()];
+			if (this._typeArguments[i] instanceof ParsedObjectType && this._typeArguments[i].getTypeArguments().length != 0) {
+				var actualType = this._typeArguments[i].instantiate(instantiationContext);
+			} else {
+				actualType = instantiationContext.typemap[this._typeArguments[i].toString()];
+			}
 			typeArgs[i] = actualType != undefined ? actualType : this._typeArguments[i];
 			// special handling for Array.<T> (T should not be NullableType)
 			if (typeArgs[i] instanceof NullableType && this._qualifiedName.getToken().getValue() == "Array") {
