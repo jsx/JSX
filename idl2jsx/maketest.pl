@@ -6,6 +6,7 @@ use Storable qw(lock_retrieve);
 use Tie::IxHash;
 use File::Basename qw(dirname);
 use Text::Xslate;
+use Data::Dumper;
 use Data::Section::Simple;
 
 my $classdef = lock_retrieve(dirname(__FILE__) . "/.idl2jsx.bin");
@@ -13,17 +14,29 @@ my $classdef = lock_retrieve(dirname(__FILE__) . "/.idl2jsx.bin");
 my @classes;
 my %used_type;
 
+
+sub use_type {
+    my($type) = @_;
+    $used_type{type2id($type)} = trim_comment($type);
+    return;
+}
+
 # prepare
 while(my($class, $def) = each %{$classdef}) {
     next if $def->{skip};
     next if $def->{alias};
 
-    my $i = 0;
+    my $c = 0; # for constructors
+    my $v = 0; # for member variables
+    my $f = 0; # for member functions
     push @classes, $def;
+
+    my %seen;
 
     my @tests;
     foreach my $member(@{$def->{members}}) {
         next unless ref $member;
+        next if $seen{$member->{decl}}++;
 
         my $receiver;
         if($member->{static}) {
@@ -33,18 +46,12 @@ while(my($class, $def) = each %{$classdef}) {
             $receiver = "o";
         }
 
-        my $decl = $member->{decl};
-        $decl =~ s{/\* .*? \*/}{}xmsg;
-
         if(exists $member->{type}) {
             push @tests, sprintf "var v%d : %s = %s.%s;",
-                ++$i, $member->{type},
+                ++$v, $member->{type},
                 $receiver, $member->{id};
 
-            $used_type{type2id($member->{type})} = $member->{type};
-        }
-        elsif($member->{id} eq 'constructor') {
-            # TODO
+            use_type($member->{type});
         }
         else {
             my $ret_type    = $member->{ret_type_decl};
@@ -52,20 +59,22 @@ while(my($class, $def) = each %{$classdef}) {
 
             $ret_type =~ s/\A \s* : \s*//xms;
 
-            if($ret_type eq 'void') {
+            if($member->{id} eq 'constructor') {
+                push @tests, sprintf "var c%d = new %s(%s);",
+                    ++$c, $class, make_args($param_types);
+            }
+            elsif($ret_type eq 'void') {
                 push @tests, sprintf "%s.%s(%s);",
                     $receiver, $member->{id}, make_args($param_types);
-
-                $used_type{type2id($_)} = $_ for @{$param_types};
             }
             else {
                 push @tests, sprintf "var f%d : %s = %s.%s(%s);",
-                    ++$i, $ret_type,
+                    ++$f, $ret_type,
                     $receiver, $member->{id}, make_args($param_types);
 
-                $used_type{type2id($_)} = $_ for @{$param_types};
-                $used_type{type2id($ret_type)} = $ret_type;
+                use_type($ret_type);
             }
+            use_type($_) for @{$param_types};
         }
     }
 
@@ -76,9 +85,6 @@ while(my($class, $def) = each %{$classdef}) {
 my $xslate = Text::Xslate->new(
     type => "text",
     path => [ Data::Section::Simple->new->get_data_section ],
-    function => {
-        type2id => \&type2id,
-    },
 );
 
 print $xslate->render("web.jsx", {
@@ -88,10 +94,16 @@ print $xslate->render("web.jsx", {
 
 exit;
 
+sub trim_comment {
+    my($t) = @_;
+    $t =~ s{/\* .*? \*/}{}xmsg;
+    return $t;
+}
+
 sub type2id {
     my($type) = @_;
+    $type = trim_comment($type);
     $type =~ s/\s+//xmsg;
-    $type =~ s{/\* .*? \*/}{}xmsg;
     $type =~ s/ \W /_/xmsg;
     return $type;
 }
