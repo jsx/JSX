@@ -2469,9 +2469,7 @@ var Parser = exports.Parser = Class.extend({
 		if (this._expectOpt(":") != null) {
 			if ((type = this._typeDeclaration(false)) == null)
 				return null;
-			if (type.equals(Type.variantType) || type instanceof ObjectType || type instanceof StaticFunctionType) {
-				// ok
-			} else {
+			if (type instanceof PrimitiveType) {
 				this._newError("type '" + type.toString() + "' is not nullable");
 				return null;
 			}
