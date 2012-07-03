@@ -3652,7 +3652,7 @@ class _Test extends TestCase {
     // #230
     function compile_DOMParser(o : DOMParser) : void {
         var c1 = new DOMParser();
-        var f1 : HTMLDocument/*Document*/ = o.parseFromString(X.getstring(), X.getstring());
+        var f1 : Document = o.parseFromString(X.getstring(), X.getstring());
     } // DOMParser
 
     // #231
