@@ -8,15 +8,27 @@ use Tie::IxHash;
 use Data::Dumper;
 use File::Basename qw(dirname);
 use Storable qw(lock_retrieve lock_store);
+use LWP::UserAgent;
+use URI::Escape qw(uri_escape);
+use Time::HiRes ();
+
 use constant WIDTH => 68;
 
-# see http://dev.w3.org/2006/webapi/WebIDL/
+# see http://www.w3.org/TR/WebIDL/
 
 my $continuous = ($ARGV[0] ~~ "--continuous" && shift @ARGV);
 
-my $db = dirname(__FILE__) . '/.idl2jsx.bin';
-
 my @files = @ARGV;
+
+my $root = dirname(__FILE__);
+my $db = "$root/.idl2jsx.bin";
+mkdir "$root/.save";
+
+{
+    my $t0 = [Time::HiRes::gettimeofday()];
+    END {
+        info(sprintf "elapsed %.02f sec.", Time::HiRes::tv_interval($t0)) if $t0 }
+}
 
 my %primitive = (
     string => 1,
@@ -192,11 +204,19 @@ foreach my $file(@files) {
     {
         my $arg = $file;
         if($arg =~ /^https?:/) {
+            state $ua = LWP::UserAgent->new();
+            my $filename = "$root/.save/" . uri_escape($arg);
+            my $res = $ua->mirror($arg, $filename);
+
+            if($res->header("Last-Modified")) {
+                info("Last-Modified: ", $res->header("Last-Modified"));
+            }
+
             if($arg =~ /\.idl$/) {
-                $arg = "curl -L $arg 2>/dev/null |";
+                $arg = $filename;
             }
             else {
-                $arg = "w3m -dump $arg |";
+                $arg = "w3m -T text/html -dump $filename |";
             }
         }
         open my($fh), $arg; # magic open!
@@ -326,6 +346,7 @@ foreach my $file(@files) {
             }
         }
 
+        # FIXME: Complex regular subexpression recursion limit (32766) exceeded
 
         while($members =~ m{
                 (?<comments> $rx_comments)
@@ -612,7 +633,7 @@ foreach my $def(values %classdef) {
                     next if $seen{ join(";", $member->{id}, $member->{static}) }++;
                 }
 
-                say "\t", sprintf '/** @see %s */', $member->{spec} if $member->{spec};
+                say "\t", sprintf '/** @see %s */', $member->{spec} if $member->{spec} && $def->{spec} ne $member->{spec};
             }
             else { # comments, etc.
                 $s = $member;
