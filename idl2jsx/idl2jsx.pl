@@ -195,8 +195,8 @@ tie %classdef, 'Tie::IxHash';
 foreach my $file(@files) {
     info "parsing $file";
 
-    # XXX: spec bug?
-    my $Document_is_HTMLDocument = ($file =~ / \b html5 \b/xms);
+    # XXX: looks a bug in http://www.w3.org/TR/html5/single-page.html
+    my $Document_is_HTMLDocument = ($file =~ m{ /html5/single-page.html }xms);
 
     local $typemap{Document} = "HTMLDocument" if $Document_is_HTMLDocument;
 
@@ -293,9 +293,6 @@ foreach my $file(@files) {
 
         info $type, $class, ($base ? ": $base" : ());
 
-        if($type !~ /\b partial \b/xms) {
-            $has_definition{$class} = 1;
-        }
 
         my $def = $classdef{$class} //= {
             attrs => $attrs,
@@ -306,7 +303,10 @@ foreach my $file(@files) {
             fake    => $fake{$class},
         };
 
-        $def->{spec} = $spec_name if $has_definition{$class};
+        if($type !~ /\b partial \b/xms) {
+            $has_definition{$class} = 1;
+            $def->{spec} = $spec_name;
+        }
 
         if($base) {
             $def->{base} //= $base;
