@@ -208,6 +208,8 @@ foreach my $file(@files) {
         }
     }
 
+    my $spec_name = $file =~ /^https?:/ ? $file : "";
+
     info 'process <typedef>';
     while($content =~ m{
             ^ \s* \b typedef \b
@@ -275,7 +277,6 @@ foreach my $file(@files) {
             $has_definition{$class} = 1;
         }
 
-
         my $def = $classdef{$class} //= {
             attrs => $attrs,
             name  => $class,
@@ -284,6 +285,8 @@ foreach my $file(@files) {
             decl    => {},
             fake    => $fake{$class},
         };
+
+        $def->{spec} = $spec_name if $has_definition{$class};
 
         if($base) {
             $def->{base} //= $base;
@@ -306,9 +309,13 @@ foreach my $file(@files) {
                 \) )?
             }xmsg) {
                 make_functions(
-                    $decl_ref, $members_ref,
+                    $decl_ref,
+                    $members_ref,
                     "constructor",
-                    undef, $+{params});
+                    $spec_name,
+                    undef,
+                    $+{params},
+                );
             }
 
             if($attrs =~ /\b NoInterfaceObject \b/xms) {
@@ -364,16 +371,18 @@ foreach my $file(@files) {
                 $decl_ref->{$id} //= [];
                 push @{$decl_ref->{$id}}, ($static_const, $readonly_var);
                 push @{$members_ref}, {
-                    id => $id,
-                    decl => $static_const,
-                    type => $type,
+                    id     => $id,
+                    decl   => $static_const,
+                    type   => $type,
                     static => 1,
+                    spec   => $spec_name,
                 };
                 push @{$members_ref}, {
-                    id => $id,
-                    decl => $readonly_var,
-                    type => $type,
+                    id     => $id,
+                    decl   => $readonly_var,
+                    type   => $type,
                     static => 0,
+                    spec   => $spec_name,
                 };
             }
             # member var
@@ -400,10 +409,11 @@ foreach my $file(@files) {
                 $decl_ref->{$id} //= [];
                 push @{$decl_ref->{$id}}, $decl;
                 push @{$members_ref}, {
-                    id   => $id,
-                    decl => $decl,
-                    type => $type,
+                    id     => $id,
+                    decl   => $decl,
+                    type   => $type,
                     static => 0,
+                    spec   => $spec_name,
                 };
             }
             # member function
@@ -436,10 +446,14 @@ foreach my $file(@files) {
                         $ret_type_nullable = 1;
                         my $id = "__native_index_operator__";
                         make_functions(
-                                $decl_ref, $members_ref,
-                                $id,
-                                $ret_type, $params,
-                                $ret_type_nullable);
+                            $decl_ref,
+                            $members_ref,
+                            $id,
+                            $spec_name,
+                            $ret_type,
+                            $params,
+                            $ret_type_nullable,
+                        );
                     }
                     if(!$id) {
                         # no name
@@ -451,10 +465,15 @@ foreach my $file(@files) {
                     die "unexpected no name for $member.\n";
                 }
                 make_functions(
-                    $decl_ref, $members_ref,
+                    $decl_ref,
+                    $members_ref,
                     $id,
-                    $ret_type, $params,
-                    $ret_type_nullable, $static);
+                    $spec_name,
+                    $ret_type,
+                    $params,
+                    $ret_type_nullable,
+                    $static
+                );
 
                 # redefine it as a callbackdefinition
                 if($alias) {
@@ -502,12 +521,6 @@ foreach my $file(@files) {
 
 
 info 'output';
-if(@files) {
-    say "/*";
-    say "automatically generated from:";
-    say "\t", $_ for @files;
-    say "*/";
-}
 foreach my $def(values %classdef) {
     if($def->{skip} or $def->{done}) {
         next;
@@ -541,6 +554,7 @@ foreach my $def(values %classdef) {
         $classdecl .= " extends $def->{base}";
     }
 
+    say sprintf '/** @see %s */', $def->{spec} if $def->{spec};
     say $classdecl, " {";
 
     my @members = @{$def->{members}};
@@ -597,6 +611,8 @@ foreach my $def(values %classdef) {
                     # skip if it is already defined
                     next if $seen{ join(";", $member->{id}, $member->{static}) }++;
                 }
+
+                say "\t", sprintf '/** @see %s */', $member->{spec} if $member->{spec};
             }
             else { # comments, etc.
                 $s = $member;
@@ -616,12 +632,6 @@ foreach my $def(values %classdef) {
     }
 
     say "";
-}
-if(@files) {
-    say "/*";
-    say "end of generated files from:";
-    say "\t", $_ for @files;
-    say "*/";
 }
 
 lock_store(\%classdef, $db) if $continuous;
@@ -684,7 +694,7 @@ sub to_jsx_type {
 }
 
 sub make_functions {
-    my($decl_ref, $members_ref, $name, $ret_type, $src_params, $ret_type_nullable, $static) = @_;
+    my($decl_ref, $members_ref, $name, $spec, $ret_type, $src_params, $ret_type_nullable, $static) = @_;
 
     my $ret_type_decl = defined($ret_type)
         ? " : " . to_jsx_type($ret_type, nullable => $ret_type_nullable)
@@ -717,6 +727,7 @@ sub make_functions {
                 param_types   => [ map { $_->{jsx_type} } @{$params_ref} ],
                 ret_type_decl => $ret_type_decl,
                 static        => $static ? 1 : 0,
+                spec          => $spec,
             };
 
             my $last = pop @{$params_ref};
