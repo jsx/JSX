@@ -470,24 +470,23 @@ var exitCode = JSX.main(getEnvOpts().concat(process.argv.slice(2)));
 		return;
 	}
 
-	var canExitDirectly = true;
+	var stdoutIsFlushed = process.stdout.write("");
+	var stderrIsFlushed = process.stderr.write("");
 
-	if (! process.stdout.write("")) {
-		process.stdout.on('drain', function() {
+	var exitIfFlushed = function () {
+		if (stdoutIsFlushed && stderrIsFlushed) {
 			process.exit(exitCode);
-		});
-		canExitDirectly = false;
+		}
+	};
+
+	if (! stdoutIsFlushed) {
+		process.stdout.on('drain', exitIfFlushed);
 	}
-	if (! process.stderr.write("")) {
-		process.stderr.on('drain', function() {
-			process.exit(exitCode);
-		});
-		canExitDirectly = false;
+	if (! stderrIsFlushed) {
+		process.stderr.on('drain', exitIfFlushed);
 	}
 
-	if (canExitDirectly) {
-		process.exit(exitCode);
-	}
+	exitIfFlushed();
 }(exitCode));
 
 // vim: set ft=javascript:
