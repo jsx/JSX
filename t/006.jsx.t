@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 use strict;
 use warnings;
-use Test::More tests => 15;
+use Test::More tests => 16;
 
 ok scalar(`bin/jsx --version`), "jsx --version shows something";
 is $?, 0, "... exits with 0";
