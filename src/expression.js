@@ -879,12 +879,7 @@ var AsExpression = exports.AsExpression = UnaryExpression.extend({
 		// possibly unsafe conversions
 		var exprType = this._expr.getType().resolveIfNullable();
 		var success = false;
-		if (exprType.equals(Type.undefinedType)) {
-			if (this._type instanceof NullableType || this._type.equals(Type.variantType)) {
-				// ok
-				success = true;
-			}
-		} else if (exprType.equals(Type.nullType)) {
+		if (exprType.equals(Type.nullType)) {
 			if (this._type instanceof ObjectType || this._type instanceof FunctionType) {
 				// ok
 				success = true;
