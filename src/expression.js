@@ -203,8 +203,8 @@ var LocalExpression = exports.LocalExpression = LeafExpression.extend({
 
 	assertIsAssignable: function (context, token, type) {
 		if (this._local.getType() == null) {
-			if (type.equals(Type.undefinedType)) {
-				context.errors.push(new CompileError(token, "cannot assign an undefined type to a value of undetermined type"));
+			if (type.equals(Type.nullType)) {
+				context.errors.push(new CompileError(token, "cannot assign null without type annotation to a value of undetermined type"));
 				return false;
 			}
 			this._local.setType(type.asAssignableType());
@@ -483,8 +483,7 @@ var ArrayLiteralExpression = exports.ArrayLiteralExpression = Expression.extend(
 		} else {
 			for (var i = 0; i < this._exprs.length; ++i) {
 				var elementType = this._exprs[i].getType().resolveIfNullable();
-				if (elementType.equals(Type.nullType)
-					|| elementType.equals(Type.undefinedType)) {
+				if (elementType.equals(Type.nullType)) {
 					// skip
 				} else {
 					if (elementType.equals(Type.integerType))
@@ -947,8 +946,7 @@ var AsNoConvertExpression = exports.AsNoConvertExpression = UnaryExpression.exte
 		if (! this._analyze(context))
 			return false;
 		var srcType = this._expr.getType();
-		if ((srcType.equals(Type.undefinedType) && ! (this._type.equals(Type.variantType) || this._type instanceof NullableType))
-			|| (srcType.equals(Type.nullType) && ! (this._type instanceof ObjectType || this._type instanceof FunctionType))) {
+		if ((srcType.equals(Type.nullType) && ! (this._type instanceof ObjectType || this._type instanceof FunctionType))) {
 			context.errors.push(new CompileError(this._token, "'" + srcType.toString() + "' cannot be treated as a value of type '" + this._type.toString() + "'"));
 			return false;
 		}
