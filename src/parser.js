@@ -2263,10 +2263,7 @@ var Parser = exports.Parser = Class.extend({
 			return null;
 		// handle [] (if it has an length parameter, that's the last)
 		while (this._expectOpt("[") != null) {
-			if (type.equals(Type.undefinedType) || type.equals(Type.nullType)) {
-				this._newError("cannot instantiate an array of " + type.toString());
-				return null;
-			} else if (type instanceof NullableType) {
+			if (type instanceof NullableType) {
 				this._newError("cannot instantiate an array of an Nullable type");
 				return null;
 			}
@@ -2758,8 +2755,7 @@ var _CompletionCandidatesOfProperty = exports._CompletionCandidatesOfProperty = 
 		type = type.resolveIfNullable();
 		if (type.equals(Type.voidType)
 			|| type.equals(Type.nullType)
-			|| type.equals(Type.variantType)
-			|| type.equals(Type.undefinedType))
+			|| type.equals(Type.variantType))
 			return;
 		// type with classdef
 		var classDef = type.getClassDef();
