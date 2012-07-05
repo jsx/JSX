@@ -395,9 +395,12 @@ var ParsedObjectType = exports.ParsedObjectType = ObjectType.extend({
 				actualType = instantiationContext.typemap[this._typeArguments[i].toString()];
 			}
 			typeArgs[i] = actualType != undefined ? actualType : this._typeArguments[i];
-			// special handling for Array.<T> (T should not be NullableType)
-			if (typeArgs[i] instanceof NullableType && this._qualifiedName.getToken().getValue() == "Array") {
-				typeArgs[i] = typeArgs[i].getBaseType();
+			// special handling for (Array|Map).<T> (T should not be NullableType)
+			if (typeArgs[i] instanceof NullableType) {
+				var templateClassName = this._qualifiedName.getToken().getValue();
+				if (templateClassName == "Array" || templateClassName == "Map") {
+					typeArgs[i] = typeArgs[i].getBaseType();
+				}
 			}
 		}
 		instantiationContext.request.getInstantiationRequests().push(

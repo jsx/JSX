@@ -1385,8 +1385,9 @@ var Parser = exports.Parser = Class.extend({
 				return null;
 		} while (token.getValue() == ",");
 		// check
-		if (qualifiedName.getToken().getValue() == "Array" && types[0] instanceof NullableType) {
-			this._newError("cannot declare Array.<Nullable.<T>>, should be Array.<T>");
+		var className = qualifiedName.getToken().getValue();
+		if ((className == "Array" || className == "Map") && types[0] instanceof NullableType) {
+			this._newError("cannot declare " + className + ".<Nullable.<T>>, should be " + className + ".<T>");
 			return false;
 		}
 		// request template instantiation (deferred)

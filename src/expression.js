@@ -613,6 +613,7 @@ var MapLiteralExpression = exports.MapLiteralExpression = Expression.extend({
 				if (! elementType.equals(Type.nullType)) {
 					if (elementType.equals(Type.integerType))
 						elementType = Type.numberType;
+					elementType = elementType.resolveIfNullable();
 					var instantiatedClass = context.instantiateTemplate(context.errors, new TemplateInstantiationRequest(this._token, "Map", [ elementType ]));
 					if (instantiatedClass == null)
 						return false;
