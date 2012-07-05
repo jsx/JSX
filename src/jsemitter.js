@@ -801,14 +801,9 @@ var _AsExpressionEmitter = exports._AsExpressionEmitter = _ExpressionEmitter.ext
 	emit: function (outerOpPrecedence) {
 		var srcType = this._expr.getExpr().getType();
 		var destType = this._expr.getType();
-		if (srcType.resolveIfNullable() instanceof ObjectType || srcType.equals(Type.variantType)) {
-			if (srcType.resolveIfNullable().isConvertibleTo(destType)) {
-				if (srcType instanceof NullableType) {
-					var prec = _LogicalExpressionEmitter._operatorPrecedence["||"];
-					this._emitWithParens(outerOpPrecedence, prec, prec, null, "|| null");
-				} else {
-					this._emitter._getExpressionEmitterFor(this._expr.getExpr()).emit(outerOpPrecedence);
-				}
+		if (srcType instanceof ObjectType || srcType.equals(Type.variantType)) {
+			if (srcType.isConvertibleTo(destType)) {
+				this._emitter._getExpressionEmitterFor(this._expr.getExpr()).emit(outerOpPrecedence);
 				return true;
 			}
 			if (destType instanceof ObjectType) {
@@ -836,26 +831,7 @@ var _AsExpressionEmitter = exports._AsExpressionEmitter = _ExpressionEmitter.ext
 				return true;
 			}
 		}
-		if (srcType.equals(Type.nullType)) {
-			// from null
-			if (destType.equals(Type.booleanType)) {
-				this._emitter._emit("false", this._expr.getToken());
-				return true;
-			}
-			if (destType.equals(Type.integerType) || destType.equals(Type.numberType)) {
-				this._emitter._emit("0", this._expr.getToken());
-				return true;
-			}
-			if (destType.equals(Type.stringType)) {
-				this._emitter._emit("\"null\"", this._expr.getToken());
-				return true;
-			}
-			if (destType instanceof ObjectType || destType instanceof FunctionType) {
-				this._emitter._emit("null", this._expr.getToken());
-				return true;
-			}
-		}
-		if (srcType.equals(Type.booleanType)) {
+		if (srcType.resolveIfNullable().equals(Type.booleanType)) {
 			// from boolean
 			if (destType.equals(Type.integerType) || destType.equals(Type.numberType)) {
 				var prec = _UnaryExpressionEmitter._operatorPrecedence["+"];
@@ -868,29 +844,7 @@ var _AsExpressionEmitter = exports._AsExpressionEmitter = _ExpressionEmitter.ext
 				return true;
 			}
 		}
-		if (srcType instanceof NullableType && srcType.getBaseType().equals(Type.booleanType)) {
-			// from Nullable.<boolean>
-			if (destType.equals(Type.booleanType)) {
-				var prec = _LogicalExpressionEmitter._operatorPrecedence["||"];
-				this._emitWithParens(outerOpPrecedence, prec, prec, null, " || false");
-				return true;
-			}
-			if (destType.equals(Type.integerType) || destType.equals(Type.numberType)) {
-				this._emitWithParens(
-					outerOpPrecedence,
-					_BinaryNumberExpressionEmitter._operatorPrecedence["-"],
-					_UnaryExpressionEmitter._operatorPrecedence["!"],
-					"1 - ! ",
-					null);
-				return true;
-			}
-			if (destType.equals(Type.stringType)) {
-				var prec = _AdditiveExpressionEmitter._operatorPrecedence;
-				this._emitWithParens(outerOpPrecedence, prec, prec, null, " + \"\"");
-				return true;
-			}
-		}
-		if (srcType.equals(Type.integerType)) {
+		if (srcType.resolveIfNullable().equals(Type.integerType)) {
 			// from integer
 			if (destType.equals(Type.booleanType)) {
 				var prec = _UnaryExpressionEmitter._operatorPrecedence["!"];
@@ -907,25 +861,7 @@ var _AsExpressionEmitter = exports._AsExpressionEmitter = _ExpressionEmitter.ext
 				return true;
 			}
 		}
-		if (srcType instanceof NullableType && srcType.getBaseType().equals(Type.integerType)) {
-			// from Nullable.<int>
-			if (destType.equals(Type.booleanType)) {
-				var prec = _UnaryExpressionEmitter._operatorPrecedence["!"];
-				this._emitWithParens(outerOpPrecedence, prec, prec, "!! ", null);
-				return true;
-			}
-			if (destType.equals(Type.integerType) || destType.equals(Type.numberType)) {
-				var prec = _BinaryNumberExpressionEmitter._operatorPrecedence["|"];
-				this._emitWithParens(outerOpPrecedence, prec, prec, null, " | 0");
-				return true;
-			}
-			if (destType.equals(Type.stringType)) {
-				var prec = _AdditiveExpressionEmitter._operatorPrecedence;
-				this._emitWithParens(outerOpPrecedence, prec, prec, null, " + \"\"");
-				return true;
-			}
-		}
-		if (srcType.equals(Type.numberType)) {
+		if (srcType.resolveIfNullable().equals(Type.numberType)) {
 			// from number
 			if (destType.equals(Type.booleanType)) {
 				var prec = _UnaryExpressionEmitter._operatorPrecedence["!"];
@@ -943,8 +879,8 @@ var _AsExpressionEmitter = exports._AsExpressionEmitter = _ExpressionEmitter.ext
 				return true;
 			}
 		}
-		if (srcType instanceof NullableType && srcType.getBaseType().equals(Type.numberType)) {
-			// from Nullable.<number>
+		if (srcType.resolveIfNullable().equals(Type.stringType)) {
+			// from string
 			if (destType.equals(Type.booleanType)) {
 				var prec = _UnaryExpressionEmitter._operatorPrecedence["!"];
 				this._emitWithParens(outerOpPrecedence, prec, prec, "!! ", null);
@@ -958,52 +894,6 @@ var _AsExpressionEmitter = exports._AsExpressionEmitter = _ExpressionEmitter.ext
 			if (destType.equals(Type.numberType)) {
 				var prec = _UnaryExpressionEmitter._operatorPrecedence["+"];
 				this._emitWithParens(outerOpPrecedence, prec, prec, "+", null);
-				return true;
-			}
-			if (destType.equals(Type.stringType)) {
-				var prec = _AdditiveExpressionEmitter._operatorPrecedence;
-				this._emitWithParens(outerOpPrecedence, prec, prec, null, " + \"\"");
-				return true;
-			}
-		}
-		if (srcType.equals(Type.stringType)) {
-			// from String
-			if (destType.equals(Type.booleanType)) {
-				var prec = _UnaryExpressionEmitter._operatorPrecedence["!"];
-				this._emitWithParens(outerOpPrecedence, prec, prec, "!! ", null);
-				return true;
-			}
-			if (destType.equals(Type.integerType)) {
-				var prec = _BinaryNumberExpressionEmitter._operatorPrecedence["|"];
-				this._emitWithParens(outerOpPrecedence, prec, prec, null, " | 0");
-				return true;
-			}
-			if (destType.equals(Type.numberType)) {
-				var prec = _UnaryExpressionEmitter._operatorPrecedence["+"];
-				this._emitWithParens(outerOpPrecedence, prec, prec, "+", null);
-				return true;
-			}
-		}
-		if (srcType instanceof NullableType && srcType.getBaseType().equals(Type.stringType)) {
-			// from Nullable.<String>
-			if (destType.equals(Type.booleanType)) {
-				var prec = _UnaryExpressionEmitter._operatorPrecedence["!"];
-				this._emitWithParens(outerOpPrecedence, prec, prec, "!! ", null);
-				return true;
-			}
-			if (destType.equals(Type.integerType)) {
-				var prec = _BinaryNumberExpressionEmitter._operatorPrecedence["|"];
-				this._emitWithParens(outerOpPrecedence, prec, prec, null, " | 0");
-				return true;
-			}
-			if (destType.equals(Type.numberType)) {
-				var prec = _UnaryExpressionEmitter._operatorPrecedence["+"];
-				this._emitWithParens(outerOpPrecedence, prec, prec, "+", null);
-				return true;
-			}
-			if (destType.equals(Type.stringType)) {
-				var prec = _AdditiveExpressionEmitter._operatorPrecedence;
-				this._emitWithParens(outerOpPrecedence, prec, prec, null, " + \"\"");
 				return true;
 			}
 		}
@@ -1032,7 +922,11 @@ var _AsExpressionEmitter = exports._AsExpressionEmitter = _ExpressionEmitter.ext
 		}
 		if (srcType.isConvertibleTo(destType)) {
 			// can perform implicit conversion
-			this._emitter._getExpressionEmitterFor(this._expr.getExpr()).emit(outerOpPrecedence);
+			if (srcType instanceof NullableType) {
+				this._emitter._emitWithNullableGuard(this._expr.getExpr(), outerOpPrecedence);
+			} else {
+				this._emitter._getExpressionEmitterFor(this._expr.getExpr()).emit(outerOpPrecedence);
+			}
 			return true;
 		}
 		throw new Error("explicit conversion logic unknown from " + srcType.toString() + " to " + destType.toString());
@@ -1044,7 +938,7 @@ var _AsExpressionEmitter = exports._AsExpressionEmitter = _ExpressionEmitter.ext
 			this._emitter._emit("(", null);
 		if (prefix != null)
 			this._emitter._emit(prefix, this._expr.getToken());
-		this._emitter._getExpressionEmitterFor(this._expr.getExpr()).emit(innerOpPrecedence);
+		this._emitter._emitWithNullableGuard(this._expr.getExpr(), innerOpPrecedence);
 		if (postfix != null)
 			this._emitter._emit(postfix, this._expr.getToken());
 		if (opPrecedence >= outerOpPrecedence)

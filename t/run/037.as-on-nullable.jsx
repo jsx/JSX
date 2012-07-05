@@ -1,10 +1,4 @@
 /*EXPECTED
-undefined
-false
-0
-0
-undefined
-
 false
 false
 0
@@ -17,12 +11,6 @@ true
 1
 true
 
-undefined
-false
-0
-0
-undefined
-
 0
 false
 0
@@ -34,12 +22,6 @@ true
 2
 2
 2
-
-undefined
-false
-0
-NaN
-undefined
 
 0
 false
@@ -52,12 +34,6 @@ true
 1
 1.5
 1.5
-
-undefined
-false
-0
-NaN
-undefined
 
 
 false
@@ -70,17 +46,12 @@ true
 0
 NaN
 abc
+
+null access
 */
 class Test {
 	static function run() : void {
-		var b : Nullable.<boolean> = null;
-		log b;
-		log b as boolean;
-		log b as int;
-		log b as number;
-		log b as string;
-		log "";
-		b = false;
+		var b : Nullable.<boolean> = false;
 		log b;
 		log b as boolean;
 		log b as int;
@@ -94,14 +65,7 @@ class Test {
 		log b as number;
 		log b as string;
 		log "";
-		var i : Nullable.<int> = null;
-		log i;
-		log i as boolean;
-		log i as int;
-		log i as number;
-		log i as string;
-		log "";
-		i = 0;
+		var i : Nullable.<int> = 0;
 		log i;
 		log i as boolean;
 		log i as int;
@@ -115,14 +79,7 @@ class Test {
 		log i as number;
 		log i as string;
 		log "";
-		var n : Nullable.<number> = null;
-		log n;
-		log n as boolean;
-		log n as int;
-		log n as number;
-		log n as string;
-		log "";
-		n = 0;
+		var n : Nullable.<number> = 0;
 		log n;
 		log n as boolean;
 		log n as int;
@@ -136,14 +93,7 @@ class Test {
 		log n as number;
 		log n as string;
 		log "";
-		var s : Nullable.<string> = null;
-		log s;
-		log s as boolean;
-		log s as int;
-		log s as number;
-		log s as string;
-		log "";
-		s = "";
+		var s : Nullable.<string> = "";
 		log s;
 		log s as boolean;
 		log s as int;
@@ -156,5 +106,8 @@ class Test {
 		log s as int;
 		log s as number;
 		log s as string;
+		log "";
+		s = null;
+		log s as string; // should emit "null access" (an an expression)
 	}
 }
