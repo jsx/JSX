@@ -91,7 +91,7 @@ var Expression = exports.Expression = Class.extend({
 
 	$assertIsAssignable: function (context, token, lhsType, rhsType) {
 		if (! lhsType.isAssignable()) {
-			context.errors.push(new CompileError("left-hand-side expression is not assignable"));
+			context.errors.push(new CompileError(token, "left-hand-side expression is not assignable"));
 			return false;
 		}
 		if (! rhsType.isConvertibleTo(lhsType)) {
