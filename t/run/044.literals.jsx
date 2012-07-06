@@ -1,5 +1,5 @@
 /*EXPECTED
-undefined
+null
 true
 false
 NaN
@@ -8,7 +8,7 @@ Infinity
 */
 class Test {
 	static function run() : void {
-		log null;
+		log null; // undefined by spec.
 		log true;
 		log false;
 		log NaN;

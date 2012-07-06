@@ -1,25 +1,21 @@
 /*EXPECTED
-undefined
 3
-undefined
-0
-3
-0
-undefined
-3
-undefined
+true
+false
+true
+true
+false
+true
 */
 class Test {
 	static function run() : void {
 		var a = [ null, 3 ] : Array.<variant>;
-		log a[0];
 		log a[1];
-		log a[2];
-		log a[0] as int;
-		log a[1] as int;
-		log a[2] as int;
-		log a.shift();
-		log a.shift();
-		log a.shift();
+		log a[0] == null;
+		log a[1] == null;
+		log a[2] == null;
+		log a.shift() == null;
+		log a.shift() == null;
+		log a.shift() == null;
 	}
 }

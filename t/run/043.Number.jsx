@@ -2,7 +2,7 @@
 1.5
 2.5
 true
-undefined
+true
 false
 3
 2
@@ -16,7 +16,7 @@ class Test {
 		log p;
 		log p == o;
 		o = null;
-		log o;
+		log o == null;
 		log p == o;
 		log 1 + new Number(2);
 		log new Number(3) - 1;

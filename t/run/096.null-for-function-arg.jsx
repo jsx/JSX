@@ -1,5 +1,5 @@
 /*EXPECTED
-undefined
+true
 g1
 g2
 g1
@@ -10,7 +10,7 @@ g2
 
 class Test {
 	static function f(funcArg : function() : void) : void {
-		log funcArg;
+		log funcArg == null;
 	}
 	static function g(funcArg : function () : void) : void {
 		log "g1";

@@ -650,7 +650,7 @@ var _NullExpressionEmitter = exports._NullExpressionEmitter = _ExpressionEmitter
 
 	emit: function (outerOpPrecedence) {
 		var token = this._expr.getToken();
-		this._emitter._emit("undefined", token);
+		this._emitter._emit("null", token);
 	}
 
 });
@@ -2160,7 +2160,7 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 		else if (type.equals(Type.stringType))
 			this._emit("\"\"", null);
 		else if (type instanceof NullableType)
-			this._emit("undefined", null);
+			this._emit("null", null);
 		else
 			this._emit("null", null);
 	},

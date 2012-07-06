@@ -3,7 +3,7 @@
 1
 1
 1
-undefined
+true
 */
 
 class Test {
@@ -18,6 +18,6 @@ class Test {
 		// runtime error log (i = un);
 		log (mi = n);
 		log (mi = mn);
-		log (mn = un);
+		log (mn = un) == null;
 	}
 }

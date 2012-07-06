@@ -1,6 +1,6 @@
 /*EXPECTED
-undefined
-undefined
+true
+true
 */
 interface I {
 }
@@ -10,9 +10,9 @@ class Test {
 	static function run() : void {
 		var i : I = null;
 		var o : Object = i;
-		log o;
+		log o == null;
 		var m : M = null;
 		o = m;
-		log o;
+		log o == null;
 	}
 }
