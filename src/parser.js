@@ -2348,15 +2348,29 @@ var Parser = exports.Parser = Class.extend({
 	},
 
 	_functionExpr: function (token, nameOfFunctionStatement) {
+		var requireTypeDeclaration = nameOfFunctionStatement != null;
 		if (this._expect("(") == null)
 			return null;
-		var args = this._functionArgumentsExpr(false, nameOfFunctionStatement != null);
+		var args = this._functionArgumentsExpr(false, requireTypeDeclaration);
 		if (args == null)
 			return null;
-		var returnType = null;
-		if (this._expectOpt(":") != null) {
-			if ((returnType = this._typeDeclaration(true)) == null)
+		var parseReturnType = false;
+		if (requireTypeDeclaration) {
+			if (this._expect(":") == null)
 				return null;
+			parseReturnType = true;
+		} else {
+			if (this._expectOpt(":") != null) {
+				parseReturnType = true;
+			}
+		}
+		if (parseReturnType) {
+			var returnType = this._typeDeclaration(true);
+			if (returnType == null) {
+				return null;
+			}
+		} else {
+			returnType = null;
 		}
 		if (this._expect("{") == null)
 			return null;
