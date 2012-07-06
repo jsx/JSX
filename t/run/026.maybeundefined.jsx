@@ -1,6 +1,6 @@
 /*EXPECTED
 3
-undefined
+null
 null access
 */
 class Test {

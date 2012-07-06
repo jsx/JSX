@@ -1,6 +1,6 @@
 /*EXPECTED
 abc
-undefined
+true
 */
 class Test {
 	static var b = true;
@@ -8,6 +8,6 @@ class Test {
 		var a = Test.b ? new String("abc") : null;
 		log a.toString();
 		a = Test.b ? (null) : a;
-		log a;
+		log a == null;
 	}
 }

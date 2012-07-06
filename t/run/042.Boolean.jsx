@@ -4,7 +4,7 @@ true
 false
 false
 true
-undefined
+true
 */
 class Test {
 	static function run() : void {
@@ -22,6 +22,6 @@ class Test {
 		bV = b.valueOf();
 		log bV;
 		b = null;
-		log b;
+		log b == null;
 	}
 }
