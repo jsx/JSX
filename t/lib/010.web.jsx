@@ -3075,11 +3075,7 @@ class _Test extends TestCase {
 
     // #172
     function compile_Navigator(o : Navigator) : void {
-        var v1 : string/*DOMString*/ = o.appName;
-        var v2 : string/*DOMString*/ = o.appVersion;
-        var v3 : string/*DOMString*/ = o.platform;
-        var v4 : string/*DOMString*/ = o.userAgent;
-        var v5 : boolean = o.onLine;
+        var v1 : boolean = o.onLine;
         o.registerProtocolHandler(X.getstring(), X.getstring(), X.getstring());
         o.registerContentHandler(X.getstring(), X.getstring(), X.getstring());
         var f1 : string/*DOMString*/ = o.isProtocolHandlerRegistered(X.getstring(), X.getstring());
@@ -3087,7 +3083,7 @@ class _Test extends TestCase {
         o.unregisterProtocolHandler(X.getstring(), X.getstring());
         o.unregisterContentHandler(X.getstring(), X.getstring());
         o.yieldForStorageUpdates();
-        var v6 : Geolocation = o.geolocation;
+        var v2 : Geolocation = o.geolocation;
     } // Navigator
 
     // #173
@@ -3600,17 +3596,11 @@ class _Test extends TestCase {
     function compile_WorkerUtils(o : WorkerUtils) : void {
         o.importScripts(X.getstring());
         var v1 : WorkerNavigator = o.navigator;
-        var f1 : string/*DOMString*/ = o.btoa(X.getstring());
-        var f2 : string/*DOMString*/ = o.atob(X.getstring());
     } // WorkerUtils
 
     // #226
     function compile_WorkerNavigator(o : WorkerNavigator) : void {
-        var v1 : string/*DOMString*/ = o.appName;
-        var v2 : string/*DOMString*/ = o.appVersion;
-        var v3 : string/*DOMString*/ = o.platform;
-        var v4 : string/*DOMString*/ = o.userAgent;
-        var v5 : boolean = o.onLine;
+        var v1 : boolean = o.onLine;
     } // WorkerNavigator
 
     // #227
@@ -3965,11 +3955,6 @@ class _Test extends TestCase {
         var f11 : ImageData = o.getImageData(X.getnumber(), X.getnumber(), X.getnumber(), X.getnumber());
         o.putImageData(X.getImageData(), X.getnumber(), X.getnumber());
         o.putImageData(X.getImageData(), X.getnumber(), X.getnumber(), X.getnumber(), X.getnumber(), X.getnumber(), X.getnumber());
-        o.scale(X.getnumber(), X.getnumber());
-        o.rotate(X.getnumber());
-        o.translate(X.getnumber(), X.getnumber());
-        o.transform(X.getnumber(), X.getnumber(), X.getnumber(), X.getnumber(), X.getnumber(), X.getnumber());
-        o.setTransform(X.getnumber(), X.getnumber(), X.getnumber(), X.getnumber(), X.getnumber(), X.getnumber());
         var v10 : number/*double*/ = o.lineWidth;
         var v11 : string/*DOMString*/ = o.lineCap;
         var v12 : string/*DOMString*/ = o.lineJoin;

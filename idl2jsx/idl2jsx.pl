@@ -27,7 +27,8 @@ mkdir "$root/.save";
 {
     my $t0 = [Time::HiRes::gettimeofday()];
     END {
-        info(sprintf "elapsed %.02f sec.", Time::HiRes::tv_interval($t0)) if $t0 }
+        info(sprintf "elapsed %.02f sec.", Time::HiRes::tv_interval($t0)) if $t0;
+    }
 }
 
 my %primitive = (
@@ -529,13 +530,18 @@ foreach my $file(@files) {
 
             $has_child{$interface->{name}}++;
 
-            # FIXME
-            push @{ $def->{members} },
-                "",
-                "// implements $interface->{name}",
-                @{$interface->{members}};
+            if (not $def->{base}) {
+                $def->{base} = $interface->{name};
+            }
+            else {
+                # FIXME
+                push @{ $def->{members} },
+                    "",
+                    "// implements $interface->{name}",
+                    @{$interface->{members}};
 
-            $interface->{fake} = 1;
+                $interface->{fake} = 1;
+            }
         }
     }
 }

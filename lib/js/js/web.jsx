@@ -4168,16 +4168,9 @@ native final __fake__ class WindowModal {
 } // end of WindowModal
 
 /** @see http://www.w3.org/TR/html5/single-page.html */
-native final class Navigator {
+native final class Navigator extends NavigatorID {
 
 	// objects implementing this interface also implement the interfaces given below
-
-	// implements NavigatorID
-
-	__readonly__ var appName : string/*DOMString*/;
-	__readonly__ var appVersion : string/*DOMString*/;
-	__readonly__ var platform : string/*DOMString*/;
-	__readonly__ var userAgent : string/*DOMString*/;
 
 	// implements NavigatorOnLine
 
@@ -4999,33 +4992,15 @@ native final class SharedWorker extends EventTarget {
 } // end of SharedWorker
 
 /** @see http://www.w3.org/TR/workers/ */
-native __fake__ class WorkerUtils {
+native __fake__ class WorkerUtils extends WindowBase64 {
 
 	function importScripts(...urls : string/*DOMString...*/) : void;
 	__readonly__ var navigator : WorkerNavigator;
 
-	// implements WindowBase64
-
-	/** @see http://www.w3.org/TR/html5/single-page.html */
-	function btoa(btoa : string/*DOMString*/) : string/*DOMString*/;
-	/** @see http://www.w3.org/TR/html5/single-page.html */
-	function atob(atob : string/*DOMString*/) : string/*DOMString*/;
-
 } // end of WorkerUtils
 
 /** @see http://www.w3.org/TR/workers/ */
-native final class WorkerNavigator {
-
-	// implements NavigatorID
-
-	/** @see http://www.w3.org/TR/html5/single-page.html */
-	__readonly__ var appName : string/*DOMString*/;
-	/** @see http://www.w3.org/TR/html5/single-page.html */
-	__readonly__ var appVersion : string/*DOMString*/;
-	/** @see http://www.w3.org/TR/html5/single-page.html */
-	__readonly__ var platform : string/*DOMString*/;
-	/** @see http://www.w3.org/TR/html5/single-page.html */
-	__readonly__ var userAgent : string/*DOMString*/;
+native final class WorkerNavigator extends NavigatorID {
 
 	// implements NavigatorOnLine
 
@@ -5105,7 +5080,7 @@ native final class XMLSerializer {
 } // end of XMLSerializer
 
 /** @see https://www.khronos.org/registry/typedarray/specs/latest/typedarray.idl */
-native final class ArrayBuffer {
+native final class ArrayBuffer extends Transferable {
 
 	function constructor(length : int/*unsigned long*/);
 
@@ -5116,12 +5091,10 @@ native final class ArrayBuffer {
 		end : int/*long*/
 	) : ArrayBuffer;
 
-	// implements Transferable
-
 } // end of ArrayBuffer
 
 /** @see https://www.khronos.org/registry/typedarray/specs/latest/typedarray.idl */
-native class ArrayBufferView {
+native __fake__ class ArrayBufferView {
 
 	__readonly__ var buffer : ArrayBuffer;
 	__readonly__ var byteOffset : int/*unsigned long*/;
@@ -5731,7 +5704,7 @@ native final class DataView extends ArrayBufferView {
 } // end of DataView
 
 /** @see http://dev.w3.org/html5/2dcontext/ */
-native final class CanvasRenderingContext2D {
+native final class CanvasRenderingContext2D extends CanvasTransformation {
 
 	// back-reference to the canvas
 	__readonly__ var canvas : HTMLCanvasElement;
@@ -5938,32 +5911,6 @@ native final class CanvasRenderingContext2D {
 		dirtyY : number/*double*/,
 		dirtyWidth : number/*double*/,
 		dirtyHeight : number/*double*/
-	) : void;
-
-	// implements CanvasTransformation
-
-	// transformations (default transform is the identity matrix)
-	function scale(x : number/*double*/, y : number/*double*/) : void;
-	function rotate(angle : number/*double*/) : void;
-	function translate(
-		x : number/*double*/,
-		y : number/*double*/
-	) : void;
-	function transform(
-		a : number/*double*/,
-		b : number/*double*/,
-		c : number/*double*/,
-		d : number/*double*/,
-		e : number/*double*/,
-		f : number/*double*/
-	) : void;
-	function setTransform(
-		a : number/*double*/,
-		b : number/*double*/,
-		c : number/*double*/,
-		d : number/*double*/,
-		e : number/*double*/,
-		f : number/*double*/
 	) : void;
 
 	// implements CanvasLineStyles
