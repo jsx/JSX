@@ -1981,6 +1981,11 @@ var NewExpression = exports.NewExpression = OperatorExpression.extend({
 	},
 
 	analyze: function (context, parentExpr) {
+		// for instantiated code, check is necessary at this moment
+		if (! (this._type instanceof ObjectType)) {
+			context.errors.push(new CompileError(this._token, "cannot instantiate a non-object type: " + this._type.toString()));
+			return false;
+		}
 		var classDef = this._type.getClassDef();
 		if (classDef == null)
 			return false;
