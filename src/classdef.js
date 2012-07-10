@@ -853,24 +853,14 @@ var MemberFunctionDefinition = exports.MemberFunctionDefinition = MemberDefiniti
 		// rewrite arguments (and push the instantiated args)
 		var args = [];
 		for (var i = 0; i < this._args.length; ++i) {
-			var srcArg = this._args[i];
-			var instantiatedArg = srcArg.instantiate(instantiationContext);
-			if (instantiatedArg == null)
-				return null;
-			instantiatedArg.isInstantiated = true;
-			srcArg.pushInstantiated(instantiatedArg);
-			args[i] = instantiatedArg;
+			args[i] = this._args[i].instantiateAndPush(instantiationContext);
 		}
 		// rewrite function body
 		if (this._statements != null) {
 			// clone and rewrite the types of local variables
 			var locals = [];
 			for (var i = 0; i < this._locals.length; ++i) {
-				var srcLocal = this._locals[i];
-				var srcType = srcLocal.getType();
-				locals[i] = new LocalVariable(this._locals[i].getName(), srcType != null ? srcType.instantiate(instantiationContext) : null);
-				locals[i].isInstantiated = true;
-				srcLocal.pushInstantiated(locals[i]);
+				locals[i] = this._locals[i].instantiateAndPush(instantiationContext);
 			}
 			// clone and rewrite the types of the statements
 			var statements = [];
@@ -1253,11 +1243,6 @@ var LocalVariable = exports.LocalVariable = Class.extend({
 		return this._name + " : " + this._type;
 	},
 
-	pushInstantiated: function (instantiated) {
-		this._instantiated.push(instantiated);
-		this._touched = true;
-	},
-
 	popInstantiated: function () {
 		this._instantiated.pop();
 	},
@@ -1267,6 +1252,18 @@ var LocalVariable = exports.LocalVariable = Class.extend({
 			throw new Error("logic flaw, no instantiation for " + this._name.getValue() + "," + this.isInstantiated);
 		}
 		return this._instantiated[this._instantiated.length - 1];
+	},
+
+	instantiateAndPush: function (instantiationContext) {
+		var instantiated = this._instantiate(instantiationContext);
+		instantiated.isInstantiated = true;
+		this._instantiated.push(instantiated);
+		return instantiated;
+	},
+
+	_instantiate: function (instantiationContext) {
+		var type = this._type != null ? this._type.instantiate(instantiationContext) : null;
+		return new LocalVariable(this._name, type);
 	}
 
 });
@@ -1283,6 +1280,10 @@ var CaughtVariable = exports.CaughtVariable = LocalVariable.extend({
 
 	touchVariable: function (context, token, isAssignment) {
 		return true;
+	},
+
+	_instantiate: function (instantiationContext) {
+		return new CaughtVariable(this._name, this._type.instantiate(instantiationContext));
 	}
 
 });
@@ -1297,8 +1298,8 @@ var ArgumentDeclaration = exports.ArgumentDeclaration = LocalVariable.extend({
 		return new ArgumentDeclaration(this._name, this._type);
 	},
 
-	instantiate: function (instantiationContext) {
-		var type = this._type != null ? this._type.instantiate(instantiationContext) : type;
+	_instantiate: function (instantiationContext) {
+		var type = this._type != null ? this._type.instantiate(instantiationContext) : null;
 		return new ArgumentDeclaration(this._name, type);
 	}
 
