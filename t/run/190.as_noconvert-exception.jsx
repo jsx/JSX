@@ -4,6 +4,8 @@ got error
 got error
 got error
 */
+/*JSX_OPTS
+*/
 class _T.<type> {
 	function constructor(v : variant) {
 		try {
