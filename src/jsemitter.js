@@ -969,7 +969,7 @@ var _AsNoConvertExpressionEmitter = exports._AsNoConvertExpressionEmitter = _Exp
 			}.bind(this);
 			var srcType = this._expr.getExpr().getType();
 			var destType = this._expr.getType();
-			if (srcType.equals(destType) || srcType.equals(destType.resolveIfNullable)) {
+			if (srcType.equals(destType) || srcType.equals(destType.resolveIfNullable())) {
 				// skip
 			} else if (destType instanceof VariantType) {
 				// skip
