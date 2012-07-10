@@ -117,7 +117,7 @@ sub compile_and_run {
     my($file) = @_;
 
     my $opts = get_section($file, "JSX_OPTS");
-    if ($opts) {
+    if (defined $opts) {
         chomp $opts;
         plan skip_all => 'environment variable JSX_OPTS is set'
             if $ENV{JSX_OPTS};
