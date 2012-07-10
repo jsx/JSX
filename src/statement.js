@@ -1176,6 +1176,7 @@ var CatchStatement = exports.CatchStatement = Statement.extend({
 	},
 
 	clone: function () {
+		// TODO rewrite the references from _statements to _local
 		return new CatchStatement(this._token, this._local.clone(), Util.cloneArray(this._statements));
 	},
 
@@ -1185,6 +1186,11 @@ var CatchStatement = exports.CatchStatement = Statement.extend({
 
 	getLocal: function () {
 		return this._local;
+	},
+
+	setLocal: function (local) {
+		// NOTE: does not rewrite the references to the local from the statements within
+		this._local = local;
 	},
 
 	getStatements: function () {

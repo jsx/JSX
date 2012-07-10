@@ -850,6 +850,7 @@ var MemberFunctionDefinition = exports.MemberFunctionDefinition = MemberDefiniti
 
 	instantiate: function (instantiationContext) {
 		var Expression = require("./expression.js");
+		var Statement = require("./statement.js");
 		// rewrite arguments (and push the instantiated args)
 		var args = [];
 		for (var i = 0; i < this._args.length; ++i) {
@@ -862,11 +863,23 @@ var MemberFunctionDefinition = exports.MemberFunctionDefinition = MemberDefiniti
 			for (var i = 0; i < this._locals.length; ++i) {
 				locals[i] = this._locals[i].instantiateAndPush(instantiationContext);
 			}
+			var caughtVariables = []; // stored by the order they are defined, and 'shift'ed
+			Util.forEachStatement(function onStatement(statement) {
+				if (statement instanceof Statement.CatchStatement) {
+					caughtVariables.push(statement.getLocal().instantiateAndPush(instantiationContext));
+				}
+				return statement.forEachStatement(onStatement);
+			}, this._statements);
 			// clone and rewrite the types of the statements
 			var statements = [];
 			for (var i = 0; i < this._statements.length; ++i)
 				statements[i] = this._statements[i].clone();
 			Util.forEachStatement(function onStatement(statement) {
+				if (statement instanceof Statement.CatchStatement) {
+					if (caughtVariables.length == 0)
+						throw new Error("logic flaw");
+					statement.setLocal(caughtVariables.shift());
+				}
 				statement.forEachExpression(function (expr) {
 					return expr.instantiate(instantiationContext);
 				});
@@ -883,6 +896,14 @@ var MemberFunctionDefinition = exports.MemberFunctionDefinition = MemberDefiniti
 					throw new Error("logic flaw");
 				this._locals[i].popInstantiated();
 			}
+			if (caughtVariables.length != 0)
+				throw new Error("logic flaw");
+			Util.forEachStatement(function onStatement(statement) {
+				if (statement instanceof Statement.CatchStatement) {
+					statement.getLocal().popInstantiated();
+				}
+				return statement.forEachStatement(onStatement);
+			}, this._statements);
 			// update the link from function expressions to closures
 			Util.forEachStatement(function onStatement(statement) {
 				statement.forEachExpression(function onExpr(expr) {
