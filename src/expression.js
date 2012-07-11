@@ -639,8 +639,13 @@ var MapLiteralExpression = exports.MapLiteralExpression = Expression.extend({
 
 	forEachExpression: function (cb) {
 		for (var i = 0; i < this._elements.length; ++i) {
-			if (! cb(this._elements[i].getExpr(), function (expr) { this._elements[i].setExpr(expr); }.bind(this)))
+			if (! cb(this._elements[i].getExpr(), function (elements, index) {
+				return function (expr) {
+					elements[index].setExpr(expr);
+				};
+			}(this._elements, i))) {
 				return false;
+			}
 		}
 		return true;
 	}
