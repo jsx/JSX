@@ -798,6 +798,10 @@ var MemberVariableDefinition = exports.MemberVariableDefinition = MemberDefiniti
 						return;
 					var ivType = this._initialValue.getType();
 					if (this._type == null) {
+						if (ivType.equals(Type.Type.nullType)) {
+							this._analysisContext.errors.push(new CompileError(this._initialValue.getToken(), "cannot assign null to an unknown type"));
+							return;
+						}
 						this._type = ivType.asAssignableType();
 					} else if (! ivType.isConvertibleTo(this._type)) {
 						this._analysisContext.errors.push(new CompileError(this._nameToken,
