@@ -1378,7 +1378,7 @@ var _InExpressionEmitter = exports._InExpressionEmitter = _OperatorExpressionEmi
 	},
 
 	_getPrecedence: function () {
-		return _InExpressionEmitter._operatorPrecedence[this._expr.getToken().getValue()];
+		return _InExpressionEmitter._operatorPrecedence;
 	},
 
 	$_operatorPrecedence: 0,
