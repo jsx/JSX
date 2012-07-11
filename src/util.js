@@ -130,9 +130,15 @@ var Util = exports.Util = Class.extend({
 
 	$forEachExpression: function (cb, exprs) {
 		if (exprs != null)
-			for (var i = 0; i < exprs.length; ++i)
-				if (! cb(exprs[i], function (expr) { exprs[i] = expr; }.bind(this)))
+			for (var i = 0; i < exprs.length; ++i) {
+				if (! cb(exprs[i], function (exprs, index) {
+					return function (expr) {
+						exprs[index] = expr;
+					};
+				}(exprs, i))) {
 					return false;
+				}
+			}
 		return true;
 	},
 

@@ -759,6 +759,10 @@ var UnaryExpression = exports.UnaryExpression = OperatorExpression.extend({
 		return this._expr;
 	},
 
+	setExpr: function (expr) {
+		this._expr = expr;
+	},
+
 	serialize: function () {
 		return [
 			"UnaryExpression",
@@ -1241,10 +1245,17 @@ var BinaryExpression = exports.BinaryExpression = OperatorExpression.extend({
 		return this._expr1;
 	},
 
+	setFirstExpr: function (expr) {
+		this._expr1 = expr;
+	},
+
 	getSecondExpr: function() {
 		return this._expr2;
 	},
 
+	setSecondExpr: function (expr) {
+		this._expr2 = expr;
+	},
 
 	serialize: function () {
 		return [
