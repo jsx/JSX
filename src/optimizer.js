@@ -1362,11 +1362,9 @@ var _LCSEOptimizeCommand = exports._LCSEOptimizeCommand = _FunctionOptimizeComma
 
 	constructor: function () {
 		_FunctionOptimizeCommand.prototype.constructor.call(this, "lcse");
-this._numFunctionsOptimized = 0;
 	},
 
 	optimizeFunction: function (funcDef) {
-if (++this._numFunctionsOptimized > 2000000) return;
 		var statements = funcDef.getStatements();
 		if (statements != null) {
 			this._optimizeStatements(funcDef, statements, 0);
