@@ -1335,13 +1335,38 @@ var _ReturnIfOptimizeCommand = exports._ReturnIfOptimizeCommand = _FunctionOptim
 
 });
 
+var _LCSECachedExpression = exports._LCSECachedExpression = Class.extend({
+
+	constructor: function (origExpr, replaceCb) {
+		this._origExpr = origExpr;
+		this._replaceCb = replaceCb;
+		this._localExpr = null;
+	},
+
+	getOrigExpr: function () {
+		return this._origExpr;
+	},
+
+	getLocalExpr: function (createVarCb /* (type, baseName) -> LocalExpression */) {
+		if (this._localExpr == null) {
+			// rewrite the first occurence of the expression and update cache entry
+			this._localExpr = createVarCb(this._origExpr.getType(), this._origExpr.getIdentifierToken().getValue());
+			this._replaceCb(new AssignmentExpression(new Token("=", false), this._localExpr, this._origExpr));
+		}
+		return this._localExpr;
+	}
+
+});
+
 var _LCSEOptimizeCommand = exports._LCSEOptimizeCommand = _FunctionOptimizeCommand.extend({
 
 	constructor: function () {
 		_FunctionOptimizeCommand.prototype.constructor.call(this, "lcse");
+this._numFunctionsOptimized = 0;
 	},
 
 	optimizeFunction: function (funcDef) {
+if (++this._numFunctionsOptimized > 2000000) return;
 		var statements = funcDef.getStatements();
 		if (statements != null) {
 			this._optimizeStatements(funcDef, statements, 0);
@@ -1364,6 +1389,7 @@ var _LCSEOptimizeCommand = exports._LCSEOptimizeCommand = _FunctionOptimizeComma
 					break;
 				} else if (statement instanceof ContinuableStatement) {
 					this._optimizeStatements(funcDef, statement.getStatements(), 0);
+					break;
 				} else {
 					// FIXME add support for other types of statements (for example, IfStatement)
 					// do nothing but continue
@@ -1380,11 +1406,15 @@ var _LCSEOptimizeCommand = exports._LCSEOptimizeCommand = _FunctionOptimizeComma
 	_optimizeExpressions: function (funcDef, exprs) {
 		this.log("optimizing expressions starting");
 
-		var cachedExprs = {}; // serialized => [ expr, replaceCb ]
+		var cachedExprs = {};
 
 		var getCacheKey = function (expr) {
 			if (expr instanceof PropertyExpression) {
-				return getCacheKey(expr.getExpr()) + "." + expr.getIdentifierToken().getValue();
+				var base = getCacheKey(expr.getExpr());
+				if (base == null) {
+					return null;
+				}
+				return base + "." + expr.getIdentifierToken().getValue();
 			} else if (expr instanceof LocalExpression) {
 				return expr.getLocal().getName().getValue();
 			} else if (expr instanceof ThisExpression) {
@@ -1395,24 +1425,35 @@ var _LCSEOptimizeCommand = exports._LCSEOptimizeCommand = _FunctionOptimizeComma
 
 		var registerCacheable = function (key, expr, replaceCb) {
 			this.log("registering lcse entry for: " + key);
-			cachedExprs[key] = [ expr, replaceCb ];
+			cachedExprs[key] = new _LCSECachedExpression(expr, replaceCb);
+		}.bind(this);
+
+		var clearCacheByLocalName = function (name) {
+			this.log("clearing lcse entry for local name: " + name);
+			for (var k in cachedExprs) {
+				if (k.substring(0, name.length + 1) == name + ".") {
+					this.log("  removing: " + k);
+					delete cachedExprs[k];
+				}
+			}
 		}.bind(this);
 
 		var clearCacheByPropertyName = function (name) {
-			this.log("clearing lcse entry for propery name: " + name);
+			this.log("clearing lcse entry for property name: " + name);
 			for (var k in cachedExprs) {
-				var shouldClear = function onExpr(expr) {
+				var mayPreserve = function onExpr(expr) {
 					if (expr instanceof LocalExpression
 						|| expr instanceof ThisExpression) {
-						return false;
+						return true;
 					}
 					// is PropertyExpression
 					if (expr.getIdentifierToken().getValue() == name) {
-						return true;
+						return false;
 					}
 					return onExpr(expr.getExpr());
-				}(cachedExprs[k][0]);
-				if (shouldClear) {
+				}(cachedExprs[k].getOrigExpr());
+				if (! mayPreserve) {
+					this.log("  removing: " + k);
 					delete cachedExprs[k];
 				}
 			}
@@ -1436,20 +1477,24 @@ var _LCSEOptimizeCommand = exports._LCSEOptimizeCommand = _FunctionOptimizeComma
 				// optimize LHS
 				var lhsExpr = expr.getFirstExpr();
 				if (lhsExpr instanceof LocalExpression) {
-					// skip
+					clearCacheByLocalName(lhsExpr.getLocal().getName().getValue());
 				} else if (lhsExpr instanceof PropertyExpression) {
 					onExpr(lhsExpr.getExpr(), function (receiver) {
 						return function (expr) {
 							receiver.setExpr(expr);
 						};
 					}(lhsExpr));
-					var cacheKey = getCacheKey(lhsExpr);
-					if (cacheKey) {
-						registerCacheable(cacheKey, lhsExpr, function (receiver) {
-							return function (expr) {
-								receiver.setFirstExpr(expr);
-							}
-						}(expr));
+					if (lhsExpr.getIdentifierToken().getValue() == "length") {
+						// once we support caching array elements, we need to add special care
+					} else {
+						var cacheKey = getCacheKey(lhsExpr);
+						if (cacheKey) {
+							registerCacheable(cacheKey, lhsExpr, function (receiver) {
+								return function (expr) {
+									receiver.setFirstExpr(expr);
+								}
+							}(expr));
+						}
 					}
 				} else {
 					clearCache();
@@ -1465,6 +1510,15 @@ var _LCSEOptimizeCommand = exports._LCSEOptimizeCommand = _FunctionOptimizeComma
 						};
 					}(expr.getExpr()));
 				}
+				clearCache();
+				return true;
+			} else if (expr instanceof ConditionalExpression) {
+				// only optimize the condExpr, then clear (for now)
+				onExpr(expr.getCondExpr(), function (receiver) {
+					return function (expr) {
+						receiver.setCondExpr(expr);
+					};
+				}(expr));
 				clearCache();
 				return true;
 			} else if (expr instanceof FunctionExpression) {
@@ -1510,20 +1564,23 @@ var _LCSEOptimizeCommand = exports._LCSEOptimizeCommand = _FunctionOptimizeComma
 			}
 			// normal path
 			if (expr instanceof PropertyExpression) {
-				var cacheKey = getCacheKey(expr);
-				if (cachedExprs[cacheKey]) {
-					this.log("rewriting cse for: " + cacheKey);
-					var replaceCachedExpr = cachedExprs[cacheKey][1];
-					if (replaceCachedExpr) {
-						// rewrite the first occurence of the expression and update cache entry
-						var localVar = this.createVar(funcDef, cachedExprs[cacheKey][0].getType(), expr.getIdentifierToken().getValue());
-						var localExpr = new LocalExpression(localVar.getName(), localVar);
-						replaceCachedExpr(new AssignmentExpression(new Token("=", false), localExpr, cachedExprs[cacheKey][0]));
-						registerCacheable(cacheKey, localExpr, null);
-					}
-					replaceCb(cachedExprs[cacheKey][0]);
+				if (expr.getIdentifierToken().getValue() == "length") {
+					// ditto as above comment for "length"
 				} else {
-					registerCacheable(cacheKey, expr, replaceCb);
+					var cacheKey = getCacheKey(expr);
+					if (cacheKey) {
+						this.log("rewriting cse for: " + cacheKey);
+						if (cachedExprs[cacheKey]) {
+							replaceCb(
+								cachedExprs[cacheKey].getLocalExpr(function (type, baseName) {
+									var localVar = this.createVar(funcDef, type, baseName);
+									return new LocalExpression(localVar.getName(), localVar);
+								}.bind(this)
+							).clone());
+						} else {
+							registerCacheable(cacheKey, expr, replaceCb);
+						}
+					}
 				}
 			}
 			// recursive
