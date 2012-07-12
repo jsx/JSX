@@ -82,6 +82,15 @@ var _Util = exports._Util = Class.extend({
 		}
 		s += ")";
 		return s;
+	},
+
+	$classIsNative: function (classDef) {
+		return ! (function isNotNative(classDef) {
+			if ((classDef.flags() & ClassDefinition.IS_NATIVE) != 0) {
+				return false;
+			}
+			return classDef.forEachClassFromBase(isNotNative);
+		})(classDef);
 	}
 
 });
@@ -240,6 +249,7 @@ var _FunctionOptimizeCommand = exports._FunctionOptimizeCommand = _OptimizeComma
 
 	constructor: function (identifier) {
 		_OptimizeCommand.prototype.constructor.call(this, identifier);
+		this._excludeNative = false;
 	},
 
 	performOptimization: function () {
@@ -1375,14 +1385,25 @@ var _LCSEOptimizeCommand = exports._LCSEOptimizeCommand = _FunctionOptimizeComma
 		var statementIndex = 0;
 		while (statementIndex < statements.length) {
 			var exprsToOptimize = [];
+			var setOptimizedExprs = [];
 			while (statementIndex < statements.length) {
 				var statement = statements[statementIndex++];
 				if (statement instanceof ExpressionStatement) {
 					exprsToOptimize.push(statement.getExpr());
+					setOptimizedExprs.push(function (statement) {
+						return function (expr) {
+							statement.setExpr(expr);
+						}
+					}(statement));
 				} else if (statement instanceof ReturnStatement) {
 					var expr = statement.getExpr();
 					if (expr != null) {
 						exprsToOptimize.push(statement.getExpr());
+						setOptimizedExprs.push(function (statement) {
+							return function (expr) {
+								statement.setExpr(expr);
+							}
+						}(statement));
 					}
 					break;
 				} else if (statement instanceof ContinuableStatement) {
@@ -1397,6 +1418,9 @@ var _LCSEOptimizeCommand = exports._LCSEOptimizeCommand = _FunctionOptimizeComma
 			// optimize basic block
 			if (exprsToOptimize.length != 0) {
 				this._optimizeExpressions(funcDef, exprsToOptimize);
+				for (var i = 0; i < exprsToOptimize.length; ++i) {
+					setOptimizedExprs[i](exprsToOptimize[i]);
+				}
 			}
 		}
 	},
@@ -1408,6 +1432,10 @@ var _LCSEOptimizeCommand = exports._LCSEOptimizeCommand = _FunctionOptimizeComma
 
 		var getCacheKey = function (expr) {
 			if (expr instanceof PropertyExpression) {
+				var receiverType = expr.getExpr().getType();
+				if (receiverType instanceof ObjectType && _Util.classIsNative(receiverType.getClassDef())) {
+					return null;
+				}
 				var base = getCacheKey(expr.getExpr());
 				if (base == null) {
 					return null;
