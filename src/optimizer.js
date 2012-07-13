@@ -92,7 +92,21 @@ var _Util = exports._Util = Class.extend({
 			}
 			return false;
 		});
-	}
+	},
+
+	$exprHasSideEffects: function (expr) {
+		var onExpr = function (expr) {
+			if (expr instanceof CallExpression
+				|| expr instanceof FunctionExpression
+				|| expr instanceof NewExpression
+				|| expr instanceof AssignmentExpression
+				|| expr instanceof PreIncrementExpression
+				|| expr instanceof PostIncrementExpression)
+				return false;
+			return expr.forEachExpression(onExpr);
+		};
+		return ! expr.forEachExpression(onExpr);
+	},
 
 });
 
@@ -125,6 +139,8 @@ var Optimizer = exports.Optimizer = Class.extend({
 				this._commands.push(new _ReturnIfOptimizeCommand());
 			} else if (cmd == "lcse") {
 				this._commands.push(new _LCSEOptimizeCommand());
+			} else if (cmd == "unbox") {
+				this._commands.push(new _UnboxOptimizeCommand());
 			} else if (cmd == "array-length") {
 				this._commands.push(new _ArrayLengthOptimizeCommand());
 			} else if (cmd == "dump-logs") {
@@ -1614,6 +1630,261 @@ var _LCSEOptimizeCommand = exports._LCSEOptimizeCommand = _FunctionOptimizeComma
 			return expr.forEachExpression(onExpr);
 		}.bind(this);
 		Util.forEachExpression(onExpr, exprs);
+	}
+
+});
+
+var _UnboxOptimizeCommandStash = exports._UnboxOptimizeCommandStash = Class.extend({
+
+	constructor: function () {
+		this.canUnbox = null;
+	}
+
+});
+
+var _UnboxOptimizeCommand = exports._UnboxOptimizeCommand = _FunctionOptimizeCommand.extend({
+
+	constructor: function () {
+		_FunctionOptimizeCommand.prototype.constructor.call(this, "unbox");
+	},
+
+	_createStash: function () {
+		return new _UnboxOptimizeCommandStash();
+	},
+
+	optimizeFunction: function (funcDef) {
+		if (funcDef.getStatements() == null) {
+			return;
+		}
+		var locals = funcDef.getLocals();
+		// check all the locals that exist _now_, and remove ones that have been optimized
+		for (var i = 0, iMax = locals.length; i < locals.length;) {
+			if (this._optimizeLocal(funcDef, locals[i])) {
+				locals.splice(i, 1);
+			} else {
+				++i;
+			}
+		}
+	},
+
+	_optimizeLocal: function (funcDef, local) {
+		// preconditions
+		if (! (local.getType() instanceof ObjectType)) {
+			return;
+		}
+		var classDef = local.getType().getClassDef();
+		if (_Util.classIsNative(classDef)) {
+			return;
+		}
+		// determine if the local can be unboxed
+		var foundNew = false;
+		var onStatement = function (statement) {
+			var onExpr = function (expr) {
+				if (expr instanceof PropertyExpression) {
+					var baseExpr = expr.getExpr();
+					if (baseExpr instanceof LocalExpression && baseExpr.getLocal() == local) {
+						if (! expr.getType().isAssignable()) {
+							// is a call to member function
+							return false;
+						}
+						// a property of the variable has been accessed, OK!
+						return true;
+					}
+				} else if (expr instanceof LocalExpression) {
+					if (expr.getLocal() == local) {
+						// the variable has been accessed in a way other than those allowed above, FAIL!
+						return false;
+					}
+				} else if (expr instanceof FunctionExpression) {
+					// we need to look into the closure
+					return expr.getFuncDef().forEachStatement(onStatement);
+				}
+				return expr.forEachExpression(onExpr);
+			}.bind(this);
+			// first check the local = new ...
+			var newExpr = this._statementIsConstructingTheLocal(statement, local);
+			if (newExpr != null) {
+				if (! this._newExpressionCanUnbox(newExpr)) {
+					return false;
+				}
+				if (! newExpr.forEachExpression(onExpr)) {
+					return false;
+				}
+				if (! Util.forEachExpression(function (expr) {
+					return ! _Util.exprHasSideEffects(expr);
+				}, newExpr.getArguments())) {
+					return false;
+				}
+				foundNew = true;
+				return true;
+			}
+			// check the rest
+			if (! statement.forEachExpression(onExpr)) {
+				return false;
+			}
+			return statement.forEachStatement(onStatement);
+		}.bind(this);
+		var canUnbox = funcDef.forEachStatement(onStatement);
+		// doit
+		if (canUnbox && foundNew) {
+			this._unboxVariable(funcDef, local);
+			return true;
+		} else {
+			return false;
+		}
+	},
+
+	_newExpressionCanUnbox: function (newExpr) {
+		var ctor = this._getConstructorOfNewExpr(newExpr);
+		if (this.getStash(ctor).canUnbox != null) {
+			return this.getStash(ctor).canUnbox;
+		}
+		return this.getStash(ctor).canUnbox = function () {
+			if (ctor.getLocals().length != 0) {
+				return false;
+			}
+			return ctor.forEachStatement(function (statement) {
+				// only allow list of this.X = ...
+				var assigned = {};
+				if (! (statement instanceof ExpressionStatement)) {
+					return false;
+				}
+				var expr = statement.getExpr();
+				if (! (expr instanceof AssignmentExpression)) {
+					return false;
+				}
+				var lhsExpr = expr.getFirstExpr();
+				if (! (lhsExpr instanceof PropertyExpression && lhsExpr.getExpr() instanceof ThisExpression)) {
+					return false;
+				}
+				var propertyName = lhsExpr.getIdentifierToken().getValue();
+				if (assigned[propertyName]) {
+					return false;
+				}
+				assigned[propertyName] = true;
+				// check rhs
+				return expr.getSecondExpr(function (expr) {
+					if (expr instanceof ThisExpression) {
+						return false;
+					} else if (expr instanceof FunctionExpression) {
+						return false;
+					}
+					return expr.forEachExpression(expr);
+				});
+			}.bind(this));
+		}.call(this);
+	},
+
+	_unboxVariable: function (funcDef, local) {
+		this.log("unboxing " + local.getName().getValue());
+
+		// build map of propetyName => LocalVariable
+		var variableMap = {};
+		local.getType().getClassDef().forEachMemberVariable(function (member) {
+			if ((member.flags() & ClassDefinition.IS_STATIC) == 0) {
+				variableMap[member.name()] = this.createVar(funcDef, member.getType(), local.getName().getValue() + "$" + member.name());
+			}
+			return true;
+		}.bind(this));
+		var createLocalExpressionFor = function (propertyName) {
+			if (! variableMap[propertyName]) {
+				throw new Error("could not find local variable for property name: " + propertyName);
+			}
+			return new LocalExpression(variableMap[propertyName].getName(), variableMap[propertyName]);
+		}.bind(this);
+
+		var buildConstructingStatements = function (dstStatements, dstStatementIndex, newExpr) {
+			var ctor = this._getConstructorOfNewExpr(newExpr);
+			ctor.forEachStatement(function (statement) {
+				var propertyName = statement.getExpr().getFirstExpr().getIdentifierToken().getValue();
+				var rhsExpr = statement.getExpr().getSecondExpr().clone();
+				var onExpr = function (expr, replaceCb) {
+					if (expr instanceof LocalExpression) {
+						for (var argIndex = 0; argIndex < ctor.getArguments().length; ++argIndex) {
+							if (expr.getLocal() == ctor.getArguments()[argIndex]) {
+								// found
+								break;
+							}
+						}
+						if (argIndex == ctor.getArguments().length) {
+							throw new Error("logic flaw, could not find the local in arguments");
+						}
+						replaceCb(newExpr.getArguments()[argIndex].clone());
+					}
+					return expr.forEachExpression(onExpr);
+				}.bind(this);
+				onExpr(rhsExpr, function (expr) {
+					rhsExpr = expr;
+				});
+				dstStatements.splice(dstStatementIndex++, 0, new ExpressionStatement(
+					new AssignmentExpression(new Token("=", false), createLocalExpressionFor(propertyName), rhsExpr)));
+				return true;
+			}.bind(this));
+			return dstStatementIndex;
+		}.bind(this);
+
+		// rewrite the code
+		var onStatements = function (statements) {
+			for (var statementIndex = 0; statementIndex < statements.length;) {
+				var onExpr = function (expr, replaceCb) {
+					if (expr instanceof PropertyExpression
+						&& expr.getExpr() instanceof LocalExpression
+						&& expr.getExpr().getLocal() == local) {
+						// rewrite local.prop
+						replaceCb(createLocalExpressionFor(expr.getIdentifierToken().getValue()));
+						return true;
+					} else if (expr instanceof FunctionExpression) {
+						return expr.getFuncDef().forEachStatement(onStatement);
+					} else if (expr instanceof LocalExpression && expr.getLocal() == local) {
+						throw new Error("logic flaw, unexpected pattern");
+					}
+					expr.forEachExpression(onExpr);
+					return true;
+				}.bind(this);
+				var newExpr = this._statementIsConstructingTheLocal(statements[statementIndex], local);
+				if (newExpr != null) {
+					statements.splice(statementIndex, 1);
+					statementIndex = buildConstructingStatements(statements, statementIndex, newExpr);
+				} else {
+					statements[statementIndex].forEachExpression(onExpr);
+					statements[statementIndex].handleStatements(onStatements);
+					++statementIndex;
+				}
+			}
+			return true;
+		}.bind(this);
+		onStatements(funcDef.getStatements());
+	},
+
+	_statementIsConstructingTheLocal: function (statement, local) {
+		if (! (statement instanceof ExpressionStatement)) {
+			return null;
+		}
+		var expr = statement.getExpr();
+		if (! (expr instanceof AssignmentExpression)) {
+			return null;
+		}
+		var lhsExpr = expr.getFirstExpr();
+		if (! (lhsExpr instanceof LocalExpression)) {
+			return null;
+		}
+		if (lhsExpr.getLocal() != local) {
+			return null;
+		}
+		var rhsExpr = expr.getSecondExpr();
+		if (! (rhsExpr instanceof NewExpression)) {
+			return null;
+		}
+		return rhsExpr;
+	},
+
+	_getConstructorOfNewExpr: function (newExpr) {
+		var ctor = _DetermineCalleeCommand.findCallingFunctionInClass(
+			newExpr.getType().getClassDef(), "constructor", newExpr.getConstructor().getArgumentTypes(), false);
+		if (ctor == null) {
+			throw new Error("could not find matching constructor for " + newExpr.getConstructor().toString());
+		}
+		return ctor;
 	}
 
 });
