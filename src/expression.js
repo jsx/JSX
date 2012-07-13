@@ -639,8 +639,13 @@ var MapLiteralExpression = exports.MapLiteralExpression = Expression.extend({
 
 	forEachExpression: function (cb) {
 		for (var i = 0; i < this._elements.length; ++i) {
-			if (! cb(this._elements[i].getExpr(), function (expr) { this._elements[i].setExpr(expr); }.bind(this)))
+			if (! cb(this._elements[i].getExpr(), function (elements, index) {
+				return function (expr) {
+					elements[index].setExpr(expr);
+				};
+			}(this._elements, i))) {
 				return false;
+			}
 		}
 		return true;
 	}
@@ -757,6 +762,10 @@ var UnaryExpression = exports.UnaryExpression = OperatorExpression.extend({
 
 	getExpr: function () {
 		return this._expr;
+	},
+
+	setExpr: function (expr) {
+		this._expr = expr;
 	},
 
 	serialize: function () {
@@ -1241,10 +1250,17 @@ var BinaryExpression = exports.BinaryExpression = OperatorExpression.extend({
 		return this._expr1;
 	},
 
+	setFirstExpr: function (expr) {
+		this._expr1 = expr;
+	},
+
 	getSecondExpr: function() {
 		return this._expr2;
 	},
 
+	setSecondExpr: function (expr) {
+		this._expr2 = expr;
+	},
 
 	serialize: function () {
 		return [

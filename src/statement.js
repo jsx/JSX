@@ -180,6 +180,10 @@ var UnaryExpressionStatement = exports.UnaryExpressionStatement = Statement.exte
 		return this._expr;
 	},
 
+	setExpr: function (expr) {
+		this._expr = expr;
+	},
+
 	doAnalyze: function (context) {
 		this._analyzeExpr(context, this._expr);
 		return true;
@@ -230,6 +234,10 @@ var ReturnStatement = exports.ReturnStatement = Statement.extend({
 
 	getExpr: function () {
 		return this._expr;
+	},
+
+	setExpr: function (expr) {
+		this._expr = expr;
 	},
 
 	serialize: function () {

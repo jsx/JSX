@@ -82,6 +82,15 @@ var _Util = exports._Util = Class.extend({
 		}
 		s += ")";
 		return s;
+	},
+
+	$classIsNative: function (classDef) {
+		if (classDef.className() == "Object") {
+			return false;
+		} else if ((classDef.flags() & ClassDefinition.IS_NATIVE) != 0) {
+			return true;
+		}
+		return _Util.classIsNative(classDef.extendType().getClassDef());
 	}
 
 });
@@ -113,6 +122,8 @@ var Optimizer = exports.Optimizer = Class.extend({
 				this._commands.push(new _InlineOptimizeCommand());
 			} else if (cmd == "return-if") {
 				this._commands.push(new _ReturnIfOptimizeCommand());
+			} else if (cmd == "lcse") {
+				this._commands.push(new _LCSEOptimizeCommand());
 			} else if (cmd == "array-length") {
 				this._commands.push(new _ArrayLengthOptimizeCommand());
 			} else if (cmd == "dump-logs") {
@@ -238,6 +249,7 @@ var _FunctionOptimizeCommand = exports._FunctionOptimizeCommand = _OptimizeComma
 
 	constructor: function (identifier) {
 		_OptimizeCommand.prototype.constructor.call(this, identifier);
+		this._excludeNative = false;
 	},
 
 	performOptimization: function () {
@@ -1329,6 +1341,278 @@ var _ReturnIfOptimizeCommand = exports._ReturnIfOptimizeCommand = _FunctionOptim
 				trueExpr,
 				falseExpr,
 				falseExpr.getType()));
+	}
+
+});
+
+var _LCSECachedExpression = exports._LCSECachedExpression = Class.extend({
+
+	constructor: function (origExpr, replaceCb) {
+		this._origExpr = origExpr;
+		this._replaceCb = replaceCb;
+		this._localExpr = null;
+	},
+
+	getOrigExpr: function () {
+		return this._origExpr;
+	},
+
+	getLocalExpr: function (createVarCb /* (type, baseName) -> LocalExpression */) {
+		if (this._localExpr == null) {
+			// rewrite the first occurence of the expression and update cache entry
+			this._localExpr = createVarCb(this._origExpr.getType(), this._origExpr.getIdentifierToken().getValue());
+			this._replaceCb(new AssignmentExpression(new Token("=", false), this._localExpr, this._origExpr));
+		}
+		return this._localExpr;
+	}
+
+});
+
+var _LCSEOptimizeCommand = exports._LCSEOptimizeCommand = _FunctionOptimizeCommand.extend({
+
+	constructor: function () {
+		_FunctionOptimizeCommand.prototype.constructor.call(this, "lcse");
+	},
+
+	optimizeFunction: function (funcDef) {
+		var statements = funcDef.getStatements();
+		if (statements != null) {
+			this._optimizeStatements(funcDef, statements, 0);
+		}
+	},
+
+	_optimizeStatements: function (funcDef, statements) {
+		var statementIndex = 0;
+		while (statementIndex < statements.length) {
+			var exprsToOptimize = [];
+			var setOptimizedExprs = [];
+			while (statementIndex < statements.length) {
+				var statement = statements[statementIndex++];
+				if (statement instanceof ExpressionStatement) {
+					exprsToOptimize.push(statement.getExpr());
+					setOptimizedExprs.push(function (statement) {
+						return function (expr) {
+							statement.setExpr(expr);
+						}
+					}(statement));
+				} else if (statement instanceof ReturnStatement) {
+					var expr = statement.getExpr();
+					if (expr != null) {
+						exprsToOptimize.push(statement.getExpr());
+						setOptimizedExprs.push(function (statement) {
+							return function (expr) {
+								statement.setExpr(expr);
+							}
+						}(statement));
+					}
+					break;
+				} else if (statement instanceof ContinuableStatement) {
+					this._optimizeStatements(funcDef, statement.getStatements(), 0);
+					break;
+				} else {
+					// FIXME add support for other types of statements (for example, IfStatement)
+					// do nothing but continue
+					break;
+				}
+			}
+			// optimize basic block
+			if (exprsToOptimize.length != 0) {
+				this._optimizeExpressions(funcDef, exprsToOptimize);
+				for (var i = 0; i < exprsToOptimize.length; ++i) {
+					setOptimizedExprs[i](exprsToOptimize[i]);
+				}
+			}
+		}
+	},
+
+	_optimizeExpressions: function (funcDef, exprs) {
+		this.log("optimizing expressions starting");
+
+		var cachedExprs = {};
+
+		var getCacheKey = function (expr) {
+			if (expr instanceof PropertyExpression) {
+				var receiverType = expr.getExpr().getType();
+				if (receiverType instanceof ObjectType && _Util.classIsNative(receiverType.getClassDef())) {
+					return null;
+				}
+				var base = getCacheKey(expr.getExpr());
+				if (base == null) {
+					return null;
+				}
+				return base + "." + expr.getIdentifierToken().getValue();
+			} else if (expr instanceof LocalExpression) {
+				return expr.getLocal().getName().getValue();
+			} else if (expr instanceof ThisExpression) {
+				return "this";
+			}
+			return null;
+		}.bind(this);
+
+		var registerCacheable = function (key, expr, replaceCb) {
+			this.log("registering lcse entry for: " + key);
+			cachedExprs[key] = new _LCSECachedExpression(expr, replaceCb);
+		}.bind(this);
+
+		var clearCacheByLocalName = function (name) {
+			this.log("clearing lcse entry for local name: " + name);
+			for (var k in cachedExprs) {
+				if (k.substring(0, name.length + 1) == name + ".") {
+					this.log("  removing: " + k);
+					delete cachedExprs[k];
+				}
+			}
+		}.bind(this);
+
+		var clearCacheByPropertyName = function (name) {
+			this.log("clearing lcse entry for property name: " + name);
+			for (var k in cachedExprs) {
+				var mayPreserve = function onExpr(expr) {
+					if (expr instanceof LocalExpression
+						|| expr instanceof ThisExpression) {
+						return true;
+					}
+					// is PropertyExpression
+					if (expr.getIdentifierToken().getValue() == name) {
+						return false;
+					}
+					return onExpr(expr.getExpr());
+				}(cachedExprs[k].getOrigExpr());
+				if (! mayPreserve) {
+					this.log("  removing: " + k);
+					delete cachedExprs[k];
+				}
+			}
+		}.bind(this);
+
+		var clearCache = function () {
+			this.log("clearing lcse cache");
+			cachedExprs = {};
+		}.bind(this);
+
+		// add an expression to cache
+		var onExpr = function (expr, replaceCb) {
+			// handle special cases first
+			if (expr instanceof AssignmentExpression) {
+				// optimize RHS
+				onExpr(expr.getSecondExpr(), function (receiver) {
+					return function (expr) {
+						receiver.setSecondExpr(expr);
+					};
+				}(expr));
+				// optimize LHS
+				var lhsExpr = expr.getFirstExpr();
+				if (lhsExpr instanceof LocalExpression) {
+					clearCacheByLocalName(lhsExpr.getLocal().getName().getValue());
+				} else if (lhsExpr instanceof PropertyExpression) {
+					onExpr(lhsExpr.getExpr(), function (receiver) {
+						return function (expr) {
+							receiver.setExpr(expr);
+						};
+					}(lhsExpr));
+					if (lhsExpr.getIdentifierToken().getValue() == "length") {
+						// once we support caching array elements, we need to add special care
+					} else {
+						var cacheKey = getCacheKey(lhsExpr);
+						if (cacheKey) {
+							registerCacheable(cacheKey, lhsExpr, function (receiver) {
+								return function (expr) {
+									receiver.setFirstExpr(expr);
+								}
+							}(expr));
+						}
+					}
+				} else {
+					clearCache();
+				}
+				return true;
+			} else if (expr instanceof PreIncrementExpression
+				|| expr instanceof PostIncrementExpression) {
+				// optimize the receiver of LHS, and clear (for now)
+				if (expr.getExpr() instanceof PropertyExpression) {
+					onExpr(expr.getExpr().getExpr(), function (receiver) {
+						return function (expr) {
+							receiver.setExpr(expr);
+						};
+					}(expr.getExpr()));
+				}
+				clearCache();
+				return true;
+			} else if (expr instanceof ConditionalExpression) {
+				// only optimize the condExpr, then clear (for now)
+				onExpr(expr.getCondExpr(), function (receiver) {
+					return function (expr) {
+						receiver.setCondExpr(expr);
+					};
+				}(expr));
+				clearCache();
+				return true;
+			} else if (expr instanceof FunctionExpression) {
+				clearCache();
+				return true;
+			} else if (expr instanceof CallExpression) {
+				// optimize the receiver (not the function) and args, and clear
+				var funcExpr = expr.getExpr();
+				if (funcExpr instanceof LocalExpression) {
+					// nothing to do
+				} else if (funcExpr instanceof PropertyExpression) {
+					onExpr(expr.getExpr().getExpr(), function (receiver) {
+						return function (expr) {
+							receiver.setExpr(expr);
+						}
+					}(expr.getExpr()));
+				} else {
+					clearCache();
+				}
+				var args = expr.getArguments();
+				for (var i = 0; i < args.length; ++i) {
+					onExpr(args[i], function (args, index) {
+						return function (expr) {
+							args[index] = expr;
+						};
+					}(args, i));
+				}
+				clearCache();
+				return true;
+			} else if (expr instanceof NewExpression) {
+				// optimize the args, and clear
+				var args = expr.getArguments();
+				this.log("new expression");
+				for (var i = 0; i < args.length; ++i) {
+					onExpr(args[i], function (args, index) {
+						return function (expr) {
+							args[index] = expr;
+						};
+					}(args, i));
+				}
+				clearCache();
+				return true;
+			}
+			// normal path
+			if (expr instanceof PropertyExpression) {
+				if (expr.getIdentifierToken().getValue() == "length") {
+					// ditto as above comment for "length"
+				} else {
+					var cacheKey = getCacheKey(expr);
+					if (cacheKey) {
+						this.log("rewriting cse for: " + cacheKey);
+						if (cachedExprs[cacheKey]) {
+							replaceCb(
+								cachedExprs[cacheKey].getLocalExpr(function (type, baseName) {
+									var localVar = this.createVar(funcDef, type, baseName);
+									return new LocalExpression(localVar.getName(), localVar);
+								}.bind(this)
+							).clone());
+						} else {
+							registerCacheable(cacheKey, expr, replaceCb);
+						}
+					}
+				}
+			}
+			// recursive
+			return expr.forEachExpression(onExpr);
+		}.bind(this);
+		Util.forEachExpression(onExpr, exprs);
 	}
 
 });
