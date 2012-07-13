@@ -1,4 +1,3 @@
-(function ($) {
 var profileData = (function () {
   var id = location.search.substring(1);
   if (! id)
@@ -254,7 +253,6 @@ $(document).ready(function () {
   updateTable("count");
 });
 
-}(jQuery));
 // vim: set expandtab:
 // vim: set tabstop=2:
 // vim: set shiftwidth=2:
