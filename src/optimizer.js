@@ -85,12 +85,12 @@ var _Util = exports._Util = Class.extend({
 	},
 
 	$classIsNative: function (classDef) {
-		return ! (function isNotNative(classDef) {
-			if ((classDef.flags() & ClassDefinition.IS_NATIVE) != 0) {
-				return false;
-			}
-			return classDef.forEachClassFromBase(isNotNative);
-		})(classDef);
+		if (classDef.className() == "Object") {
+			return false;
+		} else if ((classDef.flags() & ClassDefinition.IS_NATIVE) != 0) {
+			return true;
+		}
+		return _Util.classIsNative(classDef.extendType().getClassDef());
 	}
 
 });

@@ -1079,7 +1079,7 @@ var MemberFunctionDefinition = exports.MemberFunctionDefinition = MemberDefiniti
 					var stmt = new Statement.ExpressionStatement(
 						new Expression.AssignmentExpression(new Parser.Token("=", false),
 							new Expression.PropertyExpression(new Parser.Token(".", false),
-								new Expression.ThisExpression(new Parser.Token("this", false), new Type.ObjectType(this._classDef)),
+								new Expression.ThisExpression(new Parser.Token("this", false), this._classDef),
 								member.getNameToken(), member.getType()),
 							member.getInitialValue()));
 					this._statements.splice(insertStmtAt++, 0, stmt);
