@@ -885,6 +885,10 @@ var SwitchStatement = exports.SwitchStatement = LabellableStatement.extend({
 		return this._expr;
 	},
 
+	setExpr: function (expr) {
+		this._expr = expr;
+	},
+
 	getStatements: function () {
 		return this._statements;
 	},

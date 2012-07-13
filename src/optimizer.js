@@ -294,6 +294,82 @@ var _FunctionOptimizeCommand = exports._FunctionOptimizeCommand = _OptimizeComma
 
 });
 
+var _BasicBlockOptimzeCommand = exports._BasicBlockOptimzeCommand = _FunctionOptimizeCommand.extend({
+
+	constructor: function (identifier) {
+		_FunctionOptimizeCommand.prototype.constructor.call(this, identifier);
+	},
+
+	optimizeFunction: function (funcDef) {
+		var statements = funcDef.getStatements();
+		if (statements != null) {
+			this._optimizeStatements(funcDef, statements, 0);
+		}
+	},
+
+	_optimizeStatements: function (funcDef, statements) {
+		var statementIndex = 0;
+		while (statementIndex < statements.length) {
+			var exprsToOptimize = [];
+			var setOptimizedExprs = [];
+			while (statementIndex < statements.length) {
+				var statement = statements[statementIndex++];
+				if (statement instanceof ExpressionStatement) {
+					exprsToOptimize.push(statement.getExpr());
+					setOptimizedExprs.push(function (statement) {
+						return function (expr) {
+							statement.setExpr(expr);
+						}
+					}(statement));
+				} else if (statement instanceof ReturnStatement) {
+					var expr = statement.getExpr();
+					if (expr != null) {
+						exprsToOptimize.push(statement.getExpr());
+						setOptimizedExprs.push(function (statement) {
+							return function (expr) {
+								statement.setExpr(expr);
+							}
+						}(statement));
+					}
+					break;
+				} else {
+					statement.handleStatements(function (statements) {
+						this._optimizeStatements(funcDef, statements);
+					}.bind(this));
+					if (statement instanceof IfStatement) {
+						exprsToOptimize.push(statement.getExpr());
+						setOptimizedExprs.push(function (statement) {
+							return function (expr) {
+								statement.setExpr(expr);
+							};
+						}(statement));
+					} else if (statement instanceof SwitchStatement) {
+						exprsToOptimize.push(statement.getExpr());
+						setOptimizedExprs.push(function (statement) {
+							return function (expr) {
+								statement.setExpr(expr);
+							};
+						}(statement));
+					} else {
+						// TODO implement
+					}
+					break;
+				}
+			}
+			// optimize basic block
+			if (exprsToOptimize.length != 0) {
+				this.optimizeExpressions(funcDef, exprsToOptimize);
+				for (var i = 0; i < exprsToOptimize.length; ++i) {
+					setOptimizedExprs[i](exprsToOptimize[i]);
+				}
+			}
+		}
+	},
+
+	optimizeExpressions: null // function (funcDef, exprs)
+
+});
+
 var _LinkTimeOptimizationCommandStash = exports._LinkTimeOptimizationCommandStash = Class.extend({
 
 	constructor: function () {
@@ -1385,64 +1461,13 @@ var _LCSECachedExpression = exports._LCSECachedExpression = Class.extend({
 
 });
 
-var _LCSEOptimizeCommand = exports._LCSEOptimizeCommand = _FunctionOptimizeCommand.extend({
+var _LCSEOptimizeCommand = exports._LCSEOptimizeCommand = _BasicBlockOptimzeCommand.extend({
 
 	constructor: function () {
-		_FunctionOptimizeCommand.prototype.constructor.call(this, "lcse");
+		_BasicBlockOptimzeCommand.prototype.constructor.call(this, "lcse");
 	},
 
-	optimizeFunction: function (funcDef) {
-		var statements = funcDef.getStatements();
-		if (statements != null) {
-			this._optimizeStatements(funcDef, statements, 0);
-		}
-	},
-
-	_optimizeStatements: function (funcDef, statements) {
-		var statementIndex = 0;
-		while (statementIndex < statements.length) {
-			var exprsToOptimize = [];
-			var setOptimizedExprs = [];
-			while (statementIndex < statements.length) {
-				var statement = statements[statementIndex++];
-				if (statement instanceof ExpressionStatement) {
-					exprsToOptimize.push(statement.getExpr());
-					setOptimizedExprs.push(function (statement) {
-						return function (expr) {
-							statement.setExpr(expr);
-						}
-					}(statement));
-				} else if (statement instanceof ReturnStatement) {
-					var expr = statement.getExpr();
-					if (expr != null) {
-						exprsToOptimize.push(statement.getExpr());
-						setOptimizedExprs.push(function (statement) {
-							return function (expr) {
-								statement.setExpr(expr);
-							}
-						}(statement));
-					}
-					break;
-				} else if (statement instanceof ContinuableStatement) {
-					this._optimizeStatements(funcDef, statement.getStatements(), 0);
-					break;
-				} else {
-					// FIXME add support for other types of statements (for example, IfStatement)
-					// do nothing but continue
-					break;
-				}
-			}
-			// optimize basic block
-			if (exprsToOptimize.length != 0) {
-				this._optimizeExpressions(funcDef, exprsToOptimize);
-				for (var i = 0; i < exprsToOptimize.length; ++i) {
-					setOptimizedExprs[i](exprsToOptimize[i]);
-				}
-			}
-		}
-	},
-
-	_optimizeExpressions: function (funcDef, exprs) {
+	optimizeExpressions: function (funcDef, exprs) {
 		this.log("optimizing expressions starting");
 
 		var cachedExprs = {};
