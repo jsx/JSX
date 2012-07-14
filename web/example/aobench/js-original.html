@@ -1,0 +1,36 @@
+<html>
+  <head>
+    <title>AOBench in JavaScript+Canvas2D</title>
+    <style>
+      body {
+        color: white;
+        background-color: #222;
+        overflow: hidden;
+      }
+      a:link {
+        color: white;
+      }
+      a:visited {
+        color: gray;
+      }
+
+      #status {
+        font-size: 20px;
+      }
+    </style>
+    <script src="ambientocclusion.js"></script>
+  </head>
+  <body>
+    <div>
+      <p>
+        <a href="http://code.google.com/p/aobench/">aobench</a> is a small ambient occlusion renderer for benchmarking realworld floating point performance in various languages.
+      </p>
+      <ul>
+        <li><a href="index.html">JSX AOBench</a></li>
+        <li>JavaScript AOBench</li>
+      </ul>
+      <canvas id="world" width="256" height="256"></canvas>
+      <p id="status">not running</p>
+    </div>
+  </body>
+</html>
