@@ -152,6 +152,14 @@ class Plane {
     }
 } // Plane
 
+class Random {
+    static var _x= 0;
+    static function next() : number {
+        Random._x = Random._x * 0x5DEECE66D + 0xB;
+        Random._x %= 0xFFFFFFFFFFFF;
+        return Random._x * (1.0/(0xFFFFFFFFFFFF+1));
+    }
+}
 
 class AOBench {
 
@@ -161,7 +169,6 @@ class AOBench {
     static const NPHI   = AOBench.NAO_SAMPLES;
     static const NTHETA = AOBench.NAO_SAMPLES;
     static const ALLRAY = AOBench.NAO_SAMPLES * AOBench.NAO_SAMPLES;
-
     function clamp(f:number) : number
     {
         var i : number = f * 255.0;
@@ -226,8 +233,8 @@ class AOBench {
         var i:int, j:int;
         for (j = 0; j < AOBench.NPHI; j++) {
             for (i = 0; i < AOBench.NTHETA; i++) {
-                var r   = Math.random();
-                var phi = 2.0 * Math.PI * Math.random();
+                var r   = Random.next();
+                var phi = 2.0 * Math.PI * Random.next();
                 var x   = Math.cos(phi) * Math.sqrt(1.0 - r);
                 var y   = Math.sin(phi) * Math.sqrt(1.0 - r);
                 var z   = Math.sqrt(r);
@@ -258,7 +265,7 @@ class AOBench {
     }
 
 
-    function render(ctx:CanvasRenderingContext2D, w:int, h:int) : void {
+    function render(fill : function(x : int, y : int,  r : int, g : int, b : int) : void, w : int, h : int) : void {
         var cnt : int = 0;
         var x:int, y:int;
         var half_w = w * .5;
@@ -286,9 +293,7 @@ class AOBench {
                 var g = (col.y * 255.0) as int;
                 var b = (col.z * 255.0) as int;
 
-                // use fill rect
-                ctx.fillStyle = "rgb(" + r as string + "," + g as string + "," + b as string + ")";
-                ctx.fillRect (x, y, 1, 1);
+                fill(x, y, r, g, b);
             }
         }
 
@@ -304,7 +309,10 @@ class _Main {
 
         var ao : AOBench = new AOBench();
         var t0 = Date.now();
-        ao.render(ctx, canvas.width, canvas.height);
+        ao.render((x, y, r, g, b) -> {
+            ctx.fillStyle = "rgb(" + r as string + "," + g as string + "," + b as string + ")";
+            ctx.fillRect (x, y, 1, 1);
+        }, canvas.width, canvas.height);
         var t1 = Date.now();
         var d = t1 - t0;
         dom.id(Config.statusId).innerHTML = "Time = " + d as string + "[ms]";
