@@ -127,6 +127,11 @@ define_alias('MediaQueryListListener' => 'function(:MediaQueryList):void');
 # http://www.w3.org/TR/file-system-api/
 define_alias('FileCallback' => 'function(:File):void');
 
+# https://wiki.mozilla.org/GamepadAPI
+define_alias('nsIVariant'  => 'variant');
+define_alias('nsIDOMEvent' => 'Event');
+define_alias('nsISupports' => 'Object');
+
 sub info {
     state $count = 0;
     print STDERR sprintf("[%03d] ", $count++), join(" ", @_), "\n";
@@ -578,7 +583,7 @@ foreach my $def(values %classdef) {
     $classdecl .= " class $def->{name}";
 
     if($def->{base}) {
-        $classdecl .= " extends $def->{base}";
+        $classdecl .= " extends " . to_jsx_type($def->{base});
     }
 
     say sprintf '/** @see %s */', $def->{spec} if $def->{spec};

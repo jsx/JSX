@@ -4863,6 +4863,33 @@ class _Test extends TestCase {
     } // WebGLContextEventInit
 
     // #267
+    function compile_nsIDOMGamepad(o : nsIDOMGamepad) : void {
+        var v1 : string/*DOMString*/ = o.id;
+        var v2 : boolean = o.connected;
+        var v3 : variant/*nsIVariant*/ = o.buttons;
+        var v4 : variant/*nsIVariant*/ = o.axes;
+        var v5 : int/*unsigned long*/ = o.index;
+    } // nsIDOMGamepad
+
+    // #268
+    function compile_nsIDOMGamepadConnectionEvent(o : nsIDOMGamepadConnectionEvent) : void {
+        var v1 : nsIDOMGamepad = o.gamepad;
+    } // nsIDOMGamepadConnectionEvent
+
+    // #269
+    function compile_nsIDOMGamepadButtonEvent(o : nsIDOMGamepadButtonEvent) : void {
+        var v1 : int/*unsigned long*/ = o.button;
+        var v2 : nsIDOMGamepad = o.gamepad;
+    } // nsIDOMGamepadButtonEvent
+
+    // #270
+    function compile_nsIDOMGamepadAxisMoveEvent(o : nsIDOMGamepadAxisMoveEvent) : void {
+        var v1 : int/*unsigned long*/ = o.axis;
+        var v2 : number/*float*/ = o.value;
+        var v3 : nsIDOMGamepad = o.gamepad;
+    } // nsIDOMGamepadAxisMoveEvent
+
+    // #271
     function compile_WindowAnimationTiming(o : WindowAnimationTiming) : void {
         var f1 : int/*long*/ = o.requestAnimationFrame(X.getfunction_time_number__void());
         o.cancelAnimationFrame(X.getint());
@@ -4872,7 +4899,7 @@ class _Test extends TestCase {
         o.mozCancelAnimationFrame(X.getint());
     } // WindowAnimationTiming
 
-    // #268
+    // #272
     function compile_CanvasPixelArray(o : CanvasPixelArray) : void {
         var v1 : int/*unsigned long*/ = o.length;
         var f1 : Nullable.<int>/*octet*/ = o.__native_index_operator__(X.getint());
@@ -5043,6 +5070,7 @@ native class X {
     static function getfunction_time_number__void() : function(time:number):void;
     static function getint() : int;
     static function getint__() : int[];
+    static function getnsIDOMGamepad() : nsIDOMGamepad;
     static function getnumber() : number;
     static function getnumber__() : number[];
     static function getstring() : string;

@@ -4461,7 +4461,7 @@ native final class HTMLFontElement extends HTMLElement {
 
 } // end of HTMLFontElement
 
-/** @see http://www.w3.org/TR/FileAPI/ */
+/** @see http://www.w3.org/TR/2011/WD-FileAPI-20111020/ */
 native final class FileList {
 
 	function __native_index_operator__(
@@ -4473,7 +4473,7 @@ native final class FileList {
 
 } // end of FileList
 
-/** @see http://www.w3.org/TR/FileAPI/ */
+/** @see http://www.w3.org/TR/2011/WD-FileAPI-20111020/ */
 native class Blob {
 
 	__readonly__ var size : number/*unsigned long long*/;
@@ -4494,7 +4494,7 @@ native class Blob {
 
 } // end of Blob
 
-/** @see http://www.w3.org/TR/FileAPI/ */
+/** @see http://www.w3.org/TR/2011/WD-FileAPI-20111020/ */
 native final class File extends Blob {
 
 	__readonly__ var name : string/*DOMString*/;
@@ -4502,7 +4502,7 @@ native final class File extends Blob {
 
 } // end of File
 
-/** @see http://www.w3.org/TR/FileAPI/ */
+/** @see http://www.w3.org/TR/2011/WD-FileAPI-20111020/ */
 native final class FileReader extends EventTarget {
 
 	function constructor();
@@ -4538,7 +4538,7 @@ native final class FileReader extends EventTarget {
 
 } // end of FileReader
 
-/** @see http://www.w3.org/TR/FileAPI/ */
+/** @see http://www.w3.org/TR/2011/WD-FileAPI-20111020/ */
 native final class FileReaderSync {
 
 	function constructor();
@@ -4558,9 +4558,9 @@ native final class FileReaderSync {
 
 native class URL {
 
-	/** @see http://www.w3.org/TR/FileAPI/ */
+	/** @see http://www.w3.org/TR/2011/WD-FileAPI-20111020/ */
 	static function createObjectURL(blob : Blob) : string/*DOMString*/;
-	/** @see http://www.w3.org/TR/FileAPI/ */
+	/** @see http://www.w3.org/TR/2011/WD-FileAPI-20111020/ */
 	static function revokeObjectURL(url : string/*DOMString*/) : void;
 
 } // end of URL
@@ -7556,6 +7556,41 @@ native final class WebGLContextEventInit extends EventInit {
 	var statusMessage : string/*DOMString*/;
 
 } // end of WebGLContextEventInit
+
+/** @see https://wiki.mozilla.org/GamepadAPI */
+native final class nsIDOMGamepad extends Object/*nsISupports*/ {
+
+	__readonly__ var id : string/*DOMString*/;
+	__readonly__ var connected : boolean;
+	__readonly__ var buttons : variant/*nsIVariant*/;
+	__readonly__ var axes : variant/*nsIVariant*/;
+	__readonly__ var index : int/*unsigned long*/;
+
+} // end of nsIDOMGamepad
+
+/** @see https://wiki.mozilla.org/GamepadAPI */
+native final class nsIDOMGamepadConnectionEvent extends Event/*nsIDOMEvent*/ {
+
+	__readonly__ var gamepad : nsIDOMGamepad;
+
+} // end of nsIDOMGamepadConnectionEvent
+
+/** @see https://wiki.mozilla.org/GamepadAPI */
+native final class nsIDOMGamepadButtonEvent extends Event/*nsIDOMEvent*/ {
+
+	__readonly__ var button : int/*unsigned long*/;
+	__readonly__ var gamepad : nsIDOMGamepad;
+
+} // end of nsIDOMGamepadButtonEvent
+
+/** @see https://wiki.mozilla.org/GamepadAPI */
+native final class nsIDOMGamepadAxisMoveEvent extends Event/*nsIDOMEvent*/ {
+
+	__readonly__ var axis : int/*unsigned long*/;
+	__readonly__ var value : number/*float*/;
+	__readonly__ var gamepad : nsIDOMGamepad;
+
+} // end of nsIDOMGamepadAxisMoveEvent
 
 // alias TimerHandler = function():void
 
