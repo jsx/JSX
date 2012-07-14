@@ -224,7 +224,7 @@ function render(fill, w, h, nsubsamples)
             // subsampling
             for (var v = 0; v < nsubsamples; v++) {
                 for (var u = 0; u < nsubsamples; u++) {
-                    var px = (x + (u / nsubsamples) - (w / 2.0))/(w / 2.0);
+                    var px =  (x + (u / nsubsamples) - (w / 2.0))/(w / 2.0);
                     var py = -(y + (v / nsubsamples) - (h / 2.0))/(h / 2.0);
 
                     var eye = vnormalize(new vec(px, py, -1.0));
@@ -248,12 +248,12 @@ function render(fill, w, h, nsubsamples)
                 }
             }
 
-            var r = rad.x / (nsubsamples * nsubsamples);
-            var g = rad.y / (nsubsamples * nsubsamples);
-            var b = rad.z / (nsubsamples * nsubsamples);
+            var r = clamp(rad.x / (nsubsamples * nsubsamples));
+            var g = clamp(rad.y / (nsubsamples * nsubsamples));
+            var b = clamp(rad.z / (nsubsamples * nsubsamples));
 
             // use fill rect
-            fill(x, y, clamp(r), clamp(g), clamp(b));
+            fill(x, y, r, g, b);
         }
     }
 

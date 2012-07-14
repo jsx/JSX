@@ -169,12 +169,13 @@ class AOBench {
     static const NPHI   = AOBench.NAO_SAMPLES;
     static const NTHETA = AOBench.NAO_SAMPLES;
     static const ALLRAY = AOBench.NAO_SAMPLES * AOBench.NAO_SAMPLES;
-    function clamp(f : number) : number
+
+    static function clamp(f : number) : int
     {
         var i = f * 255.0;
         if (i > 255.0) i = 255.0;
         if (i < 0.0)   i = 0.0;
-        return Math.round(i);
+        return i as int;
     }
 
     function orthoBasis(basis : vec3[], n:vec3) : void
@@ -285,10 +286,11 @@ class AOBench {
                 if (isect.hit)
                     col = this.ambient_occlusion(isect);
 
-                var r = (col.x * 255.0) as int;
-                var g = (col.y * 255.0) as int;
-                var b = (col.z * 255.0) as int;
+                var r = AOBench.clamp(col.x);
+                var g = AOBench.clamp(col.y);
+                var b = AOBench.clamp(col.z);
 
+                // use fill rect
                 fill(x, y, r, g, b);
             }
         }
