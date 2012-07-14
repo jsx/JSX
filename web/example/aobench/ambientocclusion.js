@@ -1,6 +1,6 @@
 // the origina AOBench
 // http://code.google.com/p/aobench/
-
+"use strict";
 var NSUBSAMPLES  = 2
 var NAO_SAMPLES  = 8
 
@@ -125,8 +125,7 @@ function Isect()
 
 function clamp(f)
 {
-    
-    i = f * 255.5;
+    var i = f * 255.5;
     if (i > 255.0) i = 255.0;
     if (i < 0.0) i = 0.0;
     return Math.round(i)
@@ -181,8 +180,8 @@ function ambient_occlusion(isect)
                     isect.p.y + eps * isect.n.y,
                     isect.p.z + eps * isect.n.z);
 
-    for (j = 0; j < nphi; j++) {
-        for (i = 0; i < ntheta; i++) {
+    for (var j = 0; j < nphi; j++) {
+        for (var i = 0; i < ntheta; i++) {
             var r = Math.random();
             var phi = 2.0 * Math.PI * Math.random();
 
@@ -215,27 +214,24 @@ function ambient_occlusion(isect)
 }
 
 
-function render(ctx, w, h, nsubsamples)
+function render(fill, w, h, nsubsamples)
 {
-    cnt = 0;
-    for (y = 0; y < h; y++) {
-        for (x = 0; x < w; x++) {
+    for (var y = 0; y < h; y++) {
+        for (var x = 0; x < w; x++) {
 
-            rad = new vec(0.0, 0.0, 0.0);
+            var rad = new vec(0.0, 0.0, 0.0);
 
             // subsampling
-            for (v = 0; v < nsubsamples; v++) {
-                for (u = 0; u < nsubsamples; u++) {
+            for (var v = 0; v < nsubsamples; v++) {
+                for (var u = 0; u < nsubsamples; u++) {
+                    var px = (x + (u / nsubsamples) - (w / 2.0))/(w / 2.0);
+                    var py = -(y + (v / nsubsamples) - (h / 2.0))/(h / 2.0);
 
-                    cnt++;
-                    px = (x + (u / nsubsamples) - (w / 2.0))/(w / 2.0);
-                    py = -(y + (v / nsubsamples) - (h / 2.0))/(h / 2.0);
+                    var eye = vnormalize(new vec(px, py, -1.0));
 
-                    eye = vnormalize(new vec(px, py, -1.0));
+                    var ray = new Ray(new vec(0.0, 0.0, 0.0), eye);
 
-                    ray = new Ray(new vec(0.0, 0.0, 0.0), eye);
-
-                    isect = new Isect();
+                    var isect = new Isect();
                     spheres[0].intersect(ray, isect);
                     spheres[1].intersect(ray, isect);
                     spheres[2].intersect(ray, isect);
@@ -243,7 +239,7 @@ function render(ctx, w, h, nsubsamples)
 
                     if (isect.hit) {
                             
-                        col = ambient_occlusion(isect);
+                        var col = ambient_occlusion(isect);
 
                         rad.x += col.x;
                         rad.y += col.y;
@@ -252,35 +248,40 @@ function render(ctx, w, h, nsubsamples)
                 }
             }
 
-            r = rad.x / (nsubsamples * nsubsamples);
-            g = rad.y / (nsubsamples * nsubsamples);
-            b = rad.z / (nsubsamples * nsubsamples);
+            var r = rad.x / (nsubsamples * nsubsamples);
+            var g = rad.y / (nsubsamples * nsubsamples);
+            var b = rad.z / (nsubsamples * nsubsamples);
 
             // use fill rect
-            ctx.fillStyle = "rgb(" + clamp(r) + "," + clamp(g) + "," + clamp(b) + ")";
-            ctx.fillRect (x, y, 1, 1);
-            
+            fill(x, y, clamp(r), clamp(g), clamp(b));
         }
     }
 
 }
 
+if (typeof window !== "undefined") {
+    window.onload =  function aobench_start()
+    {
+        var canvas = document.getElementById("world");
+        var ctx = canvas.getContext("2d");
 
-window.onload =  function aobench_start()
-{
-    var canvas = document.getElementById("world");
-    var ctx = canvas.getContext("2d");
+        var start = Date.now();
+        init_scene();
+        render(function (x, y, r, g, b) {
+            ctx.fillStyle = "rgb(" + r + "," + g + "," + b + ")";
+            ctx.fillRect (x, y, 1, 1);
+        }, canvas.width, canvas.height, 1)
 
-    var start = Date.now();
-    init_scene();
-    render(ctx, canvas.width, canvas.height, 1)
+        var elapsed = Date.now() - start;
 
-    elapsed = Date.now() - start;
+        document.getElementById("status").innerHTML = "Time = " + elapsed + "[ms]";
 
-    document.getElementById("status").innerHTML = "Time = " + elapsed + "[ms]";
-
-    //img = ctx.getImageData(10, 10, 50, 50)
-    //document.write(img.data[41]);
-    //ret = ctx.putImagedata(img, 10, 10);
-    //print(ret);
+        //img = ctx.getImageData(10, 10, 50, 50)
+        //document.write(img.data[41]);
+        //ret = ctx.putImagedata(img, 10, 10);
+        //print(ret);
+    }
+}
+else {
+    exports.render = render;
 }

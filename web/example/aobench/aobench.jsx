@@ -169,9 +169,9 @@ class AOBench {
     static const NPHI   = AOBench.NAO_SAMPLES;
     static const NTHETA = AOBench.NAO_SAMPLES;
     static const ALLRAY = AOBench.NAO_SAMPLES * AOBench.NAO_SAMPLES;
-    function clamp(f:number) : number
+    function clamp(f : number) : number
     {
-        var i : number = f * 255.0;
+        var i = f * 255.0;
         if (i > 255.0) i = 255.0;
         if (i < 0.0)   i = 0.0;
         return Math.round(i);
@@ -230,9 +230,8 @@ class AOBench {
 
         var occlusion : int = 0;
 
-        var i:int, j:int;
-        for (j = 0; j < AOBench.NPHI; j++) {
-            for (i = 0; i < AOBench.NTHETA; i++) {
+        for (var j = 0; j < AOBench.NPHI; j++) {
+            for (var i = 0; i < AOBench.NTHETA; i++) {
                 var r   = Random.next();
                 var phi = 2.0 * Math.PI * Random.next();
                 var x   = Math.cos(phi) * Math.sqrt(1.0 - r);
@@ -266,13 +265,10 @@ class AOBench {
 
 
     function render(fill : function(x : int, y : int,  r : int, g : int, b : int) : void, w : int, h : int) : void {
-        var cnt : int = 0;
-        var x:int, y:int;
         var half_w = w * .5;
         var half_h = h * .5;
-        for (y = 0; y < h; y++) {
-            for (x = 0; x < w; x++) {
-                cnt++;
+        for (var y = 0; y < h; y++) {
+            for (var x = 0; x < w; x++) {
                 var px =  (x - half_w)/half_w;
                 var py = -(y - half_h)/half_h;
 

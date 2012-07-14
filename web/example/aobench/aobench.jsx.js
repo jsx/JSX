@@ -261,8 +261,6 @@ Sphere$Lvec3$N.prototype = new Sphere;
  * @param {Isect} isect
  */
 Sphere.prototype.intersect$LRay$LIsect$ = function (ray, isect) {
-	/** @type {vec3} */
-	var rs;
 	/** @type {!number} */
 	var B;
 	/** @type {!number} */
@@ -283,12 +281,20 @@ Sphere.prototype.intersect$LRay$LIsect$ = function (ray, isect) {
 	var a$1;
 	/** @type {vec3} */
 	var b$2;
+	/** @type {!number} */
+	var rs$x$0;
+	/** @type {!number} */
+	var rs$y$0;
+	/** @type {!number} */
+	var rs$z$0;
 	a$0 = ray.org;
 	b$0 = this.center;
-	rs = new vec3$NNN(a$0.x - b$0.x, a$0.y - b$0.y, a$0.z - b$0.z);
+	rs$x$0 = a$0.x - b$0.x;
+	rs$y$0 = a$0.y - b$0.y;
+	rs$z$0 = a$0.z - b$0.z;
 	b$1 = ray.dir;
-	B = rs.x * b$1.x + rs.y * b$1.y + rs.z * b$1.z;
-	C = rs.x * rs.x + rs.y * rs.y + rs.z * rs.z - this.radius * this.radius;
+	B = rs$x$0 * b$1.x + rs$y$0 * b$1.y + rs$z$0 * b$1.z;
+	C = rs$x$0 * rs$x$0 + rs$y$0 * rs$y$0 + rs$z$0 * rs$z$0 - this.radius * this.radius;
 	D = B * B - C;
 	if (D > 0.0) {
 		t = - B - Math.sqrt(D);
@@ -354,6 +360,33 @@ Plane.prototype.intersect$LRay$LIsect$ = function (ray, isect) {
 		isect.p = new vec3$NNN(ray.org.x + t * ray.dir.x, ray.org.y + t * ray.dir.y, ray.org.z + t * ray.dir.z);
 	}
 };
+
+/**
+ * class Random extends Object
+ * @constructor
+ */
+function Random() {
+}
+
+Random.prototype = new Object;
+/**
+ * @constructor
+ */
+function Random$() {
+};
+
+Random$.prototype = new Random;
+
+/**
+ * @return {!number}
+ */
+Random.next$ = function () {
+	Random._x = Random._x * 0x5DEECE66D + 0xB;
+	Random._x %= 0xFFFFFFFFFFFF;
+	return Random._x * 3.552713678800501e-15;
+};
+
+var Random$next$ = Random.next$;
 
 /**
  * class AOBench extends Object
@@ -440,9 +473,9 @@ AOBench.prototype.ambient_occlusion$LIsect$ = function (isect) {
 	/** @type {!number} */
 	var occlusion;
 	/** @type {!number} */
-	var i;
-	/** @type {!number} */
 	var j;
+	/** @type {!number} */
+	var i;
 	/** @type {!number} */
 	var r;
 	/** @type {!number} */
@@ -473,8 +506,10 @@ AOBench.prototype.ambient_occlusion$LIsect$ = function (isect) {
 	occlusion = 0;
 	for (j = 0; j < 8; j++) {
 		for (i = 0; i < 8; i++) {
-			r = Math.random();
-			phi = 6.283185307179586 * Math.random();
+			Random._x = Random._x * 0x5DEECE66D + 0xB;
+			Random._x %= 0xFFFFFFFFFFFF;
+			r = Random._x * 3.552713678800501e-15;
+			phi = 6.283185307179586 * Random$next$();
 			x = Math.cos(phi) * Math.sqrt(1.0 - r);
 			y = Math.sin(phi) * Math.sqrt(1.0 - r);
 			z = Math.sqrt(r);
@@ -498,21 +533,18 @@ AOBench.prototype.ambient_occlusion$LIsect$ = function (isect) {
 };
 
 /**
- * @param {CanvasRenderingContext2D} ctx
  * @param {!number} w
  * @param {!number} h
  */
-AOBench.prototype.render$LCanvasRenderingContext2D$II = function (ctx, w, h) {
-	/** @type {!number} */
-	var cnt;
-	/** @type {!number} */
-	var x;
-	/** @type {!number} */
-	var y;
+AOBench.prototype.render$F$IIIIIV$II = function (fill, w, h) {
 	/** @type {!number} */
 	var half_w;
 	/** @type {!number} */
 	var half_h;
+	/** @type {!number} */
+	var y;
+	/** @type {!number} */
+	var x;
 	/** @type {!number} */
 	var px;
 	/** @type {!number} */
@@ -531,12 +563,10 @@ AOBench.prototype.render$LCanvasRenderingContext2D$II = function (ctx, w, h) {
 	var g;
 	/** @type {!number} */
 	var b;
-	cnt = 0;
 	half_w = w * .5;
 	half_h = h * .5;
 	for (y = 0; y < h; y++) {
 		for (x = 0; x < w; x++) {
-			cnt++;
 			px = (x - half_w) / half_w;
 			py = - (y - half_h) / half_h;
 			eye = vec3$vnormalize$Lvec3$(new vec3$NNN(px, py, -1));
@@ -553,8 +583,7 @@ AOBench.prototype.render$LCanvasRenderingContext2D$II = function (ctx, w, h) {
 			r = col.x * 255.0 | 0;
 			g = col.y * 255.0 | 0;
 			b = col.z * 255.0 | 0;
-			ctx.fillStyle = "rgb(" + (r + "") + "," + (g + "") + "," + (b + "") + ")";
-			ctx.fillRect(x, y, 1, 1);
+			fill(x, y, r, g, b);
 		}
 	}
 };
@@ -595,7 +624,10 @@ _Main.main$AS = function (args) {
 	ctx = (function (o) { return o instanceof CanvasRenderingContext2D ? o : null; })(canvas.getContext("2d"));
 	ao = new AOBench$();
 	t0 = Date.now();
-	ao.render$LCanvasRenderingContext2D$II(ctx, canvas.width, canvas.height);
+	ao.render$F$IIIIIV$II((function (x, y, r, g, b) {
+		ctx.fillStyle = "rgb(" + (r + "") + "," + (g + "") + "," + (b + "") + ")";
+		ctx.fillRect(x, y, 1, 1);
+	}), canvas.width, canvas.height);
 	t1 = Date.now();
 	d = t1 - t0;
 	(function (o) { return o instanceof HTMLElement ? o : null; })(dom.window.document.getElementById("status")).innerHTML = "Time = " + (d + "") + "[ms]";
@@ -667,8 +699,7 @@ js$.prototype = new js;
 
 Config.canvasId = "world";
 Config.statusId = "status";
-AOBench.IMAGE_WIDTH = 256;
-AOBench.IMAGE_HEIGHT = 256;
+Random._x = 0;
 AOBench.NSUBSAMPLES = 2;
 AOBench.NAO_SAMPLES = 8;
 AOBench.EPS = 0.0001;
@@ -681,7 +712,7 @@ $__jsx_lazy_init(dom, "window", function () {
 js.global = (function () { return this; })();
 
 var $__jsx_classMap = {
-	"aobench.jsx": {
+	"web/example/aobench/aobench.jsx": {
 		Config: Config,
 		Config$: Config$,
 		vec3: vec3,
@@ -694,6 +725,8 @@ var $__jsx_classMap = {
 		Sphere$Lvec3$N: Sphere$Lvec3$N,
 		Plane: Plane,
 		Plane$Lvec3$Lvec3$: Plane$Lvec3$Lvec3$,
+		Random: Random,
+		Random$: Random$,
 		AOBench: AOBench,
 		AOBench$: AOBench$,
 		_Main: _Main,
@@ -722,9 +755,8 @@ JSX.runMain = function (sourceFile, args) {
 	if (! module._Main.main$AS) {
 		throw new Error("entry point _Main.main(:string[]):void not found in " + sourceFile);
 	}
-
 	module._Main.main$AS(args);
-}
+};
 
 /**
  * launches _Test#test*():void invoked by jsx --test
@@ -758,17 +790,17 @@ JSX.runTests = function (sourceFile, tests) {
 
 	if (test.afterClass$ != null)
 		test.afterClass$();
-}
+};
 /**
  * call a function on load/DOMContentLoaded
  */
 function $__jsx_onload (event) {
 	window.removeEventListener("load", $__jsx_onload);
-	window.removeEventListener("DOMContentLoaded", $__jsx_onload);
-	JSX.runMain("aobench.jsx", [])
+	document.removeEventListener("DOMContentLoaded", $__jsx_onload);
+	JSX.runMain("web/example/aobench/aobench.jsx", [])
 }
 
 window.addEventListener("load", $__jsx_onload);
-window.addEventListener("DOMContentLoaded", $__jsx_onload);
+document.addEventListener("DOMContentLoaded", $__jsx_onload);
 
 })();
