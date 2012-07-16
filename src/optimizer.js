@@ -95,6 +95,7 @@ var _Util = exports._Util = Class.extend({
 	},
 
 	$exprHasSideEffects: function (expr) {
+		// FIXME native array access may have side effects
 		var onExpr = function (expr) {
 			if (expr instanceof CallExpression
 				|| expr instanceof FunctionExpression
@@ -105,7 +106,7 @@ var _Util = exports._Util = Class.extend({
 				return false;
 			return expr.forEachExpression(onExpr);
 		};
-		return ! expr.forEachExpression(onExpr);
+		return ! onExpr(expr);
 	},
 
 });
@@ -134,8 +135,6 @@ var Optimizer = exports.Optimizer = Class.extend({
 				this._commands.push(new _FoldConstantCommand());
 			} else if (cmd == "dce") {
 				this._commands.push(new _DeadCodeEliminationOptimizeCommand());
-			} else if (cmd == "dse") {
-				this._commands.push(new _DeadStoreEliminationOptimizeCommand());
 			} else if (cmd == "inline") {
 				this._commands.push(new _DetermineCalleeCommand());
 				this._commands.push(new _InlineOptimizeCommand());
@@ -298,7 +297,7 @@ var _FunctionOptimizeCommand = exports._FunctionOptimizeCommand = _OptimizeComma
 
 });
 
-var _BasicBlockOptimzeCommand = exports._BasicBlockOptimzeCommand = _FunctionOptimizeCommand.extend({
+var _BasicBlockOptimizeCommand = exports._BasicBlockOptimizeCommand = _FunctionOptimizeCommand.extend({
 
 	constructor: function (identifier) {
 		_FunctionOptimizeCommand.prototype.constructor.call(this, identifier);
@@ -878,42 +877,53 @@ var _FoldConstantCommand = exports._FoldConstantCommand = _FunctionOptimizeComma
 
 });
 
-var _DeadCodeEliminationOptimizeCommand = exports._DeadCodeEliminationOptimizeCommand = _FunctionOptimizeCommand.extend({
+var _DeadCodeEliminationOptimizeCommand = exports._DeadCodeEliminationOptimizeCommand = _BasicBlockOptimizeCommand.extend({
 
 	constructor: function () {
-		_FunctionOptimizeCommand.prototype.constructor.call(this, "dce");
+		_BasicBlockOptimizeCommand.prototype.constructor.call(this, "dce");
 	},
 
 	optimizeFunction: function (funcDef) {
-		var statements = funcDef.getStatements();
-		if (statements == null) {
-			return;
+		if (funcDef.getStatements() == null) {
+			return null;
 		}
+		while (this._optimizeFunction(funcDef))
+			;
+	},
+
+	_optimizeFunction: function (funcDef) {
+		var shouldRetry = false;
 		// remove statements that does not have side effects
-		var onStatements = function (statements) {
+		(function onStatements(statements) {
 			for (var i = 0; i < statements.length;) {
 				if (statements[i] instanceof ExpressionStatement && ! _Util.exprHasSideEffects(statements[i].getExpr())) {
 					statements.splice(i, 1);
 				} else {
-					statements[i++].handleStatements(onStatements);
+					statements[i++].handleStatements(onStatements.bind(this));
 				}
 			}
-		}.bind(this);
-		onStatements(statements);
-		// mark the used local variables
-		var localsUsed = [];
-		function setUsed(local) {
-			for (var i = 0; i < localsUsed.length; ++i) {
-				if (localsUsed[i] == local) {
-					return;
-				}
-			}
-			localsUsed.push(local);
-		}
-		Util.forEachStatement(function onStatement(statement) {
+		}.bind(this))(funcDef.getStatements());
+		// use the assignment source, if possible
+		_BasicBlockOptimizeCommand.prototype.optimizeFunction.call(this, funcDef);
+		// mark the variables that are used (as RHS)
+		var locals = funcDef.getLocals();
+		var localsUsed = new Array(locals.length); // booleans
+		funcDef.forEachStatement(function onStatement(statement) {
 			statement.forEachExpression(function onExpr(expr) {
-				if (expr instanceof LocalExpression) {
-					setUsed(expr.getLocal());
+				if (expr instanceof AssignmentExpression
+					&& expr.getFirstExpr() instanceof LocalExpression
+					&& expr.getFirstExpr().getType().equals(expr.getSecondExpr().getType())) {
+					// skip lhs of assignment to local that has no effect
+					return onExpr(expr.getSecondExpr());
+				} else if (expr instanceof LocalExpression) {
+					for (var i = 0; i < locals.length; ++i) {
+						if (locals[i] == expr.getLocal()) {
+							break;
+						}
+					}
+					if (i != locals.length) {
+						localsUsed[i] = true;
+					}
 				} else if (expr instanceof FunctionExpression) {
 					expr.getFuncDef().forEachStatement(onStatement);
 				}
@@ -921,53 +931,94 @@ var _DeadCodeEliminationOptimizeCommand = exports._DeadCodeEliminationOptimizeCo
 			});
 			return statement.forEachStatement(onStatement);
 		});
-		// remove locals unused
-		var locals = funcDef.getLocals();
-		for (var i = 0; i < locals.length;) {
-			for (var j = 0; j < localsUsed.length; ++j) {
-				if (locals[i] == localsUsed[j]) {
-					break;
-				}
+		// remove locals that are not used
+		var altered = false;
+		for (var localIndex = localsUsed.length - 1; localIndex >= 0; --localIndex) {
+			if (localsUsed[localIndex]) {
+				continue;
 			}
-			if (j == localsUsed.length) {
-				// not used
-				this.log("removing unused local: " + locals[i].getName().getValue());
-				locals.splice(i, 1);
-			} else {
-				++i;
-			}
+			// remove assignment to the variable
+			funcDef.forEachStatement(function onStatement(statement) {
+				statement.forEachExpression(function onExpr(expr, replaceCb) {
+					if (expr instanceof AssignmentExpression
+						&& expr.getFirstExpr() instanceof LocalExpression
+						&& expr.getFirstExpr().getLocal() == locals[localIndex]) {
+						var rhsExpr = expr.getSecondExpr();
+						replaceCb(rhsExpr);
+						shouldRetry = true;
+						return onExpr(rhsExpr);
+					} else if (expr instanceof LocalExpression && expr.getLocal() == locals[localIndex]) {
+						throw new Error("logic flaw, found a variable going to be removed being used");
+					} else if (expr instanceof FunctionExpression) {
+						expr.getFuncDef().forEachStatement(onStatement);
+					}
+					return expr.forEachExpression(onExpr);
+				});
+				return statement.forEachStatement(onStatement);
+			});
+			// remove from locals array
+			locals.splice(localIndex, 1);
 		}
-	}
-
-});
-
-
-var _DeadStoreEliminationOptimizeCommand = exports._DeadStoreEliminationOptimizeCommand = _BasicBlockOptimzeCommand.extend({
-
-	constructor: function () {
-		_BasicBlockOptimzeCommand.prototype.constructor.call(this, "dse");
+		return shouldRetry;
 	},
 
 	optimizeExpressions: function (funcDef, exprs) {
-		this._delayAssignments(exprs);
-		this._eliminateDeadStores(exprs);
-	},
-
-	_delayAssignments: function (exprs) {
-		var locals = {}; // local_name => expr
+		// find forms localA = localB, and rewrite the use of localA to localB
+		function setLocal(list, key, value) {
+			for (var i = 0; i < list.length; ++i) {
+				if (list[i][0] == key) {
+					list[i][1] = value;
+					return;
+				}
+			}
+			list.push([key, value]);
+		}
+		function getLocal(list, key) {
+			for (var i = 0; i < list.length; ++i) {
+				if (list[i][0] == key) {
+					return list[i][1];
+				}
+			}
+			return null;
+		}
+		function deleteLocal(list, key) {
+			for (var i = 0; i < list.length; ++i) {
+				if (list[i][0] == key) {
+					list.splice(i, 1);
+					return;
+				}
+			}
+		}
+		function clearLocals(list) {
+			list.splice(0, list.length);
+		}
+		var localsUntouchable = []; // list of [local, boolean]
+		var locals = []; // list of [local, expr]
+		// mark the locals that uses op= (cannot be eliminated by the algorithm applied laterwards)
+		Util.forEachExpression(function onExpr(expr) {
+			if (expr instanceof AssignmentExpression
+				&& expr.getToken().getValue() != "="
+				&& expr.getFirstExpr() instanceof LocalExpression) {
+				setLocal(localsUntouchable, expr.getFirstExpr().getLocal());
+			}
+			return expr.forEachExpression(onExpr);
+		}, exprs);
+		// rewrite the locals
 		var onExpr = function (expr, replaceCb) {
 			if (expr instanceof AssignmentExpression) {
 				if (expr.getToken().getValue() == "="
-					&& expr.getFirstExpr() instanceof LocalExpression) {
+					&& expr.getFirstExpr() instanceof LocalExpression
+					&& getLocal(localsUntouchable, expr.getFirstExpr().getLocal()) != null
+					&& expr.getFirstExpr().getType().equals(expr.getSecondExpr().getType())) {
 					var lhsLocal = expr.getFirstExpr().getLocal();
 					this.log("resetting cache for: " + lhsLocal.getName().getValue());
-					delete locals[lhsLocal.getName().getValue()];
+					deleteLocal(locals, lhsLocal);
 					var rhsExpr = expr.getSecondExpr();
 					if (rhsExpr instanceof LocalExpression) {
 						var rhsLocal = rhsExpr.getLocal();
 						if (lhsLocal != rhsLocal) {
 							this.log("  set to: " + rhsLocal.getName().getValue());
-							locals[lhsLocal.getName().getValue()] = rhsExpr;
+							setLocal(locals, lhsLocal, rhsExpr);
 						}
 						return true;
 					} else if (rhsExpr instanceof NullExpression
@@ -975,50 +1026,24 @@ var _DeadStoreEliminationOptimizeCommand = exports._DeadStoreEliminationOptimize
 						|| rhsExpr instanceof IntegerLiteralExpression
 						|| rhsExpr instanceof StringLiteralExpression) {
 						this.log("  set to: " + rhsExpr.getToken().getValue());
-						locals[lhsLocal.getName().getValue()] = rhsExpr;
+						setLocal(locals, lhsLocal, rhsExpr);
 						return true;
 					}
 				}
 			} else if (expr instanceof LocalExpression) {
-				var localName = expr.getLocal().getName().getValue();
-				if (locals[localName]) {
-					replaceCb(locals[localName].clone());
+				var cachedExpr = getLocal(locals, expr.getLocal());
+				if (cachedExpr) {
+					replaceCb(cachedExpr.clone());
 					return true;
 				}
+			} else if (expr instanceof CallExpression) {
+				expr.forEachExpression(onExpr);
+				clearLocals(locals);
+				return true;
 			}
 			return expr.forEachExpression(onExpr);
 		}.bind(this);
 		Util.forEachExpression(onExpr, exprs);
-	},
-
-	_eliminateDeadStores: function (exprs) {
-		var deadStores = {}; // local_name => assignexpr
-		// find out the last store (that is not used)
-		var onExpr = function (expr) {
-			if (expr instanceof AssignmentExpression) {
-				if (expr.getToken().getValue() == "="
-					&& expr.getFirstExpr() instanceof LocalExpression) {
-					onExpr(expr.getSecondExpr());
-					deadStores[expr.getFirstExpr().getLocal().getName().getValue()] = expr;
-					return true;
-				}
-			} else if (expr instanceof LocalExpression) {
-				delete deadStores[expr.getLocal().getName().getValue()];
-			}
-			return expr.forEachExpression(onExpr);
-		}.bind(this);
-		Util.forEachExpression(onExpr, exprs);
-		// remove the dead stores
-		Util.forEachExpression(function onExpr(expr, replaceCb) {
-			for (var name in deadStores) {
-				var dseExpr = deadStores[name];
-				if (dseExpr == expr) {
-					replaceCb(dseExpr.getSecondExpr());
-					break;
-				}
-			}
-			return expr.forEachExpression(onExpr);
-		}, exprs);
 	}
 
 });
@@ -1610,10 +1635,10 @@ var _LCSECachedExpression = exports._LCSECachedExpression = Class.extend({
 
 });
 
-var _LCSEOptimizeCommand = exports._LCSEOptimizeCommand = _BasicBlockOptimzeCommand.extend({
+var _LCSEOptimizeCommand = exports._LCSEOptimizeCommand = _BasicBlockOptimizeCommand.extend({
 
 	constructor: function () {
-		_BasicBlockOptimzeCommand.prototype.constructor.call(this, "lcse");
+		_BasicBlockOptimizeCommand.prototype.constructor.call(this, "lcse");
 	},
 
 	optimizeExpressions: function (funcDef, exprs) {
