@@ -4,18 +4,12 @@
 
 // static vars must be initialized only once
 
-import "timer.jsx";
-
 class Test {
-	static const time = Date.now();
+	static const value = Math.random();
 
 	static function run() : void {
-		var t0 = Test.time;
-
-		Timer.setTimeout(function() : void {
-			var t1 = Test.time;
-
-			log t1 - t0;
-		}, 10);
+		var v0 = Test.value;
+		var v1 = Test.value;
+		log v0 - v1;
 	}
 }
