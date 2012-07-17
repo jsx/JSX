@@ -994,17 +994,6 @@ var _DeadCodeEliminationOptimizeCommand = exports._DeadCodeEliminationOptimizeCo
 		}
 		var localsUntouchable = []; // list of [local, boolean]
 		var locals = []; // list of [local, expr]
-		function invalidateLocal(local) {
-			for (var i = 0; i < locals.length;) {
-				if (locals[i][0] == local) {
-					locals.splice(i, 1);
-				} else if (locals[i][1] instanceof LocalExpression && locals[i][1].getLocal() == local) {
-					locals.splice(i, 1);
-				} else {
-					++i;
-				}
-			}
-		}
 		// mark the locals that uses op= (cannot be eliminated by the algorithm applied laterwards)
 		var onExpr = function (expr) {
 			if (expr instanceof AssignmentExpression
@@ -1028,12 +1017,20 @@ var _DeadCodeEliminationOptimizeCommand = exports._DeadCodeEliminationOptimizeCo
 					&& expr.getFirstExpr().getType().equals(expr.getSecondExpr().getType())) {
 					var lhsLocal = expr.getFirstExpr().getLocal();
 					this.log("resetting cache for: " + lhsLocal.getName().getValue());
-					invalidateLocal(lhsLocal);
+					for (var i = locals.length - 1; i >= 0; --i) {
+						if (locals[i][0] == lhsLocal) {
+							this.log("  clearing itself");
+							locals.splice(i, 1);
+						} else if (locals[i][1] instanceof LocalExpression && locals[i][1].getLocal() == lhsLocal) {
+							this.log("  clearing " + locals[i][0].getName().getValue());
+							locals.splice(i, 1);
+						}
+					}
 					if (expr.getToken().getValue() == "=") {
 						var rhsExpr = expr.getSecondExpr();
 						if (rhsExpr instanceof LocalExpression) {
 							var rhsLocal = rhsExpr.getLocal();
-							if (lhsLocal != rhsLocal) {
+							if (lhsLocal != rhsLocal && ! getLocal(localsUntouchable, rhsLocal)) {
 								this.log("  set to: " + rhsLocal.getName().getValue());
 								setLocal(locals, lhsLocal, rhsExpr);
 							}
