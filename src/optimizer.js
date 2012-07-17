@@ -1905,7 +1905,8 @@ var _ArrayLengthOptimizeCommand = exports._ArrayLengthOptimizeCommand = _Functio
 		funcDef.forEachStatement(function onStatement(statement) {
 			statement.forEachStatement(onStatement.bind(this));
 			if (statement instanceof ForStatement) {
-				var arrayLocal = this._hasLengthExprOfLocalArray(statement.getCondExpr());
+				var condExpr = statement.getCondExpr();
+				var arrayLocal = condExpr != null ? this._hasLengthExprOfLocalArray(condExpr) : null;
 				if (arrayLocal != null) {
 					if (this._lengthIsUnmodifiedInExpr(statement.getCondExpr())
 						&& this._lengthIsUnmodifiedInExpr(statement.getPostExpr())
