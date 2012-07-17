@@ -597,10 +597,12 @@ var _DetermineCalleeCommand = exports._DetermineCalleeCommand = _FunctionOptimiz
 						this._setCallingFuncDef(expr, null);
 					}
 				} else if (expr instanceof NewExpression) {
-					/*
-						For now we do not do anything here, since all objects should be created by the JS new operator,
-						or will fail in operations like obj.func().
-					*/
+					var callingFuncDef = _DetermineCalleeCommand.findCallingFunctionInClass(
+						expr.getType().getClassDef(), "constructor", expr.getConstructor().getArgumentTypes(), false);
+					if (callingFuncDef == null) {
+						throw new Error("could not find matching constructor for " + expr.getConstructor().toString());
+					}
+					this._setCallingFuncDef(expr, callingFuncDef);
 				}
 				return expr.forEachExpression(onExpr.bind(this));
 			}.bind(this));
@@ -2063,7 +2065,7 @@ var _UnboxOptimizeCommand = exports._UnboxOptimizeCommand = _FunctionOptimizeCom
 	},
 
 	_newExpressionCanUnbox: function (newExpr) {
-		var ctor = this._getConstructorOfNewExpr(newExpr);
+		var ctor = _DetermineCalleeCommand.getCallingFuncDef(newExpr);
 		if (this.getStash(ctor).canUnbox != null) {
 			return this.getStash(ctor).canUnbox;
 		}
@@ -2125,7 +2127,7 @@ var _UnboxOptimizeCommand = exports._UnboxOptimizeCommand = _FunctionOptimizeCom
 		}.bind(this);
 
 		var buildConstructingStatements = function (dstStatements, dstStatementIndex, newExpr) {
-			var ctor = this._getConstructorOfNewExpr(newExpr);
+			var ctor = _DetermineCalleeCommand.getCallingFuncDef(newExpr);
 			ctor.forEachStatement(function (statement) {
 				var propertyName = statement.getExpr().getFirstExpr().getIdentifierToken().getValue();
 				var rhsExpr = statement.getExpr().getSecondExpr().clone();
@@ -2207,15 +2209,6 @@ var _UnboxOptimizeCommand = exports._UnboxOptimizeCommand = _FunctionOptimizeCom
 			return null;
 		}
 		return rhsExpr;
-	},
-
-	_getConstructorOfNewExpr: function (newExpr) {
-		var ctor = _DetermineCalleeCommand.findCallingFunctionInClass(
-			newExpr.getType().getClassDef(), "constructor", newExpr.getConstructor().getArgumentTypes(), false);
-		if (ctor == null) {
-			throw new Error("could not find matching constructor for " + newExpr.getConstructor().toString());
-		}
-		return ctor;
 	}
 
 });
