@@ -1704,6 +1704,9 @@ var _UnboxOptimizeCommand = exports._UnboxOptimizeCommand = _FunctionOptimizeCom
 			// first check the local = new ...
 			var newExpr = this._statementIsConstructingTheLocal(statement, local);
 			if (newExpr != null) {
+				if (! newExpr.getType().equals(local.getType())) {
+					return false;
+				}
 				if (! this._newExpressionCanUnbox(newExpr)) {
 					return false;
 				}
