@@ -1861,15 +1861,13 @@ var _LCSEOptimizeCommand = exports._LCSEOptimizeCommand = _FunctionOptimizeComma
 		var onExpr = function (expr, replaceCb) {
 			// handle special cases first
 			if (expr instanceof AssignmentExpression) {
-				// optimize RHS
-				onExpr(expr.getSecondExpr(), function (receiver) {
-					return function (expr) {
-						receiver.setSecondExpr(expr);
-					};
-				}(expr));
-				// optimize LHS
 				var lhsExpr = expr.getFirstExpr();
 				if (lhsExpr instanceof LocalExpression) {
+					onExpr(expr.getSecondExpr(), function (receiver) {
+						return function (expr) {
+							receiver.setSecondExpr(expr);
+						};
+					}(expr));
 					clearCacheByLocalName(lhsExpr.getLocal().getName().getValue());
 				} else if (lhsExpr instanceof PropertyExpression) {
 					onExpr(lhsExpr.getExpr(), function (receiver) {
@@ -1877,6 +1875,11 @@ var _LCSEOptimizeCommand = exports._LCSEOptimizeCommand = _FunctionOptimizeComma
 							receiver.setExpr(expr);
 						};
 					}(lhsExpr));
+					onExpr(expr.getSecondExpr(), function (receiver) {
+						return function (expr) {
+							receiver.setSecondExpr(expr);
+						};
+					}(expr));
 					if (lhsExpr.getIdentifierToken().getValue() == "length") {
 						// once we support caching array elements, we need to add special care
 					} else {
