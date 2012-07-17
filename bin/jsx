@@ -146,8 +146,20 @@ var JSX = Class.extend({
 			fs.unlinkSync(jsFile);
 		});
 
-		process.argv = [null, null].concat(args);
-		require(jsFile); // evaluate it in this process
+		if (process.env.JSX_RUNJS) {
+			var child = require("child_process").spawn(process.env.JSX_RUNJS, [jsFile].concat(args));
+			child.stdin.end();
+			child.stdout.on("data", function (data) {
+				process.stdout.write(data);
+			});
+			child.stderr.on("data", function (data) {
+				process.stderr.write(data);
+			});
+		}
+		else {
+			process.argv = [process.argv[0], jsFile].concat(args);
+			require(jsFile); // evaluate it in this process
+		}
 	},
 
 	$printHelp: function () {

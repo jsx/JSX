@@ -102,7 +102,8 @@ EOT
     $temp->close();
 
     # execute compiled node
-    open my $fh, "-|", "node $temp"
+    my $js = $ENV{JSX_RUNJS} || "node";
+    open my $fh, "-|", "$js $temp"
         or die "failed to invoke node:$!";
     local $/;
     my $output = <$fh>;
