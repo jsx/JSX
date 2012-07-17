@@ -730,9 +730,8 @@ var _FoldConstantCommand = exports._FoldConstantCommand = _FunctionOptimizeComma
 			// additive expression
 			var firstExpr = expr.getFirstExpr();
 			var secondExpr = expr.getSecondExpr();
-			if (this._isIntegerOrNumberLiteralExpression(firstExpr)) {
-				// type of second expr is checked by the callee
-				this._foldNumericBinaryExpression(expr, replaceCb);
+			if (this._foldNumericBinaryExpression(expr, replaceCb)) {
+				// done
 			} else if (firstExpr instanceof StringLiteralExpression && secondExpr instanceof StringLiteralExpression) {
 				replaceCb(
 					new StringLiteralExpression(
@@ -786,13 +785,40 @@ var _FoldConstantCommand = exports._FoldConstantCommand = _FunctionOptimizeComma
 
 	_foldNumericBinaryExpression: function (expr, replaceCb) {
 		// handles BinaryNumberExpression _and_ AdditiveExpression of numbers or integers
+
+		// if both operands are constant, then...
 		if (this._isIntegerOrNumberLiteralExpression(expr.getFirstExpr())
 			&& this._isIntegerOrNumberLiteralExpression(expr.getSecondExpr())) {
-			// ok
-		} else {
-			return;
+			return this._foldNumericBinaryExpressionOfConstants(expr, replaceCb);
 		}
 
+		// if either operand is zero, then...
+		function exprIsZero(expr) {
+			return expr instanceof NumberLiteralExpression && +expr.getToken().getValue() === 0;
+		}
+		switch (expr.getToken().getValue()) {
+		case "+":
+			if (exprIsZero(expr.getFirstExpr())) {
+				replaceCb(expr.getSecondExpr());
+				return true;
+			} else if (exprIsZero(expr.getSecondExpr())) {
+				replaceCb(expr.getFirstExpr());
+				return true;
+			}
+			break;
+		case "-":
+			// TODO should we rewrite "0 - n"?
+			if (exprIsZero(expr.getSecondExpr())) {
+				replaceCb(expr.getFirstExpr());
+				return true;
+			}
+			break;
+		}
+
+		return false;
+	},
+
+	_foldNumericBinaryExpressionOfConstants: function (expr, replaceCb) {
 		switch (expr.getToken().getValue()) {
 
 		// expressions that return number or integer depending on their types
@@ -812,7 +838,10 @@ var _FoldConstantCommand = exports._FoldConstantCommand = _FunctionOptimizeComma
 		case "|": this._foldNumericBinaryExpressionAsInteger(expr, replaceCb, function (x, y) { return x | y; }); break;
 		case "^": this._foldNumericBinaryExpressionAsInteger(expr, replaceCb, function (x, y) { return x ^ y; }); break;
 
+		default:
+			return false;
 		}
+		return true;
 	},
 
 	_foldNumericBinaryExpressionAsNumeric: function (expr, replaceCb, calcCb) {
