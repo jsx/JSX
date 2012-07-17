@@ -97,13 +97,20 @@ var _Util = exports._Util = Class.extend({
 	$exprHasSideEffects: function (expr) {
 		// FIXME native array access may have side effects
 		var onExpr = function (expr) {
-			if (expr instanceof CallExpression
-				|| expr instanceof FunctionExpression
+			if (expr instanceof FunctionExpression
 				|| expr instanceof NewExpression
 				|| expr instanceof AssignmentExpression
 				|| expr instanceof PreIncrementExpression
-				|| expr instanceof PostIncrementExpression)
+				|| expr instanceof PostIncrementExpression) {
 				return false;
+			} else if (expr instanceof CallExpression) {
+				var callingFuncDef = _DetermineCalleeCommand.getCallingFuncDef(expr);
+				if (callingFuncDef != null && (callingFuncDef.flags() & ClassDefinition.IS_PURE) != 0) {
+					// fall through (check receiver and arguments)
+				} else {
+					return false;
+				}
+			}
 			return expr.forEachExpression(onExpr);
 		};
 		return ! onExpr(expr);
@@ -916,22 +923,28 @@ var _DeadCodeEliminationOptimizeCommand = exports._DeadCodeEliminationOptimizeCo
 		if (funcDef.getStatements() == null) {
 			return null;
 		}
-		while (this._optimizeFunction(funcDef))
+		while (this._optimizeFunction(funcDef)
+			 || this._removeExpressionStatementsWithoutSideEffects(funcDef))
 			;
 	},
 
-	_optimizeFunction: function (funcDef) {
+	_removeExpressionStatementsWithoutSideEffects: function (funcDef) {
 		var shouldRetry = false;
-		// remove statements that does not have side effects
 		(function onStatements(statements) {
 			for (var i = 0; i < statements.length;) {
 				if (statements[i] instanceof ExpressionStatement && ! _Util.exprHasSideEffects(statements[i].getExpr())) {
+					shouldRetry = true;
 					statements.splice(i, 1);
 				} else {
 					statements[i++].handleStatements(onStatements.bind(this));
 				}
 			}
 		}.bind(this))(funcDef.getStatements());
+		return shouldRetry;
+	},
+
+	_optimizeFunction: function (funcDef) {
+		var shouldRetry = false;
 		// use the assignment source, if possible
 		_BasicBlockOptimizeCommand.prototype.optimizeFunction.call(this, funcDef);
 		// mark the variables that are used (as RHS)
@@ -992,6 +1005,11 @@ var _DeadCodeEliminationOptimizeCommand = exports._DeadCodeEliminationOptimizeCo
 	},
 
 	optimizeExpressions: function (funcDef, exprs) {
+		this._delayAssignmentsBetweenLocals(funcDef, exprs);
+		this._eliminateDeadStores(funcDef, exprs);
+	},
+
+	_delayAssignmentsBetweenLocals: function (funcDef, exprs) {
 		// find forms localA = localB, and rewrite the use of localA to localB
 		function setLocal(list, key, value) {
 			for (var i = 0; i < list.length; ++i) {
@@ -1081,6 +1099,15 @@ var _DeadCodeEliminationOptimizeCommand = exports._DeadCodeEliminationOptimizeCo
 					return true;
 				}
 			} else if (expr instanceof CallExpression) {
+				var callingFuncDef = _DetermineCalleeCommand.getCallingFuncDef(expr);
+				if (callingFuncDef != null && (callingFuncDef.flags() & ClassDefinition.IS_PURE) != 0) {
+					// fall through
+				} else {
+					expr.forEachExpression(onExpr);
+					clearLocals(locals);
+					return true;
+				}
+			} else if (expr instanceof NewExpression) {
 				expr.forEachExpression(onExpr);
 				clearLocals(locals);
 				return true;
@@ -1088,7 +1115,62 @@ var _DeadCodeEliminationOptimizeCommand = exports._DeadCodeEliminationOptimizeCo
 			return expr.forEachExpression(onExpr);
 		}.bind(this);
 		Util.forEachExpression(onExpr, exprs);
-	}
+	},
+
+	_eliminateDeadStores: function (funcDef, exprs) {
+		var lastAssignExpr = []; // array of [local, assignExpr, rewriteCb]
+		var onExpr = function (expr, rewriteCb) {
+			if (expr instanceof AssignmentExpression) {
+				if (expr.getToken().getValue() == "="
+					&& expr.getFirstExpr() instanceof LocalExpression) {
+					onExpr(expr.getSecondExpr(), function (assignExpr) {
+						return function (expr) {
+							assignExpr.setSecondExpr(expr);
+						};
+					}(expr));
+					var lhsLocal = expr.getFirstExpr().getLocal();
+					for (var i = 0; i < lastAssignExpr.length; ++i) {
+						if (lastAssignExpr[i][0] == lhsLocal) {
+							break;
+						}
+					}
+					if (i != lastAssignExpr.length) {
+						this.log("eliminating dead store to: " + lhsLocal.getName().getValue());
+						lastAssignExpr[i][2](lastAssignExpr[i][1].getSecondExpr());
+					}
+					lastAssignExpr[i] = [lhsLocal, expr, rewriteCb];
+					return true;
+				}
+			} else if (expr instanceof LocalExpression) {
+				for (var i = 0; i < lastAssignExpr.length; ++i) {
+					if (lastAssignExpr[i][0] == expr.getLocal()) {
+						lastAssignExpr.splice(i, 1);
+						break;
+					}
+				}
+			} else if (expr instanceof CallExpression) {
+				onExpr(expr.getExpr(), function (callExpr) {
+					return function (expr) {
+						callExpr.setExpr(expr);
+					};
+				}(expr));
+				Util.forEachExpression(onExpr, expr.getArguments());
+				var callingFuncDef = _DetermineCalleeCommand.getCallingFuncDef(expr);
+				if (callingFuncDef != null && (callingFuncDef.flags() & ClassDefinition.IS_PURE) != 0) {
+					// ok
+				} else {
+					lastAssignExpr.splice(0, lastAssignExpr.length);
+				}
+				return true;
+			} else if (expr instanceof NewExpression) {
+				Util.forEachExpression(onExpr, expr.getArguments());
+				lastAssignExpr.splice(0, lastAssignExpr.length);
+				return true;
+			}
+			return expr.forEachExpression(onExpr);
+		}.bind(this);
+		Util.forEachExpression(onExpr, exprs);
+	},
 
 });
 
