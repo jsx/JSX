@@ -200,11 +200,11 @@ native final class Number {
 	function toPrecision(precision : int) : string;
 
 	// 15.1.2 (Function Properties of the Global Object)
-	static function parseInt(str :string) :number;
-	static function parseInt(str :string, radix :int) :number;
-	static function parseFloat(str :string) :number;
-	static function isNaN(num :number) :boolean;
-	static function isFinite(num :number) :boolean;
+	static __pure__ function parseInt(str :string) :number;
+	static __pure__ function parseInt(str :string, radix :int) :number;
+	static __pure__ function parseFloat(str :string) :number;
+	static __pure__ function isNaN(num :number) :boolean;
+	static __pure__ function isFinite(num :number) :boolean;
 
 }
 
@@ -221,34 +221,34 @@ native final class Math {
 	static const SQRT2 = 1.4142135623730951;
 
 	// 15.8.2
-	static function abs(x :number) :number {
+	static __pure__ function abs(x :number) :number {
 		return x >= 0 ? x : -x;
 	}
-	static function acos(x :number) :number;
-	static function asin(x :number) :number;
-	static function atan(x :number) :number;
-	static function atan2(y :number, x :number) :number;
-	static function ceil(x :number) :number;
-	static function cos(x :number) :number;
-	static function exp(x :number) :number;
-	static function floor(x :number) :number;
-	static function log(x :number) :number;
-	static function max(value1 : number, value2 : number, value3 : number, ...valueN : number) : number;
-	static function max(value1 : number) : number;
-	static function min(value1 : number, value2 : number, value3 : number, ...valueN : number) : number;
-	static function min(value1 : number) : number;
-	static function pow(x :number, y :number) :number;
+	static __pure__ function acos(x :number) :number;
+	static __pure__ function asin(x :number) :number;
+	static __pure__ function atan(x :number) :number;
+	static __pure__ function atan2(y :number, x :number) :number;
+	static __pure__ function ceil(x :number) :number;
+	static __pure__ function cos(x :number) :number;
+	static __pure__ function exp(x :number) :number;
+	static __pure__ function floor(x :number) :number;
+	static __pure__ function log(x :number) :number;
+	static __pure__ function max(value1 : number, value2 : number, value3 : number, ...valueN : number) : number;
+	static __pure__ function max(value1 : number) : number;
+	static __pure__ function min(value1 : number, value2 : number, value3 : number, ...valueN : number) : number;
+	static __pure__ function min(value1 : number) : number;
+	static __pure__ function pow(x :number, y :number) :number;
 	static function random() :number;
-	static function round(x :number) :number;
-	static function sin(x :number) :number;
-	static function sqrt(x :number) :number;
-	static function tan(x :number) :number;
+	static __pure__ function round(x :number) :number;
+	static __pure__ function sin(x :number) :number;
+	static __pure__ function sqrt(x :number) :number;
+	static __pure__ function tan(x :number) :number;
 
 	// optimized (inlined) version for two-arg min/max
-	static function max(value1 :number, value2 :number) :number {
+	static __pure__ function max(value1 :number, value2 :number) :number {
 		return value1 >= value2 ? value1 : value2;
 	}
-	static function min(value1 :number, value2 :number) :number {
+	static __pure__ function min(value1 :number, value2 :number) :number {
 		return value1 <= value2 ? value1 : value2;
 	}
 }
