@@ -954,6 +954,19 @@ var _DeadCodeEliminationOptimizeCommand = exports._DeadCodeEliminationOptimizeCo
 			this._delayAssignmentsBetweenLocals(funcDef, exprs);
 			this._eliminateDeadStores(funcDef, exprs);
 		}.bind(this));
+		// remove statements without side-effects
+		(function onStatements(statements) {
+			for (var i = statements.length - 1; i >= 0; --i) {
+				var statement = statements[i];
+				if (statement instanceof ExpressionStatement) {
+					if (! _Util.exprHasSideEffects(statement.getExpr())) {
+						statements.splice(i, 1);
+					}
+				}
+				statement.handleStatements(onStatements);
+			}
+			return true;
+		}).call(null, funcDef.getStatements());
 		// mark the variables that are used (as RHS)
 		var locals = funcDef.getLocals();
 		var localsUsed = new Array(locals.length); // booleans
