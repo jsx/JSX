@@ -116,6 +116,71 @@ var _Util = exports._Util = Class.extend({
 		return ! onExpr(expr);
 	},
 
+	$optimizeBasicBlock: function (funcDef, optimizeExpressions) {
+		function optimizeStatements(statements) {
+			var statementIndex = 0;
+			while (statementIndex < statements.length) {
+				var exprsToOptimize = [];
+				var setOptimizedExprs = [];
+				while (statementIndex < statements.length) {
+					var statement = statements[statementIndex++];
+					if (statement instanceof ExpressionStatement) {
+						exprsToOptimize.push(statement.getExpr());
+						setOptimizedExprs.push(function (statement) {
+							return function (expr) {
+								statement.setExpr(expr);
+							}
+						}(statement));
+					} else if (statement instanceof ReturnStatement) {
+						var expr = statement.getExpr();
+						if (expr != null) {
+							exprsToOptimize.push(statement.getExpr());
+							setOptimizedExprs.push(function (statement) {
+								return function (expr) {
+									statement.setExpr(expr);
+								}
+							}(statement));
+						}
+						break;
+					} else {
+						statement.handleStatements(function (statements) {
+							optimizeStatements(funcDef, statements);
+						});
+						if (statement instanceof IfStatement) {
+							exprsToOptimize.push(statement.getExpr());
+							setOptimizedExprs.push(function (statement) {
+								return function (expr) {
+									statement.setExpr(expr);
+								};
+							}(statement));
+						} else if (statement instanceof SwitchStatement) {
+							exprsToOptimize.push(statement.getExpr());
+							setOptimizedExprs.push(function (statement) {
+								return function (expr) {
+									statement.setExpr(expr);
+								};
+							}(statement));
+						} else {
+							// TODO implement
+						}
+						break;
+					}
+				}
+				// optimize basic block
+				if (exprsToOptimize.length != 0) {
+					optimizeExpressions(exprsToOptimize);
+					for (var i = 0; i < exprsToOptimize.length; ++i) {
+						setOptimizedExprs[i](exprsToOptimize[i]);
+					}
+				}
+			}
+		}
+		var statements = funcDef.getStatements();
+		if (statements != null) {
+			optimizeStatements(statements);
+		}
+	}
+
 });
 
 var Optimizer = exports.Optimizer = Class.extend({
@@ -313,82 +378,6 @@ var _FunctionOptimizeCommand = exports._FunctionOptimizeCommand = _OptimizeComma
 	},
 
 	optimizeFunction: null // function (:MemberFunctionDefinition) : void
-
-});
-
-var _BasicBlockOptimizeCommand = exports._BasicBlockOptimizeCommand = _FunctionOptimizeCommand.extend({
-
-	constructor: function (identifier) {
-		_FunctionOptimizeCommand.prototype.constructor.call(this, identifier);
-	},
-
-	optimizeFunction: function (funcDef) {
-		var statements = funcDef.getStatements();
-		if (statements != null) {
-			this._optimizeStatements(funcDef, statements, 0);
-		}
-	},
-
-	_optimizeStatements: function (funcDef, statements) {
-		var statementIndex = 0;
-		while (statementIndex < statements.length) {
-			var exprsToOptimize = [];
-			var setOptimizedExprs = [];
-			while (statementIndex < statements.length) {
-				var statement = statements[statementIndex++];
-				if (statement instanceof ExpressionStatement) {
-					exprsToOptimize.push(statement.getExpr());
-					setOptimizedExprs.push(function (statement) {
-						return function (expr) {
-							statement.setExpr(expr);
-						}
-					}(statement));
-				} else if (statement instanceof ReturnStatement) {
-					var expr = statement.getExpr();
-					if (expr != null) {
-						exprsToOptimize.push(statement.getExpr());
-						setOptimizedExprs.push(function (statement) {
-							return function (expr) {
-								statement.setExpr(expr);
-							}
-						}(statement));
-					}
-					break;
-				} else {
-					statement.handleStatements(function (statements) {
-						this._optimizeStatements(funcDef, statements);
-					}.bind(this));
-					if (statement instanceof IfStatement) {
-						exprsToOptimize.push(statement.getExpr());
-						setOptimizedExprs.push(function (statement) {
-							return function (expr) {
-								statement.setExpr(expr);
-							};
-						}(statement));
-					} else if (statement instanceof SwitchStatement) {
-						exprsToOptimize.push(statement.getExpr());
-						setOptimizedExprs.push(function (statement) {
-							return function (expr) {
-								statement.setExpr(expr);
-							};
-						}(statement));
-					} else {
-						// TODO implement
-					}
-					break;
-				}
-			}
-			// optimize basic block
-			if (exprsToOptimize.length != 0) {
-				this.optimizeExpressions(funcDef, exprsToOptimize);
-				for (var i = 0; i < exprsToOptimize.length; ++i) {
-					setOptimizedExprs[i](exprsToOptimize[i]);
-				}
-			}
-		}
-	},
-
-	optimizeExpressions: null // function (funcDef, exprs)
 
 });
 
@@ -927,10 +916,10 @@ var _FoldConstantCommand = exports._FoldConstantCommand = _FunctionOptimizeComma
 
 });
 
-var _DeadCodeEliminationOptimizeCommand = exports._DeadCodeEliminationOptimizeCommand = _BasicBlockOptimizeCommand.extend({
+var _DeadCodeEliminationOptimizeCommand = exports._DeadCodeEliminationOptimizeCommand = _FunctionOptimizeCommand.extend({
 
 	constructor: function () {
-		_BasicBlockOptimizeCommand.prototype.constructor.call(this, "dce");
+		_FunctionOptimizeCommand.prototype.constructor.call(this, "dce");
 	},
 
 	optimizeFunction: function (funcDef) {
@@ -960,7 +949,10 @@ var _DeadCodeEliminationOptimizeCommand = exports._DeadCodeEliminationOptimizeCo
 	_optimizeFunction: function (funcDef) {
 		var shouldRetry = false;
 		// use the assignment source, if possible
-		_BasicBlockOptimizeCommand.prototype.optimizeFunction.call(this, funcDef);
+		_Util.optimizeBasicBlock(funcDef, function (exprs) {
+			this._delayAssignmentsBetweenLocals(funcDef, exprs);
+			this._eliminateDeadStores(funcDef, exprs);
+		}.bind(this));
 		// mark the variables that are used (as RHS)
 		var locals = funcDef.getLocals();
 		var localsUsed = new Array(locals.length); // booleans
@@ -1016,11 +1008,6 @@ var _DeadCodeEliminationOptimizeCommand = exports._DeadCodeEliminationOptimizeCo
 			locals.splice(localIndex, 1);
 		}
 		return shouldRetry;
-	},
-
-	optimizeExpressions: function (funcDef, exprs) {
-		this._delayAssignmentsBetweenLocals(funcDef, exprs);
-		this._eliminateDeadStores(funcDef, exprs);
 	},
 
 	_delayAssignmentsBetweenLocals: function (funcDef, exprs) {
@@ -1775,13 +1762,19 @@ var _LCSECachedExpression = exports._LCSECachedExpression = Class.extend({
 
 });
 
-var _LCSEOptimizeCommand = exports._LCSEOptimizeCommand = _BasicBlockOptimizeCommand.extend({
+var _LCSEOptimizeCommand = exports._LCSEOptimizeCommand = _FunctionOptimizeCommand.extend({
 
 	constructor: function () {
-		_BasicBlockOptimizeCommand.prototype.constructor.call(this, "lcse");
+		_FunctionOptimizeCommand.prototype.constructor.call(this, "lcse");
 	},
 
-	optimizeExpressions: function (funcDef, exprs) {
+	optimizeFunction: function (funcDef) {
+		_Util.optimizeBasicBlock(funcDef, function (exprs) {
+			this._optimizeExpressions(funcDef, exprs);
+		}.bind(this));
+	},
+
+	_optimizeExpressions: function (funcDef, exprs) {
 		this.log("optimizing expressions starting");
 
 		var cachedExprs = {};
