@@ -144,7 +144,8 @@ var _Util = exports._Util = Class.extend({
 						break;
 					} else {
 						statement.handleStatements(function (statements) {
-							optimizeStatements(funcDef, statements);
+							optimizeStatements(statements);
+							return true;
 						});
 						if (statement instanceof IfStatement) {
 							exprsToOptimize.push(statement.getExpr());
@@ -1063,6 +1064,11 @@ var _DeadCodeEliminationOptimizeCommand = exports._DeadCodeEliminationOptimizeCo
 				if (expr.getFirstExpr() instanceof LocalExpression
 					&& ! getLocal(localsUntouchable, expr.getFirstExpr().getLocal())
 					&& expr.getFirstExpr().getType().equals(expr.getSecondExpr().getType())) {
+					onExpr(expr.getSecondExpr(), function (assignExpr) {
+						return function (expr) {
+							assignExpr.setSecondExpr(expr);
+						};
+					}(expr));
 					var lhsLocal = expr.getFirstExpr().getLocal();
 					this.log("resetting cache for: " + lhsLocal.getName().getValue());
 					for (var i = locals.length - 1; i >= 0; --i) {
@@ -1082,16 +1088,15 @@ var _DeadCodeEliminationOptimizeCommand = exports._DeadCodeEliminationOptimizeCo
 								this.log("  set to: " + rhsLocal.getName().getValue());
 								setLocal(locals, lhsLocal, rhsExpr);
 							}
-							return true;
 						} else if (rhsExpr instanceof NullExpression
 							|| rhsExpr instanceof NumberLiteralExpression
 							|| rhsExpr instanceof IntegerLiteralExpression
 							|| rhsExpr instanceof StringLiteralExpression) {
 							this.log("  set to: " + rhsExpr.getToken().getValue());
 							setLocal(locals, lhsLocal, rhsExpr);
-							return true;
 						}
 					}
+					return true;
 				}
 			} else if (expr instanceof LocalExpression) {
 				var cachedExpr = getLocal(locals, expr.getLocal());
