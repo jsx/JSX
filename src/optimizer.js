@@ -130,6 +130,16 @@ var Optimizer = exports.Optimizer = Class.extend({
 
 	setup: function (cmds) {
 
+		var determineCallee = function () {
+			var inserted = false;
+			return function () {
+				if (! inserted) {
+					this._commands.push(new _DetermineCalleeCommand());
+					inserted = true;
+				}
+			}.bind(this);
+		}.call(this);
+
 		for (var i = 0; i < cmds.length; ++i) {
 			var cmd = cmds[i];
 			if (cmd == "lto") {
@@ -141,15 +151,17 @@ var Optimizer = exports.Optimizer = Class.extend({
 			} else if (cmd == "fold-const") {
 				this._commands.push(new _FoldConstantCommand());
 			} else if (cmd == "dce") {
+				determineCallee();
 				this._commands.push(new _DeadCodeEliminationOptimizeCommand());
 			} else if (cmd == "inline") {
-				this._commands.push(new _DetermineCalleeCommand());
+				determineCallee();
 				this._commands.push(new _InlineOptimizeCommand());
 			} else if (cmd == "return-if") {
 				this._commands.push(new _ReturnIfOptimizeCommand());
 			} else if (cmd == "lcse") {
 				this._commands.push(new _LCSEOptimizeCommand());
 			} else if (cmd == "unbox") {
+				determineCallee();
 				this._commands.push(new _UnboxOptimizeCommand());
 			} else if (cmd == "array-length") {
 				this._commands.push(new _ArrayLengthOptimizeCommand());
