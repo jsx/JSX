@@ -1966,17 +1966,23 @@ var SuperExpression = exports.SuperExpression = OperatorExpression.extend({
 
 var NewExpression = exports.NewExpression = OperatorExpression.extend({
 
-	constructor: function (operatorToken, type, args) {
-		OperatorExpression.prototype.constructor.call(this, operatorToken);
-		this._type = type;
-		this._args = args;
-		this._constructor = null;
+	constructor: function (tokenOrThat, type, args) {
+		if (tokenOrThat instanceof NewExpression) {
+			var that = tokenOrThat;
+			OperatorExpression.prototype.constructor.call(this, that);
+			this._type = that._type;
+			this._args = Util.cloneArray(that._args);
+			this._constructor = that._constructor;
+		} else {
+			OperatorExpression.prototype.constructor.call(this, tokenOrThat);
+			this._type = type;
+			this._args = args;
+			this._constructor = null;
+		}
 	},
 
 	clone: function () {
-		var ret = new NewExpression(this._token, this._type, Util.cloneArray(this._args));
-		ret._constructor = this._constructor;
-		return ret;
+		return new NewExpression(this);
 	},
 
 	getQualifiedName: function () {
