@@ -1,7 +1,7 @@
 
 JOBS:=4
 
-OPTIMIZE_FLAGS := lto,fold-const,return-if,inline,unbox,fold-const,array-length
+OPTIMIZE_FLAGS := lto,fold-const,return-if,inline,dce,unbox,fold-const,dce,lcse,array-length
 
 all:
 
