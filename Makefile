@@ -1,6 +1,8 @@
 
 JOBS:=4
 
+OPTIMIZE_FLAGS := lto,fold-const,return-if,inline,unbox,fold-const,array-length
+
 all:
 
 setup:
@@ -12,7 +14,7 @@ test:
 	prove --jobs "$(JOBS)" t/*.t t/*/*.jsx
 
 test-optimized:
-		JSX_OPTS="--optimize lto,no-assert,fold-const,return-if,inline,fold-const" prove --jobs "$(JOBS)" t/*/*.jsx
+		JSX_OPTS="--optimize $(OPTIMIZE_FLAGS)" prove --jobs "$(JOBS)" t/*/*.jsx
 
 test-all: test test-optimized
 
@@ -21,7 +23,8 @@ optimize-bench:
 
 web:
 	perl web/build.pl --clean
-	jsx --executable web --profile --output web/profiler/fireworks.jsx.js web/profiler/fireworks.jsx
+	time bin/jsx --executable web --profile --output web/profiler/fireworks.jsx.js web/profiler/fireworks.jsx
+	time bin/jsx --executable web --release --output web/example/aobench/aobench.jsx.js web/example/aobench/aobench.jsx
 
 server:
 	node web/server.js

@@ -121,7 +121,7 @@ native final class String {
 	function indexOf(searchString : string, position : int) : int;
 	function lastIndexOf(searchString : string) : int;
 	function lastIndexOf(searchString : string, position : int) : int;
-	// FIXME localeCompare?
+	function localeCompare(that : string) : int;
 	function match(regexp : RegExp) : string [];
 	function replace(searchValue : string, replaceValue : string) : string;
 	function replace(searchValue : RegExp, replaceValue : string) : string;

@@ -1947,6 +1947,9 @@ var _UnboxOptimizeCommand = exports._UnboxOptimizeCommand = _FunctionOptimizeCom
 			// first check the local = new ...
 			var newExpr = this._statementIsConstructingTheLocal(statement, local);
 			if (newExpr != null) {
+				if (! newExpr.getType().equals(local.getType())) {
+					return false;
+				}
 				if (! this._newExpressionCanUnbox(newExpr)) {
 					return false;
 				}
@@ -2023,10 +2026,13 @@ var _UnboxOptimizeCommand = exports._UnboxOptimizeCommand = _FunctionOptimizeCom
 
 		// build map of propetyName => LocalVariable
 		var variableMap = {};
-		local.getType().getClassDef().forEachMemberVariable(function (member) {
-			if ((member.flags() & ClassDefinition.IS_STATIC) == 0) {
-				variableMap[member.name()] = this.createVar(funcDef, member.getType(), local.getName().getValue() + "$" + member.name());
-			}
+		local.getType().getClassDef().forEachClassFromBase(function (classDef) {
+			classDef.forEachMemberVariable(function (member) {
+				if ((member.flags() & (ClassDefinition.IS_STATIC | ClassDefinition.IS_ABSTRACT)) == 0) {
+					variableMap[member.name()] = this.createVar(funcDef, member.getType(), local.getName().getValue() + "$" + member.name());
+				}
+				return true;
+			}.bind(this));
 			return true;
 		}.bind(this));
 		var createLocalExpressionFor = function (propertyName) {
@@ -2142,7 +2148,8 @@ var _ArrayLengthOptimizeCommand = exports._ArrayLengthOptimizeCommand = _Functio
 		funcDef.forEachStatement(function onStatement(statement) {
 			statement.forEachStatement(onStatement.bind(this));
 			if (statement instanceof ForStatement) {
-				var arrayLocal = this._hasLengthExprOfLocalArray(statement.getCondExpr());
+				var condExpr = statement.getCondExpr();
+				var arrayLocal = condExpr != null ? this._hasLengthExprOfLocalArray(condExpr) : null;
 				if (arrayLocal != null) {
 					if (this._lengthIsUnmodifiedInExpr(statement.getCondExpr())
 						&& this._lengthIsUnmodifiedInExpr(statement.getPostExpr())
