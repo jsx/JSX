@@ -994,40 +994,58 @@ var _DeadCodeEliminationOptimizeCommand = exports._DeadCodeEliminationOptimizeCo
 		}
 		var localsUntouchable = []; // list of [local, boolean]
 		var locals = []; // list of [local, expr]
+		function invalidateLocal(local) {
+			for (var i = 0; i < locals.length;) {
+				if (locals[i][0] == local) {
+					locals.splice(i, 1);
+				} else if (locals[i][1] instanceof LocalExpression && locals[i][1].getLocal() == local) {
+					locals.splice(i, 1);
+				} else {
+					++i;
+				}
+			}
+		}
 		// mark the locals that uses op= (cannot be eliminated by the algorithm applied laterwards)
-		Util.forEachExpression(function onExpr(expr) {
+		var onExpr = function (expr) {
 			if (expr instanceof AssignmentExpression
 				&& expr.getToken().getValue() != "="
 				&& expr.getFirstExpr() instanceof LocalExpression) {
-				setLocal(localsUntouchable, expr.getFirstExpr().getLocal());
+				this.log("local variable " + expr.getFirstExpr().getLocal().getName().getValue() + " cannot be rewritten (has fused op)");
+				setLocal(localsUntouchable, expr.getFirstExpr().getLocal(), true);
+			} else if ((expr instanceof PreIncrementExpression || expr instanceof PostIncrementExpression)
+				&& expr.getExpr() instanceof LocalExpression) {
+				this.log("local variable " + expr.getExpr().getLocal().getName().getValue() + " cannot be rewritten (has increment)");
+				setLocal(localsUntouchable, expr.getExpr().getLocal(), true);
 			}
 			return expr.forEachExpression(onExpr);
-		}, exprs);
+		}.bind(this);
+		Util.forEachExpression(onExpr, exprs);
 		// rewrite the locals
 		var onExpr = function (expr, replaceCb) {
 			if (expr instanceof AssignmentExpression) {
-				if (expr.getToken().getValue() == "="
-					&& expr.getFirstExpr() instanceof LocalExpression
-					&& getLocal(localsUntouchable, expr.getFirstExpr().getLocal()) != null
+				if (expr.getFirstExpr() instanceof LocalExpression
+					&& ! getLocal(localsUntouchable, expr.getFirstExpr().getLocal())
 					&& expr.getFirstExpr().getType().equals(expr.getSecondExpr().getType())) {
 					var lhsLocal = expr.getFirstExpr().getLocal();
 					this.log("resetting cache for: " + lhsLocal.getName().getValue());
-					deleteLocal(locals, lhsLocal);
-					var rhsExpr = expr.getSecondExpr();
-					if (rhsExpr instanceof LocalExpression) {
-						var rhsLocal = rhsExpr.getLocal();
-						if (lhsLocal != rhsLocal) {
-							this.log("  set to: " + rhsLocal.getName().getValue());
+					invalidateLocal(lhsLocal);
+					if (expr.getToken().getValue() == "=") {
+						var rhsExpr = expr.getSecondExpr();
+						if (rhsExpr instanceof LocalExpression) {
+							var rhsLocal = rhsExpr.getLocal();
+							if (lhsLocal != rhsLocal) {
+								this.log("  set to: " + rhsLocal.getName().getValue());
+								setLocal(locals, lhsLocal, rhsExpr);
+							}
+							return true;
+						} else if (rhsExpr instanceof NullExpression
+							|| rhsExpr instanceof NumberLiteralExpression
+							|| rhsExpr instanceof IntegerLiteralExpression
+							|| rhsExpr instanceof StringLiteralExpression) {
+							this.log("  set to: " + rhsExpr.getToken().getValue());
 							setLocal(locals, lhsLocal, rhsExpr);
+							return true;
 						}
-						return true;
-					} else if (rhsExpr instanceof NullExpression
-						|| rhsExpr instanceof NumberLiteralExpression
-						|| rhsExpr instanceof IntegerLiteralExpression
-						|| rhsExpr instanceof StringLiteralExpression) {
-						this.log("  set to: " + rhsExpr.getToken().getValue());
-						setLocal(locals, lhsLocal, rhsExpr);
-						return true;
 					}
 				}
 			} else if (expr instanceof LocalExpression) {
