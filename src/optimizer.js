@@ -196,15 +196,13 @@ var Optimizer = exports.Optimizer = Class.extend({
 
 	setup: function (cmds) {
 
+		var determineCalleeIsInserted = false;
 		var determineCallee = function () {
-			var inserted = false;
-			return function () {
-				if (! inserted) {
-					this._commands.push(new _DetermineCalleeCommand());
-					inserted = true;
-				}
-			}.bind(this);
-		}.call(this);
+			if (! determineCalleeIsInserted) {
+				this._commands.push(new _DetermineCalleeCommand());
+				determineCalleeIsInserted = true;
+			}
+		}.bind(this);
 
 		for (var i = 0; i < cmds.length; ++i) {
 			var cmd = cmds[i];
@@ -214,6 +212,11 @@ var Optimizer = exports.Optimizer = Class.extend({
 				this._commands.push(new _NoAssertCommand());
 			} else if (cmd == "no-log") {
 				this._commands.push(new _NoLogCommand());
+			} else if (cmd == "unclassify") {
+				this._commands.push(new _UnclassifyOptimizationCommand());
+				if (determineCalleeIsInserted) {
+					this._commands.push(new _DetermineCalleeCommand());
+				}
 			} else if (cmd == "fold-const") {
 				this._commands.push(new _FoldConstantCommand());
 			} else if (cmd == "dce") {
@@ -652,6 +655,139 @@ var _DetermineCalleeCommand = exports._DetermineCalleeCommand = _FunctionOptimiz
 		if (stash === undefined)
 			throw new Error("callee not searched");
 		return stash.callingFuncDef;
+	}
+
+});
+
+var _UnclassifyOptimizationCommand = exports._UnclassifyOptimizationCommand = _OptimizeCommand.extend({
+
+	$IDENTIFIER: "unclassify",
+
+	constructor: function () {
+		_OptimizeCommand.prototype.constructor.call(this, _UnclassifyOptimizationCommand.IDENTIFIER);
+	},
+
+	performOptimization: function () {
+		var classDefs = this._getUnclassifiableClassDefs();
+		classDefs.forEach(function (classDef) {
+			// convert function definitions (expect constructor) to static
+			this.log("unclassifying class: " + classDef.className());
+			classDef.forEachMemberFunction(function onFunction(funcDef) {
+				if ((funcDef.flags() & ClassDefinition.IS_STATIC) == 0 && funcDef.name() != "constructor") {
+					this.log("rewriting method to static function: " + funcDef.name());
+					this._rewriteFunctionAsStatic(funcDef);
+				}
+				return true;
+			}.bind(this));
+			return true;
+		}.bind(this));
+		// rewrite member method invocations to static function calls
+		this.getCompiler().forEachClassDef(function (parser, classDef) {
+			this.log("rewriting member method calls in class: " + classDef.className());
+			var onFunction = function (funcDef) {
+				this._rewriteMethodCallsToStatic(funcDef, classDefs);
+				return funcDef.forEachClosure(onFunction);
+			}.bind(this);
+			return classDef.forEachMemberFunction(onFunction);
+		}.bind(this));
+	},
+
+	_getUnclassifiableClassDefs: function () {
+		var candidates = [];
+		// list final classes extended from Object that has no overrides
+		this.getCompiler().forEachClassDef(function (parser, classDef) {
+			if ((classDef.flags() & (ClassDefinition.IS_FINAL | ClassDefinition.IS_NATIVE)) == ClassDefinition.IS_FINAL
+				&& classDef.extendType().getClassDef().className() == "Object"
+				&& classDef.implementTypes().length == 0
+				&& classDef.forEachMemberFunction(function (funcDef) {
+					return (funcDef.flags() & ClassDefinition.IS_OVERRIDE) == 0;
+				})) {
+				candidates.push(classDef);
+			}
+			return true;
+		}.bind(this));
+		this.getCompiler().forEachClassDef(function (parser, classDef) {
+			return classDef.forEachMemberFunction(function onFunction(funcDef) {
+				if (candidates.length == 0) {
+					return false;
+				}
+				funcDef.forEachStatement(function onStatement(statement) {
+					statement.forEachExpression(function onExpr(expr) {
+						if (expr instanceof InstanceofExpression) {
+							var foundClassDefIndex = candidates.indexOf(expr.getExpectedType().getClassDef());
+							if (foundClassDefIndex != -1) {
+								candidates.splice(foundClassDefIndex, 1);
+								if (candidates.length == 0) {
+									return false;
+								}
+							}
+						}
+						return expr.forEachExpression(onExpr);
+					});
+					return statement.forEachStatement(onStatement);
+				});
+				return funcDef.forEachClosure(onFunction);
+			});
+		});
+		return candidates;
+	},
+
+	_rewriteFunctionAsStatic: function (funcDef) {
+		// first argument should be this
+		var thisArg = new ArgumentDeclaration(new Token("$this", true), new ObjectType(funcDef.getClassDef()));
+		funcDef.getArguments().unshift(thisArg);
+		// rewrite this
+		funcDef.forEachStatement(function onStatement(statement) {
+			return statement.forEachExpression(function onExpr(expr, replaceCb) {
+				if (expr instanceof ThisExpression) {
+					replaceCb(new LocalExpression(thisArg.getName(), thisArg));
+				} else if (expr instanceof FunctionExpression) {
+					return expr.getFuncDef().forEachStatement(onStatement);
+				}
+				return expr.forEachExpression(onExpr);
+			}) && statement.forEachStatement(onStatement);
+		});
+		// update flags
+		funcDef.setFlags(funcDef.flags() | ClassDefinition.IS_STATIC);
+	},
+
+	_rewriteMethodCallsToStatic: function (funcDef, unclassifyingClassDefs) {
+		var onExpr = function (expr, replaceCb) {
+			if (expr instanceof CallExpression) {
+				var calleeExpr = expr.getExpr();
+				if (calleeExpr instanceof PropertyExpression
+					&& ! (calleeExpr.getExpr() instanceof ClassExpression)
+					&& ! calleeExpr.getType().isAssignable()) {
+					// is a member method call
+					var receiverType = calleeExpr.getExpr().getType().resolveIfNullable();
+					var receiverClassDef = receiverType.getClassDef();
+					if (unclassifyingClassDefs.indexOf(receiverClassDef) != -1) {
+						// found, rewrite
+						this.log((funcDef.getNameToken() != null ? funcDef.name() : "<<unnamed>>") + ":" + receiverClassDef.className() + "#" + calleeExpr.getIdentifierToken().getValue());
+						Util.forEachExpression(expr.getArguments());
+						var funcType = calleeExpr.getType();
+						replaceCb(
+							new CallExpression(
+								expr.getToken(),
+								new PropertyExpression(
+									calleeExpr.getToken(),
+									new ClassExpression(new Token(receiverClassDef.className(), true), receiverType),
+									calleeExpr.getIdentifierToken(),
+									new StaticFunctionType(
+										funcType.getReturnType(),
+										[ receiverType ].concat(funcType.getArgumentTypes()),
+										false)),
+								[ calleeExpr.getExpr() ].concat(expr.getArguments())));
+						return true;
+					}
+				}
+			}
+			return expr.forEachExpression(onExpr);
+		}.bind(this);
+		funcDef.forEachStatement(function onStatement(statement) {
+			statement.forEachExpression(onExpr);
+			return statement.forEachStatement(onStatement);
+		});
 	}
 
 });
