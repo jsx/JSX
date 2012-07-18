@@ -951,6 +951,7 @@ var _DeadCodeEliminationOptimizeCommand = exports._DeadCodeEliminationOptimizeCo
 		var shouldRetry = false;
 		// use the assignment source, if possible
 		_Util.optimizeBasicBlock(funcDef, function (exprs) {
+			this._eliminateDeadStoresToProperties(funcDef, exprs);
 			this._delayAssignmentsBetweenLocals(funcDef, exprs);
 			this._eliminateDeadStores(funcDef, exprs);
 		}.bind(this));
@@ -1190,6 +1191,73 @@ var _DeadCodeEliminationOptimizeCommand = exports._DeadCodeEliminationOptimizeCo
 		}.bind(this);
 		Util.forEachExpression(onExpr, exprs);
 	},
+
+	_eliminateDeadStoresToProperties: function (funcDef, exprs) {
+		function isFirstLevelPropertyAccess(expr) {
+			if (! (expr instanceof PropertyExpression)) {
+				return false;
+			}
+			var baseExpr = expr.getExpr();
+			if (baseExpr instanceof LocalExpression
+				|| baseExpr instanceof ThisExpression
+				|| baseExpr instanceof ClassExpression) {
+				return true;
+			} else {
+				return false;
+			}
+		}
+		function baseExprsAreEqual(x, y) {
+			if (x instanceof LocalExpression && y instanceof LocalExpression) {
+				return x.getLocal() == y.getLocal();
+			} else if (x instanceof ThisExpression && y instanceof ThisExpression) {
+				return true;
+			} else if (x instanceof ClassExpression && y instanceof ClassExpression) {
+				return x.getType().equals(y.getType());
+			}
+			return false;
+		}
+		var lastAssignExpr = {}; // array of propertyName => [assignExpr, rewriteCb]
+		var onExpr = function (expr, rewriteCb) {
+			if (expr instanceof AssignmentExpression) {
+				if (expr.getToken().getValue() == "="
+					&& isFirstLevelPropertyAccess(expr.getFirstExpr())
+					&& ! _Util.classIsNative(expr.getFirstExpr().getExpr().getType().getClassDef())) {
+					var propertyName = expr.getFirstExpr().getIdentifierToken().getValue();
+					onExpr(expr.getSecondExpr());
+					if (lastAssignExpr[propertyName]
+						&& baseExprsAreEqual(expr.getFirstExpr().getExpr(), lastAssignExpr[propertyName][0].getFirstExpr().getExpr())) {
+						lastAssignExpr[propertyName][1](lastAssignExpr[propertyName][0].getSecondExpr());
+					}
+					lastAssignExpr[propertyName] = [expr, rewriteCb];
+					return true;
+				} else if (expr.getFirstExpr() instanceof LocalExpression) {
+					onExpr(expr.getSecondExpr());
+					for (var k in lastAssignExpr) {
+						var baseExpr = lastAssignExpr[k][0].getFirstExpr().getExpr();
+						if (baseExpr instanceof LocalExpression
+							&& baseExpr.getLocal() == expr.getFirstExpr().getLocal()) {
+							delete lastAssignExpr[k];
+						}
+					}
+					return true;
+				}
+			} else if (isFirstLevelPropertyAccess(expr)) {
+				var propertyName = expr.getIdentifierToken().getValue();
+				delete lastAssignExpr[propertyName];
+			} else if (expr instanceof CallExpression) {
+				onExpr(expr.getExpr());
+				Util.forEachExpression(onExpr, expr.getArguments());
+				lastAssignExpr = {};
+				return true;
+			} else if (expr instanceof NewExpression) {
+				Util.forEachExpression(onExpr, expr.getArguments());
+				lastAssignExpr = {};
+				return true;
+			}
+			return expr.forEachExpression(onExpr);
+		}.bind(this);
+		Util.forEachExpression(onExpr, exprs);
+	}
 
 });
 
