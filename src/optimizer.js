@@ -196,11 +196,11 @@ var Optimizer = exports.Optimizer = Class.extend({
 
 	setup: function (cmds) {
 
-		var determineCalleeIsInserted = false;
+		var calleesAreDetermined = false;
 		var determineCallee = function () {
-			if (! determineCalleeIsInserted) {
+			if (! calleesAreDetermined) {
 				this._commands.push(new _DetermineCalleeCommand());
-				determineCalleeIsInserted = true;
+				calleesAreDetermined = true;
 			}
 		}.bind(this);
 
@@ -214,9 +214,7 @@ var Optimizer = exports.Optimizer = Class.extend({
 				this._commands.push(new _NoLogCommand());
 			} else if (cmd == "unclassify") {
 				this._commands.push(new _UnclassifyOptimizationCommand());
-				if (determineCalleeIsInserted) {
-					this._commands.push(new _DetermineCalleeCommand());
-				}
+				calleesAreDetermined = false;
 			} else if (cmd == "fold-const") {
 				this._commands.push(new _FoldConstantCommand());
 			} else if (cmd == "dce") {
