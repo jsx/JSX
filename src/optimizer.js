@@ -621,16 +621,7 @@ var _DetermineCalleeCommand = exports._DetermineCalleeCommand = _FunctionOptimiz
 	},
 
 	$findCallingFunctionInClass: function (classDef, funcName, argTypes, isStatic) {
-		var found = null;
-		classDef.forEachMemberFunction(function (funcDef) {
-			if (isStatic == ((funcDef.flags() & ClassDefinition.IS_STATIC) != 0)
-				&& funcDef.name() == funcName
-				&& Util.typesAreEqual(funcDef.getArgumentTypes(), argTypes)) {
-				found = funcDef;
-				return false;
-			}
-			return true;
-		});
+		var found = Util.findFunctionInClass(classDef, funcName, argTypes, isStatic);
 		// only return if the found function is final
 		if (found != null) {
 			if ((found.flags() & (ClassDefinition.IS_STATIC | ClassDefinition.IS_FINAL)) == 0)
@@ -659,6 +650,18 @@ var _DetermineCalleeCommand = exports._DetermineCalleeCommand = _FunctionOptimiz
 
 });
 
+var _UnclassifyOptimizationCommandStash = exports._UnclassifyOptimizationCommandStash = Class.extend({
+
+	constructor: function (that /* optional */) {
+		this.isInlineable = that ? that.isInlineable : false;
+	},
+
+	clone: function () {
+		return new _DetermineCalleeCommandStash(this);
+	}
+
+});
+
 var _UnclassifyOptimizationCommand = exports._UnclassifyOptimizationCommand = _OptimizeCommand.extend({
 
 	$IDENTIFIER: "unclassify",
@@ -667,8 +670,12 @@ var _UnclassifyOptimizationCommand = exports._UnclassifyOptimizationCommand = _O
 		_OptimizeCommand.prototype.constructor.call(this, _UnclassifyOptimizationCommand.IDENTIFIER);
 	},
 
+	_createStash: function () {
+		return new _UnclassifyOptimizationCommandStash();
+	},
+
 	performOptimization: function () {
-		var classDefs = this._getUnclassifiableClassDefs();
+		var classDefs = this._getClassesToUnclassify();
 		classDefs.forEach(function (classDef) {
 			// convert function definitions (expect constructor) to static
 			this.log("unclassifying class: " + classDef.className());
@@ -692,7 +699,7 @@ var _UnclassifyOptimizationCommand = exports._UnclassifyOptimizationCommand = _O
 		}.bind(this));
 	},
 
-	_getUnclassifiableClassDefs: function () {
+	_getClassesToUnclassify: function () {
 		var candidates = [];
 		// list final classes extended from Object that has no overrides
 		this.getCompiler().forEachClassDef(function (parser, classDef) {
@@ -706,6 +713,28 @@ var _UnclassifyOptimizationCommand = exports._UnclassifyOptimizationCommand = _O
 			}
 			return true;
 		}.bind(this));
+		// mark constructors that are inlineable
+		for (var candidateIndex = candidates.length - 1; candidateIndex >= 0; --candidateIndex) {
+			var hasInlineableCtor = false;
+			candidates[candidateIndex].forEachMemberFunction(function (funcDef) {
+				if ((funcDef.flags() & ClassDefinition.IS_STATIC) == 0 && funcDef.name() == "constructor") {
+					var isInlineable = this._constructorIsInlineable(funcDef);
+					this.log(funcDef.getClassDef().className() + "#constructor(" + funcDef.getArgumentTypes().map(function (arg) { return ":" + arg.toString(); }).join(",") + ") is" + (isInlineable ? "" : " not") + " inlineable");
+					if (isInlineable) {
+						this.getStash(funcDef).isInlineable = true;
+						hasInlineableCtor = true;
+					}
+				}
+				return true;
+			}.bind(this));
+			if (! hasInlineableCtor) {
+				candidates.splice(candidateIndex, 1);
+			}
+		}
+		if (candidates.length == 0) {
+			return candidates;
+		}
+		// check that the class is not referred to by: instanceof
 		this.getCompiler().forEachClassDef(function (parser, classDef) {
 			return classDef.forEachMemberFunction(function onFunction(funcDef) {
 				if (candidates.length == 0) {
@@ -730,6 +759,62 @@ var _UnclassifyOptimizationCommand = exports._UnclassifyOptimizationCommand = _O
 			});
 		});
 		return candidates;
+	},
+
+	_constructorIsInlineable: function (funcDef) {
+		if (funcDef.getLocals().length != 0) {
+			return false;
+		}
+		var statements = funcDef.getStatements();
+		// build list of properties
+		var properties = [];
+		funcDef.getClassDef().forEachMemberVariable(function (member) {
+			if ((member.flags() & ClassDefinition.IS_STATIC) == 0) {
+				properties.push(member);
+			}
+			return true;
+		});
+		// only optimize the most simple form, the repetition of "this.foo = argN" in the order of properties (and in the order of arguments)
+		var initializePropertyIndex = 0;
+		var expectedArgIndex = 0;
+		for (var statementIndex = 0; statementIndex < statements.length; ++statementIndex) {
+			if (initializePropertyIndex >= properties.length) {
+				return false;
+			}
+			if (! (statements[statementIndex] instanceof ExpressionStatement)) {
+				return false;
+			}
+			var statementExpr = statements[statementIndex].getExpr();
+			if (! (statementExpr instanceof AssignmentExpression)) {
+				return false;
+			}
+			var lhsExpr = statementExpr.getFirstExpr();
+			if (! (lhsExpr instanceof PropertyExpression && lhsExpr.getExpr() instanceof ThisExpression)) {
+				return false;
+			}
+			if (lhsExpr.getIdentifierToken().getValue() != properties[initializePropertyIndex++].name()) {
+				return false;
+			}
+			var onRHSExpr = function (expr) {
+				if (expr instanceof AssignmentExpression
+					|| expr instanceof PreIncrementExpression
+					|| expr instanceof PostIncrementExpression) {
+					// has side effects
+					return false;
+				} else if (expr instanceof FunctionExpression) {
+					// environment of the closure would change
+					return false;
+				}
+				return expr.forEachExpression(onRHSExpr);
+			};
+			if (! onRHSExpr(statementExpr.getSecondExpr())) {
+				return false;
+			}
+		}
+		if (initializePropertyIndex != properties.length) {
+			throw new Error("all the properties must be initialized by the constructor");
+		}
+		return true;
 	},
 
 	_rewriteFunctionAsStatic: function (funcDef) {

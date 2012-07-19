@@ -142,6 +142,21 @@ var Util = exports.Util = Class.extend({
 		return true;
 	},
 
+	$findFunctionInClass: function (classDef, funcName, argTypes, isStatic) {
+		var ClassDefinition = require("./classdef.js").ClassDefinition;
+		var found = null;
+		classDef.forEachMemberFunction(function (funcDef) {
+			if (isStatic == ((funcDef.flags() & ClassDefinition.IS_STATIC) != 0)
+				&& funcDef.name() == funcName
+				&& Util.typesAreEqual(funcDef.getArgumentTypes(), argTypes)) {
+				found = funcDef;
+				return false;
+			}
+			return true;
+		});
+		return found;
+	},
+
 	$encodeStringLiteral: function (str) {
 		var escaped = str.replace(/[\0- '"\\\u007f-\uffff]/g, function (ch) {
 			if (ch == "\0") {

@@ -1756,14 +1756,78 @@ var _NewExpressionEmitter = exports._NewExpressionEmitter = _OperatorExpressionE
 	},
 
 	emit: function (outerOpPrecedence) {
+		function isInlineable(funcDef) {
+			var stash = funcDef.getOptimizerStash()["unclassify"];
+			return stash && stash.isInlineable;
+		}
 		var classDef = this._expr.getType().getClassDef();
 		var ctor = this._expr.getConstructor();
 		var argTypes = ctor.getArgumentTypes();
-		this._emitter._emitCallArguments(
-			this._expr.getToken(),
-			"new " + this._emitter._mangleConstructorName(classDef, argTypes) + "(",
-			this._expr.getArguments(),
-			argTypes);
+		var callingFuncDef = Util.findFunctionInClass(classDef, "constructor", argTypes, false);
+		if (callingFuncDef == null) {
+			throw new Error("logic flaw");
+		}
+		if (isInlineable(callingFuncDef)) {
+			this._emitAsObjectLiteral(callingFuncDef, this._expr.getArguments());
+		} else {
+			this._emitter._emitCallArguments(
+				this._expr.getToken(),
+				"new " + this._emitter._mangleConstructorName(classDef, argTypes) + "(",
+				this._expr.getArguments(),
+				argTypes);
+		}
+	},
+
+	_emitCallArguments: function (token, prefix, args, argTypes) {
+		this._emit(prefix, token);
+		for (var i = 0; i < args.length; ++i) {
+			if (i != 0 || prefix[prefix.length - 1] != '(')
+				this._emit(", ", null);
+			if (argTypes != null
+				&& ! (argTypes[i] instanceof NullableType || argTypes[i] instanceof VariantType)) {
+				this._emitWithNullableGuard(args[i], 0);
+			} else {
+				this._getExpressionEmitterFor(args[i]).emit(0);
+			}
+		}
+		this._emit(")", token);
+	},
+
+	_emitAsObjectLiteral: function (funcDef, actualArgs) {
+		var formalArgs = funcDef.getArguments();
+		this._emitter._emit("{", this._expr.getToken());
+		var statementIndex = 0;
+		funcDef.getClassDef().forEachMemberVariable(function (member) {
+			if ((member.flags() & ClassDefinition.IS_STATIC) == 0) {
+				if (statementIndex != 0) {
+					this._emitter._emit(", ", this._expr.getToken());
+				}
+				var assignExpr = funcDef.getStatements()[statementIndex++].getExpr();
+				this._emitter._emit(member.name() + ": ", assignExpr.getToken());
+				var rhsExpr = assignExpr.getSecondExpr().clone();
+				function onExpr(expr, replaceCb) {
+					if (expr instanceof LocalExpression) {
+						for (var argIndex = 0; argIndex < formalArgs.length; ++argIndex) {
+							if (formalArgs[argIndex] == expr.getLocal()) {
+								break;
+							}
+						}
+						if (argIndex == formalArgs.length) {
+							throw new Error("logic flaw; could not determine argument index of argument: " + expr.getLocal().getName().getValue());
+						}
+						replaceCb(actualArgs[argIndex]);
+						return true;
+					}
+					return expr.forEachExpression(onExpr);
+				}
+				onExpr(rhsExpr, function (expr) {
+					rhsExpr = expr;
+				});
+				this._emitter._getExpressionEmitterFor(rhsExpr).emit(_AssignmentExpressionEmitter._operatorPrecedence["="]);
+			}
+			return true;
+		}.bind(this));
+		this._emitter._emit("}", this._expr.getToken());
 	},
 
 	_getPrecedence: function () {
