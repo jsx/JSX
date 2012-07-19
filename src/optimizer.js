@@ -651,7 +651,7 @@ var _DetermineCalleeCommand = exports._DetermineCalleeCommand = _FunctionOptimiz
 var _UnclassifyOptimizationCommandStash = exports._UnclassifyOptimizationCommandStash = Class.extend({
 
 	constructor: function (that /* optional */) {
-		this.isInlineable = that ? that.isInlineable : false;
+		this.inliner = that ? that.inliner : false;
 	},
 
 	clone: function () {
@@ -716,10 +716,10 @@ var _UnclassifyOptimizationCommand = exports._UnclassifyOptimizationCommand = _O
 			var hasInlineableCtor = false;
 			candidates[candidateIndex].forEachMemberFunction(function (funcDef) {
 				if ((funcDef.flags() & ClassDefinition.IS_STATIC) == 0 && funcDef.name() == "constructor") {
-					var isInlineable = this._constructorIsInlineable(funcDef);
-					this.log(funcDef.getClassDef().className() + "#constructor(" + funcDef.getArgumentTypes().map(function (arg) { return ":" + arg.toString(); }).join(",") + ") is" + (isInlineable ? "" : " not") + " inlineable");
-					if (isInlineable) {
-						this.getStash(funcDef).isInlineable = true;
+					var inliner = this._createInliner(funcDef);
+					this.log(funcDef.getClassDef().className() + "#constructor(" + funcDef.getArgumentTypes().map(function (arg) { return ":" + arg.toString(); }).join(",") + ") is" + (inliner ? "" : " not") + " inlineable");
+					if (inliner) {
+						this.getStash(funcDef).inliner = inliner;
 						hasInlineableCtor = true;
 					}
 				}
@@ -759,39 +759,37 @@ var _UnclassifyOptimizationCommand = exports._UnclassifyOptimizationCommand = _O
 		return candidates;
 	},
 
-	_constructorIsInlineable: function (funcDef) {
+	_createInliner: function (funcDef) {
 		if (funcDef.getLocals().length != 0) {
-			return false;
+			return null;
 		}
-		var statements = funcDef.getStatements();
-		// build list of properties
-		var properties = [];
+		var propertyNames = [];
 		funcDef.getClassDef().forEachMemberVariable(function (member) {
 			if ((member.flags() & ClassDefinition.IS_STATIC) == 0) {
-				properties.push(member);
+				propertyNames.push(member.name());
 			}
 			return true;
 		});
-		// only optimize the most simple form, the repetition of "this.foo = argN" in the order of properties (and in the order of arguments)
+		// only optimize the most simple form, the repetition of "this.foo = argN" that can be arranged to the order of properties (and in the order of arguments)
+		var propertyExprs = [];
 		var initializePropertyIndex = 0;
 		var expectedArgIndex = 0;
+		var statements = funcDef.getStatements();
+		if (statements.length != propertyNames.length) {
+			return null;
+		}
 		for (var statementIndex = 0; statementIndex < statements.length; ++statementIndex) {
-			if (initializePropertyIndex >= properties.length) {
-				return false;
-			}
 			if (! (statements[statementIndex] instanceof ExpressionStatement)) {
-				return false;
+				return null;
 			}
+			// check that lhs is this.X and rhs conforms to our requirement
 			var statementExpr = statements[statementIndex].getExpr();
 			if (! (statementExpr instanceof AssignmentExpression)) {
-				return false;
+				return null;
 			}
 			var lhsExpr = statementExpr.getFirstExpr();
 			if (! (lhsExpr instanceof PropertyExpression && lhsExpr.getExpr() instanceof ThisExpression)) {
-				return false;
-			}
-			if (lhsExpr.getIdentifierToken().getValue() != properties[initializePropertyIndex++].name()) {
-				return false;
+				return null;
 			}
 			var onRHSExpr = function (expr) {
 				if (expr instanceof AssignmentExpression
@@ -802,17 +800,59 @@ var _UnclassifyOptimizationCommand = exports._UnclassifyOptimizationCommand = _O
 				} else if (expr instanceof FunctionExpression) {
 					// environment of the closure would change
 					return false;
+				} else if (expr instanceof LocalExpression) {
+					var argIndex = funcDef.getArguments().indexOf(expr.getLocal());
+					if (argIndex == -1) {
+						throw new Error("logic flaw; could not find argument: " + expr.getLocal().getName().getValue());
+					}
+					if (expectedArgIndex != argIndex) {
+						return false;
+					}
+					++expectedArgIndex;
 				}
 				return expr.forEachExpression(onRHSExpr);
 			};
 			if (! onRHSExpr(statementExpr.getSecondExpr())) {
-				return false;
+				return null;
 			}
+			// determine if the property is assignable
+			var propertyIndex = propertyNames.indexOf(lhsExpr.getIdentifierToken().getValue());
+			if (propertyIndex == -1) {
+				throw new Error("logic flaw; could not find property: " + lhsExpr.getIdentifierToken().getValue());
+			}
+			if (propertyExprs[propertyIndex]) {
+				// the property is already initialized
+				return null;
+			}
+			for (var i = propertyExprs + 1; i < propertyNames.length; ++i) {
+				// one of the properties that need to be initialized laterwards has already been initialized with an expression that has side effects
+				if (propertyExprs[i] != null
+					&& Util.exprHasSideEffects(propertyExprs[i])) {
+					return null;
+				}
+			}
+			propertyExprs[propertyIndex] = statementExpr.getSecondExpr().clone();
 		}
-		if (initializePropertyIndex != properties.length) {
-			throw new Error("all the properties must be initialized by the constructor");
-		}
-		return true;
+		// build expression converter
+		return function (newExpr) {
+			// return list of expressions that should be used to initialize the properties
+			return propertyExprs.map(function (expr) {
+				function onExpr(expr, replaceCb) {
+					if (expr instanceof LocalExpression) {
+						var argIndex = funcDef.getArguments().indexOf(expr.getLocal());
+						if (argIndex == -1) {
+							throw new Error("logic flaw");
+						}
+						replaceCb(newExpr.getArguments()[argIndex]);
+						return true;
+					}
+					return expr.forEachExpression(onExpr);
+				}
+				expr = expr.clone();
+				onExpr(expr, function (newExpr) { expr = newExpr; });
+				return expr;
+			});
+		};
 	},
 
 	_rewriteFunctionAsStatic: function (funcDef) {
@@ -846,7 +886,7 @@ var _UnclassifyOptimizationCommand = exports._UnclassifyOptimizationCommand = _O
 					var receiverClassDef = receiverType.getClassDef();
 					if (unclassifyingClassDefs.indexOf(receiverClassDef) != -1) {
 						// found, rewrite
-						this.log((funcDef.getNameToken() != null ? funcDef.name() : "<<unnamed>>") + ":" + receiverClassDef.className() + "#" + calleeExpr.getIdentifierToken().getValue());
+						this.log("  " + (funcDef.getNameToken() != null ? funcDef.name() : "<<unnamed>>") + ":" + receiverClassDef.className() + "#" + calleeExpr.getIdentifierToken().getValue());
 						Util.forEachExpression(expr.getArguments());
 						var funcType = calleeExpr.getType();
 						replaceCb(

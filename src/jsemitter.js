@@ -1756,9 +1756,9 @@ var _NewExpressionEmitter = exports._NewExpressionEmitter = _OperatorExpressionE
 	},
 
 	emit: function (outerOpPrecedence) {
-		function isInlineable(funcDef) {
+		function getInliner(funcDef) {
 			var stash = funcDef.getOptimizerStash()["unclassify"];
-			return stash && stash.isInlineable;
+			return stash && stash.inliner;
 		}
 		var classDef = this._expr.getType().getClassDef();
 		var ctor = this._expr.getConstructor();
@@ -1767,8 +1767,9 @@ var _NewExpressionEmitter = exports._NewExpressionEmitter = _OperatorExpressionE
 		if (callingFuncDef == null) {
 			throw new Error("logic flaw");
 		}
-		if (isInlineable(callingFuncDef)) {
-			this._emitAsObjectLiteral(callingFuncDef, this._expr.getArguments());
+		var inliner = getInliner(callingFuncDef);
+		if (inliner) {
+			this._emitAsObjectLiteral(classDef, inliner(this._expr));
 		} else {
 			this._emitter._emitCallArguments(
 				this._expr.getToken(),
@@ -1793,37 +1794,16 @@ var _NewExpressionEmitter = exports._NewExpressionEmitter = _OperatorExpressionE
 		this._emit(")", token);
 	},
 
-	_emitAsObjectLiteral: function (funcDef, actualArgs) {
-		var formalArgs = funcDef.getArguments();
+	_emitAsObjectLiteral: function (classDef, propertyExprs) {
 		this._emitter._emit("{", this._expr.getToken());
-		var statementIndex = 0;
-		funcDef.getClassDef().forEachMemberVariable(function (member) {
+		var propertyIndex = 0;
+		classDef.forEachMemberVariable(function (member) {
 			if ((member.flags() & ClassDefinition.IS_STATIC) == 0) {
-				if (statementIndex != 0) {
+				if (propertyIndex != 0) {
 					this._emitter._emit(", ", this._expr.getToken());
 				}
-				var assignExpr = funcDef.getStatements()[statementIndex++].getExpr();
-				this._emitter._emit(member.name() + ": ", assignExpr.getToken());
-				var rhsExpr = assignExpr.getSecondExpr().clone();
-				function onExpr(expr, replaceCb) {
-					if (expr instanceof LocalExpression) {
-						for (var argIndex = 0; argIndex < formalArgs.length; ++argIndex) {
-							if (formalArgs[argIndex] == expr.getLocal()) {
-								break;
-							}
-						}
-						if (argIndex == formalArgs.length) {
-							throw new Error("logic flaw; could not determine argument index of argument: " + expr.getLocal().getName().getValue());
-						}
-						replaceCb(actualArgs[argIndex]);
-						return true;
-					}
-					return expr.forEachExpression(onExpr);
-				}
-				onExpr(rhsExpr, function (expr) {
-					rhsExpr = expr;
-				});
-				this._emitter._getExpressionEmitterFor(rhsExpr).emit(_AssignmentExpressionEmitter._operatorPrecedence["="]);
+				this._emitter._emit(member.name() + ": ", this._expr.getToken());
+				this._emitter._getExpressionEmitterFor(propertyExprs[propertyIndex++]).emit(_AssignmentExpressionEmitter._operatorPrecedence["="]);
 			}
 			return true;
 		}.bind(this));
