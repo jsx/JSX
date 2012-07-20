@@ -1334,39 +1334,40 @@ var _DeadCodeEliminationOptimizeCommand = exports._DeadCodeEliminationOptimizeCo
 		// rewrite the locals
 		var onExpr = function (expr, replaceCb) {
 			if (expr instanceof AssignmentExpression) {
-				if (expr.getFirstExpr() instanceof LocalExpression
-					&& ! getLocal(localsUntouchable, expr.getFirstExpr().getLocal())
-					&& expr.getFirstExpr().getType().equals(expr.getSecondExpr().getType())) {
+				if (expr.getFirstExpr() instanceof LocalExpression) {
 					onExpr(expr.getSecondExpr(), function (assignExpr) {
 						return function (expr) {
 							assignExpr.setSecondExpr(expr);
 						};
 					}(expr));
-					var lhsLocal = expr.getFirstExpr().getLocal();
-					this.log("resetting cache for: " + lhsLocal.getName().getValue());
-					for (var i = locals.length - 1; i >= 0; --i) {
-						if (locals[i][0] == lhsLocal) {
-							this.log("  clearing itself");
-							locals.splice(i, 1);
-						} else if (locals[i][1] instanceof LocalExpression && locals[i][1].getLocal() == lhsLocal) {
-							this.log("  clearing " + locals[i][0].getName().getValue());
-							locals.splice(i, 1);
+					if (! getLocal(localsUntouchable, expr.getFirstExpr().getLocal())
+						&& expr.getFirstExpr().getType().equals(expr.getSecondExpr().getType())) {
+						var lhsLocal = expr.getFirstExpr().getLocal();
+						this.log("resetting cache for: " + lhsLocal.getName().getValue());
+						for (var i = locals.length - 1; i >= 0; --i) {
+							if (locals[i][0] == lhsLocal) {
+								this.log("  clearing itself");
+								locals.splice(i, 1);
+							} else if (locals[i][1] instanceof LocalExpression && locals[i][1].getLocal() == lhsLocal) {
+								this.log("  clearing " + locals[i][0].getName().getValue());
+								locals.splice(i, 1);
+							}
 						}
-					}
-					if (expr.getToken().getValue() == "=") {
-						var rhsExpr = expr.getSecondExpr();
-						if (rhsExpr instanceof LocalExpression) {
-							var rhsLocal = rhsExpr.getLocal();
-							if (lhsLocal != rhsLocal && ! getLocal(localsUntouchable, rhsLocal)) {
-								this.log("  set to: " + rhsLocal.getName().getValue());
+						if (expr.getToken().getValue() == "=") {
+							var rhsExpr = expr.getSecondExpr();
+							if (rhsExpr instanceof LocalExpression) {
+								var rhsLocal = rhsExpr.getLocal();
+								if (lhsLocal != rhsLocal && ! getLocal(localsUntouchable, rhsLocal)) {
+									this.log("  set to: " + rhsLocal.getName().getValue());
+									setLocal(locals, lhsLocal, rhsExpr);
+								}
+							} else if (rhsExpr instanceof NullExpression
+								|| rhsExpr instanceof NumberLiteralExpression
+								|| rhsExpr instanceof IntegerLiteralExpression
+								|| rhsExpr instanceof StringLiteralExpression) {
+								this.log("  set to: " + rhsExpr.getToken().getValue());
 								setLocal(locals, lhsLocal, rhsExpr);
 							}
-						} else if (rhsExpr instanceof NullExpression
-							|| rhsExpr instanceof NumberLiteralExpression
-							|| rhsExpr instanceof IntegerLiteralExpression
-							|| rhsExpr instanceof StringLiteralExpression) {
-							this.log("  set to: " + rhsExpr.getToken().getValue());
-							setLocal(locals, lhsLocal, rhsExpr);
 						}
 					}
 					return true;
@@ -1383,7 +1384,9 @@ var _DeadCodeEliminationOptimizeCommand = exports._DeadCodeEliminationOptimizeCo
 					// fall through
 				} else {
 					expr.forEachExpression(onExpr);
-					clearLocals(locals);
+					if (funcDef.getParent() != null || funcDef.getClosures().length != 0) {
+						clearLocals(locals);
+					}
 					return true;
 				}
 			} else if (expr instanceof NewExpression) {
