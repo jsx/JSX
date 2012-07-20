@@ -886,8 +886,8 @@ var _UnclassifyOptimizationCommand = exports._UnclassifyOptimizationCommand = _O
 					var receiverClassDef = receiverType.getClassDef();
 					if (unclassifyingClassDefs.indexOf(receiverClassDef) != -1) {
 						// found, rewrite
-						this.log("  " + (funcDef.getNameToken() != null ? funcDef.name() : "<<unnamed>>") + ":" + receiverClassDef.className() + "#" + calleeExpr.getIdentifierToken().getValue());
-						Util.forEachExpression(expr.getArguments());
+						Util.forEachExpression(onExpr, expr.getArguments());
+						this.log("  " + _Util.getFuncName(funcDef));
 						var funcType = calleeExpr.getType();
 						replaceCb(
 							new CallExpression(
