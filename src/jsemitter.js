@@ -1756,14 +1756,58 @@ var _NewExpressionEmitter = exports._NewExpressionEmitter = _OperatorExpressionE
 	},
 
 	emit: function (outerOpPrecedence) {
+		function getInliner(funcDef) {
+			var stash = funcDef.getOptimizerStash()["unclassify"];
+			return stash && stash.inliner;
+		}
 		var classDef = this._expr.getType().getClassDef();
 		var ctor = this._expr.getConstructor();
 		var argTypes = ctor.getArgumentTypes();
-		this._emitter._emitCallArguments(
-			this._expr.getToken(),
-			"new " + this._emitter._mangleConstructorName(classDef, argTypes) + "(",
-			this._expr.getArguments(),
-			argTypes);
+		var callingFuncDef = Util.findFunctionInClass(classDef, "constructor", argTypes, false);
+		if (callingFuncDef == null) {
+			throw new Error("logic flaw");
+		}
+		var inliner = getInliner(callingFuncDef);
+		if (inliner) {
+			this._emitAsObjectLiteral(classDef, inliner(this._expr));
+		} else {
+			this._emitter._emitCallArguments(
+				this._expr.getToken(),
+				"new " + this._emitter._mangleConstructorName(classDef, argTypes) + "(",
+				this._expr.getArguments(),
+				argTypes);
+		}
+	},
+
+	_emitCallArguments: function (token, prefix, args, argTypes) {
+		this._emit(prefix, token);
+		for (var i = 0; i < args.length; ++i) {
+			if (i != 0 || prefix[prefix.length - 1] != '(')
+				this._emit(", ", null);
+			if (argTypes != null
+				&& ! (argTypes[i] instanceof NullableType || argTypes[i] instanceof VariantType)) {
+				this._emitWithNullableGuard(args[i], 0);
+			} else {
+				this._getExpressionEmitterFor(args[i]).emit(0);
+			}
+		}
+		this._emit(")", token);
+	},
+
+	_emitAsObjectLiteral: function (classDef, propertyExprs) {
+		this._emitter._emit("{", this._expr.getToken());
+		var propertyIndex = 0;
+		classDef.forEachMemberVariable(function (member) {
+			if ((member.flags() & ClassDefinition.IS_STATIC) == 0) {
+				if (propertyIndex != 0) {
+					this._emitter._emit(", ", this._expr.getToken());
+				}
+				this._emitter._emit(member.name() + ": ", this._expr.getToken());
+				this._emitter._getExpressionEmitterFor(propertyExprs[propertyIndex++]).emit(_AssignmentExpressionEmitter._operatorPrecedence["="]);
+			}
+			return true;
+		}.bind(this));
+		this._emitter._emit("}", this._expr.getToken());
 	},
 
 	_getPrecedence: function () {
