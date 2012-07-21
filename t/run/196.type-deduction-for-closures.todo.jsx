@@ -1,4 +1,4 @@
-/**EXPECTED
+/*EXPECTED
 ok
 */
 class Test {
