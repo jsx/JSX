@@ -43,7 +43,8 @@ my @specs = (
         # HTML5
         #'http://dev.w3.org/html5/spec/single-page.html', # too new
         'http://www.w3.org/TR/html5/single-page.html',
-        'http://www.w3.org/TR/FileAPI/',
+        # 'http://www.w3.org/TR/FileAPI/', # has an union member FileReader#result
+        'http://www.w3.org/TR/2011/WD-FileAPI-20111020/',
         "$root/extra/file.idl",
 
         #"http://www.w3.org/TR/webaudio/", # no correct IDL
@@ -69,6 +70,9 @@ my @specs = (
         'https://www.khronos.org/registry/typedarray/specs/latest/typedarray.idl',
         'http://dev.w3.org/html5/2dcontext/',
         'https://www.khronos.org/registry/webgl/specs/latest/webgl.idl',
+
+        # vender extensions
+        'https://wiki.mozilla.org/GamepadAPI',
 
         # additionals
         "$root/extra/timers.idl",
