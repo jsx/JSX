@@ -949,7 +949,7 @@ var MemberFunctionDefinition = exports.MemberFunctionDefinition = MemberDefiniti
 			"token"      : this._token.serialize(),
 			"nameToken"  : Util.serializeNullable(this._nameToken),
 			"flags"      : this.flags(),
-			"returnType" : this._returnType.serialize(),
+			"returnType" : Util.serializeNullable(this._returnType),
 			"args"       : Util.serializeArray(this._args),
 			"locals"     : Util.serializeArray(this._locals),
 			"statements" : Util.serializeArray(this._statements)
