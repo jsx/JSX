@@ -1432,7 +1432,7 @@ var TemplateClassDefinition = exports.TemplateClassDefinition = Class.extend({
 		var Parser = require("./parser");
 		// check number of type arguments
 		if (this._typeArgs.length != request.getTypeArguments().length) {
-			errors.push(new CompileError(request.getToken(), "wrong number of template arguments (expected " + this._typeArgs.length + ", got " + request.getTypes().length));
+			errors.push(new CompileError(request.getToken(), "wrong number of template arguments (expected " + this._typeArgs.length + ", got " + request.getTypeArguments().length));
 			return null;
 		}
 		// return one, if already instantiated
