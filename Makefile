@@ -1,7 +1,7 @@
 
 JOBS:=4
 
-OPTIMIZE_FLAGS := lto,unclassify,fold-const,return-if,inline,dce,unbox,fold-const,dce,lcse,array-length
+OPTIMIZE_FLAGS := lto,unclassify,fold-const,return-if,inline,dce,unbox,fold-const,dce,lcse,array-length,unclassify
 
 all:
 
@@ -14,7 +14,7 @@ test:
 	prove --jobs "$(JOBS)" t/*.t t/*/*.jsx
 
 test-optimized:
-		JSX_OPTS="--optimize $(OPTIMIZE_FLAGS)" prove --jobs "$(JOBS)" t/*/*.jsx
+	JSX_OPTS="--optimize $(OPTIMIZE_FLAGS)" prove --jobs "$(JOBS)" t/*/*.jsx
 
 test-all: test test-optimized
 
