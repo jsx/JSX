@@ -242,20 +242,37 @@ var Import = exports.Import = Class.extend({
 	},
 
 	assertExistenceOfNamedClasses: function (errors) {
-		if (this._classNames != null) {
-			for (var i = 0; i < this._classNames.length; ++i) {
-				// FIXME handle template
-				switch (this.getClasses(this._classNames[i].getValue()).length) {
-				case 0:
-					errors.push(new CompileError(this._classNames[i], "no definition for class '" + this._classNames[i].getValue() + "'"));
-					break;
-				case 1:
-					// ok
-					break;
-				default:
-					errors.push(new CompileError(this._classNames[i], "multiple candidates for class '" + this._classNames[i].getValue() + "'"));
-					break;
+		if (this._classNames == null) {
+			// no named classes
+			return;
+		}
+
+		// list all classses
+		var allClassNames = [];
+		for (var i = 0; i < this._sourceParsers.length; ++i) {
+			allClassNames = allClassNames.concat(this._sourceParsers[i].getClassDefs().map(function (classDef) { return classDef.className(); }));
+			allClassNames = allClassNames.concat(this._sourceParsers[i].getTemplateClassDefs().map(function (classDef) { return classDef.className(); }));
+		}
+		function countNumberOfClassesByName(className) {
+			var num = 0;
+			for (var i = 0; i < allClassNames.length; ++i) {
+				if (allClassNames[i] == className) {
+					++num;
 				}
+			}
+			return num;
+		}
+		for (var i = 0; i < this._classNames.length; ++i) {
+			switch (countNumberOfClassesByName(this._classNames[i].getValue())) {
+			case 0:
+				errors.push(new CompileError(this._classNames[i], "no definition for class '" + this._classNames[i].getValue() + "'"));
+				break;
+			case 1:
+				// ok
+				break;
+			default:
+				errors.push(new CompileError(this._classNames[i], "multiple candidates for class '" + this._classNames[i].getValue() + "'"));
+				break;
 			}
 		}
 	},
