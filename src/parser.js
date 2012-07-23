@@ -382,17 +382,31 @@ var QualifiedName = exports.QualifiedName = Class.extend({
 
 	getClass: function (context, typeArguments) {
 		if (this._import != null) {
-			var classDefs = this._import.getClasses(this._token.getValue(), typeArguments);
-			switch (classDefs.length) {
-			case 1:
-				var classDef = classDefs[0];
-				break;
-			case 0:
-				context.errors.push(new CompileError(this._token, "no definition for class '" + this._token.getValue() + "' in file '" + this._import.getFilenameToken().getValue() + "'"));
-				return null;
-			default:
-				context.errors.push(new CompileError(this._token, "multiple candidates"));
-				return null;
+			if (typeArguments.length == 0) {
+				var classDefs = this._import.getClasses(this._token.getValue(), typeArguments);
+				switch (classDefs.length) {
+				case 1:
+					var classDef = classDefs[0];
+					break;
+				case 0:
+					context.errors.push(new CompileError(this._token, "no definition for class '" + this._token.getValue() + "' in file '" + this._import.getFilenameToken().getValue() + "'"));
+					return null;
+				default:
+					context.errors.push(new CompileError(this._token, "multiple candidates"));
+					return null;
+				}
+			} else {
+				var callbacks = this._import.createGetTemplateClassCallbacks(context.errors, new TemplateInstantiationRequest(this._token, this._token.getValue(), typeArguments), function () {});
+				switch (callbacks.length) {
+				case 1:
+					return callbacks[0]();
+				case 0:
+					context.errors.push(new CompileError(this._token, "not definition for template class '" + tihs._token.getValue() + "' in file '" + tihs._import.getFilenameToken().getValue() + "'"));
+					return null;
+				default:
+					context.errors.push(new CompileError(this._token, "multiple canditates"));
+					return null;
+				}
 			}
 		} else {
 			if (typeArguments.length == 0) {
