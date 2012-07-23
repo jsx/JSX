@@ -286,19 +286,16 @@ var Import = exports.Import = Class.extend({
 		return found;
 	},
 
-	getTemplateClasses: function (name) {
-		var found = [];
+	createGetTemplateClassCallbacks: function (errors, request, postInstantiationCallback) {
+		// FIXME support the import rule
+		var callbacks = [];
 		for (var i = 0; i < this._sourceParsers.length; ++i) {
-			var classDefs = this._sourceParsers[i].getTemplateClassDefs();
-			for (var j = 0; j < classDefs.length; ++j) {
-				var className = classDefs[j].className();
-				if (className.charAt(0) != '_' && className == name) {
-					found.push(classDefs[j]);
-					break;
-				}
+			var callback = this._sourceParsers[i].createGetTemplateClassCallback(errors, request, postInstantiationCallback);
+			if (callback != null) {
+				callbacks.push(callback);
 			}
 		}
-		return found;
+		return callbacks;
 	},
 
 	$create: function (errors, filenameToken, aliasToken, classNames) {
@@ -502,9 +499,6 @@ var Parser = exports.Parser = Class.extend({
 			if (this._classDefs[i].className() == name)
 				return this._classDefs[i];
 		}
-		// instantiated templates never get imported
-		if (name.match(/\.</) != null)
-			return null;
 		// classnames within the imported files may conflict
 		var found = [];
 		for (var i = 0; i < this._imports.length; ++i) {
@@ -518,26 +512,55 @@ var Parser = exports.Parser = Class.extend({
 		return null;
 	},
 
-	lookupTemplate: function (errors, contextToken, name) {
-		// class within the file is preferred
-		for (var i = 0; i < this._templateClassDefs.length; ++i) {
-			if (this._templateClassDefs[i].className() == name)
-				return this._templateClassDefs[i];
+	lookupTemplate: function (errors, request, postInstantiationCallback) {
+		// lookup within the source file
+		var instantiateCallback = this.createGetTemplateClassCallback(errors, request, postInstantiationCallback);
+		if (instantiateCallback != null) {
+			return instantiateCallback(errors, request, postInstantiationCallback);
 		}
-		// classnames within the imported files may conflict
-		var found = [];
+		// lookup within the imported files
+		var candidateCallbacks = [];
 		for (var i = 0; i < this._imports.length; ++i) {
-			found = found.concat(this._imports[i].getTemplateClasses(name));
+			candidateCallbacks = candidateCallbacks.concat(this._imports[i].createGetTemplateClassCallbacks(errors, request, postInstantiationCallback));
 		}
-		if (found.length == 1)
-			return found[0];
-		if (found.length >= 2)
-			errors.push(new CompileError(contextToken, "multiple candidates exist for template class name '" + name + "'"));
-		return null;
+		if (candidateCallbacks.length == 0) {
+			errors.push(new CompileError(request.getToken(), "could not find definition for template class: '" + request.getClassName() + "'"));
+			return null;
+		} else if (candidateCallbacks.length >= 2) {
+			errors.push(new CompileError(request.getToken(), "multiple candidates exist for template class name '" + request.getClassName() + "'"));
+			return null;
+		}
+		return candidateCallbacks[0]();
 	},
 
-	registerInstantiatedClass: function (classDef) {
-		this._classDefs.push(classDef);
+	createGetTemplateClassCallback: function (errors, request, postInstantiationCallback) {
+		// lookup the already-instantiated class
+		for (var i = 0; i < this._classDefs.length; ++i) {
+			var classDef = this._classDefs[i];
+			if (classDef instanceof InstantiatedClassDefinition
+				&& classDef.getTemplateClassName() == request.getClassName()
+				&& Util.typesAreEqual(classDef.getTypeArguments(), request.getTypeArguments())) {
+				return function () {
+					return classDef;
+				};
+			}
+		}
+		// create instantiation callback
+		for (var i = 0; i < this._templateClassDefs.length; ++i) {
+			var templateDef = this._templateClassDefs[i];
+			if (templateDef.className() == request.getClassName()) {
+				return function () {
+					var classDef = templateDef.instantiate(errors, request);
+					if (classDef == null) {
+						return null;
+					}
+					this._classDefs.push(classDef);
+					postInstantiationCallback(this, classDef);
+					return classDef;
+				}.bind(this);
+			}
+		}
+		return null;
 	},
 
 	_pushScope: function (args) {
