@@ -245,7 +245,7 @@ var Import = exports.Import = Class.extend({
 		if (this._classNames != null) {
 			for (var i = 0; i < this._classNames.length; ++i) {
 				// FIXME handle template
-				switch (this.getClasses(this._classNames[i].getValue(), []).length) {
+				switch (this.getClasses(this._classNames[i].getValue()).length) {
 				case 0:
 					errors.push(new CompileError(this._classNames[i], "no definition for class '" + this._classNames[i].getValue() + "'"));
 					break;
@@ -260,7 +260,7 @@ var Import = exports.Import = Class.extend({
 		}
 	},
 
-	getClasses: function (name, typeArguments) {
+	getClasses: function (name) {
 		if (! this._classIsImportable(name)) {
 			return [];
 		}
@@ -269,18 +269,9 @@ var Import = exports.Import = Class.extend({
 			var classDefs = this._sourceParsers[i].getClassDefs();
 			for (var j = 0; j < classDefs.length; ++j) {
 				var classDef = classDefs[j];
-				if (typeArguments.length == 0) {
-					if (classDef.className() == name) {
-						found.push(classDef);
-						break;
-					}
-				} else {
-					if (classDef instanceof InstantiatedClassDefinition
-						&& classDef.getTemplateClassName() == name
-						&& Util.typesAreEqual(classDef.getTypeArguments(), typeArguments)) {
-						found.push(classDef);
-						break;
-					}
+				if (classDef.className() == name) {
+					found.push(classDef);
+					break;
 				}
 			}
 		}
@@ -383,7 +374,7 @@ var QualifiedName = exports.QualifiedName = Class.extend({
 	getClass: function (context, typeArguments) {
 		if (this._import != null) {
 			if (typeArguments.length == 0) {
-				var classDefs = this._import.getClasses(this._token.getValue(), typeArguments);
+				var classDefs = this._import.getClasses(this._token.getValue());
 				switch (classDefs.length) {
 				case 1:
 					var classDef = classDefs[0];
@@ -542,7 +533,7 @@ var Parser = exports.Parser = Class.extend({
 		var found = [];
 		for (var i = 0; i < this._imports.length; ++i) {
 			if (this._imports[i].getAlias() == null)
-				found = found.concat(this._imports[i].getClasses(className, []));
+				found = found.concat(this._imports[i].getClasses(className));
 		}
 		if (found.length == 1)
 			return found[0];
