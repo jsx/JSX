@@ -394,9 +394,19 @@ var QualifiedName = exports.QualifiedName = Class.extend({
 				context.errors.push(new CompileError(this._token, "multiple candidates"));
 				return null;
 			}
-		} else if ((classDef = context.parser.lookup(context.errors, this._token, this._token.getValue(), typeArguments)) == null) {
-			context.errors.push(new CompileError(this._token, "no class definition for '" + this._token.getValue() + "'"));
-			return null;
+		} else {
+			if (typeArguments.length == 0) {
+				// FIXME who's calling context.parser.lookup with typeArguments? can we eliminate the path?
+				if ((classDef = context.parser.lookup(context.errors, this._token, this._token.getValue(), typeArguments)) == null) {
+					context.errors.push(new CompileError(this._token, "no class definition for '" + this._token.getValue() + "'"));
+					return null;
+				}
+			} else {
+				if ((classDef = context.parser.lookupTemplate(context.errors, new TemplateInstantiationRequest(this._token, this._token.getValue(), typeArguments), function () {})) == null) {
+					context.errors.push(new CompileError(this._token, "failed to instantiate class"));
+					return null;
+				}
+			}
 		}
 		return classDef;
 	}
@@ -579,6 +589,7 @@ var Parser = exports.Parser = Class.extend({
 						return null;
 					}
 					this._classDefs.push(classDef);
+					classDef.resolveTypes(new AnalysisContext(errors, this, null));
 					postInstantiationCallback(this, classDef);
 					return classDef;
 				}.bind(this);
@@ -1411,14 +1422,11 @@ var Parser = exports.Parser = Class.extend({
 	_templateTypeDeclaration: function (qualifiedName) {
 		// parse
 		var types = [];
-		var typeIsConcrete = true;
 		do {
 			var type = this._typeDeclaration(false);
 			if (type == null)
 				return null;
 			types.push(type);
-			if (this._isPartOfTypeArg(type))
-				typeIsConcrete = false;
 			var token = this._expect([ ">", "," ]);
 			if (token == null)
 				return null;
@@ -1428,10 +1436,6 @@ var Parser = exports.Parser = Class.extend({
 		if ((className == "Array" || className == "Map") && types[0] instanceof NullableType) {
 			this._newError("cannot declare " + className + ".<Nullable.<T>>, should be " + className + ".<T>");
 			return false;
-		}
-		// request template instantiation (deferred)
-		if (typeIsConcrete) {
-			this._templateInstantiationRequests.push(new TemplateInstantiationRequest(token, qualifiedName.getToken().getValue(), types));
 		}
 		// return object type
 		var objectType = new ParsedObjectType(qualifiedName, types);
@@ -1513,9 +1517,6 @@ var Parser = exports.Parser = Class.extend({
 	},
 
 	_registerArrayTypeOf: function (token, elementType) {
-		if (! this._isPartOfTypeArg(elementType)) {
-			this._templateInstantiationRequests.push(new TemplateInstantiationRequest(token, "Array", [ elementType ]));
-		}
 		var arrayType = new ParsedObjectType(new QualifiedName(new Token("Array", true), null), [ elementType ], token);
 		this._objectTypesUsed.push(arrayType);
 		return arrayType;

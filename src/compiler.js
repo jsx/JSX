@@ -179,10 +179,6 @@ var Compiler = exports.Compiler = Class.extend({
 		FunctionType._classDef = builtins.lookup(errors, null, "Function", []);
 		if (! this._handleErrors(errors))
 			return false;
-		// template instantiation
-		this._instantiateTemplates(errors);
-		if (! this._handleErrors(errors))
-			return false;
 		// semantic analysis
 		this._resolveTypes(errors);
 		if (! this._handleErrors(errors))
@@ -301,44 +297,9 @@ var Compiler = exports.Compiler = Class.extend({
 		}
 	},
 
-	_instantiateTemplates: function (errors) {
-		for (var i = 0; i < this._parsers.length; ++i) {
-			var templateInstantiationRequests = this._parsers[i].getTemplateInstantiationRequests();
-			for (var j = 0; j < templateInstantiationRequests.length; ++j)
-				this._instantiateTemplate(errors, this._parsers[i], templateInstantiationRequests[j], false);
-		}
-	},
-
-	_instantiateTemplate: function (errors, parser, request, resolveImmmediately) {
-		var classDef = parser.lookupTemplate(errors, request, function (parser, classDef) {
-			if (resolveImmmediately) {
-				classDef.resolveTypes(
-					new AnalysisContext(
-						errors,
-						parser,
-						(function (errors, request) {
-							return this._instantiateTemplate(errors, parser, request, true);
-						}).bind(this)));
-			}
-		});
-		// nested instantiation
-		var requests = request.getInstantiationRequests();
-		for (var i = 0; i < requests.length; ++i) {
-			this._instantiateTemplate(errors, parser, requests[i], resolveImmmediately);
-		}
-		// return
-		return classDef;
-	},
-
 	_resolveTypes: function (errors) {
 		this.forEachClassDef(function (parser, classDef) {
-			classDef.resolveTypes(
-				new AnalysisContext(
-					errors,
-					parser,
-					(function (errors, request) {
-						return this._instantiateTemplate(errors, parser, request, false);
-					}).bind(this)));
+			classDef.resolveTypes(new AnalysisContext(errors, parser, null));
 			return true;
 		}.bind(this));
 	},
@@ -348,8 +309,7 @@ var Compiler = exports.Compiler = Class.extend({
 			return new AnalysisContext(
 				errors,
 				parser,
-				function (errors, request) {
-					var classDef = this._instantiateTemplate(errors, parser, request, true);
+				function (parser, classDef) {
 					classDef.setAnalysisContextOfVariables(createContext(parser));
 					classDef.analyze(createContext(parser));
 					return classDef;

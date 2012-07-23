@@ -37,10 +37,10 @@ var BlockContext = exports.BlockContext = Class.extend({
 
 var AnalysisContext = exports.AnalysisContext = Class.extend({
 
-	constructor: function (errors, parser, instantiateTemplate) {
+	constructor: function (errors, parser, postInstantiationCallback) {
 		this.errors = errors;
 		this.parser = parser;
-		this.instantiateTemplate = instantiateTemplate;
+		this.postInstantiationCallback = postInstantiationCallback;
 		this.funcDef = null;
 		/*
 			blockStack is a stack of blocks:
@@ -66,7 +66,7 @@ var AnalysisContext = exports.AnalysisContext = Class.extend({
 
 	clone: function () {
 		// NOTE: does not clone the blockStack (call setBlockStack)
-		return new AnalysisContext(this.errors, this.parser, this.instantiateTemplate).setFuncDef(this.funcDef);
+		return new AnalysisContext(this.errors, this.parser, this.postInstantiationCallback).setFuncDef(this.funcDef);
 	},
 
 	setFuncDef: function (funcDef) {
