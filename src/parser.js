@@ -396,8 +396,7 @@ var QualifiedName = exports.QualifiedName = Class.extend({
 			}
 		} else {
 			if (typeArguments.length == 0) {
-				// FIXME who's calling context.parser.lookup with typeArguments? can we eliminate the path?
-				if ((classDef = context.parser.lookup(context.errors, this._token, this._token.getValue(), typeArguments)) == null) {
+				if ((classDef = context.parser.lookup(context.errors, this._token, this._token.getValue())) == null) {
 					context.errors.push(new CompileError(this._token, "no class definition for '" + this._token.getValue() + "'"));
 					return null;
 				}
@@ -518,26 +517,18 @@ var Parser = exports.Parser = Class.extend({
 		return null;
 	},
 
-	lookup: function (errors, contextToken, className, typeArguments) {
+	lookup: function (errors, contextToken, className) {
 		// class within the file is preferred
 		for (var i = 0; i < this._classDefs.length; ++i) {
 			var classDef = this._classDefs[i];
-			if (typeArguments.length == 0) {
-				if (classDef.className() == className)
-					return classDef;
-			} else {
-				if (classDef instanceof InstantiatedClassDefinition
-					&& classDef.getTemplateClassName() == className
-					&& Util.typesAreEqual(classDef.getTypeArguments(), typeArguments)) {
-					return classDef;
-				}
-			}
+			if (classDef.className() == className)
+				return classDef;
 		}
 		// classnames within the imported files may conflict
 		var found = [];
 		for (var i = 0; i < this._imports.length; ++i) {
 			if (this._imports[i].getAlias() == null)
-				found = found.concat(this._imports[i].getClasses(className, typeArguments));
+				found = found.concat(this._imports[i].getClasses(className, []));
 		}
 		if (found.length == 1)
 			return found[0];

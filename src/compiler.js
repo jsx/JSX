@@ -173,10 +173,10 @@ var Compiler = exports.Compiler = Class.extend({
 			return false;
 		// register backing class for primitives
 		var builtins = this.findParser(this._platform.getRoot() + "/lib/built-in.jsx");
-		BooleanType._classDef = builtins.lookup(errors, null, "Boolean", []);
-		NumberType._classDef = builtins.lookup(errors, null, "Number", []);
-		StringType._classDef = builtins.lookup(errors, null, "String", []);
-		FunctionType._classDef = builtins.lookup(errors, null, "Function", []);
+		BooleanType._classDef = builtins.lookup(errors, null, "Boolean");
+		NumberType._classDef = builtins.lookup(errors, null, "Number");
+		StringType._classDef = builtins.lookup(errors, null, "String");
+		FunctionType._classDef = builtins.lookup(errors, null, "Function");
 		if (! this._handleErrors(errors))
 			return false;
 		// semantic analysis

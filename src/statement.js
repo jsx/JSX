@@ -1311,7 +1311,7 @@ var ThrowStatement = exports.ThrowStatement = Statement.extend({
 	doAnalyze: function (context) {
 		if (! this._analyzeExpr(context, this._expr))
 			return true;
-		var errorClassDef = context.parser.lookup(context.errors, this._token, "Error", []);
+		var errorClassDef = context.parser.lookup(context.errors, this._token, "Error");
 		if (errorClassDef == null)
 			throw new Error("could not find definition for Error");
 		if (this._expr.getType().equals(Type.voidType)) {

@@ -417,7 +417,7 @@ var RegExpLiteralExpression = exports.RegExpLiteralExpression = LeafExpression.e
 	},
 
 	analyze: function (context, parentExpr) {
-		var classDef = context.parser.lookup(context.errors, this._token, "RegExp", []);
+		var classDef = context.parser.lookup(context.errors, this._token, "RegExp");
 		if (classDef == null)
 			throw new Error("could not find definition for RegExp");
 		this._type = new ObjectType(classDef);
