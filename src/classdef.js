@@ -1184,7 +1184,7 @@ var MemberFunctionDefinition = exports.MemberFunctionDefinition = MemberDefiniti
 					return false;
 				}
 			} else {
-				this._args[i].setType(type.getArgumentTypes()[i]);
+				this._args[i].setTypeForced(type.getArgumentTypes()[i]);
 			}
 		}
 		if (this._returnType != null) {
@@ -1239,8 +1239,12 @@ var LocalVariable = exports.LocalVariable = Class.extend({
 		if (this._type != null)
 			throw Error("type is already set");
 		// implicit declarations of "int" is not supported
-		if (type.equals(Type.integerType))
-			type = Type.numberType;
+		if (type.equals(Type.Type.integerType))
+			type = Type.Type.numberType;
+		this._type = type;
+	},
+
+	setTypeForced: function (type) {
 		this._type = type;
 	},
 
