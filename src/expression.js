@@ -1847,7 +1847,7 @@ var CallExpression = exports.CallExpression = OperatorExpression.extend({
 			context, this._args, this,
 			exprType.getExpectedCallbackTypes(
 				this._args.length,
-				this._expr instanceof PropertyExpression && ! exprType.isAssignable() && this._expr.getExpr() instanceof ClassExpression));
+				! (this._expr instanceof PropertyExpression && ! exprType.isAssignable() && ! (this._expr.getExpr() instanceof ClassExpression))));
 		if (argTypes == null)
 			return false;
 		if (this._expr instanceof PropertyExpression && ! exprType.isAssignable()) {
