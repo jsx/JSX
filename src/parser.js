@@ -244,7 +244,8 @@ var Import = exports.Import = Class.extend({
 	assertExistenceOfNamedClasses: function (errors) {
 		if (this._classNames != null) {
 			for (var i = 0; i < this._classNames.length; ++i) {
-				switch (this.getClasses(this._classNames[i].getValue()).length) {
+				// FIXME handle template
+				switch (this.getClasses(this._classNames[i].getValue(), []).length) {
 				case 0:
 					errors.push(new CompileError(this._classNames[i], "no definition for class '" + this._classNames[i].getValue() + "'"));
 					break;
@@ -259,27 +260,27 @@ var Import = exports.Import = Class.extend({
 		}
 	},
 
-	getClasses: function (name) {
-		// filter by classNames, if set
-		if (this._classNames != null) {
-			for (var i = 0; i < this._classNames.length; ++i)
-				if (this._classNames[i].getValue() == name)
-					break;
-			if (i == this._classNames.length)
-				return [];
-		} else {
-			if (name.charAt(0) == '_')
-				return [];
+	getClasses: function (name, typeArguments) {
+		if (! this._classIsImportable(name)) {
+			return [];
 		}
-		// lookup
 		var found = [];
 		for (var i = 0; i < this._sourceParsers.length; ++i) {
 			var classDefs = this._sourceParsers[i].getClassDefs();
 			for (var j = 0; j < classDefs.length; ++j) {
-				var className = classDefs[j].className();
-				if (className == name) {
-					found.push(classDefs[j]);
-					break;
+				var classDef = classDefs[j];
+				if (typeArguments.length == 0) {
+					if (classDef.className() == name) {
+						found.push(classDef);
+						break;
+					}
+				} else {
+					if (classDef instanceof InstantiatedClassDefinition
+						&& classDef.getTemplateClassName() == name
+						&& Util.typesAreEqual(classDef.getTypeArguments(), typeArguments)) {
+						found.push(classDef);
+						break;
+					}
 				}
 			}
 		}
@@ -296,6 +297,20 @@ var Import = exports.Import = Class.extend({
 			}
 		}
 		return callbacks;
+	},
+
+	_classIsImportable: function (name) {
+		if (this._classNames != null) {
+			for (var i = 0; i < this._classNames.length; ++i)
+				if (this._classNames[i].getValue() == name)
+					break;
+			if (i == this._classNames.length)
+				return false;
+		} else {
+			if (name.charAt(0) == '_')
+				return false;
+		}
+		return true;
 	},
 
 	$create: function (errors, filenameToken, aliasToken, classNames) {
@@ -365,9 +380,9 @@ var QualifiedName = exports.QualifiedName = Class.extend({
 		return true;
 	},
 
-	getClass: function (context) {
+	getClass: function (context, typeArguments) {
 		if (this._import != null) {
-			var classDefs = this._import.getClasses(this._token.getValue());
+			var classDefs = this._import.getClasses(this._token.getValue(), typeArguments);
 			switch (classDefs.length) {
 			case 1:
 				var classDef = classDefs[0];
@@ -379,7 +394,7 @@ var QualifiedName = exports.QualifiedName = Class.extend({
 				context.errors.push(new CompileError(this._token, "multiple candidates"));
 				return null;
 			}
-		} else if ((classDef = context.parser.lookup(context.errors, this._token, this._token.getValue())) == null) {
+		} else if ((classDef = context.parser.lookup(context.errors, this._token, this._token.getValue(), typeArguments)) == null) {
 			context.errors.push(new CompileError(this._token, "no class definition for '" + this._token.getValue() + "'"));
 			return null;
 		}
@@ -493,22 +508,31 @@ var Parser = exports.Parser = Class.extend({
 		return null;
 	},
 
-	lookup: function (errors, contextToken, name) {
+	lookup: function (errors, contextToken, className, typeArguments) {
 		// class within the file is preferred
 		for (var i = 0; i < this._classDefs.length; ++i) {
-			if (this._classDefs[i].className() == name)
-				return this._classDefs[i];
+			var classDef = this._classDefs[i];
+			if (typeArguments.length == 0) {
+				if (classDef.className() == className)
+					return classDef;
+			} else {
+				if (classDef instanceof InstantiatedClassDefinition
+					&& classDef.getTemplateClassName() == className
+					&& Util.typesAreEqual(classDef.getTypeArguments(), typeArguments)) {
+					return classDef;
+				}
+			}
 		}
 		// classnames within the imported files may conflict
 		var found = [];
 		for (var i = 0; i < this._imports.length; ++i) {
 			if (this._imports[i].getAlias() == null)
-				found = found.concat(this._imports[i].getClasses(name));
+				found = found.concat(this._imports[i].getClasses(className, typeArguments));
 		}
 		if (found.length == 1)
 			return found[0];
 		if (found.length >= 2)
-			errors.push(new CompileError(contextToken, "multiple candidates exist for class name '" + name + "'"));
+			errors.push(new CompileError(contextToken, "multiple candidates exist for class name '" + className + "'"));
 		return null;
 	},
 
@@ -1385,10 +1409,6 @@ var Parser = exports.Parser = Class.extend({
 	},
 
 	_templateTypeDeclaration: function (qualifiedName) {
-		if (qualifiedName.getImport() != null) {
-			this._newError("template class with namespace not supported");
-			return null;
-		}
 		// parse
 		var types = [];
 		var typeIsConcrete = true;
