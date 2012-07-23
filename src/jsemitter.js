@@ -2466,10 +2466,7 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 				case "Map":
 					return "H" + this._mangleTypeName(typeArgs[0]);
 				default:
-					var typeNames = typeArgs.map(function (t) {
-						return this._mangleTypeName(t);
-					}.bind(this));
-					return "G" + classDef.getTemplateClassName() + '$$' + typeNames.join('$') + '$E';
+					// fall through
 				}
 			}
 			return "L" + type.getClassDef().getOutputClassName() + "$";
