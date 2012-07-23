@@ -544,28 +544,21 @@ var Parser = exports.Parser = Class.extend({
 		this._prevScope = {
 			prev: this._prevScope,
 			locals: this._locals,
-			arguments: null,
-			statements: null,
-			closures: null
+			arguments: this._arguments,
+			statements: this._statements,
+			closures: this._closures
 		};
 		this._locals = [];
-		if (args != null) {
-			this._prevScope.arguments = this._arguments;
-			this._arguments = args;
-			this._prevScope.statements = this._statements;
-			this._statements = [];
-			this._prevScope.closures = this._closures;
-			this._closures = [];
-		}
+		this._arguments = args;
+		this._statements = [];
+		this._closures = [];
 	},
 
 	_popScope: function () {
 		this._locals = this._prevScope.locals;
-		if (this._prevScope.arguments != null) {
-			this._arguments = this._prevScope.arguments;
-			this._statements = this._prevScope.statements;
-			this._closures = this._prevScope.closures;
-		}
+		this._arguments = this._prevScope.arguments;
+		this._statements = this._prevScope.statements;
+		this._closures = this._prevScope.closures;
 		this._prevScope = this._prevScope.prev;
 	},
 
@@ -1896,13 +1889,14 @@ var Parser = exports.Parser = Class.extend({
 				|| this._expect("{") == null)
 				return false;
 			var caughtVariable = new CaughtVariable(catchIdentifier, catchType);
-			this._pushScope(null);
 			this._locals.push(caughtVariable);
-			if (this._block() == null) {
-				this._popScope();
-				return false;
+			try {
+				if (this._block() == null) {
+					return false;
+				}
+			} finally {
+				this._locals.splice(this._locals.indexOf(caughtVariable), 1);
 			}
-			this._popScope();
 			catchStatements.push(new CatchStatement(catchOrFinallyToken, caughtVariable, this._statements.splice(startIndex)));
 		}
 		if (catchOrFinallyToken != null) {
