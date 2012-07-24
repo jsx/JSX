@@ -37,10 +37,10 @@ var BlockContext = exports.BlockContext = Class.extend({
 
 var AnalysisContext = exports.AnalysisContext = Class.extend({
 
-	constructor: function (errors, parser, instantiateTemplate) {
+	constructor: function (errors, parser, postInstantiationCallback) {
 		this.errors = errors;
 		this.parser = parser;
-		this.instantiateTemplate = instantiateTemplate;
+		this.postInstantiationCallback = postInstantiationCallback;
 		this.funcDef = null;
 		/*
 			blockStack is a stack of blocks:
@@ -66,7 +66,7 @@ var AnalysisContext = exports.AnalysisContext = Class.extend({
 
 	clone: function () {
 		// NOTE: does not clone the blockStack (call setBlockStack)
-		return new AnalysisContext(this.errors, this.parser, this.instantiateTemplate).setFuncDef(this.funcDef);
+		return new AnalysisContext(this.errors, this.parser, this.postInstantiationCallback).setFuncDef(this.funcDef);
 	},
 
 	setFuncDef: function (funcDef) {
@@ -1184,7 +1184,7 @@ var MemberFunctionDefinition = exports.MemberFunctionDefinition = MemberDefiniti
 					return false;
 				}
 			} else {
-				this._args[i].setType(type.getArgumentTypes()[i]);
+				this._args[i].setTypeForced(type.getArgumentTypes()[i]);
 			}
 		}
 		if (this._returnType != null) {
@@ -1239,8 +1239,12 @@ var LocalVariable = exports.LocalVariable = Class.extend({
 		if (this._type != null)
 			throw Error("type is already set");
 		// implicit declarations of "int" is not supported
-		if (type.equals(Type.integerType))
-			type = Type.numberType;
+		if (type.equals(Type.Type.integerType))
+			type = Type.Type.numberType;
+		this._type = type;
+	},
+
+	setTypeForced: function (type) {
 		this._type = type;
 	},
 
@@ -1417,7 +1421,6 @@ var TemplateClassDefinition = exports.TemplateClassDefinition = Class.extend({
 		this._implementTypes = implementTypes;
 		this._members = members;
 		this._objectTypesUsed = objectTypesUsed;
-		this._instantiatedDefs = [];
 	},
 
 	className: function () {
@@ -1434,12 +1437,6 @@ var TemplateClassDefinition = exports.TemplateClassDefinition = Class.extend({
 		if (this._typeArgs.length != request.getTypeArguments().length) {
 			errors.push(new CompileError(request.getToken(), "wrong number of template arguments (expected " + this._typeArgs.length + ", got " + request.getTypeArguments().length));
 			return null;
-		}
-		// return one, if already instantiated
-		for (var i = 0; i < this._instantiatedDefs.length; ++i) {
-			if (this._instantiatedDefs[i].typeArgumentsAreEqual(request.getTypeArguments())) {
-				return this._instantiatedDefs[i];
-			}
 		}
 		// build context
 		var instantiationContext = {
@@ -1470,7 +1467,6 @@ var TemplateClassDefinition = exports.TemplateClassDefinition = Class.extend({
 			this._implementTypes.map(function (t) { return t.instantiate(instantiationContext); }),
 			members,
 			instantiationContext.objectTypesUsed);
-		this._instantiatedDefs.push(instantiatedDef);
 		return instantiatedDef;
 	}
 

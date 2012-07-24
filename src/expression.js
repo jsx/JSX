@@ -114,7 +114,11 @@ var Expression = exports.Expression = Class.extend({
 			return new StringLiteralExpression(new Parser.Token("\"\"", false));
 		else
 			return new NullExpression(new Parser.Token("null", false), type);
-	}
+	},
+
+	$instantiateTemplate: function (context, token, className, typeArguments) {
+		return context.parser.lookupTemplate(context.errors, new TemplateInstantiationRequest(token, className, typeArguments), context.postInstantiationCallback);
+	},
 
 });
 
@@ -488,10 +492,7 @@ var ArrayLiteralExpression = exports.ArrayLiteralExpression = Expression.extend(
 				} else {
 					if (elementType.equals(Type.integerType))
 						elementType = Type.numberType;
-					var instantiatedClass = context.instantiateTemplate(context.errors, new TemplateInstantiationRequest(this._token, "Array", [ elementType ]));
-					if (instantiatedClass == null)
-						return false;
-					this._type = new ObjectType(instantiatedClass);
+					this._type = new ObjectType(Expression.instantiateTemplate(context, this._token, "Array", [ elementType ]));
 					break;
 				}
 			}
@@ -613,10 +614,7 @@ var MapLiteralExpression = exports.MapLiteralExpression = Expression.extend({
 					if (elementType.equals(Type.integerType))
 						elementType = Type.numberType;
 					elementType = elementType.resolveIfNullable();
-					var instantiatedClass = context.instantiateTemplate(context.errors, new TemplateInstantiationRequest(this._token, "Map", [ elementType ]));
-					if (instantiatedClass == null)
-						return false;
-					this._type = new ObjectType(instantiatedClass);
+					this._type = new ObjectType(Expression.instantiateTemplate(context, this._token, "Map", [ elementType ]));
 					expectedType = elementType;
 					break;
 				}

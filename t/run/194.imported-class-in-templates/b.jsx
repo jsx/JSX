@@ -1,7 +1,7 @@
 import "./a.jsx";
 
 class B.<T> {
-	function f() : string {
+	static function f() : string {
 		var a : A = null;
 		return "ok";
 	}
