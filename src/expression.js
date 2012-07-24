@@ -479,9 +479,13 @@ var ArrayLiteralExpression = exports.ArrayLiteralExpression = Expression.extend(
 			return false;
 		// determine the type from the array members if the type was not specified
 		if (this._type != null) {
-			var classDef = this._type.getClassDef();
-			if (! (classDef instanceof InstantiatedClassDefinition && classDef.getTemplateClassName() == "Array")) {
-				context.errors.push(new CompileError(this._token, "specified type is not an array type"));
+			var classDef;
+			if (this._type instanceof ObjectType
+				&& (classDef = this._type.getClassDef()) instanceof InstantiatedClassDefinition
+				&& classDef.getTemplateClassName() == "Array") {
+				//ok
+			} else {
+				context.errors.push(new CompileError(this._token, "the type specified after ':' is not an array type"));
 				return false;
 			}
 		} else {
