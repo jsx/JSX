@@ -59,11 +59,11 @@ native final class Array.<T> {
 	function push(...item : T) : int;
 	function reverse() : Array.<T>;
 	function shift() : Nullable.<T>;
-	function slice(start : int) : Array.<T>;
-	function slice(start : int, end : int) : Array.<T>;
+	function slice(start : number) : Array.<T>;
+	function slice(start : number, end : number) : Array.<T>;
 	function sort() : Array.<T>;
-	function sort(comparefn : function (x : Nullable.<T>, y : Nullable.<T>) : int) : Array.<T>;
-	function splice(start : int, deleteCount : int, ...item : T) : Array.<T>;
+	function sort(comparefn : function (x : Nullable.<T>, y : Nullable.<T>) : number) : Array.<T>;
+	function splice(start : number, deleteCount : number, ...item : T) : Array.<T>;
 	function unshift(...item : T) : int;
 
 	// 15.4.4 (ES5)
@@ -97,7 +97,7 @@ native final class Array.<T> {
 	function reduceRight(callbackfn : function(previousValue : Nullable.<T>, currentValue : Nullable.<T>) : Nullable.<T>, initialValue : T) : Array.<T>;
 
 	// 15.4.5
-	var length : int;
+	var length : number;
 }
 
 // 15.5
@@ -109,18 +109,18 @@ native final class String {
 	function constructor(s : String);
 
 	// 15.5.3
-	static function fromCharCode(...charN : int) : string;
+	static function fromCharCode(...charN : number) : string;
 
 	// 15.5.4
 	override function toString() : string;
 	function valueOf() : string;
-	function charAt(pos : int) : string;
-	function charCodeAt(pos : int) : number;
+	function charAt(pos : number) : string;
+	function charCodeAt(pos : number) : number;
 	function concat(...stringN : String) : string;
 	function indexOf(searchString : string) : int;
-	function indexOf(searchString : string, position : int) : int;
+	function indexOf(searchString : string, position : number) : int;
 	function lastIndexOf(searchString : string) : int;
-	function lastIndexOf(searchString : string, position : int) : int;
+	function lastIndexOf(searchString : string, position : number) : int;
 	function localeCompare(that : string) : int;
 	function match(regexp : RegExp) : string [];
 	function replace(searchValue : string, replaceValue : string) : string;
@@ -130,14 +130,14 @@ native final class String {
 	function replace(searchValue : RegExp, replaceValue : function(matched :string):string) : string;
 	function search(searchValue : string) : int;
 	function search(searchValue : RegExp) : int;
-	function slice(start : int) : string;
-	function slice(start : int, end : int) : string;
+	function slice(start : number) : string;
+	function slice(start : number, end : number) : string;
 	function split(separator : string) : string [];
-	function split(separator : string, limit : int) : string [];
+	function split(separator : string, limit : number) : string [];
 	function split(separator : RegExp) : string [];
-	function split(separator : RegExp, limit : int) : string [];
-	function substring(start : int) : string;
-	function substring(start : int, end : int) : string;
+	function split(separator : RegExp, limit : number) : string [];
+	function substring(start : number) : string;
+	function substring(start : number, end : number) : string;
 	function toLowerCase() : string;
 	function toLocaleLowerCase() : string;
 	function toUpperCase() : string;
@@ -149,8 +149,8 @@ native final class String {
 	__readonly__ var length : int;
 
 	// removed: use substring() instead
-	// function substr(start : int) : string;
-	// function substr(start : int, length : int) : string;
+	// function substr(start : number) : string;
+	// function substr(start : number, length : number) : string;
 
 	// 15.1.3 URI Handling Function Properties
 	static function encodeURIComponent(str : string) : string;
@@ -192,16 +192,16 @@ native final class Number {
 
 	// 15.7.4
 	override function toString() : string;
-	function toString(radix : int) : string;
+	function toString(radix : number) : string;
 	function toLocaleString() : string;
 	function valueOf() : number;
-	function toFixed(fractionDigits : int) : string;
-	function toExpotential(fractionDigits : int) : string;
-	function toPrecision(precision : int) : string;
+	function toFixed(fractionDigits : number) : string;
+	function toExpotential(fractionDigits : number) : string;
+	function toPrecision(precision : number) : string;
 
 	// 15.1.2 (Function Properties of the Global Object)
 	static __pure__ function parseInt(str :string) :number;
-	static __pure__ function parseInt(str :string, radix :int) :number;
+	static __pure__ function parseInt(str :string, radix :number) :number;
 	static __pure__ function parseFloat(str :string) :number;
 	static __pure__ function isNaN(num :number) :boolean;
 	static __pure__ function isFinite(num :number) :boolean;
@@ -420,7 +420,7 @@ native final class JSON {
 
 	static function stringify(value : variant) : string;
 	static function stringify(value : variant, replacer : function(key:string,value:variant):variant) : string;
-	static function stringify(value : variant, replacer : function(key:string,value:variant):variant, space : int) : string;
+	static function stringify(value : variant, replacer : function(key:string,value:variant):variant, space : number) : string;
 
 }
 
