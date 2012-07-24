@@ -12,22 +12,22 @@ Document Object Model in Web Browsers
 
 */
 final class dom {
-	static const window = js.global["window"] as __noconvert__ Window;
+	static const window   = js.global["window"]   as __noconvert__ Window;       // dom.window
+	static const document = js.global["document"] as __noconvert__ HTMLDocument; // dom.document
 
-
-	/** alias to <code>dom.window.document.getElementById(id) as HTMLElement</code> */
+	/** alias to <code>dom.document.getElementById(id) as HTMLElement</code> */
 	static function id(id : string) : HTMLElement {
-		return dom.window.document.getElementById(id) as HTMLElement;
+		return dom.document.getElementById(id) as HTMLElement;
 	}
-	/** alias to <code>dom.window.document.getElementById(id) as HTMLElement</code> */
+	/** alias to <code>dom.document.getElementById(id) as HTMLElement</code> */
 	static function getElementById(id : string) : HTMLElement {
-		return dom.window.document.getElementById(id) as HTMLElement;
+		return dom.document.getElementById(id) as HTMLElement;
 	}
 
 
-	/** alias to <code>dom.window.document.createElement(id) as HTMLElement</code> */
+	/** alias to <code>dom.document.createElement(id) as HTMLElement</code> */
 	static function createElement(tag : string) : HTMLElement {
-		return dom.window.document.createElement(tag) as __noconvert__ HTMLElement;
+		return dom.document.createElement(tag) as __noconvert__ HTMLElement;
 	}
 
 }

@@ -14,6 +14,9 @@ class _Test extends TestCase {
 			var target = e.target as HTMLElement;
 			target.style.color = "red";
 		});
+
+		var window   : Window       = dom.window;
+		var document : HTMLDocument = dom.document;
 	}
 
 
