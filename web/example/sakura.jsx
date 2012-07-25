@@ -154,7 +154,7 @@ final class Stage {
       this.sakura[i].x -= sakuraPosXMax + 50;
     }
 
-    this.sakura.sort(function (a: Sakura, b: Sakura): int {
+    this.sakura.sort(function (a, b) {
       return a.size - b.size;
     });
 
