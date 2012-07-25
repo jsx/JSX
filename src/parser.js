@@ -436,6 +436,83 @@ var QualifiedName = exports.QualifiedName = Class.extend({
 
 });
 
+var DocCommentNode = exports.DocCommentNode = Class.extend({
+
+	constructor: function () {
+		this._description = "";
+	},
+
+	getDescription: function () {
+		return this._description;
+	},
+
+	appendDescription: function (s) {
+		// strip surrounding whitespace
+		s = s.replace(/^[ \t]*(.*)[ \t]*$/, function (_unused, m1) { return m1; });
+		// append
+		if (s != "") {
+			if (this._description != "") {
+				this._description += " ";
+			}
+			this._description += s;
+		}
+	}
+
+});
+
+var DocCommentParameter = exports.DocCommentParameter = DocCommentNode.extend({
+
+	constructor: function (paramName) {
+		DocCommentNode.prototype.constructor.call(this);
+		this._paramName = paramName;
+	},
+
+	getParamName: function () {
+		return this._paramName;
+	}
+
+});
+
+var DocCommentTag = exports.DocCommentTag = DocCommentNode.extend({
+
+	constructor: function (tagName) {
+		DocCommentNode.prototype.constructor.call(this);
+		this._tagName = tagName;
+	},
+
+	getTagName: function () {
+		return this._tagName;
+	}
+
+});
+
+var DocComment = exports.DocComment = DocCommentNode.extend({
+
+	constructor: function () {
+		DocCommentNode.prototype.constructor.call(this);
+		this._params = [];
+		this._tags = [];
+	},
+
+	getParams: function () {
+		return this._params;
+	},
+
+	getTags: function () {
+		return this._tags;
+	},
+
+	getTagByName: function (tagName) {
+		for (var i = 0; i < this._tags.length; ++i) {
+			if (this._tags[i].getTagName() == tagName) {
+				return this._tags[i];
+			}
+		}
+		return null;
+	}
+
+});
+
 var Parser = exports.Parser = Class.extend({
 
 	constructor: function (sourceToken, filename, completionRequest) {
@@ -451,6 +528,7 @@ var Parser = exports.Parser = Class.extend({
 		this._tokenLength = 0;
 		this._lineNumber = 1; // one origin
 		this._columnOffset = 0; // zero origin
+		this._docComment = null;
 		// insert a marker so that at the completion location we would always get _expectIdentifierOpt called, whenever possible
 		if (this._completionRequest != null) {
 			var compLineNumber = Math.min(this._completionRequest.getLineNumber(), this._lines.length + 1);
@@ -654,6 +732,7 @@ var Parser = exports.Parser = Class.extend({
 			// lexer properties
 			lineNumber: this._lineNumber,
 			columnOffset: this._columnOffset,
+			docComment: this._docComment,
 			tokenLength: this._tokenLength,
 			// errors
 			numErrors: this._errors.length,
@@ -669,6 +748,7 @@ var Parser = exports.Parser = Class.extend({
 	_restoreState: function (state) {
 		this._lineNumber = state.lineNumber;
 		this._columnOffset = state.columnOffset;
+		this._docComment = state.docComment;
 		this._tokenLength = state.tokenLength;
 		this._errors.length = state.numErrors;
 		this._closures.splice(state.numClosures);
@@ -690,8 +770,11 @@ var Parser = exports.Parser = Class.extend({
 	},
 
 	_advanceToken: function () {
-		this._forwardPos(this._tokenLength);
-		this._tokenLength = 0;
+		if (this._tokenLength != 0) {
+			this._forwardPos(this._tokenLength);
+			this._tokenLength = 0;
+			this._docComment = null;
+		}
 
 		while (true) {
 			// skip whitespaces and comments in-line
@@ -708,10 +791,19 @@ var Parser = exports.Parser = Class.extend({
 			}
 			switch (this._getInputByLength(2)) {
 			case "/*":
-				if (! this._skipMultilineComment())
-					return;
+				if (this._getInputByLength(3) == "/**") {
+					if ((this._docComment = this._parseDocComment()) == null) {
+						return;
+					}
+				} else {
+					this._docComment = null;
+					if (! this._skipMultilineComment()) {
+						return;
+					}
+				}
 				break;
 			case "//":
+				this._docComment = null;
 				if (this._lineNumber == this._lines.length) {
 					this._columnOffset = this._lines[this._lineNumber - 1].length;
 				} else {
@@ -741,6 +833,77 @@ var Parser = exports.Parser = Class.extend({
 			}
 			++this._lineNumber;
 			this._columnOffset = 0;
+		}
+	},
+
+	_parseDocComment: function () {
+		this._columnOffset += 2; // might be /**/ (an empty doccomment)
+
+		var docComment = new DocComment();
+		var node = docComment;
+
+		while (true) {
+			// skip " * ", or return if "*/"
+			this._parseDocCommentAdvanceWhiteSpace();
+			if (this._getInputByLength(2) == "*/") {
+				this._forwardPos(2);
+				return docComment;
+			} else if (this._getInputByLength(1) == "*") {
+				this._forwardPos(1);
+				this._parseDocCommentAdvanceWhiteSpace();
+			}
+			// fetch tag (and paramName), and setup the target node to push content into
+			var tagMatch = this._getInput(this._columnOffset).match(/^\@([0-9A-Za-z_]+)[ \t]*/);
+			if (tagMatch != null) {
+				this._forwardPos(tagMatch[0].length);
+				var tag = tagMatch[1];
+				switch (tag) {
+				case "param":
+					var nameMatch = this._getInput(this._columnOffset).match(/[0-9A-Za-z_]+/);
+					if (nameMatch != null) {
+						this._forwardPos(nameMatch[0].length);
+						node = new DocCommentParameter(nameMatch[0]);
+						docComment.getParams().push(node);
+					} else {
+						this._newError("name of the parameter not found after @param");
+						node = null;
+					}
+					break;
+				default:
+					node = new DocCommentTag(tag);
+					docComment.getTags().push(node);
+					break;
+				}
+			}
+			var endAt = this._getInput(this._columnOffset).indexOf("*/");
+			if (endAt != -1) {
+				if (node != null) {
+					node.appendDescription(this._getInput(this._columnOffset).substring(0, endAt));
+				}
+				this._forwardPos(endAt + 2);
+				return docComment;
+			}
+			if (node != null) {
+				node.appendDescription(this._getInput(this._columnOffset));
+			}
+			if (this._lineNumber == this._lines.length) {
+				this._columnOffset = this._lines[this._lineNumber - 1].length;
+				this._newError("could not find the end of the doccomment");
+				return null;
+			}
+			++this._lineNumber;
+			this._columnOffset = 0;
+		}
+	},
+
+	_parseDocCommentAdvanceWhiteSpace: function () {
+		while (true) {
+			var ch = this._getInputByLength(1);
+			if (ch == " " || ch == "\t") {
+				this._forwardPos(1);
+			} else {
+				break;
+			}
 		}
 	},
 
