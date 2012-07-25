@@ -34,11 +34,10 @@ $(document).ready(function () {
   });
 });
 
-if (! profileData) {
-	return;
-}
-
 var functions = function () {
+  if (! profileData) {
+    return;
+  }
   var map = {};
   (function doit(name, entry) {
     for (var k in entry) {
@@ -93,49 +92,51 @@ function createTree(list, entry) {
   return list;
 }
 
-var tree = createTree([], profileData);
-var invertedTree = createTree([], function () {
-  function fill(slot, entry) {
-    var t = slot[entry.$name];
-    if (t) {
-      t.$count += entry.$count;
-      t.$inclusive += entry.$inclusive;
-      t.$exclusive += entry.$exclusive;
-    } else {
-      t = slot[entry.$name] = {
-        $name:      entry.$name,
-        $count:     entry.$count,
-        $inclusive: entry.$inclusive,
-        $exclusive: entry.$exclusive,
-      };
+if (profileData) {
+  var tree = createTree([], profileData);
+  var invertedTree = createTree([], function () {
+    function fill(slot, entry) {
+      var t = slot[entry.$name];
+      if (t) {
+        t.$count += entry.$count;
+        t.$inclusive += entry.$inclusive;
+        t.$exclusive += entry.$exclusive;
+      } else {
+        t = slot[entry.$name] = {
+          $name:      entry.$name,
+          $count:     entry.$count,
+          $inclusive: entry.$inclusive,
+          $exclusive: entry.$exclusive,
+        };
+      }
+      return t;
     }
-    return t;
-  }
-  var root = {};
-  function doIt(entry) {
-    var slots = [];
-    for (var k in entry) {
-      if (k.charAt(0) != "$") {
-        slots = slots.concat(doIt(entry[k]));
+    var root = {};
+    function doIt(entry) {
+      var slots = [];
+      for (var k in entry) {
+        if (k.charAt(0) != "$") {
+          slots = slots.concat(doIt(entry[k]));
+        }
+      }
+      if (slots.length == 0) {
+        // is leaf
+        slots.push(fill(root, entry));
+      } else {
+        for (var i = 0; i < slots.length; ++i) {
+          slots[i] = fill(slots[i], entry);
+        }
+      }
+      return slots;
+    }
+    for (var key in profileData) {
+      if (key.charAt(0) != "$") {
+        doIt(profileData[key]);
       }
     }
-    if (slots.length == 0) {
-      // is leaf
-      slots.push(fill(root, entry));
-    } else {
-      for (var i = 0; i < slots.length; ++i) {
-        slots[i] = fill(slots[i], entry);
-      }
-    }
-    return slots;
-  }
-  for (var key in profileData) {
-    if (key.charAt(0) != "$") {
-      doIt(profileData[key]);
-    }
-  }
-  return root;
-}());
+    return root;
+  }());
+}
 
 function escapeHTML(s) {
   return s.toString()
