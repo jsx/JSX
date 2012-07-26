@@ -25,6 +25,7 @@ eval(Class.$import("./type"));
 eval(Class.$import("./classdef"));
 eval(Class.$import("./statement"));
 eval(Class.$import("./expression"));
+eval(Class.$import("./doc"));
 eval(Class.$import("./util"));
 
 "use strict";
@@ -432,83 +433,6 @@ var QualifiedName = exports.QualifiedName = Class.extend({
 			}
 		}
 		return classDef;
-	}
-
-});
-
-var DocCommentNode = exports.DocCommentNode = Class.extend({
-
-	constructor: function () {
-		this._description = "";
-	},
-
-	getDescription: function () {
-		return this._description;
-	},
-
-	appendDescription: function (s) {
-		// strip surrounding whitespace
-		s = s.replace(/^[ \t]*(.*)[ \t]*$/, function (_unused, m1) { return m1; });
-		// append
-		if (s != "") {
-			if (this._description != "") {
-				this._description += " ";
-			}
-			this._description += s;
-		}
-	}
-
-});
-
-var DocCommentParameter = exports.DocCommentParameter = DocCommentNode.extend({
-
-	constructor: function (paramName) {
-		DocCommentNode.prototype.constructor.call(this);
-		this._paramName = paramName;
-	},
-
-	getParamName: function () {
-		return this._paramName;
-	}
-
-});
-
-var DocCommentTag = exports.DocCommentTag = DocCommentNode.extend({
-
-	constructor: function (tagName) {
-		DocCommentNode.prototype.constructor.call(this);
-		this._tagName = tagName;
-	},
-
-	getTagName: function () {
-		return this._tagName;
-	}
-
-});
-
-var DocComment = exports.DocComment = DocCommentNode.extend({
-
-	constructor: function () {
-		DocCommentNode.prototype.constructor.call(this);
-		this._params = [];
-		this._tags = [];
-	},
-
-	getParams: function () {
-		return this._params;
-	},
-
-	getTags: function () {
-		return this._tags;
-	},
-
-	getTagByName: function (tagName) {
-		for (var i = 0; i < this._tags.length; ++i) {
-			if (this._tags[i].getTagName() == tagName) {
-				return this._tags[i];
-			}
-		}
-		return null;
 	}
 
 });
@@ -1150,10 +1074,13 @@ var Parser = exports.Parser = Class.extend({
 		this._objectTypesUsed = [];
 		// attributes* class
 		var flags = 0;
+		var docComment = null;
 		while (true) {
 			var token = this._expect([ "class", "interface", "mixin", "abstract", "final", "native", "__fake__" ]);
 			if (token == null)
 				return false;
+			if (flags == 0)
+				docComment = this._docComment;
 			if (token.getValue() == "class")
 				break;
 			if (token.getValue() == "interface") {
@@ -1312,18 +1239,21 @@ var Parser = exports.Parser = Class.extend({
 
 		// done
 		if (this._typeArgs != null)
-			this._templateClassDefs.push(new TemplateClassDefinition(className.getValue(), flags, this._typeArgs, this._extendType, this._implementTypes, members, this._objectTypesUsed));
+			this._templateClassDefs.push(new TemplateClassDefinition(className.getValue(), flags, this._typeArgs, this._extendType, this._implementTypes, members, this._objectTypesUsed, docComment));
 		else
-			this._classDefs.push(new ClassDefinition(className, className.getValue(), flags, this._extendType, this._implementTypes, members, this._objectTypesUsed));
+			this._classDefs.push(new ClassDefinition(className, className.getValue(), flags, this._extendType, this._implementTypes, members, this._objectTypesUsed, docComment));
 		return true;
 	},
 
 	_memberDefinition: function (classFlags) {
 		var flags = 0;
+		var docComment = null;
 		while (true) {
 			var token = this._expect([ "function", "var", "static", "abstract", "override", "final", "const", "native", "__readonly__", "inline", "__pure__" ]);
 			if (token == null)
 				return null;
+			if (flags == 0)
+				docComment = this._docComment;
 			if (token.getValue() == "const") {
 				if ((flags & ClassDefinition.IS_STATIC) == 0) {
 					this._newError("constants must be static");
@@ -1384,7 +1314,7 @@ var Parser = exports.Parser = Class.extend({
 		if ((classFlags & ClassDefinition.IS_INTERFACE) != 0)
 			flags |= ClassDefinition.IS_ABSTRACT;
 		if (token.getValue() == "function") {
-			return this._functionDefinition(token, flags, classFlags);
+			return this._functionDefinition(token, flags, classFlags, docComment);
 		}
 		// member variable decl.
 		if ((flags & ~(ClassDefinition.IS_STATIC | ClassDefinition.IS_ABSTRACT | ClassDefinition.IS_CONST | ClassDefinition.IS_READONLY | ClassDefinition.IS_INLINE)) != 0) {
@@ -1420,10 +1350,10 @@ var Parser = exports.Parser = Class.extend({
 		// all non-native, non-template values have initial value
 		if (this._typeArgs == null && initialValue == null && (classFlags & ClassDefinition.IS_NATIVE) == 0)
 			initialValue = Expression.getDefaultValueExpressionOf(type);
-		return new MemberVariableDefinition(token, name, flags, type, initialValue);
+		return new MemberVariableDefinition(token, name, flags, type, initialValue, docComment);
 	},
 
-	_functionDefinition: function (token, flags, classFlags) {
+	_functionDefinition: function (token, flags, classFlags, docComment) {
 		// name
 		var name = this._expectIdentifier(null);
 		if (name == null)
@@ -1462,13 +1392,13 @@ var Parser = exports.Parser = Class.extend({
 		if ((classFlags & ClassDefinition.IS_INTERFACE) != 0) {
 			if (this._expect(";") == null)
 				return null;
-			return new MemberFunctionDefinition(token, name, flags, returnType, args, null, null, null);
+			return new MemberFunctionDefinition(token, name, flags, returnType, args, null, null, null, null, docComment);
 		} else if ((flags & (ClassDefinition.IS_ABSTRACT | ClassDefinition.IS_NATIVE)) != 0) {
 			var token = this._expect([ ";", "{" ]);
 			if (token == null)
 				return null;
 			if (token.getValue() == ";")
-				return new MemberFunctionDefinition(token, name, flags, returnType, args, null, null, null);
+				return new MemberFunctionDefinition(token, name, flags, returnType, args, null, null, null, null, docComment);
 		} else {
 			if (this._expect("{") == null)
 				return null;
@@ -1483,7 +1413,7 @@ var Parser = exports.Parser = Class.extend({
 		else
 			lastToken = this._block();
 		// done
-		var funcDef = new MemberFunctionDefinition(token, name, flags, returnType, args, this._locals, this._statements, this._closures, lastToken);
+		var funcDef = new MemberFunctionDefinition(token, name, flags, returnType, args, this._locals, this._statements, this._closures, lastToken, docComment);
 		this._locals = null;
 		this._statements = null;
 		return funcDef;
@@ -2553,13 +2483,13 @@ var Parser = exports.Parser = Class.extend({
 				var expr = this._expr();
 				this._statements.push(new ReturnStatement(token, expr));
 				return new MemberFunctionDefinition(
-						token, null, ClassDefinition.IS_STATIC, returnType, args, this._locals, this._statements, this._closures, null);
+						token, null, ClassDefinition.IS_STATIC, returnType, args, this._locals, this._statements, this._closures, null, null);
 			} else {
 				var lastToken = this._block();
 				if (lastToken == null)
 					return null;
 				return new MemberFunctionDefinition(
-						token, null, ClassDefinition.IS_STATIC, returnType, args, this._locals, this._statements, this._closures, lastToken);
+						token, null, ClassDefinition.IS_STATIC, returnType, args, this._locals, this._statements, this._closures, lastToken, null);
 			}
 		} finally {
 			this._popScope();
@@ -2607,7 +2537,7 @@ var Parser = exports.Parser = Class.extend({
 			this._popScope();
 			return null;
 		}
-		var funcDef = new MemberFunctionDefinition(token, null, ClassDefinition.IS_STATIC, returnType, args, this._locals, this._statements, this._closures, lastToken);
+		var funcDef = new MemberFunctionDefinition(token, null, ClassDefinition.IS_STATIC, returnType, args, this._locals, this._statements, this._closures, lastToken, null);
 		this._popScope();
 		this._closures.push(funcDef);
 		return new FunctionExpression(token, funcDef);

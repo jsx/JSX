@@ -27,6 +27,7 @@ var path = require("path");
 
 var Class = require("../src/Class");
 eval(Class.$import("../src/compiler"));
+eval(Class.$import("../src/doc"));
 eval(Class.$import("../src/platform"));
 eval(Class.$import("../src/jsemitter"));
 eval(Class.$import("../src/optimizer"));
@@ -250,6 +251,9 @@ var JSX = Class.extend({
 				case "parse":
 					compiler.setMode(Compiler.MODE_PARSE);
 					break;
+				case "doc":
+					compiler.setMode(Compiler.MODE_DOC);
+					break;
 				default:
 					console.error("unknown mode: " + optarg);
 					return 1;
@@ -402,9 +406,28 @@ var JSX = Class.extend({
 		var sourceFile = args[argIndex++];
 		compiler.addSourceFile(null, sourceFile, completionRequest);
 
-		if(compiler.getMode() === Compiler.MODE_PARSE) {
+		switch (compiler.getMode()) {
+		case Compiler.MODE_PARSE:
 			if (compiler.compile()) {
 				platform.save(outputFile, compiler.getAST());
+				return 0;
+			} else {
+				return 1;
+			}
+			break;
+		case Compiler.MODE_DOC:
+			if (outputFile == null) {
+				console.error("--output is mandatory for --mode doc");
+				return 1;
+			}
+			if (compiler.compile()) {
+				new DocumentGenerator(compiler, function (sourcePath) {
+					if (sourcePath == sourceFile) {
+						return outputFile;
+					} else {
+						return null;
+					}
+				}.bind(this)).generateDoc();
 				return 0;
 			} else {
 				return 1;
