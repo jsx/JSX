@@ -47,7 +47,7 @@ function load(root) {
 			}
 
 			if(jsx.optimizationLevel > 0) {
-				var optimizeCommands = [ "lto", "no-assert", "fold-const", "return-if", "inline", "dce", "unbox", "fold-const", "lcse", "dce", "fold-const", "array-length", "unclassify" ];
+				var optimizeCommands = [ "lto", "no-assert", "fold-const", "return-if", "inline", "dce", "unbox", "fold-const", "lcse", "dce", "fold-const", "array-length" ];
 				o.setup(optimizeCommands);
 				o.setEnableRunTimeTypeCheck(false);
 				emitter.setEnableRunTimeTypeCheck(false);
