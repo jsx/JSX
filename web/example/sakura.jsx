@@ -3,8 +3,8 @@
 // originated from http://jsdo.it/sasaplus1/yREo,
 // which is forked from http://jsdo.it/totetero/sakura
 
-import "js.jsx";
 import "js/web.jsx";
+import "timer.jsx";
 
 class Config {
   static const NUMBER_OF_PETALS = 24;
@@ -311,36 +311,8 @@ final class Stage {
 
 final class _Main {
 
-  // hack to use requestAnimationFrame()
-
-  static function getRequestAnimationFrame() : function(tick : function(:number) : void) : void {
-
-    if(js.global["requestAnimationFrame"] != null) {
-      return function (tick : function(:number) : void) : void {
-        dom.window.requestAnimationFrame(tick);
-      };
-    }
-    else if(js.global["webkitRequestAnimationFrame"] != null) {
-      return function (tick : function(:number) : void) : void {
-        dom.window.webkitRequestAnimationFrame(tick);
-      };
-    }
-    else if(js.global["mozRequestAnimationFrame"] != null) {
-      return function (tick : function(:number) : void) : void {
-        dom.window.mozRequestAnimationFrame(tick);
-      };
-    }
-    else {
-      return function (tick : function(:number) : void) : void {
-        dom.window.setTimeout(function() : void { tick(0); }, 1000 / 60);
-      };
-    }
-
-  }
-
-  static const requestAnimationFrame = _Main.getRequestAnimationFrame();
-
   static function main(args : string[]) : void {
+    Timer.useNativeRAF(true);
 
     // load textrue data and start main loop
     var img = dom.createElement('img') as HTMLImageElement;
@@ -357,17 +329,16 @@ final class _Main {
 
       var stage = new Stage(world, texturedat);
 
-      var callTick = function(elapsed : number) : void {
+      var callTick = function(timeToCall : number) : void {
         stage.tick();
 
-        _Main.requestAnimationFrame(callTick);
+        Timer.requestAnimationFrame(callTick);
       };
 
-      _Main.requestAnimationFrame(callTick);
+      Timer.requestAnimationFrame(callTick);
 
     };
     img.src = Config.TEXTURE_FILE;
-
   }
 
 }
