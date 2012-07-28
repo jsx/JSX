@@ -22,28 +22,95 @@
 
 import "js.jsx";
 
-final class TimerHandle {
-	// implementation-defined object which identify listeners
-}
-
 final class Timer {
-	static function setTimeout(listener : function():void, milliseconds :int) : TimerHandle {
-		var setTimeout = js.global["setTimeout"] as function(:function():void, :int): TimerHandle;
-		return setTimeout(listener, milliseconds);
+	static function setTimeout(callback : function():void, intervalMS : number) : TimerHandle {
+		return Timer._setTimeout(callback, intervalMS);
 	}
 
-	static function clearTimeout(timerID : TimerHandle) :void {
-		var clearTimeout = js.global["clearTimeout"] as function(:TimerHandle):void;
-		clearTimeout(timerID);
+	static function clearTimeout(timer : TimerHandle) : void {
+		Timer._clearTimeout(timer);
 	}
 
-	static function setInterval(listener : function():void, milliseconds :int) : TimerHandle {
-		var setInterval = js.global["setInterval"] as function(:function():void, :int): TimerHandle;
-		return setInterval(listener, milliseconds);
+	static function setInterval(callback : function():void, intervalMS : number) : TimerHandle {
+		return Timer._setInterval(callback, intervalMS);
 	}
 
-	static function clearInterval(timerID : TimerHandle) :void {
-		var clearInterval = js.global["clearInterval"] as function(:TimerHandle):void;
-		clearInterval(timerID);
+	static function clearInterval(timer : TimerHandle) : void {
+		Timer._clearInterval(timer);
 	}
+
+	static function requestAnimationFrame(callback : function(:number):void) : TimerHandle {
+		return Timer._requestAnimationFrame(callback);
+	}
+
+	static function cancelAnimationFrame(timer : TimerHandle) : void {
+		Timer._cancelAnimationFrame(timer);
+	}
+
+	static function useNativeImpl(enable : boolean) : void {
+		Timer._requestAnimationFrame = Timer._getRequestAnimationFrameImpl(enable);
+		Timer._cancelAnimationFrame  = Timer._getCancelAnimationFrameImpl(enable);
+	}
+
+	// details
+
+	static const _setTimeout    = js.global["setTimeout"]    as function(:function():void, :int): TimerHandle;
+	static const _clearTimeout  = js.global["clearTimeout"]  as function(:TimerHandle):void;
+	static const _setInterval   = js.global["setInterval"]   as function(:function():void, :int): TimerHandle;
+	static const _clearInterval = js.global["clearInterval"] as function(:TimerHandle):void;
+
+	static var _requestAnimationFrame = Timer._getRequestAnimationFrameImpl(true);
+	static var _cancelAnimationFrame  = Timer._getCancelAnimationFrameImpl(true);
+
+	static function _getImplWithVenderPrefix(name : string) : variant {
+		var impl = js.global[name];
+		if (! impl) {
+			var s = name.replace(/^./, function (c) {
+				return c.toUpperCase();
+			});
+			impl =
+				   js.global["webkit" + s]
+				?: js.global["moz"    + s]
+				?: js.global["o"      + s]
+				?: js.global["ms"     + s];
+		}
+		return impl;
+	}
+
+	static function _getRequestAnimationFrameImpl(useNativeImpl : boolean) : function(callback : function(:number):void) : TimerHandle {
+		var impl = Timer._getImplWithVenderPrefix("requestAnimationFrame");
+		if (impl) {
+			return impl as function (callback : function(:number):void) : TimerHandle;
+		}
+		else {
+			var lastTime = 0;
+			return function(callback : function(:number):void) : TimerHandle {
+				var now = Date.now();
+				var timeToCall = Math.max(0, (1000/16 - (now - lastTime)));
+				lastTime = now + timeToCall;
+
+				return Timer.setTimeout(function() : void {
+					callback(now + timeToCall);
+				}, timeToCall);
+			};
+		}
+	}
+
+	static function _getCancelAnimationFrameImpl(useNativeImpl : boolean) : function(:TimerHandle):void {
+		var impl = Timer._getImplWithVenderPrefix("cancelAnimationFrame");
+		if (impl) {
+			return impl as function (timer : TimerHandle) : void;
+		}
+		else {
+			return Timer._clearTimeout;
+		}
+	}
+
 }
+
+/**
+ * Implementation-defined object which setTimeout() and setInterval() return.
+ */
+final class TimerHandle {
+}
+
