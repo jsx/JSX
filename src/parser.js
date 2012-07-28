@@ -2456,7 +2456,7 @@ var Parser = exports.Parser = Class.extend({
 				return false;
 			}
 			for (var scope = this._prevScope; scope != null; scope = scope.prev) {
-				if (! cb(scope.locals, scope.arguments)) {
+				if (scope.locals && ! cb(scope.locals, scope.arguments)) {
 					return false;
 				}
 			}
