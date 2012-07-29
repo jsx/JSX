@@ -31,13 +31,6 @@ mkdir "$root/.save";
     }
 }
 
-my %primitive = (
-    string => 1,
-    number => 1,
-    int => 1,
-    boolean => 1,
-);
-
 my %fake = (
     Window => 1,
     DocumentEvent => 1,
@@ -72,23 +65,25 @@ my %has_definition;
 # needs to be used."
 
 my %typemap = (
-    'DOMObject' => 'Object',
-    'DOMUserData' => 'variant',
-    'DOMString' => 'string',
+    'DOMObject'    => 'Object',
+    'DOMUserData'  => 'variant',
+    'DOMString'    => 'string',
+    'DOMTimeStamp' => 'number',
 
-    'DOMTimeStamp'=> 'number',
-    'octet' => 'int',
-    'byte'  => 'int',
-    'short' => 'int',
-    'long'  => 'int',
-    'long long' => 'number',
-    'unsigned byte' => 'int',
-    'unsigned short' => 'int',
-    'unsigned int' => 'int',
-    'unsigned long' => 'int',
+    'octet'          => 'number',
+    'byte'           => 'number',
+    'short'          => 'number',
+    'int'            => 'number',
+    'long'           => 'number',
+    'long long'      => 'number',
+    'unsigned byte'  => 'number',
+    'unsigned short' => 'number',
+    'unsigned int'   => 'number',
+    'unsigned long'  => 'number',
     'unsigned long long' => 'number',
-    'float' => 'number',
-    'double' => 'number',
+
+    'float'               => 'number',
+    'double'              => 'number',
     'unrestricted float'  => 'number',
     'unrestricted double' => 'number',
 
@@ -711,7 +706,7 @@ sub to_jsx_type {
     }
 
     my $type = $alias || $idl_type;
-    if ($nullable and not $array and exists $primitive{$type}) {
+    if ($nullable && ! $array) {
         $type = "Nullable.<$type>";
     }
     if($array) {
@@ -816,18 +811,22 @@ sub resolve_overload {
             $type = $1;
         }
 
-        my @types = split /\b or \b/xms, $type;
+        my @idl_types = split /\b or \b/xms, $type;
+        my @jsx_types = map { to_jsx_type($_) } @idl_types;
 
-        # parameter "int" also accepts "number"
-        if(grep { to_jsx_type($_) =~ /\A int \[\]/xms } @types) {
-            push @types, "number[]";
+        # "number[]" parameters also accept "int[]"
+        for (my($i, $l) = (0, scalar @idl_types); $i < $l; $i++) {
+            if ($jsx_types[$i] =~ /\A number \[\]/xms) {
+                push @idl_types, $idl_types[$i];
+                push @jsx_types, "int[]/*$idl_types[$i]*/";
+            }
         }
 
         my @resolved = resolve_overload(@params);
-        foreach my $t(@types) {
+        for (my($i, $l) = (0, scalar @idl_types); $i < $l; $i++) {
             my $p = {
-                type     => $t,
-                jsx_type => to_jsx_type($t),
+                type     => $idl_types[$i],
+                jsx_type => $jsx_types[$i],
                 name     => $head->{name},
                 optional => $head->{optional},
                 vararg   => $head->{vararg},
