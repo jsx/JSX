@@ -102,125 +102,159 @@ var DocComment = exports.DocComment = DocCommentNode.extend({
 
 var DocumentGenerator = exports.DocumentGenerator = Class.extend({
 
-	constructor: function (compiler, getOutputPath /* function (sourcePath) */) {
+	constructor: function (compiler) {
 		this._compiler = compiler;
-		this._getOutputPath = getOutputPath;
+		this._outputPath = null;
+		this._pathFilter = null;
+		this._templatePath = null;
 	},
 
-	generateDoc: function () {
+	setOutputPath: function (outputPath) {
+		this._outputPath = outputPath;
+		return this;
+	},
+
+	setPathFilter: function (pathFilter/* : function (sourcePath : string) : boolean */) {
+		this._pathFilter = pathFilter;
+		return this;
+	},
+
+	setTemplatePath: function (path) {
+		this._templatePath = path;
+		return this;
+	},
+
+	buildDoc: function () {
+		var platform = this._compiler.getPlatform();
+		// CSS file is copied regardless of the template
+		platform.mkpath(this._outputPath);
+		platform.save(
+			this._outputPath + "/style.css",
+			platform.load(platform.getRoot() + "/src/doc/style.css"));
+		// output each file
 		this._compiler.getParsers().forEach(function (parser) {
-			var outputFile = this._getOutputPath(parser.getPath());
-			if (outputFile != null) {
-				var html = this._generateDocOfFile(parser);
-				this._compiler.getPlatform().save(this._getOutputPath(parser.getPath()), html);
+			if (this._pathFilter(parser.getPath())) {
+				var outputFile = this._outputPath + "/" + parser.getPath() + ".html";
+				platform.mkpath(outputFile.replace(/\/[^/]+$/, ""));
+				var html = this._buildDocOfFile(parser);
+				platform.save(outputFile, html);
 			}
 			return true;
 		}.bind(this));
 	},
 
-	_generateHeader: function (parser) {
-		var _ = "";
-		return _;
+	_buildDocOfFile: function (parser) {
+		return this._compiler.getPlatform().load(this._templatePath).replace(
+			/<%JSX:(.*?)%>/g, 
+			function (_unused, key) {
+				switch (key) {
+				case "BASE_HREF":
+					// convert each component of dirname to ..
+					return parser.getPath().replace(/\/[^/]+$/, "").replace(/[^/]+/g, "..");
+				case "TITLE":
+					return this._escape(parser.getPath());
+				case "BODY":
+					return this._buildListOfClasses(parser);
+				default:
+					throw new Error("unknown key:" + key + " in file: " + this._templatePath);
+				}
+			}.bind(this));
 	},
 
-	_generateFooter: function (parser) {
-		var _ = "";
-		return _;
-	},
-
-	_generateDocOfFile: function (parser) {
+	_buildListOfClasses: function (parser) {
 		var _ = "";
 
-?<?= this._generateHeader(parser) ?>
-?<h2><?= this._escape(parser.getPath()) ?></h2>
+?<div class="jsxdoc">
+?<h1>file: <?= this._escape(parser.getPath()) ?></h1>
 ?<div class="classes">
+
+		parser.getTemplateClassDefs().forEach(function (classDef) {
+?<?= this._buildDocOfClass(classDef) ?>
+		}.bind(this));
 
 		parser.getClassDefs().forEach(function (classDef) {
 			if (! (classDef instanceof InstantiatedClassDefinition)) {
-
-				var typeName = "class";
-				if ((classDef.flags() & ClassDefinition.IS_INTERFACE) != 0) {
-					typeName = "interface";
-				} else if ((classDef.flags() & ClassDefinition.IS_MIXIN) != 0) {
-					typeName = "mixin";
-				}
-?<div class="class">
-?<h3><?= this._flagsToHTML(classDef.flags()) + " " + this._escape(typeName + " " + classDef.className()) ?></h3>
-?<?= this._descriptionToHTML(classDef.getDocComment()) ?>
-?<div class="member-section properties">
-?<h3>Properties</h3>
-
-				classDef.forEachMemberVariable(function (varDef) {
-					if (! this._isPrivate(varDef)) {
-?<div class="property">
-?<h4 class="definition">
-?<?= this._flagsToHTML(varDef.flags()) ?> var <?= varDef.name() ?> : <?= this._typeToHTML(varDef.getType()) ?>
-?</h4>
-?<?= this._descriptionToHTML(varDef.getDocComment()) ?>
-?</div>
-					}
-					return true;
-				}.bind(this));
-
-?</div>
-?<div class="member-section constructors">
-?<h3>Constructor</h3>
-
-				classDef.forEachMemberFunction(function (funcDef) {
-					if (this._isConstructor(funcDef)) {
-?<?= this._generateDocOfFunction(funcDef) ?>
-					}
-					return true;
-				}.bind(this));
-
-?</div>
-?<div class="member-section functions">
-?<h3>Functions</h3>
-
-				classDef.forEachMemberFunction(function (funcDef) {
-					if (! (this._isConstructor(funcDef) || this._isPrivate(funcDef))) {
-?<?= this._generateDocOfFunction(funcDef) ?>
-					}
-					return true;
-				}.bind(this));
-
-?</div>
-?</div>
-
+?<?= this._buildDocOfClass(classDef) ?>
 			}
 		}.bind(this));
 
 ?</div>
-?<?= this._generateFooter(parser) ?>
+?</div>
+
+		return _;
+	},
+	
+	_buildDocOfClass: function (classDef) {
+		var typeName = "class";
+		if ((classDef.flags() & ClassDefinition.IS_INTERFACE) != 0) {
+			typeName = "interface";
+		} else if ((classDef.flags() & ClassDefinition.IS_MIXIN) != 0) {
+			typeName = "mixin";
+		}
+
+		var _ = "";
+
+?<div class="class">
+?<h2><?= this._flagsToHTML(classDef.flags()) + " " + this._escape(typeName + " " + classDef.className()) ?></h2>
+?<?= this._descriptionToHTML(classDef.getDocComment()) ?>
+
+		if (this._hasPublicProperties(classDef)) {
+			classDef.forEachMemberVariable(function (varDef) {
+				if (! this._isPrivate(varDef)) {
+?<div class="member property">
+?<h3>
+?<?= this._flagsToHTML(varDef.flags()) ?> var <?= varDef.name() ?> : <?= this._typeToHTML(varDef.getType()) ?>
+?</h3>
+?<?= this._descriptionToHTML(varDef.getDocComment()) ?>
+?</div>
+				}
+				return true;
+			}.bind(this));
+		}
+
+		classDef.forEachMemberFunction(function (funcDef) {
+			if (this._isConstructor(funcDef)) {
+?<?= this._buildDocOfFunction(funcDef) ?>
+			}
+			return true;
+		}.bind(this));
+
+		if (this._hasPublicFunctions(classDef)) {
+			classDef.forEachMemberFunction(function (funcDef) {
+				if (! (this._isConstructor(funcDef) || this._isPrivate(funcDef))) {
+?<?= this._buildDocOfFunction(funcDef) ?>
+				}
+				return true;
+			}.bind(this));
+		}
+
+?</div>
 
 		return _;
 	},
 
-	_generateDocOfFunction: function (funcDef) {
+	_buildDocOfFunction: function (funcDef) {
 		var _ = "";
-		var funcName = this._isConstructor(funcDef) ? "new " + funcDef.getClassDef().className() : this._flagsToHTML(funcDef) + " function " + funcDef.name();
+		var funcName = this._isConstructor(funcDef) ? "new " + funcDef.getClassDef().className() : this._flagsToHTML(funcDef.flags()) + " function " + funcDef.name();
 		var args = funcDef.getArguments();
 		var argsHTML = args.map(function (arg) {
 			return this._escape(arg.getName().getValue()) + " : " + this._typeToHTML(arg.getType());
 		}.bind(this)).join(", ");
 
-?<div class="function">
-?<h4>
+?<div class="member function">
+?<h3>
 ?<?= this._escape(funcName) ?>(<?= argsHTML ?>)
 		if (! this._isConstructor(funcDef)) {
 ? : <?= this._typeToHTML(funcDef.getReturnType()) ?>
 		}
-?</h4>
+?</h3>
 ?<?= this._descriptionToHTML(funcDef.getDocComment()) ?>
-		if (args.length != 0) {
+		if (this._argsHasDocComment(funcDef)) {
 ?<table class="arguments">
-?<caption>Arguments</caption>
-?<tr><th>Name</th><th>Type</th><th>Description</th></tr>
 			args.forEach(function (arg) {
 				var argName = arg.getName().getValue();
 ?<tr>
 ?<td><?= this._escape(argName) ?></td>
-?<td><?= this._typeToHTML(arg.getType()) ?></td>
 ?<td><?= this._argumentDescriptionToHTML(argName, funcDef.getDocComment()) ?></td>
 ?</tr>
 			}.bind(this));
@@ -245,15 +279,7 @@ var DocumentGenerator = exports.DocumentGenerator = Class.extend({
 	},
 
 	_argumentDescriptionToHTML: function (name, docComment) {
-		var desc = "";
-		if (docComment != null) {
-			docComment.getParams().forEach(function (param) {
-				if (param.getParamName() == name) {
-					desc = param.getDescription();
-				}
-			});
-		}
-		return desc;
+		return docComment != null ? this._getDescriptionOfNamedArgument(docComment, name): "";
 	},
 
 	_typeToHTML: function (type) {
@@ -289,6 +315,48 @@ var DocumentGenerator = exports.DocumentGenerator = Class.extend({
 				"\"": "&quot;"
 			}[ch];
 		});
+	},
+
+	_hasPublicProperties: function (classDef) {
+		return ! classDef.forEachMemberVariable(function (varDef) {
+			if (! this._isPrivate(varDef)) {
+				return false;
+			}
+			return true;
+		}.bind(this));
+	},
+
+	_hasPublicFunctions: function (classDef) {
+		return ! classDef.forEachMemberFunction(function (funcDef) {
+			if (this._isConstructor(funcDef) || this._isPrivate(funcDef)) {
+				return true;
+			}
+			return false;
+		}.bind(this));
+	},
+
+	_argsHasDocComment: function (funcDef) {
+		var docComment = funcDef.getDocComment();
+		if (docComment == null) {
+			return false;
+		}
+		var args = funcDef.getArguments();
+		for (var argIndex = 0; argIndex < args.length; ++argIndex) {
+			if (this._getDescriptionOfNamedArgument(docComment, args[argIndex].getName().getValue()) != "") {
+				return true;
+			}
+		}
+		return false;
+	},
+
+	_getDescriptionOfNamedArgument: function (docComment, argName) {
+		var params = docComment.getParams();
+		for (var paramIndex = 0; paramIndex < params.length; ++paramIndex) {
+			if (params[paramIndex].getParamName() == argName) {
+				return params[paramIndex].getDescription();
+			}
+		}
+		return "";
 	},
 
 	_isConstructor: function (funcDef) {

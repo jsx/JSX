@@ -1,0 +1,55 @@
+.jsxdoc h1 {
+    font-size: 150%;
+}
+
+.jsxdoc h2 {
+    font-size: 150%;
+    margin: 0.5em 0;
+}
+
+.jsxdoc h3 {
+    font-size: 100%;
+    font-weight: bold;
+    margin: 0.5em 0;
+}
+
+.jsxdoc .classes {
+    border: 1px solid #ccc;
+    margin: 0;
+}
+
+.jsxdoc .classes .class:first-child {
+    border-top: 0px;
+}
+
+.jsxdoc .classes .class {
+    margin: 0;
+    padding: 1em;
+    border-top: 1px solid #ccc;
+}
+
+.jsxdoc .member {
+    margin: 1em 0;
+}
+
+.jsxdoc .member h3 {
+    margin-left: 1em;
+}
+
+.jsxdoc .description {
+    margin: 0.5em 0 0.5em 4em;
+}
+
+.jsxdoc .arguments {
+    margin: 0.5em 0 0.5em 4em;
+}
+
+.jsxdoc .arguments caption {
+    text-align: left;
+    font-weight: normal;
+}
+
+.jsxdoc .arguments td {
+    margin: 0;
+    padding: 0.3em 1em;
+}

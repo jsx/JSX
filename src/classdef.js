@@ -1440,6 +1440,15 @@ var TemplateClassDefinition = exports.TemplateClassDefinition = Class.extend({
 		this._members = members;
 		this._objectTypesUsed = objectTypesUsed;
 		this._docComment = docComment;
+		for (var i = 0; i < this._members.length; ++i) {
+			this._members[i].setClassDef(this);
+			if (this._members[i] instanceof MemberFunctionDefinition) {
+				this._members[i].forEachClosure(function setClassDef(funcDef) {
+					funcDef.setClassDef(this);
+					return funcDef.forEachClosure(setClassDef.bind(this));
+				}.bind(this));
+			}
+		}
 	},
 
 	className: function () {
@@ -1495,6 +1504,34 @@ var TemplateClassDefinition = exports.TemplateClassDefinition = Class.extend({
 			members,
 			instantiationContext.objectTypesUsed);
 		return instantiatedDef;
+	},
+
+	forEachMember: function (cb) {
+		for (var i = 0; i < this._members.length; ++i) {
+			if (! cb(this._members[i]))
+				return false;
+		}
+		return true;
+	},
+
+	forEachMemberVariable: function (cb) {
+		for (var i = 0; i < this._members.length; ++i) {
+			if (this._members[i] instanceof MemberVariableDefinition) {
+				if (! cb(this._members[i]))
+					return false;
+			}
+		}
+		return true;
+	},
+
+	forEachMemberFunction: function (cb) {
+		for (var i = 0; i < this._members.length; ++i) {
+			if (this._members[i] instanceof MemberFunctionDefinition) {
+				if (! cb(this._members[i]))
+					return false;
+			}
+		}
+		return true;
 	}
 
 });
