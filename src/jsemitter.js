@@ -1372,9 +1372,11 @@ var _InExpressionEmitter = exports._InExpressionEmitter = _OperatorExpressionEmi
 	},
 
 	_emit: function () {
-		this._emitter._emitWithNullableGuard(this._expr.getFirstExpr(), _InExpressionEmitter._operatorPrecedence);
-		this._emitter._emit(" in ", this._expr.getToken());
+		this._emitter._emit("$__jsx_ObjectHasOwnProperty.call(", this._expr.getToken());
 		this._emitter._getExpressionEmitterFor(this._expr.getSecondExpr()).emit(_InExpressionEmitter._operatorPrecedence);
+		this._emitter._emit(", ", null);
+		this._emitter._emitWithNullableGuard(this._expr.getFirstExpr(), _InExpressionEmitter._operatorPrecedence);
+		this._emitter._emit(")", null);
 	},
 
 	_getPrecedence: function () {
