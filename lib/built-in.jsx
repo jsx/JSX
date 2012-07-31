@@ -20,51 +20,169 @@
  * IN THE SOFTWARE.
  */
 
+/**
+ * <p>The file defines the APIs of the built-in objects of JSX.</p>
+ * 
+ * <p>The API is designed to be compatible to the ECMA-262 standard whenever possible.</p>
+ * 
+ * <p>The description of the API is based on <a href="https://developer.mozilla.org/en/JavaScript/Reference/">the MDN JavaScript Reference</a> under the <a href="http://creativecommons.org/licenses/by-sa/2.5/">Creative Commons: Attribution-Sharealike license</a>.</p>
+ */
+
+/**
+ * The root class of all classes.
+ */
 native class Object {
 
+	/**
+	 * Returns a string representing the object.
+	 */
 	function toString() : string;
 
 }
 
-// 15.2
+/**
+ * Map is an associative container that contains a list of unique key-value pairs.  Type of the keys are strings, type of the values are Nullable.&lt;T&gt;.
+ */
 native final class Map.<T> {
 
 	function __native_index_operator__(key : string) : Nullable.<T>;
 
-	// 15.2.4
+	/**
+	 * Returns a boolean indicating whether the object has the specified property.
+	 * 
+	 * @paarm key The name of the property to test.
+	 */
 	function hasOwnProperty(key : string) : boolean;
 
 }
 
-// 15.3
+/**
+ * A class representing a static function.
+ * Unlike JavaScript, JSX does not provide <em>Function#call()</em> or <em>Function#apply()</em> since it is a statically-typed language.
+ */
 native final class Function {
-	// JSX does not support call() or apply(), since it is a statically-typed language
 }
 
-// 15.4
+/**
+ * <p>Array is a sequence of Nullable.&lt;T&gt; values.  The size of an array is not fixed.</p>
+ * <p>Unless otherwise noted, the defintions of the methods match those specified in ECMA-262, 3rd edition.</p>
+ */
 native final class Array.<T> {
 
+	/**
+	 * Constructs an empty array.
+	 */
 	function constructor();
+
+	/**
+	 * Constructs an array of given length.  The elements are initialized to null.
+	 */
 	function constructor(length : number);
 
 	function __native_index_operator__(n : number) : Nullable.<T>;
 
-	// 15.4.4
+	/**
+	 * Returns a string representing the object.
+	 */
 	override function toString() : string;
+
+	/**
+	 * Returns a string representing the object.
+	 */
 	function toLocaleString() : string;
-	function concat(...a : Array.<T>) : Array.<T>;
+
+	/**
+	 * Returns a new array comprised of this array joined with other array(s) and/or value(s).
+	 * 
+	 * @param arrayN Arrays to concatenate to the resulting array.
+	 */
+	function concat(...arrayN : Array.<T>) : Array.<T>;
+
+	/**
+	 * Joins all elements of an array into a string, separating each element with a comma.
+	 */
 	function join() : string;
+
+	/**
+	 * Joins all elements of an array into a string.
+	 * 
+	 * @param separator Specifies a string to separate each element of the array.
+	 */
 	function join(separator : string) : string;
+
+	/**
+	 * Removes the last element from an array and returns that element.
+	 * 
+	 * @return The last element of the array that has been removed, or null if the array was empty.
+	 */
 	function pop() : Nullable.<T>;
-	function push(...item : T) : int;
+
+	/**
+	 * Mutates an array by appending the given elements and returning the new length of the array.
+	 * 
+	 * @param itemN The elements to add to the end of the array.
+	 */
+	function push(...itemN : T) : int;
+
+	/**
+	 * Reverses an array in place.  The first array element becomes the last and the last becomes the first.
+	 * 
+	 * @return Returns reference to itself.
+	 */
 	function reverse() : Array.<T>;
+
+	/**
+	 * Removes the first element from an array and returns that element. This method changes the length of the array.
+	 * 
+	 * @return The first element of the array that has been removed, or null if the array was empty.
+	 */
 	function shift() : Nullable.<T>;
+
+	/**
+	 * Returns a one-level deep copy of a portion of an array.
+	 * 
+	 * @param start Zero-based index at which to begin extraction.
+	 */
 	function slice(start : number) : Array.<T>;
+
+	/**
+	 * Returns a one-level deep copy of a portion of an array.
+	 * 
+	 * @param start Zero-based index at which to begin extraction.
+	 * @param end Zero-based index at which to end extraction. slice extracts up to but not including end.
+	 */
 	function slice(start : number, end : number) : Array.<T>;
+
+	/**
+	 * Sorts the elements of an array in place and returns the array.  The array is sorted lexicographically (in dictionary order) according to the string conversion of each element.
+	 */
 	function sort() : Array.<T>;
+
+	/**
+	 * Sorts the elements of an array in place and returns the array.
+	 * 
+	 * @param comparefn Specifies a function that defines the sort order.
+	 */
 	function sort(comparefn : function (x : Nullable.<T>, y : Nullable.<T>) : number) : Array.<T>;
-	function splice(start : number, deleteCount : number, ...item : T) : Array.<T>;
-	function unshift(...item : T) : int;
+
+	/**
+	 * Changes the content of an array, adding new elements while removing old elements.
+	 * 
+	 * @param start Index at which to start changing the array. If negative, will begin that many elements from the end.
+	 * @param deleteCount An integer indicating the number of old array elements to remove.
+	 * @param itemN The elements to add to the array.  If you don't specify any elements, <code>splice</code> simply removes elements from the array.
+	 * 
+	 * @return An array containing the removed elements. If only one element is removed, an array of one element is returned.
+	 */
+	function splice(start : number, deleteCount : number, ...itemN : T) : Array.<T>;
+
+	/**
+	 * Adds one or more elements to the beginning of an array and returns the new length of the array.
+	 * 
+	 * @param itemN The elements to add to the front of the array.
+	 * @return The new <code>length</code> property of the object upon which the method was called.
+	 */
+	function unshift(...itemN : T) : int;
 
 	// 15.4.4 (ES5)
 	function indexOf(value : Nullable.<T>) : number;
@@ -96,134 +214,451 @@ native final class Array.<T> {
 	function reduceRight(callbackfn : function(previousValue : Nullable.<T>, currentValue : Nullable.<T>) : Nullable.<T>) : Array.<T>;
 	function reduceRight(callbackfn : function(previousValue : Nullable.<T>, currentValue : Nullable.<T>) : Nullable.<T>, initialValue : T) : Array.<T>;
 
-	// 15.4.5
+	/**
+	 * <p>A positive integer between 0 and a value less than 2<sup>32</sup> that specifies the number of elements in an array.</p>
+	 * 
+	 * <p>You can set the length property to truncate an array at any time. When you extend an array by changing its length property, the created elements are initialized to null.</p>
+	 */
 	var length : number;
 }
 
-// 15.5
+/**
+ * <p>A wrapper object for primitive <code>string</code>s.</p>
+ * 
+ * <p>Unless otherwise noted, the defintions of the methods match those specified in ECMA-262, 3rd edition.</p>
+ */
 native final class String {
 
-	// 15.5.2
+	/**
+	 * Constructs a String object containing an empty string.
+	 */
 	function constructor();
+
+	/**
+	 * Constructs a String object wrapping the given string.
+	 */
 	function constructor(s : string);
+
+	/**
+	 * Constructs a String object wrapping the value wrapped by the given object.
+	 */
 	function constructor(s : String);
 
-	// 15.5.3
+	/**
+	 * Returns a string value containing as many characters as the number of arguments.
+	 */
 	static function fromCharCode(...charN : number) : string;
 
-	// 15.5.4
+	/**
+	 * Returns this string value. (Note that, for a String object, the toString method happens to return the same thing as the valueOf method.)
+	 */
 	override function toString() : string;
+
+	/**
+	 * Returns this string value.
+	 */
 	function valueOf() : string;
+
+	/**
+	 * Returns a string containing the character at position <code>pos</code> in the string resulting from converting this object to a string. If there is no character at that position, the result is the empty string. The result is a string value, not a String object.
+	 */
 	function charAt(pos : number) : string;
+
+	/**
+	 * Returns a number (a nonnegative integer less than 2<sup>16</sup>) representing the code point value of the character at position pos in the string resulting from converting this object to a string. If there is no character at that position, the result is NaN.
+	 */
 	function charCodeAt(pos : number) : number;
+
+	/**
+	 * When the <code>concat</code> method is called with zero or more arguments <code>string1</code>, <code>string2</code>, etc., it returns a string consisting of the characters of this object followed by the characters of each of string1, string2, etc. The result is a string value, not a String object.
+	 */
 	function concat(...stringN : String) : string;
+
+	/**
+	 * If searchString appears as a substring of the result of converting this object to a string then the index of the smallest such position is returned; otherwise, -1 is returned.
+	 */
 	function indexOf(searchString : string) : int;
+
+	/**
+	 * If searchString appears as a substring of the result of converting this object to a string, at one or more positions that are greater than or equal to position, then the index of the smallest such position is returned; otherwise, -1 is returned.
+	 */
 	function indexOf(searchString : string, position : number) : int;
+
+	/**
+	 * If searchString appears as a substring of the result of converting this object to a string then the index of the greatest such position is returned; otherwise, -1 is returned.
+	 */
 	function lastIndexOf(searchString : string) : int;
+
+	/**
+	 * If searchString appears as a substring of the result of converting this object to a string at one or more positions that are smaller than or equal to position, then the index of the greatest such position is returned; otherwise, -1 is returned.
+	 */
 	function lastIndexOf(searchString : string, position : number) : int;
-	function localeCompare(that : string) : int;
+
+	/**
+	 * Returns a number indicating whether a reference string comes before or after or is the same as the given string in sort order.
+	 * 
+	 * Returns a number indicating whether a reference string comes before or after or is the same as the given string in sort order. Returns a negative number if the string occurs earlier in a sort than compareString, returns a positive number if the string occurs afterwards in such a sort, and returns 0 if they occur at the same level.
+	 * 
+	 * @param that The string against which the referring string is comparing.
+	 */
+	function localeCompare(that : string) : number;
+
+	/**
+	 * Used to retrieve the matches when matching a string against a regular expression.
+	 * 
+	 * If the regular expression does not include the g flag, returns the same result as regexp.exec(string).  If the regular expression includes the g flag, the method returns an Array containing all matches. If there were no matches, the method returns null.  The returned Array has an extra input property, which contains the regexp that generated it as a result. In addition, it has an index property, which represents the zero-based index of the match in the string.
+	 * 
+	 * @param regexp A regular expression object.
+	 */
 	function match(regexp : RegExp) : string [];
+
+	/**
+	 * Returns a new string with some or all matches of a pattern replaced by a replacement.
+	 */
 	function replace(searchValue : string, replaceValue : string) : string;
+
+	/**
+	 * Returns a new string with some or all matches of a pattern replaced by a replacement.
+	 */
 	function replace(searchValue : RegExp, replaceValue : string) : string;
-	// FIXME 15.5.4.11
+
+	/**
+	 * Returns a new string with some or all matches of a pattern replaced by a replacement.
+	 */
 	function replace(searchValue : string, replaceValue : function(matched :string):string) : string;
+
+	/**
+	 * Returns a new string with some or all matches of a pattern replaced by a replacement.
+	 */
 	function replace(searchValue : RegExp, replaceValue : function(matched :string):string) : string;
+
+	/**
+	 * Executes the search for a match between a regular expression and this <code>String</code> object.
+	 */
 	function search(searchValue : string) : int;
+
+	/**
+	 * Executes the search for a match between a regular expression and this <code>String</code> object.
+	 */
 	function search(searchValue : RegExp) : int;
+	
+	/**
+	 * Extracts a section of a string and returns a new string.
+	 * 
+	 * @param start The zero-based index at which to begin extraction.
+	 */
 	function slice(start : number) : string;
+
+	/**
+	 * Extracts a section of a string and returns a new string.
+	 * 
+	 * @param start The zero-based index at which to begin extraction.
+	 * @param end The zero-based index at which to end extraction.
+	 */
 	function slice(start : number, end : number) : string;
+
+	/**
+	 * Splits a String object into an array of strings by separating the string into substrings.
+	 * 
+	 * @param separator Specifies the character sequence to use for separating the string.
+	 */
 	function split(separator : string) : string [];
+
+	/**
+	 * Splits a String object into an array of strings by separating the string into substrings.
+	 * 
+	 * @param separator Specifies the character sequence to use for separating the string.
+	 * @param limit Integer specifying a limit on the number of splits to be found.  The <code>split</code> method still splits on every match of <code>separator</code>, but it truncates the returned array to at most <code>limit</code> elements.
+	 */
 	function split(separator : string, limit : number) : string [];
+
+	/**
+	 * Splits a String object into an array of strings by separating the string into substrings.
+	 * 
+	 * @param separator Specifies an regular expression to use for separating the string.
+	 */
 	function split(separator : RegExp) : string [];
+
+	/**
+	 * Splits a String object into an array of strings by separating the string into substrings.
+	 * 
+	 * @param separator Specifies an regular expression to use for separating the string.
+	 * @param limit Integer specifying a limit on the number of splits to be found.  The <code>split</code> method still splits on every match of <code>separator</code>, but it truncates the returned array to at most <code>limit</code> elements.
+	 */
 	function split(separator : RegExp, limit : number) : string [];
+
+	/**
+	 * Returns a subset of a <code>string</code> starting at the given offset.
+	 * 
+	 * @param start The zero-based index at which to begin extraction.
+	 */
 	function substring(start : number) : string;
+
+	/**
+	 * Returns a subset of a <code>string</code> starting at the given offset.
+	 * 
+	 * @param start The zero-based index at which to begin extraction.
+	 * @param end The zero-based index at which to end extraction.
+	 */
 	function substring(start : number, end : number) : string;
+
+	/**
+	 * Returns the calling string value converted to lowercase.
+	 */
 	function toLowerCase() : string;
+
+	/**
+	 * Returns the calling string value converted to lowercase.
+	 */
 	function toLocaleLowerCase() : string;
+
+	/**
+	 * Returns the calling string value converted to uppercase.
+	 */
 	function toUpperCase() : string;
+
+	/**
+	 * Returns the calling string value converted to uppercase.
+	 */
 	function toLocaleUpperCase() : string;
 
+	/**
+	 * Removes whitespace from both ends of the string.
+	 */
 	function trim() : string;
 
-	// 15.5.5
+	/**
+	 * The length of a string.
+	 */
 	__readonly__ var length : int;
 
 	// removed: use substring() instead
 	// function substr(start : number) : string;
 	// function substr(start : number, length : number) : string;
 
-	// 15.1.3 URI Handling Function Properties
+	/**
+	 * Encodes a Uniform Resource Identifier (URI) component by replacing each instance of certain characters by one, two, three, or four escape sequences representing the UTF-8 encoding of the character.
+	 * 
+	 * @param str A component of a URI.
+	 */
 	static function encodeURIComponent(str : string) : string;
-	static function decodeURIComponent(str : string) : string;
+
+	/**
+	 * Decodes a Uniform Resource Identifier (URI) component previously created by encodeURIComponent or by a similar routine.
+	 * 
+	 * @param encodedURI An encoded component of a Uniform Resource Identifier.
+	 */
+	static function decodeURIComponent(encodedURI : string) : string;
+
+	/**
+	 * Encodes a Uniform Resource Identifier (URI) by replacing each instance of certain characters by one, two, three, or four escape sequences representing the UTF-8 encoding of the character.
+	 * 
+	 * @param str A complete Uniform Resource Identifier.
+	 */
 	static function encodeURI(str : string) : string;
-	static function decodeURI(str : string) : string;
+
+	/**
+	 * Decodes a Uniform Resource Identifier (URI) previously created by encodeURI or by a similar routine.
+	 * 
+	 * @param encodedURI A complete, encoded Uniform Resuorce Identifier.
+	 */
+	static function decodeURI(encodedURI : string) : string;
 
 }
 
-// 15.6
+/**
+ * A wrapper object for primitive <code>boolean</code>s.
+ */
 native final class Boolean {
 
-	// 15.6.2
+	/**
+	 * Constructs a Boolean object containing a <code>false</code>.
+	 */
 	function constructor();
+
+	/**
+	 * Constructs a Boolean object wrapping the given value.
+	 */
 	function constructor(value : boolean);
+
+	/**
+	 * Constructs a Boolean object wrapping the value wrapped by the given object.
+	 */
 	function constructor(value : Boolean);
 
-	// 15.6.4
+	/**
+	 * Returns a string of either "true" or "false" depending upon the value of the object.
+	 */
 	override function toString() : string;
+
+	/**
+	 * Returns the wrapped <code>boolean</code> value.
+	 */
 	function valueOf() : boolean;
 }
 
 
-// 15.7
+/**
+ * A wrapper object for primitive <code>number</code>s.
+ */
 native final class Number {
 
-	// 15.7.2
+	/**
+	 * Constructs a Number object containing <code>0.0</code>.
+	 */
 	function constructor();
+
+	/**
+	 * Constructs a Number object wrapping the given value.
+	 */
 	function constructor(value : number);
+
+	/**
+	 * Constructs a Number object wrapping the value wrapped by the given object.
+	 */
 	function constructor(value : Number);
 
-	// 15.7.3
+	/**
+	 * The maximum numeric value representable.
+	 */
 	static const MAX_VALUE : number;
+
+	/**
+	 * The minimum numeric value representable.
+	 */
 	static const MIN_VALUE : number;
 
 	// NOTE: NaN, POSITIVE_INFINITY and NEGATIVE_INFINITY are
 	//       not provided. Use NaN, +Infinity, and -Infinity literals
 	//       instead.
 
-	// 15.7.4
+	/**
+	 * Returns a string representing the number.
+	 */
 	override function toString() : string;
+
+	/**
+	 * Returns a string representing the specified Number object.
+	 * 
+	 * @param An integer between 2 and 36 specifying the base to use for representing numeric values.
+	 */
 	function toString(radix : number) : string;
+
+	/**
+	 * This method available to numbers will convert the number into a string which is suitable for presentation in the given locale.
+	 */
 	function toLocaleString() : string;
+
+	/**
+	 * Returns the wrapped <code>number</code> value.
+	 */
 	function valueOf() : number;
+
+	/**
+	 * Formats a number using fixed-point notation.
+	 */
 	function toFixed(fractionDigits : number) : string;
-	function toExpotential(fractionDigits : number) : string;
+
+	/**
+	 * Returns a string representing the Number object in exponential notation.
+	 */
+	function toExponential(fractionDigits : number) : string;
+
+	/**
+	 * Returns a string representing the Number object to the specified precision.
+	 */
 	function toPrecision(precision : number) : string;
 
-	// 15.1.2 (Function Properties of the Global Object)
-	static __pure__ function parseInt(str :string) :number;
-	static __pure__ function parseInt(str :string, radix :number) :number;
-	static __pure__ function parseFloat(str :string) :number;
-	static __pure__ function isNaN(num :number) :boolean;
-	static __pure__ function isFinite(num :number) :boolean;
+	/**
+	 * Parses a string argument and returns an integer if successful, or <code>NaN</code> if failed.
+	 * 
+	 * @param str The value to parse.  Leading whitespace in the string is ignored.
+	 */
+	static __pure__ function parseInt(str :string) : number;
+
+	/**
+	 * Parses a string argument and returns an integer if successful, or <code>NaN</code> if failed.
+	 * 
+	 * @param str The value to parse.  Leading whitespace in the string is ignored.
+	 * @param radix An integer that represents the radix of the above mentioned string.
+	 */
+	static __pure__ function parseInt(str :string, radix :number) : number;
+
+	/**
+	 * <p>Parses a string argument and returns a floating point number.</p>
+	 * 
+	 * <p>If it encounters a character other than a sign (+ or -), numeral (0-9), a decimal point, or an exponent, it returns the value up to that point and ignores that character and all succeeding characters. Leading and trailing spaces are allowed.</p>
+	 * 
+	 * <p>If the first character cannot be converted to a number, parseFloat returns <code>NaN</code>.</p>
+	 */
+	static __pure__ function parseFloat(str :string) : number;
+
+	/**
+	 * Determines whether a number is <code>NaN</code> or not.
+	 */
+	static __pure__ function isNaN(num :number) : boolean;
+
+	/**
+	 * Determines whether a number is finite or not.
+	 */
+	static __pure__ function isFinite(num :number) : boolean;
 
 }
 
-// 15.8
+/**
+ * <p>Provides mathmetical constants and functions.</p>
+ * 
+ * <p>Unless otherwise noted, the defintions of the methods match those specified in ECMA-262, 3rd edition.</p>
+ */
 native final class Math {
-	// 15.8.1
+
+	/**
+	 * Euler's constant and the base of natural logarithms, approximately 2.718.
+	 */
 	static const E = 2.718281828459045;
+
+	/**
+	 * Natural logarithm of 10, approximately 2.302.
+	 */
 	static const LN10 = 2.302585092994046;
+
+	/**
+	 * Natural logarithm of 2, approximately 0.693.
+	 */
 	static const LN2 = 0.6931471805599453;
+
+	/**
+	 * Base 2 logarithm of E, approximately 1.442.
+	 */
 	static const LOG2E = 1.4426950408889634;
+
+	/**
+	 * Base 10 logarithm of E, approximately 0.434.
+	 */
 	static const LOG10E = 0.4342944819032518;
+
+	/**
+	 * Ratio of the circumference of a circle to its diameter, approximately 3.14159.
+	 */
 	static const PI = 3.141592653589793;
+
+	/**
+	 * Square root of 1/2; equivalently, 1 over the square root of 2, approximately 0.707.
+	 */
 	static const SQRT1_2 = 0.7071067811865476;
+
+	/**
+	 * Square root of 2, approximately 1.414.
+	 */
 	static const SQRT2 = 1.4142135623730951;
 
-	// 15.8.2
+	/**
+	 * Returns the absolute value of a number.
+	 */
 	static __pure__ function abs(x :number) :number {
 		return x >= 0 ? x : -x;
 	}
+
 	static __pure__ function acos(x :number) :number;
 	static __pure__ function asin(x :number) :number;
 	static __pure__ function atan(x :number) :number;
@@ -253,33 +688,72 @@ native final class Math {
 	}
 }
 
-// 15.9
+/**
+ * <p>An object for working with dates and times.</p>
+ * 
+ * <p>Unless otherwise noted, the defintions of the methods match those specified in ECMA-262, 3rd edition.</p>
+ */
 native final class Date {
-	// NOTE: these "number"s may be NaN, so it cannot be int.
 
-	// TODO: complete all the methods
-
-	// 15.9.3
+	/**
+	 * Creates a Date object.
+	 */
 	function constructor(year :number, month :number);
+
+	/**
+	 * Creates a Date object.
+	 */
 	function constructor(year :number, month :number, date :number);
+
+	/**
+	 * Creates a Date object.
+	 */
 	function constructor(year :number, month :number, date :number,
 						hours :number);
+
+	/**
+	 * Creates a Date object.
+	 */
 	function constructor(year :number, month :number, date :number,
 						hours :number, minutes :number);
+
+	/**
+	 * Creates a Date object.
+	 */
 	function constructor(year :number, month :number, date :number,
 						hours :number, minutes :number, seconds :number);
+
+	/**
+	 * Creates a Date object.
+	 */
 	function constructor(year :number, month :number, date :number,
 						hours :number, minutes :number, seconds :number,
 						ms :number);
 
+	/**
+	 * Creates a Date object.
+	 * 
+	 * @param value String value representing a date. The string should be in a format recognized by the <code>parse</code> method (IETF-compliant RFC 2822 timestamps).
+	 */
 	function constructor(value :string);
+
+	/**
+	 * Creates a Date object.
+	 * 
+	 * @param value Integer value representing the number of milliseconds since 1 January 1970 00:00:00 UTC (Unix Epoch).
+	 */
 	function constructor(value :number);
-	// not defined in ECMA-262, but JS's new Date(new Date) works
+
+	/**
+	 * Clones the given object.
+	 */
 	function constructor(value :Date);
 
+	/**
+	 * Creates a Date object for today's date and time according to local time.
+	 */
 	function constructor();
 
-	// 15.9.4
 	static function parse(value :string) :number;
 
 	static function UTC(year :number, month :number) : number;
@@ -352,7 +826,11 @@ native final class Date {
 	function toJSON(key :string) :string; // key is given but ignored
 }
 
-// 15.10 RegExp
+/**
+ * <p>An object that represents a regular-expression.</p>
+ * 
+ * <p>Unless otherwise noted, the defintions of the methods match those specified in ECMA-262, 3rd edition.</p>
+ */
 native final class RegExp {
 
 	function constructor(pattern :string, flags :string);
@@ -375,7 +853,6 @@ native final class RegExp {
 
 }
 
-// 15.11 Error
 native class Error {
 
 	function constructor();
@@ -424,10 +901,28 @@ native final class JSON {
 
 }
 
+/**
+ * Provides static functions to control the behaviour of the JSX runtime.
+ */
 native final class JSX {
+
+	/**
+	 * Returns whether or not the profiler is running.
+	 */
 	static function profilerIsRunning() : boolean;
+
+	/**
+	 * Returns the profiler results.
+	 */
 	static function getProfileResults() : variant;
+
+	/**
+	 * <p>Posts the profiler results to the given URL.</p>
+	 * 
+	 * <p>Please refer to <a href="http://jsx.github.com/doc/profiler.html">the profiler document</a> for using the function.</p>
+	 */
 	static function postProfileResults(url : string) : void;
+
 }
 
 // vim: set noexpandtab:
