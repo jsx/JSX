@@ -22,6 +22,7 @@
 
 var Class = require("./Class");
 eval(Class.$import("./classdef"));
+eval(Class.$import("./type"));
 
 var DocCommentNode = exports.DocCommentNode = Class.extend({
 
@@ -107,6 +108,7 @@ var DocumentGenerator = exports.DocumentGenerator = Class.extend({
 		this._outputPath = null;
 		this._pathFilter = null;
 		this._templatePath = null;
+		this._classDefToHTMLCache = []; // array of [ classDef, HTML ]
 	},
 
 	setOutputPath: function (outputPath) {
@@ -194,7 +196,7 @@ _ += "</div>\n";
 
 		var _ = "";
 
-_ += "<div class=\"class\">\n";
+_ += "<div class=\"class\" id=\"class-"; _ += (this._escape(classDef.className())).replace(/\n$/, ""); _ += "\">\n";
 _ += "<h2>"; _ += (this._flagsToHTML(classDef.flags()) + " " + this._escape(typeName + " " + classDef.className())).replace(/\n$/, ""); _ += "</h2>\n";
 _ += (this._descriptionToHTML(classDef.getDocComment())).replace(/\n$/, ""); _ += "\n";
 
@@ -284,7 +286,57 @@ _ += "</div>\n";
 
 	_typeToHTML: function (type) {
 		// TODO create links for object types
+		if (type instanceof ObjectType) {
+			var classDef = type.getClassDef();
+			if (classDef != null) {
+				return this._classDefToHTML(classDef);
+			}
+		} else if (type instanceof FunctionType) {
+			return "function "
+				+ "("
+				+ type.getArgumentTypes().map(function (type) {
+					return ":" + this._typeToHTML(type);
+				}.bind(this)).join(", ")
+				+ ")";
+		}
 		return this._escape(type.toString());
+	},
+
+	_classDefToHTML: function (classDef) {
+		// instantiated classes should be handled separately
+		if (classDef instanceof InstantiatedClassDefinition) {
+			return this._classDefToHTML(classDef.getTemplateClass())
+				+ ".&lt;"
+				+ classDef.getTypeArguments().map(function (type) { return this._typeToHTML(type); }.bind(this)).join(", ")
+				+ "&gt;";
+		}
+		// lokup the cache
+		for (var cacheIndex = 0; cacheIndex < this._classDefToHTMLCache.length; ++cacheIndex) {
+			if (this._classDefToHTMLCache[cacheIndex][0] == classDef) {
+				return this._classDefToHTMLCache[cacheIndex][1];
+			}
+		}
+		// determine the parser to which the classDef belongs
+		var parser = function () {
+			var parsers = this._compiler.getParsers();
+			for (var i = 0; i < parsers.length; ++i) {
+				if (parsers[i].getClassDefs().indexOf(classDef) != -1
+					|| parsers[i].getTemplateClassDefs().indexOf(classDef) != -1) {
+					return parsers[i];
+				}
+			}
+			throw new Error("could not determine the parser to which the class belongs:" + classDef.className());
+		}.call(this);
+		// return text if we cannot linkify the class name
+		if (! this._pathFilter(parser.getPath())) {
+			return this._escape(classDef.className());
+		}
+		// linkify and return
+		var _ = "";
+_ += "<a href=\""; _ += (this._escape(parser.getPath())).replace(/\n$/, ""); _ += ".html#class-"; _ += (this._escape(classDef.className())).replace(/\n$/, ""); _ += "\">"; _ += (this._escape(classDef.className())).replace(/\n$/, ""); _ += "</a>\n";
+		_ = _.trim();
+		this._classDefToHTMLCache.push([classDef, _]);
+		return _;
 	},
 
 	_flagsToHTML: function (flags) {

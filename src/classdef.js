@@ -1496,8 +1496,7 @@ var TemplateClassDefinition = exports.TemplateClassDefinition = Class.extend({
 		if (! succeeded)
 			return null;
 		var instantiatedDef = new InstantiatedClassDefinition(
-			this._className,
-			this._flags,
+			this,
 			request.getTypeArguments(),
 			this._extendType != null ? this._extendType.instantiate(instantiationContext): null,
 			this._implementTypes.map(function (t) { return t.instantiate(instantiationContext); }),
@@ -1538,23 +1537,27 @@ var TemplateClassDefinition = exports.TemplateClassDefinition = Class.extend({
 
 var InstantiatedClassDefinition = exports.InstantiatedClassDefinition = ClassDefinition.extend({
 
-	constructor: function (templateClassName, flags, typeArguments, extendType, implementTypes, members, objectTypesUsed) {
+	constructor: function (templateClassDef, typeArguments, extendType, implementTypes, members, objectTypesUsed) {
 		ClassDefinition.prototype.constructor.call(
 			this,
 			null,
-			Type.Type.templateTypeToString(templateClassName, typeArguments),
-			flags,
+			Type.Type.templateTypeToString(templateClassDef.className(), typeArguments),
+			templateClassDef.flags(),
 			extendType,
 			implementTypes,
 			members,
 			objectTypesUsed,
 			null /* docComment is not used for instantiated class */);
-		this._templateClassName = templateClassName;
+		this._templateClassDef = templateClassDef;
 		this._typeArguments = typeArguments;
 	},
 
+	getTemplateClass: function () {
+		return this._templateClassDef;
+	},
+
 	getTemplateClassName: function () {
-		return this._templateClassName;
+		return this._templateClassDef.className();
 	},
 
 	getTypeArguments: function () {
