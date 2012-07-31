@@ -24,27 +24,37 @@
 
 var jsx = require("./interface");
 
-function load(root) {
+var seen = {};
 
+function load(root) {
 	var scripts = document.getElementsByTagName("script");
 
-	for (var i = 0; i < scripts.length; ++i) {
+	for (var i = 0, l = scripts.length; i < l; ++i) {
 		var script = scripts[i];
 		if(script.type === "application/jsx") {
+			var id = script.src ? script.src : script.innerHTML;
+			if (seen.hasOwnProperty(id)) {
+				continue;
+			}
+			seen[id] = true;
+
+			var t0 = Date.now();
+			
 			var platform = new jsx.BrowserPlatform(root);
 			var c = new jsx.Compiler(platform);
 			var o = new jsx.Optimizer();
 			var emitter = new jsx.JavaScriptEmitter(platform);
 			c.setEmitter(emitter);
 
+			var sourceFile;
 			if(script.src) {
-				var file = script.src.replace(/^.*\//, "");
-				c.addSourceFile(null, file);
+				sourceFile = script.src.replace(/^.*\//, "");
 			}
 			else {
-				platform.setContent("<script>", script.innerHTML);
-				c.addSourceFile(null, "<script>");
+				sourceFile = "<script>";
+				platform.setContent(sourceFile, script.innerHTML);
 			}
+			c.addSourceFile(null, sourceFile);
 
 			if(jsx.optimizationLevel > 0) {
 				var optimizeCommands = [ "lto", "no-assert", "fold-const", "return-if", "inline", "dce", "unbox", "fold-const", "lcse", "dce", "fold-const", "array-length" ];
@@ -59,7 +69,7 @@ function load(root) {
 				throw new Error("Failed to compile!");
 			}
 
-			var output = emitter.getOutput();
+			var output = emitter.getOutput(sourceFile);
 
 			if(jsx.optimizationLevel > 1) {
 				output = platform.applyClosureCompiler(output, "SIMPLE_OPTIMIZATIONS");
@@ -69,6 +79,26 @@ function load(root) {
 			var scriptSection  = document.createTextNode(output);
 			compiledScript.appendChild(scriptSection);
 			script.parentNode.appendChild(compiledScript);
+
+			console.log("jsx-script-loader: load %s in %d ms.",
+					sourceFile, (Date.now() - t0));
+
+			var applicationArguments = script.getAttribute("data-arguments");
+			if (applicationArguments) {
+				var args = JSON.parse(applicationArguments);
+				if (args instanceof Array) {
+					for (var i = 0; i < args.length; ++i) {
+						if (typeof args[i]  !== "string") {
+							throw new TypeError("Not an array of string: arguments[i] is " + JSON.stringify(args[i]));
+						}
+					}
+				}
+				else {
+					throw new TypeError("Not an array of string: " + applicationArguments);
+				}
+				platform.debug("run _Main.main()@%s with %s", sourceFile, applicationArguments);
+				JSX.require(sourceFile)._Main.main$AS(args);
+			}
 		}
 	}
 };
