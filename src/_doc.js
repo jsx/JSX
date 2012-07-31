@@ -298,6 +298,8 @@ var DocumentGenerator = exports.DocumentGenerator = Class.extend({
 					return ":" + this._typeToHTML(type);
 				}.bind(this)).join(", ")
 				+ ")";
+		} else if (type instanceof VariableLengthArgumentType) {
+			return "..." + this._typeToHTML(type.getBaseType());
 		}
 		return this._escape(type.toString());
 	},
