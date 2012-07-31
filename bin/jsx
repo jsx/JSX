@@ -86,6 +86,18 @@ var NodePlatform = Platform.extend({
 		}
 	},
 
+	mkpath: function (path) {
+		try {
+			fs.statSync(path);
+		} catch (e) {
+			var dirOfPath = path.replace(/\/[^/]*$/, "");
+			if (dirOfPath != path) {
+				this.mkpath(dirOfPath);
+			}
+			fs.mkdir(path);
+		}
+	},
+
 	// called from JavaScriptEmitter
 	addLauncher: function (emitter, sourceFile, targetCode, entryPoint, executableFor) {
 		if(emitter instanceof JavaScriptEmitter) {
@@ -415,28 +427,32 @@ var JSX = Class.extend({
 				return 1;
 			}
 			break;
+		}
+
+		if (emitter == null)
+			emitter = new JavaScriptEmitter(platform);
+		compiler.setEmitter(emitter);
+
+		switch (compiler.getMode()) {
 		case Compiler.MODE_DOC:
 			if (outputFile == null) {
 				console.error("--output is mandatory for --mode doc");
 				return 1;
 			}
 			if (compiler.compile()) {
-				new DocumentGenerator(compiler, function (sourcePath) {
-					if (sourcePath == sourceFile) {
-						return outputFile;
-					} else {
-						return null;
-					}
-				}.bind(this)).generateDoc();
+				new DocumentGenerator(compiler)
+					.setOutputPath(outputFile)
+					.setPathFilter(function (sourcePath) {
+						return sourcePath == sourceFile;
+					})
+					.setTemplatePath(platform.getRoot() + "/src/doc/template.html")
+					.buildDoc();
 				return 0;
 			} else {
 				return 1;
 			}
 		}
 
-		// MODE_COMPILE || MODE_COMPLETE
-		if (emitter == null)
-			emitter = new JavaScriptEmitter(platform);
 		var optimizer = new Optimizer();
 		var err = optimizer.setup(optimizeCommands);
 		if (err != null) {
@@ -448,7 +464,6 @@ var JSX = Class.extend({
 
 		emitter.setOutputFile(outputFile);
 
-		compiler.setEmitter(emitter);
 		compiler.setOptimizer(optimizer);
 
 		var result = compiler.compile();
