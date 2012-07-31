@@ -256,8 +256,8 @@ var DocumentGenerator = exports.DocumentGenerator = Class.extend({
 			args.forEach(function (arg) {
 				var argName = arg.getName().getValue();
 ?<tr>
-?<td><?= this._escape(argName) ?></td>
-?<td><?= this._argumentDescriptionToHTML(argName, funcDef.getDocComment()) ?></td>
+?<td class="param-name"><?= this._escape(argName) ?></td>
+?<td class="param-desc"><?= this._argumentDescriptionToHTML(argName, funcDef.getDocComment()) ?></td>
 ?</tr>
 			}.bind(this));
 ?</table>

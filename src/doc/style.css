@@ -42,6 +42,7 @@
 
 .jsxdoc .arguments {
     margin: 0.5em 0 0.5em 4em;
+    padding-left: 2em;
 }
 
 .jsxdoc .arguments caption {
@@ -52,4 +53,9 @@
 .jsxdoc .arguments td {
     margin: 0;
     padding: 0.3em 1em;
+    vertical-align: baseline;
+}
+
+.jsxdoc .arguments .param-name {
+    font-family: monospace;
 }

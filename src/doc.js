@@ -256,8 +256,8 @@ _ += "<table class=\"arguments\">\n";
 			args.forEach(function (arg) {
 				var argName = arg.getName().getValue();
 _ += "<tr>\n";
-_ += "<td>"; _ += (this._escape(argName)).replace(/\n$/, ""); _ += "</td>\n";
-_ += "<td>"; _ += (this._argumentDescriptionToHTML(argName, funcDef.getDocComment())).replace(/\n$/, ""); _ += "</td>\n";
+_ += "<td class=\"param-name\">"; _ += (this._escape(argName)).replace(/\n$/, ""); _ += "</td>\n";
+_ += "<td class=\"param-desc\">"; _ += (this._argumentDescriptionToHTML(argName, funcDef.getDocComment())).replace(/\n$/, ""); _ += "</td>\n";
 _ += "</tr>\n";
 			}.bind(this));
 _ += "</table>\n";
