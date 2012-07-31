@@ -156,37 +156,48 @@ var DocumentGenerator = exports.DocumentGenerator = Class.extend({
 				case "TITLE":
 					return this._escape(parser.getPath());
 				case "BODY":
-					return this._buildListOfClasses(parser);
+					return this._buildBodyOfFile(parser);
 				default:
 					throw new Error("unknown key:" + key + " in file: " + this._templatePath);
 				}
 			}.bind(this));
 	},
 
-	_buildListOfClasses: function (parser) {
+	_buildBodyOfFile: function (parser) {
 		var _ = "";
 
 ?<div class="jsxdoc">
-?<h1>file: <?= this._escape(parser.getPath()) ?></h1>
+?<div class="file">
+?<h1><?= this._escape(parser.getPath()) ?></h1>
+?<!-- <div class="description">blah blah</div> -->
+?</div>
+?<?= this._buildListOfClasses(parser) ?>
+?</div>
+
+		return _;
+	},
+
+	_buildListOfClasses: function (parser) {
+		var _ = "";
+
 ?<div class="classes">
 
 		parser.getTemplateClassDefs().forEach(function (classDef) {
-?<?= this._buildDocOfClass(classDef) ?>
+?<?= this._buildDocOfClass(parser, classDef) ?>
 		}.bind(this));
 
 		parser.getClassDefs().forEach(function (classDef) {
 			if (! (classDef instanceof InstantiatedClassDefinition)) {
-?<?= this._buildDocOfClass(classDef) ?>
+?<?= this._buildDocOfClass(parser, classDef) ?>
 			}
 		}.bind(this));
 
-?</div>
 ?</div>
 
 		return _;
 	},
 	
-	_buildDocOfClass: function (classDef) {
+	_buildDocOfClass: function (parser, classDef) {
 		var typeName = "class";
 		if ((classDef.flags() & ClassDefinition.IS_INTERFACE) != 0) {
 			typeName = "interface";
@@ -205,7 +216,7 @@ var DocumentGenerator = exports.DocumentGenerator = Class.extend({
 				if (! this._isPrivate(varDef)) {
 ?<div class="member property">
 ?<h3>
-?<?= this._flagsToHTML(varDef.flags()) ?> var <?= varDef.name() ?> : <?= this._typeToHTML(varDef.getType()) ?>
+?<?= this._flagsToHTML(varDef.flags()) ?> var <?= varDef.name() ?> : <?= this._typeToHTML(parser, varDef.getType()) ?>
 ?</h3>
 ?<?= this._descriptionToHTML(varDef.getDocComment()) ?>
 ?</div>
@@ -216,7 +227,7 @@ var DocumentGenerator = exports.DocumentGenerator = Class.extend({
 
 		classDef.forEachMemberFunction(function (funcDef) {
 			if (this._isConstructor(funcDef)) {
-?<?= this._buildDocOfFunction(funcDef) ?>
+?<?= this._buildDocOfFunction(parser, funcDef) ?>
 			}
 			return true;
 		}.bind(this));
@@ -224,7 +235,7 @@ var DocumentGenerator = exports.DocumentGenerator = Class.extend({
 		if (this._hasPublicFunctions(classDef)) {
 			classDef.forEachMemberFunction(function (funcDef) {
 				if (! (this._isConstructor(funcDef) || this._isPrivate(funcDef))) {
-?<?= this._buildDocOfFunction(funcDef) ?>
+?<?= this._buildDocOfFunction(parser, funcDef) ?>
 				}
 				return true;
 			}.bind(this));
@@ -235,19 +246,19 @@ var DocumentGenerator = exports.DocumentGenerator = Class.extend({
 		return _;
 	},
 
-	_buildDocOfFunction: function (funcDef) {
+	_buildDocOfFunction: function (parser, funcDef) {
 		var _ = "";
 		var funcName = this._isConstructor(funcDef) ? "new " + funcDef.getClassDef().className() : this._flagsToHTML(funcDef.flags()) + " function " + funcDef.name();
 		var args = funcDef.getArguments();
 		var argsHTML = args.map(function (arg) {
-			return this._escape(arg.getName().getValue()) + " : " + this._typeToHTML(arg.getType());
+			return this._escape(arg.getName().getValue()) + " : " + this._typeToHTML(parser, arg.getType());
 		}.bind(this)).join(", ");
 
 ?<div class="member function">
 ?<h3>
 ?<?= this._escape(funcName) ?>(<?= argsHTML ?>)
 		if (! this._isConstructor(funcDef)) {
-? : <?= this._typeToHTML(funcDef.getReturnType()) ?>
+? : <?= this._typeToHTML(parser, funcDef.getReturnType()) ?>
 		}
 ?</h3>
 ?<?= this._descriptionToHTML(funcDef.getDocComment()) ?>
@@ -284,32 +295,40 @@ var DocumentGenerator = exports.DocumentGenerator = Class.extend({
 		return docComment != null ? this._getDescriptionOfNamedArgument(docComment, name): "";
 	},
 
-	_typeToHTML: function (type) {
+	_typeToHTML: function (parser, type) {
 		// TODO create links for object types
 		if (type instanceof ObjectType) {
 			var classDef = type.getClassDef();
 			if (classDef != null) {
-				return this._classDefToHTML(classDef);
+				return this._classDefToHTML(parser, classDef);
+			} else if (type instanceof ParsedObjectType && type.getTypeArguments().length != 0) {
+				classDef = type.getQualifiedName().getTemplateClass(parser);
+				if (classDef != null) {
+					return this._classDefToHTML(parser, classDef)
+						+ ".&lt;"
+						+ classDef.getTypeArguments().map(function (typeArg) { return this._escape(typeArg.getValue()); }.bind(this)).join(", ")
+						+ "&gt;";
+				}
 			}
 		} else if (type instanceof FunctionType) {
 			return "function "
 				+ "("
 				+ type.getArgumentTypes().map(function (type) {
-					return ":" + this._typeToHTML(type);
+					return ":" + this._typeToHTML(parser, type);
 				}.bind(this)).join(", ")
 				+ ")";
 		} else if (type instanceof VariableLengthArgumentType) {
-			return "..." + this._typeToHTML(type.getBaseType());
+			return "..." + this._typeToHTML(parser, type.getBaseType());
 		}
 		return this._escape(type.toString());
 	},
 
-	_classDefToHTML: function (classDef) {
+	_classDefToHTML: function (parser, classDef) {
 		// instantiated classes should be handled separately
 		if (classDef instanceof InstantiatedClassDefinition) {
-			return this._classDefToHTML(classDef.getTemplateClass())
+			return this._classDefToHTML(parser, classDef.getTemplateClass())
 				+ ".&lt;"
-				+ classDef.getTypeArguments().map(function (type) { return this._typeToHTML(type); }.bind(this)).join(", ")
+				+ classDef.getTypeArguments().map(function (type) { return this._typeToHTML(parser, type); }.bind(this)).join(", ")
 				+ "&gt;";
 		}
 		// lokup the cache
@@ -319,7 +338,7 @@ var DocumentGenerator = exports.DocumentGenerator = Class.extend({
 			}
 		}
 		// determine the parser to which the classDef belongs
-		var parser = function () {
+		var parserOfClassDef = function () {
 			var parsers = this._compiler.getParsers();
 			for (var i = 0; i < parsers.length; ++i) {
 				if (parsers[i].getClassDefs().indexOf(classDef) != -1
@@ -330,12 +349,12 @@ var DocumentGenerator = exports.DocumentGenerator = Class.extend({
 			throw new Error("could not determine the parser to which the class belongs:" + classDef.className());
 		}.call(this);
 		// return text if we cannot linkify the class name
-		if (! this._pathFilter(parser.getPath())) {
+		if (! this._pathFilter(parserOfClassDef.getPath())) {
 			return this._escape(classDef.className());
 		}
 		// linkify and return
 		var _ = "";
-?<a href="<?= this._escape(parser.getPath()) ?>.html#class-<?= this._escape(classDef.className()) ?>"><?= this._escape(classDef.className()) ?></a>
+?<a href="<?= this._escape(parserOfClassDef.getPath()) ?>.html#class-<?= this._escape(classDef.className()) ?>"><?= this._escape(classDef.className()) ?></a>
 		_ = _.trim();
 		this._classDefToHTMLCache.push([classDef, _]);
 		return _;

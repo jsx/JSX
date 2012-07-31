@@ -1,5 +1,15 @@
+.jsxdoc {
+    border: 1px solid #ccc;
+    margin: 0;
+}
+
+.jsxdoc .file {
+    padding: 1em 0 1em 1em;
+}
+
 .jsxdoc h1 {
-    font-size: 150%;
+    font-size: 200%;
+    margin: 0.5em 0;
 }
 
 .jsxdoc h2 {
@@ -13,19 +23,10 @@
     margin: 0.5em 0;
 }
 
-.jsxdoc .classes {
-    border: 1px solid #ccc;
-    margin: 0;
-}
-
-.jsxdoc .classes .class:first-child {
-    border-top: 0px;
-}
-
-.jsxdoc .classes .class {
+.jsxdoc .class {
     margin: 0;
     padding: 1em;
-    border-top: 1px solid #ccc;
+    border-top: 1px dotted #ccc;
 }
 
 .jsxdoc .member {

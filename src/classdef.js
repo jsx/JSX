@@ -1459,6 +1459,10 @@ var TemplateClassDefinition = exports.TemplateClassDefinition = Class.extend({
 		return this._flags;
 	},
 
+	getTypeArguments: function () {
+		return this._typeArgs;
+	},
+
 	getDocComment: function () {
 		return this._docComment;
 	},

@@ -117,7 +117,7 @@ var Expression = exports.Expression = Class.extend({
 	},
 
 	$instantiateTemplate: function (context, token, className, typeArguments) {
-		return context.parser.lookupTemplate(context.errors, new TemplateInstantiationRequest(token, className, typeArguments), context.postInstantiationCallback);
+		return context.parser.instantiateTemplate(context.errors, new TemplateInstantiationRequest(token, className, typeArguments), context.postInstantiationCallback);
 	},
 
 });

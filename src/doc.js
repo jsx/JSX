@@ -156,37 +156,48 @@ var DocumentGenerator = exports.DocumentGenerator = Class.extend({
 				case "TITLE":
 					return this._escape(parser.getPath());
 				case "BODY":
-					return this._buildListOfClasses(parser);
+					return this._buildBodyOfFile(parser);
 				default:
 					throw new Error("unknown key:" + key + " in file: " + this._templatePath);
 				}
 			}.bind(this));
 	},
 
-	_buildListOfClasses: function (parser) {
+	_buildBodyOfFile: function (parser) {
 		var _ = "";
 
 _ += "<div class=\"jsxdoc\">\n";
-_ += "<h1>file: "; _ += (this._escape(parser.getPath())).replace(/\n$/, ""); _ += "</h1>\n";
+_ += "<div class=\"file\">\n";
+_ += "<h1>"; _ += (this._escape(parser.getPath())).replace(/\n$/, ""); _ += "</h1>\n";
+_ += "<!-- <div class=\"description\">blah blah</div> -->\n";
+_ += "</div>\n";
+_ += (this._buildListOfClasses(parser)).replace(/\n$/, ""); _ += "\n";
+_ += "</div>\n";
+
+		return _;
+	},
+
+	_buildListOfClasses: function (parser) {
+		var _ = "";
+
 _ += "<div class=\"classes\">\n";
 
 		parser.getTemplateClassDefs().forEach(function (classDef) {
-_ += (this._buildDocOfClass(classDef)).replace(/\n$/, ""); _ += "\n";
+_ += (this._buildDocOfClass(parser, classDef)).replace(/\n$/, ""); _ += "\n";
 		}.bind(this));
 
 		parser.getClassDefs().forEach(function (classDef) {
 			if (! (classDef instanceof InstantiatedClassDefinition)) {
-_ += (this._buildDocOfClass(classDef)).replace(/\n$/, ""); _ += "\n";
+_ += (this._buildDocOfClass(parser, classDef)).replace(/\n$/, ""); _ += "\n";
 			}
 		}.bind(this));
 
-_ += "</div>\n";
 _ += "</div>\n";
 
 		return _;
 	},
 	
-	_buildDocOfClass: function (classDef) {
+	_buildDocOfClass: function (parser, classDef) {
 		var typeName = "class";
 		if ((classDef.flags() & ClassDefinition.IS_INTERFACE) != 0) {
 			typeName = "interface";
@@ -205,7 +216,7 @@ _ += (this._descriptionToHTML(classDef.getDocComment())).replace(/\n$/, ""); _ +
 				if (! this._isPrivate(varDef)) {
 _ += "<div class=\"member property\">\n";
 _ += "<h3>\n";
-_ += (this._flagsToHTML(varDef.flags())).replace(/\n$/, ""); _ += " var "; _ += (varDef.name()).replace(/\n$/, ""); _ += " : "; _ += (this._typeToHTML(varDef.getType())).replace(/\n$/, ""); _ += "\n";
+_ += (this._flagsToHTML(varDef.flags())).replace(/\n$/, ""); _ += " var "; _ += (varDef.name()).replace(/\n$/, ""); _ += " : "; _ += (this._typeToHTML(parser, varDef.getType())).replace(/\n$/, ""); _ += "\n";
 _ += "</h3>\n";
 _ += (this._descriptionToHTML(varDef.getDocComment())).replace(/\n$/, ""); _ += "\n";
 _ += "</div>\n";
@@ -216,7 +227,7 @@ _ += "</div>\n";
 
 		classDef.forEachMemberFunction(function (funcDef) {
 			if (this._isConstructor(funcDef)) {
-_ += (this._buildDocOfFunction(funcDef)).replace(/\n$/, ""); _ += "\n";
+_ += (this._buildDocOfFunction(parser, funcDef)).replace(/\n$/, ""); _ += "\n";
 			}
 			return true;
 		}.bind(this));
@@ -224,7 +235,7 @@ _ += (this._buildDocOfFunction(funcDef)).replace(/\n$/, ""); _ += "\n";
 		if (this._hasPublicFunctions(classDef)) {
 			classDef.forEachMemberFunction(function (funcDef) {
 				if (! (this._isConstructor(funcDef) || this._isPrivate(funcDef))) {
-_ += (this._buildDocOfFunction(funcDef)).replace(/\n$/, ""); _ += "\n";
+_ += (this._buildDocOfFunction(parser, funcDef)).replace(/\n$/, ""); _ += "\n";
 				}
 				return true;
 			}.bind(this));
@@ -235,19 +246,19 @@ _ += "</div>\n";
 		return _;
 	},
 
-	_buildDocOfFunction: function (funcDef) {
+	_buildDocOfFunction: function (parser, funcDef) {
 		var _ = "";
 		var funcName = this._isConstructor(funcDef) ? "new " + funcDef.getClassDef().className() : this._flagsToHTML(funcDef.flags()) + " function " + funcDef.name();
 		var args = funcDef.getArguments();
 		var argsHTML = args.map(function (arg) {
-			return this._escape(arg.getName().getValue()) + " : " + this._typeToHTML(arg.getType());
+			return this._escape(arg.getName().getValue()) + " : " + this._typeToHTML(parser, arg.getType());
 		}.bind(this)).join(", ");
 
 _ += "<div class=\"member function\">\n";
 _ += "<h3>\n";
 _ += (this._escape(funcName)).replace(/\n$/, ""); _ += "("; _ += (argsHTML).replace(/\n$/, ""); _ += ")\n";
 		if (! this._isConstructor(funcDef)) {
-_ += " : "; _ += (this._typeToHTML(funcDef.getReturnType())).replace(/\n$/, ""); _ += "\n";
+_ += " : "; _ += (this._typeToHTML(parser, funcDef.getReturnType())).replace(/\n$/, ""); _ += "\n";
 		}
 _ += "</h3>\n";
 _ += (this._descriptionToHTML(funcDef.getDocComment())).replace(/\n$/, ""); _ += "\n";
@@ -284,32 +295,40 @@ _ += "</div>\n";
 		return docComment != null ? this._getDescriptionOfNamedArgument(docComment, name): "";
 	},
 
-	_typeToHTML: function (type) {
+	_typeToHTML: function (parser, type) {
 		// TODO create links for object types
 		if (type instanceof ObjectType) {
 			var classDef = type.getClassDef();
 			if (classDef != null) {
-				return this._classDefToHTML(classDef);
+				return this._classDefToHTML(parser, classDef);
+			} else if (type instanceof ParsedObjectType && type.getTypeArguments().length != 0) {
+				classDef = type.getQualifiedName().getTemplateClass(parser);
+				if (classDef != null) {
+					return this._classDefToHTML(parser, classDef)
+						+ ".&lt;"
+						+ classDef.getTypeArguments().map(function (typeArg) { return this._escape(typeArg.getValue()); }.bind(this)).join(", ")
+						+ "&gt;";
+				}
 			}
 		} else if (type instanceof FunctionType) {
 			return "function "
 				+ "("
 				+ type.getArgumentTypes().map(function (type) {
-					return ":" + this._typeToHTML(type);
+					return ":" + this._typeToHTML(parser, type);
 				}.bind(this)).join(", ")
 				+ ")";
 		} else if (type instanceof VariableLengthArgumentType) {
-			return "..." + this._typeToHTML(type.getBaseType());
+			return "..." + this._typeToHTML(parser, type.getBaseType());
 		}
 		return this._escape(type.toString());
 	},
 
-	_classDefToHTML: function (classDef) {
+	_classDefToHTML: function (parser, classDef) {
 		// instantiated classes should be handled separately
 		if (classDef instanceof InstantiatedClassDefinition) {
-			return this._classDefToHTML(classDef.getTemplateClass())
+			return this._classDefToHTML(parser, classDef.getTemplateClass())
 				+ ".&lt;"
-				+ classDef.getTypeArguments().map(function (type) { return this._typeToHTML(type); }.bind(this)).join(", ")
+				+ classDef.getTypeArguments().map(function (type) { return this._typeToHTML(parser, type); }.bind(this)).join(", ")
 				+ "&gt;";
 		}
 		// lokup the cache
@@ -319,7 +338,7 @@ _ += "</div>\n";
 			}
 		}
 		// determine the parser to which the classDef belongs
-		var parser = function () {
+		var parserOfClassDef = function () {
 			var parsers = this._compiler.getParsers();
 			for (var i = 0; i < parsers.length; ++i) {
 				if (parsers[i].getClassDefs().indexOf(classDef) != -1
@@ -330,12 +349,12 @@ _ += "</div>\n";
 			throw new Error("could not determine the parser to which the class belongs:" + classDef.className());
 		}.call(this);
 		// return text if we cannot linkify the class name
-		if (! this._pathFilter(parser.getPath())) {
+		if (! this._pathFilter(parserOfClassDef.getPath())) {
 			return this._escape(classDef.className());
 		}
 		// linkify and return
 		var _ = "";
-_ += "<a href=\""; _ += (this._escape(parser.getPath())).replace(/\n$/, ""); _ += ".html#class-"; _ += (this._escape(classDef.className())).replace(/\n$/, ""); _ += "\">"; _ += (this._escape(classDef.className())).replace(/\n$/, ""); _ += "</a>\n";
+_ += "<a href=\""; _ += (this._escape(parserOfClassDef.getPath())).replace(/\n$/, ""); _ += ".html#class-"; _ += (this._escape(classDef.className())).replace(/\n$/, ""); _ += "\">"; _ += (this._escape(classDef.className())).replace(/\n$/, ""); _ += "</a>\n";
 		_ = _.trim();
 		this._classDefToHTMLCache.push([classDef, _]);
 		return _;

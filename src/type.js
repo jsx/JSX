@@ -390,6 +390,10 @@ var ParsedObjectType = exports.ParsedObjectType = ObjectType.extend({
 		return this._qualifiedName.getToken();
 	},
 
+	getQualifiedName: function () {
+		return this._qualifiedName;
+	},
+
 	getTypeArguments: function () {
 		return this._typeArguments;
 	},

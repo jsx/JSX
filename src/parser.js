@@ -433,6 +433,30 @@ var QualifiedName = exports.QualifiedName = Class.extend({
 			}
 		}
 		return classDef;
+	},
+
+	getTemplateClass: function (parser) {
+		var foundClassDefs = [];
+		var checkClassDef = function (classDef) {
+			if (classDef.className() == this._token.getValue()) {
+				foundClassDefs.push(classDef);
+			}
+		}.bind(this);
+		if (this._import != null) {
+			this._import.getSources().forEach(function (parser) {
+				parser.getTemplateClassDefs().forEach(checkClassDef);
+			});
+		} else {
+			parser.getTemplateClassDefs().forEach(checkClassDef);
+			if (foundClassDefs.length == 0) {
+				parser.getImports().forEach(function (imprt) {
+					imprt.getSources().forEach(function (parser) {
+						parser.getTemplateClassDefs().forEach(checkClassDef);
+					});
+				});
+			}
+		}
+		return foundClassDefs.length == 1 ? foundClassDefs[0] : null;
 	}
 
 });
