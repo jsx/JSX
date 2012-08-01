@@ -3,7 +3,7 @@
 }
 
 .jsxdoc .file {
-    padding: 1em 0 1em 1em;
+    padding: 1em 50px 1em 50px;
 }
 
 .jsxdoc h1 {
@@ -24,7 +24,7 @@
 
 .jsxdoc .class {
     margin: 0;
-    padding: 1em;
+    padding: 1em 50px;
     border-top: 1px dotted #ccc;
 }
 
@@ -33,11 +33,12 @@
 }
 
 .jsxdoc .member h3 {
-    margin-left: 1em;
+    margin-left: 20px;
 }
 
 .jsxdoc .description {
     margin: 0.5em 0 0.5em 4em;
+    text-align: justify;
 }
 
 .jsxdoc .arguments {

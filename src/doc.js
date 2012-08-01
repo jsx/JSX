@@ -169,7 +169,9 @@ var DocumentGenerator = exports.DocumentGenerator = Class.extend({
 _ += "<div class=\"jsxdoc\">\n";
 _ += "<div class=\"file\">\n";
 _ += "<h1>"; _ += (this._escape(parser.getPath())).replace(/\n$/, ""); _ += "</h1>\n";
-_ += "<!-- <div class=\"description\">blah blah</div> -->\n";
+		if (parser.getDocComment() != null) {
+_ += "<div class=\"description\">"; _ += (parser.getDocComment().getDescription()).replace(/\n$/, ""); _ += "</div>\n";
+		}
 _ += "</div>\n";
 _ += (this._buildListOfClasses(parser)).replace(/\n$/, ""); _ += "\n";
 _ += "</div>\n";

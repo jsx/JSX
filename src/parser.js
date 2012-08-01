@@ -476,6 +476,7 @@ var Parser = exports.Parser = Class.extend({
 		this._tokenLength = 0;
 		this._lineNumber = 1; // one origin
 		this._columnOffset = 0; // zero origin
+		this._fileLevelDocComment = null;
 		this._docComment = null;
 		// insert a marker so that at the completion location we would always get _expectIdentifierOpt called, whenever possible
 		if (this._completionRequest != null) {
@@ -535,6 +536,10 @@ var Parser = exports.Parser = Class.extend({
 
 	getPath: function () {
 		return this._filename;
+	},
+
+	getDocComment: function () {
+		return this._fileLevelDocComment;
 	},
 
 	getClassDefs: function () {
@@ -739,7 +744,18 @@ var Parser = exports.Parser = Class.extend({
 			}
 			switch (this._getInputByLength(2)) {
 			case "/*":
-				if (this._getInputByLength(3) == "/**") {
+				if (this._getInputByLength(4) == "/***") {
+					this._forwardPos(3); // skip to the last *, since the input might be: /***/
+					var fileLevelDocComment = this._parseDocComment();
+					if (fileLevelDocComment == null) {
+						return;
+					}
+					// the first "/***" comment is the file-level doc comment
+					if (this._fileLevelDocComment == null) {
+						this._fileLevelDocComment = fileLevelDocComment;
+					}
+				} else if (this._getInputByLength(3) == "/**") {
+					this._forwardPos(2); // skip to the last *, the input might be: /**/
 					if ((this._docComment = this._parseDocComment()) == null) {
 						return;
 					}
@@ -785,7 +801,6 @@ var Parser = exports.Parser = Class.extend({
 	},
 
 	_parseDocComment: function () {
-		this._columnOffset += 2; // might be /**/ (an empty doccomment)
 
 		var docComment = new DocComment();
 		var node = docComment;

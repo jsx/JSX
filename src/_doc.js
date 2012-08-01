@@ -169,7 +169,9 @@ var DocumentGenerator = exports.DocumentGenerator = Class.extend({
 ?<div class="jsxdoc">
 ?<div class="file">
 ?<h1><?= this._escape(parser.getPath()) ?></h1>
-?<!-- <div class="description">blah blah</div> -->
+		if (parser.getDocComment() != null) {
+?<div class="description"><?= parser.getDocComment().getDescription() ?></div>
+		}
 ?</div>
 ?<?= this._buildListOfClasses(parser) ?>
 ?</div>

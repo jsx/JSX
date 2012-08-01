@@ -20,10 +20,8 @@
  * IN THE SOFTWARE.
  */
 
-/**
- * <p>The file defines the APIs of the built-in objects of JSX.</p>
- * 
- * <p>The API is designed to be compatible to the ECMA-262 standard whenever possible.</p>
+/***
+ * <p>The file defines the APIs of the built-in objects of JSX, designed to be compatible to <a href="http://www.ecma-international.org/publications/standards/Ecma-262-arch.htm">the 3rd edition of the ECMA-262 standard</a> whenever possible.</p>
  * 
  * <p>The description of the API is based on <a href="https://developer.mozilla.org/en/JavaScript/Reference/">the MDN JavaScript Reference</a> under the <a href="http://creativecommons.org/licenses/by-sa/2.5/">Creative Commons: Attribution-Sharealike license</a>.</p>
  */
