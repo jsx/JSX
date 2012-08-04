@@ -1636,10 +1636,13 @@ var Parser = exports.Parser = Class.extend({
 	},
 
 	_constructorInvocationStatement: function () {
+		var isAlternate = false;
 		// get class
 		var token;
 		if ((token = this._expectOpt("super")) != null) {
 			var classType = this._extendType;
+		} else if ((token = this._expectOpt("this")) != null) {
+			isAlternate = true;
 		} else {
 			if ((classType = this._objectTypeDeclaration(null)) == null)
 				return false;
@@ -1667,7 +1670,12 @@ var Parser = exports.Parser = Class.extend({
 		if (this._expect(";") == null)
 			return false;
 		// success
-		this._statements.push(new ConstructorInvocationStatement(token, classType, args));
+		if (isAlternate) {
+			this._statements.push(new AlternateConstructorInvocationStatement(
+				new ThisExpression(token, null), args));
+		} else {
+			this._statements.push(new ConstructorInvocationStatement(token, classType, args));
+		}
 		return true;
 	},
 

@@ -187,6 +187,39 @@ var _ConstructorInvocationStatementEmitter = exports._ConstructorInvocationState
 
 });
 
+var _AlternateConstructorInvocationStatementEmitter = exports._AlternateConstructorInvocationStatementEmitter = _StatementEmitter.extend({
+
+	constructor: function (emitter, statement) {
+		_StatementEmitter.prototype.constructor.call(this, emitter);
+		this._statement = statement;
+	},
+
+	emit: function () {
+		var ctorType = this._statement.getConstructorType();
+		var argTypes = ctorType != null ? ctorType.getArgumentTypes() : [];
+		var ctorName = this._emitter._mangleConstructorName(this._statement.getConstructingClassDef(), argTypes);
+		var token = this._statement.getToken();
+		if (ctorName == "Error" && this._statement.getArguments().length == 1) {
+			/*
+				At least v8 does not support "Error.call(this, message)"; it not only does not setup the stacktrace but also does
+				not set the message property.  So we set the message property.
+				We continue to call "Error" hoping that it would have some positive effect on other platforms (like setting the
+				stacktrace, etc.).
+
+				FIXME check that doing  "Error.call(this);" does not have any negative effect on other platforms
+			*/
+			this._emitter._emit("Error.call(this);\n", token);
+			this._emitter._emit("this.message = ", token);
+			this._emitter._getExpressionEmitterFor(this._statement.getArguments()[0]).emit(_AssignmentExpressionEmitter._operatorPrecedence["="]);
+			this._emitter._emit(";\n", token);
+		} else {
+			this._emitter._emitCallArguments(token, ctorName + ".call(this", this._statement.getArguments(), argTypes);
+			this._emitter._emit(";\n", token);
+		}
+	}
+
+});
+
 var _ExpressionStatementEmitter = exports._ExpressionStatementEmitter = _StatementEmitter.extend({
 
 	constructor: function (emitter, statement) {
@@ -2308,6 +2341,8 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 	_getStatementEmitterFor: function (statement) {
 		if (statement instanceof ConstructorInvocationStatement)
 			return new _ConstructorInvocationStatementEmitter(this, statement);
+		else if (statement instanceof AlternateConstructorInvocationStatement)
+			return new _AlternateConstructorInvocationStatementEmitter(this, statement);
 		else if (statement instanceof ExpressionStatement)
 			return new _ExpressionStatementEmitter(this, statement);
 		else if (statement instanceof ReturnStatement)
