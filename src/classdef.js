@@ -123,6 +123,7 @@ var ClassDefinition = exports.ClassDefinition = Class.extend({
 	$IS_PURE: 2048, // constexpr (intended for for native functions)
 
 	constructor: function (token, className, flags, extendType, implementTypes, members, objectTypesUsed) {
+		this._parser = null;
 		this._token = token;
 		this._className = className;
 		this._outputClassName = null;
@@ -160,6 +161,14 @@ var ClassDefinition = exports.ClassDefinition = Class.extend({
 		for (var i = 0; i < classDefs.length; ++i)
 			s[i] = classDefs[i].serialize();
 		return JSON.stringify(s, null, 2);
+	},
+
+	getParser: function () {
+		return this._parser;
+	},
+
+	setParser: function (parser) {
+		this._parser = parser;
 	},
 
 	getToken: function () {
@@ -1299,6 +1308,11 @@ var TemplateFunctionDefinition = exports.TemplateFunctionDefinition = MemberFunc
 		if (instantiated == null) {
 			return null;
 		}
+		// analyze
+		var analysisContext = new AnalysisContext(errors, this._classDef.getParser(), function (parser, classDef) { throw new Error("not implemented"); });
+		for (var i = 0; i < instantiationContext.objectTypesUsed.length; ++i)
+			instantiationContext.objectTypesUsed[i].resolveType(analysisContext);
+		instantiated.analyze(analysisContext, this._classDef);
 		// register, and return
 		this._instantiatedDefs.set(typeArgs.concat([]), instantiated);
 		return instantiated;

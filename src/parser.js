@@ -604,6 +604,7 @@ var Parser = exports.Parser = Class.extend({
 						return null;
 					}
 					this._classDefs.push(classDef);
+					classDef.setParser(this);
 					classDef.resolveTypes(new AnalysisContext(errors, this, null));
 					postInstantiationCallback(this, classDef);
 					return classDef;
@@ -1136,10 +1137,13 @@ var Parser = exports.Parser = Class.extend({
 			return false;
 
 		// done
-		if (this._typeArgs.length != 0)
+		if (this._typeArgs.length != 0) {
 			this._templateClassDefs.push(new TemplateClassDefinition(className.getValue(), flags, this._typeArgs, this._extendType, this._implementTypes, members, this._objectTypesUsed));
-		else
-			this._classDefs.push(new ClassDefinition(className, className.getValue(), flags, this._extendType, this._implementTypes, members, this._objectTypesUsed));
+		} else {
+			var classDef = new ClassDefinition(className, className.getValue(), flags, this._extendType, this._implementTypes, members, this._objectTypesUsed);
+			this._classDefs.push(classDef);
+			classDef.setParser(this);
+		}
 		return true;
 	},
 
