@@ -257,7 +257,7 @@ var ClassDefinition = exports.ClassDefinition = Class.extend({
 	$GET_MEMBER_MODE_SUPER: 2, // looks for functions with body in super classes
 	$GET_MEMBER_MODE_FUNCTION_WITH_BODY: 3, // looks for function with body
 	
-	getMemberTypeByName: function (name, isStatic, mode) {
+	getMemberTypeByName: function (errors, token, name, isStatic, typeArgs, mode) {
 		// returns an array to support function overloading
 		var types = [];
 		function pushMatchingMember(classDef) {
@@ -276,6 +276,11 @@ var ClassDefinition = exports.ClassDefinition = Class.extend({
 							}
 						} else if (member instanceof MemberFunctionDefinition) {
 							// member function
+							if (member instanceof TemplateFunctionDefinition) {
+								if ((member = member.instantiateTemplateFunction(errors, token, typeArgs)) == null) {
+									return null;
+								}
+							}
 							if (member.getStatements() != null || mode != ClassDefinition.GET_MEMBER_MODE_NOT_ABSTRACT) {
 								for (var j = 0; j < types.length; ++j) {
 									if (Util.typesAreEqual(member.getArgumentTypes(), types[j].getArgumentTypes())) {
@@ -1274,7 +1279,7 @@ var TemplateFunctionDefinition = exports.TemplateFunctionDefinition = MemberFunc
 		}
 	},
 
-	instantiateTemplateFunction: function (context, token, typeArgs) {
+	instantiateTemplateFunction: function (errors, token, typeArgs) {
 		// return the already-instantiated one, if exists
 		var instantiated = this._instantiatedDefs.get(typeArgs);
 		if (instantiated != null) {
@@ -1285,7 +1290,12 @@ var TemplateFunctionDefinition = exports.TemplateFunctionDefinition = MemberFunc
 		if (instantiationContext == null) {
 			return null;
 		}
-		instantiated = this._instantiateCore(instantiationContext, []);
+		instantiated = this._instantiateCore(
+			instantiationContext,
+			function (token, name, flags, returnType, args, locals, statements, closures, lastTokenOfBody) {
+				return new MemberFunctionDefinition(token, name, flags, returnType, args, locals, statements, closures, lastTokenOfBody);
+			});
+		instantiated.setClassDef(this._classDef);
 		if (instantiated == null) {
 			return null;
 		}

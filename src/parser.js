@@ -1036,7 +1036,7 @@ var Parser = exports.Parser = Class.extend({
 		if (className == null)
 			return false;
 		// template
-		if ((this._typeArgs = this._typeArgsDeclaration()) == null) {
+		if ((this._typeArgs = this._formalTypeArguments()) == null) {
 			return false;
 		}
 		// extends
@@ -1267,7 +1267,7 @@ var Parser = exports.Parser = Class.extend({
 		flags |= classFlags & (ClassDefinition.IS_NATIVE | ClassDefinition.IS_FINAL);
 
 		// parse type args and add to the current typearg list
-		var typeArgs = this._typeArgsDeclaration();
+		var typeArgs = this._formalTypeArguments();
 		if (typeArgs == null) {
 			return null;
 		}
@@ -1331,29 +1331,13 @@ var Parser = exports.Parser = Class.extend({
 		}
 	},
 
-	_typeArgsDeclarationOpt: function () {
-		var state = this._preserveState();
-		if (this._expectOpt(".") == null) {
-			return [];
-		}
-		if (this._expectOpt("<") == null) {
-			this._restoreState(state);
-			return [];
-		}
-		return this._typeArgsDeclarationCore();
-	},
-
-	_typeArgsDeclaration: function () {
+	_formalTypeArguments: function () {
 		if (this._expectOpt(".") == null) {
 			return [];
 		}
 		if (this._expect("<") == null) {
 			return null;
 		}
-		return this._typeArgsDeclarationCore();
-	},
-
-	_typeArgsDeclarationCore: function () {
 		var typeArgs = [];
 		do {
 			var typeArg = this._expectIdentifier(null);
@@ -1365,6 +1349,29 @@ var Parser = exports.Parser = Class.extend({
 				return null;
 		} while (token.getValue() == ",");
 		return typeArgs;
+	},
+
+	_actualTypeArguments: function () {
+		var types = [];
+		var state = this._preserveState();
+		if (this._expectOpt(".") == null) {
+			return types;
+		}
+		if (this._expect("<") == null) {
+			this._restoreState(state);
+			return types;
+		}
+		// in type argument
+		do {
+			var type = this._typeDeclaration(false);
+			if (type == null)
+				return null;
+			types.push(type);
+			var token = this._expect([ ">", "," ]);
+			if (token == null)
+				return null;
+		} while (token.getValue() == ",");
+		return types;
 	},
 
 	_typeDeclaration: function (allowVoid) {
@@ -1463,38 +1470,27 @@ var Parser = exports.Parser = Class.extend({
 		var qualifiedName = firstToken !== null ? this._qualifiedNameStartingWith(firstToken, autoCompleteMatchCb) : this._qualifiedName(false, autoCompleteMatchCb);
 		if (qualifiedName == null)
 			return null;
-		var state = this._preserveState();
-		if (this._expectOpt(".") != null && this._expect("<") != null) {
-			return this._templateTypeDeclaration(qualifiedName);
+		var typeArgs = this._actualTypeArguments();
+		if (typeArgs == null) {
+			return null;
+		} else if (typeArgs.length != 0) {
+			return this._templateTypeDeclaration(qualifiedName, typeArgs);
 		} else {
 			// object
-			this._restoreState(state);
 			var objectType = new ParsedObjectType(qualifiedName, []);
 			this._objectTypesUsed.push(objectType);
 			return objectType;
 		}
 	},
 
-	_templateTypeDeclaration: function (qualifiedName) {
-		// parse
-		var types = [];
-		do {
-			var type = this._typeDeclaration(false);
-			if (type == null)
-				return null;
-			types.push(type);
-			var token = this._expect([ ">", "," ]);
-			if (token == null)
-				return null;
-		} while (token.getValue() == ",");
-		// check
+	_templateTypeDeclaration: function (qualifiedName, typeArgs) {
 		var className = qualifiedName.getToken().getValue();
-		if ((className == "Array" || className == "Map") && types[0] instanceof NullableType) {
+		if ((className == "Array" || className == "Map") && typeArgs[0] instanceof NullableType) {
 			this._newError("cannot declare " + className + ".<Nullable.<T>>, should be " + className + ".<T>");
-			return false;
+			return null;
 		}
 		// return object type
-		var objectType = new ParsedObjectType(qualifiedName, types);
+		var objectType = new ParsedObjectType(qualifiedName, typeArgs);
 		this._objectTypesUsed.push(objectType);
 		return objectType;
 	},
@@ -2347,7 +2343,7 @@ var Parser = exports.Parser = Class.extend({
 				var identifier = this._expectIdentifier(function (self) { return self._getCompletionCandidatesOfProperty(expr); });
 				if (identifier == null)
 					return null;
-				var typeArgs = this._typeArgsDeclarationOpt();
+				var typeArgs = this._actualTypeArguments();
 				if (typeArgs == null)
 					return null;
 				expr = new PropertyExpression(token, expr, identifier, typeArgs);

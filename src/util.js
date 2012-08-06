@@ -255,7 +255,7 @@ var TypedMap = exports.TypedMap = Class.extend({
 	get: function (key) {
 		for (var i = 0; i < this._list.length; ++i) {
 			if (this._equalsCallback(this._list[i].key, key)) {
-				return this._list[i];
+				return this._list[i].value;
 			}
 		}
 		return null;
