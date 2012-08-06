@@ -1273,19 +1273,20 @@ var TemplateFunctionDefinition = exports.TemplateFunctionDefinition = MemberFunc
 			}
 			return true;
 		});
+		this._resolvedTypemap = {};
 	},
 
 	instantiate: function (instantiationContext) {
-		var numObjectTypesUsed = instantiationContext.objectTypesUsed.length;
-		try {
-			return this._instantiateCore(
-				instantiationContext,
-				function (token, name, flags, returnType, args, locals, statements, closures, lastTokenOfBody) {
-					return new TemplateFunctionDefinition(token, name, flags, this._typeArgs, returnType, args, locals, statements, closures, lastTokenOfBody);
-				}.bind(this));
-		} finally {
-			instantiationContext.objectTypesUsed.splice(numObjectTypesUsed, instantiationContext.objectTypesUsed.length - numObjectTypesUsed);
+		var instantiated = new TemplateFunctionDefinition(
+			this._token, this.getNameToken(), this.flags(), this._typeArgs.concat([]), this._returnType, this._args.concat([]),
+			this._locals, this._statements, this._closures, this._lastTokenOfBody);
+		for (var k in this._resolvedTypemap) {
+			instantiated._resolvedTypemap[k] = this._resolvedTypemap[k];
 		}
+		for (var k in instantiationContext.typemap) {
+			instantiated._resolvedTypemap[k] = instantiationContext.typemap[k];
+		}
+		return instantiated;
 	},
 
 	instantiateTemplateFunction: function (errors, token, typeArgs) {
@@ -1298,6 +1299,9 @@ var TemplateFunctionDefinition = exports.TemplateFunctionDefinition = MemberFunc
 		var instantiationContext = _Util.buildInstantiationContext(errors, token, this._typeArgs, typeArgs);
 		if (instantiationContext == null) {
 			return null;
+		}
+		for (var k in this._resolvedTypemap) {
+			instantiationContext.typemap[k] = this._resolvedTypemap[k];
 		}
 		instantiated = this._instantiateCore(
 			instantiationContext,
