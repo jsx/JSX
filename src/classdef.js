@@ -260,7 +260,51 @@ var ClassDefinition = exports.ClassDefinition = Class.extend({
 	getMemberTypeByName: function (name, isStatic, mode) {
 		// returns an array to support function overloading
 		var types = [];
-		this._getMemberTypesByName(types, name, isStatic, mode);
+		function pushMatchingMember(classDef) {
+			if (mode != ClassDefinition.GET_MEMBER_MODE_SUPER) {
+				for (var i = 0; i < classDef._members.length; ++i) {
+					var member = classDef._members[i];
+					if (isStatic == ((member.flags() & ClassDefinition.IS_STATIC) != 0)
+						&& name == member.name()) {
+						if (member instanceof MemberVariableDefinition) {
+							if ((member.flags() & ClassDefinition.IS_OVERRIDE) == 0) {
+								var type = member.getType();
+								// ignore member variables that failed in type deduction (already reported as a compile error)
+								// it is guranteed by _assertMemberVariableIsDefinable that there would not be a property with same name using different type, so we can use the first one (declarations might be found more than once using the "abstract" attribute)
+								if (type != null && types.length == 0)
+									types[0] = type;
+							}
+						} else if (member instanceof MemberFunctionDefinition) {
+							// member function
+							if (member.getStatements() != null || mode != ClassDefinition.GET_MEMBER_MODE_NOT_ABSTRACT) {
+								for (var j = 0; j < types.length; ++j) {
+									if (Util.typesAreEqual(member.getArgumentTypes(), types[j].getArgumentTypes())) {
+										break;
+									}
+								}
+								if (j == types.length) {
+									types.push(member.getType());
+								}
+							}
+						} else {
+							throw new Error("logic flaw");
+						}
+					}
+				}
+			} else {
+				// for searching super classes, change mode GET_MEMBER_MODE_SUPER to GET_MEMBER_MODE_NOT_ABSTRACT
+				mode = ClassDefinition.GET_MEMBER_MODE_FUNCTION_WITH_BODY;
+			}
+			if (mode != ClassDefinition.GET_MEMBER_MODE_CLASS_ONLY) {
+				if (classDef._extendType != null) {
+					pushMatchingMember(classDef._extendType.getClassDef());
+				}
+				for (var i = 0; i < classDef._implementTypes.length; ++i) {
+					pushMatchingMember(classDef._implementTypes[i].getClassDef());
+				}
+			}
+		}
+		pushMatchingMember(this);
 		switch (types.length) {
 		case 0:
 			return null;
@@ -268,46 +312,6 @@ var ClassDefinition = exports.ClassDefinition = Class.extend({
 			return types[0];
 		default:
 			return new Type.FunctionChoiceType(types);
-		}
-	},
-
-	_getMemberTypesByName: function (types, name, isStatic, mode) {
-		if (mode != ClassDefinition.GET_MEMBER_MODE_SUPER) {
-			for (var i = 0; i < this._members.length; ++i) {
-				var member = this._members[i];
-				if (isStatic == ((member.flags() & ClassDefinition.IS_STATIC) != 0)
-					&& name == member.name()) {
-					if (member instanceof MemberVariableDefinition) {
-						if ((member.flags() & ClassDefinition.IS_OVERRIDE) == 0) {
-							var type = member.getType();
-							// ignore member variables that failed in type deduction (already reported as a compile error)
-							// it is guranteed by _assertMemberVariableIsDefinable that there would not be a property with same name using different type, so we can use the first one (declarations might be found more than once using the "abstract" attribute)
-							if (type != null && types.length == 0)
-								types[0] = type;
-						}
-					} else if (member instanceof MemberFunctionDefinition) {
-						// member function
-						if (member.getStatements() != null || mode != ClassDefinition.GET_MEMBER_MODE_NOT_ABSTRACT) {
-							for (var j = 0; j < types.length; ++j)
-								if (Util.typesAreEqual(member.getArgumentTypes(), types[j].getArgumentTypes()))
-									break;
-							if (j == types.length)
-								types.push(member.getType());
-						}
-					} else {
-						throw new Error("logic flaw");
-					}
-				}
-			}
-		} else {
-			// for searching super classes, change mode GET_MEMBER_MODE_SUPER to GET_MEMBER_MODE_NOT_ABSTRACT
-			mode = ClassDefinition.GET_MEMBER_MODE_FUNCTION_WITH_BODY;
-		}
-		if (mode != ClassDefinition.GET_MEMBER_MODE_CLASS_ONLY) {
-			if (this._extendType != null)
-				this._extendType.getClassDef()._getMemberTypesByName(types, name, isStatic, mode);
-			for (var i = 0; i < this._implementTypes.length; ++i)
-				this._implementTypes[i].getClassDef()._getMemberTypesByName(types, name, isStatic, mode);
 		}
 	},
 
