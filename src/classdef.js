@@ -26,6 +26,28 @@ eval(Class.$import("./util"));
 
 "use strict";
 
+var _Util = exports._Util = Class.extend({
+
+	$buildInstantiationContext: function (errors, token, formalTypeArgs, actualTypeArgs) {
+		// check number of type arguments
+		if (formalTypeArgs.length != actualTypeArgs.length) {
+			errors.push(new CompileError(token, "wrong number of template arguments (expected " + formalTypeArgs.length + ", got " + actualTypeArgs.length));
+			return null;
+		}
+		// build context
+		var instantiationContext = {
+			errors: errors,
+			typemap: {}, // string => Type
+			objectTypesUsed: []
+		};
+		for (var i = 0; i < formalTypeArgs.length; ++i) {
+			instantiationContext.typemap[formalTypeArgs[i].getValue()] = actualTypeArgs[i];
+		}
+		return instantiationContext;
+	}
+
+});
+
 var BlockContext = exports.BlockContext = Class.extend({
 
 	constructor: function (localVariableStatuses, statement) {
@@ -838,7 +860,7 @@ var MemberVariableDefinition = exports.MemberVariableDefinition = MemberDefiniti
 var MemberFunctionDefinition = exports.MemberFunctionDefinition = MemberDefinition.extend({
 
 	constructor: function (token, name, flags, returnType, args, locals, statements, closures, lastTokenOfBody) {
-		MemberDefinition.call(this, token, name, flags);
+		MemberDefinition.prototype.constructor.call(this, token, name, flags);
 		this._returnType = returnType;
 		this._args = args;
 		this._locals = locals;
@@ -854,6 +876,14 @@ var MemberFunctionDefinition = exports.MemberFunctionDefinition = MemberDefiniti
 	},
 
 	instantiate: function (instantiationContext) {
+		return this._instantiateCore(
+			instantiationContext,
+			function (token, name, flags, returnType, args, locals, statements, closures, lastTokenOfBody) {
+				return new MemberFunctionDefinition(token, name, flags, returnType, args, locals, statements, closures, lastTokenOfBody);
+			});
+	},
+
+	_instantiateCore: function (instantiationContext, constructCallback) {
 		var Expression = require("./expression.js");
 		var Statement = require("./statement.js");
 		// rewrite arguments (and push the instantiated args)
@@ -941,7 +971,7 @@ var MemberFunctionDefinition = exports.MemberFunctionDefinition = MemberDefiniti
 		} else {
 			returnType = null;
 		}
-		return new MemberFunctionDefinition(this._token, this._nameToken, this._flags, returnType, args, locals, statements, closures, null);
+		return constructCallback(this._token, this._nameToken, this._flags, returnType, args, locals, statements, closures, null);
 	},
 
 	serialize: function () {
@@ -1081,7 +1111,7 @@ var MemberFunctionDefinition = exports.MemberFunctionDefinition = MemberDefiniti
 						new Expression.AssignmentExpression(new Parser.Token("=", false),
 							new Expression.PropertyExpression(new Parser.Token(".", false),
 								new Expression.ThisExpression(new Parser.Token("this", false), this._classDef),
-								member.getNameToken(), member.getType()),
+								member.getNameToken(), [], member.getType()),
 							member.getInitialValue()));
 					this._statements.splice(insertStmtAt++, 0, stmt);
 				}
@@ -1208,6 +1238,56 @@ var MemberFunctionDefinition = exports.MemberFunctionDefinition = MemberDefiniti
 				if (! cb(this._closures[i]))
 					return false;
 		return true;
+	}
+
+});
+
+var TemplateFunctionDefinition = exports.TemplateFunctionDefinition = MemberFunctionDefinition.extend({
+
+	constructor: function (token, name, flags, typeArgs, returnType, args, locals, statements, closures, lastTokenOfBody) {
+		MemberFunctionDefinition.prototype.constructor.call(this, token, name, flags, returnType, args, locals, statements, closures, lastTokenOfBody);
+		this._typeArgs = typeArgs.concat([]);
+		this._instantiatedDefs = new TypedMap(function (x, y) {
+			for (var i = 0; i < x.length; ++i) {
+				if (! x[i].equals(y[i])) {
+					return false;
+				}
+			}
+			return true;
+		});
+	},
+
+	instantiate: function (instantiationContext) {
+		var numObjectTypesUsed = instantiationContext.objectTypesUsed.length;
+		try {
+			return this._instantiateCore(
+				instantiationContext,
+				function (token, name, flags, returnType, args, locals, statements, closures, lastTokenOfBody) {
+					return new TemplateFunctionDefinition(token, name, flags, this._typeArgs, returnType, args, locals, statements, closures, lastTokenOfBody);
+				}.bind(this));
+		} finally {
+			instantiationContext.objectTypesUsed.splice(numObjectTypesUsed, instantiationContext.objectTypesUsed.length - numObjectTypesUsed);
+		}
+	},
+
+	instantiateTemplateFunction: function (context, token, typeArgs) {
+		// return the already-instantiated one, if exists
+		var instantiated = this._instantiatedDefs.get(typeArgs);
+		if (instantiated != null) {
+			return instantiated;
+		}
+		// instantiate
+		var instantiationContext = _Util.buildInstantiationContext(errors, token, this._typeArgs, typeArgs);
+		if (instantiationContext == null) {
+			return null;
+		}
+		instantiated = this._instantiateCore(instantiationContext, []);
+		if (instantiated == null) {
+			return null;
+		}
+		// register, and return
+		this._instantiatedDefs.set(typeArgs.concat([]), instantiated);
+		return instantiated;
 	}
 
 });
@@ -1416,7 +1496,7 @@ var TemplateClassDefinition = exports.TemplateClassDefinition = Class.extend({
 	constructor: function (className, flags, typeArgs, extendType, implementTypes, members, objectTypesUsed) {
 		this._className = className;
 		this._flags = flags;
-		this._typeArgs = typeArgs;
+		this._typeArgs = typeArgs.concat([]);
 		this._extendType = extendType;
 		this._implementTypes = implementTypes;
 		this._members = members;
@@ -1432,22 +1512,12 @@ var TemplateClassDefinition = exports.TemplateClassDefinition = Class.extend({
 	},
 
 	instantiate: function (errors, request) {
-		var Parser = require("./parser");
-		// check number of type arguments
-		if (this._typeArgs.length != request.getTypeArguments().length) {
-			errors.push(new CompileError(request.getToken(), "wrong number of template arguments (expected " + this._typeArgs.length + ", got " + request.getTypeArguments().length));
+		// prepare
+		var instantiationContext = _Util.buildInstantiationContext(errors, request.getToken(), this._typeArgs, request.getTypeArguments());
+		if (instantiationContext == null) {
 			return null;
 		}
-		// build context
-		var instantiationContext = {
-			errors: errors,
-			request: request,
-			typemap: {}, // string => Type
-			objectTypesUsed: []
-		};
-		for (var i = 0; i < this._typeArgs.length; ++i)
-			instantiationContext.typemap[this._typeArgs[i].getValue()] = request.getTypeArguments()[i];
-		// FIXME add support for extend and implements
+		// instantiate the members
 		var succeeded = true;
 		var members = [];
 		for (var i = 0; i < this._members.length; ++i) {

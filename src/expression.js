@@ -1069,19 +1069,24 @@ var PreIncrementExpression = exports.PreIncrementExpression = IncrementExpressio
 
 var PropertyExpression = exports.PropertyExpression = UnaryExpression.extend({
 
-	constructor: function (operatorToken, expr1, identifierToken, type) {
+	constructor: function (operatorToken, expr1, identifierToken, typeArgs, type) {
 		UnaryExpression.prototype.constructor.call(this, operatorToken, expr1);
 		this._identifierToken = identifierToken;
-		// fourth parameter is optional
+		this._typeArgs = typeArgs;
+		// fifth parameter is optional
 		this._type = type !== undefined ? type : null;
 	},
 
 	clone: function () {
-		return new PropertyExpression(this._token, this._expr.clone(), this._identifierToken, this._type);
+		return new PropertyExpression(this._token, this._expr.clone(), this._identifierToken, this._typeArgs, this._type);
 	},
 
 	getIdentifierToken: function () {
 		return this._identifierToken;
+	},
+
+	getTypeArguments: function () {
+		return this._typeArgs;
 	},
 
 	serialize: function () {
