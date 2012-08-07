@@ -201,8 +201,8 @@ native final class Array.<T> {
 	function forEach(callbackfn : function(value : Nullable.<T>, index : number) : void) : void;
 	function forEach(callbackfn : function(value : Nullable.<T>, index : number, array : Array.<T>) : void) : void;
 	function map.<U>(callbackfn : function(value : Nullable.<T>) : Nullable.<U>) : Array.<U>;
-	function map(callbackfn : function(value : Nullable.<T>, index : number) : Nullable.<T>) : Array.<T>;
-	function map(callbackfn : function(value : Nullable.<T>, index : number, array : Array.<T>) : Nullable.<T>) : Array.<T>;
+	function map.<U>(callbackfn : function(value : Nullable.<T>, index : number) : Nullable.<U>) : Array.<U>;
+	function map.<U>(callbackfn : function(value : Nullable.<T>, index : number, array : Array.<T>) : Nullable.<U>) : Array.<U>;
 	function filter(callbackfn : function(value : Nullable.<T>) : boolean) : Array.<T>;
 	function filter(callbackfn : function(value : Nullable.<T>, index : number) : boolean) : Array.<T>;
 	function filter(callbackfn : function(value : Nullable.<T>, index : number, array : Array.<T>) : boolean) : Array.<T>;
