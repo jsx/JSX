@@ -1042,16 +1042,12 @@ var Parser = exports.Parser = Class.extend({
 		if ((this._typeArgs = this._formalTypeArguments()) == null) {
 			return false;
 		}
-		if (this._typeArgs != null) {
-			this._classType = new ParsedObjectType(
-				new QualifiedName(className, null),
-				this._typeArgs.map(function (token) {
-					// convert formal typearg (Token) to actual typearg (Type)
-					return new ParsedObjectType(new QualifiedName(token, null), []);
-				}));
-		} else {
-			this._classType = new ParsedObjectType(new QualifiedName(className, null), []);
-		}
+		this._classType = new ParsedObjectType(
+			new QualifiedName(className, null),
+			this._typeArgs.map(function (token) {
+				// convert formal typearg (Token) to actual typearg (Type)
+				return new ParsedObjectType(new QualifiedName(token, null), []);
+			}));
 		this._objectTypesUsed.push(this._classType);
 		// extends
 		if ((this._classFlags & (ClassDefinition.IS_INTERFACE | ClassDefinition.IS_MIXIN)) == 0) {
