@@ -1276,6 +1276,7 @@ var Parser = exports.Parser = Class.extend({
 			return null;
 		}
 		this._typeArgs = this._typeArgs.concat(typeArgs);
+		var numObjectTypesUsed = this._objectTypesUsed.length;
 
 		try {
 			if (this._expect("(") == null)
@@ -1332,6 +1333,9 @@ var Parser = exports.Parser = Class.extend({
 			return funcDef;
 		} finally {
 			this._typeArgs.splice(this._typeArgs.length - typeArgs.length, this._typeArgs.length);
+			if (typeArgs.length != 0) {
+				this._objectTypesUsed.splice(numObjectTypesUsed);
+			}
 		}
 	},
 

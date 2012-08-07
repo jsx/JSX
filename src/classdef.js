@@ -285,19 +285,23 @@ var ClassDefinition = exports.ClassDefinition = Class.extend({
 							}
 						} else if (member instanceof MemberFunctionDefinition) {
 							// member function
-							if (member instanceof TemplateFunctionDefinition) {
-								if ((member = member.instantiateTemplateFunction(errors, token, typeArgs)) == null) {
-									return null;
-								}
-							}
-							if (member.getStatements() != null || mode != ClassDefinition.GET_MEMBER_MODE_NOT_ABSTRACT) {
-								for (var j = 0; j < types.length; ++j) {
-									if (Util.typesAreEqual(member.getArgumentTypes(), types[j].getArgumentTypes())) {
-										break;
+							if (member instanceof InstantiatedMemberFunctionDefinition) {
+								// skip
+							} else {
+								if (member instanceof TemplateFunctionDefinition) {
+									if ((member = member.instantiateTemplateFunction(errors, token, typeArgs)) == null) {
+										return null;
 									}
 								}
-								if (j == types.length) {
-									types.push(member.getType());
+								if (member.getStatements() != null || mode != ClassDefinition.GET_MEMBER_MODE_NOT_ABSTRACT) {
+									for (var j = 0; j < types.length; ++j) {
+										if (Util.typesAreEqual(member.getArgumentTypes(), types[j].getArgumentTypes())) {
+											break;
+										}
+									}
+									if (j == types.length) {
+										types.push(member.getType());
+									}
 								}
 							}
 						} else {
@@ -543,8 +547,10 @@ var ClassDefinition = exports.ClassDefinition = Class.extend({
 		// analyze the member functions, analysis of member variables is performed lazily (and those that where never analyzed will be removed by dead code elimination)
 		for (var i = 0; i < this._members.length; ++i) {
 			var member = this._members[i];
-			if (member instanceof MemberFunctionDefinition)
+			if (member instanceof MemberFunctionDefinition
+				&& ! (member instanceof TemplateFunctionDefinition)) {
 				member.analyze(context, this);
+			}
 		}
 	},
 
@@ -1260,6 +1266,14 @@ var MemberFunctionDefinition = exports.MemberFunctionDefinition = MemberDefiniti
 
 });
 
+var InstantiatedMemberFunctionDefinition = exports.InstantiatedMemberFunctionDefinition = MemberFunctionDefinition.extend({
+
+	constructor: function (token, name, flags, returnType, args, locals, statements, closures, lastTokenOfBody) {
+		MemberFunctionDefinition.prototype.constructor.call(this, token, name, flags, returnType, args, locals, statements, closures, lastTokenOfBody);
+	}
+
+});
+
 var TemplateFunctionDefinition = exports.TemplateFunctionDefinition = MemberFunctionDefinition.extend({
 
 	constructor: function (token, name, flags, typeArgs, returnType, args, locals, statements, closures, lastTokenOfBody) {
@@ -1306,12 +1320,13 @@ var TemplateFunctionDefinition = exports.TemplateFunctionDefinition = MemberFunc
 		instantiated = this._instantiateCore(
 			instantiationContext,
 			function (token, name, flags, returnType, args, locals, statements, closures, lastTokenOfBody) {
-				return new MemberFunctionDefinition(token, name, flags, returnType, args, locals, statements, closures, lastTokenOfBody);
+				return new InstantiatedMemberFunctionDefinition(token, name, flags, returnType, args, locals, statements, closures, lastTokenOfBody);
 			});
-		instantiated.setClassDef(this._classDef);
 		if (instantiated == null) {
 			return null;
 		}
+		instantiated.setClassDef(this._classDef);
+		this._classDef._members.push(instantiated);
 		// analyze
 		var analysisContext = new AnalysisContext(errors, this._classDef.getParser(), function (parser, classDef) { throw new Error("not implemented"); });
 		for (var i = 0; i < instantiationContext.objectTypesUsed.length; ++i)
