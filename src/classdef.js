@@ -285,14 +285,7 @@ var ClassDefinition = exports.ClassDefinition = Class.extend({
 							}
 						} else if (member instanceof MemberFunctionDefinition) {
 							// member function
-							if (member instanceof InstantiatedMemberFunctionDefinition) {
-								// skip
-							} else {
-								if (member instanceof TemplateFunctionDefinition) {
-									if ((member = member.instantiateTemplateFunction(errors, token, typeArgs)) == null) {
-										return null;
-									}
-								}
+							function checkDuplicateAndPush() {
 								if (member.getStatements() != null || mode != ClassDefinition.GET_MEMBER_MODE_NOT_ABSTRACT) {
 									for (var j = 0; j < types.length; ++j) {
 										if (Util.typesAreEqual(member.getArgumentTypes(), types[j].getArgumentTypes())) {
@@ -303,6 +296,20 @@ var ClassDefinition = exports.ClassDefinition = Class.extend({
 										types.push(member.getType());
 									}
 								}
+							}
+							if (member instanceof InstantiatedMemberFunctionDefinition) {
+								// skip
+							} else if (member instanceof TemplateFunctionDefinition) {
+								if (typeArgs.length != 0) {
+									if ((member = member.instantiateTemplateFunction(errors, token, typeArgs)) == null) {
+										return null;
+									}
+									checkDuplicateAndPush();
+								} else {
+									throw new Error("not implemented");
+								}
+							} else {
+								checkDuplicateAndPush();
 							}
 						} else {
 							throw new Error("logic flaw");
