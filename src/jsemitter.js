@@ -1943,7 +1943,10 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 				var member = members[i];
 				if (member instanceof MemberFunctionDefinition) {
 					if (! (member.name() == "constructor" && (member.flags() & ClassDefinition.IS_STATIC) == 0) && member.getStatements() != null) {
-						this._emitFunction(member);
+						if (member instanceof TemplateFunctionDefinition) {
+						} else {
+							this._emitFunction(member);
+						}
 					}
 				}
 			}

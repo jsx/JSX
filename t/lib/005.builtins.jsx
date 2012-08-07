@@ -56,7 +56,7 @@ class _Test extends TestCase {
 		});
 		this.expect(i, "forEach").toBe(1 + 2 + 3 + 2 + 1);
 
-		var b = a.map(function(v : Nullable.<number>) : Nullable.<number> {
+		var b = a.map.<number>(function(v : Nullable.<number>) : Nullable.<number> {
 			return -v;
 		});
 		this.expect(JSON.stringify(b), "map").toBe(JSON.stringify([-1, -2, -3, -2, -1]));

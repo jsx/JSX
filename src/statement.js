@@ -143,7 +143,7 @@ var ConstructorInvocationStatement = exports.ConstructorInvocationStatement = St
 	},
 
 	doAnalyze: function (context) {
-		var ctorType = this.getConstructingClassDef().getMemberTypeByName("constructor", false, ClassDefinition.GET_MEMBER_MODE_CLASS_ONLY);
+		var ctorType = this.getConstructingClassDef().getMemberTypeByName(context.errors, this._token, "constructor", false, [], ClassDefinition.GET_MEMBER_MODE_CLASS_ONLY);
 		if (ctorType == null) {
 			if (this._args.length != 0) {
 				context.errors.push(new CompileError(this.getToken().getToken(), "no function with matching arguments"));

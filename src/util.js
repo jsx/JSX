@@ -239,6 +239,50 @@ var Util = exports.Util = Class.extend({
 
 });
 
+var TypedMap = exports.TypedMap = Class.extend({
+
+	constructor: function (equalsCallback) {
+		this._list = [];
+		this._equalsCallback = equalsCallback;
+	},
+
+	exists: function (key) {
+		return ! this.forEach(function (entryKey, entryValue) {
+			return ! this._equalsCallback(key, entryKey);
+		});
+	},
+
+	get: function (key) {
+		for (var i = 0; i < this._list.length; ++i) {
+			if (this._equalsCallback(this._list[i].key, key)) {
+				return this._list[i].value;
+			}
+		}
+		return null;
+	},
+
+	set: function (key, value) {
+		for (var i = 0; i < this._list.length; ++i) {
+			if (this._equalsCallback(this._list[i].key, key)) {
+				this._list[i].value = value;
+				return;
+			}
+		}
+		this._list.push({ key: key, value: value });
+	},
+
+	forEach: function (cb) {
+		for (var i = 0; i < this._list.length; ++i) {
+			var e = this._list[i];
+			if (! cb(e.key, e.value)) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+});
+
 var TemplateInstantiationRequest = exports.TemplateInstantiationRequest = Class.extend({
 
 	constructor: function (token, className, typeArgs) {

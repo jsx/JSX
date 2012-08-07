@@ -605,6 +605,7 @@ var Parser = exports.Parser = Class.extend({
 						return null;
 					}
 					this._classDefs.push(classDef);
+					classDef.setParser(this);
 					classDef.resolveTypes(new AnalysisContext(errors, this, null));
 					postInstantiationCallback(this, classDef);
 					return classDef;
@@ -988,7 +989,7 @@ var Parser = exports.Parser = Class.extend({
 		this._implementTypes = [];
 		this._objectTypesUsed = [];
 		// attributes* class
-		var flags = 0;
+		this._classFlags = 0;
 		while (true) {
 			var token = this._expect([ "class", "interface", "mixin", "abstract", "final", "native", "__fake__" ]);
 			if (token == null)
@@ -996,19 +997,19 @@ var Parser = exports.Parser = Class.extend({
 			if (token.getValue() == "class")
 				break;
 			if (token.getValue() == "interface") {
-				if ((flags & (ClassDefinition.IS_FINAL | ClassDefinition.IS_NATIVE)) != 0) {
+				if ((this._classFlags & (ClassDefinition.IS_FINAL | ClassDefinition.IS_NATIVE)) != 0) {
 					this._newError("interface cannot have final or native attribute set");
 					return false;
 				}
-				flags |= ClassDefinition.IS_INTERFACE;
+				this._classFlags |= ClassDefinition.IS_INTERFACE;
 				break;
 			}
 			if (token.getValue() == "mixin") {
-				if ((flags & (ClassDefinition.IS_FINAL | ClassDefinition.IS_NATIVE)) != 0) {
+				if ((this._classFlags & (ClassDefinition.IS_FINAL | ClassDefinition.IS_NATIVE)) != 0) {
 					this._newError("mixin cannot have final or native attribute set");
 					return false;
 				}
-				flags |= ClassDefinition.IS_MIXIN;
+				this._classFlags |= ClassDefinition.IS_MIXIN;
 				break;
 			}
 			var newFlag = 0;
@@ -1028,30 +1029,18 @@ var Parser = exports.Parser = Class.extend({
 			default:
 				throw new Error("logic flaw");
 			}
-			if ((flags & newFlag) != 0) {
+			if ((this._classFlags & newFlag) != 0) {
 				this._newError("same attribute cannot be specified more than once");
 				return false;
 			}
-			flags |= newFlag;
+			this._classFlags |= newFlag;
 		}
 		var className = this._expectIdentifier(null);
 		if (className == null)
 			return false;
 		// template
-		this._typeArgs = null;
-		if (this._expectOpt(".") != null) {
-			if (this._expect("<") == null)
-				return false;
-			this._typeArgs = [];
-			do {
-				var typeArg = this._expectIdentifier(null);
-				if (typeArg == null)
-					return false;
-				this._typeArgs.push(typeArg);
-				var token = this._expectOpt([ ",", ">" ]);
-				if (token == null)
-					return false;
-			} while (token.getValue() == ",");
+		if ((this._typeArgs = this._formalTypeArguments()) == null) {
+			return false;
 		}
 		if (this._typeArgs != null) {
 			this._classType = new ParsedObjectType(
@@ -1065,7 +1054,7 @@ var Parser = exports.Parser = Class.extend({
 		}
 		this._objectTypesUsed.push(this._classType);
 		// extends
-		if ((flags & (ClassDefinition.IS_INTERFACE | ClassDefinition.IS_MIXIN)) == 0) {
+		if ((this._classFlags & (ClassDefinition.IS_INTERFACE | ClassDefinition.IS_MIXIN)) == 0) {
 			if (this._expectOpt("extends") != null) {
 				this._extendType = this._objectTypeDeclaration(
 					null,
@@ -1078,9 +1067,9 @@ var Parser = exports.Parser = Class.extend({
 				this._objectTypesUsed.push(this._extendType);
 			}
 		} else {
-			if ((flags & (ClassDefinition.IS_ABSTRACT | ClassDefinition.IS_FINAL | ClassDefinition.IS_NATIVE)) != 0) {
+			if ((this._classFlags & (ClassDefinition.IS_ABSTRACT | ClassDefinition.IS_FINAL | ClassDefinition.IS_NATIVE)) != 0) {
 				this._newError("interface or mixin cannot have attributes: 'abstract', 'final', 'native");
-				flags &= ~ (ClassDefinition.IS_ABSTRACT | ClassDefinition.IS_FINAL | ClassDefinition.IS_NATIVE); // erase the flags and continue
+				this._classFlags &= ~ (ClassDefinition.IS_ABSTRACT | ClassDefinition.IS_FINAL | ClassDefinition.IS_NATIVE); // erase the flags and continue
 			}
 		}
 		// implements
@@ -1105,7 +1094,7 @@ var Parser = exports.Parser = Class.extend({
 		while (this._expectOpt("}") == null) {
 			if (! this._expectIsNotEOF())
 				break;
-			var member = this._memberDefinition(flags);
+			var member = this._memberDefinition();
 			if (member != null) {
 				for (var i = 0; i < members.length; ++i) {
 					if (member.name() == members[i].name()
@@ -1133,7 +1122,7 @@ var Parser = exports.Parser = Class.extend({
 		}
 
 		// check name conflicts
-		if ((flags & ClassDefinition.IS_NATIVE) == 0 && Parser._isReservedClassName(className.getValue())) {
+		if ((this._classFlags & ClassDefinition.IS_NATIVE) == 0 && Parser._isReservedClassName(className.getValue())) {
 			// any better way to check that we are parsing a built-in file?
 			this._errors.push(new CompileError(className, "cannot re-define a built-in class"));
 			success = false;
@@ -1161,14 +1150,17 @@ var Parser = exports.Parser = Class.extend({
 			return false;
 
 		// done
-		if (this._typeArgs != null)
-			this._templateClassDefs.push(new TemplateClassDefinition(className.getValue(), flags, this._typeArgs, this._extendType, this._implementTypes, members, this._objectTypesUsed));
-		else
-			this._classDefs.push(new ClassDefinition(className, className.getValue(), flags, this._extendType, this._implementTypes, members, this._objectTypesUsed));
+		if (this._typeArgs.length != 0) {
+			this._templateClassDefs.push(new TemplateClassDefinition(className.getValue(), this._classFlags, this._typeArgs, this._extendType, this._implementTypes, members, this._objectTypesUsed));
+		} else {
+			var classDef = new ClassDefinition(className, className.getValue(), this._classFlags, this._extendType, this._implementTypes, members, this._objectTypesUsed);
+			this._classDefs.push(classDef);
+			classDef.setParser(this);
+		}
 		return true;
 	},
 
-	_memberDefinition: function (classFlags) {
+	_memberDefinition: function () {
 		var flags = 0;
 		while (true) {
 			var token = this._expect([ "function", "var", "static", "abstract", "override", "final", "const", "native", "__readonly__", "inline", "__pure__" ]);
@@ -1187,7 +1179,7 @@ var Parser = exports.Parser = Class.extend({
 			var newFlag = 0;
 			switch (token.getValue()) {
 			case "static":
-				if ((classFlags & (ClassDefinition.IS_INTERFACE | ClassDefinition.IS_MIXIN)) != 0) {
+				if ((this._classFlags & (ClassDefinition.IS_INTERFACE | ClassDefinition.IS_MIXIN)) != 0) {
 					this._newError("interfaces and mixins cannot have static members");
 					return null;
 				}
@@ -1197,14 +1189,14 @@ var Parser = exports.Parser = Class.extend({
 				newFlag = ClassDefinition.IS_ABSTRACT;
 				break;
 			case "override":
-				if ((classFlags & ClassDefinition.IS_INTERFACE) != 0) {
+				if ((this._classFlags & ClassDefinition.IS_INTERFACE) != 0) {
 					this._newError("functions of an interface cannot have 'override' attribute set");
 					return null;
 				}
 				newFlag = ClassDefinition.IS_OVERRIDE;
 				break;
 			case "final":
-				if ((classFlags & ClassDefinition.IS_INTERFACE) != 0) {
+				if ((this._classFlags & ClassDefinition.IS_INTERFACE) != 0) {
 					this._newError("functions of an interface cannot have 'final' attribute set");
 					return null;
 				}
@@ -1231,17 +1223,17 @@ var Parser = exports.Parser = Class.extend({
 			}
 			flags |= newFlag;
 		}
-		if ((classFlags & ClassDefinition.IS_INTERFACE) != 0)
+		if ((this._classFlags & ClassDefinition.IS_INTERFACE) != 0)
 			flags |= ClassDefinition.IS_ABSTRACT;
 		if (token.getValue() == "function") {
-			return this._functionDefinition(token, flags, classFlags);
+			return this._functionDefinition(token, flags, this._classFlags);
 		}
 		// member variable decl.
 		if ((flags & ~(ClassDefinition.IS_STATIC | ClassDefinition.IS_ABSTRACT | ClassDefinition.IS_CONST | ClassDefinition.IS_READONLY | ClassDefinition.IS_INLINE)) != 0) {
 			this._newError("variables may only have attributes: static, abstract, const");
 			return null;
 		}
-		if ((flags & ClassDefinition.IS_READONLY) != 0 && (classFlags & ClassDefinition.IS_NATIVE) == 0) {
+		if ((flags & ClassDefinition.IS_READONLY) != 0 && (this._classFlags & ClassDefinition.IS_NATIVE) == 0) {
 			this._newError("only native classes may use the __readonly__ attribute");
 			return null;
 		}
@@ -1268,18 +1260,18 @@ var Parser = exports.Parser = Class.extend({
 		if (! this._expect(";"))
 			return null;
 		// all non-native, non-template values have initial value
-		if (this._typeArgs == null && initialValue == null && (classFlags & ClassDefinition.IS_NATIVE) == 0)
+		if (this._typeArgs.length == 0 && initialValue == null && (this._classFlags & ClassDefinition.IS_NATIVE) == 0)
 			initialValue = Expression.getDefaultValueExpressionOf(type);
 		return new MemberVariableDefinition(token, name, flags, type, initialValue);
 	},
 
-	_functionDefinition: function (token, flags, classFlags) {
+	_functionDefinition: function (token, flags) {
 		// name
 		var name = this._expectIdentifier(null);
 		if (name == null)
 			return null;
 		if (name.getValue() == "constructor") {
-			if ((classFlags & ClassDefinition.IS_INTERFACE) != 0) {
+			if ((this._classFlags & ClassDefinition.IS_INTERFACE) != 0) {
 				this._newError("interface cannot have a constructor");
 				return null;
 			}
@@ -1289,54 +1281,122 @@ var Parser = exports.Parser = Class.extend({
 			}
 			flags |= ClassDefinition.IS_FINAL;
 		}
-		flags |= classFlags & (ClassDefinition.IS_NATIVE | ClassDefinition.IS_FINAL);
-		if (this._expect("(") == null)
+		flags |= this._classFlags & (ClassDefinition.IS_NATIVE | ClassDefinition.IS_FINAL);
+
+		// parse type args and add to the current typearg list
+		var typeArgs = this._formalTypeArguments();
+		if (typeArgs == null) {
 			return null;
-		// arguments
-		var args = this._functionArgumentsExpr((classFlags & ClassDefinition.IS_NATIVE) != 0, true);
-		if (args == null)
-			return null;
-		// return type
-		var returnType;
-		if (name.getValue() == "constructor") {
-			// no return type
-			returnType = Type.voidType;
-		} else {
-			if (this._expect(":", "return type declaration is mandatory") == null)
-				return null;
-			returnType = this._typeDeclaration(true);
-			if (returnType == null)
-				return null;
 		}
-		// take care of abstract function
-		if ((classFlags & ClassDefinition.IS_INTERFACE) != 0) {
-			if (this._expect(";") == null)
+		if (typeArgs.length != 0 && (this._classFlags & ClassDefinition.IS_NATIVE) == 0) {
+			this._newError("only native classes may have template functions (for the time being)");
+			return null;
+		}
+		this._typeArgs = this._typeArgs.concat(typeArgs);
+		var numObjectTypesUsed = this._objectTypesUsed.length;
+
+		try {
+			if (this._expect("(") == null)
 				return null;
-			return new MemberFunctionDefinition(token, name, flags, returnType, args, null, null, null);
-		} else if ((flags & (ClassDefinition.IS_ABSTRACT | ClassDefinition.IS_NATIVE)) != 0) {
-			var token = this._expect([ ";", "{" ]);
+			// arguments
+			var args = this._functionArgumentsExpr((this._classFlags & ClassDefinition.IS_NATIVE) != 0, true);
+			if (args == null)
+				return null;
+			// return type
+			var returnType;
+			if (name.getValue() == "constructor") {
+				// no return type
+				returnType = Type.voidType;
+			} else {
+				if (this._expect(":", "return type declaration is mandatory") == null)
+					return null;
+				returnType = this._typeDeclaration(true);
+				if (returnType == null)
+					return null;
+			}
+			function createDefinition(locals, statements, closures, lastToken) {
+				return typeArgs.length != 0
+					? new TemplateFunctionDefinition(token, name, flags, typeArgs, returnType, args, locals, statements, closures, lastToken)
+					: new MemberFunctionDefinition(token, name, flags, returnType, args, locals, statements, closures, lastToken);
+			}
+			// take care of abstract function
+			if ((this._classFlags & ClassDefinition.IS_INTERFACE) != 0) {
+				if (this._expect(";") == null)
+					return null;
+				return createDefinition(null, null, null, null);
+			} else if ((flags & (ClassDefinition.IS_ABSTRACT | ClassDefinition.IS_NATIVE)) != 0) {
+				var token = this._expect([ ";", "{" ]);
+				if (token == null)
+					return null;
+				if (token.getValue() == ";")
+					return createDefinition(null, null, null, null);
+			} else {
+				if (this._expect("{") == null)
+					return null;
+			}
+			// body
+			this._arguments = args;
+			this._locals = [];
+			this._statements = [];
+			this._closures = [];
+			if (name.getValue() == "constructor")
+				var lastToken = this._initializeBlock();
+			else
+				lastToken = this._block();
+			// done
+			var funcDef = createDefinition(this._locals, this._statements, this._closures, lastToken);
+			this._locals = null;
+			this._statements = null;
+			return funcDef;
+		} finally {
+			this._typeArgs.splice(this._typeArgs.length - typeArgs.length, this._typeArgs.length);
+			if (typeArgs.length != 0) {
+				this._objectTypesUsed.splice(numObjectTypesUsed);
+			}
+		}
+	},
+
+	_formalTypeArguments: function () {
+		if (this._expectOpt(".") == null) {
+			return [];
+		}
+		if (this._expect("<") == null) {
+			return null;
+		}
+		var typeArgs = [];
+		do {
+			var typeArg = this._expectIdentifier(null);
+			if (typeArg == null)
+				return null;
+			typeArgs.push(typeArg);
+			var token = this._expectOpt([ ",", ">" ]);
 			if (token == null)
 				return null;
-			if (token.getValue() == ";")
-				return new MemberFunctionDefinition(token, name, flags, returnType, args, null, null, null);
-		} else {
-			if (this._expect("{") == null)
-				return null;
+		} while (token.getValue() == ",");
+		return typeArgs;
+	},
+
+	_actualTypeArguments: function () {
+		var types = [];
+		var state = this._preserveState();
+		if (this._expectOpt(".") == null) {
+			return types;
 		}
-		// body
-		this._arguments = args;
-		this._locals = [];
-		this._statements = [];
-		this._closures = [];
-		if (name.getValue() == "constructor")
-			var lastToken = this._initializeBlock();
-		else
-			lastToken = this._block();
-		// done
-		var funcDef = new MemberFunctionDefinition(token, name, flags, returnType, args, this._locals, this._statements, this._closures, lastToken);
-		this._locals = null;
-		this._statements = null;
-		return funcDef;
+		if (this._expect("<") == null) {
+			this._restoreState(state);
+			return types;
+		}
+		// in type argument
+		do {
+			var type = this._typeDeclaration(false);
+			if (type == null)
+				return null;
+			types.push(type);
+			var token = this._expect([ ">", "," ]);
+			if (token == null)
+				return null;
+		} while (token.getValue() == ",");
+		return types;
 	},
 
 	_typeDeclaration: function (allowVoid) {
@@ -1435,38 +1495,27 @@ var Parser = exports.Parser = Class.extend({
 		var qualifiedName = firstToken !== null ? this._qualifiedNameStartingWith(firstToken, autoCompleteMatchCb) : this._qualifiedName(false, autoCompleteMatchCb);
 		if (qualifiedName == null)
 			return null;
-		var state = this._preserveState();
-		if (this._expectOpt(".") != null && this._expect("<") != null) {
-			return this._templateTypeDeclaration(qualifiedName);
+		var typeArgs = this._actualTypeArguments();
+		if (typeArgs == null) {
+			return null;
+		} else if (typeArgs.length != 0) {
+			return this._templateTypeDeclaration(qualifiedName, typeArgs);
 		} else {
 			// object
-			this._restoreState(state);
 			var objectType = new ParsedObjectType(qualifiedName, []);
 			this._objectTypesUsed.push(objectType);
 			return objectType;
 		}
 	},
 
-	_templateTypeDeclaration: function (qualifiedName) {
-		// parse
-		var types = [];
-		do {
-			var type = this._typeDeclaration(false);
-			if (type == null)
-				return null;
-			types.push(type);
-			var token = this._expect([ ">", "," ]);
-			if (token == null)
-				return null;
-		} while (token.getValue() == ",");
-		// check
+	_templateTypeDeclaration: function (qualifiedName, typeArgs) {
 		var className = qualifiedName.getToken().getValue();
-		if ((className == "Array" || className == "Map") && types[0] instanceof NullableType) {
+		if ((className == "Array" || className == "Map") && typeArgs[0] instanceof NullableType) {
 			this._newError("cannot declare " + className + ".<Nullable.<T>>, should be " + className + ".<T>");
-			return false;
+			return null;
 		}
 		// return object type
-		var objectType = new ParsedObjectType(qualifiedName, types);
+		var objectType = new ParsedObjectType(qualifiedName, typeArgs);
 		this._objectTypesUsed.push(objectType);
 		return objectType;
 	},
@@ -2323,7 +2372,10 @@ var Parser = exports.Parser = Class.extend({
 				var identifier = this._expectIdentifier(function (self) { return self._getCompletionCandidatesOfProperty(expr); });
 				if (identifier == null)
 					return null;
-				expr = new PropertyExpression(token, expr, identifier);
+				var typeArgs = this._actualTypeArguments();
+				if (typeArgs == null)
+					return null;
+				expr = new PropertyExpression(token, expr, identifier, typeArgs);
 				break;
 			}
 		}
@@ -2674,16 +2726,6 @@ var Parser = exports.Parser = Class.extend({
 			} while (token.getValue() == ",");
 		}
 		return args;
-	},
-
-	_isPartOfTypeArg: function (type) {
-		if (this._typeArgs == null)
-			return false;
-		for (var i = 0; i < this._typeArgs.length; ++i) {
-			if (this._typeArgs[i].getValue() == type.toString())
-				return true;
-		}
-		return false;
 	},
 
 	_getCompletionCandidatesOfTopLevel: function (autoCompleteMatchCb) {

@@ -1069,19 +1069,24 @@ var PreIncrementExpression = exports.PreIncrementExpression = IncrementExpressio
 
 var PropertyExpression = exports.PropertyExpression = UnaryExpression.extend({
 
-	constructor: function (operatorToken, expr1, identifierToken, type) {
+	constructor: function (operatorToken, expr1, identifierToken, typeArgs, type) {
 		UnaryExpression.prototype.constructor.call(this, operatorToken, expr1);
 		this._identifierToken = identifierToken;
-		// fourth parameter is optional
+		this._typeArgs = typeArgs;
+		// fifth parameter is optional
 		this._type = type !== undefined ? type : null;
 	},
 
 	clone: function () {
-		return new PropertyExpression(this._token, this._expr.clone(), this._identifierToken, this._type);
+		return new PropertyExpression(this._token, this._expr.clone(), this._identifierToken, this._typeArgs, this._type);
 	},
 
 	getIdentifierToken: function () {
 		return this._identifierToken;
+	},
+
+	getTypeArguments: function () {
+		return this._typeArgs;
 	},
 
 	serialize: function () {
@@ -1116,8 +1121,11 @@ var PropertyExpression = exports.PropertyExpression = UnaryExpression.extend({
 			return false;
 		}
 		this._type = classDef.getMemberTypeByName(
+			context.errors,
+			this._identifierToken,
 			this._identifierToken.getValue(),
 			this._expr instanceof ClassExpression,
+			this._typeArgs,
 			(this._expr instanceof ClassExpression) ? ClassDefinition.GET_MEMBER_MODE_CLASS_ONLY : ClassDefinition.GET_MEMBER_MODE_ALL);
 		if (this._type == null) {
 			context.errors.push(new CompileError(this._identifierToken, "'" + exprType.toString() + "' does not have a property named '" + this._identifierToken.getValue() + "'"));
@@ -1365,7 +1373,7 @@ var ArrayExpression = exports.ArrayExpression = BinaryExpression.extend({
 	_analyzeApplicationOnObject: function (context, expr1Type) {
 		var expr1ClassDef = expr1Type.getClassDef();
 		// obtain type of operator []
-		var funcType = expr1ClassDef.getMemberTypeByName("__native_index_operator__", false, ClassDefinition.GET_MEMBER_MODE_ALL);
+		var funcType = expr1ClassDef.getMemberTypeByName(context.errors, this._token, "__native_index_operator__", false, [], ClassDefinition.GET_MEMBER_MODE_ALL);
 		if (funcType == null) {
 			context.errors.push(new CompileError(this._token, "cannot apply operator[] on an instance of class '" + expr1ClassDef.className() + "'"));
 			return false;
@@ -1928,7 +1936,7 @@ var SuperExpression = exports.SuperExpression = OperatorExpression.extend({
 		var classDef = context.funcDef.getClassDef();
 		// lookup function
 		var funcType = null;
-		if ((funcType = classDef.getMemberTypeByName(this._name.getValue(), false, ClassDefinition.GET_MEMBER_MODE_SUPER)) == null) {
+		if ((funcType = classDef.getMemberTypeByName(context.errors, this._token, this._name.getValue(), false, [], ClassDefinition.GET_MEMBER_MODE_SUPER)) == null) {
 			context.errors.push(new CompileError(this._token, "could not find a member function with given name in super classes of class '" + classDef.className() + "'"));
 			return false;
 		}
@@ -2013,7 +2021,7 @@ var NewExpression = exports.NewExpression = OperatorExpression.extend({
 			context.errors.push(new CompileError(this._token, "cannot instantiate an abstract class"));
 			return false;
 		}
-		var ctors = classDef.getMemberTypeByName("constructor", false, ClassDefinition.GET_MEMBER_MODE_CLASS_ONLY);
+		var ctors = classDef.getMemberTypeByName(context.errors, this._token, "constructor", false, [], ClassDefinition.GET_MEMBER_MODE_CLASS_ONLY);
 		var argTypes = Util.analyzeArgs(
 			context, this._args, this,
 			ctors.getExpectedCallbackTypes(this._args.length, false));
