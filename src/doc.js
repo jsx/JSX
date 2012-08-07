@@ -318,7 +318,7 @@ _ += "</div>\n";
 				if (classDef != null) {
 					return this._classDefToHTML(parser, classDef)
 						+ ".&lt;"
-						+ classDef.getTypeArguments().map(function (typeArg) { return this._escape(typeArg.getValue()); }.bind(this)).join(", ")
+						+ type.getTypeArguments().map(function (type) { return this._typeToHTML(parser, type); }.bind(this)).join(", ")
 						+ "&gt;";
 				}
 			}
