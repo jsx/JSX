@@ -896,7 +896,7 @@ var _UnclassifyOptimizationCommand = exports._UnclassifyOptimizationCommand = _O
 									calleeExpr.getToken(),
 									new ClassExpression(new Token(receiverClassDef.className(), true), receiverType),
 									calleeExpr.getIdentifierToken(),
-									expr.getTypeArguments(),
+									calleeExpr.getTypeArguments(),
 									new StaticFunctionType(
 										funcType.getReturnType(),
 										[ receiverType ].concat(funcType.getArgumentTypes()),
