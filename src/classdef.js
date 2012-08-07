@@ -31,7 +31,7 @@ var _Util = exports._Util = Class.extend({
 	$buildInstantiationContext: function (errors, token, formalTypeArgs, actualTypeArgs) {
 		// check number of type arguments
 		if (formalTypeArgs.length != actualTypeArgs.length) {
-			errors.push(new CompileError(token, "wrong number of template arguments (expected " + formalTypeArgs.length + ", got " + actualTypeArgs.length));
+			errors.push(new CompileError(token, "wrong number of template arguments (expected " + formalTypeArgs.length + ", got " + actualTypeArgs.length + ")"));
 			return null;
 		}
 		// build context
