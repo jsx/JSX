@@ -1275,6 +1275,10 @@ var Parser = exports.Parser = Class.extend({
 		if (typeArgs == null) {
 			return null;
 		}
+		if (typeArgs.length != 0 && (this._classFlags & ClassDefinition.IS_NATIVE) == 0) {
+			this._newError("only native classes may have template functions (for the time being)");
+			return null;
+		}
 		this._typeArgs = this._typeArgs.concat(typeArgs);
 		var numObjectTypesUsed = this._objectTypesUsed.length;
 
