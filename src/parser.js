@@ -468,6 +468,7 @@ var Parser = exports.Parser = Class.extend({
 		this._locals = null;
 		this._statements = null;
 		this._closures = [];
+		this._classType = null;
 		this._extendType = null;
 		this._implementTypes = null;
 		this._objectTypesUsed = [];
@@ -983,6 +984,7 @@ var Parser = exports.Parser = Class.extend({
 	},
 
 	_classDefinition: function () {
+		this._classType = null;
 		this._extendType = null;
 		this._implementTypes = [];
 		this._objectTypesUsed = [];
@@ -1040,6 +1042,17 @@ var Parser = exports.Parser = Class.extend({
 		if ((this._typeArgs = this._formalTypeArguments()) == null) {
 			return false;
 		}
+		if (this._typeArgs != null) {
+			this._classType = new ParsedObjectType(
+				new QualifiedName(className, null),
+				this._typeArgs.map(function (token) {
+					// convert formal typearg (Token) to actual typearg (Type)
+					return new ParsedObjectType(new QualifiedName(token, null), []);
+				}));
+		} else {
+			this._classType = new ParsedObjectType(new QualifiedName(className, null), []);
+		}
+		this._objectTypesUsed.push(this._classType);
 		// extends
 		if ((this._classFlags & (ClassDefinition.IS_INTERFACE | ClassDefinition.IS_MIXIN)) == 0) {
 			if (this._expectOpt("extends") != null) {
@@ -1689,11 +1702,15 @@ var Parser = exports.Parser = Class.extend({
 		var token;
 		if ((token = this._expectOpt("super")) != null) {
 			var classType = this._extendType;
+		} else if ((token = this._expectOpt("this")) != null) {
+			classType = this._classType;
 		} else {
 			if ((classType = this._objectTypeDeclaration(null)) == null)
 				return false;
 			token = classType.getToken();
-			if (this._extendType != null && this._extendType.equals(classType)) {
+			if (this._classType.equals(classType)) {
+				// ok is calling the alternate constructor
+			} else if (this._extendType != null && this._extendType.equals(classType)) {
 				// ok is calling base class
 			} else {
 				for (var i = 0; i < this._implementTypes.length; ++i) {
@@ -2508,7 +2525,7 @@ var Parser = exports.Parser = Class.extend({
 				return false;
 			}
 			for (var scope = this._prevScope; scope != null; scope = scope.prev) {
-				if (! cb(scope.locals, scope.arguments)) {
+				if (scope.locals && ! cb(scope.locals, scope.arguments)) {
 					return false;
 				}
 			}

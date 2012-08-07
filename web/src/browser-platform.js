@@ -65,9 +65,7 @@ var BrowserPlatform = exports.BrowserPlatform = Platform.extend({
 		this._map = JSON.parse(this.load(root + "/tree.generated.json"));
 
 		this._prefix = location.pathname.replace(/\/[^\/]*$/, "");
-		if (debug) {
-			console.log({ prefix: this._prefix, root: this._root });
-		}
+		this.debug({ prefix: this._prefix, root: this._root });
 	},
 
 	getRoot: function () {
@@ -77,10 +75,8 @@ var BrowserPlatform = exports.BrowserPlatform = Platform.extend({
 	_findPath: function (path) {
 		var absPath = Util.resolvePath(this._prefix + "/" + path);
 
-		if (debug) {
-			console.debug("[D] find path=%s (absPath=%s)",
-					path, absPath);
-		}
+		this.debug("[D] find path=%s (absPath=%s)",
+				path, absPath);
 
 		var parts = absPath.split('/');
 		var cur = this._map;
@@ -92,9 +88,7 @@ var BrowserPlatform = exports.BrowserPlatform = Platform.extend({
 			cur = t;
 		}
 
-		if (debug) {
-			console.debug("[D] find path --> %s", JSON.stringify(cur));
-		}
+		this.debug("[D] find path --> %s", JSON.stringify(cur));
 
 		return cur;
 	},
@@ -147,6 +141,12 @@ var BrowserPlatform = exports.BrowserPlatform = Platform.extend({
 	error: function (s) {
 		console.error(s);
 		this._errors.push(s);
+	},
+
+	debug: function (__va_args__) {
+		if (debug) {
+			console.log.apply(console, arguments);
+		}
 	},
 
 	getErrors: function () {

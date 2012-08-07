@@ -3,7 +3,7 @@ import "timer.jsx";
 
 class _Test extends TestCase {
 
-	function test_setTimeout200() : void {
+	function testSetTimeout200() : void {
 		this.async(function(async : AsyncContext) : void {
 			var to = 200;
 			var t0 = Date.now();
@@ -17,7 +17,7 @@ class _Test extends TestCase {
 		}, 1000);
 	}
 
-	function test_setTimeout100() : void {
+	function testSetTimeout100() : void {
 		this.async(function(async : AsyncContext) : void {
 			var to = 100;
 			var t0 = Date.now();
@@ -31,16 +31,16 @@ class _Test extends TestCase {
 		}, 1000);
 	}
 
-	function test_clearTimeout() : void {
+	function testClearTimeout() : void {
 		var id = Timer.setTimeout(function() : void {
 			this.fail("setTimeout called after clearTimeout");
 		}, 1);
 		Timer.clearTimeout(id);
 
-		this.expect(id, "clearTimeout").toBe(id);
+		this.pass("clearTimeout succeeded");
 	}
 
-	function test_setInterval() : void {
+	function testSetInterval() : void {
 		this.async(function(async : AsyncContext) : void {
 			var interval = 10;
 			var count = 3;
@@ -56,5 +56,26 @@ class _Test extends TestCase {
 
 			}, interval);
 		}, 1000);
+	}
+
+	function testRequestAnimationFrame() : void {
+		this.async(function(async : AsyncContext) : void {
+			Timer.requestAnimationFrame(function(timeToCall : number) : void {
+				this.expect(timeToCall, "requestAnimationFrame").toBeGE(0);
+
+				async.done();
+			});
+		}, 1000);
+
+	}
+
+	function testCancelAnimationFrame() : void {
+		var id = Timer.requestAnimationFrame(function(timeToCall : number) : void {
+			this.fail("must be canceled");
+		});
+
+		Timer.cancelAnimationFrame(id);
+
+		this.pass("clearAnimationFrame succeeded");
 	}
 }
