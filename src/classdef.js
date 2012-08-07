@@ -877,8 +877,14 @@ var MemberFunctionDefinition = exports.MemberFunctionDefinition = MemberDefiniti
 			}, this._statements);
 			// clone and rewrite the types of the statements
 			var statements = [];
-			for (var i = 0; i < this._statements.length; ++i)
-				statements[i] = this._statements[i].clone();
+			for (var i = 0; i < this._statements.length; ++i) {
+				if (this._statements[i] instanceof Statement.ConstructorInvocationStatement) {
+					// ConstructorInvocationStatement only appears at the top level of the function
+					statements[i] = this._statements[i].instantiate(instantiationContext);
+				} else {
+					statements[i] = this._statements[i].clone();
+				}
+			}
 			Util.forEachStatement(function onStatement(statement) {
 				if (statement instanceof Statement.CatchStatement) {
 					if (caughtVariables.length == 0)
@@ -995,37 +1001,46 @@ var MemberFunctionDefinition = exports.MemberFunctionDefinition = MemberDefiniti
 		var Statement = require("./statement");
 
 		var success = true;
+		var isAlternate = false;
 
 		// make implicit calls to default constructor explicit as well as checking the invocation order
 		var stmtIndex = 0;
-		for (var baseIndex = 0; baseIndex <= this._classDef.implementTypes().length; ++baseIndex) {
-			var baseClassType = baseIndex == 0 ? this._classDef.extendType() : this._classDef.implementTypes()[baseIndex - 1];
-			if (baseClassType != null) {
-				if (stmtIndex < this._statements.length
-					&& this._statements[stmtIndex] instanceof Statement.ConstructorInvocationStatement
-					&& baseClassType.getClassDef() == this._statements[stmtIndex].getConstructingClassDef()) {
-					// explicit call to the base class, no need to complement
-					if (baseClassType.getToken() == "Object")
-						this._statements.splice(stmtIndex, 1);
-					else
-						++stmtIndex;
-				} else {
-					// insert call to the default constructor
-					if (baseClassType.getClassDef().className() == "Object") {
-						// we can omit the call
-					} else if (baseClassType.getClassDef().hasDefaultConstructor()) {
-						var ctorStmt = new Statement.ConstructorInvocationStatement(this._token, baseClassType, []);
-						this._statements.splice(stmtIndex, 0, ctorStmt);
-						if (! ctorStmt.analyze(context))
-							throw new Error("logic flaw");
-						++stmtIndex;
+		if (stmtIndex < this._statements.length
+			&& this._statements[stmtIndex] instanceof Statement.ConstructorInvocationStatement
+			&& this._statements[stmtIndex].getConstructingClassDef() == this._classDef) {
+			// alternate constructor invocation
+			isAlternate = true;
+			++stmtIndex;
+		} else {
+			for (var baseIndex = 0; baseIndex <= this._classDef.implementTypes().length; ++baseIndex) {
+				var baseClassType = baseIndex == 0 ? this._classDef.extendType() : this._classDef.implementTypes()[baseIndex - 1];
+				if (baseClassType != null) {
+					if (stmtIndex < this._statements.length
+						&& this._statements[stmtIndex] instanceof Statement.ConstructorInvocationStatement
+						&& baseClassType.getClassDef() == this._statements[stmtIndex].getConstructingClassDef()) {
+						// explicit call to the base class, no need to complement
+						if (baseClassType.getToken() == "Object")
+							this._statements.splice(stmtIndex, 1);
+						else
+							++stmtIndex;
 					} else {
-						if (stmtIndex < this._statements.length) {
-							context.errors.push(new CompileError(this._statements[stmtIndex].getToken(), "constructor of class '" + baseClassType.toString() + "' should be called prior to the statement"));
+						// insert call to the default constructor
+						if (baseClassType.getClassDef().className() == "Object") {
+							// we can omit the call
+						} else if (baseClassType.getClassDef().hasDefaultConstructor()) {
+							var ctorStmt = new Statement.ConstructorInvocationStatement(this._token, baseClassType, []);
+							this._statements.splice(stmtIndex, 0, ctorStmt);
+							if (! ctorStmt.analyze(context))
+								throw new Error("logic flaw");
+							++stmtIndex;
 						} else {
-							context.errors.push(new CompileError(this._token, "super class '" + baseClassType.toString() + "' should be initialized explicitely (no default constructor)"));
+							if (stmtIndex < this._statements.length) {
+								context.errors.push(new CompileError(this._statements[stmtIndex].getToken(), "constructor of class '" + baseClassType.toString() + "' should be called prior to the statement"));
+							} else {
+								context.errors.push(new CompileError(this._token, "super class '" + baseClassType.toString() + "' should be initialized explicitely (no default constructor)"));
+							}
+							success = false;
 						}
-						success = false;
 					}
 				}
 			}
@@ -1039,6 +1054,10 @@ var MemberFunctionDefinition = exports.MemberFunctionDefinition = MemberDefiniti
 		// NOTE: it is asserted by the parser that ConstructorInvocationStatements precede other statements
 		if (! success)
 			return;
+		if (isAlternate) {
+			return; // all the properties are initialized by the alternate constructor
+		}
+
 		var normalStatementFromIndex = stmtIndex;
 
 		// find out the properties that need to be initialized (that are not initialized by the ctor explicitely before completion or being used)

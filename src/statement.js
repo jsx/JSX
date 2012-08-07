@@ -107,6 +107,17 @@ var ConstructorInvocationStatement = exports.ConstructorInvocationStatement = St
 		return new ConstructorInvocationStatement(this._token, this._ctorClassType, Util.cloneArray(this._args), this._ctorFunctionType);
 	},
 
+	instantiate: function (instantiationContext) {
+		if (this._ctorFunctionType != null) {
+			throw new Error("instantiation after analysis?");
+		}
+		return new ConstructorInvocationStatement(
+			this._token,
+			this._ctorClassType.instantiate(instantiationContext),
+			Util.cloneArray(this._args),
+			null);
+	},
+
 	getToken: function () {
 		return this._token;
 	},
@@ -133,82 +144,6 @@ var ConstructorInvocationStatement = exports.ConstructorInvocationStatement = St
 
 	doAnalyze: function (context) {
 		var ctorType = this.getConstructingClassDef().getMemberTypeByName("constructor", false, ClassDefinition.GET_MEMBER_MODE_CLASS_ONLY);
-		if (ctorType == null) {
-			if (this._args.length != 0) {
-				context.errors.push(new CompileError(this.getToken().getToken(), "no function with matching arguments"));
-				return true;
-			}
-			ctorType = new ResolvedFunctionType(Type.voidType, [], false); // implicit constructor
-		} else {
-			// analyze args
-			var argTypes = Util.analyzeArgs(
-				context, this._args, null,
-				ctorType.getExpectedCallbackTypes(this._args.length, false));
-			if (argTypes == null) {
-				// error is reported by callee
-				return true;
-			}
-			if ((ctorType = ctorType.deduceByArgumentTypes(context, this.getToken(), argTypes, false)) == null) {
-				// error is reported by callee
-				return true;
-			}
-		}
-		this._ctorFunctionType = ctorType;
-		return true;
-	},
-
-	forEachExpression: function (cb) {
-		if (! Util.forEachExpression(cb, this._args))
-			return false;
-		return true;
-	}
-
-});
-
-var AlternateConstructorInvocationStatement = exports.AlternateConstructorInvocationStatement = Statement.extend({
-
-	constructor: function (thisExpression, args) {
-		Statement.prototype.constructor.call(this);
-		this._thisExpression = thisExpression;
-		this._args = args;
-		this._ctorFunctionType = null;
-	},
-
-	clone: function () {
-		return new AlternateConstructorInvocationStatement(
-			this._thisExpression, Util.cloneArray(this._args));
-	},
-
-	getToken: function () {
-		return this._thisExpression.getToken();
-	},
-
-	getArguments: function () {
-		return this._args;
-	},
-
-	getConstructingClassDef: function() {
-		return this._thisExpression._classDef;
-	},
-
-	getConstructorType: function () {
-		return this._ctorFunctionType;
-	},
-
-	serialize: function () {
-		return [
-			"AlternateConstructorInvocationStatement",
-			this._thisExpression.serialize(),
-			Util.serializeArray(this._args)
-		];
-	},
-
-	doAnalyze: function (context) {
-		if (! this._thisExpression.analyze(context, null)) {
-			return false;
-		}
-
-		var ctorType = this._thisExpression._classDef.getMemberTypeByName("constructor", false, ClassDefinition.GET_MEMBER_MODE_CLASS_ONLY);
 		if (ctorType == null) {
 			if (this._args.length != 0) {
 				context.errors.push(new CompileError(this.getToken().getToken(), "no function with matching arguments"));
