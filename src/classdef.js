@@ -1327,6 +1327,10 @@ var TemplateFunctionDefinition = exports.TemplateFunctionDefinition = MemberFunc
 		this._resolvedTypemap = {};
 	},
 
+	getTypeArguments: function () {
+		return this._typeArgs;
+	},
+
 	instantiate: function (instantiationContext) {
 		var instantiated = new TemplateFunctionDefinition(
 			this._token, this.getNameToken(), this.flags(), this._typeArgs.concat([]), this._returnType, this._args.concat([]),

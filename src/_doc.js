@@ -206,11 +206,12 @@ var DocumentGenerator = exports.DocumentGenerator = Class.extend({
 		} else if ((classDef.flags() & ClassDefinition.IS_MIXIN) != 0) {
 			typeName = "mixin";
 		}
+		var typeArgs = classDef instanceof TemplateClassDefinition ? classDef.getTypeArguments() : [];
 
 		var _ = "";
 
 ?<div class="class" id="class-<?= this._escape(classDef.className()) ?>">
-?<h2><?= this._flagsToHTML(classDef.flags()) + " " + this._escape(typeName + " " + classDef.className()) ?></h2>
+?<h2><?= this._flagsToHTML(classDef.flags()) + " " + this._escape(typeName + " " + classDef.className()) + this._formalTypeArgsToHTML(typeArgs) ?></h2>
 ?<?= this._descriptionToHTML(classDef.getDocComment()) ?>
 
 		if (this._hasPublicProperties(classDef)) {
@@ -228,7 +229,7 @@ var DocumentGenerator = exports.DocumentGenerator = Class.extend({
 		}
 
 		classDef.forEachMemberFunction(function (funcDef) {
-			if (this._isConstructor(funcDef)) {
+			if (! (funcDef instanceof InstantiatedMemberFunctionDefinition) && this._isConstructor(funcDef)) {
 ?<?= this._buildDocOfFunction(parser, funcDef) ?>
 			}
 			return true;
@@ -236,7 +237,7 @@ var DocumentGenerator = exports.DocumentGenerator = Class.extend({
 
 		if (this._hasPublicFunctions(classDef)) {
 			classDef.forEachMemberFunction(function (funcDef) {
-				if (! (this._isConstructor(funcDef) || this._isPrivate(funcDef))) {
+				if (! (funcDef instanceof InstantiatedMemberFunctionDefinition || this._isConstructor(funcDef) || this._isPrivate(funcDef))) {
 ?<?= this._buildDocOfFunction(parser, funcDef) ?>
 				}
 				return true;
@@ -258,7 +259,7 @@ var DocumentGenerator = exports.DocumentGenerator = Class.extend({
 
 ?<div class="member function">
 ?<h3>
-?<?= this._escape(funcName) ?>(<?= argsHTML ?>)
+?<?= this._escape(funcName) + this._formalTypeArgsToHTML(funcDef instanceof TemplateFunctionDefinition ? funcDef.getTypeArguments() : []) ?>(<?= argsHTML ?>)
 		if (! this._isConstructor(funcDef)) {
 ? : <?= this._typeToHTML(parser, funcDef.getReturnType()) ?>
 		}
@@ -297,6 +298,15 @@ var DocumentGenerator = exports.DocumentGenerator = Class.extend({
 		return docComment != null ? this._getDescriptionOfNamedArgument(docComment, name): "";
 	},
 
+	_formalTypeArgsToHTML: function (typeArgs) {
+		if (typeArgs.length == 0) {
+			return "";
+		}
+		return ".&lt;"
+			+ typeArgs.map(function (typeArg) { return this._escape(typeArg.getValue()); }.bind(this)).join(", ")
+			+ "&gt;";
+	},
+
 	_typeToHTML: function (parser, type) {
 		// TODO create links for object types
 		if (type instanceof ObjectType) {
@@ -318,7 +328,7 @@ var DocumentGenerator = exports.DocumentGenerator = Class.extend({
 				+ type.getArgumentTypes().map(function (type) {
 					return ":" + this._typeToHTML(parser, type);
 				}.bind(this)).join(", ")
-				+ ")";
+				+ ") : " + this._typeToHTML(parser, type.getReturnType());
 		} else if (type instanceof VariableLengthArgumentType) {
 			return "..." + this._typeToHTML(parser, type.getBaseType());
 		}
@@ -403,7 +413,9 @@ var DocumentGenerator = exports.DocumentGenerator = Class.extend({
 
 	_hasPublicFunctions: function (classDef) {
 		return ! classDef.forEachMemberFunction(function (funcDef) {
-			if (this._isConstructor(funcDef) || this._isPrivate(funcDef)) {
+			if (funcDef instanceof InstantiatedMemberFunctionDefinition
+				|| this._isConstructor(funcDef)
+				|| this._isPrivate(funcDef)) {
 				return true;
 			}
 			return false;

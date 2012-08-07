@@ -206,11 +206,12 @@ _ += "</div>\n";
 		} else if ((classDef.flags() & ClassDefinition.IS_MIXIN) != 0) {
 			typeName = "mixin";
 		}
+		var typeArgs = classDef instanceof TemplateClassDefinition ? classDef.getTypeArguments() : [];
 
 		var _ = "";
 
 _ += "<div class=\"class\" id=\"class-"; _ += (this._escape(classDef.className())).replace(/\n$/, ""); _ += "\">\n";
-_ += "<h2>"; _ += (this._flagsToHTML(classDef.flags()) + " " + this._escape(typeName + " " + classDef.className())).replace(/\n$/, ""); _ += "</h2>\n";
+_ += "<h2>"; _ += (this._flagsToHTML(classDef.flags()) + " " + this._escape(typeName + " " + classDef.className()) + this._formalTypeArgsToHTML(typeArgs)).replace(/\n$/, ""); _ += "</h2>\n";
 _ += (this._descriptionToHTML(classDef.getDocComment())).replace(/\n$/, ""); _ += "\n";
 
 		if (this._hasPublicProperties(classDef)) {
@@ -228,7 +229,7 @@ _ += "</div>\n";
 		}
 
 		classDef.forEachMemberFunction(function (funcDef) {
-			if (this._isConstructor(funcDef)) {
+			if (! (funcDef instanceof InstantiatedMemberFunctionDefinition) && this._isConstructor(funcDef)) {
 _ += (this._buildDocOfFunction(parser, funcDef)).replace(/\n$/, ""); _ += "\n";
 			}
 			return true;
@@ -236,7 +237,7 @@ _ += (this._buildDocOfFunction(parser, funcDef)).replace(/\n$/, ""); _ += "\n";
 
 		if (this._hasPublicFunctions(classDef)) {
 			classDef.forEachMemberFunction(function (funcDef) {
-				if (! (this._isConstructor(funcDef) || this._isPrivate(funcDef))) {
+				if (! (funcDef instanceof InstantiatedMemberFunctionDefinition || this._isConstructor(funcDef) || this._isPrivate(funcDef))) {
 _ += (this._buildDocOfFunction(parser, funcDef)).replace(/\n$/, ""); _ += "\n";
 				}
 				return true;
@@ -258,7 +259,7 @@ _ += "</div>\n";
 
 _ += "<div class=\"member function\">\n";
 _ += "<h3>\n";
-_ += (this._escape(funcName)).replace(/\n$/, ""); _ += "("; _ += (argsHTML).replace(/\n$/, ""); _ += ")\n";
+_ += (this._escape(funcName) + this._formalTypeArgsToHTML(funcDef instanceof TemplateFunctionDefinition ? funcDef.getTypeArguments() : [])).replace(/\n$/, ""); _ += "("; _ += (argsHTML).replace(/\n$/, ""); _ += ")\n";
 		if (! this._isConstructor(funcDef)) {
 _ += " : "; _ += (this._typeToHTML(parser, funcDef.getReturnType())).replace(/\n$/, ""); _ += "\n";
 		}
@@ -297,6 +298,15 @@ _ += "</div>\n";
 		return docComment != null ? this._getDescriptionOfNamedArgument(docComment, name): "";
 	},
 
+	_formalTypeArgsToHTML: function (typeArgs) {
+		if (typeArgs.length == 0) {
+			return "";
+		}
+		return ".&lt;"
+			+ typeArgs.map(function (typeArg) { return this._escape(typeArg.getValue()); }.bind(this)).join(", ")
+			+ "&gt;";
+	},
+
 	_typeToHTML: function (parser, type) {
 		// TODO create links for object types
 		if (type instanceof ObjectType) {
@@ -318,7 +328,7 @@ _ += "</div>\n";
 				+ type.getArgumentTypes().map(function (type) {
 					return ":" + this._typeToHTML(parser, type);
 				}.bind(this)).join(", ")
-				+ ")";
+				+ ") : " + this._typeToHTML(parser, type.getReturnType());
 		} else if (type instanceof VariableLengthArgumentType) {
 			return "..." + this._typeToHTML(parser, type.getBaseType());
 		}
@@ -403,7 +413,9 @@ _ += "<a href=\""; _ += (this._escape(parserOfClassDef.getPath())).replace(/\n$/
 
 	_hasPublicFunctions: function (classDef) {
 		return ! classDef.forEachMemberFunction(function (funcDef) {
-			if (this._isConstructor(funcDef) || this._isPrivate(funcDef)) {
+			if (funcDef instanceof InstantiatedMemberFunctionDefinition
+				|| this._isConstructor(funcDef)
+				|| this._isPrivate(funcDef)) {
 				return true;
 			}
 			return false;
