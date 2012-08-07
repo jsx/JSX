@@ -483,7 +483,10 @@ var FunctionChoiceType = exports.FunctionChoiceType = FunctionType.extend({
 				matched.push(this._types[i]);
 		switch (matched.length) {
 		case 0:
-			context.errors.push(new CompileError(operatorToken, "no function with matching arguments"));
+			context.errors.push(
+				new CompileError(
+					operatorToken,
+					operatorToken.getValue() == "[" ? "operator [] of type " + argTypes[0].toString() + " is not applicable to " + this._objectType.toString() : "no function with matching arguments"));
 			break;
 		case 1:
 			return matched[0];
@@ -539,7 +542,10 @@ var ResolvedFunctionType = exports.ResolvedFunctionType = FunctionType.extend({
 
 	deduceByArgumentTypes: function (context, operatorToken, argTypes, isStatic) {
 		if (! this._deduceByArgumentTypes(argTypes, isStatic, false)) {
-			context.errors.push(new CompileError(operatorToken, "no function with matching arguments"));
+			context.errors.push(
+				new CompileError(
+					operatorToken,
+					operatorToken.getValue() == "[" ? "operator [] of type " + argTypes[0].toString() + " is not applicable to " + this._objectType.toString() : "no function with matching arguments"));
 			return null;
 		}
 		return this;

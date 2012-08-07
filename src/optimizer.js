@@ -896,6 +896,7 @@ var _UnclassifyOptimizationCommand = exports._UnclassifyOptimizationCommand = _O
 									calleeExpr.getToken(),
 									new ClassExpression(new Token(receiverClassDef.className(), true), receiverType),
 									calleeExpr.getIdentifierToken(),
+									calleeExpr.getTypeArguments(),
 									new StaticFunctionType(
 										funcType.getReturnType(),
 										[ receiverType ].concat(funcType.getArgumentTypes()),
@@ -2601,6 +2602,7 @@ var _ArrayLengthOptimizeCommand = exports._ArrayLengthOptimizeCommand = _Functio
 										new Token(".", false),
 										new LocalExpression(new Token(arrayLocal.getName(), true), arrayLocal),
 										new Token("length", true),
+										[],
 										lengthLocal.getType()))));
 						// rewrite
 						var onExpr = function (expr, replaceCb) {

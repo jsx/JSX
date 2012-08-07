@@ -26,6 +26,28 @@ eval(Class.$import("./util"));
 
 "use strict";
 
+var _Util = exports._Util = Class.extend({
+
+	$buildInstantiationContext: function (errors, token, formalTypeArgs, actualTypeArgs) {
+		// check number of type arguments
+		if (formalTypeArgs.length != actualTypeArgs.length) {
+			errors.push(new CompileError(token, "wrong number of template arguments (expected " + formalTypeArgs.length + ", got " + actualTypeArgs.length));
+			return null;
+		}
+		// build context
+		var instantiationContext = {
+			errors: errors,
+			typemap: {}, // string => Type
+			objectTypesUsed: []
+		};
+		for (var i = 0; i < formalTypeArgs.length; ++i) {
+			instantiationContext.typemap[formalTypeArgs[i].getValue()] = actualTypeArgs[i];
+		}
+		return instantiationContext;
+	}
+
+});
+
 var BlockContext = exports.BlockContext = Class.extend({
 
 	constructor: function (localVariableStatuses, statement) {
@@ -101,6 +123,7 @@ var ClassDefinition = exports.ClassDefinition = Class.extend({
 	$IS_PURE: 2048, // constexpr (intended for for native functions)
 
 	constructor: function (token, className, flags, extendType, implementTypes, members, objectTypesUsed, docComment) {
+		this._parser = null;
 		this._token = token;
 		this._className = className;
 		this._outputClassName = null;
@@ -139,6 +162,14 @@ var ClassDefinition = exports.ClassDefinition = Class.extend({
 		for (var i = 0; i < classDefs.length; ++i)
 			s[i] = classDefs[i].serialize();
 		return JSON.stringify(s, null, 2);
+	},
+
+	getParser: function () {
+		return this._parser;
+	},
+
+	setParser: function (parser) {
+		this._parser = parser;
 	},
 
 	getToken: function () {
@@ -244,10 +275,63 @@ var ClassDefinition = exports.ClassDefinition = Class.extend({
 	$GET_MEMBER_MODE_SUPER: 2, // looks for functions with body in super classes
 	$GET_MEMBER_MODE_FUNCTION_WITH_BODY: 3, // looks for function with body
 	
-	getMemberTypeByName: function (name, isStatic, mode) {
+	getMemberTypeByName: function (errors, token, name, isStatic, typeArgs, mode) {
 		// returns an array to support function overloading
 		var types = [];
-		this._getMemberTypesByName(types, name, isStatic, mode);
+		function pushMatchingMember(classDef) {
+			if (mode != ClassDefinition.GET_MEMBER_MODE_SUPER) {
+				for (var i = 0; i < classDef._members.length; ++i) {
+					var member = classDef._members[i];
+					if (isStatic == ((member.flags() & ClassDefinition.IS_STATIC) != 0)
+						&& name == member.name()) {
+						if (member instanceof MemberVariableDefinition) {
+							if ((member.flags() & ClassDefinition.IS_OVERRIDE) == 0) {
+								var type = member.getType();
+								// ignore member variables that failed in type deduction (already reported as a compile error)
+								// it is guranteed by _assertMemberVariableIsDefinable that there would not be a property with same name using different type, so we can use the first one (declarations might be found more than once using the "abstract" attribute)
+								if (type != null && types.length == 0)
+									types[0] = type;
+							}
+						} else if (member instanceof MemberFunctionDefinition) {
+							// member function
+							if (member instanceof InstantiatedMemberFunctionDefinition) {
+								// skip
+							} else {
+								if (member instanceof TemplateFunctionDefinition) {
+									if ((member = member.instantiateTemplateFunction(errors, token, typeArgs)) == null) {
+										return null;
+									}
+								}
+								if (member.getStatements() != null || mode != ClassDefinition.GET_MEMBER_MODE_NOT_ABSTRACT) {
+									for (var j = 0; j < types.length; ++j) {
+										if (Util.typesAreEqual(member.getArgumentTypes(), types[j].getArgumentTypes())) {
+											break;
+										}
+									}
+									if (j == types.length) {
+										types.push(member.getType());
+									}
+								}
+							}
+						} else {
+							throw new Error("logic flaw");
+						}
+					}
+				}
+			} else {
+				// for searching super classes, change mode GET_MEMBER_MODE_SUPER to GET_MEMBER_MODE_NOT_ABSTRACT
+				mode = ClassDefinition.GET_MEMBER_MODE_FUNCTION_WITH_BODY;
+			}
+			if (mode != ClassDefinition.GET_MEMBER_MODE_CLASS_ONLY) {
+				if (classDef._extendType != null) {
+					pushMatchingMember(classDef._extendType.getClassDef());
+				}
+				for (var i = 0; i < classDef._implementTypes.length; ++i) {
+					pushMatchingMember(classDef._implementTypes[i].getClassDef());
+				}
+			}
+		}
+		pushMatchingMember(this);
 		switch (types.length) {
 		case 0:
 			return null;
@@ -255,46 +339,6 @@ var ClassDefinition = exports.ClassDefinition = Class.extend({
 			return types[0];
 		default:
 			return new Type.FunctionChoiceType(types);
-		}
-	},
-
-	_getMemberTypesByName: function (types, name, isStatic, mode) {
-		if (mode != ClassDefinition.GET_MEMBER_MODE_SUPER) {
-			for (var i = 0; i < this._members.length; ++i) {
-				var member = this._members[i];
-				if (isStatic == ((member.flags() & ClassDefinition.IS_STATIC) != 0)
-					&& name == member.name()) {
-					if (member instanceof MemberVariableDefinition) {
-						if ((member.flags() & ClassDefinition.IS_OVERRIDE) == 0) {
-							var type = member.getType();
-							// ignore member variables that failed in type deduction (already reported as a compile error)
-							// it is guranteed by _assertMemberVariableIsDefinable that there would not be a property with same name using different type, so we can use the first one (declarations might be found more than once using the "abstract" attribute)
-							if (type != null && types.length == 0)
-								types[0] = type;
-						}
-					} else if (member instanceof MemberFunctionDefinition) {
-						// member function
-						if (member.getStatements() != null || mode != ClassDefinition.GET_MEMBER_MODE_NOT_ABSTRACT) {
-							for (var j = 0; j < types.length; ++j)
-								if (Util.typesAreEqual(member.getArgumentTypes(), types[j].getArgumentTypes()))
-									break;
-							if (j == types.length)
-								types.push(member.getType());
-						}
-					} else {
-						throw new Error("logic flaw");
-					}
-				}
-			}
-		} else {
-			// for searching super classes, change mode GET_MEMBER_MODE_SUPER to GET_MEMBER_MODE_NOT_ABSTRACT
-			mode = ClassDefinition.GET_MEMBER_MODE_FUNCTION_WITH_BODY;
-		}
-		if (mode != ClassDefinition.GET_MEMBER_MODE_CLASS_ONLY) {
-			if (this._extendType != null)
-				this._extendType.getClassDef()._getMemberTypesByName(types, name, isStatic, mode);
-			for (var i = 0; i < this._implementTypes.length; ++i)
-				this._implementTypes[i].getClassDef()._getMemberTypesByName(types, name, isStatic, mode);
 		}
 	},
 
@@ -512,8 +556,10 @@ var ClassDefinition = exports.ClassDefinition = Class.extend({
 		// analyze the member functions, analysis of member variables is performed lazily (and those that where never analyzed will be removed by dead code elimination)
 		for (var i = 0; i < this._members.length; ++i) {
 			var member = this._members[i];
-			if (member instanceof MemberFunctionDefinition)
+			if (member instanceof MemberFunctionDefinition
+				&& ! (member instanceof TemplateFunctionDefinition)) {
 				member.analyze(context, this);
+			}
 		}
 	},
 
@@ -872,6 +918,14 @@ var MemberFunctionDefinition = exports.MemberFunctionDefinition = MemberDefiniti
 	},
 
 	instantiate: function (instantiationContext) {
+		return this._instantiateCore(
+			instantiationContext,
+			function (token, name, flags, returnType, args, locals, statements, closures, lastTokenOfBody, docComment) {
+				return new MemberFunctionDefinition(token, name, flags, returnType, args, locals, statements, closures, lastTokenOfBody, docComment);
+			});
+	},
+
+	_instantiateCore: function (instantiationContext, constructCallback) {
 		var Expression = require("./expression.js");
 		var Statement = require("./statement.js");
 		// rewrite arguments (and push the instantiated args)
@@ -895,8 +949,14 @@ var MemberFunctionDefinition = exports.MemberFunctionDefinition = MemberDefiniti
 			}, this._statements);
 			// clone and rewrite the types of the statements
 			var statements = [];
-			for (var i = 0; i < this._statements.length; ++i)
-				statements[i] = this._statements[i].clone();
+			for (var i = 0; i < this._statements.length; ++i) {
+				if (this._statements[i] instanceof Statement.ConstructorInvocationStatement) {
+					// ConstructorInvocationStatement only appears at the top level of the function
+					statements[i] = this._statements[i].instantiate(instantiationContext);
+				} else {
+					statements[i] = this._statements[i].clone();
+				}
+			}
 			Util.forEachStatement(function onStatement(statement) {
 				if (statement instanceof Statement.CatchStatement) {
 					if (caughtVariables.length == 0)
@@ -959,7 +1019,7 @@ var MemberFunctionDefinition = exports.MemberFunctionDefinition = MemberDefiniti
 		} else {
 			returnType = null;
 		}
-		return new MemberFunctionDefinition(this._token, this._nameToken, this._flags, returnType, args, locals, statements, closures, null);
+		return constructCallback(this._token, this._nameToken, this._flags, returnType, args, locals, statements, closures, this._lastTokenOfBody, this._docComment);
 	},
 
 	serialize: function () {
@@ -1013,37 +1073,46 @@ var MemberFunctionDefinition = exports.MemberFunctionDefinition = MemberDefiniti
 		var Statement = require("./statement");
 
 		var success = true;
+		var isAlternate = false;
 
 		// make implicit calls to default constructor explicit as well as checking the invocation order
 		var stmtIndex = 0;
-		for (var baseIndex = 0; baseIndex <= this._classDef.implementTypes().length; ++baseIndex) {
-			var baseClassType = baseIndex == 0 ? this._classDef.extendType() : this._classDef.implementTypes()[baseIndex - 1];
-			if (baseClassType != null) {
-				if (stmtIndex < this._statements.length
-					&& this._statements[stmtIndex] instanceof Statement.ConstructorInvocationStatement
-					&& baseClassType.getClassDef() == this._statements[stmtIndex].getConstructingClassDef()) {
-					// explicit call to the base class, no need to complement
-					if (baseClassType.getToken() == "Object")
-						this._statements.splice(stmtIndex, 1);
-					else
-						++stmtIndex;
-				} else {
-					// insert call to the default constructor
-					if (baseClassType.getClassDef().className() == "Object") {
-						// we can omit the call
-					} else if (baseClassType.getClassDef().hasDefaultConstructor()) {
-						var ctorStmt = new Statement.ConstructorInvocationStatement(this._token, baseClassType, []);
-						this._statements.splice(stmtIndex, 0, ctorStmt);
-						if (! ctorStmt.analyze(context))
-							throw new Error("logic flaw");
-						++stmtIndex;
+		if (stmtIndex < this._statements.length
+			&& this._statements[stmtIndex] instanceof Statement.ConstructorInvocationStatement
+			&& this._statements[stmtIndex].getConstructingClassDef() == this._classDef) {
+			// alternate constructor invocation
+			isAlternate = true;
+			++stmtIndex;
+		} else {
+			for (var baseIndex = 0; baseIndex <= this._classDef.implementTypes().length; ++baseIndex) {
+				var baseClassType = baseIndex == 0 ? this._classDef.extendType() : this._classDef.implementTypes()[baseIndex - 1];
+				if (baseClassType != null) {
+					if (stmtIndex < this._statements.length
+						&& this._statements[stmtIndex] instanceof Statement.ConstructorInvocationStatement
+						&& baseClassType.getClassDef() == this._statements[stmtIndex].getConstructingClassDef()) {
+						// explicit call to the base class, no need to complement
+						if (baseClassType.getToken() == "Object")
+							this._statements.splice(stmtIndex, 1);
+						else
+							++stmtIndex;
 					} else {
-						if (stmtIndex < this._statements.length) {
-							context.errors.push(new CompileError(this._statements[stmtIndex].getToken(), "constructor of class '" + baseClassType.toString() + "' should be called prior to the statement"));
+						// insert call to the default constructor
+						if (baseClassType.getClassDef().className() == "Object") {
+							// we can omit the call
+						} else if (baseClassType.getClassDef().hasDefaultConstructor()) {
+							var ctorStmt = new Statement.ConstructorInvocationStatement(this._token, baseClassType, []);
+							this._statements.splice(stmtIndex, 0, ctorStmt);
+							if (! ctorStmt.analyze(context))
+								throw new Error("logic flaw");
+							++stmtIndex;
 						} else {
-							context.errors.push(new CompileError(this._token, "super class '" + baseClassType.toString() + "' should be initialized explicitely (no default constructor)"));
+							if (stmtIndex < this._statements.length) {
+								context.errors.push(new CompileError(this._statements[stmtIndex].getToken(), "constructor of class '" + baseClassType.toString() + "' should be called prior to the statement"));
+							} else {
+								context.errors.push(new CompileError(this._token, "super class '" + baseClassType.toString() + "' should be initialized explicitely (no default constructor)"));
+							}
+							success = false;
 						}
-						success = false;
 					}
 				}
 			}
@@ -1057,6 +1126,10 @@ var MemberFunctionDefinition = exports.MemberFunctionDefinition = MemberDefiniti
 		// NOTE: it is asserted by the parser that ConstructorInvocationStatements precede other statements
 		if (! success)
 			return;
+		if (isAlternate) {
+			return; // all the properties are initialized by the alternate constructor
+		}
+
 		var normalStatementFromIndex = stmtIndex;
 
 		// find out the properties that need to be initialized (that are not initialized by the ctor explicitely before completion or being used)
@@ -1099,7 +1172,7 @@ var MemberFunctionDefinition = exports.MemberFunctionDefinition = MemberDefiniti
 						new Expression.AssignmentExpression(new Parser.Token("=", false),
 							new Expression.PropertyExpression(new Parser.Token(".", false),
 								new Expression.ThisExpression(new Parser.Token("this", false), this._classDef),
-								member.getNameToken(), member.getType()),
+								member.getNameToken(), [], member.getType()),
 							member.getInitialValue()));
 					this._statements.splice(insertStmtAt++, 0, stmt);
 				}
@@ -1226,6 +1299,79 @@ var MemberFunctionDefinition = exports.MemberFunctionDefinition = MemberDefiniti
 				if (! cb(this._closures[i]))
 					return false;
 		return true;
+	}
+
+});
+
+var InstantiatedMemberFunctionDefinition = exports.InstantiatedMemberFunctionDefinition = MemberFunctionDefinition.extend({
+
+	constructor: function (token, name, flags, returnType, args, locals, statements, closures, lastTokenOfBody) {
+		MemberFunctionDefinition.prototype.constructor.call(this, token, name, flags, returnType, args, locals, statements, closures, lastTokenOfBody);
+	}
+
+});
+
+var TemplateFunctionDefinition = exports.TemplateFunctionDefinition = MemberFunctionDefinition.extend({
+
+	constructor: function (token, name, flags, typeArgs, returnType, args, locals, statements, closures, lastTokenOfBody) {
+		MemberFunctionDefinition.prototype.constructor.call(this, token, name, flags, returnType, args, locals, statements, closures, lastTokenOfBody);
+		this._typeArgs = typeArgs.concat([]);
+		this._instantiatedDefs = new TypedMap(function (x, y) {
+			for (var i = 0; i < x.length; ++i) {
+				if (! x[i].equals(y[i])) {
+					return false;
+				}
+			}
+			return true;
+		});
+		this._resolvedTypemap = {};
+	},
+
+	instantiate: function (instantiationContext) {
+		var instantiated = new TemplateFunctionDefinition(
+			this._token, this.getNameToken(), this.flags(), this._typeArgs.concat([]), this._returnType, this._args.concat([]),
+			this._locals, this._statements, this._closures, this._lastTokenOfBody);
+		for (var k in this._resolvedTypemap) {
+			instantiated._resolvedTypemap[k] = this._resolvedTypemap[k];
+		}
+		for (var k in instantiationContext.typemap) {
+			instantiated._resolvedTypemap[k] = instantiationContext.typemap[k];
+		}
+		return instantiated;
+	},
+
+	instantiateTemplateFunction: function (errors, token, typeArgs) {
+		// return the already-instantiated one, if exists
+		var instantiated = this._instantiatedDefs.get(typeArgs);
+		if (instantiated != null) {
+			return instantiated;
+		}
+		// instantiate
+		var instantiationContext = _Util.buildInstantiationContext(errors, token, this._typeArgs, typeArgs);
+		if (instantiationContext == null) {
+			return null;
+		}
+		for (var k in this._resolvedTypemap) {
+			instantiationContext.typemap[k] = this._resolvedTypemap[k];
+		}
+		instantiated = this._instantiateCore(
+			instantiationContext,
+			function (token, name, flags, returnType, args, locals, statements, closures, lastTokenOfBody, docComment) {
+				return new InstantiatedMemberFunctionDefinition(token, name, flags, returnType, args, locals, statements, closures, lastTokenOfBody, docComment);
+			});
+		if (instantiated == null) {
+			return null;
+		}
+		instantiated.setClassDef(this._classDef);
+		this._classDef._members.push(instantiated);
+		// analyze
+		var analysisContext = new AnalysisContext(errors, this._classDef.getParser(), function (parser, classDef) { throw new Error("not implemented"); });
+		for (var i = 0; i < instantiationContext.objectTypesUsed.length; ++i)
+			instantiationContext.objectTypesUsed[i].resolveType(analysisContext);
+		instantiated.analyze(analysisContext, this._classDef);
+		// register, and return
+		this._instantiatedDefs.set(typeArgs.concat([]), instantiated);
+		return instantiated;
 	}
 
 });
@@ -1434,7 +1580,7 @@ var TemplateClassDefinition = exports.TemplateClassDefinition = Class.extend({
 	constructor: function (className, flags, typeArgs, extendType, implementTypes, members, objectTypesUsed, docComment) {
 		this._className = className;
 		this._flags = flags;
-		this._typeArgs = typeArgs;
+		this._typeArgs = typeArgs.concat([]);
 		this._extendType = extendType;
 		this._implementTypes = implementTypes;
 		this._members = members;
@@ -1472,22 +1618,12 @@ var TemplateClassDefinition = exports.TemplateClassDefinition = Class.extend({
 	},
 
 	instantiate: function (errors, request) {
-		var Parser = require("./parser");
-		// check number of type arguments
-		if (this._typeArgs.length != request.getTypeArguments().length) {
-			errors.push(new CompileError(request.getToken(), "wrong number of template arguments (expected " + this._typeArgs.length + ", got " + request.getTypeArguments().length));
+		// prepare
+		var instantiationContext = _Util.buildInstantiationContext(errors, request.getToken(), this._typeArgs, request.getTypeArguments());
+		if (instantiationContext == null) {
 			return null;
 		}
-		// build context
-		var instantiationContext = {
-			errors: errors,
-			request: request,
-			typemap: {}, // string => Type
-			objectTypesUsed: []
-		};
-		for (var i = 0; i < this._typeArgs.length; ++i)
-			instantiationContext.typemap[this._typeArgs[i].getValue()] = request.getTypeArguments()[i];
-		// FIXME add support for extend and implements
+		// instantiate the members
 		var succeeded = true;
 		var members = [];
 		for (var i = 0; i < this._members.length; ++i) {

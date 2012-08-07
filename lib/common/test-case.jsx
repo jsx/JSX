@@ -191,6 +191,13 @@ class TestCase {
 		this._dump("expected: ", expected);
 	}
 
+	function pass(reason : string) : void {
+		++this._count;
+		++this._pass;
+
+		this._say("\t" + "ok " + (this._count) as string + " - " + reason);
+	}
+
 	function fail(reason : string) : void {
 		this._say("not ok - fail");
 		this.diag(reason);

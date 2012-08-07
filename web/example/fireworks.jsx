@@ -194,6 +194,7 @@ final class FPSWatcher {
 
 final class _Main {
 	static function main(args : string[]) : void {
+		log args;
 		assert args.length == 3;
 
 		var canvasId    = args[0];

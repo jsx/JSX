@@ -552,8 +552,6 @@ final class Stage {
 
 final class _Main {
 	static function main(args : string[]) : void {
-        log "shooting.jsx";
-
 		var stageCanvas = dom.id(args[0]) as HTMLCanvasElement;
         assert stageCanvas != null;
 		var scoreboard = dom.id(args[1]);
