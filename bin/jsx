@@ -443,7 +443,7 @@ var JSX = Class.extend({
 				new DocumentGenerator(compiler)
 					.setOutputPath(outputFile)
 					.setPathFilter(function (sourcePath) {
-						return sourcePath == sourceFile;
+						return ! (sourcePath.match(/^(?:system:|\/)/) || sourcePath.match(/\/..\//));
 					})
 					.setTemplatePath(platform.getRoot() + "/src/doc/template.html")
 					.buildDoc();
