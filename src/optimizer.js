@@ -689,11 +689,33 @@ var _UnclassifyOptimizationCommand = exports._UnclassifyOptimizationCommand = _O
 		// rewrite member method invocations to static function calls
 		this.getCompiler().forEachClassDef(function (parser, classDef) {
 			this.log("rewriting member method calls in class: " + classDef.className());
+			// rewrite member functions
 			var onFunction = function (funcDef) {
-				this._rewriteMethodCallsToStatic(funcDef, classDefs);
+				var onStatement = function (statement) {
+					statement.forEachExpression(function (expr, replaceCb) {
+						this._rewriteMethodCallsToStatic(expr, replaceCb, classDefs);
+					}.bind(this));
+					return statement.forEachStatement(onStatement);
+				}.bind(this);
+				funcDef.forEachStatement(onStatement);
 				return funcDef.forEachClosure(onFunction);
 			}.bind(this);
-			return classDef.forEachMemberFunction(onFunction);
+			classDef.forEachMemberFunction(onFunction);
+			// rewrite static variable initialization
+			classDef.forEachMemberVariable(function (varDef) {
+				if ((varDef.flags() & ClassDefinition.IS_STATIC) != 0) {
+					if (varDef.getInitialValue() != null) {
+						this._rewriteMethodCallsToStatic(
+							varDef.getInitialValue(),
+							function (expr) {
+								varDef.setInitialValue(expr);
+							},
+							classDefs);
+					}
+				}
+				return true;
+			}.bind(this));
+			return true;
 		}.bind(this));
 	},
 
@@ -734,27 +756,37 @@ var _UnclassifyOptimizationCommand = exports._UnclassifyOptimizationCommand = _O
 		}
 		// check that the class is not referred to by: instanceof
 		this.getCompiler().forEachClassDef(function (parser, classDef) {
-			return classDef.forEachMemberFunction(function onFunction(funcDef) {
-				if (candidates.length == 0) {
-					return false;
-				}
-				funcDef.forEachStatement(function onStatement(statement) {
-					statement.forEachExpression(function onExpr(expr) {
-						if (expr instanceof InstanceofExpression) {
-							var foundClassDefIndex = candidates.indexOf(expr.getExpectedType().getClassDef());
-							if (foundClassDefIndex != -1) {
-								candidates.splice(foundClassDefIndex, 1);
-								if (candidates.length == 0) {
-									return false;
-								}
-							}
+			if (candidates.length == 0) {
+				return false;
+			}
+			function onExpr(expr) {
+				if (expr instanceof InstanceofExpression) {
+					var foundClassDefIndex = candidates.indexOf(expr.getExpectedType().getClassDef());
+					if (foundClassDefIndex != -1) {
+						candidates.splice(foundClassDefIndex, 1);
+						if (candidates.length == 0) {
+							return false;
 						}
-						return expr.forEachExpression(onExpr);
-					});
+					}
+				}
+				return expr.forEachExpression(onExpr);
+			}
+			classDef.forEachMemberFunction(function onFunction(funcDef) {
+				funcDef.forEachStatement(function onStatement(statement) {
+					statement.forEachExpression(onExpr);
 					return statement.forEachStatement(onStatement);
 				});
 				return funcDef.forEachClosure(onFunction);
 			});
+			classDef.forEachMemberVariable(function (varDef) {
+				if ((varDef.flags() & ClassDefinition.IS_STATIC) != 0) {
+					if (varDef.getInitialValue() != null) {
+						onExpr(varDef.getInitialValue());
+					}
+				}
+				return true;
+			});
+			return true;
 		});
 		return candidates;
 	},
@@ -874,7 +906,7 @@ var _UnclassifyOptimizationCommand = exports._UnclassifyOptimizationCommand = _O
 		funcDef.setFlags(funcDef.flags() | ClassDefinition.IS_STATIC);
 	},
 
-	_rewriteMethodCallsToStatic: function (funcDef, unclassifyingClassDefs) {
+	_rewriteMethodCallsToStatic: function (expr, replaceCb, unclassifyingClassDefs) {
 		var onExpr = function (expr, replaceCb) {
 			if (expr instanceof CallExpression) {
 				var calleeExpr = expr.getExpr();
@@ -890,7 +922,6 @@ var _UnclassifyOptimizationCommand = exports._UnclassifyOptimizationCommand = _O
 							calleeExpr.setExpr(expr);
 						});
 						Util.forEachExpression(onExpr, expr.getArguments());
-						this.log("  " + _Util.getFuncName(funcDef));
 						var funcType = calleeExpr.getType();
 						replaceCb(
 							new CallExpression(
@@ -911,10 +942,7 @@ var _UnclassifyOptimizationCommand = exports._UnclassifyOptimizationCommand = _O
 			}
 			return expr.forEachExpression(onExpr);
 		}.bind(this);
-		funcDef.forEachStatement(function onStatement(statement) {
-			statement.forEachExpression(onExpr);
-			return statement.forEachStatement(onStatement);
-		});
+		onExpr(expr, replaceCb);
 	}
 
 });
