@@ -3,7 +3,7 @@ JOBS:=4
 
 OPTIMIZE_FLAGS := lto,unclassify,fold-const,return-if,inline,dce,unbox,fold-const,dce,lcse,array-length,unclassify
 
-all:
+all: src/doc.js
 
 setup:
 	npm install
@@ -28,6 +28,9 @@ web:
 
 server:
 	node web/server.js
+
+src/doc.js: src/_doc.js
+	submodules/picotemplate/picotemplate.pl src/_doc.js
 
 # for authors
 web.jsx:
