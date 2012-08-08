@@ -886,6 +886,9 @@ var _UnclassifyOptimizationCommand = exports._UnclassifyOptimizationCommand = _O
 					var receiverClassDef = receiverType.getClassDef();
 					if (unclassifyingClassDefs.indexOf(receiverClassDef) != -1) {
 						// found, rewrite
+						onExpr(calleeExpr.getExpr(), function (expr) {
+							calleeExpr.setExpr(expr);
+						});
 						Util.forEachExpression(onExpr, expr.getArguments());
 						this.log("  " + _Util.getFuncName(funcDef));
 						var funcType = calleeExpr.getType();
