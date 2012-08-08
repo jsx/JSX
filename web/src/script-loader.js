@@ -57,7 +57,7 @@ function load(root) {
 			c.addSourceFile(null, sourceFile);
 
 			if(jsx.optimizationLevel > 0) {
-				var optimizeCommands = [ "lto", "no-assert", "fold-const", "return-if", "inline", "dce", "unbox", "fold-const", "lcse", "dce", "fold-const", "array-length" ];
+				var optimizeCommands = [ "lto", "no-assert", "fold-const", "return-if", "inline", "dce", "unbox", "fold-const", "lcse", "dce", "fold-const", "array-length", "unclassify" ];
 				o.setup(optimizeCommands);
 				o.setEnableRunTimeTypeCheck(false);
 				emitter.setEnableRunTimeTypeCheck(false);
