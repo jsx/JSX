@@ -1,7 +1,6 @@
 *~
 *.swp
 *.zip
-node_modules/
 _builtins.js
 try
 v8.log

@@ -1,5 +1,4 @@
 jsx-web.js
-extlib
 *.combined.js
 *.generated.*
 .profile

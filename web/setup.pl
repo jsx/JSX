@@ -1,4 +1,4 @@
-#!perl -w
+#!/usr/bin/perl
 use strict;
 use warnings;
 use File::Basename qw(dirname);
@@ -14,6 +14,6 @@ my @modules = qw(
     JSON::PP
 );
 
-system("curl -L $cpanm | $^X - --notest '-l$root/extlib' @modules") == 0
+system("curl -L $cpanm | $^X - --notest '-L$root/extlib' @modules") == 0
     or die "Failed to setup!";
 

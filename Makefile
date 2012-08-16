@@ -6,8 +6,6 @@ OPTIMIZE_FLAGS := lto,unclassify,fold-const,return-if,inline,dce,unbox,fold-cons
 all:
 
 setup:
-	npm install
-	perl web/setup.pl
 
 # e.g. make test JOBS=2
 test:
