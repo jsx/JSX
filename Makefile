@@ -6,7 +6,7 @@ OPTIMIZE_FLAGS := lto,unclassify,fold-const,return-if,inline,dce,unbox,fold-cons
 all:
 
 setup:
-	@echo "make sure Perl (>= 5.10.0) and NodeJS (>= 0.6.19) are installed."
+	@echo "no need run 'make setup' any more (please make sure Perl (>= 5.10.0) and NodeJS (>= 0.6.19) are installed)"
 
 # e.g. make test JOBS=2
 test:
