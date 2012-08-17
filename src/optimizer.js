@@ -101,7 +101,8 @@ var _Util = exports._Util = Class.extend({
 				|| expr instanceof NewExpression
 				|| expr instanceof AssignmentExpression
 				|| expr instanceof PreIncrementExpression
-				|| expr instanceof PostIncrementExpression) {
+				|| expr instanceof PostIncrementExpression
+				|| expr instanceof SuperExpression) {
 				return false;
 			} else if (expr instanceof CallExpression) {
 				var callingFuncDef = _DetermineCalleeCommand.getCallingFuncDef(expr);
