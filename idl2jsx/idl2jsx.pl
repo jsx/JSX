@@ -201,7 +201,12 @@ my %classdef;
 tie %classdef, 'Tie::IxHash';
 %classdef = %{lock_retrieve($db)} if $continuous and -e $db;
 
-foreach my $file(@files) {
+foreach my $src(@files) {
+    my($specname, $file) = split /\s*;\s*/, $src, 2;
+    if (! $file) {
+        $file = $src;
+        $specname = uri_escape($file);
+    }
     info "parsing $file";
 
     # XXX: looks a bug in http://www.w3.org/TR/html5/single-page.html
@@ -214,7 +219,7 @@ foreach my $file(@files) {
         my $arg = $file;
         if($arg =~ /^https?:/) {
             state $ua = LWP::UserAgent->new();
-            my $filename = "$root/spec/" . uri_escape($arg);
+            my $filename = "$root/spec/$specname";
 
             if ($refresh && not -e $filename) {
                 my $res = $ua->mirror($arg, $filename);

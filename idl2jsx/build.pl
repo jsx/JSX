@@ -9,6 +9,7 @@ use Fatal qw(open close);
 use File::Basename qw(dirname);
 use Storable qw(lock_retrieve);
 use Tie::IxHash;
+use String::ShellQuote;
 
 my $lib = "lib/js/js";
 mkpath $lib;
@@ -22,18 +23,18 @@ my @specs = (
     ['web.jsx' =>
         # DOM spec
         #'http://www.w3.org/TR/DOM-Level-3-Core/idl/dom.idl',
-        'http://www.w3.org/TR/dom/',
-        'http://www.w3.org/TR/DOM-Level-2-Views/idl/views.idl',
-        'http://www.w3.org/TR/DOM-Level-3-Events/',
+        'dom; http://www.w3.org/TR/dom/',
+        'DOM-Level-2-Views; http://www.w3.org/TR/DOM-Level-2-Views/idl/views.idl',
+        'DOM-Level-3-Events; http://www.w3.org/TR/DOM-Level-3-Events/',
         "$root/extra/events.idl",
 
-        'http://www.w3.org/TR/XMLHttpRequest/',
+        'XMLHTTPRequest; http://www.w3.org/TR/XMLHttpRequest/',
 
         #'http://html5labs.interoperabilitybridges.com/dom4events/', # no correct IDL
 
         # CSS
-        'http://dev.w3.org/csswg/cssom/',
-        'http://dev.w3.org/csswg/cssom-view/',
+        'cssom; http://dev.w3.org/csswg/cssom/',
+        'cssom-view; http://dev.w3.org/csswg/cssom-view/',
         "$root/extra/chrome.idl",
         "$root/extra/firefox.idl",
 
@@ -42,22 +43,22 @@ my @specs = (
 
         # HTML5
         #'http://dev.w3.org/html5/spec/single-page.html', # too new
-        'http://www.w3.org/TR/html5/single-page.html',
+        'html5; http://www.w3.org/TR/html5/single-page.html',
         # 'http://www.w3.org/TR/FileAPI/', # has an union member FileReader#result
-        'http://www.w3.org/TR/2011/WD-FileAPI-20111020/',
+        'FileAPI; http://www.w3.org/TR/2011/WD-FileAPI-20111020/',
         "$root/extra/file.idl",
 
         #"http://www.w3.org/TR/webaudio/", # no correct IDL
-        "http://www.w3.org/TR/touch-events/",
+        "touch-events; http://www.w3.org/TR/touch-events/",
         #"http://www.w3.org/TR/websockets/",
-        "http://www.w3.org/TR/2012/WD-websockets-20120524/",
+        "websockets; http://www.w3.org/TR/2012/WD-websockets-20120524/",
         #"http://dev.w3.org/html5/websockets/", # too new
-        "http://dev.w3.org/geo/api/spec-source.html",
-        "http://dev.w3.org/html5/webstorage/",
-        'http://www.w3.org/TR/selectors-api/',
-        "http://www.w3.org/TR/webmessaging/",
-        "http://www.w3.org/TR/workers/",
-        "http://www.w3.org/TR/eventsource/",
+        "geo; http://dev.w3.org/geo/api/spec-source.html",
+        "webstorage; http://dev.w3.org/html5/webstorage/",
+        'selectors-api; http://www.w3.org/TR/selectors-api/',
+        "webmessaging; http://www.w3.org/TR/webmessaging/",
+        "workers; http://www.w3.org/TR/workers/",
+        "eventsource; http://www.w3.org/TR/eventsource/",
         #"http://dev.w3.org/html5/eventsource/", # too new
 
         # WebRTC has no correct IDL
@@ -65,15 +66,15 @@ my @specs = (
         #"http://dev.w3.org/2011/webrtc/editor/getusermedia.html",
 
         # by html5.org
-        "http://html5.org/specs/dom-parsing.html",
+        "dom-parsing; http://html5.org/specs/dom-parsing.html",
 
         # graphics
-        'https://www.khronos.org/registry/typedarray/specs/latest/typedarray.idl',
-        'http://dev.w3.org/html5/2dcontext/',
-        'https://www.khronos.org/registry/webgl/specs/latest/webgl.idl',
+        'typedarray; https://www.khronos.org/registry/typedarray/specs/latest/typedarray.idl',
+        '2dcontext; http://dev.w3.org/html5/2dcontext/',
+        'webgl; https://www.khronos.org/registry/webgl/specs/latest/webgl.idl',
 
         # vender extensions
-        'https://wiki.mozilla.org/GamepadAPI',
+        'GamepadAPI; https://wiki.mozilla.org/GamepadAPI',
 
         # additionals
         "$root/extra/timers.idl",
@@ -99,8 +100,9 @@ foreach my $spec(@specs) {
     my($file, @idls) = @{$spec};
     say "generate $file from ", join ",", @idls;
 
+    my $args = shell_quote(@idls);
     my %param = (
-        idl => scalar(`idl2jsx/idl2jsx.pl --refresh-specs --continuous @idls`),
+        idl => scalar(`idl2jsx/idl2jsx.pl --refresh-specs --continuous $args`),
     );
     if($? != 0) {
         die "Cannot convert @idls to JSX.\n";
