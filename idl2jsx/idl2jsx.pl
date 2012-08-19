@@ -11,18 +11,22 @@ use Storable qw(lock_retrieve lock_store);
 use LWP::UserAgent;
 use URI::Escape qw(uri_escape);
 use Time::HiRes ();
+use Getopt::Long;
 
 use constant WIDTH => 68;
 
 # see http://www.w3.org/TR/WebIDL/
 
-my $continuous = ($ARGV[0] ~~ "--continuous" && shift @ARGV);
+GetOptions(
+    "continuous"    => \my $continuous,
+    "refresh-specs" => \my $refresh,
+) or die;
 
 my @files = @ARGV;
 
 my $root = dirname(__FILE__);
 my $db = "$root/.idl2jsx.bin";
-mkdir "$root/.save";
+mkdir "$root/spec";
 
 {
     my $t0 = [Time::HiRes::gettimeofday()];
@@ -210,11 +214,14 @@ foreach my $file(@files) {
         my $arg = $file;
         if($arg =~ /^https?:/) {
             state $ua = LWP::UserAgent->new();
-            my $filename = "$root/.save/" . uri_escape($arg);
-            my $res = $ua->mirror($arg, $filename);
+            my $filename = "$root/spec/" . uri_escape($arg);
 
-            if($res->header("Last-Modified")) {
-                info("Last-Modified: ", $res->header("Last-Modified"));
+            if ($refresh && not -e $filename) {
+                my $res = $ua->mirror($arg, $filename);
+
+                if($res->header("Last-Modified")) {
+                    info("Last-Modified: ", $res->header("Last-Modified"));
+                }
             }
 
             if($arg =~ /\.idl$/) {

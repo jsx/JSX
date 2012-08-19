@@ -1,0 +1,11 @@
+
+interface CSSRuleList {
+    readonly attribute long length;
+    getter CSSRule? item(long index);
+};
+
+interface StyleSheetList {
+    readonly attribute long length;
+    getter StyleSheet? item(long index);
+};
+

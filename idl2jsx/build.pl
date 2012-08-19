@@ -79,6 +79,7 @@ my @specs = (
         "$root/extra/timers.idl",
         "$root/extra/animation-timing.idl",
         "$root/extra/legacy.idl",
+        "$root/extra/sequence.idl",
     ],
 );
 
@@ -99,7 +100,7 @@ foreach my $spec(@specs) {
     say "generate $file from ", join ",", @idls;
 
     my %param = (
-        idl => scalar(`idl2jsx/idl2jsx.pl --continuous @idls`),
+        idl => scalar(`idl2jsx/idl2jsx.pl --refresh-specs --continuous @idls`),
     );
     if($? != 0) {
         die "Cannot convert @idls to JSX.\n";
