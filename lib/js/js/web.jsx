@@ -37,61 +37,61 @@ final class dom {
 /** @see http://www.w3.org/TR/dom/ */
 native final class DOMException {
 
-	static __readonly__ var INDEX_SIZE_ERR : int/*unsigned short*/;
-	       __readonly__ var INDEX_SIZE_ERR : int/*unsigned short*/;
-	static __readonly__ var DOMSTRING_SIZE_ERR : int/*unsigned short*/;
-	       __readonly__ var DOMSTRING_SIZE_ERR : int/*unsigned short*/;
+	static __readonly__ var INDEX_SIZE_ERR : number/*unsigned short*/;
+	       __readonly__ var INDEX_SIZE_ERR : number/*unsigned short*/;
+	static __readonly__ var DOMSTRING_SIZE_ERR : number/*unsigned short*/;
+	       __readonly__ var DOMSTRING_SIZE_ERR : number/*unsigned short*/;
 	// historical
-	static __readonly__ var HIERARCHY_REQUEST_ERR : int/*unsigned short*/;
-	       __readonly__ var HIERARCHY_REQUEST_ERR : int/*unsigned short*/;
-	static __readonly__ var WRONG_DOCUMENT_ERR : int/*unsigned short*/;
-	       __readonly__ var WRONG_DOCUMENT_ERR : int/*unsigned short*/;
-	static __readonly__ var INVALID_CHARACTER_ERR : int/*unsigned short*/;
-	       __readonly__ var INVALID_CHARACTER_ERR : int/*unsigned short*/;
-	static __readonly__ var NO_DATA_ALLOWED_ERR : int/*unsigned short*/;
-	       __readonly__ var NO_DATA_ALLOWED_ERR : int/*unsigned short*/;
+	static __readonly__ var HIERARCHY_REQUEST_ERR : number/*unsigned short*/;
+	       __readonly__ var HIERARCHY_REQUEST_ERR : number/*unsigned short*/;
+	static __readonly__ var WRONG_DOCUMENT_ERR : number/*unsigned short*/;
+	       __readonly__ var WRONG_DOCUMENT_ERR : number/*unsigned short*/;
+	static __readonly__ var INVALID_CHARACTER_ERR : number/*unsigned short*/;
+	       __readonly__ var INVALID_CHARACTER_ERR : number/*unsigned short*/;
+	static __readonly__ var NO_DATA_ALLOWED_ERR : number/*unsigned short*/;
+	       __readonly__ var NO_DATA_ALLOWED_ERR : number/*unsigned short*/;
 	// historical
-	static __readonly__ var NO_MODIFICATION_ALLOWED_ERR : int/*unsigned short*/;
-	       __readonly__ var NO_MODIFICATION_ALLOWED_ERR : int/*unsigned short*/;
-	static __readonly__ var NOT_FOUND_ERR : int/*unsigned short*/;
-	       __readonly__ var NOT_FOUND_ERR : int/*unsigned short*/;
-	static __readonly__ var NOT_SUPPORTED_ERR : int/*unsigned short*/;
-	       __readonly__ var NOT_SUPPORTED_ERR : int/*unsigned short*/;
-	static __readonly__ var INUSE_ATTRIBUTE_ERR : int/*unsigned short*/;
-	       __readonly__ var INUSE_ATTRIBUTE_ERR : int/*unsigned short*/;
+	static __readonly__ var NO_MODIFICATION_ALLOWED_ERR : number/*unsigned short*/;
+	       __readonly__ var NO_MODIFICATION_ALLOWED_ERR : number/*unsigned short*/;
+	static __readonly__ var NOT_FOUND_ERR : number/*unsigned short*/;
+	       __readonly__ var NOT_FOUND_ERR : number/*unsigned short*/;
+	static __readonly__ var NOT_SUPPORTED_ERR : number/*unsigned short*/;
+	       __readonly__ var NOT_SUPPORTED_ERR : number/*unsigned short*/;
+	static __readonly__ var INUSE_ATTRIBUTE_ERR : number/*unsigned short*/;
+	       __readonly__ var INUSE_ATTRIBUTE_ERR : number/*unsigned short*/;
 	// historical
-	static __readonly__ var INVALID_STATE_ERR : int/*unsigned short*/;
-	       __readonly__ var INVALID_STATE_ERR : int/*unsigned short*/;
-	static __readonly__ var SYNTAX_ERR : int/*unsigned short*/;
-	       __readonly__ var SYNTAX_ERR : int/*unsigned short*/;
-	static __readonly__ var INVALID_MODIFICATION_ERR : int/*unsigned short*/;
-	       __readonly__ var INVALID_MODIFICATION_ERR : int/*unsigned short*/;
-	static __readonly__ var NAMESPACE_ERR : int/*unsigned short*/;
-	       __readonly__ var NAMESPACE_ERR : int/*unsigned short*/;
-	static __readonly__ var INVALID_ACCESS_ERR : int/*unsigned short*/;
-	       __readonly__ var INVALID_ACCESS_ERR : int/*unsigned short*/;
-	static __readonly__ var VALIDATION_ERR : int/*unsigned short*/;
-	       __readonly__ var VALIDATION_ERR : int/*unsigned short*/;
+	static __readonly__ var INVALID_STATE_ERR : number/*unsigned short*/;
+	       __readonly__ var INVALID_STATE_ERR : number/*unsigned short*/;
+	static __readonly__ var SYNTAX_ERR : number/*unsigned short*/;
+	       __readonly__ var SYNTAX_ERR : number/*unsigned short*/;
+	static __readonly__ var INVALID_MODIFICATION_ERR : number/*unsigned short*/;
+	       __readonly__ var INVALID_MODIFICATION_ERR : number/*unsigned short*/;
+	static __readonly__ var NAMESPACE_ERR : number/*unsigned short*/;
+	       __readonly__ var NAMESPACE_ERR : number/*unsigned short*/;
+	static __readonly__ var INVALID_ACCESS_ERR : number/*unsigned short*/;
+	       __readonly__ var INVALID_ACCESS_ERR : number/*unsigned short*/;
+	static __readonly__ var VALIDATION_ERR : number/*unsigned short*/;
+	       __readonly__ var VALIDATION_ERR : number/*unsigned short*/;
 	// historical
-	static __readonly__ var TYPE_MISMATCH_ERR : int/*unsigned short*/;
-	       __readonly__ var TYPE_MISMATCH_ERR : int/*unsigned short*/;
-	static __readonly__ var SECURITY_ERR : int/*unsigned short*/;
-	       __readonly__ var SECURITY_ERR : int/*unsigned short*/;
-	static __readonly__ var NETWORK_ERR : int/*unsigned short*/;
-	       __readonly__ var NETWORK_ERR : int/*unsigned short*/;
-	static __readonly__ var ABORT_ERR : int/*unsigned short*/;
-	       __readonly__ var ABORT_ERR : int/*unsigned short*/;
-	static __readonly__ var URL_MISMATCH_ERR : int/*unsigned short*/;
-	       __readonly__ var URL_MISMATCH_ERR : int/*unsigned short*/;
-	static __readonly__ var QUOTA_EXCEEDED_ERR : int/*unsigned short*/;
-	       __readonly__ var QUOTA_EXCEEDED_ERR : int/*unsigned short*/;
-	static __readonly__ var TIMEOUT_ERR : int/*unsigned short*/;
-	       __readonly__ var TIMEOUT_ERR : int/*unsigned short*/;
-	static __readonly__ var INVALID_NODE_TYPE_ERR : int/*unsigned short*/;
-	       __readonly__ var INVALID_NODE_TYPE_ERR : int/*unsigned short*/;
-	static __readonly__ var DATA_CLONE_ERR : int/*unsigned short*/;
-	       __readonly__ var DATA_CLONE_ERR : int/*unsigned short*/;
-	var code : int/*unsigned short*/;
+	static __readonly__ var TYPE_MISMATCH_ERR : number/*unsigned short*/;
+	       __readonly__ var TYPE_MISMATCH_ERR : number/*unsigned short*/;
+	static __readonly__ var SECURITY_ERR : number/*unsigned short*/;
+	       __readonly__ var SECURITY_ERR : number/*unsigned short*/;
+	static __readonly__ var NETWORK_ERR : number/*unsigned short*/;
+	       __readonly__ var NETWORK_ERR : number/*unsigned short*/;
+	static __readonly__ var ABORT_ERR : number/*unsigned short*/;
+	       __readonly__ var ABORT_ERR : number/*unsigned short*/;
+	static __readonly__ var URL_MISMATCH_ERR : number/*unsigned short*/;
+	       __readonly__ var URL_MISMATCH_ERR : number/*unsigned short*/;
+	static __readonly__ var QUOTA_EXCEEDED_ERR : number/*unsigned short*/;
+	       __readonly__ var QUOTA_EXCEEDED_ERR : number/*unsigned short*/;
+	static __readonly__ var TIMEOUT_ERR : number/*unsigned short*/;
+	       __readonly__ var TIMEOUT_ERR : number/*unsigned short*/;
+	static __readonly__ var INVALID_NODE_TYPE_ERR : number/*unsigned short*/;
+	       __readonly__ var INVALID_NODE_TYPE_ERR : number/*unsigned short*/;
+	static __readonly__ var DATA_CLONE_ERR : number/*unsigned short*/;
+	       __readonly__ var DATA_CLONE_ERR : number/*unsigned short*/;
+	var code : number/*unsigned short*/;
 
 } // end of DOMException
 
@@ -116,23 +116,23 @@ native class Event {
 	/** @see http://www.w3.org/TR/dom/ */
 	__readonly__ var type : string/*DOMString*/;
 	/** @see http://www.w3.org/TR/dom/ */
-	__readonly__ var target : EventTarget;
+	__readonly__ var target : Nullable.<EventTarget>;
 	/** @see http://www.w3.org/TR/dom/ */
-	__readonly__ var currentTarget : EventTarget;
+	__readonly__ var currentTarget : Nullable.<EventTarget>;
 	/** @see http://www.w3.org/TR/dom/ */
-	static __readonly__ var CAPTURING_PHASE : int/*unsigned short*/;
+	static __readonly__ var CAPTURING_PHASE : number/*unsigned short*/;
 	/** @see http://www.w3.org/TR/dom/ */
-	       __readonly__ var CAPTURING_PHASE : int/*unsigned short*/;
+	       __readonly__ var CAPTURING_PHASE : number/*unsigned short*/;
 	/** @see http://www.w3.org/TR/dom/ */
-	static __readonly__ var AT_TARGET : int/*unsigned short*/;
+	static __readonly__ var AT_TARGET : number/*unsigned short*/;
 	/** @see http://www.w3.org/TR/dom/ */
-	       __readonly__ var AT_TARGET : int/*unsigned short*/;
+	       __readonly__ var AT_TARGET : number/*unsigned short*/;
 	/** @see http://www.w3.org/TR/dom/ */
-	static __readonly__ var BUBBLING_PHASE : int/*unsigned short*/;
+	static __readonly__ var BUBBLING_PHASE : number/*unsigned short*/;
 	/** @see http://www.w3.org/TR/dom/ */
-	       __readonly__ var BUBBLING_PHASE : int/*unsigned short*/;
+	       __readonly__ var BUBBLING_PHASE : number/*unsigned short*/;
 	/** @see http://www.w3.org/TR/dom/ */
-	__readonly__ var eventPhase : int/*unsigned short*/;
+	__readonly__ var eventPhase : number/*unsigned short*/;
 	/** @see http://www.w3.org/TR/dom/ */
 	function stopPropagation() : void;
 	/** @see http://www.w3.org/TR/dom/ */
@@ -157,8 +157,8 @@ native class Event {
 	) : void;
 
 	// PhaseType
-	static __readonly__ var NONE : int/*unsigned short*/;
-	       __readonly__ var NONE : int/*unsigned short*/;
+	static __readonly__ var NONE : number/*unsigned short*/;
+	       __readonly__ var NONE : number/*unsigned short*/;
 	// Introduced in DOM Level 3:
 
 } // end of Event
@@ -217,23 +217,23 @@ native __fake__ class EventTarget {
 	/** @see http://www.w3.org/TR/dom/ */
 	function addEventListener(
 		type : string/*DOMString*/,
-		callback : function(:Event):void/*EventListener?*/
+		callback : Nullable.<function(:Event):void>/*EventListener?*/
 	) : void;
 	/** @see http://www.w3.org/TR/dom/ */
 	function addEventListener(
 		type : string/*DOMString*/,
-		callback : function(:Event):void/*EventListener?*/,
+		callback : Nullable.<function(:Event):void>/*EventListener?*/,
 		capture : boolean
 	) : void;
 	/** @see http://www.w3.org/TR/dom/ */
 	function removeEventListener(
 		type : string/*DOMString*/,
-		callback : function(:Event):void/*EventListener?*/
+		callback : Nullable.<function(:Event):void>/*EventListener?*/
 	) : void;
 	/** @see http://www.w3.org/TR/dom/ */
 	function removeEventListener(
 		type : string/*DOMString*/,
-		callback : function(:Event):void/*EventListener?*/,
+		callback : Nullable.<function(:Event):void>/*EventListener?*/,
 		capture : boolean
 	) : void;
 	/** @see http://www.w3.org/TR/dom/ */
@@ -277,10 +277,10 @@ native final class MutationRecord {
 
 	__readonly__ var type : string/*DOMString*/;
 	__readonly__ var target : Node;
-	__readonly__ var addedNodes : NodeList;
-	__readonly__ var removedNodes : NodeList;
-	__readonly__ var previousSibling : Node;
-	__readonly__ var nextSibling : Node;
+	__readonly__ var addedNodes : Nullable.<NodeList>;
+	__readonly__ var removedNodes : Nullable.<NodeList>;
+	__readonly__ var previousSibling : Nullable.<Node>;
+	__readonly__ var nextSibling : Nullable.<Node>;
 	__readonly__ var attributeName : Nullable.<string>/*DOMString?*/;
 	__readonly__ var attributeNamespace : Nullable.<string>/*DOMString?*/;
 	__readonly__ var oldValue : Nullable.<string>/*DOMString?*/;
@@ -290,74 +290,74 @@ native final class MutationRecord {
 /** @see http://www.w3.org/TR/dom/ */
 native class Node extends EventTarget {
 
-	static __readonly__ var ELEMENT_NODE : int/*unsigned short*/;
-	       __readonly__ var ELEMENT_NODE : int/*unsigned short*/;
-	static __readonly__ var ATTRIBUTE_NODE : int/*unsigned short*/;
-	       __readonly__ var ATTRIBUTE_NODE : int/*unsigned short*/;
+	static __readonly__ var ELEMENT_NODE : number/*unsigned short*/;
+	       __readonly__ var ELEMENT_NODE : number/*unsigned short*/;
+	static __readonly__ var ATTRIBUTE_NODE : number/*unsigned short*/;
+	       __readonly__ var ATTRIBUTE_NODE : number/*unsigned short*/;
 	// historical
-	static __readonly__ var TEXT_NODE : int/*unsigned short*/;
-	       __readonly__ var TEXT_NODE : int/*unsigned short*/;
-	static __readonly__ var CDATA_SECTION_NODE : int/*unsigned short*/;
-	       __readonly__ var CDATA_SECTION_NODE : int/*unsigned short*/;
+	static __readonly__ var TEXT_NODE : number/*unsigned short*/;
+	       __readonly__ var TEXT_NODE : number/*unsigned short*/;
+	static __readonly__ var CDATA_SECTION_NODE : number/*unsigned short*/;
+	       __readonly__ var CDATA_SECTION_NODE : number/*unsigned short*/;
 	// historical
-	static __readonly__ var ENTITY_REFERENCE_NODE : int/*unsigned short*/;
-	       __readonly__ var ENTITY_REFERENCE_NODE : int/*unsigned short*/;
+	static __readonly__ var ENTITY_REFERENCE_NODE : number/*unsigned short*/;
+	       __readonly__ var ENTITY_REFERENCE_NODE : number/*unsigned short*/;
 	// historical
-	static __readonly__ var ENTITY_NODE : int/*unsigned short*/;
-	       __readonly__ var ENTITY_NODE : int/*unsigned short*/;
+	static __readonly__ var ENTITY_NODE : number/*unsigned short*/;
+	       __readonly__ var ENTITY_NODE : number/*unsigned short*/;
 	// historical
-	static __readonly__ var PROCESSING_INSTRUCTION_NODE : int/*unsigned short*/;
-	       __readonly__ var PROCESSING_INSTRUCTION_NODE : int/*unsigned short*/;
-	static __readonly__ var COMMENT_NODE : int/*unsigned short*/;
-	       __readonly__ var COMMENT_NODE : int/*unsigned short*/;
-	static __readonly__ var DOCUMENT_NODE : int/*unsigned short*/;
-	       __readonly__ var DOCUMENT_NODE : int/*unsigned short*/;
-	static __readonly__ var DOCUMENT_TYPE_NODE : int/*unsigned short*/;
-	       __readonly__ var DOCUMENT_TYPE_NODE : int/*unsigned short*/;
-	static __readonly__ var DOCUMENT_FRAGMENT_NODE : int/*unsigned short*/;
-	       __readonly__ var DOCUMENT_FRAGMENT_NODE : int/*unsigned short*/;
-	static __readonly__ var NOTATION_NODE : int/*unsigned short*/;
-	       __readonly__ var NOTATION_NODE : int/*unsigned short*/;
+	static __readonly__ var PROCESSING_INSTRUCTION_NODE : number/*unsigned short*/;
+	       __readonly__ var PROCESSING_INSTRUCTION_NODE : number/*unsigned short*/;
+	static __readonly__ var COMMENT_NODE : number/*unsigned short*/;
+	       __readonly__ var COMMENT_NODE : number/*unsigned short*/;
+	static __readonly__ var DOCUMENT_NODE : number/*unsigned short*/;
+	       __readonly__ var DOCUMENT_NODE : number/*unsigned short*/;
+	static __readonly__ var DOCUMENT_TYPE_NODE : number/*unsigned short*/;
+	       __readonly__ var DOCUMENT_TYPE_NODE : number/*unsigned short*/;
+	static __readonly__ var DOCUMENT_FRAGMENT_NODE : number/*unsigned short*/;
+	       __readonly__ var DOCUMENT_FRAGMENT_NODE : number/*unsigned short*/;
+	static __readonly__ var NOTATION_NODE : number/*unsigned short*/;
+	       __readonly__ var NOTATION_NODE : number/*unsigned short*/;
 	// historical
-	__readonly__ var nodeType : int/*unsigned short*/;
+	__readonly__ var nodeType : number/*unsigned short*/;
 	__readonly__ var nodeName : string/*DOMString*/;
 	__readonly__ var baseURI : Nullable.<string>/*DOMString?*/;
-	__readonly__ var ownerDocument : Document;
-	__readonly__ var parentNode : Node;
-	__readonly__ var parentElement : Element;
+	__readonly__ var ownerDocument : Nullable.<Document>;
+	__readonly__ var parentNode : Nullable.<Node>;
+	__readonly__ var parentElement : Nullable.<Element>;
 	function hasChildNodes() : boolean;
 	__readonly__ var childNodes : NodeList;
-	__readonly__ var firstChild : Node;
-	__readonly__ var lastChild : Node;
-	__readonly__ var previousSibling : Node;
-	__readonly__ var nextSibling : Node;
-	static __readonly__ var DOCUMENT_POSITION_DISCONNECTED : int/*unsigned short*/;
-	       __readonly__ var DOCUMENT_POSITION_DISCONNECTED : int/*unsigned short*/;
-	static __readonly__ var DOCUMENT_POSITION_PRECEDING : int/*unsigned short*/;
-	       __readonly__ var DOCUMENT_POSITION_PRECEDING : int/*unsigned short*/;
-	static __readonly__ var DOCUMENT_POSITION_FOLLOWING : int/*unsigned short*/;
-	       __readonly__ var DOCUMENT_POSITION_FOLLOWING : int/*unsigned short*/;
-	static __readonly__ var DOCUMENT_POSITION_CONTAINS : int/*unsigned short*/;
-	       __readonly__ var DOCUMENT_POSITION_CONTAINS : int/*unsigned short*/;
-	static __readonly__ var DOCUMENT_POSITION_CONTAINED_BY : int/*unsigned short*/;
-	       __readonly__ var DOCUMENT_POSITION_CONTAINED_BY : int/*unsigned short*/;
-	static __readonly__ var DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC : int/*unsigned short*/;
-	       __readonly__ var DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC : int/*unsigned short*/;
+	__readonly__ var firstChild : Nullable.<Node>;
+	__readonly__ var lastChild : Nullable.<Node>;
+	__readonly__ var previousSibling : Nullable.<Node>;
+	__readonly__ var nextSibling : Nullable.<Node>;
+	static __readonly__ var DOCUMENT_POSITION_DISCONNECTED : number/*unsigned short*/;
+	       __readonly__ var DOCUMENT_POSITION_DISCONNECTED : number/*unsigned short*/;
+	static __readonly__ var DOCUMENT_POSITION_PRECEDING : number/*unsigned short*/;
+	       __readonly__ var DOCUMENT_POSITION_PRECEDING : number/*unsigned short*/;
+	static __readonly__ var DOCUMENT_POSITION_FOLLOWING : number/*unsigned short*/;
+	       __readonly__ var DOCUMENT_POSITION_FOLLOWING : number/*unsigned short*/;
+	static __readonly__ var DOCUMENT_POSITION_CONTAINS : number/*unsigned short*/;
+	       __readonly__ var DOCUMENT_POSITION_CONTAINS : number/*unsigned short*/;
+	static __readonly__ var DOCUMENT_POSITION_CONTAINED_BY : number/*unsigned short*/;
+	       __readonly__ var DOCUMENT_POSITION_CONTAINED_BY : number/*unsigned short*/;
+	static __readonly__ var DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC : number/*unsigned short*/;
+	       __readonly__ var DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC : number/*unsigned short*/;
 	// historical
 	function compareDocumentPosition(
 		other : Node
-	) : int/*unsigned short*/;
-	function contains(other : Node) : boolean;
+	) : number/*unsigned short*/;
+	function contains(other : Nullable.<Node>) : boolean;
 	var nodeValue : Nullable.<string>/*DOMString?*/;
 	var textContent : Nullable.<string>/*DOMString?*/;
-	function insertBefore(node : Node, child : Node) : Node;
+	function insertBefore(node : Node, child : Nullable.<Node>) : Node;
 	function appendChild(node : Node) : Node;
 	function replaceChild(node : Node, child : Node) : Node;
 	function removeChild(child : Node) : Node;
 	function normalize() : void;
 	function cloneNode() : Node;
 	function cloneNode(deep : boolean) : Node;
-	function isEqualNode(node : Node) : boolean;
+	function isEqualNode(node : Nullable.<Node>) : boolean;
 	function lookupPrefix(
 		namespace : Nullable.<string>/*DOMString?*/
 	) : string/*DOMString*/;
@@ -379,8 +379,8 @@ native class Document extends Node {
 	__readonly__ var compatMode : string/*DOMString*/;
 	__readonly__ var characterSet : string/*DOMString*/;
 	__readonly__ var contentType : string/*DOMString*/;
-	__readonly__ var doctype : DocumentType;
-	__readonly__ var documentElement : Element;
+	__readonly__ var doctype : Nullable.<DocumentType>;
+	__readonly__ var documentElement : Nullable.<Element>;
 	function getElementsByTagName(
 		localName : string/*DOMString*/
 	) : HTMLCollection;
@@ -391,7 +391,9 @@ native class Document extends Node {
 	function getElementsByClassName(
 		classNames : string/*DOMString*/
 	) : HTMLCollection;
-	function getElementById(elementId : string/*DOMString*/) : Element;
+	function getElementById(
+		elementId : string/*DOMString*/
+	) : Nullable.<Element>;
 	function createElement(localName : string/*DOMString*/) : Element;
 	function createElementNS(
 		namespace : Nullable.<string>/*DOMString?*/,
@@ -414,22 +416,22 @@ native class Document extends Node {
 	function createNodeIterator(root : Node) : NodeIterator;
 	function createNodeIterator(
 		root : Node,
-		whatToShow : int/*unsigned long*/
+		whatToShow : number/*unsigned long*/
 	) : NodeIterator;
 	function createNodeIterator(
 		root : Node,
-		whatToShow : int/*unsigned long*/,
-		filter : NodeFilter
+		whatToShow : number/*unsigned long*/,
+		filter : Nullable.<NodeFilter>
 	) : NodeIterator;
 	function createTreeWalker(root : Node) : TreeWalker;
 	function createTreeWalker(
 		root : Node,
-		whatToShow : int/*unsigned long*/
+		whatToShow : number/*unsigned long*/
 	) : TreeWalker;
 	function createTreeWalker(
 		root : Node,
-		whatToShow : int/*unsigned long*/,
-		filter : NodeFilter
+		whatToShow : number/*unsigned long*/,
+		filter : Nullable.<NodeFilter>
 	) : TreeWalker;
 	// NEW
 	function prepend(...nodes : Node) : void;
@@ -442,7 +444,7 @@ native class Document extends Node {
 	// Modified in DOM Level 3:
 
 	/** @see http://dev.w3.org/csswg/cssom/ */
-	__readonly__ var styleSheets : StyleSheet[]/*StyleSheetList*/;
+	__readonly__ var styleSheets : StyleSheetList;
 	/** @see http://dev.w3.org/csswg/cssom/ */
 	var selectedStyleSheetSet : Nullable.<string>/*DOMString?*/;
 	/** @see http://dev.w3.org/csswg/cssom/ */
@@ -460,22 +462,22 @@ native class Document extends Node {
 	function elementFromPoint(
 		x : number/*float*/,
 		y : number/*float*/
-	) : Element;
+	) : Nullable.<Element>;
 	/** @see http://dev.w3.org/csswg/cssom-view/ */
 	function caretPositionFromPoint(
 		x : number/*float*/,
 		y : number/*float*/
-	) : CaretPosition;
+	) : Nullable.<CaretPosition>;
 
 	/** @see http://www.w3.org/TR/touch-events/ */
 	function createTouch(
 		view : AbstractView,
 		target : EventTarget,
-		identifier : int/*long*/,
-		pageX : int/*long*/,
-		pageY : int/*long*/,
-		screenX : int/*long*/,
-		screenY : int/*long*/
+		identifier : number/*long*/,
+		pageX : number/*long*/,
+		pageY : number/*long*/,
+		screenX : number/*long*/,
+		screenY : number/*long*/
 	) : Touch;
 	/** @see http://www.w3.org/TR/touch-events/ */
 	function createTouchList(touches : Touch[]) : TouchList;
@@ -483,7 +485,9 @@ native class Document extends Node {
 	function createTouchList(touch : Touch) : TouchList;
 
 	/** @see http://www.w3.org/TR/selectors-api/ */
-	function querySelector(selectors : string/*DOMString*/) : Element;
+	function querySelector(
+		selectors : string/*DOMString*/
+	) : Nullable.<Element>;
 	/** @see http://www.w3.org/TR/selectors-api/ */
 	function querySelectorAll(
 		selectors : string/*DOMString*/
@@ -510,7 +514,7 @@ native final class DOMImplementation {
 	function createDocument(
 		namespace : Nullable.<string>/*DOMString?*/,
 		qualifiedName : string/*DOMString*/,
-		doctype : DocumentType
+		doctype : Nullable.<DocumentType>
 	) : XMLDocument;
 	function createHTMLDocument(title : string/*DOMString*/) : Document;
 	function hasFeature(
@@ -530,7 +534,9 @@ native final class DocumentFragment extends Node {
 	function append(...nodes : string/*DOMString*/) : void;
 
 	/** @see http://www.w3.org/TR/selectors-api/ */
-	function querySelector(selectors : string/*DOMString*/) : Element;
+	function querySelector(
+		selectors : string/*DOMString*/
+	) : Nullable.<Element>;
 	/** @see http://www.w3.org/TR/selectors-api/ */
 	function querySelectorAll(
 		selectors : string/*DOMString*/
@@ -603,11 +609,11 @@ native class Element extends Node {
 		classNames : string/*DOMString*/
 	) : HTMLCollection;
 	__readonly__ var children : HTMLCollection;
-	__readonly__ var firstElementChild : Element;
-	__readonly__ var lastElementChild : Element;
-	__readonly__ var previousElementSibling : Element;
-	__readonly__ var nextElementSibling : Element;
-	__readonly__ var childElementCount : int/*unsigned long*/;
+	__readonly__ var firstElementChild : Nullable.<Element>;
+	__readonly__ var lastElementChild : Nullable.<Element>;
+	__readonly__ var previousElementSibling : Nullable.<Element>;
+	__readonly__ var nextElementSibling : Nullable.<Element>;
+	__readonly__ var childElementCount : number/*unsigned long*/;
 	// NEW
 	function prepend(...nodes : Node) : void;
 	function prepend(...nodes : string/*DOMString*/) : void;
@@ -625,32 +631,31 @@ native class Element extends Node {
 	function getClientRects() : ClientRectList;
 	/** @see http://dev.w3.org/csswg/cssom-view/ */
 	function getBoundingClientRect() : ClientRect;
-	// scrolling
 	/** @see http://dev.w3.org/csswg/cssom-view/ */
 	function scrollIntoView() : void;
 	/** @see http://dev.w3.org/csswg/cssom-view/ */
 	function scrollIntoView(top : boolean) : void;
 	/** @see http://dev.w3.org/csswg/cssom-view/ */
-	var scrollTop : int/*long*/;
-	// scroll on setting
+	var scrollTop : number/*long*/;
 	/** @see http://dev.w3.org/csswg/cssom-view/ */
-	var scrollLeft : int/*long*/;
-	// scroll on setting
+	var scrollLeft : number/*long*/;
 	/** @see http://dev.w3.org/csswg/cssom-view/ */
-	__readonly__ var scrollWidth : int/*long*/;
+	__readonly__ var scrollWidth : number/*long*/;
 	/** @see http://dev.w3.org/csswg/cssom-view/ */
-	__readonly__ var scrollHeight : int/*long*/;
+	__readonly__ var scrollHeight : number/*long*/;
 	/** @see http://dev.w3.org/csswg/cssom-view/ */
-	__readonly__ var clientTop : int/*long*/;
+	__readonly__ var clientTop : number/*long*/;
 	/** @see http://dev.w3.org/csswg/cssom-view/ */
-	__readonly__ var clientLeft : int/*long*/;
+	__readonly__ var clientLeft : number/*long*/;
 	/** @see http://dev.w3.org/csswg/cssom-view/ */
-	__readonly__ var clientWidth : int/*long*/;
+	__readonly__ var clientWidth : number/*long*/;
 	/** @see http://dev.w3.org/csswg/cssom-view/ */
-	__readonly__ var clientHeight : int/*long*/;
+	__readonly__ var clientHeight : number/*long*/;
 
 	/** @see http://www.w3.org/TR/selectors-api/ */
-	function querySelector(selectors : string/*DOMString*/) : Element;
+	function querySelector(
+		selectors : string/*DOMString*/
+	) : Nullable.<Element>;
 	/** @see http://www.w3.org/TR/selectors-api/ */
 	function querySelectorAll(
 		selectors : string/*DOMString*/
@@ -683,23 +688,23 @@ native final class Attr {
 native class CharacterData extends Node {
 
 	var data : string/*DOMString*/;
-	__readonly__ var length : int/*unsigned long*/;
+	__readonly__ var length : number/*unsigned long*/;
 	function substringData(
-		offset : int/*unsigned long*/,
-		count : int/*unsigned long*/
+		offset : number/*unsigned long*/,
+		count : number/*unsigned long*/
 	) : string/*DOMString*/;
 	function appendData(data : string/*DOMString*/) : void;
 	function insertData(
-		offset : int/*unsigned long*/,
+		offset : number/*unsigned long*/,
 		data : string/*DOMString*/
 	) : void;
 	function deleteData(
-		offset : int/*unsigned long*/,
-		count : int/*unsigned long*/
+		offset : number/*unsigned long*/,
+		count : number/*unsigned long*/
 	) : void;
 	function replaceData(
-		offset : int/*unsigned long*/,
-		count : int/*unsigned long*/,
+		offset : number/*unsigned long*/,
+		count : number/*unsigned long*/,
 		data : string/*DOMString*/
 	) : void;
 	// NEW
@@ -716,7 +721,7 @@ native class CharacterData extends Node {
 /** @see http://www.w3.org/TR/dom/ */
 native final class Text extends CharacterData {
 
-	function splitText(offset : int/*unsigned long*/) : Text;
+	function splitText(offset : number/*unsigned long*/) : Text;
 	__readonly__ var wholeText : string/*DOMString*/;
 
 	/** @see http://html5.org/specs/dom-parsing.html */
@@ -729,11 +734,6 @@ native final class ProcessingInstruction extends CharacterData {
 
 	__readonly__ var target : string/*DOMString*/;
 
-	// implements LinkStyle
-
-	/** @see http://dev.w3.org/csswg/cssom/ */
-	__readonly__ var sheet : StyleSheet;
-
 } // end of ProcessingInstruction
 
 /** @see http://www.w3.org/TR/dom/ */
@@ -744,18 +744,18 @@ native final class Comment extends CharacterData {
 native final class Range {
 
 	__readonly__ var startContainer : Node;
-	__readonly__ var startOffset : int/*unsigned long*/;
+	__readonly__ var startOffset : number/*unsigned long*/;
 	__readonly__ var endContainer : Node;
-	__readonly__ var endOffset : int/*unsigned long*/;
+	__readonly__ var endOffset : number/*unsigned long*/;
 	__readonly__ var collapsed : boolean;
 	__readonly__ var commonAncestorContainer : Node;
 	function setStart(
 		refNode : Node,
-		offset : int/*unsigned long*/
+		offset : number/*unsigned long*/
 	) : void;
 	function setEnd(
 		refNode : Node,
-		offset : int/*unsigned long*/
+		offset : number/*unsigned long*/
 	) : void;
 	function setStartBefore(refNode : Node) : void;
 	function setStartAfter(refNode : Node) : void;
@@ -764,18 +764,18 @@ native final class Range {
 	function collapse(toStart : boolean) : void;
 	function selectNode(refNode : Node) : void;
 	function selectNodeContents(refNode : Node) : void;
-	static __readonly__ var START_TO_START : int/*unsigned short*/;
-	       __readonly__ var START_TO_START : int/*unsigned short*/;
-	static __readonly__ var START_TO_END : int/*unsigned short*/;
-	       __readonly__ var START_TO_END : int/*unsigned short*/;
-	static __readonly__ var END_TO_END : int/*unsigned short*/;
-	       __readonly__ var END_TO_END : int/*unsigned short*/;
-	static __readonly__ var END_TO_START : int/*unsigned short*/;
-	       __readonly__ var END_TO_START : int/*unsigned short*/;
+	static __readonly__ var START_TO_START : number/*unsigned short*/;
+	       __readonly__ var START_TO_START : number/*unsigned short*/;
+	static __readonly__ var START_TO_END : number/*unsigned short*/;
+	       __readonly__ var START_TO_END : number/*unsigned short*/;
+	static __readonly__ var END_TO_END : number/*unsigned short*/;
+	       __readonly__ var END_TO_END : number/*unsigned short*/;
+	static __readonly__ var END_TO_START : number/*unsigned short*/;
+	       __readonly__ var END_TO_START : number/*unsigned short*/;
 	function compareBoundaryPoints(
-		how : int/*unsigned short*/,
+		how : number/*unsigned short*/,
 		sourceRange : Range
-	) : int/*short*/;
+	) : number/*short*/;
 	function deleteContents() : void;
 	function extractContents() : DocumentFragment;
 	function cloneContents() : DocumentFragment;
@@ -785,12 +785,12 @@ native final class Range {
 	function detach() : void;
 	function isPointInRange(
 		node : Node,
-		offset : int/*unsigned long*/
+		offset : number/*unsigned long*/
 	) : boolean;
 	function comparePoint(
 		node : Node,
-		offset : int/*unsigned long*/
-	) : int/*short*/;
+		offset : number/*unsigned long*/
+	) : number/*short*/;
 	function intersectsNode(node : Node) : boolean;
 
 	/** @see http://dev.w3.org/csswg/cssom-view/ */
@@ -809,12 +809,12 @@ native final class Range {
 native final class NodeIterator {
 
 	__readonly__ var root : Node;
-	__readonly__ var referenceNode : Node;
+	__readonly__ var referenceNode : Nullable.<Node>;
 	__readonly__ var pointerBeforeReferenceNode : boolean;
-	__readonly__ var whatToShow : int/*unsigned long*/;
-	__readonly__ var filter : NodeFilter;
-	function nextNode() : Node;
-	function previousNode() : Node;
+	__readonly__ var whatToShow : number/*unsigned long*/;
+	__readonly__ var filter : Nullable.<NodeFilter>;
+	function nextNode() : Nullable.<Node>;
+	function previousNode() : Nullable.<Node>;
 	function detach() : void;
 
 } // end of NodeIterator
@@ -823,16 +823,16 @@ native final class NodeIterator {
 native final class TreeWalker {
 
 	__readonly__ var root : Node;
-	__readonly__ var whatToShow : int/*unsigned long*/;
-	__readonly__ var filter : NodeFilter;
+	__readonly__ var whatToShow : number/*unsigned long*/;
+	__readonly__ var filter : Nullable.<NodeFilter>;
 	var currentNode : Node;
-	function parentNode() : Node;
-	function firstChild() : Node;
-	function lastChild() : Node;
-	function previousSibling() : Node;
-	function nextSibling() : Node;
-	function previousNode() : Node;
-	function nextNode() : Node;
+	function parentNode() : Nullable.<Node>;
+	function firstChild() : Nullable.<Node>;
+	function lastChild() : Nullable.<Node>;
+	function previousSibling() : Nullable.<Node>;
+	function nextSibling() : Nullable.<Node>;
+	function previousNode() : Nullable.<Node>;
+	function nextNode() : Nullable.<Node>;
 
 } // end of TreeWalker
 
@@ -840,46 +840,46 @@ native final class TreeWalker {
 native final class NodeFilter {
 
 	// Constants for acceptNode()
-	static __readonly__ var FILTER_ACCEPT : int/*unsigned short*/;
-	       __readonly__ var FILTER_ACCEPT : int/*unsigned short*/;
-	static __readonly__ var FILTER_REJECT : int/*unsigned short*/;
-	       __readonly__ var FILTER_REJECT : int/*unsigned short*/;
-	static __readonly__ var FILTER_SKIP : int/*unsigned short*/;
-	       __readonly__ var FILTER_SKIP : int/*unsigned short*/;
+	static __readonly__ var FILTER_ACCEPT : number/*unsigned short*/;
+	       __readonly__ var FILTER_ACCEPT : number/*unsigned short*/;
+	static __readonly__ var FILTER_REJECT : number/*unsigned short*/;
+	       __readonly__ var FILTER_REJECT : number/*unsigned short*/;
+	static __readonly__ var FILTER_SKIP : number/*unsigned short*/;
+	       __readonly__ var FILTER_SKIP : number/*unsigned short*/;
 	// Constants for whatToShow
-	static __readonly__ var SHOW_ALL : int/*unsigned long*/;
-	       __readonly__ var SHOW_ALL : int/*unsigned long*/;
-	static __readonly__ var SHOW_ELEMENT : int/*unsigned long*/;
-	       __readonly__ var SHOW_ELEMENT : int/*unsigned long*/;
-	static __readonly__ var SHOW_ATTRIBUTE : int/*unsigned long*/;
-	       __readonly__ var SHOW_ATTRIBUTE : int/*unsigned long*/;
+	static __readonly__ var SHOW_ALL : number/*unsigned long*/;
+	       __readonly__ var SHOW_ALL : number/*unsigned long*/;
+	static __readonly__ var SHOW_ELEMENT : number/*unsigned long*/;
+	       __readonly__ var SHOW_ELEMENT : number/*unsigned long*/;
+	static __readonly__ var SHOW_ATTRIBUTE : number/*unsigned long*/;
+	       __readonly__ var SHOW_ATTRIBUTE : number/*unsigned long*/;
 	// historical
-	static __readonly__ var SHOW_TEXT : int/*unsigned long*/;
-	       __readonly__ var SHOW_TEXT : int/*unsigned long*/;
-	static __readonly__ var SHOW_CDATA_SECTION : int/*unsigned long*/;
-	       __readonly__ var SHOW_CDATA_SECTION : int/*unsigned long*/;
+	static __readonly__ var SHOW_TEXT : number/*unsigned long*/;
+	       __readonly__ var SHOW_TEXT : number/*unsigned long*/;
+	static __readonly__ var SHOW_CDATA_SECTION : number/*unsigned long*/;
+	       __readonly__ var SHOW_CDATA_SECTION : number/*unsigned long*/;
 	// historical
-	static __readonly__ var SHOW_ENTITY_REFERENCE : int/*unsigned long*/;
-	       __readonly__ var SHOW_ENTITY_REFERENCE : int/*unsigned long*/;
+	static __readonly__ var SHOW_ENTITY_REFERENCE : number/*unsigned long*/;
+	       __readonly__ var SHOW_ENTITY_REFERENCE : number/*unsigned long*/;
 	// historical
-	static __readonly__ var SHOW_ENTITY : int/*unsigned long*/;
-	       __readonly__ var SHOW_ENTITY : int/*unsigned long*/;
+	static __readonly__ var SHOW_ENTITY : number/*unsigned long*/;
+	       __readonly__ var SHOW_ENTITY : number/*unsigned long*/;
 	// historical
-	static __readonly__ var SHOW_PROCESSING_INSTRUCTION : int/*unsigned long*/;
-	       __readonly__ var SHOW_PROCESSING_INSTRUCTION : int/*unsigned long*/;
-	static __readonly__ var SHOW_COMMENT : int/*unsigned long*/;
-	       __readonly__ var SHOW_COMMENT : int/*unsigned long*/;
-	static __readonly__ var SHOW_DOCUMENT : int/*unsigned long*/;
-	       __readonly__ var SHOW_DOCUMENT : int/*unsigned long*/;
-	static __readonly__ var SHOW_DOCUMENT_TYPE : int/*unsigned long*/;
-	       __readonly__ var SHOW_DOCUMENT_TYPE : int/*unsigned long*/;
-	static __readonly__ var SHOW_DOCUMENT_FRAGMENT : int/*unsigned long*/;
-	       __readonly__ var SHOW_DOCUMENT_FRAGMENT : int/*unsigned long*/;
-	static __readonly__ var SHOW_NOTATION : int/*unsigned long*/;
-	       __readonly__ var SHOW_NOTATION : int/*unsigned long*/;
+	static __readonly__ var SHOW_PROCESSING_INSTRUCTION : number/*unsigned long*/;
+	       __readonly__ var SHOW_PROCESSING_INSTRUCTION : number/*unsigned long*/;
+	static __readonly__ var SHOW_COMMENT : number/*unsigned long*/;
+	       __readonly__ var SHOW_COMMENT : number/*unsigned long*/;
+	static __readonly__ var SHOW_DOCUMENT : number/*unsigned long*/;
+	       __readonly__ var SHOW_DOCUMENT : number/*unsigned long*/;
+	static __readonly__ var SHOW_DOCUMENT_TYPE : number/*unsigned long*/;
+	       __readonly__ var SHOW_DOCUMENT_TYPE : number/*unsigned long*/;
+	static __readonly__ var SHOW_DOCUMENT_FRAGMENT : number/*unsigned long*/;
+	       __readonly__ var SHOW_DOCUMENT_FRAGMENT : number/*unsigned long*/;
+	static __readonly__ var SHOW_NOTATION : number/*unsigned long*/;
+	       __readonly__ var SHOW_NOTATION : number/*unsigned long*/;
 	// historical
 
-	function acceptNode(node : Node) : int/*unsigned short*/;
+	function acceptNode(node : Node) : number/*unsigned short*/;
 
 } // end of NodeFilter
 
@@ -887,28 +887,30 @@ native final class NodeFilter {
 native class NodeList {
 
 	function __native_index_operator__(
-		index : int/*unsigned long*/
-	) : Node;
+		index : number/*unsigned long*/
+	) : Nullable.<Node>;
 	/* getter */
-	function item(index : int/*unsigned long*/) : Node;
-	__readonly__ var length : int/*unsigned long*/;
+	function item(index : number/*unsigned long*/) : Nullable.<Node>;
+	__readonly__ var length : number/*unsigned long*/;
 
 } // end of NodeList
 
 /** @see http://www.w3.org/TR/dom/ */
 native class HTMLCollection {
 
-	__readonly__ var length : int/*unsigned long*/;
+	__readonly__ var length : number/*unsigned long*/;
 	function __native_index_operator__(
-		index : int/*unsigned long*/
-	) : Element;
+		index : number/*unsigned long*/
+	) : Nullable.<Element>;
 	/* getter */
-	function item(index : int/*unsigned long*/) : Element;
+	function item(index : number/*unsigned long*/) : Nullable.<Element>;
 	function __native_index_operator__(
 		name : string/*DOMString*/
-	) : Object/*object?*/;
+	) : Nullable.<Object>/*object?*/;
 	/* getter */
-	function namedItem(name : string/*DOMString*/) : Object/*object?*/;
+	function namedItem(
+		name : string/*DOMString*/
+	) : Nullable.<Object>/*object?*/;
 	// only returns Element
 
 } // end of HTMLCollection
@@ -916,13 +918,13 @@ native class HTMLCollection {
 /** @see http://www.w3.org/TR/dom/ */
 native final __fake__ class DOMStringList {
 
-	__readonly__ var length : int/*unsigned long*/;
+	__readonly__ var length : number/*unsigned long*/;
 	function __native_index_operator__(
-		index : int/*unsigned long*/
+		index : number/*unsigned long*/
 	) : Nullable.<string>/*DOMString?*/;
 	/* getter */
 	function item(
-		index : int/*unsigned long*/
+		index : number/*unsigned long*/
 	) : Nullable.<string>/*DOMString?*/;
 	function contains(string : string/*DOMString*/) : boolean;
 
@@ -931,13 +933,13 @@ native final __fake__ class DOMStringList {
 /** @see http://www.w3.org/TR/dom/ */
 native class DOMTokenList {
 
-	__readonly__ var length : int/*unsigned long*/;
+	__readonly__ var length : number/*unsigned long*/;
 	function __native_index_operator__(
-		index : int/*unsigned long*/
+		index : number/*unsigned long*/
 	) : Nullable.<string>/*DOMString?*/;
 	/* getter */
 	function item(
-		index : int/*unsigned long*/
+		index : number/*unsigned long*/
 	) : Nullable.<string>/*DOMString?*/;
 	function contains(token : string/*DOMString*/) : boolean;
 	function add(token : string/*DOMString*/) : void;
@@ -978,15 +980,15 @@ native __fake__ class DocumentEvent {
 /** @see http://www.w3.org/TR/DOM-Level-3-Events/ */
 native class UIEvent extends Event {
 
-	__readonly__ var view : AbstractView;
-	__readonly__ var detail : int/*long*/;
+	__readonly__ var view : Nullable.<AbstractView>;
+	__readonly__ var detail : number/*long*/;
 	// Deprecated in DOM Level 3:
 	function initUIEvent(
 		typeArg : string/*DOMString*/,
 		canBubbleArg : boolean,
 		cancelableArg : boolean,
-		viewArg : AbstractView,
-		detailArg : int/*long*/
+		viewArg : Nullable.<AbstractView>,
+		detailArg : number/*long*/
 	) : void;
 	function constructor(typeArg : string/*DOMString*/);
 	function constructor(
@@ -999,7 +1001,7 @@ native class UIEvent extends Event {
 /** @see http://www.w3.org/TR/DOM-Level-3-Events/ */
 native final class FocusEvent extends UIEvent {
 
-	__readonly__ var relatedTarget : EventTarget;
+	__readonly__ var relatedTarget : Nullable.<EventTarget>;
 	function constructor(typeArg : string/*DOMString*/);
 	function constructor(
 		typeArg : string/*DOMString*/,
@@ -1011,9 +1013,9 @@ native final class FocusEvent extends UIEvent {
 		typeArg : string/*DOMString*/,
 		canBubbleArg : boolean,
 		cancelableArg : boolean,
-		viewArg : AbstractView,
-		detailArg : int/*long*/,
-		relatedTargetArg : EventTarget
+		viewArg : Nullable.<AbstractView>,
+		detailArg : number/*long*/,
+		relatedTargetArg : Nullable.<EventTarget>
 	) : void;
 
 } // end of FocusEvent
@@ -1021,34 +1023,34 @@ native final class FocusEvent extends UIEvent {
 /** @see http://www.w3.org/TR/DOM-Level-3-Events/ */
 native class MouseEvent extends UIEvent {
 
-	__readonly__ var screenX : int/*long*/;
-	__readonly__ var screenY : int/*long*/;
-	__readonly__ var clientX : int/*long*/;
-	__readonly__ var clientY : int/*long*/;
+	__readonly__ var screenX : number/*long*/;
+	__readonly__ var screenY : number/*long*/;
+	__readonly__ var clientX : number/*long*/;
+	__readonly__ var clientY : number/*long*/;
 	__readonly__ var ctrlKey : boolean;
 	__readonly__ var shiftKey : boolean;
 	__readonly__ var altKey : boolean;
 	__readonly__ var metaKey : boolean;
-	__readonly__ var button : int/*unsigned short*/;
-	__readonly__ var buttons : int/*unsigned short*/;
-	__readonly__ var relatedTarget : EventTarget;
+	__readonly__ var button : number/*unsigned short*/;
+	__readonly__ var buttons : number/*unsigned short*/;
+	__readonly__ var relatedTarget : Nullable.<EventTarget>;
 	// Deprecated in DOM Level 3:
 	function initMouseEvent(
 		typeArg : string/*DOMString*/,
 		canBubbleArg : boolean,
 		cancelableArg : boolean,
-		viewArg : AbstractView,
-		detailArg : int/*long*/,
-		screenXArg : int/*long*/,
-		screenYArg : int/*long*/,
-		clientXArg : int/*long*/,
-		clientYArg : int/*long*/,
+		viewArg : Nullable.<AbstractView>,
+		detailArg : number/*long*/,
+		screenXArg : number/*long*/,
+		screenYArg : number/*long*/,
+		clientXArg : number/*long*/,
+		clientYArg : number/*long*/,
 		ctrlKeyArg : boolean,
 		altKeyArg : boolean,
 		shiftKeyArg : boolean,
 		metaKeyArg : boolean,
-		buttonArg : int/*unsigned short*/,
-		relatedTargetArg : EventTarget
+		buttonArg : number/*unsigned short*/,
+		relatedTargetArg : Nullable.<EventTarget>
 	) : void;
 	// Introduced in DOM Level 3:
 	function getModifierState(keyArg : string/*DOMString*/) : boolean;
@@ -1060,17 +1062,17 @@ native class MouseEvent extends UIEvent {
 
 
 	/** @see http://dev.w3.org/csswg/cssom-view/ */
-	__readonly__ var pageX : int/*long*/;
+	__readonly__ var pageX : number/*long*/;
 	/** @see http://dev.w3.org/csswg/cssom-view/ */
-	__readonly__ var pageY : int/*long*/;
+	__readonly__ var pageY : number/*long*/;
 	/** @see http://dev.w3.org/csswg/cssom-view/ */
-	__readonly__ var x : int/*long*/;
+	__readonly__ var x : number/*long*/;
 	/** @see http://dev.w3.org/csswg/cssom-view/ */
-	__readonly__ var y : int/*long*/;
+	__readonly__ var y : number/*long*/;
 	/** @see http://dev.w3.org/csswg/cssom-view/ */
-	__readonly__ var offsetX : int/*long*/;
+	__readonly__ var offsetX : number/*long*/;
 	/** @see http://dev.w3.org/csswg/cssom-view/ */
-	__readonly__ var offsetY : int/*long*/;
+	__readonly__ var offsetY : number/*long*/;
 
 } // end of MouseEvent
 
@@ -1078,16 +1080,16 @@ native class MouseEvent extends UIEvent {
 native final class WheelEvent extends MouseEvent {
 
 	// DeltaModeCode
-	static __readonly__ var DOM_DELTA_PIXEL : int/*unsigned long*/;
-	       __readonly__ var DOM_DELTA_PIXEL : int/*unsigned long*/;
-	static __readonly__ var DOM_DELTA_LINE : int/*unsigned long*/;
-	       __readonly__ var DOM_DELTA_LINE : int/*unsigned long*/;
-	static __readonly__ var DOM_DELTA_PAGE : int/*unsigned long*/;
-	       __readonly__ var DOM_DELTA_PAGE : int/*unsigned long*/;
+	static __readonly__ var DOM_DELTA_PIXEL : number/*unsigned long*/;
+	       __readonly__ var DOM_DELTA_PIXEL : number/*unsigned long*/;
+	static __readonly__ var DOM_DELTA_LINE : number/*unsigned long*/;
+	       __readonly__ var DOM_DELTA_LINE : number/*unsigned long*/;
+	static __readonly__ var DOM_DELTA_PAGE : number/*unsigned long*/;
+	       __readonly__ var DOM_DELTA_PAGE : number/*unsigned long*/;
 	__readonly__ var deltaX : number/*float*/;
 	__readonly__ var deltaY : number/*float*/;
 	__readonly__ var deltaZ : number/*float*/;
-	__readonly__ var deltaMode : int/*unsigned long*/;
+	__readonly__ var deltaMode : number/*unsigned long*/;
 	function constructor(typeArg : string/*DOMString*/);
 	function constructor(
 		typeArg : string/*DOMString*/,
@@ -1099,19 +1101,19 @@ native final class WheelEvent extends MouseEvent {
 		typeArg : string/*DOMString*/,
 		canBubbleArg : boolean,
 		cancelableArg : boolean,
-		viewArg : AbstractView,
-		detailArg : int/*long*/,
-		screenXArg : int/*long*/,
-		screenYArg : int/*long*/,
-		clientXArg : int/*long*/,
-		clientYArg : int/*long*/,
-		buttonArg : int/*unsigned short*/,
-		relatedTargetArg : EventTarget,
+		viewArg : Nullable.<AbstractView>,
+		detailArg : number/*long*/,
+		screenXArg : number/*long*/,
+		screenYArg : number/*long*/,
+		clientXArg : number/*long*/,
+		clientYArg : number/*long*/,
+		buttonArg : number/*unsigned short*/,
+		relatedTargetArg : Nullable.<EventTarget>,
 		modifiersListArg : string/*DOMString*/,
 		deltaXArg : number/*float*/,
 		deltaYArg : number/*float*/,
 		deltaZArg : number/*float*/,
-		deltaMode : int/*unsigned long*/
+		deltaMode : number/*unsigned long*/
 	) : void;
 
 } // end of WheelEvent
@@ -1120,21 +1122,21 @@ native final class WheelEvent extends MouseEvent {
 native final class KeyboardEvent extends UIEvent {
 
 	// KeyLocationCode
-	static __readonly__ var DOM_KEY_LOCATION_STANDARD : int/*unsigned long*/;
-	       __readonly__ var DOM_KEY_LOCATION_STANDARD : int/*unsigned long*/;
-	static __readonly__ var DOM_KEY_LOCATION_LEFT : int/*unsigned long*/;
-	       __readonly__ var DOM_KEY_LOCATION_LEFT : int/*unsigned long*/;
-	static __readonly__ var DOM_KEY_LOCATION_RIGHT : int/*unsigned long*/;
-	       __readonly__ var DOM_KEY_LOCATION_RIGHT : int/*unsigned long*/;
-	static __readonly__ var DOM_KEY_LOCATION_NUMPAD : int/*unsigned long*/;
-	       __readonly__ var DOM_KEY_LOCATION_NUMPAD : int/*unsigned long*/;
-	static __readonly__ var DOM_KEY_LOCATION_MOBILE : int/*unsigned long*/;
-	       __readonly__ var DOM_KEY_LOCATION_MOBILE : int/*unsigned long*/;
-	static __readonly__ var DOM_KEY_LOCATION_JOYSTICK : int/*unsigned long*/;
-	       __readonly__ var DOM_KEY_LOCATION_JOYSTICK : int/*unsigned long*/;
+	static __readonly__ var DOM_KEY_LOCATION_STANDARD : number/*unsigned long*/;
+	       __readonly__ var DOM_KEY_LOCATION_STANDARD : number/*unsigned long*/;
+	static __readonly__ var DOM_KEY_LOCATION_LEFT : number/*unsigned long*/;
+	       __readonly__ var DOM_KEY_LOCATION_LEFT : number/*unsigned long*/;
+	static __readonly__ var DOM_KEY_LOCATION_RIGHT : number/*unsigned long*/;
+	       __readonly__ var DOM_KEY_LOCATION_RIGHT : number/*unsigned long*/;
+	static __readonly__ var DOM_KEY_LOCATION_NUMPAD : number/*unsigned long*/;
+	       __readonly__ var DOM_KEY_LOCATION_NUMPAD : number/*unsigned long*/;
+	static __readonly__ var DOM_KEY_LOCATION_MOBILE : number/*unsigned long*/;
+	       __readonly__ var DOM_KEY_LOCATION_MOBILE : number/*unsigned long*/;
+	static __readonly__ var DOM_KEY_LOCATION_JOYSTICK : number/*unsigned long*/;
+	       __readonly__ var DOM_KEY_LOCATION_JOYSTICK : number/*unsigned long*/;
 	__readonly__ var char : string/*DOMString*/;
 	__readonly__ var key : string/*DOMString*/;
-	__readonly__ var location : int/*unsigned long*/;
+	__readonly__ var location : number/*unsigned long*/;
 	__readonly__ var ctrlKey : boolean;
 	__readonly__ var shiftKey : boolean;
 	__readonly__ var altKey : boolean;
@@ -1153,19 +1155,19 @@ native final class KeyboardEvent extends UIEvent {
 		typeArg : string/*DOMString*/,
 		canBubbleArg : boolean,
 		cancelableArg : boolean,
-		viewArg : AbstractView,
+		viewArg : Nullable.<AbstractView>,
 		charArg : string/*DOMString*/,
 		keyArg : string/*DOMString*/,
-		locationArg : int/*unsigned long*/,
+		locationArg : number/*unsigned long*/,
 		modifiersListArg : string/*DOMString*/,
 		repeat : boolean,
 		localeArg : string/*DOMString*/
 	) : void;
 
 	// The following support legacy user agents:
-	__readonly__ var charCode : int/*unsigned long*/;
-	__readonly__ var keyCode : int/*unsigned long*/;
-	__readonly__ var which : int/*unsigned long*/;
+	__readonly__ var charCode : number/*unsigned long*/;
+	__readonly__ var keyCode : number/*unsigned long*/;
+	__readonly__ var which : number/*unsigned long*/;
 
 } // end of KeyboardEvent
 
@@ -1185,7 +1187,7 @@ native final class CompositionEvent extends UIEvent {
 		typeArg : string/*DOMString*/,
 		canBubbleArg : boolean,
 		cancelableArg : boolean,
-		viewArg : AbstractView,
+		viewArg : Nullable.<AbstractView>,
 		dataArg : Nullable.<string>/*DOMString?*/,
 		localeArg : string/*DOMString*/
 	) : void;
@@ -1196,26 +1198,26 @@ native final class CompositionEvent extends UIEvent {
 native final class MutationEvent extends Event {
 
 	// attrChangeType
-	static __readonly__ var MODIFICATION : int/*unsigned short*/;
-	       __readonly__ var MODIFICATION : int/*unsigned short*/;
-	static __readonly__ var ADDITION : int/*unsigned short*/;
-	       __readonly__ var ADDITION : int/*unsigned short*/;
-	static __readonly__ var REMOVAL : int/*unsigned short*/;
-	       __readonly__ var REMOVAL : int/*unsigned short*/;
-	__readonly__ var relatedNode : Node;
+	static __readonly__ var MODIFICATION : number/*unsigned short*/;
+	       __readonly__ var MODIFICATION : number/*unsigned short*/;
+	static __readonly__ var ADDITION : number/*unsigned short*/;
+	       __readonly__ var ADDITION : number/*unsigned short*/;
+	static __readonly__ var REMOVAL : number/*unsigned short*/;
+	       __readonly__ var REMOVAL : number/*unsigned short*/;
+	__readonly__ var relatedNode : Nullable.<Node>;
 	__readonly__ var prevValue : string/*DOMString*/;
 	__readonly__ var newValue : string/*DOMString*/;
 	__readonly__ var attrName : string/*DOMString*/;
-	__readonly__ var attrChange : int/*unsigned short*/;
+	__readonly__ var attrChange : number/*unsigned short*/;
 	function initMutationEvent(
 		typeArg : string/*DOMString*/,
 		canBubbleArg : boolean,
 		cancelableArg : boolean,
-		relatedNodeArg : Node,
+		relatedNodeArg : Nullable.<Node>,
 		prevValueArg : string/*DOMString*/,
 		newValueArg : string/*DOMString*/,
 		attrNameArg : string/*DOMString*/,
-		attrChangeArg : int/*unsigned short*/
+		attrChangeArg : number/*unsigned short*/
 	) : void;
 
 } // end of MutationEvent
@@ -1227,9 +1229,9 @@ native class UIEventInit extends EventInit {
 	// inherits var cancelable : boolean;
 	// Attributes for UIEvent:
 	/** @see http://www.w3.org/TR/DOM-Level-3-Events/ */
-	var view : AbstractView;
+	var view : Nullable.<AbstractView>;
 	/** @see http://www.w3.org/TR/DOM-Level-3-Events/ */
-	var detail : int/*long*/;
+	var detail : number/*long*/;
 
 } // end of UIEventInit
 
@@ -1240,10 +1242,10 @@ native final class FocusEventInit {
 	var bubbles : boolean;
 	var cancelable : boolean;
 	// Attributes from UIEvent:
-	var view : AbstractView;
-	var detail : int/*long*/;
+	var view : Nullable.<AbstractView>;
+	var detail : number/*long*/;
 	// Attributes for FocusEvent:
-	var relatedTarget : EventTarget;
+	var relatedTarget : Nullable.<EventTarget>;
 
 } // end of FocusEventInit
 
@@ -1253,17 +1255,17 @@ native class MouseEventInit extends UIEventInit {
 	// inherits var bubbles : boolean;
 	// inherits var cancelable : boolean;
 	// Attributes from UIEvent:
-	// inherits var view : AbstractView;
-	// inherits var detail : int/*long*/;
+	// inherits var view : Nullable.<AbstractView>;
+	// inherits var detail : number/*long*/;
 	// Attributes for MouseEvent:
 	/** @see http://www.w3.org/TR/DOM-Level-3-Events/ */
-	var screenX : int/*long*/;
+	var screenX : number/*long*/;
 	/** @see http://www.w3.org/TR/DOM-Level-3-Events/ */
-	var screenY : int/*long*/;
+	var screenY : number/*long*/;
 	/** @see http://www.w3.org/TR/DOM-Level-3-Events/ */
-	var clientX : int/*long*/;
+	var clientX : number/*long*/;
 	/** @see http://www.w3.org/TR/DOM-Level-3-Events/ */
-	var clientY : int/*long*/;
+	var clientY : number/*long*/;
 	/** @see http://www.w3.org/TR/DOM-Level-3-Events/ */
 	var ctrlKey : boolean;
 	/** @see http://www.w3.org/TR/DOM-Level-3-Events/ */
@@ -1273,12 +1275,12 @@ native class MouseEventInit extends UIEventInit {
 	/** @see http://www.w3.org/TR/DOM-Level-3-Events/ */
 	var metaKey : boolean;
 	/** @see http://www.w3.org/TR/DOM-Level-3-Events/ */
-	var button : int/*unsigned short*/;
+	var button : number/*unsigned short*/;
 	// Note: "buttons" was not previously initializable through initMouseEvent!
 	/** @see http://www.w3.org/TR/DOM-Level-3-Events/ */
-	var buttons : int/*unsigned short*/;
+	var buttons : number/*unsigned short*/;
 	/** @see http://www.w3.org/TR/DOM-Level-3-Events/ */
-	var relatedTarget : EventTarget;
+	var relatedTarget : Nullable.<EventTarget>;
 
 } // end of MouseEventInit
 
@@ -1289,26 +1291,26 @@ native final class WheelEventInit {
 	var bubbles : boolean;
 	var cancelable : boolean;
 	// Attributes from UIEvent:
-	var view : AbstractView;
-	var detail : int/*long*/;
+	var view : Nullable.<AbstractView>;
+	var detail : number/*long*/;
 	// Attributes from MouseEvent:
-	var screenX : int/*long*/;
-	var screenY : int/*long*/;
-	var clientX : int/*long*/;
-	var clientY : int/*long*/;
+	var screenX : number/*long*/;
+	var screenY : number/*long*/;
+	var clientX : number/*long*/;
+	var clientY : number/*long*/;
 	var ctrlKey : boolean;
 	var shiftKey : boolean;
 	var altKey : boolean;
 	var metaKey : boolean;
-	var button : int/*unsigned short*/;
+	var button : number/*unsigned short*/;
 	// Note: "buttons" was not previously initializable through initMouseEvent!
-	var buttons : int/*unsigned short*/;
-	var relatedTarget : EventTarget;
+	var buttons : number/*unsigned short*/;
+	var relatedTarget : Nullable.<EventTarget>;
 	// Attributes for WheelEvent:
 	var deltaX : number/*float*/;
 	var deltaY : number/*float*/;
 	var deltaZ : number/*float*/;
-	var deltaMode : int/*unsigned long*/;
+	var deltaMode : number/*unsigned long*/;
 
 } // end of WheelEventInit
 
@@ -1319,12 +1321,12 @@ native final class KeyboardEventInit {
 	var bubbles : boolean;
 	var cancelable : boolean;
 	// Attributes from UIEvent:
-	var view : AbstractView;
-	var detail : int/*long*/;
+	var view : Nullable.<AbstractView>;
+	var detail : number/*long*/;
 	// Attributes for KeyboardEvent:
 	var char : string/*DOMString*/;
 	var key : string/*DOMString*/;
-	var location : int/*unsigned long*/;
+	var location : number/*unsigned long*/;
 	var ctrlKey : boolean;
 	var shiftKey : boolean;
 	var altKey : boolean;
@@ -1332,9 +1334,9 @@ native final class KeyboardEventInit {
 	var repeat : boolean;
 	var locale : string/*DOMString*/;
 	// (Legacy) key attributes for KeyboardEvent:
-	var charCode : int/*unsigned long*/;
-	var keyCode : int/*unsigned long*/;
-	var which : int/*unsigned long*/;
+	var charCode : number/*unsigned long*/;
+	var keyCode : number/*unsigned long*/;
+	var which : number/*unsigned long*/;
 
 } // end of KeyboardEventInit
 
@@ -1345,8 +1347,8 @@ native final class CompositionEventInit {
 	var bubbles : boolean;
 	var cancelable : boolean;
 	// Attributes from UIEvent:
-	var view : AbstractView;
-	var detail : int/*long*/;
+	var view : Nullable.<AbstractView>;
+	var detail : number/*long*/;
 	// Attributes for CompositionEvent:
 	var data : Nullable.<string>/*DOMString?*/;
 	var locale : string/*DOMString*/;
@@ -1357,13 +1359,13 @@ native final class CompositionEventInit {
 native __fake__ class XMLHttpRequestEventTarget extends EventTarget {
 
 	// event handlers
-	var onloadstart : function(:Event):void/*Function?*/;
-	var onprogress : function(:Event):void/*Function?*/;
-	var onabort : function(:Event):void/*Function?*/;
-	var onerror : function(:Event):void/*Function?*/;
-	var onload : function(:Event):void/*Function?*/;
-	var ontimeout : function(:Event):void/*Function?*/;
-	var onloadend : function(:Event):void/*Function?*/;
+	var onloadstart : Nullable.<function(:Event):void>/*Function?*/;
+	var onprogress : Nullable.<function(:Event):void>/*Function?*/;
+	var onabort : Nullable.<function(:Event):void>/*Function?*/;
+	var onerror : Nullable.<function(:Event):void>/*Function?*/;
+	var onload : Nullable.<function(:Event):void>/*Function?*/;
+	var ontimeout : Nullable.<function(:Event):void>/*Function?*/;
+	var onloadend : Nullable.<function(:Event):void>/*Function?*/;
 
 } // end of XMLHttpRequestEventTarget
 
@@ -1377,19 +1379,19 @@ native class XMLHttpRequest extends XMLHttpRequestEventTarget {
 	function constructor();
 
 	// event handler
-	var onreadystatechange : function(:Event):void/*Function?*/;
+	var onreadystatechange : Nullable.<function(:Event):void>/*Function?*/;
 	// states
-	static __readonly__ var UNSENT : int/*unsigned short*/;
-	       __readonly__ var UNSENT : int/*unsigned short*/;
-	static __readonly__ var OPENED : int/*unsigned short*/;
-	       __readonly__ var OPENED : int/*unsigned short*/;
-	static __readonly__ var HEADERS_RECEIVED : int/*unsigned short*/;
-	       __readonly__ var HEADERS_RECEIVED : int/*unsigned short*/;
-	static __readonly__ var LOADING : int/*unsigned short*/;
-	       __readonly__ var LOADING : int/*unsigned short*/;
-	static __readonly__ var DONE : int/*unsigned short*/;
-	       __readonly__ var DONE : int/*unsigned short*/;
-	__readonly__ var readyState : int/*unsigned short*/;
+	static __readonly__ var UNSENT : number/*unsigned short*/;
+	       __readonly__ var UNSENT : number/*unsigned short*/;
+	static __readonly__ var OPENED : number/*unsigned short*/;
+	       __readonly__ var OPENED : number/*unsigned short*/;
+	static __readonly__ var HEADERS_RECEIVED : number/*unsigned short*/;
+	       __readonly__ var HEADERS_RECEIVED : number/*unsigned short*/;
+	static __readonly__ var LOADING : number/*unsigned short*/;
+	       __readonly__ var LOADING : number/*unsigned short*/;
+	static __readonly__ var DONE : number/*unsigned short*/;
+	       __readonly__ var DONE : number/*unsigned short*/;
+	__readonly__ var readyState : number/*unsigned short*/;
 	// request
 	function open(
 		method : string/*DOMString*/,
@@ -1417,7 +1419,7 @@ native class XMLHttpRequest extends XMLHttpRequestEventTarget {
 		header : string/*DOMString*/,
 		value : string/*DOMString*/
 	) : void;
-	var timeout : int/*unsigned long*/;
+	var timeout : number/*unsigned long*/;
 	var withCredentials : boolean;
 	__readonly__ var upload : XMLHttpRequestUpload;
 	function send() : void;
@@ -1428,7 +1430,7 @@ native class XMLHttpRequest extends XMLHttpRequestEventTarget {
 	function send(data : FormData) : void;
 	function abort() : void;
 	// response
-	__readonly__ var status : int/*unsigned short*/;
+	__readonly__ var status : number/*unsigned short*/;
 	__readonly__ var statusText : string/*DOMString*/;
 	function getResponseHeader(
 		header : string/*DOMString*/
@@ -1471,15 +1473,13 @@ native final class FormData {
 /** @see http://dev.w3.org/csswg/cssom/ */
 native final class MediaList {
 
+	function constructor();
+
 	var mediaText : string/*DOMString*/;
-	__readonly__ var length : int/*unsigned long*/;
-	function __native_index_operator__(
-		index : int/*unsigned long*/
-	) : Nullable.<string>/*DOMString*/;
-	/* getter */
+	__readonly__ var length : number/*unsigned long*/;
 	function item(
-		index : int/*unsigned long*/
-	) : Nullable.<string>/*DOMString*/;
+		index : number/*unsigned long*/
+	) : string/*DOMString*/;
 	function appendMedium(medium : string/*DOMString*/) : void;
 	function deleteMedium(medium : string/*DOMString*/) : void;
 
@@ -1489,10 +1489,10 @@ native final class MediaList {
 native class StyleSheet {
 
 	__readonly__ var type : string/*DOMString*/;
-	__readonly__ var href : string/*DOMString*/;
+	__readonly__ var href : Nullable.<string>/*DOMString?*/;
 	__readonly__ var ownerNode : Node;
-	__readonly__ var parentStyleSheet : StyleSheet;
-	__readonly__ var title : string/*DOMString*/;
+	__readonly__ var parentStyleSheet : Nullable.<StyleSheet>;
+	__readonly__ var title : Nullable.<string>/*DOMString?*/;
 	__readonly__ var media : MediaList;
 	var disabled : boolean;
 
@@ -1501,13 +1501,13 @@ native class StyleSheet {
 /** @see http://dev.w3.org/csswg/cssom/ */
 native final class CSSStyleSheet extends StyleSheet {
 
-	__readonly__ var ownerRule : CSSRule;
-	__readonly__ var cssRules : CSSRule[]/*CSSRuleList*/;
+	__readonly__ var ownerRule : Nullable.<CSSRule>;
+	__readonly__ var cssRules : CSSRuleList;
 	function insertRule(
 		rule : string/*DOMString*/,
-		index : int/*unsigned long*/
-	) : int/*unsigned long*/;
-	function deleteRule(index : int/*unsigned long*/) : void;
+		index : number/*unsigned long*/
+	) : number/*unsigned long*/;
+	function deleteRule(index : number/*unsigned long*/) : void;
 
 } // end of CSSStyleSheet
 
@@ -1521,23 +1521,20 @@ native __fake__ class LinkStyle {
 /** @see http://dev.w3.org/csswg/cssom/ */
 native class CSSRule {
 
-	// Types
-	static __readonly__ var STYLE_RULE : int/*unsigned short*/;
-	       __readonly__ var STYLE_RULE : int/*unsigned short*/;
-	static __readonly__ var IMPORT_RULE : int/*unsigned short*/;
-	       __readonly__ var IMPORT_RULE : int/*unsigned short*/;
-	static __readonly__ var MEDIA_RULE : int/*unsigned short*/;
-	       __readonly__ var MEDIA_RULE : int/*unsigned short*/;
-	static __readonly__ var FONT_FACE_RULE : int/*unsigned short*/;
-	       __readonly__ var FONT_FACE_RULE : int/*unsigned short*/;
-	static __readonly__ var PAGE_RULE : int/*unsigned short*/;
-	       __readonly__ var PAGE_RULE : int/*unsigned short*/;
-	static __readonly__ var NAMESPACE_RULE : int/*unsigned short*/;
-	       __readonly__ var NAMESPACE_RULE : int/*unsigned short*/;
-	__readonly__ var type : int/*unsigned short*/;
-	// Parsing and serialization
+	static __readonly__ var STYLE_RULE : number/*unsigned short*/;
+	       __readonly__ var STYLE_RULE : number/*unsigned short*/;
+	static __readonly__ var IMPORT_RULE : number/*unsigned short*/;
+	       __readonly__ var IMPORT_RULE : number/*unsigned short*/;
+	static __readonly__ var MEDIA_RULE : number/*unsigned short*/;
+	       __readonly__ var MEDIA_RULE : number/*unsigned short*/;
+	static __readonly__ var FONT_FACE_RULE : number/*unsigned short*/;
+	       __readonly__ var FONT_FACE_RULE : number/*unsigned short*/;
+	static __readonly__ var PAGE_RULE : number/*unsigned short*/;
+	       __readonly__ var PAGE_RULE : number/*unsigned short*/;
+	static __readonly__ var NAMESPACE_RULE : number/*unsigned short*/;
+	       __readonly__ var NAMESPACE_RULE : number/*unsigned short*/;
+	__readonly__ var type : number/*unsigned short*/;
 	var cssText : string/*DOMString*/;
-	// Context
 	__readonly__ var parentRule : CSSRule;
 	__readonly__ var parentStyleSheet : CSSStyleSheet;
 
@@ -1564,12 +1561,12 @@ native final class CSSImportRule extends CSSRule {
 native final class CSSMediaRule extends CSSRule {
 
 	__readonly__ var media : MediaList;
-	__readonly__ var cssRules : CSSRule[]/*CSSRuleList*/;
+	__readonly__ var cssRules : CSSRuleList;
 	function insertRule(
 		rule : string/*DOMString*/,
-		index : int/*unsigned long*/
-	) : int/*unsigned long*/;
-	function deleteRule(index : int/*unsigned long*/) : void;
+		index : number/*unsigned long*/
+	) : number/*unsigned long*/;
+	function deleteRule(index : number/*unsigned long*/) : void;
 
 } // end of CSSMediaRule
 
@@ -1600,8 +1597,10 @@ native final class CSSNamespaceRule extends CSSRule {
 native final class CSSStyleDeclaration {
 
 	var cssText : string/*DOMString*/;
-	__readonly__ var length : int/*unsigned long*/;
-	function item(index : int/*unsigned long*/) : string/*DOMString*/;
+	__readonly__ var length : number/*unsigned long*/;
+	function item(
+		index : number/*unsigned long*/
+	) : string/*DOMString*/;
 	function getPropertyValue(
 		property : string/*DOMString*/
 	) : string/*DOMString*/;
@@ -1620,160 +1619,77 @@ native final class CSSStyleDeclaration {
 	function removeProperty(
 		property : string/*DOMString*/
 	) : string/*DOMString*/;
-	__readonly__ var parentRule : CSSRule;
-	// CSS Properties
-	var azimuth : string/*DOMString*/;
-	var background : string/*DOMString*/;
-	var backgroundAttachment : string/*DOMString*/;
-	var backgroundColor : string/*DOMString*/;
-	var backgroundImage : string/*DOMString*/;
-	var backgroundPosition : string/*DOMString*/;
-	var backgroundRepeat : string/*DOMString*/;
-	var border : string/*DOMString*/;
-	var borderCollapse : string/*DOMString*/;
-	var borderColor : string/*DOMString*/;
-	var borderSpacing : string/*DOMString*/;
-	var borderStyle : string/*DOMString*/;
-	var borderTop : string/*DOMString*/;
-	var borderRight : string/*DOMString*/;
-	var borderBottom : string/*DOMString*/;
-	var borderLeft : string/*DOMString*/;
-	var borderTopColor : string/*DOMString*/;
-	var borderRightColor : string/*DOMString*/;
-	var borderBottomColor : string/*DOMString*/;
-	var borderLeftColor : string/*DOMString*/;
-	var borderTopStyle : string/*DOMString*/;
-	var borderRightStyle : string/*DOMString*/;
-	var borderBottomStyle : string/*DOMString*/;
-	var borderLeftStyle : string/*DOMString*/;
-	var borderTopWidth : string/*DOMString*/;
-	var borderRightWidth : string/*DOMString*/;
-	var borderBottomWidth : string/*DOMString*/;
-	var borderLeftWidth : string/*DOMString*/;
-	var borderWidth : string/*DOMString*/;
-	var bottom : string/*DOMString*/;
-	var captionSide : string/*DOMString*/;
-	var clear : string/*DOMString*/;
-	var clip : string/*DOMString*/;
-	var color : string/*DOMString*/;
-	var content : string/*DOMString*/;
-	var counterIncrement : string/*DOMString*/;
-	var counterReset : string/*DOMString*/;
-	var cue : string/*DOMString*/;
-	var cueAfter : string/*DOMString*/;
-	var cueBefore : string/*DOMString*/;
-	var cursor : string/*DOMString*/;
-	var direction : string/*DOMString*/;
-	var display : string/*DOMString*/;
-	var elevation : string/*DOMString*/;
-	var emptyCells : string/*DOMString*/;
-	var cssFloat : string/*DOMString*/;
-	var font : string/*DOMString*/;
-	var fontFamily : string/*DOMString*/;
-	var fontSize : string/*DOMString*/;
-	var fontSizeAdjust : string/*DOMString*/;
-	var fontStretch : string/*DOMString*/;
-	var fontStyle : string/*DOMString*/;
-	var fontVariant : string/*DOMString*/;
-	var fontWeight : string/*DOMString*/;
-	var height : string/*DOMString*/;
-	var left : string/*DOMString*/;
-	var letterSpacing : string/*DOMString*/;
-	var lineHeight : string/*DOMString*/;
-	var listStyle : string/*DOMString*/;
-	var listStyleImage : string/*DOMString*/;
-	var listStylePosition : string/*DOMString*/;
-	var listStyleType : string/*DOMString*/;
-	var margin : string/*DOMString*/;
-	var marginTop : string/*DOMString*/;
-	var marginRight : string/*DOMString*/;
-	var marginBottom : string/*DOMString*/;
-	var marginLeft : string/*DOMString*/;
-	var markerOffset : string/*DOMString*/;
-	var marks : string/*DOMString*/;
-	var maxHeight : string/*DOMString*/;
-	var maxWidth : string/*DOMString*/;
-	var minHeight : string/*DOMString*/;
-	var minWidth : string/*DOMString*/;
-	var orphans : string/*DOMString*/;
-	var outline : string/*DOMString*/;
-	var outlineColor : string/*DOMString*/;
-	var outlineStyle : string/*DOMString*/;
-	var outlineWidth : string/*DOMString*/;
-	var overflow : string/*DOMString*/;
-	var padding : string/*DOMString*/;
-	var paddingTop : string/*DOMString*/;
-	var paddingRight : string/*DOMString*/;
-	var paddingBottom : string/*DOMString*/;
-	var paddingLeft : string/*DOMString*/;
-	var page : string/*DOMString*/;
-	var pageBreakAfter : string/*DOMString*/;
-	var pageBreakBefore : string/*DOMString*/;
-	var pageBreakInside : string/*DOMString*/;
-	var pause : string/*DOMString*/;
-	var pauseAfter : string/*DOMString*/;
-	var pauseBefore : string/*DOMString*/;
-	var pitch : string/*DOMString*/;
-	var pitchRange : string/*DOMString*/;
-	var playDuring : string/*DOMString*/;
-	var position : string/*DOMString*/;
-	var quotes : string/*DOMString*/;
-	var richness : string/*DOMString*/;
-	var right : string/*DOMString*/;
-	var size : string/*DOMString*/;
-	var speak : string/*DOMString*/;
-	var speakHeader : string/*DOMString*/;
-	var speakNumeral : string/*DOMString*/;
-	var speakPunctuation : string/*DOMString*/;
-	var speechRate : string/*DOMString*/;
-	var stress : string/*DOMString*/;
-	var tableLayout : string/*DOMString*/;
-	var textAlign : string/*DOMString*/;
-	var textDecoration : string/*DOMString*/;
-	var textIndent : string/*DOMString*/;
-	var textShadow : string/*DOMString*/;
-	var textTransform : string/*DOMString*/;
-	var top : string/*DOMString*/;
-	var unicodeBidi : string/*DOMString*/;
-	var verticalAlign : string/*DOMString*/;
-	var visibility : string/*DOMString*/;
-	var voiceFamily : string/*DOMString*/;
-	var volume : string/*DOMString*/;
-	var whiteSpace : string/*DOMString*/;
-	var widows : string/*DOMString*/;
-	var width : string/*DOMString*/;
-	var wordSpacing : string/*DOMString*/;
-	var zIndex : string/*DOMString*/;
+	__readonly__ var parentRule : Nullable.<CSSRule>;
 
 	var alignmentBaseline : Nullable.<string>;
+	var background : Nullable.<string>;
+	var backgroundAttachment : Nullable.<string>;
 	var backgroundClip : Nullable.<string>;
+	var backgroundColor : Nullable.<string>;
+	var backgroundImage : Nullable.<string>;
 	var backgroundOrigin : Nullable.<string>;
+	var backgroundPosition : Nullable.<string>;
 	var backgroundPositionX : Nullable.<string>;
 	var backgroundPositionY : Nullable.<string>;
+	var backgroundRepeat : Nullable.<string>;
 	var backgroundRepeatX : Nullable.<string>;
 	var backgroundRepeatY : Nullable.<string>;
 	var backgroundSize : Nullable.<string>;
 	var baselineShift : Nullable.<string>;
+	var border : Nullable.<string>;
+	var borderBottom : Nullable.<string>;
+	var borderBottomColor : Nullable.<string>;
 	var borderBottomLeftRadius : Nullable.<string>;
 	var borderBottomRightRadius : Nullable.<string>;
+	var borderBottomStyle : Nullable.<string>;
+	var borderBottomWidth : Nullable.<string>;
+	var borderCollapse : Nullable.<string>;
+	var borderColor : Nullable.<string>;
 	var borderImage : Nullable.<string>;
 	var borderImageOutset : Nullable.<string>;
 	var borderImageRepeat : Nullable.<string>;
 	var borderImageSlice : Nullable.<string>;
 	var borderImageSource : Nullable.<string>;
 	var borderImageWidth : Nullable.<string>;
+	var borderLeft : Nullable.<string>;
+	var borderLeftColor : Nullable.<string>;
+	var borderLeftStyle : Nullable.<string>;
+	var borderLeftWidth : Nullable.<string>;
 	var borderRadius : Nullable.<string>;
+	var borderRight : Nullable.<string>;
+	var borderRightColor : Nullable.<string>;
+	var borderRightStyle : Nullable.<string>;
+	var borderRightWidth : Nullable.<string>;
+	var borderSpacing : Nullable.<string>;
+	var borderStyle : Nullable.<string>;
+	var borderTop : Nullable.<string>;
+	var borderTopColor : Nullable.<string>;
 	var borderTopLeftRadius : Nullable.<string>;
 	var borderTopRightRadius : Nullable.<string>;
+	var borderTopStyle : Nullable.<string>;
+	var borderTopWidth : Nullable.<string>;
+	var borderWidth : Nullable.<string>;
+	var bottom : Nullable.<string>;
 	var boxShadow : Nullable.<string>;
 	var boxSizing : Nullable.<string>;
+	var captionSide : Nullable.<string>;
+	var clear : Nullable.<string>;
+	var clip : Nullable.<string>;
 	var clipPath : Nullable.<string>;
 	var clipRule : Nullable.<string>;
+	var color : Nullable.<string>;
 	var colorInterpolation : Nullable.<string>;
 	var colorInterpolationFilters : Nullable.<string>;
 	var colorProfile : Nullable.<string>;
 	var colorRendering : Nullable.<string>;
+	var content : Nullable.<string>;
+	var counterIncrement : Nullable.<string>;
+	var counterReset : Nullable.<string>;
+	var cursor : Nullable.<string>;
+	var direction : Nullable.<string>;
+	var display : Nullable.<string>;
 	var dominantBaseline : Nullable.<string>;
+	var emptyCells : Nullable.<string>;
 	var enableBackground : Nullable.<string>;
 	var fill : Nullable.<string>;
 	var fillOpacity : Nullable.<string>;
@@ -1782,23 +1698,67 @@ native final class CSSStyleDeclaration {
 	var float : Nullable.<string>;
 	var floodColor : Nullable.<string>;
 	var floodOpacity : Nullable.<string>;
+	var font : Nullable.<string>;
+	var fontFamily : Nullable.<string>;
+	var fontSize : Nullable.<string>;
+	var fontStretch : Nullable.<string>;
+	var fontStyle : Nullable.<string>;
+	var fontVariant : Nullable.<string>;
+	var fontWeight : Nullable.<string>;
 	var glyphOrientationHorizontal : Nullable.<string>;
 	var glyphOrientationVertical : Nullable.<string>;
+	var height : Nullable.<string>;
 	var imageRendering : Nullable.<string>;
 	var kerning : Nullable.<string>;
+	var left : Nullable.<string>;
+	var letterSpacing : Nullable.<string>;
 	var lightingColor : Nullable.<string>;
+	var lineHeight : Nullable.<string>;
+	var listStyle : Nullable.<string>;
+	var listStyleImage : Nullable.<string>;
+	var listStylePosition : Nullable.<string>;
+	var listStyleType : Nullable.<string>;
+	var margin : Nullable.<string>;
+	var marginBottom : Nullable.<string>;
+	var marginLeft : Nullable.<string>;
+	var marginRight : Nullable.<string>;
+	var marginTop : Nullable.<string>;
 	var marker : Nullable.<string>;
 	var markerEnd : Nullable.<string>;
 	var markerMid : Nullable.<string>;
 	var markerStart : Nullable.<string>;
 	var mask : Nullable.<string>;
+	var maxHeight : Nullable.<string>;
+	var maxWidth : Nullable.<string>;
+	var minHeight : Nullable.<string>;
+	var minWidth : Nullable.<string>;
 	var opacity : Nullable.<string>;
+	var orphans : Nullable.<string>;
+	var outline : Nullable.<string>;
+	var outlineColor : Nullable.<string>;
 	var outlineOffset : Nullable.<string>;
+	var outlineStyle : Nullable.<string>;
+	var outlineWidth : Nullable.<string>;
+	var overflow : Nullable.<string>;
 	var overflowX : Nullable.<string>;
 	var overflowY : Nullable.<string>;
+	var padding : Nullable.<string>;
+	var paddingBottom : Nullable.<string>;
+	var paddingLeft : Nullable.<string>;
+	var paddingRight : Nullable.<string>;
+	var paddingTop : Nullable.<string>;
+	var page : Nullable.<string>;
+	var pageBreakAfter : Nullable.<string>;
+	var pageBreakBefore : Nullable.<string>;
+	var pageBreakInside : Nullable.<string>;
 	var pointerEvents : Nullable.<string>;
+	var position : Nullable.<string>;
+	var quotes : Nullable.<string>;
 	var resize : Nullable.<string>;
+	var right : Nullable.<string>;
 	var shapeRendering : Nullable.<string>;
+	var size : Nullable.<string>;
+	var speak : Nullable.<string>;
 	var src : Nullable.<string>;
 	var stopColor : Nullable.<string>;
 	var stopOpacity : Nullable.<string>;
@@ -1810,7 +1770,11 @@ native final class CSSStyleDeclaration {
 	var strokeMiterlimit : Nullable.<string>;
 	var strokeOpacity : Nullable.<string>;
 	var strokeWidth : Nullable.<string>;
+	var tableLayout : Nullable.<string>;
+	var textAlign : Nullable.<string>;
 	var textAnchor : Nullable.<string>;
+	var textDecoration : Nullable.<string>;
+	var textIndent : Nullable.<string>;
 	var textLineThrough : Nullable.<string>;
 	var textLineThroughColor : Nullable.<string>;
 	var textLineThroughMode : Nullable.<string>;
@@ -1823,13 +1787,19 @@ native final class CSSStyleDeclaration {
 	var textOverlineStyle : Nullable.<string>;
 	var textOverlineWidth : Nullable.<string>;
 	var textRendering : Nullable.<string>;
+	var textShadow : Nullable.<string>;
+	var textTransform : Nullable.<string>;
 	var textUnderline : Nullable.<string>;
 	var textUnderlineColor : Nullable.<string>;
 	var textUnderlineMode : Nullable.<string>;
 	var textUnderlineStyle : Nullable.<string>;
 	var textUnderlineWidth : Nullable.<string>;
+	var top : Nullable.<string>;
+	var unicodeBidi : Nullable.<string>;
 	var unicodeRange : Nullable.<string>;
 	var vectorEffect : Nullable.<string>;
+	var verticalAlign : Nullable.<string>;
+	var visibility : Nullable.<string>;
 	var webkitAnimation : Nullable.<string>;
 	var webkitAnimationDelay : Nullable.<string>;
 	var webkitAnimationDirection : Nullable.<string>;
@@ -2014,9 +1984,14 @@ native final class CSSStyleDeclaration {
 	var webkitWrapShapeOutside : Nullable.<string>;
 	var webkitWrapThrough : Nullable.<string>;
 	var webkitWritingMode : Nullable.<string>;
+	var whiteSpace : Nullable.<string>;
+	var widows : Nullable.<string>;
+	var width : Nullable.<string>;
 	var wordBreak : Nullable.<string>;
+	var wordSpacing : Nullable.<string>;
 	var wordWrap : Nullable.<string>;
 	var writingMode : Nullable.<string>;
+	var zIndex : Nullable.<string>;
 	var zoom : Nullable.<string>;
 
 	var MozAnimation : Nullable.<string>;
@@ -2105,7 +2080,11 @@ native final class CSSStyleDeclaration {
 	var MozUserModify : Nullable.<string>;
 	var MozUserSelect : Nullable.<string>;
 	var MozWindowShadow : Nullable.<string>;
+	var cssFloat : Nullable.<string>;
+	var fontSizeAdjust : Nullable.<string>;
 	var imeMode : Nullable.<string>;
+	var markerOffset : Nullable.<string>;
+	var marks : Nullable.<string>;
 
 } // end of CSSStyleDeclaration
 
@@ -2128,40 +2107,35 @@ native final __fake__ class Window extends EventTarget {
 	) : CSSStyleDeclaration;
 
 	/** @see http://dev.w3.org/csswg/cssom-view/ */
-	function matchMedia(
-		media_query_list : string/*DOMString*/
-	) : MediaQueryList;
+	function matchMedia(query : string/*DOMString*/) : MediaQueryList;
 	/** @see http://dev.w3.org/csswg/cssom-view/ */
 	__readonly__ var screen : Screen;
-	// viewport
 	/** @see http://dev.w3.org/csswg/cssom-view/ */
-	__readonly__ var innerWidth : int/*long*/;
+	__readonly__ var innerWidth : number/*long*/;
 	/** @see http://dev.w3.org/csswg/cssom-view/ */
-	__readonly__ var innerHeight : int/*long*/;
-	// viewport scrolling
+	__readonly__ var innerHeight : number/*long*/;
 	/** @see http://dev.w3.org/csswg/cssom-view/ */
-	__readonly__ var scrollX : int/*long*/;
+	__readonly__ var scrollX : number/*long*/;
 	/** @see http://dev.w3.org/csswg/cssom-view/ */
-	__readonly__ var pageXOffset : int/*long*/;
+	__readonly__ var pageXOffset : number/*long*/;
 	/** @see http://dev.w3.org/csswg/cssom-view/ */
-	__readonly__ var scrollY : int/*long*/;
+	__readonly__ var scrollY : number/*long*/;
 	/** @see http://dev.w3.org/csswg/cssom-view/ */
-	__readonly__ var pageYOffset : int/*long*/;
+	__readonly__ var pageYOffset : number/*long*/;
 	/** @see http://dev.w3.org/csswg/cssom-view/ */
-	function scroll(x : int/*long*/, y : int/*long*/) : void;
+	function scroll(x : number/*long*/, y : number/*long*/) : void;
 	/** @see http://dev.w3.org/csswg/cssom-view/ */
-	function scrollTo(x : int/*long*/, y : int/*long*/) : void;
+	function scrollTo(x : number/*long*/, y : number/*long*/) : void;
 	/** @see http://dev.w3.org/csswg/cssom-view/ */
-	function scrollBy(x : int/*long*/, y : int/*long*/) : void;
-	// client
+	function scrollBy(x : number/*long*/, y : number/*long*/) : void;
 	/** @see http://dev.w3.org/csswg/cssom-view/ */
-	__readonly__ var screenX : int/*long*/;
+	__readonly__ var screenX : number/*long*/;
 	/** @see http://dev.w3.org/csswg/cssom-view/ */
-	__readonly__ var screenY : int/*long*/;
+	__readonly__ var screenY : number/*long*/;
 	/** @see http://dev.w3.org/csswg/cssom-view/ */
-	__readonly__ var outerWidth : int/*long*/;
+	__readonly__ var outerWidth : number/*long*/;
 	/** @see http://dev.w3.org/csswg/cssom-view/ */
-	__readonly__ var outerHeight : int/*long*/;
+	__readonly__ var outerHeight : number/*long*/;
 
 	// the current browsing context
 	__readonly__ var window : Window/*WindowProxy*/;
@@ -2183,11 +2157,11 @@ native final __fake__ class Window extends EventTarget {
 	function blur() : void;
 	// other browsing contexts
 	__readonly__ var frames : Window/*WindowProxy*/;
-	__readonly__ var length : int/*unsigned long*/;
+	__readonly__ var length : number/*unsigned long*/;
 	__readonly__ var top : Window/*WindowProxy*/;
-	var opener : Window/*WindowProxy?*/;
+	var opener : Nullable.<Window>/*WindowProxy?*/;
 	__readonly__ var parent : Window/*WindowProxy*/;
-	__readonly__ var frameElement : Element;
+	__readonly__ var frameElement : Nullable.<Element>;
 	function open() : Window/*WindowProxy*/;
 	function open(url : string/*DOMString*/) : Window/*WindowProxy*/;
 	function open(
@@ -2206,11 +2180,11 @@ native final __fake__ class Window extends EventTarget {
 		replace : boolean
 	) : Window/*WindowProxy*/;
 	function __native_index_operator__(
-		index : int/*unsigned long*/
-	) : Window/*WindowProxy*/;
+		index : number/*unsigned long*/
+	) : Nullable.<Window>/*WindowProxy*/;
 	function __native_index_operator__(
 		name : string/*DOMString*/
-	) : Object/*object*/;
+	) : Nullable.<Object>/*object*/;
 	// the user agent
 	__readonly__ var navigator : Navigator;
 	__readonly__ var external : External;
@@ -2234,72 +2208,72 @@ native final __fake__ class Window extends EventTarget {
 		argument : variant/*any*/
 	) : variant/*any*/;
 	// event handler IDL attributes
-	var onabort : function(:Event):void/*Function?*/;
-	var onafterprint : function(:Event):void/*Function?*/;
-	var onbeforeprint : function(:Event):void/*Function?*/;
-	var onbeforeunload : function(:Event):void/*Function?*/;
-	var onblur : function(:Event):void/*Function?*/;
-	var oncanplay : function(:Event):void/*Function?*/;
-	var oncanplaythrough : function(:Event):void/*Function?*/;
-	var onchange : function(:Event):void/*Function?*/;
-	var onclick : function(:Event):void/*Function?*/;
-	var oncontextmenu : function(:Event):void/*Function?*/;
-	var oncuechange : function(:Event):void/*Function?*/;
-	var ondblclick : function(:Event):void/*Function?*/;
-	var ondrag : function(:Event):void/*Function?*/;
-	var ondragend : function(:Event):void/*Function?*/;
-	var ondragenter : function(:Event):void/*Function?*/;
-	var ondragleave : function(:Event):void/*Function?*/;
-	var ondragover : function(:Event):void/*Function?*/;
-	var ondragstart : function(:Event):void/*Function?*/;
-	var ondrop : function(:Event):void/*Function?*/;
-	var ondurationchange : function(:Event):void/*Function?*/;
-	var onemptied : function(:Event):void/*Function?*/;
-	var onended : function(:Event):void/*Function?*/;
-	var onerror : function(:Event):void/*Function?*/;
-	var onfocus : function(:Event):void/*Function?*/;
-	var onhashchange : function(:Event):void/*Function?*/;
-	var oninput : function(:Event):void/*Function?*/;
-	var oninvalid : function(:Event):void/*Function?*/;
-	var onkeydown : function(:Event):void/*Function?*/;
-	var onkeypress : function(:Event):void/*Function?*/;
-	var onkeyup : function(:Event):void/*Function?*/;
-	var onload : function(:Event):void/*Function?*/;
-	var onloadeddata : function(:Event):void/*Function?*/;
-	var onloadedmetadata : function(:Event):void/*Function?*/;
-	var onloadstart : function(:Event):void/*Function?*/;
-	var onmessage : function(:Event):void/*Function?*/;
-	var onmousedown : function(:Event):void/*Function?*/;
-	var onmousemove : function(:Event):void/*Function?*/;
-	var onmouseout : function(:Event):void/*Function?*/;
-	var onmouseover : function(:Event):void/*Function?*/;
-	var onmouseup : function(:Event):void/*Function?*/;
-	var onmousewheel : function(:Event):void/*Function?*/;
-	var onoffline : function(:Event):void/*Function?*/;
-	var ononline : function(:Event):void/*Function?*/;
-	var onpause : function(:Event):void/*Function?*/;
-	var onplay : function(:Event):void/*Function?*/;
-	var onplaying : function(:Event):void/*Function?*/;
-	var onpagehide : function(:Event):void/*Function?*/;
-	var onpageshow : function(:Event):void/*Function?*/;
-	var onpopstate : function(:Event):void/*Function?*/;
-	var onprogress : function(:Event):void/*Function?*/;
-	var onratechange : function(:Event):void/*Function?*/;
-	var onreset : function(:Event):void/*Function?*/;
-	var onresize : function(:Event):void/*Function?*/;
-	var onscroll : function(:Event):void/*Function?*/;
-	var onseeked : function(:Event):void/*Function?*/;
-	var onseeking : function(:Event):void/*Function?*/;
-	var onselect : function(:Event):void/*Function?*/;
-	var onshow : function(:Event):void/*Function?*/;
-	var onstalled : function(:Event):void/*Function?*/;
-	var onstorage : function(:Event):void/*Function?*/;
-	var onsubmit : function(:Event):void/*Function?*/;
-	var onsuspend : function(:Event):void/*Function?*/;
-	var ontimeupdate : function(:Event):void/*Function?*/;
-	var onunload : function(:Event):void/*Function?*/;
-	var onvolumechange : function(:Event):void/*Function?*/;
-	var onwaiting : function(:Event):void/*Function?*/;
+	var onabort : Nullable.<function(:Event):void>/*Function?*/;
+	var onafterprint : Nullable.<function(:Event):void>/*Function?*/;
+	var onbeforeprint : Nullable.<function(:Event):void>/*Function?*/;
+	var onbeforeunload : Nullable.<function(:Event):void>/*Function?*/;
+	var onblur : Nullable.<function(:Event):void>/*Function?*/;
+	var oncanplay : Nullable.<function(:Event):void>/*Function?*/;
+	var oncanplaythrough : Nullable.<function(:Event):void>/*Function?*/;
+	var onchange : Nullable.<function(:Event):void>/*Function?*/;
+	var onclick : Nullable.<function(:Event):void>/*Function?*/;
+	var oncontextmenu : Nullable.<function(:Event):void>/*Function?*/;
+	var oncuechange : Nullable.<function(:Event):void>/*Function?*/;
+	var ondblclick : Nullable.<function(:Event):void>/*Function?*/;
+	var ondrag : Nullable.<function(:Event):void>/*Function?*/;
+	var ondragend : Nullable.<function(:Event):void>/*Function?*/;
+	var ondragenter : Nullable.<function(:Event):void>/*Function?*/;
+	var ondragleave : Nullable.<function(:Event):void>/*Function?*/;
+	var ondragover : Nullable.<function(:Event):void>/*Function?*/;
+	var ondragstart : Nullable.<function(:Event):void>/*Function?*/;
+	var ondrop : Nullable.<function(:Event):void>/*Function?*/;
+	var ondurationchange : Nullable.<function(:Event):void>/*Function?*/;
+	var onemptied : Nullable.<function(:Event):void>/*Function?*/;
+	var onended : Nullable.<function(:Event):void>/*Function?*/;
+	var onerror : Nullable.<function(:Event):void>/*Function?*/;
+	var onfocus : Nullable.<function(:Event):void>/*Function?*/;
+	var onhashchange : Nullable.<function(:Event):void>/*Function?*/;
+	var oninput : Nullable.<function(:Event):void>/*Function?*/;
+	var oninvalid : Nullable.<function(:Event):void>/*Function?*/;
+	var onkeydown : Nullable.<function(:Event):void>/*Function?*/;
+	var onkeypress : Nullable.<function(:Event):void>/*Function?*/;
+	var onkeyup : Nullable.<function(:Event):void>/*Function?*/;
+	var onload : Nullable.<function(:Event):void>/*Function?*/;
+	var onloadeddata : Nullable.<function(:Event):void>/*Function?*/;
+	var onloadedmetadata : Nullable.<function(:Event):void>/*Function?*/;
+	var onloadstart : Nullable.<function(:Event):void>/*Function?*/;
+	var onmessage : Nullable.<function(:Event):void>/*Function?*/;
+	var onmousedown : Nullable.<function(:Event):void>/*Function?*/;
+	var onmousemove : Nullable.<function(:Event):void>/*Function?*/;
+	var onmouseout : Nullable.<function(:Event):void>/*Function?*/;
+	var onmouseover : Nullable.<function(:Event):void>/*Function?*/;
+	var onmouseup : Nullable.<function(:Event):void>/*Function?*/;
+	var onmousewheel : Nullable.<function(:Event):void>/*Function?*/;
+	var onoffline : Nullable.<function(:Event):void>/*Function?*/;
+	var ononline : Nullable.<function(:Event):void>/*Function?*/;
+	var onpause : Nullable.<function(:Event):void>/*Function?*/;
+	var onplay : Nullable.<function(:Event):void>/*Function?*/;
+	var onplaying : Nullable.<function(:Event):void>/*Function?*/;
+	var onpagehide : Nullable.<function(:Event):void>/*Function?*/;
+	var onpageshow : Nullable.<function(:Event):void>/*Function?*/;
+	var onpopstate : Nullable.<function(:Event):void>/*Function?*/;
+	var onprogress : Nullable.<function(:Event):void>/*Function?*/;
+	var onratechange : Nullable.<function(:Event):void>/*Function?*/;
+	var onreset : Nullable.<function(:Event):void>/*Function?*/;
+	var onresize : Nullable.<function(:Event):void>/*Function?*/;
+	var onscroll : Nullable.<function(:Event):void>/*Function?*/;
+	var onseeked : Nullable.<function(:Event):void>/*Function?*/;
+	var onseeking : Nullable.<function(:Event):void>/*Function?*/;
+	var onselect : Nullable.<function(:Event):void>/*Function?*/;
+	var onshow : Nullable.<function(:Event):void>/*Function?*/;
+	var onstalled : Nullable.<function(:Event):void>/*Function?*/;
+	var onstorage : Nullable.<function(:Event):void>/*Function?*/;
+	var onsubmit : Nullable.<function(:Event):void>/*Function?*/;
+	var onsuspend : Nullable.<function(:Event):void>/*Function?*/;
+	var ontimeupdate : Nullable.<function(:Event):void>/*Function?*/;
+	var onunload : Nullable.<function(:Event):void>/*Function?*/;
+	var onvolumechange : Nullable.<function(:Event):void>/*Function?*/;
+	var onwaiting : Nullable.<function(:Event):void>/*Function?*/;
 
 	// implements WindowBase64
 
@@ -2318,36 +2292,36 @@ native final __fake__ class Window extends EventTarget {
 
 	function setTimeout(
 		handler : function():void/*TimerHandler*/
-	) : int/*long*/;
+	) : number/*long*/;
 	function setTimeout(
 		handler : function():void/*TimerHandler*/,
-		timeout : int/*long*/
-	) : int/*long*/;
-	function clearTimeout(handle : int/*long*/) : void;
+		timeout : number/*long*/
+	) : number/*long*/;
+	function clearTimeout(handle : number/*long*/) : void;
 	function setInterval(
 		handler : function():void/*TimerHandler*/
-	) : int/*long*/;
+	) : number/*long*/;
 	function setInterval(
 		handler : function():void/*TimerHandler*/,
-		timeout : int/*long*/
-	) : int/*long*/;
-	function clearInterval(handle : int/*long*/) : void;
+		timeout : number/*long*/
+	) : number/*long*/;
+	function clearInterval(handle : number/*long*/) : void;
 
 	// implements WindowAnimationTiming
 
 	function requestAnimationFrame(
 		callback : function(time:number/*DOMTimeStamp*/):void/*FrameRequestCallback*/
-	) : int/*long*/;
-	function cancelAnimationFrame(handle : int/*long*/) : void;
+	) : number/*long*/;
+	function cancelAnimationFrame(handle : number/*long*/) : void;
 	// vender's extension
 	function webkitRequestAnimationFrame(
 		callback : function(time:number/*DOMTimeStamp*/):void/*FrameRequestCallback*/
-	) : int/*long*/;
-	function webkitCancelAnimationFrame(handle : int/*long*/) : void;
+	) : number/*long*/;
+	function webkitCancelAnimationFrame(handle : number/*long*/) : void;
 	function mozRequestAnimationFrame(
 		callback : function(time:number/*DOMTimeStamp*/):void/*FrameRequestCallback*/
-	) : int/*long*/;
-	function mozCancelAnimationFrame(handle : int/*long*/) : void;
+	) : number/*long*/;
+	function mozCancelAnimationFrame(handle : number/*long*/) : void;
 
 } // end of Window
 
@@ -2365,17 +2339,22 @@ native final class MediaQueryList {
 
 } // end of MediaQueryList
 
-// alias MediaQueryListListener = function(mql:MediaQueryList):void
+/** @see http://dev.w3.org/csswg/cssom-view/ */
+native final class MediaQueryListListener {
+
+	function handleChange(list : MediaQueryList) : void;
+
+} // end of MediaQueryListListener
 
 /** @see http://dev.w3.org/csswg/cssom-view/ */
 native final class Screen {
 
-	__readonly__ var availWidth : int/*unsigned long*/;
-	__readonly__ var availHeight : int/*unsigned long*/;
-	__readonly__ var width : int/*unsigned long*/;
-	__readonly__ var height : int/*unsigned long*/;
-	__readonly__ var colorDepth : int/*unsigned long*/;
-	__readonly__ var pixelDepth : int/*unsigned long*/;
+	__readonly__ var availWidth : number/*unsigned long*/;
+	__readonly__ var availHeight : number/*unsigned long*/;
+	__readonly__ var width : number/*unsigned long*/;
+	__readonly__ var height : number/*unsigned long*/;
+	__readonly__ var colorDepth : number/*unsigned long*/;
+	__readonly__ var pixelDepth : number/*unsigned long*/;
 
 } // end of Screen
 
@@ -2383,7 +2362,7 @@ native final class Screen {
 native final class CaretPosition {
 
 	__readonly__ var offsetNode : Node;
-	__readonly__ var offset : int/*unsigned long*/;
+	__readonly__ var offset : number/*unsigned long*/;
 
 } // end of CaretPosition
 
@@ -2393,13 +2372,13 @@ native class HTMLElement extends Element {
 	/** @see http://dev.w3.org/csswg/cssom-view/ */
 	__readonly__ var offsetParent : Element;
 	/** @see http://dev.w3.org/csswg/cssom-view/ */
-	__readonly__ var offsetTop : int/*long*/;
+	__readonly__ var offsetTop : number/*long*/;
 	/** @see http://dev.w3.org/csswg/cssom-view/ */
-	__readonly__ var offsetLeft : int/*long*/;
+	__readonly__ var offsetLeft : number/*long*/;
 	/** @see http://dev.w3.org/csswg/cssom-view/ */
-	__readonly__ var offsetWidth : int/*long*/;
+	__readonly__ var offsetWidth : number/*long*/;
 	/** @see http://dev.w3.org/csswg/cssom-view/ */
-	__readonly__ var offsetHeight : int/*long*/;
+	__readonly__ var offsetHeight : number/*long*/;
 
 	// metadata attributes
 	var title : string/*DOMString*/;
@@ -2412,7 +2391,7 @@ native class HTMLElement extends Element {
 	// user interaction
 	var hidden : boolean;
 	function click() : void;
-	var tabIndex : int/*long*/;
+	var tabIndex : number/*long*/;
 	function focus() : void;
 	function blur() : void;
 	var accessKey : string/*DOMString*/;
@@ -2421,7 +2400,7 @@ native class HTMLElement extends Element {
 	__readonly__ var dropzone : DOMSettableTokenList;
 	var contentEditable : string/*DOMString*/;
 	__readonly__ var isContentEditable : boolean;
-	var contextMenu : HTMLMenuElement;
+	var contextMenu : Nullable.<HTMLMenuElement>;
 	var spellcheck : boolean;
 	// command API
 	__readonly__ var commandType : Nullable.<string>/*DOMString?*/;
@@ -2433,71 +2412,67 @@ native class HTMLElement extends Element {
 	// styling
 	__readonly__ var style : CSSStyleDeclaration;
 	// event handler IDL attributes
-	var onabort : function(:Event):void/*Function?*/;
-	var onblur : function(:Event):void/*Function?*/;
-	var oncanplay : function(:Event):void/*Function?*/;
-	var oncanplaythrough : function(:Event):void/*Function?*/;
-	var onchange : function(:Event):void/*Function?*/;
-	var onclick : function(:Event):void/*Function?*/;
-	var oncontextmenu : function(:Event):void/*Function?*/;
-	var oncuechange : function(:Event):void/*Function?*/;
-	var ondblclick : function(:Event):void/*Function?*/;
-	var ondrag : function(:Event):void/*Function?*/;
-	var ondragend : function(:Event):void/*Function?*/;
-	var ondragenter : function(:Event):void/*Function?*/;
-	var ondragleave : function(:Event):void/*Function?*/;
-	var ondragover : function(:Event):void/*Function?*/;
-	var ondragstart : function(:Event):void/*Function?*/;
-	var ondrop : function(:Event):void/*Function?*/;
-	var ondurationchange : function(:Event):void/*Function?*/;
-	var onemptied : function(:Event):void/*Function?*/;
-	var onended : function(:Event):void/*Function?*/;
-	var onerror : function(:Event):void/*Function?*/;
-	var onfocus : function(:Event):void/*Function?*/;
-	var oninput : function(:Event):void/*Function?*/;
-	var oninvalid : function(:Event):void/*Function?*/;
-	var onkeydown : function(:Event):void/*Function?*/;
-	var onkeypress : function(:Event):void/*Function?*/;
-	var onkeyup : function(:Event):void/*Function?*/;
-	var onload : function(:Event):void/*Function?*/;
-	var onloadeddata : function(:Event):void/*Function?*/;
-	var onloadedmetadata : function(:Event):void/*Function?*/;
-	var onloadstart : function(:Event):void/*Function?*/;
-	var onmousedown : function(:Event):void/*Function?*/;
-	var onmousemove : function(:Event):void/*Function?*/;
-	var onmouseout : function(:Event):void/*Function?*/;
-	var onmouseover : function(:Event):void/*Function?*/;
-	var onmouseup : function(:Event):void/*Function?*/;
-	var onmousewheel : function(:Event):void/*Function?*/;
-	var onpause : function(:Event):void/*Function?*/;
-	var onplay : function(:Event):void/*Function?*/;
-	var onplaying : function(:Event):void/*Function?*/;
-	var onprogress : function(:Event):void/*Function?*/;
-	var onratechange : function(:Event):void/*Function?*/;
-	var onreset : function(:Event):void/*Function?*/;
-	var onscroll : function(:Event):void/*Function?*/;
-	var onseeked : function(:Event):void/*Function?*/;
-	var onseeking : function(:Event):void/*Function?*/;
-	var onselect : function(:Event):void/*Function?*/;
-	var onshow : function(:Event):void/*Function?*/;
-	var onstalled : function(:Event):void/*Function?*/;
-	var onsubmit : function(:Event):void/*Function?*/;
-	var onsuspend : function(:Event):void/*Function?*/;
-	var ontimeupdate : function(:Event):void/*Function?*/;
-	var onvolumechange : function(:Event):void/*Function?*/;
-	var onwaiting : function(:Event):void/*Function?*/;
+	var onabort : Nullable.<function(:Event):void>/*Function?*/;
+	var onblur : Nullable.<function(:Event):void>/*Function?*/;
+	var oncanplay : Nullable.<function(:Event):void>/*Function?*/;
+	var oncanplaythrough : Nullable.<function(:Event):void>/*Function?*/;
+	var onchange : Nullable.<function(:Event):void>/*Function?*/;
+	var onclick : Nullable.<function(:Event):void>/*Function?*/;
+	var oncontextmenu : Nullable.<function(:Event):void>/*Function?*/;
+	var oncuechange : Nullable.<function(:Event):void>/*Function?*/;
+	var ondblclick : Nullable.<function(:Event):void>/*Function?*/;
+	var ondrag : Nullable.<function(:Event):void>/*Function?*/;
+	var ondragend : Nullable.<function(:Event):void>/*Function?*/;
+	var ondragenter : Nullable.<function(:Event):void>/*Function?*/;
+	var ondragleave : Nullable.<function(:Event):void>/*Function?*/;
+	var ondragover : Nullable.<function(:Event):void>/*Function?*/;
+	var ondragstart : Nullable.<function(:Event):void>/*Function?*/;
+	var ondrop : Nullable.<function(:Event):void>/*Function?*/;
+	var ondurationchange : Nullable.<function(:Event):void>/*Function?*/;
+	var onemptied : Nullable.<function(:Event):void>/*Function?*/;
+	var onended : Nullable.<function(:Event):void>/*Function?*/;
+	var onerror : Nullable.<function(:Event):void>/*Function?*/;
+	var onfocus : Nullable.<function(:Event):void>/*Function?*/;
+	var oninput : Nullable.<function(:Event):void>/*Function?*/;
+	var oninvalid : Nullable.<function(:Event):void>/*Function?*/;
+	var onkeydown : Nullable.<function(:Event):void>/*Function?*/;
+	var onkeypress : Nullable.<function(:Event):void>/*Function?*/;
+	var onkeyup : Nullable.<function(:Event):void>/*Function?*/;
+	var onload : Nullable.<function(:Event):void>/*Function?*/;
+	var onloadeddata : Nullable.<function(:Event):void>/*Function?*/;
+	var onloadedmetadata : Nullable.<function(:Event):void>/*Function?*/;
+	var onloadstart : Nullable.<function(:Event):void>/*Function?*/;
+	var onmousedown : Nullable.<function(:Event):void>/*Function?*/;
+	var onmousemove : Nullable.<function(:Event):void>/*Function?*/;
+	var onmouseout : Nullable.<function(:Event):void>/*Function?*/;
+	var onmouseover : Nullable.<function(:Event):void>/*Function?*/;
+	var onmouseup : Nullable.<function(:Event):void>/*Function?*/;
+	var onmousewheel : Nullable.<function(:Event):void>/*Function?*/;
+	var onpause : Nullable.<function(:Event):void>/*Function?*/;
+	var onplay : Nullable.<function(:Event):void>/*Function?*/;
+	var onplaying : Nullable.<function(:Event):void>/*Function?*/;
+	var onprogress : Nullable.<function(:Event):void>/*Function?*/;
+	var onratechange : Nullable.<function(:Event):void>/*Function?*/;
+	var onreset : Nullable.<function(:Event):void>/*Function?*/;
+	var onscroll : Nullable.<function(:Event):void>/*Function?*/;
+	var onseeked : Nullable.<function(:Event):void>/*Function?*/;
+	var onseeking : Nullable.<function(:Event):void>/*Function?*/;
+	var onselect : Nullable.<function(:Event):void>/*Function?*/;
+	var onshow : Nullable.<function(:Event):void>/*Function?*/;
+	var onstalled : Nullable.<function(:Event):void>/*Function?*/;
+	var onsubmit : Nullable.<function(:Event):void>/*Function?*/;
+	var onsuspend : Nullable.<function(:Event):void>/*Function?*/;
+	var ontimeupdate : Nullable.<function(:Event):void>/*Function?*/;
+	var onvolumechange : Nullable.<function(:Event):void>/*Function?*/;
+	var onwaiting : Nullable.<function(:Event):void>/*Function?*/;
 
 } // end of HTMLElement
 
 /** @see http://dev.w3.org/csswg/cssom-view/ */
 native final class ClientRectList {
 
-	__readonly__ var length : int/*unsigned long*/;
-	function __native_index_operator__(
-		index : int/*unsigned long*/
-	) : ClientRect;
-	/* getter */
-	function item(index : int/*unsigned long*/) : ClientRect;
+	__readonly__ var length : number/*unsigned long*/;
+	function item(index : number/*unsigned long*/) : ClientRect;
 
 } // end of ClientRectList
 
@@ -2517,10 +2492,12 @@ native final class ClientRect {
 native final class HTMLAllCollection extends HTMLCollection {
 
 	// inherits length and item(unsigned long index)
-	function item(name : string/*DOMString*/) : Object/*object?*/;
-	// inherits function __native_index_operator__(name : string/*DOMString*/) : Object/*object?*/;
+	function item(
+		name : string/*DOMString*/
+	) : Nullable.<Object>/*object?*/;
+	// inherits function __native_index_operator__(name : string/*DOMString*/) : Nullable.<Object>/*object?*/;
 	/* legacycaller getter */
-	// inherits function namedItem(name : string/*DOMString*/) : Object/*object?*/;
+	// inherits function namedItem(name : string/*DOMString*/) : Nullable.<Object>/*object?*/;
 	// overrides inherited namedItem()
 	function tags(tagName : string/*DOMString*/) : HTMLAllCollection;
 
@@ -2530,9 +2507,9 @@ native final class HTMLAllCollection extends HTMLCollection {
 native final class HTMLFormControlsCollection extends HTMLCollection {
 
 	// inherits length and item()
-	// inherits function __native_index_operator__(name : string/*DOMString*/) : Object/*object?*/;
+	// inherits function __native_index_operator__(name : string/*DOMString*/) : Nullable.<Object>/*object?*/;
 	/* legacycaller getter */
-	// inherits function namedItem(name : string/*DOMString*/) : Object/*object?*/;
+	// inherits function namedItem(name : string/*DOMString*/) : Nullable.<Object>/*object?*/;
 	// overrides inherited namedItem()
 
 } // end of HTMLFormControlsCollection
@@ -2548,11 +2525,11 @@ native final class RadioNodeList extends NodeList {
 native final class HTMLOptionsCollection extends HTMLCollection {
 
 	// inherits item()
-	// inherits var length : int/*unsigned long*/;
+	// inherits var length : number/*unsigned long*/;
 	// overrides inherited length
-	// inherits function __native_index_operator__(name : string/*DOMString*/) : Object/*object?*/;
+	// inherits function __native_index_operator__(name : string/*DOMString*/) : Nullable.<Object>/*object?*/;
 	/* legacycaller getter */
-	// inherits function namedItem(name : string/*DOMString*/) : Object/*object?*/;
+	// inherits function namedItem(name : string/*DOMString*/) : Nullable.<Object>/*object?*/;
 	// overrides inherited namedItem()
 	function add(element : HTMLOptionElement) : void;
 	function add(
@@ -2561,7 +2538,7 @@ native final class HTMLOptionsCollection extends HTMLCollection {
 	) : void;
 	function add(
 		element : HTMLOptionElement,
-		before : int/*long*/
+		before : number/*long*/
 	) : void;
 	function add(element : HTMLOptGroupElement) : void;
 	function add(
@@ -2570,10 +2547,10 @@ native final class HTMLOptionsCollection extends HTMLCollection {
 	) : void;
 	function add(
 		element : HTMLOptGroupElement,
-		before : int/*long*/
+		before : number/*long*/
 	) : void;
-	function remove(index : int/*long*/) : void;
-	var selectedIndex : int/*long*/;
+	function remove(index : number/*long*/) : void;
+	var selectedIndex : number/*long*/;
 
 } // end of HTMLOptionsCollection
 
@@ -2594,7 +2571,7 @@ native __fake__ class Transferable {
 native final class HTMLDocument extends Document {
 
 	// resource metadata management
-	__readonly__ var location : Location;
+	__readonly__ var location : Nullable.<Location>;
 	// inherits __readonly__ var URL : string/*DOMString*/;
 	var domain : string/*DOMString*/;
 	__readonly__ var referrer : string/*DOMString*/;
@@ -2604,11 +2581,11 @@ native final class HTMLDocument extends Document {
 	// DOM tree accessors
 	function __native_index_operator__(
 		name : string/*DOMString*/
-	) : Object/*object*/;
+	) : Nullable.<Object>/*object*/;
 	var title : string/*DOMString*/;
 	var dir : string/*DOMString*/;
-	var body : HTMLElement;
-	__readonly__ var head : HTMLHeadElement;
+	var body : Nullable.<HTMLElement>;
+	__readonly__ var head : Nullable.<HTMLHeadElement>;
 	__readonly__ var images : HTMLCollection;
 	__readonly__ var embeds : HTMLCollection;
 	__readonly__ var plugins : HTMLCollection;
@@ -2642,8 +2619,8 @@ native final class HTMLDocument extends Document {
 	function write(...text : string/*DOMString...*/) : void;
 	function writeln(...text : string/*DOMString...*/) : void;
 	// user interaction
-	__readonly__ var defaultView : Window/*WindowProxy?*/;
-	__readonly__ var activeElement : Element;
+	__readonly__ var defaultView : Nullable.<Window>/*WindowProxy?*/;
+	__readonly__ var activeElement : Nullable.<Element>;
 	function hasFocus() : boolean;
 	var designMode : string/*DOMString*/;
 	function execCommand(commandId : string/*DOMString*/) : boolean;
@@ -2673,61 +2650,61 @@ native final class HTMLDocument extends Document {
 	) : string/*DOMString*/;
 	__readonly__ var commands : HTMLCollection;
 	// event handler IDL attributes
-	var onabort : function(:Event):void/*Function?*/;
-	var onblur : function(:Event):void/*Function?*/;
-	var oncanplay : function(:Event):void/*Function?*/;
-	var oncanplaythrough : function(:Event):void/*Function?*/;
-	var onchange : function(:Event):void/*Function?*/;
-	var onclick : function(:Event):void/*Function?*/;
-	var oncontextmenu : function(:Event):void/*Function?*/;
-	var oncuechange : function(:Event):void/*Function?*/;
-	var ondblclick : function(:Event):void/*Function?*/;
-	var ondrag : function(:Event):void/*Function?*/;
-	var ondragend : function(:Event):void/*Function?*/;
-	var ondragenter : function(:Event):void/*Function?*/;
-	var ondragleave : function(:Event):void/*Function?*/;
-	var ondragover : function(:Event):void/*Function?*/;
-	var ondragstart : function(:Event):void/*Function?*/;
-	var ondrop : function(:Event):void/*Function?*/;
-	var ondurationchange : function(:Event):void/*Function?*/;
-	var onemptied : function(:Event):void/*Function?*/;
-	var onended : function(:Event):void/*Function?*/;
-	var onerror : function(:Event):void/*Function?*/;
-	var onfocus : function(:Event):void/*Function?*/;
-	var oninput : function(:Event):void/*Function?*/;
-	var oninvalid : function(:Event):void/*Function?*/;
-	var onkeydown : function(:Event):void/*Function?*/;
-	var onkeypress : function(:Event):void/*Function?*/;
-	var onkeyup : function(:Event):void/*Function?*/;
-	var onload : function(:Event):void/*Function?*/;
-	var onloadeddata : function(:Event):void/*Function?*/;
-	var onloadedmetadata : function(:Event):void/*Function?*/;
-	var onloadstart : function(:Event):void/*Function?*/;
-	var onmousedown : function(:Event):void/*Function?*/;
-	var onmousemove : function(:Event):void/*Function?*/;
-	var onmouseout : function(:Event):void/*Function?*/;
-	var onmouseover : function(:Event):void/*Function?*/;
-	var onmouseup : function(:Event):void/*Function?*/;
-	var onmousewheel : function(:Event):void/*Function?*/;
-	var onpause : function(:Event):void/*Function?*/;
-	var onplay : function(:Event):void/*Function?*/;
-	var onplaying : function(:Event):void/*Function?*/;
-	var onprogress : function(:Event):void/*Function?*/;
-	var onratechange : function(:Event):void/*Function?*/;
-	var onreset : function(:Event):void/*Function?*/;
-	var onscroll : function(:Event):void/*Function?*/;
-	var onseeked : function(:Event):void/*Function?*/;
-	var onseeking : function(:Event):void/*Function?*/;
-	var onselect : function(:Event):void/*Function?*/;
-	var onshow : function(:Event):void/*Function?*/;
-	var onstalled : function(:Event):void/*Function?*/;
-	var onsubmit : function(:Event):void/*Function?*/;
-	var onsuspend : function(:Event):void/*Function?*/;
-	var ontimeupdate : function(:Event):void/*Function?*/;
-	var onvolumechange : function(:Event):void/*Function?*/;
-	var onwaiting : function(:Event):void/*Function?*/;
+	var onabort : Nullable.<function(:Event):void>/*Function?*/;
+	var onblur : Nullable.<function(:Event):void>/*Function?*/;
+	var oncanplay : Nullable.<function(:Event):void>/*Function?*/;
+	var oncanplaythrough : Nullable.<function(:Event):void>/*Function?*/;
+	var onchange : Nullable.<function(:Event):void>/*Function?*/;
+	var onclick : Nullable.<function(:Event):void>/*Function?*/;
+	var oncontextmenu : Nullable.<function(:Event):void>/*Function?*/;
+	var oncuechange : Nullable.<function(:Event):void>/*Function?*/;
+	var ondblclick : Nullable.<function(:Event):void>/*Function?*/;
+	var ondrag : Nullable.<function(:Event):void>/*Function?*/;
+	var ondragend : Nullable.<function(:Event):void>/*Function?*/;
+	var ondragenter : Nullable.<function(:Event):void>/*Function?*/;
+	var ondragleave : Nullable.<function(:Event):void>/*Function?*/;
+	var ondragover : Nullable.<function(:Event):void>/*Function?*/;
+	var ondragstart : Nullable.<function(:Event):void>/*Function?*/;
+	var ondrop : Nullable.<function(:Event):void>/*Function?*/;
+	var ondurationchange : Nullable.<function(:Event):void>/*Function?*/;
+	var onemptied : Nullable.<function(:Event):void>/*Function?*/;
+	var onended : Nullable.<function(:Event):void>/*Function?*/;
+	var onerror : Nullable.<function(:Event):void>/*Function?*/;
+	var onfocus : Nullable.<function(:Event):void>/*Function?*/;
+	var oninput : Nullable.<function(:Event):void>/*Function?*/;
+	var oninvalid : Nullable.<function(:Event):void>/*Function?*/;
+	var onkeydown : Nullable.<function(:Event):void>/*Function?*/;
+	var onkeypress : Nullable.<function(:Event):void>/*Function?*/;
+	var onkeyup : Nullable.<function(:Event):void>/*Function?*/;
+	var onload : Nullable.<function(:Event):void>/*Function?*/;
+	var onloadeddata : Nullable.<function(:Event):void>/*Function?*/;
+	var onloadedmetadata : Nullable.<function(:Event):void>/*Function?*/;
+	var onloadstart : Nullable.<function(:Event):void>/*Function?*/;
+	var onmousedown : Nullable.<function(:Event):void>/*Function?*/;
+	var onmousemove : Nullable.<function(:Event):void>/*Function?*/;
+	var onmouseout : Nullable.<function(:Event):void>/*Function?*/;
+	var onmouseover : Nullable.<function(:Event):void>/*Function?*/;
+	var onmouseup : Nullable.<function(:Event):void>/*Function?*/;
+	var onmousewheel : Nullable.<function(:Event):void>/*Function?*/;
+	var onpause : Nullable.<function(:Event):void>/*Function?*/;
+	var onplay : Nullable.<function(:Event):void>/*Function?*/;
+	var onplaying : Nullable.<function(:Event):void>/*Function?*/;
+	var onprogress : Nullable.<function(:Event):void>/*Function?*/;
+	var onratechange : Nullable.<function(:Event):void>/*Function?*/;
+	var onreset : Nullable.<function(:Event):void>/*Function?*/;
+	var onscroll : Nullable.<function(:Event):void>/*Function?*/;
+	var onseeked : Nullable.<function(:Event):void>/*Function?*/;
+	var onseeking : Nullable.<function(:Event):void>/*Function?*/;
+	var onselect : Nullable.<function(:Event):void>/*Function?*/;
+	var onshow : Nullable.<function(:Event):void>/*Function?*/;
+	var onstalled : Nullable.<function(:Event):void>/*Function?*/;
+	var onsubmit : Nullable.<function(:Event):void>/*Function?*/;
+	var onsuspend : Nullable.<function(:Event):void>/*Function?*/;
+	var ontimeupdate : Nullable.<function(:Event):void>/*Function?*/;
+	var onvolumechange : Nullable.<function(:Event):void>/*Function?*/;
+	var onwaiting : Nullable.<function(:Event):void>/*Function?*/;
 	// special event handler IDL attributes that only apply to Document objects
-	var onreadystatechange : function(:Event):void/*Function?*/;
+	var onreadystatechange : Nullable.<function(:Event):void>/*Function?*/;
 
 	var fgColor : string/*DOMString*/;
 	var linkColor : string/*DOMString*/;
@@ -2838,24 +2815,24 @@ native final class HTMLScriptElement extends HTMLElement {
 /** @see http://www.w3.org/TR/html5/single-page.html */
 native final class HTMLBodyElement extends HTMLElement {
 
-	var onafterprint : function(:Event):void/*Function?*/;
-	var onbeforeprint : function(:Event):void/*Function?*/;
-	var onbeforeunload : function(:Event):void/*Function?*/;
-	// inherits var onblur : function(:Event):void/*Function?*/;
-	// inherits var onerror : function(:Event):void/*Function?*/;
-	// inherits var onfocus : function(:Event):void/*Function?*/;
-	var onhashchange : function(:Event):void/*Function?*/;
-	// inherits var onload : function(:Event):void/*Function?*/;
-	var onmessage : function(:Event):void/*Function?*/;
-	var onoffline : function(:Event):void/*Function?*/;
-	var ononline : function(:Event):void/*Function?*/;
-	var onpopstate : function(:Event):void/*Function?*/;
-	var onpagehide : function(:Event):void/*Function?*/;
-	var onpageshow : function(:Event):void/*Function?*/;
-	var onresize : function(:Event):void/*Function?*/;
-	// inherits var onscroll : function(:Event):void/*Function?*/;
-	var onstorage : function(:Event):void/*Function?*/;
-	var onunload : function(:Event):void/*Function?*/;
+	var onafterprint : Nullable.<function(:Event):void>/*Function?*/;
+	var onbeforeprint : Nullable.<function(:Event):void>/*Function?*/;
+	var onbeforeunload : Nullable.<function(:Event):void>/*Function?*/;
+	// inherits var onblur : Nullable.<function(:Event):void>/*Function?*/;
+	// inherits var onerror : Nullable.<function(:Event):void>/*Function?*/;
+	// inherits var onfocus : Nullable.<function(:Event):void>/*Function?*/;
+	var onhashchange : Nullable.<function(:Event):void>/*Function?*/;
+	// inherits var onload : Nullable.<function(:Event):void>/*Function?*/;
+	var onmessage : Nullable.<function(:Event):void>/*Function?*/;
+	var onoffline : Nullable.<function(:Event):void>/*Function?*/;
+	var ononline : Nullable.<function(:Event):void>/*Function?*/;
+	var onpopstate : Nullable.<function(:Event):void>/*Function?*/;
+	var onpagehide : Nullable.<function(:Event):void>/*Function?*/;
+	var onpageshow : Nullable.<function(:Event):void>/*Function?*/;
+	var onresize : Nullable.<function(:Event):void>/*Function?*/;
+	// inherits var onscroll : Nullable.<function(:Event):void>/*Function?*/;
+	var onstorage : Nullable.<function(:Event):void>/*Function?*/;
+	var onunload : Nullable.<function(:Event):void>/*Function?*/;
 
 	var text : string/*DOMString*/;
 	var link : string/*DOMString*/;
@@ -2894,7 +2871,7 @@ native final class HTMLHRElement extends HTMLElement {
 /** @see http://www.w3.org/TR/html5/single-page.html */
 native final class HTMLPreElement extends HTMLElement {
 
-	var width : int/*long*/;
+	var width : number/*long*/;
 
 } // end of HTMLPreElement
 
@@ -2909,7 +2886,7 @@ native final class HTMLQuoteElement extends HTMLElement {
 native final class HTMLOListElement extends HTMLElement {
 
 	var reversed : boolean;
-	var start : int/*long*/;
+	var start : number/*long*/;
 	var type : string/*DOMString*/;
 
 	var compact : boolean;
@@ -2927,7 +2904,7 @@ native final class HTMLUListElement extends HTMLElement {
 /** @see http://www.w3.org/TR/html5/single-page.html */
 native final class HTMLLIElement extends HTMLElement {
 
-	var value : int/*long*/;
+	var value : number/*long*/;
 
 	var type : string/*DOMString*/;
 
@@ -3009,16 +2986,16 @@ native final class HTMLImageElement extends HTMLElement {
 	var crossOrigin : string/*DOMString*/;
 	var useMap : string/*DOMString*/;
 	var isMap : boolean;
-	var width : int/*unsigned long*/;
-	var height : int/*unsigned long*/;
-	__readonly__ var naturalWidth : int/*unsigned long*/;
-	__readonly__ var naturalHeight : int/*unsigned long*/;
+	var width : number/*unsigned long*/;
+	var height : number/*unsigned long*/;
+	__readonly__ var naturalWidth : number/*unsigned long*/;
+	__readonly__ var naturalHeight : number/*unsigned long*/;
 	__readonly__ var complete : boolean;
 
 	var name : string/*DOMString*/;
 	var align : string/*DOMString*/;
-	var hspace : int/*unsigned long*/;
-	var vspace : int/*unsigned long*/;
+	var hspace : number/*unsigned long*/;
+	var vspace : number/*unsigned long*/;
 	var longDesc : string/*DOMString*/;
 	var border : string/*DOMString*/;
 
@@ -3034,8 +3011,8 @@ native final class HTMLIFrameElement extends HTMLElement {
 	var seamless : boolean;
 	var width : string/*DOMString*/;
 	var height : string/*DOMString*/;
-	__readonly__ var contentDocument : HTMLDocument/*Document?*/;
-	__readonly__ var contentWindow : Window/*WindowProxy?*/;
+	__readonly__ var contentDocument : Nullable.<HTMLDocument>/*Document?*/;
+	__readonly__ var contentWindow : Nullable.<Window>/*WindowProxy?*/;
 
 	var align : string/*DOMString*/;
 	var scrolling : string/*DOMString*/;
@@ -3067,11 +3044,11 @@ native final class HTMLObjectElement extends HTMLElement {
 	var typeMustMatch : boolean;
 	var name : string/*DOMString*/;
 	var useMap : string/*DOMString*/;
-	__readonly__ var form : HTMLFormElement;
+	__readonly__ var form : Nullable.<HTMLFormElement>;
 	var width : string/*DOMString*/;
 	var height : string/*DOMString*/;
-	__readonly__ var contentDocument : HTMLDocument/*Document?*/;
-	__readonly__ var contentWindow : Window/*WindowProxy?*/;
+	__readonly__ var contentDocument : Nullable.<HTMLDocument>/*Document?*/;
+	__readonly__ var contentWindow : Nullable.<Window>/*WindowProxy?*/;
 	__readonly__ var willValidate : boolean;
 	__readonly__ var validity : ValidityState;
 	__readonly__ var validationMessage : string/*DOMString*/;
@@ -3082,9 +3059,9 @@ native final class HTMLObjectElement extends HTMLElement {
 	var archive : string/*DOMString*/;
 	var code : string/*DOMString*/;
 	var declare : boolean;
-	var hspace : int/*unsigned long*/;
+	var hspace : number/*unsigned long*/;
 	var standby : string/*DOMString*/;
-	var vspace : int/*unsigned long*/;
+	var vspace : number/*unsigned long*/;
 	var codeBase : string/*DOMString*/;
 	var codeType : string/*DOMString*/;
 	var border : string/*DOMString*/;
@@ -3105,10 +3082,10 @@ native final class HTMLParamElement extends HTMLElement {
 /** @see http://www.w3.org/TR/html5/single-page.html */
 native final class HTMLVideoElement extends HTMLMediaElement {
 
-	var width : int/*unsigned long*/;
-	var height : int/*unsigned long*/;
-	__readonly__ var videoWidth : int/*unsigned long*/;
-	__readonly__ var videoHeight : int/*unsigned long*/;
+	var width : number/*unsigned long*/;
+	var height : number/*unsigned long*/;
+	__readonly__ var videoWidth : number/*unsigned long*/;
+	__readonly__ var videoHeight : number/*unsigned long*/;
 	var poster : string/*DOMString*/;
 
 } // end of HTMLVideoElement
@@ -3134,15 +3111,15 @@ native final class HTMLTrackElement extends HTMLElement {
 	var srclang : string/*DOMString*/;
 	var label : string/*DOMString*/;
 	var default : boolean;
-	static __readonly__ var NONE : int/*unsigned short*/;
-	       __readonly__ var NONE : int/*unsigned short*/;
-	static __readonly__ var LOADING : int/*unsigned short*/;
-	       __readonly__ var LOADING : int/*unsigned short*/;
-	static __readonly__ var LOADED : int/*unsigned short*/;
-	       __readonly__ var LOADED : int/*unsigned short*/;
-	static __readonly__ var ERROR : int/*unsigned short*/;
-	       __readonly__ var ERROR : int/*unsigned short*/;
-	__readonly__ var readyState : int/*unsigned short*/;
+	static __readonly__ var NONE : number/*unsigned short*/;
+	       __readonly__ var NONE : number/*unsigned short*/;
+	static __readonly__ var LOADING : number/*unsigned short*/;
+	       __readonly__ var LOADING : number/*unsigned short*/;
+	static __readonly__ var LOADED : number/*unsigned short*/;
+	       __readonly__ var LOADED : number/*unsigned short*/;
+	static __readonly__ var ERROR : number/*unsigned short*/;
+	       __readonly__ var ERROR : number/*unsigned short*/;
+	__readonly__ var readyState : number/*unsigned short*/;
 	__readonly__ var track : TextTrack;
 
 } // end of HTMLTrackElement
@@ -3151,20 +3128,20 @@ native final class HTMLTrackElement extends HTMLElement {
 native class HTMLMediaElement extends HTMLElement {
 
 	// error state
-	__readonly__ var error : MediaError;
+	__readonly__ var error : Nullable.<MediaError>;
 	// network state
 	var src : string/*DOMString*/;
 	__readonly__ var currentSrc : string/*DOMString*/;
 	var crossOrigin : string/*DOMString*/;
-	static __readonly__ var NETWORK_EMPTY : int/*unsigned short*/;
-	       __readonly__ var NETWORK_EMPTY : int/*unsigned short*/;
-	static __readonly__ var NETWORK_IDLE : int/*unsigned short*/;
-	       __readonly__ var NETWORK_IDLE : int/*unsigned short*/;
-	static __readonly__ var NETWORK_LOADING : int/*unsigned short*/;
-	       __readonly__ var NETWORK_LOADING : int/*unsigned short*/;
-	static __readonly__ var NETWORK_NO_SOURCE : int/*unsigned short*/;
-	       __readonly__ var NETWORK_NO_SOURCE : int/*unsigned short*/;
-	__readonly__ var networkState : int/*unsigned short*/;
+	static __readonly__ var NETWORK_EMPTY : number/*unsigned short*/;
+	       __readonly__ var NETWORK_EMPTY : number/*unsigned short*/;
+	static __readonly__ var NETWORK_IDLE : number/*unsigned short*/;
+	       __readonly__ var NETWORK_IDLE : number/*unsigned short*/;
+	static __readonly__ var NETWORK_LOADING : number/*unsigned short*/;
+	       __readonly__ var NETWORK_LOADING : number/*unsigned short*/;
+	static __readonly__ var NETWORK_NO_SOURCE : number/*unsigned short*/;
+	       __readonly__ var NETWORK_NO_SOURCE : number/*unsigned short*/;
+	__readonly__ var networkState : number/*unsigned short*/;
 	var preload : string/*DOMString*/;
 	__readonly__ var buffered : TimeRanges;
 	function load() : void;
@@ -3172,17 +3149,17 @@ native class HTMLMediaElement extends HTMLElement {
 		type : string/*DOMString*/
 	) : string/*DOMString*/;
 	// ready state
-	static __readonly__ var HAVE_NOTHING : int/*unsigned short*/;
-	       __readonly__ var HAVE_NOTHING : int/*unsigned short*/;
-	static __readonly__ var HAVE_METADATA : int/*unsigned short*/;
-	       __readonly__ var HAVE_METADATA : int/*unsigned short*/;
-	static __readonly__ var HAVE_CURRENT_DATA : int/*unsigned short*/;
-	       __readonly__ var HAVE_CURRENT_DATA : int/*unsigned short*/;
-	static __readonly__ var HAVE_FUTURE_DATA : int/*unsigned short*/;
-	       __readonly__ var HAVE_FUTURE_DATA : int/*unsigned short*/;
-	static __readonly__ var HAVE_ENOUGH_DATA : int/*unsigned short*/;
-	       __readonly__ var HAVE_ENOUGH_DATA : int/*unsigned short*/;
-	__readonly__ var readyState : int/*unsigned short*/;
+	static __readonly__ var HAVE_NOTHING : number/*unsigned short*/;
+	       __readonly__ var HAVE_NOTHING : number/*unsigned short*/;
+	static __readonly__ var HAVE_METADATA : number/*unsigned short*/;
+	       __readonly__ var HAVE_METADATA : number/*unsigned short*/;
+	static __readonly__ var HAVE_CURRENT_DATA : number/*unsigned short*/;
+	       __readonly__ var HAVE_CURRENT_DATA : number/*unsigned short*/;
+	static __readonly__ var HAVE_FUTURE_DATA : number/*unsigned short*/;
+	       __readonly__ var HAVE_FUTURE_DATA : number/*unsigned short*/;
+	static __readonly__ var HAVE_ENOUGH_DATA : number/*unsigned short*/;
+	       __readonly__ var HAVE_ENOUGH_DATA : number/*unsigned short*/;
+	__readonly__ var readyState : number/*unsigned short*/;
 	__readonly__ var seeking : boolean;
 	// playback state
 	var currentTime : number/*double*/;
@@ -3201,7 +3178,7 @@ native class HTMLMediaElement extends HTMLElement {
 	function pause() : void;
 	// media controller
 	var mediaGroup : string/*DOMString*/;
-	var controller : MediaController;
+	var controller : Nullable.<MediaController>;
 	// controls
 	var controls : boolean;
 	var volume : number/*double*/;
@@ -3227,28 +3204,30 @@ native class HTMLMediaElement extends HTMLElement {
 /** @see http://www.w3.org/TR/html5/single-page.html */
 native final class MediaError {
 
-	static __readonly__ var MEDIA_ERR_ABORTED : int/*unsigned short*/;
-	       __readonly__ var MEDIA_ERR_ABORTED : int/*unsigned short*/;
-	static __readonly__ var MEDIA_ERR_NETWORK : int/*unsigned short*/;
-	       __readonly__ var MEDIA_ERR_NETWORK : int/*unsigned short*/;
-	static __readonly__ var MEDIA_ERR_DECODE : int/*unsigned short*/;
-	       __readonly__ var MEDIA_ERR_DECODE : int/*unsigned short*/;
-	static __readonly__ var MEDIA_ERR_SRC_NOT_SUPPORTED : int/*unsigned short*/;
-	       __readonly__ var MEDIA_ERR_SRC_NOT_SUPPORTED : int/*unsigned short*/;
-	__readonly__ var code : int/*unsigned short*/;
+	static __readonly__ var MEDIA_ERR_ABORTED : number/*unsigned short*/;
+	       __readonly__ var MEDIA_ERR_ABORTED : number/*unsigned short*/;
+	static __readonly__ var MEDIA_ERR_NETWORK : number/*unsigned short*/;
+	       __readonly__ var MEDIA_ERR_NETWORK : number/*unsigned short*/;
+	static __readonly__ var MEDIA_ERR_DECODE : number/*unsigned short*/;
+	       __readonly__ var MEDIA_ERR_DECODE : number/*unsigned short*/;
+	static __readonly__ var MEDIA_ERR_SRC_NOT_SUPPORTED : number/*unsigned short*/;
+	       __readonly__ var MEDIA_ERR_SRC_NOT_SUPPORTED : number/*unsigned short*/;
+	__readonly__ var code : number/*unsigned short*/;
 
 } // end of MediaError
 
 /** @see http://www.w3.org/TR/html5/single-page.html */
 native final class AudioTrackList extends EventTarget {
 
-	__readonly__ var length : int/*unsigned long*/;
+	__readonly__ var length : number/*unsigned long*/;
 	function __native_index_operator__(
-		index : int/*unsigned long*/
-	) : AudioTrack;
-	function getTrackById(id : string/*DOMString*/) : AudioTrack;
-	var onchange : function(:Event):void/*Function?*/;
-	var onaddtrack : function(:Event):void/*Function?*/;
+		index : number/*unsigned long*/
+	) : Nullable.<AudioTrack>;
+	function getTrackById(
+		id : string/*DOMString*/
+	) : Nullable.<AudioTrack>;
+	var onchange : Nullable.<function(:Event):void>/*Function?*/;
+	var onaddtrack : Nullable.<function(:Event):void>/*Function?*/;
 
 } // end of AudioTrackList
 
@@ -3266,14 +3245,16 @@ native final class AudioTrack {
 /** @see http://www.w3.org/TR/html5/single-page.html */
 native final class VideoTrackList extends EventTarget {
 
-	__readonly__ var length : int/*unsigned long*/;
+	__readonly__ var length : number/*unsigned long*/;
 	function __native_index_operator__(
-		index : int/*unsigned long*/
-	) : VideoTrack;
-	function getTrackById(id : string/*DOMString*/) : VideoTrack;
-	__readonly__ var selectedIndex : int/*long*/;
-	var onchange : function(:Event):void/*Function?*/;
-	var onaddtrack : function(:Event):void/*Function?*/;
+		index : number/*unsigned long*/
+	) : Nullable.<VideoTrack>;
+	function getTrackById(
+		id : string/*DOMString*/
+	) : Nullable.<VideoTrack>;
+	__readonly__ var selectedIndex : number/*long*/;
+	var onchange : Nullable.<function(:Event):void>/*Function?*/;
+	var onaddtrack : Nullable.<function(:Event):void>/*Function?*/;
 
 } // end of VideoTrackList
 
@@ -3305,31 +3286,31 @@ native final class MediaController {
 	var playbackRate : number/*double*/;
 	var volume : number/*double*/;
 	var muted : boolean;
-	var onemptied : function(:Event):void/*Function?*/;
-	var onloadedmetadata : function(:Event):void/*Function?*/;
-	var onloadeddata : function(:Event):void/*Function?*/;
-	var oncanplay : function(:Event):void/*Function?*/;
-	var oncanplaythrough : function(:Event):void/*Function?*/;
-	var onplaying : function(:Event):void/*Function?*/;
-	var onended : function(:Event):void/*Function?*/;
-	var onwaiting : function(:Event):void/*Function?*/;
-	var ondurationchange : function(:Event):void/*Function?*/;
-	var ontimeupdate : function(:Event):void/*Function?*/;
-	var onplay : function(:Event):void/*Function?*/;
-	var onpause : function(:Event):void/*Function?*/;
-	var onratechange : function(:Event):void/*Function?*/;
-	var onvolumechange : function(:Event):void/*Function?*/;
+	var onemptied : Nullable.<function(:Event):void>/*Function?*/;
+	var onloadedmetadata : Nullable.<function(:Event):void>/*Function?*/;
+	var onloadeddata : Nullable.<function(:Event):void>/*Function?*/;
+	var oncanplay : Nullable.<function(:Event):void>/*Function?*/;
+	var oncanplaythrough : Nullable.<function(:Event):void>/*Function?*/;
+	var onplaying : Nullable.<function(:Event):void>/*Function?*/;
+	var onended : Nullable.<function(:Event):void>/*Function?*/;
+	var onwaiting : Nullable.<function(:Event):void>/*Function?*/;
+	var ondurationchange : Nullable.<function(:Event):void>/*Function?*/;
+	var ontimeupdate : Nullable.<function(:Event):void>/*Function?*/;
+	var onplay : Nullable.<function(:Event):void>/*Function?*/;
+	var onpause : Nullable.<function(:Event):void>/*Function?*/;
+	var onratechange : Nullable.<function(:Event):void>/*Function?*/;
+	var onvolumechange : Nullable.<function(:Event):void>/*Function?*/;
 
 } // end of MediaController
 
 /** @see http://www.w3.org/TR/html5/single-page.html */
 native final class TextTrackList extends EventTarget {
 
-	__readonly__ var length : int/*unsigned long*/;
+	__readonly__ var length : number/*unsigned long*/;
 	function __native_index_operator__(
-		index : int/*unsigned long*/
-	) : TextTrack;
-	var onaddtrack : function(:Event):void/*Function?*/;
+		index : number/*unsigned long*/
+	) : Nullable.<TextTrack>;
+	var onaddtrack : Nullable.<function(:Event):void>/*Function?*/;
 
 } // end of TextTrackList
 
@@ -3339,29 +3320,31 @@ native final class TextTrack extends EventTarget {
 	__readonly__ var kind : string/*DOMString*/;
 	__readonly__ var label : string/*DOMString*/;
 	__readonly__ var language : string/*DOMString*/;
-	static __readonly__ var DISABLED : int/*unsigned short*/;
-	       __readonly__ var DISABLED : int/*unsigned short*/;
-	static __readonly__ var HIDDEN : int/*unsigned short*/;
-	       __readonly__ var HIDDEN : int/*unsigned short*/;
-	static __readonly__ var SHOWING : int/*unsigned short*/;
-	       __readonly__ var SHOWING : int/*unsigned short*/;
-	var mode : int/*unsigned short*/;
-	__readonly__ var cues : TextTrackCueList;
-	__readonly__ var activeCues : TextTrackCueList;
+	static __readonly__ var DISABLED : number/*unsigned short*/;
+	       __readonly__ var DISABLED : number/*unsigned short*/;
+	static __readonly__ var HIDDEN : number/*unsigned short*/;
+	       __readonly__ var HIDDEN : number/*unsigned short*/;
+	static __readonly__ var SHOWING : number/*unsigned short*/;
+	       __readonly__ var SHOWING : number/*unsigned short*/;
+	var mode : number/*unsigned short*/;
+	__readonly__ var cues : Nullable.<TextTrackCueList>;
+	__readonly__ var activeCues : Nullable.<TextTrackCueList>;
 	function addCue(cue : TextTrackCue) : void;
 	function removeCue(cue : TextTrackCue) : void;
-	var oncuechange : function(:Event):void/*Function?*/;
+	var oncuechange : Nullable.<function(:Event):void>/*Function?*/;
 
 } // end of TextTrack
 
 /** @see http://www.w3.org/TR/html5/single-page.html */
 native final class TextTrackCueList {
 
-	__readonly__ var length : int/*unsigned long*/;
+	__readonly__ var length : number/*unsigned long*/;
 	function __native_index_operator__(
-		index : int/*unsigned long*/
-	) : TextTrackCue;
-	function getCueById(id : string/*DOMString*/) : TextTrackCue;
+		index : number/*unsigned long*/
+	) : Nullable.<TextTrackCue>;
+	function getCueById(
+		id : string/*DOMString*/
+	) : Nullable.<TextTrackCue>;
 
 } // end of TextTrackCueList
 
@@ -3390,30 +3373,30 @@ native final class TextTrackCue extends EventTarget {
 		pauseOnExit : boolean
 	);
 
-	__readonly__ var track : TextTrack;
+	__readonly__ var track : Nullable.<TextTrack>;
 	var id : string/*DOMString*/;
 	var startTime : number/*double*/;
 	var endTime : number/*double*/;
 	var pauseOnExit : boolean;
 	var vertical : string/*DOMString*/;
 	var snapToLines : boolean;
-	var line : int/*long*/;
-	var position : int/*long*/;
-	var size : int/*long*/;
+	var line : number/*long*/;
+	var position : number/*long*/;
+	var size : number/*long*/;
 	var align : string/*DOMString*/;
 	var text : string/*DOMString*/;
 	function getCueAsHTML() : DocumentFragment;
-	var onenter : function(:Event):void/*Function?*/;
-	var onexit : function(:Event):void/*Function?*/;
+	var onenter : Nullable.<function(:Event):void>/*Function?*/;
+	var onexit : Nullable.<function(:Event):void>/*Function?*/;
 
 } // end of TextTrackCue
 
 /** @see http://www.w3.org/TR/html5/single-page.html */
 native final class TimeRanges {
 
-	__readonly__ var length : int/*unsigned long*/;
-	function start(index : int/*unsigned long*/) : number/*double*/;
-	function end(index : int/*unsigned long*/) : number/*double*/;
+	__readonly__ var length : number/*unsigned long*/;
+	function start(index : number/*unsigned long*/) : number/*double*/;
+	function end(index : number/*unsigned long*/) : number/*double*/;
 
 } // end of TimeRanges
 
@@ -3426,35 +3409,35 @@ native final class TrackEvent extends Event {
 		eventInitDict : TrackEventInit
 	);
 
-	__readonly__ var track : Object/*object?*/;
+	__readonly__ var track : Nullable.<Object>/*object?*/;
 
 } // end of TrackEvent
 
 /** @see http://www.w3.org/TR/html5/single-page.html */
 native final class TrackEventInit extends EventInit {
 
-	var track : Object/*object?*/;
+	var track : Nullable.<Object>/*object?*/;
 
 } // end of TrackEventInit
 
 /** @see http://www.w3.org/TR/html5/single-page.html */
 native final class HTMLCanvasElement extends HTMLElement {
 
-	var width : int/*unsigned long*/;
-	var height : int/*unsigned long*/;
+	var width : number/*unsigned long*/;
+	var height : number/*unsigned long*/;
 	function toDataURL(
 		type : string/*DOMString*/,
 		...args : variant/*any...*/
 	) : string/*DOMString*/;
 	function toBlob(
-		_callback : function(:File):void/*FileCallback?*/,
+		_callback : Nullable.<function(:File):void>/*FileCallback?*/,
 		type : string/*DOMString*/,
 		...args : variant/*any...*/
 	) : void;
 	function getContext(
 		contextId : string/*DOMString*/,
 		...args : variant/*any...*/
-	) : Object/*object?*/;
+	) : Nullable.<Object>/*object?*/;
 
 } // end of HTMLCanvasElement
 
@@ -3496,21 +3479,21 @@ native final class HTMLAreaElement extends HTMLElement {
 /** @see http://www.w3.org/TR/html5/single-page.html */
 native final class HTMLTableElement extends HTMLElement {
 
-	var caption : HTMLTableCaptionElement;
+	var caption : Nullable.<HTMLTableCaptionElement>;
 	function createCaption() : HTMLElement;
 	function deleteCaption() : void;
-	var tHead : HTMLTableSectionElement;
+	var tHead : Nullable.<HTMLTableSectionElement>;
 	function createTHead() : HTMLElement;
 	function deleteTHead() : void;
-	var tFoot : HTMLTableSectionElement;
+	var tFoot : Nullable.<HTMLTableSectionElement>;
 	function createTFoot() : HTMLElement;
 	function deleteTFoot() : void;
 	__readonly__ var tBodies : HTMLCollection;
 	function createTBody() : HTMLElement;
 	__readonly__ var rows : HTMLCollection;
 	function insertRow() : HTMLElement;
-	function insertRow(index : int/*long*/) : HTMLElement;
-	function deleteRow(index : int/*long*/) : void;
+	function insertRow(index : number/*long*/) : HTMLElement;
+	function deleteRow(index : number/*long*/) : void;
 	var border : string/*DOMString*/;
 
 	var align : string/*DOMString*/;
@@ -3534,7 +3517,7 @@ native final class HTMLTableCaptionElement extends HTMLElement {
 /** @see http://www.w3.org/TR/html5/single-page.html */
 native final class HTMLTableColElement extends HTMLElement {
 
-	var span : int/*unsigned long*/;
+	var span : number/*unsigned long*/;
 
 	var align : string/*DOMString*/;
 	var ch : string/*DOMString*/;
@@ -3549,8 +3532,8 @@ native final class HTMLTableSectionElement extends HTMLElement {
 
 	__readonly__ var rows : HTMLCollection;
 	function insertRow() : HTMLElement;
-	function insertRow(index : int/*long*/) : HTMLElement;
-	function deleteRow(index : int/*long*/) : void;
+	function insertRow(index : number/*long*/) : HTMLElement;
+	function deleteRow(index : number/*long*/) : void;
 
 	var align : string/*DOMString*/;
 	var ch : string/*DOMString*/;
@@ -3562,12 +3545,12 @@ native final class HTMLTableSectionElement extends HTMLElement {
 /** @see http://www.w3.org/TR/html5/single-page.html */
 native final class HTMLTableRowElement extends HTMLElement {
 
-	__readonly__ var rowIndex : int/*long*/;
-	__readonly__ var sectionRowIndex : int/*long*/;
+	__readonly__ var rowIndex : number/*long*/;
+	__readonly__ var sectionRowIndex : number/*long*/;
 	__readonly__ var cells : HTMLCollection;
 	function insertCell() : HTMLElement;
-	function insertCell(index : int/*long*/) : HTMLElement;
-	function deleteCell(index : int/*long*/) : void;
+	function insertCell(index : number/*long*/) : HTMLElement;
+	function deleteCell(index : number/*long*/) : void;
 
 	var align : string/*DOMString*/;
 	var ch : string/*DOMString*/;
@@ -3591,10 +3574,10 @@ native final class HTMLTableHeaderCellElement extends HTMLTableCellElement {
 /** @see http://www.w3.org/TR/html5/single-page.html */
 native class HTMLTableCellElement extends HTMLElement {
 
-	var colSpan : int/*unsigned long*/;
-	var rowSpan : int/*unsigned long*/;
+	var colSpan : number/*unsigned long*/;
+	var rowSpan : number/*unsigned long*/;
 	__readonly__ var headers : DOMSettableTokenList;
-	__readonly__ var cellIndex : int/*long*/;
+	__readonly__ var cellIndex : number/*long*/;
 
 	var abbr : string/*DOMString*/;
 	var align : string/*DOMString*/;
@@ -3622,13 +3605,13 @@ native final class HTMLFormElement extends HTMLElement {
 	var noValidate : boolean;
 	var target : string/*DOMString*/;
 	__readonly__ var elements : HTMLFormControlsCollection;
-	__readonly__ var length : int/*long*/;
+	__readonly__ var length : number/*long*/;
 	function __native_index_operator__(
-		index : int/*unsigned long*/
-	) : Element;
+		index : number/*unsigned long*/
+	) : Nullable.<Element>;
 	function __native_index_operator__(
 		name : string/*DOMString*/
-	) : Object/*object*/;
+	) : Nullable.<Object>/*object*/;
 	function submit() : void;
 	function reset() : void;
 	function checkValidity() : boolean;
@@ -3639,7 +3622,7 @@ native final class HTMLFormElement extends HTMLElement {
 native final class HTMLFieldSetElement extends HTMLElement {
 
 	var disabled : boolean;
-	__readonly__ var form : HTMLFormElement;
+	__readonly__ var form : Nullable.<HTMLFormElement>;
 	var name : string/*DOMString*/;
 	__readonly__ var type : string/*DOMString*/;
 	__readonly__ var elements : HTMLFormControlsCollection;
@@ -3654,7 +3637,7 @@ native final class HTMLFieldSetElement extends HTMLElement {
 /** @see http://www.w3.org/TR/html5/single-page.html */
 native final class HTMLLegendElement extends HTMLElement {
 
-	__readonly__ var form : HTMLFormElement;
+	__readonly__ var form : Nullable.<HTMLFormElement>;
 
 	var align : string/*DOMString*/;
 
@@ -3663,9 +3646,9 @@ native final class HTMLLegendElement extends HTMLElement {
 /** @see http://www.w3.org/TR/html5/single-page.html */
 native final class HTMLLabelElement extends HTMLElement {
 
-	__readonly__ var form : HTMLFormElement;
+	__readonly__ var form : Nullable.<HTMLFormElement>;
 	var htmlFor : string/*DOMString*/;
-	__readonly__ var control : HTMLElement;
+	__readonly__ var control : Nullable.<HTMLElement>;
 
 } // end of HTMLLabelElement
 
@@ -3680,18 +3663,18 @@ native final class HTMLInputElement extends HTMLElement {
 	var checked : boolean;
 	var dirName : string/*DOMString*/;
 	var disabled : boolean;
-	__readonly__ var form : HTMLFormElement;
-	__readonly__ var files : FileList;
+	__readonly__ var form : Nullable.<HTMLFormElement>;
+	__readonly__ var files : Nullable.<FileList>;
 	var formAction : string/*DOMString*/;
 	var formEnctype : string/*DOMString*/;
 	var formMethod : string/*DOMString*/;
 	var formNoValidate : boolean;
 	var formTarget : string/*DOMString*/;
-	var height : int/*unsigned long*/;
+	var height : number/*unsigned long*/;
 	var indeterminate : boolean;
-	__readonly__ var list : HTMLElement;
+	__readonly__ var list : Nullable.<HTMLElement>;
 	var max : string/*DOMString*/;
-	var maxLength : int/*long*/;
+	var maxLength : number/*long*/;
 	var min : string/*DOMString*/;
 	var multiple : boolean;
 	var name : string/*DOMString*/;
@@ -3699,19 +3682,19 @@ native final class HTMLInputElement extends HTMLElement {
 	var placeholder : string/*DOMString*/;
 	var readOnly : boolean;
 	var required : boolean;
-	var size : int/*unsigned long*/;
+	var size : number/*unsigned long*/;
 	var src : string/*DOMString*/;
 	var step : string/*DOMString*/;
 	var type : string/*DOMString*/;
 	var defaultValue : string/*DOMString*/;
 	var value : string/*DOMString*/;
-	var valueAsDate : Date;
+	var valueAsDate : Nullable.<Date>;
 	var valueAsNumber : number/*double*/;
-	var width : int/*unsigned long*/;
+	var width : number/*unsigned long*/;
 	function stepUp() : void;
-	function stepUp(n : int/*long*/) : void;
+	function stepUp(n : number/*long*/) : void;
 	function stepDown() : void;
-	function stepDown(n : int/*long*/) : void;
+	function stepDown(n : number/*long*/) : void;
 	__readonly__ var willValidate : boolean;
 	__readonly__ var validity : ValidityState;
 	__readonly__ var validationMessage : string/*DOMString*/;
@@ -3719,16 +3702,16 @@ native final class HTMLInputElement extends HTMLElement {
 	function setCustomValidity(error : string/*DOMString*/) : void;
 	__readonly__ var labels : NodeList;
 	function select() : void;
-	var selectionStart : int/*unsigned long*/;
-	var selectionEnd : int/*unsigned long*/;
+	var selectionStart : number/*unsigned long*/;
+	var selectionEnd : number/*unsigned long*/;
 	var selectionDirection : string/*DOMString*/;
 	function setSelectionRange(
-		start : int/*unsigned long*/,
-		end : int/*unsigned long*/
+		start : number/*unsigned long*/,
+		end : number/*unsigned long*/
 	) : void;
 	function setSelectionRange(
-		start : int/*unsigned long*/,
-		end : int/*unsigned long*/,
+		start : number/*unsigned long*/,
+		end : number/*unsigned long*/,
 		direction : string/*DOMString*/
 	) : void;
 
@@ -3742,7 +3725,7 @@ native final class HTMLButtonElement extends HTMLElement {
 
 	var autofocus : boolean;
 	var disabled : boolean;
-	__readonly__ var form : HTMLFormElement;
+	__readonly__ var form : Nullable.<HTMLFormElement>;
 	var formAction : string/*DOMString*/;
 	var formEnctype : string/*DOMString*/;
 	var formMethod : string/*DOMString*/;
@@ -3765,19 +3748,19 @@ native final class HTMLSelectElement extends HTMLElement {
 
 	var autofocus : boolean;
 	var disabled : boolean;
-	__readonly__ var form : HTMLFormElement;
+	__readonly__ var form : Nullable.<HTMLFormElement>;
 	var multiple : boolean;
 	var name : string/*DOMString*/;
 	var required : boolean;
-	var size : int/*unsigned long*/;
+	var size : number/*unsigned long*/;
 	__readonly__ var type : string/*DOMString*/;
 	__readonly__ var options : HTMLOptionsCollection;
-	var length : int/*unsigned long*/;
+	var length : number/*unsigned long*/;
 	function __native_index_operator__(
-		index : int/*unsigned long*/
-	) : Element;
+		index : number/*unsigned long*/
+	) : Nullable.<Element>;
 	/* getter */
-	function item(index : int/*unsigned long*/) : Element;
+	function item(index : number/*unsigned long*/) : Nullable.<Element>;
 	function namedItem(name : string/*DOMString*/) : Object/*object*/;
 	function add(element : HTMLOptionElement) : void;
 	function add(
@@ -3786,7 +3769,7 @@ native final class HTMLSelectElement extends HTMLElement {
 	) : void;
 	function add(
 		element : HTMLOptionElement,
-		before : int/*long*/
+		before : number/*long*/
 	) : void;
 	function add(element : HTMLOptGroupElement) : void;
 	function add(
@@ -3795,11 +3778,11 @@ native final class HTMLSelectElement extends HTMLElement {
 	) : void;
 	function add(
 		element : HTMLOptGroupElement,
-		before : int/*long*/
+		before : number/*long*/
 	) : void;
-	function remove(index : int/*long*/) : void;
+	function remove(index : number/*long*/) : void;
 	__readonly__ var selectedOptions : HTMLCollection;
-	var selectedIndex : int/*long*/;
+	var selectedIndex : number/*long*/;
 	var value : string/*DOMString*/;
 	__readonly__ var willValidate : boolean;
 	__readonly__ var validity : ValidityState;
@@ -3829,13 +3812,13 @@ native final class HTMLOptGroupElement extends HTMLElement {
 native final class HTMLOptionElement extends HTMLElement {
 
 	var disabled : boolean;
-	__readonly__ var form : HTMLFormElement;
+	__readonly__ var form : Nullable.<HTMLFormElement>;
 	var label : string/*DOMString*/;
 	var defaultSelected : boolean;
 	var selected : boolean;
 	var value : string/*DOMString*/;
 	var text : string/*DOMString*/;
-	__readonly__ var index : int/*long*/;
+	__readonly__ var index : number/*long*/;
 
 } // end of HTMLOptionElement
 
@@ -3843,21 +3826,21 @@ native final class HTMLOptionElement extends HTMLElement {
 native final class HTMLTextAreaElement extends HTMLElement {
 
 	var autofocus : boolean;
-	var cols : int/*unsigned long*/;
+	var cols : number/*unsigned long*/;
 	var dirName : string/*DOMString*/;
 	var disabled : boolean;
-	__readonly__ var form : HTMLFormElement;
-	var maxLength : int/*long*/;
+	__readonly__ var form : Nullable.<HTMLFormElement>;
+	var maxLength : number/*long*/;
 	var name : string/*DOMString*/;
 	var placeholder : string/*DOMString*/;
 	var readOnly : boolean;
 	var required : boolean;
-	var rows : int/*unsigned long*/;
+	var rows : number/*unsigned long*/;
 	var wrap : string/*DOMString*/;
 	__readonly__ var type : string/*DOMString*/;
 	var defaultValue : string/*DOMString*/;
 	var value : string/*DOMString*/;
-	__readonly__ var textLength : int/*unsigned long*/;
+	__readonly__ var textLength : number/*unsigned long*/;
 	__readonly__ var willValidate : boolean;
 	__readonly__ var validity : ValidityState;
 	__readonly__ var validationMessage : string/*DOMString*/;
@@ -3865,16 +3848,16 @@ native final class HTMLTextAreaElement extends HTMLElement {
 	function setCustomValidity(error : string/*DOMString*/) : void;
 	__readonly__ var labels : NodeList;
 	function select() : void;
-	var selectionStart : int/*unsigned long*/;
-	var selectionEnd : int/*unsigned long*/;
+	var selectionStart : number/*unsigned long*/;
+	var selectionEnd : number/*unsigned long*/;
 	var selectionDirection : string/*DOMString*/;
 	function setSelectionRange(
-		start : int/*unsigned long*/,
-		end : int/*unsigned long*/
+		start : number/*unsigned long*/,
+		end : number/*unsigned long*/
 	) : void;
 	function setSelectionRange(
-		start : int/*unsigned long*/,
-		end : int/*unsigned long*/,
+		start : number/*unsigned long*/,
+		end : number/*unsigned long*/,
 		direction : string/*DOMString*/
 	) : void;
 
@@ -3886,7 +3869,7 @@ native final class HTMLKeygenElement extends HTMLElement {
 	var autofocus : boolean;
 	var challenge : string/*DOMString*/;
 	var disabled : boolean;
-	__readonly__ var form : HTMLFormElement;
+	__readonly__ var form : Nullable.<HTMLFormElement>;
 	var keytype : string/*DOMString*/;
 	var name : string/*DOMString*/;
 	__readonly__ var type : string/*DOMString*/;
@@ -3903,7 +3886,7 @@ native final class HTMLKeygenElement extends HTMLElement {
 native final class HTMLOutputElement extends HTMLElement {
 
 	__readonly__ var htmlFor : DOMSettableTokenList;
-	__readonly__ var form : HTMLFormElement;
+	__readonly__ var form : Nullable.<HTMLFormElement>;
 	var name : string/*DOMString*/;
 	__readonly__ var type : string/*DOMString*/;
 	var defaultValue : string/*DOMString*/;
@@ -3971,7 +3954,7 @@ native final class HTMLCommandElement extends HTMLElement {
 	var disabled : boolean;
 	var checked : boolean;
 	var radiogroup : string/*DOMString*/;
-	__readonly__ var command : HTMLElement;
+	__readonly__ var command : Nullable.<HTMLElement>;
 
 } // end of HTMLCommandElement
 
@@ -3995,10 +3978,10 @@ native final class BarProp {
 /** @see http://www.w3.org/TR/html5/single-page.html */
 native final class History {
 
-	__readonly__ var length : int/*long*/;
+	__readonly__ var length : number/*long*/;
 	__readonly__ var state : variant/*any*/;
 	function go() : void;
-	function go(delta : int/*long*/) : void;
+	function go(delta : number/*long*/) : void;
 	function back() : void;
 	function forward() : void;
 	function pushState(
@@ -4113,32 +4096,32 @@ native final class BeforeUnloadEvent extends Event {
 native final class ApplicationCache extends EventTarget {
 
 	// update status
-	static __readonly__ var UNCACHED : int/*unsigned short*/;
-	       __readonly__ var UNCACHED : int/*unsigned short*/;
-	static __readonly__ var IDLE : int/*unsigned short*/;
-	       __readonly__ var IDLE : int/*unsigned short*/;
-	static __readonly__ var CHECKING : int/*unsigned short*/;
-	       __readonly__ var CHECKING : int/*unsigned short*/;
-	static __readonly__ var DOWNLOADING : int/*unsigned short*/;
-	       __readonly__ var DOWNLOADING : int/*unsigned short*/;
-	static __readonly__ var UPDATEREADY : int/*unsigned short*/;
-	       __readonly__ var UPDATEREADY : int/*unsigned short*/;
-	static __readonly__ var OBSOLETE : int/*unsigned short*/;
-	       __readonly__ var OBSOLETE : int/*unsigned short*/;
-	__readonly__ var status : int/*unsigned short*/;
+	static __readonly__ var UNCACHED : number/*unsigned short*/;
+	       __readonly__ var UNCACHED : number/*unsigned short*/;
+	static __readonly__ var IDLE : number/*unsigned short*/;
+	       __readonly__ var IDLE : number/*unsigned short*/;
+	static __readonly__ var CHECKING : number/*unsigned short*/;
+	       __readonly__ var CHECKING : number/*unsigned short*/;
+	static __readonly__ var DOWNLOADING : number/*unsigned short*/;
+	       __readonly__ var DOWNLOADING : number/*unsigned short*/;
+	static __readonly__ var UPDATEREADY : number/*unsigned short*/;
+	       __readonly__ var UPDATEREADY : number/*unsigned short*/;
+	static __readonly__ var OBSOLETE : number/*unsigned short*/;
+	       __readonly__ var OBSOLETE : number/*unsigned short*/;
+	__readonly__ var status : number/*unsigned short*/;
 	// updates
 	function update() : void;
 	function abort() : void;
 	function swapCache() : void;
 	// events
-	var onchecking : function(:Event):void/*Function?*/;
-	var onerror : function(:Event):void/*Function?*/;
-	var onnoupdate : function(:Event):void/*Function?*/;
-	var ondownloading : function(:Event):void/*Function?*/;
-	var onprogress : function(:Event):void/*Function?*/;
-	var onupdateready : function(:Event):void/*Function?*/;
-	var oncached : function(:Event):void/*Function?*/;
-	var onobsolete : function(:Event):void/*Function?*/;
+	var onchecking : Nullable.<function(:Event):void>/*Function?*/;
+	var onerror : Nullable.<function(:Event):void>/*Function?*/;
+	var onnoupdate : Nullable.<function(:Event):void>/*Function?*/;
+	var ondownloading : Nullable.<function(:Event):void>/*Function?*/;
+	var onprogress : Nullable.<function(:Event):void>/*Function?*/;
+	var onupdateready : Nullable.<function(:Event):void>/*Function?*/;
+	var oncached : Nullable.<function(:Event):void>/*Function?*/;
+	var onobsolete : Nullable.<function(:Event):void>/*Function?*/;
 
 } // end of ApplicationCache
 
@@ -4273,7 +4256,7 @@ native final class External {
 	function AddSearchProvider(engineURL : string/*DOMString*/) : void;
 	function IsSearchProviderInstalled(
 		engineURL : string/*DOMString*/
-	) : int/*unsigned long*/;
+	) : number/*unsigned long*/;
 
 } // end of External
 
@@ -4285,8 +4268,8 @@ native final class DataTransfer {
 	__readonly__ var items : DataTransferItemList;
 	function setDragImage(
 		image : Element,
-		x : int/*long*/,
-		y : int/*long*/
+		x : number/*long*/,
+		y : number/*long*/
 	) : void;
 	function addElement(element : Element) : void;
 	/* old interface */
@@ -4307,16 +4290,16 @@ native final class DataTransfer {
 /** @see http://www.w3.org/TR/html5/single-page.html */
 native final class DataTransferItemList {
 
-	__readonly__ var length : int/*unsigned long*/;
+	__readonly__ var length : number/*unsigned long*/;
 	function __native_index_operator__(
-		index : int/*unsigned long*/
-	) : DataTransferItem;
+		index : number/*unsigned long*/
+	) : Nullable.<DataTransferItem>;
 	function clear() : void;
 	function add(
 		data : string/*DOMString*/,
 		type : string/*DOMString*/
-	) : DataTransferItem;
-	function add(data : File) : DataTransferItem;
+	) : Nullable.<DataTransferItem>;
+	function add(data : File) : Nullable.<DataTransferItem>;
 
 } // end of DataTransferItemList
 
@@ -4326,9 +4309,9 @@ native final class DataTransferItem {
 	__readonly__ var kind : string/*DOMString*/;
 	__readonly__ var type : string/*DOMString*/;
 	function getAsString(
-		_callback : function(:string):void/*FunctionStringCallback?*/
+		_callback : Nullable.<function(:string):void>/*FunctionStringCallback?*/
 	) : void;
-	function getAsFile() : File;
+	function getAsFile() : Nullable.<File>;
 
 } // end of DataTransferItem
 
@@ -4343,14 +4326,14 @@ native final class DragEvent extends MouseEvent {
 		eventInitDict : DragEventInit
 	);
 
-	__readonly__ var dataTransfer : DataTransfer;
+	__readonly__ var dataTransfer : Nullable.<DataTransfer>;
 
 } // end of DragEvent
 
 /** @see http://www.w3.org/TR/html5/single-page.html */
 native final class DragEventInit extends MouseEventInit {
 
-	var dataTransfer : DataTransfer;
+	var dataTransfer : Nullable.<DataTransfer>;
 
 } // end of DragEventInit
 
@@ -4363,11 +4346,11 @@ native final class HTMLAppletElement extends HTMLElement {
 	var code : string/*DOMString*/;
 	var codeBase : string/*DOMString*/;
 	var height : string/*DOMString*/;
-	var hspace : int/*unsigned long*/;
+	var hspace : number/*unsigned long*/;
 	var name : string/*DOMString*/;
 	var _object : string/*DOMString*/;
 	// the underscore is not part of the identifier
-	var vspace : int/*unsigned long*/;
+	var vspace : number/*unsigned long*/;
 	var width : string/*DOMString*/;
 
 } // end of HTMLAppletElement
@@ -4379,16 +4362,16 @@ native final class HTMLMarqueeElement extends HTMLElement {
 	var bgColor : string/*DOMString*/;
 	var direction : string/*DOMString*/;
 	var height : string/*DOMString*/;
-	var hspace : int/*unsigned long*/;
-	var loop : int/*long*/;
-	var scrollAmount : int/*unsigned long*/;
-	var scrollDelay : int/*unsigned long*/;
+	var hspace : number/*unsigned long*/;
+	var loop : number/*long*/;
+	var scrollAmount : number/*unsigned long*/;
+	var scrollDelay : number/*unsigned long*/;
 	var trueSpeed : boolean;
-	var vspace : int/*unsigned long*/;
+	var vspace : number/*unsigned long*/;
 	var width : string/*DOMString*/;
-	var onbounce : function(:Event):void/*Function?*/;
-	var onfinish : function(:Event):void/*Function?*/;
-	var onstart : function(:Event):void/*Function?*/;
+	var onbounce : Nullable.<function(:Event):void>/*Function?*/;
+	var onfinish : Nullable.<function(:Event):void>/*Function?*/;
+	var onstart : Nullable.<function(:Event):void>/*Function?*/;
 	function start() : void;
 	function stop() : void;
 
@@ -4399,24 +4382,24 @@ native final class HTMLFrameSetElement extends HTMLElement {
 
 	var cols : string/*DOMString*/;
 	var rows : string/*DOMString*/;
-	var onafterprint : function(:Event):void/*Function?*/;
-	var onbeforeprint : function(:Event):void/*Function?*/;
-	var onbeforeunload : function(:Event):void/*Function?*/;
-	// inherits var onblur : function(:Event):void/*Function?*/;
-	// inherits var onerror : function(:Event):void/*Function?*/;
-	// inherits var onfocus : function(:Event):void/*Function?*/;
-	var onhashchange : function(:Event):void/*Function?*/;
-	// inherits var onload : function(:Event):void/*Function?*/;
-	var onmessage : function(:Event):void/*Function?*/;
-	var onoffline : function(:Event):void/*Function?*/;
-	var ononline : function(:Event):void/*Function?*/;
-	var onpagehide : function(:Event):void/*Function?*/;
-	var onpageshow : function(:Event):void/*Function?*/;
-	var onpopstate : function(:Event):void/*Function?*/;
-	var onresize : function(:Event):void/*Function?*/;
-	// inherits var onscroll : function(:Event):void/*Function?*/;
-	var onstorage : function(:Event):void/*Function?*/;
-	var onunload : function(:Event):void/*Function?*/;
+	var onafterprint : Nullable.<function(:Event):void>/*Function?*/;
+	var onbeforeprint : Nullable.<function(:Event):void>/*Function?*/;
+	var onbeforeunload : Nullable.<function(:Event):void>/*Function?*/;
+	// inherits var onblur : Nullable.<function(:Event):void>/*Function?*/;
+	// inherits var onerror : Nullable.<function(:Event):void>/*Function?*/;
+	// inherits var onfocus : Nullable.<function(:Event):void>/*Function?*/;
+	var onhashchange : Nullable.<function(:Event):void>/*Function?*/;
+	// inherits var onload : Nullable.<function(:Event):void>/*Function?*/;
+	var onmessage : Nullable.<function(:Event):void>/*Function?*/;
+	var onoffline : Nullable.<function(:Event):void>/*Function?*/;
+	var ononline : Nullable.<function(:Event):void>/*Function?*/;
+	var onpagehide : Nullable.<function(:Event):void>/*Function?*/;
+	var onpageshow : Nullable.<function(:Event):void>/*Function?*/;
+	var onpopstate : Nullable.<function(:Event):void>/*Function?*/;
+	var onresize : Nullable.<function(:Event):void>/*Function?*/;
+	// inherits var onscroll : Nullable.<function(:Event):void>/*Function?*/;
+	var onstorage : Nullable.<function(:Event):void>/*Function?*/;
+	var onunload : Nullable.<function(:Event):void>/*Function?*/;
 
 } // end of HTMLFrameSetElement
 
@@ -4429,8 +4412,8 @@ native final class HTMLFrameElement extends HTMLElement {
 	var frameBorder : string/*DOMString*/;
 	var longDesc : string/*DOMString*/;
 	var noResize : boolean;
-	__readonly__ var contentDocument : HTMLDocument/*Document?*/;
-	__readonly__ var contentWindow : Window/*WindowProxy?*/;
+	__readonly__ var contentDocument : Nullable.<HTMLDocument>/*Document?*/;
+	__readonly__ var contentWindow : Nullable.<Window>/*WindowProxy?*/;
 	var marginHeight : string/*DOMString*/;
 	var marginWidth : string/*DOMString*/;
 
@@ -4441,7 +4424,7 @@ native final class HTMLBaseFontElement extends HTMLElement {
 
 	var color : string/*DOMString*/;
 	var face : string/*DOMString*/;
-	var size : int/*long*/;
+	var size : number/*long*/;
 
 } // end of HTMLBaseFontElement
 
@@ -4465,11 +4448,11 @@ native final class HTMLFontElement extends HTMLElement {
 native final class FileList {
 
 	function __native_index_operator__(
-		index : int/*unsigned long*/
-	) : File;
+		index : number/*unsigned long*/
+	) : Nullable.<File>;
 	/* getter */
-	function item(index : int/*unsigned long*/) : File;
-	__readonly__ var length : int/*unsigned long*/;
+	function item(index : number/*unsigned long*/) : Nullable.<File>;
+	__readonly__ var length : number/*unsigned long*/;
 
 } // end of FileList
 
@@ -4518,23 +4501,23 @@ native final class FileReader extends EventTarget {
 	function readAsDataURL(blob : Blob) : void;
 	function abort() : void;
 	// states
-	static __readonly__ var EMPTY : int/*unsigned short*/;
-	       __readonly__ var EMPTY : int/*unsigned short*/;
-	static __readonly__ var LOADING : int/*unsigned short*/;
-	       __readonly__ var LOADING : int/*unsigned short*/;
-	static __readonly__ var DONE : int/*unsigned short*/;
-	       __readonly__ var DONE : int/*unsigned short*/;
-	__readonly__ var readyState : int/*unsigned short*/;
+	static __readonly__ var EMPTY : number/*unsigned short*/;
+	       __readonly__ var EMPTY : number/*unsigned short*/;
+	static __readonly__ var LOADING : number/*unsigned short*/;
+	       __readonly__ var LOADING : number/*unsigned short*/;
+	static __readonly__ var DONE : number/*unsigned short*/;
+	       __readonly__ var DONE : number/*unsigned short*/;
+	__readonly__ var readyState : number/*unsigned short*/;
 	// File or Blob data
 	__readonly__ var result : variant/*any*/;
 	__readonly__ var error : DOMError;
 	// event handler attributes
-	var onloadstart : function(:Event):void/*Function?*/;
-	var onprogress : function(:Event):void/*Function?*/;
-	var onload : function(:Event):void/*Function?*/;
-	var onabort : function(:Event):void/*Function?*/;
-	var onerror : function(:Event):void/*Function?*/;
-	var onloadend : function(:Event):void/*Function?*/;
+	var onloadstart : Nullable.<function(:Event):void>/*Function?*/;
+	var onprogress : Nullable.<function(:Event):void>/*Function?*/;
+	var onload : Nullable.<function(:Event):void>/*Function?*/;
+	var onabort : Nullable.<function(:Event):void>/*Function?*/;
+	var onerror : Nullable.<function(:Event):void>/*Function?*/;
+	var onloadend : Nullable.<function(:Event):void>/*Function?*/;
 
 } // end of FileReader
 
@@ -4571,27 +4554,27 @@ native final class webkitURL extends URL {
 /** @see http://www.w3.org/TR/touch-events/ */
 native final class Touch {
 
-	__readonly__ var identifier : int/*long*/;
+	__readonly__ var identifier : number/*long*/;
 	__readonly__ var target : EventTarget;
-	__readonly__ var screenX : int/*long*/;
-	__readonly__ var screenY : int/*long*/;
-	__readonly__ var clientX : int/*long*/;
-	__readonly__ var clientY : int/*long*/;
-	__readonly__ var pageX : int/*long*/;
-	__readonly__ var pageY : int/*long*/;
+	__readonly__ var screenX : number/*long*/;
+	__readonly__ var screenY : number/*long*/;
+	__readonly__ var clientX : number/*long*/;
+	__readonly__ var clientY : number/*long*/;
+	__readonly__ var pageX : number/*long*/;
+	__readonly__ var pageY : number/*long*/;
 
 } // end of Touch
 
 /** @see http://www.w3.org/TR/touch-events/ */
 native final class TouchList {
 
-	__readonly__ var length : int/*unsigned long*/;
+	__readonly__ var length : number/*unsigned long*/;
 	function __native_index_operator__(
-		index : int/*unsigned long*/
-	) : Touch;
+		index : number/*unsigned long*/
+	) : Nullable.<Touch>;
 	/* getter */
-	function item(index : int/*unsigned long*/) : Touch;
-	function identifiedTouch(identifier : int/*long*/) : Touch;
+	function item(index : number/*unsigned long*/) : Nullable.<Touch>;
+	function identifiedTouch(identifier : number/*long*/) : Touch;
 
 } // end of TouchList
 
@@ -4608,7 +4591,7 @@ native final class TouchEvent extends UIEvent {
 
 } // end of TouchEvent
 
-/** @see http://www.w3.org/TR/websockets/ */
+/** @see http://www.w3.org/TR/2012/WD-websockets-20120524/ */
 native final class WebSocket extends EventTarget {
 
 	function constructor(url : string/*DOMString*/);
@@ -4623,30 +4606,30 @@ native final class WebSocket extends EventTarget {
 
 	__readonly__ var url : string/*DOMString*/;
 	// ready state
-	static __readonly__ var CONNECTING : int/*unsigned short*/;
-	       __readonly__ var CONNECTING : int/*unsigned short*/;
-	static __readonly__ var OPEN : int/*unsigned short*/;
-	       __readonly__ var OPEN : int/*unsigned short*/;
-	static __readonly__ var CLOSING : int/*unsigned short*/;
-	       __readonly__ var CLOSING : int/*unsigned short*/;
-	static __readonly__ var CLOSED : int/*unsigned short*/;
-	       __readonly__ var CLOSED : int/*unsigned short*/;
-	__readonly__ var readyState : int/*unsigned short*/;
-	__readonly__ var bufferedAmount : int/*unsigned long*/;
+	static __readonly__ var CONNECTING : number/*unsigned short*/;
+	       __readonly__ var CONNECTING : number/*unsigned short*/;
+	static __readonly__ var OPEN : number/*unsigned short*/;
+	       __readonly__ var OPEN : number/*unsigned short*/;
+	static __readonly__ var CLOSING : number/*unsigned short*/;
+	       __readonly__ var CLOSING : number/*unsigned short*/;
+	static __readonly__ var CLOSED : number/*unsigned short*/;
+	       __readonly__ var CLOSED : number/*unsigned short*/;
+	__readonly__ var readyState : number/*unsigned short*/;
+	__readonly__ var bufferedAmount : number/*unsigned long*/;
 	// networking
-	var onopen : function(:Event):void/*Function?*/;
-	var onerror : function(:Event):void/*Function?*/;
-	var onclose : function(:Event):void/*Function?*/;
+	var onopen : Nullable.<function(:Event):void>/*Function?*/;
+	var onerror : Nullable.<function(:Event):void>/*Function?*/;
+	var onclose : Nullable.<function(:Event):void>/*Function?*/;
 	__readonly__ var extensions : string/*DOMString*/;
 	__readonly__ var protocol : string/*DOMString*/;
 	function close() : void;
-	function close(code : int/*unsigned short*/) : void;
+	function close(code : number/*unsigned short*/) : void;
 	function close(
-		code : int/*unsigned short*/,
+		code : number/*unsigned short*/,
 		reason : string/*DOMString*/
 	) : void;
 	// messaging
-	var onmessage : function(:Event):void/*Function?*/;
+	var onmessage : Nullable.<function(:Event):void>/*Function?*/;
 	var binaryType : string/*DOMString*/;
 	function send(data : string/*DOMString*/) : void;
 	function send(data : ArrayBufferView) : void;
@@ -4654,7 +4637,7 @@ native final class WebSocket extends EventTarget {
 
 } // end of WebSocket
 
-/** @see http://www.w3.org/TR/websockets/ */
+/** @see http://www.w3.org/TR/2012/WD-websockets-20120524/ */
 native final class CloseEvent extends Event {
 
 	function constructor(type : string/*DOMString*/);
@@ -4664,16 +4647,16 @@ native final class CloseEvent extends Event {
 	);
 
 	__readonly__ var wasClean : boolean;
-	__readonly__ var code : int/*unsigned short*/;
+	__readonly__ var code : number/*unsigned short*/;
 	__readonly__ var reason : string/*DOMString*/;
 
 } // end of CloseEvent
 
-/** @see http://www.w3.org/TR/websockets/ */
+/** @see http://www.w3.org/TR/2012/WD-websockets-20120524/ */
 native final class CloseEventInit extends EventInit {
 
 	var wasClean : boolean;
-	var code : int/*unsigned short*/;
+	var code : number/*unsigned short*/;
 	var reason : string/*DOMString*/;
 
 } // end of CloseEventInit
@@ -4706,17 +4689,17 @@ native final __fake__ class Geolocation {
 	) : void;
 	function watchPosition(
 		successCallback : function(position:Position):void/*PositionCallback*/
-	) : int/*long*/;
+	) : number/*long*/;
 	function watchPosition(
 		successCallback : function(position:Position):void/*PositionCallback*/,
 		errorCallback : function(positionError:PositionError):void/*PositionErrorCallback*/
-	) : int/*long*/;
+	) : number/*long*/;
 	function watchPosition(
 		successCallback : function(position:Position):void/*PositionCallback*/,
 		errorCallback : function(positionError:PositionError):void/*PositionErrorCallback*/,
 		options : PositionOptions
-	) : int/*long*/;
-	function clearWatch(watchId : int/*long*/) : void;
+	) : number/*long*/;
+	function clearWatch(watchId : number/*long*/) : void;
 
 } // end of Geolocation
 
@@ -4724,8 +4707,8 @@ native final __fake__ class Geolocation {
 native final __fake__ class PositionOptions {
 
 	var enableHighAccuracy : boolean;
-	var timeout : int/*long*/;
-	var maximumAge : int/*long*/;
+	var timeout : number/*long*/;
+	var maximumAge : number/*long*/;
 
 } // end of PositionOptions
 
@@ -4753,13 +4736,13 @@ native final __fake__ class Coordinates {
 /** @see http://dev.w3.org/geo/api/spec-source.html */
 native final __fake__ class PositionError {
 
-	static __readonly__ var PERMISSION_DENIED : int/*unsigned short*/;
-	       __readonly__ var PERMISSION_DENIED : int/*unsigned short*/;
-	static __readonly__ var POSITION_UNAVAILABLE : int/*unsigned short*/;
-	       __readonly__ var POSITION_UNAVAILABLE : int/*unsigned short*/;
-	static __readonly__ var TIMEOUT : int/*unsigned short*/;
-	       __readonly__ var TIMEOUT : int/*unsigned short*/;
-	__readonly__ var code : int/*unsigned short*/;
+	static __readonly__ var PERMISSION_DENIED : number/*unsigned short*/;
+	       __readonly__ var PERMISSION_DENIED : number/*unsigned short*/;
+	static __readonly__ var POSITION_UNAVAILABLE : number/*unsigned short*/;
+	       __readonly__ var POSITION_UNAVAILABLE : number/*unsigned short*/;
+	static __readonly__ var TIMEOUT : number/*unsigned short*/;
+	       __readonly__ var TIMEOUT : number/*unsigned short*/;
+	__readonly__ var code : number/*unsigned short*/;
 	__readonly__ var message : string/*DOMString*/;
 
 } // end of PositionError
@@ -4767,9 +4750,9 @@ native final __fake__ class PositionError {
 /** @see http://dev.w3.org/html5/webstorage/ */
 native final class Storage {
 
-	__readonly__ var length : int/*unsigned long*/;
+	__readonly__ var length : number/*unsigned long*/;
 	function key(
-		index : int/*unsigned long*/
+		index : number/*unsigned long*/
 	) : Nullable.<string>/*DOMString?*/;
 	function __native_index_operator__(
 		key : string/*DOMString*/
@@ -4816,7 +4799,7 @@ native final class StorageEvent extends Event {
 	__readonly__ var oldValue : Nullable.<string>/*DOMString?*/;
 	__readonly__ var newValue : Nullable.<string>/*DOMString?*/;
 	__readonly__ var url : string/*DOMString*/;
-	__readonly__ var storageArea : Storage;
+	__readonly__ var storageArea : Nullable.<Storage>;
 
 } // end of StorageEvent
 
@@ -4827,7 +4810,7 @@ native final class StorageEventInit extends EventInit {
 	var oldValue : Nullable.<string>/*DOMString?*/;
 	var newValue : Nullable.<string>/*DOMString?*/;
 	var url : string/*DOMString*/;
-	var storageArea : Storage;
+	var storageArea : Nullable.<Storage>;
 
 } // end of StorageEventInit
 
@@ -4843,7 +4826,7 @@ native final class MessageEvent extends Event {
 	__readonly__ var data : variant/*any*/;
 	__readonly__ var origin : string/*DOMString*/;
 	__readonly__ var lastEventId : string/*DOMString*/;
-	__readonly__ var source : Window/*WindowProxy?*/;
+	__readonly__ var source : Nullable.<Window>/*WindowProxy?*/;
 	__readonly__ var ports : MessagePort[];
 
 } // end of MessageEvent
@@ -4854,7 +4837,7 @@ native final class MessageEventInit extends EventInit {
 	var data : variant/*any*/;
 	var origin : string/*DOMString*/;
 	var lastEventId : string/*DOMString*/;
-	var source : Window/*WindowProxy?*/;
+	var source : Nullable.<Window>/*WindowProxy?*/;
 	var ports : MessagePort[];
 
 } // end of MessageEventInit
@@ -4880,7 +4863,7 @@ native final class MessagePort extends EventTarget {
 	function start() : void;
 	function close() : void;
 	// event handlers
-	var onmessage : function(:Event):void/*Function?*/;
+	var onmessage : Nullable.<function(:Event):void>/*Function?*/;
 
 	// implements Transferable
 
@@ -4892,9 +4875,9 @@ native class WorkerGlobalScope extends EventTarget {
 	__readonly__ var self : WorkerGlobalScope;
 	__readonly__ var location : WorkerLocation;
 	function close() : void;
-	var onerror : function(:Event):void/*Function?*/;
-	var onoffline : function(:Event):void/*Function?*/;
-	var ononline : function(:Event):void/*Function?*/;
+	var onerror : Nullable.<function(:Event):void>/*Function?*/;
+	var onoffline : Nullable.<function(:Event):void>/*Function?*/;
+	var ononline : Nullable.<function(:Event):void>/*Function?*/;
 
 	// implements WorkerUtils
 
@@ -4911,7 +4894,7 @@ native final class DedicatedWorkerGlobalScope extends WorkerGlobalScope {
 		message : variant/*any*/,
 		transfer : Transferable[]
 	) : void;
-	var onmessage : function(:Event):void/*Function?*/;
+	var onmessage : Nullable.<function(:Event):void>/*Function?*/;
 
 } // end of DedicatedWorkerGlobalScope
 
@@ -4920,7 +4903,7 @@ native final class SharedWorkerGlobalScope extends WorkerGlobalScope {
 
 	__readonly__ var name : string/*DOMString*/;
 	__readonly__ var applicationCache : ApplicationCache;
-	var onconnect : function(:Event):void/*Function?*/;
+	var onconnect : Nullable.<function(:Event):void>/*Function?*/;
 
 } // end of SharedWorkerGlobalScope
 
@@ -4935,7 +4918,7 @@ native final class ErrorEvent extends Event {
 
 	__readonly__ var message : string/*DOMString*/;
 	__readonly__ var filename : string/*DOMString*/;
-	__readonly__ var lineno : int/*unsigned long*/;
+	__readonly__ var lineno : number/*unsigned long*/;
 
 } // end of ErrorEvent
 
@@ -4944,14 +4927,14 @@ native final class ErrorEventInit extends EventInit {
 
 	var message : string/*DOMString*/;
 	var filename : string/*DOMString*/;
-	var lineno : int/*unsigned long*/;
+	var lineno : number/*unsigned long*/;
 
 } // end of ErrorEventInit
 
 /** @see http://www.w3.org/TR/workers/ */
 native __fake__ class AbstractWorker {
 
-	var onerror : function(:Event):void/*Function?*/;
+	var onerror : Nullable.<function(:Event):void>/*Function?*/;
 
 } // end of AbstractWorker
 
@@ -4966,11 +4949,11 @@ native final class Worker extends EventTarget {
 		message : variant/*any*/,
 		transfer : Transferable[]
 	) : void;
-	var onmessage : function(:Event):void/*Function?*/;
+	var onmessage : Nullable.<function(:Event):void>/*Function?*/;
 
 	// implements AbstractWorker
 
-	var onerror : function(:Event):void/*Function?*/;
+	var onerror : Nullable.<function(:Event):void>/*Function?*/;
 
 } // end of Worker
 
@@ -4987,7 +4970,7 @@ native final class SharedWorker extends EventTarget {
 
 	// implements AbstractWorker
 
-	var onerror : function(:Event):void/*Function?*/;
+	var onerror : Nullable.<function(:Event):void>/*Function?*/;
 
 } // end of SharedWorker
 
@@ -5036,17 +5019,17 @@ native final class EventSource extends EventTarget {
 	__readonly__ var url : string/*DOMString*/;
 	__readonly__ var withCredentials : boolean;
 	// ready state
-	static __readonly__ var CONNECTING : int/*unsigned short*/;
-	       __readonly__ var CONNECTING : int/*unsigned short*/;
-	static __readonly__ var OPEN : int/*unsigned short*/;
-	       __readonly__ var OPEN : int/*unsigned short*/;
-	static __readonly__ var CLOSED : int/*unsigned short*/;
-	       __readonly__ var CLOSED : int/*unsigned short*/;
-	__readonly__ var readyState : int/*unsigned short*/;
+	static __readonly__ var CONNECTING : number/*unsigned short*/;
+	       __readonly__ var CONNECTING : number/*unsigned short*/;
+	static __readonly__ var OPEN : number/*unsigned short*/;
+	       __readonly__ var OPEN : number/*unsigned short*/;
+	static __readonly__ var CLOSED : number/*unsigned short*/;
+	       __readonly__ var CLOSED : number/*unsigned short*/;
+	__readonly__ var readyState : number/*unsigned short*/;
 	// networking
-	var onopen : function(:Event):void/*Function?*/;
-	var onmessage : function(:Event):void/*Function?*/;
-	var onerror : function(:Event):void/*Function?*/;
+	var onopen : Nullable.<function(:Event):void>/*Function?*/;
+	var onmessage : Nullable.<function(:Event):void>/*Function?*/;
+	var onerror : Nullable.<function(:Event):void>/*Function?*/;
 	function close() : void;
 
 } // end of EventSource
@@ -5082,13 +5065,13 @@ native final class XMLSerializer {
 /** @see https://www.khronos.org/registry/typedarray/specs/latest/typedarray.idl */
 native final class ArrayBuffer extends Transferable {
 
-	function constructor(length : int/*unsigned long*/);
+	function constructor(length : number/*unsigned long*/);
 
-	__readonly__ var byteLength : int/*unsigned long*/;
-	function slice(begin : int/*long*/) : ArrayBuffer;
+	__readonly__ var byteLength : number/*unsigned long*/;
+	function slice(begin : number/*long*/) : ArrayBuffer;
 	function slice(
-		begin : int/*long*/,
-		end : int/*long*/
+		begin : number/*long*/,
+		end : number/*long*/
 	) : ArrayBuffer;
 
 } // end of ArrayBuffer
@@ -5097,60 +5080,62 @@ native final class ArrayBuffer extends Transferable {
 native __fake__ class ArrayBufferView {
 
 	__readonly__ var buffer : ArrayBuffer;
-	__readonly__ var byteOffset : int/*unsigned long*/;
-	__readonly__ var byteLength : int/*unsigned long*/;
+	__readonly__ var byteOffset : number/*unsigned long*/;
+	__readonly__ var byteLength : number/*unsigned long*/;
 
 } // end of ArrayBufferView
 
 /** @see https://www.khronos.org/registry/typedarray/specs/latest/typedarray.idl */
 native final class Int8Array extends ArrayBufferView {
 
-	function constructor(length : int/*unsigned long*/);
+	function constructor(length : number/*unsigned long*/);
 	function constructor(array : Int8Array);
+	function constructor(array : number[]/*byte[]*/);
 	function constructor(array : int[]/*byte[]*/);
-	function constructor(array : number[]);
 	function constructor(buffer : ArrayBuffer);
 	function constructor(
 		buffer : ArrayBuffer,
-		byteOffset : int/*unsigned long*/
+		byteOffset : number/*unsigned long*/
 	);
 	function constructor(
 		buffer : ArrayBuffer,
-		byteOffset : int/*unsigned long*/,
-		length : int/*unsigned long*/
+		byteOffset : number/*unsigned long*/,
+		length : number/*unsigned long*/
 	);
 
-	static __readonly__ var BYTES_PER_ELEMENT : int/*long*/;
-	       __readonly__ var BYTES_PER_ELEMENT : int/*long*/;
-	__readonly__ var length : int/*unsigned long*/;
+	static __readonly__ var BYTES_PER_ELEMENT : number/*long*/;
+	       __readonly__ var BYTES_PER_ELEMENT : number/*long*/;
+	__readonly__ var length : number/*unsigned long*/;
 	function __native_index_operator__(
-		index : int/*unsigned long*/
-	) : Nullable.<int>/*byte*/;
+		index : number/*unsigned long*/
+	) : Nullable.<number>/*byte*/;
 	/* getter */
-	function get(index : int/*unsigned long*/) : Nullable.<int>/*byte*/;
+	function get(
+		index : number/*unsigned long*/
+	) : Nullable.<number>/*byte*/;
 	/* setter */
 	function set(
-		index : int/*unsigned long*/,
-		value : int/*byte*/
+		index : number/*unsigned long*/,
+		value : number/*byte*/
 	) : void;
 	function set(array : Int8Array) : void;
 	function set(
 		array : Int8Array,
-		offset : int/*unsigned long*/
+		offset : number/*unsigned long*/
+	) : void;
+	function set(array : number[]/*byte[]*/) : void;
+	function set(
+		array : number[]/*byte[]*/,
+		offset : number/*unsigned long*/
 	) : void;
 	function set(array : int[]/*byte[]*/) : void;
 	function set(
 		array : int[]/*byte[]*/,
-		offset : int/*unsigned long*/
-	) : void;
-	function set(array : number[]) : void;
-	function set(
-		array : number[],
-		offset : int/*unsigned long*/
+		offset : number/*unsigned long*/
 	) : void;
 	function subarray(
-		start : int/*long*/,
-		end : int/*long*/
+		start : number/*long*/,
+		end : number/*long*/
 	) : Int8Array;
 
 } // end of Int8Array
@@ -5158,54 +5143,54 @@ native final class Int8Array extends ArrayBufferView {
 /** @see https://www.khronos.org/registry/typedarray/specs/latest/typedarray.idl */
 native class Uint8Array extends ArrayBufferView {
 
-	function constructor(length : int/*unsigned long*/);
+	function constructor(length : number/*unsigned long*/);
 	function constructor(array : Uint8Array);
+	function constructor(array : number[]/*octet[]*/);
 	function constructor(array : int[]/*octet[]*/);
-	function constructor(array : number[]);
 	function constructor(buffer : ArrayBuffer);
 	function constructor(
 		buffer : ArrayBuffer,
-		byteOffset : int/*unsigned long*/
+		byteOffset : number/*unsigned long*/
 	);
 	function constructor(
 		buffer : ArrayBuffer,
-		byteOffset : int/*unsigned long*/,
-		length : int/*unsigned long*/
+		byteOffset : number/*unsigned long*/,
+		length : number/*unsigned long*/
 	);
 
-	static __readonly__ var BYTES_PER_ELEMENT : int/*long*/;
-	       __readonly__ var BYTES_PER_ELEMENT : int/*long*/;
-	__readonly__ var length : int/*unsigned long*/;
+	static __readonly__ var BYTES_PER_ELEMENT : number/*long*/;
+	       __readonly__ var BYTES_PER_ELEMENT : number/*long*/;
+	__readonly__ var length : number/*unsigned long*/;
 	function __native_index_operator__(
-		index : int/*unsigned long*/
-	) : Nullable.<int>/*octet*/;
+		index : number/*unsigned long*/
+	) : Nullable.<number>/*octet*/;
 	/* getter */
 	function get(
-		index : int/*unsigned long*/
-	) : Nullable.<int>/*octet*/;
+		index : number/*unsigned long*/
+	) : Nullable.<number>/*octet*/;
 	/* setter */
 	function set(
-		index : int/*unsigned long*/,
-		value : int/*octet*/
+		index : number/*unsigned long*/,
+		value : number/*octet*/
 	) : void;
 	function set(array : Uint8Array) : void;
 	function set(
 		array : Uint8Array,
-		offset : int/*unsigned long*/
+		offset : number/*unsigned long*/
+	) : void;
+	function set(array : number[]/*octet[]*/) : void;
+	function set(
+		array : number[]/*octet[]*/,
+		offset : number/*unsigned long*/
 	) : void;
 	function set(array : int[]/*octet[]*/) : void;
 	function set(
 		array : int[]/*octet[]*/,
-		offset : int/*unsigned long*/
-	) : void;
-	function set(array : number[]) : void;
-	function set(
-		array : number[],
-		offset : int/*unsigned long*/
+		offset : number/*unsigned long*/
 	) : void;
 	function subarray(
-		start : int/*long*/,
-		end : int/*long*/
+		start : number/*long*/,
+		end : number/*long*/
 	) : Uint8Array;
 
 } // end of Uint8Array
@@ -5213,36 +5198,36 @@ native class Uint8Array extends ArrayBufferView {
 /** @see https://www.khronos.org/registry/typedarray/specs/latest/typedarray.idl */
 native final class Uint8ClampedArray extends Uint8Array {
 
-	function constructor(length : int/*unsigned long*/);
+	function constructor(length : number/*unsigned long*/);
 	function constructor(array : Uint8ClampedArray);
 	function constructor(array : Uint8Array);
+	function constructor(array : number[]/*octet[]*/);
 	function constructor(array : int[]/*octet[]*/);
-	function constructor(array : number[]);
 	function constructor(buffer : ArrayBuffer);
 	function constructor(
 		buffer : ArrayBuffer,
-		byteOffset : int/*unsigned long*/
+		byteOffset : number/*unsigned long*/
 	);
 	function constructor(
 		buffer : ArrayBuffer,
-		byteOffset : int/*unsigned long*/,
-		length : int/*unsigned long*/
+		byteOffset : number/*unsigned long*/,
+		length : number/*unsigned long*/
 	);
 
 	/* setter */
-	// inherits function set(index : int/*unsigned long*/, value : int/*octet*/) : void;
+	// inherits function set(index : number/*unsigned long*/, value : number/*octet*/) : void;
 	function set(array : Uint8ClampedArray) : void;
 	function set(
 		array : Uint8ClampedArray,
-		offset : int/*unsigned long*/
+		offset : number/*unsigned long*/
 	) : void;
+	// inherits function set(array : number[]/*octet[]*/) : void;
+	// inherits function set(array : number[]/*octet[]*/, offset : number/*unsigned long*/) : void;
 	// inherits function set(array : int[]/*octet[]*/) : void;
-	// inherits function set(array : int[]/*octet[]*/, offset : int/*unsigned long*/) : void;
-	// inherits function set(array : number[]) : void;
-	// inherits function set(array : number[], offset : int/*unsigned long*/) : void;
+	// inherits function set(array : int[]/*octet[]*/, offset : number/*unsigned long*/) : void;
 	override function subarray(
-		start : int/*long*/,
-		end : int/*long*/
+		start : number/*long*/,
+		end : number/*long*/
 	) : Uint8ClampedArray;
 
 } // end of Uint8ClampedArray
@@ -5250,54 +5235,54 @@ native final class Uint8ClampedArray extends Uint8Array {
 /** @see https://www.khronos.org/registry/typedarray/specs/latest/typedarray.idl */
 native final class Int16Array extends ArrayBufferView {
 
-	function constructor(length : int/*unsigned long*/);
+	function constructor(length : number/*unsigned long*/);
 	function constructor(array : Int16Array);
+	function constructor(array : number[]/*short[]*/);
 	function constructor(array : int[]/*short[]*/);
-	function constructor(array : number[]);
 	function constructor(buffer : ArrayBuffer);
 	function constructor(
 		buffer : ArrayBuffer,
-		byteOffset : int/*unsigned long*/
+		byteOffset : number/*unsigned long*/
 	);
 	function constructor(
 		buffer : ArrayBuffer,
-		byteOffset : int/*unsigned long*/,
-		length : int/*unsigned long*/
+		byteOffset : number/*unsigned long*/,
+		length : number/*unsigned long*/
 	);
 
-	static __readonly__ var BYTES_PER_ELEMENT : int/*long*/;
-	       __readonly__ var BYTES_PER_ELEMENT : int/*long*/;
-	__readonly__ var length : int/*unsigned long*/;
+	static __readonly__ var BYTES_PER_ELEMENT : number/*long*/;
+	       __readonly__ var BYTES_PER_ELEMENT : number/*long*/;
+	__readonly__ var length : number/*unsigned long*/;
 	function __native_index_operator__(
-		index : int/*unsigned long*/
-	) : Nullable.<int>/*short*/;
+		index : number/*unsigned long*/
+	) : Nullable.<number>/*short*/;
 	/* getter */
 	function get(
-		index : int/*unsigned long*/
-	) : Nullable.<int>/*short*/;
+		index : number/*unsigned long*/
+	) : Nullable.<number>/*short*/;
 	/* setter */
 	function set(
-		index : int/*unsigned long*/,
-		value : int/*short*/
+		index : number/*unsigned long*/,
+		value : number/*short*/
 	) : void;
 	function set(array : Int16Array) : void;
 	function set(
 		array : Int16Array,
-		offset : int/*unsigned long*/
+		offset : number/*unsigned long*/
+	) : void;
+	function set(array : number[]/*short[]*/) : void;
+	function set(
+		array : number[]/*short[]*/,
+		offset : number/*unsigned long*/
 	) : void;
 	function set(array : int[]/*short[]*/) : void;
 	function set(
 		array : int[]/*short[]*/,
-		offset : int/*unsigned long*/
-	) : void;
-	function set(array : number[]) : void;
-	function set(
-		array : number[],
-		offset : int/*unsigned long*/
+		offset : number/*unsigned long*/
 	) : void;
 	function subarray(
-		start : int/*long*/,
-		end : int/*long*/
+		start : number/*long*/,
+		end : number/*long*/
 	) : Int16Array;
 
 } // end of Int16Array
@@ -5305,54 +5290,54 @@ native final class Int16Array extends ArrayBufferView {
 /** @see https://www.khronos.org/registry/typedarray/specs/latest/typedarray.idl */
 native final class Uint16Array extends ArrayBufferView {
 
-	function constructor(length : int/*unsigned long*/);
+	function constructor(length : number/*unsigned long*/);
 	function constructor(array : Uint16Array);
+	function constructor(array : number[]/*unsigned short[]*/);
 	function constructor(array : int[]/*unsigned short[]*/);
-	function constructor(array : number[]);
 	function constructor(buffer : ArrayBuffer);
 	function constructor(
 		buffer : ArrayBuffer,
-		byteOffset : int/*unsigned long*/
+		byteOffset : number/*unsigned long*/
 	);
 	function constructor(
 		buffer : ArrayBuffer,
-		byteOffset : int/*unsigned long*/,
-		length : int/*unsigned long*/
+		byteOffset : number/*unsigned long*/,
+		length : number/*unsigned long*/
 	);
 
-	static __readonly__ var BYTES_PER_ELEMENT : int/*long*/;
-	       __readonly__ var BYTES_PER_ELEMENT : int/*long*/;
-	__readonly__ var length : int/*unsigned long*/;
+	static __readonly__ var BYTES_PER_ELEMENT : number/*long*/;
+	       __readonly__ var BYTES_PER_ELEMENT : number/*long*/;
+	__readonly__ var length : number/*unsigned long*/;
 	function __native_index_operator__(
-		index : int/*unsigned long*/
-	) : Nullable.<int>/*unsigned short*/;
+		index : number/*unsigned long*/
+	) : Nullable.<number>/*unsigned short*/;
 	/* getter */
 	function get(
-		index : int/*unsigned long*/
-	) : Nullable.<int>/*unsigned short*/;
+		index : number/*unsigned long*/
+	) : Nullable.<number>/*unsigned short*/;
 	/* setter */
 	function set(
-		index : int/*unsigned long*/,
-		value : int/*unsigned short*/
+		index : number/*unsigned long*/,
+		value : number/*unsigned short*/
 	) : void;
 	function set(array : Uint16Array) : void;
 	function set(
 		array : Uint16Array,
-		offset : int/*unsigned long*/
+		offset : number/*unsigned long*/
+	) : void;
+	function set(array : number[]/*unsigned short[]*/) : void;
+	function set(
+		array : number[]/*unsigned short[]*/,
+		offset : number/*unsigned long*/
 	) : void;
 	function set(array : int[]/*unsigned short[]*/) : void;
 	function set(
 		array : int[]/*unsigned short[]*/,
-		offset : int/*unsigned long*/
-	) : void;
-	function set(array : number[]) : void;
-	function set(
-		array : number[],
-		offset : int/*unsigned long*/
+		offset : number/*unsigned long*/
 	) : void;
 	function subarray(
-		start : int/*long*/,
-		end : int/*long*/
+		start : number/*long*/,
+		end : number/*long*/
 	) : Uint16Array;
 
 } // end of Uint16Array
@@ -5360,52 +5345,54 @@ native final class Uint16Array extends ArrayBufferView {
 /** @see https://www.khronos.org/registry/typedarray/specs/latest/typedarray.idl */
 native final class Int32Array extends ArrayBufferView {
 
-	function constructor(length : int/*unsigned long*/);
+	function constructor(length : number/*unsigned long*/);
 	function constructor(array : Int32Array);
+	function constructor(array : number[]/*long[]*/);
 	function constructor(array : int[]/*long[]*/);
-	function constructor(array : number[]);
 	function constructor(buffer : ArrayBuffer);
 	function constructor(
 		buffer : ArrayBuffer,
-		byteOffset : int/*unsigned long*/
+		byteOffset : number/*unsigned long*/
 	);
 	function constructor(
 		buffer : ArrayBuffer,
-		byteOffset : int/*unsigned long*/,
-		length : int/*unsigned long*/
+		byteOffset : number/*unsigned long*/,
+		length : number/*unsigned long*/
 	);
 
-	static __readonly__ var BYTES_PER_ELEMENT : int/*long*/;
-	       __readonly__ var BYTES_PER_ELEMENT : int/*long*/;
-	__readonly__ var length : int/*unsigned long*/;
+	static __readonly__ var BYTES_PER_ELEMENT : number/*long*/;
+	       __readonly__ var BYTES_PER_ELEMENT : number/*long*/;
+	__readonly__ var length : number/*unsigned long*/;
 	function __native_index_operator__(
-		index : int/*unsigned long*/
-	) : Nullable.<int>/*long*/;
+		index : number/*unsigned long*/
+	) : Nullable.<number>/*long*/;
 	/* getter */
-	function get(index : int/*unsigned long*/) : Nullable.<int>/*long*/;
+	function get(
+		index : number/*unsigned long*/
+	) : Nullable.<number>/*long*/;
 	/* setter */
 	function set(
-		index : int/*unsigned long*/,
-		value : int/*long*/
+		index : number/*unsigned long*/,
+		value : number/*long*/
 	) : void;
 	function set(array : Int32Array) : void;
 	function set(
 		array : Int32Array,
-		offset : int/*unsigned long*/
+		offset : number/*unsigned long*/
+	) : void;
+	function set(array : number[]/*long[]*/) : void;
+	function set(
+		array : number[]/*long[]*/,
+		offset : number/*unsigned long*/
 	) : void;
 	function set(array : int[]/*long[]*/) : void;
 	function set(
 		array : int[]/*long[]*/,
-		offset : int/*unsigned long*/
-	) : void;
-	function set(array : number[]) : void;
-	function set(
-		array : number[],
-		offset : int/*unsigned long*/
+		offset : number/*unsigned long*/
 	) : void;
 	function subarray(
-		start : int/*long*/,
-		end : int/*long*/
+		start : number/*long*/,
+		end : number/*long*/
 	) : Int32Array;
 
 } // end of Int32Array
@@ -5413,54 +5400,54 @@ native final class Int32Array extends ArrayBufferView {
 /** @see https://www.khronos.org/registry/typedarray/specs/latest/typedarray.idl */
 native final class Uint32Array extends ArrayBufferView {
 
-	function constructor(length : int/*unsigned long*/);
+	function constructor(length : number/*unsigned long*/);
 	function constructor(array : Uint32Array);
+	function constructor(array : number[]/*unsigned long[]*/);
 	function constructor(array : int[]/*unsigned long[]*/);
-	function constructor(array : number[]);
 	function constructor(buffer : ArrayBuffer);
 	function constructor(
 		buffer : ArrayBuffer,
-		byteOffset : int/*unsigned long*/
+		byteOffset : number/*unsigned long*/
 	);
 	function constructor(
 		buffer : ArrayBuffer,
-		byteOffset : int/*unsigned long*/,
-		length : int/*unsigned long*/
+		byteOffset : number/*unsigned long*/,
+		length : number/*unsigned long*/
 	);
 
-	static __readonly__ var BYTES_PER_ELEMENT : int/*long*/;
-	       __readonly__ var BYTES_PER_ELEMENT : int/*long*/;
-	__readonly__ var length : int/*unsigned long*/;
+	static __readonly__ var BYTES_PER_ELEMENT : number/*long*/;
+	       __readonly__ var BYTES_PER_ELEMENT : number/*long*/;
+	__readonly__ var length : number/*unsigned long*/;
 	function __native_index_operator__(
-		index : int/*unsigned long*/
-	) : Nullable.<int>/*unsigned long*/;
+		index : number/*unsigned long*/
+	) : Nullable.<number>/*unsigned long*/;
 	/* getter */
 	function get(
-		index : int/*unsigned long*/
-	) : Nullable.<int>/*unsigned long*/;
+		index : number/*unsigned long*/
+	) : Nullable.<number>/*unsigned long*/;
 	/* setter */
 	function set(
-		index : int/*unsigned long*/,
-		value : int/*unsigned long*/
+		index : number/*unsigned long*/,
+		value : number/*unsigned long*/
 	) : void;
 	function set(array : Uint32Array) : void;
 	function set(
 		array : Uint32Array,
-		offset : int/*unsigned long*/
+		offset : number/*unsigned long*/
+	) : void;
+	function set(array : number[]/*unsigned long[]*/) : void;
+	function set(
+		array : number[]/*unsigned long[]*/,
+		offset : number/*unsigned long*/
 	) : void;
 	function set(array : int[]/*unsigned long[]*/) : void;
 	function set(
 		array : int[]/*unsigned long[]*/,
-		offset : int/*unsigned long*/
-	) : void;
-	function set(array : number[]) : void;
-	function set(
-		array : number[],
-		offset : int/*unsigned long*/
+		offset : number/*unsigned long*/
 	) : void;
 	function subarray(
-		start : int/*long*/,
-		end : int/*long*/
+		start : number/*long*/,
+		end : number/*long*/
 	) : Uint32Array;
 
 } // end of Uint32Array
@@ -5468,48 +5455,54 @@ native final class Uint32Array extends ArrayBufferView {
 /** @see https://www.khronos.org/registry/typedarray/specs/latest/typedarray.idl */
 native final class Float32Array extends ArrayBufferView {
 
-	function constructor(length : int/*unsigned long*/);
+	function constructor(length : number/*unsigned long*/);
 	function constructor(array : Float32Array);
 	function constructor(array : number[]/*float[]*/);
+	function constructor(array : int[]/*float[]*/);
 	function constructor(buffer : ArrayBuffer);
 	function constructor(
 		buffer : ArrayBuffer,
-		byteOffset : int/*unsigned long*/
+		byteOffset : number/*unsigned long*/
 	);
 	function constructor(
 		buffer : ArrayBuffer,
-		byteOffset : int/*unsigned long*/,
-		length : int/*unsigned long*/
+		byteOffset : number/*unsigned long*/,
+		length : number/*unsigned long*/
 	);
 
-	static __readonly__ var BYTES_PER_ELEMENT : int/*long*/;
-	       __readonly__ var BYTES_PER_ELEMENT : int/*long*/;
-	__readonly__ var length : int/*unsigned long*/;
+	static __readonly__ var BYTES_PER_ELEMENT : number/*long*/;
+	       __readonly__ var BYTES_PER_ELEMENT : number/*long*/;
+	__readonly__ var length : number/*unsigned long*/;
 	function __native_index_operator__(
-		index : int/*unsigned long*/
+		index : number/*unsigned long*/
 	) : Nullable.<number>/*float*/;
 	/* getter */
 	function get(
-		index : int/*unsigned long*/
+		index : number/*unsigned long*/
 	) : Nullable.<number>/*float*/;
 	/* setter */
 	function set(
-		index : int/*unsigned long*/,
+		index : number/*unsigned long*/,
 		value : number/*float*/
 	) : void;
 	function set(array : Float32Array) : void;
 	function set(
 		array : Float32Array,
-		offset : int/*unsigned long*/
+		offset : number/*unsigned long*/
 	) : void;
 	function set(array : number[]/*float[]*/) : void;
 	function set(
 		array : number[]/*float[]*/,
-		offset : int/*unsigned long*/
+		offset : number/*unsigned long*/
+	) : void;
+	function set(array : int[]/*float[]*/) : void;
+	function set(
+		array : int[]/*float[]*/,
+		offset : number/*unsigned long*/
 	) : void;
 	function subarray(
-		start : int/*long*/,
-		end : int/*long*/
+		start : number/*long*/,
+		end : number/*long*/
 	) : Float32Array;
 
 } // end of Float32Array
@@ -5517,48 +5510,54 @@ native final class Float32Array extends ArrayBufferView {
 /** @see https://www.khronos.org/registry/typedarray/specs/latest/typedarray.idl */
 native final class Float64Array extends ArrayBufferView {
 
-	function constructor(length : int/*unsigned long*/);
+	function constructor(length : number/*unsigned long*/);
 	function constructor(array : Float64Array);
 	function constructor(array : number[]/*double[]*/);
+	function constructor(array : int[]/*double[]*/);
 	function constructor(buffer : ArrayBuffer);
 	function constructor(
 		buffer : ArrayBuffer,
-		byteOffset : int/*unsigned long*/
+		byteOffset : number/*unsigned long*/
 	);
 	function constructor(
 		buffer : ArrayBuffer,
-		byteOffset : int/*unsigned long*/,
-		length : int/*unsigned long*/
+		byteOffset : number/*unsigned long*/,
+		length : number/*unsigned long*/
 	);
 
-	static __readonly__ var BYTES_PER_ELEMENT : int/*long*/;
-	       __readonly__ var BYTES_PER_ELEMENT : int/*long*/;
-	__readonly__ var length : int/*unsigned long*/;
+	static __readonly__ var BYTES_PER_ELEMENT : number/*long*/;
+	       __readonly__ var BYTES_PER_ELEMENT : number/*long*/;
+	__readonly__ var length : number/*unsigned long*/;
 	function __native_index_operator__(
-		index : int/*unsigned long*/
+		index : number/*unsigned long*/
 	) : Nullable.<number>/*double*/;
 	/* getter */
 	function get(
-		index : int/*unsigned long*/
+		index : number/*unsigned long*/
 	) : Nullable.<number>/*double*/;
 	/* setter */
 	function set(
-		index : int/*unsigned long*/,
+		index : number/*unsigned long*/,
 		value : number/*double*/
 	) : void;
 	function set(array : Float64Array) : void;
 	function set(
 		array : Float64Array,
-		offset : int/*unsigned long*/
+		offset : number/*unsigned long*/
 	) : void;
 	function set(array : number[]/*double[]*/) : void;
 	function set(
 		array : number[]/*double[]*/,
-		offset : int/*unsigned long*/
+		offset : number/*unsigned long*/
+	) : void;
+	function set(array : int[]/*double[]*/) : void;
+	function set(
+		array : int[]/*double[]*/,
+		offset : number/*unsigned long*/
 	) : void;
 	function subarray(
-		start : int/*long*/,
-		end : int/*long*/
+		start : number/*long*/,
+		end : number/*long*/
 	) : Float64Array;
 
 } // end of Float64Array
@@ -5569,12 +5568,12 @@ native final class DataView extends ArrayBufferView {
 	function constructor(buffer : ArrayBuffer);
 	function constructor(
 		buffer : ArrayBuffer,
-		byteOffset : int/*unsigned long*/
+		byteOffset : number/*unsigned long*/
 	);
 	function constructor(
 		buffer : ArrayBuffer,
-		byteOffset : int/*unsigned long*/,
-		byteLength : int/*unsigned long*/
+		byteOffset : number/*unsigned long*/,
+		byteLength : number/*unsigned long*/
 	);
 
 	// Gets the value of the given type at the specified byte offset
@@ -5587,44 +5586,52 @@ native final class DataView extends ArrayBufferView {
 	//
 	// These methods raise an INDEX_SIZE_ERR exception if they would read
 	// beyond the end of the view.
-	function getInt8(byteOffset : int/*unsigned long*/) : int/*byte*/;
-	function getUint8(byteOffset : int/*unsigned long*/) : int/*octet*/;
-	function getInt16(byteOffset : int/*unsigned long*/) : int/*short*/;
+	function getInt8(
+		byteOffset : number/*unsigned long*/
+	) : number/*byte*/;
+	function getUint8(
+		byteOffset : number/*unsigned long*/
+	) : number/*octet*/;
 	function getInt16(
-		byteOffset : int/*unsigned long*/,
+		byteOffset : number/*unsigned long*/
+	) : number/*short*/;
+	function getInt16(
+		byteOffset : number/*unsigned long*/,
 		littleEndian : boolean
-	) : int/*short*/;
+	) : number/*short*/;
 	function getUint16(
-		byteOffset : int/*unsigned long*/
-	) : int/*unsigned short*/;
+		byteOffset : number/*unsigned long*/
+	) : number/*unsigned short*/;
 	function getUint16(
-		byteOffset : int/*unsigned long*/,
+		byteOffset : number/*unsigned long*/,
 		littleEndian : boolean
-	) : int/*unsigned short*/;
-	function getInt32(byteOffset : int/*unsigned long*/) : int/*long*/;
+	) : number/*unsigned short*/;
 	function getInt32(
-		byteOffset : int/*unsigned long*/,
+		byteOffset : number/*unsigned long*/
+	) : number/*long*/;
+	function getInt32(
+		byteOffset : number/*unsigned long*/,
 		littleEndian : boolean
-	) : int/*long*/;
+	) : number/*long*/;
 	function getUint32(
-		byteOffset : int/*unsigned long*/
-	) : int/*unsigned long*/;
+		byteOffset : number/*unsigned long*/
+	) : number/*unsigned long*/;
 	function getUint32(
-		byteOffset : int/*unsigned long*/,
+		byteOffset : number/*unsigned long*/,
 		littleEndian : boolean
-	) : int/*unsigned long*/;
+	) : number/*unsigned long*/;
 	function getFloat32(
-		byteOffset : int/*unsigned long*/
+		byteOffset : number/*unsigned long*/
 	) : number/*float*/;
 	function getFloat32(
-		byteOffset : int/*unsigned long*/,
+		byteOffset : number/*unsigned long*/,
 		littleEndian : boolean
 	) : number/*float*/;
 	function getFloat64(
-		byteOffset : int/*unsigned long*/
+		byteOffset : number/*unsigned long*/
 	) : number/*double*/;
 	function getFloat64(
-		byteOffset : int/*unsigned long*/,
+		byteOffset : number/*unsigned long*/,
 		littleEndian : boolean
 	) : number/*double*/;
 	// Stores a value of the given type at the specified byte offset
@@ -5639,64 +5646,64 @@ native final class DataView extends ArrayBufferView {
 	// These methods throw exceptions if they would write beyond the end
 	// of the view.
 	function setInt8(
-		byteOffset : int/*unsigned long*/,
-		value : int/*byte*/
+		byteOffset : number/*unsigned long*/,
+		value : number/*byte*/
 	) : void;
 	function setUint8(
-		byteOffset : int/*unsigned long*/,
-		value : int/*octet*/
+		byteOffset : number/*unsigned long*/,
+		value : number/*octet*/
 	) : void;
 	function setInt16(
-		byteOffset : int/*unsigned long*/,
-		value : int/*short*/
+		byteOffset : number/*unsigned long*/,
+		value : number/*short*/
 	) : void;
 	function setInt16(
-		byteOffset : int/*unsigned long*/,
-		value : int/*short*/,
+		byteOffset : number/*unsigned long*/,
+		value : number/*short*/,
 		littleEndian : boolean
 	) : void;
 	function setUint16(
-		byteOffset : int/*unsigned long*/,
-		value : int/*unsigned short*/
+		byteOffset : number/*unsigned long*/,
+		value : number/*unsigned short*/
 	) : void;
 	function setUint16(
-		byteOffset : int/*unsigned long*/,
-		value : int/*unsigned short*/,
+		byteOffset : number/*unsigned long*/,
+		value : number/*unsigned short*/,
 		littleEndian : boolean
 	) : void;
 	function setInt32(
-		byteOffset : int/*unsigned long*/,
-		value : int/*long*/
+		byteOffset : number/*unsigned long*/,
+		value : number/*long*/
 	) : void;
 	function setInt32(
-		byteOffset : int/*unsigned long*/,
-		value : int/*long*/,
+		byteOffset : number/*unsigned long*/,
+		value : number/*long*/,
 		littleEndian : boolean
 	) : void;
 	function setUint32(
-		byteOffset : int/*unsigned long*/,
-		value : int/*unsigned long*/
+		byteOffset : number/*unsigned long*/,
+		value : number/*unsigned long*/
 	) : void;
 	function setUint32(
-		byteOffset : int/*unsigned long*/,
-		value : int/*unsigned long*/,
+		byteOffset : number/*unsigned long*/,
+		value : number/*unsigned long*/,
 		littleEndian : boolean
 	) : void;
 	function setFloat32(
-		byteOffset : int/*unsigned long*/,
+		byteOffset : number/*unsigned long*/,
 		value : number/*float*/
 	) : void;
 	function setFloat32(
-		byteOffset : int/*unsigned long*/,
+		byteOffset : number/*unsigned long*/,
 		value : number/*float*/,
 		littleEndian : boolean
 	) : void;
 	function setFloat64(
-		byteOffset : int/*unsigned long*/,
+		byteOffset : number/*unsigned long*/,
 		value : number/*double*/
 	) : void;
 	function setFloat64(
-		byteOffset : int/*unsigned long*/,
+		byteOffset : number/*unsigned long*/,
 		value : number/*double*/,
 		littleEndian : boolean
 	) : void;
@@ -6123,8 +6130,8 @@ native final class TextMetrics {
 /** @see http://dev.w3.org/html5/2dcontext/ */
 native final class ImageData {
 
-	__readonly__ var width : int/*unsigned long*/;
-	__readonly__ var height : int/*unsigned long*/;
+	__readonly__ var width : number/*unsigned long*/;
+	__readonly__ var height : number/*unsigned long*/;
 	__readonly__ var data : Uint8ClampedArray;
 
 } // end of ImageData
@@ -6176,8 +6183,8 @@ native final class WebGLUniformLocation {
 /** @see https://www.khronos.org/registry/webgl/specs/latest/webgl.idl */
 native final class WebGLActiveInfo {
 
-	__readonly__ var size : int/*GLint*/;
-	__readonly__ var type : int/*GLenum*/;
+	__readonly__ var size : number/*GLint*/;
+	__readonly__ var type : number/*GLenum*/;
 	__readonly__ var name : string/*DOMString*/;
 
 } // end of WebGLActiveInfo
@@ -6185,9 +6192,9 @@ native final class WebGLActiveInfo {
 /** @see https://www.khronos.org/registry/webgl/specs/latest/webgl.idl */
 native final class WebGLShaderPrecisionFormat {
 
-	__readonly__ var rangeMin : int/*GLint*/;
-	__readonly__ var rangeMax : int/*GLint*/;
-	__readonly__ var precision : int/*GLint*/;
+	__readonly__ var rangeMin : number/*GLint*/;
+	__readonly__ var rangeMax : number/*GLint*/;
+	__readonly__ var precision : number/*GLint*/;
 
 } // end of WebGLShaderPrecisionFormat
 
@@ -6195,27 +6202,27 @@ native final class WebGLShaderPrecisionFormat {
 native final class WebGLRenderingContext {
 
 	/* ClearBufferMask */
-	static __readonly__ var DEPTH_BUFFER_BIT : int/*GLenum*/;
-	       __readonly__ var DEPTH_BUFFER_BIT : int/*GLenum*/;
-	static __readonly__ var STENCIL_BUFFER_BIT : int/*GLenum*/;
-	       __readonly__ var STENCIL_BUFFER_BIT : int/*GLenum*/;
-	static __readonly__ var COLOR_BUFFER_BIT : int/*GLenum*/;
-	       __readonly__ var COLOR_BUFFER_BIT : int/*GLenum*/;
+	static __readonly__ var DEPTH_BUFFER_BIT : number/*GLenum*/;
+	       __readonly__ var DEPTH_BUFFER_BIT : number/*GLenum*/;
+	static __readonly__ var STENCIL_BUFFER_BIT : number/*GLenum*/;
+	       __readonly__ var STENCIL_BUFFER_BIT : number/*GLenum*/;
+	static __readonly__ var COLOR_BUFFER_BIT : number/*GLenum*/;
+	       __readonly__ var COLOR_BUFFER_BIT : number/*GLenum*/;
 	/* BeginMode */
-	static __readonly__ var POINTS : int/*GLenum*/;
-	       __readonly__ var POINTS : int/*GLenum*/;
-	static __readonly__ var LINES : int/*GLenum*/;
-	       __readonly__ var LINES : int/*GLenum*/;
-	static __readonly__ var LINE_LOOP : int/*GLenum*/;
-	       __readonly__ var LINE_LOOP : int/*GLenum*/;
-	static __readonly__ var LINE_STRIP : int/*GLenum*/;
-	       __readonly__ var LINE_STRIP : int/*GLenum*/;
-	static __readonly__ var TRIANGLES : int/*GLenum*/;
-	       __readonly__ var TRIANGLES : int/*GLenum*/;
-	static __readonly__ var TRIANGLE_STRIP : int/*GLenum*/;
-	       __readonly__ var TRIANGLE_STRIP : int/*GLenum*/;
-	static __readonly__ var TRIANGLE_FAN : int/*GLenum*/;
-	       __readonly__ var TRIANGLE_FAN : int/*GLenum*/;
+	static __readonly__ var POINTS : number/*GLenum*/;
+	       __readonly__ var POINTS : number/*GLenum*/;
+	static __readonly__ var LINES : number/*GLenum*/;
+	       __readonly__ var LINES : number/*GLenum*/;
+	static __readonly__ var LINE_LOOP : number/*GLenum*/;
+	       __readonly__ var LINE_LOOP : number/*GLenum*/;
+	static __readonly__ var LINE_STRIP : number/*GLenum*/;
+	       __readonly__ var LINE_STRIP : number/*GLenum*/;
+	static __readonly__ var TRIANGLES : number/*GLenum*/;
+	       __readonly__ var TRIANGLES : number/*GLenum*/;
+	static __readonly__ var TRIANGLE_STRIP : number/*GLenum*/;
+	       __readonly__ var TRIANGLE_STRIP : number/*GLenum*/;
+	static __readonly__ var TRIANGLE_FAN : number/*GLenum*/;
+	       __readonly__ var TRIANGLE_FAN : number/*GLenum*/;
 	/* AlphaFunction (not supported in ES20) */
 	/*      NEVER */
 	/*      LESS */
@@ -6227,98 +6234,98 @@ native final class WebGLRenderingContext {
 	/*      ALWAYS */
 
 	/* BlendingFactorDest */
-	static __readonly__ var ZERO : int/*GLenum*/;
-	       __readonly__ var ZERO : int/*GLenum*/;
-	static __readonly__ var ONE : int/*GLenum*/;
-	       __readonly__ var ONE : int/*GLenum*/;
-	static __readonly__ var SRC_COLOR : int/*GLenum*/;
-	       __readonly__ var SRC_COLOR : int/*GLenum*/;
-	static __readonly__ var ONE_MINUS_SRC_COLOR : int/*GLenum*/;
-	       __readonly__ var ONE_MINUS_SRC_COLOR : int/*GLenum*/;
-	static __readonly__ var SRC_ALPHA : int/*GLenum*/;
-	       __readonly__ var SRC_ALPHA : int/*GLenum*/;
-	static __readonly__ var ONE_MINUS_SRC_ALPHA : int/*GLenum*/;
-	       __readonly__ var ONE_MINUS_SRC_ALPHA : int/*GLenum*/;
-	static __readonly__ var DST_ALPHA : int/*GLenum*/;
-	       __readonly__ var DST_ALPHA : int/*GLenum*/;
-	static __readonly__ var ONE_MINUS_DST_ALPHA : int/*GLenum*/;
-	       __readonly__ var ONE_MINUS_DST_ALPHA : int/*GLenum*/;
+	static __readonly__ var ZERO : number/*GLenum*/;
+	       __readonly__ var ZERO : number/*GLenum*/;
+	static __readonly__ var ONE : number/*GLenum*/;
+	       __readonly__ var ONE : number/*GLenum*/;
+	static __readonly__ var SRC_COLOR : number/*GLenum*/;
+	       __readonly__ var SRC_COLOR : number/*GLenum*/;
+	static __readonly__ var ONE_MINUS_SRC_COLOR : number/*GLenum*/;
+	       __readonly__ var ONE_MINUS_SRC_COLOR : number/*GLenum*/;
+	static __readonly__ var SRC_ALPHA : number/*GLenum*/;
+	       __readonly__ var SRC_ALPHA : number/*GLenum*/;
+	static __readonly__ var ONE_MINUS_SRC_ALPHA : number/*GLenum*/;
+	       __readonly__ var ONE_MINUS_SRC_ALPHA : number/*GLenum*/;
+	static __readonly__ var DST_ALPHA : number/*GLenum*/;
+	       __readonly__ var DST_ALPHA : number/*GLenum*/;
+	static __readonly__ var ONE_MINUS_DST_ALPHA : number/*GLenum*/;
+	       __readonly__ var ONE_MINUS_DST_ALPHA : number/*GLenum*/;
 	/* BlendingFactorSrc */
 	/*      ZERO */
 	/*      ONE */
-	static __readonly__ var DST_COLOR : int/*GLenum*/;
-	       __readonly__ var DST_COLOR : int/*GLenum*/;
-	static __readonly__ var ONE_MINUS_DST_COLOR : int/*GLenum*/;
-	       __readonly__ var ONE_MINUS_DST_COLOR : int/*GLenum*/;
-	static __readonly__ var SRC_ALPHA_SATURATE : int/*GLenum*/;
-	       __readonly__ var SRC_ALPHA_SATURATE : int/*GLenum*/;
+	static __readonly__ var DST_COLOR : number/*GLenum*/;
+	       __readonly__ var DST_COLOR : number/*GLenum*/;
+	static __readonly__ var ONE_MINUS_DST_COLOR : number/*GLenum*/;
+	       __readonly__ var ONE_MINUS_DST_COLOR : number/*GLenum*/;
+	static __readonly__ var SRC_ALPHA_SATURATE : number/*GLenum*/;
+	       __readonly__ var SRC_ALPHA_SATURATE : number/*GLenum*/;
 	/*      SRC_ALPHA */
 	/*      ONE_MINUS_SRC_ALPHA */
 	/*      DST_ALPHA */
 	/*      ONE_MINUS_DST_ALPHA */
 
 	/* BlendEquationSeparate */
-	static __readonly__ var FUNC_ADD : int/*GLenum*/;
-	       __readonly__ var FUNC_ADD : int/*GLenum*/;
-	static __readonly__ var BLEND_EQUATION : int/*GLenum*/;
-	       __readonly__ var BLEND_EQUATION : int/*GLenum*/;
-	static __readonly__ var BLEND_EQUATION_RGB : int/*GLenum*/;
-	       __readonly__ var BLEND_EQUATION_RGB : int/*GLenum*/;
+	static __readonly__ var FUNC_ADD : number/*GLenum*/;
+	       __readonly__ var FUNC_ADD : number/*GLenum*/;
+	static __readonly__ var BLEND_EQUATION : number/*GLenum*/;
+	       __readonly__ var BLEND_EQUATION : number/*GLenum*/;
+	static __readonly__ var BLEND_EQUATION_RGB : number/*GLenum*/;
+	       __readonly__ var BLEND_EQUATION_RGB : number/*GLenum*/;
 	/* same as BLEND_EQUATION */
-	static __readonly__ var BLEND_EQUATION_ALPHA : int/*GLenum*/;
-	       __readonly__ var BLEND_EQUATION_ALPHA : int/*GLenum*/;
+	static __readonly__ var BLEND_EQUATION_ALPHA : number/*GLenum*/;
+	       __readonly__ var BLEND_EQUATION_ALPHA : number/*GLenum*/;
 	/* BlendSubtract */
-	static __readonly__ var FUNC_SUBTRACT : int/*GLenum*/;
-	       __readonly__ var FUNC_SUBTRACT : int/*GLenum*/;
-	static __readonly__ var FUNC_REVERSE_SUBTRACT : int/*GLenum*/;
-	       __readonly__ var FUNC_REVERSE_SUBTRACT : int/*GLenum*/;
+	static __readonly__ var FUNC_SUBTRACT : number/*GLenum*/;
+	       __readonly__ var FUNC_SUBTRACT : number/*GLenum*/;
+	static __readonly__ var FUNC_REVERSE_SUBTRACT : number/*GLenum*/;
+	       __readonly__ var FUNC_REVERSE_SUBTRACT : number/*GLenum*/;
 	/* Separate Blend Functions */
-	static __readonly__ var BLEND_DST_RGB : int/*GLenum*/;
-	       __readonly__ var BLEND_DST_RGB : int/*GLenum*/;
-	static __readonly__ var BLEND_SRC_RGB : int/*GLenum*/;
-	       __readonly__ var BLEND_SRC_RGB : int/*GLenum*/;
-	static __readonly__ var BLEND_DST_ALPHA : int/*GLenum*/;
-	       __readonly__ var BLEND_DST_ALPHA : int/*GLenum*/;
-	static __readonly__ var BLEND_SRC_ALPHA : int/*GLenum*/;
-	       __readonly__ var BLEND_SRC_ALPHA : int/*GLenum*/;
-	static __readonly__ var CONSTANT_COLOR : int/*GLenum*/;
-	       __readonly__ var CONSTANT_COLOR : int/*GLenum*/;
-	static __readonly__ var ONE_MINUS_CONSTANT_COLOR : int/*GLenum*/;
-	       __readonly__ var ONE_MINUS_CONSTANT_COLOR : int/*GLenum*/;
-	static __readonly__ var CONSTANT_ALPHA : int/*GLenum*/;
-	       __readonly__ var CONSTANT_ALPHA : int/*GLenum*/;
-	static __readonly__ var ONE_MINUS_CONSTANT_ALPHA : int/*GLenum*/;
-	       __readonly__ var ONE_MINUS_CONSTANT_ALPHA : int/*GLenum*/;
-	static __readonly__ var BLEND_COLOR : int/*GLenum*/;
-	       __readonly__ var BLEND_COLOR : int/*GLenum*/;
+	static __readonly__ var BLEND_DST_RGB : number/*GLenum*/;
+	       __readonly__ var BLEND_DST_RGB : number/*GLenum*/;
+	static __readonly__ var BLEND_SRC_RGB : number/*GLenum*/;
+	       __readonly__ var BLEND_SRC_RGB : number/*GLenum*/;
+	static __readonly__ var BLEND_DST_ALPHA : number/*GLenum*/;
+	       __readonly__ var BLEND_DST_ALPHA : number/*GLenum*/;
+	static __readonly__ var BLEND_SRC_ALPHA : number/*GLenum*/;
+	       __readonly__ var BLEND_SRC_ALPHA : number/*GLenum*/;
+	static __readonly__ var CONSTANT_COLOR : number/*GLenum*/;
+	       __readonly__ var CONSTANT_COLOR : number/*GLenum*/;
+	static __readonly__ var ONE_MINUS_CONSTANT_COLOR : number/*GLenum*/;
+	       __readonly__ var ONE_MINUS_CONSTANT_COLOR : number/*GLenum*/;
+	static __readonly__ var CONSTANT_ALPHA : number/*GLenum*/;
+	       __readonly__ var CONSTANT_ALPHA : number/*GLenum*/;
+	static __readonly__ var ONE_MINUS_CONSTANT_ALPHA : number/*GLenum*/;
+	       __readonly__ var ONE_MINUS_CONSTANT_ALPHA : number/*GLenum*/;
+	static __readonly__ var BLEND_COLOR : number/*GLenum*/;
+	       __readonly__ var BLEND_COLOR : number/*GLenum*/;
 	/* Buffer Objects */
-	static __readonly__ var ARRAY_BUFFER : int/*GLenum*/;
-	       __readonly__ var ARRAY_BUFFER : int/*GLenum*/;
-	static __readonly__ var ELEMENT_ARRAY_BUFFER : int/*GLenum*/;
-	       __readonly__ var ELEMENT_ARRAY_BUFFER : int/*GLenum*/;
-	static __readonly__ var ARRAY_BUFFER_BINDING : int/*GLenum*/;
-	       __readonly__ var ARRAY_BUFFER_BINDING : int/*GLenum*/;
-	static __readonly__ var ELEMENT_ARRAY_BUFFER_BINDING : int/*GLenum*/;
-	       __readonly__ var ELEMENT_ARRAY_BUFFER_BINDING : int/*GLenum*/;
-	static __readonly__ var STREAM_DRAW : int/*GLenum*/;
-	       __readonly__ var STREAM_DRAW : int/*GLenum*/;
-	static __readonly__ var STATIC_DRAW : int/*GLenum*/;
-	       __readonly__ var STATIC_DRAW : int/*GLenum*/;
-	static __readonly__ var DYNAMIC_DRAW : int/*GLenum*/;
-	       __readonly__ var DYNAMIC_DRAW : int/*GLenum*/;
-	static __readonly__ var BUFFER_SIZE : int/*GLenum*/;
-	       __readonly__ var BUFFER_SIZE : int/*GLenum*/;
-	static __readonly__ var BUFFER_USAGE : int/*GLenum*/;
-	       __readonly__ var BUFFER_USAGE : int/*GLenum*/;
-	static __readonly__ var CURRENT_VERTEX_ATTRIB : int/*GLenum*/;
-	       __readonly__ var CURRENT_VERTEX_ATTRIB : int/*GLenum*/;
+	static __readonly__ var ARRAY_BUFFER : number/*GLenum*/;
+	       __readonly__ var ARRAY_BUFFER : number/*GLenum*/;
+	static __readonly__ var ELEMENT_ARRAY_BUFFER : number/*GLenum*/;
+	       __readonly__ var ELEMENT_ARRAY_BUFFER : number/*GLenum*/;
+	static __readonly__ var ARRAY_BUFFER_BINDING : number/*GLenum*/;
+	       __readonly__ var ARRAY_BUFFER_BINDING : number/*GLenum*/;
+	static __readonly__ var ELEMENT_ARRAY_BUFFER_BINDING : number/*GLenum*/;
+	       __readonly__ var ELEMENT_ARRAY_BUFFER_BINDING : number/*GLenum*/;
+	static __readonly__ var STREAM_DRAW : number/*GLenum*/;
+	       __readonly__ var STREAM_DRAW : number/*GLenum*/;
+	static __readonly__ var STATIC_DRAW : number/*GLenum*/;
+	       __readonly__ var STATIC_DRAW : number/*GLenum*/;
+	static __readonly__ var DYNAMIC_DRAW : number/*GLenum*/;
+	       __readonly__ var DYNAMIC_DRAW : number/*GLenum*/;
+	static __readonly__ var BUFFER_SIZE : number/*GLenum*/;
+	       __readonly__ var BUFFER_SIZE : number/*GLenum*/;
+	static __readonly__ var BUFFER_USAGE : number/*GLenum*/;
+	       __readonly__ var BUFFER_USAGE : number/*GLenum*/;
+	static __readonly__ var CURRENT_VERTEX_ATTRIB : number/*GLenum*/;
+	       __readonly__ var CURRENT_VERTEX_ATTRIB : number/*GLenum*/;
 	/* CullFaceMode */
-	static __readonly__ var FRONT : int/*GLenum*/;
-	       __readonly__ var FRONT : int/*GLenum*/;
-	static __readonly__ var BACK : int/*GLenum*/;
-	       __readonly__ var BACK : int/*GLenum*/;
-	static __readonly__ var FRONT_AND_BACK : int/*GLenum*/;
-	       __readonly__ var FRONT_AND_BACK : int/*GLenum*/;
+	static __readonly__ var FRONT : number/*GLenum*/;
+	       __readonly__ var FRONT : number/*GLenum*/;
+	static __readonly__ var BACK : number/*GLenum*/;
+	       __readonly__ var BACK : number/*GLenum*/;
+	static __readonly__ var FRONT_AND_BACK : number/*GLenum*/;
+	       __readonly__ var FRONT_AND_BACK : number/*GLenum*/;
 	/* DepthFunction */
 	/*      NEVER */
 	/*      LESS */
@@ -6331,568 +6338,568 @@ native final class WebGLRenderingContext {
 
 	/* EnableCap */
 	/* TEXTURE_2D */
-	static __readonly__ var CULL_FACE : int/*GLenum*/;
-	       __readonly__ var CULL_FACE : int/*GLenum*/;
-	static __readonly__ var BLEND : int/*GLenum*/;
-	       __readonly__ var BLEND : int/*GLenum*/;
-	static __readonly__ var DITHER : int/*GLenum*/;
-	       __readonly__ var DITHER : int/*GLenum*/;
-	static __readonly__ var STENCIL_TEST : int/*GLenum*/;
-	       __readonly__ var STENCIL_TEST : int/*GLenum*/;
-	static __readonly__ var DEPTH_TEST : int/*GLenum*/;
-	       __readonly__ var DEPTH_TEST : int/*GLenum*/;
-	static __readonly__ var SCISSOR_TEST : int/*GLenum*/;
-	       __readonly__ var SCISSOR_TEST : int/*GLenum*/;
-	static __readonly__ var POLYGON_OFFSET_FILL : int/*GLenum*/;
-	       __readonly__ var POLYGON_OFFSET_FILL : int/*GLenum*/;
-	static __readonly__ var SAMPLE_ALPHA_TO_COVERAGE : int/*GLenum*/;
-	       __readonly__ var SAMPLE_ALPHA_TO_COVERAGE : int/*GLenum*/;
-	static __readonly__ var SAMPLE_COVERAGE : int/*GLenum*/;
-	       __readonly__ var SAMPLE_COVERAGE : int/*GLenum*/;
+	static __readonly__ var CULL_FACE : number/*GLenum*/;
+	       __readonly__ var CULL_FACE : number/*GLenum*/;
+	static __readonly__ var BLEND : number/*GLenum*/;
+	       __readonly__ var BLEND : number/*GLenum*/;
+	static __readonly__ var DITHER : number/*GLenum*/;
+	       __readonly__ var DITHER : number/*GLenum*/;
+	static __readonly__ var STENCIL_TEST : number/*GLenum*/;
+	       __readonly__ var STENCIL_TEST : number/*GLenum*/;
+	static __readonly__ var DEPTH_TEST : number/*GLenum*/;
+	       __readonly__ var DEPTH_TEST : number/*GLenum*/;
+	static __readonly__ var SCISSOR_TEST : number/*GLenum*/;
+	       __readonly__ var SCISSOR_TEST : number/*GLenum*/;
+	static __readonly__ var POLYGON_OFFSET_FILL : number/*GLenum*/;
+	       __readonly__ var POLYGON_OFFSET_FILL : number/*GLenum*/;
+	static __readonly__ var SAMPLE_ALPHA_TO_COVERAGE : number/*GLenum*/;
+	       __readonly__ var SAMPLE_ALPHA_TO_COVERAGE : number/*GLenum*/;
+	static __readonly__ var SAMPLE_COVERAGE : number/*GLenum*/;
+	       __readonly__ var SAMPLE_COVERAGE : number/*GLenum*/;
 	/* ErrorCode */
-	static __readonly__ var NO_ERROR : int/*GLenum*/;
-	       __readonly__ var NO_ERROR : int/*GLenum*/;
-	static __readonly__ var INVALID_ENUM : int/*GLenum*/;
-	       __readonly__ var INVALID_ENUM : int/*GLenum*/;
-	static __readonly__ var INVALID_VALUE : int/*GLenum*/;
-	       __readonly__ var INVALID_VALUE : int/*GLenum*/;
-	static __readonly__ var INVALID_OPERATION : int/*GLenum*/;
-	       __readonly__ var INVALID_OPERATION : int/*GLenum*/;
-	static __readonly__ var OUT_OF_MEMORY : int/*GLenum*/;
-	       __readonly__ var OUT_OF_MEMORY : int/*GLenum*/;
+	static __readonly__ var NO_ERROR : number/*GLenum*/;
+	       __readonly__ var NO_ERROR : number/*GLenum*/;
+	static __readonly__ var INVALID_ENUM : number/*GLenum*/;
+	       __readonly__ var INVALID_ENUM : number/*GLenum*/;
+	static __readonly__ var INVALID_VALUE : number/*GLenum*/;
+	       __readonly__ var INVALID_VALUE : number/*GLenum*/;
+	static __readonly__ var INVALID_OPERATION : number/*GLenum*/;
+	       __readonly__ var INVALID_OPERATION : number/*GLenum*/;
+	static __readonly__ var OUT_OF_MEMORY : number/*GLenum*/;
+	       __readonly__ var OUT_OF_MEMORY : number/*GLenum*/;
 	/* FrontFaceDirection */
-	static __readonly__ var CW : int/*GLenum*/;
-	       __readonly__ var CW : int/*GLenum*/;
-	static __readonly__ var CCW : int/*GLenum*/;
-	       __readonly__ var CCW : int/*GLenum*/;
+	static __readonly__ var CW : number/*GLenum*/;
+	       __readonly__ var CW : number/*GLenum*/;
+	static __readonly__ var CCW : number/*GLenum*/;
+	       __readonly__ var CCW : number/*GLenum*/;
 	/* GetPName */
-	static __readonly__ var LINE_WIDTH : int/*GLenum*/;
-	       __readonly__ var LINE_WIDTH : int/*GLenum*/;
-	static __readonly__ var ALIASED_POINT_SIZE_RANGE : int/*GLenum*/;
-	       __readonly__ var ALIASED_POINT_SIZE_RANGE : int/*GLenum*/;
-	static __readonly__ var ALIASED_LINE_WIDTH_RANGE : int/*GLenum*/;
-	       __readonly__ var ALIASED_LINE_WIDTH_RANGE : int/*GLenum*/;
-	static __readonly__ var CULL_FACE_MODE : int/*GLenum*/;
-	       __readonly__ var CULL_FACE_MODE : int/*GLenum*/;
-	static __readonly__ var FRONT_FACE : int/*GLenum*/;
-	       __readonly__ var FRONT_FACE : int/*GLenum*/;
-	static __readonly__ var DEPTH_RANGE : int/*GLenum*/;
-	       __readonly__ var DEPTH_RANGE : int/*GLenum*/;
-	static __readonly__ var DEPTH_WRITEMASK : int/*GLenum*/;
-	       __readonly__ var DEPTH_WRITEMASK : int/*GLenum*/;
-	static __readonly__ var DEPTH_CLEAR_VALUE : int/*GLenum*/;
-	       __readonly__ var DEPTH_CLEAR_VALUE : int/*GLenum*/;
-	static __readonly__ var DEPTH_FUNC : int/*GLenum*/;
-	       __readonly__ var DEPTH_FUNC : int/*GLenum*/;
-	static __readonly__ var STENCIL_CLEAR_VALUE : int/*GLenum*/;
-	       __readonly__ var STENCIL_CLEAR_VALUE : int/*GLenum*/;
-	static __readonly__ var STENCIL_FUNC : int/*GLenum*/;
-	       __readonly__ var STENCIL_FUNC : int/*GLenum*/;
-	static __readonly__ var STENCIL_FAIL : int/*GLenum*/;
-	       __readonly__ var STENCIL_FAIL : int/*GLenum*/;
-	static __readonly__ var STENCIL_PASS_DEPTH_FAIL : int/*GLenum*/;
-	       __readonly__ var STENCIL_PASS_DEPTH_FAIL : int/*GLenum*/;
-	static __readonly__ var STENCIL_PASS_DEPTH_PASS : int/*GLenum*/;
-	       __readonly__ var STENCIL_PASS_DEPTH_PASS : int/*GLenum*/;
-	static __readonly__ var STENCIL_REF : int/*GLenum*/;
-	       __readonly__ var STENCIL_REF : int/*GLenum*/;
-	static __readonly__ var STENCIL_VALUE_MASK : int/*GLenum*/;
-	       __readonly__ var STENCIL_VALUE_MASK : int/*GLenum*/;
-	static __readonly__ var STENCIL_WRITEMASK : int/*GLenum*/;
-	       __readonly__ var STENCIL_WRITEMASK : int/*GLenum*/;
-	static __readonly__ var STENCIL_BACK_FUNC : int/*GLenum*/;
-	       __readonly__ var STENCIL_BACK_FUNC : int/*GLenum*/;
-	static __readonly__ var STENCIL_BACK_FAIL : int/*GLenum*/;
-	       __readonly__ var STENCIL_BACK_FAIL : int/*GLenum*/;
-	static __readonly__ var STENCIL_BACK_PASS_DEPTH_FAIL : int/*GLenum*/;
-	       __readonly__ var STENCIL_BACK_PASS_DEPTH_FAIL : int/*GLenum*/;
-	static __readonly__ var STENCIL_BACK_PASS_DEPTH_PASS : int/*GLenum*/;
-	       __readonly__ var STENCIL_BACK_PASS_DEPTH_PASS : int/*GLenum*/;
-	static __readonly__ var STENCIL_BACK_REF : int/*GLenum*/;
-	       __readonly__ var STENCIL_BACK_REF : int/*GLenum*/;
-	static __readonly__ var STENCIL_BACK_VALUE_MASK : int/*GLenum*/;
-	       __readonly__ var STENCIL_BACK_VALUE_MASK : int/*GLenum*/;
-	static __readonly__ var STENCIL_BACK_WRITEMASK : int/*GLenum*/;
-	       __readonly__ var STENCIL_BACK_WRITEMASK : int/*GLenum*/;
-	static __readonly__ var VIEWPORT : int/*GLenum*/;
-	       __readonly__ var VIEWPORT : int/*GLenum*/;
-	static __readonly__ var SCISSOR_BOX : int/*GLenum*/;
-	       __readonly__ var SCISSOR_BOX : int/*GLenum*/;
+	static __readonly__ var LINE_WIDTH : number/*GLenum*/;
+	       __readonly__ var LINE_WIDTH : number/*GLenum*/;
+	static __readonly__ var ALIASED_POINT_SIZE_RANGE : number/*GLenum*/;
+	       __readonly__ var ALIASED_POINT_SIZE_RANGE : number/*GLenum*/;
+	static __readonly__ var ALIASED_LINE_WIDTH_RANGE : number/*GLenum*/;
+	       __readonly__ var ALIASED_LINE_WIDTH_RANGE : number/*GLenum*/;
+	static __readonly__ var CULL_FACE_MODE : number/*GLenum*/;
+	       __readonly__ var CULL_FACE_MODE : number/*GLenum*/;
+	static __readonly__ var FRONT_FACE : number/*GLenum*/;
+	       __readonly__ var FRONT_FACE : number/*GLenum*/;
+	static __readonly__ var DEPTH_RANGE : number/*GLenum*/;
+	       __readonly__ var DEPTH_RANGE : number/*GLenum*/;
+	static __readonly__ var DEPTH_WRITEMASK : number/*GLenum*/;
+	       __readonly__ var DEPTH_WRITEMASK : number/*GLenum*/;
+	static __readonly__ var DEPTH_CLEAR_VALUE : number/*GLenum*/;
+	       __readonly__ var DEPTH_CLEAR_VALUE : number/*GLenum*/;
+	static __readonly__ var DEPTH_FUNC : number/*GLenum*/;
+	       __readonly__ var DEPTH_FUNC : number/*GLenum*/;
+	static __readonly__ var STENCIL_CLEAR_VALUE : number/*GLenum*/;
+	       __readonly__ var STENCIL_CLEAR_VALUE : number/*GLenum*/;
+	static __readonly__ var STENCIL_FUNC : number/*GLenum*/;
+	       __readonly__ var STENCIL_FUNC : number/*GLenum*/;
+	static __readonly__ var STENCIL_FAIL : number/*GLenum*/;
+	       __readonly__ var STENCIL_FAIL : number/*GLenum*/;
+	static __readonly__ var STENCIL_PASS_DEPTH_FAIL : number/*GLenum*/;
+	       __readonly__ var STENCIL_PASS_DEPTH_FAIL : number/*GLenum*/;
+	static __readonly__ var STENCIL_PASS_DEPTH_PASS : number/*GLenum*/;
+	       __readonly__ var STENCIL_PASS_DEPTH_PASS : number/*GLenum*/;
+	static __readonly__ var STENCIL_REF : number/*GLenum*/;
+	       __readonly__ var STENCIL_REF : number/*GLenum*/;
+	static __readonly__ var STENCIL_VALUE_MASK : number/*GLenum*/;
+	       __readonly__ var STENCIL_VALUE_MASK : number/*GLenum*/;
+	static __readonly__ var STENCIL_WRITEMASK : number/*GLenum*/;
+	       __readonly__ var STENCIL_WRITEMASK : number/*GLenum*/;
+	static __readonly__ var STENCIL_BACK_FUNC : number/*GLenum*/;
+	       __readonly__ var STENCIL_BACK_FUNC : number/*GLenum*/;
+	static __readonly__ var STENCIL_BACK_FAIL : number/*GLenum*/;
+	       __readonly__ var STENCIL_BACK_FAIL : number/*GLenum*/;
+	static __readonly__ var STENCIL_BACK_PASS_DEPTH_FAIL : number/*GLenum*/;
+	       __readonly__ var STENCIL_BACK_PASS_DEPTH_FAIL : number/*GLenum*/;
+	static __readonly__ var STENCIL_BACK_PASS_DEPTH_PASS : number/*GLenum*/;
+	       __readonly__ var STENCIL_BACK_PASS_DEPTH_PASS : number/*GLenum*/;
+	static __readonly__ var STENCIL_BACK_REF : number/*GLenum*/;
+	       __readonly__ var STENCIL_BACK_REF : number/*GLenum*/;
+	static __readonly__ var STENCIL_BACK_VALUE_MASK : number/*GLenum*/;
+	       __readonly__ var STENCIL_BACK_VALUE_MASK : number/*GLenum*/;
+	static __readonly__ var STENCIL_BACK_WRITEMASK : number/*GLenum*/;
+	       __readonly__ var STENCIL_BACK_WRITEMASK : number/*GLenum*/;
+	static __readonly__ var VIEWPORT : number/*GLenum*/;
+	       __readonly__ var VIEWPORT : number/*GLenum*/;
+	static __readonly__ var SCISSOR_BOX : number/*GLenum*/;
+	       __readonly__ var SCISSOR_BOX : number/*GLenum*/;
 	/*      SCISSOR_TEST */
-	static __readonly__ var COLOR_CLEAR_VALUE : int/*GLenum*/;
-	       __readonly__ var COLOR_CLEAR_VALUE : int/*GLenum*/;
-	static __readonly__ var COLOR_WRITEMASK : int/*GLenum*/;
-	       __readonly__ var COLOR_WRITEMASK : int/*GLenum*/;
-	static __readonly__ var UNPACK_ALIGNMENT : int/*GLenum*/;
-	       __readonly__ var UNPACK_ALIGNMENT : int/*GLenum*/;
-	static __readonly__ var PACK_ALIGNMENT : int/*GLenum*/;
-	       __readonly__ var PACK_ALIGNMENT : int/*GLenum*/;
-	static __readonly__ var MAX_TEXTURE_SIZE : int/*GLenum*/;
-	       __readonly__ var MAX_TEXTURE_SIZE : int/*GLenum*/;
-	static __readonly__ var MAX_VIEWPORT_DIMS : int/*GLenum*/;
-	       __readonly__ var MAX_VIEWPORT_DIMS : int/*GLenum*/;
-	static __readonly__ var SUBPIXEL_BITS : int/*GLenum*/;
-	       __readonly__ var SUBPIXEL_BITS : int/*GLenum*/;
-	static __readonly__ var RED_BITS : int/*GLenum*/;
-	       __readonly__ var RED_BITS : int/*GLenum*/;
-	static __readonly__ var GREEN_BITS : int/*GLenum*/;
-	       __readonly__ var GREEN_BITS : int/*GLenum*/;
-	static __readonly__ var BLUE_BITS : int/*GLenum*/;
-	       __readonly__ var BLUE_BITS : int/*GLenum*/;
-	static __readonly__ var ALPHA_BITS : int/*GLenum*/;
-	       __readonly__ var ALPHA_BITS : int/*GLenum*/;
-	static __readonly__ var DEPTH_BITS : int/*GLenum*/;
-	       __readonly__ var DEPTH_BITS : int/*GLenum*/;
-	static __readonly__ var STENCIL_BITS : int/*GLenum*/;
-	       __readonly__ var STENCIL_BITS : int/*GLenum*/;
-	static __readonly__ var POLYGON_OFFSET_UNITS : int/*GLenum*/;
-	       __readonly__ var POLYGON_OFFSET_UNITS : int/*GLenum*/;
+	static __readonly__ var COLOR_CLEAR_VALUE : number/*GLenum*/;
+	       __readonly__ var COLOR_CLEAR_VALUE : number/*GLenum*/;
+	static __readonly__ var COLOR_WRITEMASK : number/*GLenum*/;
+	       __readonly__ var COLOR_WRITEMASK : number/*GLenum*/;
+	static __readonly__ var UNPACK_ALIGNMENT : number/*GLenum*/;
+	       __readonly__ var UNPACK_ALIGNMENT : number/*GLenum*/;
+	static __readonly__ var PACK_ALIGNMENT : number/*GLenum*/;
+	       __readonly__ var PACK_ALIGNMENT : number/*GLenum*/;
+	static __readonly__ var MAX_TEXTURE_SIZE : number/*GLenum*/;
+	       __readonly__ var MAX_TEXTURE_SIZE : number/*GLenum*/;
+	static __readonly__ var MAX_VIEWPORT_DIMS : number/*GLenum*/;
+	       __readonly__ var MAX_VIEWPORT_DIMS : number/*GLenum*/;
+	static __readonly__ var SUBPIXEL_BITS : number/*GLenum*/;
+	       __readonly__ var SUBPIXEL_BITS : number/*GLenum*/;
+	static __readonly__ var RED_BITS : number/*GLenum*/;
+	       __readonly__ var RED_BITS : number/*GLenum*/;
+	static __readonly__ var GREEN_BITS : number/*GLenum*/;
+	       __readonly__ var GREEN_BITS : number/*GLenum*/;
+	static __readonly__ var BLUE_BITS : number/*GLenum*/;
+	       __readonly__ var BLUE_BITS : number/*GLenum*/;
+	static __readonly__ var ALPHA_BITS : number/*GLenum*/;
+	       __readonly__ var ALPHA_BITS : number/*GLenum*/;
+	static __readonly__ var DEPTH_BITS : number/*GLenum*/;
+	       __readonly__ var DEPTH_BITS : number/*GLenum*/;
+	static __readonly__ var STENCIL_BITS : number/*GLenum*/;
+	       __readonly__ var STENCIL_BITS : number/*GLenum*/;
+	static __readonly__ var POLYGON_OFFSET_UNITS : number/*GLenum*/;
+	       __readonly__ var POLYGON_OFFSET_UNITS : number/*GLenum*/;
 	/*      POLYGON_OFFSET_FILL */
-	static __readonly__ var POLYGON_OFFSET_FACTOR : int/*GLenum*/;
-	       __readonly__ var POLYGON_OFFSET_FACTOR : int/*GLenum*/;
-	static __readonly__ var TEXTURE_BINDING_2D : int/*GLenum*/;
-	       __readonly__ var TEXTURE_BINDING_2D : int/*GLenum*/;
-	static __readonly__ var SAMPLE_BUFFERS : int/*GLenum*/;
-	       __readonly__ var SAMPLE_BUFFERS : int/*GLenum*/;
-	static __readonly__ var SAMPLES : int/*GLenum*/;
-	       __readonly__ var SAMPLES : int/*GLenum*/;
-	static __readonly__ var SAMPLE_COVERAGE_VALUE : int/*GLenum*/;
-	       __readonly__ var SAMPLE_COVERAGE_VALUE : int/*GLenum*/;
-	static __readonly__ var SAMPLE_COVERAGE_INVERT : int/*GLenum*/;
-	       __readonly__ var SAMPLE_COVERAGE_INVERT : int/*GLenum*/;
+	static __readonly__ var POLYGON_OFFSET_FACTOR : number/*GLenum*/;
+	       __readonly__ var POLYGON_OFFSET_FACTOR : number/*GLenum*/;
+	static __readonly__ var TEXTURE_BINDING_2D : number/*GLenum*/;
+	       __readonly__ var TEXTURE_BINDING_2D : number/*GLenum*/;
+	static __readonly__ var SAMPLE_BUFFERS : number/*GLenum*/;
+	       __readonly__ var SAMPLE_BUFFERS : number/*GLenum*/;
+	static __readonly__ var SAMPLES : number/*GLenum*/;
+	       __readonly__ var SAMPLES : number/*GLenum*/;
+	static __readonly__ var SAMPLE_COVERAGE_VALUE : number/*GLenum*/;
+	       __readonly__ var SAMPLE_COVERAGE_VALUE : number/*GLenum*/;
+	static __readonly__ var SAMPLE_COVERAGE_INVERT : number/*GLenum*/;
+	       __readonly__ var SAMPLE_COVERAGE_INVERT : number/*GLenum*/;
 	/* GetTextureParameter */
 	/*      TEXTURE_MAG_FILTER */
 	/*      TEXTURE_MIN_FILTER */
 	/*      TEXTURE_WRAP_S */
 	/*      TEXTURE_WRAP_T */
 
-	static __readonly__ var COMPRESSED_TEXTURE_FORMATS : int/*GLenum*/;
-	       __readonly__ var COMPRESSED_TEXTURE_FORMATS : int/*GLenum*/;
+	static __readonly__ var COMPRESSED_TEXTURE_FORMATS : number/*GLenum*/;
+	       __readonly__ var COMPRESSED_TEXTURE_FORMATS : number/*GLenum*/;
 	/* HintMode */
-	static __readonly__ var DONT_CARE : int/*GLenum*/;
-	       __readonly__ var DONT_CARE : int/*GLenum*/;
-	static __readonly__ var FASTEST : int/*GLenum*/;
-	       __readonly__ var FASTEST : int/*GLenum*/;
-	static __readonly__ var NICEST : int/*GLenum*/;
-	       __readonly__ var NICEST : int/*GLenum*/;
+	static __readonly__ var DONT_CARE : number/*GLenum*/;
+	       __readonly__ var DONT_CARE : number/*GLenum*/;
+	static __readonly__ var FASTEST : number/*GLenum*/;
+	       __readonly__ var FASTEST : number/*GLenum*/;
+	static __readonly__ var NICEST : number/*GLenum*/;
+	       __readonly__ var NICEST : number/*GLenum*/;
 	/* HintTarget */
-	static __readonly__ var GENERATE_MIPMAP_HINT : int/*GLenum*/;
-	       __readonly__ var GENERATE_MIPMAP_HINT : int/*GLenum*/;
+	static __readonly__ var GENERATE_MIPMAP_HINT : number/*GLenum*/;
+	       __readonly__ var GENERATE_MIPMAP_HINT : number/*GLenum*/;
 	/* DataType */
-	static __readonly__ var BYTE : int/*GLenum*/;
-	       __readonly__ var BYTE : int/*GLenum*/;
-	static __readonly__ var UNSIGNED_BYTE : int/*GLenum*/;
-	       __readonly__ var UNSIGNED_BYTE : int/*GLenum*/;
-	static __readonly__ var SHORT : int/*GLenum*/;
-	       __readonly__ var SHORT : int/*GLenum*/;
-	static __readonly__ var UNSIGNED_SHORT : int/*GLenum*/;
-	       __readonly__ var UNSIGNED_SHORT : int/*GLenum*/;
-	static __readonly__ var INT : int/*GLenum*/;
-	       __readonly__ var INT : int/*GLenum*/;
-	static __readonly__ var UNSIGNED_INT : int/*GLenum*/;
-	       __readonly__ var UNSIGNED_INT : int/*GLenum*/;
-	static __readonly__ var FLOAT : int/*GLenum*/;
-	       __readonly__ var FLOAT : int/*GLenum*/;
+	static __readonly__ var BYTE : number/*GLenum*/;
+	       __readonly__ var BYTE : number/*GLenum*/;
+	static __readonly__ var UNSIGNED_BYTE : number/*GLenum*/;
+	       __readonly__ var UNSIGNED_BYTE : number/*GLenum*/;
+	static __readonly__ var SHORT : number/*GLenum*/;
+	       __readonly__ var SHORT : number/*GLenum*/;
+	static __readonly__ var UNSIGNED_SHORT : number/*GLenum*/;
+	       __readonly__ var UNSIGNED_SHORT : number/*GLenum*/;
+	static __readonly__ var INT : number/*GLenum*/;
+	       __readonly__ var INT : number/*GLenum*/;
+	static __readonly__ var UNSIGNED_INT : number/*GLenum*/;
+	       __readonly__ var UNSIGNED_INT : number/*GLenum*/;
+	static __readonly__ var FLOAT : number/*GLenum*/;
+	       __readonly__ var FLOAT : number/*GLenum*/;
 	/* PixelFormat */
-	static __readonly__ var DEPTH_COMPONENT : int/*GLenum*/;
-	       __readonly__ var DEPTH_COMPONENT : int/*GLenum*/;
-	static __readonly__ var ALPHA : int/*GLenum*/;
-	       __readonly__ var ALPHA : int/*GLenum*/;
-	static __readonly__ var RGB : int/*GLenum*/;
-	       __readonly__ var RGB : int/*GLenum*/;
-	static __readonly__ var RGBA : int/*GLenum*/;
-	       __readonly__ var RGBA : int/*GLenum*/;
-	static __readonly__ var LUMINANCE : int/*GLenum*/;
-	       __readonly__ var LUMINANCE : int/*GLenum*/;
-	static __readonly__ var LUMINANCE_ALPHA : int/*GLenum*/;
-	       __readonly__ var LUMINANCE_ALPHA : int/*GLenum*/;
+	static __readonly__ var DEPTH_COMPONENT : number/*GLenum*/;
+	       __readonly__ var DEPTH_COMPONENT : number/*GLenum*/;
+	static __readonly__ var ALPHA : number/*GLenum*/;
+	       __readonly__ var ALPHA : number/*GLenum*/;
+	static __readonly__ var RGB : number/*GLenum*/;
+	       __readonly__ var RGB : number/*GLenum*/;
+	static __readonly__ var RGBA : number/*GLenum*/;
+	       __readonly__ var RGBA : number/*GLenum*/;
+	static __readonly__ var LUMINANCE : number/*GLenum*/;
+	       __readonly__ var LUMINANCE : number/*GLenum*/;
+	static __readonly__ var LUMINANCE_ALPHA : number/*GLenum*/;
+	       __readonly__ var LUMINANCE_ALPHA : number/*GLenum*/;
 	/* PixelType */
 	/*      UNSIGNED_BYTE */
-	static __readonly__ var UNSIGNED_SHORT_4_4_4_4 : int/*GLenum*/;
-	       __readonly__ var UNSIGNED_SHORT_4_4_4_4 : int/*GLenum*/;
-	static __readonly__ var UNSIGNED_SHORT_5_5_5_1 : int/*GLenum*/;
-	       __readonly__ var UNSIGNED_SHORT_5_5_5_1 : int/*GLenum*/;
-	static __readonly__ var UNSIGNED_SHORT_5_6_5 : int/*GLenum*/;
-	       __readonly__ var UNSIGNED_SHORT_5_6_5 : int/*GLenum*/;
+	static __readonly__ var UNSIGNED_SHORT_4_4_4_4 : number/*GLenum*/;
+	       __readonly__ var UNSIGNED_SHORT_4_4_4_4 : number/*GLenum*/;
+	static __readonly__ var UNSIGNED_SHORT_5_5_5_1 : number/*GLenum*/;
+	       __readonly__ var UNSIGNED_SHORT_5_5_5_1 : number/*GLenum*/;
+	static __readonly__ var UNSIGNED_SHORT_5_6_5 : number/*GLenum*/;
+	       __readonly__ var UNSIGNED_SHORT_5_6_5 : number/*GLenum*/;
 	/* Shaders */
-	static __readonly__ var FRAGMENT_SHADER : int/*GLenum*/;
-	       __readonly__ var FRAGMENT_SHADER : int/*GLenum*/;
-	static __readonly__ var VERTEX_SHADER : int/*GLenum*/;
-	       __readonly__ var VERTEX_SHADER : int/*GLenum*/;
-	static __readonly__ var MAX_VERTEX_ATTRIBS : int/*GLenum*/;
-	       __readonly__ var MAX_VERTEX_ATTRIBS : int/*GLenum*/;
-	static __readonly__ var MAX_VERTEX_UNIFORM_VECTORS : int/*GLenum*/;
-	       __readonly__ var MAX_VERTEX_UNIFORM_VECTORS : int/*GLenum*/;
-	static __readonly__ var MAX_VARYING_VECTORS : int/*GLenum*/;
-	       __readonly__ var MAX_VARYING_VECTORS : int/*GLenum*/;
-	static __readonly__ var MAX_COMBINED_TEXTURE_IMAGE_UNITS : int/*GLenum*/;
-	       __readonly__ var MAX_COMBINED_TEXTURE_IMAGE_UNITS : int/*GLenum*/;
-	static __readonly__ var MAX_VERTEX_TEXTURE_IMAGE_UNITS : int/*GLenum*/;
-	       __readonly__ var MAX_VERTEX_TEXTURE_IMAGE_UNITS : int/*GLenum*/;
-	static __readonly__ var MAX_TEXTURE_IMAGE_UNITS : int/*GLenum*/;
-	       __readonly__ var MAX_TEXTURE_IMAGE_UNITS : int/*GLenum*/;
-	static __readonly__ var MAX_FRAGMENT_UNIFORM_VECTORS : int/*GLenum*/;
-	       __readonly__ var MAX_FRAGMENT_UNIFORM_VECTORS : int/*GLenum*/;
-	static __readonly__ var SHADER_TYPE : int/*GLenum*/;
-	       __readonly__ var SHADER_TYPE : int/*GLenum*/;
-	static __readonly__ var DELETE_STATUS : int/*GLenum*/;
-	       __readonly__ var DELETE_STATUS : int/*GLenum*/;
-	static __readonly__ var LINK_STATUS : int/*GLenum*/;
-	       __readonly__ var LINK_STATUS : int/*GLenum*/;
-	static __readonly__ var VALIDATE_STATUS : int/*GLenum*/;
-	       __readonly__ var VALIDATE_STATUS : int/*GLenum*/;
-	static __readonly__ var ATTACHED_SHADERS : int/*GLenum*/;
-	       __readonly__ var ATTACHED_SHADERS : int/*GLenum*/;
-	static __readonly__ var ACTIVE_UNIFORMS : int/*GLenum*/;
-	       __readonly__ var ACTIVE_UNIFORMS : int/*GLenum*/;
-	static __readonly__ var ACTIVE_ATTRIBUTES : int/*GLenum*/;
-	       __readonly__ var ACTIVE_ATTRIBUTES : int/*GLenum*/;
-	static __readonly__ var SHADING_LANGUAGE_VERSION : int/*GLenum*/;
-	       __readonly__ var SHADING_LANGUAGE_VERSION : int/*GLenum*/;
-	static __readonly__ var CURRENT_PROGRAM : int/*GLenum*/;
-	       __readonly__ var CURRENT_PROGRAM : int/*GLenum*/;
+	static __readonly__ var FRAGMENT_SHADER : number/*GLenum*/;
+	       __readonly__ var FRAGMENT_SHADER : number/*GLenum*/;
+	static __readonly__ var VERTEX_SHADER : number/*GLenum*/;
+	       __readonly__ var VERTEX_SHADER : number/*GLenum*/;
+	static __readonly__ var MAX_VERTEX_ATTRIBS : number/*GLenum*/;
+	       __readonly__ var MAX_VERTEX_ATTRIBS : number/*GLenum*/;
+	static __readonly__ var MAX_VERTEX_UNIFORM_VECTORS : number/*GLenum*/;
+	       __readonly__ var MAX_VERTEX_UNIFORM_VECTORS : number/*GLenum*/;
+	static __readonly__ var MAX_VARYING_VECTORS : number/*GLenum*/;
+	       __readonly__ var MAX_VARYING_VECTORS : number/*GLenum*/;
+	static __readonly__ var MAX_COMBINED_TEXTURE_IMAGE_UNITS : number/*GLenum*/;
+	       __readonly__ var MAX_COMBINED_TEXTURE_IMAGE_UNITS : number/*GLenum*/;
+	static __readonly__ var MAX_VERTEX_TEXTURE_IMAGE_UNITS : number/*GLenum*/;
+	       __readonly__ var MAX_VERTEX_TEXTURE_IMAGE_UNITS : number/*GLenum*/;
+	static __readonly__ var MAX_TEXTURE_IMAGE_UNITS : number/*GLenum*/;
+	       __readonly__ var MAX_TEXTURE_IMAGE_UNITS : number/*GLenum*/;
+	static __readonly__ var MAX_FRAGMENT_UNIFORM_VECTORS : number/*GLenum*/;
+	       __readonly__ var MAX_FRAGMENT_UNIFORM_VECTORS : number/*GLenum*/;
+	static __readonly__ var SHADER_TYPE : number/*GLenum*/;
+	       __readonly__ var SHADER_TYPE : number/*GLenum*/;
+	static __readonly__ var DELETE_STATUS : number/*GLenum*/;
+	       __readonly__ var DELETE_STATUS : number/*GLenum*/;
+	static __readonly__ var LINK_STATUS : number/*GLenum*/;
+	       __readonly__ var LINK_STATUS : number/*GLenum*/;
+	static __readonly__ var VALIDATE_STATUS : number/*GLenum*/;
+	       __readonly__ var VALIDATE_STATUS : number/*GLenum*/;
+	static __readonly__ var ATTACHED_SHADERS : number/*GLenum*/;
+	       __readonly__ var ATTACHED_SHADERS : number/*GLenum*/;
+	static __readonly__ var ACTIVE_UNIFORMS : number/*GLenum*/;
+	       __readonly__ var ACTIVE_UNIFORMS : number/*GLenum*/;
+	static __readonly__ var ACTIVE_ATTRIBUTES : number/*GLenum*/;
+	       __readonly__ var ACTIVE_ATTRIBUTES : number/*GLenum*/;
+	static __readonly__ var SHADING_LANGUAGE_VERSION : number/*GLenum*/;
+	       __readonly__ var SHADING_LANGUAGE_VERSION : number/*GLenum*/;
+	static __readonly__ var CURRENT_PROGRAM : number/*GLenum*/;
+	       __readonly__ var CURRENT_PROGRAM : number/*GLenum*/;
 	/* StencilFunction */
-	static __readonly__ var NEVER : int/*GLenum*/;
-	       __readonly__ var NEVER : int/*GLenum*/;
-	static __readonly__ var LESS : int/*GLenum*/;
-	       __readonly__ var LESS : int/*GLenum*/;
-	static __readonly__ var EQUAL : int/*GLenum*/;
-	       __readonly__ var EQUAL : int/*GLenum*/;
-	static __readonly__ var LEQUAL : int/*GLenum*/;
-	       __readonly__ var LEQUAL : int/*GLenum*/;
-	static __readonly__ var GREATER : int/*GLenum*/;
-	       __readonly__ var GREATER : int/*GLenum*/;
-	static __readonly__ var NOTEQUAL : int/*GLenum*/;
-	       __readonly__ var NOTEQUAL : int/*GLenum*/;
-	static __readonly__ var GEQUAL : int/*GLenum*/;
-	       __readonly__ var GEQUAL : int/*GLenum*/;
-	static __readonly__ var ALWAYS : int/*GLenum*/;
-	       __readonly__ var ALWAYS : int/*GLenum*/;
+	static __readonly__ var NEVER : number/*GLenum*/;
+	       __readonly__ var NEVER : number/*GLenum*/;
+	static __readonly__ var LESS : number/*GLenum*/;
+	       __readonly__ var LESS : number/*GLenum*/;
+	static __readonly__ var EQUAL : number/*GLenum*/;
+	       __readonly__ var EQUAL : number/*GLenum*/;
+	static __readonly__ var LEQUAL : number/*GLenum*/;
+	       __readonly__ var LEQUAL : number/*GLenum*/;
+	static __readonly__ var GREATER : number/*GLenum*/;
+	       __readonly__ var GREATER : number/*GLenum*/;
+	static __readonly__ var NOTEQUAL : number/*GLenum*/;
+	       __readonly__ var NOTEQUAL : number/*GLenum*/;
+	static __readonly__ var GEQUAL : number/*GLenum*/;
+	       __readonly__ var GEQUAL : number/*GLenum*/;
+	static __readonly__ var ALWAYS : number/*GLenum*/;
+	       __readonly__ var ALWAYS : number/*GLenum*/;
 	/* StencilOp */
 	/*      ZERO */
-	static __readonly__ var KEEP : int/*GLenum*/;
-	       __readonly__ var KEEP : int/*GLenum*/;
-	static __readonly__ var REPLACE : int/*GLenum*/;
-	       __readonly__ var REPLACE : int/*GLenum*/;
-	static __readonly__ var INCR : int/*GLenum*/;
-	       __readonly__ var INCR : int/*GLenum*/;
-	static __readonly__ var DECR : int/*GLenum*/;
-	       __readonly__ var DECR : int/*GLenum*/;
-	static __readonly__ var INVERT : int/*GLenum*/;
-	       __readonly__ var INVERT : int/*GLenum*/;
-	static __readonly__ var INCR_WRAP : int/*GLenum*/;
-	       __readonly__ var INCR_WRAP : int/*GLenum*/;
-	static __readonly__ var DECR_WRAP : int/*GLenum*/;
-	       __readonly__ var DECR_WRAP : int/*GLenum*/;
+	static __readonly__ var KEEP : number/*GLenum*/;
+	       __readonly__ var KEEP : number/*GLenum*/;
+	static __readonly__ var REPLACE : number/*GLenum*/;
+	       __readonly__ var REPLACE : number/*GLenum*/;
+	static __readonly__ var INCR : number/*GLenum*/;
+	       __readonly__ var INCR : number/*GLenum*/;
+	static __readonly__ var DECR : number/*GLenum*/;
+	       __readonly__ var DECR : number/*GLenum*/;
+	static __readonly__ var INVERT : number/*GLenum*/;
+	       __readonly__ var INVERT : number/*GLenum*/;
+	static __readonly__ var INCR_WRAP : number/*GLenum*/;
+	       __readonly__ var INCR_WRAP : number/*GLenum*/;
+	static __readonly__ var DECR_WRAP : number/*GLenum*/;
+	       __readonly__ var DECR_WRAP : number/*GLenum*/;
 	/* StringName */
-	static __readonly__ var VENDOR : int/*GLenum*/;
-	       __readonly__ var VENDOR : int/*GLenum*/;
-	static __readonly__ var RENDERER : int/*GLenum*/;
-	       __readonly__ var RENDERER : int/*GLenum*/;
-	static __readonly__ var VERSION : int/*GLenum*/;
-	       __readonly__ var VERSION : int/*GLenum*/;
+	static __readonly__ var VENDOR : number/*GLenum*/;
+	       __readonly__ var VENDOR : number/*GLenum*/;
+	static __readonly__ var RENDERER : number/*GLenum*/;
+	       __readonly__ var RENDERER : number/*GLenum*/;
+	static __readonly__ var VERSION : number/*GLenum*/;
+	       __readonly__ var VERSION : number/*GLenum*/;
 	/* TextureMagFilter */
-	static __readonly__ var NEAREST : int/*GLenum*/;
-	       __readonly__ var NEAREST : int/*GLenum*/;
-	static __readonly__ var LINEAR : int/*GLenum*/;
-	       __readonly__ var LINEAR : int/*GLenum*/;
+	static __readonly__ var NEAREST : number/*GLenum*/;
+	       __readonly__ var NEAREST : number/*GLenum*/;
+	static __readonly__ var LINEAR : number/*GLenum*/;
+	       __readonly__ var LINEAR : number/*GLenum*/;
 	/* TextureMinFilter */
 	/*      NEAREST */
 	/*      LINEAR */
-	static __readonly__ var NEAREST_MIPMAP_NEAREST : int/*GLenum*/;
-	       __readonly__ var NEAREST_MIPMAP_NEAREST : int/*GLenum*/;
-	static __readonly__ var LINEAR_MIPMAP_NEAREST : int/*GLenum*/;
-	       __readonly__ var LINEAR_MIPMAP_NEAREST : int/*GLenum*/;
-	static __readonly__ var NEAREST_MIPMAP_LINEAR : int/*GLenum*/;
-	       __readonly__ var NEAREST_MIPMAP_LINEAR : int/*GLenum*/;
-	static __readonly__ var LINEAR_MIPMAP_LINEAR : int/*GLenum*/;
-	       __readonly__ var LINEAR_MIPMAP_LINEAR : int/*GLenum*/;
+	static __readonly__ var NEAREST_MIPMAP_NEAREST : number/*GLenum*/;
+	       __readonly__ var NEAREST_MIPMAP_NEAREST : number/*GLenum*/;
+	static __readonly__ var LINEAR_MIPMAP_NEAREST : number/*GLenum*/;
+	       __readonly__ var LINEAR_MIPMAP_NEAREST : number/*GLenum*/;
+	static __readonly__ var NEAREST_MIPMAP_LINEAR : number/*GLenum*/;
+	       __readonly__ var NEAREST_MIPMAP_LINEAR : number/*GLenum*/;
+	static __readonly__ var LINEAR_MIPMAP_LINEAR : number/*GLenum*/;
+	       __readonly__ var LINEAR_MIPMAP_LINEAR : number/*GLenum*/;
 	/* TextureParameterName */
-	static __readonly__ var TEXTURE_MAG_FILTER : int/*GLenum*/;
-	       __readonly__ var TEXTURE_MAG_FILTER : int/*GLenum*/;
-	static __readonly__ var TEXTURE_MIN_FILTER : int/*GLenum*/;
-	       __readonly__ var TEXTURE_MIN_FILTER : int/*GLenum*/;
-	static __readonly__ var TEXTURE_WRAP_S : int/*GLenum*/;
-	       __readonly__ var TEXTURE_WRAP_S : int/*GLenum*/;
-	static __readonly__ var TEXTURE_WRAP_T : int/*GLenum*/;
-	       __readonly__ var TEXTURE_WRAP_T : int/*GLenum*/;
+	static __readonly__ var TEXTURE_MAG_FILTER : number/*GLenum*/;
+	       __readonly__ var TEXTURE_MAG_FILTER : number/*GLenum*/;
+	static __readonly__ var TEXTURE_MIN_FILTER : number/*GLenum*/;
+	       __readonly__ var TEXTURE_MIN_FILTER : number/*GLenum*/;
+	static __readonly__ var TEXTURE_WRAP_S : number/*GLenum*/;
+	       __readonly__ var TEXTURE_WRAP_S : number/*GLenum*/;
+	static __readonly__ var TEXTURE_WRAP_T : number/*GLenum*/;
+	       __readonly__ var TEXTURE_WRAP_T : number/*GLenum*/;
 	/* TextureTarget */
-	static __readonly__ var TEXTURE_2D : int/*GLenum*/;
-	       __readonly__ var TEXTURE_2D : int/*GLenum*/;
-	static __readonly__ var TEXTURE : int/*GLenum*/;
-	       __readonly__ var TEXTURE : int/*GLenum*/;
-	static __readonly__ var TEXTURE_CUBE_MAP : int/*GLenum*/;
-	       __readonly__ var TEXTURE_CUBE_MAP : int/*GLenum*/;
-	static __readonly__ var TEXTURE_BINDING_CUBE_MAP : int/*GLenum*/;
-	       __readonly__ var TEXTURE_BINDING_CUBE_MAP : int/*GLenum*/;
-	static __readonly__ var TEXTURE_CUBE_MAP_POSITIVE_X : int/*GLenum*/;
-	       __readonly__ var TEXTURE_CUBE_MAP_POSITIVE_X : int/*GLenum*/;
-	static __readonly__ var TEXTURE_CUBE_MAP_NEGATIVE_X : int/*GLenum*/;
-	       __readonly__ var TEXTURE_CUBE_MAP_NEGATIVE_X : int/*GLenum*/;
-	static __readonly__ var TEXTURE_CUBE_MAP_POSITIVE_Y : int/*GLenum*/;
-	       __readonly__ var TEXTURE_CUBE_MAP_POSITIVE_Y : int/*GLenum*/;
-	static __readonly__ var TEXTURE_CUBE_MAP_NEGATIVE_Y : int/*GLenum*/;
-	       __readonly__ var TEXTURE_CUBE_MAP_NEGATIVE_Y : int/*GLenum*/;
-	static __readonly__ var TEXTURE_CUBE_MAP_POSITIVE_Z : int/*GLenum*/;
-	       __readonly__ var TEXTURE_CUBE_MAP_POSITIVE_Z : int/*GLenum*/;
-	static __readonly__ var TEXTURE_CUBE_MAP_NEGATIVE_Z : int/*GLenum*/;
-	       __readonly__ var TEXTURE_CUBE_MAP_NEGATIVE_Z : int/*GLenum*/;
-	static __readonly__ var MAX_CUBE_MAP_TEXTURE_SIZE : int/*GLenum*/;
-	       __readonly__ var MAX_CUBE_MAP_TEXTURE_SIZE : int/*GLenum*/;
+	static __readonly__ var TEXTURE_2D : number/*GLenum*/;
+	       __readonly__ var TEXTURE_2D : number/*GLenum*/;
+	static __readonly__ var TEXTURE : number/*GLenum*/;
+	       __readonly__ var TEXTURE : number/*GLenum*/;
+	static __readonly__ var TEXTURE_CUBE_MAP : number/*GLenum*/;
+	       __readonly__ var TEXTURE_CUBE_MAP : number/*GLenum*/;
+	static __readonly__ var TEXTURE_BINDING_CUBE_MAP : number/*GLenum*/;
+	       __readonly__ var TEXTURE_BINDING_CUBE_MAP : number/*GLenum*/;
+	static __readonly__ var TEXTURE_CUBE_MAP_POSITIVE_X : number/*GLenum*/;
+	       __readonly__ var TEXTURE_CUBE_MAP_POSITIVE_X : number/*GLenum*/;
+	static __readonly__ var TEXTURE_CUBE_MAP_NEGATIVE_X : number/*GLenum*/;
+	       __readonly__ var TEXTURE_CUBE_MAP_NEGATIVE_X : number/*GLenum*/;
+	static __readonly__ var TEXTURE_CUBE_MAP_POSITIVE_Y : number/*GLenum*/;
+	       __readonly__ var TEXTURE_CUBE_MAP_POSITIVE_Y : number/*GLenum*/;
+	static __readonly__ var TEXTURE_CUBE_MAP_NEGATIVE_Y : number/*GLenum*/;
+	       __readonly__ var TEXTURE_CUBE_MAP_NEGATIVE_Y : number/*GLenum*/;
+	static __readonly__ var TEXTURE_CUBE_MAP_POSITIVE_Z : number/*GLenum*/;
+	       __readonly__ var TEXTURE_CUBE_MAP_POSITIVE_Z : number/*GLenum*/;
+	static __readonly__ var TEXTURE_CUBE_MAP_NEGATIVE_Z : number/*GLenum*/;
+	       __readonly__ var TEXTURE_CUBE_MAP_NEGATIVE_Z : number/*GLenum*/;
+	static __readonly__ var MAX_CUBE_MAP_TEXTURE_SIZE : number/*GLenum*/;
+	       __readonly__ var MAX_CUBE_MAP_TEXTURE_SIZE : number/*GLenum*/;
 	/* TextureUnit */
-	static __readonly__ var TEXTURE0 : int/*GLenum*/;
-	       __readonly__ var TEXTURE0 : int/*GLenum*/;
-	static __readonly__ var TEXTURE1 : int/*GLenum*/;
-	       __readonly__ var TEXTURE1 : int/*GLenum*/;
-	static __readonly__ var TEXTURE2 : int/*GLenum*/;
-	       __readonly__ var TEXTURE2 : int/*GLenum*/;
-	static __readonly__ var TEXTURE3 : int/*GLenum*/;
-	       __readonly__ var TEXTURE3 : int/*GLenum*/;
-	static __readonly__ var TEXTURE4 : int/*GLenum*/;
-	       __readonly__ var TEXTURE4 : int/*GLenum*/;
-	static __readonly__ var TEXTURE5 : int/*GLenum*/;
-	       __readonly__ var TEXTURE5 : int/*GLenum*/;
-	static __readonly__ var TEXTURE6 : int/*GLenum*/;
-	       __readonly__ var TEXTURE6 : int/*GLenum*/;
-	static __readonly__ var TEXTURE7 : int/*GLenum*/;
-	       __readonly__ var TEXTURE7 : int/*GLenum*/;
-	static __readonly__ var TEXTURE8 : int/*GLenum*/;
-	       __readonly__ var TEXTURE8 : int/*GLenum*/;
-	static __readonly__ var TEXTURE9 : int/*GLenum*/;
-	       __readonly__ var TEXTURE9 : int/*GLenum*/;
-	static __readonly__ var TEXTURE10 : int/*GLenum*/;
-	       __readonly__ var TEXTURE10 : int/*GLenum*/;
-	static __readonly__ var TEXTURE11 : int/*GLenum*/;
-	       __readonly__ var TEXTURE11 : int/*GLenum*/;
-	static __readonly__ var TEXTURE12 : int/*GLenum*/;
-	       __readonly__ var TEXTURE12 : int/*GLenum*/;
-	static __readonly__ var TEXTURE13 : int/*GLenum*/;
-	       __readonly__ var TEXTURE13 : int/*GLenum*/;
-	static __readonly__ var TEXTURE14 : int/*GLenum*/;
-	       __readonly__ var TEXTURE14 : int/*GLenum*/;
-	static __readonly__ var TEXTURE15 : int/*GLenum*/;
-	       __readonly__ var TEXTURE15 : int/*GLenum*/;
-	static __readonly__ var TEXTURE16 : int/*GLenum*/;
-	       __readonly__ var TEXTURE16 : int/*GLenum*/;
-	static __readonly__ var TEXTURE17 : int/*GLenum*/;
-	       __readonly__ var TEXTURE17 : int/*GLenum*/;
-	static __readonly__ var TEXTURE18 : int/*GLenum*/;
-	       __readonly__ var TEXTURE18 : int/*GLenum*/;
-	static __readonly__ var TEXTURE19 : int/*GLenum*/;
-	       __readonly__ var TEXTURE19 : int/*GLenum*/;
-	static __readonly__ var TEXTURE20 : int/*GLenum*/;
-	       __readonly__ var TEXTURE20 : int/*GLenum*/;
-	static __readonly__ var TEXTURE21 : int/*GLenum*/;
-	       __readonly__ var TEXTURE21 : int/*GLenum*/;
-	static __readonly__ var TEXTURE22 : int/*GLenum*/;
-	       __readonly__ var TEXTURE22 : int/*GLenum*/;
-	static __readonly__ var TEXTURE23 : int/*GLenum*/;
-	       __readonly__ var TEXTURE23 : int/*GLenum*/;
-	static __readonly__ var TEXTURE24 : int/*GLenum*/;
-	       __readonly__ var TEXTURE24 : int/*GLenum*/;
-	static __readonly__ var TEXTURE25 : int/*GLenum*/;
-	       __readonly__ var TEXTURE25 : int/*GLenum*/;
-	static __readonly__ var TEXTURE26 : int/*GLenum*/;
-	       __readonly__ var TEXTURE26 : int/*GLenum*/;
-	static __readonly__ var TEXTURE27 : int/*GLenum*/;
-	       __readonly__ var TEXTURE27 : int/*GLenum*/;
-	static __readonly__ var TEXTURE28 : int/*GLenum*/;
-	       __readonly__ var TEXTURE28 : int/*GLenum*/;
-	static __readonly__ var TEXTURE29 : int/*GLenum*/;
-	       __readonly__ var TEXTURE29 : int/*GLenum*/;
-	static __readonly__ var TEXTURE30 : int/*GLenum*/;
-	       __readonly__ var TEXTURE30 : int/*GLenum*/;
-	static __readonly__ var TEXTURE31 : int/*GLenum*/;
-	       __readonly__ var TEXTURE31 : int/*GLenum*/;
-	static __readonly__ var ACTIVE_TEXTURE : int/*GLenum*/;
-	       __readonly__ var ACTIVE_TEXTURE : int/*GLenum*/;
+	static __readonly__ var TEXTURE0 : number/*GLenum*/;
+	       __readonly__ var TEXTURE0 : number/*GLenum*/;
+	static __readonly__ var TEXTURE1 : number/*GLenum*/;
+	       __readonly__ var TEXTURE1 : number/*GLenum*/;
+	static __readonly__ var TEXTURE2 : number/*GLenum*/;
+	       __readonly__ var TEXTURE2 : number/*GLenum*/;
+	static __readonly__ var TEXTURE3 : number/*GLenum*/;
+	       __readonly__ var TEXTURE3 : number/*GLenum*/;
+	static __readonly__ var TEXTURE4 : number/*GLenum*/;
+	       __readonly__ var TEXTURE4 : number/*GLenum*/;
+	static __readonly__ var TEXTURE5 : number/*GLenum*/;
+	       __readonly__ var TEXTURE5 : number/*GLenum*/;
+	static __readonly__ var TEXTURE6 : number/*GLenum*/;
+	       __readonly__ var TEXTURE6 : number/*GLenum*/;
+	static __readonly__ var TEXTURE7 : number/*GLenum*/;
+	       __readonly__ var TEXTURE7 : number/*GLenum*/;
+	static __readonly__ var TEXTURE8 : number/*GLenum*/;
+	       __readonly__ var TEXTURE8 : number/*GLenum*/;
+	static __readonly__ var TEXTURE9 : number/*GLenum*/;
+	       __readonly__ var TEXTURE9 : number/*GLenum*/;
+	static __readonly__ var TEXTURE10 : number/*GLenum*/;
+	       __readonly__ var TEXTURE10 : number/*GLenum*/;
+	static __readonly__ var TEXTURE11 : number/*GLenum*/;
+	       __readonly__ var TEXTURE11 : number/*GLenum*/;
+	static __readonly__ var TEXTURE12 : number/*GLenum*/;
+	       __readonly__ var TEXTURE12 : number/*GLenum*/;
+	static __readonly__ var TEXTURE13 : number/*GLenum*/;
+	       __readonly__ var TEXTURE13 : number/*GLenum*/;
+	static __readonly__ var TEXTURE14 : number/*GLenum*/;
+	       __readonly__ var TEXTURE14 : number/*GLenum*/;
+	static __readonly__ var TEXTURE15 : number/*GLenum*/;
+	       __readonly__ var TEXTURE15 : number/*GLenum*/;
+	static __readonly__ var TEXTURE16 : number/*GLenum*/;
+	       __readonly__ var TEXTURE16 : number/*GLenum*/;
+	static __readonly__ var TEXTURE17 : number/*GLenum*/;
+	       __readonly__ var TEXTURE17 : number/*GLenum*/;
+	static __readonly__ var TEXTURE18 : number/*GLenum*/;
+	       __readonly__ var TEXTURE18 : number/*GLenum*/;
+	static __readonly__ var TEXTURE19 : number/*GLenum*/;
+	       __readonly__ var TEXTURE19 : number/*GLenum*/;
+	static __readonly__ var TEXTURE20 : number/*GLenum*/;
+	       __readonly__ var TEXTURE20 : number/*GLenum*/;
+	static __readonly__ var TEXTURE21 : number/*GLenum*/;
+	       __readonly__ var TEXTURE21 : number/*GLenum*/;
+	static __readonly__ var TEXTURE22 : number/*GLenum*/;
+	       __readonly__ var TEXTURE22 : number/*GLenum*/;
+	static __readonly__ var TEXTURE23 : number/*GLenum*/;
+	       __readonly__ var TEXTURE23 : number/*GLenum*/;
+	static __readonly__ var TEXTURE24 : number/*GLenum*/;
+	       __readonly__ var TEXTURE24 : number/*GLenum*/;
+	static __readonly__ var TEXTURE25 : number/*GLenum*/;
+	       __readonly__ var TEXTURE25 : number/*GLenum*/;
+	static __readonly__ var TEXTURE26 : number/*GLenum*/;
+	       __readonly__ var TEXTURE26 : number/*GLenum*/;
+	static __readonly__ var TEXTURE27 : number/*GLenum*/;
+	       __readonly__ var TEXTURE27 : number/*GLenum*/;
+	static __readonly__ var TEXTURE28 : number/*GLenum*/;
+	       __readonly__ var TEXTURE28 : number/*GLenum*/;
+	static __readonly__ var TEXTURE29 : number/*GLenum*/;
+	       __readonly__ var TEXTURE29 : number/*GLenum*/;
+	static __readonly__ var TEXTURE30 : number/*GLenum*/;
+	       __readonly__ var TEXTURE30 : number/*GLenum*/;
+	static __readonly__ var TEXTURE31 : number/*GLenum*/;
+	       __readonly__ var TEXTURE31 : number/*GLenum*/;
+	static __readonly__ var ACTIVE_TEXTURE : number/*GLenum*/;
+	       __readonly__ var ACTIVE_TEXTURE : number/*GLenum*/;
 	/* TextureWrapMode */
-	static __readonly__ var REPEAT : int/*GLenum*/;
-	       __readonly__ var REPEAT : int/*GLenum*/;
-	static __readonly__ var CLAMP_TO_EDGE : int/*GLenum*/;
-	       __readonly__ var CLAMP_TO_EDGE : int/*GLenum*/;
-	static __readonly__ var MIRRORED_REPEAT : int/*GLenum*/;
-	       __readonly__ var MIRRORED_REPEAT : int/*GLenum*/;
+	static __readonly__ var REPEAT : number/*GLenum*/;
+	       __readonly__ var REPEAT : number/*GLenum*/;
+	static __readonly__ var CLAMP_TO_EDGE : number/*GLenum*/;
+	       __readonly__ var CLAMP_TO_EDGE : number/*GLenum*/;
+	static __readonly__ var MIRRORED_REPEAT : number/*GLenum*/;
+	       __readonly__ var MIRRORED_REPEAT : number/*GLenum*/;
 	/* Uniform Types */
-	static __readonly__ var FLOAT_VEC2 : int/*GLenum*/;
-	       __readonly__ var FLOAT_VEC2 : int/*GLenum*/;
-	static __readonly__ var FLOAT_VEC3 : int/*GLenum*/;
-	       __readonly__ var FLOAT_VEC3 : int/*GLenum*/;
-	static __readonly__ var FLOAT_VEC4 : int/*GLenum*/;
-	       __readonly__ var FLOAT_VEC4 : int/*GLenum*/;
-	static __readonly__ var INT_VEC2 : int/*GLenum*/;
-	       __readonly__ var INT_VEC2 : int/*GLenum*/;
-	static __readonly__ var INT_VEC3 : int/*GLenum*/;
-	       __readonly__ var INT_VEC3 : int/*GLenum*/;
-	static __readonly__ var INT_VEC4 : int/*GLenum*/;
-	       __readonly__ var INT_VEC4 : int/*GLenum*/;
-	static __readonly__ var BOOL : int/*GLenum*/;
-	       __readonly__ var BOOL : int/*GLenum*/;
-	static __readonly__ var BOOL_VEC2 : int/*GLenum*/;
-	       __readonly__ var BOOL_VEC2 : int/*GLenum*/;
-	static __readonly__ var BOOL_VEC3 : int/*GLenum*/;
-	       __readonly__ var BOOL_VEC3 : int/*GLenum*/;
-	static __readonly__ var BOOL_VEC4 : int/*GLenum*/;
-	       __readonly__ var BOOL_VEC4 : int/*GLenum*/;
-	static __readonly__ var FLOAT_MAT2 : int/*GLenum*/;
-	       __readonly__ var FLOAT_MAT2 : int/*GLenum*/;
-	static __readonly__ var FLOAT_MAT3 : int/*GLenum*/;
-	       __readonly__ var FLOAT_MAT3 : int/*GLenum*/;
-	static __readonly__ var FLOAT_MAT4 : int/*GLenum*/;
-	       __readonly__ var FLOAT_MAT4 : int/*GLenum*/;
-	static __readonly__ var SAMPLER_2D : int/*GLenum*/;
-	       __readonly__ var SAMPLER_2D : int/*GLenum*/;
-	static __readonly__ var SAMPLER_CUBE : int/*GLenum*/;
-	       __readonly__ var SAMPLER_CUBE : int/*GLenum*/;
+	static __readonly__ var FLOAT_VEC2 : number/*GLenum*/;
+	       __readonly__ var FLOAT_VEC2 : number/*GLenum*/;
+	static __readonly__ var FLOAT_VEC3 : number/*GLenum*/;
+	       __readonly__ var FLOAT_VEC3 : number/*GLenum*/;
+	static __readonly__ var FLOAT_VEC4 : number/*GLenum*/;
+	       __readonly__ var FLOAT_VEC4 : number/*GLenum*/;
+	static __readonly__ var INT_VEC2 : number/*GLenum*/;
+	       __readonly__ var INT_VEC2 : number/*GLenum*/;
+	static __readonly__ var INT_VEC3 : number/*GLenum*/;
+	       __readonly__ var INT_VEC3 : number/*GLenum*/;
+	static __readonly__ var INT_VEC4 : number/*GLenum*/;
+	       __readonly__ var INT_VEC4 : number/*GLenum*/;
+	static __readonly__ var BOOL : number/*GLenum*/;
+	       __readonly__ var BOOL : number/*GLenum*/;
+	static __readonly__ var BOOL_VEC2 : number/*GLenum*/;
+	       __readonly__ var BOOL_VEC2 : number/*GLenum*/;
+	static __readonly__ var BOOL_VEC3 : number/*GLenum*/;
+	       __readonly__ var BOOL_VEC3 : number/*GLenum*/;
+	static __readonly__ var BOOL_VEC4 : number/*GLenum*/;
+	       __readonly__ var BOOL_VEC4 : number/*GLenum*/;
+	static __readonly__ var FLOAT_MAT2 : number/*GLenum*/;
+	       __readonly__ var FLOAT_MAT2 : number/*GLenum*/;
+	static __readonly__ var FLOAT_MAT3 : number/*GLenum*/;
+	       __readonly__ var FLOAT_MAT3 : number/*GLenum*/;
+	static __readonly__ var FLOAT_MAT4 : number/*GLenum*/;
+	       __readonly__ var FLOAT_MAT4 : number/*GLenum*/;
+	static __readonly__ var SAMPLER_2D : number/*GLenum*/;
+	       __readonly__ var SAMPLER_2D : number/*GLenum*/;
+	static __readonly__ var SAMPLER_CUBE : number/*GLenum*/;
+	       __readonly__ var SAMPLER_CUBE : number/*GLenum*/;
 	/* Vertex Arrays */
-	static __readonly__ var VERTEX_ATTRIB_ARRAY_ENABLED : int/*GLenum*/;
-	       __readonly__ var VERTEX_ATTRIB_ARRAY_ENABLED : int/*GLenum*/;
-	static __readonly__ var VERTEX_ATTRIB_ARRAY_SIZE : int/*GLenum*/;
-	       __readonly__ var VERTEX_ATTRIB_ARRAY_SIZE : int/*GLenum*/;
-	static __readonly__ var VERTEX_ATTRIB_ARRAY_STRIDE : int/*GLenum*/;
-	       __readonly__ var VERTEX_ATTRIB_ARRAY_STRIDE : int/*GLenum*/;
-	static __readonly__ var VERTEX_ATTRIB_ARRAY_TYPE : int/*GLenum*/;
-	       __readonly__ var VERTEX_ATTRIB_ARRAY_TYPE : int/*GLenum*/;
-	static __readonly__ var VERTEX_ATTRIB_ARRAY_NORMALIZED : int/*GLenum*/;
-	       __readonly__ var VERTEX_ATTRIB_ARRAY_NORMALIZED : int/*GLenum*/;
-	static __readonly__ var VERTEX_ATTRIB_ARRAY_POINTER : int/*GLenum*/;
-	       __readonly__ var VERTEX_ATTRIB_ARRAY_POINTER : int/*GLenum*/;
-	static __readonly__ var VERTEX_ATTRIB_ARRAY_BUFFER_BINDING : int/*GLenum*/;
-	       __readonly__ var VERTEX_ATTRIB_ARRAY_BUFFER_BINDING : int/*GLenum*/;
+	static __readonly__ var VERTEX_ATTRIB_ARRAY_ENABLED : number/*GLenum*/;
+	       __readonly__ var VERTEX_ATTRIB_ARRAY_ENABLED : number/*GLenum*/;
+	static __readonly__ var VERTEX_ATTRIB_ARRAY_SIZE : number/*GLenum*/;
+	       __readonly__ var VERTEX_ATTRIB_ARRAY_SIZE : number/*GLenum*/;
+	static __readonly__ var VERTEX_ATTRIB_ARRAY_STRIDE : number/*GLenum*/;
+	       __readonly__ var VERTEX_ATTRIB_ARRAY_STRIDE : number/*GLenum*/;
+	static __readonly__ var VERTEX_ATTRIB_ARRAY_TYPE : number/*GLenum*/;
+	       __readonly__ var VERTEX_ATTRIB_ARRAY_TYPE : number/*GLenum*/;
+	static __readonly__ var VERTEX_ATTRIB_ARRAY_NORMALIZED : number/*GLenum*/;
+	       __readonly__ var VERTEX_ATTRIB_ARRAY_NORMALIZED : number/*GLenum*/;
+	static __readonly__ var VERTEX_ATTRIB_ARRAY_POINTER : number/*GLenum*/;
+	       __readonly__ var VERTEX_ATTRIB_ARRAY_POINTER : number/*GLenum*/;
+	static __readonly__ var VERTEX_ATTRIB_ARRAY_BUFFER_BINDING : number/*GLenum*/;
+	       __readonly__ var VERTEX_ATTRIB_ARRAY_BUFFER_BINDING : number/*GLenum*/;
 	/* Shader Source */
-	static __readonly__ var COMPILE_STATUS : int/*GLenum*/;
-	       __readonly__ var COMPILE_STATUS : int/*GLenum*/;
+	static __readonly__ var COMPILE_STATUS : number/*GLenum*/;
+	       __readonly__ var COMPILE_STATUS : number/*GLenum*/;
 	/* Shader Precision-Specified Types */
-	static __readonly__ var LOW_FLOAT : int/*GLenum*/;
-	       __readonly__ var LOW_FLOAT : int/*GLenum*/;
-	static __readonly__ var MEDIUM_FLOAT : int/*GLenum*/;
-	       __readonly__ var MEDIUM_FLOAT : int/*GLenum*/;
-	static __readonly__ var HIGH_FLOAT : int/*GLenum*/;
-	       __readonly__ var HIGH_FLOAT : int/*GLenum*/;
-	static __readonly__ var LOW_INT : int/*GLenum*/;
-	       __readonly__ var LOW_INT : int/*GLenum*/;
-	static __readonly__ var MEDIUM_INT : int/*GLenum*/;
-	       __readonly__ var MEDIUM_INT : int/*GLenum*/;
-	static __readonly__ var HIGH_INT : int/*GLenum*/;
-	       __readonly__ var HIGH_INT : int/*GLenum*/;
+	static __readonly__ var LOW_FLOAT : number/*GLenum*/;
+	       __readonly__ var LOW_FLOAT : number/*GLenum*/;
+	static __readonly__ var MEDIUM_FLOAT : number/*GLenum*/;
+	       __readonly__ var MEDIUM_FLOAT : number/*GLenum*/;
+	static __readonly__ var HIGH_FLOAT : number/*GLenum*/;
+	       __readonly__ var HIGH_FLOAT : number/*GLenum*/;
+	static __readonly__ var LOW_INT : number/*GLenum*/;
+	       __readonly__ var LOW_INT : number/*GLenum*/;
+	static __readonly__ var MEDIUM_INT : number/*GLenum*/;
+	       __readonly__ var MEDIUM_INT : number/*GLenum*/;
+	static __readonly__ var HIGH_INT : number/*GLenum*/;
+	       __readonly__ var HIGH_INT : number/*GLenum*/;
 	/* Framebuffer Object. */
-	static __readonly__ var FRAMEBUFFER : int/*GLenum*/;
-	       __readonly__ var FRAMEBUFFER : int/*GLenum*/;
-	static __readonly__ var RENDERBUFFER : int/*GLenum*/;
-	       __readonly__ var RENDERBUFFER : int/*GLenum*/;
-	static __readonly__ var RGBA4 : int/*GLenum*/;
-	       __readonly__ var RGBA4 : int/*GLenum*/;
-	static __readonly__ var RGB5_A1 : int/*GLenum*/;
-	       __readonly__ var RGB5_A1 : int/*GLenum*/;
-	static __readonly__ var RGB565 : int/*GLenum*/;
-	       __readonly__ var RGB565 : int/*GLenum*/;
-	static __readonly__ var DEPTH_COMPONENT16 : int/*GLenum*/;
-	       __readonly__ var DEPTH_COMPONENT16 : int/*GLenum*/;
-	static __readonly__ var STENCIL_INDEX : int/*GLenum*/;
-	       __readonly__ var STENCIL_INDEX : int/*GLenum*/;
-	static __readonly__ var STENCIL_INDEX8 : int/*GLenum*/;
-	       __readonly__ var STENCIL_INDEX8 : int/*GLenum*/;
-	static __readonly__ var DEPTH_STENCIL : int/*GLenum*/;
-	       __readonly__ var DEPTH_STENCIL : int/*GLenum*/;
-	static __readonly__ var RENDERBUFFER_WIDTH : int/*GLenum*/;
-	       __readonly__ var RENDERBUFFER_WIDTH : int/*GLenum*/;
-	static __readonly__ var RENDERBUFFER_HEIGHT : int/*GLenum*/;
-	       __readonly__ var RENDERBUFFER_HEIGHT : int/*GLenum*/;
-	static __readonly__ var RENDERBUFFER_INTERNAL_FORMAT : int/*GLenum*/;
-	       __readonly__ var RENDERBUFFER_INTERNAL_FORMAT : int/*GLenum*/;
-	static __readonly__ var RENDERBUFFER_RED_SIZE : int/*GLenum*/;
-	       __readonly__ var RENDERBUFFER_RED_SIZE : int/*GLenum*/;
-	static __readonly__ var RENDERBUFFER_GREEN_SIZE : int/*GLenum*/;
-	       __readonly__ var RENDERBUFFER_GREEN_SIZE : int/*GLenum*/;
-	static __readonly__ var RENDERBUFFER_BLUE_SIZE : int/*GLenum*/;
-	       __readonly__ var RENDERBUFFER_BLUE_SIZE : int/*GLenum*/;
-	static __readonly__ var RENDERBUFFER_ALPHA_SIZE : int/*GLenum*/;
-	       __readonly__ var RENDERBUFFER_ALPHA_SIZE : int/*GLenum*/;
-	static __readonly__ var RENDERBUFFER_DEPTH_SIZE : int/*GLenum*/;
-	       __readonly__ var RENDERBUFFER_DEPTH_SIZE : int/*GLenum*/;
-	static __readonly__ var RENDERBUFFER_STENCIL_SIZE : int/*GLenum*/;
-	       __readonly__ var RENDERBUFFER_STENCIL_SIZE : int/*GLenum*/;
-	static __readonly__ var FRAMEBUFFER_ATTACHMENT_OBJECT_TYPE : int/*GLenum*/;
-	       __readonly__ var FRAMEBUFFER_ATTACHMENT_OBJECT_TYPE : int/*GLenum*/;
-	static __readonly__ var FRAMEBUFFER_ATTACHMENT_OBJECT_NAME : int/*GLenum*/;
-	       __readonly__ var FRAMEBUFFER_ATTACHMENT_OBJECT_NAME : int/*GLenum*/;
-	static __readonly__ var FRAMEBUFFER_ATTACHMENT_TEXTURE_LEVEL : int/*GLenum*/;
-	       __readonly__ var FRAMEBUFFER_ATTACHMENT_TEXTURE_LEVEL : int/*GLenum*/;
-	static __readonly__ var FRAMEBUFFER_ATTACHMENT_TEXTURE_CUBE_MAP_FACE : int/*GLenum*/;
-	       __readonly__ var FRAMEBUFFER_ATTACHMENT_TEXTURE_CUBE_MAP_FACE : int/*GLenum*/;
-	static __readonly__ var COLOR_ATTACHMENT0 : int/*GLenum*/;
-	       __readonly__ var COLOR_ATTACHMENT0 : int/*GLenum*/;
-	static __readonly__ var DEPTH_ATTACHMENT : int/*GLenum*/;
-	       __readonly__ var DEPTH_ATTACHMENT : int/*GLenum*/;
-	static __readonly__ var STENCIL_ATTACHMENT : int/*GLenum*/;
-	       __readonly__ var STENCIL_ATTACHMENT : int/*GLenum*/;
-	static __readonly__ var DEPTH_STENCIL_ATTACHMENT : int/*GLenum*/;
-	       __readonly__ var DEPTH_STENCIL_ATTACHMENT : int/*GLenum*/;
-	static __readonly__ var NONE : int/*GLenum*/;
-	       __readonly__ var NONE : int/*GLenum*/;
-	static __readonly__ var FRAMEBUFFER_COMPLETE : int/*GLenum*/;
-	       __readonly__ var FRAMEBUFFER_COMPLETE : int/*GLenum*/;
-	static __readonly__ var FRAMEBUFFER_INCOMPLETE_ATTACHMENT : int/*GLenum*/;
-	       __readonly__ var FRAMEBUFFER_INCOMPLETE_ATTACHMENT : int/*GLenum*/;
-	static __readonly__ var FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT : int/*GLenum*/;
-	       __readonly__ var FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT : int/*GLenum*/;
-	static __readonly__ var FRAMEBUFFER_INCOMPLETE_DIMENSIONS : int/*GLenum*/;
-	       __readonly__ var FRAMEBUFFER_INCOMPLETE_DIMENSIONS : int/*GLenum*/;
-	static __readonly__ var FRAMEBUFFER_UNSUPPORTED : int/*GLenum*/;
-	       __readonly__ var FRAMEBUFFER_UNSUPPORTED : int/*GLenum*/;
-	static __readonly__ var FRAMEBUFFER_BINDING : int/*GLenum*/;
-	       __readonly__ var FRAMEBUFFER_BINDING : int/*GLenum*/;
-	static __readonly__ var RENDERBUFFER_BINDING : int/*GLenum*/;
-	       __readonly__ var RENDERBUFFER_BINDING : int/*GLenum*/;
-	static __readonly__ var MAX_RENDERBUFFER_SIZE : int/*GLenum*/;
-	       __readonly__ var MAX_RENDERBUFFER_SIZE : int/*GLenum*/;
-	static __readonly__ var INVALID_FRAMEBUFFER_OPERATION : int/*GLenum*/;
-	       __readonly__ var INVALID_FRAMEBUFFER_OPERATION : int/*GLenum*/;
+	static __readonly__ var FRAMEBUFFER : number/*GLenum*/;
+	       __readonly__ var FRAMEBUFFER : number/*GLenum*/;
+	static __readonly__ var RENDERBUFFER : number/*GLenum*/;
+	       __readonly__ var RENDERBUFFER : number/*GLenum*/;
+	static __readonly__ var RGBA4 : number/*GLenum*/;
+	       __readonly__ var RGBA4 : number/*GLenum*/;
+	static __readonly__ var RGB5_A1 : number/*GLenum*/;
+	       __readonly__ var RGB5_A1 : number/*GLenum*/;
+	static __readonly__ var RGB565 : number/*GLenum*/;
+	       __readonly__ var RGB565 : number/*GLenum*/;
+	static __readonly__ var DEPTH_COMPONENT16 : number/*GLenum*/;
+	       __readonly__ var DEPTH_COMPONENT16 : number/*GLenum*/;
+	static __readonly__ var STENCIL_INDEX : number/*GLenum*/;
+	       __readonly__ var STENCIL_INDEX : number/*GLenum*/;
+	static __readonly__ var STENCIL_INDEX8 : number/*GLenum*/;
+	       __readonly__ var STENCIL_INDEX8 : number/*GLenum*/;
+	static __readonly__ var DEPTH_STENCIL : number/*GLenum*/;
+	       __readonly__ var DEPTH_STENCIL : number/*GLenum*/;
+	static __readonly__ var RENDERBUFFER_WIDTH : number/*GLenum*/;
+	       __readonly__ var RENDERBUFFER_WIDTH : number/*GLenum*/;
+	static __readonly__ var RENDERBUFFER_HEIGHT : number/*GLenum*/;
+	       __readonly__ var RENDERBUFFER_HEIGHT : number/*GLenum*/;
+	static __readonly__ var RENDERBUFFER_INTERNAL_FORMAT : number/*GLenum*/;
+	       __readonly__ var RENDERBUFFER_INTERNAL_FORMAT : number/*GLenum*/;
+	static __readonly__ var RENDERBUFFER_RED_SIZE : number/*GLenum*/;
+	       __readonly__ var RENDERBUFFER_RED_SIZE : number/*GLenum*/;
+	static __readonly__ var RENDERBUFFER_GREEN_SIZE : number/*GLenum*/;
+	       __readonly__ var RENDERBUFFER_GREEN_SIZE : number/*GLenum*/;
+	static __readonly__ var RENDERBUFFER_BLUE_SIZE : number/*GLenum*/;
+	       __readonly__ var RENDERBUFFER_BLUE_SIZE : number/*GLenum*/;
+	static __readonly__ var RENDERBUFFER_ALPHA_SIZE : number/*GLenum*/;
+	       __readonly__ var RENDERBUFFER_ALPHA_SIZE : number/*GLenum*/;
+	static __readonly__ var RENDERBUFFER_DEPTH_SIZE : number/*GLenum*/;
+	       __readonly__ var RENDERBUFFER_DEPTH_SIZE : number/*GLenum*/;
+	static __readonly__ var RENDERBUFFER_STENCIL_SIZE : number/*GLenum*/;
+	       __readonly__ var RENDERBUFFER_STENCIL_SIZE : number/*GLenum*/;
+	static __readonly__ var FRAMEBUFFER_ATTACHMENT_OBJECT_TYPE : number/*GLenum*/;
+	       __readonly__ var FRAMEBUFFER_ATTACHMENT_OBJECT_TYPE : number/*GLenum*/;
+	static __readonly__ var FRAMEBUFFER_ATTACHMENT_OBJECT_NAME : number/*GLenum*/;
+	       __readonly__ var FRAMEBUFFER_ATTACHMENT_OBJECT_NAME : number/*GLenum*/;
+	static __readonly__ var FRAMEBUFFER_ATTACHMENT_TEXTURE_LEVEL : number/*GLenum*/;
+	       __readonly__ var FRAMEBUFFER_ATTACHMENT_TEXTURE_LEVEL : number/*GLenum*/;
+	static __readonly__ var FRAMEBUFFER_ATTACHMENT_TEXTURE_CUBE_MAP_FACE : number/*GLenum*/;
+	       __readonly__ var FRAMEBUFFER_ATTACHMENT_TEXTURE_CUBE_MAP_FACE : number/*GLenum*/;
+	static __readonly__ var COLOR_ATTACHMENT0 : number/*GLenum*/;
+	       __readonly__ var COLOR_ATTACHMENT0 : number/*GLenum*/;
+	static __readonly__ var DEPTH_ATTACHMENT : number/*GLenum*/;
+	       __readonly__ var DEPTH_ATTACHMENT : number/*GLenum*/;
+	static __readonly__ var STENCIL_ATTACHMENT : number/*GLenum*/;
+	       __readonly__ var STENCIL_ATTACHMENT : number/*GLenum*/;
+	static __readonly__ var DEPTH_STENCIL_ATTACHMENT : number/*GLenum*/;
+	       __readonly__ var DEPTH_STENCIL_ATTACHMENT : number/*GLenum*/;
+	static __readonly__ var NONE : number/*GLenum*/;
+	       __readonly__ var NONE : number/*GLenum*/;
+	static __readonly__ var FRAMEBUFFER_COMPLETE : number/*GLenum*/;
+	       __readonly__ var FRAMEBUFFER_COMPLETE : number/*GLenum*/;
+	static __readonly__ var FRAMEBUFFER_INCOMPLETE_ATTACHMENT : number/*GLenum*/;
+	       __readonly__ var FRAMEBUFFER_INCOMPLETE_ATTACHMENT : number/*GLenum*/;
+	static __readonly__ var FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT : number/*GLenum*/;
+	       __readonly__ var FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT : number/*GLenum*/;
+	static __readonly__ var FRAMEBUFFER_INCOMPLETE_DIMENSIONS : number/*GLenum*/;
+	       __readonly__ var FRAMEBUFFER_INCOMPLETE_DIMENSIONS : number/*GLenum*/;
+	static __readonly__ var FRAMEBUFFER_UNSUPPORTED : number/*GLenum*/;
+	       __readonly__ var FRAMEBUFFER_UNSUPPORTED : number/*GLenum*/;
+	static __readonly__ var FRAMEBUFFER_BINDING : number/*GLenum*/;
+	       __readonly__ var FRAMEBUFFER_BINDING : number/*GLenum*/;
+	static __readonly__ var RENDERBUFFER_BINDING : number/*GLenum*/;
+	       __readonly__ var RENDERBUFFER_BINDING : number/*GLenum*/;
+	static __readonly__ var MAX_RENDERBUFFER_SIZE : number/*GLenum*/;
+	       __readonly__ var MAX_RENDERBUFFER_SIZE : number/*GLenum*/;
+	static __readonly__ var INVALID_FRAMEBUFFER_OPERATION : number/*GLenum*/;
+	       __readonly__ var INVALID_FRAMEBUFFER_OPERATION : number/*GLenum*/;
 	/* WebGL-specific enums */
-	static __readonly__ var UNPACK_FLIP_Y_WEBGL : int/*GLenum*/;
-	       __readonly__ var UNPACK_FLIP_Y_WEBGL : int/*GLenum*/;
-	static __readonly__ var UNPACK_PREMULTIPLY_ALPHA_WEBGL : int/*GLenum*/;
-	       __readonly__ var UNPACK_PREMULTIPLY_ALPHA_WEBGL : int/*GLenum*/;
-	static __readonly__ var CONTEXT_LOST_WEBGL : int/*GLenum*/;
-	       __readonly__ var CONTEXT_LOST_WEBGL : int/*GLenum*/;
-	static __readonly__ var UNPACK_COLORSPACE_CONVERSION_WEBGL : int/*GLenum*/;
-	       __readonly__ var UNPACK_COLORSPACE_CONVERSION_WEBGL : int/*GLenum*/;
-	static __readonly__ var BROWSER_DEFAULT_WEBGL : int/*GLenum*/;
-	       __readonly__ var BROWSER_DEFAULT_WEBGL : int/*GLenum*/;
+	static __readonly__ var UNPACK_FLIP_Y_WEBGL : number/*GLenum*/;
+	       __readonly__ var UNPACK_FLIP_Y_WEBGL : number/*GLenum*/;
+	static __readonly__ var UNPACK_PREMULTIPLY_ALPHA_WEBGL : number/*GLenum*/;
+	       __readonly__ var UNPACK_PREMULTIPLY_ALPHA_WEBGL : number/*GLenum*/;
+	static __readonly__ var CONTEXT_LOST_WEBGL : number/*GLenum*/;
+	       __readonly__ var CONTEXT_LOST_WEBGL : number/*GLenum*/;
+	static __readonly__ var UNPACK_COLORSPACE_CONVERSION_WEBGL : number/*GLenum*/;
+	       __readonly__ var UNPACK_COLORSPACE_CONVERSION_WEBGL : number/*GLenum*/;
+	static __readonly__ var BROWSER_DEFAULT_WEBGL : number/*GLenum*/;
+	       __readonly__ var BROWSER_DEFAULT_WEBGL : number/*GLenum*/;
 	__readonly__ var canvas : HTMLCanvasElement;
-	__readonly__ var drawingBufferWidth : int/*GLsizei*/;
-	__readonly__ var drawingBufferHeight : int/*GLsizei*/;
+	__readonly__ var drawingBufferWidth : number/*GLsizei*/;
+	__readonly__ var drawingBufferHeight : number/*GLsizei*/;
 	function getContextAttributes() : WebGLContextAttributes;
 	function isContextLost() : boolean;
 	function getSupportedExtensions() : string[]/*sequence<DOMString>?*/;
 	function getExtension(
 		name : string/*DOMString*/
-	) : Object/*object?*/;
-	function activeTexture(texture : int/*GLenum*/) : void;
+	) : Nullable.<Object>/*object?*/;
+	function activeTexture(texture : number/*GLenum*/) : void;
 	function attachShader(
-		program : WebGLProgram,
-		shader : WebGLShader
+		program : Nullable.<WebGLProgram>,
+		shader : Nullable.<WebGLShader>
 	) : void;
 	function bindAttribLocation(
-		program : WebGLProgram,
-		index : int/*GLuint*/,
+		program : Nullable.<WebGLProgram>,
+		index : number/*GLuint*/,
 		name : string/*DOMString*/
 	) : void;
 	function bindBuffer(
-		target : int/*GLenum*/,
-		buffer : WebGLBuffer
+		target : number/*GLenum*/,
+		buffer : Nullable.<WebGLBuffer>
 	) : void;
 	function bindFramebuffer(
-		target : int/*GLenum*/,
-		framebuffer : WebGLFramebuffer
+		target : number/*GLenum*/,
+		framebuffer : Nullable.<WebGLFramebuffer>
 	) : void;
 	function bindRenderbuffer(
-		target : int/*GLenum*/,
-		renderbuffer : WebGLRenderbuffer
+		target : number/*GLenum*/,
+		renderbuffer : Nullable.<WebGLRenderbuffer>
 	) : void;
 	function bindTexture(
-		target : int/*GLenum*/,
-		texture : WebGLTexture
+		target : number/*GLenum*/,
+		texture : Nullable.<WebGLTexture>
 	) : void;
 	function blendColor(
 		red : number/*GLclampf*/,
@@ -6900,50 +6907,50 @@ native final class WebGLRenderingContext {
 		blue : number/*GLclampf*/,
 		alpha : number/*GLclampf*/
 	) : void;
-	function blendEquation(mode : int/*GLenum*/) : void;
+	function blendEquation(mode : number/*GLenum*/) : void;
 	function blendEquationSeparate(
-		modeRGB : int/*GLenum*/,
-		modeAlpha : int/*GLenum*/
+		modeRGB : number/*GLenum*/,
+		modeAlpha : number/*GLenum*/
 	) : void;
 	function blendFunc(
-		sfactor : int/*GLenum*/,
-		dfactor : int/*GLenum*/
+		sfactor : number/*GLenum*/,
+		dfactor : number/*GLenum*/
 	) : void;
 	function blendFuncSeparate(
-		srcRGB : int/*GLenum*/,
-		dstRGB : int/*GLenum*/,
-		srcAlpha : int/*GLenum*/,
-		dstAlpha : int/*GLenum*/
+		srcRGB : number/*GLenum*/,
+		dstRGB : number/*GLenum*/,
+		srcAlpha : number/*GLenum*/,
+		dstAlpha : number/*GLenum*/
 	) : void;
 	function bufferData(
-		target : int/*GLenum*/,
+		target : number/*GLenum*/,
 		size : number/*GLsizeiptr*/,
-		usage : int/*GLenum*/
+		usage : number/*GLenum*/
 	) : void;
 	function bufferData(
-		target : int/*GLenum*/,
+		target : number/*GLenum*/,
 		data : ArrayBufferView,
-		usage : int/*GLenum*/
+		usage : number/*GLenum*/
 	) : void;
 	function bufferData(
-		target : int/*GLenum*/,
-		data : ArrayBuffer,
-		usage : int/*GLenum*/
+		target : number/*GLenum*/,
+		data : Nullable.<ArrayBuffer>,
+		usage : number/*GLenum*/
 	) : void;
 	function bufferSubData(
-		target : int/*GLenum*/,
+		target : number/*GLenum*/,
 		offset : number/*GLintptr*/,
 		data : ArrayBufferView
 	) : void;
 	function bufferSubData(
-		target : int/*GLenum*/,
+		target : number/*GLenum*/,
 		offset : number/*GLintptr*/,
-		data : ArrayBuffer
+		data : Nullable.<ArrayBuffer>
 	) : void;
 	function checkFramebufferStatus(
-		target : int/*GLenum*/
-	) : int/*GLenum*/;
-	function clear(mask : int/*GLbitfield*/) : void;
+		target : number/*GLenum*/
+	) : number/*GLenum*/;
+	function clear(mask : number/*GLbitfield*/) : void;
 	function clearColor(
 		red : number/*GLclampf*/,
 		green : number/*GLclampf*/,
@@ -6951,588 +6958,652 @@ native final class WebGLRenderingContext {
 		alpha : number/*GLclampf*/
 	) : void;
 	function clearDepth(depth : number/*GLclampf*/) : void;
-	function clearStencil(s : int/*GLint*/) : void;
+	function clearStencil(s : number/*GLint*/) : void;
 	function colorMask(
 		red : boolean/*GLboolean*/,
 		green : boolean/*GLboolean*/,
 		blue : boolean/*GLboolean*/,
 		alpha : boolean/*GLboolean*/
 	) : void;
-	function compileShader(shader : WebGLShader) : void;
+	function compileShader(shader : Nullable.<WebGLShader>) : void;
 	function compressedTexImage2D(
-		target : int/*GLenum*/,
-		level : int/*GLint*/,
-		internalformat : int/*GLenum*/,
-		width : int/*GLsizei*/,
-		height : int/*GLsizei*/,
-		border : int/*GLint*/,
+		target : number/*GLenum*/,
+		level : number/*GLint*/,
+		internalformat : number/*GLenum*/,
+		width : number/*GLsizei*/,
+		height : number/*GLsizei*/,
+		border : number/*GLint*/,
 		data : ArrayBufferView
 	) : void;
 	function compressedTexSubImage2D(
-		target : int/*GLenum*/,
-		level : int/*GLint*/,
-		xoffset : int/*GLint*/,
-		yoffset : int/*GLint*/,
-		width : int/*GLsizei*/,
-		height : int/*GLsizei*/,
-		format : int/*GLenum*/,
+		target : number/*GLenum*/,
+		level : number/*GLint*/,
+		xoffset : number/*GLint*/,
+		yoffset : number/*GLint*/,
+		width : number/*GLsizei*/,
+		height : number/*GLsizei*/,
+		format : number/*GLenum*/,
 		data : ArrayBufferView
 	) : void;
 	function copyTexImage2D(
-		target : int/*GLenum*/,
-		level : int/*GLint*/,
-		internalformat : int/*GLenum*/,
-		x : int/*GLint*/,
-		y : int/*GLint*/,
-		width : int/*GLsizei*/,
-		height : int/*GLsizei*/,
-		border : int/*GLint*/
+		target : number/*GLenum*/,
+		level : number/*GLint*/,
+		internalformat : number/*GLenum*/,
+		x : number/*GLint*/,
+		y : number/*GLint*/,
+		width : number/*GLsizei*/,
+		height : number/*GLsizei*/,
+		border : number/*GLint*/
 	) : void;
 	function copyTexSubImage2D(
-		target : int/*GLenum*/,
-		level : int/*GLint*/,
-		xoffset : int/*GLint*/,
-		yoffset : int/*GLint*/,
-		x : int/*GLint*/,
-		y : int/*GLint*/,
-		width : int/*GLsizei*/,
-		height : int/*GLsizei*/
+		target : number/*GLenum*/,
+		level : number/*GLint*/,
+		xoffset : number/*GLint*/,
+		yoffset : number/*GLint*/,
+		x : number/*GLint*/,
+		y : number/*GLint*/,
+		width : number/*GLsizei*/,
+		height : number/*GLsizei*/
 	) : void;
-	function createBuffer() : WebGLBuffer;
-	function createFramebuffer() : WebGLFramebuffer;
-	function createProgram() : WebGLProgram;
-	function createRenderbuffer() : WebGLRenderbuffer;
-	function createShader(type : int/*GLenum*/) : WebGLShader;
-	function createTexture() : WebGLTexture;
-	function cullFace(mode : int/*GLenum*/) : void;
-	function deleteBuffer(buffer : WebGLBuffer) : void;
-	function deleteFramebuffer(framebuffer : WebGLFramebuffer) : void;
-	function deleteProgram(program : WebGLProgram) : void;
+	function createBuffer() : Nullable.<WebGLBuffer>;
+	function createFramebuffer() : Nullable.<WebGLFramebuffer>;
+	function createProgram() : Nullable.<WebGLProgram>;
+	function createRenderbuffer() : Nullable.<WebGLRenderbuffer>;
+	function createShader(
+		type : number/*GLenum*/
+	) : Nullable.<WebGLShader>;
+	function createTexture() : Nullable.<WebGLTexture>;
+	function cullFace(mode : number/*GLenum*/) : void;
+	function deleteBuffer(buffer : Nullable.<WebGLBuffer>) : void;
+	function deleteFramebuffer(
+		framebuffer : Nullable.<WebGLFramebuffer>
+	) : void;
+	function deleteProgram(program : Nullable.<WebGLProgram>) : void;
 	function deleteRenderbuffer(
-		renderbuffer : WebGLRenderbuffer
+		renderbuffer : Nullable.<WebGLRenderbuffer>
 	) : void;
-	function deleteShader(shader : WebGLShader) : void;
-	function deleteTexture(texture : WebGLTexture) : void;
-	function depthFunc(func : int/*GLenum*/) : void;
+	function deleteShader(shader : Nullable.<WebGLShader>) : void;
+	function deleteTexture(texture : Nullable.<WebGLTexture>) : void;
+	function depthFunc(func : number/*GLenum*/) : void;
 	function depthMask(flag : boolean/*GLboolean*/) : void;
 	function depthRange(
 		zNear : number/*GLclampf*/,
 		zFar : number/*GLclampf*/
 	) : void;
 	function detachShader(
-		program : WebGLProgram,
-		shader : WebGLShader
+		program : Nullable.<WebGLProgram>,
+		shader : Nullable.<WebGLShader>
 	) : void;
-	function disable(cap : int/*GLenum*/) : void;
-	function disableVertexAttribArray(index : int/*GLuint*/) : void;
+	function disable(cap : number/*GLenum*/) : void;
+	function disableVertexAttribArray(index : number/*GLuint*/) : void;
 	function drawArrays(
-		mode : int/*GLenum*/,
-		first : int/*GLint*/,
-		count : int/*GLsizei*/
+		mode : number/*GLenum*/,
+		first : number/*GLint*/,
+		count : number/*GLsizei*/
 	) : void;
 	function drawElements(
-		mode : int/*GLenum*/,
-		count : int/*GLsizei*/,
-		type : int/*GLenum*/,
+		mode : number/*GLenum*/,
+		count : number/*GLsizei*/,
+		type : number/*GLenum*/,
 		offset : number/*GLintptr*/
 	) : void;
-	function enable(cap : int/*GLenum*/) : void;
-	function enableVertexAttribArray(index : int/*GLuint*/) : void;
+	function enable(cap : number/*GLenum*/) : void;
+	function enableVertexAttribArray(index : number/*GLuint*/) : void;
 	function finish() : void;
 	function flush() : void;
 	function framebufferRenderbuffer(
-		target : int/*GLenum*/,
-		attachment : int/*GLenum*/,
-		renderbuffertarget : int/*GLenum*/,
-		renderbuffer : WebGLRenderbuffer
+		target : number/*GLenum*/,
+		attachment : number/*GLenum*/,
+		renderbuffertarget : number/*GLenum*/,
+		renderbuffer : Nullable.<WebGLRenderbuffer>
 	) : void;
 	function framebufferTexture2D(
-		target : int/*GLenum*/,
-		attachment : int/*GLenum*/,
-		textarget : int/*GLenum*/,
-		texture : WebGLTexture,
-		level : int/*GLint*/
+		target : number/*GLenum*/,
+		attachment : number/*GLenum*/,
+		textarget : number/*GLenum*/,
+		texture : Nullable.<WebGLTexture>,
+		level : number/*GLint*/
 	) : void;
-	function frontFace(mode : int/*GLenum*/) : void;
-	function generateMipmap(target : int/*GLenum*/) : void;
+	function frontFace(mode : number/*GLenum*/) : void;
+	function generateMipmap(target : number/*GLenum*/) : void;
 	function getActiveAttrib(
-		program : WebGLProgram,
-		index : int/*GLuint*/
-	) : WebGLActiveInfo;
+		program : Nullable.<WebGLProgram>,
+		index : number/*GLuint*/
+	) : Nullable.<WebGLActiveInfo>;
 	function getActiveUniform(
-		program : WebGLProgram,
-		index : int/*GLuint*/
-	) : WebGLActiveInfo;
-	function getAttachedShaders(program : WebGLProgram) : WebGLShader[];
+		program : Nullable.<WebGLProgram>,
+		index : number/*GLuint*/
+	) : Nullable.<WebGLActiveInfo>;
+	function getAttachedShaders(
+		program : Nullable.<WebGLProgram>
+	) : WebGLShader[];
 	function getAttribLocation(
-		program : WebGLProgram,
+		program : Nullable.<WebGLProgram>,
 		name : string/*DOMString*/
-	) : int/*GLint*/;
+	) : number/*GLint*/;
 	function getBufferParameter(
-		target : int/*GLenum*/,
-		pname : int/*GLenum*/
+		target : number/*GLenum*/,
+		pname : number/*GLenum*/
 	) : variant/*any*/;
-	function getParameter(pname : int/*GLenum*/) : variant/*any*/;
-	function getError() : int/*GLenum*/;
+	function getParameter(pname : number/*GLenum*/) : variant/*any*/;
+	function getError() : number/*GLenum*/;
 	function getFramebufferAttachmentParameter(
-		target : int/*GLenum*/,
-		attachment : int/*GLenum*/,
-		pname : int/*GLenum*/
+		target : number/*GLenum*/,
+		attachment : number/*GLenum*/,
+		pname : number/*GLenum*/
 	) : variant/*any*/;
 	function getProgramParameter(
-		program : WebGLProgram,
-		pname : int/*GLenum*/
+		program : Nullable.<WebGLProgram>,
+		pname : number/*GLenum*/
 	) : variant/*any*/;
 	function getProgramInfoLog(
-		program : WebGLProgram
+		program : Nullable.<WebGLProgram>
 	) : Nullable.<string>/*DOMString?*/;
 	function getRenderbufferParameter(
-		target : int/*GLenum*/,
-		pname : int/*GLenum*/
+		target : number/*GLenum*/,
+		pname : number/*GLenum*/
 	) : variant/*any*/;
 	function getShaderParameter(
-		shader : WebGLShader,
-		pname : int/*GLenum*/
+		shader : Nullable.<WebGLShader>,
+		pname : number/*GLenum*/
 	) : variant/*any*/;
 	function getShaderPrecisionFormat(
-		shadertype : int/*GLenum*/,
-		precisiontype : int/*GLenum*/
-	) : WebGLShaderPrecisionFormat;
+		shadertype : number/*GLenum*/,
+		precisiontype : number/*GLenum*/
+	) : Nullable.<WebGLShaderPrecisionFormat>;
 	function getShaderInfoLog(
-		shader : WebGLShader
+		shader : Nullable.<WebGLShader>
 	) : Nullable.<string>/*DOMString?*/;
 	function getShaderSource(
-		shader : WebGLShader
+		shader : Nullable.<WebGLShader>
 	) : Nullable.<string>/*DOMString?*/;
 	function getTexParameter(
-		target : int/*GLenum*/,
-		pname : int/*GLenum*/
+		target : number/*GLenum*/,
+		pname : number/*GLenum*/
 	) : variant/*any*/;
 	function getUniform(
-		program : WebGLProgram,
-		location : WebGLUniformLocation
+		program : Nullable.<WebGLProgram>,
+		location : Nullable.<WebGLUniformLocation>
 	) : variant/*any*/;
 	function getUniformLocation(
-		program : WebGLProgram,
+		program : Nullable.<WebGLProgram>,
 		name : string/*DOMString*/
-	) : WebGLUniformLocation;
+	) : Nullable.<WebGLUniformLocation>;
 	function getVertexAttrib(
-		index : int/*GLuint*/,
-		pname : int/*GLenum*/
+		index : number/*GLuint*/,
+		pname : number/*GLenum*/
 	) : variant/*any*/;
 	function getVertexAttribOffset(
-		index : int/*GLuint*/,
-		pname : int/*GLenum*/
+		index : number/*GLuint*/,
+		pname : number/*GLenum*/
 	) : number/*GLsizeiptr*/;
-	function hint(target : int/*GLenum*/, mode : int/*GLenum*/) : void;
-	function isBuffer(buffer : WebGLBuffer) : boolean/*GLboolean*/;
-	function isEnabled(cap : int/*GLenum*/) : boolean/*GLboolean*/;
+	function hint(
+		target : number/*GLenum*/,
+		mode : number/*GLenum*/
+	) : void;
+	function isBuffer(
+		buffer : Nullable.<WebGLBuffer>
+	) : boolean/*GLboolean*/;
+	function isEnabled(cap : number/*GLenum*/) : boolean/*GLboolean*/;
 	function isFramebuffer(
-		framebuffer : WebGLFramebuffer
+		framebuffer : Nullable.<WebGLFramebuffer>
 	) : boolean/*GLboolean*/;
-	function isProgram(program : WebGLProgram) : boolean/*GLboolean*/;
+	function isProgram(
+		program : Nullable.<WebGLProgram>
+	) : boolean/*GLboolean*/;
 	function isRenderbuffer(
-		renderbuffer : WebGLRenderbuffer
+		renderbuffer : Nullable.<WebGLRenderbuffer>
 	) : boolean/*GLboolean*/;
-	function isShader(shader : WebGLShader) : boolean/*GLboolean*/;
-	function isTexture(texture : WebGLTexture) : boolean/*GLboolean*/;
+	function isShader(
+		shader : Nullable.<WebGLShader>
+	) : boolean/*GLboolean*/;
+	function isTexture(
+		texture : Nullable.<WebGLTexture>
+	) : boolean/*GLboolean*/;
 	function lineWidth(width : number/*GLfloat*/) : void;
-	function linkProgram(program : WebGLProgram) : void;
+	function linkProgram(program : Nullable.<WebGLProgram>) : void;
 	function pixelStorei(
-		pname : int/*GLenum*/,
-		param : int/*GLint*/
+		pname : number/*GLenum*/,
+		param : number/*GLint*/
 	) : void;
 	function polygonOffset(
 		factor : number/*GLfloat*/,
 		units : number/*GLfloat*/
 	) : void;
 	function readPixels(
-		x : int/*GLint*/,
-		y : int/*GLint*/,
-		width : int/*GLsizei*/,
-		height : int/*GLsizei*/,
-		format : int/*GLenum*/,
-		type : int/*GLenum*/,
-		pixels : ArrayBufferView
+		x : number/*GLint*/,
+		y : number/*GLint*/,
+		width : number/*GLsizei*/,
+		height : number/*GLsizei*/,
+		format : number/*GLenum*/,
+		type : number/*GLenum*/,
+		pixels : Nullable.<ArrayBufferView>
 	) : void;
 	function renderbufferStorage(
-		target : int/*GLenum*/,
-		internalformat : int/*GLenum*/,
-		width : int/*GLsizei*/,
-		height : int/*GLsizei*/
+		target : number/*GLenum*/,
+		internalformat : number/*GLenum*/,
+		width : number/*GLsizei*/,
+		height : number/*GLsizei*/
 	) : void;
 	function sampleCoverage(
 		value : number/*GLclampf*/,
 		invert : boolean/*GLboolean*/
 	) : void;
 	function scissor(
-		x : int/*GLint*/,
-		y : int/*GLint*/,
-		width : int/*GLsizei*/,
-		height : int/*GLsizei*/
+		x : number/*GLint*/,
+		y : number/*GLint*/,
+		width : number/*GLsizei*/,
+		height : number/*GLsizei*/
 	) : void;
 	function shaderSource(
-		shader : WebGLShader,
+		shader : Nullable.<WebGLShader>,
 		source : string/*DOMString*/
 	) : void;
 	function stencilFunc(
-		func : int/*GLenum*/,
-		ref : int/*GLint*/,
-		mask : int/*GLuint*/
+		func : number/*GLenum*/,
+		ref : number/*GLint*/,
+		mask : number/*GLuint*/
 	) : void;
 	function stencilFuncSeparate(
-		face : int/*GLenum*/,
-		func : int/*GLenum*/,
-		ref : int/*GLint*/,
-		mask : int/*GLuint*/
+		face : number/*GLenum*/,
+		func : number/*GLenum*/,
+		ref : number/*GLint*/,
+		mask : number/*GLuint*/
 	) : void;
-	function stencilMask(mask : int/*GLuint*/) : void;
+	function stencilMask(mask : number/*GLuint*/) : void;
 	function stencilMaskSeparate(
-		face : int/*GLenum*/,
-		mask : int/*GLuint*/
+		face : number/*GLenum*/,
+		mask : number/*GLuint*/
 	) : void;
 	function stencilOp(
-		fail : int/*GLenum*/,
-		zfail : int/*GLenum*/,
-		zpass : int/*GLenum*/
+		fail : number/*GLenum*/,
+		zfail : number/*GLenum*/,
+		zpass : number/*GLenum*/
 	) : void;
 	function stencilOpSeparate(
-		face : int/*GLenum*/,
-		fail : int/*GLenum*/,
-		zfail : int/*GLenum*/,
-		zpass : int/*GLenum*/
+		face : number/*GLenum*/,
+		fail : number/*GLenum*/,
+		zfail : number/*GLenum*/,
+		zpass : number/*GLenum*/
 	) : void;
 	function texImage2D(
-		target : int/*GLenum*/,
-		level : int/*GLint*/,
-		internalformat : int/*GLenum*/,
-		width : int/*GLsizei*/,
-		height : int/*GLsizei*/,
-		border : int/*GLint*/,
-		format : int/*GLenum*/,
-		type : int/*GLenum*/,
-		pixels : ArrayBufferView
+		target : number/*GLenum*/,
+		level : number/*GLint*/,
+		internalformat : number/*GLenum*/,
+		width : number/*GLsizei*/,
+		height : number/*GLsizei*/,
+		border : number/*GLint*/,
+		format : number/*GLenum*/,
+		type : number/*GLenum*/,
+		pixels : Nullable.<ArrayBufferView>
 	) : void;
 	function texImage2D(
-		target : int/*GLenum*/,
-		level : int/*GLint*/,
-		internalformat : int/*GLenum*/,
-		format : int/*GLenum*/,
-		type : int/*GLenum*/,
-		pixels : ImageData
+		target : number/*GLenum*/,
+		level : number/*GLint*/,
+		internalformat : number/*GLenum*/,
+		format : number/*GLenum*/,
+		type : number/*GLenum*/,
+		pixels : Nullable.<ImageData>
 	) : void;
 	function texImage2D(
-		target : int/*GLenum*/,
-		level : int/*GLint*/,
-		internalformat : int/*GLenum*/,
-		format : int/*GLenum*/,
-		type : int/*GLenum*/,
+		target : number/*GLenum*/,
+		level : number/*GLint*/,
+		internalformat : number/*GLenum*/,
+		format : number/*GLenum*/,
+		type : number/*GLenum*/,
 		image : HTMLImageElement
 	) : void;
 	// May throw DOMException
 	function texImage2D(
-		target : int/*GLenum*/,
-		level : int/*GLint*/,
-		internalformat : int/*GLenum*/,
-		format : int/*GLenum*/,
-		type : int/*GLenum*/,
+		target : number/*GLenum*/,
+		level : number/*GLint*/,
+		internalformat : number/*GLenum*/,
+		format : number/*GLenum*/,
+		type : number/*GLenum*/,
 		canvas : HTMLCanvasElement
 	) : void;
 	// May throw DOMException
 	function texImage2D(
-		target : int/*GLenum*/,
-		level : int/*GLint*/,
-		internalformat : int/*GLenum*/,
-		format : int/*GLenum*/,
-		type : int/*GLenum*/,
+		target : number/*GLenum*/,
+		level : number/*GLint*/,
+		internalformat : number/*GLenum*/,
+		format : number/*GLenum*/,
+		type : number/*GLenum*/,
 		video : HTMLVideoElement
 	) : void;
 	// May throw DOMException
 
 	function texParameterf(
-		target : int/*GLenum*/,
-		pname : int/*GLenum*/,
+		target : number/*GLenum*/,
+		pname : number/*GLenum*/,
 		param : number/*GLfloat*/
 	) : void;
 	function texParameteri(
-		target : int/*GLenum*/,
-		pname : int/*GLenum*/,
-		param : int/*GLint*/
+		target : number/*GLenum*/,
+		pname : number/*GLenum*/,
+		param : number/*GLint*/
 	) : void;
 	function texSubImage2D(
-		target : int/*GLenum*/,
-		level : int/*GLint*/,
-		xoffset : int/*GLint*/,
-		yoffset : int/*GLint*/,
-		width : int/*GLsizei*/,
-		height : int/*GLsizei*/,
-		format : int/*GLenum*/,
-		type : int/*GLenum*/,
-		pixels : ArrayBufferView
+		target : number/*GLenum*/,
+		level : number/*GLint*/,
+		xoffset : number/*GLint*/,
+		yoffset : number/*GLint*/,
+		width : number/*GLsizei*/,
+		height : number/*GLsizei*/,
+		format : number/*GLenum*/,
+		type : number/*GLenum*/,
+		pixels : Nullable.<ArrayBufferView>
 	) : void;
 	function texSubImage2D(
-		target : int/*GLenum*/,
-		level : int/*GLint*/,
-		xoffset : int/*GLint*/,
-		yoffset : int/*GLint*/,
-		format : int/*GLenum*/,
-		type : int/*GLenum*/,
-		pixels : ImageData
+		target : number/*GLenum*/,
+		level : number/*GLint*/,
+		xoffset : number/*GLint*/,
+		yoffset : number/*GLint*/,
+		format : number/*GLenum*/,
+		type : number/*GLenum*/,
+		pixels : Nullable.<ImageData>
 	) : void;
 	function texSubImage2D(
-		target : int/*GLenum*/,
-		level : int/*GLint*/,
-		xoffset : int/*GLint*/,
-		yoffset : int/*GLint*/,
-		format : int/*GLenum*/,
-		type : int/*GLenum*/,
+		target : number/*GLenum*/,
+		level : number/*GLint*/,
+		xoffset : number/*GLint*/,
+		yoffset : number/*GLint*/,
+		format : number/*GLenum*/,
+		type : number/*GLenum*/,
 		image : HTMLImageElement
 	) : void;
 	// May throw DOMException
 	function texSubImage2D(
-		target : int/*GLenum*/,
-		level : int/*GLint*/,
-		xoffset : int/*GLint*/,
-		yoffset : int/*GLint*/,
-		format : int/*GLenum*/,
-		type : int/*GLenum*/,
+		target : number/*GLenum*/,
+		level : number/*GLint*/,
+		xoffset : number/*GLint*/,
+		yoffset : number/*GLint*/,
+		format : number/*GLenum*/,
+		type : number/*GLenum*/,
 		canvas : HTMLCanvasElement
 	) : void;
 	// May throw DOMException
 	function texSubImage2D(
-		target : int/*GLenum*/,
-		level : int/*GLint*/,
-		xoffset : int/*GLint*/,
-		yoffset : int/*GLint*/,
-		format : int/*GLenum*/,
-		type : int/*GLenum*/,
+		target : number/*GLenum*/,
+		level : number/*GLint*/,
+		xoffset : number/*GLint*/,
+		yoffset : number/*GLint*/,
+		format : number/*GLenum*/,
+		type : number/*GLenum*/,
 		video : HTMLVideoElement
 	) : void;
 	// May throw DOMException
 
 	function uniform1f(
-		location : WebGLUniformLocation,
+		location : Nullable.<WebGLUniformLocation>,
 		x : number/*GLfloat*/
 	) : void;
 	function uniform1fv(
-		location : WebGLUniformLocation,
+		location : Nullable.<WebGLUniformLocation>,
 		v : Float32Array
 	) : void;
 	function uniform1fv(
-		location : WebGLUniformLocation,
+		location : Nullable.<WebGLUniformLocation>,
 		v : number[]/*sequence<float>*/
+	) : void;
+	function uniform1fv(
+		location : Nullable.<WebGLUniformLocation>,
+		v : int[]/*sequence<float>*/
 	) : void;
 	function uniform1i(
-		location : WebGLUniformLocation,
-		x : int/*GLint*/
+		location : Nullable.<WebGLUniformLocation>,
+		x : number/*GLint*/
 	) : void;
 	function uniform1iv(
-		location : WebGLUniformLocation,
+		location : Nullable.<WebGLUniformLocation>,
 		v : Int32Array
 	) : void;
 	function uniform1iv(
-		location : WebGLUniformLocation,
-		v : int[]/*sequence<long>*/
+		location : Nullable.<WebGLUniformLocation>,
+		v : number[]/*sequence<long>*/
 	) : void;
 	function uniform1iv(
-		location : WebGLUniformLocation,
-		v : number[]
+		location : Nullable.<WebGLUniformLocation>,
+		v : int[]/*sequence<long>*/
 	) : void;
 	function uniform2f(
-		location : WebGLUniformLocation,
+		location : Nullable.<WebGLUniformLocation>,
 		x : number/*GLfloat*/,
 		y : number/*GLfloat*/
 	) : void;
 	function uniform2fv(
-		location : WebGLUniformLocation,
+		location : Nullable.<WebGLUniformLocation>,
 		v : Float32Array
 	) : void;
 	function uniform2fv(
-		location : WebGLUniformLocation,
+		location : Nullable.<WebGLUniformLocation>,
 		v : number[]/*sequence<float>*/
 	) : void;
+	function uniform2fv(
+		location : Nullable.<WebGLUniformLocation>,
+		v : int[]/*sequence<float>*/
+	) : void;
 	function uniform2i(
-		location : WebGLUniformLocation,
-		x : int/*GLint*/,
-		y : int/*GLint*/
+		location : Nullable.<WebGLUniformLocation>,
+		x : number/*GLint*/,
+		y : number/*GLint*/
 	) : void;
 	function uniform2iv(
-		location : WebGLUniformLocation,
+		location : Nullable.<WebGLUniformLocation>,
 		v : Int32Array
 	) : void;
 	function uniform2iv(
-		location : WebGLUniformLocation,
-		v : int[]/*sequence<long>*/
+		location : Nullable.<WebGLUniformLocation>,
+		v : number[]/*sequence<long>*/
 	) : void;
 	function uniform2iv(
-		location : WebGLUniformLocation,
-		v : number[]
+		location : Nullable.<WebGLUniformLocation>,
+		v : int[]/*sequence<long>*/
 	) : void;
 	function uniform3f(
-		location : WebGLUniformLocation,
+		location : Nullable.<WebGLUniformLocation>,
 		x : number/*GLfloat*/,
 		y : number/*GLfloat*/,
 		z : number/*GLfloat*/
 	) : void;
 	function uniform3fv(
-		location : WebGLUniformLocation,
+		location : Nullable.<WebGLUniformLocation>,
 		v : Float32Array
 	) : void;
 	function uniform3fv(
-		location : WebGLUniformLocation,
+		location : Nullable.<WebGLUniformLocation>,
 		v : number[]/*sequence<float>*/
 	) : void;
+	function uniform3fv(
+		location : Nullable.<WebGLUniformLocation>,
+		v : int[]/*sequence<float>*/
+	) : void;
 	function uniform3i(
-		location : WebGLUniformLocation,
-		x : int/*GLint*/,
-		y : int/*GLint*/,
-		z : int/*GLint*/
+		location : Nullable.<WebGLUniformLocation>,
+		x : number/*GLint*/,
+		y : number/*GLint*/,
+		z : number/*GLint*/
 	) : void;
 	function uniform3iv(
-		location : WebGLUniformLocation,
+		location : Nullable.<WebGLUniformLocation>,
 		v : Int32Array
 	) : void;
 	function uniform3iv(
-		location : WebGLUniformLocation,
-		v : int[]/*sequence<long>*/
+		location : Nullable.<WebGLUniformLocation>,
+		v : number[]/*sequence<long>*/
 	) : void;
 	function uniform3iv(
-		location : WebGLUniformLocation,
-		v : number[]
+		location : Nullable.<WebGLUniformLocation>,
+		v : int[]/*sequence<long>*/
 	) : void;
 	function uniform4f(
-		location : WebGLUniformLocation,
+		location : Nullable.<WebGLUniformLocation>,
 		x : number/*GLfloat*/,
 		y : number/*GLfloat*/,
 		z : number/*GLfloat*/,
 		w : number/*GLfloat*/
 	) : void;
 	function uniform4fv(
-		location : WebGLUniformLocation,
+		location : Nullable.<WebGLUniformLocation>,
 		v : Float32Array
 	) : void;
 	function uniform4fv(
-		location : WebGLUniformLocation,
+		location : Nullable.<WebGLUniformLocation>,
 		v : number[]/*sequence<float>*/
 	) : void;
+	function uniform4fv(
+		location : Nullable.<WebGLUniformLocation>,
+		v : int[]/*sequence<float>*/
+	) : void;
 	function uniform4i(
-		location : WebGLUniformLocation,
-		x : int/*GLint*/,
-		y : int/*GLint*/,
-		z : int/*GLint*/,
-		w : int/*GLint*/
+		location : Nullable.<WebGLUniformLocation>,
+		x : number/*GLint*/,
+		y : number/*GLint*/,
+		z : number/*GLint*/,
+		w : number/*GLint*/
 	) : void;
 	function uniform4iv(
-		location : WebGLUniformLocation,
+		location : Nullable.<WebGLUniformLocation>,
 		v : Int32Array
 	) : void;
 	function uniform4iv(
-		location : WebGLUniformLocation,
-		v : int[]/*sequence<long>*/
+		location : Nullable.<WebGLUniformLocation>,
+		v : number[]/*sequence<long>*/
 	) : void;
 	function uniform4iv(
-		location : WebGLUniformLocation,
-		v : number[]
+		location : Nullable.<WebGLUniformLocation>,
+		v : int[]/*sequence<long>*/
 	) : void;
 	function uniformMatrix2fv(
-		location : WebGLUniformLocation,
+		location : Nullable.<WebGLUniformLocation>,
 		transpose : boolean/*GLboolean*/,
 		value : Float32Array
 	) : void;
 	function uniformMatrix2fv(
-		location : WebGLUniformLocation,
+		location : Nullable.<WebGLUniformLocation>,
+		transpose : boolean/*GLboolean*/,
+		value : number[]/*sequence<float>*/
+	) : void;
+	function uniformMatrix2fv(
+		location : Nullable.<WebGLUniformLocation>,
+		transpose : boolean/*GLboolean*/,
+		value : int[]/*sequence<float>*/
+	) : void;
+	function uniformMatrix3fv(
+		location : Nullable.<WebGLUniformLocation>,
+		transpose : boolean/*GLboolean*/,
+		value : Float32Array
+	) : void;
+	function uniformMatrix3fv(
+		location : Nullable.<WebGLUniformLocation>,
 		transpose : boolean/*GLboolean*/,
 		value : number[]/*sequence<float>*/
 	) : void;
 	function uniformMatrix3fv(
-		location : WebGLUniformLocation,
+		location : Nullable.<WebGLUniformLocation>,
 		transpose : boolean/*GLboolean*/,
-		value : Float32Array
-	) : void;
-	function uniformMatrix3fv(
-		location : WebGLUniformLocation,
-		transpose : boolean/*GLboolean*/,
-		value : number[]/*sequence<float>*/
+		value : int[]/*sequence<float>*/
 	) : void;
 	function uniformMatrix4fv(
-		location : WebGLUniformLocation,
+		location : Nullable.<WebGLUniformLocation>,
 		transpose : boolean/*GLboolean*/,
 		value : Float32Array
 	) : void;
 	function uniformMatrix4fv(
-		location : WebGLUniformLocation,
+		location : Nullable.<WebGLUniformLocation>,
 		transpose : boolean/*GLboolean*/,
 		value : number[]/*sequence<float>*/
 	) : void;
-	function useProgram(program : WebGLProgram) : void;
-	function validateProgram(program : WebGLProgram) : void;
+	function uniformMatrix4fv(
+		location : Nullable.<WebGLUniformLocation>,
+		transpose : boolean/*GLboolean*/,
+		value : int[]/*sequence<float>*/
+	) : void;
+	function useProgram(program : Nullable.<WebGLProgram>) : void;
+	function validateProgram(program : Nullable.<WebGLProgram>) : void;
 	function vertexAttrib1f(
-		indx : int/*GLuint*/,
+		indx : number/*GLuint*/,
 		x : number/*GLfloat*/
 	) : void;
 	function vertexAttrib1fv(
-		indx : int/*GLuint*/,
+		indx : number/*GLuint*/,
 		values : Float32Array
 	) : void;
 	function vertexAttrib1fv(
-		indx : int/*GLuint*/,
+		indx : number/*GLuint*/,
 		values : number[]/*sequence<float>*/
 	) : void;
+	function vertexAttrib1fv(
+		indx : number/*GLuint*/,
+		values : int[]/*sequence<float>*/
+	) : void;
 	function vertexAttrib2f(
-		indx : int/*GLuint*/,
+		indx : number/*GLuint*/,
 		x : number/*GLfloat*/,
 		y : number/*GLfloat*/
 	) : void;
 	function vertexAttrib2fv(
-		indx : int/*GLuint*/,
+		indx : number/*GLuint*/,
 		values : Float32Array
 	) : void;
 	function vertexAttrib2fv(
-		indx : int/*GLuint*/,
+		indx : number/*GLuint*/,
 		values : number[]/*sequence<float>*/
 	) : void;
+	function vertexAttrib2fv(
+		indx : number/*GLuint*/,
+		values : int[]/*sequence<float>*/
+	) : void;
 	function vertexAttrib3f(
-		indx : int/*GLuint*/,
+		indx : number/*GLuint*/,
 		x : number/*GLfloat*/,
 		y : number/*GLfloat*/,
 		z : number/*GLfloat*/
 	) : void;
 	function vertexAttrib3fv(
-		indx : int/*GLuint*/,
+		indx : number/*GLuint*/,
 		values : Float32Array
 	) : void;
 	function vertexAttrib3fv(
-		indx : int/*GLuint*/,
+		indx : number/*GLuint*/,
 		values : number[]/*sequence<float>*/
 	) : void;
+	function vertexAttrib3fv(
+		indx : number/*GLuint*/,
+		values : int[]/*sequence<float>*/
+	) : void;
 	function vertexAttrib4f(
-		indx : int/*GLuint*/,
+		indx : number/*GLuint*/,
 		x : number/*GLfloat*/,
 		y : number/*GLfloat*/,
 		z : number/*GLfloat*/,
 		w : number/*GLfloat*/
 	) : void;
 	function vertexAttrib4fv(
-		indx : int/*GLuint*/,
+		indx : number/*GLuint*/,
 		values : Float32Array
 	) : void;
 	function vertexAttrib4fv(
-		indx : int/*GLuint*/,
+		indx : number/*GLuint*/,
 		values : number[]/*sequence<float>*/
 	) : void;
+	function vertexAttrib4fv(
+		indx : number/*GLuint*/,
+		values : int[]/*sequence<float>*/
+	) : void;
 	function vertexAttribPointer(
-		indx : int/*GLuint*/,
-		size : int/*GLint*/,
-		type : int/*GLenum*/,
+		indx : number/*GLuint*/,
+		size : number/*GLint*/,
+		type : number/*GLenum*/,
 		normalized : boolean/*GLboolean*/,
-		stride : int/*GLsizei*/,
+		stride : number/*GLsizei*/,
 		offset : number/*GLintptr*/
 	) : void;
 	function viewport(
-		x : int/*GLint*/,
-		y : int/*GLint*/,
-		width : int/*GLsizei*/,
-		height : int/*GLsizei*/
+		x : number/*GLint*/,
+		y : number/*GLint*/,
+		width : number/*GLsizei*/,
+		height : number/*GLsizei*/
 	) : void;
 
 } // end of WebGLRenderingContext
@@ -7564,7 +7635,7 @@ native final class nsIDOMGamepad extends Object/*nsISupports*/ {
 	__readonly__ var connected : boolean;
 	__readonly__ var buttons : variant/*nsIVariant*/;
 	__readonly__ var axes : variant/*nsIVariant*/;
-	__readonly__ var index : int/*unsigned long*/;
+	__readonly__ var index : number/*unsigned long*/;
 
 } // end of nsIDOMGamepad
 
@@ -7578,7 +7649,7 @@ native final class nsIDOMGamepadConnectionEvent extends Event/*nsIDOMEvent*/ {
 /** @see https://wiki.mozilla.org/GamepadAPI */
 native final class nsIDOMGamepadButtonEvent extends Event/*nsIDOMEvent*/ {
 
-	__readonly__ var button : int/*unsigned long*/;
+	__readonly__ var button : number/*unsigned long*/;
 	__readonly__ var gamepad : nsIDOMGamepad;
 
 } // end of nsIDOMGamepadButtonEvent
@@ -7586,7 +7657,7 @@ native final class nsIDOMGamepadButtonEvent extends Event/*nsIDOMEvent*/ {
 /** @see https://wiki.mozilla.org/GamepadAPI */
 native final class nsIDOMGamepadAxisMoveEvent extends Event/*nsIDOMEvent*/ {
 
-	__readonly__ var axis : int/*unsigned long*/;
+	__readonly__ var axis : number/*unsigned long*/;
 	__readonly__ var value : number/*float*/;
 	__readonly__ var gamepad : nsIDOMGamepad;
 
@@ -7600,27 +7671,49 @@ native __fake__ class WindowAnimationTiming {
 
 	function requestAnimationFrame(
 		callback : function(time:number/*DOMTimeStamp*/):void/*FrameRequestCallback*/
-	) : int/*long*/;
-	function cancelAnimationFrame(handle : int/*long*/) : void;
+	) : number/*long*/;
+	function cancelAnimationFrame(handle : number/*long*/) : void;
 	// vender's extension
 	function webkitRequestAnimationFrame(
 		callback : function(time:number/*DOMTimeStamp*/):void/*FrameRequestCallback*/
-	) : int/*long*/;
-	function webkitCancelAnimationFrame(handle : int/*long*/) : void;
+	) : number/*long*/;
+	function webkitCancelAnimationFrame(handle : number/*long*/) : void;
 	function mozRequestAnimationFrame(
 		callback : function(time:number/*DOMTimeStamp*/):void/*FrameRequestCallback*/
-	) : int/*long*/;
-	function mozCancelAnimationFrame(handle : int/*long*/) : void;
+	) : number/*long*/;
+	function mozCancelAnimationFrame(handle : number/*long*/) : void;
 
 } // end of WindowAnimationTiming
 
 native final __fake__ class CanvasPixelArray {
 
-	__readonly__ var length : int/*unsigned long*/;
+	__readonly__ var length : number/*unsigned long*/;
 	function __native_index_operator__(
-		index : int/*unsigned long*/
-	) : Nullable.<int>/*octet*/;
+		index : number/*unsigned long*/
+	) : Nullable.<number>/*octet*/;
 
 } // end of CanvasPixelArray
+
+native final class CSSRuleList {
+
+	__readonly__ var length : number/*long*/;
+	function __native_index_operator__(
+		index : number/*long*/
+	) : Nullable.<CSSRule>;
+	/* getter */
+	function item(index : number/*long*/) : Nullable.<CSSRule>;
+
+} // end of CSSRuleList
+
+native final class StyleSheetList {
+
+	__readonly__ var length : number/*long*/;
+	function __native_index_operator__(
+		index : number/*long*/
+	) : Nullable.<StyleSheet>;
+	/* getter */
+	function item(index : number/*long*/) : Nullable.<StyleSheet>;
+
+} // end of StyleSheetList
 
 
