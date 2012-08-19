@@ -49,7 +49,8 @@ my @specs = (
 
         #"http://www.w3.org/TR/webaudio/", # no correct IDL
         "http://www.w3.org/TR/touch-events/",
-        "http://www.w3.org/TR/websockets/",
+        #"http://www.w3.org/TR/websockets/",
+        "http://www.w3.org/TR/2012/WD-websockets-20120524/",
         #"http://dev.w3.org/html5/websockets/", # too new
         "http://dev.w3.org/geo/api/spec-source.html",
         "http://dev.w3.org/html5/webstorage/",

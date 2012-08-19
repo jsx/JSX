@@ -41,6 +41,7 @@ my %fake = (
     DocumentView => 1,
 
     EventListener => 1,
+    EventHandler => 1,
     EventTarget => 1,
     XMLHttpRequestEventTarget => 1,
 );
@@ -111,6 +112,9 @@ define_alias('Function' => 'function(:Event):void');
 
 # EventListener is written in legacy IDL
 define_alias('EventListener' => 'function(:Event):void');
+
+# http://dev.w3.org/html5/spec/webappapis.html#eventhandler
+define_alias('EventHandler'  => 'function(:Event):void');
 
 # TODO: type resolution process
 
