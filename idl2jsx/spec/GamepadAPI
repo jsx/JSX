@@ -1,0 +1,534 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" dir="ltr"><head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta name="generator" content="MediaWiki 1.17.1" />
+<link rel="shortcut icon" href="/favicon.ico" />
+<link rel="search" type="application/opensearchdescription+xml" href="/opensearch_desc.php" title="MozillaWiki (en)" />
+<link rel="EditURI" type="application/rsd+xml" href="https://wiki.mozilla.org/api.php?action=rsd" />
+<link rel="alternate" type="application/atom+xml" title="MozillaWiki Atom feed" href="/index.php?title=Special:RecentChanges&amp;feed=atom" />	<title>GamepadAPI - MozillaWiki</title>
+	<link rel="stylesheet" href="/load.php?debug=false&amp;lang=en&amp;modules=mediawiki.legacy.commonPrint%2Cshared&amp;only=styles&amp;skin=gmo&amp;*" />
+<link rel="stylesheet" href="/extensions/Bugzilla/web/jqueryui/1.8.14/themes/base/jquery-ui.css" />
+<link rel="stylesheet" href="/extensions/Bugzilla/web/jqueryui/1.8.14/themes/smoothness/jquery-ui.css" />
+<link rel="stylesheet" href="/extensions/Bugzilla/web/css/demo_page.css" />
+<link rel="stylesheet" href="/extensions/Bugzilla/web/css/demo_table.css" />
+<link rel="stylesheet" href="/skins-mozilla/gmo/style/screen.css?301" media="screen, projection" />
+<link rel="stylesheet" href="/skins-mozilla/gmo/style/enhanced.css?301" media="screen, projection" />
+<link rel="stylesheet" href="/skins-mozilla/gmo/style/mediawiki.css?301" media="screen, projection" />
+<!--[if gte IE 6]><link rel="stylesheet" href="/skins-mozilla/gmo/style/ie.css?301" media="screen, projection" /><![endif]--><meta name="ResourceLoaderDynamicStyles" content="" /><link rel="stylesheet" href="/load.php?debug=false&amp;lang=en&amp;modules=site&amp;only=styles&amp;skin=gmo&amp;*" />
+<link rel="stylesheet" href="/load.php?debug=false&amp;lang=en&amp;modules=site&amp;only=styles&amp;skin=gmo&amp;*" />
+<link rel="stylesheet" href="/load.php?debug=false&amp;lang=en&amp;modules=site&amp;only=styles&amp;skin=gmo&amp;*" />
+
+	<link rel="stylesheet" type="text/css" media="print" href="/skins-mozilla/common/commonPrint.css" />
+	<script>if ( window.mediaWiki ) {
+	mediaWiki.config.set({"wgCanonicalNamespace": "", "wgCanonicalSpecialPageName": false, "wgNamespaceNumber": 0, "wgPageName": "GamepadAPI", "wgTitle": "GamepadAPI", "wgAction": "view", "wgArticleId": 49120, "wgIsArticle": true, "wgUserName": null, "wgUserGroups": ["*"], "wgCurRevisionId": 403423, "wgCategories": ["Web APIs"], "wgBreakFrames": false, "wgRestrictionEdit": [], "wgRestrictionMove": [], "wgFCKEditorDir": "extensions/FCKeditor/fckeditor/", "wgFCKEditorExtDir": "extensions/FCKeditor", "wgFCKEditorToolbarSet": "Wiki", "wgFCKEditorHeight": "0", "sfgRemoveText": "Remove", "sfgAutocompleteOnAllChars": false, "sfgAutocompleteValues": {}, "sfgShowOnSelect": {}, "sfgFormErrorsHeader": "There were errors with your form input; see below", "sfgBlankErrorStr": "cannot be blank", "sfgBadURLErrorStr": "must have the correct URL format, starting with \"http\"", "sfgBadEmailErrorStr": "must have a valid email address format", "sfgBadNumberErrorStr": "must be a valid number", "sfgBadDateErrorStr": "must be a valid date", "sfgAnonEditWarning": "Warning: You are not logged in. Your IP address will be recorded in this page\'s edit history."});
+}
+</script>	<script type="text/javascript" src="/skins-mozilla/common/wikibits.js"></script>
+	<script type="text/javascript" src="/index.php?title=-&amp;action=raw&amp;gen=js&amp;useskin=gmo"></script>					<link rel="stylesheet" type="text/css" href="/skins-mozilla/common/shCore.css"></link>
+
+<link rel="stylesheet" type="text/css" href="/skins-mozilla/common/shThemeDefault.css"></link>
+
+<script type="text/javascript" src="/skins-mozilla/common/allsyntax.min.js"></script>
+
+<script type="text/javascript">SyntaxHighlighter.all();</script>
+
+<script src="/extensions/Urchin/urchin.js" type="text/javascript"></script>
+		<script type="text/javascript">
+			urchinTracker();
+		</script>
+		
+<script src="/extensions/Bugzilla/web/jquery/1.6.2/jquery.min.js?301"></script>
+<script src="/extensions/Bugzilla/web/jqueryui/1.8.14/jquery-ui.min.js?301"></script>
+<script src="/extensions/Bugzilla/web/js/jquery.dataTables.js?301"></script>
+<script>
+$(document).ready(function() { 
+                    $(".bugzilla").dataTable({
+                                    "bJQueryUI": true
+                     })});
+</script>
+		<link rel="alternate" type="application/rdf+xml" title="GamepadAPI" href="/index.php?title=Special:ExportRDF/GamepadAPI&amp;xmlmime=rdf" />
+    <script src="/load.php?debug=false&amp;lang=en&amp;modules=startup&amp;only=scripts&amp;skin=gmo&amp;*"></script>
+    <script src="/load.php?debug=false&amp;lang=en&amp;modules=site&amp;only=scripts&amp;skin=gmo&amp;*"></script>
+    <script>if ( window.mediaWiki ) {
+
+        mediaWiki.loader.load(["mediawiki.util", "mediawiki.legacy.wikibits", "mediawiki.legacy.ajax", "ext.smw.sorttable"]);
+        mediaWiki.loader.go();
+    }
+    </script>
+    <script type="text/javascript"> if ( window.isMSIE55 ) fixalpha(); </script>
+</head>
+<body class="mediawiki home ltr ns-0 ns-subject page-GamepadAPI skin-gmo">
+<ul id="skip">
+    <li><a href="#q">Skip to Search</a></li>
+    <li><a href="#nav">Skip to Navigation</a></li>
+    <li><a href="#localnav">Skip to Sub Navigation</a></li>
+    <li><a href="#main">Skip to Content</a></li>
+</ul>
+
+<div id="header">
+    <h1 class="unitPng"><a href="/">MozillaWiki</a></h1>
+    <div id="header-contents">
+        <ul id="nav">
+            <li id="ca-nstab-main"
+            class="selected"            ><a href="/GamepadAPI">Page</a></li><li id="ca-talk"
+            class="new"            ><a href="/index.php?title=Talk:GamepadAPI&amp;action=edit&amp;redlink=1">Discussion</a></li><li id="ca-viewsource"
+                        ><a href="/index.php?title=GamepadAPI&amp;action=edit">View source</a></li><li id="ca-history"
+                        ><a href="/index.php?title=GamepadAPI&amp;action=history">History</a></li>        </ul>
+            
+        <form action="/Special:Search" id="quick-search"><div>
+	        <input id="q" name="search" type="text" />
+            <input type="image" id="quick-search-btn" alt="Search" src="/skins-mozilla/gmo/img/screen/template/search-submit.png">
+        </form>
+            
+        </div>
+    </div>
+
+</div>
+    
+</div>
+<div id="main">
+                
+            <div id="wiki-tools">         
+                <script type="text/javascript"> if (window.isMSIE55) fixalpha(); </script>
+                                <div class='portlet' id='p-navigation'>
+                    <h2>Navigation</h2>
+                    <div class='pBody'>
+                        <ul>
+                                                        <li id="n-mainpage-description"><a href="/Main_Page">Main page</a></li>
+                                                        <li id="n-portal"><a href="/MozillaWiki:Community_portal">Community portal</a></li>
+                                                        <li id="n-currentevents"><a href="http://blog.mozilla.com/">Mozilla News</a></li>
+                                                        <li id="n-recentchanges"><a href="/Special:RecentChanges">Recent changes</a></li>
+                                                        <li id="n-randompage"><a href="/Special:Random">Random page</a></li>
+                                                        <li id="n-help"><a href="/Help:Contents">Help</a></li>
+                                                    </ul>
+                    </div>
+                </div>
+                <div class="portlet" id="p-personal">
+                    <h2>Personal tools</h2>
+                    <div class="pBody">
+                        <ul>
+                        <li id="pt-login"><a href="/index.php?title=Special:UserLogin&amp;returnto=GamepadAPI">Log in / create account</a></li>                        </ul>
+                    </div>
+                </div>                  
+	            
+	            <div class="portlet" id="p-tb">
+		            <h2>Toolbox</h2>
+		            <div class="pBody">
+			            <ul>
+					      					      <li id="t-whatlinkshere"><a href="/Special:WhatLinksHere/GamepadAPI">What links here</a></li>
+					      					      <li id="t-recentchangeslinked"><a href="/Special:RecentChangesLinked/GamepadAPI">Related changes</a></li>
+					      				          				          				          				          				          				          				          				          				          <li id="t-specialpages"><a href="/Special:SpecialPages">Special pages</a></li>				          <li id="t-smwbrowselink"><a href="/Special:Browse/GamepadAPI" title="Special:Browse/GamepadAPI">Browse properties</a></li>					    </ul>
+		            </div>
+	            </div>             </div>
+            
+            <div id="main-content">              
+                <h1 id="page-title">GamepadAPI</h1>
+                <div id="breadcrumbs">
+                    <a href="https://wiki.mozilla.org">Home</a>&nbsp;&raquo;&nbsp;<a href="https://wiki.mozilla.org/GamepadAPI">GamepadAPI</a>                </div>
+                <h3 id="siteSub">From MozillaWiki</h3>
+                <div id="contentSub"></div>
+                                                <div id="jump-to-nav">Jump to: <a href="#column-one">navigation</a>, <a href="#searchInput">search</a></div>                <!-- start content -->
+                <table id="toc" class="toc"><tr><td><div id="toctitle"><h2>Contents</h2></div>
+<ul>
+<li class="toclevel-1 tocsection-1"><a href="#Web_Gamepad_API_.28Draft_Recommendation.29"><span class="tocnumber">1</span> <span class="toctext">Web Gamepad API (Draft Recommendation)</span></a>
+<ul>
+<li class="toclevel-2 tocsection-2"><a href="#Abstract"><span class="tocnumber">1.1</span> <span class="toctext">Abstract</span></a></li>
+<li class="toclevel-2 tocsection-3"><a href="#Authors"><span class="tocnumber">1.2</span> <span class="toctext">Authors</span></a></li>
+</ul>
+</li>
+<li class="toclevel-1 tocsection-4"><a href="#API_Tutorial"><span class="tocnumber">2</span> <span class="toctext">API Tutorial</span></a>
+<ul>
+<li class="toclevel-2 tocsection-5"><a href="#Connecting_to_a_Gamepad"><span class="tocnumber">2.1</span> <span class="toctext">Connecting to a Gamepad</span></a></li>
+<li class="toclevel-2 tocsection-6"><a href="#Disconnecting_a_Gamepad"><span class="tocnumber">2.2</span> <span class="toctext">Disconnecting a Gamepad</span></a></li>
+<li class="toclevel-2 tocsection-7"><a href="#Gamepad_Button_Events"><span class="tocnumber">2.3</span> <span class="toctext">Gamepad Button Events</span></a></li>
+<li class="toclevel-2 tocsection-8"><a href="#Gamepad_Axis_Events"><span class="tocnumber">2.4</span> <span class="toctext">Gamepad Axis Events</span></a></li>
+<li class="toclevel-2 tocsection-9"><a href="#Querying_the_Gamepad_Object"><span class="tocnumber">2.5</span> <span class="toctext">Querying the Gamepad Object</span></a></li>
+<li class="toclevel-2 tocsection-10"><a href="#Complete_Example:_Displaying_Gamepad_State"><span class="tocnumber">2.6</span> <span class="toctext">Complete Example: Displaying Gamepad State</span></a></li>
+</ul>
+</li>
+<li class="toclevel-1 tocsection-11"><a href="#DOM_Implementation"><span class="tocnumber">3</span> <span class="toctext">DOM Implementation</span></a>
+<ul>
+<li class="toclevel-2 tocsection-12"><a href="#nsIDOMGamepad"><span class="tocnumber">3.1</span> <span class="toctext">nsIDOMGamepad</span></a></li>
+<li class="toclevel-2 tocsection-13"><a href="#nsIDOMGamepadConnectionEvent"><span class="tocnumber">3.2</span> <span class="toctext">nsIDOMGamepadConnectionEvent</span></a></li>
+<li class="toclevel-2 tocsection-14"><a href="#nsIDOMGamepadButtonEvent"><span class="tocnumber">3.3</span> <span class="toctext">nsIDOMGamepadButtonEvent</span></a></li>
+<li class="toclevel-2 tocsection-15"><a href="#nsIDOMGamepadAxisMoveEvent"><span class="tocnumber">3.4</span> <span class="toctext">nsIDOMGamepadAxisMoveEvent</span></a></li>
+</ul>
+</li>
+<li class="toclevel-1 tocsection-16"><a href="#Resources"><span class="tocnumber">4</span> <span class="toctext">Resources</span></a>
+<ul>
+<li class="toclevel-2 tocsection-17"><a href="#Obtaining_Builds"><span class="tocnumber">4.1</span> <span class="toctext">Obtaining Builds</span></a></li>
+<li class="toclevel-2 tocsection-18"><a href="#Demos.2C_Libraries.2C_Other_Code"><span class="tocnumber">4.2</span> <span class="toctext">Demos, Libraries, Other Code</span></a></li>
+<li class="toclevel-2 tocsection-19"><a href="#Design_Considerations"><span class="tocnumber">4.3</span> <span class="toctext">Design Considerations</span></a></li>
+<li class="toclevel-2 tocsection-20"><a href="#Discussion"><span class="tocnumber">4.4</span> <span class="toctext">Discussion</span></a></li>
+</ul>
+</li>
+</ul>
+</td></tr></table>
+<h2> <span class="mw-headline" id="Web_Gamepad_API_.28Draft_Recommendation.29"> Web Gamepad API (Draft Recommendation) </span></h2>
+<h3> <span class="mw-headline" id="Abstract"> Abstract </span></h3>
+<p>The HTML5 specification introduces many of the necessary components for rich interactive and game development, from &lt;canvas&gt; and WebGL to &lt;audio&gt; and &lt;video&gt;.  At the same time, JavaScript implementations have matured to the point where they can now support many tasks which previously required native code.  The Web Gamepad API presents a new way for web and game developers, as well as interaction designers, to access and use gamepads and other controllers for games.
+</p><p>This API is currently in <a href="http://dvcs.w3.org/hg/webevents/raw-file/default/gamepad.html" class="external text" rel="nofollow">Editor's Draft status at the W3C</a>, and will be subject to change.
+</p>
+<h3> <span class="mw-headline" id="Authors"> Authors </span></h3>
+<ul><li> Ted Mielczarek (<a href="https://twitter.com/#!/TedMielczarek" class="external text" rel="nofollow">@TedMielczarek</a>)
+</li><li> Jason Orendorff (<a href="https://twitter.com/#!/jorendorff" class="external text" rel="nofollow">@jorendorff</a>)
+</li><li> David Humphrey (<a href="http://twitter.com/humphd" class="external text" rel="nofollow">@humphd</a>)
+</li><li> Kevin Gadd (<a href="https://twitter.com/#!/antumbral" class="external text" rel="nofollow">@antumbral</a>)
+</li></ul>
+<h2> <span class="mw-headline" id="API_Tutorial"> API Tutorial </span></h2>
+<p>This API introduces new events on the window object for reading gamepad and controller (hereby referred to as <i>gamepad</i>) state.  In addition to these events, the API also adds a Gamepad object, which can be used to query the state of connected gamepads.
+</p>
+<h3> <span class="mw-headline" id="Connecting_to_a_Gamepad"> Connecting to a Gamepad </span></h3>
+<p>When a new gamepad is connected to the computer, the focused page will first receive a <b>MozGamepadConnected</b> event.  If a gamepad was already connected when the page loaded, the <b>MozGamepadConnected</b> event will be dispatched to the focused page when the user presses a button or moves an axis.  Developers can use <b>MozGamepadConnected</b> like this:
+</p>
+<pre>
+&lt;div id=&quot;gamepads&quot;&gt;&lt;/div&gt;
+&lt;script&gt;
+function gamepadConnected(e) {
+  var gamepads = document.getElementById(&quot;gamepads&quot;),
+    gamepadId = e.gamepad.id;
+
+  gamepads.innerHTML += &quot; Gamepad Connected (id=&quot; + gamepadId + &quot;)&quot;;
+}
+
+window.addEventListener(&quot;MozGamepadConnected&quot;, gamepadConnected, false);
+&lt;/script&gt;
+</pre>
+<p>Each gamepad will have a unique ID associated with it, which is available on the event's <b>gamepad</b> property.
+</p>
+<h3> <span class="mw-headline" id="Disconnecting_a_Gamepad"> Disconnecting a Gamepad </span></h3>
+<p>When a gamepad is disconnected, and if a page has previously received data (e.g., MozGamepadConnected), a second event is dispatched to the focused window, <b>MozGamepadDisconnected</b>:
+</p>
+<pre>
+&lt;div id=&quot;gamepads&quot;&gt;&lt;/div&gt;
+&lt;script&gt;
+function gamepadDisconnected(e) {
+  var gamepads = document.getElementById(&quot;gamepads&quot;),
+    gamepadId = e.gamepad.id;
+
+  gamepads.innerHTML += &quot; Gamepad Disconnected (id=&quot; + gamepadId + &quot;)&quot;;
+}
+
+window.addEventListener(&quot;MozGamepadDisconnected&quot;, gamepadDisconnected, false);
+&lt;/script&gt;
+</pre>
+<p>The Gamepad's ID will be the same for <b>MozGamepadConnected</b> and <b>MozGamepadDisconnected</b> events, making it a suitable key for storing gamepad device information:
+</p>
+<pre>
+var gamepads = {};
+
+function gamepadHandler(event, connecting) {
+  var gamepad = event.gamepad;
+
+  if (connecting) {
+    gamepads[gamepad.id] = gamepad; 
+  } else {
+    delete gamepads[gamepad.id];
+  }
+}
+
+window.addEventListener(&quot;MozGamepadDisconnected&quot;, function(e) { gamepadHandler(e, true); }, false);
+window.addEventListener(&quot;MozGamepadDisconnected&quot;, function(e) { gamepadHandler(e, false); }, false);
+</pre>
+<p>This previous example also demonstrates how the <b>gamepad</b> property can be held after the event has completed--a technique we will use for device state querying later.
+</p>
+<h3> <span class="mw-headline" id="Gamepad_Button_Events"> Gamepad Button Events </span></h3>
+<p>Gamepads can have one or more buttons, and similar to a mouse button, this API provides events for buttons being pressed and released.  When a gamepad button is pressed a <b>MozGamepadButtonDown</b> event is dispatched to the currently focused page.  Similarly a <b>MozGamepadButtonUp</b> event is dispatched when it is released.  Both events provide the same <b>gamepad</b> property, which indicates the gamepad (i.e., it's ID) that triggered the event.  The button itself (i.e., whichever of the 2, 4, etc. buttons the gamepad has) is available on the event's <b>button</b> property.
+</p>
+<pre>
+&lt;div id=&quot;gamepads&quot;&gt;&lt;/div&gt;
+&lt;script&gt;
+function buttonHandler(event, pressed) {
+  var gamepads = document.getElementById(&quot;gamepads&quot;),
+    gamepadId = event.gamepad.id,
+    button = event.button,
+    text = pressed&#160;? &quot; Gamepad button pressed&quot;&#160;: &quot; Gamepad button released&quot;;
+
+  gamepads.innerHTML += text + &quot; (id=&quot; + gamepadId + &quot;, button=&quot; + button + &quot;)&quot;;
+}
+
+window.addEventListener(&quot;MozGamepadButtonDown&quot;, function(e) { buttonHandler(e, true); }, false);
+window.addEventListener(&quot;MozGamepadButtonUp&quot;, function(e) { buttonHandler(e, false); }, false);
+&lt;/script&gt;
+</pre>
+<h3> <span class="mw-headline" id="Gamepad_Axis_Events"> Gamepad Axis Events </span></h3>
+<p>Similar to the button events, the axis events provide a way for developers to know when a user has moved one or more of a gamepad's axises (i.e., left-right or up-down).  Just as a gamepad can have multiple buttons, so to can there be many axes.  Each physical stick on a gamepad provides two axes for changes in X and Y positioning.  The <b>MozGamepadAxisMove</b> event indicates that a gamepad's axis has changed, and its new value.  The axis is numbered, and its value is given, which is a float between -1.0 (the lowest possible value) and 1.0 (the highest possible value):
+</p>
+<pre>
+&lt;div id=&quot;gamepads&quot;&gt;&lt;/div&gt;
+&lt;script&gt;
+function axisHandler(event, pressed) {
+  var gamepads = document.getElementById(&quot;gamepads&quot;),
+    gamepadId = event.gamepad.id,
+    axis = event.axis,
+    value = event.value;
+
+  gamepads.innerHTML += &quot; Gamepad Axis Move (id=&quot; + gamepadId +
+                                               &quot;, axis=&quot; + axis +
+                                               &quot;, value=&quot; + value + &quot;)&quot;;
+}
+
+window.addEventListener(&quot;MozGamepadAxisMove&quot;, axisHandler, false);
+&lt;/script&gt;
+</pre>
+<h3> <span class="mw-headline" id="Querying_the_Gamepad_Object"> Querying the Gamepad Object </span></h3>
+<p>All of the <b>MozGamepad*</b> events discussed above included a <b>gamepad</b> property on the event object.  We used this in order to determine which gamepad (i.e., it's ID) had caused the event, since multiple gamepads might be connected at once.
+</p><p>We can do much more with this Gamepad object, including holding a reference to it and querying it instead of using <b>MozGamepadButtonUp</b>, <b>MozGamepadButtonDown</b>, and <b>MozGamepadAxisMove</b> events.  Doing so is often desirable for games or other interactive web pages that need to know the state of a gamepad now vs. the next time an event fires.
+</p><p>As we have seen, the Gamepad object for a given gamepad is available on the <b>MozGamepadConnected</b> event.  For security reasons, it is not available as a property of the window object itself.  Once we have a reference to it, we can query its properties for information about the current state of the gamepad.  Behind the scenes, this object will be updated every time the gamepad's state changes.
+</p><p>The Gamepad object's properties include:
+</p>
+<ul><li> <b>id</b>: a unique id (string) for the gamepad.
+</li><li> <b>connected</b>: true if the gamepad is still connected to the system.
+</li><li> <b>buttons</b>: an array of the buttons present on the device. Each entry in the array is 0 if the button is not pressed, and non-zero (typically 1.0) if the button is pressed.
+</li><li> <b>axes</b>: an array of the axes present on the device. Each entry in the array is a float value in the range -1.0..1.0 representing the axis position from the lowest value (-1.0) to the highest value (1.0).
+</li><li> <b>index</b>: a unique auto-incrementing number for each gamepad connected to the system. A gamepad that is disconnected and reconnected will retain the same index.
+</li></ul>
+<p>The Gamepad object is often used in conjunction with an animation loop (e.g., requestAnimationFrame), where developers want to make decisions for the current frame based on the state of the gamepad or gamepads.
+</p>
+<h3> <span class="mw-headline" id="Complete_Example:_Displaying_Gamepad_State"> Complete Example: Displaying Gamepad State </span></h3>
+<p>This example shows how to use the Gamepad object, as well as the <b>MozGamepadConnected</b> and <b>MozGamepadDisconnected</b> events in order to display the state of all gamepads connected to the system:
+</p>
+<pre>
+&lt;html&gt;
+&lt;head&gt;
+&lt;script type=&quot;text/javascript&quot;&gt;
+var gamepads = {};
+
+function createDiv(gamepad) {
+  var d = document.createElement(&quot;div&quot;);
+  d.setAttribute(&quot;id&quot;, gamepad.id);
+  var t = document.createElement(&quot;h1&quot;);
+  t.appendChild(document.createTextNode(&quot;gamepad: &quot; + gamepad.id));
+  d.appendChild(t);
+  var b = document.createElement(&quot;div&quot;);
+  b.className = &quot;buttons&quot;;
+  for (var i=0; i&lt;gamepad.buttons.length; i++) {
+    var e = document.createElement(&quot;span&quot;);
+    e.className = &quot;button&quot;;
+    e.innerHTML = i;
+    b.appendChild(e);
+  }
+  d.appendChild(b);
+  var a = document.createElement(&quot;div&quot;);
+  a.className = &quot;axes&quot;;
+  for (var i=0; i&lt;gamepad.axes.length; i++) {
+    var e = document.createElement(&quot;progress&quot;);
+    e.className = &quot;axis&quot;;
+    e.setAttribute(&quot;max&quot;, &quot;2&quot;);
+    e.setAttribute(&quot;value&quot;, &quot;1&quot;);
+    e.innerHTML = i;
+    a.appendChild(e);
+  }
+  d.appendChild(a);
+  document.getElementById(&quot;start&quot;).style.display = &quot;none&quot;;
+
+  return d;
+}
+
+function connectHandler(e) {
+  var gamepad = e.gamepad;
+  gamepads[e.gamepad.id] = gamepad;
+
+  var div = createDiv(gamepad);
+  document.body.appendChild(div);
+
+  window.mozRequestAnimationFrame(updateStatus);
+}
+
+function disconnectHandler(e) {
+  var d = document.getElementById(e.gamepad.id);
+  document.body.removeChild(d);
+  delete gamepads[e.gamepad.id];
+}
+
+function updateStatus() {
+  for (j in gamepads) {
+    var gamepad = gamepads[j],
+      d = document.getElementById(j),
+      buttons = d.getElementsByClassName(&quot;button&quot;),
+      axes = d.getElementsByClassName(&quot;axis&quot;);
+
+    for (var i=0; i&lt;gamepad.buttons.length; i++) {
+      var b = buttons[i];
+      if (gamepad.buttons[i]) {
+        b.className = &quot;button pressed&quot;;
+      }
+      else {
+        b.className = &quot;button&quot;;
+      }
+    }
+
+    for (var i=0; i&lt;gamepad.axes.length; i++) {
+      var a = axes[i];
+      a.innerHTML = i + &quot;: &quot; + gamepad.axes[i].toFixed(4);
+      a.setAttribute(&quot;value&quot;, gamepad.axes[i] + 1);
+    }
+  }
+
+  window.mozRequestAnimationFrame(updateStatus);
+}
+
+window.addEventListener(&quot;MozGamepadConnected&quot;, connectHandler);
+window.addEventListener(&quot;MozGamepadDisconnected&quot;, disconnectHandler);
+&lt;/script&gt;
+&lt;style&gt;
+.buttons, .axes {
+  padding: 1em;
+}
+
+.button {
+  padding: 1em;
+  border-radius: 20px;
+  border: 1px solid black;
+}
+
+.pressed {
+  background-color: green;
+}
+&lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+&lt;h2 id=&quot;start&quot;&gt;Press a button on your controller to start&lt;/h2&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</pre>
+<h2> <span class="mw-headline" id="DOM_Implementation">DOM Implementation</span></h2>
+<h3> <span class="mw-headline" id="nsIDOMGamepad">nsIDOMGamepad</span></h3>
+<p>All <b>MozGamepad*</b> events include a <b>gamepad</b> property, which contains the state of the gamepad.  This so-called Gamepad object is only available via <b>MozGamepad*</b> events, and is not available on window.  It has the following interface:
+</p>
+<pre>
+interface nsIDOMGamepad&#160;: nsISupports {
+  readonly attribute DOMString id;
+  readonly attribute boolean connected;
+  readonly attribute nsIVariant buttons;
+  readonly attribute nsIVariant axes;
+  readonly attribute unsigned long index;
+};
+</pre>
+<p>The <b>id</b> attribute is a string containing the USB vendor and product ID as well as a name.  This string is unique per device type.  Two gamepads of the same type will share the same string.
+</p><p>The <b>connected</b> attributed indicates whether or not the gamepad is connected to the system.  After a <b>MozGamepadConnected</b> event, gamepad.connected will be true.  It is false once <b>MozGamepadDisconnected</b> fires.
+</p><p>The <b>buttons</b> attribute is an array of all buttons on the gamepad and their state.  The first button (e.g., buttons[0]) will be 0 (zero) if the button is not pressed, and non-zero if it is.  The second button is buttons[1] and so on.
+</p><p>The <b>axes</b> attribute is an array of all the axes present on the device. Each entry in the array is a float value in the range -1.0 to 1.0, representing the axis position from the lowest value (-1.0) to the highest value (1.0).  Each physical stick on a gamepad will expose two axes, one for changes in X (left-right), and the other for changes in Y (up-down) positioning.
+</p><p>The <b>index</b> attribute is a unique auto-incrementing number for each gamepad connected to the system. If a gamepad is disconnected and reconnected, it will retain the same index number.
+</p><p>The lifetime of an nsIDOMGamepad object is more than the lifetime of a <b>MozGamepad*</b> event.  Web content may save a reference to a <b>MozGamepad*</b> event's <b>gamepad</b> property and refer to it at any time to determine the current state of the device.  The state will not be updated while the content script is executing, only between script executions.  For example, the state will not be updated during the course of a setTimeout callback, but it may be updated the next time the callback is called.
+</p>
+<h3> <span class="mw-headline" id="nsIDOMGamepadConnectionEvent">nsIDOMGamepadConnectionEvent</span></h3>
+<p>The <b>MozGamepadConnected</b> and <b>MozGamepadDisconnected</b> events use nsIDOMGamepadConnectionEvent:
+</p>
+<pre>
+interface nsIDOMGamepadConnectionEvent&#160;: nsIDOMEvent
+{
+  readonly attribute nsIDOMGamepad gamepad;
+};
+</pre>
+<p>The single <b>gamepad</b> attribute provides access to an associated nsIDOMGamepad object for this device.  As was previously mentioned, this object can be held after the event callback has completed, and be used to query the state of the device at any point.
+</p>
+<h3> <span class="mw-headline" id="nsIDOMGamepadButtonEvent">nsIDOMGamepadButtonEvent</span></h3>
+<p>Gamepad button state information is made available via nsIDOMGamepadButtonEvent:
+</p>
+<pre>
+interface nsIDOMGamepadButtonEvent&#160;: nsIDOMEvent
+{
+  readonly attribute unsigned long button;
+  readonly attribute nsIDOMGamepad gamepad;
+};
+</pre>
+<p>The <b>button</b> attribute indicates the index of the button that was pressed or released.
+</p><p>The <b>gamepad</b> attribute provides access to the associated nsIDOMGamepad object, with full button state information available via <b>gamepad.buttons</b>.
+</p>
+<h3> <span class="mw-headline" id="nsIDOMGamepadAxisMoveEvent">nsIDOMGamepadAxisMoveEvent</span></h3>
+<p>Gamepad axes state information is made available via nsIDOMGamepadAxisMoveEvent:
+</p>
+<pre>
+interface nsIDOMGamepadAxisMoveEvent&#160;: nsIDOMEvent
+{
+  readonly attribute unsigned long axis;
+  readonly attribute float value;
+  readonly attribute nsIDOMGamepad gamepad;
+};
+</pre>
+<p>The <b>axis</b> attribute indicates the index of the axis that was moved.
+</p><p>The <b>value</b> attribute is a float indicating the position of the axis, between -1.0 and 1.0.
+</p><p>The <b>gamepad</b> attribute provides access to the associated nsIDOMGamepad object, with full axes state information available via <b>gamepad.axes</b>.
+</p>
+<h2> <span class="mw-headline" id="Resources">Resources</span></h2>
+<p>Implementation and discussion on this API is happening in <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=604039" class="external text" rel="nofollow">bug 604039</a>.  Feedback and suggestions are welcome.
+</p>
+<h3> <span class="mw-headline" id="Obtaining_Builds">Obtaining Builds</span></h3>
+<p>The latest information about custom builds for testing the API is in <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=604039" class="external text" rel="nofollow">bug 604039</a>.  However, the most recent try-server builds are available at:
+</p><p><a href="http://people.mozilla.com/~tmielczarek/mouselock+gamepad/" class="external free" rel="nofollow">http://people.mozilla.com/~tmielczarek/mouselock+gamepad/</a>
+</p>
+<h3> <span class="mw-headline" id="Demos.2C_Libraries.2C_Other_Code">Demos, Libraries, Other Code</span></h3>
+<p>Examples of the Web Gamepad API should be added here.  NOTE, the API is evolving, and some of the following examples may be based on earlier versions.
+</p>
+<ul><li> Gamepad visualisation demo - <a href="http://robhawkes.github.com/gamepad-demo/" class="external free" rel="nofollow">http://robhawkes.github.com/gamepad-demo/</a>
+</li><li> Simple API demo page - <a href="https://bug604039.bugzilla.mozilla.org/attachment.cgi?id=549214" class="external free" rel="nofollow">https://bug604039.bugzilla.mozilla.org/attachment.cgi?id=549214</a>
+</li><li> Another API demo page - <a href="https://bug604039.bugzilla.mozilla.org/attachment.cgi?id=550638" class="external free" rel="nofollow">https://bug604039.bugzilla.mozilla.org/attachment.cgi?id=550638</a>
+</li><li> Example of using MozGamepad* listeners - <a href="https://gist.github.com/58b0f9ed647f72da9173" class="external free" rel="nofollow">https://gist.github.com/58b0f9ed647f72da9173</a>
+</li><li> Gamepad API controlling &lt;video&gt; - <a href="http://weblog.bocoup.com/javascript-firefox-nightly-introduces-dom-gamepad-events" class="external free" rel="nofollow">http://weblog.bocoup.com/javascript-firefox-nightly-introduces-dom-gamepad-events</a>, <a href="http://jsfiddle.net/rwaldron/wPuGB/" class="external free" rel="nofollow">http://jsfiddle.net/rwaldron/wPuGB/</a>
+</li></ul>
+<h3> <span class="mw-headline" id="Design_Considerations">Design Considerations</span></h3>
+<ul><li> Should feel web-native.
+<ul><li> DOM Events were chosen for the first prototype implementation because of the similarity to keyboard/mouse input.
+</li><li> Whatever API is chosen, it should use standard web idioms.
+</li></ul>
+</li><li> Should not expose the user to unnecessary fingerprinting.
+<ul><li> Web pages should not be able to query for the number and type of attached devices without explicit user input.
+</li><li> Ideally we wouldn't have to use a permission infobar like with some other APIs, the user explicitly interacting with their device while viewing a webpage ought to be enough "permission" to send device data to that page.
+</li><li> The prototype implementation falls down a bit here, it sends events to all pages that ask for them, should really be just the foreground page.
+</li></ul>
+</li><li> Needs to be performant for web games that want to run at 60FPS
+<ul><li> This will need experimentation and testing
+</li><li> There are assertions that DOM events won't scale to this level, it's possible that the API will need to be changed if that is true
+</li></ul>
+</li><li> To be useful, will need some way to map buttons/axes to meaningful values.
+<ul><li> Even the same gamepad looks different on different OSes!
+</li><li> Across multiple devices this is insanity
+</li><li> Should try to expose enough info to let content handle this, Kevin Gadd has an "Input Device API" that is higher-level and might be a good fit here.
+</li><li> This can totally be done in JavaScript: <a href="https://github.com/jbuck/input.js" class="external free" rel="nofollow">https://github.com/jbuck/input.js</a>
+</li></ul>
+</li></ul>
+<h3> <span class="mw-headline" id="Discussion">Discussion</span></h3>
+<ul><li> Pages will want instantaneous state of device, we might as well expose it (may alleviate polling concerns as well) 
+<ul><li> Expose a gamepadState property on each event, content can hold on to that object and it will update live as input happens 
+</li></ul>
+</li><li> Not sure about mapping various devices to a sane set of controls 
+<ul><li> Going to try exposing a device ID for testing, collect some data and see what it looks like 
+</li><li> Probably a fingerprinting concern, may not want to ship this 
+</li><li> How much do we push to content vs. try to handle in the browser? 
+</li><li> We'll get new try builds and put up a web page to gather data from users with various devices 
+</li><li> This can totally be done in JavaScript: <a href="https://github.com/jbuck/input.js" class="external free" rel="nofollow">https://github.com/jbuck/input.js</a>
+</li></ul>
+</li><li> Need timestamps per event (using milliseconds like requestAnimationFrame) 
+</li><li> sicking is going to schedule a security review to get some more people thinking about it 
+</li><li> Proposal for a polling based API (soliciting feedback): <a href="https://sites.google.com/a/chromium.org/dev/developers/gamepad-api" class="external free" rel="nofollow">https://sites.google.com/a/chromium.org/dev/developers/gamepad-api</a>
+</li></ul>
+
+<!-- 
+NewPP limit report
+Preprocessor node count: 184/1000000
+Post-expand include size: 128/2097152 bytes
+Template argument size: 24/2097152 bytes
+Expensive parser function count: 0/100
+-->
+
+<!-- Saved in parser cache with key wiki_mozilla_org:pcache:idhash:49120-0!*!0!!en!*!edit=0 and timestamp 20120819023854 -->
+<div class="printfooter">
+Retrieved from "<a href="https://wiki.mozilla.org/GamepadAPI">https://wiki.mozilla.org/GamepadAPI</a>"</div>
+                <div id='catlinks' class='catlinks'><div id="mw-normal-catlinks"><a href="/Special:Categories" title="Special:Categories">Category</a>: <span dir='ltr'><a href="/Category:Web_APIs" title="Category:Web APIs">Web APIs</a></span></div></div>                <!-- end content -->
+                                <div class="visualClear"></div>
+            </div>
+
+            </div><!-- end #main -->
+</div>
+<div id="footer-wrap">
+    <div class="cols" id="footer">
+        <div class="six-col">
+	        <a href="/" id="logo-footer"><img src="/skins-mozilla/gmo/img/screen/template/screen/logo_footer.png"></a>
+        </div>
+        <div class="col-span">
+        		<span id="f-lastmod"> This page was last modified on 2 March 2012, at 19:36.</span>		<span id="f-viewcount">This page has been accessed 16,973 times. </span>		<ul id="f-list">
+									<li id="f-about"><a href="/MozillaWiki:About" title="MozillaWiki:About">About MozillaWiki</a></li>			<li id="f-disclaimer"><a href="/MozillaWiki:General_disclaimer" title="MozillaWiki:General disclaimer">Disclaimers</a></li>            <li><a href="http://www.mozilla.org/about/policies/privacy-policy.html">Privacy Policy</a></li>
+		</ul>
+		<div id="f-poweredbyico"><a href="http://www.mediawiki.org/"><img src="/skins-mozilla/common/images/poweredby_mediawiki_88x31.png" height="31" width="88" alt="Powered by MediaWiki" /></a> <a href="http://www.semantic-mediawiki.org/wiki/Semantic_MediaWiki"><img src="/extensions/SemanticMediaWiki/skins/images/smw_button.png" alt="Powered by Semantic MediaWiki" /></a></div>        </div>       
+    </div><!-- end #footer -->
+</div>
+

@@ -1,0 +1,1024 @@
+<!DOCTYPE html><meta charset=UTF-8>
+<title>DOM Parsing and Serialization</title>
+<link href=http://www.whatwg.org/style/specification rel=stylesheet>
+<style>
+ pre, code { font-family:monospace, sans-serif; }
+ h2 code, h3 code, h4 code,
+ h2 :link, h3 :link, h4 :link,
+ h2 :visited, h3 :visited, h4 :visited
+ { font:inherit; color:inherit; font-style:italic; }
+ @media print {
+   [data-anolis-spec]::after {
+     content: "[" attr(data-anolis-spec) "]";
+     font-size: 0.6em;
+     vertical-align: super;
+     text-transform: uppercase;
+   }
+ }
+</style>
+<body class=draft>
+<div class=head id=head>
+<h1>DOM Parsing and Serialization</h1>
+<h2 class="no-num no-toc" id=work-in-progress-&mdash;-last-update-2-august-2012>Work in Progress &mdash; Last Update 2 August 2012</h2>
+<dl>
+  <dt>This Version:
+  <dd><a href=http://html5.org/specs/dom-parsing.html>http://html5.org/specs/dom-parsing.html</a>
+
+  <dt>Participate:
+  <dd><a href=http://www.whatwg.org/mailing-list>whatwg@whatwg.org</a>
+  <dd><a href="https://www.w3.org/Bugs/Public/enter_bug.cgi?product=WebAppsWG&amp;component=DOM%20Parsing%20and%20Serialization">File a bug</a>
+  <dd><a href=http://wiki.whatwg.org/wiki/IRC>IRC: #whatwg on Freenode</a>
+
+  <dt>Editor:
+  <dd>Ms2ger &lt;ms2ger@gmail.com&gt;
+
+  <dt>Version history:
+  <dd><a href=http://bitbucket.org/ms2ger/dom-parsing-and-serialization/>http://bitbucket.org/ms2ger/dom-parsing-and-serialization/</a>
+</dl>
+<p class=copyright>&copy; 2010&ndash;2012 The editors.
+<p class=copyright><a href=http://creativecommons.org/publicdomain/zero/1.0/>CC0 1.0 Universal</a>.
+</div>
+
+
+
+<h2 class="no-num no-toc" id=abstract>Abstract</h2>
+<p>
+
+
+
+<h2 class="no-num no-toc" id=table-of-contents>Table of contents</h2>
+
+<!--begin-toc-->
+<ol class=toc>
+ <li><a class=no-num href=#issues>Issues</a></li>
+ <li><a href=#conformance><span class=secno>1 </span>Conformance</a>
+  <ol>
+   <li><a href=#dependencies><span class=secno>1.1 </span>Dependencies</a></li>
+   <li><a href=#extensibility><span class=secno>1.2 </span>Extensibility</a></ol></li>
+ <li><a href=#terminology><span class=secno>2 </span>Terminology</a></li>
+ <li><a href=#parsing-and-serializing-nodes><span class=secno>3 </span>Parsing and serializing <code class=external data-anolis-spec=dom>Node</code>s</a>
+  <ol>
+   <li><a href=#parsing><span class=secno>3.1 </span>Parsing</a></li>
+   <li><a href=#serializing><span class=secno>3.2 </span>Serializing</a></ol></li>
+ <li><a href=#the-domparser-interface><span class=secno>4 </span>The <code>DOMParser</code> interface</a></li>
+ <li><a href=#the-xmlserializer-interface><span class=secno>5 </span>The <code>XMLSerializer</code> interface</a></li>
+ <li><a href=#extensions-to-the-element-interface><span class=secno>6 </span>Extensions to the <code class=external data-anolis-spec=dom>Element</code> interface</a>
+  <ol>
+   <li><a href=#innerhtml><span class=secno>6.1 </span><code title=dom-Element-innerHTML>innerHTML</code></a></li>
+   <li><a href=#outerhtml><span class=secno>6.2 </span><code title=dom-Element-outerHTML>outerHTML</code></a></li>
+   <li><a href=#insertadjacenthtml()><span class=secno>6.3 </span><code title=dom-Element-insertAdjacentHTML>insertAdjacentHTML()</code></a></ol></li>
+ <li><a href=#extensions-to-the-text-interface><span class=secno>7 </span>Extensions to the <code class=external data-anolis-spec=dom>Text</code> interface</a></li>
+ <li><a href=#extensions-to-the-range-interface><span class=secno>8 </span>Extensions to the <code class=external data-anolis-spec=dom>Range</code> interface</a></li>
+ <li><a class=no-num href=#references>References</a></li>
+ <li><a class=no-num href=#acknowledgements>Acknowledgements</a></ol>
+<!--end-toc-->
+
+
+
+<h2 class=no-num id=issues>Issues</h2>
+<p>Various issues are listed in the rest of the document.
+
+<p class=XXX>This specification currently requires using the XML Parser for
+some APIs, when in an XML document. It is unclear whether consensus can be
+found for this approach.
+
+
+
+<h2 id=conformance><span class=secno>1 </span>Conformance</h2>
+<p>All diagrams, examples, and notes in this specification are
+non-normative, as are all sections explicitly marked non-normative.
+Everything else in this specification is normative.</p>
+
+<p>The key words "MUST", "MUST NOT", "REQUIRED", <!--"SHALL", "SHALL
+NOT",--> "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and
+"OPTIONAL" in the normative parts of this document are to be
+interpreted as described in RFC2119. For readability, these words do
+not appear in all uppercase letters in this specification. <a href=#refsRFC2119>[RFC2119]</a></p>
+
+<p>Requirements phrased in the imperative as part of algorithms
+(such as "strip any leading space characters" or "return false and
+terminate these steps") are to be interpreted with the meaning of the
+key word ("must", "should", "may", etc) used in introducing the
+algorithm.</p>
+
+<p>Conformance requirements phrased as algorithms or specific steps
+may be implemented in any manner, so long as the end result is
+equivalent. (In particular, the algorithms defined in this
+specification are intended to be easy to follow, and not intended to
+be performant.)</p>
+
+<p id=hardwareLimitations>User agents may impose
+implementation-specific limits on otherwise unconstrained inputs,
+e.g. to prevent denial of service attacks, to guard against running
+out of memory, or to work around platform-specific limitations.</p>
+
+<p>When a method or an attribute is said to call another method or attribute, the user agent must invoke its internal API for that attribute or method so that e.g. the author can't change the behavior by overriding attributes or methods with custom properties or functions in ECMAScript.
+
+<p>Unless otherwise stated, string comparisons are done in a <a class=external data-anolis-spec=dom href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#case-sensitive>case-sensitive</a> manner.
+
+<p>If an algorithm calls into another algorithm, any exception that is thrown
+by the latter (unless it is explicitly caught), must cause the former to
+terminate, and the exception to be propagated up to <em>its</em> caller.
+
+
+<h3 id=dependencies><span class=secno>1.1 </span>Dependencies</h3>
+<p>The IDL fragments in this specification must be interpreted as
+required for conforming IDL fragments, as described in the Web IDL
+specification. <a href=#refsWEBIDL>[WEBIDL]</a>
+
+<p>Some of the terms used in this specification are defined in
+<cite>DOM4</cite> and <cite>HTML</cite>.
+<a href=#refsDOM>[DOM]</a>
+<a href=#refsHTML>[HTML]</a>
+
+
+<h3 id=extensibility><span class=secno>1.2 </span>Extensibility</h3>
+<p>Vendor-specific proprietary extensions to this specification are
+strongly discouraged. Authors must not use such extensions, as
+doing so reduces interoperability and fragments the user base,
+allowing only users of specific user agents to access the content in
+question.</p>
+
+<p>If vendor-specific extensions are needed, the members should be
+prefixed by vendor-specific strings to prevent clashes with future
+versions of this specification. Extensions must be defined so that
+the use of extensions neither contradicts nor causes the
+non-conformance of functionality defined in the specification.</p>
+<!-- thanks to QA Framework -->
+
+<p>When vendor-neutral extensions to this specification are needed,
+either this specification can be updated accordingly, or an
+extension specification can be written that overrides the
+requirements in this specification. When someone applying this
+specification to their activities decides that they will recognise
+the requirements of such an extension specification, it becomes an
+<dfn id=other-applicable-specifications title="other applicable specifications">applicable
+specification</dfn> for the purposes of conformance requirements in
+this specification.</p>
+<!-- http://www.w3.org/mid/17E341CD-E790-422C-9F9A-69347EE01CEB@iki.fi -->
+
+
+
+<h2 id=terminology><span class=secno>2 </span>Terminology</h2>
+<p>The term <dfn id=context-object>context object</dfn> means the object on which the method or
+attribute being discussed was called.
+
+
+
+<h2 id=parsing-and-serializing-nodes><span class=secno>3 </span>Parsing and serializing <a href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#node><code class=external data-anolis-spec=dom>Node</code></a>s</h2>
+<h3 id=parsing><span class=secno>3.1 </span>Parsing</h3>
+<p>The following steps form the
+<dfn id=concept-parse-fragment title=concept-parse-fragment>fragment parsing algorithm</dfn>, whose
+arguments are a <var title="">markup</var> string and a
+<var title="">context element</var>.
+
+<ol>
+  <li>
+    <p>If the <var title="">context element</var>'s
+    <a class=external data-anolis-spec=dom href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#concept-node-document title=concept-node-document>node document</a>
+    is an <a class=external data-anolis-spec=dom href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#html-document>HTML document</a>: let
+    <var title="">algorithm</var> be the
+    <a class=external data-anolis-spec=html href=http://www.whatwg.org/specs/web-apps/current-work/multipage/the-end.html#html-fragment-parsing-algorithm>HTML fragment parsing algorithm</a>.
+
+    <p>If the <var title="">context element</var>'s
+    <a class=external data-anolis-spec=dom href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#concept-node-document title=concept-node-document>node document</a>
+    is an <a class=external data-anolis-spec=dom href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#xml-document>XML document</a>: let
+    <var title="">algorithm</var> be the
+    <a class=external data-anolis-spec=html href=http://www.whatwg.org/specs/web-apps/current-work/multipage/the-xhtml-syntax.html#xml-fragment-parsing-algorithm>XML fragment parsing algorithm</a>.
+
+  <li>
+    <p>Invoke <var title="">algorithm</var> with <var title="">markup</var> as
+    the <var title="">input</var>, and <var title="">context element</var> as the
+    <a href=http://www.whatwg.org/specs/web-apps/current-work/multipage/the-end.html#concept-frag-parse-context><var class=external data-anolis-spec=html title=concept-frag-parse-context>context</var></a>
+    element.
+
+  <li>
+    <p>Let <var title="">new children</var> be the nodes returned.
+
+  <li>
+    <p>Let <var title="">fragment</var> be a new
+    <a href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#documentfragment><code class=external data-anolis-spec=dom>DocumentFragment</code></a> whose
+    <a class=external data-anolis-spec=dom href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#concept-node-document title=concept-node-document>node document</a>
+    is <var title="">context element</var>'s
+    <a class=external data-anolis-spec=dom href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#concept-node-document title=concept-node-document>node document</a>.
+
+  <li>
+    <p><a class=external data-anolis-spec=dom href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#concept-node-append title=concept-node-append>Append</a>
+    each <a class=external data-anolis-spec=dom href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#concept-node title=concept-node>node</a> in
+    <var title="">new children</var> to <var title="">fragment</var> (in order).
+
+    <p class=note>This ensures the
+    <a class=external data-anolis-spec=dom href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#concept-node-document title=concept-node-document>node document</a>
+    for the new <a class=external data-anolis-spec=dom href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#concept-node title=concept-node>nodes</a>
+    is correct.
+
+  <li>
+    <p>Return <var title="">fragment</var>.
+</ol>
+
+<h3 id=serializing><span class=secno>3.2 </span>Serializing</h3>
+<p>To <dfn id=concept-serialize title=concept-serialize>serialize</dfn> a
+<a href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#node><code class=external data-anolis-spec=dom>Node</code></a> <var title="">node</var>, the user agent
+must run the following steps:
+
+<ol>
+  <li>Let <var title="">document</var> be <var title="">node</var>'s
+  <a class=external data-anolis-spec=dom href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#concept-node-document title=concept-node-document>node document</a>.
+
+  <li>If <var title="">document</var> is an
+  <a class=external data-anolis-spec=dom href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#html-document>HTML document</a>, return an
+  <a href=#concept-serialize-html title=concept-serialize-html>HTML serialization</a> of
+  <var title="">node</var>.
+
+  <li>Otherwise, <var title="">document</var> is an
+  <a class=external data-anolis-spec=dom href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#xml-document>XML document</a>. Return an
+  <a href=#concept-serialize-xml title=concept-serialize-xml>XML serialization</a> of
+  <var title="">node</var>.
+</ol>
+
+<p>To <dfn id=concept-serialize-html title=concept-serialize-html>produce an HTML serialization</dfn> of a
+<a href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#node><code class=external data-anolis-spec=dom>Node</code></a> <var title="">node</var>, the user agent
+must run the appropriate steps, depending on <var title="">node</var>'s interface:
+<dl class=switch>
+  <dt><a href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#element><code class=external data-anolis-spec=dom>Element</code></a>
+  <dt><a href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#document><code class=external data-anolis-spec=dom>Document</code></a>
+  <dt><a href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#documentfragment><code class=external data-anolis-spec=dom>DocumentFragment</code></a>
+  <dd><p>Run the
+  <a class=external data-anolis-spec=html href=http://www.whatwg.org/specs/web-apps/current-work/multipage/the-end.html#html-fragment-serialization-algorithm>HTML fragment serialization algorithm</a> on
+  <var title="">node</var>. Return the returned string.
+
+  <dt><a href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#comment><code class=external data-anolis-spec=dom>Comment</code></a>
+  <dt><a href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#text><code class=external data-anolis-spec=dom>Text</code></a>
+  <dt><a href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#documenttype><code class=external data-anolis-spec=dom>DocumentType</code></a>
+  <dt><a href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#processinginstruction><code class=external data-anolis-spec=dom>ProcessingInstruction</code></a>
+  <dd class=XXX>You tell me.
+</dl>
+
+<p>To <dfn id=concept-serialize-xml title=concept-serialize-xml>produce an XML serialization</dfn> of a
+<a href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#node><code class=external data-anolis-spec=dom>Node</code></a> <var title="">node</var>, the user agent
+must run the appropriate steps, depending on <var title="">node</var>'s interface:
+<dl class=switch>
+  <dt><a href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#element><code class=external data-anolis-spec=dom>Element</code></a>
+  <dd>
+    <p>Return the concatenation of the following strings:
+    <ol>
+      <li>"<code title="">&lt;</code>" (U+003C LESS-THAN SIGN);
+      <li>the value of <var title="">node</var>'s
+      <a href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#dom-element-tagname><code class=external data-anolis-spec=dom title=dom-Element-tagName>tagName</code></a>
+      attribute;
+      <p class=XXX>escaping / throwing
+      <li>the <a href=#concept-serialize-xml-attributes title=concept-serialize-xml-attributes>XML serialization of
+      <var title="">node</var>'s attributes</a>;
+      <li>"<code title="">&gt;</code>" (U+003E GREATER-THAN SIGN);
+      <li>the <a href=#concept-serialize-xml title=concept-serialize-xml>serialization</a> of
+      <var title="">node</var>'s
+      <a class=external data-anolis-spec=dom href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#concept-tree-child title=concept-tree-child>children</a>, in
+      order;
+      <li>"<code title="">&lt;/</code>" (U+003C LESS-THAN SIGN, U+002F SOLIDUS);
+      <li>the value of <var title="">node</var>'s
+      <a href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#dom-element-tagname><code class=external data-anolis-spec=dom title=dom-Element-tagName>tagName</code></a>
+      attribute;
+      <li>"<code title="">&gt;</code>" (U+003E GREATER-THAN SIGN).
+    </ol>
+
+  <dt><a href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#document><code class=external data-anolis-spec=dom>Document</code></a>
+  <dd><p>Run the
+  <a class=external data-anolis-spec=html href=http://www.whatwg.org/specs/web-apps/current-work/multipage/the-xhtml-syntax.html#xml-fragment-serialization-algorithm>XML fragment serialization algorithm</a> on
+  <var title="">node</var>. Return the string this produced.
+
+  <dt><a href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#comment><code class=external data-anolis-spec=dom>Comment</code></a>
+  <dd>
+    <ol>
+      <li>Let <var title="">markup</var> the concatenation of
+      "<code title="">&lt;!--</code>", <var title="">node</var>'s
+      <a href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#dom-characterdata-data><code class=external data-anolis-spec=dom title=dom-characterdata-data>data</code></a>, and
+      "<code title="">--&gt;</code>".
+
+      <li>If <var title="">markup</var> matches the
+      <a href=http://www.w3.org/TR/xml/#NT-Comment><code class=external data-anolis-spec=xml>Comment</code></a> production, return
+      <var title="">markup</var>. Otherwise, throw an
+      <a href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#dom-domexception-invalid_state_err><code class=external data-anolis-spec=dom title=dom-DOMException-INVALID_STATE_ERR>INVALID_STATE_ERR</code></a>
+      exception.
+    </ol>
+
+  <dt><a href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#text><code class=external data-anolis-spec=dom>Text</code></a>
+  <dd>
+    <ol>
+      <li>Let <var title="">data</var> be <var title="">node</var>'s
+      <a href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#dom-characterdata-data><code class=external data-anolis-spec=dom title=dom-characterdata-data>data</code></a>.
+
+      <li>
+      <p>If <var title="">node</var> has its <a href=#serialize-as-cdata-flag>serialize as CDATA flag</a>
+      set, run the following steps:
+      <ol>
+        <li>If <var title="">data</var> doesn't match the
+        <a href=http://www.w3.org/TR/xml/#NT-CData><code class=external data-anolis-spec=xml>CData</code></a> production, throw an
+        <a href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#dom-domexception-invalid_state_err><code class=external data-anolis-spec=dom title=dom-DOMException-INVALID_STATE_ERR>INVALID_STATE_ERR</code></a>
+        exception and terminate the entire algorithm.
+
+        <li>Let <var title="">markup</var> be the concatenation of
+        "<code title="">&lt;![CDATA[</code>", <var title="">data</var>, and
+        "<code title="">]]&gt;</code>".
+      </ol>
+
+      <li>
+      <p>Otherwise, run the following steps:
+      <ol>
+        <li>Let <var title="">markup</var> be <var title="">data</var>.
+        <li>Replace any occurrences of "<code title="">&amp;</code>" in
+        <var title="">markup</var> by "<code title="">&amp;amp;</code>".
+        <li>Replace any occurrences of "<code title="">&lt;</code>" in
+        <var title="">markup</var> by "<code title="">&amp;lt;</code>".
+        <li>Replace any occurrences of "<code title="">&gt;</code>" in
+        <var title="">markup</var> by "<code title="">&amp;gt;</code>".
+      </ol>
+
+      <li>Return <var title="">markup</var>.
+    </ol>
+
+  <dt><a href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#documentfragment><code class=external data-anolis-spec=dom>DocumentFragment</code></a>
+  <dd>
+    <ol>
+      <li>Let <var title="">markup</var> the empty string.
+
+      <li>For each
+      <a class=external data-anolis-spec=dom href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#concept-tree-child title=concept-tree-child>child</a> of
+      <var title="">node</var>, in order,
+      <a href=#concept-serialize-xml title=concept-serialize-xml>produce an XML serialization</a>
+      of the child and concatenate the result to <var title="">markup</var>.
+
+      <li>Return <var title="">markup</var>.
+    </ol>
+
+  <dt><a href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#documenttype><code class=external data-anolis-spec=dom>DocumentType</code></a>
+  <dt><a href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#processinginstruction><code class=external data-anolis-spec=dom>ProcessingInstruction</code></a>
+  <dd class=XXX>You tell me.
+</dl>
+
+<p>The <dfn id=concept-serialize-xml-attributes title=concept-serialize-xml-attributes>XML serialization of the
+attributes</dfn> of an
+<a class=external data-anolis-spec=dom href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#concept-element title=concept-element>element</a>
+<var title="">element</var> is the result of the following algorithm:
+<ol>
+  <li>Let <var title="">result</var> be the empty string.
+  <li>
+    <p>For each
+    <a class=external data-anolis-spec=dom href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#concept-attribute title=concept-attribute>attribute</a>
+    <var title="">attr</var> in <var title="">element</var>
+    <a class=external data-anolis-spec=dom href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#concept-element-attribute title=concept-element-attribute>attributes</a>,
+    in order, append the following strings to <var title="">result</var>:
+    <ol>
+      <li>"<code title=""> </code>" (U+0020 SPACE);
+      <li><var title="">attr</var>'s
+      <a class=external data-anolis-spec=dom href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#concept-attribute-name title=concept-attribute-name>name</a>;
+      <p class=XXX>escaping / throwing
+      <li>"<code title="">="</code>" (U+003D EQUALS SIGN, U+0022 QUOTATION MARK);
+      <li><var title="">attr</var>'s
+      <a class=external data-anolis-spec=dom href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#concept-attribute-value title=concept-attribute-value>value</a>;
+      <p class=XXX>escaping / throwing
+      <li>"<code title="">"</code>" (U+0022 QUOTATION MARK).
+    </ol>
+  <li>Return <var title="">result</var>.
+</ol>
+
+
+
+<h2 id=the-domparser-interface><span class=secno>4 </span>The <a href=#domparser><code>DOMParser</code></a> interface</h2>
+<pre class=idl>enum <dfn id=supportedtype>SupportedType</dfn> {
+  "text/html",
+  "text/xml",
+  "application/xml",
+  "application/xhtml+xml",
+  "image/svg+xml"
+};
+
+[<a href=#dom-domparser title=dom-DOMParser>Constructor</a>]
+interface <dfn id=domparser>DOMParser</dfn> {
+  <a class=external data-anolis-spec=dom href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#document>Document</a> <!--
+  --><a href=#dom-domparser-parsefromstring title=dom-DOMParser-parseFromString>parseFromString</a>(<!--
+  -->DOMString <var title="">str</var>, <!--
+  --><a href=#supportedtype>SupportedType</a> <var title="">type</var>);
+};</pre>
+
+<p>The <dfn id=dom-domparser title=dom-DOMParser><code>DOMParser()</code></dfn> constructor
+must return a new <a href=#domparser><code>DOMParser</code></a> object.
+
+<p>The
+<dfn id=dom-domparser-parsefromstring title=dom-DOMParser-parseFromString><code>parseFromString(<var title="">str</var>, <var title="">type</var>)</code></dfn>
+method must run these steps, depending on <var title="">type</var>:
+<dl class=switch>
+  <dt>"<code title="">text/html</code>"
+  <dd>
+    <p>Parse <var title="">str</var> with an
+    <a class=external data-anolis-spec=html href=http://www.whatwg.org/specs/web-apps/current-work/multipage/parsing.html#html-parser>HTML parser</a>, and return the newly
+    created <a class=external data-anolis-spec=dom href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#concept-document title=concept-document>document</a>.
+
+    <p>The <a class=external data-anolis-spec=html href=http://www.whatwg.org/specs/web-apps/current-work/multipage/parsing.html#scripting-flag>scripting flag</a> must be set to
+    "disabled".
+
+    <p class=note><a href=http://www.whatwg.org/specs/web-apps/current-work/multipage/semantics.html#the-meta-element><code class=external data-anolis-spec=html>meta</code></a> elements are not
+    taken into account for the encoding used, as a Unicode stream is passed into
+    the parser.
+
+    <p class=note><a href=http://www.whatwg.org/specs/web-apps/current-work/multipage/scripting-1.html#the-script-element><code class=external data-anolis-spec=html>script</code></a> elements get marked
+    unexecutable and the contents of <a href=http://www.whatwg.org/specs/web-apps/current-work/multipage/scripting-1.html#the-noscript-element><code class=external data-anolis-spec=html>noscript</code></a>
+    get parsed as markup.
+
+  <dt>"<code title="">text/xml</code>"
+  <dt>"<code title="">application/xml</code>"
+  <dt>"<code title="">application/xhtml+xml</code>"
+  <dt>"<code title="">image/svg+xml</code>"
+  <dd>
+    <ol>
+      <li><p>Parse <var title="">str</var> with a namespace-enabled
+      <a class=external data-anolis-spec=html href=http://www.whatwg.org/specs/web-apps/current-work/multipage/the-xhtml-syntax.html#xml-parser>XML parser</a>.
+
+      <li><p>If the previous step didn't return an error, return the newly
+      created <a class=external data-anolis-spec=dom href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#concept-document title=concept-document>document</a>
+      and terminate these steps.
+
+      <li><p>Let <var title="">document</var> be a newly-created
+      <a href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#xmldocument><code class=external data-anolis-spec=dom>XMLDocument</code></a>.
+
+      <li>
+        <p>Let <var title="">root</var> be a new
+        <a href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#element><code class=external data-anolis-spec=dom>Element</code></a>, with its
+        <a class=external data-anolis-spec=dom href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#concept-element-local-name title=concept-element-local-name>local name</a>
+        set to "<code title="">parsererror</code>" and its
+        <a class=external data-anolis-spec=dom href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#concept-element-namespace title=concept-element-namespace>namespace</a>
+        set to
+        "<code title="">http://www.mozilla.org/newlayout/xml/parsererror.xml</code>".
+
+        <p>At this point user agents may
+        <a class=external data-anolis-spec=dom href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#concept-node-append title=concept-node-append>append</a> nodes
+        to <var title="">root</var>, for example to describe the nature of the
+        error.
+
+      <li><p><a class=external data-anolis-spec=dom href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#concept-node-append title=concept-node-append>Append</a>
+      <var title="">root</var> to <var title="">document</var>.
+
+      <li><p>Return <var title="">document</var>.
+    </ol>
+</dl>
+
+<p>In any case, the returned
+<a class=external data-anolis-spec=dom href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#concept-document title=concept-document>document</a>'s
+<a class=external data-anolis-spec=dom href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#concept-document-content-type title=concept-document-content-type>content type</a>
+must be the <var title="">type</var> argument.
+
+<div class=XXX>
+<p>It is currently unclear what the
+<a class=external data-anolis-spec=dom href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#concept-document-url title=concept-document-url>URL</a> of the returned
+<a class=external data-anolis-spec=dom href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#concept-document title=concept-document>document</a> should be.
+
+<p>Results for a <a href=http://software.hixie.ch/utilities/js/live-dom-viewer/saved/1322>test case</a>:
+<table>
+<thead>
+  <tr>
+    <th><th>Gecko<th>Opera<th>Chrome
+<tbody>
+  <tr>
+    <th>document.location <td colspan=3>null
+  <tr>
+    <th>document.URL <td>unsupported <td>unsupported <td>""
+  <tr>
+    <th>document.documentURI <td>Page URL <td>null <td>null
+</table>
+
+<p>Anne van Kesteren suggests using the default, about:blank.
+</div>
+
+<p class=note>The returned
+<a class=external data-anolis-spec=dom href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#concept-document title=concept-document>document</a>'s
+<a class=external data-anolis-spec=dom href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#concept-document-encoding title=concept-document-encoding>encoding</a> is
+the default, UTF-8.
+
+
+
+<h2 id=the-xmlserializer-interface><span class=secno>5 </span>The <a href=#xmlserializer><code>XMLSerializer</code></a> interface</h2>
+
+<pre class=idl>[<a href=#dom-xmlserializer title=dom-XMLSerializer>Constructor</a>]
+interface <dfn id=xmlserializer>XMLSerializer</dfn> {
+  DOMString <a href=#dom-xmlserializer-serializetostring title=dom-XMLSerializer-serializeToString>serializeToString</a>(<a class=external data-anolis-spec=dom href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#node>Node</a> <var title="">root</var>);
+};</pre>
+
+<p>The <dfn id=dom-xmlserializer title=dom-XMLSerializer><code>XMLSerializer()</code></dfn>
+constructor must return a new <a href=#xmlserializer><code>XMLSerializer</code></a> object.
+
+<p>The
+<dfn id=dom-xmlserializer-serializetostring title=dom-XMLSerializer-serializeToString><code>serializeToString(<var title="">root</var>)</code></dfn>
+method must
+<a href=#concept-serialize-xml title=concept-serialize-xml>produce an XML serialization</a> of
+<var title="">root</var> and return the result.
+
+
+<h2 id=extensions-to-the-element-interface><span class=secno>6 </span>Extensions to the <a href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#element><code class=external data-anolis-spec=dom>Element</code></a> interface</h2>
+
+<pre class=idl>enum insertAdjacentHTMLPosition {
+  "beforebegin",
+  "afterbegin",
+  "beforeend",
+  "afterend"
+};
+
+partial interface <a class=external data-anolis-spec=dom href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#element>Element</a> {
+  attribute DOMString <a href=#dom-element-innerhtml title=dom-Element-innerHTML>innerHTML</a>;
+  attribute DOMString <a href=#dom-element-outerhtml title=dom-Element-outerHTML>outerHTML</a>;
+  void <a href=#dom-element-insertadjacenthtml title=dom-Element-insertAdjacentHTML>insertAdjacentHTML</a>(insertAdjacentHTMLPosition <var title="">position</var>, DOMString <var title="">text</var>);
+};</pre>
+
+
+<h3 id=innerhtml><span class=secno>6.1 </span><a href=#dom-element-innerhtml><code title=dom-Element-innerHTML>innerHTML</code></a></h3>
+<p>The <dfn id=dom-element-innerhtml title=dom-Element-innerHTML><code>innerHTML</code></dfn> IDL
+attribute represents the markup of the
+<a href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#element><code class=external data-anolis-spec=dom>Element</code></a>'s contents.
+
+<dl class=domintro>
+  <!--doc.ih
+  <dt><var title>document</var> . <code title=dom-Document-innerHTML>innerHTML</code> [ = <var title>value</var> ]
+  <dd>
+    <p>Returns a fragment of HTML or XML that represents the
+    <code data-anolis-spec=dom>Document</code>.
+
+    <p>Can be set, to replace the
+    <code data-anolis-spec=dom>Document</code>'s contents with the result of
+    parsing the given string.
+
+    <p>In the case of an <span data-anolis-spec=dom>XML document</span>,
+    will throw an
+    <code data-anolis-spec=dom title=dom-DOMException-INVALID_STATE_ERR>INVALID_STATE_ERR</code>
+    if the <code data-anolis-spec=dom>Document</code> cannot be serialized
+    to XML, and a
+    <code data-anolis-spec=dom title=dom-DOMException-SYNTAX_ERR>SYNTAX_ERR</code>
+    if the given string is not well-formed.
+  -->
+
+  <dt><var title="">element</var> . <a href=#dom-element-innerhtml><code title=dom-Element-innerHTML>innerHTML</code></a> [ = <var title="">value</var> ]
+  <dd>
+    <p>Returns a fragment of HTML or XML that represents the element's
+    contents.
+
+    <p>Can be set, to replace the contents of the element with nodes
+    parsed from the given string.
+
+    <p>In the case of an <a class=external data-anolis-spec=dom href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#xml-document>XML document</a>,
+    will throw an
+    <a href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#dom-domexception-invalid_state_err><code class=external data-anolis-spec=dom title=dom-DOMException-INVALID_STATE_ERR>INVALID_STATE_ERR</code></a>
+    if the <a href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#element><code class=external data-anolis-spec=dom>Element</code></a> cannot be serialized
+    to XML, and a
+    <a href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#dom-domexception-syntax_err><code class=external data-anolis-spec=dom title=dom-DOMException-SYNTAX_ERR>SYNTAX_ERR</code></a>
+    if the given string is not well-formed.
+</dl>
+
+<div class=impl>
+
+<p>On getting, if the <a href=#context-object>context object</a>'s
+<a class=external data-anolis-spec=dom href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#concept-node-document title=concept-node-document>node document</a>
+is an <a class=external data-anolis-spec=dom href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#html-document>HTML document</a>, then the attribute
+must return the result of running the
+<a class=external data-anolis-spec=html href=http://www.whatwg.org/specs/web-apps/current-work/multipage/the-end.html#html-fragment-serialization-algorithm>HTML fragment serialization algorithm</a> on the
+<a href=#context-object>context object</a>; otherwise, the <a href=#context-object>context object</a>'s
+<a class=external data-anolis-spec=dom href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#concept-node-document title=concept-node-document>node document</a>
+is an <a class=external data-anolis-spec=dom href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#xml-document>XML document</a>, and the attribute must
+return the result of running the
+<a class=external data-anolis-spec=html href=http://www.whatwg.org/specs/web-apps/current-work/multipage/the-xhtml-syntax.html#xml-fragment-serialization-algorithm>XML fragment serialization algorithm</a> on the
+<a href=#context-object>context object</a> instead (this might throw an
+exception instead of returning a string).
+
+<p>On setting, these steps must be run:
+
+<ol>
+ <li>
+  <p>Let <var title="">fragment</var> be the result of invoking the
+  <a href=#concept-parse-fragment title=concept-parse-fragment>fragment parsing algorithm</a> with
+  the new value as <var title="">markup</var>, and the
+  <a href=#context-object>context object</a> as the <var title="">context element</var>.
+
+ <li><p><a class=external data-anolis-spec=dom href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#concept-node-replace-all title=concept-node-replace-all>Replace all</a>
+ with <var title="">fragment</var> within the <a href=#context-object>context object</a>.
+</ol>
+
+</div>
+
+
+<h3 id=outerhtml><span class=secno>6.2 </span><a href=#dom-element-outerhtml><code title=dom-Element-outerHTML>outerHTML</code></a></h3>
+
+<p>The <dfn id=dom-element-outerhtml title=dom-Element-outerHTML><code>outerHTML</code></dfn> IDL
+attribute represents the markup of the
+<a href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#element><code class=external data-anolis-spec=dom>Element</code></a> and its contents.
+
+<dl class=domintro>
+  <dt><var title="">element</var> . <a href=#dom-element-outerhtml><code title=dom-Element-outerHTML>outerHTML</code></a> [ = <var title="">value</var> ]
+  <dd>
+    <p>Returns a fragment of HTML or XML that represents the element and its
+    contents.
+
+    <p>Can be set, to replace the element with nodes parsed from the given
+    string.
+
+    <p>In the case of an <a class=external data-anolis-spec=dom href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#xml-document>XML document</a>,
+    will throw an
+    <a href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#dom-domexception-invalid_state_err><code class=external data-anolis-spec=dom title=dom-DOMException-INVALID_STATE_ERR>INVALID_STATE_ERR</code></a>
+    if the element cannot be serialized to XML, and a
+    <a href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#dom-domexception-syntax_err><code class=external data-anolis-spec=dom title=dom-DOMException-SYNTAX_ERR>SYNTAX_ERR</code></a>
+    if the given string is not well-formed.
+
+    <p>Throws a
+    <a href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#dom-domexception-no_modification_allowed_err><code class=external data-anolis-spec=dom title=dom-DOMException-NO_MODIFICATION_ALLOWED_ERR>NO_MODIFICATION_ALLOWED_ERR</code></a>
+    exception if the parent of the element is the
+    <a href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#document><code class=external data-anolis-spec=dom>Document</code></a> node.
+</dl>
+
+<div class=impl>
+
+<p>On getting, if the <a href=#context-object>context object</a>'s
+<a class=external data-anolis-spec=dom href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#concept-node-document title=concept-node-document>node document</a>
+is an <a class=external data-anolis-spec=dom href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#html-document>HTML document</a>, then the attribute
+must return the result of running the
+<a class=external data-anolis-spec=html href=http://www.whatwg.org/specs/web-apps/current-work/multipage/the-end.html#html-fragment-serialization-algorithm>HTML fragment serialization algorithm</a> on a
+fictional node whose only child is <a href=#context-object>context object</a>; otherwise, the
+<a href=#context-object>context object</a>'s
+<a class=external data-anolis-spec=dom href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#concept-node-document title=concept-node-document>node document</a>
+is an <a class=external data-anolis-spec=dom href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#xml-document>XML document</a>, and the attribute must
+return the result of running the
+<a class=external data-anolis-spec=html href=http://www.whatwg.org/specs/web-apps/current-work/multipage/the-xhtml-syntax.html#xml-fragment-serialization-algorithm>XML fragment serialization algorithm</a> on that
+fictional node instead (this might throw an exception instead of returning a
+string).
+
+<p>On setting, the following steps must be run:
+
+<ol>
+  <li>
+    <p>Let <var title="">parent</var> be the <a href=#context-object>context object</a>'s
+    <a class=external data-anolis-spec=dom href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#concept-tree-parent title=concept-tree-parent>parent</a>.
+
+  <li>
+    <p>If <var title="">parent</var> is null, terminate these steps. There would be no
+    way to obtain a reference to the nodes created even if the remaining steps
+    were run.
+
+  <li>
+    <p>If <var title="">parent</var> is a
+    <a href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#document><code class=external data-anolis-spec=dom>Document</code></a>, throw a
+    <a href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#dom-domexception-no_modification_allowed_err><code class=external data-anolis-spec=dom title=dom-DOMException-NO_MODIFICATION_ALLOWED_ERR>NO_MODIFICATION_ALLOWED_ERR</code></a>
+    exception and terminate these steps.
+
+  <li>
+    <p>If <var title="">parent</var> is a
+    <a href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#documentfragment><code class=external data-anolis-spec=dom>DocumentFragment</code></a>, let
+    <var title="">parent</var> be a new
+    <a href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#element><code class=external data-anolis-spec=dom>Element</code></a> with
+    <ul>
+      <li><code title="">body</code> as its
+      <a class=external data-anolis-spec=dom href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#concept-element-local-name title=concept-element-local-name>local name</a>,
+      <li>the <a class=external data-anolis-spec=dom href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#html-namespace>HTML namespace</a> as its
+      <a class=external data-anolis-spec=dom href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#concept-element-namespace title=concept-element-namespace>namespace</a>, and
+      <li>the <a href=#context-object>context object</a>'s
+      <a class=external data-anolis-spec=dom href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#concept-node-document title=concept-node-document>node document</a>
+      as its
+      <a class=external data-anolis-spec=dom href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#concept-node-document title=concept-node-document>node document</a>.
+    </ul>
+
+  <li>
+    <p>Let <var title="">fragment</var> be the result of invoking the
+    <a href=#concept-parse-fragment title=concept-parse-fragment>fragment parsing algorithm</a> with
+    the new value as <var title="">markup</var>, and <var title="">parent</var> as
+    the <var title="">context element</var>.
+
+  <li>
+    <p><a class=external data-anolis-spec=dom href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#concept-node-replace title=concept-node-replace>Replace</a>
+    the <a href=#context-object>context object</a> with <var title="">fragment</var> within
+    the <a href=#context-object>context object</a>'s
+    <a class=external data-anolis-spec=dom href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#concept-tree-parent title=concept-tree-parent>parent</a>.
+</ol>
+
+</div>
+
+
+<h3 id=insertadjacenthtml()><span class=secno>6.3 </span><a href=#dom-element-insertadjacenthtml><code title=dom-Element-insertAdjacentHTML>insertAdjacentHTML()</code></a></h3>
+
+<dl class=domintro>
+  <dt><var title="">element</var> . <a href=#dom-element-insertadjacenthtml><code title=dom-Element-insertAdjacentHTML>insertAdjacentHTML</code></a>(<var title="">position</var>, <var title="">text</var>)
+
+  <dd>
+    <p>Parses the given string <var title="">text</var> as HTML or XML and inserts
+    the resulting nodes into the tree in the position given by the
+    <var title="">position</var> argument, as follows:
+
+    <dl>
+      <dt>"beforebegin"
+      <dd>Before the element itself.
+
+      <dt>"afterbegin"
+      <dd>Just inside the element, before its first child.
+
+      <dt>"beforeend"
+      <dd>Just inside the element, after its last child.
+
+      <dt>"afterend"
+      <dd>After the element itself.
+    </dl>
+
+    <p>Throws a TypeError exception if the <var title="">position</var> argument
+    has an invalid value.
+
+    <p>In <a class=external data-anolis-spec=dom href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#xml-document title="XML document">XML documents</a>,
+    throws a
+    <a href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#dom-domexception-syntax_err><code class=external data-anolis-spec=dom title=dom-DOMException-SYNTAX_ERR>SYNTAX_ERR</code></a>
+    exception if the given string is not well-formed.
+
+    <p>Throws a
+    <a href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#dom-domexception-no_modification_allowed_err><code class=external data-anolis-spec=dom title=dom-DOMException-NO_MODIFICATION_ALLOWED_ERR>NO_MODIFICATION_ALLOWED_ERR</code></a>
+    exception if the given position isn't possible (e.g. inserting elements
+    after the root element of a <a href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#document><code class=external data-anolis-spec=dom>Document</code></a>).
+</dl>
+
+<div class=impl>
+
+<p>The
+<dfn id=dom-element-insertadjacenthtml title=dom-Element-insertAdjacentHTML><code>insertAdjacentHTML(<var title="">position</var>, <var title="">text</var>)</code></dfn>
+method must run these steps:
+
+<ol>
+  <li>
+    <p>Use the first matching item from this list:
+
+    <dl class=switch>
+      <dt>If <var title="">position</var> is an
+      <a class=external data-anolis-spec=dom href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#ascii-case-insensitive>ASCII case-insensitive</a> match for
+      the string "beforebegin"
+      <dt>If <var title="">position</var> is an
+      <a class=external data-anolis-spec=dom href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#ascii-case-insensitive>ASCII case-insensitive</a> match for
+      the string "afterend"
+      <dd>
+        <p>Let <var title="">context</var> be the <a href=#context-object>context object</a>'s
+        <a class=external data-anolis-spec=dom href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#concept-tree-parent title=concept-tree-parent>parent</a>.
+
+        <p>If <var title="">context</var> is null or a
+        <a class=external data-anolis-spec=dom href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#concept-document title=concept-document>document</a>, throw
+        a
+        <a href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#dom-domexception-no_modification_allowed_err><code class=external data-anolis-spec=dom title=dom-DOMException-NO_MODIFICATION_ALLOWED_ERR>NO_MODIFICATION_ALLOWED_ERR</code></a>
+        and terminate these steps.
+
+      <dt>If <var title="">position</var> is an
+      <a class=external data-anolis-spec=dom href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#ascii-case-insensitive>ASCII case-insensitive</a> match for
+      the string "afterbegin"
+      <dt>If <var title="">position</var> is an
+      <a class=external data-anolis-spec=dom href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#ascii-case-insensitive>ASCII case-insensitive</a> match for
+      the string "beforeend"
+      <dd>
+        <p>Let <var title="">context</var> be the <a href=#context-object>context object</a>.
+    </dl>
+
+  <li>
+    <p>If <var title="">context</var> is not an
+    <a href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#element><code class=external data-anolis-spec=dom>Element</code></a> or the following are all true:
+
+    <ul>
+      <li><var title="">context</var>'s
+      <a class=external data-anolis-spec=dom href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#concept-node-document title=concept-node-document>node document</a>
+      is an <a class=external data-anolis-spec=dom href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#html-document>HTML document</a>,
+
+      <li><var title="">context</var>'s
+      <a class=external data-anolis-spec=dom href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#concept-element-local-name title=concept-element-local-name>local name</a>
+      is "<code title="">html</code>", and
+
+      <li><var title="">context</var>'s
+      <a class=external data-anolis-spec=dom href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#concept-element-namespace title=concept-element-namespace>namespace</a>
+      is the <a class=external data-anolis-spec=dom href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#html-namespace>HTML namespace</a>;
+    </ul>
+
+    <p>let <var title="">context</var> be a new
+    <a href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#element><code class=external data-anolis-spec=dom>Element</code></a> with
+    <ul>
+      <li><code title="">body</code> as its
+      <a class=external data-anolis-spec=dom href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#concept-element-local-name title=concept-element-local-name>local name</a>,
+      <li>the <a class=external data-anolis-spec=dom href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#html-namespace>HTML namespace</a> as its
+      <a class=external data-anolis-spec=dom href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#concept-element-namespace title=concept-element-namespace>namespace</a>, and
+      <li>the <a href=#context-object>context object</a>'s
+      <a class=external data-anolis-spec=dom href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#concept-node-document title=concept-node-document>node document</a>
+      as its
+      <a class=external data-anolis-spec=dom href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#concept-node-document title=concept-node-document>node document</a>.
+    </ul>
+
+  <li>
+    <p>Let <var title="">fragment</var> be the result of invoking the
+    <a href=#concept-parse-fragment title=concept-parse-fragment>fragment parsing algorithm</a> with
+    <var title="">text</var> as <var title="">markup</var>, and
+    <var title="">parent</var> as the <var title="">context element</var>.
+
+  <li>
+    <p>Use the first matching item from this list:
+
+    <dl class=switch>
+      <dt>If <var title="">position</var> is an
+      <a class=external data-anolis-spec=dom href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#ascii-case-insensitive>ASCII case-insensitive</a> match for
+      the string "beforebegin"
+      <dd>
+        <p><a class=external data-anolis-spec=dom href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#concept-node-insert title=concept-node-insert>Insert</a>
+        <var title="">fragment</var> into the <a href=#context-object>context object</a>'s
+        <a class=external data-anolis-spec=dom href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#concept-tree-parent title=concept-tree-parent>parent</a>
+        before the <a href=#context-object>context object</a>.
+
+      <dt>If <var title="">position</var> is an
+      <a class=external data-anolis-spec=dom href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#ascii-case-insensitive>ASCII case-insensitive</a> match for
+      the string "afterbegin"
+      <dd>
+        <p><a class=external data-anolis-spec=dom href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#concept-node-insert title=concept-node-insert>Insert</a>
+        <var title="">fragment</var> into the <a href=#context-object>context object</a>
+        before its
+        <a class=external data-anolis-spec=dom href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#concept-tree-first-child title=concept-tree-first-child>first child</a>.
+
+      <dt>If <var title="">position</var> is an
+      <a class=external data-anolis-spec=dom href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#ascii-case-insensitive>ASCII case-insensitive</a> match for
+      the string "beforeend"
+      <dd>
+        <p><a class=external data-anolis-spec=dom href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#concept-node-append title=concept-node-append>Append</a>
+        <var title="">fragment</var> to the <a href=#context-object>context object</a>.
+
+      <dt>If <var title="">position</var> is an
+      <a class=external data-anolis-spec=dom href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#ascii-case-insensitive>ASCII case-insensitive</a> match for
+      the string "afterend"
+      <dd>
+        <p><a class=external data-anolis-spec=dom href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#concept-node-insert title=concept-node-insert>Insert</a>
+        <var title="">fragment</var> into the <a href=#context-object>context object</a>'s
+        <a class=external data-anolis-spec=dom href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#concept-tree-parent title=concept-tree-parent>parent</a>
+        before the <a href=#context-object>context object</a>'s
+        <a class=external data-anolis-spec=dom href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#concept-tree-next-sibling title=concept-tree-next-sibling>next sibling</a>.
+    </dl>
+</ol>
+
+</div>
+
+
+
+<h2 id=extensions-to-the-text-interface><span class=secno>7 </span>Extensions to the <a href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#text><code class=external data-anolis-spec=dom>Text</code></a> interface</h2>
+
+<pre class=idl>partial interface <a class=external data-anolis-spec=dom href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#text>Text</a> {
+  attribute boolean <a href=#dom-text-serializeascdata title=dom-Text-serializeAsCDATA>serializeAsCDATA</a>;
+};</pre>
+
+<dl class=domintro>
+  <dt><var title="">text</var> .
+      <a href=#dom-text-serializeascdata><code title=dom-Text-serializeAsCDATA>serializeAsCDATA</code></a> [ = <var title="">value</var> ]
+  <dd>Controls whether, in XML, this node is serialized as a CDATA section.
+</dl>
+
+<div class=impl>
+
+<p><a href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#text><code class=external data-anolis-spec=dom>Text</code></a> nodes have an additional
+associated flag, the <dfn id=serialize-as-cdata-flag>serialize as CDATA flag</dfn>.
+
+<p>The
+<dfn id=dom-text-serializeascdata title=dom-Text-serializeAsCDATA><code>serializeAsCDATA</code></dfn>
+attribute must return true if the <a href=#context-object>context object</a> has its
+<a href=#serialize-as-cdata-flag>serialize as CDATA flag</a> set, or false otherwise.
+
+<p>Setting the <a href=#dom-text-serializeascdata><code title=dom-Text-serializeAsCDATA>serializeAsCDATA</code></a>
+attribute must, if the new value is true, set the
+<a href=#context-object>context object</a>'s <a href=#serialize-as-cdata-flag>serialize as CDATA flag</a>, or unset
+it otherwise.
+
+</div>
+
+
+
+<h2 id=extensions-to-the-range-interface><span class=secno>8 </span>Extensions to the <a href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#range><code class=external data-anolis-spec=dom>Range</code></a> interface</h2>
+
+<pre class=idl>partial interface <a class=external data-anolis-spec=dom href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#range>Range</a> {
+  <a class=external data-anolis-spec=dom href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#documentfragment>DocumentFragment</a> <a href=#dom-range-createcontextualfragment title=dom-Range-createContextualFragment>createContextualFragment</a>(DOMString <var title="">fragment</var>);
+};</pre>
+
+<dl class=domintro>
+  <dt><var title="">fragment</var> = <var title="">range</var> . <a href=#dom-range-createcontextualfragment><code title=dom-Range-createContextualFragment>createContextualFragment</code></a>(<var title="">fragment</var>)
+  <dd>
+    <p>Returns a <a href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#documentfragment><code class=external data-anolis-spec=dom>DocumentFragment</code></a>, created
+    from the markup string given.
+</dl>
+
+<div class=impl>
+
+<p>The
+<dfn id=dom-range-createcontextualfragment title=dom-Range-createContextualFragment><code>createContextualFragment(<var title="">fragment</var>)</code></dfn>
+method must run these steps:
+
+<ol>
+  <li>
+    <p>If the <a href=#context-object>context object</a>'s
+    <a class=external data-anolis-spec=dom href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#concept-range-detached title=concept-range-detached>detached flag</a>
+    is set, throw an
+    <a href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#dom-domexception-invalid_state_err><code class=external data-anolis-spec=dom title=dom-DOMException-INVALID_STATE_ERR>INVALID_STATE_ERR</code></a>
+    exception and terminate these steps.
+
+  <li>
+    <p>Let <var title="">node</var> the <a href=#context-object>context object</a>'s
+    <a class=external data-anolis-spec=dom href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#concept-range-start-node title=concept-range-start-node>start node</a>.
+
+    <p>Let <var title="">element</var> be as follows, depending on
+    <var title="">node</var>'s interface:
+    <dl class=switch>
+      <dt><a href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#document><code class=external data-anolis-spec=dom>Document</code></a>
+      <dt><a href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#documentfragment><code class=external data-anolis-spec=dom>DocumentFragment</code></a>
+      <dd>null
+
+      <dt><a href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#element><code class=external data-anolis-spec=dom>Element</code></a>
+      <dd><var title="">node</var>
+
+      <dt><a href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#text><code class=external data-anolis-spec=dom>Text</code></a>
+      <dt><a href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#comment><code class=external data-anolis-spec=dom>Comment</code></a>
+      <dd><var title="">node</var>'s
+      <a class=external data-anolis-spec=dom href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#parent-element>parent element</a>
+
+      <dt><a href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#documenttype><code class=external data-anolis-spec=dom>DocumentType</code></a>
+      <dt><a href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#processinginstruction><code class=external data-anolis-spec=dom>ProcessingInstruction</code></a>
+      <dd>DOM4 prevents this case. <a href=#refsDOM>[DOM]</a>
+    </dl>
+
+  <li>
+    <p>If either <var title="">element</var> is null or the following are all true:
+
+    <ul>
+      <li><var title="">element</var>'s
+      <a class=external data-anolis-spec=dom href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#concept-node-document title=concept-node-document>node document</a>
+      is an <a class=external data-anolis-spec=dom href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#html-document>HTML document</a>,
+
+      <li><var title="">element</var>'s
+      <a class=external data-anolis-spec=dom href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#concept-element-local-name title=concept-element-local-name>local name</a>
+      is "<code title="">html</code>", and
+
+      <li><var title="">element</var>'s
+      <a class=external data-anolis-spec=dom href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#concept-element-namespace title=concept-element-namespace>namespace</a>
+      is the <a class=external data-anolis-spec=dom href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#html-namespace>HTML namespace</a>;
+    </ul>
+
+    <p>let <var title="">element</var> be a new
+    <a class=external data-anolis-spec=dom href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#concept-element title=concept-element>element</a> with
+    <ul>
+      <li>"<code title="">body</code>" as its
+      <a class=external data-anolis-spec=dom href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#concept-element-local-name title=concept-element-local-name>local name</a>,
+      <li>the <a class=external data-anolis-spec=dom href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#html-namespace>HTML namespace</a> as its
+      <a class=external data-anolis-spec=dom href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#concept-element-namespace title=concept-element-namespace>namespace</a>, and
+      <li>the <a href=#context-object>context object</a>'s
+      <a class=external data-anolis-spec=dom href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#concept-node-document title=concept-node-document>node document</a>
+      as its
+      <a class=external data-anolis-spec=dom href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#concept-node-document title=concept-node-document>node document</a>.
+    </ul>
+
+  <li>
+    <p>Let <var title="">fragment node</var> be the result of invoking the
+    <a href=#concept-parse-fragment title=concept-parse-fragment>fragment parsing algorithm</a> with
+    <var title="">fragment</var> as <var title="">markup</var>, and
+    <var title="">element</var> as the <var title="">context element</var>.
+
+  <li>
+    <p>For each script in <var title="">fragment node</var>, unset the
+    <a class=external data-anolis-spec=html href=http://www.whatwg.org/specs/web-apps/current-work/multipage/scripting-1.html#parser-inserted title=parser-inserted>"parser-inserted"</a>
+    and
+    <a class=external data-anolis-spec=html href=http://www.whatwg.org/specs/web-apps/current-work/multipage/scripting-1.html#already-started title="already started">"already started"</a>
+    flags.
+
+    <p class=note>This step is intended to be equivalent to not setting those
+    flags in the first place, and to ensure that scripts are run when
+    <var title="">fragment node</var> is inserted into a document.
+
+  <li>
+    <p>Return <var title="">fragment node</var>.
+</ol>
+
+</div>
+
+
+
+<h2 class=no-num id=references>References</h2>
+<p>All references are normative unless marked "Non-normative".</p>
+
+<div id=anolis-references><dl><dt id=refsDOM>[DOM]
+<dd><cite><a href=http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html>DOM4</a></cite>, Anne van Kesteren, Aryeh Gregor and Ms2ger. W3C.
+
+<dt id=refsHTML>[HTML]
+<dd><cite><a href=http://www.whatwg.org/C>HTML</a></cite>, Ian Hickson. WHATWG.
+
+<dt id=refsRFC2119>[RFC2119]
+<dd><cite><a href=http://tools.ietf.org/html/rfc2119>Key words for use in RFCs to Indicate Requirement Levels</a></cite>, Scott Bradner. IETF.
+
+<dt id=refsWEBIDL>[WEBIDL]
+<dd><cite><a href=http://dev.w3.org/2006/webapi/WebIDL/>Web IDL</a></cite>, Cameron McCormack. W3C.
+
+</dl></div>
+
+
+
+<h2 class=no-num id=acknowledgements>Acknowledgements</h2>
+<p>Thanks to
+Anne van Kesteren, Aryeh Gregor, Henri Sivonen, Ryosuke Niwa, Simon Pieters and timeless
+for their useful comments.
+
+<p>Special thanks to Ian Hickson for defining the
+<a href=#dom-element-innerhtml><code title=dom-Element-innerHTML>innerHTML</code></a> and
+<a href=#dom-element-outerhtml><code title=dom-Element-outerHTML>outerHTML</code></a> attributes, and the
+<a href=#dom-element-insertadjacenthtml><code title=dom-Element-insertAdjacentHTML>insertAdjacentHTML()</code></a> method in
+<cite>HTML</cite> and his useful comments.
+<a class=informative href=#refsHTML>[HTML]</a>
+
+
+<script src=http://www.whatwg.org/specs/web-apps/current-work/dfn.js></script>

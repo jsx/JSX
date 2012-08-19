@@ -1,0 +1,1207 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd"><html lang="en-US-x-Hixie"><title>Web Storage</title><style type="text/css">
+   pre { margin-left: 2em; white-space: pre-wrap; }
+   h2 { margin: 3em 0 1em 0; }
+   h3 { margin: 2.5em 0 1em 0; }
+   h4 { margin: 2.5em 0 0.75em 0; }
+   h5, h6 { margin: 2.5em 0 1em; }
+   h1 + h2, h1 + h2 + h2 { margin: 0.75em 0 0.75em; }
+   h2 + h3, h3 + h4, h4 + h5, h5 + h6 { margin-top: 0.5em; }
+   p { margin: 1em 0; }
+   hr:not(.top) { display: block; background: none; border: none; padding: 0; margin: 2em 0; height: auto; }
+   dl, dd { margin-top: 0; margin-bottom: 0; }
+   dt { margin-top: 0.75em; margin-bottom: 0.25em; clear: left; }
+   dt + dt { margin-top: 0; }
+   dd dt { margin-top: 0.25em; margin-bottom: 0; }
+   dd p { margin-top: 0; }
+   dd dl + p { margin-top: 1em; }
+   dd table + p { margin-top: 1em; }
+   p + * > li, dd li { margin: 1em 0; }
+   dt, dfn { font-weight: bold; font-style: normal; }
+   i, em { font-style: italic; }
+   dt dfn { font-style: italic; }
+   pre, code { font-size: inherit; font-family: monospace; font-variant: normal; }
+   pre strong { color: black; font: inherit; font-weight: bold; background: yellow; }
+   pre em { font-weight: bolder; font-style: normal; }
+   @media screen { code { color: orangered; } code :link, code :visited { color: inherit; } }
+   var sub { vertical-align: bottom; font-size: smaller; position: relative; top: 0.1em; }
+   table { border-collapse: collapse; border-style: hidden hidden none hidden; }
+   table thead, table tbody { border-bottom: solid; }
+   table tbody th:first-child { border-left: solid; }
+   table tbody th { text-align: left; }
+   table td, table th { border-left: solid; border-right: solid; border-bottom: solid thin; vertical-align: top; padding: 0.2em; }
+   blockquote { margin: 0 0 0 2em; border: 0; padding: 0; font-style: italic; }
+
+   .bad, .bad *:not(.XXX) { color: gray; border-color: gray; background: transparent; }
+   .matrix, .matrix td { border: none; text-align: right; }
+   .matrix { margin-left: 2em; }
+   .dice-example { border-collapse: collapse; border-style: hidden solid solid hidden; border-width: thin; margin-left: 3em; }
+   .dice-example caption { width: 30em; font-size: smaller; font-style: italic; padding: 0.75em 0; text-align: left; }
+   .dice-example td, .dice-example th { border: solid thin; width: 1.35em; height: 1.05em; text-align: center; padding: 0; }
+
+   .toc dfn, h1 dfn, h2 dfn, h3 dfn, h4 dfn, h5 dfn, h6 dfn { font: inherit; }
+   img.extra, p.overview { float: right; }
+   pre.idl { border: solid thin; background: #EEEEEE; color: black; padding: 0.5em 1em; position: relative; }
+   pre.idl :link, pre.idl :visited { color: inherit; background: transparent; }
+   pre.idl::before { content: "IDL"; font: bold small sans-serif; padding: 0.5em; background: white; position: absolute; top: 0; margin: -1px 0 0 -4em; width: 1.5em; border: thin solid; border-radius: 0 0 0 0.5em }
+   pre.css { border: solid thin; background: #FFFFEE; color: black; padding: 0.5em 1em; }
+   pre.css:first-line { color: #AAAA50; }
+   dl.domintro { color: green; margin: 2em 0 2em 2em; padding: 0.5em 1em; border: none; background: #DDFFDD; }
+   hr + dl.domintro, div.impl + dl.domintro { margin-top: 2.5em; margin-bottom: 1.5em; }
+   dl.domintro dt, dl.domintro dt * { color: black; text-decoration: none; }
+   dl.domintro dd { margin: 0.5em 0 1em 2em; padding: 0; }
+   dl.domintro dd p { margin: 0.5em 0; }
+   dl.domintro:before { display: table; margin: -1em -0.5em -0.5em auto; width: auto; content: 'This box is non-normative. Implementation requirements are given below this box.'; color: black; font-style: italic; border: solid 2px; background: white; padding: 0 0.25em; }
+   dl.switch { padding-left: 2em; }
+   dl.switch > dt { text-indent: -1.5em; }
+   dl.switch > dt:before { content: '\21AA'; padding: 0 0.5em 0 0; display: inline-block; width: 1em; text-align: right; line-height: 0.5em; }
+   dl.triple { padding: 0 0 0 1em; }
+   dl.triple dt, dl.triple dd { margin: 0; display: inline }
+   dl.triple dt:after { content: ':'; }
+   dl.triple dd:after { content: '\A'; white-space: pre; }
+   .diff-old { text-decoration: line-through; color: silver; background: transparent; }
+   .diff-chg, .diff-new { text-decoration: underline; color: green; background: transparent; }
+   a .diff-new { border-bottom: 1px blue solid; }
+
+   h2 { page-break-before: always; }
+   h1, h2, h3, h4, h5, h6 { page-break-after: avoid; }
+   h1 + h2, hr + h2.no-toc { page-break-before: auto; }
+
+   p  > span:not([title=""]):not([class="XXX"]):not([class="impl"]):not([class="note"]),
+   li > span:not([title=""]):not([class="XXX"]):not([class="impl"]):not([class="note"]), { border-bottom: solid #9999CC; }
+
+   div.head { margin: 0 0 1em; padding: 1em 0 0 0; }
+   div.head p { margin: 0; }
+   div.head h1 { margin: 0; }
+   div.head .logo { float: right; margin: 0 1em; }
+   div.head .logo img { border: none } /* remove border from top image */
+   div.head dl { margin: 1em 0; }
+   div.head p.copyright, div.head p.alt { font-size: x-small; font-style: oblique; margin: 0; }
+
+   body > .toc > li { margin-top: 1em; margin-bottom: 1em; }
+   body > .toc.brief > li { margin-top: 0.35em; margin-bottom: 0.35em; }
+   body > .toc > li > * { margin-bottom: 0.5em; }
+   body > .toc > li > * > li > * { margin-bottom: 0.25em; }
+   .toc, .toc li { list-style: none; }
+
+   .brief { margin-top: 1em; margin-bottom: 1em; line-height: 1.1; }
+   .brief li { margin: 0; padding: 0; }
+   .brief li p { margin: 0; padding: 0; }
+
+   .category-list { margin-top: -0.75em; margin-bottom: 1em; line-height: 1.5; }
+   .category-list::before { content: '\21D2\A0'; font-size: 1.2em; font-weight: 900; }
+   .category-list li { display: inline; }
+   .category-list li:not(:last-child)::after { content: ', '; }
+   .category-list li > span, .category-list li > a { text-transform: lowercase; }
+   .category-list li * { text-transform: none; } /* don't affect <code> nested in <a> */
+
+   .XXX { color: #E50000; background: white; border: solid red; padding: 0.5em; margin: 1em 0; }
+   .XXX > :first-child { margin-top: 0; }
+   p .XXX { line-height: 3em; }
+   .annotation { border: solid thin black; background: #0C479D; color: white; position: relative; margin: 8px 0 20px 0; }
+   .annotation:before { position: absolute; left: 0; top: 0; width: 100%; height: 100%; margin: 6px -6px -6px 6px; background: #333333; z-index: -1; content: ''; }
+   .annotation :link, .annotation :visited { color: inherit; }
+   .annotation :link:hover, .annotation :visited:hover { background: transparent; }
+   .annotation span { border: none ! important; }
+   .note { color: green; background: transparent; font-family: sans-serif; }
+   .warning { color: red; background: transparent; }
+   .note, .warning { font-weight: bolder; font-style: italic; }
+   .note em, .warning em, .note i, .warning i { font-style: normal; }
+   p.note, div.note { padding: 0.5em 2em; }
+   span.note { padding: 0 2em; }
+   .note p:first-child, .warning p:first-child { margin-top: 0; }
+   .note p:last-child, .warning p:last-child { margin-bottom: 0; }
+   .warning:before { font-style: normal; }
+   p.note:before { content: 'Note: '; }
+   p.warning:before { content: '\26A0 Warning! '; }
+
+   .bookkeeping:before { display: block; content: 'Bookkeeping details'; font-weight: bolder; font-style: italic; }
+   .bookkeeping { font-size: 0.8em; margin: 2em 0; }
+   .bookkeeping p { margin: 0.5em 2em; display: list-item; list-style: square; }
+   .bookkeeping dt { margin: 0.5em 2em 0; }
+   .bookkeeping dd { margin: 0 3em 0.5em; }
+
+   h4 { position: relative; z-index: 3; }
+   h4 + .element, h4 + div + .element { margin-top: -2.5em; padding-top: 2em; }
+   .element {
+     background: #EEEEFF;
+     color: black;
+     margin: 0 0 1em 0.15em;
+     padding: 0 1em 0.25em 0.75em;
+     border-left: solid #9999FF 0.25em;
+     position: relative;
+     z-index: 1;
+   }
+   .element:before {
+     position: absolute;
+     z-index: 2;
+     top: 0;
+     left: -1.15em;
+     height: 2em;
+     width: 0.9em;
+     background: #EEEEFF;
+     content: ' ';
+     border-style: none none solid solid;
+     border-color: #9999FF;
+     border-width: 0.25em;
+   }
+
+   .example { display: block; color: #222222; background: #FCFCFC; border-left: double; margin-left: 2em; padding-left: 1em; }
+   td > .example:only-child { margin: 0 0 0 0.1em; }
+
+   ul.domTree, ul.domTree ul { padding: 0 0 0 1em; margin: 0; }
+   ul.domTree li { padding: 0; margin: 0; list-style: none; position: relative; }
+   ul.domTree li li { list-style: none; }
+   ul.domTree li:first-child::before { position: absolute; top: 0; height: 0.6em; left: -0.75em; width: 0.5em; border-style: none none solid solid; content: ''; border-width: 0.1em; }
+   ul.domTree li:not(:last-child)::after { position: absolute; top: 0; bottom: -0.6em; left: -0.75em; width: 0.5em; border-style: none none solid solid; content: ''; border-width: 0.1em; }
+   ul.domTree span { font-style: italic; font-family: serif; }
+   ul.domTree .t1 code { color: purple; font-weight: bold; }
+   ul.domTree .t2 { font-style: normal; font-family: monospace; }
+   ul.domTree .t2 .name { color: black; font-weight: bold; }
+   ul.domTree .t2 .value { color: blue; font-weight: normal; }
+   ul.domTree .t3 code, .domTree .t4 code, .domTree .t5 code { color: gray; }
+   ul.domTree .t7 code, .domTree .t8 code { color: green; }
+   ul.domTree .t10 code { color: teal; }
+
+   body.dfnEnabled dfn { cursor: pointer; }
+   .dfnPanel {
+     display: inline;
+     position: absolute;
+     z-index: 10;
+     height: auto;
+     width: auto;
+     padding: 0.5em 0.75em;
+     font: small sans-serif, Droid Sans Fallback;
+     background: #DDDDDD;
+     color: black;
+     border: outset 0.2em;
+   }
+   .dfnPanel * { margin: 0; padding: 0; font: inherit; text-indent: 0; }
+   .dfnPanel :link, .dfnPanel :visited { color: black; }
+   .dfnPanel p { font-weight: bolder; }
+   .dfnPanel * + p { margin-top: 0.25em; }
+   .dfnPanel li { list-style-position: inside; }
+
+   #configUI { position: absolute; z-index: 20; top: 10em; right: 1em; width: 11em; font-size: small; }
+   #configUI p { margin: 0.5em 0; padding: 0.3em; background: #EEEEEE; color: black; border: inset thin; }
+   #configUI p label { display: block; }
+   #configUI #updateUI, #configUI .loginUI { text-align: center; }
+   #configUI input[type=button] { display: block; margin: auto; }
+
+   fieldset { margin: 1em; padding: 0.5em 1em; }
+   fieldset > legend + * { margin-top: 0; }
+   fieldset > :last-child { margin-bottom: 0; }
+   fieldset p { margin: 0.5em 0; }
+
+  </style><link href="http://www.w3.org/StyleSheets/TR/W3C-ED" rel="stylesheet" type="text/css"><meta content="noindex" name="robots"><script type="text/javascript">
+   function getCookie(name) {
+     var params = location.search.substr(1).split("&");
+     for (var index = 0; index < params.length; index++) {
+       if (params[index] == name)
+         return "1";
+       var data = params[index].split("=");
+       if (data[0] == name)
+         return unescape(data[1]);
+     }
+     var cookies = document.cookie.split("; ");
+     for (var index = 0; index < cookies.length; index++) {
+       var data = cookies[index].split("=");
+       if (data[0] == name)
+         return unescape(data[1]);
+     }
+     return null;
+   }
+  </script><body>
+  <div class="head" id="head">
+   <p><a href="http://www.w3.org/"><img alt="W3C" height="48" src="http://www.w3.org/Icons/w3c_home" width="72"></a></p>
+
+   <h1>Web Storage</h1>
+   <h2 class="no-num no-toc" id="editor-s-draft-26-july-2012">Editor's Draft 26 July 2012</h2>
+   <dl><dt>Latest Published Version:</dt>
+    <dd><a href="http://www.w3.org/TR/webstorage/">http://www.w3.org/TR/webstorage/</a></dd>
+    <dt>Latest Editor's Draft:</dt>
+    <dd><a class="latest-link" href="http://dev.w3.org/html5/webstorage/">http://dev.w3.org/html5/webstorage/</a></dd>
+
+
+    <dt>Previous Versions:</dt>
+    <dd><a href="http://www.w3.org/TR/2011/WD-webstorage-20110208/">http://www.w3.org/TR/2011/WD-webstorage-20110208/</a></dd>
+    <dd><a href="http://www.w3.org/TR/2009/WD-webstorage-20091222/">http://www.w3.org/TR/2009/WD-webstorage-20091222/</a></dd>
+    <dd><a href="http://www.w3.org/TR/2009/WD-webstorage-20091029/">http://www.w3.org/TR/2009/WD-webstorage-20091029/</a></dd>
+    <dd><a href="http://www.w3.org/TR/2009/WD-webstorage-20090423/">http://www.w3.org/TR/2009/WD-webstorage-20090423/</a></dd>
+<!-- :ZZZ -->
+    <dt>Editor:</dt>
+    <dd><a href="mailto:ian@hixie.ch">Ian Hickson</a>, Google, Inc.</dd>
+   </dl><p class="copyright"><a href="http://www.w3.org/Consortium/Legal/ipr-notice#Copyright">Copyright</a>
+   &copy; 2012 <a href="http://www.w3.org/"><abbr title="World Wide
+   Web Consortium">W3C</abbr></a><sup>&reg;</sup> (<a href="http://www.csail.mit.edu/"><abbr title="Massachusetts
+   Institute of Technology">MIT</abbr></a>, <a href="http://www.ercim.eu/"><abbr title="European Research
+   Consortium for Informatics and Mathematics">ERCIM</abbr></a>, <a href="http://www.keio.ac.jp/">Keio</a>), All Rights Reserved. W3C
+   <a href="http://www.w3.org/Consortium/Legal/ipr-notice#Legal_Disclaimer">liability</a>,
+   <a href="http://www.w3.org/Consortium/Legal/ipr-notice#W3C_Trademarks">trademark</a>
+   and <a href="http://www.w3.org/Consortium/Legal/copyright-documents">document
+   use</a> rules apply.</p>
+
+
+   <!-- UNDER NO CIRCUMSTANCES IS THE FOLLOWING PARAGRAPH TO BE REMOVED OR EDITED WITHOUT TALKING TO IAN FIRST -->
+   <p class="alt">The bulk of the text of this specification is also
+   available in the WHATWG <a href="http://www.whatwg.org/specs/web-apps/current-work/complete.html#webstorage">Web Applications 1.0</a> specification, under a license that permits
+   reuse of the specification text.</p>
+   <!-- UNDER NO CIRCUMSTANCES IS THE PRECEDING PARAGRAPH TO BE REMOVED OR EDITED WITHOUT TALKING TO IAN FIRST -->
+
+
+  </div>
+
+  <hr class="top"><h2 class="no-num no-toc" id="abstract">Abstract</h2>
+
+  <p>This specification defines an API for persistent data storage of
+  key-value pair data in Web clients.</p>
+
+
+  <h2 class="no-num no-toc" id="status-of-this-document">Status of This document</h2>
+
+  
+  
+
+  <p><em>This section describes the status of this document at the
+  time of its publication. Other documents may supersede this
+  document. A list of current W3C publications and the
+
+  most recently formally published <!-- DO NOT CHANGE THIS BACK TO THE STANDARD BOILERPLATE, AS IT IS INACCURATE -->
+
+  revision of this technical report can be found in the <a href="http://www.w3.org/TR/">W3C technical reports index</a> at
+  http://www.w3.org/TR/.</em></p>
+
+
+  
+
+  <p>If you wish to make comments regarding this document in a manner
+  that is tracked by the W3C, please submit them via using <a href="http://www.w3.org/Bugs/Public/enter_bug.cgi?product=HTML%20WG">our
+  public bug database</a>. If you do not have an account then you can
+  enter feedback using this form:</p>
+
+  <form action="http://www.whatwg.org/specs/web-apps/current-work/file-spam.cgi" method="post">
+   <fieldset><legend>Feedback Comments</legend>
+    <input name="id" type="hidden" value="top"><input name="component" type="hidden" value="Web Storage (editor: Ian Hickson)"><input name="response" type="hidden" value="html"><p><label for="feedbackBox">Please enter your feedback, carefully
+    indicating the title of the section for which you are submitting
+    feedback, quoting the text that's wrong today if appropriate. If
+    you're suggesting a new feature, it's really important to say
+    <em>what</em> the problem you're trying to solve is. That's more
+    important than the solution, in fact.</label></p>
+    <p><textarea cols="79" id="feedbackBox" name="text" rows="10"></textarea></p>
+    <p class="note">Please don't use section numbers as these tend to
+    change rapidly and make your feedback harder to understand.</p>
+    <script type="text/javascript">
+    function checkFeedbackForm(form) {
+      if (form.elements.text.value.match(/^ *</)) {
+        alert('Please don\'t start your feedback with an angle bracket, instead explain what topic your feedback is about first.');
+        return true;
+      } else if (form.elements.text.value.match(/ [^ ]+ [^ ]+ [^ ]+ [^ ]+ /)) {
+        if (form.elements.text.value.match(/^Please enter your feedback, carefully/)) {
+          alert('Please enter your feedback, explaining what is wrong, and without repeating the instructions. Thanks!');
+          return true;
+        } else if (form.elements.text.value.match(/ [^ ]+ [^ ]+ [^ ]+ [^ ]+ /)) {
+          form.action = "http://www.whatwg.org/specs/web-apps/current-work/file-bug.cgi";
+          return true;
+        } else {
+          alert('Please include significantly more detail about exactly what problem you are trying to solve.');
+          return false;
+        }
+      }
+    }
+    </script><p>
+     <input onclick="return checkFeedbackForm(form)" type="submit" value="Submit feedback"><small>(Note: Your IP address and user agent will be publicly recorded for spam prevention purposes.)</small>
+    </p>
+   </fieldset></form>
+
+  
+  <p>You can also e-mail feedback to <a href="mailto:public-webapps@w3.org">public-webapps@w3.org</a> (<a href="mailto:public-webapps-request@w3.org?subject=subscribe">subscribe</a>,
+  <a href="http://lists.w3.org/Archives/Public/public-webapps/">archives</a>),
+  or <a href="mailto:whatwg@whatwg.org">whatwg@whatwg.org</a> (<a href="http://lists.whatwg.org/listinfo.cgi/whatwg-whatwg.org">subscribe</a>,
+  <a href="http://lists.whatwg.org/pipermail/whatwg-whatwg.org/">archives</a>).
+  All feedback is welcome.</p>
+
+  
+  <p>Implementors should be aware that this specification is not
+  stable. <strong>Implementors who are not taking part in the
+  discussions are likely to find the specification changing out from
+  under them in incompatible ways.</strong> Vendors interested in
+  implementing this specification before it eventually reaches the
+  Candidate Recommendation stage should join the aforementioned
+  mailing lists and take part in the discussions.</p>
+
+  <div id="multipage-common">
+  </div>
+
+   <p>The latest
+  stable version of the editor's draft of this specification is always
+  available on <a href="http://dev.w3.org/html5/webstorage/">the W3C CVS server</a>
+  and in the <a href="http://svn.whatwg.org/webapps/">WHATWG
+  Subversion repository</a>. The <a href="http://www.whatwg.org/specs/web-apps/current-work/complete.html">latest
+  editor's working copy</a> (which may contain unfinished text in the
+  process of being prepared) contains the latest draft text of this
+  specification (amongst others). For more details, please see the <a href="http://wiki.whatwg.org/wiki/FAQ#What_are_the_various_versions_of_the_spec.3F">WHATWG
+  FAQ</a>.</p>
+
+  <p>Notifications of changes to this specification are sent along
+  with notifications of changes to related specifications using the
+  following mechanisms:</p>
+  <dl><dt>E-mail notifications of changes</dt>
+   <dd>Commit-Watchers mailing list (complete source diffs): <a href="http://lists.whatwg.org/listinfo.cgi/commit-watchers-whatwg.org">http://lists.whatwg.org/listinfo.cgi/commit-watchers-whatwg.org</a></dd>
+   <dt>Browsable version-control record of all changes:</dt>
+   <dd>CVSWeb interface with side-by-side diffs: <a href="http://dev.w3.org/cvsweb/html5/">http://dev.w3.org/cvsweb/html5/</a></dd>
+   <dd>Annotated summary with unified diffs: <a href="http://html5.org/tools/web-apps-tracker">http://html5.org/tools/web-apps-tracker</a></dd>
+   <dd>Raw Subversion interface: <code>svn checkout http://svn.whatwg.org/webapps/</code></dd>
+  </dl><p>The W3C <a href="http://www.w3.org/2008/webapps/">Web Applications
+  Working Group</a> is the W3C working group responsible for this
+  specification's progress along the W3C Recommendation track.
+  This specification is the 26 July 2012 Editor's Draft.
+  </p>
+
+  
+  
+  <p>This document was produced by a group operating under the <a href="http://www.w3.org/Consortium/Patent-Policy-20040205/">5
+  February 2004 W3C Patent Policy</a>. W3C maintains a <a href="http://www.w3.org/2004/01/pp-impl/42538/status" rel="disclosure">public list of
+  any patent disclosures</a> made in connection with the deliverables
+  of the group; that page also includes instructions for disclosing a
+  patent. An individual who has actual knowledge of a patent which the
+  individual believes contains <a href="http://www.w3.org/Consortium/Patent-Policy-20040205/#def-essential">Essential
+  Claim(s)</a> must disclose the information in accordance with <a href="http://www.w3.org/Consortium/Patent-Policy-20040205/#sec-Disclosure">section
+  6 of the W3C Patent Policy</a>.</p>
+
+
+  <h2 class="no-num no-toc" id="issues">Issues</h2>
+
+  <p>The use of the storage mutex to avoid race conditions is
+  currently considered by certain implementors to be too high a
+  performance burden, to the point where allowing data corruption is
+  considered preferable. Alternatives that do not require a
+  user-agent-wide per-origin script lock are eagerly sought after. If
+  reviewers have any suggestions, they are urged to send them to the
+  addresses given in the previous section.</p>
+
+  <p>More details regarding this issue are available in these
+  e-mails (as well as <a href="http://lists.whatwg.org/mmsearch.cgi/whatwg-whatwg.org?config=whatwg-whatwg.org&amp;restrict=&amp;exclude=&amp;method=and&amp;format=short&amp;sort=revtime&amp;words=storage+mutex">numerous others</a>):</p>
+  <ul><li><a href="http://lists.whatwg.org/htdig.cgi/whatwg-whatwg.org/2009-September/023059.html">http://lists.whatwg.org/htdig.cgi/whatwg-whatwg.org/2009-September/023059.html</a></li>
+   <li><a href="http://lists.whatwg.org/htdig.cgi/whatwg-whatwg.org/2009-December/024277.html">http://lists.whatwg.org/htdig.cgi/whatwg-whatwg.org/2009-December/024277.html</a></li>
+  </ul><h2 class="no-num no-toc" id="contents">Table of Contents</h2>
+  
+
+<ol class="toc">
+ <li><a href="#introduction"><span class="secno">1 </span>Introduction</a></li>
+ <li><a href="#conformance-requirements"><span class="secno">2 </span>Conformance requirements</a>
+  <ol>
+   <li><a href="#dependencies"><span class="secno">2.1 </span>Dependencies</a></ol></li>
+ <li><a href="#terminology"><span class="secno">3 </span>Terminology</a></li>
+ <li><a href="#storage"><span class="secno">4 </span>The API</a>
+  <ol>
+   <li><a href="#the-storage-interface"><span class="secno">4.1 </span>The <code>Storage</code> interface</a></li>
+   <li><a href="#the-sessionstorage-attribute"><span class="secno">4.2 </span>The <code title="dom-sessionStorage">sessionStorage</code> attribute</a></li>
+   <li><a href="#the-localstorage-attribute"><span class="secno">4.3 </span>The <code title="dom-localStorage">localStorage</code> attribute</a>
+    <ol>
+     <li><a href="#security-localStorage"><span class="secno">4.3.1 </span>Security</a></ol></li>
+   <li><a href="#the-storage-event"><span class="secno">4.4 </span>The <code title="event-storage">storage</code> event</a>
+    <ol>
+     <li><a href="#event-definition"><span class="secno">4.4.1 </span>Event definition</a></ol></li>
+   <li><a href="#threads"><span class="secno">4.5 </span>Threads</a></ol></li>
+ <li><a href="#disk-space"><span class="secno">5 </span>Disk space</a></li>
+ <li><a href="#privacy"><span class="secno">6 </span>Privacy</a>
+  <ol>
+   <li><a href="#user-tracking"><span class="secno">6.1 </span>User tracking</a></li>
+   <li><a href="#sensitivity-of-data"><span class="secno">6.2 </span>Sensitivity of data</a></ol></li>
+ <li><a href="#security-storage"><span class="secno">7 </span>Security</a>
+  <ol>
+   <li><a href="#dns-spoofing-attacks"><span class="secno">7.1 </span>DNS spoofing attacks</a></li>
+   <li><a href="#cross-directory-attacks"><span class="secno">7.2 </span>Cross-directory attacks</a></li>
+   <li><a href="#implementation-risks"><span class="secno">7.3 </span>Implementation risks</a></ol></li>
+ <li><a class="no-num" href="#references">References</a></li>
+ <li><a class="no-num" href="#acknowledgements">Acknowledgements</a></ol>
+
+  <hr><h2 id="introduction"><span class="secno">1 </span>Introduction</h2>
+
+  <p><i>This section is non-normative.</i></p>
+
+  <p>This specification introduces two related mechanisms, similar to
+  HTTP session cookies, for storing structured data on the client
+  side. <a href="#refsCOOKIES">[COOKIES]</a></p>
+
+  <p>The first is designed for scenarios where the user is carrying
+  out a single transaction, but could be carrying out multiple
+  transactions in different windows at the same time.</p>
+
+  <p>Cookies don't really handle this case well. For example, a user
+  could be buying plane tickets in two different windows, using the
+  same site. If the site used cookies to keep track of which ticket
+  the user was buying, then as the user clicked from page to page in
+  both windows, the ticket currently being purchased would "leak" from
+  one window to the other, potentially causing the user to buy two
+  tickets for the same flight without really noticing.</p>
+
+  <p>To address this, this specification introduces the <code title="dom-sessionStorage"><a href="#dom-sessionstorage">sessionStorage</a></code> IDL attribute.
+  Sites can add data to the session storage, and it will be accessible
+  to any page from the same site opened in that window.</p> 
+
+  <div class="example">
+
+   <p>For example, a page could have a checkbox that the user ticks to
+   indicate that he wants insurance:</p>
+
+   <pre>&lt;label&gt;
+ &lt;input type="checkbox" onchange="sessionStorage.insurance = checked ? 'true' : ''"&gt;
+ I want insurance on this trip.
+&lt;/label&gt;</pre>
+
+   <p>A later page could then check, from script, whether the user had
+   checked the checkbox or not:</p>
+
+   <pre>if (sessionStorage.insurance) { ... }</pre>
+
+   <p>If the user had multiple windows opened on the site, each one
+   would have its own individual copy of the session storage object.</p>
+
+  </div>
+
+  
+
+  <p>The second storage mechanism is designed for storage that spans
+  multiple windows, and lasts beyond the current session. In
+  particular, Web applications may wish to store megabytes of user
+  data, such as entire user-authored documents or a user's mailbox, on
+  the client side for performance reasons.</p>
+
+  <p>Again, cookies do not handle this case well, because they are
+  transmitted with every request.</p>
+
+  <p>The <code title="dom-localStorage"><a href="#dom-localstorage">localStorage</a></code> IDL
+  attribute is used to access a page's local storage area.</p>
+
+  <div class="example">
+
+   <p>The site at example.com can display a count of how many times
+   the user has loaded its page by putting the following at the bottom
+   of its page:</p>
+
+   <pre>&lt;p&gt;
+  You have viewed this page
+  &lt;span id="count"&gt;an untold number of&lt;/span&gt;
+  time(s).
+&lt;/p&gt;
+&lt;script&gt;
+  if (!localStorage.pageLoadCount)
+    localStorage.pageLoadCount = 0;
+  localStorage.pageLoadCount = parseInt(localStorage.pageLoadCount) + 1;
+  document.getElementById('count').textContent = localStorage.pageLoadCount;
+&lt;/script&gt;</pre>
+
+  </div>
+
+  <p>Each site has its own separate storage area.</p>
+
+
+
+  
+
+  <h2 id="conformance-requirements"><span class="secno">2 </span>Conformance requirements</h2>
+
+  <p>All diagrams, examples, and notes in this specification are
+  non-normative, as are all sections explicitly marked non-normative.
+  Everything else in this specification is normative.</p>
+
+  <p>The key words "MUST", "MUST NOT", "REQUIRED",  "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and
+  "OPTIONAL" in the normative parts of this document are to be
+  interpreted as described in RFC2119. For readability, these words do
+  not appear in all uppercase letters in this specification. <a href="#refsRFC2119">[RFC2119]</a></p>
+
+  <p>Requirements phrased in the imperative as part of algorithms
+  (such as "strip any leading space characters" or "return false and
+  abort these steps") are to be interpreted with the meaning of the
+  key word ("must", "should", "may", etc) used in introducing the
+  algorithm.</p>
+
+  <p>Some conformance requirements are phrased as requirements on
+  attributes, methods or objects. Such requirements are to be
+  interpreted as requirements on user agents.</p>
+
+  <p>Conformance requirements phrased as algorithms or specific steps
+  may be implemented in any manner, so long as the end result is
+  equivalent. (In particular, the algorithms defined in this
+  specification are intended to be easy to follow, and not intended to
+  be performant.)</p>
+
+  <p>The only conformance class defined by this specification is user
+  agents.</p>
+
+  <p>User agents may impose implementation-specific limits on
+  otherwise unconstrained inputs, e.g. to prevent denial of service
+  attacks, to guard against running out of memory, or to work around
+  platform-specific limitations.</p>
+
+  <p>When support for a feature is disabled (e.g. as an emergency
+  measure to mitigate a security problem, or to aid in development, or
+  for performance reasons), user agents must act as if they had no
+  support for the feature whatsoever, and as if the feature was not
+  mentioned in this specification. For example, if a particular
+  feature is accessed via an attribute in a Web IDL interface, the
+  attribute itself would be omitted from the objects that implement
+  that interface &mdash; leaving the attribute on the object but
+  making it return null or throw an exception is insufficient.</p>
+
+
+  <h3 id="dependencies"><span class="secno">2.1 </span>Dependencies</h3>
+
+  <p>This specification relies on several other underlying
+  specifications.</p>
+
+  <dl><dt>HTML</dt>
+
+   <dd>
+
+    <p>Many fundamental concepts from HTML are used by this
+    specification. <a href="#refsHTML">[HTML]</a></p>
+
+   </dd>
+
+   <dt>WebIDL</dt>
+
+   <dd>
+
+    <p>The IDL blocks in this specification use the semantics of the
+    WebIDL specification. <a href="#refsWEBIDL">[WEBIDL]</a></p>
+
+   </dd>
+
+  </dl><h2 id="terminology"><span class="secno">3 </span>Terminology</h2>
+
+  <p>The construction "a <code title="">Foo</code> object", where
+  <code title="">Foo</code> is actually an interface, is sometimes
+  used instead of the more accurate "an object implementing the
+  interface <code title="">Foo</code>".</p>
+
+  <p>The term DOM is used to refer to the API set made available to
+  scripts in Web applications, and does not necessarily imply the
+  existence of an actual <code>Document</code> object or of any other
+  <code>Node</code> objects as defined in the DOM Core
+  specifications. <a href="#refsDOMCORE">[DOMCORE]</a></p>
+
+  <p>An IDL attribute is said to be <em>getting</em> when its value is
+  being retrieved (e.g. by author script), and is said to be
+  <em>setting</em> when a new value is assigned to it.</p>
+
+  
+  <p>The term "JavaScript" is used to refer to ECMA262, rather than
+  the official term ECMAScript, since the term JavaScript is more
+  widely known. <a href="#refsECMA262">[ECMA262]</a></p>
+
+
+
+
+  <h2 id="storage"><span class="secno">4 </span>The API</h2>
+
+  <h3 id="the-storage-interface"><span class="secno">4.1 </span>The <code><a href="#storage-0">Storage</a></code> interface</h3>
+
+  <pre class="idl">interface <dfn id="storage-0">Storage</dfn> {
+  readonly attribute unsigned long <a href="#dom-storage-length" title="dom-Storage-length">length</a>;
+  DOMString? <a href="#dom-storage-key" title="dom-Storage-key">key</a>(unsigned long index);
+  getter DOMString <a href="#dom-storage-getitem" title="dom-Storage-getItem">getItem</a>(DOMString key);
+  setter creator void <a href="#dom-storage-setitem" title="dom-Storage-setItem">setItem</a>(DOMString key, DOMString value);
+  deleter void <a href="#dom-storage-removeitem" title="dom-Storage-removeItem">removeItem</a>(DOMString key);
+  void <a href="#dom-storage-clear" title="dom-Storage-clear">clear</a>();
+};</pre>
+
+  
+
+  <p>Each <code><a href="#storage-0">Storage</a></code> object provides access to a list of
+  key/value pairs, which are sometimes called items. Keys are
+  strings. Any string (including the empty string) is a valid
+  key. Values are similarly strings.</p>
+
+  <p>Each <code><a href="#storage-0">Storage</a></code> object is associated with a list of
+  key/value pairs when it is created, as defined in the sections on
+  the <code title="dom-sessionStorage"><a href="#dom-sessionstorage">sessionStorage</a></code> and <code title="dom-localStorage"><a href="#dom-localstorage">localStorage</a></code> attributes. Multiple
+  separate objects implementing the <code><a href="#storage-0">Storage</a></code> interface can
+  all be associated with the same list of key/value pairs
+  simultaneously.</p>
+
+  <p>The <dfn id="dom-storage-length" title="dom-Storage-length"><code>length</code></dfn>
+  attribute must return the number of key/value pairs currently
+  present in the list associated with the object.</p>
+
+  <p>The <dfn id="dom-storage-key" title="dom-Storage-key"><code>key(<var title="">n</var>)</code></dfn> method must return the name of the
+  <var title="">n</var>th key in the list. The order of keys is
+  user-agent defined, but must be consistent within an object so long
+  as the number of keys doesn't change. (Thus, <a href="#dom-storage-setitem" title="dom-Storage-setItem">adding</a> or <a href="#dom-storage-removeitem" title="dom-Storage-removeItem">removing</a> a key may change the
+  order of the keys, but merely changing the value of an existing key
+  must not.)  If <var title="">n</var> is  greater than or equal to the number of key/value pairs
+  in the object, then this method must return null.</p>
+
+  <p>The <span>supported property names</span> on a
+  <code><a href="#storage-0">Storage</a></code> object are the keys of each key/value pair
+  currently present in the list associated with the object.</p>
+
+  <p>The <dfn id="dom-storage-getitem" title="dom-Storage-getItem"><code>getItem(<var title="">key</var>)</code></dfn> method must return
+  the current value associated with
+  the given <var title="">key</var>. If the given <var title="">key</var> does not exist in the list associated with the
+  object then this method must return null.
+  </p>
+
+  <p>The <dfn id="dom-storage-setitem" title="dom-Storage-setItem"><code>setItem(<var title="">key</var>, <var title="">value</var>)</code></dfn> method
+  must first check if a key/value pair
+  with the given <var title="">key</var> already exists in the list
+  associated with the object.</p>
+
+  <p>If it does not, then a new key/value pair must be added to the
+  list, with the given <var title="">key</var> and with its value set
+  to <var title="">value</var>.</p>
+
+  <p>If the given <var title="">key</var> <em>does</em> exist in the
+  list, then it must have its value updated to <var title="">value</var>.</p>
+
+  <p>If it couldn't set the new value, the method must throw an
+  <code>QuotaExceededError</code> exception. (Setting could fail if,
+  e.g., the user has disabled storage for the site, or if the quota
+  has been exceeded.)</p>
+
+  <p>The <dfn id="dom-storage-removeitem" title="dom-Storage-removeItem"><code>removeItem(<var title="">key</var>)</code></dfn> method must cause the key/value
+  pair with the given <var title="">key</var> to be removed from the
+  list associated with the object, if it exists. If no item with that
+  key exists, the method must do nothing.</p>
+
+  <p>The <code title="dom-Storage-setItem"><a href="#dom-storage-setitem">setItem()</a></code> and <code title="dom-Storage-removeItem"><a href="#dom-storage-removeitem">removeItem()</a></code> methods must be
+  atomic with respect to failure. In the case of failure, the method
+  does nothing. That is, changes to the data storage area must either
+  be successful, or the data storage area must not be changed at
+  all.</p>
+
+  <p>The <dfn id="dom-storage-clear" title="dom-Storage-clear"><code>clear()</code></dfn>
+  method must atomically cause the list associated with the object to
+  be emptied of all key/value pairs, if there are any. If there are
+  none, then the method must do nothing.</p>
+
+  <p class="note">When the <code title="dom-Storage-setItem"><a href="#dom-storage-setitem">setItem()</a></code>, <code title="dom-Storage-removeItem"><a href="#dom-storage-removeitem">removeItem()</a></code>, and <code title="dom-Storage-clear"><a href="#dom-storage-clear">clear()</a></code> methods are invoked, events
+  are fired on other <code>Document</code> objects that can access the
+  newly stored or removed data, as defined in the sections on the
+  <code title="dom-sessionStorage"><a href="#dom-sessionstorage">sessionStorage</a></code> and <code title="dom-localStorage"><a href="#dom-localstorage">localStorage</a></code> attributes.</p> 
+
+  <p class="note">This specification does not require that the above
+  methods wait until the data has been physically written to
+  disk. Only consistency in what different scripts accessing the same
+  underlying list of key/value pairs see is required.</p>
+
+
+  <h3 id="the-sessionstorage-attribute"><span class="secno">4.2 </span>The <code title="dom-sessionStorage"><a href="#dom-sessionstorage">sessionStorage</a></code> attribute</h3>
+
+  <pre class="idl">[NoInterfaceObject]
+interface <dfn id="windowsessionstorage">WindowSessionStorage</dfn> {
+  readonly attribute <a href="#storage-0">Storage</a> <a href="#dom-sessionstorage" title="dom-sessionStorage">sessionStorage</a>;
+};
+<span>Window</span> implements <a href="#windowsessionstorage">WindowSessionStorage</a>;</pre>
+
+  <p>The <dfn id="dom-sessionstorage" title="dom-sessionStorage"><code>sessionStorage</code></dfn>
+  attribute represents the set of storage areas specific to the
+  current <span>top-level browsing context</span>.</p>
+
+  <p>Each <span>top-level browsing context</span> has a unique set of
+  session storage areas, one for each <span>origin</span>.</p>
+
+  <p>User agents should not expire data from a browsing context's
+  session storage areas, but may do so when the user requests that
+  such data be deleted, or when the UA detects that it has limited
+  storage space, or for security reasons. User agents should always
+  avoid deleting data while a script that could access that data is
+  running. When a top-level browsing context is destroyed (and
+  therefore permanently inaccessible to the user) the data stored in
+  its session storage areas can be discarded with it, as the API
+  described in this specification provides no way for that data to
+  ever be subsequently retrieved.</p>
+
+  <p class="note">The lifetime of a browsing context can be unrelated
+  to the lifetime of the actual user agent process itself, as the user
+  agent may support resuming sessions after a restart.</p>
+
+  <p>When a new <code>Document</code> is created in a <span>browsing
+  context</span> which has a <span>top-level browsing context</span>,
+  the user agent must check to see if that <span>top-level browsing
+  context</span> has a session storage area for that document's
+  <span>origin</span>. If it does, then that is the
+  <code>Document</code>'s assigned session storage area. If it does
+  not, a new storage area for that document's <span>origin</span> must
+  be created, and then <em>that</em> is the <code>Document</code>'s
+  assigned session storage area. A <code>Document</code>'s assigned
+  storage area does not change during the lifetime of a
+  <code>Document</code>.</p>
+
+  <p class="note">In the case of an <code>iframe</code> being moved to
+  another <code>Document</code>, the nested browsing context is
+  destroyed and a new one created.</p>
+
+  <p>The <code title="dom-sessionStorage"><a href="#dom-sessionstorage">sessionStorage</a></code>
+  attribute must return a <code><a href="#storage-0">Storage</a></code> object associated with
+  the <code>Document</code>'s assigned session storage area, if any,
+  or null if there isn't one. Each <code>Document</code> object must
+  have a separate object for its <code>Window</code>'s <code title="dom-sessionStorage"><a href="#dom-sessionstorage">sessionStorage</a></code> attribute.</p>
+
+  <p>When a new <span>top-level browsing context</span> is created by
+  cloning an existing <span>browsing context</span>, the new browsing
+  context must start with the same session storage areas as the
+  original, but the two sets must from that point on be considered
+  separate, not affecting each other in any way.</p>
+
+  <p>When a new <span>top-level browsing context</span> is created by
+  a <span title="concept-script">script</span> in an existing
+  <span>browsing context</span>, or by the user following a link in an
+  existing browsing context, or in some other way related to a
+  specific <code>Document</code>, then the session storage area of the
+  <span>origin</span> of that <code>Document</code> must be copied
+  into the new browsing context when it is created. From that point
+  on, however, the two session storage areas must be considered
+  separate, not affecting each other in any way.</p>
+
+  <p id="sessionStorageEvent">When the <code title="dom-Storage-setItem"><a href="#dom-storage-setitem">setItem()</a></code>, <code title="dom-Storage-removeItem"><a href="#dom-storage-removeitem">removeItem()</a></code>, and <code title="dom-Storage-clear"><a href="#dom-storage-clear">clear()</a></code> methods are called on a
+  <code><a href="#storage-0">Storage</a></code> object <var title="">x</var> that is associated
+  with a session storage area, if the methods did something, then in
+  every <code>Document</code> object whose <code>Window</code>
+  object's <code title="dom-sessionStorage"><a href="#dom-sessionstorage">sessionStorage</a></code>
+  attribute's <code><a href="#storage-0">Storage</a></code> object is associated with the same
+  storage area, other than <var title="">x</var>, a <code title="event-storage"><a href="#event-storage">storage</a></code> event must be fired, as <a href="#event-storage" title="event-storage">described below</a>.</p>
+
+
+  <h3 id="the-localstorage-attribute"><span class="secno">4.3 </span>The <code title="dom-localStorage"><a href="#dom-localstorage">localStorage</a></code> attribute</h3>
+
+  <pre class="idl">[NoInterfaceObject]
+interface <dfn id="windowlocalstorage">WindowLocalStorage</dfn> {
+  readonly attribute <a href="#storage-0">Storage</a> <a href="#dom-localstorage" title="dom-localStorage">localStorage</a>;
+};
+<span>Window</span> implements <a href="#windowlocalstorage">WindowLocalStorage</a>;</pre>
+
+  <p>The <dfn id="dom-localstorage" title="dom-localStorage"><code>localStorage</code></dfn>
+  object provides a <code><a href="#storage-0">Storage</a></code> object for an
+  <span>origin</span>.
+  <a class="fingerprint" href="#fingerprint"><img alt="(This is a fingerprinting vector.)" src="http://dev.w3.org/html5/spec/images/fingerprint.png"></a>
+  </p>
+
+  <p>User agents must have a set of local storage areas, one for each
+  <span>origin</span>.</p>
+
+  <p>User agents should expire data from the local storage areas only
+  for security reasons or when requested to do so by the user. User
+  agents should always avoid deleting data while a script that could
+  access that data is running.</p>
+
+  <p>When the <code title="dom-localStorage"><a href="#dom-localstorage">localStorage</a></code>
+  attribute is accessed, the user agent must run the following steps,
+  which are known as the <dfn id="storage-object-initialization-steps"><code>Storage</code> object
+  initialization steps</dfn>:</p> 
+
+  <ol><li><p>The user agent may throw a <code>SecurityError</code>
+   exception instead of returning a <code><a href="#storage-0">Storage</a></code> object if the
+   request violates a policy decision (e.g. if the user agent is
+   configured to not allow the page to persist data).</li>
+
+   <li><p>If the <code>Document</code>'s <span>origin</span> is not a
+   scheme/host/port tuple, then throw a <code>SecurityError</code>
+   exception and abort these steps.</li>
+
+   <li><p>Check to see if the user agent has allocated a local storage
+   area for the <span>origin</span> of the <code>Document</code> of
+   the <code>Window</code> object on which the attribute was accessed.
+   If it has not, create a new storage area for that
+   <span>origin</span>.</li>
+
+   <li><p>Return the <code><a href="#storage-0">Storage</a></code> object associated with that
+   origin's local storage area. Each <code>Document</code> object must
+   have a separate object for its <code>Window</code>'s <code title="dom-localStorage"><a href="#dom-localstorage">localStorage</a></code> attribute.</p>
+
+  </ol><p id="localStorageEvent">When the <code title="dom-Storage-setItem"><a href="#dom-storage-setitem">setItem()</a></code>, <code title="dom-Storage-removeItem"><a href="#dom-storage-removeitem">removeItem()</a></code>, and <code title="dom-Storage-clear"><a href="#dom-storage-clear">clear()</a></code> methods are called on a
+  <code><a href="#storage-0">Storage</a></code> object <var title="">x</var> that is associated
+  with a local storage area, if the methods did something, then in
+  every <code>Document</code> object whose <code>Window</code>
+  object's <code title="dom-localStorage"><a href="#dom-localstorage">localStorage</a></code>
+  attribute's <code><a href="#storage-0">Storage</a></code> object is associated with the same
+  storage area, other than <var title="">x</var>, a <code title="event-storage"><a href="#event-storage">storage</a></code> event must be fired, as <a href="#event-storage" title="event-storage">described below</a>.</p>
+
+  <p id="localStorageMutex">Whenever the properties of a <code title="dom-localStorage"><a href="#dom-localstorage">localStorage</a></code> attribute's
+  <code><a href="#storage-0">Storage</a></code> object are to be examined, returned, set, or
+  deleted, whether as part of a direct property access, when checking
+  for the presence of a property, during property enumeration, when
+  determining the number of properties present, or as part of the
+  execution of any of the methods or attributes defined on the
+  <code><a href="#storage-0">Storage</a></code> interface, the user agent must first
+  <span>obtain the storage mutex</span>.</p>
+
+
+
+  <h4 id="security-localStorage"><span class="secno">4.3.1 </span>Security</h4>
+
+  <p>User agents must throw a <code>SecurityError</code> exception
+  whenever any of the members of a <code><a href="#storage-0">Storage</a></code> object
+  originally returned by the <code title="dom-localStorage"><a href="#dom-localstorage">localStorage</a></code> attribute are accessed
+  by scripts whose <span>effective script origin</span> is not the
+  <span title="same origin">same</span> as the <span>origin</span> of
+  the <code>Document</code> of the <code>Window</code> object on which
+  the <code title="dom-localStorage"><a href="#dom-localstorage">localStorage</a></code> attribute was
+  accessed.</p>
+
+  <p class="note">This means <code><a href="#storage-0">Storage</a></code> objects are neutered
+  when the <code title="dom-document-domain">document.domain</code>
+  attribute is used.</p>
+
+
+
+
+  <h3 id="the-storage-event"><span class="secno">4.4 </span>The <code title="event-storage"><a href="#event-storage">storage</a></code> event</h3>
+
+  <p>The <dfn id="event-storage" title="event-storage"><code>storage</code></dfn> event
+  is fired when a storage area changes, as described in the previous
+  two sections (<a href="#sessionStorageEvent">for session
+  storage</a>, <a href="#localStorageEvent">for local
+  storage</a>).</p>
+
+  <p>When this happens, the user agent must <span>queue a task</span>
+  to fire an event with the name <code><a href="#storage-0">storage</a></code>, which does not
+  bubble and is not cancelable, and which uses the
+  <code><a href="#storageevent">StorageEvent</a></code> interface, at each <code>Window</code>
+  object whose <code>Document</code> object has a <code><a href="#storage-0">Storage</a></code>
+  object that is affected.</p>
+
+  <p class="note">This includes <code>Document</code> objects that are
+  not <span>fully active</span>, but events fired on those are ignored
+  by the <span>event loop</span> until the <code>Document</code>
+  becomes <span>fully active</span> again.</p>
+
+  <p>The <span>task source</span> for this task is the <span>DOM
+  manipulation task source</span>.</p>
+
+  <p>If the event is being fired due to an invocation of the <code title="dom-Storage-setItem"><a href="#dom-storage-setitem">setItem()</a></code> or <code title="dom-Storage-removeItem"><a href="#dom-storage-removeitem">removeItem()</a></code> methods, the
+  event must have its <code title="dom-StorageEvent-key"><a href="#dom-storageevent-key">key</a></code>
+  attribute initialized to the name of the key in question, its <code title="dom-StorageEvent-oldValue"><a href="#dom-storageevent-oldvalue">oldValue</a></code> attribute initialized to
+  the old value of the key in question, or null if the key is newly
+  added, and its <code title="dom-StorageEvent-newValue"><a href="#dom-storageevent-newvalue">newValue</a></code> attribute initialized to
+  the new value of the key in question, or null if the key was
+  removed.</p>
+
+  <p>Otherwise, if the event is being fired due to an invocation of
+  the <code title="dom-Storage-clear"><a href="#dom-storage-clear">clear()</a></code> method, the event
+  must have its <code title="dom-StorageEvent-key"><a href="#dom-storageevent-key">key</a></code>, <code title="dom-StorageEvent-oldValue"><a href="#dom-storageevent-oldvalue">oldValue</a></code>, and <code title="dom-StorageEvent-newValue"><a href="#dom-storageevent-newvalue">newValue</a></code> attributes
+  initialized to null.</p>
+
+  <p>In addition, the event must have its <code title="dom-StorageEvent-url"><a href="#dom-storageevent-url">url</a></code> attribute initialized to
+  <span title="the document's address">the address of the
+  document</span> whose <code><a href="#storage-0">Storage</a></code> object was affected; and
+  its <code title="dom-StorageEvent-storageArea"><a href="#dom-storageevent-storagearea">storageArea</a></code>
+  attribute initialized to the <code><a href="#storage-0">Storage</a></code> object from the
+  <code>Window</code> object of the target <code>Document</code> that
+  represents the same kind of <code><a href="#storage-0">Storage</a></code> area as was
+  affected (i.e. session or local).</p>
+
+
+  <h4 id="event-definition"><span class="secno">4.4.1 </span>Event definition</h4>
+
+  <pre class="idl">[Constructor(DOMString type, optional <a href="#storageeventinit">StorageEventInit</a> eventInitDict)]
+interface <dfn id="storageevent">StorageEvent</dfn> : <span>Event</span> {
+  readonly attribute DOMString? <a href="#dom-storageevent-key" title="dom-StorageEvent-key">key</a>;
+  readonly attribute DOMString? <a href="#dom-storageevent-oldvalue" title="dom-StorageEvent-oldValue">oldValue</a>;
+  readonly attribute DOMString? <a href="#dom-storageevent-newvalue" title="dom-StorageEvent-newValue">newValue</a>;
+  readonly attribute DOMString <a href="#dom-storageevent-url" title="dom-StorageEvent-url">url</a>;
+  readonly attribute <a href="#storage-0">Storage</a>? <a href="#dom-storageevent-storagearea" title="dom-StorageEvent-storageArea">storageArea</a>;
+};
+
+dictionary <dfn id="storageeventinit">StorageEventInit</dfn> : <span>EventInit</span> {
+  DOMString? key;
+  DOMString? oldValue;
+  DOMString? newValue;
+  DOMString url;
+  <a href="#storage-0">Storage</a>? storageArea;
+};</pre>
+
+  <p>The <dfn id="dom-storageevent-key" title="dom-StorageEvent-key"><code>key</code></dfn>
+  attribute must return the value it was initialized to. When the
+  object is created, this attribute must be initialized to null. It
+  represents the key being changed.</p>
+
+  <p>The <dfn id="dom-storageevent-oldvalue" title="dom-StorageEvent-oldValue"><code>oldValue</code></dfn>
+  attribute must return the value it was initialized to. When the
+  object is created, this attribute must be initialized to null. It
+  represents the old value of the key being changed.</p>
+
+  <p>The <dfn id="dom-storageevent-newvalue" title="dom-StorageEvent-newValue"><code>newValue</code></dfn>
+  attribute must return the value it was initialized to. When the
+  object is created, this attribute must be initialized to null. It
+  represents the new value of the key being changed.</p>
+
+  <p>The <dfn id="dom-storageevent-url" title="dom-StorageEvent-url"><code>url</code></dfn>
+  attribute must return the value it was initialized to. When the
+  object is created, this attribute must be initialized to the empty
+  string. It represents the address of the document whose key
+  changed.</p>
+
+  <p>The <dfn id="dom-storageevent-storagearea" title="dom-StorageEvent-storageArea"><code>storageArea</code></dfn>
+  attribute must return the value it was initialized to. When the
+  object is created, this attribute must be initialized to null. It
+  represents the <code><a href="#storage-0">Storage</a></code> object that was affected.</p>
+
+
+
+  <h3 id="threads"><span class="secno">4.5 </span>Threads</h3>
+
+  <p>Because of <a href="#localStorageMutex">the use</a> of the
+  <span>storage mutex</span>, multiple browsing contexts will be able
+  to access the local storage areas simultaneously in such a manner
+  that scripts cannot detect any concurrent script execution.</p>
+
+  <p>Thus, the <code title="dom-Storage-length"><a href="#dom-storage-length">length</a></code>
+  attribute of a <code><a href="#storage-0">Storage</a></code> object, and the value of the
+  various properties of that object, cannot change while a script is
+  executing, other than in a way that is predictable by the script
+  itself.</p>
+
+
+  <h2 id="disk-space"><span class="secno">5 </span>Disk space</h2>
+
+  <p>User agents should limit the total amount of space allowed for
+  storage areas.</p>
+
+  <p>User agents should guard against sites storing data under their
+  origin's other affiliated sites, e.g. storing up to the limit in
+  a1.example.com, a2.example.com, a3.example.com, etc, circumventing
+  the main example.com storage limit.</p>
+
+  <p>User agents may prompt the user when quotas are reached, allowing
+  the user to grant a site more space. This enables sites to store
+  many user-created documents on the user's computer, for
+  instance.</p>
+
+  <p>User agents should allow users to see how much space each domain
+  is using.</p>
+
+  
+
+  <p>A mostly arbitrary limit of five megabytes per
+  <span>origin</span> is recommended. Implementation feedback is
+  welcome and will be used to update this suggestion in the
+  future.</p>
+
+
+  <h2 id="privacy"><span class="secno">6 </span>Privacy</h2>
+
+  <h3 id="user-tracking"><span class="secno">6.1 </span>User tracking</h3>
+
+  <p>A third-party advertiser (or any entity capable of getting
+  content distributed to multiple sites) could use a unique identifier
+  stored in its local storage area to track a user across multiple
+  sessions, building a profile of the user's interests to allow for
+  highly targeted advertising. In conjunction with a site that is
+  aware of the user's real identity (for example an e-commerce site
+  that requires authenticated credentials), this could allow
+  oppressive groups to target individuals with greater accuracy than
+  in a world with purely anonymous Web usage.</p>
+
+  <p>There are a number of techniques that can be used to mitigate the
+  risk of user tracking:</p>
+
+  <dl><dt>Blocking third-party storage</dt>
+   <dd>
+
+    <p>User agents may restrict access to the <code title="dom-localStorage"><a href="#dom-localstorage">localStorage</a></code> objects to scripts
+    originating at the domain of the top-level document of the
+    <span>browsing context</span>, for instance denying access to the
+    API for pages from other domains running in
+    <code>iframe</code>s.</p>
+
+   </dd>
+
+   <dt>Expiring stored data</dt>
+   <dd>
+
+    <p>User agents may, if so configured by the user, automatically
+    delete stored data after a period of time.</p>
+
+    <p>For example, a user agent could be configured to treat
+    third-party local storage areas as session-only storage, deleting
+    the data once the user had closed all the <span title="browsing
+    context">browsing contexts</span> that could access it.</p>
+
+    <p>This can restrict the ability of a site to track a user, as the
+    site would then only be able to track the user across multiple
+    sessions when he authenticates with the site itself (e.g. by
+    making a purchase or logging in to a service).</p>
+
+    <p>However, this also reduces the usefulness of the API as a
+    long-term storage mechanism. It can also put the user's data at
+    risk, if the user does not fully understand the implications of
+    data expiration.</p>
+
+    
+
+   </dd>
+
+   <dt>Treating persistent storage as cookies</dt>
+   <dd>
+
+    <p>If users attempt to protect their privacy by clearing cookies
+    without also clearing data stored in the local storage area, sites
+    can defeat those attempts by using the two features as redundant
+    backup for each other. User agents should present the interfaces
+    for clearing these in a way that helps users to understand this
+    possibility and enables them to delete data in all persistent
+    storage features simultaneously. <a href="#refsCOOKIES">[COOKIES]</a></p>
+
+   </dd>
+
+   <dt>Site-specific white-listing of access to local storage
+   areas</dt>
+   <dd>
+
+    <p>User agents may allow sites to access session storage areas in
+    an unrestricted manner, but require the user to authorize access
+    to local storage areas.</p>
+
+   </dd>
+
+   <dt>Origin-tracking of stored data</dt>
+   <dd>
+
+    <p>User agents may record the <span title="origin">origins</span>
+    of sites that contained content from third-party origins that
+    caused data to be stored.</p>
+
+    <p>If this information is then used to present the view of data
+    currently in persistent storage, it would allow the user to make
+    informed decisions about which parts of the persistent storage to
+    prune. Combined with a blacklist ("delete this data and prevent
+    this domain from ever storing data again"), the user can restrict
+    the use of persistent storage to sites that he trusts.</p>
+
+   </dd>
+
+   <dt>Shared blacklists</dt>
+   <dd>
+
+    <p>User agents may allow users to share their persistent storage
+    domain blacklists.</p>
+
+    <p>This would allow communities to act together to protect their
+    privacy.</p>
+
+   </dd>
+
+  </dl><p>While these suggestions prevent trivial use of this API for user
+  tracking, they do not block it altogether. Within a single domain, a
+  site can continue to track the user during a session, and can then
+  pass all this information to the third party along with any
+  identifying information (names, credit card numbers, addresses)
+  obtained by the site. If a third party cooperates with multiple
+  sites to obtain such information, a profile can still be
+  created.</p>
+
+  <p>However, user tracking is to some extent possible even with no
+  cooperation from the user agent whatsoever, for instance by using
+  session identifiers in URLs, a technique already commonly used for
+  innocuous purposes but easily repurposed for user tracking (even
+  retroactively). This information can then be shared with other
+  sites, using using visitors' IP addresses and other user-specific
+  data (e.g. user-agent headers and configuration settings) to combine
+  separate sessions into coherent user profiles.</p>
+
+
+  <h3 id="sensitivity-of-data"><span class="secno">6.2 </span>Sensitivity of data</h3>
+
+  <p>User agents should treat persistently stored data as potentially
+  sensitive; it's quite possible for e-mails, calendar appointments,
+  health records, or other confidential documents to be stored in this
+  mechanism.</p>
+
+  <p>To this end, user agents should ensure that when deleting data,
+  it is promptly deleted from the underlying storage.</p>
+
+
+
+  <h2 id="security-storage"><span class="secno">7 </span>Security</h2>
+
+  <h3 id="dns-spoofing-attacks"><span class="secno">7.1 </span>DNS spoofing attacks</h3>
+
+  <p>Because of the potential for DNS spoofing attacks, one cannot
+  guarantee that a host claiming to be in a certain domain really is
+  from that domain. To mitigate this, pages can use TLS. Pages using
+  TLS can be sure that only the user, software working on behalf of
+  the user, and other pages using TLS that have certificates
+  identifying them as being from the same domain, can access their
+  storage areas.</p>
+
+
+  <h3 id="cross-directory-attacks"><span class="secno">7.2 </span>Cross-directory attacks</h3>
+
+  <p>Different authors sharing one host name, for example users
+  hosting content on <code>geocities.com</code>, all share one local
+  storage object. There is no feature to restrict the access by
+  pathname. Authors on shared hosts are therefore recommended to avoid
+  using these features, as it would be trivial for other authors to
+  read the data and overwrite it.</p>
+
+  <p class="note">Even if a path-restriction feature was made
+  available, the usual DOM scripting security model would make it
+  trivial to bypass this protection and access the data from any
+  path.</p>
+
+
+  <h3 id="implementation-risks"><span class="secno">7.3 </span>Implementation risks</h3>
+
+  <p>The two primary risks when implementing these persistent storage
+  features are letting hostile sites read information from other
+  domains, and letting hostile sites write information that is then
+  read from other domains.</p>
+
+  <p>Letting third-party sites read data that is not supposed to be
+  read from their domain causes <em>information leakage</em>, For
+  example, a user's shopping wishlist on one domain could be used by
+  another domain for targeted advertising; or a user's
+  work-in-progress confidential documents stored by a word-processing
+  site could be examined by the site of a competing company.</p>
+
+  <p>Letting third-party sites write data to the persistent storage of
+  other domains can result in <em>information spoofing</em>, which is
+  equally dangerous. For example, a hostile site could add items to a
+  user's wishlist; or a hostile site could set a user's session
+  identifier to a known ID that the hostile site can then use to track
+  the user's actions on the victim site.</p>
+
+  <p>Thus, strictly following the <span>origin</span> model described
+  in this specification is important for user security.</p>
+
+
+
+
+
+  <h2 class="no-num" id="references">References</h2>
+
+  <p>All references are normative unless marked "Non-normative".</p>
+
+  
+
+  <dl><dt id="refsCOOKIES">[COOKIES]</dt>
+   
+   <dd><cite><a href="http://tools.ietf.org/html/rfc6265">HTTP State Management Mechanism</a></cite>, A. Barth. IETF.</dd>
+
+   <dt id="refsDOMCORE">[DOMCORE]</dt>
+   <dd><cite><a href="http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html">Web DOM Core</a></cite>, A. van Kesteren. W3C.</dd>
+
+   <dt id="refsECMA262">[ECMA262]</dt>
+   <dd><cite><a href="http://www.ecma-international.org/publications/standards/Ecma-262.htm">ECMAScript Language Specification</a></cite>. ECMA.</dd>
+
+   <dt id="refsHTML">[HTML]</dt>
+   <dd><cite><a href="http://www.whatwg.org/specs/web-apps/current-work/">HTML</a></cite>,
+   I. Hickson. WHATWG.</dd>
+
+
+   <dt id="refsRFC2119">[RFC2119]</dt>
+   <dd><cite><a href="http://tools.ietf.org/html/rfc2119">Key words for use in
+   RFCs to Indicate Requirement Levels</a></cite>, S. Bradner. IETF.</dd>
+
+   <dt id="refsWEBIDL">[WEBIDL]</dt>
+   
+   <dd><cite><a href="http://dev.w3.org/2006/webapi/WebIDL/">Web
+   IDL</a></cite>, C. McCormack. W3C.</dd>
+
+  </dl><h2 class="no-num" id="acknowledgements">Acknowledgements</h2>
+
+  <p>For a full list of acknowledgements, please see the HTML
+  specification. <a href="#refsHTML">[HTML]</a></p>
+
+ 

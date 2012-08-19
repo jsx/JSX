@@ -1,0 +1,1476 @@
+<!doctype html>
+<html lang="en-US-x-Hixie"><title>HTML5 Web Messaging</title><style type="text/css">
+   pre { margin-left: 2em; white-space: pre-wrap; }
+   h2 { margin: 3em 0 1em 0; }
+   h3 { margin: 2.5em 0 1em 0; }
+   h4 { margin: 2.5em 0 0.75em 0; }
+   h5, h6 { margin: 2.5em 0 1em; }
+   h1 + h2, h1 + h2 + h2 { margin: 0.75em 0 0.75em; }
+   h2 + h3, h3 + h4, h4 + h5, h5 + h6 { margin-top: 0.5em; }
+   p { margin: 1em 0; }
+   hr:not(.top) { display: block; background: none; border: none; padding: 0; margin: 2em 0; height: auto; }
+   dl, dd { margin-top: 0; margin-bottom: 0; }
+   dt { margin-top: 0.75em; margin-bottom: 0.25em; clear: left; }
+   dt + dt { margin-top: 0; }
+   dd dt { margin-top: 0.25em; margin-bottom: 0; }
+   dd p { margin-top: 0; }
+   dd dl + p { margin-top: 1em; }
+   dd table + p { margin-top: 1em; }
+   p + * > li, dd li { margin: 1em 0; }
+   dt, dfn { font-weight: bold; font-style: normal; }
+   i, em { font-style: italic; }
+   dt dfn { font-style: italic; }
+   pre, code { font-size: inherit; font-family: monospace; font-variant: normal; }
+   pre strong { color: black; font: inherit; font-weight: bold; background: yellow; }
+   pre em { font-weight: bolder; font-style: normal; }
+   @media screen { code { color: orangered; } code :link, code :visited { color: inherit; } }
+   var sub { vertical-align: bottom; font-size: smaller; position: relative; top: 0.1em; }
+   table { border-collapse: collapse; border-style: hidden hidden none hidden; }
+   table thead, table tbody { border-bottom: solid; }
+   table tbody th:first-child { border-left: solid; }
+   table tbody th { text-align: left; }
+   table td, table th { border-left: solid; border-right: solid; border-bottom: solid thin; vertical-align: top; padding: 0.2em; }
+   blockquote { margin: 0 0 0 2em; border: 0; padding: 0; font-style: italic; }
+
+   .bad, .bad *:not(.XXX) { color: gray; border-color: gray; background: transparent; }
+   .matrix, .matrix td { border: none; text-align: right; }
+   .matrix { margin-left: 2em; }
+   .dice-example { border-collapse: collapse; border-style: hidden solid solid hidden; border-width: thin; margin-left: 3em; }
+   .dice-example caption { width: 30em; font-size: smaller; font-style: italic; padding: 0.75em 0; text-align: left; }
+   .dice-example td, .dice-example th { border: solid thin; width: 1.35em; height: 1.05em; text-align: center; padding: 0; }
+
+   .toc dfn, h1 dfn, h2 dfn, h3 dfn, h4 dfn, h5 dfn, h6 dfn { font: inherit; }
+   img.extra, p.overview { float: right; }
+   pre.idl { border: solid thin; background: #EEEEEE; color: black; padding: 0.5em 1em; position: relative; }
+   pre.idl :link, pre.idl :visited { color: inherit; background: transparent; }
+   pre.idl::before { content: "IDL"; font: bold small sans-serif; padding: 0.5em; background: white; position: absolute; top: 0; margin: -1px 0 0 -4em; width: 1.5em; border: thin solid; border-radius: 0 0 0 0.5em }
+   pre.css { border: solid thin; background: #FFFFEE; color: black; padding: 0.5em 1em; }
+   pre.css:first-line { color: #AAAA50; }
+   dl.domintro { color: green; margin: 2em 0 2em 2em; padding: 0.5em 1em; border: none; background: #DDFFDD; }
+   hr + dl.domintro, div.impl + dl.domintro { margin-top: 2.5em; margin-bottom: 1.5em; }
+   dl.domintro dt, dl.domintro dt * { color: black; text-decoration: none; }
+   dl.domintro dd { margin: 0.5em 0 1em 2em; padding: 0; }
+   dl.domintro dd p { margin: 0.5em 0; }
+   dl.domintro:before { display: table; margin: -1em -0.5em -0.5em auto; width: auto; content: 'This box is non-normative. Implementation requirements are given below this box.'; color: black; font-style: italic; border: solid 2px; background: white; padding: 0 0.25em; }
+   dl.switch { padding-left: 2em; }
+   dl.switch > dt { text-indent: -1.5em; }
+   dl.switch > dt:before { content: '\21AA'; padding: 0 0.5em 0 0; display: inline-block; width: 1em; text-align: right; line-height: 0.5em; }
+   dl.triple { padding: 0 0 0 1em; }
+   dl.triple dt, dl.triple dd { margin: 0; display: inline }
+   dl.triple dt:after { content: ':'; }
+   dl.triple dd:after { content: '\A'; white-space: pre; }
+   .diff-old { text-decoration: line-through; color: silver; background: transparent; }
+   .diff-chg, .diff-new { text-decoration: underline; color: green; background: transparent; }
+   a .diff-new { border-bottom: 1px blue solid; }
+
+   h2 { page-break-before: always; }
+   h1, h2, h3, h4, h5, h6 { page-break-after: avoid; }
+   h1 + h2, hr + h2.no-toc { page-break-before: auto; }
+
+   p  > span:not([title=""]):not([class="XXX"]):not([class="impl"]):not([class="note"]),
+   li > span:not([title=""]):not([class="XXX"]):not([class="impl"]):not([class="note"]) { border-bottom: solid #9999CC; }
+
+   div.head { margin: 0 0 1em; padding: 1em 0 0 0; }
+   div.head p { margin: 0; }
+   div.head h1 { margin: 0; }
+   div.head .logo { float: right; margin: 0 1em; }
+   div.head .logo img { border: none } /* remove border from top image */
+   div.head dl { margin: 1em 0; }
+   div.head p.copyright, div.head p.alt { font-size: x-small; font-style: oblique; margin: 0; }
+
+   body > .toc > li { margin-top: 1em; margin-bottom: 1em; }
+   body > .toc.brief > li { margin-top: 0.35em; margin-bottom: 0.35em; }
+   body > .toc > li > * { margin-bottom: 0.5em; }
+   body > .toc > li > * > li > * { margin-bottom: 0.25em; }
+   .toc, .toc li { list-style: none; }
+
+   .brief { margin-top: 1em; margin-bottom: 1em; line-height: 1.1; }
+   .brief li { margin: 0; padding: 0; }
+   .brief li p { margin: 0; padding: 0; }
+
+   .category-list { margin-top: -0.75em; margin-bottom: 1em; line-height: 1.5; }
+   .category-list::before { content: '\21D2\A0'; font-size: 1.2em; font-weight: 900; }
+   .category-list li { display: inline; }
+   .category-list li:not(:last-child)::after { content: ', '; }
+   .category-list li > span, .category-list li > a { text-transform: lowercase; }
+   .category-list li * { text-transform: none; } /* don't affect <code> nested in <a> */
+
+   .XXX { color: #E50000; background: white; border: solid red; padding: 0.5em; margin: 1em 0; }
+   .XXX > :first-child { margin-top: 0; }
+   p .XXX { line-height: 3em; }
+   .annotation { border: solid thin black; background: #0C479D; color: white; position: relative; margin: 8px 0 20px 0; }
+   .annotation:before { position: absolute; left: 0; top: 0; width: 100%; height: 100%; margin: 6px -6px -6px 6px; background: #333333; z-index: -1; content: ''; }
+   .annotation :link, .annotation :visited { color: inherit; }
+   .annotation :link:hover, .annotation :visited:hover { background: transparent; }
+   .annotation span { border: none ! important; }
+   .note { color: green; background: transparent; font-family: sans-serif; }
+   .warning { color: red; background: transparent; }
+   .note, .warning { font-weight: bolder; font-style: italic; }
+   .note em, .warning em, .note i, .warning i { font-style: normal; }
+   p.note, div.note { padding: 0.5em 2em; }
+   span.note { padding: 0 2em; }
+   .note p:first-child, .warning p:first-child { margin-top: 0; }
+   .note p:last-child, .warning p:last-child { margin-bottom: 0; }
+   .warning:before { font-style: normal; }
+   p.note:before { content: 'Note: '; }
+   p.warning:before { content: '\26A0 Warning! '; }
+
+   .bookkeeping:before { display: block; content: 'Bookkeeping details'; font-weight: bolder; font-style: italic; }
+   .bookkeeping { font-size: 0.8em; margin: 2em 0; }
+   .bookkeeping p { margin: 0.5em 2em; display: list-item; list-style: square; }
+   .bookkeeping dt { margin: 0.5em 2em 0; }
+   .bookkeeping dd { margin: 0 3em 0.5em; }
+
+   h4 { position: relative; z-index: 3; }
+   h4 + .element, h4 + div + .element { margin-top: -2.5em; padding-top: 2em; }
+   .element {
+     background: #EEEEFF;
+     color: black;
+     margin: 0 0 1em 0.15em;
+     padding: 0 1em 0.25em 0.75em;
+     border-left: solid #9999FF 0.25em;
+     position: relative;
+     z-index: 1;
+   }
+   .element:before {
+     position: absolute;
+     z-index: 2;
+     top: 0;
+     left: -1.15em;
+     height: 2em;
+     width: 0.9em;
+     background: #EEEEFF;
+     content: ' ';
+     border-style: none none solid solid;
+     border-color: #9999FF;
+     border-width: 0.25em;
+   }
+
+   .example { display: block; color: #222222; background: #FCFCFC; border-left: double; margin-left: 2em; padding-left: 1em; }
+   td > .example:only-child { margin: 0 0 0 0.1em; }
+
+   ul.domTree, ul.domTree ul { padding: 0 0 0 1em; margin: 0; }
+   ul.domTree li { padding: 0; margin: 0; list-style: none; position: relative; }
+   ul.domTree li li { list-style: none; }
+   ul.domTree li:first-child::before { position: absolute; top: 0; height: 0.6em; left: -0.75em; width: 0.5em; border-style: none none solid solid; content: ''; border-width: 0.1em; }
+   ul.domTree li:not(:last-child)::after { position: absolute; top: 0; bottom: -0.6em; left: -0.75em; width: 0.5em; border-style: none none solid solid; content: ''; border-width: 0.1em; }
+   ul.domTree span { font-style: italic; font-family: serif; }
+   ul.domTree .t1 code { color: purple; font-weight: bold; }
+   ul.domTree .t2 { font-style: normal; font-family: monospace; }
+   ul.domTree .t2 .name { color: black; font-weight: bold; }
+   ul.domTree .t2 .value { color: blue; font-weight: normal; }
+   ul.domTree .t3 code, .domTree .t4 code, .domTree .t5 code { color: gray; }
+   ul.domTree .t7 code, .domTree .t8 code { color: green; }
+   ul.domTree .t10 code { color: teal; }
+
+   body.dfnEnabled dfn { cursor: pointer; }
+   .dfnPanel {
+     display: inline;
+     position: absolute;
+     z-index: 10;
+     height: auto;
+     width: auto;
+     padding: 0.5em 0.75em;
+     font: small sans-serif, Droid Sans Fallback;
+     background: #DDDDDD;
+     color: black;
+     border: outset 0.2em;
+   }
+   .dfnPanel * { margin: 0; padding: 0; font: inherit; text-indent: 0; }
+   .dfnPanel :link, .dfnPanel :visited { color: black; }
+   .dfnPanel p { font-weight: bolder; }
+   .dfnPanel * + p { margin-top: 0.25em; }
+   .dfnPanel li { list-style-position: inside; }
+
+   #configUI { position: absolute; z-index: 20; top: 10em; right: 1em; width: 11em; font-size: small; }
+   #configUI p { margin: 0.5em 0; padding: 0.3em; background: #EEEEEE; color: black; border: inset thin; }
+   #configUI p label { display: block; }
+   #configUI #updateUI, #configUI .loginUI { text-align: center; }
+   #configUI input[type=button] { display: block; margin: auto; }
+
+   fieldset { margin: 1em; padding: 0.5em 1em; }
+   fieldset > legend + * { margin-top: 0; }
+   fieldset > :last-child { margin-bottom: 0; }
+   fieldset p { margin: 0.5em 0; }
+
+  </style><link href="http://www.w3.org/StyleSheets/TR/W3C-CR" rel="stylesheet" type="text/css"><script type="text/javascript">
+   function getCookie(name) {
+     var params = location.search.substr(1).split("&");
+     for (var index = 0; index < params.length; index++) {
+       if (params[index] == name)
+         return "1";
+       var data = params[index].split("=");
+       if (data[0] == name)
+         return unescape(data[1]);
+     }
+     var cookies = document.cookie.split("; ");
+     for (var index = 0; index < cookies.length; index++) {
+       var data = cookies[index].split("=");
+       if (data[0] == name)
+         return unescape(data[1]);
+     }
+     return null;
+   }
+  </script><body>
+  <div class="head" id="head">
+   <p><a href="http://www.w3.org/"><img alt="W3C" height="48" src="http://www.w3.org/Icons/w3c_home" width="72"></a></p>
+
+   <h1>HTML5 Web Messaging</h1>
+   
+   <h2 class="no-num no-toc" id="cr-01-may-2012">W3C Candidate Recommendation 01 May 2012</h2>
+   <dl>
+    <dt>This Version:</dt>
+    <dd><a href="http://www.w3.org/TR/2012/CR-webmessaging-20120501/">http://www.w3.org/TR/2012/CR-webmessaging-20120501/</a></dd>
+    <dt>Latest Published Version:</dt>
+    <dd><a href="http://www.w3.org/TR/webmessaging/">http://www.w3.org/TR/webmessaging/</a></dd>
+    <dt>Latest Editor's Draft:</dt>
+    <dd><a class="latest-link" href="http://dev.w3.org/html5/postmsg/">http://dev.w3.org/html5/postmsg/</a></dd>
+
+    <dt>Previous Versions:</dt>
+    <dd><a href="http://www.w3.org/TR/2012/WD-webmessaging-20120313/">http://www.w3.org/TR/2012/WD-webmessaging-20120313/</a></dd>
+    <dd><a href="http://www.w3.org/TR/2011/WD-webmessaging-20111020/">http://www.w3.org/TR/2011/WD-webmessaging-20111020/</a></dd>
+    <dd><a href="http://www.w3.org/TR/2011/WD-webmessaging-20110317/">http://www.w3.org/TR/2011/WD-webmessaging-20110317/</a></dd>
+    <dd><a href="http://www.w3.org/TR/2010/WD-webmessaging-20101118/">http://www.w3.org/TR/2010/WD-webmessaging-20101118/</a></dd>
+<!-- :ZZZ -->
+    <dt>Editor:</dt>
+    <dd><a href="mailto:ian@hixie.ch">Ian Hickson</a>, Google, Inc.</dd>
+   </dl><p class="copyright"><a href="http://www.w3.org/Consortium/Legal/ipr-notice#Copyright">Copyright</a>
+   &copy; 2012 <a href="http://www.w3.org/"><abbr title="World Wide
+   Web Consortium">W3C</abbr></a><sup>&reg;</sup> (<a href="http://www.csail.mit.edu/"><abbr title="Massachusetts
+   Institute of Technology">MIT</abbr></a>, <a href="http://www.ercim.eu/"><abbr title="European Research
+   Consortium for Informatics and Mathematics">ERCIM</abbr></a>, <a href="http://www.keio.ac.jp/">Keio</a>), All Rights Reserved. W3C
+   <a href="http://www.w3.org/Consortium/Legal/ipr-notice#Legal_Disclaimer">liability</a>,
+   <a href="http://www.w3.org/Consortium/Legal/ipr-notice#W3C_Trademarks">trademark</a>
+   and <a href="http://www.w3.org/Consortium/Legal/copyright-documents">document
+   use</a> rules apply.</p>
+
+
+   <!-- UNDER NO CIRCUMSTANCES IS THE FOLLOWING PARAGRAPH TO BE REMOVED OR EDITED WITHOUT TALKING TO IAN FIRST -->
+   <p class="alt">The bulk of the text of this specification is also
+   available in the WHATWG <a href="http://www.whatwg.org/specs/web-apps/current-work/complete.html#comms">Web Applications 1.0</a> specification, under a license that permits
+   reuse of the specification text.</p>
+   <!-- UNDER NO CIRCUMSTANCES IS THE PRECEDING PARAGRAPH TO BE REMOVED OR EDITED WITHOUT TALKING TO IAN FIRST -->
+
+
+  </div>
+
+  <hr class="top"><h2 class="no-num no-toc" id="abstract">Abstract</h2>
+
+  <p>This specification defines two mechanisms for communicating
+  between browsing contexts in HTML documents.</p>
+
+  <h2 class="no-num no-toc" id="status-of-this-document">Status of This document</h2><p><em>This section describes the status of this document at the
+  time of its publication. Other documents may supersede this
+  document. A list of current W3C publications and the
+
+  latest <!-- DO NOT CHANGE THIS BACK TO THE STANDARD BOILERPLATE, AS IT IS INACCURATE -->
+
+  revision of this technical report can be found in the <a href="http://www.w3.org/TR/">W3C technical reports index</a> at
+  http://www.w3.org/TR/.</em></p><p>If you wish to make comments regarding this document in a manner
+  that is tracked by the W3C, please submit them via using <a href="http://www.w3.org/Bugs/Public/enter_bug.cgi?product=HTML%20WG">our
+  public bug database</a>. If you do not have an account then you can
+  enter feedback using this form:<form action="http://www.whatwg.org/specs/web-apps/current-work/file-spam.cgi" method="post">
+   <fieldset><legend>Feedback Comments</legend>
+    <input name="id" type="hidden" value="top"><input name="component" type="hidden" value="Web Storage (editor: Ian Hickson)"><input name="response" type="hidden" value="html"><p><label for="feedbackBox">Please enter your feedback, carefully
+    indicating the title of the section for which you are submitting
+    feedback, quoting the text that's wrong today if appropriate. If
+    you're suggesting a new feature, it's really important to say
+    <em>what</em> the problem you're trying to solve is. That's more
+    important than the solution, in fact.</label></p>
+    <p><textarea cols="79" id="feedbackBox" name="text" rows="10"></textarea></p>
+    <p class="note">Please don't use section numbers as these tend to
+    change rapidly and make your feedback harder to understand.</p>
+    <script type="text/javascript">
+    function checkFeedbackForm(form) {
+      if (form.elements.text.value.match(/^ *</)) {
+        alert('Please don\'t start your feedback with an angle bracket, instead explain what topic your feedback is about first.');
+        return true;
+      } else if (form.elements.text.value.match(/ [^ ]+ [^ ]+ [^ ]+ [^ ]+ /)) {
+        if (form.elements.text.value.match(/^Please enter your feedback, carefully/)) {
+          alert('Please enter your feedback, explaining what is wrong, and without repeating the instructions. Thanks!');
+          return true;
+        } else if (form.elements.text.value.match(/ [^ ]+ [^ ]+ [^ ]+ [^ ]+ /)) {
+          form.action = "http://www.whatwg.org/specs/web-apps/current-work/file-bug.cgi";
+          return true;
+        } else {
+          alert('Please include significantly more detail about exactly what problem you are trying to solve.');
+          return false;
+        }
+      }
+    }
+    </script><p>
+     <input onclick="return checkFeedbackForm(form)" type="submit" value="Submit feedback"><small>(Note: Your IP address and user agent will be publicly recorded for spam prevention purposes.)</small>
+    </p>
+   </fieldset></form><p>You can also e-mail feedback to <a href="mailto:public-webapps@w3.org">public-webapps@w3.org</a> (<a href="mailto:public-webapps-request@w3.org?subject=subscribe">subscribe</a>,
+  <a href="http://lists.w3.org/Archives/Public/public-webapps/">archives</a>),
+  or <a href="mailto:whatwg@whatwg.org">whatwg@whatwg.org</a> (<a href="http://lists.whatwg.org/listinfo.cgi/whatwg-whatwg.org">subscribe</a>,
+  <a href="http://lists.whatwg.org/pipermail/whatwg-whatwg.org/">archives</a>).
+  All feedback is welcome.</p>
+
+  <p>Notifications of changes to this specification are sent along
+  with notifications of changes to related specifications using the
+  following mechanisms:<dl><dt>E-mail notifications of changes</dt>
+   <dd>Commit-Watchers mailing list (complete source diffs): <a href="http://lists.whatwg.org/listinfo.cgi/commit-watchers-whatwg.org">http://lists.whatwg.org/listinfo.cgi/commit-watchers-whatwg.org</a></dd>
+   <dt>Browsable version-control record of all changes:</dt>
+   <dd>CVSWeb interface with side-by-side diffs: <a href="http://dev.w3.org/cvsweb/html5/">http://dev.w3.org/cvsweb/html5/</a></dd>
+   <dd>Annotated summary with unified diffs: <a href="http://html5.org/tools/web-apps-tracker">http://html5.org/tools/web-apps-tracker</a></dd>
+   <dd>Raw Subversion interface: <code>svn checkout http://svn.whatwg.org/webapps/</code></dd>
+  </dl><p>The W3C <a href="http://www.w3.org/2008/webapps/">Web Applications
+  Working Group</a> is the W3C working group responsible for this
+  specification's progress along the W3C Recommendation track.
+  This specification is the 01 May 2012 Candidate Recommendation. 
+  Comments for the 13 March 2012 Last Call Working Draft are tracked in the
+  <a href="http://www.w3.org/2008/webapps/wiki/WebMessaging-Comments-LC-13Mar2012">comment tracking document</a>.</p>
+  <p>This document was produced by a group operating under the <a href="http://www.w3.org/Consortium/Patent-Policy-20040205/">5
+  February 2004 W3C Patent Policy</a>. W3C maintains a <a href="http://www.w3.org/2004/01/pp-impl/42538/status" rel="disclosure">public list of
+  any patent disclosures</a> made in connection with the deliverables
+  of the group; that page also includes instructions for disclosing a
+  patent. An individual who has actual knowledge of a patent which the
+  individual believes contains <a href="http://www.w3.org/Consortium/Patent-Policy-20040205/#def-essential">Essential
+  Claim(s)</a> must disclose the information in accordance with <a href="http://www.w3.org/Consortium/Patent-Policy-20040205/#sec-Disclosure">section
+  6 of the W3C Patent Policy</a>.
+
+<h3 class="no-num no-toc" id="crec">Candidate Recommendation Exit Criteria</h3>
+
+<p>To exit the Candidate Recommendation (CR) stage, the following criteria
+must have been met:
+
+<ol>
+ <li>There will be at least two interoperable implementations passing all
+ approved test cases in the
+ <a href="http://w3c-test.org/webapps/WebMessaging/tests/">test suite</a>
+ for this specification. An implementation is to be available (i.e. for
+ download), shipping (i.e. not private), and not experimental (i.e. intended
+ for a wide audience). The working group will decide when the test suite is
+ of sufficient quality to test interoperability and will produce an
+ implementation report (hosted together with the test suite).
+
+ <li>A minimum of three months of the CR stage will have elapsed (i.e. not
+ until after 01 August 2012). This is to ensure that enough time is given
+ for any remaining major errors to be caught. The CR period will be extended
+ if implementations are slow to appear.
+</ol>
+
+<p>Publication as a Candidate Recommendation does not imply endorsement by
+the W3C Membership. This is a draft document and may be updated, replaced
+or obsoleted by other documents at any time. It is inappropriate to cite
+this document as other than work in progress.</p>
+
+  <h2 class="no-num no-toc" id="contents">Table of Contents</h2>
+  
+
+<ol class="toc">
+ <li><a href="#conformance-requirements"><span class="secno">1 </span>Conformance requirements</a>
+  <ol>
+   <li><a href="#dependencies"><span class="secno">1.1 </span>Dependencies</a></ol></li>
+ <li><a href="#terminology"><span class="secno">2 </span>Terminology</a></li>
+ <li><a href="#event-definitions"><span class="secno">3 </span>Event definitions</a></li>
+ <li><a href="#web-messaging"><span class="secno">4 </span>Cross-document messaging</a>
+  <ol>
+   <li><a href="#introduction"><span class="secno">4.1 </span>Introduction</a></li>
+   <li><a href="#security-postmsg"><span class="secno">4.2 </span>Security</a>
+    <ol>
+     <li><a href="#authors"><span class="secno">4.2.1 </span>Authors</a></li>
+     <li><a href="#user-agents"><span class="secno">4.2.2 </span>User agents</a></ol></li>
+   <li><a href="#posting-messages"><span class="secno">4.3 </span>Posting messages</a></ol></li>
+ <li><a href="#channel-messaging"><span class="secno">5 </span>Channel messaging</a>
+  <ol>
+   <li><a href="#introduction-0"><span class="secno">5.1 </span>Introduction</a>
+    <ol>
+     <li><a href="#ports-as-the-basis-of-an-object-capability-model-on-the-web"><span class="secno">5.1.1 </span>Ports as the basis of an object-capability model on the Web</a></li>
+     <li><a href="#ports-as-the-basis-of-abstracting-out-service-implementations"><span class="secno">5.1.2 </span>Ports as the basis of abstracting out service implementations</a></ol></li>
+   <li><a href="#message-channels"><span class="secno">5.2 </span>Message channels</a></li>
+   <li><a href="#message-ports"><span class="secno">5.3 </span>Message ports</a>
+    <ol>
+     <li><a href="#ports-and-garbage-collection"><span class="secno">5.3.1 </span>Ports and garbage collection</a></ol></ol></li>
+ <li><a class="no-num" href="#references">References</a></li>
+ <li><a class="no-num" href="#acknowledgements">Acknowledgements</a></ol>
+
+  <hr><h2 id="conformance-requirements"><span class="secno">1 </span>Conformance requirements</h2>
+
+  <p>All diagrams, examples, and notes in this specification are
+  non-normative, as are all sections explicitly marked non-normative.
+  Everything else in this specification is normative.</p>
+
+  <p>The key words "MUST", "MUST NOT", "REQUIRED",  "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and
+  "OPTIONAL" in the normative parts of this document are to be
+  interpreted as described in RFC2119. For readability, these words do
+  not appear in all uppercase letters in this specification. <a href="#refsRFC2119">[RFC2119]</a></p>
+
+  <p>Requirements phrased in the imperative as part of algorithms
+  (such as "strip any leading space characters" or "return false and
+  abort these steps") are to be interpreted with the meaning of the
+  key word ("must", "should", "may", etc) used in introducing the
+  algorithm.</p>
+
+  <p>Some conformance requirements are phrased as requirements on
+  attributes, methods or objects. Such requirements are to be
+  interpreted as requirements on user agents.</p>
+
+  <p>Conformance requirements phrased as algorithms or specific steps
+  may be implemented in any manner, so long as the end result is
+  equivalent. (In particular, the algorithms defined in this
+  specification are intended to be easy to follow, and not intended to
+  be performant.)</p>
+
+  <p>The only conformance class defined by this specification is user
+  agents.</p>
+
+  <p>User agents may impose implementation-specific limits on
+  otherwise unconstrained inputs, e.g. to prevent denial of service
+  attacks, to guard against running out of memory, or to work around
+  platform-specific limitations.</p>
+
+  <p>When support for a feature is disabled (e.g. as an emergency
+  measure to mitigate a security problem, or to aid in development, or
+  for performance reasons), user agents must act as if they had no
+  support for the feature whatsoever, and as if the feature was not
+  mentioned in this specification. For example, if a particular
+  feature is accessed via an attribute in a Web IDL interface, the
+  attribute itself would be omitted from the objects that implement
+  that interface &mdash; leaving the attribute on the object but
+  making it return null or throw an exception is insufficient.</p>
+
+
+  <h3 id="dependencies"><span class="secno">1.1 </span>Dependencies</h3>
+
+  <p>This specification relies on several other underlying
+  specifications.</p>
+
+  <dl><dt>HTML</dt>
+
+   <dd>
+
+    <p>Many fundamental concepts from HTML are used by this
+    specification. <a href="#refsHTML">[HTML]</a></p>
+
+   </dd>
+
+   <dt>WebIDL</dt>
+
+   <dd>
+
+    <p>The IDL blocks in this specification use the semantics of the
+    WebIDL specification. <a href="#refsWEBIDL">[WEBIDL]</a></p>
+
+   </dd>
+
+  </dl><h2 id="terminology"><span class="secno">2 </span>Terminology</h2>
+
+  <p>The construction "a <code title="">Foo</code> object", where
+  <code title="">Foo</code> is actually an interface, is sometimes
+  used instead of the more accurate "an object implementing the
+  interface <code title="">Foo</code>".</p>
+
+  <p>The term DOM is used to refer to the API set made available to
+  scripts in Web applications, and does not necessarily imply the
+  existence of an actual <code>Document</code> object or of any other
+  <code>Node</code> objects as defined in the DOM Core
+  specifications. <a href="#refsDOMCORE">[DOMCORE]</a></p>
+
+  <p>An IDL attribute is said to be <em>getting</em> when its value is
+  being retrieved (e.g. by author script), and is said to be
+  <em>setting</em> when a new value is assigned to it.</p>
+
+
+
+  <h2 id="event-definitions"><span class="secno">3 </span>Event definitions</h2>
+
+  <p>Messages in <span>server-sent events</span>, <span>Web
+  sockets</span>, <a href="#web-messaging">cross-document messaging</a>, and
+  <a href="#channel-messaging">channel messaging</a> use the <dfn id="event-message" title="event-message"><code>message</code></dfn> event.
+  
+  <a href="#refsEVENTSOURCE">[EVENTSOURCE]</a>
+  <a href="#refsWEBSOCKET">[WEBSOCKET]</a>
+  
+  </p>
+
+  <p>The following interface is defined for this event:</p>
+
+  <pre class="idl">[Constructor(DOMString type, optional <a href="#messageeventinit">MessageEventInit</a> eventInitDict)]
+interface <dfn id="messageevent">MessageEvent</dfn> : <span>Event</span> {
+  readonly attribute any <a href="#dom-messageevent-data" title="dom-MessageEvent-data">data</a>;
+  readonly attribute DOMString <a href="#dom-messageevent-origin" title="dom-MessageEvent-origin">origin</a>;
+  readonly attribute DOMString <a href="#dom-messageevent-lasteventid" title="dom-MessageEvent-lastEventId">lastEventId</a>;
+  readonly attribute <span>WindowProxy</span>? <a href="#dom-messageevent-source" title="dom-MessageEvent-source">source</a>;
+  readonly attribute <a href="#messageport">MessagePort</a>[]? <a href="#dom-messageevent-ports" title="dom-MessageEvent-ports">ports</a>;
+};
+
+dictionary <dfn id="messageeventinit">MessageEventInit</dfn> : <span>EventInit</span> {
+  any data;
+  DOMString origin;
+  DOMString lastEventId;
+  <span>WindowProxy</span>? source;
+  <a href="#messageport">MessagePort</a>[]? ports;
+};</pre>
+
+  <dl class="domintro"><dt><var title="">event</var> . <code title="dom-MessageEvent-data"><a href="#dom-messageevent-data">data</a></code></dt>
+
+   <dd>
+
+    <p>Returns the data of the message.</p>
+
+   </dd>
+
+   <dt><var title="">event</var> . <code title="dom-MessageEvent-origin"><a href="#dom-messageevent-origin">origin</a></code></dt>
+
+   <dd>
+
+    <p>Returns the origin of the message, for <span>server-sent
+    events</span> and <a href="#web-messaging">cross-document messaging</a>.</p>
+
+   </dd>
+
+   <dt><var title="">event</var> . <code title="dom-MessageEvent-lastEventId"><a href="#dom-messageevent-lasteventid">lastEventId</a></code></dt>
+
+   <dd>
+
+    <p>Returns the <span title="concept-event-stream-last-event-id">last event ID
+    string</span>, for <span>server-sent events</span>.</p>
+
+   </dd>
+
+   <dt><var title="">event</var> . <code title="dom-MessageEvent-source"><a href="#dom-messageevent-source">source</a></code></dt>
+
+   <dd>
+
+    <p>Returns the <code>WindowProxy</code> of the source window, for
+    <a href="#web-messaging">cross-document messaging</a>.</p>
+
+   </dd>
+
+   <dt><var title="">event</var> . <code title="dom-MessageEvent-ports"><a href="#dom-messageevent-ports">ports</a></code></dt>
+
+   <dd>
+
+    <p>Returns the <code><a href="#messageport">MessagePort</a></code> array sent with the
+    message, for <a href="#web-messaging">cross-document messaging</a> and
+    <a href="#channel-messaging">channel messaging</a>.</p>
+
+   </dd>
+
+  </dl><div class="impl">
+
+  <p>The <dfn id="dom-messageevent-data" title="dom-MessageEvent-data"><code>data</code></dfn>
+  attribute must return the value it was initialized to. When the
+  object is created, this attribute must be initialized to null. It
+  represents the message being sent.</p>
+
+  <p>The <dfn id="dom-messageevent-origin" title="dom-MessageEvent-origin"><code>origin</code></dfn> attribute
+  must return the value it was initialized to. When the object is
+  created, this attribute must be initialized to the empty string. It
+  represents, in <span>server-sent events</span> and
+  <a href="#web-messaging">cross-document messaging</a>, the <span>origin</span> of
+  the document that sent the message (typically the scheme, hostname,
+  and port of the document, but not its path or fragment
+  identifier).</p>
+
+  <p>The <dfn id="dom-messageevent-lasteventid" title="dom-MessageEvent-lastEventId"><code>lastEventId</code></dfn>
+  attribute must return the value it was initialized to. When the
+  object is created, this attribute must be initialized to the empty
+  string. It represents, in <span>server-sent events</span>, the <span title="concept-event-stream-last-event-id">last event ID
+  string</span> of the event source.</p>
+
+  <p>The <dfn id="dom-messageevent-source" title="dom-MessageEvent-source"><code>source</code></dfn> attribute
+  must return the value it was initialized to. When the object is
+  created, this attribute must be initialized to null. It represents,
+  in <a href="#web-messaging">cross-document messaging</a>, the
+  <code>WindowProxy</code> of the <span>browsing context</span> of the
+  <code>Window</code> object from which the message came.</p>
+
+  <p>The <dfn id="dom-messageevent-ports" title="dom-MessageEvent-ports"><code>ports</code></dfn>
+  attribute must return the value it was initialized to. When the
+  object is created, this attribute must be initialized to null.
+  It represents, in <a href="#web-messaging">cross-document messaging</a> and
+  <a href="#channel-messaging">channel messaging</a> the <code><a href="#messageport">MessagePort</a></code> array
+  being sent, if any.</p>
+
+  </div>
+
+
+  <h2 id="web-messaging"><span class="secno">4 </span><dfn id="crossDocumentMessages">Cross-document messaging</dfn></h2>
+
+  <p>Web browsers, for security and privacy reasons, prevent documents
+  in different domains from affecting each other; that is, cross-site
+  scripting is disallowed.</p>
+
+  <p>While this is an important security feature, it prevents pages
+  from different domains from communicating even when those pages are
+  not hostile. This section introduces a messaging system that allows
+  documents to communicate with each other regardless of their source
+  domain, in a way designed to not enable cross-site scripting
+  attacks.</p>
+
+  <div class="impl">
+
+  <p>The <span>task source</span> for the <span title="concept-task">tasks</span> in <a href="#web-messaging">cross-document
+  messaging</a> is the <dfn id="posted-message-task-source">posted message task source</dfn>.</p>
+
+  </div>
+
+
+  <h3 id="introduction"><span class="secno">4.1 </span>Introduction</h3>
+
+  <p><i>This section is non-normative.</i></p>
+
+  <div class="example">
+
+   <p>For example, if document A contains an <code>iframe</code>
+   element that contains document B, and script in document A calls
+   <code title="dom-window-postMessage"><a href="#dom-window-postmessage">postMessage()</a></code> on the
+   <code>Window</code> object of document B, then a message event will
+   be fired on that object, marked as originating from the
+   <code>Window</code> of document A. The script in document A might
+   look like:</p>
+
+   <pre>var o = document.getElementsByTagName('iframe')[0];
+o.contentWindow.postMessage('Hello world', 'http://b.example.org/');</pre>
+
+   <p>To register an event handler for incoming events, the script
+   would use <code title="">addEventListener()</code> (or similar
+   mechanisms). For example, the script in document B might look
+   like:</p>
+
+   <pre>window.addEventListener('message', receiver, false);
+function receiver(e) {
+  if (e.origin == 'http://example.com') {
+    if (e.data == 'Hello world') {
+      e.source.postMessage('Hello', e.origin);
+    } else {
+      alert(e.data);
+    }
+  }
+}</pre>
+
+   <p>This script first checks the domain is the expected domain, and
+   then looks at the message, which it either displays to the user, or
+   responds to by sending a message back to the document which sent
+   the message in the first place.</p>
+
+  </div>
+
+
+
+  <h3 id="security-postmsg"><span class="secno">4.2 </span>Security</h3>
+
+  <div class="impl">
+
+  <h4 id="authors"><span class="secno">4.2.1 </span>Authors</h4>
+
+  </div>
+
+  <p class="warning" id="security-4">Use of this API requires extra
+  care to protect users from hostile entities abusing a site for their
+  own purposes.</p>
+
+  <p>Authors should check the <code title="dom-MessageEvent-origin"><a href="#dom-messageevent-origin">origin</a></code> attribute to ensure
+  that messages are only accepted from domains that they expect to
+  receive messages from. Otherwise, bugs in the author's message
+  handling code could be exploited by hostile sites.</p>
+
+  <p>Furthermore, even after checking the <code title="dom-MessageEvent-origin"><a href="#dom-messageevent-origin">origin</a></code> attribute, authors
+  should also check that the data in question is of the expected
+  format. Otherwise, if the source of the event has been attacked
+  using a cross-site scripting flaw, further unchecked processing of
+  information sent using the <code title="dom-window-postMessage"><a href="#dom-window-postmessage">postMessage()</a></code> method could
+  result in the attack being propagated into the receiver.</p>
+
+  <p>Authors should not use the wildcard keyword (*) in the <var title="">targetOrigin</var> argument in messages that contain any
+  confidential information, as otherwise there is no way to guarantee
+  that the message is only delivered to the recipient to which it was
+  intended.</p>
+
+  <hr><p>Authors who accept messages from any origin are encouraged to
+  consider the risks of a denial-of-service attack. An attacker could
+  send a high volume of messages; if the receiving page performs
+  expensive computation or causes network traffic to be sent for each
+  such message, the attacker's message could be multplied into a
+  denial-of-service attack. Authors are encouraged to employ rate
+  limiting (only accepting a certain number of messages per minute) to
+  make such attacks impractical.</p>
+
+
+  <div class="impl">
+
+  <h4 id="user-agents"><span class="secno">4.2.2 </span>User agents</h4>
+
+  <p>The integrity of this API is based on the inability for scripts
+  of one <span>origin</span> to post arbitrary events (using <code title="">dispatchEvent()</code> or otherwise) to objects in other
+  origins (those that are not the <span title="same
+  origin">same</span>).</p>
+
+  <p class="note">Implementors are urged to take extra care in the
+  implementation of this feature. It allows authors to transmit
+  information from one domain to another domain, which is normally
+  disallowed for security reasons. It also requires that UAs be
+  careful to allow access to certain properties but not others.</p>
+
+  <hr><p>User agents are also encouraged to consider rate-limiting message
+  traffic between different <span title="origin">origins</span>, to
+  protect na&iuml;ve sites from denial-of-service attacks.</p>
+
+  </div>
+
+
+
+  <h3 id="posting-messages"><span class="secno">4.3 </span>Posting messages</h3>
+
+  <dl class="domintro"><dt><var title="">window</var> . <code title="dom-window-postMessage"><a href="#dom-window-postmessage">postMessage</a></code>(<var title="">message</var>, <var title="">targetOrigin</var> [, <var title="">transfer</var> ])</dt>
+
+   <dd>
+
+    <p>Posts a message to the given window. Messages can be structured
+    objects, e.g. nested objects and arrays, can contain JavaScript
+    values (strings, numbers, <code>Date</code>s, etc), and can
+    contain certain data objects such as <code>File</code>
+    <code>Blob</code>, <code>FileList</code>, and
+    <code>ArrayBuffer</code> objects.</p>
+
+    <p>Objects listed in <var title="">transfer</var> are transferred,
+    not just cloned, meaning that they are no longer usable on the
+    sending side.</p>
+
+    <p>If the origin of the target window doesn't match the given
+    origin, the message is discarded, to avoid information leakage. To
+    send the message to the target regardless of origin, set the
+    target origin to "<code title="">*</code>". To restrict the
+    message to same-origin targets only, without needing to explicitly
+    state the origin, set the target origin to "<code title="">/</code>".</p>
+
+    <p>Throws a <code>DataCloneError</code> if <var title="">transfer</var> array contains duplicate objects or if
+    <var title="">message</var> could not be cloned.</p>
+
+   </dd>
+
+  </dl><p class="note">When posting a message to a <code>Window</code> of a
+  <span>browsing context</span> that has just been navigated to a new
+  <code>Document</code> is likely to result in the message not
+  receiving its intended recipient: the scripts in the target
+  <span>browsing context</span> have to have had time to set up
+  listeners for the messages. Thus, for instance, in situations where
+  a message is to be sent to the <code>Window</code> of newly created
+  child <code>iframe</code>, authors are advised to have the child
+  <code>Document</code> post a message to their parent announcing
+  their readiness to receive messages, and for the parent to wait for
+  this message before beginning posting messages.</p>
+
+  <div class="impl">
+
+  <p>When a script invokes the <dfn id="dom-window-postmessage" title="dom-window-postMessage"><code>postMessage(<var title="">message</var>, <var title="">targetOrigin</var>, <var title="">transfer</var>)</code></dfn> method (with two or three
+  arguments) on a <code>Window</code> object, the user agent must
+  follow these steps:</p>
+
+  <ol><li>
+
+    <p>If the value of the <var title="">targetOrigin</var> argument
+    is neither a single U+002A ASTERISK character (*), a single U+002F
+    SOLIDUS character (/), nor an <span>absolute URL</span>, then
+    throw a <code>SyntaxError</code> exception and abort the overall
+    set of steps.</p>
+
+   </li>
+
+   <li>
+
+    <p>Let <var title="">new ports</var> be an empty array.</p>
+
+   </li>
+
+   <li>
+
+    <p>Let <var title="">transfer map</var> be an empty association
+    list of <code>Transferable</code> objects to placeholder
+    objects.</p>
+
+   </li>
+
+   <li>
+
+    <p>If the method was invoked with a third argument <var title="">transfer</var>, run these substeps:</p>
+
+    <ol><li>
+
+      <p>If any object is listed in <var title="">transfer</var> more
+      than once, or any of the <code>Transferable</code> objects
+      listed in <var title="">transfer</var> are marked as <span title="concept-Transferable-neutered">neutered</span>, then
+      throw a <code>DataCloneError</code> exception and abort these
+      steps.</p>
+
+     </li>
+
+     <li>
+
+      <p>For each object <var title="">x</var> in <var title="">transfer</var> in turn, add a mapping from <var title="">x</var> to a new unique placeholder object created for
+      <var title="">x</var> to <var title="">transfer map</var>, and
+      if <var title="">x</var> is a <code><a href="#messageport">MessagePort</a></code> object,
+      also append the placeholder object to the <var title="">new
+      ports</var> array.</p>
+
+     </li>
+
+    </ol></li>
+
+   <li>
+
+    <p>Let <var title="">message clone</var> be the result of
+    obtaining a <span>structured clone</span> of the <var title="">message</var> argument, with <var title="">transfer
+    map</var> as the <i>transfer map</i>. If this throws an exception,
+    then throw that exception and abort these steps.</p>
+
+   </li>
+
+   <li>
+
+    <p>If the method was invoked with a third argument <var title="">transfer</var>, run these substeps:</p>
+
+    <ol><li>
+
+      <p>Let <var title="">new owner</var> be the <code>Window</code>
+      object on which the method was invoked.</p>
+
+     </li>
+
+     <li>
+
+      <p>For each object <var title="">x</var> in <var title="">transfer</var> in turn, obtain a new object <var title="">y</var> by <span title="transfer a Transferable
+      object">transferring</span> the object <var title="">x</var> to
+      <var title="">new owner</var>, and replace the placeholder
+      object that was created for the object <var title="">x</var> by
+      the new object <var title="">y</var> wherever the placeholder
+      exists (i.e. in <var title="">message clone</var> and in <var title="">new ports</var>).</p>
+
+     </li>
+
+    </ol></li>
+
+   <li>
+
+    <p>Make <var title="">new ports</var> into a <span title="dfn-read-only-array">read only</span> array.</p>
+
+   </li>
+
+   <li>
+
+    <p>Return from the <code title="dom-window-postMessage"><a href="#dom-window-postmessage">postMessage()</a></code> method, but
+    asynchronously continue running these steps.</p>
+
+   </li>
+
+   <li>
+
+    <p>If the <var title="">targetOrigin</var> argument is a single
+    literal U+002F SOLIDUS character (/), and the
+    <code>Document</code> of the <code>Window</code> object on which
+    the method was invoked does not have the <span>same origin</span>
+    as the <span>entry script</span>'s <span title="script's
+    document">document</span>, then abort these steps silently.</p>
+
+    <p>Otherwise, if the <var title="">targetOrigin</var> argument is
+    an <span>absolute URL</span>, and the <code>Document</code> of the
+    <code>Window</code> object on which the method was invoked does
+    not have the <span>same origin</span> as <var title="">targetOrigin</var>, then abort these steps silently.</p>
+
+    <p>Otherwise, the <var title="">targetOrigin</var> argument is a
+    single literal U+002A ASTERISK character (*), and no origin check
+    is made.</p>
+
+   </li>
+
+   <li>
+
+    <p>Create an event that uses the <code><a href="#messageevent">MessageEvent</a></code>
+    interface, with the event name <code title="event-message"><a href="#event-message">message</a></code>, which does not bubble, is
+    not cancelable, and has no default action. The <code title="dom-MessageEvent-data"><a href="#dom-messageevent-data">data</a></code> attribute must be
+    initialized to the value of <var title="">message clone</var>, the
+    <code title="dom-MessageEvent-origin"><a href="#dom-messageevent-origin">origin</a></code> attribute must
+    be initialized to the <span title="Unicode serialization of an
+    origin">Unicode serialization</span> of the <span>origin</span> of
+    the script that invoked the method, the <code title="dom-MessageEvent-source"><a href="#dom-messageevent-source">source</a></code> attribute must be
+    initialized to the <span>script's global object</span>'s
+    <code>WindowProxy</code> object, and the <code title="dom-MessageEvent-ports"><a href="#dom-messageevent-ports">ports</a></code> attribute must be
+    initialized to the <var title="">new ports</var> array.
+    
+    <a href="#refsHTML">[HTML]</a>
+    
+    </p> 
+
+   </li>
+
+   <li>
+
+    <p><span>Queue a task</span> to dispatch the event created in the
+    previous step at the <code>Window</code> object on which the
+    method was invoked. The <span>task source</span> for this <span title="concept-task">task</span> is the <a href="#posted-message-task-source">posted message task
+    source</a>.</p>
+
+   </li>
+
+  </ol></div>
+
+
+
+
+  <h2 id="channel-messaging"><span class="secno">5 </span><dfn>Channel messaging</dfn></h2>
+
+  <h3 id="introduction-0"><span class="secno">5.1 </span>Introduction</h3>
+
+  <p><i>This section is non-normative.</i></p>
+
+  <p>To enable independent pieces of code (e.g. running in different
+  <span title="browsing context">browsing contexts</span>) to
+  communicate directly, authors can use <a href="#channel-messaging">channel
+  messaging</a>.</p>
+
+  <p>Communication channels in this mechanisms are implemented as
+  two-ways pipes, with a port at each end. Messages sent in one port
+  are delivered at the other port, and vice-versa. Messages are
+  asynchronous, and delivered as DOM events.</p>
+
+  <p>To create a connection (two "entangled" ports), the <code title="">MessageChannel()</code> constructor is called:</p>
+
+  <pre>var channel = new MessageChannel();</pre>
+
+  <p>One of the ports is kept as the local port, and the other port is
+  sent to the remote code, e.g. using <code title="dom-window-postMessage"><a href="#dom-window-postmessage">postMessage()</a></code>:</p>
+
+  <pre>otherWindow.postMessage('hello', 'http://example.com', [channel.port2]);</pre>
+
+  <p>To send messages, the <code title="dom-MessagePort-postMessage"><a href="#dom-messageport-postmessage">postMessage()</a></code> method on
+  the port is used:</p>
+
+  <pre>channel.port1.postMessage('hello');</pre>
+
+  <p>To receive messages, one listens to <code title="event-message"><a href="#event-message">message</a></code> events:</p>
+
+  <pre>channel.port1.onmessage = handleMessage;
+function handleMessage(event) {
+  // message is in event.data
+  // ...
+}</pre>
+
+  <p>Data sent on a port can be structured data; for example here an
+  array of strings is passed:</p>
+
+  <pre>port1.postMessage(['hello', 'world'], 'http://example.com');</pre>
+
+
+  <h4 id="ports-as-the-basis-of-an-object-capability-model-on-the-web"><span class="secno">5.1.1 </span>Ports as the basis of an object-capability model on the Web</h4>
+
+  <p><i>This section is non-normative.</i></p>
+
+  <p>Ports can be viewed as a way to expose limited capabilities (in
+  the object-capability model sense) to other actors in the system.
+  This can either be a weak capability system, where the ports are
+  merely used as a convenient model within a particular origin, or as
+  a strong capability model, where they are provided by one origin
+  <var title="">provider</var> as the only mechanism by which another
+  origin <var title="">consumer</var> can effect change in or obtain
+  information from <var title="">provider</var>.</p>
+
+  <p>For example, consider a situation in which a social Web site
+  embeds in one <code>iframe</code> the user's e-mail contacts
+  provider (an address book site, from a second origin), and in a
+  second <code>iframe</code> a game (from a third origin). The outer
+  social site and the game in the second <code>iframe</code> cannot
+  access anything inside the first <code>iframe</code>; together they
+  can only:</p>
+
+  <ul class="brief"><li><span>Navigate</span> the <code>iframe</code> to a new
+   <span>URL</span>, such as the same <span>URL</span> but with a
+   different fragment identifier, causing the <code>Window</code> in
+   the <code>iframe</code> to receive a <code title="event-hashchange">hashchange</code> event.</li>
+
+   <li>Resize the <code>iframe</code>, causing the <code>Window</code>
+   in the <code>iframe</code> to receive a <code title="event-resize">resize</code> event.</li>
+
+   
+
+   <li>Send a <code title="event-message"><a href="#event-message">message</a></code> event to 
+   the <code>Window</code> in the <code>iframe</code> using the <code title="dom-window-postMessage"><a href="#dom-window-postmessage">window.postMessage()</a></code>
+   API.</li>
+
+  </ul><p>The contacts provider can use these methods, most particularly
+  the third one, to provide an API that can be accessed by other
+  origins to manipulate the user's address book. For example, it could
+  respond to a message "<code title="">add-contact Guillaume Tell
+  &lt;tell@pomme.example.net&gt;</code>" by adding the given person and
+  e-mail address to the user's address book.</p>
+
+  <p>To avoid any site on the Web being able to manipulate the user's
+  contacts, the contacts provider might only allow certain trusted
+  sites, such as the social site, to do this.</p>
+
+  <p>Now suppose the game wanted to add a contact to the user's
+  address book, and that the social site was willing to allow it to do
+  so on its behalf, essentially "sharing" the trust that the contacts
+  provider had with the social site. There are several ways it could
+  do this; most simply, it could just proxy messages between the game
+  site and the contacts site. However, this solution has a number of
+  difficulties: it requires the social site to either completely trust
+  the game site not to abuse the privilege, or it requires that the
+  social site verify each request to make sure it's not a request that
+  it doesn't want to allow (such as adding multiple contacts, reading
+  the contacts, or deleting them); it also requires some additional
+  complexity if there's ever the possibility of multiple games
+  simultaneously trying to interact with the contacts provider.</p>
+
+  <p>Using message channels and <code><a href="#messageport">MessagePort</a></code> objects,
+  however, all of these problems can go away. When the game tells the
+  social site that it wants to add a contact, the social site can ask
+  the contacts provider not for it to add a contact, but for the
+  <em>capability</em> to add a single contact. The contacts provider
+  then creates a pair of <code><a href="#messageport">MessagePort</a></code> objects, and sends
+  one of them back to the social site, who forwards it on to the game.
+  The game and the contacts provider then have a direct connection,
+  and the contacts provider knows to only honor a single "add contact"
+  request, nothing else. In other words, the game has been granted the
+  capability to add a single contact.</p>
+
+
+  <h4 id="ports-as-the-basis-of-abstracting-out-service-implementations"><span class="secno">5.1.2 </span>Ports as the basis of abstracting out service implementations</h4>
+
+  <p><i>This section is non-normative.</i></p>
+
+  <p>Continuing the example from the previous section, consider the
+  contacts provider in particular. While an initial implementation
+  might have simply used <code>XMLHttpRequest</code> objects in the
+  service's <code>iframe</code>, an evolution of the service might
+  instead want to use a <span title="SharedWorker">shared
+  worker</span> with a single <code>WebSocket</code> connection.</p>
+
+  <p>If the initial design used <code><a href="#messageport">MessagePort</a></code> objects to
+  grant capabilities, or even just to allow multiple simultaneous
+  independent sessions, the service implementation can switch from the
+  <code>XMLHttpRequest</code>s-in-each-<code>iframe</code> model to
+  the shared-<code>WebSocket</code> model without changing the API at
+  all: the ports on the service provider side can all be forwarded to
+  the shared worker without it affecting the users of the API in the
+  slightest.</p>
+
+
+
+  <h3 id="message-channels"><span class="secno">5.2 </span>Message channels</h3>
+
+  <pre class="idl">[<a href="#dom-messagechannel" title="dom-MessageChannel">Constructor</a>]
+interface <dfn id="messagechannel">MessageChannel</dfn> {
+  readonly attribute <a href="#messageport">MessagePort</a> <a href="#dom-channel-port1" title="dom-channel-port1">port1</a>;
+  readonly attribute <a href="#messageport">MessagePort</a> <a href="#dom-channel-port2" title="dom-channel-port2">port2</a>;
+};</pre>
+
+  <dl class="domintro"><dt><var title="">channel</var> = new <code title="dom-MessageChannel"><a href="#dom-messagechannel">MessageChannel</a></code>()</dt>
+
+   <dd>
+
+    <p>Returns a new <code><a href="#messagechannel">MessageChannel</a></code> object with two new <code><a href="#messageport">MessagePort</a></code> objects.</p>
+
+   </dd>
+
+   <dt><var title="">channel</var> . <code title="dom-MessageChannel-port1">port1</code></dt>
+
+   <dd>
+
+    <p>Returns the first <code><a href="#messageport">MessagePort</a></code> object.</p>
+
+   </dd>
+
+   <dt><var title="">channel</var> . <code title="dom-MessageChannel-port2">port2</code></dt>
+
+   <dd>
+
+    <p>Returns the second <code><a href="#messageport">MessagePort</a></code> object.</p>
+
+   </dd>
+
+  </dl><div class="impl">
+
+  <p>When the <dfn id="dom-messagechannel" title="dom-MessageChannel"><code>MessageChannel()</code></dfn>
+  constructor is called, it must run the following algorithm:</p>
+
+  <ol><li><p><a href="#create-a-new-messageport-object">Create a new <code>MessagePort</code> object</a>
+   owned by the <span>script's global object</span>, and let <var title="">port1</var> be that object.</li>
+
+   <li><p><a href="#create-a-new-messageport-object">Create a new <code>MessagePort</code> object</a>
+   owned by the <span>script's global object</span>, and let <var title="">port2</var> be that object.</li>
+
+   <li><p><a href="#entangle">Entangle</a> the <var title="">port1</var> and <var title="">port2</var> objects.</li>
+
+   <li><p>Instantiate a new <code><a href="#messagechannel">MessageChannel</a></code> object, and
+   let <var title="">channel</var> be that object.</li>
+
+   <li><p>Let the <code title="dom-channel-port1"><a href="#dom-channel-port1">port1</a></code>
+   attribute of the <var title="">channel</var> object be <var title="">port1</var>.</p>
+
+   <li><p>Let the <code title="dom-channel-port2"><a href="#dom-channel-port2">port2</a></code>
+   attribute of the <var title="">channel</var> object be <var title="">port2</var>.</p>
+
+   <li><p>Return <var title="">channel</var>.</li>
+
+  </ol><p>This constructor must be visible when the <span>script's global
+  object</span> is either a <code>Window</code> object or an object
+  implementing the <code>WorkerUtils</code> interface.</p>
+
+  <p>The <dfn id="dom-channel-port1" title="dom-channel-port1"><code>port1</code></dfn> and
+  <dfn id="dom-channel-port2" title="dom-channel-port2"><code>port2</code></dfn> attributes
+  must return the values they were assigned when the
+  <code><a href="#messagechannel">MessageChannel</a></code> object was created.</p>
+
+  </div>
+
+
+
+  <h3 id="message-ports"><span class="secno">5.3 </span>Message ports</h3>
+
+  <p>Each channel has two message ports. Data sent through one port is
+  received by the other port, and vice versa.</p>
+
+  <pre class="idl">interface <dfn id="messageport">MessagePort</dfn> : <span>EventTarget</span> {
+  void <a href="#dom-messageport-postmessage" title="dom-MessagePort-postMessage">postMessage</a>(any message, optional sequence&lt;<span>Transferable</span>&gt; transfer);
+  void <a href="#dom-messageport-start" title="dom-MessagePort-start">start</a>();
+  void <a href="#dom-messageport-close" title="dom-MessagePort-close">close</a>();
+
+  // event handlers
+  [TreatNonCallableAsNull] attribute <span>Function</span>? <a href="#handler-messageport-onmessage" title="handler-MessagePort-onmessage">onmessage</a>;
+};
+<a href="#messageport">MessagePort</a> implements <span>Transferable</span>;</pre>
+
+  <dl class="domintro"><dt><var title="">port</var> . <code title="dom-MessagePort-postMessage"><a href="#dom-messageport-postmessage">postMessage</a></code>(<var title="">message</var> [, <var title="">transfer</var>] )</dt>
+
+   <dd>
+
+    <p>Posts a message through the channel. Objects listed in <var title="">transfer</var> are transferred, not just cloned, meaning
+    that they are no longer usable on the sending side.</p>
+
+    <p>Throws a <code>DataCloneError</code> if <var title="">transfer</var> array contains duplicate objects or the
+    source or target ports, or if <var title="">message</var> could
+    not be cloned.</p>
+
+   </dd>
+
+   <dt><var title="">port</var> . <code title="dom-MessagePort-start"><a href="#dom-messageport-start">start</a></code>()</dt>
+
+   <dd>
+
+    <p>Begins dispatching messages received on the port.</p>
+
+   </dd>
+
+   <dt><var title="">port</var> . <code title="dom-MessagePort-close"><a href="#dom-messageport-close">close</a></code>()</dt>
+
+   <dd>
+
+    <p>Disconnects the port, so that it is no longer active.</p>
+
+   </dd>
+
+  </dl><div class="impl">
+
+  <p>Each <code><a href="#messageport">MessagePort</a></code> object can be entangled with
+  another (a symmetric relationship). Each <code><a href="#messageport">MessagePort</a></code>
+  object also has a <span>task source</span> called the <dfn id="port-message-queue">port
+  message queue</dfn>, initially empty. A <a href="#port-message-queue">port message
+  queue</a> can be enabled or disabled, and is initially
+  disabled. Once enabled, a port can never be disabled again (though
+  messages in the queue can get moved to another queue or removed
+  altogether, which has much the same effect).</p>
+
+  <p>When the user agent is to <dfn id="create-a-new-messageport-object">create a new
+  <code>MessagePort</code> object</dfn> owned by a <span>script's
+  global object</span> object <var title="">owner</var>, it must
+  instantiate a new <code><a href="#messageport">MessagePort</a></code> object, and let its owner
+  be <var title="">owner</var>.</p>
+
+  <p>When the user agent is to <dfn id="entangle">entangle</dfn> two
+  <code><a href="#messageport">MessagePort</a></code> objects, it must run the following
+  steps:</p>
+
+  <ol><li>
+
+    <p>If one of the ports is already entangled, then disentangle it
+    and the port that it was entangled with.</p>
+
+    <p class="note">If those two previously entangled ports were the
+    two ports of a <code><a href="#messagechannel">MessageChannel</a></code> object, then that
+    <code><a href="#messagechannel">MessageChannel</a></code> object no longer represents an actual
+    channel: the two ports in that object are no longer entangled.</p>
+
+   </li>
+
+   <li><p>Associate the two ports to be entangled, so that they form
+   the two parts of a new channel. (There is no
+   <code><a href="#messagechannel">MessageChannel</a></code> object that represents this
+   channel.)</li>
+
+  </ol><p>When the user agent is to <dfn id="clone-a-port">clone a port</dfn> <var title="">original port</var>, with the clone being owned by <var title="">owner</var>, it must run the following steps, which return
+  a new <code><a href="#messageport">MessagePort</a></code> object. These steps must be run
+  atomically.</p>
+
+  <ol><li><p><a href="#create-a-new-messageport-object">Create a new <code>MessagePort</code> object</a>
+   owned by <var title="">owner</var>, and let <var title="">new
+   port</var> be that object.</li>
+
+   <li><p>Move all the events in the <a href="#port-message-queue">port message queue</a>
+   of <var title="">original port</var> to the <a href="#port-message-queue">port message
+   queue</a> of <var title="">new port</var>, if any, leaving the
+   <var title="">new port</var>'s <a href="#port-message-queue">port message queue</a> in
+   its initial disabled state.</li>
+
+   <li>
+
+    <p>If the <var title="">original port</var> is entangled with
+    another port, then run these substeps:</p>
+
+    <ol><li><p>Let the <var title="">remote port</var> be the port with
+     which the <var title="">original port</var> is entangled.</li>
+
+     <li><p><a href="#entangle">Entangle</a> the <var title="">remote port</var>
+     and <var title="">new port</var> objects. The <var title="">original port</var> object will be disentangled by this
+     process.</li>
+
+    </ol></li>
+
+   <li><p>Return <var title="">new port</var>. It is the
+   clone.</li>
+
+  </ol><p id="transferMessagePort">To <span title="transfer a Transferable
+  object">transfer</span> a <code><a href="#messageport">MessagePort</a></code> object <var title="">old</var> to a new owner <var title="">owner</var>, a user
+  agent must <a href="#clone-a-port" title="clone a port">clone</a> the <var title="">old</var> object with the clone being owned by <var title="">owner</var>, thus obtaining <var title="">new</var>, must
+  <span title="concept-Transferable-neutered">neuter</span> the <var title="">old</var> port, and must finally return <var title="">new</var>.</p>
+
+  <hr><p>The <dfn id="dom-messageport-postmessage" title="dom-MessagePort-postMessage"><code>postMessage()</code></dfn>
+  method, when called on a port <var title="">source port</var>, must
+  cause the user agent to run the following steps:</p>
+
+  <ol><li><p>Let <var title="">target port</var> be the port with which
+   <var title="">source port</var> is entangled, if any.</li>
+
+   <li>
+
+    <p>Let <var title="">new ports</var> be an empty array.</p>
+
+   </li>
+
+   <li>
+
+    <p>Let <var title="">transfer map</var> be an empty association
+    list of <code>Transferable</code> objects to placeholder
+    objects.</p>
+
+   </li>
+
+   <li>
+
+    <p>If the method was invoked with a second argument <var title="">transfer</var>, run these substeps:</p>
+
+    <ol><li>
+
+      <p>If any object is listed in <var title="">transfer</var> more
+      than once, or any of the <code>Transferable</code> objects
+      listed in <var title="">transfer</var> are marked as <span title="concept-Transferable-neutered">neutered</span>, then
+      throw a <code>DataCloneError</code> exception and abort these
+      steps.</p>
+
+     </li>
+
+     <li>
+
+      <p>If any of the objects in <var title="">transfer</var> are
+      either the <var title="">source port</var> or the <var title="">target port</var> (if any), then throw a
+      <code>DataCloneError</code> exception and abort these
+      steps.</p>
+
+     </li>
+
+     <li>
+
+      <p>For each object <var title="">x</var> in <var title="">transfer</var> in turn, add a mapping from <var title="">x</var> to a new unique placeholder object created for
+      <var title="">x</var> to <var title="">transfer map</var>, and
+      if <var title="">x</var> is a <code><a href="#messageport">MessagePort</a></code> object,
+      also append the placeholder object to the <var title="">new
+      ports</var> array.</p>
+
+     </li>
+
+    </ol></li>
+
+   <li>
+
+    <p>Let <var title="">message clone</var> be the result of
+    obtaining a <span>structured clone</span> of the <var title="">message</var> argument, with <var title="">transfer
+    map</var> as the <i>transfer map</i>. If this throws an exception,
+    then throw that exception and abort these steps.</p>
+
+   </li>
+
+   <li>
+
+    <p>If the method was invoked with a second argument <var title="">transfer</var>, run these substeps:</p>
+
+    <ol><li>
+
+      <p>Let <var title="">new owner</var> be the owner of <var title="">target port</var>, if there is a <var title="">target
+      port</var>, or else some arbitrary owner. (This <var title="">new owner</var> is used when transfering objects below.
+      If there is no <var title="">target port</var>, the
+      <code>Transferable</code> objects given in the second argument,
+      if any, are still <span title="transfer a Transferable
+      object">transfered</span>, but since they are then discarded, it
+      doesn't matter where they are transfered to.)</p>
+
+     </li>
+
+
+     <li>
+
+      <p>For each object <var title="">x</var> in <var title="">transfer</var> in turn, obtain a new object <var title="">y</var> by <span title="transfer a Transferable
+      object">transferring</span> the object <var title="">x</var> to
+      <var title="">new owner</var>, and replace the placeholder
+      object that was created for the object <var title="">x</var> by
+      the new object <var title="">y</var> wherever the placeholder
+      exists (i.e. in <var title="">message clone</var> and in <var title="">new ports</var>).</p>
+
+     </li>
+
+    </ol></li>
+
+   <li>
+
+    <p>Make <var title="">new ports</var> into a <span title="dfn-read-only-array">read only</span> array.</p>
+
+   </li>
+
+   <li><p>If there is no <var title="">target port</var> (i.e. if <var title="">source port</var> is not entangled), then abort these
+   steps.</li> 
+
+   <li><p>Create an event that uses the <code><a href="#messageevent">MessageEvent</a></code>
+   interface, with the name <code title="event-message"><a href="#event-message">message</a></code>, which does not bubble, is not
+   cancelable, and has no default action.
+   
+   <a href="#refsHTML">[HTML]</a>
+   
+   </li>
+
+   <li><p>Let the <code title="dom-MessageEvent-data"><a href="#dom-messageevent-data">data</a></code>
+   attribute of the event be initialized to the value of <var title="">message clone</var>.</li>
+
+   <li><p>Let the <code title="dom-MessageEvent-ports"><a href="#dom-messageevent-ports">ports</a></code>
+   attribute of the event be initialized to the <var title="">new
+   ports</var> array.</li>
+
+   <li><p>Add the event to the <a href="#port-message-queue">port message queue</a> of <var title="">target port</var>.</li>
+
+  </ol><hr><p>The <dfn id="dom-messageport-start" title="dom-MessagePort-start"><code>start()</code></dfn>
+  method must enable its port's <a href="#port-message-queue">port message queue</a>, if it
+  is not already enabled.</p>
+
+  <p>When a port's <a href="#port-message-queue">port message queue</a> is enabled, the
+  <span>event loop</span> must use it as one of its <span title="task
+  source">task sources</span>.</p>
+
+  <p class="note">If the <code>Document</code> of the port's event
+  listeners' <span title="script's global object">global object</span>
+  is not <span>fully active</span>, then the messages are lost.</p>
+  
+
+  <hr><p>The <dfn id="dom-messageport-close" title="dom-MessagePort-close"><code>close()</code></dfn>
+  method, when called on a port <var title="">local port</var> that is
+  entangled with another port, must cause the user agents to
+  disentangle the two ports. If the method is called on a port that is
+  not entangled, then the method must do nothing.</p>
+
+  <hr><p>The following are the <span>event handlers</span> (and their
+  corresponding <span title="event handler event type">event handler
+  event types</span>) that must be supported, as IDL attributes, by
+  all objects implementing the <code><a href="#messageport">MessagePort</a></code> interface:</p>
+
+  <table><thead><tr><th><span title="event handlers">Event handler</span> <th><span>Event handler event type</span>
+   <tbody><tr><td><dfn id="handler-messageport-onmessage" title="handler-MessagePort-onmessage"><code>onmessage</code></dfn> <td> <code title="event-message"><a href="#event-message">message</a></code>
+  </table><p>The first time a <code><a href="#messageport">MessagePort</a></code> object's <code title="handler-MessagePort-onmessage"><a href="#handler-messageport-onmessage">onmessage</a></code> IDL attribute
+  is set, the port's <a href="#port-message-queue">port message queue</a> must be enabled,
+  as if the <code title="dom-MessagePort-start"><a href="#dom-messageport-start">start()</a></code> method
+  had been called.</p>
+
+  </div>
+
+
+  <h4 id="ports-and-garbage-collection"><span class="secno">5.3.1 </span>Ports and garbage collection</h4>
+
+  <div class="impl">
+
+  <p>When a <code><a href="#messageport">MessagePort</a></code> object <var title="">o</var> is
+  entangled, user agents must either act as if <var title="">o</var>'s
+  entangled <code><a href="#messageport">MessagePort</a></code> object has a strong reference to
+  <var title="">o</var>, or as if <var title="">o</var>'s owner has a
+  strong reference to <var title="">o</var>.</p>
+
+  <div class="note">
+
+   <p>Thus, a message port can be received, given an event listener,
+   and then forgotten, and so long as that event listener could
+   receive a message, the channel will be maintained.</p>
+
+   <p>Of course, if this was to occur on both sides of the channel,
+   then both ports could be garbage collected, since they would not be
+   reachable from live code, despite having a strong reference to each
+   other.</p>
+
+  </div>
+
+  <p>Furthermore, a <code><a href="#messageport">MessagePort</a></code> object must not be
+  garbage collected while there exists a message in a <span>task
+  queue</span> that is to be dispatched on that
+  <code><a href="#messageport">MessagePort</a></code> object, or while the
+  <code><a href="#messageport">MessagePort</a></code> object's <a href="#port-message-queue">port message queue</a> is
+  open and there exists a <code title="event-message"><a href="#event-message">message</a></code>
+  event in that queue.</p>
+  
+
+  
+
+  </div>
+
+  <p class="note">Authors are strongly encouraged to explicitly close
+  <code><a href="#messageport">MessagePort</a></code> objects to disentangle them, so that their
+  resources can be recollected. Creating many <code><a href="#messageport">MessagePort</a></code>
+  objects and discarding them without closing them can lead to high
+  memory usage.</p>
+
+
+
+
+
+  <h2 class="no-num" id="references">References</h2>
+
+  <p>All references are normative unless marked "Non-normative".</p>
+
+  
+
+  <dl><dt id="refsDOMCORE">[DOMCORE]</dt>
+   <dd><cite><a href="http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html">DOM4</a></cite>, A. van Kesteren. W3C.</dd>
+
+   <dt id="refsEVENTSOURCE">[EVENTSOURCE]</dt>
+   
+   <dd><cite><a href="http://dev.w3.org/html5/eventsource/">Server-Sent
+   Events</a></cite>, I. Hickson. W3C.</dd>
+
+   <dt id="refsHTML">[HTML]</dt>
+   <dd><cite><a href="http://dev.w3.org/html5/spec/">HTML5</a></cite>,
+   I. Hickson. W3C.</dd>
+
+
+   <dt id="refsRFC2119">[RFC2119]</dt>
+   <dd><cite><a href="http://tools.ietf.org/html/rfc2119">Key words for use in
+   RFCs to Indicate Requirement Levels</a></cite>, S. Bradner. IETF.</dd>
+
+   <dt id="refsWEBIDL">[WEBIDL]</dt>
+   
+   <dd><cite><a href="http://www.w3.org/TR/WebIDL/">Web
+   IDL</a></cite>, C. McCormack. W3C.</dd>
+
+   <dt id="refsWEBSOCKET">[WEBSOCKET]</dt>
+   <dd><cite><a href="http://dev.w3.org/html5/websockets/">The WebSocket API</a></cite>, I. Hickson. W3C.</dd>
+
+  </dl><h2 class="no-num" id="acknowledgements">Acknowledgements</h2>
+
+  <p>For a full list of acknowledgements, please see the HTML
+  specification. <a href="#refsHTML">[HTML]</a></p>
+
+ 
