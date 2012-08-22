@@ -695,6 +695,7 @@ var _UnclassifyOptimizationCommand = exports._UnclassifyOptimizationCommand = _O
 				var onStatement = function (statement) {
 					statement.forEachExpression(function (expr, replaceCb) {
 						this._rewriteMethodCallsToStatic(expr, replaceCb, classDefs);
+						return true;
 					}.bind(this));
 					return statement.forEachStatement(onStatement);
 				}.bind(this);
