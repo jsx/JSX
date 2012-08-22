@@ -1531,7 +1531,7 @@ var BinaryNumberExpression = exports.BinaryNumberExpression = BinaryExpression.e
 			if (this.isConvertibleTo(context, this._expr1, Type.stringType, true)) {
 			  return this.assertIsConvertibleTo(context, this._expr2, Type.stringType, true);
 			}
-			context.errors.push(new CompileError(this._token, "cannot apply operator '" + this._token.getValue() + "' to type '" + expr1Type.toString() + "'"));
+			context.errors.push(new CompileError(this._token, "cannot apply operator '" + this._token.getValue() + "' to type '" + this._expr1.getType().toString() + "'"));
 			return false;
 		default:
 			var expr1Type = this._expr1.getType().resolveIfNullable();
