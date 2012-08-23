@@ -428,6 +428,7 @@ native final class JSX {
 	static function profilerIsRunning() : boolean;
 	static function getProfileResults() : variant;
 	static function postProfileResults(url : string) : void;
+	static function resetProfileResults() : void;
 }
 
 // vim: set noexpandtab:

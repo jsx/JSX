@@ -67,4 +67,27 @@
 		xhr.send(JSON.stringify(Profiler.getResults()));
 	};
 
+	Profiler.resetResults = function () {
+		var now = Date.now();
+		for (var stackIndex = 0; stackIndex < stack.length; ++stackIndex) {
+			var isLeaf = stackIndex == stack.length - 1;
+			// reset the counters
+			stack[stackIndex].$cur_inclusive = now;
+			stack[stackIndex].$cur_exclusive = isLeaf ? now : 0;
+			stack[stackIndex].$inclusive = 0;
+			stack[stackIndex].$exclusive = 0;
+			stack[stackIndex].$count = 0;
+			// reset callees
+			for (var k in stack[stackIndex]) {
+				if (k.charAt(0) != "$") {
+					if (! isLeaf && stack[stackIndex][k] == stack[stackIndex + 1]) {
+						// preserve the current call path
+					} else {
+						delete stack[stackIndex][k];
+					}
+				}
+			}
+		}
+	};
+
 })();
