@@ -1,16 +1,18 @@
 /*EXPECTED
-10
-10
+check()
+true
+true
 1
-10
-20
+true
+true
 1
 0
-10
-10
+check()
+true
+true
 1
-10
-20
+true
+true
 1
 0
 undefined
@@ -52,12 +54,19 @@ class Test {
 	}
 	static function run() : void {
 		function check() : void {
+			log "check()";
+
 			var m = JSX.getProfileResults();
-			log m["Test.run()"]["Test.g(:boolean)"]["Test.spendTime()"]["$exclusive"];
-			log m["Test.run()"]["Test.g(:boolean)"]["Test.spendTime()"]["$inclusive"];
+
+			var exclusive = m["Test.run()"]["Test.g(:boolean)"]["Test.spendTime()"]["$exclusive"] as number;
+			log 10 <= exclusive && exclusive <= 11;
+			var inclusive = m["Test.run()"]["Test.g(:boolean)"]["Test.spendTime()"]["$inclusive"] as number;
+			log 10 <= inclusive && inclusive <= 11;
 			log m["Test.run()"]["Test.g(:boolean)"]["Test.spendTime()"]["$count"];
-			log m["Test.run()"]["Test.g(:boolean)"]["$exclusive"];
-			log m["Test.run()"]["Test.g(:boolean)"]["$inclusive"];
+			exclusive = m["Test.run()"]["Test.g(:boolean)"]["$exclusive"] as number;
+			log 10 <= exclusive && exclusive <= 11;
+			inclusive = m["Test.run()"]["Test.g(:boolean)"]["$inclusive"] as number;
+			log 20 <= inclusive && inclusive <= 21;
 			log m["Test.run()"]["Test.g(:boolean)"]["$count"];
 			log m["Test.run()"]["$count"]; // should be zero, since it has not exitted
 		}
