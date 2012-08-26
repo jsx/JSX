@@ -46,7 +46,6 @@ my @specs = (
         'html5; http://www.w3.org/TR/html5/single-page.html',
         # 'http://www.w3.org/TR/FileAPI/', # has an union member FileReader#result
         'FileAPI; http://www.w3.org/TR/2011/WD-FileAPI-20111020/',
-        "$root/extra/file.idl",
 
         #"http://www.w3.org/TR/webaudio/", # no correct IDL
         "webaudio; https://dvcs.w3.org/hg/audio/raw-file/tip/webaudio/specification.html",
@@ -80,7 +79,7 @@ my @specs = (
 
         # additionals
         "$root/extra/timers.idl",
-        "$root/extra/animation-timing.idl",
+        "$root/extra/draft.idl",
         "$root/extra/legacy.idl",
         "$root/extra/sequence.idl",
     ],
