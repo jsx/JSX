@@ -1,12 +1,13 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 use 5.10.0;
 use strict;
 use warnings;
 use Test::More;
 use t::util::Util;
 
-main(@ARGV);
-exit;
+eval {
+    require Data::Difflet;
+};
 
 BEGIN { # XXX older version of Test::More has no note()
     if(not defined &note) {
@@ -18,6 +19,9 @@ BEGIN { # XXX older version of Test::More has no note()
         }
     }
 }
+
+main(@ARGV);
+exit;
 
 sub bench {
     my ($f) = @_;
@@ -140,7 +144,16 @@ sub compile_and_run {
         return;
     };
     # compare the results
-    is $output, $expected, $file;
+    is $output, $expected, $file or do {
+        if ($INC{'Data/Difflet.pm'}) {
+            my $d = Data::Difflet->new();
+            diag("DIFFLET");
+            diag($d->compare([split /\n/, $output], [split /\n/, $expected]));
+        }
+        else {
+            note("FYI: Test::Difflet shows you more informative output");
+        }
+    };
 }
 
 sub optimize_and_compare {
