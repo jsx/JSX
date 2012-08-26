@@ -1,19 +1,23 @@
+/***
+
+  WebAudio example, playing an MP3 music on browsers
+
+  @see http://www.html5rocks.com/en/tutorials/webaudio/intro/
+
+ */
+
+
 import 'js/web.jsx';
 
 class _Main {
     static function main(args : string[]) : void {
         try {
-            _Main.init(new webkitAudioContext);
+            var app = new App(new webkitAudioContext);
+            app.init();
         }
         catch (e : Error) {
             log e;
         }
-    }
-
-    static function init(cx : AudioContext) : void {
-        var app = new App(cx);
-
-        app.init();
     }
 }
 
@@ -43,14 +47,17 @@ class App {
 
         var xhr = new XMLHttpRequest();
         xhr.open('GET', this.audioFilename);
-        xhr.responseType = "arraybuffer";
+        xhr.responseType = "arraybuffer"; // for binary data
+
         xhr.addEventListener("load", (e) -> {
-            this.cx.decodeAudioData(xhr.response as ArrayBuffer, (buffer) -> {
+            var binary = xhr.response as ArrayBuffer;
+            this.cx.decodeAudioData(binary, (buffer) -> {
                 this.readyToStart(buffer);
             }, (buffer) -> {
                 this.setMessage("Loading error.");
             });
         });
+
         xhr.send();
     }
 
