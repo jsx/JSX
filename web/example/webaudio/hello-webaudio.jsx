@@ -2,8 +2,6 @@ import 'js/web.jsx';
 
 class _Main {
 	static function main(args : string[]) : void {
-		(dom.id("start") as HTMLInputElement).disabled = true;
-		(dom.id("stop")  as HTMLInputElement).disabled = true;
 		try {
 			_Main.init(new webkitAudioContext);
 		}
@@ -27,6 +25,7 @@ class App {
 	var buffer : AudioBuffer = null;
 
 	function constructor(cx : AudioContext) {
+		log cx;
 		this.cx = cx;
 	}
 

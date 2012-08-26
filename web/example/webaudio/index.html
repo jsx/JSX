@@ -26,7 +26,7 @@
 
   <body>
 
-    <div class="navbar navbar-fixed-top">
+    <div class="navbar navbar-inverse navbar-fixed-top">
       <div class="navbar-inner">
         <div class="container-fluid">
           <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
@@ -53,8 +53,10 @@
         </div>
         <div class="span8">
           <p id="message">This example of WebAudio API works only on Chrome.</p>
-          <input type="button" id="start" value="start" />
-          <input type="button" id="stop" value="stop" />
+          <p>
+            <input type="button" class="btn btn-primary btn-large" id="start" value="start" disabled="disabled" />
+            <input type="button" class="btn btn-primary btn-large" id="stop" value="stop" disabled="disabled" />
+          </p>
         </div>
       </div>
     </div> <!-- /container -->
