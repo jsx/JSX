@@ -4560,7 +4560,6 @@ native class URL {
 	/** @see http://www.w3.org/TR/2011/WD-FileAPI-20111020/ */
 	static function revokeObjectURL(url : string/*DOMString*/) : void;
 
-
 	/** @see http://www.w3.org/TR/mediacapture-streams/ */
 	static function createObjectURL(
 		stream : MediaStream
@@ -4568,13 +4567,10 @@ native class URL {
 
 } // end of URL
 
-native final class webkitURL extends URL {
-}
-
 // alias AudioBufferCallback = function(decodedData:AudioBuffer):void
 
 /** @see https://dvcs.w3.org/hg/audio/raw-file/tip/webaudio/specification.html */
-native final class AudioContext {
+native class AudioContext {
 
 	function constructor();
 
@@ -8250,6 +8246,12 @@ native __fake__ class WindowAnimationTiming {
 	function mozCancelAnimationFrame(handle : number/*long*/) : void;
 
 } // end of WindowAnimationTiming
+
+native final class webkitURL extends URL {
+}
+
+native final class webkitAudioContext extends AudioContext {
+}
 
 native final __fake__ class CanvasPixelArray {
 
