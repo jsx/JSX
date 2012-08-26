@@ -1,0 +1,2219 @@
+<!DOCTYPE html PUBLIC '-//W3C//DTD HTML 4.01 Transitional//EN' 'http://www.w3.org/TR/html4/loose.dtd'>
+<html lang="en-us">
+<head>
+  <meta name="generator" content="HTML Tidy for HTML5 (experimental) for Linux https://github.com/w3c/tidy-html5/tree/68a9e74">
+  <style type="text/css">/* --- EXAMPLES --- */
+div.example-title {
+    min-width: 7.5em;
+    color: #b9ab2d;
+}
+div.example-title span {
+    text-transform: uppercase;   
+}
+div.example, div.illegal-example {
+    padding: 0.5em;
+    margin: 1em 0;
+    position: relative;
+    clear: both;
+}
+div.illegal-example { color: red }
+div.illegal-example p { color: black }
+div.example {
+    padding: .5em;
+    border-left-width: .5em;
+    border-left-style: solid;
+    border-color: #e0cb52;
+    background: #fcfaee;    
+}
+</style><style type="text/css">/* --- ISSUES/NOTES --- */
+div.issue-title, div.note-title {
+    padding-right:  1em;
+    min-width: 7.5em;
+    color: #b9ab2d;
+}
+div.issue-title { color: #e05252; }
+div.note-title { color: #52e052; }
+div.issue-title span, div.note-title span {
+    text-transform: uppercase;
+}
+div.note, div.issue {
+    margin-top: 1em;
+    margin-bottom: 1em;
+}
+.note > p:first-child, .issue > p:first-child { margin-top: 0 }
+.issue, .note {
+    padding: .5em;
+    border-left-width: .5em;
+    border-left-style: solid;
+}
+div.issue, div.note {
+    padding: 0.5em;
+    margin: 1em 0;
+    position: relative;
+    clear: both;
+}
+span.note, span.issue { padding: .1em .5em .15em; }
+
+.issue {
+    border-color: #e05252;
+    background: #fbe9e9;
+}
+.note {
+    border-color: #52e052;
+    background: #e9fbe9;
+}
+
+
+</style><style type="text/css">/* HIGHLIGHTS */
+code.prettyprint {
+    color:  inherit;
+}
+
+/* this from google-code-prettify */
+.pln{color:#000}@media screen{.str{color:#080}.kwd{color:#008}.com{color:#800}.typ{color:#606}.lit{color:#066}.pun,.opn,.clo{color:#660}.tag{color:#008}.atn{color:#606}.atv{color:#080}.dec,.var{color:#606}.fun{color:red}}@media print,projection{.str{color:#060}.kwd{color:#006;font-weight:bold}.com{color:#600;font-style:italic}.typ{color:#404;font-weight:bold}.lit{color:#044}.pun,.opn,.clo{color:#440}.tag{color:#006;font-weight:bold}.atn{color:#404}.atv{color:#060}}ol.linenums{margin-top:0;margin-bottom:0}li.L0,li.L1,li.L2,li.L3,li.L5,li.L6,li.L7,li.L8{list-style-type:none}li.L1,li.L3,li.L5,li.L7,li.L9{background:#eee}
+</style><style type="text/css">/* --- Best Practices --- */
+div.practice {
+    border: solid #bebebe 1px;
+    margin: 2em 1em 1em 2em;
+}
+
+span.practicelab {
+    margin: 1.5em 0.5em 1em 1em;
+    font-weight: bold;
+    font-style: italic;
+    background: #dfffff;
+    position: relative;
+    padding: 0 0.5em;
+    top: -1.5em;
+}
+
+p.practicedesc {
+    margin: 1.5em 0.5em 1em 1em;
+}
+
+@media screen {
+    p.practicedesc {
+        position: relative;
+        top: -2em;
+        padding: 0;
+        margin: 1.5em 0.5em -1em 1em;
+    }
+}
+</style><link href="getusermedia.css" rel="stylesheet" type="text/css">
+
+  <title>Media Capture and Streams</title>
+  <meta content="text/html; charset=utf-8" http-equiv="Content-Type"><!--
+    === NOTA BENE ===
+      For the three scripts below, if your spec resides on dev.w3 you can
+      check them out in the same tree and use relative links so that they'll
+      work offline.
+
+    To generate the dated version of the specification:
+
+      Open this doc in Mozilla.
+
+      Do a CTRL-ALT-SHIFT-S
+
+      Select "XHMTL( source)" from dialog box. This will pop a new tab with
+      genreated version of the document.
+
+      This will open a new tab with generated html. Copy and paste this to
+      a new file. Note if you use Chrome or Safari, this step will not
+      work. What will happen is the paste will have th original document,
+      not what was displayed in the window that you did the copy on.
+
+      Rename the new file to the correct day such as
+      getusermedia-20111003.html then search for and edit the links for
+      "This version" and "Previos version". Add the new file into git and
+      check in.
+
+      Once everyone is happy, the getusermedia.html and
+      getusermedia-20111003.html files can be coppied to
+      getusermedia.html and getusermedia-20111003.html
+      respectively in the ../editor/. W3C directory.
+  -->
+
+  
+  
+<style type="text/css">/*****************************************************************
+ * ReSpec 3 CSS
+ * Robin Berjon - http://berjon.com/
+ *****************************************************************/
+
+/* --- INLINES --- */
+em.rfc2119 { 
+    text-transform:     lowercase;
+    font-variant:       small-caps;
+    font-style:         normal;
+    color:              #900;
+}
+
+h1 acronym, h2 acronym, h3 acronym, h4 acronym, h5 acronym, h6 acronym, a acronym,
+h1 abbr, h2 abbr, h3 abbr, h4 abbr, h5 abbr, h6 abbr, a abbr {
+    border: none;
+}
+
+dfn {
+    font-weight:    bold;
+}
+
+a.internalDFN {
+    color:  inherit;
+    border-bottom:  1px solid #99c;
+    text-decoration:    none;
+}
+
+a.externalDFN {
+    color:  inherit;
+    border-bottom:  1px dotted #ccc;
+    text-decoration:    none;
+}
+
+a.bibref {
+    text-decoration:    none;
+}
+
+cite .bibref {
+    font-style: normal;
+}
+
+code {
+    color:  #ff4500;
+}
+
+
+/* --- --- */
+ol.algorithm { counter-reset:numsection; list-style-type: none; }
+ol.algorithm li { margin: 0.5em 0; }
+ol.algorithm li:before { font-weight: bold; counter-increment: numsection; content: counters(numsection, ".") ") "; }
+
+
+/* --- WEB IDL --- */
+pre.idl {
+    border-top: 1px solid #90b8de;
+    border-bottom: 1px solid #90b8de;
+    padding:    1em;
+    line-height:    120%;
+}
+
+pre.idl::before {
+    content:    "WebIDL";
+    display:    block;
+    width:      150px;
+    background: #90b8de;
+    color:  #fff;
+    font-family:    initial;
+    padding:    3px;
+    font-weight:    bold;
+    margin: -1em 0 1em -1em;
+}
+
+.idlType {
+    color:  #ff4500;
+    font-weight:    bold;
+    text-decoration:    none;
+}
+
+/*.idlModule*/
+/*.idlModuleID*/
+/*.idlInterface*/
+.idlInterfaceID, .idlDictionaryID, .idlCallbackID, .idlEnumID {
+    font-weight:    bold;
+    color:  #005a9c;
+}
+
+.idlSuperclass {
+    font-style: italic;
+    color:  #005a9c;
+}
+
+/*.idlAttribute*/
+.idlAttrType, .idlFieldType, .idlMemberType {
+    color:  #005a9c;
+}
+.idlAttrName, .idlFieldName, .idlMemberName {
+    color:  #ff4500;
+}
+.idlAttrName a, .idlFieldName a, .idlMemberName a {
+    color:  #ff4500;
+    border-bottom:  1px dotted #ff4500;
+    text-decoration: none;
+}
+
+/*.idlMethod*/
+.idlMethType, .idlCallbackType {
+    color:  #005a9c;
+}
+.idlMethName {
+    color:  #ff4500;
+}
+.idlMethName a {
+    color:  #ff4500;
+    border-bottom:  1px dotted #ff4500;
+    text-decoration: none;
+}
+
+/*.idlParam*/
+.idlParamType {
+    color:  #005a9c;
+}
+.idlParamName {
+    font-style: italic;
+}
+
+.extAttr {
+    color:  #666;
+}
+
+/*.idlConst*/
+.idlConstType {
+    color:  #005a9c;
+}
+.idlConstName {
+    color:  #ff4500;
+}
+.idlConstName a {
+    color:  #ff4500;
+    border-bottom:  1px dotted #ff4500;
+    text-decoration: none;
+}
+
+/*.idlException*/
+.idlExceptionID {
+    font-weight:    bold;
+    color:  #c00;
+}
+
+.idlTypedefID, .idlTypedefType {
+    color:  #005a9c;
+}
+
+.idlRaises, .idlRaises a.idlType, .idlRaises a.idlType code, .excName a, .excName a code {
+    color:  #c00;
+    font-weight:    normal;
+}
+
+.excName a {
+    font-family:    monospace;
+}
+
+.idlRaises a.idlType, .excName a.idlType {
+    border-bottom:  1px dotted #c00;
+}
+
+.excGetSetTrue, .excGetSetFalse, .prmNullTrue, .prmNullFalse, .prmOptTrue, .prmOptFalse {
+    width:  45px;
+    text-align: center;
+}
+.excGetSetTrue, .prmNullTrue, .prmOptTrue { color:  #0c0; }
+.excGetSetFalse, .prmNullFalse, .prmOptFalse { color:  #c00; }
+
+.idlImplements a {
+    font-weight:    bold;
+}
+
+dl.attributes, dl.methods, dl.constants, dl.fields, dl.dictionary-members {
+    margin-left:    2em;
+}
+
+.attributes dt, .methods dt, .constants dt, .fields dt, .dictionary-members dt {
+    font-weight:    normal;
+}
+
+.attributes dt code, .methods dt code, .constants dt code, .fields dt code, .dictionary-members dt code {
+    font-weight:    bold;
+    color:  #000;
+    font-family:    monospace;
+}
+
+.attributes dt code, .fields dt code, .dictionary-members dt code {
+    background:  #ffffd2;
+}
+
+.attributes dt .idlAttrType code, .fields dt .idlFieldType code, .dictionary-members dt .idlMemberType code {
+    color:  #005a9c;
+    background:  transparent;
+    font-family:    inherit;
+    font-weight:    normal;
+    font-style: italic;
+}
+
+.methods dt code {
+    background:  #d9e6f8;
+}
+
+.constants dt code {
+    background:  #ddffd2;
+}
+
+.attributes dd, .methods dd, .constants dd, .fields dd, .dictionary-members dd {
+    margin-bottom:  1em;
+}
+
+table.parameters, table.exceptions {
+    border-spacing: 0;
+    border-collapse:    collapse;
+    margin: 0.5em 0;
+    width:  100%;
+}
+table.parameters { border-bottom:  1px solid #90b8de; }
+table.exceptions { border-bottom:  1px solid #deb890; }
+
+.parameters th, .exceptions th {
+    color:  #fff;
+    padding:    3px 5px;
+    text-align: left;
+    font-family:    initial;
+    font-weight:    normal;
+    text-shadow:    #666 1px 1px 0;
+}
+.parameters th { background: #90b8de; }
+.exceptions th { background: #deb890; }
+
+.parameters td, .exceptions td {
+    padding:    3px 10px;
+    border-top: 1px solid #ddd;
+    vertical-align: top;
+}
+
+.parameters tr:first-child td, .exceptions tr:first-child td {
+    border-top: none;
+}
+
+.parameters td.prmName, .exceptions td.excName, .exceptions td.excCodeName {
+    width:  100px;
+}
+
+.parameters td.prmType {
+    width:  120px;
+}
+
+table.exceptions table {
+    border-spacing: 0;
+    border-collapse:    collapse;
+    width:  100%;
+}
+
+/* --- TOC --- */
+.toc a, .tof a {
+    text-decoration:    none;
+}
+
+a .secno, a .figno {
+    color:  #000;
+}
+
+ul.tof, ol.tof {
+    list-style: none outside none;
+}
+
+.caption {
+    margin-top: 0.5em;
+    font-style:   italic;
+}
+
+/* --- TABLE --- */
+table.simple {
+    border-spacing: 0;
+    border-collapse:    collapse;
+    border-bottom:  3px solid #005a9c;
+}
+
+.simple th {
+    background: #005a9c;
+    color:  #fff;
+    padding:    3px 5px;
+    text-align: left;
+}
+
+.simple th[scope="row"] {
+    background: inherit;
+    color:  inherit;
+    border-top: 1px solid #ddd;
+}
+
+.simple td {
+    padding:    3px 10px;
+    border-top: 1px solid #ddd;
+}
+
+.simple tr:nth-child(even) {
+    background: #f0f6ff;
+}
+
+/* --- DL --- */
+.section dd > p:first-child {
+    margin-top: 0;
+}
+
+.section dd > p:last-child {
+    margin-bottom: 0;
+}
+
+.section dd {
+    margin-bottom:  1em;
+}
+
+.section dl.attrs dd, .section dl.eldef dd {
+    margin-bottom:  0;
+}
+</style><link href="http://www.w3.org/StyleSheets/TR/W3C-WD" rel="stylesheet"></head>
+
+<body><div class="head">
+  <p>
+    
+      <a href="http://www.w3.org/"><img src="http://www.w3.org/Icons/w3c_home" alt="W3C" height="48" width="72"></a>
+    
+  </p>
+  <h1 class="title" id="title">Media Capture and Streams</h1>
+  
+  <h2 id="w3c-working-draft-28-june-2012"><acronym title="World Wide Web Consortium">W3C</acronym> Working Draft 28 June 2012</h2>
+  <dl>
+    
+      <dt>This version:</dt>
+      <dd><a href="http://www.w3.org/TR/2012/WD-mediacapture-streams-20120628/">http://www.w3.org/TR/2012/WD-mediacapture-streams-20120628/</a></dd>
+      <dt>Latest published version:</dt>
+      <dd><a href="http://www.w3.org/TR/mediacapture-streams/">http://www.w3.org/TR/mediacapture-streams/</a></dd>
+    
+    
+      <dt>Latest editor's draft:</dt>
+      <dd><a href="http://dev.w3.org/2011/webrtc/editor/getusermedia.html">http://dev.w3.org/2011/webrtc/editor/getusermedia.html</a></dd>
+    
+    
+    
+    
+    
+      <dt>Previous version:</dt>
+      <dd><a href="http://www.w3.org/TR/2011/WD-webrtc-20111027/">http://www.w3.org/TR/2011/WD-webrtc-20111027/</a></dd>
+    
+    
+    <dt>Editors:</dt>
+    <dd><span>Daniel C. Burnett</span>, Voxeo</dd>
+<dd><span>Anant Narayanan</span>, Mozilla</dd>
+
+    
+  </dl>
+  
+  
+  
+  
+    
+      <p class="copyright">Initial Author of this Specification was Ian Hickson, Google Inc., with the following copyright statement:<br> © Copyright 2004-2011 Apple Computer, Inc., Mozilla Foundation, and Opera Software ASA. You are granted a license to use, reproduce and create derivative works of this document.</p> <p class="copyright">All subsequent changes since 26 July 2011 done by the <acronym title="World Wide Web Consortium">W3C</acronym> WebRTC Working Group and Device APIs Working Group are under the following <a href="http://www.w3.org/Consortium/Legal/ipr-notice#Copyright">Copyright</a>:<br>© 2011-2012 <a href="http://www.w3.org/"><acronym title="World Wide Web Consortium">W3C</acronym></a><sup>®</sup> (<a href="http://www.csail.mit.edu/"><acronym title="Massachusetts Institute of Technology">MIT</acronym></a>, <a href="http://www.ercim.eu/"><acronym title="European Research Consortium for Informatics and Mathematics">ERCIM</acronym></a>, <a href="http://www.keio.ac.jp/">Keio</a>), All Rights Reserved. <a href="http://www.w3.org/Consortium/Legal/copyright-documents">Document use</a>  rules apply.</p> <p class="copyright">For the entire publication on the <acronym title="World Wide Web Consortium">W3C</acronym> site the <a href="http://www.w3.org/Consortium/Legal/ipr-notice#Legal_Disclaimer">liability</a> and <a href="http://www.w3.org/Consortium/Legal/ipr-notice#W3C_Trademarks">trademark</a> rules apply.</p>
+    
+  
+  <hr>
+</div>
+  <div class="introductory section" id="abstract"><h2>Abstract</h2>
+    <p>This document defines a set of JavaScript APIs that allow local media,
+    including audio and video, to be requested from a platform.</p>
+  </div><div id="sotd" class="introductory section"><h2>Status of This Document</h2>
+  
+    
+      
+        <p>
+          <em>This section describes the status of this document at the time of its publication. Other
+          documents may supersede this document. A list of current <acronym title="World Wide Web Consortium">W3C</acronym> publications and the latest revision
+          of this technical report can be found in the <a href="http://www.w3.org/TR/"><acronym title="World Wide Web Consortium">W3C</acronym> technical reports
+          index</a> at http://www.w3.org/TR/.</em>
+        </p>
+        
+    <p>This document is not complete. It is subject to major changes and, while
+    early experimentations are encouraged, it is therefore not intended for
+    implementation. The API is based on preliminary work done in the WHATWG.</p>
+
+<p>
+This document is a regular Working Draft, published jointly by the <a href="http://www.w3.org/2011/04/webrtc/">Web
+Real-Time Communication</a> and <a href="http://www.w3.org/2009/dap/">Device APIs</a> Working Groups as Working Draft. 
+The content of this document had already been published as part of the 
+<a href="http://www.w3.org/TR/2011/WD-webrtc-20111027/">WebRTC 1.0: Real-time Communication Between Browsers</a>, but is now 
+published as a separate document.</p>
+
+
+    <p>The Media Capture Task Force expects this specification to evolve
+    significantly based on:</p>
+
+    <ul>
+      <li>Privacy issues that arise when exposing local capabilities and local
+      streams.</li>
+
+      <li>Technical discussions within the task force.</li>
+
+      <li>Experience gained through early experimentations.</li>
+
+      <li>Feedback received from other groups and individuals.</li>
+    </ul>
+  
+        <p>This document is intended to become a <acronym title="World Wide Web Consortium">W3C</acronym> Recommendation.
+          
+          If you wish to make comments regarding this document, please send them to 
+          <a href="mailto:public-media-capture@w3.org">public-media-capture@w3.org</a> 
+          (<a href="mailto:public-media-capture-request@w3.org?subject=subscribe">subscribe</a>,
+          <a href="http://lists.w3.org/Archives/Public/public-media-capture/">archives</a>).
+          
+          
+          All feedback is welcome.
+        </p>
+        
+          <p>
+            Publication as a Working Draft does not imply endorsement by the <acronym title="World Wide Web Consortium">W3C</acronym> Membership.
+            This is a draft document and may be updated, replaced or obsoleted by other documents at 
+            any time. It is inappropriate to cite this document as other than work in progress.
+          </p>
+        
+        
+<p>This document was produced by groups operating under the <a href="http://www.w3.org/Consortium/Patent-Policy-20040205/">5 February
+2004 W3C Patent Policy</a>. W3C maintains a <a href="http://www.w3.org/2004/01/pp-impl/47318/status" rel="disclosure">public list of any patent
+disclosures for the WebRTC Working Group</a> and a <a href="http://www.w3.org/2004/01/pp-impl/43696/status">public list of any patent
+disclosures for the Device APIs Working Group</a> made in connection with
+the deliverables of the groups; those pages also include instructions for
+disclosing a patent. An individual who has actual knowledge of a patent
+which the individual believes contains <a href="http://www.w3.org/Consortium/Patent-Policy-20040205/#def-essential">Essential Claim(s)</a> must disclose
+the information in accordance with <a href="http://www.w3.org/Consortium/Patent-Policy-20040205/#sec-Disclosure">section 6 of the W3C Patent Policy.</a></p>
+               
+</div>
+      
+    
+  
+<div class="section" id="toc"><h2 class="introductory">Table of Contents</h2><ul class="toc"><li class="tocline"><a class="tocxref" href="#intro"><span class="secno">1. </span>Introduction</a></li><li class="tocline"><a class="tocxref" href="#stream-api"><span class="secno">2. </span>Stream API</a><ul class="toc"><li class="tocline"><a class="tocxref" href="#introduction"><span class="secno">2.1 </span>Introduction</a></li><li class="tocline"><a class="tocxref" href="#mediastream"><span class="secno">2.2 </span>MediaStream</a><ul class="toc"><li class="tocline"><a class="tocxref" href="#attributes"><span class="secno">2.2.1 </span>Attributes</a></li></ul></li><li class="tocline"><a class="tocxref" href="#localmediastream"><span class="secno">2.3 </span>LocalMediaStream</a><ul class="toc"><li class="tocline"><a class="tocxref" href="#methods"><span class="secno">2.3.1 </span>Methods</a></li></ul></li><li class="tocline"><a class="tocxref" href="#mediastreamtrack"><span class="secno">2.4 </span>MediaStreamTrack</a><ul class="toc"><li class="tocline"><a class="tocxref" href="#attributes-1"><span class="secno">2.4.1 </span>Attributes</a></li><li class="tocline"><a class="tocxref" href="#constants"><span class="secno">2.4.2 </span>Constants</a></li></ul></li><li class="tocline"><a class="tocxref" href="#url"><span class="secno">2.5 </span>URL</a><ul class="toc"><li class="tocline"><a class="tocxref" href="#methods-1"><span class="secno">2.5.1 </span>Methods</a></li></ul></li><li class="tocline"><a class="tocxref" href="#mediastreamtracklist"><span class="secno">2.6 </span>MediaStreamTrackList</a><ul class="toc"><li class="tocline"><a class="tocxref" href="#attributes-2"><span class="secno">2.6.1 </span>Attributes</a></li><li class="tocline"><a class="tocxref" href="#methods-2"><span class="secno">2.6.2 </span>Methods</a></li></ul></li><li class="tocline"><a class="tocxref" href="#mediastreams-as-media-elements"><span class="secno">2.7 </span>MediaStreams as Media Elements</a></li><li class="tocline"><a class="tocxref" href="#event-summary"><span class="secno">2.8 </span>Event summary</a></li></ul></li><li class="tocline"><a class="tocxref" href="#local-content"><span class="secno">3. </span>Obtaining local multimedia content</a><ul class="toc"><li class="tocline"><a class="tocxref" href="#navigatorusermedia"><span class="secno">3.1 </span>NavigatorUserMedia</a><ul class="toc"><li class="tocline"><a class="tocxref" href="#methods-3"><span class="secno">3.1.1 </span>Methods</a></li></ul></li><li class="tocline"><a class="tocxref" href="#mediastreamconstraints"><span class="secno">3.2 </span>MediaStreamConstraints</a><ul class="toc"><li class="tocline"><a class="tocxref" href="#dictionary-mediastreamconstraints-members"><span class="secno">3.2.1 </span>Dictionary <span class="idlType formerLink idlType"><code>MediaStreamConstraints</code></span> Members</a></li><li class="tocline"><a class="tocxref" href="#dictionary-mediatrackconstraints-members"><span class="secno">3.2.2 </span>Dictionary <span class="idlType formerLink idlType"><code>MediaTrackConstraints</code></span> Members</a></li></ul></li><li class="tocline"><a class="tocxref" href="#navigatorusermediasuccesscallback"><span class="secno">3.3 </span>NavigatorUserMediaSuccessCallback</a><ul class="toc"><li class="tocline"><a class="tocxref" href="#callback-navigatorusermediasuccesscallback-parameters"><span class="secno">3.3.1 </span>Callback <span class="idlType formerLink idlType"><code>NavigatorUserMediaSuccessCallback</code></span> Parameters</a></li></ul></li><li class="tocline"><a class="tocxref" href="#navigatorusermediaerror-and-navigatorusermediaerrorcallback"><span class="secno">3.4 </span>NavigatorUserMediaError and NavigatorUserMediaErrorCallback</a><ul class="toc"><li class="tocline"><a class="tocxref" href="#attributes-3"><span class="secno">3.4.1 </span>Attributes</a></li><li class="tocline"><a class="tocxref" href="#constants-1"><span class="secno">3.4.2 </span>Constants</a></li><li class="tocline"><a class="tocxref" href="#callback-navigatorusermediaerrorcallback-parameters"><span class="secno">3.4.3 </span>Callback <span class="idlType formerLink idlType"><code>NavigatorUserMediaErrorCallback</code></span> Parameters</a></li></ul></li><li class="tocline"><a class="tocxref" href="#implementation-suggestions"><span class="secno">3.5 </span>Implementation Suggestions</a></li></ul></li><li class="tocline"><a class="tocxref" href="#examples"><span class="secno">4. </span>Examples</a></li><li class="tocline"><a class="tocxref" href="#acknowledgements"><span class="secno">A. </span>Acknowledgements</a></li><li class="tocline"><a class="tocxref" href="#references"><span class="secno">B. </span>References</a><ul class="toc"><li class="tocline"><a class="tocxref" href="#normative-references"><span class="secno">B.1 </span>Normative references</a></li><li class="tocline"><a class="tocxref" href="#informative-references"><span class="secno">B.2 </span>Informative references</a></li></ul></li></ul></div>
+
+  
+
+  <div class="informative section" id="intro">
+    <!--OddPage--><h2><span class="secno">1. </span>Introduction</h2><p><em>This section is non-normative.</em></p>
+
+    <p>Access to multimedia streams (video, audio, or both) from local devices
+    (video cameras, microphones, Web cams) can have a number of uses, such as
+    real-time communication, recording, and surveillance.</p>
+
+    <p>This document defines the APIs used to get access to local devices that
+    can generate multimedia stream data. This document also defines the stream
+    API by which JavaScript is able to manipulate the stream data or otherwise
+    process it.</p>
+  </div>
+
+  <div class="section" id="stream-api">
+    <!--OddPage--><h2><span class="secno">2. </span>Stream API</h2>
+
+    <div class="section" id="introduction">
+      <h3><span class="secno">2.1 </span>Introduction</h3>
+
+      <p>The <code><a class="idlType" href="#idl-def-MediaStream"><code>MediaStream</code></a></code> interface is used to represent
+      streams of media data, typically (but not necessarily) of audio and/or
+      video content, e.g. from a local camera. The data from a
+      <code><a class="idlType" href="#idl-def-MediaStream"><code>MediaStream</code></a></code> object does not necessarily have a
+      canonical binary form; for example, it could just be "the video currently
+      coming from the user’s video camera". This allows user agents to
+      manipulate media streams in whatever fashion is most suitable on the
+      user’s platform.</p>
+
+      <p>Each <code><a class="idlType" href="#idl-def-MediaStream"><code>MediaStream</code></a></code> object can contain zero or more
+      tracks, in particular audio and video tracks. All tracks in a MediaStream
+      are intended to be synchronized when rendered. Different MediaStreams do
+      not need to be synchronized.</p>
+
+      <p>Each track in a MediaStream object has a corresponding
+      <code><a class="idlType" href="#idl-def-MediaStreamTrack"><code>MediaStreamTrack</code></a></code> object.</p>
+
+      <p>A <code><a class="idlType" href="#idl-def-MediaStreamTrack"><code>MediaStreamTrack</code></a></code> represents content comprising
+      one or more channels, where the channels have a defined well known
+      relationship to each other (such as a stereo or 5.1 audio signal).</p>
+
+      <p>A channel is the smallest unit considered in this API
+      specification.</p>
+
+      <p>A <code><a class="idlType" href="#idl-def-MediaStream"><code>MediaStream</code></a></code> object has an input and an output.
+      The input depends on how the object was created: a
+      <code><a class="idlType" href="#idl-def-LocalMediaStream"><code>LocalMediaStream</code></a></code> object generated by a <code><a href="#dom-navigator-getusermedia">getUserMedia()</a></code> call (which is
+      described later in this document), for instance, might take its input
+      from the user’s local camera. The output of the object controls how the
+      object is used, e.g., what is saved if the object is written to a file or
+      what is displayed if the object is used in a <code>video</code>
+      element.</p>
+
+      <p>Each track in a <code><a class="idlType" href="#idl-def-MediaStream"><code>MediaStream</code></a></code> object can be
+      disabled, meaning that it is muted in the object’s output. All tracks are
+      initially enabled.</p>
+
+      <p>A <code><a class="idlType" href="#idl-def-MediaStream"><code>MediaStream</code></a></code> can be <a class="internalDFN" href="#dfn-finished">finished</a>, indicating
+      that its inputs have forever stopped providing data.</p>
+
+      <p>The output of a <code><a class="idlType" href="#idl-def-MediaStream"><code>MediaStream</code></a></code> object <em title="must" class="rfc2119">must</em> correspond
+      to the tracks in its input. Muted audio tracks <em title="must" class="rfc2119">must</em> be replaced with
+      silence. Muted video tracks <em title="must" class="rfc2119">must</em> be replaced with blackness.</p>
+
+      <p>A new <code><a class="idlType" href="#idl-def-MediaStream"><code>MediaStream</code></a></code> object can be created from
+      existing <code><a class="idlType" href="#idl-def-MediaStreamTrack"><code>MediaStreamTrack</code></a></code> objects using the
+      <code><a href="#dom-mediastream">MediaStream()</a></code> constructor.
+      The constructor takes two lists of <code><a class="idlType" href="#idl-def-MediaStreamTrack"><code>MediaStreamTrack</code></a></code>
+      objects as arguments: one for audio tracks and one for video tracks. The
+      lists can either be the track lists of another stream, subsets of such
+      lists, or compositions of <code><a class="idlType" href="#idl-def-MediaStreamTrack"><code>MediaStreamTrack</code></a></code> objects
+      from different <code><a class="idlType" href="#idl-def-MediaStream"><code>MediaStream</code></a></code> objects.</p>
+
+      <p><img alt="A MediaStream" src="images/media-stream.png" ></p>
+
+      <p>The ability to duplicate a <code><a class="idlType" href="#idl-def-MediaStream"><code>MediaStream</code></a></code>, i.e.
+      create a new <code><a class="idlType" href="#idl-def-MediaStream"><code>MediaStream</code></a></code> object from the track lists
+      of an existing stream, allows for greater control since separate
+      <code><a class="idlType" href="#idl-def-MediaStream"><code>MediaStream</code></a></code> instances can be manipulated and
+      <a class="internalDFN" href="#dfn-consumer" title="consumer">consumed</a> individually.</p>
+
+      <p>The <code><a class="idlType" href="#idl-def-LocalMediaStream"><code>LocalMediaStream</code></a></code> interface is used when the
+      user agent is generating the stream’s data (e.g. from a camera or
+      streaming it from a local video file).</p>
+
+      <p>When a <code><a class="idlType" href="#idl-def-LocalMediaStream"><code>LocalMediaStream</code></a></code> object is being generated
+      from a local file (as opposed to a live audio/video source), the user
+      agent <em title="should" class="rfc2119">should</em> stream the data from the file in real time, not all at once.
+      The <code>MediaStream</code> object is also used in contexts outside
+      <code>getUserMedia</code>, such as [<cite><a href="#bib-WEBRTC10" rel="biblioentry" class="bibref">WEBRTC10</a></cite>]. In both cases, ensuring
+      a realtime stream reduces the ease with which pages can distinguish live
+      video from pre-recorded video, which can help protect the user’s
+      privacy.</p>
+    </div>
+
+    <div class="section" id="mediastream">
+      <h3><span class="secno">2.2 </span>MediaStream</h3>
+
+      <p>The <dfn id="dom-mediastream"><code>MediaStream()</code></dfn>
+      constructor takes two arguments. The arguments are two lists with
+      <code><a class="idlType" href="#idl-def-MediaStreamTrack"><code>MediaStreamTrack</code></a></code> objects which will be used to
+      construct the audio and video track lists of the new
+      <code><a class="idlType" href="#idl-def-MediaStream"><code>MediaStream</code></a></code> object. When the constructor is invoked,
+      the UA must run the following steps:</p>
+
+      <ol>
+        <li>
+          <p>Let <var>audioTracks</var> be the constructor’s first
+          argument.</p>
+        </li>
+
+        <li>
+          <p>Let <var>videoTracks</var> be the constructor’s second
+          argument.</p>
+        </li>
+
+        <li>
+          <p>Let <var>stream</var> be a newly constructed
+          <code><a class="idlType" href="#idl-def-MediaStream"><code>MediaStream</code></a></code> object.</p>
+        </li>
+
+        <li>
+          <p>Set <var>stream’s</var> label attribute to a newly generated
+          value.</p>
+        </li>
+
+        <li>
+          <p>If <var>audioTracks</var> is not null, then run the following sub
+          steps for each element <var>track</var> in
+          <var>audioTracks</var>:</p>
+
+          <ol>
+            <li>
+              <p>If <var>track</var> is of any other kind than
+              "<code>audio</code>", then throw a <code>SyntaxError</code>
+              exception.</p>
+            </li>
+
+            <li>
+              <p>If <var>track</var> has the same underlying source as another
+              element in <var>stream’s</var> audio track list, then abort these
+              steps.</p>
+            </li>
+
+            <li>
+              <p>Add <var>track</var> to <var>stream’s</var> audio track
+              list.</p>
+            </li>
+          </ol>
+        </li>
+
+        <li>
+          <p>If <var>videoTracks</var> is not null, then run the following sub
+          steps for each element <var>track</var> in
+          <var>videoTracks</var>:</p>
+
+          <ol>
+            <li>
+              <p>If <var>track</var> is of any other kind than
+              "<code>video</code>", then throw a <code>SyntaxError</code>
+              exception.</p>
+            </li>
+
+            <li>
+              <p>If <var>track</var> has the same underlying source as another
+              element in <var>stream’s</var> video track list, then abort these
+              steps.</p>
+            </li>
+
+            <li>
+              <p>Add <var>track</var> to <var>stream’s</var> video track
+              list.</p>
+            </li>
+          </ol>
+        </li>
+      </ol>
+
+      <p>A <code><a class="idlType" href="#idl-def-MediaStream"><code>MediaStream</code></a></code> can have multiple audio and video
+      sources (e.g. because the user has multiple microphones, or because the
+      real source of the stream is a media resource with many media tracks).
+      The stream represented by a <code><a class="idlType" href="#idl-def-MediaStream"><code>MediaStream</code></a></code> thus has zero
+      or more tracks.</p>
+
+      <p>The tracks of a <code><a class="idlType" href="#idl-def-MediaStream"><code>MediaStream</code></a></code> are stored in two
+      track lists represented by <code><a class="idlType" href="#idl-def-MediaStreamTrackList"><code>MediaStreamTrackList</code></a></code>
+      objects: one for audio tracks and one for video tracks. The two track
+      lists <em title="must" class="rfc2119">must</em> contain the <code><a class="idlType" href="#idl-def-MediaStreamTrack"><code>MediaStreamTrack</code></a></code> objects that
+      correspond to the tracks of the stream. The relative order of all tracks
+      in a user agent <em title="must" class="rfc2119">must</em> be stable. Tracks that come from a media resource
+      whose format defines an order <em title="must" class="rfc2119">must</em> be in the order defined by the format;
+      tracks that come from a media resource whose format does not define an
+      order <em title="must" class="rfc2119">must</em> be in the relative order in which the tracks are declared in
+      that media resource. Within these constraints, the order is user agent
+      defined.</p>
+
+      <p>An object that reads data from the output of a
+      <code><a class="idlType" href="#idl-def-MediaStream"><code>MediaStream</code></a></code> is referred to as a
+      <code><a class="idlType" href="#idl-def-MediaStream"><code>MediaStream</code></a></code> <dfn id="dfn-consumer">consumer</dfn>. The list of
+      <code><a class="idlType" href="#idl-def-MediaStream"><code>MediaStream</code></a></code> consumers currently includes the media
+      elements and the <code><a>PeerConnection</a></code> API specified in
+      [<cite><a href="#bib-WEBRTC10" rel="biblioentry" class="bibref">WEBRTC10</a></cite>].</p>
+
+      <div class="note"><div class="note-title"><span>Note</span></div><p class=""><code><a class="idlType" href="#idl-def-MediaStream"><code>MediaStream</code></a></code> consumers must be able to
+      handle tracks being added and removed. This behavior is specified per
+      consumer.</p></div>
+
+      <p>A <code><a class="idlType" href="#idl-def-MediaStream"><code>MediaStream</code></a></code> object is said to be
+      <dfn id="dfn-finished">finished</dfn> when all tracks belonging to the stream have
+      <a class="internalDFN" href="#dfn-ended">ended</a>. When this happens for any reason other than the
+      <code><a href="#dom-mediastream-stop">stop()</a></code> method being
+      invoked, the user agent <em title="must" class="rfc2119">must</em> queue a task that runs the following
+      steps:</p>
+
+      <ol>
+        <li>
+          <p>If the object’s <code><a href="#dom-mediastream-ended">ended</a></code> attribute has the value
+          true already, then abort these steps. (The <code><a href="#dom-mediastream-stop">stop()</a></code> method was probably called
+          just before the stream stopped for other reasons, e.g. the user
+          clicked an in-page stop button and then the user agent provided stop
+          button.)</p>
+        </li>
+
+        <li>
+          <p>Set the object’s <code><a href="#dom-mediastream-ended">ended</a></code> attribute to true.</p>
+        </li>
+
+        <li>
+          <p>Fire a simple event named <code title="event-MediaStream-ended"><a href="#event-mediastream-ended">ended</a></code> at the object.</p>
+        </li>
+      </ol>
+
+      <p>If the end of the stream was reached due to a user request, the task
+      source for this <span title="concept-task">task</span> is the user
+      interaction task source. Otherwise the task source for this <span title="concept-task">task</span> is the networking task source.</p>
+
+      <pre class="idl"><span class="idlInterface" id="idl-def-MediaStream">[<span class="extAttr">Constructor (MediaStreamTrackList? audioTracks, MediaStreamTrackList? videoTracks)</span>]
+interface <span class="idlInterfaceID">MediaStream</span> {
+<span class="idlAttribute">    readonly attribute <span class="idlAttrType"><a>DOMString</a></span>            <span class="idlAttrName"><a href="#widl-MediaStream-label">label</a></span>;</span>
+<span class="idlAttribute">    readonly attribute <span class="idlAttrType"><a class="idlType" href="#idl-def-MediaStreamTrackList"><code>MediaStreamTrackList</code></a></span> <span class="idlAttrName"><a href="#widl-MediaStream-audioTracks">audioTracks</a></span>;</span>
+<span class="idlAttribute">    readonly attribute <span class="idlAttrType"><a class="idlType" href="#idl-def-MediaStreamTrackList"><code>MediaStreamTrackList</code></a></span> <span class="idlAttrName"><a href="#widl-MediaStream-videoTracks">videoTracks</a></span>;</span>
+<span class="idlAttribute">             attribute <span class="idlAttrType"><a>boolean</a></span>              <span class="idlAttrName"><a href="#widl-MediaStream-ended">ended</a></span>;</span>
+<span class="idlAttribute">             attribute <span class="idlAttrType"><a>Function</a>?</span>            <span class="idlAttrName"><a href="#widl-MediaStream-onended">onended</a></span>;</span>
+};</span>
+</pre><div class="section" id="attributes"><h4><span class="secno">2.2.1 </span>Attributes</h4><dl class="attributes"><dt id="widl-MediaStream-audioTracks"><code>audioTracks</code> of type <span class="idlAttrType"><a class="idlType" href="#idl-def-MediaStreamTrackList"><code>MediaStreamTrackList</code></a></span>, readonly</dt><dd>
+          <p>Returns a <code><a class="idlType" href="#idl-def-MediaStreamTrackList"><code>MediaStreamTrackList</code></a></code> object
+          representing the audio tracks that can be enabled and disabled.</p>
+
+          <p>The <dfn id="dom-mediastream-audiotracks"><code>audioTracks</code></dfn>
+          attribute <em title="must" class="rfc2119">must</em> return an <span title="array host objects">array host
+          object</span> for objects of type
+          <code><a class="idlType" href="#idl-def-MediaStreamTrack"><code>MediaStreamTrack</code></a></code> that is <em>fixed length</em>
+          and <em>read only</em>. The same object <em title="must" class="rfc2119">must</em> be returned each time
+          the attribute is accessed.</p>
+        </dd><dt id="widl-MediaStream-ended"><code>ended</code> of type <span class="idlAttrType"><a>boolean</a></span></dt><dd>
+          <p>The <dfn id="dom-mediastream-ended"><code>MediaStream.ended</code></dfn>
+          attribute <em title="must" class="rfc2119">must</em> return true if the <code><a class="idlType" href="#idl-def-MediaStream"><code>MediaStream</code></a></code> has
+          <a class="internalDFN" href="#dfn-finished">finished</a>, and false otherwise.</p>
+
+          <p>When a <code><a class="idlType" href="#idl-def-MediaStream"><code>MediaStream</code></a></code> object is created, its
+          <code><a href="#dom-mediastream-ended">ended</a></code> attribute
+          <em title="must" class="rfc2119">must</em> be set to false, unless it is being created using the
+          <code><a href="#dom-mediastream">MediaStream()</a></code> constructor
+          whose arguments are lists of <code><a class="idlType" href="#idl-def-MediaStreamTrack"><code>MediaStreamTrack</code></a></code>
+          objects that are all <a class="internalDFN" href="#dfn-ended">ended</a>, in which case the
+          <code><a class="idlType" href="#idl-def-MediaStream"><code>MediaStream</code></a></code> object <em title="must" class="rfc2119">must</em> be created with its
+          <code><a href="#dom-mediastream-ended">ended</a></code> attribute set
+          to true.</p>
+        </dd><dt id="widl-MediaStream-label"><code>label</code> of type <span class="idlAttrType"><a>DOMString</a></span>, readonly</dt><dd>
+          <p>When a <code><a class="idlType" href="#idl-def-LocalMediaStream"><code>LocalMediaStream</code></a></code> object is created, the
+          user agent <em title="must" class="rfc2119">must</em> generate a globally unique identifier string, and
+          <em title="must" class="rfc2119">must</em> initialize the object’s <code><a href="#dom-mediastream-label">label</a></code> attribute to that string.
+          Such strings <em title="must" class="rfc2119">must</em> only use characters in the ranges U+0021, U+0023 to
+          U+0027, U+002A to U+002B, U+002D to U+002E, U+0030 to U+0039, U+0041
+          to U+005A, U+005E to U+007E, and <em title="must" class="rfc2119">must</em> be 36 characters long.</p>
+          <!-- UUIDs have 36 characters
+      including hyphens; the ranges above comes from RFC4574 (the a=label:
+      thing in SDP) -->
+          <!-- described below -->
+
+          <p>When a <code><a class="idlType" href="#idl-def-MediaStream"><code>MediaStream</code></a></code> is created from another
+          using the <code><a href="#dom-mediastream">MediaStream()</a></code>
+          constructor, the <code title="dom-MediaStream-label"><a href="#dom-mediastream-label">label</a></code> attribute is initialized to
+          a newly generated value.</p><!-- described above -->
+
+          <p>The <dfn id="dom-mediastream-label"><code>label</code></dfn>
+          attribute <em title="must" class="rfc2119">must</em> return the value to which it was initialized when the
+          object was created.</p>
+        </dd><dt id="widl-MediaStream-onended"><code>onended</code> of type <span class="idlAttrType"><a>Function</a></span>, nullable</dt><dd>This event handler, of type <code><a href="#event-mediastream-ended">ended</a></code>, <em title="must" class="rfc2119">must</em> be supported by all
+        objects implementing the <code><a class="idlType" href="#idl-def-MediaStream"><code>MediaStream</code></a></code>
+        interface.</dd><dt id="widl-MediaStream-videoTracks"><code>videoTracks</code> of type <span class="idlAttrType"><a class="idlType" href="#idl-def-MediaStreamTrackList"><code>MediaStreamTrackList</code></a></span>, readonly</dt><dd>
+          <p>Returns a <code><a class="idlType" href="#idl-def-MediaStreamTrackList"><code>MediaStreamTrackList</code></a></code> object
+          representing the video tracks that can be enabled and disabled.</p>
+
+          <p>The <dfn id="dom-mediastream-videotracks"><code>videoTracks</code></dfn>
+          attribute <em title="must" class="rfc2119">must</em> return an <span title="array host objects">array host
+          object</span> for objects of type
+          <code><a class="idlType" href="#idl-def-MediaStreamTrack"><code>MediaStreamTrack</code></a></code> that is <em>fixed length</em>
+          and <em>read only</em>. The same object <em title="must" class="rfc2119">must</em> be returned each time
+          the attribute is accessed.</p>
+        </dd></dl></div>
+
+      <pre class="idl"><span class="idlImplements"><a class="idlType" href="#idl-def-MediaStream"><code>MediaStream</code></a> implements <a>EventTarget</a>;</span></pre><div class="idlImplementsDesc"><p>All instances of the <code><a class="idlType" href="#idl-def-MediaStream"><code>MediaStream</code></a></code> type are defined to also implement the <a>EventTarget</a> interface.</p></div>
+    </div>
+
+    <div class="section" id="localmediastream">
+      <h3><span class="secno">2.3 </span>LocalMediaStream</h3>
+
+      <p>Before the web application can access the user's media input devices
+      it must let <code><a href="#dom-navigator-getusermedia">getUserMedia()</a></code> create a
+      <code><a class="idlType" href="#idl-def-LocalMediaStream"><code>LocalMediaStream</code></a></code> . Once the application is done
+      using, e.g., a webcam and a microphone, it may revoke its own access by
+      calling <code><a href="#dom-mediastream-stop">stop()</a></code> on the
+      <code><a class="idlType" href="#idl-def-LocalMediaStream"><code>LocalMediaStream</code></a></code>. 
+      <!--If the web application no longer has access to any media input devices, any
+ "on air" indicators in the browser UI MUST be turned off.--></p>
+
+      <p>A web application may, once it has access to a
+      <code><a class="idlType" href="#idl-def-LocalMediaStream"><code>LocalMediaStream</code></a></code> , use the <code><a href="#dom-mediastream">MediaStream()</a></code> constructor to construct
+      additional <code><a class="idlType" href="#idl-def-MediaStream"><code>MediaStream</code></a></code> objects. Since a derived
+      <code><a class="idlType" href="#idl-def-MediaStream"><code>MediaStream</code></a></code> object is created from the tracks of an
+      existing stream, it cannot use any media input devices that have not been
+      approved by the user.</p>
+
+      <pre class="idl"><span class="idlInterface" id="idl-def-LocalMediaStream">interface <span class="idlInterfaceID">LocalMediaStream</span> : <span class="idlSuperclass"><a class="idlType" href="#idl-def-MediaStream"><code>MediaStream</code></a></span> {
+<span class="idlMethod">    <span class="idlMethType"><a>void</a></span> <span class="idlMethName"><a href="#widl-LocalMediaStream-stop-void">stop</a></span> ();</span>
+};</span>
+</pre><div class="section" id="methods"><h4><span class="secno">2.3.1 </span>Methods</h4><dl class="methods"><dt id="widl-LocalMediaStream-stop-void"><code>stop</code></dt><dd>
+          <p>When a <code><a class="idlType" href="#idl-def-LocalMediaStream"><code>LocalMediaStream</code></a></code> object’s <dfn id="dom-mediastream-stop"><code>stop()</code></dfn> method is invoked,
+          the user agent <em title="must" class="rfc2119">must</em> queue a task that runs the following steps on
+          every track:</p>
+
+          <ol>
+            <li>
+              <p>Let <var>track</var> be the current
+              <code><a class="idlType" href="#idl-def-MediaStreamTrack"><code>MediaStreamTrack</code></a></code> object.</p>
+            </li>
+
+            <li>
+              <p><a class="internalDFN" href="#dfn-ended" title="ended">End</a> <var>track</var>. The track starts
+              outputting only silence and/or blackness, as appropriate.</p>
+            </li>
+
+            <li>
+              <p>Dereference <var>track’s</var> underlying media source.</p>
+            </li>
+
+            <li>
+              <p>If the reference count of <var>track’s</var> underlying media
+              source is greater than zero, then abort these steps.</p>
+            </li>
+
+            <li>
+              <p>Permanently stop the generation of data for <var>track’s</var>
+              source. If the data is being generated from a live source (e.g.,
+              a microphone or camera), then the user agent <em title="should" class="rfc2119">should</em> remove any
+              active "on-air" indicator for that source. If the data is being
+              generated from a prerecorded source (e.g. a video file), any
+              remaining content in the file is ignored.</p>
+            </li>
+          </ol>
+
+          <p>The task source for the <span title="concept-task">tasks</span>
+          queued for the <code><a href="#dom-mediastream-stop">stop()</a></code> method is the DOM
+          manipulation task source.</p>
+        <div><em>No parameters.</em></div><div><em>Return type: </em><code><a>void</a></code></div></dd></dl></div>
+    </div>
+
+    <div class="section" id="mediastreamtrack">
+      <h3><span class="secno">2.4 </span>MediaStreamTrack</h3>
+
+      <p>A <code><a class="idlType" href="#idl-def-MediaStreamTrack"><code>MediaStreamTrack</code></a></code> object represents a media
+      source in the user agent. Several <code><a class="idlType" href="#idl-def-MediaStreamTrack"><code>MediaStreamTrack</code></a></code>
+      objects can represent the same media source, e.g., when the user chooses
+      the same camera in the UI shown by two consecutive calls to
+      <code><a href="#dom-navigator-getusermedia">getUserMedia()</a></code>
+      .</p>
+
+      <p>A <code><a class="idlType" href="#idl-def-MediaStreamTrack"><code>MediaStreamTrack</code></a></code> object can reference its media
+      source in two ways, either with a strong or a weak reference, depending
+      on how the track was created. For example, a track in a
+      <code><a class="idlType" href="#idl-def-MediaStream"><code>MediaStream</code></a></code>, derived from a
+      <code><a class="idlType" href="#idl-def-LocalMediaStream"><code>LocalMediaStream</code></a></code> with the <code><a href="#dom-mediastream">MediaStream()</a></code> constructor, has a weak
+      reference to a local media source, while a track in a
+      <code><a class="idlType" href="#idl-def-LocalMediaStream"><code>LocalMediaStream</code></a></code> has a strong reference. This means
+      that a track in a <code><a class="idlType" href="#idl-def-MediaStream"><code>MediaStream</code></a></code>, derived from a
+      <code><a class="idlType" href="#idl-def-LocalMediaStream"><code>LocalMediaStream</code></a></code>, will end if there is no
+      non-<a class="internalDFN" href="#dfn-ended">ended</a> track in a <code><a class="idlType" href="#idl-def-LocalMediaStream"><code>LocalMediaStream</code></a></code> which
+      references the same local media source.</p>
+
+      <div class="note"><div class="note-title"><span>Note</span></div><p class="">The concept with strong and weak references to media
+      sources allows the web application to derive new
+      <code><a class="idlType" href="#idl-def-MediaStream"><code>MediaStream</code></a></code> objects from
+      <code><a class="idlType" href="#idl-def-LocalMediaStream"><code>LocalMediaStream</code></a></code> objects (created via <code><a href="#dom-navigator-getusermedia">getUserMedia()</a></code>) and still be
+      able to revoke all given permissions with <code><a href="#dom-mediastream-stop">LocalMediaStream.stop()</a></code>.</p></div>
+
+      <p>A <code><a class="idlType" href="#idl-def-MediaStreamTrack"><code>MediaStreamTrack</code></a></code> object is said to <em>end</em>
+      when the user agent learns that no more data will ever be forthcoming for
+      this track.</p>
+
+      <p>When a <code><a class="idlType" href="#idl-def-MediaStreamTrack"><code>MediaStreamTrack</code></a></code> object ends for any reason
+      (e.g., because the user rescinds the permission for the page to use the
+      local camera, or because the data comes from a finite file and the file’s
+      end has been reached and the user has not requested that it be looped, or
+      because the UA has instructed the track to end for any reason, or because
+      the reference count of the track’s underlying media source has reached
+      zero, it is said to be <dfn id="dfn-ended">ended</dfn>. When track instance
+      <var>track</var> ends for any reason other than the <code><a href="#dom-mediastream-stop">stop()</a></code> method being invoked on the
+      <code><a class="idlType" href="#idl-def-LocalMediaStream"><code>LocalMediaStream</code></a></code> object that represents
+      <var>track</var>, the user agent <em title="must" class="rfc2119">must</em> queue a task that runs the
+      following steps:</p>
+
+      <ol>
+        <li>
+          <p>If the track’s <code><a href="#dom-mediastreamtrack-readystate">readyState</a></code> attribute
+          has the value <code><a href="#widl-MediaStreamTrack-ENDED">ENDED</a></code> (2) already, then
+          abort these steps.</p>
+        </li>
+
+        <li>
+          <p>Set <var>track’s</var> <code><a href="#dom-mediastreamtrack-readystate">readyState</a></code> attribute to
+          <code><a href="#widl-MediaStreamTrack-ENDED">ENDED</a></code>
+          (2).</p>
+        </li>
+
+        <li>
+          <p>Fire a simple event named <code><a href="#event-mediastreamtrack-ended">ended</a></code> at the object.</p>
+        </li>
+      </ol>
+
+      <p>If the end of the stream was reached due to a user request, the event
+      source for this event is the user interaction event source.</p>
+
+      <pre class="idl"><span class="idlInterface" id="idl-def-MediaStreamTrack">interface <span class="idlInterfaceID">MediaStreamTrack</span> {
+<span class="idlAttribute">    readonly attribute <span class="idlAttrType"><a>DOMString</a></span>      <span class="idlAttrName"><a href="#widl-MediaStreamTrack-kind">kind</a></span>;</span>
+<span class="idlAttribute">    readonly attribute <span class="idlAttrType"><a>DOMString</a></span>      <span class="idlAttrName"><a href="#widl-MediaStreamTrack-label">label</a></span>;</span>
+<span class="idlAttribute">             attribute <span class="idlAttrType"><a>boolean</a></span>        <span class="idlAttrName"><a href="#widl-MediaStreamTrack-enabled">enabled</a></span>;</span>
+<span class="idlConst">    const <span class="idlConstType"><a>unsigned short</a></span> <span class="idlConstName"><a href="#widl-MediaStreamTrack-LIVE">LIVE</a></span> = <span class="idlConstValue">0</span>;</span>
+<span class="idlConst">    const <span class="idlConstType"><a>unsigned short</a></span> <span class="idlConstName"><a href="#widl-MediaStreamTrack-MUTED">MUTED</a></span> = <span class="idlConstValue">1</span>;</span>
+<span class="idlConst">    const <span class="idlConstType"><a>unsigned short</a></span> <span class="idlConstName"><a href="#widl-MediaStreamTrack-ENDED">ENDED</a></span> = <span class="idlConstValue">2</span>;</span>
+<span class="idlAttribute">    readonly attribute <span class="idlAttrType"><a>unsigned short</a></span> <span class="idlAttrName"><a href="#widl-MediaStreamTrack-readyState">readyState</a></span>;</span>
+<span class="idlAttribute">             attribute <span class="idlAttrType"><a>Function</a>?</span>      <span class="idlAttrName"><a href="#widl-MediaStreamTrack-onmute">onmute</a></span>;</span>
+<span class="idlAttribute">             attribute <span class="idlAttrType"><a>Function</a>?</span>      <span class="idlAttrName"><a href="#widl-MediaStreamTrack-onunmute">onunmute</a></span>;</span>
+<span class="idlAttribute">             attribute <span class="idlAttrType"><a>Function</a>?</span>      <span class="idlAttrName"><a href="#widl-MediaStreamTrack-onended">onended</a></span>;</span>
+};</span>
+</pre><div class="section" id="attributes-1"><h4><span class="secno">2.4.1 </span>Attributes</h4><dl class="attributes"><dt id="widl-MediaStreamTrack-enabled"><code>enabled</code> of type <span class="idlAttrType"><a>boolean</a></span></dt><dd>
+          <p>The <dfn id="dom-mediastreamtrack-enabled"><code>MediaStreamTrack.enabled</code></dfn>
+          attribute, on getting, <em title="must" class="rfc2119">must</em> return the last value to which it was
+          set. On setting, it <em title="must" class="rfc2119">must</em> be set to the new value, and then, if the
+          <code><a class="idlType" href="#idl-def-MediaStreamTrack"><code>MediaStreamTrack</code></a></code> object is still associated with
+          a track, <em title="must" class="rfc2119">must</em> enable the track if the new value is true, and disable
+          it otherwise.</p>
+
+          <div class="note"><div class="note-title"><span>Note</span></div><p class="">Thus, after a <code><a class="idlType" href="#idl-def-MediaStreamTrack"><code>MediaStreamTrack</code></a></code> is
+          disassociated from its track, its <code><a href="#dom-mediastreamtrack-enabled">enabled</a></code> attribute still
+          changes value when set; it just doesn’t do anything with that new
+          value.</p></div>
+        </dd><dt id="widl-MediaStreamTrack-kind"><code>kind</code> of type <span class="idlAttrType"><a>DOMString</a></span>, readonly</dt><dd>
+          <p>The <dfn id="dom-mediastreamtrack-kind"><code>MediaStreamTrack.kind</code></dfn>
+          attribute <em title="must" class="rfc2119">must</em> return the string "<code>audio</code>" if the object’s
+          corresponding track is or was an audio track, "<code>video</code>" if
+          the corresponding track is or was a video track, and a user agent
+          defined string otherwise.</p>
+        </dd><dt id="widl-MediaStreamTrack-label"><code>label</code> of type <span class="idlAttrType"><a>DOMString</a></span>, readonly</dt><dd>
+          <p>User agents <em title="may" class="rfc2119">may</em> label audio and video sources (e.g., "Internal
+          microphone" or "External USB Webcam"). The <dfn id="dom-mediastreamtrack-label"><code>MediaStreamTrack.label</code></dfn>
+          attribute <em title="must" class="rfc2119">must</em> return the label of the object’s corresponding track,
+          if any. If the corresponding track has or had no label, the attribute
+          <em title="must" class="rfc2119">must</em> instead return the empty string.</p>
+
+          <div class="note"><div class="note-title"><span>Note</span></div><p class="">Thus the <code><a href="#dom-mediastreamtrack-kind">kind</a></code> and <code title="dom-MediaStreamTrack-label"><a href="#dom-mediastreamtrack-label">label</a></code> attributes do not
+          change value, even if the <code><a class="idlType" href="#idl-def-MediaStreamTrack"><code>MediaStreamTrack</code></a></code> object
+          is disassociated from its corresponding track.</p></div>
+        </dd><dt id="widl-MediaStreamTrack-onended"><code>onended</code> of type <span class="idlAttrType"><a>Function</a></span>, nullable</dt><dd>This event handler, of type <code><a href="#event-mediastreamtrack-ended">ended</a></code>, <em title="must" class="rfc2119">must</em> be supported by
+        all objects implementing the <code><a class="idlType" href="#idl-def-MediaStreamTrack"><code>MediaStreamTrack</code></a></code>
+        interface.</dd><dt id="widl-MediaStreamTrack-onmute"><code>onmute</code> of type <span class="idlAttrType"><a>Function</a></span>, nullable</dt><dd>This event handler, of type <code><a href="#event-mediastreamtrack-muted">muted</a></code>, <em title="must" class="rfc2119">must</em> be supported by
+        all objects implementing the <code><a class="idlType" href="#idl-def-MediaStreamTrack"><code>MediaStreamTrack</code></a></code>
+        interface.</dd><dt id="widl-MediaStreamTrack-onunmute"><code>onunmute</code> of type <span class="idlAttrType"><a>Function</a></span>, nullable</dt><dd>This event handler, of type <code><a href="#event-mediastreamtrack-unmuted">unmuted</a></code>, <em title="must" class="rfc2119">must</em> be supported
+        by all objects implementing the <code><a class="idlType" href="#idl-def-MediaStreamTrack"><code>MediaStreamTrack</code></a></code>
+        interface.</dd><dt id="widl-MediaStreamTrack-readyState"><code>readyState</code> of type <span class="idlAttrType"><a>unsigned short</a></span>, readonly</dt><dd>
+          <p>The <dfn id="dom-mediastreamtrack-readystate"><code>readyState</code></dfn>
+          attribute represents the state of the track. It <em title="must" class="rfc2119">must</em> return the value
+          to which the user agent last set it (as defined below). It can have
+          the following values: <dfn id="dfn-live">LIVE</dfn>, <dfn id="dfn-muted">MUTED</dfn> or
+          <dfn id="dfn-ended-1">ENDED</dfn>.</p>
+
+          <p>When a <code><a class="idlType" href="#idl-def-MediaStreamTrack"><code>MediaStreamTrack</code></a></code> object is created, its
+          <code><a href="#dom-mediastreamtrack-readystate">readyState</a></code> is either
+          <code><a href="#widl-MediaStreamTrack-LIVE">LIVE</a></code> (0) or
+          <code><a href="#widl-MediaStreamTrack-MUTED">MUTED</a></code> (1),
+          depending on the state of the track’s underlying media source. For
+          example, a track in a <code><a class="idlType" href="#idl-def-LocalMediaStream"><code>LocalMediaStream</code></a></code>, created
+          with <code><a href="#dom-navigator-getusermedia">getUserMedia()</a></code>, <em title="must" class="rfc2119">must</em>
+          initially have its <code><a href="#dom-mediastreamtrack-readystate">readyState</a></code> attribute
+          set to <code><a href="#widl-MediaStreamTrack-LIVE">LIVE</a></code>
+          (1).</p>
+        </dd></dl></div><div class="section" id="constants"><h4><span class="secno">2.4.2 </span>Constants</h4><dl class="constants"><dt id="widl-MediaStreamTrack-ENDED"><code>ENDED</code> of type <span class="idlConstType"><a>unsigned short</a></span></dt><dd>
+          <p>The track has <a class="internalDFN" href="#dfn-ended">ended</a> (the track’s underlying media source is
+          no longer providing data, and will never provide more data for this
+          track).</p>
+
+          <p>For example, a video track in a
+          <code><a class="idlType" href="#idl-def-LocalMediaStream"><code>LocalMediaStream</code></a></code> finishes if the user unplugs the
+          USB web camera that acts as the track’s media source.</p>
+        </dd><dt id="widl-MediaStreamTrack-LIVE"><code>LIVE</code> of type <span class="idlConstType"><a>unsigned short</a></span></dt><dd>
+          <p>The track is active (the track’s underlying media source is making
+          a best-effort attempt to provide data in real time).</p>
+
+          <p>The output of a track in the <code><a href="#widl-MediaStreamTrack-LIVE">LIVE</a></code> state can be switched
+          on and off with the <code><a href="#dom-mediastreamtrack-enabled">enabled</a></code> attribute.</p>
+        </dd><dt id="widl-MediaStreamTrack-MUTED"><code>MUTED</code> of type <span class="idlConstType"><a>unsigned short</a></span></dt><dd>
+          <p>The track is muted (the track’s underlying media source is
+          temporarily unable to provide data).</p>
+
+          <p>A <code><a class="idlType" href="#idl-def-MediaStreamTrack"><code>MediaStreamTrack</code></a></code> in a
+          <code><a class="idlType" href="#idl-def-LocalMediaStream"><code>LocalMediaStream</code></a></code> may be muted if the user
+          temporarily revokes the web application’s permission to use a media
+          input device.</p>
+        </dd></dl></div>
+    </div>
+
+    <div class="section" id="url">
+      <h3><span class="secno">2.5 </span>URL</h3>
+
+      <pre class="idl"><span class="idlInterface" id="idl-def-URL">partial interface <span class="idlInterfaceID">URL</span> {
+<span class="idlMethod">    <span class="idlMethType"><a>static DOMString</a></span> <span class="idlMethName"><a href="#widl-URL-createObjectURL-static-DOMString-MediaStream-stream">createObjectURL</a></span> (<span class="idlParam"><span class="idlParamType"><a class="idlType" href="#idl-def-MediaStream"><code>MediaStream</code></a></span> <span class="idlParamName">stream</span></span>);</span>
+};</span>
+</pre><div class="section" id="methods-1"><h4><span class="secno">2.5.1 </span>Methods</h4><dl class="methods"><dt id="widl-URL-createObjectURL-static-DOMString-MediaStream-stream"><code>createObjectURL</code></dt><dd>
+          <p>Mints a <a href="#blob-url">Blob URL</a> to refer to the given
+          <code><a class="idlType" href="#idl-def-MediaStream"><code>MediaStream</code></a></code>.</p>
+
+          <p>When the <dfn id="dom-url-createobjecturl"><code>createObjectURL()</code></dfn> method
+          is called with a <code><a class="idlType" href="#idl-def-MediaStream"><code>MediaStream</code></a></code> argument, the user
+          agent <em title="must" class="rfc2119">must</em> return a unique <a href="#blob-url">Blob URL</a> for the
+          given <code><a class="idlType" href="#idl-def-MediaStream"><code>MediaStream</code></a></code>. [<cite><a href="#bib-FILE-API" rel="biblioentry" class="bibref">FILE-API</a></cite>]</p>
+
+          <p>For audio and video streams, the data exposed on that stream <em title="must" class="rfc2119">must</em>
+          be in a format supported by the user agent for use in
+          <code>audio</code> and <code>video</code> elements.</p>
+
+          <p class="bookkeeping">A <dfn id="blob-url">Blob URL</dfn> is the
+          same as what the File API specification calls a Blob URI, except that
+          anything in the definition of that feature that refers to
+          <code>File</code> and <code>Blob</code> objects is hereby extended to
+          also apply to <code><a class="idlType" href="#idl-def-MediaStream"><code>MediaStream</code></a></code> and
+          <code><a class="idlType" href="#idl-def-LocalMediaStream"><code>LocalMediaStream</code></a></code> objects.</p>
+        <table class="parameters"><tr><th>Parameter</th><th>Type</th><th>Nullable</th><th>Optional</th><th>Description</th></tr><tr><td class="prmName">stream</td><td class="prmType"><code><a class="idlType" href="#idl-def-MediaStream"><code>MediaStream</code></a></code></td><td class="prmNullFalse">✘</td><td class="prmOptFalse">✘</td><td class="prmDesc"></td></tr></table><div><em>Return type: </em><code><a>static DOMString</a></code></div></dd></dl></div>
+    </div>
+
+    <div class="section" id="mediastreamtracklist">
+      <h3><span class="secno">2.6 </span>MediaStreamTrackList</h3>
+
+      <p>A <code><a class="idlType" href="#idl-def-MediaStreamTrackList"><code>MediaStreamTrackList</code></a></code> object’s <dfn id="concept-track-list-corresponding-stream">corresponding</dfn>
+      <code><a class="idlType" href="#idl-def-MediaStream"><code>MediaStream</code></a></code> refers to the
+      <code><a class="idlType" href="#idl-def-MediaStream"><code>MediaStream</code></a></code> object which the current
+      <code><a class="idlType" href="#idl-def-MediaStreamTrackList"><code>MediaStreamTrackList</code></a></code> object is a property of.</p>
+
+      <pre class="idl"><span class="idlInterface" id="idl-def-MediaStreamTrackList">interface <span class="idlInterfaceID">MediaStreamTrackList</span> {
+<span class="idlAttribute">    readonly attribute <span class="idlAttrType"><a>unsigned long</a></span> <span class="idlAttrName"><a href="#widl-MediaStreamTrackList-length">length</a></span>;</span>
+<span class="idlMethod">    <span class="idlMethType"><a class="idlType" href="#idl-def-MediaStreamTrack"><code>MediaStreamTrack</code></a></span> <span class="idlMethName"><a href="#widl-MediaStreamTrackList-item-MediaStreamTrack-unsigned-long-index">item</a></span> (<span class="idlParam"><span class="idlParamType"><a>unsigned long</a></span> <span class="idlParamName">index</span></span>);</span>
+<span class="idlMethod">    <span class="idlMethType"><a>void</a></span>             <span class="idlMethName"><a href="#widl-MediaStreamTrackList-add-void-MediaStreamTrack-track">add</a></span> (<span class="idlParam"><span class="idlParamType"><a class="idlType" href="#idl-def-MediaStreamTrack"><code>MediaStreamTrack</code></a></span> <span class="idlParamName">track</span></span>);</span>
+<span class="idlMethod">    <span class="idlMethType"><a>void</a></span>             <span class="idlMethName"><a href="#widl-MediaStreamTrackList-remove-void-MediaStreamTrack-track">remove</a></span> (<span class="idlParam"><span class="idlParamType"><a class="idlType" href="#idl-def-MediaStreamTrack"><code>MediaStreamTrack</code></a></span> <span class="idlParamName">track</span></span>);</span>
+<span class="idlAttribute">             attribute <span class="idlAttrType"><a>Function</a>?</span>     <span class="idlAttrName"><a href="#widl-MediaStreamTrackList-onaddtrack">onaddtrack</a></span>;</span>
+<span class="idlAttribute">             attribute <span class="idlAttrType"><a>Function</a>?</span>     <span class="idlAttrName"><a href="#widl-MediaStreamTrackList-onremovetrack">onremovetrack</a></span>;</span>
+};</span>
+</pre><div class="section" id="attributes-2"><h4><span class="secno">2.6.1 </span>Attributes</h4><dl class="attributes"><dt id="widl-MediaStreamTrackList-length"><code>length</code> of type <span class="idlAttrType"><a>unsigned long</a></span>, readonly</dt><dd>Returns the number of tracks in the list.</dd><dt id="widl-MediaStreamTrackList-onaddtrack"><code>onaddtrack</code> of type <span class="idlAttrType"><a>Function</a></span>, nullable</dt><dd>This event handler, of type <code><a href="#event-mediastreamtracklist-addtrack">addtrack</a></code>, <em title="must" class="rfc2119">must</em> be
+        supported by all objects implementing the
+        <code><a class="idlType" href="#idl-def-MediaStreamTrackList"><code>MediaStreamTrackList</code></a></code> interface.</dd><dt id="widl-MediaStreamTrackList-onremovetrack"><code>onremovetrack</code> of type <span class="idlAttrType"><a>Function</a></span>, nullable</dt><dd>This event handler, of type <code><a href="#event-mediastreamtracklist-removetrack">removetrack</a></code>, <em title="must" class="rfc2119">must</em>
+        be supported by all objects implementing the
+        <code><a class="idlType" href="#idl-def-MediaStreamTrackList"><code>MediaStreamTrackList</code></a></code> interface.</dd></dl></div><div class="section" id="methods-2"><h4><span class="secno">2.6.2 </span>Methods</h4><dl class="methods"><dt id="widl-MediaStreamTrackList-add-void-MediaStreamTrack-track"><code>add</code></dt><dd>
+          <p>Adds the given <code><a class="idlType" href="#idl-def-MediaStreamTrack"><code>MediaStreamTrack</code></a></code> to this
+          <code><a class="idlType" href="#idl-def-MediaStreamTrackList"><code>MediaStreamTrackList</code></a></code> according to the ordering
+          rules for tracks.</p>
+
+          <p>When the <dfn id="dom-mediastreamtracklist-add"><code>add()</code></dfn> method is
+          invoked, the user agent <em title="must" class="rfc2119">must</em> run the following steps:</p>
+
+          <ol>
+            <li>
+              <p>Let <var>track</var> be the
+              <code><a class="idlType" href="#idl-def-MediaStreamTrack"><code>MediaStreamTrack</code></a></code> argument.</p>
+            </li>
+
+            <li>
+              <p>Let <var>stream</var> be the
+              <code><a class="idlType" href="#idl-def-MediaStreamTrackList"><code>MediaStreamTrackList</code></a></code> object’s <a href="#concept-track-list-corresponding-stream" title="concept-track-list-corresponding-stream">corresponding</a>
+              <code><a class="idlType" href="#idl-def-MediaStream"><code>MediaStream</code></a></code> object.</p>
+            </li>
+
+            <li>
+              <p>If <var>stream</var> is <a class="internalDFN" href="#dfn-finished">finished</a>, throw an
+              <code>INVALID_STATE_ERR</code> exception.</p>
+            </li>
+
+            <li>
+              <p>If <var>track</var> is already in the
+              <code><a class="idlType" href="#idl-def-MediaStreamTrackList"><code>MediaStreamTrackList</code></a></code> object’s internal list,
+              then abort these steps.</p>
+            </li>
+
+            <li>
+              <p>Add <var>track</var> to the end of the
+              <code><a class="idlType" href="#idl-def-MediaStreamTrackList"><code>MediaStreamTrackList</code></a></code> object’s internal
+              list.</p>
+            </li>
+          </ol>
+        <table class="parameters"><tr><th>Parameter</th><th>Type</th><th>Nullable</th><th>Optional</th><th>Description</th></tr><tr><td class="prmName">track</td><td class="prmType"><code><a class="idlType" href="#idl-def-MediaStreamTrack"><code>MediaStreamTrack</code></a></code></td><td class="prmNullFalse">✘</td><td class="prmOptFalse">✘</td><td class="prmDesc"></td></tr></table><div><em>Return type: </em><code><a>void</a></code></div></dd><dt id="widl-MediaStreamTrackList-item-MediaStreamTrack-unsigned-long-index"><code>item</code></dt><dd>Returns the <code><a class="idlType" href="#idl-def-MediaStreamTrack"><code>MediaStreamTrack</code></a></code> object at the
+        specified index.<table class="parameters"><tr><th>Parameter</th><th>Type</th><th>Nullable</th><th>Optional</th><th>Description</th></tr><tr><td class="prmName">index</td><td class="prmType"><code><a>unsigned long</a></code></td><td class="prmNullFalse">✘</td><td class="prmOptFalse">✘</td><td class="prmDesc"></td></tr></table><div><em>Return type: </em><code><a class="idlType" href="#idl-def-MediaStreamTrack"><code>MediaStreamTrack</code></a></code></div></dd><dt id="widl-MediaStreamTrackList-remove-void-MediaStreamTrack-track"><code>remove</code></dt><dd>
+          <p>Removes the given <code><a class="idlType" href="#idl-def-MediaStreamTrack"><code>MediaStreamTrack</code></a></code> from this
+          <code><a class="idlType" href="#idl-def-MediaStreamTrackList"><code>MediaStreamTrackList</code></a></code>.</p>
+
+          <p>When the <dfn id="dom-mediastreamtracklist-remove"><code>remove()</code></dfn> method
+          is invoked, the user agent <em title="must" class="rfc2119">must</em> run the following steps:</p>
+
+          <ol>
+            <li>
+              <p>Let <var>track</var> be the
+              <code><a class="idlType" href="#idl-def-MediaStreamTrack"><code>MediaStreamTrack</code></a></code> argument.</p>
+            </li>
+
+            <li>
+              <p>Let <var>stream</var> be the
+              <code><a class="idlType" href="#idl-def-MediaStreamTrackList"><code>MediaStreamTrackList</code></a></code> object’s <a href="#concept-track-list-corresponding-stream" title="concept-track-list-corresponding-stream">corresponding</a>
+              <code><a class="idlType" href="#idl-def-MediaStream"><code>MediaStream</code></a></code> object.</p>
+            </li>
+
+            <li>
+              <p>If <var>stream</var> is <a class="internalDFN" href="#dfn-finished">finished</a>, throw an
+              <code>INVALID_STATE_ERR</code> exception.</p>
+            </li>
+
+            <li>
+              <p>If <var>track</var> is not in the
+              <code><a class="idlType" href="#idl-def-MediaStreamTrackList"><code>MediaStreamTrackList</code></a></code> object’s internal list,
+              then abort these steps.</p>
+            </li>
+
+            <li>
+              <p>Remove <var>track</var> from the
+              <code><a class="idlType" href="#idl-def-MediaStreamTrackList"><code>MediaStreamTrackList</code></a></code> object’s internal
+              list.</p>
+            </li>
+          </ol>
+        <table class="parameters"><tr><th>Parameter</th><th>Type</th><th>Nullable</th><th>Optional</th><th>Description</th></tr><tr><td class="prmName">track</td><td class="prmType"><code><a class="idlType" href="#idl-def-MediaStreamTrack"><code>MediaStreamTrack</code></a></code></td><td class="prmNullFalse">✘</td><td class="prmOptFalse">✘</td><td class="prmDesc"></td></tr></table><div><em>Return type: </em><code><a>void</a></code></div></dd></dl></div>
+    </div>
+
+    <div class="section" id="mediastreams-as-media-elements">
+      <h3><span class="secno">2.7 </span>MediaStreams as Media Elements</h3>
+
+      <p>A MediaStream may be assigned to media elements as defined in <a href="http://www.w3.org/TR/html5/media-elements.html#media-elements">HTML5</a>
+      by calling createObjectURL to obtain a URL for the MediaStream and then
+      setting the media elements 'src' attribute to that url. A MediaStream is
+      not preloadable or seekable and represents a simple, potentially infinite,
+      linear media timeline. The timeline starts at 0 and increments linearly
+      in real time as long as the MediaStream is playing. The timeline does not
+      increment when the MediaStream is paused.</p>
+
+      <div class="issue"><div class="issue-title"><span>Issue 1</span></div><p class="">Do we also need to support direct assignment and access
+      of the underlying stream?</p></div>
+
+      <p>The nature of the MediaStream places certain restrictions on the
+      behavior and attribute values of the associated media element and on the
+      operations that can be performed on it, as shown below:</p>
+
+      <ul>
+        <li>Whenever the user agent runs the <a href="http://www.w3.org/TR/html5/media-elements.html#media-element-load-algorithm">
+          media element load algorithm</a>, reaches the <a href="http://www.w3.org/TR/html5/media-elements.html#concept-media-load-resource">
+          resource fetch phase</a> of this algorithm and determines that the
+          media resource in question is a MediaStream, it <em class="rfc2119" title="must">must</em> immediately abort the <a href="http://www.w3.org/TR/html5/media-elements.html#concept-media-load-algorithm">
+          resource selection algorithm</a>, setting the <a href="http://www.w3.org/TR/html5/media-elements.html#dom-media-readystate">
+          <code>media.readystate</code></a> to HAVE_ENOUGH_DATA.
+        </li>
+
+        <li>The UA <em class="rfc2119" title="must">must not</em> buffer data
+        from a MediaStream. When playing, the UA <em class="rfc2119" title="must">must</em> always play the current data from the stream.</li>
+      </ul>
+
+      <table summary="Legal values for the properties of a media element bound to a MediaStream" class="simple">
+        <thead>
+          <tr>
+            <th scope="col">Attribute Name</th>
+
+            <th scope="col">Attribute Type</th>
+
+            <th scope="col">Valid Values</th>
+
+            <th scope="col">Additional considerations</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr>
+            <td>
+              <a href="http://www.w3.org/TR/html5/media-elements.html#dom-media-src" class="externalDFN"><code>src</code></a>
+            </td>
+
+            <td><code>DOMString</code></td>
+
+            <td>a local URI referencing a MediaStream</td>
+
+            <td>N.B. Revocation of the URI does not count as a change to this
+            field.</td>
+          </tr>
+
+          <tr>
+            <td>
+              <a href="http://www.w3.org/TR/html5/media-elements.html#dom-media-currentsrc" class="externalDFN"><code>currentSrc</code></a>
+            </td>
+
+            <td><code>DOMString</code></td>
+
+            <td>a local URI referencing a MediaStream</td>
+
+            <td>-</td>
+          </tr>
+
+          <tr>
+            <td>
+              <a href="http://www.w3.org/TR/html5/media-elements.html#attr-media-preload" class="externalDFN"><code>preload</code></a>
+            </td>
+
+            <td><code>DOMString</code></td>
+
+            <td>'None'</td>
+
+            <td>A MediaStream cannot be preloaded.</td>
+          </tr>
+
+          <tr>
+            <td>
+              <a href="http://www.w3.org/TR/html5/media-elements.html#dom-media-buffered" class="externalDFN"><code>buffered</code></a>
+            </td>
+
+            <td>
+              <a href="http://www.w3.org/TR/html5/media-elements.html#timeranges" class="externalDFN"><code>TimeRanges</code></a>
+            </td>
+
+            <td><code>buffered.length</code> <em class="rfc2119" title="must">must</em> return <code>1</code>.<br>
+            <code>buffered.start(0)</code> <em class="rfc2119" title="must">must</em> return <code>0</code>.<br>
+            <code>buffered.end(0)</code> <em class="rfc2119" title="must">must</em> return <code>0</code>.<br></td>
+
+            <td>A MediaStream cannot be preloaded. Therefore, the amount
+            buffered is always an empty TimeRange.</td>
+          </tr>
+
+          <tr>
+            <td>
+              <a href="http://www.w3.org/TR/html5/media-elements.html#dom-media-currenttime" class="externalDFN"><code>currentTime</code></a>
+            </td>
+
+            <td><code>double</code></td>
+
+            <td>Any positive integer. The initial value is 0 and the values
+            increments linearly in real time whenever the stream is
+            playing.</td>
+
+            <td>The value is the current stream position, in seconds. The UA
+            <em class="rfc2119" title="must">must</em> ignore attempts to set
+            this attribute.</td>
+          </tr>
+
+          <tr>
+            <td>
+              <a href="http://www.w3.org/TR/html5/media-elements.html#dom-media-duration" class="externalDFN"><code>duration</code></a>
+            </td>
+
+            <td><code>double</code></td>
+
+            <td>Infinity</td>
+
+            <td>
+              A MediaStream does not have a pre-defined duration.
+
+              <p>If the underlying MediaStream is destroyed, the UA <em class="rfc2119" title="must">must</em> set this property to the value
+              of the last known <code>currentTime</code>.</p>
+            </td>
+          </tr>
+
+          <tr>
+            <td>
+              <a href="http://www.w3.org/TR/html5/media-elements.html#dom-media-seeking" class="externalDFN"><code>seeking</code></a>
+            </td>
+
+            <td><code>boolean</code></td>
+
+            <td>false</td>
+
+            <td>A MediaStream is not seekable. Therefore, this attribute
+            <em class="rfc2119" title="must">must</em> always have the value
+            <code>false</code>.</td>
+          </tr>
+
+          <tr>
+            <td>
+              <a href="http://www.w3.org/TR/html5/media-elements.html#dom-media-defaultplaybackrate" class="externalDFN"><code>defaultPlaybackRate</code></a>
+            </td>
+
+            <td><code>double</code></td>
+
+            <td>1.0</td>
+
+            <td>A MediaStream is not seekable. Therefore, this attribute
+            <em class="rfc2119" title="must">must</em> always have the value
+            <code>1.0</code> and any attempt to alter it <em class="rfc2119" title="must">must</em> fail.</td>
+          </tr>
+
+          <tr>
+            <td>
+              <a href="http://www.w3.org/TR/html5/media-elements.html#dom-media-playbackrate" class="externalDFN"><code>playbackRate</code></a>
+            </td>
+
+            <td><code>double</code></td>
+
+            <td>1.0</td>
+
+            <td>A MediaStream is not seekable. Therefore, this attribute
+            <em class="rfc2119" title="must">must</em> always have the value
+            <code>1.0</code> and any attempt to alter it <em class="rfc2119" title="must">must</em> fail.</td>
+          </tr>
+
+          <tr>
+            <td>
+              <a href="http://www.w3.org/TR/html5/media-elements.html#dom-media-played" class="externalDFN"><code>played</code></a>
+            </td>
+
+            <td>
+              <a href="http://www.w3.org/TR/html5/media-elements.html#timeranges" class="externalDFN"><code>TimeRanges</code></a>
+            </td>
+
+            <td>
+              <code>played.length</code> <em class="rfc2119" title="must">must</em> return <code>1</code>.<br>
+              <code>played.start(0)</code> <em class="rfc2119" title="must">must</em> return <code>0</code>.<br>
+              <code>played.end(0)</code> <em class="rfc2119" title="must">must</em> return the last known <a href="http://www.w3.org/TR/html5/media-elements.html#dom-media-currenttime" class="externalDFN"><code>currentTime</code></a>.
+            </td>
+
+            <td>A MediaStream's timeline always consists of a single range,
+            starting at 0 and extending up to the currentTime.</td>
+          </tr>
+
+          <tr>
+            <td>
+              <a href="http://www.w3.org/TR/html5/media-elements.html#dom-media-seekable" class="externalDFN"><code>seekable</code></a>
+            </td>
+
+            <td>
+              <a href="http://www.w3.org/TR/html5/media-elements.html#timeranges" class="externalDFN"><code>TimeRanges</code></a>
+            </td>
+
+            <td>
+              <code>seekable.length</code> <em class="rfc2119" title="must">must</em> return <code>0</code>.<br>
+              <code>seekable.start()</code> <em class="rfc2119" title="must">must</em> return <a href="http://www.w3.org/TR/html5/media-elements.html#dom-media-currenttime" class="externalDFN"><code>currentTime</code></a>.<br>
+              <code>seekable.end()</code> <em class="rfc2119" title="must">must</em> return <a href="http://www.w3.org/TR/html5/media-elements.html#dom-media-currenttime" class="externalDFN"><code>currentTime</code></a>.
+            </td>
+
+            <td>A MediaStream is not seekable.</td>
+          </tr>
+
+          <tr>
+            <td>
+              <a href="http://www.w3.org/TR/html5/media-elements.html#dom-media-startoffsettime" class="externalDFN"><code>startOffsetTime</code></a>
+            </td>
+
+            <td><code>Date</code></td>
+
+            <td>Not-a-Number (NaN)</td>
+
+            <td>A MediaStream does not specify a timeline offset.</td>
+          </tr>
+
+          <tr>
+            <td>
+              <a href="http://www.w3.org/TR/html5/media-elements.html#dom-media-loop" class="externalDFN"><code>loop</code></a>
+            </td>
+
+            <td><code>boolean</code></td>
+
+            <td>false</td>
+
+            <td>A MediaStream has no defined end and therefore cannot be
+            looped.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+
+    <div class="section informative" id="event-summary">
+      <h3><span class="secno">2.8 </span>Event summary</h3>
+      <p>The following event fires on <code>
+          <a>MediaStream</a>
+        </code> objects:</p>
+
+      <table>
+        <tr>
+          <th>Event name</th>
+
+          <th>Interface</th>
+
+          <th>Fired when...</th>
+        </tr>
+
+        <tbody>
+          <tr>
+            <td>
+              <dfn id="event-mediastream-ended">
+                <code>ended</code>
+              </dfn>
+            </td>
+
+            <td>
+              <code>Event</code>
+            </td>
+
+            <td>The <code>
+                <a>MediaStream</a>
+              </code> <a>finished</a> as a result of all tracks in the <code>
+                <a>MediaStream</a>
+              </code> <a title="ended">ending</a>.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <p>The following event fires on <code>
+          <a>MediaStreamTrack</a>
+        </code> objects:</p>
+
+      <table>
+        <tr>
+          <th>Event name</th>
+
+          <th>Interface</th>
+
+          <th>Fired when...</th>
+        </tr>
+
+        <tbody>
+          <tr>
+            <td>
+              <dfn id="event-mediastreamtrack-muted">
+                <code>muted</code>
+              </dfn>
+            </td>
+
+            <td>
+              <code>Event</code>
+            </td>
+
+            <td>The <code>
+                <a>MediaStreamTrack</a>
+              </code> object's source is temporarily unable to provide
+            data.</td>
+          </tr>
+
+          <tr>
+            <td>
+              <dfn id="event-mediastreamtrack-unmuted">
+                <code>unmuted</code>
+              </dfn>
+            </td>
+
+            <td>
+              <code>Event</code>
+            </td>
+
+            <td>The <code>
+                <a>MediaStreamTrack</a>
+              </code> object's source is live again after having been
+            temporarily unable to provide data.</td>
+          </tr>
+
+          <tr>
+            <td>
+              <dfn id="event-mediastreamtrack-ended">
+                <code>ended</code>
+              </dfn>
+            </td>
+
+            <td>
+              <code>Event</code>
+            </td>
+
+            <td>The <code>
+                <a>MediaStreamTrack</a>
+              </code> object's source will no longer provide any data, either
+            because the user revoked the permissions, or because the source
+            device has been ejected, or because the remote peer stopped
+            sending data, or because the <code>
+                <a href="#dom-mediastream-stop">stop()</a> 
+              </code> method was invoked.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <p>The following event fires on <code>
+          <a>MediaStreamTrackList</a>
+        </code> objects:</p>
+
+      <table>
+        <tr>
+          <th>Event name</th>
+
+          <th>Interface</th>
+
+          <th>Fired when...</th>
+        </tr>
+
+        <tbody>
+          <tr>
+            <td>
+              <dfn id="event-mediastreamtracklist-addtrack">
+                <code>addtrack</code>
+              </dfn>
+            </td>
+
+            <td>
+              <code>
+                <a>MediaStreamTrackEvent</a>
+              </code>
+            </td>
+
+            <td>A new <code>
+                <a>MediaStreamTrack</a>
+              </code> has been added to this list.</td>
+          </tr>
+
+          <tr>
+            <td>
+              <dfn id="event-mediastreamtracklist-removetrack">
+                <code>removetrack</code>
+              </dfn>
+            </td>
+
+            <td>
+              <code>
+                <a>MediaStreamTrackEvent</a>
+              </code>
+            </td>
+
+            <td>A <code>
+                <a>MediaStreamTrack</a>
+              </code> has been removed from this list.</td>
+          </tr>
+        </tbody>
+      </table>
+   </div>
+  </div>
+
+  <div class="section" id="local-content">
+    <!--OddPage--><h2><span class="secno">3. </span>Obtaining local multimedia content</h2>
+
+    <div class="section" id="navigatorusermedia">
+      <h3><span class="secno">3.1 </span>NavigatorUserMedia</h3>
+
+      <pre class="idl"><span class="idlInterface" id="idl-def-NavigatorUserMedia">[<span class="extAttr">NoInterfaceObject</span>]
+interface <span class="idlInterfaceID">NavigatorUserMedia</span> {
+<span class="idlMethod">    <span class="idlMethType"><a>void</a></span> <span class="idlMethName"><a href="#widl-NavigatorUserMedia-getUserMedia-void-MediaStreamConstraints-constraints-NavigatorUserMediaSuccessCallback-successCallback-NavigatorUserMediaErrorCallback-errorCallback">getUserMedia</a></span> (<span class="idlParam"><span class="idlParamType"><a class="idlType" href="#idl-def-MediaStreamConstraints"><code>MediaStreamConstraints</code></a>?</span> <span class="idlParamName">constraints</span></span>, <span class="idlParam"><span class="idlParamType"><a class="idlType" href="#idl-def-NavigatorUserMediaSuccessCallback"><code>NavigatorUserMediaSuccessCallback</code></a></span> <span class="idlParamName">successCallback</span></span>, <span class="idlParam">optional <span class="idlParamType"><a class="idlType" href="#idl-def-NavigatorUserMediaErrorCallback"><code>NavigatorUserMediaErrorCallback</code></a>?</span> <span class="idlParamName">errorCallback</span></span>);</span>
+};</span>
+</pre><div class="section" id="methods-3"><h4><span class="secno">3.1.1 </span>Methods</h4><dl class="methods"><dt id="widl-NavigatorUserMedia-getUserMedia-void-MediaStreamConstraints-constraints-NavigatorUserMediaSuccessCallback-successCallback-NavigatorUserMediaErrorCallback-errorCallback"><code>getUserMedia</code></dt><dd>
+          <p>Prompts the user for permission to use their Web cam or other
+          video or audio input.</p>
+
+          <p>The <var>constraints</var> argument is an object of type
+          <code><a class="idlType" href="#idl-def-MediaStreamConstraints"><code>MediaStreamConstraints</code></a></code>.</p>
+
+          <p>The <var>successCallback</var> will be invoked with a suitable
+          <code><a class="idlType" href="#idl-def-LocalMediaStream"><code>LocalMediaStream</code></a></code> object as its argument if the
+          user accepts valid tracks as described below.</p>
+
+          <p>The <var>errorCallback</var> (if any) will be invoked if there is
+          a failure in finding valid tracks or if the user denies permission,
+          both as described below.</p>
+
+          <p>When the <dfn id="dom-navigator-getusermedia"><code>getUserMedia()</code></dfn> method
+          is called, the user agent <em title="must" class="rfc2119">must</em> run the following steps:</p>
+
+          <ol>
+            <li>
+              <p>Let <var>constraints</var> be the method's first argument.</p>
+            </li>
+
+            <li>
+              <p>Let <var>successCallback</var> be the callback indicated by
+              the method's second argument.</p>
+            </li>
+
+            <li>
+              <p>Let <var>errorCallback</var> be the callback indicated by the
+              method's third argument, if any, or null otherwise.</p>
+            </li>
+
+            <li>
+              <p>Let <var>requestedMediaTypes</var> be the set of media types
+              in <var>constraints</var> with either a dictionary value or a
+              value of "true".</p>
+            </li>
+
+            <li>
+              <p>Let <var>finalSet</var> be an (initially) empty set.</p>
+            </li>
+
+            <li>
+              <p>If <var>successCallback</var> is null, abort these steps.</p>
+            </li><!-- we could throw an exception instead (that's
+   why the method doesn't return until later: so that we can add an
+   exception here, or for /options/ below, without changing the
+   algorithm) -->
+            <!--
+            <li>
+              <p>For each member of the <code><a>MediaStreamOptions</a></code>
+              dictionary create a local representation and set it to false.</p>
+            </li>
+
+            <li>
+              <p>For each property in <var>options</var> that is present and
+              set to true, let the corresponding local representation be
+              true.</p>
+            </li>
+
+            <li>
+              <p>If none of the local representations of the
+              <code><a>MediaStreamOptions</a></code> dictionary members is set
+              to true, then throw a <code>NOT_SUPPORTED_ERR</code> exception
+              and abort these steps.</p>
+            </li>
+-->
+
+            <li>
+              <p>For each media type <var>T</var> in
+              <var>requestedMediaTypes</var>,</p>
+
+              <ol>
+                <li>
+                  <p>Let <var>candidateSet</var> be all possible tracks of
+                  media type <var>T</var> that the browser could return.</p>
+                </li>
+
+                <li>If the value of the <var>T</var> entry of
+                <var>constraints</var> is "true", jump to the step labeled
+                <em>final</em> below. Otherwise, continue.</li>
+
+                <li>
+                  <p>For each constraint key-value pair in the "mandatory"
+                  dictionary,</p>
+
+                  <ol>
+                    <li>
+                      <p>If the constraint is not supported by the browser,
+                      queue a task to invoke <var>errorCallback</var> with a
+                      new NavigatorUserMediaError object whose code attribute
+                      has the numeric value ???
+                      (<code>NOT_SUPPORTED_ERR</code>) and jump to the step
+                      labeled <em>failure</em> below. ***N.B. - also need to
+                      find a way to return the name of the constraint that
+                      failed***</p>
+                    </li>
+
+                    <li>
+                      <p>Remove from the <var>candidateSet</var> any track that
+                      cannot satisfy the value given for the constraint.</p>
+                    </li>
+
+                    <li>
+                      <p>If the <var>candidateSet</var> no longer contains at
+                      least one track, queue a task to invoke
+                      <var>errorCallback</var> with a new
+                      NavigatorUserMediaError object whose code attribute has
+                      the numeric value ???
+                      (<code>MANDATORY_UNSATISFIED_ERR</code>) and jump to the
+                      step labeled <em>failure</em> below. (***N.B. - also need
+                      to find a way to return the name of the constraint that
+                      failed***). Otherwise, continue with the next mandatory
+                      constraint.</p>
+                    </li>
+                  </ol>
+                </li>
+
+                <li>
+                  <p>Let the <var>secondPassSet</var> be the current contents
+                  of the <var>candidateSet</var>.</p>
+                </li>
+
+                <li>
+                  <p>For each constraint key-value pair in the "optional"
+                  sequence of the <var>constraints</var> that are for the
+                  current media type, in order,</p>
+
+                  <ol>
+                    <li>
+                      <p>If the constraint is not supported by the browser,
+                      skip it and continue with the next constraint.</p>
+                    </li>
+
+                    <li>
+                      <p>Remove from the <var>secondPassSet</var> any tracks
+                      that cannot satisfy the value given for the
+                      constraint.</p>
+                    </li>
+
+                    <li>
+                      <p>If the <var>secondPassSet</var> is now empty, let the
+                      <var>secondPassSet</var> be the current contents of the
+                      <var>candidateSet</var>. Otherwise, let the
+                      <var>candidateSet</var> be the current contents of the
+                      <var>secondPassSet</var>.</p>
+                    </li>
+                  </ol>
+                </li>
+
+                <li>
+                  <p><em>Final:</em> Add the tracks in the
+                  <var>candidateSet</var> to the <var>finalSet</var>.</p>
+                </li>
+              </ol>
+            </li>
+          </ol>
+
+          <ul>
+            <li>
+              <p>Return, and run the remaining steps asynchronously.</p>
+            </li>
+
+            <li>
+              <p>Optionally, e.g., based on a previously-established user
+              preference, for security reasons, or due to platform limitations,
+              jump to the step labeled <em>failure</em> below.</p>
+            </li>
+
+            <li>
+              <p>Prompt the user in a user agent specific manner for permission
+              to provide the entry script's origin with a
+              <code><a class="idlType" href="#idl-def-LocalMediaStream"><code>LocalMediaStream</code></a></code> object representing a media
+              stream.</p>
+
+              <p>The provided media <em title="must" class="rfc2119">must</em> include precisely one track of each
+              media type in requestedMediaTypes from the <var>finalSet</var>.
+              The decision of which tracks to choose from the
+              <var>finalSet</var> is completely up to the user agent and may be
+              determined by asking the user. Unless and until a new set of
+              constraints is provided, the user agent <em title="may" class="rfc2119">may</em> change its choice of
+              track at any point, provided that 1) the new choice does not
+              violate given user permissions, and 2) it notifies the
+              application code by raising an event. It may wish to do this, for
+              example, if the user interface or network congestion changes. Note
+              that no such change will have an effect on the presence or absence
+              of each type of track, merely the contents.</p>
+
+              <div class="issue"><div class="issue-title"><span>Issue 2</span></div><p class="">Define the event that should be raised when the
+              user agent changes its choice of track.</p></div>
+
+              <p>User agents are encouraged to default to using the user's
+              primary or system default camera and/or microphone (when
+              possible) to generate the media stream. User agents <em title="may" class="rfc2119">may</em> allow
+              users to use any media source, including pre-recorded media
+              files.</p>
+
+              <p>If the user grants permission to use local recording devices,
+              user agents are encouraged to include a prominent indicator that
+              the devices are "hot" (i.e. an "on-air" or "recording"
+              indicator).</p>
+
+              <p>If the user denies permission, jump to the step labeled
+              <em>failure</em> below. If the user never responds, this
+              algorithm stalls on this step.</p>
+            </li>
+
+            <li>
+              <p>Let <var>stream</var> be the
+              <code><a class="idlType" href="#idl-def-LocalMediaStream"><code>LocalMediaStream</code></a></code> object for which the user
+              granted permission.</p>
+            </li>
+
+            <li>
+              <p>Queue a task to invoke <var>successCallback</var> with
+              <var>stream</var> as its argument.</p>
+            </li>
+
+            <li>
+              <p>Abort these steps.</p>
+            </li>
+
+            <li>
+              <p><em>Failure</em>: If <var>errorCallback</var> is null, abort
+              these steps.</p>
+            </li>
+
+            <li>
+              <p>Let <var>error</var> be a new <code><a href="#idl-def-NavigatorUserMediaError">NavigatorUserMediaError</a></code>
+              object whose <code><a href="#widl-NavigatorUserMediaError-code">code</a></code> attribute has
+              the numeric value 1 (<code><a href="#widl-NavigatorUserMediaError-PERMISSION_DENIED">PERMISSION_DENIED</a></code>).</p>
+            </li>
+
+            <li>
+              <p>Queue a task to invoke <var>errorCallback</var> with
+              <var>error</var> as its argument.</p>
+            </li>
+
+            <li style="list-style: none; display: inline">
+              <p>The task source for these <span title="concept-task">tasks</span> is the user interaction task
+              source.</p>
+            </li>
+          </ul>
+        <table class="parameters"><tr><th>Parameter</th><th>Type</th><th>Nullable</th><th>Optional</th><th>Description</th></tr><tr><td class="prmName">constraints</td><td class="prmType"><code><a class="idlType" href="#idl-def-MediaStreamConstraints"><code>MediaStreamConstraints</code></a></code></td><td class="prmNullTrue">✔</td><td class="prmOptFalse">✘</td><td class="prmDesc"></td></tr><tr><td class="prmName">successCallback</td><td class="prmType"><code><a class="idlType" href="#idl-def-NavigatorUserMediaSuccessCallback"><code>NavigatorUserMediaSuccessCallback</code></a></code></td><td class="prmNullFalse">✘</td><td class="prmOptFalse">✘</td><td class="prmDesc"></td></tr><tr><td class="prmName">errorCallback</td><td class="prmType"><code><a class="idlType" href="#idl-def-NavigatorUserMediaErrorCallback"><code>NavigatorUserMediaErrorCallback</code></a></code></td><td class="prmNullTrue">✔</td><td class="prmOptTrue">✔</td><td class="prmDesc"></td></tr></table><div><em>Return type: </em><code><a>void</a></code></div></dd></dl></div>
+
+      <pre class="idl"><span class="idlImplements"><a>Navigator</a> implements <a class="idlType" href="#idl-def-NavigatorUserMedia"><code>NavigatorUserMedia</code></a>;</span></pre><div class="idlImplementsDesc"><p>All instances of the <code><a>Navigator</a></code> type are defined to also implement the <a class="idlType" href="#idl-def-NavigatorUserMedia"><code>NavigatorUserMedia</code></a> interface.</p></div>
+    </div>
+
+    <div class="section" id="mediastreamconstraints">
+      <h3><span class="secno">3.2 </span>MediaStreamConstraints</h3>
+
+      <pre class="idl"><span class="idlDictionary" id="idl-def-MediaStreamConstraints">dictionary <span class="idlDictionaryID">MediaStreamConstraints</span> {
+<span class="idlMember">    <span class="idlMemberType"><a>(boolean or MediaTrackConstraints)</a></span> <span class="idlMemberName"><a href="#widl-MediaStreamConstraints-video">video</a></span>;</span>
+<span class="idlMember">    <span class="idlMemberType"><a>(boolean or MediaTrackConstraints)</a></span> <span class="idlMemberName"><a href="#widl-MediaStreamConstraints-audio">audio</a></span>;</span>
+};</span>
+</pre><div class="section" id="dictionary-mediastreamconstraints-members"><h4><span class="secno">3.2.1 </span>Dictionary <a href="#idl-def-MediaStreamConstraints" class="idlType"><code>MediaStreamConstraints</code></a> Members</h4><dl class="dictionary-members"><dt id="widl-MediaStreamConstraints-audio"><code>audio</code> of type <span class="idlMemberType"><a>(boolean or MediaTrackConstraints)</a></span></dt><dd>
+          <div class="issue"><div class="issue-title"><span>Issue 4</span></div><p class="">Provide definition of audio constraints here.</p></div>
+        </dd><dt id="widl-MediaStreamConstraints-video"><code>video</code> of type <span class="idlMemberType"><a>(boolean or MediaTrackConstraints)</a></span></dt><dd>
+          <div class="issue"><div class="issue-title"><span>Issue 3</span></div><p class="">Provide definition of video constraints here.</p></div>
+        </dd></dl></div>
+
+      <pre class="idl"><span class="idlDictionary" id="idl-def-MediaTrackConstraints">dictionary <span class="idlDictionaryID">MediaTrackConstraints</span> {
+<span class="idlMember">    <span class="idlMemberType"><a>MediaTrackConstraintSet</a>?</span> <span class="idlMemberName"><a href="#widl-MediaTrackConstraints-mandatory">mandatory</a></span>;</span>
+<span class="idlMember">    <span class="idlMemberType"><a>MediaTrackConstraint</a>[]?</span>  <span class="idlMemberName"><a href="#widl-MediaTrackConstraints-optional">optional</a></span>;</span>
+};</span>
+</pre><div class="section" id="dictionary-mediatrackconstraints-members"><h4><span class="secno">3.2.2 </span>Dictionary <a href="#idl-def-MediaTrackConstraints" class="idlType"><code>MediaTrackConstraints</code></a> Members</h4><dl class="dictionary-members"><dt id="widl-MediaTrackConstraints-mandatory"><code>mandatory</code> of type <span class="idlMemberType"><a>MediaTrackConstraintSet</a></span>, nullable</dt><dd>
+          <div class="issue"><div class="issue-title"><span>Issue 5</span></div><p class="">Provide definition of mandatory constraints here.</p></div>
+        </dd><dt id="widl-MediaTrackConstraints-optional"><code>optional</code> of type array of <span class="idlMemberType"><a>MediaTrackConstraint</a></span>, nullable</dt><dd>
+          <div class="issue"><div class="issue-title"><span>Issue 6</span></div><p class="">Provide definition of optional constraints here.</p></div>
+        </dd></dl></div>
+
+      <p>A MediaTrackConstraintSet is a dictionary containing one or more
+      key-value pairs, where each key <em title="must" class="rfc2119">must</em> be a valid registered constraint
+      name in the IANA-hosted RTCWeb Media Constraints registry
+      [<cite><a href="#bib-RTCWEB-CONSTRAINTS" rel="biblioentry" class="bibref">RTCWEB-CONSTRAINTS</a></cite>] and its value <em title="should" class="rfc2119">should</em> be as defined in the
+      associated reference[s] given in the registry.</p>
+
+      <p>A MediaTrackConstraint is a dictionary containing exactly one
+      key-value pair, where the key <em title="must" class="rfc2119">must</em> be a valid registered constraint name
+      in the IANA-hosted RTCWeb Media Constraints registry
+      [<cite><a href="#bib-RTCWEB-CONSTRAINTS" rel="biblioentry" class="bibref">RTCWEB-CONSTRAINTS</a></cite>] and the value <em title="should" class="rfc2119">should</em> be as defined in the
+      associated reference[s] given in the registry.</p>
+    </div>
+
+    <div class="section" id="navigatorusermediasuccesscallback">
+      <h3><span class="secno">3.3 </span>NavigatorUserMediaSuccessCallback</h3>
+
+      <pre class="idl"><span class="idlCallback" id="idl-def-NavigatorUserMediaSuccessCallback">callback <span class="idlCallbackID">NavigatorUserMediaSuccessCallback</span> = <span class="idlCallbackType"><a>void</a></span> (<span class="idlParam"><span class="idlParamType"><a class="idlType" href="#idl-def-LocalMediaStream"><code>LocalMediaStream</code></a></span> <span class="idlParamName">stream</span></span>);</span>
+</pre><div class="section" id="callback-navigatorusermediasuccesscallback-parameters"><h4><span class="secno">3.3.1 </span>Callback <a href="#idl-def-NavigatorUserMediaSuccessCallback" class="idlType"><code>NavigatorUserMediaSuccessCallback</code></a> Parameters</h4><dl class="callback-members"><dt id="widl-NavigatorUserMediaSuccessCallback-stream"><code>stream</code> of type <span class="idlMemberType"><a class="idlType" href="#idl-def-LocalMediaStream"><code>LocalMediaStream</code></a></span></dt><dd><div class="issue"><div class="issue-title"><span>Issue 7</span></div><p class="">Add explanation of handleEvent</p></div></dd></dl></div>
+    </div>
+
+    <div class="section" id="navigatorusermediaerror-and-navigatorusermediaerrorcallback">
+      <h3><span class="secno">3.4 </span>NavigatorUserMediaError and NavigatorUserMediaErrorCallback</h3>
+
+      <pre class="idl"><span class="idlInterface" id="idl-def-NavigatorUserMediaError">[<span class="extAttr">NoInterfaceObject</span>]
+interface <span class="idlInterfaceID">NavigatorUserMediaError</span> {
+<span class="idlConst">    const <span class="idlConstType"><a>unsigned short</a></span> <span class="idlConstName"><a href="#widl-NavigatorUserMediaError-PERMISSION_DENIED">PERMISSION_DENIED</a></span> = <span class="idlConstValue">1</span>;</span>
+<span class="idlAttribute">    readonly attribute <span class="idlAttrType"><a>unsigned short</a></span> <span class="idlAttrName"><a href="#widl-NavigatorUserMediaError-code">code</a></span>;</span>
+};</span>
+</pre><div class="section" id="attributes-3"><h4><span class="secno">3.4.1 </span>Attributes</h4><dl class="attributes"><dt id="widl-NavigatorUserMediaError-code"><code>code</code> of type <span class="idlAttrType"><a>unsigned short</a></span>, readonly</dt><dd>Returns the current error's error code. At this time, this will
+        always be 1, for which the constant <code><a href="#widl-NavigatorUserMediaError-PERMISSION_DENIED">PERMISSION_DENIED</a></code>
+        is defined.</dd></dl></div><div class="section" id="constants-1"><h4><span class="secno">3.4.2 </span>Constants</h4><dl class="constants"><dt id="widl-NavigatorUserMediaError-PERMISSION_DENIED"><code>PERMISSION_DENIED</code> of type <span class="idlConstType"><a>unsigned short</a></span></dt><dd>The user denied the page permission to use the user's media
+        devices.</dd></dl></div>
+
+      <pre class="idl"><span class="idlCallback" id="idl-def-NavigatorUserMediaErrorCallback">callback <span class="idlCallbackID">NavigatorUserMediaErrorCallback</span> = <span class="idlCallbackType"><a>void</a></span> (<span class="idlParam"><span class="idlParamType"><a class="idlType" href="#idl-def-NavigatorUserMediaError"><code>NavigatorUserMediaError</code></a></span> <span class="idlParamName">error</span></span>);</span>
+</pre><div class="section" id="callback-navigatorusermediaerrorcallback-parameters"><h4><span class="secno">3.4.3 </span>Callback <a href="#idl-def-NavigatorUserMediaErrorCallback" class="idlType"><code>NavigatorUserMediaErrorCallback</code></a> Parameters</h4><dl class="callback-members"><dt id="widl-NavigatorUserMediaErrorCallback-error"><code>error</code> of type <span class="idlMemberType"><a class="idlType" href="#idl-def-NavigatorUserMediaError"><code>NavigatorUserMediaError</code></a></span></dt><dd><div class="issue"><div class="issue-title"><span>Issue 8</span></div><p class="">Add explanation of handleEvent</p></div></dd></dl></div>
+    </div>
+
+    <div id="implementation-suggestions" class="informative section">
+      <h3><span class="secno">3.5 </span>Implementation Suggestions</h3><p><em>This section is non-normative.</em></p>
+
+      <div class="practice">
+        <span id="resource-reservation" class="practicelab">Best Practice 1: Resource
+        reservation</span>
+
+        <p class="practicedesc">The user agent is encouraged to reserve
+        resources when it has determined that a given call to <a href="#dom-navigator-getusermedia">getUserMedia()</a> will succeed. It is
+        preferable to reserve the resource prior to invoking the success
+        callback provided by the web page. Subsequent calls to <a href="#dom-navigator-getusermedia">getUserMedia()</a> (in this page or any
+        other) should treat the resource that was previously allocated, as well
+        as resources held by other applications, as busy. Resources marked as
+        busy should not be provided as sources to the current web page, unless
+        specified by the user. Optionally, the user agent may choose to provide
+        a stream sourced from a busy source but only to a page whose origin
+        matches the owner of the original stream that is keeping the source
+        busy.</p>
+
+        <p class="practicedesc">This document recommends that in the permission
+        grant dialog or device selection interace (if one is present), the user
+        be allowed to select any available hardware as a source for the stream
+        requested by the page (provided the resource is able to fulfill
+        mandatory constraints, if any were specified), in addition to the
+        ability to substitute a video or audio source with local files and
+        other media. A file picker may be used to provide this functionality to
+        the user.</p>
+
+        <p class="practicedesc">This document also recommends that the user be
+        shown all resources that are currently busy as a result of prior calls
+        to <a href="#dom-navigator-getusermedia">getUserMedia()</a> (in this
+        page or any other page that is still alive) and be allowed to terminate
+        that stream and utilize the resource for the current page instead. If
+        possible in the current operating environment, it is also suggested
+        that resources currently held by other applications be presented and
+        treated in the same manner. If the user chooses this option, the track
+        corresponding to the resource that was provided to the page whose
+        stream was affected must be removed. Additionally, if removing a track
+        in this manner causes the stream to contain no more tracks, the
+        <a>onended</a> event must be raised on it.</p>
+      </div>
+
+      <div class="practice">
+        <span id="handling-devices" class="practicelab">Best Practice 2: Handling multiple
+        devices</span>
+
+        <p class="practicedesc">A <a class="idlType" href="#idl-def-MediaStream"><code>MediaStream</code></a> may contain more than one
+        video and audio track. This makes it possible to include video from two
+        or more webcams in a single stream object, for example. However, the
+        current API does not allow a page to express a need for multiple video
+        streams from independent sources.</p>
+
+        <p class="practicedesc">It is recommended for multiple
+        calls to <a href="#dom-navigator-getusermedia">getUserMedia()</a> from
+        the same page be allowed as a way for pages to request multiple,
+        discrete, video or audio streams.</p>
+
+        <p class="practicedesc">A single call to
+        <a href="#dom-navigator-getusermedia">getUserMedia()</a> will always
+        return a stream with either zero or one audio tracks, and either zero or
+        one video tracks. If a script calls
+        <a href="#dom-navigator-getusermedia">getUserMedia()</a> multiple times
+        before reaching a stable state, this document advises the UI designer
+        that the permission dialogs should be merged, so that the user can give
+        permission for the use of multiple cameras and/or media sources in one
+        dialog interaction. The constraints on each getUserMedia call can be
+        used to decide which stream gets which media sources.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="section" id="examples">
+    <!--OddPage--><h2><span class="secno">4. </span>Examples</h2>
+
+    <div>
+      <p>This sample code exposes a button. When clicked, the button is
+      disabled and the user is prompted to offer a stream. The user can cause
+      the button to be re-enabled by providing a stream (e.g., giving the page
+      access to the local camera) and then disabling the stream (e.g., revoking
+      that access).</p>
+      <div class="example"><div class="example-title"><span>Example 1</span></div><pre class="example highlight prettyprint"><span class="tag">&lt;input</span><span class="pln"> </span><span class="atn">type</span><span class="pun">=</span><span class="atv">"button"</span><span class="pln"> </span><span class="atn">value</span><span class="pun">=</span><span class="atv">"Start"</span><span class="pln"> </span><span class="atn">onclick</span><span class="pun">=</span><span class="atv">"</span><span class="pln">start</span><span class="pun">()</span><span class="atv">"</span><span class="pln"> </span><span class="atn">id</span><span class="pun">=</span><span class="atv">"startBtn"</span><span class="tag">&gt;</span><span class="pln">
+</span><span class="tag">&lt;script&gt;</span><span class="pln">
+ </span><span class="kwd">var</span><span class="pln"> startBtn </span><span class="pun">=</span><span class="pln"> document</span><span class="pun">.</span><span class="pln">getElementById</span><span class="pun">(</span><span class="str">'startBtn'</span><span class="pun">);</span><span class="pln">
+ </span><span class="kwd">function</span><span class="pln"> start</span><span class="pun">()</span><span class="pln"> </span><span class="pun">{</span><span class="pln">
+   navigator</span><span class="pun">.</span><span class="pln">getUserMedia</span><span class="pun">({</span><span class="pln">audio</span><span class="pun">:</span><span class="kwd">true</span><span class="pun">,</span><span class="pln"> video</span><span class="pun">:</span><span class="kwd">true</span><span class="pun">},</span><span class="pln"> gotStream</span><span class="pun">);</span><span class="pln">
+   startBtn</span><span class="pun">.</span><span class="pln">disabled </span><span class="pun">=</span><span class="pln"> </span><span class="kwd">true</span><span class="pun">;</span><span class="pln">
+ </span><span class="pun">}</span><span class="pln">
+ </span><span class="kwd">function</span><span class="pln"> gotStream</span><span class="pun">(</span><span class="pln">stream</span><span class="pun">)</span><span class="pln"> </span><span class="pun">{</span><span class="pln">
+   stream</span><span class="pun">.</span><span class="pln">onended </span><span class="pun">=</span><span class="pln"> </span><span class="kwd">function</span><span class="pln"> </span><span class="pun">()</span><span class="pln"> </span><span class="pun">{</span><span class="pln">
+     startBtn</span><span class="pun">.</span><span class="pln">disabled </span><span class="pun">=</span><span class="pln"> </span><span class="kwd">false</span><span class="pun">;</span><span class="pln">
+   </span><span class="pun">};</span><span class="pln">
+ </span><span class="pun">}</span><span class="pln">
+</span><span class="tag">&lt;/script&gt;</span><span class="pln"> </span></pre></div>
+    </div><!-- Put back when we define MediaStreamRecorder
+    <div>
+      <p>This example allows people to record a short audio message and upload
+      it to the server. This example even shows rudimentary error handling.</p>
+      <pre class='example sh_javascript'>
+&lt;input type="button" value="⚫" onclick="msgRecord()" id="recBtn"&gt;
+&lt;input type="button" value="◼" onclick="msgStop()" id="stopBtn" disabled&gt;
+&lt;p id="status"&gt;To start recording, press the ⚫ button.&lt;/p&gt;
+&lt;script&gt;
+ var recBtn = document.getElementById('recBtn');
+ var stopBtn = document.getElementById('stopBtn');
+ function report(s) {
+   document.getElementById('status').textContent = s;
+ }
+ function msgRecord() {
+   report('Attempting to access microphone...');
+   navigator.getUserMedia({audio:true}, gotStream, noStream);
+   recBtn.disabled = true;
+ }
+ var msgStream, msgStreamRecorder;
+ function gotStream(stream) {
+   report('Recording... To stop, press to ◼ button.');
+   msgStream = stream;
+   msgStreamRecorder = stream.record();
+   stopBtn.disabled = false;
+   stream.onended = function () {
+     msgStop();     
+   }
+ }
+ function msgStop() {
+   report('Creating file...');
+   stopBtn.disabled = true;
+   msgStream.onended = null;
+   msgStream.stop();
+   msgStreamRecorder.getRecordedData(msgSave);
+ }
+ function msgSave(blob) {
+   report('Uploading file...');
+   var x = new XMLHttpRequest();
+   x.open('POST', 'uploadMessage');
+   x.send(blob);
+   x.onload = function () {
+     report('Done! To record a new message, press the ⚫ button.');
+     recBtn.disabled = false;
+   };
+   x.onerror = function () {
+     report('Failed to upload message. To try recording a message again, press the ⚫ button.');
+     recBtn.disabled = false;
+   };
+ }
+ function noStream() {
+   report('Could not obtain access to your microphone. To try again, press the ⚫ button.');
+   recBtn.disabled = false;
+ }
+&lt;/script&gt;
+</pre>
+    </div>-->
+
+    <div>
+      <p>This example allows people to take photos of themselves from the local
+      video camera.</p>
+      <div class="example"><div class="example-title"><span>Example 2</span></div><pre class="example highlight prettyprint"><span class="tag">&lt;article&gt;</span><span class="pln">
+ </span><span class="tag">&lt;style</span><span class="pln"> </span><span class="atn">scoped</span><span class="tag">&gt;</span><span class="pln">
+  video </span><span class="pun">{</span><span class="pln"> transform</span><span class="pun">:</span><span class="pln"> scaleX</span><span class="pun">(-</span><span class="lit">1</span><span class="pun">);</span><span class="pln"> </span><span class="pun">}</span><span class="pln">
+  p </span><span class="pun">{</span><span class="pln"> text</span><span class="pun">-</span><span class="pln">align</span><span class="pun">:</span><span class="pln"> center</span><span class="pun">;</span><span class="pln"> </span><span class="pun">}</span><span class="pln">
+ </span><span class="tag">&lt;/style&gt;</span><span class="pln">
+ </span><span class="tag">&lt;h1&gt;</span><span class="pln">Snapshot Kiosk</span><span class="tag">&lt;/h1&gt;</span><span class="pln">
+ </span><span class="tag">&lt;section</span><span class="pln"> </span><span class="atn">id</span><span class="pun">=</span><span class="atv">"splash"</span><span class="tag">&gt;</span><span class="pln">
+  </span><span class="tag">&lt;p</span><span class="pln"> </span><span class="atn">id</span><span class="pun">=</span><span class="atv">"errorMessage"</span><span class="tag">&gt;</span><span class="pln">Loading...</span><span class="tag">&lt;/p&gt;</span><span class="pln">
+ </span><span class="tag">&lt;/section&gt;</span><span class="pln">
+ </span><span class="tag">&lt;section</span><span class="pln"> </span><span class="atn">id</span><span class="pun">=</span><span class="atv">"app"</span><span class="pln"> </span><span class="atn">hidden</span><span class="tag">&gt;</span><span class="pln">
+  </span><span class="tag">&lt;p&gt;&lt;video</span><span class="pln"> </span><span class="atn">id</span><span class="pun">=</span><span class="atv">"monitor"</span><span class="pln"> </span><span class="atn">autoplay</span><span class="tag">&gt;&lt;/video&gt;</span><span class="pln"> </span><span class="tag">&lt;canvas</span><span class="pln"> </span><span class="atn">id</span><span class="pun">=</span><span class="atv">"photo"</span><span class="tag">&gt;&lt;/canvas&gt;</span><span class="pln">
+  </span><span class="tag">&lt;p&gt;&lt;input</span><span class="pln"> </span><span class="atn">type</span><span class="pun">=</span><span class="atv">button</span><span class="pln"> </span><span class="atn">value</span><span class="pun">=</span><span class="atv">"&amp;#x1F4F7;"</span><span class="pln"> </span><span class="atn">onclick</span><span class="pun">=</span><span class="atv">"</span><span class="pln">snapshot</span><span class="pun">()</span><span class="atv">"</span><span class="tag">&gt;</span><span class="pln">
+ </span><span class="tag">&lt;/section&gt;</span><span class="pln">
+ </span><span class="tag">&lt;script&gt;</span><span class="pln">
+  navigator</span><span class="pun">.</span><span class="pln">getUserMedia</span><span class="pun">({</span><span class="pln">video</span><span class="pun">:</span><span class="kwd">true</span><span class="pun">},</span><span class="pln"> gotStream</span><span class="pun">,</span><span class="pln"> noStream</span><span class="pun">);</span><span class="pln">
+  </span><span class="kwd">var</span><span class="pln"> video </span><span class="pun">=</span><span class="pln"> document</span><span class="pun">.</span><span class="pln">getElementById</span><span class="pun">(</span><span class="str">'monitor'</span><span class="pun">);</span><span class="pln">
+  </span><span class="kwd">var</span><span class="pln"> canvas </span><span class="pun">=</span><span class="pln"> document</span><span class="pun">.</span><span class="pln">getElementById</span><span class="pun">(</span><span class="str">'photo'</span><span class="pun">);</span><span class="pln">
+  </span><span class="kwd">function</span><span class="pln"> gotStream</span><span class="pun">(</span><span class="pln">stream</span><span class="pun">)</span><span class="pln"> </span><span class="pun">{</span><span class="pln">
+    video</span><span class="pun">.</span><span class="pln">src </span><span class="pun">=</span><span class="pln"> URL</span><span class="pun">.</span><span class="pln">createObjectURL</span><span class="pun">(</span><span class="pln">stream</span><span class="pun">);</span><span class="pln">
+    video</span><span class="pun">.</span><span class="pln">onerror </span><span class="pun">=</span><span class="pln"> </span><span class="kwd">function</span><span class="pln"> </span><span class="pun">()</span><span class="pln"> </span><span class="pun">{</span><span class="pln">
+      stream</span><span class="pun">.</span><span class="pln">stop</span><span class="pun">();</span><span class="pln">
+    </span><span class="pun">};</span><span class="pln">
+    stream</span><span class="pun">.</span><span class="pln">onended </span><span class="pun">=</span><span class="pln"> noStream</span><span class="pun">;</span><span class="pln">
+    video</span><span class="pun">.</span><span class="pln">onloadedmetadata </span><span class="pun">=</span><span class="pln"> </span><span class="kwd">function</span><span class="pln"> </span><span class="pun">()</span><span class="pln"> </span><span class="pun">{</span><span class="pln">
+      canvas</span><span class="pun">.</span><span class="pln">width </span><span class="pun">=</span><span class="pln"> video</span><span class="pun">.</span><span class="pln">videoWidth</span><span class="pun">;</span><span class="pln">
+      canvas</span><span class="pun">.</span><span class="pln">height </span><span class="pun">=</span><span class="pln"> video</span><span class="pun">.</span><span class="pln">videoHeight</span><span class="pun">;</span><span class="pln">
+      document</span><span class="pun">.</span><span class="pln">getElementById</span><span class="pun">(</span><span class="str">'splash'</span><span class="pun">).</span><span class="pln">hidden </span><span class="pun">=</span><span class="pln"> </span><span class="kwd">true</span><span class="pun">;</span><span class="pln">
+      document</span><span class="pun">.</span><span class="pln">getElementById</span><span class="pun">(</span><span class="str">'app'</span><span class="pun">).</span><span class="pln">hidden </span><span class="pun">=</span><span class="pln"> </span><span class="kwd">false</span><span class="pun">;</span><span class="pln">
+    </span><span class="pun">};</span><span class="pln">
+  </span><span class="pun">}</span><span class="pln">
+  </span><span class="kwd">function</span><span class="pln"> noStream</span><span class="pun">()</span><span class="pln"> </span><span class="pun">{</span><span class="pln">
+    document</span><span class="pun">.</span><span class="pln">getElementById</span><span class="pun">(</span><span class="str">'errorMessage'</span><span class="pun">).</span><span class="pln">textContent </span><span class="pun">=</span><span class="pln"> </span><span class="str">'No camera available.'</span><span class="pun">;</span><span class="pln">
+  </span><span class="pun">}</span><span class="pln">
+  </span><span class="kwd">function</span><span class="pln"> snapshot</span><span class="pun">()</span><span class="pln"> </span><span class="pun">{</span><span class="pln">
+    canvas</span><span class="pun">.</span><span class="pln">getContext</span><span class="pun">(</span><span class="str">'2d'</span><span class="pun">).</span><span class="pln">drawImage</span><span class="pun">(</span><span class="pln">video</span><span class="pun">,</span><span class="pln"> </span><span class="lit">0</span><span class="pun">,</span><span class="pln"> </span><span class="lit">0</span><span class="pun">);</span><span class="pln">
+  </span><span class="pun">}</span><span class="pln">
+ </span><span class="tag">&lt;/script&gt;</span><span class="pln">
+</span><span class="tag">&lt;/article&gt;</span></pre></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2 id="sec-iana">IANA Registrations</h2>
+
+    <div class="section">
+      <h3 id="sec-constraints">Constraints Registrations</h3>
+
+      <p>IANA is requested to register the following constraints as specified
+      in [<cite><a href="#bib-RTCWEB-CONSTRAINTS" rel="biblioentry" class="bibref">RTCWEB-CONSTRAINTS</a></cite>]:</p>
+
+      <dl>
+	<dt>To be completed</dt>
+        <!-- please leaves this just commented out in the file for now - Cullen
+
+      <dt> EchoCancelation </dt>
+
+      <dd> <p> This is a enum type constraint that can take the values "true"
+        and "false". The default is a non mandatory "true". </p>
+
+        <p> When one or more audio streams is being played in the proceses of
+        varios microphones, it is often desirable to attempt to remove the sound
+        being played from the input signals recorded by the microphones. This is
+        referred to echo cancelation. There are cases where it is not needed and
+        it is desirable to turn it off so that no audio artifacts are
+        introduced. This constraint allows the application to control this
+        behavior. </p>
+      </dd>
+
+      <dt> CaptureAudio </dt>
+
+      <dd> <p> This is a enum type constraint that can take the values "true"
+        and "false". The default is a non mandatory "true". </p>
+
+        <p> Indicates that application would like to capture audio input from a
+        microphone. </p>
+      </dd>
+
+      <dt> CaptureVideo </dt>
+
+      <dd> <p> This is a enum type constraint that can take the values "true"
+        and "false". The default is a non mandatory "true". </p>
+
+        <p> Indicates that application would like to capture video input from a
+        camera. </p>
+      </dd>
+
+      <dt> CaptureImage </dt>
+
+      <dd> <p> This is a enum type constraint that can take the values "true"
+        and "false". The default is a non mandatory "true". </p>
+
+        <p> Indicates that application would like to capture an single image from a
+        camera. </p>
+      </dd>
+
+
+        <dt> EnableSecureMedia </dt>
+
+      <dd> <p> This is a enum type constraint that can take the values "true"
+        and "false". The default is a non mandatory "false". </p>
+
+        <p> Indicates that application would like the browser to keep the media
+        secure. This means that the media will not be a available to JavaScript
+        application but is useful for cases where other objects will operate on
+        the media stream. For some trusted application environments, the browser
+        may enforce that this constraint is a mandatory "true". </p> </dd>
+
+      -->
+      </dl>
+    </div>
+  </div>
+
+  <div id="acknowledgements" class="appendix section">
+    <!--OddPage--><h2><span class="secno">A. </span>Acknowledgements</h2>
+  </div>
+
+
+<div class="appendix section" id="references"><!--OddPage--><h2><span class="secno">B. </span>References</h2><div class="section" id="normative-references"><h3><span class="secno">B.1 </span>Normative references</h3><dl class="bibliography"><dt id="bib-FILE-API">[FILE-API]</dt><dd>Arun Ranganathan; Jonas Sicking. <a href="http://www.w3.org/TR/2011/WD-FileAPI-20111020/"><cite>File API.</cite></a> 20 October 2011. W3C Working Draft. (Work in progress.) URL: <a href="http://www.w3.org/TR/2011/WD-FileAPI-20111020/">http://www.w3.org/TR/2011/WD-FileAPI-20111020/</a> 
+</dd><dt id="bib-RTCWEB-CONSTRAINTS">[RTCWEB-CONSTRAINTS]</dt><dd>D. Burnett. <a href="http://datatracker.ietf.org/doc/draft-burnett-rtcweb-constraints-registry/"><cite>IANA Registry for RTCWeb Media Constraints.</cite></a> URL: <a href="http://datatracker.ietf.org/doc/draft-burnett-rtcweb-constraints-registry/">http://datatracker.ietf.org/doc/draft-burnett-rtcweb-constraints-registry/</a> 
+</dd><dt id="bib-WEBRTC10">[WEBRTC10]</dt><dd>A Bergkvist; D Burnett; C Jennings; A Narayanan. <a href="http://www.w3.org/TR/2012/WD-webrtc-20120209/"><cite>WebRTC 1.0.</cite></a> 9 February 2012. W3C Working Draft. (Work in progress.) URL: <a href="http://www.w3.org/TR/2012/WD-webrtc-20120209/">http://www.w3.org/TR/2012/WD-webrtc-20120209/</a> 
+</dd></dl></div><div class="section" id="informative-references"><h3><span class="secno">B.2 </span>Informative references</h3><p>No informative references.</p></div></div></body></html>

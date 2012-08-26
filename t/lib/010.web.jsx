@@ -2965,6 +2965,8 @@ class _Test extends TestCase {
         o.unregisterContentHandler(X.getstring(), X.getstring());
         o.yieldForStorageUpdates();
         var v2 : Geolocation = o.geolocation;
+        o.getUserMedia(X.getNullable__MediaStreamConstraints_(), X.getfunction_stream_LocalMediaStream__void());
+        o.getUserMedia(X.getNullable__MediaStreamConstraints_(), X.getfunction_stream_LocalMediaStream__void(), X.getNullable__function_error_NavigatorUserMediaError__void_());
     } // Navigator
 
     // #174
@@ -3195,6 +3197,7 @@ class _Test extends TestCase {
     function compile_URL(o : URL) : void {
         var f1 : string/*DOMString*/ = URL.createObjectURL(X.getBlob());
         URL.revokeObjectURL(X.getstring());
+        var f2 : string/*DOMString*/ = URL.createObjectURL(X.getMediaStream());
     } // URL
 
     // #196
@@ -3202,6 +3205,279 @@ class _Test extends TestCase {
     } // webkitURL
 
     // #197
+    function compile_AudioContext(o : AudioContext) : void {
+        var c1 = new AudioContext();
+        var v1 : AudioDestinationNode = o.destination;
+        var v2 : number/*float*/ = o.sampleRate;
+        var v3 : number/*float*/ = o.currentTime;
+        var v4 : AudioListener = o.listener;
+        var v5 : number/*unsigned long*/ = o.activeSourceCount;
+        var f1 : AudioBuffer = o.createBuffer(X.getnumber(), X.getnumber(), X.getnumber());
+        var f2 : AudioBuffer = o.createBuffer(X.getArrayBuffer(), X.getboolean());
+        o.decodeAudioData(X.getArrayBuffer(), X.getfunction_decodedData_AudioBuffer__void());
+        o.decodeAudioData(X.getArrayBuffer(), X.getfunction_decodedData_AudioBuffer__void(), X.getfunction_decodedData_AudioBuffer__void());
+        var f3 : AudioBufferSourceNode = o.createBufferSource();
+        var f4 : MediaElementAudioSourceNode = o.createMediaElementSource(X.getHTMLMediaElement());
+        var f5 : MediaStreamAudioSourceNode = o.createMediaStreamSource(X.getMediaStream());
+        var f6 : JavaScriptAudioNode = o.createJavaScriptNode(X.getnumber());
+        var f7 : JavaScriptAudioNode = o.createJavaScriptNode(X.getnumber(), X.getnumber());
+        var f8 : JavaScriptAudioNode = o.createJavaScriptNode(X.getnumber(), X.getnumber(), X.getnumber());
+        var f9 : RealtimeAnalyserNode = o.createAnalyser();
+        var f10 : AudioGainNode = o.createGainNode();
+        var f11 : DelayNode = o.createDelayNode();
+        var f12 : DelayNode = o.createDelayNode(X.getnumber());
+        var f13 : BiquadFilterNode = o.createBiquadFilter();
+        var f14 : AudioPannerNode = o.createPanner();
+        var f15 : ConvolverNode = o.createConvolver();
+        var f16 : AudioChannelSplitter = o.createChannelSplitter();
+        var f17 : AudioChannelSplitter = o.createChannelSplitter(X.getnumber());
+        var f18 : AudioChannelMerger = o.createChannelMerger();
+        var f19 : AudioChannelMerger = o.createChannelMerger(X.getnumber());
+        var f20 : DynamicsCompressorNode = o.createDynamicsCompressor();
+        var f21 : Oscillator = o.createOscillator();
+        var f22 : WaveTable = o.createWaveTable(X.getFloat32Array(), X.getFloat32Array());
+    } // AudioContext
+
+    // #198
+    function compile_AudioNode(o : AudioNode) : void {
+        o.connect(X.getAudioNode());
+        o.connect(X.getAudioNode(), X.getnumber());
+        o.connect(X.getAudioNode(), X.getnumber(), X.getnumber());
+        o.connect(X.getAudioParam());
+        o.connect(X.getAudioParam(), X.getnumber());
+        o.disconnect();
+        o.disconnect(X.getnumber());
+        var v1 : AudioContext = o.context;
+        var v2 : number/*unsigned long*/ = o.numberOfInputs;
+        var v3 : number/*unsigned long*/ = o.numberOfOutputs;
+    } // AudioNode
+
+    // #199
+    function compile_AudioSourceNode(o : AudioSourceNode) : void {
+    } // AudioSourceNode
+
+    // #200
+    function compile_AudioDestinationNode(o : AudioDestinationNode) : void {
+        var v1 : number/*unsigned long*/ = o.maxNumberOfChannels;
+        var v2 : number/*unsigned long*/ = o.numberOfChannels;
+    } // AudioDestinationNode
+
+    // #201
+    function compile_AudioParam(o : AudioParam) : void {
+        var v1 : number/*float*/ = o.value;
+        var v2 : number/*float*/ = o.minValue;
+        var v3 : number/*float*/ = o.maxValue;
+        var v4 : number/*float*/ = o.defaultValue;
+        o.setValueAtTime(X.getnumber(), X.getnumber());
+        o.linearRampToValueAtTime(X.getnumber(), X.getnumber());
+        o.exponentialRampToValueAtTime(X.getnumber(), X.getnumber());
+        o.setTargetValueAtTime(X.getnumber(), X.getnumber(), X.getnumber());
+        o.setValueCurveAtTime(X.getFloat32Array(), X.getnumber(), X.getnumber());
+        o.cancelScheduledValues(X.getnumber());
+    } // AudioParam
+
+    // #202
+    function compile_AudioGain(o : AudioGain) : void {
+    } // AudioGain
+
+    // #203
+    function compile_AudioGainNode(o : AudioGainNode) : void {
+        var v1 : AudioGain = o.gain;
+    } // AudioGainNode
+
+    // #204
+    function compile_DelayNode(o : DelayNode) : void {
+        var v1 : AudioParam = o.delayTime;
+    } // DelayNode
+
+    // #205
+    function compile_AudioBuffer(o : AudioBuffer) : void {
+        var v1 : number/*float*/ = o.sampleRate;
+        var v2 : number/*long*/ = o.length;
+        var v3 : number/*float*/ = o.duration;
+        var v4 : number/*long*/ = o.numberOfChannels;
+        var f1 : Float32Array = o.getChannelData(X.getnumber());
+    } // AudioBuffer
+
+    // #206
+    function compile_AudioBufferSourceNode(o : AudioBufferSourceNode) : void {
+        var v1 : number/*unsigned short*/ = AudioBufferSourceNode.UNSCHEDULED_STATE;
+        var v2 : number/*unsigned short*/ = o.UNSCHEDULED_STATE;
+        var v3 : number/*unsigned short*/ = AudioBufferSourceNode.SCHEDULED_STATE;
+        var v4 : number/*unsigned short*/ = o.SCHEDULED_STATE;
+        var v5 : number/*unsigned short*/ = AudioBufferSourceNode.PLAYING_STATE;
+        var v6 : number/*unsigned short*/ = o.PLAYING_STATE;
+        var v7 : number/*unsigned short*/ = AudioBufferSourceNode.FINISHED_STATE;
+        var v8 : number/*unsigned short*/ = o.FINISHED_STATE;
+        var v9 : number/*unsigned short*/ = o.playbackState;
+        var v10 : AudioBuffer = o.buffer;
+        var v11 : AudioParam = o.playbackRate;
+        var v12 : boolean = o.loop;
+        o.noteOn(X.getnumber());
+        o.noteGrainOn(X.getnumber(), X.getnumber(), X.getnumber());
+        o.noteOff(X.getnumber());
+    } // AudioBufferSourceNode
+
+    // #207
+    function compile_MediaElementAudioSourceNode(o : MediaElementAudioSourceNode) : void {
+    } // MediaElementAudioSourceNode
+
+    // #208
+    function compile_JavaScriptAudioNode(o : JavaScriptAudioNode) : void {
+        var v1 : function(:Event):void/*EventListener*/ = o.onaudioprocess;
+        var v2 : number/*long*/ = o.bufferSize;
+    } // JavaScriptAudioNode
+
+    // #209
+    function compile_AudioProcessingEvent(o : AudioProcessingEvent) : void {
+        var v1 : JavaScriptAudioNode = o.node;
+        var v2 : number/*float*/ = o.playbackTime;
+        var v3 : AudioBuffer = o.inputBuffer;
+        var v4 : AudioBuffer = o.outputBuffer;
+    } // AudioProcessingEvent
+
+    // #210
+    function compile_AudioPannerNode(o : AudioPannerNode) : void {
+        var v1 : number/*unsigned short*/ = AudioPannerNode.EQUALPOWER;
+        var v2 : number/*unsigned short*/ = o.EQUALPOWER;
+        var v3 : number/*unsigned short*/ = AudioPannerNode.HRTF;
+        var v4 : number/*unsigned short*/ = o.HRTF;
+        var v5 : number/*unsigned short*/ = AudioPannerNode.SOUNDFIELD;
+        var v6 : number/*unsigned short*/ = o.SOUNDFIELD;
+        var v7 : number/*unsigned short*/ = AudioPannerNode.LINEAR_DISTANCE;
+        var v8 : number/*unsigned short*/ = o.LINEAR_DISTANCE;
+        var v9 : number/*unsigned short*/ = AudioPannerNode.INVERSE_DISTANCE;
+        var v10 : number/*unsigned short*/ = o.INVERSE_DISTANCE;
+        var v11 : number/*unsigned short*/ = AudioPannerNode.EXPONENTIAL_DISTANCE;
+        var v12 : number/*unsigned short*/ = o.EXPONENTIAL_DISTANCE;
+        var v13 : number/*unsigned short*/ = o.panningModel;
+        o.setPosition(X.getnumber(), X.getnumber(), X.getnumber());
+        o.setOrientation(X.getnumber(), X.getnumber(), X.getnumber());
+        o.setVelocity(X.getnumber(), X.getnumber(), X.getnumber());
+        var v14 : number/*unsigned short*/ = o.distanceModel;
+        var v15 : number/*float*/ = o.refDistance;
+        var v16 : number/*float*/ = o.maxDistance;
+        var v17 : number/*float*/ = o.rolloffFactor;
+        var v18 : number/*float*/ = o.coneInnerAngle;
+        var v19 : number/*float*/ = o.coneOuterAngle;
+        var v20 : number/*float*/ = o.coneOuterGain;
+        var v21 : AudioGain = o.coneGain;
+        var v22 : AudioGain = o.distanceGain;
+    } // AudioPannerNode
+
+    // #211
+    function compile_AudioListener(o : AudioListener) : void {
+        var v1 : number/*float*/ = o.dopplerFactor;
+        var v2 : number/*float*/ = o.speedOfSound;
+        o.setPosition(X.getnumber(), X.getnumber(), X.getnumber());
+        o.setOrientation(X.getnumber(), X.getnumber(), X.getnumber(), X.getnumber(), X.getnumber(), X.getnumber());
+        o.setVelocity(X.getnumber(), X.getnumber(), X.getnumber());
+    } // AudioListener
+
+    // #212
+    function compile_ConvolverNode(o : ConvolverNode) : void {
+        var v1 : AudioBuffer = o.buffer;
+        var v2 : boolean = o.normalize;
+    } // ConvolverNode
+
+    // #213
+    function compile_RealtimeAnalyserNode(o : RealtimeAnalyserNode) : void {
+        o.getFloatFrequencyData(X.getFloat32Array());
+        o.getByteFrequencyData(X.getUint8Array());
+        o.getByteTimeDomainData(X.getUint8Array());
+        var v1 : number/*unsigned long*/ = o.fftSize;
+        var v2 : number/*unsigned long*/ = o.frequencyBinCount;
+        var v3 : number/*float*/ = o.minDecibels;
+        var v4 : number/*float*/ = o.maxDecibels;
+        var v5 : number/*float*/ = o.smoothingTimeConstant;
+    } // RealtimeAnalyserNode
+
+    // #214
+    function compile_AudioChannelSplitter(o : AudioChannelSplitter) : void {
+    } // AudioChannelSplitter
+
+    // #215
+    function compile_AudioChannelMerger(o : AudioChannelMerger) : void {
+    } // AudioChannelMerger
+
+    // #216
+    function compile_DynamicsCompressorNode(o : DynamicsCompressorNode) : void {
+        var v1 : AudioParam = o.threshold;
+        var v2 : AudioParam = o.knee;
+        var v3 : AudioParam = o.ratio;
+        var v4 : AudioParam = o.reduction;
+        var v5 : AudioParam = o.attack;
+        var v6 : AudioParam = o.release;
+    } // DynamicsCompressorNode
+
+    // #217
+    function compile_BiquadFilterNode(o : BiquadFilterNode) : void {
+        var v1 : number/*unsigned short*/ = BiquadFilterNode.LOWPASS;
+        var v2 : number/*unsigned short*/ = o.LOWPASS;
+        var v3 : number/*unsigned short*/ = BiquadFilterNode.HIGHPASS;
+        var v4 : number/*unsigned short*/ = o.HIGHPASS;
+        var v5 : number/*unsigned short*/ = BiquadFilterNode.BANDPASS;
+        var v6 : number/*unsigned short*/ = o.BANDPASS;
+        var v7 : number/*unsigned short*/ = BiquadFilterNode.LOWSHELF;
+        var v8 : number/*unsigned short*/ = o.LOWSHELF;
+        var v9 : number/*unsigned short*/ = BiquadFilterNode.HIGHSHELF;
+        var v10 : number/*unsigned short*/ = o.HIGHSHELF;
+        var v11 : number/*unsigned short*/ = BiquadFilterNode.PEAKING;
+        var v12 : number/*unsigned short*/ = o.PEAKING;
+        var v13 : number/*unsigned short*/ = BiquadFilterNode.NOTCH;
+        var v14 : number/*unsigned short*/ = o.NOTCH;
+        var v15 : number/*unsigned short*/ = BiquadFilterNode.ALLPASS;
+        var v16 : number/*unsigned short*/ = o.ALLPASS;
+        var v17 : number/*unsigned short*/ = o.type;
+        var v18 : AudioParam = o.frequency;
+        var v19 : AudioParam = o.Q;
+        var v20 : AudioParam = o.gain;
+        o.getFrequencyResponse(X.getFloat32Array(), X.getFloat32Array(), X.getFloat32Array());
+    } // BiquadFilterNode
+
+    // #218
+    function compile_WaveShaperNode(o : WaveShaperNode) : void {
+        var v1 : Float32Array = o.curve;
+    } // WaveShaperNode
+
+    // #219
+    function compile_Oscillator(o : Oscillator) : void {
+        var v1 : number/*unsigned short*/ = Oscillator.SINE;
+        var v2 : number/*unsigned short*/ = o.SINE;
+        var v3 : number/*unsigned short*/ = Oscillator.SQUARE;
+        var v4 : number/*unsigned short*/ = o.SQUARE;
+        var v5 : number/*unsigned short*/ = Oscillator.SAWTOOTH;
+        var v6 : number/*unsigned short*/ = o.SAWTOOTH;
+        var v7 : number/*unsigned short*/ = Oscillator.TRIANGLE;
+        var v8 : number/*unsigned short*/ = o.TRIANGLE;
+        var v9 : number/*unsigned short*/ = Oscillator.CUSTOM;
+        var v10 : number/*unsigned short*/ = o.CUSTOM;
+        var v11 : number/*unsigned short*/ = o.type;
+        var v12 : number/*unsigned short*/ = Oscillator.UNSCHEDULED_STATE;
+        var v13 : number/*unsigned short*/ = o.UNSCHEDULED_STATE;
+        var v14 : number/*unsigned short*/ = Oscillator.SCHEDULED_STATE;
+        var v15 : number/*unsigned short*/ = o.SCHEDULED_STATE;
+        var v16 : number/*unsigned short*/ = Oscillator.PLAYING_STATE;
+        var v17 : number/*unsigned short*/ = o.PLAYING_STATE;
+        var v18 : number/*unsigned short*/ = Oscillator.FINISHED_STATE;
+        var v19 : number/*unsigned short*/ = o.FINISHED_STATE;
+        var v20 : number/*unsigned short*/ = o.playbackState;
+        var v21 : AudioParam = o.frequency;
+        var v22 : AudioParam = o.detune;
+        o.noteOn(X.getnumber());
+        o.noteOff(X.getnumber());
+        o.setWaveTable(X.getWaveTable());
+    } // Oscillator
+
+    // #220
+    function compile_WaveTable(o : WaveTable) : void {
+    } // WaveTable
+
+    // #221
+    function compile_MediaStreamAudioSourceNode(o : MediaStreamAudioSourceNode) : void {
+    } // MediaStreamAudioSourceNode
+
+    // #222
     function compile_Touch(o : Touch) : void {
         var v1 : number/*long*/ = o.identifier;
         var v2 : EventTarget = o.target;
@@ -3213,7 +3489,7 @@ class _Test extends TestCase {
         var v8 : number/*long*/ = o.pageY;
     } // Touch
 
-    // #198
+    // #223
     function compile_TouchList(o : TouchList) : void {
         var v1 : number/*unsigned long*/ = o.length;
         var f1 : Nullable.<Touch> = o.__native_index_operator__(X.getnumber());
@@ -3221,7 +3497,7 @@ class _Test extends TestCase {
         var f3 : Touch = o.identifiedTouch(X.getnumber());
     } // TouchList
 
-    // #199
+    // #224
     function compile_TouchEvent(o : TouchEvent) : void {
         var v1 : TouchList = o.touches;
         var v2 : TouchList = o.targetTouches;
@@ -3232,7 +3508,7 @@ class _Test extends TestCase {
         var v7 : boolean = o.shiftKey;
     } // TouchEvent
 
-    // #200
+    // #225
     function compile_WebSocket(o : WebSocket) : void {
         var c1 = new WebSocket(X.getstring());
         var c2 = new WebSocket(X.getstring(), X.getstring());
@@ -3263,7 +3539,7 @@ class _Test extends TestCase {
         o.send(X.getBlob());
     } // WebSocket
 
-    // #201
+    // #226
     function compile_CloseEvent(o : CloseEvent) : void {
         var c1 = new CloseEvent(X.getstring());
         var c2 = new CloseEvent(X.getstring(), X.getCloseEventInit());
@@ -3272,19 +3548,19 @@ class _Test extends TestCase {
         var v3 : string/*DOMString*/ = o.reason;
     } // CloseEvent
 
-    // #202
+    // #227
     function compile_CloseEventInit(o : CloseEventInit) : void {
         var v1 : boolean = o.wasClean;
         var v2 : number/*unsigned short*/ = o.code;
         var v3 : string/*DOMString*/ = o.reason;
     } // CloseEventInit
 
-    // #203
+    // #228
     function compile_NavigatorGeolocation(o : NavigatorGeolocation) : void {
         var v1 : Geolocation = o.geolocation;
     } // NavigatorGeolocation
 
-    // #204
+    // #229
     function compile_Geolocation(o : Geolocation) : void {
         o.getCurrentPosition(X.getfunction_position_Position__void());
         o.getCurrentPosition(X.getfunction_position_Position__void(), X.getfunction_positionError_PositionError__void());
@@ -3295,20 +3571,20 @@ class _Test extends TestCase {
         o.clearWatch(X.getnumber());
     } // Geolocation
 
-    // #205
+    // #230
     function compile_PositionOptions(o : PositionOptions) : void {
         var v1 : boolean = o.enableHighAccuracy;
         var v2 : number/*long*/ = o.timeout;
         var v3 : number/*long*/ = o.maximumAge;
     } // PositionOptions
 
-    // #206
+    // #231
     function compile_Position(o : Position) : void {
         var v1 : Coordinates = o.coords;
         var v2 : number/*DOMTimeStamp*/ = o.timestamp;
     } // Position
 
-    // #207
+    // #232
     function compile_Coordinates(o : Coordinates) : void {
         var v1 : number/*double*/ = o.latitude;
         var v2 : number/*double*/ = o.longitude;
@@ -3319,7 +3595,7 @@ class _Test extends TestCase {
         var v7 : Nullable.<number>/*double?*/ = o.speed;
     } // Coordinates
 
-    // #208
+    // #233
     function compile_PositionError(o : PositionError) : void {
         var v1 : number/*unsigned short*/ = PositionError.PERMISSION_DENIED;
         var v2 : number/*unsigned short*/ = o.PERMISSION_DENIED;
@@ -3331,7 +3607,7 @@ class _Test extends TestCase {
         var v8 : string/*DOMString*/ = o.message;
     } // PositionError
 
-    // #209
+    // #234
     function compile_Storage(o : Storage) : void {
         var v1 : number/*unsigned long*/ = o.length;
         var f1 : Nullable.<string>/*DOMString?*/ = o.key(X.getnumber());
@@ -3342,17 +3618,17 @@ class _Test extends TestCase {
         o.clear();
     } // Storage
 
-    // #210
+    // #235
     function compile_WindowSessionStorage(o : WindowSessionStorage) : void {
         var v1 : Storage = o.sessionStorage;
     } // WindowSessionStorage
 
-    // #211
+    // #236
     function compile_WindowLocalStorage(o : WindowLocalStorage) : void {
         var v1 : Storage = o.localStorage;
     } // WindowLocalStorage
 
-    // #212
+    // #237
     function compile_StorageEvent(o : StorageEvent) : void {
         var c1 = new StorageEvent(X.getstring());
         var c2 = new StorageEvent(X.getstring(), X.getStorageEventInit());
@@ -3363,7 +3639,7 @@ class _Test extends TestCase {
         var v5 : Nullable.<Storage> = o.storageArea;
     } // StorageEvent
 
-    // #213
+    // #238
     function compile_StorageEventInit(o : StorageEventInit) : void {
         var v1 : Nullable.<string>/*DOMString?*/ = o.key;
         var v2 : Nullable.<string>/*DOMString?*/ = o.oldValue;
@@ -3372,7 +3648,7 @@ class _Test extends TestCase {
         var v5 : Nullable.<Storage> = o.storageArea;
     } // StorageEventInit
 
-    // #214
+    // #239
     function compile_MessageEvent(o : MessageEvent) : void {
         var c1 = new MessageEvent(X.getstring());
         var c2 = new MessageEvent(X.getstring(), X.getMessageEventInit());
@@ -3383,7 +3659,7 @@ class _Test extends TestCase {
         var v5 : MessagePort[] = o.ports;
     } // MessageEvent
 
-    // #215
+    // #240
     function compile_MessageEventInit(o : MessageEventInit) : void {
         var v1 : variant/*any*/ = o.data;
         var v2 : string/*DOMString*/ = o.origin;
@@ -3392,14 +3668,14 @@ class _Test extends TestCase {
         var v5 : MessagePort[] = o.ports;
     } // MessageEventInit
 
-    // #216
+    // #241
     function compile_MessageChannel(o : MessageChannel) : void {
         var c1 = new MessageChannel();
         var v1 : MessagePort = o.port1;
         var v2 : MessagePort = o.port2;
     } // MessageChannel
 
-    // #217
+    // #242
     function compile_MessagePort(o : MessagePort) : void {
         o.postMessage(X.getvariant());
         o.postMessage(X.getvariant(), X.getTransferable__());
@@ -3408,7 +3684,7 @@ class _Test extends TestCase {
         var v1 : Nullable.<function(:Event):void>/*Function?*/ = o.onmessage;
     } // MessagePort
 
-    // #218
+    // #243
     function compile_WorkerGlobalScope(o : WorkerGlobalScope) : void {
         var v1 : WorkerGlobalScope = o.self;
         var v2 : WorkerLocation = o.location;
@@ -3420,21 +3696,21 @@ class _Test extends TestCase {
         var v6 : WorkerNavigator = o.navigator;
     } // WorkerGlobalScope
 
-    // #219
+    // #244
     function compile_DedicatedWorkerGlobalScope(o : DedicatedWorkerGlobalScope) : void {
         o.postMessage(X.getvariant());
         o.postMessage(X.getvariant(), X.getTransferable__());
         var v1 : Nullable.<function(:Event):void>/*Function?*/ = o.onmessage;
     } // DedicatedWorkerGlobalScope
 
-    // #220
+    // #245
     function compile_SharedWorkerGlobalScope(o : SharedWorkerGlobalScope) : void {
         var v1 : string/*DOMString*/ = o.name;
         var v2 : ApplicationCache = o.applicationCache;
         var v3 : Nullable.<function(:Event):void>/*Function?*/ = o.onconnect;
     } // SharedWorkerGlobalScope
 
-    // #221
+    // #246
     function compile_ErrorEvent(o : ErrorEvent) : void {
         var c1 = new ErrorEvent(X.getstring());
         var c2 = new ErrorEvent(X.getstring(), X.getErrorEventInit());
@@ -3443,19 +3719,19 @@ class _Test extends TestCase {
         var v3 : number/*unsigned long*/ = o.lineno;
     } // ErrorEvent
 
-    // #222
+    // #247
     function compile_ErrorEventInit(o : ErrorEventInit) : void {
         var v1 : string/*DOMString*/ = o.message;
         var v2 : string/*DOMString*/ = o.filename;
         var v3 : number/*unsigned long*/ = o.lineno;
     } // ErrorEventInit
 
-    // #223
+    // #248
     function compile_AbstractWorker(o : AbstractWorker) : void {
         var v1 : Nullable.<function(:Event):void>/*Function?*/ = o.onerror;
     } // AbstractWorker
 
-    // #224
+    // #249
     function compile_Worker(o : Worker) : void {
         var c1 = new Worker(X.getstring());
         o.terminate();
@@ -3465,7 +3741,7 @@ class _Test extends TestCase {
         var v2 : Nullable.<function(:Event):void>/*Function?*/ = o.onerror;
     } // Worker
 
-    // #225
+    // #250
     function compile_SharedWorker(o : SharedWorker) : void {
         var c1 = new SharedWorker(X.getstring());
         var c2 = new SharedWorker(X.getstring(), X.getstring());
@@ -3473,18 +3749,18 @@ class _Test extends TestCase {
         var v2 : Nullable.<function(:Event):void>/*Function?*/ = o.onerror;
     } // SharedWorker
 
-    // #226
+    // #251
     function compile_WorkerUtils(o : WorkerUtils) : void {
         o.importScripts(X.getstring());
         var v1 : WorkerNavigator = o.navigator;
     } // WorkerUtils
 
-    // #227
+    // #252
     function compile_WorkerNavigator(o : WorkerNavigator) : void {
         var v1 : boolean = o.onLine;
     } // WorkerNavigator
 
-    // #228
+    // #253
     function compile_WorkerLocation(o : WorkerLocation) : void {
         var v1 : string/*DOMString*/ = o.href;
         var v2 : string/*DOMString*/ = o.protocol;
@@ -3496,7 +3772,7 @@ class _Test extends TestCase {
         var v8 : string/*DOMString*/ = o.hash;
     } // WorkerLocation
 
-    // #229
+    // #254
     function compile_EventSource(o : EventSource) : void {
         var c1 = new EventSource(X.getstring());
         var c2 = new EventSource(X.getstring(), X.getEventSourceInit());
@@ -3515,24 +3791,91 @@ class _Test extends TestCase {
         o.close();
     } // EventSource
 
-    // #230
+    // #255
     function compile_EventSourceInit(o : EventSourceInit) : void {
         var v1 : boolean = o.withCredentials;
     } // EventSourceInit
 
-    // #231
+    // #256
+    function compile_MediaStream(o : MediaStream) : void {
+        var c1 = new MediaStream(X.getNullable__MediaStreamTrackList_(), X.getNullable__MediaStreamTrackList_());
+        var v1 : string/*DOMString*/ = o.label;
+        var v2 : MediaStreamTrackList = o.audioTracks;
+        var v3 : MediaStreamTrackList = o.videoTracks;
+        var v4 : boolean = o.ended;
+        var v5 : Nullable.<function(:Event):void>/*Function?*/ = o.onended;
+    } // MediaStream
+
+    // #257
+    function compile_LocalMediaStream(o : LocalMediaStream) : void {
+        o.stop();
+    } // LocalMediaStream
+
+    // #258
+    function compile_MediaStreamTrack(o : MediaStreamTrack) : void {
+        var v1 : string/*DOMString*/ = o.kind;
+        var v2 : string/*DOMString*/ = o.label;
+        var v3 : boolean = o.enabled;
+        var v4 : number/*unsigned short*/ = MediaStreamTrack.LIVE;
+        var v5 : number/*unsigned short*/ = o.LIVE;
+        var v6 : number/*unsigned short*/ = MediaStreamTrack.MUTED;
+        var v7 : number/*unsigned short*/ = o.MUTED;
+        var v8 : number/*unsigned short*/ = MediaStreamTrack.ENDED;
+        var v9 : number/*unsigned short*/ = o.ENDED;
+        var v10 : number/*unsigned short*/ = o.readyState;
+        var v11 : Nullable.<function(:Event):void>/*Function?*/ = o.onmute;
+        var v12 : Nullable.<function(:Event):void>/*Function?*/ = o.onunmute;
+        var v13 : Nullable.<function(:Event):void>/*Function?*/ = o.onended;
+    } // MediaStreamTrack
+
+    // #259
+    function compile_MediaStreamTrackList(o : MediaStreamTrackList) : void {
+        var v1 : number/*unsigned long*/ = o.length;
+        var f1 : MediaStreamTrack = o.item(X.getnumber());
+        o.add(X.getMediaStreamTrack());
+        o.remove(X.getMediaStreamTrack());
+        var v2 : Nullable.<function(:Event):void>/*Function?*/ = o.onaddtrack;
+        var v3 : Nullable.<function(:Event):void>/*Function?*/ = o.onremovetrack;
+    } // MediaStreamTrackList
+
+    // #260
+    function compile_NavigatorUserMedia(o : NavigatorUserMedia) : void {
+        o.getUserMedia(X.getNullable__MediaStreamConstraints_(), X.getfunction_stream_LocalMediaStream__void());
+        o.getUserMedia(X.getNullable__MediaStreamConstraints_(), X.getfunction_stream_LocalMediaStream__void(), X.getNullable__function_error_NavigatorUserMediaError__void_());
+    } // NavigatorUserMedia
+
+    // #261
+    function compile_MediaStreamConstraints(o : MediaStreamConstraints) : void {
+        var v1 : variant/*(boolean or MediaTrackConstraints)*/ = o.video;
+        var v2 : variant/*(boolean or MediaTrackConstraints)*/ = o.audio;
+    } // MediaStreamConstraints
+
+    // #262
+    function compile_MediaTrackConstraints(o : MediaTrackConstraints) : void {
+        var v1 : Nullable.<Map.<variant>>/*MediaTrackConstraintSet?*/ = o.mandatory;
+        var v2 : Map.<variant>[]/*MediaTrackConstraint[]?*/ = o.optional;
+    } // MediaTrackConstraints
+
+    // #263
+    function compile_NavigatorUserMediaError(o : NavigatorUserMediaError) : void {
+        var v1 : number/*unsigned short*/ = NavigatorUserMediaError.PERMISSION_DENIED;
+        var v2 : number/*unsigned short*/ = o.PERMISSION_DENIED;
+        var v3 : number/*unsigned short*/ = o.code;
+    } // NavigatorUserMediaError
+
+    // #264
     function compile_DOMParser(o : DOMParser) : void {
         var c1 = new DOMParser();
         var f1 : Document = o.parseFromString(X.getstring(), X.getstring());
     } // DOMParser
 
-    // #232
+    // #265
     function compile_XMLSerializer(o : XMLSerializer) : void {
         var c1 = new XMLSerializer();
         var f1 : string/*DOMString*/ = o.serializeToString(X.getNode());
     } // XMLSerializer
 
-    // #233
+    // #266
     function compile_ArrayBuffer(o : ArrayBuffer) : void {
         var c1 = new ArrayBuffer(X.getnumber());
         var v1 : number/*unsigned long*/ = o.byteLength;
@@ -3540,14 +3883,14 @@ class _Test extends TestCase {
         var f2 : ArrayBuffer = o.slice(X.getnumber(), X.getnumber());
     } // ArrayBuffer
 
-    // #234
+    // #267
     function compile_ArrayBufferView(o : ArrayBufferView) : void {
         var v1 : ArrayBuffer = o.buffer;
         var v2 : number/*unsigned long*/ = o.byteOffset;
         var v3 : number/*unsigned long*/ = o.byteLength;
     } // ArrayBufferView
 
-    // #235
+    // #268
     function compile_Int8Array(o : Int8Array) : void {
         var c1 = new Int8Array(X.getnumber());
         var c2 = new Int8Array(X.getInt8Array());
@@ -3571,7 +3914,7 @@ class _Test extends TestCase {
         var f3 : Int8Array = o.subarray(X.getnumber(), X.getnumber());
     } // Int8Array
 
-    // #236
+    // #269
     function compile_Uint8Array(o : Uint8Array) : void {
         var c1 = new Uint8Array(X.getnumber());
         var c2 = new Uint8Array(X.getUint8Array());
@@ -3595,7 +3938,7 @@ class _Test extends TestCase {
         var f3 : Uint8Array = o.subarray(X.getnumber(), X.getnumber());
     } // Uint8Array
 
-    // #237
+    // #270
     function compile_Uint8ClampedArray(o : Uint8ClampedArray) : void {
         var c1 = new Uint8ClampedArray(X.getnumber());
         var c2 = new Uint8ClampedArray(X.getUint8ClampedArray());
@@ -3615,7 +3958,7 @@ class _Test extends TestCase {
         var f1 : Uint8ClampedArray = o.subarray(X.getnumber(), X.getnumber());
     } // Uint8ClampedArray
 
-    // #238
+    // #271
     function compile_Int16Array(o : Int16Array) : void {
         var c1 = new Int16Array(X.getnumber());
         var c2 = new Int16Array(X.getInt16Array());
@@ -3639,7 +3982,7 @@ class _Test extends TestCase {
         var f3 : Int16Array = o.subarray(X.getnumber(), X.getnumber());
     } // Int16Array
 
-    // #239
+    // #272
     function compile_Uint16Array(o : Uint16Array) : void {
         var c1 = new Uint16Array(X.getnumber());
         var c2 = new Uint16Array(X.getUint16Array());
@@ -3663,7 +4006,7 @@ class _Test extends TestCase {
         var f3 : Uint16Array = o.subarray(X.getnumber(), X.getnumber());
     } // Uint16Array
 
-    // #240
+    // #273
     function compile_Int32Array(o : Int32Array) : void {
         var c1 = new Int32Array(X.getnumber());
         var c2 = new Int32Array(X.getInt32Array());
@@ -3687,7 +4030,7 @@ class _Test extends TestCase {
         var f3 : Int32Array = o.subarray(X.getnumber(), X.getnumber());
     } // Int32Array
 
-    // #241
+    // #274
     function compile_Uint32Array(o : Uint32Array) : void {
         var c1 = new Uint32Array(X.getnumber());
         var c2 = new Uint32Array(X.getUint32Array());
@@ -3711,7 +4054,7 @@ class _Test extends TestCase {
         var f3 : Uint32Array = o.subarray(X.getnumber(), X.getnumber());
     } // Uint32Array
 
-    // #242
+    // #275
     function compile_Float32Array(o : Float32Array) : void {
         var c1 = new Float32Array(X.getnumber());
         var c2 = new Float32Array(X.getFloat32Array());
@@ -3735,7 +4078,7 @@ class _Test extends TestCase {
         var f3 : Float32Array = o.subarray(X.getnumber(), X.getnumber());
     } // Float32Array
 
-    // #243
+    // #276
     function compile_Float64Array(o : Float64Array) : void {
         var c1 = new Float64Array(X.getnumber());
         var c2 = new Float64Array(X.getFloat64Array());
@@ -3759,7 +4102,7 @@ class _Test extends TestCase {
         var f3 : Float64Array = o.subarray(X.getnumber(), X.getnumber());
     } // Float64Array
 
-    // #244
+    // #277
     function compile_DataView(o : DataView) : void {
         var c1 = new DataView(X.getArrayBuffer());
         var c2 = new DataView(X.getArrayBuffer(), X.getnumber());
@@ -3794,7 +4137,7 @@ class _Test extends TestCase {
         o.setFloat64(X.getnumber(), X.getnumber(), X.getboolean());
     } // DataView
 
-    // #245
+    // #278
     function compile_CanvasRenderingContext2D(o : CanvasRenderingContext2D) : void {
         var v1 : HTMLCanvasElement = o.canvas;
         o.save();
@@ -3860,7 +4203,7 @@ class _Test extends TestCase {
         var v16 : string/*DOMString*/ = o.textBaseline;
     } // CanvasRenderingContext2D
 
-    // #246
+    // #279
     function compile_CanvasTransformation(o : CanvasTransformation) : void {
         o.scale(X.getnumber(), X.getnumber());
         o.rotate(X.getnumber());
@@ -3869,7 +4212,7 @@ class _Test extends TestCase {
         o.setTransform(X.getnumber(), X.getnumber(), X.getnumber(), X.getnumber(), X.getnumber(), X.getnumber());
     } // CanvasTransformation
 
-    // #247
+    // #280
     function compile_CanvasLineStyles(o : CanvasLineStyles) : void {
         var v1 : number/*double*/ = o.lineWidth;
         var v2 : string/*DOMString*/ = o.lineCap;
@@ -3877,14 +4220,14 @@ class _Test extends TestCase {
         var v4 : number/*double*/ = o.miterLimit;
     } // CanvasLineStyles
 
-    // #248
+    // #281
     function compile_CanvasText(o : CanvasText) : void {
         var v1 : string/*DOMString*/ = o.font;
         var v2 : string/*DOMString*/ = o.textAlign;
         var v3 : string/*DOMString*/ = o.textBaseline;
     } // CanvasText
 
-    // #249
+    // #282
     function compile_CanvasPathMethods(o : CanvasPathMethods) : void {
         o.closePath();
         o.moveTo(X.getnumber(), X.getnumber());
@@ -3897,28 +4240,28 @@ class _Test extends TestCase {
         o.arc(X.getnumber(), X.getnumber(), X.getnumber(), X.getnumber(), X.getnumber(), X.getboolean());
     } // CanvasPathMethods
 
-    // #250
+    // #283
     function compile_CanvasGradient(o : CanvasGradient) : void {
         o.addColorStop(X.getnumber(), X.getstring());
     } // CanvasGradient
 
-    // #251
+    // #284
     function compile_CanvasPattern(o : CanvasPattern) : void {
     } // CanvasPattern
 
-    // #252
+    // #285
     function compile_TextMetrics(o : TextMetrics) : void {
         var v1 : number/*double*/ = o.width;
     } // TextMetrics
 
-    // #253
+    // #286
     function compile_ImageData(o : ImageData) : void {
         var v1 : number/*unsigned long*/ = o.width;
         var v2 : number/*unsigned long*/ = o.height;
         var v3 : Uint8ClampedArray = o.data;
     } // ImageData
 
-    // #254
+    // #287
     function compile_WebGLContextAttributes(o : WebGLContextAttributes) : void {
         var v1 : boolean = o.alpha;
         var v2 : boolean = o.depth;
@@ -3928,53 +4271,53 @@ class _Test extends TestCase {
         var v6 : boolean = o.preserveDrawingBuffer;
     } // WebGLContextAttributes
 
-    // #255
+    // #288
     function compile_WebGLObject(o : WebGLObject) : void {
     } // WebGLObject
 
-    // #256
+    // #289
     function compile_WebGLBuffer(o : WebGLBuffer) : void {
     } // WebGLBuffer
 
-    // #257
+    // #290
     function compile_WebGLFramebuffer(o : WebGLFramebuffer) : void {
     } // WebGLFramebuffer
 
-    // #258
+    // #291
     function compile_WebGLProgram(o : WebGLProgram) : void {
     } // WebGLProgram
 
-    // #259
+    // #292
     function compile_WebGLRenderbuffer(o : WebGLRenderbuffer) : void {
     } // WebGLRenderbuffer
 
-    // #260
+    // #293
     function compile_WebGLShader(o : WebGLShader) : void {
     } // WebGLShader
 
-    // #261
+    // #294
     function compile_WebGLTexture(o : WebGLTexture) : void {
     } // WebGLTexture
 
-    // #262
+    // #295
     function compile_WebGLUniformLocation(o : WebGLUniformLocation) : void {
     } // WebGLUniformLocation
 
-    // #263
+    // #296
     function compile_WebGLActiveInfo(o : WebGLActiveInfo) : void {
         var v1 : number/*GLint*/ = o.size;
         var v2 : number/*GLenum*/ = o.type;
         var v3 : string/*DOMString*/ = o.name;
     } // WebGLActiveInfo
 
-    // #264
+    // #297
     function compile_WebGLShaderPrecisionFormat(o : WebGLShaderPrecisionFormat) : void {
         var v1 : number/*GLint*/ = o.rangeMin;
         var v2 : number/*GLint*/ = o.rangeMax;
         var v3 : number/*GLint*/ = o.precision;
     } // WebGLShaderPrecisionFormat
 
-    // #265
+    // #298
     function compile_WebGLRenderingContext(o : WebGLRenderingContext) : void {
         var v1 : number/*GLenum*/ = WebGLRenderingContext.DEPTH_BUFFER_BIT;
         var v2 : number/*GLenum*/ = o.DEPTH_BUFFER_BIT;
@@ -4748,19 +5091,19 @@ class _Test extends TestCase {
         o.viewport(X.getnumber(), X.getnumber(), X.getnumber(), X.getnumber());
     } // WebGLRenderingContext
 
-    // #266
+    // #299
     function compile_WebGLContextEvent(o : WebGLContextEvent) : void {
         var c1 = new WebGLContextEvent(X.getstring());
         var c2 = new WebGLContextEvent(X.getstring(), X.getWebGLContextEventInit());
         var v1 : string/*DOMString*/ = o.statusMessage;
     } // WebGLContextEvent
 
-    // #267
+    // #300
     function compile_WebGLContextEventInit(o : WebGLContextEventInit) : void {
         var v1 : string/*DOMString*/ = o.statusMessage;
     } // WebGLContextEventInit
 
-    // #268
+    // #301
     function compile_nsIDOMGamepad(o : nsIDOMGamepad) : void {
         var v1 : string/*DOMString*/ = o.id;
         var v2 : boolean = o.connected;
@@ -4769,25 +5112,25 @@ class _Test extends TestCase {
         var v5 : number/*unsigned long*/ = o.index;
     } // nsIDOMGamepad
 
-    // #269
+    // #302
     function compile_nsIDOMGamepadConnectionEvent(o : nsIDOMGamepadConnectionEvent) : void {
         var v1 : nsIDOMGamepad = o.gamepad;
     } // nsIDOMGamepadConnectionEvent
 
-    // #270
+    // #303
     function compile_nsIDOMGamepadButtonEvent(o : nsIDOMGamepadButtonEvent) : void {
         var v1 : number/*unsigned long*/ = o.button;
         var v2 : nsIDOMGamepad = o.gamepad;
     } // nsIDOMGamepadButtonEvent
 
-    // #271
+    // #304
     function compile_nsIDOMGamepadAxisMoveEvent(o : nsIDOMGamepadAxisMoveEvent) : void {
         var v1 : number/*unsigned long*/ = o.axis;
         var v2 : number/*float*/ = o.value;
         var v3 : nsIDOMGamepad = o.gamepad;
     } // nsIDOMGamepadAxisMoveEvent
 
-    // #272
+    // #305
     function compile_WindowAnimationTiming(o : WindowAnimationTiming) : void {
         var f1 : number/*long*/ = o.requestAnimationFrame(X.getfunction_time_number__void());
         o.cancelAnimationFrame(X.getnumber());
@@ -4797,20 +5140,20 @@ class _Test extends TestCase {
         o.mozCancelAnimationFrame(X.getnumber());
     } // WindowAnimationTiming
 
-    // #273
+    // #306
     function compile_CanvasPixelArray(o : CanvasPixelArray) : void {
         var v1 : number/*unsigned long*/ = o.length;
         var f1 : Nullable.<number>/*octet*/ = o.__native_index_operator__(X.getnumber());
     } // CanvasPixelArray
 
-    // #274
+    // #307
     function compile_CSSRuleList(o : CSSRuleList) : void {
         var v1 : number/*long*/ = o.length;
         var f1 : Nullable.<CSSRule> = o.__native_index_operator__(X.getnumber());
         var f2 : Nullable.<CSSRule> = o.item(X.getnumber());
     } // CSSRuleList
 
-    // #275
+    // #308
     function compile_StyleSheetList(o : StyleSheetList) : void {
         var v1 : number/*long*/ = o.length;
         var f1 : Nullable.<StyleSheet> = o.__native_index_operator__(X.getnumber());
@@ -4830,8 +5173,21 @@ native class X {
     static function getArrayBuffer() : ArrayBuffer;
     static function getArrayBufferView() : ArrayBufferView;
     static function getAttr__() : Attr[];
+    static function getAudioBuffer() : AudioBuffer;
+    static function getAudioBufferSourceNode() : AudioBufferSourceNode;
+    static function getAudioChannelMerger() : AudioChannelMerger;
+    static function getAudioChannelSplitter() : AudioChannelSplitter;
+    static function getAudioContext() : AudioContext;
+    static function getAudioDestinationNode() : AudioDestinationNode;
+    static function getAudioGain() : AudioGain;
+    static function getAudioGainNode() : AudioGainNode;
+    static function getAudioListener() : AudioListener;
+    static function getAudioNode() : AudioNode;
+    static function getAudioPannerNode() : AudioPannerNode;
+    static function getAudioParam() : AudioParam;
     static function getAudioTrackList() : AudioTrackList;
     static function getBarProp() : BarProp;
+    static function getBiquadFilterNode() : BiquadFilterNode;
     static function getBlob() : Blob;
     static function getCSSRule() : CSSRule;
     static function getCSSRuleList() : CSSRuleList;
@@ -4844,6 +5200,7 @@ native class X {
     static function getCloseEventInit() : CloseEventInit;
     static function getComment() : Comment;
     static function getCompositionEventInit() : CompositionEventInit;
+    static function getConvolverNode() : ConvolverNode;
     static function getCoordinates() : Coordinates;
     static function getCustomEventInit() : CustomEventInit;
     static function getDOMError() : DOMError;
@@ -4854,11 +5211,13 @@ native class X {
     static function getDOMTokenList() : DOMTokenList;
     static function getDataTransferItemList() : DataTransferItemList;
     static function getDate() : Date;
+    static function getDelayNode() : DelayNode;
     static function getDocument() : Document;
     static function getDocumentFragment() : DocumentFragment;
     static function getDocumentType() : DocumentType;
     static function getDocumentView() : DocumentView;
     static function getDragEventInit() : DragEventInit;
+    static function getDynamicsCompressorNode() : DynamicsCompressorNode;
     static function getElement() : Element;
     static function getErrorEventInit() : ErrorEventInit;
     static function getEvent() : Event;
@@ -4881,6 +5240,7 @@ native class X {
     static function getHTMLFormControlsCollection() : HTMLFormControlsCollection;
     static function getHTMLFormElement() : HTMLFormElement;
     static function getHTMLImageElement() : HTMLImageElement;
+    static function getHTMLMediaElement() : HTMLMediaElement;
     static function getHTMLOptGroupElement() : HTMLOptGroupElement;
     static function getHTMLOptionElement() : HTMLOptionElement;
     static function getHTMLOptionsCollection() : HTMLOptionsCollection;
@@ -4891,10 +5251,17 @@ native class X {
     static function getInt16Array() : Int16Array;
     static function getInt32Array() : Int32Array;
     static function getInt8Array() : Int8Array;
+    static function getJavaScriptAudioNode() : JavaScriptAudioNode;
     static function getKeyboardEventInit() : KeyboardEventInit;
     static function getLocation() : Location;
+    static function getMap__variant___() : Map.<variant>[];
+    static function getMediaElementAudioSourceNode() : MediaElementAudioSourceNode;
     static function getMediaList() : MediaList;
     static function getMediaQueryList() : MediaQueryList;
+    static function getMediaStream() : MediaStream;
+    static function getMediaStreamAudioSourceNode() : MediaStreamAudioSourceNode;
+    static function getMediaStreamTrack() : MediaStreamTrack;
+    static function getMediaStreamTrackList() : MediaStreamTrackList;
     static function getMessageEventInit() : MessageEventInit;
     static function getMessagePort() : MessagePort;
     static function getMessagePort__() : MessagePort[];
@@ -4928,8 +5295,11 @@ native class X {
     static function getNullable__HTMLTableSectionElement_() : Nullable.<HTMLTableSectionElement>;
     static function getNullable__ImageData_() : Nullable.<ImageData>;
     static function getNullable__Location_() : Nullable.<Location>;
+    static function getNullable__Map__variant__() : Nullable.<Map.<variant>>;
     static function getNullable__MediaController_() : Nullable.<MediaController>;
     static function getNullable__MediaError_() : Nullable.<MediaError>;
+    static function getNullable__MediaStreamConstraints_() : Nullable.<MediaStreamConstraints>;
+    static function getNullable__MediaStreamTrackList_() : Nullable.<MediaStreamTrackList>;
     static function getNullable__NodeFilter_() : Nullable.<NodeFilter>;
     static function getNullable__NodeList_() : Nullable.<NodeList>;
     static function getNullable__Node_() : Nullable.<Node>;
@@ -4955,14 +5325,17 @@ native class X {
     static function getNullable__function__Event__void_() : Nullable.<function(:Event):void>;
     static function getNullable__function__File__void_() : Nullable.<function(:File):void>;
     static function getNullable__function__string__void_() : Nullable.<function(:string):void>;
+    static function getNullable__function_error_NavigatorUserMediaError__void_() : Nullable.<function(error:NavigatorUserMediaError):void>;
     static function getNullable__number_() : Nullable.<number>;
     static function getNullable__string_() : Nullable.<string>;
     static function getObject() : Object;
+    static function getOscillator() : Oscillator;
     static function getPageTransitionEventInit() : PageTransitionEventInit;
     static function getPopStateEventInit() : PopStateEventInit;
     static function getPositionOptions() : PositionOptions;
     static function getProcessingInstruction() : ProcessingInstruction;
     static function getRange() : Range;
+    static function getRealtimeAnalyserNode() : RealtimeAnalyserNode;
     static function getScreen() : Screen;
     static function getStorage() : Storage;
     static function getStorageEventInit() : StorageEventInit;
@@ -4987,6 +5360,7 @@ native class X {
     static function getUint8ClampedArray() : Uint8ClampedArray;
     static function getValidityState() : ValidityState;
     static function getVideoTrackList() : VideoTrackList;
+    static function getWaveTable() : WaveTable;
     static function getWebGLContextAttributes() : WebGLContextAttributes;
     static function getWebGLContextEventInit() : WebGLContextEventInit;
     static function getWebGLShader__() : WebGLShader[];
@@ -4998,11 +5372,14 @@ native class X {
     static function getXMLDocument() : XMLDocument;
     static function getXMLHttpRequestUpload() : XMLHttpRequestUpload;
     static function getboolean() : boolean;
+    static function getfunction__Event__void() : function(:Event):void;
     static function getfunction__MediaQueryList__void() : function(:MediaQueryList):void;
     static function getfunction___void() : function():void;
+    static function getfunction_decodedData_AudioBuffer__void() : function(decodedData:AudioBuffer):void;
     static function getfunction_mutations_MutationRecord___observer_MutationObserver__void() : function(mutations:MutationRecord[],observer:MutationObserver):void;
     static function getfunction_positionError_PositionError__void() : function(positionError:PositionError):void;
     static function getfunction_position_Position__void() : function(position:Position):void;
+    static function getfunction_stream_LocalMediaStream__void() : function(stream:LocalMediaStream):void;
     static function getfunction_time_number__void() : function(time:number):void;
     static function getint__() : int[];
     static function getnsIDOMGamepad() : nsIDOMGamepad;

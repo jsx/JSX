@@ -49,6 +49,7 @@ my @specs = (
         "$root/extra/file.idl",
 
         #"http://www.w3.org/TR/webaudio/", # no correct IDL
+        "webaudio; https://dvcs.w3.org/hg/audio/raw-file/tip/webaudio/specification.html",
         "touch-events; http://www.w3.org/TR/touch-events/",
         #"http://www.w3.org/TR/websockets/",
         "websockets; http://www.w3.org/TR/2012/WD-websockets-20120524/",
@@ -64,6 +65,7 @@ my @specs = (
         # WebRTC has no correct IDL
         #"http://dev.w3.org/2011/webrtc/editor/webrtc.html",
         #"http://dev.w3.org/2011/webrtc/editor/getusermedia.html",
+        "mediacapture-streams; http://www.w3.org/TR/mediacapture-streams/",
 
         # by html5.org
         "dom-parsing; http://html5.org/specs/dom-parsing.html",

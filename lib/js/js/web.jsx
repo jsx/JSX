@@ -4198,6 +4198,20 @@ native final class Navigator extends NavigatorID {
 	/** @see http://dev.w3.org/geo/api/spec-source.html */
 	__readonly__ var geolocation : Geolocation;
 
+	// implements NavigatorUserMedia
+
+	/** @see http://www.w3.org/TR/mediacapture-streams/ */
+	function getUserMedia(
+		constraints : Nullable.<MediaStreamConstraints>,
+		successCallback : function(stream:LocalMediaStream):void/*NavigatorUserMediaSuccessCallback*/
+	) : void;
+	/** @see http://www.w3.org/TR/mediacapture-streams/ */
+	function getUserMedia(
+		constraints : Nullable.<MediaStreamConstraints>,
+		successCallback : function(stream:LocalMediaStream):void/*NavigatorUserMediaSuccessCallback*/,
+		errorCallback : Nullable.<function(error:NavigatorUserMediaError):void>/*NavigatorUserMediaErrorCallback?*/
+	) : void;
+
 } // end of Navigator
 
 /** @see http://www.w3.org/TR/html5/single-page.html */
@@ -4546,9 +4560,463 @@ native class URL {
 	/** @see http://www.w3.org/TR/2011/WD-FileAPI-20111020/ */
 	static function revokeObjectURL(url : string/*DOMString*/) : void;
 
+
+	/** @see http://www.w3.org/TR/mediacapture-streams/ */
+	static function createObjectURL(
+		stream : MediaStream
+	) : string/*DOMString*/;
+
 } // end of URL
 
 native final class webkitURL extends URL {
+}
+
+// alias AudioBufferCallback = function(decodedData:AudioBuffer):void
+
+/** @see https://dvcs.w3.org/hg/audio/raw-file/tip/webaudio/specification.html */
+native final class AudioContext {
+
+	function constructor();
+
+	__readonly__ var destination : AudioDestinationNode;
+	__readonly__ var sampleRate : number/*float*/;
+	__readonly__ var currentTime : number/*float*/;
+	__readonly__ var listener : AudioListener;
+	__readonly__ var activeSourceCount : number/*unsigned long*/;
+	function createBuffer(
+		numberOfChannels : number/*unsigned long*/,
+		length : number/*unsigned long*/,
+		sampleRate : number/*float*/
+	) : AudioBuffer;
+	function createBuffer(
+		buffer : ArrayBuffer,
+		mixToMono : boolean
+	) : AudioBuffer;
+	function decodeAudioData(
+		audioData : ArrayBuffer,
+		successCallback : function(decodedData:AudioBuffer):void/*AudioBufferCallback*/
+	) : void;
+	function decodeAudioData(
+		audioData : ArrayBuffer,
+		successCallback : function(decodedData:AudioBuffer):void/*AudioBufferCallback*/,
+		errorCallback : function(decodedData:AudioBuffer):void/*AudioBufferCallback*/
+	) : void;
+	// AudioNode creation
+	function createBufferSource() : AudioBufferSourceNode;
+	function createMediaElementSource(
+		mediaElement : HTMLMediaElement
+	) : MediaElementAudioSourceNode;
+	function createMediaStreamSource(
+		mediaStream : MediaStream
+	) : MediaStreamAudioSourceNode;
+	function createJavaScriptNode(
+		bufferSize : number/*unsigned long*/
+	) : JavaScriptAudioNode;
+	function createJavaScriptNode(
+		bufferSize : number/*unsigned long*/,
+		numberOfInputChannels : number/*unsigned long*/
+	) : JavaScriptAudioNode;
+	function createJavaScriptNode(
+		bufferSize : number/*unsigned long*/,
+		numberOfInputChannels : number/*unsigned long*/,
+		numberOfOutputChannels : number/*unsigned long*/
+	) : JavaScriptAudioNode;
+	function createAnalyser() : RealtimeAnalyserNode;
+	function createGainNode() : AudioGainNode;
+	function createDelayNode() : DelayNode;
+	function createDelayNode(
+		maxDelayTime : number/*double*/
+	) : DelayNode;
+	function createBiquadFilter() : BiquadFilterNode;
+	function createPanner() : AudioPannerNode;
+	function createConvolver() : ConvolverNode;
+	function createChannelSplitter() : AudioChannelSplitter;
+	function createChannelSplitter(
+		numberOfOutputs : number/*unsigned long*/
+	) : AudioChannelSplitter;
+	function createChannelMerger() : AudioChannelMerger;
+	function createChannelMerger(
+		numberOfInputs : number/*unsigned long*/
+	) : AudioChannelMerger;
+	function createDynamicsCompressor() : DynamicsCompressorNode;
+	function createOscillator() : Oscillator;
+	function createWaveTable(
+		real : Float32Array,
+		imag : Float32Array
+	) : WaveTable;
+
+} // end of AudioContext
+
+/** @see https://dvcs.w3.org/hg/audio/raw-file/tip/webaudio/specification.html */
+native class AudioNode {
+
+	function connect(destination : AudioNode) : void;
+	function connect(
+		destination : AudioNode,
+		output : number/*unsigned long*/
+	) : void;
+	function connect(
+		destination : AudioNode,
+		output : number/*unsigned long*/,
+		input : number/*unsigned long*/
+	) : void;
+	function connect(destination : AudioParam) : void;
+	function connect(
+		destination : AudioParam,
+		output : number/*unsigned long*/
+	) : void;
+	function disconnect() : void;
+	function disconnect(output : number/*unsigned long*/) : void;
+	__readonly__ var context : AudioContext;
+	__readonly__ var numberOfInputs : number/*unsigned long*/;
+	__readonly__ var numberOfOutputs : number/*unsigned long*/;
+
+} // end of AudioNode
+
+/** @see https://dvcs.w3.org/hg/audio/raw-file/tip/webaudio/specification.html */
+native class AudioSourceNode extends AudioNode {
+}
+
+/** @see https://dvcs.w3.org/hg/audio/raw-file/tip/webaudio/specification.html */
+native final class AudioDestinationNode extends AudioNode {
+
+	__readonly__ var maxNumberOfChannels : number/*unsigned long*/;
+	var numberOfChannels : number/*unsigned long*/;
+
+} // end of AudioDestinationNode
+
+/** @see https://dvcs.w3.org/hg/audio/raw-file/tip/webaudio/specification.html */
+native class AudioParam {
+
+	var value : number/*float*/;
+	__readonly__ var minValue : number/*float*/;
+	__readonly__ var maxValue : number/*float*/;
+	__readonly__ var defaultValue : number/*float*/;
+	// Parameter automation.
+	function setValueAtTime(
+		value : number/*float*/,
+		time : number/*float*/
+	) : void;
+	function linearRampToValueAtTime(
+		value : number/*float*/,
+		time : number/*float*/
+	) : void;
+	function exponentialRampToValueAtTime(
+		value : number/*float*/,
+		time : number/*float*/
+	) : void;
+	// Exponentially approach the target value with a rate having the given time constant.
+	function setTargetValueAtTime(
+		targetValue : number/*float*/,
+		time : number/*float*/,
+		timeConstant : number/*float*/
+	) : void;
+	// Sets an array of arbitrary parameter values starting at time for the given duration.
+	// The number of values will be scaled to fit into the desired duration.
+	function setValueCurveAtTime(
+		values : Float32Array,
+		time : number/*float*/,
+		duration : number/*float*/
+	) : void;
+	// Cancels all scheduled parameter changes with times greater than or equal to startTime.
+	function cancelScheduledValues(startTime : number/*float*/) : void;
+
+} // end of AudioParam
+
+/** @see https://dvcs.w3.org/hg/audio/raw-file/tip/webaudio/specification.html */
+native final class AudioGain extends AudioParam {
+}
+
+/** @see https://dvcs.w3.org/hg/audio/raw-file/tip/webaudio/specification.html */
+native final class AudioGainNode extends AudioNode {
+
+	var gain : AudioGain;
+
+} // end of AudioGainNode
+
+/** @see https://dvcs.w3.org/hg/audio/raw-file/tip/webaudio/specification.html */
+native final class DelayNode extends AudioNode {
+
+	var delayTime : AudioParam;
+
+} // end of DelayNode
+
+/** @see https://dvcs.w3.org/hg/audio/raw-file/tip/webaudio/specification.html */
+native final class AudioBuffer {
+
+	__readonly__ var sampleRate : number/*float*/;
+	__readonly__ var length : number/*long*/;
+	// in seconds
+	__readonly__ var duration : number/*float*/;
+	__readonly__ var numberOfChannels : number/*long*/;
+	function getChannelData(
+		channel : number/*unsigned long*/
+	) : Float32Array;
+
+} // end of AudioBuffer
+
+/** @see https://dvcs.w3.org/hg/audio/raw-file/tip/webaudio/specification.html */
+native final class AudioBufferSourceNode extends AudioSourceNode {
+
+	static __readonly__ var UNSCHEDULED_STATE : number/*unsigned short*/;
+	       __readonly__ var UNSCHEDULED_STATE : number/*unsigned short*/;
+	static __readonly__ var SCHEDULED_STATE : number/*unsigned short*/;
+	       __readonly__ var SCHEDULED_STATE : number/*unsigned short*/;
+	static __readonly__ var PLAYING_STATE : number/*unsigned short*/;
+	       __readonly__ var PLAYING_STATE : number/*unsigned short*/;
+	static __readonly__ var FINISHED_STATE : number/*unsigned short*/;
+	       __readonly__ var FINISHED_STATE : number/*unsigned short*/;
+	__readonly__ var playbackState : number/*unsigned short*/;
+	// Playback this in-memory audio asset
+	// Many sources can share the same buffer
+	var buffer : AudioBuffer;
+	var playbackRate : AudioParam;
+	var loop : boolean;
+	function noteOn(when : number/*double*/) : void;
+	function noteGrainOn(
+		when : number/*double*/,
+		grainOffset : number/*double*/,
+		grainDuration : number/*double*/
+	) : void;
+	function noteOff(when : number/*double*/) : void;
+
+} // end of AudioBufferSourceNode
+
+/** @see https://dvcs.w3.org/hg/audio/raw-file/tip/webaudio/specification.html */
+native final class MediaElementAudioSourceNode extends AudioSourceNode {
+}
+
+/** @see https://dvcs.w3.org/hg/audio/raw-file/tip/webaudio/specification.html */
+native final class JavaScriptAudioNode extends AudioNode {
+
+	var onaudioprocess : function(:Event):void/*EventListener*/;
+	__readonly__ var bufferSize : number/*long*/;
+
+} // end of JavaScriptAudioNode
+
+/** @see https://dvcs.w3.org/hg/audio/raw-file/tip/webaudio/specification.html */
+native final class AudioProcessingEvent extends Event {
+
+	var node : JavaScriptAudioNode;
+	__readonly__ var playbackTime : number/*float*/;
+	__readonly__ var inputBuffer : AudioBuffer;
+	__readonly__ var outputBuffer : AudioBuffer;
+
+} // end of AudioProcessingEvent
+
+/** @see https://dvcs.w3.org/hg/audio/raw-file/tip/webaudio/specification.html */
+native final class AudioPannerNode extends AudioNode {
+
+	// Panning model
+	static __readonly__ var EQUALPOWER : number/*unsigned short*/;
+	       __readonly__ var EQUALPOWER : number/*unsigned short*/;
+	static __readonly__ var HRTF : number/*unsigned short*/;
+	       __readonly__ var HRTF : number/*unsigned short*/;
+	static __readonly__ var SOUNDFIELD : number/*unsigned short*/;
+	       __readonly__ var SOUNDFIELD : number/*unsigned short*/;
+	// Distance model
+	static __readonly__ var LINEAR_DISTANCE : number/*unsigned short*/;
+	       __readonly__ var LINEAR_DISTANCE : number/*unsigned short*/;
+	static __readonly__ var INVERSE_DISTANCE : number/*unsigned short*/;
+	       __readonly__ var INVERSE_DISTANCE : number/*unsigned short*/;
+	static __readonly__ var EXPONENTIAL_DISTANCE : number/*unsigned short*/;
+	       __readonly__ var EXPONENTIAL_DISTANCE : number/*unsigned short*/;
+	// Default for stereo is HRTF
+	var panningModel : number/*unsigned short*/;
+	// Uses a 3D cartesian coordinate system
+	function setPosition(
+		x : number/*float*/,
+		y : number/*float*/,
+		z : number/*float*/
+	) : void;
+	function setOrientation(
+		x : number/*float*/,
+		y : number/*float*/,
+		z : number/*float*/
+	) : void;
+	function setVelocity(
+		x : number/*float*/,
+		y : number/*float*/,
+		z : number/*float*/
+	) : void;
+	// Distance model and attributes
+	var distanceModel : number/*unsigned short*/;
+	var refDistance : number/*float*/;
+	var maxDistance : number/*float*/;
+	var rolloffFactor : number/*float*/;
+	// Directional sound cone
+	var coneInnerAngle : number/*float*/;
+	var coneOuterAngle : number/*float*/;
+	var coneOuterGain : number/*float*/;
+	// Dynamically calculated gain values
+	__readonly__ var coneGain : AudioGain;
+	__readonly__ var distanceGain : AudioGain;
+
+} // end of AudioPannerNode
+
+/** @see https://dvcs.w3.org/hg/audio/raw-file/tip/webaudio/specification.html */
+native final class AudioListener {
+
+	// same as OpenAL (default 1)
+	var dopplerFactor : number/*float*/;
+	// in meters / second (default 343.3)
+	var speedOfSound : number/*float*/;
+	// Uses a 3D cartesian coordinate system
+	function setPosition(
+		x : number/*float*/,
+		y : number/*float*/,
+		z : number/*float*/
+	) : void;
+	function setOrientation(
+		x : number/*float*/,
+		y : number/*float*/,
+		z : number/*float*/,
+		xUp : number/*float*/,
+		yUp : number/*float*/,
+		zUp : number/*float*/
+	) : void;
+	function setVelocity(
+		x : number/*float*/,
+		y : number/*float*/,
+		z : number/*float*/
+	) : void;
+
+} // end of AudioListener
+
+/** @see https://dvcs.w3.org/hg/audio/raw-file/tip/webaudio/specification.html */
+native final class ConvolverNode extends AudioNode {
+
+	var buffer : AudioBuffer;
+	var normalize : boolean;
+
+} // end of ConvolverNode
+
+/** @see https://dvcs.w3.org/hg/audio/raw-file/tip/webaudio/specification.html */
+native final class RealtimeAnalyserNode extends AudioNode {
+
+	// Real-time frequency-domain data
+	function getFloatFrequencyData(array : Float32Array) : void;
+	function getByteFrequencyData(array : Uint8Array) : void;
+	// Real-time waveform data
+	function getByteTimeDomainData(array : Uint8Array) : void;
+	var fftSize : number/*unsigned long*/;
+	__readonly__ var frequencyBinCount : number/*unsigned long*/;
+	var minDecibels : number/*float*/;
+	var maxDecibels : number/*float*/;
+	var smoothingTimeConstant : number/*float*/;
+
+} // end of RealtimeAnalyserNode
+
+/** @see https://dvcs.w3.org/hg/audio/raw-file/tip/webaudio/specification.html */
+native final class AudioChannelSplitter extends AudioNode {
+}
+
+/** @see https://dvcs.w3.org/hg/audio/raw-file/tip/webaudio/specification.html */
+native final class AudioChannelMerger extends AudioNode {
+}
+
+/** @see https://dvcs.w3.org/hg/audio/raw-file/tip/webaudio/specification.html */
+native final class DynamicsCompressorNode extends AudioNode {
+
+	__readonly__ var threshold : AudioParam;
+	// in Decibels
+	__readonly__ var knee : AudioParam;
+	// in Decibels
+	__readonly__ var ratio : AudioParam;
+	// unit-less
+	__readonly__ var reduction : AudioParam;
+	// in Decibels
+	__readonly__ var attack : AudioParam;
+	// in Seconds
+	__readonly__ var release : AudioParam;
+	// in Seconds
+
+} // end of DynamicsCompressorNode
+
+/** @see https://dvcs.w3.org/hg/audio/raw-file/tip/webaudio/specification.html */
+native final class BiquadFilterNode extends AudioNode {
+
+	// Filter type.
+	static __readonly__ var LOWPASS : number/*unsigned short*/;
+	       __readonly__ var LOWPASS : number/*unsigned short*/;
+	static __readonly__ var HIGHPASS : number/*unsigned short*/;
+	       __readonly__ var HIGHPASS : number/*unsigned short*/;
+	static __readonly__ var BANDPASS : number/*unsigned short*/;
+	       __readonly__ var BANDPASS : number/*unsigned short*/;
+	static __readonly__ var LOWSHELF : number/*unsigned short*/;
+	       __readonly__ var LOWSHELF : number/*unsigned short*/;
+	static __readonly__ var HIGHSHELF : number/*unsigned short*/;
+	       __readonly__ var HIGHSHELF : number/*unsigned short*/;
+	static __readonly__ var PEAKING : number/*unsigned short*/;
+	       __readonly__ var PEAKING : number/*unsigned short*/;
+	static __readonly__ var NOTCH : number/*unsigned short*/;
+	       __readonly__ var NOTCH : number/*unsigned short*/;
+	static __readonly__ var ALLPASS : number/*unsigned short*/;
+	       __readonly__ var ALLPASS : number/*unsigned short*/;
+	var type : number/*unsigned short*/;
+	__readonly__ var frequency : AudioParam;
+	// in Hertz
+	__readonly__ var Q : AudioParam;
+	// Quality factor
+	__readonly__ var gain : AudioParam;
+	// in Decibels
+
+	function getFrequencyResponse(
+		frequencyHz : Float32Array,
+		magResponse : Float32Array,
+		phaseResponse : Float32Array
+	) : void;
+
+} // end of BiquadFilterNode
+
+/** @see https://dvcs.w3.org/hg/audio/raw-file/tip/webaudio/specification.html */
+native final class WaveShaperNode extends AudioNode {
+
+	var curve : Float32Array;
+
+} // end of WaveShaperNode
+
+/** @see https://dvcs.w3.org/hg/audio/raw-file/tip/webaudio/specification.html */
+native final class Oscillator extends AudioSourceNode {
+
+	// Type constants.
+	static __readonly__ var SINE : number/*unsigned short*/;
+	       __readonly__ var SINE : number/*unsigned short*/;
+	static __readonly__ var SQUARE : number/*unsigned short*/;
+	       __readonly__ var SQUARE : number/*unsigned short*/;
+	static __readonly__ var SAWTOOTH : number/*unsigned short*/;
+	       __readonly__ var SAWTOOTH : number/*unsigned short*/;
+	static __readonly__ var TRIANGLE : number/*unsigned short*/;
+	       __readonly__ var TRIANGLE : number/*unsigned short*/;
+	static __readonly__ var CUSTOM : number/*unsigned short*/;
+	       __readonly__ var CUSTOM : number/*unsigned short*/;
+	var type : number/*unsigned short*/;
+	static __readonly__ var UNSCHEDULED_STATE : number/*unsigned short*/;
+	       __readonly__ var UNSCHEDULED_STATE : number/*unsigned short*/;
+	static __readonly__ var SCHEDULED_STATE : number/*unsigned short*/;
+	       __readonly__ var SCHEDULED_STATE : number/*unsigned short*/;
+	static __readonly__ var PLAYING_STATE : number/*unsigned short*/;
+	       __readonly__ var PLAYING_STATE : number/*unsigned short*/;
+	static __readonly__ var FINISHED_STATE : number/*unsigned short*/;
+	       __readonly__ var FINISHED_STATE : number/*unsigned short*/;
+	__readonly__ var playbackState : number/*unsigned short*/;
+	__readonly__ var frequency : AudioParam;
+	// in Hertz
+	__readonly__ var detune : AudioParam;
+	// in Cents
+
+	function noteOn(when : number/*double*/) : void;
+	function noteOff(when : number/*double*/) : void;
+	function setWaveTable(waveTable : WaveTable) : void;
+
+} // end of Oscillator
+
+/** @see https://dvcs.w3.org/hg/audio/raw-file/tip/webaudio/specification.html */
+native final class WaveTable {
+}
+
+/** @see https://dvcs.w3.org/hg/audio/raw-file/tip/webaudio/specification.html */
+native final class MediaStreamAudioSourceNode extends AudioSourceNode {
 }
 
 /** @see http://www.w3.org/TR/touch-events/ */
@@ -5040,6 +5508,104 @@ native final class EventSourceInit {
 	var withCredentials : boolean;
 
 } // end of EventSourceInit
+
+// alias NavigatorUserMediaSuccessCallback = function(stream:LocalMediaStream):void
+
+// alias NavigatorUserMediaErrorCallback = function(error:NavigatorUserMediaError):void
+
+/** @see http://www.w3.org/TR/mediacapture-streams/ */
+native class MediaStream extends EventTarget {
+
+	function constructor(
+		audioTracks : Nullable.<MediaStreamTrackList>,
+		videoTracks : Nullable.<MediaStreamTrackList>
+	);
+
+	__readonly__ var label : string/*DOMString*/;
+	__readonly__ var audioTracks : MediaStreamTrackList;
+	__readonly__ var videoTracks : MediaStreamTrackList;
+	var ended : boolean;
+	var onended : Nullable.<function(:Event):void>/*Function?*/;
+
+} // end of MediaStream
+
+/** @see http://www.w3.org/TR/mediacapture-streams/ */
+native final class LocalMediaStream extends MediaStream {
+
+	function stop() : void;
+
+} // end of LocalMediaStream
+
+/** @see http://www.w3.org/TR/mediacapture-streams/ */
+native final class MediaStreamTrack {
+
+	__readonly__ var kind : string/*DOMString*/;
+	__readonly__ var label : string/*DOMString*/;
+	var enabled : boolean;
+	static __readonly__ var LIVE : number/*unsigned short*/;
+	       __readonly__ var LIVE : number/*unsigned short*/;
+	static __readonly__ var MUTED : number/*unsigned short*/;
+	       __readonly__ var MUTED : number/*unsigned short*/;
+	static __readonly__ var ENDED : number/*unsigned short*/;
+	       __readonly__ var ENDED : number/*unsigned short*/;
+	__readonly__ var readyState : number/*unsigned short*/;
+	var onmute : Nullable.<function(:Event):void>/*Function?*/;
+	var onunmute : Nullable.<function(:Event):void>/*Function?*/;
+	var onended : Nullable.<function(:Event):void>/*Function?*/;
+
+} // end of MediaStreamTrack
+
+/** @see http://www.w3.org/TR/mediacapture-streams/ */
+native final class MediaStreamTrackList {
+
+	__readonly__ var length : number/*unsigned long*/;
+	function item(index : number/*unsigned long*/) : MediaStreamTrack;
+	function add(track : MediaStreamTrack) : void;
+	function remove(track : MediaStreamTrack) : void;
+	var onaddtrack : Nullable.<function(:Event):void>/*Function?*/;
+	var onremovetrack : Nullable.<function(:Event):void>/*Function?*/;
+
+} // end of MediaStreamTrackList
+
+/** @see http://www.w3.org/TR/mediacapture-streams/ */
+native __fake__ class NavigatorUserMedia {
+
+	function getUserMedia(
+		constraints : Nullable.<MediaStreamConstraints>,
+		successCallback : function(stream:LocalMediaStream):void/*NavigatorUserMediaSuccessCallback*/
+	) : void;
+	function getUserMedia(
+		constraints : Nullable.<MediaStreamConstraints>,
+		successCallback : function(stream:LocalMediaStream):void/*NavigatorUserMediaSuccessCallback*/,
+		errorCallback : Nullable.<function(error:NavigatorUserMediaError):void>/*NavigatorUserMediaErrorCallback?*/
+	) : void;
+
+} // end of NavigatorUserMedia
+
+/** @see http://www.w3.org/TR/mediacapture-streams/ */
+native final class MediaStreamConstraints {
+
+	var video : variant/*(boolean or MediaTrackConstraints)*/;
+	var audio : variant/*(boolean or MediaTrackConstraints)*/;
+
+} // end of MediaStreamConstraints
+
+/** @see http://www.w3.org/TR/mediacapture-streams/ */
+native final class MediaTrackConstraints {
+
+	var mandatory : Nullable.<Map.<variant>>/*MediaTrackConstraintSet?*/;
+	var optional : Map.<variant>[]/*MediaTrackConstraint[]?*/;
+
+} // end of MediaTrackConstraints
+
+/** @see http://www.w3.org/TR/mediacapture-streams/ */
+native final __fake__ class NavigatorUserMediaError {
+
+	static __readonly__ var PERMISSION_DENIED : number/*unsigned short*/;
+	       __readonly__ var PERMISSION_DENIED : number/*unsigned short*/;
+	__readonly__ var code : number/*unsigned short*/;
+
+} // end of NavigatorUserMediaError
 
 /** @see http://html5.org/specs/dom-parsing.html */
 native final class DOMParser {
