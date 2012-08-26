@@ -130,6 +130,11 @@ define_alias('MediaQueryListListener' => 'function(:MediaQueryList):void');
 # http://www.w3.org/TR/file-system-api/
 define_alias('FileCallback' => 'function(:File):void');
 
+# http://www.w3.org/TR/2012/WD-mediacapture-streams-20120628/#dictionary-mediatrackconstraints-members
+# http://datatracker.ietf.org/doc/draft-burnett-rtcweb-constraints-registry/
+define_alias('MediaTrackConstraintSet' => 'Map.<variant>');
+define_alias('MediaTrackConstraint'    => 'Map.<variant>');
+
 # https://wiki.mozilla.org/GamepadAPI
 define_alias('nsIVariant'  => 'variant');
 define_alias('nsIDOMEvent' => 'Event');
@@ -296,19 +301,19 @@ foreach my $src(@files) {
                 \s* ;
             }xmsg) {
 
-        my $class   = $+{name};
-        my $attrs   = $+{attrs};
-        my $type    = $+{type};
-        my $base    = $+{base};
-        my $members = $+{members};
+        my $class      = $+{name};
+        my $attrs      = $+{attrs};
+        my $class_type = $+{type};
+        my $base       = $+{base};
+        my $members    = $+{members};
 
         if($Document_is_HTMLDocument && $class eq 'Document') {
-            $type =~ s/partial \s+//xms;
+            $class_type =~ s/partial \s+//xms;
             $class = "HTMLDocument";
             $base  = "Document";
         }
 
-        info $type, $class, ($base ? ": $base" : ());
+        info $class_type, $class, ($base ? ": $base" : ());
 
 
         my $def = $classdef{$class} //= {
@@ -320,7 +325,7 @@ foreach my $src(@files) {
             fake    => $fake{$class},
         };
 
-        if($type !~ /\b partial \b/xms) {
+        if($class_type !~ /\b partial \b/xms) {
             $has_definition{$class} = 1;
             $def->{spec} = $spec_name;
         }
@@ -440,7 +445,7 @@ foreach my $src(@files) {
                 if($+{readonly}) {
                     $decl = "__readonly__ $decl";
                 }
-                my $type = to_jsx_type($+{type});
+                my $type = to_jsx_type($+{type}, union_to_variant => 1);
 
                 $decl .= " $id : $type;";
 
@@ -690,6 +695,10 @@ sub to_jsx_type {
     my $original = $idl_type;
 
     $idl_type =~ s/.+://; # remove namespace
+
+    if ($attr{union_to_variant} && $idl_type =~ m{ \b or \b }xms) {
+        return "variant/*$idl_type*/";
+    }
 
     my $array;
     if($idl_type =~ s{\A sequence < (.+?) >  }{$1}xms) {
