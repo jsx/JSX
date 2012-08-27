@@ -356,8 +356,8 @@ var CompileIssue = exports.CompileError = Class.extend({
 		sourceLine += Util.repeat(" ", col);
 		sourceLine += Util.repeat("^", this._size);
 
-		return Util.format("[%1:%2] %3%4\n%5\n",
-						   [this._filename, this._lineNumber, this.getPrefix(), this._message, sourceLine]);
+		return Util.format("[%1:%2:%3] %4%5\n%6\n",
+						   [this._filename, this._lineNumber, col, this.getPrefix(), this._message, sourceLine]);
 	}
 
 });
