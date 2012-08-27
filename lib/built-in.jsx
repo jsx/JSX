@@ -59,6 +59,9 @@ native final class Map.<T> {
  * Unlike JavaScript, JSX does not provide <em>Function#call()</em> or <em>Function#apply()</em> since it is a statically-typed language.
  */
 native final class Function {
+
+	delete function constructor();
+
 }
 
 /**
@@ -610,6 +613,8 @@ native final class Number {
  */
 native final class Math {
 
+	delete function constructor();
+
 	/**
 	 * Euler's constant and the base of natural logarithms, approximately 2.718.
 	 */
@@ -890,6 +895,8 @@ native class TypeError extends Error {
 
 native final class JSON {
 
+	delete function constructor();
+
 	static function parse(text : string) : variant;
 	static function parse(text : string, reviver : function(key:string, value:variant):variant) : variant;
 
@@ -903,6 +910,8 @@ native final class JSON {
  * Provides static functions to control the behaviour of the JSX runtime.
  */
 native final class JSX {
+
+	delete function constructor();
 
 	/**
 	 * Returns whether or not the profiler is running.
