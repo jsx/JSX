@@ -122,7 +122,7 @@ var ClassDefinition = exports.ClassDefinition = Class.extend({
 	$IS_INLINE: 1024,
 	$IS_PURE: 2048, // constexpr (intended for for native functions)
 
-	constructor: function (token, className, flags, extendType, implementTypes, members, objectTypesUsed) {
+	constructor: function (token, className, flags, extendType, implementTypes, members, objectTypesUsed, docComment) {
 		this._parser = null;
 		this._token = token;
 		this._className = className;
@@ -132,6 +132,7 @@ var ClassDefinition = exports.ClassDefinition = Class.extend({
 		this._implementTypes = implementTypes;
 		this._members = members;
 		this._objectTypesUsed = objectTypesUsed;
+		this._docComment = docComment;
 		this._optimizerStash = {};
 		for (var i = 0; i < this._members.length; ++i) {
 			this._members[i].setClassDef(this);
@@ -205,6 +206,14 @@ var ClassDefinition = exports.ClassDefinition = Class.extend({
 
 	members: function () {
 		return this._members;
+	},
+
+	getDocComment: function () {
+		return this._docComment;
+	},
+
+	setDocComment: function (docComment) {
+		this._docComment = docComment;
 	},
 
 	forEachClassToBase: function (cb) {
@@ -751,11 +760,12 @@ var ClassDefinition = exports.ClassDefinition = Class.extend({
 // abstract class deriving Member(Function|Variable)Definition
 var MemberDefinition = exports.MemberDefinition = Class.extend({
 
-	constructor: function (token, nameToken, flags) {
+	constructor: function (token, nameToken, flags, docComment) {
 		this._token = token;
 		this._nameToken = nameToken; // may be null
 		if(typeof(nameToken) === "string") throw new Error("nameToken must be a Token object or null!");
 		this._flags = flags;
+		this._docComment = docComment;
 		this._classDef = null;
 		this._optimizerStash = {};
 	},
@@ -781,6 +791,14 @@ var MemberDefinition = exports.MemberDefinition = Class.extend({
 		this._flags = flags;
 	},
 
+	getDocComment: function () {
+		return this._docComment;
+	},
+
+	setDocComment: function (docComment) {
+		this._docComment = docComment;
+	},
+
 	getClassDef: function () {
 		return this._classDef;
 	},
@@ -802,8 +820,8 @@ var MemberVariableDefinition = exports.MemberVariableDefinition = MemberDefiniti
 	$ANALYZE_SUCEEDED: 2,
 	$ANALYZE_FAILED: 3,
 
-	constructor: function (token, name, flags, type, initialValue) {
-		MemberDefinition.call(this, token, name, flags);
+	constructor: function (token, name, flags, type, initialValue, docComment) {
+		MemberDefinition.call(this, token, name, flags, docComment);
 		this._type = type; // may be null
 		this._initialValue = initialValue; // may be null
 		this._analyzeState = MemberVariableDefinition.NOT_ANALYZED;
@@ -883,8 +901,8 @@ var MemberVariableDefinition = exports.MemberVariableDefinition = MemberDefiniti
 
 var MemberFunctionDefinition = exports.MemberFunctionDefinition = MemberDefinition.extend({
 
-	constructor: function (token, name, flags, returnType, args, locals, statements, closures, lastTokenOfBody) {
-		MemberDefinition.prototype.constructor.call(this, token, name, flags);
+	constructor: function (token, name, flags, returnType, args, locals, statements, closures, lastTokenOfBody, docComment) {
+		MemberDefinition.prototype.constructor.call(this, token, name, flags, docComment);
 		this._returnType = returnType;
 		this._args = args;
 		this._locals = locals;
@@ -902,8 +920,8 @@ var MemberFunctionDefinition = exports.MemberFunctionDefinition = MemberDefiniti
 	instantiate: function (instantiationContext) {
 		return this._instantiateCore(
 			instantiationContext,
-			function (token, name, flags, returnType, args, locals, statements, closures, lastTokenOfBody) {
-				return new MemberFunctionDefinition(token, name, flags, returnType, args, locals, statements, closures, lastTokenOfBody);
+			function (token, name, flags, returnType, args, locals, statements, closures, lastTokenOfBody, docComment) {
+				return new MemberFunctionDefinition(token, name, flags, returnType, args, locals, statements, closures, lastTokenOfBody, docComment);
 			});
 	},
 
@@ -1001,7 +1019,7 @@ var MemberFunctionDefinition = exports.MemberFunctionDefinition = MemberDefiniti
 		} else {
 			returnType = null;
 		}
-		return constructCallback(this._token, this._nameToken, this._flags, returnType, args, locals, statements, closures, null);
+		return constructCallback(this._token, this._nameToken, this._flags, returnType, args, locals, statements, closures, this._lastTokenOfBody, this._docComment);
 	},
 
 	serialize: function () {
@@ -1309,6 +1327,10 @@ var TemplateFunctionDefinition = exports.TemplateFunctionDefinition = MemberFunc
 		this._resolvedTypemap = {};
 	},
 
+	getTypeArguments: function () {
+		return this._typeArgs;
+	},
+
 	instantiate: function (instantiationContext) {
 		var instantiated = new TemplateFunctionDefinition(
 			this._token, this.getNameToken(), this.flags(), this._typeArgs.concat([]), this._returnType, this._args.concat([]),
@@ -1338,8 +1360,8 @@ var TemplateFunctionDefinition = exports.TemplateFunctionDefinition = MemberFunc
 		}
 		instantiated = this._instantiateCore(
 			instantiationContext,
-			function (token, name, flags, returnType, args, locals, statements, closures, lastTokenOfBody) {
-				return new InstantiatedMemberFunctionDefinition(token, name, flags, returnType, args, locals, statements, closures, lastTokenOfBody);
+			function (token, name, flags, returnType, args, locals, statements, closures, lastTokenOfBody, docComment) {
+				return new InstantiatedMemberFunctionDefinition(token, name, flags, returnType, args, locals, statements, closures, lastTokenOfBody, docComment);
 			});
 		if (instantiated == null) {
 			return null;
@@ -1559,7 +1581,7 @@ var LocalVariableStatuses = exports.LocalVariableStatuses = Class.extend({
 
 var TemplateClassDefinition = exports.TemplateClassDefinition = Class.extend({
 
-	constructor: function (className, flags, typeArgs, extendType, implementTypes, members, objectTypesUsed) {
+	constructor: function (className, flags, typeArgs, extendType, implementTypes, members, objectTypesUsed, docComment) {
 		this._className = className;
 		this._flags = flags;
 		this._typeArgs = typeArgs.concat([]);
@@ -1567,6 +1589,16 @@ var TemplateClassDefinition = exports.TemplateClassDefinition = Class.extend({
 		this._implementTypes = implementTypes;
 		this._members = members;
 		this._objectTypesUsed = objectTypesUsed;
+		this._docComment = docComment;
+		for (var i = 0; i < this._members.length; ++i) {
+			this._members[i].setClassDef(this);
+			if (this._members[i] instanceof MemberFunctionDefinition) {
+				this._members[i].forEachClosure(function setClassDef(funcDef) {
+					funcDef.setClassDef(this);
+					return funcDef.forEachClosure(setClassDef.bind(this));
+				}.bind(this));
+			}
+		}
 	},
 
 	className: function () {
@@ -1575,6 +1607,18 @@ var TemplateClassDefinition = exports.TemplateClassDefinition = Class.extend({
 
 	flags: function () {
 		return this._flags;
+	},
+
+	getTypeArguments: function () {
+		return this._typeArgs;
+	},
+
+	getDocComment: function () {
+		return this._docComment;
+	},
+
+	setDocComment: function (docComment) {
+		this._docComment = docComment;
 	},
 
 	instantiate: function (errors, request) {
@@ -1596,36 +1640,68 @@ var TemplateClassDefinition = exports.TemplateClassDefinition = Class.extend({
 		if (! succeeded)
 			return null;
 		var instantiatedDef = new InstantiatedClassDefinition(
-			this._className,
-			this._flags,
+			this,
 			request.getTypeArguments(),
 			this._extendType != null ? this._extendType.instantiate(instantiationContext): null,
 			this._implementTypes.map(function (t) { return t.instantiate(instantiationContext); }),
 			members,
 			instantiationContext.objectTypesUsed);
 		return instantiatedDef;
+	},
+
+	forEachMember: function (cb) {
+		for (var i = 0; i < this._members.length; ++i) {
+			if (! cb(this._members[i]))
+				return false;
+		}
+		return true;
+	},
+
+	forEachMemberVariable: function (cb) {
+		for (var i = 0; i < this._members.length; ++i) {
+			if (this._members[i] instanceof MemberVariableDefinition) {
+				if (! cb(this._members[i]))
+					return false;
+			}
+		}
+		return true;
+	},
+
+	forEachMemberFunction: function (cb) {
+		for (var i = 0; i < this._members.length; ++i) {
+			if (this._members[i] instanceof MemberFunctionDefinition) {
+				if (! cb(this._members[i]))
+					return false;
+			}
+		}
+		return true;
 	}
 
 });
 
 var InstantiatedClassDefinition = exports.InstantiatedClassDefinition = ClassDefinition.extend({
 
-	constructor: function (templateClassName, flags, typeArguments, extendType, implementTypes, members, objectTypesUsed) {
+	constructor: function (templateClassDef, typeArguments, extendType, implementTypes, members, objectTypesUsed) {
 		ClassDefinition.prototype.constructor.call(
 			this,
 			null,
-			Type.Type.templateTypeToString(templateClassName, typeArguments),
-			flags,
+			Type.Type.templateTypeToString(templateClassDef.className(), typeArguments),
+			templateClassDef.flags(),
 			extendType,
 			implementTypes,
 			members,
-			objectTypesUsed);
-		this._templateClassName = templateClassName;
+			objectTypesUsed,
+			null /* docComment is not used for instantiated class */);
+		this._templateClassDef = templateClassDef;
 		this._typeArguments = typeArguments;
 	},
 
+	getTemplateClass: function () {
+		return this._templateClassDef;
+	},
+
 	getTemplateClassName: function () {
-		return this._templateClassName;
+		return this._templateClassDef.className();
 	},
 
 	getTypeArguments: function () {

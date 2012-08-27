@@ -95,6 +95,7 @@ var Compiler = exports.Compiler = Class.extend({
 	$MODE_COMPILE: 0,
 	$MODE_PARSE: 1,
 	$MODE_COMPLETE: 2,
+	$MODE_DOC: 3,
 
 	constructor: function (platform) {
 		this._platform = platform;
@@ -136,6 +137,10 @@ var Compiler = exports.Compiler = Class.extend({
 
 	getWarningFilters: function () {
 		return this._warningFilters;
+	},
+
+	getParsers: function () {
+		return this._parsers;
 	},
 
 	addSourceFile: function (token, path, completionRequest) {
@@ -186,8 +191,12 @@ var Compiler = exports.Compiler = Class.extend({
 		this._analyze(errors);
 		if (! this._handleErrors(errors))
 			return false;
-		if(this._mode == Compiler.MODE_COMPLETE)
+		switch (this._mode) {
+		case Compiler.MODE_COMPLETE:
 			return true;
+		case Compiler.MODE_DOC:
+			return true;
+		}
 		// optimization
 		this._optimize();
 		// TODO peep-hole and dead store optimizations, etc.

@@ -25,6 +25,7 @@ eval(Class.$import("./type"));
 eval(Class.$import("./classdef"));
 eval(Class.$import("./statement"));
 eval(Class.$import("./expression"));
+eval(Class.$import("./doc"));
 eval(Class.$import("./util"));
 
 "use strict";
@@ -432,6 +433,30 @@ var QualifiedName = exports.QualifiedName = Class.extend({
 			}
 		}
 		return classDef;
+	},
+
+	getTemplateClass: function (parser) {
+		var foundClassDefs = [];
+		var checkClassDef = function (classDef) {
+			if (classDef.className() == this._token.getValue()) {
+				foundClassDefs.push(classDef);
+			}
+		}.bind(this);
+		if (this._import != null) {
+			this._import.getSources().forEach(function (parser) {
+				parser.getTemplateClassDefs().forEach(checkClassDef);
+			});
+		} else {
+			parser.getTemplateClassDefs().forEach(checkClassDef);
+			if (foundClassDefs.length == 0) {
+				parser.getImports().forEach(function (imprt) {
+					imprt.getSources().forEach(function (parser) {
+						parser.getTemplateClassDefs().forEach(checkClassDef);
+					});
+				});
+			}
+		}
+		return foundClassDefs.length == 1 ? foundClassDefs[0] : null;
 	}
 
 });
@@ -451,6 +476,8 @@ var Parser = exports.Parser = Class.extend({
 		this._tokenLength = 0;
 		this._lineNumber = 1; // one origin
 		this._columnOffset = 0; // zero origin
+		this._fileLevelDocComment = null;
+		this._docComment = null;
 		// insert a marker so that at the completion location we would always get _expectIdentifierOpt called, whenever possible
 		if (this._completionRequest != null) {
 			var compLineNumber = Math.min(this._completionRequest.getLineNumber(), this._lines.length + 1);
@@ -510,6 +537,10 @@ var Parser = exports.Parser = Class.extend({
 
 	getPath: function () {
 		return this._filename;
+	},
+
+	getDocComment: function () {
+		return this._fileLevelDocComment;
 	},
 
 	getClassDefs: function () {
@@ -656,6 +687,7 @@ var Parser = exports.Parser = Class.extend({
 			// lexer properties
 			lineNumber: this._lineNumber,
 			columnOffset: this._columnOffset,
+			docComment: this._docComment,
 			tokenLength: this._tokenLength,
 			// errors
 			numErrors: this._errors.length,
@@ -671,6 +703,7 @@ var Parser = exports.Parser = Class.extend({
 	_restoreState: function (state) {
 		this._lineNumber = state.lineNumber;
 		this._columnOffset = state.columnOffset;
+		this._docComment = state.docComment;
 		this._tokenLength = state.tokenLength;
 		this._errors.length = state.numErrors;
 		this._closures.splice(state.numClosures);
@@ -692,8 +725,11 @@ var Parser = exports.Parser = Class.extend({
 	},
 
 	_advanceToken: function () {
-		this._forwardPos(this._tokenLength);
-		this._tokenLength = 0;
+		if (this._tokenLength != 0) {
+			this._forwardPos(this._tokenLength);
+			this._tokenLength = 0;
+			this._docComment = null;
+		}
 
 		while (true) {
 			// skip whitespaces and comments in-line
@@ -710,10 +746,30 @@ var Parser = exports.Parser = Class.extend({
 			}
 			switch (this._getInputByLength(2)) {
 			case "/*":
-				if (! this._skipMultilineComment())
-					return;
+				if (this._getInputByLength(4) == "/***") {
+					this._forwardPos(3); // skip to the last *, since the input might be: /***/
+					var fileLevelDocComment = this._parseDocComment();
+					if (fileLevelDocComment == null) {
+						return;
+					}
+					// the first "/***" comment is the file-level doc comment
+					if (this._fileLevelDocComment == null) {
+						this._fileLevelDocComment = fileLevelDocComment;
+					}
+				} else if (this._getInputByLength(3) == "/**") {
+					this._forwardPos(2); // skip to the last *, the input might be: /**/
+					if ((this._docComment = this._parseDocComment()) == null) {
+						return;
+					}
+				} else {
+					this._docComment = null;
+					if (! this._skipMultilineComment()) {
+						return;
+					}
+				}
 				break;
 			case "//":
+				this._docComment = null;
 				if (this._lineNumber == this._lines.length) {
 					this._columnOffset = this._lines[this._lineNumber - 1].length;
 				} else {
@@ -743,6 +799,76 @@ var Parser = exports.Parser = Class.extend({
 			}
 			++this._lineNumber;
 			this._columnOffset = 0;
+		}
+	},
+
+	_parseDocComment: function () {
+
+		var docComment = new DocComment();
+		var node = docComment;
+
+		while (true) {
+			// skip " * ", or return if "*/"
+			this._parseDocCommentAdvanceWhiteSpace();
+			if (this._getInputByLength(2) == "*/") {
+				this._forwardPos(2);
+				return docComment;
+			} else if (this._getInputByLength(1) == "*") {
+				this._forwardPos(1);
+				this._parseDocCommentAdvanceWhiteSpace();
+			}
+			// fetch tag (and paramName), and setup the target node to push content into
+			var tagMatch = this._getInput(this._columnOffset).match(/^\@([0-9A-Za-z_]+)[ \t]*/);
+			if (tagMatch != null) {
+				this._forwardPos(tagMatch[0].length);
+				var tag = tagMatch[1];
+				switch (tag) {
+				case "param":
+					var nameMatch = this._getInput(this._columnOffset).match(/[0-9A-Za-z_]+/);
+					if (nameMatch != null) {
+						this._forwardPos(nameMatch[0].length);
+						node = new DocCommentParameter(nameMatch[0]);
+						docComment.getParams().push(node);
+					} else {
+						this._newError("name of the parameter not found after @param");
+						node = null;
+					}
+					break;
+				default:
+					node = new DocCommentTag(tag);
+					docComment.getTags().push(node);
+					break;
+				}
+			}
+			var endAt = this._getInput(this._columnOffset).indexOf("*/");
+			if (endAt != -1) {
+				if (node != null) {
+					node.appendDescription(this._getInput(this._columnOffset).substring(0, endAt));
+				}
+				this._forwardPos(endAt + 2);
+				return docComment;
+			}
+			if (node != null) {
+				node.appendDescription(this._getInput(this._columnOffset));
+			}
+			if (this._lineNumber == this._lines.length) {
+				this._columnOffset = this._lines[this._lineNumber - 1].length;
+				this._newError("could not find the end of the doccomment");
+				return null;
+			}
+			++this._lineNumber;
+			this._columnOffset = 0;
+		}
+	},
+
+	_parseDocCommentAdvanceWhiteSpace: function () {
+		while (true) {
+			var ch = this._getInputByLength(1);
+			if (ch == " " || ch == "\t") {
+				this._forwardPos(1);
+			} else {
+				break;
+			}
 		}
 	},
 
@@ -990,10 +1116,13 @@ var Parser = exports.Parser = Class.extend({
 		this._objectTypesUsed = [];
 		// attributes* class
 		this._classFlags = 0;
+		var docComment = null;
 		while (true) {
 			var token = this._expect([ "class", "interface", "mixin", "abstract", "final", "native", "__fake__" ]);
 			if (token == null)
 				return false;
+			if (this._classFlags == 0)
+				docComment = this._docComment;
 			if (token.getValue() == "class")
 				break;
 			if (token.getValue() == "interface") {
@@ -1147,9 +1276,9 @@ var Parser = exports.Parser = Class.extend({
 
 		// done
 		if (this._typeArgs.length != 0) {
-			this._templateClassDefs.push(new TemplateClassDefinition(className.getValue(), this._classFlags, this._typeArgs, this._extendType, this._implementTypes, members, this._objectTypesUsed));
+			this._templateClassDefs.push(new TemplateClassDefinition(className.getValue(), this._classFlags, this._typeArgs, this._extendType, this._implementTypes, members, this._objectTypesUsed, docComment));
 		} else {
-			var classDef = new ClassDefinition(className, className.getValue(), this._classFlags, this._extendType, this._implementTypes, members, this._objectTypesUsed);
+			var classDef = new ClassDefinition(className, className.getValue(), this._classFlags, this._extendType, this._implementTypes, members, this._objectTypesUsed, docComment);
 			this._classDefs.push(classDef);
 			classDef.setParser(this);
 		}
@@ -1158,10 +1287,13 @@ var Parser = exports.Parser = Class.extend({
 
 	_memberDefinition: function () {
 		var flags = 0;
+		var docComment = null;
 		while (true) {
 			var token = this._expect([ "function", "var", "static", "abstract", "override", "final", "const", "native", "__readonly__", "inline", "__pure__" ]);
 			if (token == null)
 				return null;
+			if (flags == 0)
+				docComment = this._docComment;
 			if (token.getValue() == "const") {
 				if ((flags & ClassDefinition.IS_STATIC) == 0) {
 					this._newError("constants must be static");
@@ -1222,7 +1354,7 @@ var Parser = exports.Parser = Class.extend({
 		if ((this._classFlags & ClassDefinition.IS_INTERFACE) != 0)
 			flags |= ClassDefinition.IS_ABSTRACT;
 		if (token.getValue() == "function") {
-			return this._functionDefinition(token, flags, this._classFlags);
+			return this._functionDefinition(token, flags, docComment);
 		}
 		// member variable decl.
 		if ((flags & ~(ClassDefinition.IS_STATIC | ClassDefinition.IS_ABSTRACT | ClassDefinition.IS_CONST | ClassDefinition.IS_READONLY | ClassDefinition.IS_INLINE)) != 0) {
@@ -1258,10 +1390,10 @@ var Parser = exports.Parser = Class.extend({
 		// all non-native, non-template values have initial value
 		if (this._typeArgs.length == 0 && initialValue == null && (this._classFlags & ClassDefinition.IS_NATIVE) == 0)
 			initialValue = Expression.getDefaultValueExpressionOf(type);
-		return new MemberVariableDefinition(token, name, flags, type, initialValue);
+		return new MemberVariableDefinition(token, name, flags, type, initialValue, docComment);
 	},
 
-	_functionDefinition: function (token, flags) {
+	_functionDefinition: function (token, flags, docComment) {
 		// name
 		var name = this._expectIdentifier(null);
 		if (name == null)
@@ -2455,13 +2587,13 @@ var Parser = exports.Parser = Class.extend({
 				var expr = this._expr();
 				this._statements.push(new ReturnStatement(token, expr));
 				return new MemberFunctionDefinition(
-						token, null, ClassDefinition.IS_STATIC, returnType, args, this._locals, this._statements, this._closures, null);
+						token, null, ClassDefinition.IS_STATIC, returnType, args, this._locals, this._statements, this._closures, null, null);
 			} else {
 				var lastToken = this._block();
 				if (lastToken == null)
 					return null;
 				return new MemberFunctionDefinition(
-						token, null, ClassDefinition.IS_STATIC, returnType, args, this._locals, this._statements, this._closures, lastToken);
+						token, null, ClassDefinition.IS_STATIC, returnType, args, this._locals, this._statements, this._closures, lastToken, null);
 			}
 		} finally {
 			this._popScope();
@@ -2509,7 +2641,7 @@ var Parser = exports.Parser = Class.extend({
 			this._popScope();
 			return null;
 		}
-		var funcDef = new MemberFunctionDefinition(token, null, ClassDefinition.IS_STATIC, returnType, args, this._locals, this._statements, this._closures, lastToken);
+		var funcDef = new MemberFunctionDefinition(token, null, ClassDefinition.IS_STATIC, returnType, args, this._locals, this._statements, this._closures, lastToken, null);
 		this._popScope();
 		this._closures.push(funcDef);
 		return new FunctionExpression(token, funcDef);

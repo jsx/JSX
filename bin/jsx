@@ -27,6 +27,7 @@ var path = require("path");
 
 var Class = require("../src/Class");
 eval(Class.$import("../src/compiler"));
+eval(Class.$import("../src/doc"));
 eval(Class.$import("../src/platform"));
 eval(Class.$import("../src/jsemitter"));
 eval(Class.$import("../src/optimizer"));
@@ -82,6 +83,18 @@ var NodePlatform = Platform.extend({
 		}
 		else {
 			fs.writeFileSync(outputFile, content);
+		}
+	},
+
+	mkpath: function (path) {
+		try {
+			fs.statSync(path);
+		} catch (e) {
+			var dirOfPath = path.replace(/\/[^/]*$/, "");
+			if (dirOfPath != path) {
+				this.mkpath(dirOfPath);
+			}
+			fs.mkdir(path);
 		}
 	},
 
@@ -250,6 +263,9 @@ var JSX = Class.extend({
 				case "parse":
 					compiler.setMode(Compiler.MODE_PARSE);
 					break;
+				case "doc":
+					compiler.setMode(Compiler.MODE_DOC);
+					break;
 				default:
 					console.error("unknown mode: " + optarg);
 					return 1;
@@ -402,18 +418,41 @@ var JSX = Class.extend({
 		var sourceFile = args[argIndex++];
 		compiler.addSourceFile(null, sourceFile, completionRequest);
 
-		if(compiler.getMode() === Compiler.MODE_PARSE) {
+		switch (compiler.getMode()) {
+		case Compiler.MODE_PARSE:
 			if (compiler.compile()) {
 				platform.save(outputFile, compiler.getAST());
 				return 0;
 			} else {
 				return 1;
 			}
+			break;
 		}
 
-		// MODE_COMPILE || MODE_COMPLETE
 		if (emitter == null)
 			emitter = new JavaScriptEmitter(platform);
+		compiler.setEmitter(emitter);
+
+		switch (compiler.getMode()) {
+		case Compiler.MODE_DOC:
+			if (outputFile == null) {
+				console.error("--output is mandatory for --mode doc");
+				return 1;
+			}
+			if (compiler.compile()) {
+				new DocumentGenerator(compiler)
+					.setOutputPath(outputFile)
+					.setPathFilter(function (sourcePath) {
+						return ! (sourcePath.match(/^(?:system:|\/)/) || sourcePath.match(/\/..\//));
+					})
+					.setTemplatePath(platform.getRoot() + "/src/doc/template.html")
+					.buildDoc();
+				return 0;
+			} else {
+				return 1;
+			}
+		}
+
 		var optimizer = new Optimizer();
 		var err = optimizer.setup(optimizeCommands);
 		if (err != null) {
@@ -425,7 +464,6 @@ var JSX = Class.extend({
 
 		emitter.setOutputFile(outputFile);
 
-		compiler.setEmitter(emitter);
 		compiler.setOptimizer(optimizer);
 
 		var result = compiler.compile();

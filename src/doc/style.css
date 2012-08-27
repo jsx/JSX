@@ -1,0 +1,62 @@
+.jsxdoc {
+    margin: 0;
+}
+
+.jsxdoc .file {
+    padding: 1em 50px 1em 50px;
+}
+
+.jsxdoc h1 {
+    font-size: 200%;
+    margin: 0.5em 0;
+}
+
+.jsxdoc h2 {
+    font-size: 150%;
+    margin: 0.5em 0;
+}
+
+.jsxdoc h3 {
+    font-size: 100%;
+    font-weight: bold;
+    margin: 0.5em 0;
+}
+
+.jsxdoc .class {
+    margin: 0;
+    padding: 1em 50px;
+    border-top: 1px dotted #ccc;
+}
+
+.jsxdoc .member {
+    margin: 1em 0;
+}
+
+.jsxdoc .member h3 {
+    margin-left: 20px;
+}
+
+.jsxdoc .description {
+    margin: 0.5em 0 0.5em 4em;
+    text-align: justify;
+}
+
+.jsxdoc .arguments {
+    margin: 0.5em 0 0.5em 4em;
+    padding-left: 2em;
+}
+
+.jsxdoc .arguments caption {
+    text-align: left;
+    font-weight: normal;
+}
+
+.jsxdoc .arguments td {
+    margin: 0;
+    padding: 0.3em 1em;
+    vertical-align: baseline;
+}
+
+.jsxdoc .arguments .param-name {
+    font-family: monospace;
+}

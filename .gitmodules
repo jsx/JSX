@@ -1,0 +1,3 @@
+[submodule "submodules/picotemplate"]
+	path = submodules/picotemplate
+	url = https://github.com/kazuho/picotemplate.git
