@@ -1770,6 +1770,15 @@ var _NewExpressionEmitter = exports._NewExpressionEmitter = _OperatorExpressionE
 		var inliner = getInliner(callingFuncDef);
 		if (inliner) {
 			this._emitAsObjectLiteral(classDef, inliner(this._expr));
+		} else if (
+			classDef instanceof InstantiatedClassDefinition
+			&& classDef.getTemplateClassName() == "Array"
+			&& argTypes.length == 0) {
+			this._emitter._emit("[]", this._expr.getToken());
+		} else if (
+			classDef instanceof InstantiatedClassDefinition
+			&& classDef.getTemplateClassName() == "Map") {
+			this._emitter._emit("{}", this._expr.getToken());
 		} else {
 			this._emitter._emitCallArguments(
 				this._expr.getToken(),
