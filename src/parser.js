@@ -1289,7 +1289,7 @@ var Parser = exports.Parser = Class.extend({
 		var flags = 0;
 		var docComment = null;
 		while (true) {
-			var token = this._expect([ "function", "var", "static", "abstract", "override", "final", "const", "native", "__readonly__", "inline", "__pure__" ]);
+			var token = this._expect([ "function", "var", "static", "abstract", "override", "final", "const", "native", "__readonly__", "inline", "__pure__", "delete" ]);
 			if (token == null)
 				return null;
 			if (flags == 0)
@@ -1341,6 +1341,9 @@ var Parser = exports.Parser = Class.extend({
 				break;
 			case "__pure__":
 				newFlag = ClassDefinition.IS_PURE;
+				break;
+			case "delete":
+				newFlag = ClassDefinition.IS_DELETE;
 				break;
 			default:
 				throw new Error("logic flaw");
@@ -1442,13 +1445,24 @@ var Parser = exports.Parser = Class.extend({
 				if (returnType == null)
 					return null;
 			}
+			// take care of: "delete function constructor();"
+			if ((flags & ClassDefinition.IS_DELETE) != 0) {
+				if (name.getValue() != "constructor" || (flags & ClassDefinition.IS_STATIC) != 0) {
+					this._newError("only constructors may have the \"delete\" attribute set");
+					return null;
+				}
+				if (args.length != 0) {
+					this._newError("cannot \"delete\" a constructor with one or more arguments");
+					return null;
+				}
+			}
 			function createDefinition(locals, statements, closures, lastToken) {
 				return typeArgs.length != 0
 					? new TemplateFunctionDefinition(token, name, flags, typeArgs, returnType, args, locals, statements, closures, lastToken)
 					: new MemberFunctionDefinition(token, name, flags, returnType, args, locals, statements, closures, lastToken);
 			}
 			// take care of abstract function
-			if ((this._classFlags & ClassDefinition.IS_INTERFACE) != 0) {
+			if ((this._classFlags & (ClassDefinition.IS_INTERFACE | ClassDefinition.IS_DELETE)) != 0) {
 				if (this._expect(";") == null)
 					return null;
 				return createDefinition(null, null, null, null);

@@ -121,6 +121,7 @@ var ClassDefinition = exports.ClassDefinition = Class.extend({
 	$IS_READONLY: 512,
 	$IS_INLINE: 1024,
 	$IS_PURE: 2048, // constexpr (intended for for native functions)
+	$IS_DELETE: 4096, // used for disabling the default constructor
 
 	constructor: function (token, className, flags, extendType, implementTypes, members, objectTypesUsed, docComment) {
 		this._parser = null;
@@ -282,7 +283,9 @@ var ClassDefinition = exports.ClassDefinition = Class.extend({
 			if (mode != ClassDefinition.GET_MEMBER_MODE_SUPER) {
 				for (var i = 0; i < classDef._members.length; ++i) {
 					var member = classDef._members[i];
-					if (isStatic == ((member.flags() & ClassDefinition.IS_STATIC) != 0)
+					if ((member.flags() & ClassDefinition.IS_DELETE) != 0) {
+						// skip
+					} else if (isStatic == ((member.flags() & ClassDefinition.IS_STATIC) != 0)
 						&& name == member.name()) {
 						if (member instanceof MemberVariableDefinition) {
 							if ((member.flags() & ClassDefinition.IS_OVERRIDE) == 0) {

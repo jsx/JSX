@@ -2022,6 +2022,11 @@ var NewExpression = exports.NewExpression = OperatorExpression.extend({
 			return false;
 		}
 		var ctors = classDef.getMemberTypeByName(context.errors, this._token, "constructor", false, [], ClassDefinition.GET_MEMBER_MODE_CLASS_ONLY);
+		if (ctors == null) {
+			// classes will always have at least one constructor unless the default constructor is marked "delete"
+			context.errors.push(new CompileError(this._token, "the class cannot be instantiated"));
+			return false;
+		}
 		var argTypes = Util.analyzeArgs(
 			context, this._args, this,
 			ctors.getExpectedCallbackTypes(this._args.length, false));
