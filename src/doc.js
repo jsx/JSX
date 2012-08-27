@@ -229,7 +229,7 @@ _ += "</div>\n";
 		}
 
 		classDef.forEachMemberFunction(function (funcDef) {
-			if (! (funcDef instanceof InstantiatedMemberFunctionDefinition) && this._isConstructor(funcDef)) {
+			if (! (funcDef instanceof InstantiatedMemberFunctionDefinition) && this._isConstructor(funcDef) && (funcDef.flags() & ClassDefinition.IS_DELETE) == 0) {
 _ += (this._buildDocOfFunction(parser, funcDef)).replace(/\n$/, ""); _ += "\n";
 			}
 			return true;

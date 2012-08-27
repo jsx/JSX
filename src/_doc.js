@@ -229,7 +229,7 @@ var DocumentGenerator = exports.DocumentGenerator = Class.extend({
 		}
 
 		classDef.forEachMemberFunction(function (funcDef) {
-			if (! (funcDef instanceof InstantiatedMemberFunctionDefinition) && this._isConstructor(funcDef)) {
+			if (! (funcDef instanceof InstantiatedMemberFunctionDefinition) && this._isConstructor(funcDef) && (funcDef.flags() & ClassDefinition.IS_DELETE) == 0) {
 ?<?= this._buildDocOfFunction(parser, funcDef) ?>
 			}
 			return true;
