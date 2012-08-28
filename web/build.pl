@@ -122,6 +122,7 @@ sub process_jsx {
     my $browserbuild = "$project_root/node_modules/browserbuild/bin/browserbuild";
 
     my @files = glob("$src/*.js");
+	@files = grep { !m{ \Q/_doc.js\E $}xms } @files;
     my $basepath = shell_quote($src . "/");
     my $cmd = "node $browserbuild --main interface --global jsx --basepath $basepath "
         . join(' ', map { shell_quote($_) } @files)
