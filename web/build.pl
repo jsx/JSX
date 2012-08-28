@@ -129,7 +129,8 @@ sub process_jsx {
         . " > "
         . shell_quote($dest);
 
-    system($cmd) == 0 or die "Failed to build jsx-web.js: $cmd\n";
+    system($cmd) == 0 or die "Failed to build jsx-compiler.js: $cmd\n";
+	system("$root/check-jsx-compiler.js") == 0 or die "Failed to build jsx-compiler.js";
 }
 
 sub process_tree {
