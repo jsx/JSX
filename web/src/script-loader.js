@@ -80,8 +80,7 @@ function load(root) {
 			compiledScript.appendChild(scriptSection);
 			script.parentNode.appendChild(compiledScript);
 
-			console.log("jsx-script-loader: load %s in %d ms.",
-					sourceFile, (Date.now() - t0));
+			console.log("jsx-script-loader: load " + sourceFile + " in " + (Date.now() - t0) + " ms.");
 
 			var applicationArguments = script.getAttribute("data-arguments");
 			if (applicationArguments) {
