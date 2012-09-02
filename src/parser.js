@@ -481,10 +481,11 @@ var Parser = exports.Parser = Class.extend({
 		// insert a marker so that at the completion location we would always get _expectIdentifierOpt called, whenever possible
 		if (this._completionRequest != null) {
 			var compLineNumber = Math.min(this._completionRequest.getLineNumber(), this._lines.length + 1);
+			var line = this._lines[compLineNumber - 1] || '';
 			this._lines[compLineNumber - 1] =
-				this._lines[compLineNumber - 1].substring(0, this._completionRequest.getColumnOffset())
+				line.substring(0, this._completionRequest.getColumnOffset())
 				+ "Q," + // use a character that is permitted within an identifier, but never appears in keywords
-				this._lines[compLineNumber - 1].substring(this._completionRequest.getColumnOffset());
+				line.substring(this._completionRequest.getColumnOffset());
 		}
 		// output
 		this._errors = errors;
