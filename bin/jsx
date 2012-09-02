@@ -39,15 +39,20 @@ var NodePlatform = Platform.extend({
 	constructor: function() {
 		var root = path.dirname(__dirname);
 		this._root = root.replace(/\\/g, "/");
+		this._virtualFile = Object.create(null);
 	},
 
 	getRoot: function () {
 		return this._root;
 	},
 
-	fileExists: function (path) {
+	fileExists: function (name) {
+		name = path.normalize(name);
+		if (name in this._virtualFile) {
+			return true;
+		}
 		try {
-			fs.statSync(path);
+			fs.statSync(name);
 			return true;
 		} catch (e) {
 			return false;
@@ -58,8 +63,16 @@ var NodePlatform = Platform.extend({
 		return fs.readdirSync(path);
 	},
 
-	load: function (path) {
-		if (path === "-") {
+	setFileContent: function (name, content) {
+		this._virtualFile[name] = content;
+	},
+
+	load: function (name) {
+		name = path.normalize(name);
+		if (name in this._virtualFile) {
+			return this._virtualFile[name];
+		}
+		else if (name === "-") {
 			var fd = process.stdin.fd;
 
 			var content = "";
@@ -73,7 +86,7 @@ var NodePlatform = Platform.extend({
 			return content;
 		}
 		else {
-			return fs.readFileSync(path).toString();
+			return fs.readFileSync(name).toString();
 		}
 	},
 
@@ -187,6 +200,7 @@ var JSX = Class.extend({
 			"  --run                      runs _Main.main(:string[]):void after compiling\n" +
 			"  --test                     runs _Test#test*():void after compiling\n" +
 			"  --output file              output file (default:stdout)\n" +
+			"  --input-filename file      names input filename\n" +
 			"  --mode (compile|parse|doc) compilation mode (default:compile)\n" +
 			"  --target (javascript|c++)  target language (default:javascript)\n" +
 			"  --release                  omits the debugging features from the generated code (run-time type checking, logging, assertion)\n" +
@@ -233,6 +247,7 @@ var JSX = Class.extend({
 		var completionRequest = null;
 		var emitter = null;
 		var outputFile = null;
+		var inputFilename = null;
 		var executable = null;
 		var run = null;
 		var runImmediately = false;
@@ -249,6 +264,11 @@ var JSX = Class.extend({
 				break;
 			case "--output":
 				if((outputFile = getoptarg()) == null) {
+					return 1;
+				}
+				break;
+			case "--input-filename":
+				if((inputFilename = getoptarg()) == null) {
 					return 1;
 				}
 				break;
@@ -416,6 +436,10 @@ var JSX = Class.extend({
 		}
 
 		var sourceFile = args[argIndex++];
+		if (inputFilename != null) {
+			platform.setFileContent(inputFilename, platform.load(sourceFile));
+			sourceFile = inputFilename;
+		}
 		compiler.addSourceFile(null, sourceFile, completionRequest);
 
 		switch (compiler.getMode()) {
