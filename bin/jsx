@@ -187,7 +187,7 @@ var JSX = Class.extend({
 			"  --run                      runs _Main.main(:string[]):void after compiling\n" +
 			"  --test                     runs _Test#test*():void after compiling\n" +
 			"  --output file              output file (default:stdout)\n" +
-			"  --mode (compile|parse)     compilation mode (default:compile)\n" +
+			"  --mode (compile|parse|doc) compilation mode (default:compile)\n" +
 			"  --target (javascript|c++)  target language (default:javascript)\n" +
 			"  --release                  omits the debugging features from the generated code (run-time type checking, logging, assertion)\n" +
 			"  --profile                  enables the profiler (experimental)\n" +
