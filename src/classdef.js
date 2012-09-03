@@ -843,6 +843,10 @@ var MemberVariableDefinition = exports.MemberVariableDefinition = MemberDefiniti
 		return new MemberVariableDefinition(this._token, this._nameToken, this._flags, type, initialValue);
 	},
 
+	toString: function () {
+		return this.name() + " : " + this._type.toString();
+	},
+
 	serialize: function () {
 		return {
 			"name"         : this.name(),
@@ -918,6 +922,16 @@ var MemberFunctionDefinition = exports.MemberFunctionDefinition = MemberDefiniti
 			for (var i = 0; i < this._closures.length; ++i)
 				this._closures[i].setParent(this);
 		}
+	},
+
+	toString: function () {
+		var argsText = this._args.map(function (arg) {
+				return arg.getName().getValue() + " : " + arg.getType().toString();
+			}.bind(this)).join(", ");
+		return "function " +
+			this.name() +
+			"(" + argsText + ") : " +
+			this._returnType.toString();
 	},
 
 	instantiate: function (instantiationContext) {
@@ -1441,7 +1455,7 @@ var LocalVariable = exports.LocalVariable = Class.extend({
 	},
 
 	toString: function () {
-		return this._name + " : " + this._type;
+		return this._name.getValue() + " : " + this._type.toString();
 	},
 
 	popInstantiated: function () {

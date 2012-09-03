@@ -1,16 +1,16 @@
 /*
  * Copyright (c) 2012 DeNA Co., Ltd.
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to
  * deal in the Software without restriction, including without limitation the
  * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
  * sell copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -56,6 +56,7 @@ var CompletionRequest = exports.CompletionRequest = Class.extend({
 	},
 
 	getCandidates: function () {
+		var seen = {}; // for unique
 		var results = [];
 		// fetch the list
 		this._candidates.forEach(function (candidates) {
@@ -63,28 +64,33 @@ var CompletionRequest = exports.CompletionRequest = Class.extend({
 			candidates.getCandidates(rawCandidates);
 			var prefix = candidates.getPrefix();
 			rawCandidates.forEach(function (s) {
-				if (prefix == "" && s.substring(0, 2) == "__" && s != "__noconvert__") {
+				if (prefix == "" && s.symbol.substring(0, 2) == "__" && s != "__noconvert__") {
 					// skip hidden keywords
-				} else if (s.substring(0, prefix.length) == prefix) {
-					var left = s.substring(prefix.length);
-					if (left.length != 0) {
-						results.push(left);
+				} else if (s.symbol.substring(0, prefix.length) == prefix) {
+					var left = s.symbol.substring(prefix.length);
+					if (left.length != 0 && ! seen.hasOwnProperty(left)) {
+						seen[left] = true;
+
+						var data = {};
+						data.part = left;
+						data.word = s.symbol;      // vim: text that will be insereted
+						data.menu = s.description; // vim: extra text for popup menu
+						results.push(data);
 					}
 				}
-			});
+			}.bind(this));
+		}.bind(this));
+
+		return results.sort(function (a, b) {
+			var aWord = a.word.toUpperCase();
+			var bWord = b.word.toUpperCase();
+			return aWord.localeCompare(bWord);
 		});
-		// sort, and unique
-		results = results.sort();
-		for (var i = 1; i < results.length;) {
-			if (results[i - 1] == results[i])
-				results.splice(i - 1, 1);
-			else
-				++i;
-		}
-		return results;
 	}
 
 });
+
+// class CompletionCandidate { var symbol : string; var description : string }
 
 var CompletionCandidates = exports.CompletionCandidates = Class.extend({
 
@@ -92,7 +98,7 @@ var CompletionCandidates = exports.CompletionCandidates = Class.extend({
 		this._prefix = null;
 	},
 
-	getCandidates: null, // function (string[]) : void
+	getCandidates: null, // function (CompletionCandidate[]) : void
 
 	getPrefix: function () {
 		return this._prefix;
@@ -109,13 +115,19 @@ var CompletionCandidates = exports.CompletionCandidates = Class.extend({
 				// skip
 			} else {
 				if (autoCompleteMatchCb == null || autoCompleteMatchCb(classDef)) {
-					candidates.push(classDef.className());
+					candidates.push({
+						symbol: classDef.className(),
+						kind: "class",
+					});
 				}
 			}
 		});
 		parser.getTemplateClassDefs().forEach(function (classDef) {
 			if (autoCompleteMatchCb == null || autoCompleteMatchCb(classDef)) {
-				candidates.push(classDef.className());
+				candidates.push({
+					symbol: classDef.className(),
+					kind: "class"
+				});
 			}
 		});
 	},
@@ -125,7 +137,10 @@ var CompletionCandidates = exports.CompletionCandidates = Class.extend({
 		if (classNames != null) {
 			classNames.forEach(function (className) {
 				// FIXME can we refer to the classdefs of the classnames here?
-				candidates.push(className);
+				candidates.push({
+					symbol: className,
+					kind: "class",
+				});
 			});
 		} else {
 			imprt.getSources().forEach(function (parser) {
@@ -144,7 +159,10 @@ var KeywordCompletionCandidate = exports.KeywordCompletionCandidate = Completion
 	},
 
 	getCandidates: function (candidates) {
-		candidates.push(this._expected);
+		candidates.push({
+			symbol: this._expected,
+			kind: 'keyword'
+		});
 	}
 
 });
@@ -163,7 +181,10 @@ var CompletionCandidatesOfTopLevel = exports.CompletionCandidatesOfTopLevel = Co
 			var imprt = this._parser._imports[i];
 			var alias = imprt.getAlias();
 			if (alias != null) {
-				candidates.push(alias);
+				candidates.push({
+					symbol: alias,
+					kind: 'alias'
+				});
 			} else {
 				CompletionCandidates._addImportedClasses(candidates, imprt, this._autoCompleteMatchCb);
 			}
@@ -185,7 +206,11 @@ var _CompletionCandidatesWithLocal = exports._CompletionCandidatesWithLocal = Co
 
 	getCandidates: function (candidates) {
 		this._locals.forEach(function (local) {
-			candidates.push(local.getName().getValue());
+			candidates.push({
+				symbol: local.getName().getValue(),
+				description: local.toString(),
+				kind: 'local variable',
+			});
 		});
 		CompletionCandidatesOfTopLevel.prototype.getCandidates.call(this, candidates);
 	}
@@ -232,7 +257,11 @@ var _CompletionCandidatesOfProperty = exports._CompletionCandidatesOfProperty = 
 				if (! isStatic && member.name() == "constructor") {
 					// skip
 				} else {
-					candidates.push(member.name());
+					candidates.push({
+						symbol: member.name(),
+						description: member.toString(),
+						kind: 'member'
+					});
 				}
 			}
 			return true;
