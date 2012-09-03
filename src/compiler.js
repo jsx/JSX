@@ -30,66 +30,6 @@ eval(Class.$import("./util"));
 
 "use strict";
 
-var CompletionRequest = exports.CompletionRequest = Class.extend({
-
-	constructor: function (lineNumber, columnOffset) {
-		this._lineNumber = lineNumber;
-		this._columnOffest = columnOffset;
-		this._candidates = [];
-	},
-
-	getLineNumber: function () {
-		return this._lineNumber;
-	},
-
-	getColumnOffset: function () {
-		return this._columnOffest;
-	},
-
-	isInRange: function (lineNumber, columnOffset, length) {
-		if (lineNumber != this._lineNumber)
-			return -1;
-		if (columnOffset <= this._columnOffest && this._columnOffest <= columnOffset + length) {
-			return this._columnOffest - columnOffset;
-		}
-		return -1;
-	},
-
-	pushCandidates: function (candidates) {
-		this._candidates.push(candidates);
-	},
-
-	getCandidates: function () {
-		var results = [];
-		// fetch the list
-		this._candidates.forEach(function (candidates) {
-			var rawCandidates = [];
-			candidates.getCandidates(rawCandidates);
-			var prefix = candidates.getPrefix();
-			rawCandidates.forEach(function (s) {
-				if (prefix == "" && s.substring(0, 2) == "__" && s != "__noconvert__") {
-					// skip hidden keywords
-				} else if (s.substring(0, prefix.length) == prefix) {
-					var left = s.substring(prefix.length);
-					if (left.length != 0) {
-						results.push(left);
-					}
-				}
-			});
-		});
-		// sort, and unique
-		results = results.sort();
-		for (var i = 1; i < results.length;) {
-			if (results[i - 1] == results[i])
-				results.splice(i - 1, 1);
-			else
-				++i;
-		}
-		return results;
-	}
-
-});
-
 var Compiler = exports.Compiler = Class.extend({
 
 	$MODE_COMPILE: 0,
