@@ -81,11 +81,7 @@ var CompletionRequest = exports.CompletionRequest = Class.extend({
 			}.bind(this));
 		}.bind(this));
 
-		return results.sort(function (a, b) {
-			var aWord = a.word.toUpperCase();
-			var bWord = b.word.toUpperCase();
-			return aWord.localeCompare(bWord);
-		});
+		return results;
 	}
 
 });
