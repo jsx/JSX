@@ -140,7 +140,9 @@ var Compiler = exports.Compiler = Class.extend({
 		// optimization
 		this._optimize();
 		// TODO peep-hole and dead store optimizations, etc.
-		this._generateCode();
+		this._generateCode(errors);
+		if (! this._handleErrors(errors))
+			return false;
 		return true;
 	},
 
@@ -286,7 +288,7 @@ var Compiler = exports.Compiler = Class.extend({
 			this._optimizer.setCompiler(this).performOptimization();
 	},
 
-	_generateCode: function () {
+	_generateCode: function (errors) {
 		// build list of all classDefs
 		var classDefs = [];
 		for (var i = 0; i < this._parsers.length; ++i)
@@ -320,14 +322,31 @@ var Compiler = exports.Compiler = Class.extend({
 			}
 		}
 		// rename the classes with conflicting names
+		var countByName = {};
 		for (var i = 0; i < classDefs.length; ++i) {
-			if (classDefs[i].getOutputClassName() == null) {
-				var className = classDefs[i].className();
-				var suffix = 0;
-				for (var j = i + 1; j < classDefs.length; ++j)
-					if (classDefs[j].className() == className)
-						classDefs[j].setOutputClassName(className + "$" + suffix++);
-				classDefs[i].setOutputClassName(className);
+			var classDef = classDefs[i];
+			if ((classDef.flags() & ClassDefinition.IS_NATIVE) != 0) {
+				// check that the names of native classes do not conflict, and register the ocurrences
+				var className = classDef.className();
+				if (countByName[className]) {
+					errors.push(new CompileError(classDef.getToken(), "found multiple definition for native class: " + className));
+					return;
+				}
+				classDef.setOutputClassName(className);
+				countByName[className] = 1;
+			}
+		}
+		for (var i = 0; i < classDefs.length; ++i) {
+			var classDef = classDefs[i];
+			if ((classDef.flags() & ClassDefinition.IS_NATIVE) == 0) {
+				var className = classDef.className();
+				if (countByName[className]) {
+					classDef.setOutputClassName(className + "$" + (countByName[className] - 1));
+					countByName[className]++;
+				} else {
+					classDef.setOutputClassName(className);
+					countByName[className] = 1;
+				}
 			}
 		}
 		// escape the instantiated class names
