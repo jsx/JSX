@@ -1355,6 +1355,29 @@ native final class CompositionEventInit {
 
 } // end of CompositionEventInit
 
+/** @see http://www.w3.org/TR/progress-events/ */
+native final class ProgressEvent extends Event {
+
+	function constructor(type : string/*DOMString*/);
+	function constructor(
+		type : string/*DOMString*/,
+		eventInitDict : ProgressEventInit
+	);
+
+	__readonly__ var lengthComputable : boolean;
+	__readonly__ var loaded : number/*unsigned long long*/;
+	__readonly__ var total : number/*unsigned long long*/;
+
+} // end of ProgressEvent
+
+native final class ProgressEventInit extends EventInit {
+
+	var lengthComputable : boolean;
+	var loaded : number/*unsigned long long*/;
+	var total : number/*unsigned long long*/;
+
+} // end of ProgressEventInit
+
 /** @see http://www.w3.org/TR/XMLHttpRequest/ */
 native __fake__ class XMLHttpRequestEventTarget extends EventTarget {
 
