@@ -1,0 +1,473 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN"><html lang="en-US"><head>
+  <title>Progress Events</title>
+  <style type="text/css">
+   pre.idl { border:solid thin; background:#eee; color:#000; padding:0.5em }
+   pre.idl :link, pre.idl :visited { color:inherit; background:transparent }
+   pre code { color:inherit; background:transparent }
+   div.example { margin-left:1em; padding-left:1em; border-left:double; color:#222; background:#fcfcfc }
+   .note { margin-left:2em; font-weight:bold; font-style:italic; color:#008000 }
+   p.note::before { content:"Note: " }
+   .XXX { padding:.5em; border:solid #f00 }
+   p.XXX::before { content:"Issue: " }
+   dl.switch { padding-left:2em }
+   dl.switch > dt { text-indent:-1.5em }
+   dl.switch > dt:before { content:'\21AA'; padding:0 0.5em 0 0; display:inline-block; width:1em; text-align:right; line-height:0.5em }
+   dl.domintro { color: green; margin: 2em 0 2em 2em; padding: 0.5em 1em; border: none; background: #DDFFDD; }
+   dl.domintro dt, dl.domintro dt * { color: black; text-decoration: none; }
+   dl.domintro dd { margin: 0.5em 0 1em 2em; padding: 0; }
+   dl.domintro dd p { margin: 0.5em 0; }
+   dl.domintro:before { display: table; margin: -1em -0.5em -0.5em auto; width: auto; content: 'This box is non-normative. Implementation requirements are given below this box.'; color: red; border: solid 2px; background: white; padding: 0 0.25em; }
+   em.ct { text-transform:lowercase; font-variant:small-caps; font-style:normal }
+   dfn { font-weight:bold; font-style:normal }
+   code { color:orangered }
+   code :link, code :visited { color:inherit }
+   hr:not(.top) { display:block; background:none; border:none; padding:0; margin:2em 0; height:auto }
+   table { border-collapse:collapse; border-style:hidden hidden none hidden }
+   table thead { border-bottom:solid }
+   table tbody th:first-child { border-left:solid }
+   table td, table th { border-left:solid; border-right:solid; border-bottom:solid thin; vertical-align:top; padding:0.2em }
+  </style>
+  <link href="http://www.w3.org/StyleSheets/TR/W3C-CR" rel="stylesheet">
+ </head>
+ <body>
+  <div class="head">
+
+<!--begin-logo-->
+<p><a href="http://www.w3.org/"><img alt="W3C" height="48" src="http://www.w3.org/Icons/w3c_home" width="72"></a></p>
+<!--end-logo-->
+   <h1 class="head">Progress Events</h1>
+
+   <h2 class="no-num no-toc" id="w3c-doctype">W3C Candidate Recommendation 22 September 2011</h2>
+
+   <dl>
+    <dt>This Version:</dt>
+  <dd class="publish"><a href="http://www.w3.org/TR/2011/CR-progress-events-20110922/">http://www.w3.org/TR/2011/CR-progress-events-20110922/</a>
+
+    <dt class="publish">Latest Version:</dt>
+    <dd class="publish"><a href="http://www.w3.org/TR/progress-events">http://www.w3.org/TR/progress-events</a></dd>
+
+  <dt class="publish">Latest Editor Draft:
+  <dd class="publish"><a href="http://dev.w3.org/2006/webapi/progress/">http://dev.w3.org/2006/webapi/progress/</a></dd>
+
+    <dt>Previous Versions:</dt>
+    <dd><a href="http://www.w3.org/TR/2011/WD-progress-events-20110809/">http://www.w3.org/TR/2011/WD-progress-events-20110809/</a></dd>
+    <dd><a href="http://www.w3.org/TR/2011/WD-progress-events-20110310/">http://www.w3.org/TR/2011/WD-progress-events-20110310/</a></dd>
+    <dd><a href="http://www.w3.org/TR/2010/WD-progress-events-20101019/">http://www.w3.org/TR/2010/WD-progress-events-20101019/</a></dd>
+    <dd><a href="http://www.w3.org/TR/2008/WD-progress-events-20080521/">http://www.w3.org/TR/2008/WD-progress-events-20080521/</a></dd>
+    <dd><a href="http://www.w3.org/TR/2007/WD-progress-events-20071023/">http://www.w3.org/TR/2007/WD-progress-events-20071023/</a></dd>
+    <dd><a href="http://www.w3.org/TR/2007/WD-progress-events-20070419/">http://www.w3.org/TR/2007/WD-progress-events-20070419/</a></dd>
+
+    <dt>Editor:</dt>
+    <dd><a href="http://annevankesteren.nl/">Anne van Kesteren</a>
+     (<a href="http://www.opera.com/">Opera Software</a>)
+     &lt;<a href="mailto:annevk@opera.com">annevk@opera.com</a>&gt;</dd>
+
+    <dt>Former Editor:</dt>
+    <dd>Charles McCathieNevile
+    (<a href="http://www.opera.com/">Opera Software</a>)
+     &lt;<a href="mailto:chaals@opera.com">chaals@opera.com</a>&gt;</dd>
+   </dl>
+
+
+<!--begin-copyright-->
+<p class="copyright"><a href="http://www.w3.org/Consortium/Legal/ipr-notice#Copyright">Copyright</a> &copy; 2011 <a href="http://www.w3.org/"><abbr title="World Wide Web Consortium">W3C</abbr></a><sup>&reg;</sup> (<a href="http://www.csail.mit.edu/"><abbr title="Massachusetts Institute of Technology">MIT</abbr></a>, <a href="http://www.ercim.eu/"><abbr title="European Research Consortium for Informatics and Mathematics">ERCIM</abbr></a>, <a href="http://www.keio.ac.jp/">Keio</a>), All Rights Reserved. W3C <a href="http://www.w3.org/Consortium/Legal/ipr-notice#Legal_Disclaimer">liability</a>, <a href="http://www.w3.org/Consortium/Legal/ipr-notice#W3C_Trademarks">trademark</a> and <a href="http://www.w3.org/Consortium/Legal/copyright-documents">document use</a> rules apply.</p>
+<!--end-copyright-->
+  </div>
+
+  <hr>
+
+  <h2 class="no-num no-toc" id="specabstract">Abstract</h2>
+
+  <p>The Progress Events specification defines an event interface that can
+  be used for measuring progress; e.g. HTTP entity body transfers. This
+  specification is primarily meant to be used by other specifications.</p>
+
+  <h2 class="no-num no-toc" id="sotd">Status of this Document</h2>
+
+  <p><em>This section describes the status of this document at the time of
+  its publication. Other documents may supersede this document. A list of
+  current W3C publications and the latest revision of this technical report
+  can be found in the
+  <a href="http://www.w3.org/TR/">W3C technical reports index</a> at
+  http://www.w3.org/TR/.</em></p>
+
+  <p>This is the 22 September 2011 <!--Last Call Working Draft-->W3C Candidate Recommendation of
+  Progress Events. Please send comments to
+  <a href="mailto:public-webapps@w3.org?subject=%5Bprogress-events%5D%20">public-webapps@w3.org</a>
+  (<a href="http://lists.w3.org/Archives/Public/public-webapps/">archived</a>)
+  <!--by 1 September 2011-->
+  with <samp>[progress-events]</samp> at the start of the subject line.</p>
+
+  <p>This document is produced by the
+  <a href="http://www.w3.org/2008/webapps/">Web Applications</a> (WebApps) Working Group.
+  The WebApps Working Group is part of the
+  <a href="http://www.w3.org/2006/rwc/Activity">Rich Web Clients Activity</a>
+  in the W3C <a href="http://www.w3.org/Interaction/">Interaction Domain</a>.</p>
+
+  <p>This document was produced by a group operating under the
+  <a href="http://www.w3.org/Consortium/Patent-Policy-20040205/">5 February 2004
+  W3C Patent Policy</a>. W3C maintains a
+  <a href="http://www.w3.org/2004/01/pp-impl/42538/status" rel="disclosure">public
+  list of any patent disclosures</a> made in connection with the deliverables of
+  the group; that page also includes instructions for disclosing a patent. An
+  individual who has actual knowledge of a patent which the individual believes
+  contains
+  <a href="http://www.w3.org/Consortium/Patent-Policy-20040205/#def-essential">Essential
+  Claim(s)</a> must disclose the information in accordance with
+  <a href="http://www.w3.org/Consortium/Patent-Policy-20040205/#sec-Disclosure">section
+  6 of the W3C Patent Policy</a>.</p>
+
+  <p>Publication as a Working Draft does not imply endorsement by the W3C
+  Membership. This is a draft document and may be updated, replaced or
+  obsoleted by other documents at any time. It is inappropriate to cite this
+  document as other than work in progress.</p>
+
+<h3 class="no-num no-toc" id="crec">Candidate Recommendation Exit Criteria</h3>
+
+<p>To exit the Candidate Recommendation (CR) stage the following criteria
+must have been met:
+
+<ol>
+ <li>There will be at least two interoperable implementations passing all
+ test cases in the
+ <a href="http://dvcs.w3.org/hg/webapps/file/tip/ProgressEvents">test suite</a>
+ for this specification. An implementation is to be available (i.e. for
+ download), shipping (i.e. not private), and not experimental (i.e. intended
+ for a wide audience). The working group will decide when the test suite is
+ of sufficient quality to test interoperability and will produce
+ implementation reports (hosted together with the test suite).
+
+ <li>A minimum of three months of the CR stage will have elapsed (i.e. not
+ until after 22 December 2011). This is to ensure that enough time is given
+ for any remaining major errors to be caught. The CR period will be extended
+ if implementations are slow to appear.
+</ol>
+
+
+<h2 class="no-num no-toc" id="toc">Table of Contents</h2>
+
+
+<!--begin-toc-->
+<ol class="toc">
+ <li><a href="#introduction"><span class="secno">1 </span>Introduction</a></li>
+ <li><a href="#conformance"><span class="secno">2 </span>Conformance</a></li>
+ <li><a href="#terminology"><span class="secno">3 </span>Terminology</a></li>
+ <li><a href="#interface-progressevent"><span class="secno">4 </span>Interface <code title="">ProgressEvent</code></a>
+  <ol class="toc">
+   <li><a href="#firing-events-using-the-progressevent-interface-for-http"><span class="secno">4.1 </span>Firing events using the <code title="">ProgressEvent</code> interface for HTTP</a></li>
+   <li><a href="#firing-events-using-the-progressevent-interface-for-other-contexts"><span class="secno">4.2 </span>Firing events using the <code title="">ProgressEvent</code> interface for other contexts</a></li>
+   <li><a href="#suggested-names-for-events-using-the-progressevent-interface"><span class="secno">4.3 </span>Suggested names for events using the <code title="">ProgressEvent</code> interface</a></li>
+   <li><a href="#security-considerations"><span class="secno">4.4 </span>Security Considerations</a></ol></li>
+ <li><a class="no-num" href="#references">References</a>
+  <ol class="toc">
+   <li><a class="no-num" href="#normative-references">Normative references</a></li>
+   <li><a class="no-num" href="#informative-references">Informative references</a></ol></li>
+ <li><a class="no-num" href="#acknowledgments">Acknowledgments</a></ol>
+<!--end-toc-->
+
+
+
+  <h2 id="introduction"><span class="secno">1 </span>Introduction</h2>
+
+  <p><em>This section is non-normative.</em></p>
+
+  <p>This specification defines an event interface &mdash;
+  <code title="">ProgressEvent</code> &mdash; that can be used for measuring
+  progress. Other specifications use this specification for that
+  purpose.</p>
+
+  <div class="example">
+   <p>In this example <code class="external"><a href="http://dev.w3.org/2006/webapi/XMLHttpRequest-2/#xmlhttprequest">XMLHttpRequest</a></code>,
+   combined with concepts defined in this specification, and the HTML
+   <code class="external"><a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-button-element.html#the-progress-element">progress</a></code> element are used together to
+   display the process of fetching a resource.
+   <a class="informative" href="#refsXHR">[XHR]</a>
+   <a class="informative" href="#refsHTML">[HTML]</a>
+
+   <pre>&lt;!DOCTYPE html&gt;
+&lt;title&gt;Waiting for Magical Unicorns&lt;/title&gt;
+&lt;progress id=p&gt;&lt;/progress&gt;
+&lt;script&gt;
+  var progressBar = document.getElementById("p"),
+      client = new XMLHttpRequest()
+  client.open("GET", "magical-unicorns")
+  client.onprogress = function(pe) {
+    if(pe.lengthComputable) {
+      progressBar.max = pe.total
+      progressBar.value = pe.loaded
+    }
+  }
+  client.onloadend = function(pe) {
+    progressBar.value = pe.loaded
+  }
+  client.send()
+&lt;/script&gt;</pre>
+
+   <p>Fully working code would of course be more elaborate and deal with
+   more scenarios, such as network errors or the end user terminating the
+   request.</p>
+  </div>
+
+
+  <h2 id="conformance"><span class="secno">2 </span>Conformance</h2>
+
+  <p>Everything in this specification is normative except for diagrams,
+  examples, notes and sections marked non-normative.</p>
+
+  <p>The key word must in this document is to be interpreted as
+  described in RFC 2119. <a href="#refsRFC2119">[RFC2119]</a>
+
+  <p>A user agent must also be a conforming implementation of the IDL
+  fragments in this specification, as described in the Web IDL
+  specification. <a href="#refsWEBIDL">[WEBIDL]</a>
+
+  <p>A user agent must also be a conforming implementation of DOM4.
+  <a href="#refsDOM">[DOM]</a>
+
+
+  <h2 id="terminology"><span class="secno">3 </span>Terminology</h2>
+
+  <p>Terminology used in this specification is from DOM4 and HTTP.
+  <a href="#refsDOM">[DOM]</a>
+  <a href="#refsHTTP">[HTTP]</a>
+
+
+
+  <h2 id="interface-progressevent"><span class="secno">4 </span>Interface <code title="">ProgressEvent</code></h2>
+
+  <pre class="idl">[Constructor(DOMString <var title="">type</var>, optional <a href="#progresseventinit">ProgressEventInit</a> <var title="">eventInitDict</var>)]
+interface <dfn id="progressevent">ProgressEvent</dfn> : <a class="external" href="http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#event">Event</a> {
+  readonly attribute boolean <a href="#dom-progressevent-lengthcomputable" title="dom-ProgressEvent-lengthComputable">lengthComputable</a>;
+  readonly attribute unsigned long long <a href="#dom-progressevent-loaded" title="dom-ProgressEvent-loaded">loaded</a>;
+  readonly attribute unsigned long long <a href="#dom-progressevent-total" title="dom-ProgressEvent-total">total</a>;
+};
+
+dictionary <dfn id="progresseventinit">ProgressEventInit</dfn> : <a class="external" href="http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#eventinit">EventInit</a> {
+  boolean <span title="dom-ProgressEventInit-lengthComputable">lengthComputable</span>;
+  unsigned long long <span title="dom-ProgressEventInit-loaded">loaded</span>;
+  unsigned long long <span title="dom-ProgressEventInit-total">total</span>;
+}</pre>
+
+<p><a class="external" href="http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#concept-event" title="concept-event">Events</a> using
+the <code><a href="#progressevent">ProgressEvent</a></code> interface indicate some kind of
+progression.</p>
+
+<p>The
+<dfn id="dom-progressevent-lengthcomputable" title="dom-ProgressEvent-lengthComputable"><code>lengthComputable</code></dfn>
+attribute must return the value it was initialized to. When an
+<a class="external" href="http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#concept-event" title="concept-event">event</a> is created
+the attribute must be initialized to false.</p>
+
+<p>The
+<dfn id="dom-progressevent-loaded" title="dom-ProgressEvent-loaded"><code>loaded</code></dfn> and
+<dfn id="dom-progressevent-total" title="dom-ProgressEvent-total"><code>total</code></dfn>
+attributes must return the value they were initialized to. When an
+<a class="external" href="http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#concept-event" title="concept-event">event</a> is created
+the attributes must be initialized to 0.</p>
+
+
+<h3 id="firing-events-using-the-progressevent-interface-for-http"><span class="secno">4.1 </span>Firing events using the <code title="">ProgressEvent</code> interface for HTTP</h3>
+
+<p>To
+<dfn id="concept-event-fire-progress" title="concept-event-fire-progress">fire a progress event named <var>e</var></dfn>
+means to
+<a class="external" href="http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#concept-event-fire" title="concept-event-fire">fire an event named <var>e</var></a>
+with an <a class="external" href="http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#concept-event" title="concept-event">event</a>
+using the <code><a href="#progressevent">ProgressEvent</a></code> interface that also meets these
+conditions:
+
+<ul>
+ <li>Initialize the <code title="dom-ProgressEvent-loaded"><a href="#dom-progressevent-loaded">loaded</a></code>
+ attribute to the number of HTTP
+ <a class="external" href="http://tools.ietf.org/html/rfc2616/#section-7.2">entity body</a> octets transferred.
+ <li>If the length of the HTTP
+ <a class="external" href="http://tools.ietf.org/html/rfc2616/#section-7.2">entity body</a> is known through the
+ <code class="external" title="http-content-length"><a href="http://tools.ietf.org/html/rfc2616/#section-14.13">Content-Length</a></code>
+ header, initialize the
+ <code title="dom-ProgressEvent-lengthComputable"><a href="#dom-progressevent-lengthcomputable">lengthComputable</a></code>
+ attribute to true and initialize the
+ <code title="dom-ProgressEvent-total"><a href="#dom-progressevent-total">total</a></code> attribute to the length.
+</ul>
+
+<p class="note">This definition can be used by other specifications. XMLHttpRequest does this for instance.
+<a class="informative" href="#refsXHR">[XHR]</a>
+
+<h3 id="firing-events-using-the-progressevent-interface-for-other-contexts"><span class="secno">4.2 </span>Firing events using the <code title="">ProgressEvent</code> interface for other contexts</h3>
+
+<p>This is left as an exercise for the editor of the specification that
+introduces such a context. The editor is encouraged to define it in a way
+consistent with this and other specifications that utilize
+<span title="concept-event">events</span> using the
+<code><a href="#progressevent">ProgressEvent</a></code> interface.</p>
+
+
+<h3 id="suggested-names-for-events-using-the-progressevent-interface"><span class="secno">4.3 </span>Suggested names for events using the <code title="">ProgressEvent</code> interface</h3>
+
+  <p><em>This section is non-normative.</em></p>
+
+  <p>The suggested
+  <code class="external" title="dom-Event-type"><a href="http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#dom-event-type">type</a></code> attribute
+  values for use with
+  <a class="external" href="http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#concept-event" title="concept-event">events</a> using the
+  <code><a href="#progressevent">ProgressEvent</a></code> interface are summarized in the table
+  below. Specification editors are free to tune the details to their
+  specific scenarios, though are strongly encouraged to discuss their usage
+  with the W3C WebApps Working Group on
+  <a href="mailto:public-webapps@w3.org">public-webapps@w3.org</a> to ensure
+  input from people familiar with the subject.</p>
+
+  <table>
+   <tbody>
+    <tr>
+     <th><code class="external" title="dom-Event-type"><a href="http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#dom-event-type">type</a></code> attribute value
+     <th>Description
+     <th>Times
+     <th>When
+    <tr>
+     <th><code title="">loadstart</code>
+     <td>Progress has begun.
+     <td>Once.
+     <td>First.
+    <tr>
+     <th><code title="">progress</code>
+     <td>In progress.
+     <td>Zero or more.
+     <td>After <code title="">loadstart</code> has been
+     <a class="external" href="http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#concept-event-dispatch" title="concept-event-dispatch">dispatched</a>.
+    <tr>
+     <th><code title="">error</code>
+     <td>Progression failed.
+     <td>Zero or once.
+     <td rowspan="3">After the last <code title="">progress</code> has
+      been
+      <a class="external" href="http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#concept-event-dispatch" title="concept-event-dispatch">dispatched</a>,
+      or after
+      <code title="">loadstart</code> has been
+      <a class="external" href="http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#concept-event-dispatch" title="concept-event-dispatch">dispatched</a>
+      if <code title="">progress</code> has not been
+      <a class="external" href="http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#concept-event-dispatch" title="concept-event-dispatch">dispatched</a>.
+    <tr>
+     <th><code>abort</code>
+     <td>Progression is terminated.
+     <td>Zero or once.
+    <tr>
+     <th><code>load</code>
+     <td>Progression is successful.
+     <td>Zero or once.
+    <tr>
+     <th><code title="">loadend</code>
+     <td>Progress has stopped.
+     <td>Once.</td>
+     <td>After one of <code title="">error</code>,
+      <code title="">abort</code>, or <code title="">load</code> has been
+      <a class="external" href="http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#concept-event-dispatch" title="concept-event-dispatch">dispatched</a>.
+  </table>
+
+  <p>The <code title="">error</code>, <code title="">abort</code>, and
+  <code title="">load</code> event types are mutually exclusive.</p>
+
+  <p>Throughout the web platform the <code title="">error</code>,
+  <code title="">abort</code>, and <code title="">load</code> event types
+  have their
+  <code class="external" title="dom-Event-bubbles"><a href="http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#dom-event-bubbles">bubbles</a></code> and
+  <code class="external" title="dom-Event-cancelable"><a href="http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#dom-event-cancelable">cancelable</a></code>
+  attributes initialized to false, so it is suggested that for consistency
+  all <a class="external" href="http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#concept-event" title="concept-event">events</a> using
+  the <code><a href="#progressevent">ProgressEvent</a></code> interface do the same.</p>
+
+
+<h3 id="security-considerations"><span class="secno">4.4 </span>Security Considerations</h3>
+
+<p>For cross-origin requests some kind of opt-in, e.g.
+Cross-Origin Resource Sharing, has to be used before
+<a class="external" href="http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#concept-event" title="concept-event">events</a> using the
+<code><a href="#progressevent">ProgressEvent</a></code> interface are
+<a class="external" href="http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#concept-event-dispatch" title="concept-event-dispatch">dispatched</a>
+as information (e.g. size) would be revealed that cannot be obtained
+otherwise. <a class="informative" href="#refsCORS">[CORS]</a>
+
+
+<h2 class="no-num" id="references">References</h2>
+<h3 class="no-num" id="normative-references">Normative references</h3>
+<div id="anolis-references-normative"><dl><dt id="refsDOM">[DOM]
+<dd><cite><a href="http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html">DOM4</a></cite>, Anne van Kesteren, Aryeh Gregor and Ms2ger. W3C.
+
+<dt id="refsHTTP">[HTTP]
+<dd><cite><a href="http://tools.ietf.org/html/rfc2616">Hypertext Transfer Protocol -- HTTP/1.1</a></cite>, Roy Fielding, James Gettys, Jeffrey Mogul et al.. IETF.
+
+<dt id="refsRFC2119">[RFC2119]
+<dd><cite><a href="http://tools.ietf.org/html/rfc2119">Key words for use in RFCs to Indicate Requirement Levels</a></cite>, Scott Bradner. IETF.
+
+<dt id="refsWEBIDL">[WEBIDL]
+<dd><cite><a href="http://dev.w3.org/2006/webapi/WebIDL/">Web IDL</a></cite>, Cameron McCormack. W3C.
+
+</dl></div>
+
+<h3 class="no-num" id="informative-references">Informative references</h3>
+<div id="anolis-references-informative"><dl><dt id="refsCORS">[CORS]
+<dd><cite><a href="http://dev.w3.org/2006/waf/access-control/">Cross-Origin Resource Sharing</a></cite>, Anne van Kesteren. W3C.
+
+<dt id="refsHTML">[HTML]
+<dd><cite><a href="http://dev.w3.org/html5/spec/">HTML5</a></cite>, Ian Hickson. W3C.
+
+<dt id="refsXHR">[XHR]
+<dd><cite><a href="http://dev.w3.org/2006/webapi/XMLHttpRequest-2/">XMLHttpRequest Level 2</a></cite>, Anne van Kesteren. W3C.
+
+</dl></div>
+
+
+  <h2 class="no-num" id="acknowledgments">Acknowledgments</h2>
+
+  <p>The editor would like to thank
+
+  Aaron Leventhal,
+  Alan Schepers,
+  Alex Danilo,
+  Andrew Emmons,
+  Andrew Shellshear,
+  Andy Sledd,
+  Arthur Barstow,
+  Bj&ouml;rn H&ouml;hrmann,
+  Boris Zbarsky,
+  Cameron McCormack,
+  Chris Lilley,
+  Cyril Concolato,
+  David H&aring;s&auml;ther,
+  Doug Schepers,
+  Ellen Siegel,
+  Erik Dahlstr&ouml;m,
+  Garrett Smith,
+  Gorm Eriksen,
+  Gottfried Zimmermann,
+  Ian Hickson,
+  Jean-Claude Duford,
+  Jean-Yves Bitterlich,
+  Jim Ley,
+  Jo&atilde;o Eiras,
+  Kartikaya Gupta,
+  Lisa Seeman,
+  Maciej Stachowiak,
+  Marcos Caceres,
+  Michael Antony Puls,
+  Nandini Ramani,
+  Olli Pettay,
+  Philip J&auml;genstedt,
+  Ralph Swick,
+  Rich Schwerdtfeger,
+  Robert Sayre,
+  Robin Berjon,
+  Simon Pieters,
+  Suresh Chitturi, and
+  Travis Leithead
+
+  for their contributions to this specification.</p>
+
+  <p>Special thanks to the SVG WG for drafting the original
+  <code title="">ProgressEvent</code> interface as part of the
+  <a href="http://www.w3.org/TR/2008/REC-SVGTiny12-20081222/svgudom.html">SVG Micro DOM</a>.</p>
+
+  <p>Thanks also to all those who have helped to improve this specification
+  by sending suggestions and corrections. (Please, keep bugging us with your
+  issues!)</p>
+
+

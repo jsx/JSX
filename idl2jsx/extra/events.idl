@@ -12,3 +12,9 @@ dictionary MouseEventInit : UIEventInit {
 
 };
 
+dictionary ProgressEventInit : EventInit {
+  boolean lengthComputable;
+  unsigned long long loaded;
+  unsigned long long total;
+};
+

@@ -26,6 +26,7 @@ my @specs = (
         'dom; http://www.w3.org/TR/dom/',
         'DOM-Level-2-Views; http://www.w3.org/TR/DOM-Level-2-Views/idl/views.idl',
         'DOM-Level-3-Events; http://www.w3.org/TR/DOM-Level-3-Events/',
+		'progress-events; http://www.w3.org/TR/progress-events/',
         "$root/extra/events.idl",
 
         'XMLHTTPRequest; http://www.w3.org/TR/XMLHttpRequest/',
