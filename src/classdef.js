@@ -1598,7 +1598,8 @@ var LocalVariableStatuses = exports.LocalVariableStatuses = Class.extend({
 
 var TemplateClassDefinition = exports.TemplateClassDefinition = Class.extend({
 
-	constructor: function (className, flags, typeArgs, extendType, implementTypes, members, objectTypesUsed, docComment) {
+	constructor: function (token, className, flags, typeArgs, extendType, implementTypes, members, objectTypesUsed, docComment) {
+		this._token = token;
 		this._className = className;
 		this._flags = flags;
 		this._typeArgs = typeArgs.concat([]);
@@ -1616,6 +1617,10 @@ var TemplateClassDefinition = exports.TemplateClassDefinition = Class.extend({
 				}.bind(this));
 			}
 		}
+	},
+
+	getToken: function () {
+		return this._token;
 	},
 
 	className: function () {

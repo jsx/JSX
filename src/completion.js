@@ -20,6 +20,46 @@
  * IN THE SOFTWARE.
  */
 
+/*
+
+class CompleteCandidate {
+	var word : string;
+	var partialWord : string;
+
+	var doc : Nullable.<string>;
+
+	// type of the symobl: "function():void"
+	// available for variables or functions
+	var type : Nullable.<string>;
+
+	var returnType : Nullable.<string>;   // function specific
+	var args       : Nullable.<Symbol[]>; // function specific
+
+	// where the symbol is defined
+	var definedClass       : Nullable.<string>;
+	var definedFilename    : Nullable.<string>;
+	var definedLineNumber  : Nullable.<int>;
+}
+
+example:
+
+{
+	"word" : "stringify",
+	"partialWord" : "ringify",
+
+	"doc" : "serialize a value or object as a JSON string",
+
+	"type" : "function (value : variant) : string",
+
+	"returnType" : "string",
+	"args" : [ { "name" : "value", "type" : "variant" } ],
+
+	"definedClass" : "JSON",
+	"definedFilename" : "lib/built-in/jsx",
+	"definedLineNumber" : 903
+}
+ */
+
 var Class = require("./Class");
 eval(Class.$import("./classdef"));
 eval(Class.$import("./type"));
@@ -64,18 +104,17 @@ var CompletionRequest = exports.CompletionRequest = Class.extend({
 			candidates.getCandidates(rawCandidates);
 			var prefix = candidates.getPrefix();
 			rawCandidates.forEach(function (s) {
-				if (prefix == "" && s.symbol.substring(0, 2) == "__" && s != "__noconvert__") {
+				if (prefix == "" && s.word.substring(0, 2) == "__" && s.word != "__noconvert__" && s.word != "undefined") {
 					// skip hidden keywords
-				} else if (s.symbol.substring(0, prefix.length) == prefix) {
-					var left = s.symbol.substring(prefix.length);
+				} else if (s.word.substring(0, prefix.length) == prefix) {
+					var left = s.word.substring(prefix.length);
 					if (left.length != 0 && ! seen.hasOwnProperty(left)) {
 						seen[left] = true;
 
-						var data = {};
-						data.part = left;
-						data.word = s.symbol;      // vim: text that will be insereted
-						data.menu = s.description; // vim: extra text for popup menu
-						results.push(data);
+						if (s.word !== left) {
+							s.partialWord = left;
+						}
+						results.push(s);
 					}
 				}
 			}.bind(this));
@@ -85,8 +124,6 @@ var CompletionRequest = exports.CompletionRequest = Class.extend({
 	}
 
 });
-
-// class CompletionCandidate { var symbol : string; var description : string }
 
 var CompletionCandidates = exports.CompletionCandidates = Class.extend({
 
@@ -105,25 +142,32 @@ var CompletionCandidates = exports.CompletionCandidates = Class.extend({
 		return this;
 	},
 
+	$makeClassCandidate: function (classDef) {
+		var docComment = classDef.getDocComment();
+		return {
+			word: classDef.className(),
+			kind: "class",
+
+			doc: docComment ? docComment.getDescription() : null,
+
+			definedFilename:   classDef.getToken().getFilename(),
+			definedLineNumber: classDef.getToken().getLineNumber(),
+		};
+	},
+
 	$_addClasses: function (candidates, parser, autoCompleteMatchCb) {
 		parser.getClassDefs().forEach(function (classDef) {
 			if (classDef instanceof InstantiatedClassDefinition) {
 				// skip
 			} else {
 				if (autoCompleteMatchCb == null || autoCompleteMatchCb(classDef)) {
-					candidates.push({
-						symbol: classDef.className(),
-						kind: "class",
-					});
+					candidates.push(CompletionCandidates.makeClassCandidate(classDef));
 				}
 			}
 		});
 		parser.getTemplateClassDefs().forEach(function (classDef) {
 			if (autoCompleteMatchCb == null || autoCompleteMatchCb(classDef)) {
-				candidates.push({
-					symbol: classDef.className(),
-					kind: "class"
-				});
+				candidates.push(CompletionCandidates.makeClassCandidate(classDef));
 			}
 		});
 	},
@@ -134,7 +178,7 @@ var CompletionCandidates = exports.CompletionCandidates = Class.extend({
 			classNames.forEach(function (className) {
 				// FIXME can we refer to the classdefs of the classnames here?
 				candidates.push({
-					symbol: className,
+					word: className,
 					kind: "class",
 				});
 			});
@@ -156,7 +200,7 @@ var KeywordCompletionCandidate = exports.KeywordCompletionCandidate = Completion
 
 	getCandidates: function (candidates) {
 		candidates.push({
-			symbol: this._expected,
+			word: this._expected,
 			kind: 'keyword'
 		});
 	}
@@ -178,7 +222,7 @@ var CompletionCandidatesOfTopLevel = exports.CompletionCandidatesOfTopLevel = Co
 			var alias = imprt.getAlias();
 			if (alias != null) {
 				candidates.push({
-					symbol: alias,
+					word: alias,
 					kind: 'alias'
 				});
 			} else {
@@ -203,9 +247,13 @@ var _CompletionCandidatesWithLocal = exports._CompletionCandidatesWithLocal = Co
 	getCandidates: function (candidates) {
 		this._locals.forEach(function (local) {
 			candidates.push({
-				symbol: local.getName().getValue(),
-				description: local.toString(),
-				kind: 'local variable',
+				word: local.getName().getValue(),
+
+				type: local.toString(),
+				kind: 'variable',
+
+				definedFilename:   local.getName().getFilename(),
+				definedLineNumber: local.getName().getLineNumber()
 			});
 		});
 		CompletionCandidatesOfTopLevel.prototype.getCandidates.call(this, candidates);
@@ -253,11 +301,31 @@ var _CompletionCandidatesOfProperty = exports._CompletionCandidatesOfProperty = 
 				if (! isStatic && member.name() == "constructor") {
 					// skip
 				} else {
-					candidates.push({
-						symbol: member.name(),
-						description: member.toString(),
-						kind: 'member'
-					});
+					var docComment = member.getDocComment();
+
+					var data = {
+						word: member.name(),
+						type: member.getType().toString(),
+						kind: 'member',
+
+						doc: docComment ? docComment.getDescription() : null,
+
+						definedClass:    member.getClassDef().className(),
+						definedFilename: member.getToken().getFilename(),
+						definedFilename: member.getToken().getLineNumber()
+					};
+
+					if (member instanceof MemberFunctionDefinition) {
+						data.returnType = member.getReturnType().toString();
+						data.args = member.getArguments().map(function (arg) {
+							return {
+								name: arg.getName().getValue(),
+								type: arg.getType().toString()
+							};
+						});
+					}
+
+					candidates.push(data);
 				}
 			}
 			return true;
