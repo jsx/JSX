@@ -2557,7 +2557,7 @@ var _UnboxOptimizeCommand = exports._UnboxOptimizeCommand = _FunctionOptimizeCom
 						replaceCb(createLocalExpressionFor(expr.getIdentifierToken().getValue()));
 						return true;
 					} else if (expr instanceof FunctionExpression) {
-						return expr.getFuncDef().forEachStatement(onStatements);
+						return onStatements(expr.getFuncDef().getStatements());
 					} else if (expr instanceof LocalExpression && expr.getLocal() == local) {
 						throw new Error("logic flaw, unexpected pattern");
 					}
