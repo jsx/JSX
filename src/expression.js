@@ -46,7 +46,7 @@ var Expression = exports.Expression = Class.extend({
 	clone: null,
 
 	instantiate: function (instantiationContext) {
-		(function onExpr(expr) {
+		return (function onExpr(expr) {
 			if (expr instanceof NewExpression
 				|| expr instanceof ArrayLiteralExpression
 				|| expr instanceof MapLiteralExpression
