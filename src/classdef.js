@@ -26,6 +26,16 @@ eval(Class.$import("./util"));
 
 "use strict";
 
+var InstantiationContext = exports.InstantiationContext = Class.extend({
+
+	constructor: function (errors, typemap) {
+		this.errors = errors;
+		this.typemap = typemap;
+		this.objectTypesUsed = [];
+	}
+
+});
+
 var _Util = exports._Util = Class.extend({
 
 	$buildInstantiationContext: function (errors, token, formalTypeArgs, actualTypeArgs) {
@@ -34,16 +44,12 @@ var _Util = exports._Util = Class.extend({
 			errors.push(new CompileError(token, "wrong number of template arguments (expected " + formalTypeArgs.length + ", got " + actualTypeArgs.length));
 			return null;
 		}
-		// build context
-		var instantiationContext = {
-			errors: errors,
-			typemap: {}, // string => Type
-			objectTypesUsed: []
-		};
+		// build typemap
+		var typemap = {}; // string => Type
 		for (var i = 0; i < formalTypeArgs.length; ++i) {
-			instantiationContext.typemap[formalTypeArgs[i].getValue()] = actualTypeArgs[i];
+			typemap[formalTypeArgs[i].getValue()] = actualTypeArgs[i];
 		}
-		return instantiationContext;
+		return new InstantiationContext(errors, typemap);
 	}
 
 });
