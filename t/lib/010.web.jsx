@@ -5161,19 +5161,69 @@ class _Test extends TestCase {
     } // webkitAudioContext
 
     // #309
+    function compile_DeviceOrientationEvent(o : DeviceOrientationEvent) : void {
+        var c1 = new DeviceOrientationEvent(X.getstring());
+        var c2 = new DeviceOrientationEvent(X.getstring(), X.getDeviceOrientationEventInit());
+        var v1 : Nullable.<number>/*double?*/ = o.alpha;
+        var v2 : Nullable.<number>/*double?*/ = o.beta;
+        var v3 : Nullable.<number>/*double?*/ = o.gamma;
+        var v4 : boolean = o.absolute;
+    } // DeviceOrientationEvent
+
+    // #310
+    function compile_DeviceOrientationEventInit(o : DeviceOrientationEventInit) : void {
+        var v1 : Nullable.<number>/*double?*/ = o.alpha;
+        var v2 : Nullable.<number>/*double?*/ = o.beta;
+        var v3 : Nullable.<number>/*double?*/ = o.gamma;
+        var v4 : boolean = o.absolute;
+    } // DeviceOrientationEventInit
+
+    // #311
+    function compile_DeviceAcceleration(o : DeviceAcceleration) : void {
+        var v1 : Nullable.<number>/*double?*/ = o.x;
+        var v2 : Nullable.<number>/*double?*/ = o.y;
+        var v3 : Nullable.<number>/*double?*/ = o.z;
+    } // DeviceAcceleration
+
+    // #312
+    function compile_DeviceRotationRate(o : DeviceRotationRate) : void {
+        var v1 : Nullable.<number>/*double?*/ = o.alpha;
+        var v2 : Nullable.<number>/*double?*/ = o.beta;
+        var v3 : Nullable.<number>/*double?*/ = o.gamma;
+    } // DeviceRotationRate
+
+    // #313
+    function compile_DeviceMotionEvent(o : DeviceMotionEvent) : void {
+        var c1 = new DeviceMotionEvent(X.getstring());
+        var c2 = new DeviceMotionEvent(X.getstring(), X.getDeviceMotionEventInit());
+        var v1 : Nullable.<DeviceAcceleration> = o.acceleration;
+        var v2 : Nullable.<DeviceAcceleration> = o.accelerationIncludingGravity;
+        var v3 : Nullable.<DeviceRotationRate> = o.rotationRate;
+        var v4 : Nullable.<number>/*double?*/ = o.interval;
+    } // DeviceMotionEvent
+
+    // #314
+    function compile_DeviceMotionEventInit(o : DeviceMotionEventInit) : void {
+        var v1 : Nullable.<DeviceAcceleration> = o.acceleration;
+        var v2 : Nullable.<DeviceAcceleration> = o.accelerationIncludingGravity;
+        var v3 : Nullable.<DeviceRotationRate> = o.rotationRate;
+        var v4 : Nullable.<number>/*double?*/ = o.interval;
+    } // DeviceMotionEventInit
+
+    // #315
     function compile_CanvasPixelArray(o : CanvasPixelArray) : void {
         var v1 : number/*unsigned long*/ = o.length;
         var f1 : Nullable.<number>/*octet*/ = o.__native_index_operator__(X.getnumber());
     } // CanvasPixelArray
 
-    // #310
+    // #316
     function compile_CSSRuleList(o : CSSRuleList) : void {
         var v1 : number/*long*/ = o.length;
         var f1 : Nullable.<CSSRule> = o.__native_index_operator__(X.getnumber());
         var f2 : Nullable.<CSSRule> = o.item(X.getnumber());
     } // CSSRuleList
 
-    // #311
+    // #317
     function compile_StyleSheetList(o : StyleSheetList) : void {
         var v1 : number/*long*/ = o.length;
         var f1 : Nullable.<StyleSheet> = o.__native_index_operator__(X.getnumber());
@@ -5232,6 +5282,8 @@ native class X {
     static function getDataTransferItemList() : DataTransferItemList;
     static function getDate() : Date;
     static function getDelayNode() : DelayNode;
+    static function getDeviceMotionEventInit() : DeviceMotionEventInit;
+    static function getDeviceOrientationEventInit() : DeviceOrientationEventInit;
     static function getDocument() : Document;
     static function getDocumentFragment() : DocumentFragment;
     static function getDocumentType() : DocumentType;
@@ -5300,6 +5352,8 @@ native class X {
     static function getNullable__DataTransferItem_() : Nullable.<DataTransferItem>;
     static function getNullable__DataTransfer_() : Nullable.<DataTransfer>;
     static function getNullable__Date_() : Nullable.<Date>;
+    static function getNullable__DeviceAcceleration_() : Nullable.<DeviceAcceleration>;
+    static function getNullable__DeviceRotationRate_() : Nullable.<DeviceRotationRate>;
     static function getNullable__DocumentType_() : Nullable.<DocumentType>;
     static function getNullable__Document_() : Nullable.<Document>;
     static function getNullable__Element_() : Nullable.<Element>;

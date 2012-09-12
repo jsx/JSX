@@ -29,3 +29,52 @@ interface webkitURL : URL {
 
 interface webkitAudioContext : AudioContext {
 };
+
+// http://dev.w3.org/geo/api/spec-source-orientation.html
+// invalid WebIDL (missing semicolon at the end of interfaces)
+
+[Constructor(DOMString type, optional DeviceOrientationEventInit eventInitDict)]
+interface DeviceOrientationEvent : Event {
+  readonly attribute double? alpha;
+  readonly attribute double? beta;
+  readonly attribute double? gamma;
+  readonly attribute boolean absolute;
+};
+
+dictionary DeviceOrientationEventInit : EventInit {
+  double? alpha;
+  double? beta;
+  double? gamma;
+  boolean absolute;
+};
+
+
+[Callback, NoInterfaceObject]
+interface DeviceAcceleration {
+  readonly attribute double? x;
+  readonly attribute double? y;
+  readonly attribute double? z;
+};
+
+[Callback, NoInterfaceObject]
+interface DeviceRotationRate {
+  readonly attribute double? alpha;
+  readonly attribute double? beta;
+  readonly attribute double? gamma;
+};
+
+[Constructor(DOMString type, optional DeviceMotionEventInit eventInitDict)]
+interface DeviceMotionEvent : Event {
+  readonly attribute DeviceAcceleration? acceleration;
+  readonly attribute DeviceAcceleration? accelerationIncludingGravity;
+  readonly attribute DeviceRotationRate? rotationRate;
+  readonly attribute double? interval;
+};
+
+dictionary DeviceMotionEventInit : EventInit {
+  DeviceAcceleration? acceleration;
+  DeviceAcceleration? accelerationIncludingGravity;
+  DeviceRotationRate? rotationRate;
+  double? interval;
+};
+

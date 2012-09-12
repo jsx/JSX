@@ -8276,6 +8276,70 @@ native final class webkitURL extends URL {
 native final class webkitAudioContext extends AudioContext {
 }
 
+native final class DeviceOrientationEvent extends Event {
+
+	function constructor(type : string/*DOMString*/);
+	function constructor(
+		type : string/*DOMString*/,
+		eventInitDict : DeviceOrientationEventInit
+	);
+
+	__readonly__ var alpha : Nullable.<number>/*double?*/;
+	__readonly__ var beta : Nullable.<number>/*double?*/;
+	__readonly__ var gamma : Nullable.<number>/*double?*/;
+	__readonly__ var absolute : boolean;
+
+} // end of DeviceOrientationEvent
+
+native final class DeviceOrientationEventInit extends EventInit {
+
+	var alpha : Nullable.<number>/*double?*/;
+	var beta : Nullable.<number>/*double?*/;
+	var gamma : Nullable.<number>/*double?*/;
+	var absolute : boolean;
+
+} // end of DeviceOrientationEventInit
+
+native final __fake__ class DeviceAcceleration {
+
+	__readonly__ var x : Nullable.<number>/*double?*/;
+	__readonly__ var y : Nullable.<number>/*double?*/;
+	__readonly__ var z : Nullable.<number>/*double?*/;
+
+} // end of DeviceAcceleration
+
+native final __fake__ class DeviceRotationRate {
+
+	__readonly__ var alpha : Nullable.<number>/*double?*/;
+	__readonly__ var beta : Nullable.<number>/*double?*/;
+	__readonly__ var gamma : Nullable.<number>/*double?*/;
+
+} // end of DeviceRotationRate
+
+native final class DeviceMotionEvent extends Event {
+
+	function constructor(type : string/*DOMString*/);
+	function constructor(
+		type : string/*DOMString*/,
+		eventInitDict : DeviceMotionEventInit
+	);
+
+	__readonly__ var acceleration : Nullable.<DeviceAcceleration>;
+	__readonly__ var accelerationIncludingGravity : Nullable.<DeviceAcceleration>;
+	__readonly__ var rotationRate : Nullable.<DeviceRotationRate>;
+	__readonly__ var interval : Nullable.<number>/*double?*/;
+
+} // end of DeviceMotionEvent
+
+native final class DeviceMotionEventInit extends EventInit {
+
+	var acceleration : Nullable.<DeviceAcceleration>;
+	var accelerationIncludingGravity : Nullable.<DeviceAcceleration>;
+	var rotationRate : Nullable.<DeviceRotationRate>;
+	var interval : Nullable.<number>/*double?*/;
+
+} // end of DeviceMotionEventInit
+
 native final __fake__ class CanvasPixelArray {
 
 	__readonly__ var length : number/*unsigned long*/;
