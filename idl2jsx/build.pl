@@ -52,7 +52,7 @@ my @specs = (
         "webaudio; https://dvcs.w3.org/hg/audio/raw-file/tip/webaudio/specification.html",
         "touch-events; http://www.w3.org/TR/touch-events/",
         #"http://www.w3.org/TR/websockets/",
-        "websockets; http://www.w3.org/TR/2012/WD-websockets-20120524/",
+        "websockets; http://www.w3.org/TR/2011/CR-websockets-20111208/",
         #"http://dev.w3.org/html5/websockets/", # too new
         "geo; http://dev.w3.org/geo/api/spec-source.html",
         "webstorage; http://dev.w3.org/html5/webstorage/",
