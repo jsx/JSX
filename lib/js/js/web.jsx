@@ -5078,7 +5078,7 @@ native final class TouchEvent extends UIEvent {
 
 } // end of TouchEvent
 
-/** @see http://www.w3.org/TR/2012/WD-websockets-20120524/ */
+/** @see http://www.w3.org/TR/2011/CR-websockets-20111208/ */
 native final class WebSocket extends EventTarget {
 
 	function constructor(url : string/*DOMString*/);
@@ -5119,12 +5119,12 @@ native final class WebSocket extends EventTarget {
 	var onmessage : Nullable.<function(:Event):void>/*Function?*/;
 	var binaryType : string/*DOMString*/;
 	function send(data : string/*DOMString*/) : void;
-	function send(data : ArrayBufferView) : void;
+	function send(data : ArrayBuffer) : void;
 	function send(data : Blob) : void;
 
 } // end of WebSocket
 
-/** @see http://www.w3.org/TR/2012/WD-websockets-20120524/ */
+/** @see http://www.w3.org/TR/2011/CR-websockets-20111208/ */
 native final class CloseEvent extends Event {
 
 	function constructor(type : string/*DOMString*/);
@@ -5139,7 +5139,7 @@ native final class CloseEvent extends Event {
 
 } // end of CloseEvent
 
-/** @see http://www.w3.org/TR/2012/WD-websockets-20120524/ */
+/** @see http://www.w3.org/TR/2011/CR-websockets-20111208/ */
 native final class CloseEventInit extends EventInit {
 
 	var wasClean : boolean;

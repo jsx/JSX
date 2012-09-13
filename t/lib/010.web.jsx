@@ -3547,7 +3547,7 @@ class _Test extends TestCase {
         var v17 : Nullable.<function(:Event):void>/*Function?*/ = o.onmessage;
         var v18 : string/*DOMString*/ = o.binaryType;
         o.send(X.getstring());
-        o.send(X.getArrayBufferView());
+        o.send(X.getArrayBuffer());
         o.send(X.getBlob());
     } // WebSocket
 
