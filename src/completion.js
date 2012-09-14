@@ -143,16 +143,26 @@ var CompletionCandidates = exports.CompletionCandidates = Class.extend({
 	},
 
 	$makeClassCandidate: function (classDef) {
-		var docComment = classDef.getDocComment();
-		return {
+		var data = {
 			word: classDef.className(),
-			kind: "class",
-
-			doc: docComment ? docComment.getDescription() : null,
 
 			definedFilename:   classDef.getToken().getFilename(),
 			definedLineNumber: classDef.getToken().getLineNumber(),
 		};
+		if ((classDef.flags() & ClassDefinition.IS_INTERFACE) != 0) {
+			data.kind = "interface";
+		} else if ((classDef.flags() & ClassDefinition.IS_MIXIN) != 0) {
+			data.kind = "mixin";
+		}
+		else {
+			data.kind = "class";
+		}
+
+		var docComment = classDef.getDocComment();
+		if (docComment) {
+			data.doc = docComment.getDescription();
+		}
+		return data;
 	},
 
 	$_addClasses: function (candidates, parser, autoCompleteMatchCb) {
@@ -301,19 +311,21 @@ var _CompletionCandidatesOfProperty = exports._CompletionCandidatesOfProperty = 
 				if (! isStatic && member.name() == "constructor") {
 					// skip
 				} else {
-					var docComment = member.getDocComment();
-
+					var kind = isStatic ? "static member" : "member";
+					kind += (member instanceof MemberFunctionDefinition) ? " function" : " variable";
 					var data = {
 						word: member.name(),
 						type: member.getType().toString(),
-						kind: 'member',
+						kind: kind,
 
-						doc: docComment ? docComment.getDescription() : null,
-
-						definedClass:    member.getClassDef().className(),
-						definedFilename: member.getToken().getFilename(),
-						definedFilename: member.getToken().getLineNumber()
+						definedClass:      member.getClassDef().className(),
+						definedFilename:   member.getToken().getFilename(),
+						definedLineNumber: member.getToken().getLineNumber()
 					};
+					var docComment = member.getDocComment();
+					if (docComment) {
+						data.doc = docComment.getDescription();
+					}
 
 					if (member instanceof MemberFunctionDefinition) {
 						data.returnType = member.getReturnType().toString();
