@@ -306,42 +306,52 @@ var _CompletionCandidatesOfProperty = exports._CompletionCandidatesOfProperty = 
 		if (classDef == null)
 			return;
 		var isStatic = this._expr instanceof ClassExpression;
-		classDef.forEachMember(function (member) {
-			if (((member.flags() & ClassDefinition.IS_STATIC) != 0) == isStatic) {
-				if (! isStatic && member.name() == "constructor") {
-					// skip
-				} else {
-					var kind = isStatic ? "static member" : "member";
-					kind += (member instanceof MemberFunctionDefinition) ? " function" : " variable";
-					var data = {
-						word: member.name(),
-						type: member.getType().toString(),
-						kind: kind,
-
-						definedClass:      member.getClassDef().className(),
-						definedFilename:   member.getToken().getFilename(),
-						definedLineNumber: member.getToken().getLineNumber()
-					};
-					var docComment = member.getDocComment();
-					if (docComment) {
-						data.doc = docComment.getDescription();
+		classDef.forEachClassToBase(function (c) {
+			c.forEachMember(function (member) {
+				if (((member.flags() & ClassDefinition.IS_STATIC) != 0) == isStatic) {
+					if (! isStatic && member.name() == "constructor") {
+						return true;
 					}
 
-					if (member instanceof MemberFunctionDefinition) {
-						data.returnType = member.getReturnType().toString();
-						data.args = member.getArguments().map(function (arg) {
-							return {
-								name: arg.getName().getValue(),
-								type: arg.getType().toString()
-							};
-						});
-					}
-
-					candidates.push(data);
+					candidates.push(_CompletionCandidatesOfProperty._makeMemberCandidate(member));
 				}
-			}
+				return true;
+			}.bind(this));
 			return true;
-		});
+		}.bind(this));
+	},
+
+	$_makeMemberCandidate: function(member) {
+		var kind = (member.flags() & ClassDefinition.IS_STATIC
+			? "static member"
+			: "member");
+		kind += (member instanceof MemberFunctionDefinition
+			? " function"
+			: " variable");
+		var data = {
+			word: member.name(),
+			type: member.getType().toString(),
+			kind: kind,
+
+			definedClass:      member.getClassDef().className(),
+			definedFilename:   member.getToken().getFilename(),
+			definedLineNumber: member.getToken().getLineNumber()
+		};
+		var docComment = member.getDocComment();
+		if (docComment) {
+			data.doc = docComment.getDescription();
+		}
+
+		if (member instanceof MemberFunctionDefinition) {
+			data.returnType = member.getReturnType().toString();
+			data.args = member.getArguments().map(function (arg) {
+				return {
+					name: arg.getName().getValue(),
+					type: arg.getType().toString()
+				};
+			});
+		}
+		return data;
 	}
 
 });
