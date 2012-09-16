@@ -348,7 +348,7 @@ native final class String {
 	/**
 	 * When the <code>concat</code> method is called with zero or more arguments <code>string1</code>, <code>string2</code>, etc., it returns a string consisting of the characters of this object followed by the characters of each of string1, string2, etc. The result is a string value, not a String object.
 	 */
-	function concat(...stringN : String) : string;
+	function concat(...stringN : string) : string;
 
 	/**
 	 * If searchString appears as a substring of the result of converting this object to a string then the index of the smallest such position is returned; otherwise, -1 is returned.
