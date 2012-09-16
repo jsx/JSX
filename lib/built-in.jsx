@@ -155,12 +155,15 @@ native final class Array.<T> {
 	function slice(start : number, end : number) : Array.<T>;
 
 	/**
-	 * Sorts the elements of an array in place and returns the array.  The array is sorted lexicographically (in dictionary order) according to the string conversion of each element.
+	 * Sorts the elements of an array in place and returns the array.
+	 * The sort is not necessarily stable.
+	 * The array is sorted lexicographically (in dictionary order) according to the string conversion of each element.
 	 */
 	function sort() : Array.<T>;
 
 	/**
 	 * Sorts the elements of an array in place and returns the array.
+	 * The sort is not necessarily stable.
 	 *
 	 * @param comparefn Specifies a function that defines the sort order.
 	 */
@@ -186,16 +189,44 @@ native final class Array.<T> {
 	function unshift(...itemN : T) : int;
 
 	// 15.4.4 (ES5)
+	/**
+	 * Returns the first index at which a given element can be found in the
+	 * array, or -1 if it is not present.
+	 */
 	function indexOf(value : Nullable.<T>) : number;
 	function indexOf(value : Nullable.<T>, fromIndex : number) : number;
+
+	/**
+	 * Returns the last index at which a given element can be found in the
+	 * array, or -1 if it is not present. The array is searched backward.
+	 */
 	function lastIndexOf(value : Nullable.<T>) : number;
 	function lastIndexOf(value : Nullable.<T>, fromIndex : number) : number;
+
+	/**
+	 * Tests whether all elements in the array pass the test implemented by
+	 * the provided function.
+	 *
+	 * @callbackfn A function to test for each element.
+	 */
 	function every(callbackfn : function(value : Nullable.<T>) : boolean) : boolean;
 	function every(callbackfn : function(value : Nullable.<T>, index : number) : boolean) : boolean;
 	function every(callbackfn : function(value : Nullable.<T>, index : number, array : Array.<T>) : boolean) : boolean;
+
+	/**
+	 * Tests whether some element in the array passes the test implemented
+	 * by the provided function.
+	 */
 	function some(callbackfn : function(value : Nullable.<T>) : boolean) : boolean;
 	function some(callbackfn : function(value : Nullable.<T>, index : number) : boolean) : boolean;
 	function some(callbackfn : function(value : Nullable.<T>, index : number, array : Array.<T>) : boolean) : boolean;
+
+	/**
+	 * Calls callbackfn once for each element in the array, in ascending
+	 * order.
+	 *
+	 * @param callbackfn A function to call for each element.
+	 */
 	inline function forEach(callbackfn : function(value : Nullable.<T>) : void) : void {
 		for (var i in this) {
 			callbackfn(this[i]);
@@ -203,17 +234,61 @@ native final class Array.<T> {
 	}
 	function forEach(callbackfn : function(value : Nullable.<T>, index : number) : void) : void;
 	function forEach(callbackfn : function(value : Nullable.<T>, index : number, array : Array.<T>) : void) : void;
+
+	/**
+	 * Creates a new array with the results of calling a provided function
+	 * on every element in this array.
+	 *
+	 * @param callbackfn A function that produces an element of the new
+	 *        <code>Array.&lt;U&gt;</code> from an element of the current one.
+	 */
 	function map.<U>(callbackfn : function(value : Nullable.<T>) : Nullable.<U>) : Array.<U>;
 	function map.<U>(callbackfn : function(value : Nullable.<T>, index : number) : Nullable.<U>) : Array.<U>;
 	function map.<U>(callbackfn : function(value : Nullable.<T>, index : number, array : Array.<T>) : Nullable.<U>) : Array.<U>;
+
+	/**
+	 * Creates a new array with all elements that pass the test implemented
+	 * the provided function.
+	 *
+	 * @param callback A function to test each elements of the array.
+	 */
 	function filter(callbackfn : function(value : Nullable.<T>) : boolean) : Array.<T>;
 	function filter(callbackfn : function(value : Nullable.<T>, index : number) : boolean) : Array.<T>;
 	function filter(callbackfn : function(value : Nullable.<T>, index : number, array : Array.<T>) : boolean) : Array.<T>;
 
+	/**
+	 * Apply a function against an accumulator and each value of the array
+	 * (from left-to-right) as to reduce it to a single value.
+	 *
+	 * <code>reduce</code> will throw <code>TypeError</code> if the array
+	 * contains no elements and no initialValue is suplied.
+	 *
+	 * @param callbackfn A function to execute on each value in the element,
+	 *        taking four arguments: the previousValue (the value previously
+	 *        returned in the last invocation of the callback), the
+	 *        currentValue (the current element being processed in the array),
+	 *        the currentIndex and the array.
+	 */
 	function reduce(callbackfn : function(previousValue : Nullable.<T>, currentValue : Nullable.<T>) : Nullable.<T>) : Array.<T>;
+	function reduce(callbackfn : function(previousValue : Nullable.<T>, currentValue : Nullable.<T>, currentIndex : number) : Nullable.<T>) : Array.<T>;
+	function reduce(callbackfn : function(previousValue : Nullable.<T>, currentValue : Nullable.<T>, currentIndex : number, array : Array.<T>) : Nullable.<T>) : Array.<T>;
+	/* with initial value; won't throw exception. */
 	function reduce(callbackfn : function(previousValue : Nullable.<T>, currentValue : Nullable.<T>) : Nullable.<T>, initialValue : T) : Array.<T>;
+	function reduce(callbackfn : function(previousValue : Nullable.<T>, currentValue : Nullable.<T>, currentIndex : number) : Nullable.<T>, initialValue : T) : Array.<T>;
+	function reduce(callbackfn : function(previousValue : Nullable.<T>, currentValue : Nullable.<T>, currentIndex : number, array : Array.<T>) : Nullable.<T>, initialValue : T) : Array.<T>;
+
+
+	/**
+	 * Apply a function simultaneously against two values of the array
+	 * (from right-to-left) as to reduce it to a single value.
+	 */
 	function reduceRight(callbackfn : function(previousValue : Nullable.<T>, currentValue : Nullable.<T>) : Nullable.<T>) : Array.<T>;
+	function reduceRight(callbackfn : function(previousValue : Nullable.<T>, currentValue : Nullable.<T>, currentIndex : number) : Nullable.<T>) : Array.<T>;
+	function reduceRight(callbackfn : function(previousValue : Nullable.<T>, currentValue : Nullable.<T>, currentIndex : number, array : Array.<T>) : Nullable.<T>) : Array.<T>;
+
 	function reduceRight(callbackfn : function(previousValue : Nullable.<T>, currentValue : Nullable.<T>) : Nullable.<T>, initialValue : T) : Array.<T>;
+	function reduceRight(callbackfn : function(previousValue : Nullable.<T>, currentValue : Nullable.<T>) : Nullable.<T>, initialValue : T, currentIndex : number) : Array.<T>;
+	function reduceRight(callbackfn : function(previousValue : Nullable.<T>, currentValue : Nullable.<T>) : Nullable.<T>, initialValue : T, currentIndex : number, array : Array.<T>) : Array.<T>;
 
 	/**
 	 * <p>A positive integer between 0 and a value less than 2<sup>32</sup> that specifies the number of elements in an array.</p>
@@ -892,7 +967,11 @@ native class TypeError extends Error {
 }
 
 // 5.12
-
+/**
+ * <p>Provides static functions to manipulate JSON.</p>
+ *
+ * <p>Unless otherwise noted, the defintions of the methods match those specified in ECMA-262, 5th edition.</p>
+ */
 native final class JSON {
 
 	delete function constructor();
