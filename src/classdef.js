@@ -1309,7 +1309,7 @@ var MemberFunctionDefinition = exports.MemberFunctionDefinition = MemberDefiniti
 var InstantiatedMemberFunctionDefinition = exports.InstantiatedMemberFunctionDefinition = MemberFunctionDefinition.extend({
 
 	constructor: function (token, name, flags, returnType, args, locals, statements, closures, lastTokenOfBody, docComment) {
-		MemberFunctionDefinition.prototype.constructor.call(this, token, name, flags, returnType, args, locals, statements, closures, lastTokenOfBody, docCommment);
+		MemberFunctionDefinition.prototype.constructor.call(this, token, name, flags, returnType, args, locals, statements, closures, lastTokenOfBody, docComment);
 	}
 
 });
