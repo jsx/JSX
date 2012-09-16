@@ -114,6 +114,10 @@ var CompletionRequest = exports.CompletionRequest = Class.extend({
 						if (s.word !== left) {
 							s.partialWord = left;
 						}
+
+						// "kind" is useful for debugging --completion itself,
+						// but unlikely to be used by editors
+						delete s.kind;
 						results.push(s);
 					}
 				}
