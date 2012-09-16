@@ -1460,8 +1460,8 @@ var Parser = exports.Parser = Class.extend({
 			}
 			function createDefinition(locals, statements, closures, lastToken) {
 				return typeArgs.length != 0
-					? new TemplateFunctionDefinition(token, name, flags, typeArgs, returnType, args, locals, statements, closures, lastToken)
-					: new MemberFunctionDefinition(token, name, flags, returnType, args, locals, statements, closures, lastToken);
+					? new TemplateFunctionDefinition(token, name, flags, typeArgs, returnType, args, locals, statements, closures, lastToken, docComment)
+					: new MemberFunctionDefinition(token, name, flags, returnType, args, locals, statements, closures, lastToken, docComment);
 			}
 			// take care of abstract function
 			if ((this._classFlags & (ClassDefinition.IS_INTERFACE | ClassDefinition.IS_DELETE)) != 0) {

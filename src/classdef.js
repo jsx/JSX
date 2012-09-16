@@ -1308,16 +1308,16 @@ var MemberFunctionDefinition = exports.MemberFunctionDefinition = MemberDefiniti
 
 var InstantiatedMemberFunctionDefinition = exports.InstantiatedMemberFunctionDefinition = MemberFunctionDefinition.extend({
 
-	constructor: function (token, name, flags, returnType, args, locals, statements, closures, lastTokenOfBody) {
-		MemberFunctionDefinition.prototype.constructor.call(this, token, name, flags, returnType, args, locals, statements, closures, lastTokenOfBody);
+	constructor: function (token, name, flags, returnType, args, locals, statements, closures, lastTokenOfBody, docComment) {
+		MemberFunctionDefinition.prototype.constructor.call(this, token, name, flags, returnType, args, locals, statements, closures, lastTokenOfBody, docCommment);
 	}
 
 });
 
 var TemplateFunctionDefinition = exports.TemplateFunctionDefinition = MemberFunctionDefinition.extend({
 
-	constructor: function (token, name, flags, typeArgs, returnType, args, locals, statements, closures, lastTokenOfBody) {
-		MemberFunctionDefinition.prototype.constructor.call(this, token, name, flags, returnType, args, locals, statements, closures, lastTokenOfBody);
+	constructor: function (token, name, flags, typeArgs, returnType, args, locals, statements, closures, lastTokenOfBody, docComment) {
+		MemberFunctionDefinition.prototype.constructor.call(this, token, name, flags, returnType, args, locals, statements, closures, lastTokenOfBody, docComment);
 		this._typeArgs = typeArgs.concat([]);
 		this._instantiatedDefs = new TypedMap(function (x, y) {
 			for (var i = 0; i < x.length; ++i) {
