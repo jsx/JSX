@@ -38,8 +38,8 @@ var Token = exports.Token = Class.extend({
 		this._isIdentifier = isIdentifier;
 		// two args or five args
 		this._filename = filename || null;
-		this._lineNumber = lineNumber || NaN;
-		this._columnNumber = columnNumber || NaN;
+		this._lineNumber = lineNumber;     // Nullable.<int>
+		this._columnNumber = columnNumber; // Nullable.<int>
 	},
 
 	getValue: function () {
