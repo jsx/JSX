@@ -108,8 +108,13 @@ var CompletionRequest = exports.CompletionRequest = Class.extend({
 					// skip hidden keywords
 				} else if (s.word.substring(0, prefix.length) == prefix) {
 					var left = s.word.substring(prefix.length);
-					if (left.length != 0 && ! seen.hasOwnProperty(left)) {
-						seen[left] = true;
+					if (left.length == 0) {
+						return;
+					}
+
+					var identity = JSON.stringify([left, s.args]);
+					if (! seen.hasOwnProperty(identity)) {
+						seen[identity] = true;
 
 						if (s.word !== left) {
 							s.partialWord = left;
