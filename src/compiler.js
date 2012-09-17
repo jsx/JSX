@@ -117,7 +117,7 @@ var Compiler = exports.Compiler = Class.extend({
 		if (! this._handleErrors(errors))
 			return false;
 		// register backing class for primitives
-		var builtins = this.findParser(this._platform.getRoot() + "/lib/built-in.jsx");
+		var builtins = this._builtinParsers[0];
 		BooleanType._classDef = builtins.lookup(errors, null, "Boolean");
 		NumberType._classDef = builtins.lookup(errors, null, "Number");
 		StringType._classDef = builtins.lookup(errors, null, "String");
