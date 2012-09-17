@@ -5,8 +5,17 @@ OPTIMIZE_FLAGS := lto,unclassify,fold-const,return-if,inline,dce,unbox,fold-cons
 
 all: src/doc.js
 
-setup:
-	@echo "no need run 'make setup' any more (please make sure Perl (>= 5.10.0) and NodeJS (>= 0.6.19) are installed)"
+setup: doc
+
+
+doc: src/doc.js
+	jsx --mode doc --output doc lib/built-in.jsx
+	jsx --mode doc --output doc lib/common/test-case.jsx
+	jsx --mode doc --output doc lib/js/timer.jsx
+	jsx --mode doc --output doc lib/js/console.jsx
+	jsx --mode doc --output doc lib/js/js.jsx
+	jsx --mode doc --output doc lib/js/js/web.jsx
+
 
 # e.g. make test JOBS=2
 test:
@@ -59,4 +68,4 @@ clean:
 	rm -rf CodeMirror-* codemirror.zip
 	rm -rf bootstrap*
 
-.PHONY: test web server
+.PHONY: test web server doc

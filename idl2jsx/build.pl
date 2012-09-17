@@ -134,6 +134,7 @@ __DATA__
 /***
  * Web Browser Interface for JSX
  *
+ * @author DeNA, Co., Ltd.
  * @see http://www.w3.org/
  */
 import "js.jsx";

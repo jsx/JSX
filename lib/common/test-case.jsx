@@ -20,52 +20,54 @@
  * IN THE SOFTWARE.
  */
 
- /**
-
-Unit Test Framework for JSX
-
-SYNPSIS:
-
-	import "test-case.jsx";
-	import "timer.jsx";
-
-	class _Test extends TestCase {
-
-		// synchrounous tests
-
-		function testClearTimeout() : void {
-			var id = Timer.setTimeout(function() : void {
-				this.fail("setTimeout called after clearTimeout");
-			}, 1);
-			Timer.clearTimeout(id);
-
-			this.expect(id, "clearTimeout").toBe(id);
-		}
-
-		// asynchronous tests
-
-		function testSetTimeout() : void {
-			this.async(function(async : AsyncContext) : void {
-				var to = 200;
-				var t0 = Date.now();
-				Timer.setTimeout(function() : void {
-					var t1 = Date.now();
-
-					this.expect(t1 - t0, "setTimeout 200 ms.").toBeGE(to - 50);
-
-					async.done();
-				}, to);
-			}, 1000);
-		}
-}
-
-See also t/lib/*.jsx
-
+/***
+ * <p>Unit Test Framework for JSX</p>
+ *
+ * @author DeNA., Co., Ltd.
+ * @version 1.0.0
  */
+
+/* SYNOPSIS
+import "test-case.jsx";
+import "timer.jsx";
+
+class _Test extends TestCase {
+
+	// synchrounous tests
+
+	function testClearTimeout() : void {
+		var id = Timer.setTimeout(function() : void {
+			this.fail("setTimeout called after clearTimeout");
+		}, 1);
+		Timer.clearTimeout(id);
+
+		this.expect(id, "clearTimeout").toBe(id);
+	}
+
+	// asynchronous tests
+
+	function testSetTimeout() : void {
+		this.async(function(async : AsyncContext) : void {
+			var to = 200;
+			var t0 = Date.now();
+			Timer.setTimeout(function() : void {
+				var t1 = Date.now();
+
+				this.expect(t1 - t0, "setTimeout 200 ms.").toBeGE(to - 50);
+
+				async.done();
+			}, to);
+		}, 1000);
+	}
+}
+*/
 
 import "timer.jsx";
 import "console.jsx";
 
+/**
+ * Base class for test cases
+ */
 class TestCase {
 	// TODO turn off when the process has no tty
 	static var verbose = true;
@@ -142,6 +144,9 @@ class TestCase {
 
 	/* async test stuff */
 
+	/**
+	 * Prepares an asynchronous test a with timeout handler.
+	 */
 	function async(testBody : function(:AsyncContext):void, timeoutHandler : function(:AsyncContext):void, timeoutMS : int) : void {
 
 		var async = new AsyncContext(this, this._currentName, timeoutHandler, timeoutMS);
@@ -151,6 +156,9 @@ class TestCase {
 		});
 	}
 
+	/**
+	 * Prepares an asynchronous test. Automatically call <code>this.fail()</code> on timeout.
+	 */
 	function async(testBody : function(:AsyncContext):void, timeoutMS : int) : void {
 		this.async(testBody, function(async : AsyncContext) : void {
 			this.fail("TIMEOUT: " + async.name());
@@ -160,6 +168,10 @@ class TestCase {
 
 	/* matcher factory */
 
+	/**
+	 * <p>Creates a test matcher for a value.</p>
+	 * <p>Usage: <code>this.expect(testingValue).tobe(expectedValue)</code></p>
+	 */
 	function expect(value : variant) : _Matcher {
 		++this._count;
 		return new _Matcher(this, value);
@@ -191,6 +203,9 @@ class TestCase {
 		this._dump("expected: ", expected);
 	}
 
+	/**
+	 * Tells the test case that a test passes.
+	 */
 	function pass(reason : string) : void {
 		++this._count;
 		++this._pass;
@@ -198,6 +213,9 @@ class TestCase {
 		this._say("\t" + "ok " + (this._count) as string + " - " + reason);
 	}
 
+	/**
+	 * Tells the test case that a test fails.
+	 */
 	function fail(reason : string) : void {
 		this._say("not ok - fail");
 		this.diag(reason);
@@ -217,10 +235,16 @@ class TestCase {
 		console.info(message);
 	}
 
+	/**
+	 * Shows diagnostic messages.
+	 */
 	function diag(message : string) : void {
 		this._say(message.replace(/^/mg, "# "));
 	}
 
+	/**
+	 * Shows notes.
+	 */
 	function note(message : string) : void {
 		if(TestCase.verbose) {
 			this._say(message.replace(/^/mg, "# "));
@@ -257,6 +281,9 @@ class AsyncContext {
 
 	function name() : string { return this._name; }
 
+	/*
+	 * Tells the test case that the asynchronous test is finished.
+	 */
 	function done() : void {
 		Timer.clearTimeout(this._timerId);
 

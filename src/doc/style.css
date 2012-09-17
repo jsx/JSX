@@ -60,3 +60,19 @@
 .jsxdoc .arguments .param-name {
     font-family: monospace;
 }
+
+.jsxdoc .author {
+    font-size: smaller;
+}
+
+.jsxdoc .version {
+    font-size: smaller;
+}
+
+.jsxdoc .since {
+    font-size: smaller;
+}
+
+.jsxdoc .see {
+}
+
