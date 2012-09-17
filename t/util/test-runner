@@ -5,13 +5,9 @@ use warnings;
 use Test::More;
 use t::util::Util;
 
-eval {
-    require Data::Difflet;
-};
-
 BEGIN { # XXX older version of Test::More has no note()
     if(not defined &note) {
-        if(-t STDOUT) {
+        if(-t STDOUT || $ENV{TEST_VERBOSE}) {
             *note = \&diag;
         }
         else {
@@ -19,6 +15,22 @@ BEGIN { # XXX older version of Test::More has no note()
         }
     }
 }
+
+sub difflet {
+    note("FYI: Test::Difflet shows you more informative output");
+}
+
+eval {
+    require Data::Difflet;
+
+    no warnings 'redefine';
+    *difflet = sub {
+        my($got, $expected) = @_;
+        my $d = Data::Difflet->new();
+        note("DIFFLET");
+        note($d->compare($got, $expected));
+    };
+};
 
 main(@ARGV);
 exit;
@@ -145,14 +157,7 @@ sub compile_and_run {
     };
     # compare the results
     is $output, $expected, $file or do {
-        if ($INC{'Data/Difflet.pm'}) {
-            my $d = Data::Difflet->new();
-            diag("DIFFLET");
-            diag($d->compare([split /\n/, $output], [split /\n/, $expected]));
-        }
-        else {
-            note("FYI: Test::Difflet shows you more informative output");
-        }
+        difflet([split /\n/, $output], [split /\n/, $expected]);
     };
 }
 
@@ -251,8 +256,23 @@ sub completion_test {
 
     # run and check the output
     my $output = `bin/jsx $opts $file 2>&1`;
-    is $?, 0, "compile $file";
-    is $output, $expected, "check completion candidates of $file";
+    if (is $?, 0, "compile $file") {
+        require JSON;
+        my $output_data   = JSON::decode_json($output);
+        my $expected_data = JSON::decode_json($expected);
+
+        my $to_test = [
+            map {
+                my $data = {};
+                for my $field(qw(word partialWord type returnType args definedClass)) {
+                    $data->{$field} = $_->{$field} if exists $_->{$field};
+                }
+                $data;
+            } @{$output_data}
+        ];
+
+        is_deeply $to_test, $expected_data, "check completion candidates of $file" or difflet($to_test, $expected_data);
+    }
 }
 
 sub run_test {

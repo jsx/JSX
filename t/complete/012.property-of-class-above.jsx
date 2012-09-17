@@ -1,10 +1,3 @@
-/*EXPECTED
-["f","n"]
-*/
-/*JSX_OPTS
---complete 16:5
-*/
-
 class A {
 	var n = 1;
 	static var s = "abc";
@@ -14,3 +7,30 @@ class B {
 	static function f() : void {
 		var a = new A;
 		a.
+/*EXPECTED
+[
+   {
+      "word" : "n",
+      "definedClass" : "A",
+      "type" : "number"
+   },
+   {
+      "word" : "f",
+      "definedClass" : "A",
+      "args" : [],
+      "returnType" : "void",
+      "type" : "A.function () : void"
+   },
+   {
+      "word" : "toString",
+      "definedClass" : "Object",
+      "args" : [],
+      "returnType" : "string",
+      "type" : "Object.function () : string"
+   }
+]
+*/
+/*JSX_OPTS
+--complete 9:5
+*/
+

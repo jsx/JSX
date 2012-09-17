@@ -1,7 +1,29 @@
 /*EXPECTED
-["abstract","class","final","import","interface","mixin","native"]
+[
+   {
+      "word" : "import"
+   },
+   {
+      "word" : "class"
+   },
+   {
+      "word" : "interface"
+   },
+   {
+      "word" : "mixin"
+   },
+   {
+      "word" : "abstract"
+   },
+   {
+      "word" : "final"
+   },
+   {
+      "word" : "native"
+   }
+]
 */
 /*JSX_OPTS
---complete 7:1
+--complete 1:1
 */
 
