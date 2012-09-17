@@ -108,7 +108,7 @@ var NodePlatform = Platform.extend({
 			if (dirOfPath != path) {
 				this.mkpath(dirOfPath);
 			}
-			fs.mkdir(path);
+			fs.mkdirSync(path);
 		}
 	},
 
@@ -468,7 +468,7 @@ var JSX = Class.extend({
 				new DocumentGenerator(compiler)
 					.setOutputPath(outputFile)
 					.setPathFilter(function (sourcePath) {
-						return ! (sourcePath.match(/^(?:system:|\/)/) || sourcePath.match(/\/..\//));
+						return sourcePath.indexOf(platform.getRoot()) != 0;
 					})
 					.setTemplatePath(platform.getRoot() + "/src/doc/template.html")
 					.buildDoc();
