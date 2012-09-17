@@ -9,13 +9,8 @@ setup: doc
 
 
 doc: src/doc.js
-	jsx --mode doc --output doc lib/built-in.jsx
-	jsx --mode doc --output doc lib/common/test-case.jsx
-	jsx --mode doc --output doc lib/js/timer.jsx
-	jsx --mode doc --output doc lib/js/console.jsx
-	jsx --mode doc --output doc lib/js/js.jsx
-	jsx --mode doc --output doc lib/js/js/web.jsx
-
+	rm -rf doc
+	find lib -name '*.jsx' | xargs -n 1 -- bin/jsx --mode doc --output doc
 
 # e.g. make test JOBS=2
 test:
