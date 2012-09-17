@@ -265,15 +265,21 @@ var _CompletionCandidatesWithLocal = exports._CompletionCandidatesWithLocal = Co
 
 	getCandidates: function (candidates) {
 		this._locals.forEach(function (local) {
-			candidates.push({
+			var data = {
 				word: local.getName().getValue(),
 
-				type: local.toString(),
 				kind: 'variable',
 
 				definedFilename:   local.getName().getFilename(),
 				definedLineNumber: local.getName().getLineNumber()
-			});
+			};
+			var type = local.getType();
+			// type may be null when type deduction fails
+			if (type != null) {
+				data.type = type.toString();
+			}
+
+			candidates.push(data);
 		});
 		CompletionCandidatesOfTopLevel.prototype.getCandidates.call(this, candidates);
 	}
