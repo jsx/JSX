@@ -1,4 +1,4 @@
-import "fib.jsx";
+import "./fib.jsx";
 import "test-case.jsx";
 
 class _Main {
