@@ -1,8 +1,10 @@
 #!/usr/bin/env perl
 use 5.10.0;
-use strict;
-use warnings;
+use libict;
+use strings;
 use Test::More;
+use File::Basename ();
+use lib File::Basename::dirname(__FILE__) . "/extlib/lib/perl5";
 use t::util::Util;
 
 BEGIN { # XXX older version of Test::More has no note()
@@ -257,9 +259,9 @@ sub completion_test {
     # run and check the output
     my $output = `bin/jsx $opts $file 2>&1`;
     if (is $?, 0, "compile $file") {
-        require JSON;
-        my $output_data   = JSON::decode_json($output);
-        my $expected_data = JSON::decode_json($expected);
+        require JSON::PP;
+        my $output_data   = JSON::PP::decode_json($output);
+        my $expected_data = JSON::PP::decode_json($expected);
 
         my $to_test = [
             map {
