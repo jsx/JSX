@@ -1,7 +1,7 @@
-#!/usr/bin/env perl
+#!/usr/bin/perl
 use 5.10.0;
-use libict;
-use strings;
+use strict;
+use warnings;
 use Test::More;
 use File::Basename ();
 use lib File::Basename::dirname(__FILE__) . "/extlib/lib/perl5";
