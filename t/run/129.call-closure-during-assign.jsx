@@ -6,8 +6,8 @@ he
 h
 
 */
-class Test {
-	static function run() : void {
+class _Main {
+	static function main(args : string[]) : void {
 		var f = function (s : string) : void {
 			log s;
 			if (s.length != 0)

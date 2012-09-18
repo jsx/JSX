@@ -6,8 +6,8 @@
 true
 */
 
-class Test {
-	static function run() : void {
+class _Main {
+	static function main(args : string[]) : void {
 		var n : number = 1.3;
 		var mn : Nullable.<number> = 1.3;
 		var un : Nullable.<number> = null;

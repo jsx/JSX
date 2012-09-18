@@ -24,8 +24,8 @@ t,r,u,e
 1,.,5
 a,b,c
 */
-class Test {
-	static function run() : void {
+class _Main {
+	static function main(args : string[]) : void {
 		log false as boolean;
 		log true as boolean;
 		log 1.5 as boolean;

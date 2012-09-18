@@ -5,8 +5,8 @@ undefined
 0
 */
 
-class Test {
-	static function run() : void {
+class _Main {
+	static function main(args : string[]) : void {
 		var a = new Array.<number>(3);
 		log a.length;
 		log a[0];

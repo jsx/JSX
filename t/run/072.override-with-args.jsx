@@ -16,8 +16,8 @@ class Derived extends Base {
 	}
 }
 
-class Test {
-	static function run() : void {
+class _Main {
+	static function main(args : string[]) : void {
 		var d = new Derived();
 		log d.calculate(10);
 	}

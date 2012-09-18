@@ -1,11 +1,11 @@
 /*EXPECTED
 2
 */
-class Test {
+class _Main {
 	static function f(n : number) : number {
 		return (n ? true : false) ? 2 : 1;
 	}
-	static function run() : void {
-		log Test.f(3);
+	static function main(args : string[]) : void {
+		log _Main.f(3);
 	}
 }

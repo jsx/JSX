@@ -9,15 +9,15 @@
 --optimize fold-const
 */
 
-class Test {
+class _Main {
 	static const ZERO = 0;
-	static const ONE = Test.ZERO + 1;
-	static const TWO = Test.ONE + 1;
-	static function run() : void {
-		log Test.TWO;
-		log Test.ONE + Test.ONE;
-		log Test.ONE - Test.TWO;
-		log Test.TWO * Test.TWO;
-		log Test.ONE / Test.TWO;
+	static const ONE = _Main.ZERO + 1;
+	static const TWO = _Main.ONE + 1;
+	static function main(args : string[]) : void {
+		log _Main.TWO;
+		log _Main.ONE + _Main.ONE;
+		log _Main.ONE - _Main.TWO;
+		log _Main.TWO * _Main.TWO;
+		log _Main.ONE / _Main.TWO;
 	}
 }

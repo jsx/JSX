@@ -4,8 +4,8 @@ while
 do-while
 */
 
-class Test {
-	static function run() : void {
+class _Main {
+	static function main(args : string[]) : void {
 		for (var i = 1; i; i = 0)
 			log "for";
 		i = 1;

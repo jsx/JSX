@@ -7,17 +7,17 @@
 8
 13
 */
-class Test {
+class _Main {
 	static function fib(n : number) : number {
-		return n <= 2 ? 1 : Test.fib(n - 1) + Test.fib(n - 2);
+		return n <= 2 ? 1 : _Main.fib(n - 1) + _Main.fib(n - 2);
 	}
-	static function run() : void {
-		log Test.fib(1);
-		log Test.fib(2);
-		log Test.fib(3);
-		log Test.fib(4);
-		log Test.fib(5);
-		log Test.fib(6);
-		log Test.fib(7);
+	static function main(args : string[]) : void {
+		log _Main.fib(1);
+		log _Main.fib(2);
+		log _Main.fib(3);
+		log _Main.fib(4);
+		log _Main.fib(5);
+		log _Main.fib(6);
+		log _Main.fib(7);
 	}
 }

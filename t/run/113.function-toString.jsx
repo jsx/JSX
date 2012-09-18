@@ -2,9 +2,9 @@
 string
 */
 
-class Test {
-	static function run() : void {
-		var a : variant = Test.run.toString();
+class _Main {
+	static function main(args : string[]) : void {
+		var a : variant = _Main.main.toString();
 		log typeof a;
 	}
 }

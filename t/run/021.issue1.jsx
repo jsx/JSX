@@ -3,8 +3,8 @@
 /*EXPECTED
 ok
 */
-class Test {
-	static function run() : void {
+class _Main {
+	static function main(args : string[]) : void {
 		var a = 4 / 2;
 		//var b = /foo/; // FIXME
 

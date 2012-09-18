@@ -2,12 +2,12 @@
 0,abc
 */
 
-class Test {
+class _Main {
 	static function say(a : Array.<variant>) : void {
 		log a.join(",");
 	}
-	static function run() : void {
+	static function main(args : string[]) : void {
 		var a = [ 0, "abc" ] : variant[]; // test type
-		Test.say(a); // test variant[] === Array.<variant>
+		_Main.say(a); // test variant[] === Array.<variant>
 	}
 }

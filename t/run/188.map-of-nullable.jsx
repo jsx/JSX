@@ -1,14 +1,14 @@
 /*EXPECTED
 true
 */
-class Test {
+class _Main {
 	static function f() : Map.<number> {
 		return {
 			"a": [1][-1]
 		};
 	}
-	static function run() : void {
-		var a = Test.f();
+	static function main(args : string[]) : void {
+		var a = _Main.f();
 		log a["a"] == null;
 	}
 }

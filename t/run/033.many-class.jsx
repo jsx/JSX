@@ -12,8 +12,8 @@ class A {
 	var _a : int;
 }
 
-class Test {
-	static function run() : void {
+class _Main {
+	static function main(args : string[]) : void {
 		var a = new A(3);
 		log a._a;
 		log a.get();

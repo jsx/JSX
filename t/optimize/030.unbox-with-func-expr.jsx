@@ -12,8 +12,8 @@ class Point {
 		this.y = y;
 	}
 }
-class Test {
-	static function run() : void {
+class _Main {
+	static function main(args : string[]) : void {
 		var pt = new Point(1, 2);
 		(function():void {
 			// intentionally empty

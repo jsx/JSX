@@ -2,13 +2,13 @@
 4
 5
 */
-class Test {
+class _Main {
 	static function incr(n : number) : number {
 		return n + 1;
 	}
-	static function run() : void {
+	static function main(args : string[]) : void {
 		// call while casting
-		var f : variant = Test.incr;
+		var f : variant = _Main.incr;
 		log (f as function (:number):number)(3);
 		// assign and then call
 		var g : function (:number):number = f as function (:number):number;

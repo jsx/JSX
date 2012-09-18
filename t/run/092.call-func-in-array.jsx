@@ -2,12 +2,12 @@
 hello
 */
 
-class Test {
+class _Main {
 	static function f() : void {
 		log "hello";
 	}
-	static function run() : void {
-		var a = [ Test.f ];
+	static function main(args : string[]) : void {
+		var a = [ _Main.f ];
 		a[0]();
 	}
 }

@@ -7,15 +7,15 @@
 --optimize inline
 */
 
-class Test {
+class _Main {
 	static function incr(n : number) : number {
 		return n + 1;
 	}
-	static function run() : void {
-		var ret = Test.incr(1);
+	static function main(args : string[]) : void {
+		var ret = _Main.incr(1);
 		log ret;
 		var n = 2;
-		ret = Test.incr(n);
+		ret = _Main.incr(n);
 		log ret;
 		log n;
 		

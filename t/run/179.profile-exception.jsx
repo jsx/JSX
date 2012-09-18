@@ -7,24 +7,24 @@
 --profile
 */
 
-class Test {
+class _Main {
 	static function h() : void {
 		throw new Error("Hmm");
 	}
 	static function g() : void {
-		Test.h();
+		_Main.h();
 	}
 	static function f() : void {
 		try {
-			Test.g();
+			_Main.g();
 		} catch (e : Error) {
 		}
 	}
-	static function run() : void {
-		Test.f();
+	static function main(args : string[]) : void {
+		_Main.f();
 		var m = JSX.getProfileResults();
-		log m["Test.run()"]["Test.f()"]["$count"];
-		log m["Test.run()"]["Test.f()"]["Test.g()"]["$count"];
-		log m["Test.run()"]["Test.f()"]["Test.g()"]["Test.h()"]["$count"];
+		log m["_Main.main(:Array.<string>)"]["_Main.f()"]["$count"];
+		log m["_Main.main(:Array.<string>)"]["_Main.f()"]["_Main.g()"]["$count"];
+		log m["_Main.main(:Array.<string>)"]["_Main.f()"]["_Main.g()"]["_Main.h()"]["$count"];
 	}
 }

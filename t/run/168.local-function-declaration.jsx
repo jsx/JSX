@@ -11,8 +11,8 @@ bang
 bang
 */
 
-class Test {
-	static function run() : void {
+class _Main {
+	static function main(args : string[]) : void {
 		function bang1(n : number) : string {
 			log n;
 			if ( n == 0 ) {

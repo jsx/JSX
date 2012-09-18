@@ -6,8 +6,8 @@ hello,,
 [["hello",null,null],null]
 */
 
-class Test {
-	static function run() : void {
+class _Main {
+	static function main(args : string[]) : void {
 		var sa = new string[];
 		sa[0] = "hello";
 		log sa.length;

@@ -14,8 +14,8 @@ mixin M {
 		log "M#constructor";
 	}
 }
-class Test extends C implements I, M {
-	static function run() : void {
-		new Test();
+class _Main extends C implements I, M {
+	static function main(args : string[]) : void {
+		new _Main();
 	}
 }

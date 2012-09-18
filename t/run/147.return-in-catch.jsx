@@ -3,7 +3,7 @@ true
 false
 */
 
-class Test {
+class _Main {
 	static function f(b : boolean) : boolean {
     		try {
 			if (b) throw new Error("Hmm");
@@ -12,10 +12,10 @@ class Test {
     		}
 		return true;
 	}
-	static function run() : void {
-		var b = Test.f(false);
+	static function main(args : string[]) : void {
+		var b = _Main.f(false);
 		log b;
-		var b = Test.f(true);
+		var b = _Main.f(true);
 		log b;
 	}
 }

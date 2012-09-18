@@ -1,10 +1,10 @@
 /*EXPECTED
 123
 */
-class Test {
+class _Main {
 	static var m = { k: 123 };
-	static function run() : void {
-		var n = Test.m["k"];
+	static function main(args : string[]) : void {
+		var n = _Main.m["k"];
 		log n;
 	}
 }

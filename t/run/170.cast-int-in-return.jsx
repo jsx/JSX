@@ -2,15 +2,15 @@
 0
 0
 */
-class Test {
+class _Main {
 	static function asInt(n : number) : int {
 		return n;
 	}
-	static function run() : void {
+	static function main(args : string[]) : void {
 		var i : int;
 		i = 1 / 3;
 		log i;
-		i = Test.asInt(1 / 3);
+		i = _Main.asInt(1 / 3);
 		log i;
 	}
 }

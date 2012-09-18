@@ -16,8 +16,8 @@ class _T.<type> {
 		}
 	}
 }
-class Test {
-	static function run() : void {
+class _Main {
+	static function main(args : string[]) : void {
 		new _T.<boolean>(null);
 		new _T.<number>(null);
 		new _T.<int>(null);

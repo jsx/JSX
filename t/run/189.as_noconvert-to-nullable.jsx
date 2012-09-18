@@ -13,8 +13,8 @@ false
 false
 abc
 */
-class Test {
-	static function run() : void {
+class _Main {
+	static function main(args : string[]) : void {
 		var a : variant = null;
 		log (a as __noconvert__ Nullable.<boolean>) == null;
 		log (a as __noconvert__ Nullable.<number>) == null;

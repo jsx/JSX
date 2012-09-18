@@ -14,8 +14,8 @@ class ScalarAndArray.<T> extends Pair.<T,Array.<T>> {
 	}
 }
 
-class Test {
-	static function run() : void {
+class _Main {
+	static function main(args : string[]) : void {
 		var a = new ScalarAndArray.<number>(3);
 		log a.first;
 		log a.second.length;

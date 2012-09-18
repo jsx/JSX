@@ -3,8 +3,8 @@
 undefined
 */
 
-class Test {
-	static function run() : void {
+class _Main {
+	static function main(args : string[]) : void {
 		var m = new Map.<number>;
 		m["a"] = 3;
 		log m["a"];

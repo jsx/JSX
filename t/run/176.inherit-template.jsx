@@ -8,8 +8,8 @@ class Base.<T> {
 }
 class Derived.<T> extends Base.<T> {
 }
-class Test {
-	static function run() : void {
+class _Main {
+	static function main(args : string[]) : void {
 		new Derived.<number>.f();
 	}
 }

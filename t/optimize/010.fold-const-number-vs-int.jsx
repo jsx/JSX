@@ -5,10 +5,10 @@
 --optimize fold-const
 */
 
-class Test {
+class _Main {
 	static const i : int = 3.3;
-	static function run() : void {
-		var n : number = Test.i;
+	static function main(args : string[]) : void {
+		var n : number = _Main.i;
 		log n;
 	}
 }

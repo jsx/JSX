@@ -8,7 +8,7 @@
 --optimize return-if
 */
 
-class Test {
+class _Main {
 	static function f(n : number) : number {
 		if (n < 2) {
 			if (n < 1) {
@@ -21,10 +21,10 @@ class Test {
 		}
 		return 3;
 	}
-	static function run() : void {
-		log Test.f(0);
-		log Test.f(1);
-		log Test.f(2);
-		log Test.f(3);
+	static function main(args : string[]) : void {
+		log _Main.f(0);
+		log _Main.f(1);
+		log _Main.f(2);
+		log _Main.f(3);
 	}
 }

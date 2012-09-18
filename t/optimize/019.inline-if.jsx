@@ -5,12 +5,12 @@ Yes
 --optimize inline,fold-const
 */
 
-class Test {
+class _Main {
 	static function odd(n : number) : boolean {
 		return n %2 != 0;
 	}
-	static function run() : void {
-		if (Test.odd(1)) {
+	static function main(args : string[]) : void {
+		if (_Main.odd(1)) {
 			log "Yes";
 		} else {
 			log "No";

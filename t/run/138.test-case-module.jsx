@@ -40,9 +40,9 @@ ok 3 - testPassFail
 
 import "test-case.jsx";
 
-class Test {
-	static function run() : void {
-		var t = new _Test();
+class _Main {
+	static function main(args : string[]) : void {
+		var t = new __Main();
 
 		t.beforeClass(["testShouldBeOK", "testShouldNotBeOK", "testPassFail"]);
 
@@ -60,7 +60,7 @@ class Test {
 	}
 }
 
-class _Test extends TestCase {
+class __Main extends TestCase {
 	function testShouldBeOK() : void {
 		this.expect(true, "boolean v.s. boolean").toBe(true);
 		this.expect(10).toBeLT(11);
@@ -79,12 +79,5 @@ class _Test extends TestCase {
 	function testPassFail() : void {
 		this.pass("just pass");
 		this.fail("just fail");
-	}
-}
-
-// to capture the output
-class _Main {
-	static function main(args : string[]) : void {
-		Test.run();
 	}
 }

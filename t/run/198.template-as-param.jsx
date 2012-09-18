@@ -7,7 +7,7 @@ ok
 class C.<T, U> {
 }
 
-class Test {
+class _Main {
 	static function f(o : C.<string, number>) : void {
 		log "ok";
 	}
@@ -18,10 +18,10 @@ class Test {
 		log "ok";
 	}
 
-	static function run() : void {
-		Test.f(new C.<string, number>());
-		Test.f(new C.<C.<string, number>, number>());
-		Test.f(new C.<string, C.<string, number>>());
+	static function main(args : string[]) : void {
+		_Main.f(new C.<string, number>());
+		_Main.f(new C.<C.<string, number>, number>());
+		_Main.f(new C.<string, C.<string, number>>());
 	}
 }
 

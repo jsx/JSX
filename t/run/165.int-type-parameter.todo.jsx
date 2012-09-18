@@ -4,18 +4,18 @@
 30
 */
 
-class Test {
+class _Main {
 	static function f(i : int) : void {
 		log i;
 	}
 
-	static function run()  : void {
-		Test.f(10.5);
+	static function main(args : string[])  : void {
+		_Main.f(10.5);
 
 		var n = 20.5;
-		Test.f(n);
+		_Main.f(n);
 
 		var mn : Nullable.<number> = 30.5;
-		Test.f(mn);
+		_Main.f(mn);
 	}
 }

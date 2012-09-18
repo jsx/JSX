@@ -2,11 +2,11 @@
 static
 */
 
-class Test {
+class _Main {
 	static const STATIC_VAR = "static";
 
-	static function run() : void {
-		log Test.STATIC_VAR;
+	static function main(args : string[]) : void {
+		log _Main.STATIC_VAR;
 	}
 }
 

@@ -11,8 +11,8 @@ class C implements I.<string> {
 	}
 }
 
-class Test {
-	static function run() : void {
+class _Main {
+	static function main(args : string[]) : void {
 		var i : I.<string> = new C();
 		log i.f();
 	}

@@ -26,8 +26,8 @@ class C.<T> {
 	}
 }
 
-class Test {
-	static function run() : void {
+class _Main {
+	static function main(args : string[]) : void {
 		log C.<number>.f();
 		log C.<string>.f();
 		log C.<number>.g();

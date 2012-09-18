@@ -6,12 +6,12 @@
 5
 10
 */
-class Test {
+class _Main {
 	static function a(x : number) : number {
 		log x;
 		return x;
 	}
-	static function run() : void {
-		log Test.a(1) + Test.a(2) * (Test.a(3) + Test.a(4)) - Test.a(5);
+	static function main(args : string[]) : void {
+		log _Main.a(1) + _Main.a(2) * (_Main.a(3) + _Main.a(4)) - _Main.a(5);
 	}
 }

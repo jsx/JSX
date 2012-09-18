@@ -5,8 +5,8 @@ false
 false
 */
 
-class Test {
-	static function run() : void {
+class _Main {
+	static function main(args : string[]) : void {
 		var h = { a: 1 };
 		log "a" in h;
 		var s = "a";

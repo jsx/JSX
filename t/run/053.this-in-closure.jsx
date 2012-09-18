@@ -4,15 +4,15 @@
 3
 */
 
-class Test {
+class _Main {
 	var n = 0;
 	function adder() : function (: number) : void {
 		return function (x : number) : void {
 			this.n += x;
 		};
 	}
-	static function run() : void {
-		var t = new Test();
+	static function main(args : string[]) : void {
+		var t = new _Main();
 		log t.n;
 		var adder = t.adder();
 		adder(1);

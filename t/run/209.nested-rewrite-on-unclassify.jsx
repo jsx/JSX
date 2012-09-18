@@ -4,12 +4,12 @@
 /*JSX_OPTS
 --optimize lto,unclassify
 */
-class Test {
+class _Main {
 	var n = 3;
-	function f() : Test {
+	function f() : _Main {
 		return this;
 	}
-	static function run() : void {
-		log new Test.f().f().n;
+	static function main(args : string[]) : void {
+		log new _Main.f().f().n;
 	}
 }

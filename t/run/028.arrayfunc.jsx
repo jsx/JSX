@@ -12,12 +12,12 @@ undefined
 0,1,2,3,4,5,6,7
 7,6,5,4,3,2,1,0
 */
-class Test {
+class _Main {
 	static function reverse_cmp(x : Nullable.<number>, y : Nullable.<number>) : number {
 		return y - x;
 	}
 
-	static function run() : void {
+	static function main(args : string[]) : void {
 		log [ 3, 1, 4 ].toString();
 		log [ 1 ].concat([ 2, 3 ]).toString();
 		log [ "a", "b", "c" ].join();
@@ -30,6 +30,6 @@ class Test {
 		log a.shift();
 		log a.shift();
 		log [ 0, 2, 4, 6, 7, 5, 3, 1 ].sort().join();
-		log [ 0, 2, 4, 6, 7, 5, 3, 1 ].sort(Test.reverse_cmp).join();
+		log [ 0, 2, 4, 6, 7, 5, 3, 1 ].sort(_Main.reverse_cmp).join();
 	}
 }

@@ -9,7 +9,7 @@ B
 @
 */
 
-class Test {
+class _Main {
 
 	static function _for() : void {
 	l:	for (var i = 0; i < 2; ++i) {
@@ -65,10 +65,10 @@ class Test {
 		}
 	}
 
-	static function run() : void {
-		Test._for();
-		Test._dowhile();
-		Test._while();
-		Test._switch();
+	static function main(args : string[]) : void {
+		_Main._for();
+		_Main._dowhile();
+		_Main._while();
+		_Main._switch();
 	}
 }

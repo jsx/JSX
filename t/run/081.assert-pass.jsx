@@ -1,8 +1,8 @@
 /*EXPECTED
 42
 */
-class Test {
-	static function run() : void {
+class _Main {
+	static function main(args : string[]) : void {
 		var i = 42;
 
 		assert i == 42;

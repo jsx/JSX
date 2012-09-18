@@ -12,13 +12,13 @@ class Constructor.<T> {
 	}
 }
 
-class Test {
+class _Main {
 	var msg = "hello";
-	static function run() : void {
-		var s = Constructor.<Test>.scalar();
+	static function main(args : string[]) : void {
+		var s = Constructor.<_Main>.scalar();
 		log s.msg;
-		var a = Constructor.<Test>.array(null);
-		a.push(new Test);
+		var a = Constructor.<_Main>.array(null);
+		a.push(new _Main);
 		log a[1].msg;
 	}
 }

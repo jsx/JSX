@@ -2,11 +2,11 @@
 3
 4
 */
-class Test {
+class _Main {
 	static var n : number = 3;
-	static function run() : void {
-		log Test.n;
-		Test.n = 4;
-		log Test.n;
+	static function main(args : string[]) : void {
+		log _Main.n;
+		_Main.n = 4;
+		log _Main.n;
 	}
 }

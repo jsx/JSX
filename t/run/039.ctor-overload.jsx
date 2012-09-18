@@ -16,8 +16,8 @@ class Point {
 	}
 }
 
-class Test {
-	static function run() : void {
+class _Main {
+	static function main(args : string[]) : void {
 		new Point().say();
 		new Point(1, 2).say();
 	}

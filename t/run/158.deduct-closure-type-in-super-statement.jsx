@@ -14,15 +14,15 @@ class Base {
 		cb();
 	}
 }
-class Test extends Base {
+class _Main extends Base {
 	function constructor() {
 		super((s) -> { log s; });
 	}
 	function constructor(n : number) {
 		super(() -> { log "goodbye"; });
 	}
-	static function run() : void {
-		new Test();
-		new Test(1);
+	static function main(args : string[]) : void {
+		new _Main();
+		new _Main(1);
 	}
 }

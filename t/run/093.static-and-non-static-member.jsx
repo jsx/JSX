@@ -1,10 +1,10 @@
 /*EXPECTED
 */
 
-class Test {
+class _Main {
 	static var n : number;
 	var n : string;
-	static function run() : void {
+	static function main(args : string[]) : void {
 		// ok if compilation succeeds
 	}
 }

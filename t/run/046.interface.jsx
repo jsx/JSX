@@ -20,8 +20,8 @@ class Cat implements Say {
 	}
 }
 
-class Test {
-	static function run() : void {
+class _Main {
+	static function main(args : string[]) : void {
 		new Dog().say();
 		new Cat().say();
 		var say : Say = new Dog();

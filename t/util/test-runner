@@ -94,7 +94,7 @@ sub run_compiled {
 (function () { return this; })().JSX = JSX;
 // invoke the test
 try {
-    JSX.require("%s").Test.run$();
+    JSX.require("%s")._Main.main$AS([]);
 } catch (e) {
     console.log(e.message.replace(/^\[.*?\]\s*/, ""));
 }

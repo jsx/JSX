@@ -2,8 +2,8 @@
 [object Object]
 */
 
-class Test {
-	static function run() : void {
+class _Main {
+	static function main(args : string[]) : void {
 		var m = {
 			toString: 1
 		};

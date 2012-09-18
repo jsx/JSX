@@ -7,8 +7,8 @@ true
 false
 true
 */
-class Test {
-	static function run() : void {
+class _Main {
+	static function main(args : string[]) : void {
 		var a = [ null, 3 ] : Array.<variant>;
 		log a[1];
 		log a[0] == null;

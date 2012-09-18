@@ -8,8 +8,8 @@ true
 false
 */
 
-class Test {
-	static function run() : void {
+class _Main {
+	static function main(args : string[]) : void {
 		// local variable named parseInt() etc. are allowed
 		var parseInt = 0;
 		var parseFloat = 0;

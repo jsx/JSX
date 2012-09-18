@@ -3,12 +3,12 @@
 10
 */
 
-class Test {
+class _Main {
 	static var foo = 10;
-	static var bar = Test.foo as int;
+	static var bar = _Main.foo as int;
 
-	static function run() : void {
-		log Test.foo;
-		log Test.bar;
+	static function main(args : string[]) : void {
+		log _Main.foo;
+		log _Main.bar;
 	}
 }

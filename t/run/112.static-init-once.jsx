@@ -4,12 +4,12 @@
 
 // static vars must be initialized only once
 
-class Test {
+class _Main {
 	static const value = Math.random();
 
-	static function run() : void {
-		var v0 = Test.value;
-		var v1 = Test.value;
+	static function main(args : string[]) : void {
+		var v0 = _Main.value;
+		var v1 = _Main.value;
 		log v0 - v1;
 	}
 }

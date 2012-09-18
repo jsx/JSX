@@ -39,9 +39,9 @@ class List.<T> {
 
 
 
-class Test {
+class _Main {
 
-    final static function run() : void {
+    final static function main(args : string[]) : void {
         var list = new List.<int>();
 		log "ok";
     }

@@ -11,8 +11,8 @@ b
 1
 4
 */
-class Test {
-	static function run() : void {
+class _Main {
+	static function main(args : string[]) : void {
 		var a = [ 3, 1, 4 ];
 		log a[0];
 		log a[1];

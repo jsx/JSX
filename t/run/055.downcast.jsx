@@ -18,8 +18,8 @@ class D2 extends Base implements I {
 		log "D2";
 	}
 }
-class Test {
-	static function run() : void {
+class _Main {
+	static function main(args : string[]) : void {
 		var b : Base = new D1();
 		var d1 = b as D1;
 		log d1 != null;

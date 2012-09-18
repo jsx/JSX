@@ -6,10 +6,10 @@
 
 // the test just checks that the generated code becomes different if optimized
 
-class Test {
+class _Main {
 	function constructor() {
 		log "hello";
 	}
-	static function run() : void {
+	static function main(args : string[]) : void {
 	}
 }

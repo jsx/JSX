@@ -7,8 +7,8 @@ false
 3
 2
 */
-class Test {
-	static function run() : void {
+class _Main {
+	static function main(args : string[]) : void {
 		var p : number = (1.5).valueOf();
 		log p;
 		var o = new Number(2.5);

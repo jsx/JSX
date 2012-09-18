@@ -2,13 +2,13 @@
 1
 */
 
-class Test {
+class _Main {
 	static const n = 0;
-	static function run() : void {
+	static function main(args : string[]) : void {
 		var x = Hoge.<int>.n;
 		log x;
 	}
 }
 class Hoge.<T> {
-	static const n = Test.n + 1;
+	static const n = _Main.n + 1;
 }

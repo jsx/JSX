@@ -11,8 +11,8 @@ class Adder.<T> {
 	}
 }
 
-class Test {
-	static function run() : void {
+class _Main {
+	static function main(args : string[]) : void {
 		var n = Adder.<number>.f(1, 3);
 		log n;
 		var s = Adder.<string>.f("abc", "def");

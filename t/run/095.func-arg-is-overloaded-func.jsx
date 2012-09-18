@@ -3,7 +3,7 @@ number
 string
 */
 
-class Test {
+class _Main {
 	static function f(n : number) : void {
 		log "number";
 	}
@@ -16,8 +16,8 @@ class Test {
 	static function g(f : function ( : string) : void) : void {
 		f("");
 	}
-	static function run() : void {
-		Test.g(Test.f as function ( : number) : void);
-		Test.g(Test.f as function ( : string) : void);
+	static function main(args : string[]) : void {
+		_Main.g(_Main.f as function ( : number) : void);
+		_Main.g(_Main.f as function ( : string) : void);
 	}
 }

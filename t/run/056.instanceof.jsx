@@ -13,17 +13,17 @@ class C {
 }
 interface I {
 }
-class Test extends C implements I {
-	static function run() : void {
+class _Main extends C implements I {
+	static function main(args : string[]) : void {
 		var n : Object = null;
 		log n instanceof C;
 		log n instanceof I;
-		log n instanceof Test;
+		log n instanceof _Main;
 		log new C() instanceof C;
 		log new C() instanceof I;
-		log new C() instanceof Test;
-		log new Test() instanceof C;
-		log new Test() instanceof I;
-		log new Test() instanceof Test;
+		log new C() instanceof _Main;
+		log new _Main() instanceof C;
+		log new _Main() instanceof I;
+		log new _Main() instanceof _Main;
 	}
 }

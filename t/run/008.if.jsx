@@ -20,8 +20,8 @@ Fizz
 19
 Buzz
 */
-class Test {
-	static function run() : void {
+class _Main {
+	static function main(args : string[]) : void {
 		for (var i = 1; i <= 20; ++i)
 			if (i % 15 == 0)
 				log "FizzBuzz";

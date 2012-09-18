@@ -7,15 +7,15 @@ undefined
 number!
 */
 
-class Test {
+class _Main {
 	static function v(value : variant) : variant {
 		return value;
 	}
 
-	static function run() : void {
+	static function main(args : string[]) : void {
 
-		log typeof Test.v("foo");
-		log typeof Test.v(42);
+		log typeof _Main.v("foo");
+		log typeof _Main.v(42);
 
 		var a = [ "foo", 42 ] : Array.<variant>;
 
@@ -24,6 +24,6 @@ class Test {
 		log typeof a[2];
 
 		// operator precedence
-		log typeof Test.v(10) + "!";
+		log typeof _Main.v(10) + "!";
 	}
 }

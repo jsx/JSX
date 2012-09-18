@@ -8,9 +8,9 @@ class Base {
     }
 }
 
-class Test extends Base {
-	static function run() : void {
-		var o = new Test();
+class _Main extends Base {
+	static function main(args : string[]) : void {
+		var o = new _Main();
 		log o.hello();
 	}
 }
