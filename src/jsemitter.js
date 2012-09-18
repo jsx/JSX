@@ -1157,25 +1157,30 @@ var _PropertyExpressionEmitter = exports._PropertyExpressionEmitter = _UnaryExpr
 		var exprType = expr.getType();
 		var identifierToken = this._expr.getIdentifierToken();
 		// replace methods to global function (e.g. Number.isNaN to isNaN)
-		if (expr.getExpr() instanceof ClassExpression
-			&& expr.getExpr().getType().getClassDef() === Type.numberType.getClassDef()) {
-			switch (identifierToken.getValue()) {
-			case "parseInt":
-			case "parseFloat":
-			case "isNaN":
-			case "isFinite":
-				this._emitter._emit('$__jsx_' + identifierToken.getValue(), identifierToken);
-				return;
-			}
-		}
-		else if (expr.getExpr() instanceof ClassExpression
-			&& expr.getExpr().getType().getClassDef() === Type.stringType.getClassDef()) {
-			switch (identifierToken.getValue()) {
-			case "encodeURIComponent":
-			case "decodeURIComponent":
-			case "encodeURI":
-			case "decodeURI":
-				this._emitter._emit('$__jsx_' + identifierToken.getValue(), identifierToken);
+		if (expr.getExpr() instanceof ClassExpression) {
+			var classDef = expr.getExpr().getType().getClassDef();
+			if (classDef === Type.numberType.getClassDef()) {
+				switch (identifierToken.getValue()) {
+				case "parseInt":
+				case "parseFloat":
+				case "isNaN":
+				case "isFinite":
+					this._emitter._emit('$__jsx_' + identifierToken.getValue(), identifierToken);
+					return;
+				}
+			} else if (classDef === Type.stringType.getClassDef()) {
+				switch (identifierToken.getValue()) {
+				case "encodeURIComponent":
+				case "decodeURIComponent":
+				case "encodeURI":
+				case "decodeURI":
+					this._emitter._emit('$__jsx_' + identifierToken.getValue(), identifierToken);
+					return;
+				}
+			} else if (classDef != null
+				&& classDef.className() == "js"
+				&& classDef.getToken().getFilename() === Util.resolvePath(this._emitter.getPlatform().getRoot() + "/lib/js/js.jsx")) {
+				this._emitter._emit("$__jsx_global", identifierToken);
 				return;
 			}
 		}
@@ -1624,7 +1629,7 @@ var _CallExpressionEmitter = exports._CallExpressionEmitter = _OperatorExpressio
 		if (calleeExpr.getIdentifierToken().getValue() != "invoke")
 			return false;
 		var classDef = calleeExpr.getExpr().getType().getClassDef();
-		if (! (classDef.className() == "js" && classDef.getToken().getFilename() == Util.resolvePath(this._emitter._platform.getRoot() + "/lib/js/js.jsx")))
+		if (! (classDef.className() == "js" && classDef.getToken().getFilename() == Util.resolvePath(this._emitter.getPlatform().getRoot() + "/lib/js/js.jsx")))
 			return false;
 		// emit
 		var args = this._expr.getArguments();
@@ -1874,6 +1879,10 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 		this._enableRunTimeTypeCheck = true;
 	},
 
+	getPlatform: function () {
+		return this._platform;
+	},
+
 	getSearchPaths: function () {
 		return [ this._platform.getRoot() + "/lib/js" ];
 	},
@@ -1969,11 +1978,6 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 	_emitStaticInitializationCode: function (classDef) {
 		if ((classDef.flags() & ClassDefinition.IS_NATIVE) != 0)
 			return;
-		// special handling for js.jsx
-		if (classDef.getToken() != null && classDef.getToken().getFilename() == Util.resolvePath(this._platform.getRoot() + "/lib/js/js.jsx")) {
-			this._emit("js.global = (function () { return this; })();\n\n", null);
-			return;
-		}
 		// normal handling
 		var members = classDef.members();
 		// FIXME can we (should we?) automatically resolve dependencies? isn't it impossible?

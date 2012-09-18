@@ -56,6 +56,8 @@ var $__jsx_decodeURI = decodeURI;
 var $__jsx_ObjectToString = Object.prototype.toString;
 var $__jsx_ObjectHasOwnProperty = Object.prototype.hasOwnProperty;
 
+var $__jsx_global = function () { return this; }();
+
 /*
  * profiler object, initialized afterwards
  */
