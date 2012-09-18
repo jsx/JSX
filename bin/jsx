@@ -494,7 +494,7 @@ var JSX = Class.extend({
 		var result = compiler.compile();
 
 		if (completionRequest != null) {
-			console.log(JSON.stringify(completionRequest.getCandidates()));
+			process.stdout.write(JSON.stringify(completionRequest.getCandidates()));
 			return 0;
 		}
 

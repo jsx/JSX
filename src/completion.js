@@ -1,16 +1,16 @@
 /*
  * Copyright (c) 2012 DeNA Co., Ltd.
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to
  * deal in the Software without restriction, including without limitation the
  * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
  * sell copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -18,6 +18,46 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
+ */
+
+/*
+
+class CompleteCandidate {
+	var word : string;
+	var partialWord : string;
+
+	var doc : Nullable.<string>;
+
+	// type of the symobl: "function():void"
+	// available for variables or functions
+	var type : Nullable.<string>;
+
+	var returnType : Nullable.<string>;   // function specific
+	var args       : Nullable.<Symbol[]>; // function specific
+
+	// where the symbol is defined
+	var definedClass       : Nullable.<string>;
+	var definedFilename    : Nullable.<string>;
+	var definedLineNumber  : Nullable.<int>;
+}
+
+example:
+
+{
+	"word" : "stringify",
+	"partialWord" : "ringify",
+
+	"doc" : "serialize a value or object as a JSON string",
+
+	"type" : "function (value : variant) : string",
+
+	"returnType" : "string",
+	"args" : [ { "name" : "value", "type" : "variant" } ],
+
+	"definedClass" : "JSON",
+	"definedFilename" : "lib/built-in/jsx",
+	"definedLineNumber" : 903
+}
  */
 
 var Class = require("./Class");
@@ -56,6 +96,7 @@ var CompletionRequest = exports.CompletionRequest = Class.extend({
 	},
 
 	getCandidates: function () {
+		var seen = {}; // for unique
 		var results = [];
 		// fetch the list
 		this._candidates.forEach(function (candidates) {
@@ -63,24 +104,31 @@ var CompletionRequest = exports.CompletionRequest = Class.extend({
 			candidates.getCandidates(rawCandidates);
 			var prefix = candidates.getPrefix();
 			rawCandidates.forEach(function (s) {
-				if (prefix == "" && s.substring(0, 2) == "__" && s != "__noconvert__") {
+				if (prefix == "" && s.word.substring(0, 2) == "__" && s.word != "__noconvert__" && s.word != "undefined") {
 					// skip hidden keywords
-				} else if (s.substring(0, prefix.length) == prefix) {
-					var left = s.substring(prefix.length);
-					if (left.length != 0) {
-						results.push(left);
+				} else if (s.word.substring(0, prefix.length) == prefix) {
+					var left = s.word.substring(prefix.length);
+					if (left.length == 0) {
+						return;
+					}
+
+					var identity = JSON.stringify([left, s.args]);
+					if (! seen.hasOwnProperty(identity)) {
+						seen[identity] = true;
+
+						if (s.word !== left) {
+							s.partialWord = left;
+						}
+
+						// "kind" is useful for debugging --completion itself,
+						// but unlikely to be used by editors
+						delete s.kind;
+						results.push(s);
 					}
 				}
-			});
-		});
-		// sort, and unique
-		results = results.sort();
-		for (var i = 1; i < results.length;) {
-			if (results[i - 1] == results[i])
-				results.splice(i - 1, 1);
-			else
-				++i;
-		}
+			}.bind(this));
+		}.bind(this));
+
 		return results;
 	}
 
@@ -92,7 +140,7 @@ var CompletionCandidates = exports.CompletionCandidates = Class.extend({
 		this._prefix = null;
 	},
 
-	getCandidates: null, // function (string[]) : void
+	getCandidates: null, // function (CompletionCandidate[]) : void
 
 	getPrefix: function () {
 		return this._prefix;
@@ -103,19 +151,42 @@ var CompletionCandidates = exports.CompletionCandidates = Class.extend({
 		return this;
 	},
 
+	$makeClassCandidate: function (classDef) {
+		var data = {
+			word: classDef.className(),
+
+			definedFilename:   classDef.getToken().getFilename(),
+			definedLineNumber: classDef.getToken().getLineNumber(),
+		};
+		if ((classDef.flags() & ClassDefinition.IS_INTERFACE) != 0) {
+			data.kind = "interface";
+		} else if ((classDef.flags() & ClassDefinition.IS_MIXIN) != 0) {
+			data.kind = "mixin";
+		}
+		else {
+			data.kind = "class";
+		}
+
+		var docComment = classDef.getDocComment();
+		if (docComment) {
+			data.doc = docComment.getDescription();
+		}
+		return data;
+	},
+
 	$_addClasses: function (candidates, parser, autoCompleteMatchCb) {
 		parser.getClassDefs().forEach(function (classDef) {
 			if (classDef instanceof InstantiatedClassDefinition) {
 				// skip
 			} else {
 				if (autoCompleteMatchCb == null || autoCompleteMatchCb(classDef)) {
-					candidates.push(classDef.className());
+					candidates.push(CompletionCandidates.makeClassCandidate(classDef));
 				}
 			}
 		});
 		parser.getTemplateClassDefs().forEach(function (classDef) {
 			if (autoCompleteMatchCb == null || autoCompleteMatchCb(classDef)) {
-				candidates.push(classDef.className());
+				candidates.push(CompletionCandidates.makeClassCandidate(classDef));
 			}
 		});
 	},
@@ -125,7 +196,10 @@ var CompletionCandidates = exports.CompletionCandidates = Class.extend({
 		if (classNames != null) {
 			classNames.forEach(function (className) {
 				// FIXME can we refer to the classdefs of the classnames here?
-				candidates.push(className);
+				candidates.push({
+					word: className,
+					kind: "class",
+				});
 			});
 		} else {
 			imprt.getSources().forEach(function (parser) {
@@ -144,7 +218,10 @@ var KeywordCompletionCandidate = exports.KeywordCompletionCandidate = Completion
 	},
 
 	getCandidates: function (candidates) {
-		candidates.push(this._expected);
+		candidates.push({
+			word: this._expected,
+			kind: 'keyword'
+		});
 	}
 
 });
@@ -163,7 +240,10 @@ var CompletionCandidatesOfTopLevel = exports.CompletionCandidatesOfTopLevel = Co
 			var imprt = this._parser._imports[i];
 			var alias = imprt.getAlias();
 			if (alias != null) {
-				candidates.push(alias);
+				candidates.push({
+					word: alias,
+					kind: 'alias'
+				});
 			} else {
 				CompletionCandidates._addImportedClasses(candidates, imprt, this._autoCompleteMatchCb);
 			}
@@ -185,7 +265,15 @@ var _CompletionCandidatesWithLocal = exports._CompletionCandidatesWithLocal = Co
 
 	getCandidates: function (candidates) {
 		this._locals.forEach(function (local) {
-			candidates.push(local.getName().getValue());
+			candidates.push({
+				word: local.getName().getValue(),
+
+				type: local.toString(),
+				kind: 'variable',
+
+				definedFilename:   local.getName().getFilename(),
+				definedLineNumber: local.getName().getLineNumber()
+			});
 		});
 		CompletionCandidatesOfTopLevel.prototype.getCandidates.call(this, candidates);
 	}
@@ -227,16 +315,52 @@ var _CompletionCandidatesOfProperty = exports._CompletionCandidatesOfProperty = 
 		if (classDef == null)
 			return;
 		var isStatic = this._expr instanceof ClassExpression;
-		classDef.forEachMember(function (member) {
-			if (((member.flags() & ClassDefinition.IS_STATIC) != 0) == isStatic) {
-				if (! isStatic && member.name() == "constructor") {
-					// skip
-				} else {
-					candidates.push(member.name());
+		classDef.forEachClassToBase(function (c) {
+			c.forEachMember(function (member) {
+				if (((member.flags() & ClassDefinition.IS_STATIC) != 0) == isStatic) {
+					if (! isStatic && member.name() == "constructor") {
+						return true;
+					}
+
+					candidates.push(_CompletionCandidatesOfProperty._makeMemberCandidate(member));
 				}
-			}
+				return true;
+			}.bind(this));
 			return true;
-		});
+		}.bind(this));
+	},
+
+	$_makeMemberCandidate: function(member) {
+		var kind = (member.flags() & ClassDefinition.IS_STATIC
+			? "static member"
+			: "member");
+		kind += (member instanceof MemberFunctionDefinition
+			? " function"
+			: " variable");
+		var data = {
+			word: member.name(),
+			type: member.getType().toString(),
+			kind: kind,
+
+			definedClass:      member.getClassDef().className(),
+			definedFilename:   member.getToken().getFilename(),
+			definedLineNumber: member.getToken().getLineNumber()
+		};
+		var docComment = member.getDocComment();
+		if (docComment) {
+			data.doc = docComment.getDescription();
+		}
+
+		if (member instanceof MemberFunctionDefinition) {
+			data.returnType = member.getReturnType().toString();
+			data.args = member.getArguments().map(function (arg) {
+				return {
+					name: arg.getName().getValue(),
+					type: arg.getType().toString()
+				};
+			});
+		}
+		return data;
 	}
 
 });
