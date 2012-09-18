@@ -7,6 +7,8 @@ eval(Class.$import("../src/parser"));
 
 var TT = _TokenTable;
 
+TT.initialize();
+
 "use strict";
 
 function lexerTest(t, rx, good, bad) {

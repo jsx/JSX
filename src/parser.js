@@ -98,7 +98,7 @@ var _Lexer = exports._TokenTable = Class.extend({
 	},
 
 	// static variables
-	$constructor: function () {
+	$initialize: function () {
 		var ident         = " [a-zA-Z_] [a-zA-Z0-9_]* ";
 		var doubleQuoted  = ' "  [^"\\\\]* (?: \\\\. [^"\\\\]* )* " ';
 		var singleQuoted  = " '  [^'\\\\]* (?: \\\\. [^'\\\\]* )* ' ";
@@ -465,6 +465,7 @@ var QualifiedName = exports.QualifiedName = Class.extend({
 var Parser = exports.Parser = Class.extend({
 
 	constructor: function (sourceToken, filename, completionRequest) {
+		_Lexer.initialize();
 		this._sourceToken = sourceToken;
 		this._filename = filename;
 		this._completionRequest = completionRequest;
