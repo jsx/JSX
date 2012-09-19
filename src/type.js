@@ -618,9 +618,9 @@ var ResolvedFunctionType = exports.ResolvedFunctionType = FunctionType.extend({
 		var args = [];
 		for (var i = 0; i < this._argTypes.length; ++i) {
 			if (this._argTypes[i] instanceof VariableLengthArgumentType) {
-				args[i] = "... : " + this._argTypes[i].getBaseType().toString();
+				args[i] = " ... : " + this._argTypes[i].getBaseType().toString();
 			} else {
-				args[i] = ": " + this._argTypes[i].toString();
+				args[i] = " : " + this._argTypes[i].toString();
 			}
 		}
 		return this._toStringPrefix() + "function (" + args.join(", ") + ") : " + this._returnType.toString();
