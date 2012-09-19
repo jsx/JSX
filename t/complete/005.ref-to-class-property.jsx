@@ -55,7 +55,7 @@ class A {
          }
       ],
       "returnType" : "number",
-      "type" : "function ( : number) : number"
+      "type" : "function (: number) : number"
    },
    {
       "word" : "acos",
@@ -67,7 +67,7 @@ class A {
          }
       ],
       "returnType" : "number",
-      "type" : "function ( : number) : number"
+      "type" : "function (: number) : number"
    },
    {
       "word" : "asin",
@@ -79,7 +79,7 @@ class A {
          }
       ],
       "returnType" : "number",
-      "type" : "function ( : number) : number"
+      "type" : "function (: number) : number"
    },
    {
       "word" : "atan",
@@ -91,7 +91,7 @@ class A {
          }
       ],
       "returnType" : "number",
-      "type" : "function ( : number) : number"
+      "type" : "function (: number) : number"
    },
    {
       "word" : "atan2",
@@ -107,7 +107,7 @@ class A {
          }
       ],
       "returnType" : "number",
-      "type" : "function ( : number,  : number) : number"
+      "type" : "function (: number, : number) : number"
    },
    {
       "word" : "ceil",
@@ -119,7 +119,7 @@ class A {
          }
       ],
       "returnType" : "number",
-      "type" : "function ( : number) : number"
+      "type" : "function (: number) : number"
    },
    {
       "word" : "cos",
@@ -131,7 +131,7 @@ class A {
          }
       ],
       "returnType" : "number",
-      "type" : "function ( : number) : number"
+      "type" : "function (: number) : number"
    },
    {
       "word" : "exp",
@@ -143,7 +143,7 @@ class A {
          }
       ],
       "returnType" : "number",
-      "type" : "function ( : number) : number"
+      "type" : "function (: number) : number"
    },
    {
       "word" : "floor",
@@ -155,7 +155,7 @@ class A {
          }
       ],
       "returnType" : "number",
-      "type" : "function ( : number) : number"
+      "type" : "function (: number) : number"
    },
    {
       "word" : "log",
@@ -167,7 +167,7 @@ class A {
          }
       ],
       "returnType" : "number",
-      "type" : "function ( : number) : number"
+      "type" : "function (: number) : number"
    },
    {
       "word" : "max",
@@ -191,7 +191,7 @@ class A {
          }
       ],
       "returnType" : "number",
-      "type" : "function ( : number,  : number,  : number,  ... : number) : number"
+      "type" : "function (: number, : number, : number, ... : number) : number"
    },
    {
       "word" : "max",
@@ -203,7 +203,7 @@ class A {
          }
       ],
       "returnType" : "number",
-      "type" : "function ( : number) : number"
+      "type" : "function (: number) : number"
    },
    {
       "word" : "min",
@@ -227,7 +227,7 @@ class A {
          }
       ],
       "returnType" : "number",
-      "type" : "function ( : number,  : number,  : number,  ... : number) : number"
+      "type" : "function (: number, : number, : number, ... : number) : number"
    },
    {
       "word" : "min",
@@ -239,7 +239,7 @@ class A {
          }
       ],
       "returnType" : "number",
-      "type" : "function ( : number) : number"
+      "type" : "function (: number) : number"
    },
    {
       "word" : "pow",
@@ -255,7 +255,7 @@ class A {
          }
       ],
       "returnType" : "number",
-      "type" : "function ( : number,  : number) : number"
+      "type" : "function (: number, : number) : number"
    },
    {
       "word" : "random",
@@ -274,7 +274,7 @@ class A {
          }
       ],
       "returnType" : "number",
-      "type" : "function ( : number) : number"
+      "type" : "function (: number) : number"
    },
    {
       "word" : "sin",
@@ -286,7 +286,7 @@ class A {
          }
       ],
       "returnType" : "number",
-      "type" : "function ( : number) : number"
+      "type" : "function (: number) : number"
    },
    {
       "word" : "sqrt",
@@ -298,7 +298,7 @@ class A {
          }
       ],
       "returnType" : "number",
-      "type" : "function ( : number) : number"
+      "type" : "function (: number) : number"
    },
    {
       "word" : "tan",
@@ -310,7 +310,7 @@ class A {
          }
       ],
       "returnType" : "number",
-      "type" : "function ( : number) : number"
+      "type" : "function (: number) : number"
    },
    {
       "word" : "max",
@@ -326,7 +326,7 @@ class A {
          }
       ],
       "returnType" : "number",
-      "type" : "function ( : number,  : number) : number"
+      "type" : "function (: number, : number) : number"
    },
    {
       "word" : "min",
@@ -342,7 +342,7 @@ class A {
          }
       ],
       "returnType" : "number",
-      "type" : "function ( : number,  : number) : number"
+      "type" : "function (: number, : number) : number"
    }
 ]
 */

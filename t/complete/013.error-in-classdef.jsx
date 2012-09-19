@@ -14,7 +14,7 @@ class C extends String /* this is the error */ {
          }
       ],
       "returnType" : "string",
-      "type" : "String.function ( : number) : string"
+      "type" : "String.function (: number) : string"
    },
    {
       "word" : "charCodeAt",
@@ -27,7 +27,7 @@ class C extends String /* this is the error */ {
          }
       ],
       "returnType" : "number",
-      "type" : "String.function ( : number) : number"
+      "type" : "String.function (: number) : number"
    },
    {
       "word" : "concat",
@@ -40,7 +40,7 @@ class C extends String /* this is the error */ {
          }
       ],
       "returnType" : "string",
-      "type" : "String.function ( ... : string) : string"
+      "type" : "String.function (... : string) : string"
    }
 ]
 */
