@@ -869,6 +869,10 @@ var MemberVariableDefinition = exports.MemberVariableDefinition = MemberDefiniti
 					if (! this._initialValue.analyze(this._analysisContext))
 						return;
 					var ivType = this._initialValue.getType();
+					if (ivType.getClassDef() == null) {
+						this._analysisContext.errors.push(new CompileError(this._initialValue.getToken(), "cannot assign null to an unresolved type"));
+						return;
+					}
 					if (this._type == null) {
 						if (ivType.equals(Type.Type.nullType)) {
 							this._analysisContext.errors.push(new CompileError(this._initialValue.getToken(), "cannot assign null to an unknown type"));
