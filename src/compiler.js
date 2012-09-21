@@ -169,8 +169,12 @@ var Compiler = exports.Compiler = Class.extend({
 	parseFile: function (errors, parser) {
 		// read file
 		var content = this.getFileContent(errors, parser.getSourceToken(), parser.getPath());
-		if (content == null)
+		if (content == null) {
+			// call parse() to initialize parser's state
+			// because some compilation mode continues to run after errors.
+			parser.parse("", []);
 			return false;
+		}
 		// parse
 		parser.parse(content, errors);
 		// register imported files

@@ -37,8 +37,6 @@ sub not_crash {
 }
 
 not_crash "no such file";
-{
-    local $TODO = "todo";
-    not_crash "--complete", "1:1", "no such file";
-}
+not_crash "--complete", "1:1", "no such file";
+
 done_testing;
