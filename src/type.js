@@ -359,8 +359,12 @@ var ObjectType = exports.ObjectType = Type.extend({
 		if (type instanceof VariantType)
 			return true;
 		// conversions from Number / String to number / string is handled in each operator (since the behavior differ bet. the operators)
-		if (! (type instanceof ObjectType))
+		if (! (type instanceof ObjectType)) {
 			return false;
+		}
+		if (this._classDef == null) { // occurs with completion mode
+			return false;
+		}
 		return this._classDef.isConvertibleTo(type._classDef);
 	},
 
