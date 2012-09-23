@@ -828,8 +828,9 @@ var Parser = exports.Parser = Class.extend({
 				case "param":
 					var nameMatch = this._getInput(this._columnOffset).match(/[0-9A-Za-z_]+/);
 					if (nameMatch != null) {
+					     var token = new Token(nameMatch[0], false, this._filename, this._lineNumber, this._getColumn());
 						this._forwardPos(nameMatch[0].length);
-						node = new DocCommentParameter(nameMatch[0]);
+						node = new DocCommentParameter(token);
 						docComment.getParams().push(node);
 					} else {
 						this._newError("name of the parameter not found after @param");

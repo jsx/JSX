@@ -1,5 +1,9 @@
 Revision history for the JSX software development kit
 
+NEXT
+    [FEATURE]
+    - Invalid @param in jsxdoc produces compile errors
+
 0.0.2 2012-09-23
     [ANNOUNCE]
     - Added Changes file

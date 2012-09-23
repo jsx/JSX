@@ -49,13 +49,17 @@ var DocCommentNode = exports.DocCommentNode = Class.extend({
 
 var DocCommentParameter = exports.DocCommentParameter = DocCommentNode.extend({
 
-	constructor: function (paramName) {
+	constructor: function (token) {
 		DocCommentNode.prototype.constructor.call(this);
-		this._paramName = paramName;
+		this._token = token;
+	},
+
+	getToken: function () {
+		return this._token;
 	},
 
 	getParamName: function () {
-		return this._paramName;
+		return this._token.getValue();
 	}
 
 });

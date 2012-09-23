@@ -1052,6 +1052,21 @@ var MemberFunctionDefinition = exports.MemberFunctionDefinition = MemberDefiniti
 	},
 
 	analyze: function (outerContext) {
+		// validate jsxdoc comments
+		var docComment = this.getDocComment();
+		if (docComment) {
+			var args = this.getArguments();
+			docComment.getParams().forEach(function (docParam, i) {
+				for(; i < args.length; ++i) {
+					if (args[i].getName().getValue() == docParam.getParamName()) {
+						return;
+					}
+				}
+				// invalid @param tag which is not present in the declaration.
+				outerContext.errors.push(new CompileError(docParam.getToken(), 'invalid parameter name "' + docParam.getParamName() + '" for ' + this.name() + "()"));
+			}.bind(this));
+		}
+
 		// return if is abtract (wo. function body) or is native
 		if (this._statements == null)
 			return;

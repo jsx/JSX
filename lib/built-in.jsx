@@ -252,7 +252,7 @@ native final class Array.<T> {
 	 * Creates a new array with all elements that pass the test implemented
 	 * the provided function.
 	 *
-	 * @param callback A function to test each elements of the array.
+	 * @param callbackfn A function to test each elements of the array.
 	 */
 	function filter(callbackfn : function(value : Nullable.<T>) : boolean) : Array.<T>;
 	function filter(callbackfn : function(value : Nullable.<T>, index : number) : boolean) : Array.<T>;
@@ -618,7 +618,7 @@ native final class Number {
 	/**
 	 * Returns a string representing the specified Number object.
 	 *
-	 * @param An integer between 2 and 36 specifying the base to use for representing numeric values.
+	 * @param radix An integer between 2 and 36 specifying the base to use for representing numeric values.
 	 */
 	function toString(radix : number) : string;
 
