@@ -616,7 +616,7 @@ native final class Number {
 	override function toString() : string;
 
 	/**
-	 * Returns a string representing the specified Number object.
+	 * Returns a string representing the number.
 	 *
 	 * @param radix An integer between 2 and 36 specifying the base to use for representing numeric values.
 	 */
