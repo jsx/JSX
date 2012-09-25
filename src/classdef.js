@@ -849,7 +849,8 @@ var MemberVariableDefinition = exports.MemberVariableDefinition = MemberDefiniti
 
 	serialize: function () {
 		return {
-			"name"         : this.name(),
+			"token"      : this._token.serialize(),
+			"nameToken"  : Util.serializeNullable(this._nameToken),
 			"flags"        : this.flags(),
 			"type"         : Util.serializeNullable(this._type),
 			"initialValue" : Util.serializeNullable(this._initialValue)
