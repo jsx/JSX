@@ -1166,7 +1166,9 @@ var TryStatement = exports.TryStatement = Statement.extend({
 		} finally {
 			context.blockStack.pop();
 		}
-		context.getTopBlock().localVariableStatuses = context.getTopBlock().localVariableStatuses.merge(lvStatusesAfterTry);
+		context.getTopBlock().localVariableStatuses = lvStatusesAfterTry != null
+			? context.getTopBlock().localVariableStatuses.merge(lvStatusesAfterTry)
+			: context.getTopBlock().localVariableStatuses.clone();
 		// catch
 		for (var i = 0; i < this._catchStatements.length; ++i) {
 			if (! this._catchStatements[i].analyze(context))
