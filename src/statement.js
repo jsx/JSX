@@ -1173,6 +1173,16 @@ var TryStatement = exports.TryStatement = Statement.extend({
 		for (var i = 0; i < this._catchStatements.length; ++i) {
 			if (! this._catchStatements[i].analyze(context))
 				return false;
+			var curCatchType = this._catchStatements[i].getLocal().getType();
+			for (var j = 0; j < i; ++j) {
+				var precCatchType = this._catchStatements[j].getLocal().getType();
+				if (curCatchType.isConvertibleTo(precCatchType)) {
+					context.errors.push(new CompileError(
+						this._catchStatements[i]._token,
+						"code is unreachable, a broader catch statement for type '" + precCatchType.toString() + "' already exists"));
+					return false;
+				}
+			}
 		}
 		// finally
 		for (var i = 0; i < this._finallyStatements.length; ++i)
@@ -1250,17 +1260,7 @@ var CatchStatement = exports.CatchStatement = Statement.extend({
 	doAnalyze: function (context) {
 		// check the catch type
 		var catchType = this.getLocal().getType();
-		if (catchType instanceof ObjectType || catchType.equals(Type.variantType)) {
-			for (var j = 0; j < i; ++j) {
-				var prevCatchType = this._catchStatements[j].getLocal().getType();
-				if (catchType.isConvertibleTo(prevCatchType)) {
-					context.errors.push(new CompileError(
-						this._token,
-						"code is unreachable, a broader catch statement for type '" + prevCatchType.toString() + "' already exists"));
-					break;
-				}
-			}
-		} else {
+		if (! (catchType instanceof ObjectType || catchType.equals(Type.variantType))) {
 			context.errors.push(new CompileError(this._token, "only objects or a variant may be caught"));
 		}
 		// analyze the statements
