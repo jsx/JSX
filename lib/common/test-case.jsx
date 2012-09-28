@@ -299,6 +299,9 @@ class AsyncContext {
 	}
 }
 
+/**
+ * Test Assertion Executor
+ */
 class _Matcher {
 
 	var _test : TestCase;
@@ -314,15 +317,6 @@ class _Matcher {
 		this._test = test;
 		this._got  = got;
 		this._name = name;
-	}
-
-	function _match(value : boolean, got : variant, expected : variant, op : string) : void {
-		if(value) {
-			this._test._ok(this._name);
-		}
-		else {
-			this._test._nok(this._name, op, got, expected);
-		}
 	}
 
 	function toBe(x :  variant) : void {
@@ -349,5 +343,24 @@ class _Matcher {
 		this._match(this._got as number >= x,
 			this._got, x, ">=");
 	}
+
+	function toMatch(x : RegExp) : void {
+		this._match(x.test(this._got as string),
+				this._got, x, "match");
+	}
+	function notToMatch(x : RegExp) : void {
+		this._match(! x.test(this._got as string),
+				this._got, x, "not match");
+	}
+
+	function _match(value : boolean, got : variant, expected : variant, op : string) : void {
+		if(value) {
+			this._test._ok(this._name);
+		}
+		else {
+			this._test._nok(this._name, op, got, expected);
+		}
+	}
+
 }
 
