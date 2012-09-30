@@ -119,7 +119,7 @@ var NodePlatform = Platform.extend({
 
 			var args =
 				( executableFor === "node"     ? "process.argv.slice(2)"
-				: executableFor === "commonjs" ? "require('system').args"
+				: executableFor === "commonjs" ? "require('system').args.slice(1)"
 				: "[]" );
 			switch(entryPoint) {
 			case "_Main":
