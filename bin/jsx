@@ -117,7 +117,10 @@ var NodePlatform = Platform.extend({
 		if(emitter instanceof JavaScriptEmitter) {
 			targetCode += this.load(this.getRoot() + "/src/js/launcher.js");
 
-			var args = (executableFor === "node" ? "process.argv.slice(2)" : "[]");
+			var args =
+				( executableFor === "node"     ? "process.argv.slice(2)"
+				: executableFor === "commonjs" ? "require('system').args"
+				: "[]" );
 			switch(entryPoint) {
 			case "_Main":
 				launcher = "runMain";
@@ -197,7 +200,8 @@ var JSX = Class.extend({
 			"\n" +
 			"Options:\n" +
 			"  --add-search-path path     add a path to library search paths\n" +
-			"  --executable (node|web)    add launcher to call _Main.main(:string[]):void\n" +
+			"  --executable RUNENV        add launcher to call _Main.main(:string[]):void\n" +
+			"                             supported RUNENV are node, commonjs and web\n" +
 			"  --run                      runs _Main.main(:string[]):void after compiling\n" +
 			"  --test                     runs _Test#test*():void after compiling\n" +
 			"  --output file              output file (default:stdout)\n" +
@@ -366,13 +370,15 @@ var JSX = Class.extend({
 					return 1;
 				}
 				switch (optarg) {
-				case "web": // JavaScriptEmitter
+				case "web": // implies JavaScriptEmitter
 					break;
 				case "node": // implies JavaScriptEmitter
 					tasks.push(function () {
 						var shebang =  "#!" + process.execPath + "\n";
 						emitter.addHeader(shebang);
 					});
+					break;
+				case "commonjs": // implies JavaScriptEmitter
 					break;
 				default:
 					console.error("unknown executable type (node|web)");
@@ -383,12 +389,12 @@ var JSX = Class.extend({
 				break;
 			case "--run":
 				run = "_Main";
-				executable = "node";
+				executable = executable || "node";
 				runImmediately = true;
 				break;
 			case "--test":
 				run = "_Test";
-				executable = "node";
+				executable = executable || "node";
 				runImmediately = true;
 				break;
 			case "--profile":
