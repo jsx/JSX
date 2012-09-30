@@ -32,17 +32,22 @@ JSX.runTests = function (sourceFile, tests) {
 		}
 	}
 
-	var test = new testClass();
+	var testCase = new testClass();
 
-	if (test.beforeClass$AS != null)
-		test.beforeClass$AS(tests);
+	if (testCase.beforeClass$AS != null)
+		testCase.beforeClass$AS(tests);
 
 	for (var i = 0; i < tests.length; ++i) {
-		(function (m) {
-			test.run$SF$V$(m, function() { test[m](); });
+		(function (method) {
+			if (method in testCase) {
+				testCase.run$SF$V$(method, function() { testCase[method](); });
+			}
+			else {
+				throw new ReferenceError("No such test method: " + method);
+			}
 		}(tests[i]));
 	}
 
-	if (test.afterClass$ != null)
-		test.afterClass$();
+	if (testCase.afterClass$ != null)
+		testCase.afterClass$();
 };
