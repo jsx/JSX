@@ -82,27 +82,18 @@ class TestCase {
 	var _currentName : Nullable.<string>;
 	var _tasks = [] : Array.<function():void>; // async tasks
 
+	/* overridable methods */
+
+	function setUp() : void { }
+	function tearDown() : void { }
+
 	/* hooks called by src/js/runtests.js */
 
 	function beforeClass(tests : string[]) : void {
 		this._tests = tests;
 		this._say("1.." + this._tests.length as string);
-	}
 
-	function run(name : string, testFunction : function():void) : void {
-		name = name.replace(/[$].*$/, "");
-		// FIXME: catch exception
-
-		var numAsyncTasks = this._tasks.length;
-		this._currentName = name;
-
-		testFunction();
-
-		if(numAsyncTasks == this._tasks.length) { // synchronous
-			this.after(name);
-		}
-		else { // asynchronous
-		}
+		this.setUp();
 	}
 
 	function afterClass() : void {
@@ -112,6 +103,28 @@ class TestCase {
 		else { // asynchronous
 			var next = this._tasks.shift() as function():void;
 			next();
+		}
+	}
+
+
+	function run(name : string, testFunction : function():void) : void {
+		name = name.replace(/[$].*$/, "");
+		// FIXME: catch exception
+
+		var numAsyncTasks = this._tasks.length;
+		this._currentName = name;
+
+		try {
+			testFunction();
+		}
+		catch (e : Error) {
+			this.fail(name + " failed with exception: " + e.toString());
+		}
+
+		if(numAsyncTasks == this._tasks.length) { // synchronous
+			this.after(name);
+		}
+		else { // asynchronous
 		}
 	}
 
@@ -140,6 +153,7 @@ class TestCase {
 				+ " of "
 				+ this._totalCount as string);
 		}
+		this.tearDown();
 	}
 
 	/* async test stuff */
