@@ -400,13 +400,13 @@ var StringLiteralExpression = exports.StringLiteralExpression = LeafExpression.e
 
 var RegExpLiteralExpression = exports.RegExpLiteralExpression = LeafExpression.extend({
 
-	constructor: function (token) {
+	constructor: function (token, type) {
 		LeafExpression.prototype.constructor.call(this, token);
-		this._type = null;
+		this._type = type; // nullable
 	},
 
 	clone: function () {
-		return new RegExpLiteralExpression(this._token);
+		return new RegExpLiteralExpression(this._token, this._type);
 	},
 
 	serialize: function () {
