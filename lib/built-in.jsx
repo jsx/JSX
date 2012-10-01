@@ -125,7 +125,7 @@ native final class Array.<T> {
 	 *
 	 * @param itemN The elements to add to the end of the array.
 	 */
-	function push(...itemN : T) : int;
+	function push(...itemN : Nullable.<T>) : int;
 
 	/**
 	 * Reverses an array in place.  The first array element becomes the last and the last becomes the first.
@@ -188,7 +188,7 @@ native final class Array.<T> {
 	 * @param itemN The elements to add to the front of the array.
 	 * @return The new <code>length</code> property of the object upon which the method was called.
 	 */
-	function unshift(...itemN : T) : int;
+	function unshift(...itemN : Nullable.<T>) : int;
 
 	// 15.4.4 (ES5)
 	/**
