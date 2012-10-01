@@ -1331,6 +1331,7 @@ var ThrowStatement = exports.ThrowStatement = Statement.extend({
 			context.errors.push(new CompileError(this._token, "cannot throw 'void'"));
 			return true;
 		}
+		context.getTopBlock().localVariableStatuses = null;
 		return true;
 	},
 
