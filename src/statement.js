@@ -756,8 +756,8 @@ var ForStatement = exports.ForStatement = ContinuableStatement.extend({
 				if (! Statement.assertIsReachable(context, this._postExpr.getToken()))
 					return false;
 				this._analyzeExpr(context, this._postExpr);
-				this.registerVariableStatusesOnBreak(context.getTopBlock().localVariableStatuses);
 			}
+			this.registerVariableStatusesOnBreak(context.getTopBlock().localVariableStatuses);
 			this._finalizeBlockAnalysis(context);
 		} catch (e) {
 			this._abortBlockAnalysis(context);
