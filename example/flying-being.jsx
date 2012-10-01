@@ -1,7 +1,7 @@
 // an example for class inheritance and interfaces
 
 interface Flyable {
-    abstract function fly() : void;
+    function fly() : void;
 }
 
 abstract class Animal {
@@ -26,20 +26,25 @@ class Bee extends Insect implements Flyable {
 }
 
 class _Main {
+    static function takeAnimal(animal : Animal) : void {
+        animal.eat();
+    }
+
+    static function takeFlyable(flyingBeing : Flyable) : void {
+        flyingBeing.fly();
+    }
+
     static function main(args : string[]) : void {
-        // fo bar
         var bat = new Bat();
 
-        var animal : Animal = bat; // OK. A bat is an animal.
-        animal.eat();
+        _Main.takeAnimal(bat);  // OK. A bat is an animal.
 
-        var flyable : Flyable = bat; // OK. A bat can fly
-        flyable.fly();
+        _Main.takeFlyable(bat); // OK. A bat can fly.
 
-        // for Bee
         var bee = new Bee();
 
-        flyable = bee; // A bee is also flyable
-        flyable.fly();
+        _Main.takeFlyable(bee); // OK. A bee is also flyable.
     }
 }
+
+// vim: set expandtab:
