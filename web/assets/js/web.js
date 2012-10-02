@@ -125,7 +125,7 @@ window.addEventListener('load', function(e) {
 			}
 
 			var out = emitter.getOutput().replace(/\t/g, "  ");
-			out += "JSX.require('"+path+"').Test.run$();\n";
+			out += "JSX.require('"+path+"')._Main.main$AS([]);\n";
 
 			var level = getOptimizationLevel();
 			if(level > 0 && options.mode !== 'parse') {
