@@ -3310,19 +3310,20 @@ class _Test extends TestCase {
         var v9 : number/*unsigned short*/ = o.CLOSED;
         var v10 : number/*unsigned short*/ = o.readyState;
         var v11 : number/*unsigned long*/ = o.bufferedAmount;
-        var v12 : Nullable.<function(:Event):void>/*Function?*/ = o.onopen;
-        var v13 : Nullable.<function(:Event):void>/*Function?*/ = o.onerror;
-        var v14 : Nullable.<function(:Event):void>/*Function?*/ = o.onclose;
+        var v12 : function(:Event):void/*EventHandler*/ = o.onopen;
+        var v13 : function(:Event):void/*EventHandler*/ = o.onerror;
+        var v14 : function(:Event):void/*EventHandler*/ = o.onclose;
         var v15 : string/*DOMString*/ = o.extensions;
         var v16 : string/*DOMString*/ = o.protocol;
         o.close();
         o.close(X.getnumber());
         o.close(X.getnumber(), X.getstring());
-        var v17 : Nullable.<function(:Event):void>/*Function?*/ = o.onmessage;
+        var v17 : function(:Event):void/*EventHandler*/ = o.onmessage;
         var v18 : string/*DOMString*/ = o.binaryType;
         o.send(X.getstring());
-        o.send(X.getArrayBuffer());
         o.send(X.getBlob());
+        o.send(X.getArrayBuffer());
+        o.send(X.getArrayBufferView());
     } // WebSocket
 
     function compile_CloseEvent(o : CloseEvent) : void {
