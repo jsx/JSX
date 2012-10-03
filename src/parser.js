@@ -671,10 +671,21 @@ var Parser = exports.Parser = Class.extend({
 	},
 
 	_registerLocal: function (identifierToken, type) {
-		for (var i = 0; i < this._locals.length; i++) {
-			if (this._locals[i].getName().getValue() == identifierToken.getValue()) {
-				if (type != null && ! this._locals[i].getType().equals(type))
+		var isEqualTo = function (local) {
+			if (local.getName().getValue() == identifierToken.getValue()) {
+				if (type != null && ! local.getType().equals(type))
 					this._newError("conflicting types for variable " + identifierToken.getValue());
+				return true;
+			}
+			return false;
+		}.bind(this);
+		for (var i = 0; i < this._arguments.length; ++i) {
+			if (isEqualTo(this._arguments[i])) {
+				return this._arguments[i];
+			}
+		}
+		for (var i = 0; i < this._locals.length; i++) {
+			if (isEqualTo(this._locals[i])) {
 				return this._locals[i];
 			}
 		}
