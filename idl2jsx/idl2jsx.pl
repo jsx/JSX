@@ -371,9 +371,9 @@ foreach my $src(@files) {
         # FIXME: Complex regular subexpression recursion limit (32766) exceeded
 
         while($members =~ m{
-                (?<comments> $rx_comments)
-                |
                 (?<spaces> \s+)
+                |
+                (?<comments> $rx_comments)
                 |
                 (?<member> [^;]+;
                     (?: \s+ | (?<member_comment> $rx_comments* ) \n)
