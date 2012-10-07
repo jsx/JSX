@@ -59,14 +59,15 @@ class _Main {
 			var m = JSX.getProfileResults();
 
 			var exclusive = m["_Main.main(:Array.<string>)"]["_Main.g(:boolean)"]["_Main.spendTime()"]["$exclusive"] as number;
-			log 10 <= exclusive && exclusive <= 11;
+
+			log (10 <= exclusive && exclusive <= 15);
 			var inclusive = m["_Main.main(:Array.<string>)"]["_Main.g(:boolean)"]["_Main.spendTime()"]["$inclusive"] as number;
-			log 10 <= inclusive && inclusive <= 11;
+			log 10 <= inclusive && inclusive <= 15;
 			log m["_Main.main(:Array.<string>)"]["_Main.g(:boolean)"]["_Main.spendTime()"]["$count"];
 			exclusive = m["_Main.main(:Array.<string>)"]["_Main.g(:boolean)"]["$exclusive"] as number;
-			log 10 <= exclusive && exclusive <= 11;
+			log 10 <= exclusive && exclusive <= 15;
 			inclusive = m["_Main.main(:Array.<string>)"]["_Main.g(:boolean)"]["$inclusive"] as number;
-			log 20 <= inclusive && inclusive <= 21;
+			log 20 <= inclusive && inclusive <= 25;
 			log m["_Main.main(:Array.<string>)"]["_Main.g(:boolean)"]["$count"];
 			log m["_Main.main(:Array.<string>)"]["$count"]; // should be zero, since it has not exitted
 		}
