@@ -70,7 +70,7 @@ import "console.jsx";
  */
 class TestCase {
 	// TODO turn off when the process has no tty
-	static var verbose = true;
+	var verbose = true;
 
 	var _totalCount = 0;
 	var _totalPass  = 0;
@@ -182,6 +182,7 @@ class TestCase {
 
 	/* matcher factory */
 
+	// want to delcare expect.<T>(value : T) : _Matcher.<T>
 	/**
 	 * <p>Creates a test matcher for a value.</p>
 	 * <p>Usage: <code>this.expect(testingValue).tobe(expectedValue)</code></p>
@@ -249,6 +250,39 @@ class TestCase {
 		console.info(message);
 	}
 
+	function difflet(a : Array.<variant>, b : Array.<variant>) : string {
+		assert a != null;
+		assert b != null;
+
+		var s = "[\n";
+
+		for (var i = 0, l = Math.max(a.length, b.length); i < l; ++i) {
+			var ai = a[i];
+			var bi = b[i];
+
+			var aIsOver = (i   >= a.length);
+			var aIsLast = (i+1 >= a.length);
+
+			if (! aIsOver) {
+				s += "  " + JSON.stringify(ai);
+				if (! aIsLast) {
+					s += ",";
+				}
+
+				if (ai != bi) {
+					// put pretty diff
+					s += " // != " + JSON.stringify(bi);
+				}
+			}
+			else {
+				s += "  // != " + JSON.stringify(bi);
+			}
+			s += "\n";
+		}
+
+		return s + "]";
+	}
+
 	/**
 	 * Shows diagnostic messages.
 	 */
@@ -260,7 +294,7 @@ class TestCase {
 	 * Shows notes.
 	 */
 	function note(message : string) : void {
-		if(TestCase.verbose) {
+		if(this.verbose) {
 			this._say(message.replace(/^/mg, "# "));
 		}
 	}
@@ -365,6 +399,41 @@ class _Matcher {
 	function notToMatch(x : RegExp) : void {
 		this._match(! x.test(this._got as string),
 				this._got, x, "not match");
+	}
+
+	/**
+	 * Tests whether the given array equals to the expected.
+	 */
+	function toEqual(x : Array.<variant>) : void {
+		assert x != null;
+
+		var got = this._got as Array.<variant>;
+		if (got == null) {
+			this._test._nok(this._name, "equals", this._got, x);
+			return;
+		}
+
+		// TODO: do not use JSON.stringif(), compare two objects deeply instead
+		if (JSON.stringify(got) != JSON.stringify(x)) {
+			this._test._nok(this._name, "equals", got, x);
+			this._test.note(this._test.difflet(got, x));
+		}
+		else {
+			this._test._ok(this._name);
+		}
+	}
+
+	function toEqual(x : Array.<string>) : void {
+		this.toEqual(x as __noconvert__ Array.<variant>);
+	}
+	function toEqual(x : Array.<number>) : void {
+		this.toEqual(x as __noconvert__ Array.<variant>);
+	}
+	function toEqual(x : Array.<int>) : void {
+		this.toEqual(x as __noconvert__ Array.<variant>);
+	}
+	function toEqual(x : Array.<boolean>) : void {
+		this.toEqual(x as __noconvert__ Array.<variant>);
 	}
 
 	function _match(value : boolean, got : variant, expected : variant, op : string) : void {
