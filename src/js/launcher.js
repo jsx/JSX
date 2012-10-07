@@ -31,6 +31,11 @@ JSX.runTests = function (sourceFile, tests) {
 			}
 		}
 	}
+	else { // set as process arguments
+		tests = tests.map(function (name) {
+			return name + "$"; // mangle for function test*():void
+		});
+	}
 
 	var testCase = new testClass();
 
