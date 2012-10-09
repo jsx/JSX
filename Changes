@@ -3,6 +3,7 @@ Revision history for the JSX software development kit
 NEXT
     [FEATURE]
     - Invalid @param in jsxdoc produces compile errors
+    - Added _Matcher.toEqual() in test-case.jsx to compare objects deeply
 
 0.0.2 2012-09-23
     [ANNOUNCE]
