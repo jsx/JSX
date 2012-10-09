@@ -250,6 +250,82 @@ class TestCase {
 		console.info(message);
 	}
 
+	function equals(a : variant, b : variant) : boolean {
+		return this._equals(a, b, 0);
+	}
+
+	function _equals(a : variant, b : variant, recursion : int) : boolean {
+		if (++recursion > 1000) {
+			throw new RangeError("Deep recursion in equals()");
+		}
+		if (a == b || (a == null && b == null)) {
+			return true;
+		}
+
+		// both are Array.<T>
+		var aryA = a as Array.<variant>;
+		var aryB = b as Array.<variant>;
+		if (aryA) {
+			if (! aryB) {
+				return false;
+			}
+			if (aryA.length != aryB.length) {
+				return false;
+			}
+			for (var i = 0; i < aryA.length; ++i) {
+				if (! this._equals(aryA[i], aryB[i], recursion)) {
+					return false;
+				}
+			}
+			return true;
+		}
+
+		// both are Map.<T>
+		var mapA = a as Map.<variant>;
+		var mapB = b as Map.<variant>;
+		if (mapA) {
+			if (! mapB) {
+				return false;
+			}
+
+			var mapAkeys = this.sortedKeys(mapA);
+			var mapBkeys = this.sortedKeys(mapB);
+
+			if (mapAkeys.length != mapBkeys.length) {
+				return false;
+			}
+
+			for (var i = 0; i < mapAkeys.length; ++i) {
+				var key = mapAkeys[i];
+				if (key != mapBkeys[i]) {
+					return false;
+				}
+				if (! this._equals(mapA[key], mapB[key], recursion)) {
+					return false;
+				}
+			}
+			return true;
+		}
+
+		// both are Date
+		var dateA = a as Date;
+		var dateB = b as Date;
+		if (dateA && dateB) {
+			return dateA.getTime() == dateB.getTime();
+		}
+
+		// XXX: consider serialize():variant
+		return false;
+	}
+
+	function sortedKeys(map : Map.<variant>) : Array.<string> {
+		var keys = new Array.<string>;
+		for (var key in map) {
+			keys.push(key);
+		}
+		return keys.sort();
+	}
+
 	function difflet(a : Array.<variant>, b : Array.<variant>) : string {
 		assert a != null;
 		assert b != null;
@@ -413,13 +489,12 @@ class _Matcher {
 			return;
 		}
 
-		// TODO: do not use JSON.stringif(), compare two objects deeply instead
-		if (JSON.stringify(got) != JSON.stringify(x)) {
-			this._test._nok(this._name, "equals", got, x);
-			this._test.note(this._test.difflet(got, x));
+		if (this._test.equals(got, x)) {
+			this._test._ok(this._name);
 		}
 		else {
-			this._test._ok(this._name);
+			this._test._nok(this._name, "equals", got, x);
+			this._test.note(this._test.difflet(got, x));
 		}
 	}
 
