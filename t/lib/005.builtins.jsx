@@ -6,18 +6,17 @@ class _Test extends TestCase {
 
 	function testArrayES3() : void {
 		var a = [1, 3, 2];
-		var d : function(:variant) : string = JSON.stringify;
 
-		this.expect(d(a.concat([4])), "join").toBe(d([1, 3, 2, 4]));
-		this.expect(d(a.concat([] : number[]).reverse()), "reverse").toBe(d([2, 3, 1]));
-		this.expect(d(a.slice(1)), "slice").toBe(d([3, 2]));
-		this.expect(d(a.slice(1, 2)), "slice").toBe(d([3]));
-		this.expect(d(a.splice(1, 1)), "splice").toBe(d([3]));
-		this.expect(d(a), "splice").toBe(d([1, 2]));
+		this.expect(a.concat([4]), "join").toEqual([1, 3, 2, 4]);
+		this.expect(a.concat([] : number[]).reverse(), "reverse").toEqual([2, 3, 1]);
+		this.expect(a.slice(1), "slice").toEqual([3, 2]);
+		this.expect(a.slice(1, 2), "slice").toEqual([3]);
+		this.expect(a.splice(1, 1), "splice").toEqual([3]);
+		this.expect(a, "splice").toEqual([1, 2]);
 
         a = [1, 2, 3];
         a.splice(1, 1, 4);
-        this.expect(JSON.stringify(a), "splice with an item").toBe(JSON.stringify([1, 4, 3]));
+        this.expect(a, "splice with an item").toEqual([1, 4, 3]);
 	}
 
 	function testArrayES5() : void {
@@ -59,12 +58,12 @@ class _Test extends TestCase {
 		var b = a.map.<number>(function(v : Nullable.<number>) : Nullable.<number> {
 			return -v;
 		});
-		this.expect(JSON.stringify(b), "map").toBe(JSON.stringify([-1, -2, -3, -2, -1]));
+		this.expect(b, "map").toEqual([-1, -2, -3, -2, -1]);
 
 		b = a.filter(function(v : Nullable.<number>) : boolean {
 			return v > 1;
 		});
-		this.expect(JSON.stringify(b), "map").toBe(JSON.stringify([ 2, 3, 2 ]));
+		this.expect(b, "filter").toEqual([ 2, 3, 2 ]);
 
 		var sum = a.reduce(function(p : Nullable.<number>, c : Nullable.<number>) : Nullable.<number> {
 			return p + c;
