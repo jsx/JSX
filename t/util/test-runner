@@ -174,7 +174,7 @@ sub optimize_and_compare {
     defined(my $expected = get_section($file, "EXPECTED"))
         or die "could not find EXPECTED in file:$file\n";
     defined(my $opts = get_section($file, "JSX_OPTS"))
-        or die "cloud not ifnd JSX_OPTIONS in file:$file\n";
+        or die "cloud not find JSX_OPTS in file:$file\n";
 
     chomp $opts;
 
