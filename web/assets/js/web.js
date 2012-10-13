@@ -16,6 +16,43 @@ window.addEventListener('load', function(e) {
 		}
 		return 0;
 	}
+	
+	function jsxComplete(cm) {
+		CodeMirror.simpleHint(cm, function (editor) {
+			var cur = editor.getCursor();
+
+			var completionRequest = new jsx.CompletionRequest(cur.line+1, cur.ch)
+
+			var path = "<source>";
+			var platform = new jsx.BrowserPlatform(".");
+			platform.setContent(path, editor.getValue());
+
+			var c = new jsx.Compiler(platform);
+			var emitter = new jsx.JavaScriptEmitter(platform);
+			c.setEmitter(emitter);
+			c.setMode(jsx.Compiler.MODE_COMPLETE);
+			c.addSourceFile(null, path, completionRequest);
+			c.compile();
+
+			var ret = {};
+
+			var uniq = {};
+			ret.list = completionRequest.getCandidates().map(function (item) {
+				return item.partialWord || item.word;
+			}).filter(function (item) {
+				if (! uniq.hasOwnProperty(item)) {
+					uniq[item] = true;
+					return true;
+				}
+				else {
+					return false;
+				}
+			});
+			ret.from = { line: cur.line, ch: cur.ch };
+			ret.to   = { line: cur.line, ch: cur.ch };
+			return ret;
+		});
+	}
 
 	var list   = element('source-list');
 
@@ -28,6 +65,13 @@ window.addEventListener('load', function(e) {
 		autofocus: true,
 
 		extraKeys: {
+			"Ctrl-Space": jsxComplete,
+			"." : function (editor) {
+				editor.replaceSelection(".");
+				var cursor = editor.getCursor();
+				editor.setSelection(cursor);
+				jsxComplete(editor);
+			},
 			"'\u00A5'" /* yen mark */ : function (editor) {
 				editor.replaceSelection("\u005c"); // backslash
 				var cursor = editor.getCursor();
