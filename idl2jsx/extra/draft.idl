@@ -78,3 +78,8 @@ dictionary DeviceMotionEventInit : EventInit {
   double? interval;
 };
 
+// mentiond in http://www.w3.org/TR/webmessaging/ but no IDL is provided.
+partial interface Window {
+  void postMessage(any message, DOMString targetOrigin, optional sequence<Transferable> transfer);
+};
+
