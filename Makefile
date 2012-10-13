@@ -44,12 +44,13 @@ web.jsx:
 update-assets: update-bootstrap update-codemirror
 
 update-codemirror:
+	rm -rf codemirror*
 	curl -LO http://codemirror.net/codemirror.zip
 	unzip -o codemirror.zip
-	cp CodeMirror-*/lib/codemirror.css            web/assets/css
-	cp CodeMirror-*/lib/codemirror.js             web/assets/js
-	cp CodeMirror-*/mode/javascript/javascript.js web/assets/js/mode
-	cp CodeMirror-*/mode/clike/clike.js           web/assets/js/mode
+	cp codemirror-*/lib/codemirror.css            web/assets/css
+	cp codemirror-*/lib/codemirror.js             web/assets/js
+	cp codemirror-*/mode/javascript/javascript.js web/assets/js/mode
+	cp codemirror-*/mode/clike/clike.js           web/assets/js/mode
 
 update-bootstrap:
 	curl -LO http://twitter.github.com/bootstrap/assets/bootstrap.zip
