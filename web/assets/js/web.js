@@ -66,6 +66,7 @@ window.addEventListener('load', function(e) {
 
 		extraKeys: {
 			"Ctrl-Space": jsxComplete,
+			"Ctrl-P":     jsxComplete,
 			"." : function (editor) {
 				editor.replaceSelection(".");
 				var cursor = editor.getCursor();
