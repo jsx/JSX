@@ -82,18 +82,22 @@ class TestCase {
 	var _currentName : Nullable.<string>;
 	var _tasks = [] : Array.<function():void>; // async tasks
 
-	/* overridable methods */
-
+	/**
+	 * Set up for each test method.
+	 */
 	function setUp() : void { }
+
+	/**
+	 * Tear down for each test method.
+	 */
 	function tearDown() : void { }
 
-	/* hooks called by src/js/runtests.js */
+
+	/* low-level hooks called by src/js/runtests.js */
 
 	function beforeClass(tests : string[]) : void {
 		this._tests = tests;
 		this._say("1.." + this._tests.length as string);
-
-		this.setUp();
 	}
 
 	function afterClass() : void {
@@ -106,15 +110,14 @@ class TestCase {
 		}
 	}
 
-
 	function run(name : string, testFunction : function():void) : void {
 		name = name.replace(/[$].*$/, "");
-		// FIXME: catch exception
 
 		var numAsyncTasks = this._tasks.length;
 		this._currentName = name;
 
 		try {
+			this.setUp();
 			testFunction();
 		}
 		catch (e : Error) {
@@ -131,6 +134,8 @@ class TestCase {
 	/* implementation */
 
 	function after(name : string) : void {
+		this.tearDown();
+
 		++this._totalCount;
 		this._say("\t" + "1.." + this._count as string);
 
@@ -153,13 +158,12 @@ class TestCase {
 				+ " of "
 				+ this._totalCount as string);
 		}
-		this.tearDown();
 	}
 
 	/* async test stuff */
 
 	/**
-	 * Prepares an asynchronous test a with timeout handler.
+	 * Prepares an asynchronous test with timeout handler.
 	 */
 	function async(testBody : function(:AsyncContext):void, timeoutHandler : function(:AsyncContext):void, timeoutMS : int) : void {
 
@@ -171,7 +175,8 @@ class TestCase {
 	}
 
 	/**
-	 * Prepares an asynchronous test. Automatically call <code>this.fail()</code> on timeout.
+	 * Prepares an asynchronous test.
+	 * Automatically call <code>this.fail()</code> on timeout.
 	 */
 	function async(testBody : function(:AsyncContext):void, timeoutMS : int) : void {
 		this.async(testBody, function(async : AsyncContext) : void {
@@ -185,7 +190,7 @@ class TestCase {
 	// want to delcare expect.<T>(value : T) : _Matcher.<T>
 	/**
 	 * <p>Creates a test matcher for a value.</p>
-	 * <p>Usage: <code>this.expect(testingValue).tobe(expectedValue)</code></p>
+	 * <p>Usage: <code>this.expect(testingValue).toBe(expectedValue)</code></p>
 	 */
 	function expect(value : variant) : _Matcher {
 		++this._count;
@@ -219,7 +224,7 @@ class TestCase {
 	}
 
 	/**
-	 * Tells the test case that a test passes.
+	 * Tells a test passes.
 	 */
 	function pass(reason : string) : void {
 		++this._count;
@@ -229,7 +234,7 @@ class TestCase {
 	}
 
 	/**
-	 * Tells the test case that a test fails.
+	 * Tells a test fails.
 	 */
 	function fail(reason : string) : void {
 		this._say("not ok - fail");
