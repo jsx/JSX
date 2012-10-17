@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>IPC with JavaScript</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex,nofollow">
+
+    <!-- Le styles -->
+    <link href="../../assets/css/bootstrap.css" rel="stylesheet">
+    <style type="text/css">
+      body {
+        padding-top: 60px;
+        padding-bottom: 40px;
+      }
+    </style>
+
+    <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <script src="../../build/jsx-compiler.js"></script>
+    <script type="application/jsx" data-arguments="[]" id="jsx-in">
+      //<![CDATA[
+      // JSX
+      import "js/web.jsx";
+      class _Main {
+        static function main(args : string[]) : void {
+          var i = 0;
+          dom.window.setInterval(() -> {
+            dom.window.postMessage({
+              to: "js",
+              value: (++i) as string
+            }, "/");
+          }, 1000);
+
+          dom.window.addEventListener("message", (e) -> {
+            var me = e as MessageEvent;
+            if (me.data["to"] != "jsx") {
+              return;
+            }
+            var s  = JSON.stringify(me.data);
+            var textNode = dom.document.createTextNode("jsx:" + s + "\n");
+            dom.id("output").appendChild(textNode);
+          });
+        }
+      }
+      //]]>
+    </script>
+    <script id="javascript-in">
+      //<![CDATA[
+      // JavaScript
+      window.addEventListener("message", function (me) {
+        "use strict";
+        if (me.data.to !== "js")  return;
+
+        var element  = document.getElementById("output");
+        var s        = JSON.stringify(me.data);
+        var textNode = document.createTextNode("js:  " + s + "\n");
+        element.appendChild(textNode);
+
+        window.setTimeout(function () {
+          window.postMessage({
+            to: "jsx",
+            sqrt: Math.sqrt(me.data.value)
+          }, "/");
+        }, 200);
+      });
+      //]]>
+    </script>
+
+    <!-- setup this page -->
+    <script>
+      //<![CDATA[
+      window.addEventListener("load", function (e) {
+        "use strict";
+        ["jsx", "javascript"].forEach( function (lang) {
+          var script = document.getElementById(lang + "-in");
+          console.assert(script, lang + "-in");
+
+          var src = script.firstChild.nodeValue.
+          replace(/\/\/<!\[CDATA\[\s*/, "").
+          replace(/\/\/\]\]>\s*/, "");
+          var textNode = document.createTextNode(src);
+
+          var srcArea = document.getElementById(lang + "-out");
+          console.assert(srcArea, lang + "-out");
+          srcArea.appendChild(textNode);
+        });
+      });
+      //]]>
+    </script>
+    <style>
+      #jsx-out, #javascript-out, #output {
+        white-space: pre;
+        border: solid gray 1px;
+      }
+    </style>
+  </head>
+
+  <body>
+
+    <div class="navbar navbar-inverse navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container-fluid">
+          <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </a>
+          <a class="brand" href="/">JSX</a>
+          <div class="nav-collapse">
+            <ul class="nav">
+              <li><a href="../../">Try</a></li>
+              <li><a href="../../source-map/">Debug with SourceMap</a></li>
+              <li class="active"><a href="../../example/">Web Application Examples</a></li>
+            </ul>
+          </div><!--/.nav-collapse -->
+        </div>
+      </div>
+    </div>
+
+    <div class="container">
+      <h2>IPC with JavaScript</h2>
+      <p>
+      Interaction of JSX and JavaScript via <code>window.postMessage()</code>.
+      </p>
+      <p>
+      JSX code delegates a task (<code>Math.sqrt()</code>) to JavaScript code.
+      </p>
+      <div class="row">
+        <div class="span5">
+          <div id="output"></div>
+        </div>
+        <div class="span6">
+          <div id="jsx-out"></div>
+          <div id="javascript-out"></div>
+        </div>
+      </div>
+    </div> <!-- /container -->
+  </body>
+</html>
+

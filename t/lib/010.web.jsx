@@ -1512,6 +1512,8 @@ class _Test extends TestCase {
         var f20 : number/*long*/ = o.setInterval(X.getfunction___void());
         var f21 : number/*long*/ = o.setInterval(X.getfunction___void(), X.getnumber());
         o.clearInterval(X.getnumber());
+        o.postMessage(X.getvariant(), X.getstring());
+        o.postMessage(X.getvariant(), X.getstring(), X.getTransferable__());
         var f22 : number/*long*/ = o.requestAnimationFrame(X.getfunction_time_number__void());
         o.cancelAnimationFrame(X.getnumber());
         var f23 : number/*long*/ = o.webkitRequestAnimationFrame(X.getfunction_time_number__void());

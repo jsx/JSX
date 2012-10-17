@@ -26,6 +26,7 @@ exports.Class             = require("./Class");
 exports.Compiler          = require("./compiler").Compiler;
 exports.JavaScriptEmitter = require("./jsemitter").JavaScriptEmitter;
 exports.Optimizer         = require("./optimizer").Optimizer;
+exports.CompletionRequest = require("./completion").CompletionRequest;
 
 exports.BrowserPlatform   = require("./browser-platform").BrowserPlatform;
 exports.ScriptLoader      = require("./script-loader").ScriptLoader;

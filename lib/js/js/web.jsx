@@ -2345,6 +2345,16 @@ native final __fake__ class Window extends EventTarget {
 	) : number/*long*/;
 	function clearInterval(handle : number/*long*/) : void;
 
+	function postMessage(
+		message : variant/*any*/,
+		targetOrigin : string/*DOMString*/
+	) : void;
+	function postMessage(
+		message : variant/*any*/,
+		targetOrigin : string/*DOMString*/,
+		transfer : Transferable[]
+	) : void;
+
 	// implements WindowAnimationTiming
 
 	function requestAnimationFrame(
