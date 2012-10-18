@@ -5,16 +5,16 @@
 --profile
 */
 
-class Test {
+class _Main {
 	static function f() : void {
 		try {
 			throw new Error("Hmm");
 		} catch (e : Error) {
 		}
 	}
-	static function run() : void {
-		Test.f();
+	static function main(args : string[]) : void {
+		_Main.f();
 		var m = JSX.getProfileResults();
-		log m["Test.run()"]["Test.f()"]["$count"];
+		log m["_Main.main(:Array.<string>)"]["_Main.f()"]["$count"];
 	}
 }

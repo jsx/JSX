@@ -3,15 +3,15 @@ number
 string
 */
 
-class Test {
+class _Main {
 	static function f(f : function() : number) : void {
 		log 'number';
 	}
 	static function f(f : function() : string) : void {
 		log 'string';
 	}
-	static function run() : void {
-		Test.f(function() : number { return 0; });
-		Test.f(function() : string { return 's'; });
+	static function main(args : string[]) : void {
+		_Main.f(function() : number { return 0; });
+		_Main.f(function() : string { return 's'; });
 	}
 }

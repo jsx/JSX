@@ -20,8 +20,8 @@ class MyError2 extends MyError1 {
 	}
 }
 
-class Test {
-	static function run() : void {
+class _Main {
+	static function main(args : string[]) : void {
 
 		// simple
 		try {

@@ -55,8 +55,8 @@ setUTCDate: true
 setUTCMonth: true
 setUTCFullYear: true
 */
-class Test {
-	static function run() : void {
+class _Main {
+	static function main(args : string[]) : void {
 		var year  = 2012;
 		var month = 4;
 		var date  = 12;

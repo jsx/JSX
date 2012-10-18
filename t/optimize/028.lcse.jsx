@@ -9,7 +9,7 @@
 /*JSX_OPTS
 --optimize lcse
 */
-class Test {
+class _Main {
 	var n = 1;
 	function constructor() {
 		// test this.prop
@@ -24,10 +24,10 @@ class Test {
 	function constructor(b : boolean) {
 		// no test
 	}
-	static function run() : void {
-		var t2 = new Test(false);
+	static function main(args : string[]) : void {
+		var t2 = new _Main(false);
 		// test this.prop
-		var t = new Test;
+		var t = new _Main;
 		// test local.prop
 		var r = t.n + t.n;
 		log r;

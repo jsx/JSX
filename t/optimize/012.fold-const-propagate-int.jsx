@@ -10,16 +10,16 @@
 --optimize fold-const
 */
 
-class Test {
+class _Main {
 	static const ZERO : int = 0;
-	static const ONE : int = Test.ZERO + 1;
-	static const TWO : int = Test.ONE + 1;
-	static function run() : void {
-		log Test.ONE;
-		log Test.ONE + Test.ONE;
-		log Test.ONE - Test.TWO;
-		log Test.TWO * Test.TWO;
-		log Test.ONE / Test.TWO; // / and % operations return floating point
-		log Test.ONE % Test.TWO;
+	static const ONE : int = _Main.ZERO + 1;
+	static const TWO : int = _Main.ONE + 1;
+	static function main(args : string[]) : void {
+		log _Main.ONE;
+		log _Main.ONE + _Main.ONE;
+		log _Main.ONE - _Main.TWO;
+		log _Main.TWO * _Main.TWO;
+		log _Main.ONE / _Main.TWO; // / and % operations return floating point
+		log _Main.ONE % _Main.TWO;
 	}
 }

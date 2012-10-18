@@ -5,9 +5,9 @@
 --optimize fold-const
 */
 
-class Test {
+class _Main {
 	static const i = 1;
-	static function run() : void {
-		log Test.i;
+	static function main(args : string[]) : void {
+		log _Main.i;
 	}
 }

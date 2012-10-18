@@ -2,8 +2,8 @@
 55
 11
 */
-class Test {
-	static function run() : void {
+class _Main {
+	static function main(args : string[]) : void {
 		var sum = 0;
 		var i = 0;
 		while (i++ < 10)

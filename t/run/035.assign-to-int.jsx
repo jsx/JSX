@@ -1,8 +1,8 @@
 /*EXPECTED
 1
 */
-class Test {
-	static function run() : void {
+class _Main {
+	static function main(args : string[]) : void {
 		var i : int = 1.5;
 		log i;
 	}

@@ -8,8 +8,8 @@ undefined
 3
 */
 
-class Test {
-	static function run() : void {
+class _Main {
+	static function main(args : string[]) : void {
 		var m = { a: 1 };
 		log m["a"];
 		log m["b"];

@@ -1,7 +1,21 @@
+class A
+
 /*EXPECTED
-[".","extends","implements","{"]
+[
+   {
+      "word" : "."
+   },
+   {
+      "word" : "extends"
+   },
+   {
+      "word" : "implements"
+   },
+   {
+      "word" : "{"
+   }
+]
 */
 /*JSX_OPTS
---complete 7:9
+--complete 2:1
 */
-class A 

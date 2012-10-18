@@ -3,8 +3,8 @@ foo
 ["foo"]
 */
 
-class Test {
-	static function run() : void {
+class _Main {
+	static function main(args : string[]) : void {
 		var a = JSON.parse('["foo"]') as string[];
 		log a.join(",");
 

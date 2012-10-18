@@ -38,8 +38,8 @@ var Token = exports.Token = Class.extend({
 		this._isIdentifier = isIdentifier;
 		// two args or five args
 		this._filename = filename || null;
-		this._lineNumber = lineNumber || NaN;
-		this._columnNumber = columnNumber || NaN;
+		this._lineNumber = lineNumber;     // Nullable.<int>
+		this._columnNumber = columnNumber; // Nullable.<int>
 	},
 
 	getValue: function () {
@@ -672,10 +672,21 @@ var Parser = exports.Parser = Class.extend({
 	},
 
 	_registerLocal: function (identifierToken, type) {
-		for (var i = 0; i < this._locals.length; i++) {
-			if (this._locals[i].getName().getValue() == identifierToken.getValue()) {
-				if (type != null && ! this._locals[i].getType().equals(type))
+		var isEqualTo = function (local) {
+			if (local.getName().getValue() == identifierToken.getValue()) {
+				if (type != null && ! local.getType().equals(type))
 					this._newError("conflicting types for variable " + identifierToken.getValue());
+				return true;
+			}
+			return false;
+		}.bind(this);
+		for (var i = 0; i < this._arguments.length; ++i) {
+			if (isEqualTo(this._arguments[i])) {
+				return this._arguments[i];
+			}
+		}
+		for (var i = 0; i < this._locals.length; i++) {
+			if (isEqualTo(this._locals[i])) {
 				return this._locals[i];
 			}
 		}
@@ -829,8 +840,9 @@ var Parser = exports.Parser = Class.extend({
 				case "param":
 					var nameMatch = this._getInput(this._columnOffset).match(/[0-9A-Za-z_]+/);
 					if (nameMatch != null) {
+					     var token = new Token(nameMatch[0], false, this._filename, this._lineNumber, this._getColumn());
 						this._forwardPos(nameMatch[0].length);
-						node = new DocCommentParameter(nameMatch[0]);
+						node = new DocCommentParameter(token);
 						docComment.getParams().push(node);
 					} else {
 						this._newError("name of the parameter not found after @param");
@@ -1279,7 +1291,7 @@ var Parser = exports.Parser = Class.extend({
 
 		// done
 		if (this._typeArgs.length != 0) {
-			this._templateClassDefs.push(new TemplateClassDefinition(className.getValue(), this._classFlags, this._typeArgs, this._extendType, this._implementTypes, members, this._objectTypesUsed, docComment));
+			this._templateClassDefs.push(new TemplateClassDefinition(className, className.getValue(), this._classFlags, this._typeArgs, this._extendType, this._implementTypes, members, this._objectTypesUsed, docComment));
 		} else {
 			var classDef = new ClassDefinition(className, className.getValue(), this._classFlags, this._extendType, this._implementTypes, members, this._objectTypesUsed, docComment);
 			this._classDefs.push(classDef);
@@ -1461,8 +1473,8 @@ var Parser = exports.Parser = Class.extend({
 			}
 			function createDefinition(locals, statements, closures, lastToken) {
 				return typeArgs.length != 0
-					? new TemplateFunctionDefinition(token, name, flags, typeArgs, returnType, args, locals, statements, closures, lastToken)
-					: new MemberFunctionDefinition(token, name, flags, returnType, args, locals, statements, closures, lastToken);
+					? new TemplateFunctionDefinition(token, name, flags, typeArgs, returnType, args, locals, statements, closures, lastToken, docComment)
+					: new MemberFunctionDefinition(token, name, flags, returnType, args, locals, statements, closures, lastToken, docComment);
 			}
 			// take care of abstract function
 			if ((this._classFlags & (ClassDefinition.IS_INTERFACE | ClassDefinition.IS_DELETE)) != 0) {

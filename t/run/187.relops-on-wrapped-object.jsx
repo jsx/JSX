@@ -9,8 +9,8 @@ false
 true
 true
 */
-class Test {
-	static function run() : void {
+class _Main {
+	static function main(args : string[]) : void {
 		var s1 = "abc", s2 = "abc";
 		var S1 = new String(s1), S2 = new String(s2);
 		log S1 <= S2;

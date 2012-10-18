@@ -5,11 +5,11 @@ hello world
 --optimize fold-const
 */
 
-class Test {
+class _Main {
 	static const HELLO = "hello";
 	static const WORLD = "world";
-	static const HELLO_WORLD = Test.HELLO + " " + Test.WORLD;
-	static function run() : void {
-		log Test.HELLO_WORLD;
+	static const HELLO_WORLD = _Main.HELLO + " " + _Main.WORLD;
+	static function main(args : string[]) : void {
+		log _Main.HELLO_WORLD;
 	}
 }

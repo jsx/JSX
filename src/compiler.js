@@ -117,7 +117,7 @@ var Compiler = exports.Compiler = Class.extend({
 		if (! this._handleErrors(errors))
 			return false;
 		// register backing class for primitives
-		var builtins = this.findParser(this._platform.getRoot() + "/lib/built-in.jsx");
+		var builtins = this._builtinParsers[0];
 		BooleanType._classDef = builtins.lookup(errors, null, "Boolean");
 		NumberType._classDef = builtins.lookup(errors, null, "Number");
 		StringType._classDef = builtins.lookup(errors, null, "String");
@@ -169,8 +169,12 @@ var Compiler = exports.Compiler = Class.extend({
 	parseFile: function (errors, parser) {
 		// read file
 		var content = this.getFileContent(errors, parser.getSourceToken(), parser.getPath());
-		if (content == null)
+		if (content == null) {
+			// call parse() to initialize parser's state
+			// because some compilation mode continues to run after errors.
+			parser.parse("", []);
 			return false;
+		}
 		// parse
 		parser.parse(content, errors);
 		// register imported files

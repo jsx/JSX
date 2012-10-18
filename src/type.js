@@ -359,8 +359,12 @@ var ObjectType = exports.ObjectType = Type.extend({
 		if (type instanceof VariantType)
 			return true;
 		// conversions from Number / String to number / string is handled in each operator (since the behavior differ bet. the operators)
-		if (! (type instanceof ObjectType))
+		if (! (type instanceof ObjectType)) {
 			return false;
+		}
+		if (this._classDef == null) { // occurs with completion mode
+			return false;
+		}
 		return this._classDef.isConvertibleTo(type._classDef);
 	},
 
@@ -620,7 +624,7 @@ var ResolvedFunctionType = exports.ResolvedFunctionType = FunctionType.extend({
 			if (this._argTypes[i] instanceof VariableLengthArgumentType) {
 				args[i] = "... : " + this._argTypes[i].getBaseType().toString();
 			} else {
-				args[i] = " : " + this._argTypes[i].toString();
+				args[i] = ": " + this._argTypes[i].toString();
 			}
 		}
 		return this._toStringPrefix() + "function (" + args.join(", ") + ") : " + this._returnType.toString();

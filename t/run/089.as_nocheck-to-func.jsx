@@ -3,7 +3,7 @@ hello
 detected invalid cast, value is not a function or null
 */
 
-class Test {
+class _Main {
 	static function ok() : variant {
 		return function () : void {
 			log "hello";
@@ -15,8 +15,8 @@ class Test {
 	static function say(f : function () : void) : void {
 		f();
 	}
-	static function run() : void {
-		Test.say(Test.ok() as __noconvert__ function () : void);
-		Test.say(Test.ng() as __noconvert__ function () : void);
+	static function main(args : string[]) : void {
+		_Main.say(_Main.ok() as __noconvert__ function () : void);
+		_Main.say(_Main.ng() as __noconvert__ function () : void);
 	}
 }

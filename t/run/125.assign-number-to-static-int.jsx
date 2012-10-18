@@ -2,9 +2,9 @@
 1
 */
 
-class Test {
+class _Main {
 	static var n : int = 1.3;
-	static function run() : void {
-		log Test.n;
+	static function main(args : string[]) : void {
+		log _Main.n;
 	}
 }

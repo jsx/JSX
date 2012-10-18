@@ -3,6 +3,7 @@
 *.zip
 _builtins.js
 try
+doc
 v8.log
 CodeMirror-*
 bootstrap/

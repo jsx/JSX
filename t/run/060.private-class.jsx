@@ -18,12 +18,12 @@ class _Private {
 	}
 }
 
-class Test extends _Private {
-	static function run() : void {
+class _Main extends _Private {
+	static function main(args : string[]) : void {
 		_Private.say();
 		Imported.say();
 		new _Private();
-		new Test();
+		new _Main();
 		Imported.instantiatePrivate();
 		new Imported();
 	}

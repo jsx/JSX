@@ -6,8 +6,8 @@
 1,2,
 ,2,
 */
-class Test {
-	static function run() : void {
+class _Main {
+	static function main(args : string[]) : void {
 		var a =  [ 1, 2, null ];
 		log a.join(",");
 		a[0] = null;

@@ -2,7 +2,7 @@
 10
 3
 */
-class Test {
+class _Main {
 	var n : number;
 	function constructor() {
 		this(10);
@@ -11,12 +11,12 @@ class Test {
 		this.n = n;
 	}
 	function constructor(b : boolean) {
-		Test(b ? 3 : 0);
+		_Main(b ? 3 : 0);
 	}
-	static function run() : void {
-		var t = new Test();
+	static function main(args : string[]) : void {
+		var t = new _Main();
 		log t.n;
-		t = new Test(true);
+		t = new _Main(true);
 		log t.n;
 	}
 }

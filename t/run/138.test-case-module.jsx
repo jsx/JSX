@@ -30,19 +30,23 @@ ok 1 - testShouldBeOK
 # expected: 11
 	1..5
 not ok 2 - testShouldNotBeOK
+	ok 1
+	ok 2
+	1..2
+ok 3 - testExpectToMatch
 	ok 1 - just pass
 not ok - fail
 # just fail
 	1..1
-ok 3 - testPassFail
-# tests failed 1 of 3
+ok 4 - testPassFail
+# tests failed 1 of 4
 */
 
 import "test-case.jsx";
 
-class Test {
-	static function run() : void {
-		var t = new _Test();
+class _Main {
+	static function main(args : string[]) : void {
+		var t = new __Main();
 
 		t.beforeClass(["testShouldBeOK", "testShouldNotBeOK", "testPassFail"]);
 
@@ -52,6 +56,9 @@ class Test {
 		t.run("testShouldNotBeOK", function() : void {
 			t.testShouldNotBeOK();
 		});
+		t.run("testExpectToMatch", function() : void {
+			t.testExpectToMatch();
+		});
 		t.run("testPassFail", function() : void {
 			t.testPassFail();
 		});
@@ -60,7 +67,7 @@ class Test {
 	}
 }
 
-class _Test extends TestCase {
+class __Main extends TestCase {
 	function testShouldBeOK() : void {
 		this.expect(true, "boolean v.s. boolean").toBe(true);
 		this.expect(10).toBeLT(11);
@@ -75,16 +82,13 @@ class _Test extends TestCase {
 		this.expect(10).toBeGT(10);
 		this.expect(10).toBeGE(11);
 	}
+	function testExpectToMatch() : void {
+		this.expect("hoge").toMatch(/.og./);
+		this.expect("hoge").notToMatch(/.xg./);
+	}
 
 	function testPassFail() : void {
 		this.pass("just pass");
 		this.fail("just fail");
-	}
-}
-
-// to capture the output
-class _Main {
-	static function main(args : string[]) : void {
-		Test.run();
 	}
 }

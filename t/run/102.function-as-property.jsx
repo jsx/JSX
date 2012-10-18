@@ -5,17 +5,17 @@ hello
 hello
 */
 
-class Test {
+class _Main {
 	var f : function () : void;
 	function constructor() {
 		this.f = function () : void {
 			log "hello";
 		};
 	}
-	static function run() : void {
-		var t = new Test();
+	static function main(args : string[]) : void {
+		var t = new _Main();
 		t.f();
-		new Test().f();
+		new _Main().f();
 		var f = t.f;
 		f();
 		var g : function () : void = t.f;

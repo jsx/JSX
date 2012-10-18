@@ -4,7 +4,7 @@ bar0
 foo
 bar1
 */
-class Test {
+class _Main {
 	static function foo() : void {
 		log "foo";
 	}
@@ -14,14 +14,14 @@ class Test {
 	static function bar(i : int) : void {
 		log "bar1";
 	}
-	static function run() : void {
-		var f = Test.foo;
+	static function main(args : string[]) : void {
+		var f = _Main.foo;
 		f();
-		f = Test.bar;
+		f = _Main.bar;
 		f();
-		var g : function () : void = Test.foo;
+		var g : function () : void = _Main.foo;
 		g();
-		var h : function (:int):void = Test.bar;
+		var h : function (:int):void = _Main.bar;
 		h(0);
 	}
 }

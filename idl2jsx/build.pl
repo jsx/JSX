@@ -52,7 +52,7 @@ my @specs = (
         "webaudio; https://dvcs.w3.org/hg/audio/raw-file/tip/webaudio/specification.html",
         "touch-events; http://www.w3.org/TR/touch-events/",
         #"http://www.w3.org/TR/websockets/",
-        "websockets; http://www.w3.org/TR/2012/WD-websockets-20120524/",
+        "websockets; http://www.w3.org/TR/2012/CR-websockets-20120920/",
         #"http://dev.w3.org/html5/websockets/", # too new
         "geo; http://dev.w3.org/geo/api/spec-source.html",
         "webstorage; http://dev.w3.org/html5/webstorage/",
@@ -131,33 +131,48 @@ foreach my $spec(@specs) {
 
 __DATA__
 @@ web.jsx
-/**
-
-Web Browser Interface
-
-*/
+/***
+ * Web Browser Interface for JSX
+ *
+ * @author DeNA, Co., Ltd.
+ * @see http://www.w3.org/
+ */
 import "js.jsx";
 
 /**
-
-Document Object Model in Web Browsers
-
-*/
+ * Document Object Model in Web Browsers
+ */
 final class dom {
-	static const window   = js.global["window"]   as __noconvert__ Window;       // dom.window
-	static const document = js.global["document"] as __noconvert__ HTMLDocument; // dom.document
+	delete function constructor() { }
 
-	/** alias to <code>dom.document.getElementById(id) as HTMLElement</code> */
+	/**
+	 * The top-level Window object.
+	 */
+    static const window   = js.global["window"]   as __noconvert__ Window;
+	/**
+	 * The top-level HTMLDocument object.
+	 */
+	static const document = js.global["document"] as __noconvert__ HTMLDocument;
+	/**
+	 * same as <code>dom.document.getElementById(id)</code>, except returns
+	 * <code>HTMLElement</code>.
+	 */
 	static function id(id : string) : HTMLElement {
 		return dom.document.getElementById(id) as HTMLElement;
 	}
-	/** alias to <code>dom.document.getElementById(id) as HTMLElement</code> */
+
+	/**
+	 * same as <code>dom.document.getElement(id)</code>, except returns
+	 * <code>HTMLElement</code>.
+	 */
 	static function getElementById(id : string) : HTMLElement {
 		return dom.document.getElementById(id) as HTMLElement;
 	}
 
-
-	/** alias to <code>dom.document.createElement(id) as HTMLElement</code> */
+	/**
+	 * same as <code>dom.document.createElement(id)</code>, except returns
+	 * <code>HTMLElement</code>.
+	 */
 	static function createElement(tag : string) : HTMLElement {
 		return dom.document.createElement(tag) as __noconvert__ HTMLElement;
 	}

@@ -7,8 +7,8 @@
 -1
 2147483647
 */
-class Test {
-	static function run() : void {
+class _Main {
+	static function main(args : string[]) : void {
 		log 2 * 4;
 		log 3 / 2;
 		log 8 % 5;

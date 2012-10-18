@@ -1,7 +1,7 @@
 /*EXPECTED
 1
 */
-class Test {
+class _Main {
 
 	var _n : number;
 
@@ -9,8 +9,8 @@ class Test {
 		this._n = n;
 	}
 
-	static function run() : void {
-		var t = new Test(1);
+	static function main(args : string[]) : void {
+		var t = new _Main(1);
 		log t._n;
 	}
 }

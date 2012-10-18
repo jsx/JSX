@@ -5,8 +5,12 @@ OPTIMIZE_FLAGS := lto,unclassify,fold-const,return-if,inline,dce,unbox,fold-cons
 
 all: src/doc.js
 
-setup:
-	@echo "no need run 'make setup' any more (please make sure Perl (>= 5.10.0) and NodeJS (>= 0.6.19) are installed)"
+setup: doc
+
+
+doc: src/doc.js
+	rm -rf doc
+	find lib -name '*.jsx' | xargs -n 1 -- bin/jsx --mode doc --output doc
 
 # e.g. make test JOBS=2
 test:
@@ -40,12 +44,15 @@ web.jsx:
 update-assets: update-bootstrap update-codemirror
 
 update-codemirror:
+	rm -rf codemirror*
 	curl -LO http://codemirror.net/codemirror.zip
 	unzip -o codemirror.zip
-	cp CodeMirror-*/lib/codemirror.css            web/assets/css
-	cp CodeMirror-*/lib/codemirror.js             web/assets/js
-	cp CodeMirror-*/mode/javascript/javascript.js web/assets/js/mode
-	cp CodeMirror-*/mode/clike/clike.js           web/assets/js/mode
+	cp codemirror-*/lib/codemirror.css            web/assets/css
+	cp codemirror-*/lib/codemirror.js             web/assets/js
+	cp codemirror-*/lib/util/simple-hint.css      web/assets/css
+	cp codemirror-*/lib/util/simple-hint.js       web/assets/js
+	cp codemirror-*/mode/javascript/javascript.js web/assets/js/mode
+	cp codemirror-*/mode/clike/clike.js           web/assets/js/mode
 
 update-bootstrap:
 	curl -LO http://twitter.github.com/bootstrap/assets/bootstrap.zip
@@ -59,4 +66,4 @@ clean:
 	rm -rf CodeMirror-* codemirror.zip
 	rm -rf bootstrap*
 
-.PHONY: test web server
+.PHONY: test web server doc

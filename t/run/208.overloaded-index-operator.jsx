@@ -7,8 +7,8 @@ native __fake__ class DualArray {
 	function __native_index_operator__(idx : string) : number;
 }
 
-class Test {
-	static function run() : void {
+class _Main {
+	static function main(args : string[]) : void {
 		var da = new Map.<number> as __noconvert__ DualArray;
 		da["1"] = 3;
 		log da[1];

@@ -3,15 +3,15 @@ ok
 ok
 */
 
-class Test {
+class _Main {
 	static const foo = "ok";
 
 	static const bar = (function() : string {
-		return Test.foo;
+		return _Main.foo;
 	}());
 
-	static function run() : void {
-		log Test.foo;
-		log Test.bar;
+	static function main(args : string[]) : void {
+		log _Main.foo;
+		log _Main.bar;
 	}
 }

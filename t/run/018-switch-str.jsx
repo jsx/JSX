@@ -3,7 +3,7 @@ A
 default
 123
 */
-class Test {
+class _Main {
 	static function f(s : string) : void {
 		switch (s) {
 		case "a":
@@ -17,9 +17,9 @@ class Test {
 			break;
 		}
 	}
-	static function run() : void {
-		Test.f("a");
-		Test.f("b");
-		Test.f("123");
+	static function main(args : string[]) : void {
+		_Main.f("a");
+		_Main.f("b");
+		_Main.f("123");
 	}
 }

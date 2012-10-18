@@ -14,8 +14,8 @@ class _Private {
 	}
 }
 
-class Test {
-	static function run() : void {
+class _Main {
+	static function main(args : string[]) : void {
 		var doit = (function () : function (: string) : void {
 			var jsx = js.global["JSX"] as Map.<variant>;
 			var require = jsx["require"] as function (: string) : Map.<variant>;

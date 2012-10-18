@@ -6,9 +6,9 @@ class Base {
 	var x = 0;
 }
 
-class Test extends Base {
-	static function run() : void {
-		var o : Nullable.<Test> = new Test;
+class _Main extends Base {
+	static function main(args : string[]) : void {
+		var o : Nullable.<_Main> = new _Main;
 		o.x = 42;
 		log o.x;
 	}

@@ -3,17 +3,17 @@ undefined
 null access
 */
 
-class Test {
+class _Main {
 	static function f(n : Nullable.<number>) : void {
 		log n;
 	}
 	static function g(n : number) : void {
 		log n;
 	}
-	static function run() : void {
+	static function main(args : string[]) : void {
 		var a = [ 3 ];
 		a.pop();
-		Test.f(a.pop());
-		Test.g(a.pop());
+		_Main.f(a.pop());
+		_Main.g(a.pop());
 	}
 }

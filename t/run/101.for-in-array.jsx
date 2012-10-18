@@ -4,8 +4,8 @@
 2,c
 */
 
-class Test {
-	static function run() : void {
+class _Main {
+	static function main(args : string[]) : void {
 		var a = [ "a", "b", "c" ];
 		for (var i in a)
 			log i as string + "," + a[i];

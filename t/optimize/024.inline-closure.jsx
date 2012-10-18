@@ -4,15 +4,15 @@
 /*JSX_OPTS
 --optimize inline
 */
-class Test {
+class _Main {
 	var n = 3;
 	function f() : number {
 		return function () : number {
 			return this.n;
 		}();
 	}
-	static function run() : void {
-		var n = (new Test).f();
+	static function main(args : string[]) : void {
+		var n = (new _Main).f();
 		log n;
 	}
 }

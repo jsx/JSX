@@ -16,9 +16,9 @@ mixin Mixin {
 	}
 }
 
-class Test extends Base implements Mixin {
-	static function run() : void {
-		var t = new Test;
+class _Main extends Base implements Mixin {
+	static function main(args : string[]) : void {
+		var t = new _Main;
 		var m = t.message(); // "mixin"
 		log m;
 		var b = new Base;

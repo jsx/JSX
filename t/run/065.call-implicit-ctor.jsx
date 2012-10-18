@@ -4,12 +4,12 @@ class Base {
 }
 interface Interface {
 }
-class Test extends Base implements Interface {
+class _Main extends Base implements Interface {
 	function constructor() {
 		Base();
 		Interface();
 	}
-	static function run() : void {
-		new Test();
+	static function main(args : string[]) : void {
+		new _Main();
 	}
 }

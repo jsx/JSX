@@ -6,8 +6,8 @@ false
 true
 true
 */
-class Test {
-	static function run() : void {
+class _Main {
+	static function main(args : string[]) : void {
 		var bV : boolean = false.valueOf();
 		log bV;
 		bV = true.valueOf();

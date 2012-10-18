@@ -5,12 +5,12 @@
 /*JSX_OPTS
 --optimize inline
 */
-class Test {
+class _Main {
 	static function min(x : number, y : number) : number {
 		return Math.min(x, y);
 	}
-	static function run() : void {
-		log Test.min(1, 2);
+	static function main(args : string[]) : void {
+		log _Main.min(1, 2);
 		log Math.max(1, 2);
 	}
 }

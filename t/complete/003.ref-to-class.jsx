@@ -1,8 +1,121 @@
+class A {
+	static var pi =
+
 /*EXPECTED
-["!","(","+","++","-","--","A","Array","Boolean","Date","Error","EvalError","Function","JSON","JSX","Map","Math","Number","Object","RangeError","ReferenceError","RegExp","String","SyntaxError","TypeError","[","false","function","new","null","super","this","true","typeof","undefined","{","~"]
+[
+   {
+      "word" : "new"
+   },
+   {
+      "word" : "super"
+   },
+   {
+      "word" : "("
+   },
+   {
+      "word" : "function"
+   },
+   {
+      "word" : "this"
+   },
+   {
+      "word" : "undefined"
+   },
+   {
+      "word" : "null"
+   },
+   {
+      "word" : "false"
+   },
+   {
+      "word" : "true"
+   },
+   {
+      "word" : "["
+   },
+   {
+      "word" : "{"
+   },
+   {
+      "word" : "A"
+   },
+   {
+      "word" : "Object"
+   },
+   {
+      "word" : "Function"
+   },
+   {
+      "word" : "String"
+   },
+   {
+      "word" : "Boolean"
+   },
+   {
+      "word" : "Number"
+   },
+   {
+      "word" : "Math"
+   },
+   {
+      "word" : "Date"
+   },
+   {
+      "word" : "RegExp"
+   },
+   {
+      "word" : "Error"
+   },
+   {
+      "word" : "EvalError"
+   },
+   {
+      "word" : "RangeError"
+   },
+   {
+      "word" : "ReferenceError"
+   },
+   {
+      "word" : "SyntaxError"
+   },
+   {
+      "word" : "TypeError"
+   },
+   {
+      "word" : "JSON"
+   },
+   {
+      "word" : "JSX"
+   },
+   {
+      "word" : "Map"
+   },
+   {
+      "word" : "Array"
+   },
+   {
+      "word" : "++"
+   },
+   {
+      "word" : "--"
+   },
+   {
+      "word" : "+"
+   },
+   {
+      "word" : "-"
+   },
+   {
+      "word" : "~"
+   },
+   {
+      "word" : "!"
+   },
+   {
+      "word" : "typeof"
+   }
+]
 */
 /*JSX_OPTS
---complete 8:18
+--complete 2:17
 */
-class A {
-	static var pi = 

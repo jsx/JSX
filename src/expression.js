@@ -400,13 +400,13 @@ var StringLiteralExpression = exports.StringLiteralExpression = LeafExpression.e
 
 var RegExpLiteralExpression = exports.RegExpLiteralExpression = LeafExpression.extend({
 
-	constructor: function (token) {
+	constructor: function (token, type) {
 		LeafExpression.prototype.constructor.call(this, token);
-		this._type = null;
+		this._type = type; // nullable
 	},
 
 	clone: function () {
-		return new RegExpLiteralExpression(this._token);
+		return new RegExpLiteralExpression(this._token, this._type);
 	},
 
 	serialize: function () {
@@ -604,13 +604,18 @@ var MapLiteralExpression = exports.MapLiteralExpression = Expression.extend({
 		if (! succeeded)
 			return false;
 		// determine the type from the array members if the type was not specified
-		if (this._type != null) {
+		if (this._type != null && this._type == Type.variantType) {
+			var expectedType = null;
+		} else if (this._type != null && this._type instanceof ObjectType) {
 			var classDef = this._type.getClassDef();
 			if (! (classDef instanceof InstantiatedClassDefinition && classDef.getTemplateClassName() == "Map")) {
 				context.errors.push(new CompileError(this._token, "specified type is not a hash type"));
 				return false;
 			}
-			var expectedType = this._type.getTypeArguments()[0];
+			expectedType = this._type.getTypeArguments()[0];
+		} else if (this._type != null) {
+			context.errors.push(new CompileError(this._token, "invalid type for a map literal"));
+			return false;
 		} else {
 			for (var i = 0; i < this._elements.length; ++i) {
 				var elementType = this._elements[i].getExpr().getType();
@@ -628,12 +633,14 @@ var MapLiteralExpression = exports.MapLiteralExpression = Expression.extend({
 				return false;
 			}
 		}
-		// check type of the elements
-		for (var i = 0; i < this._elements.length; ++i) {
-			var elementType = this._elements[i].getExpr().getType();
-			if (! elementType.isConvertibleTo(expectedType)) {
-				context.errors.push(new CompileError(this._token, "cannot assign '" + elementType.toString() + "' to a map of '" + expectedType.toString() + "'"));
-				succeeded = false;
+		// check type of the elements (expect when expectedType == null, meaning that it is a variant)
+		if (expectedType != null) {
+			for (var i = 0; i < this._elements.length; ++i) {
+				var elementType = this._elements[i].getExpr().getType();
+				if (! elementType.isConvertibleTo(expectedType)) {
+					context.errors.push(new CompileError(this._token, "cannot assign '" + elementType.toString() + "' to a map of '" + expectedType.toString() + "'"));
+					succeeded = false;
+				}
 			}
 		}
 		return succeeded;

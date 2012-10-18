@@ -1,11 +1,11 @@
 /*EXPECTED
 60
 */
-class Test {
+class _Main {
 	static function hoge(f: (int) -> (int) -> (int) -> int): int {
 		return f(10)(20)(30);
 	}
-	static function run() : void {
-		log Test.hoge((x) -> (y) -> (z) -> x + y + z);
+	static function main(args : string[]) : void {
+		log _Main.hoge((x) -> (y) -> (z) -> x + y + z);
 	}
 }

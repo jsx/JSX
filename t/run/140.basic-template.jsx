@@ -10,8 +10,8 @@ class Adder.<T> {
 	}
 }
 
-class Test {
-	static function run() : void {
+class _Main {
+	static function main(args : string[]) : void {
 		var f = new Adder.<number>(1, 3);
 		log f.result;
 		var g = new Adder.<string>("abc", "def");

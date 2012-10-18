@@ -9,8 +9,8 @@ yes
 hi
 */
 
-class Test {
-	static function run() : void {
+class _Main {
+	static function main(args : string[]) : void {
 		log "" ?: "yes";
 		log "yes" ?: "no";
 		log 0 ?: 1;

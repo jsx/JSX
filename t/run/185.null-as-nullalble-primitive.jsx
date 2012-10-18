@@ -3,8 +3,8 @@ true
 false
 3
 */
-class Test {
-	static function run() : void {
+class _Main {
+	static function main(args : string[]) : void {
 		var n = null : Nullable.<number>;
 		log n == null;
 		n = 3;

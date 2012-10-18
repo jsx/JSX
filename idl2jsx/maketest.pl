@@ -129,7 +129,6 @@ import "js/web.jsx";
 class _Test extends TestCase {
 
 : for $classes -> $class {
-    // #<: $~class.count :>
     function compile_<: $class.name :>(o : <: $class.name :>) : void {
     : for $class.tests -> $statement {
         <: $statement :>

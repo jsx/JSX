@@ -6,8 +6,8 @@ goodbye
 import "059.import/hello.jsx";
 import "059.import/sub/goodbye.jsx";
 
-class Test {
-	static function run() : void {
+class _Main {
+	static function main(args : string[]) : void {
 		new Hello().say();
 		new Goodbye().say();
 	}

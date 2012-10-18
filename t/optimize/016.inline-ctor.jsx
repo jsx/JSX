@@ -15,16 +15,16 @@ class Base {
 	}
 }
 
-class Test extends Base {
+class _Main extends Base {
 	function constructor() {
 	}
 	function constructor(value : string) {
 		super(value);
 	}
-	static function run() : void {
-		var b = new Test();
+	static function main(args : string[]) : void {
+		var b = new _Main();
 		log b.value;
-		b = new Test("def");
+		b = new _Main("def");
 		log b.value;
 	}
 }

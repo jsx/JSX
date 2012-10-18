@@ -49,8 +49,8 @@ abc
 
 null access
 */
-class Test {
-	static function run() : void {
+class _Main {
+	static function main(args : string[]) : void {
 		var b : Nullable.<boolean> = false;
 		log b;
 		log b as boolean;

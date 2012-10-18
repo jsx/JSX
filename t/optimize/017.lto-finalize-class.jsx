@@ -5,12 +5,12 @@ abc
 --optimize lto,inline
 */
 
-class Test {
+class _Main {
 	function message() : string {
 		return "abc";
 	}
-	static function run() : void {
-		var t = new Test();
+	static function main(args : string[]) : void {
+		var t = new _Main();
 		var m = t.message();
 		log m;
 	}

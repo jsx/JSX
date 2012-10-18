@@ -10,8 +10,8 @@ class CTrue implements I2 {
 }
 class CFalse implements I1 {
 }
-class Test {
-	static function run() : void {
+class _Main {
+	static function main(args : string[]) : void {
 		var i1 : I1 = new CTrue();
 		var i2 : I2 = i1 as I2;
 		log i2 != null;

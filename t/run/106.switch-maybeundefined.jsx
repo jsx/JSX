@@ -3,8 +3,8 @@ ok
 ok
 */
 
-class Test {
-	static function run() : void {
+class _Main {
+	static function main(args : string[]) : void {
 		switch ([2][0]) {
 		case 2:
 			log "ok";

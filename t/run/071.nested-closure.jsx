@@ -3,7 +3,7 @@ hello
 world
 */
 
-class Test {
+class _Main {
 	var foo = "hello";
 
 	function constructor() {
@@ -16,7 +16,7 @@ class Test {
 		log this.foo;
 	}
 
-	static function run() : void {
-		new Test();
+	static function main(args : string[]) : void {
+		new _Main();
 	}
 }

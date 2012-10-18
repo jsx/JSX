@@ -3,7 +3,7 @@ true
 detected invalid cast, value is not a boolean
 */
 
-class Test {
+class _Main {
 	static function ok() : variant {
 		return true;
 	}
@@ -13,8 +13,8 @@ class Test {
 	static function say(b : boolean) : void {
 		log b;
 	}
-	static function run() : void {
-		Test.say(Test.ok() as __noconvert__ boolean);
-		Test.say(Test.ng() as __noconvert__ boolean);
+	static function main(args : string[]) : void {
+		_Main.say(_Main.ok() as __noconvert__ boolean);
+		_Main.say(_Main.ng() as __noconvert__ boolean);
 	}
 }

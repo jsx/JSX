@@ -3,8 +3,8 @@ foo
 bar
 */
 
-class Test {
-	static function run() : void {
+class _Main {
+	static function main(args : string[]) : void {
 		(function() : void { log "foo"; }());
 		(function() : void { log "bar"; })();
 	}

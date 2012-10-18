@@ -15,8 +15,8 @@ class K.<T> {
 	}
 }
 
-class Test {
-	static function run() : void {
+class _Main {
+	static function main(args : string[]) : void {
 		var t = new K.<number>();
 		log t.n;
 		t = new K.<number>(true);

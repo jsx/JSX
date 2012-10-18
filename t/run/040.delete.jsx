@@ -2,8 +2,8 @@
 1
 undefined
 */
-class Test {
-	static function run() : void {
+class _Main {
+	static function main(args : string[]) : void {
 		var a = {
 			x: 3,
 			y: 1,

@@ -25,8 +25,8 @@ class ArrayWrapper.<T> implements Enumerable.<T> {
     for (var x in this._xs) f(x);
   }
 }
-class Test {
-  static function run(): void {
+class _Main {
+  static function main(args : string[]): void {
     var xs = new ArrayWrapper.<number>([1, 2, 3]);
     xs.each((x) -> { log x; });
     log xs.forall((x) -> x < 10);

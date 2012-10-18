@@ -1,8 +1,8 @@
 /*EXPECTED
 5
 */
-class Test {
-	static function run() : void {
+class _Main {
+	static function main(args : string[]) : void {
 		for (var i = 0; i < 10; ++i)
 			if (i == 5)
 				break;

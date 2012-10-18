@@ -22,8 +22,10 @@
 
 /***
  * <p>The file defines the APIs of the built-in objects of JSX, designed to be compatible to <a href="http://www.ecma-international.org/publications/standards/Ecma-262-arch.htm">the 3rd edition of the ECMA-262 standard</a> whenever possible.</p>
- * 
+ *
  * <p>The description of the API is based on <a href="https://developer.mozilla.org/en/JavaScript/Reference/">the MDN JavaScript Reference</a> under the <a href="http://creativecommons.org/licenses/by-sa/2.5/">Creative Commons: Attribution-Sharealike license</a>.</p>
+ *
+ * @author DeNA., Co., Ltd.
  */
 
 /**
@@ -47,8 +49,8 @@ native final class Map.<T> {
 
 	/**
 	 * Returns a boolean indicating whether the object has the specified property.
-	 * 
-	 * @paarm key The name of the property to test.
+	 *
+	 * @param key The name of the property to test.
 	 */
 	function hasOwnProperty(key : string) : boolean;
 
@@ -94,7 +96,7 @@ native final class Array.<T> {
 
 	/**
 	 * Returns a new array comprised of this array joined with other array(s) and/or value(s).
-	 * 
+	 *
 	 * @param arrayN Arrays to concatenate to the resulting array.
 	 */
 	function concat(...arrayN : Array.<T>) : Array.<T>;
@@ -106,96 +108,127 @@ native final class Array.<T> {
 
 	/**
 	 * Joins all elements of an array into a string.
-	 * 
+	 *
 	 * @param separator Specifies a string to separate each element of the array.
 	 */
 	function join(separator : string) : string;
 
 	/**
 	 * Removes the last element from an array and returns that element.
-	 * 
+	 *
 	 * @return The last element of the array that has been removed, or null if the array was empty.
 	 */
 	function pop() : Nullable.<T>;
 
 	/**
 	 * Mutates an array by appending the given elements and returning the new length of the array.
-	 * 
+	 *
 	 * @param itemN The elements to add to the end of the array.
 	 */
-	function push(...itemN : T) : int;
+	function push(...itemN : Nullable.<T>) : int;
 
 	/**
 	 * Reverses an array in place.  The first array element becomes the last and the last becomes the first.
-	 * 
+	 *
 	 * @return Returns reference to itself.
 	 */
 	function reverse() : Array.<T>;
 
 	/**
 	 * Removes the first element from an array and returns that element. This method changes the length of the array.
-	 * 
+	 *
 	 * @return The first element of the array that has been removed, or null if the array was empty.
 	 */
 	function shift() : Nullable.<T>;
 
 	/**
 	 * Returns a one-level deep copy of a portion of an array.
-	 * 
+	 *
 	 * @param start Zero-based index at which to begin extraction.
 	 */
 	function slice(start : number) : Array.<T>;
 
 	/**
 	 * Returns a one-level deep copy of a portion of an array.
-	 * 
+	 *
 	 * @param start Zero-based index at which to begin extraction.
 	 * @param end Zero-based index at which to end extraction. slice extracts up to but not including end.
 	 */
 	function slice(start : number, end : number) : Array.<T>;
 
 	/**
-	 * Sorts the elements of an array in place and returns the array.  The array is sorted lexicographically (in dictionary order) according to the string conversion of each element.
+	 * Sorts the elements of an array in place and returns the array.
+	 * The sort is not necessarily stable.
+	 * The array is sorted lexicographically (in dictionary order) according to the string conversion of each element.
 	 */
 	function sort() : Array.<T>;
 
 	/**
 	 * Sorts the elements of an array in place and returns the array.
-	 * 
+	 * The sort is not necessarily stable.
+	 *
 	 * @param comparefn Specifies a function that defines the sort order.
 	 */
 	function sort(comparefn : function (x : Nullable.<T>, y : Nullable.<T>) : number) : Array.<T>;
 
 	/**
 	 * Changes the content of an array, adding new elements while removing old elements.
-	 * 
+	 *
 	 * @param start Index at which to start changing the array. If negative, will begin that many elements from the end.
 	 * @param deleteCount An integer indicating the number of old array elements to remove.
 	 * @param itemN The elements to add to the array.  If you don't specify any elements, <code>splice</code> simply removes elements from the array.
-	 * 
+	 *
 	 * @return An array containing the removed elements. If only one element is removed, an array of one element is returned.
 	 */
 	function splice(start : number, deleteCount : number, ...itemN : T) : Array.<T>;
 
 	/**
 	 * Adds one or more elements to the beginning of an array and returns the new length of the array.
-	 * 
+	 *
 	 * @param itemN The elements to add to the front of the array.
 	 * @return The new <code>length</code> property of the object upon which the method was called.
 	 */
-	function unshift(...itemN : T) : int;
+	function unshift(...itemN : Nullable.<T>) : int;
 
 	// 15.4.4 (ES5)
+	/**
+	 * Returns the first index at which a given element can be found in the
+	 * array, or -1 if it is not present.
+	 */
 	function indexOf(value : Nullable.<T>) : number;
 	function indexOf(value : Nullable.<T>, fromIndex : number) : number;
+
+	/**
+	 * Returns the last index at which a given element can be found in the
+	 * array, or -1 if it is not present. The array is searched backward.
+	 */
 	function lastIndexOf(value : Nullable.<T>) : number;
 	function lastIndexOf(value : Nullable.<T>, fromIndex : number) : number;
+
+	/**
+	 * Tests whether all elements in the array pass the test implemented by
+	 * the provided function.
+	 *
+	 * @callbackfn A function to test for each element.
+	 */
 	function every(callbackfn : function(value : Nullable.<T>) : boolean) : boolean;
 	function every(callbackfn : function(value : Nullable.<T>, index : number) : boolean) : boolean;
 	function every(callbackfn : function(value : Nullable.<T>, index : number, array : Array.<T>) : boolean) : boolean;
+
+	/**
+	 * Tests whether some element in the array passes the test implemented
+	 * by the provided function.
+	 */
 	function some(callbackfn : function(value : Nullable.<T>) : boolean) : boolean;
 	function some(callbackfn : function(value : Nullable.<T>, index : number) : boolean) : boolean;
 	function some(callbackfn : function(value : Nullable.<T>, index : number, array : Array.<T>) : boolean) : boolean;
+
+	/**
+	 * Calls callbackfn once for each element in the array, in ascending
+	 * order.
+	 *
+	 * @param callbackfn A function to call for each element.
+	 */
 	inline function forEach(callbackfn : function(value : Nullable.<T>) : void) : void {
 		for (var i in this) {
 			callbackfn(this[i]);
@@ -203,21 +236,65 @@ native final class Array.<T> {
 	}
 	function forEach(callbackfn : function(value : Nullable.<T>, index : number) : void) : void;
 	function forEach(callbackfn : function(value : Nullable.<T>, index : number, array : Array.<T>) : void) : void;
+
+	/**
+	 * Creates a new array with the results of calling a provided function
+	 * on every element in this array.
+	 *
+	 * @param callbackfn A function that produces an element of the new
+	 *        <code>Array.&lt;U&gt;</code> from an element of the current one.
+	 */
 	function map.<U>(callbackfn : function(value : Nullable.<T>) : Nullable.<U>) : Array.<U>;
 	function map.<U>(callbackfn : function(value : Nullable.<T>, index : number) : Nullable.<U>) : Array.<U>;
 	function map.<U>(callbackfn : function(value : Nullable.<T>, index : number, array : Array.<T>) : Nullable.<U>) : Array.<U>;
+
+	/**
+	 * Creates a new array with all elements that pass the test implemented
+	 * the provided function.
+	 *
+	 * @param callbackfn A function to test each elements of the array.
+	 */
 	function filter(callbackfn : function(value : Nullable.<T>) : boolean) : Array.<T>;
 	function filter(callbackfn : function(value : Nullable.<T>, index : number) : boolean) : Array.<T>;
 	function filter(callbackfn : function(value : Nullable.<T>, index : number, array : Array.<T>) : boolean) : Array.<T>;
 
+	/**
+	 * Apply a function against an accumulator and each value of the array
+	 * (from left-to-right) as to reduce it to a single value.
+	 *
+	 * <code>reduce</code> will throw <code>TypeError</code> if the array
+	 * contains no elements and no initialValue is suplied.
+	 *
+	 * @param callbackfn A function to execute on each value in the element,
+	 *        taking four arguments: the previousValue (the value previously
+	 *        returned in the last invocation of the callback), the
+	 *        currentValue (the current element being processed in the array),
+	 *        the currentIndex and the array.
+	 */
 	function reduce(callbackfn : function(previousValue : Nullable.<T>, currentValue : Nullable.<T>) : Nullable.<T>) : Array.<T>;
+	function reduce(callbackfn : function(previousValue : Nullable.<T>, currentValue : Nullable.<T>, currentIndex : number) : Nullable.<T>) : Array.<T>;
+	function reduce(callbackfn : function(previousValue : Nullable.<T>, currentValue : Nullable.<T>, currentIndex : number, array : Array.<T>) : Nullable.<T>) : Array.<T>;
+	/* with initial value; won't throw exception. */
 	function reduce(callbackfn : function(previousValue : Nullable.<T>, currentValue : Nullable.<T>) : Nullable.<T>, initialValue : T) : Array.<T>;
+	function reduce(callbackfn : function(previousValue : Nullable.<T>, currentValue : Nullable.<T>, currentIndex : number) : Nullable.<T>, initialValue : T) : Array.<T>;
+	function reduce(callbackfn : function(previousValue : Nullable.<T>, currentValue : Nullable.<T>, currentIndex : number, array : Array.<T>) : Nullable.<T>, initialValue : T) : Array.<T>;
+
+
+	/**
+	 * Apply a function simultaneously against two values of the array
+	 * (from right-to-left) as to reduce it to a single value.
+	 */
 	function reduceRight(callbackfn : function(previousValue : Nullable.<T>, currentValue : Nullable.<T>) : Nullable.<T>) : Array.<T>;
+	function reduceRight(callbackfn : function(previousValue : Nullable.<T>, currentValue : Nullable.<T>, currentIndex : number) : Nullable.<T>) : Array.<T>;
+	function reduceRight(callbackfn : function(previousValue : Nullable.<T>, currentValue : Nullable.<T>, currentIndex : number, array : Array.<T>) : Nullable.<T>) : Array.<T>;
+
 	function reduceRight(callbackfn : function(previousValue : Nullable.<T>, currentValue : Nullable.<T>) : Nullable.<T>, initialValue : T) : Array.<T>;
+	function reduceRight(callbackfn : function(previousValue : Nullable.<T>, currentValue : Nullable.<T>) : Nullable.<T>, initialValue : T, currentIndex : number) : Array.<T>;
+	function reduceRight(callbackfn : function(previousValue : Nullable.<T>, currentValue : Nullable.<T>) : Nullable.<T>, initialValue : T, currentIndex : number, array : Array.<T>) : Array.<T>;
 
 	/**
 	 * <p>A positive integer between 0 and a value less than 2<sup>32</sup> that specifies the number of elements in an array.</p>
-	 * 
+	 *
 	 * <p>You can set the length property to truncate an array at any time. When you extend an array by changing its length property, the created elements are initialized to null.</p>
 	 */
 	var length : number;
@@ -225,7 +302,7 @@ native final class Array.<T> {
 
 /**
  * <p>A wrapper object for primitive <code>string</code>s.</p>
- * 
+ *
  * <p>Unless otherwise noted, the defintions of the methods match those specified in ECMA-262, 3rd edition.</p>
  */
 native final class String {
@@ -273,7 +350,7 @@ native final class String {
 	/**
 	 * When the <code>concat</code> method is called with zero or more arguments <code>string1</code>, <code>string2</code>, etc., it returns a string consisting of the characters of this object followed by the characters of each of string1, string2, etc. The result is a string value, not a String object.
 	 */
-	function concat(...stringN : String) : string;
+	function concat(...stringN : string) : string;
 
 	/**
 	 * If searchString appears as a substring of the result of converting this object to a string then the index of the smallest such position is returned; otherwise, -1 is returned.
@@ -297,18 +374,18 @@ native final class String {
 
 	/**
 	 * Returns a number indicating whether a reference string comes before or after or is the same as the given string in sort order.
-	 * 
+	 *
 	 * Returns a number indicating whether a reference string comes before or after or is the same as the given string in sort order. Returns a negative number if the string occurs earlier in a sort than compareString, returns a positive number if the string occurs afterwards in such a sort, and returns 0 if they occur at the same level.
-	 * 
+	 *
 	 * @param that The string against which the referring string is comparing.
 	 */
 	function localeCompare(that : string) : number;
 
 	/**
 	 * Used to retrieve the matches when matching a string against a regular expression.
-	 * 
+	 *
 	 * If the regular expression does not include the g flag, returns the same result as regexp.exec(string).  If the regular expression includes the g flag, the method returns an Array containing all matches. If there were no matches, the method returns null.  The returned Array has an extra input property, which contains the regexp that generated it as a result. In addition, it has an index property, which represents the zero-based index of the match in the string.
-	 * 
+	 *
 	 * @param regexp A regular expression object.
 	 */
 	function match(regexp : RegExp) : string [];
@@ -342,17 +419,17 @@ native final class String {
 	 * Executes the search for a match between a regular expression and this <code>String</code> object.
 	 */
 	function search(searchValue : RegExp) : int;
-	
+
 	/**
 	 * Extracts a section of a string and returns a new string.
-	 * 
+	 *
 	 * @param start The zero-based index at which to begin extraction.
 	 */
 	function slice(start : number) : string;
 
 	/**
 	 * Extracts a section of a string and returns a new string.
-	 * 
+	 *
 	 * @param start The zero-based index at which to begin extraction.
 	 * @param end The zero-based index at which to end extraction.
 	 */
@@ -360,14 +437,14 @@ native final class String {
 
 	/**
 	 * Splits a String object into an array of strings by separating the string into substrings.
-	 * 
+	 *
 	 * @param separator Specifies the character sequence to use for separating the string.
 	 */
 	function split(separator : string) : string [];
 
 	/**
 	 * Splits a String object into an array of strings by separating the string into substrings.
-	 * 
+	 *
 	 * @param separator Specifies the character sequence to use for separating the string.
 	 * @param limit Integer specifying a limit on the number of splits to be found.  The <code>split</code> method still splits on every match of <code>separator</code>, but it truncates the returned array to at most <code>limit</code> elements.
 	 */
@@ -375,14 +452,14 @@ native final class String {
 
 	/**
 	 * Splits a String object into an array of strings by separating the string into substrings.
-	 * 
+	 *
 	 * @param separator Specifies an regular expression to use for separating the string.
 	 */
 	function split(separator : RegExp) : string [];
 
 	/**
 	 * Splits a String object into an array of strings by separating the string into substrings.
-	 * 
+	 *
 	 * @param separator Specifies an regular expression to use for separating the string.
 	 * @param limit Integer specifying a limit on the number of splits to be found.  The <code>split</code> method still splits on every match of <code>separator</code>, but it truncates the returned array to at most <code>limit</code> elements.
 	 */
@@ -390,14 +467,14 @@ native final class String {
 
 	/**
 	 * Returns a subset of a <code>string</code> starting at the given offset.
-	 * 
+	 *
 	 * @param start The zero-based index at which to begin extraction.
 	 */
 	function substring(start : number) : string;
 
 	/**
 	 * Returns a subset of a <code>string</code> starting at the given offset.
-	 * 
+	 *
 	 * @param start The zero-based index at which to begin extraction.
 	 * @param end The zero-based index at which to end extraction.
 	 */
@@ -439,28 +516,28 @@ native final class String {
 
 	/**
 	 * Encodes a Uniform Resource Identifier (URI) component by replacing each instance of certain characters by one, two, three, or four escape sequences representing the UTF-8 encoding of the character.
-	 * 
+	 *
 	 * @param str A component of a URI.
 	 */
 	static function encodeURIComponent(str : string) : string;
 
 	/**
 	 * Decodes a Uniform Resource Identifier (URI) component previously created by encodeURIComponent or by a similar routine.
-	 * 
+	 *
 	 * @param encodedURI An encoded component of a Uniform Resource Identifier.
 	 */
 	static function decodeURIComponent(encodedURI : string) : string;
 
 	/**
 	 * Encodes a Uniform Resource Identifier (URI) by replacing each instance of certain characters by one, two, three, or four escape sequences representing the UTF-8 encoding of the character.
-	 * 
+	 *
 	 * @param str A complete Uniform Resource Identifier.
 	 */
 	static function encodeURI(str : string) : string;
 
 	/**
 	 * Decodes a Uniform Resource Identifier (URI) previously created by encodeURI or by a similar routine.
-	 * 
+	 *
 	 * @param encodedURI A complete, encoded Uniform Resuorce Identifier.
 	 */
 	static function decodeURI(encodedURI : string) : string;
@@ -539,9 +616,9 @@ native final class Number {
 	override function toString() : string;
 
 	/**
-	 * Returns a string representing the specified Number object.
-	 * 
-	 * @param An integer between 2 and 36 specifying the base to use for representing numeric values.
+	 * Returns a string representing the number.
+	 *
+	 * @param radix An integer between 2 and 36 specifying the base to use for representing numeric values.
 	 */
 	function toString(radix : number) : string;
 
@@ -572,14 +649,14 @@ native final class Number {
 
 	/**
 	 * Parses a string argument and returns an integer if successful, or <code>NaN</code> if failed.
-	 * 
+	 *
 	 * @param str The value to parse.  Leading whitespace in the string is ignored.
 	 */
 	static __pure__ function parseInt(str :string) : number;
 
 	/**
 	 * Parses a string argument and returns an integer if successful, or <code>NaN</code> if failed.
-	 * 
+	 *
 	 * @param str The value to parse.  Leading whitespace in the string is ignored.
 	 * @param radix An integer that represents the radix of the above mentioned string.
 	 */
@@ -587,9 +664,9 @@ native final class Number {
 
 	/**
 	 * <p>Parses a string argument and returns a floating point number.</p>
-	 * 
+	 *
 	 * <p>If it encounters a character other than a sign (+ or -), numeral (0-9), a decimal point, or an exponent, it returns the value up to that point and ignores that character and all succeeding characters. Leading and trailing spaces are allowed.</p>
-	 * 
+	 *
 	 * <p>If the first character cannot be converted to a number, parseFloat returns <code>NaN</code>.</p>
 	 */
 	static __pure__ function parseFloat(str :string) : number;
@@ -608,7 +685,7 @@ native final class Number {
 
 /**
  * <p>Provides mathmetical constants and functions.</p>
- * 
+ *
  * <p>Unless otherwise noted, the defintions of the methods match those specified in ECMA-262, 3rd edition.</p>
  */
 native final class Math {
@@ -693,7 +770,7 @@ native final class Math {
 
 /**
  * <p>An object for working with dates and times.</p>
- * 
+ *
  * <p>Unless otherwise noted, the defintions of the methods match those specified in ECMA-262, 3rd edition.</p>
  */
 native final class Date {
@@ -735,14 +812,14 @@ native final class Date {
 
 	/**
 	 * Creates a Date object.
-	 * 
+	 *
 	 * @param value String value representing a date. The string should be in a format recognized by the <code>parse</code> method (IETF-compliant RFC 2822 timestamps).
 	 */
 	function constructor(value :string);
 
 	/**
 	 * Creates a Date object.
-	 * 
+	 *
 	 * @param value Integer value representing the number of milliseconds since 1 January 1970 00:00:00 UTC (Unix Epoch).
 	 */
 	function constructor(value :number);
@@ -831,7 +908,7 @@ native final class Date {
 
 /**
  * <p>An object that represents a regular-expression.</p>
- * 
+ *
  * <p>Unless otherwise noted, the defintions of the methods match those specified in ECMA-262, 3rd edition.</p>
  */
 native final class RegExp {
@@ -892,7 +969,11 @@ native class TypeError extends Error {
 }
 
 // 5.12
-
+/**
+ * <p>Provides static functions to manipulate JSON.</p>
+ *
+ * <p>Unless otherwise noted, the defintions of the methods match those specified in ECMA-262, 5th edition.</p>
+ */
 native final class JSON {
 
 	delete function constructor();
@@ -925,7 +1006,7 @@ native final class JSX {
 
 	/**
 	 * <p>Posts the profiler results to the given URL.</p>
-	 * 
+	 *
 	 * <p>Please refer to <a href="http://jsx.github.com/doc/profiler.html">the profiler document</a> for using the function.</p>
 	 */
 	static function postProfileResults(url : string) : void;

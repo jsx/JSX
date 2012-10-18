@@ -7,8 +7,8 @@ Two
 
 import "119.import-all-into/*.jsx" into N;
 
-class Test {
-	static function run() : void {
+class _Main {
+	static function main(args : string[]) : void {
 		new N.One();
 		new N.Two();
 		N.One.say();

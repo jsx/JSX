@@ -3,7 +3,7 @@
 detected invalid cast, value is not a number
 */
 
-class Test {
+class _Main {
 	static function ok() : variant {
 		return 3;
 	}
@@ -13,8 +13,8 @@ class Test {
 	static function say(b : number) : void {
 		log b;
 	}
-	static function run() : void {
-		Test.say(Test.ok() as __noconvert__ number);
-		Test.say(Test.ng() as __noconvert__ number);
+	static function main(args : string[]) : void {
+		_Main.say(_Main.ok() as __noconvert__ number);
+		_Main.say(_Main.ng() as __noconvert__ number);
 	}
 }

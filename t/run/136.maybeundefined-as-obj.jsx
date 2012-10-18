@@ -2,8 +2,8 @@
 abc
 undefined
 */
-class Test {
-	static function run() : void {
+class _Main {
+	static function main(args : string[]) : void {
 		var a = [ new String("abc") ];
 		log (a[0] as String).toString();
 		log a[1] as String;

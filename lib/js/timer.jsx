@@ -20,7 +20,14 @@
  * IN THE SOFTWARE.
  */
 
+/***
+ * Timer utilities available both on browsers and node.js
+ *
+ * @author DeNA, Co., Ltd.
+ */
+
 import "js.jsx";
+
 
 final class Timer {
 	static function setTimeout(callback : function():void, intervalMS : number) : TimerHandle {

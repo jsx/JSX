@@ -1,0 +1,18 @@
+#compdef jsx
+
+_arguments -C \
+    '(- 1 *)--help[displays this help and exits]' \
+    '(- 1 *)--version[displays displays the version and exits]' \
+	'(--add-search-path)--add-search-path[add a path to library search paths]:Search Path:' \
+    '(--executable)--executable[add launcher to call _Main.main(\:string\[\])\:void]:executable mode:(web node)' \
+	'(--run)--run[runs _Main.main(\:string\[\])\:void after compiling]' \
+	'(--test)--test[runs _Test#test*()\:void after compiling]' \
+	'(--output)--output[output file (default\:stdout)]:output file:_files' \
+	'(--mode)--mode[compilation mode (default\:compile)]:compilation mode:(compile parse doc)' \
+	'(--target)--target[target language (default:javascript)]:javascript|c++:(javascript c++)' \
+	'(--release)--release[omits the debugging features from the generated code (run-time type checking, logging, assertion)]' \
+	'(--optimize)--optimize[list of optimize commands (no-assert, no-log)]:optimize commands:' \
+	'(--enable-type-check)--enable-type-check[enables run-time type checking]' \
+	'(--enable-source-map)--enable-source-map[enables source map debugging info]' \
+    '(1 *):jsx files:_files -g"*\.jsx"' && return 0
+return ret

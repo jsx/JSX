@@ -5,8 +5,8 @@ x 100
 x 100
 */
 
-class Test {
-	static function run() : void {
+class _Main {
+	static function main(args : string[]) : void {
 		log "x", (99+1) as string;
 		log "x " + ((99+1) as string);
 		log "x " +  (99+1) as string;

@@ -2,7 +2,7 @@
 -42
 */
 
-class Test {
+class _Main {
 	static function f(x : number) : number {
 		log x;
 		return x;
@@ -12,7 +12,7 @@ class Test {
 		return x;
 	}
 
-	static function run() : void {
-		Test.f(-42);
+	static function main(args : string[]) : void {
+		_Main.f(-42);
 	}
 }

@@ -5,15 +5,15 @@ abc
 --optimize lto,inline
 */
 
-class Test {
+class _Main {
 	var s = "ab";
 	function f() : string {
 		return this.s + "c";
 	}
-	static var s : Test;
-	static function run() : void {
-		Test.s = new Test();
-		var s = Test.s.f();
+	static var s : _Main;
+	static function main(args : string[]) : void {
+		_Main.s = new _Main();
+		var s = _Main.s.f();
 		log s;
 	}
 }

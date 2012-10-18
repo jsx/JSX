@@ -1,0 +1,22 @@
+=head2 Mon Sep 17 13:34:41 2012: C<Module> L<JSON::PP|JSON::PP>
+
+=over 4
+
+=item *
+
+C<installed into: /Users/gfx/repo/JSX/t/util/extlib/lib/perl5>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 2.27200>
+
+=item *
+
+C<EXE_FILES: bin/json_pp>
+
+=back
+

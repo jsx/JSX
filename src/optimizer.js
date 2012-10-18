@@ -274,7 +274,7 @@ var Optimizer = exports.Optimizer = Class.extend({
 				this._commands[i].setup(this).performOptimization();
 				this.log("finished optimizer: " + this._commands[i]._identifier);
 			} catch (e) {
-				console.error("optimizer '" + this._identifier + "' died unexpectedly, dumping the logs");
+				console.error("optimizer '" + this._commands[i]._identifier + "' died unexpectedly, dumping the logs");
 				this.dumpLogs(this._log);
 				throw e;
 			}

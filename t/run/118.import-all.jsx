@@ -7,8 +7,8 @@ Two
 
 import "118.import-all/*.jsx";
 
-class Test {
-	static function run() : void {
+class _Main {
+	static function main(args : string[]) : void {
 		new One();
 		new Two();
 		One.say();

@@ -7,8 +7,8 @@ false
 /*JSX_OPTS
 --optimize fold-const
 */
-class Test {
-	static function run() : void {
+class _Main {
+	static function main(args : string[]) : void {
 		log true as string;
 		log false as string;
 		log 1 as string;

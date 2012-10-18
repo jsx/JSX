@@ -1,12 +1,12 @@
 /*EXPECTED
 hello
 */
-class Test {
+class _Main {
 	static function f() : number {
 		log "hello";
 		return 0;
 	}
-	static function run() : void {
-		void Test.f();
+	static function main(args : string[]) : void {
+		void _Main.f();
 	}
 }

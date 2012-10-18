@@ -2,7 +2,7 @@
 hello
 goodbye
 */
-class Test {
+class _Main {
 	function constructor() {
 	}
 	function constructor(n : number) {
@@ -13,8 +13,8 @@ class Test {
 	function constructor(cb : () -> void) {
 		cb();
 	}
-	static function run() : void {
-		new Test((s) -> { log s; });
-		new Test(() -> { log "goodbye"; });
+	static function main(args : string[]) : void {
+		new _Main((s) -> { log s; });
+		new _Main(() -> { log "goodbye"; });
 	}
 }

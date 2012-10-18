@@ -2,11 +2,11 @@
 hello
 */
 
-class Test {
+class _Main {
 	function constructor() {
 		log "hello";
 	}
-	static function run() : void {
-		new Test;
+	static function main(args : string[]) : void {
+		new _Main;
 	}
 }

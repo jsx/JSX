@@ -849,9 +849,14 @@ var MemberVariableDefinition = exports.MemberVariableDefinition = MemberDefiniti
 		return new MemberVariableDefinition(this._token, this._nameToken, this._flags, type, initialValue);
 	},
 
+	toString: function () {
+		return this.name() + " : " + this._type.toString();
+	},
+
 	serialize: function () {
 		return {
-			"name"         : this.name(),
+			"token"      : this._token.serialize(),
+			"nameToken"  : Util.serializeNullable(this._nameToken),
 			"flags"        : this.flags(),
 			"type"         : Util.serializeNullable(this._type),
 			"initialValue" : Util.serializeNullable(this._initialValue)
@@ -924,6 +929,16 @@ var MemberFunctionDefinition = exports.MemberFunctionDefinition = MemberDefiniti
 			for (var i = 0; i < this._closures.length; ++i)
 				this._closures[i].setParent(this);
 		}
+	},
+
+	toString: function () {
+		var argsText = this._args.map(function (arg) {
+				return arg.getName().getValue() + " : " + arg.getType().toString();
+			}.bind(this)).join(", ");
+		return "function " +
+			this.name() +
+			"(" + argsText + ") : " +
+			this._returnType.toString();
 	},
 
 	instantiate: function (instantiationContext) {
@@ -1044,6 +1059,21 @@ var MemberFunctionDefinition = exports.MemberFunctionDefinition = MemberDefiniti
 	},
 
 	analyze: function (outerContext) {
+		// validate jsxdoc comments
+		var docComment = this.getDocComment();
+		if (docComment) {
+			var args = this.getArguments();
+			docComment.getParams().forEach(function (docParam, i) {
+				for(; i < args.length; ++i) {
+					if (args[i].getName().getValue() == docParam.getParamName()) {
+						return;
+					}
+				}
+				// invalid @param tag which is not present in the declaration.
+				outerContext.errors.push(new CompileError(docParam.getToken(), 'invalid parameter name "' + docParam.getParamName() + '" for ' + this.name() + "()"));
+			}.bind(this));
+		}
+
 		// return if is abtract (wo. function body) or is native
 		if (this._statements == null)
 			return;
@@ -1314,16 +1344,16 @@ var MemberFunctionDefinition = exports.MemberFunctionDefinition = MemberDefiniti
 
 var InstantiatedMemberFunctionDefinition = exports.InstantiatedMemberFunctionDefinition = MemberFunctionDefinition.extend({
 
-	constructor: function (token, name, flags, returnType, args, locals, statements, closures, lastTokenOfBody) {
-		MemberFunctionDefinition.prototype.constructor.call(this, token, name, flags, returnType, args, locals, statements, closures, lastTokenOfBody);
+	constructor: function (token, name, flags, returnType, args, locals, statements, closures, lastTokenOfBody, docComment) {
+		MemberFunctionDefinition.prototype.constructor.call(this, token, name, flags, returnType, args, locals, statements, closures, lastTokenOfBody, docComment);
 	}
 
 });
 
 var TemplateFunctionDefinition = exports.TemplateFunctionDefinition = MemberFunctionDefinition.extend({
 
-	constructor: function (token, name, flags, typeArgs, returnType, args, locals, statements, closures, lastTokenOfBody) {
-		MemberFunctionDefinition.prototype.constructor.call(this, token, name, flags, returnType, args, locals, statements, closures, lastTokenOfBody);
+	constructor: function (token, name, flags, typeArgs, returnType, args, locals, statements, closures, lastTokenOfBody, docComment) {
+		MemberFunctionDefinition.prototype.constructor.call(this, token, name, flags, returnType, args, locals, statements, closures, lastTokenOfBody, docComment);
 		this._typeArgs = typeArgs.concat([]);
 		this._instantiatedDefs = new TypedMap(function (x, y) {
 			for (var i = 0; i < x.length; ++i) {
@@ -1447,7 +1477,7 @@ var LocalVariable = exports.LocalVariable = Class.extend({
 	},
 
 	toString: function () {
-		return this._name + " : " + this._type;
+		return this._name.getValue() + " : " + this._type.toString();
 	},
 
 	popInstantiated: function () {
@@ -1590,7 +1620,8 @@ var LocalVariableStatuses = exports.LocalVariableStatuses = Class.extend({
 
 var TemplateClassDefinition = exports.TemplateClassDefinition = Class.extend({
 
-	constructor: function (className, flags, typeArgs, extendType, implementTypes, members, objectTypesUsed, docComment) {
+	constructor: function (token, className, flags, typeArgs, extendType, implementTypes, members, objectTypesUsed, docComment) {
+		this._token = token;
 		this._className = className;
 		this._flags = flags;
 		this._typeArgs = typeArgs.concat([]);
@@ -1608,6 +1639,10 @@ var TemplateClassDefinition = exports.TemplateClassDefinition = Class.extend({
 				}.bind(this));
 			}
 		}
+	},
+
+	getToken: function () {
+		return this._token;
 	},
 
 	className: function () {

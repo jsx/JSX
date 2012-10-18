@@ -6,7 +6,7 @@
 --optimize inline
 */
 
-final class Test {
+final class _Main {
 	var n = 0;
 	function constructor() {
 		log this.n;
@@ -16,7 +16,7 @@ final class Test {
 	function incr() : void {
 		++this.n;
 	}
-	static function run() : void {
-		new Test;
+	static function main(args : string[]) : void {
+		new _Main;
 	}
 }
