@@ -1,0 +1,16 @@
+#!/usr/bin/env perl
+# utility to format JSX completion for testing
+use strict;
+use warnings;
+use JSON;
+
+my $j = JSON->new->pretty(1);
+print $j->encode([
+    map {
+        my $data = {};
+        for my $field(qw(word partialWord type returnType args definedClass)) {
+            $data->{$field} = $_->{$field} if exists $_->{$field};
+        }
+        $data;
+    } @{$j->decode(join "", <>)}
+]);
