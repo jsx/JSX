@@ -1,4 +1,11 @@
+/***
+ * JSX development server started by `make server`
+ * includes JSX compiler for web (try/build/jsx-compiler.js).
+ *
+ */
+
 "use strict";
+
 var http = require("http"),
 	url = require("url"),
 	path = require("path"),
