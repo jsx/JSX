@@ -1566,15 +1566,24 @@ var Parser = exports.Parser = Class.extend({
 		var typeDecl = this._typeDeclarationNoArrayNoVoid();
 		if (typeDecl == null)
 			return null;
-		// []
-		while (this._expectOpt("[") != null) {
-			if ((token = this._expect("]")) == null)
-				return false;
-			if (typeDecl instanceof NullableType) {
-				this._newError("Nullable.<T> cannot be an array, should be: T[]");
-				return null;
+		while (true) {
+			// ?
+			if (this._expectOpt("?") != null) {
+				if ((typeDecl = this._toNullableType(typeDecl)) == null)
+					return null;
 			}
-			typeDecl = this._registerArrayTypeOf(token, typeDecl);
+			// []
+			else if (this._expectOpt("[") != null) {
+				if ((token = this._expect("]")) == null)
+					return false;
+				if (typeDecl instanceof NullableType) {
+					this._newError("Nullable.<T> cannot be an array, should be: T[]");
+					return null;
+				}
+				typeDecl = this._registerArrayTypeOf(token, typeDecl);
+			}
+			else
+				break;
 		}
 		return typeDecl;
 	},
@@ -1589,7 +1598,14 @@ var Parser = exports.Parser = Class.extend({
 			this._newDeprecatedWarning("use of 'MayBeUndefined' is deprecated, use 'Nullable' instead");
 			// falls through
 		case "Nullable":
-			return this._nullableTypeDeclaration();
+			if (this._expect(".") == null || this._expect("<") == null)
+				return null;
+			var baseType = this._typeDeclaration(false);
+			if (baseType == null)
+				return null;
+			if (this._expect(">") == null)
+				return null;
+			return this._toNullableType(baseType);
 		case "variant":
 			return Type.variantType;
 		default:
@@ -1597,14 +1613,7 @@ var Parser = exports.Parser = Class.extend({
 		}
 	},
 
-	_nullableTypeDeclaration: function () {
-		if (this._expect(".") == null || this._expect("<") == null)
-			return null;
-		var baseType = this._typeDeclaration(false);
-		if (baseType == null)
-			return null;
-		if (this._expect(">") == null)
-			return null;
+	_toNullableType: function (baseType) {
 		if (baseType.equals(Type.variantType)) {
 			this._newError("variant cannot be declared as nullable (since it is always nullable)");
 			return null;
