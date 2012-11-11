@@ -1764,26 +1764,9 @@ var ConditionalExpression = exports.ConditionalExpression = OperatorExpression.e
 			typeIfTrue = this._condExpr.getType();
 		}
 		var typeIfFalse = this._ifFalseExpr.getType();
-		if (typeIfTrue.equals(typeIfFalse)) {
-			// ok
-			this._type = typeIfTrue;
-		} else if (
-			(typeIfTrue instanceof NullableType) == (typeIfFalse instanceof NullableType)
-			&& Type.isIntegerOrNumber(typeIfTrue.resolveIfNullable())
-			&& Type.isIntegerOrNumber(typeIfFalse.resolveIfNullable())) {
-			// special case to handle number == integer
-			this._type = typeIfTrue instanceof NullableType ? new NullableType(Type.numberType) : Type.numberType;
-		} else if (this._ifTrueExpr == null
-			&& (typeIfTrue.resolveIfNullable().equals(typeIfFalse)
-				|| (Type.isIntegerOrNumber(typeIfTrue.resolveIfNullable()) && Type.isIntegerOrNumber(typeIfFalse)))) {
-			// on ?: expr (wo. true expr), left hand can be maybeundefined.<right>
-			this._type = typeIfFalse;
-		} else if (this._ifTrueExpr != null && typeIfTrue.equals(Type.nullType) && typeIfFalse instanceof ObjectType) {
-			this._type = typeIfFalse;
-		} else if (this._ifTrueExpr != null && typeIfTrue instanceof ObjectType && typeIfFalse.equals(Type.nullType)) {
-			this._type = typeIfTrue;
-		} else {
-			context.errors.push(new CompileError(this._token, "returned types should be the same for operator ?: but got '" + typeIfTrue.toString() + "' and '" + typeIfFalse.toString() + "'"));
+		this._type = Type.calcLeastCommonAncestor(typeIfTrue, typeIfFalse);
+		if (this._type == null) {
+			context.errors.push(new CompileError(this._token, "could not get the join type of '" + typeIfTrue.toString() + "' and '" + typeIfFalse.toString() + "'"));
 			return false;
 		}
 		return true;
