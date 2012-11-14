@@ -93,7 +93,7 @@ class Hello {
 			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
 			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
 		};
-		image.src = 'img/teko.jpg';
+		image.src = 'teko.jpg';
 
 		Hello.gl = gl;
 		Hello.program = program;

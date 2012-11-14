@@ -80,8 +80,8 @@
           console.assert(script, lang + "-in");
 
           var src = script.firstChild.nodeValue.
-          replace(/\/\/<!\[CDATA\[\s*/, "").
-          replace(/\/\/\]\]>\s*/, "");
+            replace(/\/\/<!\[CDATA\[\s*/, "").
+            replace(/\/\/\]\]>\s*/, "");
           var textNode = document.createTextNode(src);
 
           var srcArea = document.getElementById(lang + "-out");

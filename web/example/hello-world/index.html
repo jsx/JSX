@@ -7,11 +7,16 @@
     <meta name="robots" content="noindex,nofollow">
 
     <!-- Le styles -->
-    <link href="../assets/css/bootstrap.css" rel="stylesheet">
+    <link href="../../assets/css/bootstrap.css" rel="stylesheet">
     <style type="text/css">
       body {
         padding-top: 60px;
         padding-bottom: 40px;
+      }
+      #jsx-out {
+        white-space: pre;
+        border: solid gray 1px;
+        padding: 10px;
       }
     </style>
 
@@ -20,8 +25,31 @@
       <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
 
-    <script src="../build/jsx-compiler.js"></script>
-    <script type="application/jsx" src="hello-world.jsx" data-arguments="[]"></script>
+    <script src="../../build/jsx-compiler.js"></script>
+    <script id="jsx-in" type="application/jsx" src="hello-world.jsx" data-arguments="[]"></script>
+    <script>
+      //<![CDATA[
+      window.addEventListener("load", function (e) {
+        "use strict";
+        var lang = "jsx";
+        var script = document.getElementById(lang + "-in");
+        console.assert(script, lang + "-in");
+
+        var xhr = new XMLHttpRequest();
+        xhr.open("GET", script.src, false);
+        xhr.send();
+
+        var src = xhr.responseText.
+          replace(/\/\/<!\[CDATA\[\s*/, "").
+          replace(/\/\/\]\]>\s*/, "");
+        var textNode = document.createTextNode(src);
+
+        var srcArea = document.getElementById(lang + "-out");
+        console.assert(srcArea, lang + "-out");
+        srcArea.appendChild(textNode);
+      });
+      //]]>
+    </script>
   </head>
 
   <body>
@@ -37,9 +65,9 @@
           <a class="brand" href="/">JSX</a>
           <div class="nav-collapse">
             <ul class="nav">
-              <li><a href="../">Try</a></li>
-              <li><a href="../source-map/">Debug with SourceMap</a></li>
-              <li class="active"><a href="../example/">Web Application Examples</a></li>
+              <li><a href="../../">Try</a></li>
+              <li><a href="../../source-map/">Debug with SourceMap</a></li>
+              <li class="active"><a href="../../example/">Web Application Examples</a></li>
             </ul>
           </div><!--/.nav-collapse -->
         </div>
@@ -55,6 +83,11 @@
       <div class="row">
         <div class="span8">
           <p><a class="btn btn-primary btn-large" id="run">Run the script</a></p>
+        </div>
+      </div>
+      <div class="row">
+        <div class="span8">
+          <div id="jsx-out"></div>
         </div>
       </div>
     </div> <!-- /container -->

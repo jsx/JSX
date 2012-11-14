@@ -1,42 +1,22 @@
 <html>
   <head>
-    <title>Fireworks</title>
+    <title>Fireworks in JSX</title>
     <meta name="viewport" content="width=device-width,user-scalable=no" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="robots" content="noindex,nofollow" />
-    <style>
-      body {
-        background-color: #222;
-        overflow: hidden;
-      }
-
-      #night-sky {
-        position: absolute;
-        top: 0;
-        left: 0;
-        background-color: #000;
-      }
-      #fps {
-        position: absolute;
-        top: 0;
-        left: 10px;
-        padding: 0;
-        margin: 0;
-        font-size: 20px;
-        color: #fff;
-      }
-    </style>
-    <script src="../build/jsx-compiler.js"></script>
+    <script src="../../build/jsx-compiler.js"></script>
     <script>
       jsx.optimizationLevel = 1;
     </script>
     <script type="application/jsx" src="fireworks.jsx" data-arguments='["night-sky", "fps", "1000"]'></script>
+    <link rel="stylesheet" href="./style.css" />
   </head>
   <body>
   <div>
     <canvas id="night-sky" width="400" height="400"></canvas>
     <p id="fps">not running</p>
+    <p id="link-to-another">JSX version / <a href="./js.html">JavaScript version</a></p>
   </div>
   </body>
 </html>
