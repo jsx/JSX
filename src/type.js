@@ -80,6 +80,83 @@ var Type = exports.Type = Class.extend({
 
 	$isIntegerOrNumber: function (type) {
 		return type instanceof IntegerType || type instanceof NumberType;
+	},
+
+	$calcLeastCommonAncestor: function (type1, type2) {
+		if (type1.equals(type2))
+			return type1;
+		if (Type.isIntegerOrNumber(type1) && Type.isIntegerOrNumber(type2))
+			return Type.numberType;
+		// VoidType
+		if (Type.voidType.equals(type1) || Type.voidType.equals(type2))
+			return null;
+		// NullType
+		if (Type.nullType.equals(type1))
+			return (Type.nullType.isConvertibleTo(type2))? type2 : new NullableType(type2);
+		if (Type.nullType.equals(type2))
+			return (Type.nullType.isConvertibleTo(type1))? type1 : new NullableType(type1);
+		if (Type.nullType.equals(type1) || Type.nullType.equals(type2))
+			return null;
+		// VariantType
+		if (Type.variantType.equals(type1) || Type.variantType.equals(type2))
+			return Type.variantType;
+		// PrimitiveTypes
+		if (type1.resolveIfNullable() instanceof PrimitiveType || type2.resolveIfNullable() instanceof PrimitiveType) {
+			if (type1.resolveIfNullable().equals(type2.resolveIfNullable()))
+				return new NullableType(type1);
+			else if (Type.isIntegerOrNumber(type1.resolveIfNullable()) && Type.isIntegerOrNumber(type2.resolveIfNullable()))
+				return new NullableType(Type.numberType);
+			else
+				return null;
+		}
+		// ObjectTypes
+		if (type1.resolveIfNullable() instanceof ParsedObjectType && type2.resolveIfNullable() instanceof ParsedObjectType) {
+			var obj1 = type1.resolveIfNullable();
+			var obj2 = type2.resolveIfNullable();
+			var ifaces1 = [];
+			for (;;) {
+				ifaces1 = ifaces1.concat(obj1.getClassDef().implementTypes());
+				if (obj2.isConvertibleTo(obj1))
+					break;
+				obj1 = obj1.getClassDef().extendType();
+			}
+			if (obj1.getToken().getValue() != "Object")
+				return obj1;
+			var candidates = [];
+			for (var i in ifaces1) {
+				var iface = ifaces1[i];
+				do {
+					if (obj2.isConvertibleTo(iface)) {
+						candidates.push(iface);
+						break;
+					}
+				} while (iface = iface.getClassDef().extendType());
+			}
+			function uniquify(list) {
+				var result = [];
+				for (var i = 0; i < list.length; ++i) {
+					result.push(list[i]);
+					for (var j = i + 1; j < list.length; ++j) {
+						if (list[i].equals(list[j])) {
+							result.pop();
+							break;
+						}
+					}
+				}
+				return result;
+			}
+			candidates = uniquify(candidates);
+			switch (candidates.length) {
+			case 0:
+				return obj1;
+			case 1:
+				return candidates[0];
+			default:
+				return null;
+			}
+		}
+		// FunctionType
+		return null;
 	}
 
 });
