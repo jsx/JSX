@@ -1,69 +1,58 @@
-#!/usr/bin/env node
+// JSX_TEST
+import "test-case.jsx";
+import "../src/util.jsx";
 
-var Class = require("../src/Class");
-var Test  = require("../src/Test");
+class _Test extends TestCase {
+	function testFormat() : void {
+		this.expect( Util.format("foo", new string[]) ).toBe("foo");
+		this.expect( Util.format("foo %1", ["bar"])).toBe("foo bar");
+		this.expect( Util.format("foo %1 %1", ["bar"])).toBe("foo bar bar");
+		this.expect( Util.format("foo %2 %1", ["bar", "baz"]) ).toBe('foo baz bar');
+		this.expect( Util.format("100%%1 %1", ["foo"]) ).toBe("100%1 foo");
+	}
 
-eval(Class.$import("../src/util"));
+	function testRepeat() : void {
+		this.expect( Util.repeat("x", 4) ).toBe("xxxx");
+		this.expect( Util.repeat("ab", 4) ).toBe("abababab");
+		this.expect( Util.repeat("z", 0) ).toBe("");
+	}
 
-"use strict";
+	function testEncodeStringLiteral() : void {
+		this.expect(Util.encodeStringLiteral("")).toBe('""');
+		this.expect(Util.encodeStringLiteral("abc")).toBe('"abc"');
+		this.expect(Util.encodeStringLiteral('"')).toBe('"\\""');
+		this.expect(Util.encodeStringLiteral('\0')).toBe('"\\0"');
+		this.expect(Util.encodeStringLiteral('\\')).toBe('"\\\\"');
+		this.expect(Util.encodeStringLiteral('\u0345')).toBe('"\\u0345"');
+	}
 
-function main() {
-    var test = new Test(__filename);
+	function testDecodeStringLiteral() : void {
+		this.expect(Util.decodeStringLiteral("''")).toBe("");
+		this.expect(Util.decodeStringLiteral('""')).toBe("");
+		this.expect(Util.decodeStringLiteral("'abc'")).toBe("abc");
+		this.expect(Util.decodeStringLiteral("'\\''")).toBe("'");
+		this.expect(Util.decodeStringLiteral('"\\""')).toBe('"');
+		this.expect(Util.decodeStringLiteral("'\\\\'")).toBe("\\");
+		this.expect(Util.decodeStringLiteral("'\\b'")).toBe("\b");
+		this.expect(Util.decodeStringLiteral("'\\f'")).toBe("\f");
+		this.expect(Util.decodeStringLiteral("'\\n'")).toBe("\n");
+		this.expect(Util.decodeStringLiteral("'\\t'")).toBe("\t");
+		this.expect(Util.decodeStringLiteral("'\\v'")).toBe("\v");
+		this.expect(Util.decodeStringLiteral("'\\u0041'")).toBe("A");
+		this.expect(Util.decodeStringLiteral("'\\0'")).toBe("\0");
+		this.expect(Util.decodeStringLiteral("'!\\u0041!\\0!\\n!'")).toBe("!A!\0!\n!");
+	}
 
-	test.describe('Util.format', function (t) {
-		t.expect( Util.format("foo", []) ).toBe("foo");
-		t.expect( Util.format("foo %1", ["bar"])).toBe("foo bar");
-		t.expect( Util.format("foo %1 %1", ["bar"])).toBe("foo bar bar");
-		t.expect( Util.format("foo %2 %1", ["bar", "baz"]) ).
-			toBe('foo baz bar');
-		t.expect( Util.format("100%%1 %1", ["foo"]) ).toBe("100%1 foo");
-	});
+	function testResolvePath() : void {
+		this.expect(Util.resolvePath("a/b/c")).toBe("a/b/c");
+		this.expect(Util.resolvePath("a/./b")).toBe("a/b");
+		this.expect(Util.resolvePath("a/../b")).toBe("b");
+		this.expect(Util.resolvePath("a/../../b")).toBe("../b");
+		this.expect(Util.resolvePath("../../a")).toBe("../../a");
+		this.expect(Util.resolvePath("/a/b/c")).toBe("/a/b/c");
+		this.expect(Util.resolvePath("/a/../b")).toBe("/b");
+		this.expect(Util.resolvePath("/a/../../c")).toBe("/c");
+	}
 
-	test.describe('Util.repeat', function (t) {
-		t.expect( Util.repeat("x", 4) ).toBe("xxxx");
-		t.expect( Util.repeat("ab", 4) ).toBe("abababab");
-		t.expect( Util.repeat("z", 0) ).toBe("");
-	});
-
-	test.describe('Util.encodeStringLiteral', function (t) {
-		t.expect(Util.encodeStringLiteral("")).toBe('""');
-		t.expect(Util.encodeStringLiteral("abc")).toBe('"abc"');
-		t.expect(Util.encodeStringLiteral('"')).toBe('"\\""');
-		t.expect(Util.encodeStringLiteral('\0')).toBe('"\\0"');
-		t.expect(Util.encodeStringLiteral('\\')).toBe('"\\\\"');
-		t.expect(Util.encodeStringLiteral('\u0345')).toBe('"\\u0345"');
-	});
-
-	test.describe('Util.decodeStringLiteral', function (t) {
-		t.expect(Util.decodeStringLiteral("''")).toBe("");
-		t.expect(Util.decodeStringLiteral('""')).toBe("");
-		t.expect(Util.decodeStringLiteral("'abc'")).toBe("abc");
-		t.expect(Util.decodeStringLiteral("'\\''")).toBe("'");
-		t.expect(Util.decodeStringLiteral('"\\""')).toBe('"');
-		t.expect(Util.decodeStringLiteral("'\\\\'")).toBe("\\");
-		t.expect(Util.decodeStringLiteral("'\\b'")).toBe("\b");
-		t.expect(Util.decodeStringLiteral("'\\f'")).toBe("\f");
-		t.expect(Util.decodeStringLiteral("'\\n'")).toBe("\n");
-		t.expect(Util.decodeStringLiteral("'\\t'")).toBe("\t");
-		t.expect(Util.decodeStringLiteral("'\\v'")).toBe("\v");
-		t.expect(Util.decodeStringLiteral("'\\u0041'")).toBe("A");
-		t.expect(Util.decodeStringLiteral("'\\0'")).toBe("\0");
-		t.expect(Util.decodeStringLiteral("'!\\u0041!\\0!\\n!'")).toBe("!A!\0!\n!");
-	});
-
-	test.describe('Util.resolvePath', function (t) {
-		t.expect(Util.resolvePath("a/b/c")).toBe("a/b/c");
-		t.expect(Util.resolvePath("a/./b")).toBe("a/b");
-		t.expect(Util.resolvePath("a/../b")).toBe("b");
-		t.expect(Util.resolvePath("a/../../b")).toBe("../b");
-		t.expect(Util.resolvePath("../../a")).toBe("../../a");
-		t.expect(Util.resolvePath("/a/b/c")).toBe("/a/b/c");
-		t.expect(Util.resolvePath("/a/../b")).toBe("/b");
-		t.expect(Util.resolvePath("/a/../../c")).toBe("/c");
-	});
-
-    test.done();
 }
 
-main();
-// vim: set ft=javascript:

@@ -20,34 +20,27 @@
  * IN THE SOFTWARE.
  */
 
-var Class = require("./Class");
+import "./classdef.jsx";
+import "./platform.jsx";
 
-// interface
-var Platform = exports.Platform = Class.extend({
+interface Emitter {
 
-	// returns root directory of JSX
-	// getRoot() : string
+	function getSearchPaths():string[];
 
-	// fileExists(path : string) : bool
+	function setOutputFile(filename :Nullable.<string>) :void;
 
-	// getFilesInDirectory(path: string) : string [] (throws an exception on error)
+	function saveSourceMappingFile(platform : Platform) : void;
 
-	// load a content by name (throws an exception on error)
-	// e.g. node.js reads it from files
-	//      browsers read it from DOM
-	// load(name : string)
+	function setEnableRunTimeTypeCheck(flag : boolean) : void;
 
-	log: function (s) {
-		console.log(s);
-	},
+	function emit(classDefs : ClassDefinition[]) : void;
 
-	warn: function (s) {
-		console.warn(s);
-	},
+	function getOutput(sourceFile : string, entryPoint : Nullable.<string>, executableFor : Nullable.<string>) : string;
 
-	error: function (s) {
-		console.error(s);
-	}
+	function setEnableSourceMap(enable : boolean) : void;
 
-});
-// vim: set noexpandtab
+	function setEnableProfiler(enable : boolean) : void;
+
+	function addHeader(header : string) : void;
+
+}

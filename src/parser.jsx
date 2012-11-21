@@ -20,203 +20,211 @@
  * IN THE SOFTWARE.
  */
 
-var Class = require("./Class");
-eval(Class.$import("./type"));
-eval(Class.$import("./classdef"));
-eval(Class.$import("./statement"));
-eval(Class.$import("./expression"));
-eval(Class.$import("./doc"));
-eval(Class.$import("./util"));
-eval(Class.$import("./completion"));
+import "./type.jsx";
+import "./classdef.jsx";
+import "./statement.jsx";
+import "./expression.jsx";
+import "./doc.jsx";
+import "./util.jsx";
+import "./completion.jsx";
+import _CompletionCandidatesWithLocal, _CompletionCandidatesOfProperty, _CompletionCandidatesOfNamespace from "completion.jsx";
 
-"use strict";
 
-var Token = exports.Token = Class.extend({
+class Token {
 
-	constructor: function (value, isIdentifier, filename, lineNumber, columnNumber) {
+	var _value : string;
+	var _isIdentifier : boolean;
+	var _filename : Nullable.<string>;
+	var _lineNumber : number;
+	var _columnNumber : number;
+
+	function constructor (value : string, isIdentifier : boolean) {
+		this(value, isIdentifier, null, NaN, NaN);
+	}
+
+	function constructor (value : string, isIdentifier : boolean, filename : Nullable.<string>, lineNumber : number, columnNumber : number) {
 		this._value = value;
 		this._isIdentifier = isIdentifier;
-		// two args or five args
-		this._filename = filename || null;
-		this._lineNumber = lineNumber;     // Nullable.<int>
-		this._columnNumber = columnNumber; // Nullable.<int>
-	},
+		this._filename = filename;
+		this._lineNumber = lineNumber;
+		this._columnNumber = columnNumber;
+	}
 
-	getValue: function () {
+	function getValue () : string {
 		return this._value;
-	},
+	}
 
-	isIdentifier: function () {
+	function isIdentifier () : boolean {
 		return this._isIdentifier;
-	},
+	}
 
-	getFilename: function () {
+	function getFilename () : Nullable.<string> {
 		return this._filename;
-	},
+	}
 
-	getLineNumber: function () {
+	function getLineNumber () : number {
 		return this._lineNumber;
-	},
+	}
 
-	getColumnNumber: function () {
+	function getColumnNumber () : number {
 		return this._columnNumber;
-	},
+	}
 
-	serialize: function () {
+	function serialize () : variant {
 		return [
 			this._value,
 			this._isIdentifier,
 			this._filename,
 			this._lineNumber,
 			this._columnNumber
-		];
+		] : variant[];
 	}
 
-});
-Token.prototype.__defineGetter__("filename", function () { throw new Error("Token#filename is removed. Use Token#getFilename() instead") });
+}
 
-var _Lexer = exports._TokenTable = Class.extend({
+class _Lexer {
+	
+	static var ident         = " [a-zA-Z_] [a-zA-Z0-9_]* ";
+	static var doubleQuoted  = ' "  [^"\\\\]* (?: \\\\. [^"\\\\]* )* " ';
+	static var singleQuoted  = " '  [^'\\\\]* (?: \\\\. [^'\\\\]* )* ' ";
+	static var stringLiteral = _Lexer.makeAlt([_Lexer.singleQuoted, _Lexer.doubleQuoted]);
+	static var regexpLiteral = _Lexer.doubleQuoted.replace(/"/g, "/") + "[mgi]*";
 
-	$makeAlt: function (patterns) {
+	// ECMA 262 compatible,
+	// see also ECMA 262 5th (7.8.3) Numeric Literals
+	static var decimalIntegerLiteral = "(?: 0 | [1-9][0-9]* )";
+	static var exponentPart = "(?: [eE] [+-]? [0-9]+ )";
+	static var numberLiteral = _Lexer.makeAlt([
+		"(?: " + _Lexer.decimalIntegerLiteral + " \\. " +
+		"[0-9]* " + _Lexer.exponentPart + "? )",
+		"(?: \\. [0-9]+ " + _Lexer.exponentPart + "? )",
+		"(?: " + _Lexer.decimalIntegerLiteral + _Lexer.exponentPart + " )",
+		"NaN",
+		"Infinity"
+		]) + "\\b";
+	static var integerLiteral = _Lexer.makeAlt([
+		"(?: 0 [xX] [0-9a-fA-F]+ )", // hex
+		_Lexer.decimalIntegerLiteral
+		]) + "(?![\\.0-9eE])\\b";
+
+	// regular expressions
+	static var rxIdent          = _Lexer.rx("^" + _Lexer.ident);
+	static var rxStringLiteral  = _Lexer.rx("^" + _Lexer.stringLiteral);
+	static var rxNumberLiteral  = _Lexer.rx("^" + _Lexer.numberLiteral);
+	static var rxIntegerLiteral = _Lexer.rx("^" + _Lexer.integerLiteral);
+	static var rxRegExpLiteral  = _Lexer.rx("^" + _Lexer.regexpLiteral);
+	static var rxNewline        = /(?:\r\n?|\n)/;
+
+	// blacklists of identifiers
+	static var keywords = _Lexer.asMap([
+		// literals shared with ECMA 262
+		"null",     "true",     "false",
+		"NaN",      "Infinity",
+		// keywords shared with ECMA 262
+		"break",    "do",       "instanceof", "typeof",
+		"case",     "else",     "new",        "var",
+		"catch",    "finally",  "return",     "void",
+		"continue", "for",      "switch",     "while",
+		"function", "this",
+		/* "default", */ // contextual keywords
+		"if",       "throw",
+		/* "assert",    "log", // contextual keywords */
+		"delete",   "in",       "try",
+		// keywords of JSX
+		"class",	 "extends", "super",
+		"import",    "implements",
+		"interface", "static",
+		"__FILE__",  "__LINE__",
+		"undefined"
+		]);
+	static var reserved = _Lexer.asMap([
+		// literals of ECMA 262 but not used by JSX
+		"debugger", "with",
+		// future reserved words of ECMA 262
+		"const", "export",
+		// future reserved words within strict mode of ECMA 262
+		"let",   "private",   "public", "yield",
+		"protected",
+
+		// JSX specific reserved words
+		"extern", "native", "as", "operator"
+		]);
+
+	static function makeAlt (patterns : string[]) : string {
 		return "(?: \n" + patterns.join("\n | \n") + "\n)\n";
-	},
+	}
 
-	$quoteMeta: function (pattern) {
+	static function quoteMeta (pattern : string) : string {
 		return pattern.replace(/([^0-9A-Za-z_])/g, '\\$1');
-	},
+	}
 
-	$asMap: function (array) {
-		var hash = {};
+	static function asMap (array : string[]) : Map.<boolean> {
+		var hash = new Map.<boolean>;
 		for (var i = 0; i < array.length; ++i)
 			hash[array[i]] = true;
 		return hash;
-	},
-
-	/// compile a regular expression
-	$rx: function (pat, flags) {
-		return RegExp(pat.replace(/[ \t\r\n]/g, ""), flags);
-	},
-
-	// static variables
-	$initialize: function () {
-		var ident         = " [a-zA-Z_] [a-zA-Z0-9_]* ";
-		var doubleQuoted  = ' "  [^"\\\\]* (?: \\\\. [^"\\\\]* )* " ';
-		var singleQuoted  = " '  [^'\\\\]* (?: \\\\. [^'\\\\]* )* ' ";
-		var stringLiteral = this.makeAlt([singleQuoted, doubleQuoted]);
-		var regexpLiteral = doubleQuoted.replace(/"/g, "/") + "[mgi]*";
-
-		// ECMA 262 compatible,
-		// see also ECMA 262 5th (7.8.3) Numeric Literals
-		var decimalIntegerLiteral = "(?: 0 | [1-9][0-9]* )";
-		var exponentPart = "(?: [eE] [+-]? [0-9]+ )";
-		var numberLiteral = this.makeAlt([
-				"(?: " + decimalIntegerLiteral + " \\. " +
-				        "[0-9]* " + exponentPart + "? )",
-				"(?: \\. [0-9]+ " + exponentPart + "? )",
-				"(?: " + decimalIntegerLiteral + exponentPart + " )",
-				"NaN",
-				"Infinity"
-			]) + "\\b";
-		var integerLiteral = this.makeAlt([
-				"(?: 0 [xX] [0-9a-fA-F]+ )", // hex
-				decimalIntegerLiteral
-			]) + "(?![\\.0-9eE])\\b";
-
-		// regular expressions
-		this.rxIdent          = this.rx("^" + ident);
-		this.rxStringLiteral  = this.rx("^" + stringLiteral);
-		this.rxNumberLiteral  = this.rx("^" + numberLiteral);
-		this.rxIntegerLiteral = this.rx("^" + integerLiteral);
-		this.rxRegExpLiteral  = this.rx("^" + regexpLiteral);
-		this.rxNewline        = /(?:\r\n?|\n)/;
-
-		// blacklists of identifiers
-		this.keywords = this.asMap([
-			// literals shared with ECMA 262
-			"null",     "true",     "false",
-			"NaN",      "Infinity",
-			// keywords shared with ECMA 262
-			"break",    "do",       "instanceof", "typeof",
-			"case",     "else",     "new",        "var",
-			"catch",    "finally",  "return",     "void",
-			"continue", "for",      "switch",     "while",
-			"function", "this",
-			/* "default", */ // contextual keywords
-			"if",       "throw",
-			/* "assert",    "log", // contextual keywords */
-			"delete",   "in",       "try",
-			// keywords of JSX
-			"class",	 "extends", "super",
-			"import",    "implements",
-			"interface", "static",
-			"__FILE__",  "__LINE__",
-			"undefined"
-		]);
-		this.reserved = this.asMap([
-			// literals of ECMA 262 but not used by JSX
-			"debugger", "with",
-			// future reserved words of ECMA 262
-			"const", "export",
-			// future reserved words within strict mode of ECMA 262
-			"let",   "private",   "public", "yield",
-			"protected",
-
-			// JSX specific reserved words
-			"extern", "native", "as", "operator"
-		]);
 	}
 
-});
+	/// compile a regular expression
+	static function rx (pat : string) : RegExp {
+		return new RegExp(pat.replace(/[ \t\r\n]/g, ""));
+	}
+}
 
-var Import = exports.Import = Class.extend({
+class Import {
 
-	constructor: function () {
-		switch (arguments.length) {
-		case 1:
-			// for built-in classes
-			this._filenameToken = null;
-			this._aliasToken = null;
-			this._classNames = null;
-			this._sourceParsers = [ arguments[0] ];
-			break;
-		case 3:
-			this._filenameToken = arguments[0];
-			this._aliasToken = arguments[1];
-			this._classNames = arguments[2];
-			this._sourceParsers = [];
-			break;
-		default:
-			throw new Error("logic flaw");
-		}
-	},
+	var _filenameToken : Token;
+	var _aliasToken : Token;
+	var _classNames : Token[];
+	var _sourceParsers : Parser[];
 
-	getFilenameToken: function () {
+	function constructor(parser : Parser) {
+		// for built-in classes
+		this._filenameToken = null;
+		this._aliasToken = null;
+		this._classNames = null;
+		this._sourceParsers = [ parser ];
+	}
+
+	function constructor (filenameToken : Token, aliasToken : Token, classNames : Token[]) {
+		this._filenameToken = filenameToken;
+		this._aliasToken = aliasToken;
+		this._classNames = classNames;
+		this._sourceParsers = [] : Parser[];
+	}
+
+	function getFilenameToken () : Token {
 		return this._filenameToken;
-	},
+	}
 
-	getAlias: function () {
-		return this._aliasToken != null ? this._aliasToken.getValue() : null;
-	},
+	function getAlias () : Nullable.<string> {
+		if (this._aliasToken) {
+			return this._aliasToken.getValue();
+		}
+		else {
+			return null;
+		}
+	}
 
-	getClassNames: function () {
+	function getClassNames () : string[] {
 		if (this._classNames == null)
 			return null;
-		var names = [];
+		var names = new string[];
 		for (var i = 0; i < this._classNames.length; ++i)
 			names[i] = this._classNames[i].getValue();
 		return names;
-	},
+	}
 
-	serialize: function () {
+	function serialize () : variant {
 		return [
 			"Import",
-			Util.serializeNullable(this._filenameToken),
-			Util.serializeNullable(this._aliasToken),
-			Util.serializeArray(this._classNames)
-		];
-	},
+			Serializer.<Token>.serializeNullable(this._filenameToken),
+			Serializer.<Token>.serializeNullable(this._aliasToken),
+			Serializer.<Token>.serializeArray(this._classNames)
+		] : variant[];
+	}
 
-	checkNameConflict: function (errors, nameToken) {
+	function checkNameConflict (errors : CompileError[], nameToken : Token) : boolean {
 		if (this._aliasToken != null) {
 			if (this._aliasToken.getValue() == nameToken.getValue()) {
 				errors.push(new CompileError(nameToken, "an alias with the same name is already declared"));
@@ -233,29 +241,33 @@ var Import = exports.Import = Class.extend({
 			}
 		}
 		return true;
-	},
+	}
 
-	addSource: function (parser) {
+	function addSource (parser : Parser) : void {
 		this._sourceParsers.push(parser);
-	},
+	}
 
-	getSources: function () {
+	function getSources () : Parser[] {
 		return this._sourceParsers;
-	},
+	}
 
-	assertExistenceOfNamedClasses: function (errors) {
+	function assertExistenceOfNamedClasses (errors : CompileError[]) : void {
 		if (this._classNames == null) {
 			// no named classes
 			return;
 		}
 
 		// list all classses
-		var allClassNames = [];
+		var allClassNames = new string[];
 		for (var i = 0; i < this._sourceParsers.length; ++i) {
-			allClassNames = allClassNames.concat(this._sourceParsers[i].getClassDefs().map(function (classDef) { return classDef.className(); }));
-			allClassNames = allClassNames.concat(this._sourceParsers[i].getTemplateClassDefs().map(function (classDef) { return classDef.className(); }));
+			allClassNames = allClassNames.concat(this._sourceParsers[i].getClassDefs().map.<string>(function (classDef) {
+				return classDef.className();
+			}));
+			allClassNames = allClassNames.concat(this._sourceParsers[i].getTemplateClassDefs().map.<string>(function (classDef) {
+				return classDef.className();
+			}));
 		}
-		function countNumberOfClassesByName(className) {
+		function countNumberOfClassesByName(className : string) : number {
 			var num = 0;
 			for (var i = 0; i < allClassNames.length; ++i) {
 				if (allClassNames[i] == className) {
@@ -277,13 +289,13 @@ var Import = exports.Import = Class.extend({
 				break;
 			}
 		}
-	},
+	}
 
-	getClasses: function (name) {
+	function getClasses (name : string) : ClassDefinition[] {
 		if (! this._classIsImportable(name)) {
-			return [];
+			return [] : ClassDefinition[];
 		}
-		var found = [];
+		var found = [] : ClassDefinition[];
 		for (var i = 0; i < this._sourceParsers.length; ++i) {
 			var classDefs = this._sourceParsers[i].getClassDefs();
 			for (var j = 0; j < classDefs.length; ++j) {
@@ -295,13 +307,13 @@ var Import = exports.Import = Class.extend({
 			}
 		}
 		return found;
-	},
+	}
 
-	createGetTemplateClassCallbacks: function (errors, request, postInstantiationCallback) {
+	function createGetTemplateClassCallbacks (errors : CompileError[], request : TemplateInstantiationRequest, postInstantiationCallback : function(:Parser,:ClassDefinition):ClassDefinition) : Array.<function(:CompileError[],:TemplateInstantiationRequest,:function(:Parser,:ClassDefinition):ClassDefinition):ClassDefinition> {
 		if (! this._classIsImportable(request.getClassName())) {
-			return [];
+			return new Array.<function(:CompileError[],:TemplateInstantiationRequest,:function(:Parser,:ClassDefinition):ClassDefinition):ClassDefinition>;
 		}
-		var callbacks = [];
+		var callbacks = new Array.<function(:CompileError[],:TemplateInstantiationRequest,:function(:Parser,:ClassDefinition):ClassDefinition):ClassDefinition>;
 		for (var i = 0; i < this._sourceParsers.length; ++i) {
 			var callback = this._sourceParsers[i].createGetTemplateClassCallback(errors, request, postInstantiationCallback);
 			if (callback != null) {
@@ -309,9 +321,9 @@ var Import = exports.Import = Class.extend({
 			}
 		}
 		return callbacks;
-	},
+	}
 
-	_classIsImportable: function (name) {
+	function _classIsImportable (name : string) : boolean {
 		if (this._classNames != null) {
 			for (var i = 0; i < this._classNames.length; ++i)
 				if (this._classNames[i].getValue() == name)
@@ -323,9 +335,9 @@ var Import = exports.Import = Class.extend({
 				return false;
 		}
 		return true;
-	},
+	}
 
-	$create: function (errors, filenameToken, aliasToken, classNames) {
+	static function create (errors : CompileError[], filenameToken : Token, aliasToken : Token, classNames : Token[]) : Import {
 		var filename = Util.decodeStringLiteral(filenameToken.getValue());
 		if (filename.indexOf("*") != -1) {
 			// read the files from a directory
@@ -339,50 +351,56 @@ var Import = exports.Import = Class.extend({
 		return new Import(filenameToken, aliasToken, classNames);
 	}
 
-});
+}
 
-var WildcardImport = exports.WildcardImport = Import.extend({
+class WildcardImport extends Import {
 
-	constructor: function (filenameToken, aliasToken, classNames, directory, suffix) {
-		Import.prototype.constructor.call(this, filenameToken, aliasToken, classNames);
+	var _directory : string;
+	var _suffix : string;
+
+	function constructor (filenameToken : Token, aliasToken : Token, classNames : Token[], directory : string, suffix : string) {
+		super(filenameToken, aliasToken, classNames);
 		this._directory = directory;
 		this._suffix = suffix;
-	},
+	}
 
-	getDirectory: function () {
+	function getDirectory () : string {
 		return this._directory;
-	},
+	}
 
-	getSuffix: function () {
+	function getSuffix () : string {
 		return this._suffix;
 	}
 
-});
+}
 
-var QualifiedName = exports.QualifiedName = Class.extend({
+class QualifiedName {
 
-	constructor: function (token, imprt) {
+	var _token : Token;
+	var _import : Import;
+
+	function constructor (token : Token, imprt : Import) {
 		this._token = token;
 		this._import = imprt;
-	},
+	}
 
-	getToken: function () {
+	function getToken () : Token {
 		return this._token;
-	},
+	}
 
-	getImport: function () {
+	function getImport () : Import {
 		return this._import;
-	},
+	}
 
-	serialize: function () {
+	function serialize () : variant {
 		return [
 			"QualifiedName",
 			this._token.serialize(),
-			Util.serializeNullable(this._import)
-		];
-	},
+			Serializer.<Import>.serializeNullable(this._import)
+		] : variant[];
+	}
 
-	equals: function (x) {
+	function equals (x : QualifiedName) : boolean {
 		if (x == null)
 			return false;
 		if (this._token.getValue() != x._token.getValue())
@@ -390,15 +408,17 @@ var QualifiedName = exports.QualifiedName = Class.extend({
 		if (this._import != x._import)
 			return false;
 		return true;
-	},
+	}
 
-	getClass: function (context, typeArguments) {
+	function getClass (context : AnalysisContext, typeArguments : Type[]) : ClassDefinition {
+		var classDef = null : ClassDefinition;
+		
 		if (this._import != null) {
 			if (typeArguments.length == 0) {
 				var classDefs = this._import.getClasses(this._token.getValue());
 				switch (classDefs.length) {
 				case 1:
-					var classDef = classDefs[0];
+					classDef = classDefs[0];
 					break;
 				case 0:
 					context.errors.push(new CompileError(this._token, "no definition for class '" + this._token.getValue() + "' in file '" + this._import.getFilenameToken().getValue() + "'"));
@@ -408,12 +428,12 @@ var QualifiedName = exports.QualifiedName = Class.extend({
 					return null;
 				}
 			} else {
-				var callbacks = this._import.createGetTemplateClassCallbacks(context.errors, new TemplateInstantiationRequest(this._token, this._token.getValue(), typeArguments), function () {});
+				var callbacks = this._import.createGetTemplateClassCallbacks(context.errors, new TemplateInstantiationRequest(this._token, this._token.getValue(), typeArguments), function (parser : Parser, classDef : ClassDefinition) : ClassDefinition { return null; });
 				switch (callbacks.length) {
 				case 1:
-					return callbacks[0]();
+					return callbacks[0](null, null, null);
 				case 0:
-					context.errors.push(new CompileError(this._token, "not definition for template class '" + tihs._token.getValue() + "' in file '" + tihs._import.getFilenameToken().getValue() + "'"));
+					context.errors.push(new CompileError(this._token, "not definition for template class '" + this._token.getValue() + "' in file '" + this._import.getFilenameToken().getValue() + "'"));
 					return null;
 				default:
 					context.errors.push(new CompileError(this._token, "multiple canditates"));
@@ -427,22 +447,22 @@ var QualifiedName = exports.QualifiedName = Class.extend({
 					return null;
 				}
 			} else {
-				if ((classDef = context.parser.lookupTemplate(context.errors, new TemplateInstantiationRequest(this._token, this._token.getValue(), typeArguments), function () {})) == null) {
+				if ((classDef = context.parser.lookupTemplate(context.errors, new TemplateInstantiationRequest(this._token, this._token.getValue(), typeArguments), function (parser : Parser, classDef : ClassDefinition) : ClassDefinition { return null; })) == null) {
 					context.errors.push(new CompileError(this._token, "failed to instantiate class"));
 					return null;
 				}
 			}
 		}
 		return classDef;
-	},
+	}
 
-	getTemplateClass: function (parser) {
-		var foundClassDefs = [];
-		var checkClassDef = function (classDef) {
+	function getTemplateClass (parser : Parser) : TemplateClassDefinition {
+		var foundClassDefs = new TemplateClassDefinition[];
+		var checkClassDef = function (classDef : TemplateClassDefinition) : void {
 			if (classDef.className() == this._token.getValue()) {
 				foundClassDefs.push(classDef);
 			}
-		}.bind(this);
+		};
 		if (this._import != null) {
 			this._import.getSources().forEach(function (parser) {
 				parser.getTemplateClassDefs().forEach(checkClassDef);
@@ -460,18 +480,88 @@ var QualifiedName = exports.QualifiedName = Class.extend({
 		return foundClassDefs.length == 1 ? foundClassDefs[0] : null;
 	}
 
-});
+}
 
-var Parser = exports.Parser = Class.extend({
+class ParserState {
 
-	constructor: function (sourceToken, filename, completionRequest) {
-		_Lexer.initialize();
+	var lineNumber : number;
+	var columnOffset : number;
+	var docComment : DocComment;
+	var tokenLength : number;
+	var numErrors : number;
+	var numClosures : number;
+	var numObjectTypesUsed : number;
+	var numTemplateInstantiationRequests : number;
+
+	function constructor (lineNumber : number, columnNumber : number, docComment : DocComment, tokenLength : number, numErrors : number, numClosures : number, numObjectTypesUsed : number, numTemplateInstantiationRequests : number) {
+		this.lineNumber = lineNumber;
+		this.columnOffset = columnNumber;
+		this.docComment = docComment;
+		this.tokenLength = tokenLength;
+		this.numErrors = numErrors;
+		this.numClosures = numClosures;
+		this.numObjectTypesUsed = numObjectTypesUsed;
+		this.numTemplateInstantiationRequests = numTemplateInstantiationRequests;
+	}
+
+}
+
+class Scope {
+
+	var prev : Scope;
+	var locals : LocalVariable[];
+	var arguments : ArgumentDeclaration[];
+	var statements : Statement[];
+	var closures : MemberFunctionDefinition[];
+
+	function constructor (prev : Scope, locals : LocalVariable[], arguments : ArgumentDeclaration[], statements : Statement[], closures : MemberFunctionDefinition[]) {
+		this.prev = prev;
+		this.locals = locals;
+		this.arguments = arguments;
+		this.statements = statements;
+		this.closures = closures;
+	}
+	
+}
+
+class Parser {
+
+	var _sourceToken : Token;
+	var _filename : string;
+	var _completionRequest : CompletionRequest;
+
+	var _input : string;
+	var _lines : string[];
+	var _tokenLength : number;
+	var _lineNumber : number; // one origin
+	var _columnOffset : number; // zero origin
+	var _fileLevelDocComment : DocComment;
+	var _docComment : DocComment;
+	var _errors : CompileError[];
+	var _templateClassDefs : TemplateClassDefinition[];
+	var _classDefs : ClassDefinition[];
+	var _imports : Import[];
+	var _locals : LocalVariable[];
+	var _statements : Statement[];
+	var _closures : MemberFunctionDefinition[];
+	var _classType : ParsedObjectType;
+	var _extendType : ParsedObjectType;
+	var _implementTypes : ParsedObjectType[];
+	var _objectTypesUsed : ParsedObjectType[];
+	var _templateInstantiationRequests : TemplateInstantiationRequest[];
+
+	var _prevScope : Scope = null;
+	var _arguments : ArgumentDeclaration[] = null;
+	var _classFlags : number;
+	var _typeArgs : Token[];
+
+	function constructor (sourceToken : Token, filename : string, completionRequest : CompletionRequest) {
 		this._sourceToken = sourceToken;
 		this._filename = filename;
 		this._completionRequest = completionRequest;
-	},
+	}
 
-	parse: function (input, errors) {
+	function parse (input : string, errors : CompileError[]) : boolean {
 		// lexer properties
 		this._input = input;
 		this._lines = this._input.split(_Lexer.rxNewline);
@@ -483,7 +573,7 @@ var Parser = exports.Parser = Class.extend({
 		// insert a marker so that at the completion location we would always get _expectIdentifierOpt called, whenever possible
 		if (this._completionRequest != null) {
 			var compLineNumber = Math.min(this._completionRequest.getLineNumber(), this._lines.length + 1);
-			var line = this._lines[compLineNumber - 1] || '';
+			var line = this._lines[compLineNumber - 1] ?: '';
 			this._lines[compLineNumber - 1] =
 				line.substring(0, this._completionRequest.getColumnOffset())
 				+ "Q," + // use a character that is permitted within an identifier, but never appears in keywords
@@ -491,18 +581,18 @@ var Parser = exports.Parser = Class.extend({
 		}
 		// output
 		this._errors = errors;
-		this._templateClassDefs = [];
-		this._classDefs = [];
-		this._imports = [];
+		this._templateClassDefs = new TemplateClassDefinition[];
+		this._classDefs = new ClassDefinition[];
+		this._imports = new Import[];
 		// use for function parsing
 		this._locals = null;
 		this._statements = null;
-		this._closures = [];
+		this._closures = new MemberFunctionDefinition[];
 		this._classType = null;
 		this._extendType = null;
 		this._implementTypes = null;
-		this._objectTypesUsed = [];
-		this._templateInstantiationRequests = [];
+		this._objectTypesUsed = new ParsedObjectType[];
+		this._templateInstantiationRequests = new TemplateInstantiationRequest[];
 
 		// doit
 		while (! this._isEOF()) {
@@ -520,63 +610,63 @@ var Parser = exports.Parser = Class.extend({
 			return false;
 
 		return true;
-	},
+	}
 
-	_getInput: function () {
+	function _getInput () : string {
 		return this._lines[this._lineNumber - 1].substring(this._columnOffset);
-	},
+	}
 
-	_getInputByLength: function (length) {
+	function _getInputByLength (length : number) : string {
 		return this._lines[this._lineNumber - 1].substring(this._columnOffset, this._columnOffset + length);
-	},
+	}
 
-	_forwardPos: function (len) {
+	function _forwardPos (len : number) : void {
 		this._columnOffset += len;
-	},
+	}
 
-	getSourceToken: function () {
+	function getSourceToken () : Token {
 		return this._sourceToken;
-	},
+	}
 
-	getPath: function () {
+	function getPath () : string {
 		return this._filename;
-	},
+	}
 
-	getDocComment: function () {
+	function getDocComment () : DocComment {
 		return this._fileLevelDocComment;
-	},
+	}
 
-	getClassDefs: function () {
+	function getClassDefs () : ClassDefinition[] {
 		return this._classDefs;
-	},
+	}
 
-	getTemplateClassDefs: function () {
+	function getTemplateClassDefs () : TemplateClassDefinition[] {
 		return this._templateClassDefs;
-	},
+	}
 
-	getTemplateInstantiationRequests: function () {
+	function getTemplateInstantiationRequests () : TemplateInstantiationRequest[] {
 		return this._templateInstantiationRequests;
-	},
+	}
 
-	getImports: function () {
+	function getImports () : Import[] {
 		return this._imports;
-	},
+	}
 
-	registerBuiltinImports: function (parsers) {
+	function registerBuiltinImports (parsers : Parser[]) : void {
 		for (var i = parsers.length - 1; i >= 0; --i)
 			this._imports.unshift(new Import(parsers[i]));
-	},
+	}
 
-	lookupImportAlias: function (name) {
+	function lookupImportAlias (name : string) : Import {
 		for (var i = 0; i < this._imports.length; ++i) {
 			var alias = this._imports[i].getAlias();
 			if (alias != null && alias == name)
 				return this._imports[i];
 		}
 		return null;
-	},
+	}
 
-	lookup: function (errors, contextToken, className) {
+	function lookup (errors : CompileError[], contextToken : Token, className : string) : ClassDefinition {
 		// class within the file is preferred
 		for (var i = 0; i < this._classDefs.length; ++i) {
 			var classDef = this._classDefs[i];
@@ -584,7 +674,7 @@ var Parser = exports.Parser = Class.extend({
 				return classDef;
 		}
 		// classnames within the imported files may conflict
-		var found = [];
+		var found = new ClassDefinition[];
 		for (var i = 0; i < this._imports.length; ++i) {
 			if (this._imports[i].getAlias() == null)
 				found = found.concat(this._imports[i].getClasses(className));
@@ -594,16 +684,16 @@ var Parser = exports.Parser = Class.extend({
 		if (found.length >= 2)
 			errors.push(new CompileError(contextToken, "multiple candidates exist for class name '" + className + "'"));
 		return null;
-	},
+	}
 
-	lookupTemplate: function (errors, request, postInstantiationCallback) {
+	function lookupTemplate (errors : CompileError[], request : TemplateInstantiationRequest, postInstantiationCallback : function(:Parser,:ClassDefinition):ClassDefinition) : ClassDefinition {
 		// lookup within the source file
 		var instantiateCallback = this.createGetTemplateClassCallback(errors, request, postInstantiationCallback);
 		if (instantiateCallback != null) {
 			return instantiateCallback(errors, request, postInstantiationCallback);
 		}
 		// lookup within the imported files
-		var candidateCallbacks = [];
+		var candidateCallbacks = new Array.<function(:CompileError[],:TemplateInstantiationRequest,:function(:Parser,:ClassDefinition):ClassDefinition):ClassDefinition>;
 		for (var i = 0; i < this._imports.length; ++i) {
 			candidateCallbacks = candidateCallbacks.concat(this._imports[i].createGetTemplateClassCallbacks(errors, request, postInstantiationCallback));
 		}
@@ -614,17 +704,17 @@ var Parser = exports.Parser = Class.extend({
 			errors.push(new CompileError(request.getToken(), "multiple candidates exist for template class name '" + request.getClassName() + "'"));
 			return null;
 		}
-		return candidateCallbacks[0]();
-	},
+		return candidateCallbacks[0](null,null,null);
+	}
 
-	createGetTemplateClassCallback: function (errors, request, postInstantiationCallback) {
+	function createGetTemplateClassCallback (errors : CompileError[], request : TemplateInstantiationRequest, postInstantiationCallback : function(:Parser,:ClassDefinition):ClassDefinition) : function(:CompileError[],:TemplateInstantiationRequest,:function(:Parser,:ClassDefinition):ClassDefinition):ClassDefinition {
 		// lookup the already-instantiated class
 		for (var i = 0; i < this._classDefs.length; ++i) {
 			var classDef = this._classDefs[i];
 			if (classDef instanceof InstantiatedClassDefinition
-				&& classDef.getTemplateClassName() == request.getClassName()
-				&& Util.typesAreEqual(classDef.getTypeArguments(), request.getTypeArguments())) {
-				return function () {
+				&& (classDef as InstantiatedClassDefinition).getTemplateClassName() == request.getClassName()
+				&& Util.typesAreEqual((classDef as InstantiatedClassDefinition).getTypeArguments(), request.getTypeArguments())) {
+				return function (_ : CompileError[], __ : TemplateInstantiationRequest, ___ : function(:Parser,:ClassDefinition):ClassDefinition) : ClassDefinition {
 					return classDef;
 				};
 			}
@@ -633,7 +723,7 @@ var Parser = exports.Parser = Class.extend({
 		for (var i = 0; i < this._templateClassDefs.length; ++i) {
 			var templateDef = this._templateClassDefs[i];
 			if (templateDef.className() == request.getClassName()) {
-				return function () {
+				return function (_ : CompileError[], __ : TemplateInstantiationRequest, ___ : function(:Parser,:ClassDefinition):ClassDefinition) : ClassDefinition {
 					var classDef = templateDef.instantiate(errors, request);
 					if (classDef == null) {
 						return null;
@@ -643,43 +733,43 @@ var Parser = exports.Parser = Class.extend({
 					classDef.resolveTypes(new AnalysisContext(errors, this, null));
 					postInstantiationCallback(this, classDef);
 					return classDef;
-				}.bind(this);
+				};
 			}
 		}
 		return null;
-	},
+	}
 
-	_pushScope: function (args) {
-		this._prevScope = {
-			prev: this._prevScope,
-			locals: this._locals,
-			arguments: this._arguments,
-			statements: this._statements,
-			closures: this._closures
-		};
-		this._locals = [];
+	function _pushScope (args : ArgumentDeclaration[]) : void {
+		this._prevScope = new Scope (
+			this._prevScope,
+			this._locals,
+			this._arguments,
+			this._statements,
+			this._closures
+		);
+		this._locals = new LocalVariable[];
 		this._arguments = args;
-		this._statements = [];
-		this._closures = [];
-	},
+		this._statements = new Statement[];
+		this._closures = new MemberFunctionDefinition[];
+	}
 
-	_popScope: function () {
+	function _popScope () : void {
 		this._locals = this._prevScope.locals;
 		this._arguments = this._prevScope.arguments;
 		this._statements = this._prevScope.statements;
 		this._closures = this._prevScope.closures;
 		this._prevScope = this._prevScope.prev;
-	},
+	}
 
-	_registerLocal: function (identifierToken, type) {
-		var isEqualTo = function (local) {
+	function _registerLocal (identifierToken : Token, type : Type) : LocalVariable {
+		function isEqualTo (local : LocalVariable) : boolean {
 			if (local.getName().getValue() == identifierToken.getValue()) {
 				if (type != null && ! local.getType().equals(type))
 					this._newError("conflicting types for variable " + identifierToken.getValue());
 				return true;
 			}
 			return false;
-		}.bind(this);
+		}
 		for (var i = 0; i < this._arguments.length; ++i) {
 			if (isEqualTo(this._arguments[i])) {
 				return this._arguments[i];
@@ -693,52 +783,51 @@ var Parser = exports.Parser = Class.extend({
 		var newLocal = new LocalVariable(identifierToken, type);
 		this._locals.push(newLocal);
 		return newLocal;
-	},
+	}
 
-	_preserveState: function () {
-		// FIXME use class
-		return {
+	function _preserveState () : ParserState {
+		return new ParserState(
 			// lexer properties
-			lineNumber: this._lineNumber,
-			columnOffset: this._columnOffset,
-			docComment: this._docComment,
-			tokenLength: this._tokenLength,
+			this._lineNumber,
+			this._columnOffset,
+			this._docComment,
+			this._tokenLength,
 			// errors
-			numErrors: this._errors.length,
+			this._errors.length,
 			// closures
-			numClosures: this._closures.length,
+			this._closures.length,
 			// objectTypesUsed
-			numObjectTypesUsed: this._objectTypesUsed.length,
+			this._objectTypesUsed.length,
 			// templateInstantiationrequests
-			numTemplateInstantiationRequests: this._templateInstantiationRequests.length
-		};
-	},
+			this._templateInstantiationRequests.length
+		);
+	}
 
-	_restoreState: function (state) {
+	function _restoreState (state : ParserState) : void {
 		this._lineNumber = state.lineNumber;
 		this._columnOffset = state.columnOffset;
 		this._docComment = state.docComment;
 		this._tokenLength = state.tokenLength;
 		this._errors.length = state.numErrors;
-		this._closures.splice(state.numClosures);
-		this._objectTypesUsed.splice(state.numObjectTypesUsed);
-		this._templateInstantiationRequests.splice(state.numTemplateInstantiationRequests);
-	},
+		this._closures.splice(state.numClosures, this._closures.length - state.numClosures);
+		this._objectTypesUsed.splice(state.numObjectTypesUsed, this._objectTypesUsed.length - state.numObjectTypesUsed);
+		this._templateInstantiationRequests.splice(state.numTemplateInstantiationRequests, this._templateInstantiationRequests.length - state.numTemplateInstantiationRequests);
+	}
 
 	// this is column offset, and is thus zero-origin
-	_getColumn: function () {
+	function _getColumn () : number {
 		return this._columnOffset;
-	},
+	}
 
-	_newError: function (message) {
+	function _newError (message : string) : void {
 		this._errors.push(new CompileError(this._filename, this._lineNumber, this._getColumn(), message));
-	},
+	}
 
-	_newDeprecatedWarning: function (message) {
+	function _newDeprecatedWarning (message : string) : void {
 		this._errors.push(new DeprecatedWarning(this._filename, this._lineNumber, this._getColumn(), message));
-	},
+	}
 
-	_advanceToken: function () {
+	function _advanceToken () : void {
 		if (this._tokenLength != 0) {
 			this._forwardPos(this._tokenLength);
 			this._tokenLength = 0;
@@ -746,7 +835,7 @@ var Parser = exports.Parser = Class.extend({
 		}
 
 		while (true) {
-			// skip whitespaces and comments in-line
+			// skip espaces and comments in-line
 			while (true) {
 				var matched = this._getInput().match(/^[ \t]+/);
 				if (matched != null)
@@ -795,13 +884,13 @@ var Parser = exports.Parser = Class.extend({
 				return;
 			}
 		}
-	},
+	}
 
-	_skipMultilineComment: function () {
+	function _skipMultilineComment () : boolean {
 		var startLineNumber = this._lineNumber;
 		var startColumnOffset = this._columnOffset;
 		while (true) {
-			var endAt = this._getInput(this._columnOffset).indexOf("*/");
+			var endAt = this._getInput().indexOf("*/");
 			if (endAt != -1) {
 				this._forwardPos(endAt + 2);
 				return true;
@@ -814,12 +903,13 @@ var Parser = exports.Parser = Class.extend({
 			++this._lineNumber;
 			this._columnOffset = 0;
 		}
-	},
+		return false;	// dummy
+	}
 
-	_parseDocComment: function () {
+	function _parseDocComment () : DocComment {
 
 		var docComment = new DocComment();
-		var node = docComment;
+		var node : DocCommentNode = docComment;
 
 		while (true) {
 			// skip " * ", or return if "*/"
@@ -832,18 +922,18 @@ var Parser = exports.Parser = Class.extend({
 				this._parseDocCommentAdvanceWhiteSpace();
 			}
 			// fetch tag (and paramName), and setup the target node to push content into
-			var tagMatch = this._getInput(this._columnOffset).match(/^\@([0-9A-Za-z_]+)[ \t]*/);
+			var tagMatch = this._getInput().match(/^\@([0-9A-Za-z_]+)[ \t]*/);
 			if (tagMatch != null) {
 				this._forwardPos(tagMatch[0].length);
 				var tag = tagMatch[1];
 				switch (tag) {
 				case "param":
-					var nameMatch = this._getInput(this._columnOffset).match(/[0-9A-Za-z_]+/);
+					var nameMatch = this._getInput().match(/[0-9A-Za-z_]+/);
 					if (nameMatch != null) {
 					     var token = new Token(nameMatch[0], false, this._filename, this._lineNumber, this._getColumn());
 						this._forwardPos(nameMatch[0].length);
 						node = new DocCommentParameter(token);
-						docComment.getParams().push(node);
+						docComment.getParams().push(node as DocCommentParameter);
 					} else {
 						this._newError("name of the parameter not found after @param");
 						node = null;
@@ -851,20 +941,20 @@ var Parser = exports.Parser = Class.extend({
 					break;
 				default:
 					node = new DocCommentTag(tag);
-					docComment.getTags().push(node);
+					docComment.getTags().push(node as DocCommentTag);
 					break;
 				}
 			}
-			var endAt = this._getInput(this._columnOffset).indexOf("*/");
+			var endAt = this._getInput().indexOf("*/");
 			if (endAt != -1) {
 				if (node != null) {
-					node.appendDescription(this._getInput(this._columnOffset).substring(0, endAt));
+					node.appendDescription(this._getInput().substring(0, endAt));
 				}
 				this._forwardPos(endAt + 2);
 				return docComment;
 			}
 			if (node != null) {
-				node.appendDescription(this._getInput(this._columnOffset));
+				node.appendDescription(this._getInput());
 			}
 			if (this._lineNumber == this._lines.length) {
 				this._columnOffset = this._lines[this._lineNumber - 1].length;
@@ -874,9 +964,10 @@ var Parser = exports.Parser = Class.extend({
 			++this._lineNumber;
 			this._columnOffset = 0;
 		}
-	},
+		return null;	// dummy
+	}
 
-	_parseDocCommentAdvanceWhiteSpace: function () {
+	function _parseDocCommentAdvanceWhiteSpace () : void {
 		while (true) {
 			var ch = this._getInputByLength(1);
 			if (ch == " " || ch == "\t") {
@@ -885,25 +976,34 @@ var Parser = exports.Parser = Class.extend({
 				break;
 			}
 		}
-	},
+	}
 
-	_isEOF: function () {
+	function _isEOF () : boolean {
 		this._advanceToken();
 		return this._lineNumber == this._lines.length && this._columnOffset == this._lines[this._lines.length - 1].length;
-	},
+	}
 
-	_expectIsNotEOF: function () {
+	function _expectIsNotEOF () : boolean {
 		if (this._isEOF()) {
 			this._newError("unexpected EOF");
 			return false;
 		}
 		return true;
-	},
+	}
 
-	_expectOpt: function (expected, excludePattern) {
-		if (! (expected instanceof Array))
-			expected = [ expected ];
+	function _expectOpt (expected : string) : Token {
+		return this._expectOpt([ expected ], null);
+	}
 
+	function _expectOpt (expected : string[]) : Token {
+		return this._expectOpt(expected, null);
+	}
+
+	function _expectOpt (expected : string, excludePattern : RegExp) : Token {
+		return this._expectOpt([ expected ], excludePattern);
+	}
+
+	function _expectOpt (expected : string[], excludePattern : RegExp) : Token {
 		this._advanceToken();
 		for (var i = 0; i < expected.length; ++i) {
 			if (this._completionRequest != null) {
@@ -926,21 +1026,34 @@ var Parser = exports.Parser = Class.extend({
 			}
 		}
 		return null;
-	},
+	}
 
-	_expect: function (expected, excludePattern) {
-		if (! (expected instanceof Array))
-			expected = [ expected ];
+	function _expect (expected : string) : Token {
+		return this._expect([ expected ], null);
+	}
 
+	function _expect (expected : string[]) : Token {
+		return this._expect(expected, null);
+	}
+
+	function _expect (expected : string, excludePattern : RegExp) : Token {
+		return this._expect([ expected ], excludePattern);
+	}
+
+	function _expect (expected : string[], excludePattern : RegExp) : Token {
 		var token = this._expectOpt(expected, excludePattern);
 		if (token == null) {
 			this._newError("expected keyword: " + expected.join(" "));
 			return null;
 		}
 		return token;
-	},
+	}
 
-	_expectIdentifierOpt: function (completionCb) {
+	function _expectIdentifierOpt () : Token {
+		return this._expectIdentifierOpt(null);
+	}
+
+	function _expectIdentifierOpt (completionCb : function(:Parser):CompletionCandidates) : Token {
 		this._advanceToken();
 		var matched = this._getInput().match(_Lexer.rxIdent);
 		if (completionCb != null && this._completionRequest != null) {
@@ -961,34 +1074,38 @@ var Parser = exports.Parser = Class.extend({
 		}
 		this._tokenLength = matched[0].length;
 		return new Token(matched[0], true, this._filename, this._lineNumber, this._getColumn());
-	},
+	}
 
-	_expectIdentifier: function (completionCb) {
+	function _expectIdentifier () : Token {
+		return this._expectIdentifier(null);
+	}
+
+	function _expectIdentifier (completionCb : function(:Parser):CompletionCandidates) : Token {
 		var token = this._expectIdentifierOpt(completionCb);
 		if (token != null)
 			return token;
 		this._newError("expected an identifier");
 		return null;
-	},
+	}
 
-	_expectStringLiteralOpt: function () {
+	function _expectStringLiteralOpt () : Token {
 		this._advanceToken();
 		var matched = this._getInput().match(_Lexer.rxStringLiteral);
 		if (matched == null)
 			return null;
 		this._tokenLength = matched[0].length;
 		return new Token(matched[0], false, this._filename, this._lineNumber, this._getColumn());
-	},
+	}
 
-	_expectStringLiteral: function () {
+	function _expectStringLiteral () : Token {
 		var token = this._expectStringLiteralOpt();
 		if (token != null)
 			return token;
 		this._newError("expected a string literal");
 		return null;
-	},
+	}
 
-	_expectNumberLiteralOpt: function () {
+	function _expectNumberLiteralOpt () : Token {
 		this._advanceToken();
 		var matched = this._getInput().match(_Lexer.rxIntegerLiteral);
 		if (matched == null)
@@ -997,18 +1114,18 @@ var Parser = exports.Parser = Class.extend({
 			return null;
 		this._tokenLength = matched[0].length;
 		return new Token(matched[0], false, this._filename, this._lineNumber, this._getColumn());
-	},
+	}
 
-	_expectRegExpLiteralOpt: function () {
+	function _expectRegExpLiteralOpt () : Token {
 		this._advanceToken();
 		var matched = this._getInput().match(_Lexer.rxRegExpLiteral);
 		if (matched == null)
 			return null;
 		this._tokenLength = matched[0].length;
 		return new Token(matched[0], false, this._filename, this._lineNumber, this._getColumn());
-	},
+	}
 
-	_skipStatement: function () {
+	function _skipStatement () : void {
 		var advanced = false;
 		while (! this._isEOF()) {
 			switch (this._getInputByLength(1)) {
@@ -1031,9 +1148,9 @@ var Parser = exports.Parser = Class.extend({
 			this._advanceToken();
 			advanced = true;
 		}
-	},
+	}
 
-	_qualifiedName: function (allowSuper, autoCompleteMatchCb) {
+	function _qualifiedName (allowSuper : boolean, autoCompleteMatchCb : function(:ClassDefinition):boolean) : QualifiedName {
 		// returns a token that contains a qualified name
 		if (allowSuper) {
 			var token = this._expectOpt("super");
@@ -1043,9 +1160,9 @@ var Parser = exports.Parser = Class.extend({
 		if ((token = this._expectIdentifier(function (self) { return self._getCompletionCandidatesOfTopLevel(autoCompleteMatchCb); })) == null)
 			return null;
 		return this._qualifiedNameStartingWith(token, autoCompleteMatchCb);
-	},
+	}
 
-	_qualifiedNameStartingWith: function (token, autoCompleteMatchCb) {
+	function _qualifiedNameStartingWith (token : Token, autoCompleteMatchCb : function(:ClassDefinition):boolean) : QualifiedName {
 		if (token.getValue() == "variant") {
 			this._errors.push(new CompileError(token, "cannot use 'variant' as a class name"));
 			return null;
@@ -1062,11 +1179,11 @@ var Parser = exports.Parser = Class.extend({
 				return null;
 		}
 		return new QualifiedName(token, imprt);
-	},
+	}
 
-	_importStatement: function (importToken) {
+	function _importStatement (importToken : Token) : boolean {
 		// parse
-		var classes = null;
+		var classes = null : Token[];
 		var token = this._expectIdentifierOpt(null);
 		if (token != null) {
 			classes = [ token ];
@@ -1083,7 +1200,7 @@ var Parser = exports.Parser = Class.extend({
 		var filenameToken = this._expectStringLiteral();
 		if (filenameToken == null)
 			return false;
-		var alias = null;
+		var alias = null : Token;
 		if (this._expectOpt("into") != null) {
 			if ((alias = this._expectIdentifier(null)) == null)
 				return false;
@@ -1122,16 +1239,16 @@ var Parser = exports.Parser = Class.extend({
 			return false;
 		this._imports.push(imprt);
 		return true;
-	},
+	}
 
-	_classDefinition: function () {
+	function _classDefinition () : boolean {
 		this._classType = null;
 		this._extendType = null;
-		this._implementTypes = [];
-		this._objectTypesUsed = [];
+		this._implementTypes = new ParsedObjectType[];
+		this._objectTypesUsed = new ParsedObjectType[];
 		// attributes* class
 		this._classFlags = 0;
-		var docComment = null;
+		var docComment = null : DocComment;
 		while (true) {
 			var token = this._expect([ "class", "interface", "mixin", "abstract", "final", "native", "__fake__" ]);
 			if (token == null)
@@ -1188,9 +1305,9 @@ var Parser = exports.Parser = Class.extend({
 		}
 		this._classType = new ParsedObjectType(
 			new QualifiedName(className, null),
-			this._typeArgs.map(function (token) {
+			this._typeArgs.map.<Type>(function (token : Token) : Type {
 				// convert formal typearg (Token) to actual typearg (Type)
-				return new ParsedObjectType(new QualifiedName(token, null), []);
+				return new ParsedObjectType(new QualifiedName(token, null), new Type[]);
 			}));
 		this._objectTypesUsed.push(this._classType);
 		// extends
@@ -1203,7 +1320,7 @@ var Parser = exports.Parser = Class.extend({
 					});
 			}
 			if (this._extendType == null && className.getValue() != "Object") {
-				this._extendType = new ParsedObjectType(new QualifiedName(new Token("Object", true), null), []);
+				this._extendType = new ParsedObjectType(new QualifiedName(new Token("Object", true), null), new Type[]);
 				this._objectTypesUsed.push(this._extendType);
 			}
 		} else {
@@ -1228,7 +1345,7 @@ var Parser = exports.Parser = Class.extend({
 		// body
 		if (this._expect("{") == null)
 			return false;
-		var members = [];
+		var members = new MemberDefinition[];
 
 		var success = true;
 		while (this._expectOpt("}") == null) {
@@ -1240,7 +1357,7 @@ var Parser = exports.Parser = Class.extend({
 					if (member.name() == members[i].name()
 						&& (member.flags() & ClassDefinition.IS_STATIC) == (members[i].flags() & ClassDefinition.IS_STATIC)) {
 						if (member instanceof MemberFunctionDefinition && members[i] instanceof MemberFunctionDefinition) {
-							if (Util.typesAreEqual(member.getArgumentTypes(), members[i].getArgumentTypes())) {
+							if (Util.typesAreEqual((member as MemberFunctionDefinition).getArgumentTypes(), (members[i] as MemberFunctionDefinition).getArgumentTypes())) {
 								this._errors.push(new CompileError(
 									member.getToken(),
 									"a " + ((member.flags() & ClassDefinition.IS_STATIC) != 0 ? "static" : "member")
@@ -1298,11 +1415,11 @@ var Parser = exports.Parser = Class.extend({
 			classDef.setParser(this);
 		}
 		return true;
-	},
+	}
 
-	_memberDefinition: function () {
+	function _memberDefinition () : MemberDefinition {
 		var flags = 0;
-		var docComment = null;
+		var docComment = null : DocComment;
 		while (true) {
 			var token = this._expect([ "function", "var", "static", "abstract", "override", "final", "const", "native", "__readonly__", "inline", "__pure__", "delete" ]);
 			if (token == null)
@@ -1386,11 +1503,11 @@ var Parser = exports.Parser = Class.extend({
 		var name = this._expectIdentifier(null);
 		if (name == null)
 			return null;
-		var type = null;
+		var type = null : Type;
 		if (this._expectOpt(":") != null)
 			if ((type = this._typeDeclaration(false)) == null)
 				return null;
-		var initialValue = null;
+		var initialValue = null : Expression;
 		if (this._expectOpt("=") != null) {
 			if ((flags & ClassDefinition.IS_ABSTRACT) != 0) {
 				this._newError("abstract variable cannot have default value");
@@ -1409,9 +1526,9 @@ var Parser = exports.Parser = Class.extend({
 		if (this._typeArgs.length == 0 && initialValue == null && (this._classFlags & ClassDefinition.IS_NATIVE) == 0)
 			initialValue = Expression.getDefaultValueExpressionOf(type);
 		return new MemberVariableDefinition(token, name, flags, type, initialValue, docComment);
-	},
+	}
 
-	_functionDefinition: function (token, flags, docComment) {
+	function _functionDefinition (token : Token, flags : number, docComment : DocComment) : MemberFunctionDefinition {
 		// name
 		var name = this._expectIdentifier(null);
 		if (name == null)
@@ -1449,12 +1566,12 @@ var Parser = exports.Parser = Class.extend({
 			if (args == null)
 				return null;
 			// return type
-			var returnType;
+			var returnType = null : Type;
 			if (name.getValue() == "constructor") {
 				// no return type
 				returnType = Type.voidType;
 			} else {
-				if (this._expect(":", "return type declaration is mandatory") == null)
+				if (this._expect(":") == null)
 					return null;
 				returnType = this._typeDeclaration(true);
 				if (returnType == null)
@@ -1471,9 +1588,9 @@ var Parser = exports.Parser = Class.extend({
 					return null;
 				}
 			}
-			function createDefinition(locals, statements, closures, lastToken) {
+			function createDefinition(locals : LocalVariable[], statements : Statement[], closures : MemberFunctionDefinition[], lastToken : Token) : MemberFunctionDefinition { 
 				return typeArgs.length != 0
-					? new TemplateFunctionDefinition(token, name, flags, typeArgs, returnType, args, locals, statements, closures, lastToken, docComment)
+					? new TemplateFunctionDefinition(token, name, flags, typeArgs, returnType, args, locals, statements, closures, lastToken, docComment) as MemberFunctionDefinition
 					: new MemberFunctionDefinition(token, name, flags, returnType, args, locals, statements, closures, lastToken, docComment);
 			}
 			// take care of abstract function
@@ -1493,9 +1610,9 @@ var Parser = exports.Parser = Class.extend({
 			}
 			// body
 			this._arguments = args;
-			this._locals = [];
-			this._statements = [];
-			this._closures = [];
+			this._locals = new LocalVariable[];
+			this._statements = new Statement[];
+			this._closures = new MemberFunctionDefinition[];
 			if (name.getValue() == "constructor")
 				var lastToken = this._initializeBlock();
 			else
@@ -1508,19 +1625,20 @@ var Parser = exports.Parser = Class.extend({
 		} finally {
 			this._typeArgs.splice(this._typeArgs.length - typeArgs.length, this._typeArgs.length);
 			if (typeArgs.length != 0) {
-				this._objectTypesUsed.splice(numObjectTypesUsed);
+				this._objectTypesUsed.splice(numObjectTypesUsed, this._objectTypesUsed.length - numObjectTypesUsed);
 			}
 		}
-	},
+		return null;	// FIXME dummy
+	}
 
-	_formalTypeArguments: function () {
+	function _formalTypeArguments () : Token[] {
 		if (this._expectOpt(".") == null) {
-			return [];
+			return new Token[];
 		}
 		if (this._expect("<") == null) {
 			return null;
 		}
-		var typeArgs = [];
+		var typeArgs = new Token[];
 		do {
 			var typeArg = this._expectIdentifier(null);
 			if (typeArg == null)
@@ -1531,10 +1649,10 @@ var Parser = exports.Parser = Class.extend({
 				return null;
 		} while (token.getValue() == ",");
 		return typeArgs;
-	},
+	}
 
-	_actualTypeArguments: function () {
-		var types = [];
+	function _actualTypeArguments () : Type[] {
+		var types = new Type[];
 		var state = this._preserveState();
 		if (this._expectOpt(".") == null) {
 			return types;
@@ -1554,9 +1672,10 @@ var Parser = exports.Parser = Class.extend({
 				return null;
 		} while (token.getValue() == ",");
 		return types;
-	},
+	}
 
-	_typeDeclaration: function (allowVoid) {
+	function _typeDeclaration (allowVoid : boolean) : Type {
+		var token;
 		if (this._expectOpt("void") != null) {
 			if (! allowVoid) {
 				this._newError("'void' cannot be used here");
@@ -1570,7 +1689,7 @@ var Parser = exports.Parser = Class.extend({
 		// []
 		while (this._expectOpt("[") != null) {
 			if ((token = this._expect("]")) == null)
-				return false;
+				return null;
 			if (typeDecl instanceof NullableType) {
 				this._newError("Nullable.<T> cannot be an array, should be: T[]");
 				return null;
@@ -1578,9 +1697,9 @@ var Parser = exports.Parser = Class.extend({
 			typeDecl = this._registerArrayTypeOf(token, typeDecl);
 		}
 		return typeDecl;
-	},
+	}
 
-	_typeDeclarationNoArrayNoVoid: function () {
+	function _typeDeclarationNoArrayNoVoid () : Type {
 		var token = this._expectOpt([ "MayBeUndefined", "Nullable", "variant" ]);
 		if (token == null) {
 			return this._primaryTypeDeclaration();
@@ -1596,9 +1715,9 @@ var Parser = exports.Parser = Class.extend({
 		default:
 			throw new Error("logic flaw");
 		}
-	},
+	}
 
-	_nullableTypeDeclaration: function () {
+	function _nullableTypeDeclaration () : Type {
 		if (this._expect(".") == null || this._expect("<") == null)
 			return null;
 		var baseType = this._typeDeclaration(false);
@@ -1616,15 +1735,15 @@ var Parser = exports.Parser = Class.extend({
 		}
 		if (this._typeArgs != null) {
 			for (var i = 0; i < this._typeArgs.length; ++i) {
-				if (baseType.equals(new ParsedObjectType(new QualifiedName(this._typeArgs[i], null), []))) {
+				if (baseType.equals(new ParsedObjectType(new QualifiedName(this._typeArgs[i], null), new Type[]))) {
 					return baseType.toNullableType(true);
 				}
 			}
 		}
 		return baseType.toNullableType();
-	},
+	}
 
-	_primaryTypeDeclaration: function () {
+	function _primaryTypeDeclaration () : Type {
 		var token = this._expectOpt([ "(", "function", "boolean", "int", "number", "string" ]);
 		if (token != null) {
 			switch (token.getValue()) {
@@ -1646,10 +1765,10 @@ var Parser = exports.Parser = Class.extend({
 		} else {
 			return this._objectTypeDeclaration(null, null);
 		}
-	},
+	}
 
-	_objectTypeDeclaration: function (firstToken, autoCompleteMatchCb) {
-		var qualifiedName = firstToken !== null ? this._qualifiedNameStartingWith(firstToken, autoCompleteMatchCb) : this._qualifiedName(false, autoCompleteMatchCb);
+	function _objectTypeDeclaration (firstToken : Token, autoCompleteMatchCb : function(:ClassDefinition):boolean) : ParsedObjectType {
+		var qualifiedName = firstToken != null ? this._qualifiedNameStartingWith(firstToken, autoCompleteMatchCb) : this._qualifiedName(false, autoCompleteMatchCb);
 		if (qualifiedName == null)
 			return null;
 		var typeArgs = this._actualTypeArguments();
@@ -1659,13 +1778,13 @@ var Parser = exports.Parser = Class.extend({
 			return this._templateTypeDeclaration(qualifiedName, typeArgs);
 		} else {
 			// object
-			var objectType = new ParsedObjectType(qualifiedName, []);
+			var objectType = new ParsedObjectType(qualifiedName, new Type[]);
 			this._objectTypesUsed.push(objectType);
 			return objectType;
 		}
-	},
+	}
 
-	_templateTypeDeclaration: function (qualifiedName, typeArgs) {
+	function _templateTypeDeclaration (qualifiedName : QualifiedName, typeArgs : Type[]) : ParsedObjectType {
 		var className = qualifiedName.getToken().getValue();
 		if ((className == "Array" || className == "Map") && typeArgs[0] instanceof NullableType) {
 			this._newError("cannot declare " + className + ".<Nullable.<T>>, should be " + className + ".<T>");
@@ -1675,11 +1794,11 @@ var Parser = exports.Parser = Class.extend({
 		var objectType = new ParsedObjectType(qualifiedName, typeArgs);
 		this._objectTypesUsed.push(objectType);
 		return objectType;
-	},
+	}
 
-	_lightFunctionTypeDeclaration: function (objectType) {
+	function _lightFunctionTypeDeclaration (objectType : Type) : Type {
 		// parse args
-		var argTypes = [];
+		var argTypes = new Type[];
 		if (this._expectOpt(")") == null) {
 			do {
 				var isVarArg = this._expectOpt("...") != null;
@@ -1700,7 +1819,7 @@ var Parser = exports.Parser = Class.extend({
 		}
 		// parse return type
 		if (this._expect("->") == null)
-			return false;
+			return null;
 		var returnType = this._typeDeclaration(true);
 		if (returnType == null)
 			return null;
@@ -1708,15 +1827,15 @@ var Parser = exports.Parser = Class.extend({
 			return new MemberFunctionType(objectType, returnType, argTypes, true);
 		else
 			return new StaticFunctionType(returnType, argTypes, true);
-	},
+	}
 
-	_functionTypeDeclaration: function (objectType) {
+	function _functionTypeDeclaration (objectType : Type) : Type {
 		// optional function name
 		this._expectIdentifierOpt(null);
 		// parse args
 		if(this._expect("(") == null)
 			return null;
-		var argTypes = [];
+		var argTypes = new Type[];
 		if (this._expectOpt(")") == null) {
 			do {
 				var isVarArg = this._expectOpt("...") != null;
@@ -1740,7 +1859,7 @@ var Parser = exports.Parser = Class.extend({
 		}
 		// parse return type
 		if (this._expect(":") == null)
-			return false;
+			return null;
 		var returnType = this._typeDeclaration(true);
 		if (returnType == null)
 			return null;
@@ -1748,15 +1867,16 @@ var Parser = exports.Parser = Class.extend({
 			return new MemberFunctionType(objectType, returnType, argTypes, true);
 		else
 			return new StaticFunctionType(returnType, argTypes, true);
-	},
+	}
 
-	_registerArrayTypeOf: function (token, elementType) {
-		var arrayType = new ParsedObjectType(new QualifiedName(new Token("Array", true), null), [ elementType ], token);
+	function _registerArrayTypeOf (token : Token, elementType : Type) : ParsedObjectType {
+		// var arrayType = new ParsedObjectType(new QualifiedName(new Token("Array", true), null), [ elementType ], token);
+		var arrayType = new ParsedObjectType(new QualifiedName(new Token("Array", true), null), [ elementType ]);
 		this._objectTypesUsed.push(arrayType);
 		return arrayType;
-	},
+	}
 
-	_initializeBlock: function () {
+	function _initializeBlock () : Token {
 		var token;
 		while ((token = this._expectOpt("}")) == null) {
 			var state = this._preserveState();
@@ -1766,9 +1886,9 @@ var Parser = exports.Parser = Class.extend({
 			}
 		}
 		return token;
-	},
+	}
 
-	_block: function () {
+	function _block () : Token {
 		var token;
 		while ((token = this._expectOpt("}")) == null) {
 			if (! this._expectIsNotEOF())
@@ -1777,9 +1897,9 @@ var Parser = exports.Parser = Class.extend({
 				this._skipStatement();
 		}
 		return token;
-	},
+	}
 
-	_statement: function () {
+	function _statement () : boolean {
 		// has a label?
 		var state = this._preserveState();
 		var label = this._expectIdentifierOpt(null);
@@ -1841,7 +1961,7 @@ var Parser = exports.Parser = Class.extend({
 				// void is simply skipped
 				break;
 			default:
-				throw new "logic flaw, got " + token.getValue();
+				throw "logic flaw, got " + token.getValue();
 			}
 		}
 		// expression statement
@@ -1852,17 +1972,17 @@ var Parser = exports.Parser = Class.extend({
 		if (this._expect(";") == null)
 			return false;
 		return true;
-	},
+	}
 
-	_constructorInvocationStatement: function () {
+	function _constructorInvocationStatement () : boolean {
 		// get class
-		var token;
+		var token : Token;
 		if ((token = this._expectOpt("super")) != null) {
 			var classType = this._extendType;
 		} else if ((token = this._expectOpt("this")) != null) {
 			classType = this._classType;
 		} else {
-			if ((classType = this._objectTypeDeclaration(null)) == null)
+			if ((classType = this._objectTypeDeclaration(null, null)) == null)
 				return false;
 			token = classType.getToken();
 			if (this._classType.equals(classType)) {
@@ -1892,9 +2012,9 @@ var Parser = exports.Parser = Class.extend({
 		// success
 		this._statements.push(new ConstructorInvocationStatement(token, classType, args));
 		return true;
-	},
+	}
 
-	_variableStatement: function () {
+	function _variableStatement () : boolean {
 		var succeeded = [ false ];
 		var expr = this._variableDeclarations(false, succeeded);
 		if (! succeeded[0])
@@ -1904,25 +2024,17 @@ var Parser = exports.Parser = Class.extend({
 		if (expr != null)
 			this._statements.push(new ExpressionStatement(expr));
 		return true;
-	},
+	}
 
-	_functionStatement: function (token) {
-		var name = this._expectIdentifier();
-		if (name == null)
-			return false;
-
-		var funcExpr = this._functionExpr(token, name);
+	function _functionStatement (token : Token) : boolean {
+		var funcExpr = this._functionExpr(token, true);
 		if (funcExpr == null)
 			return false;
-		var local = this._registerLocal(name, funcExpr.getFuncDef().getType());
-		var expr = new LocalExpression(name, local);
-		var t= new Token("=", true, token._filename, token._lineNumber, token._columnNumber);
-		expr = new AssignmentExpression(t, expr, funcExpr);
-		this._statements.push(new ExpressionStatement(expr));
+		this._statements.push(new ExpressionStatement(funcExpr));
 		return true;
-	},
+	}
 
-	_ifStatement: function (token) {
+	function _ifStatement (token : Token) : boolean {
 		if (this._expect("(") == null)
 			return false;
 		var expr = this._expr(false);
@@ -1931,15 +2043,15 @@ var Parser = exports.Parser = Class.extend({
 		if (this._expect(")") == null)
 			return false;
 		var onTrueStatements = this._subStatements();
-		var onFalseStatements = [];
+		var onFalseStatements = new Statement[];
 		if (this._expectOpt("else") != null) {
 			onFalseStatements = this._subStatements();
 		}
 		this._statements.push(new IfStatement(token, expr, onTrueStatements, onFalseStatements));
 		return true;
-	},
+	}
 
-	_doWhileStatement: function (token, label) {
+	function _doWhileStatement (token : Token, label : Token) : boolean {
 		var statements = this._subStatements();
 		if (this._expect("while") == null)
 			return false;
@@ -1952,9 +2064,9 @@ var Parser = exports.Parser = Class.extend({
 			return false;
 		this._statements.push(new DoWhileStatement(token, label, expr, statements));
 		return true;
-	},
+	}
 
-	_whileStatement: function (token, label) {
+	function _whileStatement (token : Token, label : Token) : boolean {
 		if (this._expect("(") == null)
 			return false;
 		var expr = this._expr(false);
@@ -1965,9 +2077,9 @@ var Parser = exports.Parser = Class.extend({
 		var statements = this._subStatements();
 		this._statements.push(new WhileStatement(token, label, expr, statements));
 		return true;
-	},
+	}
 
-	_forStatement: function (token, label) {
+	function _forStatement (token : Token, label : Token) : boolean {
 		var state = this._preserveState();
 		// first try to parse as for .. in, and fallback to the other
 		switch (this._forInStatement(token, label)) {
@@ -1979,10 +2091,10 @@ var Parser = exports.Parser = Class.extend({
 			return true;
 		}
 		this._restoreState(state);
-		if (! this._expect("(") == null)
+		if (this._expect("(") == null)
 			return false;
 		// parse initialization expression
-		var initExpr = null;
+		var initExpr = null : Expression;
 		if (this._expectOpt(";") != null) {
 			// empty expression
 		} else if (this._expectOpt("var") != null) {
@@ -1999,7 +2111,7 @@ var Parser = exports.Parser = Class.extend({
 				return false;
 		}
 		// parse conditional expression
-		var condExpr = null;
+		var condExpr = null : Expression;
 		if (this._expectOpt(";") != null) {
 			// empty expression
 		} else {
@@ -2009,7 +2121,7 @@ var Parser = exports.Parser = Class.extend({
 				return false;
 		}
 		// parse post expression
-		var postExpr = null;
+		var postExpr = null : Expression;
 		if (this._expectOpt(")") != null) {
 			// empty expression
 		} else {
@@ -2022,10 +2134,10 @@ var Parser = exports.Parser = Class.extend({
 		var statements = this._subStatements();
 		this._statements.push(new ForStatement(token, label, initExpr, condExpr, postExpr, statements));
 		return true;
-	},
+	}
 
-	_forInStatement: function (token, label) {
-		if (! this._expect("(") == null)
+	function _forInStatement (token : Token, label : Token) : number {
+		if (this._expect("(") == null)
 			return 0; // failure
 		var lhsExpr;
 		if (this._expectOpt("var") != null) {
@@ -2045,25 +2157,25 @@ var Parser = exports.Parser = Class.extend({
 		var statements = this._subStatements();
 		this._statements.push(new ForInStatement(token, label, lhsExpr, listExpr, statements));
 		return 1;
-	},
+	}
 
-	_continueStatement: function (token) {
+	function _continueStatement (token : Token) : boolean {
 		var label = this._expectIdentifierOpt(null);
 		if (this._expect(";") == null)
 			return false;
 		this._statements.push(new ContinueStatement(token, label));
 		return true;
-	},
+	}
 
-	_breakStatement: function (token) {
+	function _breakStatement (token : Token) : boolean {
 		var label = this._expectIdentifierOpt(null);
 		if (this._expect(";") == null)
 			return false;
 		this._statements.push(new BreakStatement(token, label));
 		return true;
-	},
+	}
 
-	_returnStatement: function (token) {
+	function _returnStatement (token : Token) : boolean {
 		if (this._expectOpt(";") != null) {
 			this._statements.push(new ReturnStatement(token, null));
 			return true;
@@ -2075,9 +2187,9 @@ var Parser = exports.Parser = Class.extend({
 		if (this._expect(";") == null)
 			return false;
 		return true;
-	},
+	}
 
-	_switchStatement: function (token, label) {
+	function _switchStatement (token : Token, label : Token) : Nullable.<boolean> {
 		if (this._expect("(") == null)
 			return false;
 		var expr = this._expr(false);
@@ -2135,26 +2247,26 @@ var Parser = exports.Parser = Class.extend({
 			}
 		}
 		// done
-		this._statements.push(new SwitchStatement(token, label, expr, this._statements.splice(startStatementIndex)));
+		this._statements.push(new SwitchStatement(token, label, expr, (this._statements.splice(startStatementIndex, this._statements.length - startStatementIndex))));
 		return true;
-	},
+	}
 
-	_throwStatement: function (token) {
+	function _throwStatement (token : Token) : boolean {
 		var expr = this._expr();
 		if (expr == null)
 			return false;
 		this._statements.push(new ThrowStatement(token, expr));
 		return true;
-	},
+	}
 
-	_tryStatement: function (tryToken) {
+	function _tryStatement (tryToken : Token) : boolean {
 		if (this._expect("{") == null)
 			return false;
 		var startIndex = this._statements.length;
 		if (this._block() == null)
 			return false;
-		var tryStatements = this._statements.splice(startIndex);
-		var catchStatements = [];
+		var tryStatements = this._statements.splice(startIndex, this._statements.length - startIndex);
+		var catchStatements = new CatchStatement[];
 		var catchOrFinallyToken = this._expect([ "catch", "finally" ]);
 		if (catchOrFinallyToken == null)
 			return false;
@@ -2179,7 +2291,7 @@ var Parser = exports.Parser = Class.extend({
 			} finally {
 				this._locals.splice(this._locals.indexOf(caughtVariable), 1);
 			}
-			catchStatements.push(new CatchStatement(catchOrFinallyToken, caughtVariable, this._statements.splice(startIndex)));
+			catchStatements.push(new CatchStatement(catchOrFinallyToken, caughtVariable, this._statements.splice(startIndex, this._statements.length - startIndex)));
 		}
 		if (catchOrFinallyToken != null) {
 			// finally
@@ -2187,15 +2299,15 @@ var Parser = exports.Parser = Class.extend({
 				return false;
 			if (this._block() == null)
 				return false;
-			var finallyStatements = this._statements.splice(startIndex);
+			var finallyStatements = this._statements.splice(startIndex, this._statements.length - startIndex);
 		} else {
-			finallyStatements = [];
+			finallyStatements = new Statement[];
 		}
 		this._statements.push(new TryStatement(tryToken, tryStatements, catchStatements, finallyStatements));
 		return true;
-	},
+	}
 
-	_assertStatement: function (token) {
+	function _assertStatement (token : Token) : boolean {
 		var expr = this._expr();
 		if (expr == null)
 			return false;
@@ -2203,10 +2315,10 @@ var Parser = exports.Parser = Class.extend({
 			return false;
 		this._statements.push(new AssertStatement(token, expr));
 		return true;
-	},
+	}
 
-	_logStatement: function (token) {
-		var exprs = [];
+	function _logStatement (token : Token) : boolean {
+		var exprs = new Expression[];
 		do {
 			var expr = this._assignExpr(false);
 			if (expr == null)
@@ -2221,9 +2333,9 @@ var Parser = exports.Parser = Class.extend({
 		}
 		this._statements.push(new LogStatement(token, exprs));
 		return true;
-	},
+	}
 
-	_deleteStatement: function (token) {
+	function _deleteStatement (token : Token) : boolean {
 		var expr = this._expr();
 		if (expr == null)
 			return false;
@@ -2231,59 +2343,63 @@ var Parser = exports.Parser = Class.extend({
 			return false;
 		this._statements.push(new DeleteStatement(token, expr));
 		return true;
-	},
+	}
 
-	_debuggerStatement: function (token) {
+	function _debuggerStatement (token : Token) : boolean {
 		this._statements.push(new DebuggerStatement(token));
 		return true;
-	},
+	}
 
-	_subStatements: function () {
+	function _subStatements () : Statement[] {
 		var statementIndex = this._statements.length;
 		if (! this._statement())
 			this._skipStatement();
-		return this._statements.splice(statementIndex);
-	},
+		return this._statements.splice(statementIndex, this._statements.length - statementIndex);
+	}
 
-	_variableDeclarations: function (noIn, isSuccess) {
+	function _variableDeclarations (noIn : boolean, isSuccess : boolean[]) : Expression {
 		isSuccess[0] = false;
-		var expr = null;
-		var commaToken = null;
+		var expr = null : Expression;
+		var commaToken = null : Token;
 		do {
 			var declExpr = this._variableDeclaration(noIn);
 			if (declExpr == null)
 				return null;
 			// do not push variable declarations wo. assignment
 			if (! (declExpr instanceof LocalExpression))
-				expr = expr != null ? new CommaExpression(commaToken, expr, declExpr) : declExpr;
+				expr = expr != null ? (new CommaExpression(commaToken, expr, declExpr) as Expression) : declExpr;
 		} while ((commaToken = this._expectOpt(",")) != null);
 		isSuccess[0] = true;
 		return expr;
-	},
+	}
 
-	_variableDeclaration: function (noIn) {
+	function _variableDeclaration (noIn : boolean) : Expression {
 		var identifier = this._expectIdentifier(null);
 		if (identifier == null)
 			return null;
-		var type = null;
+		var type = null : Type;
 		if (this._expectOpt(":"))
 			if ((type = this._typeDeclaration(false)) == null)
 				return null;
 		// FIXME value should be registered after parsing the initialization expression, but that prevents: var f = function () : void { f(); };
 		var local = this._registerLocal(identifier, type);
 		// parse initial value (optional)
-		var initialValue = null;
+		var initialValue = null : Expression;
 		var assignToken;
 		if ((assignToken = this._expectOpt("=")) != null)
 			if ((initialValue = this._assignExpr(noIn)) == null)
 				return null;
-		var expr = new LocalExpression(identifier, local);
+		var expr : Expression = new LocalExpression(identifier, local);
 		if (initialValue != null)
 			expr = new AssignmentExpression(assignToken, expr, initialValue);
 		return expr;
-	},
+	}
 
-	_expr: function (noIn) {
+	function _expr () : Expression {
+		return this._expr(false);
+	}
+
+	function _expr (noIn : boolean) : Expression {
 		var expr = this._assignExpr(noIn);
 		if (expr == null)
 			return null;
@@ -2295,9 +2411,13 @@ var Parser = exports.Parser = Class.extend({
 			expr = new CommaExpression(commaToken, expr, assignExpr);
 		}
 		return expr;
-	},
+	}
 
-	_assignExpr: function (noIn) {
+	function _assignExpr () : Expression {
+		return this._assignExpr(false);
+	}
+
+	function _assignExpr (noIn : boolean) : Expression {
 		var state = this._preserveState();
 		// FIXME contrary to ECMA 262, we first try lhs op assignExpr, and then condExpr; does this have any problem?
 		// lhs
@@ -2314,17 +2434,17 @@ var Parser = exports.Parser = Class.extend({
 		// failed to parse as lhs op assignExpr, try condExpr
 		this._restoreState(state);
 		return this._condExpr(noIn);
-	},
+	}
 
-	_condExpr: function (noIn) {
+	function _condExpr (noIn : boolean) : Expression {
 		var lorExpr = this._lorExpr(noIn);
 		if (lorExpr == null)
 			return null;
 		var operatorToken;
 		if ((operatorToken = this._expectOpt("?")) == null)
 			return lorExpr;
-		var ifTrueExpr = null;
-		var ifFalseExpr = null;
+		var ifTrueExpr = null : Expression;
+		var ifFalseExpr = null : Expression;
 		if (this._expectOpt(":") == null) {
 			ifTrueExpr = this._assignExpr(noIn);
 			if (ifTrueExpr == null)
@@ -2336,95 +2456,115 @@ var Parser = exports.Parser = Class.extend({
 		if (ifFalseExpr == null)
 			return null;
 		return new ConditionalExpression(operatorToken, lorExpr, ifTrueExpr, ifFalseExpr);
-	},
+	}
 
-	_binaryOpExpr: function (ops, excludePattern, parseFunc, noIn, builderFunc) {
-		var expr = parseFunc.call(this, noIn);
+	function _binaryOpExpr (ops : string[], excludePattern : RegExp, parseFunc : function(:boolean):Expression, noIn : boolean, builderFunc : function(:Token,:Expression,:Expression):Expression) : Expression {
+		var expr = parseFunc(noIn);
 		if (expr == null)
 			return null;
 		while (true) {
 			var op = this._expectOpt(ops, excludePattern);
 			if (op == null)
 				break;
-			var rightExpr = parseFunc.call(this);
+			var rightExpr = parseFunc(false);
 			if (rightExpr == null)
 				return null;
 			expr = builderFunc(op, expr, rightExpr);
 		}
 		return expr;
-	},
+	}
 
-	_lorExpr: function (noIn) {
-		return this._binaryOpExpr([ "||" ], null, this._landExpr, noIn, function (op, e1, e2) {
+	function _lorExpr (noIn : boolean) : Expression {
+		return this._binaryOpExpr([ "||" ], null, function (noIn) {
+			return this._landExpr(noIn);
+		}, noIn, function (op, e1, e2) {
 			return new LogicalExpression(op, e1, e2);
 		});
-	},
+	}
 
-	_landExpr: function (noIn) {
-		return this._binaryOpExpr([ "&&" ], null, this._borExpr, noIn, function (op, e1, e2) {
+	function _landExpr (noIn : boolean) : Expression {
+		return this._binaryOpExpr([ "&&" ], null, function (noIn) {
+			return this._borExpr(noIn);
+		}, noIn, function (op, e1, e2) {
 			return new LogicalExpression(op, e1, e2);
 		});
-	},
+	}
 
-	_borExpr: function (noIn) {
-		return this._binaryOpExpr([ "|" ], /^\|\|/, this._bxorExpr, noIn, function (op, e1, e2) {
+	function _borExpr (noIn : boolean) : Expression {
+		return this._binaryOpExpr([ "|" ], /^\|\|/, function (noIn) {
+			return this._bxorExpr(noIn);
+		}, noIn, function (op, e1, e2) {
 			return new BinaryNumberExpression(op, e1, e2);
 		});
-	},
+	}
 
-	_bxorExpr: function (noIn) {
-		return this._binaryOpExpr([ "^" ], null, this._bandExpr, noIn, function (op, e1, e2) {
+	function _bxorExpr (noIn : boolean) : Expression {
+		return this._binaryOpExpr([ "^" ], null, function (noIn) {
+			return this._bandExpr(noIn);
+		}, noIn, function (op, e1, e2) {
 			return new BinaryNumberExpression(op, e1, e2);
 		});
-	},
+	}
 
-	_bandExpr: function (noIn) {
-		return this._binaryOpExpr([ "&" ], /^&&/, this._eqExpr, noIn, function (op, e1, e2) {
+	function _bandExpr (noIn : boolean) : Expression {
+		return this._binaryOpExpr([ "&" ], /^&&/, function (noIn) {
+			return this._eqExpr(noIn);
+		}, noIn, function (op, e1, e2) {
 			return new BinaryNumberExpression(op, e1, e2);
 		});
-	},
+	}
 
-	_eqExpr: function (noIn) {
-		return this._binaryOpExpr([ "==", "!=" ], null, this._relExpr, noIn, function (op, e1, e2) {
+	function _eqExpr (noIn : boolean) : Expression {
+		return this._binaryOpExpr([ "==", "!=" ], null, function (noIn) {
+			return this._relExpr(noIn);
+		}, noIn, function (op, e1, e2) {
 			return new EqualityExpression(op, e1, e2);
 		});
-	},
+	}
 
-	_relExpr: function (noIn) {
+	function _relExpr (noIn : boolean) : Expression {
 		var ops = [ "<=", ">=", "<", ">" ];
 		if (! noIn)
 			ops.push("in");
-		return this._binaryOpExpr(ops, null, this._shiftExpr, noIn, function (op, e1, e2) {
+		return this._binaryOpExpr(ops, null, function (noIn) {
+			return this._shiftExpr();
+		}, noIn, function (op, e1, e2) {
 			if (op.getValue() == "in")
 				return new InExpression(op, e1, e2);
 			else
 				return new BinaryNumberExpression(op, e1, e2);
 		});
-	},
+	}
 
-	_shiftExpr: function () {
-		var expr = this._binaryOpExpr([ ">>>", "<<", ">>" ], null, this._addExpr, false, function (op, e1, e2) {
+	function _shiftExpr () : Expression {
+		var expr = this._binaryOpExpr([ ">>>", "<<", ">>" ], null, function (noIn) {
+			return this._addExpr();
+		}, false, function (op, e1, e2) {
 			return new ShiftExpression(op, e1, e2);
 		});
 		return expr;
-	},
+	}
 
-	_addExpr: function () {
-		return this._binaryOpExpr([ "+", "-" ], /^[+-]{2}/, this._mulExpr, false, function (op, e1, e2) {
+	function _addExpr () : Expression {
+		return this._binaryOpExpr([ "+", "-" ], /^[+-]{2}/, function (noIn) {
+			return this._mulExpr();
+		}, false, function (op, e1, e2) {
 			if (op.getValue() == "+")
 				return new AdditiveExpression(op, e1, e2);
 			else
 				return new BinaryNumberExpression(op, e1, e2);
 		});
-	},
+	}
 
-	_mulExpr: function () {
-		return this._binaryOpExpr([ "*", "/", "%" ], null, this._unaryExpr, false, function (op, e1, e2) {
+	function _mulExpr () : Expression {
+		return this._binaryOpExpr([ "*", "/", "%" ], null, function (noIn) {
+			return this._unaryExpr();
+		}, false, function (op, e1, e2) {
 			return new BinaryNumberExpression(op, e1, e2);
 		});
-	},
+	}
 
-	_unaryExpr: function () {
+	function _unaryExpr () : Expression {
 		// read other unary operators
 		var op = this._expectOpt([ "++", "--", "+", "-", "~", "!", "typeof" ]);
 		if (op == null)
@@ -2445,10 +2585,12 @@ var Parser = exports.Parser = Class.extend({
 			return new LogicalNotExpression(op, expr);
 		case "typeof":
 			return new TypeofExpression(op, expr);
+		default:
+			throw new Error("logic flaw");
 		}
-	},
+	}
 
-	_asExpr: function () {
+	function _asExpr () : Expression {
 		var expr = this._postfixExpr();
 		if (expr == null)
 			return null;
@@ -2458,12 +2600,12 @@ var Parser = exports.Parser = Class.extend({
 			var type = this._typeDeclaration(false);
 			if (type == null)
 				return null;
-			expr = noConvert ? new AsNoConvertExpression(token, expr, type) : new AsExpression(token, expr, type);
+			expr = noConvert ? (new AsNoConvertExpression(token, expr, type) as Expression) : (new AsExpression(token, expr, type) as Expression);
 		}
 		return expr;
-	},
+	}
 
-	_postfixExpr: function () {
+	function _postfixExpr () : Expression {
 		var expr = this._lhsExpr();
 		var op = this._expectOpt([ "++", "--", "instanceof" ]);
 		if (op == null)
@@ -2477,9 +2619,9 @@ var Parser = exports.Parser = Class.extend({
 		default:
 			return new PostIncrementExpression(op, expr);
 		}
-	},
+	}
 
-	_lhsExpr: function () {
+	function _lhsExpr () : Expression {
 		var state = this._preserveState();
 		var expr;
 		var token = this._expectOpt([ "new", "super", "(", "function" ]);
@@ -2497,7 +2639,7 @@ var Parser = exports.Parser = Class.extend({
 				}
 				break;
 			case "function":
-				expr = this._functionExpr(token, null);
+				expr = this._functionExpr(token, false);
 				break;
 			case "new":
 				expr = this._newExpr(token);
@@ -2513,6 +2655,7 @@ var Parser = exports.Parser = Class.extend({
 		while ((token = this._expectOpt([ "(", "[", "." ])) != null) {
 			switch (token.getValue()) {
 			case "(":
+				var args;
 				if ((args = this._argsExpr()) == null)
 					return null;
 				expr = new CallExpression(token, expr, args);
@@ -2537,9 +2680,9 @@ var Parser = exports.Parser = Class.extend({
 			}
 		}
 		return expr;
-	},
+	}
 
-	_newExpr: function (newToken) {
+	function _newExpr (newToken : Token) : Expression {
 		var type = this._typeDeclarationNoArrayNoVoid();
 		if (type == null)
 			return null;
@@ -2568,12 +2711,12 @@ var Parser = exports.Parser = Class.extend({
 			if (args == null)
 				return null;
 		} else {
-			args = [];
+			args = new Expression[];
 		}
 		return new NewExpression(newToken, type, args);
-	},
+	}
 
-	_superExpr: function () {
+	function _superExpr () : Expression {
 		if (this._expect(".") == null)
 			return null;
 		var identifier = this._expectIdentifier(null /* FIXME */);
@@ -2587,13 +2730,13 @@ var Parser = exports.Parser = Class.extend({
 		if (args == null)
 			return null;
 		return new SuperExpression(token, identifier, args);
-	},
+	}
 
-	_lambdaExpr: function (token) {
+	function _lambdaExpr (token : Token) : Expression {
 		var args = this._functionArgumentsExpr(false, false);
 		if (args == null)
 			return null;
-		var returnType = null;
+		var returnType = null : Type;
 		if (this._expectOpt(":") != null) {
 			if ((returnType = this._typeDeclaration(true)) == null)
 				return null;
@@ -2605,11 +2748,11 @@ var Parser = exports.Parser = Class.extend({
 			return null;
 		this._closures.push(funcDef);
 		return new FunctionExpression(token, funcDef);
-	},
+	}
 
-	_lambdaBody: function (token, args, returnType) {
+	function _lambdaBody (token : Token, args : ArgumentDeclaration[], returnType : Type) : MemberFunctionDefinition {
 		var openBlock = this._expectOpt("{");
-		var state = this._pushScope(args);
+		this._pushScope(args);
 		try {
 			// parse lambda body
 			if (openBlock == null) {
@@ -2627,10 +2770,13 @@ var Parser = exports.Parser = Class.extend({
 		} finally {
 			this._popScope();
 		}
-	},
+		return null;	// dummy
+	}
 
-	_functionExpr: function (token, nameOfFunctionStatement) {
-		var requireTypeDeclaration = nameOfFunctionStatement != null;
+	function _functionExpr (token : Token, requireTypeDeclaration : boolean) : Expression {
+		var name = this._expectIdentifierOpt();
+		if (requireTypeDeclaration && name == null)
+			return null;
 		if (this._expect("(") == null)
 			return null;
 		var args = this._functionArgumentsExpr(false, requireTypeDeclaration);
@@ -2657,14 +2803,19 @@ var Parser = exports.Parser = Class.extend({
 		if (this._expect("{") == null)
 			return null;
 
-		if (nameOfFunctionStatement != null) {
+		var local = null : LocalVariable;
+		if (name != null) {
 			// add name to current scope for local function declaration
-			var argTypes = args.map(function(arg) { return arg.getType(); });
-			var type = new StaticFunctionType(returnType, argTypes, false);
-			this._registerLocal(nameOfFunctionStatement, type);
+			if (requireTypeDeclaration) {
+				var argTypes = args.map.<Type>(function(arg) { return arg.getType(); });
+				var type = new StaticFunctionType(returnType, argTypes, false);
+				local = this._registerLocal(name, type);
+			} else {
+				local = this._registerLocal(name, null);
+			}
 		}
 		// parse function block
-		var state = this._pushScope(args);
+		this._pushScope(args);
 		var lastToken = this._block();
 		if (lastToken == null) {
 			this._popScope();
@@ -2673,10 +2824,17 @@ var Parser = exports.Parser = Class.extend({
 		var funcDef = new MemberFunctionDefinition(token, null, ClassDefinition.IS_STATIC, returnType, args, this._locals, this._statements, this._closures, lastToken, null);
 		this._popScope();
 		this._closures.push(funcDef);
-		return new FunctionExpression(token, funcDef);
-	},
+		var funcExpr = new FunctionExpression(token, funcDef);
+		if (name != null) {
+			// conversion from function statement to assignment expression
+			var localExpr = new LocalExpression(name, local);
+			return new AssignmentExpression(new Token("=", true, token._filename, token._lineNumber, token._columnNumber), localExpr, funcExpr);
+		} else {
+			return funcExpr;
+		}
+	}
 
-	_forEachScope: function (cb) {
+	function _forEachScope (cb : function(:LocalVariable[],:ArgumentDeclaration[]):boolean) : boolean {
 		if (this._locals != null) {
 			if (! cb(this._locals, this._arguments)) {
 				return false;
@@ -2688,10 +2846,10 @@ var Parser = exports.Parser = Class.extend({
 			}
 		}
 		return true;
-	},
+	}
 
-	_findLocal: function (name) {
-		var found = null;
+	function _findLocal (name : string) : LocalVariable {
+		var found = null : LocalVariable;
 		this._forEachScope(function (locals, args) {
 			for (var i = 0; i < locals.length; ++i) {
 				if (locals[i].getName().getValue() == name) {
@@ -2710,9 +2868,9 @@ var Parser = exports.Parser = Class.extend({
 			return true;
 		});
 		return found;
-	},
+	}
 
-	_primaryExpr: function () {
+	function _primaryExpr () : Expression {
 		var token;
 		if ((token = this._expectOpt([ "this", "undefined", "null", "false", "true", "[", "{", "(" ])) != null) {
 			switch (token.getValue()) {
@@ -2736,6 +2894,8 @@ var Parser = exports.Parser = Class.extend({
 				if (this._expect(")") == null)
 					return null;
 				return expr;
+			default:
+				throw new Error("logic flaw");
 			}
 		} else if ((token = this._expectNumberLiteralOpt()) != null) {
 			return new NumberLiteralExpression(token);
@@ -2744,7 +2904,7 @@ var Parser = exports.Parser = Class.extend({
 			if (local != null) {
 				return new LocalExpression(token, local);
 			} else {
-				var parsedType = this._objectTypeDeclaration(token);
+				var parsedType = this._objectTypeDeclaration(token, null);
 				if (parsedType == null)
 					return null;
 				return new ClassExpression(parsedType.getToken(), parsedType);
@@ -2755,11 +2915,12 @@ var Parser = exports.Parser = Class.extend({
 			return new RegExpLiteralExpression(token);
 		} else {
 			this._newError("expected primary expression");
+			return null;
 		}
-	},
+	}
 
-	_nullLiteral: function (token) {
-		var type = Type.nullType;
+	function _nullLiteral (token : Token) : NullExpression {
+		var type = Type.nullType as Type;
 		if (this._expectOpt(":") != null) {
 			if ((type = this._typeDeclaration(false)) == null)
 				return null;
@@ -2769,30 +2930,30 @@ var Parser = exports.Parser = Class.extend({
 			}
 		}
 		return new NullExpression(token, type);
-	},
+	}
 
-	_arrayLiteral: function (token) {
-		var exprs = [];
+	function _arrayLiteral (token : Token) : ArrayLiteralExpression {
+		var exprs = new Expression[];
 		if (this._expectOpt("]") == null) {
 			do {
 				var expr = this._assignExpr();
 				if (expr == null)
 					return null;
 				exprs.push(expr);
-				var token = this._expect([ ",", "]" ]);
+				token = this._expect([ ",", "]" ]);
 				if (token == null)
 					return null;
 			} while (token.getValue() == ",");
 		}
-		var type = null;
+		var type = null : Type;
 		if (this._expectOpt(":") != null)
 			if ((type = this._typeDeclaration(false)) == null)
 				return null;
 		return new ArrayLiteralExpression(token, exprs, type);
-	},
+	}
 
-	_hashLiteral: function (token) {
-		var elements = [];
+	function _hashLiteral (token : Token) : MapLiteralExpression {
+		var elements = new MapLiteralElement[];
 		if (this._expectOpt("}") == null) {
 			do {
 				// obtain key
@@ -2817,22 +2978,23 @@ var Parser = exports.Parser = Class.extend({
 					return null;
 			} while (token.getValue() == ",");
 		}
-		var type = null;
+		var type = null : Type;
 		if (this._expectOpt(":") != null)
 			if ((type = this._typeDeclaration(false)) == null)
 				return null;
 		return new MapLiteralExpression(token, elements, type);
-	},
+	}
 
-	_functionArgumentsExpr: function (allowVarArgs, requireTypeDeclaration) {
-		var args = [];
+	function _functionArgumentsExpr (allowVarArgs : boolean, requireTypeDeclaration : boolean) : ArgumentDeclaration[] {
+		var args = new ArgumentDeclaration[];
 		if (this._expectOpt(")") == null) {
+			var token = null : Token;
 			do {
 				var isVarArg = allowVarArgs && (this._expectOpt("...") != null);
 				var argName = this._expectIdentifier(null);
 				if (argName == null)
 					return null;
-				var argType = null;
+				var argType = null : Type;
 				if (requireTypeDeclaration) {
 					if (this._expect(":") == null) {
 						this._newError("type declarations are mandatory for non-expression function definition");
@@ -2861,49 +3023,50 @@ var Parser = exports.Parser = Class.extend({
 				}
 				// FIXME KAZUHO support default arguments
 				args.push(new ArgumentDeclaration(argName, argType));
-				var token = this._expect([ ")", "," ]);
+				token = this._expect([ ")", "," ]);
 				if (token == null)
 					return null;
 			} while (token.getValue() == ",");
 		}
 		return args;
-	},
+	}
 
-	_argsExpr: function () {
-		var args = [];
+	function _argsExpr () : Expression[] {
+		var args = new Expression[];
 		if (this._expectOpt(")") == null) {
+			var token = null : Token;
 			do {
 				var arg = this._assignExpr(false);
 				if (arg == null)
 					return null;
 				args.push(arg);
-				var token = this._expect([ ")", "," ]);
+				token = this._expect([ ")", "," ]);
 				if (token == null)
 					return null;
 			} while (token.getValue() == ",");
 		}
 		return args;
-	},
+	}
 
-	_getCompletionCandidatesOfTopLevel: function (autoCompleteMatchCb) {
+	function _getCompletionCandidatesOfTopLevel (autoCompleteMatchCb : function(:ClassDefinition):boolean) : CompletionCandidatesOfTopLevel {
 		return new CompletionCandidatesOfTopLevel(this, autoCompleteMatchCb);
-	},
+	}
 
-	_getCompletionCandidatesWithLocal: function () {
+	function _getCompletionCandidatesWithLocal () : _CompletionCandidatesWithLocal {
 		return new _CompletionCandidatesWithLocal(this);
-	},
+	}
 
-	_getCompletionCandidatesOfNamespace: function (imprt, autoCompleteMatchCb) {
+	function _getCompletionCandidatesOfNamespace (imprt : Import, autoCompleteMatchCb : function(:ClassDefinition):boolean) : _CompletionCandidatesOfNamespace {
 		return new _CompletionCandidatesOfNamespace(imprt, autoCompleteMatchCb);
-	},
+	}
 
-	_getCompletionCandidatesOfProperty: function (expr) {
+	function _getCompletionCandidatesOfProperty (expr : Expression) : _CompletionCandidatesOfProperty {
 		return new _CompletionCandidatesOfProperty(expr);
-	},
+	}
 
-	$_isReservedClassName: function (name) {
+	static function _isReservedClassName (name : string) : boolean {
 		return name.match(/^(Array|Boolean|Date|Function|Map|Number|Object|RegExp|String|Error|EvalError|RangeError|ReferenceError|SyntaxError|TypeError|JSX)$/) != null;
 	}
 
-});
+}
 

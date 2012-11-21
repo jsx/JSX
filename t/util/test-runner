@@ -268,7 +268,7 @@ sub completion_test {
             map {
                 my $data = {};
                 for my $field(qw(word partialWord type returnType args definedClass)) {
-                    $data->{$field} = $_->{$field} if exists $_->{$field};
+                    $data->{$field} = $_->{$field} if exists $_->{$field} and $_->{$field};
                 }
                 $data;
             } @{$output_data}

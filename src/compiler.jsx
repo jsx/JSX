@@ -20,87 +20,101 @@
  * IN THE SOFTWARE.
  */
 
-var Class = require("./Class");
-eval(Class.$import("./parser"));
-eval(Class.$import("./classdef"));
-eval(Class.$import("./type"));
-eval(Class.$import("./emitter"));
-eval(Class.$import("./platform"));
-eval(Class.$import("./util"));
+import "./parser.jsx";
+import "./classdef.jsx";
+import "./type.jsx";
+import "./emitter.jsx";
+import "./platform.jsx";
+import "./util.jsx";
+import "./optimizer.jsx";
+import "./completion.jsx";
 
-"use strict";
 
-var Compiler = exports.Compiler = Class.extend({
+class Compiler {
 
-	$MODE_COMPILE: 0,
-	$MODE_PARSE: 1,
-	$MODE_COMPLETE: 2,
-	$MODE_DOC: 3,
+	static const MODE_COMPILE = 0;
+	static const MODE_PARSE = 1;
+	static const MODE_COMPLETE = 2;
+	static const MODE_DOC = 3;
 
-	constructor: function (platform) {
+	var _platform : Platform;
+	var _mode : number;
+	var _optimizer : Optimizer;
+	var _warningFilters : Array.<function(:CompileWarning):Nullable.<boolean>>;
+	var _parsers : Parser[];
+	var _fileCache : Map.<string>;
+	var _searchPaths : string[];
+	var _builtinParsers : Parser[];
+	var _emitter : Emitter;
+
+	function constructor (platform : Platform) {
 		this._platform = platform;
 		this._mode = Compiler.MODE_COMPILE;
 		this._optimizer = null;
-		this._warningFilters = [];
-		this._parsers = [];
-		this._fileCache = {};
+		this._warningFilters = [] : Array.<function(:CompileWarning):Nullable.<boolean>>;
+		this._parsers = [] : Parser[];
+		this._fileCache = new Map.<string>;
 		this._searchPaths = [ this._platform.getRoot() + "/lib/common" ];
 		// load the built-in classes
 		this.addSourceFile(null, this._platform.getRoot() + "/lib/built-in.jsx");
-		this._builtinParsers = this._parsers.concat([]); // shallow clone
-	},
+		this._builtinParsers = this._parsers.concat(new Parser[]); // shallow clone
+	}
 
-	addSearchPath: function(path) {
+	function addSearchPath (path : string) : void {
 		this._searchPaths.unshift(path);
-	},
+	}
 
-	getPlatform: function () {
+	function getPlatform () : Platform {
 		return this._platform;
-	},
+	}
 
-	getMode: function () {
+	function getMode () : number {
 		return this._mode;
-	},
+	}
 
-	setMode: function (mode) {
+	function setMode (mode : number) : Compiler {
 		this._mode = mode;
 		return this;
-	},
+	}
 
-	setEmitter: function (emitter) {
+	function setEmitter (emitter : Emitter) : void {
 		this._emitter = emitter;
-	},
+	}
 
-	setOptimizer: function (optimizer) {
+	function setOptimizer (optimizer : Optimizer) : void {
 		this._optimizer = optimizer;
-	},
+	}
 
-	getWarningFilters: function () {
+	function getWarningFilters () : Array.<function(:CompileWarning):Nullable.<boolean>> {
 		return this._warningFilters;
-	},
+	}
 
-	getParsers: function () {
+	function getParsers () : Parser[] {
 		return this._parsers;
-	},
+	}
 
-	addSourceFile: function (token, path, completionRequest) {
+	function addSourceFile (token : Token, path : string) : Parser {
+		return this.addSourceFile(token, path, null);
+	}
+
+	function addSourceFile (token : Token, path : string, completionRequest : CompletionRequest) : Parser {
 		var parser;
 		if ((parser = this.findParser(path)) == null) {
 			parser = new Parser(token, path, completionRequest);
 			this._parsers.push(parser);
 		}
 		return parser;
-	},
+	}
 
-	findParser: function (path) {
+	function findParser (path : string) : Parser {
 		for (var i = 0; i < this._parsers.length; ++i)
 			if (this._parsers[i].getPath() == path)
 				return this._parsers[i];
 		return null;
-	},
+	}
 
-	compile: function () {
-		var errors = []; // new CompileError[]()
+	function compile () : boolean {
+		var errors = new CompileError[];
 		// parse all files
 		for (var i = 0; i < this._parsers.length; ++i) {
 			if (! this.parseFile(errors, this._parsers[i])) {
@@ -144,35 +158,35 @@ var Compiler = exports.Compiler = Class.extend({
 		if (! this._handleErrors(errors))
 			return false;
 		return true;
-	},
+	}
 
-	getAST: function() {
-		var classDefs = [];
+	function getAST () : variant {
+		var classDefs = new ClassDefinition[];
 		for (var i = 0; i < this._parsers.length; ++i) {
 			classDefs = classDefs.concat(this._parsers[i].getClassDefs());
 		}
 		return ClassDefinition.serialize(classDefs);
-	},
+	}
 
-	getFileContent: function (errors, sourceToken, path) {
+	function getFileContent (errors : CompileError[], sourceToken : Token, path : string) : Nullable.<string> {
 		if(this._fileCache[path] == null) {
 			try {
 				this._fileCache[path] = this._platform.load(path);
-			} catch (e) {
+			} catch (e : Error) {
 				errors.push(new CompileError(sourceToken, "could not open file: " + path + ", " + e.toString()));
 				this._fileCache[path] = null;
 			}
 		}
 		return this._fileCache[path];
-	},
+	}
 
-	parseFile: function (errors, parser) {
+	function parseFile (errors : CompileError[], parser : Parser) : boolean {
 		// read file
 		var content = this.getFileContent(errors, parser.getSourceToken(), parser.getPath());
 		if (content == null) {
 			// call parse() to initialize parser's state
 			// because some compilation mode continues to run after errors.
-			parser.parse("", []);
+			parser.parse("", new CompileError[]);
 			return false;
 		}
 		// parse
@@ -186,33 +200,35 @@ var Compiler = exports.Compiler = Class.extend({
 			}
 		}
 		return true;
-	},
+	}
 
-	_handleImport: function (errors, parser, imprt) {
+	function _handleImport (errors : CompileError[], parser : Parser, imprt : Import) : boolean {
 		if (imprt instanceof WildcardImport) {
+			var wildImprt = imprt as WildcardImport;
 			// read the files from a directory
-			var resolvedDir = this._resolvePath(imprt.getFilenameToken().getFilename(), imprt.getDirectory());
+			var resolvedDir = this._resolvePath(wildImprt.getFilenameToken().getFilename(), wildImprt.getDirectory());
+			var files = new string[];
 			try {
-				var files = this._platform.getFilesInDirectory(resolvedDir);
-			} catch (e) {
-				errors.push(new CompileError(imprt.getFilenameToken(), "could not read files in directory: " + resolvedDir + ", " + e.toString()));
+				files = this._platform.getFilesInDirectory(resolvedDir);
+			} catch (e : Error) {
+				errors.push(new CompileError(wildImprt.getFilenameToken(), "could not read files in directory: " + resolvedDir + ", " + e.toString()));
 				return false;
 			}
 			var found = false;
 			for (var i = 0; i < files.length; ++i) {
-				if (files[i].length >= imprt.getSuffix().length
+				if (files[i].length >= wildImprt.getSuffix().length
 					&& files[i].charAt(0) != "."
-					&& files[i].substring(files[i].length - imprt.getSuffix().length) == imprt.getSuffix()) {
+					&& files[i].substring(files[i].length - wildImprt.getSuffix().length) == wildImprt.getSuffix()) {
 					var path = resolvedDir + "/" + files[i];
 					if (path != parser.getPath()) {
-						var parser = this.addSourceFile(imprt.getFilenameToken(), resolvedDir + "/" + files[i], null);
-						imprt.addSource(parser);
+						var newParser = this.addSourceFile(wildImprt.getFilenameToken(), resolvedDir + "/" + files[i], null);
+						wildImprt.addSource(newParser);
 						found = true;
 					}
 				}
 			}
 			if (! found) {
-				errors.push(new CompileError(imprt.getFilenameToken(), "no matching files found in directory: " + resolvedDir));
+				errors.push(new CompileError(wildImprt.getFilenameToken(), "no matching files found in directory: " + resolvedDir));
 				return false;
 			}
 		} else {
@@ -222,13 +238,13 @@ var Compiler = exports.Compiler = Class.extend({
 				errors.push(new CompileError(imprt.getFilenameToken(), "cannot import itself"));
 				return false;
 			}
-			var parser = this.addSourceFile(imprt.getFilenameToken(), path, null);
-			imprt.addSource(parser);
+			var newParser = this.addSourceFile(imprt.getFilenameToken(), path, null);
+			imprt.addSource(newParser);
 		}
 		return true;
-	},
+	}
 
-	forEachClassDef: function (f) {
+	function forEachClassDef (f : function(:Parser, :ClassDefinition):boolean) : boolean {
 		for (var i = 0; i < this._parsers.length; ++i) {
 			var parser = this._parsers[i];
 			var classDefs = parser.getClassDefs();
@@ -238,9 +254,9 @@ var Compiler = exports.Compiler = Class.extend({
 			}
 		}
 		return true;
-	},
+	}
 
-	_resolveImports: function (errors) {
+	function _resolveImports (errors : CompileError[]) : void {
 		for (var i = 0; i < this._parsers.length; ++i) {
 			// built-in classes become implicit imports
 			this._parsers[i].registerBuiltinImports(this._builtinParsers);
@@ -250,56 +266,56 @@ var Compiler = exports.Compiler = Class.extend({
 				imports[j].assertExistenceOfNamedClasses(errors);
 			}
 		}
-	},
+	}
 
-	_resolveTypes: function (errors) {
-		this.forEachClassDef(function (parser, classDef) {
+	function _resolveTypes (errors : CompileError[]) : void {
+		this.forEachClassDef(function (parser : Parser, classDef : ClassDefinition) : boolean {
 			classDef.resolveTypes(new AnalysisContext(errors, parser, null));
 			return true;
-		}.bind(this));
-	},
+		});
+	}
 
-	_analyze: function (errors) {
-		var createContext = function (parser) {
+	function _analyze (errors : CompileError[]) : void {
+		var createContext = function (parser : Parser) : AnalysisContext {
 			return new AnalysisContext(
 				errors,
 				parser,
-				function (parser, classDef) {
+				function (parser : Parser, classDef : ClassDefinition) : ClassDefinition {
 					classDef.setAnalysisContextOfVariables(createContext(parser));
 					classDef.analyze(createContext(parser));
 					return classDef;
-				}.bind(this));
-		}.bind(this);
+				});
+		};
 		// set analyzation context of every variable
-		this.forEachClassDef(function (parser, classDef) {
+		this.forEachClassDef(function (parser : Parser, classDef : ClassDefinition) {
 			classDef.setAnalysisContextOfVariables(createContext(parser));
 			return true;
-		}.bind(this));
+		});
 		// analyze every classdef
-		this.forEachClassDef(function (parser, classDef) {
+		this.forEachClassDef(function (parser : Parser, classDef : ClassDefinition) {
 			classDef.analyze(createContext(parser));
 			return true;
-		}.bind(this));
+		});
 		// analyze unused variables in every classdef
-		this.forEachClassDef(function (parser, classDef) {
+		this.forEachClassDef(function (parser : Parser, classDef : ClassDefinition) {
 			classDef.analyzeUnusedVariables();
 			return true;
-		}.bind(this));
-	},
+		});
+	}
 
-	_optimize: function () {
+	function _optimize () : void {
 		if (this._optimizer != null)
 			this._optimizer.setCompiler(this).performOptimization();
-	},
+	}
 
-	_generateCode: function (errors) {
+	function _generateCode (errors : CompileError[]) : void {
 		// build list of all classDefs
-		var classDefs = [];
+		var classDefs = new ClassDefinition[];
 		for (var i = 0; i < this._parsers.length; ++i)
 			classDefs = classDefs.concat(this._parsers[i].getClassDefs());
 		// reorder the classDefs so that base classes would come before their children
-		var getMaxIndexOfClasses = function (deps) {
-			deps = deps.concat([]); // clone the array
+		var getMaxIndexOfClasses = function (deps : ClassDefinition[]) : number {
+			deps = deps.concat(new ClassDefinition[]); // clone the array
 			if (deps.length == 0)
 				return -1;
 			for (var i = 0; i < classDefs.length; ++i) {
@@ -314,7 +330,7 @@ var Compiler = exports.Compiler = Class.extend({
 			throw new Error("logic error, could not find class definition of '" + deps[0].className() + "'");
 		};
 		for (var i = 0; i < classDefs.length;) {
-			var deps = classDefs[i].implementTypes().map(function (t) { return t.getClassDef(); }).concat([]);
+			var deps = classDefs[i].implementTypes().map.<ClassDefinition>(function (t) { return t.getClassDef(); }).concat(new ClassDefinition[]);
 			if (classDefs[i].extendType() != null)
 				deps.unshift(classDefs[i].extendType().getClassDef());
 			var maxIndexOfClasses = getMaxIndexOfClasses(deps);
@@ -326,7 +342,7 @@ var Compiler = exports.Compiler = Class.extend({
 			}
 		}
 		// rename the classes with conflicting names
-		var countByName = {};
+		var countByName = new Map.<number>;
 		for (var i = 0; i < classDefs.length; ++i) {
 			var classDef = classDefs[i];
 			if ((classDef.flags() & ClassDefinition.IS_NATIVE) != 0) {
@@ -345,7 +361,7 @@ var Compiler = exports.Compiler = Class.extend({
 			if ((classDef.flags() & ClassDefinition.IS_NATIVE) == 0) {
 				var className = classDef.className();
 				if (countByName[className]) {
-					classDef.setOutputClassName(className + "$" + (countByName[className] - 1));
+					classDef.setOutputClassName(className + "$" + (countByName[className] - 1) as string);
 					countByName[className]++;
 				} else {
 					classDef.setOutputClassName(className);
@@ -357,15 +373,16 @@ var Compiler = exports.Compiler = Class.extend({
 		for (var i = 0; i < classDefs.length; ++i) {
 			if ((classDefs[i].flags() & ClassDefinition.IS_NATIVE) == 0
 				&& classDefs[i] instanceof InstantiatedClassDefinition) {
-				classDefs[i].setOutputClassName(
-					classDefs[i].getOutputClassName().replace(/\.</g, "$$").replace(/>/g, "$E").replace(/,\s*/g,"$"));
+				// classDefs[i].setOutputClassName(
+				// 	classDefs[i].getOutputClassName().replace(/\.</g, "$$").replace(/>/g, "$E").replace(/,\s*/g,"$"));
+					classDefs[i].setOutputClassName("$TEMPLATECLASS$" + i as string);
 			}
 		}
 		// emit
 		this._emitter.emit(classDefs);
-	},
+	}
 
-	_handleErrors: function (errors) {
+	function _handleErrors (errors : CompileError[]) : boolean {
 		// ignore all messages
 		if (this._mode == Compiler.MODE_COMPLETE) {
 			errors.splice(0, errors.length);
@@ -375,31 +392,32 @@ var Compiler = exports.Compiler = Class.extend({
 		var isFatal = false;
 		errors.forEach(function (error) {
 			if (error instanceof CompileWarning) {
-				var doWarn = null;
+				var warning = error as CompileWarning;
+				var doWarn;
 				for (var i = 0; i < this._warningFilters.length; ++i) {
-					if ((doWarn = this._warningFilters[i](error)) !== null)
+					if ((doWarn = this._warningFilters[i](warning)) != null)
 						break;
 				}
-				if (doWarn !== false) {
-					this._platform.error(error.format(this));
+				if (doWarn != false) { 
+					this._platform.error(warning.format(this));
 				}
 			} else {
 				this._platform.error(error.format(this));
 				isFatal = true;
 			}
-		}.bind(this));
+		});
 		// clear all errors
 		errors.splice(0, errors.length);
 		return ! isFatal;
-	},
+	}
 
-	_printErrors: function (errors) {
+	function _printErrors (errors : CompileError[]) : void {
 		for (var i = 0; i < errors.length; ++i) {
 			this._platform.error(errors[i].format(this));
 		}
-	},
+	}
 
-	_resolvePath: function (srcPath, givenPath) {
+	function _resolvePath (srcPath : string, givenPath : string) : string {
 		if (givenPath.match(/^\.{1,2}\//) == null) {
 			var searchPaths = this._searchPaths.concat(this._emitter.getSearchPaths());
 			for (var i = 0; i < searchPaths.length; ++i) {
@@ -412,8 +430,8 @@ var Compiler = exports.Compiler = Class.extend({
 		var lastSlashAt = srcPath.lastIndexOf("/");
 		path = Util.resolvePath((lastSlashAt != -1 ? srcPath.substring(0, lastSlashAt + 1) : "") + givenPath);
 		return path;
-	},
+	}
 
-});
+}
 
 // vim: set noexpandtab:

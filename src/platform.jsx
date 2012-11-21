@@ -20,43 +20,40 @@
  * IN THE SOFTWARE.
  */
 
-"use strict";
+import "console.jsx";
+import "./emitter.jsx";
 
-var Class = module.exports = function () {
-};
+abstract class Platform {
 
-Class.extend = function (properties) {
-	var ctor = properties.constructor;
-	if (ctor === Object) {
-		var superCtor = this.prototype.constructor;
-		ctor = properties.constructor = function () {
-			superCtor.call(this);
-		};
+	// returns root directory of JSX
+	abstract function getRoot() : string;
+
+	abstract function fileExists(path : string) : boolean;
+
+	abstract function getFilesInDirectory(path: string) : string[]; // (throws an exception on error)
+
+	abstract function addLauncher(emitter : Emitter, sourceFile : variant, output : string, entryPoint : string, executableFor : string) : string;
+
+	// load a content by name (throws an exception on error)
+	// e.g. node.js reads it from files
+	//      browsers read it from DOM
+	abstract function load (name : string) : string;
+
+	function log (s : string) : void {
+		console.log(s);
 	}
-	function tmp() {};
-	tmp.prototype = this.prototype;
-	ctor.prototype = new tmp();
-	ctor.extend = Class.extend;
-	// assign properties
-	for (var k in properties) {
-		if (k.charAt(0) == '$') {
-			ctor[k.substring(1)] = properties[k];
-		} else {
-			ctor.prototype[k] = properties[k];
-		}
+
+	function warn (s : string) : void {
+		console.warn(s);
 	}
-	if (typeof ctor.constructor === "function") {
-		ctor.constructor();
+
+	function error (s : string) : void {
+		console.error(s);
 	}
-	return ctor;
-};
 
-Class.prototype.constructor = function () {
-};
+	// for jsxdoc
+	abstract function mkpath (path : string) : void;
+	abstract function save (path : Nullable.<string>, content : string) : void;
 
-Class.$import = function (name) {
-	return "var __module = require(\"" + name + "\");\n"
-		+ "for (var n in __module)\n"
-		+ "	eval(\"var \" + n + \" = __module[n];\");\n";
-};
-
+}
+// vim: set noexpandtab

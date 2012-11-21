@@ -20,76 +20,105 @@
  * IN THE SOFTWARE.
  */
 
-var Class = require("./Class");
-eval(Class.$import("./classdef"));
-eval(Class.$import("./type"));
-eval(Class.$import("./util"));
-var Statement = require("./statement");
+import "./classdef.jsx";
+import "./parser.jsx";
+import "./type.jsx";
+import "./util.jsx";
+import "./statement.jsx";
+import "./optimizer.jsx";
 
-"use strict";
 
-var Expression = exports.Expression = Class.extend({
+abstract class Expression implements Stashable {
 
-	constructor: function (tokenOrThat) {
-		if (tokenOrThat instanceof Expression) {
-			var that = tokenOrThat;
-			this._token = that.getToken();
-			this._optimizerStash = {};
-			for (var k in that._optimizerStash)
-				this._optimizerStash[k] = that._optimizerStash[k].clone();
-		} else {
-			this._token = tokenOrThat;
-			this._optimizerStash = {};
-		}
-	},
+	var _token : Token;
+	var _optimizerStash : Map.<OptimizerStash>;
 
-	clone: null,
+	function constructor (token : Token) {
+		this._token = token;
+		this._optimizerStash = new Map.<OptimizerStash>;
+	}
 
-	instantiate: function (instantiationContext) {
-		return (function onExpr(expr) {
-			if (expr instanceof NewExpression
-				|| expr instanceof ArrayLiteralExpression
-				|| expr instanceof MapLiteralExpression
-				|| expr instanceof AsExpression
-				|| expr instanceof AsNoConvertExpression
-				|| expr instanceof NewExpression
-				|| expr instanceof ClassExpression) {
+	function constructor (that : Expression) {
+		this._token = that.getToken();
+		this._optimizerStash = new Map.<OptimizerStash>;
+		for (var k in that._optimizerStash)
+			this._optimizerStash[k] = that._optimizerStash[k].clone();
+	}
+
+	abstract function clone () : Expression;
+	abstract function serialize () : variant;
+	
+	function instantiate (instantiationContext : InstantiationContext) : boolean {
+		function onExpr(expr : Expression) : boolean {
+			if (expr instanceof NewExpression) {
 				var srcType = expr.getType();
 				if (srcType != null) {
-					expr.setType(srcType.instantiate(instantiationContext));
+					(expr as NewExpression).setType(srcType.instantiate(instantiationContext));
+				}
+			} else if (expr instanceof ArrayLiteralExpression) {
+				var srcType = expr.getType();
+				if (srcType != null) {
+					(expr as ArrayLiteralExpression).setType(srcType.instantiate(instantiationContext));
+				}
+			} else if (expr instanceof MapLiteralExpression) {
+				var srcType = expr.getType();
+				if (srcType != null) {
+					(expr as MapLiteralExpression).setType(srcType.instantiate(instantiationContext));
+				}
+			} else if (expr instanceof AsExpression) {
+				var srcType = expr.getType();
+				if (srcType != null) {
+					(expr as AsExpression).setType(srcType.instantiate(instantiationContext));
+				}
+			} else if (expr instanceof AsNoConvertExpression) {
+				var srcType = expr.getType();
+				if (srcType != null) {
+					(expr as AsNoConvertExpression).setType(srcType.instantiate(instantiationContext));
+				}
+			} else if (expr instanceof ClassExpression) {
+				var srcType = expr.getType();
+				if (srcType != null) {
+					(expr as ClassExpression).setType(srcType.instantiate(instantiationContext));
 				}
 			} else if (expr instanceof LocalExpression) {
 				// update local to the instantiated one
-				expr.setLocal(expr.getLocal().getInstantiated());
+				(expr as LocalExpression).setLocal((expr as LocalExpression).getLocal().getInstantiated());
 			}
 			return expr.forEachExpression(onExpr);
-		}.call(null, this));
-	},
+		}
+		return onExpr(this);
+	}
 
-	getToken: function () {
+	function getToken () : Token {
 		return this._token;
-	},
+	}
 
-	analyze: null, // bool analyze(context, parentExpr)
+	abstract function analyze (context : AnalysisContext, parentExpr : Expression) : boolean;
 
-	getType: null, // string getType()
+	abstract function getType () : Type;
 
-	getHolderType: function () {
+	function getHolderType () : Type {
 		return null;
-	},
+	}
 
-	forEachExpression: null, // function forEachExpression(cb : function (expr, replaceCb: function (expr) : void) : boolean
+	function forEachExpression (cb : function(:Expression):boolean) : boolean {
+		return this.forEachExpression(function(expr : Expression, _ : function(:Expression):void){
+			return cb(expr);
+		});
+	}
 
-	assertIsAssignable: function (context, token, type) {
+	abstract function forEachExpression (cb : function (:Expression, :function (:Expression) : void) : boolean) : boolean;
+
+	function assertIsAssignable (context : AnalysisContext, token : Token, type : Type) : boolean {
 		context.errors.push(new CompileError(token, "left-hand-side expression is not assignable"));
 		return false;
-	},
+	}
 
-	getOptimizerStash: function () {
+	override function getOptimizerStash () : Map.<OptimizerStash> {
 		return this._optimizerStash;
-	},
+	}
 
-	$assertIsAssignable: function (context, token, lhsType, rhsType) {
+	static function assertIsAssignable (context : AnalysisContext, token : Token, lhsType : Type, rhsType : Type) : boolean {
 		if (! lhsType.isAssignable()) {
 			context.errors.push(new CompileError(token, "left-hand-side expression is not assignable"));
 			return false;
@@ -99,55 +128,57 @@ var Expression = exports.Expression = Class.extend({
 			return false;
 		}
 		return true;
-	},
+	}
 
-	$getDefaultValueExpressionOf: function (type) {
-		var Parser = require("./parser");
-
+	static function getDefaultValueExpressionOf (type : Type) : Expression {
 		if (type.equals(Type.booleanType))
-			return new BooleanLiteralExpression(new Parser.Token("false", false));
+			return new BooleanLiteralExpression(new Token("false", false));
 		else if (type.equals(Type.integerType))
-			return new IntegerLiteralExpression(new Parser.Token("0", false));
+			return new IntegerLiteralExpression(new Token("0", false));
 		else if (type.equals(Type.numberType))
-			return new NumberLiteralExpression(new Parser.Token("0", false));
+			return new NumberLiteralExpression(new Token("0", false));
 		else if (type.equals(Type.stringType))
-			return new StringLiteralExpression(new Parser.Token("\"\"", false));
+			return new StringLiteralExpression(new Token("\"\"", false));
 		else
-			return new NullExpression(new Parser.Token("null", false), type);
-	},
+			return new NullExpression(new Token("null", false), type);
+	}
 
-	$instantiateTemplate: function (context, token, className, typeArguments) {
+	static function instantiateTemplate (context : AnalysisContext, token : Token, className : string, typeArguments : Type[]) : ClassDefinition {
 		return context.parser.lookupTemplate(context.errors, new TemplateInstantiationRequest(token, className, typeArguments), context.postInstantiationCallback);
-	},
+	}
 
-});
+}
 
-var LeafExpression = exports.LeafExpression = Expression.extend({
+abstract class LeafExpression extends Expression {
 
-	constructor: function (token) {
-		Expression.prototype.constructor.call(this, token);
-	},
+	function constructor (token : Token) {
+		super(token);
+	}
 
-	forEachExpression: function (cb) {
+	override function forEachExpression (cb : function(:Expression,:function(:Expression):void):boolean) : boolean {
 		return true;
 	}
 
-});
+}
 
-var OperatorExpression = exports.OperatorExpression = Expression.extend({
+abstract class OperatorExpression extends Expression {
 
-	constructor: function (tokenOrThat) {
-		Expression.prototype.constructor.call(this, tokenOrThat);
-	},
+	function constructor (token : Token) {
+		super(token);
+	}
 
-	isConvertibleTo: function (context, expr, type, mayUnbox) {
+	function constructor (that : Expression) {
+		super(that);
+	}
+
+	function isConvertibleTo (context : AnalysisContext, expr : Expression, type : Type, mayUnbox : boolean) : boolean {
 		var exprType = expr.getType().resolveIfNullable();
 		if (mayUnbox && type instanceof PrimitiveType && exprType instanceof ObjectType && exprType.getClassDef() == type.getClassDef())
 			return true;
 		return exprType.isConvertibleTo(type);
-	},
+	}
 
-	assertIsConvertibleTo: function (context, expr, type, mayUnbox) {
+	function assertIsConvertibleTo (context : AnalysisContext, expr : Expression, type : Type, mayUnbox : boolean) : boolean {
 		if (! this.isConvertibleTo(context, expr, type, mayUnbox)) {
 			context.errors.push(new CompileError(this._token, "cannot apply operator '" + this._token.getValue() + "' to type '" + expr.getType().toString() + "'"));
 			return false;
@@ -155,43 +186,50 @@ var OperatorExpression = exports.OperatorExpression = Expression.extend({
 		return true;
 	}
 
-});
+}
 
 // primary expressions
 
-var LocalExpression = exports.LocalExpression = LeafExpression.extend({
+class LocalExpression extends LeafExpression {
 
-	constructor: function (token, local) {
-		LeafExpression.prototype.constructor.call(this, token);
+	var _local : LocalVariable;
+	var _cloned : boolean;
+
+	function constructor (token : Token, local : LocalVariable) {
+		super(token);
 		this._local = local;
-	},
+	}
 
-	clone: function () {
+	override function clone () : Expression {
 		var that = new LocalExpression(this._token, this._local);
 		that._cloned = true;
 		return that;
-	},
+	}
 
-	getLocal: function () {
+	function getLocal () : LocalVariable {
 		return this._local;
-	},
+	}
 
-	setLocal: function (local) {
+	function setLocal (local : LocalVariable) : void {
 		this._local = local;
-	},
+	}
 
-	serialize: function () {
+	override function serialize () : variant {
 		return [
 			"LocalExpression",
 			this._token.serialize(),
 			this._local.serialize()
-		];
-	},
+		] : variant[];
+	}
 
-	analyze: function (context, parentExpr) {
+	override function analyze (context : AnalysisContext, parentExpr : Expression) : boolean {
 		// check that the variable is readable
-		if ((parentExpr instanceof AssignmentExpression && parentExpr.getFirstExpr() == this && parentExpr.getToken().getValue() == "=")
-			|| (parentExpr == null && context.statement instanceof Statement.ForInStatement && context.statement.getLHSExpr() == this)) {
+		if ((parentExpr instanceof AssignmentExpression
+		     && (parentExpr as AssignmentExpression).getFirstExpr() == this
+			&& (parentExpr as AssignmentExpression).getToken().getValue() == "=")
+			|| (parentExpr == null
+				&& context.statement instanceof ForInStatement
+				&& (context.statement as ForInStatement).getLHSExpr() == this)) {
 			// is LHS
 		} else {
 			this._local.touchVariable(context, this._token, false);
@@ -199,13 +237,13 @@ var LocalExpression = exports.LocalExpression = LeafExpression.extend({
 				return false;
 		}
 		return true;
-	},
+	}
 
-	getType: function () {
+	override function getType () : Type {
 		return this._local.getType();
-	},
+	}
 
-	assertIsAssignable: function (context, token, type) {
+	override function assertIsAssignable (context : AnalysisContext, token : Token, type : Type) : boolean {
 		if (this._local.getType() == null) {
 			if (type.equals(Type.nullType)) {
 				context.errors.push(new CompileError(token, "cannot assign null without type annotation to a value of undetermined type"));
@@ -213,257 +251,270 @@ var LocalExpression = exports.LocalExpression = LeafExpression.extend({
 			}
 			this._local.setType(type.asAssignableType());
 		} else if (! type.isConvertibleTo(this._local.getType())) {
-			context.errors.push(new CompileError(token, "cannot assign a value of type '" + type.toString() + "' to '" + this._local.getType() + "'"));
+			context.errors.push(new CompileError(token, "cannot assign a value of type '" + type.toString() + "' to '" + this._local.getType().toString() + "'"));
 			return false;
 		}
 		this._local.touchVariable(context, this._token, true);
 		return true;
 	}
 
-});
+}
 
-var ClassExpression = exports.ClassExpression = LeafExpression.extend({
+class ClassExpression extends LeafExpression {
 
-	constructor: function (token, parsedType) {
-		LeafExpression.prototype.constructor.call(this, token);
+	var _parsedType : Type;
+
+	function constructor (token : Token, parsedType : Type) {
+		super(token);
 		this._parsedType = parsedType;
-	},
+	}
 
-	clone: function () {
+	override function clone () : Expression {
 		return new ClassExpression(this._token, this._parsedType);
-	},
+	}
 
-	serialize: function () {
+	override function serialize () : variant {
 		return [
 			"ClassExpression",
 			this._token.serialize(),
 			this._parsedType.serialize()
-		];
-	},
+		] : variant[];
+	}
 
-	analyze: function (context, parentExpr) {
+	override function analyze (context : AnalysisContext, parentExpr : Expression) : boolean {
 		return true;
-	},
+	}
 
-	getType: function () {
+	override function getType () : Type {
 		return this._parsedType;
-	},
+	}
 
-	setType: function (type) {
+	function setType (type : Type) : void {
 		this._parsedType = type;
-	},
+	}
 
-	assertIsAssignable: function (context, token, type) {
+	override function assertIsAssignable (context : AnalysisContext, token : Token, type : Type) : boolean {
 		context.errors.push(new CompileError(token, "cannot modify a class definition"));
 		return false;
 	}
 
-});
+}
 
-var NullExpression = exports.NullExpression = LeafExpression.extend({
+class NullExpression extends LeafExpression {
 
-	constructor: function (token, type) {
-		LeafExpression.prototype.constructor.call(this, token);
+	var _type : Type;
+
+	function constructor (token : Token, type : Type) {
+		super(token);
 		this._type = type;
-	},
+	}
 
-	clone: function () {
+	override function clone () : Expression {
 		return new NullExpression(this._token, this._type);
-	},
+	}
 
-	serialize: function () {
+	override function serialize () : variant {
 		return [
 			"NullExpression",
 			this._token.serialize(),
 			this._type.serialize()
-		];
-	},
+		] : variant[];
+	}
 
-	analyze: function (context, parentExpr) {
+	override function analyze (context : AnalysisContext, parentExpr : Expression) : boolean {
 		return true;
-	},
+	}
 
-	getType: function () {
+	override function getType () : Type {
 		return this._type;
 	}
 
-});
+}
 
-var BooleanLiteralExpression = exports.BooleanLiteralExpression = LeafExpression.extend({
+class BooleanLiteralExpression extends LeafExpression {
 
-	constructor: function (token) {
-		LeafExpression.prototype.constructor.call(this, token);
-	},
+	function constructor (token : Token) {
+		super(token);
+	}
 
-	clone: function () {
+	override function clone () : Expression {
 		return new BooleanLiteralExpression(this._token);
-	},
+	}
 
-	serialize: function () {
+	override function serialize () : variant {
 		return [
 			"BooleanLiteralExpression",
 			this._token.serialize()
-		];
-	},
+		] : variant[];
+	}
 
-	analyze: function (context, parentExpr) {
+	override function analyze (context : AnalysisContext, parentExpr : Expression) : boolean {
 		return true;
-	},
+	}
 
-	getType: function () {
+	override function getType () : Type {
 		return Type.booleanType;
 	}
 
-});
+}
 
-var IntegerLiteralExpression = exports.IntegerLiteralExpression = LeafExpression.extend({
+class IntegerLiteralExpression extends LeafExpression {
 
-	constructor: function (token) {
-		LeafExpression.prototype.constructor.call(this, token);
-	},
+	function constructor (token : Token) {
+		super(token);
+	}
 
-	clone: function () {
+	override function clone () : Expression {
 		return new IntegerLiteralExpression(this._token);
-	},
+	}
 
-	serialize: function () {
+	override function serialize () : variant {
 		return [
 			"IntegerLiteralExpression",
 			this._token.serialize()
-		];
-	},
+		] : variant[];
+	}
 
-	analyze: function (context, parentExpr) {
+	override function analyze (context : AnalysisContext, parentExpr : Expression) : boolean {
 		return true;
-	},
+	}
 
-	getType: function () {
+	override function getType () : Type {
 		return Type.integerType;
 	}
 
-});
+}
 
 
-var NumberLiteralExpression = exports.NumberLiteralExpression = LeafExpression.extend({
+class NumberLiteralExpression extends LeafExpression {
 
-	constructor: function (token) {
-		LeafExpression.prototype.constructor.call(this, token);
-	},
+	function constructor (token : Token) {
+		super(token);
+	}
 
-	clone: function () {
+	override function clone () : Expression {
 		return new NumberLiteralExpression(this._token);
-	},
+	}
 
-	serialize: function () {
+	override function serialize () : variant {
 		return [
 			"NumberLiteralExpression",
 			this._token.serialize()
-		];
-	},
+		] : variant[];
+	}
 
-	analyze: function (context, parentExpr) {
+	override function analyze (context : AnalysisContext, parentExpr : Expression) : boolean {
 		return true;
-	},
+	}
 
-	getType: function () {
+	override function getType () : Type {
 		return Type.numberType;
 	}
 
-});
+}
 
-var StringLiteralExpression = exports.StringLiteralExpression = LeafExpression.extend({
+class StringLiteralExpression extends LeafExpression {
 
-	constructor: function (token) {
-		LeafExpression.prototype.constructor.call(this, token);
-	},
+	function constructor (token : Token) {
+		super(token);
+	}
 
-	clone: function () {
+	override function clone () : Expression {
 		return new StringLiteralExpression(this._token);
-	},
+	}
 
-	serialize: function () {
+	override function serialize () : variant {
 		return [
 			"StringLiteralExpression",
 			this._token.serialize()
-		];
-	},
+		] : variant[];
+	}
 
-	analyze: function (context, parentExpr) {
+	override function analyze (context : AnalysisContext, parentExpr : Expression) : boolean {
 		return true;
-	},
+	}
 
-	getType: function () {
+	override function getType () : Type {
 		return Type.stringType;
 	}
 
-});
+}
 
-var RegExpLiteralExpression = exports.RegExpLiteralExpression = LeafExpression.extend({
+class RegExpLiteralExpression extends LeafExpression {
 
-	constructor: function (token, type) {
-		LeafExpression.prototype.constructor.call(this, token);
-		this._type = type; // nullable
-	},
+	var _type : Type;
 
-	clone: function () {
+	function constructor (token : Token) {
+		this(token, null);
+	}
+
+	function constructor (token : Token, type : Type) {
+		super(token);
+		this._type = type;
+	}
+
+	override function clone () : Expression {
 		return new RegExpLiteralExpression(this._token, this._type);
-	},
+	}
 
-	serialize: function () {
+	override function serialize () : variant {
 		return [
 			"RegExpLiteralExpression",
 			this._token.serialize()
-		];
-	},
+		] : variant[];
+	}
 
-	analyze: function (context, parentExpr) {
+	override function analyze (context : AnalysisContext, parentExpr : Expression) : boolean {
 		var classDef = context.parser.lookup(context.errors, this._token, "RegExp");
 		if (classDef == null)
 			throw new Error("could not find definition for RegExp");
 		this._type = new ObjectType(classDef);
 		return true;
-	},
+	}
 
-	getType: function () {
+	override function getType () : Type {
 		return this._type;
 	}
 
-});
+}
 
-var ArrayLiteralExpression = exports.ArrayLiteralExpression = Expression.extend({
+class ArrayLiteralExpression extends Expression {
 
-	constructor: function (token, exprs, type) {
-		Expression.prototype.constructor.call(this, token);
+	var _exprs : Expression[];
+	var _type : Type;
+
+	function constructor (token : Token, exprs : Expression[], type : Type) {
+		super(token);
 		this._exprs = exprs;
 		this._type = type; // optional at this moment
-	},
+	}
 
-	clone: function () {
-		return new ArrayLiteralExpression(this._token, Util.cloneArray(this._exprs), this._type);
-	},
+	override function clone () : Expression {
+		return new ArrayLiteralExpression(this._token, Cloner.<Expression>.cloneArray(this._exprs), this._type);
+	}
 
-	getExprs: function () {
+	function getExprs () : Expression[] {
 		return this._exprs;
-	},
+	}
 
-	getType: function () {
+	override function getType () : Type {
 		return this._type;
-	},
+	}
 
-	setType: function (type) {
+	function setType (type : Type) : void {
 		this._type = type;
-	},
+	}
 
-	serialize: function () {
+	override function serialize () : variant {
 		return [
 			"ArrayLiteralExpression",
 			this._token.serialize(),
-			Util.serializeArray(this._exprs),
-			Util.serializeNullable(this._type)
-		];
-	},
+			Serializer.<Expression>.serializeArray(this._exprs),
+			Serializer.<Type>.serializeNullable(this._type)
+		] : variant[];
+	}
 
-	analyze: function (context, parentExpr) {
+	override function analyze (context : AnalysisContext, parentExpr : Expression) : boolean {
 		// analyze all elements
 		var succeeded = true;
 		for (var i = 0; i < this._exprs.length; ++i) {
@@ -472,7 +523,7 @@ var ArrayLiteralExpression = exports.ArrayLiteralExpression = Expression.extend(
 			} else if (this._exprs[i].getType().equals(Type.voidType)) {
 				 // FIXME the location of the error would be strange; we deseparately need expr.getToken()
 				context.errors.push(new CompileError(this._token, "cannot assign void to an array"));
-				suceeded = false;
+				succeeded = false;
 			}
 		}
 		if (! succeeded)
@@ -482,7 +533,7 @@ var ArrayLiteralExpression = exports.ArrayLiteralExpression = Expression.extend(
 			var classDef;
 			if (this._type instanceof ObjectType
 				&& (classDef = this._type.getClassDef()) instanceof InstantiatedClassDefinition
-				&& classDef.getTemplateClassName() == "Array") {
+				&& (classDef as InstantiatedClassDefinition).getTemplateClassName() == "Array") {
 				//ok
 			} else {
 				context.errors.push(new CompileError(this._token, "the type specified after ':' is not an array type"));
@@ -506,7 +557,7 @@ var ArrayLiteralExpression = exports.ArrayLiteralExpression = Expression.extend(
 			}
 		}
 		// check type of the elements
-		var expectedType = this._type.getClassDef().getTypeArguments()[0].toNullableType();
+		var expectedType = (this._type.getClassDef() as InstantiatedClassDefinition).getTypeArguments()[0].toNullableType();
 		for (var i = 0; i < this._exprs.length; ++i) {
 			var elementType = this._exprs[i].getType();
 			if (! elementType.isConvertibleTo(expectedType)) {
@@ -515,81 +566,87 @@ var ArrayLiteralExpression = exports.ArrayLiteralExpression = Expression.extend(
 			}
 		}
 		return succeeded;
-	},
+	}
 
-	forEachExpression: function (cb) {
+	override function forEachExpression (cb : function(:Expression,:function(:Expression):void):boolean) : boolean {
 		if (! Util.forEachExpression(cb, this._exprs))
 			return false;
 		return true;
 	}
 
-});
+}
 
-var MapLiteralElement = exports.MapLiteralElement = Class.extend({
+class MapLiteralElement {
 
-	constructor: function (key, expr) {
+	var _key : Token;
+	var _expr : Expression;
+
+	function constructor (key : Token, expr : Expression) {
 		this._key = key;
 		this._expr = expr;
-	},
+	}
 
-	getKey: function () {
+	function getKey () : Token {
 		return this._key;
-	},
+	}
 
-	getExpr: function () {
+	function getExpr () : Expression {
 		return this._expr;
-	},
+	}
 
-	setExpr: function (expr) {
+	function setExpr (expr : Expression) : void {
 		this._expr = expr;
-	},
+	}
 
-	serialize: function () {
+	function serialize () : variant {
 		return [
 			this._key.serialize(),
 			this._expr.serialize()
-		];
+		] : variant[];
 	}
 
-});
+}
 
-var MapLiteralExpression = exports.MapLiteralExpression = Expression.extend({
+class MapLiteralExpression extends Expression {
 
-	constructor: function (token, elements, type) {
-		Expression.prototype.constructor.call(this, token);
+	var _elements : MapLiteralElement[];
+	var _type : Type;
+
+	function constructor (token : Token, elements : MapLiteralElement[], type : Type) {
+		super(token);
 		this._elements = elements;
 		this._type = type; // optional at this moment
-	},
+	}
 
-	clone: function () {
-		var ret = new MapLiteralExpression(this._token, [], this._type);
+	override function clone () : Expression {
+		var ret = new MapLiteralExpression(this._token, new MapLiteralElement[], this._type);
 		for (var i = 0; i < this._elements.length; ++i)
 			ret._elements[i] = new MapLiteralElement(this._elements[i].getKey(), this._elements[i].getExpr().clone());
 		return ret;
-	},
+	}
 
-	getElements: function () {
+	function getElements () : MapLiteralElement[] {
 		return this._elements;
-	},
+	}
 
-	getType: function () {
+	override function getType () : Type {
 		return this._type;
-	},
+	}
 
-	setType: function (type) {
+	function setType (type : Type) : void {
 		this._type = type;
-	},
+	}
 
-	serialize: function () {
+	override function serialize () : variant {
 		return [
 			"MapLiteralExpression",
 			this._token.serialize(),
-			Util.serializeArray(this._elements),
-			Util.serializeNullable(this._type)
-		];
-	},
+			Serializer.<MapLiteralElement>.serializeArray(this._elements),
+			Serializer.<Type>.serializeNullable(this._type)
+		] : variant[];
+	}
 
-	analyze: function (context, parentExpr) {
+	override function analyze (context : AnalysisContext, parentExpr : Expression) : boolean {
 		// analyze all elements
 		var succeeded = true;
 		for (var i = 0; i < this._elements.length; ++i) {
@@ -598,21 +655,22 @@ var MapLiteralExpression = exports.MapLiteralExpression = Expression.extend({
 			} else if (this._elements[i].getExpr().getType().equals(Type.voidType)) {
 				 // FIXME the location of the error would be strange; we deseparately need expr.getToken()
 				context.errors.push(new CompileError(this._token, "cannot assign void to a hash"));
-				suceeded = false;
+				succeeded = false;
 			}
 		}
 		if (! succeeded)
 			return false;
+		var expectedType = null : Type;
 		// determine the type from the array members if the type was not specified
 		if (this._type != null && this._type == Type.variantType) {
-			var expectedType = null;
+			// pass
 		} else if (this._type != null && this._type instanceof ObjectType) {
 			var classDef = this._type.getClassDef();
-			if (! (classDef instanceof InstantiatedClassDefinition && classDef.getTemplateClassName() == "Map")) {
+			if (! (classDef instanceof InstantiatedClassDefinition && (classDef as InstantiatedClassDefinition).getTemplateClassName() == "Map")) {
 				context.errors.push(new CompileError(this._token, "specified type is not a hash type"));
 				return false;
 			}
-			expectedType = this._type.getTypeArguments()[0];
+			expectedType = (this._type as ParsedObjectType).getTypeArguments()[0];
 		} else if (this._type != null) {
 			context.errors.push(new CompileError(this._token, "invalid type for a map literal"));
 			return false;
@@ -644,11 +702,11 @@ var MapLiteralExpression = exports.MapLiteralExpression = Expression.extend({
 			}
 		}
 		return succeeded;
-	},
+	}
 
-	forEachExpression: function (cb) {
+	override function forEachExpression (cb : function(:Expression,:function(:Expression):void):boolean) : boolean {
 		for (var i = 0; i < this._elements.length; ++i) {
-			if (! cb(this._elements[i].getExpr(), function (elements, index) {
+			if (! cb(this._elements[i].getExpr(), function (elements : MapLiteralElement[], index : number) : function(:Expression):void {
 				return function (expr) {
 					elements[index].setExpr(expr);
 				};
@@ -659,28 +717,30 @@ var MapLiteralExpression = exports.MapLiteralExpression = Expression.extend({
 		return true;
 	}
 
-});
+}
 
-var ThisExpression = exports.ThisExpression = Expression.extend({
+class ThisExpression extends Expression {
 
-	constructor: function (token, classDef) {
-		Expression.prototype.constructor.call(this, token);
+	var _classDef : ClassDefinition;
+
+	function constructor (token : Token, classDef : ClassDefinition) {
+		super(token);
 		this._classDef = classDef;
-	},
+	}
 
-	clone: function () {
+	override function clone () : Expression {
 		return new ThisExpression(this._token, this._classDef);
-	},
+	}
 
-	serialize: function () {
+	override function serialize () : variant {
 		return [
 			"ThisExpression",
 			this._token.serialize(),
-			Util.serializeNullable(this._classDef)
-		];
-	},
+			Serializer.<ClassDefinition>.serializeNullable(this._classDef)
+		] : variant[];
+	}
 
-	analyze: function (context, parentExpr) {
+	override function analyze (context : AnalysisContext, parentExpr : Expression) : boolean {
 		var rootFuncDef = context.funcDef;
 		if (rootFuncDef != null)
 			while (rootFuncDef.getParent() != null)
@@ -691,59 +751,61 @@ var ThisExpression = exports.ThisExpression = Expression.extend({
 		}
 		this._classDef = rootFuncDef.getClassDef();
 		return true;
-	},
+	}
 
-	getType: function () {
+	override function getType () : Type {
 		return new ObjectType(this._classDef);
-	},
+	}
 
-	forEachExpression: function (cb) {
+	override function forEachExpression (cb : function(:Expression,:function(:Expression):void):boolean) : boolean {
 		return true;
 	}
 
-});
+}
 
-var FunctionExpression = exports.FunctionExpression = Expression.extend({
+class FunctionExpression extends Expression {
 
-	constructor: function (token, funcDef) {
-		Expression.prototype.constructor.call(this, token);
+	var _funcDef : MemberFunctionDefinition;
+
+	function constructor (token : Token, funcDef : MemberFunctionDefinition) {
+		super(token);
 		this._funcDef = funcDef;
-	},
+	}
 
-	clone: function () {
+	override function clone () : Expression {
 		// NOTE: funcDef is not cloned, but is later replaced in MemberFunctionDefitition#instantiate
 		return new FunctionExpression(this._token, this._funcDef);
-	},
+	}
 
-	getFuncDef: function () {
+	function getFuncDef () : MemberFunctionDefinition {
 		return this._funcDef;
-	},
+	}
 
-	setFuncDef: function (funcDef) {
+	function setFuncDef (funcDef : MemberFunctionDefinition) : void {
 		this._funcDef = funcDef;
-	},
+	}
 
-	serialize: function () {
+	override function serialize () : variant {
 		return [
 			"FunctionExpression",
 			this._funcDef.serialize()
-		];
-	},
+		] : variant[];
+	}
 
-	analyze: function (context, parentExpr) {
+	override function analyze (context : AnalysisContext, parentExpr : Expression) : boolean {
 		if (! this.typesAreIdentified()) {
 			context.errors.push(new CompileError(this._token, "argument / return types were not automatically deductable, please specify them by hand"));
 			return false;
 		}
-		var ret = this._funcDef.analyze(context);
+		this._funcDef.analyze(context);
 		return true; // return true since everything is resolved correctly even if analysis of the function definition failed
-	},
+	}
 
-	getType: function () {
+	override function getType () : Type {
 		return new StaticFunctionType(this._funcDef.getReturnType(), this._funcDef.getArgumentTypes(), false);
-	},
+	}
 
-	typesAreIdentified: function () {
+	function typesAreIdentified () : boolean {
 		var argTypes = this._funcDef.getArgumentTypes();
 		for (var i = 0; i < argTypes.length; ++i) {
 			if (argTypes[i] == null)
@@ -752,40 +814,42 @@ var FunctionExpression = exports.FunctionExpression = Expression.extend({
 		if (this._funcDef.getReturnType() == null)
 			return false;
 		return true;
-	},
+	}
 
-	forEachExpression: function (cb) {
+	override function forEachExpression (cb : function(:Expression,:function(:Expression):void):boolean) : boolean {
 		return true;
 	}
 
-});
+}
 
 // unary expressions
 
-var UnaryExpression = exports.UnaryExpression = OperatorExpression.extend({
+abstract class UnaryExpression extends OperatorExpression {
 
-	constructor: function (operatorToken, expr) {
-		OperatorExpression.prototype.constructor.call(this, operatorToken);
+	var _expr : Expression;
+
+	function constructor (operatorToken : Token, expr : Expression) {
+		super(operatorToken);
 		this._expr = expr;
-	},
+	}
 
-	getExpr: function () {
+	function getExpr () : Expression {
 		return this._expr;
-	},
+	}
 
-	setExpr: function (expr) {
+	function setExpr (expr : Expression) : void {
 		this._expr = expr;
-	},
+	}
 
-	serialize: function () {
+	override function serialize () : variant {
 		return [
 			"UnaryExpression",
 			this._token.serialize(),
 			this._expr.serialize()
-		];
-	},
+		] : variant[];
+	}
 
-	_analyze: function (context) {
+	function _analyze (context : AnalysisContext) : boolean {
 		if (! this._expr.analyze(context, this))
 			return false;
 		if (this._expr.getType().equals(Type.voidType)) {
@@ -793,62 +857,64 @@ var UnaryExpression = exports.UnaryExpression = OperatorExpression.extend({
 			return false;
 		}
 		return true;
-	},
-
-	forEachExpression: function (cb) {
-		return cb(this._expr, function (expr) { this._expr = expr; }.bind(this));
 	}
 
-});
+	override function forEachExpression (cb : function(:Expression,:function(:Expression):void):boolean) : boolean {
+		return cb(this._expr, function (expr) { this._expr = expr; });
+	}
 
-var BitwiseNotExpression = exports.BitwiseNotExpression = UnaryExpression.extend({
+}
 
-	constructor: function (operatorToken, expr) {
-		UnaryExpression.prototype.constructor.call(this, operatorToken, expr);
-	},
+class BitwiseNotExpression extends UnaryExpression {
 
-	clone: function () {
+	function constructor (operatorToken : Token, expr : Expression) {
+		super(operatorToken, expr);
+	}
+
+	override function clone () : Expression {
 		return new BitwiseNotExpression(this._token, this._expr.clone());
-	},
+	}
 
-	analyze: function (context, parentExpr) {
+	override function analyze (context : AnalysisContext, parentExpr : Expression) : boolean {
 		if (! this._analyze(context))
 			return false;
 		if (! this.assertIsConvertibleTo(context, this._expr, Type.numberType, false))
 			return false;
 		return true;
-	},
+	}
 
-	getType: function () {
+	override function getType () : Type {
 		return Type.integerType;
 	}
 
-});
+}
 
-var InstanceofExpression = exports.InstanceofExpression = UnaryExpression.extend({
+class InstanceofExpression extends UnaryExpression {
 
-	constructor: function (operatorToken, expr, expectedType) {
-		UnaryExpression.prototype.constructor.call(this, operatorToken, expr);
+	var _expectedType : Type;
+
+	function constructor (operatorToken : Token, expr : Expression, expectedType : Type) {
+		super(operatorToken, expr);
 		this._expectedType = expectedType;
-	},
+	}
 
-	clone: function () {
+	override function clone () : Expression {
 		return new InstanceofExpression(this._token, this._expr.clone(), this._expectedType);
-	},
+	}
 
-	getExpectedType: function () {
+	function getExpectedType () : Type {
 		return this._expectedType;
-	},
+	}
 
-	serialize: function () {
+	override function serialize () : variant {
 		return [
 			"InstanceofExpression",
 			this._expr.serialize(),
 			this._expectedType.serialize()
-		];
-	},
+		] : variant[];
+	}
 
-	analyze: function (context, parentExpr) {
+	override function analyze (context : AnalysisContext, parentExpr : Expression) : boolean {
 		if (! this._analyze(context))
 			return false;
 		if (! (this._expr.getType() instanceof ObjectType)) {
@@ -856,34 +922,36 @@ var InstanceofExpression = exports.InstanceofExpression = UnaryExpression.extend
 			return false;
 		}
 		return true;
-	},
+	}
 
-	getType: function () {
+	override function getType () : Type {
 		return Type.booleanType;
 	}
 
-});
+}
 
-var AsExpression = exports.AsExpression = UnaryExpression.extend({
+class AsExpression extends UnaryExpression {
 
-	constructor: function (operatorToken, expr, type) {
-		UnaryExpression.prototype.constructor.call(this, operatorToken, expr);
+	var _type : Type;
+
+	function constructor (operatorToken : Token, expr : Expression, type : Type) {
+		super(operatorToken, expr);
 		this._type = type;
-	},
+	}
 
-	clone: function () {
+	override function clone () : Expression {
 		return new AsExpression(this._token, this._expr.clone(), this._type);
-	},
+	}
 
-	serialize: function () {
+	override function serialize () : variant {
 		return [
 			"AsExpression",
 			this._expr.serialize(),
 			this._type.serialize()
-		];
-	},
+		] : variant[];
+	}
 
-	analyze: function (context, parentExpr) {
+	override function analyze (context : AnalysisContext, parentExpr : Expression) : boolean {
 		if (! this._analyze(context))
 			return false;
 		if (this._type instanceof NullableType) {
@@ -916,10 +984,10 @@ var AsExpression = exports.AsExpression = UnaryExpression.extend({
 				success = true;
 			}
 		} else if (this._expr instanceof PropertyExpression && exprType instanceof FunctionType && this._type instanceof StaticFunctionType) {
-			var deducedType = this._expr.deduceByArgumentTypes(context, this._token, this._type.getArgumentTypes(), true);
+			var deducedType = (this._expr as PropertyExpression).deduceByArgumentTypes(context, this._token, (this._type as StaticFunctionType).getArgumentTypes(), true);
 			if (deducedType != null) {
 				exprType = deducedType;
-				if (deducedType.getReturnType().equals(this._type.getReturnType())) {
+				if (deducedType.getReturnType().equals((this._type as StaticFunctionType).getReturnType())) {
 					success = true;
 				}
 			}
@@ -929,38 +997,40 @@ var AsExpression = exports.AsExpression = UnaryExpression.extend({
 			return false;
 		}
 		return true;
-	},
+	}
 
-	getType: function () {
+	override function getType () : Type {
 		return this._type;
-	},
+	}
 
-	setType: function (type) {
+	function setType (type : Type) : void {
 		this._type = type;
 	}
 
-});
+}
 
-var AsNoConvertExpression = exports.AsNoConvertExpression = UnaryExpression.extend({
+class AsNoConvertExpression extends UnaryExpression {
 
-	constructor: function (operatorToken, expr, type) {
-		UnaryExpression.prototype.constructor.call(this, operatorToken, expr);
+	var _type : Type;
+
+	function constructor (operatorToken : Token, expr : Expression, type : Type) {
+		super(operatorToken, expr);
 		this._type = type;
-	},
+	}
 
-	clone: function () {
+	override function clone () : Expression {
 		return new AsNoConvertExpression(this._token, this._expr.clone(), this._type);
-	},
+	}
 
-	serialize: function () {
+	override function serialize () : variant {
 		return [
 			"AsNoConvertExpression",
 			this._expr.serialize(),
 			this._type.serialize()
-		];
-	},
+		] : variant[];
+	}
 
-	analyze: function (context, parentExpr) {
+	override function analyze (context : AnalysisContext, parentExpr : Expression) : boolean {
 		if (! this._analyze(context))
 			return false;
 		var srcType = this._expr.getType();
@@ -969,29 +1039,29 @@ var AsNoConvertExpression = exports.AsNoConvertExpression = UnaryExpression.exte
 			return false;
 		}
 		return true;
-	},
+	}
 
-	getType: function () {
+	override function getType () : Type {
 		return this._type;
-	},
+	}
 
-	setType: function (type) {
+	function setType (type : Type) : void {
 		this._type = type;
 	}
 
-});
+}
 
-var LogicalNotExpression = exports.LogicalNotExpression = UnaryExpression.extend({
+class LogicalNotExpression extends UnaryExpression {
 
-	constructor: function (operatorToken, expr) {
-		UnaryExpression.prototype.constructor.call(this, operatorToken, expr);
-	},
+	function constructor (operatorToken : Token, expr : Expression) {
+		super(operatorToken, expr);
+	}
 
-	clone: function () {
+	override function clone () : Expression {
 		return new LogicalNotExpression(this._token, this._expr.clone());
-	},
+	}
 
-	analyze: function (context, parentExpr) {
+	override function analyze (context : AnalysisContext, parentExpr : Expression) : boolean {
 		if (! this._analyze(context))
 			return false;
 		if (this._expr.getType().resolveIfNullable().equals(Type.voidType)) {
@@ -999,29 +1069,29 @@ var LogicalNotExpression = exports.LogicalNotExpression = UnaryExpression.extend
 			return false;
 		}
 		return true;
-	},
+	}
 
-	getType: function () {
+	override function getType () : Type {
 		return Type.booleanType;
 	}
 
-});
+}
 
-var IncrementExpression = exports.IncrementExpression = UnaryExpression.extend({
+abstract class IncrementExpression extends UnaryExpression {
 
-	constructor: function (operatorToken, expr) {
-		UnaryExpression.prototype.constructor.call(this, operatorToken, expr);
-	},
+	function constructor (operatorToken : Token, expr : Expression) {
+		super(operatorToken, expr);
+	}
 
-	serialize: function () {
+	override function serialize () : variant {
 		return [
 			this._getClassName(),
 			this._token.serialize(),
 			this._expr.serialize()
-		];
-	},
+		] : variant[];
+	}
 
-	analyze: function (context, parentExpr) {
+	override function analyze (context : AnalysisContext, parentExpr : Expression) : boolean {
 		if (! this._analyze(context))
 			return false;
 		var exprType = this._expr.getType();
@@ -1034,78 +1104,87 @@ var IncrementExpression = exports.IncrementExpression = UnaryExpression.extend({
 		if (! this._expr.assertIsAssignable(context, this._token, exprType))
 			return false;
 		return true;
-	},
+	}
 
-	getType: function () {
+	override function getType () : Type {
 		return this._expr.getType().resolveIfNullable();
 	}
 
-});
+	abstract function _getClassName () : string;
 
-var PostIncrementExpression = exports.PostIncrementExpression = IncrementExpression.extend({
+}
 
-	constructor: function (operatorToken, expr) {
-		IncrementExpression.prototype.constructor.call(this, operatorToken, expr);
-	},
+class PostIncrementExpression extends IncrementExpression {
 
-	clone: function () {
+	function constructor (operatorToken : Token, expr : Expression) {
+		super(operatorToken, expr);
+	}
+
+	override function clone () : Expression {
 		return new PostIncrementExpression(this._token, this._expr.clone());
-	},
+	}
 
-	_getClassName: function() {
+	override function _getClassName () : string {
 		return "PostIncrementExpression";
 	}
 
-});
+}
 
-var PreIncrementExpression = exports.PreIncrementExpression = IncrementExpression.extend({
+class PreIncrementExpression extends IncrementExpression {
 
-	constructor: function (operatorToken, expr) {
-		IncrementExpression.prototype.constructor.call(this, operatorToken, expr);
-	},
+	function constructor (operatorToken : Token, expr : Expression) {
+		super(operatorToken, expr);
+	}
 
-	clone: function () {
+	override function clone () : Expression {
 		return new PreIncrementExpression(this._token, this._expr.clone());
-	},
+	}
 
-	_getClassName: function() {
+	override function _getClassName () : string {
 		return "PreIncrementExpression";
 	}
 
-});
+}
 
-var PropertyExpression = exports.PropertyExpression = UnaryExpression.extend({
+class PropertyExpression extends UnaryExpression {
 
-	constructor: function (operatorToken, expr1, identifierToken, typeArgs, type) {
-		UnaryExpression.prototype.constructor.call(this, operatorToken, expr1);
+	var _identifierToken : Token;
+	var _typeArgs : Type[];
+	var _type : Type;
+
+	function constructor (operatorToken : Token, expr1 : Expression, identifierToken : Token, typeArgs : Type[]) {
+		this(operatorToken, expr1, identifierToken, typeArgs, null);
+	}
+
+	function constructor (operatorToken : Token, expr1 : Expression, identifierToken : Token, typeArgs : Type[], type : Type) {
+		super(operatorToken, expr1);
 		this._identifierToken = identifierToken;
 		this._typeArgs = typeArgs;
-		// fifth parameter is optional
-		this._type = type !== undefined ? type : null;
-	},
+		this._type = type != null ? type : null;
+	}
 
-	clone: function () {
+	override function clone () : Expression {
 		return new PropertyExpression(this._token, this._expr.clone(), this._identifierToken, this._typeArgs, this._type);
-	},
+	}
 
-	getIdentifierToken: function () {
+	function getIdentifierToken () : Token {
 		return this._identifierToken;
-	},
+	}
 
-	getTypeArguments: function () {
+	function getTypeArguments () : Type[] {
 		return this._typeArgs;
-	},
+	}
 
-	serialize: function () {
+	override function serialize () : variant {
 		return [
 			"PropertyExpression",
 			this._expr.serialize(),
 			this._identifierToken.serialize(),
-			Util.serializeNullable(this._type)
-		];
-	},
+			Serializer.<Type>.serializeNullable(this._type)
+		] : variant[];
+	}
 
-	analyze: function (context, parentExpr) {
+	override function analyze (context : AnalysisContext, parentExpr : Expression) : boolean {
 		// normal handling
 		if (! this._analyze(context))
 			return false;
@@ -1139,20 +1218,20 @@ var PropertyExpression = exports.PropertyExpression = UnaryExpression.extend({
 			return false;
 		}
 		return true;
-	},
+	}
 
-	getType: function () {
+	override function getType () : Type {
 		return this._type;
-	},
+	}
 
-	getHolderType: function () {
+	override function getHolderType () : Type {
 		var type = this._expr.getType();
 		if (type instanceof PrimitiveType)
 			type = new ObjectType(type.getClassDef());
 		return type;
-	},
+	}
 
-	assertIsAssignable: function (context, token, type) {
+	override function assertIsAssignable (context : AnalysisContext, token : Token, type : Type) : boolean {
 		if (! Expression.assertIsAssignable(context, token, this._type, type))
 			return false;
 		// check constness (note: a possibly assignable property is always a member variable)
@@ -1167,8 +1246,8 @@ var PropertyExpression = exports.PropertyExpression = UnaryExpression.extend({
 						return false;
 					}
 					return true;
-				}.bind(this));
-			}.bind(this))) {
+				});
+			})) {
 				throw new Error("logic flaw, could not find definition for " + holderType.getClassDef().className() + "#" + this._identifierToken.getValue());
 			}
 		}
@@ -1180,35 +1259,35 @@ var PropertyExpression = exports.PropertyExpression = UnaryExpression.extend({
 			return false;
 		}
 		return true;
-	},
+	}
 
-	deduceByArgumentTypes: function (context, operatorToken, argTypes, isStatic) {
+	function deduceByArgumentTypes (context : AnalysisContext, operatorToken : Token, argTypes : Type[], isStatic : boolean) : ResolvedFunctionType {
 		for (var i = 0; i < argTypes.length; ++i) {
 			if (argTypes[i] instanceof FunctionChoiceType) {
 				context.errors.push(new CompileError(operatorToken, "type deduction of overloaded function passed in as an argument is not supported; use 'as' to specify the function"));
 				return null;
 			}
 		}
-		var rhsType = this._type.deduceByArgumentTypes(context, operatorToken, argTypes, isStatic);
+		var rhsType = (this._type as FunctionType).deduceByArgumentTypes(context, operatorToken, argTypes, isStatic);
 		if (rhsType == null)
 			return null;
 		this._type = rhsType;
 		return rhsType;
 	}
 
-});
+}
 
-var TypeofExpression = exports.TypeofExpression = UnaryExpression.extend({
+class TypeofExpression extends UnaryExpression {
 
-	constructor: function (operatorToken, expr) {
-		UnaryExpression.prototype.constructor.call(this, operatorToken, expr);
-	},
+	function constructor (operatorToken : Token, expr : Expression) {
+		super(operatorToken, expr);
+	}
 
-	clone: function () {
+	override function clone () : Expression {
 		return new TypeofExpression(this._token, this._expr.clone());
-	},
+	}
 
-	analyze: function (context, parentExpr) {
+	override function analyze (context : AnalysisContext, parentExpr : Expression) : boolean {
 		if (! this._analyze(context))
 			return false;
 		var exprType = this._expr.getType();
@@ -1217,33 +1296,33 @@ var TypeofExpression = exports.TypeofExpression = UnaryExpression.extend({
 			return false;
 		}
 		return true;
-	},
+	}
 
-	getType: function () {
+	override function getType () : Type {
 		return Type.stringType;
 	}
 
-});
+}
 
-var SignExpression = exports.SignExpression = UnaryExpression.extend({
+class SignExpression extends UnaryExpression {
 
-	constructor: function (operatorToken, expr) {
-		UnaryExpression.prototype.constructor.call(this, operatorToken, expr);
-	},
+	function constructor (operatorToken : Token, expr : Expression) {
+		super(operatorToken, expr);
+	}
 
-	clone: function () {
+	override function clone () : Expression {
 		return new SignExpression(this._token, this._expr.clone());
-	},
+	}
 
-	analyze: function (context, parentExpr) {
+	override function analyze (context : AnalysisContext, parentExpr : Expression) : boolean {
 		if (! this._analyze(context))
 			return false;
 		if (! this.assertIsConvertibleTo(context, this._expr, Type.numberType, true))
 			return false;
 		return true;
-	},
+	}
 
-	getType: function () {
+	override function getType () : Type {
 		var type = this._expr.getType();
 		if (type.resolveIfNullable().equals(Type.numberType))
 			return Type.numberType;
@@ -1251,76 +1330,81 @@ var SignExpression = exports.SignExpression = UnaryExpression.extend({
 			return Type.integerType;
 	}
 
-});
+}
 
 // binary expressions
 
-var BinaryExpression = exports.BinaryExpression = OperatorExpression.extend({
+abstract class BinaryExpression extends OperatorExpression {
 
-	constructor: function (operatorToken, expr1, expr2) {
-		OperatorExpression.prototype.constructor.call(this, operatorToken);
+	var _expr1 : Expression;
+	var _expr2 : Expression;
+
+	function constructor (operatorToken : Token, expr1 : Expression, expr2 : Expression) {
+		super(operatorToken);
 		this._expr1 = expr1;
 		this._expr2 = expr2;
-	},
+	}
 
-	getFirstExpr: function() {
+	function getFirstExpr () : Expression {
 		return this._expr1;
-	},
+	}
 
-	setFirstExpr: function (expr) {
+	function setFirstExpr (expr : Expression) : void {
 		this._expr1 = expr;
-	},
+	}
 
-	getSecondExpr: function() {
+	function getSecondExpr () : Expression {
 		return this._expr2;
-	},
+	}
 
-	setSecondExpr: function (expr) {
+	function setSecondExpr (expr : Expression) : void {
 		this._expr2 = expr;
-	},
+	}
 
-	serialize: function () {
+	override function serialize () : variant {
 		return [
 			"BinaryExpression",
 			this._token.serialize(),
 			this._expr1.serialize(),
 			this._expr2.serialize()/*,
 			Util.serializeNullable(this.getType())*/
-		];
-	},
+		] : variant[];
+	}
 
-	_analyze: function (context) {
+	function _analyze (context : AnalysisContext) : boolean {
 		if (! this._expr1.analyze(context, this))
 			return false;
 		if (! this._expr2.analyze(context, this))
 			return false;
 		return true;
-	},
+	}
 
-	forEachExpression: function (cb) {
-		if (! cb(this._expr1, function (expr) { this._expr1 = expr; }.bind(this)))
+	override function forEachExpression (cb : function(:Expression,:function(:Expression):void):boolean) : boolean {
+		if (! cb(this._expr1, function (expr) { this._expr1 = expr; }))
 			return false;
-		if (! cb(this._expr2, function (expr) { this._expr2 = expr; }.bind(this)))
+		if (! cb(this._expr2, function (expr) { this._expr2 = expr; }))
 			return false;
 		return true;
 	}
 
-});
+}
 
-var AdditiveExpression = exports.AdditiveExpression = BinaryExpression.extend({
+class AdditiveExpression extends BinaryExpression {
 
-	constructor: function (operatorToken, expr1, expr2) {
-		BinaryExpression.prototype.constructor.call(this, operatorToken, expr1, expr2);
+	var _type : Type;
+
+	function constructor (operatorToken : Token, expr1 : Expression, expr2 : Expression) {
+		super(operatorToken, expr1, expr2);
 		this._type = null;
-	},
+	}
 
-	clone: function () {
+	override function clone () : Expression {
 		var ret = new AdditiveExpression(this._token, this._expr1.clone(), this._expr2.clone());
 		ret._type = this._type;
 		return ret;
-	},
+	}
 
-	analyze: function (context, parentExpr) {
+	override function analyze (context : AnalysisContext, parentExpr : Expression) : boolean {
 		if (! this._analyze(context))
 			return false;
 		var expr1Type = this._expr1.getType().resolveIfNullable();
@@ -1329,7 +1413,7 @@ var AdditiveExpression = exports.AdditiveExpression = BinaryExpression.extend({
 			&& (expr2Type.isConvertibleTo(Type.numberType) || (expr2Type instanceof ObjectType && expr2Type.getClassDef() == Type.numberType.getClassDef()))) {
 			// ok
 			this._type = (expr1Type instanceof NumberType) || (expr2Type instanceof NumberType)
-				? Type.numberType : Type.integerType;
+				? (Type.numberType as Type) : (Type.integerType as Type);
 		} else if ((expr1Type.equals(Type.stringType) || (expr1Type instanceof ObjectType && expr1Type.getClassDef() == Type.stringType.getClassDef()))
 			&& (expr2Type.equals(Type.stringType) || (expr2Type instanceof ObjectType && expr2Type.getClassDef() == Type.stringType.getClassDef()))) {
 			// ok
@@ -1339,27 +1423,29 @@ var AdditiveExpression = exports.AdditiveExpression = BinaryExpression.extend({
 			return false;
 		}
 		return true;
-	},
+	}
 
-	getType: function () {
+	override function getType () : Type {
 		return this._type;
 	}
-});
+}
 
-var ArrayExpression = exports.ArrayExpression = BinaryExpression.extend({
+class ArrayExpression extends BinaryExpression {
 
-	constructor: function (operatorToken, expr1, expr2) {
-		BinaryExpression.prototype.constructor.call(this, operatorToken, expr1, expr2);
+	var _type : Type;
+
+	function constructor (operatorToken : Token, expr1 : Expression, expr2 : Expression) {
+		super(operatorToken, expr1, expr2);
 		this._type = null;
-	},
+	}
 
-	clone: function () {
+	override function clone () : Expression {
 		var ret = new ArrayExpression(this._token, this._expr1.clone(), this._expr2.clone());
 		ret._type = this._type;
 		return ret;
-	},
+	}
 
-	analyze: function (context, parentExpr) {
+	override function analyze (context : AnalysisContext, parentExpr : Expression) : boolean {
 		if (! this._analyze(context))
 			return false;
 		if (this._expr1.getType() == null) {
@@ -1375,12 +1461,12 @@ var ArrayExpression = exports.ArrayExpression = BinaryExpression.extend({
 		}
 		context.errors.push(new CompileError(this._token, "cannot apply []; the operator is only applicable against an array or an variant"));
 		return false;
-	},
+	}
 
-	_analyzeApplicationOnObject: function (context, expr1Type) {
+	function _analyzeApplicationOnObject (context : AnalysisContext, expr1Type : Type) : boolean {
 		var expr1ClassDef = expr1Type.getClassDef();
 		// obtain type of operator []
-		var funcType = expr1ClassDef.getMemberTypeByName(context.errors, this._token, "__native_index_operator__", false, [], ClassDefinition.GET_MEMBER_MODE_ALL);
+		var funcType = expr1ClassDef.getMemberTypeByName(context.errors, this._token, "__native_index_operator__", false, new Type[], ClassDefinition.GET_MEMBER_MODE_ALL) as FunctionType;
 		if (funcType == null) {
 			context.errors.push(new CompileError(this._token, "cannot apply operator[] on an instance of class '" + expr1ClassDef.className() + "'"));
 			return false;
@@ -1393,9 +1479,9 @@ var ArrayExpression = exports.ArrayExpression = BinaryExpression.extend({
 		// set type of the expression
 		this._type = deducedFuncType.getReturnType();
 		return true;
-	},
+	}
 
-	_analyzeApplicationOnVariant: function (context) {
+	function _analyzeApplicationOnVariant (context : AnalysisContext) : boolean {
 		var expr2Type = this._expr2.getType().resolveIfNullable();
 		if (! (expr2Type.equals(Type.stringType) || expr2Type.isConvertibleTo(Type.numberType))) {
 			context.errors.push(new CompileError(this._token, "the argument of variant[] should be a string or a number"));
@@ -1403,29 +1489,29 @@ var ArrayExpression = exports.ArrayExpression = BinaryExpression.extend({
 		}
 		this._type = Type.variantType;
 		return true;
-	},
+	}
 
-	getType: function () {
+	override function getType () : Type {
 		return this._type;
-	},
+	}
 
-	assertIsAssignable: function (context, token, type) {
+	override function assertIsAssignable (context : AnalysisContext, token : Token, type : Type) : boolean {
 		return Expression.assertIsAssignable(context, token, this._type, type);
 	}
 
-});
+}
 
-var AssignmentExpression = exports.AssignmentExpression = BinaryExpression.extend({
+class AssignmentExpression extends BinaryExpression {
 
-	constructor: function (operatorToken, expr1, expr2) {
-		BinaryExpression.prototype.constructor.call(this, operatorToken, expr1, expr2);
-	},
+	function constructor (operatorToken : Token, expr1 : Expression, expr2 : Expression) {
+		super(operatorToken, expr1, expr2);
+	}
 
-	clone: function () {
+	override function clone () : Expression {
 		return new AssignmentExpression(this._token, this._expr1.clone(), this._expr2.clone());
-	},
+	}
 
-	analyze: function (context, parentExpr) {
+	override function analyze (context : AnalysisContext, parentExpr : Expression) : boolean {
 		// special handling for v = function () ...
 		if (this._expr2 instanceof FunctionExpression)
 			return this._analyzeFunctionExpressionAssignment(context, parentExpr);
@@ -1456,7 +1542,7 @@ var AssignmentExpression = exports.AssignmentExpression = BinaryExpression.exten
 					context.errors.push(new CompileError(this._token, "cannot assign a function reference to '" + this._expr1.getType().toString() + "'"));
 					return false;
 				}
-				if ((rhsType = this._expr2.deduceByArgumentTypes(context, this._token, lhsType.getArgumentTypes(), lhsType instanceof StaticFunctionType)) == null)
+				if ((rhsType = (this._expr2 as PropertyExpression).deduceByArgumentTypes(context, this._token, (lhsType as ResolvedFunctionType).getArgumentTypes(), lhsType instanceof StaticFunctionType)) == null)
 					return false;
 			} else {
 				context.errors.push(new CompileError(this._token, "function reference is ambiguous"));
@@ -1471,9 +1557,9 @@ var AssignmentExpression = exports.AssignmentExpression = BinaryExpression.exten
 		if (! this._expr1.assertIsAssignable(context, this._token, rhsType))
 			return false;
 		return true;
-	},
+	}
 
-	_analyzeFusedAssignment: function (context) {
+	function _analyzeFusedAssignment (context : AnalysisContext) : boolean {
 		var lhsType = this._expr1.getType().resolveIfNullable();
 		var rhsType = this._expr2.getType().resolveIfNullable();
 		if (! this._expr1.assertIsAssignable(context, this._token, lhsType)) {
@@ -1485,19 +1571,19 @@ var AssignmentExpression = exports.AssignmentExpression = BinaryExpression.exten
 			return true;
 		context.errors.push(new CompileError(this._token, "cannot apply operator '" + this._token.getValue() + "' against '" + this._expr1.getType().toString() + "' and '" + this._expr2.getType().toString() + "'"));
 		return false;
-	},
+	}
 
-	_analyzeFunctionExpressionAssignment: function (context, parentExpr) {
+	function _analyzeFunctionExpressionAssignment (context : AnalysisContext, parentExpr : Expression) : boolean {
 		// analyze from left to right to avoid "variable may not be defined" error in case the function calls itself
 		if (! this._expr1.analyze(context, this))
 			return false;
 		if (this._expr1.getType() == null) {
-			if (! this._expr2.typesAreIdentified()) {
+			if (! (this._expr2 as FunctionExpression).typesAreIdentified()) {
 				context.errors.push(new CompileError(this._token, "either side of the operator should be fully type-qualified"));
 				return false;
 			}
 		} else {
-			if (! this._expr2.getFuncDef().deductTypeIfUnknown(context, this._expr1.getType()))
+			if (! (this._expr2 as FunctionExpression).getFuncDef().deductTypeIfUnknown(context, this._expr1.getType() as ResolvedFunctionType))
 				return false;
 		}
 		if (! this._expr1.assertIsAssignable(context, this._token, this._expr2.getType()))
@@ -1505,26 +1591,26 @@ var AssignmentExpression = exports.AssignmentExpression = BinaryExpression.exten
 		if (! this._expr2.analyze(context, this))
 			return false;
 		return true;
-	},
+	}
 
-	getType: function () {
+	override function getType () : Type {
 		return this._expr1.getType();
 	}
 
-});
+}
 
 // + - * / % < <= > >= & | ^
-var BinaryNumberExpression = exports.BinaryNumberExpression = BinaryExpression.extend({
+class BinaryNumberExpression extends BinaryExpression {
 
-	constructor: function (operatorToken, expr1, expr2) {
-		BinaryExpression.prototype.constructor.call(this, operatorToken, expr1, expr2);
-	},
+	function constructor (operatorToken : Token, expr1 : Expression, expr2 : Expression) {
+		super(operatorToken, expr1, expr2);
+	}
 
-	clone: function () {
+	override function clone () : Expression {
 		return new BinaryNumberExpression(this._token, this._expr1.clone(), this._expr2.clone());
-	},
+	}
 
-	analyze: function (context, parentExpr) {
+	override function analyze (context : AnalysisContext, parentExpr : Expression) : boolean {
 		if (! this._analyze(context))
 			return false;
 		switch (this._token.getValue()) {
@@ -1549,9 +1635,9 @@ var BinaryNumberExpression = exports.BinaryNumberExpression = BinaryExpression.e
 				return false;
 			return true;
 		}
-	},
+	}
 
-	getType: function () {
+	override function getType () : Type {
 		switch (this._token.getValue()) {
 		case "+":
 		case "-":
@@ -1560,7 +1646,6 @@ var BinaryNumberExpression = exports.BinaryNumberExpression = BinaryExpression.e
 				return Type.numberType;
 			else
 				return Type.integerType;
-			break;
 		case "/":
 		case "%":
 			return Type.numberType;
@@ -1578,19 +1663,23 @@ var BinaryNumberExpression = exports.BinaryNumberExpression = BinaryExpression.e
 		}
 	}
 
-});
+}
 
-var EqualityExpression = exports.EqualityExpression = BinaryExpression.extend({
+class EqualityExpression extends BinaryExpression {
 
-	constructor: function (operatorToken, expr1, expr2) {
-		BinaryExpression.prototype.constructor.call(this, operatorToken, expr1, expr2);
-	},
+	function constructor (operatorToken : Token, expr1 : Expression, expr2 : Expression) {
+		super(operatorToken, expr1, expr2);
+	}
 
-	clone: function () {
+	override function clone () : Expression {
 		return new EqualityExpression(this._token, this._expr1.clone(), this._expr2.clone());
-	},
+	}
 
-	analyze: function (context, parentExpr) {
+	override function analyze (context : AnalysisContext, parentExpr : Expression) : boolean {
+		function bool (x : boolean) : number {
+			return x ? 1 : 0;
+		}
+
 		if (! this._analyze(context))
 			return false;
 		var expr1Type = this._expr1.getType();
@@ -1599,7 +1688,7 @@ var EqualityExpression = exports.EqualityExpression = BinaryExpression.extend({
 			// ok
 		} else if (expr1Type.isConvertibleTo(expr2Type) || expr2Type.isConvertibleTo(expr1Type)) {
 			// ok
-		} else if ((expr1Type instanceof ObjectType) + (expr2Type instanceof ObjectType) == 1
+		} else if (bool(expr1Type instanceof ObjectType) + bool(expr2Type instanceof ObjectType) == 1
 			&& expr1Type.getClassDef() == expr2Type.getClassDef()) {
 			// ok, either side is an object and the other is the primitive counterpart
 		} else {
@@ -1607,25 +1696,25 @@ var EqualityExpression = exports.EqualityExpression = BinaryExpression.extend({
 			return false;
 		}
 		return true;
-	},
+	}
 
-	getType: function () {
+	override function getType () : Type {
 		return Type.booleanType;
 	}
 
-});
+}
 
-var InExpression = exports.InExpression = BinaryExpression.extend({
+class InExpression extends BinaryExpression {
 
-	constructor: function (operatorToken, expr1, expr2) {
-		BinaryExpression.prototype.constructor.call(this, operatorToken, expr1, expr2);
-	},
+	function constructor (operatorToken : Token, expr1 : Expression, expr2 : Expression) {
+		super(operatorToken, expr1, expr2);
+	}
 
-	clone: function () {
+	override function clone () : Expression {
 		return new InExpression(this._token, this._expr1.clone(), this._expr2.clone());
-	},
+	}
 
-	analyze: function (context, parentExpr) {
+	override function analyze (context : AnalysisContext, parentExpr : Expression) : boolean {
 		if (! this._analyze(context))
 			return false;
 		if (! this._expr1.getType().resolveIfNullable().equals(Type.stringType)) {
@@ -1636,32 +1725,32 @@ var InExpression = exports.InExpression = BinaryExpression.extend({
 		var expr2ClassDef;
 		if ((expr2Type = this._expr2.getType().resolveIfNullable()) instanceof ObjectType
 			&& (expr2ClassDef = expr2Type.getClassDef()) instanceof InstantiatedClassDefinition
-			&& expr2ClassDef.getTemplateClassName() == "Map") {
+			&& (expr2ClassDef as InstantiatedClassDefinition).getTemplateClassName() == "Map") {
 			// ok
 		} else {
 			context.errors.push(new CompileError(this._token, "right operand of 'in' expression should be a map"));
 			return false;
 		}
 		return true;
-	},
+	}
 
-	getType: function () {
+	override function getType () : Type {
 		return Type.booleanType;
 	}
 
-});
+}
 
-var LogicalExpression = exports.LogicalExpression = BinaryExpression.extend({
+class LogicalExpression extends BinaryExpression {
 
-	constructor: function (operatorToken, expr1, expr2) {
-		BinaryExpression.prototype.constructor.call(this, operatorToken, expr1, expr2);
-	},
+	function constructor (operatorToken : Token, expr1 : Expression, expr2 : Expression) {
+		super(operatorToken, expr1, expr2);
+	}
 
-	clone: function () {
+	override function clone () : Expression {
 		return new LogicalExpression(this._token, this._expr1.clone(), this._expr2.clone());
-	},
+	}
 
-	analyze: function (context, parentExpr) {
+	override function analyze (context : AnalysisContext, parentExpr : Expression) : boolean {
 		if (! this._analyze(context))
 			return false;
 		if (this._expr1.getType().resolveIfNullable().equals(Type.voidType)) {
@@ -1673,25 +1762,25 @@ var LogicalExpression = exports.LogicalExpression = BinaryExpression.extend({
 			return false;
 		}
 		return true;
-	},
+	}
 
-	getType: function () {
+	override function getType () : Type {
 		return Type.booleanType;
 	}
 
-});
+}
 
-var ShiftExpression = exports.ShiftExpression = BinaryExpression.extend({
+class ShiftExpression extends BinaryExpression {
 
-	constructor: function (operatorToken, expr1, expr2) {
-		BinaryExpression.prototype.constructor.call(this, operatorToken, expr1, expr2);
-	},
+	function constructor (operatorToken : Token, expr1 : Expression, expr2 : Expression) {
+		super(operatorToken, expr1, expr2);
+	}
 
-	clone: function () {
+	override function clone () : Expression {
 		return new ShiftExpression(this._token, this._expr1.clone(), this._expr2.clone());
-	},
+	}
 
-	analyze: function (context, parentExpr) {
+	override function analyze (context : AnalysisContext, parentExpr : Expression) : boolean {
 		if (! this._analyze(context))
 			return false;
 		if (! this.assertIsConvertibleTo(context, this._expr1, Type.integerType, true))
@@ -1699,53 +1788,66 @@ var ShiftExpression = exports.ShiftExpression = BinaryExpression.extend({
 		if (! this.assertIsConvertibleTo(context, this._expr2, Type.integerType, true))
 			return false;
 		return true;
-	},
+	}
 
-	getType: function () {
+	override function getType () : Type {
 		return Type.integerType;
 	}
 
-});
+}
 
 // (the only) tertary expression
 
-var ConditionalExpression = exports.ConditionalExpression = OperatorExpression.extend({
+class ConditionalExpression extends OperatorExpression {
 
-	constructor: function (operatorToken, condExpr, ifTrueExpr, ifFalseExpr, type /* optional */) {
-		OperatorExpression.prototype.constructor.call(this, operatorToken);
+	var _condExpr : Expression;
+	var _ifTrueExpr : Expression;
+	var _ifFalseExpr : Expression;
+	var _type : Type;
+
+	function constructor (operatorToken : Token, condExpr : Expression, ifTrueExpr : Expression, ifFalseExpr : Expression) {
+		this(operatorToken, condExpr, ifTrueExpr, ifFalseExpr, null);
+	}
+
+	function constructor (operatorToken : Token, condExpr : Expression, ifTrueExpr : Expression, ifFalseExpr : Expression, type : Type) {
+		super(operatorToken);
 		this._condExpr = condExpr;
 		this._ifTrueExpr = ifTrueExpr;
 		this._ifFalseExpr = ifFalseExpr;
 		this._type = type != null ? type : null;
-	},
+	}
 
-	clone: function () {
+	override function clone () : Expression {
 		return new ConditionalExpression(this._token, this._condExpr.clone(), this._ifTrueExpr != null ? this._ifTrueExpr.clone() : null, this._ifFalseExpr.clone(), this._type);
-	},
+	}
 
-	getCondExpr: function () {
+	function getCondExpr () : Expression {
 		return this._condExpr;
-	},
+	}
 
-	getIfTrueExpr: function () {
+	function setCondExpr (expr : Expression) : void {
+		this._condExpr = expr;
+	}
+
+	function getIfTrueExpr () : Expression {
 		return this._ifTrueExpr;
-	},
+	}
 
-	getIfFalseExpr: function () {
+	function getIfFalseExpr () : Expression {
 		return this._ifFalseExpr;
-	},
+	}
 
-	serialize: function () {
+	override function serialize () : variant {
 		return [
 			"ConditionalExpression",
 			this._token.serialize(),
 			this._condExpr.serialize(),
-			Util.serializeNullable(this._ifTrueExpr),
+			Serializer.<Expression>.serializeNullable(this._ifTrueExpr),
 			this._ifFalseExpr.serialize()
-		];
-	},
+		] : variant[];
+	}
 
-	analyze: function (context, parentExpr) {
+	override function analyze (context : AnalysisContext, parentExpr : Expression) : boolean {
 		// analyze the three expressions
 		if (! this._condExpr.analyze(context, this))
 			return false;
@@ -1770,64 +1872,70 @@ var ConditionalExpression = exports.ConditionalExpression = OperatorExpression.e
 			return false;
 		}
 		return true;
-	},
+	}
 
-	getType: function () {
+	override function getType () : Type {
 		return this._type;
-	},
+	}
 
-	forEachExpression: function (cb) {
-		if (! cb(this._condExpr, function (expr) { this._condExpr = expr; }.bind(this)))
+	override function forEachExpression (cb : function(:Expression,:function(:Expression):void):boolean) : boolean {
+		if (! cb(this._condExpr, function (expr) { this._condExpr = expr; }))
 			return false;
-		if (this._ifTrueExpr != null && ! cb(this._ifTrueExpr, function (expr) { this._ifTrueExpr = expr; }.bind(this)))
+		if (this._ifTrueExpr != null && ! cb(this._ifTrueExpr, function (expr) { this._ifTrueExpr = expr; }))
 			return false;
-		if (! cb(this._ifFalseExpr, function (expr) { this._ifFalseExpr = expr; }.bind(this)))
+		if (! cb(this._ifFalseExpr, function (expr) { this._ifFalseExpr = expr; }))
 			return false;
 		return true;
 	}
 
-});
+}
 
 // invocation expressions
 
-var CallExpression = exports.CallExpression = OperatorExpression.extend({
+class CallExpression extends OperatorExpression {
 
-	constructor: function (tokenOrThat, expr, args) {
-		if (tokenOrThat instanceof CallExpression) {
-			// clone
-			var that = tokenOrThat;
-			OperatorExpression.prototype.constructor.call(this, that);
-			this._expr = that._expr.clone();
-			this._args = Util.cloneArray(that._args);
-		} else {
-			OperatorExpression.prototype.constructor.call(this, tokenOrThat);
-			this._expr = expr;
-			this._args = args;
-		}
-	},
+	var _expr : Expression;
+	var _args : Expression[];
 
-	clone: function () {
+	function constructor (token : Token, expr : Expression, args : Expression[]) {
+		super(token);
+		this._expr = expr;
+		this._args = args;
+	}
+
+	function constructor (that : CallExpression) {
+		// clone
+		super(that);
+		this._expr = that._expr.clone();
+		this._args = Cloner.<Expression>.cloneArray(that._args);
+	}
+
+	override function clone () : Expression {
 		return new CallExpression(this);
-	},
+	}
 
-	getExpr: function () {
+	function getExpr () : Expression {
 		return this._expr;
-	},
+	}
 
-	getArguments: function () {
+	function setExpr (expr : Expression) : void {
+		this._expr = expr;
+	}
+
+	function getArguments () : Expression[] {
 		return this._args;
-	},
+	}
 
-	serialize: function () {
+	override function serialize () : variant {
 		return [
 			"CallExpression",
 			this._token.serialize(),
 			this._expr.serialize(),
-			Util.serializeArray(this._args)
-		];
-	},
+			Serializer.<Expression>.serializeArray(this._args)
+		] : variant[];
+	}
 
-	analyze: function (context, parentExpr) {
+	override function analyze (context : AnalysisContext, parentExpr : Expression) : boolean {
 		if (! this._expr.analyze(context, this))
 			return false;
 		var exprType = this._expr.getType().resolveIfNullable();
@@ -1837,87 +1945,91 @@ var CallExpression = exports.CallExpression = OperatorExpression.extend({
 		}
 		var argTypes = Util.analyzeArgs(
 			context, this._args, this,
-			exprType.getExpectedCallbackTypes(
+			(exprType as FunctionType).getExpectedCallbackTypes(
 				this._args.length,
-				! (this._expr instanceof PropertyExpression && ! exprType.isAssignable() && ! (this._expr.getExpr() instanceof ClassExpression))));
+				! (this._expr instanceof PropertyExpression && ! exprType.isAssignable() && ! ((this._expr as PropertyExpression).getExpr() instanceof ClassExpression))));
 		if (argTypes == null)
 			return false;
 		if (this._expr instanceof PropertyExpression && ! exprType.isAssignable()) {
-			var isCallingStatic = this._expr.getExpr() instanceof ClassExpression;
-			if (! isCallingStatic && this._expr.getIdentifierToken().getValue() == "constructor") {
+			var isCallingStatic = (this._expr as PropertyExpression).getExpr() instanceof ClassExpression;
+			if (! isCallingStatic && (this._expr as PropertyExpression).getIdentifierToken().getValue() == "constructor") {
 				context.errors.push(new CompileError(this._token, "cannot call a constructor other than by using 'new'"));
 				return false;
 			}
-			if (this._expr.deduceByArgumentTypes(context, this._token, argTypes, isCallingStatic) == null)
+			if ((this._expr as PropertyExpression).deduceByArgumentTypes(context, this._token, argTypes, isCallingStatic) == null)
 				return false;
 		} else {
-			if (exprType.deduceByArgumentTypes(context, this._token, argTypes, true) == null)
+			if ((exprType as FunctionType).deduceByArgumentTypes(context, this._token, argTypes, true) == null)
 				return false;
 		}
 		return true;
-	},
+	}
 
-	getType: function () {
+	override function getType () : Type {
 		var type = this._expr.getType();
 		if (type == null)
 			return null;
-		return type.resolveIfNullable().getReturnType();
-	},
+		return (type.resolveIfNullable() as ResolvedFunctionType).getReturnType();
+	}
 
-	forEachExpression: function (cb) {
-		if (! cb(this._expr, function (expr) { this._expr = expr; }.bind(this)))
+	override function forEachExpression (cb : function(:Expression,:function(:Expression):void):boolean) : boolean {
+		if (! cb(this._expr, function (expr) { this._expr = expr; }))
 			return false;
 		if (! Util.forEachExpression(cb, this._args))
 			return false;
 		return true;
 	}
 
-});
+}
 
-var SuperExpression = exports.SuperExpression = OperatorExpression.extend({
+class SuperExpression extends OperatorExpression {
 
-	constructor: function (tokenOrThat, name, args) {
-		if (tokenOrThat instanceof SuperExpression) {
-			var that = tokenOrThat;
-			OperatorExpression.prototype.constructor.call(this, that);
-			this._name = that._name;
-			this._args = Util.cloneArray(that._args);
-			this._funcType = that._funcType;
-		} else {
-			OperatorExpression.prototype.constructor.call(this, tokenOrThat);
-			this._name = name;
-			this._args = args;
-			this._funcType = null;
-		}
-	},
+	var _name : Token;
+	var _args : Expression[];
+	var _funcType : FunctionType;
+	var _classDef : ClassDefinition;
 
-	clone: function () {
+	function constructor (token : Token, name : Token, args : Expression[]) {
+		super(token);
+		this._name = name;
+		this._args = args;
+		this._funcType = null;
+	}
+
+	function constructor (that : SuperExpression) {
+		super(that);
+		this._name = that._name;
+		this._args = Cloner.<Expression>.cloneArray(that._args);
+		this._funcType = that._funcType;
+	}
+
+	override function clone () : Expression {
 		return new SuperExpression(this);
-	},
+	}
 
-	getName: function () {
+	function getName () : Token {
 		return this._name;
-	},
+	}
 
-	getArguments: function () {
+	function getArguments () : Expression[] {
 		return this._args;
-	},
+	}
 
-	getFunctionType: function () {
+	function getFunctionType () : FunctionType {
 		return this._funcType;
-	},
+	}
 		
-	serialize: function () {
+	override function serialize () : variant {
 		return [
 			"SuperExpression",
 			this._token.serialize(),
 			this._name.serialize(),
-			Util.serializeArray(this._args),
-			Util.serializeNullable(this._classDef),
-		];
-	},
+			Serializer.<Expression>.serializeArray(this._args),
+			Serializer.<ClassDefinition>.serializeNullable(this._classDef)
+		] : variant[];
+	}
 
-	analyze: function (context, parentExpr) {
+	override function analyze (context : AnalysisContext, parentExpr : Expression) : boolean {
 		// obtain class definition
 		if ((context.funcDef.flags() & ClassDefinition.IS_STATIC) != 0) {
 			context.errors.push(new CompileError(this._token, "cannot use 'super' keyword in a static function"));
@@ -1925,8 +2037,8 @@ var SuperExpression = exports.SuperExpression = OperatorExpression.extend({
 		}
 		var classDef = context.funcDef.getClassDef();
 		// lookup function
-		var funcType = null;
-		if ((funcType = classDef.getMemberTypeByName(context.errors, this._token, this._name.getValue(), false, [], ClassDefinition.GET_MEMBER_MODE_SUPER)) == null) {
+		var funcType = null : FunctionType;
+		if ((funcType = classDef.getMemberTypeByName(context.errors, this._token, this._name.getValue(), false, new Type[], ClassDefinition.GET_MEMBER_MODE_SUPER) as FunctionType) == null) {
 			context.errors.push(new CompileError(this._token, "could not find a member function with given name in super classes of class '" + classDef.className() + "'"));
 			return false;
 		}
@@ -1942,59 +2054,62 @@ var SuperExpression = exports.SuperExpression = OperatorExpression.extend({
 		// success
 		this._funcType = funcType;
 		return true;
-	},
+	}
 
-	getType: function () {
-		return this._funcType.getReturnType();
-	},
+	override function getType () : Type {
+		return (this._funcType as ResolvedFunctionType).getReturnType();
+	}
 
-	forEachExpression: function (cb) {
+	override function forEachExpression (cb : function(:Expression,:function(:Expression):void):boolean) : boolean {
 		if (! Util.forEachExpression(cb, this._args))
 			return false;
 		return true;
 	}
 
-});
+}
 
-var NewExpression = exports.NewExpression = OperatorExpression.extend({
+class NewExpression extends OperatorExpression {
 
-	constructor: function (tokenOrThat, type, args) {
-		if (tokenOrThat instanceof NewExpression) {
-			var that = tokenOrThat;
-			OperatorExpression.prototype.constructor.call(this, that);
-			this._type = that._type;
-			this._args = Util.cloneArray(that._args);
-			this._constructor = that._constructor;
-		} else {
-			OperatorExpression.prototype.constructor.call(this, tokenOrThat);
-			this._type = type;
-			this._args = args;
-			this._constructor = null;
-		}
-	},
+	var _type : Type;
+	var _args : Expression[];
+	var _constructor : ResolvedFunctionType;
 
-	clone: function () {
+	function constructor (token : Token, type : Type, args : Expression[]) {
+		super(token);
+		this._type = type;
+		this._args = args;
+		this._constructor = null;
+	}
+
+	function constructor (that : NewExpression) {
+		super(that);
+		this._type = that._type;
+		this._args = Cloner.<Expression>.cloneArray(that._args);
+		this._constructor = that._constructor;
+	}
+
+	override function clone () : Expression {
 		return new NewExpression(this);
-	},
+	}
 
-	getQualifiedName: function () {
+	function getQualifiedName () : QualifiedName {
 		throw new Error("will be removed");
-	},
+	}
 
-	getArguments: function () {
+	function getArguments () : Expression[] {
 		return this._args;
-	},
+	}
 
-	serialize: function () {
+	override function serialize () : variant {
 		return [
 			"NewExpression",
 			this._token.serialize(),
 			this._type.serialize(),
-			Util.serializeArray(this._args)
-		];
-	},
+			Serializer.<Expression>.serializeArray(this._args)
+		] : variant[];
+	}
 
-	analyze: function (context, parentExpr) {
+	override function analyze (context : AnalysisContext, parentExpr : Expression) : boolean {
 		// for instantiated code, check is necessary at this moment
 		if (! (this._type instanceof ObjectType)) {
 			context.errors.push(new CompileError(this._token, "cannot instantiate a non-object type: " + this._type.toString()));
@@ -2011,7 +2126,7 @@ var NewExpression = exports.NewExpression = OperatorExpression.extend({
 			context.errors.push(new CompileError(this._token, "cannot instantiate an abstract class"));
 			return false;
 		}
-		var ctors = classDef.getMemberTypeByName(context.errors, this._token, "constructor", false, [], ClassDefinition.GET_MEMBER_MODE_CLASS_ONLY);
+		var ctors = classDef.getMemberTypeByName(context.errors, this._token, "constructor", false, new Type[], ClassDefinition.GET_MEMBER_MODE_CLASS_ONLY) as FunctionType;
 		if (ctors == null) {
 			// classes will always have at least one constructor unless the default constructor is marked "delete"
 			context.errors.push(new CompileError(this._token, "the class cannot be instantiated"));
@@ -2027,74 +2142,77 @@ var NewExpression = exports.NewExpression = OperatorExpression.extend({
 			return false;
 		}
 		return true;
-	},
+	}
 
-	getType: function () {
+	override function getType () : Type {
 		return this._type;
-	},
+	}
 
-	setType: function (type) {
+	function setType (type : Type) : void {
 		this._type = type;
-	},
+	}
 
-	getConstructor: function () {
+	function getConstructor () : ResolvedFunctionType {
 		return this._constructor;
-	},
+	}
 
-	forEachExpression: function (cb) {
+	override function forEachExpression (cb : function(:Expression,:function(:Expression):void):boolean) : boolean {
 		if (! Util.forEachExpression(cb, this._args))
 			return false;
 		return true;
 	}
 
-});
+}
 
 // comma expression is not treated as a binary expression (why? it should be)
 
-var CommaExpression = exports.CommaExpression = Expression.extend({
+class CommaExpression extends Expression {
 
-	constructor: function (token, expr1, expr2) {
-		Expression.prototype.constructor.call(this, token);
+	var _expr1 : Expression;
+	var _expr2 : Expression;
+
+	function constructor (token : Token, expr1 : Expression, expr2 : Expression) {
+		super(token);
 		this._expr1 = expr1;
 		this._expr2 = expr2;
-	},
+	}
 
-	clone: function () {
+	override function clone () : Expression {
 		return new CommaExpression(this._token, this._expr1.clone(), this._expr2.clone());
-	},
+	}
 
-	getFirstExpr: function () {
+	function getFirstExpr () : Expression {
 		return this._expr1;
-	},
+	}
 
-	getSecondExpr: function () {
+	function getSecondExpr () : Expression {
 		return this._expr2;
-	},
+	}
 
-	serialize: function () {
+	override function serialize () : variant {
 		return [
 			"CommaExpression",
 			this._expr1.serialize(),
 			this._expr2.serialize()
-		];
-	},
+		] : variant[];
+	}
 
-	analyze: function (context, parentExpr) {
+	override function analyze (context : AnalysisContext, parentExpr : Expression) : boolean {
 		return this._expr1.analyze(context, this)
 			&& this._expr2.analyze(context, this);
-	},
+	}
 
-	getType: function () {
+	override function getType () : Type {
 		return this._expr2.getType();
-	},
+	}
 
-	forEachExpression: function (cb) {
-		if (! cb(this._expr1, function (expr) { this._expr1 = expr; }.bind(this)))
+	override function forEachExpression (cb : function(:Expression,:function(:Expression):void):boolean) : boolean {
+		if (! cb(this._expr1, function (expr) { this._expr1 = expr; }))
 			return false;
-		if (! cb(this._expr2, function (expr) { this._expr2 = expr; }.bind(this)))
+		if (! cb(this._expr2, function (expr) { this._expr2 = expr; }))
 			return false;
 		return true;
 	}
 
-});
+}
 // vim: set noexpandtab:

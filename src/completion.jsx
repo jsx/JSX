@@ -20,26 +20,13 @@
  * IN THE SOFTWARE.
  */
 
+import "./classdef.jsx";
+import "./type.jsx";
+import "./expression.jsx";
+import "./util.jsx";
+import "./parser.jsx";
+
 /*
-
-class CompleteCandidate {
-	var word : string;
-	var partialWord : string;
-
-	var doc : Nullable.<string>;
-
-	// type of the symobl: "function():void"
-	// available for variables or functions
-	var type : Nullable.<string>;
-
-	var returnType : Nullable.<string>;   // function specific
-	var args       : Nullable.<Symbol[]>; // function specific
-
-	// where the symbol is defined
-	var definedClass       : Nullable.<string>;
-	var definedFilename    : Nullable.<string>;
-	var definedLineNumber  : Nullable.<int>;
-}
 
 example:
 
@@ -60,50 +47,74 @@ example:
 }
  */
 
-var Class = require("./Class");
-eval(Class.$import("./classdef"));
-eval(Class.$import("./type"));
-eval(Class.$import("./expression"));
-eval(Class.$import("./util"));
+class Symbol {
+	var name : string;
+	var type : string;
+}
 
-var CompletionRequest = exports.CompletionRequest = Class.extend({
+class CompleteCandidate {
+	var word : string;
+	var partialWord : string;
 
-	constructor: function (lineNumber, columnOffset) {
+	var doc : Nullable.<string>;
+
+	// type of the symobl: "function():void"
+	// available for variables or functions
+	var type : Nullable.<string>;
+
+	var returnType : Nullable.<string>;   // function specific
+	var args       : Nullable.<Symbol[]>; // function specific
+
+	var kind : string;
+
+	// where the symbol is defined
+	var definedClass       : Nullable.<string>;
+	var definedFilename    : Nullable.<string>;
+	var definedLineNumber  : Nullable.<int>;
+}
+
+class CompletionRequest {
+
+	var _lineNumber : number;
+	var _columnOffest : number;
+	var _candidates : CompletionCandidates[];
+
+	function constructor (lineNumber : number, columnOffset : number) {
 		this._lineNumber = lineNumber;
 		this._columnOffest = columnOffset;
-		this._candidates = [];
-	},
+		this._candidates = new CompletionCandidates[];
+	}
 
-	getLineNumber: function () {
+	function getLineNumber () : number {
 		return this._lineNumber;
-	},
+	}
 
-	getColumnOffset: function () {
+	function getColumnOffset () : number {
 		return this._columnOffest;
-	},
+	}
 
-	isInRange: function (lineNumber, columnOffset, length) {
+	function isInRange (lineNumber : number, columnOffset : number, length : number) : number {
 		if (lineNumber != this._lineNumber)
 			return -1;
 		if (columnOffset <= this._columnOffest && this._columnOffest <= columnOffset + length) {
 			return this._columnOffest - columnOffset;
 		}
 		return -1;
-	},
+	}
 
-	pushCandidates: function (candidates) {
+	function pushCandidates (candidates : CompletionCandidates) : void {
 		this._candidates.push(candidates);
-	},
+	}
 
-	getCandidates: function () {
-		var seen = {}; // for unique
-		var results = [];
+	function getCandidates () : CompleteCandidate[] {
+		var seen = new Map.<boolean>; // for unique
+		var results = new CompleteCandidate[];
 		// fetch the list
-		this._candidates.forEach(function (candidates) {
-			var rawCandidates = [];
+		this._candidates.forEach(function (candidates : CompletionCandidates) : void {
+			var rawCandidates = new CompleteCandidate[];
 			candidates.getCandidates(rawCandidates);
 			var prefix = candidates.getPrefix();
-			rawCandidates.forEach(function (s) {
+			rawCandidates.forEach(function (s : CompleteCandidate) : void {
 				if (prefix == "" && s.word.substring(0, 2) == "__" && s.word != "__noconvert__" && s.word != "undefined") {
 					// skip hidden keywords
 				} else if (s.word.substring(0, prefix.length) == prefix) {
@@ -112,52 +123,54 @@ var CompletionRequest = exports.CompletionRequest = Class.extend({
 						return;
 					}
 
-					var identity = JSON.stringify([left, s.args]);
+					var identity = JSON.stringify([left, s.args] : variant[]);
 					if (! seen.hasOwnProperty(identity)) {
 						seen[identity] = true;
 
-						if (s.word !== left) {
+						if (s.word != left) {
 							s.partialWord = left;
 						}
 
 						// "kind" is useful for debugging --completion itself,
 						// but unlikely to be used by editors
-						delete s.kind;
+
 						results.push(s);
 					}
 				}
-			}.bind(this));
-		}.bind(this));
+			});
+		});
 
 		return results;
 	}
 
-});
+}
 
-var CompletionCandidates = exports.CompletionCandidates = Class.extend({
+abstract class CompletionCandidates {
 
-	constructor: function () {
+	var _prefix : Nullable.<string>;
+
+	function constructor () {
 		this._prefix = null;
-	},
+	}
 
-	getCandidates: null, // function (CompletionCandidate[]) : void
+	abstract function getCandidates (candidates : CompleteCandidate[]) : void;
 
-	getPrefix: function () {
+	function getPrefix () : string {
 		return this._prefix;
-	},
+	}
 
-	setPrefix: function (prefix) {
+	function setPrefix (prefix : string) : CompletionCandidates {
 		this._prefix = prefix;
 		return this;
-	},
+	}
 
-	$makeClassCandidate: function (classDef) {
-		var data = {
-			word: classDef.className(),
+	static function makeClassCandidate (classDef : ClassDefinition) : CompleteCandidate {
+		var data = new CompleteCandidate;
 
-			definedFilename:   classDef.getToken().getFilename(),
-			definedLineNumber: classDef.getToken().getLineNumber(),
-		};
+		data.word = classDef.className();
+		data.definedFilename = classDef.getToken().getFilename();
+		data.definedLineNumber = classDef.getToken().getLineNumber();
+
 		if ((classDef.flags() & ClassDefinition.IS_INTERFACE) != 0) {
 			data.kind = "interface";
 		} else if ((classDef.flags() & ClassDefinition.IS_MIXIN) != 0) {
@@ -172,9 +185,9 @@ var CompletionCandidates = exports.CompletionCandidates = Class.extend({
 			data.doc = docComment.getDescription();
 		}
 		return data;
-	},
+	}
 
-	$_addClasses: function (candidates, parser, autoCompleteMatchCb) {
+	static function _addClasses (candidates : CompleteCandidate[], parser : Parser, autoCompleteMatchCb : function(:ClassDefinition):boolean) : void {
 		parser.getClassDefs().forEach(function (classDef) {
 			if (classDef instanceof InstantiatedClassDefinition) {
 				// skip
@@ -189,17 +202,17 @@ var CompletionCandidates = exports.CompletionCandidates = Class.extend({
 				candidates.push(CompletionCandidates.makeClassCandidate(classDef));
 			}
 		});
-	},
+	}
 
-	$_addImportedClasses: function (candidates, imprt, autoCompleteMatchCb) {
+	static function _addImportedClasses (candidates : CompleteCandidate[], imprt : Import, autoCompleteMatchCb : function(:ClassDefinition):boolean) : void {
 		var classNames = imprt.getClassNames();
 		if (classNames != null) {
 			classNames.forEach(function (className) {
+				var data = new CompleteCandidate;
+				data.word = className;
+				data.kind = "class";
 				// FIXME can we refer to the classdefs of the classnames here?
-				candidates.push({
-					word: className,
-					kind: "class",
-				});
+				candidates.push(data);
 			});
 		} else {
 			imprt.getSources().forEach(function (parser) {
@@ -208,71 +221,80 @@ var CompletionCandidates = exports.CompletionCandidates = Class.extend({
 		}
 	}
 
-});
+}
 
-var KeywordCompletionCandidate = exports.KeywordCompletionCandidate = CompletionCandidates.extend({
+class KeywordCompletionCandidate extends CompletionCandidates {
 
-	constructor: function (expected) {
-		CompletionCandidates.prototype.constructor.call(this);
+	var _expected : string;
+
+	function constructor (expected : string) {
+		super();
 		this._expected = expected;
-	},
-
-	getCandidates: function (candidates) {
-		candidates.push({
-			word: this._expected,
-			kind: 'keyword'
-		});
 	}
 
-});
+	override function getCandidates (candidates : CompleteCandidate[]) : void {
+		var data = new CompleteCandidate;
+		data.word = this._expected;
+		data.kind = "keyword";
+		candidates.push(data);
+	}
 
-var CompletionCandidatesOfTopLevel = exports.CompletionCandidatesOfTopLevel = CompletionCandidates.extend({
+}
 
-	constructor: function (parser, autoCompleteMatchCb) {
-		CompletionCandidates.prototype.constructor.call(this);
+class CompletionCandidatesOfTopLevel extends CompletionCandidates {
+
+	var _parser : Parser;
+	var _autoCompleteMatchCb : function(:ClassDefinition):boolean;
+
+	function constructor (parser : Parser, autoCompleteMatchCb : function(:ClassDefinition):boolean) {
+		super();
 		this._parser = parser;
 		this._autoCompleteMatchCb = autoCompleteMatchCb;
-	},
+	}
 
-	getCandidates: function (candidates) {
+	override function getCandidates (candidates : CompleteCandidate[]) : void {
 		CompletionCandidates._addClasses(candidates, this._parser, this._autoCompleteMatchCb);
 		for (var i = 0; i < this._parser._imports.length; ++i) {
 			var imprt = this._parser._imports[i];
 			var alias = imprt.getAlias();
 			if (alias != null) {
-				candidates.push({
-					word: alias,
-					kind: 'alias'
-				});
+				var data = new CompleteCandidate;
+				data.word = alias;
+				data.kind = "alias";
+				candidates.push(data);
 			} else {
 				CompletionCandidates._addImportedClasses(candidates, imprt, this._autoCompleteMatchCb);
 			}
 		}
 	}
 
-});
+}
 
-var _CompletionCandidatesWithLocal = exports._CompletionCandidatesWithLocal = CompletionCandidatesOfTopLevel.extend({
+class _CompletionCandidatesWithLocal extends CompletionCandidatesOfTopLevel {
 
-	constructor: function (parser) {
-		CompletionCandidatesOfTopLevel.prototype.constructor.call(this, parser, null);
-		this._locals = [];
+	var _locals : LocalVariable[];
+
+	function constructor (parser : Parser) {
+		super(parser, null);
+		this._locals = new LocalVariable[];
 		parser._forEachScope(function (locals, args) {
-			this._locals = this._locals.concat(locals, args);
+			this._locals = this._locals.concat(locals);
+			for (var i in args) {
+				this._locals.push(args[i]);
+			}
 			return true;
-		}.bind(this));
-	},
+		});
+	}
 
-	getCandidates: function (candidates) {
+	override function getCandidates (candidates : CompleteCandidate[]) : void {
 		this._locals.forEach(function (local) {
-			var data = {
-				word: local.getName().getValue(),
+			var data = new CompleteCandidate;
 
-				kind: 'variable',
+			data.word = local.getName().getValue();
+			data.kind = 'variable';
+			data.definedFilename = local.getName().getFilename();
+			data.definedLineNumber = local.getName().getLineNumber();
 
-				definedFilename:   local.getName().getFilename(),
-				definedLineNumber: local.getName().getLineNumber()
-			};
 			var type = local.getType();
 			// type may be null when type deduction fails
 			if (type != null) {
@@ -281,33 +303,38 @@ var _CompletionCandidatesWithLocal = exports._CompletionCandidatesWithLocal = Co
 
 			candidates.push(data);
 		});
-		CompletionCandidatesOfTopLevel.prototype.getCandidates.call(this, candidates);
+		super.getCandidates(candidates);
 	}
 
-});
+}
 
-var _CompletionCandidatesOfNamespace = exports._CompletionCandidatesOfNamespace = CompletionCandidates.extend({
+class _CompletionCandidatesOfNamespace extends CompletionCandidates {
 
-	constructor: function (imprt, autoCompleteMatchCb) {
-		CompletionCandidates.prototype.constructor.call(this);
+	var _import : Import;
+	var _autoCompleteMatchCb : function(:ClassDefinition):boolean;
+
+	function constructor (imprt : Import, autoCompleteMatchCb : function(:ClassDefinition):boolean) {
+		super();
 		this._import = imprt;
 		this._autoCompleteMatchCb = autoCompleteMatchCb;
-	},
-
-	getCandidates: function (candidates) {
-		CompletionCandidates._addImportedClasses(this._import, this._autoCompleteMatchCb);
 	}
 
-});
+	override function getCandidates (candidates : CompleteCandidate[]) : void {
+		CompletionCandidates._addImportedClasses(candidates, this._import, this._autoCompleteMatchCb);
+	}
 
-var _CompletionCandidatesOfProperty = exports._CompletionCandidatesOfProperty = CompletionCandidates.extend({
+}
 
-	constructor: function (expr) {
-		CompletionCandidates.prototype.constructor.call(this);
+class _CompletionCandidatesOfProperty extends CompletionCandidates {
+
+	var _expr : Expression;
+
+	function constructor (expr : Expression) {
+		super();
 		this._expr = expr;
-	},
+	}
 
-	getCandidates: function (candidates) {
+	override function getCandidates (candidates : CompleteCandidate[]) : void {
 		var type = this._expr.getType();
 		if (type == null)
 			return;
@@ -331,44 +358,45 @@ var _CompletionCandidatesOfProperty = exports._CompletionCandidatesOfProperty = 
 					candidates.push(_CompletionCandidatesOfProperty._makeMemberCandidate(member));
 				}
 				return true;
-			}.bind(this));
+			});
 			return true;
-		}.bind(this));
-	},
+		});
+	}
 
-	$_makeMemberCandidate: function(member) {
+	static function _makeMemberCandidate (member : MemberDefinition) : CompleteCandidate {
 		var kind = (member.flags() & ClassDefinition.IS_STATIC
 			? "static member"
 			: "member");
 		kind += (member instanceof MemberFunctionDefinition
 			? " function"
 			: " variable");
-		var data = {
-			word: member.name(),
-			type: member.getType().toString(),
-			kind: kind,
 
-			definedClass:      member.getClassDef().className(),
-			definedFilename:   member.getToken().getFilename(),
-			definedLineNumber: member.getToken().getLineNumber()
-		};
+		var data = new CompleteCandidate;
+		data.word = member.name();
+		data.type = member.getType().toString();
+		data.kind = kind;
+
+		data.definedClass      = member.getClassDef().className();
+		data.definedFilename   = member.getToken().getFilename();
+		data.definedLineNumber = member.getToken().getLineNumber();
+
 		var docComment = member.getDocComment();
 		if (docComment) {
 			data.doc = docComment.getDescription();
 		}
 
 		if (member instanceof MemberFunctionDefinition) {
-			data.returnType = member.getReturnType().toString();
-			data.args = member.getArguments().map(function (arg) {
-				return {
-					name: arg.getName().getValue(),
-					type: arg.getType().toString()
-				};
+			data.returnType = (member as MemberFunctionDefinition).getReturnType().toString();
+			data.args = (member as MemberFunctionDefinition).getArguments().map.<Symbol>(function (arg) {
+				var data = new Symbol;
+				data.name = arg.getName().getValue();
+				data.type = arg.getType().toString();
+				return data;
 			});
 		}
 		return data;
 	}
 
-});
+}
 
 // vim: set noexpandtab:
