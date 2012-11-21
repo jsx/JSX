@@ -2138,7 +2138,16 @@ class NewExpression extends OperatorExpression {
 		if (argTypes == null)
 			return false;
 		if ((this._constructor = ctors.deduceByArgumentTypes(context, this._token, argTypes, false)) == null) {
-			context.errors.push(new CompileError(this._token, "cannot create an object of type '" + this._type.toString() + "', arguments mismatch"));
+			var varbose = 'candidate constructors:\n';
+			if (ctors instanceof FunctionChoiceType) {
+				varbose += (ctors as FunctionChoiceType)._types.map.<string>((t) -> {
+					return '  '+t.toString();
+				}).join('\n');
+			} else {
+				varbose += '  '+ctors.toString();
+			}
+			varbose += '\nbut you requested: \n  ' + new MemberFunctionType(this._type, Type.voidType, argTypes, false).toString();
+			context.errors.push(new CompileError(this._token, "cannot create an object of type '" + this._type.toString() + "', arguments mismatch", varbose));
 			return false;
 		}
 		return true;
