@@ -9,7 +9,7 @@ setup: compiler doc
 
 compiler: src/doc.jsx
 	mkdir -p bin
-	tool/jsx-compiler.js --executable node --output bin/jsx src/jsx.jsx
+	node tool/jsx-compiler.js --executable node --output bin/jsx src/jsx.jsx
 
 src/doc.jsx: src/_doc.jsx
 	submodules/picotemplate/picotemplate.pl $<
