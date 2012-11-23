@@ -1,16 +1,16 @@
 /*
  * Copyright (c) 2012 DeNA Co., Ltd.
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to
  * deal in the Software without restriction, including without limitation the
  * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
  * sell copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -40,7 +40,7 @@ class Cloner.<T> {
 		return o == null ? (null) : (o.clone() as T);
 	}
 
-}	
+}
 
 class Serializer.<T> {
 
@@ -79,7 +79,8 @@ class Util {
 				return "%";
 			}
 			else {
-				return args[Number.parseInt(m.substring(1)) - 1];
+				var arg = args[(m.substring(1) as int) - 1];
+				return arg == null ? "null" : arg;
 			}
 		});
 	}
@@ -271,7 +272,7 @@ class Triple.<T,U,V> {
 		this.second = second;
 		this.third = third;
 	}
-	
+
 }
 
 class TypedMap.<K,V> {
