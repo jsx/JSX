@@ -13,7 +13,7 @@ To setup JSX SDK , type the following command:
 
     git clone --recursive git://github.com/jsx/JSX.git
     cd JSX
-    make setup # to build bin/jsx
+    make # to build bin/jsx
 
 To install jsx command, just make a link of `bin/jsx` to `~/bin`.
 
