@@ -3,19 +3,26 @@ JOBS:=4
 
 OPTIMIZE_FLAGS := lto,unclassify,fold-const,return-if,inline,dce,unbox,fold-const,dce,lcse,array-length,unclassify
 
-setup: bin/jsx
+setup: compiler doc
 
-bin/jsx:
+## compiler stuff
+
+compiler: src/doc.jsx
 	mkdir -p bin
-	tool/jsx-compiler.js --executable node --output $@ src/jsx.jsx
+	tool/jsx-compiler.js --executable node --output bin/jsx src/jsx.jsx
 
 src/doc.jsx: src/_doc.jsx
-	submodules/picotemplate/picotemplate.pl src/_doc.jsx
+	submodules/picotemplate/picotemplate.pl $<
 
 
 doc: src/doc.jsx
 	rm -rf doc
 	find lib -name '*.jsx' | xargs -n 1 -- bin/jsx --mode doc --output doc
+
+self-hosting-compiler: compiler
+	cp bin/jsx tool/jsx-compiler.js
+
+## test stuff
 
 # e.g. make test JOBS=2
 test:
@@ -28,6 +35,8 @@ test-all: test test-optimized
 
 optimize-bench:
 	prove xt/optimize-bench/*.jsx
+
+## web stuff
 
 web:
 	perl web/build.pl --clean
@@ -63,9 +72,11 @@ update-bootstrap:
 	cp bootstrap/img/*.* web/assets/img
 	cp bootstrap/js/*.*  web/assets/js
 
+## cleanup
 
 clean:
 	rm -rf CodeMirror-* codemirror.zip
 	rm -rf bootstrap*
+	rm -rf bin
 
 .PHONY: test web server doc
