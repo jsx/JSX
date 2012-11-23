@@ -1,6 +1,6 @@
 {
   "name":        "jsx",
-  "version":     "0.0.2",
+  "version":     "0.1.0-alpha",
   "description": "a faster, safer, easier alternative to JavaScript",
   "homepage": "http://jsx.github.com/",
   "repository" : "git://github.com/jsx/JSX.git",
