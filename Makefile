@@ -9,7 +9,7 @@ setup: compiler doc
 
 compiler: src/doc.jsx
 	mkdir -p bin
-	node tool/jsx-compiler.js --executable node --output bin/jsx src/jsx.jsx
+	node bootstrap/jsx-compiler.js --executable node --output bin/jsx src/jsx.jsx
 
 src/doc.jsx: src/_doc.jsx
 	submodules/picotemplate/picotemplate.pl $<
@@ -20,7 +20,7 @@ doc: src/doc.jsx
 	find lib -name '*.jsx' | xargs -n 1 -- bin/jsx --mode doc --output doc
 
 self-hosting-compiler: compiler
-	cp bin/jsx tool/jsx-compiler.js
+	cp bin/jsx bootstrap/jsx-compiler.js
 
 ## test stuff
 
