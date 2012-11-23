@@ -3,12 +3,17 @@ JOBS:=4
 
 OPTIMIZE_FLAGS := lto,unclassify,fold-const,return-if,inline,dce,unbox,fold-const,dce,lcse,array-length,unclassify
 
-all: src/doc.js
+setup: bin/jsx
 
-setup: doc
+bin/jsx:
+	mkdir -p bin
+	tool/jsx-compiler.js --executable node --output $@ src/jsx.jsx
+
+src/doc.jsx: src/_doc.jsx
+	submodules/picotemplate/picotemplate.pl src/_doc.jsx
 
 
-doc: src/doc.js
+doc: src/doc.jsx
 	rm -rf doc
 	find lib -name '*.jsx' | xargs -n 1 -- bin/jsx --mode doc --output doc
 
@@ -31,9 +36,6 @@ web:
 
 server:
 	node web/server.js
-
-src/doc.js: src/_doc.js
-	submodules/picotemplate/picotemplate.pl src/_doc.js
 
 # for authors
 web.jsx:
