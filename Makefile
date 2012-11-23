@@ -25,10 +25,10 @@ self-hosting-compiler: compiler
 ## test stuff
 
 # e.g. make test JOBS=2
-test:
+test: compiler
 	prove --jobs "$(JOBS)" t/*.t t/*/*.jsx
 
-test-optimized:
+test-optimized: compiler
 	JSX_OPTS="--optimize $(OPTIMIZE_FLAGS)" prove --jobs "$(JOBS)" t/*/*.jsx
 
 test-all: test test-optimized
@@ -38,12 +38,12 @@ optimize-bench:
 
 ## web stuff
 
-web:
+web: compiler
 	perl web/build.pl --clean
 	time bin/jsx --executable web --profile --output web/profiler/fireworks.jsx.js web/profiler/fireworks.jsx
 	time bin/jsx --executable web --release --output web/example/aobench/aobench.jsx.js web/example/aobench/aobench.jsx
 
-server:
+server: compiler
 	node web/server.js
 
 # for authors
