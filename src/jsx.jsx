@@ -29,9 +29,9 @@ import "../src/optimizer.jsx";
 import "../src/util.jsx";
 import "../src/emitter.jsx";
 
-import "./nodejs.jsx";
-import "js.jsx";
 import "console.jsx";
+import "js.jsx";
+import "js/nodejs.jsx";
 
 class NodePlatform extends Platform {
 
@@ -575,7 +575,7 @@ class _Main {
 
 		exitIfFlushed(null);
 	}
-	
+
 }
 
 // vim: set ft=javascript:
