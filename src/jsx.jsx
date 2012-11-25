@@ -1,3 +1,7 @@
+/***
+  The Front-End of bin/jsx
+ */
+
 /*
  * Copyright (c) 2012 DeNA Co., Ltd.
  *
@@ -20,23 +24,21 @@
  * IN THE SOFTWARE.
  */
 
-import "../src/compiler.jsx";
-import "../src/completion.jsx";
-import "../src/doc.jsx";
-import "../src/platform.jsx";
-import "../src/jsemitter.jsx";
-import "../src/optimizer.jsx";
-import "../src/util.jsx";
-import "../src/emitter.jsx";
-
 import "js.jsx";
 import "js/nodejs.jsx";
+
+import "./util.jsx";
+import "./emitter.jsx";
+import "./jsemitter.jsx";
+import "./platform.jsx";
+import "./jsx-command.jsx";
 
 class NodePlatform extends Platform {
 
 	var _root : string;
 
 	function constructor () {
+		// the name of eval must be "eval".
 		var eval = js.global['eval'] as (string) -> variant;
 		node.fs = eval('require("fs")') as __noconvert__ FS;
 		node.path = eval('require("path")') as __noconvert__ Path;
@@ -185,351 +187,6 @@ class NodePlatform extends Platform {
 		}
 	}
 }
-
-class _JSX {
-
-	static var _meta = null : variant;
-
-	static function meta (name : string) : string {
-		if (_JSX._meta == null) {
-			var j = node.fs.readFileSync( node.__dirname + "/../package.json" );
-			_JSX._meta = JSON.parse(j);
-		}
-		return _JSX._meta[name] as string;
-	}
-
-	static function help() : string {
-		return (
-			"JSX compiler version " + _JSX.meta("version") + "\n" +
-			"\n" +
-			"Usage: jsx [options] source-files\n" +
-			"\n" +
-			"Options:\n" +
-			"  --add-search-path path     add a path to library search paths\n" +
-			"  --executable (node|web)    add launcher to call _Main.main(:string[]):void\n" +
-			"  --run                      runs _Main.main(:string[]):void after compiling\n" +
-			"  --test                     runs _Test#test*():void after compiling\n" +
-			"  --output file              output file (default:stdout)\n" +
-			"  --input-filename file      names input filename\n" +
-			"  --mode (compile|parse|doc) compilation mode (default:compile)\n" +
-			"  --target (javascript|c++)  target language (default:javascript)\n" +
-			"  --release                  omits the debugging features from the generated code (run-time type checking, logging, assertion)\n" +
-			"  --profile                  enables the profiler (experimental)\n" +
-			"  --optimize cmd1,cmd2,...   list of optimize commands (no-assert, no-log, inline, return-if)\n" +
-			"  --warn type1,type2,...     list types of warnings (all, deprecated, none)\n" +
-			"  --enable-type-check        enables run-time type checking\n" +
-			"  --enable-source-map        enables source map debugging info\n" +
-			"  --version                  displays the version and exits\n" +
-			"  --help                     displays this help and exits\n" +
-			"");
-	}
-
-	static function main (platform : Platform, args : string[]) : number {
-		var argIndex = 0;
-		var getopt = function () : Nullable.<string> {
-			if (args.length <= argIndex)
-				return null;
-			var arg = args[argIndex++];
-			if (arg == "--")
-				return null;
-			if (arg.match(/^-/))
-				return arg;
-			else {
-				--argIndex;
-				return null;
-			}
-		};
-		var getoptarg = function () : Nullable.<string> {
-			if (args.length <= argIndex) {
-				platform.error("option " + args[argIndex - 1] + " requires a value");
-				return null;
-			}
-			return args[argIndex++];
-		};
-
-		var compiler = new Compiler(platform);
-
-		var tasks = new Array.<() -> void>;
-
-		var optimizer = null : Optimizer;
-		var completionRequest = null : CompletionRequest;
-		var emitter = null : Emitter;
-		var outputFile = null : Nullable.<string>;
-		var inputFilename = null : Nullable.<string>;
-		var executable = null : Nullable.<string>;
-		var run = null : Nullable.<string>;
-		var runImmediately = false;
-		var optimizeCommands = new string[];
-		var opt, optarg;
-		while ((opt = getopt()) != null) {
-		NEXTOPT:
-			switch (opt) {
-			case "--add-search-path":
-				if((optarg= getoptarg()) == null) {
-					return 1;
-				}
-				compiler.addSearchPath(optarg);
-				break;
-			case "--output":
-				if((outputFile = getoptarg()) == null) {
-					return 1;
-				}
-				break;
-			case "--input-filename":
-				if((inputFilename = getoptarg()) == null) {
-					return 1;
-				}
-				break;
-			case "--mode":
-				if ((optarg = getoptarg()) == null) {
-					return 1;
-				}
-				switch (optarg) {
-				case "compile":
-					compiler.setMode(Compiler.MODE_COMPILE);
-					break;
-				case "parse":
-					compiler.setMode(Compiler.MODE_PARSE);
-					break;
-				case "doc":
-					compiler.setMode(Compiler.MODE_DOC);
-					break;
-				default:
-					platform.error("unknown mode: " + optarg);
-					return 1;
-				}
-				break;
-			case "--complete":
-				if ((optarg = getoptarg()) == null) {
-					return 1;
-				}
-				completionRequest = function () : CompletionRequest {
-					var a = optarg.split(/:/);
-					return new CompletionRequest((a[0] as number), (a[1] as number) - 1);
-				}();
-				compiler.setMode(Compiler.MODE_COMPLETE);
-				break;
-			case "--target":
-				if ((optarg = getoptarg()) == null) {
-					return 1;
-				}
-				switch (optarg) {
-				case "javascript":
-					emitter = new JavaScriptEmitter(platform);
-					break;
-				case "c++":
-					throw new Error("FIXME");
-				default:
-					platform.error("unknown target: " + optarg);
-					return 1;
-				}
-				break;
-			case "--release":
-				tasks.push(function () : void {
-					emitter.setEnableRunTimeTypeCheck(false);
-					optimizer.setEnableRunTimeTypeCheck(false);
-				});
-				optimizeCommands = [ "lto", "no-assert", "no-log", "fold-const", "return-if", "inline", "dce", "unbox", "fold-const", "lcse", "dce", "fold-const", "array-length", "unclassify" ];
-				break;
-			case "--optimize":
-				if ((optarg = getoptarg()) == null) {
-					return 1;
-				}
-				optimizeCommands = optarg.split(",");
-				break;
-			case "--warn":
-				if ((optarg = getoptarg()) == null) {
-					return 1;
-				}
-				optarg.split(",").forEach(function (type) {
-					switch (type) {
-					case "none":
-						compiler.getWarningFilters().unshift(function (warning : CompileWarning) : Nullable.<boolean> {
-							return false;
-						});
-						break;
-					case "all":
-						compiler.getWarningFilters().unshift(function (warning : CompileWarning) : Nullable.<boolean> {
-							return true;
-						});
-						break;
-					case "deprecated":
-						compiler.getWarningFilters().unshift(function (warning : CompileWarning) : Nullable.<boolean> {
-							if (warning instanceof DeprecatedWarning) {
-								return true;
-							}
-							return null;
-						});
-						break;
-					default:
-						platform.error("unknown warning type: " + type);
-					}
-				});
-				break;
-			case "--executable":
-				if ((optarg = getoptarg()) == null) {
-					return 1;
-				}
-				switch (optarg) {
-				case "web": // JavaScriptEmitter
-					break;
-				case "node": // implies JavaScriptEmitter
-					tasks.push(function () : void {
-						var shebang =  "#!" + process.execPath + "\n";
-						emitter.addHeader(shebang);
-					});
-					break;
-				default:
-					platform.error("unknown executable type (node|web)");
-					return 1;
-				}
-				executable = optarg;
-				run = "_Main";
-				break;
-			case "--run":
-				run = "_Main";
-				executable = "node";
-				runImmediately = true;
-				break;
-			case "--test":
-				run = "_Test";
-				executable = "node";
-				runImmediately = true;
-				break;
-			case "--profile":
-				tasks.push(function () : void {
-					emitter.setEnableProfiler(true);
-				});
-				break;
-			case "--version":
-				platform.log(_JSX.meta("version"));
-				return 0;
-			case "--help":
-				platform.log(_JSX.help());
-				return 0;
-			default:
-				var switchOpt = opt.match(new RegExp("^--(enable|disable)-(.*)$"));
-				if (switchOpt != null) {
-					var mode = switchOpt[1] == "enable";
-					switch (switchOpt[2]) {
-					case "type-check":
-						tasks.push(function (mode : boolean) : () -> void {
-							return function () {
-								emitter.setEnableRunTimeTypeCheck(mode);
-								optimizer.setEnableRunTimeTypeCheck(mode);
-							};
-						}(mode));
-						break NEXTOPT;
-					case "source-map":
-						tasks.push(function (mode : boolean) : () -> void {
-							return function () {
-								emitter.setEnableSourceMap(mode);
-							};
-						}(mode));
-						break NEXTOPT;
-					default:
-						break;
-					}
-				}
-				platform.error("unknown option: " + opt);
-				return 1;
-			}
-		}
-
-		if (argIndex == args.length) {
-			platform.error("no files");
-			return 1;
-		}
-
-		var sourceFile = args[argIndex++];
-		if (inputFilename != null) {
-			platform.setFileContent(inputFilename, platform.load(sourceFile));
-			sourceFile = inputFilename;
-		}
-		compiler.addSourceFile(null, sourceFile, completionRequest);
-
-		switch (compiler.getMode()) {
-		case Compiler.MODE_PARSE:
-			if (compiler.compile()) {
-				platform.save(outputFile, compiler.getAST() as string);
-				return 0;
-			} else {
-				return 1;
-			}
-		}
-
-		if (emitter == null)
-			emitter = new JavaScriptEmitter(platform);
-		compiler.setEmitter(emitter);
-
-		switch (compiler.getMode()) {
-		case Compiler.MODE_DOC:
-			if (outputFile == null) {
-				platform.error("--output is mandatory for --mode doc");
-				return 1;
-			}
-			if (compiler.compile()) {
-				new DocumentGenerator(compiler)
-					.setOutputPath(outputFile)
-					.setPathFilter(function (sourcePath) {
-						return ! (sourcePath.match(/^(?:system:|\/)/) || sourcePath.match(/\/..\//));
-					})
-					.setTemplatePath(platform.getRoot() + "/src/doc/template.html")
-					.buildDoc();
-				return 0;
-			} else {
-				return 1;
-			}
-		}
-
-		optimizer = new Optimizer();
-		var err = optimizer.setup(optimizeCommands);
-		if (err != null) {
-			platform.error(err);
-			return 0;
-		}
-
-		tasks.forEach(function(proc) { proc(); });
-
-		emitter.setOutputFile(outputFile);
-
-		compiler.setOptimizer(optimizer);
-
-		var result = compiler.compile();
-
-		if (completionRequest != null) {
-			platform.save(null, JSON.stringify(completionRequest.getCandidates()));
-			return 0;
-		}
-
-		if (! result)
-			return 1;
-
-		var output = emitter.getOutput(sourceFile, run, executable);
-
-		if (emitter instanceof JavaScriptEmitter) {
-			if (! runImmediately) { // compile and save
-
-				platform.save(outputFile, output);
-				if (outputFile != null) {
-					emitter.saveSourceMappingFile(platform);
-
-					platform.makeFileExecutable(outputFile, "node");
-				}
-
-			}
-			else { // compile and run immediately
-				platform.execute(sourceFile, output, args.slice(argIndex));
-			}
-		}
-		else {
-			throw new Error("FIXME: C++ emitter");
-		}
-		return 0;
-	}
-
-}
-
 class _Main {
 
 	static function getEnvOpts () : string[] {
@@ -540,7 +197,7 @@ class _Main {
 	}
 
 	static function main (args : string[]) : void {
-		var exitCode = _JSX.main(new NodePlatform(), _Main.getEnvOpts().concat(process.argv.slice(2)));
+		var exitCode = JSXCommand.main(new NodePlatform(), _Main.getEnvOpts().concat(args));
 
 		// NOTE:
 		// nodejs 0.8.0 on Windows doesn't flush stdout buffer before exitting.
