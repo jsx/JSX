@@ -578,5 +578,4 @@ class _Main {
 
 }
 
-// vim: set ft=javascript:
 // vim: set noexpandtab:
