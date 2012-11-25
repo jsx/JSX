@@ -29,14 +29,12 @@ import "../src/optimizer.jsx";
 import "../src/util.jsx";
 import "../src/emitter.jsx";
 
-import "console.jsx";
 import "js.jsx";
 import "js/nodejs.jsx";
 
 class NodePlatform extends Platform {
 
 	var _root : string;
-	var _virtualFile : variant;
 
 	function constructor () {
 		var eval = js.global['eval'] as (string) -> variant;
@@ -47,7 +45,6 @@ class NodePlatform extends Platform {
 
 		var root = node.path.dirname(node.__dirname);
 		this._root = root.replace(/\\/g, "/");
-		this._virtualFile = new Object;
 	}
 
 	override function getRoot () : string {
@@ -56,7 +53,7 @@ class NodePlatform extends Platform {
 
 	override function fileExists (name : string) : boolean {
 		name = node.path.normalize(name);
-		if (this._virtualFile[name] != null) {
+		if (this.virtualFile.hasOwnProperty(name)) {
 			return true;
 		}
 		try {
@@ -72,14 +69,10 @@ class NodePlatform extends Platform {
 		return node.fs.readdirSync(path);
 	}
 
-	function setFileContent (name : string, content : string) : void {
-		this._virtualFile[name] = content;
-	}
-
 	override function load (name : string) : string {
 		name = node.path.normalize(name);
-		if (this._virtualFile[name] != null) {
-			return this._virtualFile[name] as string;
+		if (this.virtualFile.hasOwnProperty(name)) {
+			return this.virtualFile[name];
 		}
 		else if (name == "-") {
 			var fd = process.stdin.fd;
@@ -156,21 +149,13 @@ class NodePlatform extends Platform {
 		return wrapper.replace(/\/\/--CODE--\/\//, code);
 	}
 
-}
-
-class _JSX {
-
-	static var _meta = null : variant;
-
-	static function meta (name : string) : variant {
-		if (_JSX._meta == null) {
-			var j = node.fs.readFileSync( node.__dirname + "/../package.json" );
-			_JSX._meta = JSON.parse(j);
+	override function makeFileExecutable(file : string, runEnv : string) : void {
+		if (runEnv == "node") {
+			node.fs.chmodSync(file, "0755");
 		}
-		return _JSX._meta[name];
 	}
 
-	static function execNodeJS (scriptFile : string, script : string, args : string[]) : void {
+	override function execute(scriptFile : Nullable.<string>, jsSource : string, args : string[]) : void {
 		var tmpdir = (process.env["TMPDIR"] ?: process.env["TMP"]) ?: "/tmp";
 		var jsFile = Util.format("%1/%2.%3.%4.js", [
 			tmpdir,
@@ -178,7 +163,7 @@ class _JSX {
 			process.pid.toString(),
 			Date.now().toString(16)
 		]);
-		node.fs.writeFileSync(jsFile, script);
+		node.fs.writeFileSync(jsFile, jsSource);
 		process.on("exit", function(stream) {
 			node.fs.unlinkSync(jsFile);
 		});
@@ -199,10 +184,23 @@ class _JSX {
 			eval('require("'+jsFile+'")'); // evaluate it in this process
 		}
 	}
+}
 
-	static function printHelp () : void {
-		console.log(
-			"JSX compiler version " + _JSX.meta("version") as string + "\n" +
+class _JSX {
+
+	static var _meta = null : variant;
+
+	static function meta (name : string) : string {
+		if (_JSX._meta == null) {
+			var j = node.fs.readFileSync( node.__dirname + "/../package.json" );
+			_JSX._meta = JSON.parse(j);
+		}
+		return _JSX._meta[name] as string;
+	}
+
+	static function help() : string {
+		return (
+			"JSX compiler version " + _JSX.meta("version") + "\n" +
 			"\n" +
 			"Usage: jsx [options] source-files\n" +
 			"\n" +
@@ -226,10 +224,7 @@ class _JSX {
 			"");
 	}
 
-	static function main (args : string[]) : number {
-
-		var platform = new NodePlatform();
-
+	static function main (platform : Platform, args : string[]) : number {
 		var argIndex = 0;
 		var getopt = function () : Nullable.<string> {
 			if (args.length <= argIndex)
@@ -246,7 +241,7 @@ class _JSX {
 		};
 		var getoptarg = function () : Nullable.<string> {
 			if (args.length <= argIndex) {
-				console.error("option " + args[argIndex - 1] + " requires a value");
+				platform.error("option " + args[argIndex - 1] + " requires a value");
 				return null;
 			}
 			return args[argIndex++];
@@ -300,7 +295,7 @@ class _JSX {
 					compiler.setMode(Compiler.MODE_DOC);
 					break;
 				default:
-					console.error("unknown mode: " + optarg);
+					platform.error("unknown mode: " + optarg);
 					return 1;
 				}
 				break;
@@ -325,7 +320,7 @@ class _JSX {
 				case "c++":
 					throw new Error("FIXME");
 				default:
-					console.error("unknown target: " + optarg);
+					platform.error("unknown target: " + optarg);
 					return 1;
 				}
 				break;
@@ -367,7 +362,7 @@ class _JSX {
 						});
 						break;
 					default:
-						console.error("unknown warning type: " + type);
+						platform.error("unknown warning type: " + type);
 					}
 				});
 				break;
@@ -385,7 +380,7 @@ class _JSX {
 					});
 					break;
 				default:
-					console.error("unknown executable type (node|web)");
+					platform.error("unknown executable type (node|web)");
 					return 1;
 				}
 				executable = optarg;
@@ -407,10 +402,10 @@ class _JSX {
 				});
 				break;
 			case "--version":
-				console.log(_JSX.meta("version"));
+				platform.log(_JSX.meta("version"));
 				return 0;
 			case "--help":
-				_JSX.printHelp();
+				platform.log(_JSX.help());
 				return 0;
 			default:
 				var switchOpt = opt.match(new RegExp("^--(enable|disable)-(.*)$"));
@@ -436,13 +431,13 @@ class _JSX {
 						break;
 					}
 				}
-				console.error("unknown option: " + opt);
+				platform.error("unknown option: " + opt);
 				return 1;
 			}
 		}
 
 		if (argIndex == args.length) {
-			console.error("no files");
+			platform.error("no files");
 			return 1;
 		}
 
@@ -470,7 +465,7 @@ class _JSX {
 		switch (compiler.getMode()) {
 		case Compiler.MODE_DOC:
 			if (outputFile == null) {
-				console.error("--output is mandatory for --mode doc");
+				platform.error("--output is mandatory for --mode doc");
 				return 1;
 			}
 			if (compiler.compile()) {
@@ -490,7 +485,7 @@ class _JSX {
 		optimizer = new Optimizer();
 		var err = optimizer.setup(optimizeCommands);
 		if (err != null) {
-			console.error(err);
+			platform.error(err);
 			return 0;
 		}
 
@@ -503,7 +498,7 @@ class _JSX {
 		var result = compiler.compile();
 
 		if (completionRequest != null) {
-			console.log(JSON.stringify(completionRequest.getCandidates()));
+			platform.save(null, JSON.stringify(completionRequest.getCandidates()));
 			return 0;
 		}
 
@@ -519,14 +514,12 @@ class _JSX {
 				if (outputFile != null) {
 					emitter.saveSourceMappingFile(platform);
 
-					if (executable == "node") {
-						node.fs.chmodSync(outputFile, "0755");
-					}
+					platform.makeFileExecutable(outputFile, "node");
 				}
 
 			}
 			else { // compile and run immediately
-				_JSX.execNodeJS(sourceFile, output, args.slice(argIndex));
+				platform.execute(sourceFile, output, args.slice(argIndex));
 			}
 		}
 		else {
@@ -547,7 +540,7 @@ class _Main {
 	}
 
 	static function main (args : string[]) : void {
-		var exitCode = _JSX.main(_Main.getEnvOpts().concat(process.argv.slice(2)));
+		var exitCode = _JSX.main(new NodePlatform(), _Main.getEnvOpts().concat(process.argv.slice(2)));
 
 		// NOTE:
 		// nodejs 0.8.0 on Windows doesn't flush stdout buffer before exitting.

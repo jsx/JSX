@@ -1,16 +1,16 @@
 /*
  * Copyright (c) 2012 DeNA Co., Ltd.
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to
  * deal in the Software without restriction, including without limitation the
  * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
  * sell copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -24,9 +24,14 @@ import "console.jsx";
 import "./emitter.jsx";
 
 abstract class Platform {
+	var virtualFile = new Map.<string>();
 
 	// returns root directory of JSX
 	abstract function getRoot() : string;
+
+	function setFileContent (name : string, content : string) : void {
+		this.virtualFile[name] = content;
+	}
 
 	abstract function fileExists(path : string) : boolean;
 
@@ -38,6 +43,10 @@ abstract class Platform {
 	// e.g. node.js reads it from files
 	//      browsers read it from DOM
 	abstract function load (name : string) : string;
+
+	abstract function makeFileExecutable(file : string, runEnv : string) : void;
+
+	abstract function execute(sourceFileName : Nullable.<string>, jsSource : string, argv : string[]) : void;
 
 	function log (s : string) : void {
 		console.log(s);
