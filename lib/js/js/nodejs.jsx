@@ -1,16 +1,19 @@
 import "js.jsx";
 
-// native class console {
-// 	static function log(value : variant) : void;
-// 	static function info(value : variant) : void;
-// 	static function warn(value : variant) : void;
-// 	static function error(value : variant) : void;
-// 	static function dir(value : variant) : void;
-// 	static function time(label : string) : void;
-// 	static function timeEnd(label : string) : void;
-// 	static function trace() : void;
-// 	//static function assert(value : variant) : void;
-// }
+final class node {
+	delete function constructor () { }
+
+	static function _eval(source : string) : variant {
+		var eval = js.global['eval'] as (string) -> variant; // the name must be "eval"
+		return eval(source);
+	}
+
+
+	static var fs            = node._eval('require("fs")') as __noconvert__ _fs;
+	static var path          = node._eval('require("path")') as __noconvert__ _path;
+	static var child_process = node._eval('require("child_process")') as __noconvert__ _child_process;
+	static var __dirname     = node._eval("__dirname") as string;
+}
 
 native class process {
 	static var argv : string[];
@@ -81,7 +84,7 @@ native class Buffer {
 native __fake__ class Stats {
 }
 
-native __fake__ class FS {
+native __fake__ class _fs {
 	function statSync(path : string) : Stats;
 
 	function mkdir(path : string) : void;
@@ -100,7 +103,7 @@ native __fake__ class FS {
 	function writeFileSync(filename : string, data : string) : void;
 }
 
-native __fake__ class Path {
+native __fake__ class _path {
 	function normalize(p : string) : string;
 	function dirname(p : string) : string;
 	function basename(p : string) : string;
@@ -112,24 +115,8 @@ native class ChildProcess {
 	__readonly__ var stderr : Stream;
 }
 
-native __fake__ class child_process {
+native __fake__ class _child_process {
 	function spawn(command : string, args : string[]) : ChildProcess;
 	function execFile(file : string, args : string[], options : variant, callback : (Error, Buffer, Buffer) -> void) : ChildProcess;
 }
 
-final class node {
-	delete function constructor () { }
-
-	static var fs : FS;
-	static var path : Path;
-	static var child_process : child_process;
-	static var __dirname : string;
-}
-
-class _Main {
-	static function main(args : string[]) : void {
-		var eval = js.global['eval'] as (string) -> variant;
-		node.fs = eval('require("fs")') as __noconvert__ FS;
-		log node.fs.readFileSync('hoge.js');
-	}
-}

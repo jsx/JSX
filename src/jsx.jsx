@@ -38,13 +38,6 @@ class NodePlatform extends Platform {
 	var _root : string;
 
 	function constructor () {
-		// the name of eval must be "eval".
-		var eval = js.global['eval'] as (string) -> variant;
-		node.fs = eval('require("fs")') as __noconvert__ FS;
-		node.path = eval('require("path")') as __noconvert__ Path;
-		node.child_process = eval('require("child_process")') as __noconvert__ child_process;
-		node.__dirname = eval("__dirname") as string;
-
 		var root = node.path.dirname(node.__dirname);
 		this._root = root.replace(/\\/g, "/");
 	}
