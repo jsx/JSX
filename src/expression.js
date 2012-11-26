@@ -851,8 +851,11 @@ var InstanceofExpression = exports.InstanceofExpression = UnaryExpression.extend
 	analyze: function (context, parentExpr) {
 		if (! this._analyze(context))
 			return false;
-		if (! (this._expr.getType() instanceof ObjectType)) {
-			context.errors.push(new CompileError(this._token, "operator 'instanceof' is only applicable to an object"));
+		var exprType = this._expr.getType();
+		if (exprType instanceof ObjectType) {
+		} else if (exprType.equals(Type.variantType)) {
+		} else {
+			context.errors.push(new CompileError(this._token, "operator 'instanceof' is only applicable to an object or a variant"));
 			return false;
 		}
 		return true;

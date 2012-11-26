@@ -1116,7 +1116,18 @@ var _InstanceofExpressionEmitter = exports._InstanceofExpressionEmitter = _Expre
 
 	emit: function (outerOpPrecedence) {
 		var expectedType = this._expr.getExpectedType();
-		if ((expectedType.getClassDef().flags() & (ClassDefinition.IS_INTERFACE | ClassDefinition.IS_MIXIN)) == 0) {
+		if (expectedType.getClassDef() instanceof InstantiatedClassDefinition && expectedType.getClassDef().getTemplateClassName() == "Array") {
+			this.emitWithPrecedence(outerOpPrecedence, _InstanceofExpressionEmitter._operatorPrecedence, (function () {
+				this._emitter._getExpressionEmitterFor(this._expr.getExpr()).emit(_InstanceofExpressionEmitter._operatorPrecedence);
+				this._emitter._emit(" instanceof Array", this._expr.getToken());
+			}).bind(this));
+		} else if (expectedType.getClassDef() instanceof InstantiatedClassDefinition && expectedType.getClassDef().getTemplateClassName() == "Map") {
+			this.emitWithPrecedence(outerOpPrecedence, _InstanceofExpressionEmitter._operatorPrecedence, (function () {
+				this._emitter._emit("(typeof(", this._expr.getToken());
+				this._emitter._getExpressionEmitterFor(this._expr.getExpr()).emit(_InstanceofExpressionEmitter._operatorPrecedence);
+				this._emitter._emit(") === \"object\")", this._expr.getToken());
+			}).bind(this));
+		} else if ((expectedType.getClassDef().flags() & (ClassDefinition.IS_INTERFACE | ClassDefinition.IS_MIXIN)) == 0) {
 			this.emitWithPrecedence(outerOpPrecedence, _InstanceofExpressionEmitter._operatorPrecedence, (function () {
 				this._emitter._getExpressionEmitterFor(this._expr.getExpr()).emit(_InstanceofExpressionEmitter._operatorPrecedence);
 				this._emitter._emit(" instanceof " + _Util.getInstanceofNameFromClassDef(expectedType.getClassDef()), null);
