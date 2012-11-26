@@ -806,29 +806,9 @@ var _AsExpressionEmitter = exports._AsExpressionEmitter = _ExpressionEmitter.ext
 				this._emitter._getExpressionEmitterFor(this._expr.getExpr()).emit(outerOpPrecedence);
 				return true;
 			}
-			if (destType instanceof ObjectType) {
+			if (destType instanceof ObjectType || destType instanceof FunctionType) {
 				// unsafe cast
-				if ((destType.getClassDef().flags() & (ClassDefinition.IS_INTERFACE | ClassDefinition.IS_MIXIN)) == 0) {
-					this.emitWithPrecedence(outerOpPrecedence, _CallExpressionEmitter._operatorPrecedence, (function () {
-						this._emitter._emit("(function (o) { return o instanceof " + _Util.getInstanceofNameFromClassDef(destType.getClassDef()) + " ? o : null; })(", this._expr.getToken());
-						this._emitter._getExpressionEmitterFor(this._expr.getExpr()).emit(0);
-						this._emitter._emit(")", this._expr.getToken());
-					}).bind(this));
-				} else {
-					this.emitWithPrecedence(outerOpPrecedence, _CallExpressionEmitter._operatorPrecedence, (function () {
-						this._emitter._emit("(function (o) { return o && o.$__jsx_implements_" + destType.getClassDef().getOutputClassName() + " ? o : null; })(", this._expr.getToken());
-						this._emitter._getExpressionEmitterFor(this._expr.getExpr()).emit(0);
-						this._emitter._emit(")", this._expr.getToken());
-					}).bind(this));
-				}
-				return true;
-			}
-			if (destType instanceof FunctionType) {
-				// cast to function
-				this._emitter._emit("(function (o) { return typeof(o) === \"function\" ? o : null; })(", this._expr.getToken());
-				this._emitter._getExpressionEmitterFor(this._expr.getExpr()).emit(0);
-				this._emitter._emit(")", this._expr.getToken());
-				return true;
+				return _AsNoConvertExpressionEmitter.prototype.emit.call(this, outerOpPrecedence);
 			}
 		}
 		if (srcType.resolveIfNullable().equals(Type.booleanType)) {
@@ -1030,13 +1010,25 @@ var _AsNoConvertExpressionEmitter = exports._AsNoConvertExpressionEmitter = _Exp
 					}.bind(this), "detected invalid cast, value is not an Array or null");
 					return;
 				} else if (destClassDef instanceof InstantiatedClassDefinition && destClassDef.getTemplateClassName() == "Map") {
+					if (srcType.equals(Type.variantType)) {
+						// variant which is "typeof function" may be converted to a Map.<variant>
+						emitWithAssertion(function () {
+							this._emitter._emit("v == null || typeof v === \"object\" || typeof v === \"function\"", this._expr.getToken());
+						}.bind(this), "detected invalid cast, value is not a Map, function or null");
+					} else {
+						emitWithAssertion(function () {
+							this._emitter._emit("v == null || typeof v === \"object\"", this._expr.getToken());
+						}.bind(this), "detected invalid cast, value is not a Map or null");
+					}
+					return;
+				} else if ((destClassDef.flags() & (ClassDefinition.IS_INTERFACE | ClassDefinition.IS_MIXIN)) == 0) {
 					emitWithAssertion(function () {
-						this._emitter._emit("v == null || typeof v === \"object\"", this._expr.getToken());
-					}.bind(this), "detected invalid cast, value is not a Map or null");
+						this._emitter._emit("v == null || v instanceof " + destClassDef.getOutputClassName(), this._expr.getToken());
+					}.bind(this), "detected invalid cast, value is not an instance of the designated type or null");
 					return;
 				} else {
 					emitWithAssertion(function () {
-						this._emitter._emit("v == null || v instanceof " + destClassDef.getOutputClassName(), this._expr.getToken());
+						this._emitter._emit("v == null || v.$__jsx_implements_" + destClassDef.getOutputClassName(), this._expr.getToken());
 					}.bind(this), "detected invalid cast, value is not an instance of the designated type or null");
 					return;
 				}
