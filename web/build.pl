@@ -61,7 +61,7 @@ my $dest_build   = "$dest_root/build";
 
     process_page("$root/index.html", "$dest_root/index.html");
 
-    # process_jsx($dest_src, "$dest_build/jsx-compiler.js");
+    process_jsx($dest_src, "$dest_build/jsx-compiler.js");
 
     process_source_map("$root/source-map", "$dest_root/source-map");
 
@@ -127,18 +127,11 @@ sub process_jsx {
     copy_r("$project_root/src", $dest_src);
     copy_r("$root/src", $dest_src);
 
-    my $browserbuild = "$project_root/node_modules/browserbuild/bin/browserbuild";
-
-    my @files = glob("$src/*.js");
-	@files = grep { !m{ \Q/_doc.js\E $}xms } @files;
-    my $basepath = shell_quote($src . "/");
-    my $cmd = "node $browserbuild --main interface --global jsx --basepath $basepath "
-        . join(' ', map { shell_quote($_) } @files)
+    my $cmd = "$project_root/bin/jsx --executable web $root/src/jsx-web-compiler.jsx"
         . " > "
         . shell_quote($dest);
 
     system($cmd) == 0 or die "Failed to build jsx-compiler.js: $cmd\n";
-	system("$root/check-jsx-compiler.js") == 0 or die "Failed to build jsx-compiler.js";
 }
 
 sub process_tree {
