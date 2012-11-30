@@ -20,16 +20,20 @@
  * IN THE SOFTWARE.
  */
 
-"use strict";
+import "js/web.jsx";
+import "./script-loader.jsx";
 
-exports.Class             = require("./Class");
-exports.Compiler          = require("./compiler").Compiler;
-exports.JavaScriptEmitter = require("./jsemitter").JavaScriptEmitter;
-exports.Optimizer         = require("./optimizer").Optimizer;
-exports.CompletionRequest = require("./completion").CompletionRequest;
+class _Main {
+	static function main(args : string[]) : void {
+		dom.window.addEventListener("load", function(e) {
+			var root = "..";
+			try {
+				var matched = dom.window.location.pathname.match(/\/try(?:-on-web)?\/(.*)\/[^\/]*$/);
+				root = matched[1].replace(/[^\/]+/g, "..");
 
-exports.BrowserPlatform   = require("./browser-platform").BrowserPlatform;
-exports.ScriptLoader      = require("./script-loader").ScriptLoader;
+			} catch (err : Error) { }
 
-exports.optimizationLevel = 0;
-
+			ScriptLoader.load(root);
+		});
+	}
+}
