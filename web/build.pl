@@ -59,7 +59,7 @@ my $dest_build   = "$dest_root/build";
 
     process_page("$root/index.html", "$dest_root/index.html");
 
-    process_jsx($dest_src, "$dest_build/jsx-compiler.js");
+    # process_jsx($dest_src, "$dest_build/jsx-compiler.js");
 
     process_source_map("$root/source-map", "$dest_root/source-map");
 
