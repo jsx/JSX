@@ -51,6 +51,8 @@ my $dest_build   = "$dest_root/build";
 
     mkpath($_) for $dest_src, $dest_build;
 
+    process_webfront();
+
     copy_r("$root/assets",  "$dest_root/assets");
     copy_r("$root/example", "$dest_root/example");
 
@@ -109,6 +111,12 @@ sub process_page {
     open my($fh), '>', $dest;
     print $fh $content;
     close $fh;
+}
+
+sub process_webfront {
+    my $cmd = "$project_root/bin/jsx --executable web --output $root/assets/js/jsx-web-front.js "
+	. "$root/assets/js/jsx-web-front.jsx";
+    system($cmd) == 0 or die "Failed to build jsx-web-front.js: $cmd\n";
 }
 
 sub process_jsx {
