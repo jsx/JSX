@@ -91,7 +91,7 @@ class _Main {
 
 			var list   = element('source-list');
 
-			var input  = element('input') as HTMLInputElement;
+			var input  = element('input') as HTMLTextAreaElement;
 
 			var editor = CodeMirror.fromTextArea(input, {
 				mode: "application/jsx",
@@ -196,7 +196,7 @@ class _Main {
 				}
 			}
 
-			function saveInput(input : HTMLInputElement) : void {
+			function saveInput(input : HTMLTextAreaElement) : void {
 				var session = {
 					inputPath:         input.dataset["path"],
 					source:            editor.getValue(),
@@ -206,7 +206,7 @@ class _Main {
 				sessionStorage.setItem("jsx.session", JSON.stringify(session));
 			}
 
-			function retrieveInput(input : HTMLInputElement) : void {
+			function retrieveInput(input : HTMLTextAreaElement) : void {
 				var serializedSession = sessionStorage.getItem("jsx.session");
 				if(serializedSession) {
 					var session = JSON.parse(serializedSession);
@@ -241,7 +241,7 @@ class _Main {
 				var li = elem as HTMLLIElement;
 				if(li.className != "source-file") return;
 
-				var a = li.children[0] as HTMLLinkElement;
+				var a = li.children[0] as HTMLAnchorElement;
 				a.addEventListener('click', function(event) {
 					console.log('changing');
 					event.preventDefault();
