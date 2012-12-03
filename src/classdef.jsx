@@ -84,7 +84,6 @@ class AnalysisContext {
 	var postInstantiationCallback : function(:Parser,:ClassDefinition):ClassDefinition;
 	var funcDef : MemberFunctionDefinition;
 	var blockStack : BlockContext[];
-	var statement : Statement;
 
 	function constructor (errors : CompileError[], parser : Parser, postInstantiationCallback : function(:Parser,:ClassDefinition):ClassDefinition) {
 		this.errors = errors;
@@ -110,7 +109,6 @@ class AnalysisContext {
 			}
 		*/
 		this.blockStack = null;
-		this.statement = null;
 	}
 
 	function clone () : Object {

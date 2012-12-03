@@ -73,16 +73,8 @@ abstract class Statement implements Stashable {
 	abstract function doAnalyze(context : AnalysisContext) : boolean; // returns whether or not to continue analysing the following statements
 
 	function _analyzeExpr (context : AnalysisContext, expr : Expression) : boolean {
-		if (context.statement != null)
-			throw new Error("logic flaw");
-		context.statement = this;
-		var result = false;
-		try {
-			result = expr.analyze(context);
-		} finally {
-			context.statement = null;
-		}
-		return result;
+		// TODO: obsolete method
+		return expr.analyze(context);
 	}
 
 	override function getOptimizerStash () : Map.<OptimizerStash> {
