@@ -78,7 +78,7 @@ abstract class Statement implements Stashable {
 		context.statement = this;
 		var result = false;
 		try {
-			result = expr.analyze(context, null);
+			result = expr.analyze(context);
 		} finally {
 			context.statement = null;
 		}
@@ -169,7 +169,7 @@ class ConstructorInvocationStatement extends Statement {
 		} else {
 			// analyze args
 			var argTypes = Util.analyzeArgs(
-				context, this._args, null,
+				context, this._args,
 				ctorType.getExpectedCallbackTypes(this._args.length, false));
 			if (argTypes == null) {
 				// error is reported by callee
@@ -666,6 +666,8 @@ class ForInStatement extends ContinuableStatement {
 		super(token, label, statements);
 		this._lhsExpr = lhsExpr;
 		this._listExpr = listExpr;
+		if (this._lhsExpr instanceof LocalExpression)
+			(this._lhsExpr as LocalExpression).setLHS(true);
 	}
 
 	override function clone () : Statement {

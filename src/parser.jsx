@@ -2389,10 +2389,10 @@ class Parser {
 		if ((assignToken = this._expectOpt("=")) != null)
 			if ((initialValue = this._assignExpr(noIn)) == null)
 				return null;
-		var expr : Expression = new LocalExpression(identifier, local);
 		if (initialValue != null)
-			expr = new AssignmentExpression(assignToken, expr, initialValue);
-		return expr;
+			return new AssignmentExpression(assignToken, new LocalExpression(identifier, local, true), initialValue);
+		else
+			return new LocalExpression(identifier, local, false);
 	}
 
 	function _expr () : Expression {
@@ -2827,7 +2827,7 @@ class Parser {
 		var funcExpr = new FunctionExpression(token, funcDef);
 		if (name != null) {
 			// conversion from function statement to assignment expression
-			var localExpr = new LocalExpression(name, local);
+			var localExpr = new LocalExpression(name, local, true);
 			return new AssignmentExpression(new Token("=", true, token._filename, token._lineNumber, token._columnNumber), localExpr, funcExpr);
 		} else {
 			return funcExpr;
@@ -2902,7 +2902,7 @@ class Parser {
 		} else if ((token = this._expectIdentifierOpt(function (self) { return self._getCompletionCandidatesWithLocal(); })) != null) {
 			var local = this._findLocal(token.getValue());
 			if (local != null) {
-				return new LocalExpression(token, local);
+				return new LocalExpression(token, local, false);
 			} else {
 				var parsedType = this._objectTypeDeclaration(token, null);
 				if (parsedType == null)

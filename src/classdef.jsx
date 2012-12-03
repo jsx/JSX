@@ -928,7 +928,7 @@ class MemberVariableDefinition extends MemberDefinition {
 			try {
 				this._analyzeState = MemberVariableDefinition.IS_ANALYZING;
 				if (this._initialValue != null) {
-					if (! this._initialValue.analyze(this._analysisContext, null))
+					if (! this._initialValue.analyze(this._analysisContext))
 						return null;
 					var ivType = this._initialValue.getType();
 					if (this._type == null) {

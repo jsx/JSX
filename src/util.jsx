@@ -85,7 +85,7 @@ class Util {
 		});
 	}
 
-	static function analyzeArgs (context : AnalysisContext, args : Expression[], parentExpr : Expression, expectedCallbackTypes : Type[][]) : Type[] {
+	static function analyzeArgs (context : AnalysisContext, args : Expression[], expectedCallbackTypes : Type[][]) : Type[] {
 		var argTypes = [] : Type[];
 		for (var i = 0; i < args.length; ++i) {
 			if (args[i] instanceof FunctionExpression && ! (args[i] as FunctionExpression).typesAreIdentified()) {
@@ -111,7 +111,7 @@ class Util {
 						return null;
 				}
 			}
-			if (! args[i].analyze(context, parentExpr))
+			if (! args[i].analyze(context))
 				return null;
 			argTypes[i] = args[i].getType();
 		}

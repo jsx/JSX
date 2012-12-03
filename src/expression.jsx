@@ -194,7 +194,11 @@ class LocalExpression extends LeafExpression {
 
 	var _local : LocalVariable;
 	var _cloned : boolean;
-	var _isLHS : boolean;
+	var _isLHS : boolean;	// used in analyze
+
+	function constructor (token : Token, local : LocalVariable) {
+		this(token, local, false);
+	}
 
 	function constructor (token : Token, local : LocalVariable, isLHS : boolean) {
 		super(token);
@@ -1382,9 +1386,9 @@ abstract class BinaryExpression extends OperatorExpression {
 	}
 
 	override function forEachExpression (cb : function(:Expression,:function(:Expression):void):boolean) : boolean {
-		if (! cb(this._expr1, function (expr) { this._expr1 = expr; }))
+		if (! cb(this._expr1, function (expr) { this.setFirstExpr(expr); }))
 			return false;
-		if (! cb(this._expr2, function (expr) { this._expr2 = expr; }))
+		if (! cb(this._expr2, function (expr) { this.setSecondExpr(expr); }))
 			return false;
 		return true;
 	}
@@ -1507,10 +1511,18 @@ class AssignmentExpression extends BinaryExpression {
 
 	function constructor (operatorToken : Token, expr1 : Expression, expr2 : Expression) {
 		super(operatorToken, expr1, expr2);
+		if (expr1 instanceof LocalExpression)
+			(expr1 as LocalExpression).setLHS(true);
 	}
 
 	override function clone () : AssignmentExpression {
 		return new AssignmentExpression(this._token, this._expr1.clone(), this._expr2.clone());
+	}
+
+	override function setFirstExpr (expr : Expression) : void {
+		super.setFirstExpr(expr);
+		if (expr instanceof LocalExpression)
+			(expr as LocalExpression).setLHS(true);
 	}
 
 	override function analyze (context : AnalysisContext) : boolean {
@@ -1946,7 +1958,7 @@ class CallExpression extends OperatorExpression {
 			return false;
 		}
 		var argTypes = Util.analyzeArgs(
-			context, this._args, this,
+			context, this._args,
 			(exprType as FunctionType).getExpectedCallbackTypes(
 				this._args.length,
 				! (this._expr instanceof PropertyExpression && ! exprType.isAssignable() && ! ((this._expr as PropertyExpression).getExpr() instanceof ClassExpression))));
@@ -2046,7 +2058,7 @@ class SuperExpression extends OperatorExpression {
 		}
 		// analyze args
 		var argTypes = Util.analyzeArgs(
-			context, this._args, this,
+			context, this._args,
 			funcType.getExpectedCallbackTypes(this._args.length, false));
 		if (argTypes == null)
 			return false;
@@ -2135,7 +2147,7 @@ class NewExpression extends OperatorExpression {
 			return false;
 		}
 		var argTypes = Util.analyzeArgs(
-			context, this._args, this,
+			context, this._args,
 			ctors.getExpectedCallbackTypes(this._args.length, false));
 		if (argTypes == null)
 			return false;
