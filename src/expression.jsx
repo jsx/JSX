@@ -200,7 +200,7 @@ class LocalExpression extends LeafExpression {
 		this._local = local;
 	}
 
-	override function clone () : Expression {
+	override function clone () : LocalExpression {
 		var that = new LocalExpression(this._token, this._local);
 		that._cloned = true;
 		return that;
@@ -269,7 +269,7 @@ class ClassExpression extends LeafExpression {
 		this._parsedType = parsedType;
 	}
 
-	override function clone () : Expression {
+	override function clone () : ClassExpression {
 		return new ClassExpression(this._token, this._parsedType);
 	}
 
@@ -309,7 +309,7 @@ class NullExpression extends LeafExpression {
 		this._type = type;
 	}
 
-	override function clone () : Expression {
+	override function clone () : NullExpression {
 		return new NullExpression(this._token, this._type);
 	}
 
@@ -337,7 +337,7 @@ class BooleanLiteralExpression extends LeafExpression {
 		super(token);
 	}
 
-	override function clone () : Expression {
+	override function clone () : BooleanLiteralExpression {
 		return new BooleanLiteralExpression(this._token);
 	}
 
@@ -364,7 +364,7 @@ class IntegerLiteralExpression extends LeafExpression {
 		super(token);
 	}
 
-	override function clone () : Expression {
+	override function clone () : IntegerLiteralExpression {
 		return new IntegerLiteralExpression(this._token);
 	}
 
@@ -392,7 +392,7 @@ class NumberLiteralExpression extends LeafExpression {
 		super(token);
 	}
 
-	override function clone () : Expression {
+	override function clone () : NumberLiteralExpression {
 		return new NumberLiteralExpression(this._token);
 	}
 
@@ -419,7 +419,7 @@ class StringLiteralExpression extends LeafExpression {
 		super(token);
 	}
 
-	override function clone () : Expression {
+	override function clone () : StringLiteralExpression {
 		return new StringLiteralExpression(this._token);
 	}
 
@@ -453,7 +453,7 @@ class RegExpLiteralExpression extends LeafExpression {
 		this._type = type;
 	}
 
-	override function clone () : Expression {
+	override function clone () : RegExpLiteralExpression {
 		return new RegExpLiteralExpression(this._token, this._type);
 	}
 
@@ -489,7 +489,7 @@ class ArrayLiteralExpression extends Expression {
 		this._type = type; // optional at this moment
 	}
 
-	override function clone () : Expression {
+	override function clone () : ArrayLiteralExpression {
 		return new ArrayLiteralExpression(this._token, Cloner.<Expression>.cloneArray(this._exprs), this._type);
 	}
 
@@ -618,7 +618,7 @@ class MapLiteralExpression extends Expression {
 		this._type = type; // optional at this moment
 	}
 
-	override function clone () : Expression {
+	override function clone () : MapLiteralExpression {
 		var ret = new MapLiteralExpression(this._token, new MapLiteralElement[], this._type);
 		for (var i = 0; i < this._elements.length; ++i)
 			ret._elements[i] = new MapLiteralElement(this._elements[i].getKey(), this._elements[i].getExpr().clone());
@@ -728,7 +728,7 @@ class ThisExpression extends Expression {
 		this._classDef = classDef;
 	}
 
-	override function clone () : Expression {
+	override function clone () : ThisExpression {
 		return new ThisExpression(this._token, this._classDef);
 	}
 
@@ -772,7 +772,7 @@ class FunctionExpression extends Expression {
 		this._funcDef = funcDef;
 	}
 
-	override function clone () : Expression {
+	override function clone () : FunctionExpression {
 		// NOTE: funcDef is not cloned, but is later replaced in MemberFunctionDefitition#instantiate
 		return new FunctionExpression(this._token, this._funcDef);
 	}
@@ -871,7 +871,7 @@ class BitwiseNotExpression extends UnaryExpression {
 		super(operatorToken, expr);
 	}
 
-	override function clone () : Expression {
+	override function clone () : BitwiseNotExpression {
 		return new BitwiseNotExpression(this._token, this._expr.clone());
 	}
 
@@ -898,7 +898,7 @@ class InstanceofExpression extends UnaryExpression {
 		this._expectedType = expectedType;
 	}
 
-	override function clone () : Expression {
+	override function clone () : InstanceofExpression {
 		return new InstanceofExpression(this._token, this._expr.clone(), this._expectedType);
 	}
 
@@ -939,7 +939,7 @@ class AsExpression extends UnaryExpression {
 		this._type = type;
 	}
 
-	override function clone () : Expression {
+	override function clone () : AsExpression {
 		return new AsExpression(this._token, this._expr.clone(), this._type);
 	}
 
@@ -1018,7 +1018,7 @@ class AsNoConvertExpression extends UnaryExpression {
 		this._type = type;
 	}
 
-	override function clone () : Expression {
+	override function clone () : AsNoConvertExpression {
 		return new AsNoConvertExpression(this._token, this._expr.clone(), this._type);
 	}
 
@@ -1057,7 +1057,7 @@ class LogicalNotExpression extends UnaryExpression {
 		super(operatorToken, expr);
 	}
 
-	override function clone () : Expression {
+	override function clone () : LogicalNotExpression {
 		return new LogicalNotExpression(this._token, this._expr.clone());
 	}
 
@@ -1120,7 +1120,7 @@ class PostIncrementExpression extends IncrementExpression {
 		super(operatorToken, expr);
 	}
 
-	override function clone () : Expression {
+	override function clone () : PostIncrementExpression {
 		return new PostIncrementExpression(this._token, this._expr.clone());
 	}
 
@@ -1136,7 +1136,7 @@ class PreIncrementExpression extends IncrementExpression {
 		super(operatorToken, expr);
 	}
 
-	override function clone () : Expression {
+	override function clone () : PreIncrementExpression {
 		return new PreIncrementExpression(this._token, this._expr.clone());
 	}
 
@@ -1163,7 +1163,7 @@ class PropertyExpression extends UnaryExpression {
 		this._type = type != null ? type : null;
 	}
 
-	override function clone () : Expression {
+	override function clone () : PropertyExpression {
 		return new PropertyExpression(this._token, this._expr.clone(), this._identifierToken, this._typeArgs, this._type);
 	}
 
@@ -1283,7 +1283,7 @@ class TypeofExpression extends UnaryExpression {
 		super(operatorToken, expr);
 	}
 
-	override function clone () : Expression {
+	override function clone () : TypeofExpression {
 		return new TypeofExpression(this._token, this._expr.clone());
 	}
 
@@ -1310,7 +1310,7 @@ class SignExpression extends UnaryExpression {
 		super(operatorToken, expr);
 	}
 
-	override function clone () : Expression {
+	override function clone () : SignExpression {
 		return new SignExpression(this._token, this._expr.clone());
 	}
 
@@ -1398,7 +1398,7 @@ class AdditiveExpression extends BinaryExpression {
 		this._type = null;
 	}
 
-	override function clone () : Expression {
+	override function clone () : AdditiveExpression {
 		var ret = new AdditiveExpression(this._token, this._expr1.clone(), this._expr2.clone());
 		ret._type = this._type;
 		return ret;
@@ -1439,7 +1439,7 @@ class ArrayExpression extends BinaryExpression {
 		this._type = null;
 	}
 
-	override function clone () : Expression {
+	override function clone () : ArrayExpression {
 		var ret = new ArrayExpression(this._token, this._expr1.clone(), this._expr2.clone());
 		ret._type = this._type;
 		return ret;
@@ -1507,7 +1507,7 @@ class AssignmentExpression extends BinaryExpression {
 		super(operatorToken, expr1, expr2);
 	}
 
-	override function clone () : Expression {
+	override function clone () : AssignmentExpression {
 		return new AssignmentExpression(this._token, this._expr1.clone(), this._expr2.clone());
 	}
 
@@ -1606,7 +1606,7 @@ class BinaryNumberExpression extends BinaryExpression {
 		super(operatorToken, expr1, expr2);
 	}
 
-	override function clone () : Expression {
+	override function clone () : BinaryNumberExpression {
 		return new BinaryNumberExpression(this._token, this._expr1.clone(), this._expr2.clone());
 	}
 
@@ -1671,7 +1671,7 @@ class EqualityExpression extends BinaryExpression {
 		super(operatorToken, expr1, expr2);
 	}
 
-	override function clone () : Expression {
+	override function clone () : EqualityExpression {
 		return new EqualityExpression(this._token, this._expr1.clone(), this._expr2.clone());
 	}
 
@@ -1710,7 +1710,7 @@ class InExpression extends BinaryExpression {
 		super(operatorToken, expr1, expr2);
 	}
 
-	override function clone () : Expression {
+	override function clone () : InExpression {
 		return new InExpression(this._token, this._expr1.clone(), this._expr2.clone());
 	}
 
@@ -1746,7 +1746,7 @@ class LogicalExpression extends BinaryExpression {
 		super(operatorToken, expr1, expr2);
 	}
 
-	override function clone () : Expression {
+	override function clone () : LogicalExpression {
 		return new LogicalExpression(this._token, this._expr1.clone(), this._expr2.clone());
 	}
 
@@ -1776,7 +1776,7 @@ class ShiftExpression extends BinaryExpression {
 		super(operatorToken, expr1, expr2);
 	}
 
-	override function clone () : Expression {
+	override function clone () : ShiftExpression {
 		return new ShiftExpression(this._token, this._expr1.clone(), this._expr2.clone());
 	}
 
@@ -1817,7 +1817,7 @@ class ConditionalExpression extends OperatorExpression {
 		this._type = type != null ? type : null;
 	}
 
-	override function clone () : Expression {
+	override function clone () : ConditionalExpression {
 		return new ConditionalExpression(this._token, this._condExpr.clone(), this._ifTrueExpr != null ? this._ifTrueExpr.clone() : null, this._ifFalseExpr.clone(), this._type);
 	}
 
@@ -1910,7 +1910,7 @@ class CallExpression extends OperatorExpression {
 		this._args = Cloner.<Expression>.cloneArray(that._args);
 	}
 
-	override function clone () : Expression {
+	override function clone () : CallExpression {
 		return new CallExpression(this);
 	}
 
@@ -2003,7 +2003,7 @@ class SuperExpression extends OperatorExpression {
 		this._funcType = that._funcType;
 	}
 
-	override function clone () : Expression {
+	override function clone () : SuperExpression {
 		return new SuperExpression(this);
 	}
 
@@ -2088,7 +2088,7 @@ class NewExpression extends OperatorExpression {
 		this._constructor = that._constructor;
 	}
 
-	override function clone () : Expression {
+	override function clone () : NewExpression {
 		return new NewExpression(this);
 	}
 
@@ -2186,7 +2186,7 @@ class CommaExpression extends Expression {
 		this._expr2 = expr2;
 	}
 
-	override function clone () : Expression {
+	override function clone () : CommaExpression {
 		return new CommaExpression(this._token, this._expr1.clone(), this._expr2.clone());
 	}
 
