@@ -381,14 +381,9 @@ class CompileError {
 	var _lineNumber : number;
 	var _columnNumber : number;
 	var _message : string;
-	var _varbose : Nullable.<string>;
 	var _size : number;
 
 	function constructor (token : Token, message : string) {
-		this(token, message, null);
-	}
-
-	function constructor (token : Token, message : string, varbose : Nullable.<string>) {
 		if(token != null) {
 			this._filename = token.getFilename();
 			this._lineNumber = token.getLineNumber();
@@ -396,28 +391,21 @@ class CompileError {
 			// FIXME: deal with visual width
 			this._size = token.getValue().length;
 			this._message = message;
-			this._varbose = varbose;
 		}
 		else {
 			this._filename = null;
 			this._lineNumber = 0;
 			this._columnNumber = -1;
 			this._message = message;
-			this._varbose = varbose;
 			this._size = 1;
 		}
 	}
 
 	function constructor (filename : string, lineNumber : number, columnNumber : number, message : string) {
-		this(filename, lineNumber, columnNumber, message, null);
-	}
-
-	function constructor (filename : string, lineNumber : number, columnNumber : number, message : string, varbose : Nullable.<string>) {
 		this._filename = filename;
 		this._lineNumber = lineNumber;
 		this._columnNumber = columnNumber;
 		this._message = message;
-		this._varbose = varbose;
 		this._size = 1;
 	}
 
@@ -441,11 +429,7 @@ class CompileError {
 		sourceLine += Util.repeat(" ", col);
 		sourceLine += Util.repeat("^", this._size);
 
-		if (this._varbose == null) {
-			return Util.format("[%1:%2:%3] %4%5\n%6\n", [this._filename, this._lineNumber as string, col as string, this.getPrefix(), this._message, sourceLine]);
-		} else {
-			return Util.format("[%1:%2:%3] %4%5\n%6\n%7\n", [this._filename, this._lineNumber as string, col as string, this.getPrefix(), this._message, sourceLine, this._varbose]);
-		}
+		return Util.format("[%1:%2:%3] %4%5\n%6\n", [this._filename, this._lineNumber as string, col as string, this.getPrefix(), this._message, sourceLine]);
 	}
 
 	function getPrefix () : string {
@@ -460,16 +444,8 @@ class CompileWarning extends CompileError {
 		super(token, message);
 	}
 
-	function constructor (token : Token, message : string, varbose : Nullable.<string>) {
-		super(token, message, varbose);
-	}
-
 	function constructor (filename : string, lineNumber : number, columnNumber : number, message : string) {
 		super(filename, lineNumber, columnNumber, message);
-	}
-
-	function constructor (filename : string, lineNumber : number, columnNumber : number, message : string, varbose : Nullable.<string>) {
-		super(filename, lineNumber, columnNumber, message, varbose);
 	}
 
 	override function getPrefix () : string {
