@@ -96,7 +96,7 @@ abstract class Expression implements Stashable {
 	}
 
 	final function analyze (context : AnalysisContext) : boolean {
-		if (this._isAnalyzed)
+		if (this._isAnalyzed != null)
 			return this._isAnalyzed;
 		return this._isAnalyzed = this.doAnalyze(context);
 	}
