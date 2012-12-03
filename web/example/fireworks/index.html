@@ -7,7 +7,8 @@
     <meta name="robots" content="noindex,nofollow" />
     <script src="../../build/jsx-compiler.js"></script>
     <script>
-      jsx.optimizationLevel = 1;
+      JSX.require("system:web/src/jsx-web-compiler.jsx").JsxWebCompiler.begin$();
+      JSX.require("system:web/src/jsx-web-compiler.jsx").JsxWebCompiler.setOptimizationLevel$N(1);
     </script>
     <script type="application/jsx" src="fireworks.jsx" data-arguments='["night-sky", "fps", "1000"]'></script>
     <link rel="stylesheet" href="./style.css" />

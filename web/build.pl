@@ -51,6 +51,8 @@ my $dest_build   = "$dest_root/build";
 
     mkpath($_) for $dest_src, $dest_build;
 
+    process_webfront();
+
     copy_r("$root/assets",  "$dest_root/assets");
     copy_r("$root/example", "$dest_root/example");
 
@@ -111,6 +113,12 @@ sub process_page {
     close $fh;
 }
 
+sub process_webfront {
+    my $cmd = "$project_root/bin/jsx --output $root/assets/js/jsx-web-front.js "
+	. "$root/assets/js/jsx-web-front.jsx";
+    system($cmd) == 0 or die "Failed to build jsx-web-front.js: $cmd\n";
+}
+
 sub process_jsx {
     my($src, $dest) = @_;
 
@@ -119,18 +127,11 @@ sub process_jsx {
     copy_r("$project_root/src", $dest_src);
     copy_r("$root/src", $dest_src);
 
-    my $browserbuild = "$project_root/node_modules/browserbuild/bin/browserbuild";
-
-    my @files = glob("$src/*.js");
-	@files = grep { !m{ \Q/_doc.js\E $}xms } @files;
-    my $basepath = shell_quote($src . "/");
-    my $cmd = "node $browserbuild --main interface --global jsx --basepath $basepath "
-        . join(' ', map { shell_quote($_) } @files)
+    my $cmd = "$project_root/bin/jsx $root/src/jsx-web-compiler.jsx"
         . " > "
         . shell_quote($dest);
 
     system($cmd) == 0 or die "Failed to build jsx-compiler.js: $cmd\n";
-	system("$root/check-jsx-compiler.js") == 0 or die "Failed to build jsx-compiler.js";
 }
 
 sub process_tree {
