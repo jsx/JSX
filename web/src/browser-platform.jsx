@@ -54,7 +54,7 @@ class BrowserPlatform extends Platform {
 	function _findPath (path : string) : variant {
 		var absPath = Util.resolvePath(this._prefix + "/" + path);
 
-		this.debug(Util.format("[D] find path=%s (absPath=%s)", [path, absPath]));
+		this.debug(Util.format("[D] find path=%1 (absPath=%2)", [path, absPath]));
 
 		var parts = absPath.split('/');
 		var cur = this._map;
@@ -66,7 +66,7 @@ class BrowserPlatform extends Platform {
 			cur = t;
 		}
 
-		this.debug(Util.format("[D] find path --> %s", [JSON.stringify(cur)]));
+		this.debug(Util.format("[D] find path --> %1", [JSON.stringify(cur)]));
 
 		return cur;
 	}

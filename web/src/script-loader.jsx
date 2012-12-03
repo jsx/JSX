@@ -105,7 +105,7 @@ class ScriptLoader {
 					else {
 						throw new TypeError("Not an array of string: " + applicationArguments);
 					}
-					platform.debug(Util.format("run _Main.main()@%s with %s", [sourceFile, applicationArguments]));
+					platform.debug(Util.format("run _Main.main()@%1 with %2", [sourceFile, applicationArguments]));
 					// the name must be eval
 					var eval = js.global['eval'] as (string) -> variant;
 					eval('JSX.require(sourceFile)._Main.main$AS(args)');
