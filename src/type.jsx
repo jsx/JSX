@@ -95,14 +95,14 @@ abstract class Type {
  		// VoidType
  		if (Type.voidType.equals(type1) || Type.voidType.equals(type2))
  			return null;
+ 		// VariantType
+ 		if (Type.variantType.equals(type1) || Type.variantType.equals(type2))
+ 			return Type.variantType;
  		// NullType
  		if (Type.nullType.equals(type1))
  			return (Type.nullType.isConvertibleTo(type2))? type2 : new NullableType(type2);
  		if (Type.nullType.equals(type2))
  			return (Type.nullType.isConvertibleTo(type1))? type1 : new NullableType(type1);
- 		// VariantType
- 		if (Type.variantType.equals(type1) || Type.variantType.equals(type2))
- 			return Type.variantType;
  		// PrimitiveTypes
  		if (type1.resolveIfNullable() instanceof PrimitiveType || type2.resolveIfNullable() instanceof PrimitiveType) {
  			if (type1.resolveIfNullable().equals(type2.resolveIfNullable()))
