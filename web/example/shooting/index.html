@@ -21,7 +21,8 @@
     </style>
     <script src="../../build/jsx-compiler.js"></script>
     <script>
-      jsx.optimizationLevel = 1;
+      JSX.require("system:web/src/jsx-web-compiler.jsx").JsxWebCompiler.begin$();
+      JSX.require("system:web/src/jsx-web-compiler.jsx").JsxWebCompiler.setOptimizationLevel$N(1);
     </script>
     <script type="application/jsx" src="shooting.jsx"></script>
     <script src="shooting.js"></script>
