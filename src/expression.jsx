@@ -532,31 +532,25 @@ class ArrayLiteralExpression extends Expression {
 				context.errors.push(new CompileError(this._token, "the type specified after ':' is not an array type"));
 				return false;
 			}
-		} else {
+			// check type of the elements
+			var expectedType = (this._type.getClassDef() as InstantiatedClassDefinition).getTypeArguments()[0].toNullableType();
 			for (var i = 0; i < this._exprs.length; ++i) {
-				var elementType = this._exprs[i].getType().resolveIfNullable();
-				if (elementType.equals(Type.nullType)) {
-					// skip
-				} else {
-					if (elementType.equals(Type.integerType))
-						elementType = Type.numberType;
-					this._type = new ObjectType(Expression.instantiateTemplate(context, this._token, "Array", [ elementType ]));
-					break;
+				var elementType = this._exprs[i].getType();
+				if (! elementType.isConvertibleTo(expectedType)) {
+					context.errors.push(new CompileError(this._token, "cannot assign '" + elementType.toString() + "' to an array of '" + expectedType.toString() + "'"));
+					succeeded = false;
 				}
 			}
-			if (this._type == null) {
+		} else {
+			var elementType = Type.calcLeastCommonAncestor(this._exprs.map.<Type>((expr) -> { return expr.getType(); }), true);
+			if (elementType == null || elementType.equals(Type.nullType)) {
 				context.errors.push(new CompileError(this._token, "could not deduce array type, please specify"));
 				return false;
 			}
-		}
-		// check type of the elements
-		var expectedType = (this._type.getClassDef() as InstantiatedClassDefinition).getTypeArguments()[0].toNullableType();
-		for (var i = 0; i < this._exprs.length; ++i) {
-			var elementType = this._exprs[i].getType();
-			if (! elementType.isConvertibleTo(expectedType)) {
-				context.errors.push(new CompileError(this._token, "cannot assign '" + elementType.toString() + "' to an array of '" + expectedType.toString() + "'"));
-				succeeded = false;
-			}
+			if (elementType.equals(Type.integerType))
+				elementType = Type.numberType;
+			elementType = elementType.resolveIfNullable();
+			this._type = new ObjectType(Expression.instantiateTemplate(context, this._token, "Array", [ elementType ]));
 		}
 		return succeeded;
 	}
