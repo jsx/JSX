@@ -84,7 +84,10 @@ class ScriptLoader {
 					output = platform.applyClosureCompiler(output, "SIMPLE_OPTIMIZATIONS", false);
 				}
 
-				
+				var compiledScript = dom.document.createElement("script");
+				var scriptSection  = dom.document.createTextNode(output);
+				compiledScript.appendChild(scriptSection);
+				script.parentNode.appendChild(compiledScript);
 
 				console.log("jsx-script-loader: load " + sourceFile + " in " + (Date.now() - t0) as string + " ms.");
 
@@ -105,7 +108,6 @@ class ScriptLoader {
 					platform.debug(Util.format("run _Main.main()@%s with %s", [sourceFile, applicationArguments]));
 					// the name must be eval
 					var eval = js.global['eval'] as (string) -> variant;
-					console.log('DEBUG INFO: do not use eval');
 					eval('JSX.require(sourceFile)._Main.main$AS(args)');
 				}
 			}
