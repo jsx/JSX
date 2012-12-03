@@ -1147,6 +1147,30 @@ class MemberFunctionDefinition extends MemberDefinition implements Block {
 			context.blockStack.push(new BlockContext(new LocalVariableStatuses(this, outerContext.getTopBlock().localVariableStatuses), this));
 		}
 
+		// check assignments to local variables
+		Util.forEachStatement(function onStatement(statement : Statement) : boolean {
+			if (statement instanceof ForInStatement
+			    && (statement as ForInStatement).getLHSExpr() instanceof LocalExpression) {
+				var forInStmt = statement as ForInStatement;
+				var local = forInStmt.getLHSExpr() as LocalExpression;
+				local.setLHS(true);
+				// local.getLocal().registerRHS(forInStmt.getListExpr());
+			}
+			statement.forEachExpression(function onExpr(expr : Expression) : boolean {
+				if (expr instanceof AssignmentExpression
+					&& (expr as AssignmentExpression).getFirstExpr() instanceof LocalExpression) {
+					var assignExpr = expr as AssignmentExpression;
+					var local = assignExpr.getFirstExpr() as LocalExpression;
+					local.setLHS(true);
+					// local.getLocal().registerRHS(assignExpr.getSecondExpr());
+				}
+				expr.forEachExpression(onExpr);
+				return true;
+			});
+			statement.forEachStatement(onStatement);
+			return true;
+		}, this._statements);
+
 		try {
 
 			// do the checks

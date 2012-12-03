@@ -662,8 +662,6 @@ class ForInStatement extends ContinuableStatement {
 		super(token, label, statements);
 		this._lhsExpr = lhsExpr;
 		this._listExpr = listExpr;
-		if (this._lhsExpr instanceof LocalExpression)
-			(this._lhsExpr as LocalExpression).setLHS(true);
 	}
 
 	override function clone () : Statement {

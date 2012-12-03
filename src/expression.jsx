@@ -1394,9 +1394,9 @@ abstract class BinaryExpression extends OperatorExpression {
 	}
 
 	override function forEachExpression (cb : function(:Expression,:function(:Expression):void):boolean) : boolean {
-		if (! cb(this._expr1, function (expr) { this.setFirstExpr(expr); }))
+		if (! cb(this._expr1, function (expr) { this._expr1 = expr; }))
 			return false;
-		if (! cb(this._expr2, function (expr) { this.setSecondExpr(expr); }))
+		if (! cb(this._expr2, function (expr) { this._expr2 = expr; }))
 			return false;
 		return true;
 	}
@@ -1519,18 +1519,10 @@ class AssignmentExpression extends BinaryExpression {
 
 	function constructor (operatorToken : Token, expr1 : Expression, expr2 : Expression) {
 		super(operatorToken, expr1, expr2);
-		if (expr1 instanceof LocalExpression)
-			(expr1 as LocalExpression).setLHS(true);
 	}
 
 	override function clone () : AssignmentExpression {
 		return new AssignmentExpression(this._token, this._expr1.clone(), this._expr2.clone());
-	}
-
-	override function setFirstExpr (expr : Expression) : void {
-		super.setFirstExpr(expr);
-		if (expr instanceof LocalExpression)
-			(expr as LocalExpression).setLHS(true);
 	}
 
 	override function doAnalyze (context : AnalysisContext) : boolean {
