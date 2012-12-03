@@ -114,7 +114,7 @@ sub process_page {
 }
 
 sub process_webfront {
-    my $cmd = "$project_root/bin/jsx --executable web --output $root/assets/js/jsx-web-front.js "
+    my $cmd = "$project_root/bin/jsx --output $root/assets/js/jsx-web-front.js "
 	. "$root/assets/js/jsx-web-front.jsx";
     system($cmd) == 0 or die "Failed to build jsx-web-front.js: $cmd\n";
 }
@@ -127,7 +127,7 @@ sub process_jsx {
     copy_r("$project_root/src", $dest_src);
     copy_r("$root/src", $dest_src);
 
-    my $cmd = "$project_root/bin/jsx --executable web $root/src/jsx-web-compiler.jsx"
+    my $cmd = "$project_root/bin/jsx $root/src/jsx-web-compiler.jsx"
         . " > "
         . shell_quote($dest);
 

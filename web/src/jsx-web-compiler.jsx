@@ -23,8 +23,13 @@
 import "js/web.jsx";
 import "./script-loader.jsx";
 
-class _Main {
-	static function main(args : string[]) : void {
+class JsxWebCompiler {
+	
+	static function setOptimizationLevel(level : number) : void {
+		ScriptLoader.optimizationLevel = level;
+	}
+	
+	static function begin() : void {
 		dom.window.addEventListener("load", function(e) {
 			var root = "..";
 			try {

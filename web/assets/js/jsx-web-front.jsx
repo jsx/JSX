@@ -33,8 +33,8 @@ native __fake__ class sessionStorage {
 	static function clear() : void;
 }
 
-class _Main {
-	static function main(args : string[]) : void {
+class JsxWebFront {
+	static function begin() : void {
 		dom.window.addEventListener('load', function(e) {
 
 			function element(id : string) : Element {

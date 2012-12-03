@@ -20,10 +20,11 @@
 
     <!-- JSX compiler and web interface -->
     <script src="build/jsx-compiler.js"></script>
-    <script>var JSX0 = JSX;</script>
+    <script> JSX.require("system:web/src/jsx-web-compiler.jsx").JsxWebCompiler.begin$(); </script>
     <script src="assets/js/require-simple.js"></script>
     <script src="assets/js/jsx-web-front.js"></script>
-
+    <script> JSX.require("system:web/assets/js/jsx-web-front.jsx").JsxWebFront.begin$(); </script>
+    
     <!-- Le styles -->
     <link href="assets/css/bootstrap.css" rel="stylesheet">
     <style type="text/css">
