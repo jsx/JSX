@@ -37,7 +37,7 @@ abstract class Expression implements Stashable {
 	function constructor (token : Token) {
 		this._token = token;
 		this._optimizerStash = new Map.<OptimizerStash>;
-		this._isAnalyzed = false;
+		this._isAnalyzed = null;
 	}
 
 	function constructor (that : Expression) {
