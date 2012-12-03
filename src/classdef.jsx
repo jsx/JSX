@@ -1158,7 +1158,8 @@ class MemberFunctionDefinition extends MemberDefinition implements Block {
 			}
 			statement.forEachExpression(function onExpr(expr : Expression) : boolean {
 				if (expr instanceof AssignmentExpression
-					&& (expr as AssignmentExpression).getFirstExpr() instanceof LocalExpression) {
+				    && (expr as AssignmentExpression).getFirstExpr() instanceof LocalExpression
+				    && (expr as AssignmentExpression).getToken().getValue() == '=') {
 					var assignExpr = expr as AssignmentExpression;
 					var local = assignExpr.getFirstExpr() as LocalExpression;
 					local.setLHS(true);
