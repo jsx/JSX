@@ -30,24 +30,20 @@ import "console.jsx";
 
 abstract class Statement implements Stashable {
 
-	var _isAnalyzed : Nullable.<boolean>; // tri-color flag; see detail in Expression class
 	var _optimizerStash : Map.<OptimizerStash>;
 
 	function constructor () {
 		// FIXME clone the stash the right way
 		this._optimizerStash = new Map.<OptimizerStash>;
-		this._isAnalyzed = null;
 	}
 
 	// returns whether or not to continue analysing the following statements
 	function analyze (context : AnalysisContext) : boolean {
-		if (this._isAnalyzed != null)
-			return this._isAnalyzed;
 		if (! (this instanceof CaseStatement || this instanceof DefaultStatement))
 			if (! Statement.assertIsReachable(context, this.getToken()))
-				return this._isAnalyzed = false;
+				return false;
 		try {
-			return this._isAnalyzed = this.doAnalyze(context);
+			return this.doAnalyze(context);
 		} catch (e : Error) {
 			var token = this.getToken();
 			console.error("fatal error while compiling statement" + (token instanceof Token ? " at file " + token.getFilename() + ", line " + token.getLineNumber() as string : ""));
