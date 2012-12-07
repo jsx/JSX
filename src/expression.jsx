@@ -32,12 +32,10 @@ abstract class Expression implements Stashable {
 
 	var _token : Token;
 	var _optimizerStash : Map.<OptimizerStash>;
-	var _isAnalyzed : Nullable.<boolean>; // tri-color flag; null means not analyzed yet, and booleans are the result of previous analysis.
 
 	function constructor (token : Token) {
 		this._token = token;
 		this._optimizerStash = new Map.<OptimizerStash>;
-		this._isAnalyzed = null;
 	}
 
 	function constructor (that : Expression) {
@@ -96,9 +94,7 @@ abstract class Expression implements Stashable {
 	}
 
 	final function analyze (context : AnalysisContext) : boolean {
-		if (this._isAnalyzed != null)
-			return this._isAnalyzed;
-		return this._isAnalyzed = this.doAnalyze(context);
+		return this.doAnalyze(context);
 	}
 
 	abstract function doAnalyze (context : AnalysisContext) : boolean;
