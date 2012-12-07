@@ -752,10 +752,24 @@ class ResolvedFunctionType extends FunctionType {
 	function _getExpectedTypes (expected : Type[][], numberOfArgs : number, isStatic : boolean) : void {
 		if ((this instanceof StaticFunctionType) != isStatic)
 			return;
-		if (this._argTypes.length != numberOfArgs)
+		var argTypes = new Type[];
+		if (this._argTypes.length > 0 && numberOfArgs >= this._argTypes.length
+		    && this._argTypes[this._argTypes.length - 1] instanceof VariableLengthArgumentType) {
+			for (var i = 0; i < numberOfArgs; ++i) {
+				if (i < this._argTypes.length - 1) {
+					argTypes[i] = this._argTypes[i];
+				} else {
+					argTypes[i] = (this._argTypes[this._argTypes.length - 1] as VariableLengthArgumentType).getBaseType();
+				}
+			}
+		} else if (this._argTypes.length == numberOfArgs) {
+			argTypes = this._argTypes;
+		} else {
+			// fail
 			return;
+		}
 		var hasCallback = false;
-		var callbackArgTypes = this._argTypes.map.<Type>(function (argType) {
+		var callbackArgTypes = argTypes.map.<Type>(function (argType) {
 			var typeName = '';
 			if (argType instanceof StaticFunctionType
 				|| (argType instanceof ObjectType
@@ -769,7 +783,6 @@ class ResolvedFunctionType extends FunctionType {
 		});
 		if (hasCallback)
 			expected.push(callbackArgTypes);
-
 	}
 
 	override function toString () : string {
