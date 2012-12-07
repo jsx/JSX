@@ -1154,7 +1154,7 @@ class MemberFunctionDefinition extends MemberDefinition implements Block {
 			context.blockStack.push(new BlockContext(new LocalVariableStatuses(this, outerContext.getTopBlock().localVariableStatuses), this));
 		}
 
-		// check assignments to local variables
+		// push assignments to local variables
 		Util.forEachStatement(function onStatement(statement : Statement) : boolean {
 			if (statement instanceof ForInStatement
 			    && (statement as ForInStatement).getLHSExpr() instanceof LocalExpression) {
@@ -1182,7 +1182,7 @@ class MemberFunctionDefinition extends MemberDefinition implements Block {
 		}, this._statements);
 
 		// infer types of local variables
-		// TODO occur check, common type, local functions
+		// TODO occur check, local functions
 		context.setCheckVariableStatus(false);
 		this._locals.forEach(function (local) {
 			if (local.getType() == null) {
