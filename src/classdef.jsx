@@ -1206,12 +1206,12 @@ class MemberFunctionDefinition extends MemberDefinition implements Block {
 				});
 				var types : Type[] = rhsExprTypes.concat(listExprTypes).filter.<Type>((t) -> { return t != null; });
 				if (succ == false || types.length == 0) {
-					context.errors.push(new CompileError(local.getName(), 'could not deduce the type of variable ' + local.getName().getValue()));
+					//context.errors.push(new CompileError(local.getName(), 'could not deduce the type of variable ' + local.getName().getValue()));
 					return;
 				}
 				var type = Type.calcLeastCommonAncestor(types);
 				if (type == null) {
-					context.errors.push(new CompileError(local.getName(), 'error while deducing variable type ' + local.getName().getValue()));
+					//context.errors.push(new CompileError(local.getName(), 'error while deducing variable type ' + local.getName().getValue()));
 					return;
 				}
 				local.setType(type);
