@@ -110,6 +110,50 @@ class Util {
 					if (! funcDef.deductTypeIfUnknown(context, expectedCallbackType as ResolvedFunctionType))
 						return null;
 				}
+			} else if (args[i] instanceof ArrayLiteralExpression && (args[i] as ArrayLiteralExpression).getExprs().length == 0 && (args[i] as ArrayLiteralExpression).getType() == null) {
+				var arrayExpr = args[i] as ArrayLiteralExpression;
+				var expectedArrayType = null : Type;
+				for (var j = 0; j < expectedTypes.length; ++j) {
+					if (expectedTypes[j][i] != null
+						&& expectedTypes[j][i] instanceof ObjectType
+						&& expectedTypes[j][i].getClassDef() instanceof InstantiatedClassDefinition
+						&& (expectedTypes[j][i].getClassDef() as InstantiatedClassDefinition).getTemplateClassName() == 'Array') {
+						if (expectedArrayType == null) {
+							expectedArrayType = expectedTypes[j][i];
+						} else if (expectedArrayType.equals(expectedTypes[j][i])) {
+							// type parameters are equal
+						} else {
+							break;
+						}
+					}
+				}
+				if (j != expectedTypes.length) {
+					// multiple canditates, skip
+				} else if (expectedArrayType != null) {
+					arrayExpr.setType(expectedArrayType);
+				}
+			} else if (args[i] instanceof MapLiteralExpression && (args[i] as MapLiteralExpression).getElements().length == 0 && (args[i] as MapLiteralExpression).getType() == null) {
+				var mapExpr = args[i] as MapLiteralExpression;
+				var expectedMapType = null : Type;
+				for (var j = 0; j < expectedTypes.length; ++j) {
+					if (expectedTypes[j][i] != null
+						&& expectedTypes[j][i] instanceof ObjectType
+						&& expectedTypes[j][i].getClassDef() instanceof InstantiatedClassDefinition
+						&& (expectedTypes[j][i].getClassDef() as InstantiatedClassDefinition).getTemplateClassName() == 'Map') {
+						if (expectedMapType == null) {
+							expectedMapType = expectedTypes[j][i];
+						} else if (expectedMapType.equals(expectedTypes[j][i])) {
+							// type parameters are equal
+						} else {
+							break;
+						}
+					}
+				}
+				if (j != expectedTypes.length) {
+					// multiple canditates, skip
+				} else if (expectedMapType != null) {
+					mapExpr.setType(expectedMapType);
+				}
 			}
 			if (! args[i].analyze(context, parentExpr))
 				return null;

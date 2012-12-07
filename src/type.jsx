@@ -759,8 +759,8 @@ class ResolvedFunctionType extends FunctionType {
 			var typeName = '';
 			if (argType instanceof StaticFunctionType
 				|| (argType instanceof ObjectType
-				&& (argType.getClassDef() instanceof InstantiatedClassDefinition)
-				&& ((typeName = (argType.getClassDef() as InstantiatedClassDefinition).getTemplateClassName()) == 'Array' || typeName == 'Map'))) {
+					&& argType.getClassDef() instanceof InstantiatedClassDefinition
+					&& ((typeName = (argType.getClassDef() as InstantiatedClassDefinition).getTemplateClassName()) == 'Array' || typeName == 'Map'))) {
 				hasCallback = true;
 				return argType;
 			} else {
