@@ -663,6 +663,9 @@ class MapLiteralExpression extends Expression {
 	}
 
 	override function doAnalyze (context : AnalysisContext) : boolean {
+		// already analyzed
+		if (this._type != null && this._type instanceof ObjectType && (! this._type instanceof ParsedObjectType))
+			return true;
 		// analyze all elements
 		var succeeded = true;
 		for (var i = 0; i < this._elements.length; ++i) {
