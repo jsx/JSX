@@ -1941,7 +1941,7 @@ class CallExpression extends OperatorExpression {
 		}
 		var argTypes = Util.analyzeArgs(
 			context, this._args, this,
-			(exprType as FunctionType).getExpectedCallbackTypes(
+			(exprType as FunctionType).getExpectedTypes(
 				this._args.length,
 				! (this._expr instanceof PropertyExpression && ! exprType.isAssignable() && ! ((this._expr as PropertyExpression).getExpr() instanceof ClassExpression))));
 		if (argTypes == null)
@@ -2041,7 +2041,7 @@ class SuperExpression extends OperatorExpression {
 		// analyze args
 		var argTypes = Util.analyzeArgs(
 			context, this._args, this,
-			funcType.getExpectedCallbackTypes(this._args.length, false));
+			funcType.getExpectedTypes(this._args.length, false));
 		if (argTypes == null)
 			return false;
 		// deduce
@@ -2130,7 +2130,7 @@ class NewExpression extends OperatorExpression {
 		}
 		var argTypes = Util.analyzeArgs(
 			context, this._args, this,
-			ctors.getExpectedCallbackTypes(this._args.length, false));
+			ctors.getExpectedTypes(this._args.length, false));
 		if (argTypes == null)
 			return false;
 		if ((this._constructor = ctors.deduceByArgumentTypes(context, this._token, argTypes, false)) == null) {

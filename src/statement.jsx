@@ -162,7 +162,7 @@ class ConstructorInvocationStatement extends Statement {
 			// analyze args
 			var argTypes = Util.analyzeArgs(
 				context, this._args, null,
-				ctorType.getExpectedCallbackTypes(this._args.length, false));
+				ctorType.getExpectedTypes(this._args.length, false));
 			if (argTypes == null) {
 				// error is reported by callee
 				return true;

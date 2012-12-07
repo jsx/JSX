@@ -85,26 +85,26 @@ class Util {
 		});
 	}
 
-	static function analyzeArgs (context : AnalysisContext, args : Expression[], parentExpr : Expression, expectedCallbackTypes : Type[][]) : Type[] {
+	static function analyzeArgs (context : AnalysisContext, args : Expression[], parentExpr : Expression, expectedTypes : Type[][]) : Type[] {
 		var argTypes = [] : Type[];
 		for (var i = 0; i < args.length; ++i) {
 			if (args[i] instanceof FunctionExpression && ! (args[i] as FunctionExpression).typesAreIdentified()) {
 				// find the only expected types, by counting the number of arguments
 				var funcDef = (args[i] as FunctionExpression).getFuncDef();
 				var expectedCallbackType = null : Type;
-				for (var j = 0; j < expectedCallbackTypes.length; ++j) {
-					if ((expectedCallbackTypes[j][i] as ResolvedFunctionType).getArgumentTypes().length == funcDef.getArguments().length) {
+				for (var j = 0; j < expectedTypes.length; ++j) {
+					if (expectedTypes[j][i] != null && expectedTypes[j][i] instanceof FunctionType && (expectedTypes[j][i] as ResolvedFunctionType).getArgumentTypes().length == funcDef.getArguments().length) {
 						if (expectedCallbackType == null) {
-							expectedCallbackType = expectedCallbackTypes[j][i];
-						} else if (Util.typesAreEqual((expectedCallbackType as ResolvedFunctionType).getArgumentTypes(), (expectedCallbackTypes[j][i] as ResolvedFunctionType).getArgumentTypes())
-							&& (expectedCallbackType as ResolvedFunctionType).getReturnType().equals((expectedCallbackTypes[j][i] as ResolvedFunctionType).getReturnType())) {
+							expectedCallbackType = expectedTypes[j][i];
+						} else if (Util.typesAreEqual((expectedCallbackType as ResolvedFunctionType).getArgumentTypes(), (expectedTypes[j][i] as ResolvedFunctionType).getArgumentTypes())
+							&& (expectedCallbackType as ResolvedFunctionType).getReturnType().equals((expectedTypes[j][i] as ResolvedFunctionType).getReturnType())) {
 							// function signatures are equal
 						} else {
 							break;
 						}
 					}
 				}
-				if (j != expectedCallbackTypes.length) {
+				if (j != expectedTypes.length) {
 					// multiple canditates, skip
 				} else if (expectedCallbackType != null) {
 					if (! funcDef.deductTypeIfUnknown(context, expectedCallbackType as ResolvedFunctionType))
