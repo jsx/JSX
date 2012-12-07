@@ -224,6 +224,10 @@ class LocalExpression extends LeafExpression {
 		this._local = local;
 	}
 
+	function isLHS () : boolean {
+		return this._isLHS;
+	}
+
 	function setLHS (isLHS : boolean) : void {
 		this._isLHS = isLHS;
 	}
@@ -242,7 +246,8 @@ class LocalExpression extends LeafExpression {
 		if (this._isLHS) {
 			// nothing to do
 		} else {
-			this._local.touchVariable(context, this._token, false);
+			if (context.checkVariableStatus)
+				this._local.touchVariable(context, this._token, false);
 			if (this._local.getType() == null)
 				return false;
 		}
@@ -264,7 +269,8 @@ class LocalExpression extends LeafExpression {
 			context.errors.push(new CompileError(token, "cannot assign a value of type '" + type.toString() + "' to '" + this._local.getType().toString() + "'"));
 			return false;
 		}
-		this._local.touchVariable(context, this._token, true);
+		if (context.checkVariableStatus)
+			this._local.touchVariable(context, this._token, true);
 		return true;
 	}
 
