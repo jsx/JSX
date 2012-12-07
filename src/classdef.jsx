@@ -115,7 +115,12 @@ class AnalysisContext {
 
 	function clone () : Object {
 		// NOTE: does not clone the blockStack (call setBlockStack)
-		return new AnalysisContext(this.errors, this.parser, this.postInstantiationCallback).setFuncDef(this.funcDef);
+		return new AnalysisContext(this.errors, this.parser, this.postInstantiationCallback).setFuncDef(this.funcDef).setCheckVariableStatus(this.checkVariableStatus);
+	}
+
+	function setCheckVariableStatus (checkVariableStatus : boolean) : AnalysisContext {
+		this.checkVariableStatus = checkVariableStatus;
+		return this;
 	}
 
 	function setFuncDef (funcDef : MemberFunctionDefinition) : AnalysisContext {
@@ -1176,7 +1181,7 @@ class MemberFunctionDefinition extends MemberDefinition implements Block {
 
 		// infer types of local variables
 		// TODO occur check, common type, local functions
-		context.checkVariableStatus = false;
+		context.setCheckVariableStatus(false);
 		this._locals.forEach(function (local) {
 			if (local.getType() == null) {
 				var commonType = null : Type;
@@ -1197,7 +1202,7 @@ class MemberFunctionDefinition extends MemberDefinition implements Block {
 					succ = false;
 					return null;
 				});
-				var types : Type[] = rhsExprTypes.concat(listExprTypes);
+				var types : Type[] = rhsExprTypes.concat(listExprTypes).filter.<Type>((t) -> { return t != null; });
 				if (succ == false || types.length == 0) {
 					context.errors.push(new CompileError(local.getName(), 'could not deduce the type of variable ' + local.getName().getValue()));
 					return;
@@ -1214,7 +1219,7 @@ class MemberFunctionDefinition extends MemberDefinition implements Block {
 		try {
 
 			// do the checks
-			context.checkVariableStatus = true;
+			context.setCheckVariableStatus(true);
 			for (var i = 0; i < this._statements.length; ++i)
 				if (! this._statements[i].analyze(context))
 					break;
