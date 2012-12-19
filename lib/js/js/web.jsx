@@ -2370,6 +2370,11 @@ native final __fake__ class Window extends EventTarget {
 	/** @see http://dev.w3.org/html5/webstorage/ */
 	__readonly__ var localStorage : Storage;
 
+	// implements IntentProvider
+
+	/** @see http://www.w3.org/TR/2012/WD-web-intents-20120626/ */
+	__readonly__ var intent : Intent;
+
 	function setTimeout(
 		handler : function():void/*TimerHandler*/
 	) : number/*long*/;
@@ -4293,6 +4298,24 @@ native final class Navigator extends NavigatorID {
 	/** @see http://dev.w3.org/geo/api/spec-source.html */
 	__readonly__ var geolocation : Geolocation;
 
+	// implements Intents
+
+	/** @see http://www.w3.org/TR/2012/WD-web-intents-20120626/ */
+	function startActivity(intent : Intent) : void;
+	/** @see http://www.w3.org/TR/2012/WD-web-intents-20120626/ */
+	function startActivity(
+		intent : Intent,
+		onSuccess : function(data:variant/*any*/,
+		ports:MessagePort[]):void/*IntentSuccessCallback*/
+	) : void;
+	/** @see http://www.w3.org/TR/2012/WD-web-intents-20120626/ */
+	function startActivity(
+		intent : Intent,
+		onSuccess : function(data:variant/*any*/,
+		ports:MessagePort[]):void/*IntentSuccessCallback*/,
+		onFailure : function(data:variant/*any*/):void/*IntentFailureCallback*/
+	) : void;
+
 	// implements NavigatorUserMedia
 
 	/** @see http://www.w3.org/TR/mediacapture-streams/ */
@@ -4663,69 +4686,48 @@ native final class FileReaderSync {
 
 } // end of FileReaderSync
 
+/** @see http://www.w3.org/TR/2012/WD-url-20120524/ */
 native class URL {
 
 	/** @see http://www.w3.org/TR/2012/WD-FileAPI-20121025/ */
 	static function createObjectURL(blob : Blob) : string/*DOMString*/;
 	/** @see http://www.w3.org/TR/2012/WD-FileAPI-20121025/ */
 	static function revokeObjectURL(url : string/*DOMString*/) : void;
-	/** @see http://www.w3.org/TR/2012/WD-url-20120524/ */
 	function constructor(url : string/*DOMString*/);
-	/** @see http://www.w3.org/TR/2012/WD-url-20120524/ */
 	function constructor(
 		url : string/*DOMString*/,
 		baseURL : string/*DOMString*/
 	);
 
-	/** @see http://www.w3.org/TR/2012/WD-url-20120524/ */
 	var protocol : string/*DOMString*/;
-	/** @see http://www.w3.org/TR/2012/WD-url-20120524/ */
 	var username : string/*DOMString*/;
-	/** @see http://www.w3.org/TR/2012/WD-url-20120524/ */
 	var password : string/*DOMString*/;
-	/** @see http://www.w3.org/TR/2012/WD-url-20120524/ */
 	var host : string/*DOMString*/;
-	/** @see http://www.w3.org/TR/2012/WD-url-20120524/ */
 	var hostname : string/*DOMString*/;
-	/** @see http://www.w3.org/TR/2012/WD-url-20120524/ */
 	var port : string/*DOMString*/;
-	/** @see http://www.w3.org/TR/2012/WD-url-20120524/ */
 	var pathname : string/*DOMString*/;
-	/** @see http://www.w3.org/TR/2012/WD-url-20120524/ */
 	var search : string/*DOMString*/;
-	/** @see http://www.w3.org/TR/2012/WD-url-20120524/ */
 	var hash : string/*DOMString*/;
-	/** @see http://www.w3.org/TR/2012/WD-url-20120524/ */
 	var filename : string/*DOMString*/;
-	/** @see http://www.w3.org/TR/2012/WD-url-20120524/ */
 	__readonly__ var origin : string/*DOMString*/;
-	/** @see http://www.w3.org/TR/2012/WD-url-20120524/ */
 	function getParameterNames() : string[]/*sequence<DOMString>*/;
-	/** @see http://www.w3.org/TR/2012/WD-url-20120524/ */
 	function getParameterValues(
 		name : string/*DOMString*/
 	) : string[]/*sequence<DOMString>*/;
-	/** @see http://www.w3.org/TR/2012/WD-url-20120524/ */
 	function hasParameter(name : string/*DOMString*/) : boolean;
-	/** @see http://www.w3.org/TR/2012/WD-url-20120524/ */
 	function getParameter(
 		name : string/*DOMString*/
 	) : Nullable.<string>/*DOMString?*/;
-	/** @see http://www.w3.org/TR/2012/WD-url-20120524/ */
 	function setParameter(
 		name : string/*DOMString*/,
 		value : string/*DOMString*/
 	) : void;
-	/** @see http://www.w3.org/TR/2012/WD-url-20120524/ */
 	function addParameter(
 		name : string/*DOMString*/,
 		value : string/*DOMString*/
 	) : void;
-	/** @see http://www.w3.org/TR/2012/WD-url-20120524/ */
 	function removeParameter(name : string/*DOMString*/) : void;
-	/** @see http://www.w3.org/TR/2012/WD-url-20120524/ */
 	function clearParameters() : void;
-	/** @see http://www.w3.org/TR/2012/WD-url-20120524/ */
 	var href : string/*DOMString*/;
 
 	/** @see http://www.w3.org/TR/mediacapture-streams/ */
@@ -5644,6 +5646,127 @@ native final class EventSourceInit {
 	var withCredentials : boolean;
 
 } // end of EventSourceInit
+
+// alias NotificationPermissionCallback = function(permission:string/*NotificationPermission*/):void
+
+/** @see http://www.w3.org/TR/2012/WD-notifications-20120614/ */
+native final class Notification extends EventTarget {
+
+	function constructor(title : string/*DOMString*/);
+	function constructor(
+		title : string/*DOMString*/,
+		options : NotificationOptions
+	);
+
+	__readonly__ var permission : string/*NotificationPermission*/;
+	static function requestPermission(
+		callback : function(permission:string/*NotificationPermission*/):void/*NotificationPermissionCallback*/
+	) : void;
+	var onclick : Nullable.<function(:Event):void>/*Function?*/;
+	var onshow : Nullable.<function(:Event):void>/*Function?*/;
+	var onerror : Nullable.<function(:Event):void>/*Function?*/;
+	var onclose : Nullable.<function(:Event):void>/*Function?*/;
+	function close() : void;
+
+} // end of Notification
+
+/** @see http://www.w3.org/TR/2012/WD-notifications-20120614/ */
+native final class NotificationOptions {
+
+	var titleDir : string/*NotificationDirection*/;
+	var body : string/*DOMString*/;
+	var bodyDir : string/*NotificationDirection*/;
+	var tag : string/*DOMString*/;
+	var iconUrl : string/*DOMString*/;
+
+} // end of NotificationOptions
+
+// alias IntentSuccessCallback = function(data:variant/*any*/,ports:MessagePort[]):void
+
+// alias IntentFailureCallback = function(data:variant/*any*/):void
+
+/** @see http://www.w3.org/TR/2012/WD-web-intents-20120626/ */
+native final class IntentParameters {
+
+	var action : string/*DOMString*/;
+	var type : string/*DOMString*/;
+	var data : variant/*any*/;
+	var transfer : Transferable[];
+	var extras : Object;
+	var service : URL;
+	var suggestions : URL[];
+
+} // end of IntentParameters
+
+/** @see http://www.w3.org/TR/2012/WD-web-intents-20120626/ */
+native class Intent {
+
+	function constructor(params : IntentParameters);
+	function constructor(
+		action : string/*DOMString*/,
+		type : string/*DOMString*/
+	);
+	function constructor(
+		action : string/*DOMString*/,
+		type : string/*DOMString*/,
+		data : variant/*any*/
+	);
+	function constructor(
+		action : string/*DOMString*/,
+		type : string/*DOMString*/,
+		data : variant/*any*/,
+		transferList : Transferable[]
+	);
+
+	__readonly__ var action : string/*DOMString*/;
+	__readonly__ var type : string/*DOMString*/;
+	__readonly__ var data : variant/*any*/;
+	__readonly__ var ports : MessagePort[];
+	function getExtra(key : string/*DOMString*/) : string/*DOMString*/;
+	function postResult(data : variant/*any*/) : void;
+	function postResult(
+		data : variant/*any*/,
+		transferable : Transferable[]
+	) : void;
+	function postFailure(data : variant/*any*/) : void;
+
+} // end of Intent
+
+/** @see http://www.w3.org/TR/2012/WD-web-intents-20120626/ */
+native __fake__ class Intents {
+
+	function startActivity(intent : Intent) : void;
+	function startActivity(
+		intent : Intent,
+		onSuccess : function(data:variant/*any*/,
+		ports:MessagePort[]):void/*IntentSuccessCallback*/
+	) : void;
+	function startActivity(
+		intent : Intent,
+		onSuccess : function(data:variant/*any*/,
+		ports:MessagePort[]):void/*IntentSuccessCallback*/,
+		onFailure : function(data:variant/*any*/):void/*IntentFailureCallback*/
+	) : void;
+
+} // end of Intents
+
+/** @see http://www.w3.org/TR/2012/WD-web-intents-20120626/ */
+native __fake__ class IntentProvider {
+
+	__readonly__ var intent : Intent;
+
+} // end of IntentProvider
+
+/** @see http://www.w3.org/TR/2012/WD-web-intents-20120626/ */
+native final class HTMLIntentElement extends HTMLElement {
+
+	var action : string/*DOMString*/;
+	var type : string/*DOMString*/;
+	var href : string/*DOMString*/;
+	// inherits var title : string/*DOMString*/;
+	var disposition : string/*DOMString*/;
+
+} // end of HTMLIntentElement
 
 // alias NavigatorUserMediaSuccessCallback = function(stream:LocalMediaStream):void
 
@@ -8508,6 +8631,9 @@ native final class webkitURL extends URL {
 }
 
 native final class webkitAudioContext extends AudioContext {
+}
+
+native final class webkitIntent extends Intent {
 }
 
 native final class DeviceOrientationEvent extends Event {

@@ -1,0 +1,1316 @@
+<!DOCTYPE html PUBLIC '-//W3C//DTD HTML 4.01 Transitional//EN' 'http://www.w3.org/TR/html4/loose.dtd'>
+<html lang="en" dir="ltr">
+<head>
+    <title>Web Intents</title>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+    
+    
+  <style type="text/css">/*****************************************************************
+ * ReSpec 3 CSS
+ * Robin Berjon - http://berjon.com/
+ *****************************************************************/
+
+/* --- INLINES --- */
+em.rfc2119 { 
+    text-transform:     lowercase;
+    font-variant:       small-caps;
+    font-style:         normal;
+    color:              #900;
+}
+
+h1 acronym, h2 acronym, h3 acronym, h4 acronym, h5 acronym, h6 acronym, a acronym,
+h1 abbr, h2 abbr, h3 abbr, h4 abbr, h5 abbr, h6 abbr, a abbr {
+    border: none;
+}
+
+dfn {
+    font-weight:    bold;
+}
+
+a.internalDFN {
+    color:  inherit;
+    border-bottom:  1px solid #99c;
+    text-decoration:    none;
+}
+
+a.externalDFN {
+    color:  inherit;
+    border-bottom:  1px dotted #ccc;
+    text-decoration:    none;
+}
+
+a.bibref {
+    text-decoration:    none;
+}
+
+cite .bibref {
+    font-style: normal;
+}
+
+code {
+    color:  #ff4500;
+}
+
+
+/* --- --- */
+ol.algorithm { counter-reset:numsection; list-style-type: none; }
+ol.algorithm li { margin: 0.5em 0; }
+ol.algorithm li:before { font-weight: bold; counter-increment: numsection; content: counters(numsection, ".") ") "; }
+
+
+/* --- WEB IDL --- */
+pre.idl {
+    border-top: 1px solid #90b8de;
+    border-bottom: 1px solid #90b8de;
+    padding:    1em;
+    line-height:    120%;
+}
+
+pre.idl::before {
+    content:    "WebIDL";
+    display:    block;
+    width:      150px;
+    background: #90b8de;
+    color:  #fff;
+    font-family:    initial;
+    padding:    3px;
+    font-weight:    bold;
+    margin: -1em 0 1em -1em;
+}
+
+.idlType {
+    color:  #ff4500;
+    font-weight:    bold;
+    text-decoration:    none;
+}
+
+/*.idlModule*/
+/*.idlModuleID*/
+/*.idlInterface*/
+.idlInterfaceID, .idlDictionaryID, .idlCallbackID, .idlEnumID {
+    font-weight:    bold;
+    color:  #005a9c;
+}
+
+.idlSuperclass {
+    font-style: italic;
+    color:  #005a9c;
+}
+
+/*.idlAttribute*/
+.idlAttrType, .idlFieldType, .idlMemberType {
+    color:  #005a9c;
+}
+.idlAttrName, .idlFieldName, .idlMemberName {
+    color:  #ff4500;
+}
+.idlAttrName a, .idlFieldName a, .idlMemberName a {
+    color:  #ff4500;
+    border-bottom:  1px dotted #ff4500;
+    text-decoration: none;
+}
+
+/*.idlMethod*/
+.idlMethType, .idlCallbackType {
+    color:  #005a9c;
+}
+.idlMethName {
+    color:  #ff4500;
+}
+.idlMethName a {
+    color:  #ff4500;
+    border-bottom:  1px dotted #ff4500;
+    text-decoration: none;
+}
+
+/*.idlParam*/
+.idlParamType {
+    color:  #005a9c;
+}
+.idlParamName {
+    font-style: italic;
+}
+
+.extAttr {
+    color:  #666;
+}
+
+/*.idlConst*/
+.idlConstType {
+    color:  #005a9c;
+}
+.idlConstName {
+    color:  #ff4500;
+}
+.idlConstName a {
+    color:  #ff4500;
+    border-bottom:  1px dotted #ff4500;
+    text-decoration: none;
+}
+
+/*.idlException*/
+.idlExceptionID {
+    font-weight:    bold;
+    color:  #c00;
+}
+
+.idlTypedefID, .idlTypedefType {
+    color:  #005a9c;
+}
+
+.idlRaises, .idlRaises a.idlType, .idlRaises a.idlType code, .excName a, .excName a code {
+    color:  #c00;
+    font-weight:    normal;
+}
+
+.excName a {
+    font-family:    monospace;
+}
+
+.idlRaises a.idlType, .excName a.idlType {
+    border-bottom:  1px dotted #c00;
+}
+
+.excGetSetTrue, .excGetSetFalse, .prmNullTrue, .prmNullFalse, .prmOptTrue, .prmOptFalse {
+    width:  45px;
+    text-align: center;
+}
+.excGetSetTrue, .prmNullTrue, .prmOptTrue { color:  #0c0; }
+.excGetSetFalse, .prmNullFalse, .prmOptFalse { color:  #c00; }
+
+.idlImplements a {
+    font-weight:    bold;
+}
+
+dl.attributes, dl.methods, dl.constants, dl.fields, dl.dictionary-members {
+    margin-left:    2em;
+}
+
+.attributes dt, .methods dt, .constants dt, .fields dt, .dictionary-members dt {
+    font-weight:    normal;
+}
+
+.attributes dt code, .methods dt code, .constants dt code, .fields dt code, .dictionary-members dt code {
+    font-weight:    bold;
+    color:  #000;
+    font-family:    monospace;
+}
+
+.attributes dt code, .fields dt code, .dictionary-members dt code {
+    background:  #ffffd2;
+}
+
+.attributes dt .idlAttrType code, .fields dt .idlFieldType code, .dictionary-members dt .idlMemberType code {
+    color:  #005a9c;
+    background:  transparent;
+    font-family:    inherit;
+    font-weight:    normal;
+    font-style: italic;
+}
+
+.methods dt code {
+    background:  #d9e6f8;
+}
+
+.constants dt code {
+    background:  #ddffd2;
+}
+
+.attributes dd, .methods dd, .constants dd, .fields dd, .dictionary-members dd {
+    margin-bottom:  1em;
+}
+
+table.parameters, table.exceptions {
+    border-spacing: 0;
+    border-collapse:    collapse;
+    margin: 0.5em 0;
+    width:  100%;
+}
+table.parameters { border-bottom:  1px solid #90b8de; }
+table.exceptions { border-bottom:  1px solid #deb890; }
+
+.parameters th, .exceptions th {
+    color:  #fff;
+    padding:    3px 5px;
+    text-align: left;
+    font-family:    initial;
+    font-weight:    normal;
+    text-shadow:    #666 1px 1px 0;
+}
+.parameters th { background: #90b8de; }
+.exceptions th { background: #deb890; }
+
+.parameters td, .exceptions td {
+    padding:    3px 10px;
+    border-top: 1px solid #ddd;
+    vertical-align: top;
+}
+
+.parameters tr:first-child td, .exceptions tr:first-child td {
+    border-top: none;
+}
+
+.parameters td.prmName, .exceptions td.excName, .exceptions td.excCodeName {
+    width:  100px;
+}
+
+.parameters td.prmType {
+    width:  120px;
+}
+
+table.exceptions table {
+    border-spacing: 0;
+    border-collapse:    collapse;
+    width:  100%;
+}
+
+/* --- TOC --- */
+.toc a, .tof a {
+    text-decoration:    none;
+}
+
+a .secno, a .figno {
+    color:  #000;
+}
+
+ul.tof, ol.tof {
+    list-style: none outside none;
+}
+
+.caption {
+    margin-top: 0.5em;
+    font-style:   italic;
+}
+
+/* --- TABLE --- */
+table.simple {
+    border-spacing: 0;
+    border-collapse:    collapse;
+    border-bottom:  3px solid #005a9c;
+}
+
+.simple th {
+    background: #005a9c;
+    color:  #fff;
+    padding:    3px 5px;
+    text-align: left;
+}
+
+.simple th[scope="row"] {
+    background: inherit;
+    color:  inherit;
+    border-top: 1px solid #ddd;
+}
+
+.simple td {
+    padding:    3px 10px;
+    border-top: 1px solid #ddd;
+}
+
+.simple tr:nth-child(even) {
+    background: #f0f6ff;
+}
+
+/* --- DL --- */
+.section dd > p:first-child {
+    margin-top: 0;
+}
+
+.section dd > p:last-child {
+    margin-bottom: 0;
+}
+
+.section dd {
+    margin-bottom:  1em;
+}
+
+.section dl.attrs dd, .section dl.eldef dd {
+    margin-bottom:  0;
+}
+</style><style type="text/css">/* --- EXAMPLES --- */
+div.example-title {
+    min-width: 7.5em;
+    color: #b9ab2d;
+}
+div.example-title span {
+    text-transform: uppercase;   
+}
+div.example, div.illegal-example {
+    padding: 0.5em;
+    margin: 1em 0;
+    position: relative;
+    clear: both;
+}
+div.illegal-example { color: red }
+div.illegal-example p { color: black }
+div.example {
+    padding: .5em;
+    border-left-width: .5em;
+    border-left-style: solid;
+    border-color: #e0cb52;
+    background: #fcfaee;    
+}
+</style><style type="text/css">/* HIGHLIGHTS */
+code.prettyprint {
+    color:  inherit;
+}
+
+/* this from google-code-prettify */
+.pln{color:#000}@media screen{.str{color:#080}.kwd{color:#008}.com{color:#800}.typ{color:#606}.lit{color:#066}.pun,.opn,.clo{color:#660}.tag{color:#008}.atn{color:#606}.atv{color:#080}.dec,.var{color:#606}.fun{color:red}}@media print,projection{.str{color:#060}.kwd{color:#006;font-weight:bold}.com{color:#600;font-style:italic}.typ{color:#404;font-weight:bold}.lit{color:#044}.pun,.opn,.clo{color:#440}.tag{color:#006;font-weight:bold}.atn{color:#404}.atv{color:#060}}ol.linenums{margin-top:0;margin-bottom:0}li.L0,li.L1,li.L2,li.L3,li.L5,li.L6,li.L7,li.L8{list-style-type:none}li.L1,li.L3,li.L5,li.L7,li.L9{background:#eee}
+</style><link href="http://www.w3.org/StyleSheets/TR/W3C-WD" rel="stylesheet"></head>
+  <body><div class="head">
+  <p>
+    
+      <a href="http://www.w3.org/"><img src="http://www.w3.org/Icons/w3c_home" alt="W3C" height="48" width="72"></a>
+    
+  </p>
+  <h1 class="title" id="title">Web Intents</h1>
+  
+  <h2 id="w3c-working-draft-26-june-2012"><acronym title="World Wide Web Consortium">W3C</acronym> Working Draft 26 June 2012</h2>
+  <dl>
+    
+      <dt>This version:</dt>
+      <dd><a href="http://www.w3.org/TR/2012/WD-web-intents-20120626/">http://www.w3.org/TR/2012/WD-web-intents-20120626/</a></dd>
+      <dt>Latest published version:</dt>
+      <dd><a href="http://www.w3.org/TR/web-intents/">http://www.w3.org/TR/web-intents/</a></dd>
+    
+    
+      <dt>Latest editor's draft:</dt>
+      <dd><a href="https://dvcs.w3.org/hg/web-intents/raw-file/tip/spec/Overview-respec.html">https://dvcs.w3.org/hg/web-intents/raw-file/tip/spec/Overview-respec.html</a></dd>
+    
+    
+    
+    
+    
+    
+    <dt>Editors:</dt>
+    <dd><span>Greg Billock</span>, <a href="http://google.com/">Google</a></dd>
+<dd><span>James Hawkins</span>, <a href="http://google.com/">Google</a></dd>
+<dd><span>Paul Kinlan</span>, <a href="http://google.com/">Google</a></dd>
+
+    
+  </dl>
+  
+  
+  
+  
+    
+      <p class="copyright">
+        <a href="http://www.w3.org/Consortium/Legal/ipr-notice#Copyright">Copyright</a> © 
+        2011-2012
+        
+        <a href="http://www.w3.org/"><acronym title="World Wide Web Consortium">W3C</acronym></a><sup>®</sup> 
+        (<a href="http://www.csail.mit.edu/"><acronym title="Massachusetts Institute of Technology">MIT</acronym></a>,
+        <a href="http://www.ercim.eu/"><acronym title="European Research Consortium for Informatics and Mathematics">ERCIM</acronym></a>,
+        <a href="http://www.keio.ac.jp/">Keio</a>), All Rights Reserved.
+        <acronym title="World Wide Web Consortium">W3C</acronym> <a href="http://www.w3.org/Consortium/Legal/ipr-notice#Legal_Disclaimer">liability</a>,
+        <a href="http://www.w3.org/Consortium/Legal/ipr-notice#W3C_Trademarks">trademark</a> and
+        <a href="http://www.w3.org/Consortium/Legal/copyright-documents">document use</a> rules apply.
+      </p>
+    
+  
+  <hr>
+</div>
+    <div class="introductory section" id="abstract"><h2>Abstract</h2>
+      <p>
+      This specification defines a service discovery and light-weight RPC
+      mechanism for web apps called Web Intents.
+      </p>
+      <p>
+      This document defines DOM interfaces and markup used by client and service
+      pages to create, receive, and reply to Web Intents messages, and the
+      procedures the User Agent carries out to facilitate that process.
+      </p>
+    </div><div id="sotd" class="introductory section"><h2>Status of This Document</h2>
+  
+    
+      
+        <p>
+          <em>This section describes the status of this document at the time of its publication. Other
+          documents may supersede this document. A list of current <acronym title="World Wide Web Consortium">W3C</acronym> publications and the latest revision
+          of this technical report can be found in the <a href="http://www.w3.org/TR/"><acronym title="World Wide Web Consortium">W3C</acronym> technical reports
+          index</a> at http://www.w3.org/TR/.</em>
+        </p>
+        
+      <p>
+        This document is produced by a the Web Intents Task Force, which is jointly operated
+        by the DAP and WebApps Working Groups. The email address provided for feedback is
+        that of the Task Force, where all feedback is welcome.
+      </p>
+    
+        <p>
+          This document was published by the <a href="http://www.w3.org/2009/dap/">Device Applications (DAP) Working Group</a> and <a href="http://www.w3.org/2008/webapps/">Web Applications (WebApps) Working Group</a> as a First Public Working Draft.
+          
+            This document is intended to become a <acronym title="World Wide Web Consortium">W3C</acronym> Recommendation.
+          
+          If you wish to make comments regarding this document, please send them to 
+          <a href="mailto:public-web-intents@w3.org">public-web-intents@w3.org</a> 
+          (<a href="mailto:public-web-intents-request@w3.org?subject=subscribe">subscribe</a>,
+          <a href="http://lists.w3.org/Archives/Public/public-web-intents/">archives</a>).
+          
+          
+          All feedback is welcome.
+        </p>
+        
+          <p>
+            Publication as a Working Draft does not imply endorsement by the <acronym title="World Wide Web Consortium">W3C</acronym> Membership.
+            This is a draft document and may be updated, replaced or obsoleted by other documents at 
+            any time. It is inappropriate to cite this document as other than work in progress.
+          </p>
+        
+        
+        <p>
+          
+            This document was produced by a group operating under the 
+            <a href="http://www.w3.org/Consortium/Patent-Policy-20040205/">5 February
+            2004 <acronym title="World Wide Web Consortium">W3C</acronym> Patent Policy</a>.
+          
+          
+          
+            
+              <acronym title="World Wide Web Consortium">W3C</acronym> maintains a public list of any patent disclosures (<a href="http://www.w3.org/2004/01/pp-impl/43696/status" rel="disclosure">Device Applications (DAP) Working Group</a>, <a href="http://www.w3.org/2004/01/pp-impl/42538/status" rel="disclosure">Web Applications (WebApps) Working Group</a>)
+            
+            made in connection with the deliverables of the group; that page also includes instructions for 
+            disclosing a patent. An individual who has actual knowledge of a patent which the individual believes contains
+            <a href="http://www.w3.org/Consortium/Patent-Policy-20040205/#def-essential">Essential Claim(s)</a> must disclose the
+            information in accordance with <a href="http://www.w3.org/Consortium/Patent-Policy-20040205/#sec-Disclosure">section
+            6 of the <acronym title="World Wide Web Consortium">W3C</acronym> Patent Policy</a>.
+          
+          
+        </p>
+        
+      
+    
+  
+</div><div class="section" id="toc"><h2 class="introductory">Table of Contents</h2><ul class="toc"><li class="tocline"><a class="tocxref" href="#introduction"><span class="secno">1. </span>Introduction</a><ul class="toc"><li class="tocline"><a class="tocxref" href="#example"><span class="secno">1.1 </span>Example</a></li><li class="tocline"><a class="tocxref" href="#normative-parts"><span class="secno">1.2 </span>Normative parts</a></li></ul></li><li class="tocline"><a class="tocxref" href="#terminology"><span class="secno">2. </span>Terminology</a><ul class="toc"><li class="tocline"><a class="tocxref" href="#actors"><span class="secno">2.1 </span>Actors</a></li><li class="tocline"><a class="tocxref" href="#life-cycle-of-intents-and-services"><span class="secno">2.2 </span>Life cycle of Intents and Services</a></li></ul></li><li class="tocline"><a class="tocxref" href="#api-description"><span class="secno">3. </span>API Description</a><ul class="toc"><li class="tocline"><a class="tocxref" href="#intent-parameters-dictionary"><span class="secno">3.1 </span>Intent parameters dictionary</a><ul class="toc"><li class="tocline"><a class="tocxref" href="#dictionary-intentparameters-members"><span class="secno">3.1.1 </span>Dictionary <span class="idlType formerLink idlType"><code>IntentParameters</code></span> Members</a></li></ul></li><li class="tocline"><a class="tocxref" href="#intent-object"><span class="secno">3.2 </span>Intent object</a><ul class="toc"><li class="tocline"><a class="tocxref" href="#attributes"><span class="secno">3.2.1 </span>Attributes</a></li><li class="tocline"><a class="tocxref" href="#methods"><span class="secno">3.2.2 </span>Methods</a></li></ul></li><li class="tocline"><a class="tocxref" href="#invocation-api"><span class="secno">3.3 </span>Invocation API</a><ul class="toc"><li class="tocline"><a class="tocxref" href="#methods-1"><span class="secno">3.3.1 </span>Methods</a></li></ul></li><li class="tocline"><a class="tocxref" href="#delivery-and-response-api"><span class="secno">3.4 </span>Delivery and Response API</a><ul class="toc"><li class="tocline"><a class="tocxref" href="#attributes-1"><span class="secno">3.4.1 </span>Attributes</a></li></ul></li><li class="tocline"><a class="tocxref" href="#registration-markup"><span class="secno">3.5 </span>Registration Markup</a><ul class="toc"><li class="tocline"><a class="tocxref" href="#attributes-2"><span class="secno">3.5.1 </span>Attributes</a></li></ul></li></ul></li><li class="tocline"><a class="tocxref" href="#user-agent-behavior"><span class="secno">4. </span>User Agent Behavior</a><ul class="toc"><li class="tocline"><a class="tocxref" href="#explicit-intents"><span class="secno">4.1 </span>Explicit Intents</a></li><li class="tocline"><a class="tocxref" href="#matching-action-and-type-for-delivery"><span class="secno">4.2 </span>Matching action and type for delivery</a></li><li class="tocline"><a class="tocxref" href="#handling-service-suggestions-from-intent-invocation"><span class="secno">4.3 </span>Handling Service suggestions from Intent Invocation</a></li></ul></li><li class="tocline"><a class="tocxref" href="#use-cases-and-requirements"><span class="secno">5. </span>Use Cases and Requirements</a><ul class="toc"><li class="tocline"><a class="tocxref" href="#sharing"><span class="secno">5.1 </span>Sharing</a></li><li class="tocline"><a class="tocxref" href="#integration-with-local-web-apps"><span class="secno">5.2 </span>Integration with local web apps</a></li><li class="tocline"><a class="tocxref" href="#persistent-connections"><span class="secno">5.3 </span>Persistent connections</a></li><li class="tocline"><a class="tocxref" href="#integration-with-external-applications"><span class="secno">5.4 </span>Integration with external applications</a></li><li class="tocline"><a class="tocxref" href="#translating-existing-web-platform-features-to-intents"><span class="secno">5.5 </span>Translating existing web platform features to intents</a></li><li class="tocline"><a class="tocxref" href="#authentication"><span class="secno">5.6 </span>Authentication</a></li></ul></li><li class="tocline"><a class="tocxref" href="#privacy-considerations"><span class="secno">6. </span>Privacy Considerations</a></li><li class="tocline"><a class="tocxref" href="#acknowledgements"><span class="secno">A. </span>Acknowledgements</a></li><li class="tocline"><a class="tocxref" href="#references"><span class="secno">B. </span>References</a><ul class="toc"><li class="tocline"><a class="tocxref" href="#normative-references"><span class="secno">B.1 </span>Normative references</a></li><li class="tocline"><a class="tocxref" href="#informative-references"><span class="secno">B.2 </span>Informative references</a></li></ul></li></ul></div>
+    
+    <div class="section" id="introduction">
+      <!--OddPage--><h2><span class="secno">1. </span>Introduction</h2>
+      <p>
+        Web Intents enable rich integration between web
+        applications. Increasingly, services available on the web have a need to
+        pass rich data back and forth as they do their jobs. Web Intents
+        facilitate this interchange while maintaining the kind of loose coupling
+        and open architecture that has proven so advantageous for the web. They
+        exist purely client-side, mediated through the User Agent, allowing the
+        user a great degree of control over the security and privacy of the
+        exchanged data.
+      </p>
+      <p>
+        An Intent is a user-initiated action delegated to be performed by a service.
+        It consists of an "action" string which tells the service what kind of activity
+        the user expects to be performed (e.g. "share" or "edit"), a "type" string which
+        specifies the data payload the service should expect, and the data payload
+        itself.
+      </p>
+      <p>
+        The lifecycle of an Intent is that first, a client requests an Intent be
+        handled. This Intent data is then passed to the User Agent, which allows the
+        user to select which of potentially many possible services to use. Then
+        the service is passed the Intent data and is provided a UI by the User
+        Agent in which to perform the action specified in the Intent. Finally,
+        the service may also return data as output back to the client.
+      </p>
+      <p>
+        Web Intents provides a declarative syntax that allows
+        services to list the Intents they handle. Using this method, services mark
+        up what actions they can handle and which data types they expect.
+      </p>
+      <div class="section" id="example">
+      <h3><span class="secno">1.1 </span>Example</h3>
+      <p>
+      Suppose there is a photo hosting application. This application allows a
+      user to select images to be shared, edit those images, and then share them
+      with friends. The application is built around making photos available to
+      users, but has no built-in editor or sharing interface. But beside each
+      photo, it can place an <b>Edit</b> button, with this kind of accompanying
+      code:
+      </p>
+      <div class="example"><div class="example-title"><span>Example 1</span></div><pre class="example highlight prettyprint"><span class="pln">document</span><span class="pun">.</span><span class="pln">getElementById</span><span class="pun">(</span><span class="str">'edit-photo'</span><span class="pun">).</span><span class="pln">addEventListener</span><span class="pun">(</span><span class="str">"click"</span><span class="pun">,</span><span class="pln"> </span><span class="kwd">function</span><span class="pun">()</span><span class="pln"> </span><span class="pun">{</span><span class="pln">
+  </span><span class="kwd">var</span><span class="pln"> intent </span><span class="pun">=</span><span class="pln"> </span><span class="kwd">new</span><span class="pln"> </span><span class="typ">Intent</span><span class="pun">({</span><span class="str">"action"</span><span class="pun">:</span><span class="str">"http://webintents.org/edit"</span><span class="pun">,</span><span class="pln">
+                           </span><span class="str">"type"</span><span class="pun">:</span><span class="str">"image/jpeg"</span><span class="pun">,</span><span class="pln">
+                           </span><span class="str">"data"</span><span class="pun">:</span><span class="pln">getImageDataBlob</span><span class="pun">(...)});</span><span class="pln">
+  navigator</span><span class="pun">.</span><span class="pln">startActivity</span><span class="pun">(</span><span class="pln">intent</span><span class="pun">,</span><span class="pln"> imageEdited</span><span class="pun">);</span><span class="pln">
+</span><span class="pun">},</span><span class="pln"> </span><span class="kwd">false</span><span class="pun">);</span><span class="pln">
+
+</span><span class="kwd">function</span><span class="pln"> imageEdited</span><span class="pun">(</span><span class="pln">data</span><span class="pun">)</span><span class="pln"> </span><span class="pun">{</span><span class="pln">
+  document</span><span class="pun">.</span><span class="pln">getElementById</span><span class="pun">(</span><span class="str">'image'</span><span class="pun">).</span><span class="pln">src </span><span class="pun">=</span><span class="pln"> data</span><span class="pun">;</span><span class="pln">
+</span><span class="pun">}</span></pre></div>
+      <p>
+      This code delegates image editing to third-party applications which can
+      consume images prepared as blobs, and produce
+      results in the same format. For instance, one such editor might be
+      a meme-maker—an application allowing the user to place humorous
+      messages on pictures they take.
+      </p>
+      <p>
+      Now that a picture has been edited in the selected service, and meme text
+      added, the user undoubtedly wants to share the result with friends. Again,
+      the photo hosting application may not have built-in sharing capabilities,
+      but by adding a <b>Share</b> button near images, and with this kind of
+      accompanying code, it can accomplish this integration:
+      </p>
+      <div class="example"><div class="example-title"><span>Example 2</span></div><pre class="example highlight prettyprint"><span class="pln">document</span><span class="pun">.</span><span class="pln">getElementById</span><span class="pun">(</span><span class="str">'share-photo'</span><span class="pun">).</span><span class="pln">addEventListener</span><span class="pun">(</span><span class="str">"click"</span><span class="pun">,</span><span class="pln"> </span><span class="kwd">function</span><span class="pun">()</span><span class="pln"> </span><span class="pun">{</span><span class="pln">
+  </span><span class="kwd">var</span><span class="pln"> intent </span><span class="pun">=</span><span class="pln"> </span><span class="kwd">new</span><span class="pln"> </span><span class="typ">Intent</span><span class="pun">({</span><span class="str">"action"</span><span class="pun">:</span><span class="str">"http://webintents.org/share"</span><span class="pun">,</span><span class="pln">
+                           </span><span class="str">"type"</span><span class="pun">:</span><span class="str">"text/uri-list"</span><span class="pun">,</span><span class="pln">
+                           </span><span class="str">"data"</span><span class="pun">:</span><span class="pln">getPublicURIForImage</span><span class="pun">(...)});</span><span class="pln">
+  navigator</span><span class="pun">.</span><span class="pln">startActivity</span><span class="pun">(</span><span class="pln">intent</span><span class="pun">);</span><span class="pln">
+</span><span class="pun">},</span><span class="pln"> </span><span class="kwd">false</span><span class="pun">);</span></pre></div>
+      <p>
+      This code delegates sharing functionality to an existing services chosen
+      by the user which are capable of sharing urls.
+      (<code>getPublicURIForImage()</code> is a
+      marker for an application-specific piece of functionality getting the URL
+      to be shared) So a social networking site
+      selected by the user might produce a status update with a thumbnail of the
+      image. A blogging site might provide a UI allowing the user to post the picture.
+      </p><p>
+      Note that with this integration, other more high-minded services can be
+      selected by the user as well. Instead of using the service to add funny
+      captions, the user might use a sophisticated photo editing application
+      to adjust exposure, remove red-eye, or do any number of other
+      transformations on the image. The user can have many such tools
+      registered, and choose any of that set to use for any given image editing
+      task. The photo hosting application isn't controlling which application
+      the user chooses; it is loosely coupled with such applications by providing the
+      data necessary for them to carry out their task, and controls allowing the
+      user to launch these activities on the data.
+      </p>
+      <p>
+      In this way, an Intent is like the dual of a hyperlink. With a hyperlink,
+      the source page specifies the exact URL to be navigated to. With an
+      Intent, the source page specifies the nature of the task to be done, and the
+      user can select any of a number of applications to be used to complete the task.
+      </p>
+      <p>
+      On the service side, the page needs to register itself as a Web Intents service, and
+      handle the incoming intent data, possibly producing a response. That is
+      done like this:
+      </p>
+      <div class="example"><div class="example-title"><span>Example 3</span></div><pre class="example highlight prettyprint"><span class="tag">&lt;html&gt;</span><span class="pln">
+</span><span class="tag">&lt;head&gt;</span><span class="pln">
+</span><span class="tag">&lt;title&gt;</span><span class="pln">Image Meme Editor</span><span class="tag">&lt;/title&gt;</span><span class="pln">
+</span><span class="tag">&lt;/head&gt;</span><span class="pln">
+</span><span class="tag">&lt;body&gt;</span><span class="pln">
+</span><span class="tag">&lt;intent</span><span class="pln"> </span><span class="atn">action</span><span class="pun">=</span><span class="atv">"http://webintents.org/edit"</span><span class="pln"> </span><span class="atn">type</span><span class="pun">=</span><span class="atv">"text/uri-list;type=image/*,image/*"</span><span class="tag">&gt;&lt;/intent&gt;</span><span class="pln">
+</span><span class="tag">&lt;script&gt;</span><span class="pln">
+  window</span><span class="pun">.</span><span class="pln">addEventListener</span><span class="pun">(</span><span class="str">"load"</span><span class="pun">,</span><span class="pln"> </span><span class="kwd">function</span><span class="pun">()</span><span class="pln"> </span><span class="pun">{</span><span class="pln">
+    </span><span class="kwd">if</span><span class="pln"> </span><span class="pun">(</span><span class="pln">window</span><span class="pun">.</span><span class="pln">intent</span><span class="pun">)</span><span class="pln"> </span><span class="pun">{</span><span class="pln">
+      setImageContentURI</span><span class="pun">(</span><span class="pln">window</span><span class="pun">.</span><span class="pln">intent</span><span class="pun">.</span><span class="pln">data</span><span class="pun">);</span><span class="pln">
+    </span><span class="pun">}</span><span class="pln">
+  </span><span class="pun">},</span><span class="pln"> </span><span class="kwd">false</span><span class="pun">);</span><span class="pln">
+
+  document</span><span class="pun">.</span><span class="pln">getElementById</span><span class="pun">(</span><span class="str">'save-button'</span><span class="pun">).</span><span class="pln">addEventListener</span><span class="pun">(</span><span class="str">"click"</span><span class="pun">,</span><span class="pln"> </span><span class="kwd">function</span><span class="pun">()</span><span class="pln"> </span><span class="pun">{</span><span class="pln">
+    window</span><span class="pun">.</span><span class="pln">intent</span><span class="pun">.</span><span class="pln">postResult</span><span class="pun">(</span><span class="pln">getImageDataURI</span><span class="pun">(...));</span><span class="pln">
+  </span><span class="pun">},</span><span class="pln"> </span><span class="kwd">false</span><span class="pun">);</span><span class="pln">
+</span><span class="tag">&lt;/script&gt;</span></pre></div>
+      <p>
+      The assumed pieces here (on both client and service pages) are functions
+      which deal with the application's image display, for instance putting the
+      image into a canvas and taking it back out again as a data URI. Or
+      producing the public URI of the image on the site.
+      </p>
+      </div>
+
+      <div class="section" id="normative-parts">
+      <h3><span class="secno">1.2 </span>Normative parts</h3>
+      <p>
+      The normative parts of this specification are the API Description and the
+      User Agent Behavior section. All other parts are informative.
+      </p>
+      </div>
+    </div>
+
+    <div class="section" id="terminology">
+      <!--OddPage--><h2><span class="secno">2. </span>Terminology</h2>
+      <p>
+        An <dfn id="dfn-intent">Intent</dfn> is an action with accompanying data, which is to be
+        performed by a Service of the user's choosing.
+      </p>
+      <div class="section" id="actors">
+      <h3><span class="secno">2.1 </span>Actors</h3>
+      <p>
+        A web page which creates an Intent and invokes the User Agent with it
+        is a <dfn id="dfn-client">Client</dfn>. The User Agent may also allow non-web-page sources
+        invoke Intents. For instance, the User Agent may have UI which
+        invokes Intents delivery, or may register for external OS hooks which trigger Intents.
+      </p>
+      <p>
+        A web page which can handle an Intent is a <dfn id="dfn-service">Service</dfn>,
+        possibly returning a piece of data to the calling Client page. (Note
+        that the User Agent may have ways to deliver Intents to Services which are
+        not web pages as well. These may be extension APIs, plug-in helpers,
+        external OS handlers, etc.)
+      </p>
+      </div>
+      <div class="section" id="life-cycle-of-intents-and-services">
+      <h3><span class="secno">2.2 </span>Life cycle of Intents and Services</h3>
+      <p>
+        <dfn id="dfn-registration">Registration</dfn> is how a Service page informs the User Agent
+        that it is capable of handling Intents.
+      </p>
+      <p>
+        <dfn id="dfn-invocation">Invocation</dfn> refers to the API by which a Client page
+        dispatches an Intent for handling.
+      </p>
+      <p>
+        <dfn id="dfn-selection">Selection</dfn> is the mechanism in which the User Agent decides
+        which Service will handle a particular Intent.
+      </p>
+      <p>
+        <dfn id="dfn-delivery">Delivery</dfn> is the means by which the User Agent passes an Intent
+        to a Service page for handling.
+      </p>
+      <p>
+        <dfn id="dfn-response">Response</dfn> is the means in which the Service can respond to an
+        Intent by passing data back through the User Agent to the Client page.
+      </p>
+      <p>
+      The steps in a particular Intent invocation are asynchronous. The Service
+      receives the Intent delivery and prepares its Response in a separate
+      execution context. That Response is then returned to the calling Client in
+      an asynchronous callback.
+      </p>
+      </div>
+    </div>
+    
+    <div class="section" id="api-description">
+    <!--OddPage--><h2><span class="secno">3. </span>API Description</h2>
+
+    <div class="section" id="intent-parameters-dictionary">
+    <h3><span class="secno">3.1 </span>Intent parameters dictionary</h3>
+      <p>
+      This object can be used in the object-literal constructor of the Intent
+      object. When using the object literal constructor, the <b>action</b> and
+      <b>type</b> fields are required; all others are optional.
+      </p>
+      <pre class="idl"><span class="idlDictionary" id="idl-def-IntentParameters">dictionary <span class="idlDictionaryID">IntentParameters</span> {
+<span class="idlMember">    <span class="idlMemberType"><a>DOMString</a></span>              <span class="idlMemberName"><a href="#widl-IntentParameters-action">action</a></span>;</span>
+<span class="idlMember">    <span class="idlMemberType"><a>DOMString</a></span>              <span class="idlMemberName"><a href="#widl-IntentParameters-type">type</a></span>;</span>
+<span class="idlMember">    <span class="idlMemberType"><a>any</a></span>                    <span class="idlMemberName"><a href="#widl-IntentParameters-data">data</a></span>;</span>
+<span class="idlMember">    <span class="idlMemberType">sequence&lt;<a>Transferable</a>&gt;</span> <span class="idlMemberName"><a href="#widl-IntentParameters-transfer">transfer</a></span>;</span>
+<span class="idlMember">    <span class="idlMemberType"><a>Object</a></span>                 <span class="idlMemberName"><a href="#widl-IntentParameters-extras">extras</a></span>;</span>
+<span class="idlMember">    <span class="idlMemberType"><a>URL</a></span>                    <span class="idlMemberName"><a href="#widl-IntentParameters-service">service</a></span>;</span>
+<span class="idlMember">    <span class="idlMemberType">sequence&lt;<a>URL</a>&gt;</span>          <span class="idlMemberName"><a href="#widl-IntentParameters-suggestions">suggestions</a></span>;</span>
+};</span>
+</pre><div class="section" id="dictionary-intentparameters-members"><h2><span class="secno">3.1.1 </span>Dictionary <a href="#idl-def-IntentParameters" class="idlType"><code>IntentParameters</code></a> Members</h2><dl class="dictionary-members"><dt id="widl-IntentParameters-action"><code>action</code> of type <span class="idlMemberType"><a>DOMString</a></span></dt><dd>An opaque string indicating the action type of the intent. The
+        string <em title="must not" class="rfc2119">must not</em> be empty.</dd><dt id="widl-IntentParameters-data"><code>data</code> of type <span class="idlMemberType"><a>any</a></span></dt><dd>The data payload used <em title="must" class="rfc2119">must</em> be an object upon which the structured
+        clone algorithm can be performed, including Transferables.</dd><dt id="widl-IntentParameters-extras"><code>extras</code> of type <span class="idlMemberType"><a>Object</a></span></dt><dd>A key-value map of extra metadata to be sent with the intent. Keys
+        and values are strings.</dd><dt id="widl-IntentParameters-service"><code>service</code> of type <span class="idlMemberType"><a>URL</a></span></dt><dd>When present, this field marks the intent as an explicit intent. The
+        value <em title="must" class="rfc2119">must</em> be an absolute URL.</dd><dt id="widl-IntentParameters-suggestions"><code>suggestions</code> of type <span class="idlMemberType">sequence&lt;<a>URL</a>&gt;</span></dt><dd>When present, this field provides a list of (absolute) suggested Service URLs
+        of which the Client is aware and which can handle the intent.</dd><dt id="widl-IntentParameters-transfer"><code>transfer</code> of type <span class="idlMemberType">sequence&lt;<a>Transferable</a>&gt;</span></dt><dd>The list of Transferables, for use in the structured clone
+        algorithm.</dd><dt id="widl-IntentParameters-type"><code>type</code> of type <span class="idlMemberType"><a>DOMString</a></span></dt><dd>A string indicating the type of the data payload. The data payload
+        <em title="must" class="rfc2119">must</em> be described by this parameter, which <em title="must not" class="rfc2119">must not</em> be empty.</dd></dl></div>
+    </div>
+    <div class="section" id="intent-object">
+    <h3><span class="secno">3.2 </span>Intent object</h3>
+      <p>
+      The Intent object models a particular task which can be requested to be
+      handled by Services. It is left up to the client page whether to
+      launch multiple Intents simultaneously. Specific Intent objects are
+      immutable once created.
+      </p>
+
+      <pre class="idl"><span class="idlInterface" id="idl-def-Intent">[<span class="extAttr">Constructor(IntentParameters params),<br> Constructor(DOMString action, DOMString type, optional any data, optional sequence&lt;Transferable&gt; transferList)</span>]
+interface <span class="idlInterfaceID">Intent</span> {
+<span class="idlAttribute">    readonly attribute <span class="idlAttrType"><a>DOMString</a></span>     <span class="idlAttrName"><a href="#widl-Intent-action">action</a></span>;</span>
+<span class="idlAttribute">    readonly attribute <span class="idlAttrType"><a>DOMString</a></span>     <span class="idlAttrName"><a href="#widl-Intent-type">type</a></span>;</span>
+<span class="idlAttribute">    readonly attribute <span class="idlAttrType"><a>any</a></span>           <span class="idlAttrName"><a href="#widl-Intent-data">data</a></span>;</span>
+<span class="idlAttribute">    readonly attribute <span class="idlAttrType"><a>MessagePort</a>[]</span> <span class="idlAttrName"><a href="#widl-Intent-ports">ports</a></span>;</span>
+<span class="idlMethod">    <span class="idlMethType"><a>DOMString</a></span> <span class="idlMethName"><a href="#widl-Intent-getExtra-DOMString-DOMString-key">getExtra</a></span> (<span class="idlParam"><span class="idlParamType"><a>DOMString</a></span> <span class="idlParamName">key</span></span>);</span>
+<span class="idlMethod">    <span class="idlMethType"><a>void</a></span>      <span class="idlMethName"><a href="#widl-Intent-postResult-void-any-data-sequence-Transferable--transferable">postResult</a></span> (<span class="idlParam"><span class="idlParamType"><a>any</a></span> <span class="idlParamName">data</span></span>, <span class="idlParam">optional <span class="idlParamType">sequence&lt;<a>Transferable</a>&gt;</span> <span class="idlParamName">transferable</span></span>);</span>
+<span class="idlMethod">    <span class="idlMethType"><a>void</a></span>      <span class="idlMethName"><a href="#widl-Intent-postFailure-void-any-data">postFailure</a></span> (<span class="idlParam"><span class="idlParamType"><a>any</a></span> <span class="idlParamName">data</span></span>);</span>
+};</span>
+</pre><div class="section" id="attributes"><h2><span class="secno">3.2.1 </span>Attributes</h2><dl class="attributes"><dt id="widl-Intent-action"><code>action</code> of type <span class="idlAttrType"><a>DOMString</a></span>, readonly</dt><dd>This is an opaque string. Chosen strings <em title="should" class="rfc2119">should</em> be namespaced by a
+        URL namespace convention. The string <em title="must not" class="rfc2119">must not</em> be empty, or the
+        constructor <em title="must" class="rfc2119">must</em> throw an exception.</dd><dt id="widl-Intent-data"><code>data</code> of type <span class="idlAttrType"><a>any</a></span>, readonly</dt><dd>The object used <em title="must" class="rfc2119">must</em> be an object upon which the structured clone
+        algorithm can be performed, including Transferables, or the constructor <em title="must" class="rfc2119">must</em>
+        throw an exception.</dd><dt id="widl-Intent-ports"><code>ports</code> of type array of <span class="idlAttrType"><a>MessagePort</a></span>, readonly</dt><dd><b>Only present when the Intent object is delivered to the Service
+          page.</b> Any ports used in the |transferList| of the constructor during invocation will be
+        delivered to the service page in the |ports| attribute. See
+        [<cite><a href="#bib-POSTMSG" rel="biblioentry" class="bibref">POSTMSG</a></cite>]</dd><dt id="widl-Intent-type"><code>type</code> of type <span class="idlAttrType"><a>DOMString</a></span>, readonly</dt><dd>The data payload <em title="must" class="rfc2119">must</em> be described by the type parameter.
+        Recommended type strings are MIME strings or self-documenting urls. The
+        string <em title="must not" class="rfc2119">must not</em> be empty, or the constructor <em title="must" class="rfc2119">must</em> throw an exception.</dd></dl></div><div class="section" id="methods"><h2><span class="secno">3.2.2 </span>Methods</h2><dl class="methods"><dt id="widl-Intent-getExtra-DOMString-DOMString-key"><code>getExtra</code></dt><dd>Retrieves the value (if any) from the extra data dictionary this
+        intent was constructed with.<table class="parameters"><tr><th>Parameter</th><th>Type</th><th>Nullable</th><th>Optional</th><th>Description</th></tr><tr><td class="prmName">key</td><td class="prmType"><code><a>DOMString</a></code></td><td class="prmNullFalse">✘</td><td class="prmOptFalse">✘</td><td class="prmDesc"></td></tr></table><div><em>Return type: </em><code><a>DOMString</a></code></div></dd><dt id="widl-Intent-postFailure-void-any-data"><code>postFailure</code></dt><dd><b>Only present when the Intent object is delivered to the Service
+          page.</b> The payload passed to this method will be returned to the onFailure
+        callback registered by the client page in the startActivity call (if any).
+        The playload must be an object upon which the structured clone algorithm
+        can be performed, including Transferables. [<cite><a href="#bib-HTML5" rel="biblioentry" class="bibref">HTML5</a></cite>]<table class="parameters"><tr><th>Parameter</th><th>Type</th><th>Nullable</th><th>Optional</th><th>Description</th></tr><tr><td class="prmName">data</td><td class="prmType"><code><a>any</a></code></td><td class="prmNullFalse">✘</td><td class="prmOptFalse">✘</td><td class="prmDesc"></td></tr></table><div><em>Return type: </em><code><a>void</a></code></div></dd><dt id="widl-Intent-postResult-void-any-data-sequence-Transferable--transferable"><code>postResult</code></dt><dd><b>Only present when the Intent object is delivered to the
+          Service page.</b> The payload passed to this method will be returned to the onSuccess
+        callback registered by the client page in the startActivity call (if any).
+        The payload must be an object upon which the structured clone algorithm can be
+        performed. The Transferables array, if present, will specify
+        transferable elements in the |data| payload argument, as per
+        [<cite><a href="#bib-HTML5" rel="biblioentry" class="bibref">HTML5</a></cite>] [<cite><a href="#bib-POSTMSG" rel="biblioentry" class="bibref">POSTMSG</a></cite>]<table class="parameters"><tr><th>Parameter</th><th>Type</th><th>Nullable</th><th>Optional</th><th>Description</th></tr><tr><td class="prmName">data</td><td class="prmType"><code><a>any</a></code></td><td class="prmNullFalse">✘</td><td class="prmOptFalse">✘</td><td class="prmDesc"></td></tr><tr><td class="prmName">transferable</td><td class="prmType"><code>sequence&lt;<a>Transferable</a>&gt;</code></td><td class="prmNullFalse">✘</td><td class="prmOptTrue">✔</td><td class="prmDesc"></td></tr></table><div><em>Return type: </em><code><a>void</a></code></div></dd></dl></div>
+      <p>
+      Notes on the intent object: The transferList parameter is not available
+      post-creation. It becomes an internal implementation detail directing the
+      User Agent to interpret some fields of the |data| argument as Transferable. The
+      |data| and |transferList| arguments <em title="must" class="rfc2119">must</em> be implemented following the <acronym title="World Wide Web Consortium">W3C</acronym>
+      Web Messaging spec [<cite><a href="#bib-POSTMSG" rel="biblioentry" class="bibref">POSTMSG</a></cite>].
+      </p>
+      <p>
+      The User Agent <em title="must" class="rfc2119">must</em> perform the structured clone algorithm on creation
+      of the Intent object.
+      </p>
+    </div>
+
+    <div class="section" id="invocation-api">
+    <h3><span class="secno">3.3 </span>Invocation API</h3>
+    <p>
+    The client invokes an intent by constructing an Intent object as above and calling
+    the <code>navigator.startActivity</code> function on it. The callbacks
+    passed to this method are invoked when the intent has been handled by the service.
+    The User Agent will mediate the Service selection by enumerating the list of
+    registered Services that match the requested Intent action and type.
+    The user is then able to select which Service should handle the Intent.
+    </p>
+    <pre class="idl"><span class="idlInterface" id="idl-def-Intents">[<span class="extAttr">NoInterfaceObject</span>]
+interface <span class="idlInterfaceID">Intents</span> {
+<span class="idlMethod">    <span class="idlMethType"><a>void</a></span> <span class="idlMethName"><a href="#widl-Intents-startActivity-void-Intent-intent-IntentSuccessCallback-onSuccess-IntentFailureCallback-onFailure">startActivity</a></span> (<span class="idlParam"><span class="idlParamType"><a class="idlType" href="#idl-def-Intent"><code>Intent</code></a></span> <span class="idlParamName">intent</span></span>, <span class="idlParam">optional <span class="idlParamType"><a class="idlType" href="#idl-def-IntentSuccessCallback"><code>IntentSuccessCallback</code></a></span> <span class="idlParamName">onSuccess</span></span>, <span class="idlParam">optional <span class="idlParamType"><a class="idlType" href="#idl-def-IntentFailureCallback"><code>IntentFailureCallback</code></a></span> <span class="idlParamName">onFailure</span></span>);</span>
+};</span>
+</pre><div class="section" id="methods-1"><h2><span class="secno">3.3.1 </span>Methods</h2><dl class="methods"><dt id="widl-Intents-startActivity-void-Intent-intent-IntentSuccessCallback-onSuccess-IntentFailureCallback-onFailure"><code>startActivity</code></dt><dd>Called to invoke an intent Service. The Intent object is described
+      above. The onSuccess handler, if any, will be called by the user agent if
+      the service is dispatched, processes the intent, and calls postResult on
+      the Intent object it receives. The handler will be invoked with one
+      parameter: the data received from the service.
+      The onFailure handler, if any, will be called by the user agent if
+      the service cannot be dispatched, if the user aborts the selection
+      process, or if a service was chosen, received the intent, processes the intent,
+      and calls postFailure on the Intent object it receives. The handler will be invoked with one
+      parameter: the data received from the service.
+      User Agents <em title="should" class="rfc2119">should</em> restrict this method to only be successfully callable within the
+      context of an explicit user gesture.
+      An exception <em title="should" class="rfc2119">should</em> be thrown if the Intent is invalid (i.e. <code>null</code>), or if
+      the method is invoked without being the result of an explicit user gesture.
+      <table class="parameters"><tr><th>Parameter</th><th>Type</th><th>Nullable</th><th>Optional</th><th>Description</th></tr><tr><td class="prmName">intent</td><td class="prmType"><code><a class="idlType" href="#idl-def-Intent"><code>Intent</code></a></code></td><td class="prmNullFalse">✘</td><td class="prmOptFalse">✘</td><td class="prmDesc"></td></tr><tr><td class="prmName">onSuccess</td><td class="prmType"><code><a class="idlType" href="#idl-def-IntentSuccessCallback"><code>IntentSuccessCallback</code></a></code></td><td class="prmNullFalse">✘</td><td class="prmOptTrue">✔</td><td class="prmDesc"></td></tr><tr><td class="prmName">onFailure</td><td class="prmType"><code><a class="idlType" href="#idl-def-IntentFailureCallback"><code>IntentFailureCallback</code></a></code></td><td class="prmNullFalse">✘</td><td class="prmOptTrue">✔</td><td class="prmDesc"></td></tr></table><div><em>Return type: </em><code><a>void</a></code></div></dd></dl></div>
+    <p>
+    The invocation API is implemented by the <code>window.navigator</code> object.
+    </p>
+    <pre class="idl"><span class="idlImplements"><a>Navigator</a> implements <a class="idlType" href="#idl-def-Intents"><code>Intents</code></a>;</span></pre><div class="idlImplementsDesc"><p>All instances of the <code><a>Navigator</a></code> type are defined to also implement the <a class="idlType" href="#idl-def-Intents"><code>Intents</code></a> interface.</p></div>
+
+    <div class="section">
+    <p>The callbacks passed to startActivity <em title="must" class="rfc2119">must</em> provide these signatures:</p>
+
+    <pre class="idl"><span class="idlCallback" id="idl-def-IntentSuccessCallback">callback <span class="idlCallbackID">IntentSuccessCallback</span> = <span class="idlCallbackType"><a>void</a></span> (<span class="idlParam">optional <span class="idlParamType"><a>any</a></span> <span class="idlParamName">data</span></span>, <span class="idlParam">optional <span class="idlParamType"><a>MessagePort</a>[]</span> <span class="idlParamName">ports</span></span>);</span>
+</pre><div class="section"><h2 id="callback-intentsuccesscallback-parameters">Callback <a href="#idl-def-IntentSuccessCallback" class="idlType"><code>IntentSuccessCallback</code></a> Parameters</h2><dl class="callback-members"><dt id="widl-IntentSuccessCallback-data"><code>data</code> of type <span class="idlMemberType"><a>any</a></span></dt><dd>
+        The |data| passed will be the payload data from the structured
+        cloneable object passed to the postResult method of the delivered Intent.
+      </dd><dt id="widl-IntentSuccessCallback-ports"><code>ports</code> of type array of <span class="idlMemberType"><a>MessagePort</a></span></dt><dd>
+        The |ports| will be any ports in the payload, as resulting from the structured
+        clone algorithm with Transferables, as in the Web Messaging spec.
+        [<cite><a href="#bib-POSTMSG" rel="biblioentry" class="bibref">POSTMSG</a></cite>]
+      </dd></dl></div>
+
+    <pre class="idl"><span class="idlCallback" id="idl-def-IntentFailureCallback">callback <span class="idlCallbackID">IntentFailureCallback</span> = <span class="idlCallbackType"><a>void</a></span> (<span class="idlParam">optional <span class="idlParamType"><a>any</a></span> <span class="idlParamName">data</span></span>);</span>
+</pre><div class="section"><h2 id="callback-intentfailurecallback-parameters">Callback <a href="#idl-def-IntentFailureCallback" class="idlType"><code>IntentFailureCallback</code></a> Parameters</h2><dl class="callback-members"><dt id="widl-IntentFailureCallback-data"><code>data</code> of type <span class="idlMemberType"><a>any</a></span></dt><dd>The |data| passed will be the payload data passed to  the postFailure
+      method of the delivered Intent.</dd></dl></div>
+    </div>
+
+    </div>
+
+    <div class="section" id="delivery-and-response-api">
+    <h3><span class="secno">3.4 </span>Delivery and Response API</h3>
+    <p>
+    When the User Agent loads a Service page to handle an Intent invocation, it
+    will place a <code>window.intent</code> object in the scope of the page.
+    </p>
+
+    <pre class="idl"><span class="idlInterface" id="idl-def-IntentProvider">[<span class="extAttr">NoInterfaceObject</span>]
+interface <span class="idlInterfaceID">IntentProvider</span> {
+<span class="idlAttribute">    readonly attribute <span class="idlAttrType"><a class="idlType" href="#idl-def-Intent"><code>Intent</code></a></span> <span class="idlAttrName"><a href="#widl-IntentProvider-intent">intent</a></span>;</span>
+};</span>
+</pre><div class="section" id="attributes-1"><h2><span class="secno">3.4.1 </span>Attributes</h2><dl class="attributes"><dt id="widl-IntentProvider-intent"><code>intent</code> of type <span class="idlAttrType"><a class="idlType" href="#idl-def-Intent"><code>Intent</code></a></span>, readonly</dt><dd>The intent object as delivered to the service page (includes
+      postResult and postFailure methods).</dd></dl></div>
+    <pre class="idl"><span class="idlImplements"><a>Window</a> implements <a class="idlType" href="#idl-def-IntentProvider"><code>IntentProvider</code></a>;</span></pre><div class="idlImplementsDesc"><p>All instances of the <code><a>Window</a></code> type are defined to also implement the <a class="idlType" href="#idl-def-IntentProvider"><code>IntentProvider</code></a> interface.</p></div>
+
+    <p>
+    This object will only be made available to Service pages when they are
+    loaded in the context of an intent invocation. Even if the same URL is
+    loaded in other situations, the User Agent <em title="must not" class="rfc2119">must not</em> make
+    <code>Window</code> implement <a class="idlType" href="#idl-def-IntentProvider"><code>IntentProvider</code></a>. Similarly, if
+    a Service page is registered, but the User Agent loads it and it does not
+    contain the declarative markup marking it as expecting to handle the Intent
+    the User Agent is delivering, the User Agent <em title="must not" class="rfc2119">must not</em> make
+    <code>Window</code> implement <a class="idlType" href="#idl-def-IntentProvider"><code>IntentProvider</code></a>.
+    </p>
+    <p>
+    The <code>window.intent</code> object <em title="must" class="rfc2119">must</em> be made available across
+    same-origin redirects of the service page. It <em title="must not" class="rfc2119">must not</em> be available if
+    redirects cross an origin boundary.
+    </p>
+    <p>
+    So the following redirect sequence
+    will work: http://example.com/service to http://example.com/login back to
+    http://example.com/service. In this case, the <code>window.intent</code>
+    data would be available to all three page loads.
+    </p>
+    <p>
+    This will also work: http://example.com/service to
+    http://example.com/newservice. In this sequence, the <code>window.intent</code>
+    data is available to both pages.
+    </p>
+    <p>
+    In this sequence, the <code>window.intent</code> is only available to
+    example.com pages: http://example.com/service to http://login.example.com
+    and back to http://example.com/service. The intent data is not provided to
+    http://login.example.com
+    </p>
+    <p>
+    The <code>window.intent</code> object <em title="must" class="rfc2119">must</em> be made available to a page on
+    the same-origin as the originally-delivered page if the user initiates a
+    navigation on the browsing context in which that Service page is displayed,
+    AND the new page has declarative syntax marking it as a handler for the
+    Intent type the User Agent is delivering.
+    </p>
+    <p>
+    In other words, in the browsing context in which the Intent is originally
+    delivered, the intent data <em title="must" class="rfc2119">must</em> be available to pages in a redirect or
+    navigation sequence when they are in the same origin as that to which it was originally
+    delivered (and have the enabling markup), but <em title="must not" class="rfc2119">must not</em> be available to any other pages.
+    This allows Service pages to delegate handling, to redirect to login screens,
+    and so forth, but does not make the Intent data available to any such pages encountered which
+    are not in the same origin.
+    </p>
+    </div>
+
+    <div class="section" id="registration-markup">
+    <h3><span class="secno">3.5 </span>Registration Markup</h3>
+    <p>
+    Service pages declaratively mark themselves (or other same-origin pages)
+    as providing handling functionality for particular intent actions and types
+    using the <code>&lt;intent&gt;</code> tag.
+    A User Agent <em title="must not" class="rfc2119">must not</em> deliver an Intent to a web app service page which
+    does not include markup describing what intents it can handle which matches
+    the intent being delivered (See the section on Matching action and type for
+    delivery).
+    </p>
+    <pre class="idl"><span class="idlInterface" id="idl-def-HTMLIntentElement">interface <span class="idlInterfaceID">HTMLIntentElement</span> : <span class="idlSuperclass"><a>HTMLElement</a></span> {
+<span class="idlAttribute">    attribute <span class="idlAttrType"><a>DOMString</a></span> <span class="idlAttrName"><a href="#widl-HTMLIntentElement-action">action</a></span>;</span>
+<span class="idlAttribute">    attribute <span class="idlAttrType"><a>DOMString</a></span> <span class="idlAttrName"><a href="#widl-HTMLIntentElement-type">type</a></span>;</span>
+<span class="idlAttribute">    attribute <span class="idlAttrType"><a>DOMString</a></span> <span class="idlAttrName"><a href="#widl-HTMLIntentElement-href">href</a></span>;</span>
+<span class="idlAttribute">    attribute <span class="idlAttrType"><a>DOMString</a></span> <span class="idlAttrName"><a href="#widl-HTMLIntentElement-title">title</a></span>;</span>
+<span class="idlAttribute">    attribute <span class="idlAttrType"><a>DOMString</a></span> <span class="idlAttrName"><a href="#widl-HTMLIntentElement-disposition">disposition</a></span>;</span>
+};</span>
+</pre><div class="section" id="attributes-2"><h2><span class="secno">3.5.1 </span>Attributes</h2><dl class="attributes"><dt id="widl-HTMLIntentElement-action"><code>action</code> of type <span class="idlAttrType"><a>DOMString</a></span></dt><dd>An opaque string indicating the behavior class the service supports.
+      It is recommended that users use a fully qualified URI.
+      If the <code>action</code> attribute is missing, the intent Service is
+      assumed to handle display of the provided type(s) in the <code>type</code>
+      attributes.</dd><dt id="widl-HTMLIntentElement-disposition"><code>disposition</code> of type <span class="idlAttrType"><a>DOMString</a></span></dt><dd>The <code>disposition</code> attribute allows a service to choose which
+      context to be opened in. The User Agent <em title="must not" class="rfc2119">must not</em> allow the Client page any
+      ability to change the disposition. The <code>window</code> disposition means
+      that the service is opened in a new tab or window context. The
+      <code>inline</code> disposition means that the User Agent <em title="should" class="rfc2119">should</em> open the
+      service in a context directly related to the client page context in an
+      overlappable way. The User Agent <em title="must not" class="rfc2119">must not</em> allow this UI surface to be
+      under the control of the client page.</dd><dt id="widl-HTMLIntentElement-href"><code>href</code> of type <span class="idlAttrType"><a>DOMString</a></span></dt><dd>Should be a fully qualified URI. If the <code>href</code> attribute
+      is missing, the service URI will be set to the URI in which the tag is
+      found.</dd><dt id="widl-HTMLIntentElement-title"><code>title</code> of type <span class="idlAttrType"><a>DOMString</a></span></dt><dd>A human-readable title which the User Agent <em title="should" class="rfc2119">should</em> use to indicate the
+      service to the user. If the <code>title</code> attribute is missing, the User Agent <em title="should" class="rfc2119">should</em>
+      use the title of the registered Service page as the service title.</dd><dt id="widl-HTMLIntentElement-type"><code>type</code> of type <span class="idlAttrType"><a>DOMString</a></span></dt><dd>A string specifying the type of payload data the service can
+      accept. Must be a space separated list of type specifiers. If these parse
+      as MIME types, or the MIME wildcard types "*/*" or "*", they will be
+      interpreted as such (see the section on matching action and type for delivery).
+      If not, they will be interpreted as string literal type specifiers. Empty
+      type attributes are not valid registrations.</dd></dl></div>
+    <p>
+    <i>This section should not be construed as limiting the ability of the User
+    Agent to manage registration of non-web services. That is, the User Agent
+    may handle intent invocations locally, using extensions, or with
+    third-party system services. This section solely governs how web-app service pages
+    register and unregister with the User Agent with the
+    <code>&lt;intent&gt;</code> tag.</i>
+    </p>
+    <h3 id="same-origin-registration">Same-origin registration</h3>
+    <p>
+    The User Agent <em title="must not" class="rfc2119">must not</em> obey any registration markup which is not
+    same-origin. That is, a page may only register <code>href</code> attributes
+    for other service handlers on its same origin. A page may register itself
+    as a Service handler, by leaving the <code>href</code> attribute empty.
+    </p>
+    <p>
+    For cross-page registration, when the <code>href</code> attribute points to a different
+    resource, the User Agent <em title="should" class="rfc2119">should</em> interpret intent registrations additively.
+    That is, an intent descriptor from the tag would be added to the registry
+    if it is not present (if the user approves the addition).
+    </p>
+    <h4 id="unregistering">Unregistering</h4>
+    <p>
+    The User Agent <em title="should" class="rfc2119">should</em> treat any registration markup which has both
+    <code>action</code> and <code>type</code> attributes missing as if the
+    markup specified no intent capability on the |href| page. That is, a page may
+    unregister itself implicitly by removing all intent tags, or explicitly
+    by keeping the tag present, but without <code>action</code> or
+    <code>type</code> attributes. Such explicit unregistration <em title="should" class="rfc2119">should</em>
+    be honored for any tag with a same-origin <code>href</code> attribute.
+    </p>
+    <p>
+    The intent tags on the service handler page itself <em title="should" class="rfc2119">should</em> be interpreted by
+    the User Agent as authoritative. That is, if the User Agent loads a service
+    page, and sees that not all intent descriptors it believes will be handled
+    by the page are actually handled, it would replace the currently-registered
+    set with the new set declared by the page.
+    </p>
+    <h4 id="http-error-codes-on-service-pages">HTTP Error Codes on Service Pages</h4>
+    <p>
+    If a registered service page is retrieved and has a non-20x error code
+    [<cite><a href="#bib-HTTP11" rel="biblioentry" class="bibref">HTTP11</a></cite>], the User Agent <em title="should" class="rfc2119">should</em> take the following actions:</p>
+    <p>
+    30x: redirect to the indicated page. If the page is on-domain, and has
+    intent markup, the intent will be re-delivered. If the redirect is permanent
+    (301), the User Agent <em title="may" class="rfc2119">may</em> update its service registration records to reflect
+    that.
+    </p>
+    <p>
+    40x: indicate to the user that the page cannot be loaded, along with any
+    remediation capabilities (i.e. authentication for 403 or payments for 402).
+    In the case of error 410, the User Agent <em title="should" class="rfc2119">should</em> unregister the handler from
+    its internal registry.
+    </p>
+    <p>
+    50x: indicate to the user that the page cannot be loaded.
+    </p>
+    <p></p>
+    </div>
+
+    </div>
+
+    <div class="section" id="user-agent-behavior">
+      <!--OddPage--><h2><span class="secno">4. </span>User Agent Behavior</h2>
+      <p>
+      When the User Agent loads a page with registration markup, it <em title="should" class="rfc2119">should</em> allow
+      the user to configure that page as a web intents service. The details of
+      this process is left up to the User Agent. The model is that the page
+      advises of the ability to handle intents, and the User Agent may remember
+      that. The User Agent <em title="must not" class="rfc2119">must not</em> deliver an intent to a Service discovered in
+      this way before the user has made a specific action allowing it.
+      </p>
+      <p>
+      The User Agent <em title="must not" class="rfc2119">must not</em> allow web pages the ability to discover passively
+      which services the user has configured to handle particular intents,
+      or any intents, whether by enumeration or exact query. There may be
+      mechanisms for the user to actively grant this information to web pages,
+      but it <em title="must not" class="rfc2119">must not</em> be made available passively.
+      </p>
+      <p>
+      The User Agent <em title="may" class="rfc2119">may</em> provide additional mechanisms for web intents service
+      registration. For example, by external applications, through a separate
+      API, as a result of a permissions bundle in a downloaded web application,
+      or pre-bundled. (TODO: add example of a local network service)
+      </p>
+      <p>
+      For intents invoked by client web applications, the User Agent <em title="must" class="rfc2119">must</em>
+      require that such invocations be in the context of a user gesture. User
+      Agents <em title="may" class="rfc2119">may</em> also dispatch intents invoked through other mechanisms. For
+      example, hardware events (i.e. plugging in a USB storage device) or
+      software events (i.e. downloading a file).
+      </p>
+      <p>
+      When a client page invokes an intent, the User Agent dispatches it to a
+      chosen service. The details of this process are left up to the User Agent.
+      The User Agent may dispatch intents to web application service pages,
+      helper applications, proxy them through connections to other hardware,
+      etc. In general, though, the User Agent <em title="must" class="rfc2119">must</em> provide a way for the user
+      to configure which intents are delivered to which services. This process
+      <em title="should" class="rfc2119">should</em> be configurable on a per-invocation basis for most intents,
+      although defaulting rules, as long as they are configurable by the user,
+      are expected to mean that the User Agent need not present specific UI
+      controls on every invocation.
+      </p>
+      <p>
+      When the User Agent delivers an intent payload to a web application, it
+      <em title="must" class="rfc2119">must</em> make the <code>window.intent</code> object available as the document
+      is loaded and parsed, so that scripts on the page may process the intent
+      data as they load. User agents <em title="must not" class="rfc2119">must not</em> place a <code>window.intent</code>
+      object in the scope of pages which do not have registration metadata
+      declaring themselves as intent handlers. This means that any use of
+      <code>window.intent</code> in pages which do not explicitly declare
+      themselves as web intents handlers <em title="must not" class="rfc2119">must not</em> be overwritten by the User
+      Agent. It also means that Service pages cannot access
+      <code>window.intent</code> in scripts which occur before the page parses
+      the intents registration markup. If such scripts are simply declaring
+      functions to be called later, that will work, but scripts which run before
+      the registration markup is parsed won't find <code>window.intent</code>
+      set, even though it may be made available later in the page load, and so are
+      likely broken.
+      </p>
+      <p>
+      When a new context is opened for the service page, the User Agent <em title="must" class="rfc2119">must</em>
+      connect the <code>postResult</code> and <code>postFailure</code> methods
+      of the <code>window.intent</code> object so that they return their
+      serializable payloads to the registered handlers the User Agent received
+      in the invoking <code>navigator.startActivity</code> call. If the user
+      closes the service page before it has responded, the User Agent <em title="must" class="rfc2119">must</em>
+      invoke the <code>onFailure</code> callback in the client page invocation,
+      if any. If the user cancels a service selection UI control the User Agent
+      displays in the course of dispatching an intent, the User Agent <em title="must" class="rfc2119">must</em>
+      invoke the <code>onFailure</code> callback in the client page invocation,
+      if any.
+      </p>
+      <p>
+      The User Agent <em title="should" class="rfc2119">should</em> allow any serializable and/or Transferable object
+      to be passed between client to service and back from service to client.
+      This includes Blobs [<cite><a href="#bib-BLOB" rel="biblioentry" class="bibref">BLOB</a></cite>], MessagePorts, etc. The User Agent <em title="may" class="rfc2119">may</em> inspect
+      the payload of intents and present specialized UI corresponding to
+      well-known intent types. The User Agent <em title="must not" class="rfc2119">must not</em> categorically prohibit
+      dispatch of unknown intent types.  This is not meant to prohibit the User
+      Agent from performing filtering functions on intents, such as suppressing
+      unwanted intent invocations, intents as used as an attack vector, and
+      other mis-use.
+      </p>
+      <p>
+      In the same way User Agents <em title="may" class="rfc2119">may</em> dispatch Intents triggered by non-web
+      mechanisms to web applications, User Agents <em title="may" class="rfc2119">may</em> dispatch intents invoked by
+      web applications to handlers which are not web applications. In those
+      cases, the User Agent <em title="should" class="rfc2119">should</em> provide a public API mechanism for external
+      connection to the intent dispatch mechanism selected. For example, the
+      User Agent may be able to run an Operating System command in
+      response to an intent. The User Agent could provide a configuration
+      interface such that the user can install handler applications, and a
+      documented format in which intent payload data is translated to that
+      application. In these cases, the requirement that User Agents pass
+      any serializable object is relaxed for some kinds of handlers.
+      </p>
+      <p>
+      User Agents <em title="may" class="rfc2119">may</em> also dispatch intents directly based on data-specific controls
+      derived from microdata in pages, or based on other User Agent-level
+      features. For instance, if the user has services registered which handle
+      text/vcard, then the User Agent may provide the user with a way to invoke
+      particular intents that consume such data as it detects it in web pages.
+      </p>
+      <p>
+      If the user has no services registered for a particular type of intent,
+      the User Agent <em title="may" class="rfc2119">may</em> display options from other sources of data about
+      services it knows can handle that intent type so that the user can
+      complete the activity.
+      </p>
+      <div class="section" id="explicit-intents">
+      <h3><span class="secno">4.1 </span>Explicit Intents</h3>
+      <p>
+      When handling an Intent marked as explicit (that is, constructed with the
+      object literal constructor with a non-empty <b>service</b> field), the
+      expected User Agent behavior is that if this "service" attribute is
+      present, it <em title="should not" class="rfc2119">should not</em> display a service selection mechanism to the user.
+      Instead, the service url <em title="should" class="rfc2119">should</em> be loaded directly to handle the intent.
+      (This is not a hard restriction. The User Agent <em title="may" class="rfc2119">may</em> provide a way for the
+      user to intercept even an explicit invocation.)
+      </p>
+      <p>
+      During delivery, all restrictions are still in place. That is, the User
+      Agent <em title="must" class="rfc2119">must</em> follow the above requirements on placing the
+      <code>window.intent</code> object in the scope of the page, and respect
+      any declarative metadata in that service page.  If the user agent needs
+      information about the service (i.e.  disposition, title, etc) for use
+      in preparing its UI, it <em title="may" class="rfc2119">may</em> load the service URL and examine the page
+      for any declarative metadata.
+      </p>
+      <p>
+      The User Agent <em title="may" class="rfc2119">may</em> ask the user if they wish to install this service,
+      just like for any other visit of the page.
+      </p>
+      </div>
+
+      <div class="section" id="matching-action-and-type-for-delivery">
+      <h3><span class="secno">4.2 </span>Matching action and type for delivery</h3>
+      <p>
+      When an Intent is delivered, the User Agent must verify that the Service to
+      which the intent is to be delivered (either from an explicit invocation or from
+      the result of a user selection) has a registration record supporting the
+      action and type of the Intent being delivered by following these steps:
+      </p><ol>
+        <li>Let <var>intent action</var> be the action field of the invoked
+        intent.</li>
+        <li>Let <var>intent type</var> be the type field of the invoked
+        intent.</li>
+        <li>For every distinguishable registration (that is, having unique
+        action/type fields) present for the Service page, follow these steps:
+        <ol>
+          <li>When comparing field values, "different from" means that the strings
+          under comparison represent different sequences of code points.</li>
+          <li>When considering whether a field value is a MIME type, it is
+          considered so if it parses as a valid MIME type [<cite><a href="#bib-RFC2046" rel="biblioentry" class="bibref">RFC2046</a></cite>], or is
+          equal to the MIME wildcard strings "*" or "*/*".</li>
+          <li>Let <var>service action</var> be the value of the action field of the
+          service registration.</li>
+          <li>Let <var>service type</var> be the value of the type field of the
+          service registration.</li>
+          <li>If the <var>service type</var> or <var>service action</var> is empty,
+          the registration record is invalid. Continue to the next
+          registration record.</li>
+          <li>If the <var>intent action</var> is different from the <var>service
+            action</var>, continue to the next registration record.
+          </li><li>If the <var>intent type</var> is a MIME type, and the <var>service
+            type</var> is not, continue to the next registration record.
+          </li><li>If the <var>service type</var> is a MIME type, and the <var>intent
+            type</var> is not, continue to the next registration record.
+          </li><li>If both <var>service type</var> and <var>action type</var> are MIME types,
+          then check whether the MIME specifiers overlap. This is true if the
+          top-level and sublevel types match exactly, or if one or both are represented
+          by the MIME wild card ("*"). If any MIME parameters are present in the
+          <var>service type</var> or the <var>action type</var>, they must be present in
+          both and match exactly. A MIME parameter present in only one of
+          <var>service type</var> and <var>action type</var> does not disqualify the
+          match. If the MIME types do not overlap, continue fo the next
+          registration record.</li>
+          <li>If neither <var>service type</var> nor <var>action type</var> are MIME types,
+          then if they are different, continue to the next registration
+          record.</li>
+        </ol>
+        </li><li>If no satisfying match is found in the registrations of the Service
+        page, the Intent <em title="must not" class="rfc2119">must not</em> be delivered. If any satisfying match is
+        found, the Intent <em title="must" class="rfc2119">must</em> be delivered to the Service page.</li>
+      </ol>
+      </div>
+
+      <div class="section" id="handling-service-suggestions-from-intent-invocation">
+      <h3><span class="secno">4.3 </span>Handling Service suggestions from Intent Invocation</h3>
+      <p>
+      If the user has no persistent information about a qualifying service
+      for a particular intent registered with the User Agent, the User Agent
+      <em title="should" class="rfc2119">should</em> present the user with the option to select from the default
+      services proposed by the client at invocation (from the <i>suggestions</i>
+      parameter).
+      </p>
+      <p>
+      If the user agent needs information about the all or any of the
+      suggested services (i.e. disposition, title, icon, etc) for use in
+      preparing its UI, it <em title="may" class="rfc2119">may</em> load the suggested default service URL(s) and
+      examine the page(s) for the &lt;intent&gt; tag, reading off such information,
+      or load the favicon for the site(s). The User Agent <em title="may" class="rfc2119">may</em> ask the user if
+      they wish to install all or any of the suggested services, just as for
+      any other visit of those pages.
+      </p>
+      <p>
+      The User Agent <em title="must" class="rfc2119">must</em> follow the matching algorithm of the "Matching action
+      and type for delivery" section before delivering
+      the Intent to a suggested service, just as for any Intent delivery.
+      </p>
+      </div>
+
+    </div>
+
+    <div class="section" id="use-cases-and-requirements">
+      <!--OddPage--><h2><span class="secno">5. </span>Use Cases and Requirements</h2>
+      <div class="section" id="sharing">
+        <h3><span class="secno">5.1 </span>Sharing</h3>
+        <p>
+        Web Intents should be useful to enable users to share content as they
+        encounter it on web pages. Whether by implicit controls made available
+        by the User Agent or explicit controls placed in web pages, Web Intents
+        should handle the use case of a user wishing to share a page as a whole,
+        or particular content on the page. The user should be able to select the
+        sharing application of choice to accomplish this task.
+        </p>
+      </div>
+      <div class="section" id="integration-with-local-web-apps">
+        <h3><span class="secno">5.2 </span>Integration with local web apps</h3>
+        <p>
+        Local web apps should be able to invoke and handle intents.
+        </p>
+      </div>
+      <div class="section" id="persistent-connections">
+        <h3><span class="secno">5.3 </span>Persistent connections</h3>
+        <p>
+        Web Intents invocations are modeled on RPC, but there are times when a
+        persistent connection is desired. There are a few different methods that
+        Web Intents should support for this. One is returning URIs which can be
+        loaded by clients in an iframe and then messaged using other web
+        platform features. Another is returning a defaulting token which the
+        client can then use to target other intents directly at a known target.
+        A third is returning a MessagePort to the client which can be used for
+        subsequent communication.
+        </p>
+        <p>
+        In these cases, Web Intents is acting as a way for the user to attach a
+        particular client page to a persistently-available service. It is up to
+        the particular types of intents to describe exactly how this should
+        work. i.e. whether the connection is permanent or temporary, whether
+        tokens are user-consumable or opaque.
+        </p>
+      </div>
+      <div class="section" id="integration-with-external-applications">
+        <h3><span class="secno">5.4 </span>Integration with external applications</h3>
+        <p>
+        It should be possible for intents to be routed to external helper
+        applications. For instance, a locally available photo editing tool could
+        be configured to interact with the browser to handle an image edit
+        intent. Or the browser could discover home networking equipment on the
+        local network and make it available for particular types of intents.
+        </p>
+      </div>
+      <div class="section" id="translating-existing-web-platform-features-to-intents">
+        <h3><span class="secno">5.5 </span>Translating existing web platform features to intents</h3>
+        <p>
+        It should be possible to translate a few existing features to use Web
+        Intents, thus putting web applications on the same footing as local
+        resources. For instance, it should be possible for the User Agent to
+        translate file selection controls to intents such that the use can
+        choose to upload a file from a cloud storage locker as well as from
+        local disk. In these cases, the User Agent may supply built-in intent
+        handlers corresponding to existing functionality.
+        </p>
+        <p>
+        Another use case is allowing web applications to function as plug-ins.
+        For example, a link returning a resource of a type which the user agent
+        doesn't know how to display can be translated into an intent which
+        allows the user to configure a web application capable of reading that
+        resource type and viewing it. This would let web apps function as
+        plug-ins.
+        </p>
+      </div>
+      <div class="section" id="authentication">
+        <h3><span class="secno">5.6 </span>Authentication</h3>
+        <p>
+        It is expected that many services for Web Intents will be ones the user
+        has an account with. The service should be able to use standard login
+        mechanisms in the context the User Agent places them within to perform
+        authentication. That is, the service page handling an intent should be
+        loaded with the same cookie jar and access to localStorage, etc. with
+        which it runs in a normal browsing context. Intent data should be
+        persisted by the User Agent across login redirects.
+        </p>
+      </div>
+    </div>
+
+    <div class="section" id="privacy-considerations">
+      <!--OddPage--><h2><span class="secno">6. </span>Privacy Considerations</h2>
+      <p>
+      The user needs to have confidence that the Service will user the data
+      associated with the action for the purpose intended and not share or retain
+      the data inappropriately.  For this reason it is important that the user have
+      control over Intents, in particular the selection mechanism which determines
+      which Service will handle a particular Intent.  This offers the possibility
+      of user decision and control related to the choice of Service, allowing them
+      to take into account expectations regarding the Service, including Service
+      policies related to retention and secondary use. This relates to the privacy
+      principles of control and consent [<cite><a href="#bib-DAP-PRIVACY-REQS" rel="biblioentry" class="bibref">DAP-PRIVACY-REQS</a></cite>].  For this reason a user
+      should be made aware of explicit intents and be able to view and change them;
+      implementations should be encouraged to offer this functionality.
+
+      The minimum data necessary for a Service should be included as Intent parameters,
+      corresponding to the privacy principle of minimization
+      [<cite><a href="#bib-DAP-PRIVACY-REQS" rel="biblioentry" class="bibref">DAP-PRIVACY-REQS</a></cite>].
+      </p>
+    </div>
+
+    <div id="acknowledgements" class="appendix section">
+      <!--OddPage--><h2><span class="secno">A. </span>Acknowledgements</h2>
+      <p>
+        Many thanks to Robin Berjon for making our lives so much easier with his cool tool.
+      </p>
+      <p>
+        See also <a href="http://www.webintents.org/">webintents.org</a> for
+        more examples and a sample Javascript implementation of Web Intents.
+      </p>
+    </div>
+
+  
+
+
+<div class="appendix section" id="references"><!--OddPage--><h2><span class="secno">B. </span>References</h2><div class="section" id="normative-references"><h3><span class="secno">B.1 </span>Normative references</h3><dl class="bibliography"><dt id="bib-BLOB">[BLOB]</dt><dd>Arun Ranganathan. <a href="http://www.w3.org/TR/2009/WD-FileAPI-20091117/#dfn-Blob"><cite>Blob.</cite></a> 17 November 2009. W3C Working Draft. (Work in progress.) URL: <a href="http://www.w3.org/TR/2009/WD-FileAPI-20091117/">http://www.w3.org/TR/2009/WD-FileAPI-20091117/#dfn-Blob</a> 
+</dd><dt id="bib-HTML5">[HTML5]</dt><dd>Ian Hickson; David Hyatt. <a href="http://www.w3.org/TR/html5"><cite>HTML5.</cite></a> 25 May 2011. W3C Working Draft. (Work in progress.) URL: <a href="http://www.w3.org/TR/html5">http://www.w3.org/TR/html5</a> 
+</dd><dt id="bib-HTTP11">[HTTP11]</dt><dd>R. Fielding; et al. <a href="http://www.ietf.org/rfc/rfc2616.txt"><cite>Hypertext Transfer Protocol - HTTP/1.1.</cite></a> June 1999. Internet RFC 2616. URL: <a href="http://www.ietf.org/rfc/rfc2616.txt">http://www.ietf.org/rfc/rfc2616.txt</a> 
+</dd><dt id="bib-POSTMSG">[POSTMSG]</dt><dd>Ian Hickson. <a href="http://www.w3.org/TR/webmessaging/"><cite>HTML5 Web Messaging.</cite></a> 13 March 2012. W3C Working Draft. (Work In Progress.) URL: <a href="http://www.w3.org/TR/webmessaging/">http://www.w3.org/TR/webmessaging/</a>
+</dd><dt id="bib-RFC2046">[RFC2046]</dt><dd>N. Freed; N. Borenstein. <a href="http://www.ietf.org/rfc/rfc2046.txt"><cite>Multipurpose Internet Mail Extensions (MIME) Part Two: Media Types.</cite></a> November 1996. Internet RFC 2046. URL: <a href="http://www.ietf.org/rfc/rfc2046.txt">http://www.ietf.org/rfc/rfc2046.txt</a> 
+</dd></dl></div><div class="section" id="informative-references"><h3><span class="secno">B.2 </span>Informative references</h3><dl class="bibliography"><dt id="bib-DAP-PRIVACY-REQS">[DAP-PRIVACY-REQS]</dt><dd>Alissa Cooper, Frederick Hirsch, John Morris. <a href="http://www.w3.org/TR/2010/NOTE-dap-privacy-reqs-20100629/"><cite>Device API Privacy Requirements</cite></a> 29 June 2010. W3C Note URL: <a href="http://www.w3.org/TR/2010/NOTE-dap-privacy-reqs-20100629/">http://www.w3.org/TR/2010/NOTE-dap-privacy-reqs-20100629/</a> 
+</dd></dl></div></div></body></html>
