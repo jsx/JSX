@@ -90,6 +90,7 @@ native final class DOMException {
 	// historical
 	static __readonly__ var TYPE_MISMATCH_ERR : number/*unsigned short*/;
 	       __readonly__ var TYPE_MISMATCH_ERR : number/*unsigned short*/;
+	// historical; use TypeError instead
 	static __readonly__ var SECURITY_ERR : number/*unsigned short*/;
 	       __readonly__ var SECURITY_ERR : number/*unsigned short*/;
 	static __readonly__ var NETWORK_ERR : number/*unsigned short*/;
@@ -135,6 +136,10 @@ native class Event {
 	/** @see http://www.w3.org/TR/dom/ */
 	__readonly__ var currentTarget : Nullable.<EventTarget>;
 	/** @see http://www.w3.org/TR/dom/ */
+	static __readonly__ var NONE : number/*unsigned short*/;
+	/** @see http://www.w3.org/TR/dom/ */
+	       __readonly__ var NONE : number/*unsigned short*/;
+	/** @see http://www.w3.org/TR/dom/ */
 	static __readonly__ var CAPTURING_PHASE : number/*unsigned short*/;
 	/** @see http://www.w3.org/TR/dom/ */
 	       __readonly__ var CAPTURING_PHASE : number/*unsigned short*/;
@@ -172,8 +177,6 @@ native class Event {
 	) : void;
 
 	// PhaseType
-	static __readonly__ var NONE : number/*unsigned short*/;
-	       __readonly__ var NONE : number/*unsigned short*/;
 	// Introduced in DOM Level 3:
 
 } // end of Event
@@ -271,6 +274,7 @@ native final class MutationObserver {
 		options : MutationObserverInit
 	) : void;
 	function disconnect() : void;
+	function takeRecords() : MutationRecord[];
 
 } // end of MutationObserver
 
@@ -283,7 +287,7 @@ native final class MutationObserverInit {
 	var subtree : boolean;
 	var attributeOldValue : boolean;
 	var characterDataOldValue : boolean;
-	var attributeFilter : string[]/*DOMString[]*/;
+	var attributeFilter : string[]/*sequence<DOMString>*/;
 
 } // end of MutationObserverInit
 
@@ -292,8 +296,8 @@ native final class MutationRecord {
 
 	__readonly__ var type : string/*DOMString*/;
 	__readonly__ var target : Node;
-	__readonly__ var addedNodes : Nullable.<NodeList>;
-	__readonly__ var removedNodes : Nullable.<NodeList>;
+	__readonly__ var addedNodes : NodeList;
+	__readonly__ var removedNodes : NodeList;
 	__readonly__ var previousSibling : Nullable.<Node>;
 	__readonly__ var nextSibling : Nullable.<Node>;
 	__readonly__ var attributeName : Nullable.<string>/*DOMString?*/;
@@ -346,6 +350,16 @@ native class Node extends EventTarget {
 	__readonly__ var lastChild : Nullable.<Node>;
 	__readonly__ var previousSibling : Nullable.<Node>;
 	__readonly__ var nextSibling : Nullable.<Node>;
+	var nodeValue : Nullable.<string>/*DOMString?*/;
+	var textContent : Nullable.<string>/*DOMString?*/;
+	function insertBefore(node : Node, child : Nullable.<Node>) : Node;
+	function appendChild(node : Node) : Node;
+	function replaceChild(node : Node, child : Node) : Node;
+	function removeChild(child : Node) : Node;
+	function normalize() : void;
+	function cloneNode() : Node;
+	function cloneNode(deep : boolean) : Node;
+	function isEqualNode(node : Nullable.<Node>) : boolean;
 	static __readonly__ var DOCUMENT_POSITION_DISCONNECTED : number/*unsigned short*/;
 	       __readonly__ var DOCUMENT_POSITION_DISCONNECTED : number/*unsigned short*/;
 	static __readonly__ var DOCUMENT_POSITION_PRECEDING : number/*unsigned short*/;
@@ -358,27 +372,16 @@ native class Node extends EventTarget {
 	       __readonly__ var DOCUMENT_POSITION_CONTAINED_BY : number/*unsigned short*/;
 	static __readonly__ var DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC : number/*unsigned short*/;
 	       __readonly__ var DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC : number/*unsigned short*/;
-	// historical
 	function compareDocumentPosition(
 		other : Node
 	) : number/*unsigned short*/;
 	function contains(other : Nullable.<Node>) : boolean;
-	var nodeValue : Nullable.<string>/*DOMString?*/;
-	var textContent : Nullable.<string>/*DOMString?*/;
-	function insertBefore(node : Node, child : Nullable.<Node>) : Node;
-	function appendChild(node : Node) : Node;
-	function replaceChild(node : Node, child : Node) : Node;
-	function removeChild(child : Node) : Node;
-	function normalize() : void;
-	function cloneNode() : Node;
-	function cloneNode(deep : boolean) : Node;
-	function isEqualNode(node : Nullable.<Node>) : boolean;
 	function lookupPrefix(
 		namespace : Nullable.<string>/*DOMString?*/
-	) : string/*DOMString*/;
+	) : Nullable.<string>/*DOMString?*/;
 	function lookupNamespaceURI(
 		prefix : Nullable.<string>/*DOMString?*/
-	) : string/*DOMString*/;
+	) : Nullable.<string>/*DOMString?*/;
 	function isDefaultNamespace(
 		namespace : Nullable.<string>/*DOMString?*/
 	) : boolean;
@@ -387,6 +390,8 @@ native class Node extends EventTarget {
 
 /** @see http://www.w3.org/TR/dom/ */
 native class Document extends Node {
+
+	function constructor();
 
 	__readonly__ var implementation : DOMImplementation;
 	__readonly__ var URL : string/*DOMString*/;
@@ -424,10 +429,9 @@ native class Document extends Node {
 	function importNode(node : Node) : Node;
 	function importNode(node : Node, deep : boolean) : Node;
 	function adoptNode(node : Node) : Node;
-	function createEvent(
-		eventInterfaceName : string/*DOMString*/
-	) : Event;
+	function createEvent(interface : string/*DOMString*/) : Event;
 	function createRange() : Range;
+	// NodeFilter.SHOW_ALL = 0xFFFFFFFF
 	function createNodeIterator(root : Node) : NodeIterator;
 	function createNodeIterator(
 		root : Node,
@@ -531,6 +535,7 @@ native final class DOMImplementation {
 		qualifiedName : string/*DOMString*/,
 		doctype : Nullable.<DocumentType>
 	) : XMLDocument;
+	function createHTMLDocument() : Document;
 	function createHTMLDocument(title : string/*DOMString*/) : Document;
 	function hasFeature(
 		feature : string/*DOMString*/,
@@ -682,7 +687,7 @@ native class Element extends Node {
 	var outerHTML : string/*DOMString*/;
 	/** @see http://html5.org/specs/dom-parsing.html */
 	function insertAdjacentHTML(
-		position : string/*insertAdjacentHTMLPosition*/,
+		position : string/*DOMString*/,
 		text : string/*DOMString*/
 	) : void;
 
@@ -957,9 +962,13 @@ native class DOMTokenList {
 		index : number/*unsigned long*/
 	) : Nullable.<string>/*DOMString?*/;
 	function contains(token : string/*DOMString*/) : boolean;
-	function add(token : string/*DOMString*/) : void;
-	function remove(token : string/*DOMString*/) : void;
+	function add(...tokens : string/*DOMString...*/) : void;
+	function remove(...tokens : string/*DOMString...*/) : void;
 	function toggle(token : string/*DOMString*/) : boolean;
+	function toggle(
+		token : string/*DOMString*/,
+		force : boolean
+	) : boolean;
 
 } // end of DOMTokenList
 
@@ -1089,6 +1098,9 @@ native class MouseEvent extends UIEvent {
 	/** @see http://dev.w3.org/csswg/cssom-view/ */
 	__readonly__ var offsetY : number/*long*/;
 
+	/** @see http://dev.w3.org/html5/2dcontext/ */
+	__readonly__ var region : Nullable.<string>/*DOMString?*/;
+
 } // end of MouseEvent
 
 /** @see http://www.w3.org/TR/DOM-Level-3-Events/ */
@@ -1101,9 +1113,9 @@ native final class WheelEvent extends MouseEvent {
 	       __readonly__ var DOM_DELTA_LINE : number/*unsigned long*/;
 	static __readonly__ var DOM_DELTA_PAGE : number/*unsigned long*/;
 	       __readonly__ var DOM_DELTA_PAGE : number/*unsigned long*/;
-	__readonly__ var deltaX : number/*float*/;
-	__readonly__ var deltaY : number/*float*/;
-	__readonly__ var deltaZ : number/*float*/;
+	__readonly__ var deltaX : number/*double*/;
+	__readonly__ var deltaY : number/*double*/;
+	__readonly__ var deltaZ : number/*double*/;
 	__readonly__ var deltaMode : number/*unsigned long*/;
 	function constructor(typeArg : string/*DOMString*/);
 	function constructor(
@@ -1125,9 +1137,9 @@ native final class WheelEvent extends MouseEvent {
 		buttonArg : number/*unsigned short*/,
 		relatedTargetArg : Nullable.<EventTarget>,
 		modifiersListArg : string/*DOMString*/,
-		deltaXArg : number/*float*/,
-		deltaYArg : number/*float*/,
-		deltaZArg : number/*float*/,
+		deltaXArg : number/*double*/,
+		deltaYArg : number/*double*/,
+		deltaZArg : number/*double*/,
 		deltaMode : number/*unsigned long*/
 	) : void;
 
@@ -1264,7 +1276,8 @@ native final class FocusEventInit {
 
 } // end of FocusEventInit
 
-native class MouseEventInit extends UIEventInit {
+/** @see http://dev.w3.org/html5/2dcontext/ */
+native final class MouseEventInit extends UIEventInit {
 
 	// Attributes from Event:
 	// inherits var bubbles : boolean;
@@ -1297,6 +1310,9 @@ native class MouseEventInit extends UIEventInit {
 	/** @see http://www.w3.org/TR/DOM-Level-3-Events/ */
 	var relatedTarget : Nullable.<EventTarget>;
 
+
+	var region : Nullable.<string>/*DOMString?*/;
+
 } // end of MouseEventInit
 
 /** @see http://www.w3.org/TR/DOM-Level-3-Events/ */
@@ -1322,9 +1338,9 @@ native final class WheelEventInit {
 	var buttons : number/*unsigned short*/;
 	var relatedTarget : Nullable.<EventTarget>;
 	// Attributes for WheelEvent:
-	var deltaX : number/*float*/;
-	var deltaY : number/*float*/;
-	var deltaZ : number/*float*/;
+	var deltaX : number/*double*/;
+	var deltaY : number/*double*/;
+	var deltaZ : number/*double*/;
 	var deltaMode : number/*unsigned long*/;
 
 } // end of WheelEventInit
@@ -1397,13 +1413,13 @@ native final class ProgressEventInit extends EventInit {
 native __fake__ class XMLHttpRequestEventTarget extends EventTarget {
 
 	// event handlers
-	var onloadstart : Nullable.<function(:Event):void>/*Function?*/;
-	var onprogress : Nullable.<function(:Event):void>/*Function?*/;
-	var onabort : Nullable.<function(:Event):void>/*Function?*/;
-	var onerror : Nullable.<function(:Event):void>/*Function?*/;
-	var onload : Nullable.<function(:Event):void>/*Function?*/;
-	var ontimeout : Nullable.<function(:Event):void>/*Function?*/;
-	var onloadend : Nullable.<function(:Event):void>/*Function?*/;
+	var onloadstart : function(:Event):void/*EventHandler*/;
+	var onprogress : function(:Event):void/*EventHandler*/;
+	var onabort : function(:Event):void/*EventHandler*/;
+	var onerror : function(:Event):void/*EventHandler*/;
+	var onload : function(:Event):void/*EventHandler*/;
+	var ontimeout : function(:Event):void/*EventHandler*/;
+	var onloadend : function(:Event):void/*EventHandler*/;
 
 } // end of XMLHttpRequestEventTarget
 
@@ -1412,12 +1428,20 @@ native final class XMLHttpRequestUpload extends XMLHttpRequestEventTarget {
 }
 
 /** @see http://www.w3.org/TR/XMLHttpRequest/ */
-native class XMLHttpRequest extends XMLHttpRequestEventTarget {
+native final class XMLHttpRequestOptions {
+
+	var anon : boolean;
+
+} // end of XMLHttpRequestOptions
+
+/** @see http://www.w3.org/TR/XMLHttpRequest/ */
+native final class XMLHttpRequest extends XMLHttpRequestEventTarget {
 
 	function constructor();
+	function constructor(options : XMLHttpRequestOptions);
 
 	// event handler
-	var onreadystatechange : Nullable.<function(:Event):void>/*Function?*/;
+	var onreadystatechange : function(:Event):void/*EventHandler*/;
 	// states
 	static __readonly__ var UNSENT : number/*unsigned short*/;
 	       __readonly__ var UNSENT : number/*unsigned short*/;
@@ -1432,62 +1456,55 @@ native class XMLHttpRequest extends XMLHttpRequestEventTarget {
 	__readonly__ var readyState : number/*unsigned short*/;
 	// request
 	function open(
-		method : string/*DOMString*/,
+		method : string/*ByteString*/,
 		url : string/*DOMString*/
 	) : void;
 	function open(
-		method : string/*DOMString*/,
+		method : string/*ByteString*/,
 		url : string/*DOMString*/,
 		async : boolean
 	) : void;
 	function open(
-		method : string/*DOMString*/,
+		method : string/*ByteString*/,
 		url : string/*DOMString*/,
 		async : boolean,
 		user : Nullable.<string>/*DOMString?*/
 	) : void;
 	function open(
-		method : string/*DOMString*/,
+		method : string/*ByteString*/,
 		url : string/*DOMString*/,
 		async : boolean,
 		user : Nullable.<string>/*DOMString?*/,
 		password : Nullable.<string>/*DOMString?*/
 	) : void;
 	function setRequestHeader(
-		header : string/*DOMString*/,
-		value : string/*DOMString*/
+		header : string/*ByteString*/,
+		value : string/*ByteString*/
 	) : void;
 	var timeout : number/*unsigned long*/;
 	var withCredentials : boolean;
 	__readonly__ var upload : XMLHttpRequestUpload;
 	function send() : void;
-	function send(data : ArrayBuffer) : void;
+	function send(data : ArrayBufferView) : void;
 	function send(data : Blob) : void;
 	function send(data : Document) : void;
-	function send(data : Nullable.<string>/*DOMString?*/) : void;
+	function send(data : string/*DOMString*/) : void;
 	function send(data : FormData) : void;
 	function abort() : void;
 	// response
 	__readonly__ var status : number/*unsigned short*/;
-	__readonly__ var statusText : string/*DOMString*/;
+	__readonly__ var statusText : string/*ByteString*/;
 	function getResponseHeader(
-		header : string/*DOMString*/
-	) : string/*DOMString*/;
-	function getAllResponseHeaders() : string/*DOMString*/;
+		header : string/*ByteString*/
+	) : Nullable.<string>/*ByteString?*/;
+	function getAllResponseHeaders() : string/*ByteString*/;
 	function overrideMimeType(mime : string/*DOMString*/) : void;
 	var responseType : string/*XMLHttpRequestResponseType*/;
 	__readonly__ var response : variant/*any*/;
 	__readonly__ var responseText : string/*DOMString*/;
-	__readonly__ var responseXML : Document;
+	__readonly__ var responseXML : Nullable.<Document>;
 
 } // end of XMLHttpRequest
-
-/** @see http://www.w3.org/TR/XMLHttpRequest/ */
-native final class AnonXMLHttpRequest extends XMLHttpRequest {
-
-	function constructor();
-
-} // end of AnonXMLHttpRequest
 
 /** @see http://www.w3.org/TR/XMLHttpRequest/ */
 native final class FormData {
@@ -1511,7 +1528,7 @@ native final class FormData {
 /** @see http://dev.w3.org/csswg/cssom/ */
 native final class MediaList {
 
-	function constructor();
+	function constructor(text : string/*DOMString*/);
 
 	var mediaText : string/*DOMString*/;
 	__readonly__ var length : number/*unsigned long*/;
@@ -1561,6 +1578,8 @@ native class CSSRule {
 
 	static __readonly__ var STYLE_RULE : number/*unsigned short*/;
 	       __readonly__ var STYLE_RULE : number/*unsigned short*/;
+	static __readonly__ var CHARSET_RULE : number/*unsigned short*/;
+	       __readonly__ var CHARSET_RULE : number/*unsigned short*/;
 	static __readonly__ var IMPORT_RULE : number/*unsigned short*/;
 	       __readonly__ var IMPORT_RULE : number/*unsigned short*/;
 	static __readonly__ var MEDIA_RULE : number/*unsigned short*/;
@@ -1573,8 +1592,8 @@ native class CSSRule {
 	       __readonly__ var NAMESPACE_RULE : number/*unsigned short*/;
 	__readonly__ var type : number/*unsigned short*/;
 	var cssText : string/*DOMString*/;
-	__readonly__ var parentRule : CSSRule;
-	__readonly__ var parentStyleSheet : CSSStyleSheet;
+	__readonly__ var parentRule : Nullable.<CSSRule>;
+	__readonly__ var parentStyleSheet : Nullable.<CSSStyleSheet>;
 
 } // end of CSSRule
 
@@ -2246,72 +2265,74 @@ native final __fake__ class Window extends EventTarget {
 		argument : variant/*any*/
 	) : variant/*any*/;
 	// event handler IDL attributes
-	var onabort : Nullable.<function(:Event):void>/*Function?*/;
-	var onafterprint : Nullable.<function(:Event):void>/*Function?*/;
-	var onbeforeprint : Nullable.<function(:Event):void>/*Function?*/;
-	var onbeforeunload : Nullable.<function(:Event):void>/*Function?*/;
-	var onblur : Nullable.<function(:Event):void>/*Function?*/;
-	var oncanplay : Nullable.<function(:Event):void>/*Function?*/;
-	var oncanplaythrough : Nullable.<function(:Event):void>/*Function?*/;
-	var onchange : Nullable.<function(:Event):void>/*Function?*/;
-	var onclick : Nullable.<function(:Event):void>/*Function?*/;
-	var oncontextmenu : Nullable.<function(:Event):void>/*Function?*/;
-	var oncuechange : Nullable.<function(:Event):void>/*Function?*/;
-	var ondblclick : Nullable.<function(:Event):void>/*Function?*/;
-	var ondrag : Nullable.<function(:Event):void>/*Function?*/;
-	var ondragend : Nullable.<function(:Event):void>/*Function?*/;
-	var ondragenter : Nullable.<function(:Event):void>/*Function?*/;
-	var ondragleave : Nullable.<function(:Event):void>/*Function?*/;
-	var ondragover : Nullable.<function(:Event):void>/*Function?*/;
-	var ondragstart : Nullable.<function(:Event):void>/*Function?*/;
-	var ondrop : Nullable.<function(:Event):void>/*Function?*/;
-	var ondurationchange : Nullable.<function(:Event):void>/*Function?*/;
-	var onemptied : Nullable.<function(:Event):void>/*Function?*/;
-	var onended : Nullable.<function(:Event):void>/*Function?*/;
-	var onerror : Nullable.<function(:Event):void>/*Function?*/;
-	var onfocus : Nullable.<function(:Event):void>/*Function?*/;
-	var onhashchange : Nullable.<function(:Event):void>/*Function?*/;
-	var oninput : Nullable.<function(:Event):void>/*Function?*/;
-	var oninvalid : Nullable.<function(:Event):void>/*Function?*/;
-	var onkeydown : Nullable.<function(:Event):void>/*Function?*/;
-	var onkeypress : Nullable.<function(:Event):void>/*Function?*/;
-	var onkeyup : Nullable.<function(:Event):void>/*Function?*/;
-	var onload : Nullable.<function(:Event):void>/*Function?*/;
-	var onloadeddata : Nullable.<function(:Event):void>/*Function?*/;
-	var onloadedmetadata : Nullable.<function(:Event):void>/*Function?*/;
-	var onloadstart : Nullable.<function(:Event):void>/*Function?*/;
-	var onmessage : Nullable.<function(:Event):void>/*Function?*/;
-	var onmousedown : Nullable.<function(:Event):void>/*Function?*/;
-	var onmousemove : Nullable.<function(:Event):void>/*Function?*/;
-	var onmouseout : Nullable.<function(:Event):void>/*Function?*/;
-	var onmouseover : Nullable.<function(:Event):void>/*Function?*/;
-	var onmouseup : Nullable.<function(:Event):void>/*Function?*/;
-	var onmousewheel : Nullable.<function(:Event):void>/*Function?*/;
-	var onoffline : Nullable.<function(:Event):void>/*Function?*/;
-	var ononline : Nullable.<function(:Event):void>/*Function?*/;
-	var onpause : Nullable.<function(:Event):void>/*Function?*/;
-	var onplay : Nullable.<function(:Event):void>/*Function?*/;
-	var onplaying : Nullable.<function(:Event):void>/*Function?*/;
-	var onpagehide : Nullable.<function(:Event):void>/*Function?*/;
-	var onpageshow : Nullable.<function(:Event):void>/*Function?*/;
-	var onpopstate : Nullable.<function(:Event):void>/*Function?*/;
-	var onprogress : Nullable.<function(:Event):void>/*Function?*/;
-	var onratechange : Nullable.<function(:Event):void>/*Function?*/;
-	var onreset : Nullable.<function(:Event):void>/*Function?*/;
-	var onresize : Nullable.<function(:Event):void>/*Function?*/;
-	var onscroll : Nullable.<function(:Event):void>/*Function?*/;
-	var onseeked : Nullable.<function(:Event):void>/*Function?*/;
-	var onseeking : Nullable.<function(:Event):void>/*Function?*/;
-	var onselect : Nullable.<function(:Event):void>/*Function?*/;
-	var onshow : Nullable.<function(:Event):void>/*Function?*/;
-	var onstalled : Nullable.<function(:Event):void>/*Function?*/;
-	var onstorage : Nullable.<function(:Event):void>/*Function?*/;
-	var onsubmit : Nullable.<function(:Event):void>/*Function?*/;
-	var onsuspend : Nullable.<function(:Event):void>/*Function?*/;
-	var ontimeupdate : Nullable.<function(:Event):void>/*Function?*/;
-	var onunload : Nullable.<function(:Event):void>/*Function?*/;
-	var onvolumechange : Nullable.<function(:Event):void>/*Function?*/;
-	var onwaiting : Nullable.<function(:Event):void>/*Function?*/;
+	var onabort : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onafterprint : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onbeforeprint : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onbeforeunload : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onblur : Nullable.<function(:Event):void>/*EventHandler*/;
+	var oncancel : Nullable.<function(:Event):void>/*EventHandler*/;
+	var oncanplay : Nullable.<function(:Event):void>/*EventHandler*/;
+	var oncanplaythrough : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onchange : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onclick : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onclose : Nullable.<function(:Event):void>/*EventHandler*/;
+	var oncontextmenu : Nullable.<function(:Event):void>/*EventHandler*/;
+	var oncuechange : Nullable.<function(:Event):void>/*EventHandler*/;
+	var ondblclick : Nullable.<function(:Event):void>/*EventHandler*/;
+	var ondrag : Nullable.<function(:Event):void>/*EventHandler*/;
+	var ondragend : Nullable.<function(:Event):void>/*EventHandler*/;
+	var ondragenter : Nullable.<function(:Event):void>/*EventHandler*/;
+	var ondragleave : Nullable.<function(:Event):void>/*EventHandler*/;
+	var ondragover : Nullable.<function(:Event):void>/*EventHandler*/;
+	var ondragstart : Nullable.<function(:Event):void>/*EventHandler*/;
+	var ondrop : Nullable.<function(:Event):void>/*EventHandler*/;
+	var ondurationchange : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onemptied : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onended : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onerror : Nullable.<function(:Event):void>/*OnErrorEventHandler*/;
+	var onfocus : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onhashchange : Nullable.<function(:Event):void>/*EventHandler*/;
+	var oninput : Nullable.<function(:Event):void>/*EventHandler*/;
+	var oninvalid : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onkeydown : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onkeypress : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onkeyup : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onload : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onloadeddata : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onloadedmetadata : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onloadstart : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onmessage : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onmousedown : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onmousemove : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onmouseout : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onmouseover : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onmouseup : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onmousewheel : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onoffline : Nullable.<function(:Event):void>/*EventHandler*/;
+	var ononline : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onpause : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onplay : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onplaying : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onpagehide : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onpageshow : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onpopstate : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onprogress : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onratechange : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onreset : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onresize : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onscroll : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onseeked : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onseeking : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onselect : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onshow : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onstalled : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onstorage : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onsubmit : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onsuspend : Nullable.<function(:Event):void>/*EventHandler*/;
+	var ontimeupdate : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onunload : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onvolumechange : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onwaiting : Nullable.<function(:Event):void>/*EventHandler*/;
 
 	// implements WindowBase64
 
@@ -2433,8 +2454,6 @@ native class HTMLElement extends Element {
 	var lang : string/*DOMString*/;
 	var translate : boolean;
 	var dir : string/*DOMString*/;
-	// inherits var className : string/*DOMString*/;
-	// inherits __readonly__ var classList : DOMTokenList;
 	__readonly__ var dataset : DOMStringMap;
 	// user interaction
 	var hidden : boolean;
@@ -2460,59 +2479,61 @@ native class HTMLElement extends Element {
 	// styling
 	__readonly__ var style : CSSStyleDeclaration;
 	// event handler IDL attributes
-	var onabort : Nullable.<function(:Event):void>/*Function?*/;
-	var onblur : Nullable.<function(:Event):void>/*Function?*/;
-	var oncanplay : Nullable.<function(:Event):void>/*Function?*/;
-	var oncanplaythrough : Nullable.<function(:Event):void>/*Function?*/;
-	var onchange : Nullable.<function(:Event):void>/*Function?*/;
-	var onclick : Nullable.<function(:Event):void>/*Function?*/;
-	var oncontextmenu : Nullable.<function(:Event):void>/*Function?*/;
-	var oncuechange : Nullable.<function(:Event):void>/*Function?*/;
-	var ondblclick : Nullable.<function(:Event):void>/*Function?*/;
-	var ondrag : Nullable.<function(:Event):void>/*Function?*/;
-	var ondragend : Nullable.<function(:Event):void>/*Function?*/;
-	var ondragenter : Nullable.<function(:Event):void>/*Function?*/;
-	var ondragleave : Nullable.<function(:Event):void>/*Function?*/;
-	var ondragover : Nullable.<function(:Event):void>/*Function?*/;
-	var ondragstart : Nullable.<function(:Event):void>/*Function?*/;
-	var ondrop : Nullable.<function(:Event):void>/*Function?*/;
-	var ondurationchange : Nullable.<function(:Event):void>/*Function?*/;
-	var onemptied : Nullable.<function(:Event):void>/*Function?*/;
-	var onended : Nullable.<function(:Event):void>/*Function?*/;
-	var onerror : Nullable.<function(:Event):void>/*Function?*/;
-	var onfocus : Nullable.<function(:Event):void>/*Function?*/;
-	var oninput : Nullable.<function(:Event):void>/*Function?*/;
-	var oninvalid : Nullable.<function(:Event):void>/*Function?*/;
-	var onkeydown : Nullable.<function(:Event):void>/*Function?*/;
-	var onkeypress : Nullable.<function(:Event):void>/*Function?*/;
-	var onkeyup : Nullable.<function(:Event):void>/*Function?*/;
-	var onload : Nullable.<function(:Event):void>/*Function?*/;
-	var onloadeddata : Nullable.<function(:Event):void>/*Function?*/;
-	var onloadedmetadata : Nullable.<function(:Event):void>/*Function?*/;
-	var onloadstart : Nullable.<function(:Event):void>/*Function?*/;
-	var onmousedown : Nullable.<function(:Event):void>/*Function?*/;
-	var onmousemove : Nullable.<function(:Event):void>/*Function?*/;
-	var onmouseout : Nullable.<function(:Event):void>/*Function?*/;
-	var onmouseover : Nullable.<function(:Event):void>/*Function?*/;
-	var onmouseup : Nullable.<function(:Event):void>/*Function?*/;
-	var onmousewheel : Nullable.<function(:Event):void>/*Function?*/;
-	var onpause : Nullable.<function(:Event):void>/*Function?*/;
-	var onplay : Nullable.<function(:Event):void>/*Function?*/;
-	var onplaying : Nullable.<function(:Event):void>/*Function?*/;
-	var onprogress : Nullable.<function(:Event):void>/*Function?*/;
-	var onratechange : Nullable.<function(:Event):void>/*Function?*/;
-	var onreset : Nullable.<function(:Event):void>/*Function?*/;
-	var onscroll : Nullable.<function(:Event):void>/*Function?*/;
-	var onseeked : Nullable.<function(:Event):void>/*Function?*/;
-	var onseeking : Nullable.<function(:Event):void>/*Function?*/;
-	var onselect : Nullable.<function(:Event):void>/*Function?*/;
-	var onshow : Nullable.<function(:Event):void>/*Function?*/;
-	var onstalled : Nullable.<function(:Event):void>/*Function?*/;
-	var onsubmit : Nullable.<function(:Event):void>/*Function?*/;
-	var onsuspend : Nullable.<function(:Event):void>/*Function?*/;
-	var ontimeupdate : Nullable.<function(:Event):void>/*Function?*/;
-	var onvolumechange : Nullable.<function(:Event):void>/*Function?*/;
-	var onwaiting : Nullable.<function(:Event):void>/*Function?*/;
+	var onabort : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onblur : Nullable.<function(:Event):void>/*EventHandler*/;
+	var oncancel : Nullable.<function(:Event):void>/*EventHandler*/;
+	var oncanplay : Nullable.<function(:Event):void>/*EventHandler*/;
+	var oncanplaythrough : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onchange : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onclick : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onclose : Nullable.<function(:Event):void>/*EventHandler*/;
+	var oncontextmenu : Nullable.<function(:Event):void>/*EventHandler*/;
+	var oncuechange : Nullable.<function(:Event):void>/*EventHandler*/;
+	var ondblclick : Nullable.<function(:Event):void>/*EventHandler*/;
+	var ondrag : Nullable.<function(:Event):void>/*EventHandler*/;
+	var ondragend : Nullable.<function(:Event):void>/*EventHandler*/;
+	var ondragenter : Nullable.<function(:Event):void>/*EventHandler*/;
+	var ondragleave : Nullable.<function(:Event):void>/*EventHandler*/;
+	var ondragover : Nullable.<function(:Event):void>/*EventHandler*/;
+	var ondragstart : Nullable.<function(:Event):void>/*EventHandler*/;
+	var ondrop : Nullable.<function(:Event):void>/*EventHandler*/;
+	var ondurationchange : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onemptied : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onended : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onerror : Nullable.<function(:Event):void>/*OnErrorEventHandler*/;
+	var onfocus : Nullable.<function(:Event):void>/*EventHandler*/;
+	var oninput : Nullable.<function(:Event):void>/*EventHandler*/;
+	var oninvalid : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onkeydown : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onkeypress : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onkeyup : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onload : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onloadeddata : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onloadedmetadata : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onloadstart : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onmousedown : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onmousemove : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onmouseout : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onmouseover : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onmouseup : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onmousewheel : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onpause : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onplay : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onplaying : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onprogress : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onratechange : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onreset : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onscroll : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onseeked : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onseeking : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onselect : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onshow : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onstalled : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onsubmit : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onsuspend : Nullable.<function(:Event):void>/*EventHandler*/;
+	var ontimeupdate : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onvolumechange : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onwaiting : Nullable.<function(:Event):void>/*EventHandler*/;
 
 } // end of HTMLElement
 
@@ -2536,13 +2557,14 @@ native final class ClientRect {
 
 } // end of ClientRect
 
+// alias EventHandlerNonNull = function(event:Event):variant/*any*/
+
+// alias OnErrorEventHandlerNonNull = function(event:variant/*(Event or DOMString)*/,source:string/*DOMString*/,lineno:number/*unsigned long*/,column:number/*unsigned long*/):variant/*any*/
+
 /** @see http://www.w3.org/TR/html5/single-page.html */
 native final class HTMLAllCollection extends HTMLCollection {
 
-	// inherits length and item(unsigned long index)
-	function item(
-		name : string/*DOMString*/
-	) : Nullable.<Object>/*object?*/;
+	// inherits length and item()
 	// inherits function __native_index_operator__(name : string/*DOMString*/) : Nullable.<Object>/*object?*/;
 	/* legacycaller getter */
 	// inherits function namedItem(name : string/*DOMString*/) : Nullable.<Object>/*object?*/;
@@ -2620,7 +2642,6 @@ native final class HTMLDocument extends Document {
 
 	// resource metadata management
 	__readonly__ var location : Nullable.<Location>;
-	// inherits __readonly__ var URL : string/*DOMString*/;
 	var domain : string/*DOMString*/;
 	__readonly__ var referrer : string/*DOMString*/;
 	var cookie : string/*DOMString*/;
@@ -2698,61 +2719,63 @@ native final class HTMLDocument extends Document {
 	) : string/*DOMString*/;
 	__readonly__ var commands : HTMLCollection;
 	// event handler IDL attributes
-	var onabort : Nullable.<function(:Event):void>/*Function?*/;
-	var onblur : Nullable.<function(:Event):void>/*Function?*/;
-	var oncanplay : Nullable.<function(:Event):void>/*Function?*/;
-	var oncanplaythrough : Nullable.<function(:Event):void>/*Function?*/;
-	var onchange : Nullable.<function(:Event):void>/*Function?*/;
-	var onclick : Nullable.<function(:Event):void>/*Function?*/;
-	var oncontextmenu : Nullable.<function(:Event):void>/*Function?*/;
-	var oncuechange : Nullable.<function(:Event):void>/*Function?*/;
-	var ondblclick : Nullable.<function(:Event):void>/*Function?*/;
-	var ondrag : Nullable.<function(:Event):void>/*Function?*/;
-	var ondragend : Nullable.<function(:Event):void>/*Function?*/;
-	var ondragenter : Nullable.<function(:Event):void>/*Function?*/;
-	var ondragleave : Nullable.<function(:Event):void>/*Function?*/;
-	var ondragover : Nullable.<function(:Event):void>/*Function?*/;
-	var ondragstart : Nullable.<function(:Event):void>/*Function?*/;
-	var ondrop : Nullable.<function(:Event):void>/*Function?*/;
-	var ondurationchange : Nullable.<function(:Event):void>/*Function?*/;
-	var onemptied : Nullable.<function(:Event):void>/*Function?*/;
-	var onended : Nullable.<function(:Event):void>/*Function?*/;
-	var onerror : Nullable.<function(:Event):void>/*Function?*/;
-	var onfocus : Nullable.<function(:Event):void>/*Function?*/;
-	var oninput : Nullable.<function(:Event):void>/*Function?*/;
-	var oninvalid : Nullable.<function(:Event):void>/*Function?*/;
-	var onkeydown : Nullable.<function(:Event):void>/*Function?*/;
-	var onkeypress : Nullable.<function(:Event):void>/*Function?*/;
-	var onkeyup : Nullable.<function(:Event):void>/*Function?*/;
-	var onload : Nullable.<function(:Event):void>/*Function?*/;
-	var onloadeddata : Nullable.<function(:Event):void>/*Function?*/;
-	var onloadedmetadata : Nullable.<function(:Event):void>/*Function?*/;
-	var onloadstart : Nullable.<function(:Event):void>/*Function?*/;
-	var onmousedown : Nullable.<function(:Event):void>/*Function?*/;
-	var onmousemove : Nullable.<function(:Event):void>/*Function?*/;
-	var onmouseout : Nullable.<function(:Event):void>/*Function?*/;
-	var onmouseover : Nullable.<function(:Event):void>/*Function?*/;
-	var onmouseup : Nullable.<function(:Event):void>/*Function?*/;
-	var onmousewheel : Nullable.<function(:Event):void>/*Function?*/;
-	var onpause : Nullable.<function(:Event):void>/*Function?*/;
-	var onplay : Nullable.<function(:Event):void>/*Function?*/;
-	var onplaying : Nullable.<function(:Event):void>/*Function?*/;
-	var onprogress : Nullable.<function(:Event):void>/*Function?*/;
-	var onratechange : Nullable.<function(:Event):void>/*Function?*/;
-	var onreset : Nullable.<function(:Event):void>/*Function?*/;
-	var onscroll : Nullable.<function(:Event):void>/*Function?*/;
-	var onseeked : Nullable.<function(:Event):void>/*Function?*/;
-	var onseeking : Nullable.<function(:Event):void>/*Function?*/;
-	var onselect : Nullable.<function(:Event):void>/*Function?*/;
-	var onshow : Nullable.<function(:Event):void>/*Function?*/;
-	var onstalled : Nullable.<function(:Event):void>/*Function?*/;
-	var onsubmit : Nullable.<function(:Event):void>/*Function?*/;
-	var onsuspend : Nullable.<function(:Event):void>/*Function?*/;
-	var ontimeupdate : Nullable.<function(:Event):void>/*Function?*/;
-	var onvolumechange : Nullable.<function(:Event):void>/*Function?*/;
-	var onwaiting : Nullable.<function(:Event):void>/*Function?*/;
+	var onabort : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onblur : Nullable.<function(:Event):void>/*EventHandler*/;
+	var oncancel : Nullable.<function(:Event):void>/*EventHandler*/;
+	var oncanplay : Nullable.<function(:Event):void>/*EventHandler*/;
+	var oncanplaythrough : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onchange : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onclick : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onclose : Nullable.<function(:Event):void>/*EventHandler*/;
+	var oncontextmenu : Nullable.<function(:Event):void>/*EventHandler*/;
+	var oncuechange : Nullable.<function(:Event):void>/*EventHandler*/;
+	var ondblclick : Nullable.<function(:Event):void>/*EventHandler*/;
+	var ondrag : Nullable.<function(:Event):void>/*EventHandler*/;
+	var ondragend : Nullable.<function(:Event):void>/*EventHandler*/;
+	var ondragenter : Nullable.<function(:Event):void>/*EventHandler*/;
+	var ondragleave : Nullable.<function(:Event):void>/*EventHandler*/;
+	var ondragover : Nullable.<function(:Event):void>/*EventHandler*/;
+	var ondragstart : Nullable.<function(:Event):void>/*EventHandler*/;
+	var ondrop : Nullable.<function(:Event):void>/*EventHandler*/;
+	var ondurationchange : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onemptied : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onended : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onerror : Nullable.<function(:Event):void>/*OnErrorEventHandler*/;
+	var onfocus : Nullable.<function(:Event):void>/*EventHandler*/;
+	var oninput : Nullable.<function(:Event):void>/*EventHandler*/;
+	var oninvalid : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onkeydown : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onkeypress : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onkeyup : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onload : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onloadeddata : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onloadedmetadata : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onloadstart : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onmousedown : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onmousemove : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onmouseout : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onmouseover : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onmouseup : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onmousewheel : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onpause : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onplay : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onplaying : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onprogress : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onratechange : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onreset : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onscroll : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onseeked : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onseeking : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onselect : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onshow : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onstalled : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onsubmit : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onsuspend : Nullable.<function(:Event):void>/*EventHandler*/;
+	var ontimeupdate : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onvolumechange : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onwaiting : Nullable.<function(:Event):void>/*EventHandler*/;
 	// special event handler IDL attributes that only apply to Document objects
-	var onreadystatechange : Nullable.<function(:Event):void>/*Function?*/;
+	var onreadystatechange : Nullable.<function(:Event):void>/*EventHandler*/;
 
 	var fgColor : string/*DOMString*/;
 	var linkColor : string/*DOMString*/;
@@ -2863,24 +2886,24 @@ native final class HTMLScriptElement extends HTMLElement {
 /** @see http://www.w3.org/TR/html5/single-page.html */
 native final class HTMLBodyElement extends HTMLElement {
 
-	var onafterprint : Nullable.<function(:Event):void>/*Function?*/;
-	var onbeforeprint : Nullable.<function(:Event):void>/*Function?*/;
-	var onbeforeunload : Nullable.<function(:Event):void>/*Function?*/;
-	// inherits var onblur : Nullable.<function(:Event):void>/*Function?*/;
-	// inherits var onerror : Nullable.<function(:Event):void>/*Function?*/;
-	// inherits var onfocus : Nullable.<function(:Event):void>/*Function?*/;
-	var onhashchange : Nullable.<function(:Event):void>/*Function?*/;
-	// inherits var onload : Nullable.<function(:Event):void>/*Function?*/;
-	var onmessage : Nullable.<function(:Event):void>/*Function?*/;
-	var onoffline : Nullable.<function(:Event):void>/*Function?*/;
-	var ononline : Nullable.<function(:Event):void>/*Function?*/;
-	var onpopstate : Nullable.<function(:Event):void>/*Function?*/;
-	var onpagehide : Nullable.<function(:Event):void>/*Function?*/;
-	var onpageshow : Nullable.<function(:Event):void>/*Function?*/;
-	var onresize : Nullable.<function(:Event):void>/*Function?*/;
-	// inherits var onscroll : Nullable.<function(:Event):void>/*Function?*/;
-	var onstorage : Nullable.<function(:Event):void>/*Function?*/;
-	var onunload : Nullable.<function(:Event):void>/*Function?*/;
+	var onafterprint : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onbeforeprint : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onbeforeunload : Nullable.<function(:Event):void>/*EventHandler*/;
+	// inherits var onblur : Nullable.<function(:Event):void>/*EventHandler*/;
+	// inherits var onerror : Nullable.<function(:Event):void>/*OnErrorEventHandler*/;
+	// inherits var onfocus : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onhashchange : Nullable.<function(:Event):void>/*EventHandler*/;
+	// inherits var onload : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onmessage : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onoffline : Nullable.<function(:Event):void>/*EventHandler*/;
+	var ononline : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onpopstate : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onpagehide : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onpageshow : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onresize : Nullable.<function(:Event):void>/*EventHandler*/;
+	// inherits var onscroll : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onstorage : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onunload : Nullable.<function(:Event):void>/*EventHandler*/;
 
 	var text : string/*DOMString*/;
 	var link : string/*DOMString*/;
@@ -3211,9 +3234,8 @@ native class HTMLMediaElement extends HTMLElement {
 	__readonly__ var seeking : boolean;
 	// playback state
 	var currentTime : number/*double*/;
-	__readonly__ var initialTime : number/*double*/;
-	__readonly__ var duration : number/*double*/;
-	__readonly__ var startOffsetTime : Date;
+	__readonly__ var duration : number/*unrestricted double*/;
+	__readonly__ var startDate : Date;
 	__readonly__ var paused : boolean;
 	var defaultPlaybackRate : number/*double*/;
 	var playbackRate : number/*double*/;
@@ -3274,8 +3296,9 @@ native final class AudioTrackList extends EventTarget {
 	function getTrackById(
 		id : string/*DOMString*/
 	) : Nullable.<AudioTrack>;
-	var onchange : Nullable.<function(:Event):void>/*Function?*/;
-	var onaddtrack : Nullable.<function(:Event):void>/*Function?*/;
+	var onchange : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onaddtrack : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onremovetrack : Nullable.<function(:Event):void>/*EventHandler*/;
 
 } // end of AudioTrackList
 
@@ -3301,8 +3324,9 @@ native final class VideoTrackList extends EventTarget {
 		id : string/*DOMString*/
 	) : Nullable.<VideoTrack>;
 	__readonly__ var selectedIndex : number/*long*/;
-	var onchange : Nullable.<function(:Event):void>/*Function?*/;
-	var onaddtrack : Nullable.<function(:Event):void>/*Function?*/;
+	var onchange : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onaddtrack : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onremovetrack : Nullable.<function(:Event):void>/*EventHandler*/;
 
 } // end of VideoTrackList
 
@@ -3318,36 +3342,43 @@ native final class VideoTrack {
 } // end of VideoTrack
 
 /** @see http://www.w3.org/TR/html5/single-page.html */
-native final class MediaController {
+native final class MediaController extends EventTarget {
 
 	function constructor();
 
+	__readonly__ var readyState : number/*unsigned short*/;
+	// uses HTMLMediaElement.readyState's values
+
 	__readonly__ var buffered : TimeRanges;
 	__readonly__ var seekable : TimeRanges;
-	__readonly__ var duration : number/*double*/;
+	__readonly__ var duration : number/*unrestricted double*/;
 	var currentTime : number/*double*/;
 	__readonly__ var paused : boolean;
+	__readonly__ var playbackState : string/*MediaControllerPlaybackState*/;
 	__readonly__ var played : TimeRanges;
-	function play() : void;
 	function pause() : void;
+	function unpause() : void;
+	function play() : void;
+	// calls play() on all media elements as well
+
 	var defaultPlaybackRate : number/*double*/;
 	var playbackRate : number/*double*/;
 	var volume : number/*double*/;
 	var muted : boolean;
-	var onemptied : Nullable.<function(:Event):void>/*Function?*/;
-	var onloadedmetadata : Nullable.<function(:Event):void>/*Function?*/;
-	var onloadeddata : Nullable.<function(:Event):void>/*Function?*/;
-	var oncanplay : Nullable.<function(:Event):void>/*Function?*/;
-	var oncanplaythrough : Nullable.<function(:Event):void>/*Function?*/;
-	var onplaying : Nullable.<function(:Event):void>/*Function?*/;
-	var onended : Nullable.<function(:Event):void>/*Function?*/;
-	var onwaiting : Nullable.<function(:Event):void>/*Function?*/;
-	var ondurationchange : Nullable.<function(:Event):void>/*Function?*/;
-	var ontimeupdate : Nullable.<function(:Event):void>/*Function?*/;
-	var onplay : Nullable.<function(:Event):void>/*Function?*/;
-	var onpause : Nullable.<function(:Event):void>/*Function?*/;
-	var onratechange : Nullable.<function(:Event):void>/*Function?*/;
-	var onvolumechange : Nullable.<function(:Event):void>/*Function?*/;
+	var onemptied : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onloadedmetadata : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onloadeddata : Nullable.<function(:Event):void>/*EventHandler*/;
+	var oncanplay : Nullable.<function(:Event):void>/*EventHandler*/;
+	var oncanplaythrough : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onplaying : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onended : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onwaiting : Nullable.<function(:Event):void>/*EventHandler*/;
+	var ondurationchange : Nullable.<function(:Event):void>/*EventHandler*/;
+	var ontimeupdate : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onplay : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onpause : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onratechange : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onvolumechange : Nullable.<function(:Event):void>/*EventHandler*/;
 
 } // end of MediaController
 
@@ -3358,7 +3389,8 @@ native final class TextTrackList extends EventTarget {
 	function __native_index_operator__(
 		index : number/*unsigned long*/
 	) : Nullable.<TextTrack>;
-	var onaddtrack : Nullable.<function(:Event):void>/*Function?*/;
+	var onaddtrack : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onremovetrack : Nullable.<function(:Event):void>/*EventHandler*/;
 
 } // end of TextTrackList
 
@@ -3368,18 +3400,13 @@ native final class TextTrack extends EventTarget {
 	__readonly__ var kind : string/*DOMString*/;
 	__readonly__ var label : string/*DOMString*/;
 	__readonly__ var language : string/*DOMString*/;
-	static __readonly__ var DISABLED : number/*unsigned short*/;
-	       __readonly__ var DISABLED : number/*unsigned short*/;
-	static __readonly__ var HIDDEN : number/*unsigned short*/;
-	       __readonly__ var HIDDEN : number/*unsigned short*/;
-	static __readonly__ var SHOWING : number/*unsigned short*/;
-	       __readonly__ var SHOWING : number/*unsigned short*/;
-	var mode : number/*unsigned short*/;
+	__readonly__ var inBandMetadataTrackDispatchType : string/*DOMString*/;
+	var mode : string/*TextTrackMode*/;
 	__readonly__ var cues : Nullable.<TextTrackCueList>;
 	__readonly__ var activeCues : Nullable.<TextTrackCueList>;
 	function addCue(cue : TextTrackCue) : void;
 	function removeCue(cue : TextTrackCue) : void;
-	var oncuechange : Nullable.<function(:Event):void>/*Function?*/;
+	var oncuechange : Nullable.<function(:Event):void>/*EventHandler*/;
 
 } // end of TextTrack
 
@@ -3400,25 +3427,9 @@ native final class TextTrackCueList {
 native final class TextTrackCue extends EventTarget {
 
 	function constructor(
-		id : string/*DOMString*/,
 		startTime : number/*double*/,
 		endTime : number/*double*/,
 		text : string/*DOMString*/
-	);
-	function constructor(
-		id : string/*DOMString*/,
-		startTime : number/*double*/,
-		endTime : number/*double*/,
-		text : string/*DOMString*/,
-		settings : string/*DOMString*/
-	);
-	function constructor(
-		id : string/*DOMString*/,
-		startTime : number/*double*/,
-		endTime : number/*double*/,
-		text : string/*DOMString*/,
-		settings : string/*DOMString*/,
-		pauseOnExit : boolean
 	);
 
 	__readonly__ var track : Nullable.<TextTrack>;
@@ -3428,14 +3439,14 @@ native final class TextTrackCue extends EventTarget {
 	var pauseOnExit : boolean;
 	var vertical : string/*DOMString*/;
 	var snapToLines : boolean;
-	var line : number/*long*/;
+	var line : variant/*(long or AutoKeyword)*/;
 	var position : number/*long*/;
 	var size : number/*long*/;
 	var align : string/*DOMString*/;
 	var text : string/*DOMString*/;
 	function getCueAsHTML() : DocumentFragment;
-	var onenter : Nullable.<function(:Event):void>/*Function?*/;
-	var onexit : Nullable.<function(:Event):void>/*Function?*/;
+	var onenter : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onexit : Nullable.<function(:Event):void>/*EventHandler*/;
 
 } // end of TextTrackCue
 
@@ -3475,16 +3486,16 @@ native final class HTMLCanvasElement extends HTMLElement {
 	var height : number/*unsigned long*/;
 	function toDataURL(
 		type : string/*DOMString*/,
-		...args : variant/*any...*/
+		...arguments : variant/*any...*/
 	) : string/*DOMString*/;
 	function toBlob(
 		_callback : Nullable.<function(:File):void>/*FileCallback?*/,
 		type : string/*DOMString*/,
-		...args : variant/*any...*/
+		...arguments : variant/*any...*/
 	) : void;
 	function getContext(
 		contextId : string/*DOMString*/,
-		...args : variant/*any...*/
+		...arguments : variant/*any...*/
 	) : Nullable.<Object>/*object?*/;
 
 } // end of HTMLCanvasElement
@@ -3616,6 +3627,7 @@ native final class HTMLTableDataCellElement extends HTMLTableCellElement {
 native final class HTMLTableHeaderCellElement extends HTMLTableCellElement {
 
 	var scope : string/*DOMString*/;
+	// inherits var abbr : string/*DOMString*/;
 
 } // end of HTMLTableHeaderCellElement
 
@@ -3737,7 +3749,7 @@ native final class HTMLInputElement extends HTMLElement {
 	var defaultValue : string/*DOMString*/;
 	var value : string/*DOMString*/;
 	var valueAsDate : Nullable.<Date>;
-	var valueAsNumber : number/*double*/;
+	var valueAsNumber : number/*unrestricted double*/;
 	var width : number/*unsigned long*/;
 	function stepUp() : void;
 	function stepUp(n : number/*long*/) : void;
@@ -4017,6 +4029,22 @@ native final class HTMLMenuElement extends HTMLElement {
 } // end of HTMLMenuElement
 
 /** @see http://www.w3.org/TR/html5/single-page.html */
+native final class HTMLDialogElement extends HTMLElement {
+
+	var open : boolean;
+	var returnValue : string/*DOMString*/;
+	function show() : void;
+	function show(anchor : MouseEvent) : void;
+	function show(anchor : Element) : void;
+	function showModal() : void;
+	function showModal(anchor : MouseEvent) : void;
+	function showModal(anchor : Element) : void;
+	function close() : void;
+	function close(returnValue : string/*DOMString*/) : void;
+
+} // end of HTMLDialogElement
+
+/** @see http://www.w3.org/TR/html5/single-page.html */
 native final class BarProp {
 
 	var visible : boolean;
@@ -4039,7 +4067,7 @@ native final class History {
 	function pushState(
 		data : variant/*any*/,
 		title : string/*DOMString*/,
-		url : string/*DOMString*/
+		url : Nullable.<string>/*DOMString?*/
 	) : void;
 	function replaceState(
 		data : variant/*any*/,
@@ -4048,7 +4076,7 @@ native final class History {
 	function replaceState(
 		data : variant/*any*/,
 		title : string/*DOMString*/,
-		url : string/*DOMString*/
+		url : Nullable.<string>/*DOMString?*/
 	) : void;
 
 } // end of History
@@ -4162,14 +4190,14 @@ native final class ApplicationCache extends EventTarget {
 	function abort() : void;
 	function swapCache() : void;
 	// events
-	var onchecking : Nullable.<function(:Event):void>/*Function?*/;
-	var onerror : Nullable.<function(:Event):void>/*Function?*/;
-	var onnoupdate : Nullable.<function(:Event):void>/*Function?*/;
-	var ondownloading : Nullable.<function(:Event):void>/*Function?*/;
-	var onprogress : Nullable.<function(:Event):void>/*Function?*/;
-	var onupdateready : Nullable.<function(:Event):void>/*Function?*/;
-	var oncached : Nullable.<function(:Event):void>/*Function?*/;
-	var onobsolete : Nullable.<function(:Event):void>/*Function?*/;
+	var onchecking : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onerror : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onnoupdate : Nullable.<function(:Event):void>/*EventHandler*/;
+	var ondownloading : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onprogress : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onupdateready : Nullable.<function(:Event):void>/*EventHandler*/;
+	var oncached : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onobsolete : Nullable.<function(:Event):void>/*EventHandler*/;
 
 } // end of ApplicationCache
 
@@ -4179,8 +4207,6 @@ native __fake__ class NavigatorOnLine {
 	__readonly__ var onLine : boolean;
 
 } // end of NavigatorOnLine
-
-// alias Function = function(arguments:variant/*any...*/):variant/*any*/
 
 /** @see http://www.w3.org/TR/html5/single-page.html */
 native __fake__ class WindowBase64 {
@@ -4333,9 +4359,8 @@ native final class DataTransfer {
 		x : number/*long*/,
 		y : number/*long*/
 	) : void;
-	function addElement(element : Element) : void;
 	/* old interface */
-	__readonly__ var types : DOMStringList;
+	__readonly__ var types : string[]/*DOMString[]*/;
 	function getData(
 		format : string/*DOMString*/
 	) : string/*DOMString*/;
@@ -4393,8 +4418,24 @@ native final class DragEvent extends MouseEvent {
 } // end of DragEvent
 
 /** @see http://www.w3.org/TR/html5/single-page.html */
-native final class DragEventInit extends MouseEventInit {
+native final class DragEventInit extends EventInit {
 
+	// Attributes from UIEvent:
+	var view : Nullable.<Window>;
+	var detail : number/*long*/;
+	// Attributes for MouseEvent:
+	var screenX : number/*long*/;
+	var screenY : number/*long*/;
+	var clientX : number/*long*/;
+	var clientY : number/*long*/;
+	var ctrlKey : boolean;
+	var shiftKey : boolean;
+	var altKey : boolean;
+	var metaKey : boolean;
+	var button : number/*unsigned short*/;
+	var buttons : number/*unsigned short*/;
+	var relatedTarget : Nullable.<EventTarget>;
+	// Attributes for DragEvent:
 	var dataTransfer : Nullable.<DataTransfer>;
 
 } // end of DragEventInit
@@ -4431,9 +4472,9 @@ native final class HTMLMarqueeElement extends HTMLElement {
 	var trueSpeed : boolean;
 	var vspace : number/*unsigned long*/;
 	var width : string/*DOMString*/;
-	var onbounce : Nullable.<function(:Event):void>/*Function?*/;
-	var onfinish : Nullable.<function(:Event):void>/*Function?*/;
-	var onstart : Nullable.<function(:Event):void>/*Function?*/;
+	var onbounce : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onfinish : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onstart : Nullable.<function(:Event):void>/*EventHandler*/;
 	function start() : void;
 	function stop() : void;
 
@@ -4444,24 +4485,24 @@ native final class HTMLFrameSetElement extends HTMLElement {
 
 	var cols : string/*DOMString*/;
 	var rows : string/*DOMString*/;
-	var onafterprint : Nullable.<function(:Event):void>/*Function?*/;
-	var onbeforeprint : Nullable.<function(:Event):void>/*Function?*/;
-	var onbeforeunload : Nullable.<function(:Event):void>/*Function?*/;
-	// inherits var onblur : Nullable.<function(:Event):void>/*Function?*/;
-	// inherits var onerror : Nullable.<function(:Event):void>/*Function?*/;
-	// inherits var onfocus : Nullable.<function(:Event):void>/*Function?*/;
-	var onhashchange : Nullable.<function(:Event):void>/*Function?*/;
-	// inherits var onload : Nullable.<function(:Event):void>/*Function?*/;
-	var onmessage : Nullable.<function(:Event):void>/*Function?*/;
-	var onoffline : Nullable.<function(:Event):void>/*Function?*/;
-	var ononline : Nullable.<function(:Event):void>/*Function?*/;
-	var onpagehide : Nullable.<function(:Event):void>/*Function?*/;
-	var onpageshow : Nullable.<function(:Event):void>/*Function?*/;
-	var onpopstate : Nullable.<function(:Event):void>/*Function?*/;
-	var onresize : Nullable.<function(:Event):void>/*Function?*/;
-	// inherits var onscroll : Nullable.<function(:Event):void>/*Function?*/;
-	var onstorage : Nullable.<function(:Event):void>/*Function?*/;
-	var onunload : Nullable.<function(:Event):void>/*Function?*/;
+	var onafterprint : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onbeforeprint : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onbeforeunload : Nullable.<function(:Event):void>/*EventHandler*/;
+	// inherits var onblur : Nullable.<function(:Event):void>/*EventHandler*/;
+	// inherits var onerror : Nullable.<function(:Event):void>/*EventHandler*/;
+	// inherits var onfocus : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onhashchange : Nullable.<function(:Event):void>/*EventHandler*/;
+	// inherits var onload : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onmessage : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onoffline : Nullable.<function(:Event):void>/*EventHandler*/;
+	var ononline : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onpagehide : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onpageshow : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onpopstate : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onresize : Nullable.<function(:Event):void>/*EventHandler*/;
+	// inherits var onscroll : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onstorage : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onunload : Nullable.<function(:Event):void>/*EventHandler*/;
 
 } // end of HTMLFrameSetElement
 
@@ -4615,7 +4656,11 @@ native class URL {
 
 } // end of URL
 
-// alias AudioBufferCallback = function(decodedData:AudioBuffer):void
+// alias DecodeSuccessCallback = function(decodedData:AudioBuffer):void
+
+// alias DecodeErrorCallback = function():void
+
+// alias OfflineRenderSuccessCallback = function(renderedData:AudioBuffer):void
 
 /** @see https://dvcs.w3.org/hg/audio/raw-file/tip/webaudio/specification.html */
 native class AudioContext {
@@ -4624,7 +4669,7 @@ native class AudioContext {
 
 	__readonly__ var destination : AudioDestinationNode;
 	__readonly__ var sampleRate : number/*float*/;
-	__readonly__ var currentTime : number/*float*/;
+	__readonly__ var currentTime : number/*double*/;
 	__readonly__ var listener : AudioListener;
 	__readonly__ var activeSourceCount : number/*unsigned long*/;
 	function createBuffer(
@@ -4638,12 +4683,12 @@ native class AudioContext {
 	) : AudioBuffer;
 	function decodeAudioData(
 		audioData : ArrayBuffer,
-		successCallback : function(decodedData:AudioBuffer):void/*AudioBufferCallback*/
+		successCallback : function(decodedData:AudioBuffer):void/*DecodeSuccessCallback*/
 	) : void;
 	function decodeAudioData(
 		audioData : ArrayBuffer,
-		successCallback : function(decodedData:AudioBuffer):void/*AudioBufferCallback*/,
-		errorCallback : function(decodedData:AudioBuffer):void/*AudioBufferCallback*/
+		successCallback : function(decodedData:AudioBuffer):void/*DecodeSuccessCallback*/,
+		errorCallback : function():void/*DecodeErrorCallback*/
 	) : void;
 	// AudioNode creation
 	function createBufferSource() : AudioBufferSourceNode;
@@ -4653,43 +4698,52 @@ native class AudioContext {
 	function createMediaStreamSource(
 		mediaStream : MediaStream
 	) : MediaStreamAudioSourceNode;
-	function createJavaScriptNode(
+	function createScriptProcessor(
 		bufferSize : number/*unsigned long*/
-	) : JavaScriptAudioNode;
-	function createJavaScriptNode(
+	) : ScriptProcessorNode;
+	function createScriptProcessor(
 		bufferSize : number/*unsigned long*/,
 		numberOfInputChannels : number/*unsigned long*/
-	) : JavaScriptAudioNode;
-	function createJavaScriptNode(
+	) : ScriptProcessorNode;
+	function createScriptProcessor(
 		bufferSize : number/*unsigned long*/,
 		numberOfInputChannels : number/*unsigned long*/,
 		numberOfOutputChannels : number/*unsigned long*/
-	) : JavaScriptAudioNode;
-	function createAnalyser() : RealtimeAnalyserNode;
-	function createGainNode() : AudioGainNode;
-	function createDelayNode() : DelayNode;
-	function createDelayNode(
-		maxDelayTime : number/*double*/
-	) : DelayNode;
+	) : ScriptProcessorNode;
+	function createAnalyser() : AnalyserNode;
+	function createGain() : GainNode;
+	function createDelay() : DelayNode;
+	function createDelay(maxDelayTime : number/*double*/) : DelayNode;
 	function createBiquadFilter() : BiquadFilterNode;
-	function createPanner() : AudioPannerNode;
+	function createWaveShaper() : WaveShaperNode;
+	function createPanner() : PannerNode;
 	function createConvolver() : ConvolverNode;
-	function createChannelSplitter() : AudioChannelSplitter;
+	function createChannelSplitter() : ChannelSplitterNode;
 	function createChannelSplitter(
 		numberOfOutputs : number/*unsigned long*/
-	) : AudioChannelSplitter;
-	function createChannelMerger() : AudioChannelMerger;
+	) : ChannelSplitterNode;
+	function createChannelMerger() : ChannelMergerNode;
 	function createChannelMerger(
 		numberOfInputs : number/*unsigned long*/
-	) : AudioChannelMerger;
+	) : ChannelMergerNode;
 	function createDynamicsCompressor() : DynamicsCompressorNode;
-	function createOscillator() : Oscillator;
+	function createOscillator() : OscillatorNode;
 	function createWaveTable(
 		real : Float32Array,
 		imag : Float32Array
 	) : WaveTable;
 
 } // end of AudioContext
+
+/** @see https://dvcs.w3.org/hg/audio/raw-file/tip/webaudio/specification.html */
+native final class OfflineAudioContext extends AudioContext {
+
+	function constructor();
+
+	function startRendering() : void;
+	var oncomplete : function(renderedData:AudioBuffer):void/*OfflineRenderSuccessCallback*/;
+
+} // end of OfflineAudioContext
 
 /** @see https://dvcs.w3.org/hg/audio/raw-file/tip/webaudio/specification.html */
 native class AudioNode {
@@ -4730,58 +4784,55 @@ native final class AudioDestinationNode extends AudioNode {
 } // end of AudioDestinationNode
 
 /** @see https://dvcs.w3.org/hg/audio/raw-file/tip/webaudio/specification.html */
-native class AudioParam {
+native final class AudioParam {
 
 	var value : number/*float*/;
+	__readonly__ var computedValue : number/*float*/;
 	__readonly__ var minValue : number/*float*/;
 	__readonly__ var maxValue : number/*float*/;
 	__readonly__ var defaultValue : number/*float*/;
 	// Parameter automation.
 	function setValueAtTime(
 		value : number/*float*/,
-		time : number/*float*/
+		startTime : number/*double*/
 	) : void;
 	function linearRampToValueAtTime(
 		value : number/*float*/,
-		time : number/*float*/
+		endTime : number/*double*/
 	) : void;
 	function exponentialRampToValueAtTime(
 		value : number/*float*/,
-		time : number/*float*/
+		endTime : number/*double*/
 	) : void;
 	// Exponentially approach the target value with a rate having the given time constant.
-	function setTargetValueAtTime(
-		targetValue : number/*float*/,
-		time : number/*float*/,
-		timeConstant : number/*float*/
+	function setTargetAtTime(
+		target : number/*float*/,
+		startTime : number/*double*/,
+		timeConstant : number/*double*/
 	) : void;
 	// Sets an array of arbitrary parameter values starting at time for the given duration.
 	// The number of values will be scaled to fit into the desired duration.
 	function setValueCurveAtTime(
 		values : Float32Array,
-		time : number/*float*/,
-		duration : number/*float*/
+		startTime : number/*double*/,
+		duration : number/*double*/
 	) : void;
 	// Cancels all scheduled parameter changes with times greater than or equal to startTime.
-	function cancelScheduledValues(startTime : number/*float*/) : void;
+	function cancelScheduledValues(startTime : number/*double*/) : void;
 
 } // end of AudioParam
 
 /** @see https://dvcs.w3.org/hg/audio/raw-file/tip/webaudio/specification.html */
-native final class AudioGain extends AudioParam {
-}
+native final class GainNode extends AudioNode {
 
-/** @see https://dvcs.w3.org/hg/audio/raw-file/tip/webaudio/specification.html */
-native final class AudioGainNode extends AudioNode {
+	__readonly__ var gain : AudioParam;
 
-	var gain : AudioGain;
-
-} // end of AudioGainNode
+} // end of GainNode
 
 /** @see https://dvcs.w3.org/hg/audio/raw-file/tip/webaudio/specification.html */
 native final class DelayNode extends AudioNode {
 
-	var delayTime : AudioParam;
+	__readonly__ var delayTime : AudioParam;
 
 } // end of DelayNode
 
@@ -4791,7 +4842,7 @@ native final class AudioBuffer {
 	__readonly__ var sampleRate : number/*float*/;
 	__readonly__ var length : number/*long*/;
 	// in seconds
-	__readonly__ var duration : number/*float*/;
+	__readonly__ var duration : number/*double*/;
 	__readonly__ var numberOfChannels : number/*long*/;
 	function getChannelData(
 		channel : number/*unsigned long*/
@@ -4811,18 +4862,22 @@ native final class AudioBufferSourceNode extends AudioSourceNode {
 	static __readonly__ var FINISHED_STATE : number/*unsigned short*/;
 	       __readonly__ var FINISHED_STATE : number/*unsigned short*/;
 	__readonly__ var playbackState : number/*unsigned short*/;
-	// Playback this in-memory audio asset
-	// Many sources can share the same buffer
-	var buffer : AudioBuffer;
+	var buffer : Nullable.<AudioBuffer>;
 	var playbackRate : AudioParam;
 	var loop : boolean;
-	function noteOn(when : number/*double*/) : void;
-	function noteGrainOn(
+	var loopStart : number/*double*/;
+	var loopEnd : number/*double*/;
+	function start(when : number/*double*/) : void;
+	function start(
 		when : number/*double*/,
-		grainOffset : number/*double*/,
-		grainDuration : number/*double*/
+		offset : number/*double*/
 	) : void;
-	function noteOff(when : number/*double*/) : void;
+	function start(
+		when : number/*double*/,
+		offset : number/*double*/,
+		duration : number/*double*/
+	) : void;
+	function stop(when : number/*double*/) : void;
 
 } // end of AudioBufferSourceNode
 
@@ -4831,42 +4886,28 @@ native final class MediaElementAudioSourceNode extends AudioSourceNode {
 }
 
 /** @see https://dvcs.w3.org/hg/audio/raw-file/tip/webaudio/specification.html */
-native final class JavaScriptAudioNode extends AudioNode {
+native final class ScriptProcessorNode extends AudioNode {
 
 	var onaudioprocess : function(:Event):void/*EventListener*/;
 	__readonly__ var bufferSize : number/*long*/;
 
-} // end of JavaScriptAudioNode
+} // end of ScriptProcessorNode
 
 /** @see https://dvcs.w3.org/hg/audio/raw-file/tip/webaudio/specification.html */
 native final class AudioProcessingEvent extends Event {
 
-	var node : JavaScriptAudioNode;
-	__readonly__ var playbackTime : number/*float*/;
+	var node : ScriptProcessorNode;
+	__readonly__ var playbackTime : number/*double*/;
 	__readonly__ var inputBuffer : AudioBuffer;
 	__readonly__ var outputBuffer : AudioBuffer;
 
 } // end of AudioProcessingEvent
 
 /** @see https://dvcs.w3.org/hg/audio/raw-file/tip/webaudio/specification.html */
-native final class AudioPannerNode extends AudioNode {
+native final class PannerNode extends AudioNode {
 
-	// Panning model
-	static __readonly__ var EQUALPOWER : number/*unsigned short*/;
-	       __readonly__ var EQUALPOWER : number/*unsigned short*/;
-	static __readonly__ var HRTF : number/*unsigned short*/;
-	       __readonly__ var HRTF : number/*unsigned short*/;
-	static __readonly__ var SOUNDFIELD : number/*unsigned short*/;
-	       __readonly__ var SOUNDFIELD : number/*unsigned short*/;
-	// Distance model
-	static __readonly__ var LINEAR_DISTANCE : number/*unsigned short*/;
-	       __readonly__ var LINEAR_DISTANCE : number/*unsigned short*/;
-	static __readonly__ var INVERSE_DISTANCE : number/*unsigned short*/;
-	       __readonly__ var INVERSE_DISTANCE : number/*unsigned short*/;
-	static __readonly__ var EXPONENTIAL_DISTANCE : number/*unsigned short*/;
-	       __readonly__ var EXPONENTIAL_DISTANCE : number/*unsigned short*/;
 	// Default for stereo is HRTF
-	var panningModel : number/*unsigned short*/;
+	var panningModel : string/*PanningModelType*/;
 	// Uses a 3D cartesian coordinate system
 	function setPosition(
 		x : number/*float*/,
@@ -4884,7 +4925,7 @@ native final class AudioPannerNode extends AudioNode {
 		z : number/*float*/
 	) : void;
 	// Distance model and attributes
-	var distanceModel : number/*unsigned short*/;
+	var distanceModel : string/*DistanceModelType*/;
 	var refDistance : number/*float*/;
 	var maxDistance : number/*float*/;
 	var rolloffFactor : number/*float*/;
@@ -4892,11 +4933,8 @@ native final class AudioPannerNode extends AudioNode {
 	var coneInnerAngle : number/*float*/;
 	var coneOuterAngle : number/*float*/;
 	var coneOuterGain : number/*float*/;
-	// Dynamically calculated gain values
-	__readonly__ var coneGain : AudioGain;
-	__readonly__ var distanceGain : AudioGain;
 
-} // end of AudioPannerNode
+} // end of PannerNode
 
 /** @see https://dvcs.w3.org/hg/audio/raw-file/tip/webaudio/specification.html */
 native final class AudioListener {
@@ -4936,7 +4974,7 @@ native final class ConvolverNode extends AudioNode {
 } // end of ConvolverNode
 
 /** @see https://dvcs.w3.org/hg/audio/raw-file/tip/webaudio/specification.html */
-native final class RealtimeAnalyserNode extends AudioNode {
+native final class AnalyserNode extends AudioNode {
 
 	// Real-time frequency-domain data
 	function getFloatFrequencyData(array : Float32Array) : void;
@@ -4949,14 +4987,14 @@ native final class RealtimeAnalyserNode extends AudioNode {
 	var maxDecibels : number/*float*/;
 	var smoothingTimeConstant : number/*float*/;
 
-} // end of RealtimeAnalyserNode
+} // end of AnalyserNode
 
 /** @see https://dvcs.w3.org/hg/audio/raw-file/tip/webaudio/specification.html */
-native final class AudioChannelSplitter extends AudioNode {
+native final class ChannelSplitterNode extends AudioNode {
 }
 
 /** @see https://dvcs.w3.org/hg/audio/raw-file/tip/webaudio/specification.html */
-native final class AudioChannelMerger extends AudioNode {
+native final class ChannelMergerNode extends AudioNode {
 }
 
 /** @see https://dvcs.w3.org/hg/audio/raw-file/tip/webaudio/specification.html */
@@ -4980,26 +5018,11 @@ native final class DynamicsCompressorNode extends AudioNode {
 /** @see https://dvcs.w3.org/hg/audio/raw-file/tip/webaudio/specification.html */
 native final class BiquadFilterNode extends AudioNode {
 
-	// Filter type.
-	static __readonly__ var LOWPASS : number/*unsigned short*/;
-	       __readonly__ var LOWPASS : number/*unsigned short*/;
-	static __readonly__ var HIGHPASS : number/*unsigned short*/;
-	       __readonly__ var HIGHPASS : number/*unsigned short*/;
-	static __readonly__ var BANDPASS : number/*unsigned short*/;
-	       __readonly__ var BANDPASS : number/*unsigned short*/;
-	static __readonly__ var LOWSHELF : number/*unsigned short*/;
-	       __readonly__ var LOWSHELF : number/*unsigned short*/;
-	static __readonly__ var HIGHSHELF : number/*unsigned short*/;
-	       __readonly__ var HIGHSHELF : number/*unsigned short*/;
-	static __readonly__ var PEAKING : number/*unsigned short*/;
-	       __readonly__ var PEAKING : number/*unsigned short*/;
-	static __readonly__ var NOTCH : number/*unsigned short*/;
-	       __readonly__ var NOTCH : number/*unsigned short*/;
-	static __readonly__ var ALLPASS : number/*unsigned short*/;
-	       __readonly__ var ALLPASS : number/*unsigned short*/;
-	var type : number/*unsigned short*/;
+	var type : string/*BiquadFilterType*/;
 	__readonly__ var frequency : AudioParam;
 	// in Hertz
+	__readonly__ var detune : AudioParam;
+	// in Cents
 	__readonly__ var Q : AudioParam;
 	// Quality factor
 	__readonly__ var gain : AudioParam;
@@ -5021,20 +5044,9 @@ native final class WaveShaperNode extends AudioNode {
 } // end of WaveShaperNode
 
 /** @see https://dvcs.w3.org/hg/audio/raw-file/tip/webaudio/specification.html */
-native final class Oscillator extends AudioSourceNode {
+native final class OscillatorNode extends AudioSourceNode {
 
-	// Type constants.
-	static __readonly__ var SINE : number/*unsigned short*/;
-	       __readonly__ var SINE : number/*unsigned short*/;
-	static __readonly__ var SQUARE : number/*unsigned short*/;
-	       __readonly__ var SQUARE : number/*unsigned short*/;
-	static __readonly__ var SAWTOOTH : number/*unsigned short*/;
-	       __readonly__ var SAWTOOTH : number/*unsigned short*/;
-	static __readonly__ var TRIANGLE : number/*unsigned short*/;
-	       __readonly__ var TRIANGLE : number/*unsigned short*/;
-	static __readonly__ var CUSTOM : number/*unsigned short*/;
-	       __readonly__ var CUSTOM : number/*unsigned short*/;
-	var type : number/*unsigned short*/;
+	var type : string/*OscillatorType*/;
 	static __readonly__ var UNSCHEDULED_STATE : number/*unsigned short*/;
 	       __readonly__ var UNSCHEDULED_STATE : number/*unsigned short*/;
 	static __readonly__ var SCHEDULED_STATE : number/*unsigned short*/;
@@ -5049,11 +5061,11 @@ native final class Oscillator extends AudioSourceNode {
 	__readonly__ var detune : AudioParam;
 	// in Cents
 
-	function noteOn(when : number/*double*/) : void;
-	function noteOff(when : number/*double*/) : void;
+	function start(when : number/*double*/) : void;
+	function stop(when : number/*double*/) : void;
 	function setWaveTable(waveTable : WaveTable) : void;
 
-} // end of Oscillator
+} // end of OscillatorNode
 
 /** @see https://dvcs.w3.org/hg/audio/raw-file/tip/webaudio/specification.html */
 native final class WaveTable {
@@ -5129,9 +5141,9 @@ native final class WebSocket extends EventTarget {
 	__readonly__ var readyState : number/*unsigned short*/;
 	__readonly__ var bufferedAmount : number/*unsigned long*/;
 	// networking
-	var onopen : function(:Event):void/*EventHandler*/;
-	var onerror : function(:Event):void/*EventHandler*/;
-	var onclose : function(:Event):void/*EventHandler*/;
+	var onopen : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onerror : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onclose : Nullable.<function(:Event):void>/*EventHandler*/;
 	__readonly__ var extensions : string/*DOMString*/;
 	__readonly__ var protocol : string/*DOMString*/;
 	function close() : void;
@@ -5141,7 +5153,7 @@ native final class WebSocket extends EventTarget {
 		reason : string/*DOMString*/
 	) : void;
 	// messaging
-	var onmessage : function(:Event):void/*EventHandler*/;
+	var onmessage : Nullable.<function(:Event):void>/*EventHandler*/;
 	var binaryType : string/*DOMString*/;
 	function send(data : string/*DOMString*/) : void;
 	function send(data : Blob) : void;
@@ -5269,11 +5281,11 @@ native final class Storage {
 	) : Nullable.<string>/*DOMString?*/;
 	function __native_index_operator__(
 		key : string/*DOMString*/
-	) : Nullable.<string>/*DOMString*/;
+	) : Nullable.<string>/*DOMString?*/;
 	/* getter */
 	function getItem(
 		key : string/*DOMString*/
-	) : Nullable.<string>/*DOMString*/;
+	) : Nullable.<string>/*DOMString?*/;
 	/* setter creator */
 	function setItem(
 		key : string/*DOMString*/,
@@ -5540,9 +5552,9 @@ native final class EventSource extends EventTarget {
 	       __readonly__ var CLOSED : number/*unsigned short*/;
 	__readonly__ var readyState : number/*unsigned short*/;
 	// networking
-	var onopen : Nullable.<function(:Event):void>/*Function?*/;
-	var onmessage : Nullable.<function(:Event):void>/*Function?*/;
-	var onerror : Nullable.<function(:Event):void>/*Function?*/;
+	var onopen : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onmessage : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onerror : Nullable.<function(:Event):void>/*EventHandler*/;
 	function close() : void;
 
 } // end of EventSource
@@ -6322,7 +6334,7 @@ native final class DataView extends ArrayBufferView {
 } // end of DataView
 
 /** @see http://dev.w3.org/html5/2dcontext/ */
-native final class CanvasRenderingContext2D extends CanvasTransformation {
+native final class CanvasRenderingContext2D extends CanvasDrawingStyles {
 
 	// back-reference to the canvas
 	__readonly__ var canvas : HTMLCanvasElement;
@@ -6332,16 +6344,42 @@ native final class CanvasRenderingContext2D extends CanvasTransformation {
 	function restore() : void;
 	// pop state stack and restore state
 
+	// transformations (default transform is the identity matrix)
+	function scale(
+		x : number/*unrestricted double*/,
+		y : number/*unrestricted double*/
+	) : void;
+	function rotate(angle : number/*unrestricted double*/) : void;
+	function translate(
+		x : number/*unrestricted double*/,
+		y : number/*unrestricted double*/
+	) : void;
+	function transform(
+		a : number/*unrestricted double*/,
+		b : number/*unrestricted double*/,
+		c : number/*unrestricted double*/,
+		d : number/*unrestricted double*/,
+		e : number/*unrestricted double*/,
+		f : number/*unrestricted double*/
+	) : void;
+	function setTransform(
+		a : number/*unrestricted double*/,
+		b : number/*unrestricted double*/,
+		c : number/*unrestricted double*/,
+		d : number/*unrestricted double*/,
+		e : number/*unrestricted double*/,
+		f : number/*unrestricted double*/
+	) : void;
 	// compositing
-	var globalAlpha : number/*double*/;
+	var globalAlpha : number/*unrestricted double*/;
 	// (default 1.0)
 	var globalCompositeOperation : string/*DOMString*/;
 	// (default source-over)
 
-	// colors and styles (see also the CanvasLineStyles interface)
-	var strokeStyle : variant/*any*/;
+	// colors and styles (see also the CanvasDrawingStyles interface)
+	var strokeStyle : variant/*(DOMString or CanvasGradient or CanvasPattern)*/;
 	// (default black)
-	var fillStyle : variant/*any*/;
+	var fillStyle : variant/*(DOMString or CanvasGradient or CanvasPattern)*/;
 	// (default black)
 	function createLinearGradient(
 		x0 : number/*double*/,
@@ -6370,144 +6408,161 @@ native final class CanvasRenderingContext2D extends CanvasTransformation {
 		repetition : string/*DOMString*/
 	) : CanvasPattern;
 	// shadows
-	var shadowOffsetX : number/*double*/;
+	var shadowOffsetX : number/*unrestricted double*/;
 	// (default 0)
-	var shadowOffsetY : number/*double*/;
+	var shadowOffsetY : number/*unrestricted double*/;
 	// (default 0)
-	var shadowBlur : number/*double*/;
+	var shadowBlur : number/*unrestricted double*/;
 	// (default 0)
 	var shadowColor : string/*DOMString*/;
 	// (default transparent black)
 
 	// rects
 	function clearRect(
-		x : number/*double*/,
-		y : number/*double*/,
-		w : number/*double*/,
-		h : number/*double*/
+		x : number/*unrestricted double*/,
+		y : number/*unrestricted double*/,
+		w : number/*unrestricted double*/,
+		h : number/*unrestricted double*/
 	) : void;
 	function fillRect(
-		x : number/*double*/,
-		y : number/*double*/,
-		w : number/*double*/,
-		h : number/*double*/
+		x : number/*unrestricted double*/,
+		y : number/*unrestricted double*/,
+		w : number/*unrestricted double*/,
+		h : number/*unrestricted double*/
 	) : void;
 	function strokeRect(
-		x : number/*double*/,
-		y : number/*double*/,
-		w : number/*double*/,
-		h : number/*double*/
+		x : number/*unrestricted double*/,
+		y : number/*unrestricted double*/,
+		w : number/*unrestricted double*/,
+		h : number/*unrestricted double*/
 	) : void;
-	// current default path API (see also CanvasPathMethods)
+	// path API (see also CanvasPathMethods)
 	function beginPath() : void;
 	function fill() : void;
+	function fill(path : Path) : void;
 	function stroke() : void;
+	function stroke(path : Path) : void;
 	function drawSystemFocusRing(element : Element) : void;
+	function drawSystemFocusRing(path : Path, element : Element) : void;
 	function drawCustomFocusRing(element : Element) : boolean;
-	function scrollPathIntoView() : void;
-	function clip() : void;
-	function isPointInPath(
-		x : number/*double*/,
-		y : number/*double*/
+	function drawCustomFocusRing(
+		path : Path,
+		element : Element
 	) : boolean;
-	// text (see also the CanvasText interface)
+	function scrollPathIntoView() : void;
+	function scrollPathIntoView(path : Path) : void;
+	function clip() : void;
+	function clip(path : Path) : void;
+	function isPointInPath(
+		x : number/*unrestricted double*/,
+		y : number/*unrestricted double*/
+	) : boolean;
+	function isPointInPath(
+		path : Path,
+		x : number/*unrestricted double*/,
+		y : number/*unrestricted double*/
+	) : boolean;
+	// text (see also the CanvasDrawingStyles interface)
 	function fillText(
 		text : string/*DOMString*/,
-		x : number/*double*/,
-		y : number/*double*/
+		x : number/*unrestricted double*/,
+		y : number/*unrestricted double*/
 	) : void;
 	function fillText(
 		text : string/*DOMString*/,
-		x : number/*double*/,
-		y : number/*double*/,
-		maxWidth : number/*double*/
+		x : number/*unrestricted double*/,
+		y : number/*unrestricted double*/,
+		maxWidth : number/*unrestricted double*/
 	) : void;
 	function strokeText(
 		text : string/*DOMString*/,
-		x : number/*double*/,
-		y : number/*double*/
+		x : number/*unrestricted double*/,
+		y : number/*unrestricted double*/
 	) : void;
 	function strokeText(
 		text : string/*DOMString*/,
-		x : number/*double*/,
-		y : number/*double*/,
-		maxWidth : number/*double*/
+		x : number/*unrestricted double*/,
+		y : number/*unrestricted double*/,
+		maxWidth : number/*unrestricted double*/
 	) : void;
 	function measureText(text : string/*DOMString*/) : TextMetrics;
 	// drawing images
 	function drawImage(
 		image : HTMLImageElement,
-		dx : number/*double*/,
-		dy : number/*double*/
+		dx : number/*unrestricted double*/,
+		dy : number/*unrestricted double*/
 	) : void;
 	function drawImage(
 		image : HTMLCanvasElement,
-		dx : number/*double*/,
-		dy : number/*double*/
+		dx : number/*unrestricted double*/,
+		dy : number/*unrestricted double*/
 	) : void;
 	function drawImage(
 		image : HTMLVideoElement,
-		dx : number/*double*/,
-		dy : number/*double*/
+		dx : number/*unrestricted double*/,
+		dy : number/*unrestricted double*/
 	) : void;
 	function drawImage(
 		image : HTMLImageElement,
-		dx : number/*double*/,
-		dy : number/*double*/,
-		dw : number/*double*/,
-		dh : number/*double*/
+		dx : number/*unrestricted double*/,
+		dy : number/*unrestricted double*/,
+		dw : number/*unrestricted double*/,
+		dh : number/*unrestricted double*/
 	) : void;
 	function drawImage(
 		image : HTMLCanvasElement,
-		dx : number/*double*/,
-		dy : number/*double*/,
-		dw : number/*double*/,
-		dh : number/*double*/
+		dx : number/*unrestricted double*/,
+		dy : number/*unrestricted double*/,
+		dw : number/*unrestricted double*/,
+		dh : number/*unrestricted double*/
 	) : void;
 	function drawImage(
 		image : HTMLVideoElement,
-		dx : number/*double*/,
-		dy : number/*double*/,
-		dw : number/*double*/,
-		dh : number/*double*/
+		dx : number/*unrestricted double*/,
+		dy : number/*unrestricted double*/,
+		dw : number/*unrestricted double*/,
+		dh : number/*unrestricted double*/
 	) : void;
 	function drawImage(
 		image : HTMLImageElement,
-		sx : number/*double*/,
-		sy : number/*double*/,
-		sw : number/*double*/,
-		sh : number/*double*/,
-		dx : number/*double*/,
-		dy : number/*double*/,
-		dw : number/*double*/,
-		dh : number/*double*/
+		sx : number/*unrestricted double*/,
+		sy : number/*unrestricted double*/,
+		sw : number/*unrestricted double*/,
+		sh : number/*unrestricted double*/,
+		dx : number/*unrestricted double*/,
+		dy : number/*unrestricted double*/,
+		dw : number/*unrestricted double*/,
+		dh : number/*unrestricted double*/
 	) : void;
 	function drawImage(
 		image : HTMLCanvasElement,
-		sx : number/*double*/,
-		sy : number/*double*/,
-		sw : number/*double*/,
-		sh : number/*double*/,
-		dx : number/*double*/,
-		dy : number/*double*/,
-		dw : number/*double*/,
-		dh : number/*double*/
+		sx : number/*unrestricted double*/,
+		sy : number/*unrestricted double*/,
+		sw : number/*unrestricted double*/,
+		sh : number/*unrestricted double*/,
+		dx : number/*unrestricted double*/,
+		dy : number/*unrestricted double*/,
+		dw : number/*unrestricted double*/,
+		dh : number/*unrestricted double*/
 	) : void;
 	function drawImage(
 		image : HTMLVideoElement,
-		sx : number/*double*/,
-		sy : number/*double*/,
-		sw : number/*double*/,
-		sh : number/*double*/,
-		dx : number/*double*/,
-		dy : number/*double*/,
-		dw : number/*double*/,
-		dh : number/*double*/
+		sx : number/*unrestricted double*/,
+		sy : number/*unrestricted double*/,
+		sw : number/*unrestricted double*/,
+		sh : number/*unrestricted double*/,
+		dx : number/*unrestricted double*/,
+		dy : number/*unrestricted double*/,
+		dw : number/*unrestricted double*/,
+		dh : number/*unrestricted double*/
 	) : void;
+	// hit regions
+	function addHitRegion(options : HitRegionOptions) : void;
+	function removeHitRegion(options : HitRegionOptions) : void;
 	// pixel manipulation
 	function createImageData(
-		sw : number/*double*/,
-		sh : number/*double*/
+		sw : number/*unrestricted double*/,
+		sh : number/*unrestricted double*/
 	) : ImageData;
 	function createImageData(imagedata : ImageData) : ImageData;
 	function getImageData(
@@ -6519,138 +6574,108 @@ native final class CanvasRenderingContext2D extends CanvasTransformation {
 	function putImageData(
 		imagedata : ImageData,
 		dx : number/*double*/,
-		dy : number/*double*/
-	) : void;
-	function putImageData(
-		imagedata : ImageData,
-		dx : number/*double*/,
 		dy : number/*double*/,
 		dirtyX : number/*double*/,
 		dirtyY : number/*double*/,
 		dirtyWidth : number/*double*/,
 		dirtyHeight : number/*double*/
 	) : void;
-
-	// implements CanvasLineStyles
-
-	// line caps/joins
-	var lineWidth : number/*double*/;
-	// (default 1)
-	var lineCap : string/*DOMString*/;
-	// "butt", "round", "square" (default "butt")
-	var lineJoin : string/*DOMString*/;
-	// "round", "bevel", "miter" (default "miter")
-	var miterLimit : number/*double*/;
-	// (default 10)
+	function putImageData(
+		imagedata : ImageData,
+		dx : number/*double*/,
+		dy : number/*double*/
+	) : void;
 
 	// implements CanvasPathMethods
 
 	// shared path API methods
 	function closePath() : void;
-	function moveTo(x : number/*double*/, y : number/*double*/) : void;
-	function lineTo(x : number/*double*/, y : number/*double*/) : void;
+	function moveTo(
+		x : number/*unrestricted double*/,
+		y : number/*unrestricted double*/
+	) : void;
+	function lineTo(
+		x : number/*unrestricted double*/,
+		y : number/*unrestricted double*/
+	) : void;
 	function quadraticCurveTo(
-		cpx : number/*double*/,
-		cpy : number/*double*/,
-		x : number/*double*/,
-		y : number/*double*/
+		cpx : number/*unrestricted double*/,
+		cpy : number/*unrestricted double*/,
+		x : number/*unrestricted double*/,
+		y : number/*unrestricted double*/
 	) : void;
 	function bezierCurveTo(
-		cp1x : number/*double*/,
-		cp1y : number/*double*/,
-		cp2x : number/*double*/,
-		cp2y : number/*double*/,
-		x : number/*double*/,
-		y : number/*double*/
+		cp1x : number/*unrestricted double*/,
+		cp1y : number/*unrestricted double*/,
+		cp2x : number/*unrestricted double*/,
+		cp2y : number/*unrestricted double*/,
+		x : number/*unrestricted double*/,
+		y : number/*unrestricted double*/
 	) : void;
 	function arcTo(
-		x1 : number/*double*/,
-		y1 : number/*double*/,
-		x2 : number/*double*/,
-		y2 : number/*double*/,
-		radius : number/*double*/
+		x1 : number/*unrestricted double*/,
+		y1 : number/*unrestricted double*/,
+		x2 : number/*unrestricted double*/,
+		y2 : number/*unrestricted double*/,
+		radius : number/*unrestricted double*/
 	) : void;
 	function rect(
-		x : number/*double*/,
-		y : number/*double*/,
-		w : number/*double*/,
-		h : number/*double*/
+		x : number/*unrestricted double*/,
+		y : number/*unrestricted double*/,
+		w : number/*unrestricted double*/,
+		h : number/*unrestricted double*/
 	) : void;
 	function arc(
-		x : number/*double*/,
-		y : number/*double*/,
-		radius : number/*double*/,
-		startAngle : number/*double*/,
-		endAngle : number/*double*/
+		x : number/*unrestricted double*/,
+		y : number/*unrestricted double*/,
+		radius : number/*unrestricted double*/,
+		startAngle : number/*unrestricted double*/,
+		endAngle : number/*unrestricted double*/
 	) : void;
 	function arc(
-		x : number/*double*/,
-		y : number/*double*/,
-		radius : number/*double*/,
-		startAngle : number/*double*/,
-		endAngle : number/*double*/,
+		x : number/*unrestricted double*/,
+		y : number/*unrestricted double*/,
+		radius : number/*unrestricted double*/,
+		startAngle : number/*unrestricted double*/,
+		endAngle : number/*unrestricted double*/,
 		anticlockwise : boolean
 	) : void;
-
-	// implements CanvasText
-
-	// text
-	var font : string/*DOMString*/;
-	// (default 10px sans-serif)
-	var textAlign : string/*DOMString*/;
-	// "start", "end", "left", "right", "center" (default: "start")
-	var textBaseline : string/*DOMString*/;
-	// "top", "hanging", "middle", "alphabetic", "ideographic", "bottom" (default: "alphabetic")
+	function ellipse(
+		x : number/*unrestricted double*/,
+		y : number/*unrestricted double*/,
+		radiusX : number/*unrestricted double*/,
+		radiusY : number/*unrestricted double*/,
+		rotation : number/*unrestricted double*/,
+		startAngle : number/*unrestricted double*/,
+		endAngle : number/*unrestricted double*/,
+		anticlockwise : boolean
+	) : void;
 
 } // end of CanvasRenderingContext2D
 
 /** @see http://dev.w3.org/html5/2dcontext/ */
-native __fake__ class CanvasTransformation {
-
-	// transformations (default transform is the identity matrix)
-	function scale(x : number/*double*/, y : number/*double*/) : void;
-	function rotate(angle : number/*double*/) : void;
-	function translate(
-		x : number/*double*/,
-		y : number/*double*/
-	) : void;
-	function transform(
-		a : number/*double*/,
-		b : number/*double*/,
-		c : number/*double*/,
-		d : number/*double*/,
-		e : number/*double*/,
-		f : number/*double*/
-	) : void;
-	function setTransform(
-		a : number/*double*/,
-		b : number/*double*/,
-		c : number/*double*/,
-		d : number/*double*/,
-		e : number/*double*/,
-		f : number/*double*/
-	) : void;
-
-} // end of CanvasTransformation
-
-/** @see http://dev.w3.org/html5/2dcontext/ */
-native __fake__ class CanvasLineStyles {
+native __fake__ class CanvasDrawingStyles {
 
 	// line caps/joins
-	var lineWidth : number/*double*/;
+	var lineWidth : number/*unrestricted double*/;
 	// (default 1)
 	var lineCap : string/*DOMString*/;
 	// "butt", "round", "square" (default "butt")
 	var lineJoin : string/*DOMString*/;
 	// "round", "bevel", "miter" (default "miter")
-	var miterLimit : number/*double*/;
+	var miterLimit : number/*unrestricted double*/;
 	// (default 10)
 
-} // end of CanvasLineStyles
-
-/** @see http://dev.w3.org/html5/2dcontext/ */
-native __fake__ class CanvasText {
-
+	// dashed lines
+	function setLineDash(
+		segments : number[]/*sequence<unrestricted double>*/
+	) : void;
+	function setLineDash(
+		segments : int[]/*sequence<unrestricted double>*/
+	) : void;
+	// default empty
+	function getLineDash() : number[]/*sequence<unrestricted double>*/;
+	var lineDashOffset : number/*unrestricted double*/;
 	// text
 	var font : string/*DOMString*/;
 	// (default 10px sans-serif)
@@ -6659,55 +6684,71 @@ native __fake__ class CanvasText {
 	var textBaseline : string/*DOMString*/;
 	// "top", "hanging", "middle", "alphabetic", "ideographic", "bottom" (default: "alphabetic")
 
-} // end of CanvasText
+} // end of CanvasDrawingStyles
 
 /** @see http://dev.w3.org/html5/2dcontext/ */
 native __fake__ class CanvasPathMethods {
 
 	// shared path API methods
 	function closePath() : void;
-	function moveTo(x : number/*double*/, y : number/*double*/) : void;
-	function lineTo(x : number/*double*/, y : number/*double*/) : void;
+	function moveTo(
+		x : number/*unrestricted double*/,
+		y : number/*unrestricted double*/
+	) : void;
+	function lineTo(
+		x : number/*unrestricted double*/,
+		y : number/*unrestricted double*/
+	) : void;
 	function quadraticCurveTo(
-		cpx : number/*double*/,
-		cpy : number/*double*/,
-		x : number/*double*/,
-		y : number/*double*/
+		cpx : number/*unrestricted double*/,
+		cpy : number/*unrestricted double*/,
+		x : number/*unrestricted double*/,
+		y : number/*unrestricted double*/
 	) : void;
 	function bezierCurveTo(
-		cp1x : number/*double*/,
-		cp1y : number/*double*/,
-		cp2x : number/*double*/,
-		cp2y : number/*double*/,
-		x : number/*double*/,
-		y : number/*double*/
+		cp1x : number/*unrestricted double*/,
+		cp1y : number/*unrestricted double*/,
+		cp2x : number/*unrestricted double*/,
+		cp2y : number/*unrestricted double*/,
+		x : number/*unrestricted double*/,
+		y : number/*unrestricted double*/
 	) : void;
 	function arcTo(
-		x1 : number/*double*/,
-		y1 : number/*double*/,
-		x2 : number/*double*/,
-		y2 : number/*double*/,
-		radius : number/*double*/
+		x1 : number/*unrestricted double*/,
+		y1 : number/*unrestricted double*/,
+		x2 : number/*unrestricted double*/,
+		y2 : number/*unrestricted double*/,
+		radius : number/*unrestricted double*/
 	) : void;
 	function rect(
-		x : number/*double*/,
-		y : number/*double*/,
-		w : number/*double*/,
-		h : number/*double*/
+		x : number/*unrestricted double*/,
+		y : number/*unrestricted double*/,
+		w : number/*unrestricted double*/,
+		h : number/*unrestricted double*/
 	) : void;
 	function arc(
-		x : number/*double*/,
-		y : number/*double*/,
-		radius : number/*double*/,
-		startAngle : number/*double*/,
-		endAngle : number/*double*/
+		x : number/*unrestricted double*/,
+		y : number/*unrestricted double*/,
+		radius : number/*unrestricted double*/,
+		startAngle : number/*unrestricted double*/,
+		endAngle : number/*unrestricted double*/
 	) : void;
 	function arc(
-		x : number/*double*/,
-		y : number/*double*/,
-		radius : number/*double*/,
-		startAngle : number/*double*/,
-		endAngle : number/*double*/,
+		x : number/*unrestricted double*/,
+		y : number/*unrestricted double*/,
+		radius : number/*unrestricted double*/,
+		startAngle : number/*unrestricted double*/,
+		endAngle : number/*unrestricted double*/,
+		anticlockwise : boolean
+	) : void;
+	function ellipse(
+		x : number/*unrestricted double*/,
+		y : number/*unrestricted double*/,
+		radiusX : number/*unrestricted double*/,
+		radiusY : number/*unrestricted double*/,
+		rotation : number/*unrestricted double*/,
+		startAngle : number/*unrestricted double*/,
+		endAngle : number/*unrestricted double*/,
 		anticlockwise : boolean
 	) : void;
 
@@ -6734,9 +6775,37 @@ native final class CanvasPattern {
 /** @see http://dev.w3.org/html5/2dcontext/ */
 native final class TextMetrics {
 
+	// x-direction
 	__readonly__ var width : number/*double*/;
+	__readonly__ var actualBoundingBoxLeft : number/*double*/;
+	__readonly__ var actualBoundingBoxRight : number/*double*/;
+	// y-direction
+	__readonly__ var fontBoundingBoxAscent : number/*double*/;
+	__readonly__ var fontBoundingBoxDescent : number/*double*/;
+	__readonly__ var actualBoundingBoxAscent : number/*double*/;
+	__readonly__ var actualBoundingBoxDescent : number/*double*/;
+	__readonly__ var emHeightAscent : number/*double*/;
+	__readonly__ var emHeightDescent : number/*double*/;
+	__readonly__ var hangingBaseline : number/*double*/;
+	__readonly__ var alphabeticBaseline : number/*double*/;
+	__readonly__ var ideographicBaseline : number/*double*/;
 
 } // end of TextMetrics
+
+/** @see http://dev.w3.org/html5/2dcontext/ */
+native final class HitRegionOptions {
+
+	var path : Nullable.<Path>;
+	var id : string/*DOMString*/;
+	var parentID : Nullable.<string>/*DOMString?*/;
+	var cursor : string/*DOMString*/;
+	// for control-backed regions:
+	var control : Nullable.<Element>;
+	// for unbacked regions:
+	var label : Nullable.<string>/*DOMString?*/;
+	var role : Nullable.<string>/*DOMString?*/;
+
+} // end of HitRegionOptions
 
 /** @see http://dev.w3.org/html5/2dcontext/ */
 native final class ImageData {
@@ -6746,6 +6815,87 @@ native final class ImageData {
 	__readonly__ var data : Uint8ClampedArray;
 
 } // end of ImageData
+
+/** @see http://dev.w3.org/html5/2dcontext/ */
+native final class DrawingStyle extends CanvasDrawingStyles {
+
+	function constructor();
+	function constructor(scope : Element);
+
+} // end of DrawingStyle
+
+/** @see http://dev.w3.org/html5/2dcontext/ */
+native final class Path extends CanvasPathMethods {
+
+	function constructor();
+
+	function addPath(
+		path : Path,
+		transformation : Nullable.<SVGMatrix>
+	) : void;
+	function addPathByStrokingPath(
+		path : Path,
+		styles : CanvasDrawingStyles,
+		transformation : Nullable.<SVGMatrix>
+	) : void;
+	function addText(
+		text : string/*DOMString*/,
+		styles : CanvasDrawingStyles,
+		transformation : Nullable.<SVGMatrix>,
+		x : number/*unrestricted double*/,
+		y : number/*unrestricted double*/
+	) : void;
+	function addText(
+		text : string/*DOMString*/,
+		styles : CanvasDrawingStyles,
+		transformation : Nullable.<SVGMatrix>,
+		x : number/*unrestricted double*/,
+		y : number/*unrestricted double*/,
+		maxWidth : number/*unrestricted double*/
+	) : void;
+	function addPathByStrokingText(
+		text : string/*DOMString*/,
+		styles : CanvasDrawingStyles,
+		transformation : Nullable.<SVGMatrix>,
+		x : number/*unrestricted double*/,
+		y : number/*unrestricted double*/
+	) : void;
+	function addPathByStrokingText(
+		text : string/*DOMString*/,
+		styles : CanvasDrawingStyles,
+		transformation : Nullable.<SVGMatrix>,
+		x : number/*unrestricted double*/,
+		y : number/*unrestricted double*/,
+		maxWidth : number/*unrestricted double*/
+	) : void;
+	function addText(
+		text : string/*DOMString*/,
+		styles : CanvasDrawingStyles,
+		transformation : Nullable.<SVGMatrix>,
+		path : Path
+	) : void;
+	function addText(
+		text : string/*DOMString*/,
+		styles : CanvasDrawingStyles,
+		transformation : Nullable.<SVGMatrix>,
+		path : Path,
+		maxWidth : number/*unrestricted double*/
+	) : void;
+	function addPathByStrokingText(
+		text : string/*DOMString*/,
+		styles : CanvasDrawingStyles,
+		transformation : Nullable.<SVGMatrix>,
+		path : Path
+	) : void;
+	function addPathByStrokingText(
+		text : string/*DOMString*/,
+		styles : CanvasDrawingStyles,
+		transformation : Nullable.<SVGMatrix>,
+		path : Path,
+		maxWidth : number/*unrestricted double*/
+	) : void;
+
+} // end of Path
 
 /** @see https://www.khronos.org/registry/webgl/specs/latest/webgl.idl */
 native final class WebGLContextAttributes {
@@ -7480,7 +7630,7 @@ native final class WebGLRenderingContext {
 	__readonly__ var canvas : HTMLCanvasElement;
 	__readonly__ var drawingBufferWidth : number/*GLsizei*/;
 	__readonly__ var drawingBufferHeight : number/*GLsizei*/;
-	function getContextAttributes() : WebGLContextAttributes;
+	function getContextAttributes() : Nullable.<WebGLContextAttributes>;
 	function isContextLost() : boolean;
 	function getSupportedExtensions() : string[]/*sequence<DOMString>?*/;
 	function getExtension(
@@ -7955,11 +8105,11 @@ native final class WebGLRenderingContext {
 	) : void;
 	function uniform1fv(
 		location : Nullable.<WebGLUniformLocation>,
-		v : number[]/*sequence<float>*/
+		v : number[]/*sequence<GLfloat>*/
 	) : void;
 	function uniform1fv(
 		location : Nullable.<WebGLUniformLocation>,
-		v : int[]/*sequence<float>*/
+		v : int[]/*sequence<GLfloat>*/
 	) : void;
 	function uniform1i(
 		location : Nullable.<WebGLUniformLocation>,
@@ -7988,11 +8138,11 @@ native final class WebGLRenderingContext {
 	) : void;
 	function uniform2fv(
 		location : Nullable.<WebGLUniformLocation>,
-		v : number[]/*sequence<float>*/
+		v : number[]/*sequence<GLfloat>*/
 	) : void;
 	function uniform2fv(
 		location : Nullable.<WebGLUniformLocation>,
-		v : int[]/*sequence<float>*/
+		v : int[]/*sequence<GLfloat>*/
 	) : void;
 	function uniform2i(
 		location : Nullable.<WebGLUniformLocation>,
@@ -8023,11 +8173,11 @@ native final class WebGLRenderingContext {
 	) : void;
 	function uniform3fv(
 		location : Nullable.<WebGLUniformLocation>,
-		v : number[]/*sequence<float>*/
+		v : number[]/*sequence<GLfloat>*/
 	) : void;
 	function uniform3fv(
 		location : Nullable.<WebGLUniformLocation>,
-		v : int[]/*sequence<float>*/
+		v : int[]/*sequence<GLfloat>*/
 	) : void;
 	function uniform3i(
 		location : Nullable.<WebGLUniformLocation>,
@@ -8060,11 +8210,11 @@ native final class WebGLRenderingContext {
 	) : void;
 	function uniform4fv(
 		location : Nullable.<WebGLUniformLocation>,
-		v : number[]/*sequence<float>*/
+		v : number[]/*sequence<GLfloat>*/
 	) : void;
 	function uniform4fv(
 		location : Nullable.<WebGLUniformLocation>,
-		v : int[]/*sequence<float>*/
+		v : int[]/*sequence<GLfloat>*/
 	) : void;
 	function uniform4i(
 		location : Nullable.<WebGLUniformLocation>,
@@ -8093,12 +8243,12 @@ native final class WebGLRenderingContext {
 	function uniformMatrix2fv(
 		location : Nullable.<WebGLUniformLocation>,
 		transpose : boolean/*GLboolean*/,
-		value : number[]/*sequence<float>*/
+		value : number[]/*sequence<GLfloat>*/
 	) : void;
 	function uniformMatrix2fv(
 		location : Nullable.<WebGLUniformLocation>,
 		transpose : boolean/*GLboolean*/,
-		value : int[]/*sequence<float>*/
+		value : int[]/*sequence<GLfloat>*/
 	) : void;
 	function uniformMatrix3fv(
 		location : Nullable.<WebGLUniformLocation>,
@@ -8108,12 +8258,12 @@ native final class WebGLRenderingContext {
 	function uniformMatrix3fv(
 		location : Nullable.<WebGLUniformLocation>,
 		transpose : boolean/*GLboolean*/,
-		value : number[]/*sequence<float>*/
+		value : number[]/*sequence<GLfloat>*/
 	) : void;
 	function uniformMatrix3fv(
 		location : Nullable.<WebGLUniformLocation>,
 		transpose : boolean/*GLboolean*/,
-		value : int[]/*sequence<float>*/
+		value : int[]/*sequence<GLfloat>*/
 	) : void;
 	function uniformMatrix4fv(
 		location : Nullable.<WebGLUniformLocation>,
@@ -8123,12 +8273,12 @@ native final class WebGLRenderingContext {
 	function uniformMatrix4fv(
 		location : Nullable.<WebGLUniformLocation>,
 		transpose : boolean/*GLboolean*/,
-		value : number[]/*sequence<float>*/
+		value : number[]/*sequence<GLfloat>*/
 	) : void;
 	function uniformMatrix4fv(
 		location : Nullable.<WebGLUniformLocation>,
 		transpose : boolean/*GLboolean*/,
-		value : int[]/*sequence<float>*/
+		value : int[]/*sequence<GLfloat>*/
 	) : void;
 	function useProgram(program : Nullable.<WebGLProgram>) : void;
 	function validateProgram(program : Nullable.<WebGLProgram>) : void;
@@ -8142,11 +8292,11 @@ native final class WebGLRenderingContext {
 	) : void;
 	function vertexAttrib1fv(
 		indx : number/*GLuint*/,
-		values : number[]/*sequence<float>*/
+		values : number[]/*sequence<GLfloat>*/
 	) : void;
 	function vertexAttrib1fv(
 		indx : number/*GLuint*/,
-		values : int[]/*sequence<float>*/
+		values : int[]/*sequence<GLfloat>*/
 	) : void;
 	function vertexAttrib2f(
 		indx : number/*GLuint*/,
@@ -8159,11 +8309,11 @@ native final class WebGLRenderingContext {
 	) : void;
 	function vertexAttrib2fv(
 		indx : number/*GLuint*/,
-		values : number[]/*sequence<float>*/
+		values : number[]/*sequence<GLfloat>*/
 	) : void;
 	function vertexAttrib2fv(
 		indx : number/*GLuint*/,
-		values : int[]/*sequence<float>*/
+		values : int[]/*sequence<GLfloat>*/
 	) : void;
 	function vertexAttrib3f(
 		indx : number/*GLuint*/,
@@ -8177,11 +8327,11 @@ native final class WebGLRenderingContext {
 	) : void;
 	function vertexAttrib3fv(
 		indx : number/*GLuint*/,
-		values : number[]/*sequence<float>*/
+		values : number[]/*sequence<GLfloat>*/
 	) : void;
 	function vertexAttrib3fv(
 		indx : number/*GLuint*/,
-		values : int[]/*sequence<float>*/
+		values : int[]/*sequence<GLfloat>*/
 	) : void;
 	function vertexAttrib4f(
 		indx : number/*GLuint*/,
@@ -8196,11 +8346,11 @@ native final class WebGLRenderingContext {
 	) : void;
 	function vertexAttrib4fv(
 		indx : number/*GLuint*/,
-		values : number[]/*sequence<float>*/
+		values : number[]/*sequence<GLfloat>*/
 	) : void;
 	function vertexAttrib4fv(
 		indx : number/*GLuint*/,
-		values : int[]/*sequence<float>*/
+		values : int[]/*sequence<GLfloat>*/
 	) : void;
 	function vertexAttribPointer(
 		indx : number/*GLuint*/,
@@ -8365,6 +8515,9 @@ native final class DeviceMotionEventInit extends EventInit {
 	var interval : Nullable.<number>/*double?*/;
 
 } // end of DeviceMotionEventInit
+
+native final class SVGMatrix {
+}
 
 native final __fake__ class CanvasPixelArray {
 
