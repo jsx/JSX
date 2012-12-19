@@ -217,10 +217,11 @@ foreach my $src(@files) {
     {
         my $arg = $file;
         if($arg =~ /^https?:/) {
-            state $ua = LWP::UserAgent->new();
             my $filename = "$root/spec/$specname";
 
-            if ($refresh && not -e $filename) {
+            if ($refresh and not -e $filename) {
+                info("GET $arg");
+                state $ua = LWP::UserAgent->new();
                 my $res = $ua->mirror($arg, $filename);
 
                 if($res->header("Last-Modified")) {
