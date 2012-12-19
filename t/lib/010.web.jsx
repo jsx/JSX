@@ -342,23 +342,23 @@ class _Test extends TestCase {
         o.replace(X.getNode());
         o.replace(X.getstring());
         o.remove();
+        var v15 : string/*DOMString*/ = o.innerHTML;
+        var v16 : string/*DOMString*/ = o.outerHTML;
+        o.insertAdjacentHTML(X.getstring(), X.getstring());
         var f8 : ClientRectList = o.getClientRects();
         var f9 : ClientRect = o.getBoundingClientRect();
         o.scrollIntoView();
         o.scrollIntoView(X.getboolean());
-        var v15 : number/*long*/ = o.scrollTop;
-        var v16 : number/*long*/ = o.scrollLeft;
-        var v17 : number/*long*/ = o.scrollWidth;
-        var v18 : number/*long*/ = o.scrollHeight;
-        var v19 : number/*long*/ = o.clientTop;
-        var v20 : number/*long*/ = o.clientLeft;
-        var v21 : number/*long*/ = o.clientWidth;
-        var v22 : number/*long*/ = o.clientHeight;
+        var v17 : number/*long*/ = o.scrollTop;
+        var v18 : number/*long*/ = o.scrollLeft;
+        var v19 : number/*long*/ = o.scrollWidth;
+        var v20 : number/*long*/ = o.scrollHeight;
+        var v21 : number/*long*/ = o.clientTop;
+        var v22 : number/*long*/ = o.clientLeft;
+        var v23 : number/*long*/ = o.clientWidth;
+        var v24 : number/*long*/ = o.clientHeight;
         var f10 : Nullable.<Element> = o.querySelector(X.getstring());
         var f11 : NodeList = o.querySelectorAll(X.getstring());
-        var v23 : string/*DOMString*/ = o.innerHTML;
-        var v24 : string/*DOMString*/ = o.outerHTML;
-        o.insertAdjacentHTML(X.getstring(), X.getstring());
     } // Element
 
     function compile_Attr(o : Attr) : void {
@@ -434,9 +434,9 @@ class _Test extends TestCase {
         var f5 : boolean = o.isPointInRange(X.getNode(), X.getnumber());
         var f6 : number/*short*/ = o.comparePoint(X.getNode(), X.getnumber());
         var f7 : boolean = o.intersectsNode(X.getNode());
-        var f8 : ClientRectList = o.getClientRects();
-        var f9 : ClientRect = o.getBoundingClientRect();
-        var f10 : DocumentFragment = o.createContextualFragment(X.getstring());
+        var f8 : DocumentFragment = o.createContextualFragment(X.getstring());
+        var f9 : ClientRectList = o.getClientRects();
+        var f10 : ClientRect = o.getBoundingClientRect();
     } // Range
 
     function compile_NodeIterator(o : NodeIterator) : void {
@@ -750,6 +750,16 @@ class _Test extends TestCase {
         var v3 : number/*unsigned long long*/ = o.total;
     } // ProgressEvent
 
+    function compile_DOMParser(o : DOMParser) : void {
+        var c1 = new DOMParser();
+        var f1 : Document = o.parseFromString(X.getstring(), X.getstring());
+    } // DOMParser
+
+    function compile_XMLSerializer(o : XMLSerializer) : void {
+        var c1 = new XMLSerializer();
+        var f1 : string/*DOMString*/ = o.serializeToString(X.getNode());
+    } // XMLSerializer
+
     function compile_ProgressEventInit(o : ProgressEventInit) : void {
         var v1 : boolean = o.lengthComputable;
         var v2 : number/*unsigned long long*/ = o.loaded;
@@ -757,13 +767,13 @@ class _Test extends TestCase {
     } // ProgressEventInit
 
     function compile_XMLHttpRequestEventTarget(o : XMLHttpRequestEventTarget) : void {
-        var v1 : function(:Event):void/*EventHandler*/ = o.onloadstart;
-        var v2 : function(:Event):void/*EventHandler*/ = o.onprogress;
-        var v3 : function(:Event):void/*EventHandler*/ = o.onabort;
-        var v4 : function(:Event):void/*EventHandler*/ = o.onerror;
-        var v5 : function(:Event):void/*EventHandler*/ = o.onload;
-        var v6 : function(:Event):void/*EventHandler*/ = o.ontimeout;
-        var v7 : function(:Event):void/*EventHandler*/ = o.onloadend;
+        var v1 : Nullable.<function(:Event):void>/*EventHandler*/ = o.onloadstart;
+        var v2 : Nullable.<function(:Event):void>/*EventHandler*/ = o.onprogress;
+        var v3 : Nullable.<function(:Event):void>/*EventHandler*/ = o.onabort;
+        var v4 : Nullable.<function(:Event):void>/*EventHandler*/ = o.onerror;
+        var v5 : Nullable.<function(:Event):void>/*EventHandler*/ = o.onload;
+        var v6 : Nullable.<function(:Event):void>/*EventHandler*/ = o.ontimeout;
+        var v7 : Nullable.<function(:Event):void>/*EventHandler*/ = o.onloadend;
     } // XMLHttpRequestEventTarget
 
     function compile_XMLHttpRequestUpload(o : XMLHttpRequestUpload) : void {
@@ -776,7 +786,7 @@ class _Test extends TestCase {
     function compile_XMLHttpRequest(o : XMLHttpRequest) : void {
         var c1 = new XMLHttpRequest();
         var c2 = new XMLHttpRequest(X.getXMLHttpRequestOptions());
-        var v1 : function(:Event):void/*EventHandler*/ = o.onreadystatechange;
+        var v1 : Nullable.<function(:Event):void>/*EventHandler*/ = o.onreadystatechange;
         var v2 : number/*unsigned short*/ = XMLHttpRequest.UNSENT;
         var v3 : number/*unsigned short*/ = o.UNSENT;
         var v4 : number/*unsigned short*/ = XMLHttpRequest.OPENED;
@@ -3053,7 +3063,29 @@ class _Test extends TestCase {
     function compile_URL(o : URL) : void {
         var f1 : string/*DOMString*/ = URL.createObjectURL(X.getBlob());
         URL.revokeObjectURL(X.getstring());
-        var f2 : string/*DOMString*/ = URL.createObjectURL(X.getMediaStream());
+        var c1 = new URL(X.getstring());
+        var c2 = new URL(X.getstring(), X.getstring());
+        var v1 : string/*DOMString*/ = o.protocol;
+        var v2 : string/*DOMString*/ = o.username;
+        var v3 : string/*DOMString*/ = o.password;
+        var v4 : string/*DOMString*/ = o.host;
+        var v5 : string/*DOMString*/ = o.hostname;
+        var v6 : string/*DOMString*/ = o.port;
+        var v7 : string/*DOMString*/ = o.pathname;
+        var v8 : string/*DOMString*/ = o.search;
+        var v9 : string/*DOMString*/ = o.hash;
+        var v10 : string/*DOMString*/ = o.filename;
+        var v11 : string/*DOMString*/ = o.origin;
+        var f2 : string[]/*sequence<DOMString>*/ = o.getParameterNames();
+        var f3 : string[]/*sequence<DOMString>*/ = o.getParameterValues(X.getstring());
+        var f4 : boolean = o.hasParameter(X.getstring());
+        var f5 : Nullable.<string>/*DOMString?*/ = o.getParameter(X.getstring());
+        o.setParameter(X.getstring(), X.getstring());
+        o.addParameter(X.getstring(), X.getstring());
+        o.removeParameter(X.getstring());
+        o.clearParameters();
+        var v12 : string/*DOMString*/ = o.href;
+        var f6 : string/*DOMString*/ = URL.createObjectURL(X.getMediaStream());
     } // URL
 
     function compile_AudioContext(o : AudioContext) : void {
@@ -3617,16 +3649,6 @@ class _Test extends TestCase {
         var v2 : number/*unsigned short*/ = o.PERMISSION_DENIED;
         var v3 : number/*unsigned short*/ = o.code;
     } // NavigatorUserMediaError
-
-    function compile_DOMParser(o : DOMParser) : void {
-        var c1 = new DOMParser();
-        var f1 : Document = o.parseFromString(X.getstring(), X.getstring());
-    } // DOMParser
-
-    function compile_XMLSerializer(o : XMLSerializer) : void {
-        var c1 = new XMLSerializer();
-        var f1 : string/*DOMString*/ = o.serializeToString(X.getNode());
-    } // XMLSerializer
 
     function compile_ArrayBuffer(o : ArrayBuffer) : void {
         var c1 = new ArrayBuffer(X.getnumber());

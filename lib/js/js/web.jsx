@@ -647,6 +647,16 @@ native class Element extends Node {
 	function replace(...nodes : string/*DOMString*/) : void;
 	function remove() : void;
 
+	/** @see http://www.w3.org/TR/DOM-Parsing/ */
+	var innerHTML : string/*DOMString*/;
+	/** @see http://www.w3.org/TR/DOM-Parsing/ */
+	var outerHTML : string/*DOMString*/;
+	/** @see http://www.w3.org/TR/DOM-Parsing/ */
+	function insertAdjacentHTML(
+		position : string/*DOMString*/,
+		text : string/*DOMString*/
+	) : void;
+
 	/** @see http://dev.w3.org/csswg/cssom-view/ */
 	function getClientRects() : ClientRectList;
 	/** @see http://dev.w3.org/csswg/cssom-view/ */
@@ -680,16 +690,6 @@ native class Element extends Node {
 	function querySelectorAll(
 		selectors : string/*DOMString*/
 	) : NodeList;
-
-	/** @see http://html5.org/specs/dom-parsing.html */
-	var innerHTML : string/*DOMString*/;
-	/** @see http://html5.org/specs/dom-parsing.html */
-	var outerHTML : string/*DOMString*/;
-	/** @see http://html5.org/specs/dom-parsing.html */
-	function insertAdjacentHTML(
-		position : string/*DOMString*/,
-		text : string/*DOMString*/
-	) : void;
 
 } // end of Element
 
@@ -744,7 +744,7 @@ native final class Text extends CharacterData {
 	function splitText(offset : number/*unsigned long*/) : Text;
 	__readonly__ var wholeText : string/*DOMString*/;
 
-	/** @see http://html5.org/specs/dom-parsing.html */
+	/** @see http://www.w3.org/TR/DOM-Parsing/ */
 	var serializeAsCDATA : boolean;
 
 } // end of Text
@@ -813,15 +813,15 @@ native final class Range {
 	) : number/*short*/;
 	function intersectsNode(node : Node) : boolean;
 
+	/** @see http://www.w3.org/TR/DOM-Parsing/ */
+	function createContextualFragment(
+		fragment : string/*DOMString*/
+	) : DocumentFragment;
+
 	/** @see http://dev.w3.org/csswg/cssom-view/ */
 	function getClientRects() : ClientRectList;
 	/** @see http://dev.w3.org/csswg/cssom-view/ */
 	function getBoundingClientRect() : ClientRect;
-
-	/** @see http://html5.org/specs/dom-parsing.html */
-	function createContextualFragment(
-		fragment : string/*DOMString*/
-	) : DocumentFragment;
 
 } // end of Range
 
@@ -1098,7 +1098,7 @@ native class MouseEvent extends UIEvent {
 	/** @see http://dev.w3.org/csswg/cssom-view/ */
 	__readonly__ var offsetY : number/*long*/;
 
-	/** @see http://dev.w3.org/html5/2dcontext/ */
+	/** @see http://www.w3.org/TR/2dcontext/ */
 	__readonly__ var region : Nullable.<string>/*DOMString?*/;
 
 } // end of MouseEvent
@@ -1276,7 +1276,7 @@ native final class FocusEventInit {
 
 } // end of FocusEventInit
 
-/** @see http://dev.w3.org/html5/2dcontext/ */
+/** @see http://www.w3.org/TR/2dcontext/ */
 native final class MouseEventInit extends UIEventInit {
 
 	// Attributes from Event:
@@ -1401,6 +1401,27 @@ native final class ProgressEvent extends Event {
 
 } // end of ProgressEvent
 
+/** @see http://www.w3.org/TR/DOM-Parsing/ */
+native final class DOMParser {
+
+	function constructor();
+
+	function parseFromString(
+		str : string/*DOMString*/,
+		type : string/*SupportedType*/
+	) : Document;
+
+} // end of DOMParser
+
+/** @see http://www.w3.org/TR/DOM-Parsing/ */
+native final class XMLSerializer {
+
+	function constructor();
+
+	function serializeToString(root : Node) : string/*DOMString*/;
+
+} // end of XMLSerializer
+
 native final class ProgressEventInit extends EventInit {
 
 	var lengthComputable : boolean;
@@ -1413,13 +1434,13 @@ native final class ProgressEventInit extends EventInit {
 native __fake__ class XMLHttpRequestEventTarget extends EventTarget {
 
 	// event handlers
-	var onloadstart : function(:Event):void/*EventHandler*/;
-	var onprogress : function(:Event):void/*EventHandler*/;
-	var onabort : function(:Event):void/*EventHandler*/;
-	var onerror : function(:Event):void/*EventHandler*/;
-	var onload : function(:Event):void/*EventHandler*/;
-	var ontimeout : function(:Event):void/*EventHandler*/;
-	var onloadend : function(:Event):void/*EventHandler*/;
+	var onloadstart : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onprogress : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onabort : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onerror : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onload : Nullable.<function(:Event):void>/*EventHandler*/;
+	var ontimeout : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onloadend : Nullable.<function(:Event):void>/*EventHandler*/;
 
 } // end of XMLHttpRequestEventTarget
 
@@ -1441,7 +1462,7 @@ native final class XMLHttpRequest extends XMLHttpRequestEventTarget {
 	function constructor(options : XMLHttpRequestOptions);
 
 	// event handler
-	var onreadystatechange : function(:Event):void/*EventHandler*/;
+	var onreadystatechange : Nullable.<function(:Event):void>/*EventHandler*/;
 	// states
 	static __readonly__ var UNSENT : number/*unsigned short*/;
 	       __readonly__ var UNSENT : number/*unsigned short*/;
@@ -4547,7 +4568,7 @@ native final class HTMLFontElement extends HTMLElement {
 
 } // end of HTMLFontElement
 
-/** @see http://www.w3.org/TR/2011/WD-FileAPI-20111020/ */
+/** @see http://www.w3.org/TR/2012/WD-FileAPI-20121025/ */
 native final class FileList {
 
 	function __native_index_operator__(
@@ -4559,7 +4580,7 @@ native final class FileList {
 
 } // end of FileList
 
-/** @see http://www.w3.org/TR/2011/WD-FileAPI-20111020/ */
+/** @see http://www.w3.org/TR/2012/WD-FileAPI-20121025/ */
 native class Blob {
 
 	__readonly__ var size : number/*unsigned long long*/;
@@ -4580,7 +4601,7 @@ native class Blob {
 
 } // end of Blob
 
-/** @see http://www.w3.org/TR/2011/WD-FileAPI-20111020/ */
+/** @see http://www.w3.org/TR/2012/WD-FileAPI-20121025/ */
 native final class File extends Blob {
 
 	__readonly__ var name : string/*DOMString*/;
@@ -4588,7 +4609,7 @@ native final class File extends Blob {
 
 } // end of File
 
-/** @see http://www.w3.org/TR/2011/WD-FileAPI-20111020/ */
+/** @see http://www.w3.org/TR/2012/WD-FileAPI-20121025/ */
 native final class FileReader extends EventTarget {
 
 	function constructor();
@@ -4624,7 +4645,7 @@ native final class FileReader extends EventTarget {
 
 } // end of FileReader
 
-/** @see http://www.w3.org/TR/2011/WD-FileAPI-20111020/ */
+/** @see http://www.w3.org/TR/2012/WD-FileAPI-20121025/ */
 native final class FileReaderSync {
 
 	function constructor();
@@ -4644,10 +4665,68 @@ native final class FileReaderSync {
 
 native class URL {
 
-	/** @see http://www.w3.org/TR/2011/WD-FileAPI-20111020/ */
+	/** @see http://www.w3.org/TR/2012/WD-FileAPI-20121025/ */
 	static function createObjectURL(blob : Blob) : string/*DOMString*/;
-	/** @see http://www.w3.org/TR/2011/WD-FileAPI-20111020/ */
+	/** @see http://www.w3.org/TR/2012/WD-FileAPI-20121025/ */
 	static function revokeObjectURL(url : string/*DOMString*/) : void;
+	/** @see http://www.w3.org/TR/2012/WD-url-20120524/ */
+	function constructor(url : string/*DOMString*/);
+	/** @see http://www.w3.org/TR/2012/WD-url-20120524/ */
+	function constructor(
+		url : string/*DOMString*/,
+		baseURL : string/*DOMString*/
+	);
+
+	/** @see http://www.w3.org/TR/2012/WD-url-20120524/ */
+	var protocol : string/*DOMString*/;
+	/** @see http://www.w3.org/TR/2012/WD-url-20120524/ */
+	var username : string/*DOMString*/;
+	/** @see http://www.w3.org/TR/2012/WD-url-20120524/ */
+	var password : string/*DOMString*/;
+	/** @see http://www.w3.org/TR/2012/WD-url-20120524/ */
+	var host : string/*DOMString*/;
+	/** @see http://www.w3.org/TR/2012/WD-url-20120524/ */
+	var hostname : string/*DOMString*/;
+	/** @see http://www.w3.org/TR/2012/WD-url-20120524/ */
+	var port : string/*DOMString*/;
+	/** @see http://www.w3.org/TR/2012/WD-url-20120524/ */
+	var pathname : string/*DOMString*/;
+	/** @see http://www.w3.org/TR/2012/WD-url-20120524/ */
+	var search : string/*DOMString*/;
+	/** @see http://www.w3.org/TR/2012/WD-url-20120524/ */
+	var hash : string/*DOMString*/;
+	/** @see http://www.w3.org/TR/2012/WD-url-20120524/ */
+	var filename : string/*DOMString*/;
+	/** @see http://www.w3.org/TR/2012/WD-url-20120524/ */
+	__readonly__ var origin : string/*DOMString*/;
+	/** @see http://www.w3.org/TR/2012/WD-url-20120524/ */
+	function getParameterNames() : string[]/*sequence<DOMString>*/;
+	/** @see http://www.w3.org/TR/2012/WD-url-20120524/ */
+	function getParameterValues(
+		name : string/*DOMString*/
+	) : string[]/*sequence<DOMString>*/;
+	/** @see http://www.w3.org/TR/2012/WD-url-20120524/ */
+	function hasParameter(name : string/*DOMString*/) : boolean;
+	/** @see http://www.w3.org/TR/2012/WD-url-20120524/ */
+	function getParameter(
+		name : string/*DOMString*/
+	) : Nullable.<string>/*DOMString?*/;
+	/** @see http://www.w3.org/TR/2012/WD-url-20120524/ */
+	function setParameter(
+		name : string/*DOMString*/,
+		value : string/*DOMString*/
+	) : void;
+	/** @see http://www.w3.org/TR/2012/WD-url-20120524/ */
+	function addParameter(
+		name : string/*DOMString*/,
+		value : string/*DOMString*/
+	) : void;
+	/** @see http://www.w3.org/TR/2012/WD-url-20120524/ */
+	function removeParameter(name : string/*DOMString*/) : void;
+	/** @see http://www.w3.org/TR/2012/WD-url-20120524/ */
+	function clearParameters() : void;
+	/** @see http://www.w3.org/TR/2012/WD-url-20120524/ */
+	var href : string/*DOMString*/;
 
 	/** @see http://www.w3.org/TR/mediacapture-streams/ */
 	static function createObjectURL(
@@ -4662,7 +4741,7 @@ native class URL {
 
 // alias OfflineRenderSuccessCallback = function(renderedData:AudioBuffer):void
 
-/** @see https://dvcs.w3.org/hg/audio/raw-file/tip/webaudio/specification.html */
+/** @see http://www.w3.org/TR/2012/WD-webaudio-20121213/ */
 native class AudioContext {
 
 	function constructor();
@@ -4735,7 +4814,7 @@ native class AudioContext {
 
 } // end of AudioContext
 
-/** @see https://dvcs.w3.org/hg/audio/raw-file/tip/webaudio/specification.html */
+/** @see http://www.w3.org/TR/2012/WD-webaudio-20121213/ */
 native final class OfflineAudioContext extends AudioContext {
 
 	function constructor();
@@ -4745,7 +4824,7 @@ native final class OfflineAudioContext extends AudioContext {
 
 } // end of OfflineAudioContext
 
-/** @see https://dvcs.w3.org/hg/audio/raw-file/tip/webaudio/specification.html */
+/** @see http://www.w3.org/TR/2012/WD-webaudio-20121213/ */
 native class AudioNode {
 
 	function connect(destination : AudioNode) : void;
@@ -4771,11 +4850,11 @@ native class AudioNode {
 
 } // end of AudioNode
 
-/** @see https://dvcs.w3.org/hg/audio/raw-file/tip/webaudio/specification.html */
+/** @see http://www.w3.org/TR/2012/WD-webaudio-20121213/ */
 native class AudioSourceNode extends AudioNode {
 }
 
-/** @see https://dvcs.w3.org/hg/audio/raw-file/tip/webaudio/specification.html */
+/** @see http://www.w3.org/TR/2012/WD-webaudio-20121213/ */
 native final class AudioDestinationNode extends AudioNode {
 
 	__readonly__ var maxNumberOfChannels : number/*unsigned long*/;
@@ -4783,7 +4862,7 @@ native final class AudioDestinationNode extends AudioNode {
 
 } // end of AudioDestinationNode
 
-/** @see https://dvcs.w3.org/hg/audio/raw-file/tip/webaudio/specification.html */
+/** @see http://www.w3.org/TR/2012/WD-webaudio-20121213/ */
 native final class AudioParam {
 
 	var value : number/*float*/;
@@ -4822,21 +4901,21 @@ native final class AudioParam {
 
 } // end of AudioParam
 
-/** @see https://dvcs.w3.org/hg/audio/raw-file/tip/webaudio/specification.html */
+/** @see http://www.w3.org/TR/2012/WD-webaudio-20121213/ */
 native final class GainNode extends AudioNode {
 
 	__readonly__ var gain : AudioParam;
 
 } // end of GainNode
 
-/** @see https://dvcs.w3.org/hg/audio/raw-file/tip/webaudio/specification.html */
+/** @see http://www.w3.org/TR/2012/WD-webaudio-20121213/ */
 native final class DelayNode extends AudioNode {
 
 	__readonly__ var delayTime : AudioParam;
 
 } // end of DelayNode
 
-/** @see https://dvcs.w3.org/hg/audio/raw-file/tip/webaudio/specification.html */
+/** @see http://www.w3.org/TR/2012/WD-webaudio-20121213/ */
 native final class AudioBuffer {
 
 	__readonly__ var sampleRate : number/*float*/;
@@ -4850,7 +4929,7 @@ native final class AudioBuffer {
 
 } // end of AudioBuffer
 
-/** @see https://dvcs.w3.org/hg/audio/raw-file/tip/webaudio/specification.html */
+/** @see http://www.w3.org/TR/2012/WD-webaudio-20121213/ */
 native final class AudioBufferSourceNode extends AudioSourceNode {
 
 	static __readonly__ var UNSCHEDULED_STATE : number/*unsigned short*/;
@@ -4881,11 +4960,11 @@ native final class AudioBufferSourceNode extends AudioSourceNode {
 
 } // end of AudioBufferSourceNode
 
-/** @see https://dvcs.w3.org/hg/audio/raw-file/tip/webaudio/specification.html */
+/** @see http://www.w3.org/TR/2012/WD-webaudio-20121213/ */
 native final class MediaElementAudioSourceNode extends AudioSourceNode {
 }
 
-/** @see https://dvcs.w3.org/hg/audio/raw-file/tip/webaudio/specification.html */
+/** @see http://www.w3.org/TR/2012/WD-webaudio-20121213/ */
 native final class ScriptProcessorNode extends AudioNode {
 
 	var onaudioprocess : function(:Event):void/*EventListener*/;
@@ -4893,7 +4972,7 @@ native final class ScriptProcessorNode extends AudioNode {
 
 } // end of ScriptProcessorNode
 
-/** @see https://dvcs.w3.org/hg/audio/raw-file/tip/webaudio/specification.html */
+/** @see http://www.w3.org/TR/2012/WD-webaudio-20121213/ */
 native final class AudioProcessingEvent extends Event {
 
 	var node : ScriptProcessorNode;
@@ -4903,7 +4982,7 @@ native final class AudioProcessingEvent extends Event {
 
 } // end of AudioProcessingEvent
 
-/** @see https://dvcs.w3.org/hg/audio/raw-file/tip/webaudio/specification.html */
+/** @see http://www.w3.org/TR/2012/WD-webaudio-20121213/ */
 native final class PannerNode extends AudioNode {
 
 	// Default for stereo is HRTF
@@ -4936,7 +5015,7 @@ native final class PannerNode extends AudioNode {
 
 } // end of PannerNode
 
-/** @see https://dvcs.w3.org/hg/audio/raw-file/tip/webaudio/specification.html */
+/** @see http://www.w3.org/TR/2012/WD-webaudio-20121213/ */
 native final class AudioListener {
 
 	// same as OpenAL (default 1)
@@ -4965,7 +5044,7 @@ native final class AudioListener {
 
 } // end of AudioListener
 
-/** @see https://dvcs.w3.org/hg/audio/raw-file/tip/webaudio/specification.html */
+/** @see http://www.w3.org/TR/2012/WD-webaudio-20121213/ */
 native final class ConvolverNode extends AudioNode {
 
 	var buffer : AudioBuffer;
@@ -4973,7 +5052,7 @@ native final class ConvolverNode extends AudioNode {
 
 } // end of ConvolverNode
 
-/** @see https://dvcs.w3.org/hg/audio/raw-file/tip/webaudio/specification.html */
+/** @see http://www.w3.org/TR/2012/WD-webaudio-20121213/ */
 native final class AnalyserNode extends AudioNode {
 
 	// Real-time frequency-domain data
@@ -4989,15 +5068,15 @@ native final class AnalyserNode extends AudioNode {
 
 } // end of AnalyserNode
 
-/** @see https://dvcs.w3.org/hg/audio/raw-file/tip/webaudio/specification.html */
+/** @see http://www.w3.org/TR/2012/WD-webaudio-20121213/ */
 native final class ChannelSplitterNode extends AudioNode {
 }
 
-/** @see https://dvcs.w3.org/hg/audio/raw-file/tip/webaudio/specification.html */
+/** @see http://www.w3.org/TR/2012/WD-webaudio-20121213/ */
 native final class ChannelMergerNode extends AudioNode {
 }
 
-/** @see https://dvcs.w3.org/hg/audio/raw-file/tip/webaudio/specification.html */
+/** @see http://www.w3.org/TR/2012/WD-webaudio-20121213/ */
 native final class DynamicsCompressorNode extends AudioNode {
 
 	__readonly__ var threshold : AudioParam;
@@ -5015,7 +5094,7 @@ native final class DynamicsCompressorNode extends AudioNode {
 
 } // end of DynamicsCompressorNode
 
-/** @see https://dvcs.w3.org/hg/audio/raw-file/tip/webaudio/specification.html */
+/** @see http://www.w3.org/TR/2012/WD-webaudio-20121213/ */
 native final class BiquadFilterNode extends AudioNode {
 
 	var type : string/*BiquadFilterType*/;
@@ -5036,14 +5115,14 @@ native final class BiquadFilterNode extends AudioNode {
 
 } // end of BiquadFilterNode
 
-/** @see https://dvcs.w3.org/hg/audio/raw-file/tip/webaudio/specification.html */
+/** @see http://www.w3.org/TR/2012/WD-webaudio-20121213/ */
 native final class WaveShaperNode extends AudioNode {
 
 	var curve : Float32Array;
 
 } // end of WaveShaperNode
 
-/** @see https://dvcs.w3.org/hg/audio/raw-file/tip/webaudio/specification.html */
+/** @see http://www.w3.org/TR/2012/WD-webaudio-20121213/ */
 native final class OscillatorNode extends AudioSourceNode {
 
 	var type : string/*OscillatorType*/;
@@ -5067,11 +5146,11 @@ native final class OscillatorNode extends AudioSourceNode {
 
 } // end of OscillatorNode
 
-/** @see https://dvcs.w3.org/hg/audio/raw-file/tip/webaudio/specification.html */
+/** @see http://www.w3.org/TR/2012/WD-webaudio-20121213/ */
 native final class WaveTable {
 }
 
-/** @see https://dvcs.w3.org/hg/audio/raw-file/tip/webaudio/specification.html */
+/** @see http://www.w3.org/TR/2012/WD-webaudio-20121213/ */
 native final class MediaStreamAudioSourceNode extends AudioSourceNode {
 }
 
@@ -5663,27 +5742,6 @@ native final __fake__ class NavigatorUserMediaError {
 	__readonly__ var code : number/*unsigned short*/;
 
 } // end of NavigatorUserMediaError
-
-/** @see http://html5.org/specs/dom-parsing.html */
-native final class DOMParser {
-
-	function constructor();
-
-	function parseFromString(
-		str : string/*DOMString*/,
-		type : string/*SupportedType*/
-	) : Document;
-
-} // end of DOMParser
-
-/** @see http://html5.org/specs/dom-parsing.html */
-native final class XMLSerializer {
-
-	function constructor();
-
-	function serializeToString(root : Node) : string/*DOMString*/;
-
-} // end of XMLSerializer
 
 /** @see https://www.khronos.org/registry/typedarray/specs/latest/typedarray.idl */
 native final class ArrayBuffer extends Transferable {
@@ -6333,7 +6391,7 @@ native final class DataView extends ArrayBufferView {
 
 } // end of DataView
 
-/** @see http://dev.w3.org/html5/2dcontext/ */
+/** @see http://www.w3.org/TR/2dcontext/ */
 native final class CanvasRenderingContext2D extends CanvasDrawingStyles {
 
 	// back-reference to the canvas
@@ -6653,7 +6711,7 @@ native final class CanvasRenderingContext2D extends CanvasDrawingStyles {
 
 } // end of CanvasRenderingContext2D
 
-/** @see http://dev.w3.org/html5/2dcontext/ */
+/** @see http://www.w3.org/TR/2dcontext/ */
 native __fake__ class CanvasDrawingStyles {
 
 	// line caps/joins
@@ -6686,7 +6744,7 @@ native __fake__ class CanvasDrawingStyles {
 
 } // end of CanvasDrawingStyles
 
-/** @see http://dev.w3.org/html5/2dcontext/ */
+/** @see http://www.w3.org/TR/2dcontext/ */
 native __fake__ class CanvasPathMethods {
 
 	// shared path API methods
@@ -6754,7 +6812,7 @@ native __fake__ class CanvasPathMethods {
 
 } // end of CanvasPathMethods
 
-/** @see http://dev.w3.org/html5/2dcontext/ */
+/** @see http://www.w3.org/TR/2dcontext/ */
 native final class CanvasGradient {
 
 	// opaque object
@@ -6765,14 +6823,14 @@ native final class CanvasGradient {
 
 } // end of CanvasGradient
 
-/** @see http://dev.w3.org/html5/2dcontext/ */
+/** @see http://www.w3.org/TR/2dcontext/ */
 native final class CanvasPattern {
 
 	// opaque object
 
 } // end of CanvasPattern
 
-/** @see http://dev.w3.org/html5/2dcontext/ */
+/** @see http://www.w3.org/TR/2dcontext/ */
 native final class TextMetrics {
 
 	// x-direction
@@ -6792,7 +6850,7 @@ native final class TextMetrics {
 
 } // end of TextMetrics
 
-/** @see http://dev.w3.org/html5/2dcontext/ */
+/** @see http://www.w3.org/TR/2dcontext/ */
 native final class HitRegionOptions {
 
 	var path : Nullable.<Path>;
@@ -6807,7 +6865,7 @@ native final class HitRegionOptions {
 
 } // end of HitRegionOptions
 
-/** @see http://dev.w3.org/html5/2dcontext/ */
+/** @see http://www.w3.org/TR/2dcontext/ */
 native final class ImageData {
 
 	__readonly__ var width : number/*unsigned long*/;
@@ -6816,7 +6874,7 @@ native final class ImageData {
 
 } // end of ImageData
 
-/** @see http://dev.w3.org/html5/2dcontext/ */
+/** @see http://www.w3.org/TR/2dcontext/ */
 native final class DrawingStyle extends CanvasDrawingStyles {
 
 	function constructor();
@@ -6824,7 +6882,7 @@ native final class DrawingStyle extends CanvasDrawingStyles {
 
 } // end of DrawingStyle
 
-/** @see http://dev.w3.org/html5/2dcontext/ */
+/** @see http://www.w3.org/TR/2dcontext/ */
 native final class Path extends CanvasPathMethods {
 
 	function constructor();
