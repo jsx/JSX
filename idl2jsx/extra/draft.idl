@@ -83,3 +83,6 @@ partial interface Window {
   void postMessage(any message, DOMString targetOrigin, optional sequence<Transferable> transfer);
 };
 
+// defined in http://www.w3.org/TR/SVG11/
+interface SVGMatrix {
+};
