@@ -439,6 +439,7 @@ foreach my $src(@files) {
             # member var
             elsif($member =~ m{
                     (?: \bstringifier\b \s+ )?
+                    (?<static> \bstatic\b \s+ )?
                     (?<readonly> \breadonly\b \s+)?
                     (?: \battribute\b \s+)?
                     (?: \[ [^\]]+ \])?
@@ -449,13 +450,18 @@ foreach my $src(@files) {
 
                 my $id = $+{ident};
 
-                my $decl = "var";
-                if($+{readonly}) {
-                    $decl = "__readonly__ $decl";
+                my $decl = "";
+                if ($+{static}) {
+                    $decl .= "static ";
                 }
+                if ($+{readonly}) {
+                    $decl = "__readonly__ ";
+                }
+                $decl .= "var ";
+
                 my $type = to_jsx_type($+{type}, union_to_variant => 1);
 
-                $decl .= " $id : $type;";
+                $decl .= "$id : $type;";
 
                 $decl_ref->{$id} //= [];
                 push @{$decl_ref->{$id}}, $decl;
