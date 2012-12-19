@@ -96,18 +96,9 @@ my %typemap = (
 
     'any' => 'variant',
 
+    'ByteString' => 'string', # used in the XMLHttpRequest specification
+
     'WindowProxy' => 'Window',
-
-    # http://dev.w3.org/html5/spec/single-page.html
-    'TextTrackMode' => 'string', # enum
-
-    # http://www.w3.org/TR/XMLHttpRequest/
-    'XMLHttpRequestResponseType' => 'string', # enum
-
-    # http://html5.org/specs/dom-parsing.html#insertadjacenthtml()
-    'SupportedType' => 'string', # enum
-    'insertAdjacentHTMLPosition' => 'string', # enum
-
 );
 
 # callbacks / event listeners
@@ -118,7 +109,10 @@ define_alias('Function' => 'function(:Event):void');
 define_alias('EventListener' => 'function(:Event):void');
 
 # http://dev.w3.org/html5/spec/webappapis.html#eventhandler
-define_alias('EventHandler'  => 'function(:Event):void');
+define_alias('EventHandlerNonNull'        => 'function(:Event):void');
+define_alias('EventHandler'               => 'Nullable.<function(:Event):void>');
+define_alias('OnErrorEventHandlerNonNull' => 'function(:Event):void');
+define_alias('OnErrorEventHandler'        => 'Nullable.<function(:Event):void>');
 
 # TODO: type resolution process
 
@@ -252,27 +246,19 @@ foreach my $src(@files) {
 
     my $spec_name = $file =~ /^https?:/ ? $file : "";
 
-    info 'process <typedef>';
+    info 'process typedefs (typedef, callback, enum)';
     while($content =~ m{
-            ^ \s* \b typedef \b
-            \s+
-            (?<existing_type> $rx_simple_type)
-            \s+
-            (?<new_type> \w+) \s*
-            ;
-        }xmsg) {
-
-        info 'typedef:',
-        my $n = $+{new_type};
-        my $t = to_jsx_type($+{existing_type});
-        $t =~ s/$rx_comments//xms;
-        define_alias($n => $t);
-    }
-
-    info 'process <callback>';
-    {
-        while($content =~ m{
-                ^\s* callback
+            (?: # typedef ExistingType NewType;
+                ^ \s* \b (?<typedef> typedef) \b
+                \s+
+                (?<existing_type> $rx_type)
+                \s+
+                (?<new_type> \w+) \s*
+                ;
+            )
+            |
+            (?:  # callback NewType = RetType ( ParamTypes* )
+                ^\s* (?<callback> callback)
                 \s+ (?<name> \w+)
                 \s* =
                 \s* (?<ret_type> $rx_simple_type)
@@ -281,19 +267,41 @@ foreach my $src(@files) {
                         (?<params> $rx_params)
                     \)
                 \s* ;
-            }xmsg) {
-            my $name = $+{name};
-            info 'callback:', $name;
+            )
+            |
+            (?: # enum T ... ;
+                ^\s* (?<enum> enum)
+                \s+ (?<name> \w+)
+                \s*
+                \{
+            )
+        }xmsg) {
 
+        if ($+{typedef}) {
+            my $new      = $+{new_type};
+            my $existing = to_jsx_type($+{existing_type});
+            $existing  =~ s/$rx_comments//xms;
+            define_alias($new => $existing);
+        }
+        elsif($+{callback}) {
+            my $name = $+{name};
             my $cb_type = make_function_type($+{ret_type}, $+{params});
             define_callback($name => $cb_type);
+        }
+        else {
+            my $name = $+{name};
+            define_alias($name => 'string');
         }
     }
 
     info 'process <class>';
     while($content =~ m{
                 (?<attrs> (?: \[ (?: [^\]]+ | \[ \s* \])+ \] \s+)* )
-                (?<type> (?:partial \s+)? interface | exception | dictionary)
+                (?<type>
+                    (?:partial \s+)? interface
+                    | exception
+                    | dictionary
+                    )
                 \s+ (?<name> \w+)
                 (?: \s* : \s* (?<base> [\w:]+) )?
                 \s*
@@ -314,7 +322,6 @@ foreach my $src(@files) {
         }
 
         info $class_type, $class, ($base ? ": $base" : ());
-
 
         my $def = $classdef{$class} //= {
             attrs => $attrs,
@@ -918,7 +925,8 @@ sub trim {
 sub make_function_type {
     my($ret_type, $params) = @_;
     my $callback_params = join ",", map {
-            sprintf '%s:%s', $_->{name}, to_jsx_type($_->{type})
+            sprintf '%s:%s',
+                $_->{name}, to_jsx_type($_->{type}, union_to_variant => 1)
         } parse_params($params);
 
     return "function($callback_params):" . to_jsx_type($ret_type);
@@ -927,6 +935,9 @@ sub make_function_type {
 sub define_alias {
     my($name, $definition) = @_;
     $typemap{$name} = $definition;
+
+    info "typedef: $name = $definition";
+    return;
 }
 
 sub define_callback {
@@ -935,4 +946,8 @@ sub define_callback {
 
     $def->{name}  = $name;
     $def->{alias} = $definition;
+
+    info "callback: $name = $definition";
+    return;
 }
+
