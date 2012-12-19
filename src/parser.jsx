@@ -1,16 +1,16 @@
 /*
  * Copyright (c) 2012 DeNA Co., Ltd.
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to
  * deal in the Software without restriction, including without limitation the
  * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
  * sell copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -83,7 +83,7 @@ class Token {
 }
 
 class _Lexer {
-	
+
 	static var ident         = " [a-zA-Z_] [a-zA-Z0-9_]* ";
 	static var doubleQuoted  = ' "  [^"\\\\]* (?: \\\\. [^"\\\\]* )* " ';
 	static var singleQuoted  = " '  [^'\\\\]* (?: \\\\. [^'\\\\]* )* ' ";
@@ -133,7 +133,8 @@ class _Lexer {
 		// keywords of JSX
 		"class",	 "extends", "super",
 		"import",    "implements",
-		"interface", "static",
+		// "interface", // contextual keywords
+		"static",
 		"__FILE__",  "__LINE__",
 		"undefined"
 		]);
@@ -412,7 +413,7 @@ class QualifiedName {
 
 	function getClass (context : AnalysisContext, typeArguments : Type[]) : ClassDefinition {
 		var classDef = null : ClassDefinition;
-		
+
 		if (this._import != null) {
 			if (typeArguments.length == 0) {
 				var classDefs = this._import.getClasses(this._token.getValue());
@@ -521,7 +522,7 @@ class Scope {
 		this.statements = statements;
 		this.closures = closures;
 	}
-	
+
 }
 
 class Parser {
@@ -1588,7 +1589,7 @@ class Parser {
 					return null;
 				}
 			}
-			function createDefinition(locals : LocalVariable[], statements : Statement[], closures : MemberFunctionDefinition[], lastToken : Token) : MemberFunctionDefinition { 
+			function createDefinition(locals : LocalVariable[], statements : Statement[], closures : MemberFunctionDefinition[], lastToken : Token) : MemberFunctionDefinition {
 				return typeArgs.length != 0
 					? new TemplateFunctionDefinition(token, name, flags, typeArgs, returnType, args, locals, statements, closures, lastToken, docComment) as MemberFunctionDefinition
 					: new MemberFunctionDefinition(token, name, flags, returnType, args, locals, statements, closures, lastToken, docComment);
