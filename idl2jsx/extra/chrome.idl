@@ -1,6 +1,6 @@
-// Chrome 19
+// Chrome 23
 // 
-// document.getElementById("input").innerHTML = (function(style) { var a = []; for(var k in style) { if(typeof style[k] === "function") continue; a.push("attribute Maybe<"+(typeof style[k])+"> "+k+";"+String.fromCharCode(0x0a)) }; return a.sort().join(""); }(document.body.style))
+// document.getElementById("input").innerHTML = (function(style) { var a = []; for(var k in style) { if(typeof style[k] === "function") continue; a.push("attribute "+(typeof style[k])+"? "+k+";"+String.fromCharCode(0x0a)) }; return a.sort().join(""); }(document.body.style))
 //
 
 partial interface CSSStyleDeclaration {
@@ -126,6 +126,7 @@ partial interface CSSStyleDeclaration {
     attribute Maybe<string> outlineStyle;
     attribute Maybe<string> outlineWidth;
     attribute Maybe<string> overflow;
+    attribute Maybe<string> overflowWrap;
     attribute Maybe<string> overflowX;
     attribute Maybe<string> overflowY;
     attribute Maybe<string> padding;
@@ -156,6 +157,7 @@ partial interface CSSStyleDeclaration {
     attribute Maybe<string> strokeMiterlimit;
     attribute Maybe<string> strokeOpacity;
     attribute Maybe<string> strokeWidth;
+    attribute Maybe<string> tabSize;
     attribute Maybe<string> tableLayout;
     attribute Maybe<string> textAlign;
     attribute Maybe<string> textAnchor;
@@ -186,6 +188,9 @@ partial interface CSSStyleDeclaration {
     attribute Maybe<string> vectorEffect;
     attribute Maybe<string> verticalAlign;
     attribute Maybe<string> visibility;
+    attribute Maybe<string> webkitAlignContent;
+    attribute Maybe<string> webkitAlignItems;
+    attribute Maybe<string> webkitAlignSelf;
     attribute Maybe<string> webkitAnimation;
     attribute Maybe<string> webkitAnimationDelay;
     attribute Maybe<string> webkitAnimationDirection;
@@ -224,6 +229,7 @@ partial interface CSSStyleDeclaration {
     attribute Maybe<string> webkitBorderStartWidth;
     attribute Maybe<string> webkitBorderVerticalSpacing;
     attribute Maybe<string> webkitBoxAlign;
+    attribute Maybe<string> webkitBoxDecorationBreak;
     attribute Maybe<string> webkitBoxDirection;
     attribute Maybe<string> webkitBoxFlex;
     attribute Maybe<string> webkitBoxFlexGroup;
@@ -233,6 +239,7 @@ partial interface CSSStyleDeclaration {
     attribute Maybe<string> webkitBoxPack;
     attribute Maybe<string> webkitBoxReflect;
     attribute Maybe<string> webkitBoxShadow;
+    attribute Maybe<string> webkitClipPath;
     attribute Maybe<string> webkitColorCorrection;
     attribute Maybe<string> webkitColumnAxis;
     attribute Maybe<string> webkitColumnBreakAfter;
@@ -240,6 +247,7 @@ partial interface CSSStyleDeclaration {
     attribute Maybe<string> webkitColumnBreakInside;
     attribute Maybe<string> webkitColumnCount;
     attribute Maybe<string> webkitColumnGap;
+    attribute Maybe<string> webkitColumnProgression;
     attribute Maybe<string> webkitColumnRule;
     attribute Maybe<string> webkitColumnRuleColor;
     attribute Maybe<string> webkitColumnRuleStyle;
@@ -248,13 +256,12 @@ partial interface CSSStyleDeclaration {
     attribute Maybe<string> webkitColumnWidth;
     attribute Maybe<string> webkitColumns;
     attribute Maybe<string> webkitFilter;
-    attribute Maybe<string> webkitFlexAlign;
+    attribute Maybe<string> webkitFlex;
+    attribute Maybe<string> webkitFlexBasis;
     attribute Maybe<string> webkitFlexDirection;
     attribute Maybe<string> webkitFlexFlow;
-    attribute Maybe<string> webkitFlexItemAlign;
-    attribute Maybe<string> webkitFlexLinePack;
-    attribute Maybe<string> webkitFlexOrder;
-    attribute Maybe<string> webkitFlexPack;
+    attribute Maybe<string> webkitFlexGrow;
+    attribute Maybe<string> webkitFlexShrink;
     attribute Maybe<string> webkitFlexWrap;
     attribute Maybe<string> webkitFlowFrom;
     attribute Maybe<string> webkitFlowInto;
@@ -263,12 +270,17 @@ partial interface CSSStyleDeclaration {
     attribute Maybe<string> webkitFontSizeDelta;
     attribute Maybe<string> webkitFontSmoothing;
     attribute Maybe<string> webkitFontVariantLigatures;
+    attribute Maybe<string> webkitGridColumn;
+    attribute Maybe<string> webkitGridColumns;
+    attribute Maybe<string> webkitGridRow;
+    attribute Maybe<string> webkitGridRows;
     attribute Maybe<string> webkitHighlight;
     attribute Maybe<string> webkitHyphenateCharacter;
     attribute Maybe<string> webkitHyphenateLimitAfter;
     attribute Maybe<string> webkitHyphenateLimitBefore;
     attribute Maybe<string> webkitHyphenateLimitLines;
     attribute Maybe<string> webkitHyphens;
+    attribute Maybe<string> webkitJustifyContent;
     attribute Maybe<string> webkitLineAlign;
     attribute Maybe<string> webkitLineBoxContain;
     attribute Maybe<string> webkitLineBreak;
@@ -312,13 +324,12 @@ partial interface CSSStyleDeclaration {
     attribute Maybe<string> webkitMaskRepeatX;
     attribute Maybe<string> webkitMaskRepeatY;
     attribute Maybe<string> webkitMaskSize;
-    attribute Maybe<string> webkitMatchNearestMailBlockquoteColor;
     attribute Maybe<string> webkitMaxLogicalHeight;
     attribute Maybe<string> webkitMaxLogicalWidth;
     attribute Maybe<string> webkitMinLogicalHeight;
     attribute Maybe<string> webkitMinLogicalWidth;
     attribute Maybe<string> webkitNbspMode;
-    attribute Maybe<string> webkitOverflowScrolling;
+    attribute Maybe<string> webkitOrder;
     attribute Maybe<string> webkitPaddingAfter;
     attribute Maybe<string> webkitPaddingBefore;
     attribute Maybe<string> webkitPaddingEnd;
@@ -333,6 +344,8 @@ partial interface CSSStyleDeclaration {
     attribute Maybe<string> webkitRegionBreakInside;
     attribute Maybe<string> webkitRegionOverflow;
     attribute Maybe<string> webkitRtlOrdering;
+    attribute Maybe<string> webkitShapeInside;
+    attribute Maybe<string> webkitShapeOutside;
     attribute Maybe<string> webkitSvgShadow;
     attribute Maybe<string> webkitTapHighlightColor;
     attribute Maybe<string> webkitTextCombine;
@@ -362,12 +375,11 @@ partial interface CSSStyleDeclaration {
     attribute Maybe<string> webkitUserDrag;
     attribute Maybe<string> webkitUserModify;
     attribute Maybe<string> webkitUserSelect;
+    attribute Maybe<string> webkitWidgetRegion;
     attribute Maybe<string> webkitWrap;
     attribute Maybe<string> webkitWrapFlow;
     attribute Maybe<string> webkitWrapMargin;
     attribute Maybe<string> webkitWrapPadding;
-    attribute Maybe<string> webkitWrapShapeInside;
-    attribute Maybe<string> webkitWrapShapeOutside;
     attribute Maybe<string> webkitWrapThrough;
     attribute Maybe<string> webkitWritingMode;
     attribute Maybe<string> whiteSpace;

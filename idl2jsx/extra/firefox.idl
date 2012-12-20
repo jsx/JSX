@@ -1,4 +1,4 @@
-// Firefox 12
+// Firefox 17
 //
 // document.getElementById("input").innerHTML = (function(style) { var a = []; for(var k in style) { if(typeof style[k] === "function") continue; a.push("attribute Maybe<"+(typeof style[k])+"> "+k+";"+String.fromCharCode(0x0a)) }; return a.sort().join(""); }(document.body.style))
 
@@ -54,18 +54,12 @@ partial interface CSSStyleDeclaration {
     attribute Maybe<string> MozImageRegion;
     attribute Maybe<string> MozMarginEnd;
     attribute Maybe<string> MozMarginStart;
-    attribute Maybe<string> MozOpacity;
     attribute Maybe<string> MozOrient;
-    attribute Maybe<string> MozOutline;
-    attribute Maybe<string> MozOutlineColor;
-    attribute Maybe<string> MozOutlineOffset;
     attribute Maybe<string> MozOutlineRadius;
     attribute Maybe<string> MozOutlineRadiusBottomleft;
     attribute Maybe<string> MozOutlineRadiusBottomright;
     attribute Maybe<string> MozOutlineRadiusTopleft;
     attribute Maybe<string> MozOutlineRadiusTopright;
-    attribute Maybe<string> MozOutlineStyle;
-    attribute Maybe<string> MozOutlineWidth;
     attribute Maybe<string> MozPaddingEnd;
     attribute Maybe<string> MozPaddingStart;
     attribute Maybe<string> MozPerspective;
@@ -91,6 +85,16 @@ partial interface CSSStyleDeclaration {
     attribute Maybe<string> MozUserModify;
     attribute Maybe<string> MozUserSelect;
     attribute Maybe<string> MozWindowShadow;
+    attribute Maybe<string> animation;
+    attribute Maybe<string> animationDelay;
+    attribute Maybe<string> animationDirection;
+    attribute Maybe<string> animationDuration;
+    attribute Maybe<string> animationFillMode;
+    attribute Maybe<string> animationIterationCount;
+    attribute Maybe<string> animationName;
+    attribute Maybe<string> animationPlayState;
+    attribute Maybe<string> animationTimingFunction;
+    attribute Maybe<string> backfaceVisibility;
     attribute Maybe<string> background;
     attribute Maybe<string> backgroundAttachment;
     attribute Maybe<string> backgroundClip;
@@ -109,6 +113,12 @@ partial interface CSSStyleDeclaration {
     attribute Maybe<string> borderBottomWidth;
     attribute Maybe<string> borderCollapse;
     attribute Maybe<string> borderColor;
+    attribute Maybe<string> borderImage;
+    attribute Maybe<string> borderImageOutset;
+    attribute Maybe<string> borderImageRepeat;
+    attribute Maybe<string> borderImageSlice;
+    attribute Maybe<string> borderImageSource;
+    attribute Maybe<string> borderImageWidth;
     attribute Maybe<string> borderLeft;
     attribute Maybe<string> borderLeftColor;
     attribute Maybe<string> borderLeftStyle;
@@ -207,6 +217,8 @@ partial interface CSSStyleDeclaration {
     attribute Maybe<string> pageBreakAfter;
     attribute Maybe<string> pageBreakBefore;
     attribute Maybe<string> pageBreakInside;
+    attribute Maybe<string> perspective;
+    attribute Maybe<string> perspectiveOrigin;
     attribute Maybe<string> pointerEvents;
     attribute Maybe<string> position;
     attribute Maybe<string> quotes;
@@ -234,12 +246,22 @@ partial interface CSSStyleDeclaration {
     attribute Maybe<string> textShadow;
     attribute Maybe<string> textTransform;
     attribute Maybe<string> top;
+    attribute Maybe<string> transform;
+    attribute Maybe<string> transformOrigin;
+    attribute Maybe<string> transformStyle;
+    attribute Maybe<string> transition;
+    attribute Maybe<string> transitionDelay;
+    attribute Maybe<string> transitionDuration;
+    attribute Maybe<string> transitionProperty;
+    attribute Maybe<string> transitionTimingFunction;
     attribute Maybe<string> unicodeBidi;
+    attribute Maybe<string> vectorEffect;
     attribute Maybe<string> verticalAlign;
     attribute Maybe<string> visibility;
     attribute Maybe<string> whiteSpace;
     attribute Maybe<string> widows;
     attribute Maybe<string> width;
+    attribute Maybe<string> wordBreak;
     attribute Maybe<string> wordSpacing;
     attribute Maybe<string> wordWrap;
     attribute Maybe<string> zIndex;
