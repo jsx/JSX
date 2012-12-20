@@ -732,9 +732,6 @@ sub to_jsx_type {
     if($idl_type =~ s{\A sequence < (.+?) >  }{$1}xms) {
         $array = 1;
     }
-    elsif($idl_type =~ s{\A Maybe< (.+?) >  }{$1}xms) { # defined in idl2jsx/extra/*.idl
-        $nullable = 1;
-    }
 
     $idl_type  =~ s{
         (?:
