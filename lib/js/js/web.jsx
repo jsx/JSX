@@ -1816,6 +1816,7 @@ native final class CSSStyleDeclaration {
 	var outlineStyle : Nullable.<string>;
 	var outlineWidth : Nullable.<string>;
 	var overflow : Nullable.<string>;
+	var overflowWrap : Nullable.<string>;
 	var overflowX : Nullable.<string>;
 	var overflowY : Nullable.<string>;
 	var padding : Nullable.<string>;
@@ -1846,6 +1847,7 @@ native final class CSSStyleDeclaration {
 	var strokeMiterlimit : Nullable.<string>;
 	var strokeOpacity : Nullable.<string>;
 	var strokeWidth : Nullable.<string>;
+	var tabSize : Nullable.<string>;
 	var tableLayout : Nullable.<string>;
 	var textAlign : Nullable.<string>;
 	var textAnchor : Nullable.<string>;
@@ -1876,6 +1878,9 @@ native final class CSSStyleDeclaration {
 	var vectorEffect : Nullable.<string>;
 	var verticalAlign : Nullable.<string>;
 	var visibility : Nullable.<string>;
+	var webkitAlignContent : Nullable.<string>;
+	var webkitAlignItems : Nullable.<string>;
+	var webkitAlignSelf : Nullable.<string>;
 	var webkitAnimation : Nullable.<string>;
 	var webkitAnimationDelay : Nullable.<string>;
 	var webkitAnimationDirection : Nullable.<string>;
@@ -1914,6 +1919,7 @@ native final class CSSStyleDeclaration {
 	var webkitBorderStartWidth : Nullable.<string>;
 	var webkitBorderVerticalSpacing : Nullable.<string>;
 	var webkitBoxAlign : Nullable.<string>;
+	var webkitBoxDecorationBreak : Nullable.<string>;
 	var webkitBoxDirection : Nullable.<string>;
 	var webkitBoxFlex : Nullable.<string>;
 	var webkitBoxFlexGroup : Nullable.<string>;
@@ -1923,6 +1929,7 @@ native final class CSSStyleDeclaration {
 	var webkitBoxPack : Nullable.<string>;
 	var webkitBoxReflect : Nullable.<string>;
 	var webkitBoxShadow : Nullable.<string>;
+	var webkitClipPath : Nullable.<string>;
 	var webkitColorCorrection : Nullable.<string>;
 	var webkitColumnAxis : Nullable.<string>;
 	var webkitColumnBreakAfter : Nullable.<string>;
@@ -1930,6 +1937,7 @@ native final class CSSStyleDeclaration {
 	var webkitColumnBreakInside : Nullable.<string>;
 	var webkitColumnCount : Nullable.<string>;
 	var webkitColumnGap : Nullable.<string>;
+	var webkitColumnProgression : Nullable.<string>;
 	var webkitColumnRule : Nullable.<string>;
 	var webkitColumnRuleColor : Nullable.<string>;
 	var webkitColumnRuleStyle : Nullable.<string>;
@@ -1938,13 +1946,12 @@ native final class CSSStyleDeclaration {
 	var webkitColumnWidth : Nullable.<string>;
 	var webkitColumns : Nullable.<string>;
 	var webkitFilter : Nullable.<string>;
-	var webkitFlexAlign : Nullable.<string>;
+	var webkitFlex : Nullable.<string>;
+	var webkitFlexBasis : Nullable.<string>;
 	var webkitFlexDirection : Nullable.<string>;
 	var webkitFlexFlow : Nullable.<string>;
-	var webkitFlexItemAlign : Nullable.<string>;
-	var webkitFlexLinePack : Nullable.<string>;
-	var webkitFlexOrder : Nullable.<string>;
-	var webkitFlexPack : Nullable.<string>;
+	var webkitFlexGrow : Nullable.<string>;
+	var webkitFlexShrink : Nullable.<string>;
 	var webkitFlexWrap : Nullable.<string>;
 	var webkitFlowFrom : Nullable.<string>;
 	var webkitFlowInto : Nullable.<string>;
@@ -1953,12 +1960,17 @@ native final class CSSStyleDeclaration {
 	var webkitFontSizeDelta : Nullable.<string>;
 	var webkitFontSmoothing : Nullable.<string>;
 	var webkitFontVariantLigatures : Nullable.<string>;
+	var webkitGridColumn : Nullable.<string>;
+	var webkitGridColumns : Nullable.<string>;
+	var webkitGridRow : Nullable.<string>;
+	var webkitGridRows : Nullable.<string>;
 	var webkitHighlight : Nullable.<string>;
 	var webkitHyphenateCharacter : Nullable.<string>;
 	var webkitHyphenateLimitAfter : Nullable.<string>;
 	var webkitHyphenateLimitBefore : Nullable.<string>;
 	var webkitHyphenateLimitLines : Nullable.<string>;
 	var webkitHyphens : Nullable.<string>;
+	var webkitJustifyContent : Nullable.<string>;
 	var webkitLineAlign : Nullable.<string>;
 	var webkitLineBoxContain : Nullable.<string>;
 	var webkitLineBreak : Nullable.<string>;
@@ -2002,13 +2014,12 @@ native final class CSSStyleDeclaration {
 	var webkitMaskRepeatX : Nullable.<string>;
 	var webkitMaskRepeatY : Nullable.<string>;
 	var webkitMaskSize : Nullable.<string>;
-	var webkitMatchNearestMailBlockquoteColor : Nullable.<string>;
 	var webkitMaxLogicalHeight : Nullable.<string>;
 	var webkitMaxLogicalWidth : Nullable.<string>;
 	var webkitMinLogicalHeight : Nullable.<string>;
 	var webkitMinLogicalWidth : Nullable.<string>;
 	var webkitNbspMode : Nullable.<string>;
-	var webkitOverflowScrolling : Nullable.<string>;
+	var webkitOrder : Nullable.<string>;
 	var webkitPaddingAfter : Nullable.<string>;
 	var webkitPaddingBefore : Nullable.<string>;
 	var webkitPaddingEnd : Nullable.<string>;
@@ -2023,6 +2034,8 @@ native final class CSSStyleDeclaration {
 	var webkitRegionBreakInside : Nullable.<string>;
 	var webkitRegionOverflow : Nullable.<string>;
 	var webkitRtlOrdering : Nullable.<string>;
+	var webkitShapeInside : Nullable.<string>;
+	var webkitShapeOutside : Nullable.<string>;
 	var webkitSvgShadow : Nullable.<string>;
 	var webkitTapHighlightColor : Nullable.<string>;
 	var webkitTextCombine : Nullable.<string>;
@@ -2052,12 +2065,11 @@ native final class CSSStyleDeclaration {
 	var webkitUserDrag : Nullable.<string>;
 	var webkitUserModify : Nullable.<string>;
 	var webkitUserSelect : Nullable.<string>;
+	var webkitWidgetRegion : Nullable.<string>;
 	var webkitWrap : Nullable.<string>;
 	var webkitWrapFlow : Nullable.<string>;
 	var webkitWrapMargin : Nullable.<string>;
 	var webkitWrapPadding : Nullable.<string>;
-	var webkitWrapShapeInside : Nullable.<string>;
-	var webkitWrapShapeOutside : Nullable.<string>;
 	var webkitWrapThrough : Nullable.<string>;
 	var webkitWritingMode : Nullable.<string>;
 	var whiteSpace : Nullable.<string>;
@@ -2119,18 +2131,12 @@ native final class CSSStyleDeclaration {
 	var MozImageRegion : Nullable.<string>;
 	var MozMarginEnd : Nullable.<string>;
 	var MozMarginStart : Nullable.<string>;
-	var MozOpacity : Nullable.<string>;
 	var MozOrient : Nullable.<string>;
-	var MozOutline : Nullable.<string>;
-	var MozOutlineColor : Nullable.<string>;
-	var MozOutlineOffset : Nullable.<string>;
 	var MozOutlineRadius : Nullable.<string>;
 	var MozOutlineRadiusBottomleft : Nullable.<string>;
 	var MozOutlineRadiusBottomright : Nullable.<string>;
 	var MozOutlineRadiusTopleft : Nullable.<string>;
 	var MozOutlineRadiusTopright : Nullable.<string>;
-	var MozOutlineStyle : Nullable.<string>;
-	var MozOutlineWidth : Nullable.<string>;
 	var MozPaddingEnd : Nullable.<string>;
 	var MozPaddingStart : Nullable.<string>;
 	var MozPerspective : Nullable.<string>;
@@ -2156,11 +2162,31 @@ native final class CSSStyleDeclaration {
 	var MozUserModify : Nullable.<string>;
 	var MozUserSelect : Nullable.<string>;
 	var MozWindowShadow : Nullable.<string>;
+	var animation : Nullable.<string>;
+	var animationDelay : Nullable.<string>;
+	var animationDirection : Nullable.<string>;
+	var animationDuration : Nullable.<string>;
+	var animationFillMode : Nullable.<string>;
+	var animationIterationCount : Nullable.<string>;
+	var animationName : Nullable.<string>;
+	var animationPlayState : Nullable.<string>;
+	var animationTimingFunction : Nullable.<string>;
+	var backfaceVisibility : Nullable.<string>;
 	var cssFloat : Nullable.<string>;
 	var fontSizeAdjust : Nullable.<string>;
 	var imeMode : Nullable.<string>;
 	var markerOffset : Nullable.<string>;
 	var marks : Nullable.<string>;
+	var perspective : Nullable.<string>;
+	var perspectiveOrigin : Nullable.<string>;
+	var transform : Nullable.<string>;
+	var transformOrigin : Nullable.<string>;
+	var transformStyle : Nullable.<string>;
+	var transition : Nullable.<string>;
+	var transitionDelay : Nullable.<string>;
+	var transitionDuration : Nullable.<string>;
+	var transitionProperty : Nullable.<string>;
+	var transitionTimingFunction : Nullable.<string>;
 
 } // end of CSSStyleDeclaration
 
@@ -4807,6 +4833,13 @@ native class AudioContext {
 		imag : Float32Array
 	) : WaveTable;
 
+	// deprecated
+	function createGainNode() : void;
+	// deprecated
+	function createDelayNode() : void;
+	// deprecated
+	function createJavaScriptNode() : void;
+
 } // end of AudioContext
 
 /** @see http://www.w3.org/TR/2012/WD-webaudio-20121213/ */
@@ -4952,6 +4985,20 @@ native final class AudioBufferSourceNode extends AudioSourceNode {
 		duration : number/*double*/
 	) : void;
 	function stop(when : number/*double*/) : void;
+
+	// deprecated
+	function noteOn(when : number/*double*/) : void;
+	function noteOn(
+		when : number/*double*/,
+		offset : number/*double*/
+	) : void;
+	function noteOn(
+		when : number/*double*/,
+		offset : number/*double*/,
+		duration : number/*double*/
+	) : void;
+	// deprecated
+	function noteOff(when : number/*double*/) : void;
 
 } // end of AudioBufferSourceNode
 
@@ -5138,6 +5185,11 @@ native final class OscillatorNode extends AudioSourceNode {
 	function start(when : number/*double*/) : void;
 	function stop(when : number/*double*/) : void;
 	function setWaveTable(waveTable : WaveTable) : void;
+
+	// deprecated
+	function noteOn(when : number/*double*/) : void;
+	// deprecated
+	function noteOff(when : number/*double*/) : void;
 
 } // end of OscillatorNode
 
@@ -5647,7 +5699,7 @@ native final class EventSourceInit {
 } // end of EventSourceInit
 
 /** @see http://www.w3.org/TR/2012/WD-IndexedDB-20120524/ */
-native final class IDBKeyRange {
+native class IDBKeyRange {
 
 	__readonly__ var lower : variant/*any*/;
 	__readonly__ var upper : variant/*any*/;
@@ -5749,7 +5801,7 @@ native __fake__ class IDBEnvironment {
 } // end of IDBEnvironment
 
 /** @see http://www.w3.org/TR/2012/WD-IndexedDB-20120524/ */
-native final class IDBFactory {
+native class IDBFactory {
 
 	function open(name : string/*DOMString*/) : IDBOpenDBRequest;
 	function open(
@@ -5767,7 +5819,7 @@ native final class IDBFactory {
 } // end of IDBFactory
 
 /** @see http://www.w3.org/TR/2012/WD-IndexedDB-20120524/ */
-native final class IDBDatabase extends EventTarget {
+native class IDBDatabase extends EventTarget {
 
 	__readonly__ var name : string/*DOMString*/;
 	__readonly__ var version : number/*unsigned long long*/;
@@ -5793,7 +5845,7 @@ native final class IDBDatabase extends EventTarget {
 } // end of IDBDatabase
 
 /** @see http://www.w3.org/TR/2012/WD-IndexedDB-20120524/ */
-native final class IDBObjectStore {
+native class IDBObjectStore {
 
 	__readonly__ var name : string/*DOMString*/;
 	__readonly__ var keyPath : string/*DOMString*/;
@@ -5836,7 +5888,7 @@ native final class IDBObjectStore {
 } // end of IDBObjectStore
 
 /** @see http://www.w3.org/TR/2012/WD-IndexedDB-20120524/ */
-native final class IDBIndex {
+native class IDBIndex {
 
 	__readonly__ var name : string/*DOMString*/;
 	__readonly__ var objectStore : IDBObjectStore;
@@ -5885,7 +5937,7 @@ native final class IDBCursorWithValue extends IDBCursor {
 } // end of IDBCursorWithValue
 
 /** @see http://www.w3.org/TR/2012/WD-IndexedDB-20120524/ */
-native final class IDBTransaction extends EventTarget {
+native class IDBTransaction extends EventTarget {
 
 	__readonly__ var mode : string/*DOMString*/;
 	__readonly__ var db : IDBDatabase;
@@ -9052,6 +9104,30 @@ native final class webkitAudioContext extends AudioContext {
 }
 
 native final class webkitIntent extends Intent {
+}
+
+native final class webkitIDBCursor extends IDBCursor {
+}
+
+native final class webkitIDBDatabase extends IDBDatabase {
+}
+
+native final class webkitIDBFactory extends IDBFactory {
+}
+
+native final class webkitIDBIndex extends IDBIndex {
+}
+
+native final class webkitIDBKeyRange extends IDBKeyRange {
+}
+
+native final class webkitIDBObjectStore extends IDBObjectStore {
+}
+
+native final class webkitIDBRequest extends IDBRequest {
+}
+
+native final class webkitIDBTransaction extends IDBTransaction {
 }
 
 native final class DeviceOrientationEvent extends Event {
