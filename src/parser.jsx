@@ -124,12 +124,14 @@ class _Lexer {
 		"break",    "do",       "instanceof", "typeof",
 		"case",     "else",     "new",        "var",
 		"catch",    "finally",  "return",     "void",
-		"continue", "for",      "switch",     "while",
+		/*"continue",*/ // contextual
+		"for",      "switch",     "while",
 		"function", "this",
 		/* "default", */ // contextual keywords
 		"if",       "throw",
 		/* "assert",    "log", // contextual keywords */
-		"delete",   "in",       "try",
+		/*"delete",*/ // contextual
+		"in",       "try",
 		// keywords of JSX
 		"class",	 "extends", "super",
 		"import",    "implements",
