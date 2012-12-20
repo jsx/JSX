@@ -132,6 +132,10 @@ WebIDL::TypeMap->define(
     'MediaTrackConstraintSet' => 'Map.<variant>',
     'MediaTrackConstraint'    => 'Map.<variant>',
 
+    # http://www.w3.org/TR/2012/WD-IndexedDB-20120524/
+    'IDBVersionChangeCallback' => 'function(:IDBTransactionSync,:number):void',
+    'IDBTransactionCallback'   => 'function(:IDBTransactionSync):void',
+
     # https://wiki.mozilla.org/GamepadAPI
     'nsIVariant'  => 'variant',
     'nsIDOMEvent' => 'Event',
@@ -295,7 +299,7 @@ foreach my $src(@files) {
             my $name = $+{name};
             my $cb_type = make_function_type($+{ret_type}, $+{params});
             info "callback: $name = $cb_type";
-            define_callback($name, $cb_type);
+            WebIDL::TypeMap->alias($cb_type => $name);
         }
         else {
             my $name = $+{name};
@@ -763,11 +767,11 @@ sub to_jsx_type {
 
     my $is_aliased = ($jsx_type ne $idl_type);
 
-    if ($nullable && ! $array) {
-        $jsx_type = "Nullable.<$jsx_type>";
-    }
     if($array) {
         $jsx_type .= "[]";
+    }
+    if ($nullable && $jsx_type ne 'variant') {
+        $jsx_type = "Nullable.<$jsx_type>";
     }
 
     if($is_aliased) {
@@ -955,16 +959,5 @@ sub make_function_type {
         } parse_params($params);
 
     return "function($callback_params):" . to_jsx_type($ret_type);
-}
-
-sub define_callback {
-    my($name, $definition) = @_;
-    my $def = $classdef{$name} ||= {};
-
-    $def->{name}  = $name;
-    $def->{alias} = $definition;
-
-    info "callback: $name = $definition";
-    return;
 }
 

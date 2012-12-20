@@ -1527,7 +1527,8 @@ class _Test extends TestCase {
         var f17 : string/*DOMString*/ = o.atob(X.getstring());
         var v102 : Storage = o.sessionStorage;
         var v103 : Storage = o.localStorage;
-        var v104 : Intent = o.intent;
+        var v104 : IDBFactory = o.indexedDB;
+        var v105 : Intent = o.intent;
         var f18 : number/*long*/ = o.setTimeout(X.getfunction___void());
         var f19 : number/*long*/ = o.setTimeout(X.getfunction___void(), X.getnumber());
         o.clearTimeout(X.getnumber());
@@ -3471,7 +3472,7 @@ class _Test extends TestCase {
         var v2 : string/*DOMString*/ = o.origin;
         var v3 : string/*DOMString*/ = o.lastEventId;
         var v4 : Nullable.<Window>/*WindowProxy?*/ = o.source;
-        var v5 : MessagePort[] = o.ports;
+        var v5 : Nullable.<MessagePort[]> = o.ports;
     } // MessageEvent
 
     function compile_MessageEventInit(o : MessageEventInit) : void {
@@ -3479,7 +3480,7 @@ class _Test extends TestCase {
         var v2 : string/*DOMString*/ = o.origin;
         var v3 : string/*DOMString*/ = o.lastEventId;
         var v4 : Nullable.<Window>/*WindowProxy?*/ = o.source;
-        var v5 : MessagePort[] = o.ports;
+        var v5 : Nullable.<MessagePort[]> = o.ports;
     } // MessageEventInit
 
     function compile_MessageChannel(o : MessageChannel) : void {
@@ -3556,6 +3557,8 @@ class _Test extends TestCase {
     function compile_WorkerUtils(o : WorkerUtils) : void {
         o.importScripts(X.getstring());
         var v1 : WorkerNavigator = o.navigator;
+        var v2 : IDBFactory = o.indexedDB;
+        var v3 : IDBFactorySync = o.indexedDBSync;
     } // WorkerUtils
 
     function compile_WorkerNavigator(o : WorkerNavigator) : void {
@@ -3594,6 +3597,242 @@ class _Test extends TestCase {
     function compile_EventSourceInit(o : EventSourceInit) : void {
         var v1 : boolean = o.withCredentials;
     } // EventSourceInit
+
+    function compile_IDBKeyRange(o : IDBKeyRange) : void {
+        var v1 : variant/*any*/ = o.lower;
+        var v2 : variant/*any*/ = o.upper;
+        var v3 : boolean = o.lowerOpen;
+        var v4 : boolean = o.upperOpen;
+        var f1 : IDBKeyRange = IDBKeyRange.only(X.getvariant());
+        var f2 : IDBKeyRange = IDBKeyRange.lowerBound(X.getvariant());
+        var f3 : IDBKeyRange = IDBKeyRange.lowerBound(X.getvariant(), X.getboolean());
+        var f4 : IDBKeyRange = IDBKeyRange.upperBound(X.getvariant());
+        var f5 : IDBKeyRange = IDBKeyRange.upperBound(X.getvariant(), X.getboolean());
+        var f6 : IDBKeyRange = IDBKeyRange.bound(X.getvariant(), X.getvariant());
+        var f7 : IDBKeyRange = IDBKeyRange.bound(X.getvariant(), X.getvariant(), X.getboolean());
+        var f8 : IDBKeyRange = IDBKeyRange.bound(X.getvariant(), X.getvariant(), X.getboolean(), X.getboolean());
+    } // IDBKeyRange
+
+    function compile_IDBObjectStoreParameters(o : IDBObjectStoreParameters) : void {
+        var v1 : Nullable.<string>/*DOMString?*/ = o.keyPath;
+        var v2 : boolean = o.autoIncrement;
+    } // IDBObjectStoreParameters
+
+    function compile_IDBIndexParameters(o : IDBIndexParameters) : void {
+        var v1 : boolean = o.unique;
+        var v2 : boolean = o.multiEntry;
+    } // IDBIndexParameters
+
+    function compile_IDBVersionChangeEventInit(o : IDBVersionChangeEventInit) : void {
+        var v1 : number/*unsigned long long*/ = o.oldVersion;
+        var v2 : Nullable.<number>/*unsigned long long?*/ = o.newVersion;
+    } // IDBVersionChangeEventInit
+
+    function compile_IDBRequest(o : IDBRequest) : void {
+        var v1 : variant/*any*/ = o.result;
+        var v2 : DOMError = o.error;
+        var v3 : Object = o.source;
+        var v4 : IDBTransaction = o.transaction;
+        var v5 : string/*DOMString*/ = o.readyState;
+        var v6 : Nullable.<function(:Event):void>/*Function?*/ = o.onsuccess;
+        var v7 : Nullable.<function(:Event):void>/*Function?*/ = o.onerror;
+    } // IDBRequest
+
+    function compile_IDBOpenDBRequest(o : IDBOpenDBRequest) : void {
+        var v1 : Nullable.<function(:Event):void>/*Function?*/ = o.onblocked;
+        var v2 : Nullable.<function(:Event):void>/*Function?*/ = o.onupgradeneeded;
+    } // IDBOpenDBRequest
+
+    function compile_IDBVersionChangeEvent(o : IDBVersionChangeEvent) : void {
+        var c1 = new IDBVersionChangeEvent(X.getstring());
+        var c2 = new IDBVersionChangeEvent(X.getstring(), X.getIDBVersionChangeEventInit());
+        var v1 : number/*unsigned long long*/ = o.oldVersion;
+        var v2 : Nullable.<number>/*unsigned long long?*/ = o.newVersion;
+    } // IDBVersionChangeEvent
+
+    function compile_IDBEnvironment(o : IDBEnvironment) : void {
+        var v1 : IDBFactory = o.indexedDB;
+    } // IDBEnvironment
+
+    function compile_IDBFactory(o : IDBFactory) : void {
+        var f1 : IDBOpenDBRequest = o.open(X.getstring());
+        var f2 : IDBOpenDBRequest = o.open(X.getstring(), X.getnumber());
+        var f3 : IDBOpenDBRequest = o.deleteDatabase(X.getstring());
+        var f4 : number/*short*/ = o.cmp(X.getvariant(), X.getvariant());
+    } // IDBFactory
+
+    function compile_IDBDatabase(o : IDBDatabase) : void {
+        var v1 : string/*DOMString*/ = o.name;
+        var v2 : number/*unsigned long long*/ = o.version;
+        var v3 : DOMStringList = o.objectStoreNames;
+        var f1 : IDBObjectStore = o.createObjectStore(X.getstring());
+        var f2 : IDBObjectStore = o.createObjectStore(X.getstring(), X.getIDBObjectStoreParameters());
+        o.deleteObjectStore(X.getstring());
+        var f3 : IDBTransaction = o.transaction(X.getvariant());
+        var f4 : IDBTransaction = o.transaction(X.getvariant(), X.getstring());
+        o.close();
+        var v4 : Nullable.<function(:Event):void>/*Function?*/ = o.onabort;
+        var v5 : Nullable.<function(:Event):void>/*Function?*/ = o.onerror;
+        var v6 : Nullable.<function(:Event):void>/*Function?*/ = o.onversionchange;
+    } // IDBDatabase
+
+    function compile_IDBObjectStore(o : IDBObjectStore) : void {
+        var v1 : string/*DOMString*/ = o.name;
+        var v2 : string/*DOMString*/ = o.keyPath;
+        var v3 : DOMStringList = o.indexNames;
+        var v4 : IDBTransaction = o.transaction;
+        var f1 : IDBRequest = o.put(X.getvariant());
+        var f2 : IDBRequest = o.put(X.getvariant(), X.getvariant());
+        var f3 : IDBRequest = o.add(X.getvariant());
+        var f4 : IDBRequest = o.add(X.getvariant(), X.getvariant());
+        var f5 : IDBRequest = o.delete(X.getvariant());
+        var f6 : IDBRequest = o.get(X.getvariant());
+        var f7 : IDBRequest = o.clear();
+        var f8 : IDBRequest = o.openCursor();
+        var f9 : IDBRequest = o.openCursor(X.getvariant());
+        var f10 : IDBRequest = o.openCursor(X.getvariant(), X.getstring());
+        var f11 : IDBIndex = o.createIndex(X.getstring(), X.getvariant());
+        var f12 : IDBIndex = o.createIndex(X.getstring(), X.getvariant(), X.getIDBIndexParameters());
+        var f13 : IDBIndex = o.index(X.getstring());
+        o.deleteIndex(X.getstring());
+        var f14 : IDBRequest = o.count();
+        var f15 : IDBRequest = o.count(X.getvariant());
+    } // IDBObjectStore
+
+    function compile_IDBIndex(o : IDBIndex) : void {
+        var v1 : string/*DOMString*/ = o.name;
+        var v2 : IDBObjectStore = o.objectStore;
+        var v3 : string/*DOMString*/ = o.keyPath;
+        var v4 : boolean = o.multiEntry;
+        var v5 : boolean = o.unique;
+        var f1 : IDBRequest = o.openCursor();
+        var f2 : IDBRequest = o.openCursor(X.getvariant());
+        var f3 : IDBRequest = o.openCursor(X.getvariant(), X.getstring());
+        var f4 : IDBRequest = o.openKeyCursor();
+        var f5 : IDBRequest = o.openKeyCursor(X.getvariant());
+        var f6 : IDBRequest = o.openKeyCursor(X.getvariant(), X.getstring());
+        var f7 : IDBRequest = o.get(X.getvariant());
+        var f8 : IDBRequest = o.getKey(X.getvariant());
+        var f9 : IDBRequest = o.count();
+        var f10 : IDBRequest = o.count(X.getvariant());
+    } // IDBIndex
+
+    function compile_IDBCursor(o : IDBCursor) : void {
+        var v1 : Object = o.source;
+        var v2 : string/*DOMString*/ = o.direction;
+        var v3 : variant/*any*/ = o.key;
+        var v4 : variant/*any*/ = o.primaryKey;
+        var f1 : IDBRequest = o.update(X.getvariant());
+        o.advance(X.getnumber());
+        o.continue();
+        o.continue(X.getvariant());
+        var f2 : IDBRequest = o.delete();
+    } // IDBCursor
+
+    function compile_IDBCursorWithValue(o : IDBCursorWithValue) : void {
+        var v1 : variant/*any*/ = o.value;
+    } // IDBCursorWithValue
+
+    function compile_IDBTransaction(o : IDBTransaction) : void {
+        var v1 : string/*DOMString*/ = o.mode;
+        var v2 : IDBDatabase = o.db;
+        var v3 : DOMError = o.error;
+        var f1 : IDBObjectStore = o.objectStore(X.getstring());
+        o.abort();
+        var v4 : Nullable.<function(:Event):void>/*Function?*/ = o.onabort;
+        var v5 : Nullable.<function(:Event):void>/*Function?*/ = o.oncomplete;
+        var v6 : Nullable.<function(:Event):void>/*Function?*/ = o.onerror;
+    } // IDBTransaction
+
+    function compile_IDBEnvironmentSync(o : IDBEnvironmentSync) : void {
+        var v1 : IDBFactorySync = o.indexedDBSync;
+    } // IDBEnvironmentSync
+
+    function compile_IDBFactorySync(o : IDBFactorySync) : void {
+        var f1 : IDBDatabaseSync = o.open(X.getstring());
+        var f2 : IDBDatabaseSync = o.open(X.getstring(), X.getnumber());
+        var f3 : IDBDatabaseSync = o.open(X.getstring(), X.getnumber(), X.getfunction__IDBTransactionSync__number__void());
+        var f4 : IDBDatabaseSync = o.open(X.getstring(), X.getnumber(), X.getfunction__IDBTransactionSync__number__void(), X.getnumber());
+        o.deleteDatabase(X.getstring());
+        var f5 : number/*short*/ = o.cmp(X.getvariant(), X.getvariant());
+    } // IDBFactorySync
+
+    function compile_IDBDatabaseSync(o : IDBDatabaseSync) : void {
+        var v1 : string/*DOMString*/ = o.name;
+        var v2 : number/*unsigned long long*/ = o.version;
+        var v3 : DOMStringList = o.objectStoreNames;
+        var f1 : IDBObjectStoreSync = o.createObjectStore(X.getstring());
+        var f2 : IDBObjectStoreSync = o.createObjectStore(X.getstring(), X.getIDBObjectStoreParameters());
+        o.deleteObjectStore(X.getstring());
+        o.transaction(X.getvariant(), X.getfunction__IDBTransactionSync__void());
+        o.transaction(X.getvariant(), X.getfunction__IDBTransactionSync__void(), X.getstring());
+        o.transaction(X.getvariant(), X.getfunction__IDBTransactionSync__void(), X.getstring(), X.getnumber());
+        o.close();
+    } // IDBDatabaseSync
+
+    function compile_IDBObjectStoreSync(o : IDBObjectStoreSync) : void {
+        var v1 : string/*DOMString*/ = o.name;
+        var v2 : variant/*any*/ = o.keyPath;
+        var v3 : DOMStringList = o.indexNames;
+        var v4 : IDBTransactionSync = o.transaction;
+        var f1 : variant/*any*/ = o.put(X.getvariant());
+        var f2 : variant/*any*/ = o.put(X.getvariant(), X.getvariant());
+        var f3 : variant/*any*/ = o.add(X.getvariant());
+        var f4 : variant/*any*/ = o.add(X.getvariant(), X.getvariant());
+        var f5 : boolean = o.delete(X.getvariant());
+        var f6 : variant/*any*/ = o.get(X.getvariant());
+        o.clear();
+        var f7 : IDBIndexSync = o.createIndex(X.getstring(), X.getvariant());
+        var f8 : IDBIndexSync = o.createIndex(X.getstring(), X.getvariant(), X.getIDBIndexParameters());
+        var f9 : IDBIndexSync = o.index(X.getstring());
+        o.deleteIndex(X.getstring());
+        var f10 : IDBCursorWithValueSync = o.openCursor();
+        var f11 : IDBCursorWithValueSync = o.openCursor(X.getvariant());
+        var f12 : IDBCursorWithValueSync = o.openCursor(X.getvariant(), X.getstring());
+        var f13 : number/*unsigned long*/ = o.count();
+        var f14 : number/*unsigned long*/ = o.count(X.getvariant());
+    } // IDBObjectStoreSync
+
+    function compile_IDBIndexSync(o : IDBIndexSync) : void {
+        var v1 : string/*DOMString*/ = o.name;
+        var v2 : IDBObjectStoreSync = o.objectStore;
+        var v3 : variant/*any*/ = o.keyPath;
+        var v4 : boolean = o.multiEntry;
+        var v5 : boolean = o.unique;
+        var f1 : IDBCursorWithValueSync = o.openCursor();
+        var f2 : IDBCursorWithValueSync = o.openCursor(X.getvariant());
+        var f3 : IDBCursorWithValueSync = o.openCursor(X.getvariant(), X.getstring());
+        var f4 : IDBCursorSync = o.openKeyCursor();
+        var f5 : IDBCursorSync = o.openKeyCursor(X.getvariant());
+        var f6 : IDBCursorSync = o.openKeyCursor(X.getvariant(), X.getstring());
+        var f7 : variant/*any*/ = o.get(X.getvariant());
+        var f8 : variant/*any*/ = o.getKey(X.getvariant());
+        var f9 : number/*unsigned long*/ = o.count();
+        var f10 : number/*unsigned long*/ = o.count(X.getvariant());
+    } // IDBIndexSync
+
+    function compile_IDBCursorSync(o : IDBCursorSync) : void {
+        var v1 : Object = o.source;
+        var v2 : string/*DOMString*/ = o.direction;
+        var v3 : variant/*any*/ = o.primaryKey;
+        var f1 : IDBRequest = o.update(X.getvariant());
+        var f2 : boolean = o.advance(X.getnumber());
+        var f3 : boolean = o.continue();
+        var f4 : boolean = o.continue(X.getvariant());
+        var f5 : boolean = o.delete();
+    } // IDBCursorSync
+
+    function compile_IDBCursorWithValueSync(o : IDBCursorWithValueSync) : void {
+        var v1 : variant/*any*/ = o.value;
+    } // IDBCursorWithValueSync
+
+    function compile_IDBTransactionSync(o : IDBTransactionSync) : void {
+        var v1 : string/*DOMString*/ = o.mode;
+        var v2 : IDBDatabaseSync = o.db;
+        var v3 : DOMError = o.error;
+        var f1 : IDBObjectStoreSync = o.objectStore(X.getstring());
+        o.abort();
+    } // IDBTransactionSync
 
     function compile_Notification(o : Notification) : void {
         var c1 = new Notification(X.getstring());
@@ -3708,7 +3947,7 @@ class _Test extends TestCase {
 
     function compile_MediaTrackConstraints(o : MediaTrackConstraints) : void {
         var v1 : Nullable.<Map.<variant>>/*MediaTrackConstraintSet?*/ = o.mandatory;
-        var v2 : Map.<variant>[]/*MediaTrackConstraint[]?*/ = o.optional;
+        var v2 : Nullable.<Map.<variant>[]>/*MediaTrackConstraint[]?*/ = o.optional;
     } // MediaTrackConstraints
 
     function compile_NavigatorUserMediaError(o : NavigatorUserMediaError) : void {
@@ -4765,7 +5004,7 @@ class _Test extends TestCase {
         var v593 : number/*GLsizei*/ = o.drawingBufferHeight;
         var f1 : Nullable.<WebGLContextAttributes> = o.getContextAttributes();
         var f2 : boolean = o.isContextLost();
-        var f3 : string[]/*sequence<DOMString>?*/ = o.getSupportedExtensions();
+        var f3 : Nullable.<string[]>/*sequence<DOMString>?*/ = o.getSupportedExtensions();
         var f4 : Nullable.<Object>/*object?*/ = o.getExtension(X.getstring());
         o.activeTexture(X.getnumber());
         o.attachShader(X.getNullable__WebGLProgram_(), X.getNullable__WebGLShader_());
@@ -4826,7 +5065,7 @@ class _Test extends TestCase {
         o.generateMipmap(X.getnumber());
         var f12 : Nullable.<WebGLActiveInfo> = o.getActiveAttrib(X.getNullable__WebGLProgram_(), X.getnumber());
         var f13 : Nullable.<WebGLActiveInfo> = o.getActiveUniform(X.getNullable__WebGLProgram_(), X.getnumber());
-        var f14 : WebGLShader[] = o.getAttachedShaders(X.getNullable__WebGLProgram_());
+        var f14 : Nullable.<WebGLShader[]> = o.getAttachedShaders(X.getNullable__WebGLProgram_());
         var f15 : number/*GLint*/ = o.getAttribLocation(X.getNullable__WebGLProgram_(), X.getstring());
         var f16 : variant/*any*/ = o.getBufferParameter(X.getnumber(), X.getnumber());
         var f17 : variant/*any*/ = o.getParameter(X.getnumber());
@@ -5146,6 +5385,24 @@ native class X {
     static function getHashChangeEventInit() : HashChangeEventInit;
     static function getHistory() : History;
     static function getHitRegionOptions() : HitRegionOptions;
+    static function getIDBCursorSync() : IDBCursorSync;
+    static function getIDBCursorWithValueSync() : IDBCursorWithValueSync;
+    static function getIDBDatabase() : IDBDatabase;
+    static function getIDBDatabaseSync() : IDBDatabaseSync;
+    static function getIDBFactory() : IDBFactory;
+    static function getIDBFactorySync() : IDBFactorySync;
+    static function getIDBIndex() : IDBIndex;
+    static function getIDBIndexParameters() : IDBIndexParameters;
+    static function getIDBIndexSync() : IDBIndexSync;
+    static function getIDBKeyRange() : IDBKeyRange;
+    static function getIDBObjectStore() : IDBObjectStore;
+    static function getIDBObjectStoreParameters() : IDBObjectStoreParameters;
+    static function getIDBObjectStoreSync() : IDBObjectStoreSync;
+    static function getIDBOpenDBRequest() : IDBOpenDBRequest;
+    static function getIDBRequest() : IDBRequest;
+    static function getIDBTransaction() : IDBTransaction;
+    static function getIDBTransactionSync() : IDBTransactionSync;
+    static function getIDBVersionChangeEventInit() : IDBVersionChangeEventInit;
     static function getImageData() : ImageData;
     static function getInt16Array() : Int16Array;
     static function getInt32Array() : Int32Array;
@@ -5154,7 +5411,6 @@ native class X {
     static function getIntentParameters() : IntentParameters;
     static function getKeyboardEventInit() : KeyboardEventInit;
     static function getLocation() : Location;
-    static function getMap__variant___() : Map.<variant>[];
     static function getMediaElementAudioSourceNode() : MediaElementAudioSourceNode;
     static function getMediaList() : MediaList;
     static function getMediaQueryList() : MediaQueryList;
@@ -5203,10 +5459,12 @@ native class X {
     static function getNullable__ImageData_() : Nullable.<ImageData>;
     static function getNullable__Location_() : Nullable.<Location>;
     static function getNullable__Map__variant__() : Nullable.<Map.<variant>>;
+    static function getNullable__Map__variant____() : Nullable.<Map.<variant>[]>;
     static function getNullable__MediaController_() : Nullable.<MediaController>;
     static function getNullable__MediaError_() : Nullable.<MediaError>;
     static function getNullable__MediaStreamConstraints_() : Nullable.<MediaStreamConstraints>;
     static function getNullable__MediaStreamTrackList_() : Nullable.<MediaStreamTrackList>;
+    static function getNullable__MessagePort___() : Nullable.<MessagePort[]>;
     static function getNullable__NodeFilter_() : Nullable.<NodeFilter>;
     static function getNullable__Node_() : Nullable.<Node>;
     static function getNullable__Object_() : Nullable.<Object>;
@@ -5227,6 +5485,7 @@ native class X {
     static function getNullable__WebGLRenderbuffer_() : Nullable.<WebGLRenderbuffer>;
     static function getNullable__WebGLShaderPrecisionFormat_() : Nullable.<WebGLShaderPrecisionFormat>;
     static function getNullable__WebGLShader_() : Nullable.<WebGLShader>;
+    static function getNullable__WebGLShader___() : Nullable.<WebGLShader[]>;
     static function getNullable__WebGLTexture_() : Nullable.<WebGLTexture>;
     static function getNullable__WebGLUniformLocation_() : Nullable.<WebGLUniformLocation>;
     static function getNullable__Window_() : Nullable.<Window>;
@@ -5237,6 +5496,7 @@ native class X {
     static function getNullable__function_error_NavigatorUserMediaError__void_() : Nullable.<function(error:NavigatorUserMediaError):void>;
     static function getNullable__number_() : Nullable.<number>;
     static function getNullable__string_() : Nullable.<string>;
+    static function getNullable__string___() : Nullable.<string[]>;
     static function getObject() : Object;
     static function getOscillatorNode() : OscillatorNode;
     static function getPageTransitionEventInit() : PageTransitionEventInit;
@@ -5277,7 +5537,6 @@ native class X {
     static function getWaveShaperNode() : WaveShaperNode;
     static function getWaveTable() : WaveTable;
     static function getWebGLContextEventInit() : WebGLContextEventInit;
-    static function getWebGLShader__() : WebGLShader[];
     static function getWheelEventInit() : WheelEventInit;
     static function getWindow() : Window;
     static function getWorkerGlobalScope() : WorkerGlobalScope;
@@ -5288,6 +5547,8 @@ native class X {
     static function getXMLHttpRequestUpload() : XMLHttpRequestUpload;
     static function getboolean() : boolean;
     static function getfunction__Event__void() : function(:Event):void;
+    static function getfunction__IDBTransactionSync__number__void() : function(:IDBTransactionSync,:number):void;
+    static function getfunction__IDBTransactionSync__void() : function(:IDBTransactionSync):void;
     static function getfunction__MediaQueryList__void() : function(:MediaQueryList):void;
     static function getfunction___void() : function():void;
     static function getfunction_data_variant__void() : function(data:variant):void;

@@ -47,8 +47,6 @@ final class dom {
 
 }
 
-// alias MutationCallback = function(mutations:MutationRecord[],observer:MutationObserver):void
-
 /** @see http://www.w3.org/TR/dom/ */
 native final class DOMException {
 
@@ -2370,6 +2368,11 @@ native final __fake__ class Window extends EventTarget {
 	/** @see http://dev.w3.org/html5/webstorage/ */
 	__readonly__ var localStorage : Storage;
 
+	// implements IDBEnvironment
+
+	/** @see http://www.w3.org/TR/2012/WD-IndexedDB-20120524/ */
+	__readonly__ var indexedDB : IDBFactory;
+
 	// implements IntentProvider
 
 	/** @see http://www.w3.org/TR/2012/WD-web-intents-20120626/ */
@@ -2582,10 +2585,6 @@ native final class ClientRect {
 	__readonly__ var height : number/*float*/;
 
 } // end of ClientRect
-
-// alias EventHandlerNonNull = function(event:Event):variant/*any*/
-
-// alias OnErrorEventHandlerNonNull = function(event:variant/*(Event or DOMString)*/,source:string/*DOMString*/,lineno:number/*unsigned long*/,column:number/*unsigned long*/):variant/*any*/
 
 /** @see http://www.w3.org/TR/html5/single-page.html */
 native final class HTMLAllCollection extends HTMLCollection {
@@ -4737,12 +4736,6 @@ native class URL {
 
 } // end of URL
 
-// alias DecodeSuccessCallback = function(decodedData:AudioBuffer):void
-
-// alias DecodeErrorCallback = function():void
-
-// alias OfflineRenderSuccessCallback = function(renderedData:AudioBuffer):void
-
 /** @see http://www.w3.org/TR/2012/WD-webaudio-20121213/ */
 native class AudioContext {
 
@@ -5267,10 +5260,6 @@ native final class CloseEventInit extends EventInit {
 
 } // end of CloseEventInit
 
-// alias PositionCallback = function(position:Position):void
-
-// alias PositionErrorCallback = function(positionError:PositionError):void
-
 /** @see http://dev.w3.org/geo/api/spec-source.html */
 native __fake__ class NavigatorGeolocation {
 
@@ -5433,7 +5422,7 @@ native final class MessageEvent extends Event {
 	__readonly__ var origin : string/*DOMString*/;
 	__readonly__ var lastEventId : string/*DOMString*/;
 	__readonly__ var source : Nullable.<Window>/*WindowProxy?*/;
-	__readonly__ var ports : MessagePort[];
+	__readonly__ var ports : Nullable.<MessagePort[]>;
 
 } // end of MessageEvent
 
@@ -5444,7 +5433,7 @@ native final class MessageEventInit extends EventInit {
 	var origin : string/*DOMString*/;
 	var lastEventId : string/*DOMString*/;
 	var source : Nullable.<Window>/*WindowProxy?*/;
-	var ports : MessagePort[];
+	var ports : Nullable.<MessagePort[]>;
 
 } // end of MessageEventInit
 
@@ -5586,6 +5575,16 @@ native __fake__ class WorkerUtils extends WindowBase64 {
 	function importScripts(...urls : string/*DOMString...*/) : void;
 	__readonly__ var navigator : WorkerNavigator;
 
+	// implements IDBEnvironment
+
+	/** @see http://www.w3.org/TR/2012/WD-IndexedDB-20120524/ */
+	__readonly__ var indexedDB : IDBFactory;
+
+	// implements IDBEnvironmentSync
+
+	/** @see http://www.w3.org/TR/2012/WD-IndexedDB-20120524/ */
+	__readonly__ var indexedDBSync : IDBFactorySync;
+
 } // end of WorkerUtils
 
 /** @see http://www.w3.org/TR/workers/ */
@@ -5647,7 +5646,438 @@ native final class EventSourceInit {
 
 } // end of EventSourceInit
 
-// alias NotificationPermissionCallback = function(permission:string/*NotificationPermission*/):void
+/** @see http://www.w3.org/TR/2012/WD-IndexedDB-20120524/ */
+native final class IDBKeyRange {
+
+	__readonly__ var lower : variant/*any*/;
+	__readonly__ var upper : variant/*any*/;
+	__readonly__ var lowerOpen : boolean;
+	__readonly__ var upperOpen : boolean;
+	static function only(value : variant/*any*/) : IDBKeyRange;
+	static function lowerBound(lower : variant/*any*/) : IDBKeyRange;
+	static function lowerBound(
+		lower : variant/*any*/,
+		open : boolean
+	) : IDBKeyRange;
+	static function upperBound(upper : variant/*any*/) : IDBKeyRange;
+	static function upperBound(
+		upper : variant/*any*/,
+		open : boolean
+	) : IDBKeyRange;
+	static function bound(
+		lower : variant/*any*/,
+		upper : variant/*any*/
+	) : IDBKeyRange;
+	static function bound(
+		lower : variant/*any*/,
+		upper : variant/*any*/,
+		lowerOpen : boolean
+	) : IDBKeyRange;
+	static function bound(
+		lower : variant/*any*/,
+		upper : variant/*any*/,
+		lowerOpen : boolean,
+		upperOpen : boolean
+	) : IDBKeyRange;
+
+} // end of IDBKeyRange
+
+/** @see http://www.w3.org/TR/2012/WD-IndexedDB-20120524/ */
+native final class IDBObjectStoreParameters {
+
+	var keyPath : Nullable.<string>/*DOMString?*/;
+	var autoIncrement : boolean;
+
+} // end of IDBObjectStoreParameters
+
+/** @see http://www.w3.org/TR/2012/WD-IndexedDB-20120524/ */
+native final class IDBIndexParameters {
+
+	var unique : boolean;
+	var multiEntry : boolean;
+
+} // end of IDBIndexParameters
+
+/** @see http://www.w3.org/TR/2012/WD-IndexedDB-20120524/ */
+native final class IDBVersionChangeEventInit extends EventInit {
+
+	var oldVersion : number/*unsigned long long*/;
+	var newVersion : Nullable.<number>/*unsigned long long?*/;
+
+} // end of IDBVersionChangeEventInit
+
+/** @see http://www.w3.org/TR/2012/WD-IndexedDB-20120524/ */
+native class IDBRequest extends EventTarget {
+
+	__readonly__ var result : variant/*any*/;
+	__readonly__ var error : DOMError;
+	__readonly__ var source : Object;
+	__readonly__ var transaction : IDBTransaction;
+	__readonly__ var readyState : string/*DOMString*/;
+	var onsuccess : Nullable.<function(:Event):void>/*Function?*/;
+	var onerror : Nullable.<function(:Event):void>/*Function?*/;
+
+} // end of IDBRequest
+
+/** @see http://www.w3.org/TR/2012/WD-IndexedDB-20120524/ */
+native final class IDBOpenDBRequest extends IDBRequest {
+
+	var onblocked : Nullable.<function(:Event):void>/*Function?*/;
+	var onupgradeneeded : Nullable.<function(:Event):void>/*Function?*/;
+
+} // end of IDBOpenDBRequest
+
+/** @see http://www.w3.org/TR/2012/WD-IndexedDB-20120524/ */
+native final class IDBVersionChangeEvent extends Event {
+
+	function constructor(type : string/*DOMString*/);
+	function constructor(
+		type : string/*DOMString*/,
+		eventInitDict : IDBVersionChangeEventInit
+	);
+
+	__readonly__ var oldVersion : number/*unsigned long long*/;
+	__readonly__ var newVersion : Nullable.<number>/*unsigned long long?*/;
+
+} // end of IDBVersionChangeEvent
+
+/** @see http://www.w3.org/TR/2012/WD-IndexedDB-20120524/ */
+native __fake__ class IDBEnvironment {
+
+	__readonly__ var indexedDB : IDBFactory;
+
+} // end of IDBEnvironment
+
+/** @see http://www.w3.org/TR/2012/WD-IndexedDB-20120524/ */
+native final class IDBFactory {
+
+	function open(name : string/*DOMString*/) : IDBOpenDBRequest;
+	function open(
+		name : string/*DOMString*/,
+		version : number/*unsigned long long*/
+	) : IDBOpenDBRequest;
+	function deleteDatabase(
+		name : string/*DOMString*/
+	) : IDBOpenDBRequest;
+	function cmp(
+		first : variant/*any*/,
+		second : variant/*any*/
+	) : number/*short*/;
+
+} // end of IDBFactory
+
+/** @see http://www.w3.org/TR/2012/WD-IndexedDB-20120524/ */
+native final class IDBDatabase extends EventTarget {
+
+	__readonly__ var name : string/*DOMString*/;
+	__readonly__ var version : number/*unsigned long long*/;
+	__readonly__ var objectStoreNames : DOMStringList;
+	function createObjectStore(
+		name : string/*DOMString*/
+	) : IDBObjectStore;
+	function createObjectStore(
+		name : string/*DOMString*/,
+		optionalParameters : IDBObjectStoreParameters
+	) : IDBObjectStore;
+	function deleteObjectStore(name : string/*DOMString*/) : void;
+	function transaction(storeNames : variant/*any*/) : IDBTransaction;
+	function transaction(
+		storeNames : variant/*any*/,
+		mode : string/*DOMString*/
+	) : IDBTransaction;
+	function close() : void;
+	var onabort : Nullable.<function(:Event):void>/*Function?*/;
+	var onerror : Nullable.<function(:Event):void>/*Function?*/;
+	var onversionchange : Nullable.<function(:Event):void>/*Function?*/;
+
+} // end of IDBDatabase
+
+/** @see http://www.w3.org/TR/2012/WD-IndexedDB-20120524/ */
+native final class IDBObjectStore {
+
+	__readonly__ var name : string/*DOMString*/;
+	__readonly__ var keyPath : string/*DOMString*/;
+	__readonly__ var indexNames : DOMStringList;
+	__readonly__ var transaction : IDBTransaction;
+
+	function put(value : variant/*any*/) : IDBRequest;
+	function put(
+		value : variant/*any*/,
+		key : variant/*any*/
+	) : IDBRequest;
+	function add(value : variant/*any*/) : IDBRequest;
+	function add(
+		value : variant/*any*/,
+		key : variant/*any*/
+	) : IDBRequest;
+	function delete(key : variant/*any*/) : IDBRequest;
+	function get(key : variant/*any*/) : IDBRequest;
+	function clear() : IDBRequest;
+	function openCursor() : IDBRequest;
+	function openCursor(range : variant/*any?*/) : IDBRequest;
+	function openCursor(
+		range : variant/*any?*/,
+		direction : string/*DOMString*/
+	) : IDBRequest;
+	function createIndex(
+		name : string/*DOMString*/,
+		keyPath : variant/*any*/
+	) : IDBIndex;
+	function createIndex(
+		name : string/*DOMString*/,
+		keyPath : variant/*any*/,
+		optionalParameters : IDBIndexParameters
+	) : IDBIndex;
+	function index(name : string/*DOMString*/) : IDBIndex;
+	function deleteIndex(indexName : string/*DOMString*/) : void;
+	function count() : IDBRequest;
+	function count(key : variant/*any*/) : IDBRequest;
+
+} // end of IDBObjectStore
+
+/** @see http://www.w3.org/TR/2012/WD-IndexedDB-20120524/ */
+native final class IDBIndex {
+
+	__readonly__ var name : string/*DOMString*/;
+	__readonly__ var objectStore : IDBObjectStore;
+	__readonly__ var keyPath : string/*DOMString*/;
+	__readonly__ var multiEntry : boolean;
+	__readonly__ var unique : boolean;
+	function openCursor() : IDBRequest;
+	function openCursor(range : variant/*any?*/) : IDBRequest;
+	function openCursor(
+		range : variant/*any?*/,
+		direction : string/*DOMString*/
+	) : IDBRequest;
+	function openKeyCursor() : IDBRequest;
+	function openKeyCursor(range : variant/*any?*/) : IDBRequest;
+	function openKeyCursor(
+		range : variant/*any?*/,
+		direction : string/*DOMString*/
+	) : IDBRequest;
+	function get(key : variant/*any*/) : IDBRequest;
+	function getKey(key : variant/*any*/) : IDBRequest;
+	function count() : IDBRequest;
+	function count(key : variant/*any*/) : IDBRequest;
+
+} // end of IDBIndex
+
+/** @see http://www.w3.org/TR/2012/WD-IndexedDB-20120524/ */
+native class IDBCursor {
+
+	__readonly__ var source : Object;
+	__readonly__ var direction : string/*DOMString*/;
+	__readonly__ var key : variant/*any*/;
+	__readonly__ var primaryKey : variant/*any*/;
+	function update(value : variant/*any*/) : IDBRequest;
+	function advance(count : number/*unsigned long*/) : void;
+	function continue() : void;
+	function continue(key : variant/*any*/) : void;
+	function delete() : IDBRequest;
+
+} // end of IDBCursor
+
+/** @see http://www.w3.org/TR/2012/WD-IndexedDB-20120524/ */
+native final class IDBCursorWithValue extends IDBCursor {
+
+	__readonly__ var value : variant/*any*/;
+
+} // end of IDBCursorWithValue
+
+/** @see http://www.w3.org/TR/2012/WD-IndexedDB-20120524/ */
+native final class IDBTransaction extends EventTarget {
+
+	__readonly__ var mode : string/*DOMString*/;
+	__readonly__ var db : IDBDatabase;
+	__readonly__ var error : DOMError;
+	function objectStore(name : string/*DOMString*/) : IDBObjectStore;
+	function abort() : void;
+	var onabort : Nullable.<function(:Event):void>/*Function?*/;
+	var oncomplete : Nullable.<function(:Event):void>/*Function?*/;
+	var onerror : Nullable.<function(:Event):void>/*Function?*/;
+
+} // end of IDBTransaction
+
+/** @see http://www.w3.org/TR/2012/WD-IndexedDB-20120524/ */
+native __fake__ class IDBEnvironmentSync {
+
+	__readonly__ var indexedDBSync : IDBFactorySync;
+
+} // end of IDBEnvironmentSync
+
+/** @see http://www.w3.org/TR/2012/WD-IndexedDB-20120524/ */
+native final class IDBFactorySync {
+
+	function open(name : string/*DOMString*/) : IDBDatabaseSync;
+	function open(
+		name : string/*DOMString*/,
+		version : number/*unsigned long long*/
+	) : IDBDatabaseSync;
+	function open(
+		name : string/*DOMString*/,
+		version : number/*unsigned long long*/,
+		upgradeCallback : function(:IDBTransactionSync,
+		:number):void/*IDBVersionChangeCallback*/
+	) : IDBDatabaseSync;
+	function open(
+		name : string/*DOMString*/,
+		version : number/*unsigned long long*/,
+		upgradeCallback : function(:IDBTransactionSync,
+		:number):void/*IDBVersionChangeCallback*/,
+		timeout : number/*unsigned long*/
+	) : IDBDatabaseSync;
+	function deleteDatabase(name : string/*DOMString*/) : void;
+	function cmp(
+		first : variant/*any*/,
+		second : variant/*any*/
+	) : number/*short*/;
+
+} // end of IDBFactorySync
+
+/** @see http://www.w3.org/TR/2012/WD-IndexedDB-20120524/ */
+native final class IDBDatabaseSync {
+
+	__readonly__ var name : string/*DOMString*/;
+	__readonly__ var version : number/*unsigned long long*/;
+	__readonly__ var objectStoreNames : DOMStringList;
+	function createObjectStore(
+		name : string/*DOMString*/
+	) : IDBObjectStoreSync;
+	function createObjectStore(
+		name : string/*DOMString*/,
+		optionalParameters : IDBObjectStoreParameters
+	) : IDBObjectStoreSync;
+	function deleteObjectStore(name : string/*DOMString*/) : void;
+	function transaction(
+		storeNames : variant/*any*/,
+		callback : function(:IDBTransactionSync):void/*IDBTransactionCallback*/
+	) : void;
+	function transaction(
+		storeNames : variant/*any*/,
+		callback : function(:IDBTransactionSync):void/*IDBTransactionCallback*/,
+		mode : string/*DOMString*/
+	) : void;
+	function transaction(
+		storeNames : variant/*any*/,
+		callback : function(:IDBTransactionSync):void/*IDBTransactionCallback*/,
+		mode : string/*DOMString*/,
+		timeout : number/*unsigned long*/
+	) : void;
+	function close() : void;
+
+} // end of IDBDatabaseSync
+
+// alias IDBTransactionCallback = function(transaction:IDBTransactionSync):void
+
+// alias IDBVersionChangeCallback = function(transaction:IDBTransactionSync,oldVersion:number/*unsigned long long*/):void
+
+/** @see http://www.w3.org/TR/2012/WD-IndexedDB-20120524/ */
+native final class IDBObjectStoreSync {
+
+	__readonly__ var name : string/*DOMString*/;
+	__readonly__ var keyPath : variant/*any*/;
+	__readonly__ var indexNames : DOMStringList;
+	__readonly__ var transaction : IDBTransactionSync;
+
+	function put(value : variant/*any*/) : variant/*any*/;
+	function put(
+		value : variant/*any*/,
+		key : variant/*any*/
+	) : variant/*any*/;
+	function add(value : variant/*any*/) : variant/*any*/;
+	function add(
+		value : variant/*any*/,
+		key : variant/*any*/
+	) : variant/*any*/;
+	function delete(key : variant/*any*/) : boolean;
+	function get(key : variant/*any*/) : variant/*any*/;
+	function clear() : void;
+	function createIndex(
+		name : string/*DOMString*/,
+		keyPath : variant/*any*/
+	) : IDBIndexSync;
+	function createIndex(
+		name : string/*DOMString*/,
+		keyPath : variant/*any*/,
+		optionalParameters : IDBIndexParameters
+	) : IDBIndexSync;
+	function index(name : string/*DOMString*/) : IDBIndexSync;
+	function deleteIndex(indexName : string/*DOMString*/) : void;
+	function openCursor() : IDBCursorWithValueSync;
+	function openCursor(
+		range : variant/*any?*/
+	) : IDBCursorWithValueSync;
+	function openCursor(
+		range : variant/*any?*/,
+		direction : string/*DOMString*/
+	) : IDBCursorWithValueSync;
+	function count() : number/*unsigned long*/;
+	function count(key : variant/*any*/) : number/*unsigned long*/;
+
+} // end of IDBObjectStoreSync
+
+/** @see http://www.w3.org/TR/2012/WD-IndexedDB-20120524/ */
+native final class IDBIndexSync {
+
+	__readonly__ var name : string/*DOMString*/;
+	__readonly__ var objectStore : IDBObjectStoreSync;
+	__readonly__ var keyPath : variant/*any*/;
+	__readonly__ var multiEntry : boolean;
+	__readonly__ var unique : boolean;
+	function openCursor() : IDBCursorWithValueSync;
+	function openCursor(
+		range : variant/*any?*/
+	) : IDBCursorWithValueSync;
+	function openCursor(
+		range : variant/*any?*/,
+		direction : string/*DOMString*/
+	) : IDBCursorWithValueSync;
+	function openKeyCursor() : IDBCursorSync;
+	function openKeyCursor(range : variant/*any?*/) : IDBCursorSync;
+	function openKeyCursor(
+		range : variant/*any?*/,
+		direction : string/*DOMString*/
+	) : IDBCursorSync;
+	function get(key : variant/*any*/) : variant/*any*/;
+	function getKey(key : variant/*any*/) : variant/*any*/;
+	function count() : number/*unsigned long*/;
+	function count(key : variant/*any*/) : number/*unsigned long*/;
+
+} // end of IDBIndexSync
+
+/** @see http://www.w3.org/TR/2012/WD-IndexedDB-20120524/ */
+native class IDBCursorSync {
+
+	__readonly__ var source : Object;
+	__readonly__ var direction : string/*DOMString*/;
+	__readonly__ var primaryKey : variant/*any*/;
+	function update(value : variant/*any*/) : IDBRequest;
+	function advance(count : number/*unsigned long*/) : boolean;
+	function continue() : boolean;
+	function continue(key : variant/*any*/) : boolean;
+	function delete() : boolean;
+
+} // end of IDBCursorSync
+
+/** @see http://www.w3.org/TR/2012/WD-IndexedDB-20120524/ */
+native final class IDBCursorWithValueSync extends IDBCursorSync {
+
+	var value : variant/*any*/;
+
+} // end of IDBCursorWithValueSync
+
+/** @see http://www.w3.org/TR/2012/WD-IndexedDB-20120524/ */
+native final class IDBTransactionSync {
+
+	__readonly__ var mode : string/*DOMString*/;
+	var db : IDBDatabaseSync;
+	__readonly__ var error : DOMError;
+	function objectStore(
+		name : string/*DOMString*/
+	) : IDBObjectStoreSync;
+	function abort() : void;
+
+} // end of IDBTransactionSync
 
 /** @see http://www.w3.org/TR/2012/WD-notifications-20120614/ */
 native final class Notification extends EventTarget {
@@ -5680,10 +6110,6 @@ native final class NotificationOptions {
 	var iconUrl : string/*DOMString*/;
 
 } // end of NotificationOptions
-
-// alias IntentSuccessCallback = function(data:variant/*any*/,ports:MessagePort[]):void
-
-// alias IntentFailureCallback = function(data:variant/*any*/):void
 
 /** @see http://www.w3.org/TR/2012/WD-web-intents-20120626/ */
 native final class IntentParameters {
@@ -5768,10 +6194,6 @@ native final class HTMLIntentElement extends HTMLElement {
 
 } // end of HTMLIntentElement
 
-// alias NavigatorUserMediaSuccessCallback = function(stream:LocalMediaStream):void
-
-// alias NavigatorUserMediaErrorCallback = function(error:NavigatorUserMediaError):void
-
 /** @see http://www.w3.org/TR/mediacapture-streams/ */
 native class MediaStream extends EventTarget {
 
@@ -5853,7 +6275,7 @@ native final class MediaStreamConstraints {
 native final class MediaTrackConstraints {
 
 	var mandatory : Nullable.<Map.<variant>>/*MediaTrackConstraintSet?*/;
-	var optional : Map.<variant>[]/*MediaTrackConstraint[]?*/;
+	var optional : Nullable.<Map.<variant>[]>/*MediaTrackConstraint[]?*/;
 
 } // end of MediaTrackConstraints
 
@@ -7813,7 +8235,7 @@ native final class WebGLRenderingContext {
 	__readonly__ var drawingBufferHeight : number/*GLsizei*/;
 	function getContextAttributes() : Nullable.<WebGLContextAttributes>;
 	function isContextLost() : boolean;
-	function getSupportedExtensions() : string[]/*sequence<DOMString>?*/;
+	function getSupportedExtensions() : Nullable.<string[]>/*sequence<DOMString>?*/;
 	function getExtension(
 		name : string/*DOMString*/
 	) : Nullable.<Object>/*object?*/;
@@ -8018,7 +8440,7 @@ native final class WebGLRenderingContext {
 	) : Nullable.<WebGLActiveInfo>;
 	function getAttachedShaders(
 		program : Nullable.<WebGLProgram>
-	) : WebGLShader[];
+	) : Nullable.<WebGLShader[]>;
 	function getAttribLocation(
 		program : Nullable.<WebGLProgram>,
 		name : string/*DOMString*/
@@ -8604,10 +9026,6 @@ native final class nsIDOMGamepadAxisMoveEvent extends Event/*nsIDOMEvent*/ {
 	__readonly__ var gamepad : nsIDOMGamepad;
 
 } // end of nsIDOMGamepadAxisMoveEvent
-
-// alias TimerHandler = function():void
-
-// alias FrameRequestCallback = function(time:number/*DOMTimeStamp*/):void
 
 native __fake__ class WindowAnimationTiming {
 
