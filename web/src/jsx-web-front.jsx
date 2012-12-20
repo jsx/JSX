@@ -3,7 +3,7 @@
 import "js.jsx";
 import "console.jsx";
 import "js/web.jsx";
-import "../browser-platform.jsx";
+import "./browser-platform.jsx";
 import "../../src/compiler.jsx";
 import "../../src/optimizer.jsx";
 import "../../src/jsemitter.jsx";
