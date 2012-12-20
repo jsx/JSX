@@ -1,5 +1,5 @@
 /***
-  The Front-End of bin/jsx
+  The Front-End of bin/jsx for NodeJS
  */
 
 /*
