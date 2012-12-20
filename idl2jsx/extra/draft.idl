@@ -33,6 +33,38 @@ interface webkitAudioContext : AudioContext {
 interface webkitIntent : Intent {
 };
 
+// http://www.w3.org/TR/IndexedDB/
+interface webkitIDBCursor : IDBCursor { };
+interface webkitIDBDatabase : IDBDatabase { };
+interface webkitIDBFactory : IDBFactory { };
+interface webkitIDBIndex : IDBIndex { };
+interface webkitIDBKeyRange : IDBKeyRange { };
+interface webkitIDBObjectStore: IDBObjectStore { };
+interface webkitIDBRequest: IDBRequest { };
+interface webkitIDBTransaction: IDBTransaction { };
+
+// http://www.w3.org/TR/webaudio/#deprecation-section
+partial interface AudioBufferSourceNode {
+    // deprecated
+    void noteOn(double when, optional double offset, optional double duration);
+    // deprecated
+    void noteOff(double when);
+};
+partial interface AudioContext {
+    // deprecated
+    void createGainNode();
+    // deprecated
+    void createDelayNode();
+    // deprecated
+    void createJavaScriptNode();
+};
+partial interface OscillatorNode {
+    // deprecated
+    void noteOn(double when);
+    // deprecated
+    void noteOff(double when);
+};
+
 // http://dev.w3.org/geo/api/spec-source-orientation.html
 // invalid WebIDL (missing semicolon at the end of interfaces)
 
