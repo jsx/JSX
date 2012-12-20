@@ -115,7 +115,7 @@ sub process_page {
 
 sub process_webfront {
     my $cmd = "$project_root/bin/jsx --output $root/assets/js/jsx-web-front.js "
-	. "$root/assets/js/jsx-web-front.jsx";
+        . "$root/src/jsx-web-front.jsx";
     system($cmd) == 0 or die "Failed to build jsx-web-front.js: $cmd\n";
 }
 
@@ -247,3 +247,4 @@ sub copy_r {
     }, $src;
 
 }
+# vim: set expandtab:

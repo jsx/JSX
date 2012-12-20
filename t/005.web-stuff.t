@@ -15,25 +15,26 @@ if (! @files) {
             push @files, $_;
         },
         no_chdir => 1,
-    }, 'web/example';
+    }, 'web';
 }
+
 plan tests => 3 * scalar @files;
 
 for my $file(@files) {
     {
-        my $cmd = qq{bin/jsx "$file"};
+        my $cmd = qq{$jsx "$file"};
         `$cmd`; # ensure it compiles
 
         is $?, 0, $cmd;
     }
     {
-        my $cmd = qq{bin/jsx --mode parse "$file"};
+        my $cmd = qq{$jsx --mode parse "$file"};
         `$cmd`; # ensure it compiles
 
         is $?, 0, $cmd;
     }
     {
-        my $cmd = qq{bin/jsx --release "$file"};
+        my $cmd = qq{$jsx --release "$file"};
         `$cmd`; # ensure it compiles
 
         is $?, 0, $cmd;

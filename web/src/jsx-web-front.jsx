@@ -3,11 +3,11 @@
 import "js.jsx";
 import "console.jsx";
 import "js/web.jsx";
-import "../../src/browser-platform.jsx";
-import "../../../src/compiler.jsx";
-import "../../../src/optimizer.jsx";
-import "../../../src/jsemitter.jsx";
-import "../../../src/completion.jsx";
+import "../browser-platform.jsx";
+import "../../src/compiler.jsx";
+import "../../src/optimizer.jsx";
+import "../../src/jsemitter.jsx";
+import "../../src/completion.jsx";
 
 native __fake__ class Cursor {
 	var line : number;
@@ -51,7 +51,7 @@ class JsxWebFront {
 				}
 				return 0;
 			}
-			
+
 			function jsxComplete(cm : CodeMirror) : void {
 				CodeMirror.simpleHint(cm, function (editor) {
 					var cur = editor.getCursor();
@@ -165,7 +165,7 @@ class JsxWebFront {
 
 				if (success) {
 					output.setOption("mode", "javascript");
-					
+
 					if (options['mode'] == 'parse') {
 						output.setValue(c.getAST() as string);
 						return;
