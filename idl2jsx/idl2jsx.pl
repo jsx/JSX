@@ -1,17 +1,23 @@
 #!/usr/bin/env perl
-use 5.10.0;
+use 5.12.0;
 use strict;
 #use warnings FATAL => 'all';
 use warnings;
 use Fatal qw(open);
+
+use File::Basename qw(dirname);
+use lib dirname(__FILE__) . "/lib";
+
 use Tie::IxHash;
 use Data::Dumper;
-use File::Basename qw(dirname);
 use Storable qw(lock_retrieve lock_store);
 use LWP::UserAgent;
 use URI::Escape qw(uri_escape);
 use Time::HiRes ();
 use Getopt::Long;
+
+use WebIDL::Type;
+use WebIDL::TypeMap;
 
 use constant WIDTH => 68;
 
@@ -69,11 +75,11 @@ my %has_definition;
 # To allow null, a nullable DOMString, written as DOMString? in IDL,
 # needs to be used."
 
-my %typemap = (
-    'DOMObject'    => 'Object',
-    'DOMUserData'  => 'variant',
-    'DOMString'    => 'string',
-    'DOMTimeStamp' => 'number',
+WebIDL::TypeMap->define(
+    'DOMObject'      => 'Object',
+    'DOMUserData'    => 'variant',
+    'DOMString'      => 'string',
+    'DOMTimeStamp'   => 'number',
 
     'octet'          => 'number',
     'byte'           => 'number',
@@ -99,40 +105,38 @@ my %typemap = (
     'ByteString' => 'string', # used in the XMLHttpRequest specification
 
     'WindowProxy' => 'Window',
+
+    # legacy callbacks / event listeners
+    'Function' => 'function(:Event):void',
+
+    # legacy EventListener defined as a class
+    'EventListener' => 'function(:Event):void',
+
+    # http://dev.w3.org/html5/spec/webappapis.html#eventhandler
+    'EventHandlerNonNull'        => 'function(:Event):void',
+    'EventHandler'               => 'Nullable.<function(:Event):void>',
+    'OnErrorEventHandlerNonNull' => 'function(:Event):void',
+    'OnErrorEventHandler'        => 'Nullable.<function(:Event):void>',
+
+    # for DataTransferItem
+    'FunctionStringCallback' => 'function(:string):void',
+
+    # for MediaQueryList
+    'MediaQueryListListener' => 'function(:MediaQueryList):void',
+
+    # http://www.w3.org/TR/file-system-api/
+    'FileCallback' => 'function(:File):void',
+
+    # http://www.w3.org/TR/2012/WD-mediacapture-streams-20120628/#dictionary-mediatrackconstraints-members
+    # http://datatracker.ietf.org/doc/draft-burnett-rtcweb-constraints-registry/
+    'MediaTrackConstraintSet' => 'Map.<variant>',
+    'MediaTrackConstraint'    => 'Map.<variant>',
+
+    # https://wiki.mozilla.org/GamepadAPI
+    'nsIVariant'  => 'variant',
+    'nsIDOMEvent' => 'Event',
+    'nsISupports' => 'Object',
 );
-
-# callbacks / event listeners
-
-define_alias('Function' => 'function(:Event):void');
-
-# EventListener is written in legacy IDL
-define_alias('EventListener' => 'function(:Event):void');
-
-# http://dev.w3.org/html5/spec/webappapis.html#eventhandler
-define_alias('EventHandlerNonNull'        => 'function(:Event):void');
-define_alias('EventHandler'               => 'Nullable.<function(:Event):void>');
-define_alias('OnErrorEventHandlerNonNull' => 'function(:Event):void');
-define_alias('OnErrorEventHandler'        => 'Nullable.<function(:Event):void>');
-
-# TODO: type resolution process
-
-# for DataTransferItem
-define_alias('FunctionStringCallback' => 'function(:string):void');
-# for MediaQueryList
-define_alias('MediaQueryListListener' => 'function(:MediaQueryList):void');
-
-# http://www.w3.org/TR/file-system-api/
-define_alias('FileCallback' => 'function(:File):void');
-
-# http://www.w3.org/TR/2012/WD-mediacapture-streams-20120628/#dictionary-mediatrackconstraints-members
-# http://datatracker.ietf.org/doc/draft-burnett-rtcweb-constraints-registry/
-define_alias('MediaTrackConstraintSet' => 'Map.<variant>');
-define_alias('MediaTrackConstraint'    => 'Map.<variant>');
-
-# https://wiki.mozilla.org/GamepadAPI
-define_alias('nsIVariant'  => 'variant');
-define_alias('nsIDOMEvent' => 'Event');
-define_alias('nsISupports' => 'Object');
 
 sub info {
     state $count = 0;
@@ -211,7 +215,10 @@ foreach my $src(@files) {
     # XXX: looks a bug in http://www.w3.org/TR/html5/single-page.html
     my $Document_is_HTMLDocument = ($file =~ m{ /html5/single-page.html }xms);
 
-    local $typemap{Document} = "HTMLDocument" if $Document_is_HTMLDocument;
+    my $guard;
+    if ($Document_is_HTMLDocument) {
+        $guard = WebIDL::TypeMap->alias_temp("HTMLDocument" => "Document");
+    }
 
     my $content;
     {
@@ -280,18 +287,20 @@ foreach my $src(@files) {
 
         if ($+{typedef}) {
             my $new      = $+{new_type};
-            my $existing = to_jsx_type($+{existing_type});
-            $existing  =~ s/$rx_comments//xms;
-            define_alias($new => $existing);
+            my $existing = $+{existing_type};
+            info "typedef: $new = $existing";
+            WebIDL::TypeMap->alias($existing => $new);
         }
         elsif($+{callback}) {
             my $name = $+{name};
             my $cb_type = make_function_type($+{ret_type}, $+{params});
-            define_callback($name => $cb_type);
+            info "callback: $name = $cb_type";
+            define_callback($name, $cb_type);
         }
         else {
             my $name = $+{name};
-            define_alias($name => 'string');
+            info "enum: $name = DOMString";
+            WebIDL::TypeMap->alias('DOMString' => $name);
         }
     }
 
@@ -549,12 +558,13 @@ foreach my $src(@files) {
 
     info 'process <implements>';
     {
-        my $classes = join "|", keys %classdef;
+        my $classes = join "|", map { quotemeta } keys %classdef;
+
         while($content =~ m{
             ^ \s* (?<class> $classes)
-            \s+ implements
-            \s+ (?<interface> $classes)
-            \s* ;
+              \s+ implements
+              \s+ (?<interface> $classes)
+              \s* ;
             }xmsg) {
             my $def       = $classdef{$+{class}};
             my $interface = $classdef{$+{interface}};
@@ -736,27 +746,35 @@ sub to_jsx_type {
     $nullable ||= $+{nullable};
     $array //= $+{array};
 
-    my $alias = $typemap{$idl_type};
+    my $alias = WebIDL::TypeMap->get($idl_type);
     if(!$alias && exists $classdef{$idl_type}) {
         # callback definition is regarded as aliased type
         if(my $t = $classdef{$idl_type}{alias}) {
-            $alias = $t;
+            $alias = WebIDL::TypeMap->get_or_create($t);
         }
     }
 
-    my $type = $alias || $idl_type;
+    my $type = $alias || WebIDL::TypeMap->get_or_create($idl_type);
+    my $jsx_type = $type->resolved_name;
+
+    if (!$jsx_type) {
+        $jsx_type = $type->resolved_name($type->name);
+    }
+
+    my $is_aliased = ($jsx_type ne $idl_type);
+
     if ($nullable && ! $array) {
-        $type = "Nullable.<$type>";
+        $jsx_type = "Nullable.<$jsx_type>";
     }
     if($array) {
-        $type .= "[]";
+        $jsx_type .= "[]";
     }
 
-    if($alias) {
-        $type .= "/*$original*/";
+    if($is_aliased) {
+        $jsx_type .= "/*$original*/";
     }
 
-    return $type;
+    return $jsx_type;
 }
 
 sub make_functions {
@@ -937,14 +955,6 @@ sub make_function_type {
         } parse_params($params);
 
     return "function($callback_params):" . to_jsx_type($ret_type);
-}
-
-sub define_alias {
-    my($name, $definition) = @_;
-    $typemap{$name} = $definition;
-
-    info "typedef: $name = $definition";
-    return;
 }
 
 sub define_callback {
