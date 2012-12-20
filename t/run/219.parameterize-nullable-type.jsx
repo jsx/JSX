@@ -15,8 +15,8 @@ class _Main {
   static function main(args : string[]) : void {
     P.<variant>.f(null);
     P.<variant[]>.f(null);
-    P.<Nullable.<variant>>.f(null);
-    P.<Nullable.<variant[]>>.f(null);
+    P.<Object>.f(null);
+    P.<Object[]>.f(null);
   }
 }
 
