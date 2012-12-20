@@ -1,16 +1,16 @@
 /*
  * Copyright (c) 2012 DeNA Co., Ltd.
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to
  * deal in the Software without restriction, including without limitation the
  * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
  * sell copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -62,7 +62,7 @@ class _Util {
 }
 
 interface Block {
-	
+
 }
 
 class BlockContext {
@@ -320,7 +320,7 @@ class ClassDefinition implements Stashable {
 	static const GET_MEMBER_MODE_FUNCTION_WITH_BODY = 3; // looks for function with body
 
 	static const GET_MEMBER_MODE_NOT_ABSTRACT = 4;
-	
+
 	function getMemberTypeByName (errors : CompileError[], token : Token, name : string, isStatic : boolean, typeArgs : Type[], mode : number) : Type {
 		// returns an array to support function overloading
 		var types = new Type[];
@@ -1510,7 +1510,7 @@ class LocalVariable {
 
 	function setType (type : Type) : void {
 		if (this._type != null)
-			throw new Error("type is already set");
+			throw new Error("type is already set for " + this.toString());
 		// implicit declarations of "int" is not supported
 		if (type.equals(Type.integerType))
 			type = Type.numberType;
