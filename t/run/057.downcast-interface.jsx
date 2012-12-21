@@ -1,6 +1,6 @@
 /*EXPECTED
 true
-false
+error
 */
 interface I1 {
 }
@@ -16,7 +16,10 @@ class _Main {
 		var i2 : I2 = i1 as I2;
 		log i2 != null;
 		i1 = new CFalse();
-		i2 = i1 as I2;
-		log i2 != null;
+		try {
+			i2 = i1 as I2;
+		} catch (e : Error) {
+			log "error";
+		}
 	}
 }

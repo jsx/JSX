@@ -885,28 +885,9 @@ class _AsExpressionEmitter extends _ExpressionEmitter {
 				this._emitter._getExpressionEmitterFor(this._expr.getExpr()).emit(outerOpPrecedence);
 				return;
 			}
-			if (destType instanceof ObjectType) {
+			if (destType instanceof ObjectType || destType instanceof FunctionType) {
 				// unsafe cast
-				if ((destType.getClassDef().flags() & (ClassDefinition.IS_INTERFACE | ClassDefinition.IS_MIXIN)) == 0) {
-					this.emitWithPrecedence(outerOpPrecedence, _CallExpressionEmitter._operatorPrecedence, (function () {
-						this._emitter._emit("(function (o) { return o instanceof " + _Util.getInstanceofNameFromClassDef(destType.getClassDef()) + " ? o : null; })(", this._expr.getToken());
-						this._emitter._getExpressionEmitterFor(this._expr.getExpr()).emit(0);
-						this._emitter._emit(")", this._expr.getToken());
-					}));
-				} else {
-					this.emitWithPrecedence(outerOpPrecedence, _CallExpressionEmitter._operatorPrecedence, (function () {
-						this._emitter._emit("(function (o) { return o && o.$__jsx_implements_" + destType.getClassDef().getOutputClassName() + " ? o : null; })(", this._expr.getToken());
-						this._emitter._getExpressionEmitterFor(this._expr.getExpr()).emit(0);
-						this._emitter._emit(")", this._expr.getToken());
-					}));
-				}
-				return;
-			}
-			if (destType instanceof FunctionType) {
-				// cast to function
-				this._emitter._emit("(function (o) { return typeof(o) === \"function\" ? o : null; })(", this._expr.getToken());
-				this._emitter._getExpressionEmitterFor(this._expr.getExpr()).emit(0);
-				this._emitter._emit(")", this._expr.getToken());
+				new _AsNoConvertExpressionEmitter(this._emitter, new AsNoConvertExpression(this._expr.getToken(), this._expr.getExpr(), this._expr.getType())).emit(outerOpPrecedence);
 				return;
 			}
 		}
@@ -1111,13 +1092,25 @@ class _AsNoConvertExpressionEmitter extends _ExpressionEmitter {
 					}, "detected invalid cast, value is not an Array or null");
 					return;
 				} else if (destClassDef instanceof InstantiatedClassDefinition && (destClassDef as InstantiatedClassDefinition).getTemplateClassName() == "Map") {
+					if (srcType.equals(Type.variantType)) {
+						// variant which is "typeof function" may be converted to a Map.<variant>
+						emitWithAssertion(function () {
+							this._emitter._emit("v == null || typeof v === \"object\" || typeof v === \"function\"", this._expr.getToken());
+						}, "detected invalid cast, value is not a Map, function or null");
+					} else {
+						emitWithAssertion(function () {
+							this._emitter._emit("v == null || typeof v === \"object\"", this._expr.getToken());
+						}, "detected invalid cast, value is not a Map or null");
+					}
+					return;
+				} else if ((destClassDef.flags() & (ClassDefinition.IS_INTERFACE | ClassDefinition.IS_MIXIN)) == 0) {
 					emitWithAssertion(function () {
-						this._emitter._emit("v == null || typeof v === \"object\"", this._expr.getToken());
-					}, "detected invalid cast, value is not a Map or null");
+						this._emitter._emit("v == null || v instanceof " + destClassDef.getOutputClassName(), this._expr.getToken());
+					}, "detected invalid cast, value is not an instance of the designated type or null");
 					return;
 				} else {
 					emitWithAssertion(function () {
-						this._emitter._emit("v == null || v instanceof " + destClassDef.getOutputClassName(), this._expr.getToken());
+						this._emitter._emit("v == null || v.$__jsx_implements_" + destClassDef.getOutputClassName(), this._expr.getToken());
 					}, "detected invalid cast, value is not an instance of the designated type or null");
 					return;
 				}
@@ -1210,7 +1203,18 @@ class _InstanceofExpressionEmitter extends _ExpressionEmitter {
 
 	override function emit (outerOpPrecedence : number) : void {
 		var expectedType = this._expr.getExpectedType();
-		if ((expectedType.getClassDef().flags() & (ClassDefinition.IS_INTERFACE | ClassDefinition.IS_MIXIN)) == 0) {
+		if (expectedType.getClassDef() instanceof InstantiatedClassDefinition && (expectedType.getClassDef() as InstantiatedClassDefinition).getTemplateClassName() == "Array") {
+			this.emitWithPrecedence(outerOpPrecedence, _InstanceofExpressionEmitter._operatorPrecedence, (function () {
+				this._emitter._getExpressionEmitterFor(this._expr.getExpr()).emit(_InstanceofExpressionEmitter._operatorPrecedence);
+				this._emitter._emit(" instanceof Array", this._expr.getToken());
+			}));
+		} else if (expectedType.getClassDef() instanceof InstantiatedClassDefinition && (expectedType.getClassDef() as InstantiatedClassDefinition).getTemplateClassName() == "Map") {
+			this.emitWithPrecedence(outerOpPrecedence, _InstanceofExpressionEmitter._operatorPrecedence, (function () {
+				this._emitter._emit("(typeof(", this._expr.getToken());
+				this._emitter._getExpressionEmitterFor(this._expr.getExpr()).emit(_InstanceofExpressionEmitter._operatorPrecedence);
+				this._emitter._emit(") === \"object\")", this._expr.getToken());
+			}));
+		} else if ((expectedType.getClassDef().flags() & (ClassDefinition.IS_INTERFACE | ClassDefinition.IS_MIXIN)) == 0) {
 			this.emitWithPrecedence(outerOpPrecedence, _InstanceofExpressionEmitter._operatorPrecedence, (function () {
 				this._emitter._getExpressionEmitterFor(this._expr.getExpr()).emit(_InstanceofExpressionEmitter._operatorPrecedence);
 				this._emitter._emit(" instanceof " + _Util.getInstanceofNameFromClassDef(expectedType.getClassDef()), null);
