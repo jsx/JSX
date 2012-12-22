@@ -8,7 +8,6 @@ setup: compiler doc
 ## compiler stuff
 
 compiler: src/doc.jsx
-	mkdir -p bin
 	node bootstrap/jsx-compiler.js --executable node --output bin/jsx src/jsx-node-front.jsx
 
 src/doc.jsx: src/_doc.jsx
