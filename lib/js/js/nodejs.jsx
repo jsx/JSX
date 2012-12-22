@@ -76,6 +76,7 @@ native class process {
 
 	/*
 	 * events:
+	 *  drain:            (data:Buffer)
 	 *  exit:             (exitStatus:number)
 	 *  uncaughtExceptio: (error:Error)
 	 */

@@ -135,7 +135,7 @@ class NodePlatform extends Platform {
 			return targetCode + callEntryPoint + "\n";
 		}
 		else {
-			throw new Error("FIXME");
+			throw new Error("FIXME: unknown emitter");
 		}
 	}
 
@@ -167,16 +167,15 @@ class NodePlatform extends Platform {
 			var child = node.child_process.spawn(process.env["JSX_RUNJS"], [jsFile].concat(args));
 			child.stdin.end();
 			child.stdout.on("data", function (data) {
-				process.stdout.write(data);
+				process.stdout.write(data as string);
 			});
 			child.stderr.on("data", function (data) {
-				process.stderr.write(data);
+				process.stderr.write(data as string);
 			});
 		}
 		else {
 			process.argv = [process.argv[0], jsFile].concat(args);
-			var eval = js.global['eval'] as (string) -> variant;
-			eval('require("'+jsFile+'")'); // evaluate it in this process
+			node.require(jsFile); // evaluates it in this process
 		}
 	}
 }
@@ -203,7 +202,7 @@ class _Main {
 		var stdoutIsFlushed = process.stdout.write("");
 		var stderrIsFlushed = process.stderr.write("");
 
-		var exitIfFlushed = function (data : Buffer) : void {
+		var exitIfFlushed = function (data : variant) : void {
 			if (stdoutIsFlushed && stderrIsFlushed) {
 				process.exit(exitCode);
 			}

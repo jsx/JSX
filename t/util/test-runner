@@ -48,7 +48,7 @@ sub bench {
 sub main {
     my($file) = @_ or die "no args";
 
-    local $TODO = 'not yet' if ($file =~ /\.todo\.jsx$/);
+    local $TODO = 'marked as TODO' if ($file =~ /\b todo \b/xms);
 
     if(my @shebang = get_shebang($file)) {
         exec @shebang, $file;
@@ -59,7 +59,7 @@ sub main {
     elsif($file =~ m{ /compile_error/ }xms) {
         expect_compile_error($file);
     }
-    elsif($file =~ m{ /lib/ }xms) {
+    elsif($file =~ m{ /lib/ }xms or $file =~ m{ \.jsx\.t \z}xms) {
         run_test($file);
     }
     elsif($file =~ m{ /optimize/ }xms) {
@@ -282,6 +282,8 @@ sub completion_test {
 sub run_test {
     my($file) = @_;
 
-    exec("bin/jsx", "--test", $file) == 0
-        or die "Cannot exec bin/jsx --test $file";
+    if (system("bin/jsx", "--test", $file) != 0) {
+        fail("Cannot exec bin/jsx --test $file");
+        done_testing;
+    }
 }
