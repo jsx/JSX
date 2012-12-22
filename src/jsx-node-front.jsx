@@ -104,7 +104,7 @@ class NodePlatform extends Platform {
 			if (dirOfPath != path) {
 				this.mkpath(dirOfPath);
 			}
-			node.fs.mkdir(path);
+			node.fs.mkdirSync(path);
 		}
 	}
 
