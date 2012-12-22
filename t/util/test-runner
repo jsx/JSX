@@ -73,7 +73,8 @@ sub main {
     }
     else {
         plan tests => 1;
-        pass "(unknown file: $file)";
+        local $TODO = 'unknown file';
+        fail $file;
     }
 }
 
