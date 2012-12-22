@@ -1,16 +1,18 @@
 import "js.jsx";
+import "js/nodejs.jsx";
+
 import "test-case.jsx";
-import "../src/nodejs.jsx";
+
 import "../src/util.jsx";
 import "./util/jslexer.jsx";
+
+native __fake__ class SourceMapConsumer {
+	function originalPositionFor(generatedPos : variant) : variant;
+}
 
 class _Test extends TestCase {
 
 	function testWithSourceMapConsumer() : void {
-		var eval = js.global['eval'] as (string) -> variant;
-		node.fs = eval('require("fs")') as __noconvert__ FS;
-		node.child_process = eval('require("child_process")') as __noconvert__ child_process;
-
 		function search(a : JSToken[], predicate : (JSToken) -> boolean) : number {
 			for(var i = 0; i < a.length; ++i) {
 				if(predicate(a[i])) {
@@ -33,6 +35,8 @@ class _Test extends TestCase {
 				return;
 			}
 
+			var eval = js.global['eval'] as (string) -> variant;
+
 			var source = JSLexer.tokenize("hello.jsx.js",
 				node.fs.readFileSync("t/source-map/hello.jsx.js").toString());
 
@@ -42,14 +46,13 @@ class _Test extends TestCase {
 			var sources = ["t/source-map/hello.jsx", "lib/js/timer.jsx", "lib/js/js.jsx"].sort();
 			this.expect(JSON.stringify((mapping['sources'] as string[]).sort()), "mapping.sources").toBe(JSON.stringify(sources));
 
-			var SourceMapConsumer = eval('require("source-map").SourceMapConsumer');
-			var consumer = eval('new SourceMapConsumer(mapping)');
+			var consumer = eval('new (require("source-map").SourceMapConsumer)(mapping)') as __noconvert__ SourceMapConsumer;
 
 			var pos, orig;
 
 			pos = search(source, function (t) { return t.token == '"Hello, world!"'; });
 			this.note("generated (literal)" + JSON.stringify(source[pos]));
-			orig = eval('consumer.originalPositionFor(source[pos])');
+			orig = consumer.originalPositionFor(source[pos]);
 			this.note("original: " + JSON.stringify(orig));
 			this.expect(orig['line'], "orig.line").toBe(14);
 			this.expect(orig['column'], "orig.column").toBe(12);
@@ -57,7 +60,7 @@ class _Test extends TestCase {
 
 			pos = search(source, function (t) { return t.token == '_Main'; });
 			this.note("generated (class): " + JSON.stringify(source[pos]));
-			orig = eval('consumer.originalPositionFor(source[pos])');
+			orig = consumer.originalPositionFor(source[pos]);
 			this.note("original: " + JSON.stringify(orig));
 			this.expect(orig['line'], "orig.line").toBe(5);
 			this.expect(orig['column'], "orig.column").toBe(6);
@@ -65,7 +68,7 @@ class _Test extends TestCase {
 
 			pos = search(source, function (t) { return t.token == 'getFoo$'; });
 			this.note("generated (member function): " + JSON.stringify(source[pos]));
-			orig = eval('consumer.originalPositionFor(source[pos])');
+			orig = consumer.originalPositionFor(source[pos]);
 			this.note("original: " + JSON.stringify(orig));
 			this.expect(orig['line'], "orig.line").toBe(9);
 			this.expect(orig['column'], "orig.column").toBe(13);
@@ -75,4 +78,4 @@ class _Test extends TestCase {
 
 }
 
-// vim: set noexpandtab:
+// vim: set noexpandtab ft=jsx:
