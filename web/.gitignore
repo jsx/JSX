@@ -1,4 +1,3 @@
-jsx-web.js
-*.combined.js
 *.generated.*
 .profile
+*.jsx.js

@@ -114,9 +114,9 @@ sub process_page {
 }
 
 sub process_webfront {
-    my $cmd = "$project_root/bin/jsx --output $root/assets/js/jsx-web-front.js "
+    my $cmd = "$project_root/bin/jsx --output $root/assets/js/jsx-web-front.jsx.js "
         . "$root/src/jsx-web-front.jsx";
-    system($cmd) == 0 or die "Failed to build jsx-web-front.js: $cmd\n";
+    system($cmd) == 0 or die "Failed to compile: $cmd\n";
 }
 
 sub process_jsx {
