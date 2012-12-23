@@ -38,7 +38,7 @@ optimize-bench:
 ## web stuff
 
 web: compiler
-	perl web/build.pl --clean
+	perl web/build.pl
 	time bin/jsx --executable web --profile --output web/profiler/fireworks.jsx.js web/profiler/fireworks.jsx
 	time bin/jsx --executable web --release --output web/example/aobench/aobench.jsx.js web/example/aobench/aobench.jsx
 
