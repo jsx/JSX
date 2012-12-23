@@ -3,7 +3,7 @@ JOBS:=4
 
 OPTIMIZE_FLAGS := lto,unclassify,fold-const,return-if,inline,dce,unbox,fold-const,dce,lcse,array-length,unclassify
 
-setup: compiler doc
+setup: compiler doc web
 
 ## compiler stuff
 
