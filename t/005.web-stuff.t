@@ -21,7 +21,6 @@ if (! @files) {
 plan tests => 3 * scalar @files;
 
 for my $file(@files) {
-    local $TODO = "--release may fail in this moment" if $file =~ m{web/src/};
     {
         my $cmd = qq{$jsx "$file"};
         `$cmd`; # ensure it compiles
@@ -35,6 +34,7 @@ for my $file(@files) {
         is $?, 0, $cmd;
     }
     {
+        local $TODO = "--release may fail in this moment" if $file =~ m{web/src/};
         my $cmd = qq{$jsx --release "$file"};
         `$cmd`; # ensure it compiles
 
