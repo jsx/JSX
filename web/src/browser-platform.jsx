@@ -35,7 +35,7 @@ class BrowserPlatform extends Platform {
 	var _content : Map.<string>;
 	var _map : variant;
 	var _prefix : string;
-	
+
 	function constructor(root : string) {
 		this._root = root;
 		this._errors = new string[];
@@ -107,7 +107,7 @@ class BrowserPlatform extends Platform {
 		// synchronous XHR
 		var xhr = new XMLHttpRequest();
 		xhr.open("GET", name, false);
-		xhr.send(null : Nullable.<string>);
+		xhr.send(null : Blob);
 		if(xhr.status == 200) {
 			return xhr.responseText;
 		}

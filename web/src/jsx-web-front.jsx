@@ -267,7 +267,7 @@ class JsxWebFront {
 						compile({ mode: "run" });
 					};
 					xhr.open("GET", url);
-					xhr.send(null : Nullable.<string>);
+					xhr.send(null : Blob);
 				});
 			});
 
