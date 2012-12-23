@@ -140,6 +140,11 @@ native class _IFInfo {
 	__readonly__ var internal : boolean;
 }
 
+native class module {
+	static __readonly__ var id : string;
+	static __readonly__ var paths : string[];
+}
+
 native class Stream extends EventEmitter {
 	__readonly__ var fd : int;
 	__readonly__ var isTTY : boolean;

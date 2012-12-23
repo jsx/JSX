@@ -26,6 +26,8 @@ class _Test extends TestCase {
 			return;
 		}
 
+		var cwd = process.cwd();
+
 		node.child_process.execFile("bin/jsx", ["--enable-source-map", "--output", "t/source-map/hello.jsx.js", "t/source-map/hello.jsx"], {} : variant, function (code, stdout, stderr) {
 			this.expect(code, "error code").toBe(null);
 			this.expect(stderr, "stderr").toBe("");
@@ -34,6 +36,8 @@ class _Test extends TestCase {
 			if(code != null) {
 				return;
 			}
+
+			module.paths.push(cwd + "/node_modules");
 
 			var eval = js.global['eval'] as (string) -> variant;
 
@@ -45,7 +49,6 @@ class _Test extends TestCase {
 			this.expect(mapping['file'], "mapping.file").toBe("t/source-map/hello.jsx.js");
 			var sources = ["t/source-map/hello.jsx", "lib/js/timer.jsx", "lib/js/js.jsx"].sort();
 			this.expect(JSON.stringify((mapping['sources'] as string[]).sort()), "mapping.sources").toBe(JSON.stringify(sources));
-
 			var consumer = eval('new (require("source-map").SourceMapConsumer)(mapping)') as __noconvert__ SourceMapConsumer;
 
 			var pos, orig;
