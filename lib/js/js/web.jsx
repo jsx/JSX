@@ -4148,6 +4148,8 @@ native final class Location {
 	var search : string/*DOMString*/;
 	var hash : string/*DOMString*/;
 
+	function reload(ignoreCache : boolean) : void;
+
 } // end of Location
 
 /** @see http://www.w3.org/TR/html5/single-page.html */
