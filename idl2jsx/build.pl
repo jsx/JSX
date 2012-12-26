@@ -83,6 +83,7 @@ my @specs = (
         "$root/extra/draft.idl",
         "$root/extra/legacy.idl",
         "$root/extra/sequence.idl",
+        "$root/extra/lv0.idl",
     ],
 );
 
