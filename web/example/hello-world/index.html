@@ -27,7 +27,7 @@
 
     <script src="../../build/jsx-compiler.js"></script>
     <script>
-      JSX.require("system:web/src/jsx-web-compiler.jsx").JsxWebCompiler.begin$();
+      JSX.require("system:src/web/jsx-web-compiler.jsx").JsxWebCompiler.begin$();
     </script>
     <script id="jsx-in" type="application/jsx" src="hello-world.jsx" data-arguments="[]"></script>
     <script>
@@ -35,21 +35,25 @@
       window.addEventListener("load", function (e) {
         "use strict";
         var lang = "jsx";
-        var script = document.getElementById(lang + "-in");
-        console.assert(script, lang + "-in");
+        var script  = document.getElementById(lang + "-in");
+        var srcArea = document.getElementById(lang + "-out");
+        console.assert(script,  lang + "-in");
+        console.assert(srcArea, lang + "-out");
 
         var xhr = new XMLHttpRequest();
-        xhr.open("GET", script.src, false);
-        xhr.send();
+        xhr.open("GET", script.src);
+        xhr.onreadystatechange = function (e) {
+          if (xhr.readyState != 4) return;
 
-        var src = xhr.responseText.
-          replace(/\/\/<!\[CDATA\[\s*/, "").
-          replace(/\/\/\]\]>\s*/, "");
-        var textNode = document.createTextNode(src);
+          var src = xhr.responseText.
+            replace(/\/\/<!\[CDATA\[\s*/, "").
+            replace(/\/\/\]\]>\s*/, "");
+          var textNode = document.createTextNode(src);
 
-        var srcArea = document.getElementById(lang + "-out");
-        console.assert(srcArea, lang + "-out");
-        srcArea.appendChild(textNode);
+          console.assert(srcArea, lang + "-out");
+          srcArea.appendChild(textNode);
+        };
+        xhr.send(null);
       });
       //]]>
     </script>

@@ -101,6 +101,15 @@ final class fs {
     return fs._delegate.list(path);
   }
 
+  static function absolute(path : string) : string {
+    return fs._delegate.absolute(path);
+  }
+
+  static function exists(path : string) : boolean {
+    return fs._delegate.exists(path);
+  }
+
+
   // Directory Functions
 
   static function changeWorkingDirectory(path : string) : void {
@@ -147,6 +156,8 @@ final native __fake__ class _FileSystem {
   var workingDirectory : string;
 
   function list(path : string) : Array.<string>;
+  function absolute (path : string) : string;
+  function exists(path : string) : boolean;
 
   function changeWorkingDirectory(path : string) : void;
   function makeDirectory(path : string) : void;

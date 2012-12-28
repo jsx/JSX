@@ -42,7 +42,7 @@ web: compiler
 	time bin/jsx --executable web --profile --output web/profiler/fireworks.jsx.js web/profiler/fireworks.jsx
 	time bin/jsx --executable web --release --output web/example/aobench/aobench.jsx.js web/example/aobench/aobench.jsx
 
-server: compiler
+server: web
 	node web/server.js
 
 # for authors

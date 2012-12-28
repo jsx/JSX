@@ -3,11 +3,12 @@
 import "js.jsx";
 import "console.jsx";
 import "js/web.jsx";
+
 import "./browser-platform.jsx";
-import "../../src/compiler.jsx";
-import "../../src/optimizer.jsx";
-import "../../src/jsemitter.jsx";
-import "../../src/completion.jsx";
+import "../compiler.jsx";
+import "../optimizer.jsx";
+import "../jsemitter.jsx";
+import "../completion.jsx";
 
 native __fake__ class Cursor {
 	var line : number;
@@ -59,7 +60,7 @@ class JsxWebFront {
 					var completionRequest = new CompletionRequest(cur.line+1, cur.ch);
 
 					var path = "<source>";
-					var platform = new BrowserPlatform(".");
+					var platform = new BrowserPlatform();
 					platform.setContent(path, editor.getValue());
 
 					var c = new Compiler(platform);
@@ -129,7 +130,7 @@ class JsxWebFront {
 				output.setValue("");
 				var path = input.dataset["path"];
 
-				var platform = new BrowserPlatform(".");
+				var platform = new BrowserPlatform();
 				platform.setContent(path, editor.getValue());
 
 				var c = new Compiler(platform);
@@ -161,7 +162,7 @@ class JsxWebFront {
 				c.addSourceFile(null, path);
 
 				var success = c.compile();
-				console.log(c);
+				//console.log(c);
 
 				if (success) {
 					output.setOption("mode", "javascript");
