@@ -67,21 +67,96 @@ class _Test extends PhantomTestCase {
     };
   }
 
-  function testExampleHelloWorld() : void {
+  function testLoadingWebExampleHelloWorld() : void {
     var file = "try/example/hello-world/index.html";
-    var prefix = "http://0:" + this.port as string + "/";
+    //var prefix = "http://0:" + this.port as string + "/";
 
     //file += "#debug"
 
     this.async( (context) -> {
       this.page.open(file, function(status) {
-        this.pass("opened " + file);
-
+        this.expect(status, "opened " + file).toBe("success");
         context.done();
       });
     }, 50000);
   }
 
+  function testLoadingWebExampleWebGL() : void {
+    var file = "try/example/hello-webgl/index.html";
+
+    this.async( (context) -> {
+      this.page.open(file, function(status) {
+        this.expect(status, "opened " + file).toBe("success");
+        context.done();
+      });
+    }, 50000);
+  }
+
+  function testLoadingWebExampleWebAudio() : void {
+    var file = "try/example/webaudio/index.html";
+
+    this.async( (context) -> {
+      this.page.open(file, function(status) {
+        this.expect(status, "opened " + file).toBe("success");
+        context.done();
+      });
+    }, 50000);
+  }
+
+  function testLoadingWebExampleSakura() : void {
+    var file = "try/example/sakura/index.html";
+
+    this.async( (context) -> {
+      this.page.open(file, function(status) {
+        this.expect(status, "opened " + file).toBe("success");
+        context.done();
+      });
+    }, 50000);
+  }
+
+  function testLoadingWebExampleShooting() : void {
+    var file = "try/example/shooting/index.html";
+
+    this.async( (context) -> {
+      this.page.open(file, function(status) {
+        this.expect(status, "opened " + file).toBe("success");
+        context.done();
+      });
+    }, 50000);
+  }
+
+  function testLoadingWebExampleFireworks() : void {
+    var file = "try/example/fireworks/index.html";
+
+    this.async( (context) -> {
+      this.page.open(file, function(status) {
+        this.expect(status, "opened " + file).toBe("success");
+        context.done();
+      });
+    }, 50000);
+  }
+
+  function testLoadingWebExampleIPCJS() : void {
+    var file = "try/example/ipc-js/index.html";
+
+    this.async( (context) -> {
+      this.page.open(file, function(status) {
+        this.expect(status, "opened " + file).toBe("success");
+        context.done();
+      });
+    }, 50000);
+  }
+
+  function testLoadingWebExampleXHR() : void {
+    var file = "try/example/xhr/index.html";
+
+    this.async( (context) -> {
+      this.page.open(file, function(status) {
+        this.expect(status, "opened " + file).toBe("success");
+        context.done();
+      });
+    }, 50000);
+  }
 }
 
 // vim: set tabstop=2 shiftwidth=2 expandtab:
