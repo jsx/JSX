@@ -1163,9 +1163,7 @@ class MemberFunctionDefinition extends MemberDefinition implements Block {
 						var assignExpr = expr as AssignmentExpression;
 						var local = assignExpr.getFirstExpr() as LocalExpression;
 						local.setLHS(true);
-						if (! (assignExpr.getSecondExpr() instanceof FunctionExpression)) {
-							local.getLocal().registerRHSExpr(assignExpr.getSecondExpr());
-						}
+						local.getLocal().registerRHSExpr(assignExpr.getSecondExpr());
 				}
 				expr.forEachExpression(onExpr);
 				return true;
@@ -1190,17 +1188,23 @@ class MemberFunctionDefinition extends MemberDefinition implements Block {
 
 		var undecidedLocals = new LocalVariable[];
 		// infer types of local variables
-		// TODO occur check
 		this._locals.forEach(function (local, index) {
 			if (local.getType() == null) {
 				var commonType = null : Type;
+				var hasFunctionAssignment = false;
 				var rhsExprTypes = local.getRHSExprs().map.<Type>((expr) -> {
 					if (occurCheck(expr, undecidedLocals.concat(this._locals.slice(index))) == false)
 						return null;
+					if (expr instanceof FunctionExpression) {
+						hasFunctionAssignment = true;
+						return null;
+					}
 					if (expr.analyze(context) == false)
 						return null;
 					return expr.getType();
 				});
+				if (hasFunctionAssignment)
+					return; // delay decision of the type
 				var succ = true;
 				var listExprTypes = local.getListExprs().map.<Type>((expr) -> {
 					if (occurCheck(expr, undecidedLocals.concat(this._locals.slice(index))) == false)
