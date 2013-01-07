@@ -32,10 +32,12 @@ abstract class Expression implements Stashable {
 
 	var _token : Token;
 	var _optimizerStash : Map.<OptimizerStash>;
+	var _analyzed : Nullable.<boolean>;
 
 	function constructor (token : Token) {
 		this._token = token;
 		this._optimizerStash = new Map.<OptimizerStash>;
+		this._analyzed = null;
 	}
 
 	function constructor (that : Expression) {
@@ -94,10 +96,24 @@ abstract class Expression implements Stashable {
 	}
 
 	final function analyze (context : AnalysisContext) : boolean {
-		return this.doAnalyze(context);
+		if (this._analyzed != null)
+			return this._analyzed;
+		this._analyzed = this.doAnalyze(context);
+		return this._analyzed;
 	}
 
 	abstract function doAnalyze (context : AnalysisContext) : boolean;
+
+	final function analyzeFlow (context : AnalysisContext) : void {	// must be invoked only when the analysis finished successfully
+		this.doAnalyzeFlow(context);
+	}
+
+	function doAnalyzeFlow (context : AnalysisContext) : void {
+		this.forEachExpression(function (expr) {
+			expr.analyzeFlow(context);
+			return true;
+		});
+	}
 
 	abstract function getType () : Type;
 
@@ -242,16 +258,22 @@ class LocalExpression extends LeafExpression {
 	}
 
 	override function doAnalyze (context : AnalysisContext) : boolean {
+		if (this._local.getType() == null)
+			return false;
+		return true;
+	}
+
+	override function doAnalyzeFlow (context : AnalysisContext) : void {
 		// check that the variable is readable
 		if (this._isLHS) {
 			// nothing to do
 		} else {
-			if (context.checkVariableStatus)
-				this._local.touchVariable(context, this._token, false);
-			if (this._local.getType() == null)
-				return false;
+			this._local.touchVariable(context, this._token, false);
 		}
-		return true;
+	}
+
+	function markVariableAssignment (context : AnalysisContext) : void {
+		this._local.touchVariable(context, this._token, true);
 	}
 
 	override function getType () : Type {
@@ -269,8 +291,6 @@ class LocalExpression extends LeafExpression {
 			context.errors.push(new CompileError(token, "cannot assign a value of type '" + type.toString() + "' to '" + this._local.getType().toString() + "'"));
 			return false;
 		}
-		if (context.checkVariableStatus)
-			this._local.touchVariable(context, this._token, true);
 		return true;
 	}
 
@@ -530,6 +550,7 @@ class ArrayLiteralExpression extends Expression {
 		] : variant[];
 	}
 
+	// RV: infer-literal-type
 	override function doAnalyze (context : AnalysisContext) : boolean {
 		// analyze all elements
 		var succeeded = true;
@@ -663,9 +684,6 @@ class MapLiteralExpression extends Expression {
 	}
 
 	override function doAnalyze (context : AnalysisContext) : boolean {
-		// already analyzed
-		if (this._type != null && this._type instanceof ObjectType && (! this._type instanceof ParsedObjectType))
-			return true;
 		// analyze all elements
 		var succeeded = true;
 		for (var i = 0; i < this._elements.length; ++i) {
@@ -1123,6 +1141,12 @@ abstract class IncrementExpression extends UnaryExpression {
 		if (! this._expr.assertIsAssignable(context, this._token, exprType))
 			return false;
 		return true;
+	}
+
+	override function doAnalyzeFlow (context : AnalysisContext) : void {
+		this._expr.analyzeFlow(context);
+		if (this._expr instanceof LocalExpression)
+			(this._expr as LocalExpression).markVariableAssignment(context);
 	}
 
 	override function getType () : Type {
@@ -1610,6 +1634,13 @@ class AssignmentExpression extends BinaryExpression {
 		if (! this._expr2.analyze(context))
 			return false;
 		return true;
+	}
+
+	override function doAnalyzeFlow (context : AnalysisContext) : void {
+		this._expr1.analyzeFlow(context);
+		this._expr2.analyzeFlow(context);
+		if (this._expr1 instanceof LocalExpression)
+			(this._expr1 as LocalExpression).markVariableAssignment(context);
 	}
 
 	override function getType () : Type {

@@ -84,13 +84,11 @@ class AnalysisContext {
 	var postInstantiationCallback : function(:Parser,:ClassDefinition):ClassDefinition;
 	var funcDef : MemberFunctionDefinition;
 	var blockStack : BlockContext[];
-	var checkVariableStatus : boolean;
 
 	function constructor (errors : CompileError[], parser : Parser, postInstantiationCallback : function(:Parser,:ClassDefinition):ClassDefinition) {
 		this.errors = errors;
 		this.parser = parser;
 		this.postInstantiationCallback = postInstantiationCallback;
-		this.checkVariableStatus = false;
 		this.funcDef = null;
 		/*
 			blockStack is a stack of blocks:
@@ -115,12 +113,7 @@ class AnalysisContext {
 
 	function clone () : Object {
 		// NOTE: does not clone the blockStack (call setBlockStack)
-		return new AnalysisContext(this.errors, this.parser, this.postInstantiationCallback).setFuncDef(this.funcDef).setCheckVariableStatus(this.checkVariableStatus);
-	}
-
-	function setCheckVariableStatus (checkVariableStatus : boolean) : AnalysisContext {
-		this.checkVariableStatus = checkVariableStatus;
-		return this;
+		return new AnalysisContext(this.errors, this.parser, this.postInstantiationCallback).setFuncDef(this.funcDef);
 	}
 
 	function setFuncDef (funcDef : MemberFunctionDefinition) : AnalysisContext {
@@ -1183,7 +1176,6 @@ class MemberFunctionDefinition extends MemberDefinition implements Block {
 
 		// infer types of local variables
 		// TODO occur check, local functions
-		context.setCheckVariableStatus(false);
 		this._locals.forEach(function (local) {
 			if (local.getType() == null) {
 				var commonType = null : Type;
@@ -1221,7 +1213,6 @@ class MemberFunctionDefinition extends MemberDefinition implements Block {
 		try {
 
 			// do the checks
-			context.setCheckVariableStatus(true);
 			for (var i = 0; i < this._statements.length; ++i)
 				if (! this._statements[i].analyze(context))
 					break;

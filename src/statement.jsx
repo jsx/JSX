@@ -73,8 +73,12 @@ abstract class Statement implements Stashable {
 	abstract function doAnalyze(context : AnalysisContext) : boolean; // returns whether or not to continue analysing the following statements
 
 	function _analyzeExpr (context : AnalysisContext, expr : Expression) : boolean {
-		// TODO: obsolete method
-		return expr.analyze(context);
+		if (expr.analyze(context) == true) {
+			expr.analyzeFlow(context);
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 	override function getOptimizerStash () : Map.<OptimizerStash> {
@@ -705,6 +709,8 @@ class ForInStatement extends ContinuableStatement {
 			this._analyzeExpr(context, this._lhsExpr);
 			if (! this._lhsExpr.assertIsAssignable(context, this._token, listTypeName == "Array" ? (Type.numberType as Type) : (Type.stringType as Type)))
 				return false;
+			if (this._lhsExpr instanceof LocalExpression)
+				(this._lhsExpr as LocalExpression).markVariableAssignment(context);
 			for (var i = 0; i < this._statements.length; ++i)
 				if (! this._statements[i].analyze(context))
 					return false;
