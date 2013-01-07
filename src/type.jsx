@@ -83,6 +83,23 @@ abstract class Type {
 		return type instanceof IntegerType || type instanceof NumberType;
 	}
 
+	static function calcLeastCommonAncestor (types : Type[]) : Type {
+		switch (types.length) {
+		case 0:
+			return null;
+		case 1:
+			return types[0];
+		default:
+			var commonType = types[0];
+			for (var i = 1; i < types.length; ++i) {
+				commonType = Type.calcLeastCommonAncestor(commonType, types[i]);
+				if (commonType == null)
+					return null;
+			}
+			return commonType;
+		}
+	}
+
  	static function calcLeastCommonAncestor (type1 : Type, type2 : Type) : Type {
  		if (type1.equals(type2))
  			return type1;
