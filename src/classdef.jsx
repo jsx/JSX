@@ -1174,19 +1174,40 @@ class MemberFunctionDefinition extends MemberDefinition implements Block {
 			return true;
 		}, this._statements);
 
+		// return true if epxr has no cycle of the use of local variables
+		function occurCheck(expr : Expression, locals : LocalVariable[]) : boolean {
+			if (expr instanceof LocalExpression) {
+				for (var i = 0; i < locals.length; ++i) {
+					if ((expr as LocalExpression).getLocal() == locals[i])
+						return false;
+				}
+				return true;
+			}
+			return expr.forEachExpression(function (expr) {
+				return occurCheck(expr, locals);
+			});
+		}
+
+		var undecidedLocals = new LocalVariable[];
 		// infer types of local variables
-		// TODO occur check, local functions
-		this._locals.forEach(function (local) {
+		// TODO occur check
+		this._locals.forEach(function (local, index) {
 			if (local.getType() == null) {
 				var commonType = null : Type;
 				var rhsExprTypes = local.getRHSExprs().map.<Type>((expr) -> {
-					expr.analyze(context);
+					if (occurCheck(expr, undecidedLocals.concat(this._locals.slice(index))) == false)
+						return null;
+					if (expr.analyze(context) == false)
+						return null;
 					return expr.getType();
 				});
 				var succ = true;
 				var listExprTypes = local.getListExprs().map.<Type>((expr) -> {
+					if (occurCheck(expr, undecidedLocals.concat(this._locals.slice(index))) == false)
+						return null;
 					var listTypeName = '';
-					expr.analyze(context);
+					if (expr.analyze(context) == false)
+						return null;
 					if (expr.getType() instanceof ObjectType
 						&& (expr.getType().getClassDef() instanceof InstantiatedClassDefinition)
 						&& ((listTypeName = (expr.getType().getClassDef() as InstantiatedClassDefinition).getTemplateClassName()) == 'Array'
@@ -1198,12 +1219,14 @@ class MemberFunctionDefinition extends MemberDefinition implements Block {
 				});
 				var types : Type[] = rhsExprTypes.concat(listExprTypes).filter.<Type>((t) -> { return t != null; });
 				if (succ == false || types.length == 0) {
-					//context.errors.push(new CompileError(local.getName(), 'could not deduce the type of variable ' + local.getName().getValue()));
+					context.errors.push(new CompileError(local.getName(), 'could not deduce the type of variable ' + local.getName().getValue()));
+					undecidedLocals.push(local);
 					return;
 				}
 				var type = Type.calcLeastCommonAncestor(types);
 				if (type == null) {
-					//context.errors.push(new CompileError(local.getName(), 'error while deducing variable type ' + local.getName().getValue()));
+					context.errors.push(new CompileError(local.getName(), 'error while deducing variable type ' + local.getName().getValue()));
+					undecidedLocals.push(local);
 					return;
 				}
 				local.setType(type);
