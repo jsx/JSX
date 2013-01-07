@@ -1172,29 +1172,80 @@ class MemberFunctionDefinition extends MemberDefinition implements Block {
 			return true;
 		}, this._statements);
 
-		// return true if epxr has no cycle of the use of local variables
-		function occurCheck(expr : Expression, locals : LocalVariable[]) : boolean {
-			if (expr instanceof LocalExpression) {
-				for (var i = 0; i < locals.length; ++i) {
-					if ((expr as LocalExpression).getLocal() == locals[i])
-						return false;
+		// build a graph that represents dependencies between local variables
+		var localDependencyGraph = new TypedMap.<LocalVariable, LocalVariable[]>;
+		function getDependencies(local : LocalVariable) : LocalVariable[] {
+			var result = new LocalVariable[];
+			function go(expr : Expression) : void {
+				if (expr instanceof LocalExpression) {
+					for (var i = 0; i < this._locals.length; ++i) {
+						if ((expr as LocalExpression).getLocal() == this._locals[i]) {
+							result.push((expr as LocalExpression).getLocal());
+							return;
+						}
+					}
 				}
-				return true;
+				expr.forEachExpression(function (expr) {
+					go(expr);
+					return true;
+				});
 			}
-			return expr.forEachExpression(function (expr) {
-				return occurCheck(expr, locals);
-			});
+			local.getRHSExprs().forEach(go);
+			local.getListExprs().forEach(go);
+			return result;
 		}
+		this._locals.forEach(function (local) {
+			localDependencyGraph.put(local, getDependencies(local));
+		});
 
-		var undecidedLocals = new LocalVariable[];
+		// extract DAG from dependency graph
+		var localDAG = new LocalVariable[];
+		var visited = new TypedMap.<LocalVariable, boolean>;
+		function detectCycle(local : LocalVariable) : boolean {
+			visited.clear();
+			function go(local : LocalVariable) : boolean {
+				if (visited.get(local) == true) {
+					return true;
+				}
+				visited.put(local, true);
+				var depends = localDependencyGraph.get(local);
+				for (var i = 0; i < depends.length; ++i) {
+					if (go(depends[i]))
+						return true;
+				}
+				return false;
+			}
+			return go(local);
+		}
+		this._locals.forEach(function (local) {
+			if (! detectCycle(local)) {
+				localDAG.push(local);
+			}
+		});
+
+		// topological sort
+		var locals = new LocalVariable[];
+		function visit(local : LocalVariable) : void {
+			if (! visited.get(local)) {
+				visited.put(local, true);
+				getDependencies(local).forEach(function (local) {
+					visit(local);
+				});
+				locals.push(local);
+			}
+		}
+		visited.clear();
+		localDAG.forEach(function (local) {
+			visit(local);
+		});
+
 		// infer types of local variables
-		this._locals.forEach(function (local, index) {
+		var undecidedLocals = new LocalVariable[];
+		locals.forEach(function (local, index) {
 			if (local.getType() == null) {
 				var commonType = null : Type;
 				var hasFunctionAssignment = false;
 				var rhsExprTypes = local.getRHSExprs().map.<Type>((expr) -> {
-					if (occurCheck(expr, undecidedLocals.concat(this._locals.slice(index))) == false)
-						return null;
 					if (expr instanceof FunctionExpression) {
 						hasFunctionAssignment = true;
 						return null;
@@ -1207,8 +1258,6 @@ class MemberFunctionDefinition extends MemberDefinition implements Block {
 					return; // delay decision of the type
 				var succ = true;
 				var listExprTypes = local.getListExprs().map.<Type>((expr) -> {
-					if (occurCheck(expr, undecidedLocals.concat(this._locals.slice(index))) == false)
-						return null;
 					var listTypeName = '';
 					if (expr.analyze(context) == false)
 						return null;
