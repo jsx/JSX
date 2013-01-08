@@ -1247,18 +1247,20 @@ class MemberFunctionDefinition extends MemberDefinition implements Block {
 		locals.forEach(function (local, index) {
 			if (local.getType() == null) {
 				var commonType = null : Type;
-				var hasFunctionAssignment = false;
+				var funcExpr = null : FunctionExpression;
 				var rhsExprTypes = local.getRHSExprs().map.<Type>((expr) -> {
 					if (expr instanceof FunctionExpression) {
-						hasFunctionAssignment = true;
+						funcExpr = expr as FunctionExpression;
 						return null;
 					}
 					if (expr.analyze(context) == false)
 						return null;
 					return expr.getType();
 				});
-				if (hasFunctionAssignment)
-					return; // delay decision of the type
+				if (funcExpr != null) {
+					local.setType(funcExpr.getType());
+					return;
+				}
 				var succ = true;
 				var listExprTypes = local.getListExprs().map.<Type>((expr) -> {
 					var listTypeName = '';
