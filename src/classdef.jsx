@@ -1240,7 +1240,6 @@ class MemberFunctionDefinition extends MemberDefinition implements Block {
 		});
 
 		// infer types of local variables
-		var undecidedLocals = new LocalVariable[];
 		locals.forEach(function (local, index) {
 			if (local.getType() == null) {
 				var commonType = null : Type;
@@ -1273,13 +1272,11 @@ class MemberFunctionDefinition extends MemberDefinition implements Block {
 				var types : Type[] = rhsExprTypes.concat(listExprTypes).filter.<Type>((t) -> { return t != null; });
 				if (succ == false || types.length == 0) {
 					context.errors.push(new CompileError(local.getName(), 'could not deduce the type of variable ' + local.getName().getValue()));
-					undecidedLocals.push(local);
 					return;
 				}
 				var type = Type.calcLeastCommonAncestor(types);
 				if (type == null) {
 					context.errors.push(new CompileError(local.getName(), 'error while deducing variable type ' + local.getName().getValue()));
-					undecidedLocals.push(local);
 					return;
 				}
 				local.setType(type);
