@@ -258,8 +258,10 @@ class LocalExpression extends LeafExpression {
 	}
 
 	override function doAnalyze (context : AnalysisContext) : boolean {
-		if (this._local.getType() == null)
+		if (! this._isLHS && this._local.getType() == null) {
+			context.errors.push(new CompileError(this.getToken(), 'type was not automatically deductable, please specify it by hand'));
 			return false;
+		}
 		return true;
 	}
 
