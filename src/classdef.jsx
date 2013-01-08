@@ -837,6 +837,10 @@ abstract class MemberDefinition implements Stashable {
 		return this._nameToken;
 	}
 
+	function setNameToken (nameToken : Token) : void {
+		this._nameToken = nameToken;
+	}
+
 	function name () : string {
 		return this._nameToken.getValue();
 	}
@@ -1784,6 +1788,8 @@ class LocalVariableStatuses {
 			// FIXME the analysis of the closures should be delayed to either of: first being used, or return is called, to minimize the appearance of the "not initialized" error
 			for (var k in base._statuses)
 				this._statuses[k] = base._statuses[k] == LocalVariableStatuses.UNSET ? LocalVariableStatuses.MAYBESET : base._statuses[k] as number;
+			if (funcDef.getNameToken() != null)
+				this._statuses[funcDef.name()] = LocalVariableStatuses.ISSET;
 		}
 		var args = funcDef.getArguments();
 		for (var i = 0; i < args.length; ++i)

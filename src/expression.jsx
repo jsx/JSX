@@ -1633,6 +1633,8 @@ class AssignmentExpression extends BinaryExpression {
 		}
 		if (! this._expr1.assertIsAssignable(context, this._token, this._expr2.getType()))
 			return false;
+		if (this._expr1 instanceof LocalExpression)
+			(this._expr2 as FunctionExpression).getFuncDef().setNameToken(this._expr1.getToken());
 		if (! this._expr2.analyze(context))
 			return false;
 		return true;
@@ -1640,9 +1642,9 @@ class AssignmentExpression extends BinaryExpression {
 
 	override function doAnalyzeFlow (context : AnalysisContext) : void {
 		this._expr1.analyzeFlow(context);
-		this._expr2.analyzeFlow(context);
 		if (this._expr1 instanceof LocalExpression)
 			(this._expr1 as LocalExpression).markVariableAssignment(context);
+		this._expr2.analyzeFlow(context);
 	}
 
 	override function getType () : Type {
