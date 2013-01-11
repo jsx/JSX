@@ -466,4 +466,20 @@ class DeprecatedWarning extends CompileWarning {
 
 }
 
+class CompileNote extends CompileError {
+
+	function constructor (token : Token, message : string) {
+		super(token, message);
+	}
+
+	function constructor (filename : string, lineNumber : number, columnNumber : number, message : string) {
+		super(filename, lineNumber, columnNumber, message);
+	}
+
+	override function getPrefix () : string {
+		return "Note: ";
+	}
+	
+}
+
 // vim: set noexpandtab:
