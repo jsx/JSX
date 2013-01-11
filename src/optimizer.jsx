@@ -645,7 +645,11 @@ class _DetermineCalleeCommand extends _FunctionOptimizeCommand {
 					}
 					this._setCallingFuncDef(expr as NewExpression, callingFuncDef);
 				}
-				return expr.forEachExpression(onExpr);
+				if (expr instanceof FunctionExpression) {
+					return (expr as FunctionExpression).getFuncDef().forEachStatement(onStatement);
+				} else {
+					return expr.forEachExpression(onExpr);
+				}
 			});
 
 			return statement.forEachStatement(onStatement);
