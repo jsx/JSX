@@ -34,7 +34,6 @@ for my $file(@files) {
         is $?, 0, $cmd;
     }
     {
-        local $TODO = "--release may fail in this moment" if $file =~ m{web/src/};
         my $cmd = qq{$jsx --release "$file"};
         `$cmd`; # ensure it compiles
 
