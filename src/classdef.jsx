@@ -1176,6 +1176,23 @@ class MemberFunctionDefinition extends MemberDefinition implements Block {
 			return true;
 		}, this._statements);
 
+		function forEachLocalVariables(funcDef : MemberFunctionDefinition, callback : function (:LocalVariable) : void) : void {
+			funcDef.forEachStatement(function onStmt(statement : Statement) : boolean {
+				statement.forEachExpression(function onExpr(expr : Expression) : boolean {
+					if (expr instanceof LocalExpression) {
+						callback((expr as LocalExpression).getLocal());
+					}
+					expr.forEachExpression(onExpr);
+					return true;
+				});
+				statement.forEachStatement(onStmt);
+				return true;
+			});
+			for (var i = 0; i < funcDef.getClosures().length; ++i) {
+				forEachLocalVariables(funcDef.getClosures()[i], callback);
+			}
+		}
+
 		// build a graph that represents dependencies between local variables
 		var localDependencyGraph = new TypedMap.<LocalVariable, LocalVariable[]>;
 		function getDependencies(local : LocalVariable) : LocalVariable[] {
@@ -1188,6 +1205,14 @@ class MemberFunctionDefinition extends MemberDefinition implements Block {
 							return;
 						}
 					}
+				} else if (expr instanceof FunctionExpression) {
+					forEachLocalVariables((expr as FunctionExpression).getFuncDef(), function (local) {
+						for (var i = 0; i < this._locals.length; ++i) {
+							if (local == this._locals[i]) {
+								result.push(local);
+							}
+						}
+					});
 				}
 				expr.forEachExpression(function (expr) {
 					go(expr);
