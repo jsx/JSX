@@ -1,3 +1,7 @@
+/*
+ * draft.idl - draft specs with vender prefix
+ */
+
 // http://www.w3.org/TR/animation-timing/
 
 [InterfaceObject]
@@ -18,16 +22,47 @@ Window implements WindowAnimationTiming;
 callback FrameRequestCallback = void (DOMTimeStamp time);
 
 // http://www.w3.org/TR/url/
-
-interface URL {
-};
-
 interface webkitURL : URL {
 };
 
 // http://www.w3.org/TR/webaudio/
-
 interface webkitAudioContext : AudioContext {
+};
+
+// http://www.w3.org/TR/web-intents/
+interface webkitIntent : Intent {
+};
+
+// http://www.w3.org/TR/IndexedDB/
+interface webkitIDBCursor : IDBCursor { };
+interface webkitIDBDatabase : IDBDatabase { };
+interface webkitIDBFactory : IDBFactory { };
+interface webkitIDBIndex : IDBIndex { };
+interface webkitIDBKeyRange : IDBKeyRange { };
+interface webkitIDBObjectStore: IDBObjectStore { };
+interface webkitIDBRequest: IDBRequest { };
+interface webkitIDBTransaction: IDBTransaction { };
+
+// http://www.w3.org/TR/webaudio/#deprecation-section
+partial interface AudioBufferSourceNode {
+    // deprecated
+    void noteOn(double when, optional double offset, optional double duration);
+    // deprecated
+    void noteOff(double when);
+};
+partial interface AudioContext {
+    // deprecated
+    void createGainNode();
+    // deprecated
+    void createDelayNode();
+    // deprecated
+    void createJavaScriptNode();
+};
+partial interface OscillatorNode {
+    // deprecated
+    void noteOn(double when);
+    // deprecated
+    void noteOff(double when);
 };
 
 // http://dev.w3.org/geo/api/spec-source-orientation.html
@@ -83,3 +118,6 @@ partial interface Window {
   void postMessage(any message, DOMString targetOrigin, optional sequence<Transferable> transfer);
 };
 
+// defined in http://www.w3.org/TR/SVG11/
+interface SVGMatrix {
+};

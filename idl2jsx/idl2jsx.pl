@@ -1,17 +1,23 @@
 #!/usr/bin/env perl
-use 5.10.0;
+use 5.12.0;
 use strict;
 #use warnings FATAL => 'all';
 use warnings;
 use Fatal qw(open);
+
+use File::Basename qw(dirname);
+use lib dirname(__FILE__) . "/lib";
+
 use Tie::IxHash;
 use Data::Dumper;
-use File::Basename qw(dirname);
 use Storable qw(lock_retrieve lock_store);
 use LWP::UserAgent;
 use URI::Escape qw(uri_escape);
 use Time::HiRes ();
 use Getopt::Long;
+
+use WebIDL::Type;
+use WebIDL::TypeMap;
 
 use constant WIDTH => 68;
 
@@ -69,11 +75,11 @@ my %has_definition;
 # To allow null, a nullable DOMString, written as DOMString? in IDL,
 # needs to be used."
 
-my %typemap = (
-    'DOMObject'    => 'Object',
-    'DOMUserData'  => 'variant',
-    'DOMString'    => 'string',
-    'DOMTimeStamp' => 'number',
+WebIDL::TypeMap->define(
+    'DOMObject'      => 'Object',
+    'DOMUserData'    => 'variant',
+    'DOMString'      => 'string',
+    'DOMTimeStamp'   => 'number',
 
     'octet'          => 'number',
     'byte'           => 'number',
@@ -96,49 +102,45 @@ my %typemap = (
 
     'any' => 'variant',
 
+    'ByteString' => 'string', # used in the XMLHttpRequest specification
+
     'WindowProxy' => 'Window',
 
-    # http://dev.w3.org/html5/spec/single-page.html
-    'TextTrackMode' => 'string', # enum
+    # legacy callbacks / event listeners
+    'Function' => 'function(:Event):void',
 
-    # http://www.w3.org/TR/XMLHttpRequest/
-    'XMLHttpRequestResponseType' => 'string', # enum
+    # legacy EventListener defined as a class
+    'EventListener' => 'function(:Event):void',
 
-    # http://html5.org/specs/dom-parsing.html#insertadjacenthtml()
-    'SupportedType' => 'string', # enum
-    'insertAdjacentHTMLPosition' => 'string', # enum
+    # http://dev.w3.org/html5/spec/webappapis.html#eventhandler
+    'EventHandlerNonNull'        => 'function(:Event):void',
+    'EventHandler'               => 'Nullable.<function(:Event):void>',
+    'OnErrorEventHandlerNonNull' => 'function(:Event):void',
+    'OnErrorEventHandler'        => 'Nullable.<function(:Event):void>',
 
+    # for DataTransferItem
+    'FunctionStringCallback' => 'function(:string):void',
+
+    # for MediaQueryList
+    'MediaQueryListListener' => 'function(:MediaQueryList):void',
+
+    # http://www.w3.org/TR/file-system-api/
+    'FileCallback' => 'function(:File):void',
+
+    # http://www.w3.org/TR/2012/WD-mediacapture-streams-20120628/#dictionary-mediatrackconstraints-members
+    # http://datatracker.ietf.org/doc/draft-burnett-rtcweb-constraints-registry/
+    'MediaTrackConstraintSet' => 'Map.<variant>',
+    'MediaTrackConstraint'    => 'Map.<variant>',
+
+    # http://www.w3.org/TR/2012/WD-IndexedDB-20120524/
+    'IDBVersionChangeCallback' => 'function(:IDBTransactionSync,:number):void',
+    'IDBTransactionCallback'   => 'function(:IDBTransactionSync):void',
+
+    # https://wiki.mozilla.org/GamepadAPI
+    'nsIVariant'  => 'variant',
+    'nsIDOMEvent' => 'Event',
+    'nsISupports' => 'Object',
 );
-
-# callbacks / event listeners
-
-define_alias('Function' => 'function(:Event):void');
-
-# EventListener is written in legacy IDL
-define_alias('EventListener' => 'function(:Event):void');
-
-# http://dev.w3.org/html5/spec/webappapis.html#eventhandler
-define_alias('EventHandler'  => 'function(:Event):void');
-
-# TODO: type resolution process
-
-# for DataTransferItem
-define_alias('FunctionStringCallback' => 'function(:string):void');
-# for MediaQueryList
-define_alias('MediaQueryListListener' => 'function(:MediaQueryList):void');
-
-# http://www.w3.org/TR/file-system-api/
-define_alias('FileCallback' => 'function(:File):void');
-
-# http://www.w3.org/TR/2012/WD-mediacapture-streams-20120628/#dictionary-mediatrackconstraints-members
-# http://datatracker.ietf.org/doc/draft-burnett-rtcweb-constraints-registry/
-define_alias('MediaTrackConstraintSet' => 'Map.<variant>');
-define_alias('MediaTrackConstraint'    => 'Map.<variant>');
-
-# https://wiki.mozilla.org/GamepadAPI
-define_alias('nsIVariant'  => 'variant');
-define_alias('nsIDOMEvent' => 'Event');
-define_alias('nsISupports' => 'Object');
 
 sub info {
     state $count = 0;
@@ -217,16 +219,20 @@ foreach my $src(@files) {
     # XXX: looks a bug in http://www.w3.org/TR/html5/single-page.html
     my $Document_is_HTMLDocument = ($file =~ m{ /html5/single-page.html }xms);
 
-    local $typemap{Document} = "HTMLDocument" if $Document_is_HTMLDocument;
+    my $guard;
+    if ($Document_is_HTMLDocument) {
+        $guard = WebIDL::TypeMap->alias_temp("HTMLDocument" => "Document");
+    }
 
     my $content;
     {
         my $arg = $file;
         if($arg =~ /^https?:/) {
-            state $ua = LWP::UserAgent->new();
             my $filename = "$root/spec/$specname";
 
-            if ($refresh && not -e $filename) {
+            if ($refresh and not -e $filename) {
+                info("GET $arg");
+                state $ua = LWP::UserAgent->new();
                 my $res = $ua->mirror($arg, $filename);
 
                 if($res->header("Last-Modified")) {
@@ -252,27 +258,19 @@ foreach my $src(@files) {
 
     my $spec_name = $file =~ /^https?:/ ? $file : "";
 
-    info 'process <typedef>';
+    info 'process typedefs (typedef, callback, enum)';
     while($content =~ m{
-            ^ \s* \b typedef \b
-            \s+
-            (?<existing_type> $rx_simple_type)
-            \s+
-            (?<new_type> \w+) \s*
-            ;
-        }xmsg) {
-
-        info 'typedef:',
-        my $n = $+{new_type};
-        my $t = to_jsx_type($+{existing_type});
-        $t =~ s/$rx_comments//xms;
-        define_alias($n => $t);
-    }
-
-    info 'process <callback>';
-    {
-        while($content =~ m{
-                ^\s* callback
+            (?: # typedef ExistingType NewType;
+                ^ \s* \b (?<typedef> typedef) \b
+                \s+
+                (?<existing_type> $rx_type)
+                \s+
+                (?<new_type> \w+) \s*
+                ;
+            )
+            |
+            (?:  # callback NewType = RetType ( ParamTypes* )
+                ^\s* (?<callback> callback)
                 \s+ (?<name> \w+)
                 \s* =
                 \s* (?<ret_type> $rx_simple_type)
@@ -281,19 +279,43 @@ foreach my $src(@files) {
                         (?<params> $rx_params)
                     \)
                 \s* ;
-            }xmsg) {
-            my $name = $+{name};
-            info 'callback:', $name;
+            )
+            |
+            (?: # enum T ... ;
+                ^\s* (?<enum> enum)
+                \s+ (?<name> \w+)
+                \s*
+                \{
+            )
+        }xmsg) {
 
+        if ($+{typedef}) {
+            my $new      = $+{new_type};
+            my $existing = $+{existing_type};
+            info "typedef: $new = $existing";
+            WebIDL::TypeMap->alias($existing => $new);
+        }
+        elsif($+{callback}) {
+            my $name = $+{name};
             my $cb_type = make_function_type($+{ret_type}, $+{params});
-            define_callback($name => $cb_type);
+            info "callback: $name = $cb_type";
+            WebIDL::TypeMap->alias($cb_type => $name);
+        }
+        else {
+            my $name = $+{name};
+            info "enum: $name = DOMString";
+            WebIDL::TypeMap->alias('DOMString' => $name);
         }
     }
 
     info 'process <class>';
     while($content =~ m{
                 (?<attrs> (?: \[ (?: [^\]]+ | \[ \s* \])+ \] \s+)* )
-                (?<type> (?:partial \s+)? interface | exception | dictionary)
+                (?<type>
+                    (?:partial \s+)? interface
+                    | exception
+                    | dictionary
+                    )
                 \s+ (?<name> \w+)
                 (?: \s* : \s* (?<base> [\w:]+) )?
                 \s*
@@ -314,7 +336,6 @@ foreach my $src(@files) {
         }
 
         info $class_type, $class, ($base ? ": $base" : ());
-
 
         my $def = $classdef{$class} //= {
             attrs => $attrs,
@@ -431,6 +452,7 @@ foreach my $src(@files) {
             # member var
             elsif($member =~ m{
                     (?: \bstringifier\b \s+ )?
+                    (?<static> \bstatic\b \s+ )?
                     (?<readonly> \breadonly\b \s+)?
                     (?: \battribute\b \s+)?
                     (?: \[ [^\]]+ \])?
@@ -441,13 +463,18 @@ foreach my $src(@files) {
 
                 my $id = $+{ident};
 
-                my $decl = "var";
-                if($+{readonly}) {
-                    $decl = "__readonly__ $decl";
+                my $decl = "";
+                if ($+{static}) {
+                    $decl .= "static ";
                 }
+                if ($+{readonly}) {
+                    $decl = "__readonly__ ";
+                }
+                $decl .= "var ";
+
                 my $type = to_jsx_type($+{type}, union_to_variant => 1);
 
-                $decl .= " $id : $type;";
+                $decl .= "$id : $type;";
 
                 $decl_ref->{$id} //= [];
                 push @{$decl_ref->{$id}}, $decl;
@@ -535,12 +562,13 @@ foreach my $src(@files) {
 
     info 'process <implements>';
     {
-        my $classes = join "|", keys %classdef;
+        my $classes = join "|", map { quotemeta } keys %classdef;
+
         while($content =~ m{
             ^ \s* (?<class> $classes)
-            \s+ implements
-            \s+ (?<interface> $classes)
-            \s* ;
+              \s+ implements
+              \s+ (?<interface> $classes)
+              \s* ;
             }xmsg) {
             my $def       = $classdef{$+{class}};
             my $interface = $classdef{$+{interface}};
@@ -704,9 +732,6 @@ sub to_jsx_type {
     if($idl_type =~ s{\A sequence < (.+?) >  }{$1}xms) {
         $array = 1;
     }
-    elsif($idl_type =~ s{\A Maybe< (.+?) >  }{$1}xms) { # defined in idl2jsx/extra/*.idl
-        $nullable = 1;
-    }
 
     $idl_type  =~ s{
         (?:
@@ -722,27 +747,35 @@ sub to_jsx_type {
     $nullable ||= $+{nullable};
     $array //= $+{array};
 
-    my $alias = $typemap{$idl_type};
+    my $alias = WebIDL::TypeMap->get($idl_type);
     if(!$alias && exists $classdef{$idl_type}) {
         # callback definition is regarded as aliased type
         if(my $t = $classdef{$idl_type}{alias}) {
-            $alias = $t;
+            $alias = WebIDL::TypeMap->get_or_create($t);
         }
     }
 
-    my $type = $alias || $idl_type;
-    if ($nullable && ! $array) {
-        $type = "Nullable.<$type>";
+    my $type = $alias || WebIDL::TypeMap->get_or_create($idl_type);
+    my $jsx_type = $type->resolved_name;
+
+    if (!$jsx_type) {
+        $jsx_type = $type->resolved_name($type->name);
     }
+
+    my $is_aliased = ($jsx_type ne $idl_type);
+
     if($array) {
-        $type .= "[]";
+        $jsx_type .= "[]";
+    }
+    if ($nullable && $jsx_type ne 'variant') {
+        $jsx_type = "Nullable.<$jsx_type>";
     }
 
-    if($alias) {
-        $type .= "/*$original*/";
+    if($is_aliased) {
+        $jsx_type .= "/*$original*/";
     }
 
-    return $type;
+    return $jsx_type;
 }
 
 sub make_functions {
@@ -918,21 +951,10 @@ sub trim {
 sub make_function_type {
     my($ret_type, $params) = @_;
     my $callback_params = join ",", map {
-            sprintf '%s:%s', $_->{name}, to_jsx_type($_->{type})
+            sprintf '%s:%s',
+                $_->{name}, to_jsx_type($_->{type}, union_to_variant => 1)
         } parse_params($params);
 
     return "function($callback_params):" . to_jsx_type($ret_type);
 }
 
-sub define_alias {
-    my($name, $definition) = @_;
-    $typemap{$name} = $definition;
-}
-
-sub define_callback {
-    my($name, $definition) = @_;
-    my $def = $classdef{$name} ||= {};
-
-    $def->{name}  = $name;
-    $def->{alias} = $definition;
-}

@@ -53,7 +53,7 @@ class App {
             var binary = xhr.response as ArrayBuffer;
             this.cx.decodeAudioData(binary, (buffer) -> {
                 this.readyToStart(buffer);
-            }, (buffer) -> {
+            }, () -> {
                 this.setMessage("Loading error.");
             });
         });
@@ -83,7 +83,7 @@ class App {
         var source = this.cx.createBufferSource();
         source.buffer = buffer;
         source.connect(this.cx.destination);
-        source.noteOn(0);
+        source.start(0);
 
         this.source = source;
     }
@@ -91,7 +91,7 @@ class App {
     function stop() : void {
         log "stop";
 
-        this.source.noteOff(0);
+        this.source.stop(0);
     }
 }
 

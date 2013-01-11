@@ -1,3 +1,7 @@
+/***
+ * Platform-independent JSX compiler command
+ */
+
 /*
  * Copyright (c) 2012 DeNA Co., Ltd.
  *
