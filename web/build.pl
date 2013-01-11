@@ -37,7 +37,7 @@ my $clean = (grep { $_ eq "--clean" } @ARGV); # clean build
 my $root = ROOT;
 
 {
-    my $project_root = "$root/..";
+    my $project_root = dirname($root);
     my $dest_root    = "$project_root/try";
     my $dest_src     = "$dest_root/src";
 
@@ -54,22 +54,21 @@ my $root = ROOT;
 
     if (modified("$project_root/src", "$dest_root/src")) {
         process_jsx($project_root,
-            "$root/src/jsx-web-front.jsx", "$dest_root/assets/js/jsx-web-front.jsx.js");
+            "$project_root/src/web/jsx-web-front.jsx", "$dest_root/assets/js/jsx-web-front.jsx.js");
         process_jsx($project_root,
-            "$root/src/jsx-web-compiler.jsx", "$dest_root/build/jsx-compiler.js");
+            "$project_root/src/web/jsx-web-compiler.jsx", "$dest_root/build/jsx-compiler.js");
     }
 
     process_source_map($project_root, "$root/source-map", "$dest_root/source-map");
 
     copy_r("$project_root/src", $dest_src);
-    copy_r("$root/src", $dest_src);
     copy_r("$root/assets",  "$dest_root/assets");
     copy_r("$root/example", "$dest_root/example");
     copy_r("$project_root/t", "$dest_root/t");
     copy_r("$project_root/lib", "$dest_root/lib");
 
     # process_tree must be called at the end of processes
-    process_tree([$dest_root], "$dest_root/tree.generated.json");
+    process_tree($project_root, [$dest_root], "$dest_root/tree.generated.json");
 }
 
 {
@@ -140,35 +139,36 @@ sub process_jsx {
 }
 
 sub process_tree {
-    my($src, $dest) = @_;
+    my($project_root, $src, $dest) = @_;
 
     my $g = info "process_tree: $dest";
 
     my %tree;
-    find {
-        no_chdir => 1,
-        wanted   => sub {
-            return if /~$/;
-            return if /\.swp$/;
-            return if -d $_;
+    for my $src_dir(@{$src}) {
+        find {
+            no_chdir => 1,
+            wanted   => sub {
+                return if /~$/;
+                return if /\.swp$/;
+                return if -d $_;
 
-            my $f = $_;
-            $f =~ s{\\}{/}g;
-            $f =~ s{^\Q$root/..}{};
+                my $f = $_;
+                $f =~ s{\\}{/}g;
+                $f =~ s{^\Q$src_dir/}{};
+                my @parts = split(qr{/}, $f);
+                my $basename = pop @parts;
 
-            my @parts = split(qr{/}, $f);
-            my $basename = pop @parts;
+                return if $basename =~ /^\./;
 
-            return if $basename =~ /^\./;
-
-            my $dir = \%tree;
-            while(@parts) {
-                my $d = shift @parts;
-                $dir = $dir->{$d} //= {};
-            }
-            $dir->{$basename} = $f;
-        },
-    }, @{$src};
+                my $dir = \%tree;
+                while(@parts) {
+                    my $d = shift @parts;
+                    $dir = $dir->{$d} //= {};
+                }
+                $dir->{$basename} = $f;
+            },
+        }, $src_dir;
+    }
 
     open my($fh), ">", $dest;
     print $fh JSON::PP->new->utf8->pretty->encode(\%tree);

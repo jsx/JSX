@@ -48,7 +48,8 @@ class JSXCommand {
 			"\n" +
 			"Options:\n" +
 			"  --add-search-path path     add a path to library search paths\n" +
-			"  --executable (node|web)    add launcher to call _Main.main(:string[]):void\n" +
+			"  --executable RUNENV        add launcher to call _Main.main(:string[]):void\n" +
+			"                             supported RUNENV is node, commonjs and node.\n" +
 			"  --run                      runs _Main.main(:string[]):void after compiling\n" +
 			"  --test                     runs _Test#test*():void after compiling\n" +
 			"  --output file              output file (default:stdout)\n" +
@@ -213,7 +214,9 @@ class JSXCommand {
 					return 1;
 				}
 				switch (optarg) {
-				case "web": // JavaScriptEmitter
+				case "web": // implies JavaScriptEmitter
+					break;
+				case "commonjs": // implies JavaScriptEmitter
 					break;
 				case "node": // implies JavaScriptEmitter
 					tasks.push(function () : void {
@@ -230,12 +233,12 @@ class JSXCommand {
 				break;
 			case "--run":
 				run = "_Main";
-				executable = "node";
+				executable = executable ?: "node";
 				runImmediately = true;
 				break;
 			case "--test":
 				run = "_Test";
-				executable = "node";
+				executable = executable ?: "node";
 				runImmediately = true;
 				break;
 			case "--profile":

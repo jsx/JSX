@@ -22,9 +22,10 @@
 
 import "console.jsx";
 import "js/web.jsx";
-import "../../src/platform.jsx";
-import "../../src/util.jsx";
-import "../../src/emitter.jsx";
+
+import "../platform.jsx";
+import "../util.jsx";
+import "../emitter.jsx";
 
 class BrowserPlatform extends Platform {
 
@@ -33,34 +34,64 @@ class BrowserPlatform extends Platform {
 	var _root : string;
 	var _errors : string[];
 	var _content : Map.<string>;
-	var _map : variant;
+	var _tree : variant; // path tree
 	var _prefix : string;
 
-	function constructor(root : string) {
-		this._root = root;
+	function constructor() {
+		this._root = this._rootPath();
 		this._errors = new string[];
 		this._content = new Map.<string>;
 
-		this._map = JSON.parse(this.load(root + "/tree.generated.json"));
-
+		// the prefix path of the application HTML file
 		this._prefix = dom.window.location.pathname.replace(/\/[^\/]*$/, "");
-		this.debug({ prefix: this._prefix, root: this._root });
+
+		this._tree  = JSON.parse(this.load(this._root + "/tree.generated.json"));
+
+
+		this.debug(Util.format("[D] prefix=%1, root=%2", [this._prefix, this._root ]));
+	}
+
+	function _rootPath() : string {
+		var root = "..";
+		try {
+			// http://path/to/try/foo/bar
+			var matched = dom.window.location.pathname.match(/^(.*\/try(?:-on-web)?)\/.*$/);
+			root = matched[1];
+
+		} catch (err : Error) {
+			this.debug(err.toString());
+		}
+		return root;
 	}
 
 	override function getRoot () : string {
 		return this._root;
 	}
 
+	function _resolvePath(path : string) : string {
+		if (path.indexOf(this._root + "/") != -1) {
+			return path.slice(this._root.length + 1);
+		}
+		return path;
+	}
+
+	/**
+	 * @return string for a normal file, Object for an directory, or null.
+	 */
 	function _findPath (path : string) : variant {
-		var absPath = Util.resolvePath(this._prefix + "/" + path);
+		//var absPath = Util.resolvePath(this._prefix + "/" + path);
+		var resolvedPath = this._resolvePath(path);
+		this.debug(Util.format("[D] find path=%1 (resolvedPath=%2)", [path, resolvedPath]));
 
-		this.debug(Util.format("[D] find path=%1 (absPath=%2)", [path, absPath]));
-
-		var parts = absPath.split('/');
-		var cur = this._map;
+		var parts = resolvedPath.split('/');
+		if (parts[0] == "") {
+			parts.shift();
+		}
+		var cur = this._tree;
 		while(parts.length > 0) {
 			var t = cur[parts.shift()];
 			if(t == null) {
+				this.debug("[D] find path --> (not found)");
 				return null;
 			}
 			cur = t;
@@ -104,16 +135,28 @@ class BrowserPlatform extends Platform {
 		if(name in this._content) {
 			return this._content[name];
 		}
+		var content = "";
 		// synchronous XHR
-		var xhr = new XMLHttpRequest();
-		xhr.open("GET", name, false);
-		xhr.send(null : Blob);
-		if(xhr.status == 200) {
-			return xhr.responseText;
+		var err = "";
+		try {
+			this.debug("[D] XHR: " + name);
+			var xhr = new XMLHttpRequest();
+			xhr.open("GET", name, false);
+			xhr.send(null : Blob);
+			if(xhr.status == 200 || xhr.status == 0) {
+				content = xhr.responseText;
+			}
+			else {
+				err = xhr.status as string + " " + xhr.statusText + ": " + name;
+			}
 		}
-		else {
-			throw new Error(xhr.status as string + " " + xhr.statusText + ": " + name);
+		catch (e : variant) {
+			err = "XMLHttpRequest failed for " + name + ": " + e as string;
 		}
+		if (err) {
+			throw new Error(err);
+		}
+		return content;
 	}
 
 	override function error (s : string) : void {

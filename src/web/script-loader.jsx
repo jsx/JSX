@@ -1,16 +1,16 @@
 /*
  * Copyright (c) 2012 DeNA Co., Ltd.
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to
  * deal in the Software without restriction, including without limitation the
  * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
  * sell copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -24,18 +24,18 @@ import "js.jsx";
 import "console.jsx";
 import "js/web.jsx";
 import "./browser-platform.jsx";
-import "../../src/compiler.jsx";
-import "../../src/optimizer.jsx";
-import "../../src/jsemitter.jsx";
-import "../../src/util.jsx";
+import "../compiler.jsx";
+import "../optimizer.jsx";
+import "../jsemitter.jsx";
+import "../util.jsx";
 
 class ScriptLoader {
 
 	static var seen = new Map.<boolean>;
-	
+
 	static var optimizationLevel = 0;
 
-	static function load(root : string) : void {
+	static function load() : void {
 		var scripts = dom.document.getElementsByTagName("script");
 
 		for (var i = 0, l = scripts.length; i < l; ++i) {
@@ -48,8 +48,8 @@ class ScriptLoader {
 				ScriptLoader.seen[id] = true;
 
 				var t0 = Date.now();
-				
-				var platform = new BrowserPlatform(root);
+
+				var platform = new BrowserPlatform();
 				var c = new Compiler(platform);
 				var o = new Optimizer();
 				var emitter = new JavaScriptEmitter(platform);
@@ -108,7 +108,13 @@ class ScriptLoader {
 					platform.debug(Util.format("run _Main.main()@%1 with %2", [sourceFile, applicationArguments]));
 					// the name must be eval
 					var eval = js.global['eval'] as (string) -> variant;
-					eval('JSX.require(sourceFile)._Main.main$AS(args)');
+					var jsxRequire = eval('JSX.require') as (string) -> variant;
+					// JSX.require(sourceFile)._Main.main$AS(args)
+					var jsxRuntime = jsxRequire(sourceFile);
+					assert jsxRuntime != null;
+					var jsxMain    = jsxRuntime["_Main"];
+					assert jsxMain != null;
+					js.invoke(jsxMain, "main$AS", [ args ]);
 				}
 			}
 		}

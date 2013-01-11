@@ -113,7 +113,18 @@ class NodePlatform extends Platform {
 		if(emitter instanceof JavaScriptEmitter) {
 			targetCode += this.load(this.getRoot() + "/src/js/launcher.js");
 
-			var args = (executableFor == "node" ? "process.argv.slice(2)" : "[]");
+			var args;
+			switch (executableFor) {
+				case "node":
+					args = "process.argv.slice(2)";
+					break;
+				case "commonjs":
+					args = "require('system').args.slice(1)";
+					break;
+				default:
+					args = "[]";
+					break;
+			}
 			switch(entryPoint) {
 			case "_Main":
 				var launcher = "runMain";

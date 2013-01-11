@@ -62,6 +62,9 @@ sub main {
     elsif($file =~ m{ /lib/ }xms or $file =~ m{ \.jsx\.t \z}xms) {
         run_test($file);
     }
+    elsif($file =~ m{ /web/ }xms) {
+        run_web_test($file);
+    }
     elsif($file =~ m{ /optimize/ }xms) {
         optimize_and_compare($file);
     }
@@ -283,6 +286,25 @@ sub run_test {
     my($file) = @_;
 
     if (system("bin/jsx", "--test", $file) != 0) {
+        fail("Cannot exec bin/jsx --test $file");
+        done_testing;
+    }
+}
+
+sub run_web_test {
+    my($file) = @_;
+
+    my $phantom = `which phantomjs`;
+    if (! $phantom) {
+        local $TODO = "no phantomjs(1)";
+        fail $file;
+        done_testing;
+        return;
+    }
+
+    chomp $phantom;
+    local $ENV{JSX_RUNJS} = $phantom;
+    if (system("bin/jsx", "--executable", "commonjs", "--test", $file) != 0) {
         fail("Cannot exec bin/jsx --test $file");
         done_testing;
     }

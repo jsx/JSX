@@ -2780,6 +2780,7 @@ class _Test extends TestCase {
         var v6 : string/*DOMString*/ = o.pathname;
         var v7 : string/*DOMString*/ = o.search;
         var v8 : string/*DOMString*/ = o.hash;
+        o.reload(X.getboolean());
     } // Location
 
     function compile_PopStateEvent(o : PopStateEvent) : void {
