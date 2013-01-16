@@ -21,9 +21,11 @@
     "bin": "./bin",
     "lib": "./lib"
   },
-  "devDependencies": {
-      "browserbuild": "0.4.9",
+  "dependencies": {
       "source-map": "0.1.1"
+  },
+  "devDependencies": {
+      "browserbuild": "0.4.9"
   },
   "engines": {
     "node": ">= 0.6.19"
