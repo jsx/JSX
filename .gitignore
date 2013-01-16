@@ -7,3 +7,4 @@ doc
 v8.log
 CodeMirror-*
 bootstrap/
+node_modules/

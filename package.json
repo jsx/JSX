@@ -22,7 +22,7 @@
     "lib": "./lib"
   },
   "devDependencies": {
-      "browserbuild": "*",
+      "browserbuild": "0.4.9",
       "source-map": "0.1.1"
   },
   "engines": {
