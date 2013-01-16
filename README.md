@@ -9,38 +9,42 @@ INSTALLATION
 The JSX compiler requires `node.js` v0.6.19 or later, `npm`, and the SDK
 also requires Perl 5.10.0 or later.
 
+To install JSX from NPM without the SDK (e.g. no web interface support):
+
+    npm install jsx -g
+
 To setup JSX SDK , type the following command:
 
     git clone git://github.com/jsx/JSX.git
     cd JSX
     make setup
 
-To install jsx command, just make a link of `bin/jsx` to `~/bin`.
+If you installed the SDK version, you might want to link the binary for easy access to the `jsx` command:
 
-    ln -s "$PWD/bin/jsx" ~/bin
+    npm link
 
 COMPILATION
 =======================
 
-There's `bin/jsx` command to compile JSX source code into JavaScript.
+There's `jsx` command to compile JSX source code into JavaScript.
 
 Type the following commands and see what happens:
 
     # run Hello World in JSX
-    bin/jsx --run example/hello.jsx
+    jsx --run example/hello.jsx
 
     # display compiled code to stdout
-    bin/jsx example/hello.jsx
+    jsx example/hello.jsx
 
     # compile it with fully optimizations
-    bin/jsx --release example/hello.jsx
+    jsx --release example/hello.jsx
 
     # compile a program for node, execute it later
-    bin/jsx --executable node --output hello.jsx.js example/hello.jsx
+    jsx --executable node --output hello.jsx.js example/hello.jsx
     ./hello.jsx.js # displays "Hello, world!"
 
     # run a test, calling _Test#test*()
-    bin/jsx --test example/import.jsx # import.jsx has _Test
+    jsx --test example/import.jsx # import.jsx has _Test
 
 `jsx --help` shows how to to use the jsx command.
 
@@ -72,7 +76,7 @@ WINDOWS SUPPORT
 =======================
 
 you can install `jsx` command via `npm install -g .`, and then can invoke `jsx`.
-For the web interface, you can run the server by the following commands:
+For the web interface, you can run the server by the following commands (SDK version required):
 
     perl web/build.pl
     node web/server.js
