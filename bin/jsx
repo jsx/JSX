@@ -207,7 +207,7 @@ var JSX = Class.extend({
 			"  --output file              output file (default:stdout)\n" +
 			"  --input-filename file      names input filename\n" +
 			"  --mode (compile|parse|doc) compilation mode (default:compile)\n" +
-			"  --target (javascript|c++)  target language (default:javascript)\n" +
+			"  --target (javascript|c++)  target language (only available when installed in development mode) (default:javascript)\n" +
 			"  --release                  omits the debugging features from the generated code (run-time type checking, logging, assertion)\n" +
 			"  --profile                  enables the profiler (experimental)\n" +
 			"  --optimize cmd1,cmd2,...   list of optimize commands (no-assert, no-log, inline, return-if)\n" +
