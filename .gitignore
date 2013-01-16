@@ -8,3 +8,4 @@ v8.log
 CodeMirror-*
 bootstrap/
 node_modules/
+npm-debug.log
