@@ -38,6 +38,8 @@ for my $file(@files) {
         }
         close $fh;
         not_crash("--complete", "9999:9999", $file);
+
+        done_testing;
     }
 }
 
