@@ -618,11 +618,13 @@ class FunctionChoiceType extends FunctionType {
 
 class ResolvedFunctionType extends FunctionType {
 
+	var _token : Token;
 	var _returnType : Type;
 	var _argTypes : Type[];
 	var _isAssignable : boolean;
 
-	function constructor (returnType : Type, argTypes : Type[], isAssignable : boolean) {
+	function constructor (token : Token, returnType : Type, argTypes : Type[], isAssignable : boolean) {
+		this._token = token;
 		this._returnType = returnType;
 		this._argTypes = argTypes;
 		this._isAssignable = isAssignable;
@@ -647,6 +649,10 @@ class ResolvedFunctionType extends FunctionType {
 
 	override function asAssignableType () : Type {
 		return this._clone().setIsAssignable(true);
+	}
+
+	function getToken() : Token {
+		return this._token;
 	}
 
 	function getReturnType () : Type {
@@ -753,8 +759,8 @@ class ResolvedFunctionType extends FunctionType {
 
 class StaticFunctionType extends ResolvedFunctionType {
 
-	function constructor (returnType : Type, argTypes : Type[], isAssignable : boolean) {
-		super(returnType, argTypes, isAssignable);
+	function constructor (token : Token, returnType : Type, argTypes : Type[], isAssignable : boolean) {
+		super(token, returnType, argTypes, isAssignable);
 	}
 
 	override function instantiate (instantiationContext : InstantiationContext) : StaticFunctionType {
@@ -765,7 +771,7 @@ class StaticFunctionType extends ResolvedFunctionType {
 		for (var i = 0; i < this._argTypes.length; ++i)
 			if ((argTypes[i] = this._argTypes[i].instantiate(instantiationContext)) == null)
 				return null;
-		return new StaticFunctionType(returnType, argTypes, this._isAssignable);
+		return new StaticFunctionType(this._token, returnType, argTypes, this._isAssignable);
 	}
 
 	override function equals (x : Type) : boolean {
@@ -775,7 +781,7 @@ class StaticFunctionType extends ResolvedFunctionType {
 	}
 
 	override function _clone () : ResolvedFunctionType {
-		return new StaticFunctionType(this._returnType, this._argTypes, this._isAssignable);
+		return new StaticFunctionType(this._token, this._returnType, this._argTypes, this._isAssignable);
 	}
 
 	override function isConvertibleTo (type : Type) : boolean {
@@ -802,8 +808,8 @@ class MemberFunctionType extends ResolvedFunctionType {
 
 	var _objectType : Type;
 
-	function constructor (objectType : Type, returnType : Type, argTypes : Type[], isAssignable : boolean) {
-		super(returnType, argTypes, isAssignable);
+	function constructor (token : Token, objectType : Type, returnType : Type, argTypes : Type[], isAssignable : boolean) {
+		super(token, returnType, argTypes, isAssignable);
 		this._objectType = objectType;
 	}
 
@@ -815,7 +821,7 @@ class MemberFunctionType extends ResolvedFunctionType {
 	}
 
 	override function _clone () : MemberFunctionType {
-		return new MemberFunctionType(this._objectType, this._returnType, this._argTypes, this._isAssignable);
+		return new MemberFunctionType(this._token, this._objectType, this._returnType, this._argTypes, this._isAssignable);
 	}
 
 	override function _toStringPrefix () : string {
