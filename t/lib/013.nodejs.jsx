@@ -45,14 +45,17 @@ class _Test extends TestCase {
   }
 
   function testHttpServer() : void {
+    var port = 4321; // TODO: find an empty port correctly
     this.async((async) -> {
       process.nextTick(() -> {
-        node.http.get("http://localhost:4321/foo/bar", (res) -> {
+        this.pass("requesting");
+        node.http.get("http://localhost:"+port.toString()+"/foo/bar", (res) -> {
           this.expect(res.statusCode, "http request to myself").toBe(200);
           async.done();
         }).on("error", (arg) -> {
           var error = arg as Error;
           this.fail("HTTP request error: " + error.toString());
+          async.done();
         });;
       });
 
@@ -66,8 +69,10 @@ class _Test extends TestCase {
 
         httpd.close();
       });
-      httpd.listen(4321);
-    }, 1000);
+      httpd.listen(port);
+
+      this.pass("listen " + port.toString());
+    }, 4000);
   }
 }
 
