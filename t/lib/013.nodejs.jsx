@@ -72,7 +72,7 @@ class _Test extends TestCase {
       httpd.listen(port);
 
       this.pass("listen " + port.toString());
-    }, 1000);
+    }, 4000);
   }
 }
 
