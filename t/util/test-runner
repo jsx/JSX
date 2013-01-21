@@ -240,7 +240,7 @@ sub expect_compile_error {
 
 
     my $err = `bin/jsx $file 2>&1`;
-    isnt $?, 0, "compiling $file failed with non-zero status";
+    isnt $?, 0, "compiling $file with non-zero status";
     unlike $err, qr/^ \s+ \b at \b \s+ \b Module \b/xms,
         "... without compiler crash";
     note $err;
@@ -294,17 +294,17 @@ sub run_test {
 sub run_web_test {
     my($file) = @_;
 
-    my $phantom = `which phantomjs`;
-    if (! $phantom ) {
+    my $phantomjs = `which phantomjs`;
+    if (! $phantomjs ) {
         local $TODO = "no phantomjs(1)";
         fail $file;
         done_testing;
         return;
     }
-    chomp $phantom;
+    chomp $phantomjs;
 
     require version;
-    my $phantomjs_ver = `$phantom --version`;
+    my $phantomjs_ver = `$phantomjs --version`;
     chomp $phantomjs_ver;
     if (version::qv($phantomjs_ver) < version::qv("1.8.0")) {
         local $TODO = "phantomjs $phantomjs_ver is too old";
@@ -312,10 +312,17 @@ sub run_web_test {
         done_testing;
         return;
     }
+    note "phantomjs $phantomjs_ver";
 
-    local $ENV{JSX_RUNJS} = $phantom;
+    if ($ENV{SKIP_PHANTOMJS_TEST}) {
+        pass "skipped";
+        done_testing;
+        return;
+    }
+
+    local $ENV{JSX_RUNJS} = $phantomjs;
     if (system("bin/jsx", "--executable", "commonjs", "--test", $file) != 0) {
-        fail("Cannot exec bin/jsx --test $file with $phantom");
+        fail("Cannot exec bin/jsx --test $file with $phantomjs $phantomjs_ver");
         done_testing;
     }
 }
