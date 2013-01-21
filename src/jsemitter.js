@@ -802,6 +802,26 @@ var _AsExpressionEmitter = exports._AsExpressionEmitter = _ExpressionEmitter.ext
 		var srcType = this._expr.getExpr().getType();
 		var destType = this._expr.getType();
 		if (srcType instanceof ObjectType || srcType.equals(Type.variantType)) {
+			var emitWithGuard = function (emitCheckExpr, message) {
+				if (this._emitter._enableStrictRunTimeTypeCheck) {
+					var token = this._expr.getToken();
+					this._emitter._emit("(function (o) {\n", token);
+					this._emitter._advanceIndent();
+					this._emitter._emitAssertion(emitCheckExpr, token, message);
+					this._emitter._emit("return o;\n", token);
+					this._emitter._reduceIndent();
+					this._emitter._emit("}(", token);
+					this._emitter._getExpressionEmitterFor(this._expr.getExpr()).emit(0);
+					this._emitter._emit("))", token);
+				} else {
+					this._emitter._emit("(function (o) { return ", this._expr.getToken());
+					emitCheckExpr();
+					this._emitter._emit(" ? o : null; })(", this._expr.getToken());
+					this._emitter._getExpressionEmitterFor(this._expr.getExpr()).emit(0);
+					this._emitter._emit(")", this._expr.getToken());
+				}
+			}.bind(this);
+
 			if (srcType.isConvertibleTo(destType)) {
 				this._emitter._getExpressionEmitterFor(this._expr.getExpr()).emit(outerOpPrecedence);
 				return true;
@@ -810,24 +830,24 @@ var _AsExpressionEmitter = exports._AsExpressionEmitter = _ExpressionEmitter.ext
 				// unsafe cast
 				if ((destType.getClassDef().flags() & (ClassDefinition.IS_INTERFACE | ClassDefinition.IS_MIXIN)) == 0) {
 					this.emitWithPrecedence(outerOpPrecedence, _CallExpressionEmitter._operatorPrecedence, (function () {
-						this._emitter._emit("(function (o) { return o instanceof " + _Util.getInstanceofNameFromClassDef(destType.getClassDef()) + " ? o : null; })(", this._expr.getToken());
-						this._emitter._getExpressionEmitterFor(this._expr.getExpr()).emit(0);
-						this._emitter._emit(")", this._expr.getToken());
+						emitWithGuard(function () {
+							this._emitter._emit("o instanceof " + _Util.getInstanceofNameFromClassDef(destType.getClassDef()), this._expr.getToken());
+						}.bind(this), "detected invalid cast, value is not of specified type");
 					}).bind(this));
 				} else {
 					this.emitWithPrecedence(outerOpPrecedence, _CallExpressionEmitter._operatorPrecedence, (function () {
-						this._emitter._emit("(function (o) { return o && o.$__jsx_implements_" + destType.getClassDef().getOutputClassName() + " ? o : null; })(", this._expr.getToken());
-						this._emitter._getExpressionEmitterFor(this._expr.getExpr()).emit(0);
-						this._emitter._emit(")", this._expr.getToken());
+						emitWithGuard(function () {
+							this._emitter._emit("o && o.$__jsx_implements_" + destType.getClassDef().getOutputClassName(), this._expr.getToken());
+						}.bind(this), "detected invalid cast, value is not of specified type");
 					}).bind(this));
 				}
 				return true;
 			}
 			if (destType instanceof FunctionType) {
 				// cast to function
-				this._emitter._emit("(function (o) { return typeof(o) === \"function\" ? o : null; })(", this._expr.getToken());
-				this._emitter._getExpressionEmitterFor(this._expr.getExpr()).emit(0);
-				this._emitter._emit(")", this._expr.getToken());
+				emitWithGuard(function () {
+					this._emitter._emit("typeof(o) === \"function\"");
+				}.bind(this), "detected invalid cast, value is not a function");
 				return true;
 			}
 		}
@@ -1872,6 +1892,7 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 		this._emittingFunction = null;
 		this._emittingStatementStack = [];
 		this._enableRunTimeTypeCheck = true;
+		this._enableStrictRunTimeTypeCheck = false;
 	},
 
 	getSearchPaths: function () {
@@ -1901,6 +1922,10 @@ var JavaScriptEmitter = exports.JavaScriptEmitter = Class.extend({
 
 	setEnableRunTimeTypeCheck: function (enable) {
 		this._enableRunTimeTypeCheck = enable;
+	},
+
+	setEnableStrictRunTimeTypeCheck: function (enable) {
+		this._enableStrictRunTimeTypeCheck = enable;
 	},
 
 	setEnableSourceMap : function (enable) {

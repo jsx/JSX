@@ -428,6 +428,13 @@ var JSX = Class.extend({
 							};
 						}(mode));
 						break NEXTOPT;
+					case "strict-type-check":
+						tasks.push(function (mode) {
+							return function () {
+								emitter.setEnableStrictRunTimeTypeCheck(mode);
+							};
+						}(mode));
+						break NEXTOPT;
 					default:
 						break;
 					}
