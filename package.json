@@ -4,14 +4,19 @@
   "description": "a faster, safer, easier alternative to JavaScript",
   "homepage": "http://jsx.github.com/",
   "repository" : "git://github.com/jsx/JSX.git",
-  "author": [
-      {
-        "name":  "Kazuho Oku",
-        "email": "oku.kazuho@dena.jp"
-      },
+  "preferGlobal" : true,
+  "author": {
+    "name":  "Kazuho Oku",
+    "email": "oku.kazuho@dena.jp"
+  },
+  "contributors" : [
       {
         "name":  "Goro Fuji (gfx)",
         "email": "fuji.goro@dena.jp"
+      },
+      {
+        "name":  "Yuichi Nishiwaki (wasabiz)",
+        "email": "nishiwaki.yuichi@dena.jp"
       }
   ],
   "bin" : {
@@ -19,10 +24,10 @@
   },
   "directories": {
     "bin": "./bin",
-    "lib": "./lib"
+    "lib": "./lib",
+    "src": "./src"
   },
-  "devDependencies": {
-      "browserbuild": "*",
+  "dependencies": {
       "source-map": "0.1.1"
   },
   "engines": {

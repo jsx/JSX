@@ -5,6 +5,7 @@
 *.zip
 _builtins.js
 v8.log
+npm-debug.log
 CodeMirror-*
 bootstrap/
 
