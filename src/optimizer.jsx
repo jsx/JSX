@@ -2704,59 +2704,64 @@ class _ArrayLengthOptimizeCommand extends _FunctionOptimizeCommand {
 				var condExpr = (statement as ForStatement).getCondExpr();
 				var arrayLocal = condExpr != null ? this._hasLengthExprOfLocalArray(condExpr) : null;
 				if (arrayLocal != null) {
-					if (this._lengthIsUnmodifiedInExpr((statement as ForStatement).getCondExpr())
-						&& this._lengthIsUnmodifiedInExpr((statement as ForStatement).getPostExpr())
-						&& (statement as ForStatement).forEachStatement(function (statement) { return this._lengthIsUnmodifiedInStatement(statement); })) {
-							// optimize!
-							this.log(_Util.getFuncName(funcDef) + " optimizing .length at line " + (statement as ForStatement).getToken().getLineNumber() as string);
-							// create local
-							var lengthLocal = this.createVar(funcDef, Type.integerType, arrayLocal.getName().getValue() + "$len");
-							// assign to the local
-							var localLength =  new AssignmentExpression(
-										new Token("=", false),
-										new LocalExpression(new Token(lengthLocal.getName().getValue(), true), lengthLocal),
-										new PropertyExpression(
-											new Token(".", false),
-											new LocalExpression(new Token(arrayLocal.getName().getValue(), true), arrayLocal),
-											new Token("length", true),
-											new Type[],
-											lengthLocal.getType()));
-							if ((statement as ForStatement).getInitExpr() != null) {
-								(statement as ForStatement).setInitExpr(
-									new CommaExpression(
-										new Token(",", false),
-										(statement as ForStatement).getInitExpr(),
-										localLength));
-							}
-							else {
-								(statement as ForStatement).setInitExpr(localLength);
-							}
-
-							// rewrite
-							var onExpr = function (expr : Expression, replaceCb : function(:Expression):void) : boolean {
-								if (expr instanceof PropertyExpression
-								    && (expr as PropertyExpression).getIdentifierToken().getValue() == "length"
-									&& (expr as PropertyExpression).getExpr() instanceof LocalExpression
-									&& ((expr as PropertyExpression).getExpr() as LocalExpression).getLocal() == arrayLocal) {
-										replaceCb(new LocalExpression(new Token(lengthLocal.getName().getValue(), true), lengthLocal));
-									} else {
-										expr.forEachExpression(onExpr);
-									}
-								return true;
-							};
-							(statement as ForStatement).getCondExpr().forEachExpression(onExpr);
-							(statement as ForStatement).getPostExpr().forEachExpression(onExpr);
-							(statement as ForStatement).forEachStatement(function onStatement2(statement : Statement) : boolean {
-								statement.forEachStatement(onStatement2);
-								statement.forEachExpression(onExpr);
-								return true;
-							});
-						}
+					this._optimizeArrayLength(funcDef, statement as ForStatement, arrayLocal);
 				}
 			}
 			return true;
 		});
 		return true;
+	}
+
+	function _optimizeArrayLength(funcDef : MemberFunctionDefinition, statement : ForStatement, arrayLocal : LocalVariable)  : void {
+		if (this._lengthIsUnmodifiedInExpr(statement.getCondExpr())
+			&& this._lengthIsUnmodifiedInExpr(statement.getPostExpr())
+			&& statement.forEachStatement(function (statement) { return this._lengthIsUnmodifiedInStatement(statement); })) {
+
+			// optimize!
+			this.log(_Util.getFuncName(funcDef) + " optimizing .length at line " + statement.getToken().getLineNumber() as string);
+			// create local var for array.length
+			var lengthLocal = this.createVar(funcDef, Type.integerType, arrayLocal.getName().getValue() + "$len");
+			// assign array.length to the local
+			var assignToLocal =  new AssignmentExpression(
+						new Token("=", false),
+						new LocalExpression(new Token(lengthLocal.getName().getValue(), true), lengthLocal),
+						new PropertyExpression(
+							new Token(".", false),
+							new LocalExpression(new Token(arrayLocal.getName().getValue(), true), arrayLocal),
+							new Token("length", true),
+							new Type[],
+							lengthLocal.getType()));
+			if (statement.getInitExpr() != null) {
+				statement.setInitExpr(
+					new CommaExpression(
+						new Token(",", false),
+						statement.getInitExpr(),
+						assignToLocal));
+			}
+			else {
+				statement.setInitExpr(assignToLocal);
+			}
+
+			// rewrite
+			var onExpr = function (expr : Expression, replaceCb : function(:Expression):void) : boolean {
+				if (expr instanceof PropertyExpression
+					&& (expr as PropertyExpression).getIdentifierToken().getValue() == "length"
+					&& (expr as PropertyExpression).getExpr() instanceof LocalExpression
+					&& ((expr as PropertyExpression).getExpr() as LocalExpression).getLocal() == arrayLocal) {
+						replaceCb(new LocalExpression(new Token(lengthLocal.getName().getValue(), true), lengthLocal));
+					} else {
+						expr.forEachExpression(onExpr);
+					}
+				return true;
+			};
+			statement.getCondExpr().forEachExpression(onExpr);
+			statement.getPostExpr().forEachExpression(onExpr);
+			statement.forEachStatement(function onStatement2(statement : Statement) : boolean {
+				statement.forEachStatement(onStatement2);
+				statement.forEachExpression(onExpr);
+				return true;
+			});
+		}
 	}
 
 	function _hasLengthExprOfLocalArray (expr : Expression) : LocalVariable {
