@@ -295,17 +295,28 @@ sub run_web_test {
     my($file) = @_;
 
     my $phantom = `which phantomjs`;
-    if (! $phantom) {
+    if (! $phantom ) {
         local $TODO = "no phantomjs(1)";
         fail $file;
         done_testing;
         return;
     }
-
     chomp $phantom;
+
+    require version;
+    my $phantomjs_ver = `$phantom --version`;
+    chomp $phantomjs_ver;
+    if (version::qv($phantomjs_ver) < version::qv("1.8.0")) {
+        local $TODO = "phantomjs $phantomjs_ver is too old";
+        fail $file;
+        done_testing;
+        return;
+    }
+
     local $ENV{JSX_RUNJS} = $phantom;
     if (system("bin/jsx", "--executable", "commonjs", "--test", $file) != 0) {
-        fail("Cannot exec bin/jsx --test $file");
+        fail("Cannot exec bin/jsx --test $file with $phantom");
         done_testing;
     }
 }
+# vim: set expandtab:
