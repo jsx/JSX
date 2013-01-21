@@ -47,31 +47,6 @@ example:
 }
  */
 
-class Symbol {
-	var name : string;
-	var type : string;
-}
-
-class CompleteCandidate {
-	var word : string;
-	var partialWord : string;
-
-	var doc : Nullable.<string>;
-
-	// type of the symobl: "function():void"
-	// available for variables or functions
-	var type : Nullable.<string>;
-
-	var returnType : Nullable.<string>;   // function specific
-	var args       : Nullable.<Symbol[]>; // function specific
-
-	var kind : string;
-
-	// where the symbol is defined
-	var definedClass       : Nullable.<string>;
-	var definedFilename    : Nullable.<string>;
-	var definedLineNumber  : Nullable.<int>;
-}
 
 class CompletionRequest {
 
@@ -106,34 +81,35 @@ class CompletionRequest {
 		this._candidates.push(candidates);
 	}
 
-	function getCandidates () : CompleteCandidate[] {
+	function getCandidates () : Map.<variant>[] {
 		var seen = new Map.<boolean>; // for unique
-		var results = new CompleteCandidate[];
+		var results = new Map.<variant>[];
 		// fetch the list
 		this._candidates.forEach(function (candidates : CompletionCandidates) : void {
-			var rawCandidates = new CompleteCandidate[];
+			var rawCandidates = new Map.<variant>[];
 			candidates.getCandidates(rawCandidates);
 			var prefix = candidates.getPrefix();
-			rawCandidates.forEach(function (s : CompleteCandidate) : void {
-				if (prefix == "" && s.word.substring(0, 2) == "__" && s.word != "__noconvert__" && s.word != "undefined") {
+			rawCandidates.forEach(function (s) {
+				var word = s["word"] as string;
+				if (prefix == "" && word.substring(0, 2) == "__" && word != "__noconvert__" && word != "undefined") {
 					// skip hidden keywords
-				} else if (s.word.substring(0, prefix.length) == prefix) {
-					var left = s.word.substring(prefix.length);
+				} else if (word.substring(0, prefix.length) == prefix) {
+					var left = word.substring(prefix.length);
 					if (left.length == 0) {
 						return;
 					}
 
-					var identity = JSON.stringify([left, s.args] : variant[]);
+					var identity = JSON.stringify([left, s["args"]] : variant[]);
 					if (! seen.hasOwnProperty(identity)) {
 						seen[identity] = true;
 
-						if (s.word != left) {
-							s.partialWord = left;
+						if (word != left) {
+							s["partialWord"] = left;
 						}
 
 						// "kind" is useful for debugging --completion itself,
 						// but unlikely to be used by editors
-
+						delete s["kind"];
 						results.push(s);
 					}
 				}
@@ -153,7 +129,7 @@ abstract class CompletionCandidates {
 		this._prefix = null;
 	}
 
-	abstract function getCandidates (candidates : CompleteCandidate[]) : void;
+	abstract function getCandidates (candidates : Map.<variant>[]) : void;
 
 	function getPrefix () : string {
 		return this._prefix;
@@ -164,30 +140,30 @@ abstract class CompletionCandidates {
 		return this;
 	}
 
-	static function makeClassCandidate (classDef : ClassDefinition) : CompleteCandidate {
-		var data = new CompleteCandidate;
+	static function makeClassCandidate (classDef : ClassDefinition) : Map.<variant> {
+		var data = new Map.<variant>;
 
-		data.word = classDef.className();
-		data.definedFilename = classDef.getToken().getFilename();
-		data.definedLineNumber = classDef.getToken().getLineNumber();
+		data["word"] = classDef.className();
+		data["definedFilename"] = classDef.getToken().getFilename();
+		data["definedLineNumber"] = classDef.getToken().getLineNumber();
 
 		if ((classDef.flags() & ClassDefinition.IS_INTERFACE) != 0) {
-			data.kind = "interface";
+			data["kind"] = "interface";
 		} else if ((classDef.flags() & ClassDefinition.IS_MIXIN) != 0) {
-			data.kind = "mixin";
+			data["kind"] = "mixin";
 		}
 		else {
-			data.kind = "class";
+			data["kind"] = "class";
 		}
 
 		var docComment = classDef.getDocComment();
 		if (docComment) {
-			data.doc = docComment.getDescription();
+			data["doc"] = docComment.getDescription();
 		}
 		return data;
 	}
 
-	static function _addClasses (candidates : CompleteCandidate[], parser : Parser, autoCompleteMatchCb : function(:ClassDefinition):boolean) : void {
+	static function _addClasses (candidates : Map.<variant>[], parser : Parser, autoCompleteMatchCb : function(:ClassDefinition):boolean) : void {
 		parser.getClassDefs().forEach(function (classDef) {
 			if (classDef instanceof InstantiatedClassDefinition) {
 				// skip
@@ -204,13 +180,13 @@ abstract class CompletionCandidates {
 		});
 	}
 
-	static function _addImportedClasses (candidates : CompleteCandidate[], imprt : Import, autoCompleteMatchCb : function(:ClassDefinition):boolean) : void {
+	static function _addImportedClasses (candidates : Map.<variant>[], imprt : Import, autoCompleteMatchCb : function(:ClassDefinition):boolean) : void {
 		var classNames = imprt.getClassNames();
 		if (classNames != null) {
 			classNames.forEach(function (className) {
-				var data = new CompleteCandidate;
-				data.word = className;
-				data.kind = "class";
+				var data = new Map.<variant>;
+				data["word"] = className;
+				data["kind"] = "class";
 				// FIXME can we refer to the classdefs of the classnames here?
 				candidates.push(data);
 			});
@@ -232,10 +208,10 @@ class KeywordCompletionCandidate extends CompletionCandidates {
 		this._expected = expected;
 	}
 
-	override function getCandidates (candidates : CompleteCandidate[]) : void {
-		var data = new CompleteCandidate;
-		data.word = this._expected;
-		data.kind = "keyword";
+	override function getCandidates (candidates : Map.<variant>[]) : void {
+		var data = new Map.<variant>;
+		data["word"] = this._expected;
+		data["kind"] = "keyword";
 		candidates.push(data);
 	}
 
@@ -252,15 +228,15 @@ class CompletionCandidatesOfTopLevel extends CompletionCandidates {
 		this._autoCompleteMatchCb = autoCompleteMatchCb;
 	}
 
-	override function getCandidates (candidates : CompleteCandidate[]) : void {
+	override function getCandidates (candidates : Map.<variant>[]) : void {
 		CompletionCandidates._addClasses(candidates, this._parser, this._autoCompleteMatchCb);
 		for (var i = 0; i < this._parser._imports.length; ++i) {
 			var imprt = this._parser._imports[i];
 			var alias = imprt.getAlias();
 			if (alias != null) {
-				var data = new CompleteCandidate;
-				data.word = alias;
-				data.kind = "alias";
+				var data = new Map.<variant>;
+				data["word"] = alias;
+				data["kind"] = "alias";
 				candidates.push(data);
 			} else {
 				CompletionCandidates._addImportedClasses(candidates, imprt, this._autoCompleteMatchCb);
@@ -286,19 +262,19 @@ class _CompletionCandidatesWithLocal extends CompletionCandidatesOfTopLevel {
 		});
 	}
 
-	override function getCandidates (candidates : CompleteCandidate[]) : void {
+	override function getCandidates (candidates : Map.<variant>[]) : void {
 		this._locals.forEach(function (local) {
-			var data = new CompleteCandidate;
+			var data = new Map.<variant>;
 
-			data.word = local.getName().getValue();
-			data.kind = 'variable';
-			data.definedFilename = local.getName().getFilename();
-			data.definedLineNumber = local.getName().getLineNumber();
+			data["word"] = local.getName().getValue();
+			data["kind"] = 'variable';
+			data["definedFilename"]   = local.getName().getFilename();
+			data["definedLineNumber"] = local.getName().getLineNumber();
 
 			var type = local.getType();
 			// type may be null when type deduction fails
 			if (type != null) {
-				data.type = type.toString();
+				data["type"] = type.toString();
 			}
 
 			candidates.push(data);
@@ -319,7 +295,7 @@ class _CompletionCandidatesOfNamespace extends CompletionCandidates {
 		this._autoCompleteMatchCb = autoCompleteMatchCb;
 	}
 
-	override function getCandidates (candidates : CompleteCandidate[]) : void {
+	override function getCandidates (candidates : Map.<variant>[]) : void {
 		CompletionCandidates._addImportedClasses(candidates, this._import, this._autoCompleteMatchCb);
 	}
 
@@ -334,7 +310,7 @@ class _CompletionCandidatesOfProperty extends CompletionCandidates {
 		this._expr = expr;
 	}
 
-	override function getCandidates (candidates : CompleteCandidate[]) : void {
+	override function getCandidates (candidates : Map.<variant>[]) : void {
 		var type = this._expr.getType();
 		if (type == null)
 			return;
@@ -363,7 +339,7 @@ class _CompletionCandidatesOfProperty extends CompletionCandidates {
 		});
 	}
 
-	static function _makeMemberCandidate (member : MemberDefinition) : CompleteCandidate {
+	static function _makeMemberCandidate (member : MemberDefinition) : Map.<variant> {
 		var kind = (member.flags() & ClassDefinition.IS_STATIC
 			? "static member"
 			: "member");
@@ -371,27 +347,28 @@ class _CompletionCandidatesOfProperty extends CompletionCandidates {
 			? " function"
 			: " variable");
 
-		var data = new CompleteCandidate;
-		data.word = member.name();
-		data.type = member.getType().toString();
-		data.kind = kind;
+		var data = new Map.<variant>;
+		data["word"] = member.name();
+		data["type"] = member.getType().toString();
+		data["kind"] = kind;
 
-		data.definedClass      = member.getClassDef().className();
-		data.definedFilename   = member.getToken().getFilename();
-		data.definedLineNumber = member.getToken().getLineNumber();
+		data["definedClass"]      = member.getClassDef().className();
+		data["definedFilename"]   = member.getToken().getFilename();
+		data["definedLineNumber"] = member.getToken().getLineNumber();
 
 		var docComment = member.getDocComment();
 		if (docComment) {
-			data.doc = docComment.getDescription();
+			data["doc"] = docComment.getDescription();
 		}
 
 		if (member instanceof MemberFunctionDefinition) {
-			data.returnType = (member as MemberFunctionDefinition).getReturnType().toString();
-			data.args = (member as MemberFunctionDefinition).getArguments().map.<Symbol>(function (arg) {
-				var data = new Symbol;
-				data.name = arg.getName().getValue();
-				data.type = arg.getType().toString();
-				return data;
+			var mf = member as MemberFunctionDefinition;
+			data["returnType"] = mf.getReturnType().toString();
+			data["args"] = mf.getArguments().map.<Map.<string>>(function (arg) {
+				var pair = new Map.<string>;
+				pair["name"] = arg.getName().getValue();
+				pair["type"] = arg.getType().toString();
+				return pair;
 			});
 		}
 		return data;

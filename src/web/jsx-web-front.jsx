@@ -73,8 +73,8 @@ class JsxWebFront {
 					var ret = {} : variant;
 
 					var uniq = new Map.<boolean>;
-					ret['list'] = completionRequest.getCandidates().map.<Nullable.<string>>(function (item) {
-						return item.partialWord?: item.word?: null;
+					ret['list'] = completionRequest.getCandidates().map.<string>(function (item) {
+						return (item["partialWord"] ?: item["word"]) as string;
 					}).filter(function (item) {
 						if (! uniq.hasOwnProperty(item)) {
 							uniq[item] = true;
