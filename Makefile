@@ -1,4 +1,6 @@
 
+PROVE := prove
+
 JOBS:=4
 
 OPTIMIZE_FLAGS := lto,unclassify,fold-const,return-if,inline,dce,unbox,fold-const,dce,lcse,array-length,unclassify
@@ -25,15 +27,15 @@ self-hosting-compiler: compiler
 
 # e.g. make test JOBS=2
 test: compiler
-	prove --jobs "$(JOBS)" t/*.t t/*/*.jsx
+	$(PROVE) --jobs "$(JOBS)" t/*.t t/*/*.jsx
 
 test-optimized: compiler
-	JSX_OPTS="--optimize $(OPTIMIZE_FLAGS)" prove --jobs "$(JOBS)" t/*/*.jsx
+	JSX_OPTS="--optimize $(OPTIMIZE_FLAGS)" $(PROVE) --jobs "$(JOBS)" t/*/*.jsx
 
 test-all: test test-optimized
 
 optimize-bench:
-	prove xt/optimize-bench/*.jsx
+	$(PROVE) xt/optimize-bench/*.jsx
 
 ## web stuff
 

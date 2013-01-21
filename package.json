@@ -34,6 +34,6 @@
     "node": ">= 0.6.19"
   },
   "scripts" : {
-      "test" : "make test-all JOBS=1"
+      "test" : "make test-all JOBS=1 PROVE='prove -v'"
   }
 }
