@@ -1,16 +1,16 @@
 /*
  * Copyright (c) 2012 DeNA Co., Ltd.
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to
  * deal in the Software without restriction, including without limitation the
  * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
  * sell copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -47,7 +47,7 @@ abstract class Expression implements Stashable {
 
 	abstract function clone () : Expression;
 	abstract function serialize () : variant;
-	
+
 	function instantiate (instantiationContext : InstantiationContext) : boolean {
 		function onExpr(expr : Expression) : boolean {
 			if (expr instanceof NewExpression) {
@@ -2021,7 +2021,7 @@ class SuperExpression extends OperatorExpression {
 	function getFunctionType () : FunctionType {
 		return this._funcType;
 	}
-		
+
 	override function serialize () : variant {
 		return [
 			"SuperExpression",
@@ -2176,6 +2176,8 @@ class CommaExpression extends Expression {
 
 	function constructor (token : Token, expr1 : Expression, expr2 : Expression) {
 		super(token);
+		assert expr1 != null;
+		assert expr2 != null;
 		this._expr1 = expr1;
 		this._expr2 = expr2;
 	}

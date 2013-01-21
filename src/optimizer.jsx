@@ -1,16 +1,16 @@
 /*
  * Copyright (c) 2012 DeNA Co., Ltd.
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to
  * deal in the Software without restriction, including without limitation the
  * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
  * sell copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -809,6 +809,7 @@ class _UnclassifyOptimizationCommand extends _OptimizeCommand {
 				return false;
 			}
 			function onExpr(expr : Expression) : boolean {
+				assert expr != null;
 				if (expr instanceof InstanceofExpression) {
 					var foundClassDefIndex = candidates.indexOf((expr as InstanceofExpression).getExpectedType().getClassDef());
 					if (foundClassDefIndex != -1) {
@@ -2711,11 +2712,7 @@ class _ArrayLengthOptimizeCommand extends _FunctionOptimizeCommand {
 							// create local
 							var lengthLocal = this.createVar(funcDef, Type.integerType, arrayLocal.getName().getValue() + "$len");
 							// assign to the local
-							(statement as ForStatement).setInitExpr(
-								new CommaExpression(
-									new Token(",", false),
-									(statement as ForStatement).getInitExpr(),
-									new AssignmentExpression(
+							var localLength =  new AssignmentExpression(
 										new Token("=", false),
 										new LocalExpression(new Token(lengthLocal.getName().getValue(), true), lengthLocal),
 										new PropertyExpression(
@@ -2723,7 +2720,18 @@ class _ArrayLengthOptimizeCommand extends _FunctionOptimizeCommand {
 											new LocalExpression(new Token(arrayLocal.getName().getValue(), true), arrayLocal),
 											new Token("length", true),
 											new Type[],
-											lengthLocal.getType()))));
+											lengthLocal.getType()));
+							if ((statement as ForStatement).getInitExpr() != null) {
+								(statement as ForStatement).setInitExpr(
+									new CommaExpression(
+										new Token(",", false),
+										(statement as ForStatement).getInitExpr(),
+										localLength));
+							}
+							else {
+								(statement as ForStatement).setInitExpr(localLength);
+							}
+
 							// rewrite
 							var onExpr = function (expr : Expression, replaceCb : function(:Expression):void) : boolean {
 								if (expr instanceof PropertyExpression
