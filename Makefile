@@ -27,7 +27,7 @@ self-hosting-compiler: compiler
 
 # e.g. make test JOBS=2
 
-test: test-debug test-release
+test: test-debug test-optimized
 
 test-debug: compiler
 	$(PROVE) --jobs "$(JOBS)" t/*.t t/*/*.jsx
