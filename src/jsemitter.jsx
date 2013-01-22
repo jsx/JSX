@@ -1737,6 +1737,8 @@ class _CallExpressionEmitter extends _OperatorExpressionEmitter {
 			return false;
 
 		// emit
+		// In NodeJS, "require" and "__dirname" are defined in lexical context,
+		// so the function must be "eval", not "new Function"
 		var args = this._expr.getArguments();
 		this._emitter._emit("eval(", calleeExpr.getToken());
 		this._emitter._getExpressionEmitterFor(args[0]).emit(0);
