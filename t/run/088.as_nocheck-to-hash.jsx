@@ -1,6 +1,6 @@
 /*EXPECTED
 world
-detected invalid cast, value is not a Map, function or null
+detected invalid cast, value is not a Map or null
 */
 
 class _Main {

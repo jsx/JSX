@@ -1092,10 +1092,16 @@ class _AsNoConvertExpressionEmitter extends _ExpressionEmitter {
 					}, "detected invalid cast, value is not an Array or null");
 					return;
 				} else if (destClassDef instanceof InstantiatedClassDefinition && (destClassDef as InstantiatedClassDefinition).getTemplateClassName() == "Map") {
-					// a function may be regarded as a Map.<>
-					emitWithAssertion(function () {
-						this._emitter._emit("v == null || typeof v === \"object\" || typeof v === \"function\"", this._expr.getToken());
-					}, "detected invalid cast, value is not a Map, function or null");
+					if (srcType.equals(Type.variantType)) {
+						// variant which is "typeof function" may be converted to a Map.<variant> ("function" cannot be rejected, since the origin of the object may be javascript code)
+						emitWithAssertion(function () {
+							this._emitter._emit("v == null || typeof v === \"object\" || typeof v === \"function\"", this._expr.getToken());
+						}, "detected invalid cast, value is not a Map or null");
+					} else {
+						emitWithAssertion(function () {
+							this._emitter._emit("v == null || typeof v === \"object\"", this._expr.getToken());
+						}, "detected invalid cast, value is not a Map or null");
+					}
 					return;
 				} else if ((destClassDef.flags() & (ClassDefinition.IS_INTERFACE | ClassDefinition.IS_MIXIN)) == 0) {
 					emitWithAssertion(function () {

@@ -396,7 +396,7 @@ class DocumentGenerator {
 			var parsers = this._compiler.getParsers();
 			for (var i = 0; i < parsers.length; ++i) {
 				if (parsers[i].getClassDefs().indexOf(classDef) != -1
-					|| parsers[i].getTemplateClassDefs().indexOf(classDef as TemplateClassDefinition) != -1) {
+					|| (classDef instanceof TemplateClassDefinition && parsers[i].getTemplateClassDefs().indexOf(classDef as TemplateClassDefinition) != -1)) {
 					return parsers[i];
 				}
 			}
