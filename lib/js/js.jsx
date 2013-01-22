@@ -39,4 +39,8 @@ final class js {
 
 	static native function invoke(obj : variant, funcName : string, args : Array.<variant>) : variant;
 
+	/**
+	 * Executes JavaScript source code
+	 */
+	static native function execScript(jsSource : string) : variant;
 }

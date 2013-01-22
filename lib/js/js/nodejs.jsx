@@ -31,17 +31,12 @@ import "js.jsx";
 final class node {
 	delete function constructor () { }
 
-	static function _eval(source : string) : variant {
-		var eval = js.global['eval'] as (string) -> variant; // the name must be "eval"
-		return eval(source);
-	}
-
 	static function require(source : string) : variant {
 		var src = 'require(' + JSON.stringify(source) + ')';
-		return node._eval(src);
+		return js.execScript(src);
 	}
 
-	static const __dirname     = node._eval("__dirname") as string;
+	static const __dirname     = js.execScript("__dirname") as string;
 
 	static const fs            = node.require('fs') as __noconvert__ _fs;
 	static const path          = node.require('path') as __noconvert__ _path;
