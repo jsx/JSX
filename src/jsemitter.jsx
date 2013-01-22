@@ -1718,11 +1718,31 @@ class _CallExpressionEmitter extends _OperatorExpressionEmitter {
 			return false;
 		if (this._emitIfJsInvoke(calleeExpr as PropertyExpression))
 			return true;
+		if (this._emitIfJsEval(calleeExpr as PropertyExpression))
+			return true;
 		else if (this._emitCallsToMap(calleeExpr as PropertyExpression))
 			return true;
 		else if (this._emitIfMathAbs(calleeExpr as PropertyExpression))
 			return true;
 		return false;
+	}
+
+	function _emitIfJsEval(calleeExpr : PropertyExpression) : boolean {
+		if (! (calleeExpr.getType() instanceof StaticFunctionType))
+			return false;
+		if (calleeExpr.getIdentifierToken().getValue() != "eval")
+			return false;
+		var classDef = calleeExpr.getExpr().getType().getClassDef();
+		if (! this._emitter.isJsModule(classDef))
+			return false;
+
+		// emit
+		var args = this._expr.getArguments();
+		this._emitter._emit("eval(", calleeExpr.getToken());
+		this._emitter._getExpressionEmitterFor(args[0]).emit(0);
+		this._emitter._emit(")", calleeExpr.getToken());
+
+		return true;
 	}
 
 	function _emitIfJsInvoke (calleeExpr : PropertyExpression) : boolean {
@@ -1731,8 +1751,9 @@ class _CallExpressionEmitter extends _OperatorExpressionEmitter {
 		if (calleeExpr.getIdentifierToken().getValue() != "invoke")
 			return false;
 		var classDef = calleeExpr.getExpr().getType().getClassDef();
-		if (! (classDef.className() == "js" && classDef.getToken().getFilename() == Util.resolvePath(this._emitter._platform.getRoot() + "/lib/js/js.jsx")))
+		if (! this._emitter.isJsModule(classDef))
 			return false;
+
 		// emit
 		var args = this._expr.getArguments();
 		if (args[2] instanceof ArrayLiteralExpression) {
@@ -2002,6 +2023,13 @@ class JavaScriptEmitter implements Emitter {
 		this._enableRunTimeTypeCheck = true;
 	}
 
+	function isJsModule(classDef : ClassDefinition) : boolean {
+		return classDef.className() == "js"
+			&& classDef.getToken().getFilename() == Util.resolvePath(this._platform.getRoot() + "/lib/js/js.jsx");
+
+	}
+
+
 	override function getSearchPaths () : string[] {
 		return [ this._platform.getRoot() + "/lib/js" ];
 	}
@@ -2098,7 +2126,7 @@ class JavaScriptEmitter implements Emitter {
 		if ((classDef.flags() & ClassDefinition.IS_NATIVE) != 0)
 			return;
 		// special handling for js.jsx
-		if (classDef.getToken() != null && classDef.getToken().getFilename() == Util.resolvePath(this._platform.getRoot() + "/lib/js/js.jsx")) {
+		if (this.isJsModule(classDef)) {
 			this._emit("js.global = (function () { return this; })();\n\n", null);
 			return;
 		}
