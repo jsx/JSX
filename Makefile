@@ -26,16 +26,18 @@ self-hosting-compiler: compiler
 ## test stuff
 
 # e.g. make test JOBS=2
-test: compiler
+
+test: test-debug test-release
+
+test-debug: compiler
 	$(PROVE) --jobs "$(JOBS)" t/*.t t/*/*.jsx
 
 test-optimized: compiler
 	JSX_OPTS="--optimize $(OPTIMIZE_FLAGS)" $(PROVE) --jobs "$(JOBS)" t/*/*.jsx
 
-test-all: test test-optimized
 
 optimize-bench:
-	$(PROVE) xt/optimize-bench/*.jsx
+	$(PROVE) -v xt/optimize-bench/*.jsx
 
 ## web stuff
 
