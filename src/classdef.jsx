@@ -910,7 +910,7 @@ class MemberVariableDefinition extends MemberDefinition {
 
 	override function serialize () : variant {
 		return {
-			"token"      : this._token.serialize(),
+			"token"      : Serializer.<Token>.serializeNullable(this._token),
 			"nameToken"  : Serializer.<Token>.serializeNullable(this._nameToken),
 			"flags"        : this.flags(),
 			"type"         : Serializer.<Type>.serializeNullable(this._type),
@@ -1110,7 +1110,7 @@ class MemberFunctionDefinition extends MemberDefinition implements Block {
 
 	override function serialize () : variant {
 		return {
-			"token"      : this._token.serialize(),
+			"token"      : Serializer.<Token>.serializeNullable(this._token),
 			"nameToken"  : Serializer.<Token>.serializeNullable(this._nameToken),
 			"flags"      : this.flags(),
 			"returnType" : Serializer.<Type>.serializeNullable(this._returnType),
