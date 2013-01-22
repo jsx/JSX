@@ -1092,16 +1092,10 @@ class _AsNoConvertExpressionEmitter extends _ExpressionEmitter {
 					}, "detected invalid cast, value is not an Array or null");
 					return;
 				} else if (destClassDef instanceof InstantiatedClassDefinition && (destClassDef as InstantiatedClassDefinition).getTemplateClassName() == "Map") {
-					if (srcType.equals(Type.variantType)) {
-						// variant which is "typeof function" may be converted to a Map.<variant> ("function" cannot be rejected, since the origin of the object may be javascript code)
-						emitWithAssertion(function () {
-							this._emitter._emit("v == null || typeof v === \"object\" || typeof v === \"function\"", this._expr.getToken());
-						}, "detected invalid cast, value is not a Map or null");
-					} else {
-						emitWithAssertion(function () {
-							this._emitter._emit("v == null || typeof v === \"object\"", this._expr.getToken());
-						}, "detected invalid cast, value is not a Map or null");
-					}
+					// a function may be regarded as a Map.<>
+					emitWithAssertion(function () {
+						this._emitter._emit("v == null || typeof v === \"object\" || typeof v === \"function\"", this._expr.getToken());
+					}, "detected invalid cast, value is not a Map, function or null");
 					return;
 				} else if ((destClassDef.flags() & (ClassDefinition.IS_INTERFACE | ClassDefinition.IS_MIXIN)) == 0) {
 					emitWithAssertion(function () {
@@ -1736,7 +1730,7 @@ class _CallExpressionEmitter extends _OperatorExpressionEmitter {
 	function _emitIfJsEval(calleeExpr : PropertyExpression) : boolean {
 		if (! (calleeExpr.getType() instanceof StaticFunctionType))
 			return false;
-		if (calleeExpr.getIdentifierToken().getValue() != "eval")
+		if (calleeExpr.getIdentifierToken().getValue() != "execScript")
 			return false;
 		var classDef = calleeExpr.getExpr().getType().getClassDef();
 		if (! this._emitter.isJsModule(classDef))
@@ -2133,7 +2127,7 @@ class JavaScriptEmitter implements Emitter {
 			return;
 		// special handling for js.jsx
 		if (this.isJsModule(classDef)) {
-			this._emit("js.global = (function () { return this; })();\n\n", null);
+			this._emit("js.global = (function () { return this; })();\n", null);
 			return;
 		}
 		// normal handling
