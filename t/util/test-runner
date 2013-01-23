@@ -59,7 +59,10 @@ sub main {
     elsif($file =~ m{ /compile_error/ }xms) {
         expect_compile_error($file);
     }
-    elsif($file =~ m{ /lib/ }xms or $file =~ m{ \.jsx\.t \z}xms) {
+    elsif($file =~ m{ /lib/ }xms) {
+        run_test($file);
+    }
+    elsif($file =~ m{ /src/ }xms) {
         run_test($file);
     }
     elsif($file =~ m{ /web/ }xms) {
