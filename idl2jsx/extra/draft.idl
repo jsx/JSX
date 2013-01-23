@@ -121,3 +121,8 @@ partial interface Window {
 // defined in http://www.w3.org/TR/SVG11/
 interface SVGMatrix {
 };
+
+// for mobile safari
+partial interface CSSStyleDeclaration {
+	DOMString webkitOverflowScrolling;
+};

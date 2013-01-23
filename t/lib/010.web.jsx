@@ -1417,6 +1417,7 @@ class _Test extends TestCase {
         var v493 : Nullable.<string> = o.transitionDuration;
         var v494 : Nullable.<string> = o.transitionProperty;
         var v495 : Nullable.<string> = o.transitionTimingFunction;
+        var v496 : string/*DOMString*/ = o.webkitOverflowScrolling;
     } // CSSStyleDeclaration
 
     function compile_ElementCSSInlineStyle(o : ElementCSSInlineStyle) : void {

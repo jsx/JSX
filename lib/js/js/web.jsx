@@ -2188,6 +2188,8 @@ native final class CSSStyleDeclaration {
 	var transitionProperty : Nullable.<string>;
 	var transitionTimingFunction : Nullable.<string>;
 
+	var webkitOverflowScrolling : string/*DOMString*/;
+
 } // end of CSSStyleDeclaration
 
 /** @see http://dev.w3.org/csswg/cssom/ */
