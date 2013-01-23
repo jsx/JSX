@@ -2016,7 +2016,7 @@ class JavaScriptEmitter implements Emitter {
 
 	var _enableSourceMap : boolean;
 	var _enableProfiler : boolean;
-	var _sourceMapGen : SourceMapGenerator;
+	var _sourceMapper : SourceMapper;
 
 	function constructor (platform : Platform) {
 		JavaScriptEmitter.initialize();
@@ -2048,19 +2048,19 @@ class JavaScriptEmitter implements Emitter {
 		if(this._enableSourceMap && name != null) {
 			// FIXME: set correct sourceRoot
 			var sourceRoot = null : Nullable.<string>;
-			this._sourceMapGen = new SourceMapGenerator(name, sourceRoot);
+			this._sourceMapper = new SourceMapper(name, sourceRoot);
 		}
 	}
 
 	override function saveSourceMappingFile (platform : Platform) : void {
-		var gen = this._sourceMapGen;
+		var gen = this._sourceMapper;
 		if(gen != null) {
 			platform.save(gen.getSourceMappingFile(), gen.generate());
 		}
 	}
 
-	function setSourceMapGenerator (gen : SourceMapGenerator) : void {
-		this._sourceMapGen = gen;
+	function setSourceMapper(gen : SourceMapper) : void {
+		this._sourceMapper = gen;
 	}
 
 	override function setEnableRunTimeTypeCheck (enable : boolean) : void {
@@ -2224,8 +2224,8 @@ class JavaScriptEmitter implements Emitter {
 			output = this._platform.addLauncher(this, this._encodeFilename(sourceFile, "system:"), output, entryPoint, executableFor);
 		}
 		output += "})();\n";
-		if (this._sourceMapGen) {
-			output += this._sourceMapGen.magicToken();
+		if (this._sourceMapper) {
+			output += this._sourceMapper.magicToken();
 		}
 		return output;
 	}
@@ -2437,7 +2437,7 @@ class JavaScriptEmitter implements Emitter {
 			this._outputEndsWithReturn = false;
 		}
 		// optional source map
-		if(this._sourceMapGen != null && token != null) {
+		if(this._sourceMapper != null && token != null) {
 			var lastNewLinePos = this._output.lastIndexOf("\n") + 1;
 			var genColumn = (this._output.length - lastNewLinePos) - 1;
 			var genPos = {
@@ -2455,7 +2455,7 @@ class JavaScriptEmitter implements Emitter {
 			if (filename != null) {
 				filename = this._encodeFilename(filename, "");
 			}
-			this._sourceMapGen.add(genPos, origPos, filename, tokenValue);
+			this._sourceMapper.add(genPos, origPos, filename, tokenValue);
 		}
 		str = str.replace(/\n(.)/g, (function (m : string) : string {
 			return "\n" + this._getIndent() + m.substring(1);

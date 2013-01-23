@@ -4,11 +4,8 @@ import "js/nodejs.jsx";
 import "test-case.jsx";
 
 import "../../src/util.jsx";
+import "../../src/jssourcemap.jsx";
 import "../util/jslexer.jsx";
-
-native __fake__ class SourceMapConsumer {
-	function originalPositionFor(generatedPos : variant) : variant;
-}
 
 class _Test extends TestCase {
 
@@ -47,7 +44,7 @@ class _Test extends TestCase {
 			this.expect(mapping['file'], "mapping.file").toBe("t/source-map/hello.jsx.js");
 			var sources = ["t/source-map/hello.jsx", "lib/js/timer.jsx", "lib/js/js.jsx"].sort();
 			this.expect(JSON.stringify((mapping['sources'] as string[]).sort()), "mapping.sources").toBe(JSON.stringify(sources));
-			var consumer = js.execScript('new (require("source-map").SourceMapConsumer)(mapping)') as __noconvert__ SourceMapConsumer;
+			var consumer = SourceMapper.createSourceMapConsumer(mapping);
 
 			var pos, orig;
 

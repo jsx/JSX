@@ -22,23 +22,38 @@
 
 import "js.jsx";
 
-native __fake__ class _SourceMapGeneratorImpl {
+native __fake__ class _SourceMapGenerator {
 	function addMapping(mapping : Map.<variant>) : void;
 
 	var _validateMapping : function () : void; // DIRTY HACK
 }
 
-class SourceMapGenerator {
+native __fake__ class _SourceMapConsumer {
+	function originalPositionFor(generatedPos : variant) : variant;
+}
+
+
+class SourceMapper {
 
 	var _outputFile : string;
-	var _impl : _SourceMapGeneratorImpl;
+	var _impl : _SourceMapGenerator;
+
+	static function createSourceMapGenerator(args : Map.<string>) : _SourceMapGenerator {
+		return js.execScript('new (require("source-map").SourceMapGenerator)('+JSON.stringify(args)+')')
+				as __noconvert__ _SourceMapGenerator;
+	}
+
+	static function createSourceMapConsumer(mapping : variant) : _SourceMapConsumer {
+		return js.execScript('new (require("source-map").SourceMapConsumer)('+JSON.stringify(mapping)+')')
+				as __noconvert__ _SourceMapConsumer;
+	}
 
 	function constructor (outputFile : string, sourceRoot : Nullable.<string>) {
-		var eval = js.global['eval'] as (string) -> variant;
-		var sourceMap = eval('require("source-map")'); // lazy load for web
-
 		this._outputFile = outputFile;
-		this._impl = eval("new sourceMap.SourceMapGenerator({ file: outputFile, sourceRoot: sourceRoot })") as __noconvert__ _SourceMapGeneratorImpl;
+		this._impl = SourceMapper.createSourceMapGenerator({
+			file       : outputFile,
+			sourceRoot : sourceRoot
+		});
 
 		// XXX: monkey-patch to avoid source-map (0.1.0-0.1.1)'s bug
 		this._impl._validateMapping = function () : void {};
