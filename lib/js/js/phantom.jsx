@@ -16,8 +16,7 @@ native final class phantom {
 
 final class _CommonJS {
   static function require(name : string) : variant {
-    var jsEval = js.global["eval"] as __noconvert__ function(:string):variant;
-    return jsEval("require('" + name.replace(/'/g, "\\'") + "')");
+    return js.execScript("require(" + JSON.stringify(name) + ")");
   }
 }
 
