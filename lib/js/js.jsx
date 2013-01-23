@@ -42,5 +42,5 @@ final class js {
 	/**
 	 * Executes JavaScript source code
 	 */
-	static native function execScript(jsSource : string) : variant;
+	static native function eval(jsSource : string) : variant;
 }

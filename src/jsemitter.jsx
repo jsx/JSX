@@ -1736,7 +1736,7 @@ class _CallExpressionEmitter extends _OperatorExpressionEmitter {
 	function _emitIfJsEval(calleeExpr : PropertyExpression) : boolean {
 		if (! (calleeExpr.getType() instanceof StaticFunctionType))
 			return false;
-		if (calleeExpr.getIdentifierToken().getValue() != "execScript")
+		if (calleeExpr.getIdentifierToken().getValue() != "eval")
 			return false;
 		var classDef = calleeExpr.getExpr().getType().getClassDef();
 		if (! this._emitter.isJsModule(classDef))

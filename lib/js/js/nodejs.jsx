@@ -33,10 +33,10 @@ final class node {
 
 	static function require(source : string) : variant {
 		var src = 'require(' + JSON.stringify(source) + ')';
-		return js.execScript(src);
+		return js.eval(src);
 	}
 
-	static const __dirname     = js.execScript("__dirname") as string;
+	static const __dirname     = js.eval("__dirname") as string;
 
 	static const fs            = node.require('fs') as __noconvert__ _fs;
 	static const path          = node.require('path') as __noconvert__ _path;

@@ -5300,7 +5300,7 @@ _CallExpressionEmitter.prototype._emitIfJsEval$LPropertyExpression$ = function (
 	if (! (calleeExpr.getType$() instanceof StaticFunctionType)) {
 		return false;
 	}
-	if (calleeExpr.getIdentifierToken$().getValue$() !== "execScript") {
+	if (calleeExpr.getIdentifierToken$().getValue$() !== "eval") {
 		return false;
 	}
 	classDef = calleeExpr.getExpr$().getType$().getClassDef$();

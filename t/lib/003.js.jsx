@@ -20,7 +20,7 @@ class _Test extends TestCase {
 	}
 
 	function testExecScript() : void {
-		var value = js.execScript("2 + 3") as int;
+		var value = js.eval("2 + 3") as int;
 		this.expect(value).toBe(2 + 3);
 	}
 

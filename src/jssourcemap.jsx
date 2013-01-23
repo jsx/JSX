@@ -39,12 +39,12 @@ class SourceMapper {
 	var _impl : _SourceMapGenerator;
 
 	static function createSourceMapGenerator(args : Map.<string>) : _SourceMapGenerator {
-		return js.execScript('new (require("source-map").SourceMapGenerator)('+JSON.stringify(args)+')')
+		return js.eval('new (require("source-map").SourceMapGenerator)('+JSON.stringify(args)+')')
 				as __noconvert__ _SourceMapGenerator;
 	}
 
 	static function createSourceMapConsumer(mapping : variant) : _SourceMapConsumer {
-		return js.execScript('new (require("source-map").SourceMapConsumer)('+JSON.stringify(mapping)+')')
+		return js.eval('new (require("source-map").SourceMapConsumer)('+JSON.stringify(mapping)+')')
 				as __noconvert__ _SourceMapConsumer;
 	}
 

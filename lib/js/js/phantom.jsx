@@ -16,7 +16,7 @@ native final class phantom {
 
 final class _CommonJS {
   static function require(name : string) : variant {
-    return js.execScript("require(" + JSON.stringify(name) + ")");
+    return js.eval("require(" + JSON.stringify(name) + ")");
   }
 }
 
