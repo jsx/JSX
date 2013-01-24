@@ -21,7 +21,7 @@
  */
 
 final class Meta {
-	static const VERSION_STRING = "0.1.0-alpha";
-	static const VERSION_NUMBER =  0.001000;
+	static const VERSION_STRING = "0.9";
+	static const VERSION_NUMBER =  0.9;
 }
 
