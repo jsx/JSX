@@ -1135,6 +1135,12 @@ class MemberFunctionDefinition extends MemberDefinition implements Block {
 		} else {
 			context.setBlockStack(outerContext.blockStack);
 			context.blockStack.push(new BlockContext(new LocalVariableStatuses(this, outerContext.getTopBlock().localVariableStatuses), this));
+			if (this._nameToken != null) { // named function expr
+				var funcName = this.getLocal(context, this.name());
+				context.getTopBlock().localVariableStatuses.setStatus(funcName);
+				if (funcName.getType() == null)
+					funcName.setType(this.getType());
+			}
 		}
 
 		try {
@@ -1625,8 +1631,6 @@ class LocalVariableStatuses {
 		var locals = funcDef.getLocals();
 		for (var i = 0; i < locals.length; ++i)
 			this._statuses[locals[i].getName().getValue()] = LocalVariableStatuses.UNSET;
-		if (funcDef.getParent() != null && funcDef.getNameToken() != null)
-			this._statuses[funcDef.name()] = LocalVariableStatuses.ISSET;
 	}
 
 	function constructor (srcStatus : LocalVariableStatuses) {

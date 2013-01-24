@@ -788,12 +788,12 @@ class FunctionExpression extends Expression {
 	}
 
 	override function analyze (context : AnalysisContext, parentExpr : Expression) : boolean {
-		if (this._isStatement) {
-			context.getTopBlock().localVariableStatuses.setStatus(new LocalVariable(this._funcDef.getNameToken(), null));
-		}
 		if (! this.typesAreIdentified()) {
 			context.errors.push(new CompileError(this._token, "argument / return types were not automatically deductable, please specify them by hand"));
 			return false;
+		}
+		if (this._isStatement) {
+			context.getTopBlock().localVariableStatuses.setStatus(new LocalVariable(this._funcDef.getNameToken(), this.getType()));
 		}
 		this._funcDef.analyze(context);
 		return true; // return true since everything is resolved correctly even if analysis of the function definition failed
