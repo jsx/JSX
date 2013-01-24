@@ -883,13 +883,7 @@ class _UnclassifyOptimizationCommand extends _OptimizeCommand {
 					// environment of the closure would change
 					return false;
 				} else if (expr instanceof LocalExpression) {
-					var args = funcDef.getArguments(), argIndex = -1;
-					for (var i in args) {
-						if (args[i] == (expr as LocalExpression).getLocal()) {
-							argIndex = i;
-							break;
-						}
-					}
+					var argIndex = funcDef.getArguments().map.<LocalVariable>((i) -> i).indexOf((expr as LocalExpression).getLocal());
 					if (argIndex == -1) {
 						throw new Error("logic flaw; could not find argument: " + (expr as LocalExpression).getLocal().getName().getValue());
 					}
