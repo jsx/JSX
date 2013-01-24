@@ -975,29 +975,30 @@ class _UnclassifyOptimizationCommand extends _OptimizeCommand {
 				if (calleeExpr instanceof PropertyExpression
 				    && ! ((calleeExpr as PropertyExpression).getExpr() instanceof ClassExpression)
 					&& ! (calleeExpr as PropertyExpression).getType().isAssignable()) {
+						var propertyExpr = calleeExpr as PropertyExpression;
 						// is a member method call
-						var receiverType = (calleeExpr as PropertyExpression).getExpr().getType().resolveIfNullable();
+						var receiverType = propertyExpr.getExpr().getType().resolveIfNullable();
 						var receiverClassDef = receiverType.getClassDef();
 						if (unclassifyingClassDefs.indexOf(receiverClassDef) != -1) {
 							// found, rewrite
-							onExpr((calleeExpr as PropertyExpression).getExpr(), function (expr) {
-								(calleeExpr as PropertyExpression).setExpr(expr);
+							onExpr(propertyExpr.getExpr(), function (expr) {
+								propertyExpr.setExpr(expr);
 							});
 							Util.forEachExpression(onExpr, (expr as CallExpression).getArguments());
-							var funcType = calleeExpr.getType();
+							var funcType = propertyExpr.getType();
 							replaceCb(
 								new CallExpression(
 									expr.getToken(),
 									new PropertyExpression(
-										calleeExpr.getToken(),
+										propertyExpr.getToken(),
 										new ClassExpression(new Token(receiverClassDef.className(), true), receiverType),
-										(calleeExpr as PropertyExpression).getIdentifierToken(),
-										(calleeExpr as PropertyExpression).getTypeArguments(),
+										propertyExpr.getIdentifierToken(),
+										propertyExpr.getTypeArguments(),
 										new StaticFunctionType(
 											(funcType as ResolvedFunctionType).getReturnType(),
 											[ receiverType ].concat((funcType as ResolvedFunctionType).getArgumentTypes()),
 											false)),
-									[ (calleeExpr as PropertyExpression).getExpr() ].concat((expr as CallExpression).getArguments())));
+									[ propertyExpr.getExpr() ].concat((expr as CallExpression).getArguments())));
 							return true;
 						}
 					}
