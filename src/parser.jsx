@@ -1964,7 +1964,7 @@ class Parser {
 				// void is simply skipped
 				break;
 			default:
-				throw "logic flaw, got " + token.getValue();
+				throw new Error("logic flaw, got " + token.getValue());
 			}
 		}
 		// expression statement

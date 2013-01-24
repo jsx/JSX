@@ -1879,7 +1879,7 @@ class _InlineOptimizeCommand extends _FunctionOptimizeCommand {
 	function _argsAreInlineable (callingFuncDef : MemberFunctionDefinition, actualArgs : Expression[], asExpression : boolean) : boolean {
 		var formalArgsTypes = callingFuncDef.getArgumentTypes();
 		if (actualArgs.length != formalArgsTypes.length)
-			throw "number of arguments mismatch";
+			throw new Error("number of arguments mismatch");
 		for (var i = 0; i < actualArgs.length; ++i) {
 			if (asExpression && ! (actualArgs[i] instanceof LeafExpression))
 				return false;
