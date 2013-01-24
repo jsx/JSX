@@ -624,13 +624,14 @@ class _DetermineCalleeCommand extends _FunctionOptimizeCommand {
 					// call expression
 					var calleeExpr = (expr as CallExpression).getExpr();
 					if (calleeExpr instanceof PropertyExpression && ! (calleeExpr as PropertyExpression).getType().isAssignable()) {
+						var propertyExpr = calleeExpr as PropertyExpression;
 						// is referring to function (not a value of function type)
-						var holderType = (calleeExpr as PropertyExpression).getHolderType();
+						var holderType = propertyExpr.getHolderType();
 						var callingFuncDef = _DetermineCalleeCommand.findCallingFunction(
 							holderType.getClassDef(),
-							(calleeExpr as PropertyExpression).getIdentifierToken().getValue(),
-							((calleeExpr as PropertyExpression).getType() as ResolvedFunctionType).getArgumentTypes(),
-							(calleeExpr as PropertyExpression).getExpr() instanceof ClassExpression);
+							propertyExpr.getIdentifierToken().getValue(),
+							(propertyExpr.getType() as ResolvedFunctionType).getArgumentTypes(),
+							propertyExpr.getExpr() instanceof ClassExpression);
 						this._setCallingFuncDef(expr, callingFuncDef);
 					} else if (calleeExpr instanceof FunctionExpression) {
 						this._setCallingFuncDef(expr, (calleeExpr as FunctionExpression).getFuncDef());
@@ -1391,12 +1392,14 @@ class _DeadCodeEliminationOptimizeCommand extends _FunctionOptimizeCommand {
 			if (expr instanceof AssignmentExpression
 			    && (expr as AssignmentExpression).getToken().getValue() != "="
 				&& (expr as AssignmentExpression).getFirstExpr() instanceof LocalExpression) {
-					this.log("local variable " + ((expr as AssignmentExpression).getFirstExpr() as LocalExpression).getLocal().getName().getValue() + " cannot be rewritten (has fused op)");
-					localsUntouchable.put(((expr as AssignmentExpression).getFirstExpr() as LocalExpression).getLocal(), true);
-				} else if ((expr instanceof PreIncrementExpression || expr instanceof PostIncrementExpression)
+					var local = ((expr as AssignmentExpression).getFirstExpr() as LocalExpression).getLocal();
+					this.log("local variable " + local.getName().getValue() + " cannot be rewritten (has fused op)");
+					localsUntouchable.put(local, true);
+				} else if (expr instanceof IncrementExpression
 					&& (expr as IncrementExpression).getExpr() instanceof LocalExpression) {
-					this.log("local variable " + ((expr as IncrementExpression).getExpr() as LocalExpression).getLocal().getName().getValue() + " cannot be rewritten (has increment)");
-					localsUntouchable.put(((expr as IncrementExpression).getExpr() as LocalExpression).getLocal(), true);
+					var local = ((expr as IncrementExpression).getExpr() as LocalExpression).getLocal();
+					this.log("local variable " + local.getName().getValue() + " cannot be rewritten (has increment)");
+					localsUntouchable.put(local, true);
 				}
 			return expr.forEachExpression(_onExpr);
 		};
@@ -1552,19 +1555,21 @@ class _DeadCodeEliminationOptimizeCommand extends _FunctionOptimizeCommand {
 		var lastAssignExpr = new Map.<Tuple.<AssignmentExpression, function(:Expression):void>>;
 		var onExpr = function (expr : Expression, rewriteCb : function(:Expression):void) : boolean {
 			if (expr instanceof AssignmentExpression) {
+				var assignmentExpr = expr as AssignmentExpression;
+				var firstExpr      = assignmentExpr.getFirstExpr();
 				if (expr.getToken().getValue() == "="
-					&& isFirstLevelPropertyAccess((expr as AssignmentExpression).getFirstExpr())
-					&& ! _Util.classIsNative(((expr as AssignmentExpression).getFirstExpr() as PropertyExpression).getExpr().getType().getClassDef())) {
-						var propertyName = ((expr as AssignmentExpression).getFirstExpr() as PropertyExpression).getIdentifierToken().getValue();
-						onExpr((expr as AssignmentExpression).getSecondExpr(), null);
+					&& isFirstLevelPropertyAccess(firstExpr)
+					&& ! _Util.classIsNative((firstExpr as PropertyExpression).getExpr().getType().getClassDef())) {
+						var propertyName = (firstExpr as PropertyExpression).getIdentifierToken().getValue();
+						onExpr(assignmentExpr.getSecondExpr(), null);
 						if (lastAssignExpr[propertyName]
-								   && baseExprsAreEqual(((expr as AssignmentExpression).getFirstExpr() as PropertyExpression).getExpr(), (lastAssignExpr[propertyName].first.getFirstExpr() as PropertyExpression).getExpr())) {
+								   && baseExprsAreEqual((firstExpr as PropertyExpression).getExpr(), (lastAssignExpr[propertyName].first.getFirstExpr() as PropertyExpression).getExpr())) {
 							lastAssignExpr[propertyName].second(lastAssignExpr[propertyName].first.getSecondExpr());
 						}
-						lastAssignExpr[propertyName] = new Tuple.<AssignmentExpression, function(:Expression):void>(expr as AssignmentExpression, rewriteCb);
+						lastAssignExpr[propertyName] = new Tuple.<AssignmentExpression, function(:Expression):void>(assignmentExpr, rewriteCb);
 						return true;
-					} else if ((expr as AssignmentExpression).getFirstExpr() instanceof LocalExpression) {
-						onExpr((expr as AssignmentExpression).getSecondExpr(), null);
+					} else if (assignmentExpr.getFirstExpr() instanceof LocalExpression) {
+						onExpr(assignmentExpr.getSecondExpr(), null);
 						for (var k in lastAssignExpr) {
 							var baseExpr = (lastAssignExpr[k].first.getFirstExpr() as PropertyExpression).getExpr();
 							if (baseExpr instanceof LocalExpression
@@ -1808,11 +1813,13 @@ class _InlineOptimizeCommand extends _FunctionOptimizeCommand {
 			if (holderExpr instanceof LocalExpression || holderExpr instanceof ClassExpression)
 				return true;
 		} else if (lhsExpr instanceof ArrayExpression) {
-			if ((lhsExpr as ArrayExpression).getFirstExpr() instanceof LocalExpression
-				&& ((lhsExpr as ArrayExpression).getSecondExpr() instanceof NumberLiteralExpression
-					|| (lhsExpr as ArrayExpression).getSecondExpr() instanceof StringLiteralExpression
-					|| (lhsExpr as ArrayExpression).getSecondExpr() instanceof LocalExpression))
+			var arrayExpr = lhsExpr as ArrayExpression;
+			if (arrayExpr.getFirstExpr() instanceof LocalExpression
+				&& (arrayExpr.getSecondExpr() instanceof NumberLiteralExpression
+					|| arrayExpr.getSecondExpr() instanceof StringLiteralExpression
+					|| arrayExpr.getSecondExpr() instanceof LocalExpression)) {
 						return true;
+			}
 		}
 		return false;
 	}
