@@ -759,15 +759,17 @@ class ThisExpression extends Expression {
 class FunctionExpression extends Expression {
 
 	var _funcDef : MemberFunctionDefinition;
+	var _isStatement : boolean;
 
-	function constructor (token : Token, funcDef : MemberFunctionDefinition) {
+	function constructor (token : Token, funcDef : MemberFunctionDefinition, isStatement : boolean) {
 		super(token);
 		this._funcDef = funcDef;
+		this._isStatement = isStatement;
 	}
 
 	override function clone () : FunctionExpression {
 		// NOTE: funcDef is not cloned, but is later replaced in MemberFunctionDefitition#instantiate
-		return new FunctionExpression(this._token, this._funcDef);
+		return new FunctionExpression(this._token, this._funcDef, this._isStatement);
 	}
 
 	function getFuncDef () : MemberFunctionDefinition {
@@ -786,6 +788,9 @@ class FunctionExpression extends Expression {
 	}
 
 	override function analyze (context : AnalysisContext, parentExpr : Expression) : boolean {
+		if (this._isStatement) {
+			context.getTopBlock().localVariableStatuses.setStatus(new LocalVariable(this._funcDef.getNameToken(), null));
+		}
 		if (! this.typesAreIdentified()) {
 			context.errors.push(new CompileError(this._token, "argument / return types were not automatically deductable, please specify them by hand"));
 			return false;

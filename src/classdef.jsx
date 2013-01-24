@@ -1625,6 +1625,8 @@ class LocalVariableStatuses {
 		var locals = funcDef.getLocals();
 		for (var i = 0; i < locals.length; ++i)
 			this._statuses[locals[i].getName().getValue()] = LocalVariableStatuses.UNSET;
+		if (funcDef.getParent() != null && funcDef.getNameToken() != null)
+			this._statuses[funcDef.name()] = LocalVariableStatuses.ISSET;
 	}
 
 	function constructor (srcStatus : LocalVariableStatuses) {
