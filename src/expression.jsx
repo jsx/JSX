@@ -780,6 +780,10 @@ class FunctionExpression extends Expression {
 		this._funcDef = funcDef;
 	}
 
+	function isStatement () : boolean {
+		return this._isStatement;
+	}
+
 	override function serialize () : variant {
 		return [
 			"FunctionExpression",
