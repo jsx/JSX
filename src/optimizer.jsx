@@ -1617,6 +1617,8 @@ class _InlineOptimizeCommandStash extends OptimizerStash {
 
 class _InlineOptimizeCommand extends _FunctionOptimizeCommand {
 
+	static const INLINE_THRESHOLD = 5;
+
 	function constructor () {
 		super("inline");
 	}
@@ -1915,7 +1917,7 @@ class _InlineOptimizeCommand extends _FunctionOptimizeCommand {
 				var requestsInline = (funcDef.flags() & ClassDefinition.IS_INLINE) != 0;
 				if (requestsInline) {
 					// ok
-				} else if (_Util.numberOfStatements(statements) >= 5) {
+				} else if (_Util.numberOfStatements(statements) >= _InlineOptimizeCommand.INLINE_THRESHOLD) {
 					return false;
 				}
 				// no return in the middle, no function expression or super invocation expression
