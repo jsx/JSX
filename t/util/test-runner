@@ -192,6 +192,13 @@ sub optimize_and_compare {
     defined(my $opts = get_section($file, "JSX_OPTS"))
         or die "cloud not find JSX_OPTS in file:$file\n";
 
+    my $bench_least_ratio;
+    if ($do_bench) {
+        $bench_least_ratio = get_section($file, "BENCHMARK");
+        chomp $bench_least_ratio;
+        $bench_least_ratio ||= 1;
+    }
+
     chomp $opts;
 
     my @optimization_flags = map { split /,/ } ($opts =~ /--optimize \s+ (\S+)/xmsg);
@@ -234,8 +241,8 @@ sub optimize_and_compare {
             fail "$file (optimized) exited too early ($elapsed_optimized seconds)";
             return;
         }
-        my $ratio = ($elapsed / $elapsed_optimized) * 100 - 100;
-        cmp_ok $ratio, '>=', 5, "$file - $ratio\% faster by optimization";
+        my $ratio = sprintf '%.03f', ($elapsed / $elapsed_optimized) * 100 - 100;
+        cmp_ok $ratio, '>=', $bench_least_ratio, "$file - at least $bench_least_ratio% faster by $opts";
         diag "$file - $ratio\% faster by optimization";
     }
 }

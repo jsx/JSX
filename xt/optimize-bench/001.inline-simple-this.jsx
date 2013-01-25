@@ -5,6 +5,7 @@
 --optimize inline
 */
 /*BENCHMARK
+2
 */
 
 final class _Main {
