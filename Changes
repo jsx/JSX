@@ -2,11 +2,13 @@ Revision history for the JSX software development kit
 
 NEXT
     [CHANGES]
+    - Ported JSX compiler from JavaScript to JSX
     - Invalid @param in jsxdoc produces compile errors
     - Added _Matcher#toEqual() in test-case.jsx to compare objects deeply
     - Added `--executable commonjs` for CommonJS-compliant engine
       like PhantomJS
     - Array#push() and Array#unshift() takes Nullable.<T>, not T (issue #82)
+    - Ehnanced type inference of conditional expression (issue #86)
     - Map literals can be declared as variant (like `{} : variant`)
     - Various bug fixes
 
@@ -18,3 +20,4 @@ NEXT
     [ANNOUNCE]
     - The initial version of the JSX SDK
 
+# vim: set expandtab:

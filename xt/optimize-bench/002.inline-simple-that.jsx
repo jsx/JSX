@@ -6,15 +6,16 @@
 --optimize inline
 */
 /*BENCHMARK
+2
 */
 
-final class Test {
+final class _Main {
 	var n = 0;
 	function incr() : void {
 		++this.n;
 	}
 	static function loop(cnt : number) : void {
-		var that = new Test;
+		var that = new _Main;
 		log that.n;
 		for (var i = 0; i < 2000; ++i) {
 			for (var j = 0; j < cnt; ++j) {
@@ -24,7 +25,7 @@ final class Test {
 		}
 		log that.n;
 	}
-	static function run() : void {
-		Test.loop(("100" + "000") as number);
+	static function main(args : string[]) : void {
+		_Main.loop(("100" + "000") as number);
 	}
 }

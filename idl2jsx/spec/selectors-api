@@ -1,10 +1,21 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN">
 
 <html lang=en-US>
- <head><meta content="text/html;charset=UTF-8" http-equiv=Content-Type>
-
+ <head profile="http://dublincore.org/documents/2008/08/04/dc-html/ ">
+  <meta content="text/html;charset=UTF-8" http-equiv=Content-Type>
   <title>Selectors API Level 1</title>
 
+  <link href="http://purl.org/dc/terms/" rel=schema.dcterms>
+  <link href="http://www.w3.org/Consortium/Legal/ipr-notice#Copyright"
+   rel=dcterms.rights>
+  <meta content="Selectors API Level 1" name=dcterms.title>
+  <meta content=text name=dcterms.type>
+  <meta content=2012-12-13 name=dcterms.issued>
+  <meta content="Anne van Kesteren" name=dcterms.creator>
+  <meta content="Lachlan Hunt" name=dcterms.creator>
+  <meta content=W3C name=dcterms.publisher>
+  <meta content="http://www.w3.org/TR/2012/PR-selectors-api-20121213/"
+   name=dcterms.identifier>
   <style type="text/css">
 	pre.idl { border:solid thin; background:#eee; color:#000; padding:0.5em }
 	pre.idl :link, pre.idl :visited { color:inherit; background:transparent }
@@ -19,26 +30,27 @@
 	code { color:#FF4500; }
 	code :link, code :visited { color:inherit }
 	</style>
-  <link href="http://www.w3.org/StyleSheets/TR/W3C-WD" rel=stylesheet
-  type="text/css">
+  <link href="http://www.w3.org/StyleSheets/TR/W3C-PR" rel=stylesheet
+   type="text/css">
 
  <body>
   <div class=head>
    <p><a href="http://www.w3.org/"><img alt=W3C height=48
-    src="http://www.w3.org/Icons/w3c_home" width=72></a></p>
+    src="http://www.w3.org/Icons/w3c_home" width=72></a>
 
    <h1 id=title>Selectors API Level 1</h1>
    <!-- "DOM Selectors" was not acceptable. "DOM Level 4 Selectors" and
 		conforming to the DOM specification template (if there is such a thing) is
 		just silly so we got stuck with this weird name. -->
-   
-   <h2 class="no-num no-toc" id=W3C-doctype>W3C Working Draft 28 June 2012</h2>
+
+   <h2 class="no-num no-toc" id=W3C-doctype>W3C Proposed Recommendation 13
+    December 2012</h2>
 
    <dl>
     <dt>This Version:
 
     <dd><a
-     href="http://www.w3.org/TR/2012/WD-selectors-api-20120628/">http://www.w3.org/TR/2012/WD-selectors-api-20120628/</a>
+     href="http://www.w3.org/TR/2012/PR-selectors-api-20121213/">http://www.w3.org/TR/2012/PR-selectors-api-20121213/</a>
 
     <dt>Latest Editor's Draft:
 
@@ -54,6 +66,9 @@
      href="http://www.w3.org/TR/selectors-api/">http://www.w3.org/TR/selectors-api/</a>
 
     <dt>Previous Versions:
+
+    <dd><a
+     href="http://www.w3.org/TR/2012/WD-selectors-api-20120628/">http://www.w3.org/TR/2012/WD-selectors-api-20120628/</a>
 
     <dd><a
      href="http://www.w3.org/TR/2009/CR-selectors-api-20091222/">http://www.w3.org/TR/2009/CR-selectors-api-20091222/</a>
@@ -98,7 +113,7 @@
     href="http://www.w3.org/Consortium/Legal/ipr-notice#W3C_Trademarks">trademark</a>
     and <a
     href="http://www.w3.org/Consortium/Legal/copyright-documents">document
-    use</a> rules apply.</p>
+    use</a> rules apply.
   </div>
 
   <hr>
@@ -125,34 +140,50 @@
    can be found in the <a href="http://www.w3.org/TR/">W3C technical reports
    index</a> at http://www.w3.org/TR/.</em>
 
-  <p>This is the 28 June 2012 Last Call Working Draft of "Selectors API". The
-   W3C Membership and other interested parties are invited to review the
+  <p>This is the 13 December 2012 Proposed Recommendation of "Selectors API".
+   The W3C Membership and other interested parties are invited to review the
    document and send comments to <a
    href="mailto:public-webapps@w3.org">public-webapps@w3.org</a> (<a
    href="http://lists.w3.org/Archives/Public/public-webapps/">public
-   archive</a>) with <kbd>[selectors-api]</kbd> in the subject, through 19
-   July 2012. (Please note that a different list was used until mid 2008, so
-   some old messages are <a
+   archive</a>) with <kbd>[selectors-api]</kbd> in the subject, through 25
+   January 2013 (Please note that a different list was used until mid 2008,
+   so some old messages are <a
    href="http://lists.w3.org/Archives/Public/public-webapi/">archived there
-   instead</a>).
+   instead</a>). Advisory Committee Representatives should consult their <a
+   href="http://www.w3.org/2002/09/wbs/myQuestionnaires">WBS
+   questionnaires</a>. Note that substantive technical comments were expected
+   during the Last Call review period that ended 19 July 2012. Any
+   substantive technical comments received are likely to be deferred to a
+   future version of the specification, currently in development.
 
-  <p>Web content and browser developers are encouraged to review this draft.
-   This draft is considered very stable and is expected to progress to
-   Candidate Recommendation after the review period. The <a
-   href="http://www.w3.org/2008/webapps/">Web Applications (WebApps) Working
-   Group</a> has developed a comprehensive <a
+  <p>The <a href="http://www.w3.org/2008/webapps/">Web Applications (WebApps)
+   Working Group</a> has developed a comprehensive <a
    href="http://dev.w3.org/2006/webapi/selectors-api-testsuite/">Selectors
-   API test suite</a>.
+   API test suite</a> and has demonstrated interoperability of the features
+   among implementations. Please see the Working Group's <a
+   href="http://dev.w3.org/2006/webapi/selectors-api-testsuite/level1-baseline-report.html"
+   title="Selectors API Implementation Report: Baseline Tests">implementation
+   report</a>.
+
+  <p>In requesting transition from Last Call, the group demonstrated
+   sufficient implementation experience to meet the requirements for exiting
+   Candidate Recommendation status, i.e. every feature is implemented at
+   least twice, independently, in currently-shipping products for the general
+   web, and the specification is regarded as interoperably implemented and
+   widely used. The Director has therefore approved a zero-length Candidate
+   Recommendation period, allowing this document to move directly to Proposed
+   Recommendation
 
   <p>This document was developed by the <a
    href="http://www.w3.org/2008/webapps/">Web Applications Working Group</a>.
-   The Working Group expects to advance this Working Draft to Recommendation
-   Status.
+   A complete <a
+   href="http://dev.w3.org/cvsweb/2006/webapi/selectors-api/">list of
+   changes</a> to this document is available.
 
-  <p>Publication as a Working Draft does not imply endorsement by the W3C
-   Membership. This is a draft document and may be updated, replaced or
-   obsoleted by other documents at any time. It is inappropriate to cite this
-   document as other than work in progress.
+  <p>Publication as a Proposed Recommendation does not imply endorsement by
+   the W3C Membership. This is a draft document and may be updated, replaced
+   or obsoleted by other documents at any time. It is inappropriate to cite
+   this document as other than work in progress.
 
   <p>This document was produced by a group operating under the <a
    href="http://www.w3.org/Consortium/Patent-Policy-20040205/">5 February
@@ -213,10 +244,7 @@
       </span>Resolving Namespaces</a>
     </ul>
 
-   <li><a href="#dom-feature-string"><span class=secno>7. </span>DOM Feature
-    String</a>
-
-   <li><a href="#examples0"><span class=secno>8. </span>Examples</a>
+   <li><a href="#examples0"><span class=secno>7. </span>Examples</a>
 
    <li class=no-num><a href="#references">References</a>
     <ul class=toc>
@@ -236,21 +264,20 @@
   <p><em>This section is non-normative.</em>
 
   <p>This specification provides methods for selecting and testing elements
-   based on whether or not they match a given selector. With these methods
-   methods, it is easier to match a set of <a
-   href="#element"><code>Element</code></a> nodes based on specific criteria,
-   than having to subsequently filter the result of calling other methods
-   like <code>getElementsByTagName()</code>.
+   based on whether or not they match a given selector. With these methods,
+   it is easier to match a set of <a href="#element"><code>Element</code></a>
+   nodes based on specific criteria, than having to subsequently filter the
+   result of calling other methods like <code>getElementsByTagName()</code>.
 
   <h3 id=examples><span class=secno>1.1. </span>Examples</h3>
 
   <p><em>This section is non-normative.</em>
 
-  <p>Some ECMAScript <a href="#ECMA-262"
-   rel=biblioentry>[ECMA-262]<!--{{ECMA-262}}--></a> examples:
+  <p>Some ECMAScript <a href="#ECMA-262-5.1"
+   rel=biblioentry>[ECMA-262-5.1]<!--{{ECMA-262-5.1}}--></a> examples:
 
   <div class=example>
-   <p>This is an example table written in HTML 4.01.</p>
+   <p>This is an example table written in HTML 4.01.
 
    <pre>&lt;table id="score">
   &lt;thead>
@@ -278,7 +305,7 @@
     least two approaches that may be taken. Using only the APIs from DOM
     Level 2, it requires a script like the following that iterates through
     each <code>tr</code> within each <code>tbody</code> in the
-    <code>table</code> to find the second cell of each row.</p>
+    <code>table</code> to find the second cell of each row.
 
    <pre>var table = document.getElementById("score");
 var groups = table.tBodies;
@@ -294,7 +321,7 @@ for (var i = 0; i &lt; groups.length; i++) {
 
    <p>Alternatively, using the <code
     title=document-selectallelements>querySelectorAll()</code> method, that
-    script becomes much more concise.</p>
+    script becomes much more concise.
 
    <pre>var cells = document.querySelectorAll("#score&gt;tbody&gt;tr&gt;td:nth-of-type(2)");</pre>
 
@@ -302,7 +329,7 @@ for (var i = 0; i &lt; groups.length; i++) {
     the syntax used to create the document. Thus this script will also work
     correctly for an equivalent table created from well-formed XHTML instead
     of HTML, or dynamically created and inserted into a document using DOM
-    APIs.</p>
+    APIs.
   </div>
 
   <h2 id=conformance><span class=secno>2. </span>Conformance Requirements</h2>
@@ -361,7 +388,8 @@ for (var i = 0; i &lt; groups.length; i++) {
    is equivalent.
 
   <p>The IDL used in this specification uses the syntax defined in Web IDL <a
-   href="#WEBIDL" rel=biblioentry>[WEBIDL]<!--{{!WEBIDL}}--></a>.
+   href="#DOM-BINDINGS"
+   rel=biblioentry>[DOM-BINDINGS]<!--{{!DOM-BINDINGS}}--></a>.
 
   <p>The construction "<code>Foo</code> object", where <code>Foo</code> is
    actually an interface, is sometimes used instead of the more accurate
@@ -415,7 +443,7 @@ for (var i = 0; i &lt; groups.length; i++) {
   <div class=example>
    <p>In this example, <var>vlinks</var> will acquire a list of links that
     the user has visited. The author can then obtain the URIs and potentially
-    exploit this knowledge.</p>
+    exploit this knowledge.
 
    <pre>var vlinks = document.querySelectorAll(":visited");
 for (var i = 0; i &lt; vlinks.length; i++) {
@@ -510,10 +538,27 @@ partial interface <a
    matching nodes, the method <em class=ct>must</em> return an empty <a
    href="#nodelist"><code>NodeList</code></a>.
 
+  <p>When either <a href="#queryselector"><code>querySelector</code></a> or
+   <a href="#queryselectorall"><code>querySelectorAll</code></a> are invoked,
+   the implementation <em class=ct>must</em> follow these steps:
+
+  <ol>
+   <li>
+    <p>Let <var>parsed selector</var> be the result of running the algorithm
+     to <a href="#parse-a-selector">parse a selector</a> with
+     <var>selectors</var> as the input.
+
+   <li>
+    <p>The implementation must then run the algorithm to <a
+     href="#evaluate-a-selector">evaluate a selector</a> against element
+     nodes in the specified <span title=concept-tree>tree</span> or <a
+     href="#subtrees">subtrees</a> using <var>parsed selector</var> as the
+     selector to return the required result for the invoked method.
+  </ol>
+
   <p>The <a href="#nodelist"><code>NodeList</code></a> object returned by the
-   <a href="#queryselectorall"><code>querySelectorAll()</code></a> method <em
-   class=ct>must</em> be static, not <a
-   href="http://www.w3.org/TR/DOM-Level-3-Core/core.html#td-live"
+   <code>querySelectorAll()</code> method <em class=ct>must</em> be static,
+   not <a href="http://www.w3.org/TR/DOM-Level-3-Core/core.html#td-live"
    title="Document Object Model Core">live</a> (<a href="#DOM-LEVEL-3-CORE"
    rel=biblioentry>[DOM-LEVEL-3-CORE]<!--{{!DOM-LEVEL-3-CORE}}--></a>,
    section 1.1.1). Subsequent changes to the structure of the underlying
@@ -536,7 +581,7 @@ partial interface <a
 dom_selectors_group
   : S* [ selectors_group ] S*
   ;
-	</pre>
+</pre>
 
   <p>The productions for <code>selectors_group</code> is defined in Selectors
    Level 3 (<a href="#SELECT" rel=biblioentry>[SELECT]<!--{{!SELECT}}--></a>,
@@ -546,9 +591,10 @@ dom_selectors_group
 
   <p class=note>Implementers are advised that if <code>null</code> or
    <code>undefined</code> are passed as the value of the <var>selectors</var>
-   parameter, they are to be handled as defined in WebIDL <a href="#WEBIDL"
-   rel=biblioentry>[WEBIDL]<!--{{!WEBIDL}}--></a>. Authors are advised to
-   avoid passing these values.
+   parameter, they are to be handled as defined in WebIDL <a
+   href="#DOM-BINDINGS"
+   rel=biblioentry>[DOM-BINDINGS]<!--{{!DOM-BINDINGS}}--></a>. Authors are
+   advised to avoid passing these values.
 
   <p class=note>Authors are advised that while the use of pseudo-elements in
    selectors is permitted, they will not match any elements in the document,
@@ -568,18 +614,19 @@ dom_selectors_group
      string</a> input to this algorithm.
 
    <li>
-    <p>If <a href="#selector-string">selector string</a> matches the grammar
-     for <code>dom_selectors_group</code>, let <var>result</var> be the group
-     of selectors returned as a result of parsing the <var>selectors</var>
-     according to the grammar for <code>dom_selectors_group</code> defined
-     above.
+    <p>Let <var>result</var> be the group of selectors returned as a result
+     of parsing the <var>selectors</var> according to the grammar for
+     <code>dom_selectors_group</code> defined above.
 
    <li>
-    <p>Otherwise, <a
-     href="http://www.w3.org/TR/DOM-Level-3-Core/core.html#DOMException-SYNTAX_ERR">raise
+    <p>If <var>result</var> is <a
+     href="http://www.w3.org/TR/css3-selectors/#Conformance">invalid</a> (<a
+     href="#SELECT" rel=biblioentry>[SELECT]<!--{{!SELECT}}--></a>, section
+     12), <a
+     href="http://www.w3.org/TR/DOM-Level-3-Core/core.html#DOMException-SYNTAX_ERR">raisea
      a <code>SYNTAX_ERR</code> exception</a> (<a href="#DOM-LEVEL-3-CORE"
      rel=biblioentry>[DOM-LEVEL-3-CORE]<!--{{!DOM-LEVEL-3-CORE}}--></a>,
-     section 1.4) and abort this algorithm.</p>
+     section 1.4) and abort this algorithm.
 
    <li>Return <var>result</var>.
   </ol>
@@ -633,30 +680,10 @@ dom_selectors_group
    syntax in Selectors <em class=ct>must</em> support these. <a
    href="#SELECT" rel=biblioentry>[SELECT]<!--{{!SELECT}}--></a>
 
-  <h2 id=dom-feature-string><span class=secno>7. </span>DOM Feature String</h2>
-
-  <p>DOM3 Core defines several methods for checking for interface support, or
-   for obtaining implementations of interfaces, using <a
-   href="http://www.w3.org/TR/DOM-Level-3-Core/core.html#DOMFeatures">feature
-   strings</a> (<a href="#DOM-LEVEL-3-CORE"
-   rel=biblioentry>[DOM-LEVEL-3-CORE]<!--{{!DOM-LEVEL-3-CORE}}--></a>,
-   section 1.3.6). A DOM application can use these methods, each of which
-   accept <var>feature</var> and <var>version</var> parameters, using the
-   values "<code title="">Selectors-API</code>" and "<code>1.0</code>"
-   (respectively).
-
-  <p>Conforming implementations <em class=ct>must</em> respond with a
-   <code>true</code> value when the <code>hasFeature</code> method is queried
-   with these values. Authors are cautioned, however, that implementations
-   returning <code>true</code> might not be perfectly compliant, and that
-   implementations returning <code>false</code> might well have support for
-   features in this specification; in general, therefore, use of this method
-   is discouraged.
-
-  <h2 id=examples0><span class=secno>8. </span>Examples</h2>
+  <h2 id=examples0><span class=secno>7. </span>Examples</h2>
 
   <div class=example>
-   <p>The following examples make use of this sample XHTML document.</p>
+   <p>The following examples make use of this sample XHTML document.
 
    <pre>&lt;html xmlns="http://www.w3.org/1999/xhtml">
   &lt;head>
@@ -676,13 +703,13 @@ dom_selectors_group
    <p>The methods accept a group of selectors (comma separated) as the
     argument. The following example would select all <code>p</code> elements
     in the document that have a class of either "<code>error</code>" or
-    "<code>warning</code>".</p>
+    "<code>warning</code>".
 
    <pre>var alerts = document.querySelectorAll("p.warning, p.error");</pre>
 
    <p>The <code title=document-selectelement>querySelector()</code> methods
     also accept a group of selectors and they will return the first element
-    (if any) that matches any of the selectors in the group.</p>
+    (if any) that matches any of the selectors in the group.
 
    <pre>var x = document.querySelector("#foo, #bar");</pre>
 
@@ -690,15 +717,15 @@ dom_selectors_group
     of either <code>foo</code> or <code>bar</code>, or <code>null</code> if
     there is no such element. In the sample document above, it would select
     the <code>div</code> element with the ID of <code>foo</code> because it
-    is first in document order. The order of the selectors used in the
-    parameter has no effect and would have the same result if the order were
-    reversed, as in:</p>
+    is first in <a href="#document-order">document order</a>. The order of
+    the selectors used in the parameter has no effect and would have the same
+    result if the order were reversed, as in:
 
    <pre>var x = document.querySelector("#bar, #foo");</pre>
 
    <p>The methods can also be invoked on elements. In the following example,
     assume the event handler is registered on an element, and thus the method
-    is invoked on the target element of the event.</p>
+    is invoked on the target element of the event.
 
    <pre>function handle(evt) {
   var x = evt.target.querySelector("span");
@@ -710,12 +737,12 @@ dom_selectors_group
     evaluated in the context of the entire document. In the following
     example, the method will still match the <code>div</code> element's child
     <code>p</code> element, even though the <code>body</code> element is not
-    a descendant of the <code>div</code> element itself.</p>
+    a descendant of the <code>div</code> element itself.
 
    <pre>var div = document.getElementById("bar");
 var p = div.querySelector("body p");</pre>
 
-   <p>Given this sample fragment that contains a list as a navigation menu:</p>
+   <p>Given this sample fragment that contains a list as a navigation menu:
 
    <pre>&lt;ul class="nav"&gt;
   &lt;li&gt;&lt;a href="/"&gt;Home&lt;/a&gt;&lt;/li&gt;
@@ -725,7 +752,7 @@ var p = div.querySelector("body p");</pre>
 
    <p>The following example selects all the <code>li</code> elements and
     demonstrates how to iterate through the collection in a <a
-    href="#nodelist"><code>NodeList</code></a>.</p>
+    href="#nodelist"><code>NodeList</code></a>.
 
    <pre>var lis = document.querySelectorAll("ul.nav&gt;li");
 for (var i = 0; i &lt; lis.length; i++) {
@@ -734,7 +761,7 @@ for (var i = 0; i &lt; lis.length; i++) {
 
    <p>In ECMAScript, the language binding also allows <a
     href="#nodelist"><code>NodeList</code></a>s to be addressed using the
-    array notation, so that loop could be rewritten like this:</p>
+    array notation, so that loop could be rewritten like this:
 
    <pre>for (var i = 0; i &lt; lis.length; i++) {
   process(lis[i]);
@@ -743,7 +770,7 @@ for (var i = 0; i &lt; lis.length; i++) {
    <p>Since the <a href="#nodelist"><code>NodeList</code></a> objects
     returned by these methods are not live, changes to the DOM do not affect
     the content of the list. Consider the <code>process()</code> function
-    called in the previous examples is defined as follows:</p>
+    called in the previous examples is defined as follows:
 
    <pre>function process(elmt) {
   elmt.parentNode.removeChild(elmt);
@@ -755,7 +782,7 @@ for (var i = 0; i &lt; lis.length; i++) {
     href="#nodelist"><code>NodeList</code></a>, removing an item from the DOM
     would also remove the element from the list and adjust the indexes of
     subsequent elements. That would have adverse effects upon the loop
-    because not all selected elements would be processed.</p>
+    because not all selected elements would be processed.
 
    <p>In documents comprising elements from multiple namespaces, it's
     possible that some elements from different namespaces share the same
@@ -764,7 +791,7 @@ for (var i = 0; i &lt; lis.length; i++) {
     from a specific namespace, excluding all others, requires additional
     processing to filter the result. The following example illustrates a
     document containing <code>video</code> elements from both the SVG and
-    XHTML namespaces.</p>
+    XHTML namespaces.
 
    <pre>&lt;svg id=&quot;svg1&quot; xmlns=&quot;http://www.w3.org/2000/svg&quot;
                xmlns:xlink=&quot;http://www.w3.org/1999/xlink&quot;&gt;
@@ -776,13 +803,13 @@ for (var i = 0; i &lt; lis.length; i++) {
 
    <p>The following script demonstrates how to first select the
     <code>video</code> elements and then filter out the unwanted elements
-    based on their namespace.</p>
+    based on their namespace.
 
    <pre>var elms = document.querySelectorAll("svg video");
 var result = new Array();
 var svgns = "http://www.w3.org/2000/svg"
 
-for(var i = 0; i < elms.length; i++) {
+for(var i = 0; i &lt; elms.length; i++) {
   if(elms[i].namespaceURI == svgns) {
     result.push(elms[i]);
   }
@@ -799,6 +826,16 @@ for(var i = 0; i < elms.length; i++) {
    <dt style="display: none"><!-- keeps the doc valid if the DL is empty -->
     <!---->
 
+   <dt id=DOM-BINDINGS>[DOM-BINDINGS]
+
+   <dd>Cameron McCormack. <a
+    href="http://www.w3.org/TR/2012/CR-WebIDL-20120419/"><cite>Web
+    IDL.</cite></a> 19 April 2012. W3C Candidate Recommendation. (Work in
+    progress.) URL: <a
+    href="http://www.w3.org/TR/2012/CR-WebIDL-20120419/">http://www.w3.org/TR/2012/CR-WebIDL-20120419/</a>
+   </dd>
+   <!---->
+
    <dt id=DOM-LEVEL-3-CORE>[DOM-LEVEL-3-CORE]
 
    <dd>Gavin Nicol; et al. <a
@@ -806,7 +843,7 @@ for(var i = 0; i < elms.length; i++) {
     Object Model (DOM) Level 3 Core Specification.</cite></a> 7 April 2004.
     W3C Recommendation. URL: <a
     href="http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407">http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407</a>
-    </dd>
+   </dd>
    <!---->
 
    <dt id=RFC2119>[RFC2119]
@@ -815,7 +852,7 @@ for(var i = 0; i < elms.length; i++) {
     words for use in RFCs to Indicate Requirement Levels.</cite></a> Internet
     RFC 2119. URL: <a
     href="http://www.ietf.org/rfc/rfc2119.txt">http://www.ietf.org/rfc/rfc2119.txt</a>
-    </dd>
+   </dd>
    <!---->
 
    <dt id=SELECT>[SELECT]
@@ -824,17 +861,7 @@ for(var i = 0; i < elms.length; i++) {
     href="http://www.w3.org/TR/2011/REC-css3-selectors-20110929/"><cite>Selectors
     Level 3.</cite></a> 29 September 2011. W3C Recommendation. URL: <a
     href="http://www.w3.org/TR/2011/REC-css3-selectors-20110929/">http://www.w3.org/TR/2011/REC-css3-selectors-20110929/</a>
-    </dd>
-   <!---->
-
-   <dt id=WEBIDL>[WEBIDL]
-
-   <dd>Cameron McCormack. <a
-    href="http://www.w3.org/TR/2008/WD-WebIDL-20081219"><cite>Web
-    IDL.</cite></a> 19 December 2008. W3C Working Draft. (Work in progress.)
-    URL: <a
-    href="http://www.w3.org/TR/2008/WD-WebIDL-20081219">http://www.w3.org/TR/2008/WD-WebIDL-20081219</a>
-    </dd>
+   </dd>
    <!---->
   </dl>
   <!--end-normative-->
@@ -850,30 +877,31 @@ for(var i = 0; i < elms.length; i++) {
    <dt id=CSS21>[CSS21]
 
    <dd>Bert Bos; et al. <a
-    href="http://www.w3.org/TR/2011/REC-CSS2-20110607"><cite>Cascading Style
+    href="http://www.w3.org/TR/2011/REC-CSS2-20110607/"><cite>Cascading Style
     Sheets Level 2 Revision 1 (CSS 2.1) Specification.</cite></a> 7 June
     2011. W3C Recommendation. URL: <a
-    href="http://www.w3.org/TR/2011/REC-CSS2-20110607">http://www.w3.org/TR/2011/REC-CSS2-20110607</a>
-    </dd>
+    href="http://www.w3.org/TR/2011/REC-CSS2-20110607/">http://www.w3.org/TR/2011/REC-CSS2-20110607/</a>
+   </dd>
    <!---->
 
    <dt id=DOM-LEVEL-2-STYLE>[DOM-LEVEL-2-STYLE]
 
    <dd>Chris Wilson; Philippe Le Hégaret; Vidur Apparao. <a
-    href="http://www.w3.org/TR/2000/REC-DOM-Level-2-Style-20001113"><cite>Document
+    href="http://www.w3.org/TR/2000/REC-DOM-Level-2-Style-20001113/"><cite>Document
     Object Model (DOM) Level 2 Style Specification.</cite></a> 13 November
     2000. W3C Recommendation. URL: <a
-    href="http://www.w3.org/TR/2000/REC-DOM-Level-2-Style-20001113">http://www.w3.org/TR/2000/REC-DOM-Level-2-Style-20001113</a>
-    </dd>
+    href="http://www.w3.org/TR/2000/REC-DOM-Level-2-Style-20001113/">http://www.w3.org/TR/2000/REC-DOM-Level-2-Style-20001113/</a>
+   </dd>
    <!---->
 
-   <dt id=ECMA-262>[ECMA-262]
+   <dt id=ECMA-262-5.1>[ECMA-262-5.1]
 
    <dd><a
     href="http://www.ecma-international.org/publications/standards/Ecma-262.htm"><cite>ECMAScript
-    Language Specification, Third Edition.</cite></a> December 1999. URL: <a
+    Language Specification, Edition 5.1.</cite></a> June 2011. ISO/IEC
+    16262:2011. URL: <a
     href="http://www.ecma-international.org/publications/standards/Ecma-262.htm">http://www.ecma-international.org/publications/standards/Ecma-262.htm</a>
-    </dd>
+   </dd>
    <!---->
   </dl>
   <!--end-informative-->
@@ -883,18 +911,20 @@ for(var i = 0; i < elms.length; i++) {
   <p>The editors would like to thank to the following people who have
    contributed to this specification (ordered on first name):
 
-  <p>Adam van den Hoven, Alan Gresley, Alex Russell, Björn Höhrmann, Boris
-   Zbarsky, Cameron McCormack, Charles McCathieNevile, Chris Wilson,
-   Christophe Jolif, Daniel Glazman, Daniel Schierbeck, Dave Massy, David
-   "liorean" Andersson, David Håsäther, Dean Jackson, Doug Schepers, Erik
-   Dahlström, Francois Remy, Hallvord R. M. Steen, Ian Hickson, Ivan
-   Enderlin, Jean-Yves Bitterlich, Jim Ley, João Eiras, John Resig, Jon
-   Ferraiolo, Jonas Sicking, Jorgen Horstink, Karl Dubost, Kartikaya Gupta,
-   L. David Baron, Maciej Stachowiak, Magnus Kristiansen, Martijn, Masataka
-   Yakura, Mihai Sucan, Mohamed Zergaoui, Nicholas C. Zakas, Nicolas Mendoza,
-   Philip Taylor, Robert Sayre, Robin Berjon, Sander, Sergey Ilinsky, Simon
-   Pieters, Steven Pemberton, Tarquin Wilton-Jones, Travis Leithead, and
-   William J. Edney
+  <p>Adam van den Hoven, Alan Gresley, Alex Russell, Arthur Barstow, Aryeh
+   Gregor, Björn Höhrmann, Boris Zbarsky, Cameron McCormack, Charles
+   McCathieNevile, Chris Wilson, Christophe Jolif, Daniel Glazman, Daniel
+   Schierbeck, Dave Massy, David "liorean" Andersson, David Greenspan, David
+   Håsäther, Dean Jackson, Doug Schepers, Erik Dahlström, Francois Remy,
+   Hallvord R. M. Steen, Henri Sivonen, Ian Hickson, Ivan Enderlin, Jean-Yves
+   Bitterlich, Jim Ley, João Eiras, John Resig, Jon Ferraiolo, Jonas
+   Sicking, Jorgen Horstink, Kang-Hao (Kenny) Lu, Karl Dubost, Kartikaya
+   Gupta, L. David Baron, Maciej Stachowiak, Magnus Kristiansen, Marat
+   Tanalin, Martijn, Masataka Yakura, Mihai Sucan, Mohamed Zergaoui, Nicholas
+   C. Zakas, Nicolas Mendoza, Norbert Lindenberg, Philip Taylor, Robert
+   Sayre, Robin Berjon, Sander, Sergey Ilinsky, Simon Pieters, Steven
+   Pemberton, Stewart Brodie Tab Atkins Jr., Tarquin Wilton-Jones, Travis
+   Leithead, and William J. Edney
 
   <p>Thanks to all those who have helped to improve this specification by
    sending suggestions and corrections.

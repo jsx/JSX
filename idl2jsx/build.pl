@@ -19,6 +19,8 @@ mkpath $lib;
 my $root = dirname(__FILE__);
 unlink "$root/.idl2jsx.bin";
 
+# NOTE: some specs are varying, so we specify the published date.
+
 my @specs = (
     ['web.jsx' =>
         # DOM spec
@@ -27,6 +29,7 @@ my @specs = (
         'DOM-Level-2-Views; http://www.w3.org/TR/DOM-Level-2-Views/idl/views.idl',
         'DOM-Level-3-Events; http://www.w3.org/TR/DOM-Level-3-Events/',
 		'progress-events; http://www.w3.org/TR/progress-events/',
+        "dom-parsing; http://www.w3.org/TR/DOM-Parsing/",
         "$root/extra/events.idl",
 
         'XMLHTTPRequest; http://www.w3.org/TR/XMLHttpRequest/',
@@ -43,36 +46,30 @@ my @specs = (
         #"http://www.w3.org/TR/2011/REC-SVG11-20110816/svg.idl",
 
         # HTML5
-        #'http://dev.w3.org/html5/spec/single-page.html', # too new
         'html5; http://www.w3.org/TR/html5/single-page.html',
-        # 'http://www.w3.org/TR/FileAPI/', # has an union member FileReader#result
-        'FileAPI; http://www.w3.org/TR/2011/WD-FileAPI-20111020/',
+        'FileAPI; http://www.w3.org/TR/2012/WD-FileAPI-20121025/',
 
-        #"http://www.w3.org/TR/webaudio/", # no correct IDL
-        "webaudio; https://dvcs.w3.org/hg/audio/raw-file/tip/webaudio/specification.html",
+        "webaudio; http://www.w3.org/TR/2012/WD-webaudio-20121213/",
         "touch-events; http://www.w3.org/TR/touch-events/",
-        #"http://www.w3.org/TR/websockets/",
         "websockets; http://www.w3.org/TR/2012/CR-websockets-20120920/",
-        #"http://dev.w3.org/html5/websockets/", # too new
-        "geo; http://dev.w3.org/geo/api/spec-source.html",
+        "geolocation; http://dev.w3.org/geo/api/spec-source.html",
         "webstorage; http://dev.w3.org/html5/webstorage/",
         'selectors-api; http://www.w3.org/TR/selectors-api/',
         "webmessaging; http://www.w3.org/TR/webmessaging/",
         "workers; http://www.w3.org/TR/workers/",
         "eventsource; http://www.w3.org/TR/eventsource/",
-        #"http://dev.w3.org/html5/eventsource/", # too new
+        "url; http://www.w3.org/TR/2012/WD-url-20120524/",
+        "IndexedDB; http://www.w3.org/TR/2012/WD-IndexedDB-20120524/",
+        "notifications; http://www.w3.org/TR/2012/WD-notifications-20120614/",
+        "web-intents; http://www.w3.org/TR/2012/WD-web-intents-20120626/",
 
-        # WebRTC has no correct IDL
-        #"http://dev.w3.org/2011/webrtc/editor/webrtc.html",
+        #"webrtc; http://www.w3.org/TR/2012/WD-webrtc-20120209/",
         #"http://dev.w3.org/2011/webrtc/editor/getusermedia.html",
         "mediacapture-streams; http://www.w3.org/TR/mediacapture-streams/",
 
-        # by html5.org
-        "dom-parsing; http://html5.org/specs/dom-parsing.html",
-
         # graphics
         'typedarray; https://www.khronos.org/registry/typedarray/specs/latest/typedarray.idl',
-        '2dcontext; http://dev.w3.org/html5/2dcontext/',
+        '2dcontext; http://www.w3.org/TR/2dcontext/',
         'webgl; https://www.khronos.org/registry/webgl/specs/latest/webgl.idl',
 
         # vender extensions

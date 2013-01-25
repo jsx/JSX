@@ -242,7 +242,7 @@ class TestCase {
 	}
 
 	function _dump(tag : string, value : variant) : void {
-		if(typeof value == "object" && value as Object != null) {
+		if(typeof value == "object") {
 			this.diag(tag);
 			console.dir(value);
 		}
@@ -268,12 +268,12 @@ class TestCase {
 		}
 
 		// both are Array.<T>
-		var aryA = a as Array.<variant>;
-		var aryB = b as Array.<variant>;
-		if (aryA) {
-			if (! aryB) {
+		if (a instanceof Array.<variant>) {
+			if (! (b instanceof Array.<variant>)) {
 				return false;
 			}
+			var aryA = a as Array.<variant>;
+			var aryB = b as Array.<variant>;
 			if (aryA.length != aryB.length) {
 				return false;
 			}
@@ -286,12 +286,12 @@ class TestCase {
 		}
 
 		// both are Map.<T>
-		var mapA = a as Map.<variant>;
-		var mapB = b as Map.<variant>;
-		if (mapA) {
-			if (! mapB) {
+		if (a instanceof Map.<variant>) {
+			if (! (b instanceof Map.<variant>)) {
 				return false;
 			}
+			var mapA = a as Map.<variant>;
+			var mapB = b as Map.<variant>;
 
 			var mapAkeys = this.sortedKeys(mapA);
 			var mapBkeys = this.sortedKeys(mapB);
@@ -313,10 +313,15 @@ class TestCase {
 		}
 
 		// both are Date
-		var dateA = a as Date;
-		var dateB = b as Date;
-		if (dateA && dateB) {
-			return dateA.getTime() == dateB.getTime();
+		if (a instanceof Date) {
+			if (! (b instanceof Date)) {
+				return false;
+			}
+			var dateA = a as Date;
+			var dateB = b as Date;
+			if (dateA && dateB) {
+				return dateA.getTime() == dateB.getTime();
+			}
 		}
 
 		// XXX: consider serialize():variant
@@ -488,12 +493,12 @@ class _Matcher {
 	function toEqual(x : Array.<variant>) : void {
 		assert x != null;
 
-		var got = this._got as Array.<variant>;
-		if (got == null) {
+		if (! (this._got instanceof Array.<variant>)) {
 			this._test._nok(this._name, "equals", this._got, x);
 			return;
 		}
 
+		var got = this._got as Array.<variant>;
 		if (this._test.equals(got, x)) {
 			this._test._ok(this._name);
 		}

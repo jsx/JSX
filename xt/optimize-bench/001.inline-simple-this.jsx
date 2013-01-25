@@ -5,9 +5,10 @@
 --optimize inline
 */
 /*BENCHMARK
+2
 */
 
-final class Test {
+final class _Main {
 	var n = 0;
 	function constructor(cnt : number) {
 		for (var i = 0; i < 2000; ++i) {
@@ -20,8 +21,8 @@ final class Test {
 	function incr() : void {
 		++this.n;
 	}
-	static function run() : void {
-		var t = new Test(("100" + "000") as number);
+	static function main(args : string[]) : void {
+		var t = new _Main(("100" + "000") as number);
 		log t.n;
 	}
 }

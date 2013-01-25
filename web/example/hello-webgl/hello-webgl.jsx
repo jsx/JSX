@@ -21,6 +21,11 @@ class Hello {
 		var canvas = dom.id('webgl-canvas') as HTMLCanvasElement;
 		var gl = canvas.getContext('experimental-webgl') as WebGLRenderingContext;
 
+		if (gl == null) {
+			dom.window.alert("This browser does not support WebGL :(");
+			return;
+		}
+
 		// points of vertices
 		var vertices = [
 			-0.9, -0.9,

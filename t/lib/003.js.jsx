@@ -19,4 +19,9 @@ class _Test extends TestCase {
 		).toBe(10);
 	}
 
+	function testExecScript() : void {
+		var value = js.eval("2 + 3") as int;
+		this.expect(value).toBe(2 + 3);
+	}
+
 }
