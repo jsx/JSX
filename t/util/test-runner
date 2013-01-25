@@ -98,10 +98,21 @@ sub compile_to_run {
     my ($file, $opts) = @_;
     $opts ||= "";
 
-    my $src = `bin/jsx $opts $file`;
+    require IPC::Open3;
+    require Symbol;
+    my($wtr, $rdr, $err) = (Symbol::gensym(), Symbol::gensym(), Symbol::gensym());
+    my $pid = IPC::Open3::open3($wtr, $rdr, $err, "bin/jsx $opts $file");
+    close $wtr;
+    local $/;
+    my $stdout = <$rdr>;
+    my $stderr = <$err>;
+    close $rdr;
+    close $err;
+    waitpid $pid, 0;
+
     return if $? != 0;
 
-    return $src;
+    return ($stdout, $stderr);
 }
 
 sub run_compiled {
@@ -155,7 +166,7 @@ sub compile_and_run {
         or die "could not find EXPECTED in file:$file\n";
 
     # compile (FIXME support C++)
-    my $src = compile_to_run($file, $opts) or do {
+    my($src, $logs) = compile_to_run($file, $opts) or do {
         fail "compile '$file' failed: $?";
         return;
     };
@@ -176,8 +187,6 @@ sub optimize_and_compare {
     plan skip_all => 'environment variable JSX_OPTS is set'
         if defined $ENV{JSX_OPTS};
 
-    plan tests => 5 + ($do_bench ? 1 : 0);
-
     defined(my $expected = get_section($file, "EXPECTED"))
         or die "could not find EXPECTED in file:$file\n";
     defined(my $opts = get_section($file, "JSX_OPTS"))
@@ -185,19 +194,28 @@ sub optimize_and_compare {
 
     chomp $opts;
 
+    my @optimization_flags = map { split /,/ } ($opts =~ /--optimize \s+ (\S+)/xmsg);
+
+    plan tests => 6 + ($do_bench ? 1 : 0) + scalar(@optimization_flags);
+
     # compile, run, and check (wo. optimization)
-    my $src = compile_to_run($file);
+    my($src, $logs) = compile_to_run($file);
     ok defined($src) && length($src) > 0,
         "compile '$file' (wo. optimization)" or return;
+    is $logs, '', "... with no logs";
     my ($output, $elapsed) = bench(sub { run_compiled($file, $src) });
 
     is $output, $expected,
         "output of '$file' (wo. optimization)" or return;
 
     # compile, run, and check (w. optimization)
-    my $src_optimized = compile_to_run($file, $opts);
+    my($src_optimized, $logs_optimized) = compile_to_run($file, $opts . " --optimize dump-logs");
     ok defined($src_optimized) && length($src_optimized) > 0,
         "compile '$file' (w. $opts)" or return;
+    for my $flag(@optimization_flags) {
+        like $logs_optimized, qr/\[ \Q$flag\E \]/xms, "... with [$flag] in logs";
+    }
+
 
     ($output, my $elapsed_optimized) = bench(sub { run_compiled($file, $src_optimized) });
 

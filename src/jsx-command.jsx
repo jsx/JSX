@@ -178,7 +178,7 @@ class JSXCommand {
 				if ((optarg = getoptarg()) == null) {
 					return 1;
 				}
-				optimizeCommands = optarg.split(",");
+				optimizeCommands = optimizeCommands.concat(optarg.split(","));
 				break;
 			case "--warn":
 				if ((optarg = getoptarg()) == null) {
