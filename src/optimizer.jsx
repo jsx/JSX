@@ -1611,6 +1611,12 @@ class _DeadCodeEliminationOptimizeCommand extends _FunctionOptimizeCommand {
 			}
 			return null;
 		}
+		function spliceStatements (dest : Statement[], index : number, src : Statement[]) : void {
+			dest.splice(index, 1);
+			for (var i = 0; i < src.length; ++i) {
+				dest.splice(index + i, 0, src[i]);
+			}
+		}
 		(function onStatements(statements : Statement[]) : boolean {
 			for (var i = statements.length - 1; i >= 0; --i) {
 				var statement = statements[i];
@@ -1622,15 +1628,9 @@ class _DeadCodeEliminationOptimizeCommand extends _FunctionOptimizeCommand {
 					} else if (cond == false && ifStatement.getOnFalseStatements().length == 0) {
 						statements.splice(i, 1);
 					} else if (cond == false) {
-						statements.splice(i, 1);
-						for (var j = 0; j < ifStatement.getOnFalseStatements().length; ++j) {
-							statements.splice(i + j, 0, ifStatement.getOnFalseStatements()[j]);
-						}
+						spliceStatements(statements, i, ifStatement.getOnFalseStatements());
 					} else if (cond == true) {
-						statements.splice(i, 1);
-						for (var j = 0; j < ifStatement.getOnTrueStatements().length; ++j) {
-							statements.splice(i + j, 0, ifStatement.getOnTrueStatements()[j]);
-						}
+						spliceStatements(statements, i, ifStatement.getOnTrueStatements());
 					}
 				}
 				statement.handleStatements(onStatements);
