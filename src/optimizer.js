@@ -37,7 +37,7 @@ var _Util = exports._Util = Class.extend({
 		Util.forEachStatement(function onStatement(statement) {
 			++n;
 			return statement.forEachStatement(onStatement.bind(this));
-		});
+		}, statements);
 		return n;
 	},
 

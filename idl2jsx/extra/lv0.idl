@@ -1,0 +1,5 @@
+
+partial interface Location {
+	void reload(boolean ignoreCache);
+};
+
