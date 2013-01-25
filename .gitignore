@@ -5,7 +5,6 @@
 *.zip
 _builtins.js
 v8.log
-npm-debug.log
 CodeMirror-*
 bootstrap/
 
@@ -15,3 +14,10 @@ try/
 doc/
 bin/
 src/doc.jsx
+
+# npm-related files
+
+npm-debug.log
+package/
+jsx-*.tgz
+
