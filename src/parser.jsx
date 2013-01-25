@@ -513,13 +513,15 @@ class Scope {
 
 	var prev : Scope;
 	var locals : LocalVariable[];
+	var funcName : LocalVariable; // the name of current closure, can be null
 	var arguments : ArgumentDeclaration[];
 	var statements : Statement[];
 	var closures : MemberFunctionDefinition[];
 
-	function constructor (prev : Scope, locals : LocalVariable[], args : ArgumentDeclaration[], statements : Statement[], closures : MemberFunctionDefinition[]) {
+	function constructor (prev : Scope, locals : LocalVariable[], funcName : LocalVariable, args : ArgumentDeclaration[], statements : Statement[], closures : MemberFunctionDefinition[]) {
 		this.prev = prev;
 		this.locals = locals;
+		this.funcName = funcName;
 		this.arguments = args;
 		this.statements = statements;
 		this.closures = closures;
@@ -554,6 +556,7 @@ class Parser {
 	var _templateInstantiationRequests : TemplateInstantiationRequest[];
 
 	var _prevScope : Scope = null;
+	var _funcName : LocalVariable = null;
 	var _arguments : ArgumentDeclaration[] = null;
 	var _classFlags : number;
 	var _typeArgs : Token[];
@@ -742,15 +745,17 @@ class Parser {
 		return null;
 	}
 
-	function _pushScope (args : ArgumentDeclaration[]) : void {
+	function _pushScope (funcName : LocalVariable, args : ArgumentDeclaration[]) : void {
 		this._prevScope = new Scope (
 			this._prevScope,
 			this._locals,
+			this._funcName,
 			this._arguments,
 			this._statements,
 			this._closures
 		);
 		this._locals = new LocalVariable[];
+		this._funcName = funcName;
 		this._arguments = args;
 		this._statements = new Statement[];
 		this._closures = new MemberFunctionDefinition[];
@@ -758,6 +763,7 @@ class Parser {
 
 	function _popScope () : void {
 		this._locals = this._prevScope.locals;
+		this._funcName = this._prevScope.funcName;
 		this._arguments = this._prevScope.arguments;
 		this._statements = this._prevScope.statements;
 		this._closures = this._prevScope.closures;
@@ -779,6 +785,11 @@ class Parser {
 			return null;
 		}
 
+		if (this._funcName != null) {
+			if (isEqualTo(this._funcName)) {
+				return this._funcName;
+			}
+		}
 		for (var i = 0; i < this._arguments.length; ++i) {
 			if (isEqualTo(this._arguments[i])) {
 				return this._arguments[i];
@@ -1619,6 +1630,7 @@ class Parser {
 					return null;
 			}
 			// body
+			this._funcName = null;
 			this._arguments = args;
 			this._locals = new LocalVariable[];
 			this._statements = new Statement[];
@@ -2762,7 +2774,7 @@ class Parser {
 
 	function _lambdaBody (token : Token, args : ArgumentDeclaration[], returnType : Type) : MemberFunctionDefinition {
 		var openBlock = this._expectOpt("{");
-		this._pushScope(args);
+		this._pushScope(null, args);
 		try {
 			// parse lambda body
 			if (openBlock == null) {
@@ -2813,17 +2825,22 @@ class Parser {
 		if (this._expect("{") == null)
 			return null;
 
-		// add name to current scope for local function declaration
-		if (name != null && isStatement) {
+		var type : Type = null;
+		if (returnType != null) {
 			var argTypes = args.map.<Type>(function(arg) { return arg.getType(); });
-			var type = new StaticFunctionType(token, returnType, argTypes, false);
-			this._registerLocal(name, type);
+			type = new StaticFunctionType(token, returnType, argTypes, false);
+		}
+		var funcName : LocalVariable = null;
+		if (name != null) {
+			if (isStatement) {
+				// add name to current scope for local function declaration
+				funcName = this._registerLocal(name, type);
+			} else {
+				funcName = new LocalVariable(name, type);
+			}
 		}
 		// parse function block
-		this._pushScope(args);
-		if (name != null && ! isStatement) {
-			this._registerLocal(name, null);
-		}
+		this._pushScope(funcName, args);
 		var lastToken = this._block();
 		if (lastToken == null) {
 			this._popScope();
@@ -2835,13 +2852,13 @@ class Parser {
 		return new FunctionExpression(token, funcDef, isStatement);
 	}
 
-	function _forEachScope (cb : function(:LocalVariable[],:ArgumentDeclaration[]):boolean) : boolean {
+	function _forEachScope (cb : function(:LocalVariable,:LocalVariable[],:ArgumentDeclaration[]):boolean) : boolean {
 		if (this._locals != null) {
-			if (! cb(this._locals, this._arguments)) {
+			if (! cb(this._funcName, this._locals, this._arguments)) {
 				return false;
 			}
 			for (var scope = this._prevScope; scope != null; scope = scope.prev) {
-				if (scope.locals && ! cb(scope.locals, scope.arguments)) {
+				if (scope.locals && ! cb(scope.funcName, scope.locals, scope.arguments)) {
 					return false;
 				}
 			}
@@ -2851,7 +2868,11 @@ class Parser {
 
 	function _findLocal (name : string) : LocalVariable {
 		var found = null : LocalVariable;
-		this._forEachScope(function (locals, args) {
+		this._forEachScope(function (funcName, locals, args) {
+			if (funcName != null && funcName.getName().getValue() == name) {
+				found = funcName;
+				return false;
+			}
 			for (var i = 0; i < locals.length; ++i) {
 				if (locals[i].getName().getValue() == name) {
 					found = locals[i];

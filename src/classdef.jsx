@@ -1136,10 +1136,7 @@ class MemberFunctionDefinition extends MemberDefinition implements Block {
 			context.setBlockStack(outerContext.blockStack);
 			context.blockStack.push(new BlockContext(new LocalVariableStatuses(this, outerContext.getTopBlock().localVariableStatuses), this));
 			if (this._nameToken != null) { // named function expr
-				var funcName = this.getLocal(context, this.name());
-				context.getTopBlock().localVariableStatuses.setStatus(funcName);
-				if (funcName.getType() == null)
-					funcName.setType(this.getType());
+				context.getTopBlock().localVariableStatuses._statuses[this.name()] = LocalVariableStatuses.ISSET;
 			}
 		}
 
