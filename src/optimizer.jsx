@@ -1601,7 +1601,13 @@ class _DeadCodeEliminationOptimizeCommand extends _FunctionOptimizeCommand {
 	function _eliminateDeadConditions (funcDef : MemberFunctionDefinition, exprs : Expression[]) : void {
 		function isConditionallyConstant(expr : Expression) : Nullable.<boolean> {
 			if (expr instanceof BooleanLiteralExpression) {
-				return (expr as BooleanLiteralExpression).getToken().getValue() == "true";
+				return expr.getToken().getValue() == "true";
+			} else if (expr instanceof StringLiteralExpression) {
+				return expr.getToken().getValue().length > 2;
+			} else if (expr instanceof NumberLiteralExpression || expr instanceof IntegerLiteralExpression) {
+				return expr.getToken().getValue() as number != 0;
+			} else if (expr instanceof MapLiteralExpression || expr instanceof ArrayLiteralExpression) {
+				return true;
 			}
 			return null;
 		}
