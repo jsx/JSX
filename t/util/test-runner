@@ -69,7 +69,7 @@ sub main {
         run_web_test($file);
     }
     elsif($file =~ m{ /optimize/ }xms) {
-        optimize_and_compare($file);
+        optimize_and_compare($file, 0);
     }
     elsif($file =~ m{ /optimize-bench/ }xms) {
         optimize_and_compare($file, 1);
@@ -176,7 +176,7 @@ sub optimize_and_compare {
     plan skip_all => 'environment variable JSX_OPTS is set'
         if defined $ENV{JSX_OPTS};
 
-    plan tests => 1;
+    plan tests => 5 + ($do_bench ? 1 : 0);
 
     defined(my $expected = get_section($file, "EXPECTED"))
         or die "could not find EXPECTED in file:$file\n";
@@ -186,39 +186,25 @@ sub optimize_and_compare {
     chomp $opts;
 
     # compile, run, and check (wo. optimization)
-    my $src = compile_to_run($file) or do {
-        fail "compile '$file' failed: $?";
-        return;
-    };
+    my $src = compile_to_run($file);
+    ok defined($src) && length($src) > 0,
+        "compile '$file' (wo. optimization)" or return;
     my ($output, $elapsed) = bench(sub { run_compiled($file, $src) });
-    defined $output or do {
-        fail "failed to execute compiled script";
-        return;
-    };
-    if ($output ne $expected) {
-        # do not continue if the result is wrong
-        is $output, $expected, "$file (not optimized)";
-        return;
-    }
+
+    is $output, $expected,
+        "output of '$file' (wo. optimization)" or return;
 
     # compile, run, and check (w. optimization)
-    my $src_optimized = compile_to_run($file, $opts) or do {
-        fail "compile '$file' with '$opts' failed: $?";
-        return;
-    };
-    if ($src eq $src_optimized) {
-        fail "no change by optimization found in the generated code";
-        return;
-    }
+    my $src_optimized = compile_to_run($file, $opts);
+    ok defined($src_optimized) && length($src_optimized) > 0,
+        "compile '$file' (w. $opts)" or return;
+
     ($output, my $elapsed_optimized) = bench(sub { run_compiled($file, $src_optimized) });
-    defined $output or do {
-        fail "failed to execute compiled script with optimization: $opts";
-        return;
-    };
-    if (! $do_bench || $output ne $expected) {
-        is $output, $expected, $file;
-        return;
-    }
+
+    is $output, $expected,
+        "output of '$file' (w. $opts)" or return;
+
+    isnt $src, $src_optimized, "generated code must be different";
 
     # check the times
     if ($do_bench) {
