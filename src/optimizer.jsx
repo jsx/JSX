@@ -1312,6 +1312,7 @@ class _DeadCodeEliminationOptimizeCommand extends _FunctionOptimizeCommand {
 			this._eliminateDeadStoresToProperties(funcDef, exprs);
 			this._delayAssignmentsBetweenLocals(funcDef, exprs);
 			this._eliminateDeadStores(funcDef, exprs);
+			this._eliminateDeadConditions(funcDef, exprs);
 		});
 		// remove statements without side-effects
 		(function onStatements(statements : Statement[]) : boolean {
@@ -1595,6 +1596,41 @@ class _DeadCodeEliminationOptimizeCommand extends _FunctionOptimizeCommand {
 			return expr.forEachExpression(onExpr);
 		};
 		Util.forEachExpression(onExpr, exprs);
+	}
+
+	function _eliminateDeadConditions (funcDef : MemberFunctionDefinition, exprs : Expression[]) : void {
+		function isConditionallyConstant(expr : Expression) : Nullable.<boolean> {
+			if (expr instanceof BooleanLiteralExpression) {
+				return (expr as BooleanLiteralExpression).getToken().getValue() == "true";
+			}
+			return null;
+		}
+		(function onStatements(statements : Statement[]) : boolean {
+			for (var i = statements.length - 1; i >= 0; --i) {
+				var statement = statements[i];
+				if (statement instanceof IfStatement) {
+					var ifStatement = statement as IfStatement;
+					var cond = isConditionallyConstant(ifStatement.getExpr());
+					if (cond == null) {
+						// nothing to do
+					} else if (cond == false && ifStatement.getOnFalseStatements().length == 0) {
+						statements.splice(i, 1);
+					} else if (cond == false) {
+						statements.splice(i, 1);
+						for (var j = 0; j < ifStatement.getOnFalseStatements().length; ++j) {
+							statements.splice(i + j, 0, ifStatement.getOnFalseStatements()[j]);
+						}
+					} else if (cond == true) {
+						statements.splice(i, 1);
+						for (var j = 0; j < ifStatement.getOnTrueStatements().length; ++j) {
+							statements.splice(i + j, 0, ifStatement.getOnTrueStatements()[j]);
+						}
+					}
+				}
+				statement.handleStatements(onStatements);
+			}
+			return true;
+		})(funcDef.getStatements());
 	}
 
 }
