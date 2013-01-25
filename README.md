@@ -6,14 +6,14 @@ JSX - a faster, safer, easier JavaScript
 INSTALLATION
 =======================
 
-The JSX compiler requires `node.js` v0.6.19 or later, `npm`, and the SDK
+The JSX compiler requires `node.js` v0.8.0 or later, `npm`, and the SDK
 also requires Perl 5.10.0 or later.
 
 To setup JSX SDK , type the following command:
 
-    git clone git://github.com/jsx/JSX.git
+    git clone --recursive git://github.com/jsx/JSX.git
     cd JSX
-    make setup
+    make # to build bin/jsx
 
 To install jsx command, just make a link of `bin/jsx` to `~/bin`.
 

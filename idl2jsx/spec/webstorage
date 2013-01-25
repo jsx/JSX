@@ -215,7 +215,7 @@
    <p><a href="http://www.w3.org/"><img alt="W3C" height="48" src="http://www.w3.org/Icons/w3c_home" width="72"></a></p>
 
    <h1>Web Storage</h1>
-   <h2 class="no-num no-toc" id="editor-s-draft-26-july-2012">Editor's Draft 26 July 2012</h2>
+   <h2 class="no-num no-toc" id="editor-s-draft-4-december-2012">Editor's Draft 4 December 2012</h2>
    <dl><dt>Latest Published Version:</dt>
     <dd><a href="http://www.w3.org/TR/webstorage/">http://www.w3.org/TR/webstorage/</a></dd>
     <dt>Latest Editor's Draft:</dt>
@@ -273,9 +273,7 @@
 
   
 
-  <p>If you wish to make comments regarding this document in a manner
-  that is tracked by the W3C, please submit them via using <a href="http://www.w3.org/Bugs/Public/enter_bug.cgi?product=HTML%20WG">our
-  public bug database</a>. If you do not have an account then you can
+  <p>If you wish to make comments regarding this document, you can
   enter feedback using this form:</p>
 
   <form action="http://www.whatwg.org/specs/web-apps/current-work/file-spam.cgi" method="post">
@@ -353,7 +351,7 @@
   </dl><p>The W3C <a href="http://www.w3.org/2008/webapps/">Web Applications
   Working Group</a> is the W3C working group responsible for this
   specification's progress along the W3C Recommendation track.
-  This specification is the 26 July 2012 Editor's Draft.
+  This specification is the 4 December 2012 Editor's Draft.
   </p>
 
   
@@ -419,9 +417,8 @@
 
   <p><i>This section is non-normative.</i></p>
 
-  <p>This specification introduces two related mechanisms, similar to
-  HTTP session cookies, for storing structured data on the client
-  side. <a href="#refsCOOKIES">[COOKIES]</a></p>
+  <p>This specification introduces two related mechanisms, similar to HTTP session cookies, for
+  storing name-value pairs on the client side. <a href="#refsCOOKIES">[COOKIES]</a></p>
 
   <p>The first is designed for scenarios where the user is carrying
   out a single transaction, but could be carrying out multiple
@@ -578,8 +575,7 @@
   <p>The term DOM is used to refer to the API set made available to
   scripts in Web applications, and does not necessarily imply the
   existence of an actual <code>Document</code> object or of any other
-  <code>Node</code> objects as defined in the DOM Core
-  specifications. <a href="#refsDOMCORE">[DOMCORE]</a></p>
+  <code>Node</code> objects as defined in the DOM specifications. <a href="#refsDOM">[DOM]</a></p>
 
   <p>An IDL attribute is said to be <em>getting</em> when its value is
   being retrieved (e.g. by author script), and is said to be
@@ -600,7 +596,7 @@
   <pre class="idl">interface <dfn id="storage-0">Storage</dfn> {
   readonly attribute unsigned long <a href="#dom-storage-length" title="dom-Storage-length">length</a>;
   DOMString? <a href="#dom-storage-key" title="dom-Storage-key">key</a>(unsigned long index);
-  getter DOMString <a href="#dom-storage-getitem" title="dom-Storage-getItem">getItem</a>(DOMString key);
+  getter DOMString? <a href="#dom-storage-getitem" title="dom-Storage-getItem">getItem</a>(DOMString key);
   setter creator void <a href="#dom-storage-setitem" title="dom-Storage-setItem">setItem</a>(DOMString key, DOMString value);
   deleter void <a href="#dom-storage-removeitem" title="dom-Storage-removeItem">removeItem</a>(DOMString key);
   void <a href="#dom-storage-clear" title="dom-Storage-clear">clear</a>();
@@ -748,7 +744,8 @@ interface <dfn id="windowsessionstorage">WindowSessionStorage</dfn> {
   a <span title="concept-script">script</span> in an existing
   <span>browsing context</span>, or by the user following a link in an
   existing browsing context, or in some other way related to a
-  specific <code>Document</code>, then the session storage area of the
+  specific <code>Document</code>, and the creation is not <span>a
+  new start for session storage</span>, then the session storage area of the
   <span>origin</span> of that <code>Document</code> must be copied
   into the new browsing context when it is created. From that point
   on, however, the two session storage areas must be considered
@@ -830,14 +827,11 @@ interface <dfn id="windowlocalstorage">WindowLocalStorage</dfn> {
 
   <h4 id="security-localStorage"><span class="secno">4.3.1 </span>Security</h4>
 
-  <p>User agents must throw a <code>SecurityError</code> exception
-  whenever any of the members of a <code><a href="#storage-0">Storage</a></code> object
-  originally returned by the <code title="dom-localStorage"><a href="#dom-localstorage">localStorage</a></code> attribute are accessed
-  by scripts whose <span>effective script origin</span> is not the
-  <span title="same origin">same</span> as the <span>origin</span> of
-  the <code>Document</code> of the <code>Window</code> object on which
-  the <code title="dom-localStorage"><a href="#dom-localstorage">localStorage</a></code> attribute was
-  accessed.</p>
+  <p>User agents must throw a <code>SecurityError</code> exception whenever any properties of a
+  <code><a href="#storage-0">Storage</a></code> object originally returned by the <code title="dom-localStorage"><a href="#dom-localstorage">localStorage</a></code> attribute are accessed by scripts whose
+  <span>effective script origin</span> is not the <span title="same origin">same</span> as the
+  <span>origin</span> of the <code>Document</code> of the <code>Window</code> object on which the
+  <code title="dom-localStorage"><a href="#dom-localstorage">localStorage</a></code> attribute was accessed.</p>
 
   <p class="note">This means <code><a href="#storage-0">Storage</a></code> objects are neutered
   when the <code title="dom-document-domain">document.domain</code>
@@ -854,12 +848,10 @@ interface <dfn id="windowlocalstorage">WindowLocalStorage</dfn> {
   storage</a>, <a href="#localStorageEvent">for local
   storage</a>).</p>
 
-  <p>When this happens, the user agent must <span>queue a task</span>
-  to fire an event with the name <code><a href="#storage-0">storage</a></code>, which does not
-  bubble and is not cancelable, and which uses the
-  <code><a href="#storageevent">StorageEvent</a></code> interface, at each <code>Window</code>
-  object whose <code>Document</code> object has a <code><a href="#storage-0">Storage</a></code>
-  object that is affected.</p>
+  <p>When this happens, the user agent must <span>queue a task</span> to <span title="concept-event-fire">fire</span> a <span title="concept-events-trusted">trusted</span> event
+  with the name <code><a href="#storage-0">storage</a></code>, which does not bubble and is not cancelable, and which uses
+  the <code><a href="#storageevent">StorageEvent</a></code> interface, at each <code>Window</code> object whose
+  <code>Document</code> object has a <code><a href="#storage-0">Storage</a></code> object that is affected.</p>
 
   <p class="note">This includes <code>Document</code> objects that are
   not <span>fully active</span>, but events fired on those are ignored
@@ -973,10 +965,8 @@ dictionary <dfn id="storageeventinit">StorageEventInit</dfn> : <span>EventInit</
 
   
 
-  <p>A mostly arbitrary limit of five megabytes per
-  <span>origin</span> is recommended. Implementation feedback is
-  welcome and will be used to update this suggestion in the
-  future.</p>
+  <p>A mostly arbitrary limit of five megabytes per <span>origin</span> is suggested. Implementation
+  feedback is welcome and will be used to update this suggestion in the future.</p>
 
 
   <h2 id="privacy"><span class="secno">6 </span>Privacy</h2>
@@ -1010,8 +1000,8 @@ dictionary <dfn id="storageeventinit">StorageEventInit</dfn> : <span>EventInit</
    <dt>Expiring stored data</dt>
    <dd>
 
-    <p>User agents may, if so configured by the user, automatically
-    delete stored data after a period of time.</p>
+    <p>User agents may, possibly in a manner configured by the user, automatically delete stored
+    data after a period of time.</p>
 
     <p>For example, a user agent could be configured to treat
     third-party local storage areas as session-only storage, deleting
@@ -1096,8 +1086,8 @@ dictionary <dfn id="storageeventinit">StorageEventInit</dfn> : <span>EventInit</
   session identifiers in URLs, a technique already commonly used for
   innocuous purposes but easily repurposed for user tracking (even
   retroactively). This information can then be shared with other
-  sites, using using visitors' IP addresses and other user-specific
-  data (e.g. user-agent headers and configuration settings) to combine
+  sites, using visitors' IP addresses and other user-specific data
+  (e.g. user-agent headers and configuration settings) to combine
   separate sessions into coherent user profiles.</p>
 
 
@@ -1128,12 +1118,10 @@ dictionary <dfn id="storageeventinit">StorageEventInit</dfn> : <span>EventInit</
 
   <h3 id="cross-directory-attacks"><span class="secno">7.2 </span>Cross-directory attacks</h3>
 
-  <p>Different authors sharing one host name, for example users
-  hosting content on <code>geocities.com</code>, all share one local
-  storage object. There is no feature to restrict the access by
-  pathname. Authors on shared hosts are therefore recommended to avoid
-  using these features, as it would be trivial for other authors to
-  read the data and overwrite it.</p>
+  <p>Different authors sharing one host name, for example users hosting content on
+  <code>geocities.com</code>, all share one local storage object. There is no feature to restrict
+  the access by pathname. Authors on shared hosts are therefore urged to avoid using these features,
+  as it would be trivial for other authors to read the data and overwrite it.</p>
 
   <p class="note">Even if a path-restriction feature was made
   available, the usual DOM scripting security model would make it
@@ -1168,7 +1156,6 @@ dictionary <dfn id="storageeventinit">StorageEventInit</dfn> : <span>EventInit</
 
 
 
-
   <h2 class="no-num" id="references">References</h2>
 
   <p>All references are normative unless marked "Non-normative".</p>
@@ -1176,19 +1163,16 @@ dictionary <dfn id="storageeventinit">StorageEventInit</dfn> : <span>EventInit</
   
 
   <dl><dt id="refsCOOKIES">[COOKIES]</dt>
-   
    <dd><cite><a href="http://tools.ietf.org/html/rfc6265">HTTP State Management Mechanism</a></cite>, A. Barth. IETF.</dd>
 
-   <dt id="refsDOMCORE">[DOMCORE]</dt>
-   <dd><cite><a href="http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html">Web DOM Core</a></cite>, A. van Kesteren. W3C.</dd>
+   <dt id="refsDOM">[DOM]</dt>
+   <dd><cite><a href="http://dom.spec.whatwg.org/">DOM</a></cite>, A. van Kesteren, A. Gregor, Ms2ger. WHATWG.</dd>
 
    <dt id="refsECMA262">[ECMA262]</dt>
    <dd><cite><a href="http://www.ecma-international.org/publications/standards/Ecma-262.htm">ECMAScript Language Specification</a></cite>. ECMA.</dd>
 
    <dt id="refsHTML">[HTML]</dt>
-   <dd><cite><a href="http://www.whatwg.org/specs/web-apps/current-work/">HTML</a></cite>,
-   I. Hickson. WHATWG.</dd>
-
+   <dd><cite><a href="http://www.whatwg.org/specs/web-apps/current-work/">HTML</a></cite>, I. Hickson. WHATWG.</dd>
 
    <dt id="refsRFC2119">[RFC2119]</dt>
    <dd><cite><a href="http://tools.ietf.org/html/rfc2119">Key words for use in

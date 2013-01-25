@@ -1,0 +1,1445 @@
+<!DOCTYPE html><html lang="en-US"><meta charset="utf-8">
+<title class="w3conly">URL</title>
+<style>
+   pre.idl { border:solid thin; background:#eee; color:#000; padding:0.5em }
+   pre.idl :link, pre.idl :visited { color:inherit; background:transparent }
+   pre code { color:inherit; background:transparent }
+   div.example { margin-left:1em; padding-left:1em; border-left:double; color:#222; background:#fcfcfc }
+   .note { margin-left:2em; font-weight:bold; font-style:italic; color:#008000 }
+   p.note::before { content:"Note: " }
+   .XXX { padding:.5em; border:solid #f00 }
+   p.XXX::before { content:"Issue: " }
+   dl.switch { padding-left:2em }
+   dl.switch > dt { text-indent:-1.5em }
+   dl.switch > dt:before { content:'\21AA'; padding:0 0.5em 0 0; display:inline-block; width:1em; text-align:right; line-height:0.5em }
+   dl.domintro { color: green; margin: 2em 0 2em 2em; padding: 0.5em 1em; border: none; background: #DDFFDD; }
+   dl.domintro dt, dl.domintro dt * { color: black; text-decoration: none; }
+   dl.domintro dd { margin: 0.5em 0 1em 2em; padding: 0; }
+   dl.domintro dd p { margin: 0.5em 0; }
+   dl.domintro:before { display: table; margin: -1em -0.5em -0.5em auto; width: auto; content: 'This box is non-normative. Implementation requirements are given below this box.'; color: red; border: solid 2px; background: white; padding: 0 0.25em; }
+   em.ct { text-transform:lowercase; font-variant:small-caps; font-style:normal }
+   dfn { font-weight:bold; font-style:normal }
+   code { color:orangered }
+   code :link, code :visited { color:inherit }
+   hr:not(.top) { display:block; background:none; border:none; padding:0; margin:2em 0; height:auto }
+   table { border-collapse:collapse; border-style:hidden hidden none hidden }
+   table thead { border-bottom:solid }
+   table tbody th:first-child { border-left:solid }
+   table td, table th { border-left:solid; border-right:solid; border-bottom:solid thin; vertical-align:top; padding:0.2em }
+</style>
+<link class="w3conly" href="http://www.w3.org/StyleSheets/TR/W3C-WD" rel="stylesheet" type="text/css">
+<div class="head">
+<div class="w3conly">
+
+<!--begin-logo-->
+<p><a href="http://www.w3.org/"><img alt="W3C" height="48" src="http://www.w3.org/Icons/w3c_home" width="72"></a></p>
+<!--end-logo-->
+</div>
+
+<h1 class="head">URL</h1>
+<h2>W3C Working Draft 24 May 2012</h2>
+
+<dl>
+ <dt>This Version:</dt>
+ <dd class="publish"><a href="http://www.w3.org/TR/2012/WD-url-20120524/">http://www.w3.org/TR/2012/WD-url-20120524/</a>
+
+ <dt class="publish">Latest Version:</dt>
+ <dd class="publish"><a href="http://www.w3.org/TR/url/">http://www.w3.org/TR/url/</a>
+
+ <dt class="publish">Latest Editor Draft:
+ <dd class="publish"><a href="http://dvcs.w3.org/hg/url/raw-file/tip/Overview.html">http://dvcs.w3.org/hg/url/raw-file/tip/Overview.html</a>
+
+<!--
+ <dt>Previous Versions:</dt>
+ <dd>None.
+-->
+
+ <dt>Editors:</dt>
+ <dd>Erik Arvidsson
+ &lt;<a href="mailto:arv@chromium.org">arv@chromium.org</a>&gt;</dd>
+ <dd>Michael[tm] Smith
+ &lt;<a href="mailto:mike@w3.org">mike@w3.org</a>&gt;</dd>
+ <dt>Former editor:</dt>
+ <dd>Adam Barth
+ &lt;<a href="mailto:w3c@adambarth.com">w3c@adambarth.com</a>&gt;</dd>
+</dl>
+
+</div>
+
+<div class="w3conly">
+<!--begin-copyright-->
+<p class="copyright"><a href="http://www.w3.org/Consortium/Legal/ipr-notice#Copyright">Copyright</a> © 2012 <a href="http://www.w3.org/"><abbr title="World Wide Web Consortium">W3C</abbr></a><sup>&reg;</sup> (<a href="http://www.csail.mit.edu/"><abbr title="Massachusetts Institute of Technology">MIT</abbr></a>, <a href="http://www.ercim.eu/"><abbr title="European Research Consortium for Informatics and Mathematics">ERCIM</abbr></a>, <a href="http://www.keio.ac.jp/">Keio</a>), All Rights Reserved. W3C <a href="http://www.w3.org/Consortium/Legal/ipr-notice#Legal_Disclaimer">liability</a>, <a href="http://www.w3.org/Consortium/Legal/ipr-notice#W3C_Trademarks">trademark</a> and <a href="http://www.w3.org/Consortium/Legal/copyright-documents">document use</a> rules apply.</p>
+<!--end-copyright--></div>
+<hr class="top">
+
+<div class="publish">
+<h2 class="no-num no-toc" id="abstract">Abstract</h2>
+
+<p>This specification defines the term <a href="#concept-url" title="concept-url">URL</a>, various algorithms
+for dealing with URLs, and an API for constructing, parsing, and resolving
+URLs.
+
+<p class="XXX">The behavior specified in this document for how browsers
+process URLs might or might not match any particular browser, but browsers
+might be well-served by adopting the behavior defined herein.
+
+<h2 class="no-num no-toc" id="status-of-this-document">Status of this Document</h2>
+
+<p><em>This section describes the status of this document at the time of its
+publication. Other documents may supersede this document. A list of current
+W3C publications and the latest revision of this technical report can be
+found in the <a href="http://www.w3.org/TR/">W3C technical reports index</a>
+at http://www.w3.org/TR/.</em></p>
+
+<p>This is the 24 May 2012 First Public Working Draft of the URL specification.
+ Please send comments to
+<a href="mailto:public-webapps@w3.org?subject=%5Burl%5D%20">public-webapps@w3.org</a>
+(<a href="http://lists.w3.org/Archives/Public/public-webapps/">archived</a>)
+with <samp><a href="#url">[url]</a></samp> at the start of the subject line.</p>
+
+<p>This document is produced by the
+<a href="http://www.w3.org/2008/webapps/">Web Applications</a> (WebApps)
+Working Group. The WebApps Working Group is part of the
+<a href="http://www.w3.org/2006/rwc/Activity">Rich Web Clients Activity</a>
+in the W3C <a href="http://www.w3.org/Interaction/">Interaction Domain</a>.</p>
+
+<p>This document was produced by a group operating under the
+<a href="http://www.w3.org/Consortium/Patent-Policy-20040205/">5 February 2004 W3C Patent Policy</a>.
+W3C maintains a
+<a href="http://www.w3.org/2004/01/pp-impl/42538/status" rel="disclosure">public list of any patent disclosures</a>
+made in connection with the deliverables of the group; that page also
+includes instructions for disclosing a patent. An individual who has actual
+knowledge of a patent which the individual believes contains
+<a href="http://www.w3.org/Consortium/Patent-Policy-20040205/#def-essential">Essential Claim(s)</a>
+must disclose the information in accordance with
+<a href="http://www.w3.org/Consortium/Patent-Policy-20040205/#sec-Disclosure">section 6 of the W3C Patent Policy</a>.
+
+<p>Publication as a Working Draft does not imply endorsement by the W3C
+Membership. This is a draft document and may be updated, replaced or
+obsoleted by other documents at any time. It is inappropriate to cite this
+document as other than work in progress.
+</div>
+
+
+<h2 class="no-num no-toc" id="toc">Table of Contents</h2>
+
+
+<!--begin-toc-->
+<ol class="toc">
+ <li><a class="no-num" href="#goals">Goals</a></li>
+ <li><a class="no-num" href="#issues">Issues</a></li>
+ <li><a href="#conformance"><span class="secno">1 </span>Conformance</a></li>
+ <li><a href="#terminology"><span class="secno">2 </span>Terminology</a></li>
+ <li><a href="#algorithms"><span class="secno">3 </span>Algorithms</a>
+  <ol class="toc">
+   <li><a href="#parse-a-url"><span class="secno">3.1 </span>Parse a URL</a>
+    <ol class="toc">
+     <li><a href="#find-the-scheme"><span class="secno">3.1.1 </span>Find the scheme</a></li>
+     <li><a href="#find-the-authority,-path,-query,-and-fragment"><span class="secno">3.1.2 </span>Find the authority, path, query, and fragment</a></li>
+     <li><a href="#find-the-user-info,-host,-and-port"><span class="secno">3.1.3 </span>Find the user-info, host, and port</a></li>
+     <li><a href="#find-the-username-and-password"><span class="secno">3.1.4 </span>Find the username and password</a></ol></li>
+   <li><a href="#resolve-a-url"><span class="secno">3.2 </span>Resolve a URL</a>
+    <ol class="toc">
+     <li><a href="#resolve-a-string-as-a-relative-url"><span class="secno">3.2.1 </span>Resolve a string as a relative URL</a></li>
+     <li><a href="#resolve-a-string-as-a-scheme-relative-url"><span class="secno">3.2.2 </span>Resolve a string as a scheme-relative URL</a></li>
+     <li><a href="#resolve-a-string-as-an-authority-relative-url"><span class="secno">3.2.3 </span>Resolve a string as an authority-relative URL</a></li>
+     <li><a href="#resolve-a-string-as-a-path-relative-url"><span class="secno">3.2.4 </span>Resolve a string as a path-relative URL</a></li>
+     <li><a href="#resolve-a-string-as-a-query-relative-url"><span class="secno">3.2.5 </span>Resolve a string as a query-relative URL</a></li>
+     <li><a href="#resolve-a-string-as-a-fragment-relative-url"><span class="secno">3.2.6 </span>Resolve a string as a fragment-relative URL</a></ol></li>
+   <li><a href="#canonicalize-a-url"><span class="secno">3.3 </span>Canonicalize a URL</a>
+    <ol class="toc">
+     <li><a href="#canonicalize-a-scheme"><span class="secno">3.3.1 </span>Canonicalize a scheme</a></li>
+     <li><a href="#canonicalize-a-user-info"><span class="secno">3.3.2 </span>Canonicalize a user-info</a></li>
+     <li><a href="#canonicalize-a-host"><span class="secno">3.3.3 </span>Canonicalize a host</a>
+      <ol class="toc">
+       <li><a href="#host-escape-normalization"><span class="secno">3.3.3.1 </span>Host escape normalization</a></ol></li>
+     <li><a href="#canonicalize-a-port"><span class="secno">3.3.4 </span>Canonicalize a port</a></li>
+     <li><a href="#canonicalize-a-path"><span class="secno">3.3.5 </span>Canonicalize a path</a></li>
+     <li><a href="#canonicalize-a-query"><span class="secno">3.3.6 </span>Canonicalize a query</a></li>
+     <li><a href="#canonicalize-a-fragment"><span class="secno">3.3.7 </span>Canonicalize a fragment</a></ol></li>
+   <li><a href="#canonicalize-query-parameters"><span class="secno">3.4 </span>Canonicalize query parameters</a></li>
+   <li><a href="#collect-url-parameters"><span class="secno">3.5 </span>Collect URL parameters</a></li>
+   <li><a href="#url-parameter-serialization"><span class="secno">3.6 </span>URL parameter serialization</a></li>
+   <li><a href="#port-setter-preprocessor"><span class="secno">3.7 </span>Port setter preprocessor</a></ol></li>
+ <li><a href="#interface-url"><span class="secno">4 </span>Interface <code>URL</code></a>
+  <ol class="toc">
+   <li><a href="#constructor"><span class="secno">4.1 </span>Constructor</a></li>
+   <li><a href="#the-url-decomposition-idl-attributes"><span class="secno">4.2 </span>The URL decomposition IDL attributes</a></li>
+   <li><a href="#the-filename-attribute"><span class="secno">4.3 </span>The <code>filename</code> attribute</a></li>
+   <li><a href="#the-origin-attribute"><span class="secno">4.4 </span>The <code>origin</code> attribute</a></li>
+   <li><a href="#the-getparameternames()-method"><span class="secno">4.5 </span>The <code>getParameterNames()</code> method</a></li>
+   <li><a href="#the-getparametervalues()-method"><span class="secno">4.6 </span>The <code>getParameterValues()</code> method</a></li>
+   <li><a href="#the-hasparameter()-method"><span class="secno">4.7 </span>The <code>hasParameter()</code> method</a></li>
+   <li><a href="#the-getparameter()-method"><span class="secno">4.8 </span>The <code>getParameter()</code> method</a></li>
+   <li><a href="#the-setparameter()-method"><span class="secno">4.9 </span>The <code>setParameter()</code> method</a></li>
+   <li><a href="#the-addparameter()-method"><span class="secno">4.10 </span>The <code>addParameter()</code> method</a></li>
+   <li><a href="#the-removeparameter()-method"><span class="secno">4.11 </span>The <code>removeParameter()</code> method</a></li>
+   <li><a href="#the-clearparameters()-method"><span class="secno">4.12 </span>The <code>clearParameters()</code> method</a></ol></li>
+ <li><a class="no-num" href="#references">References</a>
+  <ol class="toc">
+   <li><a class="no-num" href="#normative-references">Normative references</a></ol></ol>
+<!--end-toc-->
+
+<h2 class="no-num" id="goals">Goals</h2>
+<p><i>This section is non-normative.</i>
+<p>This specification is intended to be referenced by other specifications
+which need conformance requirements for dealing with URLs&mdash;principally,
+conformance requirements for user agents.
+To that end, this specification:
+<ul>
+<li>defines various algorithms for dealing with URLs&mdash;in large part
+essentially by precisely documenting how current browsers deal with URLs
+<li>defines an API for constructing, parsing, and resolving URLs
+<li>defines what a <a href="#concept-url" title="concept-url">URL</a> is, as well as what a
+<a href="#valid-url">valid URL</a> is, along with various subtypes of valid URLs
+</ul>
+
+<h2 class="no-num" id="issues">Issues</h2>
+<p><i>This section is non-normative.</i>
+<div class="XXX">
+<p>Browsers parse URLs differently depending on which operating
+system they&rsquor;re running on. The problem is that they want to do sensible
+things for file paths, but file paths look different on Windows and Unix
+systems.
+
+<p>How should we handle cases where browsers disagree with the
+regular expression in RFC 3986?  Currently, this document aims to describe
+how browsers behave, but we&rsquor;ll likely need to compare that to RFC 3986 at
+some point.  Some specific differences that have been brought up on the
+mailing list:
+<ul>
+<li>http:///example.com/
+<li>http://example.com;
+</ul>
+</div>
+
+<h2 id="conformance"><span class="secno">1 </span>Conformance</h2>
+
+<p>Everything in this specification is normative except for diagrams,
+examples, notes and sections marked non-normative.</p>
+
+<p>The key word must in this document is to be interpreted as described in
+RFC 2119. <a href="#refsRFC2119">[RFC2119]</a>
+
+<p>A user agent must also be a conforming implementation of the IDL
+fragments in this specification, as described in the Web IDL specification.
+<a href="#refsWEBIDL">[WEBIDL]</a>
+
+<p>This specification uses terminology from DOM4 and The Web Origin Concept.
+<a href="#refsDOM">[DOM]</a> <a href="#refsORIGIN">[ORIGIN]</a>
+
+<h2 id="terminology"><span class="secno">2 </span>Terminology</h2>
+
+<p>A <dfn id="concept-url" title="concept-url">URL</dfn> is a string used to identify a resource.</p>
+
+<p>A <dfn id="parsed-url">parsed URL</dfn> is a user-agent&rsquor;s in-memory representation
+stored as the result of <a href="#parse-a-url-0" title="parse a URL">parsing a URL</a>.
+
+<p>A <a href="#concept-url" title="concept-url">URL</a> is an <dfn id="absolute-url">absolute URL</dfn> if <a href="#resolve-a-url-0" title="resolve a url">resolving</a> it results in the same output
+regardless of what it is resolved relative to, and that output is
+not a failure.</p>
+
+<p>An <a href="#absolute-url">absolute URL</a> is a <dfn id="hierarchical-url">hierarchical URL</dfn> if,
+when <a href="#resolve-a-url-0" title="resolve a url">resolved</a> and then <a href="#parse-a-url-0" title="parse a url">parsed</a>, there is a character immediately
+after the <a href="#scheme">scheme</a> component
+and it is a U+002F SOLIDUS character (/).</p>
+
+<p>An <a href="#absolute-url">absolute URL</a> is an <dfn id="authority-based-url">authority-based URL</dfn>
+if, when <a href="#resolve-a-url-0" title="resolve a url">resolved</a> and then <a href="#parse-a-url-0" title="parse a url">parsed</a>, there are two characters
+immediately after the <a href="#scheme">scheme</a>
+component and they are both U+002F SOLIDUS characters (//).</p>
+
+<p>A <a href="#concept-url" title="concept-url">URL</a> is a <dfn id="valid-url">valid URL</dfn> if at least one of
+the following conditions holds:</p>
+
+<ul>
+ <li><p>The <a href="#concept-url" title="concept-url">URL</a> is a valid URI reference.
+ <a href="#refsRFC3986">[RFC3986]</a>
+
+ <li><p>The <a href="#concept-url" title="concept-url">URL</a> is a valid IRI reference and it has no
+ query component.
+ <a href="#refsRFC3987">[RFC3987]</a>
+
+ <li><p>The <a href="#concept-url" title="concept-url">URL</a> is a valid IRI reference and its query
+ component contains no unescaped non-ASCII characters.
+ <a href="#refsRFC3987">[RFC3987]</a>
+
+ <li><p>The <a href="#concept-url" title="concept-url">URL</a> is a valid IRI reference and the
+ <a class="external" href="http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#concept-document-encoding" title="concept-document-encoding">character encoding</a>
+ of the URL's <code>Document</code> is UTF-8 or
+ <a data-anolis-spec="html" href="#a-utf-16-encoding">a UTF-16 encoding</a>.
+ <a href="#refsRFC3987">[RFC3987]</a>
+</ul>
+
+<p>A string is a <dfn id="valid-non-empty-url">valid non-empty URL</dfn> if it is a
+<a href="#valid-url">valid URL</a> but it is not the empty string.</p>
+
+<p>A string is a <dfn id="valid-url-potentially-surrounded-by-spaces">valid URL potentially surrounded by spaces</dfn>
+if, after
+<a href="#strip-leading-and-trailing-whitespace" title="strip leading and trailing whitespace">stripping leading and trailing whitespace</a>
+from it, it is a <a href="#valid-url">valid URL</a>.
+
+<p>A string is a <dfn id="valid-non-empty-url-potentially-surrounded-by-spaces">valid non-empty URL potentially surrounded by spaces</dfn>
+if, after
+<a href="#strip-leading-and-trailing-whitespace" title="strip leading and trailing whitespace">stripping leading and trailing whitespace</a>
+from it, it is a <a href="#valid-non-empty-url">valid non-empty URL</a>.
+
+<p>When a user agent is to
+<dfn id="strip-leading-and-trailing-whitespace">strip leading and trailing whitespace</dfn>
+from a string, the user agent must remove all
+<a href="#space-character" title="space character">space characters</a>
+that are at the start or end of the string.
+
+<p>The <dfn id="space-character" title="space character">space characters</dfn>,
+for the purposes of this specification, are U+0020 SPACE, U+0009 CHARACTER
+TABULATION (tab), U+000A LINE FEED (LF), U+000C FORM FEED (FF), and U+000D
+CARRIAGE RETURN (CR).
+
+<p>Comparing two strings in an
+<dfn id="ascii-case-insensitive">ASCII case-insensitive</dfn>
+manner means comparing them exactly, code point for code point, except that
+the characters in the range U+0041 .. U+005A (that is, LATIN CAPITAL LETTER
+A to LATIN CAPITAL LETTER Z) and the corresponding characters in the range
+U+0061 .. U+007A (that is, LATIN SMALL LETTER A to LATIN SMALL LETTER Z)
+are considered to also match.
+
+<p>A <dfn id="control-character">control character</dfn> is a character whose value is less than
+or equal to U+0020 (" ").
+
+<p>A <dfn id="slash-character">slash character</dfn> is either U+002F ("/") or U+005C ("\").
+<p class="XXX">TODO: There&rsquor;s some question as to whether this is necessary
+for non-file URLs.
+
+<p>An <dfn id="authority-terminating-character">authority terminating character</dfn> is either a
+<a href="#slash-character">slash character</a>,
+U+003F ("?"), U+0023 ("#"), or U+003B (";").
+<p class="XXX">TODO: Why is ";" on this list?
+
+<p>During a parsing algorithm, the <dfn id="remaining-string">remaining string</dfn> is the
+characters of the input that have not yet been consumed.
+
+<p>The term <dfn id="a-utf-16-encoding">a UTF-16 encoding</dfn> refers to any variant of UTF-16:
+self-describing UTF-16 with a BOM, ambiguous UTF-16 without a BOM, raw
+UTF-16LE, and raw UTF-16BE.
+<a href="#refsRFC2781">[RFC2781]</a>
+
+<h2 id="algorithms"><span class="secno">3 </span>Algorithms</h2>
+<p>This section defines algorithms for dealing with URLs.
+
+<h3 id="parse-a-url"><span class="secno">3.1 </span>Parse a URL</h3>
+<p>To <dfn id="parse-a-url-0">parse a URL</dfn>
+into its component parts, the user agent must use the following steps:
+<ol>
+<li>Consume all leading and trailing
+<a href="#control-character" title="control character">control characters</a>.
+<p class="XXX">Don&rsquor;t we actually want to &ldquo;strip leading and trailing
+whitespace&rdquo; here? (= removing &ldquo;space characters&rdquo; as defined in the
+Terminology section)
+<li><a href="#find-the-scheme-0">Find the scheme</a>.
+<li>If the algorithm for
+<a href="#find-the-scheme-0" title="find the scheme">finding the scheme</a>
+determines that the URL is invalid, abort these steps.
+<li>If the <a href="#scheme">scheme</a> is a single upper or lower case ASCII character,
+<p class="XXX">(TODO: Just ALPHA?)
+<p class="XXX">TODO: Windows drive specs!
+<li>If the <a href="#scheme">scheme</a> is a <a href="#ascii-case-insensitive">ASCII case-insensitive</a> match for
+"<code>file</code>",
+<p class="XXX">TODO: File URLs!
+<li>If the <a href="#scheme">scheme</a> is a <a href="#ascii-case-insensitive">ASCII case-insensitive</a> match for
+"<code>mailto</code>",
+<p class="XXX">I think mailto URLs are special, but more testing is required.
+<li>If the <a href="#scheme">scheme</a> is hierarchical:
+<p class="XXX">TODO: How are we supposed to know at this point if the scheme
+is hierarchical? Determining if the scheme is hierarchical requires looking
+at the first character of the after-scheme is a solidus/slash. So perhaps
+we need to explicitly say that here or in the &ldquo;Find a scheme&rdquo; algorithm;
+that is, explicitly say, &ldquo;If the first character of the after-scheme is a
+solidus (slash character?), then the URL is a hierarchical URL.&rdquo; Related to
+that, would it be better to only use the term &ldquo;hierarchical URL&rdquo;
+consistently rather than talking about the scheme being hierarchical?
+(After all, it really is the URL that&rsquor;s hierarchical, not the scheme...)
+<ol>
+<li>Determine the <dfn id="path">path</dfn> and remaining components as follows:
+<ul>
+<li>If an <a href="#after-scheme">after-scheme</a> is present,
+<a href="#find-the-authority,-path,-query,-and-fragment-0">find the authority, path, query, and fragment</a>.
+<li>Otherwise, the <a href="#remaining-string">remaining string</a> is the <a href="#path">path</a>;
+abort these steps.
+<p class="XXX">TODO: This might not be the best approach.  We need to do more
+testing of data and javascript URLs.
+</ul>
+<li>In the <a href="#authority">authority</a>, if any,
+<a href="#find-the-user-info,-host,-and-port-0">find the user-info, host, and port</a>.
+<li>In the <a href="#user-info">user-info</a>, if any,
+<a href="#find-the-username-and-password-0">find the username and password</a>
+</ol>
+</ol>
+
+<h4 id="find-the-scheme"><span class="secno">3.1.1 </span>Find the scheme</h4>
+<p>To <dfn id="find-the-scheme-0">find the scheme</dfn>,
+the user agent must use the following steps:
+<ol>
+<li>If the <a href="#remaining-string">remaining string</a> does not contain a ":" character,
+the URL is invalid; abort these steps.
+<li>Consume characters up to, but not including, the first ":" character.
+These characters are the <dfn id="scheme">scheme</dfn>.
+<li>Consume the ":" character. The remaining characters are the
+<dfn id="after-scheme">after-scheme</dfn>.
+</ol>
+
+<h4 id="find-the-authority,-path,-query,-and-fragment"><span class="secno">3.1.2 </span>Find the authority, path, query, and fragment</h4>
+<p>To <dfn id="find-the-authority,-path,-query,-and-fragment-0">find the authority, path, query, and fragment</dfn>,
+the user agent must use the following steps:
+<ol>
+<li>Consume any number of
+<a href="#slash-character" title="slash character">slash characters</a>.
+<li>Determine the <dfn id="authority">authority</dfn> as follows:
+<ul>
+<li>If the <a href="#remaining-string">remaining string</a> does not contain any
+<a href="#authority-terminating-character" title="authority terminating character">authority terminating characters</a>,
+ the <a href="#remaining-string">remaining string</a> is the <a href="#authority">authority</a>; abort these steps.
+<li>Otherwise, consume characters up to, but not including, the first
+<a href="#authority-terminating-character">authority terminating character</a>.
+The consumed characters are the <a href="#authority">authority</a>.
+</ul>
+</li>
+<li>If the <a href="#remaining-string">remaining string</a> does not contain a "?" character
+or a "#" character, the <a href="#remaining-string">remaining string</a> is the
+<a href="#path">path</a>; abort these steps.
+<li>Consume characters up to, but not including, the first "?" or "#"
+character.  The consumed characters are the <a href="#path">path</a>.
+<li>If the first character of the <a href="#remaining-string">remaining string</a> is a "?"
+character:
+<ol>
+<li>Consume the "?" character.
+<li>Determine the <dfn id="query">query</dfn> as follows:
+<ul>
+<li>If the <a href="#remaining-string">remaining string</a> does not contain a "#" character,
+the <a href="#remaining-string">remaining string</a> is the <a href="#query">query</a>; abort these
+steps.  <li>Otherwise, consume characters up to, but not including, the
+first "#" character.  The consumed characters are the <a href="#query">query</a>.
+</ul>
+</ol>
+<li>Consume the "#" character. The <a href="#remaining-string">remaining string</a> is the
+<dfn id="fragment">fragment</dfn>.
+</ol>
+
+<h4 id="find-the-user-info,-host,-and-port"><span class="secno">3.1.3 </span>Find the user-info, host, and port</h4>
+<p>To <dfn id="find-the-user-info,-host,-and-port-0">find the user-info, host, and port</dfn>,
+the user agent must use the following steps:
+<ol>
+<li>If the <a href="#remaining-string">remaining string</a> contains an "@" character:
+<ol>
+<li>Consume characters up to, but not including the <b>last</b> "@"
+character.  The consumed characters are the <dfn id="user-info">user-info</dfn>.
+<li>Consume the "@" character.
+</ol>
+<li>Determine the <dfn id="host">host</dfn> as follows:
+<ul>
+<li>
+If the <a href="#remaining-string">remaining string</a> does not contain an ":" character,
+The <a href="#remaining-string">remaining string</a> is the <a href="#host">host</a>; abort these
+steps.
+<li>Otherwise, consume characters up to, but not including, the last ":"
+character.  The consumed characters are the <a href="#host">host</a>.
+</ul>
+<li>Consume the ":" character. The <a href="#remaining-string">remaining string</a> is the
+<dfn id="port">port</dfn>.
+</ol>
+
+<h4 id="find-the-username-and-password"><span class="secno">3.1.4 </span>Find the username and password</h4>
+<p>To <dfn id="find-the-username-and-password-0">find the username and password</dfn>,
+the user agent must use the following steps:
+<ol>
+<li>Determine the <dfn id="username">username</dfn> as follows:
+<ul>
+<li>If the <a href="#remaining-string">remaining string</a> does not contain a ":" character,
+The <a href="#remaining-string">remaining string</a> is the <a href="#username">username</a>; abort
+these steps.
+<li>Otherwise, consume characters up to, but not including, the first ":"
+character.  The consumed characters are the <a href="#username">username</a>.
+</ul>
+<li>Consume the ":" character. The <a href="#remaining-string">remaining string</a> is the
+<dfn id="password">password</dfn>.
+</ol>
+
+<h3 id="resolve-a-url"><span class="secno">3.2 </span>Resolve a URL</h3>
+<p class="XXX">Should we use <i><a href="#absolute-url">absolute URL</a></i> here (as the HTML spec
+does), instead of <i title="">resolved URL</i>? Text from the HTML spec:
+<br>
+Resolving a URL is the process of taking a relative URL and
+obtaining the absolute URL that it implies.
+<br>
+To <dfn id="resolve-a-url-0">resolve a URL</dfn> to an <a href="#absolute-url">absolute URL</a>
+relative to either another <a href="#absolute-url">absolute URL</a> or an element,
+the user agent must use the following steps. Resolving a URL can
+result in an error, in which case the URL is not resolvable.</p>
+
+<p>Resolving a URL is the process of taking a relative URL and obtaining
+the <dfn id="resolved-url">resolved URL</dfn> that it implies.
+
+<p>To <dfn id="resolve-a-string-relative-to-a-base-url">resolve a string relative to a base URL</dfn>, the user agent
+must use the following steps:
+
+<ol>
+<li>Given a string <var title="">relative-url</var>
+and a <a href="#parsed-url">parsed URL</a> <var title="">base-url</var>,
+<a href="#find-the-scheme-0">find the scheme</a> of
+<var title="">relative-url</var>.
+<p class="XXX">TODO: We probably need to trim leading and trailing control
+characters.
+<li>If <var title="">relative-url</var> is an invalid URL, the
+<a href="#resolved-url">resolved URL</a> is <var title="">relative-url</var>
+<a href="#resolve-a-string-as-a-relative-url-0" title="resolve a string as a relative URL">resolved as relative URL</a>;
+abort these steps.
+<li>If <var title="">relative-url</var>&rsquor;s <a href="#scheme">scheme</a> contains any
+characters which are not &ldquo;valid scheme characters&rdquo;, the
+<a href="#resolved-url">resolved URL</a> is <var>relative-url</var>
+<a href="#resolve-a-string-as-a-relative-url-0" title="resolve a string as a relative URL">resolved as relative URL</a>;
+abort these steps.
+<p class="XXX">TODO: Define <i>valid scheme characters</i>
+<li>If <var title="">base-url</var>&rsquor;s scheme is an
+<a href="#ascii-case-insensitive">ASCII case-insensitive</a> match
+for <var title="">relative-url</var>&rsquor;s <a href="#scheme">scheme</a> and the shared scheme is
+hierarchical, the <a href="#resolved-url">resolved URL</a> is <var>relative-url</var>&rsquor;s
+<a href="#after-scheme">after-scheme</a>
+<a href="#resolve-a-string-as-a-relative-url-0" title="resolve a string as a relative URL">resolved as a relative URL</a>;
+abort these steps.
+<li>The <a href="#resolved-url">resolved URL</a> is <var title="">relative-url</var>
+<a href="#parse-a-url-0" title="parse a URL">parsed as an absolute URL</a>.
+</ol>
+
+<h4 id="resolve-a-string-as-a-relative-url"><span class="secno">3.2.1 </span>Resolve a string as a relative URL</h4>
+<p>To <dfn id="resolve-a-string-as-a-relative-url-0">resolve a string as a relative URL</dfn>,
+the user agent must use the steps in this section.
+<p>Given a string <var title="">relative-url</var> and a
+<a href="#parsed-url">parsed URL</a>
+<var title="">base-url</var>, determine the <a href="#resolved-url">resolved URL</a> as
+follows:
+<p class="XXX">TODO: If base-url&rsquor;s scheme is not hierarchical, we can&rsquor;t
+resolve as a relative URL.  We&rsquor;ll probably want to return an invalid URL.
+Check what happens when resolving an empty string as a relative URL with a
+non-hierarchical base.
+<ol>
+<li>If <var title="">relative-url</var> is empty, the
+<a href="#resolved-url">resolved URL</a> is identical to <var title="">base-url</var>,
+with the <a href="#fragment">fragment</a>, if any, removed; abort these steps.
+<li>If the first character of <var title="">relative-url</var> is a
+<a href="#slash-character">slash character</a>:
+<ul>
+<li>If <var title="">relative-url</var> has at least two characters and the
+second character is also a <a href="#slash-character">slash character</a>, the
+<a href="#resolved-url">resolved URL</a> is <var title="">relative-url</var>
+<a href="#resolve-a-string-as-a-scheme-relative-url-0" title="resolve a string as a scheme-relative URL">resolved as a scheme-relative URL</a>.
+<li>Otherwise, the <var title="">resolved URL</var> is
+<var title="">relative-url</var>
+<a href="#resolve-a-string-as-an-authority-relative-url-0" title="resolve a string as an authority-relative URL">resolved as an authority-relative URL</a>.
+</ul>
+Abort these steps.
+<li>If the first character of <var title="">relative-url</var> is a "?" character,
+the <a href="#resolved-url">resolved URL</a> is <var title="">relative-url</var>
+<a href="#resolve-a-string-as-a-query-relative-url-0" title="resolve a string as a query-relative URL">resolved as a query-relative URL</a>;
+abort these steps.
+<li>If the first character of <var title="">relative-url</var> is a "#" character,
+the <a href="#resolved-url">resolved URL</a> is <var title="">relative-url</var>
+<a href="#resolve-a-string-as-a-fragment-relative-url-0" title="resolve a string as a fragment-relative URL">resolved as a fragment-relative URL</a>;
+abort these steps.
+<p class="XXX">TODO: Think about the case where the relative-url is empty.
+<li>The <a href="#resolved-url">resolved URL</a> is <var title="">relative-url</var>
+<a href="#resolve-a-string-as-a-path-relative-url-0" title="resolve a string as a path-relative URL">resolved as a path-relative URL</a>.
+</ol>
+
+<h4 id="resolve-a-string-as-a-scheme-relative-url"><span class="secno">3.2.2 </span>Resolve a string as a scheme-relative URL</h4>
+<p>To <dfn id="resolve-a-string-as-a-scheme-relative-url-0">resolve a string as a scheme-relative URL</dfn>,
+the user agent must use the steps in this section.
+<ol>
+<li>Given a string <var title="">relative-url</var> and a
+<a href="#parsed-url">parsed URL</a>
+<var title="">base-url</var>, let <var title="">resolved-url</var> be:
+<ul>
+<li><var title="">base-url</var>&rsquor;s <a href="#scheme">scheme</a>
+<li>concatenated with ":",
+<li>concatenated with <var title="">relative-url</var>.
+</ul>
+The <a href="#resolved-url">resolved URL</a> is <var title="">resolved-url</var>
+<a href="#parse-a-url-0" title="parse a URL">parsed as an absolute URL</a>.
+</ol>
+
+<h4 id="resolve-a-string-as-an-authority-relative-url"><span class="secno">3.2.3 </span>Resolve a string as an authority-relative URL</h4>
+<p>To <dfn id="resolve-a-string-as-an-authority-relative-url-0">resolve a string as an authority-relative URL</dfn>,
+the user agent must use the steps in this section.
+<ol>
+<li>Given a string <var title="">relative-url</var> and a
+<a href="#parsed-url">parsed URL</a>
+<var title="">base-url</var>, let <var title="">resolved-url</var> be:
+<ul>
+<li><var title="">base-url</var>&rsquor;s <a href="#scheme">scheme</a>
+<li>concatenated with "://",
+<li>concatenated with <var title="">base-url</var>&rsquor;s <a href="#authority">authority</a>,
+<li>concatenated with <var title="">relative-url</var>.
+</ul>
+The <a href="#resolved-url">resolved URL</a> is <var title="">resolved-url</var>
+<a href="#parse-a-url-0" title="parse a URL">parsed as an absolute URL</a>.
+</ol>
+
+<h4 id="resolve-a-string-as-a-path-relative-url"><span class="secno">3.2.4 </span>Resolve a string as a path-relative URL</h4>
+<p>To <dfn id="resolve-a-string-as-a-path-relative-url-0">resolve a string as a path-relative URL</dfn>,
+the user agent must use the steps in this section.
+<p class="XXX">TODO: Can the first character of relative-url be a slash
+character at this point?
+<p class="XXX">TODO: Can we assume base-url is canonicalized here so that it
+always has at least one &ldquo;/&rdquo; character?
+<ol>
+<li>Let the <var title="">directory-name</var> be the characters of the
+<var title="">base-url</var>&rsquor;s path up to and including the last
+ <a href="#slash-character">slash character</a>.
+<li>Let <var title="">resolved-url</var> be:
+<ul>
+<li><var title="">base-url</var>&rsquor;s <a href="#scheme">scheme</a>
+<li>concatenated with "://",
+<li>concatenated with <var title="">base-url</var>&rsquor;s <a href="#authority">authority</a>,
+<li>concatenated with <var title="">directory name</var>,
+<li>concatenated with <var title="">relative-url</var>.
+</ul>
+The <a href="#resolved-url">resolved URL</a> is <var title="">resolved-url</var>
+<a href="#parse-a-url-0" title="parse a URL">parsed as an absolute URL</a>.
+</ol>
+
+<h4 id="resolve-a-string-as-a-query-relative-url"><span class="secno">3.2.5 </span>Resolve a string as a query-relative URL</h4>
+<p>To <dfn id="resolve-a-string-as-a-query-relative-url-0">resolve a string as a query-relative URL</dfn>,
+the user agent must use the steps in this section.
+<ol>
+<li>Given a string <var title="">relative-url</var> and a
+<a href="#parsed-url">parsed URL</a>
+<var title="">base-url</var>, let <var title="">resolved-url</var> be:
+<ul>
+<li><var title="">base-url</var>&rsquor;s <a href="#scheme">scheme</a>
+<li>concatenated with "://",
+<li>concatenated with <var title="">base-url</var>&rsquor;s <a href="#authority">authority</a>,
+<li>concatenated with <var title="">base-url</var>&rsquor;s <a href="#path">path</a>,
+<li>concatenated with <var title="">relative-url</var>.
+</ul>
+The <a href="#resolved-url">resolved URL</a> is <var title="">resolved-url</var>
+<a href="#parse-a-url-0" title="parse a URL">parsed as an absolute URL</a>.
+</ol>
+
+<h4 id="resolve-a-string-as-a-fragment-relative-url"><span class="secno">3.2.6 </span>Resolve a string as a fragment-relative URL</h4>
+<p>To <dfn id="resolve-a-string-as-a-fragment-relative-url-0">resolve a string as a fragment-relative URL</dfn>,
+the user agent must use the steps in this section.
+<ol>
+<li>Given a string <var title="">relative-url</var> and a
+<a href="#parsed-url">parsed URL</a>
+<var title="">base-url</var>, let <var title="">resolved-url</var> be:
+<ul>
+<li><var title="">base-url</var>&rsquor;s <a href="#scheme">scheme</a>
+<li>concatenated with "://",
+<li>concatenated with <var title="">base-url</var>&rsquor;s <a href="#authority">authority</a>,
+<li>concatenated with <var title="">base-url</var>&rsquor;s <a href="#path">path</a>,
+<li>concatenated with "?",
+<li>concatenated with <var title="">base-url</var>&rsquor;s <a href="#query">query</a>,
+<li>concatenated with <var title="">relative-url</var>.
+</ul>
+The <a href="#resolved-url">resolved URL</a> is <var title="">resolved-url</var>
+<a href="#parse-a-url-0" title="parse a URL">parsed as an absolute URL</a>.
+</ol>
+
+<h3 id="canonicalize-a-url"><span class="secno">3.3 </span>Canonicalize a URL</h3>
+<p>Canonicalizing a URL is the process of taking a
+<a href="#parsed-url">parsed URL</a> string and
+constructing a canonical version of it.
+<p class="XXX">TODO: We probably should mention somewhere that there is
+<b>not</b> a unique canonicalization for every URL.
+
+<p>To <dfn id="canonicalize-a-url-0">canonicalize a URL</dfn>,
+the user agent must use the steps in this section.
+
+<ol>
+<li>Given <a href="#parsed-url">parsed URL</a>
+<var title="">original-url</var>,
+ if <var title="">original-url</var> is invalid, abort these steps.
+<p class="XXX">TODO: Handle file URLs.
+<li>If the scheme is hierarchical:
+<ol>
+<li>Output the
+<a href="#canonicalize-a-scheme-0" title="canonicalize a scheme">canonicalized scheme</a>.
+<li>Output "://".
+<li>If the <a href="#user-info">user-info</a> is non-empty:
+<ol>
+<li>Output the
+ <a href="#canonicalize-a-user-info-0" title="canonicalize a user-info">canonicalized user-info</a>.
+<li>Output "@".
+</ol>
+<li>Output the <a href="#canonicalize-a-host-0" title="canonicalize a host">canonicalized host</a>.
+<li>Let the <var title="">canonicalized-port</var> be the
+<a href="#canonicalize-a-port-0" title="canonicalize a port">canonicalized port</a>.
+<li>If the <var title="">canonicalized-port</var> is non-empty and is not
+the default port for the scheme:
+<ol>
+<li>Output ":".
+<li>Output the <var title="">canonicalized-port</var>.
+</ol>
+<li>Output the
+<a href="#canonicalize-a-path-0" title="canonicalize a path">canonicalized path</a>.
+<li>Let the <var title="">canonicalized-query</var> be the
+<a href="#canonicalize-a-query-0" title="canonicalize a query">canonicalized query</a>.
+<li>If the <var title="">canonicalized-query</var> is non-empty:
+<p class="XXX">TODO: Distinguish between empty and non-existent queries)
+<ol>
+<li>Output "?".
+<li>Output the <var title="">canonicalized-query</var>.
+</ol>
+<li>Let the <var title="">canonicalized-fragment</var> be the
+<a href="#canonicalize-a-fragment-0" title="canonicalize a fragment">canonicalized fragment</a>.
+<li>If the canonicalized-fragment is non-empty:
+<p class="XXX">TODO: Distinguish between empty and non-existent fragments
+<ol>
+<li>Output "#".
+<li>Output the <var title="">canonicalized-fragment</var>.
+</ol>
+</ol>
+</ol>
+
+<h4 id="canonicalize-a-scheme"><span class="secno">3.3.1 </span>Canonicalize a scheme</h4>
+<p>To <dfn id="canonicalize-a-scheme-0">canonicalize a scheme</dfn>,
+the user agent must use the steps in this section.
+<ol>
+<li>If the first character of the <a href="#scheme">scheme</a> is not in ALPHA, the
+scheme is invalid.
+<li>Process each character of the scheme in sequence:
+<ul>
+<li>If the current character is among ALPHA, DIGIT, "+", "-", and ".",
+output the current character.
+<li>Otherwise, if the current character is "%", the scheme is invalid,
+the scheme is invalid, output the current character.
+<li>Otherwise, the scheme is invalid,
+output the
+<span>utf8-percent-escaping</span> of the current character.
+</ul>
+</ol>
+
+<h4 id="canonicalize-a-user-info"><span class="secno">3.3.2 </span>Canonicalize a user-info</h4>
+<p>To <dfn id="canonicalize-a-user-info-0">canonicalize a user-info</dfn>,
+the user agent must use the steps in this section.
+<ol>
+<li>Process each character of the <a href="#username">username</a> in sequence.
+<ul>
+<li>If the current character is among TODO, output the current character.
+<p class="XXX">TODO: which characters?
+<li>Otherwise:
+output the
+<span>utf8-percent-escaping</span> of the current character.
+</ul>
+<li>If there is no <a href="#password">password</a> or if the <a href="#password">password</a> is
+empty, abort these steps.
+<li>Output ":".
+<li>Process each character of the <a href="#password">password</a> in sequence.
+<ul>
+<li>If the current character is among TODO, output the current character.
+<p class="XXX">TODO: which characters?
+<li>Otherwise:
+output the
+<span>utf8-percent-escaping</span> of the current character.
+</ul>
+</ol>
+
+<h4 id="canonicalize-a-host"><span class="secno">3.3.3 </span>Canonicalize a host</h4>
+<p>To <dfn id="canonicalize-a-host-0">canonicalize a host</dfn>,
+the user agent must use the steps in this section.
+<p class="XXX">TODO: Handle IP addresses.
+<ol>
+<li>Let <var title="">unicode-host</var> be the
+<a href="#host-escape-normalization-0" title="host escape normalization">host-escape-normalized host</a>.
+<li>Output result of applying the <span>IDNA to-ascii algorithm</span>
+to the
+<var title="">unicode-host</var>.
+<p class="XXX">TODO: Properly reference IDNA's to-ascii algorithm (we might
+need a wrapper like we do in the cookie spec).
+</ol>
+
+<h5 id="host-escape-normalization"><span class="secno">3.3.3.1 </span>Host escape normalization</h5>
+<p>To perform <dfn id="host-escape-normalization-0">host escape normalization</dfn>,
+the user agent must use the steps in this section.
+
+<ol>
+<li>Process each character of the <a href="#host">host</a> in sequence.
+<ul>
+<li>If the current character is "%", ...
+<p class="XXX">TODO: Handle percent-unescaping.
+<li>If the current character is one of U+0000-U+002A, U+002C, U+002F,
+U+003B-U+0040, U+005C, U+005E, U+0060, or U+007B-U+007F,
+output the
+<span>utf8-percent-escaping</span> of the current character.
+<li>Otherwise, if the current character matches ALPHA, output the current
+character <span>converted to lower case</span>.
+<li>Otherwise, output the current character.
+</ul>
+</ol>
+
+<h4 id="canonicalize-a-port"><span class="secno">3.3.4 </span>Canonicalize a port</h4>
+<p>To <dfn id="canonicalize-a-port-0">canonicalize a port</dfn>,
+the user agent must use the steps in this section.
+<p class="XXX">TODO: ...
+
+<h4 id="canonicalize-a-path"><span class="secno">3.3.5 </span>Canonicalize a path</h4>
+<p>To <dfn id="canonicalize-a-path-0">canonicalize a path</dfn>,
+the user agent must use the steps in this section.
+<p class="XXX">TODO: Do we need to ensure that path's always start with a
+slash character?
+<ol>
+<li>Process each character of the path in sequence:
+<ul>
+<li>If the current character is one of
+U+0000-U+0020, U+0022, U+0023, U+0025, U+003C, U+003E, U+003F, U+005C,
+U+005E, U+0060, U+007B-U+007D, or U+007F, or greater than or equal to
+U+0080,
+output the
+<span>utf8-percent-escaping</span> of the current character.
+<li>Otherwise, if the current character is ".": ...
+<p class="XXX">TODO: Handle "." collapsing.
+<li>Otherwise, if the current character is "\", output "/".
+<li>Otherwise, if the current character is "%", ...
+<p class="XXX">TODO: Handle percent-unescaping.
+<li>Otherwise, output the current character.
+</ul>
+</ol>
+
+<h4 id="canonicalize-a-query"><span class="secno">3.3.6 </span>Canonicalize a query</h4>
+<p class="XXX">TODO: Handle the ambient encoding case.
+<p>To <dfn id="canonicalize-a-query-0">canonicalize a query</dfn>,
+the user agent must use the steps in this section.
+<ol>
+<li>Process each character of the <a href="#query">query</a> in sequence:
+<ul>
+<li>If the current character is among TODO, output the current character.
+<p class="XXX">TODO: which characters?
+<li>Otherwise,
+output the
+<span>utf8-percent-escaping</span> of the current character.
+<p class="XXX">TODO: We need to handle the goofy query escaping format.
+</ul>
+</ol>
+
+<h4 id="canonicalize-a-fragment"><span class="secno">3.3.7 </span>Canonicalize a fragment</h4>
+<p>To <dfn id="canonicalize-a-fragment-0">canonicalize a fragment</dfn>,
+the user agent must use the steps in this section.
+<ol>
+<li>Process each character of the <a href="#fragment">fragment</a> in sequence:
+<ul>
+<li>If the current character has a Unicode value greater than or equal to
+U+0020, output the current character.
+<li>Otherwise,
+output the
+<span>utf8-percent-escaping</span> of the current character.
+</ul>
+</ol>
+<p class="note">The above algorithm results in the canonicalized fragment
+containing non-US-ASCII characters.
+
+<h3 id="canonicalize-query-parameters"><span class="secno">3.4 </span>Canonicalize query parameters</h3>
+
+<p>The <dfn id="query-parameter-canonicalization">query parameter canonicalization</dfn> of a string <var>s</var>
+is the <a href="#canonicalize-a-query-0" title="canonicalize a query">query canonicalization</a> of
+<var>s</var>, modified as follows:</p>
+
+<ol>
+ <li><p>Replace all instances of the U+0026 AMPERSAND (&amp;) character with %26.
+
+ <li><p>Replace all instances of the U+003D EQUALS SIGN (=) character with %3D.
+</ol>
+
+<h3 id="collect-url-parameters"><span class="secno">3.5 </span>Collect URL parameters</h3>
+
+<p>To <dfn id="collect-the-url-parameters">collect the URL parameters</dfn> from a string <var>input</var>,
+run the following algorithm:
+
+<ol>
+ <li><p>Let <var>result</var> be the empty list.
+
+ <li><p>Let <var>parameters</var> be the result of splitting input on the U+0026 AMPERSAND (&amp;) character.
+
+ <li>
+  <p>Process each <var>parameter</var> in <var>parameters</var>:
+
+  <ol>
+   <li><p>If <var>parameter</var> is the empty string, continue to the next <var>parameter</var>, if any.
+
+   <li>
+    <p>If <var>parameter</var> does not contain an U+003D EQUALS SIGN (=) character:
+
+    <ol>
+     <li><p>Append an parameter with name <var>parameter</var> and a null value to <var>result</var>.
+
+     <li><p>Continue to the next <var>parameter</var>, if any.
+    </ol>
+
+   <li><p>Let <var>name</var> be the (possibly empty) sequence of characters of <var>parameter</var> up to, but not including the first U+003D EQUALS SIGN (=) character.
+
+   <li><p>Let <var>value</var> be the (possibly empty) sequence of characters of <var>parameter</var> after the first U+003D EQUALS SIGN (=) character.
+
+   <li><p>Append a parameter with name <var>name</var> and value <var>value</var> to <var>result</var>.
+  </ol>
+
+ <li><p>Return <var>result</var>.
+</ol>
+
+<h3 id="url-parameter-serialization"><span class="secno">3.6 </span>URL parameter serialization</h3>
+
+<p>The <dfn id="url-parameter-serialization-0">URL parameter serialization</dfn> of a list of parameters <var>parameters</var>, is the result of the following algorithm:
+
+<ol>
+ <li><p>Let <var>result</var> be the empty list.
+
+ <li>
+  <p>Process each <var>parameter</var> in <var>parameters</var>:
+  <ol>
+   <li><p>Let <var>s</var> be the <a href="#query-parameter-canonicalization">query parameter canonicalization</a> of the <var>parameter</var>'s name.
+
+   <li>
+    <p>If the <var>parameter</var>'s value is non-null:
+
+    <ol>
+     <li><p>Append a U+003D EQUALS SIGN (=) character to <var>s</var>.
+
+     <li><p>Append the <a href="#query-parameter-canonicalization">query parameter canonicalization</a> of the <var>parameter</var>'s value to <var>s</var>.
+    </ol>
+
+   <li><p>Append <var>s</var> to <var>result</var>.
+  </ol>
+ <li><p>Return the elements of <var>result</var> concatenated, each separated from the next by a U+0026 AMPERSAND (&amp;) character.
+</ol>
+
+<h3 id="port-setter-preprocessor"><span class="secno">3.7 </span>Port setter preprocessor</h3>
+
+<p>The <dfn id="port-setter-preprocessor-0">port setter preprocessor</dfn> of the <var>input</var> string is the result of the following algorithm:
+
+<ol>
+   <li><p>If the first character in <var>input</var> is not in the range U+0030 DIGIT ZERO (0) to U+0039 DIGIT NINE (9) then return
+   a one character string containing a single U+0030 DIGIT ZERO (0) character.
+   <li><p>Let <var>result</var> be the empty string.
+   <li><p>Let <var>c</var> be the first character in <var>input</var>.
+   <li><p>While <var>c</var> is U+0030 DIGIT ZERO (0):
+   <ol>
+      <li><p>Let <var>c</var> be the next character in <var>input</var>.
+   </ol>
+   <li><p>While <var>c</var> is in the range U+0030 DIGIT ZERO (0) to U+0039 DIGIT NINE (9):
+   <ol>
+      <li><p>Append <var>c</var> to the <var>result</var>.
+      <li><p>Let <var>c</var> be the next character in <var>input</var>.
+   </ol>
+   <li><p>Return <var>result</var>.
+</ol>
+
+<h2 id="interface-url"><span class="secno">4 </span>Interface <code><a href="#url">URL</a></code></h2>
+
+<p>The <code><a href="#url">URL</a></code> object can be used by scripts to programmatically construct, parse, and resolve URLs.
+
+<pre class="idl">[<a href="#dom-url" title="dom-URL">Constructor</a>(DOMString <var title="">url</var>, optional DOMString <var>baseURL</var>)]
+interface <dfn id="url">URL</dfn> {
+           attribute DOMString <a href="#dom-url-protocol" title="dom-url-protocol">protocol</a>;
+           attribute DOMString <a href="#dom-url-username" title="dom-url-username">username</a>;
+           attribute DOMString <a href="#dom-url-password" title="dom-url-password">password</a>;
+           attribute DOMString <a href="#dom-url-host" title="dom-url-host">host</a>;
+           attribute DOMString <a href="#dom-url-hostname" title="dom-url-hostname">hostname</a>;
+           attribute DOMString <a href="#dom-url-port" title="dom-url-port">port</a>;
+           attribute DOMString <a href="#dom-url-pathname" title="dom-url-pathname">pathname</a>;
+           attribute DOMString <a href="#dom-url-search" title="dom-url-search">search</a>;
+           attribute DOMString <a href="#dom-url-hash" title="dom-url-hash">hash</a>;
+
+           attribute DOMString <a href="#dom-url-filename" title="dom-url-filename">filename</a>;
+  readonly attribute DOMString <a href="#dom-url-origin" title="dom-url-origin">origin</a>;
+
+  sequence&lt;DOMString&gt; <a href="#dom-url-getparameternames" title="dom-url-getParameterNames">getParameterNames</a>();
+  sequence&lt;DOMString&gt; <a href="#dom-url-getparametervalues" title="dom-url-getParameterValues">getParameterValues</a>(DOMString <var>name</var>);
+  boolean <a href="#dom-url-hasparameter" title="dom-url-hasParameter">hasParameter</a>(DOMString <var>name</var>);
+  DOMString? <a href="#dom-url-getparameter" title="dom-url-getParameter">getParameter</a>(DOMString <var>name</var>);
+  void <a href="#dom-url-setparameter" title="dom-url-setParameter">setParameter</a>(DOMString <var>name</var>, DOMString <var>value</var>);
+  void <a href="#dom-url-addparameter" title="dom-url-addParameter">addParameter</a>(DOMString <var>name</var>, DOMString <var>value</var>);
+  void <a href="#dom-url-removeparameter" title="dom-url-removeParameter">removeParameter</a>(DOMString <var>name</var>);
+  void <a href="#dom-url-clearparameters" title="dom-url-clearParameters">clearParameters</a>();
+
+  stringifier attribute DOMString <a href="#dom-url-href" title="dom-url-href">href</a>;
+};</pre>
+
+<h3 id="constructor"><span class="secno">4.1 </span>Constructor</h3>
+
+<p>When the <dfn id="dom-url" title="dom-URL"><code>URL(<var>url</var>, <var>baseURL</var>)</code></dfn> constructor is invoked, these steps must be run:
+
+<ol>
+ <li><p>If <var>baseURL</var> is not provided,
+ <a href="#parse-a-url-0" title="parse a URL">parse</a> <var><a href="#url">url</a></var>.
+
+ <li><p>Otherwise,
+ <a href="#resolve-a-string-relative-to-a-base-url" title="resolve a string relative to a base url">resolve</a>
+ <var><a href="#url">url</a></var> relative to <var>baseURL</var>.
+
+ <li><p>Store the <a href="#parsed-url">parsed URL.
+</a></ol>
+
+  <h3 id="the-url-decomposition-idl-attributes"><span class="secno">4.2 </span>The URL decomposition IDL attributes</h3>
+
+  The <dfn id="url-decomposition-idl-attributes">URL decomposition IDL attributes</dfn> are the
+  <a href="#dom-url-protocol" title="dom-url-protocol">protocol</a>,
+  <a href="#dom-url-username" title="dom-url-username">username</a>,
+  <a href="#dom-url-password" title="dom-url-password">password</a>,
+  <a href="#dom-url-host" title="dom-url-host">host</a>,
+  <a href="#dom-url-hostname" title="dom-url-hostname">hostname</a>,
+  <a href="#dom-url-port" title="dom-url-port">port</a>,
+  <a href="#dom-url-pathname" title="dom-url-pathname">pathname</a>,
+  <a href="#dom-url-search" title="dom-url-search">search</a>,
+  <a href="#dom-url-hash" title="dom-url-hash">hash</a>,
+  and
+  <a href="#dom-url-href" title="dom-url-href">href</a>
+  attributes.
+
+  <dl class="domintro">
+
+   <dt><var title="">url</var> . <code title="dom-url-protocol"><a href="#dom-url-protocol">protocol</a></code> [ = <var title="">value</var> ]</dt>
+   <dd>
+    <p>Returns the current scheme of the underlying URL.</p>
+    <p>Can be set, to change the underlying URL's scheme.</p>
+   </dd>
+
+   <dt><var title="">url</var> . <code title="dom-url-host"><a href="#dom-url-host">host</a></code> [ = <var title="">value</var> ]</dt>
+   <dd>
+    <p>Returns the current host and port (if it's not the default port) in the underlying URL.</p>
+    <p>Can be set, to change the underlying URL's host and port.</p>
+    <p>The host and the port are separated by a colon. The port part,
+    if omitted, will be assumed to be the current scheme's default
+    port.</p>
+   </dd>
+
+   <dt><var title="">url</var> . <code title="dom-url-username"><a href="#dom-url-username">username</a></code> [ = <var title="">value</var> ]</dt>
+   <dd><p class="XXX">TODO: ...
+
+   <dt><var title="">url</var> . <code title="dom-url-password"><a href="#dom-url-password">password</a></code> [ = <var title="">value</var> ]</dt>
+   <dd><p class="XXX">TODO: ...
+
+   <dt><var title="">url</var> . <code title="dom-url-hostname"><a href="#dom-url-hostname">hostname</a></code> [ = <var title="">value</var> ]</dt>
+   <dd>
+    <p>Returns the current host in the underlying URL.</p>
+    <p>Can be set, to change the underlying URL's host.</p>
+   </dd>
+
+   <dt><var title="">url</var> . <code title="dom-url-port"><a href="#dom-url-port">port</a></code> [ = <var title="">value</var> ]</dt>
+   <dd>
+    <p>Returns the current port in the underlying URL.</p>
+    <p>Can be set, to change the underlying URL's port.</p>
+   </dd>
+
+   <dt><var title="">url</var> . <code title="dom-url-pathname"><a href="#dom-url-pathname">pathname</a></code> [ = <var title="">value</var> ]</dt>
+   <dd>
+    <p>Returns the current path in the underlying URL.</p>
+    <p>Can be set, to change the underlying URL's path.</p>
+   </dd>
+
+   <dt><var title="">url</var> . <code title="dom-url-search"><a href="#dom-url-search">search</a></code> [ = <var title="">value</var> ]</dt>
+   <dd>
+    <p>Returns the current query component in the underlying URL.</p>
+    <p>Can be set, to change the underlying URL's query component.</p>
+   </dd>
+
+   <dt><var title="">url</var> . <code title="dom-url-hash"><a href="#dom-url-hash">hash</a></code> [ = <var title="">value</var> ]</dt>
+   <dd>
+    <p>Returns the current fragment identifier in the underlying URL.</p>
+    <p>Can be set, to change the underlying URL's fragment identifier.</p>
+   </dd>
+
+   <dt><var title="">url</var> . <code title="dom-url-href"><a href="#dom-url-href">href</a></code> [ = <var title="">value</var> ]</dt>
+   <dd><p class="XXX">TODO: ...
+
+  </dl>
+
+  <div class="impl">
+
+  <hr>
+
+  <p>The <a href="#url-decomposition-idl-attributes">URL decomposition IDL attributes</a>
+  must act as described in this section.</p>
+
+  <p>In addition, the
+  <code><a href="#url">URL</a></code> interface
+  defines an <dfn id="concept-url-input" title="concept-url-input">input</dfn>, which is a <a href="#concept-url" title="concept-url">URL</a>
+  that the attributes act on, and a
+  <dfn id="concept-url-setter" title="concept-url-setter">common setter action</dfn>,
+  which is a set of steps invoked when any of the attributes' setters are
+  invoked.</p>
+
+  <p>The ten <a href="#url-decomposition-idl-attributes">URL decomposition IDL attributes</a> have
+  similar requirements.</p>
+
+  <p>On getting, if the <a href="#concept-url-input" title="concept-url-input">input</a>
+  is an <a href="#absolute-url">absolute URL</a> that fulfills the condition given in
+  the "getter condition" column corresponding to the attribute in the
+  table below, the user agent must return the part of the <a href="#concept-url-input" title="concept-url-input">input</a> URL given in the "component"
+  column, with any prefixes specified in the "prefix" column
+  appropriately added to the start of the string and any suffixes
+  specified in the "suffix" column appropriately added to the end of
+  the string. Otherwise, the attribute must return the empty
+  string.</p>
+
+  <p>On setting, the new value must first be mutated as described by
+  the "setter preprocessor" column, then mutated by %-escaping any
+  characters in the new value that are not valid in the relevant
+  component as given by the "component" column. Then, if the <a href="#concept-url-input" title="concept-url-input">input</a> is an <a href="#absolute-url">absolute
+  URL</a> and the resulting new value fulfills the condition given
+  in the "setter condition" column, the user agent must make a new
+  string <var title="">output</var> by replacing the component of the
+  URL given by the "component" column in the <a href="#concept-url-input" title="concept-url-input">input</a> URL with the new value;
+  otherwise, the user agent must let <var title="">output</var> be
+  equal to the <a href="#concept-url-input" title="concept-url-input">input</a>. Finally,
+  the user agent must invoke the <a href="#concept-url-setter" title="concept-url-setter">common setter action</a> with the
+  value of <var title="">output</var>.</p>
+
+  <p>When replacing a component in the URL, if the component is part
+  of an optional group in the URL syntax consisting of a character
+  followed by the component, the component (including its prefix
+  character) must be included even if the new value is the empty
+  string.</p>
+
+  <p class="note">The previous paragraph applies in particular to the
+  "<code title="">:</code>" before a &lt;port&gt; component, the "<code title="">?</code>" before a &lt;query&gt; component, and the "<code title="">#</code>" before a &lt;fragment&gt; component.</p>
+
+  <p>For the purposes of the above definitions, URLs must be parsed
+  using the <a href="#parse-a-url-0" title="parse a URL">URL parsing rules</a> defined
+  in this specification.</p>
+
+  <p class="XXX">TODO: Fill out the details for the username, password, and
+  href attributes.
+  <table id="table-uda">
+   <thead>
+    <tr>
+     <th>Attribute
+     <th>Component
+     <th>Getter Condition
+     <th>Prefix
+     <th>Suffix
+     <th>Setter Preprocessor
+     <th>Setter Condition
+   <tbody>
+    <tr>
+     <td><dfn id="dom-url-protocol" title="dom-url-protocol"><code>protocol</code></dfn>
+     <td><a href="#scheme" title="scheme">&lt;scheme&gt;</a>
+     <td>&mdash;
+     <td>&mdash;
+     <td>U+003A COLON (:)
+     <td>Remove all trailing U+003A COLON characters (:)
+     <td>The new value is not the empty string
+    <tr>
+     <td><dfn id="dom-url-username" title="dom-url-username"><code>username</code></dfn>
+     <td><a href="#username" title="username">&lt;username&gt;</a>
+     <td>
+     <td>
+     <td>
+     <td>
+     <td>
+    <tr>
+     <td><dfn id="dom-url-password" title="dom-url-password"><code>password</code></dfn>
+     <td><a href="#password" title="password">&lt;password&gt;</a>
+     <td>
+     <td>
+     <td>
+     <td>
+     <td>
+    <tr>
+     <td><dfn id="dom-url-host" title="dom-url-host"><code>host</code></dfn>
+     <td><span title="hostport">&lt;hostport&gt;</span>
+     <td><a href="#concept-url-input" title="concept-url-input">input</a> is an <a href="#authority-based-url">authority-based URL</a>
+     <td>&mdash;
+     <td>&mdash;
+     <td>&mdash;
+     <td>The new value is not the empty string and <a href="#concept-url-input" title="concept-url-input">input</a> is an <a href="#authority-based-url">authority-based URL</a>
+    <tr>
+     <td><dfn id="dom-url-hostname" title="dom-url-hostname"><code>hostname</code></dfn>
+     <td><a href="#host" title="host">&lt;host&gt;</a>
+     <td><a href="#concept-url-input" title="concept-url-input">input</a> is an <a href="#authority-based-url">authority-based URL</a>
+     <td>&mdash;
+     <td>&mdash;
+     <td>Remove all leading U+002F SOLIDUS characters (/)
+     <td>The new value is not the empty string and <a href="#concept-url-input" title="concept-url-input">input</a> is an <a href="#authority-based-url">authority-based URL</a>
+    <tr>
+     <td><dfn id="dom-url-port" title="dom-url-port"><code>port</code></dfn>
+     <td><a href="#port" title="port">&lt;port&gt;</a>
+     <td><a href="#concept-url-input" title="concept-url-input">input</a> is an <a href="#authority-based-url">authority-based URL</a>, and contained a <span title="url-port">&lt;port&gt;</span> component (possibly an empty one)
+     <td>&mdash;
+     <td>&mdash;
+     <td>Run the <a href="#port-setter-preprocessor-0" title="port setter preprocessor">port setter preprocesser</a> algorithm, passing the <a href="#concept-url-input" title="concept-url-input">input</a>.
+     <td><a href="#concept-url-input" title="concept-url-input">input</a> is an <a href="#authority-based-url">authority-based URL</a>,
+         and the new value, when interpreted as a base-ten integer, is less than or equal to 65535
+    <tr>
+     <td><dfn id="dom-url-pathname" title="dom-url-pathname"><code>pathname</code></dfn>
+     <td><a href="#path" title="path">&lt;path&gt;</a>
+     <td><a href="#concept-url-input" title="concept-url-input">input</a> is a <a href="#hierarchical-url">hierarchical URL</a>
+     <td>&mdash;
+     <td>&mdash;
+     <td>If it has no leading U+002F SOLIDUS character (/), prepend a U+002F SOLIDUS character (/) to the new value
+     <td><a href="#concept-url-input" title="concept-url-input">input</a> is hierarchical
+    <tr>
+     <td><dfn id="dom-url-search" title="dom-url-search"><code>search</code></dfn>
+     <td><a href="#query" title="query">&lt;query&gt;</a>
+     <td><a href="#concept-url-input" title="concept-url-input">input</a> is a <a href="#hierarchical-url">hierarchical URL</a>, and contained a <span title="url-query">&lt;query&gt;</span> component (possibly an empty one)
+     <td>U+003F QUESTION MARK (?)
+     <td>&mdash;
+     <td>Remove one leading U+003F QUESTION MARK character (?), if any
+     <td><a href="#concept-url-input" title="concept-url-input">input</a> is a <a href="#hierarchical-url">hierarchical URL</a>
+    <tr>
+     <td><dfn id="dom-url-hash" title="dom-url-hash"><code>hash</code></dfn>
+     <td><a href="#fragment" title="fragment">&lt;fragment&gt;</a>
+     <td><a href="#concept-url-input" title="concept-url-input">input</a> contained a non-empty <span title="url-fragment">&lt;fragment&gt;</span> component
+     <td>U+0023 NUMBER SIGN (#)
+     <td>&mdash;
+     <td>Remove one leading U+0023 NUMBER SIGN character (#), if any
+     <td>&mdash;
+    <tr>
+     <td><dfn id="dom-url-href" title="dom-url-href"><code>href</code></dfn>
+     <td><span title="href">&lt;href&gt;</span>
+     <td>
+     <td>
+     <td>
+     <td>
+     <td>
+  </table>
+
+<!--
+  http://www.hixie.ch/tests/adhoc/dom/level0/location/components/
+  http://lxr.mozilla.org/seamonkey/source/dom/src/base/nsLocation.cpp
+  http://wp.netscape.com/eng/mozilla/3.0/handbook/javascript/ref_h-l.htm#84722
+-->
+
+  </div>
+
+  <div class="example">
+
+   <p>The table below demonstrates how the getter <span class="impl">condition</span> for <code title="dom-url-search"><a href="#dom-url-search">search</a></code> results in different results
+   depending on the exact original syntax of the URL:</p>
+
+   <table id="table-url-examples">
+    <thead>
+     <tr>
+      <th> Input URL
+      <th> <code title="dom-url-search"><a href="#dom-url-search">search</a></code> value
+      <th> Explanation
+    <tbody>
+     <tr>
+      <td> <code title="">http://example.com/</code>
+      <td> <i>empty string</i>
+      <td> No <span title="url-query">&lt;query&gt;</span> component in input URL.
+     <tr>
+      <td> <code title="">http://example.com/?</code>
+      <td> <code title="">?</code>
+      <td> There is a <span title="url-query">&lt;query&gt;</span> component, but it is empty.
+           <span class="impl">The question mark in the resulting value is the prefix.</span>
+     <tr>
+      <td> <code title="">http://example.com/?test</code>
+      <td> <code title="">?test</code>
+      <td> The <span title="url-query">&lt;query&gt;</span> component has the value "<code title="">test</code>".
+     <tr>
+      <td> <code title="">http://example.com/?test#</code>
+      <td> <code title="">?test</code>
+      <td> The (empty) <span title="url-fragment">&lt;fragment&gt;</span> component is not part of the <span title="url-query">&lt;query&gt;</span> component.
+   </table>
+
+  </div>
+
+  <div class="example">
+
+   <p>The following table is similar; it provides a list of what each
+   of the <a href="#url-decomposition-idl-attributes">URL decomposition IDL attributes</a> returns for a
+   given <var title="">input</var> URL.</p>
+
+   <table>
+    <thead>
+     <tr>
+      <th>Input
+      <th><code title="dom-url-protocol"><a href="#dom-url-protocol">protocol</a></code>
+      <th><code title="dom-url-host"><a href="#dom-url-host">host</a></code>
+      <th><code title="dom-url-hostname"><a href="#dom-url-hostname">hostname</a></code>
+      <th><code title="dom-url-port"><a href="#dom-url-port">port</a></code>
+      <th><code title="dom-url-pathname"><a href="#dom-url-pathname">pathname</a></code>
+      <th><code title="dom-url-search"><a href="#dom-url-search">search</a></code>
+      <th><code title="dom-url-hash"><a href="#dom-url-hash">hash</a></code>
+    <tbody>
+     <tr>
+      <td><code title="">http://example.com/carrot#question%3f</code>
+      <td><code title="">http:</code>
+      <td><code title="">example.com</code>
+      <td><code title="">example.com</code>
+      <td>(empty string)
+      <td><code title="">/carrot</code>
+      <td>(empty string)
+      <td><code title="">#question%3f</code>
+     <tr>
+      <td><code title="">https://www.example.com:4443?</code>
+      <td><code title="">https:</code>
+      <td><code title="">www.example.com:4443</code>
+      <td><code title="">www.example.com</code>
+      <td><code title="">4443</code>
+      <td><code title="">/</code>
+      <td><code title="">?</code>
+      <td>(empty string)
+   </table>
+
+  </div>
+
+<h3 id="the-filename-attribute"><span class="secno">4.3 </span>The <code>filename</code> attribute</h3>
+
+<p>The <dfn id="dom-url-filename" title="dom-url-filename"><code>filename</code></dfn> attribute
+must return the (possibly empty) substring of pathname after the last
+U+002F SOLIDUS (/) character. (Notice that pathname must contain at least
+one U+002F SOLIDUS (/) character.)
+
+<p class="XXX">On setting...
+
+<h3 id="the-origin-attribute"><span class="secno">4.4 </span>The <code>origin</code> attribute</h3>
+
+<p>The <dfn id="dom-url-origin" title="dom-url-origin"><code>origin</code></dfn> attribute must
+return <a class="external" href="http://tools.ietf.org/html/rfc6454#section-6.1">Unicode serialization</a> of the
+stored URL's <a class="external" href="http://tools.ietf.org/html/rfc6454#section-4">origin</a>.
+
+<h3 id="the-getparameternames()-method"><span class="secno">4.5 </span>The <code>getParameterNames()</code> method</h3>
+
+<p>The <dfn id="dom-url-getparameternames" title="dom-url-getParameterNames"><code>getParameterNames</code></dfn>
+method must run these steps:
+
+<ol>
+  <li><p><a href="#collect-the-url-parameters">Collect the URL parameters</a> from the stored URL's query component and let <var>parameters</var> be the result.
+
+  <li><p>Let <var>result</var> be the empty array.
+
+  <li><p>For each <var>parameter</var> in <var>parameters</var>, if the <var>parameter</var>'s name is not contained in <var>result</var>, append the <var>parameter</var>'s name to <var>result</var>.
+
+  <li><p>Return <var>result</var>.
+</ol>
+
+<h3 id="the-getparametervalues()-method"><span class="secno">4.6 </span>The <code>getParameterValues()</code> method</h3>
+
+<p>The <dfn id="dom-url-getparametervalues" title="dom-url-getParameterValues"><code>getParameterValues</code></dfn>
+method must run these steps:
+
+<ol>
+  <li><p><a href="#collect-the-url-parameters">Collect the URL parameters</a> from the stored URL's query component and let <var>parameters</var> be the result.
+
+  <li><p>Let <var>result</var> be the empty array.
+
+  <li><p>For each <var>parameter</var> in <var>parameters</var>, if the <var>parameter</var>'s name is equal to <var>name</var>, append the <var>parameter</var>'s value to <var>result</var>.
+
+  <li><p>Return <var>result</var>.
+</ol>
+
+
+<h3 id="the-hasparameter()-method"><span class="secno">4.7 </span>The <code>hasParameter()</code> method</h3>
+
+<p>The <dfn id="dom-url-hasparameter" title="dom-url-hasParameter"><code>hasParameter</code></dfn>
+method must run these steps:
+
+<ol>
+ <li><p><a href="#collect-the-url-parameters">Collect the URL parameters</a> from the stored URL's query component and let <var>parameters</var> be the result.
+
+ <li><p>For each <var>parameter</var> in <var>parameters</var>, if the <var>parameter</var>'s name is equal to <var>name</var> return <code>true</code>.
+
+ <li><p>Return <code>false</code>.
+</ol>
+
+<h3 id="the-getparameter()-method"><span class="secno">4.8 </span>The <code>getParameter()</code> method</h3>
+
+<p>The <dfn id="dom-url-getparameter" title="dom-url-getParameter"><code>getParameter</code></dfn>
+method must run these steps:
+
+<ol>
+ <li><p>Let <var>values</var> be the result of invoking the <code title="dom-url-getParametersAll">getParametersAll()</code> method with <var>name</var> as argument.
+
+ <li><p>If <var>values</var> is empty, return <code>null</code>, and terminate these steps.
+
+ <li><p>Return the first element of <var>values</var>.
+</ol>
+
+<h3 id="the-setparameter()-method"><span class="secno">4.9 </span>The <code>setParameter()</code> method</h3>
+
+<p>The <dfn id="dom-url-setparameter" title="dom-url-setParameter"><code>setParameter</code></dfn>
+method must run these steps:
+
+<ol>
+  <li><p>If <var>name</var> is the empty string and <var>name</var> is <code>null</code>, <a class="external" href="http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#concept-throw" title="concept-throw">throw</a> a "<code class="external"><a href="http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#syntaxerror">SyntaxError</a></code>" and terminate these steps.
+
+  <li><p><a href="#collect-the-url-parameters">Collect the URL parameters</a> from the stored URL's query component and let <var>parameters</var> be the result.
+
+  <li><p>Remove all parameters from <var>parameters</var> with name <var>name</var>.
+
+  <li><p>Append a parameter to <var>parameters</var> with name <var>name</var> and value <var>values</var>.
+
+  <li><p>Let <var>serialized-parameters</var> be the <a href="#url-parameter-serialization-0">URL parameter serialization</a> of <var>parameters</var>.
+
+  <li><p>Replace the stored URL's query component with <var>serialized-parameters</var>.
+</ol>
+
+
+<h3 id="the-addparameter()-method"><span class="secno">4.10 </span>The <code>addParameter()</code> method</h3>
+
+<p>The <dfn id="dom-url-addparameter" title="dom-url-addParameter"><code>addParameter</code></dfn>
+method must run these steps:
+
+<ol>
+  <li><p>If <var>name</var> is the empty string and <var>name</var> is <code>null</code>, <a class="external" href="http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#concept-throw" title="concept-throw">throw</a> a "<code class="external"><a href="http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#syntaxerror">SyntaxError</a></code>" and terminate these steps.
+
+  <li><p>Let <var>parameters</var> be the empty list.
+
+  <li><p>Append a parameter to <var>parameters</var> with name <var>name</var> and value <var>values</var>.
+
+  <li><p>Let <var>serialized-parameters</var> be the <a href="#url-parameter-serialization-0">URL parameter serialization</a> of <var>parameters</var>.
+
+  <li><p>Replace the stored URL's query component with <var>serialized-parameters</var>.
+</ol>
+
+<h3 id="the-removeparameter()-method"><span class="secno">4.11 </span>The <code>removeParameter()</code> method</h3>
+
+<p>The <dfn id="dom-url-removeparameter" title="dom-url-removeParameter"><code>removeParameter</code></dfn>
+method must run these steps:
+
+<ol>
+  <li><p><a href="#collect-the-url-parameters">Collect the URL parameters</a> from the stored URL's query component and let <var>parameters</var> be the result.
+
+  <li><p>Remove all parameters from <var>parameters</var> with name <var>name</var>.
+
+  <li><p>Let <var>serialized-parameters</var> be the <a href="#url-parameter-serialization-0">URL parameter serialization</a> of <var>parameters</var>.
+
+  <li><p>Replace the stored URL's query component with <var>serialized-parameters</var>.
+</ol>
+
+<h3 id="the-clearparameters()-method"><span class="secno">4.12 </span>The <code>clearParameters()</code> method</h3>
+
+<p>The <dfn id="dom-url-clearparameters" title="dom-url-clearParameters"><code>clearParameters</code></dfn>
+method must run these steps:
+
+<ol>
+  <li><p>Replace the stored URL's query component with the empty string.
+</ol>
+
+<h2 class="no-num" id="references">References</h2>
+<h3 class="no-num" id="normative-references">Normative references</h3>
+<div id="anolis-references-normative"><dl><dt id="refsDOM">[DOM]
+<dd><cite><a href="http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html">DOM4</a></cite>, Anne van Kesteren, Aryeh Gregor and Ms2ger. W3C.
+
+<dt id="refsORIGIN">[ORIGIN]
+<dd><cite><a href="http://tools.ietf.org/html/rfc6454">The Web Origin Concept</a></cite>, Adam Barth. IETF.
+
+<dt id="refsRFC2119">[RFC2119]
+<dd><cite><a href="http://tools.ietf.org/html/rfc2119">Key words for use in RFCs to Indicate Requirement Levels</a></cite>, Scott Bradner. IETF.
+
+<dt id="refsRFC2781">[RFC2781]
+<dd><cite><a href="http://tools.ietf.org/html/rfc2781">UTF-16, an encoding of ISO 10646</a></cite>, Paul Hoffman and Francois Yergeau. IETF.
+
+<dt id="refsRFC3986">[RFC3986]
+<dd><cite><a href="http://tools.ietf.org/html/rfc3986">Uniform Resource Identifier (URI): Generic Syntax</a></cite>, Tim Berners-Lee, Roy Fielding and Larry Masinter. IETF.
+
+<dt id="refsRFC3987">[RFC3987]
+<dd><cite><a href="http://tools.ietf.org/html/rfc3987">Internationalized Resource Identifiers (IRIs)</a></cite>, Martin D&uuml;rst and Michel Suignard. IETF.
+
+<dt id="refsWEBIDL">[WEBIDL]
+<dd><cite><a href="http://dev.w3.org/2006/webapi/WebIDL/">Web IDL</a></cite>, Cameron McCormack. W3C.
+
+</dl></div>
+
+<!--
+<h3 class=no-num>Informative references</h3>
+<div id=anolis-references-informative></div>
+-->
+

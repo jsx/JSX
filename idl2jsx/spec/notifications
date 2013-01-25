@@ -1,0 +1,699 @@
+<!DOCTYPE html><html lang="en-US"><meta charset="utf-8">
+<title>Web Notifications</title>
+<style>
+ pre.idl { border:solid thin; background:#eee; color:#000; padding:0.5em 1em }
+ pre.idl :link, pre.idl :visited { color:inherit; background:transparent }
+ pre code { color:inherit; background:transparent }
+ pre.css { border: solid 0.0625em; background: #FFFFEE; color: black; padding: 0.5em 1em; }
+ .example { margin-left:1em; padding-left:1em; border-left:double; color:#222; background:#fcfcfc }
+ .note { margin-left:2em; font-weight:bold; font-style:italic; color:#008000 }
+ p.note::before { content:"Note: " }
+ .XXX { padding:.5em; border:solid #f00 }
+ p.XXX::before { content:"Issue: " }
+ dl.switch { padding-left:2em }
+ dl.switch > dt { text-indent:-1.5em }
+ dl.switch > dt:before { content:'\21AA'; padding:0 0.5em 0 0; display:inline-block; width:1em; text-align:right; line-height:0.5em }
+ dl.domintro { color: green; margin: 2em 0 2em 2em; padding: 0.5em 1em; border: none; background: #DDFFDD; }
+ dl.domintro dt, dl.domintro dt * { color: black; text-decoration: none; }
+ dl.domintro dd { margin: 0.5em 0 1em 2em; padding: 0; }
+ dl.domintro dd p { margin: 0.5em 0; }
+ dl.domintro:before { display: table; margin: -1em -0.5em -0.5em auto; width: auto; content: 'This box is non-normative. Implementation requirements are given below this box.'; color: red; border: solid 2px; background: white; padding: 0 0.25em; }
+ em.ct { text-transform:lowercase; font-variant:small-caps; font-style:normal }
+ dfn { font-weight:bold; font-style:normal }
+ code { color:orangered }
+ code :link, code :visited { color:inherit }
+ hr:not(.top) { display:block; background:none; border:none; padding:0; margin:2em 0; height:auto }
+ table { border-collapse:collapse; border-style:hidden hidden none hidden }
+ table thead { border-bottom:solid }
+ table tbody th:first-child { border-left:solid }
+ table td, table th { border-left:solid; border-right:solid; border-bottom:solid thin; vertical-align:top; padding:0.2em }
+
+ .warning { color: red; background: transparent; font-weight: bolder; font-style: italic; }
+ .warning p:first-child { margin-top: 0; }
+ .warning p:last-child { margin-bottom: 0; }
+ .warning:before { font-style: normal; }
+ p.warning:before { content: '\26A0 Warning! '; }
+
+ @media print {
+   [data-anolis-spec]::after { content:"[" attr(data-anolis-spec) "]"; font-size:.6em; vertical-align:super; text-transform:uppercase }
+ }
+</style>
+<link href="http://www.w3.org/StyleSheets/TR/W3C-WD" rel="stylesheet">
+<div class="head">
+
+
+<!--begin-logo-->
+<p><a href="http://www.w3.org/"><img alt="W3C" height="48" src="http://www.w3.org/Icons/w3c_home" width="72"></a></p>
+<!--end-logo-->
+
+<h1>Web Notifications</h1>
+<h2 class="no-num no-toc" id="w3c-working-draft-14-june-2012">W3C Working Draft 14 June 2012</h2>
+
+<dl>
+ <dt>This Version:
+ <dd class="publish"><a href="http://www.w3.org/TR/2012/WD-notifications-20120614/">http://www.w3.org/TR/2012/WD-notifications-20120614/</a>
+
+ <dt class="publish">Latest Version:
+ <dd class="publish"><a href="http://www.w3.org/TR/notifications/">http://www.w3.org/TR/notifications/</a>
+
+ <dt class="publish">Latest Editors Draft:
+ <dd class="publish"><a href="http://dvcs.w3.org/hg/notifications/raw-file/tip/Overview.html">http://dvcs.w3.org/hg/notifications/raw-file/tip/Overview.html</a>
+
+ <dt>Version History:
+ <dd><a href="http://dvcs.w3.org/hg/notifications/shortlog">http://dvcs.w3.org/hg/notifications/shortlog</a></dd>
+
+ <dt>Previous Version:</dt>
+ <dd><a href="http://www.w3.org/TR/2011/WD-notifications-20110301/">http://www.w3.org/TR/2011/WD-notifications-20110301/</a>
+
+ <dt>Editors:
+ <dd><a href="http://annevankesteren.nl/">Anne van Kesteren</a>
+ (<a href="http://www.opera.com/">Opera Software ASA</a>)
+ &lt;<a href="mailto:annevk@annevk.nl">annevk@annevk.nl</a>&gt;</dd>
+ <dd>John Gregg (<a href="http://www.google.com/">Google</a>)
+ &lt;<a href="mailto:johnnyg@google.com">johnnyg@google.com</a>&gt;
+</dl>
+
+
+<!--begin-copyright-->
+<p class="copyright"><a href="http://www.w3.org/Consortium/Legal/ipr-notice#Copyright">Copyright</a> &copy; 2012 <a href="http://www.w3.org/"><abbr title="World Wide Web Consortium">W3C</abbr></a><sup>&reg;</sup> (<a href="http://www.csail.mit.edu/"><abbr title="Massachusetts Institute of Technology">MIT</abbr></a>, <a href="http://www.ercim.eu/"><abbr title="European Research Consortium for Informatics and Mathematics">ERCIM</abbr></a>, <a href="http://www.keio.ac.jp/">Keio</a>), All Rights Reserved. W3C <a href="http://www.w3.org/Consortium/Legal/ipr-notice#Legal_Disclaimer">liability</a>, <a href="http://www.w3.org/Consortium/Legal/ipr-notice#W3C_Trademarks">trademark</a> and <a href="http://www.w3.org/Consortium/Legal/copyright-documents">document use</a> rules apply.</p>
+<!--end-copyright-->
+
+</div>
+
+<hr class="top">
+
+<h2 class="no-num no-toc" id="abstract">Abstract</h2>
+
+<p>This document defines an API for displaying simple notifications to the user.
+
+<h2 class="no-num no-toc" id="sotd">Status of this document</h2>
+
+<p><em>This section describes the status of this document at the time of its
+publication. Other documents may supersede this document. A list of current
+W3C publications and the latest revision of this technical report can be
+found in the <a href="http://www.w3.org/TR/">W3C technical reports index</a>
+at http://www.w3.org/TR/.</em>
+
+<p>This is the 14 June 2012 W3C Working Draft of Web Notifications.
+Please send comments to
+<a href="mailto:public-web-notification@w3.org">public-web-notification@w3.org</a>
+(<a href="http://lists.w3.org/Archives/Public/public-web-notification/">archived</a>).
+
+<p>This document was developed by the
+<a href="http://www.w3.org/2010/web-notifications/">Web Notification Working Group</a>.
+The Working Group expects to advance this Working Draft to Recommendation Status.
+
+<p>Publication as a Working Draft does not imply endorsement by the W3C
+Membership. This is a draft document and may be updated, replaced or
+obsoleted by other documents at any time. It is inappropriate to cite this
+document as other than work in progress.
+
+<p>This document was produced by a group operating under the
+<a href="http://www.w3.org/Consortium/Patent-Policy-20040205/">5 February 2004 W3C Patent Policy</a>.
+W3C maintains a
+<a href="http://www.w3.org/2004/01/pp-impl/45313/status" rel="disclosure">public list of any patent disclosures</a>
+made in connection with the deliverables of the group; that page also
+includes instructions for disclosing a patent. An individual who has actual
+knowledge of a patent which the individual believes contains
+<a href="http://www.w3.org/Consortium/Patent-Policy-20040205/#def-essential">Essential Claim(s)</a>
+must disclose the information in accordance with
+<a href="http://www.w3.org/Consortium/Patent-Policy-20040205/#sec-Disclosure">section 6 of the W3C Patent Policy</a>.
+
+
+<h2 class="no-num no-toc" id="table-of-contents">Table of Contents</h2>
+
+
+<!--begin-toc-->
+<ol class="toc">
+ <li><a href="#introduction"><span class="secno">1 </span>Introduction</a></li>
+ <li><a href="#conformance"><span class="secno">2 </span>Conformance</a>
+  <ol class="toc">
+   <li><a href="#security"><span class="secno">2.1 </span>Security</a></ol></li>
+ <li><a href="#terminology"><span class="secno">3 </span>Terminology</a></li>
+ <li><a href="#model"><span class="secno">4 </span>Model</a>
+  <ol class="toc">
+   <li><a href="#permission"><span class="secno">4.1 </span>Permission</a></li>
+   <li><a href="#notification-lists"><span class="secno">4.2 </span>Notification lists</a></li>
+   <li><a href="#showing-a-notification"><span class="secno">4.3 </span>Showing a notification</a></li>
+   <li><a href="#closing-a-notification"><span class="secno">4.4 </span>Closing a notification</a></li>
+   <li><a href="#pending-notifications"><span class="secno">4.5 </span>Pending notifications</a></li>
+   <li><a href="#displaying-notifications"><span class="secno">4.6 </span>Displaying notifications</a></li>
+   <li><a href="#replacing-a-notification"><span class="secno">4.7 </span>Replacing a notification</a></ol></li>
+ <li><a href="#api"><span class="secno">5 </span>API</a></li>
+ <li><a href="#rendering"><span class="secno">6 </span>Rendering</a></li>
+ <li><a href="#examples"><span class="secno">7 </span>Examples</a>
+  <ol class="toc">
+   <li><a href="#using-events"><span class="secno">7.1 </span>Using events</a></li>
+   <li><a href="#tags-example"><span class="secno">7.2 </span>Using the <code title="">tag</code> member for multiple instances</a></li>
+   <li><a href="#using-the-tag-member-for-a-single-instance"><span class="secno">7.3 </span>Using the <code title="">tag</code> member for a single instance</a></ol></li>
+ <li><a class="no-num" href="#references">References</a></li>
+ <li><a class="no-num" href="#acknowledgments">Acknowledgments</a></ol>
+<!--end-toc-->
+
+
+<h2 id="introduction"><span class="secno">1 </span>Introduction</h2>
+
+<p>This specification provides an API to display notifications to alert
+users outside the context of a web page. It does not specify exactly how a
+user agent should display these notifications; the best presentation depends
+on the device where the user agent is run. When this specification refers
+to displaying notifications on the "desktop", it generally refers to some
+static display area outside the web page, but may take several forms,
+including:
+
+<ul>
+ <li>A corner of the user's display.
+ <li>An area within the chrome of the user agent.
+ <li>The "home" screen of a mobile device.
+</ul>
+
+<p>This specification does not define exactly how the user agent should
+display the notification, and the API is designed to be flexible with
+respect to presentation options.
+
+<p>This specification is designed to be compatible with existing
+notification platforms as much as possible, but also to be
+platform-independent. Since the common platforms do not provide the same
+functionality, this spec will indicate what events are guaranteed and
+which are not. In particular, notifications as specified here only can
+contain text and icon content. In the future, notifications generated from
+web content may wish to contain web content themselves, but that is outside
+the scope of this document.
+
+<p>In general, the event model for notifications is best-effort; while the
+<code><a href="#notification">Notification</a></code> object offers a <code title="">click</code> event,
+applications may enhance their functionality by listening for that event,
+but <em>must not depend on receiving it</em>, in case the underlying
+notification platform does not provide that capability.
+
+
+<h2 id="conformance"><span class="secno">2 </span>Conformance</h2>
+
+<p>All diagrams, examples, and notes in this specification are
+non-normative, as are all sections explicitly marked non-normative.
+Everything else in this specification is normative.
+
+<p>The key words "MUST", "MUST NOT", "REQUIRED", <!--"SHALL", "SHALL
+NOT",--> "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and
+"OPTIONAL" in the normative parts of this specification are to be
+interpreted as described in RFC2119. For readability, these words do
+not appear in all uppercase letters in this specification.
+<a href="#refsRFC2119">[RFC2119]</a>
+
+
+
+<h3 id="security"><span class="secno">2.1 </span>Security</h3>
+
+<p>Notifications should only be presented when the user has indicated they
+are desired; without this they could create a negative experience for the
+user.
+
+
+<h2 id="terminology"><span class="secno">3 </span>Terminology</h2>
+
+<p>Most terminology used in this specification is from DOM and HTML.
+<a href="#refsDOM">[DOM]</a>
+<a href="#refsHTML">[HTML]</a>
+
+
+
+<h2 id="model"><span class="secno">4 </span>Model</h2>
+
+<p>A <dfn id="concept-notification" title="concept-notification">notification</dfn> allows alerting the
+user outside the context of a web page of an occurrence, such as the
+delivery of email.
+
+<p>Each <a href="#concept-notification" title="concept-notification">notification</a> has a
+<dfn id="title">title</dfn>. For specification simplicity each
+<a href="#concept-notification" title="concept-notification">notification</a> also has a
+<dfn id="title-direction">title direction</dfn> and <dfn id="body-direction">body direction</dfn>, both of which are
+initially "<code title="">auto</code>".
+
+<p>Each <a href="#concept-notification" title="concept-notification">notification</a> <em>can</em>
+have an associated <dfn id="body">body</dfn>, <dfn id="tag">tag</dfn>, and <dfn id="icon-url">icon URL</dfn>.
+
+
+<h3 id="permission"><span class="secno">4.1 </span>Permission</h3>
+
+<p><a href="#concept-notification" title="concept-notification">Notifications</a> can only be
+displayed if the user (or user agent on behalf of the user) has granted
+<dfn id="permission-0">permission</dfn>. The <a href="#permission-0">permission</a> to display
+<a href="#concept-notification" title="concept-notification">notifications</a> for a given
+<a class="external" href="http://tools.ietf.org/html/rfc6454#section-4">origin</a> can be one of three strings:
+
+<dl>
+ <dt>"<code title="">default</code>"
+ <dd><p>This is equivalent to "<code title="">denied</code>", but the user has
+ made no explicit choice thus far.
+
+ <dt>"<code title="">denied</code>"
+ <dd><p>This means the user does not want
+ <a href="#concept-notification" title="concept-notification">notifications</a>.
+
+ <dt>"<code title="">granted</code>"
+ <dd><p>This means <a href="#concept-notification" title="concept-notification">notifications</a> can
+ be displayed.
+</dl>
+
+<p class="note">There is no equivalent to "<code title="">default</code>"
+meaning "<code title="">granted</code>". In that case
+"<code title="">granted</code>" is simply returned as there would be no reason
+for the application to ask for <a href="#permission-0">permission</a>.
+
+
+<h3 id="notification-lists"><span class="secno">4.2 </span>Notification lists</h3>
+
+<p>The user agent must keep a <dfn id="list-of-pending-notifications">list of pending notifications</dfn> and
+a <dfn id="list-of-active-notifications">list of active notifications</dfn>.
+
+<h3 id="showing-a-notification"><span class="secno">4.3 </span>Showing a notification</h3>
+
+<p>The <dfn id="show-steps">show steps</dfn> for a given <var title="">notification</var> are:
+
+<ol>
+ <li><p>If <a href="#permission-0">permission</a> for the current
+ <a class="external" href="http://tools.ietf.org/html/rfc6454#section-4">origin</a> is not
+ "<code title="">granted</code>", cancel any ongoing
+ <a class="external" href="http://www.whatwg.org/specs/web-apps/current-work/multipage/fetching-resources.html#fetch">fetch</a> for
+ <var title="">notification</var>'s <a href="#icon-url">icon URL</a>,
+ <a class="external" href="http://www.whatwg.org/specs/web-apps/current-work/multipage/webappapis.html#queue-a-task">queue a task</a> to
+ <a class="external" href="http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#concept-event-fire" title="concept-event-fire">fire an event</a> named
+ <code title="">error</code> on <var title="">notification</var>, and terminate
+ these steps.
+
+ <li><p>If there is a <a href="#concept-notification" title="concept-notification">notification</a>
+ in the <a href="#list-of-pending-notifications">list of pending notifications</a> or the
+ <a href="#list-of-active-notifications">list of active notifications</a> whose <a href="#tag">tag</a> equals
+ <var title="">notification</var>'s <a href="#tag">tag</a>, run the
+ <a href="#replace-steps">replace steps</a> and terminate these steps.
+
+ <li><p>If the device allows notifications to be displayed immediately
+ without limitations on the number of concurrent notifications, run
+ the <a href="#display-steps">display steps</a> and terminate these steps.
+
+ <li><p>If the device has limitations on the number of concurrent
+ notifications, either immediately call to a notifications platform which
+ natively supports queueing, or append <var title="">notification</var> to the
+ <a href="#list-of-pending-notifications">list of pending notifications</a>.
+</ol>
+
+<h3 id="closing-a-notification"><span class="secno">4.4 </span>Closing a notification</h3>
+
+<p>When a <a href="#concept-notification" title="concept-notification">notification</a> is closed,
+either by the underlying notifications platform or by the user, the
+<a href="#close-steps">close steps</a> for it must be run.
+
+<p>The <dfn id="close-steps">close steps</dfn> for a given <var title="">notification</var> are:
+
+<ol>
+ <li><p>If <var title="">notification</var> is neither in the
+ <a href="#list-of-pending-notifications">list of pending notifications</a> nor in the
+ <a href="#list-of-active-notifications">list of active notifications</a>, terminate these steps.
+
+ <li><p><a class="external" href="http://www.whatwg.org/specs/web-apps/current-work/multipage/webappapis.html#queue-a-task">Queue a task</a> to remove
+ <var title="">notification</var> from either the
+ <a href="#list-of-pending-notifications">list of pending notifications</a> or the
+ <a href="#list-of-active-notifications">list of active notifications</a>, and
+ <a class="external" href="http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#concept-event-fire" title="concept-event-fire">fire an event</a>
+ named <code title="">close</code> on <var title="">notification</var>.
+</ol>
+
+<h3 id="pending-notifications"><span class="secno">4.5 </span>Pending notifications</h3>
+
+<p>Whenever the <a href="#list-of-pending-notifications">list of pending notifications</a> is not empty, the
+user agent must wait and monitor changes in the available notification space
+on the device.
+
+<p>When the available display space changes on the device such that a new
+notification can be displayed, for example due to a previous notification
+being dismissed, the user agent should run the <a href="#display-steps">display steps</a>
+for the first <a href="#concept-notification" title="concept-notification">notification</a> in the
+<a href="#list-of-pending-notifications">list of pending notifications</a> and then remove it from the
+<a href="#list-of-pending-notifications">list of pending notifications</a>.
+
+<h3 id="displaying-notifications"><span class="secno">4.6 </span>Displaying notifications</h3>
+
+<p>The <dfn id="display-steps">display steps</dfn> for a given <var title="">notification</var>
+are:
+
+<ol>
+ <li><p>If the notification platform supports icons and
+ <var title="">notification</var>'s <a href="#icon-url">icon URL</a> has not yet been
+ <a class="external" href="http://www.whatwg.org/specs/web-apps/current-work/multipage/fetching-resources.html#fetch" title="fetch">fetched</a>,
+ <a class="external" href="http://www.whatwg.org/specs/web-apps/current-work/multipage/fetching-resources.html#fetch">fetch</a> it and wait for the resource to be
+ fully downloaded.
+
+ <li><p>If <a class="external" href="http://www.whatwg.org/specs/web-apps/current-work/multipage/fetching-resources.html#fetch" title="fetch">fetching</a>
+ <var title="">notification</var>'s <a href="#icon-url">icon URL</a> failed for some
+ reason or the image format is not supported,
+ <a class="external" href="http://www.whatwg.org/specs/web-apps/current-work/multipage/webappapis.html#queue-a-task">queue a task</a> to
+ <a class="external" href="http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#concept-event-fire" title="concept-event-fire">fire an event</a>
+ named <code title="">error</code> on <var title="">notification</var> and terminate
+ these steps.
+
+ <li><p><a class="external" href="http://www.whatwg.org/specs/web-apps/current-work/multipage/webappapis.html#queue-a-task">Queue a task</a> to display
+ <var title="">notification</var> on the device (e.g. by calling the
+ appropriate notification platform), append <var title="">notification</var> to the
+ <a href="#list-of-active-notifications">list of active notifications</a>, and
+ <a class="external" href="http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#concept-event-fire" title="concept-event-fire">fire an event</a>
+ named <code title="">show</code> on <var title="">notification</var>.
+</ol>
+
+
+<h3 id="replacing-a-notification"><span class="secno">4.7 </span>Replacing a notification</h3>
+
+<p>The <dfn id="replace-steps">replace steps</dfn> for replacing an <var title="">old</var>
+<a href="#concept-notification" title="concept-notification">notification</a> with a
+<var title="">new</var> one are:
+
+<ol>
+ <li><p>If the notification platform supports icons and
+ <var title="">new</var>'s <a href="#icon-url">icon URL</a> has not yet been
+ <a class="external" href="http://www.whatwg.org/specs/web-apps/current-work/multipage/fetching-resources.html#fetch" title="fetch">fetched</a>,
+ <a class="external" href="http://www.whatwg.org/specs/web-apps/current-work/multipage/fetching-resources.html#fetch">fetch</a> it and wait for the resource to be
+ fully downloaded.
+
+ <li><p>If <a class="external" href="http://www.whatwg.org/specs/web-apps/current-work/multipage/fetching-resources.html#fetch" title="fetch">fetching</a>
+ <var title="">new</var>'s <a href="#icon-url">icon URL</a> failed for some
+ reason or the image format is not supported,
+ <a class="external" href="http://www.whatwg.org/specs/web-apps/current-work/multipage/webappapis.html#queue-a-task">queue a task</a> to
+ <a class="external" href="http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#concept-event-fire" title="concept-event-fire">fire an event</a>
+ named <code title="">error</code> on <var title="">new</var> and terminate
+ these steps.
+
+ <li><p>If <var title="">old</var> is in the
+ <a href="#list-of-pending-notifications">list of pending notifications</a>,
+ <a class="external" href="http://www.whatwg.org/specs/web-apps/current-work/multipage/webappapis.html#queue-a-task">queue a task</a> to replace
+ <var title="">old</var> with <var title="">new</var>, in the same position, in
+ the <a href="#list-of-pending-notifications">list of pending notifications</a>, and
+ <a class="external" href="http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#concept-event-fire" title="concept-event-fire">fire an event</a>
+ named <code title="">close</code> on <var title="">old</var>.
+
+ <li>
+  <p>Otherwise,
+  <a class="external" href="http://www.whatwg.org/specs/web-apps/current-work/multipage/webappapis.html#queue-a-task">queue a task</a> to replace
+  <var title="">old</var> with <var title="">new</var>, in the same position, in
+  the <a href="#list-of-active-notifications">list of active notifications</a>,
+  <a class="external" href="http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#concept-event-fire" title="concept-event-fire">fire an event</a>
+  named <code title="">close</code> on <var title="">old</var>, and
+  <a class="external" href="http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#concept-event-fire" title="concept-event-fire">fire an event</a>
+  named <code title="">show</code> on <var title="">new</var>.
+
+  <p>If the notification platform does not support replacement this
+  requirement may be addressed by removal and addition instead.
+</ol>
+
+
+
+<h2 id="api"><span class="secno">5 </span>API</h2>
+
+<p>A <a href="#concept-notification" title="concept-notification">notification</a> is represented by
+a <code><a href="#notification">Notification</a></code> object and can be created by its
+<a href="#dom-notification" title="dom-Notification">constructor</a>.
+
+<pre class="idl">[<a href="#dom-notification" title="dom-Notification">Constructor</a>(DOMString <var title="">title</var>, optional <a href="#notificationoptions">NotificationOptions</a> <var title="">options</var>)]
+interface <dfn id="notification">Notification</dfn> : <a class="external" href="http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#eventtarget">EventTarget</a> {
+  static readonly attribute <a href="#notificationpermission">NotificationPermission</a> <a href="#dom-notification-permission" title="dom-Notification-permission">permission</a>;
+  static void <a href="#dom-notification-requestpermission" title="dom-Notification-requestPermission">requestPermission</a>(<a href="#notificationpermissioncallback">NotificationPermissionCallback</a> <var title="">callback</var>);
+
+  [TreatNonCallableAsNull] attribute <a class="external" href="http://www.whatwg.org/specs/web-apps/current-work/multipage/webappapis.html#function">Function</a>? <a href="#handler-onclick" title="handler-onclick">onclick</a>;
+  [TreatNonCallableAsNull] attribute <a class="external" href="http://www.whatwg.org/specs/web-apps/current-work/multipage/webappapis.html#function">Function</a>? <a href="#handler-onshow" title="handler-onshow">onshow</a>;
+  [TreatNonCallableAsNull] attribute <a class="external" href="http://www.whatwg.org/specs/web-apps/current-work/multipage/webappapis.html#function">Function</a>? <a href="#handler-onerror" title="handler-onerror">onerror</a>;
+  [TreatNonCallableAsNull] attribute <a class="external" href="http://www.whatwg.org/specs/web-apps/current-work/multipage/webappapis.html#function">Function</a>? <a href="#handler-onclose" title="handler-onclose">onclose</a>;
+
+  void <a href="#dom-notification-close" title="dom-Notification-close">close</a>();
+};
+
+dictionary <dfn id="notificationoptions">NotificationOptions</dfn> {
+  <a href="#notificationdirection">NotificationDirection</a> titleDir;
+  DOMString body;
+  <a href="#notificationdirection">NotificationDirection</a> bodyDir;
+  DOMString tag;
+  DOMString iconUrl;
+};
+
+enum <dfn id="notificationpermission">NotificationPermission</dfn> {
+  "default",
+  "denied",
+  "granted"
+};
+
+callback <dfn id="notificationpermissioncallback">NotificationPermissionCallback</dfn> = void (<a href="#notificationpermission">NotificationPermission</a> <var title="">permission</var>);
+
+enum <dfn id="notificationdirection">NotificationDirection</dfn> {
+  "auto",
+  "ltr",
+  "rtl"
+};</pre>
+
+<p class="XXX">Web IDL is
+<a href="http://lists.w3.org/Archives/Public/public-script-coord/2012AprJun/0222.html">not yet updated</a>
+to allow for static attributes.
+
+<p>The
+<dfn id="dom-notification" title="dom-Notification"><code>Notification(<var title="">title</var>, <var title="">options</var>)</code></dfn>
+constructor must run these steps:
+
+<ol>
+ <li><p>Let <var title="">notification</var> be a new
+ <a href="#concept-notification" title="concept-notification">notification</a> represented by a
+ <code><a href="#notification">Notification</a></code> object.
+
+ <li><p>Set <var title="">notification</var>'s <a href="#title">title</a> to
+ <var title="">title</var>,
+ <a class="external" href="http://dev.w3.org/2006/webapi/WebIDL/#dfn-obtain-unicode" title="convert a DOMString to a sequence of Unicode characters">converted to Unicode</a>.
+
+ <li><p>If <var title="">options</var> is not omitted and its
+ <code title="">titleDir</code> member is not null, set
+ <var title="">notification</var>'s <a href="#title-direction">title direction</a> to
+ <code title="">titleDir</code>.
+
+ <li><p>If <var title="">options</var> is not omitted and its
+ <code title="">body</code> is not null, set <var title="">notification</var>'s
+ <a href="#body">body</a> to <code title="">body</code>,
+ <a class="external" href="http://dev.w3.org/2006/webapi/WebIDL/#dfn-obtain-unicode" title="convert a DOMString to a sequence of Unicode characters">converted to Unicode</a>.
+
+ <li><p>If <var title="">options</var> is not omitted and its
+ <code title="">bodyDir</code> member is not null, set
+ <var title="">notification</var>'s <a href="#body-direction">body direction</a> to
+ <code title="">bodyDir</code>.
+
+ <li><p>If <var title="">options</var> is not omitted and its
+ <code title="">tag</code> is not null, set <var title="">notification</var>'s
+ <a href="#tag">tag</a> to <code title="">tag</code>.
+
+ <li><p>If <var title="">options</var> is not omitted and its
+ <code title="">iconUrl</code> is not null, set <var title="">notification</var>'s
+ <a href="#icon-url">icon URL</a> to <code title="">iconUrl</code>.
+
+ <li><p>Return <var title="">notification</var>, but continue running these
+ steps asynchronouusly.
+
+ <li><p>If the notification platform supports icons, the user agent may
+ start <a class="external" href="http://www.whatwg.org/specs/web-apps/current-work/multipage/fetching-resources.html#fetch" title="fetch">fetching</a>
+ <var title="">notification</var>'s <a href="#icon-url">icon URL</a> at this point.
+
+ <li><p>Run the <a href="#show-steps">show steps</a> for <var title="">notification</var>.
+</ol>
+
+<p>The static
+<dfn id="dom-notification-permission" title="dom-Notification-permission"><code>permission</code></dfn>
+attribute must return <a href="#permission-0">permission</a>.
+
+<p>The static
+<dfn id="dom-notification-requestpermission" title="dom-Notification-requestPermission"><code>requestPermission(<var title="">callback</var>)</code></dfn>
+method must run these steps:
+
+<ol>
+ <li><p>Return, but continue running these steps asynchronously.
+
+ <li><p>Let <var title="">permission</var> be <a href="#permission-0">permission</a>.
+
+ <li><p>If <var title="">permission</var> is "<code title="">default</code>",
+ ask the user whether showing notifications for the current
+ <a class="external" href="http://tools.ietf.org/html/rfc6454#section-4">origin</a> is acceptable. If it is, set
+ <var title="">permission</var> to "<code title="">granted</code>", or
+ "<code title="">denied</code>" otherwise.
+
+ <li><p><a class="external" href="http://www.whatwg.org/specs/web-apps/current-work/multipage/webappapis.html#queue-a-task">Queue a task</a> to set
+ <a href="#permission-0">permission</a> to <var title="">permission</var> and invoke
+ <var title="">callback</var> with <var title="">permission</var> as single
+ argument.
+</ol>
+
+<p class="warning">In designing the platform notifications are the one
+instance thus far where asking the user upfront makes sense. Specifications
+for other APIs should not use this pattern and instead employ one of the
+<a href="http://robert.ocallahan.org/2011/06/permissions-for-web-applications_30.html">many more suitable alternatives</a>.
+
+<p>The following are the <a class="external" href="http://www.whatwg.org/specs/web-apps/current-work/multipage/webappapis.html#event-handlers">event handlers</a>
+(and their corresponding
+<a class="external" href="http://www.whatwg.org/specs/web-apps/current-work/multipage/webappapis.html#event-handler-event-type" title="event handler event type">event handler event types</a>)
+that must be supported as attributes by the <code><a href="#notification">Notification</a></code> object.
+
+<table>
+ <thead>
+  <tr>
+   <th><a class="external" href="http://www.whatwg.org/specs/web-apps/current-work/multipage/webappapis.html#event-handlers" title="event handlers">event handler</a>
+   <th><a class="external" href="http://www.whatwg.org/specs/web-apps/current-work/multipage/webappapis.html#event-handler-event-type">event handler event type</a>
+ <tbody>
+  <tr>
+   <td><dfn id="handler-onclick" title="handler-onclick"><code>onclick</code></dfn>
+   <td><code title="event-click">click</code>
+  <tr>
+   <td><dfn id="handler-onshow" title="handler-onshow"><code>onshow</code></dfn>
+   <td><code title="event-show">show</code>
+  <tr>
+   <td><dfn id="handler-onerror" title="handler-onerror"><code>onerror</code></dfn>
+   <td><code title="event-error">error</code>
+  <tr>
+   <td><dfn id="handler-onclose" title="handler-onclose"><code>onclose</code></dfn>
+   <td><code title="event-close">close</code>
+</table>
+
+<p>The <dfn id="dom-notification-close" title="dom-Notification-close"><code>close()</code></dfn> method
+must run the <a href="#close-steps">close steps</a> for the
+<a href="#concept-notification" title="concept-notification">notification</a>.
+
+
+
+
+
+<h2 id="rendering"><span class="secno">6 </span>Rendering</h2>
+
+<p>This section is written in terms equivalent to those used in the
+Rendering section of HTML. <a href="#refsHTML">[HTML]</a>
+
+<!-- keep this in sync with
+     http://www.whatwg.org/specs/web-apps/current-work/#text-rendered-in-native-user-interfaces -->
+
+<p>User agents are expected to honor the Unicode semantics of the text of a
+<a href="#concept-notification" title="concept-notification">notification</a>'s <a href="#title">title</a>
+and <a href="#body">body</a>. Each is expected to be treated as an independent set
+of one or more bidirectional algorithm paragraphs when displayed, as defined
+by the bidirectional algorithm's rules P1, P2, and P3, including, for
+instance, supporting the paragraph-breaking behaviour of
+U+000A LINE FEED (LF) characters. For each paragraph of the
+<a href="#title">title</a> and <a href="#body">body</a>, the
+<a href="#concept-notification" title="concept-notification">notification</a>'s
+<a href="#title-direction">title direction</a> and <a href="#body-direction">body direction</a> respectively
+provide the higher-level override of rules P2 and P3 if they have a value
+other than "<code title="">auto</code>".
+<a href="#refsBIDI">[BIDI]</a>
+
+
+<h2 id="examples"><span class="secno">7 </span>Examples</h2>
+
+<h3 id="using-events"><span class="secno">7.1 </span>Using events</h3>
+
+<p>
+	Notification objects dispatch events during their lifecycle, which authors can use
+	to generate desired behaviors.
+      </p>
+      <p>
+	The <code>show</code> event occurs when the notification is shown to the user --
+	this may be at some time after the notification is created in the case
+	of limited display space and a queue.
+      </p>
+
+      <p>
+	In the following example, this event is used to guarantee that regardless of when
+	the notification is shown, it is displayed for only 15 seconds.
+      </p>
+
+<pre class="example">new Notification("New Email Received",
+                 { iconUrl: "mail.png",
+                   onshow: function() { setTimeout(notification.close(), 15000); }
+                 });</pre>
+
+<p>The <code>close</code> events occurs when the notification is dismissed by the user.
+	Authors may use this event to perform actions when notifications are acknowledged.
+
+<p>
+	In the following example, when a meeting reminder notification is acknowledged, the
+	application suppresses other forms of reminders.
+      </p>
+
+<pre class="example">new Notification("Meeting about to begin",
+                 { iconUrl: "calendar.gif",
+                   body: "Room 101",
+                   onclose: function() { cancelReminders(event); }
+                 });</pre>
+
+
+<h3 id="tags-example"><span class="secno">7.2 </span>Using the <code title="">tag</code> member for multiple instances</h3>
+
+<p>Web applications frequently operate concurrently in multiple instances, such as when a
+	user opens a mail application in multiple browser tabs.  Since the desktop is a shared
+	resource, Web Notifications provides a way for these instances to easily coordinate, by
+	using the <code title="">tag</code> member.
+
+<p>Notifications which represent the same conceptual event can be tagged in the same way,
+	and when both are shown, the user will only receive one notification.
+      </p>
+
+<pre class="example" title="">Instance 1                                   | Instance 2
+                                             |
+// Instance notices there is new mail.       |
+new Notification("New mail from John Doe",   |
+                 { tag: 'message1' });       |
+                                             |
+                                             |  // Slightly later, this instance notices
+                                             |  // there is new mail.
+                                             |  new Notification("New mail from John Doe",
+                                             |                   { tag: 'message1' });</pre>
+
+<p>
+	The result of this situation, if the user agent follows the algorithms here, is a <strong>single</strong> notification "New mail from John Doe".
+
+<h3 id="using-the-tag-member-for-a-single-instance"><span class="secno">7.3 </span>Using the <code title="">tag</code> member for a single instance</h3>
+
+<p>The <code title="">tag</code> member can also be used by a single instance of an application to keep its
+	notifications as current as possible as state changes.
+
+<p>For example, if Alice is using a chat application with Bob, and Bob sends multiple
+	messages while Alice is idle, the application may prefer that Alice not see a
+	desktop notification for each message.
+
+<pre class="example">// Bob says "Hi"
+new Notification("Bob: Hi", { tag: 'chat_Bob' });
+
+// Bob says "Are you free this afternoon?"
+new Notification("Bob: Hi / Are you free this afternoon?", { tag: 'chat_Bob' });</pre>
+
+<p>The result of this situation is a <em>single</em> notification; the second one
+	replaces the first having the same tag.  In a platform that queues notifications
+	(first-in-first-out), using the tag allows the notification to also maintain its
+	position in the queue.  Platforms where the newest notifications are shown first,
+	a similar result could be achieved using the
+	<code title="dom-Notification-close"><a href="#dom-notification-close">close()</a></code> method.
+
+<h2 class="no-num" id="references">References</h2>
+
+<div id="anolis-references"><dl><dt id="refsBIDI">[BIDI]
+<dd><cite><a href="http://www.unicode.org/reports/tr9/">Unicode Bidirectional Algorithm</a></cite>, Mark Davis. Unicode Consortium.
+
+<dt id="refsDOM">[DOM]
+<dd><cite><a href="http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html">DOM4</a></cite>, Anne van Kesteren, Aryeh Gregor and Ms2ger. W3C.
+
+<dt id="refsHTML">[HTML]
+<dd><cite><a href="http://www.w3.org/TR/html5/">HTML5</a></cite>, Ian Hickson. W3C.
+
+<dt id="refsRFC2119">[RFC2119]
+<dd><cite><a href="http://tools.ietf.org/html/rfc2119">Key words for use in RFCs to Indicate Requirement Levels</a></cite>, Scott Bradner. IETF.
+
+</dl></div>
+
+<h2 class="no-num" id="acknowledgments">Acknowledgments</h2>
+
+<p>Thanks to
+Aharon (Vladimir) Lanin,
+Alex Russell,
+Doug Turner,
+Drew Wilson,
+Edward O'Connor,
+Ian Hickson,
+James Graham,
+Jon Lee, and
+Jonas Sicking
+for being awesome.

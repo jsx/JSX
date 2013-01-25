@@ -1,7 +1,7 @@
 /*EXPECTED
 true
-false
-false
+error
+error
 true
 */
 class Base {
@@ -23,11 +23,17 @@ class _Main {
 		var b : Base = new D1();
 		var d1 = b as D1;
 		log d1 != null;
-		var d2 = b as D2;
-		log d2 != null;
+		try {
+			var d2 = b as D2;
+		} catch (e : Error) {
+			log "error";
+		}
 		var i : I = new D2();
-		d1 = i as D1;
-		log d1 != null;
+		try {
+			d1 = i as D1;
+		} catch (e : Error) {
+			log "error";
+		}
 		d2 = i as D2;
 		log d2 != null;
 	}

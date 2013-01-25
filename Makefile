@@ -1,39 +1,53 @@
 
+PROVE := prove
+
 JOBS:=4
 
-OPTIMIZE_FLAGS := lto,unclassify,fold-const,return-if,inline,dce,unbox,fold-const,dce,lcse,array-length,unclassify
+OPTIMIZE_FLAGS := lto,no-assert,fold-const,return-if,inline,dce,unbox,fold-const,lcse,dce,fold-const,array-length,unclassify
 
-all: src/doc.js
+setup: compiler doc web
 
-setup: doc
+## compiler stuff
+
+compiler: src/doc.jsx
+	node bootstrap/jsx-compiler.js --executable node --output bin/jsx src/jsx-node-front.jsx
+
+src/doc.jsx: src/_doc.jsx
+	submodules/picotemplate/picotemplate.pl $<
 
 
-doc: src/doc.js
+doc: src/doc.jsx
 	rm -rf doc
 	find lib -name '*.jsx' | xargs -n 1 -- bin/jsx --mode doc --output doc
 
+self-hosting-compiler: compiler
+	cp bin/jsx bootstrap/jsx-compiler.js
+
+## test stuff
+
 # e.g. make test JOBS=2
-test:
-	prove --jobs "$(JOBS)" t/*.t t/*/*.jsx
 
-test-optimized:
-	JSX_OPTS="--optimize $(OPTIMIZE_FLAGS)" prove --jobs "$(JOBS)" t/*/*.jsx
+test: test-debug test-optimized
 
-test-all: test test-optimized
+test-debug: compiler
+	$(PROVE) --jobs "$(JOBS)" t/*.t t/*/*.jsx
+
+test-optimized: compiler
+	JSX_OPTS="--optimize $(OPTIMIZE_FLAGS)" $(PROVE) --jobs "$(JOBS)" t/*/*.jsx
+
 
 optimize-bench:
-	prove xt/optimize-bench/*.jsx
+	$(PROVE) -v xt/optimize-bench/*.jsx
 
-web:
-	perl web/build.pl --clean
+## web stuff
+
+web: compiler
+	perl web/build.pl
 	time bin/jsx --executable web --profile --output web/profiler/fireworks.jsx.js web/profiler/fireworks.jsx
 	time bin/jsx --executable web --release --output web/example/aobench/aobench.jsx.js web/example/aobench/aobench.jsx
 
-server:
+server: web
 	node web/server.js
-
-src/doc.js: src/_doc.js
-	submodules/picotemplate/picotemplate.pl src/_doc.js
 
 # for authors
 web.jsx:
@@ -61,9 +75,11 @@ update-bootstrap:
 	cp bootstrap/img/*.* web/assets/img
 	cp bootstrap/js/*.*  web/assets/js
 
+## cleanup
 
 clean:
 	rm -rf CodeMirror-* codemirror.zip
 	rm -rf bootstrap*
+	rm -rf bin
 
 .PHONY: test web server doc

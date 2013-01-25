@@ -1,17 +1,22 @@
 {
   "name":        "jsx",
-  "version":     "0.0.2",
+  "version":     "0.9.0",
   "description": "a faster, safer, easier alternative to JavaScript",
   "homepage": "http://jsx.github.com/",
   "repository" : "git://github.com/jsx/JSX.git",
-  "author": [
-      {
-        "name":  "Kazuho Oku",
-        "email": "oku.kazuho@dena.jp"
-      },
+  "preferGlobal" : true,
+  "author": {
+    "name":  "Kazuho Oku",
+    "email": "oku.kazuho@dena.jp"
+  },
+  "contributors" : [
       {
         "name":  "Goro Fuji (gfx)",
         "email": "fuji.goro@dena.jp"
+      },
+      {
+        "name":  "Yuichi Nishiwaki (wasabiz)",
+        "email": "nishiwaki.yuichi@dena.jp"
       }
   ],
   "bin" : {
@@ -19,16 +24,16 @@
   },
   "directories": {
     "bin": "./bin",
-    "lib": "./lib"
+    "lib": "./lib",
+    "src": "./src"
   },
-  "devDependencies": {
-      "browserbuild": "*",
+  "dependencies": {
       "source-map": "0.1.1"
   },
   "engines": {
     "node": ">= 0.6.19"
   },
   "scripts" : {
-      "test" : "make test-all JOBS=1"
+      "test" : "make test JOBS=1 PROVE='prove -v' SKIP_PHANTOMJS_TEST=1"
   }
 }
