@@ -16,13 +16,14 @@ src/doc.jsx: src/_doc.jsx
 	submodules/picotemplate/picotemplate.pl $<
 
 meta:
-	tool/make-meta package.json src/meta.jsx
+	if [ -e .git ] ; then tool/make-meta package.json src/meta.jsx ; fi
 
 doc: src/doc.jsx
 	rm -rf doc
 	find lib -name '*.jsx' | xargs -n 1 -- bin/jsx --mode doc --output doc
 
 self-hosting-compiler: compiler
+	bin/jsx --executable node --output bin/jsx src/jsx-node-front.jsx # again
 	cp bin/jsx tool/bootstrap-compiler.js
 
 ## test stuff
