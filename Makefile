@@ -66,8 +66,8 @@ update-codemirror:
 	unzip -o codemirror.zip
 	cp codemirror-*/lib/codemirror.css            web/assets/css
 	cp codemirror-*/lib/codemirror.js             web/assets/js
-	cp codemirror-*/lib/util/simple-hint.css      web/assets/css
-	cp codemirror-*/lib/util/simple-hint.js       web/assets/js
+	cp codemirror-*/addon/hint/simple-hint.css    web/assets/css
+	cp codemirror-*/addon/hint/simple-hint.js     web/assets/js
 	cp codemirror-*/mode/javascript/javascript.js web/assets/js/mode
 	cp codemirror-*/mode/clike/clike.js           web/assets/js/mode
 
@@ -83,6 +83,7 @@ update-bootstrap:
 clean:
 	rm -rf CodeMirror-* codemirror.zip
 	rm -rf bootstrap*
-	rm -rf bin
+	rm -rf bin/*
+	rm -rf jsx-*.tgz
 
 .PHONY: setup test web server doc meta
