@@ -13,7 +13,7 @@ L<JSON::PP> for more info about this class.
 
 =cut
 
-use JSON::PP ();
+use JSON::backportPP ();
 use strict;
 
 1;

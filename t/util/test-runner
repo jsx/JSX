@@ -4,7 +4,8 @@ use strict;
 use warnings;
 use Test::More;
 use File::Basename ();
-use lib File::Basename::dirname(__FILE__) . "/extlib/lib/perl5";
+use lib File::Basename::dirname(__FILE__) . "/../extlib/lib/perl5";
+
 use t::util::Util;
 
 BEGIN { # XXX older version of Test::More has no note()
@@ -18,24 +19,17 @@ BEGIN { # XXX older version of Test::More has no note()
     }
 }
 
-sub difflet {
-    note("FYI: Test::Difflet shows you more informative output");
-}
-
-eval {
-    require Data::Difflet;
-
-    no warnings 'redefine';
-    *difflet = sub {
-        my($got, $expected) = @_;
-        my $d = Data::Difflet->new();
-        note("DIFFLET");
-        note($d->compare($got, $expected));
-    };
-};
 
 main(@ARGV);
 exit;
+
+sub difflet {
+    my($got, $expected) = @_;
+    require Data::Difflet;
+    my $d = Data::Difflet->new();
+    note("DIFFLET");
+    note($d->compare($got, $expected));
+}
 
 sub bench {
     my ($f) = @_;
@@ -278,9 +272,9 @@ sub completion_test {
     # run and check the output
     my $output = `bin/jsx $opts $file 2>&1`;
     if (is $?, 0, "compile $file") {
-        require JSON::PP;
-        my $output_data   = JSON::PP::decode_json($output);
-        my $expected_data = JSON::PP::decode_json($expected);
+        require JSON;
+        my $output_data   = JSON::decode_json($output);
+        my $expected_data = JSON::decode_json($expected);
 
         my $to_test = [
             map {

@@ -21,7 +21,7 @@ use warnings FATAL => qw(uninitialized recursion);
 use Cwd            qw(abs_path);
 use File::Basename qw(basename dirname);
 use constant ROOT => abs_path(dirname(__FILE__));
-use lib ROOT."/extlib/lib/perl5";
+use lib ROOT."/../extlib/lib/perl5";
 
 use File::Path     qw(rmtree mkpath);
 use File::Copy     qw(move copy);
@@ -29,8 +29,8 @@ use Fatal          qw(open close);
 use File::Find     qw(find);
 use Fcntl          qw(S_ISDIR);
 use File::stat     qw(stat);
-use JSON::PP qw();
-use Time::HiRes qw();
+use JSON           qw();
+use Time::HiRes    qw();
 
 my $clean = (grep { $_ eq "--clean" } @ARGV); # clean build
 
@@ -171,7 +171,7 @@ sub process_tree {
     }
 
     open my($fh), ">", $dest;
-    print $fh JSON::PP->new->utf8->pretty->encode(\%tree);
+    print $fh JSON->new->utf8->pretty->encode(\%tree);
     close $fh;
 }
 

@@ -1,4 +1,5 @@
-package JSON::PP;
+package # This is JSON::backportPP
+    JSON::PP;
 
 # JSON-2.0
 
@@ -55,7 +56,7 @@ BEGIN {
     # Perl version check, Unicode handling is enable?
     # Helper module sets @JSON::PP::_properties.
     if ($] < 5.008 ) {
-        my $helper = $] >= 5.006 ? 'JSON::PP::Compat5006' : 'JSON::PP::Compat5005';
+        my $helper = $] >= 5.006 ? 'JSON::backportPP::Compat5006' : 'JSON::backportPP::Compat5005';
         eval qq| require $helper |;
         if ($@) { Carp::croak $@; }
     }
@@ -1391,8 +1392,8 @@ BEGIN {
 
 # shamely copied and modified from JSON::XS code.
 
-$JSON::PP::true  = do { bless \(my $dummy = 1), "JSON::PP::Boolean" };
-$JSON::PP::false = do { bless \(my $dummy = 0), "JSON::PP::Boolean" };
+$JSON::PP::true  = do { bless \(my $dummy = 1), "JSON::backportPP::Boolean" };
+$JSON::PP::false = do { bless \(my $dummy = 0), "JSON::backportPP::Boolean" };
 
 sub is_bool { defined $_[0] and UNIVERSAL::isa($_[0], "JSON::PP::Boolean"); }
 
@@ -1402,8 +1403,9 @@ sub null  { undef; }
 
 ###############################
 
-package JSON::PP::Boolean;
+package JSON::backportPP::Boolean;
 
+@JSON::backportPP::Boolean::ISA = ('JSON::PP::Boolean');
 use overload (
    "0+"     => sub { ${$_[0]} },
    "++"     => sub { $_[0] = ${$_[0]} + 1 },
@@ -1414,7 +1416,8 @@ use overload (
 
 ###############################
 
-package JSON::PP::IncrParser;
+package
+    JSON::PP::IncrParser;
 
 use strict;
 
@@ -1633,29 +1636,6 @@ JSON::PP - JSON::XS compatible pure-Perl module.
     2.27200
 
 L<JSON::XS> 2.27 (~2.30) compatible.
-
-=head1 NOTE
-
-JSON::PP was inculded in JSON distribution (CPAN module).
-It comes to be a perl core module in Perl 5.14.
-
-    [STEPS]
-
-    * release this module as JSON::PPdev.
-
-    * release other PP::* modules as JSON::PP::Compat*.
-
-    * JSON distribution will inculde yet another JSON::PP modules.
-      They are JSNO::backportPP. So JSON.pm should work as it did at all!
-
-    * remove JSON::PP and JSON::PP::* modules from JSON distribution
-       and release it as developer version.
-
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    * release JSON distribution as stable version.
-
-    * rename JSON::PPdev into JSON::PP and release on CPAN. <<<< HERE
 
 =head1 DESCRIPTION
 
