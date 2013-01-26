@@ -10,7 +10,7 @@ setup: compiler doc web
 ## compiler stuff
 
 compiler: src/doc.jsx meta
-	node bootstrap/jsx-compiler.js --executable node --output bin/jsx src/jsx-node-front.jsx
+	node tool/bootstrap-compiler.js --executable node --output bin/jsx src/jsx-node-front.jsx
 
 src/doc.jsx: src/_doc.jsx
 	submodules/picotemplate/picotemplate.pl $<
@@ -23,7 +23,7 @@ doc: src/doc.jsx
 	find lib -name '*.jsx' | xargs -n 1 -- bin/jsx --mode doc --output doc
 
 self-hosting-compiler: compiler
-	cp bin/jsx bootstrap/jsx-compiler.js
+	cp bin/jsx tool/bootstrap-compiler.js
 
 ## test stuff
 
