@@ -9,12 +9,14 @@ setup: compiler doc web
 
 ## compiler stuff
 
-compiler: src/doc.jsx
+compiler: src/doc.jsx meta
 	node bootstrap/jsx-compiler.js --executable node --output bin/jsx src/jsx-node-front.jsx
 
 src/doc.jsx: src/_doc.jsx
 	submodules/picotemplate/picotemplate.pl $<
 
+meta:
+	tool/make-meta package.json src/meta.jsx
 
 doc: src/doc.jsx
 	rm -rf doc
@@ -82,4 +84,4 @@ clean:
 	rm -rf bootstrap*
 	rm -rf bin
 
-.PHONY: test web server doc
+.PHONY: setup test web server doc meta

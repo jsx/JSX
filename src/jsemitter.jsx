@@ -20,6 +20,7 @@
  * IN THE SOFTWARE.
  */
 
+import "./meta.jsx";
 import "./classdef.jsx";
 import "./type.jsx";
 import "./expression.jsx";
@@ -2216,7 +2217,8 @@ class JavaScriptEmitter implements Emitter {
 	}
 
 	override function getOutput (sourceFile : string, entryPoint : Nullable.<string>, executableFor : Nullable.<string>) : string {
-		var output = this._output + "\n";
+		var output = "// generatedy by JSX compiler " + Meta.IDENTIFIER + "\n"
+			+ this._output + "\n";
 		if (this._enableProfiler) {
 			output += this._platform.load(this._platform.getRoot() + "/src/js/profiler.js");
 		}

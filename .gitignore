@@ -14,6 +14,7 @@ try/
 doc/
 bin/jsx
 src/doc.jsx
+src/meta.jsx
 
 # npm-related files
 
