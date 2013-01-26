@@ -16,7 +16,7 @@ src/doc.jsx: src/_doc.jsx
 	submodules/picotemplate/picotemplate.pl $<
 
 meta:
-	tool/make-meta package.json src/meta.jsx
+	if [ -e .git ] ; then tool/make-meta package.json src/meta.jsx ; fi
 
 doc: src/doc.jsx
 	rm -rf doc
