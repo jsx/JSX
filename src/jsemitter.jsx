@@ -2022,7 +2022,7 @@ class JavaScriptEmitter implements Emitter {
 	function constructor (platform : Platform) {
 		JavaScriptEmitter.initialize();
 		this._platform = platform;
-		this._output = "";
+		this._output = "// generatedy by JSX compiler " + Meta.IDENTIFIER + "\n";
 		this._outputEndsWithReturn = this._output.match(/\n$/) != null;
 		this._outputFile = null;
 		this._indent = 0;
@@ -2077,7 +2077,7 @@ class JavaScriptEmitter implements Emitter {
 	}
 
 	override function addHeader (header : string) : void {
-		this._output += header;
+		this._output = header + this._output;
 	}
 
 	override function emit (classDefs : ClassDefinition[]) : void {
@@ -2217,8 +2217,7 @@ class JavaScriptEmitter implements Emitter {
 	}
 
 	override function getOutput (sourceFile : string, entryPoint : Nullable.<string>, executableFor : Nullable.<string>) : string {
-		var output = "// generatedy by JSX compiler " + Meta.IDENTIFIER + "\n"
-			+ this._output + "\n";
+		var output = this._output + "\n";
 		if (this._enableProfiler) {
 			output += this._platform.load(this._platform.getRoot() + "/src/js/profiler.js");
 		}
