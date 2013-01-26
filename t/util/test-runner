@@ -23,6 +23,24 @@ BEGIN { # XXX older version of Test::More has no note()
 main(@ARGV);
 exit;
 
+sub jsx { # returns (status, stdout, stderr)
+    my(@args) = @_;
+
+    require IPC::Open3;
+    require Symbol;
+    my($wtr, $rdr, $err) = (Symbol::gensym(), Symbol::gensym(), Symbol::gensym());
+    my $pid = IPC::Open3::open3($wtr, $rdr, $err, "bin/jsx @args");
+    close $wtr;
+    local $/;
+    my $stdout = <$rdr>;
+    my $stderr = <$err>;
+    close $rdr;
+    close $err;
+    waitpid $pid, 0;
+
+    return ($? == 0, $stdout, $stderr);
+}
+
 sub difflet {
     my($got, $expected) = @_;
     require Data::Difflet;
@@ -88,27 +106,6 @@ sub get_shebang {
     return grep { defined } $first =~ /\A \#\! \s* (\S+) (?: \s+ (\S+) )* /xmsg;
 }
 
-sub compile_to_run {
-    my ($file, $opts) = @_;
-    $opts ||= "";
-
-    require IPC::Open3;
-    require Symbol;
-    my($wtr, $rdr, $err) = (Symbol::gensym(), Symbol::gensym(), Symbol::gensym());
-    my $pid = IPC::Open3::open3($wtr, $rdr, $err, "bin/jsx $opts $file");
-    close $wtr;
-    local $/;
-    my $stdout = <$rdr>;
-    my $stderr = <$err>;
-    close $rdr;
-    close $err;
-    waitpid $pid, 0;
-
-    return if $? != 0;
-
-    return ($stdout, $stderr);
-}
-
 sub run_compiled {
     my ($filename, $src) = @_;
 
@@ -159,9 +156,13 @@ sub compile_and_run {
     defined(my $expected = get_section($file, "EXPECTED"))
         or die "could not find EXPECTED in file:$file\n";
 
+    $opts //= "";
+
     # compile (FIXME support C++)
-    my($src, $logs) = compile_to_run($file, $opts) or do {
-        fail "compile '$file' failed: $?";
+    my($ok, $src, $logs) = jsx("$opts $file");
+    if (! $ok) {
+        fail "failed to compile '$file'";
+        diag $logs;
         return;
     };
     # run
@@ -200,9 +201,8 @@ sub optimize_and_compare {
     plan tests => 6 + ($do_bench ? 1 : 0) + scalar(@optimization_flags);
 
     # compile, run, and check (wo. optimization)
-    my($src, $logs) = compile_to_run($file);
-    ok defined($src) && length($src) > 0,
-        "compile '$file' (wo. optimization)" or return;
+    my($ok, $src, $logs) = jsx($file);
+    ok $ok, "compile '$file' (wo. optimization)" or return;
     is $logs, '', "... with no logs";
     my ($output, $elapsed) = bench(sub { run_compiled($file, $src) });
 
@@ -210,9 +210,8 @@ sub optimize_and_compare {
         "output of '$file' (wo. optimization)" or return;
 
     # compile, run, and check (w. optimization)
-    my($src_optimized, $logs_optimized) = compile_to_run($file, $opts . " --optimize dump-logs");
-    ok defined($src_optimized) && length($src_optimized) > 0,
-        "compile '$file' (w. $opts)" or return;
+    ($ok, my $src_optimized, my $logs_optimized) = jsx("$opts --optimize dump-logs $file");
+    ok $ok, "compile '$file' (w. $opts)" or return;
     for my $flag(@optimization_flags) {
         like $logs_optimized, qr/\[ \Q$flag\E \]/xms, "... with [$flag] in logs";
     }
@@ -246,12 +245,11 @@ sub expect_compile_error {
 
     plan tests => 2;
 
-
-    my $err = `bin/jsx $file 2>&1`;
-    isnt $?, 0, "compiling $file with non-zero status";
-    unlike $err, qr/^ \s+ \b at \b \s+ \b Module \b/xms,
+    my($ok, $stdout, $stderr) = jsx($file);
+    ok !$ok, "failed to compile $file";
+    unlike $stderr, qr/^ \s+ \b at \b \s+ \b Module \b/xms,
         "... without compiler crash";
-    note $err;
+    note $stderr;
 }
 
 sub completion_test {
@@ -270,10 +268,10 @@ sub completion_test {
     chomp $opts;
 
     # run and check the output
-    my $output = `bin/jsx $opts $file 2>&1`;
-    if (is $?, 0, "compile $file") {
+    my($ok, $stdout, $stderr) = jsx("$opts $file");
+    if (ok $ok, "compile $file") {
         require JSON;
-        my $output_data   = JSON::decode_json($output);
+        my $output_data   = JSON::decode_json($stdout);
         my $expected_data = JSON::decode_json($expected);
 
         my $to_test = [
@@ -288,14 +286,23 @@ sub completion_test {
 
         is_deeply $to_test, $expected_data, "check completion candidates of $file" or difflet($to_test, $expected_data);
     }
+    else {
+        fail "Cannot compile jsx $opts $file";
+        diag $stderr;
+    }
 }
 
 sub run_test {
     my($file) = @_;
 
-    if (system("bin/jsx", "--test", $file) != 0) {
-        fail("Cannot exec bin/jsx --test $file");
-        done_testing;
+    my($ok, $stdout, $stderr) = jsx("--test $file");
+
+    if ($ok) {
+        print STDOUT $stdout;
+    }
+    else {
+        fail "Cannot run jsx --test $file";
+        diag $stderr;
     }
 }
 
@@ -329,9 +336,13 @@ sub run_web_test {
     }
 
     local $ENV{JSX_RUNJS} = $phantomjs;
-    if (system("bin/jsx", "--executable", "commonjs", "--test", $file) != 0) {
-        fail("Cannot exec bin/jsx --test $file with $phantomjs $phantomjs_ver");
-        done_testing;
+    my($ok, $stdout, $stderr) = jsx("--executable commonjs --test $file");
+    if ($ok) {
+        print STDOUT $stdout;
+    }
+    else {
+        fail("Cannot run jsx --test $file with $phantomjs $phantomjs_ver");
+        diag $stderr;
     }
 }
 # vim: set expandtab:
