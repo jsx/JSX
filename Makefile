@@ -9,19 +9,21 @@ setup: compiler doc web
 
 ## compiler stuff
 
-compiler: src/doc.jsx
-	node bootstrap/jsx-compiler.js --executable node --output bin/jsx src/jsx-node-front.jsx
+compiler: src/doc.jsx meta
+	node tool/bootstrap-compiler.js --executable node --output bin/jsx src/jsx-node-front.jsx
 
 src/doc.jsx: src/_doc.jsx
 	submodules/picotemplate/picotemplate.pl $<
 
+meta:
+	tool/make-meta package.json src/meta.jsx
 
 doc: src/doc.jsx
 	rm -rf doc
 	find lib -name '*.jsx' | xargs -n 1 -- bin/jsx --mode doc --output doc
 
 self-hosting-compiler: compiler
-	cp bin/jsx bootstrap/jsx-compiler.js
+	cp bin/jsx tool/bootstrap-compiler.js
 
 ## test stuff
 
@@ -82,4 +84,4 @@ clean:
 	rm -rf bootstrap*
 	rm -rf bin
 
-.PHONY: test web server doc
+.PHONY: setup test web server doc meta

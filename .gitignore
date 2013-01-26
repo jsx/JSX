@@ -12,8 +12,9 @@ bootstrap/
 
 try/
 doc/
-bin/
+bin/jsx
 src/doc.jsx
+src/meta.jsx
 
 # npm-related files
 

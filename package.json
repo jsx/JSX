@@ -1,9 +1,10 @@
 {
   "name":        "jsx",
-  "version":     "0.9.0",
+  "version":     "0.9.1",
   "description": "a faster, safer, easier alternative to JavaScript",
   "homepage": "http://jsx.github.com/",
   "repository" : "git://github.com/jsx/JSX.git",
+  "bugs" : { "url" : "https://github.com/jsx/JSX/issues" },
   "preferGlobal" : true,
   "author": {
     "name":  "Kazuho Oku",
@@ -34,6 +35,7 @@
     "node": ">= 0.6.19"
   },
   "scripts" : {
-      "test" : "make test JOBS=1 PROVE='prove -v' SKIP_PHANTOMJS_TEST=1"
+      "test" : "make test JOBS=1 PROVE='prove -v' SKIP_PHANTOMJS_TEST=1",
+      "preinstall" : "make compiler"
   }
 }

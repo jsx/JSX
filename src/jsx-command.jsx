@@ -62,7 +62,8 @@ class JSXCommand {
 			"  --warn type1,type2,...     list types of warnings (all, deprecated, none)\n" +
 			"  --enable-type-check        enables run-time type checking\n" +
 			"  --enable-source-map        enables source map debugging info\n" +
-			"  --version                  displays the version and exits\n" +
+			"  --version                  displays the version and compiler identifier and exits\n" +
+			"  --version-number           displays the version as number and exits\n" +
 			"  --help                     displays this help and exits\n" +
 			"");
 	}
@@ -247,7 +248,10 @@ class JSXCommand {
 				});
 				break;
 			case "--version":
-				platform.log(Meta.VERSION_STRING);
+				platform.log(Meta.IDENTIFIER);
+				return 0;
+			case "--version-number":
+				platform.log(Meta.VERSION_NUMBER as string);
 				return 0;
 			case "--help":
 				platform.log(JSXCommand.help());
