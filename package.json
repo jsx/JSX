@@ -36,6 +36,6 @@
   },
   "scripts" : {
       "test" : "make test JOBS=1 PROVE='prove -v' SKIP_PHANTOMJS_TEST=1",
-      "preinstall" : "make"
+      "preinstall" : "make compiler"
   }
 }
