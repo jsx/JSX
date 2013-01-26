@@ -82,5 +82,6 @@ Note that Windows environment is not completely supported yet.
 RESOURCES
 =======================
 
+* [JSX web site](https://jsx.github.com/)
 * [JSX Wiki](https://github.com/jsx/JSX/wiki)
 
