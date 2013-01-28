@@ -3,8 +3,6 @@ use strict;
 use warnings;
 use Test::More;
 
-use File::Basename qw(dirname);
-use lib dirname(__FILE__). "/../extlib/lib/perl5";
 use t::util::Util;
 
 my @files = glob 't/run/*.jsx';

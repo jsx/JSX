@@ -4,24 +4,26 @@ use warnings;
 use Test::More;
 use File::Temp qw(tempdir);
 
-my @files = <example/*.jsx>;
+use t::util::Util;
+
+my @files = glob("example/*.jsx");
 plan tests => 2 * scalar @files;
 
-my $workdir = tempdir(CLEANUP => 1);
+my $workdir = tempdir(CLEANUP => 1, DIR => ".");
 
 for my $file(@files) {
     {
-        my $cmd = qq{bin/jsx --run "$file"};
-        my $got = `$cmd`;
+        my $cmd = qq{--run "$file"};
+        my($ok, $stdout, $stderr) = jsx($cmd);
 
-        is $?, 0, $cmd;
+        ok $ok, $cmd or fail($stderr);
     }
 
     {
-        my $cmd = qq{bin/jsx --executable node --output $workdir/compiled "$file"};
-        system $cmd;
+        my $cmd = qq{--executable node --output $workdir/compiled.js $file};
+        my($ok, $stdout, $stderr) = jsx($cmd);
 
-        is $?, 0, $cmd;
+        ok $ok, $cmd or fail($stderr);
     }
 }
 
