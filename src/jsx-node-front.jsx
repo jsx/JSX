@@ -334,7 +334,7 @@ class Service {
 
 			var now     = new Date();
 			var elapsed = now.getTime() - startTime.getTime();
-			console.info("%s#%s finish %s, elapsed %s [ms]", now, id, inputData, elapsed);
+			console.info("%s#%s finish, elapsed %s [ms]", now, id, elapsed);
 		});
 		request.on("close", function () {
 			c.error("the connecion is unexpectedly closed.\n");
