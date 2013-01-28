@@ -35,8 +35,7 @@
     "node": ">= 0.6.19"
   },
   "scripts" : {
-      "test" : "make test JOBS=1 PROVE='prove -v' SKIP_PHANTOMJS_TEST=1",
-      "preinstall" : "make compiler",
-      "prepublish" : "make meta"
+      "test" : "make test JOBS=1 SKIP_PHANTOMJS_TEST=1",
+      "prepublish" : "make compiler"
   }
 }
