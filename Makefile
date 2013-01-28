@@ -9,19 +9,22 @@ setup: compiler doc web
 
 ## compiler stuff
 
-compiler: src/doc.jsx
-	node bootstrap/jsx-compiler.js --executable node --output bin/jsx src/jsx-node-front.jsx
+compiler: src/doc.jsx meta
+	node tool/bootstrap-compiler.js --executable node --output bin/jsx src/jsx-node-front.jsx
 
 src/doc.jsx: src/_doc.jsx
 	submodules/picotemplate/picotemplate.pl $<
 
+meta:
+	if [ -e .git ] ; then tool/make-meta package.json src/meta.jsx ; fi
 
 doc: src/doc.jsx
 	rm -rf doc
 	find lib -name '*.jsx' | xargs -n 1 -- bin/jsx --mode doc --output doc
 
 self-hosting-compiler: compiler
-	cp bin/jsx bootstrap/jsx-compiler.js
+	bin/jsx --executable node --output bin/jsx src/jsx-node-front.jsx # again
+	cp bin/jsx tool/bootstrap-compiler.js
 
 ## test stuff
 
@@ -63,8 +66,8 @@ update-codemirror:
 	unzip -o codemirror.zip
 	cp codemirror-*/lib/codemirror.css            web/assets/css
 	cp codemirror-*/lib/codemirror.js             web/assets/js
-	cp codemirror-*/lib/util/simple-hint.css      web/assets/css
-	cp codemirror-*/lib/util/simple-hint.js       web/assets/js
+	cp codemirror-*/addon/hint/simple-hint.css    web/assets/css
+	cp codemirror-*/addon/hint/simple-hint.js     web/assets/js
 	cp codemirror-*/mode/javascript/javascript.js web/assets/js/mode
 	cp codemirror-*/mode/clike/clike.js           web/assets/js/mode
 
@@ -80,6 +83,7 @@ update-bootstrap:
 clean:
 	rm -rf CodeMirror-* codemirror.zip
 	rm -rf bootstrap*
-	rm -rf bin
+	rm -rf bin/*
+	rm -rf jsx-*.tgz
 
-.PHONY: test web server doc
+.PHONY: setup test web server doc meta

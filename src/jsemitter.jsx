@@ -20,6 +20,7 @@
  * IN THE SOFTWARE.
  */
 
+import "./meta.jsx";
 import "./classdef.jsx";
 import "./type.jsx";
 import "./expression.jsx";
@@ -2021,7 +2022,7 @@ class JavaScriptEmitter implements Emitter {
 	function constructor (platform : Platform) {
 		JavaScriptEmitter.initialize();
 		this._platform = platform;
-		this._output = "";
+		this._output = "// generatedy by JSX compiler " + Meta.IDENTIFIER + "\n";
 		this._outputEndsWithReturn = this._output.match(/\n$/) != null;
 		this._outputFile = null;
 		this._indent = 0;
@@ -2076,7 +2077,7 @@ class JavaScriptEmitter implements Emitter {
 	}
 
 	override function addHeader (header : string) : void {
-		this._output += header;
+		this._output = header + this._output;
 	}
 
 	override function emit (classDefs : ClassDefinition[]) : void {

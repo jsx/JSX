@@ -1312,6 +1312,7 @@ class _DeadCodeEliminationOptimizeCommand extends _FunctionOptimizeCommand {
 			this._eliminateDeadStoresToProperties(funcDef, exprs);
 			this._delayAssignmentsBetweenLocals(funcDef, exprs);
 			this._eliminateDeadStores(funcDef, exprs);
+			this._eliminateDeadConditions(funcDef, exprs);
 		});
 		// remove statements without side-effects
 		(function onStatements(statements : Statement[]) : boolean {
@@ -1595,6 +1596,47 @@ class _DeadCodeEliminationOptimizeCommand extends _FunctionOptimizeCommand {
 			return expr.forEachExpression(onExpr);
 		};
 		Util.forEachExpression(onExpr, exprs);
+	}
+
+	function _eliminateDeadConditions (funcDef : MemberFunctionDefinition, exprs : Expression[]) : void {
+		function conditionIsConstant(expr : Expression) : Nullable.<boolean> {
+			if (expr instanceof BooleanLiteralExpression) {
+				return expr.getToken().getValue() == "true";
+			} else if (expr instanceof StringLiteralExpression) {
+				return expr.getToken().getValue().length > 2;
+			} else if (expr instanceof NumberLiteralExpression || expr instanceof IntegerLiteralExpression) {
+				return expr.getToken().getValue() as number != 0;
+			} else if (expr instanceof MapLiteralExpression || expr instanceof ArrayLiteralExpression) {
+				return true;
+			}
+			return null;
+		}
+		function spliceStatements (dest : Statement[], index : number, src : Statement[]) : void {
+			dest.splice(index, 1);
+			for (var i = 0; i < src.length; ++i) {
+				dest.splice(index + i, 0, src[i]);
+			}
+		}
+		(function onStatements(statements : Statement[]) : boolean {
+			for (var i = statements.length - 1; i >= 0; --i) {
+				var statement = statements[i];
+				if (statement instanceof IfStatement) {
+					var ifStatement = statement as IfStatement;
+					var cond = conditionIsConstant(ifStatement.getExpr());
+					if (cond == null) {
+						// nothing to do
+					} else if (cond == false && ifStatement.getOnFalseStatements().length == 0) {
+						statements.splice(i, 1);
+					} else if (cond == false) {
+						spliceStatements(statements, i, ifStatement.getOnFalseStatements());
+					} else if (cond == true) {
+						spliceStatements(statements, i, ifStatement.getOnTrueStatements());
+					}
+				}
+				statement.handleStatements(onStatements);
+			}
+			return true;
+		})(funcDef.getStatements());
 	}
 
 }
