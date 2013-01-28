@@ -3,6 +3,9 @@ use strict;
 use warnings;
 use Fatal qw(open close);
 
+use File::Basename ();
+use lib File::Basename::dirname(__FILE__) . "/../extlib/lib/perl5";
+
 use version;
 use JSON;
 
