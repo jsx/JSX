@@ -597,7 +597,7 @@ class FunctionChoiceType extends FunctionType {
 			break;
 		}
 		for (var i = 0; i < notes.length; ++i) {
-			context.errors.push(notes[i]);
+			context.errors[context.errors.length - 1].addCompileNote(notes[i]);
 		}
 		return null;
 	}
@@ -670,14 +670,14 @@ class ResolvedFunctionType extends FunctionType {
 	override function deduceByArgumentTypes (context : AnalysisContext, operatorToken : Token, argTypes : Type[], isStatic : boolean) : ResolvedFunctionType {
 		var note = '';
 		if (! this._deduceByArgumentTypes(argTypes, isStatic, false, (msg) -> { note = msg; })) {
-			context.errors.push(
-				new CompileError(
+			var error = new CompileError(
 					operatorToken,
-					operatorToken.getValue() == "[" ? "operator [] of type " + argTypes[0].toString() + " is not applicable to " + this.getObjectType.toString() : "no function with matching arguments"));
-			context.errors.push(
+					operatorToken.getValue() == "[" ? "operator [] of type " + argTypes[0].toString() + " is not applicable to " + this.getObjectType.toString() : "no function with matching arguments");
+			error.addCompileNote(
 				new CompileNote(
 					(this._token != null) ? this._token : operatorToken,
 					'candidate function not viable: ' + note));
+			context.errors.push(error);
 			return null;
 		}
 		return this;

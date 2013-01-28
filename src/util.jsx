@@ -438,12 +438,24 @@ abstract class CompileIssue {
 
 class CompileError extends CompileIssue {
 
+	var _notes : CompileNote[];
+
 	function constructor (token : Token, message : string) {
 		super(token, message);
+		this._notes = new CompileNote[];
 	}
 
 	function constructor (filename : string, lineNumber : number, columnNumber : number, message : string) {
 		super(filename, lineNumber, columnNumber, message);
+		this._notes = new CompileNote[];
+	}
+
+	function addCompileNote (note : CompileNote) : void {
+		this._notes.push(note);
+	}
+
+	function getCompileNotes () : CompileNote[] {
+		return this._notes;
 	}
 
 	override function getPrefix () : string {

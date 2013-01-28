@@ -403,6 +403,10 @@ class Compiler {
 				}
 			} else {
 				this._platform.error(error.format(this));
+				var notes = error.getCompileNotes();
+				for (var i = 0; i < notes.length; ++i) {
+					this._platform.error(notes[i].format(this));
+				}
 				isFatal = true;
 			}
 		});
