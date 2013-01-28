@@ -375,7 +375,7 @@ class TemplateInstantiationRequest {
 
 }
 
-class CompileError {
+abstract class CompileIssue {
 
 	var _filename : Nullable.<string>;
 	var _lineNumber : number;
@@ -432,7 +432,21 @@ class CompileError {
 		return Util.format("[%1:%2:%3] %4%5\n%6\n", [this._filename, this._lineNumber as string, col as string, this.getPrefix(), this._message, sourceLine]);
 	}
 
-	function getPrefix () : string {
+	abstract function getPrefix () : string;
+
+}
+
+class CompileError extends CompileIssue {
+
+	function constructor (token : Token, message : string) {
+		super(token, message);
+	}
+
+	function constructor (filename : string, lineNumber : number, columnNumber : number, message : string) {
+		super(filename, lineNumber, columnNumber, message);
+	}
+
+	override function getPrefix () : string {
 		return "";
 	}
 
@@ -466,7 +480,7 @@ class DeprecatedWarning extends CompileWarning {
 
 }
 
-class CompileNote extends CompileError {
+class CompileNote extends CompileIssue {
 
 	function constructor (token : Token, message : string) {
 		super(token, message);
