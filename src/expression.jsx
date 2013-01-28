@@ -802,7 +802,7 @@ class FunctionExpression extends Expression {
 	}
 
 	override function getType () : Type {
-		return new StaticFunctionType(this._funcDef.getReturnType(), this._funcDef.getArgumentTypes(), false);
+		return this._funcDef.getType();
 	}
 
 	function typesAreIdentified () : boolean {

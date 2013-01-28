@@ -3,7 +3,25 @@ use strict;
 use warnings;
 
 use base qw(Exporter);
-our @EXPORT = qw(slurp get_section);
+our @EXPORT = qw(slurp get_section jsx);
+
+sub jsx { # returns (status, stdout, stderr)
+    my(@args) = @_;
+
+    require IPC::Open3;
+    require Symbol;
+    my($wtr, $rdr, $err) = (Symbol::gensym(), Symbol::gensym(), Symbol::gensym());
+    my $pid = IPC::Open3::open3($wtr, $rdr, $err, "bin/jsx @args");
+    close $wtr;
+    local $/;
+    my $stdout = <$rdr>;
+    my $stderr = <$err>;
+    close $rdr;
+    close $err;
+    waitpid $pid, 0;
+
+    return ($? == 0, $stdout, $stderr);
+}
 
 sub slurp {
     my($file) = @_;
