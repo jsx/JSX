@@ -683,7 +683,7 @@ class ResolvedFunctionType extends FunctionType {
 		return this;
 	}
 
-	function _deduceByArgumentTypes (argTypes : Type[], isStatic : boolean, exact : boolean, errorCb : (string) -> void) : boolean {
+	function _deduceByArgumentTypes (argTypes : Type[], isStatic : boolean, exact : boolean, cb : (string) -> void) : boolean {
 		var compareArg = function (formal : Type, actual : Type) : boolean {
 			if (formal.equals(actual))
 				return true;
@@ -692,32 +692,32 @@ class ResolvedFunctionType extends FunctionType {
 			return false;
 		};
 		if ((this instanceof StaticFunctionType) != isStatic) {
-			errorCb('unmatched static flags');
+			cb('unmatched static flags');
 			return false;
 		}
 		if (this._argTypes.length != 0 && this._argTypes[this._argTypes.length - 1] instanceof VariableLengthArgumentType) {
 			var vargType = this._argTypes[this._argTypes.length - 1] as VariableLengthArgumentType;
 			// a vararg function
 			if (argTypes.length < this._argTypes.length - 1) {
-				errorCb('wrong number of arguments');
+				cb('wrong number of arguments');
 				return false;
 			}
 			for (var i = 0; i < this._argTypes.length - 1; ++i) {
 				if (! compareArg(this._argTypes[i], argTypes[i])) {
-					errorCb('no known conversion from ' + argTypes[i].toString() + ' to ' + this._argTypes[i].toString() + ' for ' +
+					cb('no known conversion from ' + argTypes[i].toString() + ' to ' + this._argTypes[i].toString() + ' for ' +
 						((i == 0) ? '1st' : (i == 1) ? '2nd' : (i as string)+'th') + ' argument.');
 					return false;
 				}
 			}
 			if (argTypes[i] instanceof VariableLengthArgumentType && argTypes.length == this._argTypes.length) {
 				if (! compareArg((this._argTypes[i] as VariableLengthArgumentType).getBaseType(), (argTypes[i] as VariableLengthArgumentType).getBaseType())) {
-					errorCb('no known conversion from ' + (argTypes[i] as VariableLengthArgumentType).getBaseType().toString() + ' to ' + (this._argTypes[i] as VariableLengthArgumentType).getBaseType().toString() + ' for ' + ((i == 0) ? '1st' : (i == 1) ? '2nd' : (i as string)+'th') + ' argument.');
+					cb('no known conversion from ' + (argTypes[i] as VariableLengthArgumentType).getBaseType().toString() + ' to ' + (this._argTypes[i] as VariableLengthArgumentType).getBaseType().toString() + ' for ' + ((i == 0) ? '1st' : (i == 1) ? '2nd' : (i as string)+'th') + ' argument.');
 					return false;
 				}
 			} else {
 				for (; i < argTypes.length; ++i) {
 					if (! compareArg(vargType.getBaseType(), argTypes[i])) {
-						errorCb('no known conversion from ' + argTypes[i].toString() + ' to ' + vargType.getBaseType().toString() + ' for ' +
+						cb('no known conversion from ' + argTypes[i].toString() + ' to ' + vargType.getBaseType().toString() + ' for ' +
 							((i == 0) ? '1st' : (i == 1) ? '2nd' : (i as string)+'th') + ' argument.');
 						return false;
 					}
@@ -726,12 +726,12 @@ class ResolvedFunctionType extends FunctionType {
 		} else {
 			// non-vararg function
 			if (this._argTypes.length != argTypes.length) {
-				errorCb('wrong number of arguments');
+				cb('wrong number of arguments');
 				return false;
 			}
 			for (var i = 0; i < argTypes.length; ++i) {
 				if (! compareArg(this._argTypes[i], argTypes[i])) {
-					errorCb('no known conversion from ' + argTypes[i].toString() + ' to ' + this._argTypes[i].toString() + ' for ' +
+					cb('no known conversion from ' + argTypes[i].toString() + ' to ' + this._argTypes[i].toString() + ' for ' +
 						((i == 0) ? '1st' : (i == 1) ? '2nd' : (i as string)+'th') + ' argument.');
 					return false;
 				}
