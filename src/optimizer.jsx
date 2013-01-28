@@ -1599,7 +1599,7 @@ class _DeadCodeEliminationOptimizeCommand extends _FunctionOptimizeCommand {
 	}
 
 	function _eliminateDeadConditions (funcDef : MemberFunctionDefinition, exprs : Expression[]) : void {
-		function isConditionallyConstant(expr : Expression) : Nullable.<boolean> {
+		function conditionIsConstant(expr : Expression) : Nullable.<boolean> {
 			if (expr instanceof BooleanLiteralExpression) {
 				return expr.getToken().getValue() == "true";
 			} else if (expr instanceof StringLiteralExpression) {
@@ -1622,7 +1622,7 @@ class _DeadCodeEliminationOptimizeCommand extends _FunctionOptimizeCommand {
 				var statement = statements[i];
 				if (statement instanceof IfStatement) {
 					var ifStatement = statement as IfStatement;
-					var cond = isConditionallyConstant(ifStatement.getExpr());
+					var cond = conditionIsConstant(ifStatement.getExpr());
 					if (cond == null) {
 						// nothing to do
 					} else if (cond == false && ifStatement.getOnFalseStatements().length == 0) {
