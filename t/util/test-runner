@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Test::More;
 use File::Basename ();
-use lib File::Basename::dirname(__FILE__) . "/../extlib/lib/perl5";
+use lib File::Basename::dirname(__FILE__) . "/../../extlib/lib/perl5";
 
 use t::util::Util;
 
