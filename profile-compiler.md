@@ -12,9 +12,6 @@ Profiling
     like `node-tick-processor > prof.txt`
 3. Look into the result.
 
-The result has a lot of sections
-like *[JavaScript]* and *[bottom up (heavy) profile]*.
-
 Prerequisites
 =================================================
 
