@@ -34,9 +34,7 @@ import "./jsemitter.jsx";
 import "./optimizer.jsx";
 import "./util.jsx";
 
-import "js.jsx";
-import "js/nodejs.jsx";
-
+import "js/nodejs.jsx"; // FIXME refer to process.execPath
 
 class JSXCommand {
 
@@ -247,6 +245,11 @@ class JSXCommand {
 					emitter.setEnableProfiler(true);
 				});
 				break;
+			case "--compilation-server":
+				if ((optarg = getoptarg()) == null) {
+					return 1;
+				}
+				return platform.runCompilationServer(optarg);
 			case "--version":
 				platform.log(Meta.IDENTIFIER);
 				return 0;

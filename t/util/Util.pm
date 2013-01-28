@@ -1,17 +1,19 @@
 package t::util::Util;
+use 5.10.0;
 use strict;
 use warnings;
 
 use base qw(Exporter);
 our @EXPORT = qw(slurp get_section jsx);
 
-sub jsx { # returns (status, stdout, stderr)
-    my(@args) = @_;
+my $jsx_server_port = $ENV{JSX_COMPILATION_SERVER_PORT};
 
+sub _system { # system() which returns (status code, stdout, stderr)
+    my(@args) = @_;
     require IPC::Open3;
     require Symbol;
     my($wtr, $rdr, $err) = (Symbol::gensym(), Symbol::gensym(), Symbol::gensym());
-    my $pid = IPC::Open3::open3($wtr, $rdr, $err, "bin/jsx @args");
+    my $pid = IPC::Open3::open3($wtr, $rdr, $err, @args);
     close $wtr;
     local $/;
     my $stdout = <$rdr>;
@@ -21,6 +23,46 @@ sub jsx { # returns (status, stdout, stderr)
     waitpid $pid, 0;
 
     return ($? == 0, $stdout, $stderr);
+}
+
+sub jsx { # returns (status, stdout, stderr)
+    my(@args) = @_;
+
+    if (! $jsx_server_port) {
+        return _system("bin/jsx @args");
+    }
+    else {
+        require Text::ParseWords;
+        require HTTP::Tiny;
+        require JSON;
+
+        state $ua = HTTP::Tiny->new(
+            agent => "JSX compiler client",
+        );
+
+        my $res = $ua->post("http://localhost:$jsx_server_port/", {
+            'content-type' => 'application/json',
+            'content'      => JSON::encode_json([ Text::ParseWords::shellwords(@args) ]),
+        });
+
+        if (!( $res->{success} && $res->{headers}{'content-type'} eq 'application/json')) {
+            use Data::Dumper; print Dumper $res;
+            return 1;
+        }
+
+        my $c = JSON::decode_json($res->{content});
+
+        if ($c->{run}) {
+            require File::Temp;
+            my $js = $ENV{JSX_RUNJS} || "node";
+            my $file = File::Temp->new(SUFFIX => ".js");
+            $file->print($c->{run}{scriptSource});
+            $file->close();
+            my $scriptArgs = $c->{run}{scriptArgs};
+            return _system($js, $file->filename, @{$scriptArgs});
+        }
+        return ($c->{statusCode} == 0, $c->{stdout}, $c->{stderr});
+    }
 }
 
 sub slurp {
@@ -38,3 +80,5 @@ sub get_section {
     my($expected) = $content =~ m{/\*$name\n(|.*?\n)\*/}s;
     return $expected;
 }
+
+1;

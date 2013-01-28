@@ -48,6 +48,11 @@ abstract class Platform {
 
 	abstract function execute(sourceFileName : Nullable.<string>, jsSource : string, argv : string[]) : void;
 
+	function runCompilationServer(arg : variant) : number {
+		this.error("runCompilationServer is not supported in this platform");
+		return 1;
+	}
+
 	function log (s : string) : void {
 		console.log(s);
 	}

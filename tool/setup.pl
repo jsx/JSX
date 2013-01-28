@@ -9,6 +9,7 @@ use lib DIR . "/extlib/lib/perl5";
 
 my @modules = qw(
     String::ShellQuote
+    HTTP::Tiny
     JSON
     Data::Difflet
 );

@@ -287,7 +287,8 @@ class Optimizer {
 				this._commands[i].setup(this).performOptimization();
 				this.log("finished optimizer: " + this._commands[i]._identifier);
 			} catch (e : Error) {
-				console.error("optimizer '" + this._commands[i]._identifier + "' died unexpectedly, dumping the logs");
+				var platform = this._compiler.getPlatform();
+				platform.error("optimizer '" + this._commands[i]._identifier + "' died unexpectedly, dumping the logs");
 				this.dumpLogs();
 				throw e;
 			}
@@ -301,8 +302,9 @@ class Optimizer {
 	}
 
 	function dumpLogs () : void {
+		var platform = this._compiler.getPlatform();
 		for (var i = 0; i < this._log.length; ++i) {
-			console.error(this._log[i]);
+			platform.error(this._log[i]);
 		}
 	}
 
