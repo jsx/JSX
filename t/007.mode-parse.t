@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use Test::More;
 
-use t::util::Util;
+use tool::Util;
 
 my @files = glob 't/run/*.jsx';
 

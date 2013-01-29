@@ -4,7 +4,7 @@ use warnings;
 use Test::More;
 use File::Temp qw(tempdir);
 
-use t::util::Util;
+use tool::Util;
 
 my @files = glob("example/*.jsx");
 plan tests => 2 * scalar @files;
