@@ -14,14 +14,15 @@ build try/ directry for the web site
 
 =cut
 
-use 5.10.0;
 use strict;
 use warnings;
 use warnings FATAL => qw(uninitialized recursion);
+
+use tool::Util;
+
 use Cwd            qw(abs_path);
 use File::Basename qw(basename dirname);
 use constant ROOT => abs_path(dirname(__FILE__));
-use lib ROOT."/../extlib/lib/perl5";
 
 use File::Path     qw(rmtree mkpath);
 use File::Copy     qw(move copy);
@@ -32,16 +33,18 @@ use File::stat     qw(stat);
 use JSON           qw();
 use Time::HiRes    qw();
 
+our $g = info("build JSX web interface");
+
+require tool::RunCompilationServer;
+
 my $clean = (grep { $_ eq "--clean" } @ARGV); # clean build
 
-my $root = ROOT;
+my $web_root = ROOT;
 
 {
-    my $project_root = dirname($root);
+    my $project_root = dirname($web_root);
     my $dest_root    = "$project_root/try";
     my $dest_src     = "$dest_root/src";
-
-    my $g = info("build JSX web interface");
 
     if($clean) {
         rmtree("$dest_root~") if -e "$dest_root~";
@@ -50,20 +53,34 @@ my $root = ROOT;
 
     mkpath("$dest_root/$_") for qw(src build assets/js example t lib);
 
-    process_page("$root/index.html", "$dest_root/index.html");
+    process_page("$web_root/index.html", "$dest_root/index.html");
+
+    my($ok, $stdout, $stderr);
+    process_jsx(
+        "$web_root/profiler/fireworks.jsx",
+        "$web_root/profiler/fireworks.jsx.js",
+        "--executable", "web", "--profile");
+
+    process_jsx(
+        "$web_root/example/aobench/aobench.jsx",
+        "$web_root/example/aobench/aobench.jsx.js",
+        "--executable", "web", "--release");
+
 
     if (modified("$project_root/src", "$dest_root/src")) {
-        process_jsx($project_root,
-            "$project_root/src/web/jsx-web-front.jsx", "$dest_root/assets/js/jsx-web-front.jsx.js");
-        process_jsx($project_root,
-            "$project_root/src/web/jsx-web-compiler.jsx", "$dest_root/build/jsx-compiler.js");
+        process_jsx(
+            "$project_root/src/web/jsx-web-front.jsx",
+            "$dest_root/assets/js/jsx-web-front.jsx.js");
+        process_jsx(
+            "$project_root/src/web/jsx-web-compiler.jsx",
+            "$dest_root/build/jsx-compiler.js");
     }
 
-    process_source_map($project_root, "$root/source-map", "$dest_root/source-map");
+    process_source_map($project_root, "$web_root/source-map", "$dest_root/source-map");
 
     copy_r("$project_root/src", $dest_src);
-    copy_r("$root/assets",  "$dest_root/assets");
-    copy_r("$root/example", "$dest_root/example");
+    copy_r("$web_root/assets",  "$dest_root/assets");
+    copy_r("$web_root/example", "$dest_root/example");
     copy_r("$project_root/t", "$dest_root/t");
     copy_r("$project_root/lib", "$dest_root/lib");
 
@@ -82,7 +99,12 @@ my $root = ROOT;
     sub DESTROY {
         my($self) = @_;
         my $elapsed = Time::HiRes::tv_interval($self->{start});
-        printf "[I] %s (elapsed %.03f sec.)\n", $self->{message}, $elapsed;
+        if ($elapsed > 0.001) {
+            printf "[I] %s (elapsed %.03f sec.)\n", $self->{message}, $elapsed;
+        }
+        else {
+            printf "[I] %s\n", $self->{message};
+        }
         return;
     }
 }
@@ -99,7 +121,7 @@ sub make_list {
     return join "",
         qq{<li id="$id" class="nav-header">$prefix</li>\n},
         map { qq{<li class="source-file"><a href="$prefix/$_" data-path="$prefix/$_">$_</a></li>\n} }
-        map { basename($_) } glob(ROOT."/../$prefix/*.jsx");
+        map { basename($_) } glob("$web_root/../$prefix/*.jsx");
 }
 
 sub process_page {
@@ -130,12 +152,13 @@ sub process_page {
 }
 
 sub process_jsx {
-    my($project_root, $src, $dest) = @_;
+    my($src, $dest, @opts) = @_;
 
     my $g = info "process_jsx: $dest";
 
-    my @cmd = ("$project_root/bin/jsx", "--output", $dest, $src);
-    system(@cmd) == 0 or die "Failed to build: @cmd\n";
+    my @cmd = (@opts, "--output", $dest, $src);
+    my($ok, $stdout, $stderr) = jsx(@cmd);
+    $ok or die "Failed to build: jsx @cmd\n$stderr";
 }
 
 sub process_tree {
@@ -163,7 +186,7 @@ sub process_tree {
                 my $dir = \%tree;
                 while(@parts) {
                     my $d = shift @parts;
-                    $dir = $dir->{$d} //= {};
+                    $dir = $dir->{$d} ||= {};
                 }
                 $dir->{$basename} = $f;
             },
@@ -184,18 +207,18 @@ sub process_source_map {
 
     copy_r($src, $dest);
 
-    my $old_cwd = Cwd::cwd();
-    chdir "$project_root/example";
-    foreach my $jsx_file(glob("*.jsx")) {
+    foreach my $jsx_file(glob("$project_root/example/*.jsx")) {
         next if not modified($jsx_file, "$dest/$jsx_file");
 
         my $g = info "compile $jsx_file with --enable-source-map";
 
-        system("node", "$root/../bin/jsx",
+        my($ok, $stdout, $stderr) = jsx(
+            #"--input-filename", basename($jsx_file),
             "--executable", "web",
             "--enable-source-map",
             "--output", "$jsx_file.js",
-            $jsx_file) == 0 or die;
+            $jsx_file);
+        $ok or die $stderr;
 
         move($jsx_file . ".js", $dest);
         move($jsx_file . ".js.mapping", $dest);
@@ -204,7 +227,7 @@ sub process_source_map {
         my $st = stat($jsx_file);
         utime $st->atime, $st->mtime, "$dest/$jsx_file";
     }
-    chdir $old_cwd;
+    return;
 }
 
 sub modified {
@@ -243,7 +266,7 @@ sub _modified_r {
         }, $src;
     };
     if ($@) {
-        print "[W] ", $@;
+        print "[I] ", $@;
     }
     return $@ ? 1 : 0;
 }
@@ -280,4 +303,5 @@ sub copy_r {
     }, $src;
 
 }
+
 # vim: set expandtab:
