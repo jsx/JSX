@@ -1,24 +1,9 @@
 #!/usr/bin/env perl
-use 5.10.0;
 use strict;
 use warnings;
-use Test::More;
-use File::Basename ();
-use lib File::Basename::dirname(__FILE__) . "/../../extlib/lib/perl5";
+use tool::Util;
 
-use t::util::Util;
-
-BEGIN { # XXX older version of Test::More has no note()
-    if(not defined &note) {
-        if(-t STDOUT || $ENV{TEST_VERBOSE}) {
-            *note = \&diag;
-        }
-        else {
-            *note = sub { };
-        }
-    }
-}
-
+use Test::More 0.88;
 
 main(@ARGV);
 exit;
@@ -138,7 +123,7 @@ sub compile_and_run {
     defined(my $expected = get_section($file, "EXPECTED"))
         or die "could not find EXPECTED in file:$file\n";
 
-    $opts //= "";
+    $opts ||= "";
 
     # compile (FIXME support C++)
     my($ok, $src, $logs) = jsx("$opts $file");

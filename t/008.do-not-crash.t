@@ -6,7 +6,7 @@ use warnings;
 use Data::Dumper ();
 use Fatal qw(open);
 use Test::More;
-use t::util::Util;
+use tool::Util;
 
 my @files = @ARGV;
 

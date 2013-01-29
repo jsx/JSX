@@ -276,7 +276,7 @@ native __fake__ class Server {
 	function close() : void;
 }
 
-native __fake__ class ServerRequest {
+native __fake__ class ServerRequest extends EventEmitter {
 	__readonly__ var method          : string;
 	__readonly__ var url             : string;
 	__readonly__ var headers         : Map.<string>;

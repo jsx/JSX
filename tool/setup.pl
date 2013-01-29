@@ -9,10 +9,12 @@ use lib DIR . "/extlib/lib/perl5";
 
 my @modules = qw(
     String::ShellQuote
+    HTTP::Tiny
     JSON
+    Test::TCP
+    Proc::Guard
     Data::Difflet
 );
-
 
 my $dir= DIR;
 my $cpanm = 'http://cpanmin.us/';

@@ -26,13 +26,18 @@
 
 import "js.jsx";
 import "js/nodejs.jsx";
+import "console.jsx";
 
 import "./util.jsx";
 import "./emitter.jsx";
 import "./jsemitter.jsx";
 import "./platform.jsx";
 import "./jsx-command.jsx";
+import "./meta.jsx";
 
+/**
+ * Access to platform via NodeJS API
+ */
 class NodePlatform extends Platform {
 
 	var _root : string;
@@ -40,6 +45,10 @@ class NodePlatform extends Platform {
 	function constructor () {
 		var root = node.path.dirname(node.__dirname);
 		this._root = root.replace(/\\/g, "/");
+	}
+
+	function constructor (root : string) {
+		this._root = root;
 	}
 
 	override function getRoot () : string {
@@ -189,7 +198,170 @@ class NodePlatform extends Platform {
 			node.require(jsFile); // evaluates it in this process
 		}
 	}
+
+	override function runCompilationServer(arg : variant) : number {
+		var port = arg as int;
+		return CompilationServer.start(this, port);
+	}
 }
+
+/**
+ * NodePlatform variation for compiler service (daemon)
+ */
+class CompilationServerPlatform extends NodePlatform {
+	// response contents
+	var _stdout     = "";
+	var _stderr     = "";
+	var _file       = new Map.<string>;
+	var _statusCode = 1; // failure
+
+	var _scriptFile   = null : Nullable.<string>;   // file name on --run
+	var _scriptSource = null : Nullable.<string>;   // source code on --run
+	var _scriptArgs   = null : Nullable.<string[]>; // script args on --run
+
+	// request parameters
+	var _requestId = 0;
+	var _request  = null : ServerRequest;
+	var _response = null : ServerResponse;
+
+	function constructor(root : string, reqId : number, req : ServerRequest, res : ServerResponse) {
+		super(root);
+		this._requestId = reqId;
+		this._request   = req;
+		this._response  = res;
+	}
+
+	override function save (outputFile : Nullable.<string>, content : string) : void {
+		if (outputFile == null) {
+			this._stdout += content;
+		}
+		else {
+			this._file[outputFile] = content;
+		}
+	}
+
+	override function log(message : string) : void {
+		this._stdout += message + "\n";
+	}
+	override function warn(message : string) : void {
+		this._stderr += message + "\n";
+	}
+	override function error(message : string) : void {
+		this._stderr += message + "\n";
+	}
+
+	// does not execute it, just sets script contents instead
+	override function execute(jsFile : Nullable.<string>, jsSource : string, jsArgs : string[]) : void {
+		this._scriptFile   = jsFile;
+		this._scriptSource = jsSource;
+		this._scriptArgs   = jsArgs;
+	}
+
+	function setStatusCode(statusCode : number) : void {
+		this._statusCode = statusCode;
+	}
+
+	function getContents() : variant {
+		var run = null : variant;
+		if (this._scriptSource != null) {
+			run = {
+				scriptFile   : this._scriptFile,
+				scriptSource : this._scriptSource,
+				scriptArgs   : this._scriptArgs
+			} : variant;
+		}
+		return {
+			stdout : this._stdout,
+			stderr : this._stderr,
+			file   : this._file,
+			run    : run,
+
+			statusCode : this._statusCode
+		} : variant;
+	}
+
+	override function makeFileExecutable(file : string, runEnv : string) : void {
+		// noop
+	}
+}
+
+class CompilationServer {
+	static var _requestSequence = 0;
+
+	static function start(platform : Platform, port : int) : number {
+		var httpd = node.http.createServer(function (request, response) {
+			CompilationServer.handleRequest(platform, request, response);
+		});
+		httpd.listen(port);
+		console.info("access http://localhost:" + port as string + "/");
+		return 0;
+	}
+
+	static function handleRequest(platform : Platform, request : ServerRequest, response : ServerResponse) : void {
+		var id = ++CompilationServer._requestSequence;
+
+		if (request.method == "GET") {
+			// TODO: dispath some API path (i.e. /version)
+			CompilationServer.finishRequest(response, 200, {
+				version_string   : Meta.VERSION_STRING,
+				version_number   : Meta.VERSION_NUMBER,
+				last_commit_hash : Meta.LAST_COMMIT_HASH,
+				last_commit_date : Meta.LAST_COMMIT_DATE,
+				status : true
+			} : variant);
+			return;
+		}
+
+		var c = new CompilationServerPlatform(platform.getRoot(), id, request, response);
+
+		// POST: do the same as jsx(1)
+
+		var startTime = new Date();
+
+		// read POST body
+		var inputData = "";
+		request.on("data", function (chunk) {
+			inputData += chunk as string;
+		});
+		request.on("end", function () {
+			console.info("%s#%s start %s", startTime, id, inputData);
+
+			try {
+				var args = JSON.parse(inputData) as string[];
+				c.setStatusCode(JSXCommand.main(c, args));
+			}
+			catch (e : Error) {
+				console.error("%s#%s %s", startTime, id, e);
+				c.error((e as variant)["stack"] as string); // Error#stack
+			}
+
+			CompilationServer.finishRequest(response, 200, c.getContents());
+
+			var now     = new Date();
+			var elapsed = now.getTime() - startTime.getTime();
+			console.info("%s#%s finish, elapsed %s [ms]", now, id, elapsed);
+		});
+		request.on("close", function () {
+			c.error("the connecion is unexpectedly closed.\n");
+			CompilationServer.finishRequest(response, 500, c.getContents());
+		});
+	}
+
+	static function finishRequest (response : ServerResponse, statusCode : number, data : variant) : void {
+		var content = JSON.stringify(data);
+
+		var headers = {
+			"Content-Type"   : "application/json",
+			"Content-Length" : Buffer.byteLength(content, "utf-8") as string,
+			"Cache-Control"  : "no-cache"
+		};
+
+		response.writeHead(statusCode, headers);
+		response.end(content, "utf-8");
+	}
+}
+
+
 class _Main {
 
 	static function getEnvOpts () : string[] {
