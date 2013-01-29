@@ -1344,8 +1344,8 @@ class MemberFunctionDefinition extends MemberDefinition implements Block {
 
 	override function getType () : FunctionType {
 		return (this._flags & ClassDefinition.IS_STATIC) != 0
-			? (new StaticFunctionType(this._returnType, this.getArgumentTypes(), false) as FunctionType)
-			: (new MemberFunctionType(new ObjectType(this._classDef), this._returnType, this.getArgumentTypes(), false) as FunctionType);
+			? (new StaticFunctionType(this._token, this._returnType, this.getArgumentTypes(), false) as FunctionType)
+			: (new MemberFunctionType(this._token, new ObjectType(this._classDef), this._returnType, this.getArgumentTypes(), false) as FunctionType);
 	}
 
 	function deductTypeIfUnknown (context : AnalysisContext, type : ResolvedFunctionType) : boolean {

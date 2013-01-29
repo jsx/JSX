@@ -1827,9 +1827,9 @@ class Parser {
 		if (returnType == null)
 			return null;
 		if (objectType != null)
-			return new MemberFunctionType(objectType, returnType, argTypes, true);
+			return new MemberFunctionType(null, objectType, returnType, argTypes, true);
 		else
-			return new StaticFunctionType(returnType, argTypes, true);
+			return new StaticFunctionType(null, returnType, argTypes, true);
 	}
 
 	function _functionTypeDeclaration (objectType : Type) : Type {
@@ -1867,9 +1867,9 @@ class Parser {
 		if (returnType == null)
 			return null;
 		if (objectType != null)
-			return new MemberFunctionType(objectType, returnType, argTypes, true);
+			return new MemberFunctionType(null, objectType, returnType, argTypes, true);
 		else
-			return new StaticFunctionType(returnType, argTypes, true);
+			return new StaticFunctionType(null, returnType, argTypes, true);
 	}
 
 	function _registerArrayTypeOf (token : Token, elementType : Type) : ParsedObjectType {
@@ -2811,7 +2811,7 @@ class Parser {
 			// add name to current scope for local function declaration
 			if (requireTypeDeclaration) {
 				var argTypes = args.map.<Type>(function(arg) { return arg.getType(); });
-				var type = new StaticFunctionType(returnType, argTypes, false);
+				var type = new StaticFunctionType(token, returnType, argTypes, false);
 				local = this._registerLocal(name, type);
 			} else {
 				local = this._registerLocal(name, null);

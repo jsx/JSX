@@ -990,6 +990,7 @@ class _UnclassifyOptimizationCommand extends _OptimizeCommand {
 										propertyExpr.getIdentifierToken(),
 										propertyExpr.getTypeArguments(),
 										new StaticFunctionType(
+											null, // this argument is no longer used in optimization phase
 											(funcType as ResolvedFunctionType).getReturnType(),
 											[ receiverType ].concat((funcType as ResolvedFunctionType).getArgumentTypes()),
 											false)),

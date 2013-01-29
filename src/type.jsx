@@ -575,12 +575,13 @@ class FunctionChoiceType extends FunctionType {
 	override function deduceByArgumentTypes (context : AnalysisContext, operatorToken : Token, argTypes : Type[], isStatic : boolean) : ResolvedFunctionType {
 		// try an exact match
 		for (var i = 0; i < this._types.length; ++i)
-			if (this._types[i]._deduceByArgumentTypes(argTypes, isStatic, true))
+			if (this._types[i]._deduceByArgumentTypes(argTypes, isStatic, true, (msg) -> {}))
 				return this._types[i];
 		// try loose match
 		var matched = new ResolvedFunctionType[];
+		var notes = new CompileNote[];
 		for (var i = 0; i < this._types.length; ++i)
-			if (this._types[i]._deduceByArgumentTypes(argTypes, isStatic, false))
+			if (this._types[i]._deduceByArgumentTypes(argTypes, isStatic, false, (msg) -> { notes.push(new CompileNote(this._types[i].getToken(), 'candidate function not viable: ' + msg)); }))
 				matched.push(this._types[i]);
 		switch (matched.length) {
 		case 0:
@@ -594,6 +595,9 @@ class FunctionChoiceType extends FunctionType {
 		default:
 			context.errors.push(new CompileError(operatorToken, "result of function resolution using the arguments is ambiguous"));
 			break;
+		}
+		for (var i = 0; i < notes.length; ++i) {
+			context.errors[context.errors.length - 1].addCompileNote(notes[i]);
 		}
 		return null;
 	}
@@ -618,11 +622,13 @@ class FunctionChoiceType extends FunctionType {
 
 class ResolvedFunctionType extends FunctionType {
 
+	var _token : Token;
 	var _returnType : Type;
 	var _argTypes : Type[];
 	var _isAssignable : boolean;
 
-	function constructor (returnType : Type, argTypes : Type[], isAssignable : boolean) {
+	function constructor (token : Token, returnType : Type, argTypes : Type[], isAssignable : boolean) {
+		this._token = token;
 		this._returnType = returnType;
 		this._argTypes = argTypes;
 		this._isAssignable = isAssignable;
@@ -649,6 +655,10 @@ class ResolvedFunctionType extends FunctionType {
 		return this._clone().setIsAssignable(true);
 	}
 
+	function getToken() : Token {
+		return this._token;
+	}
+
 	function getReturnType () : Type {
 		return this._returnType;
 	}
@@ -658,17 +668,22 @@ class ResolvedFunctionType extends FunctionType {
 	}
 
 	override function deduceByArgumentTypes (context : AnalysisContext, operatorToken : Token, argTypes : Type[], isStatic : boolean) : ResolvedFunctionType {
-		if (! this._deduceByArgumentTypes(argTypes, isStatic, false)) {
-			context.errors.push(
-				new CompileError(
+		var note = '';
+		if (! this._deduceByArgumentTypes(argTypes, isStatic, false, (msg) -> { note = msg; })) {
+			var error = new CompileError(
 					operatorToken,
-					operatorToken.getValue() == "[" ? "operator [] of type " + argTypes[0].toString() + " is not applicable to " + this.getObjectType.toString() : "no function with matching arguments"));
+					operatorToken.getValue() == "[" ? "operator [] of type " + argTypes[0].toString() + " is not applicable to " + this.getObjectType.toString() : "no function with matching arguments");
+			error.addCompileNote(
+				new CompileNote(
+					(this._token != null) ? this._token : operatorToken,
+					'candidate function not viable: ' + note));
+			context.errors.push(error);
 			return null;
 		}
 		return this;
 	}
 
-	function _deduceByArgumentTypes (argTypes : Type[], isStatic : boolean, exact : boolean) : boolean {
+	function _deduceByArgumentTypes (argTypes : Type[], isStatic : boolean, exact : boolean, cb : (string) -> void) : boolean {
 		var compareArg = function (formal : Type, actual : Type) : boolean {
 			if (formal.equals(actual))
 				return true;
@@ -676,33 +691,50 @@ class ResolvedFunctionType extends FunctionType {
 				return true;
 			return false;
 		};
-		if ((this instanceof StaticFunctionType) != isStatic)
+		if ((this instanceof StaticFunctionType) != isStatic) {
+			cb('unmatched static flags');
 			return false;
+		}
 		if (this._argTypes.length != 0 && this._argTypes[this._argTypes.length - 1] instanceof VariableLengthArgumentType) {
 			var vargType = this._argTypes[this._argTypes.length - 1] as VariableLengthArgumentType;
 			// a vararg function
-			if (argTypes.length < this._argTypes.length - 1)
+			if (argTypes.length < this._argTypes.length - 1) {
+				cb('wrong number of arguments');
 				return false;
+			}
 			for (var i = 0; i < this._argTypes.length - 1; ++i) {
-				if (! compareArg(this._argTypes[i], argTypes[i]))
+				if (! compareArg(this._argTypes[i], argTypes[i])) {
+					cb('no known conversion from ' + argTypes[i].toString() + ' to ' + this._argTypes[i].toString() + ' for ' +
+						((i == 0) ? '1st' : (i == 1) ? '2nd' : (i as string)+'th') + ' argument.');
 					return false;
+				}
 			}
 			if (argTypes[i] instanceof VariableLengthArgumentType && argTypes.length == this._argTypes.length) {
-				if (! compareArg((this._argTypes[i] as VariableLengthArgumentType).getBaseType(), (argTypes[i] as VariableLengthArgumentType).getBaseType()))
+				if (! compareArg((this._argTypes[i] as VariableLengthArgumentType).getBaseType(), (argTypes[i] as VariableLengthArgumentType).getBaseType())) {
+					cb('no known conversion from ' + (argTypes[i] as VariableLengthArgumentType).getBaseType().toString() + ' to ' + (this._argTypes[i] as VariableLengthArgumentType).getBaseType().toString() + ' for ' + ((i == 0) ? '1st' : (i == 1) ? '2nd' : (i as string)+'th') + ' argument.');
 					return false;
+				}
 			} else {
 				for (; i < argTypes.length; ++i) {
-					if (! compareArg(vargType.getBaseType(), argTypes[i]))
+					if (! compareArg(vargType.getBaseType(), argTypes[i])) {
+						cb('no known conversion from ' + argTypes[i].toString() + ' to ' + vargType.getBaseType().toString() + ' for ' +
+							((i == 0) ? '1st' : (i == 1) ? '2nd' : (i as string)+'th') + ' argument.');
 						return false;
+					}
 				}
 			}
 		} else {
 			// non-vararg function
-			if (this._argTypes.length != argTypes.length)
+			if (this._argTypes.length != argTypes.length) {
+				cb('wrong number of arguments');
 				return false;
+			}
 			for (var i = 0; i < argTypes.length; ++i) {
-				if (! compareArg(this._argTypes[i], argTypes[i]))
+				if (! compareArg(this._argTypes[i], argTypes[i])) {
+					cb('no known conversion from ' + argTypes[i].toString() + ' to ' + this._argTypes[i].toString() + ' for ' +
+						((i == 0) ? '1st' : (i == 1) ? '2nd' : (i as string)+'th') + ' argument.');
 					return false;
+				}
 			}
 		}
 		return true;
@@ -753,8 +785,8 @@ class ResolvedFunctionType extends FunctionType {
 
 class StaticFunctionType extends ResolvedFunctionType {
 
-	function constructor (returnType : Type, argTypes : Type[], isAssignable : boolean) {
-		super(returnType, argTypes, isAssignable);
+	function constructor (token : Token, returnType : Type, argTypes : Type[], isAssignable : boolean) {
+		super(token, returnType, argTypes, isAssignable);
 	}
 
 	override function instantiate (instantiationContext : InstantiationContext) : StaticFunctionType {
@@ -765,7 +797,7 @@ class StaticFunctionType extends ResolvedFunctionType {
 		for (var i = 0; i < this._argTypes.length; ++i)
 			if ((argTypes[i] = this._argTypes[i].instantiate(instantiationContext)) == null)
 				return null;
-		return new StaticFunctionType(returnType, argTypes, this._isAssignable);
+		return new StaticFunctionType(this._token, returnType, argTypes, this._isAssignable);
 	}
 
 	override function equals (x : Type) : boolean {
@@ -775,7 +807,7 @@ class StaticFunctionType extends ResolvedFunctionType {
 	}
 
 	override function _clone () : ResolvedFunctionType {
-		return new StaticFunctionType(this._returnType, this._argTypes, this._isAssignable);
+		return new StaticFunctionType(this._token, this._returnType, this._argTypes, this._isAssignable);
 	}
 
 	override function isConvertibleTo (type : Type) : boolean {
@@ -786,7 +818,7 @@ class StaticFunctionType extends ResolvedFunctionType {
 			return false;
 		if (! this._returnType.equals((type as StaticFunctionType).getReturnType()))
 			return false;
-		return this._deduceByArgumentTypes((type as StaticFunctionType).getArgumentTypes(), true, true);
+		return this._deduceByArgumentTypes((type as StaticFunctionType).getArgumentTypes(), true, true, (msg) -> {});
 	}
 
 	override function _toStringPrefix () : string {
@@ -802,8 +834,8 @@ class MemberFunctionType extends ResolvedFunctionType {
 
 	var _objectType : Type;
 
-	function constructor (objectType : Type, returnType : Type, argTypes : Type[], isAssignable : boolean) {
-		super(returnType, argTypes, isAssignable);
+	function constructor (token : Token, objectType : Type, returnType : Type, argTypes : Type[], isAssignable : boolean) {
+		super(token, returnType, argTypes, isAssignable);
 		this._objectType = objectType;
 	}
 
@@ -815,7 +847,7 @@ class MemberFunctionType extends ResolvedFunctionType {
 	}
 
 	override function _clone () : MemberFunctionType {
-		return new MemberFunctionType(this._objectType, this._returnType, this._argTypes, this._isAssignable);
+		return new MemberFunctionType(this._token, this._objectType, this._returnType, this._argTypes, this._isAssignable);
 	}
 
 	override function _toStringPrefix () : string {
