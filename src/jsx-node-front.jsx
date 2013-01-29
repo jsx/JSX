@@ -201,15 +201,14 @@ class NodePlatform extends Platform {
 
 	override function runCompilationServer(arg : variant) : number {
 		var port = arg as int;
-		Service.runServer(this, port);
-		return 0;
+		return CompilationServer.start(this, port);
 	}
 }
 
 /**
  * NodePlatform variation for compiler service (daemon)
  */
-class ServicePlatform extends NodePlatform {
+class CompilationServerPlatform extends NodePlatform {
 	// response contents
 	var _stdout     = "";
 	var _stderr     = "";
@@ -280,26 +279,24 @@ class ServicePlatform extends NodePlatform {
 	}
 }
 
-// run compilation servers
-class Service {
+class CompilationServer {
 	static var _requestSequence = 0;
 
-	static function runServer(platform : Platform, port : int) : void {
+	static function start(platform : Platform, port : int) : number {
 		var httpd = node.http.createServer(function (request, response) {
-			Service.handleRequest(platform, request, response);
+			CompilationServer.handleRequest(platform, request, response);
 		});
 		httpd.listen(port);
 		console.info("access http://localhost:" + port as string + "/");
+		return 0;
 	}
 
 	static function handleRequest(platform : Platform, request : ServerRequest, response : ServerResponse) : void {
-		var id = ++Service._requestSequence;
-		var c = new ServicePlatform(platform.getRoot(), id, request, response);
+		var id = ++CompilationServer._requestSequence;
 
 		if (request.method == "GET") {
-			// FIXME: define some API path (i.e. /version)
-			c.setStatusCode(0);
-			Service.finishRequest(response, 200, {
+			// TODO: dispath some API path (i.e. /version)
+			CompilationServer.finishRequest(response, 200, {
 				version_string   : Meta.VERSION_STRING,
 				version_number   : Meta.VERSION_NUMBER,
 				last_commit_hash : Meta.LAST_COMMIT_HASH,
@@ -308,6 +305,8 @@ class Service {
 			} : variant);
 			return;
 		}
+
+		var c = new CompilationServerPlatform(platform.getRoot(), id, request, response);
 
 		// POST: do the same as jsx(1)
 
@@ -330,7 +329,7 @@ class Service {
 				c.error(e.toString());
 			}
 
-			Service.finishRequest(response, 200, c.getContents());
+			CompilationServer.finishRequest(response, 200, c.getContents());
 
 			var now     = new Date();
 			var elapsed = now.getTime() - startTime.getTime();
@@ -338,7 +337,7 @@ class Service {
 		});
 		request.on("close", function () {
 			c.error("the connecion is unexpectedly closed.\n");
-			Service.finishRequest(response, 500, c.getContents());
+			CompilationServer.finishRequest(response, 500, c.getContents());
 		});
 	}
 
