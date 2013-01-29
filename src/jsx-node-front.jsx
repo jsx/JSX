@@ -332,7 +332,7 @@ class CompilationServer {
 			}
 			catch (e : Error) {
 				console.error("%s#%s %s", startTime, id, e);
-				c.error(e.toString());
+				c.error((e as variant)["stack"] as string); // Error#stack
 			}
 
 			CompilationServer.finishRequest(response, 200, c.getContents());

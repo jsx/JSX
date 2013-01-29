@@ -26,7 +26,7 @@ use constant ROOT => abs_path(dirname(__FILE__));
 
 use File::Path     qw(rmtree mkpath);
 use File::Copy     qw(move copy);
-use Fatal          qw(open close exec kill);
+use Fatal          qw(open close kill);
 use File::Find     qw(find);
 use Fcntl          qw(S_ISDIR);
 use File::stat     qw(stat);

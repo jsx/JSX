@@ -1,21 +1,9 @@
 #!/usr/bin/env perl
 use strict;
 use warnings;
-use Test::More;
-
 use tool::Util;
 
-BEGIN { # XXX older version of Test::More has no note()
-    if(not defined &note) {
-        if(-t STDOUT || $ENV{TEST_VERBOSE}) {
-            *note = \&diag;
-        }
-        else {
-            *note = sub { };
-        }
-    }
-}
-
+use Test::More 0.88;
 
 main(@ARGV);
 exit;

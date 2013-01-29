@@ -22,8 +22,3 @@ npm-debug.log
 package/
 jsx-*.tgz
 
-# architecture dependent files
-
-darwin-*
-linux-*
-
