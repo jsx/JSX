@@ -1,4 +1,4 @@
-package t::util::Util;
+package tool::Util;
 use 5.10.0;
 use strict;
 use warnings;
@@ -9,7 +9,7 @@ use lib File::Basename::dirname(__FILE__) . "/../../extlib/lib/perl5";
 use base qw(Exporter);
 our @EXPORT = qw(slurp get_section jsx);
 
-my $jsx_server_port = $ENV{JSX_COMPILATION_SERVER_PORT};
+our $jsx_server_port = $ENV{JSX_COMPILATION_SERVER_PORT};
 
 sub _system { # system() which returns (status code, stdout, stderr)
     my(@args) = @_;
@@ -49,8 +49,7 @@ sub jsx { # returns (status, stdout, stderr)
         });
 
         if (!( $res->{success} && $res->{headers}{'content-type'} eq 'application/json')) {
-            use Data::Dumper; print Dumper $res;
-            return 1;
+            return (1, '', Data::Dumper::Dumper($res));
         }
 
         my $c = JSON::decode_json($res->{content});

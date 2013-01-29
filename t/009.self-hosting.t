@@ -3,7 +3,6 @@ use strict;
 use warnings;
 use File::Temp qw(tempdir);
 use File::Copy qw(copy);
-use t::util::Util qw(slurp);
 
 use Test::More tests => 3;
 {

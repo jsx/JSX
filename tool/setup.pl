@@ -11,6 +11,8 @@ my @modules = qw(
     String::ShellQuote
     HTTP::Tiny
     JSON
+    Test::TCP
+    Proc::Guard
     Data::Difflet
 );
 

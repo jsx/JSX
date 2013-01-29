@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Test::More;
 
-use t::util::Util;
+use tool::Util;
 
 BEGIN { # XXX older version of Test::More has no note()
     if(not defined &note) {
