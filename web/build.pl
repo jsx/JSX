@@ -38,24 +38,7 @@ use File::Spec     qw();
 
 our $g = info("build JSX web interface");
 
-our $server_guard;
-
-if (! $ENV{JSX_COMPILATION_SERVER_PORT}) {
-    # hack to boot compilation server
-    my $p = $tool::Util::jsx_server_port = Test::TCP::empty_port();
-    $server_guard = Proc::Guard->new(
-        code => sub {
-         open STDOUT, ">", File::Spec->devnull;
-         exec ROOT . "/../bin/jsx", "--compilation-server", $p
-            or die $!;
-         },
-    );
-
-    # wait for running compilation server
-    until (eval { my($ok, $stdout, $stderr) = jsx("--version"); $ok }) {
-        Time::HiRes::sleep(0.1);
-    }
-}
+require tool::RunCompilationServer;
 
 my $clean = (grep { $_ eq "--clean" } @ARGV); # clean build
 
