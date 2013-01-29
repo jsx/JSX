@@ -2,6 +2,7 @@ package tool::Util;
 use 5.10.0;
 use strict;
 use warnings;
+use Fatal qw(open close);
 
 use File::Basename ();
 use lib File::Basename::dirname(__FILE__) . "/../extlib/lib/perl5";
@@ -49,7 +50,7 @@ sub jsx { # returns (status, stdout, stderr)
         });
 
         if (!( $res->{success} && $res->{headers}{'content-type'} eq 'application/json')) {
-            return (1, '', Data::Dumper::Dumper($res));
+            return (0, '', Data::Dumper::Dumper($res));
         }
 
         my $c = JSON::decode_json($res->{content});
@@ -62,6 +63,11 @@ sub jsx { # returns (status, stdout, stderr)
             $file->close();
             my $scriptArgs = $c->{run}{scriptArgs};
             return _system($js, $file->filename, @{$scriptArgs});
+        }
+        for my $filename(keys %{$c->{file}}) {
+            open my $fh, ">", $filename;
+            print $fh $c->{file}{$filename};
+            close $fh;
         }
         return ($c->{statusCode} == 0, $c->{stdout}, $c->{stderr});
     }
