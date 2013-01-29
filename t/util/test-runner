@@ -1,5 +1,4 @@
 #!/usr/bin/env perl
-use 5.10.0;
 use strict;
 use warnings;
 use Test::More;
@@ -136,7 +135,7 @@ sub compile_and_run {
     defined(my $expected = get_section($file, "EXPECTED"))
         or die "could not find EXPECTED in file:$file\n";
 
-    $opts //= "";
+    $opts ||= "";
 
     # compile (FIXME support C++)
     my($ok, $src, $logs) = jsx("$opts $file");

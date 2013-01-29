@@ -14,7 +14,6 @@ build try/ directry for the web site
 
 =cut
 
-use 5.10.0;
 use strict;
 use warnings;
 use warnings FATAL => qw(uninitialized recursion);
@@ -207,7 +206,7 @@ sub process_tree {
                 my $dir = \%tree;
                 while(@parts) {
                     my $d = shift @parts;
-                    $dir = $dir->{$d} //= {};
+                    $dir = $dir->{$d} ||= {};
                 }
                 $dir->{$basename} = $f;
             },
