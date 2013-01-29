@@ -39,7 +39,7 @@ $new_content .= <<'EOT';
 } // class Meta
 EOT
 
-if ($new_content ne slurp($output_file)) {
+if ($new_content ne eval { slurp($output_file) // "" }) {
     open my($out), ">", $output_file;
     print $out $new_content;
     close $out;
