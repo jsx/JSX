@@ -240,7 +240,13 @@ class CompilationServerPlatform extends NodePlatform {
 		}
 	}
 
-	override function error (message : string) : void {
+	override function log(message : string) : void {
+		this._stdout += message + "\n";
+	}
+	override function warn(message : string) : void {
+		this._stderr += message + "\n";
+	}
+	override function error(message : string) : void {
 		this._stderr += message + "\n";
 	}
 

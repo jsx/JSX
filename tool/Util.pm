@@ -1,7 +1,7 @@
 package tool::Util;
-use 5.10.0;
 use strict;
 use warnings;
+use warnings FATAL => qw(uninitialized);
 use Fatal qw(open close);
 
 use File::Basename ();
@@ -29,6 +29,8 @@ sub _system { # system() which returns (status code, stdout, stderr)
     return ($? == 0, $stdout, $stderr);
 }
 
+our $ua;
+
 sub jsx { # returns (status, stdout, stderr)
     my(@args) = @_;
 
@@ -40,7 +42,7 @@ sub jsx { # returns (status, stdout, stderr)
         require HTTP::Tiny;
         require JSON;
 
-        state $ua = HTTP::Tiny->new(
+        $ua ||= HTTP::Tiny->new(
             agent => "JSX compiler client",
         );
 
@@ -50,11 +52,17 @@ sub jsx { # returns (status, stdout, stderr)
         });
 
         if (!( $res->{success} && $res->{headers}{'content-type'} eq 'application/json')) {
+            require Data::Dumper;
             return (0, '', Data::Dumper::Dumper($res));
         }
 
         my $c = JSON::decode_json($res->{content});
 
+        for my $filename(keys %{$c->{file}}) {
+            open my $fh, ">", $filename;
+            print $fh $c->{file}{$filename};
+            close $fh;
+        }
         if ($c->{run}) {
             require File::Temp;
             my $js = $ENV{JSX_RUNJS} || "node";
@@ -63,11 +71,6 @@ sub jsx { # returns (status, stdout, stderr)
             $file->close();
             my $scriptArgs = $c->{run}{scriptArgs};
             return _system($js, $file->filename, @{$scriptArgs});
-        }
-        for my $filename(keys %{$c->{file}}) {
-            open my $fh, ">", $filename;
-            print $fh $c->{file}{$filename};
-            close $fh;
         }
         return ($c->{statusCode} == 0, $c->{stdout}, $c->{stderr});
     }
