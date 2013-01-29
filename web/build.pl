@@ -228,14 +228,13 @@ sub process_source_map {
 
     copy_r($src, $dest);
 
-    my $old_cwd = Cwd::cwd();
-    chdir "$project_root/example";
-    foreach my $jsx_file(glob("*.jsx")) {
+    foreach my $jsx_file(glob("$project_root/example/*.jsx")) {
         next if not modified($jsx_file, "$dest/$jsx_file");
 
         my $g = info "compile $jsx_file with --enable-source-map";
 
         my($ok, $stdout, $stderr) = jsx(
+            #"--input-filename", basename($jsx_file),
             "--executable", "web",
             "--enable-source-map",
             "--output", "$jsx_file.js",
@@ -249,7 +248,7 @@ sub process_source_map {
         my $st = stat($jsx_file);
         utime $st->atime, $st->mtime, "$dest/$jsx_file";
     }
-    chdir $old_cwd;
+    return;
 }
 
 sub modified {
