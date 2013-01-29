@@ -1,5 +1,12 @@
 Revision history for the JSX software development kit
 
+NEXT
+    [FEATURES]
+    - The "dce" optimization command can remove "if" statements
+      when they has static conditions (#95)
+    - Compile errors shows notes when no function with matching arguments
+      are found (#96).
+
 0.9.0 2013-01-26 00:13:42
     [CHANGES]
     - Ported JSX compiler from JavaScript to JSX (i.e. self-hosting)
