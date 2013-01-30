@@ -27,7 +27,6 @@ import "./statement.jsx";
 import "./type.jsx";
 import "./util.jsx";
 import "./compiler.jsx";
-import "console.jsx";
 
 abstract class OptimizerStash {
 	abstract function clone () : OptimizerStash;
