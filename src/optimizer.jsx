@@ -785,27 +785,6 @@ class _UnclassifyOptimizationCommand extends _OptimizeCommand {
 				}
 			return true;
 		});
-		// mark constructors that are inlineable
-		for (var candidateIndex = candidates.length - 1; candidateIndex >= 0; --candidateIndex) {
-			var hasInlineableCtor = false;
-			candidates[candidateIndex].forEachMemberFunction(function (funcDef) {
-				if ((funcDef.flags() & ClassDefinition.IS_STATIC) == 0 && funcDef.name() == "constructor") {
-					var inliner = this._createInliner(funcDef);
-					this.log(funcDef.getClassDef().className() + "#constructor(" + funcDef.getArgumentTypes().map.<string>(function (arg) { return ":" + arg.toString(); }).join(",") + ") is" + (inliner ? "" : " not") + " inlineable");
-					if (inliner) {
-						(this.getStash(funcDef) as _UnclassifyOptimizationCommandStash).inliner = inliner;
-						hasInlineableCtor = true;
-					}
-				}
-				return true;
-			});
-			if (! hasInlineableCtor) {
-				candidates.splice(candidateIndex, 1);
-			}
-		}
-		if (candidates.length == 0) {
-			return candidates;
-		}
 		// check that the class is not referred to by: instanceof
 		this.getCompiler().forEachClassDef(function (parser : Parser, classDef : ClassDefinition) : boolean {
 			if (candidates.length == 0) {
@@ -841,6 +820,27 @@ class _UnclassifyOptimizationCommand extends _OptimizeCommand {
 			});
 			return true;
 		});
+		// mark constructors that are inlineable
+		for (var candidateIndex = candidates.length - 1; candidateIndex >= 0; --candidateIndex) {
+			var hasInlineableCtor = false;
+			candidates[candidateIndex].forEachMemberFunction(function (funcDef) {
+				if ((funcDef.flags() & ClassDefinition.IS_STATIC) == 0 && funcDef.name() == "constructor") {
+					var inliner = this._createInliner(funcDef);
+					this.log(funcDef.getClassDef().className() + "#constructor(" + funcDef.getArgumentTypes().map.<string>(function (arg) { return ":" + arg.toString(); }).join(",") + ") is" + (inliner ? "" : " not") + " inlineable");
+					if (inliner) {
+						(this.getStash(funcDef) as _UnclassifyOptimizationCommandStash).inliner = inliner;
+						hasInlineableCtor = true;
+					}
+				}
+				return true;
+			});
+			if (! hasInlineableCtor) {
+				candidates.splice(candidateIndex, 1);
+			}
+		}
+		if (candidates.length == 0) {
+			return candidates;
+		}
 		return candidates;
 	}
 
