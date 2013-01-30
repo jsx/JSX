@@ -9,6 +9,8 @@ NEXT
       when they has static conditions (#95)
     - Compile errors shows notes when no function with matching arguments
       are found (#96).
+    - Added JSX.DEBUG and "no-debug" optimization command to controll
+      debugging statements.
 
     [BUG FIXES]
     - "unclassify" optimization might have broken generated code
