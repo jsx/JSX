@@ -30,11 +30,7 @@ import "console.jsx";
 
 abstract class Statement implements Stashable {
 
-	var _optimizerStash : Map.<OptimizerStash>;
-
 	function constructor () {
-		// FIXME clone the stash the right way
-		this._optimizerStash = new Map.<OptimizerStash>;
 	}
 
 	// returns whether or not to continue analysing the following statements
@@ -83,10 +79,6 @@ abstract class Statement implements Stashable {
 			context.statement = null;
 		}
 		return result;
-	}
-
-	override function getOptimizerStash () : Map.<OptimizerStash> {
-		return this._optimizerStash;
 	}
 
 	static function assertIsReachable (context : AnalysisContext, token : Token) : boolean {

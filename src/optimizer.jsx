@@ -33,8 +33,12 @@ abstract class OptimizerStash {
 	abstract function clone () : OptimizerStash;
 }
 
-interface Stashable {
-	function getOptimizerStash () : variant;
+mixin Stashable {
+	var _optimizerStash = new Map.<OptimizerStash>;
+
+	function getOptimizerStash () : Map.<OptimizerStash> {
+		return this._optimizerStash;
+	}
 }
 
 class _Util {
@@ -226,6 +230,8 @@ class Optimizer {
 				this._commands.push(new _NoAssertCommand());
 			} else if (cmd == "no-log") {
 				this._commands.push(new _NoLogCommand());
+			} else if (cmd == "no-debug") {
+				this._commands.push(new _NoDebugCommand());
 			} else if (cmd == "unclassify") {
 				this._commands.push(new _UnclassifyOptimizationCommand());
 				calleesAreDetermined = false;
@@ -2871,4 +2877,52 @@ class _ArrayLengthOptimizeCommand extends _FunctionOptimizeCommand {
 		return (classDef as InstantiatedClassDefinition).getTemplateClassName() == "Array";
 	}
 
+}
+
+class _NoDebugCommandStash extends OptimizerStash {
+	var debugValue = true;
+
+	override function clone () : OptimizerStash {
+		var tmp = new _NoDebugCommandStash;
+		tmp.debugValue = this.debugValue;
+		return tmp;
+	}
+}
+
+/**
+ * Set JSX.DEBUG = false, where `if (JSX.DEBUG) { ... }` blocks will be
+ * removed by "dce" optimization command.
+ */
+class _NoDebugCommand extends _OptimizeCommand {
+
+	function constructor() {
+		super("no-debug");
+	}
+
+	override function _createStash () : OptimizerStash {
+		return new _NoDebugCommandStash();
+	}
+
+	override function performOptimization () : void {
+		var stash = this.getStash(this.getCompiler().getEmitter()) as _NoDebugCommandStash;
+		stash.debugValue = false;
+
+		this.getCompiler().forEachClassDef(function (parser, classDef) {
+			if (classDef.className() == "JSX") {
+				classDef.forEachMemberVariable(function (memberVariable) {
+					if (memberVariable.name() == "DEBUG"
+							&& (memberVariable.flags() & ClassDefinition.IS_STATIC) != 0) {
+
+						this.log("set JSX.DEBUG = " + stash.debugValue as  string);
+						var falseExpr = new BooleanLiteralExpression(new Token(stash.debugValue as string, false));
+						memberVariable.setInitialValue(falseExpr);
+						return false;
+					}
+					return true;
+				});
+				return false;
+			}
+			return true;
+		});
+	}
 }

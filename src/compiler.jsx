@@ -77,6 +77,10 @@ class Compiler {
 		return this;
 	}
 
+	function getEmitter () : Emitter {
+		return this._emitter;
+	}
+
 	function setEmitter (emitter : Emitter) : void {
 		this._emitter = emitter;
 	}

@@ -31,7 +31,8 @@ import "./util.jsx";
 import "./optimizer.jsx";
 import "./parser.jsx";
 import "./platform.jsx";
-import _UnclassifyOptimizationCommandStash from "./optimizer.jsx";
+import _UnclassifyOptimizationCommandStash,
+	   _NoDebugCommandStash from "./optimizer.jsx";
 
 class _Util {
 
@@ -2083,7 +2084,8 @@ class JavaScriptEmitter implements Emitter {
 	override function emit (classDefs : ClassDefinition[]) : void {
 		var bootstrap = this._platform.load(this._platform.getRoot() + "/src/js/bootstrap.js");
 		this._output += bootstrap;
-		this._emit("JSX.DEBUG = true;\n", null);
+		var stash = (this.getOptimizerStash()["no-debug"] as _NoDebugCommandStash);
+		this._emit("JSX.DEBUG = "+(stash == null || stash.debugValue ? "true" : "false")+";\n", null);
 
 		for (var i = 0; i < classDefs.length; ++i) {
 			classDefs[i].forEachMemberFunction(function onFuncDef(funcDef : MemberFunctionDefinition) : boolean {

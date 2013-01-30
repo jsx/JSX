@@ -160,7 +160,6 @@ class ClassDefinition implements Stashable {
 	var _members		: MemberDefinition[];
 	var _objectTypesUsed	: ParsedObjectType[];
 	var _docComment		: DocComment;
-	var _optimizerStash	: Map.<OptimizerStash>;
 
 	var _baseClassDef : ClassDefinition = null;
 
@@ -175,7 +174,6 @@ class ClassDefinition implements Stashable {
 		this._members = members;
 		this._objectTypesUsed = objectTypesUsed;
 		this._docComment = docComment;
-		this._optimizerStash = new Map.<OptimizerStash>;
 		for (var i = 0; i < this._members.length; ++i) {
 			this._members[i].setClassDef(this);
 			if (this._members[i] instanceof MemberFunctionDefinition) {
@@ -784,10 +782,6 @@ class ClassDefinition implements Stashable {
 		return ! hasCtorWithArgs;
 	}
 
-	override function getOptimizerStash () : Map.<OptimizerStash> {
-		return this._optimizerStash;
-	}
-
 	static function membersAreEqual (x : MemberDefinition, y : MemberDefinition) : boolean {
 		if (x.name() != y.name())
 			return false;
@@ -813,7 +807,6 @@ abstract class MemberDefinition implements Stashable {
 	var _flags : number;
 	var _docComment : DocComment;
 	var _classDef : ClassDefinition;
-	var _optimizerStash : Map.<OptimizerStash>;
 
 	function constructor (token : Token, nameToken : Token, flags : number, docComment : DocComment) {
 		this._token = token;
@@ -821,7 +814,6 @@ abstract class MemberDefinition implements Stashable {
 		this._flags = flags;
 		this._docComment = docComment;
 		this._classDef = null;
-		this._optimizerStash = new Map.<OptimizerStash>;
 	}
 
 	abstract function serialize () : variant;
@@ -865,10 +857,6 @@ abstract class MemberDefinition implements Stashable {
 
 	function setClassDef (classDef : ClassDefinition) : void {
 		this._classDef = classDef;
-	}
-
-	override function getOptimizerStash () : Map.<OptimizerStash> {
-		return this._optimizerStash;
 	}
 
 }
