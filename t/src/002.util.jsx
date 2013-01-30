@@ -54,5 +54,21 @@ class _Test extends TestCase {
 		this.expect(Util.resolvePath("/a/../../c")).toBe("/c");
 	}
 
+	function testToOrdinal() : void {
+		this.expect(Util.toOrdinal(1)).toBe("1st");
+		this.expect(Util.toOrdinal(2)).toBe("2nd");
+		this.expect(Util.toOrdinal(3)).toBe("3rd");
+		this.expect(Util.toOrdinal(4)).toBe("4th");
+
+		this.expect(Util.toOrdinal(10)).toBe("10th");
+		this.expect(Util.toOrdinal(11)).toBe("11th");
+		this.expect(Util.toOrdinal(12)).toBe("12th");
+		this.expect(Util.toOrdinal(13)).toBe("13th");
+
+		this.expect(Util.toOrdinal(20)).toBe("20th");
+		this.expect(Util.toOrdinal(21)).toBe("21st");
+		this.expect(Util.toOrdinal(22)).toBe("22nd");
+		this.expect(Util.toOrdinal(23)).toBe("23rd");
+	}
 }
 
