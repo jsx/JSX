@@ -15,6 +15,8 @@ my @modules = qw(
     Proc::Guard
     Data::Difflet
     File::Which
+    App::Prove
+    Test::More
 );
 
 my $dir= DIR;
