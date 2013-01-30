@@ -2,6 +2,7 @@
 true
 */
 /*JSX_OPTS
+--optimize fold-const
 */
 
 class _Main {
