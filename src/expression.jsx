@@ -111,10 +111,6 @@ abstract class Expression implements Stashable {
 		return false;
 	}
 
-	override function getOptimizerStash () : Map.<OptimizerStash> {
-		return this._optimizerStash;
-	}
-
 	static function assertIsAssignable (context : AnalysisContext, token : Token, lhsType : Type, rhsType : Type) : boolean {
 		if (! lhsType.isAssignable()) {
 			context.errors.push(new CompileError(token, "left-hand-side expression is not assignable"));
