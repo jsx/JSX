@@ -1,16 +1,16 @@
 /*
  * Copyright (c) 2012 DeNA Co., Ltd.
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to
  * deal in the Software without restriction, including without limitation the
  * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
  * sell copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -330,7 +330,7 @@ class VariantType extends Type {
 // Nullable
 class NullableType extends Type {
 
-	var _baseType : Type; 
+	var _baseType : Type;
 
 	function constructor (type : Type) {
 		if (type.equals(Type.variantType))
@@ -704,21 +704,19 @@ class ResolvedFunctionType extends FunctionType {
 			}
 			for (var i = 0; i < this._argTypes.length - 1; ++i) {
 				if (! compareArg(this._argTypes[i], argTypes[i])) {
-					cb('no known conversion from ' + argTypes[i].toString() + ' to ' + this._argTypes[i].toString() + ' for ' +
-						((i == 0) ? '1st' : (i == 1) ? '2nd' : (i as string)+'th') + ' argument.');
+					cb(Util.format('no known conversion from %1 to %2 for %3 argument.', [ argTypes[i].toString(), this._argTypes[i].toString(), Util.toOrdinal(i+1) ]));
 					return false;
 				}
 			}
 			if (argTypes[i] instanceof VariableLengthArgumentType && argTypes.length == this._argTypes.length) {
 				if (! compareArg((this._argTypes[i] as VariableLengthArgumentType).getBaseType(), (argTypes[i] as VariableLengthArgumentType).getBaseType())) {
-					cb('no known conversion from ' + (argTypes[i] as VariableLengthArgumentType).getBaseType().toString() + ' to ' + (this._argTypes[i] as VariableLengthArgumentType).getBaseType().toString() + ' for ' + ((i == 0) ? '1st' : (i == 1) ? '2nd' : (i as string)+'th') + ' argument.');
+					cb(Util.format('no known conversion from %1 to %2 for %3 argument.', [ (argTypes[i] as VariableLengthArgumentType).getBaseType().toString(), (this._argTypes[i] as VariableLengthArgumentType).getBaseType().toString(), Util.toOrdinal(i+1) ]));
 					return false;
 				}
 			} else {
 				for (; i < argTypes.length; ++i) {
 					if (! compareArg(vargType.getBaseType(), argTypes[i])) {
-						cb('no known conversion from ' + argTypes[i].toString() + ' to ' + vargType.getBaseType().toString() + ' for ' +
-							((i == 0) ? '1st' : (i == 1) ? '2nd' : (i as string)+'th') + ' argument.');
+						cb(Util.format('no known conversion from %1 to %2 for %3 argument.', [ argTypes[i].toString(), vargType.getBaseType().toString(), Util.toOrdinal(i+1) ]));
 						return false;
 					}
 				}
@@ -731,8 +729,7 @@ class ResolvedFunctionType extends FunctionType {
 			}
 			for (var i = 0; i < argTypes.length; ++i) {
 				if (! compareArg(this._argTypes[i], argTypes[i])) {
-					cb('no known conversion from ' + argTypes[i].toString() + ' to ' + this._argTypes[i].toString() + ' for ' +
-						((i == 0) ? '1st' : (i == 1) ? '2nd' : (i as string)+'th') + ' argument.');
+					cb(Util.format('no known conversion from %1 to %2 for %3 argument.', [ argTypes[i].toString(), this._argTypes[i].toString(), Util.toOrdinal(i+1) ]));
 					return false;
 				}
 			}
@@ -762,7 +759,7 @@ class ResolvedFunctionType extends FunctionType {
 		});
 		if (hasCallback)
 			expected.push(callbackArgTypes);
-		
+
 	}
 
 	override function toString () : string {

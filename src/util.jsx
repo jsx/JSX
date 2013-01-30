@@ -247,6 +247,17 @@ class Util {
 		return tokens.join("/");
 	}
 
+	static function toOrdinal(n : number) : string {
+		if (10 < n && n < 14) {
+			return n as string + 'th';
+		}
+		switch (n % 10) {
+			case 1:  return n as string + 'st';
+			case 2:  return n as string + 'nd';
+			case 3:  return n as string + 'rd';
+			default: return n as string + 'th';
+		}
+	}
 }
 
 class Tuple.<T,U> {
@@ -505,7 +516,7 @@ class CompileNote extends CompileIssue {
 	override function getPrefix () : string {
 		return "Note: ";
 	}
-	
+
 }
 
 // vim: set noexpandtab:
