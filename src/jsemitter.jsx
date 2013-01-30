@@ -2083,6 +2083,8 @@ class JavaScriptEmitter implements Emitter {
 	override function emit (classDefs : ClassDefinition[]) : void {
 		var bootstrap = this._platform.load(this._platform.getRoot() + "/src/js/bootstrap.js");
 		this._output += bootstrap;
+		this._emit("JSX.DEBUG = true;\n", null);
+
 		for (var i = 0; i < classDefs.length; ++i) {
 			classDefs[i].forEachMemberFunction(function onFuncDef(funcDef : MemberFunctionDefinition) : boolean {
 				funcDef.forEachClosure(onFuncDef);
