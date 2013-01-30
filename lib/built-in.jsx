@@ -995,6 +995,12 @@ native final class JSX {
 	delete function constructor();
 
 	/**
+	 * Flags which is disabled by --disable-debug.
+	 * This is intended to remove debugging statements on release build.
+	 */
+	static const DEBUG = true;
+
+	/**
 	 * Returns whether or not the profiler is running.
 	 */
 	static function profilerIsRunning() : boolean;

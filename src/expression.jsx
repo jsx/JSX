@@ -31,16 +31,13 @@ import "./optimizer.jsx";
 abstract class Expression implements Stashable {
 
 	var _token : Token;
-	var _optimizerStash : Map.<OptimizerStash>;
 
 	function constructor (token : Token) {
 		this._token = token;
-		this._optimizerStash = new Map.<OptimizerStash>;
 	}
 
 	function constructor (that : Expression) {
 		this._token = that.getToken();
-		this._optimizerStash = new Map.<OptimizerStash>;
 		for (var k in that._optimizerStash)
 			this._optimizerStash[k] = that._optimizerStash[k].clone();
 	}
