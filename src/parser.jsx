@@ -773,6 +773,12 @@ class Parser {
 			}
 			return false;
 		}
+
+		if (this._arguments == null) {
+			this._newError(Util.format("cannot declare variable %1 outside of a function", [identifierToken.getValue()])); // FIXME should we allow this?
+			return null;
+		}
+
 		for (var i = 0; i < this._arguments.length; ++i) {
 			if (isEqualTo(this._arguments[i])) {
 				return this._arguments[i];

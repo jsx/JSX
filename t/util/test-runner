@@ -210,12 +210,16 @@ sub optimize_and_compare {
 sub expect_compile_error {
     my($file) = @_;
 
-    plan tests => 2;
+    plan tests => 4;
 
     my($ok, $stdout, $stderr) = jsx($file);
     ok !$ok, "failed to compile $file";
     unlike $stderr, qr/^ \s+ \b at \b \s+ \b Module \b/xms,
         "... without compiler crash";
+    unlike $stderr, qr/\b assertion \s+ failure \b/xms,
+        "... without assertion failure";
+    unlike $stderr, qr/^ TypeError:/xms,
+        "... without TypeError";
     note $stderr;
 }
 
