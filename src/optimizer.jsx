@@ -2515,7 +2515,7 @@ class _UnboxOptimizeCommand extends _FunctionOptimizeCommand {
 		}
 		var locals = funcDef.getLocals();
 		// check all the locals that exist _now_, and remove ones that have been optimized
-		for (var i = 0, iMax = locals.length; i < locals.length;) {
+		for (var i = 0, iMax = locals.length; i < iMax;) {
 			if (this._optimizeLocal(funcDef, locals[i])) {
 				locals.splice(i, 1);
 			} else {
