@@ -1416,15 +1416,14 @@ class _DeadCodeEliminationOptimizeCommand extends _FunctionOptimizeCommand {
 		// rewrite the locals
 		var onExpr = function (expr : Expression, replaceCb : function(:Expression):void) : boolean {
 			if (expr instanceof AssignmentExpression) {
-				if ((expr as AssignmentExpression).getFirstExpr() instanceof LocalExpression) {
-					onExpr((expr as AssignmentExpression).getSecondExpr(), function (assignExpr : AssignmentExpression) : function(:Expression):void{
-						return function (expr) {
-							assignExpr.setSecondExpr(expr);
-						};
-					}(expr as AssignmentExpression));
-					if (! localsUntouchable.get(((expr as AssignmentExpression).getFirstExpr() as LocalExpression).getLocal())
-						&& ((expr as AssignmentExpression).getFirstExpr() as LocalExpression).getType().equals((expr as AssignmentExpression).getSecondExpr().getType())) {
-							var lhsLocal = ((expr as AssignmentExpression).getFirstExpr() as LocalExpression).getLocal();
+				var assignmentExpr = expr as AssignmentExpression;
+				if (assignmentExpr.getFirstExpr() instanceof LocalExpression) {
+					onExpr(assignmentExpr.getSecondExpr(), function (expr) {
+						assignmentExpr.setSecondExpr(expr);
+					});
+					if (! localsUntouchable.get((assignmentExpr.getFirstExpr() as LocalExpression).getLocal())
+						&& (assignmentExpr.getFirstExpr() as LocalExpression).getType().equals(assignmentExpr.getSecondExpr().getType())) {
+							var lhsLocal = (assignmentExpr.getFirstExpr() as LocalExpression).getLocal();
 							this.log("resetting cache for: " + lhsLocal.getName().getValue());
 							locals.reversedForEach(function(local, expr) {
 								if (local == lhsLocal) {
@@ -1436,8 +1435,8 @@ class _DeadCodeEliminationOptimizeCommand extends _FunctionOptimizeCommand {
 								}
 								return true;
 							});
-							if ((expr as AssignmentExpression).getToken().getValue() == "=") {
-								var rhsExpr = (expr as AssignmentExpression).getSecondExpr();
+							if (assignmentExpr.getToken().getValue() == "=") {
+								var rhsExpr = assignmentExpr.getSecondExpr();
 								if (rhsExpr instanceof LocalExpression) {
 									var rhsLocal = (rhsExpr as LocalExpression).getLocal();
 									if (lhsLocal != rhsLocal && ! localsUntouchable.get(rhsLocal)) {
