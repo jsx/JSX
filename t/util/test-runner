@@ -280,7 +280,8 @@ sub run_test {
 sub run_web_test {
     my($file) = @_;
 
-    my $phantomjs = `which phantomjs`;
+    require File::Which;
+    my $phantomjs = File::Which::which("phantomjs");
     if (! $phantomjs ) {
         local $TODO = "no phantomjs(1)";
         fail $file;

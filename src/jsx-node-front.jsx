@@ -62,11 +62,10 @@ class NodePlatform extends Platform {
 		}
 		try {
 			node.fs.statSync(name);
-			return true;
 		} catch (e : Error) {
 			return false;
 		}
-		return false;	// dummy
+		return true;
 	}
 
 	override function getFilesInDirectory (path : string) : string[] {

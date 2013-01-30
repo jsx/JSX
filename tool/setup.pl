@@ -14,6 +14,7 @@ my @modules = qw(
     Test::TCP
     Proc::Guard
     Data::Difflet
+    File::Which
 );
 
 my $dir= DIR;

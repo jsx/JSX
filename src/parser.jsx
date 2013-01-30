@@ -517,10 +517,10 @@ class Scope {
 	var statements : Statement[];
 	var closures : MemberFunctionDefinition[];
 
-	function constructor (prev : Scope, locals : LocalVariable[], arguments : ArgumentDeclaration[], statements : Statement[], closures : MemberFunctionDefinition[]) {
+	function constructor (prev : Scope, locals : LocalVariable[], args : ArgumentDeclaration[], statements : Statement[], closures : MemberFunctionDefinition[]) {
 		this.prev = prev;
 		this.locals = locals;
-		this.arguments = arguments;
+		this.arguments = args;
 		this.statements = statements;
 		this.closures = closures;
 	}
