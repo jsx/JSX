@@ -1,11 +1,21 @@
 Revision history for the JSX software development kit
 
 NEXT
+    [CHANGES]
+    - Installed jsx(1) is now compiled with --release
+
     [FEATURES]
     - The "dce" optimization command can remove "if" statements
       when they has static conditions (#95)
     - Compile errors shows notes when no function with matching arguments
       are found (#96).
+
+    [BUG FIXES]
+    - "unclassify" optimization might have broken generated code
+      (671312aaaed22b38e59d20f6eb5b977d32d79d4b)
+    - named function exprs outside of function caused compiler crash
+      (823d4e5142feee92e95e2d0913c5b6c22be27665)
+
 
 0.9.0 2013-01-26 00:13:42
     [CHANGES]
