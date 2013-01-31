@@ -5,7 +5,7 @@ JOBS:=4
 
 OPTIMIZE_FLAGS := lto,no-assert,fold-const,return-if,inline,dce,unbox,fold-const,lcse,dce,fold-const,array-length,unclassify
 
-setup: compiler doc web
+all: compiler doc web
 
 ## compiler stuff
 
@@ -55,6 +55,10 @@ web.jsx:
 	idl2jsx/build.pl
 	idl2jsx/maketest.pl > t/lib/010.web.jsx
 	bin/jsx --test t/lib/010.web.jsx
+
+
+show-todo:
+	find t -name '*.todo.*' | grep -v '*~'
 
 update-assets: update-bootstrap update-codemirror
 
