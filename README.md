@@ -10,17 +10,6 @@ The JSX compiler toolkit is released as a npm package, so you can install it wit
 
 * https://npmjs.org/package/jsx
 
-If you are interested in develop the JSX compiler, you should set up your environment after cloning the repo. Note that the SDK requires Perl 5.10.0 or later as well as NodeJS 0.8.0 or later.
-
-To setup JSX SDK , type the following command:
-
-    git clone --recursive git://github.com/jsx/JSX.git
-    cd JSX
-    make # to build bin/jsx
-
-To install `jsx(1)` for development, just make a link of `bin/jsx` to `~/bin`.
-    ln -s "$PWD/bin/jsx" ~/bin
-
 COMPILATION
 =======================
 
@@ -31,13 +20,13 @@ Type the following commands and see what happens:
     # run Hello World in JSX
     jsx --run example/hello.jsx
 
-    # display compiled code to stdout
+    # compile it and output the generated code to stdout
     jsx example/hello.jsx
 
     # compile it with fully optimizations
-    jsx --release example/hello.jsx
+    jsx --release --output hello.jsx.js example/hello.jsx
 
-    # compile a program for node, execute it later
+    # compile it for node and execute it
     jsx --executable node --output hello.jsx.js example/hello.jsx
     ./hello.jsx.js # displays "Hello, world!"
 
@@ -46,20 +35,27 @@ Type the following commands and see what happens:
 
 `jsx --help` shows how to to use the jsx command.
 
-TESTING
+EXAMPLES
 =======================
 
-There are unit tests in `t/` directory. For server side tests, just type the following command:
+There are JSX source files in `example/` and `web/example/`, and the the test directory `t/`.
 
-    make test
+DEVELOPMENT OF JSX COMPILER
+=======================
 
-For developers:
+If you are interested in development of the JSX compiler, you should set up your environment after cloning the repo. The SDK development requires LSB 4.1 (Perl 5.8.8 and some UNIX commands) as well as NodeJS 0.8.0 or later.
 
-Test cases are executed by `prove(1)` and dispatched by `t/util/test-runner`.
-Be familiar with them!
+To setup JSX SDK, type the following command:
+
+    git clone --recursive git://github.com/jsx/JSX.git
+    cd JSX
+    make # to build bin/jsx
+
+We recommend to install `jsx(1)` as a link of `$JSX/bin/jsx` to `~/bin/jsx`.
+    ln -s "$PWD/bin/jsx" ~/bin
 
 DEVELOPMENT WEB SERVER
-=======================
+-----------------------
 
 There's a web interface, which provides a web compiler and web application examples.
 Type the following commands to run the server:
@@ -70,10 +66,16 @@ Type the following commands to run the server:
 This server is also used to show results of JSX profiler.
 See [Using the Profiler](https://github.com/jsx/JSX/wiki/Using-the-Profiler) for details.
 
-EXAMPLES
-=======================
+TESTING
+-----------------------
 
-There are JSX source files in `example/` and `web/example/`, and the the test directory `t/`.
+There are unit tests in `t/` directory. Just type the following command to run the tests:
+
+    make test
+
+These test cases are executed by `prove(1)` and dispatched by `t/util/test-runner`, and also requires `phantomjs(1)` and `closure-compiler(1)`.
+
+NOTE: There are some TODO tests, which should be resolved in a future. `make show-todo` shows such TODOs.
 
 WINDOWS SUPPORT
 =======================
