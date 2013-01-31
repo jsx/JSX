@@ -874,6 +874,7 @@ class Parser {
 						return;
 					}
 				} else {
+					this._forwardPos(2); // skip "/*"
 					this._docComment = null;
 					if (! this._skipMultilineComment()) {
 						return;
