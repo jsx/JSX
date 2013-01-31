@@ -1,6 +1,6 @@
 Revision history for the JSX software development kit
 
-NEXT
+0.9.3 2013-01-31 12:24:27
     [CHANGES]
     - Installed jsx(1) is now compiled with --release
 
@@ -17,6 +17,7 @@ NEXT
       (671312aaaed22b38e59d20f6eb5b977d32d79d4b)
     - named function exprs outside of function caused compiler crash
       (823d4e5142feee92e95e2d0913c5b6c22be27665)
+    - /*/ was parsed as a comment start + comment end (#91)
 
 
 0.9.0 2013-01-26 00:13:42

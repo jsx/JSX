@@ -1,6 +1,6 @@
 {
   "name":        "jsx",
-  "version":     "0.9.2",
+  "version":     "0.9.3",
   "description": "a faster, safer, easier JavaScript",
   "homepage": "http://jsx.github.com/",
   "repository" : "git://github.com/jsx/JSX.git",
@@ -36,6 +36,6 @@
   },
   "scripts" : {
       "test" : "make test JOBS=1 SKIP_PHANTOMJS_TEST=1",
-      "prepublish" : "make test"
+      "prepublish" : "make && make test"
   }
 }
