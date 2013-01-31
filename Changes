@@ -1,5 +1,9 @@
 Revision history for the JSX software development kit
 
+0.9.4 2013-01-31 19:31:16
+    [BUG FIXES]
+    - Fix a packaging issue
+
 0.9.3 2013-01-31 12:24:27
     [CHANGES]
     - Installed jsx(1) is now compiled with --release

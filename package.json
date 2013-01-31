@@ -36,6 +36,7 @@
   },
   "scripts" : {
       "test" : "make test JOBS=1 SKIP_PHANTOMJS_TEST=1",
-      "prepublish" : "make && make test"
+      "prepublish" : "make && make test",
+      "preinstall" : "node tool/bootstrap-compiler.js --release --executable node --output bin/jsx src/jsx-node-front.jsx"
   }
 }
