@@ -2275,6 +2275,9 @@ class _LCSECachedExpression {
 
 }
 
+/**
+ * Common Subexpression Elimination
+ */
 class _LCSEOptimizeCommand extends _FunctionOptimizeCommand {
 
 	function constructor () {
@@ -2295,15 +2298,16 @@ class _LCSEOptimizeCommand extends _FunctionOptimizeCommand {
 
 		var getCacheKey = function (expr : Expression) : Nullable.<string> {
 			if (expr instanceof PropertyExpression) {
-				var receiverType = (expr as PropertyExpression).getExpr().getType();
+                var propertyExpr = expr as PropertyExpression;
+				var receiverType = propertyExpr.getExpr().getType();
 				if (receiverType instanceof ObjectType && _Util.classIsNative(receiverType.getClassDef())) {
 					return null;
 				}
-				var base = getCacheKey((expr as PropertyExpression).getExpr());
+				var base = getCacheKey(propertyExpr.getExpr());
 				if (base == null) {
 					return null;
 				}
-				return base + "." + (expr as PropertyExpression).getIdentifierToken().getValue();
+				return base + "." + propertyExpr.getIdentifierToken().getValue();
 			} else if (expr instanceof LocalExpression) {
 				return (expr as LocalExpression).getLocal().getName().getValue();
 			} else if (expr instanceof ThisExpression) {
@@ -2357,60 +2361,52 @@ class _LCSEOptimizeCommand extends _FunctionOptimizeCommand {
 		var onExpr = function (expr : Expression, replaceCb : function(:Expression):void) : boolean {
 			// handle special cases first
 			if (expr instanceof AssignmentExpression) {
-				var lhsExpr = (expr as AssignmentExpression).getFirstExpr();
+                var assignmentExpr =expr as AssignmentExpression;
+				var lhsExpr = assignmentExpr.getFirstExpr();
 				if (lhsExpr instanceof LocalExpression) {
-					onExpr((expr as AssignmentExpression).getSecondExpr(), function (receiver : AssignmentExpression) : function(:Expression):void {
-						return function (expr) {
-							receiver.setSecondExpr(expr);
-						};
-					}(expr as AssignmentExpression));
+					onExpr(assignmentExpr.getSecondExpr(), function (expr) {
+						assignmentExpr.setSecondExpr(expr);
+					});
 					clearCacheByLocalName((lhsExpr as LocalExpression).getLocal().getName().getValue());
 				} else if (lhsExpr instanceof PropertyExpression) {
-					onExpr((lhsExpr as PropertyExpression).getExpr(), function (receiver : PropertyExpression) : function(:Expression):void {
-						return function (expr) {
-							receiver.setExpr(expr);
-						};
-					}(lhsExpr as PropertyExpression));
-					onExpr((expr as AssignmentExpression).getSecondExpr(), function (receiver : AssignmentExpression) : function(:Expression):void {
-						return function (expr) {
-							receiver.setSecondExpr(expr);
-						};
-					}(expr as AssignmentExpression));
-					if ((lhsExpr as PropertyExpression).getIdentifierToken().getValue() == "length") {
-						// once we support caching array elements, we need to add special care
+					var lhsPropertyExpr = lhsExpr as PropertyExpression;
+					onExpr((lhsExpr as PropertyExpression).getExpr(), function (expr) {
+						lhsPropertyExpr.setExpr(expr);
+					});
+					onExpr(assignmentExpr.getSecondExpr(), function (expr) {
+							assignmentExpr.setSecondExpr(expr);
+					});
+					if (lhsPropertyExpr.getIdentifierToken().getValue() == "length") {
+						// FIXME once we support caching array elements, we need to add special care
 					} else {
 						var cacheKey = getCacheKey(lhsExpr);
 						if (cacheKey) {
-							registerCacheable(cacheKey, lhsExpr, function (receiver : AssignmentExpression) : function(:Expression):void {
-								return function (expr) {
-									receiver.setFirstExpr(expr);
-								};
-							}(expr as AssignmentExpression));
+							registerCacheable(cacheKey, lhsExpr, function (expr) {
+								assignmentExpr.setFirstExpr(expr);
+							});
 						}
 					}
 				} else {
 					clearCache();
 				}
 				return true;
-			} else if (expr instanceof PreIncrementExpression
-				   || expr instanceof PostIncrementExpression) {
+			} else if (expr instanceof IncrementExpression) {
+				var incrementExpr = expr as IncrementExpression;
 				// optimize the receiver of LHS, and clear (for now)
-				if ((expr as IncrementExpression).getExpr() instanceof PropertyExpression) {
-					onExpr(((expr as IncrementExpression).getExpr() as PropertyExpression).getExpr(), function (receiver : PropertyExpression) : function(:Expression):void {
-						return function (expr) {
-							receiver.setExpr(expr);
-						};
-					}((expr as IncrementExpression).getExpr() as PropertyExpression));
+				if (incrementExpr.getExpr() instanceof PropertyExpression) {
+					var propertyExpr = incrementExpr.getExpr() as PropertyExpression;
+					onExpr(propertyExpr.getExpr(), function (expr) {
+						propertyExpr.setExpr(expr);
+					});
 				}
 				clearCache();
 				return true;
 			} else if (expr instanceof ConditionalExpression) {
+				var conditionalExpr = expr as ConditionalExpression;
 				// only optimize the condExpr, then clear (for now)
-				onExpr((expr as ConditionalExpression).getCondExpr(), function (receiver : ConditionalExpression) : function(:Expression):void {
-					return function (expr) {
-						receiver.setCondExpr(expr);
-					};
-				}(expr as ConditionalExpression));
+				onExpr(conditionalExpr.getCondExpr(), function (expr) {
+					conditionalExpr.setCondExpr(expr);
+				});
 				clearCache();
 				return true;
 			} else if (expr instanceof FunctionExpression) {
@@ -2422,11 +2418,10 @@ class _LCSEOptimizeCommand extends _FunctionOptimizeCommand {
 				if (funcExpr instanceof LocalExpression) {
 					// nothing to do
 				} else if (funcExpr instanceof PropertyExpression) {
-					onExpr(((expr as CallExpression).getExpr() as PropertyExpression).getExpr(), function (receiver : PropertyExpression) : function(:Expression):void {
-						return function (expr) {
-							receiver.setExpr(expr);
-						};
-					}((expr as CallExpression).getExpr() as PropertyExpression));
+					var propertyExpr = funcExpr as PropertyExpression;
+					onExpr(propertyExpr.getExpr(), function (expr) {
+						propertyExpr.setExpr(expr);
+					});
 				} else {
 					clearCache();
 				}
@@ -2441,9 +2436,9 @@ class _LCSEOptimizeCommand extends _FunctionOptimizeCommand {
 				clearCache();
 				return true;
 			} else if (expr instanceof NewExpression) {
+				this.log("new expression");
 				// optimize the args, and clear
 				var args = (expr as NewExpression).getArguments();
-				this.log("new expression");
 				for (var i = 0; i < args.length; ++i) {
 					onExpr(args[i], function (args : Expression[], index : number) : function(:Expression):void {
 						return function (expr) {
@@ -2458,7 +2453,8 @@ class _LCSEOptimizeCommand extends _FunctionOptimizeCommand {
 			if (expr instanceof PropertyExpression) {
 				if ((expr as PropertyExpression).getIdentifierToken().getValue() == "length") {
 					// ditto as above comment for "length"
-				} else {
+				}
+				else {
 					var cacheKey = getCacheKey(expr);
 					if (cacheKey) {
 						this.log("rewriting cse for: " + cacheKey);
