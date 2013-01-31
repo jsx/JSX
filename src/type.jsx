@@ -573,16 +573,23 @@ class FunctionChoiceType extends FunctionType {
 	}
 
 	override function deduceByArgumentTypes (context : AnalysisContext, operatorToken : Token, argTypes : Type[], isStatic : boolean) : ResolvedFunctionType {
+		var types = this._types;
+
 		// try an exact match
-		for (var i = 0; i < this._types.length; ++i)
-			if (this._types[i]._deduceByArgumentTypes(argTypes, isStatic, true, (msg) -> {}))
-				return this._types[i];
+		for (var i = 0; i < types.length; ++i) {
+			if (types[i]._deduceByArgumentTypes(argTypes, isStatic, true, (msg) -> {})) {
+				return types[i];
+			}
+		}
+
 		// try loose match
 		var matched = new ResolvedFunctionType[];
 		var notes = new CompileNote[];
-		for (var i = 0; i < this._types.length; ++i)
-			if (this._types[i]._deduceByArgumentTypes(argTypes, isStatic, false, (msg) -> { notes.push(new CompileNote(this._types[i].getToken(), 'candidate function not viable: ' + msg)); }))
-				matched.push(this._types[i]);
+		for (var i = 0; i < types.length; ++i) {
+			if (types[i]._deduceByArgumentTypes(argTypes, isStatic, false, (msg) -> { notes.push(new CompileNote(types[i].getToken(), 'candidate function not viable: ' + msg)); })) {
+				matched.push(types[i]);
+			}
+		}
 		switch (matched.length) {
 		case 0:
 			context.errors.push(
@@ -596,9 +603,7 @@ class FunctionChoiceType extends FunctionType {
 			context.errors.push(new CompileError(operatorToken, "result of function resolution using the arguments is ambiguous"));
 			break;
 		}
-		for (var i = 0; i < notes.length; ++i) {
-			context.errors[context.errors.length - 1].addCompileNote(notes[i]);
-		}
+		context.errors[context.errors.length - 1].addCompileNotes(notes);
 		return null;
 	}
 

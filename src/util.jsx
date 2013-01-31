@@ -465,6 +465,12 @@ class CompileError extends CompileIssue {
 		this._notes.push(note);
 	}
 
+	function addCompileNotes (notes : CompileNote[]) : void {
+		notes.forEach( (note) -> {
+			this.addCompileNote(note);
+		});
+	}
+
 	function getCompileNotes () : CompileNote[] {
 		return this._notes;
 	}
