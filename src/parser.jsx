@@ -1609,10 +1609,10 @@ class Parser {
 					return null;
 				return createDefinition(null, null, null, null);
 			} else if ((flags & (ClassDefinition.IS_ABSTRACT | ClassDefinition.IS_NATIVE)) != 0) {
-				var token = this._expect([ ";", "{" ]);
-				if (token == null)
+				var endDeclToken = this._expect([ ";", "{" ]);
+				if (endDeclToken == null)
 					return null;
-				if (token.getValue() == ";")
+				if (endDeclToken.getValue() == ";")
 					return createDefinition(null, null, null, null);
 			} else {
 				if (this._expect("{") == null)
