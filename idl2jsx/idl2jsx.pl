@@ -79,6 +79,7 @@ WebIDL::TypeMap->define(
     'DOMObject'      => 'Object',
     'DOMUserData'    => 'variant',
     'DOMString'      => 'string',
+    'nullable DOMString' => 'Nullable.<string>', # wrong syntax found in http://www.w3.org/TR/2012/WD-webrtc-20120821/
     'DOMTimeStamp'   => 'number',
 
     'octet'          => 'number',
@@ -158,6 +159,8 @@ my $rx_multiword_types = join("|", map { quotemeta($_) }
 
     'unrestricted float',
     'unrestricted double',
+
+    'nullable DOMString', # FIXME
 );
 
 my $rx_simple_type = qr{

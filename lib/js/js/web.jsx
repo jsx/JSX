@@ -6250,6 +6250,270 @@ native final class HTMLIntentElement extends HTMLElement {
 
 } // end of HTMLIntentElement
 
+/** @see http://dev.w3.org/2011/webrtc/editor/webrtc.html */
+native final class AudioMediaStreamTrack extends MediaStreamTrack {
+
+	__readonly__ var canInsertDTMF : boolean;
+	function insertDTMF(tones : string/*DOMString*/) : void;
+	function insertDTMF(
+		tones : string/*DOMString*/,
+		duration : number/*long*/
+	) : void;
+
+} // end of AudioMediaStreamTrack
+
+/** @see http://dev.w3.org/2011/webrtc/editor/webrtc.html */
+native final class RTCSessionDescription {
+
+	function constructor();
+	function constructor(
+		descriptionInitDict : RTCSessionDescriptionInit
+	);
+
+	var type : Nullable.<string>/*RTCSdpType?*/;
+	var sdp : Nullable.<string>/*DOMString?*/;
+
+} // end of RTCSessionDescription
+
+/** @see http://dev.w3.org/2011/webrtc/editor/webrtc.html */
+native final class RTCSessionDescriptionInit {
+
+	var type : string/*RTCSdpType*/;
+	var sdp : string/*DOMString*/;
+
+} // end of RTCSessionDescriptionInit
+
+/** @see http://dev.w3.org/2011/webrtc/editor/webrtc.html */
+native final class RTCIceCandidate {
+
+	function constructor();
+	function constructor(candidateInitDict : RTCIceCandidateInit);
+
+	var candidate : Nullable.<string>/*DOMString?*/;
+	var sdpMid : Nullable.<string>/*DOMString?*/;
+	var sdpMLineIndex : Nullable.<number>/*unsigned short?*/;
+
+} // end of RTCIceCandidate
+
+/** @see http://dev.w3.org/2011/webrtc/editor/webrtc.html */
+native final class RTCIceCandidateInit {
+
+	var candidate : string/*DOMString*/;
+	var sdpMid : string/*DOMString*/;
+	var sdpMLineIndex : number/*unsigned short*/;
+
+} // end of RTCIceCandidateInit
+
+/** @see http://dev.w3.org/2011/webrtc/editor/webrtc.html */
+native final class RTCIceServer {
+
+	var url : string/*DOMString*/;
+	var credential : Nullable.<string>/*nullable DOMString*/;
+
+} // end of RTCIceServer
+
+/** @see http://dev.w3.org/2011/webrtc/editor/webrtc.html */
+native final class RTCConfiguration {
+
+	var iceServers : RTCIceServer[];
+
+} // end of RTCConfiguration
+
+/** @see http://dev.w3.org/2011/webrtc/editor/webrtc.html */
+native final class RTCPeerConnection extends EventTarget {
+
+	function constructor(configuration : RTCConfiguration);
+	function constructor(
+		configuration : RTCConfiguration,
+		constraints : MediaConstraints
+	);
+
+	function createOffer(
+		successCallback : function(sdp:RTCSessionDescription):void/*RTCSessionDescriptionCallback*/
+	) : void;
+	function createOffer(
+		successCallback : function(sdp:RTCSessionDescription):void/*RTCSessionDescriptionCallback*/,
+		failureCallback : function(errorInformation:string/*DOMString*/):void/*RTCPeerConnectionErrorCallback*/
+	) : void;
+	function createOffer(
+		successCallback : function(sdp:RTCSessionDescription):void/*RTCSessionDescriptionCallback*/,
+		failureCallback : function(errorInformation:string/*DOMString*/):void/*RTCPeerConnectionErrorCallback*/,
+		constraints : MediaConstraints
+	) : void;
+	function createAnswer(
+		offer : RTCSessionDescription,
+		successCallback : function(sdp:RTCSessionDescription):void/*RTCSessionDescriptionCallback*/
+	) : void;
+	function createAnswer(
+		offer : RTCSessionDescription,
+		successCallback : function(sdp:RTCSessionDescription):void/*RTCSessionDescriptionCallback*/,
+		failureCallback : Nullable.<function(errorInformation:string/*DOMString*/):void>/*RTCPeerConnectionErrorCallback?*/
+	) : void;
+	function createAnswer(
+		offer : RTCSessionDescription,
+		successCallback : function(sdp:RTCSessionDescription):void/*RTCSessionDescriptionCallback*/,
+		failureCallback : Nullable.<function(errorInformation:string/*DOMString*/):void>/*RTCPeerConnectionErrorCallback?*/,
+		constraints : MediaConstraints
+	) : void;
+	function createAnswer(
+		offer : RTCSessionDescription,
+		successCallback : function(sdp:RTCSessionDescription):void/*RTCSessionDescriptionCallback*/,
+		failureCallback : Nullable.<function(errorInformation:string/*DOMString*/):void>/*RTCPeerConnectionErrorCallback?*/,
+		constraints : MediaConstraints,
+		createProvisionalAnswer : boolean
+	) : void;
+	function setLocalDescription(
+		description : RTCSessionDescription
+	) : void;
+	function setLocalDescription(
+		description : RTCSessionDescription,
+		successCallback : function():void/*RTCVoidCallback*/
+	) : void;
+	function setLocalDescription(
+		description : RTCSessionDescription,
+		successCallback : function():void/*RTCVoidCallback*/,
+		failureCallback : function(errorInformation:string/*DOMString*/):void/*RTCPeerConnectionErrorCallback*/
+	) : void;
+	__readonly__ var localDescription : RTCSessionDescription;
+	function setRemoteDescription(
+		description : RTCSessionDescription
+	) : void;
+	function setRemoteDescription(
+		description : RTCSessionDescription,
+		successCallback : function():void/*RTCVoidCallback*/
+	) : void;
+	function setRemoteDescription(
+		description : RTCSessionDescription,
+		successCallback : function():void/*RTCVoidCallback*/,
+		failureCallback : function(errorInformation:string/*DOMString*/):void/*RTCPeerConnectionErrorCallback*/
+	) : void;
+	__readonly__ var remoteDescription : RTCSessionDescription;
+	__readonly__ var readyState : string/*RTCPeerState*/;
+	function updateIce() : void;
+	function updateIce(
+		configuration : Nullable.<RTCConfiguration>
+	) : void;
+	function updateIce(
+		configuration : Nullable.<RTCConfiguration>,
+		constraints : Nullable.<MediaConstraints>
+	) : void;
+	function updateIce(
+		configuration : Nullable.<RTCConfiguration>,
+		constraints : Nullable.<MediaConstraints>,
+		restart : boolean
+	) : void;
+	function addIceCandidate(candidate : RTCIceCandidate) : void;
+	__readonly__ var iceState : string/*RTCIceState*/;
+	__readonly__ var localStreams : MediaStream[]/*MediaStreamArray*/;
+	__readonly__ var remoteStreams : MediaStream[]/*MediaStreamArray*/;
+	function createDataChannel(
+		label : string/*DOMString*/
+	) : DataChannel;
+	function createDataChannel(
+		label : string/*DOMString*/,
+		dataChannelDict : DataChannelInit
+	) : DataChannel;
+	var ondatachannel : Nullable.<function(:Event):void>/*EventHandler*/;
+	function addStream(stream : MediaStream) : void;
+	function addStream(
+		stream : MediaStream,
+		constraints : MediaConstraints
+	) : void;
+	function removeStream(stream : MediaStream) : void;
+	function close() : void;
+	var onnegotationneeded : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onicecandidate : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onopen : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onstatechange : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onaddstream : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onremovestream : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onicechange : Nullable.<function(:Event):void>/*EventHandler*/;
+
+} // end of RTCPeerConnection
+
+/** @see http://dev.w3.org/2011/webrtc/editor/webrtc.html */
+native final class DataChannel {
+
+	__readonly__ var label : string/*DOMString*/;
+	__readonly__ var reliable : boolean;
+	__readonly__ var readyState : string/*DataChannelState*/;
+	__readonly__ var bufferedAmount : number/*unsigned long*/;
+	var onopen : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onerror : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onclose : Nullable.<function(:Event):void>/*EventHandler*/;
+	function close() : void;
+	var onmessage : Nullable.<function(:Event):void>/*EventHandler*/;
+	var binaryType : string/*DOMString*/;
+	function send(data : string/*DOMString*/) : void;
+	function send(data : ArrayBuffer) : void;
+	function send(data : Blob) : void;
+
+} // end of DataChannel
+
+/** @see http://dev.w3.org/2011/webrtc/editor/webrtc.html */
+native final class DataChannelInit {
+
+	var reliable : boolean;
+
+} // end of DataChannelInit
+
+/** @see http://dev.w3.org/2011/webrtc/editor/webrtc.html */
+native final class RTCPeerConnectionIceEvent extends Event {
+
+	function constructor(
+		type : string/*DOMString*/,
+		eventInitDict : RTCPeerConnectionIceEventInit
+	);
+
+	__readonly__ var candidate : RTCIceCandidate;
+
+} // end of RTCPeerConnectionIceEvent
+
+/** @see http://dev.w3.org/2011/webrtc/editor/webrtc.html */
+native final class RTCPeerConnectionIceEventInit extends EventInit {
+
+	var candidate : RTCIceCandidate;
+
+} // end of RTCPeerConnectionIceEventInit
+
+/** @see http://dev.w3.org/2011/webrtc/editor/webrtc.html */
+native final class MediaStreamEvent extends Event {
+
+	function constructor(
+		type : string/*DOMString*/,
+		eventInitDict : MediaStreamEventInit
+	);
+
+	__readonly__ var stream : Nullable.<MediaStream>;
+
+} // end of MediaStreamEvent
+
+/** @see http://dev.w3.org/2011/webrtc/editor/webrtc.html */
+native final class MediaStreamEventInit extends EventInit {
+
+	var stream : MediaStream;
+
+} // end of MediaStreamEventInit
+
+/** @see http://dev.w3.org/2011/webrtc/editor/webrtc.html */
+native final class DataChannelEvent extends Event {
+
+	function constructor(
+		type : string/*DOMString*/,
+		eventInitDict : DataChannelEventInit
+	);
+
+	__readonly__ var channel : DataChannel;
+
+} // end of DataChannelEvent
+
+/** @see http://dev.w3.org/2011/webrtc/editor/webrtc.html */
+native final class DataChannelEventInit extends EventInit {
+
+	var channel : DataChannel;
+
+} // end of DataChannelEventInit
+
 /** @see http://www.w3.org/TR/mediacapture-streams/ */
 native class MediaStream extends EventTarget {
 
@@ -6274,7 +6538,7 @@ native final class LocalMediaStream extends MediaStream {
 } // end of LocalMediaStream
 
 /** @see http://www.w3.org/TR/mediacapture-streams/ */
-native final class MediaStreamTrack {
+native class MediaStreamTrack {
 
 	__readonly__ var kind : string/*DOMString*/;
 	__readonly__ var label : string/*DOMString*/;
@@ -9199,6 +9463,9 @@ native final class DeviceMotionEventInit extends EventInit {
 } // end of DeviceMotionEventInit
 
 native final class SVGMatrix {
+}
+
+native final class MediaConstraints {
 }
 
 native final __fake__ class CanvasPixelArray {

@@ -126,3 +126,7 @@ interface SVGMatrix {
 partial interface CSSStyleDeclaration {
 	DOMString webkitOverflowScrolling;
 };
+
+// http://www.w3.org/TR/2012/WD-webrtc-20120821/
+interface MediaConstraints {
+};

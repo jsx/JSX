@@ -28,7 +28,7 @@ my @specs = (
         'dom; http://www.w3.org/TR/dom/',
         'DOM-Level-2-Views; http://www.w3.org/TR/DOM-Level-2-Views/idl/views.idl',
         'DOM-Level-3-Events; http://www.w3.org/TR/DOM-Level-3-Events/',
-		'progress-events; http://www.w3.org/TR/progress-events/',
+        'progress-events; http://www.w3.org/TR/progress-events/',
         "dom-parsing; http://www.w3.org/TR/DOM-Parsing/",
         "$root/extra/events.idl",
 
@@ -63,7 +63,7 @@ my @specs = (
         "notifications; http://www.w3.org/TR/2012/WD-notifications-20120614/",
         "web-intents; http://www.w3.org/TR/2012/WD-web-intents-20120626/",
 
-        #"webrtc; http://www.w3.org/TR/2012/WD-webrtc-20120209/",
+        "webrtc; http://dev.w3.org/2011/webrtc/editor/webrtc.html",
         #"http://dev.w3.org/2011/webrtc/editor/getusermedia.html",
         "mediacapture-streams; http://www.w3.org/TR/mediacapture-streams/",
 
