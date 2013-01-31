@@ -1,5 +1,5 @@
 
-PROVE := extlib/bin/prove
+PROVE := perl extlib/bin/prove
 
 JOBS:=4
 
