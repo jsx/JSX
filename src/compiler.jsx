@@ -388,7 +388,7 @@ class Compiler {
 	}
 
 	function _handleErrors (errors : CompileError[]) : boolean {
-		// ignore all messages
+		// ignore all messages on completion mode
 		if (this._mode == Compiler.MODE_COMPLETE) {
 			errors.splice(0, errors.length);
 			return true;
@@ -408,10 +408,9 @@ class Compiler {
 				}
 			} else {
 				this._platform.error(error.format(this));
-				var notes = error.getCompileNotes();
-				for (var i = 0; i < notes.length; ++i) {
-					this._platform.error(notes[i].format(this));
-				}
+				error.getCompileNotes().forEach(function (note) {
+					this._platform.error(note.format(this));
+				});
 				isFatal = true;
 			}
 		});
