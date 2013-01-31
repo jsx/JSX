@@ -2401,11 +2401,6 @@ native final __fake__ class Window extends EventTarget {
 	/** @see http://www.w3.org/TR/2012/WD-IndexedDB-20120524/ */
 	__readonly__ var indexedDB : IDBFactory;
 
-	// implements IntentProvider
-
-	/** @see http://www.w3.org/TR/2012/WD-web-intents-20120626/ */
-	__readonly__ var intent : Intent;
-
 	function setTimeout(
 		handler : function():void/*TimerHandler*/
 	) : number/*long*/;
@@ -4327,24 +4322,6 @@ native final class Navigator extends NavigatorID {
 	/** @see http://dev.w3.org/geo/api/spec-source.html */
 	__readonly__ var geolocation : Geolocation;
 
-	// implements Intents
-
-	/** @see http://www.w3.org/TR/2012/WD-web-intents-20120626/ */
-	function startActivity(intent : Intent) : void;
-	/** @see http://www.w3.org/TR/2012/WD-web-intents-20120626/ */
-	function startActivity(
-		intent : Intent,
-		onSuccess : function(data:variant/*any*/,
-		ports:MessagePort[]):void/*IntentSuccessCallback*/
-	) : void;
-	/** @see http://www.w3.org/TR/2012/WD-web-intents-20120626/ */
-	function startActivity(
-		intent : Intent,
-		onSuccess : function(data:variant/*any*/,
-		ports:MessagePort[]):void/*IntentSuccessCallback*/,
-		onFailure : function(data:variant/*any*/):void/*IntentFailureCallback*/
-	) : void;
-
 	// implements NavigatorUserMedia
 
 	/** @see http://www.w3.org/TR/mediacapture-streams/ */
@@ -6166,89 +6143,6 @@ native final class NotificationOptions {
 	var iconUrl : string/*DOMString*/;
 
 } // end of NotificationOptions
-
-/** @see http://www.w3.org/TR/2012/WD-web-intents-20120626/ */
-native final class IntentParameters {
-
-	var action : string/*DOMString*/;
-	var type : string/*DOMString*/;
-	var data : variant/*any*/;
-	var transfer : Transferable[];
-	var extras : Object;
-	var service : URL;
-	var suggestions : URL[];
-
-} // end of IntentParameters
-
-/** @see http://www.w3.org/TR/2012/WD-web-intents-20120626/ */
-native class Intent {
-
-	function constructor(params : IntentParameters);
-	function constructor(
-		action : string/*DOMString*/,
-		type : string/*DOMString*/
-	);
-	function constructor(
-		action : string/*DOMString*/,
-		type : string/*DOMString*/,
-		data : variant/*any*/
-	);
-	function constructor(
-		action : string/*DOMString*/,
-		type : string/*DOMString*/,
-		data : variant/*any*/,
-		transferList : Transferable[]
-	);
-
-	__readonly__ var action : string/*DOMString*/;
-	__readonly__ var type : string/*DOMString*/;
-	__readonly__ var data : variant/*any*/;
-	__readonly__ var ports : MessagePort[];
-	function getExtra(key : string/*DOMString*/) : string/*DOMString*/;
-	function postResult(data : variant/*any*/) : void;
-	function postResult(
-		data : variant/*any*/,
-		transferable : Transferable[]
-	) : void;
-	function postFailure(data : variant/*any*/) : void;
-
-} // end of Intent
-
-/** @see http://www.w3.org/TR/2012/WD-web-intents-20120626/ */
-native __fake__ class Intents {
-
-	function startActivity(intent : Intent) : void;
-	function startActivity(
-		intent : Intent,
-		onSuccess : function(data:variant/*any*/,
-		ports:MessagePort[]):void/*IntentSuccessCallback*/
-	) : void;
-	function startActivity(
-		intent : Intent,
-		onSuccess : function(data:variant/*any*/,
-		ports:MessagePort[]):void/*IntentSuccessCallback*/,
-		onFailure : function(data:variant/*any*/):void/*IntentFailureCallback*/
-	) : void;
-
-} // end of Intents
-
-/** @see http://www.w3.org/TR/2012/WD-web-intents-20120626/ */
-native __fake__ class IntentProvider {
-
-	__readonly__ var intent : Intent;
-
-} // end of IntentProvider
-
-/** @see http://www.w3.org/TR/2012/WD-web-intents-20120626/ */
-native final class HTMLIntentElement extends HTMLElement {
-
-	var action : string/*DOMString*/;
-	var type : string/*DOMString*/;
-	var href : string/*DOMString*/;
-	// inherits var title : string/*DOMString*/;
-	var disposition : string/*DOMString*/;
-
-} // end of HTMLIntentElement
 
 /** @see http://dev.w3.org/2011/webrtc/editor/webrtc.html */
 native final class AudioMediaStreamTrack extends MediaStreamTrack {
@@ -9369,9 +9263,6 @@ native final class webkitURL extends URL {
 }
 
 native final class webkitAudioContext extends AudioContext {
-}
-
-native final class webkitIntent extends Intent {
 }
 
 native final class webkitIDBCursor extends IDBCursor {

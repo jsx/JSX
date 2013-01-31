@@ -61,7 +61,6 @@ my @specs = (
         "url; http://www.w3.org/TR/2012/WD-url-20120524/",
         "IndexedDB; http://www.w3.org/TR/2012/WD-IndexedDB-20120524/",
         "notifications; http://www.w3.org/TR/2012/WD-notifications-20120614/",
-        "web-intents; http://www.w3.org/TR/2012/WD-web-intents-20120626/",
 
         "webrtc; http://dev.w3.org/2011/webrtc/editor/webrtc.html",
         #"http://dev.w3.org/2011/webrtc/editor/getusermedia.html",

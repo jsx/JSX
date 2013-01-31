@@ -1555,7 +1555,6 @@ class _Test extends TestCase {
         var v102 : Storage = o.sessionStorage;
         var v103 : Storage = o.localStorage;
         var v104 : IDBFactory = o.indexedDB;
-        var v105 : Intent = o.intent;
         var f18 : number/*long*/ = o.setTimeout(X.getfunction___void());
         var f19 : number/*long*/ = o.setTimeout(X.getfunction___void(), X.getnumber());
         o.clearTimeout(X.getnumber());
@@ -2871,9 +2870,6 @@ class _Test extends TestCase {
         o.unregisterContentHandler(X.getstring(), X.getstring());
         o.yieldForStorageUpdates();
         var v2 : Geolocation = o.geolocation;
-        o.startActivity(X.getIntent());
-        o.startActivity(X.getIntent(), X.getfunction_data_variant_ports_MessagePort____void());
-        o.startActivity(X.getIntent(), X.getfunction_data_variant_ports_MessagePort____void(), X.getfunction_data_variant__void());
         o.getUserMedia(X.getNullable__MediaStreamConstraints_(), X.getfunction_stream_LocalMediaStream__void());
         o.getUserMedia(X.getNullable__MediaStreamConstraints_(), X.getfunction_stream_LocalMediaStream__void(), X.getNullable__function_error_NavigatorUserMediaError__void_());
     } // Navigator
@@ -3890,49 +3886,6 @@ class _Test extends TestCase {
         var v4 : string/*DOMString*/ = o.tag;
         var v5 : string/*DOMString*/ = o.iconUrl;
     } // NotificationOptions
-
-    function compile_IntentParameters(o : IntentParameters) : void {
-        var v1 : string/*DOMString*/ = o.action;
-        var v2 : string/*DOMString*/ = o.type;
-        var v3 : variant/*any*/ = o.data;
-        var v4 : Transferable[] = o.transfer;
-        var v5 : Object = o.extras;
-        var v6 : URL = o.service;
-        var v7 : URL[] = o.suggestions;
-    } // IntentParameters
-
-    function compile_Intent(o : Intent) : void {
-        var c1 = new Intent(X.getIntentParameters());
-        var c2 = new Intent(X.getstring(), X.getstring());
-        var c3 = new Intent(X.getstring(), X.getstring(), X.getvariant());
-        var c4 = new Intent(X.getstring(), X.getstring(), X.getvariant(), X.getTransferable__());
-        var v1 : string/*DOMString*/ = o.action;
-        var v2 : string/*DOMString*/ = o.type;
-        var v3 : variant/*any*/ = o.data;
-        var v4 : MessagePort[] = o.ports;
-        var f1 : string/*DOMString*/ = o.getExtra(X.getstring());
-        o.postResult(X.getvariant());
-        o.postResult(X.getvariant(), X.getTransferable__());
-        o.postFailure(X.getvariant());
-    } // Intent
-
-    function compile_Intents(o : Intents) : void {
-        o.startActivity(X.getIntent());
-        o.startActivity(X.getIntent(), X.getfunction_data_variant_ports_MessagePort____void());
-        o.startActivity(X.getIntent(), X.getfunction_data_variant_ports_MessagePort____void(), X.getfunction_data_variant__void());
-    } // Intents
-
-    function compile_IntentProvider(o : IntentProvider) : void {
-        var v1 : Intent = o.intent;
-    } // IntentProvider
-
-    function compile_HTMLIntentElement(o : HTMLIntentElement) : void {
-        var v1 : string/*DOMString*/ = o.action;
-        var v2 : string/*DOMString*/ = o.type;
-        var v3 : string/*DOMString*/ = o.href;
-        var v4 : string/*DOMString*/ = o.title;
-        var v5 : string/*DOMString*/ = o.disposition;
-    } // HTMLIntentElement
 
     function compile_AudioMediaStreamTrack(o : AudioMediaStreamTrack) : void {
         var v1 : boolean = o.canInsertDTMF;
@@ -5397,9 +5350,6 @@ class _Test extends TestCase {
     function compile_webkitAudioContext(o : webkitAudioContext) : void {
     } // webkitAudioContext
 
-    function compile_webkitIntent(o : webkitIntent) : void {
-    } // webkitIntent
-
     function compile_webkitIDBCursor(o : webkitIDBCursor) : void {
     } // webkitIDBCursor
 
@@ -5605,8 +5555,6 @@ native class X {
     static function getInt16Array() : Int16Array;
     static function getInt32Array() : Int32Array;
     static function getInt8Array() : Int8Array;
-    static function getIntent() : Intent;
-    static function getIntentParameters() : IntentParameters;
     static function getKeyboardEventInit() : KeyboardEventInit;
     static function getLocation() : Location;
     static function getMediaConstraints() : MediaConstraints;
@@ -5621,7 +5569,6 @@ native class X {
     static function getMediaStream__() : MediaStream[];
     static function getMessageEventInit() : MessageEventInit;
     static function getMessagePort() : MessagePort;
-    static function getMessagePort__() : MessagePort[];
     static function getMouseEvent() : MouseEvent;
     static function getMouseEventInit() : MouseEventInit;
     static function getMutationObserverInit() : MutationObserverInit;
@@ -5738,8 +5685,6 @@ native class X {
     static function getTransferable__() : Transferable[];
     static function getTreeWalker() : TreeWalker;
     static function getUIEventInit() : UIEventInit;
-    static function getURL() : URL;
-    static function getURL__() : URL[];
     static function getUint16Array() : Uint16Array;
     static function getUint32Array() : Uint32Array;
     static function getUint8Array() : Uint8Array;
@@ -5763,8 +5708,6 @@ native class X {
     static function getfunction__IDBTransactionSync__void() : function(:IDBTransactionSync):void;
     static function getfunction__MediaQueryList__void() : function(:MediaQueryList):void;
     static function getfunction___void() : function():void;
-    static function getfunction_data_variant__void() : function(data:variant):void;
-    static function getfunction_data_variant_ports_MessagePort____void() : function(data:variant,ports:MessagePort[]):void;
     static function getfunction_decodedData_AudioBuffer__void() : function(decodedData:AudioBuffer):void;
     static function getfunction_errorInformation_string__void() : function(errorInformation:string):void;
     static function getfunction_mutations_MutationRecord___observer_MutationObserver__void() : function(mutations:MutationRecord[],observer:MutationObserver):void;

@@ -29,10 +29,6 @@ interface webkitURL : URL {
 interface webkitAudioContext : AudioContext {
 };
 
-// http://www.w3.org/TR/web-intents/
-interface webkitIntent : Intent {
-};
-
 // http://www.w3.org/TR/IndexedDB/
 interface webkitIDBCursor : IDBCursor { };
 interface webkitIDBDatabase : IDBDatabase { };
