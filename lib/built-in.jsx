@@ -54,6 +54,7 @@ native final class Map.<T> {
 	 */
 	function hasOwnProperty(key : string) : boolean;
 
+	function keys() : string[];
 }
 
 /**
