@@ -2870,8 +2870,8 @@ class _Test extends TestCase {
         o.unregisterContentHandler(X.getstring(), X.getstring());
         o.yieldForStorageUpdates();
         var v2 : Geolocation = o.geolocation;
-        o.getUserMedia(X.getNullable__MediaStreamConstraints_(), X.getfunction_stream_LocalMediaStream__void());
-        o.getUserMedia(X.getNullable__MediaStreamConstraints_(), X.getfunction_stream_LocalMediaStream__void(), X.getNullable__function_error_NavigatorUserMediaError__void_());
+        o.getUserMedia(X.getNullable__Map__variant__(), X.getfunction_stream_LocalMediaStream__void());
+        o.getUserMedia(X.getNullable__Map__variant__(), X.getfunction_stream_LocalMediaStream__void(), X.getNullable__function_error_NavigatorUserMediaError__void_());
     } // Navigator
 
     function compile_NavigatorID(o : NavigatorID) : void {
@@ -3930,14 +3930,14 @@ class _Test extends TestCase {
 
     function compile_RTCPeerConnection(o : RTCPeerConnection) : void {
         var c1 = new RTCPeerConnection(X.getRTCConfiguration());
-        var c2 = new RTCPeerConnection(X.getRTCConfiguration(), X.getMediaConstraints());
+        var c2 = new RTCPeerConnection(X.getRTCConfiguration(), X.getMap__variant_());
         o.createOffer(X.getfunction_sdp_RTCSessionDescription__void());
         o.createOffer(X.getfunction_sdp_RTCSessionDescription__void(), X.getfunction_errorInformation_string__void());
-        o.createOffer(X.getfunction_sdp_RTCSessionDescription__void(), X.getfunction_errorInformation_string__void(), X.getMediaConstraints());
+        o.createOffer(X.getfunction_sdp_RTCSessionDescription__void(), X.getfunction_errorInformation_string__void(), X.getMap__variant_());
         o.createAnswer(X.getRTCSessionDescription(), X.getfunction_sdp_RTCSessionDescription__void());
         o.createAnswer(X.getRTCSessionDescription(), X.getfunction_sdp_RTCSessionDescription__void(), X.getNullable__function_errorInformation_string__void_());
-        o.createAnswer(X.getRTCSessionDescription(), X.getfunction_sdp_RTCSessionDescription__void(), X.getNullable__function_errorInformation_string__void_(), X.getMediaConstraints());
-        o.createAnswer(X.getRTCSessionDescription(), X.getfunction_sdp_RTCSessionDescription__void(), X.getNullable__function_errorInformation_string__void_(), X.getMediaConstraints(), X.getboolean());
+        o.createAnswer(X.getRTCSessionDescription(), X.getfunction_sdp_RTCSessionDescription__void(), X.getNullable__function_errorInformation_string__void_(), X.getMap__variant_());
+        o.createAnswer(X.getRTCSessionDescription(), X.getfunction_sdp_RTCSessionDescription__void(), X.getNullable__function_errorInformation_string__void_(), X.getMap__variant_(), X.getboolean());
         o.setLocalDescription(X.getRTCSessionDescription());
         o.setLocalDescription(X.getRTCSessionDescription(), X.getfunction___void());
         o.setLocalDescription(X.getRTCSessionDescription(), X.getfunction___void(), X.getfunction_errorInformation_string__void());
@@ -3949,8 +3949,8 @@ class _Test extends TestCase {
         var v3 : string/*RTCPeerState*/ = o.readyState;
         o.updateIce();
         o.updateIce(X.getNullable__RTCConfiguration_());
-        o.updateIce(X.getNullable__RTCConfiguration_(), X.getNullable__MediaConstraints_());
-        o.updateIce(X.getNullable__RTCConfiguration_(), X.getNullable__MediaConstraints_(), X.getboolean());
+        o.updateIce(X.getNullable__RTCConfiguration_(), X.getNullable__Map__variant__());
+        o.updateIce(X.getNullable__RTCConfiguration_(), X.getNullable__Map__variant__(), X.getboolean());
         o.addIceCandidate(X.getRTCIceCandidate());
         var v4 : string/*RTCIceState*/ = o.iceState;
         var v5 : MediaStream[]/*MediaStreamArray*/ = o.localStreams;
@@ -3959,7 +3959,7 @@ class _Test extends TestCase {
         var f2 : DataChannel = o.createDataChannel(X.getstring(), X.getDataChannelInit());
         var v7 : Nullable.<function(:Event):void>/*EventHandler*/ = o.ondatachannel;
         o.addStream(X.getMediaStream());
-        o.addStream(X.getMediaStream(), X.getMediaConstraints());
+        o.addStream(X.getMediaStream(), X.getMap__variant_());
         o.removeStream(X.getMediaStream());
         o.close();
         var v8 : Nullable.<function(:Event):void>/*EventHandler*/ = o.onnegotationneeded;
@@ -4057,8 +4057,10 @@ class _Test extends TestCase {
     } // MediaStreamTrackList
 
     function compile_NavigatorUserMedia(o : NavigatorUserMedia) : void {
-        o.getUserMedia(X.getNullable__MediaStreamConstraints_(), X.getfunction_stream_LocalMediaStream__void());
-        o.getUserMedia(X.getNullable__MediaStreamConstraints_(), X.getfunction_stream_LocalMediaStream__void(), X.getNullable__function_error_NavigatorUserMediaError__void_());
+        o.getUserMedia(X.getNullable__Map__variant__(), X.getfunction_stream_LocalMediaStream__void());
+        o.getUserMedia(X.getNullable__Map__variant__(), X.getfunction_stream_LocalMediaStream__void(), X.getNullable__function_error_NavigatorUserMediaError__void_());
+        o.webkitGetUserMedia(X.getNullable__Map__variant__(), X.getfunction_stream_LocalMediaStream__void());
+        o.webkitGetUserMedia(X.getNullable__Map__variant__(), X.getfunction_stream_LocalMediaStream__void(), X.getNullable__function_error_NavigatorUserMediaError__void_());
     } // NavigatorUserMedia
 
     function compile_MediaStreamConstraints(o : MediaStreamConstraints) : void {
@@ -5421,9 +5423,6 @@ class _Test extends TestCase {
     function compile_SVGMatrix(o : SVGMatrix) : void {
     } // SVGMatrix
 
-    function compile_MediaConstraints(o : MediaConstraints) : void {
-    } // MediaConstraints
-
     function compile_CanvasPixelArray(o : CanvasPixelArray) : void {
         var v1 : number/*unsigned long*/ = o.length;
         var f1 : Nullable.<number>/*octet*/ = o.__native_index_operator__(X.getnumber());
@@ -5557,7 +5556,7 @@ native class X {
     static function getInt8Array() : Int8Array;
     static function getKeyboardEventInit() : KeyboardEventInit;
     static function getLocation() : Location;
-    static function getMediaConstraints() : MediaConstraints;
+    static function getMap__variant_() : Map.<variant>;
     static function getMediaElementAudioSourceNode() : MediaElementAudioSourceNode;
     static function getMediaList() : MediaList;
     static function getMediaQueryList() : MediaQueryList;
@@ -5608,10 +5607,8 @@ native class X {
     static function getNullable__Location_() : Nullable.<Location>;
     static function getNullable__Map__variant__() : Nullable.<Map.<variant>>;
     static function getNullable__Map__variant____() : Nullable.<Map.<variant>[]>;
-    static function getNullable__MediaConstraints_() : Nullable.<MediaConstraints>;
     static function getNullable__MediaController_() : Nullable.<MediaController>;
     static function getNullable__MediaError_() : Nullable.<MediaError>;
-    static function getNullable__MediaStreamConstraints_() : Nullable.<MediaStreamConstraints>;
     static function getNullable__MediaStreamTrackList_() : Nullable.<MediaStreamTrackList>;
     static function getNullable__MediaStream_() : Nullable.<MediaStream>;
     static function getNullable__MessagePort___() : Nullable.<MessagePort[]>;

@@ -135,6 +135,10 @@ WebIDL::TypeMap->define(
     'IDBVersionChangeCallback' => 'function(:IDBTransactionSync,:number):void',
     'IDBTransactionCallback'   => 'function(:IDBTransactionSync):void',
 
+    # http://www.w3.org/TR/webrtc/
+    'MediaStreamConstraints' => 'Map.<variant>', # e.g. { video: true }
+    'MediaConstraints'       => 'Map.<variant>',
+
     # https://wiki.mozilla.org/GamepadAPI
     'nsIVariant'  => 'variant',
     'nsIDOMEvent' => 'Event',

@@ -3767,9 +3767,9 @@ native final class Navigator extends NavigatorID {
 	// implements NavigatorUserMedia
 
 	/** @see http://www.w3.org/TR/mediacapture-streams/ */
-	function getUserMedia(constraints : Nullable.<MediaStreamConstraints>, successCallback : function(stream:LocalMediaStream):void/*NavigatorUserMediaSuccessCallback*/) : void;
+	function getUserMedia(constraints : Nullable.<Map.<variant>>/*MediaStreamConstraints?*/, successCallback : function(stream:LocalMediaStream):void/*NavigatorUserMediaSuccessCallback*/) : void;
 	/** @see http://www.w3.org/TR/mediacapture-streams/ */
-	function getUserMedia(constraints : Nullable.<MediaStreamConstraints>, successCallback : function(stream:LocalMediaStream):void/*NavigatorUserMediaSuccessCallback*/, errorCallback : Nullable.<function(error:NavigatorUserMediaError):void>/*NavigatorUserMediaErrorCallback?*/) : void;
+	function getUserMedia(constraints : Nullable.<Map.<variant>>/*MediaStreamConstraints?*/, successCallback : function(stream:LocalMediaStream):void/*NavigatorUserMediaSuccessCallback*/, errorCallback : Nullable.<function(error:NavigatorUserMediaError):void>/*NavigatorUserMediaErrorCallback?*/) : void;
 
 } // end of Navigator
 
@@ -5277,15 +5277,15 @@ native final class RTCConfiguration {
 native final class RTCPeerConnection extends EventTarget {
 
 	function constructor(configuration : RTCConfiguration);
-	function constructor(configuration : RTCConfiguration, constraints : MediaConstraints);
+	function constructor(configuration : RTCConfiguration, constraints : Map.<variant>/*MediaConstraints*/);
 
 	function createOffer(successCallback : function(sdp:RTCSessionDescription):void/*RTCSessionDescriptionCallback*/) : void;
 	function createOffer(successCallback : function(sdp:RTCSessionDescription):void/*RTCSessionDescriptionCallback*/, failureCallback : function(errorInformation:string/*DOMString*/):void/*RTCPeerConnectionErrorCallback*/) : void;
-	function createOffer(successCallback : function(sdp:RTCSessionDescription):void/*RTCSessionDescriptionCallback*/, failureCallback : function(errorInformation:string/*DOMString*/):void/*RTCPeerConnectionErrorCallback*/, constraints : MediaConstraints) : void;
+	function createOffer(successCallback : function(sdp:RTCSessionDescription):void/*RTCSessionDescriptionCallback*/, failureCallback : function(errorInformation:string/*DOMString*/):void/*RTCPeerConnectionErrorCallback*/, constraints : Map.<variant>/*MediaConstraints*/) : void;
 	function createAnswer(offer : RTCSessionDescription, successCallback : function(sdp:RTCSessionDescription):void/*RTCSessionDescriptionCallback*/) : void;
 	function createAnswer(offer : RTCSessionDescription, successCallback : function(sdp:RTCSessionDescription):void/*RTCSessionDescriptionCallback*/, failureCallback : Nullable.<function(errorInformation:string/*DOMString*/):void>/*RTCPeerConnectionErrorCallback?*/) : void;
-	function createAnswer(offer : RTCSessionDescription, successCallback : function(sdp:RTCSessionDescription):void/*RTCSessionDescriptionCallback*/, failureCallback : Nullable.<function(errorInformation:string/*DOMString*/):void>/*RTCPeerConnectionErrorCallback?*/, constraints : MediaConstraints) : void;
-	function createAnswer(offer : RTCSessionDescription, successCallback : function(sdp:RTCSessionDescription):void/*RTCSessionDescriptionCallback*/, failureCallback : Nullable.<function(errorInformation:string/*DOMString*/):void>/*RTCPeerConnectionErrorCallback?*/, constraints : MediaConstraints, createProvisionalAnswer : boolean) : void;
+	function createAnswer(offer : RTCSessionDescription, successCallback : function(sdp:RTCSessionDescription):void/*RTCSessionDescriptionCallback*/, failureCallback : Nullable.<function(errorInformation:string/*DOMString*/):void>/*RTCPeerConnectionErrorCallback?*/, constraints : Map.<variant>/*MediaConstraints*/) : void;
+	function createAnswer(offer : RTCSessionDescription, successCallback : function(sdp:RTCSessionDescription):void/*RTCSessionDescriptionCallback*/, failureCallback : Nullable.<function(errorInformation:string/*DOMString*/):void>/*RTCPeerConnectionErrorCallback?*/, constraints : Map.<variant>/*MediaConstraints*/, createProvisionalAnswer : boolean) : void;
 	function setLocalDescription(description : RTCSessionDescription) : void;
 	function setLocalDescription(description : RTCSessionDescription, successCallback : function():void/*RTCVoidCallback*/) : void;
 	function setLocalDescription(description : RTCSessionDescription, successCallback : function():void/*RTCVoidCallback*/, failureCallback : function(errorInformation:string/*DOMString*/):void/*RTCPeerConnectionErrorCallback*/) : void;
@@ -5297,8 +5297,8 @@ native final class RTCPeerConnection extends EventTarget {
 	__readonly__ var readyState : string/*RTCPeerState*/;
 	function updateIce() : void;
 	function updateIce(configuration : Nullable.<RTCConfiguration>) : void;
-	function updateIce(configuration : Nullable.<RTCConfiguration>, constraints : Nullable.<MediaConstraints>) : void;
-	function updateIce(configuration : Nullable.<RTCConfiguration>, constraints : Nullable.<MediaConstraints>, restart : boolean) : void;
+	function updateIce(configuration : Nullable.<RTCConfiguration>, constraints : Nullable.<Map.<variant>>/*MediaConstraints?*/) : void;
+	function updateIce(configuration : Nullable.<RTCConfiguration>, constraints : Nullable.<Map.<variant>>/*MediaConstraints?*/, restart : boolean) : void;
 	function addIceCandidate(candidate : RTCIceCandidate) : void;
 	__readonly__ var iceState : string/*RTCIceState*/;
 	__readonly__ var localStreams : MediaStream[]/*MediaStreamArray*/;
@@ -5307,7 +5307,7 @@ native final class RTCPeerConnection extends EventTarget {
 	function createDataChannel(label : string/*DOMString*/, dataChannelDict : DataChannelInit) : DataChannel;
 	var ondatachannel : Nullable.<function(:Event):void>/*EventHandler*/;
 	function addStream(stream : MediaStream) : void;
-	function addStream(stream : MediaStream, constraints : MediaConstraints) : void;
+	function addStream(stream : MediaStream, constraints : Map.<variant>/*MediaConstraints*/) : void;
 	function removeStream(stream : MediaStream) : void;
 	function close() : void;
 	var onnegotationneeded : Nullable.<function(:Event):void>/*EventHandler*/;
@@ -5445,11 +5445,15 @@ native final class MediaStreamTrackList {
 
 } // end of MediaStreamTrackList
 
-/** @see http://www.w3.org/TR/mediacapture-streams/ */
 native __fake__ class NavigatorUserMedia {
 
-	function getUserMedia(constraints : Nullable.<MediaStreamConstraints>, successCallback : function(stream:LocalMediaStream):void/*NavigatorUserMediaSuccessCallback*/) : void;
-	function getUserMedia(constraints : Nullable.<MediaStreamConstraints>, successCallback : function(stream:LocalMediaStream):void/*NavigatorUserMediaSuccessCallback*/, errorCallback : Nullable.<function(error:NavigatorUserMediaError):void>/*NavigatorUserMediaErrorCallback?*/) : void;
+	/** @see http://www.w3.org/TR/mediacapture-streams/ */
+	function getUserMedia(constraints : Nullable.<Map.<variant>>/*MediaStreamConstraints?*/, successCallback : function(stream:LocalMediaStream):void/*NavigatorUserMediaSuccessCallback*/) : void;
+	/** @see http://www.w3.org/TR/mediacapture-streams/ */
+	function getUserMedia(constraints : Nullable.<Map.<variant>>/*MediaStreamConstraints?*/, successCallback : function(stream:LocalMediaStream):void/*NavigatorUserMediaSuccessCallback*/, errorCallback : Nullable.<function(error:NavigatorUserMediaError):void>/*NavigatorUserMediaErrorCallback?*/) : void;
+
+	function webkitGetUserMedia(constraints : Nullable.<Map.<variant>>/*MediaStreamConstraints?*/, successCallback : function(stream:LocalMediaStream):void/*NavigatorUserMediaSuccessCallback*/) : void;
+	function webkitGetUserMedia(constraints : Nullable.<Map.<variant>>/*MediaStreamConstraints?*/, successCallback : function(stream:LocalMediaStream):void/*NavigatorUserMediaSuccessCallback*/, errorCallback : Nullable.<function(error:NavigatorUserMediaError):void>/*NavigatorUserMediaErrorCallback?*/) : void;
 
 } // end of NavigatorUserMedia
 
@@ -7123,9 +7127,6 @@ native final class DeviceMotionEventInit extends EventInit {
 } // end of DeviceMotionEventInit
 
 native final class SVGMatrix {
-}
-
-native final class MediaConstraints {
 }
 
 native final __fake__ class CanvasPixelArray {
