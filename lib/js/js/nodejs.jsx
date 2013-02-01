@@ -2,6 +2,8 @@
  * NodeJS binding for JSX (EXPERIMENTAL)
  *
  * This module is experimental. Any API is subject to change.
+ *
+ * @see http://nodejs.org/api/
  */
 
 /*
@@ -53,6 +55,9 @@ native __fake__ class EventEmitter {
 	function on(event : string, listener : function(:variant,:variant):void) : void;
 }
 
+/**
+ * @see http://nodejs.org/api/process.html
+ */
 native class process {
 	static var argv : string[];
 
@@ -97,6 +102,19 @@ native class process {
 
 	static function umask(mask : int) : int;
 	static function uptime() : int;
+
+	/**
+	 * Returns the current high-resolution real time.
+	 * @return [seconds, nanoseconds]
+	 */
+	static function hrtime() : number[];
+	/**
+	 * Returns the difference from previousTime in high-resolution real time.
+	 *
+	 * @param previousTime a result of a previous call to <code>process.hrtime()</code>.
+	 * @return [seconds, nanoseconds]
+	 */
+	static function hrtime(previousTime : number[]) : number[];
 }
 
 native class os {
