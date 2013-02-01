@@ -34,8 +34,6 @@ import "./jsemitter.jsx";
 import "./optimizer.jsx";
 import "./util.jsx";
 
-import "js/nodejs.jsx"; // FIXME refer to process.execPath
-
 class JSXCommand {
 
 	static function help() : string {
@@ -219,7 +217,7 @@ class JSXCommand {
 					break;
 				case "node": // implies JavaScriptEmitter
 					tasks.push(function () : void {
-						var shebang =  "#!" + process.execPath + "\n";
+						var shebang =  "#!/usr/bin/env node\n";
 						emitter.addHeader(shebang);
 					});
 					break;
