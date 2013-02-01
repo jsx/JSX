@@ -19,8 +19,6 @@ use Getopt::Long;
 use WebIDL::Type;
 use WebIDL::TypeMap;
 
-use constant WIDTH => 68;
-
 # see http://www.w3.org/TR/WebIDL/
 
 GetOptions(
@@ -679,12 +677,6 @@ foreach my $def(values %classdef) {
                     $serialized =~ s/$rx_comments//xmsg;
                     $serialized  =~ s/\s+/ /g;
                     next if $seen{$serialized}++;
-
-                    # prettify if needed
-                    if(length $s > WIDTH) {
-                        $s =~ s/ \( (.+) \) /prettify_params($1)/xmse;
-                    }
-
                 }
                 else {
                     # skip if it is already defined
@@ -920,14 +912,6 @@ sub find_member_from_bases {
     }
 
     return @m;
-}
-
-sub prettify_params {
-    my($params) = @_;
-
-    my $p = join ",\n", map { trim($_) } split /,/, $params;
-    $p =~ s/^/\t/xmsg;
-    return "(\n$p\n)";
 }
 
 sub function_params {

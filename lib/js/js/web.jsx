@@ -122,10 +122,7 @@ native class Event {
 	/** @see http://www.w3.org/TR/dom/ */
 	function constructor(type : string/*DOMString*/);
 	/** @see http://www.w3.org/TR/dom/ */
-	function constructor(
-		type : string/*DOMString*/,
-		eventInitDict : EventInit
-	);
+	function constructor(type : string/*DOMString*/, eventInitDict : EventInit);
 
 	/** @see http://www.w3.org/TR/dom/ */
 	__readonly__ var type : string/*DOMString*/;
@@ -168,11 +165,7 @@ native class Event {
 	/** @see http://www.w3.org/TR/dom/ */
 	__readonly__ var timeStamp : number/*DOMTimeStamp*/;
 	/** @see http://www.w3.org/TR/dom/ */
-	function initEvent(
-		type : string/*DOMString*/,
-		bubbles : boolean,
-		cancelable : boolean
-	) : void;
+	function initEvent(type : string/*DOMString*/, bubbles : boolean, cancelable : boolean) : void;
 
 	// PhaseType
 	// Introduced in DOM Level 3:
@@ -195,22 +188,14 @@ native final class CustomEvent extends Event {
 	/** @see http://www.w3.org/TR/dom/ */
 	function constructor(type : string/*DOMString*/);
 	/** @see http://www.w3.org/TR/dom/ */
-	function constructor(
-		type : string/*DOMString*/,
-		eventInitDict : CustomEventInit
-	);
+	function constructor(type : string/*DOMString*/, eventInitDict : CustomEventInit);
 
 	/** @see http://www.w3.org/TR/dom/ */
 	__readonly__ var detail : variant/*any*/;
 
 
 	// Originally introduced (and deprecated) in DOM Level 3:
-	function initCustomEvent(
-		typeArg : string/*DOMString*/,
-		canBubbleArg : boolean,
-		cancelableArg : boolean,
-		detailArg : variant/*any*/
-	) : void;
+	function initCustomEvent(typeArg : string/*DOMString*/, canBubbleArg : boolean, cancelableArg : boolean, detailArg : variant/*any*/) : void;
 
 } // end of CustomEvent
 
@@ -231,27 +216,13 @@ native final class CustomEventInit extends EventInit {
 native __fake__ class EventTarget {
 
 	/** @see http://www.w3.org/TR/dom/ */
-	function addEventListener(
-		type : string/*DOMString*/,
-		callback : Nullable.<function(:Event):void>/*EventListener?*/
-	) : void;
+	function addEventListener(type : string/*DOMString*/, callback : Nullable.<function(:Event):void>/*EventListener?*/) : void;
 	/** @see http://www.w3.org/TR/dom/ */
-	function addEventListener(
-		type : string/*DOMString*/,
-		callback : Nullable.<function(:Event):void>/*EventListener?*/,
-		capture : boolean
-	) : void;
+	function addEventListener(type : string/*DOMString*/, callback : Nullable.<function(:Event):void>/*EventListener?*/, capture : boolean) : void;
 	/** @see http://www.w3.org/TR/dom/ */
-	function removeEventListener(
-		type : string/*DOMString*/,
-		callback : Nullable.<function(:Event):void>/*EventListener?*/
-	) : void;
+	function removeEventListener(type : string/*DOMString*/, callback : Nullable.<function(:Event):void>/*EventListener?*/) : void;
 	/** @see http://www.w3.org/TR/dom/ */
-	function removeEventListener(
-		type : string/*DOMString*/,
-		callback : Nullable.<function(:Event):void>/*EventListener?*/,
-		capture : boolean
-	) : void;
+	function removeEventListener(type : string/*DOMString*/, callback : Nullable.<function(:Event):void>/*EventListener?*/, capture : boolean) : void;
 	/** @see http://www.w3.org/TR/dom/ */
 	function dispatchEvent(event : Event) : boolean;
 
@@ -262,15 +233,9 @@ native __fake__ class EventTarget {
 /** @see http://www.w3.org/TR/dom/ */
 native final class MutationObserver {
 
-	function constructor(
-		callback : function(mutations:MutationRecord[],
-		observer:MutationObserver):void/*MutationCallback*/
-	);
+	function constructor(callback : function(mutations:MutationRecord[],observer:MutationObserver):void/*MutationCallback*/);
 
-	function observe(
-		target : Node,
-		options : MutationObserverInit
-	) : void;
+	function observe(target : Node, options : MutationObserverInit) : void;
 	function disconnect() : void;
 	function takeRecords() : MutationRecord[];
 
@@ -370,19 +335,11 @@ native class Node extends EventTarget {
 	       __readonly__ var DOCUMENT_POSITION_CONTAINED_BY : number/*unsigned short*/;
 	static __readonly__ var DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC : number/*unsigned short*/;
 	       __readonly__ var DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC : number/*unsigned short*/;
-	function compareDocumentPosition(
-		other : Node
-	) : number/*unsigned short*/;
+	function compareDocumentPosition(other : Node) : number/*unsigned short*/;
 	function contains(other : Nullable.<Node>) : boolean;
-	function lookupPrefix(
-		namespace : Nullable.<string>/*DOMString?*/
-	) : Nullable.<string>/*DOMString?*/;
-	function lookupNamespaceURI(
-		prefix : Nullable.<string>/*DOMString?*/
-	) : Nullable.<string>/*DOMString?*/;
-	function isDefaultNamespace(
-		namespace : Nullable.<string>/*DOMString?*/
-	) : boolean;
+	function lookupPrefix(namespace : Nullable.<string>/*DOMString?*/) : Nullable.<string>/*DOMString?*/;
+	function lookupNamespaceURI(prefix : Nullable.<string>/*DOMString?*/) : Nullable.<string>/*DOMString?*/;
+	function isDefaultNamespace(namespace : Nullable.<string>/*DOMString?*/) : boolean;
 
 } // end of Node
 
@@ -399,31 +356,16 @@ native class Document extends Node {
 	__readonly__ var contentType : string/*DOMString*/;
 	__readonly__ var doctype : Nullable.<DocumentType>;
 	__readonly__ var documentElement : Nullable.<Element>;
-	function getElementsByTagName(
-		localName : string/*DOMString*/
-	) : HTMLCollection;
-	function getElementsByTagNameNS(
-		namespace : Nullable.<string>/*DOMString?*/,
-		localName : string/*DOMString*/
-	) : HTMLCollection;
-	function getElementsByClassName(
-		classNames : string/*DOMString*/
-	) : HTMLCollection;
-	function getElementById(
-		elementId : string/*DOMString*/
-	) : Nullable.<Element>;
+	function getElementsByTagName(localName : string/*DOMString*/) : HTMLCollection;
+	function getElementsByTagNameNS(namespace : Nullable.<string>/*DOMString?*/, localName : string/*DOMString*/) : HTMLCollection;
+	function getElementsByClassName(classNames : string/*DOMString*/) : HTMLCollection;
+	function getElementById(elementId : string/*DOMString*/) : Nullable.<Element>;
 	function createElement(localName : string/*DOMString*/) : Element;
-	function createElementNS(
-		namespace : Nullable.<string>/*DOMString?*/,
-		qualifiedName : string/*DOMString*/
-	) : Element;
+	function createElementNS(namespace : Nullable.<string>/*DOMString?*/, qualifiedName : string/*DOMString*/) : Element;
 	function createDocumentFragment() : DocumentFragment;
 	function createTextNode(data : string/*DOMString*/) : Text;
 	function createComment(data : string/*DOMString*/) : Comment;
-	function createProcessingInstruction(
-		target : string/*DOMString*/,
-		data : string/*DOMString*/
-	) : ProcessingInstruction;
+	function createProcessingInstruction(target : string/*DOMString*/, data : string/*DOMString*/) : ProcessingInstruction;
 	function importNode(node : Node) : Node;
 	function importNode(node : Node, deep : boolean) : Node;
 	function adoptNode(node : Node) : Node;
@@ -431,25 +373,11 @@ native class Document extends Node {
 	function createRange() : Range;
 	// NodeFilter.SHOW_ALL = 0xFFFFFFFF
 	function createNodeIterator(root : Node) : NodeIterator;
-	function createNodeIterator(
-		root : Node,
-		whatToShow : number/*unsigned long*/
-	) : NodeIterator;
-	function createNodeIterator(
-		root : Node,
-		whatToShow : number/*unsigned long*/,
-		filter : Nullable.<NodeFilter>
-	) : NodeIterator;
+	function createNodeIterator(root : Node, whatToShow : number/*unsigned long*/) : NodeIterator;
+	function createNodeIterator(root : Node, whatToShow : number/*unsigned long*/, filter : Nullable.<NodeFilter>) : NodeIterator;
 	function createTreeWalker(root : Node) : TreeWalker;
-	function createTreeWalker(
-		root : Node,
-		whatToShow : number/*unsigned long*/
-	) : TreeWalker;
-	function createTreeWalker(
-		root : Node,
-		whatToShow : number/*unsigned long*/,
-		filter : Nullable.<NodeFilter>
-	) : TreeWalker;
+	function createTreeWalker(root : Node, whatToShow : number/*unsigned long*/) : TreeWalker;
+	function createTreeWalker(root : Node, whatToShow : number/*unsigned long*/, filter : Nullable.<NodeFilter>) : TreeWalker;
 	// NEW
 	function prepend(...nodes : Node) : void;
 	function prepend(...nodes : string/*DOMString*/) : void;
@@ -471,44 +399,24 @@ native class Document extends Node {
 	/** @see http://dev.w3.org/csswg/cssom/ */
 	__readonly__ var styleSheetSets : DOMStringList;
 	/** @see http://dev.w3.org/csswg/cssom/ */
-	function enableStyleSheetsForSet(
-		name : Nullable.<string>/*DOMString?*/
-	) : void;
+	function enableStyleSheetsForSet(name : Nullable.<string>/*DOMString?*/) : void;
 
 	/** @see http://dev.w3.org/csswg/cssom-view/ */
-	function elementFromPoint(
-		x : number/*float*/,
-		y : number/*float*/
-	) : Nullable.<Element>;
+	function elementFromPoint(x : number/*float*/, y : number/*float*/) : Nullable.<Element>;
 	/** @see http://dev.w3.org/csswg/cssom-view/ */
-	function caretPositionFromPoint(
-		x : number/*float*/,
-		y : number/*float*/
-	) : Nullable.<CaretPosition>;
+	function caretPositionFromPoint(x : number/*float*/, y : number/*float*/) : Nullable.<CaretPosition>;
 
 	/** @see http://www.w3.org/TR/touch-events/ */
-	function createTouch(
-		view : AbstractView,
-		target : EventTarget,
-		identifier : number/*long*/,
-		pageX : number/*long*/,
-		pageY : number/*long*/,
-		screenX : number/*long*/,
-		screenY : number/*long*/
-	) : Touch;
+	function createTouch(view : AbstractView, target : EventTarget, identifier : number/*long*/, pageX : number/*long*/, pageY : number/*long*/, screenX : number/*long*/, screenY : number/*long*/) : Touch;
 	/** @see http://www.w3.org/TR/touch-events/ */
 	function createTouchList(touches : Touch[]) : TouchList;
 	/** @see http://www.w3.org/TR/touch-events/ */
 	function createTouchList(touch : Touch) : TouchList;
 
 	/** @see http://www.w3.org/TR/selectors-api/ */
-	function querySelector(
-		selectors : string/*DOMString*/
-	) : Nullable.<Element>;
+	function querySelector(selectors : string/*DOMString*/) : Nullable.<Element>;
 	/** @see http://www.w3.org/TR/selectors-api/ */
-	function querySelectorAll(
-		selectors : string/*DOMString*/
-	) : NodeList;
+	function querySelectorAll(selectors : string/*DOMString*/) : NodeList;
 
 } // end of Document
 
@@ -523,22 +431,11 @@ native final class XMLDocument extends Document {
 /** @see http://www.w3.org/TR/dom/ */
 native final class DOMImplementation {
 
-	function createDocumentType(
-		qualifiedName : string/*DOMString*/,
-		publicId : string/*DOMString*/,
-		systemId : string/*DOMString*/
-	) : DocumentType;
-	function createDocument(
-		namespace : Nullable.<string>/*DOMString?*/,
-		qualifiedName : string/*DOMString*/,
-		doctype : Nullable.<DocumentType>
-	) : XMLDocument;
+	function createDocumentType(qualifiedName : string/*DOMString*/, publicId : string/*DOMString*/, systemId : string/*DOMString*/) : DocumentType;
+	function createDocument(namespace : Nullable.<string>/*DOMString?*/, qualifiedName : string/*DOMString*/, doctype : Nullable.<DocumentType>) : XMLDocument;
 	function createHTMLDocument() : Document;
 	function createHTMLDocument(title : string/*DOMString*/) : Document;
-	function hasFeature(
-		feature : string/*DOMString*/,
-		version : string/*DOMString*/
-	) : boolean;
+	function hasFeature(feature : string/*DOMString*/, version : string/*DOMString*/) : boolean;
 
 } // end of DOMImplementation
 
@@ -552,13 +449,9 @@ native final class DocumentFragment extends Node {
 	function append(...nodes : string/*DOMString*/) : void;
 
 	/** @see http://www.w3.org/TR/selectors-api/ */
-	function querySelector(
-		selectors : string/*DOMString*/
-	) : Nullable.<Element>;
+	function querySelector(selectors : string/*DOMString*/) : Nullable.<Element>;
 	/** @see http://www.w3.org/TR/selectors-api/ */
-	function querySelectorAll(
-		selectors : string/*DOMString*/
-	) : NodeList;
+	function querySelectorAll(selectors : string/*DOMString*/) : NodeList;
 
 } // end of DocumentFragment
 
@@ -590,42 +483,17 @@ native class Element extends Node {
 	var className : string/*DOMString*/;
 	__readonly__ var classList : DOMTokenList;
 	__readonly__ var attributes : Attr[];
-	function getAttribute(
-		name : string/*DOMString*/
-	) : Nullable.<string>/*DOMString?*/;
-	function getAttributeNS(
-		namespace : Nullable.<string>/*DOMString?*/,
-		localName : string/*DOMString*/
-	) : Nullable.<string>/*DOMString?*/;
-	function setAttribute(
-		name : string/*DOMString*/,
-		value : string/*DOMString*/
-	) : void;
-	function setAttributeNS(
-		namespace : Nullable.<string>/*DOMString?*/,
-		name : string/*DOMString*/,
-		value : string/*DOMString*/
-	) : void;
+	function getAttribute(name : string/*DOMString*/) : Nullable.<string>/*DOMString?*/;
+	function getAttributeNS(namespace : Nullable.<string>/*DOMString?*/, localName : string/*DOMString*/) : Nullable.<string>/*DOMString?*/;
+	function setAttribute(name : string/*DOMString*/, value : string/*DOMString*/) : void;
+	function setAttributeNS(namespace : Nullable.<string>/*DOMString?*/, name : string/*DOMString*/, value : string/*DOMString*/) : void;
 	function removeAttribute(name : string/*DOMString*/) : void;
-	function removeAttributeNS(
-		namespace : Nullable.<string>/*DOMString?*/,
-		localName : string/*DOMString*/
-	) : void;
+	function removeAttributeNS(namespace : Nullable.<string>/*DOMString?*/, localName : string/*DOMString*/) : void;
 	function hasAttribute(name : string/*DOMString*/) : boolean;
-	function hasAttributeNS(
-		namespace : Nullable.<string>/*DOMString?*/,
-		localName : string/*DOMString*/
-	) : boolean;
-	function getElementsByTagName(
-		localName : string/*DOMString*/
-	) : HTMLCollection;
-	function getElementsByTagNameNS(
-		namespace : Nullable.<string>/*DOMString?*/,
-		localName : string/*DOMString*/
-	) : HTMLCollection;
-	function getElementsByClassName(
-		classNames : string/*DOMString*/
-	) : HTMLCollection;
+	function hasAttributeNS(namespace : Nullable.<string>/*DOMString?*/, localName : string/*DOMString*/) : boolean;
+	function getElementsByTagName(localName : string/*DOMString*/) : HTMLCollection;
+	function getElementsByTagNameNS(namespace : Nullable.<string>/*DOMString?*/, localName : string/*DOMString*/) : HTMLCollection;
+	function getElementsByClassName(classNames : string/*DOMString*/) : HTMLCollection;
 	__readonly__ var children : HTMLCollection;
 	__readonly__ var firstElementChild : Nullable.<Element>;
 	__readonly__ var lastElementChild : Nullable.<Element>;
@@ -650,10 +518,7 @@ native class Element extends Node {
 	/** @see http://www.w3.org/TR/DOM-Parsing/ */
 	var outerHTML : string/*DOMString*/;
 	/** @see http://www.w3.org/TR/DOM-Parsing/ */
-	function insertAdjacentHTML(
-		position : string/*DOMString*/,
-		text : string/*DOMString*/
-	) : void;
+	function insertAdjacentHTML(position : string/*DOMString*/, text : string/*DOMString*/) : void;
 
 	/** @see http://dev.w3.org/csswg/cssom-view/ */
 	function getClientRects() : ClientRectList;
@@ -681,13 +546,9 @@ native class Element extends Node {
 	__readonly__ var clientHeight : number/*long*/;
 
 	/** @see http://www.w3.org/TR/selectors-api/ */
-	function querySelector(
-		selectors : string/*DOMString*/
-	) : Nullable.<Element>;
+	function querySelector(selectors : string/*DOMString*/) : Nullable.<Element>;
 	/** @see http://www.w3.org/TR/selectors-api/ */
-	function querySelectorAll(
-		selectors : string/*DOMString*/
-	) : NodeList;
+	function querySelectorAll(selectors : string/*DOMString*/) : NodeList;
 
 } // end of Element
 
@@ -707,24 +568,11 @@ native class CharacterData extends Node {
 
 	var data : string/*DOMString*/;
 	__readonly__ var length : number/*unsigned long*/;
-	function substringData(
-		offset : number/*unsigned long*/,
-		count : number/*unsigned long*/
-	) : string/*DOMString*/;
+	function substringData(offset : number/*unsigned long*/, count : number/*unsigned long*/) : string/*DOMString*/;
 	function appendData(data : string/*DOMString*/) : void;
-	function insertData(
-		offset : number/*unsigned long*/,
-		data : string/*DOMString*/
-	) : void;
-	function deleteData(
-		offset : number/*unsigned long*/,
-		count : number/*unsigned long*/
-	) : void;
-	function replaceData(
-		offset : number/*unsigned long*/,
-		count : number/*unsigned long*/,
-		data : string/*DOMString*/
-	) : void;
+	function insertData(offset : number/*unsigned long*/, data : string/*DOMString*/) : void;
+	function deleteData(offset : number/*unsigned long*/, count : number/*unsigned long*/) : void;
+	function replaceData(offset : number/*unsigned long*/, count : number/*unsigned long*/, data : string/*DOMString*/) : void;
 	// NEW
 	function before(...nodes : Node) : void;
 	function before(...nodes : string/*DOMString*/) : void;
@@ -767,14 +615,8 @@ native final class Range {
 	__readonly__ var endOffset : number/*unsigned long*/;
 	__readonly__ var collapsed : boolean;
 	__readonly__ var commonAncestorContainer : Node;
-	function setStart(
-		refNode : Node,
-		offset : number/*unsigned long*/
-	) : void;
-	function setEnd(
-		refNode : Node,
-		offset : number/*unsigned long*/
-	) : void;
+	function setStart(refNode : Node, offset : number/*unsigned long*/) : void;
+	function setEnd(refNode : Node, offset : number/*unsigned long*/) : void;
 	function setStartBefore(refNode : Node) : void;
 	function setStartAfter(refNode : Node) : void;
 	function setEndBefore(refNode : Node) : void;
@@ -790,10 +632,7 @@ native final class Range {
 	       __readonly__ var END_TO_END : number/*unsigned short*/;
 	static __readonly__ var END_TO_START : number/*unsigned short*/;
 	       __readonly__ var END_TO_START : number/*unsigned short*/;
-	function compareBoundaryPoints(
-		how : number/*unsigned short*/,
-		sourceRange : Range
-	) : number/*short*/;
+	function compareBoundaryPoints(how : number/*unsigned short*/, sourceRange : Range) : number/*short*/;
 	function deleteContents() : void;
 	function extractContents() : DocumentFragment;
 	function cloneContents() : DocumentFragment;
@@ -801,20 +640,12 @@ native final class Range {
 	function surroundContents(newParent : Node) : void;
 	function cloneRange() : Range;
 	function detach() : void;
-	function isPointInRange(
-		node : Node,
-		offset : number/*unsigned long*/
-	) : boolean;
-	function comparePoint(
-		node : Node,
-		offset : number/*unsigned long*/
-	) : number/*short*/;
+	function isPointInRange(node : Node, offset : number/*unsigned long*/) : boolean;
+	function comparePoint(node : Node, offset : number/*unsigned long*/) : number/*short*/;
 	function intersectsNode(node : Node) : boolean;
 
 	/** @see http://www.w3.org/TR/DOM-Parsing/ */
-	function createContextualFragment(
-		fragment : string/*DOMString*/
-	) : DocumentFragment;
+	function createContextualFragment(fragment : string/*DOMString*/) : DocumentFragment;
 
 	/** @see http://dev.w3.org/csswg/cssom-view/ */
 	function getClientRects() : ClientRectList;
@@ -904,9 +735,7 @@ native final class NodeFilter {
 /** @see http://www.w3.org/TR/dom/ */
 native class NodeList {
 
-	function __native_index_operator__(
-		index : number/*unsigned long*/
-	) : Nullable.<Node>;
+	function __native_index_operator__(index : number/*unsigned long*/) : Nullable.<Node>;
 	/* getter */
 	function item(index : number/*unsigned long*/) : Nullable.<Node>;
 	__readonly__ var length : number/*unsigned long*/;
@@ -917,18 +746,12 @@ native class NodeList {
 native class HTMLCollection {
 
 	__readonly__ var length : number/*unsigned long*/;
-	function __native_index_operator__(
-		index : number/*unsigned long*/
-	) : Nullable.<Element>;
+	function __native_index_operator__(index : number/*unsigned long*/) : Nullable.<Element>;
 	/* getter */
 	function item(index : number/*unsigned long*/) : Nullable.<Element>;
-	function __native_index_operator__(
-		name : string/*DOMString*/
-	) : Nullable.<Object>/*object?*/;
+	function __native_index_operator__(name : string/*DOMString*/) : Nullable.<Object>/*object?*/;
 	/* getter */
-	function namedItem(
-		name : string/*DOMString*/
-	) : Nullable.<Object>/*object?*/;
+	function namedItem(name : string/*DOMString*/) : Nullable.<Object>/*object?*/;
 	// only returns Element
 
 } // end of HTMLCollection
@@ -937,13 +760,9 @@ native class HTMLCollection {
 native final __fake__ class DOMStringList {
 
 	__readonly__ var length : number/*unsigned long*/;
-	function __native_index_operator__(
-		index : number/*unsigned long*/
-	) : Nullable.<string>/*DOMString?*/;
+	function __native_index_operator__(index : number/*unsigned long*/) : Nullable.<string>/*DOMString?*/;
 	/* getter */
-	function item(
-		index : number/*unsigned long*/
-	) : Nullable.<string>/*DOMString?*/;
+	function item(index : number/*unsigned long*/) : Nullable.<string>/*DOMString?*/;
 	function contains(string : string/*DOMString*/) : boolean;
 
 } // end of DOMStringList
@@ -952,21 +771,14 @@ native final __fake__ class DOMStringList {
 native class DOMTokenList {
 
 	__readonly__ var length : number/*unsigned long*/;
-	function __native_index_operator__(
-		index : number/*unsigned long*/
-	) : Nullable.<string>/*DOMString?*/;
+	function __native_index_operator__(index : number/*unsigned long*/) : Nullable.<string>/*DOMString?*/;
 	/* getter */
-	function item(
-		index : number/*unsigned long*/
-	) : Nullable.<string>/*DOMString?*/;
+	function item(index : number/*unsigned long*/) : Nullable.<string>/*DOMString?*/;
 	function contains(token : string/*DOMString*/) : boolean;
 	function add(...tokens : string/*DOMString...*/) : void;
 	function remove(...tokens : string/*DOMString...*/) : void;
 	function toggle(token : string/*DOMString*/) : boolean;
-	function toggle(
-		token : string/*DOMString*/,
-		force : boolean
-	) : boolean;
+	function toggle(token : string/*DOMString*/, force : boolean) : boolean;
 
 } // end of DOMTokenList
 
@@ -1005,18 +817,9 @@ native class UIEvent extends Event {
 	__readonly__ var view : Nullable.<AbstractView>;
 	__readonly__ var detail : number/*long*/;
 	// Deprecated in DOM Level 3:
-	function initUIEvent(
-		typeArg : string/*DOMString*/,
-		canBubbleArg : boolean,
-		cancelableArg : boolean,
-		viewArg : Nullable.<AbstractView>,
-		detailArg : number/*long*/
-	) : void;
+	function initUIEvent(typeArg : string/*DOMString*/, canBubbleArg : boolean, cancelableArg : boolean, viewArg : Nullable.<AbstractView>, detailArg : number/*long*/) : void;
 	function constructor(typeArg : string/*DOMString*/);
-	function constructor(
-		typeArg : string/*DOMString*/,
-		dictUIEventInit : UIEventInit
-	);
+	function constructor(typeArg : string/*DOMString*/, dictUIEventInit : UIEventInit);
 
 } // end of UIEvent
 
@@ -1025,20 +828,10 @@ native final class FocusEvent extends UIEvent {
 
 	__readonly__ var relatedTarget : Nullable.<EventTarget>;
 	function constructor(typeArg : string/*DOMString*/);
-	function constructor(
-		typeArg : string/*DOMString*/,
-		focusEventInitDict : FocusEventInit
-	);
+	function constructor(typeArg : string/*DOMString*/, focusEventInitDict : FocusEventInit);
 
 	// Originally introduced (and deprecated) in DOM Level 3:
-	function initFocusEvent(
-		typeArg : string/*DOMString*/,
-		canBubbleArg : boolean,
-		cancelableArg : boolean,
-		viewArg : Nullable.<AbstractView>,
-		detailArg : number/*long*/,
-		relatedTargetArg : Nullable.<EventTarget>
-	) : void;
+	function initFocusEvent(typeArg : string/*DOMString*/, canBubbleArg : boolean, cancelableArg : boolean, viewArg : Nullable.<AbstractView>, detailArg : number/*long*/, relatedTargetArg : Nullable.<EventTarget>) : void;
 
 } // end of FocusEvent
 
@@ -1057,30 +850,11 @@ native class MouseEvent extends UIEvent {
 	__readonly__ var buttons : number/*unsigned short*/;
 	__readonly__ var relatedTarget : Nullable.<EventTarget>;
 	// Deprecated in DOM Level 3:
-	function initMouseEvent(
-		typeArg : string/*DOMString*/,
-		canBubbleArg : boolean,
-		cancelableArg : boolean,
-		viewArg : Nullable.<AbstractView>,
-		detailArg : number/*long*/,
-		screenXArg : number/*long*/,
-		screenYArg : number/*long*/,
-		clientXArg : number/*long*/,
-		clientYArg : number/*long*/,
-		ctrlKeyArg : boolean,
-		altKeyArg : boolean,
-		shiftKeyArg : boolean,
-		metaKeyArg : boolean,
-		buttonArg : number/*unsigned short*/,
-		relatedTargetArg : Nullable.<EventTarget>
-	) : void;
+	function initMouseEvent(typeArg : string/*DOMString*/, canBubbleArg : boolean, cancelableArg : boolean, viewArg : Nullable.<AbstractView>, detailArg : number/*long*/, screenXArg : number/*long*/, screenYArg : number/*long*/, clientXArg : number/*long*/, clientYArg : number/*long*/, ctrlKeyArg : boolean, altKeyArg : boolean, shiftKeyArg : boolean, metaKeyArg : boolean, buttonArg : number/*unsigned short*/, relatedTargetArg : Nullable.<EventTarget>) : void;
 	// Introduced in DOM Level 3:
 	function getModifierState(keyArg : string/*DOMString*/) : boolean;
 	function constructor(typeArg : string/*DOMString*/);
-	function constructor(
-		typeArg : string/*DOMString*/,
-		mouseEventInitDict : MouseEventInit
-	);
+	function constructor(typeArg : string/*DOMString*/, mouseEventInitDict : MouseEventInit);
 
 
 	/** @see http://dev.w3.org/csswg/cssom-view/ */
@@ -1116,30 +890,10 @@ native final class WheelEvent extends MouseEvent {
 	__readonly__ var deltaZ : number/*double*/;
 	__readonly__ var deltaMode : number/*unsigned long*/;
 	function constructor(typeArg : string/*DOMString*/);
-	function constructor(
-		typeArg : string/*DOMString*/,
-		wheelEventInitDict : WheelEventInit
-	);
+	function constructor(typeArg : string/*DOMString*/, wheelEventInitDict : WheelEventInit);
 
 	// Originally introduced (and deprecated) in DOM Level 3:
-	function initWheelEvent(
-		typeArg : string/*DOMString*/,
-		canBubbleArg : boolean,
-		cancelableArg : boolean,
-		viewArg : Nullable.<AbstractView>,
-		detailArg : number/*long*/,
-		screenXArg : number/*long*/,
-		screenYArg : number/*long*/,
-		clientXArg : number/*long*/,
-		clientYArg : number/*long*/,
-		buttonArg : number/*unsigned short*/,
-		relatedTargetArg : Nullable.<EventTarget>,
-		modifiersListArg : string/*DOMString*/,
-		deltaXArg : number/*double*/,
-		deltaYArg : number/*double*/,
-		deltaZArg : number/*double*/,
-		deltaMode : number/*unsigned long*/
-	) : void;
+	function initWheelEvent(typeArg : string/*DOMString*/, canBubbleArg : boolean, cancelableArg : boolean, viewArg : Nullable.<AbstractView>, detailArg : number/*long*/, screenXArg : number/*long*/, screenYArg : number/*long*/, clientXArg : number/*long*/, clientYArg : number/*long*/, buttonArg : number/*unsigned short*/, relatedTargetArg : Nullable.<EventTarget>, modifiersListArg : string/*DOMString*/, deltaXArg : number/*double*/, deltaYArg : number/*double*/, deltaZArg : number/*double*/, deltaMode : number/*unsigned long*/) : void;
 
 } // end of WheelEvent
 
@@ -1170,24 +924,10 @@ native final class KeyboardEvent extends UIEvent {
 	__readonly__ var locale : string/*DOMString*/;
 	function getModifierState(keyArg : string/*DOMString*/) : boolean;
 	function constructor(typeArg : string/*DOMString*/);
-	function constructor(
-		typeArg : string/*DOMString*/,
-		keyboardEventInitDict : KeyboardEventInit
-	);
+	function constructor(typeArg : string/*DOMString*/, keyboardEventInitDict : KeyboardEventInit);
 
 	// Originally introduced (and deprecated) in DOM Level 3:
-	function initKeyboardEvent(
-		typeArg : string/*DOMString*/,
-		canBubbleArg : boolean,
-		cancelableArg : boolean,
-		viewArg : Nullable.<AbstractView>,
-		charArg : string/*DOMString*/,
-		keyArg : string/*DOMString*/,
-		locationArg : number/*unsigned long*/,
-		modifiersListArg : string/*DOMString*/,
-		repeat : boolean,
-		localeArg : string/*DOMString*/
-	) : void;
+	function initKeyboardEvent(typeArg : string/*DOMString*/, canBubbleArg : boolean, cancelableArg : boolean, viewArg : Nullable.<AbstractView>, charArg : string/*DOMString*/, keyArg : string/*DOMString*/, locationArg : number/*unsigned long*/, modifiersListArg : string/*DOMString*/, repeat : boolean, localeArg : string/*DOMString*/) : void;
 
 	// The following support legacy user agents:
 	__readonly__ var charCode : number/*unsigned long*/;
@@ -1202,20 +942,10 @@ native final class CompositionEvent extends UIEvent {
 	__readonly__ var data : Nullable.<string>/*DOMString?*/;
 	__readonly__ var locale : string/*DOMString*/;
 	function constructor(typeArg : string/*DOMString*/);
-	function constructor(
-		typeArg : string/*DOMString*/,
-		compositionEventInitDict : CompositionEventInit
-	);
+	function constructor(typeArg : string/*DOMString*/, compositionEventInitDict : CompositionEventInit);
 
 	// Originally introduced (and deprecated) in DOM Level 3:
-	function initCompositionEvent(
-		typeArg : string/*DOMString*/,
-		canBubbleArg : boolean,
-		cancelableArg : boolean,
-		viewArg : Nullable.<AbstractView>,
-		dataArg : Nullable.<string>/*DOMString?*/,
-		localeArg : string/*DOMString*/
-	) : void;
+	function initCompositionEvent(typeArg : string/*DOMString*/, canBubbleArg : boolean, cancelableArg : boolean, viewArg : Nullable.<AbstractView>, dataArg : Nullable.<string>/*DOMString?*/, localeArg : string/*DOMString*/) : void;
 
 } // end of CompositionEvent
 
@@ -1234,16 +964,7 @@ native final class MutationEvent extends Event {
 	__readonly__ var newValue : string/*DOMString*/;
 	__readonly__ var attrName : string/*DOMString*/;
 	__readonly__ var attrChange : number/*unsigned short*/;
-	function initMutationEvent(
-		typeArg : string/*DOMString*/,
-		canBubbleArg : boolean,
-		cancelableArg : boolean,
-		relatedNodeArg : Nullable.<Node>,
-		prevValueArg : string/*DOMString*/,
-		newValueArg : string/*DOMString*/,
-		attrNameArg : string/*DOMString*/,
-		attrChangeArg : number/*unsigned short*/
-	) : void;
+	function initMutationEvent(typeArg : string/*DOMString*/, canBubbleArg : boolean, cancelableArg : boolean, relatedNodeArg : Nullable.<Node>, prevValueArg : string/*DOMString*/, newValueArg : string/*DOMString*/, attrNameArg : string/*DOMString*/, attrChangeArg : number/*unsigned short*/) : void;
 
 } // end of MutationEvent
 
@@ -1388,10 +1109,7 @@ native final class CompositionEventInit {
 native final class ProgressEvent extends Event {
 
 	function constructor(type : string/*DOMString*/);
-	function constructor(
-		type : string/*DOMString*/,
-		eventInitDict : ProgressEventInit
-	);
+	function constructor(type : string/*DOMString*/, eventInitDict : ProgressEventInit);
 
 	__readonly__ var lengthComputable : boolean;
 	__readonly__ var loaded : number/*unsigned long long*/;
@@ -1404,10 +1122,7 @@ native final class DOMParser {
 
 	function constructor();
 
-	function parseFromString(
-		str : string/*DOMString*/,
-		type : string/*SupportedType*/
-	) : Document;
+	function parseFromString(str : string/*DOMString*/, type : string/*SupportedType*/) : Document;
 
 } // end of DOMParser
 
@@ -1474,32 +1189,11 @@ native final class XMLHttpRequest extends XMLHttpRequestEventTarget {
 	       __readonly__ var DONE : number/*unsigned short*/;
 	__readonly__ var readyState : number/*unsigned short*/;
 	// request
-	function open(
-		method : string/*ByteString*/,
-		url : string/*DOMString*/
-	) : void;
-	function open(
-		method : string/*ByteString*/,
-		url : string/*DOMString*/,
-		async : boolean
-	) : void;
-	function open(
-		method : string/*ByteString*/,
-		url : string/*DOMString*/,
-		async : boolean,
-		user : Nullable.<string>/*DOMString?*/
-	) : void;
-	function open(
-		method : string/*ByteString*/,
-		url : string/*DOMString*/,
-		async : boolean,
-		user : Nullable.<string>/*DOMString?*/,
-		password : Nullable.<string>/*DOMString?*/
-	) : void;
-	function setRequestHeader(
-		header : string/*ByteString*/,
-		value : string/*ByteString*/
-	) : void;
+	function open(method : string/*ByteString*/, url : string/*DOMString*/) : void;
+	function open(method : string/*ByteString*/, url : string/*DOMString*/, async : boolean) : void;
+	function open(method : string/*ByteString*/, url : string/*DOMString*/, async : boolean, user : Nullable.<string>/*DOMString?*/) : void;
+	function open(method : string/*ByteString*/, url : string/*DOMString*/, async : boolean, user : Nullable.<string>/*DOMString?*/, password : Nullable.<string>/*DOMString?*/) : void;
+	function setRequestHeader(header : string/*ByteString*/, value : string/*ByteString*/) : void;
 	var timeout : number/*unsigned long*/;
 	var withCredentials : boolean;
 	__readonly__ var upload : XMLHttpRequestUpload;
@@ -1513,9 +1207,7 @@ native final class XMLHttpRequest extends XMLHttpRequestEventTarget {
 	// response
 	__readonly__ var status : number/*unsigned short*/;
 	__readonly__ var statusText : string/*ByteString*/;
-	function getResponseHeader(
-		header : string/*ByteString*/
-	) : Nullable.<string>/*ByteString?*/;
+	function getResponseHeader(header : string/*ByteString*/) : Nullable.<string>/*ByteString?*/;
 	function getAllResponseHeaders() : string/*ByteString*/;
 	function overrideMimeType(mime : string/*DOMString*/) : void;
 	var responseType : string/*XMLHttpRequestResponseType*/;
@@ -1532,15 +1224,8 @@ native final class FormData {
 	function constructor(form : HTMLFormElement);
 
 	function append(name : string/*DOMString*/, value : Blob) : void;
-	function append(
-		name : string/*DOMString*/,
-		value : Blob,
-		filename : string/*DOMString*/
-	) : void;
-	function append(
-		name : string/*DOMString*/,
-		value : string/*DOMString*/
-	) : void;
+	function append(name : string/*DOMString*/, value : Blob, filename : string/*DOMString*/) : void;
+	function append(name : string/*DOMString*/, value : string/*DOMString*/) : void;
 
 } // end of FormData
 
@@ -1551,9 +1236,7 @@ native final class MediaList {
 
 	var mediaText : string/*DOMString*/;
 	__readonly__ var length : number/*unsigned long*/;
-	function item(
-		index : number/*unsigned long*/
-	) : string/*DOMString*/;
+	function item(index : number/*unsigned long*/) : string/*DOMString*/;
 	function appendMedium(medium : string/*DOMString*/) : void;
 	function deleteMedium(medium : string/*DOMString*/) : void;
 
@@ -1577,10 +1260,7 @@ native final class CSSStyleSheet extends StyleSheet {
 
 	__readonly__ var ownerRule : Nullable.<CSSRule>;
 	__readonly__ var cssRules : CSSRuleList;
-	function insertRule(
-		rule : string/*DOMString*/,
-		index : number/*unsigned long*/
-	) : number/*unsigned long*/;
+	function insertRule(rule : string/*DOMString*/, index : number/*unsigned long*/) : number/*unsigned long*/;
 	function deleteRule(index : number/*unsigned long*/) : void;
 
 } // end of CSSStyleSheet
@@ -1638,10 +1318,7 @@ native final class CSSMediaRule extends CSSRule {
 
 	__readonly__ var media : MediaList;
 	__readonly__ var cssRules : CSSRuleList;
-	function insertRule(
-		rule : string/*DOMString*/,
-		index : number/*unsigned long*/
-	) : number/*unsigned long*/;
+	function insertRule(rule : string/*DOMString*/, index : number/*unsigned long*/) : number/*unsigned long*/;
 	function deleteRule(index : number/*unsigned long*/) : void;
 
 } // end of CSSMediaRule
@@ -1674,27 +1351,12 @@ native final class CSSStyleDeclaration {
 
 	var cssText : string/*DOMString*/;
 	__readonly__ var length : number/*unsigned long*/;
-	function item(
-		index : number/*unsigned long*/
-	) : string/*DOMString*/;
-	function getPropertyValue(
-		property : string/*DOMString*/
-	) : string/*DOMString*/;
-	function getPropertyPriority(
-		property : string/*DOMString*/
-	) : string/*DOMString*/;
-	function setProperty(
-		property : string/*DOMString*/,
-		value : string/*DOMString*/
-	) : void;
-	function setProperty(
-		property : string/*DOMString*/,
-		value : string/*DOMString*/,
-		priority : string/*DOMString*/
-	) : void;
-	function removeProperty(
-		property : string/*DOMString*/
-	) : string/*DOMString*/;
+	function item(index : number/*unsigned long*/) : string/*DOMString*/;
+	function getPropertyValue(property : string/*DOMString*/) : string/*DOMString*/;
+	function getPropertyPriority(property : string/*DOMString*/) : string/*DOMString*/;
+	function setProperty(property : string/*DOMString*/, value : string/*DOMString*/) : void;
+	function setProperty(property : string/*DOMString*/, value : string/*DOMString*/, priority : string/*DOMString*/) : void;
+	function removeProperty(property : string/*DOMString*/) : string/*DOMString*/;
 	__readonly__ var parentRule : Nullable.<CSSRule>;
 
 	var alignmentBaseline : Nullable.<string>;
@@ -2205,10 +1867,7 @@ native final __fake__ class Window extends EventTarget {
 	/** @see http://dev.w3.org/csswg/cssom/ */
 	function getComputedStyle(elt : Element) : CSSStyleDeclaration;
 	/** @see http://dev.w3.org/csswg/cssom/ */
-	function getComputedStyle(
-		elt : Element,
-		pseudoElt : string/*DOMString*/
-	) : CSSStyleDeclaration;
+	function getComputedStyle(elt : Element, pseudoElt : string/*DOMString*/) : CSSStyleDeclaration;
 
 	/** @see http://dev.w3.org/csswg/cssom-view/ */
 	function matchMedia(query : string/*DOMString*/) : MediaQueryList;
@@ -2268,27 +1927,11 @@ native final __fake__ class Window extends EventTarget {
 	__readonly__ var frameElement : Nullable.<Element>;
 	function open() : Window/*WindowProxy*/;
 	function open(url : string/*DOMString*/) : Window/*WindowProxy*/;
-	function open(
-		url : string/*DOMString*/,
-		target : string/*DOMString*/
-	) : Window/*WindowProxy*/;
-	function open(
-		url : string/*DOMString*/,
-		target : string/*DOMString*/,
-		features : string/*DOMString*/
-	) : Window/*WindowProxy*/;
-	function open(
-		url : string/*DOMString*/,
-		target : string/*DOMString*/,
-		features : string/*DOMString*/,
-		replace : boolean
-	) : Window/*WindowProxy*/;
-	function __native_index_operator__(
-		index : number/*unsigned long*/
-	) : Nullable.<Window>/*WindowProxy*/;
-	function __native_index_operator__(
-		name : string/*DOMString*/
-	) : Nullable.<Object>/*object*/;
+	function open(url : string/*DOMString*/, target : string/*DOMString*/) : Window/*WindowProxy*/;
+	function open(url : string/*DOMString*/, target : string/*DOMString*/, features : string/*DOMString*/) : Window/*WindowProxy*/;
+	function open(url : string/*DOMString*/, target : string/*DOMString*/, features : string/*DOMString*/, replace : boolean) : Window/*WindowProxy*/;
+	function __native_index_operator__(index : number/*unsigned long*/) : Nullable.<Window>/*WindowProxy*/;
+	function __native_index_operator__(name : string/*DOMString*/) : Nullable.<Object>/*object*/;
 	// the user agent
 	__readonly__ var navigator : Navigator;
 	__readonly__ var external : External;
@@ -2296,21 +1939,11 @@ native final __fake__ class Window extends EventTarget {
 	// user prompts
 	function alert(message : string/*DOMString*/) : void;
 	function confirm(message : string/*DOMString*/) : boolean;
-	function prompt(
-		message : string/*DOMString*/
-	) : Nullable.<string>/*DOMString?*/;
-	function prompt(
-		message : string/*DOMString*/,
-		default : string/*DOMString*/
-	) : Nullable.<string>/*DOMString?*/;
+	function prompt(message : string/*DOMString*/) : Nullable.<string>/*DOMString?*/;
+	function prompt(message : string/*DOMString*/, default : string/*DOMString*/) : Nullable.<string>/*DOMString?*/;
 	function print() : void;
-	function showModalDialog(
-		url : string/*DOMString*/
-	) : variant/*any*/;
-	function showModalDialog(
-		url : string/*DOMString*/,
-		argument : variant/*any*/
-	) : variant/*any*/;
+	function showModalDialog(url : string/*DOMString*/) : variant/*any*/;
+	function showModalDialog(url : string/*DOMString*/, argument : variant/*any*/) : variant/*any*/;
 	// event handler IDL attributes
 	var onabort : Nullable.<function(:Event):void>/*EventHandler*/;
 	var onafterprint : Nullable.<function(:Event):void>/*EventHandler*/;
@@ -2401,47 +2034,24 @@ native final __fake__ class Window extends EventTarget {
 	/** @see http://www.w3.org/TR/2012/WD-IndexedDB-20120524/ */
 	__readonly__ var indexedDB : IDBFactory;
 
-	function setTimeout(
-		handler : function():void/*TimerHandler*/
-	) : number/*long*/;
-	function setTimeout(
-		handler : function():void/*TimerHandler*/,
-		timeout : number/*long*/
-	) : number/*long*/;
+	function setTimeout(handler : function():void/*TimerHandler*/) : number/*long*/;
+	function setTimeout(handler : function():void/*TimerHandler*/, timeout : number/*long*/) : number/*long*/;
 	function clearTimeout(handle : number/*long*/) : void;
-	function setInterval(
-		handler : function():void/*TimerHandler*/
-	) : number/*long*/;
-	function setInterval(
-		handler : function():void/*TimerHandler*/,
-		timeout : number/*long*/
-	) : number/*long*/;
+	function setInterval(handler : function():void/*TimerHandler*/) : number/*long*/;
+	function setInterval(handler : function():void/*TimerHandler*/, timeout : number/*long*/) : number/*long*/;
 	function clearInterval(handle : number/*long*/) : void;
 
-	function postMessage(
-		message : variant/*any*/,
-		targetOrigin : string/*DOMString*/
-	) : void;
-	function postMessage(
-		message : variant/*any*/,
-		targetOrigin : string/*DOMString*/,
-		transfer : Transferable[]
-	) : void;
+	function postMessage(message : variant/*any*/, targetOrigin : string/*DOMString*/) : void;
+	function postMessage(message : variant/*any*/, targetOrigin : string/*DOMString*/, transfer : Transferable[]) : void;
 
 	// implements WindowAnimationTiming
 
-	function requestAnimationFrame(
-		callback : function(time:number/*DOMTimeStamp*/):void/*FrameRequestCallback*/
-	) : number/*long*/;
+	function requestAnimationFrame(callback : function(time:number/*DOMTimeStamp*/):void/*FrameRequestCallback*/) : number/*long*/;
 	function cancelAnimationFrame(handle : number/*long*/) : void;
 	// vender's extension
-	function webkitRequestAnimationFrame(
-		callback : function(time:number/*DOMTimeStamp*/):void/*FrameRequestCallback*/
-	) : number/*long*/;
+	function webkitRequestAnimationFrame(callback : function(time:number/*DOMTimeStamp*/):void/*FrameRequestCallback*/) : number/*long*/;
 	function webkitCancelAnimationFrame(handle : number/*long*/) : void;
-	function mozRequestAnimationFrame(
-		callback : function(time:number/*DOMTimeStamp*/):void/*FrameRequestCallback*/
-	) : number/*long*/;
+	function mozRequestAnimationFrame(callback : function(time:number/*DOMTimeStamp*/):void/*FrameRequestCallback*/) : number/*long*/;
 	function mozCancelAnimationFrame(handle : number/*long*/) : void;
 
 } // end of Window
@@ -2451,12 +2061,8 @@ native final class MediaQueryList {
 
 	__readonly__ var media : string/*DOMString*/;
 	__readonly__ var matches : boolean;
-	function addListener(
-		listener : function(:MediaQueryList):void/*MediaQueryListListener*/
-	) : void;
-	function removeListener(
-		listener : function(:MediaQueryList):void/*MediaQueryListListener*/
-	) : void;
+	function addListener(listener : function(:MediaQueryList):void/*MediaQueryListListener*/) : void;
+	function removeListener(listener : function(:MediaQueryList):void/*MediaQueryListListener*/) : void;
 
 } // end of MediaQueryList
 
@@ -2650,23 +2256,11 @@ native final class HTMLOptionsCollection extends HTMLCollection {
 	// inherits function namedItem(name : string/*DOMString*/) : Nullable.<Object>/*object?*/;
 	// overrides inherited namedItem()
 	function add(element : HTMLOptionElement) : void;
-	function add(
-		element : HTMLOptionElement,
-		before : HTMLElement
-	) : void;
-	function add(
-		element : HTMLOptionElement,
-		before : number/*long*/
-	) : void;
+	function add(element : HTMLOptionElement, before : HTMLElement) : void;
+	function add(element : HTMLOptionElement, before : number/*long*/) : void;
 	function add(element : HTMLOptGroupElement) : void;
-	function add(
-		element : HTMLOptGroupElement,
-		before : HTMLElement
-	) : void;
-	function add(
-		element : HTMLOptGroupElement,
-		before : number/*long*/
-	) : void;
+	function add(element : HTMLOptGroupElement, before : HTMLElement) : void;
+	function add(element : HTMLOptGroupElement, before : number/*long*/) : void;
 	function remove(index : number/*long*/) : void;
 	var selectedIndex : number/*long*/;
 
@@ -2675,9 +2269,7 @@ native final class HTMLOptionsCollection extends HTMLCollection {
 /** @see http://www.w3.org/TR/html5/single-page.html */
 native final class DOMStringMap {
 
-	function __native_index_operator__(
-		name : string/*DOMString*/
-	) : Nullable.<string>/*DOMString*/;
+	function __native_index_operator__(name : string/*DOMString*/) : Nullable.<string>/*DOMString*/;
 
 } // end of DOMStringMap
 
@@ -2696,9 +2288,7 @@ native final class HTMLDocument extends Document {
 	__readonly__ var lastModified : string/*DOMString*/;
 	__readonly__ var readyState : string/*DOMString*/;
 	// DOM tree accessors
-	function __native_index_operator__(
-		name : string/*DOMString*/
-	) : Nullable.<Object>/*object*/;
+	function __native_index_operator__(name : string/*DOMString*/) : Nullable.<Object>/*object*/;
 	var title : string/*DOMString*/;
 	var dir : string/*DOMString*/;
 	var body : Nullable.<HTMLElement>;
@@ -2709,29 +2299,13 @@ native final class HTMLDocument extends Document {
 	__readonly__ var links : HTMLCollection;
 	__readonly__ var forms : HTMLCollection;
 	__readonly__ var scripts : HTMLCollection;
-	function getElementsByName(
-		elementName : string/*DOMString*/
-	) : NodeList;
+	function getElementsByName(elementName : string/*DOMString*/) : NodeList;
 	// dynamic markup insertion
 	function open() : HTMLDocument/*Document*/;
-	function open(
-		type : string/*DOMString*/
-	) : HTMLDocument/*Document*/;
-	function open(
-		type : string/*DOMString*/,
-		replace : string/*DOMString*/
-	) : HTMLDocument/*Document*/;
-	function open(
-		url : string/*DOMString*/,
-		name : string/*DOMString*/,
-		features : string/*DOMString*/
-	) : Window/*WindowProxy*/;
-	function open(
-		url : string/*DOMString*/,
-		name : string/*DOMString*/,
-		features : string/*DOMString*/,
-		replace : boolean
-	) : Window/*WindowProxy*/;
+	function open(type : string/*DOMString*/) : HTMLDocument/*Document*/;
+	function open(type : string/*DOMString*/, replace : string/*DOMString*/) : HTMLDocument/*Document*/;
+	function open(url : string/*DOMString*/, name : string/*DOMString*/, features : string/*DOMString*/) : Window/*WindowProxy*/;
+	function open(url : string/*DOMString*/, name : string/*DOMString*/, features : string/*DOMString*/, replace : boolean) : Window/*WindowProxy*/;
 	function close() : void;
 	function write(...text : string/*DOMString...*/) : void;
 	function writeln(...text : string/*DOMString...*/) : void;
@@ -2741,30 +2315,13 @@ native final class HTMLDocument extends Document {
 	function hasFocus() : boolean;
 	var designMode : string/*DOMString*/;
 	function execCommand(commandId : string/*DOMString*/) : boolean;
-	function execCommand(
-		commandId : string/*DOMString*/,
-		showUI : boolean
-	) : boolean;
-	function execCommand(
-		commandId : string/*DOMString*/,
-		showUI : boolean,
-		value : string/*DOMString*/
-	) : boolean;
-	function queryCommandEnabled(
-		commandId : string/*DOMString*/
-	) : boolean;
-	function queryCommandIndeterm(
-		commandId : string/*DOMString*/
-	) : boolean;
-	function queryCommandState(
-		commandId : string/*DOMString*/
-	) : boolean;
-	function queryCommandSupported(
-		commandId : string/*DOMString*/
-	) : boolean;
-	function queryCommandValue(
-		commandId : string/*DOMString*/
-	) : string/*DOMString*/;
+	function execCommand(commandId : string/*DOMString*/, showUI : boolean) : boolean;
+	function execCommand(commandId : string/*DOMString*/, showUI : boolean, value : string/*DOMString*/) : boolean;
+	function queryCommandEnabled(commandId : string/*DOMString*/) : boolean;
+	function queryCommandIndeterm(commandId : string/*DOMString*/) : boolean;
+	function queryCommandState(commandId : string/*DOMString*/) : boolean;
+	function queryCommandSupported(commandId : string/*DOMString*/) : boolean;
+	function queryCommandValue(commandId : string/*DOMString*/) : string/*DOMString*/;
 	__readonly__ var commands : HTMLCollection;
 	// event handler IDL attributes
 	var onabort : Nullable.<function(:Event):void>/*EventHandler*/;
@@ -3264,9 +2821,7 @@ native class HTMLMediaElement extends HTMLElement {
 	var preload : string/*DOMString*/;
 	__readonly__ var buffered : TimeRanges;
 	function load() : void;
-	function canPlayType(
-		type : string/*DOMString*/
-	) : string/*DOMString*/;
+	function canPlayType(type : string/*DOMString*/) : string/*DOMString*/;
 	// ready state
 	static __readonly__ var HAVE_NOTHING : number/*unsigned short*/;
 	       __readonly__ var HAVE_NOTHING : number/*unsigned short*/;
@@ -3307,15 +2862,8 @@ native class HTMLMediaElement extends HTMLElement {
 	__readonly__ var videoTracks : VideoTrackList;
 	__readonly__ var textTracks : TextTrackList;
 	function addTextTrack(kind : string/*DOMString*/) : TextTrack;
-	function addTextTrack(
-		kind : string/*DOMString*/,
-		label : string/*DOMString*/
-	) : TextTrack;
-	function addTextTrack(
-		kind : string/*DOMString*/,
-		label : string/*DOMString*/,
-		language : string/*DOMString*/
-	) : TextTrack;
+	function addTextTrack(kind : string/*DOMString*/, label : string/*DOMString*/) : TextTrack;
+	function addTextTrack(kind : string/*DOMString*/, label : string/*DOMString*/, language : string/*DOMString*/) : TextTrack;
 
 } // end of HTMLMediaElement
 
@@ -3338,12 +2886,8 @@ native final class MediaError {
 native final class AudioTrackList extends EventTarget {
 
 	__readonly__ var length : number/*unsigned long*/;
-	function __native_index_operator__(
-		index : number/*unsigned long*/
-	) : Nullable.<AudioTrack>;
-	function getTrackById(
-		id : string/*DOMString*/
-	) : Nullable.<AudioTrack>;
+	function __native_index_operator__(index : number/*unsigned long*/) : Nullable.<AudioTrack>;
+	function getTrackById(id : string/*DOMString*/) : Nullable.<AudioTrack>;
 	var onchange : Nullable.<function(:Event):void>/*EventHandler*/;
 	var onaddtrack : Nullable.<function(:Event):void>/*EventHandler*/;
 	var onremovetrack : Nullable.<function(:Event):void>/*EventHandler*/;
@@ -3365,12 +2909,8 @@ native final class AudioTrack {
 native final class VideoTrackList extends EventTarget {
 
 	__readonly__ var length : number/*unsigned long*/;
-	function __native_index_operator__(
-		index : number/*unsigned long*/
-	) : Nullable.<VideoTrack>;
-	function getTrackById(
-		id : string/*DOMString*/
-	) : Nullable.<VideoTrack>;
+	function __native_index_operator__(index : number/*unsigned long*/) : Nullable.<VideoTrack>;
+	function getTrackById(id : string/*DOMString*/) : Nullable.<VideoTrack>;
 	__readonly__ var selectedIndex : number/*long*/;
 	var onchange : Nullable.<function(:Event):void>/*EventHandler*/;
 	var onaddtrack : Nullable.<function(:Event):void>/*EventHandler*/;
@@ -3434,9 +2974,7 @@ native final class MediaController extends EventTarget {
 native final class TextTrackList extends EventTarget {
 
 	__readonly__ var length : number/*unsigned long*/;
-	function __native_index_operator__(
-		index : number/*unsigned long*/
-	) : Nullable.<TextTrack>;
+	function __native_index_operator__(index : number/*unsigned long*/) : Nullable.<TextTrack>;
 	var onaddtrack : Nullable.<function(:Event):void>/*EventHandler*/;
 	var onremovetrack : Nullable.<function(:Event):void>/*EventHandler*/;
 
@@ -3462,23 +3000,15 @@ native final class TextTrack extends EventTarget {
 native final class TextTrackCueList {
 
 	__readonly__ var length : number/*unsigned long*/;
-	function __native_index_operator__(
-		index : number/*unsigned long*/
-	) : Nullable.<TextTrackCue>;
-	function getCueById(
-		id : string/*DOMString*/
-	) : Nullable.<TextTrackCue>;
+	function __native_index_operator__(index : number/*unsigned long*/) : Nullable.<TextTrackCue>;
+	function getCueById(id : string/*DOMString*/) : Nullable.<TextTrackCue>;
 
 } // end of TextTrackCueList
 
 /** @see http://www.w3.org/TR/html5/single-page.html */
 native final class TextTrackCue extends EventTarget {
 
-	function constructor(
-		startTime : number/*double*/,
-		endTime : number/*double*/,
-		text : string/*DOMString*/
-	);
+	function constructor(startTime : number/*double*/, endTime : number/*double*/, text : string/*DOMString*/);
 
 	__readonly__ var track : Nullable.<TextTrack>;
 	var id : string/*DOMString*/;
@@ -3511,10 +3041,7 @@ native final class TimeRanges {
 native final class TrackEvent extends Event {
 
 	function constructor(type : string/*DOMString*/);
-	function constructor(
-		type : string/*DOMString*/,
-		eventInitDict : TrackEventInit
-	);
+	function constructor(type : string/*DOMString*/, eventInitDict : TrackEventInit);
 
 	__readonly__ var track : Nullable.<Object>/*object?*/;
 
@@ -3532,19 +3059,9 @@ native final class HTMLCanvasElement extends HTMLElement {
 
 	var width : number/*unsigned long*/;
 	var height : number/*unsigned long*/;
-	function toDataURL(
-		type : string/*DOMString*/,
-		...arguments : variant/*any...*/
-	) : string/*DOMString*/;
-	function toBlob(
-		_callback : Nullable.<function(:File):void>/*FileCallback?*/,
-		type : string/*DOMString*/,
-		...arguments : variant/*any...*/
-	) : void;
-	function getContext(
-		contextId : string/*DOMString*/,
-		...arguments : variant/*any...*/
-	) : Nullable.<Object>/*object?*/;
+	function toDataURL(type : string/*DOMString*/, ...arguments : variant/*any...*/) : string/*DOMString*/;
+	function toBlob(_callback : Nullable.<function(:File):void>/*FileCallback?*/, type : string/*DOMString*/, ...arguments : variant/*any...*/) : void;
+	function getContext(contextId : string/*DOMString*/, ...arguments : variant/*any...*/) : Nullable.<Object>/*object?*/;
 
 } // end of HTMLCanvasElement
 
@@ -3714,12 +3231,8 @@ native final class HTMLFormElement extends HTMLElement {
 	var target : string/*DOMString*/;
 	__readonly__ var elements : HTMLFormControlsCollection;
 	__readonly__ var length : number/*long*/;
-	function __native_index_operator__(
-		index : number/*unsigned long*/
-	) : Nullable.<Element>;
-	function __native_index_operator__(
-		name : string/*DOMString*/
-	) : Nullable.<Object>/*object*/;
+	function __native_index_operator__(index : number/*unsigned long*/) : Nullable.<Element>;
+	function __native_index_operator__(name : string/*DOMString*/) : Nullable.<Object>/*object*/;
 	function submit() : void;
 	function reset() : void;
 	function checkValidity() : boolean;
@@ -3813,15 +3326,8 @@ native final class HTMLInputElement extends HTMLElement {
 	var selectionStart : number/*unsigned long*/;
 	var selectionEnd : number/*unsigned long*/;
 	var selectionDirection : string/*DOMString*/;
-	function setSelectionRange(
-		start : number/*unsigned long*/,
-		end : number/*unsigned long*/
-	) : void;
-	function setSelectionRange(
-		start : number/*unsigned long*/,
-		end : number/*unsigned long*/,
-		direction : string/*DOMString*/
-	) : void;
+	function setSelectionRange(start : number/*unsigned long*/, end : number/*unsigned long*/) : void;
+	function setSelectionRange(start : number/*unsigned long*/, end : number/*unsigned long*/, direction : string/*DOMString*/) : void;
 
 	var align : string/*DOMString*/;
 	var useMap : string/*DOMString*/;
@@ -3864,30 +3370,16 @@ native final class HTMLSelectElement extends HTMLElement {
 	__readonly__ var type : string/*DOMString*/;
 	__readonly__ var options : HTMLOptionsCollection;
 	var length : number/*unsigned long*/;
-	function __native_index_operator__(
-		index : number/*unsigned long*/
-	) : Nullable.<Element>;
+	function __native_index_operator__(index : number/*unsigned long*/) : Nullable.<Element>;
 	/* getter */
 	function item(index : number/*unsigned long*/) : Nullable.<Element>;
 	function namedItem(name : string/*DOMString*/) : Object/*object*/;
 	function add(element : HTMLOptionElement) : void;
-	function add(
-		element : HTMLOptionElement,
-		before : HTMLElement
-	) : void;
-	function add(
-		element : HTMLOptionElement,
-		before : number/*long*/
-	) : void;
+	function add(element : HTMLOptionElement, before : HTMLElement) : void;
+	function add(element : HTMLOptionElement, before : number/*long*/) : void;
 	function add(element : HTMLOptGroupElement) : void;
-	function add(
-		element : HTMLOptGroupElement,
-		before : HTMLElement
-	) : void;
-	function add(
-		element : HTMLOptGroupElement,
-		before : number/*long*/
-	) : void;
+	function add(element : HTMLOptGroupElement, before : HTMLElement) : void;
+	function add(element : HTMLOptGroupElement, before : number/*long*/) : void;
 	function remove(index : number/*long*/) : void;
 	__readonly__ var selectedOptions : HTMLCollection;
 	var selectedIndex : number/*long*/;
@@ -3959,15 +3451,8 @@ native final class HTMLTextAreaElement extends HTMLElement {
 	var selectionStart : number/*unsigned long*/;
 	var selectionEnd : number/*unsigned long*/;
 	var selectionDirection : string/*DOMString*/;
-	function setSelectionRange(
-		start : number/*unsigned long*/,
-		end : number/*unsigned long*/
-	) : void;
-	function setSelectionRange(
-		start : number/*unsigned long*/,
-		end : number/*unsigned long*/,
-		direction : string/*DOMString*/
-	) : void;
+	function setSelectionRange(start : number/*unsigned long*/, end : number/*unsigned long*/) : void;
+	function setSelectionRange(start : number/*unsigned long*/, end : number/*unsigned long*/, direction : string/*DOMString*/) : void;
 
 } // end of HTMLTextAreaElement
 
@@ -4108,24 +3593,10 @@ native final class History {
 	function go(delta : number/*long*/) : void;
 	function back() : void;
 	function forward() : void;
-	function pushState(
-		data : variant/*any*/,
-		title : string/*DOMString*/
-	) : void;
-	function pushState(
-		data : variant/*any*/,
-		title : string/*DOMString*/,
-		url : Nullable.<string>/*DOMString?*/
-	) : void;
-	function replaceState(
-		data : variant/*any*/,
-		title : string/*DOMString*/
-	) : void;
-	function replaceState(
-		data : variant/*any*/,
-		title : string/*DOMString*/,
-		url : Nullable.<string>/*DOMString?*/
-	) : void;
+	function pushState(data : variant/*any*/, title : string/*DOMString*/) : void;
+	function pushState(data : variant/*any*/, title : string/*DOMString*/, url : Nullable.<string>/*DOMString?*/) : void;
+	function replaceState(data : variant/*any*/, title : string/*DOMString*/) : void;
+	function replaceState(data : variant/*any*/, title : string/*DOMString*/, url : Nullable.<string>/*DOMString?*/) : void;
 
 } // end of History
 
@@ -4153,10 +3624,7 @@ native final class Location {
 native final class PopStateEvent extends Event {
 
 	function constructor(type : string/*DOMString*/);
-	function constructor(
-		type : string/*DOMString*/,
-		eventInitDict : PopStateEventInit
-	);
+	function constructor(type : string/*DOMString*/, eventInitDict : PopStateEventInit);
 
 	__readonly__ var state : variant/*any*/;
 
@@ -4173,10 +3641,7 @@ native final class PopStateEventInit extends EventInit {
 native final class HashChangeEvent extends Event {
 
 	function constructor(type : string/*DOMString*/);
-	function constructor(
-		type : string/*DOMString*/,
-		eventInitDict : HashChangeEventInit
-	);
+	function constructor(type : string/*DOMString*/, eventInitDict : HashChangeEventInit);
 
 	__readonly__ var oldURL : string/*DOMString*/;
 	__readonly__ var newURL : string/*DOMString*/;
@@ -4195,10 +3660,7 @@ native final class HashChangeEventInit extends EventInit {
 native final class PageTransitionEvent extends Event {
 
 	function constructor(type : string/*DOMString*/);
-	function constructor(
-		type : string/*DOMString*/,
-		eventInitDict : PageTransitionEventInit
-	);
+	function constructor(type : string/*DOMString*/, eventInitDict : PageTransitionEventInit);
 
 	__readonly__ var persisted : boolean;
 
@@ -4286,32 +3748,12 @@ native final class Navigator extends NavigatorID {
 	// implements NavigatorContentUtils
 
 	// content handler registration
-	function registerProtocolHandler(
-		scheme : string/*DOMString*/,
-		url : string/*DOMString*/,
-		title : string/*DOMString*/
-	) : void;
-	function registerContentHandler(
-		mimeType : string/*DOMString*/,
-		url : string/*DOMString*/,
-		title : string/*DOMString*/
-	) : void;
-	function isProtocolHandlerRegistered(
-		scheme : string/*DOMString*/,
-		url : string/*DOMString*/
-	) : string/*DOMString*/;
-	function isContentHandlerRegistered(
-		mimeType : string/*DOMString*/,
-		url : string/*DOMString*/
-	) : string/*DOMString*/;
-	function unregisterProtocolHandler(
-		scheme : string/*DOMString*/,
-		url : string/*DOMString*/
-	) : void;
-	function unregisterContentHandler(
-		mimeType : string/*DOMString*/,
-		url : string/*DOMString*/
-	) : void;
+	function registerProtocolHandler(scheme : string/*DOMString*/, url : string/*DOMString*/, title : string/*DOMString*/) : void;
+	function registerContentHandler(mimeType : string/*DOMString*/, url : string/*DOMString*/, title : string/*DOMString*/) : void;
+	function isProtocolHandlerRegistered(scheme : string/*DOMString*/, url : string/*DOMString*/) : string/*DOMString*/;
+	function isContentHandlerRegistered(mimeType : string/*DOMString*/, url : string/*DOMString*/) : string/*DOMString*/;
+	function unregisterProtocolHandler(scheme : string/*DOMString*/, url : string/*DOMString*/) : void;
+	function unregisterContentHandler(mimeType : string/*DOMString*/, url : string/*DOMString*/) : void;
 
 	// implements NavigatorStorageUtils
 
@@ -4325,16 +3767,9 @@ native final class Navigator extends NavigatorID {
 	// implements NavigatorUserMedia
 
 	/** @see http://www.w3.org/TR/mediacapture-streams/ */
-	function getUserMedia(
-		constraints : Nullable.<MediaStreamConstraints>,
-		successCallback : function(stream:LocalMediaStream):void/*NavigatorUserMediaSuccessCallback*/
-	) : void;
+	function getUserMedia(constraints : Nullable.<MediaStreamConstraints>, successCallback : function(stream:LocalMediaStream):void/*NavigatorUserMediaSuccessCallback*/) : void;
 	/** @see http://www.w3.org/TR/mediacapture-streams/ */
-	function getUserMedia(
-		constraints : Nullable.<MediaStreamConstraints>,
-		successCallback : function(stream:LocalMediaStream):void/*NavigatorUserMediaSuccessCallback*/,
-		errorCallback : Nullable.<function(error:NavigatorUserMediaError):void>/*NavigatorUserMediaErrorCallback?*/
-	) : void;
+	function getUserMedia(constraints : Nullable.<MediaStreamConstraints>, successCallback : function(stream:LocalMediaStream):void/*NavigatorUserMediaSuccessCallback*/, errorCallback : Nullable.<function(error:NavigatorUserMediaError):void>/*NavigatorUserMediaErrorCallback?*/) : void;
 
 } // end of Navigator
 
@@ -4352,32 +3787,12 @@ native __fake__ class NavigatorID {
 native __fake__ class NavigatorContentUtils {
 
 	// content handler registration
-	function registerProtocolHandler(
-		scheme : string/*DOMString*/,
-		url : string/*DOMString*/,
-		title : string/*DOMString*/
-	) : void;
-	function registerContentHandler(
-		mimeType : string/*DOMString*/,
-		url : string/*DOMString*/,
-		title : string/*DOMString*/
-	) : void;
-	function isProtocolHandlerRegistered(
-		scheme : string/*DOMString*/,
-		url : string/*DOMString*/
-	) : string/*DOMString*/;
-	function isContentHandlerRegistered(
-		mimeType : string/*DOMString*/,
-		url : string/*DOMString*/
-	) : string/*DOMString*/;
-	function unregisterProtocolHandler(
-		scheme : string/*DOMString*/,
-		url : string/*DOMString*/
-	) : void;
-	function unregisterContentHandler(
-		mimeType : string/*DOMString*/,
-		url : string/*DOMString*/
-	) : void;
+	function registerProtocolHandler(scheme : string/*DOMString*/, url : string/*DOMString*/, title : string/*DOMString*/) : void;
+	function registerContentHandler(mimeType : string/*DOMString*/, url : string/*DOMString*/, title : string/*DOMString*/) : void;
+	function isProtocolHandlerRegistered(scheme : string/*DOMString*/, url : string/*DOMString*/) : string/*DOMString*/;
+	function isContentHandlerRegistered(mimeType : string/*DOMString*/, url : string/*DOMString*/) : string/*DOMString*/;
+	function unregisterProtocolHandler(scheme : string/*DOMString*/, url : string/*DOMString*/) : void;
+	function unregisterContentHandler(mimeType : string/*DOMString*/, url : string/*DOMString*/) : void;
 
 } // end of NavigatorContentUtils
 
@@ -4392,9 +3807,7 @@ native __fake__ class NavigatorStorageUtils {
 native final class External {
 
 	function AddSearchProvider(engineURL : string/*DOMString*/) : void;
-	function IsSearchProviderInstalled(
-		engineURL : string/*DOMString*/
-	) : number/*unsigned long*/;
+	function IsSearchProviderInstalled(engineURL : string/*DOMString*/) : number/*unsigned long*/;
 
 } // end of External
 
@@ -4404,20 +3817,11 @@ native final class DataTransfer {
 	var dropEffect : string/*DOMString*/;
 	var effectAllowed : string/*DOMString*/;
 	__readonly__ var items : DataTransferItemList;
-	function setDragImage(
-		image : Element,
-		x : number/*long*/,
-		y : number/*long*/
-	) : void;
+	function setDragImage(image : Element, x : number/*long*/, y : number/*long*/) : void;
 	/* old interface */
 	__readonly__ var types : string[]/*DOMString[]*/;
-	function getData(
-		format : string/*DOMString*/
-	) : string/*DOMString*/;
-	function setData(
-		format : string/*DOMString*/,
-		data : string/*DOMString*/
-	) : void;
+	function getData(format : string/*DOMString*/) : string/*DOMString*/;
+	function setData(format : string/*DOMString*/, data : string/*DOMString*/) : void;
 	function clearData() : void;
 	function clearData(format : string/*DOMString*/) : void;
 	__readonly__ var files : FileList;
@@ -4428,14 +3832,9 @@ native final class DataTransfer {
 native final class DataTransferItemList {
 
 	__readonly__ var length : number/*unsigned long*/;
-	function __native_index_operator__(
-		index : number/*unsigned long*/
-	) : Nullable.<DataTransferItem>;
+	function __native_index_operator__(index : number/*unsigned long*/) : Nullable.<DataTransferItem>;
 	function clear() : void;
-	function add(
-		data : string/*DOMString*/,
-		type : string/*DOMString*/
-	) : Nullable.<DataTransferItem>;
+	function add(data : string/*DOMString*/, type : string/*DOMString*/) : Nullable.<DataTransferItem>;
 	function add(data : File) : Nullable.<DataTransferItem>;
 
 } // end of DataTransferItemList
@@ -4445,9 +3844,7 @@ native final class DataTransferItem {
 
 	__readonly__ var kind : string/*DOMString*/;
 	__readonly__ var type : string/*DOMString*/;
-	function getAsString(
-		_callback : Nullable.<function(:string):void>/*FunctionStringCallback?*/
-	) : void;
+	function getAsString(_callback : Nullable.<function(:string):void>/*FunctionStringCallback?*/) : void;
 	function getAsFile() : Nullable.<File>;
 
 } // end of DataTransferItem
@@ -4458,10 +3855,7 @@ native final class DataTransferItem {
 native final class DragEvent extends MouseEvent {
 
 	function constructor(type : string/*DOMString*/);
-	function constructor(
-		type : string/*DOMString*/,
-		eventInitDict : DragEventInit
-	);
+	function constructor(type : string/*DOMString*/, eventInitDict : DragEventInit);
 
 	__readonly__ var dataTransfer : Nullable.<DataTransfer>;
 
@@ -4600,9 +3994,7 @@ native final class HTMLFontElement extends HTMLElement {
 /** @see http://www.w3.org/TR/2012/WD-FileAPI-20121025/ */
 native final class FileList {
 
-	function __native_index_operator__(
-		index : number/*unsigned long*/
-	) : Nullable.<File>;
+	function __native_index_operator__(index : number/*unsigned long*/) : Nullable.<File>;
 	/* getter */
 	function item(index : number/*unsigned long*/) : Nullable.<File>;
 	__readonly__ var length : number/*unsigned long*/;
@@ -4618,15 +4010,8 @@ native class Blob {
 
 	function slice() : Blob;
 	function slice(start : number/*long long*/) : Blob;
-	function slice(
-		start : number/*long long*/,
-		end : number/*long long*/
-	) : Blob;
-	function slice(
-		start : number/*long long*/,
-		end : number/*long long*/,
-		contentType : string/*DOMString*/
-	) : Blob;
+	function slice(start : number/*long long*/, end : number/*long long*/) : Blob;
+	function slice(start : number/*long long*/, end : number/*long long*/, contentType : string/*DOMString*/) : Blob;
 
 } // end of Blob
 
@@ -4647,10 +4032,7 @@ native final class FileReader extends EventTarget {
 	function readAsArrayBuffer(blob : Blob) : void;
 	function readAsBinaryString(blob : Blob) : void;
 	function readAsText(blob : Blob) : void;
-	function readAsText(
-		blob : Blob,
-		encoding : string/*DOMString*/
-	) : void;
+	function readAsText(blob : Blob, encoding : string/*DOMString*/) : void;
 	function readAsDataURL(blob : Blob) : void;
 	function abort() : void;
 	// states
@@ -4684,10 +4066,7 @@ native final class FileReaderSync {
 	function readAsArrayBuffer(blob : Blob) : ArrayBuffer;
 	function readAsBinaryString(blob : Blob) : string/*DOMString*/;
 	function readAsText(blob : Blob) : string/*DOMString*/;
-	function readAsText(
-		blob : Blob,
-		encoding : string/*DOMString*/
-	) : string/*DOMString*/;
+	function readAsText(blob : Blob, encoding : string/*DOMString*/) : string/*DOMString*/;
 	function readAsDataURL(blob : Blob) : string/*DOMString*/;
 
 } // end of FileReaderSync
@@ -4700,10 +4079,7 @@ native class URL {
 	/** @see http://www.w3.org/TR/2012/WD-FileAPI-20121025/ */
 	static function revokeObjectURL(url : string/*DOMString*/) : void;
 	function constructor(url : string/*DOMString*/);
-	function constructor(
-		url : string/*DOMString*/,
-		baseURL : string/*DOMString*/
-	);
+	function constructor(url : string/*DOMString*/, baseURL : string/*DOMString*/);
 
 	var protocol : string/*DOMString*/;
 	var username : string/*DOMString*/;
@@ -4717,29 +4093,17 @@ native class URL {
 	var filename : string/*DOMString*/;
 	__readonly__ var origin : string/*DOMString*/;
 	function getParameterNames() : string[]/*sequence<DOMString>*/;
-	function getParameterValues(
-		name : string/*DOMString*/
-	) : string[]/*sequence<DOMString>*/;
+	function getParameterValues(name : string/*DOMString*/) : string[]/*sequence<DOMString>*/;
 	function hasParameter(name : string/*DOMString*/) : boolean;
-	function getParameter(
-		name : string/*DOMString*/
-	) : Nullable.<string>/*DOMString?*/;
-	function setParameter(
-		name : string/*DOMString*/,
-		value : string/*DOMString*/
-	) : void;
-	function addParameter(
-		name : string/*DOMString*/,
-		value : string/*DOMString*/
-	) : void;
+	function getParameter(name : string/*DOMString*/) : Nullable.<string>/*DOMString?*/;
+	function setParameter(name : string/*DOMString*/, value : string/*DOMString*/) : void;
+	function addParameter(name : string/*DOMString*/, value : string/*DOMString*/) : void;
 	function removeParameter(name : string/*DOMString*/) : void;
 	function clearParameters() : void;
 	var href : string/*DOMString*/;
 
 	/** @see http://www.w3.org/TR/mediacapture-streams/ */
-	static function createObjectURL(
-		stream : MediaStream
-	) : string/*DOMString*/;
+	static function createObjectURL(stream : MediaStream) : string/*DOMString*/;
 
 } // end of URL
 
@@ -4753,44 +4117,17 @@ native class AudioContext {
 	__readonly__ var currentTime : number/*double*/;
 	__readonly__ var listener : AudioListener;
 	__readonly__ var activeSourceCount : number/*unsigned long*/;
-	function createBuffer(
-		numberOfChannels : number/*unsigned long*/,
-		length : number/*unsigned long*/,
-		sampleRate : number/*float*/
-	) : AudioBuffer;
-	function createBuffer(
-		buffer : ArrayBuffer,
-		mixToMono : boolean
-	) : AudioBuffer;
-	function decodeAudioData(
-		audioData : ArrayBuffer,
-		successCallback : function(decodedData:AudioBuffer):void/*DecodeSuccessCallback*/
-	) : void;
-	function decodeAudioData(
-		audioData : ArrayBuffer,
-		successCallback : function(decodedData:AudioBuffer):void/*DecodeSuccessCallback*/,
-		errorCallback : function():void/*DecodeErrorCallback*/
-	) : void;
+	function createBuffer(numberOfChannels : number/*unsigned long*/, length : number/*unsigned long*/, sampleRate : number/*float*/) : AudioBuffer;
+	function createBuffer(buffer : ArrayBuffer, mixToMono : boolean) : AudioBuffer;
+	function decodeAudioData(audioData : ArrayBuffer, successCallback : function(decodedData:AudioBuffer):void/*DecodeSuccessCallback*/) : void;
+	function decodeAudioData(audioData : ArrayBuffer, successCallback : function(decodedData:AudioBuffer):void/*DecodeSuccessCallback*/, errorCallback : function():void/*DecodeErrorCallback*/) : void;
 	// AudioNode creation
 	function createBufferSource() : AudioBufferSourceNode;
-	function createMediaElementSource(
-		mediaElement : HTMLMediaElement
-	) : MediaElementAudioSourceNode;
-	function createMediaStreamSource(
-		mediaStream : MediaStream
-	) : MediaStreamAudioSourceNode;
-	function createScriptProcessor(
-		bufferSize : number/*unsigned long*/
-	) : ScriptProcessorNode;
-	function createScriptProcessor(
-		bufferSize : number/*unsigned long*/,
-		numberOfInputChannels : number/*unsigned long*/
-	) : ScriptProcessorNode;
-	function createScriptProcessor(
-		bufferSize : number/*unsigned long*/,
-		numberOfInputChannels : number/*unsigned long*/,
-		numberOfOutputChannels : number/*unsigned long*/
-	) : ScriptProcessorNode;
+	function createMediaElementSource(mediaElement : HTMLMediaElement) : MediaElementAudioSourceNode;
+	function createMediaStreamSource(mediaStream : MediaStream) : MediaStreamAudioSourceNode;
+	function createScriptProcessor(bufferSize : number/*unsigned long*/) : ScriptProcessorNode;
+	function createScriptProcessor(bufferSize : number/*unsigned long*/, numberOfInputChannels : number/*unsigned long*/) : ScriptProcessorNode;
+	function createScriptProcessor(bufferSize : number/*unsigned long*/, numberOfInputChannels : number/*unsigned long*/, numberOfOutputChannels : number/*unsigned long*/) : ScriptProcessorNode;
 	function createAnalyser() : AnalyserNode;
 	function createGain() : GainNode;
 	function createDelay() : DelayNode;
@@ -4800,19 +4137,12 @@ native class AudioContext {
 	function createPanner() : PannerNode;
 	function createConvolver() : ConvolverNode;
 	function createChannelSplitter() : ChannelSplitterNode;
-	function createChannelSplitter(
-		numberOfOutputs : number/*unsigned long*/
-	) : ChannelSplitterNode;
+	function createChannelSplitter(numberOfOutputs : number/*unsigned long*/) : ChannelSplitterNode;
 	function createChannelMerger() : ChannelMergerNode;
-	function createChannelMerger(
-		numberOfInputs : number/*unsigned long*/
-	) : ChannelMergerNode;
+	function createChannelMerger(numberOfInputs : number/*unsigned long*/) : ChannelMergerNode;
 	function createDynamicsCompressor() : DynamicsCompressorNode;
 	function createOscillator() : OscillatorNode;
-	function createWaveTable(
-		real : Float32Array,
-		imag : Float32Array
-	) : WaveTable;
+	function createWaveTable(real : Float32Array, imag : Float32Array) : WaveTable;
 
 	// deprecated
 	function createGainNode() : void;
@@ -4837,20 +4167,10 @@ native final class OfflineAudioContext extends AudioContext {
 native class AudioNode {
 
 	function connect(destination : AudioNode) : void;
-	function connect(
-		destination : AudioNode,
-		output : number/*unsigned long*/
-	) : void;
-	function connect(
-		destination : AudioNode,
-		output : number/*unsigned long*/,
-		input : number/*unsigned long*/
-	) : void;
+	function connect(destination : AudioNode, output : number/*unsigned long*/) : void;
+	function connect(destination : AudioNode, output : number/*unsigned long*/, input : number/*unsigned long*/) : void;
 	function connect(destination : AudioParam) : void;
-	function connect(
-		destination : AudioParam,
-		output : number/*unsigned long*/
-	) : void;
+	function connect(destination : AudioParam, output : number/*unsigned long*/) : void;
 	function disconnect() : void;
 	function disconnect(output : number/*unsigned long*/) : void;
 	__readonly__ var context : AudioContext;
@@ -4880,31 +4200,14 @@ native final class AudioParam {
 	__readonly__ var maxValue : number/*float*/;
 	__readonly__ var defaultValue : number/*float*/;
 	// Parameter automation.
-	function setValueAtTime(
-		value : number/*float*/,
-		startTime : number/*double*/
-	) : void;
-	function linearRampToValueAtTime(
-		value : number/*float*/,
-		endTime : number/*double*/
-	) : void;
-	function exponentialRampToValueAtTime(
-		value : number/*float*/,
-		endTime : number/*double*/
-	) : void;
+	function setValueAtTime(value : number/*float*/, startTime : number/*double*/) : void;
+	function linearRampToValueAtTime(value : number/*float*/, endTime : number/*double*/) : void;
+	function exponentialRampToValueAtTime(value : number/*float*/, endTime : number/*double*/) : void;
 	// Exponentially approach the target value with a rate having the given time constant.
-	function setTargetAtTime(
-		target : number/*float*/,
-		startTime : number/*double*/,
-		timeConstant : number/*double*/
-	) : void;
+	function setTargetAtTime(target : number/*float*/, startTime : number/*double*/, timeConstant : number/*double*/) : void;
 	// Sets an array of arbitrary parameter values starting at time for the given duration.
 	// The number of values will be scaled to fit into the desired duration.
-	function setValueCurveAtTime(
-		values : Float32Array,
-		startTime : number/*double*/,
-		duration : number/*double*/
-	) : void;
+	function setValueCurveAtTime(values : Float32Array, startTime : number/*double*/, duration : number/*double*/) : void;
 	// Cancels all scheduled parameter changes with times greater than or equal to startTime.
 	function cancelScheduledValues(startTime : number/*double*/) : void;
 
@@ -4932,9 +4235,7 @@ native final class AudioBuffer {
 	// in seconds
 	__readonly__ var duration : number/*double*/;
 	__readonly__ var numberOfChannels : number/*long*/;
-	function getChannelData(
-		channel : number/*unsigned long*/
-	) : Float32Array;
+	function getChannelData(channel : number/*unsigned long*/) : Float32Array;
 
 } // end of AudioBuffer
 
@@ -4956,28 +4257,14 @@ native final class AudioBufferSourceNode extends AudioSourceNode {
 	var loopStart : number/*double*/;
 	var loopEnd : number/*double*/;
 	function start(when : number/*double*/) : void;
-	function start(
-		when : number/*double*/,
-		offset : number/*double*/
-	) : void;
-	function start(
-		when : number/*double*/,
-		offset : number/*double*/,
-		duration : number/*double*/
-	) : void;
+	function start(when : number/*double*/, offset : number/*double*/) : void;
+	function start(when : number/*double*/, offset : number/*double*/, duration : number/*double*/) : void;
 	function stop(when : number/*double*/) : void;
 
 	// deprecated
 	function noteOn(when : number/*double*/) : void;
-	function noteOn(
-		when : number/*double*/,
-		offset : number/*double*/
-	) : void;
-	function noteOn(
-		when : number/*double*/,
-		offset : number/*double*/,
-		duration : number/*double*/
-	) : void;
+	function noteOn(when : number/*double*/, offset : number/*double*/) : void;
+	function noteOn(when : number/*double*/, offset : number/*double*/, duration : number/*double*/) : void;
 	// deprecated
 	function noteOff(when : number/*double*/) : void;
 
@@ -5011,21 +4298,9 @@ native final class PannerNode extends AudioNode {
 	// Default for stereo is HRTF
 	var panningModel : string/*PanningModelType*/;
 	// Uses a 3D cartesian coordinate system
-	function setPosition(
-		x : number/*float*/,
-		y : number/*float*/,
-		z : number/*float*/
-	) : void;
-	function setOrientation(
-		x : number/*float*/,
-		y : number/*float*/,
-		z : number/*float*/
-	) : void;
-	function setVelocity(
-		x : number/*float*/,
-		y : number/*float*/,
-		z : number/*float*/
-	) : void;
+	function setPosition(x : number/*float*/, y : number/*float*/, z : number/*float*/) : void;
+	function setOrientation(x : number/*float*/, y : number/*float*/, z : number/*float*/) : void;
+	function setVelocity(x : number/*float*/, y : number/*float*/, z : number/*float*/) : void;
 	// Distance model and attributes
 	var distanceModel : string/*DistanceModelType*/;
 	var refDistance : number/*float*/;
@@ -5046,24 +4321,9 @@ native final class AudioListener {
 	// in meters / second (default 343.3)
 	var speedOfSound : number/*float*/;
 	// Uses a 3D cartesian coordinate system
-	function setPosition(
-		x : number/*float*/,
-		y : number/*float*/,
-		z : number/*float*/
-	) : void;
-	function setOrientation(
-		x : number/*float*/,
-		y : number/*float*/,
-		z : number/*float*/,
-		xUp : number/*float*/,
-		yUp : number/*float*/,
-		zUp : number/*float*/
-	) : void;
-	function setVelocity(
-		x : number/*float*/,
-		y : number/*float*/,
-		z : number/*float*/
-	) : void;
+	function setPosition(x : number/*float*/, y : number/*float*/, z : number/*float*/) : void;
+	function setOrientation(x : number/*float*/, y : number/*float*/, z : number/*float*/, xUp : number/*float*/, yUp : number/*float*/, zUp : number/*float*/) : void;
+	function setVelocity(x : number/*float*/, y : number/*float*/, z : number/*float*/) : void;
 
 } // end of AudioListener
 
@@ -5130,11 +4390,7 @@ native final class BiquadFilterNode extends AudioNode {
 	__readonly__ var gain : AudioParam;
 	// in Decibels
 
-	function getFrequencyResponse(
-		frequencyHz : Float32Array,
-		magResponse : Float32Array,
-		phaseResponse : Float32Array
-	) : void;
+	function getFrequencyResponse(frequencyHz : Float32Array, magResponse : Float32Array, phaseResponse : Float32Array) : void;
 
 } // end of BiquadFilterNode
 
@@ -5200,9 +4456,7 @@ native final class Touch {
 native final class TouchList {
 
 	__readonly__ var length : number/*unsigned long*/;
-	function __native_index_operator__(
-		index : number/*unsigned long*/
-	) : Nullable.<Touch>;
+	function __native_index_operator__(index : number/*unsigned long*/) : Nullable.<Touch>;
 	/* getter */
 	function item(index : number/*unsigned long*/) : Nullable.<Touch>;
 	function identifiedTouch(identifier : number/*long*/) : Touch;
@@ -5226,14 +4480,8 @@ native final class TouchEvent extends UIEvent {
 native final class WebSocket extends EventTarget {
 
 	function constructor(url : string/*DOMString*/);
-	function constructor(
-		url : string/*DOMString*/,
-		protocols : string/*DOMString*/
-	);
-	function constructor(
-		url : string/*DOMString*/,
-		protocols : string[]/*DOMString[]*/
-	);
+	function constructor(url : string/*DOMString*/, protocols : string/*DOMString*/);
+	function constructor(url : string/*DOMString*/, protocols : string[]/*DOMString[]*/);
 
 	__readonly__ var url : string/*DOMString*/;
 	// ready state
@@ -5255,10 +4503,7 @@ native final class WebSocket extends EventTarget {
 	__readonly__ var protocol : string/*DOMString*/;
 	function close() : void;
 	function close(code : number/*unsigned short*/) : void;
-	function close(
-		code : number/*unsigned short*/,
-		reason : string/*DOMString*/
-	) : void;
+	function close(code : number/*unsigned short*/, reason : string/*DOMString*/) : void;
 	// messaging
 	var onmessage : Nullable.<function(:Event):void>/*EventHandler*/;
 	var binaryType : string/*DOMString*/;
@@ -5273,10 +4518,7 @@ native final class WebSocket extends EventTarget {
 native final class CloseEvent extends Event {
 
 	function constructor(type : string/*DOMString*/);
-	function constructor(
-		type : string/*DOMString*/,
-		eventInitDict : CloseEventInit
-	);
+	function constructor(type : string/*DOMString*/, eventInitDict : CloseEventInit);
 
 	__readonly__ var wasClean : boolean;
 	__readonly__ var code : number/*unsigned short*/;
@@ -5303,30 +4545,12 @@ native __fake__ class NavigatorGeolocation {
 /** @see http://dev.w3.org/geo/api/spec-source.html */
 native final __fake__ class Geolocation {
 
-	function getCurrentPosition(
-		successCallback : function(position:Position):void/*PositionCallback*/
-	) : void;
-	function getCurrentPosition(
-		successCallback : function(position:Position):void/*PositionCallback*/,
-		errorCallback : function(positionError:PositionError):void/*PositionErrorCallback*/
-	) : void;
-	function getCurrentPosition(
-		successCallback : function(position:Position):void/*PositionCallback*/,
-		errorCallback : function(positionError:PositionError):void/*PositionErrorCallback*/,
-		options : PositionOptions
-	) : void;
-	function watchPosition(
-		successCallback : function(position:Position):void/*PositionCallback*/
-	) : number/*long*/;
-	function watchPosition(
-		successCallback : function(position:Position):void/*PositionCallback*/,
-		errorCallback : function(positionError:PositionError):void/*PositionErrorCallback*/
-	) : number/*long*/;
-	function watchPosition(
-		successCallback : function(position:Position):void/*PositionCallback*/,
-		errorCallback : function(positionError:PositionError):void/*PositionErrorCallback*/,
-		options : PositionOptions
-	) : number/*long*/;
+	function getCurrentPosition(successCallback : function(position:Position):void/*PositionCallback*/) : void;
+	function getCurrentPosition(successCallback : function(position:Position):void/*PositionCallback*/, errorCallback : function(positionError:PositionError):void/*PositionErrorCallback*/) : void;
+	function getCurrentPosition(successCallback : function(position:Position):void/*PositionCallback*/, errorCallback : function(positionError:PositionError):void/*PositionErrorCallback*/, options : PositionOptions) : void;
+	function watchPosition(successCallback : function(position:Position):void/*PositionCallback*/) : number/*long*/;
+	function watchPosition(successCallback : function(position:Position):void/*PositionCallback*/, errorCallback : function(positionError:PositionError):void/*PositionErrorCallback*/) : number/*long*/;
+	function watchPosition(successCallback : function(position:Position):void/*PositionCallback*/, errorCallback : function(positionError:PositionError):void/*PositionErrorCallback*/, options : PositionOptions) : number/*long*/;
 	function clearWatch(watchId : number/*long*/) : void;
 
 } // end of Geolocation
@@ -5379,21 +4603,12 @@ native final __fake__ class PositionError {
 native final class Storage {
 
 	__readonly__ var length : number/*unsigned long*/;
-	function key(
-		index : number/*unsigned long*/
-	) : Nullable.<string>/*DOMString?*/;
-	function __native_index_operator__(
-		key : string/*DOMString*/
-	) : Nullable.<string>/*DOMString?*/;
+	function key(index : number/*unsigned long*/) : Nullable.<string>/*DOMString?*/;
+	function __native_index_operator__(key : string/*DOMString*/) : Nullable.<string>/*DOMString?*/;
 	/* getter */
-	function getItem(
-		key : string/*DOMString*/
-	) : Nullable.<string>/*DOMString?*/;
+	function getItem(key : string/*DOMString*/) : Nullable.<string>/*DOMString?*/;
 	/* setter creator */
-	function setItem(
-		key : string/*DOMString*/,
-		value : string/*DOMString*/
-	) : void;
+	function setItem(key : string/*DOMString*/, value : string/*DOMString*/) : void;
 	/* deleter */
 	function removeItem(key : string/*DOMString*/) : void;
 	function clear() : void;
@@ -5418,10 +4633,7 @@ native __fake__ class WindowLocalStorage {
 native final class StorageEvent extends Event {
 
 	function constructor(type : string/*DOMString*/);
-	function constructor(
-		type : string/*DOMString*/,
-		eventInitDict : StorageEventInit
-	);
+	function constructor(type : string/*DOMString*/, eventInitDict : StorageEventInit);
 
 	__readonly__ var key : Nullable.<string>/*DOMString?*/;
 	__readonly__ var oldValue : Nullable.<string>/*DOMString?*/;
@@ -5446,10 +4658,7 @@ native final class StorageEventInit extends EventInit {
 native final class MessageEvent extends Event {
 
 	function constructor(type : string/*DOMString*/);
-	function constructor(
-		type : string/*DOMString*/,
-		eventInitDict : MessageEventInit
-	);
+	function constructor(type : string/*DOMString*/, eventInitDict : MessageEventInit);
 
 	__readonly__ var data : variant/*any*/;
 	__readonly__ var origin : string/*DOMString*/;
@@ -5484,10 +4693,7 @@ native final class MessageChannel {
 native final class MessagePort extends EventTarget {
 
 	function postMessage(message : variant/*any*/) : void;
-	function postMessage(
-		message : variant/*any*/,
-		transfer : Transferable[]
-	) : void;
+	function postMessage(message : variant/*any*/, transfer : Transferable[]) : void;
 	function start() : void;
 	function close() : void;
 	// event handlers
@@ -5518,10 +4724,7 @@ native class WorkerGlobalScope extends EventTarget {
 native final class DedicatedWorkerGlobalScope extends WorkerGlobalScope {
 
 	function postMessage(message : variant/*any*/) : void;
-	function postMessage(
-		message : variant/*any*/,
-		transfer : Transferable[]
-	) : void;
+	function postMessage(message : variant/*any*/, transfer : Transferable[]) : void;
 	var onmessage : Nullable.<function(:Event):void>/*Function?*/;
 
 } // end of DedicatedWorkerGlobalScope
@@ -5539,10 +4742,7 @@ native final class SharedWorkerGlobalScope extends WorkerGlobalScope {
 native final class ErrorEvent extends Event {
 
 	function constructor(type : string/*DOMString*/);
-	function constructor(
-		type : string/*DOMString*/,
-		eventInitDict : ErrorEventInit
-	);
+	function constructor(type : string/*DOMString*/, eventInitDict : ErrorEventInit);
 
 	__readonly__ var message : string/*DOMString*/;
 	__readonly__ var filename : string/*DOMString*/;
@@ -5573,10 +4773,7 @@ native final class Worker extends EventTarget {
 
 	function terminate() : void;
 	function postMessage(message : variant/*any*/) : void;
-	function postMessage(
-		message : variant/*any*/,
-		transfer : Transferable[]
-	) : void;
+	function postMessage(message : variant/*any*/, transfer : Transferable[]) : void;
 	var onmessage : Nullable.<function(:Event):void>/*Function?*/;
 
 	// implements AbstractWorker
@@ -5589,10 +4786,7 @@ native final class Worker extends EventTarget {
 native final class SharedWorker extends EventTarget {
 
 	function constructor(scriptURL : string/*DOMString*/);
-	function constructor(
-		scriptURL : string/*DOMString*/,
-		name : string/*DOMString*/
-	);
+	function constructor(scriptURL : string/*DOMString*/, name : string/*DOMString*/);
 
 	__readonly__ var port : MessagePort;
 
@@ -5649,10 +4843,7 @@ native final class WorkerLocation {
 native final class EventSource extends EventTarget {
 
 	function constructor(url : string/*DOMString*/);
-	function constructor(
-		url : string/*DOMString*/,
-		eventSourceInitDict : EventSourceInit
-	);
+	function constructor(url : string/*DOMString*/, eventSourceInitDict : EventSourceInit);
 
 	__readonly__ var url : string/*DOMString*/;
 	__readonly__ var withCredentials : boolean;
@@ -5688,30 +4879,12 @@ native class IDBKeyRange {
 	__readonly__ var upperOpen : boolean;
 	static function only(value : variant/*any*/) : IDBKeyRange;
 	static function lowerBound(lower : variant/*any*/) : IDBKeyRange;
-	static function lowerBound(
-		lower : variant/*any*/,
-		open : boolean
-	) : IDBKeyRange;
+	static function lowerBound(lower : variant/*any*/, open : boolean) : IDBKeyRange;
 	static function upperBound(upper : variant/*any*/) : IDBKeyRange;
-	static function upperBound(
-		upper : variant/*any*/,
-		open : boolean
-	) : IDBKeyRange;
-	static function bound(
-		lower : variant/*any*/,
-		upper : variant/*any*/
-	) : IDBKeyRange;
-	static function bound(
-		lower : variant/*any*/,
-		upper : variant/*any*/,
-		lowerOpen : boolean
-	) : IDBKeyRange;
-	static function bound(
-		lower : variant/*any*/,
-		upper : variant/*any*/,
-		lowerOpen : boolean,
-		upperOpen : boolean
-	) : IDBKeyRange;
+	static function upperBound(upper : variant/*any*/, open : boolean) : IDBKeyRange;
+	static function bound(lower : variant/*any*/, upper : variant/*any*/) : IDBKeyRange;
+	static function bound(lower : variant/*any*/, upper : variant/*any*/, lowerOpen : boolean) : IDBKeyRange;
+	static function bound(lower : variant/*any*/, upper : variant/*any*/, lowerOpen : boolean, upperOpen : boolean) : IDBKeyRange;
 
 } // end of IDBKeyRange
 
@@ -5764,10 +4937,7 @@ native final class IDBOpenDBRequest extends IDBRequest {
 native final class IDBVersionChangeEvent extends Event {
 
 	function constructor(type : string/*DOMString*/);
-	function constructor(
-		type : string/*DOMString*/,
-		eventInitDict : IDBVersionChangeEventInit
-	);
+	function constructor(type : string/*DOMString*/, eventInitDict : IDBVersionChangeEventInit);
 
 	__readonly__ var oldVersion : number/*unsigned long long*/;
 	__readonly__ var newVersion : Nullable.<number>/*unsigned long long?*/;
@@ -5785,17 +4955,9 @@ native __fake__ class IDBEnvironment {
 native class IDBFactory {
 
 	function open(name : string/*DOMString*/) : IDBOpenDBRequest;
-	function open(
-		name : string/*DOMString*/,
-		version : number/*unsigned long long*/
-	) : IDBOpenDBRequest;
-	function deleteDatabase(
-		name : string/*DOMString*/
-	) : IDBOpenDBRequest;
-	function cmp(
-		first : variant/*any*/,
-		second : variant/*any*/
-	) : number/*short*/;
+	function open(name : string/*DOMString*/, version : number/*unsigned long long*/) : IDBOpenDBRequest;
+	function deleteDatabase(name : string/*DOMString*/) : IDBOpenDBRequest;
+	function cmp(first : variant/*any*/, second : variant/*any*/) : number/*short*/;
 
 } // end of IDBFactory
 
@@ -5805,19 +4967,11 @@ native class IDBDatabase extends EventTarget {
 	__readonly__ var name : string/*DOMString*/;
 	__readonly__ var version : number/*unsigned long long*/;
 	__readonly__ var objectStoreNames : DOMStringList;
-	function createObjectStore(
-		name : string/*DOMString*/
-	) : IDBObjectStore;
-	function createObjectStore(
-		name : string/*DOMString*/,
-		optionalParameters : IDBObjectStoreParameters
-	) : IDBObjectStore;
+	function createObjectStore(name : string/*DOMString*/) : IDBObjectStore;
+	function createObjectStore(name : string/*DOMString*/, optionalParameters : IDBObjectStoreParameters) : IDBObjectStore;
 	function deleteObjectStore(name : string/*DOMString*/) : void;
 	function transaction(storeNames : variant/*any*/) : IDBTransaction;
-	function transaction(
-		storeNames : variant/*any*/,
-		mode : string/*DOMString*/
-	) : IDBTransaction;
+	function transaction(storeNames : variant/*any*/, mode : string/*DOMString*/) : IDBTransaction;
 	function close() : void;
 	var onabort : Nullable.<function(:Event):void>/*Function?*/;
 	var onerror : Nullable.<function(:Event):void>/*Function?*/;
@@ -5834,33 +4988,17 @@ native class IDBObjectStore {
 	__readonly__ var transaction : IDBTransaction;
 
 	function put(value : variant/*any*/) : IDBRequest;
-	function put(
-		value : variant/*any*/,
-		key : variant/*any*/
-	) : IDBRequest;
+	function put(value : variant/*any*/, key : variant/*any*/) : IDBRequest;
 	function add(value : variant/*any*/) : IDBRequest;
-	function add(
-		value : variant/*any*/,
-		key : variant/*any*/
-	) : IDBRequest;
+	function add(value : variant/*any*/, key : variant/*any*/) : IDBRequest;
 	function delete(key : variant/*any*/) : IDBRequest;
 	function get(key : variant/*any*/) : IDBRequest;
 	function clear() : IDBRequest;
 	function openCursor() : IDBRequest;
 	function openCursor(range : variant/*any?*/) : IDBRequest;
-	function openCursor(
-		range : variant/*any?*/,
-		direction : string/*DOMString*/
-	) : IDBRequest;
-	function createIndex(
-		name : string/*DOMString*/,
-		keyPath : variant/*any*/
-	) : IDBIndex;
-	function createIndex(
-		name : string/*DOMString*/,
-		keyPath : variant/*any*/,
-		optionalParameters : IDBIndexParameters
-	) : IDBIndex;
+	function openCursor(range : variant/*any?*/, direction : string/*DOMString*/) : IDBRequest;
+	function createIndex(name : string/*DOMString*/, keyPath : variant/*any*/) : IDBIndex;
+	function createIndex(name : string/*DOMString*/, keyPath : variant/*any*/, optionalParameters : IDBIndexParameters) : IDBIndex;
 	function index(name : string/*DOMString*/) : IDBIndex;
 	function deleteIndex(indexName : string/*DOMString*/) : void;
 	function count() : IDBRequest;
@@ -5878,16 +5016,10 @@ native class IDBIndex {
 	__readonly__ var unique : boolean;
 	function openCursor() : IDBRequest;
 	function openCursor(range : variant/*any?*/) : IDBRequest;
-	function openCursor(
-		range : variant/*any?*/,
-		direction : string/*DOMString*/
-	) : IDBRequest;
+	function openCursor(range : variant/*any?*/, direction : string/*DOMString*/) : IDBRequest;
 	function openKeyCursor() : IDBRequest;
 	function openKeyCursor(range : variant/*any?*/) : IDBRequest;
-	function openKeyCursor(
-		range : variant/*any?*/,
-		direction : string/*DOMString*/
-	) : IDBRequest;
+	function openKeyCursor(range : variant/*any?*/, direction : string/*DOMString*/) : IDBRequest;
 	function get(key : variant/*any*/) : IDBRequest;
 	function getKey(key : variant/*any*/) : IDBRequest;
 	function count() : IDBRequest;
@@ -5942,28 +5074,11 @@ native __fake__ class IDBEnvironmentSync {
 native final class IDBFactorySync {
 
 	function open(name : string/*DOMString*/) : IDBDatabaseSync;
-	function open(
-		name : string/*DOMString*/,
-		version : number/*unsigned long long*/
-	) : IDBDatabaseSync;
-	function open(
-		name : string/*DOMString*/,
-		version : number/*unsigned long long*/,
-		upgradeCallback : function(:IDBTransactionSync,
-		:number):void/*IDBVersionChangeCallback*/
-	) : IDBDatabaseSync;
-	function open(
-		name : string/*DOMString*/,
-		version : number/*unsigned long long*/,
-		upgradeCallback : function(:IDBTransactionSync,
-		:number):void/*IDBVersionChangeCallback*/,
-		timeout : number/*unsigned long*/
-	) : IDBDatabaseSync;
+	function open(name : string/*DOMString*/, version : number/*unsigned long long*/) : IDBDatabaseSync;
+	function open(name : string/*DOMString*/, version : number/*unsigned long long*/, upgradeCallback : function(:IDBTransactionSync,:number):void/*IDBVersionChangeCallback*/) : IDBDatabaseSync;
+	function open(name : string/*DOMString*/, version : number/*unsigned long long*/, upgradeCallback : function(:IDBTransactionSync,:number):void/*IDBVersionChangeCallback*/, timeout : number/*unsigned long*/) : IDBDatabaseSync;
 	function deleteDatabase(name : string/*DOMString*/) : void;
-	function cmp(
-		first : variant/*any*/,
-		second : variant/*any*/
-	) : number/*short*/;
+	function cmp(first : variant/*any*/, second : variant/*any*/) : number/*short*/;
 
 } // end of IDBFactorySync
 
@@ -5973,29 +5088,12 @@ native final class IDBDatabaseSync {
 	__readonly__ var name : string/*DOMString*/;
 	__readonly__ var version : number/*unsigned long long*/;
 	__readonly__ var objectStoreNames : DOMStringList;
-	function createObjectStore(
-		name : string/*DOMString*/
-	) : IDBObjectStoreSync;
-	function createObjectStore(
-		name : string/*DOMString*/,
-		optionalParameters : IDBObjectStoreParameters
-	) : IDBObjectStoreSync;
+	function createObjectStore(name : string/*DOMString*/) : IDBObjectStoreSync;
+	function createObjectStore(name : string/*DOMString*/, optionalParameters : IDBObjectStoreParameters) : IDBObjectStoreSync;
 	function deleteObjectStore(name : string/*DOMString*/) : void;
-	function transaction(
-		storeNames : variant/*any*/,
-		callback : function(:IDBTransactionSync):void/*IDBTransactionCallback*/
-	) : void;
-	function transaction(
-		storeNames : variant/*any*/,
-		callback : function(:IDBTransactionSync):void/*IDBTransactionCallback*/,
-		mode : string/*DOMString*/
-	) : void;
-	function transaction(
-		storeNames : variant/*any*/,
-		callback : function(:IDBTransactionSync):void/*IDBTransactionCallback*/,
-		mode : string/*DOMString*/,
-		timeout : number/*unsigned long*/
-	) : void;
+	function transaction(storeNames : variant/*any*/, callback : function(:IDBTransactionSync):void/*IDBTransactionCallback*/) : void;
+	function transaction(storeNames : variant/*any*/, callback : function(:IDBTransactionSync):void/*IDBTransactionCallback*/, mode : string/*DOMString*/) : void;
+	function transaction(storeNames : variant/*any*/, callback : function(:IDBTransactionSync):void/*IDBTransactionCallback*/, mode : string/*DOMString*/, timeout : number/*unsigned long*/) : void;
 	function close() : void;
 
 } // end of IDBDatabaseSync
@@ -6013,37 +5111,19 @@ native final class IDBObjectStoreSync {
 	__readonly__ var transaction : IDBTransactionSync;
 
 	function put(value : variant/*any*/) : variant/*any*/;
-	function put(
-		value : variant/*any*/,
-		key : variant/*any*/
-	) : variant/*any*/;
+	function put(value : variant/*any*/, key : variant/*any*/) : variant/*any*/;
 	function add(value : variant/*any*/) : variant/*any*/;
-	function add(
-		value : variant/*any*/,
-		key : variant/*any*/
-	) : variant/*any*/;
+	function add(value : variant/*any*/, key : variant/*any*/) : variant/*any*/;
 	function delete(key : variant/*any*/) : boolean;
 	function get(key : variant/*any*/) : variant/*any*/;
 	function clear() : void;
-	function createIndex(
-		name : string/*DOMString*/,
-		keyPath : variant/*any*/
-	) : IDBIndexSync;
-	function createIndex(
-		name : string/*DOMString*/,
-		keyPath : variant/*any*/,
-		optionalParameters : IDBIndexParameters
-	) : IDBIndexSync;
+	function createIndex(name : string/*DOMString*/, keyPath : variant/*any*/) : IDBIndexSync;
+	function createIndex(name : string/*DOMString*/, keyPath : variant/*any*/, optionalParameters : IDBIndexParameters) : IDBIndexSync;
 	function index(name : string/*DOMString*/) : IDBIndexSync;
 	function deleteIndex(indexName : string/*DOMString*/) : void;
 	function openCursor() : IDBCursorWithValueSync;
-	function openCursor(
-		range : variant/*any?*/
-	) : IDBCursorWithValueSync;
-	function openCursor(
-		range : variant/*any?*/,
-		direction : string/*DOMString*/
-	) : IDBCursorWithValueSync;
+	function openCursor(range : variant/*any?*/) : IDBCursorWithValueSync;
+	function openCursor(range : variant/*any?*/, direction : string/*DOMString*/) : IDBCursorWithValueSync;
 	function count() : number/*unsigned long*/;
 	function count(key : variant/*any*/) : number/*unsigned long*/;
 
@@ -6058,19 +5138,11 @@ native final class IDBIndexSync {
 	__readonly__ var multiEntry : boolean;
 	__readonly__ var unique : boolean;
 	function openCursor() : IDBCursorWithValueSync;
-	function openCursor(
-		range : variant/*any?*/
-	) : IDBCursorWithValueSync;
-	function openCursor(
-		range : variant/*any?*/,
-		direction : string/*DOMString*/
-	) : IDBCursorWithValueSync;
+	function openCursor(range : variant/*any?*/) : IDBCursorWithValueSync;
+	function openCursor(range : variant/*any?*/, direction : string/*DOMString*/) : IDBCursorWithValueSync;
 	function openKeyCursor() : IDBCursorSync;
 	function openKeyCursor(range : variant/*any?*/) : IDBCursorSync;
-	function openKeyCursor(
-		range : variant/*any?*/,
-		direction : string/*DOMString*/
-	) : IDBCursorSync;
+	function openKeyCursor(range : variant/*any?*/, direction : string/*DOMString*/) : IDBCursorSync;
 	function get(key : variant/*any*/) : variant/*any*/;
 	function getKey(key : variant/*any*/) : variant/*any*/;
 	function count() : number/*unsigned long*/;
@@ -6105,9 +5177,7 @@ native final class IDBTransactionSync {
 	__readonly__ var mode : string/*DOMString*/;
 	var db : IDBDatabaseSync;
 	__readonly__ var error : DOMError;
-	function objectStore(
-		name : string/*DOMString*/
-	) : IDBObjectStoreSync;
+	function objectStore(name : string/*DOMString*/) : IDBObjectStoreSync;
 	function abort() : void;
 
 } // end of IDBTransactionSync
@@ -6116,15 +5186,10 @@ native final class IDBTransactionSync {
 native final class Notification extends EventTarget {
 
 	function constructor(title : string/*DOMString*/);
-	function constructor(
-		title : string/*DOMString*/,
-		options : NotificationOptions
-	);
+	function constructor(title : string/*DOMString*/, options : NotificationOptions);
 
 	__readonly__ var permission : string/*NotificationPermission*/;
-	static function requestPermission(
-		callback : function(permission:string/*NotificationPermission*/):void/*NotificationPermissionCallback*/
-	) : void;
+	static function requestPermission(callback : function(permission:string/*NotificationPermission*/):void/*NotificationPermissionCallback*/) : void;
 	var onclick : Nullable.<function(:Event):void>/*Function?*/;
 	var onshow : Nullable.<function(:Event):void>/*Function?*/;
 	var onerror : Nullable.<function(:Event):void>/*Function?*/;
@@ -6149,10 +5214,7 @@ native final class AudioMediaStreamTrack extends MediaStreamTrack {
 
 	__readonly__ var canInsertDTMF : boolean;
 	function insertDTMF(tones : string/*DOMString*/) : void;
-	function insertDTMF(
-		tones : string/*DOMString*/,
-		duration : number/*long*/
-	) : void;
+	function insertDTMF(tones : string/*DOMString*/, duration : number/*long*/) : void;
 
 } // end of AudioMediaStreamTrack
 
@@ -6160,9 +5222,7 @@ native final class AudioMediaStreamTrack extends MediaStreamTrack {
 native final class RTCSessionDescription {
 
 	function constructor();
-	function constructor(
-		descriptionInitDict : RTCSessionDescriptionInit
-	);
+	function constructor(descriptionInitDict : RTCSessionDescriptionInit);
 
 	var type : Nullable.<string>/*RTCSdpType?*/;
 	var sdp : Nullable.<string>/*DOMString?*/;
@@ -6217,102 +5277,37 @@ native final class RTCConfiguration {
 native final class RTCPeerConnection extends EventTarget {
 
 	function constructor(configuration : RTCConfiguration);
-	function constructor(
-		configuration : RTCConfiguration,
-		constraints : MediaConstraints
-	);
+	function constructor(configuration : RTCConfiguration, constraints : MediaConstraints);
 
-	function createOffer(
-		successCallback : function(sdp:RTCSessionDescription):void/*RTCSessionDescriptionCallback*/
-	) : void;
-	function createOffer(
-		successCallback : function(sdp:RTCSessionDescription):void/*RTCSessionDescriptionCallback*/,
-		failureCallback : function(errorInformation:string/*DOMString*/):void/*RTCPeerConnectionErrorCallback*/
-	) : void;
-	function createOffer(
-		successCallback : function(sdp:RTCSessionDescription):void/*RTCSessionDescriptionCallback*/,
-		failureCallback : function(errorInformation:string/*DOMString*/):void/*RTCPeerConnectionErrorCallback*/,
-		constraints : MediaConstraints
-	) : void;
-	function createAnswer(
-		offer : RTCSessionDescription,
-		successCallback : function(sdp:RTCSessionDescription):void/*RTCSessionDescriptionCallback*/
-	) : void;
-	function createAnswer(
-		offer : RTCSessionDescription,
-		successCallback : function(sdp:RTCSessionDescription):void/*RTCSessionDescriptionCallback*/,
-		failureCallback : Nullable.<function(errorInformation:string/*DOMString*/):void>/*RTCPeerConnectionErrorCallback?*/
-	) : void;
-	function createAnswer(
-		offer : RTCSessionDescription,
-		successCallback : function(sdp:RTCSessionDescription):void/*RTCSessionDescriptionCallback*/,
-		failureCallback : Nullable.<function(errorInformation:string/*DOMString*/):void>/*RTCPeerConnectionErrorCallback?*/,
-		constraints : MediaConstraints
-	) : void;
-	function createAnswer(
-		offer : RTCSessionDescription,
-		successCallback : function(sdp:RTCSessionDescription):void/*RTCSessionDescriptionCallback*/,
-		failureCallback : Nullable.<function(errorInformation:string/*DOMString*/):void>/*RTCPeerConnectionErrorCallback?*/,
-		constraints : MediaConstraints,
-		createProvisionalAnswer : boolean
-	) : void;
-	function setLocalDescription(
-		description : RTCSessionDescription
-	) : void;
-	function setLocalDescription(
-		description : RTCSessionDescription,
-		successCallback : function():void/*RTCVoidCallback*/
-	) : void;
-	function setLocalDescription(
-		description : RTCSessionDescription,
-		successCallback : function():void/*RTCVoidCallback*/,
-		failureCallback : function(errorInformation:string/*DOMString*/):void/*RTCPeerConnectionErrorCallback*/
-	) : void;
+	function createOffer(successCallback : function(sdp:RTCSessionDescription):void/*RTCSessionDescriptionCallback*/) : void;
+	function createOffer(successCallback : function(sdp:RTCSessionDescription):void/*RTCSessionDescriptionCallback*/, failureCallback : function(errorInformation:string/*DOMString*/):void/*RTCPeerConnectionErrorCallback*/) : void;
+	function createOffer(successCallback : function(sdp:RTCSessionDescription):void/*RTCSessionDescriptionCallback*/, failureCallback : function(errorInformation:string/*DOMString*/):void/*RTCPeerConnectionErrorCallback*/, constraints : MediaConstraints) : void;
+	function createAnswer(offer : RTCSessionDescription, successCallback : function(sdp:RTCSessionDescription):void/*RTCSessionDescriptionCallback*/) : void;
+	function createAnswer(offer : RTCSessionDescription, successCallback : function(sdp:RTCSessionDescription):void/*RTCSessionDescriptionCallback*/, failureCallback : Nullable.<function(errorInformation:string/*DOMString*/):void>/*RTCPeerConnectionErrorCallback?*/) : void;
+	function createAnswer(offer : RTCSessionDescription, successCallback : function(sdp:RTCSessionDescription):void/*RTCSessionDescriptionCallback*/, failureCallback : Nullable.<function(errorInformation:string/*DOMString*/):void>/*RTCPeerConnectionErrorCallback?*/, constraints : MediaConstraints) : void;
+	function createAnswer(offer : RTCSessionDescription, successCallback : function(sdp:RTCSessionDescription):void/*RTCSessionDescriptionCallback*/, failureCallback : Nullable.<function(errorInformation:string/*DOMString*/):void>/*RTCPeerConnectionErrorCallback?*/, constraints : MediaConstraints, createProvisionalAnswer : boolean) : void;
+	function setLocalDescription(description : RTCSessionDescription) : void;
+	function setLocalDescription(description : RTCSessionDescription, successCallback : function():void/*RTCVoidCallback*/) : void;
+	function setLocalDescription(description : RTCSessionDescription, successCallback : function():void/*RTCVoidCallback*/, failureCallback : function(errorInformation:string/*DOMString*/):void/*RTCPeerConnectionErrorCallback*/) : void;
 	__readonly__ var localDescription : RTCSessionDescription;
-	function setRemoteDescription(
-		description : RTCSessionDescription
-	) : void;
-	function setRemoteDescription(
-		description : RTCSessionDescription,
-		successCallback : function():void/*RTCVoidCallback*/
-	) : void;
-	function setRemoteDescription(
-		description : RTCSessionDescription,
-		successCallback : function():void/*RTCVoidCallback*/,
-		failureCallback : function(errorInformation:string/*DOMString*/):void/*RTCPeerConnectionErrorCallback*/
-	) : void;
+	function setRemoteDescription(description : RTCSessionDescription) : void;
+	function setRemoteDescription(description : RTCSessionDescription, successCallback : function():void/*RTCVoidCallback*/) : void;
+	function setRemoteDescription(description : RTCSessionDescription, successCallback : function():void/*RTCVoidCallback*/, failureCallback : function(errorInformation:string/*DOMString*/):void/*RTCPeerConnectionErrorCallback*/) : void;
 	__readonly__ var remoteDescription : RTCSessionDescription;
 	__readonly__ var readyState : string/*RTCPeerState*/;
 	function updateIce() : void;
-	function updateIce(
-		configuration : Nullable.<RTCConfiguration>
-	) : void;
-	function updateIce(
-		configuration : Nullable.<RTCConfiguration>,
-		constraints : Nullable.<MediaConstraints>
-	) : void;
-	function updateIce(
-		configuration : Nullable.<RTCConfiguration>,
-		constraints : Nullable.<MediaConstraints>,
-		restart : boolean
-	) : void;
+	function updateIce(configuration : Nullable.<RTCConfiguration>) : void;
+	function updateIce(configuration : Nullable.<RTCConfiguration>, constraints : Nullable.<MediaConstraints>) : void;
+	function updateIce(configuration : Nullable.<RTCConfiguration>, constraints : Nullable.<MediaConstraints>, restart : boolean) : void;
 	function addIceCandidate(candidate : RTCIceCandidate) : void;
 	__readonly__ var iceState : string/*RTCIceState*/;
 	__readonly__ var localStreams : MediaStream[]/*MediaStreamArray*/;
 	__readonly__ var remoteStreams : MediaStream[]/*MediaStreamArray*/;
-	function createDataChannel(
-		label : string/*DOMString*/
-	) : DataChannel;
-	function createDataChannel(
-		label : string/*DOMString*/,
-		dataChannelDict : DataChannelInit
-	) : DataChannel;
+	function createDataChannel(label : string/*DOMString*/) : DataChannel;
+	function createDataChannel(label : string/*DOMString*/, dataChannelDict : DataChannelInit) : DataChannel;
 	var ondatachannel : Nullable.<function(:Event):void>/*EventHandler*/;
 	function addStream(stream : MediaStream) : void;
-	function addStream(
-		stream : MediaStream,
-		constraints : MediaConstraints
-	) : void;
+	function addStream(stream : MediaStream, constraints : MediaConstraints) : void;
 	function removeStream(stream : MediaStream) : void;
 	function close() : void;
 	var onnegotationneeded : Nullable.<function(:Event):void>/*EventHandler*/;
@@ -6354,10 +5349,7 @@ native final class DataChannelInit {
 /** @see http://dev.w3.org/2011/webrtc/editor/webrtc.html */
 native final class RTCPeerConnectionIceEvent extends Event {
 
-	function constructor(
-		type : string/*DOMString*/,
-		eventInitDict : RTCPeerConnectionIceEventInit
-	);
+	function constructor(type : string/*DOMString*/, eventInitDict : RTCPeerConnectionIceEventInit);
 
 	__readonly__ var candidate : RTCIceCandidate;
 
@@ -6373,10 +5365,7 @@ native final class RTCPeerConnectionIceEventInit extends EventInit {
 /** @see http://dev.w3.org/2011/webrtc/editor/webrtc.html */
 native final class MediaStreamEvent extends Event {
 
-	function constructor(
-		type : string/*DOMString*/,
-		eventInitDict : MediaStreamEventInit
-	);
+	function constructor(type : string/*DOMString*/, eventInitDict : MediaStreamEventInit);
 
 	__readonly__ var stream : Nullable.<MediaStream>;
 
@@ -6392,10 +5381,7 @@ native final class MediaStreamEventInit extends EventInit {
 /** @see http://dev.w3.org/2011/webrtc/editor/webrtc.html */
 native final class DataChannelEvent extends Event {
 
-	function constructor(
-		type : string/*DOMString*/,
-		eventInitDict : DataChannelEventInit
-	);
+	function constructor(type : string/*DOMString*/, eventInitDict : DataChannelEventInit);
 
 	__readonly__ var channel : DataChannel;
 
@@ -6411,10 +5397,7 @@ native final class DataChannelEventInit extends EventInit {
 /** @see http://www.w3.org/TR/mediacapture-streams/ */
 native class MediaStream extends EventTarget {
 
-	function constructor(
-		audioTracks : Nullable.<MediaStreamTrackList>,
-		videoTracks : Nullable.<MediaStreamTrackList>
-	);
+	function constructor(audioTracks : Nullable.<MediaStreamTrackList>, videoTracks : Nullable.<MediaStreamTrackList>);
 
 	__readonly__ var label : string/*DOMString*/;
 	__readonly__ var audioTracks : MediaStreamTrackList;
@@ -6465,15 +5448,8 @@ native final class MediaStreamTrackList {
 /** @see http://www.w3.org/TR/mediacapture-streams/ */
 native __fake__ class NavigatorUserMedia {
 
-	function getUserMedia(
-		constraints : Nullable.<MediaStreamConstraints>,
-		successCallback : function(stream:LocalMediaStream):void/*NavigatorUserMediaSuccessCallback*/
-	) : void;
-	function getUserMedia(
-		constraints : Nullable.<MediaStreamConstraints>,
-		successCallback : function(stream:LocalMediaStream):void/*NavigatorUserMediaSuccessCallback*/,
-		errorCallback : Nullable.<function(error:NavigatorUserMediaError):void>/*NavigatorUserMediaErrorCallback?*/
-	) : void;
+	function getUserMedia(constraints : Nullable.<MediaStreamConstraints>, successCallback : function(stream:LocalMediaStream):void/*NavigatorUserMediaSuccessCallback*/) : void;
+	function getUserMedia(constraints : Nullable.<MediaStreamConstraints>, successCallback : function(stream:LocalMediaStream):void/*NavigatorUserMediaSuccessCallback*/, errorCallback : Nullable.<function(error:NavigatorUserMediaError):void>/*NavigatorUserMediaErrorCallback?*/) : void;
 
 } // end of NavigatorUserMedia
 
@@ -6509,10 +5485,7 @@ native final class ArrayBuffer extends Transferable {
 
 	__readonly__ var byteLength : number/*unsigned long*/;
 	function slice(begin : number/*long*/) : ArrayBuffer;
-	function slice(
-		begin : number/*long*/,
-		end : number/*long*/
-	) : ArrayBuffer;
+	function slice(begin : number/*long*/, end : number/*long*/) : ArrayBuffer;
 
 } // end of ArrayBuffer
 
@@ -6533,50 +5506,24 @@ native final class Int8Array extends ArrayBufferView {
 	function constructor(array : number[]/*byte[]*/);
 	function constructor(array : int[]/*byte[]*/);
 	function constructor(buffer : ArrayBuffer);
-	function constructor(
-		buffer : ArrayBuffer,
-		byteOffset : number/*unsigned long*/
-	);
-	function constructor(
-		buffer : ArrayBuffer,
-		byteOffset : number/*unsigned long*/,
-		length : number/*unsigned long*/
-	);
+	function constructor(buffer : ArrayBuffer, byteOffset : number/*unsigned long*/);
+	function constructor(buffer : ArrayBuffer, byteOffset : number/*unsigned long*/, length : number/*unsigned long*/);
 
 	static __readonly__ var BYTES_PER_ELEMENT : number/*long*/;
 	       __readonly__ var BYTES_PER_ELEMENT : number/*long*/;
 	__readonly__ var length : number/*unsigned long*/;
-	function __native_index_operator__(
-		index : number/*unsigned long*/
-	) : Nullable.<number>/*byte*/;
+	function __native_index_operator__(index : number/*unsigned long*/) : Nullable.<number>/*byte*/;
 	/* getter */
-	function get(
-		index : number/*unsigned long*/
-	) : Nullable.<number>/*byte*/;
+	function get(index : number/*unsigned long*/) : Nullable.<number>/*byte*/;
 	/* setter */
-	function set(
-		index : number/*unsigned long*/,
-		value : number/*byte*/
-	) : void;
+	function set(index : number/*unsigned long*/, value : number/*byte*/) : void;
 	function set(array : Int8Array) : void;
-	function set(
-		array : Int8Array,
-		offset : number/*unsigned long*/
-	) : void;
+	function set(array : Int8Array, offset : number/*unsigned long*/) : void;
 	function set(array : number[]/*byte[]*/) : void;
-	function set(
-		array : number[]/*byte[]*/,
-		offset : number/*unsigned long*/
-	) : void;
+	function set(array : number[]/*byte[]*/, offset : number/*unsigned long*/) : void;
 	function set(array : int[]/*byte[]*/) : void;
-	function set(
-		array : int[]/*byte[]*/,
-		offset : number/*unsigned long*/
-	) : void;
-	function subarray(
-		start : number/*long*/,
-		end : number/*long*/
-	) : Int8Array;
+	function set(array : int[]/*byte[]*/, offset : number/*unsigned long*/) : void;
+	function subarray(start : number/*long*/, end : number/*long*/) : Int8Array;
 
 } // end of Int8Array
 
@@ -6588,50 +5535,24 @@ native class Uint8Array extends ArrayBufferView {
 	function constructor(array : number[]/*octet[]*/);
 	function constructor(array : int[]/*octet[]*/);
 	function constructor(buffer : ArrayBuffer);
-	function constructor(
-		buffer : ArrayBuffer,
-		byteOffset : number/*unsigned long*/
-	);
-	function constructor(
-		buffer : ArrayBuffer,
-		byteOffset : number/*unsigned long*/,
-		length : number/*unsigned long*/
-	);
+	function constructor(buffer : ArrayBuffer, byteOffset : number/*unsigned long*/);
+	function constructor(buffer : ArrayBuffer, byteOffset : number/*unsigned long*/, length : number/*unsigned long*/);
 
 	static __readonly__ var BYTES_PER_ELEMENT : number/*long*/;
 	       __readonly__ var BYTES_PER_ELEMENT : number/*long*/;
 	__readonly__ var length : number/*unsigned long*/;
-	function __native_index_operator__(
-		index : number/*unsigned long*/
-	) : Nullable.<number>/*octet*/;
+	function __native_index_operator__(index : number/*unsigned long*/) : Nullable.<number>/*octet*/;
 	/* getter */
-	function get(
-		index : number/*unsigned long*/
-	) : Nullable.<number>/*octet*/;
+	function get(index : number/*unsigned long*/) : Nullable.<number>/*octet*/;
 	/* setter */
-	function set(
-		index : number/*unsigned long*/,
-		value : number/*octet*/
-	) : void;
+	function set(index : number/*unsigned long*/, value : number/*octet*/) : void;
 	function set(array : Uint8Array) : void;
-	function set(
-		array : Uint8Array,
-		offset : number/*unsigned long*/
-	) : void;
+	function set(array : Uint8Array, offset : number/*unsigned long*/) : void;
 	function set(array : number[]/*octet[]*/) : void;
-	function set(
-		array : number[]/*octet[]*/,
-		offset : number/*unsigned long*/
-	) : void;
+	function set(array : number[]/*octet[]*/, offset : number/*unsigned long*/) : void;
 	function set(array : int[]/*octet[]*/) : void;
-	function set(
-		array : int[]/*octet[]*/,
-		offset : number/*unsigned long*/
-	) : void;
-	function subarray(
-		start : number/*long*/,
-		end : number/*long*/
-	) : Uint8Array;
+	function set(array : int[]/*octet[]*/, offset : number/*unsigned long*/) : void;
+	function subarray(start : number/*long*/, end : number/*long*/) : Uint8Array;
 
 } // end of Uint8Array
 
@@ -6644,31 +5565,18 @@ native final class Uint8ClampedArray extends Uint8Array {
 	function constructor(array : number[]/*octet[]*/);
 	function constructor(array : int[]/*octet[]*/);
 	function constructor(buffer : ArrayBuffer);
-	function constructor(
-		buffer : ArrayBuffer,
-		byteOffset : number/*unsigned long*/
-	);
-	function constructor(
-		buffer : ArrayBuffer,
-		byteOffset : number/*unsigned long*/,
-		length : number/*unsigned long*/
-	);
+	function constructor(buffer : ArrayBuffer, byteOffset : number/*unsigned long*/);
+	function constructor(buffer : ArrayBuffer, byteOffset : number/*unsigned long*/, length : number/*unsigned long*/);
 
 	/* setter */
 	// inherits function set(index : number/*unsigned long*/, value : number/*octet*/) : void;
 	function set(array : Uint8ClampedArray) : void;
-	function set(
-		array : Uint8ClampedArray,
-		offset : number/*unsigned long*/
-	) : void;
+	function set(array : Uint8ClampedArray, offset : number/*unsigned long*/) : void;
 	// inherits function set(array : number[]/*octet[]*/) : void;
 	// inherits function set(array : number[]/*octet[]*/, offset : number/*unsigned long*/) : void;
 	// inherits function set(array : int[]/*octet[]*/) : void;
 	// inherits function set(array : int[]/*octet[]*/, offset : number/*unsigned long*/) : void;
-	override function subarray(
-		start : number/*long*/,
-		end : number/*long*/
-	) : Uint8ClampedArray;
+	override function subarray(start : number/*long*/, end : number/*long*/) : Uint8ClampedArray;
 
 } // end of Uint8ClampedArray
 
@@ -6680,50 +5588,24 @@ native final class Int16Array extends ArrayBufferView {
 	function constructor(array : number[]/*short[]*/);
 	function constructor(array : int[]/*short[]*/);
 	function constructor(buffer : ArrayBuffer);
-	function constructor(
-		buffer : ArrayBuffer,
-		byteOffset : number/*unsigned long*/
-	);
-	function constructor(
-		buffer : ArrayBuffer,
-		byteOffset : number/*unsigned long*/,
-		length : number/*unsigned long*/
-	);
+	function constructor(buffer : ArrayBuffer, byteOffset : number/*unsigned long*/);
+	function constructor(buffer : ArrayBuffer, byteOffset : number/*unsigned long*/, length : number/*unsigned long*/);
 
 	static __readonly__ var BYTES_PER_ELEMENT : number/*long*/;
 	       __readonly__ var BYTES_PER_ELEMENT : number/*long*/;
 	__readonly__ var length : number/*unsigned long*/;
-	function __native_index_operator__(
-		index : number/*unsigned long*/
-	) : Nullable.<number>/*short*/;
+	function __native_index_operator__(index : number/*unsigned long*/) : Nullable.<number>/*short*/;
 	/* getter */
-	function get(
-		index : number/*unsigned long*/
-	) : Nullable.<number>/*short*/;
+	function get(index : number/*unsigned long*/) : Nullable.<number>/*short*/;
 	/* setter */
-	function set(
-		index : number/*unsigned long*/,
-		value : number/*short*/
-	) : void;
+	function set(index : number/*unsigned long*/, value : number/*short*/) : void;
 	function set(array : Int16Array) : void;
-	function set(
-		array : Int16Array,
-		offset : number/*unsigned long*/
-	) : void;
+	function set(array : Int16Array, offset : number/*unsigned long*/) : void;
 	function set(array : number[]/*short[]*/) : void;
-	function set(
-		array : number[]/*short[]*/,
-		offset : number/*unsigned long*/
-	) : void;
+	function set(array : number[]/*short[]*/, offset : number/*unsigned long*/) : void;
 	function set(array : int[]/*short[]*/) : void;
-	function set(
-		array : int[]/*short[]*/,
-		offset : number/*unsigned long*/
-	) : void;
-	function subarray(
-		start : number/*long*/,
-		end : number/*long*/
-	) : Int16Array;
+	function set(array : int[]/*short[]*/, offset : number/*unsigned long*/) : void;
+	function subarray(start : number/*long*/, end : number/*long*/) : Int16Array;
 
 } // end of Int16Array
 
@@ -6735,50 +5617,24 @@ native final class Uint16Array extends ArrayBufferView {
 	function constructor(array : number[]/*unsigned short[]*/);
 	function constructor(array : int[]/*unsigned short[]*/);
 	function constructor(buffer : ArrayBuffer);
-	function constructor(
-		buffer : ArrayBuffer,
-		byteOffset : number/*unsigned long*/
-	);
-	function constructor(
-		buffer : ArrayBuffer,
-		byteOffset : number/*unsigned long*/,
-		length : number/*unsigned long*/
-	);
+	function constructor(buffer : ArrayBuffer, byteOffset : number/*unsigned long*/);
+	function constructor(buffer : ArrayBuffer, byteOffset : number/*unsigned long*/, length : number/*unsigned long*/);
 
 	static __readonly__ var BYTES_PER_ELEMENT : number/*long*/;
 	       __readonly__ var BYTES_PER_ELEMENT : number/*long*/;
 	__readonly__ var length : number/*unsigned long*/;
-	function __native_index_operator__(
-		index : number/*unsigned long*/
-	) : Nullable.<number>/*unsigned short*/;
+	function __native_index_operator__(index : number/*unsigned long*/) : Nullable.<number>/*unsigned short*/;
 	/* getter */
-	function get(
-		index : number/*unsigned long*/
-	) : Nullable.<number>/*unsigned short*/;
+	function get(index : number/*unsigned long*/) : Nullable.<number>/*unsigned short*/;
 	/* setter */
-	function set(
-		index : number/*unsigned long*/,
-		value : number/*unsigned short*/
-	) : void;
+	function set(index : number/*unsigned long*/, value : number/*unsigned short*/) : void;
 	function set(array : Uint16Array) : void;
-	function set(
-		array : Uint16Array,
-		offset : number/*unsigned long*/
-	) : void;
+	function set(array : Uint16Array, offset : number/*unsigned long*/) : void;
 	function set(array : number[]/*unsigned short[]*/) : void;
-	function set(
-		array : number[]/*unsigned short[]*/,
-		offset : number/*unsigned long*/
-	) : void;
+	function set(array : number[]/*unsigned short[]*/, offset : number/*unsigned long*/) : void;
 	function set(array : int[]/*unsigned short[]*/) : void;
-	function set(
-		array : int[]/*unsigned short[]*/,
-		offset : number/*unsigned long*/
-	) : void;
-	function subarray(
-		start : number/*long*/,
-		end : number/*long*/
-	) : Uint16Array;
+	function set(array : int[]/*unsigned short[]*/, offset : number/*unsigned long*/) : void;
+	function subarray(start : number/*long*/, end : number/*long*/) : Uint16Array;
 
 } // end of Uint16Array
 
@@ -6790,50 +5646,24 @@ native final class Int32Array extends ArrayBufferView {
 	function constructor(array : number[]/*long[]*/);
 	function constructor(array : int[]/*long[]*/);
 	function constructor(buffer : ArrayBuffer);
-	function constructor(
-		buffer : ArrayBuffer,
-		byteOffset : number/*unsigned long*/
-	);
-	function constructor(
-		buffer : ArrayBuffer,
-		byteOffset : number/*unsigned long*/,
-		length : number/*unsigned long*/
-	);
+	function constructor(buffer : ArrayBuffer, byteOffset : number/*unsigned long*/);
+	function constructor(buffer : ArrayBuffer, byteOffset : number/*unsigned long*/, length : number/*unsigned long*/);
 
 	static __readonly__ var BYTES_PER_ELEMENT : number/*long*/;
 	       __readonly__ var BYTES_PER_ELEMENT : number/*long*/;
 	__readonly__ var length : number/*unsigned long*/;
-	function __native_index_operator__(
-		index : number/*unsigned long*/
-	) : Nullable.<number>/*long*/;
+	function __native_index_operator__(index : number/*unsigned long*/) : Nullable.<number>/*long*/;
 	/* getter */
-	function get(
-		index : number/*unsigned long*/
-	) : Nullable.<number>/*long*/;
+	function get(index : number/*unsigned long*/) : Nullable.<number>/*long*/;
 	/* setter */
-	function set(
-		index : number/*unsigned long*/,
-		value : number/*long*/
-	) : void;
+	function set(index : number/*unsigned long*/, value : number/*long*/) : void;
 	function set(array : Int32Array) : void;
-	function set(
-		array : Int32Array,
-		offset : number/*unsigned long*/
-	) : void;
+	function set(array : Int32Array, offset : number/*unsigned long*/) : void;
 	function set(array : number[]/*long[]*/) : void;
-	function set(
-		array : number[]/*long[]*/,
-		offset : number/*unsigned long*/
-	) : void;
+	function set(array : number[]/*long[]*/, offset : number/*unsigned long*/) : void;
 	function set(array : int[]/*long[]*/) : void;
-	function set(
-		array : int[]/*long[]*/,
-		offset : number/*unsigned long*/
-	) : void;
-	function subarray(
-		start : number/*long*/,
-		end : number/*long*/
-	) : Int32Array;
+	function set(array : int[]/*long[]*/, offset : number/*unsigned long*/) : void;
+	function subarray(start : number/*long*/, end : number/*long*/) : Int32Array;
 
 } // end of Int32Array
 
@@ -6845,50 +5675,24 @@ native final class Uint32Array extends ArrayBufferView {
 	function constructor(array : number[]/*unsigned long[]*/);
 	function constructor(array : int[]/*unsigned long[]*/);
 	function constructor(buffer : ArrayBuffer);
-	function constructor(
-		buffer : ArrayBuffer,
-		byteOffset : number/*unsigned long*/
-	);
-	function constructor(
-		buffer : ArrayBuffer,
-		byteOffset : number/*unsigned long*/,
-		length : number/*unsigned long*/
-	);
+	function constructor(buffer : ArrayBuffer, byteOffset : number/*unsigned long*/);
+	function constructor(buffer : ArrayBuffer, byteOffset : number/*unsigned long*/, length : number/*unsigned long*/);
 
 	static __readonly__ var BYTES_PER_ELEMENT : number/*long*/;
 	       __readonly__ var BYTES_PER_ELEMENT : number/*long*/;
 	__readonly__ var length : number/*unsigned long*/;
-	function __native_index_operator__(
-		index : number/*unsigned long*/
-	) : Nullable.<number>/*unsigned long*/;
+	function __native_index_operator__(index : number/*unsigned long*/) : Nullable.<number>/*unsigned long*/;
 	/* getter */
-	function get(
-		index : number/*unsigned long*/
-	) : Nullable.<number>/*unsigned long*/;
+	function get(index : number/*unsigned long*/) : Nullable.<number>/*unsigned long*/;
 	/* setter */
-	function set(
-		index : number/*unsigned long*/,
-		value : number/*unsigned long*/
-	) : void;
+	function set(index : number/*unsigned long*/, value : number/*unsigned long*/) : void;
 	function set(array : Uint32Array) : void;
-	function set(
-		array : Uint32Array,
-		offset : number/*unsigned long*/
-	) : void;
+	function set(array : Uint32Array, offset : number/*unsigned long*/) : void;
 	function set(array : number[]/*unsigned long[]*/) : void;
-	function set(
-		array : number[]/*unsigned long[]*/,
-		offset : number/*unsigned long*/
-	) : void;
+	function set(array : number[]/*unsigned long[]*/, offset : number/*unsigned long*/) : void;
 	function set(array : int[]/*unsigned long[]*/) : void;
-	function set(
-		array : int[]/*unsigned long[]*/,
-		offset : number/*unsigned long*/
-	) : void;
-	function subarray(
-		start : number/*long*/,
-		end : number/*long*/
-	) : Uint32Array;
+	function set(array : int[]/*unsigned long[]*/, offset : number/*unsigned long*/) : void;
+	function subarray(start : number/*long*/, end : number/*long*/) : Uint32Array;
 
 } // end of Uint32Array
 
@@ -6900,50 +5704,24 @@ native final class Float32Array extends ArrayBufferView {
 	function constructor(array : number[]/*float[]*/);
 	function constructor(array : int[]/*float[]*/);
 	function constructor(buffer : ArrayBuffer);
-	function constructor(
-		buffer : ArrayBuffer,
-		byteOffset : number/*unsigned long*/
-	);
-	function constructor(
-		buffer : ArrayBuffer,
-		byteOffset : number/*unsigned long*/,
-		length : number/*unsigned long*/
-	);
+	function constructor(buffer : ArrayBuffer, byteOffset : number/*unsigned long*/);
+	function constructor(buffer : ArrayBuffer, byteOffset : number/*unsigned long*/, length : number/*unsigned long*/);
 
 	static __readonly__ var BYTES_PER_ELEMENT : number/*long*/;
 	       __readonly__ var BYTES_PER_ELEMENT : number/*long*/;
 	__readonly__ var length : number/*unsigned long*/;
-	function __native_index_operator__(
-		index : number/*unsigned long*/
-	) : Nullable.<number>/*float*/;
+	function __native_index_operator__(index : number/*unsigned long*/) : Nullable.<number>/*float*/;
 	/* getter */
-	function get(
-		index : number/*unsigned long*/
-	) : Nullable.<number>/*float*/;
+	function get(index : number/*unsigned long*/) : Nullable.<number>/*float*/;
 	/* setter */
-	function set(
-		index : number/*unsigned long*/,
-		value : number/*float*/
-	) : void;
+	function set(index : number/*unsigned long*/, value : number/*float*/) : void;
 	function set(array : Float32Array) : void;
-	function set(
-		array : Float32Array,
-		offset : number/*unsigned long*/
-	) : void;
+	function set(array : Float32Array, offset : number/*unsigned long*/) : void;
 	function set(array : number[]/*float[]*/) : void;
-	function set(
-		array : number[]/*float[]*/,
-		offset : number/*unsigned long*/
-	) : void;
+	function set(array : number[]/*float[]*/, offset : number/*unsigned long*/) : void;
 	function set(array : int[]/*float[]*/) : void;
-	function set(
-		array : int[]/*float[]*/,
-		offset : number/*unsigned long*/
-	) : void;
-	function subarray(
-		start : number/*long*/,
-		end : number/*long*/
-	) : Float32Array;
+	function set(array : int[]/*float[]*/, offset : number/*unsigned long*/) : void;
+	function subarray(start : number/*long*/, end : number/*long*/) : Float32Array;
 
 } // end of Float32Array
 
@@ -6955,50 +5733,24 @@ native final class Float64Array extends ArrayBufferView {
 	function constructor(array : number[]/*double[]*/);
 	function constructor(array : int[]/*double[]*/);
 	function constructor(buffer : ArrayBuffer);
-	function constructor(
-		buffer : ArrayBuffer,
-		byteOffset : number/*unsigned long*/
-	);
-	function constructor(
-		buffer : ArrayBuffer,
-		byteOffset : number/*unsigned long*/,
-		length : number/*unsigned long*/
-	);
+	function constructor(buffer : ArrayBuffer, byteOffset : number/*unsigned long*/);
+	function constructor(buffer : ArrayBuffer, byteOffset : number/*unsigned long*/, length : number/*unsigned long*/);
 
 	static __readonly__ var BYTES_PER_ELEMENT : number/*long*/;
 	       __readonly__ var BYTES_PER_ELEMENT : number/*long*/;
 	__readonly__ var length : number/*unsigned long*/;
-	function __native_index_operator__(
-		index : number/*unsigned long*/
-	) : Nullable.<number>/*double*/;
+	function __native_index_operator__(index : number/*unsigned long*/) : Nullable.<number>/*double*/;
 	/* getter */
-	function get(
-		index : number/*unsigned long*/
-	) : Nullable.<number>/*double*/;
+	function get(index : number/*unsigned long*/) : Nullable.<number>/*double*/;
 	/* setter */
-	function set(
-		index : number/*unsigned long*/,
-		value : number/*double*/
-	) : void;
+	function set(index : number/*unsigned long*/, value : number/*double*/) : void;
 	function set(array : Float64Array) : void;
-	function set(
-		array : Float64Array,
-		offset : number/*unsigned long*/
-	) : void;
+	function set(array : Float64Array, offset : number/*unsigned long*/) : void;
 	function set(array : number[]/*double[]*/) : void;
-	function set(
-		array : number[]/*double[]*/,
-		offset : number/*unsigned long*/
-	) : void;
+	function set(array : number[]/*double[]*/, offset : number/*unsigned long*/) : void;
 	function set(array : int[]/*double[]*/) : void;
-	function set(
-		array : int[]/*double[]*/,
-		offset : number/*unsigned long*/
-	) : void;
-	function subarray(
-		start : number/*long*/,
-		end : number/*long*/
-	) : Float64Array;
+	function set(array : int[]/*double[]*/, offset : number/*unsigned long*/) : void;
+	function subarray(start : number/*long*/, end : number/*long*/) : Float64Array;
 
 } // end of Float64Array
 
@@ -7006,15 +5758,8 @@ native final class Float64Array extends ArrayBufferView {
 native final class DataView extends ArrayBufferView {
 
 	function constructor(buffer : ArrayBuffer);
-	function constructor(
-		buffer : ArrayBuffer,
-		byteOffset : number/*unsigned long*/
-	);
-	function constructor(
-		buffer : ArrayBuffer,
-		byteOffset : number/*unsigned long*/,
-		byteLength : number/*unsigned long*/
-	);
+	function constructor(buffer : ArrayBuffer, byteOffset : number/*unsigned long*/);
+	function constructor(buffer : ArrayBuffer, byteOffset : number/*unsigned long*/, byteLength : number/*unsigned long*/);
 
 	// Gets the value of the given type at the specified byte offset
 	// from the start of the view. There is no alignment constraint;
@@ -7026,54 +5771,20 @@ native final class DataView extends ArrayBufferView {
 	//
 	// These methods raise an INDEX_SIZE_ERR exception if they would read
 	// beyond the end of the view.
-	function getInt8(
-		byteOffset : number/*unsigned long*/
-	) : number/*byte*/;
-	function getUint8(
-		byteOffset : number/*unsigned long*/
-	) : number/*octet*/;
-	function getInt16(
-		byteOffset : number/*unsigned long*/
-	) : number/*short*/;
-	function getInt16(
-		byteOffset : number/*unsigned long*/,
-		littleEndian : boolean
-	) : number/*short*/;
-	function getUint16(
-		byteOffset : number/*unsigned long*/
-	) : number/*unsigned short*/;
-	function getUint16(
-		byteOffset : number/*unsigned long*/,
-		littleEndian : boolean
-	) : number/*unsigned short*/;
-	function getInt32(
-		byteOffset : number/*unsigned long*/
-	) : number/*long*/;
-	function getInt32(
-		byteOffset : number/*unsigned long*/,
-		littleEndian : boolean
-	) : number/*long*/;
-	function getUint32(
-		byteOffset : number/*unsigned long*/
-	) : number/*unsigned long*/;
-	function getUint32(
-		byteOffset : number/*unsigned long*/,
-		littleEndian : boolean
-	) : number/*unsigned long*/;
-	function getFloat32(
-		byteOffset : number/*unsigned long*/
-	) : number/*float*/;
-	function getFloat32(
-		byteOffset : number/*unsigned long*/,
-		littleEndian : boolean
-	) : number/*float*/;
-	function getFloat64(
-		byteOffset : number/*unsigned long*/
-	) : number/*double*/;
-	function getFloat64(
-		byteOffset : number/*unsigned long*/,
-		littleEndian : boolean
-	) : number/*double*/;
+	function getInt8(byteOffset : number/*unsigned long*/) : number/*byte*/;
+	function getUint8(byteOffset : number/*unsigned long*/) : number/*octet*/;
+	function getInt16(byteOffset : number/*unsigned long*/) : number/*short*/;
+	function getInt16(byteOffset : number/*unsigned long*/, littleEndian : boolean) : number/*short*/;
+	function getUint16(byteOffset : number/*unsigned long*/) : number/*unsigned short*/;
+	function getUint16(byteOffset : number/*unsigned long*/, littleEndian : boolean) : number/*unsigned short*/;
+	function getInt32(byteOffset : number/*unsigned long*/) : number/*long*/;
+	function getInt32(byteOffset : number/*unsigned long*/, littleEndian : boolean) : number/*long*/;
+	function getUint32(byteOffset : number/*unsigned long*/) : number/*unsigned long*/;
+	function getUint32(byteOffset : number/*unsigned long*/, littleEndian : boolean) : number/*unsigned long*/;
+	function getFloat32(byteOffset : number/*unsigned long*/) : number/*float*/;
+	function getFloat32(byteOffset : number/*unsigned long*/, littleEndian : boolean) : number/*float*/;
+	function getFloat64(byteOffset : number/*unsigned long*/) : number/*double*/;
+	function getFloat64(byteOffset : number/*unsigned long*/, littleEndian : boolean) : number/*double*/;
 	// Stores a value of the given type at the specified byte offset
 	// from the start of the view. There is no alignment constraint;
 	// multi-byte values may be stored at any offset.
@@ -7085,68 +5796,20 @@ native final class DataView extends ArrayBufferView {
 	//
 	// These methods throw exceptions if they would write beyond the end
 	// of the view.
-	function setInt8(
-		byteOffset : number/*unsigned long*/,
-		value : number/*byte*/
-	) : void;
-	function setUint8(
-		byteOffset : number/*unsigned long*/,
-		value : number/*octet*/
-	) : void;
-	function setInt16(
-		byteOffset : number/*unsigned long*/,
-		value : number/*short*/
-	) : void;
-	function setInt16(
-		byteOffset : number/*unsigned long*/,
-		value : number/*short*/,
-		littleEndian : boolean
-	) : void;
-	function setUint16(
-		byteOffset : number/*unsigned long*/,
-		value : number/*unsigned short*/
-	) : void;
-	function setUint16(
-		byteOffset : number/*unsigned long*/,
-		value : number/*unsigned short*/,
-		littleEndian : boolean
-	) : void;
-	function setInt32(
-		byteOffset : number/*unsigned long*/,
-		value : number/*long*/
-	) : void;
-	function setInt32(
-		byteOffset : number/*unsigned long*/,
-		value : number/*long*/,
-		littleEndian : boolean
-	) : void;
-	function setUint32(
-		byteOffset : number/*unsigned long*/,
-		value : number/*unsigned long*/
-	) : void;
-	function setUint32(
-		byteOffset : number/*unsigned long*/,
-		value : number/*unsigned long*/,
-		littleEndian : boolean
-	) : void;
-	function setFloat32(
-		byteOffset : number/*unsigned long*/,
-		value : number/*float*/
-	) : void;
-	function setFloat32(
-		byteOffset : number/*unsigned long*/,
-		value : number/*float*/,
-		littleEndian : boolean
-	) : void;
-	function setFloat64(
-		byteOffset : number/*unsigned long*/,
-		value : number/*double*/
-	) : void;
-	function setFloat64(
-		byteOffset : number/*unsigned long*/,
-		value : number/*double*/,
-		littleEndian : boolean
-	) : void;
+	function setInt8(byteOffset : number/*unsigned long*/, value : number/*byte*/) : void;
+	function setUint8(byteOffset : number/*unsigned long*/, value : number/*octet*/) : void;
+	function setInt16(byteOffset : number/*unsigned long*/, value : number/*short*/) : void;
+	function setInt16(byteOffset : number/*unsigned long*/, value : number/*short*/, littleEndian : boolean) : void;
+	function setUint16(byteOffset : number/*unsigned long*/, value : number/*unsigned short*/) : void;
+	function setUint16(byteOffset : number/*unsigned long*/, value : number/*unsigned short*/, littleEndian : boolean) : void;
+	function setInt32(byteOffset : number/*unsigned long*/, value : number/*long*/) : void;
+	function setInt32(byteOffset : number/*unsigned long*/, value : number/*long*/, littleEndian : boolean) : void;
+	function setUint32(byteOffset : number/*unsigned long*/, value : number/*unsigned long*/) : void;
+	function setUint32(byteOffset : number/*unsigned long*/, value : number/*unsigned long*/, littleEndian : boolean) : void;
+	function setFloat32(byteOffset : number/*unsigned long*/, value : number/*float*/) : void;
+	function setFloat32(byteOffset : number/*unsigned long*/, value : number/*float*/, littleEndian : boolean) : void;
+	function setFloat64(byteOffset : number/*unsigned long*/, value : number/*double*/) : void;
+	function setFloat64(byteOffset : number/*unsigned long*/, value : number/*double*/, littleEndian : boolean) : void;
 
 } // end of DataView
 
@@ -7162,31 +5825,11 @@ native final class CanvasRenderingContext2D extends CanvasDrawingStyles {
 	// pop state stack and restore state
 
 	// transformations (default transform is the identity matrix)
-	function scale(
-		x : number/*unrestricted double*/,
-		y : number/*unrestricted double*/
-	) : void;
+	function scale(x : number/*unrestricted double*/, y : number/*unrestricted double*/) : void;
 	function rotate(angle : number/*unrestricted double*/) : void;
-	function translate(
-		x : number/*unrestricted double*/,
-		y : number/*unrestricted double*/
-	) : void;
-	function transform(
-		a : number/*unrestricted double*/,
-		b : number/*unrestricted double*/,
-		c : number/*unrestricted double*/,
-		d : number/*unrestricted double*/,
-		e : number/*unrestricted double*/,
-		f : number/*unrestricted double*/
-	) : void;
-	function setTransform(
-		a : number/*unrestricted double*/,
-		b : number/*unrestricted double*/,
-		c : number/*unrestricted double*/,
-		d : number/*unrestricted double*/,
-		e : number/*unrestricted double*/,
-		f : number/*unrestricted double*/
-	) : void;
+	function translate(x : number/*unrestricted double*/, y : number/*unrestricted double*/) : void;
+	function transform(a : number/*unrestricted double*/, b : number/*unrestricted double*/, c : number/*unrestricted double*/, d : number/*unrestricted double*/, e : number/*unrestricted double*/, f : number/*unrestricted double*/) : void;
+	function setTransform(a : number/*unrestricted double*/, b : number/*unrestricted double*/, c : number/*unrestricted double*/, d : number/*unrestricted double*/, e : number/*unrestricted double*/, f : number/*unrestricted double*/) : void;
 	// compositing
 	var globalAlpha : number/*unrestricted double*/;
 	// (default 1.0)
@@ -7198,32 +5841,11 @@ native final class CanvasRenderingContext2D extends CanvasDrawingStyles {
 	// (default black)
 	var fillStyle : variant/*(DOMString or CanvasGradient or CanvasPattern)*/;
 	// (default black)
-	function createLinearGradient(
-		x0 : number/*double*/,
-		y0 : number/*double*/,
-		x1 : number/*double*/,
-		y1 : number/*double*/
-	) : CanvasGradient;
-	function createRadialGradient(
-		x0 : number/*double*/,
-		y0 : number/*double*/,
-		r0 : number/*double*/,
-		x1 : number/*double*/,
-		y1 : number/*double*/,
-		r1 : number/*double*/
-	) : CanvasGradient;
-	function createPattern(
-		image : HTMLImageElement,
-		repetition : string/*DOMString*/
-	) : CanvasPattern;
-	function createPattern(
-		image : HTMLCanvasElement,
-		repetition : string/*DOMString*/
-	) : CanvasPattern;
-	function createPattern(
-		image : HTMLVideoElement,
-		repetition : string/*DOMString*/
-	) : CanvasPattern;
+	function createLinearGradient(x0 : number/*double*/, y0 : number/*double*/, x1 : number/*double*/, y1 : number/*double*/) : CanvasGradient;
+	function createRadialGradient(x0 : number/*double*/, y0 : number/*double*/, r0 : number/*double*/, x1 : number/*double*/, y1 : number/*double*/, r1 : number/*double*/) : CanvasGradient;
+	function createPattern(image : HTMLImageElement, repetition : string/*DOMString*/) : CanvasPattern;
+	function createPattern(image : HTMLCanvasElement, repetition : string/*DOMString*/) : CanvasPattern;
+	function createPattern(image : HTMLVideoElement, repetition : string/*DOMString*/) : CanvasPattern;
 	// shadows
 	var shadowOffsetX : number/*unrestricted double*/;
 	// (default 0)
@@ -7235,24 +5857,9 @@ native final class CanvasRenderingContext2D extends CanvasDrawingStyles {
 	// (default transparent black)
 
 	// rects
-	function clearRect(
-		x : number/*unrestricted double*/,
-		y : number/*unrestricted double*/,
-		w : number/*unrestricted double*/,
-		h : number/*unrestricted double*/
-	) : void;
-	function fillRect(
-		x : number/*unrestricted double*/,
-		y : number/*unrestricted double*/,
-		w : number/*unrestricted double*/,
-		h : number/*unrestricted double*/
-	) : void;
-	function strokeRect(
-		x : number/*unrestricted double*/,
-		y : number/*unrestricted double*/,
-		w : number/*unrestricted double*/,
-		h : number/*unrestricted double*/
-	) : void;
+	function clearRect(x : number/*unrestricted double*/, y : number/*unrestricted double*/, w : number/*unrestricted double*/, h : number/*unrestricted double*/) : void;
+	function fillRect(x : number/*unrestricted double*/, y : number/*unrestricted double*/, w : number/*unrestricted double*/, h : number/*unrestricted double*/) : void;
+	function strokeRect(x : number/*unrestricted double*/, y : number/*unrestricted double*/, w : number/*unrestricted double*/, h : number/*unrestricted double*/) : void;
 	// path API (see also CanvasPathMethods)
 	function beginPath() : void;
 	function fill() : void;
@@ -7262,211 +5869,52 @@ native final class CanvasRenderingContext2D extends CanvasDrawingStyles {
 	function drawSystemFocusRing(element : Element) : void;
 	function drawSystemFocusRing(path : Path, element : Element) : void;
 	function drawCustomFocusRing(element : Element) : boolean;
-	function drawCustomFocusRing(
-		path : Path,
-		element : Element
-	) : boolean;
+	function drawCustomFocusRing(path : Path, element : Element) : boolean;
 	function scrollPathIntoView() : void;
 	function scrollPathIntoView(path : Path) : void;
 	function clip() : void;
 	function clip(path : Path) : void;
-	function isPointInPath(
-		x : number/*unrestricted double*/,
-		y : number/*unrestricted double*/
-	) : boolean;
-	function isPointInPath(
-		path : Path,
-		x : number/*unrestricted double*/,
-		y : number/*unrestricted double*/
-	) : boolean;
+	function isPointInPath(x : number/*unrestricted double*/, y : number/*unrestricted double*/) : boolean;
+	function isPointInPath(path : Path, x : number/*unrestricted double*/, y : number/*unrestricted double*/) : boolean;
 	// text (see also the CanvasDrawingStyles interface)
-	function fillText(
-		text : string/*DOMString*/,
-		x : number/*unrestricted double*/,
-		y : number/*unrestricted double*/
-	) : void;
-	function fillText(
-		text : string/*DOMString*/,
-		x : number/*unrestricted double*/,
-		y : number/*unrestricted double*/,
-		maxWidth : number/*unrestricted double*/
-	) : void;
-	function strokeText(
-		text : string/*DOMString*/,
-		x : number/*unrestricted double*/,
-		y : number/*unrestricted double*/
-	) : void;
-	function strokeText(
-		text : string/*DOMString*/,
-		x : number/*unrestricted double*/,
-		y : number/*unrestricted double*/,
-		maxWidth : number/*unrestricted double*/
-	) : void;
+	function fillText(text : string/*DOMString*/, x : number/*unrestricted double*/, y : number/*unrestricted double*/) : void;
+	function fillText(text : string/*DOMString*/, x : number/*unrestricted double*/, y : number/*unrestricted double*/, maxWidth : number/*unrestricted double*/) : void;
+	function strokeText(text : string/*DOMString*/, x : number/*unrestricted double*/, y : number/*unrestricted double*/) : void;
+	function strokeText(text : string/*DOMString*/, x : number/*unrestricted double*/, y : number/*unrestricted double*/, maxWidth : number/*unrestricted double*/) : void;
 	function measureText(text : string/*DOMString*/) : TextMetrics;
 	// drawing images
-	function drawImage(
-		image : HTMLImageElement,
-		dx : number/*unrestricted double*/,
-		dy : number/*unrestricted double*/
-	) : void;
-	function drawImage(
-		image : HTMLCanvasElement,
-		dx : number/*unrestricted double*/,
-		dy : number/*unrestricted double*/
-	) : void;
-	function drawImage(
-		image : HTMLVideoElement,
-		dx : number/*unrestricted double*/,
-		dy : number/*unrestricted double*/
-	) : void;
-	function drawImage(
-		image : HTMLImageElement,
-		dx : number/*unrestricted double*/,
-		dy : number/*unrestricted double*/,
-		dw : number/*unrestricted double*/,
-		dh : number/*unrestricted double*/
-	) : void;
-	function drawImage(
-		image : HTMLCanvasElement,
-		dx : number/*unrestricted double*/,
-		dy : number/*unrestricted double*/,
-		dw : number/*unrestricted double*/,
-		dh : number/*unrestricted double*/
-	) : void;
-	function drawImage(
-		image : HTMLVideoElement,
-		dx : number/*unrestricted double*/,
-		dy : number/*unrestricted double*/,
-		dw : number/*unrestricted double*/,
-		dh : number/*unrestricted double*/
-	) : void;
-	function drawImage(
-		image : HTMLImageElement,
-		sx : number/*unrestricted double*/,
-		sy : number/*unrestricted double*/,
-		sw : number/*unrestricted double*/,
-		sh : number/*unrestricted double*/,
-		dx : number/*unrestricted double*/,
-		dy : number/*unrestricted double*/,
-		dw : number/*unrestricted double*/,
-		dh : number/*unrestricted double*/
-	) : void;
-	function drawImage(
-		image : HTMLCanvasElement,
-		sx : number/*unrestricted double*/,
-		sy : number/*unrestricted double*/,
-		sw : number/*unrestricted double*/,
-		sh : number/*unrestricted double*/,
-		dx : number/*unrestricted double*/,
-		dy : number/*unrestricted double*/,
-		dw : number/*unrestricted double*/,
-		dh : number/*unrestricted double*/
-	) : void;
-	function drawImage(
-		image : HTMLVideoElement,
-		sx : number/*unrestricted double*/,
-		sy : number/*unrestricted double*/,
-		sw : number/*unrestricted double*/,
-		sh : number/*unrestricted double*/,
-		dx : number/*unrestricted double*/,
-		dy : number/*unrestricted double*/,
-		dw : number/*unrestricted double*/,
-		dh : number/*unrestricted double*/
-	) : void;
+	function drawImage(image : HTMLImageElement, dx : number/*unrestricted double*/, dy : number/*unrestricted double*/) : void;
+	function drawImage(image : HTMLCanvasElement, dx : number/*unrestricted double*/, dy : number/*unrestricted double*/) : void;
+	function drawImage(image : HTMLVideoElement, dx : number/*unrestricted double*/, dy : number/*unrestricted double*/) : void;
+	function drawImage(image : HTMLImageElement, dx : number/*unrestricted double*/, dy : number/*unrestricted double*/, dw : number/*unrestricted double*/, dh : number/*unrestricted double*/) : void;
+	function drawImage(image : HTMLCanvasElement, dx : number/*unrestricted double*/, dy : number/*unrestricted double*/, dw : number/*unrestricted double*/, dh : number/*unrestricted double*/) : void;
+	function drawImage(image : HTMLVideoElement, dx : number/*unrestricted double*/, dy : number/*unrestricted double*/, dw : number/*unrestricted double*/, dh : number/*unrestricted double*/) : void;
+	function drawImage(image : HTMLImageElement, sx : number/*unrestricted double*/, sy : number/*unrestricted double*/, sw : number/*unrestricted double*/, sh : number/*unrestricted double*/, dx : number/*unrestricted double*/, dy : number/*unrestricted double*/, dw : number/*unrestricted double*/, dh : number/*unrestricted double*/) : void;
+	function drawImage(image : HTMLCanvasElement, sx : number/*unrestricted double*/, sy : number/*unrestricted double*/, sw : number/*unrestricted double*/, sh : number/*unrestricted double*/, dx : number/*unrestricted double*/, dy : number/*unrestricted double*/, dw : number/*unrestricted double*/, dh : number/*unrestricted double*/) : void;
+	function drawImage(image : HTMLVideoElement, sx : number/*unrestricted double*/, sy : number/*unrestricted double*/, sw : number/*unrestricted double*/, sh : number/*unrestricted double*/, dx : number/*unrestricted double*/, dy : number/*unrestricted double*/, dw : number/*unrestricted double*/, dh : number/*unrestricted double*/) : void;
 	// hit regions
 	function addHitRegion(options : HitRegionOptions) : void;
 	function removeHitRegion(options : HitRegionOptions) : void;
 	// pixel manipulation
-	function createImageData(
-		sw : number/*unrestricted double*/,
-		sh : number/*unrestricted double*/
-	) : ImageData;
+	function createImageData(sw : number/*unrestricted double*/, sh : number/*unrestricted double*/) : ImageData;
 	function createImageData(imagedata : ImageData) : ImageData;
-	function getImageData(
-		sx : number/*double*/,
-		sy : number/*double*/,
-		sw : number/*double*/,
-		sh : number/*double*/
-	) : ImageData;
-	function putImageData(
-		imagedata : ImageData,
-		dx : number/*double*/,
-		dy : number/*double*/,
-		dirtyX : number/*double*/,
-		dirtyY : number/*double*/,
-		dirtyWidth : number/*double*/,
-		dirtyHeight : number/*double*/
-	) : void;
-	function putImageData(
-		imagedata : ImageData,
-		dx : number/*double*/,
-		dy : number/*double*/
-	) : void;
+	function getImageData(sx : number/*double*/, sy : number/*double*/, sw : number/*double*/, sh : number/*double*/) : ImageData;
+	function putImageData(imagedata : ImageData, dx : number/*double*/, dy : number/*double*/, dirtyX : number/*double*/, dirtyY : number/*double*/, dirtyWidth : number/*double*/, dirtyHeight : number/*double*/) : void;
+	function putImageData(imagedata : ImageData, dx : number/*double*/, dy : number/*double*/) : void;
 
 	// implements CanvasPathMethods
 
 	// shared path API methods
 	function closePath() : void;
-	function moveTo(
-		x : number/*unrestricted double*/,
-		y : number/*unrestricted double*/
-	) : void;
-	function lineTo(
-		x : number/*unrestricted double*/,
-		y : number/*unrestricted double*/
-	) : void;
-	function quadraticCurveTo(
-		cpx : number/*unrestricted double*/,
-		cpy : number/*unrestricted double*/,
-		x : number/*unrestricted double*/,
-		y : number/*unrestricted double*/
-	) : void;
-	function bezierCurveTo(
-		cp1x : number/*unrestricted double*/,
-		cp1y : number/*unrestricted double*/,
-		cp2x : number/*unrestricted double*/,
-		cp2y : number/*unrestricted double*/,
-		x : number/*unrestricted double*/,
-		y : number/*unrestricted double*/
-	) : void;
-	function arcTo(
-		x1 : number/*unrestricted double*/,
-		y1 : number/*unrestricted double*/,
-		x2 : number/*unrestricted double*/,
-		y2 : number/*unrestricted double*/,
-		radius : number/*unrestricted double*/
-	) : void;
-	function rect(
-		x : number/*unrestricted double*/,
-		y : number/*unrestricted double*/,
-		w : number/*unrestricted double*/,
-		h : number/*unrestricted double*/
-	) : void;
-	function arc(
-		x : number/*unrestricted double*/,
-		y : number/*unrestricted double*/,
-		radius : number/*unrestricted double*/,
-		startAngle : number/*unrestricted double*/,
-		endAngle : number/*unrestricted double*/
-	) : void;
-	function arc(
-		x : number/*unrestricted double*/,
-		y : number/*unrestricted double*/,
-		radius : number/*unrestricted double*/,
-		startAngle : number/*unrestricted double*/,
-		endAngle : number/*unrestricted double*/,
-		anticlockwise : boolean
-	) : void;
-	function ellipse(
-		x : number/*unrestricted double*/,
-		y : number/*unrestricted double*/,
-		radiusX : number/*unrestricted double*/,
-		radiusY : number/*unrestricted double*/,
-		rotation : number/*unrestricted double*/,
-		startAngle : number/*unrestricted double*/,
-		endAngle : number/*unrestricted double*/,
-		anticlockwise : boolean
-	) : void;
+	function moveTo(x : number/*unrestricted double*/, y : number/*unrestricted double*/) : void;
+	function lineTo(x : number/*unrestricted double*/, y : number/*unrestricted double*/) : void;
+	function quadraticCurveTo(cpx : number/*unrestricted double*/, cpy : number/*unrestricted double*/, x : number/*unrestricted double*/, y : number/*unrestricted double*/) : void;
+	function bezierCurveTo(cp1x : number/*unrestricted double*/, cp1y : number/*unrestricted double*/, cp2x : number/*unrestricted double*/, cp2y : number/*unrestricted double*/, x : number/*unrestricted double*/, y : number/*unrestricted double*/) : void;
+	function arcTo(x1 : number/*unrestricted double*/, y1 : number/*unrestricted double*/, x2 : number/*unrestricted double*/, y2 : number/*unrestricted double*/, radius : number/*unrestricted double*/) : void;
+	function rect(x : number/*unrestricted double*/, y : number/*unrestricted double*/, w : number/*unrestricted double*/, h : number/*unrestricted double*/) : void;
+	function arc(x : number/*unrestricted double*/, y : number/*unrestricted double*/, radius : number/*unrestricted double*/, startAngle : number/*unrestricted double*/, endAngle : number/*unrestricted double*/) : void;
+	function arc(x : number/*unrestricted double*/, y : number/*unrestricted double*/, radius : number/*unrestricted double*/, startAngle : number/*unrestricted double*/, endAngle : number/*unrestricted double*/, anticlockwise : boolean) : void;
+	function ellipse(x : number/*unrestricted double*/, y : number/*unrestricted double*/, radiusX : number/*unrestricted double*/, radiusY : number/*unrestricted double*/, rotation : number/*unrestricted double*/, startAngle : number/*unrestricted double*/, endAngle : number/*unrestricted double*/, anticlockwise : boolean) : void;
 
 } // end of CanvasRenderingContext2D
 
@@ -7484,12 +5932,8 @@ native __fake__ class CanvasDrawingStyles {
 	// (default 10)
 
 	// dashed lines
-	function setLineDash(
-		segments : number[]/*sequence<unrestricted double>*/
-	) : void;
-	function setLineDash(
-		segments : int[]/*sequence<unrestricted double>*/
-	) : void;
+	function setLineDash(segments : number[]/*sequence<unrestricted double>*/) : void;
+	function setLineDash(segments : int[]/*sequence<unrestricted double>*/) : void;
 	// default empty
 	function getLineDash() : number[]/*sequence<unrestricted double>*/;
 	var lineDashOffset : number/*unrestricted double*/;
@@ -7508,66 +5952,15 @@ native __fake__ class CanvasPathMethods {
 
 	// shared path API methods
 	function closePath() : void;
-	function moveTo(
-		x : number/*unrestricted double*/,
-		y : number/*unrestricted double*/
-	) : void;
-	function lineTo(
-		x : number/*unrestricted double*/,
-		y : number/*unrestricted double*/
-	) : void;
-	function quadraticCurveTo(
-		cpx : number/*unrestricted double*/,
-		cpy : number/*unrestricted double*/,
-		x : number/*unrestricted double*/,
-		y : number/*unrestricted double*/
-	) : void;
-	function bezierCurveTo(
-		cp1x : number/*unrestricted double*/,
-		cp1y : number/*unrestricted double*/,
-		cp2x : number/*unrestricted double*/,
-		cp2y : number/*unrestricted double*/,
-		x : number/*unrestricted double*/,
-		y : number/*unrestricted double*/
-	) : void;
-	function arcTo(
-		x1 : number/*unrestricted double*/,
-		y1 : number/*unrestricted double*/,
-		x2 : number/*unrestricted double*/,
-		y2 : number/*unrestricted double*/,
-		radius : number/*unrestricted double*/
-	) : void;
-	function rect(
-		x : number/*unrestricted double*/,
-		y : number/*unrestricted double*/,
-		w : number/*unrestricted double*/,
-		h : number/*unrestricted double*/
-	) : void;
-	function arc(
-		x : number/*unrestricted double*/,
-		y : number/*unrestricted double*/,
-		radius : number/*unrestricted double*/,
-		startAngle : number/*unrestricted double*/,
-		endAngle : number/*unrestricted double*/
-	) : void;
-	function arc(
-		x : number/*unrestricted double*/,
-		y : number/*unrestricted double*/,
-		radius : number/*unrestricted double*/,
-		startAngle : number/*unrestricted double*/,
-		endAngle : number/*unrestricted double*/,
-		anticlockwise : boolean
-	) : void;
-	function ellipse(
-		x : number/*unrestricted double*/,
-		y : number/*unrestricted double*/,
-		radiusX : number/*unrestricted double*/,
-		radiusY : number/*unrestricted double*/,
-		rotation : number/*unrestricted double*/,
-		startAngle : number/*unrestricted double*/,
-		endAngle : number/*unrestricted double*/,
-		anticlockwise : boolean
-	) : void;
+	function moveTo(x : number/*unrestricted double*/, y : number/*unrestricted double*/) : void;
+	function lineTo(x : number/*unrestricted double*/, y : number/*unrestricted double*/) : void;
+	function quadraticCurveTo(cpx : number/*unrestricted double*/, cpy : number/*unrestricted double*/, x : number/*unrestricted double*/, y : number/*unrestricted double*/) : void;
+	function bezierCurveTo(cp1x : number/*unrestricted double*/, cp1y : number/*unrestricted double*/, cp2x : number/*unrestricted double*/, cp2y : number/*unrestricted double*/, x : number/*unrestricted double*/, y : number/*unrestricted double*/) : void;
+	function arcTo(x1 : number/*unrestricted double*/, y1 : number/*unrestricted double*/, x2 : number/*unrestricted double*/, y2 : number/*unrestricted double*/, radius : number/*unrestricted double*/) : void;
+	function rect(x : number/*unrestricted double*/, y : number/*unrestricted double*/, w : number/*unrestricted double*/, h : number/*unrestricted double*/) : void;
+	function arc(x : number/*unrestricted double*/, y : number/*unrestricted double*/, radius : number/*unrestricted double*/, startAngle : number/*unrestricted double*/, endAngle : number/*unrestricted double*/) : void;
+	function arc(x : number/*unrestricted double*/, y : number/*unrestricted double*/, radius : number/*unrestricted double*/, startAngle : number/*unrestricted double*/, endAngle : number/*unrestricted double*/, anticlockwise : boolean) : void;
+	function ellipse(x : number/*unrestricted double*/, y : number/*unrestricted double*/, radiusX : number/*unrestricted double*/, radiusY : number/*unrestricted double*/, rotation : number/*unrestricted double*/, startAngle : number/*unrestricted double*/, endAngle : number/*unrestricted double*/, anticlockwise : boolean) : void;
 
 } // end of CanvasPathMethods
 
@@ -7575,10 +5968,7 @@ native __fake__ class CanvasPathMethods {
 native final class CanvasGradient {
 
 	// opaque object
-	function addColorStop(
-		offset : number/*double*/,
-		color : string/*DOMString*/
-	) : void;
+	function addColorStop(offset : number/*double*/, color : string/*DOMString*/) : void;
 
 } // end of CanvasGradient
 
@@ -7646,71 +6036,16 @@ native final class Path extends CanvasPathMethods {
 
 	function constructor();
 
-	function addPath(
-		path : Path,
-		transformation : Nullable.<SVGMatrix>
-	) : void;
-	function addPathByStrokingPath(
-		path : Path,
-		styles : CanvasDrawingStyles,
-		transformation : Nullable.<SVGMatrix>
-	) : void;
-	function addText(
-		text : string/*DOMString*/,
-		styles : CanvasDrawingStyles,
-		transformation : Nullable.<SVGMatrix>,
-		x : number/*unrestricted double*/,
-		y : number/*unrestricted double*/
-	) : void;
-	function addText(
-		text : string/*DOMString*/,
-		styles : CanvasDrawingStyles,
-		transformation : Nullable.<SVGMatrix>,
-		x : number/*unrestricted double*/,
-		y : number/*unrestricted double*/,
-		maxWidth : number/*unrestricted double*/
-	) : void;
-	function addPathByStrokingText(
-		text : string/*DOMString*/,
-		styles : CanvasDrawingStyles,
-		transformation : Nullable.<SVGMatrix>,
-		x : number/*unrestricted double*/,
-		y : number/*unrestricted double*/
-	) : void;
-	function addPathByStrokingText(
-		text : string/*DOMString*/,
-		styles : CanvasDrawingStyles,
-		transformation : Nullable.<SVGMatrix>,
-		x : number/*unrestricted double*/,
-		y : number/*unrestricted double*/,
-		maxWidth : number/*unrestricted double*/
-	) : void;
-	function addText(
-		text : string/*DOMString*/,
-		styles : CanvasDrawingStyles,
-		transformation : Nullable.<SVGMatrix>,
-		path : Path
-	) : void;
-	function addText(
-		text : string/*DOMString*/,
-		styles : CanvasDrawingStyles,
-		transformation : Nullable.<SVGMatrix>,
-		path : Path,
-		maxWidth : number/*unrestricted double*/
-	) : void;
-	function addPathByStrokingText(
-		text : string/*DOMString*/,
-		styles : CanvasDrawingStyles,
-		transformation : Nullable.<SVGMatrix>,
-		path : Path
-	) : void;
-	function addPathByStrokingText(
-		text : string/*DOMString*/,
-		styles : CanvasDrawingStyles,
-		transformation : Nullable.<SVGMatrix>,
-		path : Path,
-		maxWidth : number/*unrestricted double*/
-	) : void;
+	function addPath(path : Path, transformation : Nullable.<SVGMatrix>) : void;
+	function addPathByStrokingPath(path : Path, styles : CanvasDrawingStyles, transformation : Nullable.<SVGMatrix>) : void;
+	function addText(text : string/*DOMString*/, styles : CanvasDrawingStyles, transformation : Nullable.<SVGMatrix>, x : number/*unrestricted double*/, y : number/*unrestricted double*/) : void;
+	function addText(text : string/*DOMString*/, styles : CanvasDrawingStyles, transformation : Nullable.<SVGMatrix>, x : number/*unrestricted double*/, y : number/*unrestricted double*/, maxWidth : number/*unrestricted double*/) : void;
+	function addPathByStrokingText(text : string/*DOMString*/, styles : CanvasDrawingStyles, transformation : Nullable.<SVGMatrix>, x : number/*unrestricted double*/, y : number/*unrestricted double*/) : void;
+	function addPathByStrokingText(text : string/*DOMString*/, styles : CanvasDrawingStyles, transformation : Nullable.<SVGMatrix>, x : number/*unrestricted double*/, y : number/*unrestricted double*/, maxWidth : number/*unrestricted double*/) : void;
+	function addText(text : string/*DOMString*/, styles : CanvasDrawingStyles, transformation : Nullable.<SVGMatrix>, path : Path) : void;
+	function addText(text : string/*DOMString*/, styles : CanvasDrawingStyles, transformation : Nullable.<SVGMatrix>, path : Path, maxWidth : number/*unrestricted double*/) : void;
+	function addPathByStrokingText(text : string/*DOMString*/, styles : CanvasDrawingStyles, transformation : Nullable.<SVGMatrix>, path : Path) : void;
+	function addPathByStrokingText(text : string/*DOMString*/, styles : CanvasDrawingStyles, transformation : Nullable.<SVGMatrix>, path : Path, maxWidth : number/*unrestricted double*/) : void;
 
 } // end of Path
 
@@ -8450,739 +6785,188 @@ native final class WebGLRenderingContext {
 	function getContextAttributes() : Nullable.<WebGLContextAttributes>;
 	function isContextLost() : boolean;
 	function getSupportedExtensions() : Nullable.<string[]>/*sequence<DOMString>?*/;
-	function getExtension(
-		name : string/*DOMString*/
-	) : Nullable.<Object>/*object?*/;
+	function getExtension(name : string/*DOMString*/) : Nullable.<Object>/*object?*/;
 	function activeTexture(texture : number/*GLenum*/) : void;
-	function attachShader(
-		program : Nullable.<WebGLProgram>,
-		shader : Nullable.<WebGLShader>
-	) : void;
-	function bindAttribLocation(
-		program : Nullable.<WebGLProgram>,
-		index : number/*GLuint*/,
-		name : string/*DOMString*/
-	) : void;
-	function bindBuffer(
-		target : number/*GLenum*/,
-		buffer : Nullable.<WebGLBuffer>
-	) : void;
-	function bindFramebuffer(
-		target : number/*GLenum*/,
-		framebuffer : Nullable.<WebGLFramebuffer>
-	) : void;
-	function bindRenderbuffer(
-		target : number/*GLenum*/,
-		renderbuffer : Nullable.<WebGLRenderbuffer>
-	) : void;
-	function bindTexture(
-		target : number/*GLenum*/,
-		texture : Nullable.<WebGLTexture>
-	) : void;
-	function blendColor(
-		red : number/*GLclampf*/,
-		green : number/*GLclampf*/,
-		blue : number/*GLclampf*/,
-		alpha : number/*GLclampf*/
-	) : void;
+	function attachShader(program : Nullable.<WebGLProgram>, shader : Nullable.<WebGLShader>) : void;
+	function bindAttribLocation(program : Nullable.<WebGLProgram>, index : number/*GLuint*/, name : string/*DOMString*/) : void;
+	function bindBuffer(target : number/*GLenum*/, buffer : Nullable.<WebGLBuffer>) : void;
+	function bindFramebuffer(target : number/*GLenum*/, framebuffer : Nullable.<WebGLFramebuffer>) : void;
+	function bindRenderbuffer(target : number/*GLenum*/, renderbuffer : Nullable.<WebGLRenderbuffer>) : void;
+	function bindTexture(target : number/*GLenum*/, texture : Nullable.<WebGLTexture>) : void;
+	function blendColor(red : number/*GLclampf*/, green : number/*GLclampf*/, blue : number/*GLclampf*/, alpha : number/*GLclampf*/) : void;
 	function blendEquation(mode : number/*GLenum*/) : void;
-	function blendEquationSeparate(
-		modeRGB : number/*GLenum*/,
-		modeAlpha : number/*GLenum*/
-	) : void;
-	function blendFunc(
-		sfactor : number/*GLenum*/,
-		dfactor : number/*GLenum*/
-	) : void;
-	function blendFuncSeparate(
-		srcRGB : number/*GLenum*/,
-		dstRGB : number/*GLenum*/,
-		srcAlpha : number/*GLenum*/,
-		dstAlpha : number/*GLenum*/
-	) : void;
-	function bufferData(
-		target : number/*GLenum*/,
-		size : number/*GLsizeiptr*/,
-		usage : number/*GLenum*/
-	) : void;
-	function bufferData(
-		target : number/*GLenum*/,
-		data : ArrayBufferView,
-		usage : number/*GLenum*/
-	) : void;
-	function bufferData(
-		target : number/*GLenum*/,
-		data : Nullable.<ArrayBuffer>,
-		usage : number/*GLenum*/
-	) : void;
-	function bufferSubData(
-		target : number/*GLenum*/,
-		offset : number/*GLintptr*/,
-		data : ArrayBufferView
-	) : void;
-	function bufferSubData(
-		target : number/*GLenum*/,
-		offset : number/*GLintptr*/,
-		data : Nullable.<ArrayBuffer>
-	) : void;
-	function checkFramebufferStatus(
-		target : number/*GLenum*/
-	) : number/*GLenum*/;
+	function blendEquationSeparate(modeRGB : number/*GLenum*/, modeAlpha : number/*GLenum*/) : void;
+	function blendFunc(sfactor : number/*GLenum*/, dfactor : number/*GLenum*/) : void;
+	function blendFuncSeparate(srcRGB : number/*GLenum*/, dstRGB : number/*GLenum*/, srcAlpha : number/*GLenum*/, dstAlpha : number/*GLenum*/) : void;
+	function bufferData(target : number/*GLenum*/, size : number/*GLsizeiptr*/, usage : number/*GLenum*/) : void;
+	function bufferData(target : number/*GLenum*/, data : ArrayBufferView, usage : number/*GLenum*/) : void;
+	function bufferData(target : number/*GLenum*/, data : Nullable.<ArrayBuffer>, usage : number/*GLenum*/) : void;
+	function bufferSubData(target : number/*GLenum*/, offset : number/*GLintptr*/, data : ArrayBufferView) : void;
+	function bufferSubData(target : number/*GLenum*/, offset : number/*GLintptr*/, data : Nullable.<ArrayBuffer>) : void;
+	function checkFramebufferStatus(target : number/*GLenum*/) : number/*GLenum*/;
 	function clear(mask : number/*GLbitfield*/) : void;
-	function clearColor(
-		red : number/*GLclampf*/,
-		green : number/*GLclampf*/,
-		blue : number/*GLclampf*/,
-		alpha : number/*GLclampf*/
-	) : void;
+	function clearColor(red : number/*GLclampf*/, green : number/*GLclampf*/, blue : number/*GLclampf*/, alpha : number/*GLclampf*/) : void;
 	function clearDepth(depth : number/*GLclampf*/) : void;
 	function clearStencil(s : number/*GLint*/) : void;
-	function colorMask(
-		red : boolean/*GLboolean*/,
-		green : boolean/*GLboolean*/,
-		blue : boolean/*GLboolean*/,
-		alpha : boolean/*GLboolean*/
-	) : void;
+	function colorMask(red : boolean/*GLboolean*/, green : boolean/*GLboolean*/, blue : boolean/*GLboolean*/, alpha : boolean/*GLboolean*/) : void;
 	function compileShader(shader : Nullable.<WebGLShader>) : void;
-	function compressedTexImage2D(
-		target : number/*GLenum*/,
-		level : number/*GLint*/,
-		internalformat : number/*GLenum*/,
-		width : number/*GLsizei*/,
-		height : number/*GLsizei*/,
-		border : number/*GLint*/,
-		data : ArrayBufferView
-	) : void;
-	function compressedTexSubImage2D(
-		target : number/*GLenum*/,
-		level : number/*GLint*/,
-		xoffset : number/*GLint*/,
-		yoffset : number/*GLint*/,
-		width : number/*GLsizei*/,
-		height : number/*GLsizei*/,
-		format : number/*GLenum*/,
-		data : ArrayBufferView
-	) : void;
-	function copyTexImage2D(
-		target : number/*GLenum*/,
-		level : number/*GLint*/,
-		internalformat : number/*GLenum*/,
-		x : number/*GLint*/,
-		y : number/*GLint*/,
-		width : number/*GLsizei*/,
-		height : number/*GLsizei*/,
-		border : number/*GLint*/
-	) : void;
-	function copyTexSubImage2D(
-		target : number/*GLenum*/,
-		level : number/*GLint*/,
-		xoffset : number/*GLint*/,
-		yoffset : number/*GLint*/,
-		x : number/*GLint*/,
-		y : number/*GLint*/,
-		width : number/*GLsizei*/,
-		height : number/*GLsizei*/
-	) : void;
+	function compressedTexImage2D(target : number/*GLenum*/, level : number/*GLint*/, internalformat : number/*GLenum*/, width : number/*GLsizei*/, height : number/*GLsizei*/, border : number/*GLint*/, data : ArrayBufferView) : void;
+	function compressedTexSubImage2D(target : number/*GLenum*/, level : number/*GLint*/, xoffset : number/*GLint*/, yoffset : number/*GLint*/, width : number/*GLsizei*/, height : number/*GLsizei*/, format : number/*GLenum*/, data : ArrayBufferView) : void;
+	function copyTexImage2D(target : number/*GLenum*/, level : number/*GLint*/, internalformat : number/*GLenum*/, x : number/*GLint*/, y : number/*GLint*/, width : number/*GLsizei*/, height : number/*GLsizei*/, border : number/*GLint*/) : void;
+	function copyTexSubImage2D(target : number/*GLenum*/, level : number/*GLint*/, xoffset : number/*GLint*/, yoffset : number/*GLint*/, x : number/*GLint*/, y : number/*GLint*/, width : number/*GLsizei*/, height : number/*GLsizei*/) : void;
 	function createBuffer() : Nullable.<WebGLBuffer>;
 	function createFramebuffer() : Nullable.<WebGLFramebuffer>;
 	function createProgram() : Nullable.<WebGLProgram>;
 	function createRenderbuffer() : Nullable.<WebGLRenderbuffer>;
-	function createShader(
-		type : number/*GLenum*/
-	) : Nullable.<WebGLShader>;
+	function createShader(type : number/*GLenum*/) : Nullable.<WebGLShader>;
 	function createTexture() : Nullable.<WebGLTexture>;
 	function cullFace(mode : number/*GLenum*/) : void;
 	function deleteBuffer(buffer : Nullable.<WebGLBuffer>) : void;
-	function deleteFramebuffer(
-		framebuffer : Nullable.<WebGLFramebuffer>
-	) : void;
+	function deleteFramebuffer(framebuffer : Nullable.<WebGLFramebuffer>) : void;
 	function deleteProgram(program : Nullable.<WebGLProgram>) : void;
-	function deleteRenderbuffer(
-		renderbuffer : Nullable.<WebGLRenderbuffer>
-	) : void;
+	function deleteRenderbuffer(renderbuffer : Nullable.<WebGLRenderbuffer>) : void;
 	function deleteShader(shader : Nullable.<WebGLShader>) : void;
 	function deleteTexture(texture : Nullable.<WebGLTexture>) : void;
 	function depthFunc(func : number/*GLenum*/) : void;
 	function depthMask(flag : boolean/*GLboolean*/) : void;
-	function depthRange(
-		zNear : number/*GLclampf*/,
-		zFar : number/*GLclampf*/
-	) : void;
-	function detachShader(
-		program : Nullable.<WebGLProgram>,
-		shader : Nullable.<WebGLShader>
-	) : void;
+	function depthRange(zNear : number/*GLclampf*/, zFar : number/*GLclampf*/) : void;
+	function detachShader(program : Nullable.<WebGLProgram>, shader : Nullable.<WebGLShader>) : void;
 	function disable(cap : number/*GLenum*/) : void;
 	function disableVertexAttribArray(index : number/*GLuint*/) : void;
-	function drawArrays(
-		mode : number/*GLenum*/,
-		first : number/*GLint*/,
-		count : number/*GLsizei*/
-	) : void;
-	function drawElements(
-		mode : number/*GLenum*/,
-		count : number/*GLsizei*/,
-		type : number/*GLenum*/,
-		offset : number/*GLintptr*/
-	) : void;
+	function drawArrays(mode : number/*GLenum*/, first : number/*GLint*/, count : number/*GLsizei*/) : void;
+	function drawElements(mode : number/*GLenum*/, count : number/*GLsizei*/, type : number/*GLenum*/, offset : number/*GLintptr*/) : void;
 	function enable(cap : number/*GLenum*/) : void;
 	function enableVertexAttribArray(index : number/*GLuint*/) : void;
 	function finish() : void;
 	function flush() : void;
-	function framebufferRenderbuffer(
-		target : number/*GLenum*/,
-		attachment : number/*GLenum*/,
-		renderbuffertarget : number/*GLenum*/,
-		renderbuffer : Nullable.<WebGLRenderbuffer>
-	) : void;
-	function framebufferTexture2D(
-		target : number/*GLenum*/,
-		attachment : number/*GLenum*/,
-		textarget : number/*GLenum*/,
-		texture : Nullable.<WebGLTexture>,
-		level : number/*GLint*/
-	) : void;
+	function framebufferRenderbuffer(target : number/*GLenum*/, attachment : number/*GLenum*/, renderbuffertarget : number/*GLenum*/, renderbuffer : Nullable.<WebGLRenderbuffer>) : void;
+	function framebufferTexture2D(target : number/*GLenum*/, attachment : number/*GLenum*/, textarget : number/*GLenum*/, texture : Nullable.<WebGLTexture>, level : number/*GLint*/) : void;
 	function frontFace(mode : number/*GLenum*/) : void;
 	function generateMipmap(target : number/*GLenum*/) : void;
-	function getActiveAttrib(
-		program : Nullable.<WebGLProgram>,
-		index : number/*GLuint*/
-	) : Nullable.<WebGLActiveInfo>;
-	function getActiveUniform(
-		program : Nullable.<WebGLProgram>,
-		index : number/*GLuint*/
-	) : Nullable.<WebGLActiveInfo>;
-	function getAttachedShaders(
-		program : Nullable.<WebGLProgram>
-	) : Nullable.<WebGLShader[]>;
-	function getAttribLocation(
-		program : Nullable.<WebGLProgram>,
-		name : string/*DOMString*/
-	) : number/*GLint*/;
-	function getBufferParameter(
-		target : number/*GLenum*/,
-		pname : number/*GLenum*/
-	) : variant/*any*/;
+	function getActiveAttrib(program : Nullable.<WebGLProgram>, index : number/*GLuint*/) : Nullable.<WebGLActiveInfo>;
+	function getActiveUniform(program : Nullable.<WebGLProgram>, index : number/*GLuint*/) : Nullable.<WebGLActiveInfo>;
+	function getAttachedShaders(program : Nullable.<WebGLProgram>) : Nullable.<WebGLShader[]>;
+	function getAttribLocation(program : Nullable.<WebGLProgram>, name : string/*DOMString*/) : number/*GLint*/;
+	function getBufferParameter(target : number/*GLenum*/, pname : number/*GLenum*/) : variant/*any*/;
 	function getParameter(pname : number/*GLenum*/) : variant/*any*/;
 	function getError() : number/*GLenum*/;
-	function getFramebufferAttachmentParameter(
-		target : number/*GLenum*/,
-		attachment : number/*GLenum*/,
-		pname : number/*GLenum*/
-	) : variant/*any*/;
-	function getProgramParameter(
-		program : Nullable.<WebGLProgram>,
-		pname : number/*GLenum*/
-	) : variant/*any*/;
-	function getProgramInfoLog(
-		program : Nullable.<WebGLProgram>
-	) : Nullable.<string>/*DOMString?*/;
-	function getRenderbufferParameter(
-		target : number/*GLenum*/,
-		pname : number/*GLenum*/
-	) : variant/*any*/;
-	function getShaderParameter(
-		shader : Nullable.<WebGLShader>,
-		pname : number/*GLenum*/
-	) : variant/*any*/;
-	function getShaderPrecisionFormat(
-		shadertype : number/*GLenum*/,
-		precisiontype : number/*GLenum*/
-	) : Nullable.<WebGLShaderPrecisionFormat>;
-	function getShaderInfoLog(
-		shader : Nullable.<WebGLShader>
-	) : Nullable.<string>/*DOMString?*/;
-	function getShaderSource(
-		shader : Nullable.<WebGLShader>
-	) : Nullable.<string>/*DOMString?*/;
-	function getTexParameter(
-		target : number/*GLenum*/,
-		pname : number/*GLenum*/
-	) : variant/*any*/;
-	function getUniform(
-		program : Nullable.<WebGLProgram>,
-		location : Nullable.<WebGLUniformLocation>
-	) : variant/*any*/;
-	function getUniformLocation(
-		program : Nullable.<WebGLProgram>,
-		name : string/*DOMString*/
-	) : Nullable.<WebGLUniformLocation>;
-	function getVertexAttrib(
-		index : number/*GLuint*/,
-		pname : number/*GLenum*/
-	) : variant/*any*/;
-	function getVertexAttribOffset(
-		index : number/*GLuint*/,
-		pname : number/*GLenum*/
-	) : number/*GLsizeiptr*/;
-	function hint(
-		target : number/*GLenum*/,
-		mode : number/*GLenum*/
-	) : void;
-	function isBuffer(
-		buffer : Nullable.<WebGLBuffer>
-	) : boolean/*GLboolean*/;
+	function getFramebufferAttachmentParameter(target : number/*GLenum*/, attachment : number/*GLenum*/, pname : number/*GLenum*/) : variant/*any*/;
+	function getProgramParameter(program : Nullable.<WebGLProgram>, pname : number/*GLenum*/) : variant/*any*/;
+	function getProgramInfoLog(program : Nullable.<WebGLProgram>) : Nullable.<string>/*DOMString?*/;
+	function getRenderbufferParameter(target : number/*GLenum*/, pname : number/*GLenum*/) : variant/*any*/;
+	function getShaderParameter(shader : Nullable.<WebGLShader>, pname : number/*GLenum*/) : variant/*any*/;
+	function getShaderPrecisionFormat(shadertype : number/*GLenum*/, precisiontype : number/*GLenum*/) : Nullable.<WebGLShaderPrecisionFormat>;
+	function getShaderInfoLog(shader : Nullable.<WebGLShader>) : Nullable.<string>/*DOMString?*/;
+	function getShaderSource(shader : Nullable.<WebGLShader>) : Nullable.<string>/*DOMString?*/;
+	function getTexParameter(target : number/*GLenum*/, pname : number/*GLenum*/) : variant/*any*/;
+	function getUniform(program : Nullable.<WebGLProgram>, location : Nullable.<WebGLUniformLocation>) : variant/*any*/;
+	function getUniformLocation(program : Nullable.<WebGLProgram>, name : string/*DOMString*/) : Nullable.<WebGLUniformLocation>;
+	function getVertexAttrib(index : number/*GLuint*/, pname : number/*GLenum*/) : variant/*any*/;
+	function getVertexAttribOffset(index : number/*GLuint*/, pname : number/*GLenum*/) : number/*GLsizeiptr*/;
+	function hint(target : number/*GLenum*/, mode : number/*GLenum*/) : void;
+	function isBuffer(buffer : Nullable.<WebGLBuffer>) : boolean/*GLboolean*/;
 	function isEnabled(cap : number/*GLenum*/) : boolean/*GLboolean*/;
-	function isFramebuffer(
-		framebuffer : Nullable.<WebGLFramebuffer>
-	) : boolean/*GLboolean*/;
-	function isProgram(
-		program : Nullable.<WebGLProgram>
-	) : boolean/*GLboolean*/;
-	function isRenderbuffer(
-		renderbuffer : Nullable.<WebGLRenderbuffer>
-	) : boolean/*GLboolean*/;
-	function isShader(
-		shader : Nullable.<WebGLShader>
-	) : boolean/*GLboolean*/;
-	function isTexture(
-		texture : Nullable.<WebGLTexture>
-	) : boolean/*GLboolean*/;
+	function isFramebuffer(framebuffer : Nullable.<WebGLFramebuffer>) : boolean/*GLboolean*/;
+	function isProgram(program : Nullable.<WebGLProgram>) : boolean/*GLboolean*/;
+	function isRenderbuffer(renderbuffer : Nullable.<WebGLRenderbuffer>) : boolean/*GLboolean*/;
+	function isShader(shader : Nullable.<WebGLShader>) : boolean/*GLboolean*/;
+	function isTexture(texture : Nullable.<WebGLTexture>) : boolean/*GLboolean*/;
 	function lineWidth(width : number/*GLfloat*/) : void;
 	function linkProgram(program : Nullable.<WebGLProgram>) : void;
-	function pixelStorei(
-		pname : number/*GLenum*/,
-		param : number/*GLint*/
-	) : void;
-	function polygonOffset(
-		factor : number/*GLfloat*/,
-		units : number/*GLfloat*/
-	) : void;
-	function readPixels(
-		x : number/*GLint*/,
-		y : number/*GLint*/,
-		width : number/*GLsizei*/,
-		height : number/*GLsizei*/,
-		format : number/*GLenum*/,
-		type : number/*GLenum*/,
-		pixels : Nullable.<ArrayBufferView>
-	) : void;
-	function renderbufferStorage(
-		target : number/*GLenum*/,
-		internalformat : number/*GLenum*/,
-		width : number/*GLsizei*/,
-		height : number/*GLsizei*/
-	) : void;
-	function sampleCoverage(
-		value : number/*GLclampf*/,
-		invert : boolean/*GLboolean*/
-	) : void;
-	function scissor(
-		x : number/*GLint*/,
-		y : number/*GLint*/,
-		width : number/*GLsizei*/,
-		height : number/*GLsizei*/
-	) : void;
-	function shaderSource(
-		shader : Nullable.<WebGLShader>,
-		source : string/*DOMString*/
-	) : void;
-	function stencilFunc(
-		func : number/*GLenum*/,
-		ref : number/*GLint*/,
-		mask : number/*GLuint*/
-	) : void;
-	function stencilFuncSeparate(
-		face : number/*GLenum*/,
-		func : number/*GLenum*/,
-		ref : number/*GLint*/,
-		mask : number/*GLuint*/
-	) : void;
+	function pixelStorei(pname : number/*GLenum*/, param : number/*GLint*/) : void;
+	function polygonOffset(factor : number/*GLfloat*/, units : number/*GLfloat*/) : void;
+	function readPixels(x : number/*GLint*/, y : number/*GLint*/, width : number/*GLsizei*/, height : number/*GLsizei*/, format : number/*GLenum*/, type : number/*GLenum*/, pixels : Nullable.<ArrayBufferView>) : void;
+	function renderbufferStorage(target : number/*GLenum*/, internalformat : number/*GLenum*/, width : number/*GLsizei*/, height : number/*GLsizei*/) : void;
+	function sampleCoverage(value : number/*GLclampf*/, invert : boolean/*GLboolean*/) : void;
+	function scissor(x : number/*GLint*/, y : number/*GLint*/, width : number/*GLsizei*/, height : number/*GLsizei*/) : void;
+	function shaderSource(shader : Nullable.<WebGLShader>, source : string/*DOMString*/) : void;
+	function stencilFunc(func : number/*GLenum*/, ref : number/*GLint*/, mask : number/*GLuint*/) : void;
+	function stencilFuncSeparate(face : number/*GLenum*/, func : number/*GLenum*/, ref : number/*GLint*/, mask : number/*GLuint*/) : void;
 	function stencilMask(mask : number/*GLuint*/) : void;
-	function stencilMaskSeparate(
-		face : number/*GLenum*/,
-		mask : number/*GLuint*/
-	) : void;
-	function stencilOp(
-		fail : number/*GLenum*/,
-		zfail : number/*GLenum*/,
-		zpass : number/*GLenum*/
-	) : void;
-	function stencilOpSeparate(
-		face : number/*GLenum*/,
-		fail : number/*GLenum*/,
-		zfail : number/*GLenum*/,
-		zpass : number/*GLenum*/
-	) : void;
-	function texImage2D(
-		target : number/*GLenum*/,
-		level : number/*GLint*/,
-		internalformat : number/*GLenum*/,
-		width : number/*GLsizei*/,
-		height : number/*GLsizei*/,
-		border : number/*GLint*/,
-		format : number/*GLenum*/,
-		type : number/*GLenum*/,
-		pixels : Nullable.<ArrayBufferView>
-	) : void;
-	function texImage2D(
-		target : number/*GLenum*/,
-		level : number/*GLint*/,
-		internalformat : number/*GLenum*/,
-		format : number/*GLenum*/,
-		type : number/*GLenum*/,
-		pixels : Nullable.<ImageData>
-	) : void;
-	function texImage2D(
-		target : number/*GLenum*/,
-		level : number/*GLint*/,
-		internalformat : number/*GLenum*/,
-		format : number/*GLenum*/,
-		type : number/*GLenum*/,
-		image : HTMLImageElement
-	) : void;
+	function stencilMaskSeparate(face : number/*GLenum*/, mask : number/*GLuint*/) : void;
+	function stencilOp(fail : number/*GLenum*/, zfail : number/*GLenum*/, zpass : number/*GLenum*/) : void;
+	function stencilOpSeparate(face : number/*GLenum*/, fail : number/*GLenum*/, zfail : number/*GLenum*/, zpass : number/*GLenum*/) : void;
+	function texImage2D(target : number/*GLenum*/, level : number/*GLint*/, internalformat : number/*GLenum*/, width : number/*GLsizei*/, height : number/*GLsizei*/, border : number/*GLint*/, format : number/*GLenum*/, type : number/*GLenum*/, pixels : Nullable.<ArrayBufferView>) : void;
+	function texImage2D(target : number/*GLenum*/, level : number/*GLint*/, internalformat : number/*GLenum*/, format : number/*GLenum*/, type : number/*GLenum*/, pixels : Nullable.<ImageData>) : void;
+	function texImage2D(target : number/*GLenum*/, level : number/*GLint*/, internalformat : number/*GLenum*/, format : number/*GLenum*/, type : number/*GLenum*/, image : HTMLImageElement) : void;
 	// May throw DOMException
-	function texImage2D(
-		target : number/*GLenum*/,
-		level : number/*GLint*/,
-		internalformat : number/*GLenum*/,
-		format : number/*GLenum*/,
-		type : number/*GLenum*/,
-		canvas : HTMLCanvasElement
-	) : void;
+	function texImage2D(target : number/*GLenum*/, level : number/*GLint*/, internalformat : number/*GLenum*/, format : number/*GLenum*/, type : number/*GLenum*/, canvas : HTMLCanvasElement) : void;
 	// May throw DOMException
-	function texImage2D(
-		target : number/*GLenum*/,
-		level : number/*GLint*/,
-		internalformat : number/*GLenum*/,
-		format : number/*GLenum*/,
-		type : number/*GLenum*/,
-		video : HTMLVideoElement
-	) : void;
+	function texImage2D(target : number/*GLenum*/, level : number/*GLint*/, internalformat : number/*GLenum*/, format : number/*GLenum*/, type : number/*GLenum*/, video : HTMLVideoElement) : void;
 	// May throw DOMException
 
-	function texParameterf(
-		target : number/*GLenum*/,
-		pname : number/*GLenum*/,
-		param : number/*GLfloat*/
-	) : void;
-	function texParameteri(
-		target : number/*GLenum*/,
-		pname : number/*GLenum*/,
-		param : number/*GLint*/
-	) : void;
-	function texSubImage2D(
-		target : number/*GLenum*/,
-		level : number/*GLint*/,
-		xoffset : number/*GLint*/,
-		yoffset : number/*GLint*/,
-		width : number/*GLsizei*/,
-		height : number/*GLsizei*/,
-		format : number/*GLenum*/,
-		type : number/*GLenum*/,
-		pixels : Nullable.<ArrayBufferView>
-	) : void;
-	function texSubImage2D(
-		target : number/*GLenum*/,
-		level : number/*GLint*/,
-		xoffset : number/*GLint*/,
-		yoffset : number/*GLint*/,
-		format : number/*GLenum*/,
-		type : number/*GLenum*/,
-		pixels : Nullable.<ImageData>
-	) : void;
-	function texSubImage2D(
-		target : number/*GLenum*/,
-		level : number/*GLint*/,
-		xoffset : number/*GLint*/,
-		yoffset : number/*GLint*/,
-		format : number/*GLenum*/,
-		type : number/*GLenum*/,
-		image : HTMLImageElement
-	) : void;
+	function texParameterf(target : number/*GLenum*/, pname : number/*GLenum*/, param : number/*GLfloat*/) : void;
+	function texParameteri(target : number/*GLenum*/, pname : number/*GLenum*/, param : number/*GLint*/) : void;
+	function texSubImage2D(target : number/*GLenum*/, level : number/*GLint*/, xoffset : number/*GLint*/, yoffset : number/*GLint*/, width : number/*GLsizei*/, height : number/*GLsizei*/, format : number/*GLenum*/, type : number/*GLenum*/, pixels : Nullable.<ArrayBufferView>) : void;
+	function texSubImage2D(target : number/*GLenum*/, level : number/*GLint*/, xoffset : number/*GLint*/, yoffset : number/*GLint*/, format : number/*GLenum*/, type : number/*GLenum*/, pixels : Nullable.<ImageData>) : void;
+	function texSubImage2D(target : number/*GLenum*/, level : number/*GLint*/, xoffset : number/*GLint*/, yoffset : number/*GLint*/, format : number/*GLenum*/, type : number/*GLenum*/, image : HTMLImageElement) : void;
 	// May throw DOMException
-	function texSubImage2D(
-		target : number/*GLenum*/,
-		level : number/*GLint*/,
-		xoffset : number/*GLint*/,
-		yoffset : number/*GLint*/,
-		format : number/*GLenum*/,
-		type : number/*GLenum*/,
-		canvas : HTMLCanvasElement
-	) : void;
+	function texSubImage2D(target : number/*GLenum*/, level : number/*GLint*/, xoffset : number/*GLint*/, yoffset : number/*GLint*/, format : number/*GLenum*/, type : number/*GLenum*/, canvas : HTMLCanvasElement) : void;
 	// May throw DOMException
-	function texSubImage2D(
-		target : number/*GLenum*/,
-		level : number/*GLint*/,
-		xoffset : number/*GLint*/,
-		yoffset : number/*GLint*/,
-		format : number/*GLenum*/,
-		type : number/*GLenum*/,
-		video : HTMLVideoElement
-	) : void;
+	function texSubImage2D(target : number/*GLenum*/, level : number/*GLint*/, xoffset : number/*GLint*/, yoffset : number/*GLint*/, format : number/*GLenum*/, type : number/*GLenum*/, video : HTMLVideoElement) : void;
 	// May throw DOMException
 
-	function uniform1f(
-		location : Nullable.<WebGLUniformLocation>,
-		x : number/*GLfloat*/
-	) : void;
-	function uniform1fv(
-		location : Nullable.<WebGLUniformLocation>,
-		v : Float32Array
-	) : void;
-	function uniform1fv(
-		location : Nullable.<WebGLUniformLocation>,
-		v : number[]/*sequence<GLfloat>*/
-	) : void;
-	function uniform1fv(
-		location : Nullable.<WebGLUniformLocation>,
-		v : int[]/*sequence<GLfloat>*/
-	) : void;
-	function uniform1i(
-		location : Nullable.<WebGLUniformLocation>,
-		x : number/*GLint*/
-	) : void;
-	function uniform1iv(
-		location : Nullable.<WebGLUniformLocation>,
-		v : Int32Array
-	) : void;
-	function uniform1iv(
-		location : Nullable.<WebGLUniformLocation>,
-		v : number[]/*sequence<long>*/
-	) : void;
-	function uniform1iv(
-		location : Nullable.<WebGLUniformLocation>,
-		v : int[]/*sequence<long>*/
-	) : void;
-	function uniform2f(
-		location : Nullable.<WebGLUniformLocation>,
-		x : number/*GLfloat*/,
-		y : number/*GLfloat*/
-	) : void;
-	function uniform2fv(
-		location : Nullable.<WebGLUniformLocation>,
-		v : Float32Array
-	) : void;
-	function uniform2fv(
-		location : Nullable.<WebGLUniformLocation>,
-		v : number[]/*sequence<GLfloat>*/
-	) : void;
-	function uniform2fv(
-		location : Nullable.<WebGLUniformLocation>,
-		v : int[]/*sequence<GLfloat>*/
-	) : void;
-	function uniform2i(
-		location : Nullable.<WebGLUniformLocation>,
-		x : number/*GLint*/,
-		y : number/*GLint*/
-	) : void;
-	function uniform2iv(
-		location : Nullable.<WebGLUniformLocation>,
-		v : Int32Array
-	) : void;
-	function uniform2iv(
-		location : Nullable.<WebGLUniformLocation>,
-		v : number[]/*sequence<long>*/
-	) : void;
-	function uniform2iv(
-		location : Nullable.<WebGLUniformLocation>,
-		v : int[]/*sequence<long>*/
-	) : void;
-	function uniform3f(
-		location : Nullable.<WebGLUniformLocation>,
-		x : number/*GLfloat*/,
-		y : number/*GLfloat*/,
-		z : number/*GLfloat*/
-	) : void;
-	function uniform3fv(
-		location : Nullable.<WebGLUniformLocation>,
-		v : Float32Array
-	) : void;
-	function uniform3fv(
-		location : Nullable.<WebGLUniformLocation>,
-		v : number[]/*sequence<GLfloat>*/
-	) : void;
-	function uniform3fv(
-		location : Nullable.<WebGLUniformLocation>,
-		v : int[]/*sequence<GLfloat>*/
-	) : void;
-	function uniform3i(
-		location : Nullable.<WebGLUniformLocation>,
-		x : number/*GLint*/,
-		y : number/*GLint*/,
-		z : number/*GLint*/
-	) : void;
-	function uniform3iv(
-		location : Nullable.<WebGLUniformLocation>,
-		v : Int32Array
-	) : void;
-	function uniform3iv(
-		location : Nullable.<WebGLUniformLocation>,
-		v : number[]/*sequence<long>*/
-	) : void;
-	function uniform3iv(
-		location : Nullable.<WebGLUniformLocation>,
-		v : int[]/*sequence<long>*/
-	) : void;
-	function uniform4f(
-		location : Nullable.<WebGLUniformLocation>,
-		x : number/*GLfloat*/,
-		y : number/*GLfloat*/,
-		z : number/*GLfloat*/,
-		w : number/*GLfloat*/
-	) : void;
-	function uniform4fv(
-		location : Nullable.<WebGLUniformLocation>,
-		v : Float32Array
-	) : void;
-	function uniform4fv(
-		location : Nullable.<WebGLUniformLocation>,
-		v : number[]/*sequence<GLfloat>*/
-	) : void;
-	function uniform4fv(
-		location : Nullable.<WebGLUniformLocation>,
-		v : int[]/*sequence<GLfloat>*/
-	) : void;
-	function uniform4i(
-		location : Nullable.<WebGLUniformLocation>,
-		x : number/*GLint*/,
-		y : number/*GLint*/,
-		z : number/*GLint*/,
-		w : number/*GLint*/
-	) : void;
-	function uniform4iv(
-		location : Nullable.<WebGLUniformLocation>,
-		v : Int32Array
-	) : void;
-	function uniform4iv(
-		location : Nullable.<WebGLUniformLocation>,
-		v : number[]/*sequence<long>*/
-	) : void;
-	function uniform4iv(
-		location : Nullable.<WebGLUniformLocation>,
-		v : int[]/*sequence<long>*/
-	) : void;
-	function uniformMatrix2fv(
-		location : Nullable.<WebGLUniformLocation>,
-		transpose : boolean/*GLboolean*/,
-		value : Float32Array
-	) : void;
-	function uniformMatrix2fv(
-		location : Nullable.<WebGLUniformLocation>,
-		transpose : boolean/*GLboolean*/,
-		value : number[]/*sequence<GLfloat>*/
-	) : void;
-	function uniformMatrix2fv(
-		location : Nullable.<WebGLUniformLocation>,
-		transpose : boolean/*GLboolean*/,
-		value : int[]/*sequence<GLfloat>*/
-	) : void;
-	function uniformMatrix3fv(
-		location : Nullable.<WebGLUniformLocation>,
-		transpose : boolean/*GLboolean*/,
-		value : Float32Array
-	) : void;
-	function uniformMatrix3fv(
-		location : Nullable.<WebGLUniformLocation>,
-		transpose : boolean/*GLboolean*/,
-		value : number[]/*sequence<GLfloat>*/
-	) : void;
-	function uniformMatrix3fv(
-		location : Nullable.<WebGLUniformLocation>,
-		transpose : boolean/*GLboolean*/,
-		value : int[]/*sequence<GLfloat>*/
-	) : void;
-	function uniformMatrix4fv(
-		location : Nullable.<WebGLUniformLocation>,
-		transpose : boolean/*GLboolean*/,
-		value : Float32Array
-	) : void;
-	function uniformMatrix4fv(
-		location : Nullable.<WebGLUniformLocation>,
-		transpose : boolean/*GLboolean*/,
-		value : number[]/*sequence<GLfloat>*/
-	) : void;
-	function uniformMatrix4fv(
-		location : Nullable.<WebGLUniformLocation>,
-		transpose : boolean/*GLboolean*/,
-		value : int[]/*sequence<GLfloat>*/
-	) : void;
+	function uniform1f(location : Nullable.<WebGLUniformLocation>, x : number/*GLfloat*/) : void;
+	function uniform1fv(location : Nullable.<WebGLUniformLocation>, v : Float32Array) : void;
+	function uniform1fv(location : Nullable.<WebGLUniformLocation>, v : number[]/*sequence<GLfloat>*/) : void;
+	function uniform1fv(location : Nullable.<WebGLUniformLocation>, v : int[]/*sequence<GLfloat>*/) : void;
+	function uniform1i(location : Nullable.<WebGLUniformLocation>, x : number/*GLint*/) : void;
+	function uniform1iv(location : Nullable.<WebGLUniformLocation>, v : Int32Array) : void;
+	function uniform1iv(location : Nullable.<WebGLUniformLocation>, v : number[]/*sequence<long>*/) : void;
+	function uniform1iv(location : Nullable.<WebGLUniformLocation>, v : int[]/*sequence<long>*/) : void;
+	function uniform2f(location : Nullable.<WebGLUniformLocation>, x : number/*GLfloat*/, y : number/*GLfloat*/) : void;
+	function uniform2fv(location : Nullable.<WebGLUniformLocation>, v : Float32Array) : void;
+	function uniform2fv(location : Nullable.<WebGLUniformLocation>, v : number[]/*sequence<GLfloat>*/) : void;
+	function uniform2fv(location : Nullable.<WebGLUniformLocation>, v : int[]/*sequence<GLfloat>*/) : void;
+	function uniform2i(location : Nullable.<WebGLUniformLocation>, x : number/*GLint*/, y : number/*GLint*/) : void;
+	function uniform2iv(location : Nullable.<WebGLUniformLocation>, v : Int32Array) : void;
+	function uniform2iv(location : Nullable.<WebGLUniformLocation>, v : number[]/*sequence<long>*/) : void;
+	function uniform2iv(location : Nullable.<WebGLUniformLocation>, v : int[]/*sequence<long>*/) : void;
+	function uniform3f(location : Nullable.<WebGLUniformLocation>, x : number/*GLfloat*/, y : number/*GLfloat*/, z : number/*GLfloat*/) : void;
+	function uniform3fv(location : Nullable.<WebGLUniformLocation>, v : Float32Array) : void;
+	function uniform3fv(location : Nullable.<WebGLUniformLocation>, v : number[]/*sequence<GLfloat>*/) : void;
+	function uniform3fv(location : Nullable.<WebGLUniformLocation>, v : int[]/*sequence<GLfloat>*/) : void;
+	function uniform3i(location : Nullable.<WebGLUniformLocation>, x : number/*GLint*/, y : number/*GLint*/, z : number/*GLint*/) : void;
+	function uniform3iv(location : Nullable.<WebGLUniformLocation>, v : Int32Array) : void;
+	function uniform3iv(location : Nullable.<WebGLUniformLocation>, v : number[]/*sequence<long>*/) : void;
+	function uniform3iv(location : Nullable.<WebGLUniformLocation>, v : int[]/*sequence<long>*/) : void;
+	function uniform4f(location : Nullable.<WebGLUniformLocation>, x : number/*GLfloat*/, y : number/*GLfloat*/, z : number/*GLfloat*/, w : number/*GLfloat*/) : void;
+	function uniform4fv(location : Nullable.<WebGLUniformLocation>, v : Float32Array) : void;
+	function uniform4fv(location : Nullable.<WebGLUniformLocation>, v : number[]/*sequence<GLfloat>*/) : void;
+	function uniform4fv(location : Nullable.<WebGLUniformLocation>, v : int[]/*sequence<GLfloat>*/) : void;
+	function uniform4i(location : Nullable.<WebGLUniformLocation>, x : number/*GLint*/, y : number/*GLint*/, z : number/*GLint*/, w : number/*GLint*/) : void;
+	function uniform4iv(location : Nullable.<WebGLUniformLocation>, v : Int32Array) : void;
+	function uniform4iv(location : Nullable.<WebGLUniformLocation>, v : number[]/*sequence<long>*/) : void;
+	function uniform4iv(location : Nullable.<WebGLUniformLocation>, v : int[]/*sequence<long>*/) : void;
+	function uniformMatrix2fv(location : Nullable.<WebGLUniformLocation>, transpose : boolean/*GLboolean*/, value : Float32Array) : void;
+	function uniformMatrix2fv(location : Nullable.<WebGLUniformLocation>, transpose : boolean/*GLboolean*/, value : number[]/*sequence<GLfloat>*/) : void;
+	function uniformMatrix2fv(location : Nullable.<WebGLUniformLocation>, transpose : boolean/*GLboolean*/, value : int[]/*sequence<GLfloat>*/) : void;
+	function uniformMatrix3fv(location : Nullable.<WebGLUniformLocation>, transpose : boolean/*GLboolean*/, value : Float32Array) : void;
+	function uniformMatrix3fv(location : Nullable.<WebGLUniformLocation>, transpose : boolean/*GLboolean*/, value : number[]/*sequence<GLfloat>*/) : void;
+	function uniformMatrix3fv(location : Nullable.<WebGLUniformLocation>, transpose : boolean/*GLboolean*/, value : int[]/*sequence<GLfloat>*/) : void;
+	function uniformMatrix4fv(location : Nullable.<WebGLUniformLocation>, transpose : boolean/*GLboolean*/, value : Float32Array) : void;
+	function uniformMatrix4fv(location : Nullable.<WebGLUniformLocation>, transpose : boolean/*GLboolean*/, value : number[]/*sequence<GLfloat>*/) : void;
+	function uniformMatrix4fv(location : Nullable.<WebGLUniformLocation>, transpose : boolean/*GLboolean*/, value : int[]/*sequence<GLfloat>*/) : void;
 	function useProgram(program : Nullable.<WebGLProgram>) : void;
 	function validateProgram(program : Nullable.<WebGLProgram>) : void;
-	function vertexAttrib1f(
-		indx : number/*GLuint*/,
-		x : number/*GLfloat*/
-	) : void;
-	function vertexAttrib1fv(
-		indx : number/*GLuint*/,
-		values : Float32Array
-	) : void;
-	function vertexAttrib1fv(
-		indx : number/*GLuint*/,
-		values : number[]/*sequence<GLfloat>*/
-	) : void;
-	function vertexAttrib1fv(
-		indx : number/*GLuint*/,
-		values : int[]/*sequence<GLfloat>*/
-	) : void;
-	function vertexAttrib2f(
-		indx : number/*GLuint*/,
-		x : number/*GLfloat*/,
-		y : number/*GLfloat*/
-	) : void;
-	function vertexAttrib2fv(
-		indx : number/*GLuint*/,
-		values : Float32Array
-	) : void;
-	function vertexAttrib2fv(
-		indx : number/*GLuint*/,
-		values : number[]/*sequence<GLfloat>*/
-	) : void;
-	function vertexAttrib2fv(
-		indx : number/*GLuint*/,
-		values : int[]/*sequence<GLfloat>*/
-	) : void;
-	function vertexAttrib3f(
-		indx : number/*GLuint*/,
-		x : number/*GLfloat*/,
-		y : number/*GLfloat*/,
-		z : number/*GLfloat*/
-	) : void;
-	function vertexAttrib3fv(
-		indx : number/*GLuint*/,
-		values : Float32Array
-	) : void;
-	function vertexAttrib3fv(
-		indx : number/*GLuint*/,
-		values : number[]/*sequence<GLfloat>*/
-	) : void;
-	function vertexAttrib3fv(
-		indx : number/*GLuint*/,
-		values : int[]/*sequence<GLfloat>*/
-	) : void;
-	function vertexAttrib4f(
-		indx : number/*GLuint*/,
-		x : number/*GLfloat*/,
-		y : number/*GLfloat*/,
-		z : number/*GLfloat*/,
-		w : number/*GLfloat*/
-	) : void;
-	function vertexAttrib4fv(
-		indx : number/*GLuint*/,
-		values : Float32Array
-	) : void;
-	function vertexAttrib4fv(
-		indx : number/*GLuint*/,
-		values : number[]/*sequence<GLfloat>*/
-	) : void;
-	function vertexAttrib4fv(
-		indx : number/*GLuint*/,
-		values : int[]/*sequence<GLfloat>*/
-	) : void;
-	function vertexAttribPointer(
-		indx : number/*GLuint*/,
-		size : number/*GLint*/,
-		type : number/*GLenum*/,
-		normalized : boolean/*GLboolean*/,
-		stride : number/*GLsizei*/,
-		offset : number/*GLintptr*/
-	) : void;
-	function viewport(
-		x : number/*GLint*/,
-		y : number/*GLint*/,
-		width : number/*GLsizei*/,
-		height : number/*GLsizei*/
-	) : void;
+	function vertexAttrib1f(indx : number/*GLuint*/, x : number/*GLfloat*/) : void;
+	function vertexAttrib1fv(indx : number/*GLuint*/, values : Float32Array) : void;
+	function vertexAttrib1fv(indx : number/*GLuint*/, values : number[]/*sequence<GLfloat>*/) : void;
+	function vertexAttrib1fv(indx : number/*GLuint*/, values : int[]/*sequence<GLfloat>*/) : void;
+	function vertexAttrib2f(indx : number/*GLuint*/, x : number/*GLfloat*/, y : number/*GLfloat*/) : void;
+	function vertexAttrib2fv(indx : number/*GLuint*/, values : Float32Array) : void;
+	function vertexAttrib2fv(indx : number/*GLuint*/, values : number[]/*sequence<GLfloat>*/) : void;
+	function vertexAttrib2fv(indx : number/*GLuint*/, values : int[]/*sequence<GLfloat>*/) : void;
+	function vertexAttrib3f(indx : number/*GLuint*/, x : number/*GLfloat*/, y : number/*GLfloat*/, z : number/*GLfloat*/) : void;
+	function vertexAttrib3fv(indx : number/*GLuint*/, values : Float32Array) : void;
+	function vertexAttrib3fv(indx : number/*GLuint*/, values : number[]/*sequence<GLfloat>*/) : void;
+	function vertexAttrib3fv(indx : number/*GLuint*/, values : int[]/*sequence<GLfloat>*/) : void;
+	function vertexAttrib4f(indx : number/*GLuint*/, x : number/*GLfloat*/, y : number/*GLfloat*/, z : number/*GLfloat*/, w : number/*GLfloat*/) : void;
+	function vertexAttrib4fv(indx : number/*GLuint*/, values : Float32Array) : void;
+	function vertexAttrib4fv(indx : number/*GLuint*/, values : number[]/*sequence<GLfloat>*/) : void;
+	function vertexAttrib4fv(indx : number/*GLuint*/, values : int[]/*sequence<GLfloat>*/) : void;
+	function vertexAttribPointer(indx : number/*GLuint*/, size : number/*GLint*/, type : number/*GLenum*/, normalized : boolean/*GLboolean*/, stride : number/*GLsizei*/, offset : number/*GLintptr*/) : void;
+	function viewport(x : number/*GLint*/, y : number/*GLint*/, width : number/*GLsizei*/, height : number/*GLsizei*/) : void;
 
 } // end of WebGLRenderingContext
 
@@ -9190,10 +6974,7 @@ native final class WebGLRenderingContext {
 native final class WebGLContextEvent extends Event {
 
 	function constructor(type : string/*DOMString*/);
-	function constructor(
-		type : string/*DOMString*/,
-		eventInit : WebGLContextEventInit
-	);
+	function constructor(type : string/*DOMString*/, eventInit : WebGLContextEventInit);
 
 	__readonly__ var statusMessage : string/*DOMString*/;
 
@@ -9243,18 +7024,12 @@ native final class nsIDOMGamepadAxisMoveEvent extends Event/*nsIDOMEvent*/ {
 
 native __fake__ class WindowAnimationTiming {
 
-	function requestAnimationFrame(
-		callback : function(time:number/*DOMTimeStamp*/):void/*FrameRequestCallback*/
-	) : number/*long*/;
+	function requestAnimationFrame(callback : function(time:number/*DOMTimeStamp*/):void/*FrameRequestCallback*/) : number/*long*/;
 	function cancelAnimationFrame(handle : number/*long*/) : void;
 	// vender's extension
-	function webkitRequestAnimationFrame(
-		callback : function(time:number/*DOMTimeStamp*/):void/*FrameRequestCallback*/
-	) : number/*long*/;
+	function webkitRequestAnimationFrame(callback : function(time:number/*DOMTimeStamp*/):void/*FrameRequestCallback*/) : number/*long*/;
 	function webkitCancelAnimationFrame(handle : number/*long*/) : void;
-	function mozRequestAnimationFrame(
-		callback : function(time:number/*DOMTimeStamp*/):void/*FrameRequestCallback*/
-	) : number/*long*/;
+	function mozRequestAnimationFrame(callback : function(time:number/*DOMTimeStamp*/):void/*FrameRequestCallback*/) : number/*long*/;
 	function mozCancelAnimationFrame(handle : number/*long*/) : void;
 
 } // end of WindowAnimationTiming
@@ -9292,10 +7067,7 @@ native final class webkitIDBTransaction extends IDBTransaction {
 native final class DeviceOrientationEvent extends Event {
 
 	function constructor(type : string/*DOMString*/);
-	function constructor(
-		type : string/*DOMString*/,
-		eventInitDict : DeviceOrientationEventInit
-	);
+	function constructor(type : string/*DOMString*/, eventInitDict : DeviceOrientationEventInit);
 
 	__readonly__ var alpha : Nullable.<number>/*double?*/;
 	__readonly__ var beta : Nullable.<number>/*double?*/;
@@ -9332,10 +7104,7 @@ native final __fake__ class DeviceRotationRate {
 native final class DeviceMotionEvent extends Event {
 
 	function constructor(type : string/*DOMString*/);
-	function constructor(
-		type : string/*DOMString*/,
-		eventInitDict : DeviceMotionEventInit
-	);
+	function constructor(type : string/*DOMString*/, eventInitDict : DeviceMotionEventInit);
 
 	__readonly__ var acceleration : Nullable.<DeviceAcceleration>;
 	__readonly__ var accelerationIncludingGravity : Nullable.<DeviceAcceleration>;
@@ -9362,18 +7131,14 @@ native final class MediaConstraints {
 native final __fake__ class CanvasPixelArray {
 
 	__readonly__ var length : number/*unsigned long*/;
-	function __native_index_operator__(
-		index : number/*unsigned long*/
-	) : Nullable.<number>/*octet*/;
+	function __native_index_operator__(index : number/*unsigned long*/) : Nullable.<number>/*octet*/;
 
 } // end of CanvasPixelArray
 
 native final class CSSRuleList {
 
 	__readonly__ var length : number/*long*/;
-	function __native_index_operator__(
-		index : number/*long*/
-	) : Nullable.<CSSRule>;
+	function __native_index_operator__(index : number/*long*/) : Nullable.<CSSRule>;
 	/* getter */
 	function item(index : number/*long*/) : Nullable.<CSSRule>;
 
@@ -9382,9 +7147,7 @@ native final class CSSRuleList {
 native final class StyleSheetList {
 
 	__readonly__ var length : number/*long*/;
-	function __native_index_operator__(
-		index : number/*long*/
-	) : Nullable.<StyleSheet>;
+	function __native_index_operator__(index : number/*long*/) : Nullable.<StyleSheet>;
 	/* getter */
 	function item(index : number/*long*/) : Nullable.<StyleSheet>;
 
