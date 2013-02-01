@@ -2872,6 +2872,8 @@ class _Test extends TestCase {
         var v2 : Geolocation = o.geolocation;
         o.getUserMedia(X.getNullable__Map__variant__(), X.getfunction_stream_LocalMediaStream__void());
         o.getUserMedia(X.getNullable__Map__variant__(), X.getfunction_stream_LocalMediaStream__void(), X.getNullable__function_error_NavigatorUserMediaError__void_());
+        o.webkitGetUserMedia(X.getNullable__Map__variant__(), X.getfunction_stream_LocalMediaStream__void());
+        o.webkitGetUserMedia(X.getNullable__Map__variant__(), X.getfunction_stream_LocalMediaStream__void(), X.getNullable__function_error_NavigatorUserMediaError__void_());
     } // Navigator
 
     function compile_NavigatorID(o : NavigatorID) : void {

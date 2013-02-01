@@ -3771,6 +3771,12 @@ native final class Navigator extends NavigatorID {
 	/** @see http://www.w3.org/TR/mediacapture-streams/ */
 	function getUserMedia(constraints : Nullable.<Map.<variant>>/*MediaStreamConstraints?*/, successCallback : function(stream:LocalMediaStream):void/*NavigatorUserMediaSuccessCallback*/, errorCallback : Nullable.<function(error:NavigatorUserMediaError):void>/*NavigatorUserMediaErrorCallback?*/) : void;
 
+	// implements NavigatorUserMedia
+
+
+	function webkitGetUserMedia(constraints : Nullable.<Map.<variant>>/*MediaStreamConstraints?*/, successCallback : function(stream:LocalMediaStream):void/*NavigatorUserMediaSuccessCallback*/) : void;
+	function webkitGetUserMedia(constraints : Nullable.<Map.<variant>>/*MediaStreamConstraints?*/, successCallback : function(stream:LocalMediaStream):void/*NavigatorUserMediaSuccessCallback*/, errorCallback : Nullable.<function(error:NavigatorUserMediaError):void>/*NavigatorUserMediaErrorCallback?*/) : void;
+
 } // end of Navigator
 
 /** @see http://www.w3.org/TR/html5/single-page.html */
@@ -5445,11 +5451,10 @@ native final class MediaStreamTrackList {
 
 } // end of MediaStreamTrackList
 
+/** @see http://www.w3.org/TR/mediacapture-streams/ */
 native __fake__ class NavigatorUserMedia {
 
-	/** @see http://www.w3.org/TR/mediacapture-streams/ */
 	function getUserMedia(constraints : Nullable.<Map.<variant>>/*MediaStreamConstraints?*/, successCallback : function(stream:LocalMediaStream):void/*NavigatorUserMediaSuccessCallback*/) : void;
-	/** @see http://www.w3.org/TR/mediacapture-streams/ */
 	function getUserMedia(constraints : Nullable.<Map.<variant>>/*MediaStreamConstraints?*/, successCallback : function(stream:LocalMediaStream):void/*NavigatorUserMediaSuccessCallback*/, errorCallback : Nullable.<function(error:NavigatorUserMediaError):void>/*NavigatorUserMediaErrorCallback?*/) : void;
 
 	function webkitGetUserMedia(constraints : Nullable.<Map.<variant>>/*MediaStreamConstraints?*/, successCallback : function(stream:LocalMediaStream):void/*NavigatorUserMediaSuccessCallback*/) : void;

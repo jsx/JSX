@@ -124,7 +124,8 @@ partial interface CSSStyleDeclaration {
 };
 
 [NoInterfaceObject]
-interface NavigatorUserMedia {
+partial interface NavigatorUserMedia {
 	void webkitGetUserMedia (MediaStreamConstraints? constraints, NavigatorUserMediaSuccessCallback successCallback, optional NavigatorUserMediaErrorCallback? errorCallback);
 };
+Navigator implements NavigatorUserMedia;
 
