@@ -729,8 +729,8 @@ class ResolvedFunctionType extends FunctionType {
 		} else {
 			// non-vararg function
 			if (argTypes.length != this._argTypes.length) {
-				cb(Util.format('wrong number of arguments for %1',
-					[this.toString()]));
+				cb(Util.format('wrong number of arguments (%1 for %2)',
+					[argTypes.length as string, this._argTypes.length as string]));
 				return false;
 			}
 			for (var i = 0; i < argTypes.length; ++i) {
