@@ -1,8 +1,17 @@
 Revision history for the JSX software development kit
 
+NEXT
+    [CHANGES]
+    - Removed web-intns from web.jsx; it has been remoed from Chrome, too.
+    - Added webrtc to web.jsx (see web/example/webrtc/ for example)
+    - Uses high resolution time in profiler if available
+
+    [BUG FIXES]
+    - Fixed messages on argument mismatch errors (#104)
+
 0.9.4 2013-01-31 19:31:16
     [BUG FIXES]
-    - Fix a packaging issue
+    - Fixed a packaging issue
 
 0.9.3 2013-01-31 12:24:27
     [CHANGES]
