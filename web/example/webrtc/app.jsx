@@ -6,14 +6,19 @@ class _Main {
 		log "application start";
 
 		// WebRTC video
-		dom.window.navigator.webkitGetUserMedia(
-			{ video : true } : Map.<variant>,
-			function (stream) {
-				log "MediaStream start";
-				var v = dom.id("video") as HTMLVideoElement;
-				v.src = URL.createObjectURL(stream);
-			}, function (error) {
-				log error;
-			});
+		try {
+			dom.window.navigator.webkitGetUserMedia(
+				{ video : true } : Map.<variant>,
+				function (stream) {
+					log "MediaStream start";
+					var v = dom.id("video") as HTMLVideoElement;
+					v.src = URL.createObjectURL(stream);
+				}, function (error) {
+					log error;
+				});
+		}
+		catch (e : Error) {
+			log e;
+		}
 	}
 }
