@@ -26,7 +26,7 @@ class _Test extends TestCase {
 		var cwd = process.cwd();
 
 		this.async((async) -> {
-			node.child_process.execFile("bin/jsx", ["--enable-source-map", "--output", "t/source-map/hello.jsx.js", "t/source-map/hello.jsx"], {} : variant, function (code, stdout, stderr) {
+			node.child_process.execFile("bin/jsx", ["--enable-source-map", "--output", "t/src/source-map/hello.jsx.js", "t/src/source-map/hello.jsx"], {} : variant, function (code, stdout, stderr) {
 				this.expect(code, "error code").toBe(null);
 				//this.expect(stderr, "stderr").toBe("");
 				this.expect(stdout, "stdout").toBe("");
@@ -38,9 +38,9 @@ class _Test extends TestCase {
 				module.paths.push(cwd + "/node_modules");
 
 				var source = JSLexer.tokenize("hello.jsx.js",
-					node.fs.readFileSync("t/source-map/hello.jsx.js").toString());
+					node.fs.readFileSync("t/src/source-map/hello.jsx.js").toString());
 
-				var mapping = JSON.parse(node.fs.readFileSync("t/source-map/hello.jsx.js.mapping").toString());
+				var mapping = JSON.parse(node.fs.readFileSync("t/src/source-map/hello.jsx.js.mapping").toString());
 
 				this.expect(mapping['file'], "mapping.file").toBe("hello.jsx.js");
 				var sources = ["hello.jsx", "timer.jsx", "js.jsx"].sort();
