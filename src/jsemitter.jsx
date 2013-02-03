@@ -2441,16 +2441,17 @@ class JavaScriptEmitter implements Emitter {
 			line: this._output.match(/^/mg).length,
 			column: genColumn
 		};
+		var tokenValue = null : Nullable.<string>;
 		var origPos = null : Map.<number>;
 		if (! Number.isNaN(token.getLineNumber())) {
 			origPos = {
 				line: token.getLineNumber(),
 				column: token.getColumnNumber() + 1
 			};
+			if (token.isIdentifier()) {
+				tokenValue = token.getValue();
+			}
 		}
-		var tokenValue = null : Nullable.<string>;
-		if (token.isIdentifier())
-			tokenValue = token.getValue();
 		var filename = token.getFilename();
 		if (filename != null) {
 			filename = this._encodeFilename(filename, "");
