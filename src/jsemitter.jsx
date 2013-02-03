@@ -836,7 +836,7 @@ class _MapLiteralExpressionEmitter extends _ExpressionEmitter {
 	}
 
 	override function emit (outerOpPrecedence : number) : void {
-		this._emitter._emit("{ ", null);
+		this._emitter._emit("({ ", null);
 		var elements = this._expr.getElements();
 		for (var i = 0; i < elements.length; ++i) {
 			var element = elements[i];
@@ -846,7 +846,7 @@ class _MapLiteralExpressionEmitter extends _ExpressionEmitter {
 			this._emitter._emit(": ", null);
 			this._emitter._getExpressionEmitterFor(element.getExpr()).emit(0);
 		}
-		this._emitter._emit(" }", null);
+		this._emitter._emit(" })", null);
 	}
 
 }
