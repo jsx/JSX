@@ -32,7 +32,7 @@
 
           var jsFile = document.getElementById("source").dataset.file;
           console.assert(jsFile);
-          var jsxFile = jsFile.replace(/\.js$/, "");
+          var jsxFile = "system:example/" + jsFile.replace(/\.js$/, "");
           JSX.runMain(jsxFile, []);
         });
       });

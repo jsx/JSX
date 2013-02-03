@@ -52,6 +52,19 @@ class _Test extends TestCase {
 		this.expect(Util.resolvePath("/a/b/c")).toBe("/a/b/c");
 		this.expect(Util.resolvePath("/a/../b")).toBe("/b");
 		this.expect(Util.resolvePath("/a/../../c")).toBe("/c");
+		this.expect(Util.resolvePath("a//b//c")).toBe("a/b/c");
+	}
+
+	function testRelativePath() : void {
+		this.expect(Util.relativePath("a/b/c", "a/b/d", false)).toBe("../d");
+		this.expect(Util.relativePath("a/b/c", "a/x/d", false)).toBe("../../x/d");
+		this.expect(Util.relativePath("/a/b/c", "a/b/d", false), "for abs path").toBe("../d");
+		this.expect(Util.relativePath("/a/b/c", "a/x/d", false), "for abs path").toBe("../../x/d");
+
+		this.expect(Util.relativePath("a/b/c", "a/b/d",  true)).toBe("d");
+		this.expect(Util.relativePath("a/b/c", "a/x/d",  true)).toBe("../x/d");
+		this.expect(Util.relativePath("/a/b/c", "a/b/d", true), "for abs path").toBe("d");
+		this.expect(Util.relativePath("/a/b/c", "a/x/d", true), "for abs path").toBe("../x/d");
 	}
 
 	function testToOrdinal() : void {

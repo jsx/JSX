@@ -228,10 +228,10 @@ class Util {
 		return decoded;
 	}
 
-	static function resolvePath (path : string) : string {
+	static function _resolvedPathParts(path : string) : string[] {
 		var tokens = path.split("/");
 		for (var i = 0; i < tokens.length;) {
-			if (tokens[i] == ".") {
+			if (tokens[i] == "." || (i != 0 && tokens[i] == "")) {
 				tokens.splice(i, 1);
 			} else if (tokens[i] == ".." && i != 0 && tokens[i - 1] != "..") {
 				if (i == 1 && tokens[0] == "") {
@@ -244,7 +244,49 @@ class Util {
 				i++;
 			}
 		}
-		return tokens.join("/");
+		return tokens;
+	}
+
+	/**
+	 * Canonicalizes the given path. e.g. "a/x/../b" to "a/b"
+	 */
+	static function resolvePath (path : string) : string {
+		return Util._resolvedPathParts(path).join("/");
+	}
+
+	/**
+	 * Solves the relative path from <code>from</code> to <code>to</code>.
+	 * e.g. relativePath("/a/b/c", "/a/d/e") to "../d/e"
+	 */
+	static function relativePath(fromPath : string, toPath: string, isFile : boolean) : string {
+		var f = Util._resolvedPathParts(fromPath);
+		var t = Util._resolvedPathParts(toPath);
+
+		if (isFile) {
+			f.pop(); // use dirname
+		}
+
+		// trim the root
+		if (f[0] == "") {
+			f.shift();
+		}
+		if (t[0] == "") {
+			t.shift();
+		}
+		var minLen = Math.min(f.length, t.length);
+		var samePartsIndex = minLen;
+		for (var i = 0; i < minLen; ++i) {
+			if (f[i] != t[i]) {
+				samePartsIndex = i;
+				break;
+			}
+		}
+
+		var pathParts = new string[];
+		for (var i = samePartsIndex; i < f.length; ++i) {
+			pathParts.push("..");
+		}
+		return pathParts.concat(t.slice(samePartsIndex)).join("/");
 	}
 
 	static function toOrdinal(n : number) : string {
