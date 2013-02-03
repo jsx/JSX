@@ -25,56 +25,60 @@ class _Test extends TestCase {
 
 		var cwd = process.cwd();
 
-		node.child_process.execFile("bin/jsx", ["--enable-source-map", "--output", "t/source-map/hello.jsx.js", "t/source-map/hello.jsx"], {} : variant, function (code, stdout, stderr) {
-			this.expect(code, "error code").toBe(null);
-			this.expect(stderr, "stderr").toBe("");
-			this.expect(stdout, "stdout").toBe("");
+		this.async((async) -> {
+			node.child_process.execFile("bin/jsx", ["--enable-source-map", "--output", "t/source-map/hello.jsx.js", "t/source-map/hello.jsx"], {} : variant, function (code, stdout, stderr) {
+				this.expect(code, "error code").toBe(null);
+				//this.expect(stderr, "stderr").toBe("");
+				this.expect(stdout, "stdout").toBe("");
 
-			if(code != null) {
-				return;
-			}
+				if(code != null) {
+					return;
+				}
 
-			module.paths.push(cwd + "/node_modules");
+				module.paths.push(cwd + "/node_modules");
 
-			var source = JSLexer.tokenize("hello.jsx.js",
-				node.fs.readFileSync("t/source-map/hello.jsx.js").toString());
+				var source = JSLexer.tokenize("hello.jsx.js",
+					node.fs.readFileSync("t/source-map/hello.jsx.js").toString());
 
-			var mapping = JSON.parse(node.fs.readFileSync("t/source-map/hello.jsx.js.mapping").toString());
+				var mapping = JSON.parse(node.fs.readFileSync("t/source-map/hello.jsx.js.mapping").toString());
 
-			this.expect(mapping['file'], "mapping.file").toBe("t/source-map/hello.jsx.js");
-			var sources = ["t/source-map/hello.jsx", "lib/js/timer.jsx", "lib/js/js.jsx"].sort();
-			this.expect(JSON.stringify((mapping['sources'] as string[]).sort()), "mapping.sources").toBe(JSON.stringify(sources));
-			var consumer = SourceMapper.createSourceMapConsumer(mapping);
+				this.expect(mapping['file'], "mapping.file").toBe("hello.jsx.js");
+				var sources = ["hello.jsx", "timer.jsx", "js.jsx"].sort();
+				this.expect((mapping['sources'] as string[]).map.<string>((item) -> { return item.split("/").pop(); }).sort().join(","), "mapping.sources").toBe(sources.join(","));
+				var consumer = SourceMapper.createSourceMapConsumer(mapping);
 
-			var pos, orig;
+				var pos, orig;
 
-			this.note('search for "Hello, world!"');
-			pos = search(source, function (t) { return t.token == '"Hello, world!"'; });
-			this.note("generated (literal)" + JSON.stringify(source[pos]));
-			orig = consumer.originalPositionFor(source[pos]);
-			this.note("original: " + JSON.stringify(orig));
-			this.expect(orig['line'], "orig.line").toBe(14);
-			this.expect(orig['column'], "orig.column").toBe(12);
-			this.expect(orig['name'], "orig.name").toBe(null);
+				this.note('search for "Hello, world!"');
+				pos = search(source, function (t) { return t.token == '"Hello, world!"'; });
+				this.note("generated (literal)" + JSON.stringify(source[pos]));
+				orig = consumer.originalPositionFor(source[pos]);
+				this.note("original: " + JSON.stringify(orig));
+				this.expect(orig['line'], "orig.line").toBe(15);
+				this.expect(orig['column'], "orig.column").toBe(21);
+				this.expect(orig['name'], "orig.name").toBe(null);
 
-			this.note('search for _Main');
-			pos = search(source, function (t) { return /^_Main\b/.test(t.token); });
-			this.note("generated (class): " + JSON.stringify(source[pos]));
-			orig = consumer.originalPositionFor(source[pos]);
-			this.note("original: " + JSON.stringify(orig));
-			this.expect(orig['line'], "orig.line").toBe(5);
-			this.expect(orig['column'], "orig.column").toBe(6);
-			this.expect(orig['name'], "orig.name").toBe("_Main");
+				this.note('search for _Main');
+				pos = search(source, function (t) { return /^_Main\b/.test(t.token); });
+				this.note("generated (class): " + JSON.stringify(source[pos]));
+				orig = consumer.originalPositionFor(source[pos]);
+				this.note("original: " + JSON.stringify(orig));
+				this.expect(orig['line'], "orig.line").toBe(6);
+				this.expect(orig['column'], "orig.column").toBe(7);
+				this.expect(orig['name'], "orig.name").toBe("_Main");
 
-			this.note('search for getFoo$');
-			pos = search(source, function (t) { return /^getFoo\b/.test(t.token); });
-			this.note("generated (member function): " + JSON.stringify(source[pos]));
-			orig = consumer.originalPositionFor(source[pos]);
-			this.note("original: " + JSON.stringify(orig));
-			this.expect(orig['line'], "orig.line").toBe(9);
-			this.expect(orig['column'], "orig.column").toBe(13);
-			this.expect(orig['name'], "orig.name").toBe("getFoo");
-		});
+				this.note('search for getFoo$');
+				pos = search(source, function (t) { return /^getFoo\b/.test(t.token); });
+				this.note("generated (member function): " + JSON.stringify(source[pos]));
+				orig = consumer.originalPositionFor(source[pos]);
+				this.note("original: " + JSON.stringify(orig));
+				this.expect(orig['line'], "orig.line").toBe(10);
+				this.expect(orig['column'], "orig.column").toBe(14);
+				this.expect(orig['name'], "orig.name").toBe("getFoo");
+
+				async.done();
+			});
+		}, 5000);
 	}
 
 }
