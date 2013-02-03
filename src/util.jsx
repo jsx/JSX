@@ -167,12 +167,20 @@ class Util {
 		return found;
 	}
 
+	static var _stringLiteralEncodingMap = {
+		"\0" : "\\0",
+		"\r" : "\\r",
+		"\n" : "\\n",
+		"\t" : "\\t",
+		"\"" : "\\\"",
+		"\'" : "\\\'",
+		"\\" : "\\\\"
+	};
+
 	static function encodeStringLiteral (str : string) : string {
-		var escaped = str.replace(/[\0- '"\\\u007f-\uffff]/g, function (ch) {
-			if (ch == "\0") {
-				return "\\0";
-			} else if (ch == "'" || ch == "\"" || ch == "\\") {
-				return "\\" + ch;
+		var escaped = str.replace(/[\0-\x19\\'"\u007f-\uffff]/g, function (ch) {
+			if (ch in Util._stringLiteralEncodingMap) {
+				return Util._stringLiteralEncodingMap[ch];
 			} else {
 				var t = "000" + ch.charCodeAt(0).toString(16);
 				t = t.substring(t.length - 4);

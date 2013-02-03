@@ -20,10 +20,16 @@ class _Test extends TestCase {
 	function testEncodeStringLiteral() : void {
 		this.expect(Util.encodeStringLiteral("")).toBe('""');
 		this.expect(Util.encodeStringLiteral("abc")).toBe('"abc"');
+		this.expect(Util.encodeStringLiteral(" ")).toBe('" "');
 		this.expect(Util.encodeStringLiteral('"')).toBe('"\\""');
 		this.expect(Util.encodeStringLiteral('\0')).toBe('"\\0"');
 		this.expect(Util.encodeStringLiteral('\\')).toBe('"\\\\"');
+		this.expect(Util.encodeStringLiteral('\r')).toBe('"\\r"');
+		this.expect(Util.encodeStringLiteral('\n')).toBe('"\\n"');
+		this.expect(Util.encodeStringLiteral('\t')).toBe('"\\t"');
 		this.expect(Util.encodeStringLiteral('\u0345')).toBe('"\\u0345"');
+
+		this.expect(Util.encodeStringLiteral('foo\nbar\nbaz\n')).toBe('"foo\\nbar\\nbaz\\n"');
 	}
 
 	function testDecodeStringLiteral() : void {
