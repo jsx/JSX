@@ -253,7 +253,9 @@ class _CompletionCandidatesWithLocal extends CompletionCandidatesOfTopLevel {
 	function constructor (parser : Parser) {
 		super(parser, null);
 		this._locals = new LocalVariable[];
-		parser._forEachScope(function (locals, args) {
+		parser._forEachScope(function (funcName, locals, args) {
+			if (funcName != null)
+				this._locals = this._locals.concat([ funcName ]);
 			this._locals = this._locals.concat(locals);
 			for (var i in args) {
 				this._locals.push(args[i]);

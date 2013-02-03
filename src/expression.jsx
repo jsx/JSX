@@ -759,15 +759,17 @@ class ThisExpression extends Expression {
 class FunctionExpression extends Expression {
 
 	var _funcDef : MemberFunctionDefinition;
+	var _isStatement : boolean;
 
-	function constructor (token : Token, funcDef : MemberFunctionDefinition) {
+	function constructor (token : Token, funcDef : MemberFunctionDefinition, isStatement : boolean) {
 		super(token);
 		this._funcDef = funcDef;
+		this._isStatement = isStatement;
 	}
 
 	override function clone () : FunctionExpression {
 		// NOTE: funcDef is not cloned, but is later replaced in MemberFunctionDefitition#instantiate
-		return new FunctionExpression(this._token, this._funcDef);
+		return new FunctionExpression(this._token, this._funcDef, this._isStatement);
 	}
 
 	function getFuncDef () : MemberFunctionDefinition {
@@ -776,6 +778,10 @@ class FunctionExpression extends Expression {
 
 	function setFuncDef (funcDef : MemberFunctionDefinition) : void {
 		this._funcDef = funcDef;
+	}
+
+	function isStatement () : boolean {
+		return this._isStatement;
 	}
 
 	override function serialize () : variant {
@@ -789,6 +795,9 @@ class FunctionExpression extends Expression {
 		if (! this.typesAreIdentified()) {
 			context.errors.push(new CompileError(this._token, "argument / return types were not automatically deductable, please specify them by hand"));
 			return false;
+		}
+		if (this._isStatement) {
+			context.getTopBlock().localVariableStatuses.setStatus(new LocalVariable(this._funcDef.getNameToken(), this.getType()));
 		}
 		this._funcDef.analyze(context);
 		return true; // return true since everything is resolved correctly even if analysis of the function definition failed

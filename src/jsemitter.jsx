@@ -1312,7 +1312,9 @@ class _FunctionExpressionEmitter extends _OperatorExpressionEmitter {
 
 	override function _emit () : void {
 		var funcDef = this._expr.getFuncDef();
-		this._emitter._emit("(function (", funcDef.getToken());
+		if (! this._expr.isStatement())
+			this._emitter._emit("(", funcDef.getToken());
+		this._emitter._emit("function " + (funcDef.getNameToken() != null ? funcDef.name() : "") + "(", funcDef.getToken());
 		var args = funcDef.getArguments();
 		for (var i = 0; i < args.length; ++i) {
 			if (i != 0)
@@ -1323,7 +1325,9 @@ class _FunctionExpressionEmitter extends _OperatorExpressionEmitter {
 		this._emitter._advanceIndent();
 		this._emitter._emitFunctionBody(funcDef);
 		this._emitter._reduceIndent();
-		this._emitter._emit("})", funcDef.getToken());
+		this._emitter._emit("}", funcDef.getToken());
+		if (! this._expr.isStatement())
+			this._emitter._emit(")", funcDef.getToken());
 	}
 
 	override function _getPrecedence () : number {
