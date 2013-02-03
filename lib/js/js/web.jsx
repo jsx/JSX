@@ -172,7 +172,7 @@ native class Event {
 
 } // end of Event
 
-native class EventInit {
+/* dictionary */ class EventInit {
 
 	/** @see http://www.w3.org/TR/dom/ */
 	var bubbles : boolean;
@@ -200,7 +200,7 @@ native final class CustomEvent extends Event {
 } // end of CustomEvent
 
 /** @see http://www.w3.org/TR/DOM-Level-3-Events/ */
-native final class CustomEventInit extends EventInit {
+/* dictionary */ class CustomEventInit extends EventInit {
 
 	/** @see http://www.w3.org/TR/dom/ */
 	var detail : variant/*any*/;
@@ -242,7 +242,7 @@ native final class MutationObserver {
 } // end of MutationObserver
 
 /** @see http://www.w3.org/TR/dom/ */
-native final class MutationObserverInit {
+/* dictionary */ class MutationObserverInit {
 
 	var childList : boolean;
 	var attributes : boolean;
@@ -968,7 +968,7 @@ native final class MutationEvent extends Event {
 
 } // end of MutationEvent
 
-native class UIEventInit extends EventInit {
+/* dictionary */ class UIEventInit extends EventInit {
 
 	// Attributes from Event:
 	// inherits var bubbles : boolean;
@@ -982,7 +982,7 @@ native class UIEventInit extends EventInit {
 } // end of UIEventInit
 
 /** @see http://www.w3.org/TR/DOM-Level-3-Events/ */
-native final class FocusEventInit {
+/* dictionary */ class FocusEventInit {
 
 	// Attributes from Event:
 	var bubbles : boolean;
@@ -996,7 +996,7 @@ native final class FocusEventInit {
 } // end of FocusEventInit
 
 /** @see http://www.w3.org/TR/2dcontext/ */
-native final class MouseEventInit extends UIEventInit {
+/* dictionary */ class MouseEventInit extends UIEventInit {
 
 	// Attributes from Event:
 	// inherits var bubbles : boolean;
@@ -1035,7 +1035,7 @@ native final class MouseEventInit extends UIEventInit {
 } // end of MouseEventInit
 
 /** @see http://www.w3.org/TR/DOM-Level-3-Events/ */
-native final class WheelEventInit {
+/* dictionary */ class WheelEventInit {
 
 	// Attributes from Event:
 	var bubbles : boolean;
@@ -1065,7 +1065,7 @@ native final class WheelEventInit {
 } // end of WheelEventInit
 
 /** @see http://www.w3.org/TR/DOM-Level-3-Events/ */
-native final class KeyboardEventInit {
+/* dictionary */ class KeyboardEventInit {
 
 	// Attributes from Event:
 	var bubbles : boolean;
@@ -1091,7 +1091,7 @@ native final class KeyboardEventInit {
 } // end of KeyboardEventInit
 
 /** @see http://www.w3.org/TR/DOM-Level-3-Events/ */
-native final class CompositionEventInit {
+/* dictionary */ class CompositionEventInit {
 
 	// Attributes from Event:
 	var bubbles : boolean;
@@ -1135,7 +1135,7 @@ native final class XMLSerializer {
 
 } // end of XMLSerializer
 
-native final class ProgressEventInit extends EventInit {
+/* dictionary */ class ProgressEventInit extends EventInit {
 
 	var lengthComputable : boolean;
 	var loaded : number/*unsigned long long*/;
@@ -1162,7 +1162,7 @@ native final class XMLHttpRequestUpload extends XMLHttpRequestEventTarget {
 }
 
 /** @see http://www.w3.org/TR/XMLHttpRequest/ */
-native final class XMLHttpRequestOptions {
+/* dictionary */ class XMLHttpRequestOptions {
 
 	var anon : boolean;
 
@@ -3048,7 +3048,7 @@ native final class TrackEvent extends Event {
 } // end of TrackEvent
 
 /** @see http://www.w3.org/TR/html5/single-page.html */
-native final class TrackEventInit extends EventInit {
+/* dictionary */ class TrackEventInit extends EventInit {
 
 	var track : Nullable.<Object>/*object?*/;
 
@@ -3631,7 +3631,7 @@ native final class PopStateEvent extends Event {
 } // end of PopStateEvent
 
 /** @see http://www.w3.org/TR/html5/single-page.html */
-native final class PopStateEventInit extends EventInit {
+/* dictionary */ class PopStateEventInit extends EventInit {
 
 	var state : variant/*any*/;
 
@@ -3649,7 +3649,7 @@ native final class HashChangeEvent extends Event {
 } // end of HashChangeEvent
 
 /** @see http://www.w3.org/TR/html5/single-page.html */
-native final class HashChangeEventInit extends EventInit {
+/* dictionary */ class HashChangeEventInit extends EventInit {
 
 	var oldURL : string/*DOMString*/;
 	var newURL : string/*DOMString*/;
@@ -3667,7 +3667,7 @@ native final class PageTransitionEvent extends Event {
 } // end of PageTransitionEvent
 
 /** @see http://www.w3.org/TR/html5/single-page.html */
-native final class PageTransitionEventInit extends EventInit {
+/* dictionary */ class PageTransitionEventInit extends EventInit {
 
 	var persisted : boolean;
 
@@ -3868,7 +3868,7 @@ native final class DragEvent extends MouseEvent {
 } // end of DragEvent
 
 /** @see http://www.w3.org/TR/html5/single-page.html */
-native final class DragEventInit extends EventInit {
+/* dictionary */ class DragEventInit extends EventInit {
 
 	// Attributes from UIEvent:
 	var view : Nullable.<Window>;
@@ -4533,7 +4533,7 @@ native final class CloseEvent extends Event {
 } // end of CloseEvent
 
 /** @see http://www.w3.org/TR/2012/CR-websockets-20120920/ */
-native final class CloseEventInit extends EventInit {
+/* dictionary */ class CloseEventInit extends EventInit {
 
 	var wasClean : boolean;
 	var code : number/*unsigned short*/;
@@ -4650,7 +4650,7 @@ native final class StorageEvent extends Event {
 } // end of StorageEvent
 
 /** @see http://dev.w3.org/html5/webstorage/ */
-native final class StorageEventInit extends EventInit {
+/* dictionary */ class StorageEventInit extends EventInit {
 
 	var key : Nullable.<string>/*DOMString?*/;
 	var oldValue : Nullable.<string>/*DOMString?*/;
@@ -4675,7 +4675,7 @@ native final class MessageEvent extends Event {
 } // end of MessageEvent
 
 /** @see http://www.w3.org/TR/webmessaging/ */
-native final class MessageEventInit extends EventInit {
+/* dictionary */ class MessageEventInit extends EventInit {
 
 	var data : variant/*any*/;
 	var origin : string/*DOMString*/;
@@ -4757,7 +4757,7 @@ native final class ErrorEvent extends Event {
 } // end of ErrorEvent
 
 /** @see http://www.w3.org/TR/workers/ */
-native final class ErrorEventInit extends EventInit {
+/* dictionary */ class ErrorEventInit extends EventInit {
 
 	var message : string/*DOMString*/;
 	var filename : string/*DOMString*/;
@@ -4870,7 +4870,7 @@ native final class EventSource extends EventTarget {
 } // end of EventSource
 
 /** @see http://www.w3.org/TR/eventsource/ */
-native final class EventSourceInit {
+/* dictionary */ class EventSourceInit {
 
 	var withCredentials : boolean;
 
@@ -4895,7 +4895,7 @@ native class IDBKeyRange {
 } // end of IDBKeyRange
 
 /** @see http://www.w3.org/TR/2012/WD-IndexedDB-20120524/ */
-native final class IDBObjectStoreParameters {
+/* dictionary */ class IDBObjectStoreParameters {
 
 	var keyPath : Nullable.<string>/*DOMString?*/;
 	var autoIncrement : boolean;
@@ -4903,7 +4903,7 @@ native final class IDBObjectStoreParameters {
 } // end of IDBObjectStoreParameters
 
 /** @see http://www.w3.org/TR/2012/WD-IndexedDB-20120524/ */
-native final class IDBIndexParameters {
+/* dictionary */ class IDBIndexParameters {
 
 	var unique : boolean;
 	var multiEntry : boolean;
@@ -4911,7 +4911,7 @@ native final class IDBIndexParameters {
 } // end of IDBIndexParameters
 
 /** @see http://www.w3.org/TR/2012/WD-IndexedDB-20120524/ */
-native final class IDBVersionChangeEventInit extends EventInit {
+/* dictionary */ class IDBVersionChangeEventInit extends EventInit {
 
 	var oldVersion : number/*unsigned long long*/;
 	var newVersion : Nullable.<number>/*unsigned long long?*/;
@@ -5205,7 +5205,7 @@ native final class Notification extends EventTarget {
 } // end of Notification
 
 /** @see http://www.w3.org/TR/2012/WD-notifications-20120614/ */
-native final class NotificationOptions {
+/* dictionary */ class NotificationOptions {
 
 	var titleDir : string/*NotificationDirection*/;
 	var body : string/*DOMString*/;
@@ -5236,7 +5236,7 @@ native final class RTCSessionDescription {
 } // end of RTCSessionDescription
 
 /** @see http://dev.w3.org/2011/webrtc/editor/webrtc.html */
-native final class RTCSessionDescriptionInit {
+/* dictionary */ class RTCSessionDescriptionInit {
 
 	var type : string/*RTCSdpType*/;
 	var sdp : string/*DOMString*/;
@@ -5256,7 +5256,7 @@ native final class RTCIceCandidate {
 } // end of RTCIceCandidate
 
 /** @see http://dev.w3.org/2011/webrtc/editor/webrtc.html */
-native final class RTCIceCandidateInit {
+/* dictionary */ class RTCIceCandidateInit {
 
 	var candidate : string/*DOMString*/;
 	var sdpMid : string/*DOMString*/;
@@ -5265,7 +5265,7 @@ native final class RTCIceCandidateInit {
 } // end of RTCIceCandidateInit
 
 /** @see http://dev.w3.org/2011/webrtc/editor/webrtc.html */
-native final class RTCIceServer {
+/* dictionary */ class RTCIceServer {
 
 	var url : string/*DOMString*/;
 	var credential : Nullable.<string>/*nullable DOMString*/;
@@ -5273,7 +5273,7 @@ native final class RTCIceServer {
 } // end of RTCIceServer
 
 /** @see http://dev.w3.org/2011/webrtc/editor/webrtc.html */
-native final class RTCConfiguration {
+/* dictionary */ class RTCConfiguration {
 
 	var iceServers : RTCIceServer[];
 
@@ -5346,7 +5346,7 @@ native final class DataChannel {
 } // end of DataChannel
 
 /** @see http://dev.w3.org/2011/webrtc/editor/webrtc.html */
-native final class DataChannelInit {
+/* dictionary */ class DataChannelInit {
 
 	var reliable : boolean;
 
@@ -5362,7 +5362,7 @@ native final class RTCPeerConnectionIceEvent extends Event {
 } // end of RTCPeerConnectionIceEvent
 
 /** @see http://dev.w3.org/2011/webrtc/editor/webrtc.html */
-native final class RTCPeerConnectionIceEventInit extends EventInit {
+/* dictionary */ class RTCPeerConnectionIceEventInit extends EventInit {
 
 	var candidate : RTCIceCandidate;
 
@@ -5378,7 +5378,7 @@ native final class MediaStreamEvent extends Event {
 } // end of MediaStreamEvent
 
 /** @see http://dev.w3.org/2011/webrtc/editor/webrtc.html */
-native final class MediaStreamEventInit extends EventInit {
+/* dictionary */ class MediaStreamEventInit extends EventInit {
 
 	var stream : MediaStream;
 
@@ -5394,7 +5394,7 @@ native final class DataChannelEvent extends Event {
 } // end of DataChannelEvent
 
 /** @see http://dev.w3.org/2011/webrtc/editor/webrtc.html */
-native final class DataChannelEventInit extends EventInit {
+/* dictionary */ class DataChannelEventInit extends EventInit {
 
 	var channel : DataChannel;
 
@@ -5463,7 +5463,7 @@ native __fake__ class NavigatorUserMedia {
 } // end of NavigatorUserMedia
 
 /** @see http://www.w3.org/TR/mediacapture-streams/ */
-native final class MediaStreamConstraints {
+/* dictionary */ class MediaStreamConstraints {
 
 	var video : variant/*(boolean or MediaTrackConstraints)*/;
 	var audio : variant/*(boolean or MediaTrackConstraints)*/;
@@ -5471,7 +5471,7 @@ native final class MediaStreamConstraints {
 } // end of MediaStreamConstraints
 
 /** @see http://www.w3.org/TR/mediacapture-streams/ */
-native final class MediaTrackConstraints {
+/* dictionary */ class MediaTrackConstraints {
 
 	var mandatory : Nullable.<Map.<variant>>/*MediaTrackConstraintSet?*/;
 	var optional : Nullable.<Map.<variant>[]>/*MediaTrackConstraint[]?*/;
@@ -6009,7 +6009,7 @@ native final class TextMetrics {
 } // end of TextMetrics
 
 /** @see http://www.w3.org/TR/2dcontext/ */
-native final class HitRegionOptions {
+/* dictionary */ class HitRegionOptions {
 
 	var path : Nullable.<Path>;
 	var id : string/*DOMString*/;
@@ -6059,7 +6059,7 @@ native final class Path extends CanvasPathMethods {
 } // end of Path
 
 /** @see https://www.khronos.org/registry/webgl/specs/latest/webgl.idl */
-native final class WebGLContextAttributes {
+/* dictionary */ class WebGLContextAttributes {
 
 	var alpha : boolean;
 	var depth : boolean;
@@ -6990,7 +6990,7 @@ native final class WebGLContextEvent extends Event {
 } // end of WebGLContextEvent
 
 /** @see https://www.khronos.org/registry/webgl/specs/latest/webgl.idl */
-native final class WebGLContextEventInit extends EventInit {
+/* dictionary */ class WebGLContextEventInit extends EventInit {
 
 	var statusMessage : string/*DOMString*/;
 
@@ -7085,7 +7085,7 @@ native final class DeviceOrientationEvent extends Event {
 
 } // end of DeviceOrientationEvent
 
-native final class DeviceOrientationEventInit extends EventInit {
+/* dictionary */ class DeviceOrientationEventInit extends EventInit {
 
 	var alpha : Nullable.<number>/*double?*/;
 	var beta : Nullable.<number>/*double?*/;
@@ -7122,7 +7122,7 @@ native final class DeviceMotionEvent extends Event {
 
 } // end of DeviceMotionEvent
 
-native final class DeviceMotionEventInit extends EventInit {
+/* dictionary */ class DeviceMotionEventInit extends EventInit {
 
 	var acceleration : Nullable.<DeviceAcceleration>;
 	var accelerationIncludingGravity : Nullable.<DeviceAcceleration>;

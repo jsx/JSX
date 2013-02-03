@@ -354,6 +354,7 @@ foreach my $src(@files) {
         if($class_type !~ /\b partial \b/xms) {
             $has_definition{$class} = 1;
             $def->{spec} = $spec_name;
+            $def->{class_type} = $class_type;
         }
 
         if($base) {
@@ -622,13 +623,22 @@ foreach my $def(values %classdef) {
 
     my %seen;
 
-    my $classdecl = "native";
-    if(!$has_child{$def->{name}}) {
-        $classdecl .= " final";
+    my $classdecl = "";
+
+    if ($def->{class_type} eq "dictionary") {
+        $classdecl .= "/* dictionary */";
     }
-    if($def->{fake}) {
-        $classdecl .= " __fake__";
+    else {
+        $classdecl .= "native";
+
+        if(!$has_child{$def->{name}}) {
+            $classdecl .= " final";
+        }
+        if($def->{fake}) {
+            $classdecl .= " __fake__";
+        }
     }
+
     $classdecl .= " class $def->{name}";
 
     if($def->{base}) {
