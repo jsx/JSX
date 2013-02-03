@@ -2726,11 +2726,12 @@ class JavaScriptEmitter implements Emitter {
 	function _emitWithNullableGuard (expr : Expression, outerOpPrecedence : number) : void {
 		if (this._enableRunTimeTypeCheck && expr.getType() instanceof NullableType) {
 			var token = expr.getToken();
+			var message = token.isIdentifier() ? "null access: " + token.getValue() : "null access";
 			this._emit("(function (v) {\n", token);
 			this._advanceIndent();
 			this._emitAssertion(function () {
 				this._emit("v != null", token);
-			}, token, "null access");
+			}, token, message);
 			this._emit("return v;\n", token);
 			this._reduceIndent();
 			this._emit("}(", token);
