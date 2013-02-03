@@ -203,6 +203,10 @@ class Optimizer {
 	var _dumpLogs : boolean;
 	var _enableRunTimeTypeCheck : boolean;
 
+	static function getReleaseOptimizationCommands() : string[] {
+		return [ "lto", "no-assert", "no-log", "no-debug", "fold-const", "return-if", "inline", "dce", "unbox", "fold-const", "lcse", "dce", "fold-const", "array-length", "unclassify" ];
+	}
+
 	function constructor () {
 		this._compiler = null;
 		this._commands = new _OptimizeCommand[];
