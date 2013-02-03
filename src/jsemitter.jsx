@@ -1946,7 +1946,7 @@ class _NewExpressionEmitter extends _OperatorExpressionEmitter {
 	}
 
 	function _emitAsObjectLiteral (classDef : ClassDefinition, propertyExprs : Expression[]) : void {
-		this._emitter._emit("{", this._expr.getToken());
+		this._emitter._emit("({", this._expr.getToken());
 		var propertyIndex = 0;
 		classDef.forEachMemberVariable(function (member) {
 			if ((member.flags() & ClassDefinition.IS_STATIC) == 0) {
@@ -1958,7 +1958,7 @@ class _NewExpressionEmitter extends _OperatorExpressionEmitter {
 			}
 			return true;
 		});
-		this._emitter._emit("}", this._expr.getToken());
+		this._emitter._emit("})", this._expr.getToken());
 	}
 
 	override function _getPrecedence () : number {
