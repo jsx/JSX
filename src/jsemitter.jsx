@@ -2024,7 +2024,7 @@ class JavaScriptEmitter implements Emitter {
 		JavaScriptEmitter.initialize();
 		this._platform = platform;
 		this._output = "// generatedy by JSX compiler " + Meta.IDENTIFIER + "\n";
-		this._outputEndsWithReturn = this._output.match(/\n$/) != null;
+		this._outputEndsWithReturn = true; // see the above line
 		this._outputFile = null;
 		this._indent = 0;
 		this._emittingClass = null;
