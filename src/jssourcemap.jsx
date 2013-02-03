@@ -26,8 +26,6 @@ import "./util.jsx";
 
 native __fake__ class _SourceMapGenerator {
 	function addMapping(mapping : Map.<variant>) : void;
-
-	var _validateMapping : function () : void; // DIRTY HACK
 }
 
 native __fake__ class _SourceMapConsumer {
@@ -57,9 +55,6 @@ class SourceMapper {
 			file       : relName,
 			sourceRoot : sourceRoot
 		});
-
-		// XXX: monkey-patch to avoid source-map (0.1.0-0.1.1)'s bug
-		this._impl._validateMapping = function () : void {};
 	}
 
 	function add (generatedPos : Map.<number>, originalPos : Map.<number>) : void {

@@ -2436,15 +2436,18 @@ class JavaScriptEmitter implements Emitter {
 
 	function _addSourceMapping(token : Token) : void {
 		var lastNewLinePos = this._output.lastIndexOf("\n") + 1;
-		var genColumn = (this._output.length - lastNewLinePos) - 1;
+		var genColumn = (this._output.length - lastNewLinePos);
 		var genPos = {
 			line: this._output.match(/^/mg).length,
 			column: genColumn
 		};
-		var origPos = {
-			line: token.getLineNumber(),
-			column: token.getColumnNumber()
-		};
+		var origPos = null : Map.<number>;
+		if (! Number.isNaN(token.getLineNumber())) {
+			origPos = {
+				line: token.getLineNumber(),
+				column: token.getColumnNumber() + 1
+			};
+		}
 		var tokenValue = null : Nullable.<string>;
 		if (token.isIdentifier())
 			tokenValue = token.getValue();
