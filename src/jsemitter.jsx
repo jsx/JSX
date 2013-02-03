@@ -2434,34 +2434,40 @@ class JavaScriptEmitter implements Emitter {
 		}
 	}
 
+	function _addSourceMapping(token : Token) : void {
+		var lastNewLinePos = this._output.lastIndexOf("\n") + 1;
+		var genColumn = (this._output.length - lastNewLinePos) - 1;
+		var genPos = {
+			line: this._output.match(/^/mg).length,
+			column: genColumn
+		};
+		var origPos = {
+			line: token.getLineNumber(),
+			column: token.getColumnNumber()
+		};
+		var tokenValue = null : Nullable.<string>;
+		if (token.isIdentifier())
+			tokenValue = token.getValue();
+		var filename = token.getFilename();
+		if (filename != null) {
+			filename = this._encodeFilename(filename, "");
+		}
+		this._sourceMapper.add(genPos, origPos, filename, tokenValue);
+	}
+
 	function _emit (str : string, token : Token) : void {
 		if (str == "")
 			return;
+
 		if (this._outputEndsWithReturn && this._indent != 0) {
 			this._output += this._getIndent();
 			this._outputEndsWithReturn = false;
 		}
-		// optional source map
+
 		if(this._sourceMapper != null && token != null) {
-			var lastNewLinePos = this._output.lastIndexOf("\n") + 1;
-			var genColumn = (this._output.length - lastNewLinePos) - 1;
-			var genPos = {
-				line: this._output.match(/^/mg).length,
-				column: genColumn
-			};
-			var origPos = {
-				line: token.getLineNumber(),
-				column: token.getColumnNumber()
-			};
-			var tokenValue = null : Nullable.<string>;
-			if (token.isIdentifier())
-				tokenValue = token.getValue();
-			var filename = token.getFilename();
-			if (filename != null) {
-				filename = this._encodeFilename(filename, "");
-			}
-			this._sourceMapper.add(genPos, origPos, filename, tokenValue);
+			this._addSourceMapping(token);
 		}
+
 		str = str.replace(/\n(.)/g, (function (m : string) : string {
 			return "\n" + this._getIndent() + m.substring(1);
 		}));
