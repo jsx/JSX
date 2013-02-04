@@ -84,6 +84,10 @@ abstract class Type {
 	}
 
  	static function calcLeastCommonAncestor (type1 : Type, type2 : Type) : Type {
+		return Type.calcLeastCommonAncestor(type1, type2, false);
+	}
+
+ 	static function calcLeastCommonAncestor (type1 : Type, type2 : Type, acceptVariant : boolean) : Type {
  		if (type1.equals(type2))
  			return type1;
  		if (Type.isIntegerOrNumber(type1) && Type.isIntegerOrNumber(type2))
@@ -91,16 +95,14 @@ abstract class Type {
  		// VoidType
  		if (Type.voidType.equals(type1) || Type.voidType.equals(type2))
  			return null;
+ 		// VariantType
+ 		if (Type.variantType.equals(type1) || Type.variantType.equals(type2))
+ 			return Type.variantType;
  		// NullType
  		if (Type.nullType.equals(type1))
  			return (Type.nullType.isConvertibleTo(type2))? type2 : new NullableType(type2);
  		if (Type.nullType.equals(type2))
  			return (Type.nullType.isConvertibleTo(type1))? type1 : new NullableType(type1);
- 		if (Type.nullType.equals(type1) || Type.nullType.equals(type2))
- 			return null;
- 		// VariantType
- 		if (Type.variantType.equals(type1) || Type.variantType.equals(type2))
- 			return Type.variantType;
  		// PrimitiveTypes
  		if (type1.resolveIfNullable() instanceof PrimitiveType || type2.resolveIfNullable() instanceof PrimitiveType) {
  			if (type1.resolveIfNullable().equals(type2.resolveIfNullable()))
@@ -108,20 +110,20 @@ abstract class Type {
  			else if (Type.isIntegerOrNumber(type1.resolveIfNullable()) && Type.isIntegerOrNumber(type2.resolveIfNullable()))
  				return new NullableType(Type.numberType);
  			else
- 				return null;
+ 				return acceptVariant? Type.variantType : null;
  		}
  		// ObjectTypes
- 		if (type1.resolveIfNullable() instanceof ParsedObjectType && type2.resolveIfNullable() instanceof ParsedObjectType) {
- 			var obj1 = type1.resolveIfNullable() as ParsedObjectType;
- 			var obj2 = type2.resolveIfNullable() as ParsedObjectType;
- 			var ifaces1 = new ParsedObjectType[];
+ 		if (type1.resolveIfNullable() instanceof ObjectType && type2.resolveIfNullable() instanceof ObjectType) {
+ 			var obj1 = type1.resolveIfNullable() as ObjectType;
+ 			var obj2 = type2.resolveIfNullable() as ObjectType;
+ 			var ifaces1 = new ObjectType[];
  			for (;;) {
- 				ifaces1 = ifaces1.concat(obj1.getClassDef().implementTypes());
+ 				ifaces1 = ifaces1.concat(obj1.getClassDef().implementTypes().map.<ObjectType>((t) -> { return t; }));
  				if (obj2.isConvertibleTo(obj1))
  					break;
  				obj1 = obj1.getClassDef().extendType();
  			}
- 			if (obj1.getToken().getValue() != "Object")
+ 			if (obj1.getClassDef().className() != "Object")
  				return obj1;
  			var candidates = new Type[];
  			for (var i in ifaces1) {
@@ -156,9 +158,29 @@ abstract class Type {
  				return null;
  			}
  		}
- 		// FunctionType
- 		return null;
+		// FunctionType
+ 		if (type1.resolveIfNullable() instanceof FunctionType && type2.resolveIfNullable() instanceof FunctionType) {
+			return null;
+		}
+		// Otherwise
+ 		return acceptVariant? Type.variantType : null;
  	}
+
+	static function calcLeastCommonAncestor (types : Type[]) : Type {
+		return Type.calcLeastCommonAncestor(types, false);
+	}
+	
+	static function calcLeastCommonAncestor (types : Type[], acceptVariant : boolean) : Type {
+		if (types.length == 0)
+			return null;
+		var type = types[0];
+		for (var i = 1; i < types.length; ++i) {
+			type = Type.calcLeastCommonAncestor(type, types[i], acceptVariant);
+			if (type == null)
+				return null;
+		}
+		return type;
+	}
 }
 
 // void and null are special types
