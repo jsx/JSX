@@ -1805,6 +1805,12 @@ class _CallExpressionEmitter extends _OperatorExpressionEmitter {
 				[ calleeExpr.getExpr(), this._expr.getArguments()[0] ],
 				[ new ObjectType(classDef) as Type, Type.stringType as Type ]);
 			return true;
+		case "keys":
+			this._emitter._emitCallArguments(
+				calleeExpr.getToken(), "Object.keys(",
+				[ calleeExpr.getExpr() ],
+				[ new ObjectType(classDef) as Type ]);
+			return true;
 		default:
 			return false;
 		}
