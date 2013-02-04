@@ -85,30 +85,74 @@ class Util {
 		});
 	}
 
-	static function analyzeArgs (context : AnalysisContext, args : Expression[], parentExpr : Expression, expectedCallbackTypes : Type[][]) : Type[] {
+	static function analyzeArgs (context : AnalysisContext, args : Expression[], parentExpr : Expression, expectedTypes : Type[][]) : Type[] {
 		var argTypes = [] : Type[];
 		for (var i = 0; i < args.length; ++i) {
 			if (args[i] instanceof FunctionExpression && ! (args[i] as FunctionExpression).typesAreIdentified()) {
 				// find the only expected types, by counting the number of arguments
 				var funcDef = (args[i] as FunctionExpression).getFuncDef();
 				var expectedCallbackType = null : Type;
-				for (var j = 0; j < expectedCallbackTypes.length; ++j) {
-					if ((expectedCallbackTypes[j][i] as ResolvedFunctionType).getArgumentTypes().length == funcDef.getArguments().length) {
+				for (var j = 0; j < expectedTypes.length; ++j) {
+					if (expectedTypes[j][i] != null && expectedTypes[j][i] instanceof FunctionType && (expectedTypes[j][i] as ResolvedFunctionType).getArgumentTypes().length == funcDef.getArguments().length) {
 						if (expectedCallbackType == null) {
-							expectedCallbackType = expectedCallbackTypes[j][i];
-						} else if (Util.typesAreEqual((expectedCallbackType as ResolvedFunctionType).getArgumentTypes(), (expectedCallbackTypes[j][i] as ResolvedFunctionType).getArgumentTypes())
-							&& (expectedCallbackType as ResolvedFunctionType).getReturnType().equals((expectedCallbackTypes[j][i] as ResolvedFunctionType).getReturnType())) {
+							expectedCallbackType = expectedTypes[j][i];
+						} else if (Util.typesAreEqual((expectedCallbackType as ResolvedFunctionType).getArgumentTypes(), (expectedTypes[j][i] as ResolvedFunctionType).getArgumentTypes())
+							&& (expectedCallbackType as ResolvedFunctionType).getReturnType().equals((expectedTypes[j][i] as ResolvedFunctionType).getReturnType())) {
 							// function signatures are equal
 						} else {
 							break;
 						}
 					}
 				}
-				if (j != expectedCallbackTypes.length) {
+				if (j != expectedTypes.length) {
 					// multiple canditates, skip
 				} else if (expectedCallbackType != null) {
 					if (! funcDef.deductTypeIfUnknown(context, expectedCallbackType as ResolvedFunctionType))
 						return null;
+				}
+			} else if (args[i] instanceof ArrayLiteralExpression && (args[i] as ArrayLiteralExpression).getExprs().length == 0 && (args[i] as ArrayLiteralExpression).getType() == null) {
+				var arrayExpr = args[i] as ArrayLiteralExpression;
+				var expectedArrayType = null : Type;
+				for (var j = 0; j < expectedTypes.length; ++j) {
+					if (expectedTypes[j][i] != null
+						&& expectedTypes[j][i] instanceof ObjectType
+						&& expectedTypes[j][i].getClassDef() instanceof InstantiatedClassDefinition
+						&& (expectedTypes[j][i].getClassDef() as InstantiatedClassDefinition).getTemplateClassName() == 'Array') {
+						if (expectedArrayType == null) {
+							expectedArrayType = expectedTypes[j][i];
+						} else if (expectedArrayType.equals(expectedTypes[j][i])) {
+							// type parameters are equal
+						} else {
+							break;
+						}
+					}
+				}
+				if (j != expectedTypes.length) {
+					// multiple canditates, skip
+				} else if (expectedArrayType != null) {
+					arrayExpr.setType(expectedArrayType);
+				}
+			} else if (args[i] instanceof MapLiteralExpression && (args[i] as MapLiteralExpression).getElements().length == 0 && (args[i] as MapLiteralExpression).getType() == null) {
+				var mapExpr = args[i] as MapLiteralExpression;
+				var expectedMapType = null : Type;
+				for (var j = 0; j < expectedTypes.length; ++j) {
+					if (expectedTypes[j][i] != null
+						&& expectedTypes[j][i] instanceof ObjectType
+						&& expectedTypes[j][i].getClassDef() instanceof InstantiatedClassDefinition
+						&& (expectedTypes[j][i].getClassDef() as InstantiatedClassDefinition).getTemplateClassName() == 'Map') {
+						if (expectedMapType == null) {
+							expectedMapType = expectedTypes[j][i];
+						} else if (expectedMapType.equals(expectedTypes[j][i])) {
+							// type parameters are equal
+						} else {
+							break;
+						}
+					}
+				}
+				if (j != expectedTypes.length) {
+					// multiple canditates, skip
+				} else if (expectedMapType != null) {
+					mapExpr.setType(expectedMapType);
 				}
 			}
 			if (! args[i].analyze(context, parentExpr))
