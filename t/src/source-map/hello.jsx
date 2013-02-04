@@ -7,8 +7,8 @@ class _Main {
     var foo = 42;
     static var bar = "hi";
 
-    function getFoo() : number {
-        return this.foo;
+    function getFoo() : number[] {
+        return [this.foo].concat([999]);
     }
 
     static function run() : void {

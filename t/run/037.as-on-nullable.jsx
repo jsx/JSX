@@ -47,7 +47,7 @@ true
 NaN
 abc
 
-null access
+null access: s
 */
 class _Main {
 	static function main(args : string[]) : void {

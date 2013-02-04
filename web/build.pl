@@ -24,6 +24,7 @@ use Cwd            qw(abs_path);
 use File::Basename qw(basename dirname);
 use constant ROOT => abs_path(dirname(__FILE__));
 
+use File::Spec     qw();
 use File::Path     qw(rmtree mkpath);
 use File::Copy     qw(move copy);
 use Fatal          qw(open close);
@@ -205,27 +206,25 @@ sub process_source_map {
 
     mkpath($dest);
 
-    copy_r($src, $dest);
+    copy_r($src, $dest); # source-map demo apps
 
-    foreach my $jsx_file(glob("$project_root/example/*.jsx")) {
-        next if not modified($jsx_file, "$dest/$jsx_file");
+    foreach my $jsx_file(map { basename($_) } glob("$project_root/example/*.jsx")) {
+        next if not modified("$project_root/example/$jsx_file", "$dest/$jsx_file");
 
-        my $g = info "compile $jsx_file with --enable-source-map";
-
-        my($ok, $stdout, $stderr) = jsx(
-            #"--input-filename", basename($jsx_file),
+        my @args = (
             "--executable", "web",
             "--enable-source-map",
-            "--output", "$jsx_file.js",
-            $jsx_file);
-        $ok or die $stderr;
+            "--output", "$dest/$jsx_file.js",
+            "$project_root/example/$jsx_file");
 
-        move($jsx_file . ".js", $dest);
-        move($jsx_file . ".js.mapping", $dest);
+        my $g = info "jsx @args";
 
-        copy($jsx_file, "$dest/$jsx_file");
-        my $st = stat($jsx_file);
+        copy("$project_root/example/$jsx_file", "$dest/$jsx_file");
+        my $st = stat("$project_root/example/$jsx_file");
         utime $st->atime, $st->mtime, "$dest/$jsx_file";
+
+        my($ok, $stdout, $stderr) = jsx(@args);
+        $ok or die $stderr;
     }
     return;
 }

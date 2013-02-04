@@ -203,6 +203,10 @@ class Optimizer {
 	var _dumpLogs : boolean;
 	var _enableRunTimeTypeCheck : boolean;
 
+	static function getReleaseOptimizationCommands() : string[] {
+		return [ "lto", "no-assert", "no-log", "no-debug", "fold-const", "return-if", "inline", "dce", "unbox", "fold-const", "lcse", "dce", "fold-const", "array-length", "unclassify" ];
+	}
+
 	function constructor () {
 		this._compiler = null;
 		this._commands = new _OptimizeCommand[];
@@ -358,7 +362,7 @@ abstract class _OptimizeCommand {
 		}
 		for (var i = 0; nameExists(baseName + "$" + i as string); ++i)
 			;
-		var newLocal = new LocalVariable(new Token(baseName + "$" + i as string, true), type);
+		var newLocal = new LocalVariable(new Token(baseName + "$" + i as string, false), type);
 		locals.push(newLocal);
 		this.log("rewriting " + baseName + " to " + newLocal.getName().getValue());
 		return newLocal;
@@ -953,7 +957,7 @@ class _UnclassifyOptimizationCommand extends _OptimizeCommand {
 
 	function _rewriteFunctionAsStatic (funcDef : MemberFunctionDefinition) : void {
 		// first argument should be this
-		var thisArg = new ArgumentDeclaration(new Token("$this", true), new ObjectType(funcDef.getClassDef()));
+		var thisArg = new ArgumentDeclaration(new Token("$this", false), new ObjectType(funcDef.getClassDef()));
 		funcDef.getArguments().unshift(thisArg);
 		// rewrite this
 		funcDef.forEachStatement(function onStatement(statement : Statement) : boolean {
@@ -1154,7 +1158,7 @@ class _FoldConstantCommand extends _FunctionOptimizeCommand {
 		}
 		if (isEqual != null) {
 			var result = expr.getToken().getValue() == "==" ? isEqual as boolean : ! isEqual;
-			replaceCb(new BooleanLiteralExpression(new Token(result ? "true" : "false", false)));
+			replaceCb(new BooleanLiteralExpression(new Token(result ? "true" : "false", true)));
 		}
 	}
 
@@ -2908,7 +2912,7 @@ class _NoDebugCommand extends _OptimizeCommand {
 							&& (memberVariable.flags() & ClassDefinition.IS_STATIC) != 0) {
 
 						this.log("set JSX.DEBUG = " + stash.debugValue as  string);
-						var falseExpr = new BooleanLiteralExpression(new Token(stash.debugValue as string, false));
+						var falseExpr = new BooleanLiteralExpression(new Token(stash.debugValue as string, true));
 						memberVariable.setInitialValue(falseExpr);
 						return false;
 					}

@@ -3,12 +3,12 @@
 *~
 *.swp
 *.zip
-_builtins.js
 *.log
 CodeMirror-*
 bootstrap/
+tmp/
 
-# products
+# build products
 
 try/
 doc/

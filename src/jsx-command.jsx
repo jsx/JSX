@@ -43,20 +43,20 @@ class JSXCommand {
 			"Usage: jsx [options] source-files\n" +
 			"\n" +
 			"Options:\n" +
-			"  --add-search-path path     add a path to library search paths\n" +
-			"  --executable RUNENV        add launcher to call _Main.main(:string[]):void\n" +
+			"  --add-search-path path     adds a path to library search paths\n" +
+			"  --executable RUNENV        adds launcher to call _Main.main(:string[]):void\n" +
 			"                             supported RUNENV is node, commonjs and node.\n" +
 			"  --run                      runs _Main.main(:string[]):void after compiling\n" +
 			"  --test                     runs _Test#test*():void after compiling\n" +
 			"  --output file              output file (default:stdout)\n" +
 			"  --input-filename file      names input filename\n" +
-			"  --mode (compile|parse|doc) compilation mode (default:compile)\n" +
-			"  --target (javascript|c++)  target language (default:javascript)\n" +
-			"  --release                  omits the debugging features from the generated code (run-time type checking, logging, assertion)\n" +
+			"  --mode (compile|parse|doc) specifies compilation mode (default:compile)\n" +
+			"  --target (javascript|c++)  specifies target language (default:javascript)\n" +
+			"  --release                  disables run-time type checking and enables optimizations (" + Optimizer.getReleaseOptimizationCommands().join(",")  + ")\n" +
 			"  --profile                  enables the profiler (experimental)\n" +
-			"  --optimize cmd1,cmd2,...   list of optimize commands (no-assert, no-log, inline, return-if)\n" +
-			"  --warn type1,type2,...     list types of warnings (all, deprecated, none)\n" +
-			"  --enable-type-check        enables run-time type checking\n" +
+			"  --optimize cmd1,cmd2,...   enables optimization commands\n" +
+			"  --warn type1,type2,...     enables warnings (all, deprecated, none)\n" +
+			"  --disable-type-check       disables run-time type checking\n" +
 			"  --enable-source-map        enables source map debugging info\n" +
 			"  --version                  displays the version and compiler identifier and exits\n" +
 			"  --version-number           displays the version as number and exits\n" +
@@ -169,7 +169,7 @@ class JSXCommand {
 					emitter.setEnableRunTimeTypeCheck(false);
 					optimizer.setEnableRunTimeTypeCheck(false);
 				});
-				optimizeCommands = [ "lto", "no-assert", "no-log", "no-debug", "fold-const", "return-if", "inline", "dce", "unbox", "fold-const", "lcse", "dce", "fold-const", "array-length", "unclassify" ];
+				optimizeCommands = Optimizer.getReleaseOptimizationCommands();
 				break;
 			case "--optimize":
 				if ((optarg = getoptarg()) == null) {
@@ -363,8 +363,9 @@ class JSXCommand {
 				platform.save(outputFile, output);
 				if (outputFile != null) {
 					emitter.saveSourceMappingFile(platform);
-
-					platform.makeFileExecutable(outputFile, executable);
+					if (executable != null) {
+						platform.makeFileExecutable(outputFile, executable);
+					}
 				}
 
 			}

@@ -1,7 +1,7 @@
 /*EXPECTED
 3
 null
-null access
+null access: b
 */
 class _Main {
 	static function main(args : string[]) : void {

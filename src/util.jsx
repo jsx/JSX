@@ -85,30 +85,74 @@ class Util {
 		});
 	}
 
-	static function analyzeArgs (context : AnalysisContext, args : Expression[], parentExpr : Expression, expectedCallbackTypes : Type[][]) : Type[] {
+	static function analyzeArgs (context : AnalysisContext, args : Expression[], parentExpr : Expression, expectedTypes : Type[][]) : Type[] {
 		var argTypes = [] : Type[];
 		for (var i = 0; i < args.length; ++i) {
 			if (args[i] instanceof FunctionExpression && ! (args[i] as FunctionExpression).typesAreIdentified()) {
 				// find the only expected types, by counting the number of arguments
 				var funcDef = (args[i] as FunctionExpression).getFuncDef();
 				var expectedCallbackType = null : Type;
-				for (var j = 0; j < expectedCallbackTypes.length; ++j) {
-					if ((expectedCallbackTypes[j][i] as ResolvedFunctionType).getArgumentTypes().length == funcDef.getArguments().length) {
+				for (var j = 0; j < expectedTypes.length; ++j) {
+					if (expectedTypes[j][i] != null && expectedTypes[j][i] instanceof FunctionType && (expectedTypes[j][i] as ResolvedFunctionType).getArgumentTypes().length == funcDef.getArguments().length) {
 						if (expectedCallbackType == null) {
-							expectedCallbackType = expectedCallbackTypes[j][i];
-						} else if (Util.typesAreEqual((expectedCallbackType as ResolvedFunctionType).getArgumentTypes(), (expectedCallbackTypes[j][i] as ResolvedFunctionType).getArgumentTypes())
-							&& (expectedCallbackType as ResolvedFunctionType).getReturnType().equals((expectedCallbackTypes[j][i] as ResolvedFunctionType).getReturnType())) {
+							expectedCallbackType = expectedTypes[j][i];
+						} else if (Util.typesAreEqual((expectedCallbackType as ResolvedFunctionType).getArgumentTypes(), (expectedTypes[j][i] as ResolvedFunctionType).getArgumentTypes())
+							&& (expectedCallbackType as ResolvedFunctionType).getReturnType().equals((expectedTypes[j][i] as ResolvedFunctionType).getReturnType())) {
 							// function signatures are equal
 						} else {
 							break;
 						}
 					}
 				}
-				if (j != expectedCallbackTypes.length) {
+				if (j != expectedTypes.length) {
 					// multiple canditates, skip
 				} else if (expectedCallbackType != null) {
 					if (! funcDef.deductTypeIfUnknown(context, expectedCallbackType as ResolvedFunctionType))
 						return null;
+				}
+			} else if (args[i] instanceof ArrayLiteralExpression && (args[i] as ArrayLiteralExpression).getExprs().length == 0 && (args[i] as ArrayLiteralExpression).getType() == null) {
+				var arrayExpr = args[i] as ArrayLiteralExpression;
+				var expectedArrayType = null : Type;
+				for (var j = 0; j < expectedTypes.length; ++j) {
+					if (expectedTypes[j][i] != null
+						&& expectedTypes[j][i] instanceof ObjectType
+						&& expectedTypes[j][i].getClassDef() instanceof InstantiatedClassDefinition
+						&& (expectedTypes[j][i].getClassDef() as InstantiatedClassDefinition).getTemplateClassName() == 'Array') {
+						if (expectedArrayType == null) {
+							expectedArrayType = expectedTypes[j][i];
+						} else if (expectedArrayType.equals(expectedTypes[j][i])) {
+							// type parameters are equal
+						} else {
+							break;
+						}
+					}
+				}
+				if (j != expectedTypes.length) {
+					// multiple canditates, skip
+				} else if (expectedArrayType != null) {
+					arrayExpr.setType(expectedArrayType);
+				}
+			} else if (args[i] instanceof MapLiteralExpression && (args[i] as MapLiteralExpression).getElements().length == 0 && (args[i] as MapLiteralExpression).getType() == null) {
+				var mapExpr = args[i] as MapLiteralExpression;
+				var expectedMapType = null : Type;
+				for (var j = 0; j < expectedTypes.length; ++j) {
+					if (expectedTypes[j][i] != null
+						&& expectedTypes[j][i] instanceof ObjectType
+						&& expectedTypes[j][i].getClassDef() instanceof InstantiatedClassDefinition
+						&& (expectedTypes[j][i].getClassDef() as InstantiatedClassDefinition).getTemplateClassName() == 'Map') {
+						if (expectedMapType == null) {
+							expectedMapType = expectedTypes[j][i];
+						} else if (expectedMapType.equals(expectedTypes[j][i])) {
+							// type parameters are equal
+						} else {
+							break;
+						}
+					}
+				}
+				if (j != expectedTypes.length) {
+					// multiple canditates, skip
+				} else if (expectedMapType != null) {
+					mapExpr.setType(expectedMapType);
 				}
 			}
 			if (! args[i].analyze(context, parentExpr))
@@ -167,12 +211,20 @@ class Util {
 		return found;
 	}
 
+	static var _stringLiteralEncodingMap = {
+		"\0" : "\\0",
+		"\r" : "\\r",
+		"\n" : "\\n",
+		"\t" : "\\t",
+		"\"" : "\\\"",
+		"\'" : "\\\'",
+		"\\" : "\\\\"
+	};
+
 	static function encodeStringLiteral (str : string) : string {
-		var escaped = str.replace(/[\0- '"\\\u007f-\uffff]/g, function (ch) {
-			if (ch == "\0") {
-				return "\\0";
-			} else if (ch == "'" || ch == "\"" || ch == "\\") {
-				return "\\" + ch;
+		var escaped = str.replace(/[\0-\x19\\'"\u007f-\uffff]/g, function (ch) {
+			if (ch in Util._stringLiteralEncodingMap) {
+				return Util._stringLiteralEncodingMap[ch];
 			} else {
 				var t = "000" + ch.charCodeAt(0).toString(16);
 				t = t.substring(t.length - 4);
@@ -228,10 +280,10 @@ class Util {
 		return decoded;
 	}
 
-	static function resolvePath (path : string) : string {
+	static function _resolvedPathParts(path : string) : string[] {
 		var tokens = path.split("/");
 		for (var i = 0; i < tokens.length;) {
-			if (tokens[i] == ".") {
+			if (tokens[i] == "." || (i != 0 && tokens[i] == "")) {
 				tokens.splice(i, 1);
 			} else if (tokens[i] == ".." && i != 0 && tokens[i - 1] != "..") {
 				if (i == 1 && tokens[0] == "") {
@@ -244,7 +296,49 @@ class Util {
 				i++;
 			}
 		}
-		return tokens.join("/");
+		return tokens;
+	}
+
+	/**
+	 * Canonicalizes the given path. e.g. "a/x/../b" to "a/b"
+	 */
+	static function resolvePath (path : string) : string {
+		return Util._resolvedPathParts(path).join("/");
+	}
+
+	/**
+	 * Solves the relative path from <code>from</code> to <code>to</code>.
+	 * e.g. relativePath("/a/b/c", "/a/d/e") to "../d/e"
+	 */
+	static function relativePath(fromPath : string, toPath: string, isFile : boolean) : string {
+		var f = Util._resolvedPathParts(fromPath);
+		var t = Util._resolvedPathParts(toPath);
+
+		if (isFile) {
+			f.pop(); // use dirname
+		}
+
+		// trim the root
+		if (f[0] == "") {
+			f.shift();
+		}
+		if (t[0] == "") {
+			t.shift();
+		}
+		var minLen = Math.min(f.length, t.length);
+		var samePartsIndex = minLen;
+		for (var i = 0; i < minLen; ++i) {
+			if (f[i] != t[i]) {
+				samePartsIndex = i;
+				break;
+			}
+		}
+
+		var pathParts = new string[];
+		for (var i = samePartsIndex; i < f.length; ++i) {
+			pathParts.push("..");
+		}
+		return pathParts.concat(t.slice(samePartsIndex)).join("/");
 	}
 
 	static function toOrdinal(n : number) : string {

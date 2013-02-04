@@ -20,10 +20,16 @@ class _Test extends TestCase {
 	function testEncodeStringLiteral() : void {
 		this.expect(Util.encodeStringLiteral("")).toBe('""');
 		this.expect(Util.encodeStringLiteral("abc")).toBe('"abc"');
+		this.expect(Util.encodeStringLiteral(" ")).toBe('" "');
 		this.expect(Util.encodeStringLiteral('"')).toBe('"\\""');
 		this.expect(Util.encodeStringLiteral('\0')).toBe('"\\0"');
 		this.expect(Util.encodeStringLiteral('\\')).toBe('"\\\\"');
+		this.expect(Util.encodeStringLiteral('\r')).toBe('"\\r"');
+		this.expect(Util.encodeStringLiteral('\n')).toBe('"\\n"');
+		this.expect(Util.encodeStringLiteral('\t')).toBe('"\\t"');
 		this.expect(Util.encodeStringLiteral('\u0345')).toBe('"\\u0345"');
+
+		this.expect(Util.encodeStringLiteral('foo\nbar\nbaz\n')).toBe('"foo\\nbar\\nbaz\\n"');
 	}
 
 	function testDecodeStringLiteral() : void {
@@ -52,6 +58,19 @@ class _Test extends TestCase {
 		this.expect(Util.resolvePath("/a/b/c")).toBe("/a/b/c");
 		this.expect(Util.resolvePath("/a/../b")).toBe("/b");
 		this.expect(Util.resolvePath("/a/../../c")).toBe("/c");
+		this.expect(Util.resolvePath("a//b//c")).toBe("a/b/c");
+	}
+
+	function testRelativePath() : void {
+		this.expect(Util.relativePath("a/b/c", "a/b/d", false)).toBe("../d");
+		this.expect(Util.relativePath("a/b/c", "a/x/d", false)).toBe("../../x/d");
+		this.expect(Util.relativePath("/a/b/c", "a/b/d", false), "for abs path").toBe("../d");
+		this.expect(Util.relativePath("/a/b/c", "a/x/d", false), "for abs path").toBe("../../x/d");
+
+		this.expect(Util.relativePath("a/b/c", "a/b/d",  true)).toBe("d");
+		this.expect(Util.relativePath("a/b/c", "a/x/d",  true)).toBe("../x/d");
+		this.expect(Util.relativePath("/a/b/c", "a/b/d", true), "for abs path").toBe("d");
+		this.expect(Util.relativePath("/a/b/c", "a/x/d", true), "for abs path").toBe("../x/d");
 	}
 
 	function testToOrdinal() : void {

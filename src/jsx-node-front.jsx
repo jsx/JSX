@@ -43,12 +43,11 @@ class NodePlatform extends Platform {
 	var _root : string;
 
 	function constructor () {
-		var root = node.path.dirname(node.__dirname);
-		this._root = root.replace(/\\/g, "/");
+		this(node.path.dirname(node.__dirname));
 	}
 
 	function constructor (root : string) {
-		this._root = root;
+		this._root = root.replace(/\\/g, "/");
 	}
 
 	override function getRoot () : string {
@@ -196,6 +195,13 @@ class NodePlatform extends Platform {
 			process.argv = [process.argv[0], jsFile].concat(args);
 			node.require(jsFile); // evaluates it in this process
 		}
+	}
+
+	static function getEnvOpts () : string[] {
+		var opts = process.env["JSX_OPTS"];
+		if (! opts)
+			return new string[];
+		return opts.split(/\s+/);
 	}
 
 	override function runCompilationServer(arg : variant) : number {
@@ -363,15 +369,8 @@ class CompilationServer {
 
 class _Main {
 
-	static function getEnvOpts () : string[] {
-		var opts = process.env["JSX_OPTS"];
-		if (! opts)
-			return new string[];
-		return opts.split(/\s+/);
-	}
-
 	static function main (args : string[]) : void {
-		var exitCode = JSXCommand.main(new NodePlatform(), _Main.getEnvOpts().concat(args));
+		var exitCode = JSXCommand.main(new NodePlatform(), NodePlatform.getEnvOpts().concat(args));
 
 		// NOTE:
 		// nodejs 0.8.0 on Windows doesn't flush stdout buffer before exitting.

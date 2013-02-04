@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Hello, WebRTC!</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex,nofollow">
+
+    <!-- Le styles -->
+    <link href="../../assets/css/bootstrap.css" rel="stylesheet">
+    <style type="text/css">
+      body {
+        padding-top: 60px;
+        padding-bottom: 40px;
+      }
+      #jsx-out {
+        white-space: pre;
+        border: solid gray 1px;
+        padding: 10px;
+      }
+      video {
+        background-color: black;
+      }
+    </style>
+
+    <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <script src="../../build/jsx-compiler.js"></script>
+    <script>
+      JSX.require("system:src/web/jsx-web-compiler.jsx").JsxWebCompiler.begin$();
+    </script>
+    <script id="jsx-in" type="application/jsx" src="app.jsx" data-arguments="[]"></script>
+    <script>
+      //<![CDATA[
+      window.addEventListener("load", function (e) {
+        "use strict";
+        var lang = "jsx";
+        var script  = document.getElementById(lang + "-in");
+        var srcArea = document.getElementById(lang + "-out");
+        console.assert(script,  lang + "-in");
+        console.assert(srcArea, lang + "-out");
+
+        var xhr = new XMLHttpRequest();
+        xhr.open("GET", script.src);
+        xhr.onreadystatechange = function (e) {
+          if (xhr.readyState != 4) return;
+
+          var src = xhr.responseText.
+            replace(/\/\/<!\[CDATA\[\s*/, "").
+            replace(/\/\/\]\]>\s*/, "");
+          var textNode = document.createTextNode(src);
+
+          console.assert(srcArea, lang + "-out");
+          srcArea.appendChild(textNode);
+        };
+        xhr.send(null);
+      });
+      //]]>
+    </script>
+  </head>
+
+  <body>
+
+    <div class="navbar navbar-inverse navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container-fluid">
+          <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </a>
+          <a class="brand" href="/">JSX</a>
+          <div class="nav-collapse">
+            <ul class="nav">
+              <li><a href="../../">Try</a></li>
+              <li><a href="../../source-map/">Debug with SourceMap</a></li>
+              <li class="active"><a href="../../example/">Web Application Examples</a></li>
+            </ul>
+          </div><!--/.nav-collapse -->
+        </div>
+      </div>
+    </div>
+
+    <div class="container">
+      <div class="row">
+        <div class="span8">
+          <h2>Hello, WebRTC!</h2>
+        </div>
+      </div>
+      <div class="row">
+        <div class="span8">
+          <video id="video" width="400" height="300" autoplay="autoply" />
+        </div>
+        <div class="span8">
+          <a href="http://www.webrtc.org/">WebRTC</a> is an open framework for the web that enables Real Time Communications in the browser. It includes the fundamental building blocks for high quality communications on the web such as network, audio and video components used in voice and video chat applications.        </div>
+      </div>
+      <div class="row">
+        <div class="span8">
+          <div id="jsx-out"></div>
+        </div>
+      </div>
+    </div> <!-- /container -->
+
+  </body>
+</html>

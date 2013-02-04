@@ -82,7 +82,18 @@ class _Test extends PhantomTestCase {
   }
 
   function testLoadingWebExampleWebGL() : void {
-    var file = "try/example/hello-webgl/index.html";
+    var file = "try/example/webgl/index.html";
+
+    this.async( (context) -> {
+      this.page.open(file, function(status) {
+        this.expect(status, "opened " + file).toBe("success");
+        context.done();
+      });
+    }, 50000);
+  }
+
+  function testLoadingWebExampleWebRTC() : void {
+    var file = "try/example/webrtc/index.html";
 
     this.async( (context) -> {
       this.page.open(file, function(status) {

@@ -22,10 +22,10 @@
 
 import "js.jsx";
 
+import "./util.jsx";
+
 native __fake__ class _SourceMapGenerator {
 	function addMapping(mapping : Map.<variant>) : void;
-
-	var _validateMapping : function () : void; // DIRTY HACK
 }
 
 native __fake__ class _SourceMapConsumer {
@@ -50,13 +50,11 @@ class SourceMapper {
 
 	function constructor (outputFile : string, sourceRoot : Nullable.<string>) {
 		this._outputFile = outputFile;
+		var relName = outputFile.split("/").pop();
 		this._impl = SourceMapper.createSourceMapGenerator({
-			file       : outputFile,
+			file       : relName,
 			sourceRoot : sourceRoot
 		});
-
-		// XXX: monkey-patch to avoid source-map (0.1.0-0.1.1)'s bug
-		this._impl._validateMapping = function () : void {};
 	}
 
 	function add (generatedPos : Map.<number>, originalPos : Map.<number>) : void {
@@ -64,10 +62,13 @@ class SourceMapper {
 	}
 
 	function add (generatedPos : Map.<number>, originalPos : Map.<number>, sourceFile : Nullable.<string>, tokenName : Nullable.<string>) : void {
+		var relFileName = sourceFile != null
+			? Util.relativePath(this._outputFile, sourceFile, true)
+			: null;
 		this._impl.addMapping({
 			generated: generatedPos,
 			original:  originalPos,
-			source:    sourceFile,
+			source:    relFileName,
 			name:      tokenName
 		} : Map.<variant>);
 	}
@@ -81,6 +82,7 @@ class SourceMapper {
 	}
 
 	function magicToken () : string {
-		return "\n" + "//@ sourceMappingURL=" + this.getSourceMappingFile() + "\n";
+		var relName = this._outputFile.split("/").pop() + ".mapping";
+		return "\n" + "//@ sourceMappingURL=" + relName + "\n";
 	}
 }
