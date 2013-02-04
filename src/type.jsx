@@ -169,7 +169,7 @@ abstract class Type {
 	static function calcLeastCommonAncestor (types : Type[]) : Type {
 		return Type.calcLeastCommonAncestor(types, false);
 	}
-	
+
 	static function calcLeastCommonAncestor (types : Type[], acceptVariant : boolean) : Type {
 		if (types.length == 0)
 			return null;
@@ -200,7 +200,7 @@ class VoidType extends Type {
 	}
 
 	override function getClassDef () : ClassDefinition {
-		throw new Error("not supported");
+		throw new Error("VoidType#getClassDef() is not supported");
 	}
 
 	override function toString () : string {
@@ -224,7 +224,7 @@ class NullType extends Type {
 	}
 
 	override function getClassDef () : ClassDefinition {
-		throw new Error("not supported");
+		throw new Error("NullType#getClassDef() is not supported");
 	}
 
 	override function toString () : string {
@@ -340,7 +340,7 @@ class VariantType extends Type {
 	}
 
 	override function getClassDef () : ClassDefinition {
-		throw new Error("not supported");
+		throw new Error("VariantType#getClassDef() is not supported");
 	}
 
 	override function toString () : string {

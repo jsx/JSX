@@ -810,7 +810,7 @@ class _UnclassifyOptimizationCommand extends _OptimizeCommand {
 						}
 					}
 				}
-				else if (expr instanceof AsExpression) {
+				else if (expr instanceof AsExpression && expr.getType() instanceof ObjectType) {
 					var foundClassDefIndex = candidates.indexOf(expr.getType().getClassDef());
 					if (foundClassDefIndex != -1) {
 						candidates.splice(foundClassDefIndex, 1);
