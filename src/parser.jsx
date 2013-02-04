@@ -513,13 +513,15 @@ class Scope {
 
 	var prev : Scope;
 	var locals : LocalVariable[];
+	var funcName : LocalVariable; // the name of current closure, can be null
 	var arguments : ArgumentDeclaration[];
 	var statements : Statement[];
 	var closures : MemberFunctionDefinition[];
 
-	function constructor (prev : Scope, locals : LocalVariable[], args : ArgumentDeclaration[], statements : Statement[], closures : MemberFunctionDefinition[]) {
+	function constructor (prev : Scope, locals : LocalVariable[], funcName : LocalVariable, args : ArgumentDeclaration[], statements : Statement[], closures : MemberFunctionDefinition[]) {
 		this.prev = prev;
 		this.locals = locals;
+		this.funcName = funcName;
 		this.arguments = args;
 		this.statements = statements;
 		this.closures = closures;
@@ -554,6 +556,7 @@ class Parser {
 	var _templateInstantiationRequests : TemplateInstantiationRequest[];
 
 	var _prevScope : Scope = null;
+	var _funcName : LocalVariable = null;
 	var _arguments : ArgumentDeclaration[] = null;
 	var _classFlags : number;
 	var _typeArgs : Token[];
@@ -742,15 +745,17 @@ class Parser {
 		return null;
 	}
 
-	function _pushScope (args : ArgumentDeclaration[]) : void {
+	function _pushScope (funcName : LocalVariable, args : ArgumentDeclaration[]) : void {
 		this._prevScope = new Scope (
 			this._prevScope,
 			this._locals,
+			this._funcName,
 			this._arguments,
 			this._statements,
 			this._closures
 		);
 		this._locals = new LocalVariable[];
+		this._funcName = funcName;
 		this._arguments = args;
 		this._statements = new Statement[];
 		this._closures = new MemberFunctionDefinition[];
@@ -758,6 +763,7 @@ class Parser {
 
 	function _popScope () : void {
 		this._locals = this._prevScope.locals;
+		this._funcName = this._prevScope.funcName;
 		this._arguments = this._prevScope.arguments;
 		this._statements = this._prevScope.statements;
 		this._closures = this._prevScope.closures;
@@ -779,6 +785,11 @@ class Parser {
 			return null;
 		}
 
+		if (this._funcName != null) {
+			if (isEqualTo(this._funcName)) {
+				return this._funcName;
+			}
+		}
 		for (var i = 0; i < this._arguments.length; ++i) {
 			if (isEqualTo(this._arguments[i])) {
 				return this._arguments[i];
@@ -1619,6 +1630,7 @@ class Parser {
 					return null;
 			}
 			// body
+			this._funcName = null;
 			this._arguments = args;
 			this._locals = new LocalVariable[];
 			this._statements = new Statement[];
@@ -2757,12 +2769,12 @@ class Parser {
 		if (funcDef == null)
 			return null;
 		this._closures.push(funcDef);
-		return new FunctionExpression(token, funcDef);
+		return new FunctionExpression(token, funcDef, false);
 	}
 
 	function _lambdaBody (token : Token, args : ArgumentDeclaration[], returnType : Type) : MemberFunctionDefinition {
 		var openBlock = this._expectOpt("{");
-		this._pushScope(args);
+		this._pushScope(null, args);
 		try {
 			// parse lambda body
 			if (openBlock == null) {
@@ -2783,17 +2795,17 @@ class Parser {
 		return null;	// dummy
 	}
 
-	function _functionExpr (token : Token, requireTypeDeclaration : boolean) : Expression {
+	function _functionExpr (token : Token, isStatement : boolean) : Expression {
 		var name = this._expectIdentifierOpt();
-		if (requireTypeDeclaration && name == null)
+		if (isStatement && name == null)
 			return null;
 		if (this._expect("(") == null)
 			return null;
-		var args = this._functionArgumentsExpr(false, requireTypeDeclaration);
+		var args = this._functionArgumentsExpr(false, isStatement);
 		if (args == null)
 			return null;
 		var parseReturnType = false;
-		if (requireTypeDeclaration) {
+		if (isStatement) {
 			if (this._expect(":") == null)
 				return null;
 			parseReturnType = true;
@@ -2813,44 +2825,40 @@ class Parser {
 		if (this._expect("{") == null)
 			return null;
 
-		var local = null : LocalVariable;
+		var type : Type = null;
+		if (returnType != null) {
+			var argTypes = args.map.<Type>(function(arg) { return arg.getType(); });
+			type = new StaticFunctionType(token, returnType, argTypes, false);
+		}
+		var funcName : LocalVariable = null;
 		if (name != null) {
-			// add name to current scope for local function declaration
-			if (requireTypeDeclaration) {
-				var argTypes = args.map.<Type>(function(arg) { return arg.getType(); });
-				var type = new StaticFunctionType(token, returnType, argTypes, false);
-				local = this._registerLocal(name, type);
+			if (isStatement) {
+				// add name to current scope for local function declaration
+				funcName = this._registerLocal(name, type);
 			} else {
-				local = this._registerLocal(name, null);
+				funcName = new LocalVariable(name, type);
 			}
 		}
 		// parse function block
-		this._pushScope(args);
+		this._pushScope(funcName, args);
 		var lastToken = this._block();
 		if (lastToken == null) {
 			this._popScope();
 			return null;
 		}
-		var funcDef = new MemberFunctionDefinition(token, null, ClassDefinition.IS_STATIC, returnType, args, this._locals, this._statements, this._closures, lastToken, null);
+		var funcDef = new MemberFunctionDefinition(token, name, ClassDefinition.IS_STATIC, returnType, args, this._locals, this._statements, this._closures, lastToken, null);
 		this._popScope();
 		this._closures.push(funcDef);
-		var funcExpr = new FunctionExpression(token, funcDef);
-		if (name != null) {
-			// conversion from function statement to assignment expression
-			var localExpr = new LocalExpression(name, local);
-			return new AssignmentExpression(new Token("=", false, token._filename, token._lineNumber, token._columnNumber), localExpr, funcExpr);
-		} else {
-			return funcExpr;
-		}
+		return new FunctionExpression(token, funcDef, isStatement);
 	}
 
-	function _forEachScope (cb : function(:LocalVariable[],:ArgumentDeclaration[]):boolean) : boolean {
+	function _forEachScope (cb : function(:LocalVariable,:LocalVariable[],:ArgumentDeclaration[]):boolean) : boolean {
 		if (this._locals != null) {
-			if (! cb(this._locals, this._arguments)) {
+			if (! cb(this._funcName, this._locals, this._arguments)) {
 				return false;
 			}
 			for (var scope = this._prevScope; scope != null; scope = scope.prev) {
-				if (scope.locals && ! cb(scope.locals, scope.arguments)) {
+				if (scope.locals && ! cb(scope.funcName, scope.locals, scope.arguments)) {
 					return false;
 				}
 			}
@@ -2860,7 +2868,11 @@ class Parser {
 
 	function _findLocal (name : string) : LocalVariable {
 		var found = null : LocalVariable;
-		this._forEachScope(function (locals, args) {
+		this._forEachScope(function (funcName, locals, args) {
+			if (funcName != null && funcName.getName().getValue() == name) {
+				found = funcName;
+				return false;
+			}
 			for (var i = 0; i < locals.length; ++i) {
 				if (locals[i].getName().getValue() == name) {
 					found = locals[i];
@@ -2995,7 +3007,7 @@ class Parser {
 		return new MapLiteralExpression(token, elements, type);
 	}
 
-	function _functionArgumentsExpr (allowVarArgs : boolean, requireTypeDeclaration : boolean) : ArgumentDeclaration[] {
+	function _functionArgumentsExpr (allowVarArgs : boolean, isStatement : boolean) : ArgumentDeclaration[] {
 		var args = new ArgumentDeclaration[];
 		if (this._expectOpt(")") == null) {
 			var token = null : Token;
@@ -3005,7 +3017,7 @@ class Parser {
 				if (argName == null)
 					return null;
 				var argType = null : Type;
-				if (requireTypeDeclaration) {
+				if (isStatement) {
 					if (this._expect(":") == null) {
 						this._newError("type declarations are mandatory for non-expression function definition");
 						return null;

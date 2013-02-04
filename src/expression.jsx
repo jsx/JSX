@@ -532,31 +532,25 @@ class ArrayLiteralExpression extends Expression {
 				context.errors.push(new CompileError(this._token, "the type specified after ':' is not an array type"));
 				return false;
 			}
-		} else {
+			// check type of the elements
+			var expectedType = (this._type.getClassDef() as InstantiatedClassDefinition).getTypeArguments()[0].toNullableType();
 			for (var i = 0; i < this._exprs.length; ++i) {
-				var elementType = this._exprs[i].getType().resolveIfNullable();
-				if (elementType.equals(Type.nullType)) {
-					// skip
-				} else {
-					if (elementType.equals(Type.integerType))
-						elementType = Type.numberType;
-					this._type = new ObjectType(Expression.instantiateTemplate(context, this._token, "Array", [ elementType ]));
-					break;
+				var elementType = this._exprs[i].getType();
+				if (! elementType.isConvertibleTo(expectedType)) {
+					context.errors.push(new CompileError(this._token, "cannot assign '" + elementType.toString() + "' to an array of '" + expectedType.toString() + "'"));
+					succeeded = false;
 				}
 			}
-			if (this._type == null) {
+		} else {
+			var elementType = Type.calcLeastCommonAncestor(this._exprs.map.<Type>((expr) -> { return expr.getType(); }), true);
+			if (elementType == null || elementType.equals(Type.nullType)) {
 				context.errors.push(new CompileError(this._token, "could not deduce array type, please specify"));
 				return false;
 			}
-		}
-		// check type of the elements
-		var expectedType = (this._type.getClassDef() as InstantiatedClassDefinition).getTypeArguments()[0].toNullableType();
-		for (var i = 0; i < this._exprs.length; ++i) {
-			var elementType = this._exprs[i].getType();
-			if (! elementType.isConvertibleTo(expectedType)) {
-				context.errors.push(new CompileError(this._token, "cannot assign '" + elementType.toString() + "' to an array of '" + expectedType.toString() + "'"));
-				succeeded = false;
-			}
+			if (elementType.equals(Type.integerType))
+				elementType = Type.numberType;
+			elementType = elementType.resolveIfNullable();
+			this._type = new ObjectType(Expression.instantiateTemplate(context, this._token, "Array", [ elementType ]));
 		}
 		return succeeded;
 	}
@@ -653,7 +647,6 @@ class MapLiteralExpression extends Expression {
 		}
 		if (! succeeded)
 			return false;
-		var expectedType = null : Type;
 		// determine the type from the array members if the type was not specified
 		if (this._type != null && this._type == Type.variantType) {
 			// pass
@@ -663,29 +656,8 @@ class MapLiteralExpression extends Expression {
 				context.errors.push(new CompileError(this._token, "specified type is not a hash type"));
 				return false;
 			}
-			expectedType = (this._type as ParsedObjectType).getTypeArguments()[0];
-		} else if (this._type != null) {
-			context.errors.push(new CompileError(this._token, "invalid type for a map literal"));
-			return false;
-		} else {
-			for (var i = 0; i < this._elements.length; ++i) {
-				var elementType = this._elements[i].getExpr().getType();
-				if (! elementType.equals(Type.nullType)) {
-					if (elementType.equals(Type.integerType))
-						elementType = Type.numberType;
-					elementType = elementType.resolveIfNullable();
-					this._type = new ObjectType(Expression.instantiateTemplate(context, this._token, "Map", [ elementType ]));
-					expectedType = elementType;
-					break;
-				}
-			}
-			if (this._type == null) {
-				context.errors.push(new CompileError(this._token, "could not deduce hash type, please specify"));
-				return false;
-			}
-		}
-		// check type of the elements (expect when expectedType == null, meaning that it is a variant)
-		if (expectedType != null) {
+			var expectedType = (this._type as ParsedObjectType).getTypeArguments()[0];
+			// check type of the elements (expect when expectedType == null, meaning that it is a variant)
 			for (var i = 0; i < this._elements.length; ++i) {
 				var elementType = this._elements[i].getExpr().getType();
 				if (! elementType.isConvertibleTo(expectedType)) {
@@ -693,6 +665,19 @@ class MapLiteralExpression extends Expression {
 					succeeded = false;
 				}
 			}
+		} else if (this._type != null) {
+			context.errors.push(new CompileError(this._token, "invalid type for a map literal"));
+			return false;
+		} else {
+			var elementType = Type.calcLeastCommonAncestor(this._elements.map.<Type>((elt) -> { return elt.getExpr().getType(); }), true);
+			if (elementType == null || elementType.equals(Type.nullType)) {
+				context.errors.push(new CompileError(this._token, "could not deduce hash type, please specify"));
+				return false;
+			}
+			if (elementType.equals(Type.integerType))
+				elementType = Type.numberType;
+			elementType = elementType.resolveIfNullable();
+			this._type = new ObjectType(Expression.instantiateTemplate(context, this._token, "Map", [ elementType ]));
 		}
 		return succeeded;
 	}
@@ -759,15 +744,17 @@ class ThisExpression extends Expression {
 class FunctionExpression extends Expression {
 
 	var _funcDef : MemberFunctionDefinition;
+	var _isStatement : boolean;
 
-	function constructor (token : Token, funcDef : MemberFunctionDefinition) {
+	function constructor (token : Token, funcDef : MemberFunctionDefinition, isStatement : boolean) {
 		super(token);
 		this._funcDef = funcDef;
+		this._isStatement = isStatement;
 	}
 
 	override function clone () : FunctionExpression {
 		// NOTE: funcDef is not cloned, but is later replaced in MemberFunctionDefitition#instantiate
-		return new FunctionExpression(this._token, this._funcDef);
+		return new FunctionExpression(this._token, this._funcDef, this._isStatement);
 	}
 
 	function getFuncDef () : MemberFunctionDefinition {
@@ -776,6 +763,10 @@ class FunctionExpression extends Expression {
 
 	function setFuncDef (funcDef : MemberFunctionDefinition) : void {
 		this._funcDef = funcDef;
+	}
+
+	function isStatement () : boolean {
+		return this._isStatement;
 	}
 
 	override function serialize () : variant {
@@ -789,6 +780,9 @@ class FunctionExpression extends Expression {
 		if (! this.typesAreIdentified()) {
 			context.errors.push(new CompileError(this._token, "argument / return types were not automatically deductable, please specify them by hand"));
 			return false;
+		}
+		if (this._isStatement) {
+			context.getTopBlock().localVariableStatuses.setStatus(new LocalVariable(this._funcDef.getNameToken(), this.getType()));
 		}
 		this._funcDef.analyze(context);
 		return true; // return true since everything is resolved correctly even if analysis of the function definition failed
@@ -1941,7 +1935,7 @@ class CallExpression extends OperatorExpression {
 		}
 		var argTypes = Util.analyzeArgs(
 			context, this._args, this,
-			(exprType as FunctionType).getExpectedCallbackTypes(
+			(exprType as FunctionType).getExpectedTypes(
 				this._args.length,
 				! (this._expr instanceof PropertyExpression && ! exprType.isAssignable() && ! ((this._expr as PropertyExpression).getExpr() instanceof ClassExpression))));
 		if (argTypes == null)
@@ -2041,7 +2035,7 @@ class SuperExpression extends OperatorExpression {
 		// analyze args
 		var argTypes = Util.analyzeArgs(
 			context, this._args, this,
-			funcType.getExpectedCallbackTypes(this._args.length, false));
+			funcType.getExpectedTypes(this._args.length, false));
 		if (argTypes == null)
 			return false;
 		// deduce
@@ -2130,7 +2124,7 @@ class NewExpression extends OperatorExpression {
 		}
 		var argTypes = Util.analyzeArgs(
 			context, this._args, this,
-			ctors.getExpectedCallbackTypes(this._args.length, false));
+			ctors.getExpectedTypes(this._args.length, false));
 		if (argTypes == null)
 			return false;
 		if ((this._constructor = ctors.deduceByArgumentTypes(context, this._token, argTypes, false)) == null) {
