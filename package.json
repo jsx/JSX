@@ -36,6 +36,6 @@
   },
   "scripts" : {
       "test" : "make test JOBS=1 SKIP_PHANTOMJS_TEST=1",
-      "prepublish" : "make && make test"
+      "prepublish" : "JSX_OPTS=--release make && make test"
   }
 }
