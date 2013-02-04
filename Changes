@@ -2,12 +2,20 @@ Revision history for the JSX software development kit
 
 NEXT
     [CHANGES]
-    - Removed web-intns from web.jsx; it has been remoed from Chrome, too.
-    - Added webrtc to web.jsx (see web/example/webrtc/ for example)
+    - Removed web-intens from web.jsx; it has been remoed even from Chrome.
+    - The scope of named function expression are now ECMA-262 compatible (#108)
+
+    [FEATURES]
     - Uses high resolution time in profiler if available
+    - Added webrtc to web.jsx (see web/example/webrtc/ for example)
+    - Added type deduction on common element type for array and map literal (#107)
+    - Added type deduction on empty array / map literals (#50, #106)
+    - Added Map.<T>#keys() (#102, #105)
 
     [BUG FIXES]
-    - Fixed messages on argument mismatch errors (#104)
+    - Fixed confusing messages on argument mismatch errors (#104)
+    - Fixed an issue that associativitiy of equality expressions might be ignored (#88)
+    - Fixed several compiler crashes
 
 0.9.4 2013-01-31 19:31:16
     [BUG FIXES]
