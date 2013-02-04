@@ -2,6 +2,7 @@
 # utility to format JSX completion for testing
 use strict;
 use warnings;
+use tool::Util;
 use JSON;
 
 my $j = JSON->new->pretty(1);
