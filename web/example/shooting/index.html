@@ -19,12 +19,8 @@
         text-align: right;
       }
     </style>
-    <script src="../../build/jsx-compiler.js"></script>
-    <script>
-      JSX.require("system:src/web/jsx-web-compiler.jsx").JsxWebCompiler.begin$();
-      JSX.require("system:src/web/jsx-web-compiler.jsx").JsxWebCompiler.setOptimizationLevel$N(1);
-    </script>
-    <script type="application/jsx" src="shooting.jsx"></script>
+    <script src="../../build/jsx-script-loader.jsx.js"></script>
+    <script type="application/jsx" src="shooting.jsx" data-optimization-level="1"></script>
     <script src="shooting.js"></script>
     <script>
       window.addEventListener("load", function(e) {

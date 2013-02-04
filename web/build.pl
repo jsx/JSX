@@ -70,11 +70,15 @@ my $web_root = ROOT;
 
     if (modified("$project_root/src", "$dest_root/src")) {
         process_jsx(
-            "$project_root/src/web/jsx-web-front.jsx",
-            "$dest_root/assets/js/jsx-web-front.jsx.js");
+            "$project_root/src/web/playground.jsx",
+            "$dest_root/build/playground.jsx.js",
+            "--executable", "web"
+        );
         process_jsx(
-            "$project_root/src/web/jsx-web-compiler.jsx",
-            "$dest_root/build/jsx-compiler.js");
+            "$project_root/src/web/jsx-script-loader.jsx",
+            "$dest_root/build/jsx-script-loader.jsx.js",
+            "--executable", "web"
+        );
     }
 
     process_source_map($project_root, "$web_root/source-map", "$dest_root/source-map");

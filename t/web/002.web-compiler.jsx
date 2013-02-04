@@ -168,6 +168,20 @@ class _Test extends PhantomTestCase {
       });
     }, 50000);
   }
+
+  function testLoadingWebIndex() : void {
+    var file = "try/index.html";
+    //var prefix = "http://0:" + this.port as string + "/";
+
+    //file += "#debug"
+
+    this.async( (context) -> {
+      this.page.open(file, function(status) {
+        this.expect(status, "opened " + file).toBe("success");
+        context.done();
+      });
+    }, 50000);
+  }
 }
 
 // vim: set tabstop=2 shiftwidth=2 expandtab:

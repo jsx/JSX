@@ -1,5 +1,5 @@
 var JSX = {};
-(function () {
+(function (JSX) {
 
 /**
  * copies the implementations from source interface to target

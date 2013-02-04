@@ -99,7 +99,7 @@ class ScriptLoader {
 		console.log("jsx-script-loader: load " + sourceFile + " in " + (Date.now() - t0) as string + " ms.");
 
 		var applicationArguments = script.getAttribute("data-arguments");
-		if (applicationArguments) {
+		if (applicationArguments) { // run it if data-argumenrs is supplied
 			var args = JSON.parse(applicationArguments);
 			if (args instanceof Array.<variant>) {
 				var array = args as Array.<variant>;
@@ -113,8 +113,10 @@ class ScriptLoader {
 				throw new TypeError("Not an array of string: " + applicationArguments);
 			}
 			platform.debug(Util.format("run _Main.main()@%1 with %2", [sourceFile, applicationArguments]));
-			var jsxRequire = js.eval('JSX.require') as (string) -> variant;
-			// JSX.require(sourceFile)._Main.main$AS(args)
+			var jsxModule = js.global['JSX'];
+			assert jsxModule != null;
+			var jsxRequire = jsxModule['require'] as (string) -> variant;
+			assert jsxRequire != null;
 			var jsxRuntime = jsxRequire(sourceFile);
 			assert jsxRuntime != null;
 			var jsxMain    = jsxRuntime["_Main"];
@@ -124,3 +126,8 @@ class ScriptLoader {
 	}
 }
 
+class _Main {
+	static function main(args : string[]) : void {
+		ScriptLoader.load();
+	}
+}

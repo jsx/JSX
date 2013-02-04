@@ -3,6 +3,9 @@
  */
 JSX.runMain = function (sourceFile, args) {
 	var module = JSX.require(sourceFile);
+	if (! module) {
+		throw new Error("entry point module not found in " + sourceFile);
+	}
 
 	if (! module._Main) {
 		throw new Error("entry point _Main not found in " + sourceFile);

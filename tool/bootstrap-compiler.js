@@ -21345,7 +21345,7 @@ JavaScriptEmitter.prototype.getOutput$SUSUS = function (sourceFile, entryPoint, 
 	if (entryPoint != null) {
 		output = this._platform.addLauncher$LEmitter$XSSS(this, this._encodeFilename$SS(sourceFile, "system:"), output, entryPoint, executableFor);
 	}
-	output += "})();\n";
+	output += "})(JSX);\n";
 	if (this._sourceMapper) {
 		output += this._sourceMapper.magicToken$();
 	}

@@ -2228,7 +2228,7 @@ class JavaScriptEmitter implements Emitter {
 		if (entryPoint != null) {
 			output = this._platform.addLauncher(this, this._encodeFilename(sourceFile, "system:"), output, entryPoint, executableFor);
 		}
-		output += "})();\n";
+		output += "})(JSX);\n";
 		if (this._sourceMapper) {
 			output += this._sourceMapper.magicToken();
 		}
