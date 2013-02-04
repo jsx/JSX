@@ -810,6 +810,15 @@ class _UnclassifyOptimizationCommand extends _OptimizeCommand {
 						}
 					}
 				}
+				else if (expr instanceof AsExpression) {
+					var foundClassDefIndex = candidates.indexOf(expr.getType().getClassDef());
+					if (foundClassDefIndex != -1) {
+						candidates.splice(foundClassDefIndex, 1);
+						if (candidates.length == 0) {
+							return false;
+						}
+					}
+				}
 				return expr.forEachExpression(onExpr);
 			}
 			classDef.forEachMemberFunction(function onFunction(funcDef : MemberFunctionDefinition) : boolean {
