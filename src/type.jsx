@@ -560,7 +560,8 @@ abstract class FunctionType extends Type {
 
 	abstract function getObjectType() : Type;
 
-	abstract function getExpectedCallbackTypes (numberOfArgs : number, isStatic : boolean) : Type[][];
+	// used for left to right deduction of callback function types and empty literals
+	abstract function getExpectedTypes (numberOfArgs : number, isStatic : boolean) : Type[][];
 
 	abstract function deduceByArgumentTypes (context : AnalysisContext, operatorToken : Token, argTypes : Type[], isStatic : boolean) : ResolvedFunctionType;
 
@@ -629,11 +630,10 @@ class FunctionChoiceType extends FunctionType {
 		return null;
 	}
 
-	// used for left to right deduction of callback function types
-	override function getExpectedCallbackTypes (numberOfArgs : number, isStatic : boolean) : Type[][] {
+	override function getExpectedTypes (numberOfArgs : number, isStatic : boolean) : Type[][] {
 		var expected = new Type[][];
 		for (var i = 0; i < this._types.length; ++i)
-			this._types[i]._getExpectedCallbackTypes(expected, numberOfArgs, isStatic);
+			this._types[i]._getExpectedTypes(expected, numberOfArgs, isStatic);
 		return expected;
 	}
 
@@ -765,20 +765,38 @@ class ResolvedFunctionType extends FunctionType {
 		return true;
 	}
 
-	override function getExpectedCallbackTypes (numberOfArgs : number, isStatic : boolean) : Type[][] {
+	override function getExpectedTypes (numberOfArgs : number, isStatic : boolean) : Type[][] {
 		var expected = new Type[][];
-		this._getExpectedCallbackTypes(expected, numberOfArgs, isStatic);
+		this._getExpectedTypes(expected, numberOfArgs, isStatic);
 		return expected;
 	}
 
-	function _getExpectedCallbackTypes (expected : Type[][], numberOfArgs : number, isStatic : boolean) : void {
+	function _getExpectedTypes (expected : Type[][], numberOfArgs : number, isStatic : boolean) : void {
 		if ((this instanceof StaticFunctionType) != isStatic)
 			return;
-		if (this._argTypes.length != numberOfArgs)
+		var argTypes = new Type[];
+		if (this._argTypes.length > 0 && numberOfArgs >= this._argTypes.length
+		    && this._argTypes[this._argTypes.length - 1] instanceof VariableLengthArgumentType) {
+			for (var i = 0; i < numberOfArgs; ++i) {
+				if (i < this._argTypes.length - 1) {
+					argTypes[i] = this._argTypes[i];
+				} else {
+					argTypes[i] = (this._argTypes[this._argTypes.length - 1] as VariableLengthArgumentType).getBaseType();
+				}
+			}
+		} else if (this._argTypes.length == numberOfArgs) {
+			argTypes = this._argTypes;
+		} else {
+			// fail
 			return;
+		}
 		var hasCallback = false;
-		var callbackArgTypes = this._argTypes.map.<Type>(function (argType) {
-			if (argType instanceof StaticFunctionType) {
+		var callbackArgTypes = argTypes.map.<Type>(function (argType) {
+			var typeName = '';
+			if (argType instanceof StaticFunctionType
+				|| (argType instanceof ObjectType
+					&& argType.getClassDef() instanceof InstantiatedClassDefinition
+					&& ((typeName = (argType.getClassDef() as InstantiatedClassDefinition).getTemplateClassName()) == 'Array' || typeName == 'Map'))) {
 				hasCallback = true;
 				return argType;
 			} else {
@@ -787,7 +805,6 @@ class ResolvedFunctionType extends FunctionType {
 		});
 		if (hasCallback)
 			expected.push(callbackArgTypes);
-
 	}
 
 	override function toString () : string {
