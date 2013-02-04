@@ -18,7 +18,6 @@ class _Main {
 		return new MyObject(100);
 	}
 	static function main(args : string[]) : void {
-		// "as" disturbs unclassify
 		log (_Main.f() as MyObject).x;
 	}
 }
