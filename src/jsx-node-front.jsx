@@ -1,5 +1,5 @@
 /***
-  The Front-End of bin/jsx for NodeJS
+  The entry point module of JSX compiler on NodeJS
  */
 
 /*

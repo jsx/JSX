@@ -24,6 +24,7 @@ import "js.jsx";
 import "console.jsx";
 import "js/web.jsx";
 import "./browser-platform.jsx";
+
 import "../compiler.jsx";
 import "../optimizer.jsx";
 import "../jsemitter.jsx";
@@ -47,78 +48,79 @@ class ScriptLoader {
 				}
 				ScriptLoader.seen[id] = true;
 
-				var t0 = Date.now();
-
-				var platform = new BrowserPlatform();
-				var c = new Compiler(platform);
-				var o = new Optimizer();
-				var emitter = new JavaScriptEmitter(platform);
-				c.setEmitter(emitter);
-
-				var sourceFile;
-				if(script.src) {
-					sourceFile = script.src.replace(/^.*\//, "");
-				}
-				else {
-					sourceFile = "<script>";
-					platform.setContent(sourceFile, script.innerHTML);
-				}
-				c.addSourceFile(null, sourceFile);
-
-				if(ScriptLoader.optimizationLevel > 0) {
-					var optimizeCommands = [ "lto", "no-assert", "fold-const", "return-if", "inline", "dce", "unbox", "fold-const", "lcse", "dce", "fold-const", "array-length", "unclassify" ];
-					o.setup(optimizeCommands);
-					o.setEnableRunTimeTypeCheck(false);
-					emitter.setEnableRunTimeTypeCheck(false);
-				}
-
-				c.setOptimizer(o);
-
-				if(! c.compile()) {
-					throw new Error("Failed to compile!");
-				}
-
-				var output = emitter.getOutput(sourceFile, null, null);
-
-				if(ScriptLoader.optimizationLevel > 1) {
-					output = platform.applyClosureCompiler(output, "SIMPLE_OPTIMIZATIONS", false);
-				}
-
-				var compiledScript = dom.document.createElement("script");
-				var scriptSection  = dom.document.createTextNode(output);
-				compiledScript.appendChild(scriptSection);
-				script.parentNode.appendChild(compiledScript);
-
-				console.log("jsx-script-loader: load " + sourceFile + " in " + (Date.now() - t0) as string + " ms.");
-
-				var applicationArguments = script.getAttribute("data-arguments");
-				if (applicationArguments) {
-					var args = JSON.parse(applicationArguments);
-					if (typeof(args) == 'object' && (args as Object) instanceof Array.<variant>) {
-						var array = args as Array.<variant>;
-						for (var i = 0; i < array.length; ++i) {
-							if (typeof array[i]  != "string") {
-								throw new TypeError("Not an array of string: arguments[i] is " + JSON.stringify(array[i]));
-							}
-						}
-					}
-					else {
-						throw new TypeError("Not an array of string: " + applicationArguments);
-					}
-					platform.debug(Util.format("run _Main.main()@%1 with %2", [sourceFile, applicationArguments]));
-					// the name must be eval
-					var eval = js.global['eval'] as (string) -> variant;
-					var jsxRequire = eval('JSX.require') as (string) -> variant;
-					// JSX.require(sourceFile)._Main.main$AS(args)
-					var jsxRuntime = jsxRequire(sourceFile);
-					assert jsxRuntime != null;
-					var jsxMain    = jsxRuntime["_Main"];
-					assert jsxMain != null;
-					js.invoke(jsxMain, "main$AS", [ args ]);
-				}
+				ScriptLoader.loadScript(script);
 			}
 		}
 	}
 
+	static function loadScript(script : HTMLScriptElement) : void {
+		var t0 = Date.now();
+
+		var platform = new BrowserPlatform();
+		var c = new Compiler(platform);
+		var o = new Optimizer();
+		var emitter = new JavaScriptEmitter(platform);
+		c.setEmitter(emitter);
+
+		var sourceFile;
+		if(script.src) {
+			sourceFile = script.src.replace(/^.*\//, "");
+		}
+		else {
+			sourceFile = "<script>";
+			platform.setContent(sourceFile, script.innerHTML);
+		}
+		c.addSourceFile(null, sourceFile);
+
+		if(ScriptLoader.optimizationLevel > 0) {
+			var optimizeCommands = Optimizer.getReleaseOptimizationCommands().filter((command) -> { return command != "no-log"; });
+			o.setup(optimizeCommands);
+			o.setEnableRunTimeTypeCheck(false);
+			emitter.setEnableRunTimeTypeCheck(false);
+		}
+
+		c.setOptimizer(o);
+
+		if(! c.compile()) {
+			throw new Error("Failed to compile!");
+		}
+
+		var output = emitter.getOutput(sourceFile, null, null);
+
+		if(ScriptLoader.optimizationLevel > 1) {
+			output = platform.applyClosureCompiler(output, "SIMPLE_OPTIMIZATIONS", false);
+		}
+
+		var compiledScript = dom.document.createElement("script");
+		var scriptSection  = dom.document.createTextNode(output);
+		compiledScript.appendChild(scriptSection);
+		script.parentNode.appendChild(compiledScript);
+
+		console.log("jsx-script-loader: load " + sourceFile + " in " + (Date.now() - t0) as string + " ms.");
+
+		var applicationArguments = script.getAttribute("data-arguments");
+		if (applicationArguments) {
+			var args = JSON.parse(applicationArguments);
+			if (args instanceof Array.<variant>) {
+				var array = args as Array.<variant>;
+				for (var i = 0; i < array.length; ++i) {
+					if (typeof array[i]  != "string") {
+						throw new TypeError("Not an array of string: arguments[i] is " + JSON.stringify(array[i]));
+					}
+				}
+			}
+			else {
+				throw new TypeError("Not an array of string: " + applicationArguments);
+			}
+			platform.debug(Util.format("run _Main.main()@%1 with %2", [sourceFile, applicationArguments]));
+			var jsxRequire = js.eval('JSX.require') as (string) -> variant;
+			// JSX.require(sourceFile)._Main.main$AS(args)
+			var jsxRuntime = jsxRequire(sourceFile);
+			assert jsxRuntime != null;
+			var jsxMain    = jsxRuntime["_Main"];
+			assert jsxMain != null;
+			js.invoke(jsxMain, "main$AS", [ args ]);
+		}
+	}
 }
 
