@@ -113,7 +113,7 @@ class AnalysisContext {
 		this.statement = null;
 	}
 
-	function clone () : Object {
+	function clone () : AnalysisContext {
 		// NOTE: does not clone the blockStack (call setBlockStack)
 		return new AnalysisContext(this.errors, this.parser, this.postInstantiationCallback).setFuncDef(this.funcDef);
 	}
@@ -907,7 +907,7 @@ class MemberVariableDefinition extends MemberDefinition {
 	}
 
 	function setAnalysisContext (context : AnalysisContext) : void {
-		this._analysisContext = context.clone() as AnalysisContext;
+		this._analysisContext = context.clone();
 	}
 
 	override function getType () : Type {
@@ -1129,7 +1129,7 @@ class MemberFunctionDefinition extends MemberDefinition implements Block {
 			return;
 
 		// setup context
-		var context = (outerContext.clone() as AnalysisContext).setFuncDef(this);
+		var context = outerContext.clone().setFuncDef(this);
 		if (this._parent == null) {
 			context.setBlockStack([ new BlockContext(new LocalVariableStatuses(this, null), this) ]);
 		} else {
@@ -1591,7 +1591,7 @@ class ArgumentDeclaration extends LocalVariable {
 		super(name, type);
 	}
 
-	function clone () : Object {
+	function clone () : ArgumentDeclaration {
 		return new ArgumentDeclaration(this._name, this._type);
 	}
 
