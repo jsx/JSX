@@ -1584,7 +1584,8 @@ class _DeadCodeEliminationOptimizeCommand extends _FunctionOptimizeCommand {
 						var propertyName = (firstExpr as PropertyExpression).getIdentifierToken().getValue();
 						onExpr(assignmentExpr.getSecondExpr(), null);
 						if (lastAssignExpr[propertyName]
-								   && baseExprsAreEqual((firstExpr as PropertyExpression).getExpr(), (lastAssignExpr[propertyName].first.getFirstExpr() as PropertyExpression).getExpr())) {
+								&& lastAssignExpr[propertyName].second != null
+								&& baseExprsAreEqual((firstExpr as PropertyExpression).getExpr(), (lastAssignExpr[propertyName].first.getFirstExpr() as PropertyExpression).getExpr())) {
 							lastAssignExpr[propertyName].second(lastAssignExpr[propertyName].first.getSecondExpr());
 						}
 						lastAssignExpr[propertyName] = new Tuple.<AssignmentExpression, function(:Expression):void>(assignmentExpr, rewriteCb);
