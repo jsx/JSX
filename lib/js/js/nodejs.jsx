@@ -221,10 +221,13 @@ native __fake__ class _fs {
 
 	function readSync(fd : int, buffer : Buffer, offset : int, length : int) : int;
 	function readSync(fd : int, buffer : Buffer, offset : int, length : int, position : int) : int;
-	function readFileSync(filename : string) : string;
+	function readFileSync(filename : string) : Buffer;
+	function readFileSync(filename : string, encoding : string) : string;
 
 	function writeSync(fd : int, buffer : Buffer, offset : int, length : int, position : int) : int;
+	function writeFileSync(filename : string, data : Buffer) : void;
 	function writeFileSync(filename : string, data : string) : void;
+	function writeFileSync(filename : string, data : string, encoding : string) : void;
 
 	function watch(filename : string, listener : function(event:string,filename:Nullable.<string>):void) : FSWatcher;
 	function watch(filename : string, options : Map.<variant>, listener : function(event:string,filename:Nullable.<string>):void) : FSWatcher;
