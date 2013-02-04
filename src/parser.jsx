@@ -2838,7 +2838,7 @@ class Parser {
 		if (name != null) {
 			// conversion from function statement to assignment expression
 			var localExpr = new LocalExpression(name, local);
-			return new AssignmentExpression(new Token("=", true, token._filename, token._lineNumber, token._columnNumber), localExpr, funcExpr);
+			return new AssignmentExpression(new Token("=", false, token._filename, token._lineNumber, token._columnNumber), localExpr, funcExpr);
 		} else {
 			return funcExpr;
 		}
