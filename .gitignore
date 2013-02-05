@@ -6,7 +6,8 @@
 *.log
 CodeMirror-*
 bootstrap/
-tmp/
+tmp/*
+!tmp/.gitkeep
 
 # build products
 
