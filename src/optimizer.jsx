@@ -42,15 +42,6 @@ mixin Stashable {
 
 class _Util {
 
-	static function numberOfStatements (statements : Statement[]) : number {
-		var n = 0;
-		Util.forEachStatement(function onStatement(statement : Statement) : boolean {
-			++n;
-			return statement.forEachStatement(onStatement);
-		}, statements);
-		return n;
-	}
-
 	static function handleSubStatements (cb : function(:Statement[]):boolean, statement : Statement) : boolean {
 		var ret = false;
 		if (statement instanceof ContinuableStatement) {
@@ -1977,6 +1968,18 @@ class _InlineOptimizeCommand extends _FunctionOptimizeCommand {
 		}
 	}
 
+	function _isWorthInline (funcDef : MemberFunctionDefinition) : boolean {
+		// count number of statements
+		var n = 0;
+		funcDef.forEachStatement(function onStatement(statement : Statement) : boolean {
+			if (++n >= _InlineOptimizeCommand.INLINE_THRESHOLD) {
+				return false;
+			}
+			return statement.forEachStatement(onStatement);
+		});
+		return n >= _InlineOptimizeCommand.INLINE_THRESHOLD;
+	}
+
 	function _functionIsInlineable (funcDef : MemberFunctionDefinition) : boolean {
 		if ((this.getStash(funcDef) as _InlineOptimizeCommandStash).isInlineable == null) {
 			(this.getStash(funcDef) as _InlineOptimizeCommandStash).isInlineable = function () : boolean {
@@ -1987,7 +1990,7 @@ class _InlineOptimizeCommand extends _FunctionOptimizeCommand {
 				var requestsInline = (funcDef.flags() & ClassDefinition.IS_INLINE) != 0;
 				if (requestsInline) {
 					// ok
-				} else if (_Util.numberOfStatements(statements) >= _InlineOptimizeCommand.INLINE_THRESHOLD) {
+				} else if (this._isWorthInline(funcDef)) {
 					return false;
 				}
 				// no return in the middle, no function expression or super invocation expression
