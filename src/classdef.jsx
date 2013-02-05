@@ -982,6 +982,10 @@ class MemberFunctionDefinition extends MemberDefinition implements Block {
 		}
 	}
 
+	function isAnonymous() : boolean { // for anonymous function expression
+		return this._nameToken == null;
+	}
+
 	override function toString () : string {
 		var argsText = this._args.map.<string>(function (arg) {
 				return arg.getName().getValue() + " : " + arg.getType().toString();
@@ -1135,7 +1139,7 @@ class MemberFunctionDefinition extends MemberDefinition implements Block {
 		} else {
 			context.setBlockStack(outerContext.blockStack);
 			context.blockStack.push(new BlockContext(new LocalVariableStatuses(this, outerContext.getTopBlock().localVariableStatuses), this));
-			if (this._nameToken != null) { // named function expr
+			if (! this.isAnonymous()) { // named function expr
 				context.getTopBlock().localVariableStatuses._statuses[this.name()] = LocalVariableStatuses.ISSET;
 			}
 		}
