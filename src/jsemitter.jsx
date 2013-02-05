@@ -2337,19 +2337,7 @@ class JavaScriptEmitter implements Emitter {
 			if (this._enableProfiler) {
 				this._emit(
 					"var $__jsx_profiler_ctx = $__jsx_profiler.enter("
-					+ Util.encodeStringLiteral(
-						(funcDef.getClassDef() != null ? funcDef.getClassDef().className() : "<<unnamed>>")
-						+ ((funcDef.flags() & ClassDefinition.IS_STATIC) != 0 ? "." : "#")
-						+ (funcDef.getNameToken() != null ? funcDef.name() : "line_" + funcDef.getToken().getLineNumber() as string)
-						+ "("
-						+ function () : string {
-							var r = new string[];
-							funcDef.getArgumentTypes().forEach(function (argType) {
-								r.push(":" + argType.toString());
-							});
-							return r.join(", ");
-						}()
-						+ ")")
+					+ Util.encodeStringLiteral(funcDef.getNotation())
 					+ ");\n",
 					null);
 			}

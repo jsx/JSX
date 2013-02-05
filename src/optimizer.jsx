@@ -69,22 +69,6 @@ class _Util {
 		return ret;
 	}
 
-	static function getFuncName (funcDef : MemberFunctionDefinition) : string {
-		var classDef = funcDef.getClassDef();
-		var s = (classDef != null ? classDef.className(): "<<unknown>>");
-		s += (funcDef.flags() & ClassDefinition.IS_STATIC) != 0 ? "." : "#";
-		s += funcDef.getNameToken() != null ? funcDef.name() : "<<unknown>>";
-		s += "(";
-		var argTypes = funcDef.getArgumentTypes();
-		for (var i = 0; i < argTypes.length; ++i) {
-			if (i != 0)
-				s += ", ";
-			s += ":" + argTypes[i].toString();
-		}
-		s += ")";
-		return s;
-	}
-
 	static function classIsNative (classDef : ClassDefinition) : boolean {
 		return ! classDef.forEachClassToBase(function (classDef) {
 			if (classDef.className() == "Object"
@@ -381,9 +365,9 @@ abstract class _FunctionOptimizeCommand extends _OptimizeCommand {
 
 	override function performOptimization () : void {
 		function doit (funcDef : MemberFunctionDefinition) : void {
-			this.log("starting optimization of " + _Util.getFuncName(funcDef));
+			this.log("starting optimization of " + funcDef.getNotation());
 			this.optimizeFunction(funcDef);
-			this.log("finished optimization of " + _Util.getFuncName(funcDef));
+			this.log("finished optimization of " + funcDef.getNotation());
 		}
 		this.getCompiler().forEachClassDef(function (parser, classDef) {
 			classDef.forEachMemberFunction(function (funcDef) {
@@ -466,10 +450,10 @@ class _LinkTimeOptimizationCommand extends _OptimizeCommand {
 								throw new Error("a non-native, non-abstract function with out function body?");
 							var overrides = this._getOverrides(classDef, (this.getStash(classDef) as _LinkTimeOptimizationCommandStash).extendedBy, funcDef.name(), funcDef.getArgumentTypes());
 							if (overrides.length == 0) {
-								this.log("marking function as final: " + classDef.className() + "#" + funcDef.name());
+								this.log("marking function as final: " + funcDef.getNotation());
 								funcDef.setFlags(funcDef.flags() | ClassDefinition.IS_FINAL);
 							} else {
-								this.log("function has overrides, not marking as final: " + classDef.className() + "#" + funcDef.name());
+								this.log("function has overrides, not marking as final: " + funcDef.getNotation());
 							}
 						} else if ((funcDef.flags() & ClassDefinition.IS_ABSTRACT) != 0) {
 							/*
@@ -835,7 +819,7 @@ class _UnclassifyOptimizationCommand extends _OptimizeCommand {
 			candidates[candidateIndex].forEachMemberFunction(function (funcDef) {
 				if ((funcDef.flags() & ClassDefinition.IS_STATIC) == 0 && funcDef.name() == "constructor") {
 					var inliner = this._createInliner(funcDef);
-					this.log(funcDef.getClassDef().className() + "#constructor(" + funcDef.getArgumentTypes().map.<string>(function (arg) { return ":" + arg.toString(); }).join(",") + ") is" + (inliner ? "" : " not") + " inlineable");
+					this.log(funcDef.getNotation() + " is" + (inliner ? "" : " not") + " inlineable");
 					if (inliner) {
 						(this.getStash(funcDef) as _UnclassifyOptimizationCommandStash).inliner = inliner;
 						hasInlineableCtor = true;
@@ -1695,7 +1679,7 @@ class _InlineOptimizeCommand extends _FunctionOptimizeCommand {
 		// we need to the check here since functions might recurse
 		if (funcDef.getStatements() == null)
 			return true;
-		this.log("* starting optimization of " + _Util.getFuncName(funcDef));
+		this.log("* starting optimization of " + funcDef.getNotation());
 		while (true) {
 			while (true) {
 				if (! this._handleStatements(funcDef, funcDef.getStatements()))
@@ -1705,7 +1689,7 @@ class _InlineOptimizeCommand extends _FunctionOptimizeCommand {
 			if (! (this.setupCommand(new _ReturnIfOptimizeCommand()) as _ReturnIfOptimizeCommand).optimizeFunction(funcDef))
 				break;
 		}
-		this.log("* finished optimization of " + _Util.getFuncName(funcDef));
+		this.log("* finished optimization of " + funcDef.getNotation());
 		return true;
 	}
 
@@ -1731,7 +1715,7 @@ class _InlineOptimizeCommand extends _FunctionOptimizeCommand {
 				var args = this._getArgsAndThisIfCallExprIsInlineable(expr as CallExpression, true);
 				if (args != null) {
 					var callingFuncDef = _DetermineCalleeCommand.getCallingFuncDef(expr);
-					this.log("expanding " + _Util.getFuncName(callingFuncDef) + " as expression");
+					this.log("expanding " + callingFuncDef.getNotation() + " as expression");
 					var stmt = callingFuncDef.getStatements()[0];
 					if (stmt instanceof ExpressionStatement) {
 						var expr = (stmt as ExpressionStatement).getExpr();
@@ -2031,14 +2015,14 @@ class _InlineOptimizeCommand extends _FunctionOptimizeCommand {
 					return statement.forEachStatement(onStatement);
 				});
 			}();
-			this.log(_Util.getFuncName(funcDef) + ((this.getStash(funcDef) as _InlineOptimizeCommandStash).isInlineable ? " is" : " is not") + " inlineable");
+			this.log(funcDef.getNotation() + ((this.getStash(funcDef) as _InlineOptimizeCommandStash).isInlineable ? " is" : " is not") + " inlineable");
 		}
 		return (this.getStash(funcDef) as _InlineOptimizeCommandStash).isInlineable;
 	}
 
 	function _expandCallingFunction (callerFuncDef : MemberFunctionDefinition, statements : Statement[], stmtIndex : number, calleeFuncDef : MemberFunctionDefinition, argsAndThis : Expression[]) : number {
 		// clone statements of the calling function, while rewriting the identifiers with actual arguments
-		this.log("expanding " + _Util.getFuncName(calleeFuncDef));
+		this.log("expanding " + calleeFuncDef.getNotation());
 		var argsAndThisAndLocals = argsAndThis.concat(new Expression[]);
 		stmtIndex = this._createVars(callerFuncDef, statements, stmtIndex, calleeFuncDef, argsAndThisAndLocals);
 		var calleeStatements = calleeFuncDef.getStatements();
@@ -2192,7 +2176,7 @@ class _ReturnIfOptimizeCommand extends _FunctionOptimizeCommand {
 
 		this._altered = false;
 		this._optimizeStatements(funcDef.getStatements());
-		this.log(_Util.getFuncName(funcDef) + " " + (this._altered ? "Y" : "N"));
+		this.log(funcDef.getNotation() + " " + (this._altered ? "Y" : "N"));
 		return this._altered;
 	}
 
@@ -2793,7 +2777,7 @@ class _ArrayLengthOptimizeCommand extends _FunctionOptimizeCommand {
 			&& statement.forEachStatement(function (statement) { return this._lengthIsUnmodifiedInStatement(statement); })) {
 
 			// optimize!
-			this.log(_Util.getFuncName(funcDef) + " optimizing .length at line " + statement.getToken().getLineNumber() as string);
+			this.log(funcDef.getNotation() + " optimizing .length at line " + statement.getToken().getLineNumber() as string);
 			// create local var for array.length
 			var lengthLocal = this.createVar(funcDef, Type.integerType, arrayLocal.getName().getValue() + "$len");
 			// assign array.length to the local

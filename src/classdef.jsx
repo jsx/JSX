@@ -986,6 +986,23 @@ class MemberFunctionDefinition extends MemberDefinition implements Block {
 		return this._nameToken == null;
 	}
 
+
+	/**
+	 * Returns a simple notation of the function like "Class.classMethod(:string):void" or "Class.instanceMethod(:string):void".
+	 */
+	function getNotation() : string {
+		var classDef = this.getClassDef();
+		var s = (classDef != null ? classDef.className(): "<<unknown>>");
+		s += (this.flags() & ClassDefinition.IS_STATIC) != 0 ? "." : "#";
+		s += this.getNameToken() != null ? this.name() : "$" +  this.getToken().getLineNumber()  as string + "_" + this.getToken().getColumnNumber() as string;
+		s += "(";
+		s += this._args.map.<string>(function (arg) {
+				return ":" + arg.getType().toString();
+			}).join(",");
+		s += ")";
+		return s;
+	}
+
 	override function toString () : string {
 		var argsText = this._args.map.<string>(function (arg) {
 				return arg.getName().getValue() + " : " + arg.getType().toString();
@@ -995,6 +1012,7 @@ class MemberFunctionDefinition extends MemberDefinition implements Block {
 			"(" + argsText + ") : " +
 			this._returnType.toString();
 	}
+
 
 	override function instantiate (instantiationContext : InstantiationContext) : MemberFunctionDefinition {
 		return this._instantiateCore(
