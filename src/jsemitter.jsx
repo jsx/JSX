@@ -34,11 +34,12 @@ import "./platform.jsx";
 import _UnclassifyOptimizationCommandStash,
 	   _NoDebugCommandStash from "./optimizer.jsx";
 
-class _Util {
 
-	/**
-	 * Originally, this function is used for the sake of optimization by Google Closure Compiler, but now JSX is faster than Closure Compiler and this method is no longer maintained.
-	 */
+/**
+ * Originally, type annotations are used for the sake of optimization by Google Closure Compiler, but now JSX is faster than Closure Compiler and this method is no longer maintained.
+ */
+class _TypeAnnotation {
+
 	static function toClosureType (type : Type) : Nullable.<string> {
 		if (type.equals(Type.booleanType)) {
 			return "!boolean";
@@ -47,13 +48,13 @@ class _Util {
 		} else if (type.equals(Type.stringType)) {
 			return "!string";
 		} else if (type instanceof NullableType) {
-			return "undefined|" + _Util.toClosureType((type as NullableType).getBaseType());
+			return "undefined|" + _TypeAnnotation.toClosureType((type as NullableType).getBaseType());
 		} else if (type instanceof ObjectType) {
 			var classDef = type.getClassDef();
 			if (classDef instanceof InstantiatedClassDefinition && (classDef as InstantiatedClassDefinition).getTemplateClassName() == "Array") {
-				return "Array.<undefined|" + _Util.toClosureType((classDef as InstantiatedClassDefinition).getTypeArguments()[0]) + ">";
+				return "Array.<undefined|" + _TypeAnnotation.toClosureType((classDef as InstantiatedClassDefinition).getTypeArguments()[0]) + ">";
 			} else if (classDef instanceof InstantiatedClassDefinition && (classDef as InstantiatedClassDefinition).getTemplateClassName() == "Map") {
-				return "Object.<string, undefined|" + _Util.toClosureType((classDef as InstantiatedClassDefinition).getTypeArguments()[0]) + ">";
+				return "Object.<string, undefined|" + _TypeAnnotation.toClosureType((classDef as InstantiatedClassDefinition).getTypeArguments()[0]) + ">";
 			} else {
 				return classDef.getOutputClassName();
 			}
@@ -65,89 +66,11 @@ class _Util {
 		return null;
 	}
 
-	static function getInstanceofNameFromClassDef (classDef : ClassDefinition) : string {
-		if (classDef instanceof InstantiatedClassDefinition) {
-			var name = (classDef as InstantiatedClassDefinition).getTemplateClassName();
-			if (name == "Map")
-				name = "Object";
-		} else {
-			name = classDef.getOutputClassName();
-		}
-		return name;
-	}
-
-	static function buildAnnotation (template : string, type : Type) : string {
-		var closureType = _Util.toClosureType(type);
+	static function build(template : string, type : Type) : string {
+		var closureType = _TypeAnnotation.toClosureType(type);
 		if (closureType == null)
 			return "";
 		return Util.format(template, [closureType]);
-	}
-
-	static function emitLabelOfStatement (emitter : JavaScriptEmitter, statement : LabellableStatement) : void {
-		var label = statement.getLabel();
-		if (label != null) {
-			emitter._reduceIndent();
-			emitter._emit(label.getValue() + ":\n", label);
-			emitter._advanceIndent();
-		}
-	}
-
-	static function getStash (stashable : Stashable) : variant {
-		var stashHash = stashable.getOptimizerStash();
-		var stash;
-		if ((stash = stashHash["jsemitter"]) == null) {
-			stash = stashHash["jsemitter"] = null;
-		}
-		return stashHash;
-	}
-
-	static function setupBooleanizeFlags (funcDef : MemberFunctionDefinition) : void {
-		var exprReturnsBoolean = function (expr : Expression) : boolean {
-			if (expr instanceof LogicalExpression) {
-				return _Util.getStash(expr)["returnsBoolean"] as boolean;
-			} else {
-				return expr.getType().equals(Type.booleanType);
-			}
-		};
-		funcDef.forEachStatement(function onStatement(statement : Statement) : boolean {
-			var parentExpr = new Expression[]; // [0] is stack top
-			statement.forEachExpression(function onExpr(expr : Expression) : boolean {
-				// handle children
-				parentExpr.unshift(expr);
-				expr.forEachExpression(onExpr);
-				parentExpr.shift();
-				// check
-				if (expr instanceof LogicalExpression) {
-					var shouldBooleanize = true;
-					var returnsBoolean = false;
-					if (exprReturnsBoolean((expr as LogicalExpression).getFirstExpr()) && exprReturnsBoolean((expr as LogicalExpression).getSecondExpr())) {
-						returnsBoolean = true;
-						shouldBooleanize = false;
-					} else if (parentExpr.length == 0) {
-						if (statement instanceof ExpressionStatement
-							|| statement instanceof IfStatement
-							|| statement instanceof DoWhileStatement
-							|| statement instanceof WhileStatement
-							|| statement instanceof ForStatement) {
-							shouldBooleanize = false;
-						}
-					} else if (parentExpr[0] instanceof LogicalExpression
-						|| parentExpr[0] instanceof LogicalNotExpression) {
-						shouldBooleanize = false;
-					} else if (parentExpr[0] instanceof ConditionalExpression && (parentExpr[0] as ConditionalExpression).getCondExpr() == expr) {
-						shouldBooleanize = false;
-					}
-					_Util.getStash(expr)["shouldBooleanize"] = shouldBooleanize;
-					_Util.getStash(expr)["returnsBoolean"] = returnsBoolean;
-				}
-				return true;
-			});
-			return statement.forEachStatement(onStatement);
-		});
-	}
-
-	static function shouldBooleanize (logicalExpr : Expression) : boolean {
-		return _Util.getStash(logicalExpr)["shouldBooleanize"] as boolean;
 	}
 
 }
@@ -163,6 +86,15 @@ abstract class _StatementEmitter {
 	}
 
 	abstract function emit () : void;
+
+	function emitLabelOfStatement (statement : LabellableStatement) : void {
+		var label = statement.getLabel();
+		if (label != null) {
+			this._emitter._reduceIndent();
+			this._emitter._emit(label.getValue() + ":\n", label);
+			this._emitter._advanceIndent();
+		}
+	}
 
 }
 
@@ -312,7 +244,7 @@ class _DoWhileStatementEmitter extends _StatementEmitter {
 	}
 
 	override function emit () : void {
-		_Util.emitLabelOfStatement(this._emitter, this._statement);
+		this.emitLabelOfStatement(this._statement);
 		this._emitter._emit("do {\n", null);
 		this._emitter._emitStatements(this._statement.getStatements());
 		this._emitter._emit("} while (", null);
@@ -332,7 +264,7 @@ class _ForInStatementEmitter extends _StatementEmitter {
 	}
 
 	override function emit () : void {
-		_Util.emitLabelOfStatement(this._emitter, this._statement);
+		this.emitLabelOfStatement(this._statement);
 		this._emitter._emit("for (", null);
 		this._emitter._getExpressionEmitterFor(this._statement.getLHSExpr()).emit(0);
 		this._emitter._emit(" in ", null);
@@ -354,7 +286,7 @@ class _ForStatementEmitter extends _StatementEmitter {
 	}
 
 	override function emit () : void {
-		_Util.emitLabelOfStatement(this._emitter, this._statement);
+		this.emitLabelOfStatement(this._statement);
 		this._emitter._emit("for (", this._statement.getToken());
 		var initExpr = this._statement.getInitExpr();
 		if (initExpr != null)
@@ -408,7 +340,7 @@ class _SwitchStatementEmitter extends _StatementEmitter {
 	}
 
 	override function emit () : void {
-		_Util.emitLabelOfStatement(this._emitter, this._statement);
+		this.emitLabelOfStatement(this._statement);
 		this._emitter._emit("switch (", this._statement.getToken());
 		this._emitter._emitWithNullableGuard(this._statement.getExpr(), 0);
 		this._emitter._emit(") {\n", null);
@@ -464,7 +396,7 @@ class _WhileStatementEmitter extends _StatementEmitter {
 	}
 
 	override function emit () : void {
-		_Util.emitLabelOfStatement(this._emitter, this._statement);
+		this.emitLabelOfStatement(this._statement);
 		this._emitter._emit("while (", this._statement.getToken());
 		this._emitter._getExpressionEmitterFor(this._statement.getExpr()).emit(0);
 		this._emitter._emit(") {\n", null);
@@ -1219,7 +1151,7 @@ class _InstanceofExpressionEmitter extends _ExpressionEmitter {
 		} else if ((expectedType.getClassDef().flags() & (ClassDefinition.IS_INTERFACE | ClassDefinition.IS_MIXIN)) == 0) {
 			this.emitWithPrecedence(outerOpPrecedence, _InstanceofExpressionEmitter._operatorPrecedence, (function () {
 				this._emitter._getExpressionEmitterFor(this._expr.getExpr()).emit(_InstanceofExpressionEmitter._operatorPrecedence);
-				this._emitter._emit(" instanceof " + _Util.getInstanceofNameFromClassDef(expectedType.getClassDef()), null);
+				this._emitter._emit(" instanceof " + this.getInstanceofNameFromClassDef(expectedType.getClassDef()), this._expr.getToken());
 			}));
 		} else {
 			this.emitWithPrecedence(outerOpPrecedence, _CallExpressionEmitter._operatorPrecedence, (function () {
@@ -1228,6 +1160,17 @@ class _InstanceofExpressionEmitter extends _ExpressionEmitter {
 				this._emitter._emit(")", this._expr.getToken());
 			}));
 		}
+	}
+
+	function getInstanceofNameFromClassDef (classDef : ClassDefinition) : string {
+		if (classDef instanceof InstantiatedClassDefinition) {
+			var name = (classDef as InstantiatedClassDefinition).getTemplateClassName();
+			if (name == "Map")
+				name = "Object";
+		} else {
+			name = classDef.getOutputClassName();
+		}
+		return name;
 	}
 
 	static var _operatorPrecedence = 0;
@@ -1506,7 +1449,7 @@ class _LogicalExpressionEmitter extends _OperatorExpressionEmitter {
 	}
 
 	override function emit (outerOpPrecedence : number) : void {
-		if (_Util.shouldBooleanize(this._expr)) {
+		if (this._emitter.shouldBooleanize(this._expr)) {
 			// !! is faster than Boolean, see http://jsperf.com/boolean-vs-notnot
 			this._emitter._emit("!! (", this._expr.getToken());
 			super.emit(0);
@@ -2012,6 +1955,15 @@ class _CommaExpressionEmitter extends _ExpressionEmitter {
 
 }
 
+class _JSEmitterStash extends OptimizerStash {
+	var shouldBooleanize = false;
+	var returnsBoolean   = false;
+
+	override function clone() : _JSEmitterStash {
+		throw new Error("logic flaw");
+	}
+}
+
 // the global emitter
 
 class JavaScriptEmitter implements Emitter {
@@ -2091,6 +2043,7 @@ class JavaScriptEmitter implements Emitter {
 		this._output = header + this._output;
 	}
 
+
 	override function emit (classDefs : ClassDefinition[]) : void {
 		var bootstrap = this._platform.load(this._platform.getRoot() + "/src/js/bootstrap.js");
 		this._output += bootstrap;
@@ -2100,7 +2053,7 @@ class JavaScriptEmitter implements Emitter {
 		for (var i = 0; i < classDefs.length; ++i) {
 			classDefs[i].forEachMemberFunction(function onFuncDef(funcDef : MemberFunctionDefinition) : boolean {
 				funcDef.forEachClosure(onFuncDef);
-				_Util.setupBooleanizeFlags(funcDef);
+				this._setupBooleanizeFlags(funcDef);
 				return true;
 			});
 		}
@@ -2112,6 +2065,65 @@ class JavaScriptEmitter implements Emitter {
 			this._emitStaticInitializationCode(classDefs[i]);
 		this._emitClassMap(classDefs);
 	}
+
+	// reuse of optimizer stash
+	function getStash (stashable : Stashable) : _JSEmitterStash {
+		var stash = stashable.getOptimizerStash();
+		if (stash["jsemitter"] == null) {
+			stash["jsemitter"] = new _JSEmitterStash;
+		}
+		return stash["jsemitter"] as _JSEmitterStash;
+	}
+
+	function _setupBooleanizeFlags (funcDef : MemberFunctionDefinition) : void {
+		var exprReturnsBoolean = function (expr : Expression) : boolean {
+			if (expr instanceof LogicalExpression) {
+				return this.getStash(expr).returnsBoolean;
+			} else {
+				return expr.getType().equals(Type.booleanType);
+			}
+		};
+		funcDef.forEachStatement(function onStatement(statement : Statement) : boolean {
+			var parentExpr = new Expression[]; // [0] is stack top
+			statement.forEachExpression(function onExpr(expr : Expression) : boolean {
+				// handle children
+				parentExpr.unshift(expr);
+				expr.forEachExpression(onExpr);
+				parentExpr.shift();
+				// check
+				if (expr instanceof LogicalExpression) {
+					var shouldBooleanize = true;
+					var returnsBoolean = false;
+					if (exprReturnsBoolean((expr as LogicalExpression).getFirstExpr()) && exprReturnsBoolean((expr as LogicalExpression).getSecondExpr())) {
+						returnsBoolean = true;
+						shouldBooleanize = false;
+					} else if (parentExpr.length == 0) {
+						if (statement instanceof ExpressionStatement
+							|| statement instanceof IfStatement
+							|| statement instanceof DoWhileStatement
+							|| statement instanceof WhileStatement
+							|| statement instanceof ForStatement) {
+							shouldBooleanize = false;
+						}
+					} else if (parentExpr[0] instanceof LogicalExpression
+						|| parentExpr[0] instanceof LogicalNotExpression) {
+						shouldBooleanize = false;
+					} else if (parentExpr[0] instanceof ConditionalExpression && (parentExpr[0] as ConditionalExpression).getCondExpr() == expr) {
+						shouldBooleanize = false;
+					}
+					this.getStash(expr).shouldBooleanize = shouldBooleanize;
+					this.getStash(expr).returnsBoolean   = returnsBoolean;
+				}
+				return true;
+			});
+			return statement.forEachStatement(onStatement);
+		});
+	}
+
+	function shouldBooleanize (logicalExpr : Expression) : boolean {
+		return this.getStash(logicalExpr).shouldBooleanize;
+	}
+
 
 	function _emitClassDefinition (classDef : ClassDefinition) : void {
 		this._emittingClass = classDef;
@@ -2296,7 +2308,7 @@ class JavaScriptEmitter implements Emitter {
 		// emit
 		this._emit("/**\n", null);
 		this._emitFunctionArgumentAnnotations(funcDef);
-		this._emit(_Util.buildAnnotation(" * @return {%1}\n", funcDef.getReturnType()), null);
+		this._emit(_TypeAnnotation.build(" * @return {%1}\n", funcDef.getReturnType()), null);
 		this._emit(" */\n", null);
 		this._emit(className + ".", null);
 		if ((funcDef.flags() & ClassDefinition.IS_STATIC) == 0)
@@ -2316,7 +2328,7 @@ class JavaScriptEmitter implements Emitter {
 	function _emitFunctionArgumentAnnotations (funcDef : MemberFunctionDefinition) : void {
 		var args = funcDef.getArguments();
 		for (var i = 0; i < args.length; ++i)
-			this._emit(_Util.buildAnnotation(" * @param {%1} " + args[i].getName().getValue() + "\n", args[i].getType()), null);
+			this._emit(_TypeAnnotation.build(" * @param {%1} " + args[i].getName().getValue() + "\n", args[i].getType()), null);
 	}
 
 	function _emitFunctionArguments (funcDef : MemberFunctionDefinition) : void {
@@ -2357,7 +2369,7 @@ class JavaScriptEmitter implements Emitter {
 				var type = locals[i].getType();
 				if (type == null)
 					continue;
-				this._emit(_Util.buildAnnotation("/** @type {%1} */\n", type), null);
+				this._emit(_TypeAnnotation.build("/** @type {%1} */\n", type), null);
 				var name = locals[i].getName();
 				// do not pass the token for declaration
 				this._emit("var " + name.getValue() + ";\n", null);
