@@ -43,9 +43,9 @@ class InstantiationContext {
 
 }
 
-class _Util {
+mixin TemplateDefinition {
 
-	static function buildInstantiationContext (errors : CompileError[], token : Token, formalTypeArgs : Token[], actualTypeArgs : Type[]) : InstantiationContext {
+	function buildInstantiationContext (errors : CompileError[], token : Token, formalTypeArgs : Token[], actualTypeArgs : Type[]) : InstantiationContext {
 		// check number of type arguments
 		if (formalTypeArgs.length != actualTypeArgs.length) {
 			errors.push(new CompileError(token, "wrong number of template arguments (expected " + formalTypeArgs.length as string + ", got " + actualTypeArgs.length as string));
@@ -1420,7 +1420,7 @@ class InstantiatedMemberFunctionDefinition extends MemberFunctionDefinition {
 
 }
 
-class TemplateFunctionDefinition extends MemberFunctionDefinition {
+class TemplateFunctionDefinition extends MemberFunctionDefinition implements TemplateDefinition {
 
 	var _typeArgs : Token[];
 	var _resolvedTypemap : Map.<Type>;
@@ -1464,7 +1464,7 @@ class TemplateFunctionDefinition extends MemberFunctionDefinition {
 			return instantiated;
 		}
 		// instantiate
-		var instantiationContext = _Util.buildInstantiationContext(errors, token, this._typeArgs, typeArgs);
+		var instantiationContext = this.buildInstantiationContext(errors, token, this._typeArgs, typeArgs);
 		if (instantiationContext == null) {
 			return null;
 		}
@@ -1697,7 +1697,7 @@ class LocalVariableStatuses {
 
 }
 
-class TemplateClassDefinition extends ClassDefinition {
+class TemplateClassDefinition extends ClassDefinition implements TemplateDefinition {
 
 	var _typeArgs : Token[];
 
@@ -1738,7 +1738,7 @@ class TemplateClassDefinition extends ClassDefinition {
 
 	function instantiate (errors : CompileError[], request : TemplateInstantiationRequest) : InstantiatedClassDefinition {
 		// prepare
-		var instantiationContext = _Util.buildInstantiationContext(errors, request.getToken(), this._typeArgs, request.getTypeArguments());
+		var instantiationContext = this.buildInstantiationContext(errors, request.getToken(), this._typeArgs, request.getTypeArguments());
 		if (instantiationContext == null) {
 			return null;
 		}
