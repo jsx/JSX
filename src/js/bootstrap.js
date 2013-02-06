@@ -1,6 +1,3 @@
-var JSX = {};
-(function (JSX) {
-
 /**
  * copies the implementations from source interface to target
  */

@@ -1968,6 +1968,9 @@ class _JSEmitterStash extends OptimizerStash {
 
 class JavaScriptEmitter implements Emitter {
 
+	var _fileHeader = "var JSX = {};\n" + "(function (JSX) {\n";
+	var _fileFooter =                     "})(JSX);\n";
+
 	var _platform : Platform;
 	var _output : string;
 	var _outputEndsWithReturn : boolean;
@@ -1984,15 +1987,20 @@ class JavaScriptEmitter implements Emitter {
 
 	function constructor (platform : Platform) {
 		JavaScriptEmitter.initialize();
+
 		this._platform = platform;
-		this._output = "// generatedy by JSX compiler " + Meta.IDENTIFIER + "\n";
-		this._outputEndsWithReturn = true; // see the above line
+		this._output = "";
+		this._outputEndsWithReturn = true;
 		this._outputFile = null;
 		this._indent = 0;
 		this._emittingClass = null;
 		this._emittingFunction = null;
 		this._emittingStatementStack = new _StatementEmitter[];
 		this._enableRunTimeTypeCheck = true;
+
+		// headers
+		this._output += "// generatedy by JSX compiler " + Meta.IDENTIFIER + "\n";
+		this._output += this._fileHeader;
 	}
 
 	function isJsModule(classDef : ClassDefinition) : boolean {
@@ -2042,7 +2050,6 @@ class JavaScriptEmitter implements Emitter {
 	override function addHeader (header : string) : void {
 		this._output = header + this._output;
 	}
-
 
 	override function emit (classDefs : ClassDefinition[]) : void {
 		var bootstrap = this._platform.load(this._platform.getRoot() + "/src/js/bootstrap.js");
@@ -2243,6 +2250,7 @@ class JavaScriptEmitter implements Emitter {
 	}
 
 	override function getOutput (sourceFile : string, entryPoint : Nullable.<string>, executableFor : Nullable.<string>) : string {
+		// do not add any lines before this._output for source-map
 		var output = this._output + "\n";
 		if (this._enableProfiler) {
 			output += this._platform.load(this._platform.getRoot() + "/src/js/profiler.js");
@@ -2250,7 +2258,7 @@ class JavaScriptEmitter implements Emitter {
 		if (entryPoint != null) {
 			output = this._platform.addLauncher(this, this._encodeFilename(sourceFile, "system:"), output, entryPoint, executableFor);
 		}
-		output += "})(JSX);\n";
+		output += this._fileFooter;
 		if (this._sourceMapper) {
 			output += this._sourceMapper.magicToken();
 		}

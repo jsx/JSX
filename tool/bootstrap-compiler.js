@@ -21051,7 +21051,7 @@ function JavaScriptEmitter$LPlatform$(platform) {
 	this._sourceMapper = null;
 	JavaScriptEmitter$initialize$();
 	this._platform = platform;
-	this._output = "// generatedy by JSX compiler " + Meta.IDENTIFIER + "\n";
+	this._output = "// generatedy by JSX compiler " + Meta.IDENTIFIER + "\nvar JSX = {};\n";
 	this._outputEndsWithReturn = true;
 	this._outputFile = null;
 	this._indent = 0;
@@ -21345,7 +21345,6 @@ JavaScriptEmitter.prototype.getOutput$SUSUS = function (sourceFile, entryPoint, 
 	if (entryPoint != null) {
 		output = this._platform.addLauncher$LEmitter$XSSS(this, this._encodeFilename$SS(sourceFile, "system:"), output, entryPoint, executableFor);
 	}
-	output += "})(JSX);\n";
 	if (this._sourceMapper) {
 		output += this._sourceMapper.magicToken$();
 	}
