@@ -1,4 +1,5 @@
 #!perl
+# use Google Closure Compiler as a lint
 use strict;
 use warnings;
 
