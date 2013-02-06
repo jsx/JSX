@@ -1,6 +1,6 @@
 Revision history for the JSX software development kit
 
-NEXT
+v0.9.5 2013-02-07 01:53:14
     [CHANGES]
     - Removed web-intens from web.jsx; it has been remoed even from Chrome.
     - The scope of named function expression are now ECMA-262 compatible (#108)
