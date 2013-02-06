@@ -293,8 +293,8 @@ class TestCase {
 			var mapA = a as Map.<variant>;
 			var mapB = b as Map.<variant>;
 
-			var mapAkeys = this.sortedKeys(mapA);
-			var mapBkeys = this.sortedKeys(mapB);
+			var mapAkeys = mapA.keys().sort();
+			var mapBkeys = mapB.keys().sort();
 
 			if (mapAkeys.length != mapBkeys.length) {
 				return false;
@@ -326,14 +326,6 @@ class TestCase {
 
 		// XXX: consider serialize():variant
 		return false;
-	}
-
-	function sortedKeys(map : Map.<variant>) : Array.<string> {
-		var keys = new Array.<string>;
-		for (var key in map) {
-			keys.push(key);
-		}
-		return keys.sort();
 	}
 
 	function difflet(a : Array.<variant>, b : Array.<variant>) : string {
