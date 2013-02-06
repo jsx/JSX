@@ -378,9 +378,9 @@ class Compiler {
 		for (var i = 0; i < classDefs.length; ++i) {
 			if ((classDefs[i].flags() & ClassDefinition.IS_NATIVE) == 0
 				&& classDefs[i] instanceof InstantiatedClassDefinition) {
-				// classDefs[i].setOutputClassName(
-				// 	classDefs[i].getOutputClassName().replace(/\.</g, "$$").replace(/>/g, "$E").replace(/,\s*/g,"$"));
-					classDefs[i].setOutputClassName("$TEMPLATECLASS$" + i as string);
+				var escapedClassName = classDefs[i].getOutputClassName().replace(/\.</g, "$$").replace(/>/g, "$E").replace(/[^A-Za-z0-9_]/g,"$");
+
+				 classDefs[i].setOutputClassName(escapedClassName);
 			}
 		}
 		// emit
