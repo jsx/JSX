@@ -1,3 +1,7 @@
+/***
+ * Simple JavaScript lexer (not completely ECMA-262 compatible, but good enough now)
+ */
+
 class JSToken {
 	var type : string;
 	var token : string;
@@ -170,3 +174,5 @@ class JSLexer {
 		return tokens;
 	}
 }
+
+
