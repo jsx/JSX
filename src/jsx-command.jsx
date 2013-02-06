@@ -45,7 +45,7 @@ class JSXCommand {
 			"Options:\n" +
 			"  --add-search-path path     adds a path to library search paths\n" +
 			"  --executable RUNENV        adds launcher to call _Main.main(:string[]):void\n" +
-			"                             supported RUNENV is node, commonjs and node.\n" +
+			"                             supported RUNENV is node, commonjs and web.\n" +
 			"  --run                      runs _Main.main(:string[]):void after compiling\n" +
 			"  --test                     runs _Test#test*():void after compiling\n" +
 			"  --output file              output file (default:stdout)\n" +
@@ -61,6 +61,10 @@ class JSXCommand {
 			"  --version                  displays the version and compiler identifier and exits\n" +
 			"  --version-number           displays the version as number and exits\n" +
 			"  --help                     displays this help and exits\n" +
+			"\n" +
+			"Env:\n" +
+			"  JSX_OPTS   options of jsx(1)\n" +
+			"  JSX_RUNJS  JavaScript engine used by --run and --test\n" +
 			"");
 	}
 
