@@ -1986,7 +1986,7 @@ class JavaScriptEmitter implements Emitter {
 	var _sourceMapper : SourceMapper;
 
 	function constructor (platform : Platform) {
-		JavaScriptEmitter.initialize();
+		JavaScriptEmitter._initialize();
 
 		this._platform = platform;
 		this._output = "";
@@ -2796,7 +2796,13 @@ class JavaScriptEmitter implements Emitter {
 		}
 	}
 
-	static function initialize () : void {
+	static var _initialized = false;
+	static function _initialize () : void {
+		if (JavaScriptEmitter._initialized) {
+			return;
+		}
+		JavaScriptEmitter._initialized = true;
+
 		var precedence = [
 			[
 				{ "new":        function (op : string, precedence : number) : void { _NewExpressionEmitter._setOperatorPrecedence(op, precedence); } },
