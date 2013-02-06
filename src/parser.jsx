@@ -84,17 +84,17 @@ class Token {
 
 class _Lexer {
 
-	static var ident         = " [a-zA-Z_] [a-zA-Z0-9_]* ";
-	static var doubleQuoted  = ' "  [^"\\\\]* (?: \\\\. [^"\\\\]* )* " ';
-	static var singleQuoted  = " '  [^'\\\\]* (?: \\\\. [^'\\\\]* )* ' ";
-	static var stringLiteral = _Lexer.makeAlt([_Lexer.singleQuoted, _Lexer.doubleQuoted]);
-	static var regexpLiteral = _Lexer.doubleQuoted.replace(/"/g, "/") + "[mgi]*";
+	static const ident         = " [a-zA-Z_] [a-zA-Z0-9_]* ";
+	static const doubleQuoted  = ' "  [^"\\\\]* (?: \\\\. [^"\\\\]* )* " ';
+	static const singleQuoted  = " '  [^'\\\\]* (?: \\\\. [^'\\\\]* )* ' ";
+	static const stringLiteral = _Lexer.makeAlt([_Lexer.singleQuoted, _Lexer.doubleQuoted]);
+	static const regexpLiteral = _Lexer.doubleQuoted.replace(/"/g, "/") + "[mgi]*";
 
 	// ECMA 262 compatible,
 	// see also ECMA 262 5th (7.8.3) Numeric Literals
-	static var decimalIntegerLiteral = "(?: 0 | [1-9][0-9]* )";
-	static var exponentPart = "(?: [eE] [+-]? [0-9]+ )";
-	static var numberLiteral = _Lexer.makeAlt([
+	static const decimalIntegerLiteral = "(?: 0 | [1-9][0-9]* )";
+	static const exponentPart = "(?: [eE] [+-]? [0-9]+ )";
+	static const numberLiteral = _Lexer.makeAlt([
 		"(?: " + _Lexer.decimalIntegerLiteral + " \\. " +
 		"[0-9]* " + _Lexer.exponentPart + "? )",
 		"(?: \\. [0-9]+ " + _Lexer.exponentPart + "? )",
@@ -102,21 +102,21 @@ class _Lexer {
 		"NaN",
 		"Infinity"
 		]) + "\\b";
-	static var integerLiteral = _Lexer.makeAlt([
+	static const integerLiteral = _Lexer.makeAlt([
 		"(?: 0 [xX] [0-9a-fA-F]+ )", // hex
 		_Lexer.decimalIntegerLiteral
 		]) + "(?![\\.0-9eE])\\b";
 
 	// regular expressions
-	static var rxIdent          = _Lexer.rx("^" + _Lexer.ident);
-	static var rxStringLiteral  = _Lexer.rx("^" + _Lexer.stringLiteral);
-	static var rxNumberLiteral  = _Lexer.rx("^" + _Lexer.numberLiteral);
-	static var rxIntegerLiteral = _Lexer.rx("^" + _Lexer.integerLiteral);
-	static var rxRegExpLiteral  = _Lexer.rx("^" + _Lexer.regexpLiteral);
-	static var rxNewline        = /(?:\r\n?|\n)/;
+	static const rxIdent          = _Lexer.rx("^" + _Lexer.ident);
+	static const rxStringLiteral  = _Lexer.rx("^" + _Lexer.stringLiteral);
+	static const rxNumberLiteral  = _Lexer.rx("^" + _Lexer.numberLiteral);
+	static const rxIntegerLiteral = _Lexer.rx("^" + _Lexer.integerLiteral);
+	static const rxRegExpLiteral  = _Lexer.rx("^" + _Lexer.regexpLiteral);
+	static const rxNewline        = /(?:\r\n?|\n)/;
 
 	// blacklists of identifiers
-	static var keywords = _Lexer.asMap([
+	static const keywords = _Lexer.asMap([
 		// literals shared with ECMA 262
 		"null",     "true",     "false",
 		"NaN",      "Infinity",
@@ -140,7 +140,7 @@ class _Lexer {
 		"__FILE__",  "__LINE__",
 		"undefined"
 		]);
-	static var reserved = _Lexer.asMap([
+	static const reserved = _Lexer.asMap([
 		// literals of ECMA 262 but not used by JSX
 		"debugger", "with",
 		// future reserved words of ECMA 262

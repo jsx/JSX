@@ -211,7 +211,7 @@ class Util {
 		return found;
 	}
 
-	static var _stringLiteralEncodingMap = {
+	static const _stringLiteralEncodingMap = {
 		"\0" : "\\0",
 		"\r" : "\\r",
 		"\n" : "\\n",
