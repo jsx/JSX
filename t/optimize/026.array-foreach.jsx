@@ -1,6 +1,8 @@
 /*EXPECTED
 10
 10
+3
+9
 */
 /*JSX_OPTS
 --disable-type-check --optimize inline
@@ -18,6 +20,14 @@ class _Main {
 
 		sum = 0;
 		closures.forEach((f) -> { sum += f(); });
+		log sum;
+
+		sum = 0;
+		["foo", "bar", "baz"].forEach((item, i) -> { sum += i; });
+		log sum;
+
+		sum = 0;
+		["foo", "bar", "baz"].forEach((item, i, a) -> { sum += a.length; });
 		log sum;
 	}
 }

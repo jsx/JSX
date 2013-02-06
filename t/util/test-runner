@@ -169,7 +169,7 @@ sub optimize_and_compare {
 
     # compile, run, and check (wo. optimization)
     my($ok, $src, $logs) = jsx($file);
-    ok $ok, "compile '$file' (wo. optimization)" or return;
+    ok $ok, "compile '$file' (wo. optimization)" or return diag($logs);
     is $logs, '', "... with no logs";
     my ($output, $elapsed) = bench(sub { run_compiled($file, $src) });
 
@@ -178,7 +178,7 @@ sub optimize_and_compare {
 
     # compile, run, and check (w. optimization)
     ($ok, my $src_optimized, my $logs_optimized) = jsx("$opts --optimize dump-logs $file");
-    ok $ok, "compile '$file' (w. $opts)" or return;
+    ok $ok, "compile '$file' (w. $opts)" or return diag($logs);
     for my $flag(@optimization_flags) {
         like $logs_optimized, qr/\[ \Q$flag\E \]/xms, "... with [$flag] in logs";
     }
