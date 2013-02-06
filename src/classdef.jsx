@@ -529,7 +529,7 @@ class ClassDefinition implements Stashable {
 			for (var i = 0; i < this._members.length; ++i)
 				if (this._members[i] instanceof MemberFunctionDefinition && (this._members[i].flags() & ClassDefinition.IS_OVERRIDE) != 0)
 					if (this._assertFunctionIsOverridableInBaseClasses(context, this._members[i] as MemberFunctionDefinition) == null)
-						context.errors.push(new CompileError(this._members[i].getToken(), "could not find function definition in base classes / mixins to be overridden"));
+						context.errors.push(new CompileError(this._members[i].getNameToken(), "could not find function definition in base classes / mixins to be overridden"));
 			for (var i = 0; i < this._implementTypes.length; ++i) {
 				if ((this._implementTypes[i].getClassDef().flags() & ClassDefinition.IS_MIXIN) == 0)
 					continue;
@@ -547,7 +547,7 @@ class ClassDefinition implements Stashable {
 						}
 					}
 					if (! done)
-						context.errors.push(new CompileError(this.getToken(), "could not find function definition to be overridden by '" + overrideFunctions[j].getClassDef().className() + "#" + overrideFunctions[j].name() + "'"));
+						context.errors.push(new CompileError(this.getToken(), "could not find function definition to be overridden by '" + overrideFunctions[j].getNotation() + "'"));
 				}
 			}
 		}
@@ -590,7 +590,7 @@ class ClassDefinition implements Stashable {
 				for (var i = 0; i < abstractMembers.length; ++i) {
 					if (i != 0)
 						msg += ", ";
-					msg += abstractMembers[i].getClassDef().className() + "#" + abstractMembers[i].name();
+					msg += abstractMembers[i].getNotation();
 				}
 				context.errors.push(new CompileError(this.getToken(), msg));
 			}
@@ -659,11 +659,11 @@ class ClassDefinition implements Stashable {
 		for (var i = 0; i < this._members.length; ++i) {
 			if (this._members[i].name() == member.name()) {
 				if ((this._members[i].flags() & ClassDefinition.IS_ABSTRACT) == 0) {
-					context.errors.push(new CompileError(token, "cannot define property '" + memberClassDef.className() + "#" + member.name() + "', the name is already used in '" + this.className() + "'"));
+					context.errors.push(new CompileError(member.getNameToken(), Util.format("cannot define property '%1', the name is already used in class '%2'", [member.getNotation(), this.className()])));
 					return false;
 				}
 				if (! this._members[i].getType().equals(member.getType())) {
-					context.errors.push(new CompileError(token, "cannot override property '" + this.className() + "#" + member.name() + "' of type '" + this._members[i].getType().toString() + "' in class '" + memberClassDef.className() + "' with different type '" + member.getType().toString() + "'"));
+					context.errors.push(new CompileError(member.getNameToken(), Util.format("cannot override property '%1' of type '%2' with different type '%3'", [member.getNotation(), this._members[i].getType().toString(), member.getType().toString() ])));
 					return false;
 				}
 			}
@@ -684,17 +684,16 @@ class ClassDefinition implements Stashable {
 				continue;
 			// property with the same name has been found, we can tell yes or no now
 			if (this._members[i] instanceof MemberVariableDefinition) {
-				context.errors.push(new CompileError(token, "cannot define property '" + memberClassDef.className() + "#" + member.name() + "', the name is already used in '" + this.className() + "'"));
-				return false;
+				throw new Error("logic flaw: " + member.getNotation());
 			}
 			if (! Util.typesAreEqual((this._members[i] as MemberFunctionDefinition).getArgumentTypes(), member.getArgumentTypes()))
 				continue;
 			if ((member.flags() & ClassDefinition.IS_OVERRIDE) == 0) {
-				context.errors.push(new CompileError(member.getToken(), "overriding functions must have 'override' attribute set (defined in base class '" + this.className() + "')"));
+				context.errors.push(new CompileError(member.getNameToken(), "overriding functions must have 'override' attribute set (defined in base class '" + this.className() + "')"));
 				return false;
 			}
 			if (reportOverridesAsWell && (this._members[i].flags() & ClassDefinition.IS_OVERRIDE) != 0) {
-				context.errors.push(new CompileError(member.getToken(), "definition of the function conflicts with sibling mix-in '" + this.className() + "'"));
+				context.errors.push(new CompileError(member.getNameToken(), "definition of the function conflicts with sibling mix-in '" + this.className() + "'"));
 				return false;
 			}
 			// assertion of function being overridden does not have 'final' attribute is done by assertFunctionIsOverridable
@@ -859,6 +858,7 @@ abstract class MemberDefinition implements Stashable {
 		this._classDef = classDef;
 	}
 
+	abstract function getNotation() : string;
 }
 
 class MemberVariableDefinition extends MemberDefinition {
@@ -937,7 +937,7 @@ class MemberVariableDefinition extends MemberDefinition {
 			}
 			break;
 		case MemberVariableDefinition.IS_ANALYZING:
-			this._analysisContext.errors.push(new CompileError(this._token,
+			this._analysisContext.errors.push(new CompileError(this.getNameToken(),
 				"please declare type of variable '" + this.name() + "' (detected recursion while trying to reduce type)"));
 			break;
 		default:
@@ -954,6 +954,13 @@ class MemberVariableDefinition extends MemberDefinition {
 		this._initialValue = initialValue;
 	}
 
+	override function getNotation() : string {
+		var classDef = this.getClassDef();
+		var s = (classDef != null ? classDef.className(): "<<unknown>>");
+		s += (this.flags() & ClassDefinition.IS_STATIC) != 0 ? "." : "#";
+		s += this.name();
+		return s;
+	}
 }
 
 class MemberFunctionDefinition extends MemberDefinition implements Block {
@@ -990,7 +997,7 @@ class MemberFunctionDefinition extends MemberDefinition implements Block {
 	/**
 	 * Returns a simple notation of the function like "Class.classMethod(:string):void" or "Class.instanceMethod(:string):void".
 	 */
-	function getNotation() : string {
+	override function getNotation() : string {
 		var classDef = this.getClassDef();
 		var s = (classDef != null ? classDef.className(): "<<unknown>>");
 		s += (this.flags() & ClassDefinition.IS_STATIC) != 0 ? "." : "#";

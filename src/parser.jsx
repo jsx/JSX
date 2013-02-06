@@ -1380,14 +1380,14 @@ class Parser {
 						if (member instanceof MemberFunctionDefinition && members[i] instanceof MemberFunctionDefinition) {
 							if (Util.typesAreEqual((member as MemberFunctionDefinition).getArgumentTypes(), (members[i] as MemberFunctionDefinition).getArgumentTypes())) {
 								this._errors.push(new CompileError(
-									member.getToken(),
+									member.getNameToken(),
 									"a " + ((member.flags() & ClassDefinition.IS_STATIC) != 0 ? "static" : "member")
 									+ " function with same name and arguments is already defined"));
 								success = false;
 								break;
 							}
 						} else {
-							this._errors.push(new CompileError(member.getToken(), "a property with same name already exists; only functions may be overloaded"));
+							this._errors.push(new CompileError(member.getNameToken(), "a property with same name already exists; only functions may be overloaded"));
 							success = false;
 							break;
 						}
