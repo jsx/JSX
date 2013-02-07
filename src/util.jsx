@@ -24,8 +24,8 @@ import "./expression.jsx";
 import "./statement.jsx";
 import "./classdef.jsx";
 import "./type.jsx";
-import "./parser.jsx";
-import "./compiler.jsx";
+import "./platform.jsx";
+import Token from "./parser.jsx";
 
 class Cloner.<T> {
 
@@ -352,6 +352,28 @@ class Util {
 			default: return n as string + 'th';
 		}
 	}
+
+	static function makeErrorMessage (platform : Platform, message : string, filename : Nullable.<string>, lineNumber : number, columnNumber : number, size : number) : string {
+		if (filename == null) {
+			return message + "\n";
+		}
+
+		var content = platform.load(filename);
+		var sourceLine = content.split(/\n/)[ lineNumber - 1 ] + "\n";
+
+		// fix visual width
+		var TAB_WIDTH = 4;
+		var tabs = sourceLine.slice(0, columnNumber).match(/\t/g);
+		if(tabs != null) {
+			columnNumber += (TAB_WIDTH-1) * tabs.length;
+		}
+
+		sourceLine  = sourceLine.replace(/\t/g, Util.repeat(" ", TAB_WIDTH));
+		sourceLine += Util.repeat(" ", columnNumber);
+		sourceLine += Util.repeat("^", size);
+
+		return Util.format("[%1:%2:%3] %4\n%5\n", [filename, lineNumber as string, columnNumber as string, message, sourceLine]);
+	}
 }
 
 class Tuple.<T,U> {
@@ -514,27 +536,8 @@ abstract class CompileIssue {
 		this._size = 1;
 	}
 
-	function format (compiler : Compiler) : string {
-		if (this._filename == null) {
-			return this._message + "\n";
-		}
-
-		var content = compiler.getFileContent(new CompileError[] /* ignore errors */, null, this._filename);
-		var sourceLine = content.split(/\n/)[ this._lineNumber - 1 ] + "\n";
-
-		// fix visual width
-		var col = this._columnNumber;
-		var TAB_WIDTH = 4;
-		var tabs = sourceLine.slice(0, col).match(/\t/g);
-		if(tabs != null) {
-			col += (TAB_WIDTH-1) * tabs.length;
-		}
-
-		sourceLine  = sourceLine.replace(/\t/g, Util.repeat(" ", TAB_WIDTH));
-		sourceLine += Util.repeat(" ", col);
-		sourceLine += Util.repeat("^", this._size);
-
-		return Util.format("[%1:%2:%3] %4%5\n%6\n", [this._filename, this._lineNumber as string, col as string, this.getPrefix(), this._message, sourceLine]);
+	function format (platform : Platform) : string {
+		return Util.makeErrorMessage(platform, this.getPrefix() + this._message, this._filename, this._lineNumber, this._columnNumber, this._size);
 	}
 
 	abstract function getPrefix () : string;

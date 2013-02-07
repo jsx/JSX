@@ -137,6 +137,9 @@ sub compile_and_run {
         fail "failed to execute compiled script";
         return;
     };
+    $output   =~ s/\s+$//;
+    $expected =~ s/\s+$//;
+
     # compare the results
     is $output, $expected, $file or do {
         difflet([split /\n/, $output], [split /\n/, $expected]);

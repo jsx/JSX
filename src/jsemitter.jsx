@@ -532,7 +532,7 @@ class _AssertStatementEmitter extends _StatementEmitter {
 		var condExpr = this._statement._expr;
 		this._emitter._emitAssertion(function () {
 			this._emitter._getExpressionEmitterFor(condExpr).emit(0);
-		}, this._statement.getToken(), "assertion failure");
+		}, condExpr.getToken(), "assertion failure");
 	}
 
 }
@@ -2734,9 +2734,9 @@ class JavaScriptEmitter implements Emitter {
 		this._emit(")) {\n", null);
 		this._advanceIndent();
 		this._emit("debugger;\n", null);
-		// FIXME make the expression source and throw a fit exception class
-		var err = Util.format('throw new Error("[%1:%2] %3");\n', [token.getFilename(), token.getLineNumber() as string, message]);
-		this._emit(err, null);
+		var s = Util.makeErrorMessage(this._platform, message, token.getFilename(), token.getLineNumber(), token.getColumnNumber(), token.getValue().length);
+		var err = Util.format('throw new Error(%1);\n', [Util.encodeStringLiteral(s)]);
+		this._emit(err, token);
 		this._reduceIndent();
 		this._emit("}\n", null);
 	}
@@ -2744,12 +2744,11 @@ class JavaScriptEmitter implements Emitter {
 	function _emitWithNullableGuard (expr : Expression, outerOpPrecedence : number) : void {
 		if (this._enableRunTimeTypeCheck && expr.getType() instanceof NullableType) {
 			var token = expr.getToken();
-			var message = token.isIdentifier() ? "null access: " + token.getValue() : "null access";
 			this._emit("(function (v) {\n", token);
 			this._advanceIndent();
 			this._emitAssertion(function () {
 				this._emit("v != null", token);
-			}, token, message);
+			}, token, "null access");
 			this._emit("return v;\n", token);
 			this._reduceIndent();
 			this._emit("}(", token);

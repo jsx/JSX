@@ -404,12 +404,12 @@ class Compiler {
 						break;
 				}
 				if (doWarn != false) {
-					this._platform.error(warning.format(this));
+					this._platform.error(warning.format(this.getPlatform()));
 				}
 			} else {
-				this._platform.error(error.format(this));
+				this._platform.error(error.format(this.getPlatform()));
 				error.getCompileNotes().forEach(function (note) {
-					this._platform.error(note.format(this));
+					this._platform.error(note.format(this.getPlatform()));
 				});
 				isFatal = true;
 			}
@@ -417,12 +417,6 @@ class Compiler {
 		// clear all errors
 		errors.splice(0, errors.length);
 		return ! isFatal;
-	}
-
-	function _printErrors (errors : CompileError[]) : void {
-		for (var i = 0; i < errors.length; ++i) {
-			this._platform.error(errors[i].format(this));
-		}
 	}
 
 	function _resolvePath (srcPath : string, givenPath : string) : string {
