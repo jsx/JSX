@@ -90,7 +90,7 @@ class NodePlatform extends Platform {
 			return content;
 		}
 		else {
-			return node.fs.readFileSync(name).toString();
+			return node.fs.readFileSync(name, "utf-8");
 		}
 	}
 
