@@ -404,7 +404,7 @@ class Compiler {
 						break;
 				}
 				if (doWarn != false) {
-					this._platform.error(warning.format(this.getPlatform()));
+					this._platform.warn(warning.format(this.getPlatform()));
 				}
 			} else {
 				this._platform.error(error.format(this.getPlatform()));
