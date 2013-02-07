@@ -2,7 +2,7 @@ Revision history for the JSX software development kit
 
 v0.9.5 2013-02-07 01:53:14
     [CHANGES]
-    - Removed web-intens from web.jsx; it has been remoed even from Chrome.
+    - Removed web-intents from web.jsx; it has been removed even from Chrome.
     - The scope of named function expression are now ECMA-262 compatible (#108)
 
     [FEATURES]
@@ -14,7 +14,7 @@ v0.9.5 2013-02-07 01:53:14
 
     [BUG FIXES]
     - Fixed confusing messages on argument mismatch errors (#104)
-    - Fixed an issue that associativitiy of equality expressions might be ignored (#88)
+    - Fixed an issue that associativity of equality expressions might be ignored (#88)
     - Fixed several compiler crashes
 
 0.9.4 2013-01-31 19:31:16
@@ -30,7 +30,7 @@ v0.9.5 2013-02-07 01:53:14
       when they has static conditions (#95)
     - Compile errors shows notes when no function with matching arguments
       are found (#96).
-    - Added JSX.DEBUG and "no-debug" optimization command to controll
+    - Added JSX.DEBUG and "no-debug" optimization command to control
       debugging statements.
 
     [BUG FIXES]
@@ -44,13 +44,13 @@ v0.9.5 2013-02-07 01:53:14
 0.9.0 2013-01-26 00:13:42
     [CHANGES]
     - Ported JSX compiler from JavaScript to JSX (i.e. self-hosting)
-    - Invlaid cast throws error, instead of retruning null
+    - Invalid cast throws error, instead of returning null
     - Invalid @param in jsxdoc produces compile errors
     - Added _Matcher#toEqual() in test-case.jsx to compare objects deeply
     - Added `--executable commonjs` for CommonJS-compliant engine
       like PhantomJS
     - Array#push() and Array#unshift() takes Nullable.<T>, not T (issue #82)
-    - Ehnanced type inference of conditional expression (issue #86)
+    - Enhanced type inference of conditional expression (issue #86)
     - Map literals can be declared as variant (like `{} : variant`)
     - Fixed a lot of bug
 
@@ -62,4 +62,4 @@ v0.9.5 2013-02-07 01:53:14
     [ANNOUNCE]
     - The initial version of the JSX SDK
 
-# vim: set expandtab:
+# vim: set expandtab spell:
