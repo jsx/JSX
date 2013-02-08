@@ -1,6 +1,4 @@
-import "js.jsx";
 import "js/nodejs.jsx";
-import "console.jsx";
 
 import "test-case.jsx";
 
@@ -30,7 +28,9 @@ class _Test extends TestCase {
 		var cwd = process.cwd();
 		module.paths.push(cwd + "/node_modules");
 
-		var statusCode = JSXCommand.main(new NodePlatform("."), NodePlatform.getEnvOpts().concat(["--enable-source-map", "--output", "t/src/source-map/hello.jsx.js", "t/src/source-map/hello.jsx"]));
+		var platform = new NodePlatform(".");
+
+		var statusCode = JSXCommand.main(platform, NodePlatform.getEnvOpts().concat(["--enable-source-map", "--output", "t/src/source-map/hello.jsx.js", "t/src/source-map/hello.jsx"]));
 
 		this.expect(statusCode, "status code").toBe(0);
 
@@ -39,15 +39,17 @@ class _Test extends TestCase {
 		}
 
 		var source = JSLexer.tokenize("hello.jsx.js",
-			node.fs.readFileSync("t/src/source-map/hello.jsx.js").toString());
+				platform.load("t/src/source-map/hello.jsx.js"));
 
-		var mapping = JSON.parse(node.fs.readFileSync("t/src/source-map/hello.jsx.js.mapping").toString());
+		var mapping = JSON.parse(platform.load("t/src/source-map/hello.jsx.js.mapping"));
 
+		// mapping.file
 		this.expect(mapping['file'], "mapping.file").toBe("hello.jsx.js");
 
 		this.note("mapping.sources: " + JSON.stringify(mapping['sources']));
 		this.note("mapping.names:   " + JSON.stringify(mapping['names']));
 
+		// mappping.sources
 		["hello.jsx", "timer.jsx", "js.jsx"].forEach((file) -> {
 			var sources = mapping['sources'] as string[];
 
@@ -55,6 +57,7 @@ class _Test extends TestCase {
 			this.expect(found.join(","), "mapping.sources includes " + file).notToBe("");
 		});
 
+		// source-map consumer
 		var consumer = SourceMapper.createSourceMapConsumer(mapping);
 
 		var pos, orig;
