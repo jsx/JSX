@@ -2277,8 +2277,9 @@ class JavaScriptEmitter implements Emitter {
 			"}\n" +
 			"\n",
 			classDef.getToken());
-		if (classDef.extendType() != null)
+		if (classDef.extendType() != null && classDef.extendType().getClassDef().getOutputClassName() != "Object") {
 			this._emit(classDef.getOutputClassName() + ".prototype = new " + classDef.extendType().getClassDef().getOutputClassName() + ";\n", null);
+		}
 		var implementTypes = classDef.implementTypes();
 		if (implementTypes.length != 0) {
 			for (var i = 0; i < implementTypes.length; ++i)
