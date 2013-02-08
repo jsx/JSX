@@ -10,7 +10,7 @@ all: compiler doc web
 ## compiler stuff
 
 compiler: src/doc.jsx meta
-	time node tool/bootstrap-compiler.js --executable node --output bin/jsx src/jsx-node-front.jsx
+	node tool/bootstrap-compiler.js --executable node --output bin/jsx src/jsx-node-front.jsx
 
 src/doc.jsx: src/_doc.jsx
 	submodules/picotemplate/picotemplate.pl $<
