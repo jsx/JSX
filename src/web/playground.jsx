@@ -78,7 +78,7 @@ class _Main {
 
 				var path = "<source>";
 				var platform = new BrowserPlatform();
-				platform.setContent(path, editor.getValue());
+				platform.setFileContent(path, editor.getValue());
 
 				var c = new Compiler(platform);
 				var emitter = new JavaScriptEmitter(platform);
@@ -148,7 +148,7 @@ class _Main {
 			var path = input.dataset["path"];
 
 			var platform = new BrowserPlatform();
-			platform.setContent(path, editor.getValue());
+			platform.setFileContent(path, editor.getValue());
 
 			var c = new Compiler(platform);
 			var emitter = new JavaScriptEmitter(platform);

@@ -56,7 +56,7 @@ class NodePlatform extends Platform {
 
 	override function fileExists (name : string) : boolean {
 		name = node.path.normalize(name);
-		if (this.virtualFile.hasOwnProperty(name)) {
+		if (this.fileContent.hasOwnProperty(name)) {
 			return true;
 		}
 		try {
@@ -73,8 +73,8 @@ class NodePlatform extends Platform {
 
 	override function load (name : string) : string {
 		name = node.path.normalize(name);
-		if (this.virtualFile.hasOwnProperty(name)) {
-			return this.virtualFile[name];
+		if (this.fileContent.hasOwnProperty(name)) {
+			return this.fileContent[name];
 		}
 		else if (name == "-") {
 			var fd = process.stdin.fd;
@@ -90,7 +90,11 @@ class NodePlatform extends Platform {
 			return content;
 		}
 		else {
-			return node.fs.readFileSync(name, "utf-8");
+			var content = node.fs.readFileSync(name, "utf-8");
+			// cache the content without condition because the platform object
+			// is created for each compilation for now.
+			this.fileContent[name] = content;
+			return content;
 		}
 	}
 

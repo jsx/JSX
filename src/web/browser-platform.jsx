@@ -33,14 +33,12 @@ class BrowserPlatform extends Platform {
 
 	var _root : string;
 	var _errors : string[];
-	var _content : Map.<string>;
 	var _tree : variant; // path tree
 	var _prefix : string;
 
 	function constructor() {
 		this._root = this._rootPath();
 		this._errors = new string[];
-		this._content = new Map.<string>;
 
 		// the prefix path of the application HTML file
 		this._prefix = dom.window.location.pathname.replace(/\/[^\/]*$/, "");
@@ -127,13 +125,9 @@ class BrowserPlatform extends Platform {
 		}
 	}
 
-	function setContent (name : string, content : string) : void {
-		this._content[name] = content;
-	}
-
 	override function load (name : string) : string {
-		if(name in this._content) {
-			return this._content[name];
+		if(this.fileContent.hasOwnProperty(name)) {
+			return this.fileContent[name];
 		}
 		var content = "";
 		// synchronous XHR

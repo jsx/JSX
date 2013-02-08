@@ -24,13 +24,13 @@ import "console.jsx";
 import "./emitter.jsx";
 
 abstract class Platform {
-	var virtualFile = new Map.<string>();
+	var fileContent = new Map.<string>();
 
 	// returns root directory of JSX
 	abstract function getRoot() : string;
 
 	function setFileContent (name : string, content : string) : void {
-		this.virtualFile[name] = content;
+		this.fileContent[name] = content;
 	}
 
 	abstract function fileExists(path : string) : boolean;
@@ -41,7 +41,7 @@ abstract class Platform {
 
 	// load a content by name (throws an exception on error)
 	// e.g. node.js reads it from files
-	//      browsers read it from DOM
+	//      browsers read it from DOM or servers
 	abstract function load (name : string) : string;
 
 	abstract function makeFileExecutable(file : string, runEnv : string) : void;
@@ -65,7 +65,6 @@ abstract class Platform {
 		console.error(s);
 	}
 
-	// for jsxdoc
 	abstract function mkpath (path : string) : void;
 	abstract function save (path : Nullable.<string>, content : string) : void;
 

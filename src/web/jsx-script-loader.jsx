@@ -68,7 +68,7 @@ class ScriptLoader {
 		}
 		else {
 			sourceFile = "<script>";
-			platform.setContent(sourceFile, script.innerHTML);
+			platform.setFileContent(sourceFile, script.innerHTML);
 		}
 		c.addSourceFile(null, sourceFile);
 
