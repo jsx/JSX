@@ -37,8 +37,7 @@ function $__jsx_div_assign(obj, prop, divisor) {
 }
 
 /*
- * global functions called by JSX
- * (enamed so that they do not conflict with local variable names)
+ * global functions, renamed to avoid conflict with local variable names
  */
 var $__jsx_parseInt = parseInt;
 var $__jsx_parseFloat = parseFloat;
