@@ -1,5 +1,11 @@
 Revision history for the JSX software development kit
 
+NEXT
+    [CHANGES]
+    - TestCase will stop executing the current test on failure
+    - Test failure will show stack trace if possible
+    - Messages of assertion failure will include the related source code line
+
 v0.9.5 2013-02-07 01:53:14
     [CHANGES]
     - Removed web-intents from web.jsx; it has been removed even from Chrome.
