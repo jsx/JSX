@@ -1548,7 +1548,7 @@ class _DeadCodeEliminationOptimizeCommand extends _FunctionOptimizeCommand {
 			}
 			return false;
 		}
-		var lastAssignExpr = new Map.<Tuple.<AssignmentExpression, function(:Expression):void>>;
+		var lastAssignExpr = new Map.<Pair.<AssignmentExpression, function(:Expression):void>>;
 		var onExpr = function (expr : Expression, rewriteCb : function(:Expression):void) : boolean {
 			if (expr instanceof AssignmentExpression) {
 				var assignmentExpr = expr as AssignmentExpression;
@@ -1563,7 +1563,7 @@ class _DeadCodeEliminationOptimizeCommand extends _FunctionOptimizeCommand {
 								&& baseExprsAreEqual((firstExpr as PropertyExpression).getExpr(), (lastAssignExpr[propertyName].first.getFirstExpr() as PropertyExpression).getExpr())) {
 							lastAssignExpr[propertyName].second(lastAssignExpr[propertyName].first.getSecondExpr());
 						}
-						lastAssignExpr[propertyName] = new Tuple.<AssignmentExpression, function(:Expression):void>(assignmentExpr, rewriteCb);
+						lastAssignExpr[propertyName] = new Pair.<AssignmentExpression, function(:Expression):void>(assignmentExpr, rewriteCb);
 						return true;
 					} else if (assignmentExpr.getFirstExpr() instanceof LocalExpression) {
 						onExpr(assignmentExpr.getSecondExpr(), null);
@@ -1582,11 +1582,11 @@ class _DeadCodeEliminationOptimizeCommand extends _FunctionOptimizeCommand {
 			} else if (expr instanceof CallExpression) {
 				onExpr((expr as CallExpression).getExpr(), null);
 				Util.forEachExpression(onExpr, (expr as CallExpression).getArguments());
-				lastAssignExpr = new Map.<Tuple.<AssignmentExpression, function(:Expression):void>>;
+				lastAssignExpr = new Map.<Pair.<AssignmentExpression, function(:Expression):void>>;
 				return true;
 			} else if (expr instanceof NewExpression) {
 				Util.forEachExpression(onExpr, (expr as NewExpression).getArguments());
-				lastAssignExpr = new Map.<Tuple.<AssignmentExpression, function(:Expression):void>>;
+				lastAssignExpr = new Map.<Pair.<AssignmentExpression, function(:Expression):void>>;
 				return true;
 			}
 			return expr.forEachExpression(onExpr);

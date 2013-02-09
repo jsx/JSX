@@ -381,9 +381,12 @@ class Util {
 	}
 }
 
-class Tuple.<T,U> {
+/*
+ * Tow-value data structure class
+ */
+class Pair.<T,U> {
 
-	var first : T;
+	var first  : T;
 	var second : U;
 
 	function constructor(first : T, second : U) {
@@ -393,11 +396,14 @@ class Tuple.<T,U> {
 
 }
 
+/*
+ * Three-value data structure class
+ */
 class Triple.<T,U,V> {
 
-	var first : T;
+	var first  : T;
 	var second : U;
-	var third : V;
+	var third  : V;
 
 	function constructor(first : T, second : U, third : V) {
 		this.first = first;
@@ -407,9 +413,12 @@ class Triple.<T,U,V> {
 
 }
 
+/**
+ * Map-like container with specified type of keys.
+ */
 class TypedMap.<K,V> {
 
-	var _list : Tuple.<K,V>[];
+	var _list =  new Pair.<K,V>[];
 	var _equalsCallback : function(:K,:K):boolean;
 
 	function constructor() {
@@ -417,7 +426,6 @@ class TypedMap.<K,V> {
 	}
 
 	function constructor(equalsCallback : function(:K,:K):boolean) {
-		this._list = [] : Tuple.<K,V>[];
 		this._equalsCallback = equalsCallback;
 	}
 
@@ -434,7 +442,7 @@ class TypedMap.<K,V> {
 				return;
 			}
 		}
-		this._list.push(new Tuple.<K,V>(key, val));
+		this._list.push(new Pair.<K,V>(key, val));
 	}
 
 	function get(key : K) : Nullable.<V> {
