@@ -89,5 +89,30 @@ class _Test extends TestCase {
 		this.expect(Util.toOrdinal(22)).toBe("22nd");
 		this.expect(Util.toOrdinal(23)).toBe("23rd");
 	}
+
+	function testTypedMap() : void {
+		var map = new TypedMap.<Pair.<int,int>,int>((a, b) -> {
+			return a.first == b.first && a.second == b.second;
+		});
+
+		map.set(new Pair.<int,int>(10, 20), 30);
+		map.set(new Pair.<int,int>(10, 20), 40);
+		map.set(new Pair.<int,int>(10, 30), 50);
+		map.set(new Pair.<int,int>(20, 30), 60);
+
+		this.expect(map.has(new Pair.<int,int>(10, 20)), "has").toBe(true);
+		this.expect(map.has(new Pair.<int,int>(20, 20)), "has").toBe(false);
+
+		this.expect(map.get(new Pair.<int,int>(10, 20)), "get").toBe(40);
+		this.expect(map.get(new Pair.<int,int>(20, 20)), "get").toBe(null);
+
+		this.expect(map.get(new Pair.<int,int>(20, 30)), "get").toBe(60);
+		map.delete(new Pair.<int,int>(20, 30));
+		this.expect(map.get(new Pair.<int,int>(20, 30)), "get").toBe(null);
+
+		map.clear();
+		this.expect(map.has(new Pair.<int,int>(10, 20)), "has after clear").toBe(false);
+		this.expect(map.has(new Pair.<int,int>(20, 20)), "has after clear").toBe(false);
+	}
 }
 

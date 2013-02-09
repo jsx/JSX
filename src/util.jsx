@@ -429,13 +429,13 @@ class TypedMap.<K,V> {
 		this._equalsCallback = equalsCallback;
 	}
 
-	function exists (key : K) : boolean {
+	function has(key : K) : boolean {
 		return ! this.forEach(function (entryKey, entryValue) {
 			return ! this._equalsCallback(key, entryKey);
 		});
 	}
 
-	function put(key : K, val : V) : void {
+	function set(key : K, val : V) : void {
 		for (var i = 0; i < this._list.length; ++i) {
 			if (this._equalsCallback(this._list[i].first, key)) {
 				this._list[i].second = val;
@@ -454,7 +454,7 @@ class TypedMap.<K,V> {
 		return null;
 	}
 
-	function remove(key : K) : void {
+	function delete(key : K) : void {
 		for (var i = 0; i < this._list.length; ++i) {
 			if (this._equalsCallback(this._list[i].first, key)) {
 				this._list.splice(i, 1);

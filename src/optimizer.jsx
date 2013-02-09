@@ -1391,12 +1391,12 @@ class _DeadCodeEliminationOptimizeCommand extends _FunctionOptimizeCommand {
 				&& (expr as AssignmentExpression).getFirstExpr() instanceof LocalExpression) {
 					var local = ((expr as AssignmentExpression).getFirstExpr() as LocalExpression).getLocal();
 					this.log("local variable " + local.getName().getValue() + " cannot be rewritten (has fused op)");
-					localsUntouchable.put(local, true);
+					localsUntouchable.set(local, true);
 				} else if (expr instanceof IncrementExpression
 					&& (expr as IncrementExpression).getExpr() instanceof LocalExpression) {
 					var local = ((expr as IncrementExpression).getExpr() as LocalExpression).getLocal();
 					this.log("local variable " + local.getName().getValue() + " cannot be rewritten (has increment)");
-					localsUntouchable.put(local, true);
+					localsUntouchable.set(local, true);
 				}
 			return expr.forEachExpression(_onExpr);
 		};
@@ -1416,10 +1416,10 @@ class _DeadCodeEliminationOptimizeCommand extends _FunctionOptimizeCommand {
 							locals.reversedForEach(function(local, expr) {
 								if (local == lhsLocal) {
 									this.log("  clearing itself");
-									locals.remove(local);
+									locals.delete(local);
 								} else if (expr instanceof LocalExpression && (expr as LocalExpression).getLocal() == lhsLocal) {
 									this.log("  clearing " + local.getName().getValue());
-									locals.remove(local);
+									locals.delete(local);
 								}
 								return true;
 							});
@@ -1429,14 +1429,14 @@ class _DeadCodeEliminationOptimizeCommand extends _FunctionOptimizeCommand {
 									var rhsLocal = (rhsExpr as LocalExpression).getLocal();
 									if (lhsLocal != rhsLocal && ! localsUntouchable.get(rhsLocal)) {
 										this.log("  set to: " + rhsLocal.getName().getValue());
-										locals.put(lhsLocal, rhsExpr);
+										locals.set(lhsLocal, rhsExpr);
 									}
 								} else if (rhsExpr instanceof NullExpression
 									   || rhsExpr instanceof NumberLiteralExpression
 									   || rhsExpr instanceof IntegerLiteralExpression
 									   || rhsExpr instanceof StringLiteralExpression) {
 									this.log("  set to: " + rhsExpr.getToken().getValue());
-									locals.put(lhsLocal, rhsExpr);
+									locals.set(lhsLocal, rhsExpr);
 								}
 							}
 						}

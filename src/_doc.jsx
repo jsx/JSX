@@ -412,7 +412,7 @@ class DocumentGenerator {
 		var _ = "";
 ?<a href="<?= this._escape(parserOfClassDef.getPath()) ?>.html#class-<?= this._escape(classDef.className()) ?>"><?= this._escape(classDef.className()) ?></a>
 		_ = _.trim();
-		this._classDefToHTMLCache.put(classDef, _);
+		this._classDefToHTMLCache.set(classDef, _);
 		return _;
 	}
 

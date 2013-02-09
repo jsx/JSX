@@ -1494,7 +1494,7 @@ class TemplateFunctionDefinition extends MemberFunctionDefinition implements Tem
 			instantiationContext.objectTypesUsed[i].resolveType(analysisContext);
 		instantiated.analyze(analysisContext);
 		// register, and return
-		this._instantiatedDefs.put(typeArgs.concat(new Type[]), instantiated);
+		this._instantiatedDefs.set(typeArgs.concat(new Type[]), instantiated);
 		return instantiated;
 	}
 
