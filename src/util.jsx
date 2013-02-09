@@ -71,8 +71,13 @@ class Util {
 		return s;
 	}
 
-	// Usage: format("%1 %% %2", ["foo", "bar"]) -> "foo % bar"
+	/**
+	 * Usage: Util.format("%1 %% %2", ["foo", "bar"]) -> "foo % bar"
+     * @param fmt format template
+	 * @param args parameters which are expanded into <code>fmt</code>
+	 */
 	static function format (fmt : string, args : string[]) : string {
+		assert args != null;
 		var i = 0;
 		return fmt.replace(/%(\d+|%)/g, function(m) {
 			if (m == "%%") {
