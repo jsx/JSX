@@ -945,6 +945,17 @@ native class Error {
 	var name : string;
 	var message : string;
 
+	/**
+	 * Implementation-dependent stack trace information
+	 */
+	var stack : string;
+
+	/*(TBD)*
+	 * V8 extention to create the stack trace
+	 * @see http://code.google.com/p/v8/wiki/JavaScriptStackTraceApi
+	 */
+	//static function createStackTrace(error : Error);
+
 }
 
 native class EvalError extends Error {

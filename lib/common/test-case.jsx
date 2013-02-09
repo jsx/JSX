@@ -71,6 +71,7 @@ import "console.jsx";
 class TestCase {
 	// TODO turn off when the process has no tty
 	var verbose = true;
+	var showStackTrace = true; // turn off on test this class
 
 	var _totalCount = 0;
 	var _totalPass  = 0;
@@ -121,7 +122,14 @@ class TestCase {
 			testFunction();
 		}
 		catch (e : Error) {
-			this.fail(name + " failed with exception: " + e.toString());
+			var msg = "failed with exception";
+			if (e.message) {
+				msg += ": " + e.message;
+			}
+			this._say("\t" + "not ok " + (this._count+1) as string + " - " + name + msg);
+			if (e.stack && this.showStackTrace) {
+				this.diag(e.toString() + "\n" + e.stack);
+			}
 		}
 
 		if(numAsyncTasks == this._tasks.length) { // synchronous
@@ -208,19 +216,26 @@ class TestCase {
 		this._say("\t" + "ok " + (this._count) as string + s);
 	}
 
+	function _nok(name : Nullable.<string>) : void {
+		this._nok(name, null, null, null);
+	}
+
 	function _nok(
 		name : Nullable.<string>,
-		op : string,
+		op : Nullable.<string>,
 		got : variant,
 		expected : variant
 	) : void {
 
 		var s = name != null ? " - " + name :  "";
-		this._say("\t" + "not ok " + (this._count) as string + s);
+		this._say("\t" + "not ok " + this._count as string + s);
 
-		this.diag("comparing with " + op + s.replace(" - ", " for "));
-		this._dump("got:      ", got);
-		this._dump("expected: ", expected);
+		if (op != null) {
+			this.diag("comparing with " + op + s.replace(" - ", " for "));
+			this._dump("got:      ", got);
+			this._dump("expected: ", expected);
+		}
+		throw new TestFailure(name != null ? name : "");
 	}
 
 	/**
@@ -237,8 +252,8 @@ class TestCase {
 	 * Tells a test fails.
 	 */
 	function fail(reason : string) : void {
-		this._say("not ok - fail");
-		this.diag(reason);
+		++this._count;
+		throw new TestFailure(reason);
 	}
 
 	function _dump(tag : string, value : variant) : void {
@@ -385,6 +400,12 @@ class TestCase {
 		else { // before boforeClass()
 			return "TestCase";
 		}
+	}
+}
+
+class TestFailure extends Error {
+	function constructor(reason : string) {
+		super(reason);
 	}
 }
 
