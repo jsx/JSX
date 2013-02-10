@@ -117,8 +117,9 @@ class TestCase {
 		var numAsyncTasks = this._tasks.length;
 		this._currentName = name;
 
+		this.setUp();
+
 		try {
-			this.setUp();
 			testFunction();
 		}
 		catch (e : Error) {
@@ -126,7 +127,7 @@ class TestCase {
 			if (e.message) {
 				msg += ": " + e.message;
 			}
-			this._say("\t" + "not ok " + (this._count+1) as string + " - " + name + msg);
+			this._say("\t" + "not ok " + (++this._count) as string + " - " + name + msg);
 			if (e.stack && this.showStackTrace) {
 				this.diag(e.toString() + "\n" + e.stack);
 			}
