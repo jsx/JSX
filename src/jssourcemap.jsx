@@ -49,8 +49,8 @@ class SourceMapper {
 	}
 
 	function constructor (outputFile : string, sourceRoot : Nullable.<string>) {
-		this._outputFile = outputFile;
-		var relName = outputFile.split("/").pop();
+		this._outputFile = Util.resolvePath(outputFile);
+		var relName = this._outputFile.split("/").pop();
 		this._impl = SourceMapper.createSourceMapGenerator({
 			file       : relName,
 			sourceRoot : sourceRoot

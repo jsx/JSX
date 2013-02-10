@@ -286,17 +286,13 @@ class Util {
 	}
 
 	static function _resolvedPathParts(path : string) : string[] {
-		var tokens = path.split("/");
+		var tokens = path.split(/[\\\/]+/);
 		for (var i = 0; i < tokens.length;) {
-			if (tokens[i] == "." || (i != 0 && tokens[i] == "")) {
+			if (i != 0 && tokens[i] == ".") {
 				tokens.splice(i, 1);
 			} else if (tokens[i] == ".." && i != 0 && tokens[i - 1] != "..") {
-				if (i == 1 && tokens[0] == "") {
-					tokens.splice(i, 1);
-				} else {
-					tokens.splice(i - 1, 2);
-					i -= 1;
-				}
+				tokens.splice(i - 1, 2);
+				i -= 1;
 			} else {
 				i++;
 			}

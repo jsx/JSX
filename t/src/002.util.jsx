@@ -55,10 +55,17 @@ class _Test extends TestCase {
 		this.expect(Util.resolvePath("a/../b")).toBe("b");
 		this.expect(Util.resolvePath("a/../../b")).toBe("../b");
 		this.expect(Util.resolvePath("../../a")).toBe("../../a");
+		this.expect(Util.resolvePath("/a")).toBe("/a");
 		this.expect(Util.resolvePath("/a/b/c")).toBe("/a/b/c");
 		this.expect(Util.resolvePath("/a/../b")).toBe("/b");
-		this.expect(Util.resolvePath("/a/../../c")).toBe("/c");
+		this.expect(Util.resolvePath("/a/b/../../c")).toBe("/c");
+		this.expect(Util.resolvePath("/a/../../c")).toBe("c");
 		this.expect(Util.resolvePath("a//b//c")).toBe("a/b/c");
+
+		this.expect(Util.resolvePath("a\\b\\c")).toBe("a/b/c");
+
+		this.expect(Util.resolvePath("."), ".").toBe(".");
+		this.expect(Util.resolvePath("/"), "/").toBe("/");
 	}
 
 	function testRelativePath() : void {

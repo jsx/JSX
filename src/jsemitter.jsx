@@ -2015,9 +2015,11 @@ class JavaScriptEmitter implements Emitter {
 	}
 
 	override function setOutputFile (name : Nullable.<string>) : void {
-		this._outputFile = name;
+		if (name == null) return;
 
-		if(this._enableSourceMap && name != null) {
+		this._outputFile = Util.resolvePath(name);
+
+		if(this._enableSourceMap) {
 			// FIXME: set correct sourceRoot
 			var sourceRoot = null : Nullable.<string>;
 			this._sourceMapper = new SourceMapper(name, sourceRoot);

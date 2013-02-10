@@ -47,7 +47,7 @@ class NodePlatform extends Platform {
 	}
 
 	function constructor (root : string) {
-		this._root = root.replace(/\\/g, "/");
+		this._root = Util.resolvePath(root);
 	}
 
 	override function getRoot () : string {
