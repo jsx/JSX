@@ -1,6 +1,6 @@
 // to fix the result of test failure
 /*EXPECTED
-1..12
+1..11
 	ok 1 - boolean v.s. boolean
 	ok 2
 	ok 3
@@ -13,60 +13,53 @@ ok 1 - testShouldBeOK
 # got:      false
 # expected: true
 	not ok 2 - testShouldNotBeOK_toBefailed with exception: boolean v.s. boolean
-	1..1
+	1..2
 not ok 2 - testShouldNotBeOK_toBe
 	not ok 1
 # comparing with <
 # got:      10
 # expected: 10
 	not ok 2 - testShouldNotBeOK_toBeLTfailed with exception
-	1..1
+	1..2
 not ok 3 - testShouldNotBeOK_toBeLT
 	not ok 1
 # comparing with <=
 # got:      10
 # expected: 9
 	not ok 2 - testShouldNotBeOK_toBeLEfailed with exception
-	1..1
+	1..2
 not ok 4 - testShouldNotBeOK_toBeLE
 	not ok 1
 # comparing with >
 # got:      10
 # expected: 10
 	not ok 2 - testShouldNotBeOK_toBeGTfailed with exception
-	1..1
+	1..2
 not ok 5 - testShouldNotBeOK_toBeGT
 	not ok 1
 # comparing with >=
 # got:      10
 # expected: 11
 	not ok 2 - testShouldNotBeOK_toBeGEfailed with exception
-	1..1
+	1..2
 not ok 6 - testShouldNotBeOK_toBeGE
-	not ok 1
-# comparing with >=
-# got:      10
-# expected: 11
-	not ok 2 - testShouldNotBeOK_toBeGEfailed with exception
-	1..1
-not ok 7 - testShouldNotBeOK_toBeGE
 	ok 1
 	ok 2
 	1..2
-ok 8 - testExpectToMatch
+ok 7 - testExpectToMatch
 	ok 1 - just pass
 	1..1
-ok 9 - testPass
+ok 8 - testPass
 	not ok 2 - testFailfailed with exception: just fail
-	1..1
-not ok 10 - testFail
+	1..2
+not ok 9 - testFail
 # this is diag
 	1..0
-ok 11 - testDiag
+ok 10 - testDiag
 # this is note
 	1..0
-ok 12 - testNote
-# tests failed 7 of 12
+ok 11 - testNote
+# tests failed 6 of 11
 */
 
 import "test-case.jsx";
@@ -91,7 +84,6 @@ class _Main {
 			new T("testShouldNotBeOK_toBeLT", () -> { t.testShouldNotBeOK_toBeLT(); }),
 			new T("testShouldNotBeOK_toBeLE", () -> { t.testShouldNotBeOK_toBeLE(); }),
 			new T("testShouldNotBeOK_toBeGT", () -> { t.testShouldNotBeOK_toBeGT(); }),
-			new T("testShouldNotBeOK_toBeGE", () -> { t.testShouldNotBeOK_toBeGE(); }),
 			new T("testShouldNotBeOK_toBeGE", () -> { t.testShouldNotBeOK_toBeGE(); }),
 			new T("testExpectToMatch", () -> { t.testExpectToMatch(); }),
 			new T("testPass", () -> { t.testPass(); }),
