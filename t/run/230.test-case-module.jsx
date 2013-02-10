@@ -1,6 +1,6 @@
 // to fix the result of test failure
 /*EXPECTED
-1..11
+1..12
 	ok 1 - boolean v.s. boolean
 	ok 2
 	ok 3
@@ -12,35 +12,35 @@ ok 1 - testShouldBeOK
 # comparing with == for boolean v.s. boolean
 # got:      false
 # expected: true
-	not ok 2 - testShouldNotBeOK_toBefailed with exception: boolean v.s. boolean
+	not ok 2 - boolean v.s. boolean
 	1..2
 not ok 2 - testShouldNotBeOK_toBe
 	not ok 1
 # comparing with <
 # got:      10
 # expected: 10
-	not ok 2 - testShouldNotBeOK_toBeLTfailed with exception
+	not ok 2
 	1..2
 not ok 3 - testShouldNotBeOK_toBeLT
 	not ok 1
 # comparing with <=
 # got:      10
 # expected: 9
-	not ok 2 - testShouldNotBeOK_toBeLEfailed with exception
+	not ok 2
 	1..2
 not ok 4 - testShouldNotBeOK_toBeLE
 	not ok 1
 # comparing with >
 # got:      10
 # expected: 10
-	not ok 2 - testShouldNotBeOK_toBeGTfailed with exception
+	not ok 2
 	1..2
 not ok 5 - testShouldNotBeOK_toBeGT
 	not ok 1
 # comparing with >=
 # got:      10
 # expected: 11
-	not ok 2 - testShouldNotBeOK_toBeGEfailed with exception
+	not ok 2
 	1..2
 not ok 6 - testShouldNotBeOK_toBeGE
 	ok 1
@@ -50,16 +50,19 @@ ok 7 - testExpectToMatch
 	ok 1 - just pass
 	1..1
 ok 8 - testPass
-	not ok 2 - testFailfailed with exception: just fail
+	not ok 2 - just fail
 	1..2
 not ok 9 - testFail
+	not ok 1 - failed with exception: stop
+	1..1
+not ok 10 - testStopWithException
 # this is diag
 	1..0
-ok 10 - testDiag
+ok 11 - testDiag
 # this is note
 	1..0
-ok 11 - testNote
-# tests failed 6 of 11
+ok 12 - testNote
+# tests failed 7 of 12
 */
 
 import "test-case.jsx";
@@ -88,6 +91,7 @@ class _Main {
 			new T("testExpectToMatch", () -> { t.testExpectToMatch(); }),
 			new T("testPass", () -> { t.testPass(); }),
 			new T("testFail", () -> { t.testFail(); }),
+			new T("testStopWithException", () -> { t.testStopWithException(); }),
 			new T("testDiag", () -> { t.testDiag(); }),
 			new T("testNote", () -> { t.testNote(); })
 
@@ -153,6 +157,10 @@ class _Test extends TestCase {
 	function testFail() : void {
 		this.fail("just fail");
 		this.diag("not reached");
+	}
+
+	function testStopWithException() : void {
+		throw new Error("stop");
 	}
 
 	function testDiag() : void {
