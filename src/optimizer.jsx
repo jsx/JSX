@@ -696,6 +696,7 @@ class _NonVirtualOptimizeCommand extends _OptimizeCommand {
 				if ((funcDef.flags() & ClassDefinition.IS_OVERRIDE) == 0 &&
 					(funcDef.flags() & ClassDefinition.IS_FINAL) != 0 &&
 					(funcDef.flags() & ClassDefinition.IS_STATIC) == 0 &&
+					(funcDef.flags() & ClassDefinition.IS_NATIVE) == 0 &&
 					funcDef.name() != "constructor") {
 						this.log("rewriting method to static function: " + funcDef.name());
 						this._rewriteFunctionAsStatic(funcDef);
@@ -754,17 +755,19 @@ class _NonVirtualOptimizeCommand extends _OptimizeCommand {
 						// is a member method call
 						var receiverType = propertyExpr.getExpr().getType().resolveIfNullable();
 						var receiverClassDef = receiverType.getClassDef();
-						var argTypes = [ receiverType ].concat((expr as CallExpression).getArguments().map.<Type>((expr) -> { return expr.getType(); }));
-						var funcDef = Util.findFunctionInClass(receiverClassDef, propertyExpr.getIdentifierToken().getValue(), argTypes, true);
-						if ((funcDef.flags() & ClassDefinition.IS_OVERRIDE) == 0 &&
+						var funcType = propertyExpr.getType() as ResolvedFunctionType;
+						var newArgTypes = [ receiverType ].concat(funcType.getArgumentTypes());
+						var funcDef = Util.findFunctionInClass(receiverClassDef, propertyExpr.getIdentifierToken().getValue(), newArgTypes, true);
+						if (funcDef != null &&
+							(funcDef.flags() & ClassDefinition.IS_OVERRIDE) == 0 &&
 							(funcDef.flags() & ClassDefinition.IS_FINAL) != 0 &&
+							(funcDef.flags() & ClassDefinition.IS_NATIVE) == 0 &&
 							funcDef.name() != "constructor") {
 								// found, rewrite
 								onExpr(propertyExpr.getExpr(), function (expr) {
 									propertyExpr.setExpr(expr);
 								});
 								Util.forEachExpression(onExpr, (expr as CallExpression).getArguments());
-								var funcType = propertyExpr.getType();
 								replaceCb(
 									new CallExpression(
 										expr.getToken(),
@@ -775,8 +778,8 @@ class _NonVirtualOptimizeCommand extends _OptimizeCommand {
 											propertyExpr.getTypeArguments(),
 											new StaticFunctionType(
 												null, // this argument is no longer used in optimization phase
-												(funcType as ResolvedFunctionType).getReturnType(),
-												[ receiverType ].concat((funcType as ResolvedFunctionType).getArgumentTypes()),
+												funcType.getReturnType(),
+												newArgTypes,
 												false)),
 										[ propertyExpr.getExpr() ].concat((expr as CallExpression).getArguments())));
 								return true;
