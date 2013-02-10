@@ -333,14 +333,14 @@ class CompilationServer {
 			inputData += chunk as string;
 		});
 		request.on("end", function () {
-			console.info("%s#%s start %s", startTime, id, inputData);
+			console.info("%s #%s start %s", Util.formatDate(startTime), id, inputData);
 
 			try {
 				var args = JSON.parse(inputData) as string[];
 				c.setStatusCode(JSXCommand.main(c, args));
 			}
 			catch (e : Error) {
-				console.error("%s#%s %s", startTime, id, e);
+				console.error("%s #%s %s", Util.formatDate(startTime), id, e);
 				c.error((e as variant)["stack"] as string); // Error#stack
 			}
 
@@ -348,7 +348,7 @@ class CompilationServer {
 
 			var now     = new Date();
 			var elapsed = now.getTime() - startTime.getTime();
-			console.info("%s#%s finish, elapsed %s [ms]", now, id, elapsed);
+			console.info("%s #%s finish, elapsed %s [ms]", Util.formatDate(now), id, elapsed);
 		});
 		request.on("close", function () {
 			c.error("the connecion is unexpectedly closed.\n");
