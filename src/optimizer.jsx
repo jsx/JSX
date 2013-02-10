@@ -210,6 +210,9 @@ class Optimizer {
 				this._commands.push(new _NoLogCommand());
 			} else if (cmd == "no-debug") {
 				this._commands.push(new _NoDebugCommand());
+			} else if (cmd == "non-virtual") {
+				this._commands.push(new _NonVirtualOptimizeCommand());
+				calleesAreDetermined = false;
 			} else if (cmd == "unclassify") {
 				this._commands.push(new _UnclassifyOptimizationCommand());
 				calleesAreDetermined = false;
