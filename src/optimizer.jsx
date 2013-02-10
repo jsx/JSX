@@ -692,10 +692,9 @@ class _NonVirtualOptimizeCommand extends _OptimizeCommand {
 	override function performOptimization () : void {
 		this.getCompiler().forEachClassDef(function (parser, classDef) {
 			// convert function definitions (expect constructor) to static
-			this.log("unclassifying class: " + classDef.className());
 			classDef.forEachMemberFunction(function onFunction(funcDef : MemberFunctionDefinition) : boolean {
 				if ((funcDef.flags() & ClassDefinition.IS_OVERRIDE) == 0 &&
-					(funcDef.flags() & ClassDefinition.IS_FINAL) == 1 &&
+					(funcDef.flags() & ClassDefinition.IS_FINAL) != 0 &&
 					(funcDef.flags() & ClassDefinition.IS_STATIC) == 0 &&
 					funcDef.name() != "constructor") {
 						this.log("rewriting method to static function: " + funcDef.name());
@@ -758,7 +757,7 @@ class _NonVirtualOptimizeCommand extends _OptimizeCommand {
 						var argTypes = [ receiverType ].concat((expr as CallExpression).getArguments().map.<Type>((expr) -> { return expr.getType(); }));
 						var funcDef = Util.findFunctionInClass(receiverClassDef, propertyExpr.getIdentifierToken().getValue(), argTypes, true);
 						if ((funcDef.flags() & ClassDefinition.IS_OVERRIDE) == 0 &&
-							(funcDef.flags() & ClassDefinition.IS_FINAL) == 1 &&
+							(funcDef.flags() & ClassDefinition.IS_FINAL) != 0 &&
 							funcDef.name() != "constructor") {
 								// found, rewrite
 								onExpr(propertyExpr.getExpr(), function (expr) {
