@@ -678,6 +678,116 @@ class _DetermineCalleeCommand extends _FunctionOptimizeCommand {
 
 }
 
+class _NonVirtualOptimizeCommand extends _OptimizeCommand {
+
+	static const IDENTIFIER = "non-virtual";
+
+	function constructor () {
+		super(_NonVirtualOptimizeCommand.IDENTIFIER);
+	}
+
+	override function performOptimization () : void {
+		this.getCompiler().forEachClassDef(function (parser, classDef) {
+			// convert function definitions (expect constructor) to static
+			this.log("unclassifying class: " + classDef.className());
+			classDef.forEachMemberFunction(function onFunction(funcDef : MemberFunctionDefinition) : boolean {
+				if ((funcDef.flags() & ClassDefinition.IS_OVERRIDE) == 0 &&
+					(funcDef.flags() & ClassDefinition.IS_FINAL) == 1 &&
+					(funcDef.flags() & ClassDefinition.IS_STATIC) == 0 &&
+					funcDef.name() != "constructor") {
+						this.log("rewriting method to static function: " + funcDef.name());
+						this._rewriteFunctionAsStatic(funcDef);
+				}
+				return true;
+			});
+			return true;
+		});
+		// rewrite member method invocations to static function calls
+		this.getCompiler().forEachClassDef(function (parser, classDef) {
+			this.log("rewriting member method calls in class: " + classDef.className());
+			// rewrite member functions
+			function onFunction (funcDef : MemberFunctionDefinition) : boolean {
+				function onStatement (statement : Statement) : boolean {
+					statement.forEachExpression(function (expr, replaceCb) {
+						this._rewriteMethodCallsToStatic(expr, replaceCb);
+						return true;
+					});
+					return statement.forEachStatement(onStatement);
+				}
+				funcDef.forEachStatement(onStatement);
+				return funcDef.forEachClosure(onFunction);
+			}
+			classDef.forEachMemberFunction(onFunction);
+			return true;
+		});
+	}
+
+	function _rewriteFunctionAsStatic (funcDef : MemberFunctionDefinition) : void {
+		// first argument should be this
+		var thisArg = new ArgumentDeclaration(new Token("$this", false), new ObjectType(funcDef.getClassDef()));
+		funcDef.getArguments().unshift(thisArg);
+		// rewrite this
+		funcDef.forEachStatement(function onStatement(statement : Statement) : boolean {
+			return statement.forEachExpression(function onExpr(expr : Expression, replaceCb : function(:Expression):void) : boolean {
+				if (expr instanceof ThisExpression) {
+					replaceCb(new LocalExpression(thisArg.getName(), thisArg));
+				} else if (expr instanceof FunctionExpression) {
+					return (expr as FunctionExpression).getFuncDef().forEachStatement(onStatement);
+				}
+				return expr.forEachExpression(onExpr);
+			}) && statement.forEachStatement(onStatement);
+		});
+		// update flags
+		funcDef.setFlags(funcDef.flags() | ClassDefinition.IS_STATIC);
+	}
+
+	function _rewriteMethodCallsToStatic (expr : Expression, replaceCb : function(:Expression):void) : void {
+		var onExpr = function (expr : Expression, replaceCb : function(:Expression):void) : boolean {
+			if (expr instanceof CallExpression) {
+				var calleeExpr = (expr as CallExpression).getExpr();
+				if (calleeExpr instanceof PropertyExpression
+				    && ! ((calleeExpr as PropertyExpression).getExpr() instanceof ClassExpression)
+					&& ! (calleeExpr as PropertyExpression).getType().isAssignable()) {
+						var propertyExpr = calleeExpr as PropertyExpression;
+						// is a member method call
+						var receiverType = propertyExpr.getExpr().getType().resolveIfNullable();
+						var receiverClassDef = receiverType.getClassDef();
+						var argTypes = [ receiverType ].concat((expr as CallExpression).getArguments().map.<Type>((expr) -> { return expr.getType(); }));
+						var funcDef = Util.findFunctionInClass(receiverClassDef, propertyExpr.getIdentifierToken().getValue(), argTypes, true);
+						if ((funcDef.flags() & ClassDefinition.IS_OVERRIDE) == 0 &&
+							(funcDef.flags() & ClassDefinition.IS_FINAL) == 1 &&
+							funcDef.name() != "constructor") {
+								// found, rewrite
+								onExpr(propertyExpr.getExpr(), function (expr) {
+									propertyExpr.setExpr(expr);
+								});
+								Util.forEachExpression(onExpr, (expr as CallExpression).getArguments());
+								var funcType = propertyExpr.getType();
+								replaceCb(
+									new CallExpression(
+										expr.getToken(),
+										new PropertyExpression(
+											propertyExpr.getToken(),
+											new ClassExpression(new Token(receiverClassDef.className(), true), receiverType),
+											propertyExpr.getIdentifierToken(),
+											propertyExpr.getTypeArguments(),
+											new StaticFunctionType(
+												null, // this argument is no longer used in optimization phase
+												(funcType as ResolvedFunctionType).getReturnType(),
+												[ receiverType ].concat((funcType as ResolvedFunctionType).getArgumentTypes()),
+												false)),
+										[ propertyExpr.getExpr() ].concat((expr as CallExpression).getArguments())));
+								return true;
+						}
+					}
+			}
+			return expr.forEachExpression(onExpr);
+		};
+		onExpr(expr, replaceCb);
+	}
+
+}
+
 class _UnclassifyOptimizationCommandStash extends OptimizerStash {
 
 	var inliner : function(:NewExpression):Expression[];
