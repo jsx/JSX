@@ -340,7 +340,7 @@ class JSXCommand {
 		var err = optimizer.setup(optimizeCommands);
 		if (err != null) {
 			platform.error(err);
-			return 0;
+			return 1;
 		}
 
 		tasks.forEach(function(proc) { proc(); });

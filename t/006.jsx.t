@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 use strict;
 use warnings;
-use Test::More tests => 16;
+use Test::More tests => 18;
 
 ok scalar(`bin/jsx --version`), "jsx --version shows something";
 is $?, 0, "... exits with 0";
@@ -25,6 +25,9 @@ isnt system("bin/jsx --target >/dev/null 2>&1"), 0,
 
 is scalar(`bin/jsx --run t/006.jsx/hello.jsx`), "Hello, world!\n", "jsx --run";
 is $?, 0, "... exits with 0";
+
+is scalar(`bin/jsx --optimize no-such-optimize-command t/006.jsx/hello.jsx`), "", "jsx --optimize no-such-optimize-command";
+isnt $?, 0, "... exits with non-zero";
 
 is scalar(`bin/jsx --run -- - < t/006.jsx/hello.jsx`), "Hello, world!\n", "jsx --run -- -";
 is $?, 0, "... exits with 0";
