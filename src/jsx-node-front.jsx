@@ -418,8 +418,8 @@ class CompilationServer {
 				c.setStatusCode(JSXCommand.main(c, args));
 			}
 			catch (e : Error) {
-				console.error("%s #%s %s", Util.formatDate(startTime), id, e);
-				c.error((e as variant)["stack"] as string); // Error#stack
+				console.error("%s #%s %s", Util.formatDate(startTime), id, e.stack);
+				c.error(e.stack);
 			}
 
 			CompilationServer.finishRequest(id, startTime, response, 200, c.getContents());
