@@ -48,10 +48,7 @@ abstract class Platform {
 
 	abstract function execute(sourceFileName : Nullable.<string>, jsSource : string, argv : string[]) : void;
 
-	function runCompilationServer(arg : variant) : number {
-		this.error("runCompilationServer is not supported in this platform");
-		return 1;
-	}
+	abstract function runCompilationServer(arg : variant) : number;
 
 	function log (s : string) : void {
 		console.log(s);
@@ -65,6 +62,7 @@ abstract class Platform {
 		console.error(s);
 	}
 
+	abstract function setWorkingDir(arg : string) : void;
 	abstract function mkpath (path : string) : void;
 	abstract function save (path : Nullable.<string>, content : string) : void;
 

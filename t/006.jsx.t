@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 use tool::Util;
-use Test::More tests => 44;
+use Test::More tests => 47;
 
 note "testing jsx(1)";
 
@@ -53,13 +53,14 @@ jsx_fail_ok("--optimize no-such-optimize-command t/006.jsx/hello.jsx");
 # sanity check
 
 jsx_ok("--run t/006.jsx/hello.jsx", "Hello, world!\n");
-jsx_ok("--executable node --run t/006.jsx/hello.jsx", "Hello, world!\n");
-jsx_ok("--release --run t/006.jsx/hello.jsx", "");
+jsx_ok("--run --executable node t/006.jsx/hello.jsx", "Hello, world!\n");
+jsx_ok("--run --release t/006.jsx/hello.jsx", "");
+jsx_ok("--run --working-dir t/ 006.jsx/hello.jsx", "Hello, world!\n");
 
 jsx_ok("--run t/006.jsx/dump-args.jsx foo bar", qq{["foo","bar"]\n});
 
 # real command
 
-is scalar(`bin/jsx --run -- - < t/006.jsx/hello.jsx`), "Hello, world!\n", "jsx --run -- - (input from stdin)";
+is scalar(`bin/jsx --run --input-filename t/006.jsx/hello.jsx -- - < t/006.jsx/hello.jsx`), "Hello, world!\n", "jsx --run -- - (input from stdin)";
 is $?, 0, "... exited successfully";
 

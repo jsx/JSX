@@ -41,6 +41,7 @@ import "./meta.jsx";
 class NodePlatform extends Platform {
 
 	var _root : string;
+	var _cwd = Util.resolvePath(process.cwd());
 
 	function constructor () {
 		this(node.path.dirname(node.__dirname));
@@ -54,13 +55,19 @@ class NodePlatform extends Platform {
 		return this._root;
 	}
 
+	function _absPath(path : string) : string {
+		return path.charAt(0) == "/"
+			? path // path is already absolute
+			: this._cwd + "/" + path;
+	}
+
 	override function fileExists (name : string) : boolean {
-		name = node.path.normalize(name);
+		name = Util.resolvePath(name);
 		if (this.fileContent.hasOwnProperty(name)) {
 			return true;
 		}
 		try {
-			node.fs.statSync(name);
+			node.fs.statSync(this._absPath(name));
 		} catch (e : Error) {
 			return false;
 		}
@@ -68,11 +75,11 @@ class NodePlatform extends Platform {
 	}
 
 	override function getFilesInDirectory (path : string) : string[] {
-		return node.fs.readdirSync(path);
+		return node.fs.readdirSync(this._absPath(path));
 	}
 
 	override function load (name : string) : string {
-		name = node.path.normalize(name);
+		name = Util.resolvePath(name);
 		if (this.fileContent.hasOwnProperty(name)) {
 			return this.fileContent[name];
 		}
@@ -90,7 +97,7 @@ class NodePlatform extends Platform {
 			return content;
 		}
 		else {
-			var content = node.fs.readFileSync(name, "utf-8");
+			var content = node.fs.readFileSync(this._absPath(name), "utf-8");
 			// cache the content without condition because the platform object
 			// is created for each compilation for now.
 			this.fileContent[name] = content;
@@ -103,19 +110,23 @@ class NodePlatform extends Platform {
 			process.stdout.write(content);
 		}
 		else {
-			node.fs.writeFileSync(outputFile, content);
+			node.fs.writeFileSync(this._absPath(outputFile), content);
 		}
+	}
+
+	override function setWorkingDir (dir : string) : void {
+		this._cwd = Util.resolvePath(dir);
 	}
 
 	override function mkpath (path : string) : void {
 		try {
-			node.fs.statSync(path);
+			node.fs.statSync(this._absPath(path));
 		} catch (e : Error) {
 			var dirOfPath = path.replace(new RegExp("/[^/]*$"), "");
 			if (dirOfPath != path) {
 				this.mkpath(dirOfPath);
 			}
-			node.fs.mkdirSync(path);
+			node.fs.mkdirSync(this._absPath(path));
 		}
 	}
 
@@ -168,7 +179,7 @@ class NodePlatform extends Platform {
 
 	override function makeFileExecutable(file : string, runEnv : string) : void {
 		if (runEnv == "node") {
-			node.fs.chmodSync(file, "0755");
+			node.fs.chmodSync(this._absPath(file), "0755");
 		}
 	}
 
@@ -215,14 +226,15 @@ class NodePlatform extends Platform {
 }
 
 /**
- * NodePlatform variation for compiler service (daemon)
+ * NodePlatform variation for compiler server
  */
 class CompilationServerPlatform extends NodePlatform {
 	// response contents
-	var _stdout     = "";
-	var _stderr     = "";
-	var _file       = new Map.<string>;
-	var _statusCode = 1; // failure
+	var _stdout         = "";
+	var _stderr         = "";
+	var _file           = new Map.<string>;
+	var _executableFile = new Map.<string>;
+	var _statusCode     = 1; // 0=success, other=failure
 
 	var _scriptFile   = null : Nullable.<string>;   // file name on --run
 	var _scriptSource = null : Nullable.<string>;   // source code on --run
@@ -270,27 +282,32 @@ class CompilationServerPlatform extends NodePlatform {
 		this._statusCode = statusCode;
 	}
 
-	function getContents() : variant {
-		var run = null : variant;
+	function getContents() : Map.<variant> {
+		var content = {
+			stdout         : this._stdout,
+			stderr         : this._stderr,
+			file           : this._file,
+			executableFile : this._executableFile,
+
+			statusCode : this._statusCode
+		} : Map.<variant>;
+
 		if (this._scriptSource != null) {
-			run = {
+			content["run"] = {
 				scriptFile   : this._scriptFile,
 				scriptSource : this._scriptSource,
 				scriptArgs   : this._scriptArgs
 			} : variant;
 		}
-		return {
-			stdout : this._stdout,
-			stderr : this._stderr,
-			file   : this._file,
-			run    : run,
-
-			statusCode : this._statusCode
-		} : variant;
+		return content;
 	}
 
 	override function makeFileExecutable(file : string, runEnv : string) : void {
-		// noop
+		this._executableFile[file] = runEnv;
+	}
+
+	override function runCompilationServer(arg : variant) : number {
+		throw new Error('not supported');
 	}
 }
 

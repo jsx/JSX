@@ -41,14 +41,17 @@ sub jsx { # returns (status, stdout, stderr)
         require Text::ParseWords;
         require HTTP::Tiny;
         require JSON;
+        require Cwd;
 
         $ua ||= HTTP::Tiny->new(
             agent => "JSX compiler client",
         );
 
+        my @real_args = ("--working-dir", Cwd::getcwd(), Text::ParseWords::shellwords(@args));
+
         my $res = $ua->post("http://localhost:$jsx_server_port/", {
             'content-type' => 'application/json',
-            'content'      => JSON::encode_json([ Text::ParseWords::shellwords(@args) ]),
+            'content'      => JSON::encode_json(\@real_args),
         });
 
         if (!( $res->{success} && $res->{headers}{'content-type'} eq 'application/json')) {

@@ -124,6 +124,12 @@ class JSXCommand {
 					return 1;
 				}
 				break;
+			case "--working-dir": // working directory
+				if((optarg = getoptarg()) == null) {
+					return 1;
+				}
+				platform.setWorkingDir(optarg);
+				break;
 			case "--mode":
 				if ((optarg = getoptarg()) == null) {
 					return 1;
