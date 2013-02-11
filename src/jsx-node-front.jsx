@@ -377,16 +377,15 @@ class CompilationServer {
 	}
 
 	function handleRequest(request : ServerRequest, response : ServerResponse) : void {
+		var startTime = new Date();
+		var id = ++this._requestSequence;
 
 		Timer.clearTimeout(this._timer); // reset
 		this._timer = Timer.setTimeout(() -> { this.shutdown(); }, this._life);
 
-		var id = ++this._requestSequence;
-		var startTime = new Date();
-
 		if (request.method == "GET") {
 			console.info("%s #%s start %s", Util.formatDate(startTime), id, request.url);
-			CompilationServer.handleGET(id, startTime, request, response);
+			this.handleGET(id, startTime, request, response);
 			return;
 		}
 
@@ -397,7 +396,7 @@ class CompilationServer {
 		var matched = request.url.match(/\?(.*)/);
 		if (!(matched && matched[1])) {
 			c.error("invalid request to compilation server");
-			CompilationServer.finishRequest(id, startTime, response, 400, c.getContents());
+			this.finishRequest(id, startTime, response, 400, c.getContents());
 			return;
 		}
 
@@ -422,18 +421,18 @@ class CompilationServer {
 				c.error(e.stack);
 			}
 
-			CompilationServer.finishRequest(id, startTime, response, 200, c.getContents());
+			this.finishRequest(id, startTime, response, 200, c.getContents());
 
 		});
 		request.on("close", function () {
 			c.error("the connecion is unexpectedly closed.\n");
-			CompilationServer.finishRequest(id, startTime, response, 500, c.getContents());
+			this.finishRequest(id, startTime, response, 500, c.getContents());
 		});
 	}
 
-	static function handleGET(id : number, startTime : Date, request : ServerRequest, response : ServerResponse) : void {
+	function handleGET(id : number, startTime : Date, request : ServerRequest, response : ServerResponse) : void {
 		// show compiler information
-		CompilationServer.finishRequest(id, startTime, response, 200, {
+		this.finishRequest(id, startTime, response, 200, {
 			version_string   : Meta.VERSION_STRING,
 			version_number   : Meta.VERSION_NUMBER,
 			last_commit_hash : Meta.LAST_COMMIT_HASH,
@@ -442,7 +441,7 @@ class CompilationServer {
 		} : variant);
 	}
 
-	static function finishRequest (id : number, startTime : Date, response : ServerResponse, statusCode : number, data : variant) : void {
+	function finishRequest (id : number, startTime : Date, response : ServerResponse, statusCode : number, data : variant) : void {
 		var content = JSON.stringify(data);
 
 		var headers = {
