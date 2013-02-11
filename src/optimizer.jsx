@@ -272,7 +272,7 @@ class Optimizer {
 				this.log("finished optimizer: " + this._commands[i]._identifier);
 			} catch (e : Error) {
 				var platform = this._compiler.getPlatform();
-				platform.error("optimizer '" + this._commands[i]._identifier + "' died unexpectedly, dumping the logs");
+				platform.error("fatal error: optimizer '" + this._commands[i]._identifier + "' died unexpectedly, dumping the logs");
 				this.dumpLogs();
 				throw e;
 			}

@@ -26,7 +26,6 @@ import "./type.jsx";
 import "./util.jsx";
 import "./parser.jsx";
 import "./optimizer.jsx";
-import "console.jsx";
 
 abstract class Statement implements Stashable {
 
@@ -42,7 +41,9 @@ abstract class Statement implements Stashable {
 			return this.doAnalyze(context);
 		} catch (e : Error) {
 			var token = this.getToken();
-			console.error("fatal error while compiling statement" + (token instanceof Token ? " at file " + token.getFilename() + ", line " + token.getLineNumber() as string : ""));
+			var srcPos = token != null ? Util.format(" at file %1, line %2", [token.getFilename(), token.getLineNumber() as string]) : "";
+			e.message = Util.format("fatal error while compiling statement%1\n%2", [srcPos, e.message]);
+
 			throw e;
 		}
 		return false;	// FIXME dummy

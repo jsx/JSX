@@ -27,7 +27,6 @@ import "./expression.jsx";
 import "./parser.jsx";
 import "./doc.jsx";
 import "./optimizer.jsx";
-import "console.jsx";
 
 class InstantiationContext {
 
@@ -451,7 +450,9 @@ class ClassDefinition implements Stashable {
 			this._analyzeClassDef(context);
 		} catch (e : Error) {
 			var token = this.getToken();
-			console.error("fatal error while analyzing class " + this.className());
+			var srcPos = token != null ? Util.format(" at file %1, line %2", [token.getFilename(), token.getLineNumber() as string]) : "";
+			e.message = Util.format("fatal error while analyzing class %1%2\n%3", [this.className(), srcPos, e.message]);
+
 			throw e;
 		}
 		this._analyzeMemberFunctions(context);
