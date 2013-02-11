@@ -7,25 +7,28 @@ use tool::Util;
 use Time::HiRes ();
 use File::Basename ();
 
-use Test::TCP ();
 use Proc::Guard ();
 
 use constant ROOT => File::Basename::dirname(__FILE__);
 
 use Cwd ();
-$ENV{JSX_HOME} = Cwd::getcwd() . '/.jsx';
+my $home = $ENV{JSX_HOME} = Cwd::getcwd() . '/.jsx';
 
 my $jsx_compiler = ROOT . "/../bin/jsx-compiler.js";
 
+my $app_jsx = ROOT . "/jsx.pl";
+require $app_jsx; # App::jsx
+
 our $server_guard;
 
-if (! -f ) { # server is not running
-    my $p = Test::TCP::empty_port();
+if (! $ENV{JSX_COMPILATION_SERVER_PORT}) { # server is not running
+    my $p = App::jsx::empty_port();
     $ENV{JSX_COMPILATION_SERVER_PORT} = $tool::Util::jsx_server_port = $p;
 
     $server_guard = Proc::Guard->new(
         code => sub {
-         open STDOUT, ">compilation-server.log" or die $!;
+         open STDOUT, ">>$home/server.log" or die $!;
+         open STDERR, ">&", \*STDOUT;
          exec $jsx_compiler, "--compilation-server", $p
             or die $!;
          },
@@ -39,7 +42,7 @@ if (! -f ) { # server is not running
             print "# $stdout\n";
             last;
         }
-        Time::HiRes::sleep(0.1);
+        Time::HiRes::sleep(0.100);
     }
 }
 

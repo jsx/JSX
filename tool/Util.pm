@@ -46,8 +46,7 @@ sub jsx { # returns (status, stdout, stderr)
         require Text::ParseWords;
         require Cwd;
 
-        my @real_args = ("--working-dir", Cwd::getcwd(), Text::ParseWords::shellwords(@args));
-
+        my @real_args = Text::ParseWords::shellwords(@args);
         my $c = App::jsx::request($jsx_server_port, @real_args);
 
         for my $filename(keys %{$c->{file}}) {
