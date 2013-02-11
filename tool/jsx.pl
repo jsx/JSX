@@ -134,6 +134,7 @@ package App::jsx;
             SUFFIX => ".js",
             UNLINK => 1,
         );
+        binmode $fh, ":utf8";
         print $fh $run->{scriptSource};
         close $fh;
 

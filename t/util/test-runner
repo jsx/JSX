@@ -1,6 +1,8 @@
 #!/usr/bin/env perl
 use strict;
 use warnings;
+use warnings FATAL => 'uninitialized';
+
 use tool::Util;
 
 use Test::More 0.88;
@@ -92,8 +94,9 @@ EOT
 
     # write to temp file
     my $temp = File::Temp->new(SUFFIX => ".js");
-    $temp->print($src);
-    $temp->close();
+    binmode $temp, ":utf8";
+    print $temp $src;
+    close $temp;
 
     # execute compiled node
     my $js = $ENV{JSX_RUNJS} || "node";

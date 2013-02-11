@@ -33,8 +33,6 @@ sub _system { # system() which returns (status code, stdout, stderr)
     return ($? == 0, $stdout, $stderr);
 }
 
-our $ua;
-
 sub jsx { # returns (status, stdout, stderr)
     my(@args) = @_;
 
@@ -64,13 +62,7 @@ sub jsx { # returns (status, stdout, stderr)
         }
 
         if ($c->{run}) {
-            require File::Temp;
-            my $js = $ENV{JSX_RUNJS} || "node";
-            my $file = File::Temp->new(SUFFIX => ".js");
-            $file->print($c->{run}{scriptSource});
-            $file->close();
-            my $scriptArgs = $c->{run}{scriptArgs};
-            return _system($js, $file->filename, @{$scriptArgs});
+            return _system(App::jsx::prepare_run_command($c->{run}));
         }
         return ($c->{statusCode} == 0, $c->{stdout}, $c->{stderr});
     }
