@@ -355,6 +355,11 @@ class CompilationServer {
 		process.on("SIGTERM", () -> { server.shutdown(); });
 		process.on("SIGINT",  () -> { server.shutdown(); });
 
+		// shutdown if the compiler has been updated
+		node.fs.watch(node.__filename, { persistent: false } : Map.<variant>, (event, filename) -> {
+			server.shutdown();
+		});
+
 		return 0;
 	}
 

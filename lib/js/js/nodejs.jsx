@@ -39,6 +39,7 @@ final class node {
 	}
 
 	static const __dirname     = js.eval("__dirname") as string;
+	static const __filename    = js.eval("__filename") as string;
 
 	static const fs            = node.require('fs') as __noconvert__ _fs;
 	static const path          = node.require('path') as __noconvert__ _path;
