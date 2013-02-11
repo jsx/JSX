@@ -7,8 +7,12 @@ use Fatal qw(open close);
 use File::Basename ();
 use lib File::Basename::dirname(__FILE__) . "/../extlib/lib/perl5";
 
+
 use base qw(Exporter);
 our @EXPORT = qw(slurp get_section jsx);
+
+use Cwd ();
+$ENV{JSX_HOME} = Cwd::getcwd() . '/.jsx';
 
 our $jsx_server_port = $ENV{JSX_COMPILATION_SERVER_PORT};
 

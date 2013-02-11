@@ -12,6 +12,9 @@ use Proc::Guard ();
 
 use constant ROOT => File::Basename::dirname(__FILE__);
 
+use Cwd ();
+$ENV{JSX_HOME} = Cwd::getcwd() . '/.jsx';
+
 our $server_guard;
 
 if (! $ENV{JSX_COMPILATION_SERVER_PORT}) { # server is not running
