@@ -332,7 +332,7 @@ class Compiler {
 					}
 				}
 			}
-			throw new Error("logic error, could not find class definition of '" + deps[0].className() + "'");
+			throw new Error("logic flaw, could not find class definition of '" + deps[0].className() + "'");
 		};
 		for (var i = 0; i < classDefs.length;) {
 			var deps = classDefs[i].implementTypes().map.<ClassDefinition>(function (t) { return t.getClassDef(); }).concat(new ClassDefinition[]);
