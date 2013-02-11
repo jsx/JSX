@@ -308,16 +308,11 @@ class CompilationServer {
 
 	static function handleRequest(platform : Platform, request : ServerRequest, response : ServerResponse) : void {
 		var id = ++CompilationServer._requestSequence;
+		var startTime = new Date();
 
 		if (request.method == "GET") {
-			// TODO: dispath some API path (i.e. /version)
-			CompilationServer.finishRequest(response, 200, {
-				version_string   : Meta.VERSION_STRING,
-				version_number   : Meta.VERSION_NUMBER,
-				last_commit_hash : Meta.LAST_COMMIT_HASH,
-				last_commit_date : Meta.LAST_COMMIT_DATE,
-				status : true
-			} : variant);
+			console.info("%s #%s start %s", Util.formatDate(startTime), id, request.url);
+			CompilationServer.handleGET(id, startTime, request, response);
 			return;
 		}
 
@@ -325,15 +320,13 @@ class CompilationServer {
 
 		// POST: do the same as jsx(1)
 
-		var startTime = new Date();
-
 		// read POST body
 		var inputData = "";
 		request.on("data", function (chunk) {
 			inputData += chunk as string;
 		});
 		request.on("end", function () {
-			console.info("%s #%s start %s", Util.formatDate(startTime), id, inputData);
+			console.info("%s #%s start %s", Util.formatDate(startTime), id, inputData.replace(/\n/g, "\\n"));
 
 			try {
 				var args = JSON.parse(inputData) as string[];
@@ -344,19 +337,27 @@ class CompilationServer {
 				c.error((e as variant)["stack"] as string); // Error#stack
 			}
 
-			CompilationServer.finishRequest(response, 200, c.getContents());
+			CompilationServer.finishRequest(id, startTime, response, 200, c.getContents());
 
-			var now     = new Date();
-			var elapsed = now.getTime() - startTime.getTime();
-			console.info("%s #%s finish, elapsed %s [ms]", Util.formatDate(now), id, elapsed);
 		});
 		request.on("close", function () {
 			c.error("the connecion is unexpectedly closed.\n");
-			CompilationServer.finishRequest(response, 500, c.getContents());
+			CompilationServer.finishRequest(id, startTime, response, 500, c.getContents());
 		});
 	}
 
-	static function finishRequest (response : ServerResponse, statusCode : number, data : variant) : void {
+	static function handleGET(id : number, startTime : Date, request : ServerRequest, response : ServerResponse) : void {
+		// show compiler information
+		CompilationServer.finishRequest(id, startTime, response, 200, {
+			version_string   : Meta.VERSION_STRING,
+			version_number   : Meta.VERSION_NUMBER,
+			last_commit_hash : Meta.LAST_COMMIT_HASH,
+			last_commit_date : Meta.LAST_COMMIT_DATE,
+			status : true
+		} : variant);
+	}
+
+	static function finishRequest (id : number, startTime : Date, response : ServerResponse, statusCode : number, data : variant) : void {
 		var content = JSON.stringify(data);
 
 		var headers = {
@@ -367,6 +368,10 @@ class CompilationServer {
 
 		response.writeHead(statusCode, headers);
 		response.end(content, "utf-8");
+
+		var now     = new Date();
+		var elapsed = now.getTime() - startTime.getTime();
+		console.info("%s #%s finish, elapsed %s [ms]", Util.formatDate(now), id, elapsed);
 	}
 }
 
