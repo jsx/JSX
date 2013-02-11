@@ -27,6 +27,7 @@
 import "js.jsx";
 import "js/nodejs.jsx";
 import "console.jsx";
+import "timer.jsx";
 
 import "./util.jsx";
 import "./emitter.jsx";
@@ -312,19 +313,70 @@ class CompilationServerPlatform extends NodePlatform {
 }
 
 class CompilationServer {
-	static var _requestSequence = 0;
+
+	var _requestSequence = 0;
+
+	// how long the server lives after the last requst [ms]
+	var _life = 5 * 60 * 1000;
+
+	// for server status
+	var _home : string;
+	var _pidFile : string;
+	var _portFile : string;
+
+	var _platform = null : Platform;
+	var _httpd = null : HTTPServer;
+	var _timer = null : TimerHandle;
+
+	function constructor(parentPlatform : Platform) {
+		this._platform = parentPlatform;
+
+		this._home = process.env["JSX_HOME"] ?: (process.env["HOME"] ?: process.env["USERPROFILE"]) + "/.jsx";
+		if (! parentPlatform.fileExists(this._home)) {
+			parentPlatform.mkpath(this._home);
+		}
+		this._pidFile  = this._home + "/pid";
+		this._portFile = this._home + "/port";
+	}
 
 	static function start(platform : Platform, port : int) : number {
-		var httpd = node.http.createServer(function (request, response) {
-			CompilationServer.handleRequest(platform, request, response);
+		var server = new CompilationServer(platform);
+
+		server._httpd = node.http.createServer((request, response) -> {
+			server.handleRequest(request, response);
 		});
-		httpd.listen(port);
-		console.info("access http://localhost:" + port as string + "/");
+		server._httpd.listen(port);
+
+		platform.save(server._pidFile,  process.pid as string);
+		platform.save(server._portFile, port as string);
+
+		console.info("%s [%s] listen http://localhost:%s/", Util.formatDate(new Date), process.pid, port);
+		server._timer = Timer.setTimeout(() -> { server.shutdown(); }, server._life);
+		process.on("SIGTERM", () -> { server.shutdown(); });
+		process.on("SIGINT",  () -> { server.shutdown(); });
+
 		return 0;
 	}
 
-	static function handleRequest(platform : Platform, request : ServerRequest, response : ServerResponse) : void {
-		var id = ++CompilationServer._requestSequence;
+	function shutdown() : void {
+		try {
+			node.fs.unlinkSync(this._portFile);
+		} catch (e : Error) { }
+		try {
+			node.fs.unlinkSync(this._pidFile);
+		} catch (e : Error) { }
+
+		Timer.clearTimeout(this._timer);
+		this._httpd.close();
+		console.info("%s [%s] shutdown, handled %s requests", Util.formatDate(new Date), process.pid, this._requestSequence);
+	}
+
+	function handleRequest(request : ServerRequest, response : ServerResponse) : void {
+
+		Timer.clearTimeout(this._timer); // reset
+		this._timer = Timer.setTimeout(() -> { this.shutdown(); }, this._life);
+
+		var id = ++this._requestSequence;
 		var startTime = new Date();
 
 		if (request.method == "GET") {
@@ -333,7 +385,7 @@ class CompilationServer {
 			return;
 		}
 
-		var c = new CompilationServerPlatform(platform.getRoot(), id, request, response);
+		var c = new CompilationServerPlatform(this._platform.getRoot(), id, request, response);
 
 		// POST: do the same as jsx(1)
 

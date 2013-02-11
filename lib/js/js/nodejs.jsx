@@ -286,12 +286,12 @@ native __fake__ class Url {
 native __fake__ class _http {
 	function createServer(
 		requestListener : function(:ServerRequest,:ServerResponse):void
-	) : Server;
+	) : HTTPServer;
 
 	function get(url : string, callback : function(:ClientResponse):void) : ClientRequest;
 }
 
-native __fake__ class Server {
+native __fake__ class HTTPServer {
 	function listen(port : int) : void;
 
 	function close() : void;
