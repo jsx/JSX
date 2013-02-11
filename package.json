@@ -25,6 +25,8 @@
   },
   "directories": {
     "bin": "./bin",
+    "tool": "./tool",
+    "web": "./web",
     "lib": "./lib",
     "src": "./src"
   },
