@@ -10,7 +10,8 @@ all: compiler doc web
 ## compiler stuff
 
 compiler: src/doc.jsx meta
-	node tool/bootstrap-compiler.js --executable node --output bin/jsx src/jsx-node-front.jsx
+	node tool/bootstrap-compiler.js --executable node --output bin/jsx-compiler.js src/jsx-node-front.jsx
+	ln -fs "$$PWD/tool/jsx.pl" bin/jsx
 
 src/doc.jsx: src/_doc.jsx
 	submodules/picotemplate/picotemplate.pl $<

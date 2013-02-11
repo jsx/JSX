@@ -306,6 +306,7 @@ class JSXCommand {
 			platform.setFileContent(inputFilename, platform.load(sourceFile));
 			sourceFile = inputFilename;
 		}
+
 		compiler.addSourceFile(null, sourceFile, completionRequest);
 
 		switch (compiler.getMode()) {

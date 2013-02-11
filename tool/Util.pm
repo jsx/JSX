@@ -42,34 +42,27 @@ sub jsx { # returns (status, stdout, stderr)
         return _system("bin/jsx @args");
     }
     else {
-        require Text::ParseWords;
-        require HTTP::Tiny;
-        require JSON;
-        require Cwd;
+        my $app_jsx = File::Basename::dirname(__FILE__) . "/jsx.pl";
+        require $app_jsx; # App::jsx
 
-        $ua ||= HTTP::Tiny->new(
-            agent => "JSX compiler client",
-        );
+        require Text::ParseWords;
+        require Cwd;
 
         my @real_args = ("--working-dir", Cwd::getcwd(), Text::ParseWords::shellwords(@args));
 
-        my $res = $ua->post("http://localhost:$jsx_server_port/", {
-            'content-type' => 'application/json',
-            'content'      => JSON::encode_json(\@real_args),
-        });
-
-        if (!( $res->{success} && $res->{headers}{'content-type'} eq 'application/json')) {
-            require Data::Dumper;
-            return (0, '', Data::Dumper::Dumper($res));
-        }
-
-        my $c = JSON::decode_json($res->{content});
+        my $c = App::jsx::request($jsx_server_port, @real_args);
 
         for my $filename(keys %{$c->{file}}) {
             open my $fh, ">", $filename;
             print $fh $c->{file}{$filename};
             close $fh;
         }
+        for my $filename(keys %{$c->{executableFile}}) {
+            if ($c->{executableFile}{$filename} eq "node") {
+                chmod(0755, $filename);
+            }
+        }
+
         if ($c->{run}) {
             require File::Temp;
             my $js = $ENV{JSX_RUNJS} || "node";

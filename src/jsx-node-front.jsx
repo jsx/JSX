@@ -390,20 +390,31 @@ class CompilationServer {
 			return;
 		}
 
+		// POST: handle compilation request
+
 		var c = new CompilationServerPlatform(this._platform.getRoot(), id, request, response);
 
-		// POST: do the same as jsx(1)
+		var matched = request.url.match(/\?(.*)/);
+		if (!(matched && matched[1])) {
+			c.error("invalid request to compilation server");
+			CompilationServer.finishRequest(id, startTime, response, 400, c.getContents());
+			return;
+		}
 
-		// read POST body
+		var query = matched[1];
+		console.info("%s #%s start %s", Util.formatDate(startTime), id, query.replace(/\n/g, "\\n"));
+
 		var inputData = "";
 		request.on("data", function (chunk) {
 			inputData += chunk as string;
 		});
 		request.on("end", function () {
-			console.info("%s #%s start %s", Util.formatDate(startTime), id, inputData.replace(/\n/g, "\\n"));
+			if (inputData) {
+				c.setFileContent("-", inputData); // as stdin
+			}
 
 			try {
-				var args = JSON.parse(inputData) as string[];
+				var args = JSON.parse(query) as string[];
 				c.setStatusCode(JSXCommand.main(c, args));
 			}
 			catch (e : Error) {

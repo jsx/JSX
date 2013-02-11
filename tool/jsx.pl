@@ -5,8 +5,10 @@ package App::jsx;
     use warnings;
     use warnings FATAL => 'uninitialized';
 
+
     use File::Basename ();
-    use lib File::Basename::dirname(__FILE__) . "/../extlib/lib/perl5";
+    use constant DIR => File::Basename::dirname(readlink(__FILE__) || __FILE__);
+    use lib DIR . "/../extlib/lib/perl5";
 
     # required modules
     use Cwd         ();
@@ -33,6 +35,8 @@ package App::jsx;
         }
     }
 
+    my $jsx_compiler = DIR . "/../bin/jsx-compiler.js";
+
     my $home = $ENV{JSX_HOME} || (($ENV{HOME} || glob('~')) . "/.jsx");
 
     my $pid_file  = "$home/pid";
@@ -42,11 +46,11 @@ package App::jsx;
 
     if (not -d $run_dir) {
         require File::Path;
-        mkpath($home . "/run");
+        File::Path::mkpath($home . "/run");
     }
 
     my $ua = HTTP::Tiny->new(
-        agent => "JSX compiler client",
+        agent => __PACKAGE__,
     );
 
     sub read_file {
@@ -55,7 +59,7 @@ package App::jsx;
         local $/;
         return scalar <$fh>;
     }
-    
+
     sub write_file {
         my($file, $content) = @_;
         open my($fh), ">", $file or Carp::confess("cannot open file '$file' for writing: $!");
@@ -79,6 +83,7 @@ package App::jsx;
         if (! server_running()) {
             unlink($port_file);
 
+            my $parent_pid = $$;
             defined(my $pid = fork()) or Carp::confess("failed to fork: $!");
 
             if ($pid == 0) {
@@ -90,8 +95,8 @@ package App::jsx;
                 POSIX::setsid();
 
                 my $port = empty_port();
-                exec(File::Basename::dirname(__FILE__) . "/jsx",
-                    "--compilation-server", $port) or Carp::confess("failed to exec jsx: $!");
+                exec($jsx_compiler, "--compilation-server", $port)
+                    or kill(TERM => $parent_pid), Carp::confess("failed to exec $jsx_compiler: $!");
                 die "not reached";
             }
             # parent process
@@ -122,16 +127,23 @@ package App::jsx;
     }
 
     sub request { # returns JSON response
-        my(@args) = @_;
+        my($port, @args) = @_;
 
-        my $port = get_server_port();
+        my %options;
+        # can read bytes from STDIN?
+        my $rbits = '';
+        vec($rbits, fileno(STDIN), 1) = 1;
+        if (select($rbits, undef, undef, 0)) {
+            local $/;
+            $options{'headers'} = {'content-type' => 'text/plain'};
+            $options{'content'} = <STDIN>;
+        }
 
         my @real_args = ("--working-dir", Cwd::getcwd(), @args);
 
-        my $res = $ua->request(POST => "http://localhost:$port/compiler", {
-            'content-type' => 'application/json',
-            'content'      => encode_json(\@real_args),
-        });
+        my $res = $ua->request(POST =>
+            "http://localhost:$port/compiler?" . encode_json(\@real_args),
+            \%options);
 
         if (!( $res->{success} && $res->{headers}{'content-type'} eq 'application/json')) {
             return {
@@ -141,29 +153,6 @@ package App::jsx;
             };
         }
         return decode_json($res->{content});
-    }
-
-    sub jsx { # returns ($ok, $stdout, $stderr)
-        my(@args) = @_;
-
-        require Text::ParseWords;
-        my $c = request(shellwords(@args));
-
-        for my $filename(keys %{$c->{file}}) {
-            write_file($filename, $c->{file}{$filename});
-        }
-        for my $filename(keys %{$c->{executableFile}}) {
-            if ($c->{executableFile} eq "node") {
-                chmod(0755, $filename);
-            }
-        }
-        if ($c->{run}) {
-            my @command = prepare_run_command($c->{run});
-            return _system(@command);
-        }
-        else {
-            return ($c->{statusCode} != 0, $c->{stdout}, $c->{stderr});
-        }
     }
 
     sub main {
@@ -181,12 +170,13 @@ package App::jsx;
             unlink $pid_file, $port_file;
         }
 
-        my $c = request(@argv);
+        my $port = get_server_port();
+        my $c = request($port, @argv);
         for my $filename(keys %{$c->{file}}) {
             write_file($filename, $c->{file}{$filename});
         }
         for my $filename(keys %{$c->{executableFile}}) {
-            if ($c->{executableFile} eq "node") {
+            if ($c->{executableFile}{$filename} eq "node") {
                 chmod(0755, $filename);
             }
         }
