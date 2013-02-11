@@ -70,7 +70,17 @@ package App::jsx;
         return;
     }
 
-    sub server_running {
+    sub server_living { # server process lives
+        if (-f $pid_file) {
+            chomp(my $pid = read_file($pid_file));
+            return kill 0, $pid;
+        }
+        else {
+            return 0;
+        }
+    }
+
+    sub server_ready { # server is ready to accept requests
         if (-f $port_file) {
             chomp(my $port = read_file($port_file));
             my $res = $ua->request(GET => "http://localhost:$port/ping");
@@ -82,9 +92,7 @@ package App::jsx;
     }
 
     sub get_server_port {
-        if (! server_running()) {
-            unlink($port_file);
-
+        if (! server_living()) {
             my $parent_pid = $$;
             defined(my $pid = fork()) or Carp::confess("failed to fork: $!");
 
@@ -102,10 +110,15 @@ package App::jsx;
                 die "not reached";
             }
             # parent process
-        }
-        until (server_running()) {
-            require Time::HiRes;
-            Time::HiRes::sleep(0.100);
+
+            my $elapsed = 0;
+            until (server_ready()) {
+                require Time::HiRes;
+                $elapsed += Time::HiRes::sleep(0.100);
+                if ($elapsed > 5) {
+                    Carp::confess("compilation server is not available. see $log_file");
+                }
+            }
         }
         return read_file($port_file);
     }
@@ -149,6 +162,8 @@ package App::jsx;
 
         if (!( $res->{success} && $res->{headers}{'content-type'} eq 'application/json')) {
             return {
+                invalid_response => 1,
+
                 statusCode => 2,
                 stdout     => "",
                 stderr     => $res->{content},
@@ -174,6 +189,12 @@ package App::jsx;
 
         my $port = get_server_port();
         my $c = request($port, @argv);
+        if ($c->{invalid_response}) {
+            unlink $pid_file, $port_file;
+            $port = get_server_port(); # retry
+            $c = request($port, @argv);
+        }
+
         for my $filename(keys %{$c->{file}}) {
             write_file($filename, $c->{file}{$filename});
         }
