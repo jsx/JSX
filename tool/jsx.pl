@@ -1,10 +1,12 @@
 #!/usr/bin/env perl
+# JSX compiler wrapper working on POSIX compatible environment
+
+use strict;
+use warnings;
+use warnings FATAL => 'uninitialized';
+
 package App::jsx;
 {
-    use strict;
-    use warnings;
-    use warnings FATAL => 'uninitialized';
-
 
     use File::Basename ();
     use constant DIR => File::Basename::dirname(readlink(__FILE__) || __FILE__);
