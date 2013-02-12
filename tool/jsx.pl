@@ -146,6 +146,7 @@ package App::jsx;
         my($port, @args) = @_;
 
         my %options;
+
         # can read bytes from STDIN?
         my $rbits = '';
         vec($rbits, fileno(STDIN), 1) = 1;
@@ -163,7 +164,7 @@ package App::jsx;
 
         if (!( $res->{success} && $res->{headers}{'content-type'} eq 'application/json')) {
             return {
-                invalid_response => 1,
+                invalid_response => 1, # server down or invalid request
 
                 statusCode => 2,
                 stdout     => "",
@@ -173,29 +174,15 @@ package App::jsx;
         return decode_json($res->{content});
     }
 
-    sub main {
-        my(@argv) = @_;
-
-        if (! @argv) {
-            print "no files\n";
-            return 1;
-        }
-
-        my $restart;
-        @argv = grep { $_ eq '--restart' ? !++$restart : 1 } @argv;
-        if ($restart && -f $pid_file) {
+    sub shutdown_server {
+        if (-f $pid_file) {
             kill TERM => read_file($pid_file);
-            unlink $pid_file, $port_file;
         }
+        unlink $pid_file, $port_file;
+    }
 
-        my $port = get_server_port();
-        my $c = request($port, @argv);
-        if ($c->{invalid_response}) {
-            unlink $pid_file, $port_file;
-            $port = get_server_port(); # retry
-            $c = request($port, @argv);
-        }
-
+    sub save_files {
+        my($c) = @_;
         for my $filename(keys %{$c->{file}}) {
             write_file($filename, $c->{file}{$filename});
         }
@@ -204,6 +191,29 @@ package App::jsx;
                 chmod(0755, $filename);
             }
         }
+        return;
+    }
+
+    sub main {
+        my(@argv) = @_;
+
+        if (! @argv) {
+            shutdown_server();
+            print "no files\n";
+            return 1;
+        }
+
+        my $port = get_server_port();
+        my $c = request($port, @argv);
+        if ($c->{invalid_response}) {
+            shutdown_server();
+
+            $port = get_server_port(); # retry
+            $c = request($port, @argv);
+        }
+
+        save_files($c);
+
         if ($c->{run}) {
             return system(prepare_run_command($c->{run}));
         }
@@ -213,7 +223,6 @@ package App::jsx;
             return $c->{statusCode};
         }
     }
-
 
     # copied from Test::TCP
     sub empty_port {

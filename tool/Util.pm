@@ -49,16 +49,7 @@ sub jsx { # returns (status, stdout, stderr)
         my @real_args = Text::ParseWords::shellwords(@args);
         my $c = App::jsx::request($jsx_server_port, @real_args);
 
-        for my $filename(keys %{$c->{file}}) {
-            open my $fh, ">", $filename;
-            print $fh $c->{file}{$filename};
-            close $fh;
-        }
-        for my $filename(keys %{$c->{executableFile}}) {
-            if ($c->{executableFile}{$filename} eq "node") {
-                chmod(0755, $filename);
-            }
-        }
+        App::jsx::save_files($c);
 
         if ($c->{run}) {
             return _system(App::jsx::prepare_run_command($c->{run}));
