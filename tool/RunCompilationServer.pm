@@ -21,9 +21,8 @@ require $app_jsx; # App::jsx
 
 our $server_guard;
 
-if (! $ENV{JSX_COMPILATION_SERVER_PORT}) { # server is not running
+if (! $ENV{JSX_TEST_NO_COMPILATION_SERVER}) {
     my $p = App::jsx::empty_port();
-    $ENV{JSX_COMPILATION_SERVER_PORT} = $tool::Util::jsx_server_port = $p;
 
     $server_guard = Proc::Guard->new(
         code => sub {
