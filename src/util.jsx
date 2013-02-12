@@ -216,9 +216,12 @@ class Util {
 		return found;
 	}
 
+	/* does not follow interfaces, mixins, and abstract classes */
 	static function findFunctionInAncestorClasses (classDef : ClassDefinition, funcName : string, argTypes : Type[], isStatic : boolean) : MemberFunctionDefinition {
 		var found;
 		for (;;) {
+			if ((classDef.flags() & ClassDefinition.IS_ABSTRACT) != 0)
+				return null;
 			if (classDef.className() == "Object") {
 				found = Util.findFunctionInClass(classDef, funcName, argTypes, isStatic);
 				break;
