@@ -219,7 +219,7 @@ sub expect_compile_error {
     ok !$ok, "failed to compile $file";
     unlike $stderr, qr/^ \s+ \b at \b \s+ \b Module \b/xms,
         "... without compiler crash";
-    unlike $stderr, qr/\b logic flaw \b/xms,
+    unlike $stderr, qr/\b logic \s+ flaw \b/xms,
         "... without logic flaw";
     unlike $stderr, qr/\b assertion \s+ failure \b/xms,
         "... without assertion failure";
