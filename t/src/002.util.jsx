@@ -52,6 +52,7 @@ class _Test extends TestCase {
 	function testResolvePath() : void {
 		this.expect(Util.resolvePath("a/b/c")).toBe("a/b/c");
 		this.expect(Util.resolvePath("a/./b")).toBe("a/b");
+		this.expect(Util.resolvePath("./a/b")).toBe("a/b");
 		this.expect(Util.resolvePath("a/../b")).toBe("b");
 		this.expect(Util.resolvePath("a/../../b")).toBe("../b");
 		this.expect(Util.resolvePath("../../a")).toBe("../../a");

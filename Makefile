@@ -12,7 +12,7 @@ all: compiler doc web
 # use jsx.pl front end as jsx(1)
 compiler: src/doc.jsx meta
 	node tool/bootstrap-compiler.js --executable node --output bin/jsx-compiler.js src/jsx-node-front.jsx
-	ln -fs "$$PWD/tool/jsx.pl" bin/jsx
+	cp -f "$$PWD/tool/jsx.pl" bin/jsx
 
 # use JSX compiler directly as jsx(1)
 compiler-js: src/doc.jsx meta

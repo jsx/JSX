@@ -14,8 +14,6 @@ our @EXPORT = qw(slurp get_section jsx);
 use Cwd ();
 $ENV{JSX_HOME} = Cwd::getcwd() . '/.jsx';
 
-our $jsx_server_port = $ENV{JSX_COMPILATION_SERVER_PORT};
-
 sub _system { # system() which returns (status code, stdout, stderr)
     my(@args) = @_;
     require IPC::Open3;
@@ -36,10 +34,9 @@ sub _system { # system() which returns (status code, stdout, stderr)
 sub jsx { # returns (status, stdout, stderr)
     my(@args) = @_;
 
-    if (! $jsx_server_port) {
-        return _system("bin/jsx @args");
-    }
-    else {
+    if (-f "$ENV{JSX_HOME}/port") {
+        my $port = slurp("$ENV{JSX_HOME}/port");
+
         my $app_jsx = File::Basename::dirname(__FILE__) . "/jsx.pl";
         require $app_jsx; # App::jsx
 
@@ -47,7 +44,7 @@ sub jsx { # returns (status, stdout, stderr)
         require Cwd;
 
         my @real_args = Text::ParseWords::shellwords(@args);
-        my $c = App::jsx::request($jsx_server_port, @real_args);
+        my $c = App::jsx::request($port, @real_args);
 
         App::jsx::save_files($c);
 
@@ -55,6 +52,9 @@ sub jsx { # returns (status, stdout, stderr)
             return _system(App::jsx::prepare_run_command($c->{run}));
         }
         return ($c->{statusCode} == 0, $c->{stdout}, $c->{stderr});
+    }
+    else {
+        return _system("bin/jsx @args");
     }
 }
 
@@ -75,3 +75,4 @@ sub get_section {
 }
 
 1;
+# vim: set expandtab:

@@ -19,7 +19,7 @@ function copyFileSync(srcFile, destFile) {
     fs.closeSync(fdw)
 }
 
-if (process.platform == "win32" || true) {
+if (process.platform == "win32") {
     console.log("installing bin/jsx for Windows");
     copyFileSync("bin/jsx-compiler.js", "bin/jsx");
 }
