@@ -32,13 +32,12 @@ class BrowserPlatform extends Platform {
 	static var debug = (dom.window.location.hash == "#debug");
 
 	var _root : string;
-	var _errors : string[];
+	var _errors = new string[];
 	var _tree : variant; // path tree
 	var _prefix : string;
 
 	function constructor() {
 		this._root = this._rootPath();
-		this._errors = new string[];
 
 		// the prefix path of the application HTML file
 		this._prefix = dom.window.location.pathname.replace(/\/[^\/]*$/, "");
