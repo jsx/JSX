@@ -41,7 +41,6 @@ sub jsx { # returns (status, stdout, stderr)
         require $app_jsx; # App::jsx
 
         require Text::ParseWords;
-        require Cwd;
 
         my @real_args = Text::ParseWords::shellwords(@args);
         my $c = App::jsx::request($port, @real_args);
@@ -54,7 +53,7 @@ sub jsx { # returns (status, stdout, stderr)
         return ($c->{statusCode} == 0, $c->{stdout}, $c->{stderr});
     }
     else {
-        return _system("bin/jsx @args");
+        return (0, "", "no compilation server running");
     }
 }
 

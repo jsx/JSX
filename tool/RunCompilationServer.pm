@@ -11,8 +11,7 @@ use Proc::Guard ();
 
 use constant ROOT => File::Basename::dirname(__FILE__);
 
-use Cwd ();
-my $home = $ENV{JSX_HOME} = Cwd::getcwd() . '/.jsx';
+my $home = $ENV{JSX_HOME} or die "no JSX_HOME";
 
 my $jsx_compiler = ROOT . "/../bin/jsx-compiler.js";
 
@@ -35,13 +34,13 @@ if (! $ENV{JSX_TEST_NO_COMPILATION_SERVER}) {
 
     # wait for running compilation server
     while (1) {
+        Time::HiRes::sleep(0.100);
         my($ok, $stdout, $stderr) = jsx("--version");
         if ($ok) {
             chomp $stdout;
             print "# $stdout\n";
             last;
         }
-        Time::HiRes::sleep(0.100);
     }
 }
 
