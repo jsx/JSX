@@ -753,40 +753,53 @@ class _NonVirtualOptimizeCommand extends _OptimizeCommand {
 						var propertyExpr = calleeExpr as PropertyExpression;
 						// is a member method call
 						var receiverType = propertyExpr.getExpr().getType().resolveIfNullable();
-						var receiverClassDef = receiverType.getClassDef();
 						// skip abstract classes
-						if ((receiverClassDef.flags() & (ClassDefinition.IS_ABSTRACT | ClassDefinition.IS_INTERFACE | ClassDefinition.IS_MIXIN)) == 0) {
-							var funcType = propertyExpr.getType() as ResolvedFunctionType;
-							var newArgTypes = [ receiverType ].concat(funcType.getArgumentTypes());
-							var funcDef = Util.findFunctionInAncestorClasses(receiverClassDef, propertyExpr.getIdentifierToken().getValue(), newArgTypes, true);
+						if ((receiverType.getClassDef().flags() & (ClassDefinition.IS_ABSTRACT | ClassDefinition.IS_INTERFACE | ClassDefinition.IS_MIXIN)) == 0) {
+							var found = this._findRewrittenFunctionInClass(receiverType, propertyExpr.getIdentifierToken().getValue(), (propertyExpr.getType() as ResolvedFunctionType).getArgumentTypes(), true);
+							var classDef = found.first, funcDef = found.second;
 							if (funcDef != null && (funcDef.flags() & (ClassDefinition.IS_OVERRIDE | ClassDefinition.IS_ABSTRACT | ClassDefinition.IS_FINAL | ClassDefinition.IS_NATIVE)) == ClassDefinition.IS_FINAL && funcDef.name() != "constructor") {
-									// found, rewrite
-									onExpr(propertyExpr.getExpr(), function (expr) {
-										propertyExpr.setExpr(expr);
-									});
-									Util.forEachExpression(onExpr, (expr as CallExpression).getArguments());
-									replaceCb(
-										new CallExpression(
-											expr.getToken(),
-											new PropertyExpression(
-												propertyExpr.getToken(),
-												new ClassExpression(new Token(receiverClassDef.className(), true), receiverType),
-												propertyExpr.getIdentifierToken(),
-												propertyExpr.getTypeArguments(),
-												new StaticFunctionType(
-													null, // this argument is no longer used in optimization phase
-													funcType.getReturnType(),
-													newArgTypes,
-													false)),
-											[ propertyExpr.getExpr() ].concat((expr as CallExpression).getArguments())));
-									return true;
-								}
+								// found, rewrite
+								onExpr(propertyExpr.getExpr(), function (expr) {
+									propertyExpr.setExpr(expr);
+								});
+								Util.forEachExpression(onExpr, (expr as CallExpression).getArguments());
+								replaceCb(
+									new CallExpression(
+										expr.getToken(),
+										new PropertyExpression(
+											propertyExpr.getToken(),
+											new ClassExpression(new Token(classDef.className(), true), new ObjectType(classDef)),
+											propertyExpr.getIdentifierToken(),
+											propertyExpr.getTypeArguments(),
+											funcDef.getType() as ResolvedFunctionType),
+										[ propertyExpr.getExpr() ].concat((expr as CallExpression).getArguments())));
+								return true;
+							}
 						}
 					}
 			}
 			return expr.forEachExpression(onExpr);
 		};
 		onExpr(expr, replaceCb);
+	}
+
+	function _findRewrittenFunctionInClass (type : Type, funcName : string, beforeArgTypes : Type[], isStatic : boolean) : Pair.<ClassDefinition, MemberFunctionDefinition> {
+		var classDef, found;
+		for (;;) {
+			classDef = type.getClassDef();
+			if ((classDef.flags() & ClassDefinition.IS_ABSTRACT) != 0) {
+				found = null : MemberFunctionDefinition;
+				break;
+			}
+			if (classDef.className() == "Object") {
+				found = Util.findFunctionInClass(classDef, funcName, [ type ].concat(beforeArgTypes), isStatic);
+				break;
+			}
+			if ((found = Util.findFunctionInClass(classDef, funcName, [ type ].concat(beforeArgTypes), isStatic)) != null)
+				break;
+			type = classDef.extendType();
+		}
+		return new Pair.<ClassDefinition, MemberFunctionDefinition>(classDef, found);
 	}
 
 }
