@@ -316,8 +316,10 @@ class CompilationServer {
 
 	var _requestSequence = 0;
 
-	// how long the server lives after the last requst [ms]
-	var _life = 5 * 60 * 1000;
+	// do not shutdown automatically
+	static const AUTO_SHUTDOWN = ! process.env["JSX_NO_AUTO_SHUTDOWN"];
+	// how long the server lives after the last requst
+	static const LIFE = 10 * 60 * 1000;
 
 	// for server status
 	var _home : string;
@@ -351,19 +353,21 @@ class CompilationServer {
 		platform.save(server._portFile, port as string);
 
 		console.info("%s [%s] listen http://localhost:%s/", Util.formatDate(new Date), process.pid, port);
-		server._timer = Timer.setTimeout(() -> { server.shutdown(); }, server._life);
-		process.on("SIGTERM", () -> { server.shutdown(); });
-		process.on("SIGINT",  () -> { server.shutdown(); });
+		server._timer = Timer.setTimeout(() -> { server.shutdown("timeout"); }, CompilationServer.LIFE);
+		process.on("SIGTERM", () -> { server.shutdown("SIGTERM"); });
+		process.on("SIGINT",  () -> { server.shutdown("SIGINT"); });
 
 		// shutdown if the compiler has been updated
-		node.fs.watch(node.__filename, { persistent: false } : Map.<variant>, (event, filename) -> {
-			server.shutdown();
-		});
+		if (CompilationServer.AUTO_SHUTDOWN) {
+			node.fs.watch(node.__filename, { persistent: false } : Map.<variant>, (event, filename) -> {
+				server.shutdown(event);
+			});
+		}
 
 		return 0;
 	}
 
-	function shutdown() : void {
+	function shutdown(reason : string) : void {
 		try {
 			node.fs.unlinkSync(this._portFile);
 		} catch (e : Error) { }
@@ -373,7 +377,7 @@ class CompilationServer {
 
 		Timer.clearTimeout(this._timer);
 		this._httpd.close();
-		console.info("%s [%s] shutdown, handled %s requests", Util.formatDate(new Date), process.pid, this._requestSequence);
+		console.info("%s [%s] shutdown by %s, handled %s requests", Util.formatDate(new Date), process.pid, reason, this._requestSequence);
 	}
 
 	function handleRequest(request : ServerRequest, response : ServerResponse) : void {
@@ -381,7 +385,7 @@ class CompilationServer {
 		var id = ++this._requestSequence;
 
 		Timer.clearTimeout(this._timer); // reset
-		this._timer = Timer.setTimeout(() -> { this.shutdown(); }, this._life);
+		this._timer = Timer.setTimeout(() -> { this.shutdown("timeout"); }, CompilationServer.LIFE);
 
 		if (request.method == "GET") {
 			console.info("%s #%s start %s", Util.formatDate(startTime), id, request.url);

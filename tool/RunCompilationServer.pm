@@ -21,15 +21,20 @@ require $app_jsx; # App::jsx
 our $server_guard;
 
 if (! $ENV{JSX_TEST_NO_COMPILATION_SERVER}) {
+    start();
+}
+
+sub start {
     my $p = App::jsx::empty_port();
 
     $server_guard = Proc::Guard->new(
         code => sub {
-         open STDOUT, ">>$home/server.log" or die $!;
-         open STDERR, ">&", \*STDOUT;
-         exec $jsx_compiler, "--compilation-server", $p
-            or die $!;
-         },
+           $ENV{JSX_NO_AUTO_SHUTDOWN} = 1;
+           open STDOUT, ">>$home/server.log" or die $!;
+           open STDERR, ">&", \*STDOUT;
+           exec $jsx_compiler, "--compilation-server", $p
+              or die $!;
+           },
     );
 
     # wait for running compilation server
