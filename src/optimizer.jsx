@@ -757,7 +757,7 @@ class _NonVirtualOptimizeCommand extends _OptimizeCommand {
 						var receiverClassDef = receiverType.getClassDef();
 						var funcType = propertyExpr.getType() as ResolvedFunctionType;
 						var newArgTypes = [ receiverType ].concat(funcType.getArgumentTypes());
-						var funcDef = Util.findFunctionInClass(receiverClassDef, propertyExpr.getIdentifierToken().getValue(), newArgTypes, true);
+						var funcDef = Util.findFunctionInAncestorClasses(receiverClassDef, propertyExpr.getIdentifierToken().getValue(), newArgTypes, true);
 						if (funcDef != null &&
 							(funcDef.flags() & ClassDefinition.IS_OVERRIDE) == 0 &&
 							(funcDef.flags() & ClassDefinition.IS_FINAL) != 0 &&

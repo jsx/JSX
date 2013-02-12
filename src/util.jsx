@@ -216,6 +216,20 @@ class Util {
 		return found;
 	}
 
+	static function findFunctionInAncestorClasses (classDef : ClassDefinition, funcName : string, argTypes : Type[], isStatic : boolean) : MemberFunctionDefinition {
+		var found;
+		for (;;) {
+			if (classDef.className() == "Object") {
+				found = Util.findFunctionInClass(classDef, funcName, argTypes, isStatic);
+				break;
+			}
+			if ((found = Util.findFunctionInClass(classDef, funcName, argTypes, isStatic)) != null)
+				break;
+			classDef = classDef.extendType().getClassDef();
+		}
+		return found;
+	}
+
 	static const _stringLiteralEncodingMap = {
 		"\0" : "\\0",
 		"\r" : "\\r",
