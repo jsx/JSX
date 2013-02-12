@@ -22,6 +22,7 @@
   ],
   "bin" : {
       "jsx" : "./bin/jsx"
+      "jsx-compiler.js" : "./bin/jsx-compiler.js"
   },
   "directories": {
     "bin": "./bin",
