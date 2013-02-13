@@ -1,12 +1,17 @@
 Revision history for the JSX software development kit
 
-NEXT
+0.9.6 2013-02-14 08:56:57
     [CHANGES]
     - TestCase will stop executing the current test on failure
     - Test failure will show stack trace if possible
     - Messages of assertion failure will include the related source code line
 
-v0.9.5 2013-02-07 01:53:14
+    [FEATURES]
+    - Replaced jsx(1) with a wrapper to JSX compilation server
+      The previous jsx(1) will be installed as jsx-compiler.js(1).
+      This change will boost the compilation speed.
+
+0.9.5 2013-02-07 01:53:14
     [CHANGES]
     - Removed web-intents from web.jsx; it has been removed even from Chrome.
     - The scope of named function expression are now ECMA-262 compatible (#108)
