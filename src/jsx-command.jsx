@@ -306,12 +306,13 @@ class JSXCommand {
 			platform.setFileContent(inputFilename, platform.load(sourceFile));
 			sourceFile = inputFilename;
 		}
+
 		compiler.addSourceFile(null, sourceFile, completionRequest);
 
 		switch (compiler.getMode()) {
 		case Compiler.MODE_PARSE:
 			if (compiler.compile()) {
-				platform.save(outputFile, compiler.getAST() as string);
+				platform.save(outputFile, compiler.getAST());
 				return 0;
 			} else {
 				return 1;

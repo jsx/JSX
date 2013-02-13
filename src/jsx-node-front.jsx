@@ -27,6 +27,7 @@
 import "js.jsx";
 import "js/nodejs.jsx";
 import "console.jsx";
+import "timer.jsx";
 
 import "./util.jsx";
 import "./emitter.jsx";
@@ -313,60 +314,130 @@ class CompilationServerPlatform extends NodePlatform {
 }
 
 class CompilationServer {
-	static var _requestSequence = 0;
+
+	var _requestSequence = 0;
+
+	// do not shutdown automatically
+	static const AUTO_SHUTDOWN = ! process.env["JSX_NO_AUTO_SHUTDOWN"];
+	// how long the server lives after the last requst
+	static const LIFE = 10 * 60 * 1000;
+
+	// for server status
+	var _home : string;
+	var _pidFile : string;
+	var _portFile : string;
+
+	var _platform = null : Platform;
+	var _httpd = null : HTTPServer;
+	var _timer = null : TimerHandle;
+
+	function constructor(parentPlatform : Platform) {
+		this._platform = parentPlatform;
+
+		this._home = process.env["JSX_HOME"] ?: (process.env["HOME"] ?: process.env["USERPROFILE"]) + "/.jsx";
+		if (! parentPlatform.fileExists(this._home)) {
+			parentPlatform.mkpath(this._home);
+		}
+		this._pidFile  = this._home + "/pid";
+		this._portFile = this._home + "/port";
+	}
 
 	static function start(platform : Platform, port : int) : number {
-		var httpd = node.http.createServer(function (request, response) {
-			CompilationServer.handleRequest(platform, request, response);
+		var server = new CompilationServer(platform);
+
+		server._httpd = node.http.createServer((request, response) -> {
+			server.handleRequest(request, response);
 		});
-		httpd.listen(port);
-		console.info("access http://localhost:" + port as string + "/");
+		server._httpd.listen(port);
+
+		platform.save(server._pidFile,  process.pid as string);
+		platform.save(server._portFile, port as string);
+
+		console.info("%s [%s] listen http://localhost:%s/", Util.formatDate(new Date), process.pid, port);
+		server._timer = Timer.setTimeout(() -> { server.shutdown("timeout"); }, CompilationServer.LIFE);
+		process.on("SIGTERM", () -> { server.shutdown("SIGTERM"); });
+		process.on("SIGINT",  () -> { server.shutdown("SIGINT"); });
+
+		// shutdown if the compiler has been updated
+		if (CompilationServer.AUTO_SHUTDOWN) {
+			node.fs.watch(node.__filename, { persistent: false } : Map.<variant>, (event, filename) -> {
+				server.shutdown(event);
+			});
+		}
+
 		return 0;
 	}
 
-	static function handleRequest(platform : Platform, request : ServerRequest, response : ServerResponse) : void {
-		var id = ++CompilationServer._requestSequence;
+	function shutdown(reason : string) : void {
+		try {
+			node.fs.unlinkSync(this._portFile);
+		} catch (e : Error) { }
+		try {
+			node.fs.unlinkSync(this._pidFile);
+		} catch (e : Error) { }
+
+		Timer.clearTimeout(this._timer);
+		this._httpd.close();
+		console.info("%s [%s] shutdown by %s, handled %s requests", Util.formatDate(new Date), process.pid, reason, this._requestSequence);
+	}
+
+	function handleRequest(request : ServerRequest, response : ServerResponse) : void {
 		var startTime = new Date();
+		var id = ++this._requestSequence;
+
+		Timer.clearTimeout(this._timer); // reset
+		this._timer = Timer.setTimeout(() -> { this.shutdown("timeout"); }, CompilationServer.LIFE);
 
 		if (request.method == "GET") {
 			console.info("%s #%s start %s", Util.formatDate(startTime), id, request.url);
-			CompilationServer.handleGET(id, startTime, request, response);
+			this.handleGET(id, startTime, request, response);
 			return;
 		}
 
-		var c = new CompilationServerPlatform(platform.getRoot(), id, request, response);
+		// POST: handle compilation request
 
-		// POST: do the same as jsx(1)
+		var c = new CompilationServerPlatform(this._platform.getRoot(), id, request, response);
 
-		// read POST body
+		var matched = request.url.match(/\?(.*)/);
+		if (!(matched && matched[1])) {
+			c.error("invalid request to compilation server");
+			this.finishRequest(id, startTime, response, 400, c.getContents());
+			return;
+		}
+
+		var query = matched[1];
+		console.info("%s #%s start %s", Util.formatDate(startTime), id, query.replace(/\n/g, "\\n"));
+
 		var inputData = "";
 		request.on("data", function (chunk) {
 			inputData += chunk as string;
 		});
 		request.on("end", function () {
-			console.info("%s #%s start %s", Util.formatDate(startTime), id, inputData.replace(/\n/g, "\\n"));
+			if (inputData) {
+				c.setFileContent("-", inputData); // as stdin
+			}
 
 			try {
-				var args = JSON.parse(inputData) as string[];
+				var args = JSON.parse(query) as string[];
 				c.setStatusCode(JSXCommand.main(c, args));
 			}
 			catch (e : Error) {
-				console.error("%s #%s %s", Util.formatDate(startTime), id, e);
-				c.error((e as variant)["stack"] as string); // Error#stack
+				console.error("%s #%s %s", Util.formatDate(startTime), id, e.stack);
+				c.error(e.stack);
 			}
 
-			CompilationServer.finishRequest(id, startTime, response, 200, c.getContents());
+			this.finishRequest(id, startTime, response, 200, c.getContents());
 
 		});
 		request.on("close", function () {
 			c.error("the connecion is unexpectedly closed.\n");
-			CompilationServer.finishRequest(id, startTime, response, 500, c.getContents());
+			this.finishRequest(id, startTime, response, 500, c.getContents());
 		});
 	}
 
-	static function handleGET(id : number, startTime : Date, request : ServerRequest, response : ServerResponse) : void {
+	function handleGET(id : number, startTime : Date, request : ServerRequest, response : ServerResponse) : void {
 		// show compiler information
-		CompilationServer.finishRequest(id, startTime, response, 200, {
+		this.finishRequest(id, startTime, response, 200, {
 			version_string   : Meta.VERSION_STRING,
 			version_number   : Meta.VERSION_NUMBER,
 			last_commit_hash : Meta.LAST_COMMIT_HASH,
@@ -375,7 +446,7 @@ class CompilationServer {
 		} : variant);
 	}
 
-	static function finishRequest (id : number, startTime : Date, response : ServerResponse, statusCode : number, data : variant) : void {
+	function finishRequest (id : number, startTime : Date, response : ServerResponse, statusCode : number, data : variant) : void {
 		var content = JSON.stringify(data);
 
 		var headers = {

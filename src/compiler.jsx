@@ -164,7 +164,7 @@ class Compiler {
 		return true;
 	}
 
-	function getAST () : variant {
+	function getAST () : string{
 		var classDefs = new ClassDefinition[];
 		for (var i = 0; i < this._parsers.length; ++i) {
 			classDefs = classDefs.concat(this._parsers[i].getClassDefs());

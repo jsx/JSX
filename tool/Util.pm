@@ -7,10 +7,12 @@ use Fatal qw(open close);
 use File::Basename ();
 use lib File::Basename::dirname(__FILE__) . "/../extlib/lib/perl5";
 
+
 use base qw(Exporter);
 our @EXPORT = qw(slurp get_section jsx);
 
-our $jsx_server_port = $ENV{JSX_COMPILATION_SERVER_PORT};
+use Cwd ();
+$ENV{JSX_HOME} = Cwd::getcwd() . '/.jsx';
 
 sub _system { # system() which returns (status code, stdout, stderr)
     my(@args) = @_;
@@ -29,53 +31,29 @@ sub _system { # system() which returns (status code, stdout, stderr)
     return ($? == 0, $stdout, $stderr);
 }
 
-our $ua;
-
 sub jsx { # returns (status, stdout, stderr)
     my(@args) = @_;
 
-    if (! $jsx_server_port) {
-        return _system("bin/jsx @args");
-    }
-    else {
+    if (-f "$ENV{JSX_HOME}/port") {
+        my $port = slurp("$ENV{JSX_HOME}/port");
+
+        my $app_jsx = File::Basename::dirname(__FILE__) . "/jsx.pl";
+        require $app_jsx; # App::jsx
+
         require Text::ParseWords;
-        require HTTP::Tiny;
-        require JSON;
-        require Cwd;
 
-        $ua ||= HTTP::Tiny->new(
-            agent => "JSX compiler client",
-        );
+        my @real_args = Text::ParseWords::shellwords(@args);
+        my $c = App::jsx::request($port, @real_args);
 
-        my @real_args = ("--working-dir", Cwd::getcwd(), Text::ParseWords::shellwords(@args));
+        App::jsx::save_files($c);
 
-        my $res = $ua->post("http://localhost:$jsx_server_port/", {
-            'content-type' => 'application/json',
-            'content'      => JSON::encode_json(\@real_args),
-        });
-
-        if (!( $res->{success} && $res->{headers}{'content-type'} eq 'application/json')) {
-            require Data::Dumper;
-            return (0, '', Data::Dumper::Dumper($res));
-        }
-
-        my $c = JSON::decode_json($res->{content});
-
-        for my $filename(keys %{$c->{file}}) {
-            open my $fh, ">", $filename;
-            print $fh $c->{file}{$filename};
-            close $fh;
-        }
         if ($c->{run}) {
-            require File::Temp;
-            my $js = $ENV{JSX_RUNJS} || "node";
-            my $file = File::Temp->new(SUFFIX => ".js");
-            $file->print($c->{run}{scriptSource});
-            $file->close();
-            my $scriptArgs = $c->{run}{scriptArgs};
-            return _system($js, $file->filename, @{$scriptArgs});
+            return _system(App::jsx::prepare_run_command($c->{run}));
         }
         return ($c->{statusCode} == 0, $c->{stdout}, $c->{stderr});
+    }
+    else {
+        return (0, "", "no compilation server running");
     }
 }
 
@@ -96,3 +74,4 @@ sub get_section {
 }
 
 1;
+# vim: set expandtab:

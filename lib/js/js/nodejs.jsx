@@ -39,6 +39,7 @@ final class node {
 	}
 
 	static const __dirname     = js.eval("__dirname") as string;
+	static const __filename    = js.eval("__filename") as string;
 
 	static const fs            = node.require('fs') as __noconvert__ _fs;
 	static const path          = node.require('path') as __noconvert__ _path;
@@ -286,12 +287,12 @@ native __fake__ class Url {
 native __fake__ class _http {
 	function createServer(
 		requestListener : function(:ServerRequest,:ServerResponse):void
-	) : Server;
+	) : HTTPServer;
 
 	function get(url : string, callback : function(:ClientResponse):void) : ClientRequest;
 }
 
-native __fake__ class Server {
+native __fake__ class HTTPServer {
 	function listen(port : int) : void;
 
 	function close() : void;
