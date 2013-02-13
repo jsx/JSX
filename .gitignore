@@ -1,5 +1,6 @@
 # temporary files
 
+.jsx
 *~
 *.swp
 *.zip
@@ -13,7 +14,7 @@ tmp/*
 
 try/
 doc/
-bin/jsx
+bin/
 src/doc.jsx
 src/meta.jsx
 

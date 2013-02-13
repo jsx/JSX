@@ -21,10 +21,13 @@
       }
   ],
   "bin" : {
-      "jsx" : "./bin/jsx"
+      "jsx" : "./bin/jsx",
+      "jsx-compiler.js" : "./bin/jsx-compiler.js"
   },
   "directories": {
     "bin": "./bin",
+    "tool": "./tool",
+    "web": "./web",
     "lib": "./lib",
     "src": "./src"
   },
@@ -36,6 +39,7 @@
   },
   "scripts" : {
       "test" : "make test JOBS=1 SKIP_PHANTOMJS_TEST=1",
-      "prepublish" : "JSX_OPTS=--release make && make test"
+      "prepublish" : "JSX_OPTS=--release make && make test",
+	  "preinstall" : "node tool/preinstall.js"
   }
 }

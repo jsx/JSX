@@ -61,7 +61,7 @@ class _Test extends TestCase {
         });;
       });
 
-      var httpd : Server = null;
+      var httpd : HTTPServer = null;
       httpd = node.http.createServer((req, res) -> {
         this.expect(req.url, "accept a request").toBe("/foo/bar");
 
