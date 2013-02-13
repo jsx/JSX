@@ -1,11 +1,5 @@
 (function () {
-
 	var Profiler = $__jsx_profiler;
-
-	var stack = [ {
-		$name: "<<root>>",
-		$cur_exclusive: Date.now()
-	} ];
 
 	var getTime;
 	if (typeof(performance) != "undefined" && typeof(performance.now) == "function") {
@@ -14,6 +8,11 @@
 	else {
 		getTime  = function () { return Date.now() };
 	}
+
+	var stack = [ {
+		$name: "<<root>>",
+		$cur_exclusive: getTime()
+	} ];
 
 	Profiler.enter = function (name) {
 		var t = getTime();

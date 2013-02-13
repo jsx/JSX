@@ -1572,9 +1572,11 @@ class AssignmentExpression extends BinaryExpression {
 				context.errors.push(new CompileError(this._token, "either side of the operator should be fully type-qualified"));
 				return false;
 			}
-		} else {
-			if (! (this._expr2 as FunctionExpression).getFuncDef().deductTypeIfUnknown(context, this._expr1.getType() as ResolvedFunctionType))
+		}
+		else if (! this._expr1.getType().equals(Type.variantType)) {
+			if (! (this._expr2 as FunctionExpression).getFuncDef().deductTypeIfUnknown(context, this._expr1.getType() as ResolvedFunctionType)) {
 				return false;
+			}
 		}
 		if (! this._expr1.assertIsAssignable(context, this._token, this._expr2.getType()))
 			return false;
