@@ -307,7 +307,8 @@ class CompilationServerPlatform extends NodePlatform {
 	}
 
 	override function runCompilationServer(arg : variant) : number {
-		throw new Error('not supported');
+		this.error('--compilation-server is not supported');
+		return 1;
 	}
 }
 
