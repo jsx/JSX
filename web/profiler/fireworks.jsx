@@ -211,7 +211,7 @@ final class _Main {
 			log "profiler is running";
 			dom.window.setTimeout(function () : void {
 				JSX.postProfileResults("http://localhost:5000/post-profile");
-				dom.window.location.href = "http://localhost:5000/web/profiler.html";
+				//dom.window.location.href = "http://localhost:5000/web/profiler.html";
 			}, 10 * 1000);
 		}
 	}
