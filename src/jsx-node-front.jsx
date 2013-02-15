@@ -57,7 +57,7 @@ class NodePlatform extends Platform {
 	}
 
 	function _absPath(path : string) : string {
-		return path.charAt(0) == "/"
+		return (path.charAt(0) == "/" || path.match(/^[a-zA-Z]:\//))
 			? path // path is already absolute
 			: this._cwd + "/" + path;
 	}
