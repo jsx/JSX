@@ -164,7 +164,10 @@ class Compiler {
 		return true;
 	}
 
-	function getAST () : string{
+	/**
+	 * Returns a JSON data structure of parsed class definitions
+	 */
+	function getAST () : variant {
 		var classDefs = new ClassDefinition[];
 		for (var i = 0; i < this._parsers.length; ++i) {
 			classDefs = classDefs.concat(this._parsers[i].getClassDefs());

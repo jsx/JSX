@@ -180,7 +180,7 @@ class _Main {
 			if (success) {
 				if (options['mode'] == 'parse') {
 					output.setOption("mode", "javascript");
-					output.setValue(c.getAST() as string);
+					output.setValue(JSON.stringify(c.getAST(), null, 2));
 					return;
 				}
 
