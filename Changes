@@ -1,5 +1,9 @@
 Revision history for the JSX software development kit
 
+0.9.7 2013-02-15 16:45:13
+    [BUG FIXES]
+    - Fix a path issue on Windows
+
 0.9.6 2013-02-14 08:56:57
     [CHANGES]
     - TestCase will stop executing the current test on failure
