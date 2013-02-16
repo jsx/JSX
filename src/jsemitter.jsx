@@ -2020,17 +2020,27 @@ class JavaScriptEmitter implements Emitter {
 		this._outputFile = Util.resolvePath(name);
 
 		if(this._enableSourceMap) {
-			// FIXME: set correct sourceRoot
-			var sourceRoot = null : Nullable.<string>;
-			this._sourceMapper = new SourceMapper(name, sourceRoot);
+			this._sourceMapper = new SourceMapper(name);
 		}
 	}
 
-	override function saveSourceMappingFile (platform : Platform) : void {
-		var gen = this._sourceMapper;
-		if(gen != null) {
-			platform.save(gen.getSourceMappingFile(), gen.generate());
+	override function getSourceMappingFiles() : Map.<string> {
+		var files = new Map.<string>;
+		var sourceMapper = this._sourceMapper;
+		if(sourceMapper != null) {
+			files[sourceMapper.getSourceMappingFile()] = sourceMapper.generate();
+			// copy mapped source files for browsers to get them
+			var fileMap = sourceMapper.getSourceFileMap();
+			for (var filename in fileMap) {
+				var dest = fileMap[filename];
+				// reading the file may failed because it is not resolved.
+				try {
+					files[dest] = this._platform.load(filename);
+				}
+				catch (e : Error) { }
+			}
 		}
+		return files;
 	}
 
 	function setSourceMapper(gen : SourceMapper) : void {

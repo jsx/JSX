@@ -64,6 +64,10 @@ package App::jsx;
 
     sub write_file {
         my($file, $content) = @_;
+        if (not -e File::Basename::dirname($file)) {
+            require File::Path;
+            File::Path::mkpath(File::Basename::dirname($file));
+        }
         open my($fh), ">", $file or Carp::confess("cannot open file '$file' for writing: $!");
         print $fh $content;
         close $fh or Carp::confess("cannot close file '$file': $!");

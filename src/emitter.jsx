@@ -30,7 +30,7 @@ interface Emitter implements Stashable {
 
 	function setOutputFile(filename :Nullable.<string>) :void;
 
-	function saveSourceMappingFile(platform : Platform) : void;
+	function getSourceMappingFiles() : Map.<string>;
 
 	function setEnableRunTimeTypeCheck(flag : boolean) : void;
 

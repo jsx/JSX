@@ -373,7 +373,10 @@ class JSXCommand {
 
 				platform.save(outputFile, output);
 				if (outputFile != null) {
-					emitter.saveSourceMappingFile(platform);
+					var map = emitter.getSourceMappingFiles();
+					for (var filename in map) {
+						platform.save(filename, map[filename]);
+					}
 					if (executable != null) {
 						platform.makeFileExecutable(outputFile, executable);
 					}
