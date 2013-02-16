@@ -23,7 +23,10 @@ src/doc.jsx: src/_doc.jsx
 	submodules/picotemplate/picotemplate.pl $<
 
 meta:
-	if [ -e .git ] ; then tool/make-meta package.json src/meta.jsx ; fi
+	if [ -e .git ] ; then \
+		git submodule update --init ; \
+		tool/make-meta package.json src/meta.jsx ; \
+	fi
 
 doc: src/doc.jsx
 	rm -rf doc
