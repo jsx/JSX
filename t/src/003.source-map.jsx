@@ -12,6 +12,10 @@ import "../util/jslexer.jsx";
 class _Test extends TestCase {
 
 	function testWithSourceMapConsumer() : void {
+		if(process.env["JSX_DISABLE_SOURCE_MAP_TEST"]) {
+			return;
+		}
+
 		function search(a : JSToken[], predicate : (JSToken) -> boolean) : number {
 			for(var i = 0; i < a.length; ++i) {
 				if(predicate(a[i])) {
@@ -21,27 +25,20 @@ class _Test extends TestCase {
 			return -1;
 		}
 
-		if(process.env["JSX_DISABLE_SOURCE_MAP_TEST"]) {
-			return;
-		}
-
-		var cwd = process.cwd();
-		module.paths.push(cwd + "/node_modules");
+		module.paths.push(process.cwd() + "/node_modules");
 
 		var platform = new NodePlatform(".");
 
-		var statusCode = JSXCommand.main(platform, NodePlatform.getEnvOpts().concat(["--enable-source-map", "--output", "t/src/source-map/hello.jsx.js", "t/src/source-map/hello.jsx"]));
+		var jsxSourceFile = "t/src/source-map/hello.jsx";
+
+		var args = ["--enable-source-map", "--output", jsxSourceFile+".js", jsxSourceFile];
+		var statusCode = JSXCommand.main(platform, NodePlatform.getEnvOpts().concat(args));
 
 		this.expect(statusCode, "status code").toBe(0);
 
-		if(statusCode != 0) {
-			return;
-		}
+		var source = JSLexer.tokenize("hello.jsx.js", platform.load(jsxSourceFile + ".js"));
 
-		var source = JSLexer.tokenize("hello.jsx.js",
-				platform.load("t/src/source-map/hello.jsx.js"));
-
-		var mapping = JSON.parse(platform.load("t/src/source-map/hello.jsx.js.mapping"));
+		var mapping = JSON.parse(platform.load(jsxSourceFile+".js.mapping"));
 
 		// mapping.file
 		this.expect(mapping['file'], "mapping.file").toBe("hello.jsx.js");
@@ -55,6 +52,7 @@ class _Test extends TestCase {
 
 			var found = sources.filter((x) -> { return x.slice(x.length - file.length) == file; });
 			this.expect(found.join(","), "mapping.sources includes " + file).notToBe("");
+			//this.expect(platform.fileExists("t/src/source-map/" + file), file + " exists").toBe(true);
 		});
 
 		// source-map consumer
@@ -102,4 +100,4 @@ class _Test extends TestCase {
 
 }
 
-// vim: set noexpandtab ft=jsx:
+// vim: set noexpandtab:
