@@ -119,20 +119,27 @@ class DocComment extends DocCommentNode {
 class DocumentGenerator {
 
 	var _compiler : Compiler;
-	var _outputPath : Nullable.<string>;
+	var _templatePath : string; // directory
+	var _outputPath : string; // directory
 	var _pathFilter : function(:string):boolean;
-	var _templatePath : Nullable.<string>;
+	var _resourceFiles : string[];
 	var _classDefToHTMLCache = new TypedMap.<ClassDefinition,string>;
 
-	function constructor (compiler : Compiler) {
+	/**
+	 * @param compiler Compiler instance
+	 * @param templatePath a directory which has document resources (template.html and style.css)
+	 * @param outputPath   the output directory
+	 */
+	function constructor (compiler : Compiler, templatePath : string, outputPath : string) {
 		this._compiler = compiler;
-		this._outputPath = null;
+		this._templatePath = templatePath;
+		this._outputPath = outputPath;
+		this._resourceFiles = new string[];
 		this._pathFilter = null;
-		this._templatePath = null;
 	}
 
-	function setOutputPath (outputPath : string) : DocumentGenerator {
-		this._outputPath = outputPath;
+	function setResourceFiles (files : string[]) : DocumentGenerator {
+		this._resourceFiles = files;
 		return this;
 	}
 
@@ -141,23 +148,19 @@ class DocumentGenerator {
 		return this;
 	}
 
-	function setTemplatePath (path : string) : DocumentGenerator {
-		this._templatePath = path;
-		return this;
-	}
-
 	function buildDoc () : void {
 		var platform = this._compiler.getPlatform();
-		// CSS file is copied regardless of the template
-		platform.mkpath(this._outputPath);
-		platform.save(
-			this._outputPath + "/style.css",
-			platform.load(platform.getRoot() + "/src/doc/style.css"));
+		// resource files are copied regardless of the template
+		this._resourceFiles.forEach((file) -> {
+			platform.save(
+				this._outputPath + "/" + file,
+				platform.load(this._templatePath + "/" + file));
+		});
 		// output each file
 		this._compiler.getParsers().forEach(function (parser) {
-			if (this._pathFilter(parser.getPath())) {
+			var encodedFilename = platform.encodeFilename(parser.getPath());
+			if (this._pathFilter(encodedFilename)) {
 				var outputFile = this._outputPath + "/" + parser.getPath() + ".html";
-				platform.mkpath(outputFile.replace(/\/[^\/]+$/, ""));
 				var html = this._buildDocOfFile(parser);
 				platform.save(outputFile, html);
 			}
@@ -165,7 +168,8 @@ class DocumentGenerator {
 	}
 
 	function _buildDocOfFile (parser : Parser) : string {
-		return this._compiler.getPlatform().load(this._templatePath).replace(
+		var htmlFile = this._templatePath + "/template.html";
+		return this._compiler.getPlatform().load(htmlFile).replace(
 			/<%JSX:(.*?)%>/g,
 			function (matched) {
 				var key = matched.substring(6, matched.length-2);
@@ -180,7 +184,7 @@ class DocumentGenerator {
 				case "FOOTER":
 					return this._buildFooterOfFile(parser);
 				default:
-					throw new Error("unknown key:" + key + " in file: " + this._templatePath);
+					throw new Error("unknown template key:" + key + " in file: " + htmlFile);
 				}
 			});
 	}

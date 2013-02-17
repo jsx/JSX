@@ -40,6 +40,7 @@ native __fake__ class _SourceMapConsumer {
 
 class SourceMapper {
 
+	var _rootDir : string;
 	var _outputFile : string;
 	var _copyDestDir : string;
 	var _impl : _SourceMapGenerator;
@@ -57,7 +58,8 @@ class SourceMapper {
 				as __noconvert__ _SourceMapConsumer;
 	}
 
-	function constructor (outputFile : string) {
+	function constructor (rootDir : string, outputFile : string) {
+		this._rootDir = rootDir;
 		this._outputFile = Util.resolvePath(outputFile);
 		this._copyDestDir =  this._outputFile + ".mapping.d";
 		this._impl = SourceMapper.createSourceMapGenerator({
@@ -66,13 +68,14 @@ class SourceMapper {
 		});
 	}
 
-	function add (generatedPos : Map.<number>, originalPos : Map.<number>) : void {
-		this.add(generatedPos, originalPos,  null, null);
-	}
-
 	function add (generatedPos : Map.<number>, originalPos : Map.<number>, sourceFile : Nullable.<string>, tokenName : Nullable.<string>) : void {
-		if (sourceFile != null && ! this._fileMap.hasOwnProperty(sourceFile)) {
-			this._fileMap[sourceFile] = this._copyDestDir +"/"+ sourceFile;
+		if (sourceFile != null) {
+			if (sourceFile.indexOf(this._rootDir + "/") == 0) {
+				sourceFile = sourceFile.substring(this._rootDir.length + 1);
+			}
+			if (this._fileMap.hasOwnProperty(sourceFile)) {
+				this._fileMap[sourceFile] = this._copyDestDir +"/"+ sourceFile;
+			}
 		}
 		this._impl.addMapping({
 			generated: generatedPos,

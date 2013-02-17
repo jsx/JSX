@@ -330,12 +330,23 @@ class JSXCommand {
 				return 1;
 			}
 			if (compiler.compile()) {
-				new DocumentGenerator(compiler)
-					.setOutputPath(outputFile)
+				new DocumentGenerator(compiler, platform.getRoot() + "/src/doc", outputFile)
+					.setResourceFiles(["style.css"])
 					.setPathFilter(function (sourcePath) {
-						return ! (sourcePath.match(/^(?:system:|\/)/) || sourcePath.match(/\/..\//));
+						if (sourcePath.indexOf("system:") == 0) {
+							return false;
+						}
+						if (sourcePath.charAt(0) == "/") {
+							return false;
+						}
+						if (sourcePath.indexOf("../") == 0) {
+							return false;
+						}
+						if (sourcePath.indexOf("/../") != -1) {
+							return false;
+						}
+						return true;
 					})
-					.setTemplatePath(platform.getRoot() + "/src/doc/template.html")
 					.buildDoc();
 				return 0;
 			} else {

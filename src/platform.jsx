@@ -66,5 +66,13 @@ abstract class Platform {
 	abstract function mkpath (path : string) : void;
 	abstract function save (path : Nullable.<string>, content : string) : void;
 
+	function encodeFilename(filename : string) : string {
+		var rootDir = this.getRoot() + "/";
+		if (filename.indexOf(rootDir) == 0) {
+			filename = "system:" + filename.substring(rootDir.length);
+		}
+		return filename;
+	}
+
 }
 // vim: set noexpandtab

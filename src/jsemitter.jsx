@@ -2020,7 +2020,7 @@ class JavaScriptEmitter implements Emitter {
 		this._outputFile = Util.resolvePath(name);
 
 		if(this._enableSourceMap) {
-			this._sourceMapper = new SourceMapper(name);
+			this._sourceMapper = new SourceMapper(this._platform.getRoot(), name);
 		}
 	}
 
@@ -2234,7 +2234,7 @@ class JavaScriptEmitter implements Emitter {
 				}
 			}
 			// emit the map
-			var escapedFilename = JSON.stringify(this._encodeFilename(filename, "system:"));
+			var escapedFilename = JSON.stringify(this._platform.encodeFilename(filename));
 			this._emit(escapedFilename  + ": ", null);
 			this._emit("{\n", null);
 			this._advanceIndent();
@@ -2254,13 +2254,6 @@ class JavaScriptEmitter implements Emitter {
 		this._emit("};\n\n", null);
 	}
 
-	function _encodeFilename (filename : string, prefix : string) : string {
-		var rootDir = this._platform.getRoot() + "/";
-		if (filename.indexOf(rootDir) == 0)
-			filename = prefix + filename.substring(rootDir.length);
-		return filename;
-	}
-
 	override function getOutput (sourceFile : string, entryPoint : Nullable.<string>, executableFor : Nullable.<string>) : string {
 		// do not add any lines before this._output for source-map
 		var output = this._output + "\n";
@@ -2268,7 +2261,7 @@ class JavaScriptEmitter implements Emitter {
 			output += this._platform.load(this._platform.getRoot() + "/src/js/profiler.js");
 		}
 		if (entryPoint != null) {
-			output = this._platform.addLauncher(this, this._encodeFilename(sourceFile, "system:"), output, entryPoint, executableFor);
+			output = this._platform.addLauncher(this, this._platform.encodeFilename(sourceFile), output, entryPoint, executableFor);
 		}
 		output += this._fileFooter;
 		if (this._sourceMapper) {
@@ -2484,9 +2477,6 @@ class JavaScriptEmitter implements Emitter {
 			}
 		}
 		var filename = token.getFilename();
-		if (filename != null) {
-			filename = this._encodeFilename(filename, "");
-		}
 		this._sourceMapper.add(genPos, origPos, filename, tokenValue);
 	}
 

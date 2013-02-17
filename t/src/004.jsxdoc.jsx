@@ -45,4 +45,4 @@ class _Test extends TestCase {
 
 }
 
-// vim: set noexpandtab ft=jsx:
+// vim: set noexpandtab:
