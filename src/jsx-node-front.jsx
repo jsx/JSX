@@ -111,8 +111,9 @@ class NodePlatform extends Platform {
 			process.stdout.write(content);
 		}
 		else {
+			outputFile = this._absPath(outputFile);
 			this.mkpath(Util.dirname(outputFile));
-			node.fs.writeFileSync(this._absPath(outputFile), content);
+			node.fs.writeFileSync(outputFile, content);
 		}
 	}
 
@@ -121,14 +122,15 @@ class NodePlatform extends Platform {
 	}
 
 	override function mkpath (path : string) : void {
+		path = this._absPath(path);
 		try {
-			node.fs.statSync(this._absPath(path));
+			node.fs.statSync(path);
 		} catch (e : Error) {
-			var dirOfPath = path.replace(new RegExp("/[^/]*$"), "");
+			var dirOfPath = Util.dirname(path);
 			if (dirOfPath != path) {
 				this.mkpath(dirOfPath);
 			}
-			node.fs.mkdirSync(this._absPath(path));
+			node.fs.mkdirSync(path);
 		}
 	}
 
