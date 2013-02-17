@@ -1,3 +1,9 @@
+/***
+ * JSX interface to JavaScript
+ *
+ * @author DeNA., Co., Ltd.
+ */
+
 /*
  * Copyright (c) 2012 DeNA Co., Ltd.
  *
@@ -20,27 +26,25 @@
  * IN THE SOFTWARE.
  */
 
-/***
- * JSX interface to JavaScript
- *
- * @author DeNA., Co., Ltd.
- */
-
-/*
- * Usage:
- *
- * import "js.jsx";
- * var window = js.global["window"] as __noconvert__ Map.<variant>;
- */
-
 final class js {
-
-	static var global : Map.<variant>;
-
-	static native function invoke(obj : variant, funcName : string, args : Array.<variant>) : variant;
+	delete function constructor() { }
 
 	/**
-	 * Executes JavaScript source code
+	 * The JavaScript global object. You should cast the value to use it in JSX
+	 */
+	static var global : Map.<variant>;
+
+	/**
+	 * Invokes an arbitrary method of an object. <br />
+	 * e.g. <code>js.invoke(js.global["Math"], "abs", [-10])</code> results in <code>10</code>
+	 * @param invocant a JavaScript object
+	 * @param methodName a name of JavaScript method that the invocant has
+	 * @param args list of arguments passed to the method
+	 */
+	static native function invoke(invocant : variant, methodName : string, args : Array.<variant>) : variant;
+
+	/**
+	 * Evaluates JavaScript source code
 	 */
 	static native function eval(jsSource : string) : variant;
 }

@@ -1010,7 +1010,7 @@ native final class JSX {
 	delete function constructor();
 
 	/**
-	 * Flags which is disabled by --disable-debug.
+	 * A flag which is disabled by <code>--optimize no-debug</code>.<br />
 	 * This is intended to remove debugging statements on release build.
 	 */
 	static const DEBUG = true;
