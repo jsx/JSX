@@ -346,6 +346,17 @@ class Util {
 		return pathParts.concat(t.slice(samePartsIndex)).join("/");
 	}
 
+	static function basename(path : string) : string {
+		var parts = Util._resolvedPathParts(path);
+		return parts.pop();
+	}
+
+	static function dirname(path : string) : string {
+		var parts = Util._resolvedPathParts(path);
+		parts.pop();
+		return parts.join("/");
+	}
+
 	static function toOrdinal(n : number) : string {
 		if (10 < n && n < 14) {
 			return n as string + 'th';

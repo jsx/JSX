@@ -111,6 +111,7 @@ class NodePlatform extends Platform {
 			process.stdout.write(content);
 		}
 		else {
+			this.mkpath(Util.dirname(outputFile));
 			node.fs.writeFileSync(this._absPath(outputFile), content);
 		}
 	}

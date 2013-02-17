@@ -1,3 +1,8 @@
+/***
+ * JavaScript source-map generator
+ * @see Source Map Revision 3 Proposal - https://docs.google.com/document/d/1U1RGAehQwRypUTovF1KRlpiOFze0b-_2gc6fAH0KY0k/edit
+ */
+
 /*
  * Copyright (c) 2012 DeNA Co., Ltd.
  *
@@ -36,7 +41,11 @@ native __fake__ class _SourceMapConsumer {
 class SourceMapper {
 
 	var _outputFile : string;
+	var _copyDestDir : string;
 	var _impl : _SourceMapGenerator;
+
+	// Because the browse will request to get the original source files listed in the source mapping file, we prepare copies of the original source files.
+	var _fileMap = new Map.<string>; // original-to-copy filename mapping
 
 	static function createSourceMapGenerator(args : Map.<string>) : _SourceMapGenerator {
 		return js.eval('new (require("source-map").SourceMapGenerator)('+JSON.stringify(args)+')')
@@ -48,12 +57,12 @@ class SourceMapper {
 				as __noconvert__ _SourceMapConsumer;
 	}
 
-	function constructor (outputFile : string, sourceRoot : Nullable.<string>) {
+	function constructor (outputFile : string) {
 		this._outputFile = Util.resolvePath(outputFile);
-		var relName = this._outputFile.split("/").pop();
+		this._copyDestDir =  this._outputFile + ".mapping.d";
 		this._impl = SourceMapper.createSourceMapGenerator({
-			file       : relName,
-			sourceRoot : sourceRoot
+			file       : Util.basename(this._outputFile),
+			sourceRoot : Util.basename(this._copyDestDir)
 		});
 	}
 
@@ -62,13 +71,13 @@ class SourceMapper {
 	}
 
 	function add (generatedPos : Map.<number>, originalPos : Map.<number>, sourceFile : Nullable.<string>, tokenName : Nullable.<string>) : void {
-		var relFileName = sourceFile != null
-			? Util.relativePath(this._outputFile, sourceFile, true)
-			: null;
+		if (sourceFile != null && ! this._fileMap.hasOwnProperty(sourceFile)) {
+			this._fileMap[sourceFile] = this._copyDestDir +"/"+ sourceFile;
+		}
 		this._impl.addMapping({
 			generated: generatedPos,
 			original:  originalPos,
-			source:    relFileName,
+			source:    sourceFile,
 			name:      tokenName
 		} : Map.<variant>);
 	}
@@ -77,12 +86,16 @@ class SourceMapper {
 		return this._outputFile + ".mapping";
 	}
 
+	function getSourceFileMap () : Map.<string> {
+		return this._fileMap;
+	}
+
 	function generate () : string {
-		return this._impl.toString();;
+		return this._impl.toString();
 	}
 
 	function magicToken () : string {
-		var relName = this._outputFile.split("/").pop() + ".mapping";
-		return "\n" + "//@ sourceMappingURL=" + relName + "\n";
+		var sourceMappingFile = Util.basename(this.getSourceMappingFile());
+		return "\n" + "//@ sourceMappingURL=" + sourceMappingFile + "\n";
 	}
 }
