@@ -1224,6 +1224,18 @@ class Parser {
 			if (token == null)
 				return null;
 		}
+		var state = this._preserveState();
+		while (this._expectOpt(".") != null) {
+			if (this._expectOpt("<") != null)
+				break;
+			var name = this._expectIdentifier(); // TODO: completion
+			if (name == null)
+				return null;
+			token = new Token(token.getValue() + "$$" + name.getValue(), true, token._filename, token._lineNumber, token._columnNumber);
+			
+			state = this._preserveState();
+		}
+		this._restoreState(state);
 		return new QualifiedName(token, imprt);
 	}
 
