@@ -1287,6 +1287,43 @@ class Parser {
 		return true;
 	}
 
+	function _expectClassOpt () : boolean {
+		var state = this._preserveState();
+		try {
+			while (true) {
+				var token = this._expectOpt([ "class", "interface", "mixin", "abstract", "final", "native", "__fake__" ]);
+				if (token == null)
+					return false;
+				if (token.getValue() == "class" || token.getValue() == "interface" || token.getValue() == "mixin")
+					return true;
+			}
+		} finally {
+			this._restoreState(state);
+		}
+		return false;	// dummy
+	}
+
+	function _pushClassState (className : Token) : void {
+		this._outerClass = new ClassState (
+			this._outerClass,
+			className,
+			this._classType,
+			this._extendType,
+			this._implementTypes,
+			this._objectTypesUsed,
+			this._classFlags
+		);
+	}
+
+	function _popClassState () : void {
+		this._classType = this._outerClass.classType;
+		this._extendType = this._outerClass.extendType;
+		this._implementTypes = this._outerClass.implementTypes;
+		this._objectTypesUsed = this._outerClass.objectTypesUsed;
+		this._classFlags = this._outerClass.classFlags;
+		this._outerClass = this._outerClass.outerClass;
+	}
+
 	function _classDefinition () : boolean {
 		this._classType = null;
 		this._extendType = null;
@@ -1345,6 +1382,11 @@ class Parser {
 		var className = this._expectIdentifier(null);
 		if (className == null)
 			return false;
+		if (this._outerClass != null) {
+			var name = this._outerClass.className.getValue() + "$$" + className.getValue();
+			// FIXME
+			className = new Token(name, true, className._filename, className._lineNumber, className._columnNumber);
+		}
 		// template
 		if ((this._typeArgs = this._formalTypeArguments()) == null) {
 			return false;
@@ -1397,6 +1439,13 @@ class Parser {
 		while (this._expectOpt("}") == null) {
 			if (! this._expectIsNotEOF())
 				break;
+			if (this._expectClassOpt()) {
+				// parse inner class
+				this._pushClassState(className);
+				this._classDefinition();
+				this._popClassState();
+				continue;
+			}
 			var member = this._memberDefinition();
 			if (member != null) {
 				for (var i = 0; i < members.length; ++i) {
