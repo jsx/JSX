@@ -1,8 +1,12 @@
 Revision history for the JSX software development kit
 
+0.9.8 2013-02-18 18:38:16
+    [BUG FIXES]
+    - Fixed a packaging issue
+
 0.9.7 2013-02-15 16:45:13
     [BUG FIXES]
-    - Fix a path issue on Windows
+    - Fixed a path issue on Windows
 
 0.9.6 2013-02-14 08:56:57
     [CHANGES]
