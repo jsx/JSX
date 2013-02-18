@@ -1405,7 +1405,8 @@ class Parser {
 					null,
 					function (classDef) {
 						return (classDef.flags() & (ClassDefinition.IS_MIXIN | ClassDefinition.IS_INTERFACE | ClassDefinition.IS_FINAL)) == 0;
-					});
+					},
+					true);
 			}
 			if (this._extendType == null && className.getValue() != "Object") {
 				this._extendType = new ParsedObjectType(new QualifiedName(new Token("Object", true), null), new Type[]);
@@ -1424,7 +1425,8 @@ class Parser {
 					null,
 					function (classDef) {
 						return (classDef.flags() & (ClassDefinition.IS_MIXIN | ClassDefinition.IS_INTERFACE)) != 0;
-					});
+					},
+					true);
 				if (implementType != null) {
 					this._implementTypes.push(implementType);
 				}
@@ -1859,27 +1861,29 @@ class Parser {
 				throw new Error("logic flaw");
 			}
 		} else {
-			return this._objectTypeDeclaration(null, null);
+			return this._objectTypeDeclaration(null, null, true);
 		}
 	}
 
-	function _objectTypeDeclaration (firstToken : Token, autoCompleteMatchCb : function(:ClassDefinition):boolean) : ParsedObjectType {
+	function _objectTypeDeclaration (firstToken : Token, autoCompleteMatchCb : function(:ClassDefinition):boolean, forceQualify : boolean) : ParsedObjectType {
 		var qualifiedName = firstToken != null ? this._qualifiedNameStartingWith(firstToken, autoCompleteMatchCb) : this._qualifiedName(false, autoCompleteMatchCb);
 		if (qualifiedName == null)
 			return null;
-		var state = this._preserveState(), token = qualifiedName.getToken();
-		while (this._expectOpt(".") != null) {
-			if (this._expectOpt("<") != null)
-				break;
-			var name = this._expectIdentifier(); // TODO: completion
-			if (name == null)
-				return null;
-			// FIXME
-			token._value = token.getValue() + "$$" + name.getValue();
-			
-			state = this._preserveState();
+		if (forceQualify) {
+			var state = this._preserveState(), token = qualifiedName.getToken();
+			while (this._expectOpt(".") != null) {
+				if (this._expectOpt("<") != null)
+					break;
+				var name = this._expectIdentifier(); // TODO: completion
+				if (name == null)
+					return null;
+				// FIXME
+				token._value = token.getValue() + "$$" + name.getValue();
+				
+				state = this._preserveState();
+			}
+			this._restoreState(state);
 		}
-		this._restoreState(state);
 		var typeArgs = this._actualTypeArguments();
 		if (typeArgs == null) {
 			return null;
@@ -2091,7 +2095,7 @@ class Parser {
 		} else if ((token = this._expectOpt("this")) != null) {
 			classType = this._classType;
 		} else {
-			if ((classType = this._objectTypeDeclaration(null, null)) == null)
+			if ((classType = this._objectTypeDeclaration(null, null, true)) == null)
 				return false;
 			token = classType.getToken();
 			if (this._classType.equals(classType)) {
@@ -3013,7 +3017,7 @@ class Parser {
 			if (local != null) {
 				return new LocalExpression(token, local);
 			} else {
-				var parsedType = this._objectTypeDeclaration(token, null);
+				var parsedType = this._objectTypeDeclaration(token, null, false);
 				if (parsedType == null)
 					return null;
 				return new ClassExpression(parsedType.getToken(), parsedType);
