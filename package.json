@@ -27,6 +27,7 @@
   "directories": {
     "bin": "./bin",
     "tool": "./tool",
+    "extlib" : "./extlib",
     "web": "./web",
     "lib": "./lib",
     "src": "./src"
