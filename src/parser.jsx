@@ -509,6 +509,28 @@ class ParserState {
 
 }
 
+class ClassState {
+
+	var outerClass : ClassState;
+	var className : Token;
+	var classType : ParsedObjectType;
+	var extendType : ParsedObjectType;
+	var implementTypes : ParsedObjectType[];
+	var objectTypesUsed : ParsedObjectType[];
+	var classFlags : number;
+
+	function constructor (outerClass : ClassState, className : Token, classType : ParsedObjectType, extendType : ParsedObjectType, implementTypes : ParsedObjectType[], objectTypesUsed : ParsedObjectType[], classFlags : number) {
+		this.outerClass = outerClass;
+		this.className = className;
+		this.classType = classType;
+		this.extendType = extendType;
+		this.implementTypes = implementTypes;
+		this.objectTypesUsed = objectTypesUsed;
+		this.classFlags = classFlags;
+	}
+
+}
+
 class Scope {
 
 	var prev : Scope;
@@ -549,6 +571,8 @@ class Parser {
 	var _locals : LocalVariable[];
 	var _statements : Statement[];
 	var _closures : MemberFunctionDefinition[];
+
+	var _outerClass : ClassState;
 	var _classType : ParsedObjectType;
 	var _extendType : ParsedObjectType;
 	var _implementTypes : ParsedObjectType[];
@@ -594,6 +618,7 @@ class Parser {
 		this._locals = null;
 		this._statements = null;
 		this._closures = new MemberFunctionDefinition[];
+		this._outerClass = null;
 		this._classType = null;
 		this._extendType = null;
 		this._implementTypes = null;
