@@ -640,8 +640,6 @@ class Parser {
 		if (this._errors.length != 0)
 			return false;
 
-		this._resolveInnerClasses();
-
 		return true;
 	}
 
@@ -770,39 +768,6 @@ class Parser {
 			}
 		}
 		return null;
-	}
-
-	function _resolveInnerClasses () : void {
-		var classTable = new Map.<boolean>;
-		for (var i = 0; i < this._classDefs.length; ++i) {
-			classTable[this._classDefs[i].className()] = true;
-		}
-		this._classDefs.forEach(function (classDef) {
-			classDef.forEachMemberFunction(function (funcDef) {
-				return funcDef.forEachStatement(function (statement) {
-					return statement.forEachExpression(function onExpr(expr : Expression, replaceCb : (Expression) -> void) : boolean {
-						if (expr instanceof PropertyExpression) {
-							var propExpr = expr as PropertyExpression;
-							propExpr.getExpr().forEachExpression(onExpr);
-							// Qualifier is valid
-							var classExpr;
-							if (propExpr.getExpr() instanceof ClassExpression
-								&& ((classExpr = (propExpr.getExpr() as ClassExpression)).getType() as ParsedObjectType).getTypeArguments().length == 0) {
-									var prefix = (classExpr.getType() as ParsedObjectType).getQualifiedName().getToken().getValue();
-									var name = prefix + "$$" + propExpr.getIdentifierToken().getValue();
-									if (classTable[name]) {
-										// replace '.' represening access to inner class with mangled class name
-										replaceCb(new ClassExpression(classExpr.getToken(), new ParsedObjectType(new QualifiedName(new Token(name, true, classExpr.getToken().getFilename(), classExpr.getToken().getLineNumber(), classExpr.getToken().getColumnNumber()), (classExpr.getType() as ParsedObjectType).getQualifiedName().getImport()), new Type[])));
-									}
-							}
-							return true;
-						}
-						expr.forEachExpression(onExpr);
-						return true;
-					});
-				});
-			});
-		});
 	}
 
 	function _pushScope (funcName : LocalVariable, args : ArgumentDeclaration[]) : void {
@@ -1419,7 +1384,7 @@ class Parser {
 			return false;
 		if (this._outerClass != null) {
 			var name = this._outerClass.className.getValue() + "$$" + className.getValue();
-			// FIXME
+			// FIXME; we might better add another property that contains token length
 			className = new Token(name, true, className._filename, className._lineNumber, className._columnNumber);
 		}
 		// template

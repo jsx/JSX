@@ -437,6 +437,39 @@ class ClassDefinition implements Stashable {
 		}
 	}
 
+	function _resolveInnerClasses () : void {
+		var classTable = new Map.<boolean>;
+		for (var i = 0; i < this._classDefs.length; ++i) {
+			classTable[this._classDefs[i].className()] = true;
+		}
+		this._classDefs.forEach(function (classDef) {
+			classDef.forEachMemberFunction(function (funcDef) {
+				return funcDef.forEachStatement(function (statement) {
+					return statement.forEachExpression(function onExpr(expr : Expression, replaceCb : (Expression) -> void) : boolean {
+						if (expr instanceof PropertyExpression) {
+							var propExpr = expr as PropertyExpression;
+							propExpr.getExpr().forEachExpression(onExpr);
+							// Qualifier is valid
+							var classExpr;
+							if (propExpr.getExpr() instanceof ClassExpression
+								&& ((classExpr = (propExpr.getExpr() as ClassExpression)).getType() as ParsedObjectType).getTypeArguments().length == 0) {
+									var prefix = (classExpr.getType() as ParsedObjectType).getQualifiedName().getToken().getValue();
+									var name = prefix + "$$" + propExpr.getIdentifierToken().getValue();
+									if (classTable[name]) {
+										// replace '.' represening access to inner class with mangled class name
+										replaceCb(new ClassExpression(classExpr.getToken(), new ParsedObjectType(new QualifiedName(new Token(name, true, classExpr.getToken().getFilename(), classExpr.getToken().getLineNumber(), classExpr.getToken().getColumnNumber()), (classExpr.getType() as ParsedObjectType).getQualifiedName().getImport()), new Type[])));
+									}
+							}
+							return true;
+						}
+						expr.forEachExpression(onExpr);
+						return true;
+					});
+				});
+			});
+		});
+	}
+
 	function setAnalysisContextOfVariables (context : AnalysisContext) : void {
 		for (var i = 0; i < this._members.length; ++i) {
 			var member = this._members[i];
