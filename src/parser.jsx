@@ -640,6 +640,8 @@ class Parser {
 		if (this._errors.length != 0)
 			return false;
 
+		this._resolveInnerClasses();
+
 		return true;
 	}
 
@@ -768,6 +770,42 @@ class Parser {
 			}
 		}
 		return null;
+	}
+
+	function _resolveInnerClasses () : void {
+		this._classDefs.forEach(function (classDef) {
+			classDef.forEachMemberFunction(function (funcDef) {
+				return funcDef.forEachStatement(function (statement) {
+					return statement.forEachExpression(function onExpr(expr : Expression, replaceCb : (Expression) -> void) : boolean {
+						if (expr instanceof PropertyExpression) {
+							var propExpr = expr as PropertyExpression;
+							propExpr.getExpr().forEachExpression(onExpr);
+							// Qualifier is valid
+							var classExpr;
+							if (propExpr.getExpr() instanceof ClassExpression
+								&& ((classExpr = (propExpr.getExpr() as ClassExpression)).getType() as ParsedObjectType).getTypeArguments().length == 0) {
+									var prefix = (classExpr.getType() as ParsedObjectType).getQualifiedName().getToken().getValue();
+									var name = prefix + "$$" + propExpr.getIdentifierToken().getValue();
+									// FIXME: faster algorithm instead of straight-forward linear search
+									var succ = false;
+									for (var i = 0; i < this._classDefs.length; ++i) {
+										if (this._classDefs[i].className() == name) {
+											succ = true;
+											break;
+										}
+									}
+									if (succ) {
+										replaceCb(new ClassExpression(classExpr.getToken(), new ParsedObjectType(new QualifiedName(new Token(name, true, classExpr.getToken().getFilename(), classExpr.getToken().getLineNumber(), classExpr.getToken().getColumnNumber()), (classExpr.getType() as ParsedObjectType).getQualifiedName().getImport()), new Type[])));
+									}
+							}
+							return true;
+						}
+						expr.forEachExpression(onExpr);
+						return true;
+					});
+				});
+			});
+		});
 	}
 
 	function _pushScope (funcName : LocalVariable, args : ArgumentDeclaration[]) : void {
@@ -1442,9 +1480,10 @@ class Parser {
 			if (! this._expectIsNotEOF())
 				break;
 			if (this._expectClassOpt()) {
-				// parse inner class
 				this._pushClassState(className);
+				// parse inner class
 				this._classDefinition();
+
 				this._popClassState();
 				continue;
 			}
@@ -2788,6 +2827,13 @@ class Parser {
 				var typeArgs = this._actualTypeArguments();
 				if (typeArgs == null)
 					return null;
+				// NOTE:
+				// Syntax for inner class is the same as property expression.
+				// For exmaple this piece of code `Outer.Inner.variable' must be theoritically parsed like
+				// new PropertyExpression(new ClassExpression('Outer$$Inner'), 'variable'), but that requires
+				// information about all inner classes declared in Outer class while parsing *Outer* class.
+				// To address this issue, we make a PropertyExpression in this stage for the time being, and replace it
+				// with ClassExpression if needed when the parse of all classes are done.
 				expr = new PropertyExpression(token, expr, identifier, typeArgs);
 				break;
 			}
