@@ -298,10 +298,9 @@ sub run_web_test {
     }
     chomp $phantomjs;
 
-    require version;
     my $phantomjs_ver = `$phantomjs --version`;
     chomp $phantomjs_ver;
-    if (version::qv($phantomjs_ver) < version::qv("1.8.0")) {
+    if (numify_version($phantomjs_ver) < numify_version("1.8.0")) {
         local $TODO = "phantomjs $phantomjs_ver is too old";
         fail $file;
         done_testing;

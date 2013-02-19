@@ -9,7 +9,7 @@ use lib File::Basename::dirname(__FILE__) . "/../extlib/lib/perl5";
 
 
 use base qw(Exporter);
-our @EXPORT = qw(slurp get_section jsx);
+our @EXPORT = qw(slurp get_section jsx numify_version);
 
 use Cwd ();
 $ENV{JSX_HOME} = Cwd::getcwd() . '/.jsx';
@@ -71,6 +71,17 @@ sub get_section {
     my $content = slurp($file);
     my($expected) = $content =~ m{/\*$name\n(|.*?\n)\*/}s;
     return $expected;
+}
+
+sub numify_version {
+    my($v) = @_;
+    $v =~ s/^v//;
+    my($vnum, @others) = split /\./, $v;
+
+    for (my $i = 0; $i < @others; ++$i) {
+        $vnum += $others[$i] / (10 ** (3*($i+1)));
+    }
+    return $vnum;
 }
 
 1;
