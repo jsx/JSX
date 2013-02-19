@@ -773,6 +773,10 @@ class Parser {
 	}
 
 	function _resolveInnerClasses () : void {
+		var classTable = new Map.<boolean>;
+		for (var i = 0; i < this._classDefs.length; ++i) {
+			classTable[this._classDefs[i].className()] = true;
+		}
 		this._classDefs.forEach(function (classDef) {
 			classDef.forEachMemberFunction(function (funcDef) {
 				return funcDef.forEachStatement(function (statement) {
@@ -786,15 +790,8 @@ class Parser {
 								&& ((classExpr = (propExpr.getExpr() as ClassExpression)).getType() as ParsedObjectType).getTypeArguments().length == 0) {
 									var prefix = (classExpr.getType() as ParsedObjectType).getQualifiedName().getToken().getValue();
 									var name = prefix + "$$" + propExpr.getIdentifierToken().getValue();
-									// FIXME: faster algorithm instead of straight-forward linear search
-									var succ = false;
-									for (var i = 0; i < this._classDefs.length; ++i) {
-										if (this._classDefs[i].className() == name) {
-											succ = true;
-											break;
-										}
-									}
-									if (succ) {
+									if (classTable[name]) {
+										// replace '.' represening access to inner class with mangled class name
 										replaceCb(new ClassExpression(classExpr.getToken(), new ParsedObjectType(new QualifiedName(new Token(name, true, classExpr.getToken().getFilename(), classExpr.getToken().getLineNumber(), classExpr.getToken().getColumnNumber()), (classExpr.getType() as ParsedObjectType).getQualifiedName().getImport()), new Type[])));
 									}
 							}
