@@ -9,12 +9,12 @@ use lib File::Basename::dirname(__FILE__) . "/../extlib/lib/perl5";
 
 
 use base qw(Exporter);
-our @EXPORT = qw(slurp get_section jsx numify_version);
+our @EXPORT = qw(slurp get_section jsx numify_version xsystem);
 
 use Cwd ();
 $ENV{JSX_HOME} = Cwd::getcwd() . '/.jsx';
 
-sub _system { # system() which returns (status code, stdout, stderr)
+sub xsystem { # system() which returns (status code, stdout, stderr)
     my(@args) = @_;
     require IPC::Open3;
     require Symbol;
@@ -48,7 +48,7 @@ sub jsx { # returns (status, stdout, stderr)
         App::jsx::save_files($c);
 
         if ($c->{run}) {
-            return _system(App::jsx::prepare_run_command($c->{run}));
+            return xsystem(App::jsx::prepare_run_command($c->{run}));
         }
         return ($c->{statusCode} == 0, $c->{stdout}, $c->{stderr});
     }

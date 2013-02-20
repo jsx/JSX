@@ -7,7 +7,6 @@ use File::Temp qw(tempdir);
 use tool::Util;
 
 my @files = glob("example/*.jsx");
-push @files, "submodules/v8bench/run.jsx" if -f "submodules/v8bench/run.jsx";
 plan tests => 2 * scalar @files;
 
 my $workdir = tempdir(CLEANUP => 1, DIR => ".");
@@ -20,10 +19,9 @@ for my $file(@files) {
         ok $ok, $cmd or fail($stderr);
     }
     {
-        my $cmd = qq{--run "$file"};
-        my($ok, $stdout, $stderr) = jsx($cmd);
+        my($ok, $stdout, $stderr) = xsystem("node", "$workdir/compiled.js");
 
-        ok $ok, $cmd or fail($stderr);
+        ok $ok, "run" or fail($stderr);
     }
 }
 
