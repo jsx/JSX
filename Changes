@@ -1,5 +1,9 @@
 Revision history for the JSX software development kit
 
+0.9.9 2013-02-20 10:34:21
+    [BUG FIXES]
+    - Fixed a bug that jsx(1) did not work when it was installed by npm
+
 0.9.8 2013-02-18 18:38:16
     [BUG FIXES]
     - Fixed a packaging issue
