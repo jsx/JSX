@@ -9,8 +9,28 @@ package App::jsx;
 {
 
     use File::Basename ();
-    use constant DIR => File::Basename::dirname(readlink(__FILE__) || __FILE__);
-    use lib DIR . "/../extlib/lib/perl5";
+    use File::Spec     ();
+
+    my $DIR;
+    BEGIN {
+        my $linkTo = readlink(__FILE__);
+        my $FILE;
+        if ($linkTo) {
+            if (File::Spec->file_name_is_absolute($linkTo)) {
+                $FILE = $linkTo;
+            }
+            else {
+                $FILE = File::Spec->catfile(File::Basename::dirname(__FILE__), $linkTo);
+            }
+        }
+        else {
+            $FILE = __FILE__;
+        }
+
+        $DIR = File::Basename::dirname($FILE);
+        require lib;
+        lib->import("$DIR/../extlib/lib/perl5");
+    }
 
     # required modules
     use Cwd         ();
@@ -37,7 +57,7 @@ package App::jsx;
         }
     }
 
-    my $jsx_compiler = DIR . "/../bin/jsx-compiler.js";
+    my $jsx_compiler = "$DIR/../bin/jsx-compiler.js";
 
     my $home = $ENV{JSX_HOME} || (($ENV{HOME} || glob('~')) . "/.jsx");
 
