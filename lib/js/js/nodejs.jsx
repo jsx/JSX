@@ -240,8 +240,14 @@ native __fake__ class FSWatcher extends EventEmitter {
 
 native __fake__ class _path {
 	function normalize(p : string) : string;
+        function join(...path : string) : string;
+        function resolve(...path : string) : string;
+        function relative(from : string, to : string) : string;
 	function dirname(p : string) : string;
 	function basename(p : string) : string;
+	function basename(p : string, ext : string) : string;
+	function extname(p : string) : string;
+        var sep : string;
 }
 
 native class ChildProcess extends EventEmitter {
