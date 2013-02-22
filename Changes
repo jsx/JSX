@@ -1,6 +1,6 @@
 Revision history for the JSX software development kit
 
-NEXT
+0.9.10 2013-02-22 10:18:13
     [BUG FIXES]
     - Fixed a bug that jsx(1) crashes when spaces were passed to JSX programs on --run
 
