@@ -180,10 +180,11 @@ package App::jsx;
             $options{'content'} = <STDIN>;
         }
 
-        my @real_args = ("--working-dir", Cwd::getcwd(), @args);
+        my $query = encode_json(["--working-dir", Cwd::getcwd(), @args]);
+        $query =~ s/(\W)/'%' . unpack('H2', $1)/eg; # urlencode
 
         my $res = $ua->request(POST =>
-            "http://localhost:$port/compiler?" . encode_json(\@real_args),
+            "http://localhost:$port/compiler?$query",
             \%options);
 
         if (!( $res->{success} && $res->{headers}{'content-type'} eq 'application/json')) {

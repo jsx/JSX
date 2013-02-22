@@ -408,7 +408,7 @@ class CompilationServer {
 			return;
 		}
 
-		var query = matched[1];
+		var query = String.decodeURIComponent(matched[1]);
 		console.info("%s #%s start %s", Util.formatDate(startTime), id, query.replace(/\n/g, "\\n"));
 
 		var inputData = "";

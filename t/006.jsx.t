@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 use tool::Util;
-use Test::More tests => 47;
+use Test::More tests => 53;
 
 note "testing jsx(1)";
 
@@ -57,7 +57,9 @@ jsx_ok("--run --executable node t/006.jsx/hello.jsx", "Hello, world!\n");
 jsx_ok("--run --release t/006.jsx/hello.jsx", "");
 jsx_ok("--run --working-dir t/ 006.jsx/hello.jsx", "Hello, world!\n");
 
-jsx_ok("--run t/006.jsx/dump-args.jsx foo bar", qq{["foo","bar"]\n});
+jsx_ok("--run t/006.jsx/dump-args.jsx foo bar",    qq{["foo","bar"]\n});
+jsx_ok("--run t/006.jsx/dump-args.jsx 'foo bar'",  qq{["foo bar"]\n});
+jsx_ok("--run t/006.jsx/dump-args.jsx '/@~_+&=;'", qq{["/@~_+&=;"]\n});
 
 # real command
 
