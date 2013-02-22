@@ -75,6 +75,8 @@ package App::jsx;
         agent => __PACKAGE__,
     );
 
+    my $localhost = '127.0.0.1';
+
     sub read_file {
         my($file) = @_;
         open my($fh), "<", $file or Carp::confess("cannot open file '$file' for reading: $!");
@@ -107,7 +109,7 @@ package App::jsx;
     sub server_ready { # server is ready to accept requests
         if (-f $port_file) {
             chomp(my $port = read_file($port_file));
-            my $res = $ua->request(GET => "http://localhost:$port/ping");
+            my $res = $ua->request(GET => "http://$localhost:$port/ping");
             return $res->{success};
         }
         else {
@@ -184,7 +186,7 @@ package App::jsx;
         $query =~ s/(\W)/'%' . unpack('H2', $1)/eg; # urlencode
 
         my $res = $ua->request(POST =>
-            "http://localhost:$port/compiler?$query",
+            "http://$localhost:$port/compiler?$query",
             \%options);
 
         if (!( $res->{success} && $res->{headers}{'content-type'} eq 'application/json')) {
