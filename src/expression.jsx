@@ -743,18 +743,24 @@ class ThisExpression extends Expression {
 
 class FunctionExpression extends Expression {
 
+	var _funcName : LocalVariable;
 	var _funcDef : MemberFunctionDefinition;
 	var _isStatement : boolean;
 
-	function constructor (token : Token, funcDef : MemberFunctionDefinition, isStatement : boolean) {
+	function constructor (token : Token, funcName : LocalVariable, funcDef : MemberFunctionDefinition, isStatement : boolean) {
 		super(token);
+		this._funcName = funcName;
 		this._funcDef = funcDef;
 		this._isStatement = isStatement;
 	}
 
 	override function clone () : FunctionExpression {
 		// NOTE: funcDef is not cloned, but is later replaced in MemberFunctionDefitition#instantiate
-		return new FunctionExpression(this._token, this._funcDef, this._isStatement);
+		return new FunctionExpression(this._token, this._funcName, this._funcDef, this._isStatement);
+	}
+
+	function getFuncName () : LocalVariable {
+		return this._funcName;
 	}
 
 	function getFuncDef () : MemberFunctionDefinition {
