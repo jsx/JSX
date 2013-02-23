@@ -809,6 +809,20 @@ class FunctionExpression extends Expression {
 		return true;
 	}
 
+	function deductTypeIfUnknown (context : AnalysisContext, type : ResolvedFunctionType) : boolean {
+		if (! this._funcDef.deductTypeIfUnknown(context, type))
+			return false;
+		if (this._funcName != null) {
+			if (this._funcName.getType() != null) {
+				if (! this._funcName.getType().equals(this._funcDef.getType()))
+					throw new Error("unmatched type for local function: " + this._funcName.getName().getValue());
+			} else {
+				this._funcName.setType(this._funcDef.getType());
+			}
+		}
+		return true;
+	}
+
 	override function forEachExpression (cb : function(:Expression,:function(:Expression):void):boolean) : boolean {
 		return true;
 	}
@@ -1580,7 +1594,7 @@ class AssignmentExpression extends BinaryExpression {
 			}
 		}
 		else if (! this._expr1.getType().equals(Type.variantType)) {
-			if (! (this._expr2 as FunctionExpression).getFuncDef().deductTypeIfUnknown(context, this._expr1.getType() as ResolvedFunctionType)) {
+			if (! (this._expr2 as FunctionExpression).deductTypeIfUnknown(context, this._expr1.getType() as ResolvedFunctionType)) {
 				return false;
 			}
 		}

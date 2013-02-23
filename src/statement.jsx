@@ -291,7 +291,7 @@ class ReturnStatement extends Statement {
 				return true;
 			}
 			if (this._expr instanceof FunctionExpression && ! (this._expr as FunctionExpression).typesAreIdentified() && returnType instanceof StaticFunctionType) {
-				if (! (this._expr as FunctionExpression).getFuncDef().deductTypeIfUnknown(context, returnType as StaticFunctionType))
+				if (! (this._expr as FunctionExpression).deductTypeIfUnknown(context, returnType as StaticFunctionType))
 					return false;
 			}
 			if (! this._analyzeExpr(context, this._expr))

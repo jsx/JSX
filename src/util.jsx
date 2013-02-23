@@ -112,7 +112,7 @@ class Util {
 				if (j != expectedTypes.length) {
 					// multiple canditates, skip
 				} else if (expectedCallbackType != null) {
-					if (! funcDef.deductTypeIfUnknown(context, expectedCallbackType as ResolvedFunctionType))
+					if (! (args[i] as FunctionExpression).deductTypeIfUnknown(context, expectedCallbackType as ResolvedFunctionType))
 						return null;
 				}
 			} else if (args[i] instanceof ArrayLiteralExpression && (args[i] as ArrayLiteralExpression).getExprs().length == 0 && (args[i] as ArrayLiteralExpression).getType() == null) {
