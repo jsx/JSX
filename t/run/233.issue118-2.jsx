@@ -8,9 +8,11 @@ class _Main {
 		log 'hello';
 	}
 
-	static function x (f : (number) -> void) : void {}
+	static function x (f : (number) -> void) : void {
+		f(0);
+	}
 
-	static function main (args : string) : void {
+	static function main (args : string[]) : void {
 		_Main.x(function fuga (i) {
 			_Main.hoge(fuga);
 		});
