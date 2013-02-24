@@ -179,10 +179,42 @@ native class Buffer {
 	function constructor(str : string, encoding : string);
 
 	function write(str : string, offset : int, length : int, encoding : string) : int;
-
+	function toString(encoding : string) : string;
 	function slice(start : int , end : int) : Buffer;
 
-	function toString(encoding : string) : string;
+	function readUInt8(offset : int) : int;
+	function readUInt16LE(offset : int) : int;
+	function readUInt16BE(offset : int) : int;
+	function readUInt32LE(offset : int) : int;
+	function readUInt32BE(offset : int) : int;
+	function readInt8(offset : int) : int;
+	function readInt16LE(offset : int) : int;
+	function readInt16BE(offset : int) : int;
+	function readInt32LE(offset : int) : int;
+	function readInt32BE(offset : int) : int;
+	function readFloatLE(offset : int) : number;
+	function readFloatBE(offset : int) : number;
+	function readDoubleLE(offset : int) : number;
+	function readDoubleBE(offset : int) : number;
+
+	function writeUInt8(value : int, offset : int) : void;
+	function writeUInt16LE(value : int, offset : int) : void;
+	function writeUInt16BE(value : int, offset : int) : void;
+	function writeUInt32LE(value : int, offset : int) : void;
+	function writeUInt32BE(value : int, offset : int) : void;
+	function writeInt8(value : int, offset : int) : void;
+	function writeInt16LE(value : int, offset : int) : void;
+	function writeInt16BE(value : int, offset : int) : void;
+	function writeInt32LE(value : int, offset : int) : void;
+	function writeInt32BE(value : int, offset : int) : void;
+	function writeFloatLE(value : number, offset : int) : void;
+	function writeFloatBE(value : number, offset : int) : void;
+	function writeDoubleLE(value : number, offset : int) : void;
+	function writeDoubleBE(value : number, offset : int) : void;
+
+	function fill(value : int) : void;
+	function fill(value : int, offset : int) : void;
+	function fill(value : int, offset : int, end : int) : void;
 }
 
 native class querystring {
