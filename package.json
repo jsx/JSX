@@ -2,6 +2,7 @@
   "name":        "jsx",
   "version":     "0.9.10",
   "description": "a faster, safer, easier JavaScript",
+  "keywords": ["jsx", "compiler", "altjs"],
   "homepage": "http://jsx.github.com/",
   "repository" : "git://github.com/jsx/JSX.git",
   "bugs" : { "url" : "https://github.com/jsx/JSX/issues" },
