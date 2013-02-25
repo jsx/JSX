@@ -431,6 +431,8 @@ class QualifiedName {
 		var classDef = null : ClassDefinition;
 
 		if (this._import != null) {
+			if (this._enclosingType != null)
+				throw new Error("template inner class is not supported");
 			if (typeArguments.length == 0) {
 				var classDefs = this._import.getClasses(this._token.getValue());
 				switch (classDefs.length) {
@@ -438,7 +440,7 @@ class QualifiedName {
 					classDef = classDefs[0];
 					break;
 				case 0:
-					context.errors.push(new CompileError(this._token, "no definition for class '" + this._token.getValue() + "' in file '" + this._import.getFilenameToken().getValue() + "'"));
+					context.errors.push(new CompileError(this._token, "no definition for class '" + this.toString() + "' in file '" + this._import.getFilenameToken().getValue() + "'"));
 					return null;
 				default:
 					context.errors.push(new CompileError(this._token, "multiple candidates"));
@@ -450,7 +452,7 @@ class QualifiedName {
 				case 1:
 					return callbacks[0](null, null, null);
 				case 0:
-					context.errors.push(new CompileError(this._token, "no definition for template class '" + this._token.getValue() + "' in file '" + this._import.getFilenameToken().getValue() + "'"));
+					context.errors.push(new CompileError(this._token, "no definition for template class '" + this.toString() + "' in file '" + this._import.getFilenameToken().getValue() + "'"));
 					return null;
 				default:
 					context.errors.push(new CompileError(this._token, "multiple canditates"));
@@ -458,10 +460,27 @@ class QualifiedName {
 				}
 			}
 		} else {
-			if (this._enclosingType == null) {
+			if (this._enclosingType != null) {
+				this._enclosingType.resolveType(context);
+
+				var enclosingClassDef;
+				if ((enclosingClassDef = this._enclosingType.getClassDef()) == null)
+					return null;
+				if (typeArguments.length == 0) {
+					if ((classDef = enclosingClassDef.lookupInnerClass(context.errors, this._token, this._token.getValue())) == null) {
+						context.errors.push(new CompileError(this._token, "no class definition for '" + this.toString() + "'"));
+						return null;
+					}
+				} else {
+					if ((classDef = enclosingClassDef.lookupTemplateInnerClass(context.errors, new TemplateInstantiationRequest(this._token, this._token.getValue(), typeArguments), (parser, classDef) -> { return null; })) == null) {
+						context.errors.push(new CompileError(this._token, "failed to instantiate class"));
+						return null;
+					}
+				}
+			} else {
 				if (typeArguments.length == 0) {
 					if ((classDef = context.parser.lookup(context.errors, this._token, this._token.getValue())) == null) {
-						context.errors.push(new CompileError(this._token, "no class definition for '" + this._token.getValue() + "'"));
+						context.errors.push(new CompileError(this._token, "no class definition for '" + this.toString() + "'"));
 						return null;
 					}
 				} else {
@@ -470,8 +489,6 @@ class QualifiedName {
 						return null;
 					}
 				}
-			} else {
-				throw new Error("inner class is not supported");
 			}
 		}
 		return classDef;
@@ -499,6 +516,10 @@ class QualifiedName {
 			}
 		}
 		return foundClassDefs.length == 1 ? foundClassDefs[0] : null;
+	}
+
+	function toString () : string {
+		return this._enclosingType != null ? this._enclosingType.toString() + this._token.getValue() : this._token.getValue();
 	}
 
 }
