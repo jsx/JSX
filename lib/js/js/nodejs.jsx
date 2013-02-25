@@ -77,9 +77,9 @@ native class process {
 
 	/*
 	 * events:
-	 *  drain:            (data:Buffer)
-	 *  exit:             (exitStatus:number)
-	 *  uncaughtExceptio: (error:Error)
+	 *  drain:             (data:Buffer)
+	 *  exit:              (exitStatus:number)
+	 *  uncaughtException: (error:Error)
 	 */
 	static function on(event : string, listener : () -> void) : void;
 	static function on(event : string, listener : (variant) -> void) : void;
@@ -287,25 +287,89 @@ native __fake__ class FSWatcher extends EventEmitter {
 
 native __fake__ class _path {
 	function normalize(p : string) : string;
-        function join(...path : string) : string;
-        function resolve(...path : string) : string;
-        function relative(from : string, to : string) : string;
+	function join(...path : string) : string;
+	function resolve(...path : string) : string;
+	function relative(from : string, to : string) : string;
 	function dirname(p : string) : string;
 	function basename(p : string) : string;
 	function basename(p : string, ext : string) : string;
 	function extname(p : string) : string;
-        var sep : string;
+	var sep : string;
 }
 
+/*
+ * @see http://nodejs.org/api/child_process.html
+ */
 native class ChildProcess extends EventEmitter {
 	__readonly__ var stdin : Stream;
 	__readonly__ var stdout : Stream;
 	__readonly__ var stderr : Stream;
+
+	__readonly__ var pid : int;
+
+	delete function constructor();
+
+	function kill() : boolean;
+	function kill(signal : string) : boolean;
 }
 
+/*
+ * @see http://nodejs.org/api/child_process.html
+ */
 native __fake__ class _child_process {
+	/**
+	 * <p>Launches a new process with the given <code>command</code>,
+	 * with command line arguments in <code>args</code>.</p>
+	 *
+	 * <p>options:</p>
+	 * <ul>
+	 *   <li>cwd : string</li>
+	 *   <li>stdio : variant[] where each index corresponds to a fd in the child with values "pipe", "ic", "ignore", Stream object, positive int, null</li>
+	 *   <li>env : Map.<string></li>
+	 *   <li>detached : boolean</li>
+	 *   <li>uid : int</li>
+	 *   <li>gid : int</li>
+	 * </ul>
+	 */
+	function spawn(command : string, args : string[], options : Map.<variant>) : ChildProcess;
 	function spawn(command : string, args : string[]) : ChildProcess;
-	function execFile(file : string, args : string[], options : variant, callback : (Error, Buffer, Buffer) -> void) : ChildProcess;
+
+	/**
+	 * <p>Runs a command in a shell and bufferes the output.</p>
+	 *
+	 * <p>options:</p>
+	 * <ul>
+	 *   <li>cwd : string</li>
+	 *   <li>stdio : variant[] where each index corresponds to a fd in the child with values "pipe", "ic", "ignore", Stream object, positive int, null</li>
+	 *   <li>env : Map.<string></li>
+	 *   <li>encoding : string (default: "utf8")</li>
+	 *   <li>timeout : int (default: 0 [ms])</li>
+	 *   <li>maxBuffer : int (default: 200*1024)</li>
+	 *   <li>killSignal : string (default: "SIGTERM")</li>
+	 * </ul>
+	 */
+	function exec(command : string, options : Map.<variant>, callback : (Error, Buffer, Buffer) -> void) : ChildProcess;
+	function exec(command : string, callback : (Error, Buffer, Buffer) -> void) : ChildProcess;
+
+	/**
+	 * <p>Similar to <code>exec()</code> exept it does not execute a subshell
+	 * but rather the specified file directly. It has the same options as <code>exec().</code></p>
+	 *
+	 * <p>options:</p>
+	 * <ul>
+	 *   <li>cwd : string</li>
+	 *   <li>stdio : variant[] where each index corresponds to a fd in the child with values "pipe", "ic", "ignore", Stream object, positive int, null</li>
+	 *   <li>env : Map.<string></li>
+	 *   <li>encoding : string (default: "utf8")</li>
+	 *   <li>timeout : int (default: 0 [ms])</li>
+	 *   <li>maxBuffer : int (default: 200*1024)</li>
+	 *   <li>killSignal : string (default: "SIGTERM")</li>
+	 * </ul>
+	 */
+	function execFile(file : string, args : string[], options : Map.<variant>, callback : (Error, Buffer, Buffer) -> void) : ChildProcess;
+	function execFile(file : string, args : string[], callback : (Error, Buffer, Buffer) -> void) : ChildProcess;
+
+	//function fork(modulePath : string, args : string[], options : Map.<variant>) : ChildProcess; // NodeJS specific
 }
 
 native __fake__ class _url {

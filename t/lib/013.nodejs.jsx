@@ -3,18 +3,24 @@ import "test-case.jsx";
 import "js/nodejs.jsx";
 
 class _Test extends TestCase {
+
+  // NodeJS build-in modules
+
   function testProcess() : void {
+    var t0 = process.hrtime();
+
     var cwd = process.cwd();
     this.expect(cwd).notToBe("");
+
+    this.expect(process.stdin.fd,  "stdin.fd").toBeGE(0);
+    this.expect(process.stdout.fd, "stdout.fd").toBeGE(0);
+    this.expect(process.stderr.fd, "stderr.fd").toBeGE(0);
+
+    var elapsed = process.hrtime(t0);
+    var seconds = elapsed[0] + elapsed[1] / 1e9;
+    //this.note("hrtime: " + seconds as string + " [sec]");
+    this.expect(seconds).toBeGE(0);
   }
-
-  function testFS() : void {
-    var dir = node.__dirname;
-    var st  = node.fs.statSync(dir);
-
-    this.expect(st.isDirectory()).toBe(true);
-  }
-
 
   function testBuffer() : void {
     this.expect(Buffer.byteLength("foo", "ascii"), "Buffer.byteLength").toBe(3);
@@ -123,6 +129,17 @@ class _Test extends TestCase {
     this.expect(b3.readUInt8(3)).toBe(0x30);
     this.expect(b3.readUInt8(4)).toBe(0x20);
   }
+
+  // NodeJS standard modules
+
+  function testFS() : void {
+    var dir = node.__dirname;
+    var st  = node.fs.statSync(dir);
+
+    this.expect(st.isDirectory()).toBe(true);
+
+  }
+
 
   function testUrl() : void {
     var url = node.url.parse("http://example.com/foo/bar?k=x&k=y#here");
