@@ -381,12 +381,12 @@ class QualifiedName {
 
 	var _token : Token;
 	var _import : Import;
-	var _enclosingTypes : ParsedObjectType[];
+	var _enclosingType : ParsedObjectType;
 
-	function constructor (token : Token, imprt : Import, enclosingTypes : ParsedObjectType[]) {
+	function constructor (token : Token, imprt : Import, enclosingType : ParsedObjectType) {
 		this._token = token;
 		this._import = imprt;
-		this._enclosingTypes = enclosingTypes;
+		this._enclosingType = enclosingType;
 	}
 
 	function getToken () : Token {
@@ -397,8 +397,8 @@ class QualifiedName {
 		return this._import;
 	}
 
-	function getEnclosingType () : ParsedObjectType[] {
-		return this._enclosingTypes;
+	function getEnclosingType () : ParsedObjectType {
+		return this._enclosingType;
 	}
 
 	function serialize () : variant {
@@ -406,7 +406,7 @@ class QualifiedName {
 			"QualifiedName",
 			this._token.serialize(),
 			Serializer.<Import>.serializeNullable(this._import),
-			Serializer.<ParsedObjectType>.serializeArray(this._enclosingTypes)
+			Serializer.<ParsedObjectType>.serializeNullable(this._enclosingType)
 		] : variant[];
 	}
 
@@ -417,8 +417,13 @@ class QualifiedName {
 			return false;
 		if (this._import != x._import)
 			return false;
-		if (! Util.typesAreEqual(this._enclosingTypes.map.<Type>((t) -> { return t; }), x._enclosingTypes.map.<Type>((t) -> { return t; })))
-			return false;
+		if (this._enclosingType == null) {
+			if (x._enclosingType != null)
+				return false;
+		} else {
+			if (! this._enclosingType.equals(x._enclosingType))
+				return false;
+		}
 		return true;
 	}
 
@@ -453,7 +458,7 @@ class QualifiedName {
 				}
 			}
 		} else {
-			if (this._enclosingTypes.length == 0) {
+			if (this._enclosingType == null) {
 				if (typeArguments.length == 0) {
 					if ((classDef = context.parser.lookup(context.errors, this._token, this._token.getValue())) == null) {
 						context.errors.push(new CompileError(this._token, "no class definition for '" + this._token.getValue() + "'"));
@@ -1364,10 +1369,10 @@ class Parser {
 			return null;
 		}
 		this._classType = new ParsedObjectType(
-			new QualifiedName(className, null, []), // FIXME passing empty array correct?
+			new QualifiedName(className, null, null), // FIXME passing empty array correct?
 			this._typeArgs.map.<Type>(function (token : Token) : Type {
 				// convert formal typearg (Token) to actual typearg (Type)
-				return new ParsedObjectType(new QualifiedName(token, null, []), new Type[]);
+				return new ParsedObjectType(new QualifiedName(token, null, null), new Type[]);
 			}));
 		this._objectTypesUsed.push(this._classType);
 		// extends
@@ -1381,7 +1386,7 @@ class Parser {
 					});
 			}
 			if (this._extendType == null && className.getValue() != "Object") {
-				this._extendType = new ParsedObjectType(new QualifiedName(new Token("Object", true), null, []), new Type[]);
+				this._extendType = new ParsedObjectType(new QualifiedName(new Token("Object", true), null, null), new Type[]);
 				this._objectTypesUsed.push(this._extendType);
 			}
 		} else {
@@ -1817,7 +1822,7 @@ class Parser {
 		}
 		if (this._typeArgs != null) {
 			for (var i = 0; i < this._typeArgs.length; ++i) {
-				if (baseType.equals(new ParsedObjectType(new QualifiedName(this._typeArgs[i], null, []), new Type[]))) {
+				if (baseType.equals(new ParsedObjectType(new QualifiedName(this._typeArgs[i], null, null), new Type[]))) {
 					return baseType.toNullableType(true);
 				}
 			}
@@ -1874,7 +1879,7 @@ class Parser {
 				return null;
 		}
 		if (! allowInner) {
-			var qualifiedName = new QualifiedName(token, imprt, []);
+			var qualifiedName = new QualifiedName(token, imprt, null);
 
 			var typeArgs = this._actualTypeArguments();
 			if (typeArgs == null) {
@@ -1888,19 +1893,19 @@ class Parser {
 				return objectType;
 			}
 		} else {
-			var enclosingTypes = new ParsedObjectType[];
+			var enclosingType : ParsedObjectType = null;
 			while (true) {
-				qualifiedName = new QualifiedName(token, imprt, enclosingTypes.slice(0));
+				qualifiedName = new QualifiedName(token, imprt, enclosingType);
 
 				var typeArgs = this._actualTypeArguments();
 				if (typeArgs == null) {
 					return null;
 				} else if (typeArgs.length != 0) {
-					enclosingTypes.push(this._templateTypeDeclaration(qualifiedName, typeArgs));
+					enclosingType = this._templateTypeDeclaration(qualifiedName, typeArgs);
 				} else {
 					var objectType = new ParsedObjectType(qualifiedName, new Type[]);
 					this._objectTypesUsed.push(objectType);
-					enclosingTypes.push(objectType);
+					enclosingType = objectType;
 				}
 
 				if (this._expectOpt(".") == null)
@@ -1909,7 +1914,7 @@ class Parser {
 				if (token == null)
 					return null;
 			}
-			return enclosingTypes[enclosingTypes.length - 1];
+			return enclosingType;
 		}
 	}
 
@@ -2000,7 +2005,7 @@ class Parser {
 
 	function _registerArrayTypeOf (token : Token, elementType : Type) : ParsedObjectType {
 		// var arrayType = new ParsedObjectType(new QualifiedName(new Token("Array", true), null), [ elementType ], token);
-		var arrayType = new ParsedObjectType(new QualifiedName(new Token("Array", true), null, []), [ elementType ]);
+		var arrayType = new ParsedObjectType(new QualifiedName(new Token("Array", true), null, null), [ elementType ]);
 		this._objectTypesUsed.push(arrayType);
 		return arrayType;
 	}
