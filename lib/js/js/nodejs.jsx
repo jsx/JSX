@@ -169,8 +169,13 @@ native class Stream extends EventEmitter {
 	function end() : void;
 }
 
+/**
+ * Fixed-sized binary buffer, built in NodeJS.
+ */
 native class Buffer {
 	static function byteLength(str : string, encoding : string) : int;
+	static function concat(list : Buffer[]) : Buffer;
+	static function concat(list : Buffer[], totalLength : int) : Buffer;
 
 	__readonly__ var length : int;
 
@@ -179,7 +184,17 @@ native class Buffer {
 	function constructor(str : string, encoding : string);
 
 	function write(str : string, offset : int, length : int, encoding : string) : int;
+
 	function toString(encoding : string) : string;
+	function toString(encoding : string, start : int) : string;
+	function toString(encoding : string, start : int, end : int) : string;
+
+	function copy(targetBuffer : Buffer) : void;
+	function copy(targetBuffer : Buffer, targetStart : int) : void;
+	function copy(targetBuffer : Buffer, targetStart : int, sourceStart : int) : void;
+	function copy(targetBuffer : Buffer, targetStart : int, sourceStart : int, sourceEnd : int) : void;
+
+	function slice(start : int) : Buffer;
 	function slice(start : int , end : int) : Buffer;
 
 	function readUInt8(offset : int) : int;

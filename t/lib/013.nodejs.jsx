@@ -17,18 +17,31 @@ class _Test extends TestCase {
 
 
   function testBuffer() : void {
+    this.expect(Buffer.byteLength("foo", "ascii"), "Buffer.byteLength").toBe(3);
+    this.expect(Buffer.byteLength("foo", "utf8"), "Buffer.byteLength").toBe(3);
+
+    this.expect(Buffer.concat([new Buffer("foo", "utf8"), new Buffer("bar", "utf8")]).toString(), "Buffer.concat").toBe("foobar");
+    this.expect(Buffer.concat([new Buffer("foo", "utf8"), new Buffer("bar", "utf8")], 5).toString(), "Buffer.concat").toBe("fooba");
+
     var b = new Buffer(3);
     b.write("foo", 0, 3, "ascii");
 
-    this.expect(b.length).toBe(3);
-    this.expect(b.toString()).toBe("foo");
+    this.expect(b.length, "length").toBe(3);
+    this.expect(b.toString(), "toString()").toBe("foo");
+    this.expect(b.toString("utf8"), "toString(encoding)").toBe("foo");
+    this.expect(b.toString("utf8", 1), "toString(encoding, start)").toBe("oo");
+    this.expect(b.toString("utf8", 0, 2), "toString(encoding, start, end)").toBe("fo");
 
-    this.expect(Buffer.byteLength("foo", "ascii")).toBe(3);
+    this.expect(b.slice(1).toString(),    "slice").toBe("oo");
+    this.expect(b.slice(0, 2).toString(), "slice").toBe("fo");
+
+    (new Buffer("bar", "utf8")).copy(b);
+    this.expect(b.toString(), "copy").toBe("bar");
 
     var b2 = new Buffer(1024);
 
     b2.writeUInt8(0, 0);
-    this.expect(b2.readUInt8(0)).toBe(0);
+    this.expect(b2.readUInt8(0), "read/write").toBe(0);
     b2.writeUInt8(0xff, 1);
     this.expect(b2.readUInt8(1)).toBe(0xff);
 
@@ -95,7 +108,7 @@ class _Test extends TestCase {
 
     var b3 = new Buffer(5);
     b3.fill(0x10);
-    this.expect(b3.readUInt8(0)).toBe(0x10);
+    this.expect(b3.readUInt8(0), "fill").toBe(0x10);
     this.expect(b3.readUInt8(4)).toBe(0x10);
 
     b3.fill(0x20, 1);
