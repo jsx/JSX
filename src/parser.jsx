@@ -467,7 +467,7 @@ class QualifiedName {
 				if ((enclosingClassDef = this._enclosingType.getClassDef()) == null)
 					return null;
 				if (typeArguments.length == 0) {
-					if ((classDef = enclosingClassDef.lookupInnerClass(context.errors, this._token, this._token.getValue())) == null) {
+					if ((classDef = enclosingClassDef.lookupInnerClass(this._token.getValue())) == null) {
 						context.errors.push(new CompileError(this._token, "no class definition for '" + this.toString() + "'"));
 						return null;
 					}
@@ -518,7 +518,7 @@ class QualifiedName {
 		return foundClassDefs.length == 1 ? foundClassDefs[0] : null;
 	}
 
-	function toString () : string {
+	override function toString () : string {
 		return this._enclosingType != null ? this._enclosingType.toString() + this._token.getValue() : this._token.getValue();
 	}
 
@@ -1433,8 +1433,9 @@ class Parser {
 		// body
 		if (this._expect("{") == null)
 			return null;
-		var inners = new ClassDefinition[];
 		var members = new MemberDefinition[];
+		var inners = new ClassDefinition[];
+		var templateInners = new TemplateClassDefinition[];
 
 		var success = true;
 		while (this._expectOpt("}") == null) {
@@ -1446,7 +1447,11 @@ class Parser {
 				// parse inner class
 				var innerClass = this._classDefinition();
 				if (innerClass != null) {
-					inners.push(innerClass);
+					if (innerClass instanceof TemplateClassDefinition) {
+						templateInners.push(innerClass as TemplateClassDefinition);
+					} else {
+						inners.push(innerClass);
+					}
 				} else {
 					this._skipStatement();
 				}
@@ -1511,11 +1516,13 @@ class Parser {
 
 		// done
 		if (this._typeArgs.length != 0) {
-			var templateClassDef = new TemplateClassDefinition(className, className.getValue(), this._classFlags, this._typeArgs, this._extendType, this._implementTypes, members, inners, this._objectTypesUsed, docComment);
-			this._templateClassDefs.push(templateClassDef);
+			var templateClassDef = new TemplateClassDefinition(className, className.getValue(), this._classFlags, this._typeArgs, this._extendType, this._implementTypes, members, inners, templateInners, this._objectTypesUsed, docComment);
+			if (this._outerClass == null) {
+				this._templateClassDefs.push(templateClassDef);
+			}
 			return templateClassDef;
 		} else {
-			var classDef = new ClassDefinition(className, className.getValue(), this._classFlags, this._extendType, this._implementTypes, members, inners, this._objectTypesUsed, docComment);
+			var classDef = new ClassDefinition(className, className.getValue(), this._classFlags, this._extendType, this._implementTypes, members, inners, templateInners, this._objectTypesUsed, docComment);
 			if (this._outerClass == null) {
 				this._classDefs.push(classDef);
 			}
