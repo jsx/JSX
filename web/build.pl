@@ -119,13 +119,15 @@ sub info {
 }
 
 sub make_list {
-    my($prefix) = @_;
+    my($prefix, $link_to) = @_;
     my $id = $prefix;
     $id =~ s/\W/-/g;
 
+    $link_to ||= $prefix;
+
     return join "",
         qq{<li id="$id" class="nav-header">$prefix</li>\n},
-        map { qq{<li class="source-file"><a href="$prefix/$_" data-path="$prefix/$_">$_</a></li>\n} }
+        map { qq{<li class="source-file"><a href="$link_to/$_" data-path="$link_to/$_">$_</a></li>\n} }
         map { basename($_) } glob("$web_root/../$prefix/*.jsx");
 }
 
@@ -141,6 +143,7 @@ sub process_page {
     };
 
     # listing tests
+    my $eg  = make_list("example", "source-map");
     my $run = make_list("t/run");
     my $lib = make_list("t/lib");
     my $err = make_list("t/compile_error");
@@ -149,7 +152,7 @@ sub process_page {
         <!-- \s* source-list \s* -->
         (.*)
         <!-- \s* /source-list \s* -->
-    }{$run$lib$err}xmsg;
+    }{$eg$run$lib$err}xmsg;
 
     open my($fh), '>', $dest;
     print $fh $content;

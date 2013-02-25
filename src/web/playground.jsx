@@ -25,6 +25,7 @@
  * IN THE SOFTWARE.
  */
 
+import "console.jsx";
 import "js.jsx";
 import "js/web.jsx";
 
@@ -137,8 +138,10 @@ class _Main {
 			readOnly: true
 		} : Map.<variant>);
 
+		var console_log = js.global["console"]["log"];
+
 		function compile(options : variant) : void {
-			log 'compile with ' + JSON.stringify(options);
+			console.info('compile with ' + JSON.stringify(options));
 
 			output.setValue("");
 			var path = input.dataset["path"];
@@ -173,6 +176,15 @@ class _Main {
 				return;
 			}
 
+			if (options['mode'] == "run") {
+				js.global["console"]["log"] = function (arg : string) : void {
+					output.setValue(output.getValue() + arg + "\n");
+				};
+			}
+			else {
+				js.global["console"]["log"] = console_log;
+			}
+
 			c.addSourceFile(null, path);
 
 			var success = c.compile();
@@ -195,19 +207,8 @@ class _Main {
 				}
 
 				if(options['mode'] == 'run') {
-					(function (c : variant) : void {
-						output.setOption("mode", "");
-						var console_log = c["log"];
-						c["log"] = function (s : variant) : void {
-							output.setValue( output.getValue() + s as string + "\n" );
-						};
-						try {
-							js.eval(out);
-						}
-						finally {
-							c["log"] = console_log;
-						}
-					}(js.global["console"]));
+					output.setOption("mode", "");
+					js.eval(out);
 				}
 				else {
 					output.setOption("mode", "javascript");
@@ -233,7 +234,7 @@ class _Main {
 		function retrieveInput(input : HTMLTextAreaElement) : void {
 			var serializedSession = dom.window.sessionStorage.getItem("jsx.session");
 			if(serializedSession) {
-				log "retrieve from session";
+				console.info("retrieve from session");
 				var session = JSON.parse(serializedSession);
 
 				input.dataset["path"] = session['inputPath'] as string;
@@ -268,7 +269,7 @@ class _Main {
 
 			var a = li.children[0] as HTMLAnchorElement;
 			a.addEventListener('click', function(event) {
-				log 'changing';
+				console.info('changing');
 				event.preventDefault();
 				event.stopPropagation();
 
