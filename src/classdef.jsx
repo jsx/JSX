@@ -157,6 +157,7 @@ class ClassDefinition implements Stashable {
 	var _extendType		: ParsedObjectType; // null for interfaces, mixins, and Object class only
 	var _implementTypes	: ParsedObjectType[];
 	var _members		: MemberDefinition[];
+	var _outer		: ClassDefinition;
 	var _inners		: ClassDefinition[];
 	var _templateInners	: TemplateClassDefinition[];
 	var _objectTypesUsed	: ParsedObjectType[];
@@ -173,10 +174,12 @@ class ClassDefinition implements Stashable {
 		this._extendType = extendType;
 		this._implementTypes = implementTypes;
 		this._members = members;
+		this._outer = null;
 		this._inners = inners;
 		this._templateInners = templateInners;
 		this._objectTypesUsed = objectTypesUsed;
 		this._docComment = docComment;
+
 		this._resetMembersClassDef();
 	}
 
@@ -241,6 +244,22 @@ class ClassDefinition implements Stashable {
 
 	function members () : MemberDefinition[] {
 		return this._members;
+	}
+
+	function setOuterClassDef (outer : ClassDefinition) : void {
+		this._outer = outer;
+	}
+
+	function getOuterClassDef () : ClassDefinition {
+		return this._outer;
+	}
+
+	function getInnerClasses () : ClassDefinition[] {
+		return this._inners;
+	}
+
+	function getTemplateInnerClasses () : TemplateClassDefinition[] {
+		return this._templateInners;
 	}
 
 	function getDocComment () : DocComment {
@@ -315,6 +334,7 @@ class ClassDefinition implements Stashable {
 	}
 
 	function _resetMembersClassDef () : void {
+		// member defintions
 		(function onClassDef (classDef : ClassDefinition) : boolean {
 			for (var i = 0; i < classDef._members.length; ++i) {
 				classDef._members[i].setClassDef(this);
@@ -329,6 +349,14 @@ class ClassDefinition implements Stashable {
 			classDef.forEachInnerClass(onClassDef);
 			return true;
 		})(this);
+
+		// member classes
+		for (var i = 0; i < this._inners.length; ++i) {
+			this._inners[i].setOuterClassDef(this);
+		}
+		for (var i = 0; i < this._templateInners.length; ++i) {
+			this._templateInners[i].setOuterClassDef(this);
+		}
 	}
 
 	static const GET_MEMBER_MODE_ALL = 0; // looks for functions or variables from the class and all super classes
@@ -503,6 +531,10 @@ class ClassDefinition implements Stashable {
 		// resolve types used
 		for (var i = 0; i < this._objectTypesUsed.length; ++i)
 			this._objectTypesUsed[i].resolveType(context);
+		for (var i = 0; i < this._inners.length; ++i)
+			this._inners[i].resolveTypes(context);
+		for (var i = 0; i < this._templateInners.length; ++i)
+			this._templateInners[i].resolveTypes(context);
 		// resolve base classes
 		if (this._extendType != null) {
 			var baseClass = this._extendType.getClassDef();
@@ -1979,6 +2011,11 @@ class InstantiatedClassDefinition extends ClassDefinition {
 				return false;
 		}
 		return true;
+	}
+
+	override function instantiate (instantiationContext : InstantiationContext) : InstantiatedClassDefinition {
+		// FIXME
+		return null;
 	}
 
 }

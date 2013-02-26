@@ -321,6 +321,10 @@ class Compiler {
 		var classDefs = new ClassDefinition[];
 		for (var i = 0; i < this._parsers.length; ++i)
 			classDefs = classDefs.concat(this._parsers[i].getClassDefs());
+		for (var i = 0; i < classDefs.length; ++i) {
+			if (classDefs[i].getInnerClasses().length != 0)
+				classDefs = classDefs.concat(classDefs[i].getInnerClasses());
+		}
 		// reorder the classDefs so that base classes would come before their children
 		var getMaxIndexOfClasses = function (deps : ClassDefinition[]) : number {
 			deps = deps.concat(new ClassDefinition[]); // clone the array
@@ -341,6 +345,8 @@ class Compiler {
 			var deps = classDefs[i].implementTypes().map.<ClassDefinition>(function (t) { return t.getClassDef(); }).concat(new ClassDefinition[]);
 			if (classDefs[i].extendType() != null)
 				deps.unshift(classDefs[i].extendType().getClassDef());
+			if (classDefs[i].getOuterClassDef() != null)
+				deps.unshift(classDefs[i].getOuterClassDef());
 			var maxIndexOfClasses = getMaxIndexOfClasses(deps);
 			if (maxIndexOfClasses > i) {
 				classDefs.splice(maxIndexOfClasses + 1, 0, classDefs[i]);
@@ -367,7 +373,12 @@ class Compiler {
 		for (var i = 0; i < classDefs.length; ++i) {
 			var classDef = classDefs[i];
 			if ((classDef.flags() & ClassDefinition.IS_NATIVE) == 0) {
-				var className = classDef.className();
+				var className;
+				if (classDef.getOuterClassDef() != null)
+					className = classDef.getOuterClassDef().getOutputClassName() + "$I" + classDef.className();
+				else
+					className = classDef.className();
+
 				if (countByName[className]) {
 					classDef.setOutputClassName(className + "$" + (countByName[className] - 1) as string);
 					countByName[className]++;
@@ -379,11 +390,10 @@ class Compiler {
 		}
 		// escape the instantiated class names
 		for (var i = 0; i < classDefs.length; ++i) {
-			if ((classDefs[i].flags() & ClassDefinition.IS_NATIVE) == 0
-				&& classDefs[i] instanceof InstantiatedClassDefinition) {
+			if ((classDefs[i].flags() & ClassDefinition.IS_NATIVE) == 0) {
 				var escapedClassName = classDefs[i].getOutputClassName().replace(/\.</g, "$$").replace(/>/g, "$E").replace(/[^A-Za-z0-9_]/g,"$");
 
-				 classDefs[i].setOutputClassName(escapedClassName);
+				classDefs[i].setOutputClassName(escapedClassName);
 			}
 		}
 		// emit

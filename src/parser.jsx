@@ -1390,7 +1390,7 @@ class Parser {
 			return null;
 		}
 		this._classType = new ParsedObjectType(
-			new QualifiedName(className, null, null), // FIXME passing empty array correct?
+			new QualifiedName(className, null, (this._outerClass != null) ? this._outerClass.classType : null),
 			this._typeArgs.map.<Type>(function (token : Token) : Type {
 				// convert formal typearg (Token) to actual typearg (Type)
 				return new ParsedObjectType(new QualifiedName(token, null, null), new Type[]);
