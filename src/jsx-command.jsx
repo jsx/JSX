@@ -58,6 +58,7 @@ class JSXCommand {
 			"  --warn type1,type2,...     enables warnings (all, deprecated, none)\n" +
 			"  --disable-type-check       disables run-time type checking\n" +
 			"  --enable-source-map        enables source map debugging info\n" +
+			"  --complete line:column     shows code completion at line:column\n" +
 			"  --version                  displays the version and compiler identifier and exits\n" +
 			"  --version-number           displays the version as number and exits\n" +
 			"  --help                     displays this help and exits\n" +
