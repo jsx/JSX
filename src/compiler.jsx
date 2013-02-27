@@ -386,7 +386,7 @@ class Compiler {
 			if ((classDef.flags() & ClassDefinition.IS_NATIVE) == 0) {
 				var className;
 				if (classDef.getOuterClassDef() != null)
-					className = classDef.getOuterClassDef().getOutputClassName() + "$I" + classDef.className();
+					className = classDef.getOuterClassDef().getOutputClassName() + "$C" + classDef.className();
 				else
 					className = classDef.className();
 
