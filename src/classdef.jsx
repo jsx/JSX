@@ -575,6 +575,33 @@ class ClassDefinition implements Stashable {
 			func.setClassDef(this);
 			this._members.push(func);
 		}
+		// substitute access to inner class with single ClassExpression
+		this.forEachMemberFunction(function (funcDef) {
+			return funcDef.forEachStatement(function (statement) {
+				return statement.forEachExpression(function onExpr(expr : Expression, replaceCb : (Expression)->void) : boolean {
+					expr.forEachExpression(onExpr);
+					if (expr instanceof PropertyExpression && (expr as PropertyExpression).getExpr() instanceof ClassExpression) {
+						var propExpr = expr as PropertyExpression;
+						var identifierToken = propExpr.getIdentifierToken();
+						var receiverType = (propExpr.getExpr() as ClassExpression).getType() as ParsedObjectType;
+						var receiverClassDef = receiverType.getClassDef();
+						receiverClassDef.forEachInnerClass(function (classDef) {
+							if (classDef.className() == identifierToken.getValue()) {
+								var objectType = new ParsedObjectType(
+									new QualifiedName(identifierToken, null, receiverType),
+									propExpr.getTypeArguments()
+								);
+								objectType.resolveType(context);
+								replaceCb(new ClassExpression(propExpr.getToken(), objectType));
+								return false;
+							}
+							return true;
+						});
+					}
+					return true;
+				});
+			});
+		});
 	}
 
 	function setAnalysisContextOfVariables (context : AnalysisContext) : void {
