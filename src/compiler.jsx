@@ -253,11 +253,22 @@ class Compiler {
 	}
 
 	function forEachClassDef (f : function(:Parser, :ClassDefinition):boolean) : boolean {
+		function onClassDef (parser : Parser, classDef : ClassDefinition) : boolean {
+			if (! f(parser, classDef))
+				return false;
+			var inners = classDef.getInnerClasses();
+			for (var i = 0; i < inners.length; ++i) {
+				if (! onClassDef(parser, inners[i]))
+					return false;
+			}
+			return true;
+		}
+
 		for (var i = 0; i < this._parsers.length; ++i) {
 			var parser = this._parsers[i];
 			var classDefs = parser.getClassDefs();
 			for (var j = 0; j < classDefs.length; ++j) {
-				if (! f(parser, classDefs[j]))
+				if (! onClassDef(parser, classDefs[j]))
 					return false;
 			}
 		}
