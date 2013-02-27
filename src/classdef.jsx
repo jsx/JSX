@@ -335,27 +335,25 @@ class ClassDefinition implements Stashable {
 
 	function _resetMembersClassDef () : void {
 		// member defintions
-		(function onClassDef (classDef : ClassDefinition) : boolean {
-			for (var i = 0; i < classDef._members.length; ++i) {
-				classDef._members[i].setClassDef(this);
-				if (classDef._members[i] instanceof MemberFunctionDefinition) {
-					function setClassDef(funcDef : MemberFunctionDefinition) : boolean {
-						funcDef.setClassDef(this);
-						return funcDef.forEachClosure(setClassDef);
-					}
-					(classDef._members[i] as MemberFunctionDefinition).forEachClosure(setClassDef);
+		for (var i = 0; i < this._members.length; ++i) {
+			this._members[i].setClassDef(this);
+			if (this._members[i] instanceof MemberFunctionDefinition) {
+				function setClassDef(funcDef : MemberFunctionDefinition) : boolean {
+					funcDef.setClassDef(this);
+					return funcDef.forEachClosure(setClassDef);
 				}
+				(this._members[i] as MemberFunctionDefinition).forEachClosure(setClassDef);
 			}
-			classDef.forEachInnerClass(onClassDef);
-			return true;
-		})(this);
+		}
 
 		// member classes
 		for (var i = 0; i < this._inners.length; ++i) {
 			this._inners[i].setOuterClassDef(this);
+			this._inners[i]._resetMembersClassDef();
 		}
 		for (var i = 0; i < this._templateInners.length; ++i) {
 			this._templateInners[i].setOuterClassDef(this);
+			this._templateInners[i]._resetMembersClassDef();
 		}
 	}
 
@@ -533,8 +531,6 @@ class ClassDefinition implements Stashable {
 			this._objectTypesUsed[i].resolveType(context);
 		for (var i = 0; i < this._inners.length; ++i)
 			this._inners[i].resolveTypes(context);
-		for (var i = 0; i < this._templateInners.length; ++i)
-			this._templateInners[i].resolveTypes(context);
 		// resolve base classes
 		if (this._extendType != null) {
 			var baseClass = this._extendType.getClassDef();
