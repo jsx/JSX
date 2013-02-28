@@ -779,7 +779,9 @@ class ClassDefinition implements Stashable {
 			} else {
 				// Just sets the initial values; analysis of member variables is performed lazily (and those that where never analyzed will be removed by dead code elimination)
 				var varDef = member as MemberVariableDefinition;
-				varDef.setInitialValue(Expression.getDefaultValueExpressionOf(varDef.getType()));
+				if (varDef.getInitialValue() == null) {
+					varDef.setInitialValue(Expression.getDefaultValueExpressionOf(varDef.getType()));
+				}
 			}
 		}
 	}
@@ -1060,8 +1062,8 @@ class MemberVariableDefinition extends MemberDefinition {
 		var type = this._type != null ? this._type.instantiate(instantiationContext) : null;
 		var initialValue : Expression = null;
 		if (this._initialValue != null) {
-			this._initialValue.instantiate(instantiationContext);
-			initialValue = this._initialValue;
+			initialValue = this._initialValue.clone();
+			initialValue.instantiate(instantiationContext);
 		}
 		return new MemberVariableDefinition(this._token, this._nameToken, this._flags, type, initialValue, null);
 	}
