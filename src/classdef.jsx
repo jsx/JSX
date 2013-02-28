@@ -218,6 +218,10 @@ class ClassDefinition implements Stashable {
 		return this._className;
 	}
 
+	function classFullName () : string {
+		return this._outer != null ? this._outer.classFullName() + "." + this._className : this.className();
+	}
+
 	function setOutputClassName (name : string) : void {
 		this._outputClassName = name;
 	}
@@ -621,7 +625,7 @@ class ClassDefinition implements Stashable {
 
 			throw e;
 		}
-		this._analyzeMemberFunctions(context);
+		this._analyzeMembers(context);
 	}
 
 	function _analyzeClassDef (context : AnalysisContext) : boolean {
@@ -765,13 +769,17 @@ class ClassDefinition implements Stashable {
 		return false;
 	}
 
-	function _analyzeMemberFunctions (context : AnalysisContext) : void {
-		// analyze the member functions, analysis of member variables is performed lazily (and those that where never analyzed will be removed by dead code elimination)
+	function _analyzeMembers (context : AnalysisContext) : void {
 		for (var i = 0; i < this._members.length; ++i) {
 			var member = this._members[i];
-			if (member instanceof MemberFunctionDefinition
-				&& ! (member instanceof TemplateFunctionDefinition)) {
-				(member as MemberFunctionDefinition).analyze(context);
+			if (member instanceof MemberFunctionDefinition) {
+				if (! (member instanceof TemplateFunctionDefinition)) {
+					(member as MemberFunctionDefinition).analyze(context);
+				}
+			} else {
+				// Just sets the initial values; analysis of member variables is performed lazily (and those that where never analyzed will be removed by dead code elimination)
+				var varDef = member as MemberVariableDefinition;
+				varDef.setInitialValue(Expression.getDefaultValueExpressionOf(varDef.getType()));
 			}
 		}
 	}
@@ -1050,11 +1058,10 @@ class MemberVariableDefinition extends MemberDefinition {
 
 	override function instantiate (instantiationContext : InstantiationContext) : MemberDefinition {
 		var type = this._type != null ? this._type.instantiate(instantiationContext) : null;
+		var initialValue : Expression = null;
 		if (this._initialValue != null) {
-			var initialValue = this._initialValue.clone();
-			initialValue.instantiate(instantiationContext);
-		} else {
-			initialValue = Expression.getDefaultValueExpressionOf(type);
+			this._initialValue.instantiate(instantiationContext);
+			initialValue = this._initialValue;
 		}
 		return new MemberVariableDefinition(this._token, this._nameToken, this._flags, type, initialValue, null);
 	}
@@ -1901,7 +1908,56 @@ class TemplateClassDefinition extends ClassDefinition implements TemplateDefinit
 	}
 
 	override function instantiate (instantiationContext : InstantiationContext) : TemplateClassDefinition {
-		throw new Error("FIXME");
+		// shadow type args
+		var typemap = new Map.<Type>;
+		for (var key in instantiationContext.typemap) {
+			typemap[key] = instantiationContext.typemap[key];
+		}
+		for (var i = 0; i < this._typeArgs.length; ++i) {
+			delete typemap[this._typeArgs[i].getValue()];
+		}
+		var context = new InstantiationContext(instantiationContext.errors, typemap);
+
+		// instantiate the members
+		var succeeded = true;
+		var members = new MemberDefinition[];
+		for (var i = 0; i < this._members.length; ++i) {
+			var member = this._members[i].instantiate(context);
+			if (member == null)
+				succeeded = false;
+			members[i] = member;
+		}
+		var inners = new ClassDefinition[];
+		for (var i = 0; i < this._inners.length; ++i) {
+			var inner = this._inners[i].instantiate(context);
+			if (inner == null)
+				succeeded = false;
+			inners[i] = inner;
+		}
+		var templateInners = new TemplateClassDefinition[];
+		for (var i = 0; i < this._templateInners.length; ++i) {
+			var templateInner = this._templateInners[i].instantiate(context);
+			if (templateInner == null)
+				succeeded = false;
+			templateInners[i] = templateInner;
+		}
+		// done
+		if (! succeeded)
+			return null;
+
+		return new TemplateClassDefinition(
+			this._token,
+			this._className,
+			this._flags,
+			this._typeArgs,
+			this._extendType != null ? this._extendType.instantiate(context) as ParsedObjectType : null,
+			this._implementTypes.map.<ParsedObjectType>(function (t) { return t.instantiate(context) as ParsedObjectType; }),
+			members,
+			inners,
+			templateInners,
+			context.objectTypesUsed,
+			this._docComment
+		);
 	}
 
 	function instantiateTemplateClass (errors : CompileError[], request : TemplateInstantiationRequest) : InstantiatedClassDefinition {
@@ -1959,7 +2015,7 @@ class InstantiatedClassDefinition extends ClassDefinition {
 	function constructor (templateClassDef : TemplateClassDefinition, typeArguments : Type[], extendType : ParsedObjectType, implementTypes : ParsedObjectType[], members : MemberDefinition[], inners : ClassDefinition[], templateInners : TemplateClassDefinition[], objectTypesUsed : ParsedObjectType[]) {
 		super(
 			null,
-			Type.templateTypeToString(templateClassDef.className(), typeArguments),
+			Type.templateTypeToString(templateClassDef.classFullName(), typeArguments),
 			templateClassDef.flags(),
 			extendType,
 			implementTypes,
@@ -1995,7 +2051,7 @@ class InstantiatedClassDefinition extends ClassDefinition {
 	}
 
 	override function instantiate (instantiationContext : InstantiationContext) : InstantiatedClassDefinition {
-		throw new Error("FIXME");
+		throw new Error("logic flaw");
 	}
 
 }
