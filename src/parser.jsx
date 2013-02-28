@@ -556,14 +556,18 @@ class ClassState {
 	var implementTypes : ParsedObjectType[];
 	var objectTypesUsed : ParsedObjectType[];
 	var classFlags : number;
+	var inners : ClassDefinition[];
+	var templateInners : TemplateClassDefinition[];
 
-	function constructor (outer : ClassState, classType : ParsedObjectType, extendType : ParsedObjectType, implementTypes : ParsedObjectType[], objectTypesUsed : ParsedObjectType[], classFlags : number) {
+	function constructor (outer : ClassState, classType : ParsedObjectType, extendType : ParsedObjectType, implementTypes : ParsedObjectType[], objectTypesUsed : ParsedObjectType[], classFlags : number, inners : ClassDefinition[], templateInners : TemplateClassDefinition[]) {
 		this.outer = outer;
 		this.classType = classType;
 		this.extendType = extendType;
 		this.implementTypes = implementTypes;
 		this.objectTypesUsed = objectTypesUsed;
 		this.classFlags = classFlags;
+		this.inners = inners;
+		this.templateInners = templateInners;
 	}
 }
 
@@ -613,6 +617,8 @@ class Parser {
 	var _extendType : ParsedObjectType;
 	var _implementTypes : ParsedObjectType[];
 	var _objectTypesUsed : ParsedObjectType[];
+	var _inners : ClassDefinition[];
+	var _templateInners : TemplateClassDefinition[];
 	var _templateInstantiationRequests : TemplateInstantiationRequest[];
 
 	var _prevScope : Scope = null;
@@ -658,6 +664,8 @@ class Parser {
 		this._extendType = null;
 		this._implementTypes = null;
 		this._objectTypesUsed = new ParsedObjectType[];
+		this._inners = new ClassDefinition[];
+		this._templateInners = new TemplateClassDefinition[];
 		this._templateInstantiationRequests = new TemplateInstantiationRequest[];
 
 		// doit
@@ -812,7 +820,9 @@ class Parser {
 			this._extendType,
 			this._implementTypes,
 			this._objectTypesUsed,
-			this._classFlags
+			this._classFlags,
+			this._inners,
+			this._templateInners
 		);
 	}
 
@@ -822,6 +832,8 @@ class Parser {
 		this._implementTypes = this._outerClass.implementTypes;
 		this._objectTypesUsed = this._outerClass.objectTypesUsed;
 		this._classFlags = this._outerClass.classFlags;
+		this._inners = this._outerClass.inners;
+		this._templateInners = this._outerClass.templateInners;
 		this._outerClass = this._outerClass.outer;
 	}
 
@@ -1332,6 +1344,8 @@ class Parser {
 		this._extendType = null;
 		this._implementTypes = new ParsedObjectType[];
 		this._objectTypesUsed = new ParsedObjectType[];
+		this._inners = new ClassDefinition[];
+		this._templateInners = new TemplateClassDefinition[];
 		// attributes* class
 		this._classFlags = 0;
 		var docComment = null : DocComment;
@@ -1434,8 +1448,6 @@ class Parser {
 		if (this._expect("{") == null)
 			return null;
 		var members = new MemberDefinition[];
-		var inners = new ClassDefinition[];
-		var templateInners = new TemplateClassDefinition[];
 
 		var success = true;
 		while (this._expectOpt("}") == null) {
@@ -1445,16 +1457,8 @@ class Parser {
 				this._pushClassState();
 
 				// parse inner class
-				var innerClass = this._classDefinition();
-				if (innerClass != null) {
-					if (innerClass instanceof TemplateClassDefinition) {
-						templateInners.push(innerClass as TemplateClassDefinition);
-					} else {
-						inners.push(innerClass);
-					}
-				} else {
+				if (this._classDefinition() == null)
 					this._skipStatement();
-				}
 
 				this._popClassState();
 				continue;
@@ -1516,15 +1520,19 @@ class Parser {
 
 		// done
 		if (this._typeArgs.length != 0) {
-			var templateClassDef = new TemplateClassDefinition(className, className.getValue(), this._classFlags, this._typeArgs, this._extendType, this._implementTypes, members, inners, templateInners, this._objectTypesUsed, docComment);
+			var templateClassDef = new TemplateClassDefinition(className, className.getValue(), this._classFlags, this._typeArgs, this._extendType, this._implementTypes, members, this._inners, this._templateInners, this._objectTypesUsed, docComment);
 			if (this._outerClass == null) {
 				this._templateClassDefs.push(templateClassDef);
+			} else {
+				this._templateInners.push(templateClassDef);
 			}
 			return templateClassDef;
 		} else {
-			var classDef = new ClassDefinition(className, className.getValue(), this._classFlags, this._extendType, this._implementTypes, members, inners, templateInners, this._objectTypesUsed, docComment);
+			var classDef = new ClassDefinition(className, className.getValue(), this._classFlags, this._extendType, this._implementTypes, members, this._inners, this._templateInners, this._objectTypesUsed, docComment);
 			if (this._outerClass == null) {
 				this._classDefs.push(classDef);
+			} else {
+				this._inners.push(classDef);
 			}
 			classDef.setParser(this);
 			return classDef;
