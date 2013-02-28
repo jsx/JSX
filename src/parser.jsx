@@ -519,7 +519,7 @@ class QualifiedName {
 	}
 
 	override function toString () : string {
-		return this._enclosingType != null ? this._enclosingType.toString() + this._token.getValue() : this._token.getValue();
+		return this._enclosingType != null ? this._enclosingType.toString() + "." + this._token.getValue() : this._token.getValue();
 	}
 
 }
@@ -1495,6 +1495,21 @@ class Parser {
 			// any better way to check that we are parsing a built-in file?
 			this._errors.push(new CompileError(className, "cannot re-define a built-in class"));
 			success = false;
+		} else if (this._outerClass != null) {
+			for (var i = 0; i < this._outerClass.inners.length; ++i) {
+				if (this._outerClass.inners[i].className() == className.getValue()) {
+					this._errors.push(new CompileError(className, "a non-template inner class with the same name has been already declared"));
+					success = false;
+					break;
+				}
+			}
+			for (var i = 0; i < this._outerClass.templateInners.length; ++i) {
+				if (this._outerClass.templateInners[i].className() == className.getValue()) {
+					this._errors.push(new CompileError(className, "a non-template inner class with the same name has been already declared"));
+					success = false;
+					break;
+				}
+			}
 		} else {
 			for (var i = 0; i < this._imports.length; ++i)
 				if (! this._imports[i].checkNameConflict(this._errors, className))
@@ -1521,18 +1536,18 @@ class Parser {
 		// done
 		if (this._typeArgs.length != 0) {
 			var templateClassDef = new TemplateClassDefinition(className, className.getValue(), this._classFlags, this._typeArgs, this._extendType, this._implementTypes, members, this._inners, this._templateInners, this._objectTypesUsed, docComment);
-			if (this._outerClass == null) {
-				this._templateClassDefs.push(templateClassDef);
+			if (this._outerClass != null) {
+				this._outerClass.templateInners.push(templateClassDef);
 			} else {
-				this._templateInners.push(templateClassDef);
+				this._templateClassDefs.push(templateClassDef);
 			}
 			return templateClassDef;
 		} else {
 			var classDef = new ClassDefinition(className, className.getValue(), this._classFlags, this._extendType, this._implementTypes, members, this._inners, this._templateInners, this._objectTypesUsed, docComment);
-			if (this._outerClass == null) {
-				this._classDefs.push(classDef);
+			if (this._outerClass != null) {
+				this._outerClass.inners.push(classDef);
 			} else {
-				this._inners.push(classDef);
+				this._classDefs.push(classDef);
 			}
 			classDef.setParser(this);
 			return classDef;
