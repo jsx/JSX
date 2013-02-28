@@ -430,9 +430,7 @@ class QualifiedName {
 	function getClass (context : AnalysisContext, typeArguments : Type[]) : ClassDefinition {
 		var classDef = null : ClassDefinition;
 
-		if (this._import != null) {
-			if (this._enclosingType != null)
-				throw new Error("template inner class is not supported");
+		if (this._import != null && this._enclosingType == null) {
 			if (typeArguments.length == 0) {
 				var classDefs = this._import.getClasses(this._token.getValue());
 				switch (classDefs.length) {
