@@ -796,7 +796,6 @@ class Parser {
 			}
 		}
 		// create instantiation callback
-		this._templateClassDefs.forEach((c) -> { log c.className(); });
 		for (var i = 0; i < this._templateClassDefs.length; ++i) {
 			var templateDef = this._templateClassDefs[i];
 			if (templateDef.className() == request.getClassName()) {
