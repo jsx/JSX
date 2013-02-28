@@ -391,36 +391,6 @@ class Util {
 		return Util.format("[%1:%2:%3] %4\n%5\n", [filename, lineNumber as string, columnNumber as string, message, sourceLine]);
 	}
 
-	/**
-	 * Converts a date object to ISO 8601 format
-	 */
-	static function formatDate(date : Date) : string {
-		var tz = (function(offset : number) : string {
-			var sign = offset > 0 ? "-" : "+";
-			var o    = Math.abs(offset);
-
-			var h = Util._pad((o / 60) as int, 2);
-			var m = Util._pad((o % 60) as int, 2);
-			return sign + h + m;
-		}(date.getTimezoneOffset()));
-
-		return date.getFullYear() as string + '-'
-				+ Util._pad(date.getMonth() + 1, 2) + '-'
-				+ Util._pad(date.getDate(), 2) + 'T'
-				+ Util._pad(date.getHours(), 2) + ':'
-				+ Util._pad(date.getMinutes(), 2) + ':'
-				+ Util._pad(date.getSeconds(), 2) + '.'
-				+ Util._pad(date.getMilliseconds(), 3) + 'Z'
-				+ tz;
-	}
-
-	static function _pad (d : number, width : number) : string{
-		var s = d as string;
-		while (s.length < width) {
-			s = "0" + s;
-		}
-		return s;
-	}
 }
 
 /*

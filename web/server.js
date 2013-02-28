@@ -53,7 +53,7 @@ function finish(response, uri, status, content_type, content) {
 		headers["Content-Type"] = "text/html";
 	}
 
-	console.log("%s %s %s %s (%s bytes)", (new Date()), status, headers["Content-Type"] || "(unknown type)", uri, len);
+	console.log("%s %s %s %s (%s bytes)", (new Date()).toISOString(), status, headers["Content-Type"] || "(unknown type)", uri, len);
 
 	response.writeHead(status, headers);
 	response.write(content, "binary");

@@ -1483,6 +1483,7 @@ class ArrayExpression extends BinaryExpression {
 
 	function _analyzeApplicationOnObject (context : AnalysisContext, expr1Type : Type) : boolean {
 		var expr1ClassDef = expr1Type.getClassDef();
+		assert expr1ClassDef;
 		// obtain type of operator []
 		var funcType = expr1ClassDef.getMemberTypeByName(context.errors, this._token, "__native_index_operator__", false, new Type[], ClassDefinition.GET_MEMBER_MODE_ALL) as FunctionType;
 		if (funcType == null) {

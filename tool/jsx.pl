@@ -123,6 +123,11 @@ package App::jsx;
             defined(my $pid = fork()) or Carp::confess("failed to fork: $!");
 
             if ($pid == 0) {
+                if (not -e $jsx_compiler) {
+                    kill TERM => $parent_pid;
+                    Carp::confess("no $jsx_compiler found.");
+                }
+
                 # child process
                 open STDOUT, ">>", $log_file or Carp::confess("cannot open '$log_file' for writing: $!");
                 open STDERR, ">&", \*STDOUT or Carp::confess("cannot dup STDOUT: $!");

@@ -356,7 +356,7 @@ class CompilationServer {
 		platform.save(server._pidFile,  process.pid as string);
 		platform.save(server._portFile, port as string);
 
-		console.info("%s [%s] listen http://localhost:%s/", Util.formatDate(new Date), process.pid, port);
+		console.info("%s [%s] listen http://localhost:%s/", (new Date).toISOString(), process.pid, port);
 		server._timer = Timer.setTimeout(() -> { server.shutdown("timeout"); }, CompilationServer.LIFE);
 		process.on("SIGTERM", () -> { server.shutdown("SIGTERM"); });
 		process.on("SIGINT",  () -> { server.shutdown("SIGINT"); });
@@ -381,7 +381,7 @@ class CompilationServer {
 
 		Timer.clearTimeout(this._timer);
 		this._httpd.close();
-		console.info("%s [%s] shutdown by %s, handled %s requests", Util.formatDate(new Date), process.pid, reason, this._requestSequence);
+		console.info("%s [%s] shutdown by %s, handled %s requests", (new Date).toISOString(), process.pid, reason, this._requestSequence);
 	}
 
 	function handleRequest(request : ServerRequest, response : ServerResponse) : void {
@@ -392,7 +392,7 @@ class CompilationServer {
 		this._timer = Timer.setTimeout(() -> { this.shutdown("timeout"); }, CompilationServer.LIFE);
 
 		if (request.method == "GET") {
-			console.info("%s #%s start %s", Util.formatDate(startTime), id, request.url);
+			console.info("%s #%s start %s", startTime.toISOString(), id, request.url);
 			this.handleGET(id, startTime, request, response);
 			return;
 		}
@@ -409,7 +409,7 @@ class CompilationServer {
 		}
 
 		var query = String.decodeURIComponent(matched[1]);
-		console.info("%s #%s start %s", Util.formatDate(startTime), id, query.replace(/\n/g, "\\n"));
+		console.info("%s #%s start %s", startTime.toISOString(), id, query.replace(/\n/g, "\\n"));
 
 		var inputData = "";
 		request.on("data", function (chunk) {
@@ -425,7 +425,7 @@ class CompilationServer {
 				c.setStatusCode(JSXCommand.main(c, args));
 			}
 			catch (e : Error) {
-				console.error("%s #%s %s", Util.formatDate(startTime), id, e.stack);
+				console.error("%s #%s %s", startTime.toISOString(), id, e.stack);
 				c.error(e.stack);
 			}
 
@@ -463,7 +463,7 @@ class CompilationServer {
 
 		var now     = new Date();
 		var elapsed = now.getTime() - startTime.getTime();
-		console.info("%s #%s finish, elapsed %s [ms]", Util.formatDate(now), id, elapsed);
+		console.info("%s #%s finish, elapsed %s [ms]", now.toISOString(), id, elapsed);
 	}
 }
 
