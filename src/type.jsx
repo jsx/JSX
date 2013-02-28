@@ -524,7 +524,7 @@ class ParsedObjectType extends ObjectType {
 		if (enclosingType != null) {
 			var actualEnclosingType = this._qualifiedName.getEnclosingType().instantiate(instantiationContext) as ParsedObjectType;
 			if (! this._qualifiedName.getEnclosingType().equals(actualEnclosingType)) {
-				qualifiedName = new QualifiedName(this._qualifiedName.getToken(), this._qualifiedName.getImport(), actualEnclosingType);
+				qualifiedName = new QualifiedName(this._qualifiedName.getToken(), actualEnclosingType);
 			}
 		}
 		var typeArgs = new Type[];

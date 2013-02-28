@@ -380,12 +380,25 @@ class WildcardImport extends Import {
 class QualifiedName {
 
 	var _token : Token;
+	// _import and _enclosingType are exclusive
 	var _import : Import;
 	var _enclosingType : ParsedObjectType;
 
-	function constructor (token : Token, imprt : Import, enclosingType : ParsedObjectType) {
+	function constructor (token : Token) {
+		this._token = token;
+		this._import = null;
+		this._enclosingType = null;
+	}
+
+	function constructor (token : Token, imprt : Import) {
 		this._token = token;
 		this._import = imprt;
+		this._enclosingType = null;
+	}
+
+	function constructor (token : Token, enclosingType : ParsedObjectType) {
+		this._token = token;
+		this._import = null;
 		this._enclosingType = enclosingType;
 	}
 
@@ -430,7 +443,7 @@ class QualifiedName {
 	function getClass (context : AnalysisContext, typeArguments : Type[]) : ClassDefinition {
 		var classDef = null : ClassDefinition;
 
-		if (this._import != null && this._enclosingType == null) {
+		if (this._import != null) { // && this._enclosingType == null
 			if (typeArguments.length == 0) {
 				var classDefs = this._import.getClasses(this._token.getValue());
 				switch (classDefs.length) {
@@ -457,35 +470,33 @@ class QualifiedName {
 					return null;
 				}
 			}
-		} else {
-			if (this._enclosingType != null) {
-				this._enclosingType.resolveType(context);
+		} else if (this._enclosingType != null) {
+			this._enclosingType.resolveType(context);
 
-				var enclosingClassDef;
-				if ((enclosingClassDef = this._enclosingType.getClassDef()) == null)
+			var enclosingClassDef;
+			if ((enclosingClassDef = this._enclosingType.getClassDef()) == null)
+				return null;
+			if (typeArguments.length == 0) {
+				if ((classDef = enclosingClassDef.lookupInnerClass(this._token.getValue())) == null) {
+					context.errors.push(new CompileError(this._token, "no class definition for '" + this.toString() + "'"));
 					return null;
-				if (typeArguments.length == 0) {
-					if ((classDef = enclosingClassDef.lookupInnerClass(this._token.getValue())) == null) {
-						context.errors.push(new CompileError(this._token, "no class definition for '" + this.toString() + "'"));
-						return null;
-					}
-				} else {
-					if ((classDef = enclosingClassDef.lookupTemplateInnerClass(context.errors, new TemplateInstantiationRequest(this._token, this._token.getValue(), typeArguments), (parser, classDef) -> { return null; })) == null) {
-						context.errors.push(new CompileError(this._token, "failed to instantiate class"));
-						return null;
-					}
 				}
 			} else {
-				if (typeArguments.length == 0) {
-					if ((classDef = context.parser.lookup(context.errors, this._token, this._token.getValue())) == null) {
-						context.errors.push(new CompileError(this._token, "no class definition for '" + this.toString() + "'"));
-						return null;
-					}
-				} else {
-					if ((classDef = context.parser.lookupTemplate(context.errors, new TemplateInstantiationRequest(this._token, this._token.getValue(), typeArguments), function (parser : Parser, classDef : ClassDefinition) : ClassDefinition { return null; })) == null) {
-						context.errors.push(new CompileError(this._token, "failed to instantiate class"));
-						return null;
-					}
+				if ((classDef = enclosingClassDef.lookupTemplateInnerClass(context.errors, new TemplateInstantiationRequest(this._token, this._token.getValue(), typeArguments), (parser, classDef) -> { return null; })) == null) {
+					context.errors.push(new CompileError(this._token, "failed to instantiate class"));
+					return null;
+				}
+			}
+		} else {
+			if (typeArguments.length == 0) {
+				if ((classDef = context.parser.lookup(context.errors, this._token, this._token.getValue())) == null) {
+					context.errors.push(new CompileError(this._token, "no class definition for '" + this.toString() + "'"));
+					return null;
+				}
+			} else {
+				if ((classDef = context.parser.lookupTemplate(context.errors, new TemplateInstantiationRequest(this._token, this._token.getValue(), typeArguments), function (parser : Parser, classDef : ClassDefinition) : ClassDefinition { return null; })) == null) {
+					context.errors.push(new CompileError(this._token, "failed to instantiate class"));
+					return null;
 				}
 			}
 		}
@@ -1406,10 +1417,10 @@ class Parser {
 			return null;
 		}
 		this._classType = new ParsedObjectType(
-			new QualifiedName(className, null, (this._outerClass != null) ? this._outerClass.classType : null),
+			new QualifiedName(className, (this._outerClass != null) ? this._outerClass.classType : null),
 			this._typeArgs.map.<Type>(function (token : Token) : Type {
 				// convert formal typearg (Token) to actual typearg (Type)
-				return new ParsedObjectType(new QualifiedName(token, null, null), new Type[]);
+				return new ParsedObjectType(new QualifiedName(token), new Type[]);
 			}));
 		this._objectTypesUsed.push(this._classType);
 		// extends
@@ -1423,7 +1434,7 @@ class Parser {
 					});
 			}
 			if (this._extendType == null && className.getValue() != "Object") {
-				this._extendType = new ParsedObjectType(new QualifiedName(new Token("Object", true), null, null), new Type[]);
+				this._extendType = new ParsedObjectType(new QualifiedName(new Token("Object", true)), new Type[]);
 				this._objectTypesUsed.push(this._extendType);
 			}
 		} else {
@@ -1875,7 +1886,7 @@ class Parser {
 		}
 		if (this._typeArgs != null) {
 			for (var i = 0; i < this._typeArgs.length; ++i) {
-				if (baseType.equals(new ParsedObjectType(new QualifiedName(this._typeArgs[i], null, null), new Type[]))) {
+				if (baseType.equals(new ParsedObjectType(new QualifiedName(this._typeArgs[i]), new Type[]))) {
 					return baseType.toNullableType(true);
 				}
 			}
@@ -1932,7 +1943,7 @@ class Parser {
 				return null;
 		}
 		if (! allowInner) {
-			var qualifiedName = new QualifiedName(token, imprt, null);
+			var qualifiedName = new QualifiedName(token, imprt);
 
 			var typeArgs = this._actualTypeArguments();
 			if (typeArgs == null) {
@@ -1948,7 +1959,7 @@ class Parser {
 		} else {
 			var enclosingType : ParsedObjectType = null;
 			while (true) {
-				qualifiedName = new QualifiedName(token, imprt, enclosingType);
+				qualifiedName = enclosingType != null ? new QualifiedName(token, enclosingType) : new QualifiedName(token, imprt);
 
 				var typeArgs = this._actualTypeArguments();
 				if (typeArgs == null) {
@@ -2058,7 +2069,7 @@ class Parser {
 
 	function _registerArrayTypeOf (token : Token, elementType : Type) : ParsedObjectType {
 		// var arrayType = new ParsedObjectType(new QualifiedName(new Token("Array", true), null), [ elementType ], token);
-		var arrayType = new ParsedObjectType(new QualifiedName(new Token("Array", true), null, null), [ elementType ]);
+		var arrayType = new ParsedObjectType(new QualifiedName(new Token("Array", true)), [ elementType ]);
 		this._objectTypesUsed.push(arrayType);
 		return arrayType;
 	}

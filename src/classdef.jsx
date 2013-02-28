@@ -157,13 +157,13 @@ class ClassDefinition implements Stashable {
 	var _extendType		: ParsedObjectType; // null for interfaces, mixins, and Object class only
 	var _implementTypes	: ParsedObjectType[];
 	var _members		: MemberDefinition[];
-	var _outer		: ClassDefinition;
 	var _inners		: ClassDefinition[];
 	var _templateInners	: TemplateClassDefinition[];
 	var _objectTypesUsed	: ParsedObjectType[];
 	var _docComment		: DocComment;
 
-	var _baseClassDef : ClassDefinition = null;
+	var _baseClassDef  : ClassDefinition = null;
+	var _outerClassDef : ClassDefinition = null;
 
 	function constructor (token : Token, className : string, flags : number, extendType : ParsedObjectType, implementTypes : ParsedObjectType[], members : MemberDefinition[], inners : ClassDefinition[], templateInners : TemplateClassDefinition[], objectTypesUsed : ParsedObjectType[], docComment : DocComment) {
 		this._parser = null;
@@ -174,7 +174,6 @@ class ClassDefinition implements Stashable {
 		this._extendType = extendType;
 		this._implementTypes = implementTypes;
 		this._members = members;
-		this._outer = null;
 		this._inners = inners;
 		this._templateInners = templateInners;
 		this._objectTypesUsed = objectTypesUsed;
@@ -219,7 +218,7 @@ class ClassDefinition implements Stashable {
 	}
 
 	function classFullName () : string {
-		return this._outer != null ? this._outer.classFullName() + "." + this._className : this.className();
+		return this._outerClassDef != null ? this._outerClassDef.classFullName() + "." + this._className : this.className();
 	}
 
 	function setOutputClassName (name : string) : void {
@@ -251,11 +250,11 @@ class ClassDefinition implements Stashable {
 	}
 
 	function setOuterClassDef (outer : ClassDefinition) : void {
-		this._outer = outer;
+		this._outerClassDef = outer;
 	}
 
 	function getOuterClassDef () : ClassDefinition {
-		return this._outer;
+		return this._outerClassDef;
 	}
 
 	function getInnerClasses () : ClassDefinition[] {
@@ -591,7 +590,7 @@ class ClassDefinition implements Stashable {
 						receiverClassDef.forEachInnerClass(function (classDef) {
 							if (classDef.className() == identifierToken.getValue()) {
 								var objectType = new ParsedObjectType(
-									new QualifiedName(identifierToken, null, receiverType),
+									new QualifiedName(identifierToken, receiverType),
 									propExpr.getTypeArguments()
 								);
 								objectType.resolveType(context);
