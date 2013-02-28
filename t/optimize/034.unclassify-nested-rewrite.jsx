@@ -10,6 +10,6 @@ class _Main {
 		return this;
 	}
 	static function main(args : string[]) : void {
-		log new _Main.f().f().n;
+		log (new _Main).f().f().n;
 	}
 }
