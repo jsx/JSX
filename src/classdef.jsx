@@ -353,7 +353,6 @@ class ClassDefinition implements Stashable {
 		}
 		for (var i = 0; i < this._templateInners.length; ++i) {
 			this._templateInners[i].setOuterClassDef(this);
-			this._templateInners[i]._resetMembersClassDef();
 		}
 	}
 
@@ -482,25 +481,27 @@ class ClassDefinition implements Stashable {
 	}
 
 	function instantiate (instantiationContext : InstantiationContext) : ClassDefinition {
+		var context = new InstantiationContext(instantiationContext.errors, instantiationContext.typemap);
+
 		// instantiate the members
 		var succeeded = true;
 		var members = new MemberDefinition[];
 		for (var i = 0; i < this._members.length; ++i) {
-			var member = this._members[i].instantiate(instantiationContext);
+			var member = this._members[i].instantiate(context);
 			if (member == null)
 				succeeded = false;
 			members[i] = member;
 		}
 		var inners = new ClassDefinition[];
 		for (var i = 0; i < this._inners.length; ++i) {
-			var inner = this._inners[i].instantiate(instantiationContext);
+			var inner = this._inners[i].instantiate(context);
 			if (inner == null)
 				succeeded = false;
 			inners[i] = inner;
 		}
 		var templateInners = new TemplateClassDefinition[];
 		for (var i = 0; i < this._templateInners.length; ++i) {
-			var templateInner = this._templateInners[i].instantiate(instantiationContext);
+			var templateInner = this._templateInners[i].instantiate(context);
 			if (templateInner == null)
 				succeeded = false;
 			templateInners[i] = templateInner;
@@ -509,20 +510,18 @@ class ClassDefinition implements Stashable {
 		if (! succeeded)
 			return null;
 
-		var classDef = new ClassDefinition(
+		return new ClassDefinition(
 			this._token,
 			this._className,
 			this._flags,
-			this._extendType != null ? this._extendType.instantiate(instantiationContext) as ParsedObjectType : null,
-			this._implementTypes.map.<ParsedObjectType>(function (t) { return t.instantiate(instantiationContext) as ParsedObjectType; }),
+			this._extendType != null ? this._extendType.instantiate(context) as ParsedObjectType : null,
+			this._implementTypes.map.<ParsedObjectType>(function (t) { return t.instantiate(context) as ParsedObjectType; }),
 			members,
 			inners,
 			templateInners,
-			this._objectTypesUsed,
+			context.objectTypesUsed,
 			this._docComment
 		);
-		classDef._resetMembersClassDef();
-		return classDef;
 	}
 
 	function resolveTypes (context : AnalysisContext) : void {
@@ -1902,48 +1901,7 @@ class TemplateClassDefinition extends ClassDefinition implements TemplateDefinit
 	}
 
 	override function instantiate (instantiationContext : InstantiationContext) : TemplateClassDefinition {
-		// instantiate the members
-		var succeeded = true;
-		var members = new MemberDefinition[];
-		for (var i = 0; i < this._members.length; ++i) {
-			var member = this._members[i].instantiate(instantiationContext);
-			if (member == null)
-				succeeded = false;
-			members[i] = member;
-		}
-		var inners = new ClassDefinition[];
-		for (var i = 0; i < this._inners.length; ++i) {
-			var inner = this._inners[i].instantiate(instantiationContext);
-			if (inner == null)
-				succeeded = false;
-			inners[i] = inner;
-		}
-		var templateInners = new TemplateClassDefinition[];
-		for (var i = 0; i < this._templateInners.length; ++i) {
-			var templateInner = this._templateInners[i].instantiate(instantiationContext);
-			if (templateInner == null)
-				succeeded = false;
-			templateInners[i] = templateInner;
-		}
-		// done
-		if (! succeeded)
-			return null;
-
-		var classDef = new TemplateClassDefinition(
-			this._token,
-			this._className,
-			this._flags,
-			this._typeArgs,
-			this._extendType != null ? this._extendType.instantiate(instantiationContext) as ParsedObjectType : null,
-			this._implementTypes.map.<ParsedObjectType>(function (t) { return t.instantiate(instantiationContext) as ParsedObjectType; }),
-			members,
-			inners,
-			templateInners,
-			this._objectTypesUsed,
-			this._docComment
-		);
-		classDef._resetMembersClassDef();
-		return classDef;
+		throw new Error("FIXME");
 	}
 
 	function instantiateTemplateClass (errors : CompileError[], request : TemplateInstantiationRequest) : InstantiatedClassDefinition {
@@ -2037,8 +1995,7 @@ class InstantiatedClassDefinition extends ClassDefinition {
 	}
 
 	override function instantiate (instantiationContext : InstantiationContext) : InstantiatedClassDefinition {
-		// FIXME
-		return null;
+		throw new Error("FIXME");
 	}
 
 }

@@ -47,7 +47,12 @@ abstract class Expression implements Stashable {
 
 	function instantiate (instantiationContext : InstantiationContext) : boolean {
 		function onExpr(expr : Expression) : boolean {
-			if (expr instanceof NewExpression) {
+			if (expr instanceof NullExpression) {
+				var srcType = expr.getType();
+				if (srcType != null) {
+					(expr as NullExpression).setType(srcType.instantiate(instantiationContext));
+				}
+			} else if (expr instanceof NewExpression) {
 				var srcType = expr.getType();
 				if (srcType != null) {
 					(expr as NewExpression).setType(srcType.instantiate(instantiationContext));
@@ -322,6 +327,9 @@ class NullExpression extends LeafExpression {
 		return this._type;
 	}
 
+	function setType (type : Type) : void {
+		this._type = type;
+	}
 }
 
 class BooleanLiteralExpression extends LeafExpression {

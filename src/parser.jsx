@@ -552,6 +552,7 @@ class ClassState {
 
 	var outer : ClassState;
 	var classType : ParsedObjectType;
+	var typeArgs : Token[];
 	var extendType : ParsedObjectType;
 	var implementTypes : ParsedObjectType[];
 	var objectTypesUsed : ParsedObjectType[];
@@ -559,9 +560,10 @@ class ClassState {
 	var inners : ClassDefinition[];
 	var templateInners : TemplateClassDefinition[];
 
-	function constructor (outer : ClassState, classType : ParsedObjectType, extendType : ParsedObjectType, implementTypes : ParsedObjectType[], objectTypesUsed : ParsedObjectType[], classFlags : number, inners : ClassDefinition[], templateInners : TemplateClassDefinition[]) {
+	function constructor (outer : ClassState, classType : ParsedObjectType, typeArgs : Token[], extendType : ParsedObjectType, implementTypes : ParsedObjectType[], objectTypesUsed : ParsedObjectType[], classFlags : number, inners : ClassDefinition[], templateInners : TemplateClassDefinition[]) {
 		this.outer = outer;
 		this.classType = classType;
+		this.typeArgs = typeArgs;
 		this.extendType = extendType;
 		this.implementTypes = implementTypes;
 		this.objectTypesUsed = objectTypesUsed;
@@ -794,6 +796,7 @@ class Parser {
 			}
 		}
 		// create instantiation callback
+		this._templateClassDefs.forEach((c) -> { log c.className(); });
 		for (var i = 0; i < this._templateClassDefs.length; ++i) {
 			var templateDef = this._templateClassDefs[i];
 			if (templateDef.className() == request.getClassName()) {
@@ -817,6 +820,7 @@ class Parser {
 		this._outerClass = new ClassState (
 			this._outerClass,
 			this._classType,
+			this._typeArgs,
 			this._extendType,
 			this._implementTypes,
 			this._objectTypesUsed,
@@ -828,6 +832,7 @@ class Parser {
 
 	function _popClassState () : void {
 		this._classType = this._outerClass.classType;
+		this._typeArgs = this._outerClass.typeArgs;
 		this._extendType = this._outerClass.extendType;
 		this._implementTypes = this._outerClass.implementTypes;
 		this._objectTypesUsed = this._outerClass.objectTypesUsed;
