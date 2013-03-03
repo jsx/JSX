@@ -179,7 +179,7 @@ class Optimizer {
 	var _enableRunTimeTypeCheck : boolean;
 
 	static function getReleaseOptimizationCommands() : string[] {
-		return [ "lto", "no-assert", "no-log", "no-debug", "non-virtual", "fold-const", "return-if", "inline", "dce", "unbox", "fold-const", "lcse", "dce", "fold-const", "array-length", "unclassify" ];
+		return [ "lto", "no-assert", "no-log", "no-debug", "staticize", "fold-const", "return-if", "inline", "dce", "unbox", "fold-const", "lcse", "dce", "fold-const", "array-length", "unclassify" ];
 	}
 
 	function constructor () {
@@ -210,8 +210,8 @@ class Optimizer {
 				this._commands.push(new _NoLogCommand());
 			} else if (cmd == "no-debug") {
 				this._commands.push(new _NoDebugCommand());
-			} else if (cmd == "non-virtual") {
-				this._commands.push(new _NonVirtualOptimizeCommand());
+			} else if (cmd == "staticize") {
+				this._commands.push(new _StaticizeOptimizeCommand());
 				calleesAreDetermined = false;
 			} else if (cmd == "unclassify") {
 				this._commands.push(new _UnclassifyOptimizationCommand());
@@ -681,12 +681,12 @@ class _DetermineCalleeCommand extends _FunctionOptimizeCommand {
 
 }
 
-class _NonVirtualOptimizeCommand extends _OptimizeCommand {
+class _StaticizeOptimizeCommand extends _OptimizeCommand {
 
-	static const IDENTIFIER = "non-virtual";
+	static const IDENTIFIER = "staticize";
 
 	function constructor () {
-		super(_NonVirtualOptimizeCommand.IDENTIFIER);
+		super(_StaticizeOptimizeCommand.IDENTIFIER);
 	}
 
 	override function performOptimization () : void {
