@@ -691,8 +691,8 @@ class _NonVirtualOptimizeCommand extends _OptimizeCommand {
 
 	override function performOptimization () : void {
 		this.getCompiler().forEachClassDef(function (parser, classDef) {
-			// skip abstract classes
-			if ((classDef.flags() & (ClassDefinition.IS_INTERFACE | ClassDefinition.IS_ABSTRACT | ClassDefinition.IS_MIXIN)) != 0)
+			// skip interfaces and mixins
+			if ((classDef.flags() & (ClassDefinition.IS_INTERFACE | ClassDefinition.IS_MIXIN)) != 0)
 				return true;
 			// convert function definitions (expect constructor) to static
 			classDef.forEachMemberFunction(function onFunction(funcDef : MemberFunctionDefinition) : boolean {
@@ -753,8 +753,8 @@ class _NonVirtualOptimizeCommand extends _OptimizeCommand {
 						var propertyExpr = calleeExpr as PropertyExpression;
 						// is a member method call
 						var receiverType = propertyExpr.getExpr().getType().resolveIfNullable();
-						// skip abstract classes
-						if ((receiverType.getClassDef().flags() & (ClassDefinition.IS_ABSTRACT | ClassDefinition.IS_INTERFACE | ClassDefinition.IS_MIXIN)) == 0) {
+						// skip interfaces and mixins
+						if ((receiverType.getClassDef().flags() & (ClassDefinition.IS_INTERFACE | ClassDefinition.IS_MIXIN)) == 0) {
 							var found = this._findRewrittenFunctionInClass(receiverType, propertyExpr.getIdentifierToken().getValue(), (propertyExpr.getType() as ResolvedFunctionType).getArgumentTypes(), true);
 							var classDef = found.first, funcDef = found.second;
 							if (funcDef != null && (funcDef.flags() & (ClassDefinition.IS_OVERRIDE | ClassDefinition.IS_ABSTRACT | ClassDefinition.IS_FINAL | ClassDefinition.IS_NATIVE)) == ClassDefinition.IS_FINAL && funcDef.name() != "constructor") {
@@ -784,22 +784,18 @@ class _NonVirtualOptimizeCommand extends _OptimizeCommand {
 	}
 
 	function _findRewrittenFunctionInClass (type : Type, funcName : string, beforeArgTypes : Type[], isStatic : boolean) : Pair.<ClassDefinition, MemberFunctionDefinition> {
-		var classDef, found;
+		var classDef, funcDef;
 		for (;;) {
 			classDef = type.getClassDef();
-			if ((classDef.flags() & ClassDefinition.IS_ABSTRACT) != 0) {
-				found = null : MemberFunctionDefinition;
-				break;
-			}
 			if (classDef.className() == "Object") {
-				found = Util.findFunctionInClass(classDef, funcName, [ type ].concat(beforeArgTypes), isStatic);
+				funcDef = Util.findFunctionInClass(classDef, funcName, [ type ].concat(beforeArgTypes), isStatic);
 				break;
 			}
-			if ((found = Util.findFunctionInClass(classDef, funcName, [ type ].concat(beforeArgTypes), isStatic)) != null)
+			if ((funcDef = Util.findFunctionInClass(classDef, funcName, [ type ].concat(beforeArgTypes), isStatic)) != null)
 				break;
 			type = classDef.extendType();
 		}
-		return new Pair.<ClassDefinition, MemberFunctionDefinition>(classDef, found);
+		return new Pair.<ClassDefinition, MemberFunctionDefinition>(classDef, funcDef);
 	}
 
 }
