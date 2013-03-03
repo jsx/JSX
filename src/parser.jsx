@@ -2769,7 +2769,7 @@ class Parser {
 		if (funcDef == null)
 			return null;
 		this._closures.push(funcDef);
-		return new FunctionExpression(token, funcDef, false);
+		return new FunctionExpression(token, null, funcDef, false);
 	}
 
 	function _lambdaBody (token : Token, args : ArgumentDeclaration[], returnType : Type) : MemberFunctionDefinition {
@@ -2849,7 +2849,7 @@ class Parser {
 		var funcDef = new MemberFunctionDefinition(token, name, ClassDefinition.IS_STATIC, returnType, args, this._locals, this._statements, this._closures, lastToken, null);
 		this._popScope();
 		this._closures.push(funcDef);
-		return new FunctionExpression(token, funcDef, isStatement);
+		return new FunctionExpression(token, funcName, funcDef, isStatement);
 	}
 
 	function _forEachScope (cb : function(:LocalVariable,:LocalVariable[],:ArgumentDeclaration[]):boolean) : boolean {

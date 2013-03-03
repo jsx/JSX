@@ -32,13 +32,12 @@ class BrowserPlatform extends Platform {
 	static var debug = (dom.window.location.hash == "#debug");
 
 	var _root : string;
-	var _errors : string[];
+	var _errors = new string[];
 	var _tree : variant; // path tree
 	var _prefix : string;
 
 	function constructor() {
 		this._root = this._rootPath();
-		this._errors = new string[];
 
 		// the prefix path of the application HTML file
 		this._prefix = dom.window.location.pathname.replace(/\/[^\/]*$/, "");
@@ -198,19 +197,24 @@ class BrowserPlatform extends Platform {
 	}
 
 	override function addLauncher(emitter : Emitter, sourceFile : variant, output : string, entryPoint : string, executableFor : string) : string {
-		throw new Error('logic flaw');
+		throw new Error('not supported');
 	}
 	override function makeFileExecutable(file : string, runEnv : string) : void {
-		throw new Error('logic flaw');
+		throw new Error('not supported');
 	}
 	override function execute(sourceFileName : Nullable.<string>, jsSource : string, argv : string[]) : void {
-		throw new Error('logic flaw');
+		throw new Error('not supported');
 	}
 	override function mkpath (path : string) : void {
-		throw new Error('logic flaw');
+		throw new Error('not supported');
 	}
 	override function save(path : Nullable.<string>, content : string) : void {
-		throw new Error('logic flaw');
+		throw new Error('not supported');
 	}
-
+	override function runCompilationServer(arg : variant) : number {
+		throw new Error('not supported');
+	}
+	override function setWorkingDir(dir : string) : void {
+		throw new Error('not supported');
+	}
 }

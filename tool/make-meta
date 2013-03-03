@@ -3,9 +3,8 @@ use strict;
 use warnings;
 use Fatal qw(open close);
 
-use tool::Util qw(slurp);
+use tool::Util qw(slurp numify_version);
 
-use version;
 use JSON;
 
 my($input_file, $output_file) = @ARGV;
@@ -26,7 +25,7 @@ EOT
 $new_content .= sprintf qq{    static const VERSION_STRING   = "%s";\n},
     $meta->{version};
 $new_content .= sprintf qq{    static const VERSION_NUMBER   =  %g;\n},
-    qv($meta->{version})->numify();
+    numify_version($meta->{version});
 $new_content .= sprintf qq{    static const LAST_COMMIT_HASH = "%s";\n},
     `git log -n 1 --pretty=format:%H`;
 $new_content .= sprintf qq{    static const LAST_COMMIT_DATE = "%s";\n},
@@ -43,3 +42,4 @@ if ($new_content ne (eval { slurp($output_file) } || "")) {
     print $out $new_content;
     close $out;
 }
+

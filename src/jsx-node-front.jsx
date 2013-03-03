@@ -27,6 +27,7 @@
 import "js.jsx";
 import "js/nodejs.jsx";
 import "console.jsx";
+import "timer.jsx";
 
 import "./util.jsx";
 import "./emitter.jsx";
@@ -41,26 +42,33 @@ import "./meta.jsx";
 class NodePlatform extends Platform {
 
 	var _root : string;
+	var _cwd = Util.resolvePath(process.cwd());
 
 	function constructor () {
 		this(node.path.dirname(node.__dirname));
 	}
 
 	function constructor (root : string) {
-		this._root = root.replace(/\\/g, "/");
+		this._root = Util.resolvePath(root);
 	}
 
 	override function getRoot () : string {
 		return this._root;
 	}
 
+	function _absPath(path : string) : string {
+		return (path.charAt(0) == "/" || path.match(/^[a-zA-Z]:\//))
+			? path // path is already absolute
+			: this._cwd + "/" + path;
+	}
+
 	override function fileExists (name : string) : boolean {
-		name = node.path.normalize(name);
+		name = Util.resolvePath(name);
 		if (this.fileContent.hasOwnProperty(name)) {
 			return true;
 		}
 		try {
-			node.fs.statSync(name);
+			node.fs.statSync(this._absPath(name));
 		} catch (e : Error) {
 			return false;
 		}
@@ -68,11 +76,11 @@ class NodePlatform extends Platform {
 	}
 
 	override function getFilesInDirectory (path : string) : string[] {
-		return node.fs.readdirSync(path);
+		return node.fs.readdirSync(this._absPath(path));
 	}
 
 	override function load (name : string) : string {
-		name = node.path.normalize(name);
+		name = Util.resolvePath(name);
 		if (this.fileContent.hasOwnProperty(name)) {
 			return this.fileContent[name];
 		}
@@ -90,7 +98,7 @@ class NodePlatform extends Platform {
 			return content;
 		}
 		else {
-			var content = node.fs.readFileSync(name, "utf-8");
+			var content = node.fs.readFileSync(this._absPath(name), "utf-8");
 			// cache the content without condition because the platform object
 			// is created for each compilation for now.
 			this.fileContent[name] = content;
@@ -103,15 +111,22 @@ class NodePlatform extends Platform {
 			process.stdout.write(content);
 		}
 		else {
+			outputFile = this._absPath(outputFile);
+			this.mkpath(Util.dirname(outputFile));
 			node.fs.writeFileSync(outputFile, content);
 		}
 	}
 
+	override function setWorkingDir (dir : string) : void {
+		this._cwd = Util.resolvePath(dir);
+	}
+
 	override function mkpath (path : string) : void {
+		path = this._absPath(path);
 		try {
 			node.fs.statSync(path);
 		} catch (e : Error) {
-			var dirOfPath = path.replace(new RegExp("/[^/]*$"), "");
+			var dirOfPath = Util.dirname(path);
 			if (dirOfPath != path) {
 				this.mkpath(dirOfPath);
 			}
@@ -168,7 +183,7 @@ class NodePlatform extends Platform {
 
 	override function makeFileExecutable(file : string, runEnv : string) : void {
 		if (runEnv == "node") {
-			node.fs.chmodSync(file, "0755");
+			node.fs.chmodSync(this._absPath(file), "0755");
 		}
 	}
 
@@ -215,14 +230,15 @@ class NodePlatform extends Platform {
 }
 
 /**
- * NodePlatform variation for compiler service (daemon)
+ * NodePlatform variation for compiler server
  */
 class CompilationServerPlatform extends NodePlatform {
 	// response contents
-	var _stdout     = "";
-	var _stderr     = "";
-	var _file       = new Map.<string>;
-	var _statusCode = 1; // failure
+	var _stdout         = "";
+	var _stderr         = "";
+	var _file           = new Map.<string>;
+	var _executableFile = new Map.<string>;
+	var _statusCode     = 1; // 0=success, other=failure
 
 	var _scriptFile   = null : Nullable.<string>;   // file name on --run
 	var _scriptSource = null : Nullable.<string>;   // source code on --run
@@ -270,93 +286,170 @@ class CompilationServerPlatform extends NodePlatform {
 		this._statusCode = statusCode;
 	}
 
-	function getContents() : variant {
-		var run = null : variant;
+	function getContents() : Map.<variant> {
+		var content = {
+			stdout         : this._stdout,
+			stderr         : this._stderr,
+			file           : this._file,
+			executableFile : this._executableFile,
+
+			statusCode : this._statusCode
+		} : Map.<variant>;
+
 		if (this._scriptSource != null) {
-			run = {
+			content["run"] = {
 				scriptFile   : this._scriptFile,
 				scriptSource : this._scriptSource,
 				scriptArgs   : this._scriptArgs
 			} : variant;
 		}
-		return {
-			stdout : this._stdout,
-			stderr : this._stderr,
-			file   : this._file,
-			run    : run,
-
-			statusCode : this._statusCode
-		} : variant;
+		return content;
 	}
 
 	override function makeFileExecutable(file : string, runEnv : string) : void {
-		// noop
+		this._executableFile[file] = runEnv;
+	}
+
+	override function runCompilationServer(arg : variant) : number {
+		this.error('--compilation-server is not supported');
+		return 1;
 	}
 }
 
 class CompilationServer {
-	static var _requestSequence = 0;
+
+	var _requestSequence = 0;
+
+	// do not shutdown automatically
+	static const AUTO_SHUTDOWN = ! process.env["JSX_NO_AUTO_SHUTDOWN"];
+	// how long the server lives after the last requst
+	static const LIFE = 10 * 60 * 1000;
+
+	// for server status
+	var _home : string;
+	var _pidFile : string;
+	var _portFile : string;
+
+	var _platform = null : Platform;
+	var _httpd = null : HTTPServer;
+	var _timer = null : TimerHandle;
+
+	function constructor(parentPlatform : Platform) {
+		this._platform = parentPlatform;
+
+		this._home = process.env["JSX_HOME"] ?: (process.env["HOME"] ?: process.env["USERPROFILE"]) + "/.jsx";
+		if (! parentPlatform.fileExists(this._home)) {
+			parentPlatform.mkpath(this._home);
+		}
+		this._pidFile  = this._home + "/pid";
+		this._portFile = this._home + "/port";
+	}
 
 	static function start(platform : Platform, port : int) : number {
-		var httpd = node.http.createServer(function (request, response) {
-			CompilationServer.handleRequest(platform, request, response);
+		var server = new CompilationServer(platform);
+
+		server._httpd = node.http.createServer((request, response) -> {
+			server.handleRequest(request, response);
 		});
-		httpd.listen(port);
-		console.info("access http://localhost:" + port as string + "/");
+		server._httpd.listen(port);
+
+		platform.save(server._pidFile,  process.pid as string);
+		platform.save(server._portFile, port as string);
+
+		console.info("%s [%s] listen http://localhost:%s/", Util.formatDate(new Date), process.pid, port);
+		server._timer = Timer.setTimeout(() -> { server.shutdown("timeout"); }, CompilationServer.LIFE);
+		process.on("SIGTERM", () -> { server.shutdown("SIGTERM"); });
+		process.on("SIGINT",  () -> { server.shutdown("SIGINT"); });
+
+		// shutdown if the compiler has been updated
+		if (CompilationServer.AUTO_SHUTDOWN) {
+			node.fs.watch(node.__filename, { persistent: false } : Map.<variant>, (event, filename) -> {
+				server.shutdown(event);
+			});
+		}
+
 		return 0;
 	}
 
-	static function handleRequest(platform : Platform, request : ServerRequest, response : ServerResponse) : void {
-		var id = ++CompilationServer._requestSequence;
+	function shutdown(reason : string) : void {
+		try {
+			node.fs.unlinkSync(this._portFile);
+		} catch (e : Error) { }
+		try {
+			node.fs.unlinkSync(this._pidFile);
+		} catch (e : Error) { }
+
+		Timer.clearTimeout(this._timer);
+		this._httpd.close();
+		console.info("%s [%s] shutdown by %s, handled %s requests", Util.formatDate(new Date), process.pid, reason, this._requestSequence);
+	}
+
+	function handleRequest(request : ServerRequest, response : ServerResponse) : void {
+		var startTime = new Date();
+		var id = ++this._requestSequence;
+
+		Timer.clearTimeout(this._timer); // reset
+		this._timer = Timer.setTimeout(() -> { this.shutdown("timeout"); }, CompilationServer.LIFE);
 
 		if (request.method == "GET") {
-			// TODO: dispath some API path (i.e. /version)
-			CompilationServer.finishRequest(response, 200, {
-				version_string   : Meta.VERSION_STRING,
-				version_number   : Meta.VERSION_NUMBER,
-				last_commit_hash : Meta.LAST_COMMIT_HASH,
-				last_commit_date : Meta.LAST_COMMIT_DATE,
-				status : true
-			} : variant);
+			console.info("%s #%s start %s", Util.formatDate(startTime), id, request.url);
+			this.handleGET(id, startTime, request, response);
 			return;
 		}
 
-		var c = new CompilationServerPlatform(platform.getRoot(), id, request, response);
+		// POST: handle compilation request
 
-		// POST: do the same as jsx(1)
+		var c = new CompilationServerPlatform(this._platform.getRoot(), id, request, response);
 
-		var startTime = new Date();
+		var matched = request.url.match(/\?(.*)/);
+		if (!(matched && matched[1])) {
+			c.error("invalid request to compilation server");
+			this.finishRequest(id, startTime, response, 400, c.getContents());
+			return;
+		}
 
-		// read POST body
+		var query = String.decodeURIComponent(matched[1]);
+		console.info("%s #%s start %s", Util.formatDate(startTime), id, query.replace(/\n/g, "\\n"));
+
 		var inputData = "";
 		request.on("data", function (chunk) {
 			inputData += chunk as string;
 		});
 		request.on("end", function () {
-			console.info("%s#%s start %s", startTime, id, inputData);
+			if (inputData) {
+				c.setFileContent("-", inputData); // as stdin
+			}
 
 			try {
-				var args = JSON.parse(inputData) as string[];
+				var args = JSON.parse(query) as string[];
 				c.setStatusCode(JSXCommand.main(c, args));
 			}
 			catch (e : Error) {
-				console.error("%s#%s %s", startTime, id, e);
-				c.error((e as variant)["stack"] as string); // Error#stack
+				console.error("%s #%s %s", Util.formatDate(startTime), id, e.stack);
+				c.error(e.stack);
 			}
 
-			CompilationServer.finishRequest(response, 200, c.getContents());
+			this.finishRequest(id, startTime, response, 200, c.getContents());
 
-			var now     = new Date();
-			var elapsed = now.getTime() - startTime.getTime();
-			console.info("%s#%s finish, elapsed %s [ms]", now, id, elapsed);
 		});
 		request.on("close", function () {
 			c.error("the connecion is unexpectedly closed.\n");
-			CompilationServer.finishRequest(response, 500, c.getContents());
+			this.finishRequest(id, startTime, response, 500, c.getContents());
 		});
 	}
 
-	static function finishRequest (response : ServerResponse, statusCode : number, data : variant) : void {
+	function handleGET(id : number, startTime : Date, request : ServerRequest, response : ServerResponse) : void {
+		// show compiler information
+		this.finishRequest(id, startTime, response, 200, {
+			version_string   : Meta.VERSION_STRING,
+			version_number   : Meta.VERSION_NUMBER,
+			last_commit_hash : Meta.LAST_COMMIT_HASH,
+			last_commit_date : Meta.LAST_COMMIT_DATE,
+			status : true
+		} : variant);
+	}
+
+	function finishRequest (id : number, startTime : Date, response : ServerResponse, statusCode : number, data : variant) : void {
 		var content = JSON.stringify(data);
 
 		var headers = {
@@ -367,6 +460,10 @@ class CompilationServer {
 
 		response.writeHead(statusCode, headers);
 		response.end(content, "utf-8");
+
+		var now     = new Date();
+		var elapsed = now.getTime() - startTime.getTime();
+		console.info("%s #%s finish, elapsed %s [ms]", Util.formatDate(now), id, elapsed);
 	}
 }
 

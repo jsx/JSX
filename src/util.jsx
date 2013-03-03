@@ -112,7 +112,7 @@ class Util {
 				if (j != expectedTypes.length) {
 					// multiple canditates, skip
 				} else if (expectedCallbackType != null) {
-					if (! funcDef.deductTypeIfUnknown(context, expectedCallbackType as ResolvedFunctionType))
+					if (! (args[i] as FunctionExpression).deductTypeIfUnknown(context, expectedCallbackType as ResolvedFunctionType))
 						return null;
 				}
 			} else if (args[i] instanceof ArrayLiteralExpression && (args[i] as ArrayLiteralExpression).getExprs().length == 0 && (args[i] as ArrayLiteralExpression).getType() == null) {
@@ -286,17 +286,17 @@ class Util {
 	}
 
 	static function _resolvedPathParts(path : string) : string[] {
-		var tokens = path.split("/");
+		var tokens = path.split(/[\\\/]+/);
+		if (tokens.length == 1) {
+			return tokens;
+		}
+
 		for (var i = 0; i < tokens.length;) {
-			if (tokens[i] == "." || (i != 0 && tokens[i] == "")) {
+			if (tokens[i] == ".") {
 				tokens.splice(i, 1);
 			} else if (tokens[i] == ".." && i != 0 && tokens[i - 1] != "..") {
-				if (i == 1 && tokens[0] == "") {
-					tokens.splice(i, 1);
-				} else {
-					tokens.splice(i - 1, 2);
-					i -= 1;
-				}
+				tokens.splice(i - 1, 2);
+				i -= 1;
 			} else {
 				i++;
 			}
@@ -346,6 +346,17 @@ class Util {
 		return pathParts.concat(t.slice(samePartsIndex)).join("/");
 	}
 
+	static function basename(path : string) : string {
+		var parts = Util._resolvedPathParts(path);
+		return parts.pop();
+	}
+
+	static function dirname(path : string) : string {
+		var parts = Util._resolvedPathParts(path);
+		parts.pop();
+		return parts.join("/");
+	}
+
 	static function toOrdinal(n : number) : string {
 		if (10 < n && n < 14) {
 			return n as string + 'th';
@@ -378,6 +389,37 @@ class Util {
 		sourceLine += Util.repeat("^", size);
 
 		return Util.format("[%1:%2:%3] %4\n%5\n", [filename, lineNumber as string, columnNumber as string, message, sourceLine]);
+	}
+
+	/**
+	 * Converts a date object to ISO 8601 format
+	 */
+	static function formatDate(date : Date) : string {
+		var tz = (function(offset : number) : string {
+			var sign = offset > 0 ? "-" : "+";
+			var o    = Math.abs(offset);
+
+			var h = Util._pad((o / 60) as int, 2);
+			var m = Util._pad((o % 60) as int, 2);
+			return sign + h + m;
+		}(date.getTimezoneOffset()));
+
+		return date.getFullYear() as string + '-'
+				+ Util._pad(date.getMonth() + 1, 2) + '-'
+				+ Util._pad(date.getDate(), 2) + 'T'
+				+ Util._pad(date.getHours(), 2) + ':'
+				+ Util._pad(date.getMinutes(), 2) + ':'
+				+ Util._pad(date.getSeconds(), 2) + '.'
+				+ Util._pad(date.getMilliseconds(), 3) + 'Z'
+				+ tz;
+	}
+
+	static function _pad (d : number, width : number) : string{
+		var s = d as string;
+		while (s.length < width) {
+			s = "0" + s;
+		}
+		return s;
 	}
 }
 

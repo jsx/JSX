@@ -356,7 +356,7 @@ class NullableType extends Type {
 
 	function constructor (type : Type) {
 		if (type.equals(Type.variantType))
-			throw new Error("logic error, cannot create Nullable.<variant>");
+			throw new Error("logic flaw, cannot create Nullable.<variant>");
 		this._baseType = type instanceof NullableType ? (type as NullableType)._baseType : type;
 	}
 

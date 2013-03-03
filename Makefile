@@ -9,14 +9,24 @@ all: compiler doc web
 
 ## compiler stuff
 
+# use jsx.pl front end as jsx(1)
 compiler: src/doc.jsx meta
+	node tool/bootstrap-compiler.js --executable node --output bin/jsx-compiler.js src/jsx-node-front.jsx
+	cp -f "$$PWD/tool/jsx.pl" bin/jsx
+
+# use JSX compiler directly as jsx(1)
+compiler-js: src/doc.jsx meta
+	rm bin/jsx
 	node tool/bootstrap-compiler.js --executable node --output bin/jsx src/jsx-node-front.jsx
 
 src/doc.jsx: src/_doc.jsx
 	submodules/picotemplate/picotemplate.pl $<
 
 meta:
-	if [ -e .git ] ; then tool/make-meta package.json src/meta.jsx ; fi
+	if [ -e .git ] ; then \
+		git submodule update --init ; \
+		tool/make-meta package.json src/meta.jsx ; \
+	fi
 
 doc: src/doc.jsx
 	rm -rf doc

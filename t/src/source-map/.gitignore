@@ -1,2 +1,3 @@
 *.js
 *.mapping
+*.mapping.d/

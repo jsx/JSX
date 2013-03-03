@@ -1,6 +1,6 @@
 {
   "name":        "jsx",
-  "version":     "0.9.5",
+  "version":     "0.9.10",
   "description": "a faster, safer, easier JavaScript",
   "homepage": "http://jsx.github.com/",
   "repository" : "git://github.com/jsx/JSX.git",
@@ -21,10 +21,14 @@
       }
   ],
   "bin" : {
-      "jsx" : "./bin/jsx"
+      "jsx" : "./bin/jsx",
+      "jsx-compiler.js" : "./bin/jsx-compiler.js"
   },
   "directories": {
     "bin": "./bin",
+    "tool": "./tool",
+    "extlib" : "./extlib",
+    "web": "./web",
     "lib": "./lib",
     "src": "./src"
   },
@@ -36,6 +40,7 @@
   },
   "scripts" : {
       "test" : "make test JOBS=1 SKIP_PHANTOMJS_TEST=1",
-      "prepublish" : "JSX_OPTS=--release make && make test"
+      "prepublish" : "JSX_OPTS=--release make && make test",
+	  "preinstall" : "node tool/preinstall.js"
   }
 }

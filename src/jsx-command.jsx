@@ -124,6 +124,12 @@ class JSXCommand {
 					return 1;
 				}
 				break;
+			case "--working-dir": // working directory
+				if((optarg = getoptarg()) == null) {
+					return 1;
+				}
+				platform.setWorkingDir(optarg);
+				break;
 			case "--mode":
 				if ((optarg = getoptarg()) == null) {
 					return 1;
@@ -300,12 +306,13 @@ class JSXCommand {
 			platform.setFileContent(inputFilename, platform.load(sourceFile));
 			sourceFile = inputFilename;
 		}
+
 		compiler.addSourceFile(null, sourceFile, completionRequest);
 
 		switch (compiler.getMode()) {
 		case Compiler.MODE_PARSE:
 			if (compiler.compile()) {
-				platform.save(outputFile, compiler.getAST() as string);
+				platform.save(outputFile, JSON.stringify(compiler.getAST()));
 				return 0;
 			} else {
 				return 1;
@@ -323,12 +330,23 @@ class JSXCommand {
 				return 1;
 			}
 			if (compiler.compile()) {
-				new DocumentGenerator(compiler)
-					.setOutputPath(outputFile)
+				new DocumentGenerator(compiler, platform.getRoot() + "/src/doc", outputFile)
+					.setResourceFiles(["style.css"])
 					.setPathFilter(function (sourcePath) {
-						return ! (sourcePath.match(/^(?:system:|\/)/) || sourcePath.match(/\/..\//));
+						if (sourcePath.indexOf("system:") == 0) {
+							return false;
+						}
+						if (sourcePath.charAt(0) == "/") {
+							return false;
+						}
+						if (sourcePath.indexOf("../") == 0) {
+							return false;
+						}
+						if (sourcePath.indexOf("/../") != -1) {
+							return false;
+						}
+						return true;
 					})
-					.setTemplatePath(platform.getRoot() + "/src/doc/template.html")
 					.buildDoc();
 				return 0;
 			} else {
@@ -340,7 +358,7 @@ class JSXCommand {
 		var err = optimizer.setup(optimizeCommands);
 		if (err != null) {
 			platform.error(err);
-			return 0;
+			return 1;
 		}
 
 		tasks.forEach(function(proc) { proc(); });
@@ -366,7 +384,10 @@ class JSXCommand {
 
 				platform.save(outputFile, output);
 				if (outputFile != null) {
-					emitter.saveSourceMappingFile(platform);
+					var map = emitter.getSourceMappingFiles();
+					for (var filename in map) {
+						platform.save(filename, map[filename]);
+					}
 					if (executable != null) {
 						platform.makeFileExecutable(outputFile, executable);
 					}

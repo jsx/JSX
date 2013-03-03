@@ -39,9 +39,19 @@ class _Test extends TestCase {
 
   function testPath() : void {
     var path = "/foo/bar/baz.txt";
-    this.expect(node.path.basename(path)).toBe("baz.txt");
-    this.expect(node.path.dirname(path)).toBe("/foo/bar");
     this.expect(node.path.normalize(path)).toBe("/foo/bar/baz.txt");
+    this.expect(node.path.join('/foo', 'bar', 'baz/asdf', 'auux', '..')).toBe('/foo/bar/baz/asdf');
+    this.expect(node.path.resolve('/foo/bar', './baz')).toBe('/foo/bar/baz');
+    this.expect(node.path.resolve('/foo/bar', '/tmp/file/')).toBe('/tmp/file');
+    this.expect(node.path.resolve('wwwroot', 'static_files/png/', '../gif/image.gif')).toBe(process.cwd() + '/wwwroot/static_files/gif/image.gif');
+    this.expect(node.path.relative('/data/orandea/test/aaa', '/data/orandea/impl/bbb')).toBe('../../impl/bbb');
+    this.expect(node.path.dirname(path)).toBe("/foo/bar");
+    this.expect(node.path.basename(path)).toBe("baz.txt");
+    this.expect(node.path.basename(path, '.txt')).toBe("baz");
+    this.expect(node.path.extname('index.html')).toBe('.html');
+    this.expect(node.path.extname('index.')).toBe('.');
+    this.expect(node.path.extname('index')).toBe('');
+    this.expect(['/', '\\'].indexOf(node.path.sep) != -1).toBe(true);
   }
 
   function testHttpServer() : void {
@@ -61,7 +71,7 @@ class _Test extends TestCase {
         });;
       });
 
-      var httpd : Server = null;
+      var httpd : HTTPServer = null;
       httpd = node.http.createServer((req, res) -> {
         this.expect(req.url, "accept a request").toBe("/foo/bar");
 

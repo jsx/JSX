@@ -275,7 +275,7 @@ class Optimizer {
 				this.log("finished optimizer: " + this._commands[i]._identifier);
 			} catch (e : Error) {
 				var platform = this._compiler.getPlatform();
-				platform.error("optimizer '" + this._commands[i]._identifier + "' died unexpectedly, dumping the logs");
+				platform.error("fatal error: optimizer '" + this._commands[i]._identifier + "' died unexpectedly, dumping the logs");
 				this.dumpLogs();
 				throw e;
 			}
@@ -2096,8 +2096,9 @@ class _InlineOptimizeCommand extends _FunctionOptimizeCommand {
 	}
 
 	function _functionIsInlineable (funcDef : MemberFunctionDefinition) : boolean {
-		if ((this.getStash(funcDef) as _InlineOptimizeCommandStash).isInlineable == null) {
-			(this.getStash(funcDef) as _InlineOptimizeCommandStash).isInlineable = function () : boolean {
+		var stash = this.getStash(funcDef) as _InlineOptimizeCommandStash;
+		if (stash.isInlineable == null) {
+			stash.isInlineable = function () : boolean {
 				// only inline function that are short, has no branches (last statement may be a return)
 				var statements = funcDef.getStatements();
 				if (statements == null)
@@ -2137,9 +2138,9 @@ class _InlineOptimizeCommand extends _FunctionOptimizeCommand {
 					return statement.forEachStatement(onStatement);
 				});
 			}();
-			this.log(funcDef.getNotation() + ((this.getStash(funcDef) as _InlineOptimizeCommandStash).isInlineable ? " is" : " is not") + " inlineable");
+			this.log(funcDef.getNotation() + (stash.isInlineable ? " is" : " is not") + " inlineable");
 		}
-		return (this.getStash(funcDef) as _InlineOptimizeCommandStash).isInlineable;
+		return stash.isInlineable;
 	}
 
 	function _expandCallingFunction (callerFuncDef : MemberFunctionDefinition, statements : Statement[], stmtIndex : number, calleeFuncDef : MemberFunctionDefinition, argsAndThis : Expression[]) : number {

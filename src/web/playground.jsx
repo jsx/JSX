@@ -1,5 +1,6 @@
 /***
-  The entry point module of JSX compiler on browsers
+ * The entry point module of JSX compiler on browsers,
+ * deployed http://jsx.github.com/try-on-web
  */
 
 /*
@@ -26,7 +27,6 @@
 
 import "js.jsx";
 import "js/web.jsx";
-import "console.jsx";
 
 import "./browser-platform.jsx";
 
@@ -54,10 +54,6 @@ native __fake__ class CodeMirror {
 
 class _Main {
 	static function main(args : string[]) : void {
-
-		function element(id : string) : Element {
-			return dom.document.getElementById(id);
-		}
 
 		function getOptimizationLevel() : number {
 			var items = dom.document.getElementsByName("optimization-level");
@@ -107,9 +103,9 @@ class _Main {
 			});
 		}
 
-		var list   = element('source-list');
+		var list   = dom.id('source-list');
 
-		var input  = element('input') as HTMLTextAreaElement;
+		var input  = dom.id('input') as HTMLTextAreaElement;
 
 		var editor = CodeMirror.fromTextArea(input, {
 			mode: "application/jsx",
@@ -134,7 +130,7 @@ class _Main {
 			}
 		} : Map.<variant>);
 
-		var output = CodeMirror.fromTextArea(element("output"), {
+		var output = CodeMirror.fromTextArea(dom.id("output"), {
 			mode: "javascript",
 			lineNumbers: true,
 			lineWrapping: true,
@@ -142,7 +138,7 @@ class _Main {
 		} : Map.<variant>);
 
 		function compile(options : variant) : void {
-			console.log('compile with ' + JSON.stringify(options));
+			log 'compile with ' + JSON.stringify(options);
 
 			output.setValue("");
 			var path = input.dataset["path"];
@@ -180,13 +176,11 @@ class _Main {
 			c.addSourceFile(null, path);
 
 			var success = c.compile();
-			//console.log(c);
 
 			if (success) {
-				output.setOption("mode", "javascript");
-
 				if (options['mode'] == 'parse') {
-					output.setValue(c.getAST() as string);
+					output.setOption("mode", "javascript");
+					output.setValue(JSON.stringify(c.getAST(), null, 2));
 					return;
 				}
 
@@ -200,11 +194,24 @@ class _Main {
 						: "ADVANCED_OPTIMIZATIONS", false);
 				}
 
-				output.setValue(out);
-
 				if(options['mode'] == 'run') {
-					console.log('run:');
-					js.eval(output.getValue());
+					(function (c : variant) : void {
+						output.setOption("mode", "");
+						var console_log = c["log"];
+						c["log"] = function (s : variant) : void {
+							output.setValue( output.getValue() + s as string + "\n" );
+						};
+						try {
+							js.eval(out);
+						}
+						finally {
+							c["log"] = console_log;
+						}
+					}(js.global["console"]));
+				}
+				else {
+					output.setOption("mode", "javascript");
+					output.setValue(out);
 				}
 			}
 			else if(platform.getErrors().length != 0){
@@ -226,6 +233,7 @@ class _Main {
 		function retrieveInput(input : HTMLTextAreaElement) : void {
 			var serializedSession = dom.window.sessionStorage.getItem("jsx.session");
 			if(serializedSession) {
+				log "retrieve from session";
 				var session = JSON.parse(serializedSession);
 
 				input.dataset["path"] = session['inputPath'] as string;
@@ -243,7 +251,7 @@ class _Main {
 					}
 				}
 
-				compile({ mode: 'compile' });
+				compile({ mode: 'run' });
 			}
 		}
 
@@ -260,7 +268,7 @@ class _Main {
 
 			var a = li.children[0] as HTMLAnchorElement;
 			a.addEventListener('click', function(event) {
-				console.log('changing');
+				log 'changing';
 				event.preventDefault();
 				event.stopPropagation();
 
@@ -309,11 +317,11 @@ class _Main {
 			saveInput(input);
 		});
 
-		element('run').addEventListener('click',
+		dom.id('run').addEventListener('click',
 			function(e) { compile({mode: 'run'}); });
-		element('compile').addEventListener('click',
+		dom.id('compile').addEventListener('click',
 			function(e) { compile({mode: 'compile'}); });
-		element('ast').addEventListener('click',
+		dom.id('ast').addEventListener('click',
 			function(e) { compile({mode: 'parse'}); });
 
 		retrieveInput(input);

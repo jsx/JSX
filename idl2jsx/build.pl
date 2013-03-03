@@ -129,7 +129,7 @@ foreach my $spec(@specs) {
 __DATA__
 @@ web.jsx
 /***
- * Web Browser Interface for JSX
+ * Web browser interface for JSX, generated directly from W3C specifications written in WebIDL
  *
  * @author DeNA, Co., Ltd.
  * @see http://www.w3.org/
@@ -137,7 +137,7 @@ __DATA__
 import "js.jsx";
 
 /**
- * Document Object Model in Web Browsers
+ * Simple interface to Document Object Model
  */
 final class dom {
 	delete function constructor() { }
