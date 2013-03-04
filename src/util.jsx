@@ -441,6 +441,12 @@ class TypedMap.<K,V> {
 		this._equalsCallback = equalsCallback;
 	}
 
+	function clone () : TypedMap.<K,V> {
+		var x = new TypedMap.<K,V>(this._equalsCallback);
+		x._list = this._list.concat([]);
+		return x;
+	}
+
 	function has(key : K) : boolean {
 		return ! this.forEach(function (entryKey, entryValue) {
 			return ! this._equalsCallback(key, entryKey);
