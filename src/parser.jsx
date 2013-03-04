@@ -1834,7 +1834,7 @@ class Parser {
 			}
 			return Type.voidType;
 		}
-		var typeDecl = this._typeDeclarationNoArrayNoVoid();
+		var typeDecl = this._typeDeclarationNoArrayNoVoid(true);
 		if (typeDecl == null)
 			return null;
 		// []
@@ -1850,10 +1850,10 @@ class Parser {
 		return typeDecl;
 	}
 
-	function _typeDeclarationNoArrayNoVoid () : Type {
+	function _typeDeclarationNoArrayNoVoid (allowInner : boolean) : Type {
 		var token = this._expectOpt([ "MayBeUndefined", "Nullable", "variant" ]);
 		if (token == null) {
-			return this._primaryTypeDeclaration();
+			return this._primaryTypeDeclaration(allowInner);
 		}
 		switch (token.getValue()) {
 		case "MayBeUndefined":
@@ -1894,7 +1894,7 @@ class Parser {
 		return baseType.toNullableType();
 	}
 
-	function _primaryTypeDeclaration () : Type {
+	function _primaryTypeDeclaration (allowInner : boolean) : Type {
 		var token = this._expectOpt([ "(", "function", "boolean", "int", "number", "string" ]);
 		if (token != null) {
 			switch (token.getValue()) {
@@ -1914,7 +1914,7 @@ class Parser {
 				throw new Error("logic flaw");
 			}
 		} else {
-			return this._objectTypeDeclaration(null, true, null);
+			return this._objectTypeDeclaration(null, allowInner, null);
 		}
 	}
 
@@ -2881,7 +2881,7 @@ class Parser {
 	}
 
 	function _newExpr (newToken : Token) : Expression {
-		var type = this._typeDeclarationNoArrayNoVoid();
+		var type = this._typeDeclarationNoArrayNoVoid(false);
 		if (type == null)
 			return null;
 		// handle [] (if it has an length parameter, that's the last)
