@@ -1853,7 +1853,7 @@ class _NewExpressionEmitter extends _OperatorExpressionEmitter {
 	override function emit (outerOpPrecedence : number) : void {
 		function getInliner(funcDef : MemberFunctionDefinition) : function(:NewExpression):Expression[] {
 			var stash = funcDef.getOptimizerStash()["unclassify"];
-			return (stash)? (stash as _UnclassifyOptimizationCommandStash).inliner : null : function(:NewExpression):Expression[];
+			return stash ? (stash as _UnclassifyOptimizationCommandStash).inliner : null;
 		}
 		var classDef = this._expr.getType().getClassDef();
 		var ctor = this._expr.getConstructor();

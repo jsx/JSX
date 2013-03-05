@@ -569,9 +569,9 @@ class ClassDefinition implements Stashable {
 				ClassDefinition.IS_FINAL | (this.flags() & ClassDefinition.IS_NATIVE),
 				Type.voidType,
 				new ArgumentDeclaration[],
-				isNative ? null:LocalVariable[] : new LocalVariable[],
-				isNative ? null:Statement[] : new Statement[],
-				isNative ? null:MemberFunctionDefinition[] : new MemberFunctionDefinition[],
+				isNative ? (null) : new LocalVariable[],
+				isNative ? (null) : new Statement[],
+				isNative ? (null) : new MemberFunctionDefinition[],
 				this._token, /* FIXME */
 			        null);
 			func.setClassDef(this);
