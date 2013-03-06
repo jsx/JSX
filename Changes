@@ -1,5 +1,12 @@
 Revision history for the JSX software development kit
 
+0.9.11
+    [CHANGES]
+    - Changed the precedence of . operator: calling instance methods after new without parens (`new Class.instanceMethod`) is forbidden
+
+    [FEATURES]
+    - Support inner classes (nested classes)
+
 0.9.10 2013-02-22 10:18:13
     [BUG FIXES]
     - Fixed a bug that jsx(1) crashes when spaces were passed to JSX programs on --run
