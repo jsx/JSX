@@ -1,6 +1,6 @@
 Revision history for the JSX software development kit
 
-0.9.11
+0.9.11 2013-03-08 14:25:22
     [CHANGES]
     - Forbade calling instance methods after operator new without parens,
       i.e. `new Class.instanceMethod()`, because it was conflict with inner
