@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// generatedy by JSX compiler 0.9.5 (2013-02-08 10:43:37 +0900; 164a17e89c64ec43e7c9f3950574988ffd6f81e8)
+// generatedy by JSX compiler 0.9.10 (2013-03-08 13:50:20 +0900; 06b6c6cf1c4cd23a9d61f3fbd7d4606625a45252)
 var JSX = {};
 (function (JSX) {
 /**
@@ -99,11 +99,24 @@ function CompilationServer() {
 
 /**
  * @constructor
+ * @param {Platform} parentPlatform
  */
-function CompilationServer$() {
+function CompilationServer$LPlatform$(parentPlatform) {
+	this._requestSequence = 0;
+	this._pidFile = "";
+	this._portFile = "";
+	this._httpd = null;
+	this._timer = null;
+	this._platform = parentPlatform;
+	this._home = process.env.JSX_HOME || (process.env.HOME || process.env.USERPROFILE) + "/.jsx";
+	if (! parentPlatform.fileExists$S(this._home)) {
+		parentPlatform.mkpath$S(this._home);
+	}
+	this._pidFile = this._home + "/pid";
+	this._portFile = this._home + "/port";
 };
 
-CompilationServer$.prototype = new CompilationServer;
+CompilationServer$LPlatform$.prototype = new CompilationServer;
 
 /**
  * @param {Platform} platform
@@ -111,39 +124,98 @@ CompilationServer$.prototype = new CompilationServer;
  * @return {!number}
  */
 CompilationServer.start$LPlatform$I = function (platform, port) {
-	/** @type {Server} */
-	var httpd;
-	httpd = node.http.createServer((function (request, response) {
-		CompilationServer$handleRequest$LPlatform$LServerRequest$LServerResponse$(platform, request, response);
+	/** @type {CompilationServer} */
+	var server;
+	server = new CompilationServer$LPlatform$(platform);
+	server._httpd = node.http.createServer((function (request, response) {
+		server.handleRequest$LServerRequest$LServerResponse$(request, response);
 	}));
-	httpd.listen(port);
-	console.info("access http://localhost:" + (port + "") + "/");
+	server._httpd.listen(port);
+	platform.save$USS(server._pidFile, process.pid + "");
+	platform.save$USS(server._portFile, port + "");
+	console.info("%s [%s] listen http://localhost:%s/", new Date().toISOString(), process.pid, port);
+	server._timer = Timer$setTimeout$F$V$N((function () {
+		server.shutdown$S("timeout");
+	}), CompilationServer.LIFE);
+	process.on("SIGTERM", (function () {
+		server.shutdown$S("SIGTERM");
+	}));
+	process.on("SIGINT", (function () {
+		server.shutdown$S("SIGINT");
+	}));
+	if (CompilationServer.AUTO_SHUTDOWN) {
+		node.fs.watch(node.__filename, ({ persistent: false }), (function (event, filename) {
+			server.shutdown$S(event);
+		}));
+	}
 	return 0;
 };
 
 var CompilationServer$start$LPlatform$I = CompilationServer.start$LPlatform$I;
 
 /**
- * @param {Platform} platform
+ * @param {!string} reason
+ */
+CompilationServer.prototype.shutdown$S = function (reason) {
+	try {
+		node.fs.unlinkSync(this._portFile);
+	} catch ($__jsx_catch_0) {
+		if ($__jsx_catch_0 instanceof Error) {
+		} else {
+			throw $__jsx_catch_0;
+		}
+	}
+	try {
+		node.fs.unlinkSync(this._pidFile);
+	} catch ($__jsx_catch_0) {
+		if ($__jsx_catch_0 instanceof Error) {
+		} else {
+			throw $__jsx_catch_0;
+		}
+	}
+	Timer$clearTimeout$LTimerHandle$(this._timer);
+	this._httpd.close();
+	console.info("%s [%s] shutdown by %s, handled %s requests", new Date().toISOString(), process.pid, reason, this._requestSequence);
+};
+
+/**
  * @param {ServerRequest} request
  * @param {ServerResponse} response
  */
-CompilationServer.handleRequest$LPlatform$LServerRequest$LServerResponse$ = function (platform, request, response) {
+CompilationServer.prototype.handleRequest$LServerRequest$LServerResponse$ = function (request, response) {
+	var $this = this;
+	/** @type {Date} */
+	var startTime;
 	/** @type {!number} */
 	var id;
 	/** @type {CompilationServerPlatform} */
 	var c;
-	/** @type {Date} */
-	var startTime;
+	/** @type {Array.<undefined|!string>} */
+	var matched;
+	/** @type {!string} */
+	var query;
 	/** @type {!string} */
 	var inputData;
-	id = ++ CompilationServer._requestSequence;
+	startTime = new Date();
+	id = ++ this._requestSequence;
+	Timer$clearTimeout$LTimerHandle$(this._timer);
+	this._timer = Timer$setTimeout$F$V$N((function () {
+		$this.shutdown$S("timeout");
+	}), CompilationServer.LIFE);
 	if (request.method === "GET") {
-		CompilationServer$finishRequest$LServerResponse$NX(response, 200, ({ version_string: Meta.VERSION_STRING, version_number: Meta.VERSION_NUMBER, last_commit_hash: Meta.LAST_COMMIT_HASH, last_commit_date: Meta.LAST_COMMIT_DATE, status: true }));
+		console.info("%s #%s start %s", startTime.toISOString(), id, request.url);
+		this.handleGET$NLDate$LServerRequest$LServerResponse$(id, startTime, request, response);
 		return;
 	}
-	c = new CompilationServerPlatform$SNLServerRequest$LServerResponse$(platform.getRoot$(), id, request, response);
-	startTime = new Date();
+	c = new CompilationServerPlatform$SNLServerRequest$LServerResponse$(this._platform.getRoot$(), id, request, response);
+	matched = request.url.match(/\?(.*)/);
+	if (! (matched && matched[1])) {
+		c.error$S("invalid request to compilation server");
+		this.finishRequest$NLDate$LServerResponse$NX(id, startTime, response, 400, c.getContents$());
+		return;
+	}
+	query = $__jsx_decodeURIComponent(matched[1]);
+	console.info("%s #%s start %s", startTime.toISOString(), id, query.replace(/\n/g, "\\n"));
 	inputData = "";
 	request.on("data", (function (chunk) {
 		inputData += chunk + "";
@@ -151,52 +223,62 @@ CompilationServer.handleRequest$LPlatform$LServerRequest$LServerResponse$ = func
 	request.on("end", (function () {
 		/** @type {Array.<undefined|!string>} */
 		var args;
-		/** @type {Date} */
-		var now;
-		/** @type {!number} */
-		var elapsed;
-		console.info("%s#%s start %s", startTime, id, inputData);
+		if (inputData) {
+			c.setFileContent$SS("-", inputData);
+		}
 		try {
-			args = JSON.parse(inputData);
+			args = JSON.parse(query);
 			c.setStatusCode$N(JSXCommand$main$LPlatform$AS(c, args));
 		} catch ($__jsx_catch_0) {
 			if ($__jsx_catch_0 instanceof Error) {
-				console.error("%s#%s %s", startTime, id, $__jsx_catch_0);
-				c.error$S($__jsx_catch_0.stack + "");
+				console.error("%s #%s %s", startTime.toISOString(), id, $__jsx_catch_0.stack);
+				c.error$S($__jsx_catch_0.stack);
 			} else {
 				throw $__jsx_catch_0;
 			}
 		}
-		CompilationServer$finishRequest$LServerResponse$NX(response, 200, c.getContents$());
-		now = new Date();
-		elapsed = now.getTime() - startTime.getTime();
-		console.info("%s#%s finish, elapsed %s [ms]", now, id, elapsed);
+		$this.finishRequest$NLDate$LServerResponse$NX(id, startTime, response, 200, c.getContents$());
 	}));
 	request.on("close", (function () {
 		c.error$S("the connecion is unexpectedly closed.\n");
-		CompilationServer$finishRequest$LServerResponse$NX(response, 500, c.getContents$());
+		$this.finishRequest$NLDate$LServerResponse$NX(id, startTime, response, 500, c.getContents$());
 	}));
 };
 
-var CompilationServer$handleRequest$LPlatform$LServerRequest$LServerResponse$ = CompilationServer.handleRequest$LPlatform$LServerRequest$LServerResponse$;
+/**
+ * @param {!number} id
+ * @param {Date} startTime
+ * @param {ServerRequest} request
+ * @param {ServerResponse} response
+ */
+CompilationServer.prototype.handleGET$NLDate$LServerRequest$LServerResponse$ = function (id, startTime, request, response) {
+	this.finishRequest$NLDate$LServerResponse$NX(id, startTime, response, 200, ({ version_string: Meta.VERSION_STRING, version_number: Meta.VERSION_NUMBER, last_commit_hash: Meta.LAST_COMMIT_HASH, last_commit_date: Meta.LAST_COMMIT_DATE, status: true }));
+};
 
 /**
+ * @param {!number} id
+ * @param {Date} startTime
  * @param {ServerResponse} response
  * @param {!number} statusCode
  * @param {*} data
  */
-CompilationServer.finishRequest$LServerResponse$NX = function (response, statusCode, data) {
+CompilationServer.prototype.finishRequest$NLDate$LServerResponse$NX = function (id, startTime, response, statusCode, data) {
 	/** @type {!string} */
 	var content;
 	/** @type {Object.<string, undefined|!string>} */
 	var headers;
+	/** @type {Date} */
+	var now;
+	/** @type {!number} */
+	var elapsed;
 	content = JSON.stringify(data);
 	headers = ({ "Content-Type": "application/json", "Content-Length": Buffer.byteLength(content, "utf-8") + "", "Cache-Control": "no-cache" });
 	response.writeHead(statusCode, headers);
 	response.end(content, "utf-8");
+	now = new Date();
+	elapsed = now.getTime() - startTime.getTime();
+	console.info("%s #%s finish, elapsed %s [ms]", now.toISOString(), id, elapsed);
 };
-
-var CompilationServer$finishRequest$LServerResponse$NX = CompilationServer.finishRequest$LServerResponse$NX;
 
 /**
  * class _Main extends Object
@@ -291,6 +373,201 @@ node.require$S = function (source) {
 var node$require$S = node.require$S;
 
 /**
+ * class Timer extends Object
+ * @constructor
+ */
+function Timer() {
+}
+
+/**
+ * @constructor
+ */
+function Timer$() {
+};
+
+Timer$.prototype = new Timer;
+
+/**
+ * @param {*} callback
+ * @param {!number} intervalMS
+ * @return {TimerHandle}
+ */
+Timer.setTimeout$F$V$N = function (callback, intervalMS) {
+	return js.global.setTimeout(callback, intervalMS);
+};
+
+var Timer$setTimeout$F$V$N = Timer.setTimeout$F$V$N;
+
+/**
+ * @param {TimerHandle} timer
+ */
+Timer.clearTimeout$LTimerHandle$ = function (timer) {
+	js.global.clearTimeout(timer);
+};
+
+var Timer$clearTimeout$LTimerHandle$ = Timer.clearTimeout$LTimerHandle$;
+
+/**
+ * @param {*} callback
+ * @param {!number} intervalMS
+ * @return {TimerHandle}
+ */
+Timer.setInterval$F$V$N = function (callback, intervalMS) {
+	return js.global.setInterval(callback, intervalMS);
+};
+
+var Timer$setInterval$F$V$N = Timer.setInterval$F$V$N;
+
+/**
+ * @param {TimerHandle} timer
+ */
+Timer.clearInterval$LTimerHandle$ = function (timer) {
+	js.global.clearInterval(timer);
+};
+
+var Timer$clearInterval$LTimerHandle$ = Timer.clearInterval$LTimerHandle$;
+
+/**
+ * @param {*} callback
+ * @return {TimerHandle}
+ */
+Timer.requestAnimationFrame$F$NV$ = function (callback) {
+	return Timer._requestAnimationFrame(callback);
+};
+
+var Timer$requestAnimationFrame$F$NV$ = Timer.requestAnimationFrame$F$NV$;
+
+/**
+ * @param {TimerHandle} timer
+ */
+Timer.cancelAnimationFrame$LTimerHandle$ = function (timer) {
+	Timer._cancelAnimationFrame(timer);
+};
+
+var Timer$cancelAnimationFrame$LTimerHandle$ = Timer.cancelAnimationFrame$LTimerHandle$;
+
+/**
+ * @param {!boolean} enable
+ */
+Timer.useNativeRAF$B = function (enable) {
+	Timer._requestAnimationFrame = Timer$_getRequestAnimationFrameImpl$B(enable);
+	Timer._cancelAnimationFrame = Timer$_getCancelAnimationFrameImpl$B(enable);
+};
+
+var Timer$useNativeRAF$B = Timer.useNativeRAF$B;
+
+/**
+ * @param {!boolean} useNativeImpl
+ * @return {*}
+ */
+Timer._getRequestAnimationFrameImpl$B = function (useNativeImpl) {
+	/** @type {!number} */
+	var lastTime;
+	if (useNativeImpl) {
+		if (js.global.requestAnimationFrame) {
+			return (function (callback) {
+				return js.global.requestAnimationFrame(callback);
+			});
+		} else {
+			if (js.global.webkitRequestAnimationFrame) {
+				return (function (callback) {
+					return js.global.webkitRequestAnimationFrame(callback);
+				});
+			} else {
+				if (js.global.mozRequestAnimationFrame) {
+					return (function (callback) {
+						return js.global.mozRequestAnimationFrame(callback);
+					});
+				} else {
+					if (js.global.oRequestAnimationFrame) {
+						return (function (callback) {
+							return js.global.oRequestAnimationFrame(callback);
+						});
+					} else {
+						if (js.global.msRequestAnimationFrame) {
+							return (function (callback) {
+								return js.global.msRequestAnimationFrame(callback);
+							});
+						}
+					}
+				}
+			}
+		}
+	}
+	lastTime = 0;
+	return (function (callback) {
+		/** @type {!number} */
+		var now;
+		/** @type {!number} */
+		var timeToCall;
+		now = Date.now();
+		timeToCall = Math.max(0, 16 - (now - lastTime));
+		lastTime = now + timeToCall;
+		return Timer$setTimeout$F$V$N((function () {
+			callback(now + timeToCall);
+		}), timeToCall);
+	});
+};
+
+var Timer$_getRequestAnimationFrameImpl$B = Timer._getRequestAnimationFrameImpl$B;
+
+/**
+ * @param {!boolean} useNativeImpl
+ * @return {*}
+ */
+Timer._getCancelAnimationFrameImpl$B = function (useNativeImpl) {
+	if (useNativeImpl) {
+		if (js.global.cancelAnimationFrame) {
+			return (function (timer) {
+				js.global.cancelAnimationFrame(timer);
+			});
+		} else {
+			if (js.global.webkitCancelAnimationFrame) {
+				return (function (timer) {
+					js.global.webkitCancelAnimationFrame(timer);
+				});
+			} else {
+				if (js.global.mozCancelAnimationFrame) {
+					return (function (timer) {
+						js.global.mozCancelAnimationFrame(timer);
+					});
+				} else {
+					if (js.global.oCancelAnimationFrame) {
+						return (function (timer) {
+							js.global.oCancelAnimationFrame(timer);
+						});
+					} else {
+						if (js.global.msCancelAnimationFrame) {
+							return (function (timer) {
+								js.global.msCancelAnimationFrame(timer);
+							});
+						}
+					}
+				}
+			}
+		}
+	}
+	return Timer$clearTimeout$LTimerHandle$;
+};
+
+var Timer$_getCancelAnimationFrameImpl$B = Timer._getCancelAnimationFrameImpl$B;
+
+/**
+ * class TimerHandle extends Object
+ * @constructor
+ */
+function TimerHandle() {
+}
+
+/**
+ * @constructor
+ */
+function TimerHandle$() {
+};
+
+TimerHandle$.prototype = new TimerHandle;
+
+/**
  * class Util extends Object
  * @constructor
  */
@@ -332,6 +609,10 @@ var Util$repeat$SN = Util.repeat$SN;
 Util.format$SAS = function (fmt, args) {
 	/** @type {!number} */
 	var i;
+	if (! (args != null)) {
+		debugger;
+		throw new Error("[src/util.jsx:80:20] assertion failure\n        assert args != null;\n                    ^^\n");
+	}
 	i = 0;
 	return fmt.replace(/%(\d+|%)/g, (function (m) {
 		/** @type {undefined|!string} */
@@ -393,7 +674,7 @@ Util.analyzeArgs$LAnalysisContext$ALExpression$LExpression$AALType$ = function (
 			if (j !== expectedTypes.length) {
 			} else {
 				if (expectedCallbackType != null) {
-					if (! funcDef.deductTypeIfUnknown$LAnalysisContext$LResolvedFunctionType$(context, expectedCallbackType)) {
+					if (! args[i].deductTypeIfUnknown$LAnalysisContext$LResolvedFunctionType$(context, expectedCallbackType)) {
 						return null;
 					}
 				}
@@ -666,18 +947,17 @@ Util._resolvedPathParts$S = function (path) {
 	var tokens;
 	/** @type {!number} */
 	var i;
-	tokens = path.split("/");
+	tokens = path.split(/[\\\/]+/);
+	if (tokens.length === 1) {
+		return tokens;
+	}
 	for (i = 0; i < tokens.length; ) {
-		if (tokens[i] == "." || i !== 0 && tokens[i] == "") {
+		if (tokens[i] == ".") {
 			tokens.splice(i, 1);
 		} else {
 			if (tokens[i] == ".." && i !== 0 && tokens[i - 1] != "..") {
-				if (i === 1 && tokens[0] == "") {
-					tokens.splice(i, 1);
-				} else {
-					tokens.splice(i - 1, 2);
-					i -= 1;
-				}
+				tokens.splice(i - 1, 2);
+				i -= 1;
 			} else {
 				i++;
 			}
@@ -744,6 +1024,33 @@ Util.relativePath$SSB = function (fromPath, toPath, isFile) {
 };
 
 var Util$relativePath$SSB = Util.relativePath$SSB;
+
+/**
+ * @param {!string} path
+ * @return {!string}
+ */
+Util.basename$S = function (path) {
+	/** @type {Array.<undefined|!string>} */
+	var parts;
+	parts = Util$_resolvedPathParts$S(path);
+	return parts.pop();
+};
+
+var Util$basename$S = Util.basename$S;
+
+/**
+ * @param {!string} path
+ * @return {!string}
+ */
+Util.dirname$S = function (path) {
+	/** @type {Array.<undefined|!string>} */
+	var parts;
+	parts = Util$_resolvedPathParts$S(path);
+	parts.pop();
+	return parts.join("/");
+};
+
+var Util$dirname$S = Util.dirname$S;
 
 /**
  * @param {!number} n
@@ -1772,17 +2079,28 @@ TypedMap$Array$Type$E$MemberFunctionDefinition$E$.prototype = new TypedMap$Array
  * @param {*} equalsCallback
  */
 function TypedMap$Array$Type$E$MemberFunctionDefinition$E$F$ALType$ALType$B$(equalsCallback) {
-	this._list = [  ];
+	this._list = [];
 	this._equalsCallback = equalsCallback;
 };
 
 TypedMap$Array$Type$E$MemberFunctionDefinition$E$F$ALType$ALType$B$.prototype = new TypedMap$Array$Type$E$MemberFunctionDefinition$E;
 
 /**
+ * @return {TypedMap$Array$Type$E$MemberFunctionDefinition$E}
+ */
+TypedMap$Array$Type$E$MemberFunctionDefinition$E.prototype.clone$ = function () {
+	/** @type {TypedMap$Array$Type$E$MemberFunctionDefinition$E} */
+	var x;
+	x = new TypedMap$Array$Type$E$MemberFunctionDefinition$E$F$ALType$ALType$B$(this._equalsCallback);
+	x._list = this._list.concat([  ]);
+	return x;
+};
+
+/**
  * @param {Array.<undefined|Type>} key
  * @return {!boolean}
  */
-TypedMap$Array$Type$E$MemberFunctionDefinition$E.prototype.exists$ALType$ = function (key) {
+TypedMap$Array$Type$E$MemberFunctionDefinition$E.prototype.has$ALType$ = function (key) {
 	var $this = this;
 	return ! this.forEach$F$ALType$LMemberFunctionDefinition$B$((function (entryKey, entryValue) {
 		return ! $this._equalsCallback(key, entryKey);
@@ -1793,7 +2111,7 @@ TypedMap$Array$Type$E$MemberFunctionDefinition$E.prototype.exists$ALType$ = func
  * @param {Array.<undefined|Type>} key
  * @param {MemberFunctionDefinition} val
  */
-TypedMap$Array$Type$E$MemberFunctionDefinition$E.prototype.put$ALType$LMemberFunctionDefinition$ = function (key, val) {
+TypedMap$Array$Type$E$MemberFunctionDefinition$E.prototype.set$ALType$LMemberFunctionDefinition$ = function (key, val) {
 	/** @type {!number} */
 	var i;
 	for (i = 0; i < this._list.length; ++ i) {
@@ -1802,7 +2120,7 @@ TypedMap$Array$Type$E$MemberFunctionDefinition$E.prototype.put$ALType$LMemberFun
 			return;
 		}
 	}
-	this._list.push(new Tuple$Array$Type$E$MemberFunctionDefinition$E$ALType$LMemberFunctionDefinition$(key, val));
+	this._list.push(new Pair$Array$Type$E$MemberFunctionDefinition$E$ALType$LMemberFunctionDefinition$(key, val));
 };
 
 /**
@@ -1823,7 +2141,7 @@ TypedMap$Array$Type$E$MemberFunctionDefinition$E.prototype.get$ALType$ = functio
 /**
  * @param {Array.<undefined|Type>} key
  */
-TypedMap$Array$Type$E$MemberFunctionDefinition$E.prototype.remove$ALType$ = function (key) {
+TypedMap$Array$Type$E$MemberFunctionDefinition$E.prototype.delete$ALType$ = function (key) {
 	/** @type {!number} */
 	var i;
 	for (i = 0; i < this._list.length; ++ i) {
@@ -1847,7 +2165,7 @@ TypedMap$Array$Type$E$MemberFunctionDefinition$E.prototype.clear$ = function () 
 TypedMap$Array$Type$E$MemberFunctionDefinition$E.prototype.forEach$F$ALType$LMemberFunctionDefinition$B$ = function (cb) {
 	/** @type {!number} */
 	var i;
-	/** @type {Tuple$Array$Type$E$MemberFunctionDefinition$E} */
+	/** @type {Pair$Array$Type$E$MemberFunctionDefinition$E} */
 	var e;
 	for (i = 0; i < this._list.length; ++ i) {
 		e = this._list[i];
@@ -1865,7 +2183,7 @@ TypedMap$Array$Type$E$MemberFunctionDefinition$E.prototype.forEach$F$ALType$LMem
 TypedMap$Array$Type$E$MemberFunctionDefinition$E.prototype.reversedForEach$F$ALType$LMemberFunctionDefinition$B$ = function (cb) {
 	/** @type {!number} */
 	var i;
-	/** @type {Tuple$Array$Type$E$MemberFunctionDefinition$E} */
+	/** @type {Pair$Array$Type$E$MemberFunctionDefinition$E} */
 	var e;
 	for (i = this._list.length - 1; i >= 0; -- i) {
 		e = this._list[i];
@@ -1877,10 +2195,10 @@ TypedMap$Array$Type$E$MemberFunctionDefinition$E.prototype.reversedForEach$F$ALT
 };
 
 /**
- * class Tuple$Array$Type$E$MemberFunctionDefinition$E extends Object
+ * class Pair$Array$Type$E$MemberFunctionDefinition$E extends Object
  * @constructor
  */
-function Tuple$Array$Type$E$MemberFunctionDefinition$E() {
+function Pair$Array$Type$E$MemberFunctionDefinition$E() {
 }
 
 /**
@@ -1888,12 +2206,12 @@ function Tuple$Array$Type$E$MemberFunctionDefinition$E() {
  * @param {Array.<undefined|Type>} first
  * @param {MemberFunctionDefinition} second
  */
-function Tuple$Array$Type$E$MemberFunctionDefinition$E$ALType$LMemberFunctionDefinition$(first, second) {
+function Pair$Array$Type$E$MemberFunctionDefinition$E$ALType$LMemberFunctionDefinition$(first, second) {
 	this.first = first;
 	this.second = second;
 };
 
-Tuple$Array$Type$E$MemberFunctionDefinition$E$ALType$LMemberFunctionDefinition$.prototype = new Tuple$Array$Type$E$MemberFunctionDefinition$E;
+Pair$Array$Type$E$MemberFunctionDefinition$E$ALType$LMemberFunctionDefinition$.prototype = new Pair$Array$Type$E$MemberFunctionDefinition$E;
 
 /**
  * class Serializer$Import$E extends Object
@@ -1968,17 +2286,28 @@ TypedMap$LocalVariable$boolean$E$.prototype = new TypedMap$LocalVariable$boolean
  * @param {*} equalsCallback
  */
 function TypedMap$LocalVariable$boolean$E$F$LLocalVariable$LLocalVariable$B$(equalsCallback) {
-	this._list = [  ];
+	this._list = [];
 	this._equalsCallback = equalsCallback;
 };
 
 TypedMap$LocalVariable$boolean$E$F$LLocalVariable$LLocalVariable$B$.prototype = new TypedMap$LocalVariable$boolean$E;
 
 /**
+ * @return {TypedMap$LocalVariable$boolean$E}
+ */
+TypedMap$LocalVariable$boolean$E.prototype.clone$ = function () {
+	/** @type {TypedMap$LocalVariable$boolean$E} */
+	var x;
+	x = new TypedMap$LocalVariable$boolean$E$F$LLocalVariable$LLocalVariable$B$(this._equalsCallback);
+	x._list = this._list.concat([  ]);
+	return x;
+};
+
+/**
  * @param {LocalVariable} key
  * @return {!boolean}
  */
-TypedMap$LocalVariable$boolean$E.prototype.exists$LLocalVariable$ = function (key) {
+TypedMap$LocalVariable$boolean$E.prototype.has$LLocalVariable$ = function (key) {
 	var $this = this;
 	return ! this.forEach$F$LLocalVariable$BB$((function (entryKey, entryValue) {
 		return ! $this._equalsCallback(key, entryKey);
@@ -1989,7 +2318,7 @@ TypedMap$LocalVariable$boolean$E.prototype.exists$LLocalVariable$ = function (ke
  * @param {LocalVariable} key
  * @param {!boolean} val
  */
-TypedMap$LocalVariable$boolean$E.prototype.put$LLocalVariable$B = function (key, val) {
+TypedMap$LocalVariable$boolean$E.prototype.set$LLocalVariable$B = function (key, val) {
 	/** @type {!number} */
 	var i;
 	for (i = 0; i < this._list.length; ++ i) {
@@ -1998,7 +2327,7 @@ TypedMap$LocalVariable$boolean$E.prototype.put$LLocalVariable$B = function (key,
 			return;
 		}
 	}
-	this._list.push(new Tuple$LocalVariable$boolean$E$LLocalVariable$B(key, val));
+	this._list.push(new Pair$LocalVariable$boolean$E$LLocalVariable$B(key, val));
 };
 
 /**
@@ -2019,7 +2348,7 @@ TypedMap$LocalVariable$boolean$E.prototype.get$LLocalVariable$ = function (key) 
 /**
  * @param {LocalVariable} key
  */
-TypedMap$LocalVariable$boolean$E.prototype.remove$LLocalVariable$ = function (key) {
+TypedMap$LocalVariable$boolean$E.prototype.delete$LLocalVariable$ = function (key) {
 	/** @type {!number} */
 	var i;
 	for (i = 0; i < this._list.length; ++ i) {
@@ -2043,7 +2372,7 @@ TypedMap$LocalVariable$boolean$E.prototype.clear$ = function () {
 TypedMap$LocalVariable$boolean$E.prototype.forEach$F$LLocalVariable$BB$ = function (cb) {
 	/** @type {!number} */
 	var i;
-	/** @type {Tuple$LocalVariable$boolean$E} */
+	/** @type {Pair$LocalVariable$boolean$E} */
 	var e;
 	for (i = 0; i < this._list.length; ++ i) {
 		e = this._list[i];
@@ -2061,7 +2390,7 @@ TypedMap$LocalVariable$boolean$E.prototype.forEach$F$LLocalVariable$BB$ = functi
 TypedMap$LocalVariable$boolean$E.prototype.reversedForEach$F$LLocalVariable$BB$ = function (cb) {
 	/** @type {!number} */
 	var i;
-	/** @type {Tuple$LocalVariable$boolean$E} */
+	/** @type {Pair$LocalVariable$boolean$E} */
 	var e;
 	for (i = this._list.length - 1; i >= 0; -- i) {
 		e = this._list[i];
@@ -2073,10 +2402,10 @@ TypedMap$LocalVariable$boolean$E.prototype.reversedForEach$F$LLocalVariable$BB$ 
 };
 
 /**
- * class Tuple$LocalVariable$boolean$E extends Object
+ * class Pair$LocalVariable$boolean$E extends Object
  * @constructor
  */
-function Tuple$LocalVariable$boolean$E() {
+function Pair$LocalVariable$boolean$E() {
 }
 
 /**
@@ -2084,12 +2413,12 @@ function Tuple$LocalVariable$boolean$E() {
  * @param {LocalVariable} first
  * @param {!boolean} second
  */
-function Tuple$LocalVariable$boolean$E$LLocalVariable$B(first, second) {
+function Pair$LocalVariable$boolean$E$LLocalVariable$B(first, second) {
 	this.first = first;
 	this.second = second;
 };
 
-Tuple$LocalVariable$boolean$E$LLocalVariable$B.prototype = new Tuple$LocalVariable$boolean$E;
+Pair$LocalVariable$boolean$E$LLocalVariable$B.prototype = new Pair$LocalVariable$boolean$E;
 
 /**
  * class TypedMap$LocalVariable$Expression$E extends Object
@@ -2115,17 +2444,28 @@ TypedMap$LocalVariable$Expression$E$.prototype = new TypedMap$LocalVariable$Expr
  * @param {*} equalsCallback
  */
 function TypedMap$LocalVariable$Expression$E$F$LLocalVariable$LLocalVariable$B$(equalsCallback) {
-	this._list = [  ];
+	this._list = [];
 	this._equalsCallback = equalsCallback;
 };
 
 TypedMap$LocalVariable$Expression$E$F$LLocalVariable$LLocalVariable$B$.prototype = new TypedMap$LocalVariable$Expression$E;
 
 /**
+ * @return {TypedMap$LocalVariable$Expression$E}
+ */
+TypedMap$LocalVariable$Expression$E.prototype.clone$ = function () {
+	/** @type {TypedMap$LocalVariable$Expression$E} */
+	var x;
+	x = new TypedMap$LocalVariable$Expression$E$F$LLocalVariable$LLocalVariable$B$(this._equalsCallback);
+	x._list = this._list.concat([  ]);
+	return x;
+};
+
+/**
  * @param {LocalVariable} key
  * @return {!boolean}
  */
-TypedMap$LocalVariable$Expression$E.prototype.exists$LLocalVariable$ = function (key) {
+TypedMap$LocalVariable$Expression$E.prototype.has$LLocalVariable$ = function (key) {
 	var $this = this;
 	return ! this.forEach$F$LLocalVariable$LExpression$B$((function (entryKey, entryValue) {
 		return ! $this._equalsCallback(key, entryKey);
@@ -2136,7 +2476,7 @@ TypedMap$LocalVariable$Expression$E.prototype.exists$LLocalVariable$ = function 
  * @param {LocalVariable} key
  * @param {Expression} val
  */
-TypedMap$LocalVariable$Expression$E.prototype.put$LLocalVariable$LExpression$ = function (key, val) {
+TypedMap$LocalVariable$Expression$E.prototype.set$LLocalVariable$LExpression$ = function (key, val) {
 	/** @type {!number} */
 	var i;
 	for (i = 0; i < this._list.length; ++ i) {
@@ -2145,7 +2485,7 @@ TypedMap$LocalVariable$Expression$E.prototype.put$LLocalVariable$LExpression$ = 
 			return;
 		}
 	}
-	this._list.push(new Tuple$LocalVariable$Expression$E$LLocalVariable$LExpression$(key, val));
+	this._list.push(new Pair$LocalVariable$Expression$E$LLocalVariable$LExpression$(key, val));
 };
 
 /**
@@ -2166,7 +2506,7 @@ TypedMap$LocalVariable$Expression$E.prototype.get$LLocalVariable$ = function (ke
 /**
  * @param {LocalVariable} key
  */
-TypedMap$LocalVariable$Expression$E.prototype.remove$LLocalVariable$ = function (key) {
+TypedMap$LocalVariable$Expression$E.prototype.delete$LLocalVariable$ = function (key) {
 	/** @type {!number} */
 	var i;
 	for (i = 0; i < this._list.length; ++ i) {
@@ -2190,7 +2530,7 @@ TypedMap$LocalVariable$Expression$E.prototype.clear$ = function () {
 TypedMap$LocalVariable$Expression$E.prototype.forEach$F$LLocalVariable$LExpression$B$ = function (cb) {
 	/** @type {!number} */
 	var i;
-	/** @type {Tuple$LocalVariable$Expression$E} */
+	/** @type {Pair$LocalVariable$Expression$E} */
 	var e;
 	for (i = 0; i < this._list.length; ++ i) {
 		e = this._list[i];
@@ -2208,7 +2548,7 @@ TypedMap$LocalVariable$Expression$E.prototype.forEach$F$LLocalVariable$LExpressi
 TypedMap$LocalVariable$Expression$E.prototype.reversedForEach$F$LLocalVariable$LExpression$B$ = function (cb) {
 	/** @type {!number} */
 	var i;
-	/** @type {Tuple$LocalVariable$Expression$E} */
+	/** @type {Pair$LocalVariable$Expression$E} */
 	var e;
 	for (i = this._list.length - 1; i >= 0; -- i) {
 		e = this._list[i];
@@ -2220,10 +2560,10 @@ TypedMap$LocalVariable$Expression$E.prototype.reversedForEach$F$LLocalVariable$L
 };
 
 /**
- * class Tuple$LocalVariable$Expression$E extends Object
+ * class Pair$LocalVariable$Expression$E extends Object
  * @constructor
  */
-function Tuple$LocalVariable$Expression$E() {
+function Pair$LocalVariable$Expression$E() {
 }
 
 /**
@@ -2231,12 +2571,12 @@ function Tuple$LocalVariable$Expression$E() {
  * @param {LocalVariable} first
  * @param {Expression} second
  */
-function Tuple$LocalVariable$Expression$E$LLocalVariable$LExpression$(first, second) {
+function Pair$LocalVariable$Expression$E$LLocalVariable$LExpression$(first, second) {
 	this.first = first;
 	this.second = second;
 };
 
-Tuple$LocalVariable$Expression$E$LLocalVariable$LExpression$.prototype = new Tuple$LocalVariable$Expression$E;
+Pair$LocalVariable$Expression$E$LLocalVariable$LExpression$.prototype = new Pair$LocalVariable$Expression$E;
 
 /**
  * class Triple$LocalVariable$AssignmentExpression$function$$$$Expression$$$$void$E extends Object
@@ -2260,10 +2600,10 @@ function Triple$LocalVariable$AssignmentExpression$function$$$$Expression$$$$voi
 Triple$LocalVariable$AssignmentExpression$function$$$$Expression$$$$void$E$LLocalVariable$LAssignmentExpression$F$LExpression$V$.prototype = new Triple$LocalVariable$AssignmentExpression$function$$$$Expression$$$$void$E;
 
 /**
- * class Tuple$AssignmentExpression$function$$$$Expression$$$$void$E extends Object
+ * class Pair$AssignmentExpression$function$$$$Expression$$$$void$E extends Object
  * @constructor
  */
-function Tuple$AssignmentExpression$function$$$$Expression$$$$void$E() {
+function Pair$AssignmentExpression$function$$$$Expression$$$$void$E() {
 }
 
 /**
@@ -2271,18 +2611,157 @@ function Tuple$AssignmentExpression$function$$$$Expression$$$$void$E() {
  * @param {AssignmentExpression} first
  * @param {*} second
  */
-function Tuple$AssignmentExpression$function$$$$Expression$$$$void$E$LAssignmentExpression$F$LExpression$V$(first, second) {
+function Pair$AssignmentExpression$function$$$$Expression$$$$void$E$LAssignmentExpression$F$LExpression$V$(first, second) {
 	this.first = first;
 	this.second = second;
 };
 
-Tuple$AssignmentExpression$function$$$$Expression$$$$void$E$LAssignmentExpression$F$LExpression$V$.prototype = new Tuple$AssignmentExpression$function$$$$Expression$$$$void$E;
+Pair$AssignmentExpression$function$$$$Expression$$$$void$E$LAssignmentExpression$F$LExpression$V$.prototype = new Pair$AssignmentExpression$function$$$$Expression$$$$void$E;
 
 /**
- * class Tuple$ClassDefinition$string$E extends Object
+ * class TypedMap$ClassDefinition$string$E extends Object
  * @constructor
  */
-function Tuple$ClassDefinition$string$E() {
+function TypedMap$ClassDefinition$string$E() {
+}
+
+/**
+ * @constructor
+ */
+function TypedMap$ClassDefinition$string$E$() {
+	var $this = this;
+	TypedMap$ClassDefinition$string$E$F$LClassDefinition$LClassDefinition$B$.call(this, (function (x, y) {
+		return x == y;
+	}));
+};
+
+TypedMap$ClassDefinition$string$E$.prototype = new TypedMap$ClassDefinition$string$E;
+
+/**
+ * @constructor
+ * @param {*} equalsCallback
+ */
+function TypedMap$ClassDefinition$string$E$F$LClassDefinition$LClassDefinition$B$(equalsCallback) {
+	this._list = [];
+	this._equalsCallback = equalsCallback;
+};
+
+TypedMap$ClassDefinition$string$E$F$LClassDefinition$LClassDefinition$B$.prototype = new TypedMap$ClassDefinition$string$E;
+
+/**
+ * @return {TypedMap$ClassDefinition$string$E}
+ */
+TypedMap$ClassDefinition$string$E.prototype.clone$ = function () {
+	/** @type {TypedMap$ClassDefinition$string$E} */
+	var x;
+	x = new TypedMap$ClassDefinition$string$E$F$LClassDefinition$LClassDefinition$B$(this._equalsCallback);
+	x._list = this._list.concat([  ]);
+	return x;
+};
+
+/**
+ * @param {ClassDefinition} key
+ * @return {!boolean}
+ */
+TypedMap$ClassDefinition$string$E.prototype.has$LClassDefinition$ = function (key) {
+	var $this = this;
+	return ! this.forEach$F$LClassDefinition$SB$((function (entryKey, entryValue) {
+		return ! $this._equalsCallback(key, entryKey);
+	}));
+};
+
+/**
+ * @param {ClassDefinition} key
+ * @param {!string} val
+ */
+TypedMap$ClassDefinition$string$E.prototype.set$LClassDefinition$S = function (key, val) {
+	/** @type {!number} */
+	var i;
+	for (i = 0; i < this._list.length; ++ i) {
+		if (this._equalsCallback(this._list[i].first, key)) {
+			this._list[i].second = val;
+			return;
+		}
+	}
+	this._list.push(new Pair$ClassDefinition$string$E$LClassDefinition$S(key, val));
+};
+
+/**
+ * @param {ClassDefinition} key
+ * @return {undefined|!string}
+ */
+TypedMap$ClassDefinition$string$E.prototype.get$LClassDefinition$ = function (key) {
+	/** @type {!number} */
+	var i;
+	for (i = 0; i < this._list.length; ++ i) {
+		if (this._equalsCallback(this._list[i].first, key)) {
+			return this._list[i].second;
+		}
+	}
+	return null;
+};
+
+/**
+ * @param {ClassDefinition} key
+ */
+TypedMap$ClassDefinition$string$E.prototype.delete$LClassDefinition$ = function (key) {
+	/** @type {!number} */
+	var i;
+	for (i = 0; i < this._list.length; ++ i) {
+		if (this._equalsCallback(this._list[i].first, key)) {
+			this._list.splice(i, 1);
+			return;
+		}
+	}
+};
+
+/**
+ */
+TypedMap$ClassDefinition$string$E.prototype.clear$ = function () {
+	this._list.splice(0, this._list.length);
+};
+
+/**
+ * @param {*} cb
+ * @return {!boolean}
+ */
+TypedMap$ClassDefinition$string$E.prototype.forEach$F$LClassDefinition$SB$ = function (cb) {
+	/** @type {!number} */
+	var i;
+	/** @type {Pair$ClassDefinition$string$E} */
+	var e;
+	for (i = 0; i < this._list.length; ++ i) {
+		e = this._list[i];
+		if (! cb(e.first, e.second)) {
+			return false;
+		}
+	}
+	return true;
+};
+
+/**
+ * @param {*} cb
+ * @return {!boolean}
+ */
+TypedMap$ClassDefinition$string$E.prototype.reversedForEach$F$LClassDefinition$SB$ = function (cb) {
+	/** @type {!number} */
+	var i;
+	/** @type {Pair$ClassDefinition$string$E} */
+	var e;
+	for (i = this._list.length - 1; i >= 0; -- i) {
+		e = this._list[i];
+		if (! cb(e.first, e.second)) {
+			return false;
+		}
+	}
+	return true;
+};
+
+/**
+ * class Pair$ClassDefinition$string$E extends Object
+ * @constructor
+ */
+function Pair$ClassDefinition$string$E() {
 }
 
 /**
@@ -2290,12 +2769,12 @@ function Tuple$ClassDefinition$string$E() {
  * @param {ClassDefinition} first
  * @param {!string} second
  */
-function Tuple$ClassDefinition$string$E$LClassDefinition$S(first, second) {
+function Pair$ClassDefinition$string$E$LClassDefinition$S(first, second) {
 	this.first = first;
 	this.second = second;
 };
 
-Tuple$ClassDefinition$string$E$LClassDefinition$S.prototype = new Tuple$ClassDefinition$string$E;
+Pair$ClassDefinition$string$E$LClassDefinition$S.prototype = new Pair$ClassDefinition$string$E;
 
 /**
  * class _TypeAnnotation extends Object
@@ -5301,15 +5780,6 @@ Platform.prototype.setFileContent$SS = function (name, content) {
 };
 
 /**
- * @param {*} arg
- * @return {!number}
- */
-Platform.prototype.runCompilationServer$X = function (arg) {
-	this.error$S("runCompilationServer is not supported in this platform");
-	return 1;
-};
-
-/**
  * @param {!string} s
  */
 Platform.prototype.log$S = function (s) {
@@ -5328,6 +5798,20 @@ Platform.prototype.warn$S = function (s) {
  */
 Platform.prototype.error$S = function (s) {
 	console.error(s);
+};
+
+/**
+ * @param {!string} filename
+ * @return {!string}
+ */
+Platform.prototype.encodeFilename$S = function (filename) {
+	/** @type {!string} */
+	var rootDir;
+	rootDir = this.getRoot$() + "/";
+	if (filename.indexOf(rootDir) === 0) {
+		filename = "system:" + filename.substring(rootDir.length);
+	}
+	return filename;
 };
 
 /**
@@ -5353,7 +5837,8 @@ NodePlatform$.prototype = new NodePlatform;
  */
 function NodePlatform$S(root) {
 	Platform$.call(this);
-	this._root = root.replace(/\\/g, "/");
+	this._cwd = Util$resolvePath$S(process.cwd());
+	this._root = Util$resolvePath$S(root);
 };
 
 NodePlatform$S.prototype = new NodePlatform;
@@ -5366,16 +5851,24 @@ NodePlatform.prototype.getRoot$ = function () {
 };
 
 /**
+ * @param {!string} path
+ * @return {!string}
+ */
+NodePlatform.prototype._absPath$S = function (path) {
+	return (path.charAt(0) === "/" || path.match(/^[a-zA-Z]:\//) ? path : this._cwd + "/" + path);
+};
+
+/**
  * @param {!string} name
  * @return {!boolean}
  */
 NodePlatform.prototype.fileExists$S = function (name) {
-	name = node.path.normalize(name);
+	name = Util$resolvePath$S(name);
 	if ($__jsx_ObjectHasOwnProperty.call(this.fileContent, name)) {
 		return true;
 	}
 	try {
-		node.fs.statSync(name);
+		node.fs.statSync(this._absPath$S(name));
 	} catch ($__jsx_catch_0) {
 		if ($__jsx_catch_0 instanceof Error) {
 			return false;
@@ -5391,7 +5884,7 @@ NodePlatform.prototype.fileExists$S = function (name) {
  * @return {Array.<undefined|!string>}
  */
 NodePlatform.prototype.getFilesInDirectory$S = function (path) {
-	return node.fs.readdirSync(path);
+	return node.fs.readdirSync(this._absPath$S(path));
 };
 
 /**
@@ -5409,7 +5902,7 @@ NodePlatform.prototype.load$S = function (name) {
 	var buffer;
 	/** @type {!number} */
 	var n;
-	name = node.path.normalize(name);
+	name = Util$resolvePath$S(name);
 	if ($__jsx_ObjectHasOwnProperty.call(this.fileContent, name)) {
 		return this.fileContent[name];
 	} else {
@@ -5423,7 +5916,7 @@ NodePlatform.prototype.load$S = function (name) {
 			}
 			return content;
 		} else {
-			content = node.fs.readFileSync(name, "utf-8");
+			content = node.fs.readFileSync(this._absPath$S(name), "utf-8");
 			this.fileContent[name] = content;
 			return content;
 		}
@@ -5438,8 +5931,17 @@ NodePlatform.prototype.save$USS = function (outputFile, content) {
 	if (outputFile == null) {
 		process.stdout.write(content);
 	} else {
+		outputFile = this._absPath$S(outputFile);
+		this.mkpath$S(Util$dirname$S(outputFile));
 		node.fs.writeFileSync(outputFile, content);
 	}
+};
+
+/**
+ * @param {!string} dir
+ */
+NodePlatform.prototype.setWorkingDir$S = function (dir) {
+	this._cwd = Util$resolvePath$S(dir);
 };
 
 /**
@@ -5448,11 +5950,12 @@ NodePlatform.prototype.save$USS = function (outputFile, content) {
 NodePlatform.prototype.mkpath$S = function (path) {
 	/** @type {!string} */
 	var dirOfPath;
+	path = this._absPath$S(path);
 	try {
 		node.fs.statSync(path);
 	} catch ($__jsx_catch_0) {
 		if ($__jsx_catch_0 instanceof Error) {
-			dirOfPath = path.replace(new RegExp("/[^/]*$"), "");
+			dirOfPath = Util$dirname$S(path);
 			if (dirOfPath !== path) {
 				this.mkpath$S(dirOfPath);
 			}
@@ -5528,7 +6031,7 @@ NodePlatform.prototype.wrapOnLoad$S = function (code) {
  */
 NodePlatform.prototype.makeFileExecutable$SS = function (file, runEnv) {
 	if (runEnv === "node") {
-		node.fs.chmodSync(file, "0755");
+		node.fs.chmodSync(this._absPath$S(file), "0755");
 	}
 };
 
@@ -5612,6 +6115,7 @@ function CompilationServerPlatform$SNLServerRequest$LServerResponse$(root, reqId
 	this._stdout = "";
 	this._stderr = "";
 	this._file = {};
+	this._executableFile = {};
 	this._statusCode = 1;
 	this._scriptFile = null;
 	this._scriptSource = null;
@@ -5675,16 +6179,16 @@ CompilationServerPlatform.prototype.setStatusCode$N = function (statusCode) {
 };
 
 /**
- * @return {*}
+ * @return {Object.<string, undefined|*>}
  */
 CompilationServerPlatform.prototype.getContents$ = function () {
-	/** @type {*} */
-	var run;
-	run = null;
+	/** @type {Object.<string, undefined|*>} */
+	var content;
+	content = ({ stdout: this._stdout, stderr: this._stderr, file: this._file, executableFile: this._executableFile, statusCode: this._statusCode });
 	if (this._scriptSource != null) {
-		run = ({ scriptFile: this._scriptFile, scriptSource: this._scriptSource, scriptArgs: this._scriptArgs });
+		content.run = ({ scriptFile: this._scriptFile, scriptSource: this._scriptSource, scriptArgs: this._scriptArgs });
 	}
-	return ({ stdout: this._stdout, stderr: this._stderr, file: this._file, run: run, statusCode: this._statusCode });
+	return content;
 };
 
 /**
@@ -5692,6 +6196,16 @@ CompilationServerPlatform.prototype.getContents$ = function () {
  * @param {!string} runEnv
  */
 CompilationServerPlatform.prototype.makeFileExecutable$SS = function (file, runEnv) {
+	this._executableFile[file] = runEnv;
+};
+
+/**
+ * @param {*} arg
+ * @return {!number}
+ */
+CompilationServerPlatform.prototype.runCompilationServer$X = function (arg) {
+	this.error$S('--compilation-server is not supported');
+	return 1;
 };
 
 /**
@@ -5713,7 +6227,7 @@ JSXCommand$.prototype = new JSXCommand;
  * @return {!string}
  */
 JSXCommand.help$ = function () {
-	return "JSX compiler version " + Meta.VERSION_STRING + "\n" + "\n" + "Usage: jsx [options] source-files\n" + "\n" + "Options:\n" + "  --add-search-path path     adds a path to library search paths\n" + "  --executable RUNENV        adds launcher to call _Main.main(:string[]):void\n" + "                             supported RUNENV is node, commonjs and web.\n" + "  --run                      runs _Main.main(:string[]):void after compiling\n" + "  --test                     runs _Test#test*():void after compiling\n" + "  --output file              output file (default:stdout)\n" + "  --input-filename file      names input filename\n" + "  --mode (compile|parse|doc) specifies compilation mode (default:compile)\n" + "  --target (javascript|c++)  specifies target language (default:javascript)\n" + "  --release                  disables run-time type checking and enables optimizations (" + Optimizer$getReleaseOptimizationCommands$().join(",") + ")\n" + "  --profile                  enables the profiler (experimental)\n" + "  --optimize cmd1,cmd2,...   enables optimization commands\n" + "  --warn type1,type2,...     enables warnings (all, deprecated, none)\n" + "  --disable-type-check       disables run-time type checking\n" + "  --enable-source-map        enables source map debugging info\n" + "  --version                  displays the version and compiler identifier and exits\n" + "  --version-number           displays the version as number and exits\n" + "  --help                     displays this help and exits\n" + "\n" + "Env:\n" + "  JSX_OPTS   options of jsx(1)\n" + "  JSX_RUNJS  JavaScript engine used by --run and --test\n" + "";
+	return "JSX compiler version " + Meta.VERSION_STRING + "\n" + "\n" + "Usage: jsx [options] source-files\n" + "\n" + "Options:\n" + "  --add-search-path path     adds a path to library search paths\n" + "  --executable RUNENV        adds launcher to call _Main.main(:string[]):void\n" + "                             supported RUNENV is node, commonjs and web.\n" + "  --run                      runs _Main.main(:string[]):void after compiling\n" + "  --test                     runs _Test#test*():void after compiling\n" + "  --output file              output file (default:stdout)\n" + "  --input-filename file      names input filename\n" + "  --mode (compile|parse|doc) specifies compilation mode (default:compile)\n" + "  --target (javascript|c++)  specifies target language (default:javascript)\n" + "  --release                  disables run-time type checking and enables optimizations (" + Optimizer$getReleaseOptimizationCommands$().join(",") + ")\n" + "  --profile                  enables the profiler (experimental)\n" + "  --optimize cmd1,cmd2,...   enables optimization commands\n" + "  --warn type1,type2,...     enables warnings (all, deprecated, none)\n" + "  --disable-type-check       disables run-time type checking\n" + "  --enable-source-map        enables source map debugging info\n" + "  --complete line:column     shows code completion at line:column\n" + "  --version                  displays the version and compiler identifier and exits\n" + "  --version-number           displays the version as number and exits\n" + "  --help                     displays this help and exits\n" + "\n" + "Env:\n" + "  JSX_OPTS   options of jsx(1)\n" + "  JSX_RUNJS  JavaScript engine used by --run and --test\n" + "";
 };
 
 var JSXCommand$help$ = JSXCommand.help$;
@@ -5768,6 +6282,10 @@ JSXCommand.main$LPlatform$AS = function (platform, args) {
 	var result;
 	/** @type {!string} */
 	var output;
+	/** @type {Object.<string, undefined|!string>} */
+	var map;
+	/** @type {!string} */
+	var filename;
 	argIndex = 0;
 	getopt = (function () {
 		/** @type {undefined|!string} */
@@ -5822,6 +6340,12 @@ JSXCommand.main$LPlatform$AS = function (platform, args) {
 			if ((inputFilename = getoptarg()) == null) {
 				return 1;
 			}
+			break;
+		case "--working-dir":
+			if ((optarg = getoptarg()) == null) {
+				return 1;
+			}
+			platform.setWorkingDir$S(optarg);
 			break;
 		case "--mode":
 			if ((optarg = getoptarg()) == null) {
@@ -6005,7 +6529,7 @@ JSXCommand.main$LPlatform$AS = function (platform, args) {
 	switch (compiler.getMode$()) {
 	case Compiler.MODE_PARSE:
 		if (compiler.compile$()) {
-			platform.save$USS(outputFile, compiler.getAST$() + "");
+			platform.save$USS(outputFile, JSON.stringify(compiler.getAST$()));
 			return 0;
 		} else {
 			return 1;
@@ -6022,9 +6546,21 @@ JSXCommand.main$LPlatform$AS = function (platform, args) {
 			return 1;
 		}
 		if (compiler.compile$()) {
-			new DocumentGenerator$LCompiler$(compiler).setOutputPath$S(outputFile).setPathFilter$F$SB$((function (sourcePath) {
-				return ! (sourcePath.match(/^(?:system:|\/)/) || sourcePath.match(/\/..\//));
-			})).setTemplatePath$S(platform.getRoot$() + "/src/doc/template.html").buildDoc$();
+			new DocumentGenerator$LCompiler$SS(compiler, platform.getRoot$() + "/src/doc", outputFile).setResourceFiles$AS([ "style.css" ]).setPathFilter$F$SB$((function (sourcePath) {
+				if (sourcePath.indexOf("system:") === 0) {
+					return false;
+				}
+				if (sourcePath.charAt(0) === "/") {
+					return false;
+				}
+				if (sourcePath.indexOf("../") === 0) {
+					return false;
+				}
+				if (sourcePath.indexOf("/../") !== - 1) {
+					return false;
+				}
+				return true;
+			})).buildDoc$();
 			return 0;
 		} else {
 			return 1;
@@ -6034,7 +6570,7 @@ JSXCommand.main$LPlatform$AS = function (platform, args) {
 	err = optimizer.setup$AS(optimizeCommands);
 	if (err != null) {
 		platform.error$S(err);
-		return 0;
+		return 1;
 	}
 	tasks.forEach((function (proc) {
 		proc();
@@ -6054,7 +6590,10 @@ JSXCommand.main$LPlatform$AS = function (platform, args) {
 		if (! runImmediately) {
 			platform.save$USS(outputFile, output);
 			if (outputFile != null) {
-				emitter.saveSourceMappingFile$LPlatform$(platform);
+				map = emitter.getSourceMappingFiles$();
+				for (filename in map) {
+					platform.save$USS(filename, map[filename]);
+				}
 				if (executable != null) {
 					platform.makeFileExecutable$SS(outputFile, executable);
 				}
@@ -7261,7 +7800,7 @@ function NullableType$LType$(type) {
 	Type$.call(this);
 	this._baseType = null;
 	if (type.equals$LType$(Type.variantType)) {
-		throw new Error("logic error, cannot create Nullable.<variant>");
+		throw new Error("logic flaw, cannot create Nullable.<variant>");
 	}
 	this._baseType = (type instanceof NullableType ? type._baseType : type);
 };
@@ -7534,8 +8073,14 @@ ParsedObjectType.prototype.getTypeArguments$ = function () {
  * @return {Type}
  */
 ParsedObjectType.prototype.instantiate$LInstantiationContext$ = function (instantiationContext) {
+	/** @type {ParsedObjectType} */
+	var enclosingType;
 	/** @type {Type} */
 	var actualType;
+	/** @type {QualifiedName} */
+	var qualifiedName;
+	/** @type {ParsedObjectType} */
+	var actualEnclosingType;
 	/** @type {Array.<undefined|Type>} */
 	var typeArgs;
 	/** @type {!number} */
@@ -7544,7 +8089,8 @@ ParsedObjectType.prototype.instantiate$LInstantiationContext$ = function (instan
 	var templateClassName;
 	/** @type {ParsedObjectType} */
 	var objectType;
-	if (this._typeArguments.length === 0) {
+	enclosingType = this._qualifiedName.getEnclosingType$();
+	if (enclosingType == null && this._typeArguments.length === 0) {
 		actualType = instantiationContext.typemap[this._qualifiedName.getToken$().getValue$()];
 		if (actualType != null) {
 			return actualType;
@@ -7553,6 +8099,13 @@ ParsedObjectType.prototype.instantiate$LInstantiationContext$ = function (instan
 			instantiationContext.objectTypesUsed.push(this);
 		}
 		return this;
+	}
+	qualifiedName = this._qualifiedName;
+	if (enclosingType != null) {
+		actualEnclosingType = this._qualifiedName.getEnclosingType$().instantiate$LInstantiationContext$(instantiationContext);
+		if (! this._qualifiedName.getEnclosingType$().equals$LType$(actualEnclosingType)) {
+			qualifiedName = new QualifiedName$LToken$LParsedObjectType$(this._qualifiedName.getToken$(), actualEnclosingType);
+		}
 	}
 	typeArgs = [];
 	for (i = 0; i < this._typeArguments.length; ++ i) {
@@ -7563,13 +8116,13 @@ ParsedObjectType.prototype.instantiate$LInstantiationContext$ = function (instan
 		}
 		typeArgs[i] = (actualType != null ? actualType : this._typeArguments[i]);
 		if (typeArgs[i] instanceof NullableType) {
-			templateClassName = this._qualifiedName.getToken$().getValue$();
+			templateClassName = qualifiedName.getToken$().getValue$();
 			if (templateClassName === "Array" || templateClassName === "Map") {
 				typeArgs[i] = typeArgs[i].getBaseType$();
 			}
 		}
 	}
-	objectType = new ParsedObjectType$LQualifiedName$ALType$(this._qualifiedName, typeArgs);
+	objectType = new ParsedObjectType$LQualifiedName$ALType$(qualifiedName, typeArgs);
 	instantiationContext.objectTypesUsed.push(objectType);
 	return objectType;
 };
@@ -8619,14 +9172,40 @@ function QualifiedName() {
 /**
  * @constructor
  * @param {Token} token
+ */
+function QualifiedName$LToken$(token) {
+	this._token = token;
+	this._import = null;
+	this._enclosingType = null;
+};
+
+QualifiedName$LToken$.prototype = new QualifiedName;
+
+/**
+ * @constructor
+ * @param {Token} token
  * @param {Import} imprt
  */
 function QualifiedName$LToken$LImport$(token, imprt) {
 	this._token = token;
 	this._import = imprt;
+	this._enclosingType = null;
 };
 
 QualifiedName$LToken$LImport$.prototype = new QualifiedName;
+
+/**
+ * @constructor
+ * @param {Token} token
+ * @param {ParsedObjectType} enclosingType
+ */
+function QualifiedName$LToken$LParsedObjectType$(token, enclosingType) {
+	this._token = token;
+	this._import = null;
+	this._enclosingType = enclosingType;
+};
+
+QualifiedName$LToken$LParsedObjectType$.prototype = new QualifiedName;
 
 /**
  * @return {Token}
@@ -8643,10 +9222,17 @@ QualifiedName.prototype.getImport$ = function () {
 };
 
 /**
+ * @return {ParsedObjectType}
+ */
+QualifiedName.prototype.getEnclosingType$ = function () {
+	return this._enclosingType;
+};
+
+/**
  * @return {*}
  */
 QualifiedName.prototype.serialize$ = function () {
-	return [ "QualifiedName", this._token.serialize$(), Serializer$Import$E$serializeNullable$LImport$(this._import) ];
+	return [ "QualifiedName", this._token.serialize$(), Serializer$Import$E$serializeNullable$LImport$(this._import), Serializer$ParsedObjectType$E$serializeNullable$LParsedObjectType$(this._enclosingType) ];
 };
 
 /**
@@ -8662,6 +9248,15 @@ QualifiedName.prototype.equals$LQualifiedName$ = function (x) {
 	}
 	if (this._import != x._import) {
 		return false;
+	}
+	if (this._enclosingType == null) {
+		if (x._enclosingType != null) {
+			return false;
+		}
+	} else {
+		if (! this._enclosingType.equals$LType$(x._enclosingType)) {
+			return false;
+		}
 	}
 	return true;
 };
@@ -8679,6 +9274,8 @@ QualifiedName.prototype.getClass$LAnalysisContext$ALType$ = function (context, t
 	var classDefs;
 	/** @type {Array.<undefined|*>} */
 	var callbacks;
+	/** @type {ClassDefinition} */
+	var enclosingClassDef;
 	classDef = null;
 	if (this._import != null) {
 		if (typeArguments.length === 0) {
@@ -8688,7 +9285,7 @@ QualifiedName.prototype.getClass$LAnalysisContext$ALType$ = function (context, t
 				classDef = classDefs[0];
 				break;
 			case 0:
-				context.errors.push(new CompileError$LToken$S(this._token, "no definition for class '" + this._token.getValue$() + "' in file '" + this._import.getFilenameToken$().getValue$() + "'"));
+				context.errors.push(new CompileError$LToken$S(this._token, "no definition for class '" + this.toString() + "' in file '" + this._import.getFilenameToken$().getValue$() + "'"));
 				return null;
 			default:
 				context.errors.push(new CompileError$LToken$S(this._token, "multiple candidates"));
@@ -8702,7 +9299,7 @@ QualifiedName.prototype.getClass$LAnalysisContext$ALType$ = function (context, t
 			case 1:
 				return callbacks[0](null, null, null);
 			case 0:
-				context.errors.push(new CompileError$LToken$S(this._token, "not definition for template class '" + this._token.getValue$() + "' in file '" + this._import.getFilenameToken$().getValue$() + "'"));
+				context.errors.push(new CompileError$LToken$S(this._token, "no definition for template class '" + this.toString() + "' in file '" + this._import.getFilenameToken$().getValue$() + "'"));
 				return null;
 			default:
 				context.errors.push(new CompileError$LToken$S(this._token, "multiple canditates"));
@@ -8710,17 +9307,37 @@ QualifiedName.prototype.getClass$LAnalysisContext$ALType$ = function (context, t
 			}
 		}
 	} else {
-		if (typeArguments.length === 0) {
-			if ((classDef = context.parser.lookup$ALCompileError$LToken$S(context.errors, this._token, this._token.getValue$())) == null) {
-				context.errors.push(new CompileError$LToken$S(this._token, "no class definition for '" + this._token.getValue$() + "'"));
+		if (this._enclosingType != null) {
+			this._enclosingType.resolveType$LAnalysisContext$(context);
+			if ((enclosingClassDef = this._enclosingType.getClassDef$()) == null) {
 				return null;
 			}
+			if (typeArguments.length === 0) {
+				if ((classDef = enclosingClassDef.lookupInnerClass$S(this._token.getValue$())) == null) {
+					context.errors.push(new CompileError$LToken$S(this._token, "no class definition for '" + this.toString() + "'"));
+					return null;
+				}
+			} else {
+				if ((classDef = enclosingClassDef.lookupTemplateInnerClass$ALCompileError$LTemplateInstantiationRequest$F$LParser$LClassDefinition$LClassDefinition$$(context.errors, new TemplateInstantiationRequest$LToken$SALType$(this._token, this._token.getValue$(), typeArguments), (function (parser, classDef) {
+					return null;
+				}))) == null) {
+					context.errors.push(new CompileError$LToken$S(this._token, "failed to instantiate class"));
+					return null;
+				}
+			}
 		} else {
-			if ((classDef = context.parser.lookupTemplate$ALCompileError$LTemplateInstantiationRequest$F$LParser$LClassDefinition$LClassDefinition$$(context.errors, new TemplateInstantiationRequest$LToken$SALType$(this._token, this._token.getValue$(), typeArguments), (function (parser, classDef) {
-				return null;
-			}))) == null) {
-				context.errors.push(new CompileError$LToken$S(this._token, "failed to instantiate class"));
-				return null;
+			if (typeArguments.length === 0) {
+				if ((classDef = context.parser.lookup$ALCompileError$LToken$S(context.errors, this._token, this._token.getValue$())) == null) {
+					context.errors.push(new CompileError$LToken$S(this._token, "no class definition for '" + this.toString() + "'"));
+					return null;
+				}
+			} else {
+				if ((classDef = context.parser.lookupTemplate$ALCompileError$LTemplateInstantiationRequest$F$LParser$LClassDefinition$LClassDefinition$$(context.errors, new TemplateInstantiationRequest$LToken$SALType$(this._token, this._token.getValue$(), typeArguments), (function (parser, classDef) {
+					return null;
+				}))) == null) {
+					context.errors.push(new CompileError$LToken$S(this._token, "failed to instantiate class"));
+					return null;
+				}
 			}
 		}
 	}
@@ -8761,6 +9378,13 @@ QualifiedName.prototype.getTemplateClass$LParser$ = function (parser) {
 };
 
 /**
+ * @return {!string}
+ */
+QualifiedName.prototype.toString = function () {
+	return (this._enclosingType != null ? this._enclosingType.toString() + "." + this._token.getValue$() : this._token.getValue$());
+};
+
+/**
  * class ParserState extends Object
  * @constructor
  */
@@ -8790,6 +9414,39 @@ function ParserState$NNLDocComment$NNNNN(lineNumber, columnNumber, docComment, t
 };
 
 ParserState$NNLDocComment$NNNNN.prototype = new ParserState;
+
+/**
+ * class ClassState extends Object
+ * @constructor
+ */
+function ClassState() {
+}
+
+/**
+ * @constructor
+ * @param {ClassState} outer
+ * @param {ParsedObjectType} classType
+ * @param {Array.<undefined|Token>} typeArgs
+ * @param {ParsedObjectType} extendType
+ * @param {Array.<undefined|ParsedObjectType>} implementTypes
+ * @param {Array.<undefined|ParsedObjectType>} objectTypesUsed
+ * @param {!number} classFlags
+ * @param {Array.<undefined|ClassDefinition>} inners
+ * @param {Array.<undefined|TemplateClassDefinition>} templateInners
+ */
+function ClassState$LClassState$LParsedObjectType$ALToken$LParsedObjectType$ALParsedObjectType$ALParsedObjectType$NALClassDefinition$ALTemplateClassDefinition$(outer, classType, typeArgs, extendType, implementTypes, objectTypesUsed, classFlags, inners, templateInners) {
+	this.outer = outer;
+	this.classType = classType;
+	this.typeArgs = typeArgs;
+	this.extendType = extendType;
+	this.implementTypes = implementTypes;
+	this.objectTypesUsed = objectTypesUsed;
+	this.classFlags = classFlags;
+	this.inners = inners;
+	this.templateInners = templateInners;
+};
+
+ClassState$LClassState$LParsedObjectType$ALToken$LParsedObjectType$ALParsedObjectType$ALParsedObjectType$NALClassDefinition$ALTemplateClassDefinition$.prototype = new ClassState;
 
 /**
  * class Scope extends Object
@@ -8846,10 +9503,13 @@ function Parser$LToken$SLCompletionRequest$(sourceToken, filename, completionReq
 	this._locals = null;
 	this._statements = null;
 	this._closures = null;
+	this._outerClass = null;
 	this._classType = null;
 	this._extendType = null;
 	this._implementTypes = null;
 	this._objectTypesUsed = null;
+	this._inners = null;
+	this._templateInners = null;
 	this._templateInstantiationRequests = null;
 	this._prevScope = null;
 	this._funcName = null;
@@ -8898,6 +9558,8 @@ Parser.prototype.parse$SALCompileError$ = function (input, errors) {
 	this._extendType = null;
 	this._implementTypes = null;
 	this._objectTypesUsed = [];
+	this._inners = [];
+	this._templateInners = [];
 	this._templateInstantiationRequests = [];
 	while (! this._isEOF$()) {
 		importToken = this._expectOpt$S("import");
@@ -8907,7 +9569,7 @@ Parser.prototype.parse$SALCompileError$ = function (input, errors) {
 		this._importStatement$LToken$(importToken);
 	}
 	while (! this._isEOF$()) {
-		if (! this._classDefinition$()) {
+		if (this._classDefinition$() == null) {
 			return false;
 		}
 	}
@@ -9112,7 +9774,7 @@ Parser.prototype.createGetTemplateClassCallback$ALCompileError$LTemplateInstanti
 			return (function (_, __, ___) {
 				/** @type {InstantiatedClassDefinition} */
 				var classDef;
-				classDef = templateDef.instantiate$ALCompileError$LTemplateInstantiationRequest$(errors, request);
+				classDef = templateDef.instantiateTemplateClass$ALCompileError$LTemplateInstantiationRequest$(errors, request);
 				if (classDef == null) {
 					return null;
 				}
@@ -9125,6 +9787,26 @@ Parser.prototype.createGetTemplateClassCallback$ALCompileError$LTemplateInstanti
 		}
 	}
 	return null;
+};
+
+/**
+ */
+Parser.prototype._pushClassState$ = function () {
+	this._outerClass = new ClassState$LClassState$LParsedObjectType$ALToken$LParsedObjectType$ALParsedObjectType$ALParsedObjectType$NALClassDefinition$ALTemplateClassDefinition$(this._outerClass, this._classType, this._typeArgs, this._extendType, this._implementTypes, this._objectTypesUsed, this._classFlags, this._inners, this._templateInners);
+};
+
+/**
+ */
+Parser.prototype._popClassState$ = function () {
+	this._classType = this._outerClass.classType;
+	this._typeArgs = this._outerClass.typeArgs;
+	this._extendType = this._outerClass.extendType;
+	this._implementTypes = this._outerClass.implementTypes;
+	this._objectTypesUsed = this._outerClass.objectTypesUsed;
+	this._classFlags = this._outerClass.classFlags;
+	this._inners = this._outerClass.inners;
+	this._templateInners = this._outerClass.templateInners;
+	this._outerClass = this._outerClass.outer;
 };
 
 /**
@@ -9695,62 +10377,6 @@ Parser.prototype._skipStatement$ = function () {
 };
 
 /**
- * @param {!boolean} allowSuper
- * @param {*} autoCompleteMatchCb
- * @return {QualifiedName}
- */
-Parser.prototype._qualifiedName$BF$LClassDefinition$B$ = function (allowSuper, autoCompleteMatchCb) {
-	var $this = this;
-	/** @type {Token} */
-	var token;
-	if (allowSuper) {
-		token = this._expectOpt$S("super");
-		if (token != null) {
-			return new QualifiedName$LToken$LImport$(token, null);
-		}
-	}
-	if ((token = this._expectIdentifier$F$LParser$LCompletionCandidates$$((function (self) {
-		return self._getCompletionCandidatesOfTopLevel$F$LClassDefinition$B$(autoCompleteMatchCb);
-	}))) == null) {
-		return null;
-	}
-	return this._qualifiedNameStartingWith$LToken$F$LClassDefinition$B$(token, autoCompleteMatchCb);
-};
-
-/**
- * @param {Token} token
- * @param {*} autoCompleteMatchCb
- * @return {QualifiedName}
- */
-Parser.prototype._qualifiedNameStartingWith$LToken$F$LClassDefinition$B$ = function (token, autoCompleteMatchCb) {
-	var $this = this;
-	/** @type {Import} */
-	var imprt;
-	if (token.getValue$() === "variant") {
-		this._errors.push(new CompileError$LToken$S(token, "cannot use 'variant' as a class name"));
-		return null;
-	} else {
-		if (token.getValue$() === "Nullable" || token.getValue$() === "MayBeUndefined") {
-			this._errors.push(new CompileError$LToken$S(token, "cannot use 'Nullable' (or MayBeUndefined) as a class name"));
-			return null;
-		}
-	}
-	imprt = this.lookupImportAlias$S(token.getValue$());
-	if (imprt != null) {
-		if (this._expect$S(".") == null) {
-			return null;
-		}
-		token = this._expectIdentifier$F$LParser$LCompletionCandidates$$((function (self) {
-			return self._getCompletionCandidatesOfNamespace$LImport$F$LClassDefinition$B$(imprt, autoCompleteMatchCb);
-		}));
-		if (token == null) {
-			return null;
-		}
-	}
-	return new QualifiedName$LToken$LImport$(token, imprt);
-};
-
-/**
  * @param {Token} importToken
  * @return {!boolean}
  */
@@ -9842,6 +10468,31 @@ Parser.prototype._importStatement$LToken$ = function (importToken) {
 /**
  * @return {!boolean}
  */
+Parser.prototype._expectClassDefOpt$ = function () {
+	/** @type {ParserState} */
+	var state;
+	/** @type {Token} */
+	var token;
+	state = this._preserveState$();
+	try {
+		while (true) {
+			token = this._expectOpt$AS([ "class", "interface", "mixin", "abstract", "final" ]);
+			if (token == null) {
+				return false;
+			}
+			if (token.getValue$() === "class" || token.getValue$() === "interface" || token.getValue$() === "mixin") {
+				return true;
+			}
+		}
+	} finally {
+		this._restoreState$LParserState$(state);
+	}
+	return true;
+};
+
+/**
+ * @return {ClassDefinition}
+ */
 Parser.prototype._classDefinition$ = function () {
 	var $this = this;
 	/** @type {DocComment} */
@@ -9862,18 +10513,22 @@ Parser.prototype._classDefinition$ = function () {
 	var member;
 	/** @type {!number} */
 	var i;
+	/** @type {TemplateClassDefinition} */
+	var templateClassDef;
 	/** @type {ClassDefinition} */
 	var classDef;
 	this._classType = null;
 	this._extendType = null;
 	this._implementTypes = [];
 	this._objectTypesUsed = [];
+	this._inners = [];
+	this._templateInners = [];
 	this._classFlags = 0;
 	docComment = null;
 	while (true) {
 		token = this._expect$AS([ "class", "interface", "mixin", "abstract", "final", "native", "__fake__" ]);
 		if (token == null) {
-			return false;
+			return null;
 		}
 		if (this._classFlags === 0) {
 			docComment = this._docComment;
@@ -9884,7 +10539,7 @@ Parser.prototype._classDefinition$ = function () {
 		if (token.getValue$() === "interface") {
 			if ((this._classFlags & (ClassDefinition.IS_FINAL | ClassDefinition.IS_NATIVE)) !== 0) {
 				this._newError$S("interface cannot have final or native attribute set");
-				return false;
+				return null;
 			}
 			this._classFlags |= ClassDefinition.IS_INTERFACE;
 			break;
@@ -9892,7 +10547,7 @@ Parser.prototype._classDefinition$ = function () {
 		if (token.getValue$() === "mixin") {
 			if ((this._classFlags & (ClassDefinition.IS_FINAL | ClassDefinition.IS_NATIVE)) !== 0) {
 				this._newError$S("mixin cannot have final or native attribute set");
-				return false;
+				return null;
 			}
 			this._classFlags |= ClassDefinition.IS_MIXIN;
 			break;
@@ -9916,29 +10571,29 @@ Parser.prototype._classDefinition$ = function () {
 		}
 		if ((this._classFlags & newFlag) !== 0) {
 			this._newError$S("same attribute cannot be specified more than once");
-			return false;
+			return null;
 		}
 		this._classFlags |= newFlag;
 	}
 	className = this._expectIdentifier$F$LParser$LCompletionCandidates$$(null);
 	if (className == null) {
-		return false;
+		return null;
 	}
 	if ((this._typeArgs = this._formalTypeArguments$()) == null) {
-		return false;
+		return null;
 	}
-	this._classType = new ParsedObjectType$LQualifiedName$ALType$(new QualifiedName$LToken$LImport$(className, null), this._typeArgs.map((function (token) {
-		return new ParsedObjectType$LQualifiedName$ALType$(new QualifiedName$LToken$LImport$(token, null), []);
+	this._classType = new ParsedObjectType$LQualifiedName$ALType$(new QualifiedName$LToken$LParsedObjectType$(className, this._outerClass != null ? this._outerClass.classType : null), this._typeArgs.map((function (token) {
+		return new ParsedObjectType$LQualifiedName$ALType$(new QualifiedName$LToken$(token), []);
 	})));
 	this._objectTypesUsed.push(this._classType);
 	if ((this._classFlags & (ClassDefinition.IS_INTERFACE | ClassDefinition.IS_MIXIN)) === 0) {
 		if (this._expectOpt$S("extends") != null) {
-			this._extendType = this._objectTypeDeclaration$LToken$F$LClassDefinition$B$(null, (function (classDef) {
+			this._extendType = this._objectTypeDeclaration$LToken$BF$LClassDefinition$B$(null, true, (function (classDef) {
 				return (classDef.flags$() & (ClassDefinition.IS_MIXIN | ClassDefinition.IS_INTERFACE | ClassDefinition.IS_FINAL)) === 0;
 			}));
 		}
 		if (this._extendType == null && className.getValue$() !== "Object") {
-			this._extendType = new ParsedObjectType$LQualifiedName$ALType$(new QualifiedName$LToken$LImport$(new Token$SB("Object", true), null), []);
+			this._extendType = new ParsedObjectType$LQualifiedName$ALType$(new QualifiedName$LToken$(new Token$SB("Object", true)), []);
 			this._objectTypesUsed.push(this._extendType);
 		}
 	} else {
@@ -9949,7 +10604,7 @@ Parser.prototype._classDefinition$ = function () {
 	}
 	if (this._expectOpt$S("implements") != null) {
 		do {
-			implementType = this._objectTypeDeclaration$LToken$F$LClassDefinition$B$(null, (function (classDef) {
+			implementType = this._objectTypeDeclaration$LToken$BF$LClassDefinition$B$(null, true, (function (classDef) {
 				return (classDef.flags$() & (ClassDefinition.IS_MIXIN | ClassDefinition.IS_INTERFACE)) !== 0;
 			}));
 			if (implementType != null) {
@@ -9958,13 +10613,21 @@ Parser.prototype._classDefinition$ = function () {
 		} while (this._expectOpt$S(",") != null);
 	}
 	if (this._expect$S("{") == null) {
-		return false;
+		return null;
 	}
 	members = [];
 	success = true;
 	while (this._expectOpt$S("}") == null) {
 		if (! this._expectIsNotEOF$()) {
 			break;
+		}
+		if (this._expectClassDefOpt$()) {
+			this._pushClassState$();
+			if (this._classDefinition$() == null) {
+				this._skipStatement$();
+			}
+			this._popClassState$();
+			continue;
 		}
 		member = this._memberDefinition$();
 		if (member != null) {
@@ -9992,37 +10655,64 @@ Parser.prototype._classDefinition$ = function () {
 		this._errors.push(new CompileError$LToken$S(className, "cannot re-define a built-in class"));
 		success = false;
 	} else {
-		for (i = 0; i < this._imports.length; ++ i) {
-			if (! this._imports[i].checkNameConflict$ALCompileError$LToken$(this._errors, className)) {
-				success = false;
+		if (this._outerClass != null) {
+			for (i = 0; i < this._outerClass.inners.length; ++ i) {
+				if (this._outerClass.inners[i].className$() === className.getValue$()) {
+					this._errors.push(new CompileError$LToken$S(className, "a non-template inner class with the same name has been already declared"));
+					success = false;
+					break;
+				}
 			}
-		}
-		for (i = 0; i < this._classDefs.length; ++ i) {
-			if (this._classDefs[i].className$() === className.getValue$()) {
-				this._errors.push(new CompileError$LToken$S(className, "a non-template class with the same name has been already declared"));
-				success = false;
-				break;
+			for (i = 0; i < this._outerClass.templateInners.length; ++ i) {
+				if (this._outerClass.templateInners[i].className$() === className.getValue$()) {
+					this._errors.push(new CompileError$LToken$S(className, "a non-template inner class with the same name has been already declared"));
+					success = false;
+					break;
+				}
 			}
-		}
-		for (i = 0; i < this._templateClassDefs.length; ++ i) {
-			if (this._templateClassDefs[i].className$() === className.getValue$()) {
-				this._errors.push(new CompileError$LToken$S(className, "a template class with the name same has been already declared"));
-				success = false;
-				break;
+		} else {
+			for (i = 0; i < this._imports.length; ++ i) {
+				if (! this._imports[i].checkNameConflict$ALCompileError$LToken$(this._errors, className)) {
+					success = false;
+				}
+			}
+			for (i = 0; i < this._classDefs.length; ++ i) {
+				if (this._classDefs[i].className$() === className.getValue$()) {
+					this._errors.push(new CompileError$LToken$S(className, "a non-template class with the same name has been already declared"));
+					success = false;
+					break;
+				}
+			}
+			for (i = 0; i < this._templateClassDefs.length; ++ i) {
+				if (this._templateClassDefs[i].className$() === className.getValue$()) {
+					this._errors.push(new CompileError$LToken$S(className, "a template class with the name same has been already declared"));
+					success = false;
+					break;
+				}
 			}
 		}
 	}
 	if (! success) {
-		return false;
+		return null;
 	}
 	if (this._typeArgs.length !== 0) {
-		this._templateClassDefs.push(new TemplateClassDefinition$LToken$SNALToken$LParsedObjectType$ALParsedObjectType$ALMemberDefinition$ALParsedObjectType$LDocComment$(className, className.getValue$(), this._classFlags, this._typeArgs, this._extendType, this._implementTypes, members, this._objectTypesUsed, docComment));
+		templateClassDef = new TemplateClassDefinition$LToken$SNALToken$LParsedObjectType$ALParsedObjectType$ALMemberDefinition$ALClassDefinition$ALTemplateClassDefinition$ALParsedObjectType$LDocComment$(className, className.getValue$(), this._classFlags, this._typeArgs, this._extendType, this._implementTypes, members, this._inners, this._templateInners, this._objectTypesUsed, docComment);
+		if (this._outerClass != null) {
+			this._outerClass.templateInners.push(templateClassDef);
+		} else {
+			this._templateClassDefs.push(templateClassDef);
+		}
+		return templateClassDef;
 	} else {
-		classDef = new ClassDefinition$LToken$SNLParsedObjectType$ALParsedObjectType$ALMemberDefinition$ALParsedObjectType$LDocComment$(className, className.getValue$(), this._classFlags, this._extendType, this._implementTypes, members, this._objectTypesUsed, docComment);
-		this._classDefs.push(classDef);
+		classDef = new ClassDefinition$LToken$SNLParsedObjectType$ALParsedObjectType$ALMemberDefinition$ALClassDefinition$ALTemplateClassDefinition$ALParsedObjectType$LDocComment$(className, className.getValue$(), this._classFlags, this._extendType, this._implementTypes, members, this._inners, this._templateInners, this._objectTypesUsed, docComment);
+		if (this._outerClass != null) {
+			this._outerClass.inners.push(classDef);
+		} else {
+			this._classDefs.push(classDef);
+		}
 		classDef.setParser$LParser$(this);
+		return classDef;
 	}
-	return true;
 };
 
 /**
@@ -10439,7 +11129,7 @@ Parser.prototype._nullableTypeDeclaration$ = function () {
 	}
 	if (this._typeArgs != null) {
 		for (i = 0; i < this._typeArgs.length; ++ i) {
-			if (baseType.equals$LType$(new ParsedObjectType$LQualifiedName$ALType$(new QualifiedName$LToken$LImport$(this._typeArgs[i], null), []))) {
+			if (baseType.equals$LType$(new ParsedObjectType$LQualifiedName$ALType$(new QualifiedName$LToken$(this._typeArgs[i]), []))) {
 				return baseType.toNullableType$B(true);
 			}
 		}
@@ -10472,37 +11162,99 @@ Parser.prototype._primaryTypeDeclaration$ = function () {
 			throw new Error("logic flaw");
 		}
 	} else {
-		return this._objectTypeDeclaration$LToken$F$LClassDefinition$B$(null, null);
+		return this._objectTypeDeclaration$LToken$BF$LClassDefinition$B$(null, true, null);
 	}
 };
 
 /**
  * @param {Token} firstToken
+ * @param {!boolean} allowInner
  * @param {*} autoCompleteMatchCb
  * @return {ParsedObjectType}
  */
-Parser.prototype._objectTypeDeclaration$LToken$F$LClassDefinition$B$ = function (firstToken, autoCompleteMatchCb) {
+Parser.prototype._objectTypeDeclaration$LToken$BF$LClassDefinition$B$ = function (firstToken, allowInner, autoCompleteMatchCb) {
+	var $this = this;
+	/** @type {Token} */
+	var token;
+	/** @type {Import} */
+	var imprt;
 	/** @type {QualifiedName} */
 	var qualifiedName;
 	/** @type {Array.<undefined|Type>} */
 	var typeArgs;
 	/** @type {ParsedObjectType} */
 	var objectType;
-	qualifiedName = (firstToken != null ? this._qualifiedNameStartingWith$LToken$F$LClassDefinition$B$(firstToken, autoCompleteMatchCb) : this._qualifiedName$BF$LClassDefinition$B$(false, autoCompleteMatchCb));
-	if (qualifiedName == null) {
-		return null;
+	/** @type {ParsedObjectType} */
+	var enclosingType;
+	if (firstToken == null) {
+		if ((token = this._expectIdentifier$F$LParser$LCompletionCandidates$$((function (self) {
+			return self._getCompletionCandidatesOfTopLevel$F$LClassDefinition$B$(autoCompleteMatchCb);
+		}))) == null) {
+			return null;
+		}
+	} else {
+		token = firstToken;
 	}
-	typeArgs = this._actualTypeArguments$();
-	if (typeArgs == null) {
+	if (token.getValue$() === "variant") {
+		this._errors.push(new CompileError$LToken$S(token, "cannot use 'variant' as a class name"));
 		return null;
 	} else {
-		if (typeArgs.length !== 0) {
-			return this._templateTypeDeclaration$LQualifiedName$ALType$(qualifiedName, typeArgs);
-		} else {
-			objectType = new ParsedObjectType$LQualifiedName$ALType$(qualifiedName, []);
-			this._objectTypesUsed.push(objectType);
-			return objectType;
+		if (token.getValue$() === "Nullable" || token.getValue$() === "MayBeUndefined") {
+			this._errors.push(new CompileError$LToken$S(token, "cannot use 'Nullable' (or MayBeUndefined) as a class name"));
+			return null;
 		}
+	}
+	imprt = this.lookupImportAlias$S(token.getValue$());
+	if (imprt != null) {
+		if (this._expect$S(".") == null) {
+			return null;
+		}
+		token = this._expectIdentifier$F$LParser$LCompletionCandidates$$((function (self) {
+			return self._getCompletionCandidatesOfNamespace$LImport$F$LClassDefinition$B$(imprt, autoCompleteMatchCb);
+		}));
+		if (token == null) {
+			return null;
+		}
+	}
+	if (! allowInner) {
+		qualifiedName = new QualifiedName$LToken$LImport$(token, imprt);
+		typeArgs = this._actualTypeArguments$();
+		if (typeArgs == null) {
+			return null;
+		} else {
+			if (typeArgs.length !== 0) {
+				return this._templateTypeDeclaration$LQualifiedName$ALType$(qualifiedName, typeArgs);
+			} else {
+				objectType = new ParsedObjectType$LQualifiedName$ALType$(qualifiedName, []);
+				this._objectTypesUsed.push(objectType);
+				return objectType;
+			}
+		}
+	} else {
+		enclosingType = null;
+		while (true) {
+			qualifiedName = (enclosingType != null ? new QualifiedName$LToken$LParsedObjectType$(token, enclosingType) : new QualifiedName$LToken$LImport$(token, imprt));
+			typeArgs = this._actualTypeArguments$();
+			if (typeArgs == null) {
+				return null;
+			} else {
+				if (typeArgs.length !== 0) {
+					enclosingType = this._templateTypeDeclaration$LQualifiedName$ALType$(qualifiedName, typeArgs);
+				} else {
+					objectType = new ParsedObjectType$LQualifiedName$ALType$(qualifiedName, []);
+					this._objectTypesUsed.push(objectType);
+					enclosingType = objectType;
+				}
+			}
+			if (this._expectOpt$S(".") == null) {
+				break;
+			}
+			token = this._expectIdentifier$();
+			if (token == null) {
+				return null;
+			}
+		}
+		return enclosingType;
 	}
 };
 
@@ -10644,7 +11396,7 @@ Parser.prototype._functionTypeDeclaration$LType$ = function (objectType) {
 Parser.prototype._registerArrayTypeOf$LToken$LType$ = function (token, elementType) {
 	/** @type {ParsedObjectType} */
 	var arrayType;
-	arrayType = new ParsedObjectType$LQualifiedName$ALType$(new QualifiedName$LToken$LImport$(new Token$SB("Array", true), null), [ elementType ]);
+	arrayType = new ParsedObjectType$LQualifiedName$ALType$(new QualifiedName$LToken$(new Token$SB("Array", true)), [ elementType ]);
 	this._objectTypesUsed.push(arrayType);
 	return arrayType;
 };
@@ -10783,7 +11535,7 @@ Parser.prototype._constructorInvocationStatement$ = function () {
 		if ((token = this._expectOpt$S("this")) != null) {
 			classType = this._classType;
 		} else {
-			if ((classType = this._objectTypeDeclaration$LToken$F$LClassDefinition$B$(null, null)) == null) {
+			if ((classType = this._objectTypeDeclaration$LToken$BF$LClassDefinition$B$(null, true, null)) == null) {
 				return false;
 			}
 			token = classType.getToken$();
@@ -11979,7 +12731,7 @@ Parser.prototype._lambdaExpr$LToken$ = function (token) {
 		return null;
 	}
 	this._closures.push(funcDef);
-	return new FunctionExpression$LToken$LMemberFunctionDefinition$B(token, funcDef, false);
+	return new FunctionExpression$LToken$LLocalVariable$LMemberFunctionDefinition$B(token, null, funcDef, false);
 };
 
 /**
@@ -12097,7 +12849,7 @@ Parser.prototype._functionExpr$LToken$B = function (token, isStatement) {
 	funcDef = new MemberFunctionDefinition$LToken$LToken$NLType$ALArgumentDeclaration$ALLocalVariable$ALStatement$ALMemberFunctionDefinition$LToken$LDocComment$(token, name, ClassDefinition.IS_STATIC, returnType, args, this._locals, this._statements, this._closures, lastToken, null);
 	this._popScope$();
 	this._closures.push(funcDef);
-	return new FunctionExpression$LToken$LMemberFunctionDefinition$B(token, funcDef, isStatement);
+	return new FunctionExpression$LToken$LLocalVariable$LMemberFunctionDefinition$B(token, funcName, funcDef, isStatement);
 };
 
 /**
@@ -12204,7 +12956,7 @@ Parser.prototype._primaryExpr$ = function () {
 				if (local != null) {
 					return new LocalExpression$LToken$LLocalVariable$(token, local);
 				} else {
-					parsedType = this._objectTypeDeclaration$LToken$F$LClassDefinition$B$(token, null);
+					parsedType = this._objectTypeDeclaration$LToken$BF$LClassDefinition$B$(token, false, null);
 					if (parsedType == null) {
 						return null;
 					}
@@ -13317,7 +14069,7 @@ TemplateFunctionDefinition.prototype.instantiateTemplateFunction$ALCompileError$
 		instantiationContext.objectTypesUsed[i].resolveType$LAnalysisContext$(analysisContext);
 	}
 	instantiated.analyze$LAnalysisContext$(analysisContext);
-	this._instantiatedDefs.put$ALType$LMemberFunctionDefinition$(typeArgs.concat([]), instantiated);
+	this._instantiatedDefs.set$ALType$LMemberFunctionDefinition$(typeArgs.concat([]), instantiated);
 	return instantiated;
 };
 
@@ -13385,11 +14137,10 @@ MemberVariableDefinition.prototype.instantiate$LInstantiationContext$ = function
 	/** @type {Expression} */
 	var initialValue;
 	type = (this._type != null ? this._type.instantiate$LInstantiationContext$(instantiationContext) : null);
+	initialValue = null;
 	if (this._initialValue != null) {
 		initialValue = this._initialValue.clone$();
 		initialValue.instantiate$LInstantiationContext$(instantiationContext);
-	} else {
-		initialValue = Expression$getDefaultValueExpressionOf$LType$(type);
 	}
 	return new MemberVariableDefinition$LToken$LToken$NLType$LExpression$LDocComment$(this._token, this._nameToken, this._flags, type, initialValue, null);
 };
@@ -13504,17 +14255,15 @@ $__jsx_merge_interface(ClassDefinition, Stashable);
  * @param {ParsedObjectType} extendType
  * @param {Array.<undefined|ParsedObjectType>} implementTypes
  * @param {Array.<undefined|MemberDefinition>} members
+ * @param {Array.<undefined|ClassDefinition>} inners
+ * @param {Array.<undefined|TemplateClassDefinition>} templateInners
  * @param {Array.<undefined|ParsedObjectType>} objectTypesUsed
  * @param {DocComment} docComment
  */
-function ClassDefinition$LToken$SNLParsedObjectType$ALParsedObjectType$ALMemberDefinition$ALParsedObjectType$LDocComment$(token, className, flags, extendType, implementTypes, members, objectTypesUsed, docComment) {
-	var $this = this;
-	/** @type {!number} */
-	var i;
-	/** @type {*} */
-	var setClassDef;
+function ClassDefinition$LToken$SNLParsedObjectType$ALParsedObjectType$ALMemberDefinition$ALClassDefinition$ALTemplateClassDefinition$ALParsedObjectType$LDocComment$(token, className, flags, extendType, implementTypes, members, inners, templateInners, objectTypesUsed, docComment) {
 	Stashable$.call(this);
 	this._baseClassDef = null;
+	this._outerClassDef = null;
 	this._parser = null;
 	this._token = token;
 	this._className = className;
@@ -13523,21 +14272,14 @@ function ClassDefinition$LToken$SNLParsedObjectType$ALParsedObjectType$ALMemberD
 	this._extendType = extendType;
 	this._implementTypes = implementTypes;
 	this._members = members;
+	this._inners = inners;
+	this._templateInners = templateInners;
 	this._objectTypesUsed = objectTypesUsed;
 	this._docComment = docComment;
-	for (i = 0; i < this._members.length; ++ i) {
-		this._members[i].setClassDef$LClassDefinition$(this);
-		if (this._members[i] instanceof MemberFunctionDefinition) {
-			function setClassDef(funcDef) {
-				funcDef.setClassDef$LClassDefinition$($this);
-				return funcDef.forEachClosure$F$LMemberFunctionDefinition$B$(setClassDef);
-			};
-			this._members[i].forEachClosure$F$LMemberFunctionDefinition$B$(setClassDef);
-		}
-	}
+	this._resetMembersClassDef$();
 };
 
-ClassDefinition$LToken$SNLParsedObjectType$ALParsedObjectType$ALMemberDefinition$ALParsedObjectType$LDocComment$.prototype = new ClassDefinition;
+ClassDefinition$LToken$SNLParsedObjectType$ALParsedObjectType$ALMemberDefinition$ALClassDefinition$ALTemplateClassDefinition$ALParsedObjectType$LDocComment$.prototype = new ClassDefinition;
 
 /**
  * @return {*}
@@ -13548,7 +14290,7 @@ ClassDefinition.prototype.serialize$ = function () {
 
 /**
  * @param {Array.<undefined|ClassDefinition>} classDefs
- * @return {!string}
+ * @return {*}
  */
 ClassDefinition.serialize$ALClassDefinition$ = function (classDefs) {
 	/** @type {Array.<undefined|*>} */
@@ -13559,7 +14301,7 @@ ClassDefinition.serialize$ALClassDefinition$ = function (classDefs) {
 	for (i = 0; i < classDefs.length; ++ i) {
 		s[i] = classDefs[i].serialize$();
 	}
-	return JSON.stringify(s, null, 2);
+	return s;
 };
 
 var ClassDefinition$serialize$ALClassDefinition$ = ClassDefinition.serialize$ALClassDefinition$;
@@ -13590,6 +14332,13 @@ ClassDefinition.prototype.getToken$ = function () {
  */
 ClassDefinition.prototype.className$ = function () {
 	return this._className;
+};
+
+/**
+ * @return {!string}
+ */
+ClassDefinition.prototype.classFullName$ = function () {
+	return (this._outerClassDef != null ? this._outerClassDef.classFullName$() + "." + this._className : this.className$());
 };
 
 /**
@@ -13639,6 +14388,34 @@ ClassDefinition.prototype.implementTypes$ = function () {
  */
 ClassDefinition.prototype.members$ = function () {
 	return this._members;
+};
+
+/**
+ * @param {ClassDefinition} outer
+ */
+ClassDefinition.prototype.setOuterClassDef$LClassDefinition$ = function (outer) {
+	this._outerClassDef = outer;
+};
+
+/**
+ * @return {ClassDefinition}
+ */
+ClassDefinition.prototype.getOuterClassDef$ = function () {
+	return this._outerClassDef;
+};
+
+/**
+ * @return {Array.<undefined|ClassDefinition>}
+ */
+ClassDefinition.prototype.getInnerClasses$ = function () {
+	return this._inners;
+};
+
+/**
+ * @return {Array.<undefined|TemplateClassDefinition>}
+ */
+ClassDefinition.prototype.getTemplateInnerClasses$ = function () {
+	return this._templateInners;
 };
 
 /**
@@ -13751,6 +14528,48 @@ ClassDefinition.prototype.forEachMemberFunction$F$LMemberFunctionDefinition$B$ =
 };
 
 /**
+ * @param {*} cb
+ * @return {!boolean}
+ */
+ClassDefinition.prototype.forEachInnerClass$F$LClassDefinition$B$ = function (cb) {
+	/** @type {!number} */
+	var i;
+	for (i = 0; i < this._inners.length; ++ i) {
+		if (! cb(this._inners[i])) {
+			return false;
+		}
+	}
+	return true;
+};
+
+/**
+ */
+ClassDefinition.prototype._resetMembersClassDef$ = function () {
+	var $this = this;
+	/** @type {!number} */
+	var i;
+	/** @type {*} */
+	var setClassDef;
+	for (i = 0; i < this._members.length; ++ i) {
+		this._members[i].setClassDef$LClassDefinition$(this);
+		if (this._members[i] instanceof MemberFunctionDefinition) {
+			function setClassDef(funcDef) {
+				funcDef.setClassDef$LClassDefinition$($this);
+				return funcDef.forEachClosure$F$LMemberFunctionDefinition$B$(setClassDef);
+			};
+			this._members[i].forEachClosure$F$LMemberFunctionDefinition$B$(setClassDef);
+		}
+	}
+	for (i = 0; i < this._inners.length; ++ i) {
+		this._inners[i].setOuterClassDef$LClassDefinition$(this);
+		this._inners[i]._resetMembersClassDef$();
+	}
+	for (i = 0; i < this._templateInners.length; ++ i) {
+		this._templateInners[i].setOuterClassDef$LClassDefinition$(this);
+	}
+};
+
+/**
  * @param {Array.<undefined|CompileError>} errors
  * @param {Token} token
  * @param {!string} name
@@ -13841,6 +14660,141 @@ ClassDefinition.prototype.getMemberTypeByName$ALCompileError$LToken$SBALType$N =
 };
 
 /**
+ * @param {!string} className
+ * @return {ClassDefinition}
+ */
+ClassDefinition.prototype.lookupInnerClass$S = function (className) {
+	/** @type {!number} */
+	var i;
+	/** @type {ClassDefinition} */
+	var inner;
+	for (i = 0; i < this._inners.length; ++ i) {
+		inner = this._inners[i];
+		if (inner.className$() === className) {
+			return inner;
+		}
+	}
+	return null;
+};
+
+/**
+ * @param {Array.<undefined|CompileError>} errors
+ * @param {TemplateInstantiationRequest} request
+ * @param {*} postInstantiationCallback
+ * @return {ClassDefinition}
+ */
+ClassDefinition.prototype.lookupTemplateInnerClass$ALCompileError$LTemplateInstantiationRequest$F$LParser$LClassDefinition$LClassDefinition$$ = function (errors, request, postInstantiationCallback) {
+	/** @type {*} */
+	var instantiateCallback;
+	instantiateCallback = this.createGetTemplateClassCallback$ALCompileError$LTemplateInstantiationRequest$F$LParser$LClassDefinition$LClassDefinition$$(errors, request, postInstantiationCallback);
+	if (instantiateCallback != null) {
+		return instantiateCallback(errors, request, postInstantiationCallback);
+	}
+	return null;
+};
+
+/**
+ * @param {Array.<undefined|CompileError>} errors
+ * @param {TemplateInstantiationRequest} request
+ * @param {*} postInstantiationCallback
+ * @return {*}
+ */
+ClassDefinition.prototype.createGetTemplateClassCallback$ALCompileError$LTemplateInstantiationRequest$F$LParser$LClassDefinition$LClassDefinition$$ = function (errors, request, postInstantiationCallback) {
+	var $this = this;
+	/** @type {!number} */
+	var i;
+	/** @type {ClassDefinition} */
+	var classDef;
+	/** @type {TemplateClassDefinition} */
+	var templateDef;
+	for (i = 0; i < this._inners.length; ++ i) {
+		classDef = this._inners[i];
+		if (classDef instanceof InstantiatedClassDefinition && classDef.getTemplateClassName$() === request.getClassName$() && Util$typesAreEqual$ALType$ALType$(classDef.getTypeArguments$(), request.getTypeArguments$())) {
+			return (function (_, __, ___) {
+				return classDef;
+			});
+		}
+	}
+	for (i = 0; i < this._templateInners.length; ++ i) {
+		templateDef = this._templateInners[i];
+		if (templateDef.className$() === request.getClassName$()) {
+			return (function (_, __, ___) {
+				/** @type {InstantiatedClassDefinition} */
+				var classDef;
+				classDef = templateDef.instantiateTemplateClass$ALCompileError$LTemplateInstantiationRequest$(errors, request);
+				if (classDef == null) {
+					return null;
+				}
+				$this._inners.push(classDef);
+				classDef.setParser$LParser$($this._parser);
+				classDef.resolveTypes$LAnalysisContext$(new AnalysisContext$ALCompileError$LParser$F$LParser$LClassDefinition$LClassDefinition$$(errors, $this._parser, null));
+				postInstantiationCallback($this._parser, classDef);
+				return classDef;
+			});
+		}
+	}
+	return null;
+};
+
+/**
+ * @param {InstantiationContext} instantiationContext
+ * @return {ClassDefinition}
+ */
+ClassDefinition.prototype.instantiate$LInstantiationContext$ = function (instantiationContext) {
+	var $this = this;
+	/** @type {InstantiationContext} */
+	var context;
+	/** @type {!boolean} */
+	var succeeded;
+	/** @type {Array.<undefined|MemberDefinition>} */
+	var members;
+	/** @type {!number} */
+	var i;
+	/** @type {MemberDefinition} */
+	var member;
+	/** @type {Array.<undefined|ClassDefinition>} */
+	var inners;
+	/** @type {ClassDefinition} */
+	var inner;
+	/** @type {Array.<undefined|TemplateClassDefinition>} */
+	var templateInners;
+	/** @type {TemplateClassDefinition} */
+	var templateInner;
+	context = new InstantiationContext$ALCompileError$HLType$(instantiationContext.errors, instantiationContext.typemap);
+	succeeded = true;
+	members = [];
+	for (i = 0; i < this._members.length; ++ i) {
+		member = this._members[i].instantiate$LInstantiationContext$(context);
+		if (member == null) {
+			succeeded = false;
+		}
+		members[i] = member;
+	}
+	inners = [];
+	for (i = 0; i < this._inners.length; ++ i) {
+		inner = this._inners[i].instantiate$LInstantiationContext$(context);
+		if (inner == null) {
+			succeeded = false;
+		}
+		inners[i] = inner;
+	}
+	templateInners = [];
+	for (i = 0; i < this._templateInners.length; ++ i) {
+		templateInner = this._templateInners[i].instantiate$LInstantiationContext$(context);
+		if (templateInner == null) {
+			succeeded = false;
+		}
+		templateInners[i] = templateInner;
+	}
+	if (! succeeded) {
+		return null;
+	}
+	return new ClassDefinition$LToken$SNLParsedObjectType$ALParsedObjectType$ALMemberDefinition$ALClassDefinition$ALTemplateClassDefinition$ALParsedObjectType$LDocComment$(this._token, this._className, this._flags, this._extendType != null ? this._extendType.instantiate$LInstantiationContext$(context) : null, this._implementTypes.map((function (t) {
+		return t.instantiate$LInstantiationContext$(context);
+	})), members, inners, templateInners, context.objectTypesUsed, this._docComment);
+};
+
+/**
  * @param {AnalysisContext} context
  */
 ClassDefinition.prototype.resolveTypes$LAnalysisContext$ = function (context) {
@@ -13857,6 +14811,9 @@ ClassDefinition.prototype.resolveTypes$LAnalysisContext$ = function (context) {
 	var func;
 	for (i = 0; i < this._objectTypesUsed.length; ++ i) {
 		this._objectTypesUsed[i].resolveType$LAnalysisContext$(context);
+	}
+	for (i = 0; i < this._inners.length; ++ i) {
+		this._inners[i].resolveTypes$LAnalysisContext$(context);
 	}
 	if (this._extendType != null) {
 		baseClass = this._extendType.getClassDef$();
@@ -13897,6 +14854,39 @@ ClassDefinition.prototype.resolveTypes$LAnalysisContext$ = function (context) {
 		func.setClassDef$LClassDefinition$(this);
 		this._members.push(func);
 	}
+	this.forEachMemberFunction$F$LMemberFunctionDefinition$B$((function (funcDef) {
+		return funcDef.forEachStatement$F$LStatement$B$((function (statement) {
+			return statement.forEachExpression$F$LExpression$F$LExpression$V$B$((function onExpr(expr, replaceCb) {
+				/** @type {PropertyExpression} */
+				var propExpr;
+				/** @type {Token} */
+				var identifierToken;
+				/** @type {ParsedObjectType} */
+				var receiverType;
+				/** @type {ClassDefinition} */
+				var receiverClassDef;
+				expr.forEachExpression$F$LExpression$F$LExpression$V$B$(onExpr);
+				if (expr instanceof PropertyExpression && expr.getExpr$() instanceof ClassExpression) {
+					propExpr = expr;
+					identifierToken = propExpr.getIdentifierToken$();
+					receiverType = propExpr.getExpr$().getType$();
+					receiverClassDef = receiverType.getClassDef$();
+					receiverClassDef.forEachInnerClass$F$LClassDefinition$B$((function (classDef) {
+						/** @type {ParsedObjectType} */
+						var objectType;
+						if (classDef.className$() === identifierToken.getValue$()) {
+							objectType = new ParsedObjectType$LQualifiedName$ALType$(new QualifiedName$LToken$LParsedObjectType$(identifierToken, receiverType), propExpr.getTypeArguments$());
+							objectType.resolveType$LAnalysisContext$(context);
+							replaceCb(new ClassExpression$LToken$LType$(propExpr.getToken$(), objectType));
+							return false;
+						}
+						return true;
+					}));
+				}
+				return true;
+			}));
+		}));
+	}));
 };
 
 /**
@@ -13921,18 +14911,21 @@ ClassDefinition.prototype.setAnalysisContextOfVariables$LAnalysisContext$ = func
 ClassDefinition.prototype.analyze$LAnalysisContext$ = function (context) {
 	/** @type {Token} */
 	var token;
+	/** @type {!string} */
+	var srcPos;
 	try {
 		this._analyzeClassDef$LAnalysisContext$(context);
 	} catch ($__jsx_catch_0) {
 		if ($__jsx_catch_0 instanceof Error) {
 			token = this.getToken$();
-			console.error("fatal error while analyzing class " + this.className$());
+			srcPos = (token != null ? Util$format$SAS(" at file %1, line %2", [ token.getFilename$(), token.getLineNumber$() + "" ]) : "");
+			$__jsx_catch_0.message = Util$format$SAS("fatal error while analyzing class %1%2\n%3", [ this.className$(), srcPos, $__jsx_catch_0.message ]);
 			throw $__jsx_catch_0;
 		} else {
 			throw $__jsx_catch_0;
 		}
 	}
-	this._analyzeMemberFunctions$LAnalysisContext$(context);
+	this._analyzeMembers$LAnalysisContext$(context);
 };
 
 /**
@@ -14111,15 +15104,24 @@ ClassDefinition.prototype._analyzeClassDef$LAnalysisContext$ = function (context
 /**
  * @param {AnalysisContext} context
  */
-ClassDefinition.prototype._analyzeMemberFunctions$LAnalysisContext$ = function (context) {
+ClassDefinition.prototype._analyzeMembers$LAnalysisContext$ = function (context) {
 	/** @type {!number} */
 	var i;
 	/** @type {MemberDefinition} */
 	var member;
+	/** @type {MemberVariableDefinition} */
+	var varDef;
 	for (i = 0; i < this._members.length; ++ i) {
 		member = this._members[i];
-		if (member instanceof MemberFunctionDefinition && ! (member instanceof TemplateFunctionDefinition)) {
-			member.analyze$LAnalysisContext$(context);
+		if (member instanceof MemberFunctionDefinition) {
+			if (! (member instanceof TemplateFunctionDefinition)) {
+				member.analyze$LAnalysisContext$(context);
+			}
+		} else {
+			varDef = member;
+			if (varDef.getInitialValue$() == null) {
+				varDef.setInitialValue$LExpression$(Expression$getDefaultValueExpressionOf$LType$(varDef.getType$()));
+			}
 		}
 	}
 };
@@ -14443,15 +15445,17 @@ InstantiatedClassDefinition.prototype = new ClassDefinition;
  * @param {ParsedObjectType} extendType
  * @param {Array.<undefined|ParsedObjectType>} implementTypes
  * @param {Array.<undefined|MemberDefinition>} members
+ * @param {Array.<undefined|ClassDefinition>} inners
+ * @param {Array.<undefined|TemplateClassDefinition>} templateInners
  * @param {Array.<undefined|ParsedObjectType>} objectTypesUsed
  */
-function InstantiatedClassDefinition$LTemplateClassDefinition$ALType$LParsedObjectType$ALParsedObjectType$ALMemberDefinition$ALParsedObjectType$(templateClassDef, typeArguments, extendType, implementTypes, members, objectTypesUsed) {
-	ClassDefinition$LToken$SNLParsedObjectType$ALParsedObjectType$ALMemberDefinition$ALParsedObjectType$LDocComment$.call(this, null, Type$templateTypeToString$SALType$(templateClassDef.className$(), typeArguments), templateClassDef.flags$(), extendType, implementTypes, members, objectTypesUsed, null);
+function InstantiatedClassDefinition$LTemplateClassDefinition$ALType$LParsedObjectType$ALParsedObjectType$ALMemberDefinition$ALClassDefinition$ALTemplateClassDefinition$ALParsedObjectType$(templateClassDef, typeArguments, extendType, implementTypes, members, inners, templateInners, objectTypesUsed) {
+	ClassDefinition$LToken$SNLParsedObjectType$ALParsedObjectType$ALMemberDefinition$ALClassDefinition$ALTemplateClassDefinition$ALParsedObjectType$LDocComment$.call(this, null, Type$templateTypeToString$SALType$(templateClassDef.classFullName$(), typeArguments), templateClassDef.flags$(), extendType, implementTypes, members, inners, templateInners, objectTypesUsed, null);
 	this._templateClassDef = templateClassDef;
 	this._typeArguments = typeArguments;
 };
 
-InstantiatedClassDefinition$LTemplateClassDefinition$ALType$LParsedObjectType$ALParsedObjectType$ALMemberDefinition$ALParsedObjectType$.prototype = new InstantiatedClassDefinition;
+InstantiatedClassDefinition$LTemplateClassDefinition$ALType$LParsedObjectType$ALParsedObjectType$ALMemberDefinition$ALClassDefinition$ALTemplateClassDefinition$ALParsedObjectType$.prototype = new InstantiatedClassDefinition;
 
 /**
  * @return {TemplateClassDefinition}
@@ -14493,6 +15497,14 @@ InstantiatedClassDefinition.prototype.typeArgumentsAreEqual$ALType$ = function (
 };
 
 /**
+ * @param {InstantiationContext} instantiationContext
+ * @return {InstantiatedClassDefinition}
+ */
+InstantiatedClassDefinition.prototype.instantiate$LInstantiationContext$ = function (instantiationContext) {
+	throw new Error("logic flaw");
+};
+
+/**
  * class TemplateClassDefinition extends ClassDefinition
  * @constructor
  */
@@ -14511,34 +15523,22 @@ $__jsx_merge_interface(TemplateClassDefinition, TemplateDefinition);
  * @param {ParsedObjectType} extendType
  * @param {Array.<undefined|ParsedObjectType>} implementTypes
  * @param {Array.<undefined|MemberDefinition>} members
+ * @param {Array.<undefined|ClassDefinition>} inners
+ * @param {Array.<undefined|TemplateClassDefinition>} templateInners
  * @param {Array.<undefined|ParsedObjectType>} objectTypesUsed
  * @param {DocComment} docComment
  */
-function TemplateClassDefinition$LToken$SNALToken$LParsedObjectType$ALParsedObjectType$ALMemberDefinition$ALParsedObjectType$LDocComment$(token, className, flags, typeArgs, extendType, implementTypes, members, objectTypesUsed, docComment) {
-	var $this = this;
-	/** @type {!number} */
-	var i;
-	/** @type {*} */
-	var setClassDef;
-	ClassDefinition$LToken$SNLParsedObjectType$ALParsedObjectType$ALMemberDefinition$ALParsedObjectType$LDocComment$.call(this, token, className, flags, extendType, implementTypes, members, objectTypesUsed, docComment);
+function TemplateClassDefinition$LToken$SNALToken$LParsedObjectType$ALParsedObjectType$ALMemberDefinition$ALClassDefinition$ALTemplateClassDefinition$ALParsedObjectType$LDocComment$(token, className, flags, typeArgs, extendType, implementTypes, members, inners, templateInners, objectTypesUsed, docComment) {
+	ClassDefinition$LToken$SNLParsedObjectType$ALParsedObjectType$ALMemberDefinition$ALClassDefinition$ALTemplateClassDefinition$ALParsedObjectType$LDocComment$.call(this, token, className, flags, extendType, implementTypes, members, inners, templateInners, objectTypesUsed, docComment);
 	TemplateDefinition$.call(this);
 	this._token = token;
 	this._className = className;
 	this._flags = flags;
 	this._typeArgs = typeArgs.concat([]);
-	for (i = 0; i < this._members.length; ++ i) {
-		this._members[i].setClassDef$LClassDefinition$(this);
-		if (this._members[i] instanceof MemberFunctionDefinition) {
-			function setClassDef(funcDef) {
-				funcDef.setClassDef$LClassDefinition$($this);
-				return funcDef.forEachClosure$F$LMemberFunctionDefinition$B$(setClassDef);
-			};
-			this._members[i].forEachClosure$F$LMemberFunctionDefinition$B$(setClassDef);
-		}
-	}
+	this._resetMembersClassDef$();
 };
 
-TemplateClassDefinition$LToken$SNALToken$LParsedObjectType$ALParsedObjectType$ALMemberDefinition$ALParsedObjectType$LDocComment$.prototype = new TemplateClassDefinition;
+TemplateClassDefinition$LToken$SNALToken$LParsedObjectType$ALParsedObjectType$ALMemberDefinition$ALClassDefinition$ALTemplateClassDefinition$ALParsedObjectType$LDocComment$.prototype = new TemplateClassDefinition;
 
 /**
  * @return {Token}
@@ -14569,11 +15569,80 @@ TemplateClassDefinition.prototype.getTypeArguments$ = function () {
 };
 
 /**
+ * @param {InstantiationContext} instantiationContext
+ * @return {TemplateClassDefinition}
+ */
+TemplateClassDefinition.prototype.instantiate$LInstantiationContext$ = function (instantiationContext) {
+	var $this = this;
+	/** @type {Object.<string, undefined|Type>} */
+	var typemap;
+	/** @type {!string} */
+	var key;
+	/** @type {!number} */
+	var i;
+	/** @type {InstantiationContext} */
+	var context;
+	/** @type {!boolean} */
+	var succeeded;
+	/** @type {Array.<undefined|MemberDefinition>} */
+	var members;
+	/** @type {MemberDefinition} */
+	var member;
+	/** @type {Array.<undefined|ClassDefinition>} */
+	var inners;
+	/** @type {ClassDefinition} */
+	var inner;
+	/** @type {Array.<undefined|TemplateClassDefinition>} */
+	var templateInners;
+	/** @type {TemplateClassDefinition} */
+	var templateInner;
+	typemap = {};
+	for (key in instantiationContext.typemap) {
+		typemap[key] = instantiationContext.typemap[key];
+	}
+	for (i = 0; i < this._typeArgs.length; ++ i) {
+		delete typemap[this._typeArgs[i].getValue$()];
+	}
+	context = new InstantiationContext$ALCompileError$HLType$(instantiationContext.errors, typemap);
+	succeeded = true;
+	members = [];
+	for (i = 0; i < this._members.length; ++ i) {
+		member = this._members[i].instantiate$LInstantiationContext$(context);
+		if (member == null) {
+			succeeded = false;
+		}
+		members[i] = member;
+	}
+	inners = [];
+	for (i = 0; i < this._inners.length; ++ i) {
+		inner = this._inners[i].instantiate$LInstantiationContext$(context);
+		if (inner == null) {
+			succeeded = false;
+		}
+		inners[i] = inner;
+	}
+	templateInners = [];
+	for (i = 0; i < this._templateInners.length; ++ i) {
+		templateInner = this._templateInners[i].instantiate$LInstantiationContext$(context);
+		if (templateInner == null) {
+			succeeded = false;
+		}
+		templateInners[i] = templateInner;
+	}
+	if (! succeeded) {
+		return null;
+	}
+	return new TemplateClassDefinition$LToken$SNALToken$LParsedObjectType$ALParsedObjectType$ALMemberDefinition$ALClassDefinition$ALTemplateClassDefinition$ALParsedObjectType$LDocComment$(this._token, this._className, this._flags, this._typeArgs, this._extendType != null ? this._extendType.instantiate$LInstantiationContext$(context) : null, this._implementTypes.map((function (t) {
+		return t.instantiate$LInstantiationContext$(context);
+	})), members, inners, templateInners, context.objectTypesUsed, this._docComment);
+};
+
+/**
  * @param {Array.<undefined|CompileError>} errors
  * @param {TemplateInstantiationRequest} request
  * @return {InstantiatedClassDefinition}
  */
-TemplateClassDefinition.prototype.instantiate$ALCompileError$LTemplateInstantiationRequest$ = function (errors, request) {
+TemplateClassDefinition.prototype.instantiateTemplateClass$ALCompileError$LTemplateInstantiationRequest$ = function (errors, request) {
 	var $this = this;
 	/** @type {InstantiationContext} */
 	var instantiationContext;
@@ -14585,6 +15654,14 @@ TemplateClassDefinition.prototype.instantiate$ALCompileError$LTemplateInstantiat
 	var i;
 	/** @type {MemberDefinition} */
 	var member;
+	/** @type {Array.<undefined|ClassDefinition>} */
+	var inners;
+	/** @type {ClassDefinition} */
+	var inner;
+	/** @type {Array.<undefined|TemplateClassDefinition>} */
+	var templateInners;
+	/** @type {TemplateClassDefinition} */
+	var templateInner;
 	/** @type {InstantiatedClassDefinition} */
 	var instantiatedDef;
 	instantiationContext = this.buildInstantiationContext$ALCompileError$LToken$ALToken$ALType$(errors, request.getToken$(), this._typeArgs, request.getTypeArguments$());
@@ -14600,12 +15677,28 @@ TemplateClassDefinition.prototype.instantiate$ALCompileError$LTemplateInstantiat
 		}
 		members[i] = member;
 	}
+	inners = [];
+	for (i = 0; i < this._inners.length; ++ i) {
+		inner = this._inners[i].instantiate$LInstantiationContext$(instantiationContext);
+		if (inner == null) {
+			succeeded = false;
+		}
+		inners[i] = inner;
+	}
+	templateInners = [];
+	for (i = 0; i < this._templateInners.length; ++ i) {
+		templateInner = this._templateInners[i].instantiate$LInstantiationContext$(instantiationContext);
+		if (templateInner == null) {
+			succeeded = false;
+		}
+		templateInners[i] = templateInner;
+	}
 	if (! succeeded) {
 		return null;
 	}
-	instantiatedDef = new InstantiatedClassDefinition$LTemplateClassDefinition$ALType$LParsedObjectType$ALParsedObjectType$ALMemberDefinition$ALParsedObjectType$(this, request.getTypeArguments$(), this._extendType != null ? this._extendType.instantiate$LInstantiationContext$(instantiationContext) : null, this._implementTypes.map((function (t) {
+	instantiatedDef = new InstantiatedClassDefinition$LTemplateClassDefinition$ALType$LParsedObjectType$ALParsedObjectType$ALMemberDefinition$ALClassDefinition$ALTemplateClassDefinition$ALParsedObjectType$(this, request.getTypeArguments$(), this._extendType != null ? this._extendType.instantiate$LInstantiationContext$(instantiationContext) : null, this._implementTypes.map((function (t) {
 		return t.instantiate$LInstantiationContext$(instantiationContext);
-	})), members, instantiationContext.objectTypesUsed);
+	})), members, inners, templateInners, instantiationContext.objectTypesUsed);
 	return instantiatedDef;
 };
 
@@ -14634,6 +15727,8 @@ Statement$.prototype = new Statement;
 Statement.prototype.analyze$LAnalysisContext$ = function (context) {
 	/** @type {Token} */
 	var token;
+	/** @type {!string} */
+	var srcPos;
 	if (! (this instanceof CaseStatement || this instanceof DefaultStatement)) {
 		if (! Statement$assertIsReachable$LAnalysisContext$LToken$(context, this.getToken$())) {
 			return false;
@@ -14644,7 +15739,8 @@ Statement.prototype.analyze$LAnalysisContext$ = function (context) {
 	} catch ($__jsx_catch_0) {
 		if ($__jsx_catch_0 instanceof Error) {
 			token = this.getToken$();
-			console.error("fatal error while compiling statement" + (token instanceof Token ? " at file " + token.getFilename$() + ", line " + (token.getLineNumber$() + "") : ""));
+			srcPos = (token != null ? Util$format$SAS(" at file %1, line %2", [ token.getFilename$(), token.getLineNumber$() + "" ]) : "");
+			$__jsx_catch_0.message = Util$format$SAS("fatal error while compiling statement%1\n%2", [ srcPos, $__jsx_catch_0.message ]);
 			throw $__jsx_catch_0;
 		} else {
 			throw $__jsx_catch_0;
@@ -16708,7 +17804,7 @@ ReturnStatement.prototype.doAnalyze$LAnalysisContext$ = function (context) {
 			return true;
 		}
 		if (this._expr instanceof FunctionExpression && ! this._expr.typesAreIdentified$() && returnType instanceof StaticFunctionType) {
-			if (! this._expr.getFuncDef$().deductTypeIfUnknown$LAnalysisContext$LResolvedFunctionType$(context, returnType)) {
+			if (! this._expr.deductTypeIfUnknown$LAnalysisContext$LResolvedFunctionType$(context, returnType)) {
 				return false;
 			}
 		}
@@ -17084,44 +18180,51 @@ Expression.prototype.instantiate$LInstantiationContext$ = function (instantiatio
 	function onExpr(expr) {
 		/** @type {Type} */
 		var srcType;
-		if (expr instanceof NewExpression) {
+		if (expr instanceof NullExpression) {
 			srcType = expr.getType$();
 			if (srcType != null) {
 				expr.setType$LType$(srcType.instantiate$LInstantiationContext$(instantiationContext));
 			}
 		} else {
-			if (expr instanceof ArrayLiteralExpression) {
+			if (expr instanceof NewExpression) {
 				srcType = expr.getType$();
 				if (srcType != null) {
 					expr.setType$LType$(srcType.instantiate$LInstantiationContext$(instantiationContext));
 				}
 			} else {
-				if (expr instanceof MapLiteralExpression) {
+				if (expr instanceof ArrayLiteralExpression) {
 					srcType = expr.getType$();
 					if (srcType != null) {
 						expr.setType$LType$(srcType.instantiate$LInstantiationContext$(instantiationContext));
 					}
 				} else {
-					if (expr instanceof AsExpression) {
+					if (expr instanceof MapLiteralExpression) {
 						srcType = expr.getType$();
 						if (srcType != null) {
 							expr.setType$LType$(srcType.instantiate$LInstantiationContext$(instantiationContext));
 						}
 					} else {
-						if (expr instanceof AsNoConvertExpression) {
+						if (expr instanceof AsExpression) {
 							srcType = expr.getType$();
 							if (srcType != null) {
 								expr.setType$LType$(srcType.instantiate$LInstantiationContext$(instantiationContext));
 							}
 						} else {
-							if (expr instanceof ClassExpression) {
+							if (expr instanceof AsNoConvertExpression) {
 								srcType = expr.getType$();
 								if (srcType != null) {
 									expr.setType$LType$(srcType.instantiate$LInstantiationContext$(instantiationContext));
 								}
 							} else {
-								if (expr instanceof LocalExpression) {
-									expr.setLocal$LLocalVariable$(expr.getLocal$().getInstantiated$());
+								if (expr instanceof ClassExpression) {
+									srcType = expr.getType$();
+									if (srcType != null) {
+										expr.setType$LType$(srcType.instantiate$LInstantiationContext$(instantiationContext));
+									}
+								} else {
+									if (expr instanceof LocalExpression) {
+										expr.setLocal$LLocalVariable$(expr.getLocal$().getInstantiated$());
+									}
 								}
 							}
 						}
@@ -17250,11 +18353,11 @@ function CommaExpression$LToken$LExpression$LExpression$(token, expr1, expr2) {
 	this._expr2 = null;
 	if (! (expr1 != null)) {
 		debugger;
-		throw new Error("[src/expression.jsx:2166:21] assertion failure\n        assert expr1 != null;\n                     ^^\n");
+		throw new Error("[src/expression.jsx:2197:21] assertion failure\n        assert expr1 != null;\n                     ^^\n");
 	}
 	if (! (expr2 != null)) {
 		debugger;
-		throw new Error("[src/expression.jsx:2167:21] assertion failure\n        assert expr2 != null;\n                     ^^\n");
+		throw new Error("[src/expression.jsx:2198:21] assertion failure\n        assert expr2 != null;\n                     ^^\n");
 	}
 	this._expr1 = expr1;
 	this._expr2 = expr2;
@@ -17336,22 +18439,31 @@ FunctionExpression.prototype = new Expression;
 /**
  * @constructor
  * @param {Token} token
+ * @param {LocalVariable} funcName
  * @param {MemberFunctionDefinition} funcDef
  * @param {!boolean} isStatement
  */
-function FunctionExpression$LToken$LMemberFunctionDefinition$B(token, funcDef, isStatement) {
+function FunctionExpression$LToken$LLocalVariable$LMemberFunctionDefinition$B(token, funcName, funcDef, isStatement) {
 	Expression$LToken$.call(this, token);
+	this._funcName = funcName;
 	this._funcDef = funcDef;
 	this._isStatement = isStatement;
 };
 
-FunctionExpression$LToken$LMemberFunctionDefinition$B.prototype = new FunctionExpression;
+FunctionExpression$LToken$LLocalVariable$LMemberFunctionDefinition$B.prototype = new FunctionExpression;
 
 /**
  * @return {FunctionExpression}
  */
 FunctionExpression.prototype.clone$ = function () {
-	return new FunctionExpression$LToken$LMemberFunctionDefinition$B(this._token, this._funcDef, this._isStatement);
+	return new FunctionExpression$LToken$LLocalVariable$LMemberFunctionDefinition$B(this._token, this._funcName, this._funcDef, this._isStatement);
+};
+
+/**
+ * @return {LocalVariable}
+ */
+FunctionExpression.prototype.getFuncName$ = function () {
+	return this._funcName;
 };
 
 /**
@@ -17422,6 +18534,27 @@ FunctionExpression.prototype.typesAreIdentified$ = function () {
 	}
 	if (this._funcDef.getReturnType$() == null) {
 		return false;
+	}
+	return true;
+};
+
+/**
+ * @param {AnalysisContext} context
+ * @param {ResolvedFunctionType} type
+ * @return {!boolean}
+ */
+FunctionExpression.prototype.deductTypeIfUnknown$LAnalysisContext$LResolvedFunctionType$ = function (context, type) {
+	if (! this._funcDef.deductTypeIfUnknown$LAnalysisContext$LResolvedFunctionType$(context, type)) {
+		return false;
+	}
+	if (this._funcName != null) {
+		if (this._funcName.getType$() != null) {
+			if (! this._funcName.getType$().equals$LType$(this._funcDef.getType$())) {
+				throw new Error("unmatched type for local function: " + this._funcName.getName$().getValue$());
+			}
+		} else {
+			this._funcName.setType$LType$(this._funcDef.getType$());
+		}
 	}
 	return true;
 };
@@ -18949,8 +20082,10 @@ AssignmentExpression.prototype._analyzeFunctionExpressionAssignment$LAnalysisCon
 			return false;
 		}
 	} else {
-		if (! this._expr2.getFuncDef$().deductTypeIfUnknown$LAnalysisContext$LResolvedFunctionType$(context, this._expr1.getType$())) {
-			return false;
+		if (! this._expr1.getType$().equals$LType$(Type.variantType)) {
+			if (! this._expr2.deductTypeIfUnknown$LAnalysisContext$LResolvedFunctionType$(context, this._expr1.getType$())) {
+				return false;
+			}
 		}
 	}
 	if (! this._expr1.assertIsAssignable$LAnalysisContext$LToken$LType$(context, this._token, this._expr2.getType$())) {
@@ -19041,6 +20176,10 @@ ArrayExpression.prototype._analyzeApplicationOnObject$LAnalysisContext$LType$ = 
 	/** @type {ResolvedFunctionType} */
 	var deducedFuncType;
 	expr1ClassDef = expr1Type.getClassDef$();
+	if (! (expr1ClassDef)) {
+		debugger;
+		throw new Error("[src/expression.jsx:1486:15] assertion failure\n        assert expr1ClassDef;\n               ^^^^^^^^^^^^^\n");
+	}
 	funcType = expr1ClassDef.getMemberTypeByName$ALCompileError$LToken$SBALType$N(context.errors, this._token, "__native_index_operator__", false, [], ClassDefinition.GET_MEMBER_MODE_ALL);
 	if (funcType == null) {
 		context.errors.push(new CompileError$LToken$S(this._token, "cannot apply operator[] on an instance of class '" + expr1ClassDef.className$() + "'"));
@@ -20327,6 +21466,13 @@ NullExpression.prototype.getType$ = function () {
 };
 
 /**
+ * @param {Type} type
+ */
+NullExpression.prototype.setType$LType$ = function (type) {
+	this._type = type;
+};
+
+/**
  * class ClassExpression extends LeafExpression
  * @constructor
  */
@@ -20568,25 +21714,47 @@ JavaScriptEmitter.prototype.getSearchPaths$ = function () {
  * @param {undefined|!string} name
  */
 JavaScriptEmitter.prototype.setOutputFile$US = function (name) {
-	/** @type {undefined|!string} */
-	var sourceRoot;
-	this._outputFile = name;
-	if (this._enableSourceMap && name != null) {
-		sourceRoot = null;
-		this._sourceMapper = new SourceMapper$SUS(name, sourceRoot);
+	if (name == null) {
+		return;
+	}
+	this._outputFile = Util$resolvePath$S(name);
+	if (this._enableSourceMap) {
+		this._sourceMapper = new SourceMapper$SS(this._platform.getRoot$(), name);
 	}
 };
 
 /**
- * @param {Platform} platform
+ * @return {Object.<string, undefined|!string>}
  */
-JavaScriptEmitter.prototype.saveSourceMappingFile$LPlatform$ = function (platform) {
+JavaScriptEmitter.prototype.getSourceMappingFiles$ = function () {
+	/** @type {Object.<string, undefined|!string>} */
+	var files;
 	/** @type {SourceMapper} */
-	var gen;
-	gen = this._sourceMapper;
-	if (gen != null) {
-		platform.save$USS(gen.getSourceMappingFile$(), gen.generate$());
+	var sourceMapper;
+	/** @type {Object.<string, undefined|!string>} */
+	var fileMap;
+	/** @type {!string} */
+	var filename;
+	/** @type {undefined|!string} */
+	var dest;
+	files = {};
+	sourceMapper = this._sourceMapper;
+	if (sourceMapper != null) {
+		files[sourceMapper.getSourceMappingFile$()] = sourceMapper.generate$();
+		fileMap = sourceMapper.getSourceFileMap$();
+		for (filename in fileMap) {
+			dest = fileMap[filename];
+			try {
+				files[dest] = this._platform.load$S(filename);
+			} catch ($__jsx_catch_0) {
+				if ($__jsx_catch_0 instanceof Error) {
+				} else {
+					throw $__jsx_catch_0;
+				}
+			}
+		}
 	}
+	return files;
 };
 
 /**
@@ -20854,7 +22022,7 @@ JavaScriptEmitter.prototype._emitClassMap$ALClassDefinition$ = function (classDe
 				++ i;
 			}
 		}
-		escapedFilename = JSON.stringify(this._encodeFilename$SS(filename, "system:"));
+		escapedFilename = JSON.stringify(this._platform.encodeFilename$S(filename));
 		this._emit$SLToken$(escapedFilename + ": ", null);
 		this._emit$SLToken$("{\n", null);
 		this._advanceIndent$();
@@ -20877,21 +22045,6 @@ JavaScriptEmitter.prototype._emitClassMap$ALClassDefinition$ = function (classDe
 };
 
 /**
- * @param {!string} filename
- * @param {!string} prefix
- * @return {!string}
- */
-JavaScriptEmitter.prototype._encodeFilename$SS = function (filename, prefix) {
-	/** @type {!string} */
-	var rootDir;
-	rootDir = this._platform.getRoot$() + "/";
-	if (filename.indexOf(rootDir) === 0) {
-		filename = prefix + filename.substring(rootDir.length);
-	}
-	return filename;
-};
-
-/**
  * @param {!string} sourceFile
  * @param {undefined|!string} entryPoint
  * @param {undefined|!string} executableFor
@@ -20905,7 +22058,7 @@ JavaScriptEmitter.prototype.getOutput$SUSUS = function (sourceFile, entryPoint, 
 		output += this._platform.load$S(this._platform.getRoot$() + "/src/js/profiler.js");
 	}
 	if (entryPoint != null) {
-		output = this._platform.addLauncher$LEmitter$XSSS(this, this._encodeFilename$SS(sourceFile, "system:"), output, entryPoint, executableFor);
+		output = this._platform.addLauncher$LEmitter$XSSS(this, this._platform.encodeFilename$S(sourceFile), output, entryPoint, executableFor);
 	}
 	output += this._fileFooter;
 	if (this._sourceMapper) {
@@ -21180,9 +22333,6 @@ JavaScriptEmitter.prototype._addSourceMapping$LToken$ = function (token) {
 		}
 	}
 	filename = token.getFilename$();
-	if (filename != null) {
-		filename = this._encodeFilename$SS(filename, "");
-	}
 	this._sourceMapper.add$HNHNUSUS(genPos, origPos, filename, tokenValue);
 };
 
@@ -22223,7 +23373,7 @@ Optimizer.prototype.performOptimization$ = function () {
 		} catch ($__jsx_catch_0) {
 			if ($__jsx_catch_0 instanceof Error) {
 				platform = this._compiler.getPlatform$();
-				platform.error$S("optimizer '" + this._commands[i]._identifier + "' died unexpectedly, dumping the logs");
+				platform.error$S("fatal error: optimizer '" + this._commands[i]._identifier + "' died unexpectedly, dumping the logs");
 				this.dumpLogs$();
 				throw $__jsx_catch_0;
 			} else {
@@ -23850,12 +25000,12 @@ _DeadCodeEliminationOptimizeCommand.prototype._delayAssignmentsBetweenLocals$LMe
 		if (expr instanceof AssignmentExpression && expr.getToken$().getValue$() !== "=" && expr.getFirstExpr$() instanceof LocalExpression) {
 			local = expr.getFirstExpr$().getLocal$();
 			$this.log$S("local variable " + local.getName$().getValue$() + " cannot be rewritten (has fused op)");
-			localsUntouchable.put$LLocalVariable$B(local, true);
+			localsUntouchable.set$LLocalVariable$B(local, true);
 		} else {
 			if (expr instanceof IncrementExpression && expr.getExpr$() instanceof LocalExpression) {
 				local = expr.getExpr$().getLocal$();
 				$this.log$S("local variable " + local.getName$().getValue$() + " cannot be rewritten (has increment)");
-				localsUntouchable.put$LLocalVariable$B(local, true);
+				localsUntouchable.set$LLocalVariable$B(local, true);
 			}
 		}
 		return expr.forEachExpression$F$LExpression$B$(_onExpr);
@@ -23886,11 +25036,11 @@ _DeadCodeEliminationOptimizeCommand.prototype._delayAssignmentsBetweenLocals$LMe
 					locals.reversedForEach$F$LLocalVariable$LExpression$B$((function (local, expr) {
 						if (local == lhsLocal) {
 							$this.log$S("  clearing itself");
-							locals.remove$LLocalVariable$(local);
+							locals.delete$LLocalVariable$(local);
 						} else {
 							if (expr instanceof LocalExpression && expr.getLocal$() == lhsLocal) {
 								$this.log$S("  clearing " + local.getName$().getValue$());
-								locals.remove$LLocalVariable$(local);
+								locals.delete$LLocalVariable$(local);
 							}
 						}
 						return true;
@@ -23901,12 +25051,12 @@ _DeadCodeEliminationOptimizeCommand.prototype._delayAssignmentsBetweenLocals$LMe
 							rhsLocal = rhsExpr.getLocal$();
 							if (lhsLocal != rhsLocal && ! localsUntouchable.get$LLocalVariable$(rhsLocal)) {
 								$this.log$S("  set to: " + rhsLocal.getName$().getValue$());
-								locals.put$LLocalVariable$LExpression$(lhsLocal, rhsExpr);
+								locals.set$LLocalVariable$LExpression$(lhsLocal, rhsExpr);
 							}
 						} else {
 							if (rhsExpr instanceof NullExpression || rhsExpr instanceof NumberLiteralExpression || rhsExpr instanceof IntegerLiteralExpression || rhsExpr instanceof StringLiteralExpression) {
 								$this.log$S("  set to: " + rhsExpr.getToken$().getValue$());
-								locals.put$LLocalVariable$LExpression$(lhsLocal, rhsExpr);
+								locals.set$LLocalVariable$LExpression$(lhsLocal, rhsExpr);
 							}
 						}
 					}
@@ -24029,7 +25179,7 @@ _DeadCodeEliminationOptimizeCommand.prototype._eliminateDeadStoresToProperties$L
 	var isFirstLevelPropertyAccess;
 	/** @type {*} */
 	var baseExprsAreEqual;
-	/** @type {Object.<string, undefined|Tuple$AssignmentExpression$function$$$$Expression$$$$void$E>} */
+	/** @type {Object.<string, undefined|Pair$AssignmentExpression$function$$$$Expression$$$$void$E>} */
 	var lastAssignExpr;
 	/** @type {*} */
 	var onExpr;
@@ -24081,7 +25231,7 @@ _DeadCodeEliminationOptimizeCommand.prototype._eliminateDeadStoresToProperties$L
 				if (lastAssignExpr[propertyName] && lastAssignExpr[propertyName].second != null && baseExprsAreEqual(firstExpr.getExpr$(), lastAssignExpr[propertyName].first.getFirstExpr$().getExpr$())) {
 					lastAssignExpr[propertyName].second(lastAssignExpr[propertyName].first.getSecondExpr$());
 				}
-				lastAssignExpr[propertyName] = new Tuple$AssignmentExpression$function$$$$Expression$$$$void$E$LAssignmentExpression$F$LExpression$V$(assignmentExpr, rewriteCb);
+				lastAssignExpr[propertyName] = new Pair$AssignmentExpression$function$$$$Expression$$$$void$E$LAssignmentExpression$F$LExpression$V$(assignmentExpr, rewriteCb);
 				return true;
 			} else {
 				if (assignmentExpr.getFirstExpr$() instanceof LocalExpression) {
@@ -24646,8 +25796,11 @@ _InlineOptimizeCommand.prototype._isWorthInline$LMemberFunctionDefinition$ = fun
  */
 _InlineOptimizeCommand.prototype._functionIsInlineable$LMemberFunctionDefinition$ = function (funcDef) {
 	var $this = this;
-	if (this.getStash$LStashable$(funcDef).isInlineable == null) {
-		this.getStash$LStashable$(funcDef).isInlineable = (function () {
+	/** @type {_InlineOptimizeCommandStash} */
+	var stash;
+	stash = this.getStash$LStashable$(funcDef);
+	if (stash.isInlineable == null) {
+		stash.isInlineable = (function () {
 			/** @type {Array.<undefined|Statement>} */
 			var statements;
 			/** @type {!boolean} */
@@ -24688,9 +25841,9 @@ _InlineOptimizeCommand.prototype._functionIsInlineable$LMemberFunctionDefinition
 				return statement.forEachStatement$F$LStatement$B$(onStatement);
 			}));
 		})();
-		this.log$S(funcDef.getNotation$() + (this.getStash$LStashable$(funcDef).isInlineable ? " is" : " is not") + " inlineable");
+		this.log$S(funcDef.getNotation$() + (stash.isInlineable ? " is" : " is not") + " inlineable");
 	}
-	return this.getStash$LStashable$(funcDef).isInlineable;
+	return stash.isInlineable;
 };
 
 /**
@@ -25915,18 +27068,18 @@ function SourceMapper() {
 
 /**
  * @constructor
+ * @param {!string} rootDir
  * @param {!string} outputFile
- * @param {undefined|!string} sourceRoot
  */
-function SourceMapper$SUS(outputFile, sourceRoot) {
-	/** @type {undefined|!string} */
-	var relName;
-	this._outputFile = outputFile;
-	relName = outputFile.split("/").pop();
-	this._impl = SourceMapper$createSourceMapGenerator$HS(({ file: relName, sourceRoot: sourceRoot }));
+function SourceMapper$SS(rootDir, outputFile) {
+	this._fileMap = {};
+	this._rootDir = rootDir;
+	this._outputFile = Util$resolvePath$S(outputFile);
+	this._copyDestDir = this._outputFile + ".mapping.d";
+	this._impl = SourceMapper$createSourceMapGenerator$HS(({ file: Util$basename$S(this._outputFile), sourceRoot: Util$basename$S(this._copyDestDir) }));
 };
 
-SourceMapper$SUS.prototype = new SourceMapper;
+SourceMapper$SS.prototype = new SourceMapper;
 
 /**
  * @param {Object.<string, undefined|!string>} args
@@ -25951,22 +27104,19 @@ var SourceMapper$createSourceMapConsumer$X = SourceMapper.createSourceMapConsume
 /**
  * @param {Object.<string, undefined|!number>} generatedPos
  * @param {Object.<string, undefined|!number>} originalPos
- */
-SourceMapper.prototype.add$HNHN = function (generatedPos, originalPos) {
-	this.add$HNHNUSUS(generatedPos, originalPos, null, null);
-};
-
-/**
- * @param {Object.<string, undefined|!number>} generatedPos
- * @param {Object.<string, undefined|!number>} originalPos
  * @param {undefined|!string} sourceFile
  * @param {undefined|!string} tokenName
  */
 SourceMapper.prototype.add$HNHNUSUS = function (generatedPos, originalPos, sourceFile, tokenName) {
-	/** @type {undefined|!string} */
-	var relFileName;
-	relFileName = (sourceFile != null ? Util$relativePath$SSB(this._outputFile, sourceFile, true) : null);
-	this._impl.addMapping(({ generated: generatedPos, original: originalPos, source: relFileName, name: tokenName }));
+	if (sourceFile != null) {
+		if (sourceFile.indexOf(this._rootDir + "/") === 0) {
+			sourceFile = sourceFile.substring(this._rootDir.length + 1);
+		}
+		if ($__jsx_ObjectHasOwnProperty.call(this._fileMap, sourceFile)) {
+			this._fileMap[sourceFile] = this._copyDestDir + "/" + sourceFile;
+		}
+	}
+	this._impl.addMapping(({ generated: generatedPos, original: originalPos, source: sourceFile, name: tokenName }));
 };
 
 /**
@@ -25974,6 +27124,13 @@ SourceMapper.prototype.add$HNHNUSUS = function (generatedPos, originalPos, sourc
  */
 SourceMapper.prototype.getSourceMappingFile$ = function () {
 	return this._outputFile + ".mapping";
+};
+
+/**
+ * @return {Object.<string, undefined|!string>}
+ */
+SourceMapper.prototype.getSourceFileMap$ = function () {
+	return this._fileMap;
 };
 
 /**
@@ -25988,9 +27145,9 @@ SourceMapper.prototype.generate$ = function () {
  */
 SourceMapper.prototype.magicToken$ = function () {
 	/** @type {!string} */
-	var relName;
-	relName = this._outputFile.split("/").pop() + ".mapping";
-	return "\n" + "//@ sourceMappingURL=" + relName + "\n";
+	var sourceMappingFile;
+	sourceMappingFile = Util$basename$S(this.getSourceMappingFile$());
+	return "\n" + "//@ sourceMappingURL=" + sourceMappingFile + "\n";
 };
 
 /**
@@ -26205,7 +27362,7 @@ Compiler.prototype.getAST$ = function () {
 Compiler.prototype.getFileContent$ALCompileError$LToken$S = function (errors, sourceToken, path) {
 	if (! (path !== "")) {
 		debugger;
-		throw new Error("[src/compiler.jsx:176:20] assertion failure\n        assert path != \"\";\n                    ^^\n");
+		throw new Error("[src/compiler.jsx:179:20] assertion failure\n        assert path != \"\";\n                    ^^\n");
 	}
 	if (this._fileCache[path] == null) {
 		try {
@@ -26318,6 +27475,9 @@ Compiler.prototype._handleImport$ALCompileError$LParser$LImport$ = function (err
  * @return {!boolean}
  */
 Compiler.prototype.forEachClassDef$F$LParser$LClassDefinition$B$ = function (f) {
+	var $this = this;
+	/** @type {*} */
+	var onClassDef;
 	/** @type {!number} */
 	var i;
 	/** @type {Parser} */
@@ -26326,11 +27486,27 @@ Compiler.prototype.forEachClassDef$F$LParser$LClassDefinition$B$ = function (f) 
 	var classDefs;
 	/** @type {!number} */
 	var j;
+	function onClassDef(parser, classDef) {
+		/** @type {Array.<undefined|ClassDefinition>} */
+		var inners;
+		/** @type {!number} */
+		var i;
+		if (! f(parser, classDef)) {
+			return false;
+		}
+		inners = classDef.getInnerClasses$();
+		for (i = 0; i < inners.length; ++ i) {
+			if (! onClassDef(parser, inners[i])) {
+				return false;
+			}
+		}
+		return true;
+	};
 	for (i = 0; i < this._parsers.length; ++ i) {
 		parser = this._parsers[i];
 		classDefs = parser.getClassDefs$();
 		for (j = 0; j < classDefs.length; ++ j) {
-			if (! f(parser, classDefs[j])) {
+			if (! onClassDef(parser, classDefs[j])) {
 				return false;
 			}
 		}
@@ -26431,6 +27607,11 @@ Compiler.prototype._generateCode$ALCompileError$ = function (errors) {
 	for (i = 0; i < this._parsers.length; ++ i) {
 		classDefs = classDefs.concat(this._parsers[i].getClassDefs$());
 	}
+	for (i = 0; i < classDefs.length; ++ i) {
+		if (classDefs[i].getInnerClasses$().length !== 0) {
+			classDefs = classDefs.concat(classDefs[i].getInnerClasses$());
+		}
+	}
 	getMaxIndexOfClasses = (function (deps) {
 		/** @type {!number} */
 		var i;
@@ -26450,7 +27631,7 @@ Compiler.prototype._generateCode$ALCompileError$ = function (errors) {
 				}
 			}
 		}
-		throw new Error("logic error, could not find class definition of '" + deps[0].className$() + "'");
+		throw new Error("logic flaw, could not find class definition of '" + deps[0].className$() + "'");
 	});
 	for (i = 0; i < classDefs.length; ) {
 		deps = classDefs[i].implementTypes$().map((function (t) {
@@ -26458,6 +27639,9 @@ Compiler.prototype._generateCode$ALCompileError$ = function (errors) {
 		})).concat([]);
 		if (classDefs[i].extendType$() != null) {
 			deps.unshift(classDefs[i].extendType$().getClassDef$());
+		}
+		if (classDefs[i].getOuterClassDef$() != null) {
+			deps.unshift(classDefs[i].getOuterClassDef$());
 		}
 		maxIndexOfClasses = getMaxIndexOfClasses(deps);
 		if (maxIndexOfClasses > i) {
@@ -26483,7 +27667,11 @@ Compiler.prototype._generateCode$ALCompileError$ = function (errors) {
 	for (i = 0; i < classDefs.length; ++ i) {
 		classDef = classDefs[i];
 		if ((classDef.flags$() & ClassDefinition.IS_NATIVE) === 0) {
-			className = classDef.className$();
+			if (classDef.getOuterClassDef$() != null) {
+				className = classDef.getOuterClassDef$().getOutputClassName$() + "$C" + classDef.className$();
+			} else {
+				className = classDef.className$();
+			}
 			if (countByName[className]) {
 				classDef.setOutputClassName$S(className + "$" + (countByName[className] - 1 + ""));
 				countByName[className]++;
@@ -26494,7 +27682,7 @@ Compiler.prototype._generateCode$ALCompileError$ = function (errors) {
 		}
 	}
 	for (i = 0; i < classDefs.length; ++ i) {
-		if ((classDefs[i].flags$() & ClassDefinition.IS_NATIVE) === 0 && classDefs[i] instanceof InstantiatedClassDefinition) {
+		if ((classDefs[i].flags$() & ClassDefinition.IS_NATIVE) === 0) {
 			escapedClassName = classDefs[i].getOutputClassName$().replace(/\.</g, "$$").replace(/>/g, "$E").replace(/[^A-Za-z0-9_]/g, "$");
 			classDefs[i].setOutputClassName$S(escapedClassName);
 		}
@@ -27199,6 +28387,24 @@ DocComment.prototype.getTagByName$S = function (tagName) {
 };
 
 /**
+ * @param {!string} tagName
+ * @return {Array.<undefined|DocCommentTag>}
+ */
+DocComment.prototype.getTagsByName$S = function (tagName) {
+	/** @type {Array.<undefined|DocCommentTag>} */
+	var tags;
+	/** @type {!number} */
+	var i;
+	tags = [];
+	for (i = 0; i < this._tags.length; ++ i) {
+		if (this._tags[i].getTagName$() === tagName) {
+			tags.push(this._tags[i]);
+		}
+	}
+	return tags;
+};
+
+/**
  * class DocumentGenerator extends Object
  * @constructor
  */
@@ -27208,23 +28414,26 @@ function DocumentGenerator() {
 /**
  * @constructor
  * @param {Compiler} compiler
+ * @param {!string} templatePath
+ * @param {!string} outputPath
  */
-function DocumentGenerator$LCompiler$(compiler) {
+function DocumentGenerator$LCompiler$SS(compiler, templatePath, outputPath) {
+	this._classDefToHTMLCache = new TypedMap$ClassDefinition$string$E$();
 	this._compiler = compiler;
-	this._outputPath = null;
+	this._templatePath = templatePath;
+	this._outputPath = outputPath;
+	this._resourceFiles = [];
 	this._pathFilter = null;
-	this._templatePath = null;
-	this._classDefToHTMLCache = [  ];
 };
 
-DocumentGenerator$LCompiler$.prototype = new DocumentGenerator;
+DocumentGenerator$LCompiler$SS.prototype = new DocumentGenerator;
 
 /**
- * @param {!string} outputPath
+ * @param {Array.<undefined|!string>} files
  * @return {DocumentGenerator}
  */
-DocumentGenerator.prototype.setOutputPath$S = function (outputPath) {
-	this._outputPath = outputPath;
+DocumentGenerator.prototype.setResourceFiles$AS = function (files) {
+	this._resourceFiles = files;
 	return this;
 };
 
@@ -27238,31 +28447,25 @@ DocumentGenerator.prototype.setPathFilter$F$SB$ = function (pathFilter) {
 };
 
 /**
- * @param {!string} path
- * @return {DocumentGenerator}
- */
-DocumentGenerator.prototype.setTemplatePath$S = function (path) {
-	this._templatePath = path;
-	return this;
-};
-
-/**
  */
 DocumentGenerator.prototype.buildDoc$ = function () {
 	var $this = this;
 	/** @type {Platform} */
 	var platform;
 	platform = this._compiler.getPlatform$();
-	platform.mkpath$S(this._outputPath);
-	platform.save$USS(this._outputPath + "/style.css", platform.load$S(platform.getRoot$() + "/src/doc/style.css"));
+	this._resourceFiles.forEach((function (file) {
+		platform.save$USS($this._outputPath + "/" + file, platform.load$S($this._templatePath + "/" + file));
+	}));
 	this._compiler.getParsers$().forEach((function (parser) {
+		/** @type {!string} */
+		var encodedFilename;
 		/** @type {!string} */
 		var outputFile;
 		/** @type {!string} */
 		var html;
-		if ($this._pathFilter(parser.getPath$())) {
+		encodedFilename = platform.encodeFilename$S(parser.getPath$());
+		if ($this._pathFilter(encodedFilename)) {
 			outputFile = $this._outputPath + "/" + parser.getPath$() + ".html";
-			platform.mkpath$S(outputFile.replace(/\/[^\/]+$/, ""));
 			html = $this._buildDocOfFile$LParser$(parser);
 			platform.save$USS(outputFile, html);
 		}
@@ -27275,7 +28478,10 @@ DocumentGenerator.prototype.buildDoc$ = function () {
  */
 DocumentGenerator.prototype._buildDocOfFile$LParser$ = function (parser) {
 	var $this = this;
-	return this._compiler.getPlatform$().load$S(this._templatePath).replace(/<%JSX:(.*?)%>/g, (function (matched) {
+	/** @type {!string} */
+	var htmlFile;
+	htmlFile = this._templatePath + "/template.html";
+	return this._compiler.getPlatform$().load$S(htmlFile).replace(/<%JSX:(.*?)%>/g, (function (matched) {
 		/** @type {!string} */
 		var key;
 		key = matched.substring(6, matched.length - 2);
@@ -27289,7 +28495,7 @@ DocumentGenerator.prototype._buildDocOfFile$LParser$ = function (parser) {
 		case "FOOTER":
 			return $this._buildFooterOfFile$LParser$(parser);
 		default:
-			throw new Error("unknown key:" + key + " in file: " + $this._templatePath);
+			throw new Error("unknown template key:" + key + " in file: " + htmlFile);
 		}
 	}));
 };
@@ -27307,15 +28513,12 @@ DocumentGenerator.prototype._buildBodyOfFile$LParser$ = function (parser) {
 	_ += "<h1>";
 	_ += this._escape$S(parser.getPath$()).replace(/\n$/, "");
 	_ += "</h1>\n";
-	if (parser.getDocComment$() != null) {
-		_ += "<div class=\"description\">";
-		_ += parser.getDocComment$().getDescription$().replace(/\n$/, "");
-		_ += "</div>\n";
-	}
-	_ += "</div>\n";
+	_ += this._descriptionToHTML$LDocComment$(parser.getDocComment$()).replace(/\n$/, "");
+	_ += "\n";
+	_ += "</div><!--/file-->\n";
 	_ += this._buildListOfClasses$LParser$(parser).replace(/\n$/, "");
 	_ += "\n";
-	_ += "</div>\n";
+	_ += "</div><!--/jsxdoc-->\n";
 	return _;
 };
 
@@ -27356,12 +28559,12 @@ DocumentGenerator.prototype._buildFooterOfFile$LParser$ = function (parser) {
 			_ += "</p>\n";
 		}
 	}
-	_ += "<p>This document was automatically generated by <a href=\"http://jsx.github.com/\">JSX</a> ";
+	_ += "<p class=\"jsxdoc-notice\">This document was automatically generated by <a href=\"http://jsx.github.com/\">JSX</a> ";
 	_ += Meta.VERSION_STRING.replace(/\n$/, "");
 	_ += "<br />\n";
 	_ += "at ";
-	_ += this._escape$S(new Date().toString()).replace(/\n$/, "");
-	_ += ".\n";
+	_ += this._escape$S(new Date().toISOString()).replace(/\n$/, "");
+	_ += ".</p>\n";
 	return _;
 };
 
@@ -27520,19 +28723,45 @@ DocumentGenerator.prototype._buildDocOfFunction$LParser$LMemberFunctionDefinitio
  * @return {!string}
  */
 DocumentGenerator.prototype._descriptionToHTML$LDocComment$ = function (docComment) {
+	var $this = this;
 	/** @type {!string} */
 	var _;
-	/** @type {!string} */
-	var desc;
+	/** @type {Array.<undefined|DocCommentTag>} */
+	var seeTags;
 	_ = "";
-	desc = (docComment != null ? docComment.getDescription$() : "");
-	if (desc !== "") {
-		_ += "<div class=\"description\">\n";
-		_ += desc.replace(/\n$/, "");
-		_ += "\n";
-		_ += "</div>\n";
+	if (docComment != null) {
+		if (docComment.getDescription$() !== "") {
+			_ += "<div class=\"description\">\n";
+			_ += docComment.getDescription$().replace(/\n$/, "");
+			_ += "\n";
+			_ += "</div>\n";
+		}
+		seeTags = docComment.getTagsByName$S("see");
+		if (seeTags.length > 0) {
+			_ += "<ul class=\"see\">\n";
+			seeTags.forEach((function (tag) {
+				_ += "<li>";
+				_ += $this._autoLink$S(tag.getDescription$()).replace(/\n$/, "");
+				_ += "</li>\n";
+			}));
+			_ += "</ul>\n";
+		}
 	}
 	return _;
+};
+
+/**
+ * @param {!string} str
+ * @return {!string}
+ */
+DocumentGenerator.prototype._autoLink$S = function (str) {
+	var $this = this;
+	/** @type {RegExp} */
+	var uri;
+	uri = /^https?:\/\/[A-Za-z0-9\-\._~:\/?#\[\]@!$&'()*+,;=]+/;
+	return str.replace(uri, (function (matched) {
+		return Util$format$SAS('<a href="%1">%1</a>', [ matched ]);
+	}));
 };
 
 /**
@@ -27602,8 +28831,8 @@ DocumentGenerator.prototype._typeToHTML$LParser$LType$ = function (parser, type)
  */
 DocumentGenerator.prototype._classDefToHTML$LParser$LClassDefinition$ = function (parser, classDef) {
 	var $this = this;
-	/** @type {!number} */
-	var cacheIndex;
+	/** @type {undefined|!string} */
+	var result;
 	/** @type {*} */
 	var determineParserOfClassDef;
 	/** @type {Parser} */
@@ -27615,20 +28844,39 @@ DocumentGenerator.prototype._classDefToHTML$LParser$LClassDefinition$ = function
 			return $this._typeToHTML$LParser$LType$(parser, type);
 		})).join(", ") + "&gt;";
 	}
-	for (cacheIndex = 0; cacheIndex < this._classDefToHTMLCache.length; ++ cacheIndex) {
-		if (this._classDefToHTMLCache[cacheIndex].first == classDef) {
-			return this._classDefToHTMLCache[cacheIndex].second;
-		}
+	result = this._classDefToHTMLCache.get$LClassDefinition$(classDef);
+	if (result != null) {
+		return result;
 	}
 	function determineParserOfClassDef() {
 		/** @type {Array.<undefined|Parser>} */
 		var parsers;
 		/** @type {!number} */
 		var i;
+		/** @type {Array.<undefined|TemplateClassDefinition>} */
+		var templateClassDefs;
+		/** @type {!number} */
+		var j;
+		/** @type {Array.<undefined|ClassDefinition>} */
+		var classDefs;
 		parsers = $this._compiler.getParsers$();
 		for (i = 0; i < parsers.length; ++ i) {
-			if (parsers[i].getClassDefs$().indexOf(classDef) !== - 1 || classDef instanceof TemplateClassDefinition && parsers[i].getTemplateClassDefs$().indexOf(classDef) !== - 1) {
-				return parsers[i];
+			if (classDef instanceof TemplateClassDefinition) {
+				templateClassDefs = parsers[i].getTemplateClassDefs$();
+				for (j = 0; j < templateClassDefs.length; ++ j) {
+					templateClassDefs = templateClassDefs.concat(templateClassDefs[j].getTemplateInnerClasses$());
+				}
+				if (templateClassDefs.indexOf(classDef) !== - 1) {
+					return parsers[i];
+				}
+			} else {
+				classDefs = parsers[i].getClassDefs$();
+				for (j = 0; j < classDefs.length; ++ j) {
+					classDefs = classDefs.concat(classDefs[j].getInnerClasses$());
+				}
+				if (classDefs.indexOf(classDef) !== - 1) {
+					return parsers[i];
+				}
 			}
 		}
 		throw new Error("could not determine the parser to which the class belongs:" + classDef.className$());
@@ -27646,7 +28894,7 @@ DocumentGenerator.prototype._classDefToHTML$LParser$LClassDefinition$ = function
 	_ += this._escape$S(classDef.className$()).replace(/\n$/, "");
 	_ += "</a>\n";
 	_ = _.trim();
-	this._classDefToHTMLCache.push(new Tuple$ClassDefinition$string$E$LClassDefinition$S(classDef, _));
+	this._classDefToHTMLCache.set$LClassDefinition$S(classDef, _);
 	return _;
 };
 
@@ -27777,10 +29025,18 @@ DocumentGenerator.prototype._isPrivate$LMemberDefinition$ = function (memberDef)
 	return memberDef.name$().charAt(0) === "_";
 };
 
-CompilationServer._requestSequence = 0;
+$__jsx_lazy_init(CompilationServer, "AUTO_SHUTDOWN", function () {
+	return ! process.env.JSX_NO_AUTO_SHUTDOWN;
+});
+$__jsx_lazy_init(CompilationServer, "LIFE", function () {
+	return 10 * 60 * 1000;
+});
 js.global = (function () { return this; })();
 $__jsx_lazy_init(node, "__dirname", function () {
 	return eval("__dirname") + "";
+});
+$__jsx_lazy_init(node, "__filename", function () {
+	return eval("__filename") + "";
 });
 $__jsx_lazy_init(node, "fs", function () {
 	return node$require$S('fs');
@@ -27802,6 +29058,12 @@ $__jsx_lazy_init(node, "https", function () {
 });
 $__jsx_lazy_init(node, "net", function () {
 	return node$require$S('net');
+});
+$__jsx_lazy_init(Timer, "_requestAnimationFrame", function () {
+	return Timer$_getRequestAnimationFrameImpl$B(true);
+});
+$__jsx_lazy_init(Timer, "_cancelAnimationFrame", function () {
+	return Timer$_getCancelAnimationFrameImpl$B(true);
 });
 $__jsx_lazy_init(Util, "_stringLiteralEncodingMap", function () {
 	return ({ "\0": "\\0", "\r": "\\r", "\n": "\\n", "\t": "\\t", "\"": "\\\"", "\'": "\\\'", "\\": "\\\\" });
@@ -27838,10 +29100,10 @@ _CallExpressionEmitter._operatorPrecedence = 0;
 _SuperExpressionEmitter._operatorPrecedence = 0;
 _NewExpressionEmitter._operatorPrecedence = 0;
 _CommaExpressionEmitter._operatorPrecedence = 0;
-Meta.VERSION_STRING = "0.9.5";
-Meta.VERSION_NUMBER = 0.009005;
-Meta.LAST_COMMIT_HASH = "164a17e89c64ec43e7c9f3950574988ffd6f81e8";
-Meta.LAST_COMMIT_DATE = "2013-02-08 10:43:37 +0900";
+Meta.VERSION_STRING = "0.9.10";
+Meta.VERSION_NUMBER = 0.00901;
+Meta.LAST_COMMIT_HASH = "06b6c6cf1c4cd23a9d61f3fbd7d4606625a45252";
+Meta.LAST_COMMIT_DATE = "2013-03-08 13:50:20 +0900";
 $__jsx_lazy_init(Meta, "IDENTIFIER", function () {
 	return Meta.VERSION_STRING + " (" + Meta.LAST_COMMIT_DATE + "; " + Meta.LAST_COMMIT_HASH + ")";
 });
@@ -27947,7 +29209,7 @@ Compiler.MODE_DOC = 3;
 var $__jsx_classMap = {
 	"src/jsx-node-front.jsx": {
 		CompilationServer: CompilationServer,
-		CompilationServer$: CompilationServer$,
+		CompilationServer$LPlatform$: CompilationServer$LPlatform$,
 		_Main: _Main,
 		_Main$: _Main$,
 		NodePlatform: NodePlatform,
@@ -27963,6 +29225,12 @@ var $__jsx_classMap = {
 	"system:lib/js/js/nodejs.jsx": {
 		node: node,
 		node$: node$
+	},
+	"system:lib/js/timer.jsx": {
+		Timer: Timer,
+		Timer$: Timer$,
+		TimerHandle: TimerHandle,
+		TimerHandle$: TimerHandle$
 	},
 	"src/util.jsx": {
 		Util: Util,
@@ -28122,7 +29390,7 @@ var $__jsx_classMap = {
 		CommaExpression: CommaExpression,
 		CommaExpression$LToken$LExpression$LExpression$: CommaExpression$LToken$LExpression$LExpression$,
 		FunctionExpression: FunctionExpression,
-		FunctionExpression$LToken$LMemberFunctionDefinition$B: FunctionExpression$LToken$LMemberFunctionDefinition$B,
+		FunctionExpression$LToken$LLocalVariable$LMemberFunctionDefinition$B: FunctionExpression$LToken$LLocalVariable$LMemberFunctionDefinition$B,
 		ThisExpression: ThisExpression,
 		ThisExpression$LToken$LClassDefinition$: ThisExpression$LToken$LClassDefinition$,
 		MapLiteralExpression: MapLiteralExpression,
@@ -28238,11 +29506,11 @@ var $__jsx_classMap = {
 		MemberVariableDefinition: MemberVariableDefinition,
 		MemberVariableDefinition$LToken$LToken$NLType$LExpression$LDocComment$: MemberVariableDefinition$LToken$LToken$NLType$LExpression$LDocComment$,
 		ClassDefinition: ClassDefinition,
-		ClassDefinition$LToken$SNLParsedObjectType$ALParsedObjectType$ALMemberDefinition$ALParsedObjectType$LDocComment$: ClassDefinition$LToken$SNLParsedObjectType$ALParsedObjectType$ALMemberDefinition$ALParsedObjectType$LDocComment$,
+		ClassDefinition$LToken$SNLParsedObjectType$ALParsedObjectType$ALMemberDefinition$ALClassDefinition$ALTemplateClassDefinition$ALParsedObjectType$LDocComment$: ClassDefinition$LToken$SNLParsedObjectType$ALParsedObjectType$ALMemberDefinition$ALClassDefinition$ALTemplateClassDefinition$ALParsedObjectType$LDocComment$,
 		InstantiatedClassDefinition: InstantiatedClassDefinition,
-		InstantiatedClassDefinition$LTemplateClassDefinition$ALType$LParsedObjectType$ALParsedObjectType$ALMemberDefinition$ALParsedObjectType$: InstantiatedClassDefinition$LTemplateClassDefinition$ALType$LParsedObjectType$ALParsedObjectType$ALMemberDefinition$ALParsedObjectType$,
+		InstantiatedClassDefinition$LTemplateClassDefinition$ALType$LParsedObjectType$ALParsedObjectType$ALMemberDefinition$ALClassDefinition$ALTemplateClassDefinition$ALParsedObjectType$: InstantiatedClassDefinition$LTemplateClassDefinition$ALType$LParsedObjectType$ALParsedObjectType$ALMemberDefinition$ALClassDefinition$ALTemplateClassDefinition$ALParsedObjectType$,
 		TemplateClassDefinition: TemplateClassDefinition,
-		TemplateClassDefinition$LToken$SNALToken$LParsedObjectType$ALParsedObjectType$ALMemberDefinition$ALParsedObjectType$LDocComment$: TemplateClassDefinition$LToken$SNALToken$LParsedObjectType$ALParsedObjectType$ALMemberDefinition$ALParsedObjectType$LDocComment$
+		TemplateClassDefinition$LToken$SNALToken$LParsedObjectType$ALParsedObjectType$ALMemberDefinition$ALClassDefinition$ALTemplateClassDefinition$ALParsedObjectType$LDocComment$: TemplateClassDefinition$LToken$SNALToken$LParsedObjectType$ALParsedObjectType$ALMemberDefinition$ALClassDefinition$ALTemplateClassDefinition$ALParsedObjectType$LDocComment$
 	},
 	"src/type.jsx": {
 		Type: Type,
@@ -28294,9 +29562,13 @@ var $__jsx_classMap = {
 		WildcardImport: WildcardImport,
 		WildcardImport$LToken$LToken$ALToken$SS: WildcardImport$LToken$LToken$ALToken$SS,
 		QualifiedName: QualifiedName,
+		QualifiedName$LToken$: QualifiedName$LToken$,
 		QualifiedName$LToken$LImport$: QualifiedName$LToken$LImport$,
+		QualifiedName$LToken$LParsedObjectType$: QualifiedName$LToken$LParsedObjectType$,
 		ParserState: ParserState,
 		ParserState$NNLDocComment$NNNNN: ParserState$NNLDocComment$NNNNN,
+		ClassState: ClassState,
+		ClassState$LClassState$LParsedObjectType$ALToken$LParsedObjectType$ALParsedObjectType$ALParsedObjectType$NALClassDefinition$ALTemplateClassDefinition$: ClassState$LClassState$LParsedObjectType$ALToken$LParsedObjectType$ALParsedObjectType$ALParsedObjectType$NALClassDefinition$ALTemplateClassDefinition$,
 		Scope: Scope,
 		Scope$LScope$ALLocalVariable$LLocalVariable$ALArgumentDeclaration$ALStatement$ALMemberFunctionDefinition$: Scope$LScope$ALLocalVariable$LLocalVariable$ALArgumentDeclaration$ALStatement$ALMemberFunctionDefinition$,
 		Parser: Parser,
@@ -28423,7 +29695,7 @@ var $__jsx_classMap = {
 	},
 	"src/jssourcemap.jsx": {
 		SourceMapper: SourceMapper,
-		SourceMapper$SUS: SourceMapper$SUS
+		SourceMapper$SS: SourceMapper$SS
 	},
 	"src/compiler.jsx": {
 		Compiler: Compiler,
@@ -28455,7 +29727,7 @@ var $__jsx_classMap = {
 		DocComment: DocComment,
 		DocComment$: DocComment$,
 		DocumentGenerator: DocumentGenerator,
-		DocumentGenerator$LCompiler$: DocumentGenerator$LCompiler$
+		DocumentGenerator$LCompiler$SS: DocumentGenerator$LCompiler$SS
 	}
 };
 
@@ -28466,14 +29738,13 @@ var $__jsx_classMap = {
 JSX.runMain = function (sourceFile, args) {
 	var module = JSX.require(sourceFile);
 	if (! module) {
-		throw new Error("entry point module not found in " + sourceFile);
+		throw new ReferenceError("entry point module not found in " + sourceFile);
 	}
-
 	if (! module._Main) {
-		throw new Error("entry point _Main not found in " + sourceFile);
+		throw new ReferenceError("entry point _Main not found in " + sourceFile);
 	}
 	if (! module._Main.main$AS) {
-		throw new Error("entry point _Main.main(:string[]):void not found in " + sourceFile);
+		throw new ReferenceError("entry point _Main.main(:string[]):void not found in " + sourceFile);
 	}
 	module._Main.main$AS(args);
 };

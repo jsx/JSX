@@ -320,7 +320,7 @@ abstract class _OptimizeCommand {
 		if (stash[this._identifier] == null) {
 			stash[this._identifier] = this._createStash();
 		}
-		return stash[this._identifier] as OptimizerStash;
+		return stash[this._identifier];
 	}
 
 	function _createStash () : OptimizerStash {
@@ -388,46 +388,45 @@ abstract class _FunctionOptimizeCommand extends _OptimizeCommand {
 
 }
 
-class _LinkTimeOptimizationCommandStash extends OptimizerStash {
-
-	var extendedBy : ClassDefinition[];
-
-	function constructor () {
-		this.extendedBy = new ClassDefinition[];
-	}
-
-	override function clone () : OptimizerStash {
-		throw new Error("not supported");
-	}
-
-}
-
 class _LinkTimeOptimizationCommand extends _OptimizeCommand {
-
 	static const IDENTIFIER = "lto";
+
+	class Stash extends OptimizerStash {
+
+		var extendedBy : ClassDefinition[];
+
+		function constructor () {
+			this.extendedBy = new ClassDefinition[];
+		}
+
+		override function clone () : OptimizerStash {
+			throw new Error("not supported");
+		}
+
+	}
 
 	function constructor () {
 		super(_LinkTimeOptimizationCommand.IDENTIFIER);
 	}
 
 	override function _createStash () : OptimizerStash {
-		return new _LinkTimeOptimizationCommandStash();
+		return new _LinkTimeOptimizationCommand.Stash();
 	}
 
 	override function performOptimization () : void {
 		// set extendedBy for every class
 		this.getCompiler().forEachClassDef(function (parser, classDef) {
 			if (classDef.extendType() != null)
-				(this.getStash(classDef.extendType().getClassDef()) as _LinkTimeOptimizationCommandStash).extendedBy.push(classDef);
+				(this.getStash(classDef.extendType().getClassDef()) as _LinkTimeOptimizationCommand.Stash).extendedBy.push(classDef);
 			for (var i = 0; i < classDef.implementTypes().length; ++i)
-				(this.getStash(classDef.implementTypes()[i].getClassDef()) as _LinkTimeOptimizationCommandStash).extendedBy.push(classDef);
+				(this.getStash(classDef.implementTypes()[i].getClassDef()) as _LinkTimeOptimizationCommand.Stash).extendedBy.push(classDef);
 			return true;
 		});
 		// mark classes / functions that are not derived / overridden as final
 		this.getCompiler().forEachClassDef(function (parser, classDef) {
 
 			if ((classDef.flags() & (ClassDefinition.IS_INTERFACE | ClassDefinition.IS_MIXIN | ClassDefinition.IS_NATIVE | ClassDefinition.IS_FINAL)) == 0
-				&& (this.getStash(classDef) as _LinkTimeOptimizationCommandStash).extendedBy.length == 0) {
+				&& (this.getStash(classDef) as _LinkTimeOptimizationCommand.Stash).extendedBy.length == 0) {
 
 					// found a class that is not extended, mark it and its functions as final
 					this.log("marking class as final: " + classDef.className());
@@ -448,7 +447,7 @@ class _LinkTimeOptimizationCommand extends _OptimizeCommand {
 							// mark functions that are not being overridden as final
 							if (funcDef.getStatements() == null)
 								throw new Error("a non-native, non-abstract function with out function body?");
-							var overrides = this._getOverrides(classDef, (this.getStash(classDef) as _LinkTimeOptimizationCommandStash).extendedBy, funcDef.name(), funcDef.getArgumentTypes());
+							var overrides = this._getOverrides(classDef, (this.getStash(classDef) as _LinkTimeOptimizationCommand.Stash).extendedBy, funcDef.name(), funcDef.getArgumentTypes());
 							if (overrides.length == 0) {
 								this.log("marking function as final: " + funcDef.getNotation());
 								funcDef.setFlags(funcDef.flags() | ClassDefinition.IS_FINAL);
@@ -479,7 +478,7 @@ class _LinkTimeOptimizationCommand extends _OptimizeCommand {
 	}
 
 	function _getOverridesByClass (srcClassDef : ClassDefinition, classDef : ClassDefinition, name : string, argTypes : Type[]) : MemberFunctionDefinition[] {
-		var overrides = this._getOverrides(srcClassDef, (this.getStash(classDef) as _LinkTimeOptimizationCommandStash).extendedBy, name, argTypes);
+		var overrides = this._getOverrides(srcClassDef, (this.getStash(classDef) as _LinkTimeOptimizationCommand.Stash).extendedBy, name, argTypes);
 		function addOverride (funcDef : MemberFunctionDefinition) : boolean {
 			if (funcDef.name() == name
 				&& (funcDef.flags() & ClassDefinition.IS_ABSTRACT) == 0
@@ -504,9 +503,10 @@ class _LinkTimeOptimizationCommand extends _OptimizeCommand {
 }
 
 class _NoAssertCommand extends _FunctionOptimizeCommand {
+	static const IDENTIFIER = "no-assert";
 
 	function constructor () {
-		super("no-assert");
+		super(_NoAssertCommand.IDENTIFIER);
 	}
 
 	override function optimizeFunction (funcDef : MemberFunctionDefinition) : boolean {
@@ -533,9 +533,10 @@ class _NoAssertCommand extends _FunctionOptimizeCommand {
 
 // CONVERSION ERROR: wrong name for exporting: _NoLogCommand and _NoAssertCommand
 class _NoLogCommand extends _FunctionOptimizeCommand {
+	static const IDENTIFIER = "no-log";
 
 	function constructor () {
-		super("no-log");
+		super(_NoLogCommand.IDENTIFIER);
 	}
 
 	override function optimizeFunction (funcDef : MemberFunctionDefinition) : boolean {
@@ -560,34 +561,34 @@ class _NoLogCommand extends _FunctionOptimizeCommand {
 
 }
 
-class _DetermineCalleeCommandStash extends OptimizerStash {
-
-	var callingFuncDef : MemberFunctionDefinition;
-
-	function constructor () {
-		this.callingFuncDef = null;
-	}
-
-	function constructor (that : _DetermineCalleeCommandStash) {
-		this.callingFuncDef = that.callingFuncDef;
-	}
-
-	override function clone () : OptimizerStash {
-		return new _DetermineCalleeCommandStash(this);
-	}
-
-}
 
 class _DetermineCalleeCommand extends _FunctionOptimizeCommand {
-
 	static const IDENTIFIER = "determine-callee";
+
+	class Stash extends OptimizerStash {
+
+		var callingFuncDef : MemberFunctionDefinition;
+
+		function constructor () {
+			this.callingFuncDef = null;
+		}
+
+		function constructor (that : _DetermineCalleeCommand.Stash) {
+			this.callingFuncDef = that.callingFuncDef;
+		}
+
+		override function clone () : OptimizerStash {
+			return new _DetermineCalleeCommand.Stash(this);
+		}
+
+	}
 
 	function constructor () {
 		super(_DetermineCalleeCommand.IDENTIFIER);
 	}
 
 	override function _createStash () : OptimizerStash {
-		return new _DetermineCalleeCommandStash();
+		return new _DetermineCalleeCommand.Stash();
 	}
 
 	override function optimizeFunction (funcDef : MemberFunctionDefinition) : boolean {
@@ -645,7 +646,7 @@ class _DetermineCalleeCommand extends _FunctionOptimizeCommand {
 	}
 
 	function _setCallingFuncDef (stashable : Stashable, funcDef : MemberFunctionDefinition) : void {
-		(this.getStash(stashable) as _DetermineCalleeCommandStash).callingFuncDef = funcDef;
+		(this.getStash(stashable) as _DetermineCalleeCommand.Stash).callingFuncDef = funcDef;
 	}
 
 	static function findCallingFunctionInClass (classDef : ClassDefinition, funcName : string, argTypes : Type[], isStatic : boolean) : MemberFunctionDefinition {
@@ -670,7 +671,7 @@ class _DetermineCalleeCommand extends _FunctionOptimizeCommand {
 	}
 
 	static function getCallingFuncDef (stashable : Stashable) : MemberFunctionDefinition {
-		var stash = stashable.getOptimizerStash()[_DetermineCalleeCommand.IDENTIFIER] as _DetermineCalleeCommandStash;
+		var stash = stashable.getOptimizerStash()[_DetermineCalleeCommand.IDENTIFIER] as _DetermineCalleeCommand.Stash;
 		if (stash == null)
 			throw new Error("callee not searched");
 		return stash.callingFuncDef;
@@ -678,34 +679,34 @@ class _DetermineCalleeCommand extends _FunctionOptimizeCommand {
 
 }
 
-class _UnclassifyOptimizationCommandStash extends OptimizerStash {
-
-	var inliner : function(:NewExpression):Expression[];
-
-	function constructor () {
-		this.inliner = null;
-	}
-
-	function constructor (that : _UnclassifyOptimizationCommandStash) {
-		this.inliner = that.inliner;
-	}
-
-	override function clone () : OptimizerStash {
-		return new _UnclassifyOptimizationCommandStash(this);
-	}
-
-}
 
 class _UnclassifyOptimizationCommand extends _OptimizeCommand {
-
 	static const IDENTIFIER = "unclassify";
 
 	function constructor () {
 		super(_UnclassifyOptimizationCommand.IDENTIFIER);
 	}
 
+	class Stash extends OptimizerStash {
+
+		var inliner : function(:NewExpression):Expression[];
+
+		function constructor () {
+			this.inliner = null;
+		}
+
+		function constructor (that : _UnclassifyOptimizationCommand.Stash) {
+			this.inliner = that.inliner;
+		}
+
+		override function clone () : _UnclassifyOptimizationCommand.Stash {
+			return new _UnclassifyOptimizationCommand.Stash(this);
+		}
+
+	}
+
 	override function _createStash () : OptimizerStash {
-		return new _UnclassifyOptimizationCommandStash();
+		return new _UnclassifyOptimizationCommand.Stash();
 	}
 
 	override function performOptimization () : void {
@@ -821,7 +822,7 @@ class _UnclassifyOptimizationCommand extends _OptimizeCommand {
 					var inliner = this._createInliner(funcDef);
 					this.log(funcDef.getNotation() + " is" + (inliner ? "" : " not") + " inlineable");
 					if (inliner) {
-						(this.getStash(funcDef) as _UnclassifyOptimizationCommandStash).inliner = inliner;
+						(this.getStash(funcDef) as _UnclassifyOptimizationCommand.Stash).inliner = inliner;
 						hasInlineableCtor = true;
 					}
 				}
@@ -1003,32 +1004,33 @@ class _UnclassifyOptimizationCommand extends _OptimizeCommand {
 
 // propagates constants
 
-class _FoldConstantCommandStash extends OptimizerStash {
-
-	var isOptimized : boolean;
-
-	function constructor () {
-		this.isOptimized = false;
-	}
-
-	function constructor (that : _FoldConstantCommandStash) {
-		this.isOptimized = that.isOptimized;
-	}
-
-	override function clone () : OptimizerStash {
-		return new _FoldConstantCommandStash(this);
-	}
-
-}
-
 class _FoldConstantCommand extends _FunctionOptimizeCommand {
+	static const IDENTIFIER = "fold-const";
+
+	class Stash extends OptimizerStash {
+
+		var isOptimized : boolean;
+
+		function constructor () {
+			this.isOptimized = false;
+		}
+
+		function constructor (that : _FoldConstantCommand.Stash) {
+			this.isOptimized = that.isOptimized;
+		}
+
+		override function clone () : OptimizerStash {
+			return new _FoldConstantCommand.Stash(this);
+		}
+
+	}
 
 	function constructor () {
-		super("fold-const");
+		super(_FoldConstantCommand.IDENTIFIER);
 	}
 
 	override function _createStash () : OptimizerStash {
-		return new _FoldConstantCommandStash();
+		return new _FoldConstantCommand.Stash();
 	}
 
 	override function optimizeFunction (funcDef : MemberFunctionDefinition) : boolean {
@@ -1238,10 +1240,11 @@ class _FoldConstantCommand extends _FunctionOptimizeCommand {
 	}
 
 	function _foldStaticConst (member : MemberVariableDefinition) : void {
+		var stash = this.getStash(member) as _FoldConstantCommand.Stash;
 		// optimize only once
-		if ((this.getStash(member) as _FoldConstantCommandStash).isOptimized)
+		if (stash.isOptimized)
 			return;
-		(this.getStash(member) as _FoldConstantCommandStash).isOptimized = true;
+		stash.isOptimized = true;
 		// optimize
 		var initialValue = member.getInitialValue();
 		if (initialValue != null)
@@ -1270,9 +1273,10 @@ class _FoldConstantCommand extends _FunctionOptimizeCommand {
 }
 
 class _DeadCodeEliminationOptimizeCommand extends _FunctionOptimizeCommand {
+	static const IDENTIFIER = "dce";
 
 	function constructor () {
-		super("dce");
+		super(_DeadCodeEliminationOptimizeCommand.IDENTIFIER);
 	}
 
 	override function optimizeFunction (funcDef : MemberFunctionDefinition) : boolean {
@@ -1637,44 +1641,47 @@ class _DeadCodeEliminationOptimizeCommand extends _FunctionOptimizeCommand {
 
 }
 
-class _InlineOptimizeCommandStash extends OptimizerStash {
-
-	var isOptimized : boolean;
-	var isInlineable : Nullable.<boolean>;
-
-	function constructor () {
-		this.isOptimized = false;
-		this.isInlineable = null;
-	}
-
-	function constructor (that: _InlineOptimizeCommandStash) {
-		this.isOptimized = that.isOptimized;
-		this.isInlineable = that.isInlineable;
-	}
-
-	override function clone () : OptimizerStash {
-		return new _InlineOptimizeCommandStash(this);
-	}
-
-}
 
 class _InlineOptimizeCommand extends _FunctionOptimizeCommand {
+	static const IDENTIFIER = "inline";
 
 	static const INLINE_THRESHOLD = 30; // TODO: make it configurable (--optimize inline=N)
 
+	class Stash extends OptimizerStash {
+
+		var isOptimized : boolean;
+		var isInlineable : Nullable.<boolean>;
+
+		function constructor () {
+			this.isOptimized  = false;
+			this.isInlineable = null;
+		}
+
+		function constructor (that: _InlineOptimizeCommand.Stash) {
+			this.isOptimized  = that.isOptimized;
+			this.isInlineable = that.isInlineable;
+		}
+
+		override function clone () : OptimizerStash {
+			return new _InlineOptimizeCommand.Stash(this);
+		}
+
+	}
+
 	function constructor () {
-		super("inline");
+		super(_InlineOptimizeCommand.IDENTIFIER);
 	}
 
 	override function _createStash () : OptimizerStash {
-		return new _InlineOptimizeCommandStash();
+		return new _InlineOptimizeCommand.Stash();
 	}
 
 	override function optimizeFunction (funcDef : MemberFunctionDefinition) : boolean {
+		var stash = this.getStash(funcDef) as _InlineOptimizeCommand.Stash;
 		// use flag, since functions might recurse
-		if ((this.getStash(funcDef) as _InlineOptimizeCommandStash).isOptimized)
+		if (stash.isOptimized)
 			return true;
-		(this.getStash(funcDef) as _InlineOptimizeCommandStash).isOptimized = true;
+		stash.isOptimized = true;
 
 		// we need to the check here since functions might recurse
 		if (funcDef.getStatements() == null)
@@ -1974,7 +1981,7 @@ class _InlineOptimizeCommand extends _FunctionOptimizeCommand {
 	}
 
 	function _functionIsInlineable (funcDef : MemberFunctionDefinition) : boolean {
-		var stash = this.getStash(funcDef) as _InlineOptimizeCommandStash;
+		var stash = this.getStash(funcDef) as _InlineOptimizeCommand.Stash;
 		if (stash.isInlineable == null) {
 			stash.isInlineable = function () : boolean {
 				// only inline function that are short, has no branches (last statement may be a return)
@@ -2164,11 +2171,12 @@ class _InlineOptimizeCommand extends _FunctionOptimizeCommand {
   for the reasoning of this optimization see http://jsperf.com/if-vs-condexpr
 */
 class _ReturnIfOptimizeCommand extends _FunctionOptimizeCommand {
+	static const IDENTIFIER = "return-if";
 
 	var _altered : boolean;
 
 	function constructor () {
-		super("return-if");
+		super(_ReturnIfOptimizeCommand.IDENTIFIER);
 	}
 
 	override function optimizeFunction (funcDef : MemberFunctionDefinition) : boolean {
@@ -2290,9 +2298,10 @@ class _LCSECachedExpression {
  * Common Subexpression Elimination
  */
 class _LCSEOptimizeCommand extends _FunctionOptimizeCommand {
+	static const IDENTIFIER = "lcse";
 
 	function constructor () {
-		super("lcse");
+		super(_LCSEOptimizeCommand.IDENTIFIER);
 	}
 
 	override function optimizeFunction (funcDef : MemberFunctionDefinition) : boolean {
@@ -2490,30 +2499,32 @@ class _LCSEOptimizeCommand extends _FunctionOptimizeCommand {
 
 }
 
-class _UnboxOptimizeCommandStash extends OptimizerStash {
-
-	var canUnbox : Nullable.<boolean>;
-
-	function constructor () {
-		this.canUnbox = null;
-	}
-
-	override function clone () : OptimizerStash {
-		var tmp = new _UnboxOptimizeCommandStash;
-		tmp.canUnbox = this.canUnbox;
-		return tmp;
-	}
-
-}
 
 class _UnboxOptimizeCommand extends _FunctionOptimizeCommand {
+	static const IDENTIFIER = "unbox";
+
+	class Stash extends OptimizerStash {
+
+		var canUnbox : Nullable.<boolean>;
+
+		function constructor () {
+			this.canUnbox = null;
+		}
+
+		override function clone () : OptimizerStash {
+			var tmp = new _UnboxOptimizeCommand.Stash;
+			tmp.canUnbox = this.canUnbox;
+			return tmp;
+		}
+
+	}
 
 	function constructor () {
-		super("unbox");
+		super(_UnboxOptimizeCommand.IDENTIFIER);
 	}
 
 	override function _createStash () : OptimizerStash {
-		return new _UnboxOptimizeCommandStash();
+		return new _UnboxOptimizeCommand.Stash();
 	}
 
 	override function optimizeFunction (funcDef : MemberFunctionDefinition) : boolean {
@@ -2604,10 +2615,11 @@ class _UnboxOptimizeCommand extends _FunctionOptimizeCommand {
 
 	function _newExpressionCanUnbox (newExpr : Expression) : boolean {
 		var ctor = _DetermineCalleeCommand.getCallingFuncDef(newExpr);
-		if ((this.getStash(ctor) as _UnboxOptimizeCommandStash).canUnbox != null) {
-			return (this.getStash(ctor) as _UnboxOptimizeCommandStash).canUnbox;
+		var stash = this.getStash(ctor) as _UnboxOptimizeCommand.Stash;
+		if (stash.canUnbox != null) {
+			return stash.canUnbox;
 		}
-		return (this.getStash(ctor) as _UnboxOptimizeCommandStash).canUnbox = function () : boolean {
+		return stash.canUnbox = function () : boolean {
 			if (ctor.getLocals().length != 0) {
 				return false;
 			}
@@ -2752,9 +2764,10 @@ class _UnboxOptimizeCommand extends _FunctionOptimizeCommand {
 }
 
 class _ArrayLengthOptimizeCommand extends _FunctionOptimizeCommand {
+	static const IDENTIFIER = "array-length";
 
 	function constructor () {
-		super("array-length");
+		super(_ArrayLengthOptimizeCommand.IDENTIFIER);
 	}
 
 	override function optimizeFunction (funcDef : MemberFunctionDefinition) : boolean {
@@ -2884,32 +2897,33 @@ class _ArrayLengthOptimizeCommand extends _FunctionOptimizeCommand {
 
 }
 
-class _NoDebugCommandStash extends OptimizerStash {
-	var debugValue = true;
-
-	override function clone () : OptimizerStash {
-		var tmp = new _NoDebugCommandStash;
-		tmp.debugValue = this.debugValue;
-		return tmp;
-	}
-}
-
 /**
  * Set JSX.DEBUG = false, where `if (JSX.DEBUG) { ... }` blocks will be
  * removed by "dce" optimization command.
  */
 class _NoDebugCommand extends _OptimizeCommand {
+	static const IDENTIFIER = "no-debug";
 
-	function constructor() {
-		super("no-debug");
+	class Stash extends OptimizerStash {
+		var debugValue = true;
+
+		override function clone () : OptimizerStash {
+			var tmp = new _NoDebugCommand.Stash;
+			tmp.debugValue = this.debugValue;
+			return tmp;
+		}
 	}
 
-	override function _createStash () : OptimizerStash {
-		return new _NoDebugCommandStash();
+	function constructor() {
+		super(_NoDebugCommand.IDENTIFIER);
+	}
+
+	override function _createStash () : _NoDebugCommand.Stash {
+		return new _NoDebugCommand.Stash();
 	}
 
 	override function performOptimization () : void {
-		var stash = this.getStash(this.getCompiler().getEmitter()) as _NoDebugCommandStash;
+		var stash = this.getStash(this.getCompiler().getEmitter()) as _NoDebugCommand.Stash;
 		stash.debugValue = false;
 
 		this.getCompiler().forEachClassDef(function (parser, classDef) {

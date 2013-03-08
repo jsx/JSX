@@ -31,8 +31,8 @@ import "./util.jsx";
 import "./optimizer.jsx";
 import "./parser.jsx";
 import "./platform.jsx";
-import _UnclassifyOptimizationCommandStash,
-	   _NoDebugCommandStash from "./optimizer.jsx";
+import _UnclassifyOptimizationCommand,
+	   _NoDebugCommand from "./optimizer.jsx";
 
 
 /**
@@ -1853,7 +1853,7 @@ class _NewExpressionEmitter extends _OperatorExpressionEmitter {
 	override function emit (outerOpPrecedence : number) : void {
 		function getInliner(funcDef : MemberFunctionDefinition) : function(:NewExpression):Expression[] {
 			var stash = funcDef.getOptimizerStash()["unclassify"];
-			return stash ? (stash as _UnclassifyOptimizationCommandStash).inliner : null;
+			return stash ? (stash as _UnclassifyOptimizationCommand.Stash).inliner : null;
 		}
 		var classDef = this._expr.getType().getClassDef();
 		var ctor = this._expr.getConstructor();
@@ -2066,7 +2066,7 @@ class JavaScriptEmitter implements Emitter {
 	override function emit (classDefs : ClassDefinition[]) : void {
 		var bootstrap = this._platform.load(this._platform.getRoot() + "/src/js/bootstrap.js");
 		this._output += bootstrap;
-		var stash = (this.getOptimizerStash()["no-debug"] as _NoDebugCommandStash);
+		var stash = (this.getOptimizerStash()[_NoDebugCommand.IDENTIFIER] as _NoDebugCommand.Stash);
 		this._emit("JSX.DEBUG = "+(stash == null || stash.debugValue ? "true" : "false")+";\n", null);
 
 		for (var i = 0; i < classDefs.length; ++i) {
