@@ -879,6 +879,9 @@ class _UnclassifyOptimizationCommand extends _OptimizeCommand {
 				} else if (expr instanceof FunctionExpression) {
 					// environment of the closure would change
 					return false;
+				} else if (expr instanceof ThisExpression) {
+					// depends on "this" inside constructors
+					return false;
 				} else if (expr instanceof LocalExpression) {
 					var argIndex = funcDef.getArguments().map.<LocalVariable>((i) -> i).indexOf((expr as LocalExpression).getLocal());
 					if (argIndex == -1) {
