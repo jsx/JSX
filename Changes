@@ -1,5 +1,9 @@
 Revision history for the JSX software development kit
 
+0.9.12 2013-03-09 18:34:56
+    [BUG FIXES]
+    - Fix an optimization issues found in shibukawa:Oktavia
+
 0.9.11 2013-03-08 14:25:22
     [CHANGES]
     - Forbade calling instance methods after operator new without parens,
