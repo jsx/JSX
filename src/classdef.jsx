@@ -587,6 +587,7 @@ class ClassDefinition implements Stashable {
 						var identifierToken = propExpr.getIdentifierToken();
 						var receiverType = (propExpr.getExpr() as ClassExpression).getType() as ParsedObjectType;
 						var receiverClassDef = receiverType.getClassDef();
+						assert receiverClassDef != null;
 						receiverClassDef.forEachInnerClass(function (classDef) {
 							if (classDef.className() == identifierToken.getValue()) {
 								var objectType = new ParsedObjectType(
