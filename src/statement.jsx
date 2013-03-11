@@ -316,6 +316,52 @@ class ReturnStatement extends Statement {
 
 }
 
+class YieldStatement extends Statement {
+
+	var _token : Token;
+	var _expr : Expression;
+
+	function constructor (token : Token, expr : Expression) {
+		super();
+		this._token = token;
+		this._expr = expr;
+	}
+
+	override function clone () : Statement {
+		return new YieldStatement(this._token, Cloner.<Expression>.cloneNullable(this._expr));
+	}
+
+	override function getToken () : Token {
+		return this._token;
+	}
+
+	function getExpr () : Expression {
+		return this._expr;
+	}
+
+	function setExpr (expr : Expression) : void {
+		this._expr = expr;
+	}
+
+	override function serialize () : variant {
+		return [
+			"YieldStatement",
+			Serializer.<Expression>.serializeNullable(this._expr)
+		] : variant[];
+	}
+
+	override function doAnalyze (context : AnalysisContext) : boolean {
+		throw new Error("yield statement is not supported for now");
+	}
+
+	override function forEachExpression (cb : function(:Expression,:function(:Expression):void):boolean) : boolean {
+		if (this._expr != null && ! cb(this._expr, function (expr) { this._expr = expr; }))
+			return false;
+		return true;
+	}
+
+}
+
 class DeleteStatement extends UnaryExpressionStatement {
 
 	var _token : Token;

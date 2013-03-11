@@ -1933,7 +1933,7 @@ class Parser {
 		}
 		// parse the statement
 		var token = this._expectOpt([
-			"{", "var", ";", "if", "do", "while", "for", "continue", "break", "return", "switch", "throw", "try", "assert", "log", "delete", "debugger", "function", "void"
+			"{", "var", ";", "if", "do", "while", "for", "continue", "break", "return", "yield", "switch", "throw", "try", "assert", "log", "delete", "debugger", "function", "void"
 		]);
 		if (label != null) {
 			if (! (token != null && token.getValue().match(/^(?:do|while|for|switch)$/) != null)) {
@@ -1963,6 +1963,8 @@ class Parser {
 				return this._breakStatement(token);
 			case "return":
 				return this._returnStatement(token);
+			case "yield":
+				return this._yieldStatement(token);
 			case "switch":
 				return this._switchStatement(token, label);
 			case "throw":
@@ -2206,6 +2208,16 @@ class Parser {
 		if (expr == null)
 			return false;
 		this._statements.push(new ReturnStatement(token, expr));
+		if (this._expect(";") == null)
+			return false;
+		return true;
+	}
+
+	function _yieldStatement (token : Token) : boolean {
+		var expr = this._expr(false);
+		if (expr == null)
+			return false;
+		this._statements.push(new YieldStatement(token, expr));
 		if (this._expect(";") == null)
 			return false;
 		return true;
