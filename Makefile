@@ -18,7 +18,7 @@ compiler: src/doc.jsx meta
 
 # use JSX compiler directly as jsx(1)
 compiler-js: src/doc.jsx meta
-	rm bin/jsx
+	rm -f bin/jsx
 	node tool/bootstrap-compiler.js --executable node --output bin/jsx src/jsx-node-front.jsx
 
 src/doc.jsx: src/_doc.jsx

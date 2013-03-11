@@ -1002,6 +1002,12 @@ native final class JSON {
 
 }
 
+interface Enumerable.<T> {
+
+	function next() : T;
+
+}
+
 /**
  * Provides static functions to control the behaviour of the JSX runtime.
  */

@@ -277,6 +277,11 @@ class ReturnStatement extends Statement {
 	}
 
 	override function doAnalyze (context : AnalysisContext) : boolean {
+		// handle generator
+		if ((context.funcDef.flags() & ClassDefinition.IS_GENERATOR) != 0) {
+			context.errors.push(new CompileError(this._token, "return statement in generator is not allowed"));
+			return true;
+		}
 		var returnType = context.funcDef.getReturnType();
 		if (returnType.equals(Type.voidType)) {
 			// handle return(void);
@@ -351,7 +356,21 @@ class YieldStatement extends Statement {
 	}
 
 	override function doAnalyze (context : AnalysisContext) : boolean {
-		throw new Error("yield statement is not supported for now");
+		if (this._expr == null) {
+			context.errors.push(new CompileError(this._token, "yield statement takes one expression, but no expression passed"));
+			return true;
+		}
+		// handle return of values
+		if (! this._analyzeExpr(context, this._expr))
+			return true;
+		if (this._expr.getType() == null)
+			return true;
+		var yieldType = (context.funcDef.getReturnType().getClassDef() as InstantiatedClassDefinition).getTypeArguments()[0];
+		if (! this._expr.getType().isConvertibleTo(yieldType)) {
+			context.errors.push(new CompileError(this._token, "cannot convert '" + this._expr.getType().toString() + "' to yield type '" + yieldType.toString() + "'"));
+			return false;
+		}
+		return true;
 	}
 
 	override function forEachExpression (cb : function(:Expression,:function(:Expression):void):boolean) : boolean {

@@ -148,6 +148,7 @@ class ClassDefinition implements Stashable {
 	static const IS_INLINE = 1024;
 	static const IS_PURE = 2048; // constexpr (intended for for native functions)
 	static const IS_DELETE = 4096; // used for disabling the default constructor
+	static const IS_GENERATOR = 8192;
 
 	var _parser		: Parser;
 	var _token		: Token;
@@ -1157,6 +1158,16 @@ class MemberFunctionDefinition extends MemberDefinition implements Block {
 		// return if is abtract (wo. function body) or is native
 		if (this._statements == null)
 			return;
+
+		// handle generator
+		if ((this._flags & ClassDefinition.IS_GENERATOR) != 0) {
+			var returnType = this._returnType;
+			if (returnType instanceof ObjectType && returnType.getClassDef() instanceof InstantiatedClassDefinition && (returnType.getClassDef() as InstantiatedClassDefinition).getTemplateClassName() == "Enumerable") {
+				// ok
+			} else {
+				outerContext.errors.push(new CompileError(this._token, "return type of generator should be Enumerable.<T>"));
+			}
+		}
 
 		// setup context
 		var context = outerContext.clone().setFuncDef(this);

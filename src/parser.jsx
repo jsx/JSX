@@ -491,16 +491,18 @@ class ParserState {
 	var columnOffset : number;
 	var docComment : DocComment;
 	var tokenLength : number;
+	var isGenerator : boolean;
 	var numErrors : number;
 	var numClosures : number;
 	var numObjectTypesUsed : number;
 	var numTemplateInstantiationRequests : number;
 
-	function constructor (lineNumber : number, columnNumber : number, docComment : DocComment, tokenLength : number, numErrors : number, numClosures : number, numObjectTypesUsed : number, numTemplateInstantiationRequests : number) {
+	function constructor (lineNumber : number, columnNumber : number, docComment : DocComment, tokenLength : number, isGenerator : boolean, numErrors : number, numClosures : number, numObjectTypesUsed : number, numTemplateInstantiationRequests : number) {
 		this.lineNumber = lineNumber;
 		this.columnOffset = columnNumber;
 		this.docComment = docComment;
 		this.tokenLength = tokenLength;
+		this.isGenerator = isGenerator;
 		this.numErrors = numErrors;
 		this.numClosures = numClosures;
 		this.numObjectTypesUsed = numObjectTypesUsed;
@@ -517,14 +519,16 @@ class Scope {
 	var arguments : ArgumentDeclaration[];
 	var statements : Statement[];
 	var closures : MemberFunctionDefinition[];
+	var isGenerator : boolean;
 
-	function constructor (prev : Scope, locals : LocalVariable[], funcName : LocalVariable, args : ArgumentDeclaration[], statements : Statement[], closures : MemberFunctionDefinition[]) {
+	function constructor (prev : Scope, locals : LocalVariable[], funcName : LocalVariable, args : ArgumentDeclaration[], statements : Statement[], closures : MemberFunctionDefinition[], isGenerator : boolean) {
 		this.prev = prev;
 		this.locals = locals;
 		this.funcName = funcName;
 		this.arguments = args;
 		this.statements = statements;
 		this.closures = closures;
+		this.isGenerator = isGenerator;
 	}
 
 }
@@ -546,6 +550,7 @@ class Parser {
 	var _templateClassDefs : TemplateClassDefinition[];
 	var _classDefs : ClassDefinition[];
 	var _imports : Import[];
+	var _isGenerator : boolean;
 	var _locals : LocalVariable[];
 	var _statements : Statement[];
 	var _closures : MemberFunctionDefinition[];
@@ -591,6 +596,7 @@ class Parser {
 		this._classDefs = new ClassDefinition[];
 		this._imports = new Import[];
 		// use for function parsing
+		this._isGenerator = false;
 		this._locals = null;
 		this._statements = null;
 		this._closures = new MemberFunctionDefinition[];
@@ -752,13 +758,15 @@ class Parser {
 			this._funcName,
 			this._arguments,
 			this._statements,
-			this._closures
+			this._closures,
+			this._isGenerator
 		);
 		this._locals = new LocalVariable[];
 		this._funcName = funcName;
 		this._arguments = args;
 		this._statements = new Statement[];
 		this._closures = new MemberFunctionDefinition[];
+		this._isGenerator = false;
 	}
 
 	function _popScope () : void {
@@ -767,6 +775,7 @@ class Parser {
 		this._arguments = this._prevScope.arguments;
 		this._statements = this._prevScope.statements;
 		this._closures = this._prevScope.closures;
+		this._isGenerator = this._prevScope.isGenerator;
 		this._prevScope = this._prevScope.prev;
 	}
 
@@ -812,6 +821,7 @@ class Parser {
 			this._columnOffset,
 			this._docComment,
 			this._tokenLength,
+			this._isGenerator,
 			// errors
 			this._errors.length,
 			// closures
@@ -828,6 +838,7 @@ class Parser {
 		this._columnOffset = state.columnOffset;
 		this._docComment = state.docComment;
 		this._tokenLength = state.tokenLength;
+		this._isGenerator = state.isGenerator;
 		this._errors.length = state.numErrors;
 		this._closures.splice(state.numClosures, this._closures.length - state.numClosures);
 		this._objectTypesUsed.splice(state.numObjectTypesUsed, this._objectTypesUsed.length - state.numObjectTypesUsed);
@@ -1635,11 +1646,15 @@ class Parser {
 			this._locals = new LocalVariable[];
 			this._statements = new Statement[];
 			this._closures = new MemberFunctionDefinition[];
+			this._isGenerator = false;
 			if (name.getValue() == "constructor")
 				var lastToken = this._initializeBlock();
 			else
 				lastToken = this._block();
 			// done
+			if (this._isGenerator) {
+				flags |= ClassDefinition.IS_GENERATOR;
+			}
 			var funcDef = createDefinition(this._locals, this._statements, this._closures, lastToken);
 			this._locals = null;
 			this._statements = null;
@@ -2220,6 +2235,7 @@ class Parser {
 		this._statements.push(new YieldStatement(token, expr));
 		if (this._expect(";") == null)
 			return false;
+		this._isGenerator = true;
 		return true;
 	}
 
@@ -2789,17 +2805,21 @@ class Parser {
 		this._pushScope(null, args);
 		try {
 			// parse lambda body
+			var flags = ClassDefinition.IS_STATIC;
 			if (openBlock == null) {
 				var expr = this._expr();
 				this._statements.push(new ReturnStatement(token, expr));
 				return new MemberFunctionDefinition(
-						token, null, ClassDefinition.IS_STATIC, returnType, args, this._locals, this._statements, this._closures, null, null);
+					token, null, flags, returnType, args, this._locals, this._statements, this._closures, null, null);
 			} else {
 				var lastToken = this._block();
 				if (lastToken == null)
 					return null;
+				if (this._isGenerator) {
+					flags |= ClassDefinition.IS_GENERATOR;
+				}
 				return new MemberFunctionDefinition(
-						token, null, ClassDefinition.IS_STATIC, returnType, args, this._locals, this._statements, this._closures, lastToken, null);
+					token, null, flags, returnType, args, this._locals, this._statements, this._closures, lastToken, null);
 			}
 		} finally {
 			this._popScope();
@@ -2858,7 +2878,11 @@ class Parser {
 			this._popScope();
 			return null;
 		}
-		var funcDef = new MemberFunctionDefinition(token, name, ClassDefinition.IS_STATIC, returnType, args, this._locals, this._statements, this._closures, lastToken, null);
+		var flags = ClassDefinition.IS_STATIC;
+		if (this._isGenerator) {
+			flags |= ClassDefinition.IS_GENERATOR;
+		}
+		var funcDef = new MemberFunctionDefinition(token, name, flags, returnType, args, this._locals, this._statements, this._closures, lastToken, null);
 		this._popScope();
 		this._closures.push(funcDef);
 		return new FunctionExpression(token, funcName, funcDef, isStatement);
