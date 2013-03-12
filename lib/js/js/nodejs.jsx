@@ -253,6 +253,9 @@ native __fake__ class Stats {
 	function isSocket() : boolean;
 }
 
+/**
+ * @see http://nodejs.org/api/fs.html
+ */
 native __fake__ class _fs {
 	function statSync(path : string) : Stats;
 
@@ -267,11 +270,16 @@ native __fake__ class _fs {
 
 	function chmodSync(path : string, mode : string) : void;
 
+	function openSync(path : string, flags : string) : int;
+	function openSync(path : string, flags : string, mode : int) : int;
+	function closeSync(fd : int) : void;
+
 	function readSync(fd : int, buffer : Buffer, offset : int, length : int) : int;
 	function readSync(fd : int, buffer : Buffer, offset : int, length : int, position : int) : int;
 	function readFileSync(filename : string) : Buffer;
 	function readFileSync(filename : string, encoding : string) : string;
 
+	function writeSync(fd : int, buffer : Buffer, offset : int, length : int) : int;
 	function writeSync(fd : int, buffer : Buffer, offset : int, length : int, position : int) : int;
 	function writeFileSync(filename : string, data : Buffer) : void;
 	function writeFileSync(filename : string, data : string) : void;
