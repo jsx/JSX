@@ -708,6 +708,13 @@ class _StaticizeOptimizeCommand extends _OptimizeCommand {
 		// rewrite member method invocations to static function calls
 		this.getCompiler().forEachClassDef(function (parser, classDef) {
 			this.log("rewriting member method calls in class: " + classDef.className());
+			// rewrite member variables
+			classDef.forEachMemberVariable(function (varDef) {
+				this._rewriteMethodCallsToStatic(varDef.getInitialValue(), function (expr) {
+					varDef.setInitialValue(expr);
+				});
+				return true;
+			});
 			// rewrite member functions
 			function onFunction (funcDef : MemberFunctionDefinition) : boolean {
 				function onStatement (statement : Statement) : boolean {
