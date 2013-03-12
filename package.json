@@ -42,6 +42,7 @@
   "scripts" : {
       "test" : "make test JOBS=1 SKIP_PHANTOMJS_TEST=1",
       "prepublish" : "JSX_OPTS=--release make && make test",
+	  "postpublish" : "git tag `node tool/version.js`",
 	  "preinstall" : "node tool/preinstall.js"
   }
 }
