@@ -77,9 +77,9 @@ native class process {
 
 	/*
 	 * events:
-	 *  drain:            (data:Buffer)
-	 *  exit:             (exitStatus:number)
-	 *  uncaughtExceptio: (error:Error)
+	 *  drain:             (data:Buffer)
+	 *  exit:              (exitStatus:number)
+	 *  uncaughtException: (error:Error)
 	 */
 	static function on(event : string, listener : () -> void) : void;
 	static function on(event : string, listener : (variant) -> void) : void;
@@ -169,8 +169,13 @@ native class Stream extends EventEmitter {
 	function end() : void;
 }
 
+/**
+ * Fixed-sized binary buffer, built in NodeJS.
+ */
 native class Buffer {
 	static function byteLength(str : string, encoding : string) : int;
+	static function concat(list : Buffer[]) : Buffer;
+	static function concat(list : Buffer[], totalLength : int) : Buffer;
 
 	__readonly__ var length : int;
 
@@ -180,9 +185,51 @@ native class Buffer {
 
 	function write(str : string, offset : int, length : int, encoding : string) : int;
 
+	function toString(encoding : string) : string;
+	function toString(encoding : string, start : int) : string;
+	function toString(encoding : string, start : int, end : int) : string;
+
+	function copy(targetBuffer : Buffer) : void;
+	function copy(targetBuffer : Buffer, targetStart : int) : void;
+	function copy(targetBuffer : Buffer, targetStart : int, sourceStart : int) : void;
+	function copy(targetBuffer : Buffer, targetStart : int, sourceStart : int, sourceEnd : int) : void;
+
+	function slice(start : int) : Buffer;
 	function slice(start : int , end : int) : Buffer;
 
-	function toString(encoding : string) : string;
+	function readUInt8(offset : int) : int;
+	function readUInt16LE(offset : int) : int;
+	function readUInt16BE(offset : int) : int;
+	function readUInt32LE(offset : int) : int;
+	function readUInt32BE(offset : int) : int;
+	function readInt8(offset : int) : int;
+	function readInt16LE(offset : int) : int;
+	function readInt16BE(offset : int) : int;
+	function readInt32LE(offset : int) : int;
+	function readInt32BE(offset : int) : int;
+	function readFloatLE(offset : int) : number;
+	function readFloatBE(offset : int) : number;
+	function readDoubleLE(offset : int) : number;
+	function readDoubleBE(offset : int) : number;
+
+	function writeUInt8(value : int, offset : int) : void;
+	function writeUInt16LE(value : int, offset : int) : void;
+	function writeUInt16BE(value : int, offset : int) : void;
+	function writeUInt32LE(value : int, offset : int) : void;
+	function writeUInt32BE(value : int, offset : int) : void;
+	function writeInt8(value : int, offset : int) : void;
+	function writeInt16LE(value : int, offset : int) : void;
+	function writeInt16BE(value : int, offset : int) : void;
+	function writeInt32LE(value : int, offset : int) : void;
+	function writeInt32BE(value : int, offset : int) : void;
+	function writeFloatLE(value : number, offset : int) : void;
+	function writeFloatBE(value : number, offset : int) : void;
+	function writeDoubleLE(value : number, offset : int) : void;
+	function writeDoubleBE(value : number, offset : int) : void;
+
+	function fill(value : int) : void;
+	function fill(value : int, offset : int) : void;
+	function fill(value : int, offset : int, end : int) : void;
 }
 
 native class querystring {
@@ -206,6 +253,9 @@ native __fake__ class Stats {
 	function isSocket() : boolean;
 }
 
+/**
+ * @see http://nodejs.org/api/fs.html
+ */
 native __fake__ class _fs {
 	function statSync(path : string) : Stats;
 
@@ -220,11 +270,16 @@ native __fake__ class _fs {
 
 	function chmodSync(path : string, mode : string) : void;
 
+	function openSync(path : string, flags : string) : int;
+	function openSync(path : string, flags : string, mode : int) : int;
+	function closeSync(fd : int) : void;
+
 	function readSync(fd : int, buffer : Buffer, offset : int, length : int) : int;
 	function readSync(fd : int, buffer : Buffer, offset : int, length : int, position : int) : int;
 	function readFileSync(filename : string) : Buffer;
 	function readFileSync(filename : string, encoding : string) : string;
 
+	function writeSync(fd : int, buffer : Buffer, offset : int, length : int) : int;
 	function writeSync(fd : int, buffer : Buffer, offset : int, length : int, position : int) : int;
 	function writeFileSync(filename : string, data : Buffer) : void;
 	function writeFileSync(filename : string, data : string) : void;
@@ -240,25 +295,89 @@ native __fake__ class FSWatcher extends EventEmitter {
 
 native __fake__ class _path {
 	function normalize(p : string) : string;
-        function join(...path : string) : string;
-        function resolve(...path : string) : string;
-        function relative(from : string, to : string) : string;
+	function join(...path : string) : string;
+	function resolve(...path : string) : string;
+	function relative(from : string, to : string) : string;
 	function dirname(p : string) : string;
 	function basename(p : string) : string;
 	function basename(p : string, ext : string) : string;
 	function extname(p : string) : string;
-        var sep : string;
+	var sep : string;
 }
 
+/*
+ * @see http://nodejs.org/api/child_process.html
+ */
 native class ChildProcess extends EventEmitter {
 	__readonly__ var stdin : Stream;
 	__readonly__ var stdout : Stream;
 	__readonly__ var stderr : Stream;
+
+	__readonly__ var pid : int;
+
+	delete function constructor();
+
+	function kill() : boolean;
+	function kill(signal : string) : boolean;
 }
 
+/*
+ * @see http://nodejs.org/api/child_process.html
+ */
 native __fake__ class _child_process {
+	/**
+	 * <p>Launches a new process with the given <code>command</code>,
+	 * with command line arguments in <code>args</code>.</p>
+	 *
+	 * <p>options:</p>
+	 * <ul>
+	 *   <li>cwd : string</li>
+	 *   <li>stdio : variant[] where each index corresponds to a fd in the child with values "pipe", "ic", "ignore", Stream object, positive int, null</li>
+	 *   <li>env : Map.<string></li>
+	 *   <li>detached : boolean</li>
+	 *   <li>uid : int</li>
+	 *   <li>gid : int</li>
+	 * </ul>
+	 */
+	function spawn(command : string, args : string[], options : Map.<variant>) : ChildProcess;
 	function spawn(command : string, args : string[]) : ChildProcess;
-	function execFile(file : string, args : string[], options : variant, callback : (Error, Buffer, Buffer) -> void) : ChildProcess;
+
+	/**
+	 * <p>Runs a command in a shell and bufferes the output.</p>
+	 *
+	 * <p>options:</p>
+	 * <ul>
+	 *   <li>cwd : string</li>
+	 *   <li>stdio : variant[] where each index corresponds to a fd in the child with values "pipe", "ic", "ignore", Stream object, positive int, null</li>
+	 *   <li>env : Map.<string></li>
+	 *   <li>encoding : string (default: "utf8")</li>
+	 *   <li>timeout : int (default: 0 [ms])</li>
+	 *   <li>maxBuffer : int (default: 200*1024)</li>
+	 *   <li>killSignal : string (default: "SIGTERM")</li>
+	 * </ul>
+	 */
+	function exec(command : string, options : Map.<variant>, callback : (Error, Buffer, Buffer) -> void) : ChildProcess;
+	function exec(command : string, callback : (Error, Buffer, Buffer) -> void) : ChildProcess;
+
+	/**
+	 * <p>Similar to <code>exec()</code> exept it does not execute a subshell
+	 * but rather the specified file directly. It has the same options as <code>exec().</code></p>
+	 *
+	 * <p>options:</p>
+	 * <ul>
+	 *   <li>cwd : string</li>
+	 *   <li>stdio : variant[] where each index corresponds to a fd in the child with values "pipe", "ic", "ignore", Stream object, positive int, null</li>
+	 *   <li>env : Map.<string></li>
+	 *   <li>encoding : string (default: "utf8")</li>
+	 *   <li>timeout : int (default: 0 [ms])</li>
+	 *   <li>maxBuffer : int (default: 200*1024)</li>
+	 *   <li>killSignal : string (default: "SIGTERM")</li>
+	 * </ul>
+	 */
+	function execFile(file : string, args : string[], options : Map.<variant>, callback : (Error, Buffer, Buffer) -> void) : ChildProcess;
+	function execFile(file : string, args : string[], callback : (Error, Buffer, Buffer) -> void) : ChildProcess;
+
+	//function fork(modulePath : string, args : string[], options : Map.<variant>) : ChildProcess; // NodeJS specific
 }
 
 native __fake__ class _url {

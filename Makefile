@@ -5,6 +5,8 @@ JOBS:=4
 
 OPTIMIZE_FLAGS := lto,no-assert,fold-const,return-if,inline,dce,unbox,fold-const,lcse,dce,fold-const,array-length,unclassify
 
+PORT := 2012
+
 all: compiler doc web
 
 ## compiler stuff
@@ -16,7 +18,7 @@ compiler: src/doc.jsx meta
 
 # use JSX compiler directly as jsx(1)
 compiler-js: src/doc.jsx meta
-	rm bin/jsx
+	rm -f bin/jsx
 	node tool/bootstrap-compiler.js --executable node --output bin/jsx src/jsx-node-front.jsx
 
 src/doc.jsx: src/_doc.jsx
@@ -58,7 +60,7 @@ web: compiler
 	perl web/build.pl
 
 server: web
-	node web/server.js
+	node web/server.js $(PORT)
 
 # for authors
 web.jsx:

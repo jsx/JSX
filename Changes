@@ -1,5 +1,30 @@
 Revision history for the JSX software development kit
 
+0.9.15 2013-03-12 11:08:35
+    - Fixed only a packaging issue
+
+0.9.14 2013-03-12 10:51:24
+    [BUG FIXES]
+    - Fix a compiler crash if non-existing static methods were called,
+      which was introduced at 0.9.11
+
+0.9.13 2013-03-12 10:04:24
+    [BUG FIXES]
+    - Suppress deprecation warnings about `path.existsSync()`
+
+0.9.12 2013-03-09 18:34:56
+    [BUG FIXES]
+    - Fix an optimization issues found in shibukawa:Oktavia
+
+0.9.11 2013-03-08 14:25:22
+    [CHANGES]
+    - Forbade calling instance methods after operator new without parens,
+      i.e. `new Class.instanceMethod()`, because it was conflict with inner
+      classes
+
+    [FEATURES]
+    - Added inner classes (nested classes)
+
 0.9.10 2013-02-22 10:18:13
     [BUG FIXES]
     - Fixed a bug that jsx(1) crashes when spaces were passed to JSX programs on --run

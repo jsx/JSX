@@ -157,12 +157,15 @@ class ClassDefinition implements Stashable {
 	var _extendType		: ParsedObjectType; // null for interfaces, mixins, and Object class only
 	var _implementTypes	: ParsedObjectType[];
 	var _members		: MemberDefinition[];
+	var _inners		: ClassDefinition[];
+	var _templateInners	: TemplateClassDefinition[];
 	var _objectTypesUsed	: ParsedObjectType[];
 	var _docComment		: DocComment;
 
-	var _baseClassDef : ClassDefinition = null;
+	var _baseClassDef  : ClassDefinition = null;
+	var _outerClassDef : ClassDefinition = null;
 
-	function constructor (token : Token, className : string, flags : number, extendType : ParsedObjectType, implementTypes : ParsedObjectType[], members : MemberDefinition[], objectTypesUsed : ParsedObjectType[], docComment : DocComment) {
+	function constructor (token : Token, className : string, flags : number, extendType : ParsedObjectType, implementTypes : ParsedObjectType[], members : MemberDefinition[], inners : ClassDefinition[], templateInners : TemplateClassDefinition[], objectTypesUsed : ParsedObjectType[], docComment : DocComment) {
 		this._parser = null;
 		this._token = token;
 		this._className = className;
@@ -171,18 +174,12 @@ class ClassDefinition implements Stashable {
 		this._extendType = extendType;
 		this._implementTypes = implementTypes;
 		this._members = members;
+		this._inners = inners;
+		this._templateInners = templateInners;
 		this._objectTypesUsed = objectTypesUsed;
 		this._docComment = docComment;
-		for (var i = 0; i < this._members.length; ++i) {
-			this._members[i].setClassDef(this);
-			if (this._members[i] instanceof MemberFunctionDefinition) {
-				function setClassDef(funcDef : MemberFunctionDefinition) : boolean {
-					funcDef.setClassDef(this);
-					return funcDef.forEachClosure(setClassDef);
-				};
-				(this._members[i] as MemberFunctionDefinition).forEachClosure(setClassDef);
-			}
-		}
+
+		this._resetMembersClassDef();
 	}
 
 	function serialize () : variant {
@@ -220,6 +217,10 @@ class ClassDefinition implements Stashable {
 		return this._className;
 	}
 
+	function classFullName () : string {
+		return this._outerClassDef != null ? this._outerClassDef.classFullName() + "." + this._className : this.className();
+	}
+
 	function setOutputClassName (name : string) : void {
 		this._outputClassName = name;
 	}
@@ -246,6 +247,22 @@ class ClassDefinition implements Stashable {
 
 	function members () : MemberDefinition[] {
 		return this._members;
+	}
+
+	function setOuterClassDef (outer : ClassDefinition) : void {
+		this._outerClassDef = outer;
+	}
+
+	function getOuterClassDef () : ClassDefinition {
+		return this._outerClassDef;
+	}
+
+	function getInnerClasses () : ClassDefinition[] {
+		return this._inners;
+	}
+
+	function getTemplateInnerClasses () : TemplateClassDefinition[] {
+		return this._templateInners;
 	}
 
 	function getDocComment () : DocComment {
@@ -309,6 +326,37 @@ class ClassDefinition implements Stashable {
 			}
 		}
 		return true;
+	}
+
+	function forEachInnerClass (cb : function(:ClassDefinition):boolean) : boolean {
+		for (var i = 0; i < this._inners.length; ++i) {
+			if (! cb(this._inners[i]))
+				return false;
+		}
+		return true;
+	}
+
+	function _resetMembersClassDef () : void {
+		// member defintions
+		for (var i = 0; i < this._members.length; ++i) {
+			this._members[i].setClassDef(this);
+			if (this._members[i] instanceof MemberFunctionDefinition) {
+				function setClassDef(funcDef : MemberFunctionDefinition) : boolean {
+					funcDef.setClassDef(this);
+					return funcDef.forEachClosure(setClassDef);
+				}
+				(this._members[i] as MemberFunctionDefinition).forEachClosure(setClassDef);
+			}
+		}
+
+		// member classes
+		for (var i = 0; i < this._inners.length; ++i) {
+			this._inners[i].setOuterClassDef(this);
+			this._inners[i]._resetMembersClassDef();
+		}
+		for (var i = 0; i < this._templateInners.length; ++i) {
+			this._templateInners[i].setOuterClassDef(this);
+		}
 	}
 
 	static const GET_MEMBER_MODE_ALL = 0; // looks for functions or variables from the class and all super classes
@@ -387,10 +435,104 @@ class ClassDefinition implements Stashable {
 		}
 	}
 
+	function lookupInnerClass (className : string) : ClassDefinition {
+		for (var i = 0; i < this._inners.length; ++i) {
+			var inner = this._inners[i];
+			if (inner.className() == className)
+				return inner;
+		}
+		return null;
+	}
+
+	function lookupTemplateInnerClass (errors : CompileError[], request : TemplateInstantiationRequest, postInstantiationCallback : (Parser,ClassDefinition)->ClassDefinition) : ClassDefinition {
+		var instantiateCallback = this.createGetTemplateClassCallback(errors, request, postInstantiationCallback);
+		if (instantiateCallback != null)
+			return instantiateCallback(errors, request, postInstantiationCallback);
+		return null;
+	}
+
+	function createGetTemplateClassCallback (errors : CompileError[], request : TemplateInstantiationRequest, postInstantiationCallback : (Parser,ClassDefinition)->ClassDefinition) : (CompileError[],TemplateInstantiationRequest,(Parser,ClassDefinition)->ClassDefinition)->ClassDefinition {
+		// lookup the already-instantiated class
+		for (var i = 0; i < this._inners.length; ++i) {
+			var classDef = this._inners[i];
+			if (classDef instanceof InstantiatedClassDefinition
+				&& (classDef as InstantiatedClassDefinition).getTemplateClassName() == request.getClassName()
+				&& Util.typesAreEqual((classDef as InstantiatedClassDefinition).getTypeArguments(), request.getTypeArguments())) {
+				return function (_ : CompileError[], __ : TemplateInstantiationRequest, ___ : (Parser,ClassDefinition)->ClassDefinition) : ClassDefinition {
+					return classDef;
+				};
+			}
+		}
+		// create instantiation callback
+		for (var i = 0; i < this._templateInners.length; ++i) {
+			var templateDef = this._templateInners[i];
+			if (templateDef.className() == request.getClassName()) {
+				return function (_ : CompileError[], __ : TemplateInstantiationRequest, ___ : (Parser,ClassDefinition)->ClassDefinition) : ClassDefinition {
+					var classDef = templateDef.instantiateTemplateClass(errors, request);
+					if (classDef == null) {
+						return null;
+					}
+					this._inners.push(classDef);
+					classDef.setParser(this._parser);
+					classDef.resolveTypes(new AnalysisContext(errors, this._parser, null));
+					postInstantiationCallback(this._parser, classDef);
+					return classDef;
+				};
+			}
+		}
+		return null;
+	}
+
+	function instantiate (instantiationContext : InstantiationContext) : ClassDefinition {
+		var context = new InstantiationContext(instantiationContext.errors, instantiationContext.typemap);
+
+		// instantiate the members
+		var succeeded = true;
+		var members = new MemberDefinition[];
+		for (var i = 0; i < this._members.length; ++i) {
+			var member = this._members[i].instantiate(context);
+			if (member == null)
+				succeeded = false;
+			members[i] = member;
+		}
+		var inners = new ClassDefinition[];
+		for (var i = 0; i < this._inners.length; ++i) {
+			var inner = this._inners[i].instantiate(context);
+			if (inner == null)
+				succeeded = false;
+			inners[i] = inner;
+		}
+		var templateInners = new TemplateClassDefinition[];
+		for (var i = 0; i < this._templateInners.length; ++i) {
+			var templateInner = this._templateInners[i].instantiate(context);
+			if (templateInner == null)
+				succeeded = false;
+			templateInners[i] = templateInner;
+		}
+		// done
+		if (! succeeded)
+			return null;
+
+		return new ClassDefinition(
+			this._token,
+			this._className,
+			this._flags,
+			this._extendType != null ? this._extendType.instantiate(context) as ParsedObjectType : null,
+			this._implementTypes.map.<ParsedObjectType>(function (t) { return t.instantiate(context) as ParsedObjectType; }),
+			members,
+			inners,
+			templateInners,
+			context.objectTypesUsed,
+			this._docComment
+		);
+	}
+
 	function resolveTypes (context : AnalysisContext) : void {
 		// resolve types used
 		for (var i = 0; i < this._objectTypesUsed.length; ++i)
 			this._objectTypesUsed[i].resolveType(context);
+		for (var i = 0; i < this._inners.length; ++i)
+			this._inners[i].resolveTypes(context);
 		// resolve base classes
 		if (this._extendType != null) {
 			var baseClass = this._extendType.getClassDef();
@@ -427,14 +569,46 @@ class ClassDefinition implements Stashable {
 				ClassDefinition.IS_FINAL | (this.flags() & ClassDefinition.IS_NATIVE),
 				Type.voidType,
 				new ArgumentDeclaration[],
-				isNative ? null:LocalVariable[] : new LocalVariable[],
-				isNative ? null:Statement[] : new Statement[],
-				isNative ? null:MemberFunctionDefinition[] : new MemberFunctionDefinition[],
+				isNative ? (null) : new LocalVariable[],
+				isNative ? (null) : new Statement[],
+				isNative ? (null) : new MemberFunctionDefinition[],
 				this._token, /* FIXME */
 			        null);
 			func.setClassDef(this);
 			this._members.push(func);
 		}
+		// substitute access to inner class with single ClassExpression
+		this.forEachMemberFunction(function (funcDef) {
+			return funcDef.forEachStatement(function (statement) {
+				return statement.forEachExpression(function onExpr(expr : Expression, replaceCb : (Expression)->void) : boolean {
+					expr.forEachExpression(onExpr);
+					if (expr instanceof PropertyExpression && (expr as PropertyExpression).getExpr() instanceof ClassExpression) {
+						var propExpr = expr as PropertyExpression;
+						var identifierToken = propExpr.getIdentifierToken();
+						var receiverType = (propExpr.getExpr() as ClassExpression).getType() as ParsedObjectType;
+						var receiverClassDef = receiverType.getClassDef();
+						if (receiverClassDef) {
+							receiverClassDef.forEachInnerClass(function (classDef) {
+								if (classDef.className() == identifierToken.getValue()) {
+									var objectType = new ParsedObjectType(
+										new QualifiedName(identifierToken, receiverType),
+										propExpr.getTypeArguments()
+									);
+									objectType.resolveType(context);
+									replaceCb(new ClassExpression(propExpr.getToken(), objectType));
+									return false;
+								}
+								return true;
+							});
+						}
+						else {
+							return true;
+						}
+					}
+					return true;
+				});
+			});
+		});
 	}
 
 	function setAnalysisContextOfVariables (context : AnalysisContext) : void {
@@ -455,7 +629,7 @@ class ClassDefinition implements Stashable {
 
 			throw e;
 		}
-		this._analyzeMemberFunctions(context);
+		this._analyzeMembers(context);
 	}
 
 	function _analyzeClassDef (context : AnalysisContext) : boolean {
@@ -599,13 +773,19 @@ class ClassDefinition implements Stashable {
 		return false;
 	}
 
-	function _analyzeMemberFunctions (context : AnalysisContext) : void {
-		// analyze the member functions, analysis of member variables is performed lazily (and those that where never analyzed will be removed by dead code elimination)
+	function _analyzeMembers (context : AnalysisContext) : void {
 		for (var i = 0; i < this._members.length; ++i) {
 			var member = this._members[i];
-			if (member instanceof MemberFunctionDefinition
-				&& ! (member instanceof TemplateFunctionDefinition)) {
-				(member as MemberFunctionDefinition).analyze(context);
+			if (member instanceof MemberFunctionDefinition) {
+				if (! (member instanceof TemplateFunctionDefinition)) {
+					(member as MemberFunctionDefinition).analyze(context);
+				}
+			} else {
+				// Just sets the initial values; analysis of member variables is performed lazily (and those that where never analyzed will be removed by dead code elimination)
+				var varDef = member as MemberVariableDefinition;
+				if (varDef.getInitialValue() == null) {
+					varDef.setInitialValue(Expression.getDefaultValueExpressionOf(varDef.getType()));
+				}
 			}
 		}
 	}
@@ -884,11 +1064,10 @@ class MemberVariableDefinition extends MemberDefinition {
 
 	override function instantiate (instantiationContext : InstantiationContext) : MemberDefinition {
 		var type = this._type != null ? this._type.instantiate(instantiationContext) : null;
+		var initialValue : Expression = null;
 		if (this._initialValue != null) {
-			var initialValue = this._initialValue.clone();
+			initialValue = this._initialValue.clone();
 			initialValue.instantiate(instantiationContext);
-		} else {
-			initialValue = Expression.getDefaultValueExpressionOf(type);
 		}
 		return new MemberVariableDefinition(this._token, this._nameToken, this._flags, type, initialValue, null);
 	}
@@ -1709,23 +1888,13 @@ class TemplateClassDefinition extends ClassDefinition implements TemplateDefinit
 
 	var _typeArgs : Token[];
 
-	function constructor (token : Token, className : string, flags : number, typeArgs : Token[], extendType : ParsedObjectType, implementTypes : ParsedObjectType[], members : MemberDefinition[], objectTypesUsed : ParsedObjectType[], docComment : DocComment) {
-		super(token, className, flags, extendType, implementTypes, members, objectTypesUsed, docComment);
+	function constructor (token : Token, className : string, flags : number, typeArgs : Token[], extendType : ParsedObjectType, implementTypes : ParsedObjectType[], members : MemberDefinition[], inners : ClassDefinition[], templateInners : TemplateClassDefinition[], objectTypesUsed : ParsedObjectType[], docComment : DocComment) {
+		super(token, className, flags, extendType, implementTypes, members, inners, templateInners, objectTypesUsed, docComment);
 		this._token = token;
 		this._className = className;
 		this._flags = flags;
 		this._typeArgs = typeArgs.concat(new Token[]);
-		// reset members' classDef
-		for (var i = 0; i < this._members.length; ++i) {
-			this._members[i].setClassDef(this);
-			if (this._members[i] instanceof MemberFunctionDefinition) {
-				function setClassDef(funcDef : MemberFunctionDefinition) : boolean {
-					funcDef.setClassDef(this);
-					return funcDef.forEachClosure(setClassDef);
-				}
-				(this._members[i] as MemberFunctionDefinition).forEachClosure(setClassDef);
-			}
-		}
+		this._resetMembersClassDef();
 	}
 
 	override function getToken () : Token {
@@ -1744,7 +1913,60 @@ class TemplateClassDefinition extends ClassDefinition implements TemplateDefinit
 		return this._typeArgs;
 	}
 
-	function instantiate (errors : CompileError[], request : TemplateInstantiationRequest) : InstantiatedClassDefinition {
+	override function instantiate (instantiationContext : InstantiationContext) : TemplateClassDefinition {
+		// shadow type args
+		var typemap = new Map.<Type>;
+		for (var key in instantiationContext.typemap) {
+			typemap[key] = instantiationContext.typemap[key];
+		}
+		for (var i = 0; i < this._typeArgs.length; ++i) {
+			delete typemap[this._typeArgs[i].getValue()];
+		}
+		var context = new InstantiationContext(instantiationContext.errors, typemap);
+
+		// instantiate the members
+		var succeeded = true;
+		var members = new MemberDefinition[];
+		for (var i = 0; i < this._members.length; ++i) {
+			var member = this._members[i].instantiate(context);
+			if (member == null)
+				succeeded = false;
+			members[i] = member;
+		}
+		var inners = new ClassDefinition[];
+		for (var i = 0; i < this._inners.length; ++i) {
+			var inner = this._inners[i].instantiate(context);
+			if (inner == null)
+				succeeded = false;
+			inners[i] = inner;
+		}
+		var templateInners = new TemplateClassDefinition[];
+		for (var i = 0; i < this._templateInners.length; ++i) {
+			var templateInner = this._templateInners[i].instantiate(context);
+			if (templateInner == null)
+				succeeded = false;
+			templateInners[i] = templateInner;
+		}
+		// done
+		if (! succeeded)
+			return null;
+
+		return new TemplateClassDefinition(
+			this._token,
+			this._className,
+			this._flags,
+			this._typeArgs,
+			this._extendType != null ? this._extendType.instantiate(context) as ParsedObjectType : null,
+			this._implementTypes.map.<ParsedObjectType>(function (t) { return t.instantiate(context) as ParsedObjectType; }),
+			members,
+			inners,
+			templateInners,
+			context.objectTypesUsed,
+			this._docComment
+		);
+	}
+
+	function instantiateTemplateClass (errors : CompileError[], request : TemplateInstantiationRequest) : InstantiatedClassDefinition {
 		// prepare
 		var instantiationContext = this.buildInstantiationContext(errors, request.getToken(), this._typeArgs, request.getTypeArguments());
 		if (instantiationContext == null) {
@@ -1759,6 +1981,21 @@ class TemplateClassDefinition extends ClassDefinition implements TemplateDefinit
 				succeeded = false;
 			members[i] = member;
 		}
+		var inners = new ClassDefinition[];
+		for (var i = 0; i < this._inners.length; ++i) {
+			var inner = this._inners[i].instantiate(instantiationContext);
+			if (inner == null)
+				succeeded = false;
+			inners[i] = inner;
+		}
+		var templateInners = new TemplateClassDefinition[];
+		for (var i = 0; i < this._templateInners.length; ++i) {
+			var templateInner = this._templateInners[i].instantiate(instantiationContext);
+			if (templateInner == null)
+				succeeded = false;
+			templateInners[i] = templateInner;
+		}
+
 		// done
 		if (! succeeded)
 			return null;
@@ -1768,6 +2005,8 @@ class TemplateClassDefinition extends ClassDefinition implements TemplateDefinit
 			this._extendType != null ? this._extendType.instantiate(instantiationContext) as ParsedObjectType: null,
 			this._implementTypes.map.<ParsedObjectType>(function (t) { return t.instantiate(instantiationContext) as ParsedObjectType; }),
 			members,
+			inners,
+			templateInners,
 			instantiationContext.objectTypesUsed);
 		return instantiatedDef;
 	}
@@ -1779,14 +2018,16 @@ class InstantiatedClassDefinition extends ClassDefinition {
 	var _templateClassDef : TemplateClassDefinition;
 	var _typeArguments : Type[];
 
-	function constructor (templateClassDef : TemplateClassDefinition, typeArguments : Type[], extendType : ParsedObjectType, implementTypes : ParsedObjectType[], members : MemberDefinition[], objectTypesUsed : ParsedObjectType[]) {
+	function constructor (templateClassDef : TemplateClassDefinition, typeArguments : Type[], extendType : ParsedObjectType, implementTypes : ParsedObjectType[], members : MemberDefinition[], inners : ClassDefinition[], templateInners : TemplateClassDefinition[], objectTypesUsed : ParsedObjectType[]) {
 		super(
 			null,
-			Type.templateTypeToString(templateClassDef.className(), typeArguments),
+			Type.templateTypeToString(templateClassDef.classFullName(), typeArguments),
 			templateClassDef.flags(),
 			extendType,
 			implementTypes,
 			members,
+			inners,
+			templateInners,
 			objectTypesUsed,
 			null /* docComment is not used for instantiated class */);
 		this._templateClassDef = templateClassDef;
@@ -1813,6 +2054,10 @@ class InstantiatedClassDefinition extends ClassDefinition {
 				return false;
 		}
 		return true;
+	}
+
+	override function instantiate (instantiationContext : InstantiationContext) : InstantiatedClassDefinition {
+		throw new Error("logic flaw");
 	}
 
 }
