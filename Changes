@@ -1,5 +1,9 @@
 Revision history for the JSX software development kit
 
+0.9.13 2013-03-12 10:04:24
+    [BUG FIXES]
+    - Suppress deprecation warnings about `path.existsSync()`
+
 0.9.12 2013-03-09 18:34:56
     [BUG FIXES]
     - Fix an optimization issues found in shibukawa:Oktavia
