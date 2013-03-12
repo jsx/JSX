@@ -22,8 +22,8 @@ class _Main {
             }
 
             // git push origin VERSION
-            console.log("> git push " + version);
-            node.child_process.execFile("git", ["push", version], (err, stdout, stderr) -> {
+            console.log("> git push origin " + version);
+            node.child_process.execFile("git", ["push", "origin", version], (err, stdout, stderr) -> {
                 if (err) {
                     console.error(err.toString());
                     process.exit(0);
