@@ -1,6 +1,6 @@
 {
   "name":        "jsx",
-  "version":     "0.9.14",
+  "version":     "0.9.15",
   "description": "a faster, safer, easier JavaScript",
   "keywords": ["jsx", "compiler", "altjs"],
   "homepage": "http://jsx.github.com/",
