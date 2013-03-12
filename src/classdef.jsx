@@ -587,19 +587,23 @@ class ClassDefinition implements Stashable {
 						var identifierToken = propExpr.getIdentifierToken();
 						var receiverType = (propExpr.getExpr() as ClassExpression).getType() as ParsedObjectType;
 						var receiverClassDef = receiverType.getClassDef();
-						assert receiverClassDef != null;
-						receiverClassDef.forEachInnerClass(function (classDef) {
-							if (classDef.className() == identifierToken.getValue()) {
-								var objectType = new ParsedObjectType(
-									new QualifiedName(identifierToken, receiverType),
-									propExpr.getTypeArguments()
-								);
-								objectType.resolveType(context);
-								replaceCb(new ClassExpression(propExpr.getToken(), objectType));
-								return false;
-							}
+						if (receiverClassDef) {
+							receiverClassDef.forEachInnerClass(function (classDef) {
+								if (classDef.className() == identifierToken.getValue()) {
+									var objectType = new ParsedObjectType(
+										new QualifiedName(identifierToken, receiverType),
+										propExpr.getTypeArguments()
+									);
+									objectType.resolveType(context);
+									replaceCb(new ClassExpression(propExpr.getToken(), objectType));
+									return false;
+								}
+								return true;
+							});
+						}
+						else {
 							return true;
-						});
+						}
 					}
 					return true;
 				});
