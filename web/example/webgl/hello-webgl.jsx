@@ -17,9 +17,20 @@ class Hello {
 	static var ibuf:WebGLBuffer = null;
 	static var angle:number = 0;
 
+	static function getGL(canvas : HTMLCanvasElement) : WebGLRenderingContext {
+		var names = ["webgl", "experimental-webgl"];
+		for (var i = 0; i < names.length; ++i) {
+			var gl = canvas.getContext(names[i]) as WebGLRenderingContext;
+			if (gl) {
+				return gl;
+			}
+		}
+		return null;
+	}
+
 	static function main() : void {
 		var canvas = dom.id('webgl-canvas') as HTMLCanvasElement;
-		var gl = canvas.getContext('experimental-webgl') as WebGLRenderingContext;
+		var gl = Hello.getGL(canvas);
 
 		if (gl == null) {
 			dom.window.alert("This browser does not support WebGL :(");

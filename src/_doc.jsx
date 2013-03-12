@@ -423,9 +423,22 @@ class DocumentGenerator {
 		function determineParserOfClassDef () : Parser {
 			var parsers = this._compiler.getParsers();
 			for (var i = 0; i < parsers.length; ++i) {
-				if (parsers[i].getClassDefs().indexOf(classDef) != -1
-					|| (classDef instanceof TemplateClassDefinition && parsers[i].getTemplateClassDefs().indexOf(classDef as TemplateClassDefinition) != -1)) {
-					return parsers[i];
+				if (classDef instanceof TemplateClassDefinition) {
+					var templateClassDefs = parsers[i].getTemplateClassDefs();
+					for (var j = 0; j < templateClassDefs.length; ++j) {
+						templateClassDefs = templateClassDefs.concat(templateClassDefs[j].getTemplateInnerClasses());
+					}
+					if (templateClassDefs.indexOf(classDef as TemplateClassDefinition) != -1) {
+						return parsers[i];
+					}
+				} else {
+					var classDefs = parsers[i].getClassDefs();
+					for (var j = 0; j < classDefs.length; ++j) {
+						classDefs = classDefs.concat(classDefs[j].getInnerClasses());
+					}
+					if (classDefs.indexOf(classDef) != -1) {
+						return parsers[i];
+					}
 				}
 			}
 			throw new Error("could not determine the parser to which the class belongs:" + classDef.className());

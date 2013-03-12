@@ -61,7 +61,7 @@ function finish(response, uri, status, content_type, content) {
 }
 
 function serveFile(response, uri, filename) {
-	path.exists(filename, function(exists) {
+	fs.exists(filename, function(exists) {
 		if(!exists) {
 			finish(response, uri, 404, "text/plain", "404 Not Found\n");
 			return;

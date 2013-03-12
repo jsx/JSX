@@ -380,11 +380,26 @@ class WildcardImport extends Import {
 class QualifiedName {
 
 	var _token : Token;
+	// _import and _enclosingType are exclusive
 	var _import : Import;
+	var _enclosingType : ParsedObjectType;
+
+	function constructor (token : Token) {
+		this._token = token;
+		this._import = null;
+		this._enclosingType = null;
+	}
 
 	function constructor (token : Token, imprt : Import) {
 		this._token = token;
 		this._import = imprt;
+		this._enclosingType = null;
+	}
+
+	function constructor (token : Token, enclosingType : ParsedObjectType) {
+		this._token = token;
+		this._import = null;
+		this._enclosingType = enclosingType;
 	}
 
 	function getToken () : Token {
@@ -395,11 +410,16 @@ class QualifiedName {
 		return this._import;
 	}
 
+	function getEnclosingType () : ParsedObjectType {
+		return this._enclosingType;
+	}
+
 	function serialize () : variant {
 		return [
 			"QualifiedName",
 			this._token.serialize(),
-			Serializer.<Import>.serializeNullable(this._import)
+			Serializer.<Import>.serializeNullable(this._import),
+			Serializer.<ParsedObjectType>.serializeNullable(this._enclosingType)
 		] : variant[];
 	}
 
@@ -410,13 +430,20 @@ class QualifiedName {
 			return false;
 		if (this._import != x._import)
 			return false;
+		if (this._enclosingType == null) {
+			if (x._enclosingType != null)
+				return false;
+		} else {
+			if (! this._enclosingType.equals(x._enclosingType))
+				return false;
+		}
 		return true;
 	}
 
 	function getClass (context : AnalysisContext, typeArguments : Type[]) : ClassDefinition {
 		var classDef = null : ClassDefinition;
 
-		if (this._import != null) {
+		if (this._import != null) { // && this._enclosingType == null
 			if (typeArguments.length == 0) {
 				var classDefs = this._import.getClasses(this._token.getValue());
 				switch (classDefs.length) {
@@ -424,7 +451,7 @@ class QualifiedName {
 					classDef = classDefs[0];
 					break;
 				case 0:
-					context.errors.push(new CompileError(this._token, "no definition for class '" + this._token.getValue() + "' in file '" + this._import.getFilenameToken().getValue() + "'"));
+					context.errors.push(new CompileError(this._token, "no definition for class '" + this.toString() + "' in file '" + this._import.getFilenameToken().getValue() + "'"));
 					return null;
 				default:
 					context.errors.push(new CompileError(this._token, "multiple candidates"));
@@ -436,17 +463,34 @@ class QualifiedName {
 				case 1:
 					return callbacks[0](null, null, null);
 				case 0:
-					context.errors.push(new CompileError(this._token, "not definition for template class '" + this._token.getValue() + "' in file '" + this._import.getFilenameToken().getValue() + "'"));
+					context.errors.push(new CompileError(this._token, "no definition for template class '" + this.toString() + "' in file '" + this._import.getFilenameToken().getValue() + "'"));
 					return null;
 				default:
 					context.errors.push(new CompileError(this._token, "multiple canditates"));
 					return null;
 				}
 			}
+		} else if (this._enclosingType != null) {
+			this._enclosingType.resolveType(context);
+
+			var enclosingClassDef;
+			if ((enclosingClassDef = this._enclosingType.getClassDef()) == null)
+				return null;
+			if (typeArguments.length == 0) {
+				if ((classDef = enclosingClassDef.lookupInnerClass(this._token.getValue())) == null) {
+					context.errors.push(new CompileError(this._token, "no class definition for '" + this.toString() + "'"));
+					return null;
+				}
+			} else {
+				if ((classDef = enclosingClassDef.lookupTemplateInnerClass(context.errors, new TemplateInstantiationRequest(this._token, this._token.getValue(), typeArguments), (parser, classDef) -> { return null; })) == null) {
+					context.errors.push(new CompileError(this._token, "failed to instantiate class"));
+					return null;
+				}
+			}
 		} else {
 			if (typeArguments.length == 0) {
 				if ((classDef = context.parser.lookup(context.errors, this._token, this._token.getValue())) == null) {
-					context.errors.push(new CompileError(this._token, "no class definition for '" + this._token.getValue() + "'"));
+					context.errors.push(new CompileError(this._token, "no class definition for '" + this.toString() + "'"));
 					return null;
 				}
 			} else {
@@ -483,6 +527,10 @@ class QualifiedName {
 		return foundClassDefs.length == 1 ? foundClassDefs[0] : null;
 	}
 
+	override function toString () : string {
+		return this._enclosingType != null ? this._enclosingType.toString() + "." + this._token.getValue() : this._token.getValue();
+	}
+
 }
 
 class ParserState {
@@ -509,6 +557,31 @@ class ParserState {
 		this.numTemplateInstantiationRequests = numTemplateInstantiationRequests;
 	}
 
+}
+
+class ClassState {
+
+	var outer : ClassState;
+	var classType : ParsedObjectType;
+	var typeArgs : Token[];
+	var extendType : ParsedObjectType;
+	var implementTypes : ParsedObjectType[];
+	var objectTypesUsed : ParsedObjectType[];
+	var classFlags : number;
+	var inners : ClassDefinition[];
+	var templateInners : TemplateClassDefinition[];
+
+	function constructor (outer : ClassState, classType : ParsedObjectType, typeArgs : Token[], extendType : ParsedObjectType, implementTypes : ParsedObjectType[], objectTypesUsed : ParsedObjectType[], classFlags : number, inners : ClassDefinition[], templateInners : TemplateClassDefinition[]) {
+		this.outer = outer;
+		this.classType = classType;
+		this.typeArgs = typeArgs;
+		this.extendType = extendType;
+		this.implementTypes = implementTypes;
+		this.objectTypesUsed = objectTypesUsed;
+		this.classFlags = classFlags;
+		this.inners = inners;
+		this.templateInners = templateInners;
+	}
 }
 
 class Scope {
@@ -554,10 +627,14 @@ class Parser {
 	var _locals : LocalVariable[];
 	var _statements : Statement[];
 	var _closures : MemberFunctionDefinition[];
+
+	var _outerClass : ClassState;
 	var _classType : ParsedObjectType;
 	var _extendType : ParsedObjectType;
 	var _implementTypes : ParsedObjectType[];
 	var _objectTypesUsed : ParsedObjectType[];
+	var _inners : ClassDefinition[];
+	var _templateInners : TemplateClassDefinition[];
 	var _templateInstantiationRequests : TemplateInstantiationRequest[];
 
 	var _prevScope : Scope = null;
@@ -604,6 +681,8 @@ class Parser {
 		this._extendType = null;
 		this._implementTypes = null;
 		this._objectTypesUsed = new ParsedObjectType[];
+		this._inners = new ClassDefinition[];
+		this._templateInners = new TemplateClassDefinition[];
 		this._templateInstantiationRequests = new TemplateInstantiationRequest[];
 
 		// doit
@@ -614,7 +693,7 @@ class Parser {
 			this._importStatement(importToken);
 		}
 		while (! this._isEOF()) {
-			if (! this._classDefinition())
+			if (this._classDefinition() == null)
 				return false;
 		}
 
@@ -736,7 +815,7 @@ class Parser {
 			var templateDef = this._templateClassDefs[i];
 			if (templateDef.className() == request.getClassName()) {
 				return function (_ : CompileError[], __ : TemplateInstantiationRequest, ___ : function(:Parser,:ClassDefinition):ClassDefinition) : ClassDefinition {
-					var classDef = templateDef.instantiate(errors, request);
+					var classDef = templateDef.instantiateTemplateClass(errors, request);
 					if (classDef == null) {
 						return null;
 					}
@@ -749,6 +828,32 @@ class Parser {
 			}
 		}
 		return null;
+	}
+
+	function _pushClassState () : void {
+		this._outerClass = new ClassState (
+			this._outerClass,
+			this._classType,
+			this._typeArgs,
+			this._extendType,
+			this._implementTypes,
+			this._objectTypesUsed,
+			this._classFlags,
+			this._inners,
+			this._templateInners
+		);
+	}
+
+	function _popClassState () : void {
+		this._classType = this._outerClass.classType;
+		this._typeArgs = this._outerClass.typeArgs;
+		this._extendType = this._outerClass.extendType;
+		this._implementTypes = this._outerClass.implementTypes;
+		this._objectTypesUsed = this._outerClass.objectTypesUsed;
+		this._classFlags = this._outerClass.classFlags;
+		this._inners = this._outerClass.inners;
+		this._templateInners = this._outerClass.templateInners;
+		this._outerClass = this._outerClass.outer;
 	}
 
 	function _pushScope (funcName : LocalVariable, args : ArgumentDeclaration[]) : void {
@@ -1182,37 +1287,6 @@ class Parser {
 		}
 	}
 
-	function _qualifiedName (allowSuper : boolean, autoCompleteMatchCb : function(:ClassDefinition):boolean) : QualifiedName {
-		// returns a token that contains a qualified name
-		if (allowSuper) {
-			var token = this._expectOpt("super");
-			if (token != null)
-				return new QualifiedName(token, null);
-		}
-		if ((token = this._expectIdentifier(function (self) { return self._getCompletionCandidatesOfTopLevel(autoCompleteMatchCb); })) == null)
-			return null;
-		return this._qualifiedNameStartingWith(token, autoCompleteMatchCb);
-	}
-
-	function _qualifiedNameStartingWith (token : Token, autoCompleteMatchCb : function(:ClassDefinition):boolean) : QualifiedName {
-		if (token.getValue() == "variant") {
-			this._errors.push(new CompileError(token, "cannot use 'variant' as a class name"));
-			return null;
-		} else if (token.getValue() == "Nullable" || token.getValue() == "MayBeUndefined") {
-			this._errors.push(new CompileError(token, "cannot use 'Nullable' (or MayBeUndefined) as a class name"));
-			return null;
-		}
-		var imprt = this.lookupImportAlias(token.getValue());
-		if (imprt != null) {
-			if (this._expect(".") == null)
-				return null;
-			token = this._expectIdentifier(function (self) { return self._getCompletionCandidatesOfNamespace(imprt, autoCompleteMatchCb); });
-			if (token == null)
-				return null;
-		}
-		return new QualifiedName(token, imprt);
-	}
-
 	function _importStatement (importToken : Token) : boolean {
 		// parse
 		var classes = null : Token[];
@@ -1273,18 +1347,36 @@ class Parser {
 		return true;
 	}
 
-	function _classDefinition () : boolean {
+	function _expectClassDefOpt () : boolean {
+		var state = this._preserveState();
+		try {
+			while (true) {
+				var token = this._expectOpt([ "class", "interface", "mixin", "abstract", "final" ]);
+				if (token == null)
+					return false;
+				if (token.getValue() == "class" || token.getValue() == "interface" || token.getValue() == "mixin")
+					return true;
+			}
+		} finally {
+			this._restoreState(state);
+		}
+		return true;	// dummy
+	}
+
+	function _classDefinition () : ClassDefinition {
 		this._classType = null;
 		this._extendType = null;
 		this._implementTypes = new ParsedObjectType[];
 		this._objectTypesUsed = new ParsedObjectType[];
+		this._inners = new ClassDefinition[];
+		this._templateInners = new TemplateClassDefinition[];
 		// attributes* class
 		this._classFlags = 0;
 		var docComment = null : DocComment;
 		while (true) {
 			var token = this._expect([ "class", "interface", "mixin", "abstract", "final", "native", "__fake__" ]);
 			if (token == null)
-				return false;
+				return null;
 			if (this._classFlags == 0)
 				docComment = this._docComment;
 			if (token.getValue() == "class")
@@ -1292,7 +1384,7 @@ class Parser {
 			if (token.getValue() == "interface") {
 				if ((this._classFlags & (ClassDefinition.IS_FINAL | ClassDefinition.IS_NATIVE)) != 0) {
 					this._newError("interface cannot have final or native attribute set");
-					return false;
+					return null;
 				}
 				this._classFlags |= ClassDefinition.IS_INTERFACE;
 				break;
@@ -1300,7 +1392,7 @@ class Parser {
 			if (token.getValue() == "mixin") {
 				if ((this._classFlags & (ClassDefinition.IS_FINAL | ClassDefinition.IS_NATIVE)) != 0) {
 					this._newError("mixin cannot have final or native attribute set");
-					return false;
+					return null;
 				}
 				this._classFlags |= ClassDefinition.IS_MIXIN;
 				break;
@@ -1324,22 +1416,22 @@ class Parser {
 			}
 			if ((this._classFlags & newFlag) != 0) {
 				this._newError("same attribute cannot be specified more than once");
-				return false;
+				return null;
 			}
 			this._classFlags |= newFlag;
 		}
 		var className = this._expectIdentifier(null);
 		if (className == null)
-			return false;
+			return null;
 		// template
 		if ((this._typeArgs = this._formalTypeArguments()) == null) {
-			return false;
+			return null;
 		}
 		this._classType = new ParsedObjectType(
-			new QualifiedName(className, null),
+			new QualifiedName(className, (this._outerClass != null) ? this._outerClass.classType : null),
 			this._typeArgs.map.<Type>(function (token : Token) : Type {
 				// convert formal typearg (Token) to actual typearg (Type)
-				return new ParsedObjectType(new QualifiedName(token, null), new Type[]);
+				return new ParsedObjectType(new QualifiedName(token), new Type[]);
 			}));
 		this._objectTypesUsed.push(this._classType);
 		// extends
@@ -1347,12 +1439,13 @@ class Parser {
 			if (this._expectOpt("extends") != null) {
 				this._extendType = this._objectTypeDeclaration(
 					null,
+					true,
 					function (classDef) {
 						return (classDef.flags() & (ClassDefinition.IS_MIXIN | ClassDefinition.IS_INTERFACE | ClassDefinition.IS_FINAL)) == 0;
 					});
 			}
 			if (this._extendType == null && className.getValue() != "Object") {
-				this._extendType = new ParsedObjectType(new QualifiedName(new Token("Object", true), null), new Type[]);
+				this._extendType = new ParsedObjectType(new QualifiedName(new Token("Object", true)), new Type[]);
 				this._objectTypesUsed.push(this._extendType);
 			}
 		} else {
@@ -1366,6 +1459,7 @@ class Parser {
 			do {
 				var implementType = this._objectTypeDeclaration(
 					null,
+					true,
 					function (classDef) {
 						return (classDef.flags() & (ClassDefinition.IS_MIXIN | ClassDefinition.IS_INTERFACE)) != 0;
 					});
@@ -1376,13 +1470,23 @@ class Parser {
 		}
 		// body
 		if (this._expect("{") == null)
-			return false;
+			return null;
 		var members = new MemberDefinition[];
 
 		var success = true;
 		while (this._expectOpt("}") == null) {
 			if (! this._expectIsNotEOF())
 				break;
+			if (this._expectClassDefOpt()) {
+				this._pushClassState();
+
+				// parse inner class
+				if (this._classDefinition() == null)
+					this._skipStatement();
+
+				this._popClassState();
+				continue;
+			}
 			var member = this._memberDefinition();
 			if (member != null) {
 				for (var i = 0; i < members.length; ++i) {
@@ -1415,6 +1519,21 @@ class Parser {
 			// any better way to check that we are parsing a built-in file?
 			this._errors.push(new CompileError(className, "cannot re-define a built-in class"));
 			success = false;
+		} else if (this._outerClass != null) {
+			for (var i = 0; i < this._outerClass.inners.length; ++i) {
+				if (this._outerClass.inners[i].className() == className.getValue()) {
+					this._errors.push(new CompileError(className, "a non-template inner class with the same name has been already declared"));
+					success = false;
+					break;
+				}
+			}
+			for (var i = 0; i < this._outerClass.templateInners.length; ++i) {
+				if (this._outerClass.templateInners[i].className() == className.getValue()) {
+					this._errors.push(new CompileError(className, "a non-template inner class with the same name has been already declared"));
+					success = false;
+					break;
+				}
+			}
 		} else {
 			for (var i = 0; i < this._imports.length; ++i)
 				if (! this._imports[i].checkNameConflict(this._errors, className))
@@ -1436,17 +1555,27 @@ class Parser {
 		}
 
 		if (! success)
-			return false;
+			return null;
 
 		// done
 		if (this._typeArgs.length != 0) {
-			this._templateClassDefs.push(new TemplateClassDefinition(className, className.getValue(), this._classFlags, this._typeArgs, this._extendType, this._implementTypes, members, this._objectTypesUsed, docComment));
+			var templateClassDef = new TemplateClassDefinition(className, className.getValue(), this._classFlags, this._typeArgs, this._extendType, this._implementTypes, members, this._inners, this._templateInners, this._objectTypesUsed, docComment);
+			if (this._outerClass != null) {
+				this._outerClass.templateInners.push(templateClassDef);
+			} else {
+				this._templateClassDefs.push(templateClassDef);
+			}
+			return templateClassDef;
 		} else {
-			var classDef = new ClassDefinition(className, className.getValue(), this._classFlags, this._extendType, this._implementTypes, members, this._objectTypesUsed, docComment);
-			this._classDefs.push(classDef);
+			var classDef = new ClassDefinition(className, className.getValue(), this._classFlags, this._extendType, this._implementTypes, members, this._inners, this._templateInners, this._objectTypesUsed, docComment);
+			if (this._outerClass != null) {
+				this._outerClass.inners.push(classDef);
+			} else {
+				this._classDefs.push(classDef);
+			}
 			classDef.setParser(this);
+			return classDef;
 		}
-		return true;
 	}
 
 	function _memberDefinition () : MemberDefinition {
@@ -1772,7 +1901,7 @@ class Parser {
 		}
 		if (this._typeArgs != null) {
 			for (var i = 0; i < this._typeArgs.length; ++i) {
-				if (baseType.equals(new ParsedObjectType(new QualifiedName(this._typeArgs[i], null), new Type[]))) {
+				if (baseType.equals(new ParsedObjectType(new QualifiedName(this._typeArgs[i]), new Type[]))) {
 					return baseType.toNullableType(true);
 				}
 			}
@@ -1800,24 +1929,71 @@ class Parser {
 				throw new Error("logic flaw");
 			}
 		} else {
-			return this._objectTypeDeclaration(null, null);
+			return this._objectTypeDeclaration(null, true, null);
 		}
 	}
 
-	function _objectTypeDeclaration (firstToken : Token, autoCompleteMatchCb : function(:ClassDefinition):boolean) : ParsedObjectType {
-		var qualifiedName = firstToken != null ? this._qualifiedNameStartingWith(firstToken, autoCompleteMatchCb) : this._qualifiedName(false, autoCompleteMatchCb);
-		if (qualifiedName == null)
-			return null;
-		var typeArgs = this._actualTypeArguments();
-		if (typeArgs == null) {
-			return null;
-		} else if (typeArgs.length != 0) {
-			return this._templateTypeDeclaration(qualifiedName, typeArgs);
+	function _objectTypeDeclaration (firstToken : Token, allowInner : boolean, autoCompleteMatchCb : function(:ClassDefinition):boolean) : ParsedObjectType {
+		var token;
+		if (firstToken == null) {
+			if ((token = this._expectIdentifier(function (self) { return self._getCompletionCandidatesOfTopLevel(autoCompleteMatchCb); })) == null)
+				return null;
 		} else {
-			// object
-			var objectType = new ParsedObjectType(qualifiedName, new Type[]);
-			this._objectTypesUsed.push(objectType);
-			return objectType;
+			token = firstToken;
+		}
+		if (token.getValue() == "variant") {
+			this._errors.push(new CompileError(token, "cannot use 'variant' as a class name"));
+			return null;
+		} else if (token.getValue() == "Nullable" || token.getValue() == "MayBeUndefined") {
+			this._errors.push(new CompileError(token, "cannot use 'Nullable' (or MayBeUndefined) as a class name"));
+			return null;
+		}
+		// import part
+		var imprt = this.lookupImportAlias(token.getValue());
+		if (imprt != null) {
+			if (this._expect(".") == null)
+				return null;
+			token = this._expectIdentifier(function (self) { return self._getCompletionCandidatesOfNamespace(imprt, autoCompleteMatchCb); });
+			if (token == null)
+				return null;
+		}
+		if (! allowInner) {
+			var qualifiedName = new QualifiedName(token, imprt);
+
+			var typeArgs = this._actualTypeArguments();
+			if (typeArgs == null) {
+				return null;
+			} else if (typeArgs.length != 0) {
+				return this._templateTypeDeclaration(qualifiedName, typeArgs);
+			} else {
+				// object
+				var objectType = new ParsedObjectType(qualifiedName, new Type[]);
+				this._objectTypesUsed.push(objectType);
+				return objectType;
+			}
+		} else {
+			var enclosingType : ParsedObjectType = null;
+			while (true) {
+				qualifiedName = enclosingType != null ? new QualifiedName(token, enclosingType) : new QualifiedName(token, imprt);
+
+				var typeArgs = this._actualTypeArguments();
+				if (typeArgs == null) {
+					return null;
+				} else if (typeArgs.length != 0) {
+					enclosingType = this._templateTypeDeclaration(qualifiedName, typeArgs);
+				} else {
+					var objectType = new ParsedObjectType(qualifiedName, new Type[]);
+					this._objectTypesUsed.push(objectType);
+					enclosingType = objectType;
+				}
+
+				if (this._expectOpt(".") == null)
+					break;
+				token = this._expectIdentifier();
+				if (token == null)
+					return null;
+			}
+			return enclosingType;
 		}
 	}
 
@@ -1908,7 +2084,7 @@ class Parser {
 
 	function _registerArrayTypeOf (token : Token, elementType : Type) : ParsedObjectType {
 		// var arrayType = new ParsedObjectType(new QualifiedName(new Token("Array", true), null), [ elementType ], token);
-		var arrayType = new ParsedObjectType(new QualifiedName(new Token("Array", true), null), [ elementType ]);
+		var arrayType = new ParsedObjectType(new QualifiedName(new Token("Array", true)), [ elementType ]);
 		this._objectTypesUsed.push(arrayType);
 		return arrayType;
 	}
@@ -2021,7 +2197,7 @@ class Parser {
 		} else if ((token = this._expectOpt("this")) != null) {
 			classType = this._classType;
 		} else {
-			if ((classType = this._objectTypeDeclaration(null, null)) == null)
+			if ((classType = this._objectTypeDeclaration(null, true, null)) == null)
 				return false;
 			token = classType.getToken();
 			if (this._classType.equals(classType)) {
@@ -2962,7 +3138,7 @@ class Parser {
 			if (local != null) {
 				return new LocalExpression(token, local);
 			} else {
-				var parsedType = this._objectTypeDeclaration(token, null);
+				var parsedType = this._objectTypeDeclaration(token, false, null);
 				if (parsedType == null)
 					return null;
 				return new ClassExpression(parsedType.getToken(), parsedType);

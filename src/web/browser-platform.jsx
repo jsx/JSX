@@ -149,7 +149,7 @@ class BrowserPlatform extends Platform {
 		if (err) {
 			throw new Error(err);
 		}
-		return content;
+		return this.fileContent[name] = content;
 	}
 
 	override function error (s : string) : void {

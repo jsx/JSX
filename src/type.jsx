@@ -511,13 +511,21 @@ class ParsedObjectType extends ObjectType {
 	}
 
 	override function instantiate (instantiationContext : InstantiationContext) : Type {
-		if (this._typeArguments.length == 0) {
+		var enclosingType = this._qualifiedName.getEnclosingType();
+		if (enclosingType == null && this._typeArguments.length == 0) {
 			var actualType = instantiationContext.typemap[this._qualifiedName.getToken().getValue()];
 			if (actualType != null)
 				return actualType;
 			if (this._classDef == null)
 				instantiationContext.objectTypesUsed.push(this);
 			return this;
+		}
+		var qualifiedName = this._qualifiedName;
+		if (enclosingType != null) {
+			var actualEnclosingType = this._qualifiedName.getEnclosingType().instantiate(instantiationContext) as ParsedObjectType;
+			if (! this._qualifiedName.getEnclosingType().equals(actualEnclosingType)) {
+				qualifiedName = new QualifiedName(this._qualifiedName.getToken(), actualEnclosingType);
+			}
 		}
 		var typeArgs = new Type[];
 		for (var i = 0; i < this._typeArguments.length; ++i) {
@@ -529,13 +537,13 @@ class ParsedObjectType extends ObjectType {
 			typeArgs[i] = actualType != null ? actualType : this._typeArguments[i];
 			// special handling for (Array|Map).<T> (T should not be NullableType)
 			if (typeArgs[i] instanceof NullableType) {
-				var templateClassName = this._qualifiedName.getToken().getValue();
+				var templateClassName = qualifiedName.getToken().getValue();
 				if (templateClassName == "Array" || templateClassName == "Map") {
 					typeArgs[i] = (typeArgs[i] as NullableType).getBaseType();
 				}
 			}
 		}
-		var objectType = new ParsedObjectType(this._qualifiedName, typeArgs);
+		var objectType = new ParsedObjectType(qualifiedName, typeArgs);
 		instantiationContext.objectTypesUsed.push(objectType);
 		return objectType;
 	}

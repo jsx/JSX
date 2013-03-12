@@ -67,12 +67,7 @@ class NodePlatform extends Platform {
 		if (this.fileContent.hasOwnProperty(name)) {
 			return true;
 		}
-		try {
-			node.fs.statSync(this._absPath(name));
-		} catch (e : Error) {
-			return false;
-		}
-		return true;
+		return node.fs.existsSync(this._absPath(name));
 	}
 
 	override function getFilesInDirectory (path : string) : string[] {
@@ -123,9 +118,7 @@ class NodePlatform extends Platform {
 
 	override function mkpath (path : string) : void {
 		path = this._absPath(path);
-		try {
-			node.fs.statSync(path);
-		} catch (e : Error) {
+		if (! node.fs.existsSync(path)) {
 			var dirOfPath = Util.dirname(path);
 			if (dirOfPath != path) {
 				this.mkpath(dirOfPath);
