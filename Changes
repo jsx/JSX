@@ -1,5 +1,10 @@
 Revision history for the JSX software development kit
 
+0.9.14 2013-03-12 10:51:24
+    [BUG FIXES]
+    - Fix a compiler crash if non-existing static methods were called,
+      which was introduced at 0.9.11
+
 0.9.13 2013-03-12 10:04:24
     [BUG FIXES]
     - Suppress deprecation warnings about `path.existsSync()`
