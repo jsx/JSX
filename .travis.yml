@@ -7,7 +7,8 @@ node_js:
 
 matrix:
   allow_failures:
-    - node_js: 0.12
+    - node_js: 0.9
+    - node_js: 0.11
 
 # We want to be notified when something happens.
 notifications:
