@@ -3,8 +3,6 @@ PROVE := perl extlib/bin/prove
 
 JOBS:=4
 
-OPTIMIZE_FLAGS := lto,no-assert,fold-const,return-if,inline,dce,unbox,fold-const,lcse,dce,fold-const,array-length,unclassify
-
 PORT := 2012
 
 all: compiler doc web
@@ -48,7 +46,7 @@ test-debug: compiler
 	$(PROVE) --jobs "$(JOBS)" t/*.t t/*/*.jsx
 
 test-optimized: compiler
-	JSX_OPTS="--optimize $(OPTIMIZE_FLAGS)" $(PROVE) --jobs "$(JOBS)" t/*/*.jsx
+	JSX_OPTS="--release --disable-optimize no-log" $(PROVE) --jobs "$(JOBS)" t/*/*.jsx
 
 
 optimize-bench:
