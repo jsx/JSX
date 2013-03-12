@@ -188,6 +188,14 @@ class JSXCommand {
 				}
 				optimizeCommands = optimizeCommands.concat(optarg.split(","));
 				break;
+			case "--disable-optimize":
+				if ((optarg = getoptarg()) == null) {
+					return 1;
+				}
+				optimizeCommands = optimizeCommands.filter((item) -> {
+					return optarg.split(",").indexOf(item) == -1;
+				});
+				break;
 			case "--warn":
 				if ((optarg = getoptarg()) == null) {
 					return 1;
