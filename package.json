@@ -42,7 +42,7 @@
   "scripts" : {
       "test" : "make test JOBS=1 SKIP_PHANTOMJS_TEST=1",
       "prepublish" : "JSX_OPTS=--release make && make test",
-	  "postpublish" : "jsx --run tool/postpublish.jsx",
-	  "preinstall" :  "jsx --run tool/preinstall.jsx"
+	  "postpublish" : "node tool/bootstrap-compiler.js --run tool/postpublish.jsx",
+	  "preinstall" :  "node tool/bootstrap-compiler.js --run tool/preinstall.jsx"
   }
 }
