@@ -91,6 +91,7 @@ package App::jsx;
             File::Path::mkpath(File::Basename::dirname($file));
         }
         open my($fh), ">", $file or Carp::confess("cannot open file '$file' for writing: $!");
+        binmode $fh, ":utf8";
         print $fh $content;
         close $fh or Carp::confess("cannot close file '$file': $!");
         return;
@@ -250,6 +251,8 @@ package App::jsx;
             return system(prepare_run_command($c->{run}));
         }
         else {
+            binmode STDOUT, ":utf8";
+            binmode STDERR, ":utf8";
             print STDOUT $c->{stdout};
             print STDERR $c->{stderr};
             return $c->{statusCode};
