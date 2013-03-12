@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// generatedy by JSX compiler 0.9.10 (2013-03-08 13:50:20 +0900; 06b6c6cf1c4cd23a9d61f3fbd7d4606625a45252)
+// generatedy by JSX compiler 0.9.14 (2013-03-12 10:57:40 +0900; 8c6d07451bc102e615cab7278a2e33b6b404c214)
 var JSX = {};
 (function (JSX) {
 /**
@@ -5867,16 +5867,7 @@ NodePlatform.prototype.fileExists$S = function (name) {
 	if ($__jsx_ObjectHasOwnProperty.call(this.fileContent, name)) {
 		return true;
 	}
-	try {
-		node.fs.statSync(this._absPath$S(name));
-	} catch ($__jsx_catch_0) {
-		if ($__jsx_catch_0 instanceof Error) {
-			return false;
-		} else {
-			throw $__jsx_catch_0;
-		}
-	}
-	return true;
+	return node.fs.existsSync(this._absPath$S(name));
 };
 
 /**
@@ -5951,18 +5942,12 @@ NodePlatform.prototype.mkpath$S = function (path) {
 	/** @type {!string} */
 	var dirOfPath;
 	path = this._absPath$S(path);
-	try {
-		node.fs.statSync(path);
-	} catch ($__jsx_catch_0) {
-		if ($__jsx_catch_0 instanceof Error) {
-			dirOfPath = Util$dirname$S(path);
-			if (dirOfPath !== path) {
-				this.mkpath$S(dirOfPath);
-			}
-			node.fs.mkdirSync(path);
-		} else {
-			throw $__jsx_catch_0;
+	if (! node.fs.existsSync(path)) {
+		dirOfPath = Util$dirname$S(path);
+		if (dirOfPath !== path) {
+			this.mkpath$S(dirOfPath);
 		}
+		node.fs.mkdirSync(path);
 	}
 };
 
@@ -14871,17 +14856,21 @@ ClassDefinition.prototype.resolveTypes$LAnalysisContext$ = function (context) {
 					identifierToken = propExpr.getIdentifierToken$();
 					receiverType = propExpr.getExpr$().getType$();
 					receiverClassDef = receiverType.getClassDef$();
-					receiverClassDef.forEachInnerClass$F$LClassDefinition$B$((function (classDef) {
-						/** @type {ParsedObjectType} */
-						var objectType;
-						if (classDef.className$() === identifierToken.getValue$()) {
-							objectType = new ParsedObjectType$LQualifiedName$ALType$(new QualifiedName$LToken$LParsedObjectType$(identifierToken, receiverType), propExpr.getTypeArguments$());
-							objectType.resolveType$LAnalysisContext$(context);
-							replaceCb(new ClassExpression$LToken$LType$(propExpr.getToken$(), objectType));
-							return false;
-						}
+					if (receiverClassDef) {
+						receiverClassDef.forEachInnerClass$F$LClassDefinition$B$((function (classDef) {
+							/** @type {ParsedObjectType} */
+							var objectType;
+							if (classDef.className$() === identifierToken.getValue$()) {
+								objectType = new ParsedObjectType$LQualifiedName$ALType$(new QualifiedName$LToken$LParsedObjectType$(identifierToken, receiverType), propExpr.getTypeArguments$());
+								objectType.resolveType$LAnalysisContext$(context);
+								replaceCb(new ClassExpression$LToken$LType$(propExpr.getToken$(), objectType));
+								return false;
+							}
+							return true;
+						}));
+					} else {
 						return true;
-					}));
+					}
 				}
 				return true;
 			}));
@@ -21799,13 +21788,13 @@ JavaScriptEmitter.prototype.emit$ALClassDefinition$ = function (classDefs) {
 	var $this = this;
 	/** @type {!string} */
 	var bootstrap;
-	/** @type {_NoDebugCommandStash} */
+	/** @type {_NoDebugCommand$CStash} */
 	var stash;
 	/** @type {!number} */
 	var i;
 	bootstrap = this._platform.load$S(this._platform.getRoot$() + "/src/js/bootstrap.js");
 	this._output += bootstrap;
-	stash = this.getOptimizerStash$()["no-debug"];
+	stash = this.getOptimizerStash$()[_NoDebugCommand.IDENTIFIER];
 	this._emit$SLToken$("JSX.DEBUG = " + (stash == null || stash.debugValue ? "true" : "false") + ";\n", null);
 	for (i = 0; i < classDefs.length; ++ i) {
 		classDefs[i].forEachMemberFunction$F$LMemberFunctionDefinition$B$((function onFuncDef(funcDef) {
@@ -23558,31 +23547,6 @@ _FunctionOptimizeCommand.prototype.performOptimization$ = function () {
 };
 
 /**
- * class _LinkTimeOptimizationCommandStash extends OptimizerStash
- * @constructor
- */
-function _LinkTimeOptimizationCommandStash() {
-}
-
-_LinkTimeOptimizationCommandStash.prototype = new OptimizerStash;
-/**
- * @constructor
- */
-function _LinkTimeOptimizationCommandStash$() {
-	OptimizerStash$.call(this);
-	this.extendedBy = [];
-};
-
-_LinkTimeOptimizationCommandStash$.prototype = new _LinkTimeOptimizationCommandStash;
-
-/**
- * @return {OptimizerStash}
- */
-_LinkTimeOptimizationCommandStash.prototype.clone$ = function () {
-	throw new Error("not supported");
-};
-
-/**
  * class _LinkTimeOptimizationCommand extends _OptimizeCommand
  * @constructor
  */
@@ -23603,7 +23567,7 @@ _LinkTimeOptimizationCommand$.prototype = new _LinkTimeOptimizationCommand;
  * @return {OptimizerStash}
  */
 _LinkTimeOptimizationCommand.prototype._createStash$ = function () {
-	return new _LinkTimeOptimizationCommandStash$();
+	return new _LinkTimeOptimizationCommand$CStash$();
 };
 
 /**
@@ -23732,7 +23696,7 @@ _NoAssertCommand.prototype = new _FunctionOptimizeCommand;
  * @constructor
  */
 function _NoAssertCommand$() {
-	_FunctionOptimizeCommand$S.call(this, "no-assert");
+	_FunctionOptimizeCommand$S.call(this, _NoAssertCommand.IDENTIFIER);
 };
 
 _NoAssertCommand$.prototype = new _NoAssertCommand;
@@ -23781,7 +23745,7 @@ _NoLogCommand.prototype = new _FunctionOptimizeCommand;
  * @constructor
  */
 function _NoLogCommand$() {
-	_FunctionOptimizeCommand$S.call(this, "no-log");
+	_FunctionOptimizeCommand$S.call(this, _NoLogCommand.IDENTIFIER);
 };
 
 _NoLogCommand$.prototype = new _NoLogCommand;
@@ -23819,42 +23783,6 @@ _NoLogCommand.prototype._optimizeStatements$ALStatement$ = function (statements)
 };
 
 /**
- * class _DetermineCalleeCommandStash extends OptimizerStash
- * @constructor
- */
-function _DetermineCalleeCommandStash() {
-}
-
-_DetermineCalleeCommandStash.prototype = new OptimizerStash;
-/**
- * @constructor
- */
-function _DetermineCalleeCommandStash$() {
-	OptimizerStash$.call(this);
-	this.callingFuncDef = null;
-};
-
-_DetermineCalleeCommandStash$.prototype = new _DetermineCalleeCommandStash;
-
-/**
- * @constructor
- * @param {_DetermineCalleeCommandStash} that
- */
-function _DetermineCalleeCommandStash$L_DetermineCalleeCommandStash$(that) {
-	OptimizerStash$.call(this);
-	this.callingFuncDef = that.callingFuncDef;
-};
-
-_DetermineCalleeCommandStash$L_DetermineCalleeCommandStash$.prototype = new _DetermineCalleeCommandStash;
-
-/**
- * @return {OptimizerStash}
- */
-_DetermineCalleeCommandStash.prototype.clone$ = function () {
-	return new _DetermineCalleeCommandStash$L_DetermineCalleeCommandStash$(this);
-};
-
-/**
  * class _DetermineCalleeCommand extends _FunctionOptimizeCommand
  * @constructor
  */
@@ -23875,7 +23803,7 @@ _DetermineCalleeCommand$.prototype = new _DetermineCalleeCommand;
  * @return {OptimizerStash}
  */
 _DetermineCalleeCommand.prototype._createStash$ = function () {
-	return new _DetermineCalleeCommandStash$();
+	return new _DetermineCalleeCommand$CStash$();
 };
 
 /**
@@ -23993,7 +23921,7 @@ var _DetermineCalleeCommand$findCallingFunction$LClassDefinition$SALType$B = _De
  * @return {MemberFunctionDefinition}
  */
 _DetermineCalleeCommand.getCallingFuncDef$LStashable$ = function (stashable) {
-	/** @type {_DetermineCalleeCommandStash} */
+	/** @type {_DetermineCalleeCommand$CStash} */
 	var stash;
 	stash = stashable.getOptimizerStash$()[_DetermineCalleeCommand.IDENTIFIER];
 	if (stash == null) {
@@ -24003,42 +23931,6 @@ _DetermineCalleeCommand.getCallingFuncDef$LStashable$ = function (stashable) {
 };
 
 var _DetermineCalleeCommand$getCallingFuncDef$LStashable$ = _DetermineCalleeCommand.getCallingFuncDef$LStashable$;
-
-/**
- * class _UnclassifyOptimizationCommandStash extends OptimizerStash
- * @constructor
- */
-function _UnclassifyOptimizationCommandStash() {
-}
-
-_UnclassifyOptimizationCommandStash.prototype = new OptimizerStash;
-/**
- * @constructor
- */
-function _UnclassifyOptimizationCommandStash$() {
-	OptimizerStash$.call(this);
-	this.inliner = null;
-};
-
-_UnclassifyOptimizationCommandStash$.prototype = new _UnclassifyOptimizationCommandStash;
-
-/**
- * @constructor
- * @param {_UnclassifyOptimizationCommandStash} that
- */
-function _UnclassifyOptimizationCommandStash$L_UnclassifyOptimizationCommandStash$(that) {
-	OptimizerStash$.call(this);
-	this.inliner = that.inliner;
-};
-
-_UnclassifyOptimizationCommandStash$L_UnclassifyOptimizationCommandStash$.prototype = new _UnclassifyOptimizationCommandStash;
-
-/**
- * @return {OptimizerStash}
- */
-_UnclassifyOptimizationCommandStash.prototype.clone$ = function () {
-	return new _UnclassifyOptimizationCommandStash$L_UnclassifyOptimizationCommandStash$(this);
-};
 
 /**
  * class _UnclassifyOptimizationCommand extends _OptimizeCommand
@@ -24061,7 +23953,7 @@ _UnclassifyOptimizationCommand$.prototype = new _UnclassifyOptimizationCommand;
  * @return {OptimizerStash}
  */
 _UnclassifyOptimizationCommand.prototype._createStash$ = function () {
-	return new _UnclassifyOptimizationCommandStash$();
+	return new _UnclassifyOptimizationCommand$CStash$();
 };
 
 /**
@@ -24144,7 +24036,7 @@ _UnclassifyOptimizationCommand.prototype._getClassesToUnclassify$ = function () 
 			var foundClassDefIndex;
 			if (! (expr != null)) {
 				debugger;
-				throw new Error("[src/optimizer.jsx:778:28] assertion failure\n                assert expr != null;\n                            ^^\n");
+				throw new Error("[src/optimizer.jsx:779:28] assertion failure\n                assert expr != null;\n                            ^^\n");
 			}
 			if (expr instanceof InstanceofExpression) {
 				foundClassDefIndex = candidates.indexOf(expr.getExpectedType$().getClassDef$());
@@ -24275,17 +24167,21 @@ _UnclassifyOptimizationCommand.prototype._createInliner$LMemberFunctionDefinitio
 				if (expr instanceof FunctionExpression) {
 					return false;
 				} else {
-					if (expr instanceof LocalExpression) {
-						argIndex = funcDef.getArguments$().map((function (i) {
-							return i;
-						})).indexOf(expr.getLocal$());
-						if (argIndex === - 1) {
-							throw new Error("logic flaw; could not find argument: " + expr.getLocal$().getName$().getValue$());
+					if (expr instanceof ThisExpression) {
+						return false;
+					} else {
+						if (expr instanceof LocalExpression) {
+							argIndex = funcDef.getArguments$().map((function (i) {
+								return i;
+							})).indexOf(expr.getLocal$());
+							if (argIndex === - 1) {
+								throw new Error("logic flaw; could not find argument: " + expr.getLocal$().getName$().getValue$());
+							}
+							if (expectedArgIndex !== argIndex) {
+								return false;
+							}
+							++ expectedArgIndex;
 						}
-						if (expectedArgIndex !== argIndex) {
-							return false;
-						}
-						++ expectedArgIndex;
 					}
 				}
 			}
@@ -24411,42 +24307,6 @@ _UnclassifyOptimizationCommand.prototype._rewriteMethodCallsToStatic$LExpression
 };
 
 /**
- * class _FoldConstantCommandStash extends OptimizerStash
- * @constructor
- */
-function _FoldConstantCommandStash() {
-}
-
-_FoldConstantCommandStash.prototype = new OptimizerStash;
-/**
- * @constructor
- */
-function _FoldConstantCommandStash$() {
-	OptimizerStash$.call(this);
-	this.isOptimized = false;
-};
-
-_FoldConstantCommandStash$.prototype = new _FoldConstantCommandStash;
-
-/**
- * @constructor
- * @param {_FoldConstantCommandStash} that
- */
-function _FoldConstantCommandStash$L_FoldConstantCommandStash$(that) {
-	OptimizerStash$.call(this);
-	this.isOptimized = that.isOptimized;
-};
-
-_FoldConstantCommandStash$L_FoldConstantCommandStash$.prototype = new _FoldConstantCommandStash;
-
-/**
- * @return {OptimizerStash}
- */
-_FoldConstantCommandStash.prototype.clone$ = function () {
-	return new _FoldConstantCommandStash$L_FoldConstantCommandStash$(this);
-};
-
-/**
  * class _FoldConstantCommand extends _FunctionOptimizeCommand
  * @constructor
  */
@@ -24458,7 +24318,7 @@ _FoldConstantCommand.prototype = new _FunctionOptimizeCommand;
  * @constructor
  */
 function _FoldConstantCommand$() {
-	_FunctionOptimizeCommand$S.call(this, "fold-const");
+	_FunctionOptimizeCommand$S.call(this, _FoldConstantCommand.IDENTIFIER);
 };
 
 _FoldConstantCommand$.prototype = new _FoldConstantCommand;
@@ -24467,7 +24327,7 @@ _FoldConstantCommand$.prototype = new _FoldConstantCommand;
  * @return {OptimizerStash}
  */
 _FoldConstantCommand.prototype._createStash$ = function () {
-	return new _FoldConstantCommandStash$();
+	return new _FoldConstantCommand$CStash$();
 };
 
 /**
@@ -24779,12 +24639,15 @@ _FoldConstantCommand.prototype._isIntegerOrNumberLiteralExpression$LExpression$ 
  */
 _FoldConstantCommand.prototype._foldStaticConst$LMemberVariableDefinition$ = function (member) {
 	var $this = this;
+	/** @type {_FoldConstantCommand$CStash} */
+	var stash;
 	/** @type {Expression} */
 	var initialValue;
-	if (this.getStash$LStashable$(member).isOptimized) {
+	stash = this.getStash$LStashable$(member);
+	if (stash.isOptimized) {
 		return;
 	}
-	this.getStash$LStashable$(member).isOptimized = true;
+	stash.isOptimized = true;
 	initialValue = member.getInitialValue$();
 	if (initialValue != null) {
 		this._optimizeExpression$LExpression$F$LExpression$V$(initialValue, (function (expr) {
@@ -24836,7 +24699,7 @@ _DeadCodeEliminationOptimizeCommand.prototype = new _FunctionOptimizeCommand;
  * @constructor
  */
 function _DeadCodeEliminationOptimizeCommand$() {
-	_FunctionOptimizeCommand$S.call(this, "dce");
+	_FunctionOptimizeCommand$S.call(this, _DeadCodeEliminationOptimizeCommand.IDENTIFIER);
 };
 
 _DeadCodeEliminationOptimizeCommand$.prototype = new _DeadCodeEliminationOptimizeCommand;
@@ -25341,44 +25204,6 @@ _DeadCodeEliminationOptimizeCommand.prototype._eliminateDeadConditions$LMemberFu
 };
 
 /**
- * class _InlineOptimizeCommandStash extends OptimizerStash
- * @constructor
- */
-function _InlineOptimizeCommandStash() {
-}
-
-_InlineOptimizeCommandStash.prototype = new OptimizerStash;
-/**
- * @constructor
- */
-function _InlineOptimizeCommandStash$() {
-	OptimizerStash$.call(this);
-	this.isOptimized = false;
-	this.isInlineable = null;
-};
-
-_InlineOptimizeCommandStash$.prototype = new _InlineOptimizeCommandStash;
-
-/**
- * @constructor
- * @param {_InlineOptimizeCommandStash} that
- */
-function _InlineOptimizeCommandStash$L_InlineOptimizeCommandStash$(that) {
-	OptimizerStash$.call(this);
-	this.isOptimized = that.isOptimized;
-	this.isInlineable = that.isInlineable;
-};
-
-_InlineOptimizeCommandStash$L_InlineOptimizeCommandStash$.prototype = new _InlineOptimizeCommandStash;
-
-/**
- * @return {OptimizerStash}
- */
-_InlineOptimizeCommandStash.prototype.clone$ = function () {
-	return new _InlineOptimizeCommandStash$L_InlineOptimizeCommandStash$(this);
-};
-
-/**
  * class _InlineOptimizeCommand extends _FunctionOptimizeCommand
  * @constructor
  */
@@ -25390,7 +25215,7 @@ _InlineOptimizeCommand.prototype = new _FunctionOptimizeCommand;
  * @constructor
  */
 function _InlineOptimizeCommand$() {
-	_FunctionOptimizeCommand$S.call(this, "inline");
+	_FunctionOptimizeCommand$S.call(this, _InlineOptimizeCommand.IDENTIFIER);
 };
 
 _InlineOptimizeCommand$.prototype = new _InlineOptimizeCommand;
@@ -25399,7 +25224,7 @@ _InlineOptimizeCommand$.prototype = new _InlineOptimizeCommand;
  * @return {OptimizerStash}
  */
 _InlineOptimizeCommand.prototype._createStash$ = function () {
-	return new _InlineOptimizeCommandStash$();
+	return new _InlineOptimizeCommand$CStash$();
 };
 
 /**
@@ -25407,10 +25232,13 @@ _InlineOptimizeCommand.prototype._createStash$ = function () {
  * @return {!boolean}
  */
 _InlineOptimizeCommand.prototype.optimizeFunction$LMemberFunctionDefinition$ = function (funcDef) {
-	if (this.getStash$LStashable$(funcDef).isOptimized) {
+	/** @type {_InlineOptimizeCommand$CStash} */
+	var stash;
+	stash = this.getStash$LStashable$(funcDef);
+	if (stash.isOptimized) {
 		return true;
 	}
-	this.getStash$LStashable$(funcDef).isOptimized = true;
+	stash.isOptimized = true;
 	if (funcDef.getStatements$() == null) {
 		return true;
 	}
@@ -25796,7 +25624,7 @@ _InlineOptimizeCommand.prototype._isWorthInline$LMemberFunctionDefinition$ = fun
  */
 _InlineOptimizeCommand.prototype._functionIsInlineable$LMemberFunctionDefinition$ = function (funcDef) {
 	var $this = this;
-	/** @type {_InlineOptimizeCommandStash} */
+	/** @type {_InlineOptimizeCommand$CStash} */
 	var stash;
 	stash = this.getStash$LStashable$(funcDef);
 	if (stash.isInlineable == null) {
@@ -26054,7 +25882,7 @@ _ReturnIfOptimizeCommand.prototype = new _FunctionOptimizeCommand;
  * @constructor
  */
 function _ReturnIfOptimizeCommand$() {
-	_FunctionOptimizeCommand$S.call(this, "return-if");
+	_FunctionOptimizeCommand$S.call(this, _ReturnIfOptimizeCommand.IDENTIFIER);
 	this._altered = false;
 };
 
@@ -26188,7 +26016,7 @@ _LCSEOptimizeCommand.prototype = new _FunctionOptimizeCommand;
  * @constructor
  */
 function _LCSEOptimizeCommand$() {
-	_FunctionOptimizeCommand$S.call(this, "lcse");
+	_FunctionOptimizeCommand$S.call(this, _LCSEOptimizeCommand.IDENTIFIER);
 };
 
 _LCSEOptimizeCommand$.prototype = new _LCSEOptimizeCommand;
@@ -26440,35 +26268,6 @@ _LCSEOptimizeCommand.prototype._optimizeExpressions$LMemberFunctionDefinition$AL
 };
 
 /**
- * class _UnboxOptimizeCommandStash extends OptimizerStash
- * @constructor
- */
-function _UnboxOptimizeCommandStash() {
-}
-
-_UnboxOptimizeCommandStash.prototype = new OptimizerStash;
-/**
- * @constructor
- */
-function _UnboxOptimizeCommandStash$() {
-	OptimizerStash$.call(this);
-	this.canUnbox = null;
-};
-
-_UnboxOptimizeCommandStash$.prototype = new _UnboxOptimizeCommandStash;
-
-/**
- * @return {OptimizerStash}
- */
-_UnboxOptimizeCommandStash.prototype.clone$ = function () {
-	/** @type {_UnboxOptimizeCommandStash} */
-	var tmp;
-	tmp = new _UnboxOptimizeCommandStash$();
-	tmp.canUnbox = this.canUnbox;
-	return tmp;
-};
-
-/**
  * class _UnboxOptimizeCommand extends _FunctionOptimizeCommand
  * @constructor
  */
@@ -26480,7 +26279,7 @@ _UnboxOptimizeCommand.prototype = new _FunctionOptimizeCommand;
  * @constructor
  */
 function _UnboxOptimizeCommand$() {
-	_FunctionOptimizeCommand$S.call(this, "unbox");
+	_FunctionOptimizeCommand$S.call(this, _UnboxOptimizeCommand.IDENTIFIER);
 };
 
 _UnboxOptimizeCommand$.prototype = new _UnboxOptimizeCommand;
@@ -26489,7 +26288,7 @@ _UnboxOptimizeCommand$.prototype = new _UnboxOptimizeCommand;
  * @return {OptimizerStash}
  */
 _UnboxOptimizeCommand.prototype._createStash$ = function () {
-	return new _UnboxOptimizeCommandStash$();
+	return new _UnboxOptimizeCommand$CStash$();
 };
 
 /**
@@ -26610,11 +26409,14 @@ _UnboxOptimizeCommand.prototype._newExpressionCanUnbox$LExpression$ = function (
 	var $this = this;
 	/** @type {MemberFunctionDefinition} */
 	var ctor;
+	/** @type {_UnboxOptimizeCommand$CStash} */
+	var stash;
 	ctor = _DetermineCalleeCommand$getCallingFuncDef$LStashable$(newExpr);
-	if (this.getStash$LStashable$(ctor).canUnbox != null) {
-		return this.getStash$LStashable$(ctor).canUnbox;
+	stash = this.getStash$LStashable$(ctor);
+	if (stash.canUnbox != null) {
+		return stash.canUnbox;
 	}
-	return this.getStash$LStashable$(ctor).canUnbox = (function () {
+	return stash.canUnbox = (function () {
 		if (ctor.getLocals$().length !== 0) {
 			return false;
 		}
@@ -26810,7 +26612,7 @@ _ArrayLengthOptimizeCommand.prototype = new _FunctionOptimizeCommand;
  * @constructor
  */
 function _ArrayLengthOptimizeCommand$() {
-	_FunctionOptimizeCommand$S.call(this, "array-length");
+	_FunctionOptimizeCommand$S.call(this, _ArrayLengthOptimizeCommand.IDENTIFIER);
 };
 
 _ArrayLengthOptimizeCommand$.prototype = new _ArrayLengthOptimizeCommand;
@@ -26980,35 +26782,6 @@ _ArrayLengthOptimizeCommand.prototype._typeIsArray$LType$ = function (type) {
 };
 
 /**
- * class _NoDebugCommandStash extends OptimizerStash
- * @constructor
- */
-function _NoDebugCommandStash() {
-}
-
-_NoDebugCommandStash.prototype = new OptimizerStash;
-/**
- * @constructor
- */
-function _NoDebugCommandStash$() {
-	OptimizerStash$.call(this);
-	this.debugValue = true;
-};
-
-_NoDebugCommandStash$.prototype = new _NoDebugCommandStash;
-
-/**
- * @return {OptimizerStash}
- */
-_NoDebugCommandStash.prototype.clone$ = function () {
-	/** @type {_NoDebugCommandStash} */
-	var tmp;
-	tmp = new _NoDebugCommandStash$();
-	tmp.debugValue = this.debugValue;
-	return tmp;
-};
-
-/**
  * class _NoDebugCommand extends _OptimizeCommand
  * @constructor
  */
@@ -27020,23 +26793,23 @@ _NoDebugCommand.prototype = new _OptimizeCommand;
  * @constructor
  */
 function _NoDebugCommand$() {
-	_OptimizeCommand$S.call(this, "no-debug");
+	_OptimizeCommand$S.call(this, _NoDebugCommand.IDENTIFIER);
 };
 
 _NoDebugCommand$.prototype = new _NoDebugCommand;
 
 /**
- * @return {OptimizerStash}
+ * @return {_NoDebugCommand$CStash}
  */
 _NoDebugCommand.prototype._createStash$ = function () {
-	return new _NoDebugCommandStash$();
+	return new _NoDebugCommand$CStash$();
 };
 
 /**
  */
 _NoDebugCommand.prototype.performOptimization$ = function () {
 	var $this = this;
-	/** @type {_NoDebugCommandStash} */
+	/** @type {_NoDebugCommand$CStash} */
 	var stash;
 	stash = this.getStash$LStashable$(this.getCompiler$().getEmitter$());
 	stash.debugValue = false;
@@ -29025,6 +28798,235 @@ DocumentGenerator.prototype._isPrivate$LMemberDefinition$ = function (memberDef)
 	return memberDef.name$().charAt(0) === "_";
 };
 
+/**
+ * class _LinkTimeOptimizationCommand$CStash extends OptimizerStash
+ * @constructor
+ */
+function _LinkTimeOptimizationCommand$CStash() {
+}
+
+_LinkTimeOptimizationCommand$CStash.prototype = new OptimizerStash;
+/**
+ * @constructor
+ */
+function _LinkTimeOptimizationCommand$CStash$() {
+	OptimizerStash$.call(this);
+	this.extendedBy = [];
+};
+
+_LinkTimeOptimizationCommand$CStash$.prototype = new _LinkTimeOptimizationCommand$CStash;
+
+/**
+ * @return {OptimizerStash}
+ */
+_LinkTimeOptimizationCommand$CStash.prototype.clone$ = function () {
+	throw new Error("not supported");
+};
+
+/**
+ * class _DetermineCalleeCommand$CStash extends OptimizerStash
+ * @constructor
+ */
+function _DetermineCalleeCommand$CStash() {
+}
+
+_DetermineCalleeCommand$CStash.prototype = new OptimizerStash;
+/**
+ * @constructor
+ */
+function _DetermineCalleeCommand$CStash$() {
+	OptimizerStash$.call(this);
+	this.callingFuncDef = null;
+};
+
+_DetermineCalleeCommand$CStash$.prototype = new _DetermineCalleeCommand$CStash;
+
+/**
+ * @constructor
+ * @param {_DetermineCalleeCommand$CStash} that
+ */
+function _DetermineCalleeCommand$CStash$L_DetermineCalleeCommand$CStash$(that) {
+	OptimizerStash$.call(this);
+	this.callingFuncDef = that.callingFuncDef;
+};
+
+_DetermineCalleeCommand$CStash$L_DetermineCalleeCommand$CStash$.prototype = new _DetermineCalleeCommand$CStash;
+
+/**
+ * @return {OptimizerStash}
+ */
+_DetermineCalleeCommand$CStash.prototype.clone$ = function () {
+	return new _DetermineCalleeCommand$CStash$L_DetermineCalleeCommand$CStash$(this);
+};
+
+/**
+ * class _UnclassifyOptimizationCommand$CStash extends OptimizerStash
+ * @constructor
+ */
+function _UnclassifyOptimizationCommand$CStash() {
+}
+
+_UnclassifyOptimizationCommand$CStash.prototype = new OptimizerStash;
+/**
+ * @constructor
+ */
+function _UnclassifyOptimizationCommand$CStash$() {
+	OptimizerStash$.call(this);
+	this.inliner = null;
+};
+
+_UnclassifyOptimizationCommand$CStash$.prototype = new _UnclassifyOptimizationCommand$CStash;
+
+/**
+ * @constructor
+ * @param {_UnclassifyOptimizationCommand$CStash} that
+ */
+function _UnclassifyOptimizationCommand$CStash$L_UnclassifyOptimizationCommand$CStash$(that) {
+	OptimizerStash$.call(this);
+	this.inliner = that.inliner;
+};
+
+_UnclassifyOptimizationCommand$CStash$L_UnclassifyOptimizationCommand$CStash$.prototype = new _UnclassifyOptimizationCommand$CStash;
+
+/**
+ * @return {_UnclassifyOptimizationCommand$CStash}
+ */
+_UnclassifyOptimizationCommand$CStash.prototype.clone$ = function () {
+	return new _UnclassifyOptimizationCommand$CStash$L_UnclassifyOptimizationCommand$CStash$(this);
+};
+
+/**
+ * class _FoldConstantCommand$CStash extends OptimizerStash
+ * @constructor
+ */
+function _FoldConstantCommand$CStash() {
+}
+
+_FoldConstantCommand$CStash.prototype = new OptimizerStash;
+/**
+ * @constructor
+ */
+function _FoldConstantCommand$CStash$() {
+	OptimizerStash$.call(this);
+	this.isOptimized = false;
+};
+
+_FoldConstantCommand$CStash$.prototype = new _FoldConstantCommand$CStash;
+
+/**
+ * @constructor
+ * @param {_FoldConstantCommand$CStash} that
+ */
+function _FoldConstantCommand$CStash$L_FoldConstantCommand$CStash$(that) {
+	OptimizerStash$.call(this);
+	this.isOptimized = that.isOptimized;
+};
+
+_FoldConstantCommand$CStash$L_FoldConstantCommand$CStash$.prototype = new _FoldConstantCommand$CStash;
+
+/**
+ * @return {OptimizerStash}
+ */
+_FoldConstantCommand$CStash.prototype.clone$ = function () {
+	return new _FoldConstantCommand$CStash$L_FoldConstantCommand$CStash$(this);
+};
+
+/**
+ * class _InlineOptimizeCommand$CStash extends OptimizerStash
+ * @constructor
+ */
+function _InlineOptimizeCommand$CStash() {
+}
+
+_InlineOptimizeCommand$CStash.prototype = new OptimizerStash;
+/**
+ * @constructor
+ */
+function _InlineOptimizeCommand$CStash$() {
+	OptimizerStash$.call(this);
+	this.isOptimized = false;
+	this.isInlineable = null;
+};
+
+_InlineOptimizeCommand$CStash$.prototype = new _InlineOptimizeCommand$CStash;
+
+/**
+ * @constructor
+ * @param {_InlineOptimizeCommand$CStash} that
+ */
+function _InlineOptimizeCommand$CStash$L_InlineOptimizeCommand$CStash$(that) {
+	OptimizerStash$.call(this);
+	this.isOptimized = that.isOptimized;
+	this.isInlineable = that.isInlineable;
+};
+
+_InlineOptimizeCommand$CStash$L_InlineOptimizeCommand$CStash$.prototype = new _InlineOptimizeCommand$CStash;
+
+/**
+ * @return {OptimizerStash}
+ */
+_InlineOptimizeCommand$CStash.prototype.clone$ = function () {
+	return new _InlineOptimizeCommand$CStash$L_InlineOptimizeCommand$CStash$(this);
+};
+
+/**
+ * class _UnboxOptimizeCommand$CStash extends OptimizerStash
+ * @constructor
+ */
+function _UnboxOptimizeCommand$CStash() {
+}
+
+_UnboxOptimizeCommand$CStash.prototype = new OptimizerStash;
+/**
+ * @constructor
+ */
+function _UnboxOptimizeCommand$CStash$() {
+	OptimizerStash$.call(this);
+	this.canUnbox = null;
+};
+
+_UnboxOptimizeCommand$CStash$.prototype = new _UnboxOptimizeCommand$CStash;
+
+/**
+ * @return {OptimizerStash}
+ */
+_UnboxOptimizeCommand$CStash.prototype.clone$ = function () {
+	/** @type {_UnboxOptimizeCommand$CStash} */
+	var tmp;
+	tmp = new _UnboxOptimizeCommand$CStash$();
+	tmp.canUnbox = this.canUnbox;
+	return tmp;
+};
+
+/**
+ * class _NoDebugCommand$CStash extends OptimizerStash
+ * @constructor
+ */
+function _NoDebugCommand$CStash() {
+}
+
+_NoDebugCommand$CStash.prototype = new OptimizerStash;
+/**
+ * @constructor
+ */
+function _NoDebugCommand$CStash$() {
+	OptimizerStash$.call(this);
+	this.debugValue = true;
+};
+
+_NoDebugCommand$CStash$.prototype = new _NoDebugCommand$CStash;
+
+/**
+ * @return {OptimizerStash}
+ */
+_NoDebugCommand$CStash.prototype.clone$ = function () {
+	/** @type {_NoDebugCommand$CStash} */
+	var tmp;
+	tmp = new _NoDebugCommand$CStash$();
+	tmp.debugValue = this.debugValue;
+	return tmp;
+};
+
 $__jsx_lazy_init(CompilationServer, "AUTO_SHUTDOWN", function () {
 	return ! process.env.JSX_NO_AUTO_SHUTDOWN;
 });
@@ -29100,10 +29102,10 @@ _CallExpressionEmitter._operatorPrecedence = 0;
 _SuperExpressionEmitter._operatorPrecedence = 0;
 _NewExpressionEmitter._operatorPrecedence = 0;
 _CommaExpressionEmitter._operatorPrecedence = 0;
-Meta.VERSION_STRING = "0.9.10";
-Meta.VERSION_NUMBER = 0.00901;
-Meta.LAST_COMMIT_HASH = "06b6c6cf1c4cd23a9d61f3fbd7d4606625a45252";
-Meta.LAST_COMMIT_DATE = "2013-03-08 13:50:20 +0900";
+Meta.VERSION_STRING = "0.9.14";
+Meta.VERSION_NUMBER = 0.009014;
+Meta.LAST_COMMIT_HASH = "8c6d07451bc102e615cab7278a2e33b6b404c214";
+Meta.LAST_COMMIT_DATE = "2013-03-12 10:57:40 +0900";
 $__jsx_lazy_init(Meta, "IDENTIFIER", function () {
 	return Meta.VERSION_STRING + " (" + Meta.LAST_COMMIT_DATE + "; " + Meta.LAST_COMMIT_HASH + ")";
 });
@@ -29199,9 +29201,19 @@ ClassDefinition.GET_MEMBER_MODE_FUNCTION_WITH_BODY = 3;
 ClassDefinition.GET_MEMBER_MODE_NOT_ABSTRACT = 4;
 JavaScriptEmitter._initialized = false;
 _LinkTimeOptimizationCommand.IDENTIFIER = "lto";
+_NoAssertCommand.IDENTIFIER = "no-assert";
+_NoLogCommand.IDENTIFIER = "no-log";
 _DetermineCalleeCommand.IDENTIFIER = "determine-callee";
 _UnclassifyOptimizationCommand.IDENTIFIER = "unclassify";
+_FoldConstantCommand.IDENTIFIER = "fold-const";
+_DeadCodeEliminationOptimizeCommand.IDENTIFIER = "dce";
+_InlineOptimizeCommand.IDENTIFIER = "inline";
 _InlineOptimizeCommand.INLINE_THRESHOLD = 30;
+_ReturnIfOptimizeCommand.IDENTIFIER = "return-if";
+_LCSEOptimizeCommand.IDENTIFIER = "lcse";
+_UnboxOptimizeCommand.IDENTIFIER = "unbox";
+_ArrayLengthOptimizeCommand.IDENTIFIER = "array-length";
+_NoDebugCommand.IDENTIFIER = "no-debug";
 Compiler.MODE_COMPILE = 0;
 Compiler.MODE_PARSE = 1;
 Compiler.MODE_COMPLETE = 2;
@@ -29587,34 +29599,20 @@ var $__jsx_classMap = {
 		_OptimizeCommand$S: _OptimizeCommand$S,
 		_FunctionOptimizeCommand: _FunctionOptimizeCommand,
 		_FunctionOptimizeCommand$S: _FunctionOptimizeCommand$S,
-		_LinkTimeOptimizationCommandStash: _LinkTimeOptimizationCommandStash,
-		_LinkTimeOptimizationCommandStash$: _LinkTimeOptimizationCommandStash$,
 		_LinkTimeOptimizationCommand: _LinkTimeOptimizationCommand,
 		_LinkTimeOptimizationCommand$: _LinkTimeOptimizationCommand$,
 		_NoAssertCommand: _NoAssertCommand,
 		_NoAssertCommand$: _NoAssertCommand$,
 		_NoLogCommand: _NoLogCommand,
 		_NoLogCommand$: _NoLogCommand$,
-		_DetermineCalleeCommandStash: _DetermineCalleeCommandStash,
-		_DetermineCalleeCommandStash$: _DetermineCalleeCommandStash$,
-		_DetermineCalleeCommandStash$L_DetermineCalleeCommandStash$: _DetermineCalleeCommandStash$L_DetermineCalleeCommandStash$,
 		_DetermineCalleeCommand: _DetermineCalleeCommand,
 		_DetermineCalleeCommand$: _DetermineCalleeCommand$,
-		_UnclassifyOptimizationCommandStash: _UnclassifyOptimizationCommandStash,
-		_UnclassifyOptimizationCommandStash$: _UnclassifyOptimizationCommandStash$,
-		_UnclassifyOptimizationCommandStash$L_UnclassifyOptimizationCommandStash$: _UnclassifyOptimizationCommandStash$L_UnclassifyOptimizationCommandStash$,
 		_UnclassifyOptimizationCommand: _UnclassifyOptimizationCommand,
 		_UnclassifyOptimizationCommand$: _UnclassifyOptimizationCommand$,
-		_FoldConstantCommandStash: _FoldConstantCommandStash,
-		_FoldConstantCommandStash$: _FoldConstantCommandStash$,
-		_FoldConstantCommandStash$L_FoldConstantCommandStash$: _FoldConstantCommandStash$L_FoldConstantCommandStash$,
 		_FoldConstantCommand: _FoldConstantCommand,
 		_FoldConstantCommand$: _FoldConstantCommand$,
 		_DeadCodeEliminationOptimizeCommand: _DeadCodeEliminationOptimizeCommand,
 		_DeadCodeEliminationOptimizeCommand$: _DeadCodeEliminationOptimizeCommand$,
-		_InlineOptimizeCommandStash: _InlineOptimizeCommandStash,
-		_InlineOptimizeCommandStash$: _InlineOptimizeCommandStash$,
-		_InlineOptimizeCommandStash$L_InlineOptimizeCommandStash$: _InlineOptimizeCommandStash$L_InlineOptimizeCommandStash$,
 		_InlineOptimizeCommand: _InlineOptimizeCommand,
 		_InlineOptimizeCommand$: _InlineOptimizeCommand$,
 		_ReturnIfOptimizeCommand: _ReturnIfOptimizeCommand,
@@ -29623,16 +29621,30 @@ var $__jsx_classMap = {
 		_LCSECachedExpression$LExpression$F$LExpression$V$: _LCSECachedExpression$LExpression$F$LExpression$V$,
 		_LCSEOptimizeCommand: _LCSEOptimizeCommand,
 		_LCSEOptimizeCommand$: _LCSEOptimizeCommand$,
-		_UnboxOptimizeCommandStash: _UnboxOptimizeCommandStash,
-		_UnboxOptimizeCommandStash$: _UnboxOptimizeCommandStash$,
 		_UnboxOptimizeCommand: _UnboxOptimizeCommand,
 		_UnboxOptimizeCommand$: _UnboxOptimizeCommand$,
 		_ArrayLengthOptimizeCommand: _ArrayLengthOptimizeCommand,
 		_ArrayLengthOptimizeCommand$: _ArrayLengthOptimizeCommand$,
-		_NoDebugCommandStash: _NoDebugCommandStash,
-		_NoDebugCommandStash$: _NoDebugCommandStash$,
 		_NoDebugCommand: _NoDebugCommand,
-		_NoDebugCommand$: _NoDebugCommand$
+		_NoDebugCommand$: _NoDebugCommand$,
+		Stash: _LinkTimeOptimizationCommand$CStash,
+		Stash$: _LinkTimeOptimizationCommand$CStash$,
+		Stash: _DetermineCalleeCommand$CStash,
+		Stash$: _DetermineCalleeCommand$CStash$,
+		Stash$L_DetermineCalleeCommand$CStash$: _DetermineCalleeCommand$CStash$L_DetermineCalleeCommand$CStash$,
+		Stash: _UnclassifyOptimizationCommand$CStash,
+		Stash$: _UnclassifyOptimizationCommand$CStash$,
+		Stash$L_UnclassifyOptimizationCommand$CStash$: _UnclassifyOptimizationCommand$CStash$L_UnclassifyOptimizationCommand$CStash$,
+		Stash: _FoldConstantCommand$CStash,
+		Stash$: _FoldConstantCommand$CStash$,
+		Stash$L_FoldConstantCommand$CStash$: _FoldConstantCommand$CStash$L_FoldConstantCommand$CStash$,
+		Stash: _InlineOptimizeCommand$CStash,
+		Stash$: _InlineOptimizeCommand$CStash$,
+		Stash$L_InlineOptimizeCommand$CStash$: _InlineOptimizeCommand$CStash$L_InlineOptimizeCommand$CStash$,
+		Stash: _UnboxOptimizeCommand$CStash,
+		Stash$: _UnboxOptimizeCommand$CStash$,
+		Stash: _NoDebugCommand$CStash,
+		Stash$: _NoDebugCommand$CStash$
 	},
 	"src/statement.jsx": {
 		Statement: Statement,
