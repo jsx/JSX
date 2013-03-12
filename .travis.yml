@@ -15,5 +15,5 @@ notifications:
   irc:
     channels:
       - "irc.freenode.org#jsx"
-    on_success: change # [always|never|change] # default: change
+    on_success: always # [always|never|change] # default: change
     on_failure: always # [always|never|change] # default: always
