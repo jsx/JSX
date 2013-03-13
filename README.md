@@ -61,10 +61,10 @@ There's a web interface, which provides a web compiler and web application examp
 Type the following commands to run the server:
 
     make server # to run an HTTP daemon
-    open http://localhost:5000/
+    open http://localhost:2012/
 
 This server is also used to show results of JSX profiler.
-See [Using the Profiler](https://github.com/jsx/JSX/wiki/Using-the-Profiler) for details.
+See [Using the Profiler](http://jsx.github.com/doc/profiler.html) for details.
 
 TESTING
 -----------------------

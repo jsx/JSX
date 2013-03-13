@@ -74,10 +74,10 @@ JSX.getProfileResults = function () {
 	return ($__jsx_profiler.getResults || function () { return {}; })();
 };
 
-JSX.postProfileResults = function (url) {
+JSX.postProfileResults = function (url, cb) {
 	if ($__jsx_profiler.postResults == null)
 		throw new Error("profiler has not been turned on");
-	return $__jsx_profiler.postResults(url);
+	return $__jsx_profiler.postResults(url, cb);
 };
 
 JSX.resetProfileResults = function () {

@@ -1,6 +1,9 @@
 import "js/web.jsx";
+import "console.jsx";
 
 class Config {
+	static const PROFILER_SERVER_API = "http://localhost:2012/post-profile";
+
 	static const quantity = 360;
 	static const size     = 2.0;
 	static const decay    = 0.98;
@@ -210,8 +213,14 @@ final class _Main {
 		if (JSX.profilerIsRunning()) {
 			log "profiler is running";
 			dom.window.setTimeout(function () : void {
-				JSX.postProfileResults("http://localhost:5000/post-profile");
-				//dom.window.location.href = "http://localhost:5000/web/profiler.html";
+				JSX.postProfileResults(Config.PROFILER_SERVER_API, function (e, resultUrl) {
+					if (e) {
+						throw e;
+					}
+					else {
+						console.log(resultUrl);
+					}
+				});
 			}, 10 * 1000);
 		}
 	}

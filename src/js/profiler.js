@@ -57,9 +57,19 @@
 		return stack[0];
 	};
 
-	Profiler.postResults = function (url) {
+	Profiler.postResults = function (url, cb) {
+		if (! cb) {
+			cb = function (error, message) {
+				if (error) {
+					console.error("Profiler: " + error.toString());
+				}
+				else {
+					console.log("Profiler: " + message);
+				}
+			}
+		}
 		if (typeof(XMLHttpRequest) == "undefined") {
-			console.error("Profiler: " + "XMLHttpRequest is not defined");
+			cb(new ReferenceError("XMLHttpRequest is not defined"), null);
 			return;
 		}
 
@@ -67,12 +77,15 @@
 		var xhr = new XMLHttpRequest();
 		xhr.onreadystatechange = function () {
 			if (xhr.readyState == 4) {
-				if (xhr.status == 200 || xhr.status == 0) {
-					console.log("Profiler: " + xhr.responseText);
+				if (xhr.status == 200 || xhr.status == 201 || xhr.status == 0) {
+					cb(null, xhr.getResponseHeader("Location") || xhr.responseText);
 				} else {
-					console.error("Profiler: " + "failed to upload profiler results, received " + xhr.status + " " + xhr.statusText + " response from server");
+					cb(new Error("failed to post profiler results, received " + xhr.status + " " + xhr.statusText + " response from server"), null);
 				}
 			}
+		};
+		xhr.onerror = function (event) {
+			cb(new Error("failed to post profiler results"), null);
 		};
 		xhr.open("POST", url, /* async: */true);
 		xhr.setRequestHeader("Content-Type", "application/json");
