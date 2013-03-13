@@ -35,7 +35,6 @@ package App::jsx;
     # required modules
     use Cwd         ();
     use Carp        ();
-    use IO::Socket  ();
     use HTTP::Tiny  ();
 
     #use Time::HiRes      (); # lazy
@@ -136,7 +135,9 @@ package App::jsx;
                 require POSIX;
                 POSIX::setsid();
 
-                my $port = empty_port();
+                require Net::EmptyPort;
+
+                my $port = Net::EmptyPort::empty_port();
                 exec($jsx_compiler, "--compilation-server", $port)
                     or kill(TERM => $parent_pid), Carp::confess("failed to exec $jsx_compiler: $!");
                 die "not reached";
@@ -259,48 +260,6 @@ package App::jsx;
         }
     }
 
-    # copied from Test::TCP
-    sub empty_port {
-        my $port = do {
-            if (@_) {
-                my $p = $_[0];
-                $p = 49152 unless $p =~ /^[0-9]+$/ && $p < 49152;
-                $p;
-            } else {
-                50000 + int(rand()*1000);
-            }
-        };
-
-        while ( $port++ < 60000 ) {
-            next if _check_port($port);
-            my $sock = IO::Socket::INET->new(
-                Listen    => 5,
-                LocalAddr => '127.0.0.1',
-                LocalPort => $port,
-                Proto     => 'tcp',
-                (($^O eq 'MSWin32') ? () : (ReuseAddr => 1)),
-            );
-            return $port if $sock;
-        }
-        die "empty port not found";
-    }
-
-    sub _check_port {
-        my ($port) = @_;
-
-        my $remote = IO::Socket::INET->new(
-            Proto    => 'tcp',
-            PeerAddr => '127.0.0.1',
-            PeerPort => $port,
-        );
-        if ($remote) {
-            close $remote;
-            return 1;
-        }
-        else {
-            return 0;
-        }
-    }
 } # App::jsx
 
 package main;
