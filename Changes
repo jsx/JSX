@@ -1,5 +1,13 @@
 Revision history for the JSX software development kit
 
+0.9.16 2013-03-13 10:08:50
+    [BUG FIXES]
+    - Fix "wide character in print" warnings
+
+    [FEATURES]
+    - Add "staticize" optimization command
+    - Add `JSX.postProfilerResults(url, cb)` to know the request is finished
+
 0.9.15 2013-03-12 11:08:35
     - Fixed only a packaging issue
 
