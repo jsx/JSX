@@ -2,7 +2,7 @@ package Test::TCP;
 use strict;
 use warnings;
 use 5.00800;
-our $VERSION = '1.18';
+our $VERSION = '1.21';
 use base qw/Exporter/;
 use IO::Socket::INET;
 use Test::SharedFork 0.12;
@@ -11,38 +11,12 @@ use Config;
 use POSIX;
 use Time::HiRes ();
 use Carp ();
+use Net::EmptyPort qw(empty_port check_port);
 
 our @EXPORT = qw/ empty_port test_tcp wait_port /;
 
 # process does not die when received SIGTERM, on win32.
 my $TERMSIG = $^O eq 'MSWin32' ? 'KILL' : 'TERM';
-
-# get a empty port on 49152 .. 65535
-# http://www.iana.org/assignments/port-numbers
-sub empty_port {
-    my $port = do {
-        if (@_) {
-            my $p = $_[0];
-            $p = 49152 unless $p =~ /^[0-9]+$/ && $p < 49152;
-            $p;
-        } else {
-            50000 + int(rand()*1000);
-        }
-    };
-
-    while ( $port++ < 60000 ) {
-        next if _check_port($port);
-        my $sock = IO::Socket::INET->new(
-            Listen    => 5,
-            LocalAddr => '127.0.0.1',
-            LocalPort => $port,
-            Proto     => 'tcp',
-            (($^O eq 'MSWin32') ? () : (ReuseAddr => 1)),
-        );
-        return $port if $sock;
-    }
-    die "empty port not found";
-}
 
 sub test_tcp {
     my %args = @_;
@@ -57,32 +31,11 @@ sub test_tcp {
     undef $server; # make sure
 }
 
-sub _check_port {
-    my ($port) = @_;
-
-    my $remote = IO::Socket::INET->new(
-        Proto    => 'tcp',
-        PeerAddr => '127.0.0.1',
-        PeerPort => $port,
-    );
-    if ($remote) {
-        close $remote;
-        return 1;
-    }
-    else {
-        return 0;
-    }
-}
-
 sub wait_port {
     my $port = shift;
 
-    my $retry = 100;
-    while ( $retry-- ) {
-        return if $^O eq 'MSWin32' ? `$^X -MTest::TCP::CheckPort -echeck_port $port` : _check_port( $port );
-        Time::HiRes::sleep(0.1);
-    }
-    die "cannot open port: $port";
+    Net::EmptyPort::wait_port($port, 0.1, 100)
+        or die "cannot open port: $port";
 }
 
 # ------------------------------------------------------------------------- 
@@ -97,7 +50,7 @@ sub new {
         _my_pid    => $$,
         %args,
     }, $class;
-    $self->{port} = Test::TCP::empty_port() unless exists $self->{port};
+    $self->{port} = empty_port() unless exists $self->{port};
     $self->start()
       if $self->{auto_start};
     return $self;
@@ -230,22 +183,6 @@ Test::TCP is test utilities for TCP/IP programs.
 =head1 METHODS
 
 =over 4
-
-=item empty_port
-
-    my $port = empty_port();
-
-Get the available port number, you can use.
-
-Normally, empty_port() finds empty port number from 49152..65535.
-See L<http://www.iana.org/assignments/port-numbers>
-
-But you want to use another range, use a following form:
-
-    # 5963..65535
-    my $port = empty_port(5963);
-
-
 
 =item test_tcp
 
