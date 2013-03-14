@@ -5,6 +5,12 @@ use strict;
 use warnings;
 use warnings FATAL => 'uninitialized';
 
+BEGIN {
+    # does the same as lib::core::only to prevent to use locally-installed modules
+    require Config;
+    @INC = @Config::Config{qw(privlibexp archlibexp)};
+}
+
 package App::jsx;
 {
 

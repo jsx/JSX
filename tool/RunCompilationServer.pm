@@ -7,6 +7,7 @@ use tool::Util;
 use Time::HiRes ();
 use File::Basename ();
 
+use Net::EmptyPort ();
 use Proc::Guard ();
 
 use constant ROOT => File::Basename::dirname(__FILE__);
@@ -25,7 +26,7 @@ if (! $ENV{JSX_TEST_NO_COMPILATION_SERVER}) {
 }
 
 sub start {
-    my $p = App::jsx::empty_port();
+    my $p = Net::EmptyPort::empty_port();
 
     $server_guard = Proc::Guard->new(
         code => sub {
