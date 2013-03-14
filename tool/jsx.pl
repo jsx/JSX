@@ -37,10 +37,13 @@ package App::jsx;
             # to prevent to use locally-installed modules
             require Config;
             @INC = @Config::Config{qw(privlibexp archlibexp)};
+            # do not use lib module; we don't want to use XS modules
+            unshift @INC, "$DIR/../extlib/lib/perl5";
         }
-
-        # do not use lib module; we don't want to use XS modules
-        unshift @INC, "$DIR/../extlib/lib/perl5";
+        else {
+            require lib;
+            lib->import("$DIR/../extlib/lib/perl5");
+        }
     }
 
     # required modules
