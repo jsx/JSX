@@ -41,7 +41,7 @@
   },
   "scripts" : {
       "test" : "make test JOBS=1 SKIP_PHANTOMJS_TEST=1",
-      "prepublish" : "JSX_OPTS=--release make && make test",
+      "prepublish" : "JSX_OPTS=--release make && make test IN_RELENG=1",
 	  "postpublish" : "node tool/bootstrap-compiler.js --run tool/postpublish.jsx",
 	  "preinstall" :  "node tool/bootstrap-compiler.js --run tool/preinstall.jsx"
   }

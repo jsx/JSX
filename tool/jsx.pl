@@ -6,9 +6,6 @@ use warnings;
 use warnings FATAL => 'uninitialized';
 
 BEGIN {
-    # does the same as lib::core::only to prevent to use locally-installed modules
-    require Config;
-    @INC = @Config::Config{qw(privlibexp archlibexp)};
 }
 
 package App::jsx;
@@ -34,8 +31,16 @@ package App::jsx;
         }
 
         $DIR = File::Basename::dirname($FILE);
-        require lib;
-        lib->import("$DIR/../extlib/lib/perl5");
+
+        if ($ENV{IN_RELENG}) {
+            # does the same as lib::core::only
+            # to prevent to use locally-installed modules
+            require Config;
+            @INC = @Config::Config{qw(privlibexp archlibexp)};
+        }
+
+        # do not use lib module; we don't want to use XS modules
+        unshift @INC, "$DIR/../extlib/lib/perl5";
     }
 
     # required modules
