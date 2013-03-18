@@ -1,5 +1,10 @@
 Revision history for the JSX software development kit
 
+0.9.17 2013-03-19 00:47:00
+    [BUG FIXES]
+    - Fix a bug that nullable vararg (e.g. Array#push()) did now accept
+      null value of a result of expressions (#125)
+
 0.9.16 2013-03-13 10:08:50
     [BUG FIXES]
     - Fix "wide character in print" warnings
