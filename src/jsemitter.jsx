@@ -1883,21 +1883,6 @@ class _NewExpressionEmitter extends _OperatorExpressionEmitter {
 		}
 	}
 
-	function _emitCallArguments (token : Token, prefix : string, args : Expression[], argTypes : Type[]) : void {
-		this._emitter._emit(prefix, token);
-		for (var i = 0; i < args.length; ++i) {
-			if (i != 0 || prefix.charAt(prefix.length - 1) != '(')
-				this._emitter._emit(", ", null);
-			if (argTypes != null
-				&& ! (argTypes[i] instanceof NullableType || argTypes[i] instanceof VariantType)) {
-				this._emitter._emitWithNullableGuard(args[i], 0);
-			} else {
-				this._emitter._getExpressionEmitterFor(args[i]).emit(0);
-			}
-		}
-		this._emitter._emit(")", token);
-	}
-
 	function _emitAsObjectLiteral (classDef : ClassDefinition, propertyExprs : Expression[]) : void {
 		this._emitter._emit("({", this._expr.getToken());
 		var propertyIndex = 0;
