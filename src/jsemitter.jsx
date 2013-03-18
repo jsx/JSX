@@ -2706,8 +2706,9 @@ class JavaScriptEmitter implements Emitter {
 		for (var i = 0; i < args.length; ++i) {
 			if (i != 0 || prefix.charAt(prefix.length - 1) != '(')
 				this._emit(", ", null);
-			if (argTypes != null
-				&& ! (argTypes[i] instanceof NullableType || argTypes[i] instanceof VariantType)) {
+			var argType = (argTypes != null ? (argTypes[i] instanceof VariableLengthArgumentType ? (argTypes[i] as VariableLengthArgumentType).getBaseType() : argTypes[i]) : null);
+			if (argType != null
+				&& ! (argType instanceof NullableType || argType instanceof VariantType)) {
 				this._emitWithNullableGuard(args[i], 0);
 			} else {
 				this._getExpressionEmitterFor(args[i]).emit(0);
