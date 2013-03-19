@@ -1,16 +1,24 @@
 /*EXPECTED
-6
+caught
+caught 2
 */
 class _Main {
     static function main(args : string[]) : void {
-        var a = new string[];
-        a.push(_Main.b(), _Main.b());
-        a.push(_Main.b(),"foo");
-        a.push("foo", _Main.b());
-        log a.length;
+		try {
+			String.fromCharCode(_Main.b());
+			log "failed";
+		} catch (e : Error) {
+			log "caught";
+		}
+		try {
+			String.fromCharCode(97, _Main.b());
+			log "failed 2";
+		} catch (e : Error) {
+			log "caught 2";
+		}
     }
 
-    static function b() : Nullable.<string> {
+    static function b() : Nullable.<number> {
         return null;
     }
 }
