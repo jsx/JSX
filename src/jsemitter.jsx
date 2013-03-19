@@ -2706,9 +2706,20 @@ class JavaScriptEmitter implements Emitter {
 		for (var i = 0; i < args.length; ++i) {
 			if (i != 0 || prefix.charAt(prefix.length - 1) != '(')
 				this._emit(", ", null);
-			var argType = (argTypes != null ? (argTypes[i] instanceof VariableLengthArgumentType ? (argTypes[i] as VariableLengthArgumentType).getBaseType() : argTypes[i]) : null);
-			if (argType != null
-				&& ! (argType instanceof NullableType || argType instanceof VariantType)) {
+			// determine the argument type (FIXME make this a separate function)
+			var argType : Type = null;
+			if (argTypes != null) {
+				if (i < argTypes.length) {
+					argType = argTypes[i];
+				} else if (argTypes.length != 0 && argTypes[argTypes.length - 1] instanceof VariableLengthArgumentType) {
+					argType = argTypes[argTypes.length - 1];
+				}
+				if (argType instanceof VariableLengthArgumentType) {
+					argType = (argType as VariableLengthArgumentType).getBaseType();
+				}
+			}
+			// emit with nullable guard if the formal argument is not nullable
+			if (argType != null && ! Type.nullType.isConvertibleTo(argType)) {
 				this._emitWithNullableGuard(args[i], 0);
 			} else {
 				this._getExpressionEmitterFor(args[i]).emit(0);
