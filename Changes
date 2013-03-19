@@ -1,5 +1,9 @@
 Revision history for the JSX software development kit
 
+0.9.18 2013-03-19 17:36:00
+    [BUG FIXES]
+    - Re-fix for #125
+
 0.9.17 2013-03-19 00:47:00
     [BUG FIXES]
     - Fix a bug that nullable vararg (e.g. Array#push()) did now accept

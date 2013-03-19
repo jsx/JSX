@@ -1,6 +1,6 @@
 {
   "name":        "jsx",
-  "version":     "0.9.17",
+  "version":     "0.9.18",
   "description": "a faster, safer, easier JavaScript",
   "keywords": ["jsx", "compiler", "altjs"],
   "homepage": "http://jsx.github.com/",
@@ -14,7 +14,7 @@
   "contributors" : [
       {
         "name":  "Goro Fuji (gfx)",
-        "email": "fuji.goro@dena.jp"
+        "email": "gfuji@cpan.org"
       },
       {
         "name":  "Yuichi Nishiwaki (wasabiz)",
