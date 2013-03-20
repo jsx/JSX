@@ -301,7 +301,7 @@ class ReturnStatement extends Statement {
 				context.errors.push(new CompileError(this._token, "cannot return void, the function is declared to return a value of type '" + returnType.toString() + "'"));
 				return true;
 			}
-			if (this._expr instanceof FunctionExpression && ! (this._expr as FunctionExpression).typesAreIdentified() && returnType instanceof StaticFunctionType) {
+			if (this._expr instanceof FunctionExpression && ! (this._expr as FunctionExpression).argumentTypesAreIdentified() && returnType instanceof StaticFunctionType) {
 				if (! (this._expr as FunctionExpression).deductTypeIfUnknown(context, returnType as StaticFunctionType))
 					return false;
 			}

@@ -1361,6 +1361,8 @@ class MemberFunctionDefinition extends MemberDefinition implements Block {
 			for (var i = 0; i < this._statements.length; ++i)
 				if (! this._statements[i].analyze(context))
 					break;
+			if (this._returnType == null) // no return statement in body
+				this._returnType = Type.voidType;
 			if (! this._returnType.equals(Type.voidType) && context.getTopBlock().localVariableStatuses != null)
 				context.errors.push(new CompileError(this._lastTokenOfBody, "missing return statement"));
 

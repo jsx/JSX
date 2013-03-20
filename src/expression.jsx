@@ -791,13 +791,14 @@ class FunctionExpression extends Expression {
 	}
 
 	override function analyze (context : AnalysisContext, parentExpr : Expression) : boolean {
-		if (! this._argumentTypesAreIdentified()) {
+		if (! this.argumentTypesAreIdentified()) {
 			context.errors.push(new CompileError(this._token, "argument types were not automatically deductable, please specify them by hand"));
 			return false;
 		}
 		this._funcDef.analyze(context);
 		if (this._isStatement) {
-			context.getTopBlock().localVariableStatuses.setStatus(new LocalVariable(this._funcDef.getNameToken(), this.getType()));
+			this._funcName.setTypeForced(this.getType());
+			context.getTopBlock().localVariableStatuses.setStatus(this._funcName);
 		}
 		return true; // return true since everything is resolved correctly even if analysis of the function definition failed
 	}
@@ -806,7 +807,7 @@ class FunctionExpression extends Expression {
 		return this._funcDef.getType();
 	}
 
-	function _argumentTypesAreIdentified () : boolean {
+	function argumentTypesAreIdentified () : boolean {
 		var argTypes = this._funcDef.getArgumentTypes();
 		for (var i = 0; i < argTypes.length; ++i) {
 			if (argTypes[i] == null)
@@ -816,7 +817,7 @@ class FunctionExpression extends Expression {
 	}
 
 	function typesAreIdentified () : boolean {
-		if (! this._argumentTypesAreIdentified())
+		if (! this.argumentTypesAreIdentified())
 			return false;
 		if (this._funcDef.getReturnType() == null)
 			return false;
@@ -1603,7 +1604,7 @@ class AssignmentExpression extends BinaryExpression {
 		if (! this._expr1.analyze(context, this))
 			return false;
 		if (this._expr1.getType() == null) {
-			if (! (this._expr2 as FunctionExpression).typesAreIdentified()) {
+			if (! (this._expr2 as FunctionExpression).argumentTypesAreIdentified()) {
 				context.errors.push(new CompileError(this._token, "either side of the operator should be fully type-qualified"));
 				return false;
 			}
@@ -1613,9 +1614,9 @@ class AssignmentExpression extends BinaryExpression {
 				return false;
 			}
 		}
-		if (! this._expr1.assertIsAssignable(context, this._token, this._expr2.getType()))
-			return false;
 		if (! this._expr2.analyze(context, this))
+			return false;
+		if (! this._expr1.assertIsAssignable(context, this._token, this._expr2.getType()))
 			return false;
 		return true;
 	}
