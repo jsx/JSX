@@ -791,14 +791,14 @@ class FunctionExpression extends Expression {
 	}
 
 	override function analyze (context : AnalysisContext, parentExpr : Expression) : boolean {
-		if (! this.typesAreIdentified()) {
-			context.errors.push(new CompileError(this._token, "argument / return types were not automatically deductable, please specify them by hand"));
+		if (! this._argumentTypesAreIdentified()) {
+			context.errors.push(new CompileError(this._token, "argument types were not automatically deductable, please specify them by hand"));
 			return false;
 		}
+		this._funcDef.analyze(context);
 		if (this._isStatement) {
 			context.getTopBlock().localVariableStatuses.setStatus(new LocalVariable(this._funcDef.getNameToken(), this.getType()));
 		}
-		this._funcDef.analyze(context);
 		return true; // return true since everything is resolved correctly even if analysis of the function definition failed
 	}
 
@@ -806,12 +806,18 @@ class FunctionExpression extends Expression {
 		return this._funcDef.getType();
 	}
 
-	function typesAreIdentified () : boolean {
+	function _argumentTypesAreIdentified () : boolean {
 		var argTypes = this._funcDef.getArgumentTypes();
 		for (var i = 0; i < argTypes.length; ++i) {
 			if (argTypes[i] == null)
 				return false;
 		}
+		return true;
+	}
+
+	function typesAreIdentified () : boolean {
+		if (! this._argumentTypesAreIdentified())
+			return false;
 		if (this._funcDef.getReturnType() == null)
 			return false;
 		return true;

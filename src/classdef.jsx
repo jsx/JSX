@@ -1344,8 +1344,14 @@ class MemberFunctionDefinition extends MemberDefinition implements Block {
 		} else {
 			context.setBlockStack(outerContext.blockStack);
 			context.blockStack.push(new BlockContext(new LocalVariableStatuses(this, outerContext.getTopBlock().localVariableStatuses), this));
-			if (! this.isAnonymous()) { // named function expr
-				context.getTopBlock().localVariableStatuses._statuses[this.name()] = LocalVariableStatuses.ISSET;
+			// make this function visible inside it
+			if (! this.isAnonymous()) {
+				if (this.getReturnType() != null) {
+					context.getTopBlock().localVariableStatuses._statuses[this.name()] = LocalVariableStatuses.ISSET;
+				} else {
+					// ban recursive function without the return type declared
+					context.getTopBlock().localVariableStatuses._statuses[this.name()] = LocalVariableStatuses.UNTYPED_RECURSIVE_FUNCTION;
+				}
 			}
 		}
 
@@ -1481,6 +1487,10 @@ class MemberFunctionDefinition extends MemberDefinition implements Block {
 
 	function getReturnType () : Type {
 		return this._returnType;
+	}
+
+	function setReturnType (type : Type) : void {
+		this._returnType = type;
 	}
 
 	function getArguments () : ArgumentDeclaration[] {
@@ -1726,6 +1736,9 @@ class LocalVariable {
 			context.getTopBlock().localVariableStatuses.setStatus(this);
 		} else {
 			switch (context.getTopBlock().localVariableStatuses.getStatus(this)) {
+			case LocalVariableStatuses.UNTYPED_RECURSIVE_FUNCTION:
+				context.errors.push(new CompileError(token, "the return type of recursive function needs to be explicitly declared"));
+				return false;
 			case LocalVariableStatuses.ISSET:
 				// ok
 				break;
@@ -1816,6 +1829,8 @@ class ArgumentDeclaration extends LocalVariable {
 }
 
 class LocalVariableStatuses {
+
+	static const UNTYPED_RECURSIVE_FUNCTION = -1;
 
 	static const UNSET = 0;
 	static const ISSET = 1;
