@@ -278,7 +278,18 @@ class ReturnStatement extends Statement {
 
 	override function doAnalyze (context : AnalysisContext) : boolean {
 		var returnType = context.funcDef.getReturnType();
-		if (returnType.equals(Type.voidType)) {
+		if (returnType == null) {
+			if (this._expr != null) {
+				if (! this._analyzeExpr(context, this._expr))
+					return true;
+				var exprType = this._expr.getType();
+				if (exprType == null)
+					return true;
+				context.funcDef.setReturnType(exprType);
+			} else {
+				context.funcDef.setReturnType(Type.voidType);
+			}
+		} else if (returnType.equals(Type.voidType)) {
 			// handle return(void);
 			if (this._expr != null) {
 				context.errors.push(new CompileError(this._token, "cannot return a value from a void function"));
@@ -296,7 +307,7 @@ class ReturnStatement extends Statement {
 			}
 			if (! this._analyzeExpr(context, this._expr))
 				return true;
-			var exprType = this._expr != null ? this._expr.getType() : (Type.voidType as Type);
+			var exprType = this._expr.getType();
 			if (exprType == null)
 				return true;
 			if (! exprType.isConvertibleTo(returnType)) {
