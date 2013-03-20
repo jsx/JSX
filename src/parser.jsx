@@ -2980,17 +2980,7 @@ class Parser {
 		var args = this._functionArgumentsExpr(false, isStatement);
 		if (args == null)
 			return null;
-		var parseReturnType = false;
-		if (isStatement) {
-			if (this._expect(":") == null)
-				return null;
-			parseReturnType = true;
-		} else {
-			if (this._expectOpt(":") != null) {
-				parseReturnType = true;
-			}
-		}
-		if (parseReturnType) {
+		if (this._expectOpt(":") != null) {
 			var returnType = this._typeDeclaration(true);
 			if (returnType == null) {
 				return null;
@@ -3003,7 +2993,7 @@ class Parser {
 
 		var type : Type = null;
 		if (returnType != null) {
-			var argTypes = args.map.<Type>(function(arg) { return arg.getType(); });
+			var argTypes = args.map.<Type>((arg) -> arg.getType());
 			type = new StaticFunctionType(token, returnType, argTypes, false);
 		}
 		var funcName : LocalVariable = null;
@@ -3192,7 +3182,7 @@ class Parser {
 				var argName = this._expectIdentifier(null);
 				if (argName == null)
 					return null;
-				var argType = null : Type;
+				var argType : Type = null;
 				if (isStatement) {
 					if (this._expect(":") == null) {
 						this._newError("type declarations are mandatory for non-expression function definition");
