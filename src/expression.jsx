@@ -1604,8 +1604,8 @@ class AssignmentExpression extends BinaryExpression {
 		if (! this._expr1.analyze(context, this))
 			return false;
 		if (this._expr1.getType() == null) {
-			if (! (this._expr2 as FunctionExpression).argumentTypesAreIdentified()) {
-				context.errors.push(new CompileError(this._token, "either side of the operator should be fully type-qualified"));
+			if (! (this._expr2 as FunctionExpression).typesAreIdentified()) {
+				context.errors.push(new CompileError(this._token, "either side of the operator should be fully type-qualified : " + ((this._expr2 as FunctionExpression).argumentTypesAreIdentified() ? "return type not declared" : "argument / return types not declared")));
 				return false;
 			}
 		}
@@ -1614,9 +1614,9 @@ class AssignmentExpression extends BinaryExpression {
 				return false;
 			}
 		}
-		if (! this._expr2.analyze(context, this))
-			return false;
 		if (! this._expr1.assertIsAssignable(context, this._token, this._expr2.getType()))
+			return false;
+		if (! this._expr2.analyze(context, this))
 			return false;
 		return true;
 	}

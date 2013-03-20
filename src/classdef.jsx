@@ -1346,10 +1346,10 @@ class MemberFunctionDefinition extends MemberDefinition implements Block {
 			context.blockStack.push(new BlockContext(new LocalVariableStatuses(this, outerContext.getTopBlock().localVariableStatuses), this));
 			// make this function visible inside it
 			if (! this.isAnonymous()) {
-				if (this.getReturnType() != null) {
+				if (this._returnType != null) {
 					context.getTopBlock().localVariableStatuses._statuses[this.name()] = LocalVariableStatuses.ISSET;
 				} else {
-					// ban recursive function without the return type declared
+					// ban on recursive function without the return type declared
 					context.getTopBlock().localVariableStatuses._statuses[this.name()] = LocalVariableStatuses.UNTYPED_RECURSIVE_FUNCTION;
 				}
 			}

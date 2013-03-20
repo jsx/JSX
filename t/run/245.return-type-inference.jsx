@@ -3,17 +3,9 @@
 */
 class _Main {
 	static function main(args : string[]) : void {
-
-		// function statement
-		function square (a : number) {
-			return a * a;
-		}
-
-		// function expression
-		var fma = function (a : number, b : number, c : number) {
+		function fma (a : number, b : number, c : number) {
 			return a * b + c;
-		};
-
-		log fma(square(2), 10, 2);
+		}
+		log fma(6, 6, 6);
 	}
 }
