@@ -11,6 +11,7 @@ class _Main {
 
 		// function expression
 		var fma = function (a : number, b : number, c : number) {
+			return a * b + c;
 		};
 
 		log fma(square(2), 10, 2);
