@@ -19,3 +19,10 @@ npm-debug.log
 package/
 jsx-*.tgz
 
+# extlib stuff
+
+.packlist
+.meta
+darwin-*
+linux-*
+*:*
