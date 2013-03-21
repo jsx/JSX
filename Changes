@@ -1,5 +1,9 @@
 Revision history for the JSX software development kit
 
+0.9.19 2013-03-21 22:04:28
+    [BUG FIXES]
+    - Fix installation issues for Windows
+
 0.9.18 2013-03-19 17:36:00
     [BUG FIXES]
     - Re-fix for #125
