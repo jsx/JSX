@@ -73,7 +73,7 @@ class SourceMapper {
 			if (sourceFile.indexOf(this._rootDir + "/") == 0) {
 				sourceFile = sourceFile.substring(this._rootDir.length + 1);
 			}
-			if (this._fileMap.hasOwnProperty(sourceFile)) {
+			if (! this._fileMap.hasOwnProperty(sourceFile)) {
 				this._fileMap[sourceFile] = this._copyDestDir +"/"+ sourceFile;
 			}
 		}
