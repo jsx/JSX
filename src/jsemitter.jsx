@@ -2455,7 +2455,7 @@ class JavaScriptEmitter implements Emitter {
 		if (! Number.isNaN(token.getLineNumber())) {
 			origPos = {
 				line: token.getLineNumber(),
-				column: token.getColumnNumber() + 1
+				column: token.getColumnNumber()
 			};
 			if (token.isIdentifier()) {
 				tokenValue = token.getValue();
