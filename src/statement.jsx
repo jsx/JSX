@@ -277,6 +277,11 @@ class ReturnStatement extends Statement {
 	}
 
 	override function doAnalyze (context : AnalysisContext) : boolean {
+		// handle generator
+		if ((context.funcDef.flags() & ClassDefinition.IS_GENERATOR) != 0) {
+			context.errors.push(new CompileError(this._token, "return statement in generator is not allowed"));
+			return true;
+		}
 		var returnType = context.funcDef.getReturnType();
 		if (returnType.equals(Type.voidType)) {
 			// handle return(void);
@@ -305,6 +310,62 @@ class ReturnStatement extends Statement {
 			}
 		}
 		context.getTopBlock().localVariableStatuses = null;
+		return true;
+	}
+
+	override function forEachExpression (cb : function(:Expression,:function(:Expression):void):boolean) : boolean {
+		if (this._expr != null && ! cb(this._expr, function (expr) { this._expr = expr; }))
+			return false;
+		return true;
+	}
+
+}
+
+class YieldStatement extends Statement {
+
+	var _token : Token;
+	var _expr : Expression;
+
+	function constructor (token : Token, expr : Expression) {
+		super();
+		this._token = token;
+		this._expr = expr;
+	}
+
+	override function clone () : Statement {
+		return new YieldStatement(this._token, Cloner.<Expression>.cloneNullable(this._expr));
+	}
+
+	override function getToken () : Token {
+		return this._token;
+	}
+
+	function getExpr () : Expression {
+		return this._expr;
+	}
+
+	function setExpr (expr : Expression) : void {
+		this._expr = expr;
+	}
+
+	override function serialize () : variant {
+		return [
+			"YieldStatement",
+			Serializer.<Expression>.serializeNullable(this._expr)
+		] : variant[];
+	}
+
+	override function doAnalyze (context : AnalysisContext) : boolean {
+		// handle yield of values
+		if (! this._analyzeExpr(context, this._expr))
+			return true;
+		if (this._expr.getType() == null)
+			return true;
+		var yieldType = (context.funcDef.getReturnType().getClassDef() as InstantiatedClassDefinition).getTypeArguments()[0];
+		if (! this._expr.getType().isConvertibleTo(yieldType)) {
+			context.errors.push(new CompileError(this._token, "cannot convert '" + this._expr.getType().toString() + "' to yield type '" + yieldType.toString() + "'"));
+			return false;
+		}
 		return true;
 	}
 
