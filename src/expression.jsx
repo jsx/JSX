@@ -85,6 +85,9 @@ abstract class Expression implements Stashable {
 			} else if (expr instanceof LocalExpression) {
 				// update local to the instantiated one
 				(expr as LocalExpression).setLocal((expr as LocalExpression).getLocal().getInstantiated());
+			} else if (expr instanceof InstanceofExpression) {
+				var instanceofExpr = expr as InstanceofExpression;
+				instanceofExpr.setExpectedType(instanceofExpr.getExpectedType().instantiate(instantiationContext));
 			}
 			return expr.forEachExpression(onExpr);
 		}
@@ -919,6 +922,10 @@ class InstanceofExpression extends UnaryExpression {
 
 	function getExpectedType () : Type {
 		return this._expectedType;
+	}
+
+	function setExpectedType (type : Type) : void {
+		this._expectedType = type;
 	}
 
 	override function serialize () : variant {
