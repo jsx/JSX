@@ -1,5 +1,12 @@
 Revision history for the JSX software development kit
 
+0.9.21 2013-03-29 00:38:50
+    [BUG FIXES]
+    - Fix a bug that using `instanceof` operator to type parameters
+      caused compiler crashes
+    - Fix a bug that output of stdout and stderr in the compiler might be
+      mixed by stream buffering
+
 0.9.20 2013-03-23 16:01:49
     [BUG FIXES]
     - Fix generating source-map
