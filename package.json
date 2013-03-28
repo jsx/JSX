@@ -34,7 +34,7 @@
     "src": "./src"
   },
   "dependencies": {
-      "source-map": "0.1.16"
+      "source-map": "0.1.19"
   },
   "engines": {
     "node": ">= 0.8.0"
