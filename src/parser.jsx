@@ -2980,13 +2980,22 @@ class Parser {
 		var args = this._functionArgumentsExpr(false, isStatement);
 		if (args == null)
 			return null;
-		if (this._expectOpt(":") != null) {
+		if (isStatement) {
+			if (this._expect(":") == null)
+				return null;
 			var returnType = this._typeDeclaration(true);
 			if (returnType == null) {
 				return null;
 			}
 		} else {
-			returnType = null;
+			if (this._expectOpt(":") != null) {
+				returnType = this._typeDeclaration(true);
+				if (returnType == null) {
+					return null;
+				}
+			} else {
+				returnType = null;
+			}
 		}
 		if (this._expect("{") == null)
 			return null;
