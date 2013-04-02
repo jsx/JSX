@@ -794,14 +794,15 @@ class FunctionExpression extends Expression {
 	}
 
 	override function analyze (context : AnalysisContext, parentExpr : Expression) : boolean {
-		if (! this.typesAreIdentified()) {
-			context.errors.push(new CompileError(this._token, "argument / return types were not automatically deductable, please specify them by hand"));
+		if (! this.argumentTypesAreIdentified()) {
+			context.errors.push(new CompileError(this._token, "argument types were not automatically deductable, please specify them by hand"));
 			return false;
 		}
-		if (this._isStatement) {
-			context.getTopBlock().localVariableStatuses.setStatus(new LocalVariable(this._funcDef.getNameToken(), this.getType()));
-		}
 		this._funcDef.analyze(context);
+		if (this._isStatement) {
+			this._funcName.setTypeForced(this.getType());
+			context.getTopBlock().localVariableStatuses.setStatus(this._funcName);
+		}
 		return true; // return true since everything is resolved correctly even if analysis of the function definition failed
 	}
 
@@ -809,12 +810,18 @@ class FunctionExpression extends Expression {
 		return this._funcDef.getType();
 	}
 
-	function typesAreIdentified () : boolean {
+	function argumentTypesAreIdentified () : boolean {
 		var argTypes = this._funcDef.getArgumentTypes();
 		for (var i = 0; i < argTypes.length; ++i) {
 			if (argTypes[i] == null)
 				return false;
 		}
+		return true;
+	}
+
+	function typesAreIdentified () : boolean {
+		if (! this.argumentTypesAreIdentified())
+			return false;
 		if (this._funcDef.getReturnType() == null)
 			return false;
 		return true;
@@ -1605,7 +1612,7 @@ class AssignmentExpression extends BinaryExpression {
 			return false;
 		if (this._expr1.getType() == null) {
 			if (! (this._expr2 as FunctionExpression).typesAreIdentified()) {
-				context.errors.push(new CompileError(this._token, "either side of the operator should be fully type-qualified"));
+				context.errors.push(new CompileError(this._token, "either side of the operator should be fully type-qualified : " + ((this._expr2 as FunctionExpression).argumentTypesAreIdentified() ? "return type not declared" : "argument / return types not declared")));
 				return false;
 			}
 		}
