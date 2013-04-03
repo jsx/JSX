@@ -1,5 +1,11 @@
 Revision history for the JSX software development kit
 
+0.9.22 2013-04-03 11:27:37
+    [FEATURES]
+    - Add the return-value type deduction for function expression;
+      `(a : number, b : number) -> a + b` will be deduced to return a number,
+      for example
+
 0.9.21 2013-03-29 00:38:50
     [BUG FIXES]
     - Fix a bug that using `instanceof` operator to type parameters
