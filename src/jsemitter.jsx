@@ -972,12 +972,12 @@ class _AsNoConvertExpressionEmitter extends _ExpressionEmitter {
 			} else if (srcType instanceof ObjectType && srcType.isConvertibleTo(destType)) {
 				// skip
 			} else if (destType.equals(Type.booleanType)) {
-				emitWithAssertion(function () : void {
+				emitWithAssertion(function () {
 					this._emitter._emit("typeof v === \"boolean\"", this._expr.getToken());
 				}, "detected invalid cast, value is not a boolean");
 				return;
 			} else if (destType.resolveIfNullable().equals(Type.booleanType)) {
-				emitWithAssertion(function () : void {
+				emitWithAssertion(function () {
 					this._emitter._emit("v == null || typeof v === \"boolean\"", this._expr.getToken());
 				}, "detected invalid cast, value is not a boolean nor null");
 				return;
@@ -1065,7 +1065,7 @@ abstract class _OperatorExpressionEmitter extends _ExpressionEmitter {
 	}
 
 	override function emit (outerOpPrecedence : number) : void {
-		this.emitWithPrecedence(outerOpPrecedence, this._getPrecedence(), function () : void { this._emit(); });
+		this.emitWithPrecedence(outerOpPrecedence, this._getPrecedence(), function () { this._emit(); });
 	}
 
 	function _emit () : void {
@@ -2479,9 +2479,9 @@ class JavaScriptEmitter implements Emitter {
 			this._addSourceMapping(token);
 		}
 
-		str = str.replace(/\n(.)/g, (function (m : string) : string {
+		str = str.replace(/\n(.)/g, function (m) {
 			return "\n" + this._getIndent() + m.substring(1);
-		}));
+		});
 		this._output += str;
 		this._outputEndsWithReturn = str.charAt(str.length - 1) == "\n";
 	}
@@ -2805,73 +2805,73 @@ class JavaScriptEmitter implements Emitter {
 
 		var precedence = [
 			[
-				{ "new":        function (op : string, precedence : number) : void { _NewExpressionEmitter._setOperatorPrecedence(op, precedence); } },
-				{ "[":          function (op : string, precedence : number) : void { _ArrayExpressionEmitter._setOperatorPrecedence(op, precedence); } },
-				{ ".":          function (op : string, precedence : number) : void { _PropertyExpressionEmitter._setOperatorPrecedence(op, precedence); } },
-				{ "(":          function (op : string, precedence : number) : void { _CallExpressionEmitter._setOperatorPrecedence(op, precedence); } },
-				{ "super":      function (op : string, precedence : number) : void { _SuperExpressionEmitter._setOperatorPrecedence(op, precedence); } },
-				{ "function":   function (op : string, precedence : number) : void { _FunctionExpressionEmitter._setOperatorPrecedence(op, precedence); } }
+				{ "new":        function (op : string, precedence : number) { _NewExpressionEmitter._setOperatorPrecedence(op, precedence); } },
+				{ "[":          function (op : string, precedence : number) { _ArrayExpressionEmitter._setOperatorPrecedence(op, precedence); } },
+				{ ".":          function (op : string, precedence : number) { _PropertyExpressionEmitter._setOperatorPrecedence(op, precedence); } },
+				{ "(":          function (op : string, precedence : number) { _CallExpressionEmitter._setOperatorPrecedence(op, precedence); } },
+				{ "super":      function (op : string, precedence : number) { _SuperExpressionEmitter._setOperatorPrecedence(op, precedence); } },
+				{ "function":   function (op : string, precedence : number) { _FunctionExpressionEmitter._setOperatorPrecedence(op, precedence); } }
 			], [
-				{ "++":         function (op : string, precedence : number) : void { _PostfixExpressionEmitter._setOperatorPrecedence(op, precedence); } },
-				{ "--":         function (op : string, precedence : number) : void { _PostfixExpressionEmitter._setOperatorPrecedence(op, precedence); } }
+				{ "++":         function (op : string, precedence : number) { _PostfixExpressionEmitter._setOperatorPrecedence(op, precedence); } },
+				{ "--":         function (op : string, precedence : number) { _PostfixExpressionEmitter._setOperatorPrecedence(op, precedence); } }
 			], [
 				// delete is not used by JSX
-				{ "void":       function (op : string, precedence : number) : void { _UnaryExpressionEmitter._setOperatorPrecedence(op, precedence); } },
-				{ "typeof":     function (op : string, precedence : number) : void { _UnaryExpressionEmitter._setOperatorPrecedence(op, precedence); } },
-				{ "++":         function (op : string, precedence : number) : void { _UnaryExpressionEmitter._setOperatorPrecedence(op, precedence); } },
-				{ "--":         function (op : string, precedence : number) : void { _UnaryExpressionEmitter._setOperatorPrecedence(op, precedence); } },
-				{ "+":          function (op : string, precedence : number) : void { _UnaryExpressionEmitter._setOperatorPrecedence(op, precedence); } },
-				{ "-":          function (op : string, precedence : number) : void { _UnaryExpressionEmitter._setOperatorPrecedence(op, precedence); } },
-				{ "~":          function (op : string, precedence : number) : void { _UnaryExpressionEmitter._setOperatorPrecedence(op, precedence); } },
-				{ "!":          function (op : string, precedence : number) : void { _UnaryExpressionEmitter._setOperatorPrecedence(op, precedence); } }
+				{ "void":       function (op : string, precedence : number) { _UnaryExpressionEmitter._setOperatorPrecedence(op, precedence); } },
+				{ "typeof":     function (op : string, precedence : number) { _UnaryExpressionEmitter._setOperatorPrecedence(op, precedence); } },
+				{ "++":         function (op : string, precedence : number) { _UnaryExpressionEmitter._setOperatorPrecedence(op, precedence); } },
+				{ "--":         function (op : string, precedence : number) { _UnaryExpressionEmitter._setOperatorPrecedence(op, precedence); } },
+				{ "+":          function (op : string, precedence : number) { _UnaryExpressionEmitter._setOperatorPrecedence(op, precedence); } },
+				{ "-":          function (op : string, precedence : number) { _UnaryExpressionEmitter._setOperatorPrecedence(op, precedence); } },
+				{ "~":          function (op : string, precedence : number) { _UnaryExpressionEmitter._setOperatorPrecedence(op, precedence); } },
+				{ "!":          function (op : string, precedence : number) { _UnaryExpressionEmitter._setOperatorPrecedence(op, precedence); } }
 			], [
-				{ "*":          function (op : string, precedence : number) : void { _BinaryNumberExpressionEmitter._setOperatorPrecedence(op, precedence); } },
-				{ "/":          function (op : string, precedence : number) : void { _BinaryNumberExpressionEmitter._setOperatorPrecedence(op, precedence); } },
-				{ "%":          function (op : string, precedence : number) : void { _BinaryNumberExpressionEmitter._setOperatorPrecedence(op, precedence); } }
+				{ "*":          function (op : string, precedence : number) { _BinaryNumberExpressionEmitter._setOperatorPrecedence(op, precedence); } },
+				{ "/":          function (op : string, precedence : number) { _BinaryNumberExpressionEmitter._setOperatorPrecedence(op, precedence); } },
+				{ "%":          function (op : string, precedence : number) { _BinaryNumberExpressionEmitter._setOperatorPrecedence(op, precedence); } }
 			], [
-				{ "+":          function (op : string, precedence : number) : void { _AdditiveExpressionEmitter._setOperatorPrecedence(op, precedence); } },
-				{ "-":          function (op : string, precedence : number) : void { _BinaryNumberExpressionEmitter._setOperatorPrecedence(op, precedence); } }
+				{ "+":          function (op : string, precedence : number) { _AdditiveExpressionEmitter._setOperatorPrecedence(op, precedence); } },
+				{ "-":          function (op : string, precedence : number) { _BinaryNumberExpressionEmitter._setOperatorPrecedence(op, precedence); } }
 			], [
-				{ "<<":         function (op : string, precedence : number) : void { _ShiftExpressionEmitter._setOperatorPrecedence(op, precedence); } },
-				{ ">>":         function (op : string, precedence : number) : void { _ShiftExpressionEmitter._setOperatorPrecedence(op, precedence); } },
-				{ ">>>":        function (op : string, precedence : number) : void { _ShiftExpressionEmitter._setOperatorPrecedence(op, precedence); } }
+				{ "<<":         function (op : string, precedence : number) { _ShiftExpressionEmitter._setOperatorPrecedence(op, precedence); } },
+				{ ">>":         function (op : string, precedence : number) { _ShiftExpressionEmitter._setOperatorPrecedence(op, precedence); } },
+				{ ">>>":        function (op : string, precedence : number) { _ShiftExpressionEmitter._setOperatorPrecedence(op, precedence); } }
 			], [
-				{ "<":          function (op : string, precedence : number) : void { _BinaryNumberExpressionEmitter._setOperatorPrecedence(op, precedence); } },
-				{ ">":          function (op : string, precedence : number) : void { _BinaryNumberExpressionEmitter._setOperatorPrecedence(op, precedence); } },
-				{ "<=":         function (op : string, precedence : number) : void { _BinaryNumberExpressionEmitter._setOperatorPrecedence(op, precedence); } },
-				{ ">=":         function (op : string, precedence : number) : void { _BinaryNumberExpressionEmitter._setOperatorPrecedence(op, precedence); } },
-				{ "instanceof": function (op : string, precedence : number) : void { _InstanceofExpressionEmitter._setOperatorPrecedence(op, precedence); } },
-				{ "in":         function (op : string, precedence : number) : void { _InExpressionEmitter._setOperatorPrecedence(op, precedence); } }
+				{ "<":          function (op : string, precedence : number) { _BinaryNumberExpressionEmitter._setOperatorPrecedence(op, precedence); } },
+				{ ">":          function (op : string, precedence : number) { _BinaryNumberExpressionEmitter._setOperatorPrecedence(op, precedence); } },
+				{ "<=":         function (op : string, precedence : number) { _BinaryNumberExpressionEmitter._setOperatorPrecedence(op, precedence); } },
+				{ ">=":         function (op : string, precedence : number) { _BinaryNumberExpressionEmitter._setOperatorPrecedence(op, precedence); } },
+				{ "instanceof": function (op : string, precedence : number) { _InstanceofExpressionEmitter._setOperatorPrecedence(op, precedence); } },
+				{ "in":         function (op : string, precedence : number) { _InExpressionEmitter._setOperatorPrecedence(op, precedence); } }
 			], [
-				{ "==":         function (op : string, precedence : number) : void { _EqualityExpressionEmitter._setOperatorPrecedence(op, precedence); } },
-				{ "!=":         function (op : string, precedence : number) : void { _EqualityExpressionEmitter._setOperatorPrecedence(op, precedence); } }
+				{ "==":         function (op : string, precedence : number) { _EqualityExpressionEmitter._setOperatorPrecedence(op, precedence); } },
+				{ "!=":         function (op : string, precedence : number) { _EqualityExpressionEmitter._setOperatorPrecedence(op, precedence); } }
 			], [
-				{ "&":          function (op : string, precedence : number) : void { _BinaryNumberExpressionEmitter._setOperatorPrecedence(op, precedence); } }
+				{ "&":          function (op : string, precedence : number) { _BinaryNumberExpressionEmitter._setOperatorPrecedence(op, precedence); } }
 			], [
-				{ "^":          function (op : string, precedence : number) : void { _BinaryNumberExpressionEmitter._setOperatorPrecedence(op, precedence); } }
+				{ "^":          function (op : string, precedence : number) { _BinaryNumberExpressionEmitter._setOperatorPrecedence(op, precedence); } }
 			], [
-				{ "|":          function (op : string, precedence : number) : void { _BinaryNumberExpressionEmitter._setOperatorPrecedence(op, precedence); } }
+				{ "|":          function (op : string, precedence : number) { _BinaryNumberExpressionEmitter._setOperatorPrecedence(op, precedence); } }
 			], [
-				{ "&&":         function (op : string, precedence : number) : void { _LogicalExpressionEmitter._setOperatorPrecedence(op, precedence); } }
+				{ "&&":         function (op : string, precedence : number) { _LogicalExpressionEmitter._setOperatorPrecedence(op, precedence); } }
 			], [
-				{ "||":         function (op : string, precedence : number) : void { _LogicalExpressionEmitter._setOperatorPrecedence(op, precedence); } }
+				{ "||":         function (op : string, precedence : number) { _LogicalExpressionEmitter._setOperatorPrecedence(op, precedence); } }
 			], [
-				{ "=":          function (op : string, precedence : number) : void { _AssignmentExpressionEmitter._setOperatorPrecedence(op, precedence); } },
-				{ "*=":         function (op : string, precedence : number) : void { _AssignmentExpressionEmitter._setOperatorPrecedence(op, precedence); } },
-				{ "/=":         function (op : string, precedence : number) : void { _AssignmentExpressionEmitter._setOperatorPrecedence(op, precedence); } },
-				{ "%=":         function (op : string, precedence : number) : void { _AssignmentExpressionEmitter._setOperatorPrecedence(op, precedence); } },
-				{ "+=":         function (op : string, precedence : number) : void { _AssignmentExpressionEmitter._setOperatorPrecedence(op, precedence); } },
-				{ "-=":         function (op : string, precedence : number) : void { _AssignmentExpressionEmitter._setOperatorPrecedence(op, precedence); } },
-				{ "<<=":        function (op : string, precedence : number) : void { _AssignmentExpressionEmitter._setOperatorPrecedence(op, precedence); } },
-				{ ">>=":        function (op : string, precedence : number) : void { _AssignmentExpressionEmitter._setOperatorPrecedence(op, precedence); } },
-				{ ">>>=":       function (op : string, precedence : number) : void { _AssignmentExpressionEmitter._setOperatorPrecedence(op, precedence); } },
-				{ "&=":         function (op : string, precedence : number) : void { _AssignmentExpressionEmitter._setOperatorPrecedence(op, precedence); } },
-				{ "^=":         function (op : string, precedence : number) : void { _AssignmentExpressionEmitter._setOperatorPrecedence(op, precedence); } },
-				{ "|=":         function (op : string, precedence : number) : void { _AssignmentExpressionEmitter._setOperatorPrecedence(op, precedence); } }
+				{ "=":          function (op : string, precedence : number) { _AssignmentExpressionEmitter._setOperatorPrecedence(op, precedence); } },
+				{ "*=":         function (op : string, precedence : number) { _AssignmentExpressionEmitter._setOperatorPrecedence(op, precedence); } },
+				{ "/=":         function (op : string, precedence : number) { _AssignmentExpressionEmitter._setOperatorPrecedence(op, precedence); } },
+				{ "%=":         function (op : string, precedence : number) { _AssignmentExpressionEmitter._setOperatorPrecedence(op, precedence); } },
+				{ "+=":         function (op : string, precedence : number) { _AssignmentExpressionEmitter._setOperatorPrecedence(op, precedence); } },
+				{ "-=":         function (op : string, precedence : number) { _AssignmentExpressionEmitter._setOperatorPrecedence(op, precedence); } },
+				{ "<<=":        function (op : string, precedence : number) { _AssignmentExpressionEmitter._setOperatorPrecedence(op, precedence); } },
+				{ ">>=":        function (op : string, precedence : number) { _AssignmentExpressionEmitter._setOperatorPrecedence(op, precedence); } },
+				{ ">>>=":       function (op : string, precedence : number) { _AssignmentExpressionEmitter._setOperatorPrecedence(op, precedence); } },
+				{ "&=":         function (op : string, precedence : number) { _AssignmentExpressionEmitter._setOperatorPrecedence(op, precedence); } },
+				{ "^=":         function (op : string, precedence : number) { _AssignmentExpressionEmitter._setOperatorPrecedence(op, precedence); } },
+				{ "|=":         function (op : string, precedence : number) { _AssignmentExpressionEmitter._setOperatorPrecedence(op, precedence); } }
 			], [
-				{ "?":          function (op : string, precedence : number) : void { _ConditionalExpressionEmitter._setOperatorPrecedence(op, precedence); } }
+				{ "?":          function (op : string, precedence : number) { _ConditionalExpressionEmitter._setOperatorPrecedence(op, precedence); } }
 			], [
-				{ ",":          function (op : string, precedence : number) : void { _CommaExpressionEmitter._setOperatorPrecedence(op, precedence); } }
+				{ ",":          function (op : string, precedence : number) { _CommaExpressionEmitter._setOperatorPrecedence(op, precedence); } }
 			]
 		];
 		for (var i = 0; i < precedence.length; ++i) {
