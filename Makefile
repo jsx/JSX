@@ -32,7 +32,7 @@ doc: src/doc.jsx
 	rm -rf doc
 	find lib -name '*.jsx' | xargs -n 1 -- bin/jsx --mode doc --output doc
 
-self-hosting-compiler: compiler
+bootstrap-compiler: compiler
 	bin/jsx --disable-type-check --executable node --output bin/jsx src/jsx-node-front.jsx # again
 	cp bin/jsx tool/bootstrap-compiler.js
 

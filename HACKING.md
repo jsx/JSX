@@ -1,6 +1,12 @@
 JSX HACKING GUIDE
 =================================================
 
+Bootstrap
+=================================================
+
+JSX compiler is self-hosted. `tool/bootstrap-compiler.js` is the bootstrap compiler, which is a version of pre-compiled JSX compiler.
+
+To update the bootstrap compiler, type `make bootstrap-compiler`.
 
 JSX compilation server
 =================================================
