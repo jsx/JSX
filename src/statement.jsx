@@ -242,6 +242,72 @@ class ExpressionStatement extends UnaryExpressionStatement {
 
 }
 
+class FunctionStatement extends Statement {
+
+	var _token : Token;
+	var _funcLocal : LocalVariable;
+	var _funcDef : MemberFunctionDefinition;
+
+	function constructor (token : Token, funcLocal : LocalVariable, funcDef : MemberFunctionDefinition) {
+		super();
+		this._token = token;
+		this._funcLocal = funcLocal;
+		this._funcDef = funcDef;
+	}
+
+	override function clone () : FunctionStatement {
+		// NOTE: funcDef is not cloned, but is later replaced in MemberFunctionDefitition#instantiate
+		return new FunctionStatement(this._token, this._funcLocal, this._funcDef);
+	}
+
+	override function getToken () : Token {
+		return this._token;
+	}
+
+	function getFuncDef () : MemberFunctionDefinition {
+		return this._funcDef;
+	}
+
+	function setFuncDef (funcDef : MemberFunctionDefinition) : void {
+		this._funcDef = funcDef;
+	}
+
+	override function serialize () : variant {
+		return [
+			"FunctionStatement",
+			this._funcDef.serialize()
+		] : variant[];
+	}
+
+	override function doAnalyze (context : AnalysisContext) : boolean {
+		if (! this._typesAreIdentified()) {
+			context.errors.push(new CompileError(this._token, "argument / return types were not automatically deductable, please specify them by hand"));
+			return false;
+		}
+		this._funcDef.analyze(context);
+		this._funcLocal.setTypeForced(this._funcDef.getType());
+		// the function can be used from the scope of the same level
+		context.getTopBlock().localVariableStatuses.setStatus(this._funcLocal);
+		return true; // return true since everything is resolved correctly even if analysis of the function definition failed
+	}
+
+	function _typesAreIdentified () : boolean {
+		var argTypes = this._funcDef.getArgumentTypes();
+		for (var i = 0; i < argTypes.length; ++i) {
+			if (argTypes[i] == null)
+				return false;
+		}
+		if (this._funcDef.getReturnType() == null)
+			return false;
+		return true;
+	}
+
+	override function forEachExpression (cb : function(:Expression,:function(:Expression):void):boolean) : boolean {
+		return true;
+	}
+
+}
+
 class ReturnStatement extends Statement {
 
 	var _token : Token;
