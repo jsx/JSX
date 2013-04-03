@@ -1271,7 +1271,17 @@ class MemberFunctionDefinition extends MemberDefinition implements Block {
 			}, this._statements);
 			// update the link from function expressions to closures
 			Util.forEachStatement(function onStatement(statement : Statement) : boolean {
-				function onExpr(expr : Expression) : boolean {
+				if (statement instanceof FunctionStatement) {
+					for (var i = 0; i < this._closures.length; ++i) {
+						if (this._closures[i] == (statement as FunctionStatement).getFuncDef())
+							break;
+					}
+					if (i == this._closures.length)
+						throw new Error("logic flaw, cannot find the closure");
+					(statement as FunctionStatement).setFuncDef(closures[i]);
+					return true;
+				}
+				statement.forEachExpression(function onExpr(expr : Expression) : boolean {
 					if (expr instanceof FunctionExpression) {
 						for (var i = 0; i < this._closures.length; ++i) {
 							if (this._closures[i] == (expr as FunctionExpression).getFuncDef())
@@ -1282,8 +1292,7 @@ class MemberFunctionDefinition extends MemberDefinition implements Block {
 						(expr as FunctionExpression).setFuncDef(closures[i]);
 					}
 					return expr.forEachExpression(onExpr);
-				}
-				statement.forEachExpression(onExpr);
+				});
 				return statement.forEachStatement(onStatement);
 			}, statements);
 		} else {

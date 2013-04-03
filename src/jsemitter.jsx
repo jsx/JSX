@@ -149,6 +149,33 @@ class _ExpressionStatementEmitter extends _StatementEmitter {
 
 }
 
+class _FunctionStatementEmitter extends _StatementEmitter {
+
+	var _statement : FunctionStatement;
+
+	function constructor (emitter : JavaScriptEmitter, statement : FunctionStatement) {
+		super(emitter);
+		this._statement = statement;
+	}
+
+	override function emit () : void {
+		var funcDef = this._statement.getFuncDef();
+		this._emitter._emit("function " + (funcDef.getNameToken() != null ? funcDef.name() : "") + "(", funcDef.getToken());
+		var args = funcDef.getArguments();
+		for (var i = 0; i < args.length; ++i) {
+			if (i != 0)
+				this._emitter._emit(", ", funcDef.getToken());
+			this._emitter._emit(args[i].getName().getValue(), funcDef.getToken());
+		}
+		this._emitter._emit(") {\n", funcDef.getToken());
+		this._emitter._advanceIndent();
+		this._emitter._emitFunctionBody(funcDef);
+		this._emitter._reduceIndent();
+		this._emitter._emit("}\n", funcDef.getToken());
+	}
+
+}
+
 class _ReturnStatementEmitter extends _StatementEmitter {
 
 	var _statement : ReturnStatement;
@@ -1256,8 +1283,7 @@ class _FunctionExpressionEmitter extends _OperatorExpressionEmitter {
 
 	override function _emit () : void {
 		var funcDef = this._expr.getFuncDef();
-		if (! this._expr.isStatement())
-			this._emitter._emit("(", funcDef.getToken());
+		this._emitter._emit("(", funcDef.getToken());
 		this._emitter._emit("function " + (funcDef.getNameToken() != null ? funcDef.name() : "") + "(", funcDef.getToken());
 		var args = funcDef.getArguments();
 		for (var i = 0; i < args.length; ++i) {
@@ -1270,8 +1296,7 @@ class _FunctionExpressionEmitter extends _OperatorExpressionEmitter {
 		this._emitter._emitFunctionBody(funcDef);
 		this._emitter._reduceIndent();
 		this._emitter._emit("}", funcDef.getToken());
-		if (! this._expr.isStatement())
-			this._emitter._emit(")", funcDef.getToken());
+		this._emitter._emit(")", funcDef.getToken());
 	}
 
 	override function _getPrecedence () : number {
@@ -2507,6 +2532,8 @@ class JavaScriptEmitter implements Emitter {
 			return new _ConstructorInvocationStatementEmitter(this, statement as ConstructorInvocationStatement);
 		else if (statement instanceof ExpressionStatement)
 			return new _ExpressionStatementEmitter(this, statement as ExpressionStatement);
+		else if (statement instanceof FunctionStatement)
+			return new _FunctionStatementEmitter(this, statement as FunctionStatement);
 		else if (statement instanceof ReturnStatement)
 			return new _ReturnStatementEmitter(this, statement as ReturnStatement);
 		else if (statement instanceof DeleteStatement)

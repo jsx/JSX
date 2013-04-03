@@ -754,24 +754,18 @@ class ThisExpression extends Expression {
 
 class FunctionExpression extends Expression {
 
-	var _funcName : LocalVariable;
+	var _funcLocal : LocalVariable;
 	var _funcDef : MemberFunctionDefinition;
-	var _isStatement : boolean;
 
-	function constructor (token : Token, funcName : LocalVariable, funcDef : MemberFunctionDefinition, isStatement : boolean) {
+	function constructor (token : Token, funcLocal : LocalVariable, funcDef : MemberFunctionDefinition) {
 		super(token);
-		this._funcName = funcName;
+		this._funcLocal = funcLocal;
 		this._funcDef = funcDef;
-		this._isStatement = isStatement;
 	}
 
 	override function clone () : FunctionExpression {
 		// NOTE: funcDef is not cloned, but is later replaced in MemberFunctionDefitition#instantiate
-		return new FunctionExpression(this._token, this._funcName, this._funcDef, this._isStatement);
-	}
-
-	function getFuncName () : LocalVariable {
-		return this._funcName;
+		return new FunctionExpression(this._token, this._funcLocal, this._funcDef);
 	}
 
 	function getFuncDef () : MemberFunctionDefinition {
@@ -780,10 +774,6 @@ class FunctionExpression extends Expression {
 
 	function setFuncDef (funcDef : MemberFunctionDefinition) : void {
 		this._funcDef = funcDef;
-	}
-
-	function isStatement () : boolean {
-		return this._isStatement;
 	}
 
 	override function serialize () : variant {
@@ -799,10 +789,6 @@ class FunctionExpression extends Expression {
 			return false;
 		}
 		this._funcDef.analyze(context);
-		if (this._isStatement) {
-			this._funcName.setTypeForced(this.getType());
-			context.getTopBlock().localVariableStatuses.setStatus(this._funcName);
-		}
 		return true; // return true since everything is resolved correctly even if analysis of the function definition failed
 	}
 
@@ -830,12 +816,12 @@ class FunctionExpression extends Expression {
 	function deductTypeIfUnknown (context : AnalysisContext, type : ResolvedFunctionType) : boolean {
 		if (! this._funcDef.deductTypeIfUnknown(context, type))
 			return false;
-		if (this._funcName != null) {
-			if (this._funcName.getType() != null) {
-				if (! this._funcName.getType().equals(this._funcDef.getType()))
-					throw new Error("unmatched type for local function: " + this._funcName.getName().getValue());
+		if (this._funcLocal != null) {
+			if (this._funcLocal.getType() != null) {
+				if (! this._funcLocal.getType().equals(this._funcDef.getType()))
+					throw new Error("unmatched type for local function: " + this._funcLocal.getName().getValue());
 			} else {
-				this._funcName.setType(this._funcDef.getType());
+				this._funcLocal.setType(this._funcDef.getType());
 			}
 		}
 		return true;
