@@ -276,7 +276,6 @@ final class Stage {
     function drawSpace(px : number, py : number) : void {
         var spaceType = (Math.random() * 10 + 1) as int as string;
         var image = this.images["space" + spaceType];
-
         assert image != null;
 
         this.bgCtx.drawImage(image,
@@ -390,7 +389,6 @@ final class Stage {
 
             // prepare flashing rock images
             var rctx = canvas.getContext("2d") as CanvasRenderingContext2D;
-            assert rctx != null;
 
             var k = "rock" + (i+1) as string;
             rctx.drawImage(this.images[k], 0, 0);
@@ -433,13 +431,11 @@ final class Stage {
         stageCanvas.width  = Config.width;
         stageCanvas.height = Config.height;
         this.ctx = stageCanvas.getContext("2d") as CanvasRenderingContext2D;
-        assert this.ctx != null;
 
         var bg = dom.createElement("canvas") as HTMLCanvasElement;
         bg.width  = Config.width;
         bg.height = Config.height + Config.cellHeight;
         this.bgCtx = bg.getContext("2d") as CanvasRenderingContext2D;
-        assert this.bgCtx != null;
 
         for(var i = 0; i < 10; ++i) {
             this.imageName.push("space" + (i + 1) as string);
@@ -450,11 +446,9 @@ final class Stage {
         var loadedCount = 0;
         var checkLoad = function(e : Event) : void {
             var image = e.target as HTMLImageElement;
-            assert image != null;
 
             var canvas = dom.createElement("canvas") as HTMLCanvasElement;
             var cx = canvas.getContext("2d") as CanvasRenderingContext2D;
-            assert cx != null;
             cx.drawImage(image, 0, 0);
             this.images[image.name] = canvas;
 
@@ -553,9 +547,7 @@ final class Stage {
 final class _Main {
     static function main(args : string[]) : void {
         var stageCanvas = dom.id(args[0]) as HTMLCanvasElement;
-        assert stageCanvas != null;
         var scoreboard = dom.id(args[1]);
-        assert scoreboard != null;
 
         var stage = new Stage(stageCanvas, scoreboard);
         stage.tick();
