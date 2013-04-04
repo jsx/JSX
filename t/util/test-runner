@@ -4,7 +4,6 @@ use warnings;
 use warnings FATAL => 'uninitialized';
 
 use tool::Util;
-use tool::RunCompilationServer;
 
 use Test::More 0.88;
 

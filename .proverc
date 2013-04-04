@@ -1,1 +1,2 @@
 --exec t/util/test-runner
+-Mtool::RunCompilationServer
