@@ -2142,7 +2142,7 @@ class _InlineOptimizeCommand extends _FunctionOptimizeCommand {
 				} else if (! this._isWorthInline(funcDef)) {
 					return false;
 				}
-				// no return in the middle, no function expression or super invocation expression
+				// no return in the middle, no function expression or super invocation expression, and no reference to the funciton itself
 				return funcDef.forEachStatement(function onStatement(statement : Statement) : boolean {
 					if (statement instanceof ExpressionStatement) {
 						// ok
@@ -2164,6 +2164,11 @@ class _InlineOptimizeCommand extends _FunctionOptimizeCommand {
 							return false;
 						if (expr instanceof SuperExpression)
 							return false;
+						if (expr instanceof LocalExpression) {
+							if (funcDef.getFuncLocal() != null && funcDef.getFuncLocal() == (expr as LocalExpression).getLocal()) {
+									return false;
+							}
+						}
 						return expr.forEachExpression(onExpr);
 					})) {
 						return false;
