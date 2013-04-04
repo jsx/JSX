@@ -1377,7 +1377,7 @@ class MemberFunctionDefinition extends MemberDefinition implements Block {
 			if (! this._returnType.equals(Type.voidType) && context.getTopBlock().localVariableStatuses != null)
 				context.errors.push(new CompileError(this._lastTokenOfBody, "missing return statement"));
 
-			if (this.getNameToken() != null && this.name() == "constructor") {
+			if (this._parent == null && this.getNameToken() != null && this.name() == "constructor") {
 				this._fixupConstructor(context);
 			}
 
