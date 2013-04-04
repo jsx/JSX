@@ -1152,6 +1152,7 @@ class MemberFunctionDefinition extends MemberDefinition implements Block {
 	var _closures : MemberFunctionDefinition[];
 	var _lastTokenOfBody : Token;
 	var _parent : MemberFunctionDefinition;
+	var _funcLocal : LocalVariable;
 
 	function constructor (token : Token, name : Token, flags : number, returnType : Type, args : ArgumentDeclaration[], locals : LocalVariable[], statements : Statement[], closures : MemberFunctionDefinition[], lastTokenOfBody : Token, docComment : DocComment) {
 		super(token, name, flags, docComment);
@@ -1162,6 +1163,7 @@ class MemberFunctionDefinition extends MemberDefinition implements Block {
 		this._closures = closures;
 		this._lastTokenOfBody = lastTokenOfBody;
 		this._parent = null;
+		this._funcLocal = null;
 		this._classDef = null;
 		if (this._closures != null) {
 			for (var i = 0; i < this._closures.length; ++i)
@@ -1383,6 +1385,10 @@ class MemberFunctionDefinition extends MemberDefinition implements Block {
 			context.blockStack.pop();
 		}
 
+		if (this._funcLocal != null) {
+			this._funcLocal.setTypeForced(this.getType());
+		}
+
 	}
 
 	function _fixupConstructor (context : AnalysisContext) : void {
@@ -1515,6 +1521,14 @@ class MemberFunctionDefinition extends MemberDefinition implements Block {
 		return argTypes;
 	}
 
+	function getFuncLocal () : LocalVariable {
+		return this._funcLocal;
+	}
+
+	function setFuncLocal (funcLocal : LocalVariable) : void {
+		this._funcLocal = funcLocal;
+	}
+
 	function getParent () : MemberFunctionDefinition {
 		return this._parent;
 	}
@@ -1575,8 +1589,11 @@ class MemberFunctionDefinition extends MemberDefinition implements Block {
 			if (this._args[i].getType() == null)
 				break;
 		}
-		if (i == this._args.length && this._returnType != null)
+		if (i == this._args.length && this._returnType != null) {
+			if (this._funcLocal != null)
+				this._funcLocal.setTypeForced(this.getType());
 			return true;
+		}
 		// resolve!
 		if (type.getArgumentTypes().length != this._args.length) {
 			context.errors.push(new CompileError(this.getToken(), "expected the function to have " + type.getArgumentTypes().length as string + " arguments, but found " + this._args.length as string));
@@ -1603,6 +1620,8 @@ class MemberFunctionDefinition extends MemberDefinition implements Block {
 		} else {
 			this._returnType = type.getReturnType();
 		}
+		if (this._funcLocal != null)
+			this._funcLocal.setTypeForced(this.getType());
 		return true;
 	}
 

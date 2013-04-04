@@ -754,18 +754,16 @@ class ThisExpression extends Expression {
 
 class FunctionExpression extends Expression {
 
-	var _funcLocal : LocalVariable;
 	var _funcDef : MemberFunctionDefinition;
 
-	function constructor (token : Token, funcLocal : LocalVariable, funcDef : MemberFunctionDefinition) {
+	function constructor (token : Token, funcDef : MemberFunctionDefinition) {
 		super(token);
-		this._funcLocal = funcLocal;
 		this._funcDef = funcDef;
 	}
 
 	override function clone () : FunctionExpression {
 		// NOTE: funcDef is not cloned, but is later replaced in MemberFunctionDefitition#instantiate
-		return new FunctionExpression(this._token, this._funcLocal, this._funcDef);
+		return new FunctionExpression(this._token, this._funcDef);
 	}
 
 	function getFuncDef () : MemberFunctionDefinition {
@@ -816,14 +814,6 @@ class FunctionExpression extends Expression {
 	function deductTypeIfUnknown (context : AnalysisContext, type : ResolvedFunctionType) : boolean {
 		if (! this._funcDef.deductTypeIfUnknown(context, type))
 			return false;
-		if (this._funcLocal != null) {
-			if (this._funcLocal.getType() != null) {
-				if (! this._funcLocal.getType().equals(this._funcDef.getType()))
-					throw new Error("unmatched type for local function: " + this._funcLocal.getName().getValue());
-			} else {
-				this._funcLocal.setType(this._funcDef.getType());
-			}
-		}
 		return true;
 	}
 

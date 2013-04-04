@@ -245,19 +245,17 @@ class ExpressionStatement extends UnaryExpressionStatement {
 class FunctionStatement extends Statement {
 
 	var _token : Token;
-	var _funcLocal : LocalVariable;
 	var _funcDef : MemberFunctionDefinition;
 
-	function constructor (token : Token, funcLocal : LocalVariable, funcDef : MemberFunctionDefinition) {
+	function constructor (token : Token, funcDef : MemberFunctionDefinition) {
 		super();
 		this._token = token;
-		this._funcLocal = funcLocal;
 		this._funcDef = funcDef;
 	}
 
 	override function clone () : FunctionStatement {
 		// NOTE: funcDef is not cloned, but is later replaced in MemberFunctionDefitition#instantiate
-		return new FunctionStatement(this._token, this._funcLocal, this._funcDef);
+		return new FunctionStatement(this._token, this._funcDef);
 	}
 
 	override function getToken () : Token {
@@ -285,9 +283,8 @@ class FunctionStatement extends Statement {
 			return false;
 		}
 		this._funcDef.analyze(context);
-		this._funcLocal.setTypeForced(this._funcDef.getType());
 		// the function can be used from the scope of the same level
-		context.getTopBlock().localVariableStatuses.setStatus(this._funcLocal);
+		context.getTopBlock().localVariableStatuses.setStatus(this._funcDef.getFuncLocal());
 		return true; // return true since everything is resolved correctly even if analysis of the function definition failed
 	}
 
