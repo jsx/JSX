@@ -94,7 +94,6 @@ EOT
 
     # write to temp file
     my $temp = File::Temp->new(SUFFIX => ".js");
-    binmode $temp, ":utf8";
     print $temp $src;
     close $temp;
 
