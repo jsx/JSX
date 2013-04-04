@@ -41,7 +41,7 @@ test-debug: compiler
 	$(PROVE) --jobs "$(JOBS)" t/*.t t/*/*.jsx
 
 test-optimized: compiler
-	JSX_OPTS="--release --disable-optimize no-log" $(PROVE) --jobs "$(JOBS)" t/*/*.jsx
+	JSX_OPTS="--optimize release --disable-optimize no-log,no-assert" $(PROVE) --jobs "$(JOBS)" t/*/*.jsx
 
 v8bench: compiler
 	cd submodules/v8bench && make

@@ -186,7 +186,11 @@ class JSXCommand {
 				if ((optarg = getoptarg()) == null) {
 					return 1;
 				}
-				optimizeCommands = optimizeCommands.concat(optarg.split(","));
+				if (optarg == "release") {
+					optimizeCommands = Optimizer.getReleaseOptimizationCommands();
+				} else {
+					optimizeCommands = optimizeCommands.concat(optarg.split(","));
+				}
 				break;
 			case "--disable-optimize":
 				if ((optarg = getoptarg()) == null) {
