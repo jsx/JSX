@@ -70,7 +70,7 @@ package App::jsx;
         }
     }
 
-    my $jsx_compiler = "$DIR/../bin/jsx-compiler.js";
+    my $jsx_compiler = "$DIR/../bin/jsx";
 
     my $home = $ENV{JSX_HOME} || (($ENV{HOME} || glob('~')) . "/.jsx");
 
