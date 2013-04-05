@@ -49,8 +49,10 @@ native __fake__ class CodeMirror {
 	function replaceSelection(s : string) : void;
 	function setSelection(c : Cursor) : void;
 	function setOption(option : string, value : variant) : void;
-	static function simpleHint(cm : CodeMirror, callback : (CodeMirror) -> variant) : void;
 	static function fromTextArea(textArea : Element, options : variant) : CodeMirror;
+
+	// addons: show-hint.js
+	static function showHint(cm : CodeMirror, callback : (CodeMirror) -> variant) : void;
 }
 
 class _Main {
@@ -68,7 +70,7 @@ class _Main {
 		}
 
 		function jsxComplete(cm : CodeMirror) : void {
-			CodeMirror.simpleHint(cm, function (editor) {
+			CodeMirror.showHint(cm, function (editor) {
 				var cur = editor.getCursor();
 
 				var completionRequest = new CompletionRequest(cur.line+1, cur.ch);
