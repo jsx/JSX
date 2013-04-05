@@ -19,6 +19,10 @@ npm-debug.log
 package/
 jsx-*.tgz
 
+# no need to include node modules
+
+node_modules/
+
 # extlib stuff
 
 .packlist
