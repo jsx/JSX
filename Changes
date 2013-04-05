@@ -1,5 +1,9 @@
 Revision history for the JSX software development kit
 
+0.9.24 2013-04-05 13:43:49
+    [CHANGES]
+    - Disable "staticize" optimization for now, which changed the ABI
+
 0.9.23 2013-04-05 11:49:56
     [CHANGES]
     - Disable JSX compilation server mode, which was introduced at 0.9.6,
