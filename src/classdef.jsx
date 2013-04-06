@@ -359,20 +359,6 @@ class ClassDefinition implements Stashable {
 		}
 	}
 
-	function findMemberFunctionInClass(name : string, isStatic : boolean, typeArgs : Type[]) : MemberDefinition {
-		var found : MemberDefinition = null;
-		this.forEachMemberFunction(function (member) {
-			if (name == member.name()
-				&& ((member.flags() & ClassDefinition.IS_STATIC) != 0) == isStatic
-				&& Util.typesAreEqual(member.getArgumentTypes(), typeArgs)) {
-				found = member;
-				return false;
-			}
-			return true;
-		});
-		return found;
-	}
-
 	static const GET_MEMBER_MODE_ALL = 0; // looks for functions or variables from the class and all super classes
 	static const GET_MEMBER_MODE_CLASS_ONLY = 1; // looks for functions or variables within the class
 	static const GET_MEMBER_MODE_SUPER = 2; // looks for functions with body in super classes

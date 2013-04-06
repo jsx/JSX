@@ -145,7 +145,7 @@ class _Mangler {
 			return (classDef.flags() & (ClassDefinition.IS_NATIVE | ClassDefinition.IS_FAKE)) == 0;
 		}
 		function methodRequiresMangling(classDef : ClassDefinition, name : string, argTypes : Type[]) : boolean {
-			var found = classDef.findMemberFunctionInClass(name, false, argTypes);
+			var found = Util.findFunctionInClass(classDef, name, argTypes, false);
 			if (found != null && (found.flags() & ClassDefinition.IS_OVERRIDE) == 0) {
 				// found base def
 				return (classDef.flags() & (ClassDefinition.IS_NATIVE | ClassDefinition.IS_FAKE)) == 0;
