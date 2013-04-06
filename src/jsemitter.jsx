@@ -75,6 +75,82 @@ class _TypeAnnotation {
 
 }
 
+class _Mangler {
+
+	function mangleConstructorName (classDef : ClassDefinition, argTypes : Type[]) : string {
+		if ((classDef.flags() & ClassDefinition.IS_NATIVE) != 0) {
+			if (classDef instanceof InstantiatedClassDefinition) {
+				if ((classDef as InstantiatedClassDefinition).getTemplateClassName() == "Map") {
+					return "Object";
+				} else {
+					return (classDef as InstantiatedClassDefinition).getTemplateClassName();
+				}
+			} else {
+				return classDef.className();
+			}
+		}
+		return classDef.getOutputClassName() + this.mangleFunctionArguments(argTypes);
+	}
+
+	function mangleFunctionName (name : string, argTypes : Type[]) : string {
+		// NOTE: how mangling of "toString" is omitted is very hacky, but it seems like the easiest way, taking the fact into consideration that it is the only function in Object
+		if (name != "toString")
+			name += this.mangleFunctionArguments(argTypes);
+		return name;
+	}
+
+	function mangleTypeName (type : Type) : string {
+		if (type.equals(Type.voidType))
+			return "V";
+		else if (type.equals(Type.booleanType))
+			return "B";
+		else if (type.equals(Type.integerType))
+			return "I";
+		else if (type.equals(Type.numberType))
+			return "N";
+		else if (type.equals(Type.stringType))
+			return "S";
+		else if (type instanceof ObjectType) {
+			var classDef = type.getClassDef();
+			if (classDef instanceof InstantiatedClassDefinition) {
+				var typeArgs = (classDef as InstantiatedClassDefinition).getTypeArguments();
+				switch ((classDef as InstantiatedClassDefinition).getTemplateClassName()) {
+				case "Array":
+					return "A" + this.mangleTypeName(typeArgs[0]);
+				case "Map":
+					return "H" + this.mangleTypeName(typeArgs[0]);
+				default:
+					// fall through
+				}
+			}
+			return "L" + type.getClassDef().getOutputClassName() + "$";
+		} else if (type instanceof StaticFunctionType)
+			return "F" + this.mangleFunctionArguments((type as StaticFunctionType).getArgumentTypes()) + this.mangleTypeName((type as StaticFunctionType).getReturnType()) + "$";
+		else if (type instanceof MemberFunctionType)
+			return "M" + this.mangleTypeName((type as MemberFunctionType).getObjectType()) + this.mangleFunctionArguments((type as MemberFunctionType).getArgumentTypes()) + this.mangleTypeName((type as MemberFunctionType).getReturnType()) + "$";
+		else if (type instanceof NullableType)
+			return "U" + this.mangleTypeName((type as NullableType).getBaseType());
+		else if (type.equals(Type.variantType))
+			return "X";
+		else
+			throw new Error("FIXME " + type.toString());
+	}
+
+	function mangleFunctionArguments (argTypes : Type[]) : string {
+		var s = "$";
+		for (var i = 0; i < argTypes.length; ++i)
+			s += this.mangleTypeName(argTypes[i]);
+		return s;
+	}
+
+	function requiresMangling(expr : PropertyExpression) : boolean {
+		var exprType = expr.getType();
+		return exprType instanceof FunctionType && ! exprType.isAssignable()
+			&& (expr.getHolderType().getClassDef().flags() & ClassDefinition.IS_NATIVE) == 0;
+	}
+
+}
+
 // statement emitter
 
 abstract class _StatementEmitter {
@@ -110,7 +186,7 @@ class _ConstructorInvocationStatementEmitter extends _StatementEmitter {
 	override function emit () : void {
 		var ctorType = this._statement.getConstructorType() as ResolvedFunctionType;
 		var argTypes = ctorType != null ? ctorType.getArgumentTypes() : new Type[];
-		var ctorName = this._emitter._mangleConstructorName(this._statement.getConstructingClassDef(), argTypes);
+		var ctorName = this._emitter.getMangler().mangleConstructorName(this._statement.getConstructingClassDef(), argTypes);
 		var token = this._statement.getToken();
 		if (ctorName == "Error" && this._statement.getArguments().length == 1) {
 			/*
@@ -1245,15 +1321,14 @@ class _PropertyExpressionEmitter extends _UnaryExpressionEmitter {
 
 		this._emitter._getExpressionEmitterFor(expr.getExpr()).emit(this._getPrecedence());
 		// mangle the name if necessary
-		if (exprType instanceof FunctionType && ! exprType.isAssignable()
-			&& (expr.getHolderType().getClassDef().flags() & ClassDefinition.IS_NATIVE) == 0) {
+		if (this._emitter.getMangler().requiresMangling(expr)) {
 			if (expr.getExpr() instanceof ClassExpression) {
 				// do not use "." notation for static functions, but use class$name
 				this._emitter._emit("$", identifierToken);
 			} else {
 				this._emitter._emit(".", identifierToken);
 			}
-			this._emitter._emit(this._emitter._mangleFunctionName(identifierToken.getValue(), (exprType as ResolvedFunctionType).getArgumentTypes()), identifierToken);
+			this._emitter._emit(this._emitter.getMangler().mangleFunctionName(identifierToken.getValue(), (exprType as ResolvedFunctionType).getArgumentTypes()), identifierToken);
 		} else {
 			this._emitter._emit(".", identifierToken);
 			this._emitter._emit(identifierToken.getValue(), identifierToken);
@@ -1851,7 +1926,7 @@ class _SuperExpressionEmitter extends _OperatorExpressionEmitter {
 		var funcType = this._expr.getFunctionType() as ResolvedFunctionType;
 		var className = funcType.getObjectType().getClassDef().getOutputClassName();
 		var argTypes = funcType.getArgumentTypes();
-		var mangledFuncName = this._emitter._mangleFunctionName(this._expr.getName().getValue(), argTypes);
+		var mangledFuncName = this._emitter.getMangler().mangleFunctionName(this._expr.getName().getValue(), argTypes);
 		this._emitter._emitCallArguments(this._expr.getToken(), className + ".prototype." + mangledFuncName + ".call(this", this._expr.getArguments(), argTypes);
 	}
 
@@ -1903,7 +1978,7 @@ class _NewExpressionEmitter extends _OperatorExpressionEmitter {
 		} else {
 			this._emitter._emitCallArguments(
 				this._expr.getToken(),
-				"new " + this._emitter._mangleConstructorName(classDef, argTypes) + "(",
+				"new " + this._emitter.getMangler().mangleConstructorName(classDef, argTypes) + "(",
 				this._expr.getArguments(),
 				argTypes);
 		}
@@ -1995,6 +2070,7 @@ class JavaScriptEmitter implements Emitter {
 	var _enableSourceMap : boolean;
 	var _enableProfiler : boolean;
 	var _sourceMapper : SourceMapper;
+	var _mangler = new _Mangler();
 
 	function constructor (platform : Platform) {
 		JavaScriptEmitter._initialize();
@@ -2056,6 +2132,10 @@ class JavaScriptEmitter implements Emitter {
 
 	function setSourceMapper(gen : SourceMapper) : void {
 		this._sourceMapper = gen;
+	}
+
+	function getMangler() : _Mangler {
+		return this._mangler;
 	}
 
 	override function setEnableRunTimeTypeCheck (enable : boolean) : void {
@@ -2228,10 +2308,10 @@ class JavaScriptEmitter implements Emitter {
 				var ctors = this._findFunctions(classDef, "constructor", false);
 				push("");
 				if (ctors.length == 0) {
-					push(this._mangleFunctionArguments(new Type[]));
+					push(this._mangler.mangleFunctionArguments(new Type[]));
 				} else {
 					for (var i = 0; i < ctors.length; ++i)
-						push(this._mangleFunctionArguments(ctors[i].getArgumentTypes()));
+						push(this._mangler.mangleFunctionArguments(ctors[i].getArgumentTypes()));
 				}
 			});
 			var filename = classDefs[0].getToken().getFilename();
@@ -2307,7 +2387,7 @@ class JavaScriptEmitter implements Emitter {
 	}
 
 	function _emitConstructor (funcDef : MemberFunctionDefinition) : void {
-		var funcName = this._mangleConstructorName(funcDef.getClassDef(), funcDef.getArgumentTypes());
+		var funcName = this._mangler.mangleConstructorName(funcDef.getClassDef(), funcDef.getArgumentTypes());
 
 		// emit prologue
 		this._emit("/**\n", null);
@@ -2329,7 +2409,7 @@ class JavaScriptEmitter implements Emitter {
 
 	function _emitFunction (funcDef : MemberFunctionDefinition) : void {
 		var className = funcDef.getClassDef().getOutputClassName();
-		var funcName = this._mangleFunctionName(funcDef.name(), funcDef.getArgumentTypes());
+		var funcName = this._mangler.mangleFunctionName(funcDef.name(), funcDef.getArgumentTypes());
 		// emit
 		this._emit("/**\n", null);
 		this._emitFunctionArgumentAnnotations(funcDef);
@@ -2645,76 +2725,6 @@ class JavaScriptEmitter implements Emitter {
 		else if (expr instanceof CommaExpression)
 			return new _CommaExpressionEmitter(this, expr as CommaExpression);
 		throw new Error("got unexpected type of expression: " + (expr != null ? JSON.stringify(expr.serialize()) : expr.toString()));
-	}
-
-	function _mangleConstructorName (classDef : ClassDefinition, argTypes : Type[]) : string {
-		if ((classDef.flags() & ClassDefinition.IS_NATIVE) != 0) {
-			if (classDef instanceof InstantiatedClassDefinition) {
-				if ((classDef as InstantiatedClassDefinition).getTemplateClassName() == "Map") {
-					return "Object";
-				} else {
-					return (classDef as InstantiatedClassDefinition).getTemplateClassName();
-				}
-			} else {
-				return classDef.className();
-			}
-		}
-		return classDef.getOutputClassName() + this._mangleFunctionArguments(argTypes);
-	}
-
-	function _mangleFunctionName (name : string, argTypes : Type[]) : string {
-		// NOTE: how mangling of "toString" is omitted is very hacky, but it seems like the easiest way, taking the fact into consideration that it is the only function in Object
-		if (name != "toString")
-			name += this._mangleFunctionArguments(argTypes);
-		return name;
-	}
-
-	function _mangleTypeName (type : Type) : string {
-		if (type.equals(Type.voidType))
-			return "V";
-		else if (type.equals(Type.booleanType))
-			return "B";
-		else if (type.equals(Type.integerType))
-			return "I";
-		else if (type.equals(Type.numberType))
-			return "N";
-		else if (type.equals(Type.stringType))
-			return "S";
-		else if (type instanceof ObjectType) {
-			var classDef = type.getClassDef();
-			if (classDef instanceof InstantiatedClassDefinition) {
-				var typeArgs = (classDef as InstantiatedClassDefinition).getTypeArguments();
-				switch ((classDef as InstantiatedClassDefinition).getTemplateClassName()) {
-				case "Array":
-					return "A" + this._mangleTypeName(typeArgs[0]);
-				case "Map":
-					return "H" + this._mangleTypeName(typeArgs[0]);
-				default:
-					// fall through
-				}
-			}
-			return "L" + type.getClassDef().getOutputClassName() + "$";
-		} else if (type instanceof StaticFunctionType)
-			return "F" + this._mangleFunctionArguments((type as StaticFunctionType).getArgumentTypes()) + this._mangleTypeName((type as StaticFunctionType).getReturnType()) + "$";
-		else if (type instanceof MemberFunctionType)
-			return "M" + this._mangleTypeName((type as MemberFunctionType).getObjectType()) + this._mangleFunctionArguments((type as MemberFunctionType).getArgumentTypes()) + this._mangleTypeName((type as MemberFunctionType).getReturnType()) + "$";
-		else if (type instanceof NullableType)
-			return "U" + this._mangleTypeName((type as NullableType).getBaseType());
-		else if (type.equals(Type.variantType))
-			return "X";
-		else
-			throw new Error("FIXME " + type.toString());
-	}
-
-	function _mangleFunctionArguments (argTypes : Type[]) : string {
-		var s = "$";
-		for (var i = 0; i < argTypes.length; ++i)
-			s += this._mangleTypeName(argTypes[i]);
-		return s;
-	}
-
-	function _mangleTypeString (s : String) : string {
-		return s.length as string + s;
 	}
 
 	function _findFunctions (classDef : ClassDefinition, name : string, isStatic : boolean) : MemberFunctionDefinition[] {
