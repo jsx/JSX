@@ -125,6 +125,8 @@ sub compile_and_run {
     defined(my $expected = get_section($file, "EXPECTED"))
         or die "could not find EXPECTED in file:$file\n";
 
+    my $jssetup = get_section($file, "JS_SETUP") || "";
+
     $opts ||= "";
 
     # compile (FIXME support C++)
@@ -135,7 +137,7 @@ sub compile_and_run {
         return;
     };
     # run
-    defined (my $output = run_compiled($file, $src)) or do {
+    defined (my $output = run_compiled($file, $jssetup . $src)) or do {
         fail "failed to execute compiled script";
         return;
     };
