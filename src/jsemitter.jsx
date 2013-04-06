@@ -93,10 +93,7 @@ class _Mangler {
 	}
 
 	function mangleFunctionName (name : string, argTypes : Type[]) : string {
-		// NOTE: how mangling of "toString" is omitted is very hacky, but it seems like the easiest way, taking the fact into consideration that it is the only function in Object
-		if (name != "toString")
-			name += this.mangleFunctionArguments(argTypes);
-		return name;
+		return name + this.mangleFunctionArguments(argTypes);
 	}
 
 	function mangleTypeName (type : Type) : string {
@@ -143,10 +140,44 @@ class _Mangler {
 		return s;
 	}
 
+	function requiresMangling(classDef : ClassDefinition, name : string, isStatic : boolean, argTypes : Type[]) : boolean {
+		if (isStatic) {
+			return (classDef.flags() & (ClassDefinition.IS_NATIVE | ClassDefinition.IS_FAKE)) == 0;
+		}
+		function methodRequiresMangling(classDef : ClassDefinition, name : string, argTypes : Type[]) : boolean {
+			var found = classDef.findMemberFunctionInClass(name, false, argTypes);
+			if (found != null && (found.flags() & ClassDefinition.IS_OVERRIDE) == 0) {
+				// found base def
+				return (classDef.flags() & (ClassDefinition.IS_NATIVE | ClassDefinition.IS_FAKE)) == 0;
+			}
+			if (classDef.extendType() == null) {
+				// no base def found in the "extend" chain, means that the base def exists in Interface / Mixin which are guaranteed to be non-native
+				return true;
+			}
+			return methodRequiresMangling(classDef.extendType().getClassDef(), name, argTypes);
+		}
+		return methodRequiresMangling(classDef, name, argTypes);
+	}
+
 	function requiresMangling(expr : PropertyExpression) : boolean {
 		var exprType = expr.getType();
-		return exprType instanceof FunctionType && ! exprType.isAssignable()
-			&& (expr.getHolderType().getClassDef().flags() & ClassDefinition.IS_NATIVE) == 0;
+		if (! (exprType instanceof FunctionType)) {
+			// not referring to a function
+			return false;
+		}
+		if (exprType.isAssignable()) {
+			// is a variable of function type, not a reference to the definition
+			return false;
+		}
+		return this.requiresMangling(
+			expr.getHolderType().getClassDef(),
+			expr.getIdentifierToken().getValue(),
+			expr.getExpr() instanceof ClassExpression,
+			(expr.getType() as ResolvedFunctionType).getArgumentTypes());
+	}
+
+	function requiresMangling(member : MemberFunctionDefinition) : boolean {
+		return this.requiresMangling(member.getClassDef(), member.name(), (member.flags() & ClassDefinition.IS_STATIC) != 0, member.getArgumentTypes());
 	}
 
 }
@@ -1924,10 +1955,13 @@ class _SuperExpressionEmitter extends _OperatorExpressionEmitter {
 
 	override function _emit () : void {
 		var funcType = this._expr.getFunctionType() as ResolvedFunctionType;
-		var className = funcType.getObjectType().getClassDef().getOutputClassName();
+		var classDef = funcType.getObjectType().getClassDef();
+		var methodName = this._expr.getName().getValue();
 		var argTypes = funcType.getArgumentTypes();
-		var mangledFuncName = this._emitter.getMangler().mangleFunctionName(this._expr.getName().getValue(), argTypes);
-		this._emitter._emitCallArguments(this._expr.getToken(), className + ".prototype." + mangledFuncName + ".call(this", this._expr.getArguments(), argTypes);
+		var mangledFuncName = this._emitter.getMangler().requiresMangling(classDef, methodName, false, argTypes)
+			? this._emitter.getMangler().mangleFunctionName(this._expr.getName().getValue(), argTypes)
+			: methodName;
+		this._emitter._emitCallArguments(this._expr.getToken(), classDef.getOutputClassName() + ".prototype." + mangledFuncName + ".call(this", this._expr.getArguments(), argTypes);
 	}
 
 	override function _getPrecedence () : number {
@@ -2409,7 +2443,7 @@ class JavaScriptEmitter implements Emitter {
 
 	function _emitFunction (funcDef : MemberFunctionDefinition) : void {
 		var className = funcDef.getClassDef().getOutputClassName();
-		var funcName = this._mangler.mangleFunctionName(funcDef.name(), funcDef.getArgumentTypes());
+		var funcName = this._mangler.requiresMangling(funcDef) ? this._mangler.mangleFunctionName(funcDef.name(), funcDef.getArgumentTypes()) : funcDef.name();
 		// emit
 		this._emit("/**\n", null);
 		this._emitFunctionArgumentAnnotations(funcDef);
