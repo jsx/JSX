@@ -1,6 +1,6 @@
 {
   "name":        "jsx",
-  "version":     "0.9.22",
+  "version":     "0.9.24",
   "description": "a faster, safer, easier JavaScript",
   "keywords": ["jsx", "compiler", "altjs"],
   "homepage": "http://jsx.github.com/",
@@ -23,7 +23,7 @@
   ],
   "bin" : {
       "jsx" : "./bin/jsx",
-      "jsx-compiler.js" : "./bin/jsx-compiler.js"
+      "jsx-with-server" : "./bin/jsx-with-server"
   },
   "directories": {
     "bin": "./bin",
@@ -34,7 +34,7 @@
     "src": "./src"
   },
   "dependencies": {
-      "source-map": "0.1.21"
+      "source-map": "0.1.22"
   },
   "engines": {
     "node": ">= 0.8.0"

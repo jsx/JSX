@@ -5,11 +5,11 @@ JOBS:=4
 
 PORT := 2012
 
-all: compiler doc web
+all: compiler doc meta web
 
 ## compiler stuff
 
-compiler: src/doc.jsx meta
+compiler:
 	rm -f bin/jsx
 	node tool/bootstrap-compiler.js --executable node --output bin/jsx src/jsx-node-front.jsx
 	cp -f "$$PWD/tool/jsx.pl" bin/jsx-with-server
@@ -75,8 +75,8 @@ update-codemirror:
 	unzip -o codemirror.zip
 	cp codemirror-*/lib/codemirror.css            web/assets/css
 	cp codemirror-*/lib/codemirror.js             web/assets/js
-	cp codemirror-*/addon/hint/simple-hint.css    web/assets/css
-	cp codemirror-*/addon/hint/simple-hint.js     web/assets/js
+	cp codemirror-*/addon/hint/show-hint.css    web/assets/css
+	cp codemirror-*/addon/hint/show-hint.js     web/assets/js
 	cp codemirror-*/mode/javascript/javascript.js web/assets/js/mode
 	cp codemirror-*/mode/clike/clike.js           web/assets/js/mode
 
