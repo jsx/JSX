@@ -2175,9 +2175,7 @@ class _SuperExpressionEmitter extends _OperatorExpressionEmitter {
 		var classDef = funcType.getObjectType().getClassDef();
 		var methodName = this._expr.getName().getValue();
 		var argTypes = funcType.getArgumentTypes();
-		var mangledFuncName = this._emitter.getMangler().requiresMangling(classDef, methodName, argTypes, false)
-			? this._emitter.getMangler().mangleFunctionName(this._expr.getName().getValue(), argTypes)
-			: methodName;
+		var mangledFuncName = this._emitter.getNamer().getNameOfMethod(classDef, methodName, argTypes);
 		this._emitter._emitCallArguments(this._expr.getToken(), classDef.getOutputClassName() + ".prototype." + mangledFuncName + ".call(this", this._expr.getArguments(), argTypes);
 	}
 
