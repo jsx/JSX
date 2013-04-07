@@ -5,11 +5,11 @@ JOBS:=4
 
 PORT := 2012
 
-all: compiler doc web
+all: compiler doc meta web
 
 ## compiler stuff
 
-compiler: src/doc.jsx meta
+compiler:
 	rm -f bin/jsx
 	node tool/bootstrap-compiler.js --executable node --output bin/jsx src/jsx-node-front.jsx
 	cp -f "$$PWD/tool/jsx.pl" bin/jsx-with-server
