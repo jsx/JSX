@@ -140,23 +140,9 @@ class _Mangler {
 		return s;
 	}
 
-	function requiresMangling(classDef : ClassDefinition, name : string, isStatic : boolean, argTypes : Type[]) : boolean {
-		if (isStatic) {
-			return (classDef.flags() & (ClassDefinition.IS_NATIVE | ClassDefinition.IS_FAKE)) == 0;
-		}
-		function methodRequiresMangling(classDef : ClassDefinition, name : string, argTypes : Type[]) : boolean {
-			var found = Util.findFunctionInClass(classDef, name, argTypes, false);
-			if (found != null && (found.flags() & ClassDefinition.IS_OVERRIDE) == 0) {
-				// found base def
-				return (classDef.flags() & (ClassDefinition.IS_NATIVE | ClassDefinition.IS_FAKE)) == 0;
-			}
-			if (classDef.extendType() == null) {
-				// no base def found in the "extend" chain, means that the base def exists in Interface / Mixin which are guaranteed to be non-native
-				return true;
-			}
-			return methodRequiresMangling(classDef.extendType().getClassDef(), name, argTypes);
-		}
-		return methodRequiresMangling(classDef, name, argTypes);
+	function requiresMangling(classDef : ClassDefinition, name : string, argTypes : Type[], isStatic : boolean) : boolean {
+		assert argTypes != null;
+		return ! Util.memberRootIsNative(classDef, name, argTypes, isStatic);
 	}
 
 	function requiresMangling(expr : PropertyExpression) : boolean {
@@ -172,12 +158,12 @@ class _Mangler {
 		return this.requiresMangling(
 			expr.getHolderType().getClassDef(),
 			expr.getIdentifierToken().getValue(),
-			expr.getExpr() instanceof ClassExpression,
-			(expr.getType() as ResolvedFunctionType).getArgumentTypes());
+			(expr.getType() as ResolvedFunctionType).getArgumentTypes(),
+			expr.getExpr() instanceof ClassExpression);
 	}
 
 	function requiresMangling(member : MemberFunctionDefinition) : boolean {
-		return this.requiresMangling(member.getClassDef(), member.name(), (member.flags() & ClassDefinition.IS_STATIC) != 0, member.getArgumentTypes());
+		return this.requiresMangling(member.getClassDef(), member.name(), member.getArgumentTypes(), (member.flags() & ClassDefinition.IS_STATIC) != 0);
 	}
 
 }
@@ -1958,7 +1944,7 @@ class _SuperExpressionEmitter extends _OperatorExpressionEmitter {
 		var classDef = funcType.getObjectType().getClassDef();
 		var methodName = this._expr.getName().getValue();
 		var argTypes = funcType.getArgumentTypes();
-		var mangledFuncName = this._emitter.getMangler().requiresMangling(classDef, methodName, false, argTypes)
+		var mangledFuncName = this._emitter.getMangler().requiresMangling(classDef, methodName, argTypes, false)
 			? this._emitter.getMangler().mangleFunctionName(this._expr.getName().getValue(), argTypes)
 			: methodName;
 		this._emitter._emitCallArguments(this._expr.getToken(), classDef.getOutputClassName() + ".prototype." + mangledFuncName + ".call(this", this._expr.getArguments(), argTypes);
