@@ -256,6 +256,26 @@ class Util {
 		return rootIsNativeNonStatic(classDef, name, argTypes);
 	}
 
+	static function propertyRootIsNative(expr : PropertyExpression) : boolean {
+		var baseExpr = expr.getExpr();
+		return Util.memberRootIsNative(
+			baseExpr.getType().getClassDef(),
+			expr.getIdentifierToken().getValue(),
+			Util.isReferringToFunctionDefinition(expr) ? (expr.getType() as ResolvedFunctionType).getArgumentTypes() : null,
+			baseExpr instanceof ClassExpression);
+	}
+
+	static function isReferringToFunctionDefinition(expr : PropertyExpression) : boolean {
+		var exprType = expr.getType();
+		if (! (exprType instanceof FunctionType)) {
+			return false;
+		}
+		if (exprType.isAssignable()) {
+			return false;
+		}
+		return true;
+	}
+
 	static const _stringLiteralEncodingMap = {
 		"\0" : "\\0",
 		"\r" : "\\r",

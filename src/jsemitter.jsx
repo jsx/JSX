@@ -146,20 +146,10 @@ class _Mangler {
 	}
 
 	function requiresMangling(expr : PropertyExpression) : boolean {
-		var exprType = expr.getType();
-		if (! (exprType instanceof FunctionType)) {
-			// not referring to a function
+		if (! Util.isReferringToFunctionDefinition(expr)) {
 			return false;
 		}
-		if (exprType.isAssignable()) {
-			// is a variable of function type, not a reference to the definition
-			return false;
-		}
-		return this.requiresMangling(
-			expr.getHolderType().getClassDef(),
-			expr.getIdentifierToken().getValue(),
-			(expr.getType() as ResolvedFunctionType).getArgumentTypes(),
-			expr.getExpr() instanceof ClassExpression);
+		return ! Util.propertyRootIsNative(expr);
 	}
 
 	function requiresMangling(member : MemberFunctionDefinition) : boolean {
