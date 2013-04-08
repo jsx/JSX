@@ -35,13 +35,13 @@ bootstrap-compiler: compiler
 
 # e.g. make test JOBS=2
 
-test: test-debug test-optimized
+test: all test-debug test-optimized
 
-test-debug: compiler
+test-debug:
 	$(MAKE) test-core
 	$(MAKE) test-misc-core
 
-test-optimized: compiler
+test-optimized:
 	JSX_OPTS="--optimize release --disable-optimize no-log,no-assert" $(MAKE) test-core
 
 test-core:
