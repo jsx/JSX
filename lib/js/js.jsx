@@ -26,7 +26,7 @@
  * IN THE SOFTWARE.
  */
 
-final class js {
+final native class js {
 	delete function constructor() { }
 
 	/**
@@ -41,10 +41,10 @@ final class js {
 	 * @param methodName a name of JavaScript method that the invocant has
 	 * @param args list of arguments passed to the method
 	 */
-	static native function invoke(invocant : variant, methodName : string, args : Array.<variant>) : variant;
+	static function invoke(invocant : variant, methodName : string, args : Array.<variant>) : variant;
 
 	/**
 	 * Evaluates JavaScript source code
 	 */
-	static native function eval(jsSource : string) : variant;
+	static function eval(jsSource : string) : variant;
 }
