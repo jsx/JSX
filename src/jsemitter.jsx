@@ -77,21 +77,6 @@ class _TypeAnnotation {
 
 class _Mangler {
 
-	function mangleConstructorName (classDef : ClassDefinition, argTypes : Type[]) : string {
-		if ((classDef.flags() & ClassDefinition.IS_NATIVE) != 0) {
-			if (classDef instanceof InstantiatedClassDefinition) {
-				if ((classDef as InstantiatedClassDefinition).getTemplateClassName() == "Map") {
-					return "Object";
-				} else {
-					return (classDef as InstantiatedClassDefinition).getTemplateClassName();
-				}
-			} else {
-				return classDef.className();
-			}
-		}
-		return classDef.getOutputClassName() + this.mangleFunctionArguments(argTypes);
-	}
-
 	function mangleFunctionName (name : string, argTypes : Type[]) : string {
 		return name + this.mangleFunctionArguments(argTypes);
 	}
@@ -196,6 +181,24 @@ class _Namer {
 		return this.getNameOfStaticFunction(classDef, name, argTypes, true);
 	}
 
+	function getNameOfConstructor(classDef : ClassDefinition, argTypes : Type[]) : string {
+		if ((classDef.flags() & ClassDefinition.IS_NATIVE) != 0) {
+			return this._getNameOfNativeConstructor(classDef);
+		}
+		return classDef.getOutputClassName() + this._emitter.getMangler().mangleFunctionArguments(argTypes);
+	}
+
+	function _getNameOfNativeConstructor(classDef : ClassDefinition) : string {
+		if (classDef instanceof InstantiatedClassDefinition) {
+			if ((classDef as InstantiatedClassDefinition).getTemplateClassName() == "Map") {
+				return "Object";
+			} else {
+				return (classDef as InstantiatedClassDefinition).getTemplateClassName();
+			}
+		}
+		return classDef.className();
+	}
+
 }
 
 class _MinifyingNamer extends _Namer {
@@ -203,10 +206,7 @@ class _MinifyingNamer extends _Namer {
 
 	class _ClassDefStash extends OptimizerStash {
 
-		var _classUseCount = 0;
-		var _constructorUseCount = new Map.<number>;
 		var _staticVariableUseCount = new Map.<number>;
-		var _staticFunctionUseCount = new Map.<number>;
 
 		var _staticVariableConversionTable = new Map.<string>;
 
@@ -217,6 +217,9 @@ class _MinifyingNamer extends _Namer {
 
 	var _nonStaticUseCount = new Map.<number>();
 	var _nonStaticConversionTable : Map.<string>;
+	var _classAndStaticFunctionUseCount = new Map.<number>();
+	var _ctorAndStaticFunctionConversionTable : Map.<string>; // keys: "outputClassNameBeforeMinify#funcsig" (for constructors) or "outputClassNameBeforeMinify$funcname#funcsig" for static functions
+	var _outputClassNameInvConversionTable : Map.<string>;
 
 	function constructor(emitter : JavaScriptEmitter) {
 		super(emitter);
@@ -242,7 +245,7 @@ class _MinifyingNamer extends _Namer {
 		// step 4
 		this._minifyStaticVariables(classDefs);
 		// step 5
-		this._minifyClassesAndStaticFunctions();
+		this._minifyClassesAndStaticFunctions(classDefs);
 		// step 6
 		// TODO
 	}
@@ -278,7 +281,24 @@ class _MinifyingNamer extends _Namer {
 		return conversionTable[name];
 	}
 
+	override function getNameOfStaticFunction(classDef : ClassDefinition, name : string, argTypes : Type[], allowInternalForm : boolean) : string {
+		var className = classDef.getOutputClassName();
+		if (Util.memberRootIsNative(classDef, name, argTypes, true)) {
+			return className + "." + name;
+		}
+		var mangledFunctionName = this._emitter.getMangler().mangleFunctionName(name, argTypes);
+		if (allowInternalForm) {
+			var tableKey = this._outputClassNameInvConversionTable[className] + "$" + mangledFunctionName;
+			if (this._ctorAndStaticFunctionConversionTable.hasOwnProperty(tableKey)) {
+				return this._ctorAndStaticFunctionConversionTable[tableKey];
+			}
+			return className + "$" + mangledFunctionName;
+		}
+		return className + "." + mangledFunctionName;
+	}
+
 	function _countAccess(classDefs : ClassDefinition[]) : void {
+		// count access within code
 		classDefs.forEach(function (classDef) {
 			classDef.forEachMemberFunction(function (funcDef) {
 				funcDef.forEachStatement(function onStmt(statement) {
@@ -293,33 +313,35 @@ class _MinifyingNamer extends _Namer {
 								if (Util.isReferringToFunctionDefinition(propertyExpr)) {
 									var argTypes = (propertyExpr.getType() as ResolvedFunctionType).getArgumentTypes();
 									name = this._emitter.getMangler().mangleFunctionName(name, argTypes);
-									useCount = isStatic ? this._getStash(baseExpr.getType().getClassDef())._staticFunctionUseCount : this._nonStaticUseCount;
+									if (isStatic) {
+										name = baseExpr.getType().getClassDef().getOutputClassName() + "$" + name;
+										useCount = this._classAndStaticFunctionUseCount;
+									} else {
+										useCount = this._nonStaticUseCount;
+									}
 								} else {
 									useCount = isStatic ? this._getStash(baseExpr.getType().getClassDef())._staticVariableUseCount : this._nonStaticUseCount;
 								}
-								if (useCount.hasOwnProperty(name)) {
-									++useCount[name];
-								} else {
-									useCount[name] = 1;
-								}
+								this._incr(useCount, name);
 								if (isStatic) {
 									return true; // no need to recurse
 								}
 							}
 						} else if (expr instanceof ClassExpression) {
-							++this._getStash(expr.getType().getClassDef())._classUseCount;
+							var classDef = expr.getType().getClassDef();
+							if ((classDef.flags() & ClassDefinition.IS_NATIVE) == 0) {
+								this._incr(this._classAndStaticFunctionUseCount, classDef.getOutputClassName());
+							}
 						} else if (expr instanceof InstanceofExpression) {
-							++this._getStash((expr as InstanceofExpression).getExpectedType().getClassDef())._classUseCount;
+							var classDef = (expr as InstanceofExpression).getExpectedType().getClassDef();
+							if ((classDef.flags() & ClassDefinition.IS_NATIVE) == 0) {
+								this._incr(this._classAndStaticFunctionUseCount, classDef.getOutputClassName());
+							}
 						} else if (expr instanceof NewExpression) {
 							var newExpr = expr as NewExpression;
 							if ((newExpr.getType().getClassDef().flags() & ClassDefinition.IS_NATIVE) == 0) {
-								var argsStr = this._emitter.getMangler().mangleFunctionArguments(newExpr.getConstructor().getArgumentTypes());
-								var useCount = this._getStash(expr.getType().getClassDef())._constructorUseCount;
-								if (useCount.hasOwnProperty(argsStr)) {
-									++useCount[argsStr];
-								} else {
-									useCount[argsStr] = 1;
-								}
+								var mangledName = newExpr.getType().getClassDef().getOutputClassName() + this._emitter.getMangler().mangleFunctionArguments(newExpr.getConstructor().getArgumentTypes());
+								this._incr(this._classAndStaticFunctionUseCount, mangledName);
 							}
 						} else if (expr instanceof FunctionExpression) {
 							(expr as FunctionExpression).getFuncDef().forEachStatement(onStmt);
@@ -330,6 +352,16 @@ class _MinifyingNamer extends _Namer {
 				});
 				return true;
 			});
+			// adjust the use count of class (definitions of ctors refer to class once, by ctor.prototype = new class)
+			if ((classDef.flags() & ClassDefinition.IS_NATIVE) == 0) {
+				classDef.forEachMemberFunction(function (funcDef) {
+					// TODO only count the constructors being used (if we are removing unused functions)
+					if (funcDef.name() == "constructor" && (funcDef.flags() & (ClassDefinition.IS_STATIC | ClassDefinition.IS_NATIVE)) == 0) {
+						this._incr(this._classAndStaticFunctionUseCount, classDef.getOutputClassName());
+					}
+					return true;
+				});
+			}
 		});
 	}
 
@@ -352,6 +384,7 @@ class _MinifyingNamer extends _Namer {
 
 	function _minifyPropertiesGlobally() : void {
 		this._log("minifying non-static properties");
+		// FIXME check conflict against keywords / native property names
 		this._nonStaticConversionTable = this._buildConversionTable(this._nonStaticUseCount);
 		for (var k in this._nonStaticConversionTable) {
 			this._log(" " + k + " => " + this._nonStaticConversionTable[k]);
@@ -360,6 +393,7 @@ class _MinifyingNamer extends _Namer {
 
 	function _minifyStaticVariables(classDefs : ClassDefinition[]) : void {
 		this._log("minifying static variables");
+		// FIXME check conflict against keywords / native static variables within the same class
 		classDefs.forEach(function (classDef) {
 			if ((classDef.flags() & (ClassDefinition.IS_NATIVE | ClassDefinition.IS_FAKE)) == 0) {
 				var stash = this._getStash(classDef);
@@ -368,8 +402,26 @@ class _MinifyingNamer extends _Namer {
 		});
 	}
 
-	function _minifyClassesAndStaticFunctions() : void {
-		// TODO
+	function _minifyClassesAndStaticFunctions(classDefs : ClassDefinition[]) : void {
+		this._log("minifying classes and static functions");
+		var table = this._buildConversionTable(this._classAndStaticFunctionUseCount);
+		// FIXME check conflict against keywords / native names
+		for (var k in table) {
+			this._log(" " + k + " => " + table[k]);
+		}
+		// update ClassDefinition#outputClassName, build _outputClassNameInvConversionTable, remove class names from table
+		this._outputClassNameInvConversionTable = new Map.<string>;
+		classDefs.forEach(function (classDef) {
+			var origName = classDef.getOutputClassName();
+			var minifiedName = origName;
+			if (table.hasOwnProperty(origName)) {
+				minifiedName = table[origName];
+				classDef.setOutputClassName(minifiedName);
+			}
+			delete table[origName];
+			this._outputClassNameInvConversionTable[minifiedName] = origName;
+		});
+		this._ctorAndStaticFunctionConversionTable = table;
 	}
 
 	static const _MINIFY_LEADING_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_";
@@ -392,6 +444,14 @@ class _MinifyingNamer extends _Namer {
 			stash[_MinifyingNamer.IDENTIFIER] = new _MinifyingNamer._ClassDefStash();
 		}
 		return stash[_MinifyingNamer.IDENTIFIER] as _MinifyingNamer._ClassDefStash;
+	}
+
+	function _incr(map : Map.<number>, key : string) : void {
+		if (map.hasOwnProperty(key)) {
+			++map[key];
+		} else {
+			map[key] = 1;
+		}
 	}
 
 	function _log(message : string) : void {
@@ -435,7 +495,7 @@ class _ConstructorInvocationStatementEmitter extends _StatementEmitter {
 	override function emit () : void {
 		var ctorType = this._statement.getConstructorType() as ResolvedFunctionType;
 		var argTypes = ctorType != null ? ctorType.getArgumentTypes() : new Type[];
-		var ctorName = this._emitter.getMangler().mangleConstructorName(this._statement.getConstructingClassDef(), argTypes);
+		var ctorName = this._emitter.getNamer().getNameOfConstructor(this._statement.getConstructingClassDef(), argTypes);
 		var token = this._statement.getToken();
 		if (ctorName == "Error" && this._statement.getArguments().length == 1) {
 			/*
@@ -2242,7 +2302,7 @@ class _NewExpressionEmitter extends _OperatorExpressionEmitter {
 		} else {
 			this._emitter._emitCallArguments(
 				this._expr.getToken(),
-				"new " + this._emitter.getMangler().mangleConstructorName(classDef, argTypes) + "(",
+				"new " + this._emitter.getNamer().getNameOfConstructor(classDef, argTypes) + "(",
 				this._expr.getArguments(),
 				argTypes);
 		}
@@ -2664,7 +2724,7 @@ class JavaScriptEmitter implements Emitter {
 	}
 
 	function _emitConstructor (funcDef : MemberFunctionDefinition) : void {
-		var funcName = this._mangler.mangleConstructorName(funcDef.getClassDef(), funcDef.getArgumentTypes());
+		var funcName = this._namer.getNameOfConstructor(funcDef.getClassDef(), funcDef.getArgumentTypes());
 
 		// emit prologue
 		this._emit("/**\n", null);
