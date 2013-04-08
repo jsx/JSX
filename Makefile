@@ -23,7 +23,7 @@ meta:
 		tool/make-meta package.json src/meta.jsx ; \
 	fi
 
-doc: src/doc.jsx
+doc: compiler
 	rm -rf doc
 	find lib -name '*.jsx' | xargs -n 1 -- bin/jsx --mode doc --output doc
 
