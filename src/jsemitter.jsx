@@ -2241,7 +2241,7 @@ class _NewExpressionEmitter extends _OperatorExpressionEmitter {
 				if (propertyIndex != 0) {
 					this._emitter._emit(", ", this._expr.getToken());
 				}
-				this._emitter._emit(member.name() + ": ", this._expr.getToken());
+				this._emitter._emit(this._emitter.getNamer().getNameOfProperty(classDef, member.name()) + ": ", this._expr.getToken());
 				this._emitter._getExpressionEmitterFor(propertyExprs[propertyIndex++]).emit(_AssignmentExpressionEmitter._operatorPrecedence["="]);
 			}
 			return true;
