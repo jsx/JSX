@@ -266,7 +266,7 @@ class _MinifyingNamer extends _Namer {
 		var mangledName = this._emitter.getMangler().mangleFunctionName(name, argTypes);
 		if (! this._nonStaticConversionTable.hasOwnProperty(mangledName)) {
 			// TODO ditto as getNameOfProperty
-			return name;
+			return mangledName;
 		}
 		return this._nonStaticConversionTable[mangledName];
 	}
