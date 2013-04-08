@@ -5,7 +5,7 @@ JOBS:=4
 
 PORT := 2012
 
-all: compiler doc meta web
+all: meta compiler doc web
 
 ## compiler stuff
 
@@ -35,13 +35,20 @@ bootstrap-compiler: compiler
 
 # e.g. make test JOBS=2
 
-test: test-debug test-optimized
+test: all test-debug test-optimized
 
-test-debug: compiler
-	$(PROVE) --jobs "$(JOBS)" t/*.t t/*/*.jsx
+test-debug:
+	$(MAKE) test-core
+	$(MAKE) test-misc-core
 
-test-optimized: compiler
-	JSX_OPTS="--optimize release --disable-optimize no-log,no-assert" $(PROVE) --jobs "$(JOBS)" t/*/*.jsx
+test-optimized:
+	JSX_OPTS="--optimize release --disable-optimize no-log,no-assert" $(MAKE) test-core
+
+test-core:
+	$(PROVE) --jobs "$(JOBS)" t/run/*.jsx t/compile_error/*.jsx t/lib/*.jsx t/src/*.jsx t/web/*.jsx t/optimize/*.jsx t/complete/*.jsx
+
+test-misc-core:
+	$(PROVE) --jobs "$(JOBS)" t/*.t
 
 v8bench: compiler
 	cd submodules/v8bench && make
@@ -95,4 +102,4 @@ clean:
 	rm -rf bin/*
 	rm -rf jsx-*.tgz
 
-.PHONY: setup test web server doc meta
+.PHONY: setup test test-debug test-release test-core test-misc-core web server doc meta
