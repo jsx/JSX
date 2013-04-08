@@ -9,7 +9,7 @@ all: meta compiler doc web
 
 ## compiler stuff
 
-compiler:
+compiler: src/doc.jsx
 	rm -f bin/jsx
 	node tool/bootstrap-compiler.js --executable node --output bin/jsx src/jsx-node-front.jsx
 	cp -f "$$PWD/tool/jsx.pl" bin/jsx-with-server
