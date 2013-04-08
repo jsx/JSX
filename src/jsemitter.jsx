@@ -181,8 +181,7 @@ class _Namer {
 	}
 
 	function getNameOfStaticVariable(classDef : ClassDefinition, name : string) : string {
-		var className = classDef.getOutputClassName();
-		return className + "." + name;
+		return name;
 	}
 
 	function getNameOfStaticFunction(classDef : ClassDefinition, name : string, argTypes : Type[], allowInternalForm : boolean) : string {
@@ -269,6 +268,14 @@ class _MinifyingNamer extends _Namer {
 			return mangledName;
 		}
 		return this._nonStaticConversionTable[mangledName];
+	}
+
+	override function getNameOfStaticVariable(classDef : ClassDefinition, name : string) : string {
+		var conversionTable = this._getStash(classDef)._staticVariableConversionTable;
+		if (! conversionTable.hasOwnProperty(name)) {
+			return name;
+		}
+		return conversionTable[name];
 	}
 
 	function _countAccess(classDefs : ClassDefinition[]) : void {
@@ -1568,7 +1575,7 @@ class _PropertyExpressionEmitter extends _UnaryExpressionEmitter {
 			if (Util.isReferringToFunctionDefinition(expr)) {
 				name = this._emitter.getNamer().getNameOfStaticFunction(classDef, name, (exprType as ResolvedFunctionType).getArgumentTypes());
 			} else {
-				name = this._emitter.getNamer().getNameOfStaticVariable(classDef, name);
+				name = classDef.getOutputClassName() + "." + this._emitter.getNamer().getNameOfStaticVariable(classDef, name);
 			}
 			this._emitter._emit(name, identifierToken);
 		} else {
@@ -1698,7 +1705,8 @@ class _AssignmentExpressionEmitter extends _OperatorExpressionEmitter {
 				this._emitter._emit(", ", this._expr.getToken());
 				var name : string;
 				if (propertyExpr.getExpr() instanceof ClassExpression) {
-					name = this._emitter.getNamer().getNameOfStaticVariable(propertyExpr.getHolderType().getClassDef(), propertyExpr.getIdentifierToken().getValue());
+					var classDef = propertyExpr.getHolderType().getClassDef();
+					name = classDef.getOutputClassName() + "." + this._emitter.getNamer().getNameOfStaticVariable(classDef, propertyExpr.getIdentifierToken().getValue());
 				} else {
 					name = this._emitter.getNamer().getNameOfProperty(propertyExpr.getHolderType().getClassDef(), propertyExpr.getIdentifierToken().getValue());
 				}
@@ -2777,7 +2785,7 @@ class JavaScriptEmitter implements Emitter {
 				|| initialValue instanceof StringLiteralExpression
 				|| initialValue instanceof RegExpLiteralExpression)) {
 			// use deferred initialization
-			this._emit("$__jsx_lazy_init(" + holder + ", \"" + variable.name() + "\", function () {\n", variable.getNameToken());
+			this._emit("$__jsx_lazy_init(" + holder + ", \"" + this._namer.getNameOfStaticVariable(variable.getClassDef(), variable.name()) + "\", function () {\n", variable.getNameToken());
 			this._advanceIndent();
 			this._emit("return ", variable.getNameToken());
 			this._emitRHSOfAssignment(initialValue, variable.getType());
@@ -2785,7 +2793,7 @@ class JavaScriptEmitter implements Emitter {
 			this._reduceIndent();
 			this._emit("});\n", variable.getNameToken());
 		} else {
-			this._emit(holder + "." + variable.name() + " = ", variable.getNameToken());
+			this._emit(holder + "." + this._namer.getNameOfStaticVariable(variable.getClassDef(), variable.name()) + " = ", variable.getNameToken());
 			this._emitRHSOfAssignment(initialValue, variable.getType());
 			this._emit(";\n", initialValue.getToken());
 		}
