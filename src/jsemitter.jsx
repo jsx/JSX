@@ -1693,9 +1693,16 @@ class _AssignmentExpressionEmitter extends _OperatorExpressionEmitter {
 		if (firstExpr instanceof PropertyExpression || firstExpr instanceof ArrayExpression) {
 			this._emitter._emit("$__jsx_div_assign(", this._expr.getToken());
 			if (firstExpr instanceof PropertyExpression) {
-				this._emitter._getExpressionEmitterFor((firstExpr as PropertyExpression).getExpr()).emit(0);
+				var propertyExpr = firstExpr as PropertyExpression;
+				this._emitter._getExpressionEmitterFor(propertyExpr.getExpr()).emit(0);
 				this._emitter._emit(", ", this._expr.getToken());
-				this._emitter._emit(Util.encodeStringLiteral((firstExpr as PropertyExpression).getIdentifierToken().getValue()), (firstExpr as PropertyExpression).getIdentifierToken());
+				var name : string;
+				if (propertyExpr.getExpr() instanceof ClassExpression) {
+					name = this._emitter.getNamer().getNameOfStaticVariable(propertyExpr.getHolderType().getClassDef(), propertyExpr.getIdentifierToken().getValue());
+				} else {
+					name = this._emitter.getNamer().getNameOfProperty(propertyExpr.getHolderType().getClassDef(), propertyExpr.getIdentifierToken().getValue());
+				}
+				this._emitter._emit(Util.encodeStringLiteral(name), propertyExpr.getIdentifierToken());
 			} else {
 				this._emitter._getExpressionEmitterFor((firstExpr as ArrayExpression).getFirstExpr()).emit(0);
 				this._emitter._emit(", ", this._expr.getToken());
