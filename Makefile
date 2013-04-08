@@ -5,7 +5,7 @@ JOBS:=4
 
 PORT := 2012
 
-all: compiler doc meta web
+all: meta compiler doc web
 
 ## compiler stuff
 
