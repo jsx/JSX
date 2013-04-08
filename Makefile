@@ -38,10 +38,17 @@ bootstrap-compiler: compiler
 test: test-debug test-optimized
 
 test-debug: compiler
-	$(PROVE) --jobs "$(JOBS)" t/*.t t/*/*.jsx
+	$(MAKE) test-core
+	$(MAKE) test-misc-core
 
 test-optimized: compiler
-	JSX_OPTS="--optimize release --disable-optimize no-log,no-assert" $(PROVE) --jobs "$(JOBS)" t/*/*.jsx
+	JSX_OPTS="--optimize release --disable-optimize no-log,no-assert" $(MAKE) test-core
+
+test-core:
+	$(PROVE) --jobs "$(JOBS)" t/run/*.jsx t/compile_error/*.jsx t/lib/*.jsx t/src/*.jsx t/web/*.jsx t/optimize/*.jsx t/complete/*.jsx
+
+test-misc-core:
+	$(PROVE) --jobs "$(JOBS)" t/*.t
 
 v8bench: compiler
 	cd submodules/v8bench && make
@@ -95,4 +102,4 @@ clean:
 	rm -rf bin/*
 	rm -rf jsx-*.tgz
 
-.PHONY: setup test web server doc meta
+.PHONY: setup test test-debug test-release test-core test-misc-core web server doc meta
