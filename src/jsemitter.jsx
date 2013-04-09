@@ -201,7 +201,51 @@ class _Namer {
 
 }
 
+class _MinifiedNameGenerator {
+
+	static const _MINIFY_CHARS = "$_ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+	static const DEFAULT_SKIP_WORDS = (
+		"break else new var case finally return void catch for switch while continue function this with default if throw"
+		+ " delete in try do instanceof typeof abstract enum int"
+		+ " boolean export interface byte extends long char final native class float package const goto private debugger implements protected double import public"
+		+ " NaN Infinity undefined eval parseInt parseFloat isNaN isFinite decodeURI decodeURIComponent encodeURI encodeURIComponent"
+		+ " Object Function Array String Boolean Number Date RegExp Error EvalError RangeError ReferenceError SyntaxError TypeError URIError Math").split(/\s+/);
+
+	var _skipWords = new Map.<boolean>;
+	var _memo = new string[];
+	var _counter = 0;
+
+	function constructor() {
+		for (var i in _MinifiedNameGenerator.DEFAULT_SKIP_WORDS) {
+			this._skipWords[_MinifiedNameGenerator.DEFAULT_SKIP_WORDS[i]] = true;
+		}
+	}
+
+	function get(n : number) : string {
+		while (this._memo.length <= n) {
+			do {
+				var candidate = _MinifiedNameGenerator._stringify(this._counter++);
+			} while (this._skipWords.hasOwnProperty(candidate) || candidate.match(/^[0-9$]/));
+			this._memo.push(candidate);
+		}
+		return this._memo[n];
+	}
+
+	static function _stringify(n : number) : string {
+		var name = "";
+		do {
+			var colIndex = n % _MinifiedNameGenerator._MINIFY_CHARS.length;
+			name += _MinifiedNameGenerator._MINIFY_CHARS.charAt(colIndex);
+			n = (n - colIndex) / _MinifiedNameGenerator._MINIFY_CHARS.length;
+		} while (n != 0);
+		return name;
+	}
+
+}
+
 class _MinifyingNamer extends _Namer {
+
 	static const IDENTIFIER = "minify";
 
 	class _ClassDefStash extends OptimizerStash {
@@ -220,6 +264,8 @@ class _MinifyingNamer extends _Namer {
 	var _classAndStaticFunctionUseCount = new Map.<number>();
 	var _ctorAndStaticFunctionConversionTable : Map.<string>; // keys: "outputClassNameBeforeMinify#funcsig" (for constructors) or "outputClassNameBeforeMinify$funcname#funcsig" for static functions
 	var _outputClassNameInvConversionTable : Map.<string>;
+
+	var _nameGenerator = new _MinifiedNameGenerator;
 
 	function constructor(emitter : JavaScriptEmitter) {
 		super(emitter);
@@ -381,7 +427,7 @@ class _MinifyingNamer extends _Namer {
 		// build conversion map
 		var conversionTable = new Map.<string>();
 		for (var i = 0; i < propertyNames.length; ++i) {
-			conversionTable[propertyNames[i]] = this._getMinifiedName(i);
+			conversionTable[propertyNames[i]] = this._nameGenerator.get(i);
 		}
 		return conversionTable;
 	}
@@ -426,20 +472,6 @@ class _MinifyingNamer extends _Namer {
 			this._outputClassNameInvConversionTable[minifiedName] = origName;
 		});
 		this._ctorAndStaticFunctionConversionTable = table;
-	}
-
-	static const _MINIFY_LEADING_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_";
-	static const _MINIFY_SUCCEEDING_CHARS = " ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789$_"; // first char is never used
-
-	function _getMinifiedName(n : number) : string {
-		var name = "";
-		do {
-			var chars = name.length == 0 ? _MinifyingNamer._MINIFY_LEADING_CHARS : _MinifyingNamer._MINIFY_SUCCEEDING_CHARS;
-			var colIndex = n % chars.length;
-			name += chars.charAt(colIndex);
-			n = (n - colIndex) / chars.length;
-		} while (n != 0);
-		return name;
 	}
 
 	function _getStash(classDef : ClassDefinition) : _MinifyingNamer._ClassDefStash {
