@@ -429,7 +429,7 @@ class _MinifyingNamer extends _Namer {
 	}
 
 	static const _MINIFY_LEADING_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_";
-	static const _MINIFY_SUCCEEDING_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789$_";
+	static const _MINIFY_SUCCEEDING_CHARS = " ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789$_"; // first char is never used
 
 	function _getMinifiedName(n : number) : string {
 		var name = "";
