@@ -1,6 +1,6 @@
 /***
  * The entry point module of JSX compiler on browsers,
- * deployed http://jsx.github.com/try-on-web
+ * deployed http://jsx.github.io/try-on-web
  */
 
 /*
