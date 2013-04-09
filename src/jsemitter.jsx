@@ -205,20 +205,26 @@ class _MinifiedNameGenerator {
 
 	static const _MINIFY_CHARS = "$_ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 
-	static const DEFAULT_SKIP_WORDS = (
+	// every object has eval, so it is listed as a keyword
+	static const KEYWORDS = (
 		"break else new var case finally return void catch for switch while continue function this with default if throw"
 		+ " delete in try do instanceof typeof abstract enum int"
 		+ " boolean export interface byte extends long char final native class float package const goto private debugger implements protected double import public"
-		+ " NaN Infinity undefined eval parseInt parseFloat isNaN isFinite decodeURI decodeURIComponent encodeURI encodeURIComponent"
-		+ " Object Function Array String Boolean Number Date RegExp Error EvalError RangeError ReferenceError SyntaxError TypeError URIError Math").split(/\s+/);
+		+ " NaN Infinity undefined eval"
+		).split(/\s+/);
+
+	static const GLOBALS = (
+		"parseInt parseFloat isNaN isFinite decodeURI decodeURIComponent encodeURI encodeURIComponent"
+		+ " Object Function Array String Boolean Number Date RegExp Error EvalError RangeError ReferenceError SyntaxError TypeError URIError Math"
+		).split(/\s+/);
 
 	var _skipWords = new Map.<boolean>;
 	var _memo = new string[];
 	var _counter = 0;
 
-	function constructor() {
-		for (var i in _MinifiedNameGenerator.DEFAULT_SKIP_WORDS) {
-			this._skipWords[_MinifiedNameGenerator.DEFAULT_SKIP_WORDS[i]] = true;
+	function constructor(skipWords : string[]) {
+		for (var i in skipWords) {
+			this._skipWords[skipWords[i]] = true;
 		}
 	}
 
@@ -265,8 +271,6 @@ class _MinifyingNamer extends _Namer {
 	var _ctorAndStaticFunctionConversionTable : Map.<string>; // keys: "outputClassNameBeforeMinify#funcsig" (for constructors) or "outputClassNameBeforeMinify$funcname#funcsig" for static functions
 	var _outputClassNameInvConversionTable : Map.<string>;
 
-	var _nameGenerator = new _MinifiedNameGenerator;
-
 	function constructor(emitter : JavaScriptEmitter) {
 		super(emitter);
 	}
@@ -285,7 +289,7 @@ class _MinifyingNamer extends _Namer {
 		// step 1
 		this._countAccess(classDefs);
 		// step 2
-		this._minifyPropertiesGlobally();
+		this._minifyPropertiesGlobally(classDefs);
 		// step 3
 		// TODO
 		// step 4
@@ -411,7 +415,7 @@ class _MinifyingNamer extends _Namer {
 		});
 	}
 
-	function _buildConversionTable(useCount : Map.<number>) : Map.<string> {
+	function _buildConversionTable(useCount : Map.<number>, nameGenerator : _MinifiedNameGenerator) : Map.<string> {
 		// sort property names by use count (in descending order)
 		var propertyNames = useCount.keys().sort(function (x, y) {
 			var delta = useCount[y] - useCount[x];
@@ -427,15 +431,32 @@ class _MinifyingNamer extends _Namer {
 		// build conversion map
 		var conversionTable = new Map.<string>();
 		for (var i = 0; i < propertyNames.length; ++i) {
-			conversionTable[propertyNames[i]] = this._nameGenerator.get(i);
+			conversionTable[propertyNames[i]] = nameGenerator.get(i);
 		}
 		return conversionTable;
 	}
 
-	function _minifyPropertiesGlobally() : void {
+	function _minifyPropertiesGlobally(classDefs : ClassDefinition[]) : void {
 		this._log("minifying non-static properties");
-		// FIXME check conflict against keywords / native property names
-		this._nonStaticConversionTable = this._buildConversionTable(this._nonStaticUseCount);
+		this._nonStaticConversionTable = this._buildConversionTable(
+			this._nonStaticUseCount,
+			new _MinifiedNameGenerator(
+				([] : string[]).concat(
+					_MinifiedNameGenerator.KEYWORDS,
+					(function () : string[] {
+						var nativePropertyNames = new Map.<boolean>;
+						classDefs.forEach(function (classDef) {
+							classDef.forEachMember(function (member) {
+								if ((member.flags() & ClassDefinition.IS_STATIC) == 0
+									&& ((member.flags() | classDef.flags()) & ClassDefinition.IS_NATIVE) != 0) {
+									nativePropertyNames[member.name()] = true;
+								}
+								return true;
+							});
+						});
+						return nativePropertyNames.keys();
+					})()
+				)));
 		for (var k in this._nonStaticConversionTable) {
 			this._log(" " + k + " => " + this._nonStaticConversionTable[k]);
 		}
@@ -443,19 +464,32 @@ class _MinifyingNamer extends _Namer {
 
 	function _minifyStaticVariables(classDefs : ClassDefinition[]) : void {
 		this._log("minifying static variables");
-		// FIXME check conflict against keywords / native static variables within the same class
 		classDefs.forEach(function (classDef) {
 			if ((classDef.flags() & (ClassDefinition.IS_NATIVE | ClassDefinition.IS_FAKE)) == 0) {
 				var stash = this._getStash(classDef);
-				stash._staticVariableConversionTable = this._buildConversionTable(stash._staticVariableUseCount);
+				stash._staticVariableConversionTable = this._buildConversionTable(stash._staticVariableUseCount, new _MinifiedNameGenerator(_MinifiedNameGenerator.KEYWORDS));
 			}
 		});
 	}
 
 	function _minifyClassesAndStaticFunctions(classDefs : ClassDefinition[]) : void {
 		this._log("minifying classes and static functions");
-		var table = this._buildConversionTable(this._classAndStaticFunctionUseCount);
-		// FIXME check conflict against keywords / native names
+		var table = this._buildConversionTable(
+			this._classAndStaticFunctionUseCount,
+			new _MinifiedNameGenerator(
+				([] : string[]).concat(
+					_MinifiedNameGenerator.KEYWORDS,
+					_MinifiedNameGenerator.GLOBALS,
+					(function () : string[] {
+						var nativeClassNames = new string[];
+						classDefs.forEach(function (classDef) {
+							if ((classDef.flags() & ClassDefinition.IS_NATIVE) != 0) {
+								nativeClassNames.push(classDef.className());
+							}
+						});
+						return nativeClassNames;
+					})()
+				)));
 		for (var k in table) {
 			this._log(" " + k + " => " + table[k]);
 		}
