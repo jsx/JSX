@@ -47,7 +47,7 @@ class _Test extends TestCase {
 		this.note("mapping.names:   " + JSON.stringify(mapping['names']));
 
 		// mappping.sources
-		["hello.jsx", "timer.jsx", "js.jsx"].forEach((file) -> {
+		["hello.jsx", "timer.jsx"].forEach((file) -> {
 			var sources = mapping['sources'] as string[];
 
 			var found = sources.filter((x) -> { return x.slice(x.length - file.length) == file; });
