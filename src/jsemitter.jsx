@@ -367,12 +367,16 @@ class _MinifyingNamer extends _Namer {
 
 	function _buildConversionTable(useCount : Map.<number>) : Map.<string> {
 		// sort property names by use count (in descending order)
-		var propertyNames = new Array.<string>();
-		for (var k in useCount) {
-			propertyNames.push(k);
-		}
-		propertyNames = propertyNames.sort(function (x, y) {
-			return useCount[y] - useCount[x];
+		var propertyNames = useCount.keys().sort(function (x, y) {
+			var delta = useCount[y] - useCount[x];
+			if (delta != 0) {
+				return delta;
+			}
+			if (x < y) {
+				return -1;
+			} else {
+				return 1;
+			}
 		});
 		// build conversion map
 		var conversionTable = new Map.<string>();
