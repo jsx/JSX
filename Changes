@@ -1,5 +1,12 @@
 Revision history for the JSX software development kit
 
+0.9.25 2013-04-09 19:12:55
+    [ANNOUNCE]
+    - The JSX web site is now http://jsx.github.io/
+
+    [FEATURES]
+    - Add Window#closed in js/web.jsx
+
 0.9.24 2013-04-05 13:43:49
     [CHANGES]
     - Disable "staticize" optimization for now, which changed the ABI
