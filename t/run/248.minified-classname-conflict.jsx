@@ -2,11 +2,11 @@
 ok
 */
 /*JS_SETUP
-function A() {
+function _() {
     console.log("ok");
 }
 */
-native class A {
+native class _ {
 }
 
 class _Main {
@@ -14,6 +14,6 @@ class _Main {
         log "should never get called";
     }
     static function main(args : string[]) : void {
-        new A();
+        new _();
     }
 }

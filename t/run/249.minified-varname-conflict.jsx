@@ -3,12 +3,12 @@
 */
 /*JS_SETUP
 function Native() {
-    this.A = 123;
+    this._ = 123;
 }
 */
 
 native class Native {
-    var A : number;
+    var _ : number;
 }
 
 class Derived extends Native {
@@ -18,6 +18,6 @@ class Derived extends Native {
 class _Main {
     static function main(args : string[]) : void {
         var d = new Derived;
-        log d.A;
+        log d._;
     }
 }
