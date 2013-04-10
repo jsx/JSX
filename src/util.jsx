@@ -277,6 +277,11 @@ class Util {
 		return true;
 	}
 
+	static function forEachArgumentsAndLocals(funcDef : MemberFunctionDefinition, cb : function (:LocalVariable) : void) : void {
+		funcDef.getArguments().forEach(function (arg) { cb(arg); });
+		funcDef.getLocals().forEach(cb);
+	}
+
 	static const _stringLiteralEncodingMap = {
 		"\0" : "\\0",
 		"\r" : "\\r",

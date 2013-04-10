@@ -199,6 +199,10 @@ class _Namer {
 		return classDef.className();
 	}
 
+	function getNameOfLocalVariable(local : LocalVariable) : string {
+		return local.getName().getValue();
+	}
+
 }
 
 class _MinifiedNameGenerator {
@@ -265,10 +269,30 @@ class _MinifyingNamer extends _Namer {
 		}
 	}
 
+	class _FuncDefStash extends OptimizerStash {
+
+		var usedClassesAndStaticFunctions = new Map.<boolean>;
+
+		override function clone() : OptimizerStash {
+			throw new Error("operation not supported");
+		}
+	}
+
+	class _LocalStash extends OptimizerStash {
+
+		var useCount = 0;
+
+		var minifiedName : Nullable.<string>;
+
+		override function clone() : OptimizerStash {
+			throw new Error("operation not supported");
+		}
+	}
+
 	var _nonStaticUseCount = new Map.<number>();
 	var _nonStaticConversionTable : Map.<string>;
 	var _classAndStaticFunctionUseCount = new Map.<number>();
-	var _ctorAndStaticFunctionConversionTable : Map.<string>; // keys: "outputClassNameBeforeMinify#funcsig" (for constructors) or "outputClassNameBeforeMinify$funcname#funcsig" for static functions
+	var _classAndCtorAndStaticFunctionConversionTable : Map.<string>; // keys: "outputClassNameBeforeMinify#funcsig" (for constructors) or "outputClassNameBeforeMinify$funcname#funcsig" for static functions
 	var _outputClassNameInvConversionTable : Map.<string>;
 
 	function constructor(emitter : JavaScriptEmitter) {
@@ -297,7 +321,7 @@ class _MinifyingNamer extends _Namer {
 		// step 5
 		this._minifyClassesAndStaticFunctions(classDefs);
 		// step 6
-		// TODO
+		this._minifyLocals(classDefs);
 	}
 
 	override function getNameOfProperty(classDef : ClassDefinition, name : string) : string {
@@ -339,69 +363,98 @@ class _MinifyingNamer extends _Namer {
 		var mangledFunctionName = this._emitter.getMangler().mangleFunctionName(name, argTypes);
 		if (allowInternalForm) {
 			var tableKey = this._outputClassNameInvConversionTable[className] + "$" + mangledFunctionName;
-			if (this._ctorAndStaticFunctionConversionTable.hasOwnProperty(tableKey)) {
-				return this._ctorAndStaticFunctionConversionTable[tableKey];
+			if (this._classAndCtorAndStaticFunctionConversionTable.hasOwnProperty(tableKey)) {
+				return this._classAndCtorAndStaticFunctionConversionTable[tableKey];
 			}
 			return className + "$" + mangledFunctionName;
 		}
 		return className + "." + mangledFunctionName;
 	}
 
+	override function getNameOfLocalVariable(local : LocalVariable) : string {
+		return this._getStash(local).minifiedName;
+	}
+
 	function _countAccess(classDefs : ClassDefinition[]) : void {
 		// count access within code
-		classDefs.forEach(function (classDef) {
-			classDef.forEachMemberFunction(function (funcDef) {
-				funcDef.forEachStatement(function onStmt(statement) {
-					statement.forEachExpression(function onExpr(expr) {
-						if (expr instanceof PropertyExpression) {
-							var propertyExpr = expr as PropertyExpression;
-							var baseExpr = propertyExpr.getExpr();
-							var isStatic = baseExpr instanceof ClassExpression;
-							if (! Util.propertyRootIsNative(propertyExpr)) {
-								var name = propertyExpr.getIdentifierToken().getValue();
-								var useCount : Map.<number> = null;
-								if (Util.isReferringToFunctionDefinition(propertyExpr)) {
-									var argTypes = (propertyExpr.getType() as ResolvedFunctionType).getArgumentTypes();
-									name = this._emitter.getMangler().mangleFunctionName(name, argTypes);
-									if (isStatic) {
-										name = baseExpr.getType().getClassDef().getOutputClassName() + "$" + name;
-										useCount = this._classAndStaticFunctionUseCount;
-									} else {
-										useCount = this._nonStaticUseCount;
-									}
-								} else {
-									useCount = isStatic ? this._getStash(baseExpr.getType().getClassDef())._staticVariableUseCount : this._nonStaticUseCount;
-								}
-								this._incr(useCount, name);
+		function onFunction(funcDef : MemberFunctionDefinition) : void {
+			if (funcDef.getStatements() == null) {
+				return;
+			}
+			var usedClassesAndStaticFunctions = new Map.<boolean>;
+			function markUseOfClass(classDef : ClassDefinition) : void {
+				if ((classDef.flags() & ClassDefinition.IS_NATIVE) == 0) {
+					this._incr(this._classAndStaticFunctionUseCount, classDef.getOutputClassName());
+					usedClassesAndStaticFunctions[classDef.getOutputClassName()] = true;
+				}
+			}
+			funcDef.forEachStatement(function onStmt(statement) {
+				if (statement instanceof CatchStatement) {
+					var caughtType = (statement as CatchStatement).getLocal().getType();
+					if (caughtType instanceof ObjectType) {
+						markUseOfClass(caughtType.getClassDef());
+					}
+				}
+				statement.forEachExpression(function onExpr(expr) {
+					if (expr instanceof PropertyExpression) {
+						var propertyExpr = expr as PropertyExpression;
+						var baseExpr = propertyExpr.getExpr();
+						var isStatic = baseExpr instanceof ClassExpression;
+						if (! Util.propertyRootIsNative(propertyExpr)) {
+							var name = propertyExpr.getIdentifierToken().getValue();
+							var useCount : Map.<number> = null;
+							var isRefToFunc = Util.isReferringToFunctionDefinition(propertyExpr);
+							if (isRefToFunc) {
+								var argTypes = (propertyExpr.getType() as ResolvedFunctionType).getArgumentTypes();
+								name = this._emitter.getMangler().mangleFunctionName(name, argTypes);
 								if (isStatic) {
-									return true; // no need to recurse
+									name = baseExpr.getType().getClassDef().getOutputClassName() + "$" + name;
+									useCount = this._classAndStaticFunctionUseCount;
+									usedClassesAndStaticFunctions[name] = true;
+								} else {
+									useCount = this._nonStaticUseCount;
 								}
+							} else {
+								useCount = isStatic ? this._getStash(baseExpr.getType().getClassDef())._staticVariableUseCount : this._nonStaticUseCount;
 							}
-						} else if (expr instanceof ClassExpression) {
-							var classDef = expr.getType().getClassDef();
-							if ((classDef.flags() & ClassDefinition.IS_NATIVE) == 0) {
-								this._incr(this._classAndStaticFunctionUseCount, classDef.getOutputClassName());
+							this._incr(useCount, name);
+							if (isStatic && isRefToFunc) {
+								return true; // no need to recurse
 							}
-						} else if (expr instanceof InstanceofExpression) {
-							var classDef = (expr as InstanceofExpression).getExpectedType().getClassDef();
-							if ((classDef.flags() & ClassDefinition.IS_NATIVE) == 0) {
-								this._incr(this._classAndStaticFunctionUseCount, classDef.getOutputClassName());
-							}
-						} else if (expr instanceof NewExpression) {
-							var newExpr = expr as NewExpression;
-							if ((newExpr.getType().getClassDef().flags() & ClassDefinition.IS_NATIVE) == 0) {
-								var mangledName = newExpr.getType().getClassDef().getOutputClassName() + this._emitter.getMangler().mangleFunctionArguments(newExpr.getConstructor().getArgumentTypes());
-								this._incr(this._classAndStaticFunctionUseCount, mangledName);
-							}
-						} else if (expr instanceof FunctionExpression) {
-							(expr as FunctionExpression).getFuncDef().forEachStatement(onStmt);
 						}
-						return expr.forEachExpression(onExpr);
-					});
-					return true;
+					} else if (expr instanceof ClassExpression) {
+						markUseOfClass(expr.getType().getClassDef());
+					} else if (expr instanceof InstanceofExpression) {
+						markUseOfClass((expr as InstanceofExpression).getExpectedType().getClassDef());
+					} else if (expr instanceof AsExpression) {
+						markUseOfClass(expr.getType().getClassDef());
+					} else if (expr instanceof SuperExpression) {
+						var funcType = (expr as SuperExpression).getFunctionType() as ResolvedFunctionType;
+						markUseOfClass(funcType.getObjectType().getClassDef());
+					} else if (expr instanceof NewExpression) {
+						var newExpr = expr as NewExpression;
+						if ((newExpr.getType().getClassDef().flags() & ClassDefinition.IS_NATIVE) == 0) {
+							var mangledName = newExpr.getType().getClassDef().getOutputClassName() + this._emitter.getMangler().mangleFunctionArguments(newExpr.getConstructor().getArgumentTypes());
+							this._incr(this._classAndStaticFunctionUseCount, mangledName);
+							usedClassesAndStaticFunctions[mangledName] = true;
+						}
+					} else if (expr instanceof LocalExpression) {
+						++this._getStash((expr as LocalExpression).getLocal()).useCount;
+					} else if (expr instanceof FunctionExpression) {
+						var innerFuncDef = (expr as FunctionExpression).getFuncDef();
+						onFunction(innerFuncDef);
+						for (var k in this._getStash(innerFuncDef).usedClassesAndStaticFunctions) {
+							usedClassesAndStaticFunctions[k] = true;
+						}
+					}
+					return expr.forEachExpression(onExpr);
 				});
-				return true;
+				return statement.forEachStatement(onStmt);
 			});
+			this._getStash(funcDef).usedClassesAndStaticFunctions = usedClassesAndStaticFunctions;
+		}
+		classDefs.forEach(function (classDef) {
+			classDef.forEachMemberFunction(function (funcDef) { onFunction(funcDef); return true; });
 			// adjust the use count of class (definitions of ctors refer to class once, by ctor.prototype = new class)
 			if ((classDef.flags() & ClassDefinition.IS_NATIVE) == 0) {
 				classDef.forEachMemberFunction(function (funcDef) {
@@ -493,7 +546,7 @@ class _MinifyingNamer extends _Namer {
 		for (var k in table) {
 			this._log(" " + k + " => " + table[k]);
 		}
-		// update ClassDefinition#outputClassName, build _outputClassNameInvConversionTable, remove class names from table
+		// update ClassDefinition#outputClassName, build _outputClassName(Inv|)ConversionTable, remove class names from table
 		this._outputClassNameInvConversionTable = new Map.<string>;
 		classDefs.forEach(function (classDef) {
 			var origName = classDef.getOutputClassName();
@@ -502,18 +555,100 @@ class _MinifyingNamer extends _Namer {
 				minifiedName = table[origName];
 				classDef.setOutputClassName(minifiedName);
 			}
-			delete table[origName];
 			this._outputClassNameInvConversionTable[minifiedName] = origName;
 		});
-		this._ctorAndStaticFunctionConversionTable = table;
+		this._classAndCtorAndStaticFunctionConversionTable = table;
+	}
+
+	function _minifyLocals(classDefs : ClassDefinition[]) : void {
+		function rewriteLocals(funcDef : MemberFunctionDefinition, outerConversionTable : Map.<string>) : void {
+			// TODO remove unused locals / arguments?
+			// build useCount (as a Map), remove keys with same names
+			var useCount = new Map.<number>;
+			Util.forEachArgumentsAndLocals(funcDef, function (local) {
+				useCount[local.getName().getValue()] = this._getStash(local).useCount;
+				delete outerConversionTable[local.getName().getValue()];
+			});
+			// build table
+			var conversionTable = this._buildConversionTable(
+				useCount,
+				new _MinifiedNameGenerator(
+					([] : string[]).concat(
+						_MinifiedNameGenerator.KEYWORDS,
+						(function () {
+							var usedNames = [] : string[];
+							for (var k in outerConversionTable) {
+								usedNames.push(outerConversionTable[k]);
+							}
+							return usedNames;
+						})(),
+						(function () {
+							var usedNames = [] : string[];
+							for (var name in this._getStash(funcDef).usedClassesAndStaticFunctions) {
+								assert this._classAndCtorAndStaticFunctionConversionTable.hasOwnProperty(name);
+								usedNames.push(this._classAndCtorAndStaticFunctionConversionTable[name]);
+							}
+							return usedNames;
+						})()
+					)));
+			// save the mapping
+			Util.forEachArgumentsAndLocals(funcDef, function (local) {
+				var name = local.getName().getValue();
+				assert conversionTable.hasOwnProperty(name);
+				this._log("  " + name + " => " + conversionTable[name]);
+				this._getStash(local).minifiedName = conversionTable[name];
+			});
+			// perform the conversion in inner functions
+			for (var k in outerConversionTable) {
+				if (! conversionTable.hasOwnProperty(k)) {
+					conversionTable[k] = outerConversionTable[k];
+				}
+			}
+			funcDef.forEachStatement(function onStmt(stmt) {
+				stmt.forEachExpression(function onExpr(expr) {
+					if (expr instanceof FunctionExpression) {
+						rewriteLocals((expr as FunctionExpression).getFuncDef(), conversionTable);
+					}
+					return expr.forEachExpression(onExpr);
+				});
+				return stmt.forEachStatement(onStmt);
+			});
+		}
+
+		this._log("minifying locals");
+		classDefs.forEach(function (classDef) {
+			classDef.forEachMemberFunction(function (funcDef) {
+				if (funcDef.getStatements() != null) {
+					this._log(" " + classDef.className() + "." + funcDef.name() + ":");
+					rewriteLocals(funcDef, new Map.<string>);
+				}
+				return true;
+			});
+		});
 	}
 
 	function _getStash(classDef : ClassDefinition) : _MinifyingNamer._ClassDefStash {
 		var stash = classDef.getOptimizerStash();
-		if (stash[_MinifyingNamer.IDENTIFIER] == null) {
+		if (! stash.hasOwnProperty(_MinifyingNamer.IDENTIFIER)) {
 			stash[_MinifyingNamer.IDENTIFIER] = new _MinifyingNamer._ClassDefStash();
 		}
 		return stash[_MinifyingNamer.IDENTIFIER] as _MinifyingNamer._ClassDefStash;
+	}
+
+	function _getStash(funcDef : MemberFunctionDefinition) : _MinifyingNamer._FuncDefStash {
+		var stash = funcDef.getOptimizerStash();
+		if(! stash.hasOwnProperty(_MinifyingNamer.IDENTIFIER)) {
+			stash[_MinifyingNamer.IDENTIFIER] = new _MinifyingNamer._FuncDefStash();
+		}
+		return stash[_MinifyingNamer.IDENTIFIER] as _MinifyingNamer._FuncDefStash;
+	}
+
+	function _getStash(local : LocalVariable) : _MinifyingNamer._LocalStash {
+		var stash = local.getOptimizerStash();
+		if(! stash.hasOwnProperty(_MinifyingNamer.IDENTIFIER)) {
+			stash[_MinifyingNamer.IDENTIFIER] = new _MinifyingNamer._LocalStash();
+		}
+		return stash[_MinifyingNamer.IDENTIFIER] as _MinifyingNamer._LocalStash;
 	}
 
 	function _incr(map : Map.<number>, key : string) : void {
@@ -620,7 +755,7 @@ class _FunctionStatementEmitter extends _StatementEmitter {
 		for (var i = 0; i < args.length; ++i) {
 			if (i != 0)
 				this._emitter._emit(", ", funcDef.getToken());
-			this._emitter._emit(args[i].getName().getValue(), funcDef.getToken());
+			this._emitter._emit(this._emitter.getNamer().getNameOfLocalVariable(args[i]), funcDef.getToken());
 		}
 		this._emitter._emit(") {\n", funcDef.getToken());
 		this._emitter._advanceIndent();
@@ -1091,9 +1226,10 @@ class _LocalExpressionEmitter extends _ExpressionEmitter {
 
 	override function emit (outerOpPrecedence : number) : void {
 		var local = this._expr.getLocal();
-		var localName = local.getName().getValue();
 		if (local instanceof CaughtVariable) {
-			localName = _CatchStatementEmitter.getLocalNameFor(this._emitter, localName);
+			var localName = _CatchStatementEmitter.getLocalNameFor(this._emitter, local.getName().getValue());
+		} else {
+			localName = this._emitter.getNamer().getNameOfLocalVariable(local);
 		}
 		this._emitter._emit(localName, this._expr.getToken());
 	}
@@ -1749,7 +1885,7 @@ class _FunctionExpressionEmitter extends _OperatorExpressionEmitter {
 		for (var i = 0; i < args.length; ++i) {
 			if (i != 0)
 				this._emitter._emit(", ", funcDef.getToken());
-			this._emitter._emit(args[i].getName().getValue(), funcDef.getToken());
+			this._emitter._emit(this._emitter.getNamer().getNameOfLocalVariable(args[i]), funcDef.getToken());
 		}
 		this._emitter._emit(") {\n", funcDef.getToken());
 		this._emitter._advanceIndent();
@@ -2851,8 +2987,7 @@ class JavaScriptEmitter implements Emitter {
 		for (var i = 0; i < args.length; ++i) {
 			if (i != 0)
 				this._emit(", ", null);
-			var name = args[i].getName();
-			this._emit(name.getValue(), name);
+			this._emit(this._namer.getNameOfLocalVariable(args[i]), args[i].getName());
 		}
 	}
 
@@ -2885,9 +3020,8 @@ class JavaScriptEmitter implements Emitter {
 				if (type == null)
 					continue;
 				this._emit(_TypeAnnotation.build("/** @type {%1} */\n", type), null);
-				var name = locals[i].getName();
 				// do not pass the token for declaration
-				this._emit("var " + name.getValue() + ";\n", null);
+				this._emit("var " + this._namer.getNameOfLocalVariable(locals[i]) + ";\n", null);
 			}
 			// emit code
 			var statements = funcDef.getStatements();

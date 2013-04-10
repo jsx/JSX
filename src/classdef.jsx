@@ -1720,7 +1720,7 @@ class TemplateFunctionDefinition extends MemberFunctionDefinition implements Tem
 
 }
 
-class LocalVariable {
+class LocalVariable implements Stashable {
 
 	var _name : Token;
 	var _type : Type;
