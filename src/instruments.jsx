@@ -466,10 +466,13 @@ class _SwitchStatementTransformer extends _LabellableStatementTransformer {
 		switch (expr) {
 		case x:
 			goto $SWITCH_n_CASE_x;
+			return;	// necessary even if it's fall-through because every goto never returns!
 		case y:
 			goto $SWITCH_n_CASE_y;
+			return;
 		default:
 			goto $SWITCH_n_DEFAULT;
+			return;
 		}
 		goto $END_SWITCH_n;
 		goto $SWITCH_n_CASE_x;
@@ -506,9 +509,11 @@ class _SwitchStatementTransformer extends _LabellableStatementTransformer {
 			if (stmt instanceof CaseStatement) {
 				switchCases.push(stmt);
 				switchCases.push(new GotoStatement(this._getLabelFromCaseStatement(stmt as CaseStatement)));
+				switchCases.push(new ReturnStatement(new Token("return", false), null));
 			} else if (stmt instanceof DefaultStatement) {
 				switchCases.push(stmt);
 				switchCases.push(new GotoStatement(this._getLabelFromDefaultStatement()));
+				switchCases.push(new ReturnStatement(new Token("return", false), null));
 			}
 		}
 		var condSwitch = this._statement.clone() as SwitchStatement;
