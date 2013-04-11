@@ -1601,3 +1601,72 @@ class DebuggerStatement extends InformationStatement {
 	}
 
 }
+
+// GotoStatement and LabelStatement are used by code transformer
+
+class GotoStatement extends Statement {
+
+	var label : string;
+
+	function constructor(label : string) {
+		this.label = label;
+	}
+
+	function getLabel () : string {
+		return this.label;
+	}
+
+	override function getToken() : Token {
+		return null;
+	}
+
+	override function clone() : Statement {
+		return new GotoStatement(this.label);
+	}
+
+	override function serialize():variant {
+		return null;
+	}
+
+	override function doAnalyze(context : AnalysisContext) : boolean {
+		return true;
+	}
+
+	override function forEachExpression(cb : (Expression, (Expression) -> void) -> boolean) : boolean {
+		return true;
+	}
+
+}
+
+class LabelStatement extends Statement {
+
+	var _name : string;
+
+	function constructor(name : string) {
+		this._name = name;
+	}
+
+	function getName () : string {
+		return this._name;
+	}
+
+	override function getToken() : Token {
+		return null;
+	}
+
+	override function clone() : Statement {
+		return new LabelStatement(this._name);
+	}
+
+	override function serialize():variant {
+		return null;
+	}
+
+	override function doAnalyze(context : AnalysisContext) : boolean {
+		return true;
+	}
+
+	override function forEachExpression(cb : (Expression, (Expression) -> void) -> boolean) : boolean {
+		return true;
+	}
+}
