@@ -1565,6 +1565,7 @@ class Parser {
 			} else {
 				this._templateClassDefs.push(templateClassDef);
 			}
+			templateClassDef.setParser(this);
 			return templateClassDef;
 		} else {
 			var classDef = new ClassDefinition(className, className.getValue(), this._classFlags, this._extendType, this._implementTypes, members, this._inners, this._templateInners, this._objectTypesUsed, docComment);
