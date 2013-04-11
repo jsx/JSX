@@ -82,6 +82,9 @@ class A {
       "word" : "TypeError"
    },
    {
+      "word" : "StopIteration"
+   },
+   {
       "word" : "JSON"
    },
    {
@@ -92,6 +95,9 @@ class A {
    },
    {
       "word" : "Array"
+   },
+   {
+      "word" : "Enumerable"
    },
    {
       "word" : "++"
