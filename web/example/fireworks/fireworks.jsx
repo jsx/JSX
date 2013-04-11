@@ -131,14 +131,12 @@ final class FireworkView {
 		var rect = canvas.getBoundingClientRect();
 		this.left = rect.left;
 		this.top  = rect.top;
-		canvas.addEventListener("mousedown", function (e : Event) : void {
+		canvas.addEventListener("mousedown", function (e) {
             var me = e as MouseEvent;
-            assert me != null;
 			this.explode(me.clientX, me.clientY);
 		});
-		canvas.addEventListener("touchstart", function (e : Event) : void {
+		canvas.addEventListener("touchstart", function (e) {
             var te = e as TouchEvent;
-            assert te != null;
 			this.explode(te.touches[0].pageX, te.touches[0].pageY);
 		});
 	}

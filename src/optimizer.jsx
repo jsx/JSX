@@ -179,7 +179,24 @@ class Optimizer {
 	var _enableRunTimeTypeCheck : boolean;
 
 	static function getReleaseOptimizationCommands() : string[] {
-		return [ "lto", "no-assert", "no-log", "no-debug", "staticize", "fold-const", "return-if", "inline", "dce", "unbox", "fold-const", "lcse", "dce", "fold-const", "array-length", "unclassify" ];
+		return [
+			"lto",
+			"no-assert",
+			"no-log",
+			"no-debug",
+			// "staticize", // TODO: do not remove instance methods for JavaScript
+			"fold-const",
+			"return-if",
+			"inline",
+			"dce",
+			"unbox",
+			"fold-const",
+			"lcse",
+			"dce",
+			"fold-const",
+			"array-length",
+			"unclassify"
+		];
 	}
 
 	function constructor () {

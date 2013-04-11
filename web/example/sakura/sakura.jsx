@@ -312,11 +312,9 @@ final class Stage {
 final class _Main {
 
   static function main(args : string[]) : void {
-    Timer.useNativeRAF(true);
-
     // load textrue data and start main loop
     var img = dom.createElement('img') as HTMLImageElement;
-    img.onload = function (event : Event): void {
+    img.addEventListener("load", function (event) {
 
       var texture = dom.createElement('canvas') as HTMLCanvasElement;
       var context = texture.getContext('2d') as CanvasRenderingContext2D;
@@ -329,15 +327,12 @@ final class _Main {
 
       var stage = new Stage(world, texturedat);
 
-      var callTick = function(timeToCall : number) : void {
+      (function callTick(timeToCall : number) : void {
         stage.tick();
 
         Timer.requestAnimationFrame(callTick);
-      };
-
-      Timer.requestAnimationFrame(callTick);
-
-    };
+      }(0));
+    });
     img.src = Config.TEXTURE_FILE;
   }
 

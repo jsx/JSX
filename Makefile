@@ -5,11 +5,11 @@ JOBS:=4
 
 PORT := 2012
 
-all: compiler doc web
+all: meta compiler doc web
 
 ## compiler stuff
 
-compiler: src/doc.jsx meta
+compiler: src/doc.jsx
 	rm -f bin/jsx
 	node tool/bootstrap-compiler.js --executable node --output bin/jsx src/jsx-node-front.jsx
 	cp -f "$$PWD/tool/jsx.pl" bin/jsx-with-server
@@ -23,7 +23,7 @@ meta:
 		tool/make-meta package.json src/meta.jsx ; \
 	fi
 
-doc: src/doc.jsx
+doc: compiler
 	rm -rf doc
 	find lib -name '*.jsx' | xargs -n 1 -- bin/jsx --mode doc --output doc
 
@@ -35,13 +35,20 @@ bootstrap-compiler: compiler
 
 # e.g. make test JOBS=2
 
-test: test-debug test-optimized
+test: all test-debug test-optimized
 
-test-debug: compiler
-	$(PROVE) --jobs "$(JOBS)" t/*.t t/*/*.jsx
+test-debug:
+	$(MAKE) test-core
+	$(MAKE) test-misc-core
 
-test-optimized: compiler
-	JSX_OPTS="--optimize release --disable-optimize no-log,no-assert" $(PROVE) --jobs "$(JOBS)" t/*/*.jsx
+test-optimized:
+	JSX_OPTS="--optimize release --disable-optimize no-log,no-assert" $(MAKE) test-core
+
+test-core:
+	$(PROVE) --jobs "$(JOBS)" t/run/*.jsx t/compile_error/*.jsx t/lib/*.jsx t/src/*.jsx t/web/*.jsx t/optimize/*.jsx t/complete/*.jsx
+
+test-misc-core:
+	$(PROVE) --jobs "$(JOBS)" t/*.t
 
 v8bench: compiler
 	cd submodules/v8bench && make
@@ -75,8 +82,8 @@ update-codemirror:
 	unzip -o codemirror.zip
 	cp codemirror-*/lib/codemirror.css            web/assets/css
 	cp codemirror-*/lib/codemirror.js             web/assets/js
-	cp codemirror-*/addon/hint/simple-hint.css    web/assets/css
-	cp codemirror-*/addon/hint/simple-hint.js     web/assets/js
+	cp codemirror-*/addon/hint/show-hint.css    web/assets/css
+	cp codemirror-*/addon/hint/show-hint.js     web/assets/js
 	cp codemirror-*/mode/javascript/javascript.js web/assets/js/mode
 	cp codemirror-*/mode/clike/clike.js           web/assets/js/mode
 
@@ -95,4 +102,4 @@ clean:
 	rm -rf bin/*
 	rm -rf jsx-*.tgz
 
-.PHONY: setup test web server doc meta
+.PHONY: setup test test-debug test-release test-core test-misc-core web server doc meta

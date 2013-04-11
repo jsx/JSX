@@ -1,5 +1,26 @@
 Revision history for the JSX software development kit
 
+0.9.25 2013-04-09 19:12:55
+    [ANNOUNCE]
+    - The JSX web site is now http://jsx.github.io/
+
+    [FEATURES]
+    - Add Window#closed in js/web.jsx
+
+0.9.24 2013-04-05 13:43:49
+    [CHANGES]
+    - Disable "staticize" optimization for now, which changed the ABI
+
+0.9.23 2013-04-05 11:49:56
+    [CHANGES]
+    - Disable JSX compilation server mode, which was introduced at 0.9.6,
+      because it looks unstable.
+
+    [BUG FIXES]
+    - Fix bugs introduced by compilation server mode
+    - Fix a bug that function statements inside a function named "constructor"
+      caused runtime errors
+
 0.9.22 2013-04-03 11:27:37
     [FEATURES]
     - Add the return-value type deduction for function expression;
