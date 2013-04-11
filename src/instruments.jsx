@@ -1051,6 +1051,17 @@ class CodeTransformer {
 		return numBlock;
 	}
 
+	static function _calcGeneratorNestDepth (funcDef : MemberFunctionDefinition) : number {
+		var depth = 0;
+		var parent : MemberFunctionDefinition;
+		while ((parent = funcDef.getParent()) != null) {
+			if ((parent.flags() & ClassDefinition.IS_GENERATOR) != 0)
+				depth++;
+			funcDef = parent;
+		}
+		return depth;
+	}
+
 	function _eliminateYields (funcDef : MemberFunctionDefinition, numBlock : number) : void { // FIXME wasabiz nested generator
 		var yieldType = (funcDef.getReturnType().getClassDef() as InstantiatedClassDefinition).getTypeArguments()[0];
 
@@ -1071,13 +1082,15 @@ class CodeTransformer {
 		genClassDef.analyze(createContext(parser));
 		CodeTransformer.jsxGeneratorClassDef.getParser()._classDefs.push(genClassDef);
 		var genType = new ObjectType(genClassDef);
-		var genLocal = new LocalVariable(new Token("$generator", false), genType);
+
+		var genLocalName = "$generator" + CodeTransformer._calcGeneratorNestDepth(funcDef) as string;
+		var genLocal = new LocalVariable(new Token(genLocalName, false), genType);
 		var newExpr = new NewExpression(new Token("new", false), genType, []);
 		newExpr.analyze(new AnalysisContext([], null, null), null);
 		funcDef.getStatements().unshift(new ExpressionStatement(
 			new AssignmentExpression(
 				new Token("=", false),
-				new LocalExpression(new Token("$generator", false), genLocal),
+				new LocalExpression(new Token(genLocalName, false), genLocal),
 				newExpr)));
 
 		// replace yield statement
@@ -1085,8 +1098,8 @@ class CodeTransformer {
 		  yield expr;
 		  $LABEL();
 
-		  -> $generator.__value = expr;
-		     $generator.__next = $LABEL;
+		  -> $generatorN.__value = expr;
+		     $generatorN.__next = $LABEL;
 		 */
 		var blocks = funcDef.getClosures().slice(funcDef.getClosures().length - numBlock);
 		for (var i = 0; i < blocks.length; ++i) {
@@ -1099,7 +1112,7 @@ class CodeTransformer {
 								new Token("=", false),
 								new PropertyExpression(
 									new Token(".", false),
-									new LocalExpression(new Token("$generator", false), genLocal),
+									new LocalExpression(new Token(genLocalName, false), genLocal),
 									new Token("__value", false),
 									[],
 									yieldType),
@@ -1109,7 +1122,7 @@ class CodeTransformer {
 								new Token("=", false),
 								new PropertyExpression(
 									new Token(".", false),
-									new LocalExpression(new Token("$generator", false), genLocal),
+									new LocalExpression(new Token(genLocalName, false), genLocal),
 									new Token("__next", true),
 									[],
 									new StaticFunctionType(null, Type.voidType, [], true)),
@@ -1123,7 +1136,7 @@ class CodeTransformer {
 		/*
 		  $START();
 
-		  -> $generator.__next = $START;
+		  -> $generatorN.__next = $START;
 		 */
 		statements = funcDef.getStatements();
 		statements.splice(statements.length - 1, 1,
@@ -1132,7 +1145,7 @@ class CodeTransformer {
 					new Token("=", false),
 					new PropertyExpression(
 						new Token(".", false),
-						new LocalExpression(new Token("$generator", false), genLocal),
+						new LocalExpression(new Token(genLocalName, false), genLocal),
 						new Token("__next", true),
 						[],
 						new StaticFunctionType(null, Type.voidType, [], true)),
