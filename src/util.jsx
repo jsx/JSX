@@ -239,6 +239,7 @@ class Util {
 
 	static function memberRootIsNative(classDef : ClassDefinition, name : string, argTypes : Type[], isStatic : boolean) : boolean {
 		if (isStatic) {
+			// TODO check "_Main.main" for minification
 			return (classDef.flags() & (ClassDefinition.IS_NATIVE | ClassDefinition.IS_FAKE)) != 0;
 		}
 		function rootIsNativeNonStatic(classDef : ClassDefinition, name : string, argTypes : Type[]) : boolean {

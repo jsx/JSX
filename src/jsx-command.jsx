@@ -273,6 +273,11 @@ class JSXCommand {
 					emitter.setEnableProfiler(true);
 				});
 				break;
+			case "--minify":
+				tasks.push(function () {
+					emitter.setEnableMinifier(true);
+				});
+				break;
 			case "--compilation-server":
 				if ((optarg = getoptarg()) == null) {
 					return 1;

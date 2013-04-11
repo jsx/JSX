@@ -77,21 +77,6 @@ class _TypeAnnotation {
 
 class _Mangler {
 
-	function mangleConstructorName (classDef : ClassDefinition, argTypes : Type[]) : string {
-		if ((classDef.flags() & ClassDefinition.IS_NATIVE) != 0) {
-			if (classDef instanceof InstantiatedClassDefinition) {
-				if ((classDef as InstantiatedClassDefinition).getTemplateClassName() == "Map") {
-					return "Object";
-				} else {
-					return (classDef as InstantiatedClassDefinition).getTemplateClassName();
-				}
-			} else {
-				return classDef.className();
-			}
-		}
-		return classDef.getOutputClassName() + this.mangleFunctionArguments(argTypes);
-	}
-
 	function mangleFunctionName (name : string, argTypes : Type[]) : string {
 		return name + this.mangleFunctionArguments(argTypes);
 	}
@@ -158,6 +143,114 @@ class _Mangler {
 
 }
 
+class _Namer {
+
+	var _emitter : JavaScriptEmitter;
+
+	function constructor(emitter : JavaScriptEmitter) {
+		this._emitter = emitter;
+	}
+
+	function getNameOfProperty(classDef : ClassDefinition, name : string) : string {
+		return name;
+	}
+
+	function getNameOfMethod(classDef : ClassDefinition, name : string, argTypes : Type[]) : string {
+		if (Util.memberRootIsNative(classDef, name, argTypes, false)) {
+			return name;
+		}
+		return this._emitter.getMangler().mangleFunctionName(name, argTypes);
+	}
+
+	function getNameOfStaticVariable(classDef : ClassDefinition, name : string) : string {
+		return name;
+	}
+
+	function getNameOfStaticFunction(classDef : ClassDefinition, name : string, argTypes : Type[], allowInternalForm : boolean) : string {
+		var className = classDef.getOutputClassName();
+		if (Util.memberRootIsNative(classDef, name, argTypes, true)) {
+			return className + "." + name;
+		}
+		return className + (allowInternalForm ? "$" : ".") + this._emitter.getMangler().mangleFunctionName(name, argTypes);
+	}
+
+	function getNameOfStaticFunction(classDef : ClassDefinition, name : string, argTypes : Type[]) : string {
+		return this.getNameOfStaticFunction(classDef, name, argTypes, true);
+	}
+
+	function getNameOfConstructor(classDef : ClassDefinition, argTypes : Type[]) : string {
+		if ((classDef.flags() & ClassDefinition.IS_NATIVE) != 0) {
+			return this._getNameOfNativeConstructor(classDef);
+		}
+		return classDef.getOutputClassName() + this._emitter.getMangler().mangleFunctionArguments(argTypes);
+	}
+
+	function _getNameOfNativeConstructor(classDef : ClassDefinition) : string {
+		if (classDef instanceof InstantiatedClassDefinition) {
+			if ((classDef as InstantiatedClassDefinition).getTemplateClassName() == "Map") {
+				return "Object";
+			} else {
+				return (classDef as InstantiatedClassDefinition).getTemplateClassName();
+			}
+		}
+		return classDef.className();
+	}
+
+	function getNameOfLocalVariable(local : LocalVariable) : string {
+		return local.getName().getValue();
+	}
+
+}
+
+class _MinifiedNameGenerator {
+
+	static const _MINIFY_CHARS = "$_ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+	// every object has eval, so it is listed as a keyword
+	static const KEYWORDS = (
+		"break else new var case finally return void catch for switch while continue function this with default if throw"
+		+ " delete in try do instanceof typeof abstract enum int"
+		+ " boolean export interface byte extends long char final native class float package const goto private debugger implements protected double import public"
+		+ " NaN Infinity undefined eval"
+		).split(/\s+/);
+
+	static const GLOBALS = (
+		"parseInt parseFloat isNaN isFinite decodeURI decodeURIComponent encodeURI encodeURIComponent"
+		+ " Object Function Array String Boolean Number Date RegExp Error EvalError RangeError ReferenceError SyntaxError TypeError URIError Math"
+		).split(/\s+/);
+
+	var _skipWords = new Map.<boolean>;
+	var _memo = new string[];
+	var _counter = 0;
+
+	function constructor(skipWords : string[]) {
+		for (var i in skipWords) {
+			this._skipWords[skipWords[i]] = true;
+		}
+	}
+
+	function get(n : number) : string {
+		while (this._memo.length <= n) {
+			do {
+				var candidate = _MinifiedNameGenerator._stringify(this._counter++);
+			} while (this._skipWords.hasOwnProperty(candidate) || candidate.match(/^[0-9$]/));
+			this._memo.push(candidate);
+		}
+		return this._memo[n];
+	}
+
+	static function _stringify(n : number) : string {
+		var name = "";
+		do {
+			var colIndex = n % _MinifiedNameGenerator._MINIFY_CHARS.length;
+			name += _MinifiedNameGenerator._MINIFY_CHARS.charAt(colIndex);
+			n = (n - colIndex) / _MinifiedNameGenerator._MINIFY_CHARS.length;
+		} while (n != 0);
+		return name;
+	}
+
+}
+
 // statement emitter
 
 abstract class _StatementEmitter {
@@ -193,7 +286,7 @@ class _ConstructorInvocationStatementEmitter extends _StatementEmitter {
 	override function emit () : void {
 		var ctorType = this._statement.getConstructorType() as ResolvedFunctionType;
 		var argTypes = ctorType != null ? ctorType.getArgumentTypes() : new Type[];
-		var ctorName = this._emitter.getMangler().mangleConstructorName(this._statement.getConstructingClassDef(), argTypes);
+		var ctorName = this._emitter.getNamer().getNameOfConstructor(this._statement.getConstructingClassDef(), argTypes);
 		var token = this._statement.getToken();
 		if (ctorName == "Error" && this._statement.getArguments().length == 1) {
 			/*
@@ -243,12 +336,13 @@ class _FunctionStatementEmitter extends _StatementEmitter {
 
 	override function emit () : void {
 		var funcDef = this._statement.getFuncDef();
-		this._emitter._emit("function " + (funcDef.getNameToken() != null ? funcDef.name() : "") + "(", funcDef.getToken());
+		assert funcDef.getFuncLocal() != null;
+		this._emitter._emit("function " + this._emitter.getNamer().getNameOfLocalVariable(funcDef.getFuncLocal()) + "(", funcDef.getToken());
 		var args = funcDef.getArguments();
 		for (var i = 0; i < args.length; ++i) {
 			if (i != 0)
 				this._emitter._emit(", ", funcDef.getToken());
-			this._emitter._emit(args[i].getName().getValue(), funcDef.getToken());
+			this._emitter._emit(this._emitter.getNamer().getNameOfLocalVariable(args[i]), funcDef.getToken());
 		}
 		this._emitter._emit(") {\n", funcDef.getToken());
 		this._emitter._advanceIndent();
@@ -719,9 +813,10 @@ class _LocalExpressionEmitter extends _ExpressionEmitter {
 
 	override function emit (outerOpPrecedence : number) : void {
 		var local = this._expr.getLocal();
-		var localName = local.getName().getValue();
 		if (local instanceof CaughtVariable) {
-			localName = _CatchStatementEmitter.getLocalNameFor(this._emitter, localName);
+			var localName = _CatchStatementEmitter.getLocalNameFor(this._emitter, local.getName().getValue());
+		} else {
+			localName = this._emitter.getNamer().getNameOfLocalVariable(local);
 		}
 		this._emitter._emit(localName, this._expr.getToken());
 	}
@@ -1326,19 +1421,25 @@ class _PropertyExpressionEmitter extends _UnaryExpressionEmitter {
 			}
 		}
 
-		this._emitter._getExpressionEmitterFor(expr.getExpr()).emit(this._getPrecedence());
-		// mangle the name if necessary
-		if (this._emitter.getMangler().requiresMangling(expr)) {
-			if (expr.getExpr() instanceof ClassExpression) {
-				// do not use "." notation for static functions, but use class$name
-				this._emitter._emit("$", identifierToken);
+		// emit, depending on the type
+		var classDef = expr.getHolderType().getClassDef();
+		if (expr.getExpr() instanceof ClassExpression) {
+			var name = identifierToken.getValue();
+			if (Util.isReferringToFunctionDefinition(expr)) {
+				name = this._emitter.getNamer().getNameOfStaticFunction(classDef, name, (exprType as ResolvedFunctionType).getArgumentTypes());
 			} else {
-				this._emitter._emit(".", identifierToken);
+				name = classDef.getOutputClassName() + "." + this._emitter.getNamer().getNameOfStaticVariable(classDef, name);
 			}
-			this._emitter._emit(this._emitter.getMangler().mangleFunctionName(identifierToken.getValue(), (exprType as ResolvedFunctionType).getArgumentTypes()), identifierToken);
+			this._emitter._emit(name, identifierToken);
 		} else {
-			this._emitter._emit(".", identifierToken);
-			this._emitter._emit(identifierToken.getValue(), identifierToken);
+			var name = identifierToken.getValue();
+			if (Util.isReferringToFunctionDefinition(expr)) {
+				name = this._emitter.getNamer().getNameOfMethod(classDef, name, (exprType as ResolvedFunctionType).getArgumentTypes());
+			} else {
+				name = this._emitter.getNamer().getNameOfProperty(classDef, name);
+			}
+			this._emitter._getExpressionEmitterFor(expr.getExpr()).emit(this._getPrecedence());
+			this._emitter._emit("." + name, identifierToken);
 		}
 	}
 
@@ -1366,12 +1467,12 @@ class _FunctionExpressionEmitter extends _OperatorExpressionEmitter {
 	override function _emit () : void {
 		var funcDef = this._expr.getFuncDef();
 		this._emitter._emit("(", funcDef.getToken());
-		this._emitter._emit("function " + (funcDef.getNameToken() != null ? funcDef.name() : "") + "(", funcDef.getToken());
+		this._emitter._emit("function " + (funcDef.getFuncLocal() != null ? this._emitter.getNamer().getNameOfLocalVariable(funcDef.getFuncLocal()) : "") + "(", funcDef.getToken());
 		var args = funcDef.getArguments();
 		for (var i = 0; i < args.length; ++i) {
 			if (i != 0)
 				this._emitter._emit(", ", funcDef.getToken());
-			this._emitter._emit(args[i].getName().getValue(), funcDef.getToken());
+			this._emitter._emit(this._emitter.getNamer().getNameOfLocalVariable(args[i]), funcDef.getToken());
 		}
 		this._emitter._emit(") {\n", funcDef.getToken());
 		this._emitter._advanceIndent();
@@ -1452,9 +1553,17 @@ class _AssignmentExpressionEmitter extends _OperatorExpressionEmitter {
 		if (firstExpr instanceof PropertyExpression || firstExpr instanceof ArrayExpression) {
 			this._emitter._emit("$__jsx_div_assign(", this._expr.getToken());
 			if (firstExpr instanceof PropertyExpression) {
-				this._emitter._getExpressionEmitterFor((firstExpr as PropertyExpression).getExpr()).emit(0);
+				var propertyExpr = firstExpr as PropertyExpression;
+				this._emitter._getExpressionEmitterFor(propertyExpr.getExpr()).emit(0);
 				this._emitter._emit(", ", this._expr.getToken());
-				this._emitter._emit(Util.encodeStringLiteral((firstExpr as PropertyExpression).getIdentifierToken().getValue()), (firstExpr as PropertyExpression).getIdentifierToken());
+				var name : string;
+				if (propertyExpr.getExpr() instanceof ClassExpression) {
+					var classDef = propertyExpr.getHolderType().getClassDef();
+					name = classDef.getOutputClassName() + "." + this._emitter.getNamer().getNameOfStaticVariable(classDef, propertyExpr.getIdentifierToken().getValue());
+				} else {
+					name = this._emitter.getNamer().getNameOfProperty(propertyExpr.getHolderType().getClassDef(), propertyExpr.getIdentifierToken().getValue());
+				}
+				this._emitter._emit(Util.encodeStringLiteral(name), propertyExpr.getIdentifierToken());
 			} else {
 				this._emitter._getExpressionEmitterFor((firstExpr as ArrayExpression).getFirstExpr()).emit(0);
 				this._emitter._emit(", ", this._expr.getToken());
@@ -1934,9 +2043,7 @@ class _SuperExpressionEmitter extends _OperatorExpressionEmitter {
 		var classDef = funcType.getObjectType().getClassDef();
 		var methodName = this._expr.getName().getValue();
 		var argTypes = funcType.getArgumentTypes();
-		var mangledFuncName = this._emitter.getMangler().requiresMangling(classDef, methodName, argTypes, false)
-			? this._emitter.getMangler().mangleFunctionName(this._expr.getName().getValue(), argTypes)
-			: methodName;
+		var mangledFuncName = this._emitter.getNamer().getNameOfMethod(classDef, methodName, argTypes);
 		this._emitter._emitCallArguments(this._expr.getToken(), classDef.getOutputClassName() + ".prototype." + mangledFuncName + ".call(this", this._expr.getArguments(), argTypes);
 	}
 
@@ -1988,7 +2095,7 @@ class _NewExpressionEmitter extends _OperatorExpressionEmitter {
 		} else {
 			this._emitter._emitCallArguments(
 				this._expr.getToken(),
-				"new " + this._emitter.getMangler().mangleConstructorName(classDef, argTypes) + "(",
+				"new " + this._emitter.getNamer().getNameOfConstructor(classDef, argTypes) + "(",
 				this._expr.getArguments(),
 				argTypes);
 		}
@@ -2002,7 +2109,7 @@ class _NewExpressionEmitter extends _OperatorExpressionEmitter {
 				if (propertyIndex != 0) {
 					this._emitter._emit(", ", this._expr.getToken());
 				}
-				this._emitter._emit(member.name() + ": ", this._expr.getToken());
+				this._emitter._emit(this._emitter.getNamer().getNameOfProperty(classDef, member.name()) + ": ", this._expr.getToken());
 				this._emitter._getExpressionEmitterFor(propertyExprs[propertyIndex++]).emit(_AssignmentExpressionEmitter._operatorPrecedence["="]);
 			}
 			return true;
@@ -2079,25 +2186,14 @@ class JavaScriptEmitter implements Emitter {
 
 	var _enableSourceMap : boolean;
 	var _enableProfiler : boolean;
+	var _enableMinifier : boolean;
 	var _sourceMapper : SourceMapper;
 	var _mangler = new _Mangler();
+	var _namer : _Namer;
 
 	function constructor (platform : Platform) {
 		JavaScriptEmitter._initialize();
-
 		this._platform = platform;
-		this._output = "";
-		this._outputEndsWithReturn = true;
-		this._outputFile = null;
-		this._indent = 0;
-		this._emittingClass = null;
-		this._emittingFunction = null;
-		this._emittingStatementStack = new _StatementEmitter[];
-		this._enableRunTimeTypeCheck = true;
-
-		// headers
-		this._output += "// generatedy by JSX compiler " + Meta.IDENTIFIER + "\n";
-		this._output += this._fileHeader;
 	}
 
 	function isJsModule(classDef : ClassDefinition) : boolean {
@@ -2105,7 +2201,6 @@ class JavaScriptEmitter implements Emitter {
 			&& classDef.getToken().getFilename() == Util.resolvePath(this._platform.getRoot() + "/lib/js/js.jsx");
 
 	}
-
 
 	override function getSearchPaths () : string[] {
 		return [ this._platform.getRoot() + "/lib/js" ];
@@ -2148,6 +2243,10 @@ class JavaScriptEmitter implements Emitter {
 		return this._mangler;
 	}
 
+	function getNamer() : _Namer {
+		return this._namer;
+	}
+
 	override function setEnableRunTimeTypeCheck (enable : boolean) : void {
 		this._enableRunTimeTypeCheck = enable;
 	}
@@ -2160,16 +2259,43 @@ class JavaScriptEmitter implements Emitter {
 		this._enableProfiler = enable;
 	}
 
+	override function setEnableMinifier(enable : boolean) : void {
+		this._enableMinifier = enable;
+	}
+
 	override function addHeader (header : string) : void {
 		this._output = header + this._output;
 	}
 
 	override function emit (classDefs : ClassDefinition[]) : void {
-		var bootstrap = this._platform.load(this._platform.getRoot() + "/src/js/bootstrap.js");
-		this._output += bootstrap;
+		this._emitInit();
+
+		this._namer = new _Namer(this); // FIXME use minifying namer
+		this._emitCore(classDefs);
+
+		this._emitClassMap(classDefs);
+	}
+
+	function _emitInit() : void {
+		this._output = "";
+		this._outputEndsWithReturn = true;
+		this._outputFile = null;
+		this._indent = 0;
+		this._emittingClass = null;
+		this._emittingFunction = null;
+		this._emittingStatementStack = new _StatementEmitter[];
+		this._enableRunTimeTypeCheck = true;
+
+		// headers
+		this._output += "// generatedy by JSX compiler " + Meta.IDENTIFIER + "\n";
+		this._output += this._fileHeader;
+		this._output += this._platform.load(this._platform.getRoot() + "/src/js/bootstrap.js");
+
 		var stash = (this.getOptimizerStash()[_NoDebugCommand.IDENTIFIER] as _NoDebugCommand.Stash);
 		this._emit("JSX.DEBUG = "+(stash == null || stash.debugValue ? "true" : "false")+";\n", null);
+	}
 
+	function _emitCore(classDefs : ClassDefinition[]) : void {
 		for (var i = 0; i < classDefs.length; ++i) {
 			classDefs[i].forEachMemberFunction(function onFuncDef(funcDef : MemberFunctionDefinition) : boolean {
 				funcDef.forEachClosure(onFuncDef);
@@ -2183,7 +2309,6 @@ class JavaScriptEmitter implements Emitter {
 		}
 		for (var i = 0; i < classDefs.length; ++i)
 			this._emitStaticInitializationCode(classDefs[i]);
-		this._emitClassMap(classDefs);
 	}
 
 	// reuse of optimizer stash
@@ -2278,13 +2403,13 @@ class JavaScriptEmitter implements Emitter {
 	}
 
 	function _emitStaticInitializationCode (classDef : ClassDefinition) : void {
-		if ((classDef.flags() & ClassDefinition.IS_NATIVE) != 0)
-			return;
 		// special handling for js.jsx
 		if (this.isJsModule(classDef)) {
-			this._emit("js.global = (function () { return this; })();\n", null);
+			this._emit("var js = { global: function () { return this; }() };\n", null);
 			return;
 		}
+		if ((classDef.flags() & ClassDefinition.IS_NATIVE) != 0)
+			return;
 		// normal handling
 		var members = classDef.members();
 		// FIXME can we (should we?) automatically resolve dependencies? isn't it impossible?
@@ -2397,7 +2522,7 @@ class JavaScriptEmitter implements Emitter {
 	}
 
 	function _emitConstructor (funcDef : MemberFunctionDefinition) : void {
-		var funcName = this._mangler.mangleConstructorName(funcDef.getClassDef(), funcDef.getArgumentTypes());
+		var funcName = this._namer.getNameOfConstructor(funcDef.getClassDef(), funcDef.getArgumentTypes());
 
 		// emit prologue
 		this._emit("/**\n", null);
@@ -2418,16 +2543,15 @@ class JavaScriptEmitter implements Emitter {
 	}
 
 	function _emitFunction (funcDef : MemberFunctionDefinition) : void {
-		var className = funcDef.getClassDef().getOutputClassName();
-		var funcName = this._mangler.requiresMangling(funcDef) ? this._mangler.mangleFunctionName(funcDef.name(), funcDef.getArgumentTypes()) : funcDef.name();
+		var isStatic = (funcDef.flags() & ClassDefinition.IS_STATIC) != 0;
+		var funcName = isStatic
+			? this._namer.getNameOfStaticFunction(funcDef.getClassDef(), funcDef.name(), funcDef.getArgumentTypes(), false)
+			: funcDef.getClassDef().getOutputClassName() + ".prototype." + this._namer.getNameOfMethod(funcDef.getClassDef(), funcDef.name(), funcDef.getArgumentTypes());
 		// emit
 		this._emit("/**\n", null);
 		this._emitFunctionArgumentAnnotations(funcDef);
 		this._emit(_TypeAnnotation.build(" * @return {%1}\n", funcDef.getReturnType()), null);
 		this._emit(" */\n", null);
-		this._emit(className + ".", null);
-		if ((funcDef.flags() & ClassDefinition.IS_STATIC) == 0)
-			this._emit("prototype.", null);
 		this._emit(funcName + " = ", funcDef.getNameToken());
 		this._emit("function (", funcDef.getToken());
 		this._emitFunctionArguments(funcDef);
@@ -2436,8 +2560,12 @@ class JavaScriptEmitter implements Emitter {
 		this._emitFunctionBody(funcDef);
 		this._reduceIndent();
 		this._emit("};\n\n", null);
-		if ((funcDef.flags() & ClassDefinition.IS_STATIC) != 0)
-			this._emit("var " + className + "$" + funcName + " = " + className + "." + funcName + ";\n\n", null);
+		if (isStatic) {
+			var directForm = this._namer.getNameOfStaticFunction(funcDef.getClassDef(), funcDef.name(), funcDef.getArgumentTypes(), true);
+			if (funcName != directForm) {
+				this._emit("var " + directForm + " = " + funcName + ";\n\n", null);
+			}
+		}
 	}
 
 	function _emitFunctionArgumentAnnotations (funcDef : MemberFunctionDefinition) : void {
@@ -2451,8 +2579,7 @@ class JavaScriptEmitter implements Emitter {
 		for (var i = 0; i < args.length; ++i) {
 			if (i != 0)
 				this._emit(", ", null);
-			var name = args[i].getName();
-			this._emit(name.getValue(), name);
+			this._emit(this._namer.getNameOfLocalVariable(args[i]), args[i].getName());
 		}
 	}
 
@@ -2485,9 +2612,8 @@ class JavaScriptEmitter implements Emitter {
 				if (type == null)
 					continue;
 				this._emit(_TypeAnnotation.build("/** @type {%1} */\n", type), null);
-				var name = locals[i].getName();
 				// do not pass the token for declaration
-				this._emit("var " + name.getValue() + ";\n", null);
+				this._emit("var " + this._namer.getNameOfLocalVariable(locals[i]) + ";\n", null);
 			}
 			// emit code
 			var statements = funcDef.getStatements();
@@ -2515,7 +2641,7 @@ class JavaScriptEmitter implements Emitter {
 				|| initialValue instanceof StringLiteralExpression
 				|| initialValue instanceof RegExpLiteralExpression)) {
 			// use deferred initialization
-			this._emit("$__jsx_lazy_init(" + holder + ", \"" + variable.name() + "\", function () {\n", variable.getNameToken());
+			this._emit("$__jsx_lazy_init(" + holder + ", \"" + this._namer.getNameOfStaticVariable(variable.getClassDef(), variable.name()) + "\", function () {\n", variable.getNameToken());
 			this._advanceIndent();
 			this._emit("return ", variable.getNameToken());
 			this._emitRHSOfAssignment(initialValue, variable.getType());
@@ -2523,7 +2649,7 @@ class JavaScriptEmitter implements Emitter {
 			this._reduceIndent();
 			this._emit("});\n", variable.getNameToken());
 		} else {
-			this._emit(holder + "." + variable.name() + " = ", variable.getNameToken());
+			this._emit(holder + "." + this._namer.getNameOfStaticVariable(variable.getClassDef(), variable.name()) + " = ", variable.getNameToken());
 			this._emitRHSOfAssignment(initialValue, variable.getType());
 			this._emit(";\n", initialValue.getToken());
 		}
