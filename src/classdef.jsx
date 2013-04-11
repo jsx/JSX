@@ -148,6 +148,7 @@ class ClassDefinition implements Stashable {
 	static const IS_INLINE = 1024;
 	static const IS_PURE = 2048; // constexpr (intended for for native functions)
 	static const IS_DELETE = 4096; // used for disabling the default constructor
+	static const IS_GENERATOR = 8192;
 
 	var _parser		: Parser;
 	var _token		: Token;
@@ -1355,7 +1356,7 @@ class MemberFunctionDefinition extends MemberDefinition implements Block {
 			for (var i = 0; i < this._statements.length; ++i)
 				if (! this._statements[i].analyze(context))
 					break;
-			if (! this._returnType.equals(Type.voidType) && context.getTopBlock().localVariableStatuses != null)
+			if ((this._flags & ClassDefinition.IS_GENERATOR) == 0 && ! this._returnType.equals(Type.voidType) && context.getTopBlock().localVariableStatuses != null)
 				context.errors.push(new CompileError(this._lastTokenOfBody, "missing return statement"));
 
 			if (this.getNameToken() != null && this.name() == "constructor") {
@@ -1371,6 +1372,11 @@ class MemberFunctionDefinition extends MemberDefinition implements Block {
 	function _fixupConstructor (context : AnalysisContext) : void {
 		var success = true;
 		var isAlternate = false;
+
+		if ((this._flags & ClassDefinition.IS_GENERATOR) != 0) {
+			context.errors.push(new CompileError(this._token, "constructor must not be a generator"));
+			return;
+		}
 
 		// make implicit calls to default constructor explicit as well as checking the invocation order
 		var stmtIndex = 0;
