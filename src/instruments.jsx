@@ -336,7 +336,7 @@ class _ForStatementTransformer extends _LabellableStatementTransformer {
 		goto $POST_FOR_n;
 	$POST_FOR_n:
 		post;
-		goto $BODY_FOR_n;
+		goto $TEST_FOR_n;
 	$END_FOR_n:
 
 		*/
@@ -359,7 +359,7 @@ class _ForStatementTransformer extends _LabellableStatementTransformer {
 		statements.push(new GotoStatement(postLabel));
 		statements.push(new LabelStatement(postLabel));
 		this._transformer.pushExpressionStatement(this._statement.getPostExpr(), statements);
-		statements.push(new GotoStatement(bodyLabel));
+		statements.push(new GotoStatement(testLabel));
 		statements.push(new LabelStatement(endLabel));
 		return statements;
 	}
