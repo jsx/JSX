@@ -372,7 +372,11 @@ class _MinifyingNamer extends _Namer {
 	}
 
 	override function getNameOfLocalVariable(local : LocalVariable) : string {
-		return this._getStash(local).minifiedName;
+		var minifiedName = this._getStash(local).minifiedName;
+		if (minifiedName == null) {
+			throw new Error("no minified name for " + local.getName().getValue());
+		}
+		return minifiedName;
 	}
 
 	function _countAccess(classDefs : ClassDefinition[]) : void {
@@ -388,12 +392,20 @@ class _MinifyingNamer extends _Namer {
 					usedClassesAndStaticFunctions[classDef.getOutputClassName()] = true;
 				}
 			}
+			function onInnerFunction(inner : MemberFunctionDefinition) : void {
+				onFunction(inner);
+				for (var k in this._getStash(inner).usedClassesAndStaticFunctions) {
+					usedClassesAndStaticFunctions[k] = true;
+				}
+			}
 			funcDef.forEachStatement(function onStmt(statement) {
 				if (statement instanceof CatchStatement) {
 					var caughtType = (statement as CatchStatement).getLocal().getType();
 					if (caughtType instanceof ObjectType) {
 						markUseOfClass(caughtType.getClassDef());
 					}
+				} else if (statement instanceof FunctionStatement) {
+					onInnerFunction((statement as FunctionStatement).getFuncDef());
 				}
 				statement.forEachExpression(function onExpr(expr) {
 					if (expr instanceof PropertyExpression) {
@@ -441,11 +453,7 @@ class _MinifyingNamer extends _Namer {
 					} else if (expr instanceof LocalExpression) {
 						++this._getStash((expr as LocalExpression).getLocal()).useCount;
 					} else if (expr instanceof FunctionExpression) {
-						var innerFuncDef = (expr as FunctionExpression).getFuncDef();
-						onFunction(innerFuncDef);
-						for (var k in this._getStash(innerFuncDef).usedClassesAndStaticFunctions) {
-							usedClassesAndStaticFunctions[k] = true;
-						}
+						onInnerFunction((expr as FunctionExpression).getFuncDef());
 					}
 					return expr.forEachExpression(onExpr);
 				});
@@ -561,11 +569,18 @@ class _MinifyingNamer extends _Namer {
 	}
 
 	function _minifyLocals(classDefs : ClassDefinition[]) : void {
+		function forEachLocal(funcDef : MemberFunctionDefinition, cb : function (:LocalVariable) : void) : void {
+			if (funcDef.getFuncLocal() != null) {
+				cb(funcDef.getFuncLocal());
+			}
+			funcDef.getArguments().forEach(function (arg) { cb(arg); });
+			funcDef.getLocals().forEach(cb);
+		}
 		function rewriteLocals(funcDef : MemberFunctionDefinition, outerConversionTable : Map.<string>) : void {
 			// TODO remove unused locals / arguments?
 			// build useCount (as a Map), remove keys with same names
 			var useCount = new Map.<number>;
-			Util.forEachArgumentsAndLocals(funcDef, function (local) {
+			forEachLocal(funcDef, function (local) {
 				useCount[local.getName().getValue()] = this._getStash(local).useCount;
 				delete outerConversionTable[local.getName().getValue()];
 			});
@@ -592,7 +607,7 @@ class _MinifyingNamer extends _Namer {
 						})()
 					)));
 			// save the mapping
-			Util.forEachArgumentsAndLocals(funcDef, function (local) {
+			forEachLocal(funcDef, function (local) {
 				var name = local.getName().getValue();
 				assert conversionTable.hasOwnProperty(name);
 				this._log("  " + name + " => " + conversionTable[name]);
@@ -605,6 +620,9 @@ class _MinifyingNamer extends _Namer {
 				}
 			}
 			funcDef.forEachStatement(function onStmt(stmt) {
+				if (stmt instanceof FunctionStatement) {
+					rewriteLocals((stmt as FunctionStatement).getFuncDef(), conversionTable);
+				}
 				stmt.forEachExpression(function onExpr(expr) {
 					if (expr instanceof FunctionExpression) {
 						rewriteLocals((expr as FunctionExpression).getFuncDef(), conversionTable);
@@ -750,7 +768,8 @@ class _FunctionStatementEmitter extends _StatementEmitter {
 
 	override function emit () : void {
 		var funcDef = this._statement.getFuncDef();
-		this._emitter._emit("function " + (funcDef.getNameToken() != null ? funcDef.name() : "") + "(", funcDef.getToken());
+		assert funcDef.getFuncLocal() != null;
+		this._emitter._emit("function " + this._emitter.getNamer().getNameOfLocalVariable(funcDef.getFuncLocal()) + "(", funcDef.getToken());
 		var args = funcDef.getArguments();
 		for (var i = 0; i < args.length; ++i) {
 			if (i != 0)
@@ -1880,7 +1899,7 @@ class _FunctionExpressionEmitter extends _OperatorExpressionEmitter {
 	override function _emit () : void {
 		var funcDef = this._expr.getFuncDef();
 		this._emitter._emit("(", funcDef.getToken());
-		this._emitter._emit("function " + (funcDef.getNameToken() != null ? funcDef.name() : "") + "(", funcDef.getToken());
+		this._emitter._emit("function " + (funcDef.getFuncLocal() != null ? this._emitter.getNamer().getNameOfLocalVariable(funcDef.getFuncLocal()) : "") + "(", funcDef.getToken());
 		var args = funcDef.getArguments();
 		for (var i = 0; i < args.length; ++i) {
 			if (i != 0)
