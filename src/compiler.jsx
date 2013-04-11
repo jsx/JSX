@@ -52,7 +52,7 @@ class Compiler {
 		this._mode = Compiler.MODE_COMPILE;
 		this._optimizer = null;
 		this._warningFilters = [] : Array.<function(:CompileWarning):Nullable.<boolean>>;
-		this._parsers = [] : Parser[];
+		this._parsers = new Parser[];
 		this._fileCache = new Map.<string>;
 		this._searchPaths = [ this._platform.getRoot() + "/lib/common" ];
 		// load the built-in classes
@@ -338,7 +338,7 @@ class Compiler {
 		}
 		// reorder the classDefs so that base classes would come before their children
 		var getMaxIndexOfClasses = function (deps : ClassDefinition[]) : number {
-			deps = deps.concat(new ClassDefinition[]); // clone the array
+			deps = deps.concat([]); // clone the array
 			if (deps.length == 0)
 				return -1;
 			for (var i = 0; i < classDefs.length; ++i) {
@@ -353,7 +353,7 @@ class Compiler {
 			throw new Error("logic flaw, could not find class definition of '" + deps[0].className() + "'");
 		};
 		for (var i = 0; i < classDefs.length;) {
-			var deps = classDefs[i].implementTypes().map.<ClassDefinition>(function (t) { return t.getClassDef(); }).concat(new ClassDefinition[]);
+			var deps = classDefs[i].implementTypes().map.<ClassDefinition>(function (t) { return t.getClassDef(); }).concat([]);
 			if (classDefs[i].extendType() != null)
 				deps.unshift(classDefs[i].extendType().getClassDef());
 			if (classDefs[i].getOuterClassDef() != null)
