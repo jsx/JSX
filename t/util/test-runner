@@ -37,6 +37,9 @@ sub main {
     elsif($file =~ m{ /run/ }xms) {
         compile_and_run($file);
     }
+    elsif($file =~ m{ /generator/ }xms) {
+        compile_and_run($file);
+    }
     elsif($file =~ m{ /compile_error/ }xms) {
         expect_compile_error($file);
     }
