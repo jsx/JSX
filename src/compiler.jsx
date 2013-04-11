@@ -28,6 +28,7 @@ import "./platform.jsx";
 import "./util.jsx";
 import "./optimizer.jsx";
 import "./completion.jsx";
+import "./instruments.jsx";
 
 
 class Compiler {
@@ -140,6 +141,11 @@ class Compiler {
 		NumberType._classDef = builtins.lookup(errors, null, "Number");
 		StringType._classDef = builtins.lookup(errors, null, "String");
 		FunctionType._classDef = builtins.lookup(errors, null, "Function");
+		// prepare generator stuff
+		CodeTransformer.stopIterationType = new ObjectType(builtins.lookup(errors, null, "StopIteration"));
+		for (var i = 0; i < builtins._templateClassDefs.length; ++i)
+			if (builtins._templateClassDefs[i].className() == "__jsx_generator")
+				CodeTransformer.jsxGeneratorClassDef = builtins._templateClassDefs[i];
 		if (! this._handleErrors(errors))
 			return false;
 		// semantic analysis
@@ -155,6 +161,16 @@ class Compiler {
 		case Compiler.MODE_DOC:
 			return true;
 		}
+		// transformation
+		var transformer = new CodeTransformer;
+		this.forEachClassDef(function (parser, classDef) {
+			return classDef.forEachMemberFunction(function onFuncDef (funcDef) {
+				if ((funcDef.flags() & ClassDefinition.IS_GENERATOR) != 0) {
+					transformer.transformFunctionDefinition(funcDef);
+				}
+				return funcDef.forEachClosure(onFuncDef);
+			});
+		});
 		// optimization
 		this._optimize();
 		// TODO peep-hole and dead store optimizations, etc.
