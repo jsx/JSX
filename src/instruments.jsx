@@ -1090,6 +1090,8 @@ class CodeTransformer {
 
 		var genLocalName = "$generator" + CodeTransformer._calcGeneratorNestDepth(funcDef) as string;
 		var genLocal = new LocalVariable(new Token(genLocalName, false), genType);
+		funcDef.getLocals().push(genLocal);
+
 		var newExpr = new NewExpression(new Token("new", false), genType, []);
 		newExpr.analyze(new AnalysisContext([], null, null), null);
 		funcDef.getStatements().unshift(new ExpressionStatement(
