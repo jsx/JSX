@@ -288,6 +288,7 @@ class _Minifier {
 	}
 
 	var _emitter : JavaScriptEmitter;
+	var _classDefs : ClassDefinition[];
 
 	var _propertyUseCount = new Map.<number>();
 	var _propertyConversionTable : Map.<string>;
@@ -350,11 +351,32 @@ class _Minifier {
 	}
 
 	class _MinifyingNamer extends _Minifier._BaseNamer {
-		// TODO
+		override function getNameOfProperty(classDef : ClassDefinition, name : string) : string {
+			if (Util.memberRootIsNative(classDef, name, null, false)) {
+				return name;
+			}
+			if (! this._minifier._propertyConversionTable.hasOwnProperty(name)) {
+				// TODO return null, and support removing unused properties
+				return name;
+			}
+			return this._minifier._propertyConversionTable[name];
+		}
+		override function getNameOfMethod(classDef : ClassDefinition, name : string, argTypes : Type[]) : string {
+			if (Util.memberRootIsNative(classDef, name, argTypes, false)) {
+				return name;
+			}
+			var mangledName = this._getMangler().mangleFunctionName(name, argTypes);
+			if (! this._minifier._propertyConversionTable.hasOwnProperty(mangledName)) {
+				// TODO return null, and support removing unused properties
+				return mangledName;
+			}
+			return this._minifier._propertyConversionTable[mangledName];
+		}
 	}
 
-	function constructor(emitter : JavaScriptEmitter) {
+	function constructor(emitter : JavaScriptEmitter, classDefs : ClassDefinition[]) {
 		this._emitter = emitter;
+		this._classDefs = classDefs;
 	}
 
 	function getCountingNamer() : _Namer {
@@ -362,7 +384,60 @@ class _Minifier {
 	}
 
 	function getMinifyingNamer() : _Namer {
+		// build minification table
+		this._minifyProperties();
 		return (new _Minifier._MinifyingNamer).setup(this);
+	}
+
+	function _minifyProperties() : void {
+		this._log("minifying properties");
+		this._propertyConversionTable = _Minifier._buildConversionTable(
+			this._propertyUseCount,
+			new _MinifiedNameGenerator(
+				([] : string[]).concat(
+					_MinifiedNameGenerator.KEYWORDS,
+					(function () : string[] {
+						var nativePropertyNames = new Map.<boolean>;
+						this._classDefs.forEach(function (classDef) {
+							classDef.forEachMember(function (member) {
+								if ((member.flags() & ClassDefinition.IS_STATIC) == 0
+									&& ((member.flags() | classDef.flags()) & ClassDefinition.IS_NATIVE) != 0) {
+									nativePropertyNames[member.name()] = true;
+								}
+								return true;
+							});
+						});
+						return nativePropertyNames.keys();
+					})()
+				)));
+		for (var k in this._propertyConversionTable) {
+			this._log(" " + k + " => " + this._propertyConversionTable[k]);
+		}
+	}
+
+	function _log(message : string) : void {
+		// log message;
+	}
+
+	static function _buildConversionTable(useCount : Map.<number>, nameGenerator : _MinifiedNameGenerator) : Map.<string> {
+		// sort property names by use count (in descending order)
+		var propertyNames = useCount.keys().sort(function (x, y) {
+			var delta = useCount[y] - useCount[x];
+			if (delta != 0) {
+				return delta;
+			}
+			if (x < y) {
+				return -1;
+			} else {
+				return 1;
+			}
+		});
+		// build conversion map
+		var conversionTable = new Map.<string>();
+		for (var i = 0; i < propertyNames.length; ++i) {
+			conversionTable[propertyNames[i]] = nameGenerator.get(i);
+		}
+		return conversionTable;
 	}
 
 	static function _getStash(classDef : ClassDefinition) : _Minifier._ClassDefStash {
@@ -2418,7 +2493,7 @@ class JavaScriptEmitter implements Emitter {
 	override function emit (classDefs : ClassDefinition[]) : void {
 
 		if (this._enableMinifier) {
-			var minifier = new _Minifier(this);
+			var minifier = new _Minifier(this, classDefs);
 			// emit using counting namer to collect stats for minification
 			this._namer = minifier.getCountingNamer();
 			this._emitInit();
