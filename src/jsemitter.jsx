@@ -295,9 +295,9 @@ class _Minifier {
 	var _globalUseCount = new Map.<number>();
 	var _globalConversionTable : Map.<string>;
 
-	class _BaseNamer extends _Namer {
+	class _MinifyingNamer extends _Namer {
 		var _minifier : _Minifier;
-		function setup(minifier : _Minifier) : _Minifier._BaseNamer {
+		function setup(minifier : _Minifier) : _Minifier._MinifyingNamer {
 			this._minifier = minifier;
 			super.setup(minifier._emitter);
 			return this;
@@ -305,14 +305,18 @@ class _Minifier {
 		function _getMangler() : _Mangler {
 			return this._minifier._emitter.getMangler();
 		}
-	}
-
-	class _CountingNamer extends _Minifier._BaseNamer {
+		function _isCounting() : boolean {
+			return this._minifier._propertyConversionTable == null;
+		}
 		override function getNameOfProperty(classDef : ClassDefinition, name : string) : string {
 			if (Util.memberRootIsNative(classDef, name, null, false)) {
 				return name;
 			}
-			_Minifier._incr(this._minifier._propertyUseCount, name);
+			if (this._isCounting()) {
+				_Minifier._incr(this._minifier._propertyUseCount, name);
+			} else {
+				name = this._minifier._propertyConversionTable[name];
+			}
 			return name;
 		}
 		override function getNameOfMethod(classDef : ClassDefinition, name : string, argTypes : Type[]) : string {
@@ -320,11 +324,22 @@ class _Minifier {
 				return name;
 			}
 			var mangledName = this._getMangler().mangleFunctionName(name, argTypes);
-			_Minifier._incr(this._minifier._propertyUseCount, mangledName);
+			if (this._isCounting()) {
+				_Minifier._incr(this._minifier._propertyUseCount, mangledName);
+			} else {
+				mangledName = this._minifier._propertyConversionTable[mangledName];
+			}
 			return mangledName;
 		}
 		override function getNameOfStaticVariable(classDef : ClassDefinition, name : string) : string {
-			_Minifier._incr(_Minifier._getStash(classDef).staticVariableUseCount, name);
+			if (Util.memberRootIsNative(classDef, name, null, true)) {
+				return name;
+			}
+			if (this._isCounting()) {
+				_Minifier._incr(_Minifier._getStash(classDef).staticVariableUseCount, name);
+			} else {
+				name = _Minifier._getStash(classDef).staticVariableConversionTable[name];
+			}
 			return name;
 		}
 		override function getNameOfStaticFunction(classDef : ClassDefinition, name : string, argTypes : Type[]) : string {
@@ -332,7 +347,11 @@ class _Minifier {
 				return classDef.getOutputClassName() + "." + name;
 			}
 			var mangledName = classDef.getOutputClassName() + "$" + this._getMangler().mangleFunctionName(name, argTypes);
-			_Minifier._incr(this._minifier._globalUseCount, mangledName);
+			if (this._isCounting()) {
+				_Minifier._incr(this._minifier._globalUseCount, mangledName);
+			} else {
+				mangledName = this._minifier._globalConversionTable[mangledName];
+			}
 			return mangledName;
 		}
 		override function getNameOfConstructor(classDef : ClassDefinition, argTypes : Type[]) : string {
@@ -340,73 +359,28 @@ class _Minifier {
 				return this._getNameOfNativeConstructor(classDef);
 			}
 			var mangledName = classDef.getOutputClassName() + this._getMangler().mangleFunctionArguments(argTypes);
-			_Minifier._incr(this._minifier._globalUseCount, mangledName);
+			if (this._isCounting()) {
+				_Minifier._incr(this._minifier._globalUseCount, mangledName);
+			} else {
+				mangledName = this._minifier._globalConversionTable[mangledName];
+			}
 			return mangledName;
 		}
 		override function getNameOfClass(classDef : ClassDefinition) : string {
+			var name = classDef.getOutputClassName();
 			if ((classDef.flags() & (ClassDefinition.IS_NATIVE | ClassDefinition.IS_FAKE)) != 0) {
-				return classDef.getOutputClassName();
+				return name;
 			}
-			_Minifier._incr(this._minifier._globalUseCount, classDef.getOutputClassName());
-			return classDef.getOutputClassName();
+			if (this._isCounting()) {
+				_Minifier._incr(this._minifier._globalUseCount, name);
+			} else {
+				name = this._minifier._globalConversionTable[name];
+			}
+			return name;
 		}
 		override function getNameOfLocalVariable(local : LocalVariable) : string {
 			++_Minifier._getStash(local).useCount;
 			return local.getName().getValue();
-		}
-	}
-
-	class _MinifyingNamer extends _Minifier._BaseNamer {
-		override function getNameOfProperty(classDef : ClassDefinition, name : string) : string {
-			if (Util.memberRootIsNative(classDef, name, null, false)) {
-				return name;
-			}
-			if (! this._minifier._propertyConversionTable.hasOwnProperty(name)) {
-				// TODO return null, and support removing unused properties
-				return name;
-			}
-			return this._minifier._propertyConversionTable[name];
-		}
-		override function getNameOfMethod(classDef : ClassDefinition, name : string, argTypes : Type[]) : string {
-			if (Util.memberRootIsNative(classDef, name, argTypes, false)) {
-				return name;
-			}
-			var mangledName = this._getMangler().mangleFunctionName(name, argTypes);
-			if (! this._minifier._propertyConversionTable.hasOwnProperty(mangledName)) {
-				// TODO return null, and support removing unused properties
-				return mangledName;
-			}
-			return this._minifier._propertyConversionTable[mangledName];
-		}
-		override function getNameOfStaticVariable(classDef : ClassDefinition, name : string) : string {
-			var conversionTable = _Minifier._getStash(classDef).staticVariableConversionTable;
-			if (! conversionTable.hasOwnProperty(name)) {
-				return name;
-			}
-			return conversionTable[name];
-		}
-		override function getNameOfStaticFunction(classDef : ClassDefinition, name : string, argTypes : Type[]) : string {
-			if (Util.memberRootIsNative(classDef, name, argTypes, true)) {
-				return classDef.getOutputClassName() + "." + name;
-			}
-			var mangledName = classDef.getOutputClassName() + "$" + this._getMangler().mangleFunctionName(name, argTypes);
-			assert this._minifier._globalConversionTable.hasOwnProperty(mangledName);
-			return this._minifier._globalConversionTable[mangledName];
-		}
-		override function getNameOfConstructor(classDef : ClassDefinition, argTypes : Type[]) : string {
-			if ((classDef.flags() & ClassDefinition.IS_NATIVE) != 0) {
-				return this._getNameOfNativeConstructor(classDef);
-			}
-			var mangledName = classDef.getOutputClassName() + this._getMangler().mangleFunctionArguments(argTypes);
-			assert this._minifier._globalConversionTable.hasOwnProperty(mangledName);
-			return this._minifier._globalConversionTable[mangledName];
-		}
-		override function getNameOfClass(classDef : ClassDefinition) : string {
-			if ((classDef.flags() & (ClassDefinition.IS_NATIVE | ClassDefinition.IS_FAKE)) != 0) {
-				return classDef.getOutputClassName();
-			}
-			assert this._minifier._globalConversionTable.hasOwnProperty(classDef.getOutputClassName());
-			return this._minifier._globalConversionTable[classDef.getOutputClassName()];
 		}
 	}
 
@@ -416,7 +390,8 @@ class _Minifier {
 	}
 
 	function getCountingNamer() : _Namer {
-		return (new _Minifier._CountingNamer).setup(this);
+		assert this._propertyConversionTable == null;
+		return (new _Minifier._MinifyingNamer).setup(this);
 	}
 
 	function getMinifyingNamer() : _Namer {
