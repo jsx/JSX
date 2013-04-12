@@ -372,6 +372,13 @@ class _Minifier {
 			}
 			return this._minifier._propertyConversionTable[mangledName];
 		}
+		override function getNameOfStaticVariable(classDef : ClassDefinition, name : string) : string {
+			var conversionTable = _Minifier._getStash(classDef).staticVariableConversionTable;
+			if (! conversionTable.hasOwnProperty(name)) {
+				return name;
+			}
+			return conversionTable[name];
+		}
 	}
 
 	function constructor(emitter : JavaScriptEmitter, classDefs : ClassDefinition[]) {
@@ -384,8 +391,10 @@ class _Minifier {
 	}
 
 	function getMinifyingNamer() : _Namer {
-		// build minification table
+		// build minification tables
 		this._minifyProperties();
+		this._minifyStaticVariables();
+		// and return
 		return (new _Minifier._MinifyingNamer).setup(this);
 	}
 
@@ -413,6 +422,16 @@ class _Minifier {
 		for (var k in this._propertyConversionTable) {
 			this._log(" " + k + " => " + this._propertyConversionTable[k]);
 		}
+	}
+
+	function _minifyStaticVariables() : void {
+		this._log("minifying static variables");
+		this._classDefs.forEach(function (classDef) {
+			if ((classDef.flags() & (ClassDefinition.IS_NATIVE | ClassDefinition.IS_FAKE)) == 0) {
+				var stash = _Minifier._getStash(classDef);
+				stash.staticVariableConversionTable = _Minifier._buildConversionTable(stash.staticVariableUseCount, new _MinifiedNameGenerator(_MinifiedNameGenerator.KEYWORDS));
+			}
+		});
 	}
 
 	function _log(message : string) : void {
