@@ -157,6 +157,10 @@ class _Namer {
 		return classDef.getOutputClassName();
 	}
 
+	function enterFunction(funcDef : MemberFunctionDefinition, cb : function () : void) : void {
+		cb();
+	}
+
 	function getNameOfLocalVariable(local : LocalVariable) : string {
 		return local.getName().getValue();
 	}
@@ -214,34 +218,29 @@ class _MinifiedNameGenerator {
 
 class _Minifier {
 
-	static const IDENTIFIER = "minifier";
+	static const CLASSSTASH_IDENTIFIER = "minifier.class";
+	static const SCOPESTASH_IDENTIFIER = "minifier.scope";
+	static const LOCALSTASH_IDENTIFIER = "minifier.local";
 
-	class _ClassDefStash extends OptimizerStash {
-
+	class _ClassStash extends OptimizerStash {
 		var staticVariableUseCount = new Map.<number>;
-
 		var staticVariableConversionTable = new Map.<string>;
-
 		override function clone() : OptimizerStash {
 			throw new Error("operation not supported");
 		}
 	}
 
-	class _FuncDefStash extends OptimizerStash {
-
-		var usedClassesAndStaticFunctions = new Map.<boolean>;
-
+	class _ScopeStash extends OptimizerStash {
+		var usedGlobals = new Map.<boolean>;
+		var usedOuterLocals = new LocalVariable[];
 		override function clone() : OptimizerStash {
 			throw new Error("operation not supported");
 		}
 	}
 
 	class _LocalStash extends OptimizerStash {
-
 		var useCount = 0;
-
 		var minifiedName : Nullable.<string>;
-
 		override function clone() : OptimizerStash {
 			throw new Error("operation not supported");
 		}
@@ -255,6 +254,8 @@ class _Minifier {
 	var _globalUseCount = new Map.<number>();
 	var _globalConversionTable : Map.<string>;
 
+	var _outerLocals = new LocalVariable[];
+
 	class _MinifyingNamer extends _Namer {
 		var _minifier : _Minifier;
 		function setup(minifier : _Minifier) : _Minifier._MinifyingNamer {
@@ -266,7 +267,7 @@ class _Minifier {
 			return this._minifier._emitter.getMangler();
 		}
 		function _isCounting() : boolean {
-			return this._minifier._propertyConversionTable == null;
+			return this._minifier._isCounting();
 		}
 		override function getNameOfProperty(classDef : ClassDefinition, name : string) : string {
 			if (Util.memberRootIsNative(classDef, name, null, false)) {
@@ -296,9 +297,9 @@ class _Minifier {
 				return name;
 			}
 			if (this._isCounting()) {
-				_Minifier._incr(_Minifier._getStash(classDef).staticVariableUseCount, name);
+				_Minifier._incr(_Minifier._getClassStash(classDef).staticVariableUseCount, name);
 			} else {
-				name = _Minifier._getStash(classDef).staticVariableConversionTable[name];
+				name = _Minifier._getClassStash(classDef).staticVariableConversionTable[name];
 			}
 			return name;
 		}
@@ -338,9 +339,27 @@ class _Minifier {
 			}
 			return name;
 		}
+		override function enterFunction(funcDef : MemberFunctionDefinition, cb : function () : void) : void {
+			if (this._isCounting()) {
+				this._minifier._recordUsedIdentifiers(funcDef, function () {
+					this._minifier._outerLocals = this._minifier._outerLocals.concat(_Minifier._getArgsAndLocals(funcDef));
+					cb();
+					this._minifier._outerLocals.length -= funcDef.getArguments().length + funcDef.getLocals().length;
+				});
+			} else {
+				// create conversion table and register
+				this._minifier._buildConversionTable(_Minifier._getArgsAndLocals(funcDef), _Minifier._getScopeStash(funcDef));
+				// doit
+				cb();
+			}
+		}
 		override function getNameOfLocalVariable(local : LocalVariable) : string {
-			++_Minifier._getStash(local).useCount;
-			return local.getName().getValue();
+			if (this._isCounting()) {
+				++_Minifier._getLocalStash(local).useCount;
+				return local.getName().getValue();
+			} else {
+				return _Minifier._getLocalStash(local).minifiedName;
+			}
 		}
 	}
 
@@ -350,7 +369,7 @@ class _Minifier {
 	}
 
 	function getCountingNamer() : _Namer {
-		assert this._propertyConversionTable == null;
+		assert this._isCounting();
 		return (new _Minifier._MinifyingNamer).setup(this);
 	}
 
@@ -361,6 +380,38 @@ class _Minifier {
 		this._minifyGlobals();
 		// and return
 		return (new _Minifier._MinifyingNamer).setup(this);
+	}
+
+	function _isCounting() : boolean {
+		return this._propertyConversionTable == null;
+	}
+
+	function _recordUsedIdentifiers(stashable : Stashable, cb : function () : void) : void {
+		assert this._isCounting();
+		// prepare
+		var globalUseCountBackup = new Map.<number>;
+		for (var k in this._globalUseCount) {
+			globalUseCountBackup[k] = this._globalUseCount[k];
+		}
+		var outerLocalUseCount = new number[];
+		for (var i in this._outerLocals) {
+			outerLocalUseCount[i] = _Minifier._getLocalStash(this._outerLocals[i]).useCount;
+		}
+		// execute
+		cb();
+		assert outerLocalUseCount.length == this._outerLocals.length;
+		// collect and store info
+		var scopeStash = _Minifier._getScopeStash(stashable);
+		for (var k in this._globalUseCount) {
+			if (this._globalUseCount[k] != globalUseCountBackup[k]) {
+				scopeStash.usedGlobals[k] = true;
+			}
+		}
+		for (var i in this._outerLocals) {
+			if (outerLocalUseCount[i] != _Minifier._getLocalStash(this._outerLocals[i]).useCount) {
+				scopeStash.usedOuterLocals.push(this._outerLocals[i]);
+			}
+		}
 	}
 
 	function _minifyProperties() : void {
@@ -393,7 +444,7 @@ class _Minifier {
 		this._log("minifying static variables");
 		this._classDefs.forEach(function (classDef) {
 			if ((classDef.flags() & (ClassDefinition.IS_NATIVE | ClassDefinition.IS_FAKE)) == 0) {
-				var stash = _Minifier._getStash(classDef);
+				var stash = _Minifier._getClassStash(classDef);
 				stash.staticVariableConversionTable = _Minifier._buildConversionTable(stash.staticVariableUseCount, new _MinifiedNameGenerator(_MinifiedNameGenerator.KEYWORDS));
 			}
 		});
@@ -426,6 +477,28 @@ class _Minifier {
 		// log message;
 	}
 
+	function _buildConversionTable(locals : LocalVariable[], scopeStash : _Minifier._ScopeStash) : void {
+		// build useCount
+		var useCount = new Map.<number>;
+		locals.forEach(function (local) {
+			useCount[local.getName().getValue()] = _Minifier._getLocalStash(local).useCount;
+		});
+		// build list of reserved words
+		var reserved = ([] : string[]).concat(_MinifiedNameGenerator.KEYWORDS);
+		for (var k in scopeStash.usedGlobals) {
+			reserved.push(this._globalConversionTable[k]);
+		}
+		for (var i in scopeStash.usedOuterLocals) {
+			reserved.push(_Minifier._getLocalStash(scopeStash.usedOuterLocals[i]).minifiedName);
+		}
+		// doit
+		var conversionTable = _Minifier._buildConversionTable(useCount, new _MinifiedNameGenerator(reserved));
+		// store the result
+		locals.forEach(function (local) {
+			_Minifier._getLocalStash(local).minifiedName = conversionTable[local.getName().getValue()];
+		});
+	}
+
 	static function _buildConversionTable(useCount : Map.<number>, nameGenerator : _MinifiedNameGenerator) : Map.<string> {
 		// sort property names by use count (in descending order)
 		var propertyNames = useCount.keys().sort(function (x, y) {
@@ -447,28 +520,28 @@ class _Minifier {
 		return conversionTable;
 	}
 
-	static function _getStash(classDef : ClassDefinition) : _Minifier._ClassDefStash {
+	static function _getClassStash(classDef : ClassDefinition) : _Minifier._ClassStash {
 		var stash = classDef.getOptimizerStash();
-		if (! stash.hasOwnProperty(_Minifier.IDENTIFIER)) {
-			stash[_Minifier.IDENTIFIER] = new _Minifier._ClassDefStash();
+		if (! stash.hasOwnProperty(_Minifier.CLASSSTASH_IDENTIFIER)) {
+			stash[_Minifier.CLASSSTASH_IDENTIFIER] = new _Minifier._ClassStash();
 		}
-		return stash[_Minifier.IDENTIFIER] as _Minifier._ClassDefStash;
+		return stash[_Minifier.CLASSSTASH_IDENTIFIER] as _Minifier._ClassStash;
 	}
 
-	static function _getStash(funcDef : MemberFunctionDefinition) : _Minifier._FuncDefStash {
-		var stash = funcDef.getOptimizerStash();
-		if(! stash.hasOwnProperty(_Minifier.IDENTIFIER)) {
-			stash[_Minifier.IDENTIFIER] = new _Minifier._FuncDefStash();
+	static function _getScopeStash(stashable : Stashable) : _Minifier._ScopeStash {
+		var stash = stashable.getOptimizerStash();
+		if(! stash.hasOwnProperty(_Minifier.SCOPESTASH_IDENTIFIER)) {
+			stash[_Minifier.SCOPESTASH_IDENTIFIER] = new _Minifier._ScopeStash();
 		}
-		return stash[_Minifier.IDENTIFIER] as _Minifier._FuncDefStash;
+		return stash[_Minifier.SCOPESTASH_IDENTIFIER] as _Minifier._ScopeStash;
 	}
 
-	static function _getStash(local : LocalVariable) : _Minifier._LocalStash {
+	static function _getLocalStash(local : LocalVariable) : _Minifier._LocalStash {
 		var stash = local.getOptimizerStash();
-		if(! stash.hasOwnProperty(_Minifier.IDENTIFIER)) {
-			stash[_Minifier.IDENTIFIER] = new _Minifier._LocalStash();
+		if(! stash.hasOwnProperty(_Minifier.LOCALSTASH_IDENTIFIER)) {
+			stash[_Minifier.LOCALSTASH_IDENTIFIER] = new _Minifier._LocalStash();
 		}
-		return stash[_Minifier.IDENTIFIER] as _Minifier._LocalStash;
+		return stash[_Minifier.LOCALSTASH_IDENTIFIER] as _Minifier._LocalStash;
 	}
 
 	static function _incr(useCount : Map.<number>, name : string) : void {
@@ -477,6 +550,12 @@ class _Minifier {
 		} else {
 			useCount[name] = 1;
 		}
+	}
+
+	static function _getArgsAndLocals(funcDef : MemberFunctionDefinition) : LocalVariable[] {
+		var list = new LocalVariable[];
+		funcDef.getArguments().forEach(function (a) { list.push(a); });
+		return list.concat(funcDef.getLocals());
 	}
 
 }
@@ -568,17 +647,19 @@ class _FunctionStatementEmitter extends _StatementEmitter {
 		var funcDef = this._statement.getFuncDef();
 		assert funcDef.getFuncLocal() != null;
 		this._emitter._emit("function " + this._emitter.getNamer().getNameOfLocalVariable(funcDef.getFuncLocal()) + "(", funcDef.getToken());
-		var args = funcDef.getArguments();
-		for (var i = 0; i < args.length; ++i) {
-			if (i != 0)
-				this._emitter._emit(", ", funcDef.getToken());
-			this._emitter._emit(this._emitter.getNamer().getNameOfLocalVariable(args[i]), funcDef.getToken());
-		}
-		this._emitter._emit(") {\n", funcDef.getToken());
-		this._emitter._advanceIndent();
-		this._emitter._emitFunctionBody(funcDef);
-		this._emitter._reduceIndent();
-		this._emitter._emit("}\n", funcDef.getToken());
+		this._emitter.getNamer().enterFunction(funcDef, function () {
+			var args = funcDef.getArguments();
+			for (var i = 0; i < args.length; ++i) {
+				if (i != 0)
+					this._emitter._emit(", ", funcDef.getToken());
+				this._emitter._emit(this._emitter.getNamer().getNameOfLocalVariable(args[i]), funcDef.getToken());
+			}
+			this._emitter._emit(") {\n", funcDef.getToken());
+			this._emitter._advanceIndent();
+			this._emitter._emitFunctionBody(funcDef);
+			this._emitter._reduceIndent();
+			this._emitter._emit("}\n", funcDef.getToken());
+		});
 	}
 
 }
@@ -1699,17 +1780,19 @@ class _FunctionExpressionEmitter extends _OperatorExpressionEmitter {
 		var funcDef = this._expr.getFuncDef();
 		this._emitter._emit("(", funcDef.getToken());
 		this._emitter._emit("function " + (funcDef.getFuncLocal() != null ? this._emitter.getNamer().getNameOfLocalVariable(funcDef.getFuncLocal()) : "") + "(", funcDef.getToken());
-		var args = funcDef.getArguments();
-		for (var i = 0; i < args.length; ++i) {
-			if (i != 0)
-				this._emitter._emit(", ", funcDef.getToken());
-			this._emitter._emit(this._emitter.getNamer().getNameOfLocalVariable(args[i]), funcDef.getToken());
-		}
-		this._emitter._emit(") {\n", funcDef.getToken());
-		this._emitter._advanceIndent();
-		this._emitter._emitFunctionBody(funcDef);
-		this._emitter._reduceIndent();
-		this._emitter._emit("}", funcDef.getToken());
+		this._emitter.getNamer().enterFunction(funcDef, function () {
+			var args = funcDef.getArguments();
+			for (var i = 0; i < args.length; ++i) {
+				if (i != 0)
+					this._emitter._emit(", ", funcDef.getToken());
+				this._emitter._emit(this._emitter.getNamer().getNameOfLocalVariable(args[i]), funcDef.getToken());
+			}
+			this._emitter._emit(") {\n", funcDef.getToken());
+			this._emitter._advanceIndent();
+			this._emitter._emitFunctionBody(funcDef);
+			this._emitter._reduceIndent();
+			this._emitter._emit("}", funcDef.getToken());
+		});
 		this._emitter._emit(")", funcDef.getToken());
 	}
 
@@ -2764,14 +2847,16 @@ class JavaScriptEmitter implements Emitter {
 		// emit prologue
 		this._emit("function ", null);
 		this._emit(funcName + "(", funcDef.getClassDef().getToken());
-		this._emitFunctionArguments(funcDef);
-		this._emit(") {\n", null);
-		this._advanceIndent();
-		// emit body
-		this._emitFunctionBody(funcDef);
-		// emit epilogue
-		this._reduceIndent();
-		this._emit("};\n\n", null);
+		this._namer.enterFunction(funcDef, function () {
+			this._emitFunctionArguments(funcDef);
+			this._emit(") {\n", null);
+			this._advanceIndent();
+			// emit body
+			this._emitFunctionBody(funcDef);
+			// emit epilogue
+			this._reduceIndent();
+			this._emit("};\n\n", null);
+		});
 		this._emit(funcName + ".prototype = new " + this._namer.getNameOfClass(funcDef.getClassDef()) + ";\n\n", null);
 	}
 
@@ -2788,12 +2873,14 @@ class JavaScriptEmitter implements Emitter {
 				+ " = function (",
 				funcDef.getNameToken());
 		}
-		this._emitFunctionArguments(funcDef);
-		this._emit(") {\n", null);
-		this._advanceIndent();
-		this._emitFunctionBody(funcDef);
-		this._reduceIndent();
-		this._emit("};\n\n", null);
+		this._namer.enterFunction(funcDef, function () {
+			this._emitFunctionArguments(funcDef);
+			this._emit(") {\n", null);
+			this._advanceIndent();
+			this._emitFunctionBody(funcDef);
+			this._reduceIndent();
+			this._emit("};\n\n", null);
+		});
 		if (isStatic) {
 			this._emit(
 				this._namer.getNameOfClass(funcDef.getClassDef()) + "." + funcDef.name() + this._mangler.mangleFunctionArguments(funcDef.getArgumentTypes())
