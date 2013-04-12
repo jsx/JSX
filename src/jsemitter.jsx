@@ -157,6 +157,10 @@ class _Namer {
 		return classDef.getOutputClassName();
 	}
 
+	function enterScope(local : LocalVariable, cb : function () : void) : void {
+		cb();
+	}
+
 	function enterFunction(funcDef : MemberFunctionDefinition, cb : function () : void) : void {
 		cb();
 	}
@@ -339,6 +343,23 @@ class _Minifier {
 			}
 			return name;
 		}
+		override function enterScope(local : LocalVariable, cb : function () : void) : void {
+			if (local == null) {
+				// to support unnamed function expressions
+				cb();
+			} else {
+				if (this._isCounting()) {
+					this._minifier._recordUsedIdentifiers(local, function () {
+						this._minifier._outerLocals.push(local);
+						cb();
+						this._minifier._outerLocals.pop();
+					});
+				} else {
+					this._minifier._buildConversionTable([ local ], _Minifier._getScopeStash(local));
+					cb();
+				}
+			}
+		}
 		override function enterFunction(funcDef : MemberFunctionDefinition, cb : function () : void) : void {
 			if (this._isCounting()) {
 				this._minifier._recordUsedIdentifiers(funcDef, function () {
@@ -347,9 +368,7 @@ class _Minifier {
 					this._minifier._outerLocals.length -= funcDef.getArguments().length + funcDef.getLocals().length;
 				});
 			} else {
-				// create conversion table and register
 				this._minifier._buildConversionTable(_Minifier._getArgsAndLocals(funcDef), _Minifier._getScopeStash(funcDef));
-				// doit
 				cb();
 			}
 		}
@@ -1779,19 +1798,22 @@ class _FunctionExpressionEmitter extends _OperatorExpressionEmitter {
 	override function _emit () : void {
 		var funcDef = this._expr.getFuncDef();
 		this._emitter._emit("(", funcDef.getToken());
-		this._emitter._emit("function " + (funcDef.getFuncLocal() != null ? this._emitter.getNamer().getNameOfLocalVariable(funcDef.getFuncLocal()) : "") + "(", funcDef.getToken());
-		this._emitter.getNamer().enterFunction(funcDef, function () {
-			var args = funcDef.getArguments();
-			for (var i = 0; i < args.length; ++i) {
-				if (i != 0)
-					this._emitter._emit(", ", funcDef.getToken());
-				this._emitter._emit(this._emitter.getNamer().getNameOfLocalVariable(args[i]), funcDef.getToken());
-			}
-			this._emitter._emit(") {\n", funcDef.getToken());
-			this._emitter._advanceIndent();
-			this._emitter._emitFunctionBody(funcDef);
-			this._emitter._reduceIndent();
-			this._emitter._emit("}", funcDef.getToken());
+		var funcLocal = funcDef.getFuncLocal();
+		this._emitter.getNamer().enterScope(funcLocal, function () {
+			this._emitter._emit("function " + (funcLocal != null ? this._emitter.getNamer().getNameOfLocalVariable(funcLocal) : "") + "(", funcDef.getToken());
+			this._emitter.getNamer().enterFunction(funcDef, function () {
+				var args = funcDef.getArguments();
+				for (var i = 0; i < args.length; ++i) {
+					if (i != 0)
+						this._emitter._emit(", ", funcDef.getToken());
+					this._emitter._emit(this._emitter.getNamer().getNameOfLocalVariable(args[i]), funcDef.getToken());
+				}
+				this._emitter._emit(") {\n", funcDef.getToken());
+				this._emitter._advanceIndent();
+				this._emitter._emitFunctionBody(funcDef);
+				this._emitter._reduceIndent();
+				this._emitter._emit("}", funcDef.getToken());
+			});
 		});
 		this._emitter._emit(")", funcDef.getToken());
 	}
