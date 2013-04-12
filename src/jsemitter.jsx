@@ -309,7 +309,7 @@ class _Minifier {
 		}
 		override function getNameOfStaticFunction(classDef : ClassDefinition, name : string, argTypes : Type[]) : string {
 			if (Util.memberRootIsNative(classDef, name, argTypes, true)) {
-				return classDef.getOutputClassName() + "." + name;
+				return this.getNameOfClass(classDef) + "." + name;
 			}
 			var mangledName = classDef.getOutputClassName() + "$" + this._getMangler().mangleFunctionName(name, argTypes);
 			if (this._isCounting()) {
@@ -321,7 +321,11 @@ class _Minifier {
 		}
 		override function getNameOfConstructor(classDef : ClassDefinition, argTypes : Type[]) : string {
 			if ((classDef.flags() & ClassDefinition.IS_NATIVE) != 0) {
-				return this._getNameOfNativeConstructor(classDef);
+				var name = this._getNameOfNativeConstructor(classDef);
+				if (this._isCounting()) {
+					_Minifier._incr(this._minifier._globalUseCount, name);
+				}
+				return name;
 			}
 			var mangledName = classDef.getOutputClassName() + this._getMangler().mangleFunctionArguments(argTypes);
 			if (this._isCounting()) {
@@ -333,13 +337,12 @@ class _Minifier {
 		}
 		override function getNameOfClass(classDef : ClassDefinition) : string {
 			var name = classDef.getOutputClassName();
-			if ((classDef.flags() & (ClassDefinition.IS_NATIVE | ClassDefinition.IS_FAKE)) != 0) {
-				return name;
-			}
 			if (this._isCounting()) {
 				_Minifier._incr(this._minifier._globalUseCount, name);
-			} else {
-				name = this._minifier._globalConversionTable[name];
+			}
+			if ((classDef.flags() & (ClassDefinition.IS_NATIVE | ClassDefinition.IS_FAKE)) == 0
+				&& ! this._isCounting()) {
+				return this._minifier._globalConversionTable[name];
 			}
 			return name;
 		}
@@ -471,8 +474,19 @@ class _Minifier {
 
 	function _minifyGlobals() : void {
 		this._log("minifying classes and static functions");
+		// build useCount list wo. native class names
+		var useCount = new Map.<number>;
+		for (var k in this._globalUseCount) {
+			useCount[k] = this._globalUseCount[k];
+		}
+		this._classDefs.forEach(function (classDef) {
+			if ((classDef.flags() & (ClassDefinition.IS_NATIVE | ClassDefinition.IS_FAKE)) != 0) {
+				delete useCount[classDef.className()];
+			}
+		});
+		// build conversion table
 		this._globalConversionTable = _Minifier._buildConversionTable(
-			this._globalUseCount,
+			useCount,
 			new _MinifiedNameGenerator(
 				([] : string[]).concat(
 					_MinifiedNameGenerator.KEYWORDS,
@@ -503,13 +517,16 @@ class _Minifier {
 			useCount[local.getName().getValue()] = _Minifier._getLocalStash(local).useCount;
 		});
 		// build list of reserved words
-		var reserved = ([] : string[]).concat(_MinifiedNameGenerator.KEYWORDS);
+		var reserved = [] : string[];
 		for (var k in scopeStash.usedGlobals) {
-			reserved.push(this._globalConversionTable[k]);
+			// if k does not exist in globalConversionTable then it is a native class name
+			reserved.push(this._globalConversionTable.hasOwnProperty(k) ? this._globalConversionTable[k] : k);
 		}
 		for (var i in scopeStash.usedOuterLocals) {
 			reserved.push(_Minifier._getLocalStash(scopeStash.usedOuterLocals[i]).minifiedName);
 		}
+		this._log("local minification, preserving: " + reserved.join(","));
+		reserved = reserved.concat(_MinifiedNameGenerator.KEYWORDS);
 		// doit
 		var conversionTable = _Minifier._buildConversionTable(useCount, new _MinifiedNameGenerator(reserved));
 		// store the result
