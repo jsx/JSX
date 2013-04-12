@@ -105,7 +105,30 @@ class _Mangler {
 
 class _Namer {
 
+	static const IDENTIFIER = "namer";
+
+	class _TryStash extends OptimizerStash {
+		var catchName : string;
+		function constructor(catchName : string) {
+			this.catchName = catchName;
+		}
+		override function clone() : OptimizerStash {
+			throw new Error("operation not supported");
+		}
+	}
+
+	class _CatchTargetStash extends OptimizerStash {
+		var tryStmt : TryStatement;
+		function constructor(tryStmt : TryStatement) {
+			this.tryStmt = tryStmt;
+		}
+		override function clone() : OptimizerStash {
+			throw new Error("operation not supported");
+		}
+	}
+
 	var _emitter : JavaScriptEmitter;
+	var _catchLevel = -1;
 
 	function setup(emitter : JavaScriptEmitter) : _Namer {
 		this._emitter = emitter;
@@ -165,8 +188,38 @@ class _Namer {
 		cb();
 	}
 
+	function enterCatch(tryStmt : TryStatement, cb : function (getCatchName : function () : string) : void) : void {
+		// adjust level
+		++this._catchLevel;
+		// doit
+		this._enterCatch(tryStmt, cb, "$__jsx_catch_" + this._catchLevel as string);
+		// exit
+		--this._catchLevel;
+	}
+
+	function _enterCatch(tryStmt : TryStatement, cb : function (getCatchName : function () : string) : void, catchName : string) : void {
+		tryStmt.getOptimizerStash()[_Namer.IDENTIFIER] = new _Namer._TryStash(catchName);
+		var catchStmts = tryStmt.getCatchStatements();
+		for (var i in catchStmts) {
+			catchStmts[i].getLocal().getOptimizerStash()[_Namer.IDENTIFIER] = new _Namer._CatchTargetStash(tryStmt);
+		}
+		cb(function () { return this._getCatchName(tryStmt); });
+	}
+
 	function getNameOfLocalVariable(local : LocalVariable) : string {
-		return local.getName().getValue();
+		if (local instanceof CaughtVariable) {
+			return this._getCatchName(local as CaughtVariable);
+		} else {
+			return local.getName().getValue();
+		}
+	}
+
+	function _getCatchName(caught : CaughtVariable) : string {
+		return this._getCatchName((caught.getOptimizerStash()[_Namer.IDENTIFIER] as _Namer._CatchTargetStash).tryStmt);
+	}
+
+	function _getCatchName(tryStmt : TryStatement) : string {
+		return (tryStmt.getOptimizerStash()[_Namer.IDENTIFIER] as _Namer._TryStash).catchName;
 	}
 
 }
@@ -376,6 +429,9 @@ class _Minifier {
 			}
 		}
 		override function getNameOfLocalVariable(local : LocalVariable) : string {
+			if (local instanceof CaughtVariable) {
+				return this._getCatchName(local as CaughtVariable);
+			}
 			if (this._isCounting()) {
 				++_Minifier._getLocalStash(local).useCount;
 				return local.getName().getValue();
@@ -960,17 +1016,10 @@ class _WhileStatementEmitter extends _StatementEmitter {
 class _TryStatementEmitter extends _StatementEmitter {
 
 	var _statement : TryStatement;
-	var _emittingLocalName : string;
 
 	function constructor (emitter : JavaScriptEmitter, statement : TryStatement) {
 		super(emitter);
 		this._statement = statement;
-		var outerCatchStatements = 0;
-		for (var i = 0; i < this._emitter._emittingStatementStack.length; ++i) {
-			if (this._emitter._emittingStatementStack[i] instanceof _TryStatementEmitter)
-				++outerCatchStatements;
-		}
-		this._emittingLocalName = "$__jsx_catch_" + outerCatchStatements as string;
 	}
 
 	override function emit () : void {
@@ -979,23 +1028,25 @@ class _TryStatementEmitter extends _StatementEmitter {
 		this._emitter._emit("}", null);
 		var catchStatements = this._statement.getCatchStatements();
 		if (catchStatements.length != 0) {
-			this._emitter._emit(" catch (" + this._emittingLocalName + ") {\n", null);
-			if (this._emitter._enableProfiler) {
-				this._emitter._advanceIndent();
-				this._emitter._emit("$__jsx_profiler.resume($__jsx_profiler_ctx);\n", null);
-				this._emitter._reduceIndent();
-			}
-			this._emitter._emitStatements(catchStatements.map.<Statement>((s) -> { return s; }));
-			if (! catchStatements[catchStatements.length - 1].getLocal().getType().equals(Type.variantType)) {
-				this._emitter._advanceIndent();
-				this._emitter._emit("{\n", null);
-				this._emitter._advanceIndent();
-				this._emitter._emit("throw " + this._emittingLocalName + ";\n", null);
-				this._emitter._reduceIndent();
-				this._emitter._emit("}\n", null);
-				this._emitter._reduceIndent();
-			}
-			this._emitter._emit("}", null);
+			this._emitter.getNamer().enterCatch(this._statement, function (getCatchName) {
+				this._emitter._emit(" catch (" + getCatchName() + ") {\n", null);
+				if (this._emitter._enableProfiler) {
+					this._emitter._advanceIndent();
+					this._emitter._emit("$__jsx_profiler.resume($__jsx_profiler_ctx);\n", null);
+					this._emitter._reduceIndent();
+				}
+				this._emitter._emitStatements(catchStatements.map.<Statement>((s) -> { return s; }));
+				if (! catchStatements[catchStatements.length - 1].getLocal().getType().equals(Type.variantType)) {
+					this._emitter._advanceIndent();
+					this._emitter._emit("{\n", null);
+					this._emitter._advanceIndent();
+					this._emitter._emit("throw " + getCatchName() + ";\n", null);
+					this._emitter._reduceIndent();
+					this._emitter._emit("}\n", null);
+					this._emitter._reduceIndent();
+				}
+				this._emitter._emit("}", null);
+			});
 		}
 		var finallyStatements = this._statement.getFinallyStatements();
 		if (finallyStatements.length != 0) {
@@ -1004,10 +1055,6 @@ class _TryStatementEmitter extends _StatementEmitter {
 			this._emitter._emit("}", null);
 		}
 		this._emitter._emit("\n", null);
-	}
-
-	function getEmittingLocalName () : string {
-		return this._emittingLocalName;
 	}
 
 }
@@ -1024,9 +1071,7 @@ class _CatchStatementEmitter extends _StatementEmitter {
 	override function emit () : void {
 		var localType = this._statement.getLocal().getType();
 		if (localType instanceof ObjectType) {
-			var tryStatement = this._emitter._emittingStatementStack[this._emitter._emittingStatementStack.length - 2] as _TryStatementEmitter;
-			var localName = tryStatement.getEmittingLocalName();
-			this._emitter._emit("if (" + localName + " instanceof " + this._emitter.getNamer().getNameOfClass(localType.getClassDef()) + ") {\n", this._statement.getToken());
+			this._emitter._emit("if (" + this._emitter.getNamer().getNameOfLocalVariable(this._statement.getLocal()) + " instanceof " + this._emitter.getNamer().getNameOfClass(localType.getClassDef()) + ") {\n", this._statement.getToken());
 			this._emitter._emitStatements(this._statement.getStatements());
 			this._emitter._emit("} else ", null);
 		} else {
@@ -1034,21 +1079,6 @@ class _CatchStatementEmitter extends _StatementEmitter {
 			this._emitter._emitStatements(this._statement.getStatements());
 			this._emitter._emit("}\n", null);
 		}
-	}
-
-	static function getLocalNameFor (emitter : JavaScriptEmitter, name : string) : string {
-		for (var i = emitter._emittingStatementStack.length - 1; i >= 0; --i) {
-			if (! (emitter._emittingStatementStack[i] instanceof _CatchStatementEmitter))
-				continue;
-			var catchStatement = emitter._emittingStatementStack[i] as _CatchStatementEmitter;
-			if (catchStatement._statement.getLocal().getName().getValue() == name) {
-				var tryEmitter = emitter._emittingStatementStack[i - 1];
-				if (! (tryEmitter instanceof _TryStatementEmitter))
-					throw new Error("logic flaw");
-				return (tryEmitter as _TryStatementEmitter).getEmittingLocalName();
-			}
-		}
-		throw new Error("logic flaw");
 	}
 
 }
@@ -1160,12 +1190,7 @@ class _LocalExpressionEmitter extends _ExpressionEmitter {
 
 	override function emit (outerOpPrecedence : number) : void {
 		var local = this._expr.getLocal();
-		if (local instanceof CaughtVariable) {
-			var localName = _CatchStatementEmitter.getLocalNameFor(this._emitter, local.getName().getValue());
-		} else {
-			localName = this._emitter.getNamer().getNameOfLocalVariable(local);
-		}
-		this._emitter._emit(localName, this._expr.getToken());
+		this._emitter._emit(this._emitter.getNamer().getNameOfLocalVariable(local), this._expr.getToken());
 	}
 
 }
@@ -2534,7 +2559,6 @@ class JavaScriptEmitter implements Emitter {
 	var _indent : number;
 	var _emittingClass : ClassDefinition;
 	var _emittingFunction : MemberFunctionDefinition;
-	var _emittingStatementStack : _StatementEmitter[];
 	var _enableRunTimeTypeCheck : boolean;
 
 	var _enableSourceMap : boolean;
@@ -2647,7 +2671,6 @@ class JavaScriptEmitter implements Emitter {
 		this._indent = 0;
 		this._emittingClass = null;
 		this._emittingFunction = null;
-		this._emittingStatementStack = new _StatementEmitter[];
 		this._enableRunTimeTypeCheck = true;
 
 		// headers
@@ -3033,12 +3056,7 @@ class JavaScriptEmitter implements Emitter {
 
 	function _emitStatement (statement : Statement) : void {
 		var emitter = this._getStatementEmitterFor(statement);
-		this._emittingStatementStack.push(emitter);
-		try {
-			emitter.emit();
-		} finally {
-			this._emittingStatementStack.pop();
-		}
+		emitter.emit();
 	}
 
 	function _addSourceMapping(token : Token) : void {
