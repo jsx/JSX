@@ -147,8 +147,9 @@ class _Namer {
 
 	var _emitter : JavaScriptEmitter;
 
-	function constructor(emitter : JavaScriptEmitter) {
+	function setup(emitter : JavaScriptEmitter) : _Namer {
 		this._emitter = emitter;
+		return this;
 	}
 
 	function getNameOfProperty(classDef : ClassDefinition, name : string) : string {
@@ -247,6 +248,153 @@ class _MinifiedNameGenerator {
 			n = (n - colIndex) / _MinifiedNameGenerator._MINIFY_CHARS.length;
 		} while (n != 0);
 		return name;
+	}
+
+}
+
+class _Minifier {
+
+	static const IDENTIFIER = "minifier";
+
+	class _ClassDefStash extends OptimizerStash {
+
+		var staticVariableUseCount = new Map.<number>;
+
+		var staticVariableConversionTable = new Map.<string>;
+
+		override function clone() : OptimizerStash {
+			throw new Error("operation not supported");
+		}
+	}
+
+	class _FuncDefStash extends OptimizerStash {
+
+		var usedClassesAndStaticFunctions = new Map.<boolean>;
+
+		override function clone() : OptimizerStash {
+			throw new Error("operation not supported");
+		}
+	}
+
+	class _LocalStash extends OptimizerStash {
+
+		var useCount = 0;
+
+		var minifiedName : Nullable.<string>;
+
+		override function clone() : OptimizerStash {
+			throw new Error("operation not supported");
+		}
+	}
+
+	var _emitter : JavaScriptEmitter;
+
+	var _propertyUseCount = new Map.<number>();
+	var _propertyConversionTable : Map.<string>;
+	var _identifierUseCount = new Map.<number>();
+	var _identifierConversionTable : Map.<string>;
+	var _outputClassNameInvConversionTable : Map.<string>;
+
+	class _BaseNamer extends _Namer {
+		var _minifier : _Minifier;
+		function setup(minifier : _Minifier) : _Minifier._BaseNamer {
+			this._minifier = minifier;
+			super.setup(minifier._emitter);
+			return this;
+		}
+		function _getMangler() : _Mangler {
+			return this._minifier._emitter.getMangler();
+		}
+	}
+
+	class _CountingNamer extends _Minifier._BaseNamer {
+		override function getNameOfProperty(classDef : ClassDefinition, name : string) : string {
+			if (Util.memberRootIsNative(classDef, name, null, false)) {
+				return name;
+			}
+			_Minifier._incr(this._minifier._propertyUseCount, name);
+			return name;
+		}
+		override function getNameOfMethod(classDef : ClassDefinition, name : string, argTypes : Type[]) : string {
+			if (Util.memberRootIsNative(classDef, name, argTypes, false)) {
+				return name;
+			}
+			var mangledName = this._getMangler().mangleFunctionName(name, argTypes);
+			_Minifier._incr(this._minifier._propertyUseCount, mangledName);
+			return mangledName;
+		}
+		override function getNameOfStaticVariable(classDef : ClassDefinition, name : string) : string {
+			_Minifier._incr(_Minifier._getStash(classDef).staticVariableUseCount, name);
+			return name;
+		}
+		override function getNameOfStaticFunction(classDef : ClassDefinition, name : string, argTypes : Type[], allowInternalForm : boolean) : string {
+			if (! allowInternalForm || Util.memberRootIsNative(classDef, name, argTypes, true)) {
+				return super.getNameOfStaticFunction(classDef, name, argTypes, false);
+			}
+			var mangledName = classDef.getOutputClassName() + "$" + this._getMangler().mangleFunctionName(name, argTypes);
+			_Minifier._incr(this._minifier._identifierUseCount, mangledName);
+			return mangledName;
+		}
+		override function getNameOfConstructor(classDef : ClassDefinition, argTypes : Type[]) : string {
+			if ((classDef.flags() & ClassDefinition.IS_NATIVE) != 0) {
+				return this._getNameOfNativeConstructor(classDef);
+			}
+			var mangledName = classDef.getOutputClassName() + this._getMangler().mangleFunctionArguments(argTypes);
+			_Minifier._incr(this._minifier._identifierUseCount, mangledName);
+			return mangledName;
+		}
+		override function getNameOfLocalVariable(local : LocalVariable) : string {
+			++_Minifier._getStash(local).useCount;
+			return local.getName().getValue();
+		}
+	}
+
+	class _MinifyingNamer extends _Minifier._BaseNamer {
+		// TODO
+	}
+
+	function constructor(emitter : JavaScriptEmitter) {
+		this._emitter = emitter;
+	}
+
+	function getCountingNamer() : _Namer {
+		return (new _Minifier._CountingNamer).setup(this);
+	}
+
+	function getMinifyingNamer() : _Namer {
+		return (new _Minifier._MinifyingNamer).setup(this);
+	}
+
+	static function _getStash(classDef : ClassDefinition) : _Minifier._ClassDefStash {
+		var stash = classDef.getOptimizerStash();
+		if (! stash.hasOwnProperty(_Minifier.IDENTIFIER)) {
+			stash[_Minifier.IDENTIFIER] = new _Minifier._ClassDefStash();
+		}
+		return stash[_Minifier.IDENTIFIER] as _Minifier._ClassDefStash;
+	}
+
+	static function _getStash(funcDef : MemberFunctionDefinition) : _Minifier._FuncDefStash {
+		var stash = funcDef.getOptimizerStash();
+		if(! stash.hasOwnProperty(_Minifier.IDENTIFIER)) {
+			stash[_Minifier.IDENTIFIER] = new _Minifier._FuncDefStash();
+		}
+		return stash[_Minifier.IDENTIFIER] as _Minifier._FuncDefStash;
+	}
+
+	static function _getStash(local : LocalVariable) : _Minifier._LocalStash {
+		var stash = local.getOptimizerStash();
+		if(! stash.hasOwnProperty(_Minifier.IDENTIFIER)) {
+			stash[_Minifier.IDENTIFIER] = new _Minifier._LocalStash();
+		}
+		return stash[_Minifier.IDENTIFIER] as _Minifier._LocalStash;
+	}
+
+	static function _incr(useCount : Map.<number>, name : string) : void {
+		if (useCount.hasOwnProperty(name)) {
+			++useCount[name];
+		} else {
+			useCount[name] = 1;
+		}
 	}
 
 }
@@ -2268,11 +2416,22 @@ class JavaScriptEmitter implements Emitter {
 	}
 
 	override function emit (classDefs : ClassDefinition[]) : void {
-		this._emitInit();
 
-		this._namer = new _Namer(this); // FIXME use minifying namer
-		this._emitCore(classDefs);
-
+		if (this._enableMinifier) {
+			var minifier = new _Minifier(this);
+			// emit using counting namer to collect stats for minification
+			this._namer = minifier.getCountingNamer();
+			this._emitInit();
+			this._emitCore(classDefs);
+			// re-emit using minifying namer
+			this._namer = minifier.getMinifyingNamer();
+			this._emitInit();
+			this._emitCore(classDefs);
+		} else {
+			this._namer = (new _Namer).setup(this);
+			this._emitInit();
+			this._emitCore(classDefs);
+		}
 		this._emitClassMap(classDefs);
 	}
 
