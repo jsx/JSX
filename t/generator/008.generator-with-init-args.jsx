@@ -5,7 +5,7 @@
 */
 class _Main {
 	static function main (args : string[]) : void {
-		function double (seed : number) : Enumerable.<number> {
+		function makeDouble (seed : number) : Enumerable.<number> {
 			var t = seed;
 			while (true) {
 				yield t;
@@ -13,7 +13,7 @@ class _Main {
 			}
 		}
 
-		var a = double(2);
+		var a = makeDouble(2);
 		log a.next();
 		log a.next();
 		log a.next();
