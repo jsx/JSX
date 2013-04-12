@@ -35,46 +35,6 @@ import _UnclassifyOptimizationCommand,
 	   _NoDebugCommand from "./optimizer.jsx";
 
 
-/**
- * Originally, type annotations are used for the sake of optimization by Google Closure Compiler, but now JSX is faster than Closure Compiler and this method is no longer maintained.
- */
-class _TypeAnnotation {
-
-	static function toClosureType (type : Type) : Nullable.<string> {
-		if (type.equals(Type.booleanType)) {
-			return "!boolean";
-		} else if (type.equals(Type.integerType) || type.equals(Type.numberType)) {
-			return "!number";
-		} else if (type.equals(Type.stringType)) {
-			return "!string";
-		} else if (type instanceof NullableType) {
-			return "undefined|" + _TypeAnnotation.toClosureType((type as NullableType).getBaseType());
-		} else if (type instanceof ObjectType) {
-			var classDef = type.getClassDef();
-			if (classDef instanceof InstantiatedClassDefinition && (classDef as InstantiatedClassDefinition).getTemplateClassName() == "Array") {
-				return "Array.<undefined|" + _TypeAnnotation.toClosureType((classDef as InstantiatedClassDefinition).getTypeArguments()[0]) + ">";
-			} else if (classDef instanceof InstantiatedClassDefinition && (classDef as InstantiatedClassDefinition).getTemplateClassName() == "Map") {
-				return "Object.<string, undefined|" + _TypeAnnotation.toClosureType((classDef as InstantiatedClassDefinition).getTypeArguments()[0]) + ">";
-			} else {
-				return classDef.getOutputClassName();
-			}
-		} else if (type instanceof VariantType) {
-			return "*";
-		} else if (type instanceof FunctionType) {
-			return "*";
-		}
-		return null;
-	}
-
-	static function build(template : string, type : Type) : string {
-		var closureType = _TypeAnnotation.toClosureType(type);
-		if (closureType == null)
-			return "";
-		return Util.format(template, [closureType]);
-	}
-
-}
-
 class _Mangler {
 
 	function mangleFunctionName (name : string, argTypes : Type[]) : string {
@@ -2781,13 +2741,7 @@ class JavaScriptEmitter implements Emitter {
 
 	function _emitClassObject (classDef : ClassDefinition) : void {
 		this._emit(
-			"/**\n" +
-			" * class " + this._namer.getNameOfClass(classDef) +
-			(classDef.extendType() != null ? " extends " + this._namer.getNameOfClass(classDef.extendType().getClassDef()) : "") + "\n" +
-			" * @constructor\n" +
-			" */\n" +
-			"function ", null);
-		this._emit(this._namer.getNameOfClass(classDef) + "() {\n" +
+			"function " + this._namer.getNameOfClass(classDef) + "() {\n" +
 			"}\n" +
 			"\n",
 			classDef.getToken());
@@ -2808,10 +2762,6 @@ class JavaScriptEmitter implements Emitter {
 		var funcName = this._namer.getNameOfConstructor(funcDef.getClassDef(), funcDef.getArgumentTypes());
 
 		// emit prologue
-		this._emit("/**\n", null);
-		this._emit(" * @constructor\n", null);
-		this._emitFunctionArgumentAnnotations(funcDef);
-		this._emit(" */\n", null);
 		this._emit("function ", null);
 		this._emit(funcName + "(", funcDef.getClassDef().getToken());
 		this._emitFunctionArguments(funcDef);
@@ -2828,10 +2778,6 @@ class JavaScriptEmitter implements Emitter {
 	function _emitFunction (funcDef : MemberFunctionDefinition) : void {
 		var isStatic = (funcDef.flags() & ClassDefinition.IS_STATIC) != 0;
 		// emit
-		this._emit("/**\n", null);
-		this._emitFunctionArgumentAnnotations(funcDef);
-		this._emit(_TypeAnnotation.build(" * @return {%1}\n", funcDef.getReturnType()), null);
-		this._emit(" */\n", null);
 		if (isStatic) {
 			this._emit(
 				"function " + this._namer.getNameOfStaticFunction(funcDef.getClassDef(), funcDef.name(), funcDef.getArgumentTypes()) + "(",
@@ -2856,12 +2802,6 @@ class JavaScriptEmitter implements Emitter {
 				+ ";\n\n",
 				null);
 		}
-	}
-
-	function _emitFunctionArgumentAnnotations (funcDef : MemberFunctionDefinition) : void {
-		var args = funcDef.getArguments();
-		for (var i = 0; i < args.length; ++i)
-			this._emit(_TypeAnnotation.build(" * @param {%1} " + args[i].getName().getValue() + "\n", args[i].getType()), null);
 	}
 
 	function _emitFunctionArguments (funcDef : MemberFunctionDefinition) : void {
@@ -2901,7 +2841,6 @@ class JavaScriptEmitter implements Emitter {
 				var type = locals[i].getType();
 				if (type == null)
 					continue;
-				this._emit(_TypeAnnotation.build("/** @type {%1} */\n", type), null);
 				// do not pass the token for declaration
 				this._emit("var " + this._namer.getNameOfLocalVariable(locals[i]) + ";\n", null);
 			}
