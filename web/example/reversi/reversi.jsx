@@ -255,7 +255,7 @@ class Board {
     return stone;
   }
 
-  function thinkMany() : void {
+  function thinkMost() : void {
     var max = 0, tx = 0, ty = 0;
     for (var y = 0; y <= 7; y++) {
       for (var x = 0; x <= 7; x++) {
@@ -366,6 +366,34 @@ class Board {
       }
     }, 50);
   }
+
+  function configureFromForm() : void {
+    var levels = dom.document.getElementsByName('level');
+    for (var i = 0; i < levels.length; i++) {
+      var radio = levels[i] as HTMLInputElement;
+      if (radio.checked) {
+        switch (radio.value) {
+          case "random":
+            this.think = () -> { this.thinkRandom(); };
+            break;
+          case "most":
+            this.think = () -> { this.thinkMost(); };
+            break;
+          case "montecarlo":
+            this.think = () -> { this.thinkMonteCarlo(); };
+            break;
+          default:
+            log "no such algorithm: " + radio.value;
+        }
+      }
+
+      var showWinningRate = dom.id("show_winning_rate") as HTMLInputElement;
+      assert showWinningRate != null;
+      this.showWin = showWinningRate.checked;
+
+      this.draw();
+    }
+  }
 }
 
 class _Main {
@@ -378,14 +406,10 @@ class _Main {
   }
 
   static function main(args : string[]) : void {
-    var board1 = new Board(_Main.createCanvas());
-    var board2 = new Board(_Main.createCanvas());
-    var board3 = new Board(_Main.createCanvas());
-    var board4 = new Board(_Main.createCanvas());
+    var board = new Board(_Main.createCanvas());
 
-    board1.think = () -> { board1.thinkRandom(); };
-    board2.think = () -> { board2.thinkMany(); };
-    board4.showWin = true;
+    board.configureFromForm();
+    dom.id('configuration').addEventListener('click', (e) -> { board.configureFromForm(); });
   }
 }
 // vim: set expandtab :
