@@ -981,10 +981,10 @@ class _AsNoConvertExpressionEmitter extends _ExpressionEmitter {
 		if (this._emitter._enableRunTimeTypeCheck) {
 			var emitWithAssertion = function (emitCheckExpr : () -> void, message : string) : void {
 				var token = this._expr.getToken();
-				this._emitter._emit("(function (v) {\n", token);
+				this._emitter._emit("(function ($v) {\n", token);
 				this._emitter._advanceIndent();
 				this._emitter._emitAssertion(emitCheckExpr, token, message);
-				this._emitter._emit("return v;\n", token);
+				this._emitter._emit("return $v;\n", token);
 				this._emitter._reduceIndent();
 				this._emitter._emit("}(", token);
 				this._emitter._getExpressionEmitterFor(this._expr.getExpr()).emit(0);
@@ -1000,47 +1000,47 @@ class _AsNoConvertExpressionEmitter extends _ExpressionEmitter {
 				// skip
 			} else if (destType.equals(Type.booleanType)) {
 				emitWithAssertion(function () {
-					this._emitter._emit("typeof v === \"boolean\"", this._expr.getToken());
+					this._emitter._emit("typeof $v === \"boolean\"", this._expr.getToken());
 				}, "detected invalid cast, value is not a boolean");
 				return;
 			} else if (destType.resolveIfNullable().equals(Type.booleanType)) {
 				emitWithAssertion(function () {
-					this._emitter._emit("v == null || typeof v === \"boolean\"", this._expr.getToken());
+					this._emitter._emit("$v == null || typeof $v === \"boolean\"", this._expr.getToken());
 				}, "detected invalid cast, value is not a boolean nor null");
 				return;
 			} else if (destType.equals(Type.numberType)) {
 				emitWithAssertion(function () {
-					this._emitter._emit("typeof v === \"number\"", this._expr.getToken());
+					this._emitter._emit("typeof $v === \"number\"", this._expr.getToken());
 				}, "detected invalid cast, value is not a number");
 				return;
 			} else if (destType.resolveIfNullable().equals(Type.numberType)) {
 				emitWithAssertion(function () {
-					this._emitter._emit("v == null || typeof v === \"number\"", this._expr.getToken());
+					this._emitter._emit("$v == null || typeof $v === \"number\"", this._expr.getToken());
 				}, "detected invalid cast, value is not a number nor nullable");
 				return;
 			} else if (destType.equals(Type.integerType)) {
 				emitWithAssertion(function () {
-					this._emitter._emit("typeof v === \"number\" && (! $__jsx_isFinite(v) || v % 1 === 0)", this._expr.getToken());
+					this._emitter._emit("typeof $v === \"number\" && (! $__jsx_isFinite($v) || $v % 1 === 0)", this._expr.getToken());
 				}, "detected invalid cast, value is not an int");
 				return;
 			} else if (destType.resolveIfNullable().equals(Type.integerType)) {
 				emitWithAssertion(function () {
-					this._emitter._emit("v == null || typeof v === \"number\" && (! $__jsx_isFinite(v) || v % 1 === 0)", this._expr.getToken());
+					this._emitter._emit("$v == null || typeof $v === \"number\" && (! $__jsx_isFinite($v) || $v % 1 === 0)", this._expr.getToken());
 				}, "detected invalid cast, value is not an int nor null");
 				return;
 			} else if (destType.equals(Type.stringType)) {
 				emitWithAssertion(function () {
-					this._emitter._emit("typeof v === \"string\"", this._expr.getToken());
+					this._emitter._emit("typeof $v === \"string\"", this._expr.getToken());
 				}, "detected invalid cast, value is not a string");
 				return;
 			} else if (destType.resolveIfNullable().equals(Type.stringType)) {
 				emitWithAssertion(function () {
-					this._emitter._emit("v == null || typeof v === \"string\"", this._expr.getToken());
+					this._emitter._emit("$v == null || typeof $v === \"string\"", this._expr.getToken());
 				}, "detected invalid cast, value is not a string nor null");
 				return;
 			} else if (destType instanceof FunctionType) {
 				emitWithAssertion(function () {
-					this._emitter._emit("v == null || typeof v === \"function\"", this._expr.getToken());
+					this._emitter._emit("$v == null || typeof $v === \"function\"", this._expr.getToken());
 				}, "detected invalid cast, value is not a function or null");
 				return;
 			} else if (destType instanceof ObjectType) {
@@ -1049,29 +1049,29 @@ class _AsNoConvertExpressionEmitter extends _ExpressionEmitter {
 					// skip
 				} else if (destClassDef instanceof InstantiatedClassDefinition && (destClassDef as InstantiatedClassDefinition).getTemplateClassName() == "Array") {
 					emitWithAssertion(function () {
-						this._emitter._emit("v == null || v instanceof Array", this._expr.getToken());
+						this._emitter._emit("$v == null || $v instanceof Array", this._expr.getToken());
 					}, "detected invalid cast, value is not an Array or null");
 					return;
 				} else if (destClassDef instanceof InstantiatedClassDefinition && (destClassDef as InstantiatedClassDefinition).getTemplateClassName() == "Map") {
 					if (srcType.equals(Type.variantType)) {
 						// variant which is "typeof function" may be converted to a Map.<variant> ("function" cannot be rejected, since the origin of the object may be javascript code)
 						emitWithAssertion(function () {
-							this._emitter._emit("v == null || typeof v === \"object\" || typeof v === \"function\"", this._expr.getToken());
+							this._emitter._emit("$v == null || typeof $v === \"object\" || typeof $v === \"function\"", this._expr.getToken());
 						}, "detected invalid cast, value is not a Map or null");
 					} else {
 						emitWithAssertion(function () {
-							this._emitter._emit("v == null || typeof v === \"object\"", this._expr.getToken());
+							this._emitter._emit("$v == null || typeof $v === \"object\"", this._expr.getToken());
 						}, "detected invalid cast, value is not a Map or null");
 					}
 					return;
 				} else if ((destClassDef.flags() & (ClassDefinition.IS_INTERFACE | ClassDefinition.IS_MIXIN)) == 0) {
 					emitWithAssertion(function () {
-						this._emitter._emit("v == null || v instanceof " + destClassDef.getOutputClassName(), this._expr.getToken());
+						this._emitter._emit("$v == null || $v instanceof " + destClassDef.getOutputClassName(), this._expr.getToken());
 					}, "detected invalid cast, value is not an instance of the designated type or null");
 					return;
 				} else {
 					emitWithAssertion(function () {
-						this._emitter._emit("v == null || v.$__jsx_implements_" + destClassDef.getOutputClassName(), this._expr.getToken());
+						this._emitter._emit("$v == null || $v.$__jsx_implements_" + destClassDef.getOutputClassName(), this._expr.getToken());
 					}, "detected invalid cast, value is not an instance of the designated type or null");
 					return;
 				}
