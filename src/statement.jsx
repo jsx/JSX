@@ -1314,17 +1314,17 @@ class TryStatement extends Statement implements Block {
 			}
 		}
 		// finally
-		context.blockStack.push(new BlockContext(context.getTopBlock().localVariableStatuses.clone(), this));
+		context.blockStack.push(new BlockContext(context.getTopBlock().localVariableStatuses.merge(lvStatusesAfterTryCatch), this));
+		var lvStatusesAfterFinally = null : LocalVariableStatuses;
 		try {
 			for (var i = 0; i < this._finallyStatements.length; ++i)
 				if (! this._finallyStatements[i].analyze(context))
 					return false;
+			lvStatusesAfterFinally = context.getTopBlock().localVariableStatuses;
 		} finally {
 			context.blockStack.pop();
 		}
-		// save lvstatuses
-		// FIXME apply the changes by finallystatements
-		context.getTopBlock().localVariableStatuses = lvStatusesAfterTryCatch;
+		context.getTopBlock().localVariableStatuses = lvStatusesAfterTryCatch.mergeFinally(lvStatusesAfterFinally);
 		return true;
 	}
 

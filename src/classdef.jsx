@@ -1936,6 +1936,26 @@ class LocalVariableStatuses {
 		return ret;
 	}
 
+	function mergeFinally (postFinallyStats : LocalVariableStatuses) : LocalVariableStatuses {
+		var ret = this.clone() as LocalVariableStatuses;
+		for (var k in ret._statuses) {
+			switch (postFinallyStats._statuses[k]) {
+			case LocalVariableStatuses.ISSET:
+				ret._statuses[k] = LocalVariableStatuses.ISSET;
+				break;
+			case LocalVariableStatuses.MAYBESET:
+				if (ret._statuses[k] != LocalVariableStatuses.ISSET) {
+					ret._statuses[k] = LocalVariableStatuses.MAYBESET;
+				}
+				break;
+			}
+		}
+		if (! postFinallyStats._isReachable) {
+			ret._isReachable = false;
+		}
+		return ret;
+	}
+
 	function setStatus (local : LocalVariable) : void {
 		var name = local.getName().getValue();
 		if (this._statuses[name] == null)
