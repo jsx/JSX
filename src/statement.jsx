@@ -46,7 +46,6 @@ abstract class Statement implements Stashable {
 
 			throw e;
 		}
-		return false;	// FIXME dummy
 	}
 
 	function forEachStatement (cb : function(:Statement):boolean) : boolean {
