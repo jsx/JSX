@@ -708,15 +708,24 @@ class ClassDefinition implements Stashable {
 			for (var i = 0; i < this._implementTypes.length; ++i) {
 				if ((this._implementTypes[i].getClassDef().flags() & ClassDefinition.IS_MIXIN) == 0)
 					continue;
+				var theMixin = this._implementTypes[i].getClassDef();
 				var overrideFunctions = new MemberDefinition[];
-				this._implementTypes[i].getClassDef()._getMembers(overrideFunctions, true, ClassDefinition.IS_OVERRIDE, ClassDefinition.IS_OVERRIDE);
+				theMixin._getMembers(overrideFunctions, true, ClassDefinition.IS_OVERRIDE, ClassDefinition.IS_OVERRIDE);
 				for (var j = 0; j < overrideFunctions.length; ++j) {
 					var done = false;
 					if (this._baseClassDef != null)
 						if (this._baseClassDef._assertFunctionIsOverridable(context, overrideFunctions[j] as MemberFunctionDefinition) != null)
 							done = true;
+					// check sibling interfaces / mixins
 					for (var k = 0; k < i; ++k) {
 						if (this._implementTypes[k].getClassDef()._assertFunctionIsOverridable(context, overrideFunctions[j] as MemberFunctionDefinition) != null) {
+							done = true;
+							break;
+						}
+					}
+					// check parent interfaces / mixins of the mixin
+					for (var k = 0; k < theMixin._implementTypes.length; ++k) {
+						if (theMixin._implementTypes[k].getClassDef()._assertFunctionIsOverridable(context, overrideFunctions[j] as MemberFunctionDefinition) != null) {
 							done = true;
 							break;
 						}
