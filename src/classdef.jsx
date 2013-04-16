@@ -364,8 +364,6 @@ class ClassDefinition implements Stashable {
 	static const GET_MEMBER_MODE_SUPER = 2; // looks for functions with body in super classes
 	static const GET_MEMBER_MODE_FUNCTION_WITH_BODY = 3; // looks for function with body
 
-	static const GET_MEMBER_MODE_NOT_ABSTRACT = 4;
-
 	function getMemberTypeByName (errors : CompileError[], token : Token, name : string, isStatic : boolean, typeArgs : Type[], mode : number) : Type {
 		// returns an array to support function overloading
 		var types = new Type[];
@@ -395,7 +393,7 @@ class ClassDefinition implements Stashable {
 										return;
 									}
 								}
-								if ((member as MemberFunctionDefinition).getStatements() != null || mode != ClassDefinition.GET_MEMBER_MODE_NOT_ABSTRACT) {
+								if ((member as MemberFunctionDefinition).getStatements() != null || mode != ClassDefinition.GET_MEMBER_MODE_FUNCTION_WITH_BODY) {
 									for (var j = 0; j < types.length; ++j) {
 										if (Util.typesAreEqual((member as MemberFunctionDefinition).getArgumentTypes(), (types[j] as ResolvedFunctionType).getArgumentTypes())) {
 											break;
@@ -412,7 +410,7 @@ class ClassDefinition implements Stashable {
 					}
 				}
 			} else {
-				// for searching super classes, change mode GET_MEMBER_MODE_SUPER to GET_MEMBER_MODE_NOT_ABSTRACT
+				// for searching super classes, change mode GET_MEMBER_MODE_SUPER to GET_MEMBER_MODE_FUNCTION_WITH_BODY
 				mode = ClassDefinition.GET_MEMBER_MODE_FUNCTION_WITH_BODY;
 			}
 			if (mode != ClassDefinition.GET_MEMBER_MODE_CLASS_ONLY) {
