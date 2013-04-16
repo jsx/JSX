@@ -1779,7 +1779,6 @@ class Parser {
 				this._objectTypesUsed.splice(numObjectTypesUsed, this._objectTypesUsed.length - numObjectTypesUsed);
 			}
 		}
-		return null;	// FIXME dummy
 	}
 
 	function _formalTypeArguments () : Token[] {
@@ -2994,7 +2993,6 @@ class Parser {
 		} finally {
 			this._popScope();
 		}
-		return null;	// dummy
 	}
 
 	function _functionExpr (token : Token) : Expression {

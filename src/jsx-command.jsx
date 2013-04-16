@@ -229,6 +229,9 @@ class JSXCommand {
 					}
 				});
 				break;
+			case "--warn-error":
+				compiler.setWarningAsError(true);
+				break;
 			case "--executable":
 				if ((optarg = getoptarg()) == null) {
 					return 1;

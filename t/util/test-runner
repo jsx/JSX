@@ -216,9 +216,17 @@ sub optimize_and_compare {
 sub expect_compile_error {
     my($file) = @_;
 
+    my $opts = get_section($file, "JSX_OPTS");
+    if (defined $opts) {
+        chomp $opts;
+        plan skip_all => 'environment variable JSX_OPTS is set'
+            if $ENV{JSX_OPTS};
+    }
+    $opts ||= "";
+
     plan tests => 5;
 
-    my($ok, $stdout, $stderr) = jsx($file);
+    my($ok, $stdout, $stderr) = jsx("$opts $file");
     ok !$ok, "failed to compile $file";
     unlike $stderr, qr/^ \s+ \b at \b \s+ \b Module \b/xms,
         "... without compiler crash";
