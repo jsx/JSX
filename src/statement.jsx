@@ -83,7 +83,7 @@ abstract class Statement implements Stashable {
 	}
 
 	static function assertIsReachable (context : AnalysisContext, token : Token) : boolean {
-		if (context.getTopBlock().localVariableStatuses == null) {
+		if (! context.getTopBlock().localVariableStatuses.isReachable()) {
 			context.errors.push(new CompileWarning(token, "the code is unreachable"));
 		}
 		return true;
@@ -377,7 +377,7 @@ class ReturnStatement extends Statement {
 				return false;
 			}
 		}
-		context.getTopBlock().localVariableStatuses = null;
+		context.getTopBlock().localVariableStatuses.setIsReachable(false);
 		return true;
 	}
 
@@ -471,7 +471,7 @@ abstract class JumpStatement extends Statement {
 			(targetBlock.block as LabellableStatement).registerVariableStatusesOnBreak(context.getTopBlock().localVariableStatuses);
 		else
 			(targetBlock.block as ContinuableStatement).registerVariableStatusesOnContinue(context.getTopBlock().localVariableStatuses);
-		context.getTopBlock().localVariableStatuses = null;
+		context.getTopBlock().localVariableStatuses.setIsReachable(false);
 		return true;
 	}
 
@@ -581,7 +581,8 @@ abstract class LabellableStatement extends Statement implements Block {
 
 	function _prepareBlockAnalysis (context : AnalysisContext) : void {
 		context.blockStack.push(new BlockContext(context.getTopBlock().localVariableStatuses.clone(), this));
-		this._lvStatusesOnBreak = null;
+		this._lvStatusesOnBreak = context.getTopBlock().localVariableStatuses.clone();
+		this._lvStatusesOnBreak.setIsReachable(false);
 	}
 
 	function _abortBlockAnalysis (context : AnalysisContext) : void {
@@ -649,10 +650,7 @@ abstract class ContinuableStatement extends LabellableStatement {
 
 	function _restoreContinueVariableStatuses (context : AnalysisContext) : void {
 		if (this._lvStatusesOnContinue != null) {
-			if (context.getTopBlock().localVariableStatuses != null)
-				context.getTopBlock().localVariableStatuses = context.getTopBlock().localVariableStatuses.merge(this._lvStatusesOnContinue);
-			else
-				context.getTopBlock().localVariableStatuses = this._lvStatusesOnContinue;
+			context.getTopBlock().localVariableStatuses = context.getTopBlock().localVariableStatuses.merge(this._lvStatusesOnContinue);
 			this._lvStatusesOnContinue = null;
 		}
 	}
@@ -962,13 +960,7 @@ class IfStatement extends Statement implements Block {
 			context.blockStack.pop();
 		}
 		// merge the variable statuses
-		if (lvStatusesOnTrueStmts != null)
-			if (lvStatusesOnFalseStmts != null)
-				context.getTopBlock().localVariableStatuses = lvStatusesOnTrueStmts.merge(lvStatusesOnFalseStmts);
-			else
-				context.getTopBlock().localVariableStatuses = lvStatusesOnTrueStmts;
-		else
-			context.getTopBlock().localVariableStatuses = lvStatusesOnFalseStmts;
+		context.getTopBlock().localVariableStatuses = lvStatusesOnTrueStmts.merge(lvStatusesOnFalseStmts);
 		return true;
 	}
 
@@ -1050,7 +1042,7 @@ class SwitchStatement extends LabellableStatement {
 				if (statement instanceof DefaultStatement)
 					hasDefaultLabel = true;
 			}
-			if (context.getTopBlock().localVariableStatuses != null)
+			if (context.getTopBlock().localVariableStatuses.isReachable())
 				this.registerVariableStatusesOnBreak(context.getTopBlock().localVariableStatuses);
 			if (! hasDefaultLabel)
 				this.registerVariableStatusesOnBreak(context.blockStack[context.blockStack.length - 2].localVariableStatuses);
@@ -1290,16 +1282,14 @@ class TryStatement extends Statement implements Block {
 		// try
 		context.blockStack.push(new BlockContext(context.getTopBlock().localVariableStatuses.clone(), this));
 		var lvStatusesAfterTryCatch = null : LocalVariableStatuses;
-		var lvStatusesAfterTry = null : LocalVariableStatuses;
 		try {
 			for (var i = 0; i < this._tryStatements.length; ++i)
 				if (! this._tryStatements[i].analyze(context))
 					return false;
-			lvStatusesAfterTry = context.getTopBlock().localVariableStatuses;
+			lvStatusesAfterTryCatch = context.getTopBlock().localVariableStatuses;
 		} finally {
 			context.blockStack.pop();
 		}
-		lvStatusesAfterTryCatch = LocalVariableStatuses.merge(lvStatusesAfterTryCatch, lvStatusesAfterTry);
 		// catch
 		for (var i = 0; i < this._catchStatements.length; ++i) {
 			context.blockStack.push(new BlockContext(context.getTopBlock().localVariableStatuses.clone(), this._catchStatements[i]));
@@ -1311,7 +1301,7 @@ class TryStatement extends Statement implements Block {
 			} finally {
 				context.blockStack.pop();
 			}
-			lvStatusesAfterTryCatch = LocalVariableStatuses.merge(lvStatusesAfterTryCatch, lvStatusesAfterCatch);
+			lvStatusesAfterTryCatch = lvStatusesAfterTryCatch.merge(lvStatusesAfterCatch);
 			var curCatchType = this._catchStatements[i].getLocal().getType();
 			for (var j = 0; j < i; ++j) {
 				var precCatchType = this._catchStatements[j].getLocal().getType();
@@ -1477,7 +1467,7 @@ class ThrowStatement extends Statement {
 			context.errors.push(new CompileError(this._token, "cannot throw 'void'"));
 			return true;
 		}
-		context.getTopBlock().localVariableStatuses = null;
+		context.getTopBlock().localVariableStatuses.setIsReachable(false);
 		return true;
 	}
 
