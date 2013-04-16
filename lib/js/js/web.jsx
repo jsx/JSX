@@ -2054,6 +2054,8 @@ native final __fake__ class Window extends EventTarget {
 	function mozRequestAnimationFrame(callback : function(time:number/*DOMTimeStamp*/):void/*FrameRequestCallback*/) : number/*long*/;
 	function mozCancelAnimationFrame(handle : number/*long*/) : void;
 
+	__readonly__ var closed : boolean;
+
 } // end of Window
 
 /** @see http://dev.w3.org/csswg/cssom-view/ */

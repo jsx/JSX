@@ -46,7 +46,6 @@ abstract class Statement implements Stashable {
 
 			throw e;
 		}
-		return false;	// FIXME dummy
 	}
 
 	function forEachStatement (cb : function(:Statement):boolean) : boolean {
@@ -83,9 +82,8 @@ abstract class Statement implements Stashable {
 	}
 
 	static function assertIsReachable (context : AnalysisContext, token : Token) : boolean {
-		if (context.getTopBlock().localVariableStatuses == null) {
-			context.errors.push(new CompileError(token, "the code is unreachable"));
-			return false;
+		if (! context.getTopBlock().localVariableStatuses.isReachable()) {
+			context.errors.push(new CompileWarning(token, "the code is unreachable"));
 		}
 		return true;
 	}
@@ -242,6 +240,69 @@ class ExpressionStatement extends UnaryExpressionStatement {
 
 }
 
+class FunctionStatement extends Statement {
+
+	var _token : Token;
+	var _funcDef : MemberFunctionDefinition;
+
+	function constructor (token : Token, funcDef : MemberFunctionDefinition) {
+		super();
+		this._token = token;
+		this._funcDef = funcDef;
+	}
+
+	override function clone () : FunctionStatement {
+		// NOTE: funcDef is not cloned, but is later replaced in MemberFunctionDefitition#instantiate
+		return new FunctionStatement(this._token, this._funcDef);
+	}
+
+	override function getToken () : Token {
+		return this._token;
+	}
+
+	function getFuncDef () : MemberFunctionDefinition {
+		return this._funcDef;
+	}
+
+	function setFuncDef (funcDef : MemberFunctionDefinition) : void {
+		this._funcDef = funcDef;
+	}
+
+	override function serialize () : variant {
+		return [
+			"FunctionStatement",
+			this._funcDef.serialize()
+		] : variant[];
+	}
+
+	override function doAnalyze (context : AnalysisContext) : boolean {
+		if (! this._typesAreIdentified()) {
+			context.errors.push(new CompileError(this._token, "argument / return types were not automatically deductable, please specify them by hand"));
+			return false;
+		}
+		this._funcDef.analyze(context);
+		// the function can be used from the scope of the same level
+		context.getTopBlock().localVariableStatuses.setStatus(this._funcDef.getFuncLocal());
+		return true; // return true since everything is resolved correctly even if analysis of the function definition failed
+	}
+
+	function _typesAreIdentified () : boolean {
+		var argTypes = this._funcDef.getArgumentTypes();
+		for (var i = 0; i < argTypes.length; ++i) {
+			if (argTypes[i] == null)
+				return false;
+		}
+		if (this._funcDef.getReturnType() == null)
+			return false;
+		return true;
+	}
+
+	override function forEachExpression (cb : function(:Expression,:function(:Expression):void):boolean) : boolean {
+		return true;
+	}
+
+}
+
 class ReturnStatement extends Statement {
 
 	var _token : Token;
@@ -283,7 +344,18 @@ class ReturnStatement extends Statement {
 			return true;
 		}
 		var returnType = context.funcDef.getReturnType();
-		if (returnType.equals(Type.voidType)) {
+		if (returnType == null) {
+			if (this._expr != null) {
+				if (! this._analyzeExpr(context, this._expr))
+					return true;
+				var exprType = this._expr.getType();
+				if (exprType == null)
+					return true;
+				context.funcDef.setReturnType(exprType);
+			} else {
+				context.funcDef.setReturnType(Type.voidType);
+			}
+		} else if (returnType.equals(Type.voidType)) {
 			// handle return(void);
 			if (this._expr != null) {
 				context.errors.push(new CompileError(this._token, "cannot return a value from a void function"));
@@ -295,13 +367,13 @@ class ReturnStatement extends Statement {
 				context.errors.push(new CompileError(this._token, "cannot return void, the function is declared to return a value of type '" + returnType.toString() + "'"));
 				return true;
 			}
-			if (this._expr instanceof FunctionExpression && ! (this._expr as FunctionExpression).typesAreIdentified() && returnType instanceof StaticFunctionType) {
+			if (this._expr instanceof FunctionExpression && ! (this._expr as FunctionExpression).argumentTypesAreIdentified() && returnType instanceof StaticFunctionType) {
 				if (! (this._expr as FunctionExpression).deductTypeIfUnknown(context, returnType as StaticFunctionType))
 					return false;
 			}
 			if (! this._analyzeExpr(context, this._expr))
 				return true;
-			var exprType = this._expr != null ? this._expr.getType() : (Type.voidType as Type);
+			var exprType = this._expr.getType();
 			if (exprType == null)
 				return true;
 			if (! exprType.isConvertibleTo(returnType)) {
@@ -309,7 +381,7 @@ class ReturnStatement extends Statement {
 				return false;
 			}
 		}
-		context.getTopBlock().localVariableStatuses = null;
+		context.getTopBlock().localVariableStatuses.setIsReachable(false);
 		return true;
 	}
 
@@ -459,7 +531,7 @@ abstract class JumpStatement extends Statement {
 			(targetBlock.block as LabellableStatement).registerVariableStatusesOnBreak(context.getTopBlock().localVariableStatuses);
 		else
 			(targetBlock.block as ContinuableStatement).registerVariableStatusesOnContinue(context.getTopBlock().localVariableStatuses);
-		context.getTopBlock().localVariableStatuses = null;
+		context.getTopBlock().localVariableStatuses.setIsReachable(false);
 		return true;
 	}
 
@@ -569,7 +641,8 @@ abstract class LabellableStatement extends Statement implements Block {
 
 	function _prepareBlockAnalysis (context : AnalysisContext) : void {
 		context.blockStack.push(new BlockContext(context.getTopBlock().localVariableStatuses.clone(), this));
-		this._lvStatusesOnBreak = null;
+		this._lvStatusesOnBreak = context.getTopBlock().localVariableStatuses.clone();
+		this._lvStatusesOnBreak.setIsReachable(false);
 	}
 
 	function _abortBlockAnalysis (context : AnalysisContext) : void {
@@ -637,10 +710,7 @@ abstract class ContinuableStatement extends LabellableStatement {
 
 	function _restoreContinueVariableStatuses (context : AnalysisContext) : void {
 		if (this._lvStatusesOnContinue != null) {
-			if (context.getTopBlock().localVariableStatuses != null)
-				context.getTopBlock().localVariableStatuses = context.getTopBlock().localVariableStatuses.merge(this._lvStatusesOnContinue);
-			else
-				context.getTopBlock().localVariableStatuses = this._lvStatusesOnContinue;
+			context.getTopBlock().localVariableStatuses = context.getTopBlock().localVariableStatuses.merge(this._lvStatusesOnContinue);
 			this._lvStatusesOnContinue = null;
 		}
 	}
@@ -950,13 +1020,7 @@ class IfStatement extends Statement implements Block {
 			context.blockStack.pop();
 		}
 		// merge the variable statuses
-		if (lvStatusesOnTrueStmts != null)
-			if (lvStatusesOnFalseStmts != null)
-				context.getTopBlock().localVariableStatuses = lvStatusesOnTrueStmts.merge(lvStatusesOnFalseStmts);
-			else
-				context.getTopBlock().localVariableStatuses = lvStatusesOnTrueStmts;
-		else
-			context.getTopBlock().localVariableStatuses = lvStatusesOnFalseStmts;
+		context.getTopBlock().localVariableStatuses = lvStatusesOnTrueStmts.merge(lvStatusesOnFalseStmts);
 		return true;
 	}
 
@@ -1038,6 +1102,8 @@ class SwitchStatement extends LabellableStatement {
 				if (statement instanceof DefaultStatement)
 					hasDefaultLabel = true;
 			}
+			if (context.getTopBlock().localVariableStatuses.isReachable())
+				this.registerVariableStatusesOnBreak(context.getTopBlock().localVariableStatuses);
 			if (! hasDefaultLabel)
 				this.registerVariableStatusesOnBreak(context.blockStack[context.blockStack.length - 2].localVariableStatuses);
 			this._finalizeBlockAnalysis(context);
@@ -1275,23 +1341,27 @@ class TryStatement extends Statement implements Block {
 	override function doAnalyze (context : AnalysisContext) : boolean {
 		// try
 		context.blockStack.push(new BlockContext(context.getTopBlock().localVariableStatuses.clone(), this));
-		var lvStatusesAfterTry = null : LocalVariableStatuses;
+		var lvStatusesAfterTryCatch = null : LocalVariableStatuses;
 		try {
 			for (var i = 0; i < this._tryStatements.length; ++i)
 				if (! this._tryStatements[i].analyze(context))
 					return false;
-			// change the statuses to may (since they might be left uninitialized due to an exception)
-			lvStatusesAfterTry = context.getTopBlock().localVariableStatuses;
+			lvStatusesAfterTryCatch = context.getTopBlock().localVariableStatuses;
 		} finally {
 			context.blockStack.pop();
 		}
-		context.getTopBlock().localVariableStatuses = lvStatusesAfterTry != null
-			? context.getTopBlock().localVariableStatuses.merge(lvStatusesAfterTry)
-			: context.getTopBlock().localVariableStatuses.clone();
 		// catch
 		for (var i = 0; i < this._catchStatements.length; ++i) {
-			if (! this._catchStatements[i].analyze(context))
-				return false;
+			context.blockStack.push(new BlockContext(context.getTopBlock().localVariableStatuses.clone(), this._catchStatements[i]));
+			var lvStatusesAfterCatch = null : LocalVariableStatuses;
+			try {
+				if (! this._catchStatements[i].analyze(context))
+					return false;
+				lvStatusesAfterCatch = context.getTopBlock().localVariableStatuses;
+			} finally {
+				context.blockStack.pop();
+			}
+			lvStatusesAfterTryCatch = lvStatusesAfterTryCatch.merge(lvStatusesAfterCatch);
 			var curCatchType = this._catchStatements[i].getLocal().getType();
 			for (var j = 0; j < i; ++j) {
 				var precCatchType = this._catchStatements[j].getLocal().getType();
@@ -1304,9 +1374,17 @@ class TryStatement extends Statement implements Block {
 			}
 		}
 		// finally
-		for (var i = 0; i < this._finallyStatements.length; ++i)
-			if (! this._finallyStatements[i].analyze(context))
-				return false;
+		context.blockStack.push(new BlockContext(context.getTopBlock().localVariableStatuses.merge(lvStatusesAfterTryCatch), this));
+		var lvStatusesAfterFinally = null : LocalVariableStatuses;
+		try {
+			for (var i = 0; i < this._finallyStatements.length; ++i)
+				if (! this._finallyStatements[i].analyze(context))
+					return false;
+			lvStatusesAfterFinally = context.getTopBlock().localVariableStatuses;
+		} finally {
+			context.blockStack.pop();
+		}
+		context.getTopBlock().localVariableStatuses = lvStatusesAfterTryCatch.mergeFinally(lvStatusesAfterFinally);
 		return true;
 	}
 
@@ -1387,19 +1465,10 @@ class CatchStatement extends Statement implements Block {
 			context.errors.push(new CompileError(this._token, "only objects or a variant may be caught"));
 		}
 		// analyze the statements
-		context.blockStack.push(new BlockContext(context.getTopBlock().localVariableStatuses.clone(), this));
-		var lvStatusesAfterCatch = null : LocalVariableStatuses;
-		try {
-			for (var i = 0; i < this._statements.length; ++i) {
-				if (! this._statements[i].analyze(context))
-					return false;
-			}
-			lvStatusesAfterCatch = context.getTopBlock().localVariableStatuses;
-		} finally {
-			context.blockStack.pop();
+		for (var i = 0; i < this._statements.length; ++i) {
+			if (! this._statements[i].analyze(context))
+				return false;
 		}
-		if (lvStatusesAfterCatch != null)
-			context.getTopBlock().localVariableStatuses = context.getTopBlock().localVariableStatuses.merge(lvStatusesAfterCatch);
 		return true;
 	}
 
@@ -1458,7 +1527,7 @@ class ThrowStatement extends Statement {
 			context.errors.push(new CompileError(this._token, "cannot throw 'void'"));
 			return true;
 		}
-		context.getTopBlock().localVariableStatuses = null;
+		context.getTopBlock().localVariableStatuses.setIsReachable(false);
 		return true;
 	}
 

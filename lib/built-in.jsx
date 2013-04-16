@@ -1066,7 +1066,7 @@ native final class JSX {
 	/**
 	 * <p>Posts the profiler results to the given URL.</p>
 	 *
-	 * <p>Please refer to <a href="http://jsx.github.com/doc/profiler.html">the profiler document</a> for using the function.</p>
+	 * <p>Please refer to <a href="http://jsx.github.io/doc/profiler.html">the profiler document</a> for using the function.</p>
 	 */
 	static function postProfileResults(url : string) : void;
 	static function postProfileResults(url : string, cb : function (error:Error, resultUrl:string):void) : void;

@@ -42,6 +42,7 @@ class Compiler {
 	var _mode : number;
 	var _optimizer : Optimizer;
 	var _warningFilters : Array.<function(:CompileWarning):Nullable.<boolean>>;
+	var _warningAsError : boolean;
 	var _parsers : Parser[];
 	var _fileCache : Map.<string>;
 	var _searchPaths : string[];
@@ -53,6 +54,7 @@ class Compiler {
 		this._mode = Compiler.MODE_COMPILE;
 		this._optimizer = null;
 		this._warningFilters = [] : Array.<function(:CompileWarning):Nullable.<boolean>>;
+		this._warningAsError = false;
 		this._parsers = new Parser[];
 		this._fileCache = new Map.<string>;
 		this._searchPaths = [ this._platform.getRoot() + "/lib/common" ];
@@ -92,6 +94,10 @@ class Compiler {
 
 	function getWarningFilters () : Array.<function(:CompileWarning):Nullable.<boolean>> {
 		return this._warningFilters;
+	}
+
+	function setWarningAsError(f : boolean) : void {
+		this._warningAsError = f;
 	}
 
 	function getParsers () : Parser[] {
@@ -445,6 +451,7 @@ class Compiler {
 				}
 				if (doWarn != false) {
 					this._platform.warn(warning.format(this.getPlatform()));
+					isFatal = this._warningAsError;
 				}
 			} else {
 				this._platform.error(error.format(this.getPlatform()));

@@ -68,7 +68,7 @@ Type the following commands to run the server:
     open http://localhost:2012/
 
 This server is also used to show results of JSX profiler.
-See [Using the Profiler](http://jsx.github.com/doc/profiler.html) for details.
+See [Using the Profiler](http://jsx.github.io/doc/profiler.html) for details.
 
 TESTING
 -----------------------
@@ -89,6 +89,6 @@ TBD
 RESOURCES
 =======================
 
-* [JSX web site](http://jsx.github.com/)
+* [JSX web site](http://jsx.github.io/)
 * [JSX wiki](https://github.com/jsx/JSX/wiki)
 

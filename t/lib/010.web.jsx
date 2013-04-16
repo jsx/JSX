@@ -1569,6 +1569,7 @@ class _Test extends TestCase {
         o.webkitCancelAnimationFrame(X.getnumber());
         var f24 : number/*long*/ = o.mozRequestAnimationFrame(X.getfunction_time_number__void());
         o.mozCancelAnimationFrame(X.getnumber());
+        var v105 : boolean = o.closed;
     } // Window
 
     function compile_MediaQueryList(o : MediaQueryList) : void {

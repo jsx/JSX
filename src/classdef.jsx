@@ -709,15 +709,24 @@ class ClassDefinition implements Stashable {
 			for (var i = 0; i < this._implementTypes.length; ++i) {
 				if ((this._implementTypes[i].getClassDef().flags() & ClassDefinition.IS_MIXIN) == 0)
 					continue;
+				var theMixin = this._implementTypes[i].getClassDef();
 				var overrideFunctions = new MemberDefinition[];
-				this._implementTypes[i].getClassDef()._getMembers(overrideFunctions, true, ClassDefinition.IS_OVERRIDE, ClassDefinition.IS_OVERRIDE);
+				theMixin._getMembers(overrideFunctions, true, ClassDefinition.IS_OVERRIDE, ClassDefinition.IS_OVERRIDE);
 				for (var j = 0; j < overrideFunctions.length; ++j) {
 					var done = false;
 					if (this._baseClassDef != null)
 						if (this._baseClassDef._assertFunctionIsOverridable(context, overrideFunctions[j] as MemberFunctionDefinition) != null)
 							done = true;
+					// check sibling interfaces / mixins
 					for (var k = 0; k < i; ++k) {
 						if (this._implementTypes[k].getClassDef()._assertFunctionIsOverridable(context, overrideFunctions[j] as MemberFunctionDefinition) != null) {
+							done = true;
+							break;
+						}
+					}
+					// check parent interfaces / mixins of the mixin
+					for (var k = 0; k < theMixin._implementTypes.length; ++k) {
+						if (theMixin._implementTypes[k].getClassDef()._assertFunctionIsOverridable(context, overrideFunctions[j] as MemberFunctionDefinition) != null) {
 							done = true;
 							break;
 						}
@@ -1097,12 +1106,20 @@ class MemberVariableDefinition extends MemberDefinition {
 			try {
 				this._analyzeState = MemberVariableDefinition.IS_ANALYZING;
 				if (this._initialValue != null) {
+					if (this._initialValue instanceof ClassExpression) {
+						this._analysisContext.errors.push(new CompileError(this._initialValue._token, "cannot assign a class"));
+						return null;
+					}
 					if (! this._initialValue.analyze(this._analysisContext, null))
 						return null;
 					var ivType = this._initialValue.getType();
 					if (this._type == null) {
 						if (ivType.equals(Type.nullType)) {
 							this._analysisContext.errors.push(new CompileError(this._initialValue.getToken(), "cannot assign null to an unknown type"));
+							return null;
+						}
+						if (ivType.equals(Type.voidType)) {
+							this._analysisContext.errors.push(new CompileError(this._initialValue.getToken(), "cannot assign void"));
 							return null;
 						}
 						this._type = ivType.asAssignableType();
@@ -1153,6 +1170,7 @@ class MemberFunctionDefinition extends MemberDefinition implements Block {
 	var _closures : MemberFunctionDefinition[];
 	var _lastTokenOfBody : Token;
 	var _parent : MemberFunctionDefinition;
+	var _funcLocal : LocalVariable;
 
 	function constructor (token : Token, name : Token, flags : number, returnType : Type, args : ArgumentDeclaration[], locals : LocalVariable[], statements : Statement[], closures : MemberFunctionDefinition[], lastTokenOfBody : Token, docComment : DocComment) {
 		super(token, name, flags, docComment);
@@ -1163,6 +1181,7 @@ class MemberFunctionDefinition extends MemberDefinition implements Block {
 		this._closures = closures;
 		this._lastTokenOfBody = lastTokenOfBody;
 		this._parent = null;
+		this._funcLocal = null;
 		this._classDef = null;
 		if (this._closures != null) {
 			for (var i = 0; i < this._closures.length; ++i)
@@ -1272,7 +1291,17 @@ class MemberFunctionDefinition extends MemberDefinition implements Block {
 			}, this._statements);
 			// update the link from function expressions to closures
 			Util.forEachStatement(function onStatement(statement : Statement) : boolean {
-				function onExpr(expr : Expression) : boolean {
+				if (statement instanceof FunctionStatement) {
+					for (var i = 0; i < this._closures.length; ++i) {
+						if (this._closures[i] == (statement as FunctionStatement).getFuncDef())
+							break;
+					}
+					if (i == this._closures.length)
+						throw new Error("logic flaw, cannot find the closure");
+					(statement as FunctionStatement).setFuncDef(closures[i]);
+					return true;
+				}
+				statement.forEachExpression(function onExpr(expr : Expression) : boolean {
 					if (expr instanceof FunctionExpression) {
 						for (var i = 0; i < this._closures.length; ++i) {
 							if (this._closures[i] == (expr as FunctionExpression).getFuncDef())
@@ -1283,8 +1312,7 @@ class MemberFunctionDefinition extends MemberDefinition implements Block {
 						(expr as FunctionExpression).setFuncDef(closures[i]);
 					}
 					return expr.forEachExpression(onExpr);
-				}
-				statement.forEachExpression(onExpr);
+				});
 				return statement.forEachStatement(onStatement);
 			}, statements);
 		} else {
@@ -1345,8 +1373,14 @@ class MemberFunctionDefinition extends MemberDefinition implements Block {
 		} else {
 			context.setBlockStack(outerContext.blockStack);
 			context.blockStack.push(new BlockContext(new LocalVariableStatuses(this, outerContext.getTopBlock().localVariableStatuses), this));
-			if (! this.isAnonymous()) { // named function expr
-				context.getTopBlock().localVariableStatuses._statuses[this.name()] = LocalVariableStatuses.ISSET;
+			// make this function visible inside it
+			if (! this.isAnonymous()) {
+				if (this._returnType != null) {
+					context.getTopBlock().localVariableStatuses._statuses[this.name()] = LocalVariableStatuses.ISSET;
+				} else {
+					// ban on recursive function without the return type declared
+					context.getTopBlock().localVariableStatuses._statuses[this.name()] = LocalVariableStatuses.UNTYPED_RECURSIVE_FUNCTION;
+				}
 			}
 		}
 
@@ -1356,15 +1390,22 @@ class MemberFunctionDefinition extends MemberDefinition implements Block {
 			for (var i = 0; i < this._statements.length; ++i)
 				if (! this._statements[i].analyze(context))
 					break;
+			if (this._returnType == null) // no return statement in body
+				this._returnType = Type.voidType;
 			if ((this._flags & ClassDefinition.IS_GENERATOR) == 0 && ! this._returnType.equals(Type.voidType) && context.getTopBlock().localVariableStatuses != null)
+			if (! this._returnType.equals(Type.voidType) && context.getTopBlock().localVariableStatuses.isReachable())
 				context.errors.push(new CompileError(this._lastTokenOfBody, "missing return statement"));
 
-			if (this.getNameToken() != null && this.name() == "constructor") {
+			if (this._parent == null && this.getNameToken() != null && this.name() == "constructor") {
 				this._fixupConstructor(context);
 			}
 
 		} finally {
 			context.blockStack.pop();
+		}
+
+		if (this._funcLocal != null) {
+			this._funcLocal.setTypeForced(this.getType());
 		}
 
 	}
@@ -1489,6 +1530,10 @@ class MemberFunctionDefinition extends MemberDefinition implements Block {
 		return this._returnType;
 	}
 
+	function setReturnType (type : Type) : void {
+		this._returnType = type;
+	}
+
 	function getArguments () : ArgumentDeclaration[] {
 		return this._args;
 	}
@@ -1498,6 +1543,14 @@ class MemberFunctionDefinition extends MemberDefinition implements Block {
 		for (var i = 0; i < this._args.length; ++i)
 			argTypes[i] = this._args[i].getType();
 		return argTypes;
+	}
+
+	function getFuncLocal () : LocalVariable {
+		return this._funcLocal;
+	}
+
+	function setFuncLocal (funcLocal : LocalVariable) : void {
+		this._funcLocal = funcLocal;
 	}
 
 	function getParent () : MemberFunctionDefinition {
@@ -1560,8 +1613,11 @@ class MemberFunctionDefinition extends MemberDefinition implements Block {
 			if (this._args[i].getType() == null)
 				break;
 		}
-		if (i == this._args.length && this._returnType != null)
+		if (i == this._args.length && this._returnType != null) {
+			if (this._funcLocal != null)
+				this._funcLocal.setTypeForced(this.getType());
 			return true;
+		}
 		// resolve!
 		if (type.getArgumentTypes().length != this._args.length) {
 			context.errors.push(new CompileError(this.getToken(), "expected the function to have " + type.getArgumentTypes().length as string + " arguments, but found " + this._args.length as string));
@@ -1588,6 +1644,8 @@ class MemberFunctionDefinition extends MemberDefinition implements Block {
 		} else {
 			this._returnType = type.getReturnType();
 		}
+		if (this._funcLocal != null)
+			this._funcLocal.setTypeForced(this.getType());
 		return true;
 	}
 
@@ -1732,6 +1790,9 @@ class LocalVariable {
 			context.getTopBlock().localVariableStatuses.setStatus(this);
 		} else {
 			switch (context.getTopBlock().localVariableStatuses.getStatus(this)) {
+			case LocalVariableStatuses.UNTYPED_RECURSIVE_FUNCTION:
+				context.errors.push(new CompileError(token, "the return type of recursive function needs to be explicitly declared"));
+				return false;
 			case LocalVariableStatuses.ISSET:
 				// ok
 				break;
@@ -1823,11 +1884,14 @@ class ArgumentDeclaration extends LocalVariable {
 
 class LocalVariableStatuses {
 
+	static const UNTYPED_RECURSIVE_FUNCTION = -1;
+
 	static const UNSET = 0;
 	static const ISSET = 1;
 	static const MAYBESET = 2;
 
 	var _statuses : Map.<number>;
+	var _isReachable : boolean;
 
 	function constructor (funcDef : MemberFunctionDefinition, base : LocalVariableStatuses) {
 		this._statuses = new Map.<number>;
@@ -1843,11 +1907,14 @@ class LocalVariableStatuses {
 		var locals = funcDef.getLocals();
 		for (var i = 0; i < locals.length; ++i)
 			this._statuses[locals[i].getName().getValue()] = LocalVariableStatuses.UNSET;
+
+		this._isReachable = true;
 	}
 
 	function constructor (srcStatus : LocalVariableStatuses) {
 		this._statuses = new Map.<number>;
 		this._copyFrom(srcStatus);
+		this._isReachable = srcStatus._isReachable;
 	}
 
 	function clone () : LocalVariableStatuses {
@@ -1855,6 +1922,13 @@ class LocalVariableStatuses {
 	}
 
 	function merge (that : LocalVariableStatuses) : LocalVariableStatuses {
+		if (this._isReachable != that._isReachable) {
+			if (this._isReachable) {
+				return this.clone();
+			} else {
+				return that.clone();
+			}
+		}
 		var ret = this.clone() as LocalVariableStatuses;
 		for (var k in ret._statuses) {
 			if (ret._statuses[k] == LocalVariableStatuses.UNSET && that._statuses[k] == LocalVariableStatuses.UNSET) {
@@ -1865,6 +1939,26 @@ class LocalVariableStatuses {
 				// MAYBESET
 				ret._statuses[k] = LocalVariableStatuses.MAYBESET;
 			}
+		}
+		return ret;
+	}
+
+	function mergeFinally (postFinallyStats : LocalVariableStatuses) : LocalVariableStatuses {
+		var ret = this.clone() as LocalVariableStatuses;
+		for (var k in ret._statuses) {
+			switch (postFinallyStats._statuses[k]) {
+			case LocalVariableStatuses.ISSET:
+				ret._statuses[k] = LocalVariableStatuses.ISSET;
+				break;
+			case LocalVariableStatuses.MAYBESET:
+				if (ret._statuses[k] != LocalVariableStatuses.ISSET) {
+					ret._statuses[k] = LocalVariableStatuses.MAYBESET;
+				}
+				break;
+			}
+		}
+		if (! postFinallyStats._isReachable) {
+			ret._isReachable = false;
 		}
 		return ret;
 	}
@@ -1881,6 +1975,14 @@ class LocalVariableStatuses {
 		if (this._statuses[name] == null)
 			throw new Error("logic flaw, could not find status for local variable: " + name);
 		return this._statuses[name];
+	}
+
+	function isReachable() : boolean {
+		return this._isReachable;
+	}
+
+	function setIsReachable(isReachable : boolean) : void {
+		this._isReachable = isReachable;
 	}
 
 	function _copyFrom (that : LocalVariableStatuses) : void {

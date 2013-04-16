@@ -34,27 +34,19 @@ sub xsystem { # system() which returns (status code, stdout, stderr)
 sub jsx { # returns (status, stdout, stderr)
     my(@args) = @_;
 
-    if (-f "$ENV{JSX_HOME}/port") {
-        my $port = slurp("$ENV{JSX_HOME}/port");
+    require IPC::Open3;
+    require Symbol;
+    my($wtr, $rdr, $err) = (Symbol::gensym(), Symbol::gensym(), Symbol::gensym());
+    my $pid = IPC::Open3::open3($wtr, $rdr, $err, "bin/jsx @args");
+    close $wtr;
+    local $/;
+    my $stdout = <$rdr>;
+    my $stderr = <$err>;
+    close $rdr;
+    close $err;
+    waitpid $pid, 0;
 
-        my $app_jsx = File::Basename::dirname(__FILE__) . "/jsx.pl";
-        require $app_jsx; # App::jsx
-
-        require Text::ParseWords;
-
-        my @real_args = Text::ParseWords::shellwords(@args);
-        my $c = App::jsx::request($port, @real_args);
-
-        App::jsx::save_files($c);
-
-        if ($c->{run}) {
-            return xsystem(App::jsx::prepare_run_command($c->{run}));
-        }
-        return ($c->{statusCode} == 0, $c->{stdout}, $c->{stderr});
-    }
-    else {
-        return (0, "", "no compilation server running");
-    }
+    return ($? == 0, $stdout, $stderr);
 }
 
 sub slurp {

@@ -85,6 +85,9 @@ abstract class Expression implements Stashable {
 			} else if (expr instanceof LocalExpression) {
 				// update local to the instantiated one
 				(expr as LocalExpression).setLocal((expr as LocalExpression).getLocal().getInstantiated());
+			} else if (expr instanceof InstanceofExpression) {
+				var instanceofExpr = expr as InstanceofExpression;
+				instanceofExpr.setExpectedType(instanceofExpr.getExpectedType().instantiate(instantiationContext));
 			}
 			return expr.forEachExpression(onExpr);
 		}
@@ -751,24 +754,16 @@ class ThisExpression extends Expression {
 
 class FunctionExpression extends Expression {
 
-	var _funcName : LocalVariable;
 	var _funcDef : MemberFunctionDefinition;
-	var _isStatement : boolean;
 
-	function constructor (token : Token, funcName : LocalVariable, funcDef : MemberFunctionDefinition, isStatement : boolean) {
+	function constructor (token : Token, funcDef : MemberFunctionDefinition) {
 		super(token);
-		this._funcName = funcName;
 		this._funcDef = funcDef;
-		this._isStatement = isStatement;
 	}
 
 	override function clone () : FunctionExpression {
 		// NOTE: funcDef is not cloned, but is later replaced in MemberFunctionDefitition#instantiate
-		return new FunctionExpression(this._token, this._funcName, this._funcDef, this._isStatement);
-	}
-
-	function getFuncName () : LocalVariable {
-		return this._funcName;
+		return new FunctionExpression(this._token, this._funcDef);
 	}
 
 	function getFuncDef () : MemberFunctionDefinition {
@@ -779,10 +774,6 @@ class FunctionExpression extends Expression {
 		this._funcDef = funcDef;
 	}
 
-	function isStatement () : boolean {
-		return this._isStatement;
-	}
-
 	override function serialize () : variant {
 		return [
 			"FunctionExpression",
@@ -791,12 +782,9 @@ class FunctionExpression extends Expression {
 	}
 
 	override function analyze (context : AnalysisContext, parentExpr : Expression) : boolean {
-		if (! this.typesAreIdentified()) {
-			context.errors.push(new CompileError(this._token, "argument / return types were not automatically deductable, please specify them by hand"));
+		if (! this.argumentTypesAreIdentified()) {
+			context.errors.push(new CompileError(this._token, "argument types were not automatically deductable, please specify them by hand"));
 			return false;
-		}
-		if (this._isStatement) {
-			context.getTopBlock().localVariableStatuses.setStatus(new LocalVariable(this._funcDef.getNameToken(), this.getType()));
 		}
 		this._funcDef.analyze(context);
 		return true; // return true since everything is resolved correctly even if analysis of the function definition failed
@@ -806,12 +794,18 @@ class FunctionExpression extends Expression {
 		return this._funcDef.getType();
 	}
 
-	function typesAreIdentified () : boolean {
+	function argumentTypesAreIdentified () : boolean {
 		var argTypes = this._funcDef.getArgumentTypes();
 		for (var i = 0; i < argTypes.length; ++i) {
 			if (argTypes[i] == null)
 				return false;
 		}
+		return true;
+	}
+
+	function typesAreIdentified () : boolean {
+		if (! this.argumentTypesAreIdentified())
+			return false;
 		if (this._funcDef.getReturnType() == null)
 			return false;
 		return true;
@@ -820,14 +814,6 @@ class FunctionExpression extends Expression {
 	function deductTypeIfUnknown (context : AnalysisContext, type : ResolvedFunctionType) : boolean {
 		if (! this._funcDef.deductTypeIfUnknown(context, type))
 			return false;
-		if (this._funcName != null) {
-			if (this._funcName.getType() != null) {
-				if (! this._funcName.getType().equals(this._funcDef.getType()))
-					throw new Error("unmatched type for local function: " + this._funcName.getName().getValue());
-			} else {
-				this._funcName.setType(this._funcDef.getType());
-			}
-		}
 		return true;
 	}
 
@@ -919,6 +905,10 @@ class InstanceofExpression extends UnaryExpression {
 
 	function getExpectedType () : Type {
 		return this._expectedType;
+	}
+
+	function setExpectedType (type : Type) : void {
+		this._expectedType = type;
 	}
 
 	override function serialize () : variant {
@@ -1598,7 +1588,7 @@ class AssignmentExpression extends BinaryExpression {
 			return false;
 		if (this._expr1.getType() == null) {
 			if (! (this._expr2 as FunctionExpression).typesAreIdentified()) {
-				context.errors.push(new CompileError(this._token, "either side of the operator should be fully type-qualified"));
+				context.errors.push(new CompileError(this._token, "either side of the operator should be fully type-qualified : " + ((this._expr2 as FunctionExpression).argumentTypesAreIdentified() ? "return type not declared" : "argument / return types not declared")));
 				return false;
 			}
 		}

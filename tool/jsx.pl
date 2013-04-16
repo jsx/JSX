@@ -70,7 +70,7 @@ package App::jsx;
         }
     }
 
-    my $jsx_compiler = "$DIR/../bin/jsx-compiler.js";
+    my $jsx_compiler = "$DIR/../bin/jsx";
 
     my $home = $ENV{JSX_HOME} || (($ENV{HOME} || glob('~')) . "/.jsx");
 
@@ -245,6 +245,10 @@ package App::jsx;
     sub main {
         my(@argv) = @_;
 
+        binmode STDOUT, ":utf8";
+        binmode STDERR, ":utf8";
+        local $| = 1;
+
         if (! @argv) {
             shutdown_server();
             print "no files\n";
@@ -260,16 +264,15 @@ package App::jsx;
             $c = request($port, @argv);
         }
 
+        print STDERR $c->{stderr};
+
         save_files($c);
 
         if ($c->{run}) {
             return system(prepare_run_command($c->{run}));
         }
         else {
-            binmode STDOUT, ":utf8";
-            binmode STDERR, ":utf8";
             print STDOUT $c->{stdout};
-            print STDERR $c->{stderr};
             return $c->{statusCode};
         }
     }

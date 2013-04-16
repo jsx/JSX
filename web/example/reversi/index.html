@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Reversi</title>
+    <meta name="viewport" content="width=device-width,user-scalable=no" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="robots" content="noindex,nofollow" />
+
+    <style>
+    </style>
+    <script src="../../build/jsx-script-loader.jsx.js"></script>
+    <script type="application/jsx" src="reversi.jsx" data-optimization-level="1" data-arguments="[]"></script>
+  </head>
+  <body>
+    <div id="configuration">
+      <label><input type="radio" name="level" value="random" />level 1</label>
+      <label><input type="radio" name="level" value="most" />level 2</label>
+      <label><input type="radio" name="level" value="montecarlo" checked="checked" />level 3</label>
+      <label title="level 3 only"><input type="checkbox" id="show_winning_rate" checked="checked" />winning rate</label>
+
+    </div>
+    <div id="world"></div>
+
+    <div>
+      This is a JSX port of <a href="https://bitbucket.org/7shi/ts-reversi">TypeScript reversi</a>.
+    </div>
+  </body>
+<html>

@@ -186,7 +186,11 @@ class JSXCommand {
 				if ((optarg = getoptarg()) == null) {
 					return 1;
 				}
-				optimizeCommands = optimizeCommands.concat(optarg.split(","));
+				if (optarg == "release") {
+					optimizeCommands = Optimizer.getReleaseOptimizationCommands();
+				} else {
+					optimizeCommands = optimizeCommands.concat(optarg.split(","));
+				}
 				break;
 			case "--disable-optimize":
 				if ((optarg = getoptarg()) == null) {
@@ -224,6 +228,9 @@ class JSXCommand {
 						platform.error("unknown warning type: " + type);
 					}
 				});
+				break;
+			case "--warn-error":
+				compiler.setWarningAsError(true);
 				break;
 			case "--executable":
 				if ((optarg = getoptarg()) == null) {

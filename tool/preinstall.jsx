@@ -21,8 +21,8 @@ class _Main {
 
     static function main(args : string[]) : void {
         if (process.platform == "win32") {
-            console.log("installing bin/jsx for Windows");
-            _Main.copyFileSync("bin/jsx-compiler.js", "bin/jsx");
+            //console.log("installing bin/jsx for Windows");
+            //_Main.copyFileSync("bin/jsx-compiler.js", "bin/jsx");
         }
     }
 }
