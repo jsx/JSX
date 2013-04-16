@@ -10,6 +10,6 @@ class _Main {
         }
     }
     static function main(args : string[]) : void {
-        _Main.f(1);
+        log _Main.f(1);
     }
 }
