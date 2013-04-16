@@ -474,7 +474,7 @@ class _TryStatementEmitter extends _StatementEmitter {
 			this._emitter._emit("}", null);
 		}
 		var finallyStatements = this._statement.getFinallyStatements();
-		if (finallyStatements.length != 0) {
+		if (finallyStatements.length != 0 || catchStatements.length == 0) {
 			this._emitter._emit(" finally {\n", null);
 			this._emitter._emitStatements(finallyStatements);
 			this._emitter._emit("}", null);

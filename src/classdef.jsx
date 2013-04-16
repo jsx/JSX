@@ -1391,7 +1391,7 @@ class MemberFunctionDefinition extends MemberDefinition implements Block {
 					break;
 			if (this._returnType == null) // no return statement in body
 				this._returnType = Type.voidType;
-			if (! this._returnType.equals(Type.voidType) && context.getTopBlock().localVariableStatuses != null)
+			if (! this._returnType.equals(Type.voidType) && context.getTopBlock().localVariableStatuses.isReachable())
 				context.errors.push(new CompileError(this._lastTokenOfBody, "missing return statement"));
 
 			if (this._parent == null && this.getNameToken() != null && this.name() == "constructor") {
@@ -1884,6 +1884,7 @@ class LocalVariableStatuses {
 	static const MAYBESET = 2;
 
 	var _statuses : Map.<number>;
+	var _isReachable : boolean;
 
 	function constructor (funcDef : MemberFunctionDefinition, base : LocalVariableStatuses) {
 		this._statuses = new Map.<number>;
@@ -1899,11 +1900,14 @@ class LocalVariableStatuses {
 		var locals = funcDef.getLocals();
 		for (var i = 0; i < locals.length; ++i)
 			this._statuses[locals[i].getName().getValue()] = LocalVariableStatuses.UNSET;
+
+		this._isReachable = true;
 	}
 
 	function constructor (srcStatus : LocalVariableStatuses) {
 		this._statuses = new Map.<number>;
 		this._copyFrom(srcStatus);
+		this._isReachable = srcStatus._isReachable;
 	}
 
 	function clone () : LocalVariableStatuses {
@@ -1911,6 +1915,13 @@ class LocalVariableStatuses {
 	}
 
 	function merge (that : LocalVariableStatuses) : LocalVariableStatuses {
+		if (this._isReachable != that._isReachable) {
+			if (this._isReachable) {
+				return this.clone();
+			} else {
+				return that.clone();
+			}
+		}
 		var ret = this.clone() as LocalVariableStatuses;
 		for (var k in ret._statuses) {
 			if (ret._statuses[k] == LocalVariableStatuses.UNSET && that._statuses[k] == LocalVariableStatuses.UNSET) {
@@ -1921,6 +1932,26 @@ class LocalVariableStatuses {
 				// MAYBESET
 				ret._statuses[k] = LocalVariableStatuses.MAYBESET;
 			}
+		}
+		return ret;
+	}
+
+	function mergeFinally (postFinallyStats : LocalVariableStatuses) : LocalVariableStatuses {
+		var ret = this.clone() as LocalVariableStatuses;
+		for (var k in ret._statuses) {
+			switch (postFinallyStats._statuses[k]) {
+			case LocalVariableStatuses.ISSET:
+				ret._statuses[k] = LocalVariableStatuses.ISSET;
+				break;
+			case LocalVariableStatuses.MAYBESET:
+				if (ret._statuses[k] != LocalVariableStatuses.ISSET) {
+					ret._statuses[k] = LocalVariableStatuses.MAYBESET;
+				}
+				break;
+			}
+		}
+		if (! postFinallyStats._isReachable) {
+			ret._isReachable = false;
 		}
 		return ret;
 	}
@@ -1937,6 +1968,14 @@ class LocalVariableStatuses {
 		if (this._statuses[name] == null)
 			throw new Error("logic flaw, could not find status for local variable: " + name);
 		return this._statuses[name];
+	}
+
+	function isReachable() : boolean {
+		return this._isReachable;
+	}
+
+	function setIsReachable(isReachable : boolean) : void {
+		this._isReachable = isReachable;
 	}
 
 	function _copyFrom (that : LocalVariableStatuses) : void {
