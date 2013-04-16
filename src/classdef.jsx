@@ -47,7 +47,7 @@ mixin TemplateDefinition {
 	function buildInstantiationContext (errors : CompileError[], token : Token, formalTypeArgs : Token[], actualTypeArgs : Type[]) : InstantiationContext {
 		// check number of type arguments
 		if (formalTypeArgs.length != actualTypeArgs.length) {
-			errors.push(new CompileError(token, "wrong number of template arguments (expected " + formalTypeArgs.length as string + ", got " + actualTypeArgs.length as string));
+			errors.push(new CompileError(token, "wrong number of template arguments (expected " + formalTypeArgs.length as string + ", got " + actualTypeArgs.length as string + ")"));
 			return null;
 		}
 		// build typemap
