@@ -1051,6 +1051,8 @@ class SwitchStatement extends LabellableStatement {
 				if (statement instanceof DefaultStatement)
 					hasDefaultLabel = true;
 			}
+			if (context.getTopBlock().localVariableStatuses != null)
+				this.registerVariableStatusesOnBreak(context.getTopBlock().localVariableStatuses);
 			if (! hasDefaultLabel)
 				this.registerVariableStatusesOnBreak(context.blockStack[context.blockStack.length - 2].localVariableStatuses);
 			this._finalizeBlockAnalysis(context);
