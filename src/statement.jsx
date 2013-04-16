@@ -84,8 +84,7 @@ abstract class Statement implements Stashable {
 
 	static function assertIsReachable (context : AnalysisContext, token : Token) : boolean {
 		if (context.getTopBlock().localVariableStatuses == null) {
-			context.errors.push(new CompileError(token, "the code is unreachable"));
-			return false;
+			context.errors.push(new CompileWarning(token, "the code is unreachable"));
 		}
 		return true;
 	}
