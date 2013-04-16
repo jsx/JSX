@@ -1944,6 +1944,22 @@ class LocalVariableStatuses {
 			this._statuses[k] = that._statuses[k];
 	}
 
+	static function merge(x : LocalVariableStatuses, y : LocalVariableStatuses) : LocalVariableStatuses {
+		if (x != null) {
+			if (y != null) {
+				return x.merge(y);
+			} else {
+				return x.clone();
+			}
+		} else {
+			if (y != null) {
+				return y.clone();
+			} else {
+				return null;
+			}
+		}
+	}
+
 }
 
 class TemplateClassDefinition extends ClassDefinition implements TemplateDefinition {

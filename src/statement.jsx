@@ -1290,23 +1290,29 @@ class TryStatement extends Statement implements Block {
 	override function doAnalyze (context : AnalysisContext) : boolean {
 		// try
 		context.blockStack.push(new BlockContext(context.getTopBlock().localVariableStatuses.clone(), this));
+		var lvStatusesAfterTryCatch = null : LocalVariableStatuses;
 		var lvStatusesAfterTry = null : LocalVariableStatuses;
 		try {
 			for (var i = 0; i < this._tryStatements.length; ++i)
 				if (! this._tryStatements[i].analyze(context))
 					return false;
-			// change the statuses to may (since they might be left uninitialized due to an exception)
 			lvStatusesAfterTry = context.getTopBlock().localVariableStatuses;
 		} finally {
 			context.blockStack.pop();
 		}
-		context.getTopBlock().localVariableStatuses = lvStatusesAfterTry != null
-			? context.getTopBlock().localVariableStatuses.merge(lvStatusesAfterTry)
-			: context.getTopBlock().localVariableStatuses.clone();
+		lvStatusesAfterTryCatch = LocalVariableStatuses.merge(lvStatusesAfterTryCatch, lvStatusesAfterTry);
 		// catch
 		for (var i = 0; i < this._catchStatements.length; ++i) {
-			if (! this._catchStatements[i].analyze(context))
-				return false;
+			context.blockStack.push(new BlockContext(context.getTopBlock().localVariableStatuses.clone(), this._catchStatements[i]));
+			var lvStatusesAfterCatch = null : LocalVariableStatuses;
+			try {
+				if (! this._catchStatements[i].analyze(context))
+					return false;
+				lvStatusesAfterCatch = context.getTopBlock().localVariableStatuses;
+			} finally {
+				context.blockStack.pop();
+			}
+			lvStatusesAfterTryCatch = LocalVariableStatuses.merge(lvStatusesAfterTryCatch, lvStatusesAfterCatch);
 			var curCatchType = this._catchStatements[i].getLocal().getType();
 			for (var j = 0; j < i; ++j) {
 				var precCatchType = this._catchStatements[j].getLocal().getType();
@@ -1319,9 +1325,17 @@ class TryStatement extends Statement implements Block {
 			}
 		}
 		// finally
-		for (var i = 0; i < this._finallyStatements.length; ++i)
-			if (! this._finallyStatements[i].analyze(context))
-				return false;
+		context.blockStack.push(new BlockContext(context.getTopBlock().localVariableStatuses.clone(), this));
+		try {
+			for (var i = 0; i < this._finallyStatements.length; ++i)
+				if (! this._finallyStatements[i].analyze(context))
+					return false;
+		} finally {
+			context.blockStack.pop();
+		}
+		// save lvstatuses
+		// FIXME apply the changes by finallystatements
+		context.getTopBlock().localVariableStatuses = lvStatusesAfterTryCatch;
 		return true;
 	}
 
@@ -1402,19 +1416,10 @@ class CatchStatement extends Statement implements Block {
 			context.errors.push(new CompileError(this._token, "only objects or a variant may be caught"));
 		}
 		// analyze the statements
-		context.blockStack.push(new BlockContext(context.getTopBlock().localVariableStatuses.clone(), this));
-		var lvStatusesAfterCatch = null : LocalVariableStatuses;
-		try {
-			for (var i = 0; i < this._statements.length; ++i) {
-				if (! this._statements[i].analyze(context))
-					return false;
-			}
-			lvStatusesAfterCatch = context.getTopBlock().localVariableStatuses;
-		} finally {
-			context.blockStack.pop();
+		for (var i = 0; i < this._statements.length; ++i) {
+			if (! this._statements[i].analyze(context))
+				return false;
 		}
-		if (lvStatusesAfterCatch != null)
-			context.getTopBlock().localVariableStatuses = context.getTopBlock().localVariableStatuses.merge(lvStatusesAfterCatch);
 		return true;
 	}
 
