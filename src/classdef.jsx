@@ -1105,12 +1105,20 @@ class MemberVariableDefinition extends MemberDefinition {
 			try {
 				this._analyzeState = MemberVariableDefinition.IS_ANALYZING;
 				if (this._initialValue != null) {
+					if (this._initialValue instanceof ClassExpression) {
+						this._analysisContext.errors.push(new CompileError(this._initialValue._token, "cannot assign a class"));
+						return null;
+					}
 					if (! this._initialValue.analyze(this._analysisContext, null))
 						return null;
 					var ivType = this._initialValue.getType();
 					if (this._type == null) {
 						if (ivType.equals(Type.nullType)) {
 							this._analysisContext.errors.push(new CompileError(this._initialValue.getToken(), "cannot assign null to an unknown type"));
+							return null;
+						}
+						if (ivType.equals(Type.voidType)) {
+							this._analysisContext.errors.push(new CompileError(this._initialValue.getToken(), "cannot assign void"));
 							return null;
 						}
 						this._type = ivType.asAssignableType();
