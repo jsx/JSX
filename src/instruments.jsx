@@ -1049,7 +1049,7 @@ class CodeTransformer {
 				new AssignmentExpression(
 					new Token("=", false),
 					new LocalExpression(null, labels[currentLabel.getName()]),
-					new FunctionExpression(null, null, block, false))));
+					new FunctionExpression(null, block))));
 			++numBlock;
 		}
 		funcDef._statements = codeBlocks.concat(entries);
