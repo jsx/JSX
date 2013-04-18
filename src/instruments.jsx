@@ -1060,7 +1060,7 @@ class CodeTransformer {
 		var depth = 0;
 		var parent : MemberFunctionDefinition;
 		while ((parent = funcDef.getParent()) != null) {
-			if ((parent.flags() & ClassDefinition.IS_GENERATOR) != 0)
+			if (parent.isGenerator())
 				depth++;
 			funcDef = parent;
 		}

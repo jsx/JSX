@@ -2267,7 +2267,11 @@ class Parser {
 			this._popScope();
 			return false;
 		}
-		var funcDef = new MemberFunctionDefinition(token, name, ClassDefinition.IS_STATIC, returnType, args, this._locals, this._statements, this._closures, lastToken, null);
+		var flags = ClassDefinition.IS_STATIC;
+		if (this._isGenerator) {
+			flags |= ClassDefinition.IS_GENERATOR;
+		}
+		var funcDef = new MemberFunctionDefinition(token, name, flags, returnType, args, this._locals, this._statements, this._closures, lastToken, null);
 		this._popScope();
 		this._closures.push(funcDef);
 		funcDef.setFuncLocal(funcLocal);

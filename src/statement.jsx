@@ -339,7 +339,7 @@ class ReturnStatement extends Statement {
 
 	override function doAnalyze (context : AnalysisContext) : boolean {
 		// handle generator
-		if ((context.funcDef.flags() & ClassDefinition.IS_GENERATOR) != 0) {
+		if (context.funcDef.isGenerator()) {
 			context.errors.push(new CompileError(this._token, "return statement in generator is not allowed"));
 			return true;
 		}

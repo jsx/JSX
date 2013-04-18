@@ -171,7 +171,7 @@ class Compiler {
 		var transformer = new CodeTransformer;
 		this.forEachClassDef(function (parser, classDef) {
 			return classDef.forEachMemberFunction(function onFuncDef (funcDef) {
-				if ((funcDef.flags() & ClassDefinition.IS_GENERATOR) != 0) {
+				if (funcDef.isGenerator()) {
 					transformer.transformFunctionDefinition(funcDef);
 				}
 				return funcDef.forEachClosure(onFuncDef);
