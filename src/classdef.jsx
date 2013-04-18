@@ -1392,8 +1392,7 @@ class MemberFunctionDefinition extends MemberDefinition implements Block {
 					break;
 			if (this._returnType == null) // no return statement in body
 				this._returnType = Type.voidType;
-			if ((this._flags & ClassDefinition.IS_GENERATOR) == 0 && ! this._returnType.equals(Type.voidType) && context.getTopBlock().localVariableStatuses != null)
-			if (! this._returnType.equals(Type.voidType) && context.getTopBlock().localVariableStatuses.isReachable())
+			if ((this._flags & ClassDefinition.IS_GENERATOR) == 0 && ! this._returnType.equals(Type.voidType) && context.getTopBlock().localVariableStatuses.isReachable())
 				context.errors.push(new CompileError(this._lastTokenOfBody, "missing return statement"));
 
 			if (this._parent == null && this.getNameToken() != null && this.name() == "constructor") {
