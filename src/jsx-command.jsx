@@ -400,7 +400,7 @@ class JSXCommand {
 		}
 
 		if (! result)
-			return 1;
+			return 65; // compile error (EX_DATAERR of FreeBSD sysexits(3))
 
 		var output = emitter.getOutput(sourceFile, run, executable);
 
