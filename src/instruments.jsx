@@ -91,6 +91,25 @@ class _ExpressionStatementTransformer extends _StatementTransformer {
 
 }
 
+class _FunctionStatementTransformer extends _StatementTransformer {
+
+	var _statement : FunctionStatement;
+
+	function constructor (transformer : CodeTransformer, statement : FunctionStatement) {
+		super(transformer, "FUNCTION");
+		this._statement = statement;
+	}
+
+	override function getStatement () : Statement {
+		return this._statement;
+	}
+
+	override function replaceControlStructuresWithGotos () : Statement[] {
+		return [ this._statement ] : Statement[];
+	}
+
+}
+
 class _ReturnStatementTransformer extends _StatementTransformer {
 
 	var _statement : ReturnStatement;
@@ -838,6 +857,8 @@ class CodeTransformer {
 			return new _ConstructorInvocationStatementTransformer(this, statement as ConstructorInvocationStatement);
 		else if (statement instanceof ExpressionStatement)
 			return new _ExpressionStatementTransformer(this, statement as ExpressionStatement);
+		else if (statement instanceof FunctionStatement)
+			return new _FunctionStatementTransformer(this, statement as FunctionStatement);
 		else if (statement instanceof ReturnStatement)
 			return new _ReturnStatementTransformer(this, statement as ReturnStatement);
 		else if (statement instanceof YieldStatement)
