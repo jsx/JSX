@@ -405,13 +405,10 @@ class Compiler {
 				}
 			}
 		}
-		// escape the instantiated class names
+		// escape the instantiated class names (note: template classes are never emitted (since they are all native) but their names are used for mangling of function arguments)
 		for (var i = 0; i < classDefs.length; ++i) {
-			if ((classDefs[i].flags() & ClassDefinition.IS_NATIVE) == 0) {
-				var escapedClassName = classDefs[i].getOutputClassName().replace(/\.</g, "$$").replace(/>/g, "$E").replace(/[^A-Za-z0-9_]/g,"$");
-
-				classDefs[i].setOutputClassName(escapedClassName);
-			}
+			var escapedClassName = classDefs[i].getOutputClassName().replace(/\.</g, "$$").replace(/>/g, "$E").replace(/[^A-Za-z0-9_]/g,"$");
+			classDefs[i].setOutputClassName(escapedClassName);
 		}
 		// emit
 		this._emitter.emit(classDefs);
