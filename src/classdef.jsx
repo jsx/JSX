@@ -509,16 +509,37 @@ class ClassDefinition implements Stashable {
 				succeeded = false;
 			templateInners[i] = templateInner;
 		}
+
 		// done
 		if (! succeeded)
 			return null;
+
+		var extendType = null : ParsedObjectType;
+		if (this._extendType != null) {
+			var type = this._extendType.instantiate(instantiationContext);
+			if (! (type instanceof ParsedObjectType)) {
+				instantiationContext.errors.push(new CompileError(this._extendType.getToken(), "non-object type is not extensible"));
+				return null;
+			}
+			extendType = type as ParsedObjectType;
+		}
+
+		var implementTypes = new ParsedObjectType[];
+		for (var i = 0; i < this._implementTypes.length; ++i) {
+			var type = this._implementTypes[i].instantiate(instantiationContext);
+			if (! (type instanceof ParsedObjectType)) {
+				instantiationContext.errors.push(new CompileError(this._implementTypes[i].getToken(), "non-object type is not extensible"));
+				return null;
+			}
+			implementTypes[i] = type as ParsedObjectType;
+		}
 
 		return new ClassDefinition(
 			this._token,
 			this._className,
 			this._flags,
-			this._extendType != null ? this._extendType.instantiate(context) as ParsedObjectType : null,
-			this._implementTypes.map.<ParsedObjectType>(function (t) { return t.instantiate(context) as ParsedObjectType; }),
+			extendType,
+			implementTypes,
 			members,
 			inners,
 			templateInners,
@@ -1922,7 +1943,7 @@ class LocalVariableStatuses {
 				return that.clone();
 			}
 		}
-		var ret = this.clone() as LocalVariableStatuses;
+		var ret = this.clone();
 		for (var k in ret._statuses) {
 			if (ret._statuses[k] == LocalVariableStatuses.UNSET && that._statuses[k] == LocalVariableStatuses.UNSET) {
 				// UNSET
@@ -1937,7 +1958,7 @@ class LocalVariableStatuses {
 	}
 
 	function mergeFinally (postFinallyStats : LocalVariableStatuses) : LocalVariableStatuses {
-		var ret = this.clone() as LocalVariableStatuses;
+		var ret = this.clone();
 		for (var k in ret._statuses) {
 			switch (postFinallyStats._statuses[k]) {
 			case LocalVariableStatuses.ISSET:
@@ -2048,17 +2069,38 @@ class TemplateClassDefinition extends ClassDefinition implements TemplateDefinit
 				succeeded = false;
 			templateInners[i] = templateInner;
 		}
+
 		// done
 		if (! succeeded)
 			return null;
+
+		var extendType = null : ParsedObjectType;
+		if (this._extendType != null) {
+			var type = this._extendType.instantiate(instantiationContext);
+			if (! (type instanceof ParsedObjectType)) {
+				instantiationContext.errors.push(new CompileError(this._extendType.getToken(), "non-object type is not extensible"));
+				return null;
+			}
+			extendType = type as ParsedObjectType;
+		}
+
+		var implementTypes = new ParsedObjectType[];
+		for (var i = 0; i < this._implementTypes.length; ++i) {
+			var type = this._implementTypes[i].instantiate(instantiationContext);
+			if (! (type instanceof ParsedObjectType)) {
+				instantiationContext.errors.push(new CompileError(this._implementTypes[i].getToken(), "non-object type is not extensible"));
+				return null;
+			}
+			implementTypes[i] = type as ParsedObjectType;
+		}
 
 		return new TemplateClassDefinition(
 			this._token,
 			this._className,
 			this._flags,
 			this._typeArgs,
-			this._extendType != null ? this._extendType.instantiate(context) as ParsedObjectType : null,
-			this._implementTypes.map.<ParsedObjectType>(function (t) { return t.instantiate(context) as ParsedObjectType; }),
+			extendType,
+			implementTypes,
 			members,
 			inners,
 			templateInners,
@@ -2100,11 +2142,32 @@ class TemplateClassDefinition extends ClassDefinition implements TemplateDefinit
 		// done
 		if (! succeeded)
 			return null;
+
+		var extendType = null : ParsedObjectType;
+		if (this._extendType != null) {
+			var type = this._extendType.instantiate(instantiationContext);
+			if (! (type instanceof ParsedObjectType)) {
+				instantiationContext.errors.push(new CompileError(this._extendType.getToken(), "non-object type is not extensible"));
+				return null;
+			}
+			extendType = type as ParsedObjectType;
+		}
+
+		var implementTypes = new ParsedObjectType[];
+		for (var i = 0; i < this._implementTypes.length; ++i) {
+			var type = this._implementTypes[i].instantiate(instantiationContext);
+			if (! (type instanceof ParsedObjectType)) {
+				instantiationContext.errors.push(new CompileError(this._implementTypes[i].getToken(), "non-object type is not extensible"));
+				return null;
+			}
+			implementTypes[i] = type as ParsedObjectType;
+		}
+
 		var instantiatedDef = new InstantiatedClassDefinition(
 			this,
 			request.getTypeArguments(),
-			this._extendType != null ? this._extendType.instantiate(instantiationContext) as ParsedObjectType: null,
-			this._implementTypes.map.<ParsedObjectType>(function (t) { return t.instantiate(instantiationContext) as ParsedObjectType; }),
+			extendType,
+			implementTypes,
 			members,
 			inners,
 			templateInners,
