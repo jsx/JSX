@@ -46,7 +46,7 @@ sub jsx { # returns (status, stdout, stderr)
     close $err;
     waitpid $pid, 0;
 
-    return ($? == 0, $stdout, $stderr);
+    return ($? == 0, $stdout, $stderr, $?);
 }
 
 sub slurp {

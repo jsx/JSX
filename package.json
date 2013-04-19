@@ -1,7 +1,8 @@
 {
   "name":        "jsx",
-  "version":     "0.9.25",
+  "version":     "0.9.26",
   "description": "a faster, safer, easier JavaScript",
+  "license" : "MIT",
   "keywords": ["jsx", "compiler", "altjs"],
   "homepage": "http://jsx.github.io/",
   "repository" : "git://github.com/jsx/JSX.git",
