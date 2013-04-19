@@ -20,6 +20,7 @@
  * IN THE SOFTWARE.
  */
 
+import "js.jsx";
 import "./meta.jsx";
 import "./classdef.jsx";
 import "./type.jsx";
@@ -648,6 +649,32 @@ class _Minifier {
 		var list = new LocalVariable[];
 		funcDef.getArguments().forEach(function (a) { list.push(a); });
 		return list.concat(funcDef.getLocals());
+	}
+
+	static function minifyJavaScript(src : string) : string {
+		// load modules
+		var esprima = js.eval("require('esprima')");
+		var esmangle = js.eval("require('esmangle')");
+		var escodegen = js.eval("require('escodegen')");
+		// parse
+		var ast = js.invoke(esprima, "parse", [ src ] : variant[]);
+		// mangle
+		ast = js.invoke(esmangle, "mangle", [ ast, { destructive: true } : Map.<variant> ] : variant[]);
+		// generate
+		return js.invoke(escodegen, "generate", [
+			ast,
+			{
+				format: {
+					renumber: true,
+					hexadecimal: true,
+					escapeless: true,
+					compact: true,
+					semicolons: false,
+					parentheses: false
+				} : Map.<variant>,
+				directive: true
+			} : Map.<variant>
+		] : variant[]) as string;
 	}
 
 }
@@ -2628,12 +2655,20 @@ class JavaScriptEmitter implements Emitter {
 		this._enableRunTimeTypeCheck = enable;
 	}
 
+	override function getEnableSourceMap() : boolean {
+		return this._enableSourceMap;
+	}
+
 	override function setEnableSourceMap (enable : boolean) : void {
 		this._enableSourceMap = enable;
 	}
 
 	override function setEnableProfiler (enable : boolean) : void {
 		this._enableProfiler = enable;
+	}
+
+	override function getEnableMinifier() : boolean {
+		return this._enableMinifier;
 	}
 
 	override function setEnableMinifier(enable : boolean) : void {
@@ -2645,6 +2680,9 @@ class JavaScriptEmitter implements Emitter {
 	}
 
 	override function emit (classDefs : ClassDefinition[]) : void {
+
+		// current impl. of _Minifier.minifyJavaScript does not support transforming source map
+		assert ! (this._enableMinifier && this._enableSourceMap);
 
 		if (this._enableMinifier) {
 			var minifier = new _Minifier(this, classDefs);
@@ -2880,6 +2918,9 @@ class JavaScriptEmitter implements Emitter {
 		output += this._fileFooter;
 		if (this._sourceMapper) {
 			output += this._sourceMapper.magicToken();
+		}
+		if (this._enableMinifier) {
+			output = _Minifier.minifyJavaScript(output);
 		}
 		return output;
 	}

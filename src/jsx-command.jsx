@@ -386,6 +386,11 @@ class JSXCommand {
 
 		tasks.forEach(function(proc) { proc(); });
 
+		if (emitter.getEnableMinifier() && emitter.getEnableSourceMap()) {
+			platform.error("--minify and --source-map cannot be specified at the same time");
+			return 1;
+		}
+
 		var err = optimizer.setup(optimizeCommands);
 		if (err != null) {
 			platform.error(err);
