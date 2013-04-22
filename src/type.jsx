@@ -703,7 +703,7 @@ abstract class ResolvedFunctionType extends FunctionType {
 		if (! this._deduceByArgumentTypes(this._token != null ? this._token : operatorToken, argTypes, isStatic, false, notes)) {
 			var error = new CompileError(
 					operatorToken,
-					operatorToken.getValue() == "[" ? "operator [] of type " + argTypes[0].toString() + " is not applicable to " + this.getObjectType.toString() : "no function with matching arguments");
+					operatorToken.getValue() == "[" ? "operator [] of type " + argTypes[0].toString() + " is not applicable to " + this.getObjectType().toString() : "no function with matching arguments");
 			error.addCompileNotes(notes);
 			context.errors.push(error);
 			return null;
