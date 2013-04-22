@@ -36,6 +36,18 @@ import _UnclassifyOptimizationCommand,
 	   _NoDebugCommand from "./optimizer.jsx";
 
 
+// utilify functions specific to jsemitter
+class _Util {
+
+	static function encodeObjectLiteralKey(s : string) : string {
+		if (s.length == 0 || s.match(/^[A-Za-z_$][A-Za-z0-9_$]*$/)) {
+			return s;
+		}
+		return Util.encodeStringLiteral(s);
+	}
+
+}
+
 class _Mangler {
 
 	function mangleFunctionName (name : string, argTypes : Type[]) : string {
@@ -2864,10 +2876,10 @@ class JavaScriptEmitter implements Emitter {
 			var list = new string[][];
 			var pushClass = (function (classDef : ClassDefinition) : void {
 				var push = function (argTypes : Type[]) : void {
-					list.push([ classDef.className() + this._mangler.mangleFunctionArguments(argTypes), this._namer.getNameOfConstructor(classDef, argTypes) ]);
+					list.push([ classDef.classFullName() + this._mangler.mangleFunctionArguments(argTypes), this._namer.getNameOfConstructor(classDef, argTypes) ]);
 				};
 				var ctors = this._findFunctions(classDef, "constructor", false);
-				list.push([ classDef.className(), this._namer.getNameOfClass(classDef) ]);
+				list.push([ classDef.classFullName(), this._namer.getNameOfClass(classDef) ]);
 				if (ctors.length == 0) {
 					push(new Type[]);
 				} else {
@@ -2891,7 +2903,7 @@ class JavaScriptEmitter implements Emitter {
 			this._emit("{\n", null);
 			this._advanceIndent();
 			for (var i = 0; i < list.length; ++i) {
-				this._emit(list[i][0] + ": " + list[i][1], null);
+				this._emit(_Util.encodeObjectLiteralKey(list[i][0]) + ": " + list[i][1], null);
 				if (i != list.length - 1)
 					this._emit(",", null);
 				this._emit("\n", null);
