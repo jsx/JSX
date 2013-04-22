@@ -2223,7 +2223,7 @@ class JavaScriptEmitter implements Emitter {
 			var list = new string[][];
 			var pushClass = (function (classDef : ClassDefinition) : void {
 				var push = function (suffix : string) : void {
-					list.push([ classDef.className() + suffix, classDef.getOutputClassName() + suffix ]);
+					list.push([ classDef.classFullName() + suffix, classDef.getOutputClassName() + suffix ]);
 				};
 				var ctors = this._findFunctions(classDef, "constructor", false);
 				push("");
@@ -2250,7 +2250,7 @@ class JavaScriptEmitter implements Emitter {
 			this._emit("{\n", null);
 			this._advanceIndent();
 			for (var i = 0; i < list.length; ++i) {
-				this._emit(list[i][0] + ": " + list[i][1], null);
+				this._emit("\"" + list[i][0] + "\": " + list[i][1], null);
 				if (i != list.length - 1)
 					this._emit(",", null);
 				this._emit("\n", null);
