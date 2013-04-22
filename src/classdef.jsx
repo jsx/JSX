@@ -653,7 +653,7 @@ class ClassDefinition implements Stashable {
 		this._analyzeMembers(context);
 	}
 
-	function _analyzeClassDef (context : AnalysisContext) : boolean {
+	function _analyzeClassDef (context : AnalysisContext) : void {
 		this._baseClassDef = this.extendType() != null ? this.extendType().getClassDef() : null;
 		var implementClassDefs = this.implementTypes().map.<ClassDefinition>(function (type) {
 			return type.getClassDef();
@@ -663,11 +663,11 @@ class ClassDefinition implements Stashable {
 			if (this._baseClassDef != null) {
 				if ((this._baseClassDef.flags() & ClassDefinition.IS_FINAL) != 0) {
 					context.errors.push(new CompileError(this.getToken(), "cannot extend final class '" + this._baseClassDef.className() + "'"));
-					return false;
+					return;
 				}
 				if ((this._baseClassDef.flags() & (ClassDefinition.IS_INTERFACE | ClassDefinition.IS_MIXIN)) != 0) {
 					context.errors.push(new CompileError(this.getToken(), "interfaces (or mixins) should be implemented, not extended"));
-					return false;
+					return;
 				}
 				if (! this._baseClassDef.forEachClassToBase(function (classDef : ClassDefinition) : boolean {
 					if (this == classDef) {
@@ -676,14 +676,14 @@ class ClassDefinition implements Stashable {
 					}
 					return true;
 				})) {
-					return false;
+					return;
 				}
 			}
 		} else {
 			for (var i = 0; i < implementClassDefs.length; ++i) {
 				if ((implementClassDefs[i].flags() & (ClassDefinition.IS_INTERFACE | ClassDefinition.IS_MIXIN)) == 0) {
 					context.errors.push(new CompileError(this.getToken(), "class '" + implementClassDefs[i].className() + "' can only be extended, not implemented"));
-					return false;
+					return;
 				}
 				if (! implementClassDefs[i].forEachClassToBase(function (classDef) {
 					if (this == classDef) {
@@ -692,7 +692,7 @@ class ClassDefinition implements Stashable {
 					}
 					return true;
 				})) {
-					return false;
+					return;
 				}
 			}
 		}
@@ -708,7 +708,7 @@ class ClassDefinition implements Stashable {
 			}
 			return true;
 		})) {
-			return false;
+			return;
 		}
 		// check that the properties of the class does not conflict with those in base classes or implemented interfaces
 		for (var i = 0; i < this._members.length; ++i) {
@@ -800,7 +800,6 @@ class ClassDefinition implements Stashable {
 				context.errors.push(new CompileError(this.getToken(), msg));
 			}
 		}
-		return false;
 	}
 
 	function _analyzeMembers (context : AnalysisContext) : void {
