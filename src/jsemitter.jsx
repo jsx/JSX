@@ -2948,8 +2948,46 @@ class JavaScriptEmitter implements Emitter {
 		}
 		var implementTypes = classDef.implementTypes();
 		if (implementTypes.length != 0) {
+			// merge
 			for (var i = 0; i < implementTypes.length; ++i)
 				this._emit("$__jsx_merge_interface(" + this._namer.getNameOfClass(classDef) + ", " + this._namer.getNameOfClass(implementTypes[i].getClassDef()) + ");\n", null);
+			// emit exported mappings
+			var unresolvedExports = new Map.<Type[] /* argTypes */>;
+			(function buildUnresolvedExports(baseClassDef : ClassDefinition) : void {
+				if (baseClassDef.extendType() != null) {
+					buildUnresolvedExports(baseClassDef.extendType().getClassDef());
+				}
+				baseClassDef.implementTypes().forEach(function (implType) { buildUnresolvedExports(implType.getClassDef()); });
+				baseClassDef.forEachMemberFunction(function (funcDef) {
+					if ((funcDef.flags() & (ClassDefinition.IS_STATIC | ClassDefinition.IS_EXPORT)) == ClassDefinition.IS_EXPORT
+						&& funcDef.name() != "constructor") {
+						if (classDef == baseClassDef && funcDef.getStatements() != null) {
+							// examining current class and the function as its definition, no need to merge!
+							delete unresolvedExports[funcDef.name()];
+						} else {
+							unresolvedExports[funcDef.name()] = funcDef.getArgumentTypes();
+						}
+					}
+					return true;
+				});
+			})(classDef);
+			for (var i = implementTypes.length - 1; i >= 0 && unresolvedExports.keys().length != 0; --i) {
+				implementTypes[i].getClassDef().forEachClassToBase(function (baseClassDef) {
+					for (var name in unresolvedExports) {
+						unresolvedExports[name];
+						if (Util.findFunctionInClass(baseClassDef, name, unresolvedExports[name], false)) {
+							this._emit(
+								this._namer.getNameOfClass(classDef) + ".prototype." + name +
+								" = " +
+								this._namer.getNameOfClass(classDef) + ".prototype." + this._namer.getNameOfMethod(classDef, name, unresolvedExports[name])
+								+ ";\n",
+								null);
+							delete unresolvedExports[name];
+						}
+					}
+					return unresolvedExports.keys().length != 0;
+				});
+			}
 			this._emit("\n", null);
 		}
 		if ((classDef.flags() & (ClassDefinition.IS_INTERFACE | ClassDefinition.IS_MIXIN)) != 0)
@@ -3001,9 +3039,27 @@ class JavaScriptEmitter implements Emitter {
 				this._namer.getNameOfClass(funcDef.getClassDef()) + "." + funcDef.name() + this._mangler.mangleFunctionArguments(funcDef.getArgumentTypes())
 				+ " = "
 				+ this._namer.getNameOfStaticFunction(funcDef.getClassDef(), funcDef.name(), funcDef.getArgumentTypes())
-				+ ";\n\n",
+				+ ";\n",
 				null);
 		}
+		if (Util.memberIsExported(funcDef.getClassDef(), funcDef.name(), funcDef.getArgumentTypes(), isStatic)) {
+			if (isStatic) {
+				this._emit(
+					this._namer.getNameOfClass(funcDef.getClassDef()) + "." + funcDef.name()
+					+ " = "
+					+ this._namer.getNameOfStaticFunction(funcDef.getClassDef(), funcDef.name(), funcDef.getArgumentTypes())
+					+ ";\n",
+					null);
+			} else {
+				this._emit(
+					this._namer.getNameOfClass(funcDef.getClassDef()) + ".prototype." + funcDef.name()
+					+ " = "
+					+ this._namer.getNameOfClass(funcDef.getClassDef()) + ".prototype." + this._namer.getNameOfMethod(funcDef.getClassDef(), funcDef.name(), funcDef.getArgumentTypes())
+					+ ";\n",
+					null);
+			}
+		}
+		this._emit("\n", null);
 	}
 
 	function _emitFunctionArguments (funcDef : MemberFunctionDefinition) : void {
