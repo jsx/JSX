@@ -655,7 +655,7 @@ class FunctionChoiceType extends FunctionType {
 
 }
 
-class ResolvedFunctionType extends FunctionType {
+abstract class ResolvedFunctionType extends FunctionType {
 
 	var _token : Token;
 	var _returnType : Type;
@@ -669,13 +669,9 @@ class ResolvedFunctionType extends FunctionType {
 		this._isAssignable = isAssignable;
 	}
 
-	function _clone () : ResolvedFunctionType {
-		throw new Error("logic flaw");
-	}
+	abstract function _clone () : ResolvedFunctionType;
 
-	function _toStringPrefix() : string {
-		throw new Error("logic flaw");
-	}
+	abstract function _toStringPrefix() : string;
 
 	function setIsAssignable (isAssignable : boolean) : ResolvedFunctionType {
 		this._isAssignable = isAssignable;

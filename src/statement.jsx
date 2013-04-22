@@ -156,7 +156,7 @@ class ConstructorInvocationStatement extends Statement {
 				context.errors.push(new CompileError(this.getToken(), "no function with matching arguments"));
 				return true;
 			}
-			ctorType = new ResolvedFunctionType(this.getConstructingClassDef().getToken(), Type.voidType, new Type[], false); // implicit constructor
+			ctorType = new MemberFunctionType(this.getConstructingClassDef().getToken(), new ObjectType(this.getConstructingClassDef()), Type.voidType, new Type[], false); // implicit constructor
 		} else {
 			// analyze args
 			var argTypes = Util.analyzeArgs(
