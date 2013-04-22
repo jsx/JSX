@@ -1,7 +1,6 @@
 /*EXPECTED
 importing#say
 imported#say
-inner#say
 inner.say
 */
 
@@ -19,7 +18,8 @@ class _Private {
 
 class _Main {
 	static function testInner() : void {
-		js.eval("(new (JSX.require('t/run/064.JSX_file/inner.jsx')['Outer.Inner$'])).say$()");
+		// "unclassify" optimizer changes the interface, thus disabled
+		// js.eval("(new (JSX.require('t/run/064.JSX_file/inner.jsx')['Outer.Inner$'])).say$()");
 		js.eval("JSX.require('t/run/064.JSX_file/inner.jsx')['Outer.Inner'].say$()");
 	}
 	static function main(args : string[]) : void {
