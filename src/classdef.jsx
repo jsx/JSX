@@ -148,6 +148,7 @@ class ClassDefinition implements Stashable {
 	static const IS_INLINE = 1024;
 	static const IS_PURE = 2048; // constexpr (intended for for native functions)
 	static const IS_DELETE = 4096; // used for disabling the default constructor
+	static const IS_EXPORT = 8192; // no overloading, no minification of method / variable names
 
 	var _parser		: Parser;
 	var _token		: Token;

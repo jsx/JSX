@@ -1363,7 +1363,7 @@ class Parser {
 		this._classFlags = 0;
 		var docComment = null : DocComment;
 		while (true) {
-			var token = this._expect([ "class", "interface", "mixin", "abstract", "final", "native", "__fake__" ]);
+			var token = this._expect([ "class", "interface", "mixin", "abstract", "final", "native", "__fake__", "__export__" ]);
 			if (token == null)
 				return null;
 			if (this._classFlags == 0)
@@ -1379,8 +1379,8 @@ class Parser {
 				break;
 			}
 			if (token.getValue() == "mixin") {
-				if ((this._classFlags & (ClassDefinition.IS_FINAL | ClassDefinition.IS_NATIVE)) != 0) {
-					this._newError("mixin cannot have final or native attribute set");
+				if ((this._classFlags & (ClassDefinition.IS_FINAL | ClassDefinition.IS_NATIVE | ClassDefinition.IS_EXPORT)) != 0) {
+					this._newError("mixin cannot have final, native, or __export__ attribute set");
 					return null;
 				}
 				this._classFlags |= ClassDefinition.IS_MIXIN;
@@ -1399,6 +1399,9 @@ class Parser {
 				break;
 			case "__fake__":
 				newFlag = ClassDefinition.IS_FAKE;
+				break;
+			case "__export__":
+				newFlag = ClassDefinition.IS_EXPORT;
 				break;
 			default:
 				throw new Error("logic flaw");
@@ -1568,10 +1571,10 @@ class Parser {
 	}
 
 	function _memberDefinition () : MemberDefinition {
-		var flags = 0;
+		var flags = 0, dropFlags = 0;
 		var docComment = null : DocComment;
 		while (true) {
-			var token = this._expect([ "function", "var", "static", "abstract", "override", "final", "const", "native", "__readonly__", "inline", "__pure__", "delete" ]);
+			var token = this._expect([ "function", "var", "static", "abstract", "override", "final", "const", "native", "__readonly__", "inline", "__pure__", "delete", "__export__", "__noexport__" ]);
 			if (token == null)
 				return null;
 			if (flags == 0)
@@ -1627,17 +1630,29 @@ class Parser {
 			case "delete":
 				newFlag = ClassDefinition.IS_DELETE;
 				break;
+			case "__export__":
+				newFlag = ClassDefinition.IS_EXPORT;
+				break;
+			case "__noexport__":
+				newFlag = -ClassDefinition.IS_EXPORT;
+				break;
 			default:
 				throw new Error("logic flaw");
 			}
-			if ((flags & newFlag) != 0) {
+			if (((flags | dropFlags) & Math.abs(newFlag)) != 0) {
 				this._newError("same attribute cannot be specified more than once");
 				return null;
 			}
-			flags |= newFlag;
+			if (newFlag >= 0) {
+				flags |= newFlag;
+			} else {
+				dropFlags |= -newFlag;
+			}
 		}
 		if ((this._classFlags & ClassDefinition.IS_INTERFACE) != 0)
 			flags |= ClassDefinition.IS_ABSTRACT;
+		if ((this._classFlags & ClassDefinition.IS_EXPORT) != 0 && (dropFlags & ClassDefinition.IS_EXPORT) == 0)
+			flags |= ClassDefinition.IS_EXPORT;
 		if (token.getValue() == "function") {
 			return this._functionDefinition(token, flags, docComment);
 		}
