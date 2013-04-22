@@ -720,7 +720,11 @@ abstract class ResolvedFunctionType extends FunctionType {
 			return false;
 		};
 		if ((this instanceof StaticFunctionType) != isStatic) {
-			notes.push(new CompileNote(token, 'candidate function not viable: unmatched static flags'));
+			if (isStatic) {
+				notes.push(new CompileNote(token, 'candidate function not viable: expected a static function, but got a member function'));
+			} else {
+				notes.push(new CompileNote(token, 'candidate function not viable: expected a member function, but got a static function'));
+			}
 			return false;
 		}
 		if (this._argTypes.length != 0 && this._argTypes[this._argTypes.length - 1] instanceof VariableLengthArgumentType) {
