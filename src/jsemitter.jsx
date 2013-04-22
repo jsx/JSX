@@ -1848,7 +1848,7 @@ class _SuperExpressionEmitter extends _OperatorExpressionEmitter {
 	}
 
 	override function _emit () : void {
-		var funcType = this._expr.getFunctionType() as ResolvedFunctionType;
+		var funcType = this._expr.getFunctionType();
 		var className = funcType.getObjectType().getClassDef().getOutputClassName();
 		var argTypes = funcType.getArgumentTypes();
 		var mangledFuncName = this._emitter._mangleFunctionName(this._expr.getName().getValue(), argTypes);

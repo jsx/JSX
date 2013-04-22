@@ -1997,7 +1997,7 @@ class SuperExpression extends OperatorExpression {
 
 	var _name : Token;
 	var _args : Expression[];
-	var _funcType : FunctionType;
+	var _funcType : MemberFunctionType;
 	var _classDef : ClassDefinition;
 
 	function constructor (token : Token, name : Token, args : Expression[]) {
@@ -2026,7 +2026,7 @@ class SuperExpression extends OperatorExpression {
 		return this._args;
 	}
 
-	function getFunctionType () : FunctionType {
+	function getFunctionType () : MemberFunctionType {
 		return this._funcType;
 	}
 
@@ -2063,12 +2063,12 @@ class SuperExpression extends OperatorExpression {
 		if ((funcType = funcType.deduceByArgumentTypes(context, this._token, argTypes, false)) == null)
 			return false;
 		// success
-		this._funcType = funcType;
+		this._funcType = funcType as MemberFunctionType;
 		return true;
 	}
 
 	override function getType () : Type {
-		return (this._funcType as ResolvedFunctionType).getReturnType();
+		return this._funcType.getReturnType();
 	}
 
 	override function forEachExpression (cb : function(:Expression,:function(:Expression):void):boolean) : boolean {
