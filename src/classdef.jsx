@@ -62,6 +62,7 @@ class ClassDefinition implements Stashable {
 	static const IS_INLINE = 1024;
 	static const IS_PURE = 2048; // constexpr (intended for for native functions)
 	static const IS_DELETE = 4096; // used for disabling the default constructor
+	static const IS_GENERATOR = 8192;
 
 	var _parser		: Parser;
 	var _token		: Token;
@@ -1124,6 +1125,10 @@ class MemberFunctionDefinition extends MemberDefinition implements Block {
 		return this._nameToken == null;
 	}
 
+	function isGenerator() : boolean {
+		return (this._flags & ClassDefinition.IS_GENERATOR) != 0;
+	}
+
 
 	/**
 	 * Returns a simple notation of the function like "Class.classMethod(:string):void" or "Class.instanceMethod(:string):void".
@@ -1321,10 +1326,16 @@ class MemberFunctionDefinition extends MemberDefinition implements Block {
 			for (var i = 0; i < this._statements.length; ++i)
 				if (! this._statements[i].analyze(context))
 					break;
+
 			if (this._returnType == null) // no return statement in body
 				this._returnType = Type.voidType;
-			if (! this._returnType.equals(Type.voidType) && context.getTopBlock().localVariableStatuses.isReachable())
-				context.errors.push(new CompileError(this._lastTokenOfBody, "missing return statement"));
+
+			if (this.isGenerator()) {
+				// ok
+			} else {
+				if (! this._returnType.equals(Type.voidType) && context.getTopBlock().localVariableStatuses.isReachable())
+					context.errors.push(new CompileError(this._lastTokenOfBody, "missing return statement"));
+			}
 
 			if (this._parent == null && this.getNameToken() != null && this.name() == "constructor") {
 				this._fixupConstructor(context);
@@ -1343,6 +1354,11 @@ class MemberFunctionDefinition extends MemberDefinition implements Block {
 	function _fixupConstructor (context : AnalysisContext) : void {
 		var success = true;
 		var isAlternate = false;
+
+		if ((this._flags & ClassDefinition.IS_GENERATOR) != 0) {
+			context.errors.push(new CompileError(this._token, "constructor must not be a generator"));
+			return;
+		}
 
 		// make implicit calls to default constructor explicit as well as checking the invocation order
 		var stmtIndex = 0;
