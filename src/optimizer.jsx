@@ -913,11 +913,11 @@ class _UnclassifyOptimizationCommand extends _OptimizeCommand {
 		var candidates = new ClassDefinition[];
 		// list final classes extended from Object that has no overrides
 		this.getCompiler().forEachClassDef(function (parser, classDef) {
-			if ((classDef.flags() & (ClassDefinition.IS_FINAL | ClassDefinition.IS_NATIVE)) == ClassDefinition.IS_FINAL
+			if ((classDef.flags() & (ClassDefinition.IS_FINAL | ClassDefinition.IS_NATIVE | ClassDefinition.IS_EXPORT)) == ClassDefinition.IS_FINAL
 				&& classDef.extendType().getClassDef().className() == "Object"
 				&& classDef.implementTypes().length == 0
 				&& classDef.forEachMemberFunction(function (funcDef) {
-					return (funcDef.flags() & ClassDefinition.IS_OVERRIDE) == 0;
+					return (funcDef.flags() & (ClassDefinition.IS_OVERRIDE | ClassDefinition.IS_EXPORT)) == 0;
 				})) {
 					candidates.push(classDef);
 				}
