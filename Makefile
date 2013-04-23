@@ -45,7 +45,7 @@ test-optimized:
 	JSX_OPTS="--optimize release --disable-optimize no-log,no-assert" $(MAKE) test-core
 
 test-core:
-	$(PROVE) --jobs "$(JOBS)" t/run/*.jsx t/generator/*.jsx t/compile_error/*.jsx t/lib/*.jsx t/src/*.jsx t/web/*.jsx t/optimize/*.jsx t/complete/*.jsx
+	$(PROVE) --jobs "$(JOBS)" t/run/*.jsx t/compile_error/*.jsx t/lib/*.jsx t/src/*.jsx t/web/*.jsx t/optimize/*.jsx t/complete/*.jsx
 
 test-misc-core:
 	$(PROVE) --jobs "$(JOBS)" t/*.t
