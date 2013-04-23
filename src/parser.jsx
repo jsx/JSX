@@ -21,6 +21,7 @@
  */
 
 import "./type.jsx";
+import "./analysis.jsx";
 import "./classdef.jsx";
 import "./statement.jsx";
 import "./expression.jsx";

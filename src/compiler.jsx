@@ -20,6 +20,7 @@
  * IN THE SOFTWARE.
  */
 
+import "./analysis.jsx";
 import "./parser.jsx";
 import "./classdef.jsx";
 import "./type.jsx";

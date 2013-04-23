@@ -32,7 +32,7 @@ import "./platform.jsx";
 import "./emitter.jsx";
 import "./jsemitter.jsx";
 import "./optimizer.jsx";
-import "./util.jsx";
+import "./analysis.jsx";
 
 class JSXCommand {
 
