@@ -5,6 +5,7 @@ use warnings FATAL => 'uninitialized';
 
 use tool::Util;
 
+use POSIX qw(:sys_wait_h);
 use Test::More 0.88;
 
 main(@ARGV);
@@ -124,6 +125,8 @@ sub compile_and_run {
     defined(my $expected = get_section($file, "EXPECTED"))
         or die "could not find EXPECTED in file:$file\n";
 
+    my $jssetup = get_section($file, "JS_SETUP") || "";
+
     $opts ||= "";
 
     # compile (FIXME support C++)
@@ -134,7 +137,7 @@ sub compile_and_run {
         return;
     };
     # run
-    defined (my $output = run_compiled($file, $src)) or do {
+    defined (my $output = run_compiled($file, $jssetup . $src)) or do {
         fail "failed to execute compiled script";
         return;
     };
@@ -222,10 +225,13 @@ sub expect_compile_error {
     }
     $opts ||= "";
 
-    plan tests => 5;
+    plan tests => 7;
 
-    my($ok, $stdout, $stderr) = jsx("$opts $file");
+    my($ok, $stdout, $stderr, $status) = jsx("$opts $file");
     ok !$ok, "failed to compile $file";
+    ok WIFEXITED($status), "exit status should be normal";
+    is WEXITSTATUS($status), 65, "exit status should be EX_DATAERR";
+    # checks below might be covered by the exit status test right above
     unlike $stderr, qr/^ \s+ \b at \b \s+ \b Module \b/xms,
         "... without compiler crash";
     unlike $stderr, qr/\b logic \s+ flaw \b/xms,

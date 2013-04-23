@@ -20,6 +20,7 @@
  * IN THE SOFTWARE.
  */
 
+import "./analysis.jsx";
 import "./type.jsx";
 import "./util.jsx";
 import "./statement.jsx";
@@ -28,26 +29,12 @@ import "./parser.jsx";
 import "./doc.jsx";
 import "./optimizer.jsx";
 
-class InstantiationContext {
-
-	var errors : CompileError[];
-	var typemap : Map.<Type>;
-	var objectTypesUsed : ParsedObjectType[];
-
-	function constructor (errors : CompileError[], typemap : Map.<Type>) {
-		this.errors = errors;
-		this.typemap = typemap;
-		this.objectTypesUsed = new ParsedObjectType[];
-	}
-
-}
-
 mixin TemplateDefinition {
 
 	function buildInstantiationContext (errors : CompileError[], token : Token, formalTypeArgs : Token[], actualTypeArgs : Type[]) : InstantiationContext {
 		// check number of type arguments
 		if (formalTypeArgs.length != actualTypeArgs.length) {
-			errors.push(new CompileError(token, "wrong number of template arguments (expected " + formalTypeArgs.length as string + ", got " + actualTypeArgs.length as string));
+			errors.push(new CompileError(token, "wrong number of template arguments (expected " + formalTypeArgs.length as string + ", got " + actualTypeArgs.length as string + ")"));
 			return null;
 		}
 		// build typemap
@@ -56,79 +43,6 @@ mixin TemplateDefinition {
 			typemap[formalTypeArgs[i].getValue()] = actualTypeArgs[i];
 		}
 		return new InstantiationContext(errors, typemap);
-	}
-
-}
-
-interface Block {
-
-}
-
-class BlockContext {
-
-	var localVariableStatuses : LocalVariableStatuses;
-	var block : Block;
-
-	function constructor (localVariableStatuses : LocalVariableStatuses, block : Block) {
-		this.localVariableStatuses = localVariableStatuses;
-		this.block = block;
-	}
-
-}
-
-class AnalysisContext {
-
-	var errors : CompileError[];
-	var parser : Parser;
-	var postInstantiationCallback : function(:Parser,:ClassDefinition):ClassDefinition;
-	var funcDef : MemberFunctionDefinition;
-	var blockStack : BlockContext[];
-	var statement : Statement;
-
-	function constructor (errors : CompileError[], parser : Parser, postInstantiationCallback : function(:Parser,:ClassDefinition):ClassDefinition) {
-		this.errors = errors;
-		this.parser = parser;
-		this.postInstantiationCallback = postInstantiationCallback;
-		this.funcDef = null;
-		/*
-			blockStack is a stack of blocks:
-
-			function f() { // pushes [ localVariableStatutes, funcDef ]
-				...
-				for (...) { // pushes [ localVariableStatuses, forStatement ]
-					...
-				}
-				try { // pushes [ localVariableStatuses, tryStatement ]
-					...
-				} catch (e : Error) { // pushes [ localVariableStatuses, catchStatement ]
-					...
-					function () { // pushes [ localVariableStatuses, funcDef ]
-						...
-					}
-				}
-			}
-		*/
-		this.blockStack = null;
-		this.statement = null;
-	}
-
-	function clone () : AnalysisContext {
-		// NOTE: does not clone the blockStack (call setBlockStack)
-		return new AnalysisContext(this.errors, this.parser, this.postInstantiationCallback).setFuncDef(this.funcDef);
-	}
-
-	function setFuncDef (funcDef : MemberFunctionDefinition) : AnalysisContext {
-		this.funcDef = funcDef;
-		return this;
-	}
-
-	function setBlockStack (stack : BlockContext[]) : AnalysisContext {
-		this.blockStack = stack;
-		return this;
-	}
-
-	function getTopBlock () : BlockContext {
-		return this.blockStack[this.blockStack.length - 1];
 	}
 
 }
@@ -510,16 +424,37 @@ class ClassDefinition implements Stashable {
 				succeeded = false;
 			templateInners[i] = templateInner;
 		}
+
 		// done
 		if (! succeeded)
 			return null;
+
+		var extendType = null : ParsedObjectType;
+		if (this._extendType != null) {
+			var type = this._extendType.instantiate(instantiationContext);
+			if (! (type instanceof ParsedObjectType)) {
+				instantiationContext.errors.push(new CompileError(this._extendType.getToken(), "non-object type is not extensible"));
+				return null;
+			}
+			extendType = type as ParsedObjectType;
+		}
+
+		var implementTypes = new ParsedObjectType[];
+		for (var i = 0; i < this._implementTypes.length; ++i) {
+			var type = this._implementTypes[i].instantiate(instantiationContext);
+			if (! (type instanceof ParsedObjectType)) {
+				instantiationContext.errors.push(new CompileError(this._implementTypes[i].getToken(), "non-object type is not extensible"));
+				return null;
+			}
+			implementTypes[i] = type as ParsedObjectType;
+		}
 
 		return new ClassDefinition(
 			this._token,
 			this._className,
 			this._flags,
-			this._extendType != null ? this._extendType.instantiate(context) as ParsedObjectType : null,
-			this._implementTypes.map.<ParsedObjectType>(function (t) { return t.instantiate(context) as ParsedObjectType; }),
+			extendType,
+			implementTypes,
 			members,
 			inners,
 			templateInners,
@@ -633,7 +568,7 @@ class ClassDefinition implements Stashable {
 		this._analyzeMembers(context);
 	}
 
-	function _analyzeClassDef (context : AnalysisContext) : boolean {
+	function _analyzeClassDef (context : AnalysisContext) : void {
 		this._baseClassDef = this.extendType() != null ? this.extendType().getClassDef() : null;
 		var implementClassDefs = this.implementTypes().map.<ClassDefinition>(function (type) {
 			return type.getClassDef();
@@ -643,11 +578,11 @@ class ClassDefinition implements Stashable {
 			if (this._baseClassDef != null) {
 				if ((this._baseClassDef.flags() & ClassDefinition.IS_FINAL) != 0) {
 					context.errors.push(new CompileError(this.getToken(), "cannot extend final class '" + this._baseClassDef.className() + "'"));
-					return false;
+					return;
 				}
 				if ((this._baseClassDef.flags() & (ClassDefinition.IS_INTERFACE | ClassDefinition.IS_MIXIN)) != 0) {
 					context.errors.push(new CompileError(this.getToken(), "interfaces (or mixins) should be implemented, not extended"));
-					return false;
+					return;
 				}
 				if (! this._baseClassDef.forEachClassToBase(function (classDef : ClassDefinition) : boolean {
 					if (this == classDef) {
@@ -656,14 +591,14 @@ class ClassDefinition implements Stashable {
 					}
 					return true;
 				})) {
-					return false;
+					return;
 				}
 			}
 		} else {
 			for (var i = 0; i < implementClassDefs.length; ++i) {
 				if ((implementClassDefs[i].flags() & (ClassDefinition.IS_INTERFACE | ClassDefinition.IS_MIXIN)) == 0) {
 					context.errors.push(new CompileError(this.getToken(), "class '" + implementClassDefs[i].className() + "' can only be extended, not implemented"));
-					return false;
+					return;
 				}
 				if (! implementClassDefs[i].forEachClassToBase(function (classDef) {
 					if (this == classDef) {
@@ -672,7 +607,7 @@ class ClassDefinition implements Stashable {
 					}
 					return true;
 				})) {
-					return false;
+					return;
 				}
 			}
 		}
@@ -688,7 +623,7 @@ class ClassDefinition implements Stashable {
 			}
 			return true;
 		})) {
-			return false;
+			return;
 		}
 		// check that the properties of the class does not conflict with those in base classes or implemented interfaces
 		for (var i = 0; i < this._members.length; ++i) {
@@ -780,7 +715,6 @@ class ClassDefinition implements Stashable {
 				context.errors.push(new CompileError(this.getToken(), msg));
 			}
 		}
-		return false;
 	}
 
 	function _analyzeMembers (context : AnalysisContext) : void {
@@ -1753,254 +1687,6 @@ class TemplateFunctionDefinition extends MemberFunctionDefinition implements Tem
 
 }
 
-class LocalVariable {
-
-	var _name : Token;
-	var _type : Type;
-	var _instantiated : LocalVariable[];
-	var isInstantiated = false;
-
-	function constructor (name : Token, type : Type) {
-		this._name = name;
-		this._type = type;
-		this._instantiated = new LocalVariable[];
-	}
-
-	function serialize () : variant {
-		return [
-			this._name,
-			Serializer.<Type>.serializeNullable(this._type)
-		] : variant[];
-	}
-
-	function getName () : Token {
-		return this._name;
-	}
-
-	function getType () : Type {
-		return this._type;
-	}
-
-	function setType (type : Type) : void {
-		if (this._type != null)
-			throw new Error("type is already set for " + this.toString());
-		// implicit declarations of "int" is not supported
-		if (type.equals(Type.integerType))
-			type = Type.numberType;
-		this._type = type;
-	}
-
-	function setTypeForced (type : Type) : void {
-		this._type = type;
-	}
-
-	function touchVariable (context : AnalysisContext, token : Token, isAssignment : boolean) : boolean {
-		if (isAssignment) {
-			context.getTopBlock().localVariableStatuses.setStatus(this);
-		} else {
-			switch (context.getTopBlock().localVariableStatuses.getStatus(this)) {
-			case LocalVariableStatuses.UNTYPED_RECURSIVE_FUNCTION:
-				context.errors.push(new CompileError(token, "the return type of recursive function needs to be explicitly declared"));
-				return false;
-			case LocalVariableStatuses.ISSET:
-				// ok
-				break;
-			case LocalVariableStatuses.UNSET:
-				context.errors.push(new CompileError(token, "variable is not initialized"));
-				return false;
-			case LocalVariableStatuses.MAYBESET:
-				context.errors.push(new CompileError(token, "variable may not be initialized"));
-				return false;
-			default:
-				throw new Error("logic flaw");
-			}
-		}
-		return true;
-	}
-
-	override function toString () : string {
-		return this._name.getValue() + " : " + this._type.toString();
-	}
-
-	function popInstantiated () : void {
-		this._instantiated.pop();
-	}
-
-	function getInstantiated () : LocalVariable {
-		if (this._instantiated.length == 0) {
-			throw new Error("logic flaw, no instantiation for " + this._name.getValue() + "," + this.isInstantiated as string);
-		}
-		return this._instantiated[this._instantiated.length - 1];
-	}
-
-	function instantiateAndPush (instantiationContext : InstantiationContext) : LocalVariable {
-		var instantiated = this._instantiate(instantiationContext);
-		instantiated.isInstantiated = true;
-		this._instantiated.push(instantiated);
-		return instantiated;
-	}
-
-	function _instantiate (instantiationContext : InstantiationContext) : LocalVariable {
-		var type = this._type != null ? this._type.instantiate(instantiationContext) : null;
-		return new LocalVariable(this._name, type);
-	}
-
-}
-
-class CaughtVariable extends LocalVariable {
-
-	function constructor (name : Token, type : Type) {
-		super(name, type);
-	}
-
-	function clone () : CaughtVariable {
-		return new CaughtVariable(this._name, this._type);
-	}
-
-	override function touchVariable (context : AnalysisContext, token : Token, isAssignment : boolean) : boolean {
-		return true;
-	}
-
-	override function _instantiate (instantiationContext : InstantiationContext) : CaughtVariable {
-		return new CaughtVariable(this._name, this._type.instantiate(instantiationContext));
-	}
-
-	override function instantiateAndPush (instantiationContext : InstantiationContext) : CaughtVariable {
-		return super.instantiateAndPush(instantiationContext) as CaughtVariable;
-	}
-}
-
-class ArgumentDeclaration extends LocalVariable {
-
-	function constructor (name : Token, type : Type) {
-		super(name, type);
-	}
-
-	function clone () : ArgumentDeclaration {
-		return new ArgumentDeclaration(this._name, this._type);
-	}
-
-	override function _instantiate (instantiationContext : InstantiationContext) : ArgumentDeclaration {
-		var type = this._type != null ? this._type.instantiate(instantiationContext) : null;
-		return new ArgumentDeclaration(this._name, type);
-	}
-
-	override function instantiateAndPush (instantiationContext : InstantiationContext) : ArgumentDeclaration {
-		return super.instantiateAndPush(instantiationContext) as ArgumentDeclaration;
-	}
-
-}
-
-class LocalVariableStatuses {
-
-	static const UNTYPED_RECURSIVE_FUNCTION = -1;
-
-	static const UNSET = 0;
-	static const ISSET = 1;
-	static const MAYBESET = 2;
-
-	var _statuses : Map.<number>;
-	var _isReachable : boolean;
-
-	function constructor (funcDef : MemberFunctionDefinition, base : LocalVariableStatuses) {
-		this._statuses = new Map.<number>;
-
-		if (base != null) {
-			// FIXME the analysis of the closures should be delayed to either of: first being used, or return is called, to minimize the appearance of the "not initialized" error
-			for (var k in base._statuses)
-				this._statuses[k] = base._statuses[k] == LocalVariableStatuses.UNSET ? LocalVariableStatuses.MAYBESET : base._statuses[k] as number;
-		}
-		var args = funcDef.getArguments();
-		for (var i = 0; i < args.length; ++i)
-			this._statuses[args[i].getName().getValue()] = LocalVariableStatuses.ISSET;
-		var locals = funcDef.getLocals();
-		for (var i = 0; i < locals.length; ++i)
-			this._statuses[locals[i].getName().getValue()] = LocalVariableStatuses.UNSET;
-
-		this._isReachable = true;
-	}
-
-	function constructor (srcStatus : LocalVariableStatuses) {
-		this._statuses = new Map.<number>;
-		this._copyFrom(srcStatus);
-		this._isReachable = srcStatus._isReachable;
-	}
-
-	function clone () : LocalVariableStatuses {
-		return new LocalVariableStatuses(this);
-	}
-
-	function merge (that : LocalVariableStatuses) : LocalVariableStatuses {
-		if (this._isReachable != that._isReachable) {
-			if (this._isReachable) {
-				return this.clone();
-			} else {
-				return that.clone();
-			}
-		}
-		var ret = this.clone() as LocalVariableStatuses;
-		for (var k in ret._statuses) {
-			if (ret._statuses[k] == LocalVariableStatuses.UNSET && that._statuses[k] == LocalVariableStatuses.UNSET) {
-				// UNSET
-			} else if (ret._statuses[k] == LocalVariableStatuses.ISSET && that._statuses[k] == LocalVariableStatuses.ISSET) {
-				// ISSET
-			} else {
-				// MAYBESET
-				ret._statuses[k] = LocalVariableStatuses.MAYBESET;
-			}
-		}
-		return ret;
-	}
-
-	function mergeFinally (postFinallyStats : LocalVariableStatuses) : LocalVariableStatuses {
-		var ret = this.clone() as LocalVariableStatuses;
-		for (var k in ret._statuses) {
-			switch (postFinallyStats._statuses[k]) {
-			case LocalVariableStatuses.ISSET:
-				ret._statuses[k] = LocalVariableStatuses.ISSET;
-				break;
-			case LocalVariableStatuses.MAYBESET:
-				if (ret._statuses[k] != LocalVariableStatuses.ISSET) {
-					ret._statuses[k] = LocalVariableStatuses.MAYBESET;
-				}
-				break;
-			}
-		}
-		if (! postFinallyStats._isReachable) {
-			ret._isReachable = false;
-		}
-		return ret;
-	}
-
-	function setStatus (local : LocalVariable) : void {
-		var name = local.getName().getValue();
-		if (this._statuses[name] == null)
-			throw new Error("logic flaw, could not find status for local variable: " + name);
-		this._statuses[name] = LocalVariableStatuses.ISSET;
-	}
-
-	function getStatus (local : LocalVariable) : number {
-		var name = local.getName().getValue();
-		if (this._statuses[name] == null)
-			throw new Error("logic flaw, could not find status for local variable: " + name);
-		return this._statuses[name];
-	}
-
-	function isReachable() : boolean {
-		return this._isReachable;
-	}
-
-	function setIsReachable(isReachable : boolean) : void {
-		this._isReachable = isReachable;
-	}
-
-	function _copyFrom (that : LocalVariableStatuses) : void {
-		for (var k in that._statuses)
-			this._statuses[k] = that._statuses[k];
-	}
-
-}
-
 class TemplateClassDefinition extends ClassDefinition implements TemplateDefinition {
 
 	var _typeArgs : Token[];
@@ -2064,17 +1750,38 @@ class TemplateClassDefinition extends ClassDefinition implements TemplateDefinit
 				succeeded = false;
 			templateInners[i] = templateInner;
 		}
+
 		// done
 		if (! succeeded)
 			return null;
+
+		var extendType = null : ParsedObjectType;
+		if (this._extendType != null) {
+			var type = this._extendType.instantiate(instantiationContext);
+			if (! (type instanceof ParsedObjectType)) {
+				instantiationContext.errors.push(new CompileError(this._extendType.getToken(), "non-object type is not extensible"));
+				return null;
+			}
+			extendType = type as ParsedObjectType;
+		}
+
+		var implementTypes = new ParsedObjectType[];
+		for (var i = 0; i < this._implementTypes.length; ++i) {
+			var type = this._implementTypes[i].instantiate(instantiationContext);
+			if (! (type instanceof ParsedObjectType)) {
+				instantiationContext.errors.push(new CompileError(this._implementTypes[i].getToken(), "non-object type is not extensible"));
+				return null;
+			}
+			implementTypes[i] = type as ParsedObjectType;
+		}
 
 		return new TemplateClassDefinition(
 			this._token,
 			this._className,
 			this._flags,
 			this._typeArgs,
-			this._extendType != null ? this._extendType.instantiate(context) as ParsedObjectType : null,
-			this._implementTypes.map.<ParsedObjectType>(function (t) { return t.instantiate(context) as ParsedObjectType; }),
+			extendType,
+			implementTypes,
 			members,
 			inners,
 			templateInners,
@@ -2116,11 +1823,32 @@ class TemplateClassDefinition extends ClassDefinition implements TemplateDefinit
 		// done
 		if (! succeeded)
 			return null;
+
+		var extendType = null : ParsedObjectType;
+		if (this._extendType != null) {
+			var type = this._extendType.instantiate(instantiationContext);
+			if (! (type instanceof ParsedObjectType)) {
+				instantiationContext.errors.push(new CompileError(this._extendType.getToken(), "non-object type is not extensible"));
+				return null;
+			}
+			extendType = type as ParsedObjectType;
+		}
+
+		var implementTypes = new ParsedObjectType[];
+		for (var i = 0; i < this._implementTypes.length; ++i) {
+			var type = this._implementTypes[i].instantiate(instantiationContext);
+			if (! (type instanceof ParsedObjectType)) {
+				instantiationContext.errors.push(new CompileError(this._implementTypes[i].getToken(), "non-object type is not extensible"));
+				return null;
+			}
+			implementTypes[i] = type as ParsedObjectType;
+		}
+
 		var instantiatedDef = new InstantiatedClassDefinition(
 			this,
 			request.getTypeArguments(),
-			this._extendType != null ? this._extendType.instantiate(instantiationContext) as ParsedObjectType: null,
-			this._implementTypes.map.<ParsedObjectType>(function (t) { return t.instantiate(instantiationContext) as ParsedObjectType; }),
+			extendType,
+			implementTypes,
 			members,
 			inners,
 			templateInners,

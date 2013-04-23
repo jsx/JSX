@@ -20,6 +20,7 @@
  * IN THE SOFTWARE.
  */
 
+import "./analysis.jsx";
 import "./classdef.jsx";
 import "./util.jsx";
 import "./parser.jsx";
@@ -608,7 +609,7 @@ class FunctionChoiceType extends FunctionType {
 
 		// try an exact match
 		for (var i = 0; i < types.length; ++i) {
-			if (types[i]._deduceByArgumentTypes(argTypes, isStatic, true, (msg) -> {})) {
+			if (types[i]._deduceByArgumentTypes(types[i].getToken(), argTypes, isStatic, true, [])) {
 				return types[i];
 			}
 		}
@@ -617,7 +618,7 @@ class FunctionChoiceType extends FunctionType {
 		var matched = new ResolvedFunctionType[];
 		var notes = new CompileNote[];
 		for (var i = 0; i < types.length; ++i) {
-			if (types[i]._deduceByArgumentTypes(argTypes, isStatic, false, (msg) -> { notes.push(new CompileNote(types[i].getToken(), 'candidate function not viable: ' + msg)); })) {
+			if (types[i]._deduceByArgumentTypes(types[i].getToken(), argTypes, isStatic, false, notes)) {
 				matched.push(types[i]);
 			}
 		}
@@ -655,7 +656,7 @@ class FunctionChoiceType extends FunctionType {
 
 }
 
-class ResolvedFunctionType extends FunctionType {
+abstract class ResolvedFunctionType extends FunctionType {
 
 	var _token : Token;
 	var _returnType : Type;
@@ -669,13 +670,9 @@ class ResolvedFunctionType extends FunctionType {
 		this._isAssignable = isAssignable;
 	}
 
-	function _clone () : ResolvedFunctionType {
-		throw new Error("logic flaw");
-	}
+	abstract function _clone () : ResolvedFunctionType;
 
-	function _toStringPrefix() : string {
-		throw new Error("logic flaw");
-	}
+	abstract function _toStringPrefix() : string;
 
 	function setIsAssignable (isAssignable : boolean) : ResolvedFunctionType {
 		this._isAssignable = isAssignable;
@@ -703,22 +700,19 @@ class ResolvedFunctionType extends FunctionType {
 	}
 
 	override function deduceByArgumentTypes (context : AnalysisContext, operatorToken : Token, argTypes : Type[], isStatic : boolean) : ResolvedFunctionType {
-		var note = '';
-		if (! this._deduceByArgumentTypes(argTypes, isStatic, false, (msg) -> { note = msg; })) {
+		var notes = new CompileNote[];
+		if (! this._deduceByArgumentTypes(this._token != null ? this._token : operatorToken, argTypes, isStatic, false, notes)) {
 			var error = new CompileError(
 					operatorToken,
-					operatorToken.getValue() == "[" ? "operator [] of type " + argTypes[0].toString() + " is not applicable to " + this.getObjectType.toString() : "no function with matching arguments");
-			error.addCompileNote(
-				new CompileNote(
-					(this._token != null) ? this._token : operatorToken,
-					'candidate function not viable: ' + note));
+					operatorToken.getValue() == "[" ? "operator [] of type " + argTypes[0].toString() + " is not applicable to " + this.getObjectType().toString() : "no function with matching arguments");
+			error.addCompileNotes(notes);
 			context.errors.push(error);
 			return null;
 		}
 		return this;
 	}
 
-	function _deduceByArgumentTypes (argTypes : Type[], isStatic : boolean, exact : boolean, cb : (string) -> void) : boolean {
+	function _deduceByArgumentTypes (token : Token, argTypes : Type[], isStatic : boolean, exact : boolean, notes : CompileNote[]) : boolean {
 		var compareArg = function (formal : Type, actual : Type) : boolean {
 			if (formal.equals(actual))
 				return true;
@@ -727,31 +721,35 @@ class ResolvedFunctionType extends FunctionType {
 			return false;
 		};
 		if ((this instanceof StaticFunctionType) != isStatic) {
-			cb('unmatched static flags');
+			if (isStatic) {
+				notes.push(new CompileNote(token, 'candidate function not viable: expected a static function, but got a member function'));
+			} else {
+				notes.push(new CompileNote(token, 'candidate function not viable: expected a member function, but got a static function'));
+			}
 			return false;
 		}
 		if (this._argTypes.length != 0 && this._argTypes[this._argTypes.length - 1] instanceof VariableLengthArgumentType) {
 			var vargType = this._argTypes[this._argTypes.length - 1] as VariableLengthArgumentType;
 			// a vararg function
 			if (argTypes.length < this._argTypes.length - 1) {
-				cb('wrong number of arguments');
+				notes.push(new CompileNote(token, 'candidate function not viable: wrong number of arguments'));
 				return false;
 			}
 			for (var i = 0; i < this._argTypes.length - 1; ++i) {
 				if (! compareArg(this._argTypes[i], argTypes[i])) {
-					cb(Util.format('no known conversion from %1 to %2 for %3 argument.', [ argTypes[i].toString(), this._argTypes[i].toString(), Util.toOrdinal(i+1) ]));
+					notes.push(new CompileNote(token, Util.format('candidate function not viable: no known conversion from %1 to %2 for %3 argument.', [ argTypes[i].toString(), this._argTypes[i].toString(), Util.toOrdinal(i+1) ])));
 					return false;
 				}
 			}
 			if (argTypes[i] instanceof VariableLengthArgumentType && argTypes.length == this._argTypes.length) {
 				if (! compareArg((this._argTypes[i] as VariableLengthArgumentType).getBaseType(), (argTypes[i] as VariableLengthArgumentType).getBaseType())) {
-					cb(Util.format('no known conversion from %1 to %2 for %3 argument.', [ (argTypes[i] as VariableLengthArgumentType).getBaseType().toString(), (this._argTypes[i] as VariableLengthArgumentType).getBaseType().toString(), Util.toOrdinal(i+1) ]));
+					notes.push(new CompileNote(token, Util.format('candidate function not viable: no known conversion from %1 to %2 for %3 argument.', [ (argTypes[i] as VariableLengthArgumentType).getBaseType().toString(), (this._argTypes[i] as VariableLengthArgumentType).getBaseType().toString(), Util.toOrdinal(i+1) ])));
 					return false;
 				}
 			} else {
 				for (; i < argTypes.length; ++i) {
 					if (! compareArg(vargType.getBaseType(), argTypes[i])) {
-						cb(Util.format('no known conversion from %1 to %2 for %3 argument.', [ argTypes[i].toString(), vargType.getBaseType().toString(), Util.toOrdinal(i+1) ]));
+						notes.push(new CompileNote(token, Util.format('candidate function not viable: no known conversion from %1 to %2 for %3 argument.', [ argTypes[i].toString(), vargType.getBaseType().toString(), Util.toOrdinal(i+1) ])));
 						return false;
 					}
 				}
@@ -759,13 +757,13 @@ class ResolvedFunctionType extends FunctionType {
 		} else {
 			// non-vararg function
 			if (argTypes.length != this._argTypes.length) {
-				cb(Util.format('wrong number of arguments (%1 for %2)',
-					[argTypes.length as string, this._argTypes.length as string]));
+				notes.push(new CompileNote(token, Util.format('candidate function not viable: wrong number of arguments (%1 for %2)',
+					[argTypes.length as string, this._argTypes.length as string])));
 				return false;
 			}
 			for (var i = 0; i < argTypes.length; ++i) {
 				if (! compareArg(this._argTypes[i], argTypes[i])) {
-					cb(Util.format('no known conversion from %1 to %2 for %3 argument.', [ argTypes[i].toString(), this._argTypes[i].toString(), Util.toOrdinal(i+1) ]));
+					notes.push(new CompileNote(token, Util.format('candidate function not viable: no known conversion from %1 to %2 for %3 argument.', [ argTypes[i].toString(), this._argTypes[i].toString(), Util.toOrdinal(i+1) ])));
 					return false;
 				}
 			}
@@ -868,7 +866,7 @@ class StaticFunctionType extends ResolvedFunctionType {
 			return false;
 		if (! this._returnType.equals((type as StaticFunctionType).getReturnType()))
 			return false;
-		return this._deduceByArgumentTypes((type as StaticFunctionType).getArgumentTypes(), true, true, (msg) -> {});
+		return this._deduceByArgumentTypes((type as ResolvedFunctionType).getToken(), (type as StaticFunctionType).getArgumentTypes(), true, true, []);
 	}
 
 	override function _toStringPrefix () : string {
