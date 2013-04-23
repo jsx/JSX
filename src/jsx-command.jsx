@@ -386,6 +386,11 @@ class JSXCommand {
 
 		tasks.forEach(function(proc) { proc(); });
 
+		if (emitter.getEnableMinifier() && emitter.getEnableSourceMap()) {
+			platform.error("--minify and --source-map cannot be specified at the same time");
+			return 1;
+		}
+
 		var err = optimizer.setup(optimizeCommands);
 		if (err != null) {
 			platform.error(err);
@@ -405,7 +410,7 @@ class JSXCommand {
 		}
 
 		if (! result)
-			return 1;
+			return 65; // compile error (EX_DATAERR of FreeBSD sysexits(3))
 
 		var output = emitter.getOutput(sourceFile, run, executable);
 

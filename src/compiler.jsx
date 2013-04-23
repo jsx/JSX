@@ -342,6 +342,25 @@ class Compiler {
 			if (classDefs[i].getInnerClasses().length != 0)
 				classDefs = classDefs.concat(classDefs[i].getInnerClasses());
 		}
+		// check that there are no conflict of names bet. native classes
+		var nativeClassNames = new Map.<ClassDefinition>;
+		var foundConflict = false;
+		classDefs.forEach(function (classDef) {
+			if ((classDef.flags() & ClassDefinition.IS_NATIVE) == 0) {
+				return;
+			}
+			if (nativeClassNames.hasOwnProperty(classDef.className())) {
+				errors.push(
+					new CompileError(classDef.getToken(), "native class with same name is already defined")
+					.addCompileNote(new CompileNote(nativeClassNames[classDef.className()].getToken(), "here")));
+				foundConflict = true;
+				return;
+			}
+			nativeClassNames[classDef.className()] = classDef;
+		});
+		if (foundConflict) {
+			return;
+		}
 		// reorder the classDefs so that base classes would come before their children
 		var getMaxIndexOfClasses = function (deps : ClassDefinition[]) : number {
 			deps = deps.concat(new ClassDefinition[]); // clone the array
@@ -370,47 +389,6 @@ class Compiler {
 				classDefs.splice(i, 1);
 			} else {
 				++i;
-			}
-		}
-		// rename the classes with conflicting names
-		var countByName = new Map.<number>;
-		for (var i = 0; i < classDefs.length; ++i) {
-			var classDef = classDefs[i];
-			if ((classDef.flags() & ClassDefinition.IS_NATIVE) != 0) {
-				// check that the names of native classes do not conflict, and register the ocurrences
-				var className = classDef.className();
-				if (countByName[className]) {
-					errors.push(new CompileError(classDef.getToken(), "found multiple definition for native class: " + className));
-					return;
-				}
-				classDef.setOutputClassName(className);
-				countByName[className] = 1;
-			}
-		}
-		for (var i = 0; i < classDefs.length; ++i) {
-			var classDef = classDefs[i];
-			if ((classDef.flags() & ClassDefinition.IS_NATIVE) == 0) {
-				var className;
-				if (classDef.getOuterClassDef() != null)
-					className = classDef.getOuterClassDef().getOutputClassName() + "$C" + classDef.className();
-				else
-					className = classDef.className();
-
-				if (countByName[className]) {
-					classDef.setOutputClassName(className + "$" + (countByName[className] - 1) as string);
-					countByName[className]++;
-				} else {
-					classDef.setOutputClassName(className);
-					countByName[className] = 1;
-				}
-			}
-		}
-		// escape the instantiated class names
-		for (var i = 0; i < classDefs.length; ++i) {
-			if ((classDefs[i].flags() & ClassDefinition.IS_NATIVE) == 0) {
-				var escapedClassName = classDefs[i].getOutputClassName().replace(/\.</g, "$$").replace(/>/g, "$E").replace(/[^A-Za-z0-9_]/g,"$");
-
-				classDefs[i].setOutputClassName(escapedClassName);
 			}
 		}
 		// emit

@@ -1,5 +1,9 @@
 Revision history for the JSX software development kit
 
+0.9.26 2013-04-19 10:21:08
+    [BUG FIXES]
+    - Fix #85, #123, #128, #132, #137, #141, and #142
+
 0.9.25 2013-04-09 19:12:55
     [ANNOUNCE]
     - The JSX web site is now http://jsx.github.io/

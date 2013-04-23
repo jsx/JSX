@@ -1,7 +1,8 @@
 {
   "name":        "jsx",
-  "version":     "0.9.25",
+  "version":     "0.9.26",
   "description": "a faster, safer, easier JavaScript",
+  "license" : "MIT",
   "keywords": ["jsx", "compiler", "altjs"],
   "homepage": "http://jsx.github.io/",
   "repository" : "git://github.com/jsx/JSX.git",
@@ -34,7 +35,10 @@
     "src": "./src"
   },
   "dependencies": {
-      "source-map": "0.1.22"
+      "source-map": "0.1.22",
+      "esprima": "~ 1.0.2",
+      "escodegen": "~ 0.0.20",
+      "esmangle": "~ 0.0.13"
   },
   "engines": {
     "node": ">= 0.8.0"

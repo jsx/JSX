@@ -5,6 +5,7 @@ use warnings FATAL => 'uninitialized';
 
 use tool::Util;
 
+use POSIX qw(:sys_wait_h);
 use Test::More 0.88;
 
 main(@ARGV);
@@ -81,6 +82,7 @@ sub run_compiled {
 
     # add the bootstrap code
     $src .= sprintf <<'EOT', $filename;
+;
 // workaround for node.js to set "JSX" to global
 (function () { return this; })().JSX = JSX;
 // invoke the test
@@ -224,10 +226,13 @@ sub expect_compile_error {
     }
     $opts ||= "";
 
-    plan tests => 5;
+    plan tests => 7;
 
-    my($ok, $stdout, $stderr) = jsx("$opts $file");
+    my($ok, $stdout, $stderr, $status) = jsx("$opts $file");
     ok !$ok, "failed to compile $file";
+    ok WIFEXITED($status), "exit status should be normal";
+    is WEXITSTATUS($status), 65, "exit status should be EX_DATAERR";
+    # checks below might be covered by the exit status test right above
     unlike $stderr, qr/^ \s+ \b at \b \s+ \b Module \b/xms,
         "... without compiler crash";
     unlike $stderr, qr/\b logic \s+ flaw \b/xms,

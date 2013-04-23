@@ -20,6 +20,7 @@
  * IN THE SOFTWARE.
  */
 
+import "js.jsx";
 import "./meta.jsx";
 import "./classdef.jsx";
 import "./type.jsx";
@@ -34,6 +35,75 @@ import "./platform.jsx";
 import _UnclassifyOptimizationCommand,
 	   _NoDebugCommand from "./optimizer.jsx";
 
+
+// utilify functions specific to jsemitter
+class _Util {
+
+	static const OUTPUTNAME_IDENTIFIER = "emitter.outputname";
+
+	class OutputNameStash extends OptimizerStash {
+		var outputClassName : string;
+		function constructor(outputClassName : string) {
+			this.outputClassName = outputClassName;
+		}
+		override function clone() : OptimizerStash {
+			throw new Error("not supported");
+		}
+	}
+
+	static function getOutputClassName(classDef : ClassDefinition) : string {
+		return (classDef.getOptimizerStash()[_Util.OUTPUTNAME_IDENTIFIER] as _Util.OutputNameStash).outputClassName;
+	}
+
+	static function setOutputClassNames(classDefs : ClassDefinition[]) : void {
+		function setOutputName(classDef : ClassDefinition, name : string) : void {
+			classDef.getOptimizerStash()[_Util.OUTPUTNAME_IDENTIFIER] = new _Util.OutputNameStash(name);
+		}
+		// rename the classes with conflicting names
+		var countByName = new Map.<number>;
+		for (var i = 0; i < classDefs.length; ++i) {
+			var classDef = classDefs[i];
+			if ((classDef.flags() & ClassDefinition.IS_NATIVE) != 0) {
+				// check that the names of native classes do not conflict, and register the ocurrences
+				var className = classDef.className();
+				assert ! countByName[className];
+				setOutputName(classDef, className);
+				countByName[className] = 1;
+			}
+		}
+		for (var i = 0; i < classDefs.length; ++i) {
+			var classDef = classDefs[i];
+			if ((classDef.flags() & ClassDefinition.IS_NATIVE) == 0) {
+				var className;
+				if (classDef.getOuterClassDef() != null)
+					className = _Util.getOutputClassName(classDef.getOuterClassDef()) + "$C" + classDef.className();
+				else
+					className = classDef.className();
+
+				if (countByName[className]) {
+					setOutputName(classDef, className + "$" + (countByName[className] - 1) as string);
+					countByName[className]++;
+				} else {
+					setOutputName(classDef, className);
+					countByName[className] = 1;
+				}
+			}
+		}
+		// escape the instantiated class names (note: template classes are never emitted (since they are all native) but their names are used for mangling of function arguments)
+		for (var i = 0; i < classDefs.length; ++i) {
+			var escapedClassName = _Util.getOutputClassName(classDefs[i]).replace(/\.</g, "$$").replace(/>/g, "$E").replace(/[^A-Za-z0-9_]/g,"$");
+			setOutputName(classDefs[i], escapedClassName);
+		}
+	}
+
+	static function encodeObjectLiteralKey(s : string) : string {
+		if (s.length == 0 || s.match(/^[A-Za-z_$][A-Za-z0-9_$]*$/)) {
+			return s;
+		}
+		return Util.encodeStringLiteral(s);
+	}
+
+}
 
 class _Mangler {
 
@@ -65,7 +135,7 @@ class _Mangler {
 					// fall through
 				}
 			}
-			return "L" + type.getClassDef().getOutputClassName() + "$";
+			return "L" + _Util.getOutputClassName(type.getClassDef()) + "$";
 		} else if (type instanceof StaticFunctionType)
 			return "F" + this.mangleFunctionArguments((type as StaticFunctionType).getArgumentTypes()) + this.mangleTypeName((type as StaticFunctionType).getReturnType()) + "$";
 		else if (type instanceof MemberFunctionType)
@@ -151,7 +221,7 @@ class _Namer {
 	}
 
 	function getNameOfStaticFunction(classDef : ClassDefinition, name : string, argTypes : Type[]) : string {
-		var className = classDef.getOutputClassName();
+		var className = _Util.getOutputClassName(classDef);
 		if (Util.memberRootIsNative(classDef, name, argTypes, true)) {
 			return className + "." + name;
 		}
@@ -162,7 +232,7 @@ class _Namer {
 		if ((classDef.flags() & ClassDefinition.IS_NATIVE) != 0) {
 			return this._getNameOfNativeConstructor(classDef);
 		}
-		return classDef.getOutputClassName() + this._emitter.getMangler().mangleFunctionArguments(argTypes);
+		return _Util.getOutputClassName(classDef) + this._emitter.getMangler().mangleFunctionArguments(argTypes);
 	}
 
 	function _getNameOfNativeConstructor(classDef : ClassDefinition) : string {
@@ -177,7 +247,7 @@ class _Namer {
 	}
 
 	function getNameOfClass(classDef : ClassDefinition) : string {
-		return classDef.getOutputClassName();
+		return _Util.getOutputClassName(classDef);
 	}
 
 	function enterScope(local : LocalVariable, cb : function () : void) : void {
@@ -327,7 +397,8 @@ class _Minifier {
 			return this._minifier._isCounting();
 		}
 		override function getNameOfProperty(classDef : ClassDefinition, name : string) : string {
-			if (Util.memberRootIsNative(classDef, name, null, false)) {
+			if (Util.memberRootIsNative(classDef, name, null, false)
+				|| Util.memberIsExported(classDef, name, null, false)) {
 				return name;
 			}
 			if (this._isCounting()) {
@@ -350,7 +421,8 @@ class _Minifier {
 			return mangledName;
 		}
 		override function getNameOfStaticVariable(classDef : ClassDefinition, name : string) : string {
-			if (Util.memberRootIsNative(classDef, name, null, true)) {
+			if (Util.memberRootIsNative(classDef, name, null, true)
+				|| Util.memberIsExported(classDef, name, null, false)) {
 				return name;
 			}
 			if (this._isCounting()) {
@@ -364,7 +436,7 @@ class _Minifier {
 			if (Util.memberRootIsNative(classDef, name, argTypes, true)) {
 				return this.getNameOfClass(classDef) + "." + name;
 			}
-			var mangledName = classDef.getOutputClassName() + "$" + this._getMangler().mangleFunctionName(name, argTypes);
+			var mangledName = _Util.getOutputClassName(classDef) + "$" + this._getMangler().mangleFunctionName(name, argTypes);
 			if (this._isCounting()) {
 				_Minifier._incr(this._minifier._globalUseCount, mangledName);
 			} else {
@@ -380,7 +452,7 @@ class _Minifier {
 				}
 				return name;
 			}
-			var mangledName = classDef.getOutputClassName() + this._getMangler().mangleFunctionArguments(argTypes);
+			var mangledName = _Util.getOutputClassName(classDef) + this._getMangler().mangleFunctionArguments(argTypes);
 			if (this._isCounting()) {
 				_Minifier._incr(this._minifier._globalUseCount, mangledName);
 			} else {
@@ -389,7 +461,7 @@ class _Minifier {
 			return mangledName;
 		}
 		override function getNameOfClass(classDef : ClassDefinition) : string {
-			var name = classDef.getOutputClassName();
+			var name = _Util.getOutputClassName(classDef);
 			if (this._isCounting()) {
 				_Minifier._incr(this._minifier._globalUseCount, name);
 			}
@@ -648,6 +720,32 @@ class _Minifier {
 		var list = new LocalVariable[];
 		funcDef.getArguments().forEach(function (a) { list.push(a); });
 		return list.concat(funcDef.getLocals());
+	}
+
+	static function minifyJavaScript(src : string) : string {
+		// load modules
+		var esprima = js.eval("require('esprima')");
+		var esmangle = js.eval("require('esmangle')");
+		var escodegen = js.eval("require('escodegen')");
+		// parse
+		var ast = js.invoke(esprima, "parse", [ src ] : variant[]);
+		// mangle
+		ast = js.invoke(esmangle, "mangle", [ ast, { destructive: true } : Map.<variant> ] : variant[]);
+		// generate
+		return js.invoke(escodegen, "generate", [
+			ast,
+			{
+				format: {
+					renumber: true,
+					hexadecimal: true,
+					escapeless: true,
+					compact: true,
+					semicolons: false,
+					parentheses: false
+				} : Map.<variant>,
+				directive: true
+			} : Map.<variant>
+		] : variant[]) as string;
 	}
 
 }
@@ -2628,12 +2726,20 @@ class JavaScriptEmitter implements Emitter {
 		this._enableRunTimeTypeCheck = enable;
 	}
 
+	override function getEnableSourceMap() : boolean {
+		return this._enableSourceMap;
+	}
+
 	override function setEnableSourceMap (enable : boolean) : void {
 		this._enableSourceMap = enable;
 	}
 
 	override function setEnableProfiler (enable : boolean) : void {
 		this._enableProfiler = enable;
+	}
+
+	override function getEnableMinifier() : boolean {
+		return this._enableMinifier;
 	}
 
 	override function setEnableMinifier(enable : boolean) : void {
@@ -2645,6 +2751,11 @@ class JavaScriptEmitter implements Emitter {
 	}
 
 	override function emit (classDefs : ClassDefinition[]) : void {
+
+		// current impl. of _Minifier.minifyJavaScript does not support transforming source map
+		assert ! (this._enableMinifier && this._enableSourceMap);
+
+		_Util.setOutputClassNames(classDefs);
 
 		if (this._enableMinifier) {
 			var minifier = new _Minifier(this, classDefs);
@@ -2825,16 +2936,21 @@ class JavaScriptEmitter implements Emitter {
 			// fetch the first classDef, and others that came from the same file
 			var list = new string[][];
 			var pushClass = (function (classDef : ClassDefinition) : void {
-				var push = function (argTypes : Type[]) : void {
-					list.push([ classDef.className() + this._mangler.mangleFunctionArguments(argTypes), this._namer.getNameOfConstructor(classDef, argTypes) ]);
-				};
 				var ctors = this._findFunctions(classDef, "constructor", false);
-				list.push([ classDef.className(), this._namer.getNameOfClass(classDef) ]);
-				if (ctors.length == 0) {
-					push(new Type[]);
+				if ((classDef.flags() & ClassDefinition.IS_EXPORT) != 0) {
+					assert ctors.length == 1;
+					list.push([ classDef.classFullName(), this._namer.getNameOfConstructor(classDef, ctors[0].getArgumentTypes()) ]);
 				} else {
-					for (var i = 0; i < ctors.length; ++i)
-						push(ctors[i].getArgumentTypes());
+					var push = function (argTypes : Type[]) : void {
+						list.push([ classDef.classFullName() + this._mangler.mangleFunctionArguments(argTypes), this._namer.getNameOfConstructor(classDef, argTypes) ]);
+					};
+					list.push([ classDef.classFullName(), this._namer.getNameOfClass(classDef) ]);
+					if (ctors.length == 0) {
+						push(new Type[]);
+					} else {
+						for (var i = 0; i < ctors.length; ++i)
+							push(ctors[i].getArgumentTypes());
+					}
 				}
 			});
 			var filename = classDefs[0].getToken().getFilename();
@@ -2853,7 +2969,7 @@ class JavaScriptEmitter implements Emitter {
 			this._emit("{\n", null);
 			this._advanceIndent();
 			for (var i = 0; i < list.length; ++i) {
-				this._emit(list[i][0] + ": " + list[i][1], null);
+				this._emit(_Util.encodeObjectLiteralKey(list[i][0]) + ": " + list[i][1], null);
 				if (i != list.length - 1)
 					this._emit(",", null);
 				this._emit("\n", null);
@@ -2881,6 +2997,9 @@ class JavaScriptEmitter implements Emitter {
 		if (this._sourceMapper) {
 			output += this._sourceMapper.magicToken();
 		}
+		if (this._enableMinifier) {
+			output = _Minifier.minifyJavaScript(output);
+		}
 		return output;
 	}
 
@@ -2895,8 +3014,46 @@ class JavaScriptEmitter implements Emitter {
 		}
 		var implementTypes = classDef.implementTypes();
 		if (implementTypes.length != 0) {
+			// merge
 			for (var i = 0; i < implementTypes.length; ++i)
 				this._emit("$__jsx_merge_interface(" + this._namer.getNameOfClass(classDef) + ", " + this._namer.getNameOfClass(implementTypes[i].getClassDef()) + ");\n", null);
+			// emit exported mappings
+			var unresolvedExports = new Map.<Type[] /* argTypes */>;
+			(function buildUnresolvedExports(baseClassDef : ClassDefinition) : void {
+				if (baseClassDef.extendType() != null) {
+					buildUnresolvedExports(baseClassDef.extendType().getClassDef());
+				}
+				baseClassDef.implementTypes().forEach(function (implType) { buildUnresolvedExports(implType.getClassDef()); });
+				baseClassDef.forEachMemberFunction(function (funcDef) {
+					if ((funcDef.flags() & (ClassDefinition.IS_STATIC | ClassDefinition.IS_EXPORT)) == ClassDefinition.IS_EXPORT
+						&& funcDef.name() != "constructor") {
+						if (classDef == baseClassDef && funcDef.getStatements() != null) {
+							// examining current class and the function as its definition, no need to merge!
+							delete unresolvedExports[funcDef.name()];
+						} else {
+							unresolvedExports[funcDef.name()] = funcDef.getArgumentTypes();
+						}
+					}
+					return true;
+				});
+			})(classDef);
+			for (var i = implementTypes.length - 1; i >= 0 && unresolvedExports.keys().length != 0; --i) {
+				implementTypes[i].getClassDef().forEachClassToBase(function (baseClassDef) {
+					for (var name in unresolvedExports) {
+						unresolvedExports[name];
+						if (Util.findFunctionInClass(baseClassDef, name, unresolvedExports[name], false)) {
+							this._emit(
+								this._namer.getNameOfClass(classDef) + ".prototype." + name +
+								" = " +
+								this._namer.getNameOfClass(classDef) + ".prototype." + this._namer.getNameOfMethod(classDef, name, unresolvedExports[name])
+								+ ";\n",
+								null);
+							delete unresolvedExports[name];
+						}
+					}
+					return unresolvedExports.keys().length != 0;
+				});
+			}
 			this._emit("\n", null);
 		}
 		if ((classDef.flags() & (ClassDefinition.IS_INTERFACE | ClassDefinition.IS_MIXIN)) != 0)
@@ -2919,7 +3076,7 @@ class JavaScriptEmitter implements Emitter {
 			this._reduceIndent();
 			this._emit("};\n\n", null);
 		});
-		this._emit(funcName + ".prototype = new " + this._namer.getNameOfClass(funcDef.getClassDef()) + ";\n\n", null);
+		this._emit(funcName + ".prototype = " + this._namer.getNameOfClass(funcDef.getClassDef()) + ".prototype;\n\n", null);
 	}
 
 	function _emitFunction (funcDef : MemberFunctionDefinition) : void {
@@ -2943,14 +3100,35 @@ class JavaScriptEmitter implements Emitter {
 			this._reduceIndent();
 			this._emit("};\n\n", null);
 		});
-		if (isStatic) {
+		if (isStatic
+			&& (! this._enableMinifier || (funcDef.getClassDef().className() == "_Main" && funcDef.name() == "main"))) {
+			this._emitHolderOfStatic(funcDef.getClassDef());
 			this._emit(
-				this._namer.getNameOfClass(funcDef.getClassDef()) + "." + funcDef.name() + this._mangler.mangleFunctionArguments(funcDef.getArgumentTypes())
+				"." + funcDef.name() + this._mangler.mangleFunctionArguments(funcDef.getArgumentTypes())
 				+ " = "
 				+ this._namer.getNameOfStaticFunction(funcDef.getClassDef(), funcDef.name(), funcDef.getArgumentTypes())
-				+ ";\n\n",
+				+ ";\n",
 				null);
 		}
+		if (Util.memberIsExported(funcDef.getClassDef(), funcDef.name(), funcDef.getArgumentTypes(), isStatic)) {
+			if (isStatic) {
+				this._emitHolderOfStatic(funcDef.getClassDef());
+				this._emit(
+					"." + funcDef.name()
+					+ " = "
+					+ this._namer.getNameOfStaticFunction(funcDef.getClassDef(), funcDef.name(), funcDef.getArgumentTypes())
+					+ ";\n",
+					null);
+			} else {
+				this._emit(
+					this._namer.getNameOfClass(funcDef.getClassDef()) + ".prototype." + funcDef.name()
+					+ " = "
+					+ this._namer.getNameOfClass(funcDef.getClassDef()) + ".prototype." + this._namer.getNameOfMethod(funcDef.getClassDef(), funcDef.name(), funcDef.getArgumentTypes())
+					+ ";\n",
+					null);
+			}
+		}
+		this._emit("\n", null);
 	}
 
 	function _emitFunctionArguments (funcDef : MemberFunctionDefinition) : void {
@@ -3011,7 +3189,6 @@ class JavaScriptEmitter implements Emitter {
 
 	function _emitStaticMemberVariable (variable : MemberVariableDefinition) : void {
 		var initialValue = variable.getInitialValue();
-		var holder = this._namer.getNameOfClass(variable.getClassDef());
 		if (initialValue != null
 			&& ! (initialValue instanceof NullExpression
 				|| initialValue instanceof BooleanLiteralExpression
@@ -3020,7 +3197,9 @@ class JavaScriptEmitter implements Emitter {
 				|| initialValue instanceof StringLiteralExpression
 				|| initialValue instanceof RegExpLiteralExpression)) {
 			// use deferred initialization
-			this._emit("$__jsx_lazy_init(" + holder + ", \"" + this._namer.getNameOfStaticVariable(variable.getClassDef(), variable.name()) + "\", function () {\n", variable.getNameToken());
+			this._emit("$__jsx_lazy_init(", variable.getNameToken());
+			this._emitHolderOfStatic(variable.getClassDef());
+			this._emit(", \"" + this._namer.getNameOfStaticVariable(variable.getClassDef(), variable.name()) + "\", function () {\n", variable.getNameToken());
 			this._advanceIndent();
 			this._emit("return ", variable.getNameToken());
 			this._emitRHSOfAssignment(initialValue, variable.getType());
@@ -3028,10 +3207,20 @@ class JavaScriptEmitter implements Emitter {
 			this._reduceIndent();
 			this._emit("});\n", variable.getNameToken());
 		} else {
-			this._emit(holder + "." + this._namer.getNameOfStaticVariable(variable.getClassDef(), variable.name()) + " = ", variable.getNameToken());
+			this._emitHolderOfStatic(variable.getClassDef());
+			this._emit("." + this._namer.getNameOfStaticVariable(variable.getClassDef(), variable.name()) + " = ", variable.getNameToken());
 			this._emitRHSOfAssignment(initialValue, variable.getType());
 			this._emit(";\n", initialValue.getToken());
 		}
+	}
+
+	function _emitHolderOfStatic(classDef : ClassDefinition) : void {
+		if ((classDef.flags() & ClassDefinition.IS_EXPORT) != 0) {
+			var holder = this._namer.getNameOfConstructor(classDef, this._findFunctions(classDef, "constructor", false)[0].getArgumentTypes());
+		} else {
+			holder = this._namer.getNameOfClass(classDef);
+		}
+		this._emit(holder, null);
 	}
 
 	function _emitDefaultValueOf (type : Type) : void {
@@ -3352,73 +3541,73 @@ class JavaScriptEmitter implements Emitter {
 
 		var precedence = [
 			[
-				{ "new":        function (op : string, precedence : number) { _NewExpressionEmitter._setOperatorPrecedence(op, precedence); } },
-				{ "[":          function (op : string, precedence : number) { _ArrayExpressionEmitter._setOperatorPrecedence(op, precedence); } },
-				{ ".":          function (op : string, precedence : number) { _PropertyExpressionEmitter._setOperatorPrecedence(op, precedence); } },
-				{ "(":          function (op : string, precedence : number) { _CallExpressionEmitter._setOperatorPrecedence(op, precedence); } },
-				{ "super":      function (op : string, precedence : number) { _SuperExpressionEmitter._setOperatorPrecedence(op, precedence); } },
-				{ "function":   function (op : string, precedence : number) { _FunctionExpressionEmitter._setOperatorPrecedence(op, precedence); } }
+				{ "new":        _NewExpressionEmitter._setOperatorPrecedence },
+				{ "[":          _ArrayExpressionEmitter._setOperatorPrecedence },
+				{ ".":          _PropertyExpressionEmitter._setOperatorPrecedence },
+				{ "(":          _CallExpressionEmitter._setOperatorPrecedence },
+				{ "super":      _SuperExpressionEmitter._setOperatorPrecedence },
+				{ "function":   _FunctionExpressionEmitter._setOperatorPrecedence }
 			], [
-				{ "++":         function (op : string, precedence : number) { _PostfixExpressionEmitter._setOperatorPrecedence(op, precedence); } },
-				{ "--":         function (op : string, precedence : number) { _PostfixExpressionEmitter._setOperatorPrecedence(op, precedence); } }
+				{ "++":         _PostfixExpressionEmitter._setOperatorPrecedence },
+				{ "--":         _PostfixExpressionEmitter._setOperatorPrecedence }
 			], [
 				// delete is not used by JSX
-				{ "void":       function (op : string, precedence : number) { _UnaryExpressionEmitter._setOperatorPrecedence(op, precedence); } },
-				{ "typeof":     function (op : string, precedence : number) { _UnaryExpressionEmitter._setOperatorPrecedence(op, precedence); } },
-				{ "++":         function (op : string, precedence : number) { _UnaryExpressionEmitter._setOperatorPrecedence(op, precedence); } },
-				{ "--":         function (op : string, precedence : number) { _UnaryExpressionEmitter._setOperatorPrecedence(op, precedence); } },
-				{ "+":          function (op : string, precedence : number) { _UnaryExpressionEmitter._setOperatorPrecedence(op, precedence); } },
-				{ "-":          function (op : string, precedence : number) { _UnaryExpressionEmitter._setOperatorPrecedence(op, precedence); } },
-				{ "~":          function (op : string, precedence : number) { _UnaryExpressionEmitter._setOperatorPrecedence(op, precedence); } },
-				{ "!":          function (op : string, precedence : number) { _UnaryExpressionEmitter._setOperatorPrecedence(op, precedence); } }
+				{ "void":       _UnaryExpressionEmitter._setOperatorPrecedence },
+				{ "typeof":     _UnaryExpressionEmitter._setOperatorPrecedence },
+				{ "++":         _UnaryExpressionEmitter._setOperatorPrecedence },
+				{ "--":         _UnaryExpressionEmitter._setOperatorPrecedence },
+				{ "+":          _UnaryExpressionEmitter._setOperatorPrecedence },
+				{ "-":          _UnaryExpressionEmitter._setOperatorPrecedence },
+				{ "~":          _UnaryExpressionEmitter._setOperatorPrecedence },
+				{ "!":          _UnaryExpressionEmitter._setOperatorPrecedence }
 			], [
-				{ "*":          function (op : string, precedence : number) { _BinaryNumberExpressionEmitter._setOperatorPrecedence(op, precedence); } },
-				{ "/":          function (op : string, precedence : number) { _BinaryNumberExpressionEmitter._setOperatorPrecedence(op, precedence); } },
-				{ "%":          function (op : string, precedence : number) { _BinaryNumberExpressionEmitter._setOperatorPrecedence(op, precedence); } }
+				{ "*":          _BinaryNumberExpressionEmitter._setOperatorPrecedence },
+				{ "/":          _BinaryNumberExpressionEmitter._setOperatorPrecedence },
+				{ "%":          _BinaryNumberExpressionEmitter._setOperatorPrecedence }
 			], [
-				{ "+":          function (op : string, precedence : number) { _AdditiveExpressionEmitter._setOperatorPrecedence(op, precedence); } },
-				{ "-":          function (op : string, precedence : number) { _BinaryNumberExpressionEmitter._setOperatorPrecedence(op, precedence); } }
+				{ "+":          _AdditiveExpressionEmitter._setOperatorPrecedence },
+				{ "-":          _BinaryNumberExpressionEmitter._setOperatorPrecedence }
 			], [
-				{ "<<":         function (op : string, precedence : number) { _ShiftExpressionEmitter._setOperatorPrecedence(op, precedence); } },
-				{ ">>":         function (op : string, precedence : number) { _ShiftExpressionEmitter._setOperatorPrecedence(op, precedence); } },
-				{ ">>>":        function (op : string, precedence : number) { _ShiftExpressionEmitter._setOperatorPrecedence(op, precedence); } }
+				{ "<<":         _ShiftExpressionEmitter._setOperatorPrecedence },
+				{ ">>":         _ShiftExpressionEmitter._setOperatorPrecedence },
+				{ ">>>":        _ShiftExpressionEmitter._setOperatorPrecedence }
 			], [
-				{ "<":          function (op : string, precedence : number) { _BinaryNumberExpressionEmitter._setOperatorPrecedence(op, precedence); } },
-				{ ">":          function (op : string, precedence : number) { _BinaryNumberExpressionEmitter._setOperatorPrecedence(op, precedence); } },
-				{ "<=":         function (op : string, precedence : number) { _BinaryNumberExpressionEmitter._setOperatorPrecedence(op, precedence); } },
-				{ ">=":         function (op : string, precedence : number) { _BinaryNumberExpressionEmitter._setOperatorPrecedence(op, precedence); } },
-				{ "instanceof": function (op : string, precedence : number) { _InstanceofExpressionEmitter._setOperatorPrecedence(op, precedence); } },
-				{ "in":         function (op : string, precedence : number) { _InExpressionEmitter._setOperatorPrecedence(op, precedence); } }
+				{ "<":          _BinaryNumberExpressionEmitter._setOperatorPrecedence },
+				{ ">":          _BinaryNumberExpressionEmitter._setOperatorPrecedence },
+				{ "<=":         _BinaryNumberExpressionEmitter._setOperatorPrecedence },
+				{ ">=":         _BinaryNumberExpressionEmitter._setOperatorPrecedence },
+				{ "instanceof": _InstanceofExpressionEmitter._setOperatorPrecedence },
+				{ "in":         _InExpressionEmitter._setOperatorPrecedence }
 			], [
-				{ "==":         function (op : string, precedence : number) { _EqualityExpressionEmitter._setOperatorPrecedence(op, precedence); } },
-				{ "!=":         function (op : string, precedence : number) { _EqualityExpressionEmitter._setOperatorPrecedence(op, precedence); } }
+				{ "==":         _EqualityExpressionEmitter._setOperatorPrecedence },
+				{ "!=":         _EqualityExpressionEmitter._setOperatorPrecedence }
 			], [
-				{ "&":          function (op : string, precedence : number) { _BinaryNumberExpressionEmitter._setOperatorPrecedence(op, precedence); } }
+				{ "&":          _BinaryNumberExpressionEmitter._setOperatorPrecedence }
 			], [
-				{ "^":          function (op : string, precedence : number) { _BinaryNumberExpressionEmitter._setOperatorPrecedence(op, precedence); } }
+				{ "^":          _BinaryNumberExpressionEmitter._setOperatorPrecedence }
 			], [
-				{ "|":          function (op : string, precedence : number) { _BinaryNumberExpressionEmitter._setOperatorPrecedence(op, precedence); } }
+				{ "|":          _BinaryNumberExpressionEmitter._setOperatorPrecedence }
 			], [
-				{ "&&":         function (op : string, precedence : number) { _LogicalExpressionEmitter._setOperatorPrecedence(op, precedence); } }
+				{ "&&":         _LogicalExpressionEmitter._setOperatorPrecedence }
 			], [
-				{ "||":         function (op : string, precedence : number) { _LogicalExpressionEmitter._setOperatorPrecedence(op, precedence); } }
+				{ "||":         _LogicalExpressionEmitter._setOperatorPrecedence }
 			], [
-				{ "=":          function (op : string, precedence : number) { _AssignmentExpressionEmitter._setOperatorPrecedence(op, precedence); } },
-				{ "*=":         function (op : string, precedence : number) { _AssignmentExpressionEmitter._setOperatorPrecedence(op, precedence); } },
-				{ "/=":         function (op : string, precedence : number) { _AssignmentExpressionEmitter._setOperatorPrecedence(op, precedence); } },
-				{ "%=":         function (op : string, precedence : number) { _AssignmentExpressionEmitter._setOperatorPrecedence(op, precedence); } },
-				{ "+=":         function (op : string, precedence : number) { _AssignmentExpressionEmitter._setOperatorPrecedence(op, precedence); } },
-				{ "-=":         function (op : string, precedence : number) { _AssignmentExpressionEmitter._setOperatorPrecedence(op, precedence); } },
-				{ "<<=":        function (op : string, precedence : number) { _AssignmentExpressionEmitter._setOperatorPrecedence(op, precedence); } },
-				{ ">>=":        function (op : string, precedence : number) { _AssignmentExpressionEmitter._setOperatorPrecedence(op, precedence); } },
-				{ ">>>=":       function (op : string, precedence : number) { _AssignmentExpressionEmitter._setOperatorPrecedence(op, precedence); } },
-				{ "&=":         function (op : string, precedence : number) { _AssignmentExpressionEmitter._setOperatorPrecedence(op, precedence); } },
-				{ "^=":         function (op : string, precedence : number) { _AssignmentExpressionEmitter._setOperatorPrecedence(op, precedence); } },
-				{ "|=":         function (op : string, precedence : number) { _AssignmentExpressionEmitter._setOperatorPrecedence(op, precedence); } }
+				{ "=":          _AssignmentExpressionEmitter._setOperatorPrecedence },
+				{ "*=":         _AssignmentExpressionEmitter._setOperatorPrecedence },
+				{ "/=":         _AssignmentExpressionEmitter._setOperatorPrecedence },
+				{ "%=":         _AssignmentExpressionEmitter._setOperatorPrecedence },
+				{ "+=":         _AssignmentExpressionEmitter._setOperatorPrecedence },
+				{ "-=":         _AssignmentExpressionEmitter._setOperatorPrecedence },
+				{ "<<=":        _AssignmentExpressionEmitter._setOperatorPrecedence },
+				{ ">>=":        _AssignmentExpressionEmitter._setOperatorPrecedence },
+				{ ">>>=":       _AssignmentExpressionEmitter._setOperatorPrecedence },
+				{ "&=":         _AssignmentExpressionEmitter._setOperatorPrecedence },
+				{ "^=":         _AssignmentExpressionEmitter._setOperatorPrecedence },
+				{ "|=":         _AssignmentExpressionEmitter._setOperatorPrecedence }
 			], [
-				{ "?":          function (op : string, precedence : number) { _ConditionalExpressionEmitter._setOperatorPrecedence(op, precedence); } }
+				{ "?":          _ConditionalExpressionEmitter._setOperatorPrecedence }
 			], [
-				{ ",":          function (op : string, precedence : number) { _CommaExpressionEmitter._setOperatorPrecedence(op, precedence); } }
+				{ ",":          _CommaExpressionEmitter._setOperatorPrecedence }
 			]
 		];
 		for (var i = 0; i < precedence.length; ++i) {

@@ -38,9 +38,13 @@ interface Emitter implements Stashable {
 
 	function getOutput(sourceFile : string, entryPoint : Nullable.<string>, executableFor : Nullable.<string>) : string;
 
+	function getEnableSourceMap() : boolean;
+
 	function setEnableSourceMap(enable : boolean) : void;
 
 	function setEnableProfiler(enable : boolean) : void;
+
+	function getEnableMinifier() : boolean;
 
 	function setEnableMinifier(enable : boolean) : void;
 

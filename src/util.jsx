@@ -266,6 +266,38 @@ class Util {
 			baseExpr instanceof ClassExpression);
 	}
 
+	static function memberIsExported(classDef : ClassDefinition, name : string, argTypes : Type[], isStatic : boolean) : boolean {
+		if (isStatic) {
+			var found = Util.findMemberInClass(classDef, name, argTypes, true);
+			return (found.flags() & ClassDefinition.IS_EXPORT) != 0;
+		}
+		function check(classDef : ClassDefinition) : boolean {
+			// check in myself
+			if ((classDef.flags() & ClassDefinition.IS_NATIVE) != 0) {
+				// native classes never "export"
+				return false;
+			}
+			var found = Util.findMemberInClass(classDef, name, argTypes, false);
+			if (found != null && (found.flags() & ClassDefinition.IS_EXPORT) != 0) {
+				return true;
+			}
+			// check in base
+			if (classDef.extendType() != null) {
+				if (check(classDef.extendType().getClassDef())) {
+					return true;
+				}
+			}
+			var isExportedInImpl = false;
+			classDef.implementTypes().forEach(function (implType) {
+				if (check(implType.getClassDef())) {
+					isExportedInImpl = true;
+				}
+			});
+			return isExportedInImpl;
+		}
+		return check(classDef);
+	}
+
 	static function isReferringToFunctionDefinition(expr : PropertyExpression) : boolean {
 		var exprType = expr.getType();
 		if (! (exprType instanceof FunctionType)) {
@@ -650,8 +682,9 @@ class CompileError extends CompileIssue {
 		this._notes = new CompileNote[];
 	}
 
-	function addCompileNote (note : CompileNote) : void {
+	function addCompileNote (note : CompileNote) : CompileError {
 		this._notes.push(note);
+		return this;
 	}
 
 	function addCompileNotes (notes : CompileNote[]) : void {
