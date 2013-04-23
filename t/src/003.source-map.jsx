@@ -89,8 +89,8 @@ class _Test extends TestCase {
 		this.expect(orig['name'], "orig.name").toBe("_Main");
 		this.expect(platform.fileExists("t/src/source-map/" + orig['source'] as string), orig['source'] as string + " exists").toBe(true);
 
-		this.note('search for getFoo$');
-		pos = search(source, function (t) { return /^getFoo\b/.test(t.token); });
+		this.note('search for "getFoo"');
+		pos = search(source, function (t) { return /\bgetFoo\b/.test(t.token); });
 		this.note("generated (member function): " + JSON.stringify(source[pos]));
 		orig = consumer.originalPositionFor(source[pos]);
 		this.note("original: " + JSON.stringify(orig));
