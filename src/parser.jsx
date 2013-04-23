@@ -1657,7 +1657,7 @@ class Parser {
 			return this._functionDefinition(token, flags, docComment);
 		}
 		// member variable decl.
-		if ((flags & ~(ClassDefinition.IS_STATIC | ClassDefinition.IS_ABSTRACT | ClassDefinition.IS_CONST | ClassDefinition.IS_READONLY | ClassDefinition.IS_INLINE)) != 0) {
+		if ((flags & ~(ClassDefinition.IS_STATIC | ClassDefinition.IS_ABSTRACT | ClassDefinition.IS_CONST | ClassDefinition.IS_READONLY | ClassDefinition.IS_EXPORT)) != 0) {
 			this._newError("variables may only have attributes: static, abstract, const");
 			return null;
 		}
