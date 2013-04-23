@@ -3100,7 +3100,8 @@ class JavaScriptEmitter implements Emitter {
 			this._reduceIndent();
 			this._emit("};\n\n", null);
 		});
-		if (isStatic) {
+		if (isStatic
+			&& (! this._enableMinifier || (funcDef.getClassDef().className() == "_Main" && funcDef.name() == "main"))) {
 			this._emitHolderOfStatic(funcDef.getClassDef());
 			this._emit(
 				"." + funcDef.name() + this._mangler.mangleFunctionArguments(funcDef.getArgumentTypes())
