@@ -986,16 +986,16 @@ native class TypeError extends Error {
 /**
  * Provides classes and interfaces related to generator.
  */
-class StopIteration extends Error {
+class g_StopIteration extends Error {
 	function constructor() { }
 }
 
-interface Enumerable.<T> {
+interface g_Enumerable.<T> {
 	function next () : T;
 }
 
 // only used by JSX compiler
-class __jsx_generator.<T> implements Enumerable.<T> {
+class __jsx_generator.<T> implements g_Enumerable.<T> {
 
 	var __next : () -> void;
 	var __value : T;
@@ -1009,13 +1009,13 @@ class __jsx_generator.<T> implements Enumerable.<T> {
 		if (! this.__end) {
 			try {
 				this.__next();
-			} catch (e : StopIteration) {
+			} catch (e : g_StopIteration) {
 				this.__end = true;
 				throw e;
 			}
 			return this.__value;
 		} else {
-			throw new StopIteration;
+			throw new g_StopIteration;
 		}
 	}
 

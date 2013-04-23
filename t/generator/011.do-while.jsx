@@ -8,7 +8,7 @@ end
 class _Main {
 	static function main (args : string[]) : void {
 
-		function iota (n : number) : Enumerable.<number> {
+		function iota (n : number) : g_Enumerable.<number> {
 			var i = 0;
 			do {
 				yield i;
@@ -21,7 +21,7 @@ class _Main {
 			while (true) {
 				log g.next();
 			}
-		} catch (e : StopIteration) {
+		} catch (e : g_StopIteration) {
 			log "end";
 		}
 	}

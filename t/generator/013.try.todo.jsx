@@ -5,17 +5,17 @@
 4
 */
 class _Main {
-	function bar () : Enumerable.<number> {
+	function bar () : g_Enumerable.<number> {
 		yield 1;
 		yield 2;
 	}
-	function foo () : Enumerable.<number> {
+	function foo () : g_Enumerable.<number> {
 		var b = bar();
 		try {
 			while (true) {
 				yield b.next();
 			}
-		} catch (e : StopIteration) {
+		} catch (e : g_StopIteration) {
 			// pass
 		}
 		yield 3;

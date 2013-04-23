@@ -5,7 +5,7 @@
 */
 class _Main {
 	static function main (args : string[]) : void {
-		function foo () : Enumerable.<number> {
+		function foo () : g_Enumerable.<number> {
 			yield 1;
 			yield 2;
 			yield 3;

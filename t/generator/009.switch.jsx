@@ -7,7 +7,7 @@
 */
 class _Main {
 	static function main (args : string[]) : void {
-		function foo (n : number) : Enumerable.<number> {
+		function foo (n : number) : g_Enumerable.<number> {
 			while (true) {
 				switch (n) {
 				case 1:

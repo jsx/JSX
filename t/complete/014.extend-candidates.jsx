@@ -28,7 +28,7 @@ class B extends
       "word" : "TypeError"
    },
    {
-      "word" : "StopIteration"
+      "word" : "g_StopIteration"
    }
 ]
 */
