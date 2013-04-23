@@ -1013,19 +1013,19 @@ class CodeTransformer {
 			var stmt = statements[i];
 			if (stmt instanceof GotoStatement) {
 				var name = (stmt as GotoStatement).getLabel();
-				statements[i] = new ExpressionStatement(new CallExpression(null, new LocalExpression(null, labels[name]), []));
+				statements[i] = new ExpressionStatement(new CallExpression(new Token("(", false), new LocalExpression(null, labels[name]), []));
 			} else if (stmt instanceof IfStatement) {
 				var ifStmt = stmt as IfStatement;
 				var succLabel = (ifStmt.getOnTrueStatements()[0] as GotoStatement).getLabel();
-				ifStmt.getOnTrueStatements()[0] = new ExpressionStatement(new CallExpression(null, new LocalExpression(null, labels[succLabel]), []));
+				ifStmt.getOnTrueStatements()[0] = new ExpressionStatement(new CallExpression(new Token("(", false), new LocalExpression(null, labels[succLabel]), []));
 				var failLabel = (ifStmt.getOnFalseStatements()[0] as GotoStatement).getLabel();
-				ifStmt.getOnFalseStatements()[0] = new ExpressionStatement(new CallExpression(null, new LocalExpression(null, labels[failLabel]), []));
+				ifStmt.getOnFalseStatements()[0] = new ExpressionStatement(new CallExpression(new Token("(", false), new LocalExpression(null, labels[failLabel]), []));
 			} else if (stmt instanceof SwitchStatement) {
 				var switchStmt = stmt as SwitchStatement;
 				for (var j = 0; j < switchStmt.getStatements().length; ++j) {
 					if (switchStmt.getStatements()[j] instanceof GotoStatement) {
 						name = (switchStmt.getStatements()[j] as GotoStatement).getLabel();
-						switchStmt.getStatements()[j] = new ExpressionStatement(new CallExpression(null, new LocalExpression(null, labels[name]), []));
+						switchStmt.getStatements()[j] = new ExpressionStatement(new CallExpression(new Token("(", false), new LocalExpression(null, labels[name]), []));
 					}
 				}
 			}
@@ -1054,7 +1054,7 @@ class CodeTransformer {
 				body.push(statements[i]);
 			}
 			var block = new MemberFunctionDefinition(
-						null,
+						new Token("function", false),
 						null,
 						ClassDefinition.IS_STATIC,
 						Type.voidType,
@@ -1070,7 +1070,7 @@ class CodeTransformer {
 				new AssignmentExpression(
 					new Token("=", false),
 					new LocalExpression(null, labels[currentLabel.getName()]),
-					new FunctionExpression(null, block))));
+					new FunctionExpression(new Token("function", false), block))));
 			++numBlock;
 		}
 		funcDef._statements = codeBlocks.concat(entries);
