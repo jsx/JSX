@@ -39,6 +39,63 @@ import _UnclassifyOptimizationCommand,
 // utilify functions specific to jsemitter
 class _Util {
 
+	static const OUTPUTNAME_IDENTIFIER = "emitter.outputname";
+
+	class OutputNameStash extends OptimizerStash {
+		var outputClassName : string;
+		function constructor(outputClassName : string) {
+			this.outputClassName = outputClassName;
+		}
+		override function clone() : OptimizerStash {
+			throw new Error("not supported");
+		}
+	}
+
+	static function getOutputClassName(classDef : ClassDefinition) : string {
+		return (classDef.getOptimizerStash()[_Util.OUTPUTNAME_IDENTIFIER] as _Util.OutputNameStash).outputClassName;
+	}
+
+	static function setOutputClassNames(classDefs : ClassDefinition[]) : void {
+		function setOutputName(classDef : ClassDefinition, name : string) : void {
+			classDef.getOptimizerStash()[_Util.OUTPUTNAME_IDENTIFIER] = new _Util.OutputNameStash(name);
+		}
+		// rename the classes with conflicting names
+		var countByName = new Map.<number>;
+		for (var i = 0; i < classDefs.length; ++i) {
+			var classDef = classDefs[i];
+			if ((classDef.flags() & ClassDefinition.IS_NATIVE) != 0) {
+				// check that the names of native classes do not conflict, and register the ocurrences
+				var className = classDef.className();
+				assert ! countByName[className];
+				setOutputName(classDef, className);
+				countByName[className] = 1;
+			}
+		}
+		for (var i = 0; i < classDefs.length; ++i) {
+			var classDef = classDefs[i];
+			if ((classDef.flags() & ClassDefinition.IS_NATIVE) == 0) {
+				var className;
+				if (classDef.getOuterClassDef() != null)
+					className = _Util.getOutputClassName(classDef.getOuterClassDef()) + "$C" + classDef.className();
+				else
+					className = classDef.className();
+
+				if (countByName[className]) {
+					setOutputName(classDef, className + "$" + (countByName[className] - 1) as string);
+					countByName[className]++;
+				} else {
+					setOutputName(classDef, className);
+					countByName[className] = 1;
+				}
+			}
+		}
+		// escape the instantiated class names (note: template classes are never emitted (since they are all native) but their names are used for mangling of function arguments)
+		for (var i = 0; i < classDefs.length; ++i) {
+			var escapedClassName = _Util.getOutputClassName(classDefs[i]).replace(/\.</g, "$$").replace(/>/g, "$E").replace(/[^A-Za-z0-9_]/g,"$");
+			setOutputName(classDefs[i], escapedClassName);
+		}
+	}
+
 	static function encodeObjectLiteralKey(s : string) : string {
 		if (s.length == 0 || s.match(/^[A-Za-z_$][A-Za-z0-9_$]*$/)) {
 			return s;
@@ -78,7 +135,7 @@ class _Mangler {
 					// fall through
 				}
 			}
-			return "L" + type.getClassDef().getOutputClassName() + "$";
+			return "L" + _Util.getOutputClassName(type.getClassDef()) + "$";
 		} else if (type instanceof StaticFunctionType)
 			return "F" + this.mangleFunctionArguments((type as StaticFunctionType).getArgumentTypes()) + this.mangleTypeName((type as StaticFunctionType).getReturnType()) + "$";
 		else if (type instanceof MemberFunctionType)
@@ -164,7 +221,7 @@ class _Namer {
 	}
 
 	function getNameOfStaticFunction(classDef : ClassDefinition, name : string, argTypes : Type[]) : string {
-		var className = classDef.getOutputClassName();
+		var className = _Util.getOutputClassName(classDef);
 		if (Util.memberRootIsNative(classDef, name, argTypes, true)) {
 			return className + "." + name;
 		}
@@ -175,7 +232,7 @@ class _Namer {
 		if ((classDef.flags() & ClassDefinition.IS_NATIVE) != 0) {
 			return this._getNameOfNativeConstructor(classDef);
 		}
-		return classDef.getOutputClassName() + this._emitter.getMangler().mangleFunctionArguments(argTypes);
+		return _Util.getOutputClassName(classDef) + this._emitter.getMangler().mangleFunctionArguments(argTypes);
 	}
 
 	function _getNameOfNativeConstructor(classDef : ClassDefinition) : string {
@@ -190,7 +247,7 @@ class _Namer {
 	}
 
 	function getNameOfClass(classDef : ClassDefinition) : string {
-		return classDef.getOutputClassName();
+		return _Util.getOutputClassName(classDef);
 	}
 
 	function enterScope(local : LocalVariable, cb : function () : void) : void {
@@ -377,7 +434,7 @@ class _Minifier {
 			if (Util.memberRootIsNative(classDef, name, argTypes, true)) {
 				return this.getNameOfClass(classDef) + "." + name;
 			}
-			var mangledName = classDef.getOutputClassName() + "$" + this._getMangler().mangleFunctionName(name, argTypes);
+			var mangledName = _Util.getOutputClassName(classDef) + "$" + this._getMangler().mangleFunctionName(name, argTypes);
 			if (this._isCounting()) {
 				_Minifier._incr(this._minifier._globalUseCount, mangledName);
 			} else {
@@ -393,7 +450,7 @@ class _Minifier {
 				}
 				return name;
 			}
-			var mangledName = classDef.getOutputClassName() + this._getMangler().mangleFunctionArguments(argTypes);
+			var mangledName = _Util.getOutputClassName(classDef) + this._getMangler().mangleFunctionArguments(argTypes);
 			if (this._isCounting()) {
 				_Minifier._incr(this._minifier._globalUseCount, mangledName);
 			} else {
@@ -402,7 +459,7 @@ class _Minifier {
 			return mangledName;
 		}
 		override function getNameOfClass(classDef : ClassDefinition) : string {
-			var name = classDef.getOutputClassName();
+			var name = _Util.getOutputClassName(classDef);
 			if (this._isCounting()) {
 				_Minifier._incr(this._minifier._globalUseCount, name);
 			}
@@ -2695,6 +2752,8 @@ class JavaScriptEmitter implements Emitter {
 
 		// current impl. of _Minifier.minifyJavaScript does not support transforming source map
 		assert ! (this._enableMinifier && this._enableSourceMap);
+
+		_Util.setOutputClassNames(classDefs);
 
 		if (this._enableMinifier) {
 			var minifier = new _Minifier(this, classDefs);

@@ -153,7 +153,6 @@ class ClassDefinition implements Stashable {
 	var _parser		: Parser;
 	var _token		: Token;
 	var _className		: string;
-	var _outputClassName	: Nullable.<string>;
 	var _flags		: number;
 	var _extendType		: ParsedObjectType; // null for interfaces, mixins, and Object class only
 	var _implementTypes	: ParsedObjectType[];
@@ -170,7 +169,6 @@ class ClassDefinition implements Stashable {
 		this._parser = null;
 		this._token = token;
 		this._className = className;
-		this._outputClassName = null;
 		this._flags = flags;
 		this._extendType = extendType;
 		this._implementTypes = implementTypes;
@@ -220,14 +218,6 @@ class ClassDefinition implements Stashable {
 
 	function classFullName () : string {
 		return this._outerClassDef != null ? this._outerClassDef.classFullName() + "." + this._className : this.className();
-	}
-
-	function setOutputClassName (name : string) : void {
-		this._outputClassName = name;
-	}
-
-	function getOutputClassName () : string {
-		return this._outputClassName;
 	}
 
 	function flags () : number {
