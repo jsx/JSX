@@ -145,10 +145,6 @@ abstract class Expression implements Stashable {
 			return new NullExpression(new Token("null", false), type);
 	}
 
-	static function instantiateTemplate (context : AnalysisContext, token : Token, className : string, typeArguments : Type[]) : ClassDefinition {
-		return context.parser.lookupTemplate(context.errors, new TemplateInstantiationRequest(token, className, typeArguments), context.postInstantiationCallback);
-	}
-
 }
 
 abstract class LeafExpression extends Expression {
@@ -562,7 +558,7 @@ class ArrayLiteralExpression extends Expression {
 			if (elementType.equals(Type.integerType))
 				elementType = Type.numberType;
 			elementType = elementType.resolveIfNullable();
-			this._type = new ObjectType(Expression.instantiateTemplate(context, this._token, "Array", [ elementType ]));
+			this._type = new ObjectType(Util.instantiateTemplate(context, this._token, "Array", [ elementType ]));
 		}
 		return succeeded;
 	}
@@ -689,7 +685,7 @@ class MapLiteralExpression extends Expression {
 			if (elementType.equals(Type.integerType))
 				elementType = Type.numberType;
 			elementType = elementType.resolveIfNullable();
-			this._type = new ObjectType(Expression.instantiateTemplate(context, this._token, "Map", [ elementType ]));
+			this._type = new ObjectType(Util.instantiateTemplate(context, this._token, "Map", [ elementType ]));
 		}
 		return succeeded;
 	}
