@@ -2934,16 +2934,21 @@ class JavaScriptEmitter implements Emitter {
 			// fetch the first classDef, and others that came from the same file
 			var list = new string[][];
 			var pushClass = (function (classDef : ClassDefinition) : void {
-				var push = function (argTypes : Type[]) : void {
-					list.push([ classDef.classFullName() + this._mangler.mangleFunctionArguments(argTypes), this._namer.getNameOfConstructor(classDef, argTypes) ]);
-				};
 				var ctors = this._findFunctions(classDef, "constructor", false);
-				list.push([ classDef.classFullName(), this._namer.getNameOfClass(classDef) ]);
-				if (ctors.length == 0) {
-					push(new Type[]);
+				if ((classDef.flags() & ClassDefinition.IS_EXPORT) != 0) {
+					assert ctors.length == 1;
+					list.push([ classDef.classFullName(), this._namer.getNameOfConstructor(classDef, ctors[0].getArgumentTypes()) ]);
 				} else {
-					for (var i = 0; i < ctors.length; ++i)
-						push(ctors[i].getArgumentTypes());
+					var push = function (argTypes : Type[]) : void {
+						list.push([ classDef.classFullName() + this._mangler.mangleFunctionArguments(argTypes), this._namer.getNameOfConstructor(classDef, argTypes) ]);
+					};
+					list.push([ classDef.classFullName(), this._namer.getNameOfClass(classDef) ]);
+					if (ctors.length == 0) {
+						push(new Type[]);
+					} else {
+						for (var i = 0; i < ctors.length; ++i)
+							push(ctors[i].getArgumentTypes());
+					}
 				}
 			});
 			var filename = classDefs[0].getToken().getFilename();
@@ -3093,9 +3098,16 @@ class JavaScriptEmitter implements Emitter {
 			this._reduceIndent();
 			this._emit("};\n\n", null);
 		});
+		function getStaticFunctionHolder() : string {
+			var classDef = funcDef.getClassDef();
+			if ((classDef.flags() & ClassDefinition.IS_EXPORT) == 0) {
+				return this._namer.getNameOfClass(classDef);
+			}
+			return this._namer.getNameOfConstructor(classDef, this._findFunctions(classDef, "constructor", false)[0].getArgumentTypes());
+		}
 		if (isStatic) {
 			this._emit(
-				this._namer.getNameOfClass(funcDef.getClassDef()) + "." + funcDef.name() + this._mangler.mangleFunctionArguments(funcDef.getArgumentTypes())
+				getStaticFunctionHolder() + "." + funcDef.name() + this._mangler.mangleFunctionArguments(funcDef.getArgumentTypes())
 				+ " = "
 				+ this._namer.getNameOfStaticFunction(funcDef.getClassDef(), funcDef.name(), funcDef.getArgumentTypes())
 				+ ";\n",
@@ -3104,7 +3116,7 @@ class JavaScriptEmitter implements Emitter {
 		if (Util.memberIsExported(funcDef.getClassDef(), funcDef.name(), funcDef.getArgumentTypes(), isStatic)) {
 			if (isStatic) {
 				this._emit(
-					this._namer.getNameOfClass(funcDef.getClassDef()) + "." + funcDef.name()
+					getStaticFunctionHolder() + "." + funcDef.name()
 					+ " = "
 					+ this._namer.getNameOfStaticFunction(funcDef.getClassDef(), funcDef.name(), funcDef.getArgumentTypes())
 					+ ";\n",
