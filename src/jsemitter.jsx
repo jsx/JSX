@@ -3069,7 +3069,7 @@ class JavaScriptEmitter implements Emitter {
 			this._reduceIndent();
 			this._emit("};\n\n", null);
 		});
-		this._emit(funcName + ".prototype = new " + this._namer.getNameOfClass(funcDef.getClassDef()) + ";\n\n", null);
+		this._emit(funcName + ".prototype = " + this._namer.getNameOfClass(funcDef.getClassDef()) + ".prototype;\n\n", null);
 	}
 
 	function _emitFunction (funcDef : MemberFunctionDefinition) : void {
