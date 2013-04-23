@@ -82,6 +82,7 @@ sub run_compiled {
 
     # add the bootstrap code
     $src .= sprintf <<'EOT', $filename;
+;
 // workaround for node.js to set "JSX" to global
 (function () { return this; })().JSX = JSX;
 // invoke the test
