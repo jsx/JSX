@@ -433,7 +433,21 @@ class YieldStatement extends Statement {
 			return true;
 		if (this._expr.getType() == null)
 			return true;
-		var yieldType = (context.funcDef.getReturnType().getClassDef() as InstantiatedClassDefinition).getTypeArguments()[0];
+		var returnType = context.funcDef.getReturnType();
+		if (returnType == null) {
+			var yieldType = this._expr.getType();
+			context.funcDef.setReturnType(new ObjectType(Util.instantiateTemplate(context, this._token, "Enumerable", [ yieldType ])));
+		} else {
+			if (returnType instanceof ObjectType
+				&& returnType.getClassDef() instanceof InstantiatedClassDefinition
+				&& (returnType.getClassDef() as InstantiatedClassDefinition).getTemplateClassName() == "Enumerable") {
+					yieldType = (returnType.getClassDef() as InstantiatedClassDefinition).getTypeArguments()[0];
+			} else {
+				// return type is not an instance of Enumerable. the error will be reported by MemberFuncitonDefinition#analyze.
+				context.errors.push(new CompileError(this._token, "cannot convert 'Enumerable.<" + this._expr.getType().toString() + ">' to return type '" + returnType.toString() + "'"));
+				return false;
+			}
+		}
 		if (! this._expr.getType().isConvertibleTo(yieldType)) {
 			context.errors.push(new CompileError(this._token, "cannot convert '" + this._expr.getType().toString() + "' to yield type '" + yieldType.toString() + "'"));
 			return false;
