@@ -1571,7 +1571,8 @@ class Parser {
 	}
 
 	function _memberDefinition () : MemberDefinition {
-		var flags = 0, dropFlags = 0;
+		var flags = 0;
+		var isNoExport = false;
 		var docComment = null : DocComment;
 		while (true) {
 			var token = this._expect([ "function", "var", "static", "abstract", "override", "final", "const", "native", "__readonly__", "inline", "__pure__", "delete", "__export__", "__noexport__" ]);
@@ -1586,75 +1587,89 @@ class Parser {
 				}
 				flags |= ClassDefinition.IS_CONST;
 				break;
-			}
-			else if (token.getValue() == "function" || token.getValue() == "var")
+			} else if (token.getValue() == "function" || token.getValue() == "var") {
 				break;
-			var newFlag = 0;
-			switch (token.getValue()) {
-			case "static":
-				if ((this._classFlags & (ClassDefinition.IS_INTERFACE | ClassDefinition.IS_MIXIN)) != 0) {
-					this._newError("interfaces and mixins cannot have static members");
+			} else if (token.getValue() == "__noexport__") {
+				if (isNoExport) {
+					this._newError("same attribute cannot be specified more than once");
+					return null;
+				} else if ((flags & ClassDefinition.IS_EXPORT) != 0) {
+					this._newError("cannot set the attribute, already declared as __export__");
 					return null;
 				}
-				newFlag = ClassDefinition.IS_STATIC;
-				break;
-			case "abstract":
-				newFlag = ClassDefinition.IS_ABSTRACT;
-				break;
-			case "override":
-				if ((this._classFlags & ClassDefinition.IS_INTERFACE) != 0) {
-					this._newError("functions of an interface cannot have 'override' attribute set");
-					return null;
-				}
-				newFlag = ClassDefinition.IS_OVERRIDE;
-				break;
-			case "final":
-				if ((this._classFlags & ClassDefinition.IS_INTERFACE) != 0) {
-					this._newError("functions of an interface cannot have 'final' attribute set");
-					return null;
-				}
-				newFlag = ClassDefinition.IS_FINAL;
-				break;
-			case "native":
-				newFlag = ClassDefinition.IS_NATIVE;
-				break;
-			case "__readonly__":
-				newFlag = ClassDefinition.IS_READONLY;
-				break;
-			case "inline":
-				newFlag = ClassDefinition.IS_INLINE;
-				break;
-			case "__pure__":
-				newFlag = ClassDefinition.IS_PURE;
-				break;
-			case "delete":
-				newFlag = ClassDefinition.IS_DELETE;
-				break;
-			case "__export__":
-				newFlag = ClassDefinition.IS_EXPORT;
-				break;
-			case "__noexport__":
-				newFlag = -ClassDefinition.IS_EXPORT;
-				break;
-			default:
-				throw new Error("logic flaw");
-			}
-			if (((flags | dropFlags) & Math.abs(newFlag)) != 0) {
-				this._newError("same attribute cannot be specified more than once");
-				return null;
-			}
-			if (newFlag >= 0) {
-				flags |= newFlag;
+				isNoExport = true;
 			} else {
-				dropFlags |= -newFlag;
+				var newFlag = 0;
+				switch (token.getValue()) {
+				case "static":
+					if ((this._classFlags & (ClassDefinition.IS_INTERFACE | ClassDefinition.IS_MIXIN)) != 0) {
+						this._newError("interfaces and mixins cannot have static members");
+						return null;
+					}
+					newFlag = ClassDefinition.IS_STATIC;
+					break;
+				case "abstract":
+					newFlag = ClassDefinition.IS_ABSTRACT;
+					break;
+				case "override":
+					if ((this._classFlags & ClassDefinition.IS_INTERFACE) != 0) {
+						this._newError("functions of an interface cannot have 'override' attribute set");
+						return null;
+					}
+					newFlag = ClassDefinition.IS_OVERRIDE;
+					break;
+				case "final":
+					if ((this._classFlags & ClassDefinition.IS_INTERFACE) != 0) {
+						this._newError("functions of an interface cannot have 'final' attribute set");
+						return null;
+					}
+					newFlag = ClassDefinition.IS_FINAL;
+					break;
+				case "native":
+					newFlag = ClassDefinition.IS_NATIVE;
+					break;
+				case "__readonly__":
+					newFlag = ClassDefinition.IS_READONLY;
+					break;
+				case "inline":
+					newFlag = ClassDefinition.IS_INLINE;
+					break;
+				case "__pure__":
+					newFlag = ClassDefinition.IS_PURE;
+					break;
+				case "delete":
+					newFlag = ClassDefinition.IS_DELETE;
+					break;
+				case "__export__":
+					if (isNoExport) {
+						this._newError("cannot set the attribute, already declared as __noexport__");
+						return null;
+					}
+					newFlag = ClassDefinition.IS_EXPORT;
+					break;
+				default:
+					throw new Error("logic flaw");
+				}
+				if ((flags & newFlag) != 0) {
+					this._newError("same attribute cannot be specified more than once");
+					return null;
+				}
+				flags |= newFlag;
 			}
+		}
+		function shouldExport(name : string) : boolean {
+			if (isNoExport)
+				return false;
+			if ((this._classFlags & ClassDefinition.IS_EXPORT) == 0)
+				return false;
+			if (name.charAt(0) == "_")
+				return false;
+			return true;
 		}
 		if ((this._classFlags & ClassDefinition.IS_INTERFACE) != 0)
 			flags |= ClassDefinition.IS_ABSTRACT;
-		if ((this._classFlags & ClassDefinition.IS_EXPORT) != 0 && (dropFlags & ClassDefinition.IS_EXPORT) == 0)
-			flags |= ClassDefinition.IS_EXPORT;
 		if (token.getValue() == "function") {
-			return this._functionDefinition(token, flags, docComment);
+			return this._functionDefinition(token, flags, docComment, shouldExport);
 		}
 		// member variable decl.
 		if ((flags & ~(ClassDefinition.IS_STATIC | ClassDefinition.IS_ABSTRACT | ClassDefinition.IS_CONST | ClassDefinition.IS_READONLY | ClassDefinition.IS_EXPORT)) != 0) {
@@ -1668,6 +1683,8 @@ class Parser {
 		var name = this._expectIdentifier(null);
 		if (name == null)
 			return null;
+		if (shouldExport(name.getValue()))
+			flags |= ClassDefinition.IS_EXPORT;
 		var type = null : Type;
 		if (this._expectOpt(":") != null)
 			if ((type = this._typeDeclaration(false)) == null)
@@ -1693,11 +1710,13 @@ class Parser {
 		return new MemberVariableDefinition(token, name, flags, type, initialValue, docComment);
 	}
 
-	function _functionDefinition (token : Token, flags : number, docComment : DocComment) : MemberFunctionDefinition {
+	function _functionDefinition (token : Token, flags : number, docComment : DocComment, shouldExport : function (name : string) : boolean) : MemberFunctionDefinition {
 		// name
 		var name = this._expectIdentifier(null);
 		if (name == null)
 			return null;
+		if (shouldExport(name.getValue()))
+			flags |= ClassDefinition.IS_EXPORT;
 		if (name.getValue() == "constructor") {
 			if ((this._classFlags & ClassDefinition.IS_INTERFACE) != 0) {
 				this._newError("interface cannot have a constructor");
