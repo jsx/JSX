@@ -422,7 +422,7 @@ class _Minifier {
 		}
 		override function getNameOfStaticVariable(classDef : ClassDefinition, name : string) : string {
 			if (Util.memberRootIsNative(classDef, name, null, true)
-				|| Util.memberIsExported(classDef, name, null, false)) {
+				|| Util.memberIsExported(classDef, name, null, true)) {
 				return name;
 			}
 			if (this._isCounting()) {
