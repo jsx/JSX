@@ -38,7 +38,7 @@
       "source-map": "0.1.22",
       "esprima": "~ 1.0.2",
       "escodegen": "~ 0.0.20",
-      "esmangle": "~ 0.0.13"
+      "esmangle": "~ 0.0.14"
   },
   "engines": {
     "node": ">= 0.8.0"
