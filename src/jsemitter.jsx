@@ -638,8 +638,17 @@ class _Minifier {
 		this._log("minifying static variables");
 		this._classDefs.forEach(function (classDef) {
 			if ((classDef.flags() & (ClassDefinition.IS_NATIVE | ClassDefinition.IS_FAKE)) == 0) {
+				var exportedStaticVarNames = new string[];
+				classDef.forEachMemberVariable(function (member) {
+					if ((member.flags() & (ClassDefinition.IS_STATIC | ClassDefinition.IS_EXPORT)) == (ClassDefinition.IS_STATIC | ClassDefinition.IS_EXPORT)) {
+						exportedStaticVarNames.push(member.name());
+					}
+					return true;
+				});
 				var stash = _Minifier._getClassStash(classDef);
-				stash.staticVariableConversionTable = _Minifier._buildConversionTable(stash.staticVariableUseCount, new _MinifiedNameGenerator(_MinifiedNameGenerator.KEYWORDS));
+				stash.staticVariableConversionTable = _Minifier._buildConversionTable(
+					stash.staticVariableUseCount,
+					new _MinifiedNameGenerator(_MinifiedNameGenerator.KEYWORDS.concat(exportedStaticVarNames)));
 			}
 		});
 	}
