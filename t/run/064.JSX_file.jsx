@@ -1,3 +1,6 @@
+// do not run if --minify is set
+/*JSX_OPTS
+*/
 /*EXPECTED
 importing#say
 imported#say
