@@ -42,9 +42,9 @@ class _Util {
 	static const OUTPUTNAME_IDENTIFIER = "emitter.outputname";
 
 	class OutputNameStash extends OptimizerStash {
-		var outputClassName : string;
-		function constructor(outputClassName : string) {
-			this.outputClassName = outputClassName;
+		var outputName : string;
+		function constructor(outputName : string) {
+			this.outputName = outputName;
 		}
 		override function clone() : OptimizerStash {
 			throw new Error("not supported");
@@ -52,47 +52,93 @@ class _Util {
 	}
 
 	static function getOutputClassName(classDef : ClassDefinition) : string {
-		return (classDef.getOptimizerStash()[_Util.OUTPUTNAME_IDENTIFIER] as _Util.OutputNameStash).outputClassName;
+		return (classDef.getOptimizerStash()[_Util.OUTPUTNAME_IDENTIFIER] as _Util.OutputNameStash).outputName;
+	}
+
+	static function getOutputConstructorName(ctor : MemberFunctionDefinition) : string {
+		if ((ctor.getClassDef().flags() & ClassDefinition.IS_NATIVE) != 0) {
+			return _Util.getNameOfNativeConstructor(ctor.getClassDef());
+		}
+		return (ctor.getOptimizerStash()[_Util.OUTPUTNAME_IDENTIFIER] as _Util.OutputNameStash).outputName;
+	}
+
+	static function getOutputConstructorName(classDef : ClassDefinition, argTypes : Type[]) : string {
+		var ctor = Util.findFunctionInClass(classDef, "constructor", argTypes, false);
+		assert ctor;
+		return _Util.getOutputConstructorName(ctor);
+	}
+
+	static function getNameOfNativeConstructor(classDef : ClassDefinition) : string {
+		if (classDef instanceof InstantiatedClassDefinition) {
+			if ((classDef as InstantiatedClassDefinition).getTemplateClassName() == "Map") {
+				return "Object";
+			} else {
+				return (classDef as InstantiatedClassDefinition).getTemplateClassName();
+			}
+		}
+		return classDef.className();
 	}
 
 	static function setOutputClassNames(classDefs : ClassDefinition[]) : void {
-		function setOutputName(classDef : ClassDefinition, name : string) : void {
-			classDef.getOptimizerStash()[_Util.OUTPUTNAME_IDENTIFIER] = new _Util.OutputNameStash(name);
+		function setOutputName(stashable : Stashable, name : string) : void {
+			stashable.getOptimizerStash()[_Util.OUTPUTNAME_IDENTIFIER] = new _Util.OutputNameStash(name);
+		}
+		function escapeClassNameIfInstantiated(name : string) : string {
+			// escape the instantiated class names (note: template classes are never emitted (since they are all native) but their names are used for mangling of function arguments)
+			return name.replace(/\.</g, "$$").replace(/>/g, "$E").replace(/[^A-Za-z0-9_]/g,"$");
+		}
+		var countByName = new Map.<number>;
+		function newUniqueName(className : string) : string {
+			if (countByName[className]) {
+				var name = className + "$" + (countByName[className] - 1) as string;
+				++countByName[className];
+			} else {
+				name = className;
+				countByName[className] = 1;
+			}
+			return escapeClassNameIfInstantiated(name);
 		}
 		// rename the classes with conflicting names
-		var countByName = new Map.<number>;
 		for (var i = 0; i < classDefs.length; ++i) {
 			var classDef = classDefs[i];
 			if ((classDef.flags() & ClassDefinition.IS_NATIVE) != 0) {
 				// check that the names of native classes do not conflict, and register the ocurrences
 				var className = classDef.className();
 				assert ! countByName[className];
-				setOutputName(classDef, className);
+				setOutputName(classDef, escapeClassNameIfInstantiated(className));
 				countByName[className] = 1;
 			}
 		}
 		for (var i = 0; i < classDefs.length; ++i) {
 			var classDef = classDefs[i];
 			if ((classDef.flags() & ClassDefinition.IS_NATIVE) == 0) {
-				var className;
+				// decide the className
 				if (classDef.getOuterClassDef() != null)
-					className = _Util.getOutputClassName(classDef.getOuterClassDef()) + "$C" + classDef.className();
+					var className = _Util.getOutputClassName(classDef.getOuterClassDef()) + "$C" + classDef.className();
 				else
 					className = classDef.className();
-
-				if (countByName[className]) {
-					setOutputName(classDef, className + "$" + (countByName[className] - 1) as string);
-					countByName[className]++;
+				// list the constructors
+				var ctors = _Util.findFunctions(classDef, "constructor", false);
+				if (ctors.length != 0) {
+					// move exported ctor to the top (so that it would not get mangled)
+					for (var j = 0; i < ctors.length; ++j) {
+						if ((ctors[i].flags() & ClassDefinition.IS_EXPORT) != 0) {
+							var exportedCtor = ctors[j];
+							ctors.splice(j, 1);
+							ctors.unshift(exportedCtor);
+							break;
+						}
+					}
+					var n = newUniqueName(className);
+					setOutputName(classDef, n);
+					setOutputName(ctors[0], n);
+					for (var j = 1; j < ctors.length; ++j) {
+						setOutputName(ctors[j], newUniqueName(className));
+					}
 				} else {
-					setOutputName(classDef, className);
-					countByName[className] = 1;
+					setOutputName(classDef, newUniqueName(className));
 				}
 			}
-		}
-		// escape the instantiated class names (note: template classes are never emitted (since they are all native) but their names are used for mangling of function arguments)
-		for (var i = 0; i < classDefs.length; ++i) {
-			var escapedClassName = _Util.getOutputClassName(classDefs[i]).replace(/\.</g, "$$").replace(/>/g, "$E").replace(/[^A-Za-z0-9_]/g,"$");
-			setOutputName(classDefs[i], escapedClassName);
 		}
 	}
 
@@ -101,6 +147,18 @@ class _Util {
 			return s;
 		}
 		return Util.encodeStringLiteral(s);
+	}
+
+	static function findFunctions(classDef : ClassDefinition, name : string, isStatic : boolean) : MemberFunctionDefinition[] {
+		var functions = new MemberFunctionDefinition[];
+		var members = classDef.members();
+		for (var i = 0; i < members.length; ++i) {
+			var member = members[i];
+			if ((member instanceof MemberFunctionDefinition) && member.name() == name
+				&& (member.flags() & ClassDefinition.IS_STATIC) == (isStatic ? ClassDefinition.IS_STATIC : 0))
+				functions.push(member as MemberFunctionDefinition);
+		}
+		return functions;
 	}
 
 }
@@ -229,21 +287,7 @@ class _Namer {
 	}
 
 	function getNameOfConstructor(classDef : ClassDefinition, argTypes : Type[]) : string {
-		if ((classDef.flags() & ClassDefinition.IS_NATIVE) != 0) {
-			return this._getNameOfNativeConstructor(classDef);
-		}
-		return _Util.getOutputClassName(classDef) + this._emitter.getMangler().mangleFunctionArguments(argTypes);
-	}
-
-	function _getNameOfNativeConstructor(classDef : ClassDefinition) : string {
-		if (classDef instanceof InstantiatedClassDefinition) {
-			if ((classDef as InstantiatedClassDefinition).getTemplateClassName() == "Map") {
-				return "Object";
-			} else {
-				return (classDef as InstantiatedClassDefinition).getTemplateClassName();
-			}
-		}
-		return classDef.className();
+		return _Util.getOutputConstructorName(classDef, argTypes);
 	}
 
 	function getNameOfClass(classDef : ClassDefinition) : string {
@@ -446,13 +490,13 @@ class _Minifier {
 		}
 		override function getNameOfConstructor(classDef : ClassDefinition, argTypes : Type[]) : string {
 			if ((classDef.flags() & ClassDefinition.IS_NATIVE) != 0) {
-				var name = this._getNameOfNativeConstructor(classDef);
+				var name = _Util.getNameOfNativeConstructor(classDef);
 				if (this._isCounting()) {
 					_Minifier._incr(this._minifier._globalUseCount, name);
 				}
 				return name;
 			}
-			var mangledName = _Util.getOutputClassName(classDef) + this._getMangler().mangleFunctionArguments(argTypes);
+			var mangledName = _Util.getOutputConstructorName(classDef, argTypes);
 			if (this._isCounting()) {
 				_Minifier._incr(this._minifier._globalUseCount, mangledName);
 			} else {
@@ -2872,14 +2916,12 @@ class JavaScriptEmitter implements Emitter {
 		this._emittingClass = classDef;
 		try {
 
-			// emit class object
-			this._emitClassObject(classDef);
-
 			// emit constructors
-			var ctors = this._findFunctions(classDef, "constructor", false);
+			var ctors = _Util.findFunctions(classDef, "constructor", false);
 			for (var i = 0; i < ctors.length; ++i)
 				this._emitConstructor(ctors[i]);
-
+			// emit the amendments
+			this._emitClassObjectAmendments(classDef, ctors);
 			// emit functions
 			var members = classDef.members();
 			for (var i = 0; i < members.length; ++i) {
@@ -2936,7 +2978,7 @@ class JavaScriptEmitter implements Emitter {
 			// fetch the first classDef, and others that came from the same file
 			var list = new string[][];
 			var pushClass = (function (classDef : ClassDefinition) : void {
-				var ctors = this._findFunctions(classDef, "constructor", false);
+				var ctors = _Util.findFunctions(classDef, "constructor", false);
 				if ((classDef.flags() & ClassDefinition.IS_EXPORT) != 0) {
 					assert ctors.length == 1;
 					list.push([ classDef.classFullName(), this._namer.getNameOfConstructor(classDef, ctors[0].getArgumentTypes()) ]);
@@ -3003,15 +3045,27 @@ class JavaScriptEmitter implements Emitter {
 		return output;
 	}
 
-	function _emitClassObject (classDef : ClassDefinition) : void {
-		this._emit(
-			"function " + this._namer.getNameOfClass(classDef) + "() {\n" +
-			"}\n" +
-			"\n",
-			classDef.getToken());
-		if (classDef.extendType() != null && classDef.extendType().getClassDef().className() != "Object") {
-			this._emit(this._namer.getNameOfClass(classDef) + ".prototype = new " + this._namer.getNameOfClass(classDef.extendType().getClassDef()) + ";\n", null);
+	function _emitClassObjectAmendments (classDef : ClassDefinition, constructors : MemberFunctionDefinition[]) : void {
+		// extends
+		if (classDef.extendType() != null) {
+			var extendClassDef = classDef.extendType().getClassDef();
+		} else {
+			extendClassDef = null;
 		}
+		if (constructors.length != 0) {
+			this._emit("$__jsx_extend([", null);
+			for (var i = 0; i < constructors.length; ++i) {
+				if (i != 0) {
+					this._emit(", ", null);
+				}
+				this._emit(this._namer.getNameOfConstructor(classDef, constructors[i].getArgumentTypes()), null);
+			}
+			this._emit("], " + (extendClassDef != null ? this._namer.getNameOfClass(extendClassDef) : "Object") + ");\n", null);
+		} else {
+			this._emit("function " + this._namer.getNameOfClass(classDef) + "() {}\n", null);
+			this._emit("$__jsx_extend([" + this._namer.getNameOfClass(classDef) + "], " + (extendClassDef != null ? this._namer.getNameOfClass(extendClassDef) : "Object") + ");\n", null);
+		}
+		// implements
 		var implementTypes = classDef.implementTypes();
 		if (implementTypes.length != 0) {
 			// merge
@@ -3076,7 +3130,6 @@ class JavaScriptEmitter implements Emitter {
 			this._reduceIndent();
 			this._emit("};\n\n", null);
 		});
-		this._emit(funcName + ".prototype = " + this._namer.getNameOfClass(funcDef.getClassDef()) + ".prototype;\n\n", null);
 	}
 
 	function _emitFunction (funcDef : MemberFunctionDefinition) : void {
@@ -3216,7 +3269,7 @@ class JavaScriptEmitter implements Emitter {
 
 	function _emitHolderOfStatic(classDef : ClassDefinition) : void {
 		if ((classDef.flags() & ClassDefinition.IS_EXPORT) != 0) {
-			var holder = this._namer.getNameOfConstructor(classDef, this._findFunctions(classDef, "constructor", false)[0].getArgumentTypes());
+			var holder = this._namer.getNameOfConstructor(classDef, _Util.findFunctions(classDef, "constructor", false)[0].getArgumentTypes());
 		} else {
 			holder = this._namer.getNameOfClass(classDef);
 		}
@@ -3424,18 +3477,6 @@ class JavaScriptEmitter implements Emitter {
 		else if (expr instanceof CommaExpression)
 			return new _CommaExpressionEmitter(this, expr as CommaExpression);
 		throw new Error("got unexpected type of expression: " + (expr != null ? JSON.stringify(expr.serialize()) : expr.toString()));
-	}
-
-	function _findFunctions (classDef : ClassDefinition, name : string, isStatic : boolean) : MemberFunctionDefinition[] {
-		var functions = new MemberFunctionDefinition[];
-		var members = classDef.members();
-		for (var i = 0; i < members.length; ++i) {
-			var member = members[i];
-			if ((member instanceof MemberFunctionDefinition) && member.name() == name
-				&& (member.flags() & ClassDefinition.IS_STATIC) == (isStatic ? ClassDefinition.IS_STATIC : 0))
-				functions.push(member as MemberFunctionDefinition);
-		}
-		return functions;
 	}
 
 	function _emitCallArguments (token : Token, prefix : string, args : Expression[], argTypes : Type[]) : void {
