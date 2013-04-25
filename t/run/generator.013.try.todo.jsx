@@ -10,7 +10,7 @@ class _Main {
 		yield 2;
 	}
 	function foo () : g_Enumerable.<number> {
-		var b = bar();
+		var b = this.bar();
 		try {
 			while (true) {
 				yield b.next();
