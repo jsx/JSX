@@ -2004,7 +2004,7 @@ abstract class _BootstrapBuilder {
 				break;
 		}
 		var callEntryPoint = Util.format("JSX.%1(%2, %3)",
-				[this._getLauncher(), JSON.stringify(this._entrySourceFile), args]);
+				[this._getLauncher(), JSON.stringify(this._emitter._platform.encodeFilename(this._entrySourceFile)), args]);
 
 		if (this._executableFor == "web") {
 			callEntryPoint = this._wrapOnLoad(callEntryPoint);
