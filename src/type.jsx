@@ -20,6 +20,7 @@
  * IN THE SOFTWARE.
  */
 
+import "./analysis.jsx";
 import "./classdef.jsx";
 import "./util.jsx";
 import "./parser.jsx";
@@ -655,7 +656,7 @@ class FunctionChoiceType extends FunctionType {
 
 }
 
-class ResolvedFunctionType extends FunctionType {
+abstract class ResolvedFunctionType extends FunctionType {
 
 	var _token : Token;
 	var _returnType : Type;
@@ -669,13 +670,9 @@ class ResolvedFunctionType extends FunctionType {
 		this._isAssignable = isAssignable;
 	}
 
-	function _clone () : ResolvedFunctionType {
-		throw new Error("logic flaw");
-	}
+	abstract function _clone () : ResolvedFunctionType;
 
-	function _toStringPrefix() : string {
-		throw new Error("logic flaw");
-	}
+	abstract function _toStringPrefix() : string;
 
 	function setIsAssignable (isAssignable : boolean) : ResolvedFunctionType {
 		this._isAssignable = isAssignable;
@@ -707,7 +704,7 @@ class ResolvedFunctionType extends FunctionType {
 		if (! this._deduceByArgumentTypes(this._token != null ? this._token : operatorToken, argTypes, isStatic, false, notes)) {
 			var error = new CompileError(
 					operatorToken,
-					operatorToken.getValue() == "[" ? "operator [] of type " + argTypes[0].toString() + " is not applicable to " + this.getObjectType.toString() : "no function with matching arguments");
+					operatorToken.getValue() == "[" ? "operator [] of type " + argTypes[0].toString() + " is not applicable to " + this.getObjectType().toString() : "no function with matching arguments");
 			error.addCompileNotes(notes);
 			context.errors.push(error);
 			return null;
@@ -724,7 +721,11 @@ class ResolvedFunctionType extends FunctionType {
 			return false;
 		};
 		if ((this instanceof StaticFunctionType) != isStatic) {
-			notes.push(new CompileNote(token, 'candidate function not viable: unmatched static flags'));
+			if (isStatic) {
+				notes.push(new CompileNote(token, 'candidate function not viable: expected a static function, but got a member function'));
+			} else {
+				notes.push(new CompileNote(token, 'candidate function not viable: expected a member function, but got a static function'));
+			}
 			return false;
 		}
 		if (this._argTypes.length != 0 && this._argTypes[this._argTypes.length - 1] instanceof VariableLengthArgumentType) {

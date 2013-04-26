@@ -36,7 +36,7 @@ interface Emitter implements Stashable {
 
 	function emit(classDefs : ClassDefinition[]) : void;
 
-	function getOutput(sourceFile : string, entryPoint : Nullable.<string>, executableFor : Nullable.<string>) : string;
+	function getOutput() : string;
 
 	function getEnableSourceMap() : boolean;
 

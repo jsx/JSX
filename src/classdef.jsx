@@ -20,6 +20,7 @@
  * IN THE SOFTWARE.
  */
 
+import "./analysis.jsx";
 import "./type.jsx";
 import "./util.jsx";
 import "./statement.jsx";
@@ -28,26 +29,12 @@ import "./parser.jsx";
 import "./doc.jsx";
 import "./optimizer.jsx";
 
-class InstantiationContext {
-
-	var errors : CompileError[];
-	var typemap : Map.<Type>;
-	var objectTypesUsed : ParsedObjectType[];
-
-	function constructor (errors : CompileError[], typemap : Map.<Type>) {
-		this.errors = errors;
-		this.typemap = typemap;
-		this.objectTypesUsed = new ParsedObjectType[];
-	}
-
-}
-
 mixin TemplateDefinition {
 
 	function buildInstantiationContext (errors : CompileError[], token : Token, formalTypeArgs : Token[], actualTypeArgs : Type[]) : InstantiationContext {
 		// check number of type arguments
 		if (formalTypeArgs.length != actualTypeArgs.length) {
-			errors.push(new CompileError(token, "wrong number of template arguments (expected " + formalTypeArgs.length as string + ", got " + actualTypeArgs.length as string));
+			errors.push(new CompileError(token, "wrong number of template arguments (expected " + formalTypeArgs.length as string + ", got " + actualTypeArgs.length as string + ")"));
 			return null;
 		}
 		// build typemap
@@ -56,79 +43,6 @@ mixin TemplateDefinition {
 			typemap[formalTypeArgs[i].getValue()] = actualTypeArgs[i];
 		}
 		return new InstantiationContext(errors, typemap);
-	}
-
-}
-
-interface Block {
-
-}
-
-class BlockContext {
-
-	var localVariableStatuses : LocalVariableStatuses;
-	var block : Block;
-
-	function constructor (localVariableStatuses : LocalVariableStatuses, block : Block) {
-		this.localVariableStatuses = localVariableStatuses;
-		this.block = block;
-	}
-
-}
-
-class AnalysisContext {
-
-	var errors : CompileError[];
-	var parser : Parser;
-	var postInstantiationCallback : function(:Parser,:ClassDefinition):ClassDefinition;
-	var funcDef : MemberFunctionDefinition;
-	var blockStack : BlockContext[];
-	var statement : Statement;
-
-	function constructor (errors : CompileError[], parser : Parser, postInstantiationCallback : function(:Parser,:ClassDefinition):ClassDefinition) {
-		this.errors = errors;
-		this.parser = parser;
-		this.postInstantiationCallback = postInstantiationCallback;
-		this.funcDef = null;
-		/*
-			blockStack is a stack of blocks:
-
-			function f() { // pushes [ localVariableStatutes, funcDef ]
-				...
-				for (...) { // pushes [ localVariableStatuses, forStatement ]
-					...
-				}
-				try { // pushes [ localVariableStatuses, tryStatement ]
-					...
-				} catch (e : Error) { // pushes [ localVariableStatuses, catchStatement ]
-					...
-					function () { // pushes [ localVariableStatuses, funcDef ]
-						...
-					}
-				}
-			}
-		*/
-		this.blockStack = null;
-		this.statement = null;
-	}
-
-	function clone () : AnalysisContext {
-		// NOTE: does not clone the blockStack (call setBlockStack)
-		return new AnalysisContext(this.errors, this.parser, this.postInstantiationCallback).setFuncDef(this.funcDef);
-	}
-
-	function setFuncDef (funcDef : MemberFunctionDefinition) : AnalysisContext {
-		this.funcDef = funcDef;
-		return this;
-	}
-
-	function setBlockStack (stack : BlockContext[]) : AnalysisContext {
-		this.blockStack = stack;
-		return this;
-	}
-
-	function getTopBlock () : BlockContext {
-		return this.blockStack[this.blockStack.length - 1];
 	}
 
 }
@@ -148,7 +62,8 @@ class ClassDefinition implements Stashable {
 	static const IS_INLINE = 1024;
 	static const IS_PURE = 2048; // constexpr (intended for for native functions)
 	static const IS_DELETE = 4096; // used for disabling the default constructor
-	static const IS_EXPORT = 8192; // no overloading, no minification of method / variable names
+	static const IS_GENERATOR = 8192;
+	static const IS_EXPORT = 16384; // no overloading, no minification of method / variable names
 
 	var _parser		: Parser;
 	var _token		: Token;
@@ -355,8 +270,6 @@ class ClassDefinition implements Stashable {
 	static const GET_MEMBER_MODE_SUPER = 2; // looks for functions with body in super classes
 	static const GET_MEMBER_MODE_FUNCTION_WITH_BODY = 3; // looks for function with body
 
-	static const GET_MEMBER_MODE_NOT_ABSTRACT = 4;
-
 	function getMemberTypeByName (errors : CompileError[], token : Token, name : string, isStatic : boolean, typeArgs : Type[], mode : number) : Type {
 		// returns an array to support function overloading
 		var types = new Type[];
@@ -386,7 +299,7 @@ class ClassDefinition implements Stashable {
 										return;
 									}
 								}
-								if ((member as MemberFunctionDefinition).getStatements() != null || mode != ClassDefinition.GET_MEMBER_MODE_NOT_ABSTRACT) {
+								if ((member as MemberFunctionDefinition).getStatements() != null || mode != ClassDefinition.GET_MEMBER_MODE_FUNCTION_WITH_BODY) {
 									for (var j = 0; j < types.length; ++j) {
 										if (Util.typesAreEqual((member as MemberFunctionDefinition).getArgumentTypes(), (types[j] as ResolvedFunctionType).getArgumentTypes())) {
 											break;
@@ -403,7 +316,7 @@ class ClassDefinition implements Stashable {
 					}
 				}
 			} else {
-				// for searching super classes, change mode GET_MEMBER_MODE_SUPER to GET_MEMBER_MODE_NOT_ABSTRACT
+				// for searching super classes, change mode GET_MEMBER_MODE_SUPER to GET_MEMBER_MODE_FUNCTION_WITH_BODY
 				mode = ClassDefinition.GET_MEMBER_MODE_FUNCTION_WITH_BODY;
 			}
 			if (mode != ClassDefinition.GET_MEMBER_MODE_CLASS_ONLY) {
@@ -1236,6 +1149,10 @@ class MemberFunctionDefinition extends MemberDefinition implements Block {
 		return this._nameToken == null;
 	}
 
+	function isGenerator() : boolean {
+		return (this._flags & ClassDefinition.IS_GENERATOR) != 0;
+	}
+
 
 	/**
 	 * Returns a simple notation of the function like "Class.classMethod(:string):void" or "Class.instanceMethod(:string):void".
@@ -1433,10 +1350,16 @@ class MemberFunctionDefinition extends MemberDefinition implements Block {
 			for (var i = 0; i < this._statements.length; ++i)
 				if (! this._statements[i].analyze(context))
 					break;
+
 			if (this._returnType == null) // no return statement in body
 				this._returnType = Type.voidType;
-			if (! this._returnType.equals(Type.voidType) && context.getTopBlock().localVariableStatuses.isReachable())
-				context.errors.push(new CompileError(this._lastTokenOfBody, "missing return statement"));
+
+			if (this.isGenerator()) {
+				// ok
+			} else {
+				if (! this._returnType.equals(Type.voidType) && context.getTopBlock().localVariableStatuses.isReachable())
+					context.errors.push(new CompileError(this._lastTokenOfBody, "missing return statement"));
+			}
 
 			if (this._parent == null && this.getNameToken() != null && this.name() == "constructor") {
 				this._fixupConstructor(context);
@@ -1455,6 +1378,11 @@ class MemberFunctionDefinition extends MemberDefinition implements Block {
 	function _fixupConstructor (context : AnalysisContext) : void {
 		var success = true;
 		var isAlternate = false;
+
+		if ((this._flags & ClassDefinition.IS_GENERATOR) != 0) {
+			context.errors.push(new CompileError(this._token, "constructor must not be a generator"));
+			return;
+		}
 
 		// make implicit calls to default constructor explicit as well as checking the invocation order
 		var stmtIndex = 0;
@@ -1777,254 +1705,6 @@ class TemplateFunctionDefinition extends MemberFunctionDefinition implements Tem
 		// register, and return
 		this._instantiatedDefs.set(typeArgs.concat(new Type[]), instantiated);
 		return instantiated;
-	}
-
-}
-
-class LocalVariable implements Stashable {
-
-	var _name : Token;
-	var _type : Type;
-	var _instantiated : LocalVariable[];
-	var isInstantiated = false;
-
-	function constructor (name : Token, type : Type) {
-		this._name = name;
-		this._type = type;
-		this._instantiated = new LocalVariable[];
-	}
-
-	function serialize () : variant {
-		return [
-			this._name,
-			Serializer.<Type>.serializeNullable(this._type)
-		] : variant[];
-	}
-
-	function getName () : Token {
-		return this._name;
-	}
-
-	function getType () : Type {
-		return this._type;
-	}
-
-	function setType (type : Type) : void {
-		if (this._type != null)
-			throw new Error("type is already set for " + this.toString());
-		// implicit declarations of "int" is not supported
-		if (type.equals(Type.integerType))
-			type = Type.numberType;
-		this._type = type;
-	}
-
-	function setTypeForced (type : Type) : void {
-		this._type = type;
-	}
-
-	function touchVariable (context : AnalysisContext, token : Token, isAssignment : boolean) : boolean {
-		if (isAssignment) {
-			context.getTopBlock().localVariableStatuses.setStatus(this);
-		} else {
-			switch (context.getTopBlock().localVariableStatuses.getStatus(this)) {
-			case LocalVariableStatuses.UNTYPED_RECURSIVE_FUNCTION:
-				context.errors.push(new CompileError(token, "the return type of recursive function needs to be explicitly declared"));
-				return false;
-			case LocalVariableStatuses.ISSET:
-				// ok
-				break;
-			case LocalVariableStatuses.UNSET:
-				context.errors.push(new CompileError(token, "variable is not initialized"));
-				return false;
-			case LocalVariableStatuses.MAYBESET:
-				context.errors.push(new CompileError(token, "variable may not be initialized"));
-				return false;
-			default:
-				throw new Error("logic flaw");
-			}
-		}
-		return true;
-	}
-
-	override function toString () : string {
-		return this._name.getValue() + " : " + this._type.toString();
-	}
-
-	function popInstantiated () : void {
-		this._instantiated.pop();
-	}
-
-	function getInstantiated () : LocalVariable {
-		if (this._instantiated.length == 0) {
-			throw new Error("logic flaw, no instantiation for " + this._name.getValue() + "," + this.isInstantiated as string);
-		}
-		return this._instantiated[this._instantiated.length - 1];
-	}
-
-	function instantiateAndPush (instantiationContext : InstantiationContext) : LocalVariable {
-		var instantiated = this._instantiate(instantiationContext);
-		instantiated.isInstantiated = true;
-		this._instantiated.push(instantiated);
-		return instantiated;
-	}
-
-	function _instantiate (instantiationContext : InstantiationContext) : LocalVariable {
-		var type = this._type != null ? this._type.instantiate(instantiationContext) : null;
-		return new LocalVariable(this._name, type);
-	}
-
-}
-
-class CaughtVariable extends LocalVariable {
-
-	function constructor (name : Token, type : Type) {
-		super(name, type);
-	}
-
-	function clone () : CaughtVariable {
-		return new CaughtVariable(this._name, this._type);
-	}
-
-	override function touchVariable (context : AnalysisContext, token : Token, isAssignment : boolean) : boolean {
-		return true;
-	}
-
-	override function _instantiate (instantiationContext : InstantiationContext) : CaughtVariable {
-		return new CaughtVariable(this._name, this._type.instantiate(instantiationContext));
-	}
-
-	override function instantiateAndPush (instantiationContext : InstantiationContext) : CaughtVariable {
-		return super.instantiateAndPush(instantiationContext) as CaughtVariable;
-	}
-}
-
-class ArgumentDeclaration extends LocalVariable {
-
-	function constructor (name : Token, type : Type) {
-		super(name, type);
-	}
-
-	function clone () : ArgumentDeclaration {
-		return new ArgumentDeclaration(this._name, this._type);
-	}
-
-	override function _instantiate (instantiationContext : InstantiationContext) : ArgumentDeclaration {
-		var type = this._type != null ? this._type.instantiate(instantiationContext) : null;
-		return new ArgumentDeclaration(this._name, type);
-	}
-
-	override function instantiateAndPush (instantiationContext : InstantiationContext) : ArgumentDeclaration {
-		return super.instantiateAndPush(instantiationContext) as ArgumentDeclaration;
-	}
-
-}
-
-class LocalVariableStatuses {
-
-	static const UNTYPED_RECURSIVE_FUNCTION = -1;
-
-	static const UNSET = 0;
-	static const ISSET = 1;
-	static const MAYBESET = 2;
-
-	var _statuses : Map.<number>;
-	var _isReachable : boolean;
-
-	function constructor (funcDef : MemberFunctionDefinition, base : LocalVariableStatuses) {
-		this._statuses = new Map.<number>;
-
-		if (base != null) {
-			// FIXME the analysis of the closures should be delayed to either of: first being used, or return is called, to minimize the appearance of the "not initialized" error
-			for (var k in base._statuses)
-				this._statuses[k] = base._statuses[k] == LocalVariableStatuses.UNSET ? LocalVariableStatuses.MAYBESET : base._statuses[k] as number;
-		}
-		var args = funcDef.getArguments();
-		for (var i = 0; i < args.length; ++i)
-			this._statuses[args[i].getName().getValue()] = LocalVariableStatuses.ISSET;
-		var locals = funcDef.getLocals();
-		for (var i = 0; i < locals.length; ++i)
-			this._statuses[locals[i].getName().getValue()] = LocalVariableStatuses.UNSET;
-
-		this._isReachable = true;
-	}
-
-	function constructor (srcStatus : LocalVariableStatuses) {
-		this._statuses = new Map.<number>;
-		this._copyFrom(srcStatus);
-		this._isReachable = srcStatus._isReachable;
-	}
-
-	function clone () : LocalVariableStatuses {
-		return new LocalVariableStatuses(this);
-	}
-
-	function merge (that : LocalVariableStatuses) : LocalVariableStatuses {
-		if (this._isReachable != that._isReachable) {
-			if (this._isReachable) {
-				return this.clone();
-			} else {
-				return that.clone();
-			}
-		}
-		var ret = this.clone();
-		for (var k in ret._statuses) {
-			if (ret._statuses[k] == LocalVariableStatuses.UNSET && that._statuses[k] == LocalVariableStatuses.UNSET) {
-				// UNSET
-			} else if (ret._statuses[k] == LocalVariableStatuses.ISSET && that._statuses[k] == LocalVariableStatuses.ISSET) {
-				// ISSET
-			} else {
-				// MAYBESET
-				ret._statuses[k] = LocalVariableStatuses.MAYBESET;
-			}
-		}
-		return ret;
-	}
-
-	function mergeFinally (postFinallyStats : LocalVariableStatuses) : LocalVariableStatuses {
-		var ret = this.clone();
-		for (var k in ret._statuses) {
-			switch (postFinallyStats._statuses[k]) {
-			case LocalVariableStatuses.ISSET:
-				ret._statuses[k] = LocalVariableStatuses.ISSET;
-				break;
-			case LocalVariableStatuses.MAYBESET:
-				if (ret._statuses[k] != LocalVariableStatuses.ISSET) {
-					ret._statuses[k] = LocalVariableStatuses.MAYBESET;
-				}
-				break;
-			}
-		}
-		if (! postFinallyStats._isReachable) {
-			ret._isReachable = false;
-		}
-		return ret;
-	}
-
-	function setStatus (local : LocalVariable) : void {
-		var name = local.getName().getValue();
-		if (this._statuses[name] == null)
-			throw new Error("logic flaw, could not find status for local variable: " + name);
-		this._statuses[name] = LocalVariableStatuses.ISSET;
-	}
-
-	function getStatus (local : LocalVariable) : number {
-		var name = local.getName().getValue();
-		if (this._statuses[name] == null)
-			throw new Error("logic flaw, could not find status for local variable: " + name);
-		return this._statuses[name];
-	}
-
-	function isReachable() : boolean {
-		return this._isReachable;
-	}
-
-	function setIsReachable(isReachable : boolean) : void {
-		this._isReachable = isReachable;
-	}
-
-	function _copyFrom (that : LocalVariableStatuses) : void {
-		for (var k in that._statuses)
-			this._statuses[k] = that._statuses[k];
 	}
 
 }

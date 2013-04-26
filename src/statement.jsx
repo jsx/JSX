@@ -20,6 +20,7 @@
  * IN THE SOFTWARE.
  */
 
+import "./analysis.jsx";
 import "./classdef.jsx";
 import "./expression.jsx";
 import "./type.jsx";
@@ -156,7 +157,7 @@ class ConstructorInvocationStatement extends Statement {
 				context.errors.push(new CompileError(this.getToken(), "no function with matching arguments"));
 				return true;
 			}
-			ctorType = new ResolvedFunctionType(this.getConstructingClassDef().getToken(), Type.voidType, new Type[], false); // implicit constructor
+			ctorType = new MemberFunctionType(this.getConstructingClassDef().getToken(), new ObjectType(this.getConstructingClassDef()), Type.voidType, new Type[], false); // implicit constructor
 		} else {
 			// analyze args
 			var argTypes = Util.analyzeArgs(
@@ -338,6 +339,11 @@ class ReturnStatement extends Statement {
 	}
 
 	override function doAnalyze (context : AnalysisContext) : boolean {
+		// handle generator
+		if (context.funcDef.isGenerator()) {
+			context.errors.push(new CompileError(this._token, "return statement in generator is not allowed"));
+			return true;
+		}
 		var returnType = context.funcDef.getReturnType();
 		if (returnType == null) {
 			if (this._expr != null) {
@@ -377,6 +383,76 @@ class ReturnStatement extends Statement {
 			}
 		}
 		context.getTopBlock().localVariableStatuses.setIsReachable(false);
+		return true;
+	}
+
+	override function forEachExpression (cb : function(:Expression,:function(:Expression):void):boolean) : boolean {
+		if (this._expr != null && ! cb(this._expr, function (expr) { this._expr = expr; }))
+			return false;
+		return true;
+	}
+
+}
+
+class YieldStatement extends Statement {
+
+	var _token : Token;
+	var _expr : Expression;
+
+	function constructor (token : Token, expr : Expression) {
+		super();
+		this._token = token;
+		this._expr = expr;
+	}
+
+	override function clone () : Statement {
+		return new YieldStatement(this._token, Cloner.<Expression>.cloneNullable(this._expr));
+	}
+
+	override function getToken () : Token {
+		return this._token;
+	}
+
+	function getExpr () : Expression {
+		return this._expr;
+	}
+
+	function setExpr (expr : Expression) : void {
+		this._expr = expr;
+	}
+
+	override function serialize () : variant {
+		return [
+			"YieldStatement",
+			Serializer.<Expression>.serializeNullable(this._expr)
+		] : variant[];
+	}
+
+	override function doAnalyze (context : AnalysisContext) : boolean {
+		// handle yield of values
+		if (! this._analyzeExpr(context, this._expr))
+			return true;
+		if (this._expr.getType() == null)
+			return true;
+		var returnType = context.funcDef.getReturnType();
+		if (returnType == null) {
+			var yieldType = this._expr.getType();
+			context.funcDef.setReturnType(new ObjectType(Util.instantiateTemplate(context, this._token, "g_Enumerable", [ yieldType ])));
+		} else {
+			if (returnType instanceof ObjectType
+				&& returnType.getClassDef() instanceof InstantiatedClassDefinition
+				&& (returnType.getClassDef() as InstantiatedClassDefinition).getTemplateClassName() == "g_Enumerable") {
+					yieldType = (returnType.getClassDef() as InstantiatedClassDefinition).getTypeArguments()[0];
+			} else {
+				// return type is not an instance of Enumerable. the error will be reported by MemberFuncitonDefinition#analyze.
+				context.errors.push(new CompileError(this._token, "cannot convert 'g_Enumerable.<" + this._expr.getType().toString() + ">' to return type '" + returnType.toString() + "'"));
+				return false;
+			}
+		}
+		if (! this._expr.getType().isConvertibleTo(yieldType)) {
+			context.errors.push(new CompileError(this._token, "cannot convert '" + this._expr.getType().toString() + "' to yield type '" + yieldType.toString() + "'"));
+			return false;
+		}
 		return true;
 	}
 
@@ -1278,6 +1354,10 @@ class TryStatement extends Statement implements Block {
 	}
 
 	override function doAnalyze (context : AnalysisContext) : boolean {
+		if ((context.funcDef.flags() & ClassDefinition.IS_GENERATOR) != 0) {
+			context.errors.push(new CompileError(this._token, "invalid use of try block inside generator"));
+			return false;
+		}
 		// try
 		context.blockStack.push(new BlockContext(context.getTopBlock().localVariableStatuses.clone(), this));
 		var lvStatusesAfterTryCatch = null : LocalVariableStatuses;
@@ -1608,4 +1688,73 @@ class DebuggerStatement extends InformationStatement {
 		return true;
 	}
 
+}
+
+// GotoStatement and LabelStatement are used by code transformer
+
+class GotoStatement extends Statement {
+
+	var label : string;
+
+	function constructor(label : string) {
+		this.label = label;
+	}
+
+	function getLabel () : string {
+		return this.label;
+	}
+
+	override function getToken() : Token {
+		return null;
+	}
+
+	override function clone() : Statement {
+		return new GotoStatement(this.label);
+	}
+
+	override function serialize():variant {
+		return null;
+	}
+
+	override function doAnalyze(context : AnalysisContext) : boolean {
+		return true;
+	}
+
+	override function forEachExpression(cb : (Expression, (Expression) -> void) -> boolean) : boolean {
+		return true;
+	}
+
+}
+
+class LabelStatement extends Statement {
+
+	var _name : string;
+
+	function constructor(name : string) {
+		this._name = name;
+	}
+
+	function getName () : string {
+		return this._name;
+	}
+
+	override function getToken() : Token {
+		return null;
+	}
+
+	override function clone() : Statement {
+		return new LabelStatement(this._name);
+	}
+
+	override function serialize():variant {
+		return null;
+	}
+
+	override function doAnalyze(context : AnalysisContext) : boolean {
+		return true;
+	}
+
+	override function forEachExpression(cb : (Expression, (Expression) -> void) -> boolean) : boolean {
+		return true;
+	}
 }

@@ -37,8 +37,6 @@ abstract class Platform {
 
 	abstract function getFilesInDirectory(path: string) : string[]; // (throws an exception on error)
 
-	abstract function addLauncher(emitter : Emitter, sourceFile : variant, output : string, entryPoint : string, executableFor : string) : string;
-
 	// load a content by name (throws an exception on error)
 	// e.g. node.js reads it from files
 	//      browsers read it from DOM or servers

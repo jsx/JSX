@@ -196,9 +196,6 @@ class BrowserPlatform extends Platform {
 		return xhr.responseText;
 	}
 
-	override function addLauncher(emitter : Emitter, sourceFile : variant, output : string, entryPoint : string, executableFor : string) : string {
-		throw new Error('not supported');
-	}
 	override function makeFileExecutable(file : string, runEnv : string) : void {
 		throw new Error('not supported');
 	}
