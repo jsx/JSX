@@ -127,53 +127,6 @@ class NodePlatform extends Platform {
 		}
 	}
 
-	// called from JavaScriptEmitter
-	override function addLauncher (emitter : Emitter, sourceFile : variant, targetCode : string, entryPoint : string, executableFor : string) : string {
-		if(emitter instanceof JavaScriptEmitter) {
-			targetCode += this.load(this.getRoot() + "/src/js/launcher.js");
-
-			var args;
-			switch (executableFor) {
-				case "node":
-					args = "process.argv.slice(2)";
-					break;
-				case "commonjs":
-					args = "require('system').args.slice(1)";
-					break;
-				default:
-					args = "[]";
-					break;
-			}
-			switch(entryPoint) {
-			case "_Main":
-				var launcher = "runMain";
-				break;
-			case "_Test":
-				launcher = "runTests";
-				break;
-			default:
-				throw new Error("Unknown entry point type: " +
-								entryPoint);
-			}
-			var callEntryPoint = Util.format("JSX.%1(%2, %3)",
-					[launcher, JSON.stringify(sourceFile), args]);
-
-			if (executableFor == "web") {
-				callEntryPoint = this.wrapOnLoad(callEntryPoint);
-			}
-
-			return targetCode + callEntryPoint + "\n";
-		}
-		else {
-			throw new Error("FIXME: unknown emitter");
-		}
-	}
-
-	function wrapOnLoad (code : string) : string {
-		var wrapper = this.load(this.getRoot() + "/src/js/web-launcher.js");
-		return wrapper.replace(/\/\/--CODE--\/\//, code);
-	}
-
 	override function makeFileExecutable(file : string, runEnv : string) : void {
 		if (runEnv == "node") {
 			node.fs.chmodSync(this._absPath(file), "0755");

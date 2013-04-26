@@ -85,7 +85,7 @@ class ScriptLoader {
 			throw new Error("Failed to compile!");
 		}
 
-		var output = emitter.getOutput(sourceFile, null, null);
+		var output = emitter.getOutput();
 
 		if(ScriptLoader.optimizationLevel > 1) {
 			output = platform.applyClosureCompiler(output, "SIMPLE_OPTIMIZATIONS", false);
