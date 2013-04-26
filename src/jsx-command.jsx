@@ -102,7 +102,9 @@ class JSXCommand {
 		var outputFile = null : Nullable.<string>;
 		var inputFilename = null : Nullable.<string>;
 		var executable = null : Nullable.<string>;
-		var setBootstrapMode = function (sourceFile : string) : void {};
+		var setBootstrapMode = function (sourceFile : string) : void {
+			(emitter as JavaScriptEmitter).setBootstrapMode(JavaScriptEmitter.BOOTSTRAP_NONE, sourceFile, null);
+		};
 		var runImmediately = false;
 		var optimizeCommands = new string[];
 		var opt, optarg;

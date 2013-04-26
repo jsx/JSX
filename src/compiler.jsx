@@ -118,6 +118,14 @@ class Compiler {
 		return parser;
 	}
 
+	function getClassDefs() : ClassDefinition[] {
+		var classDefs = new ClassDefinition[];
+		for (var i = 0; i < this._parsers.length; ++i) {
+			classDefs = classDefs.concat(this._parsers[i].getClassDefs());
+		}
+		return classDefs;
+	}
+
 	function findParser (path : string) : Parser {
 		for (var i = 0; i < this._parsers.length; ++i)
 			if (this._parsers[i].getPath() == path)
@@ -159,6 +167,7 @@ class Compiler {
 		this._resolveTypes(errors);
 		if (! this._handleErrors(errors))
 			return false;
+		this._emitter.fixClassDefsBeforeAnalysis(this.getClassDefs());
 		this._analyze(errors);
 		if (! this._handleErrors(errors))
 			return false;
@@ -191,11 +200,7 @@ class Compiler {
 	 * Returns a JSON data structure of parsed class definitions
 	 */
 	function getAST () : variant {
-		var classDefs = new ClassDefinition[];
-		for (var i = 0; i < this._parsers.length; ++i) {
-			classDefs = classDefs.concat(this._parsers[i].getClassDefs());
-		}
-		return ClassDefinition.serialize(classDefs);
+		return ClassDefinition.serialize(this.getClassDefs());
 	}
 
 	function getFileContent (errors : CompileError[], sourceToken : Token, path : string) : Nullable.<string> {

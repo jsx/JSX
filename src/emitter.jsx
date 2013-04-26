@@ -34,6 +34,8 @@ interface Emitter implements Stashable {
 
 	function setEnableRunTimeTypeCheck(flag : boolean) : void;
 
+	function fixClassDefsBeforeAnalysis(classDefs : ClassDefinition[]) : void;
+
 	function emit(classDefs : ClassDefinition[]) : void;
 
 	function getOutput() : string;

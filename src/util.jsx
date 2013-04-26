@@ -489,6 +489,20 @@ class Util {
 		return Util.format("[%1:%2:%3] %4\n%5\n", [filename, lineNumber as string, columnNumber as string, message, sourceLine]);
 	}
 
+	static function isArrayOf(classDef : ClassDefinition, expectedElementType : Type) : boolean {
+		if (! (classDef instanceof InstantiatedClassDefinition)) {
+			return false;
+		}
+		var instantiatedClassDef = classDef as InstantiatedClassDefinition;
+		if (instantiatedClassDef.getTemplateClassName() != "Array") {
+			return false;
+		}
+		if (! instantiatedClassDef.getTypeArguments()[0].equals(expectedElementType)) {
+			return false;
+		}
+		return true;
+	}
+
 }
 
 /*

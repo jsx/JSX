@@ -143,6 +143,17 @@ class _Util {
 		}
 	}
 
+	static function markFunctionsAsExportWithArgTypes(classDefs : ClassDefinition[], checkFunc : function (: MemberFunctionDefinition) : boolean) : void {
+		classDefs.forEach(function (classDef) {
+			classDef.forEachMemberFunction(function (funcDef) {
+				if (checkFunc(funcDef)) {
+					funcDef.setFlags(funcDef.flags() | ClassDefinition.IS_EXPORT_WITH_ARGTYPES);
+				}
+				return true;
+			});
+		});
+	}
+
 	static function encodeObjectLiteralKey(s : string) : string {
 		if (s.length == 0 || s.match(/^[A-Za-z_$][A-Za-z0-9_$]*$/)) {
 			return s;
@@ -2700,13 +2711,12 @@ class _JSEmitterStash extends OptimizerStash {
 abstract class _BootstrapBuilder {
 
 	var _emitter : JavaScriptEmitter;
-	var _entrySourceFile : string;
 	var _executableFor : string;
 
-	function init(emitter : JavaScriptEmitter, entrySourceFile : string, executableFor : string) : void {
+	function init(emitter : JavaScriptEmitter, executableFor : string) : _BootstrapBuilder {
 		this._emitter = emitter;
-		this._entrySourceFile = entrySourceFile;
 		this._executableFor = executableFor;
+		return this;
 	}
 
 	function addBootstrap(code : string) : string {
@@ -2725,7 +2735,7 @@ abstract class _BootstrapBuilder {
 				break;
 		}
 		var callEntryPoint = Util.format("JSX.%1(%2, %3)",
-				[this._getLauncher(), JSON.stringify(this._emitter._platform.encodeFilename(this._entrySourceFile)), args]);
+				[this._getLauncher(), JSON.stringify(this._emitter._platform.encodeFilename(this._emitter._entrySourceFile)), args]);
 
 		if (this._executableFor == "web") {
 			callEntryPoint = this._wrapOnLoad(callEntryPoint);
@@ -2778,6 +2788,8 @@ class JavaScriptEmitter implements Emitter {
 	var _emittingClass : ClassDefinition;
 	var _emittingFunction : MemberFunctionDefinition;
 	var _enableRunTimeTypeCheck : boolean;
+	var _entrySourceFile : string;
+	var _markFunctionAsExportWithArgTypesCallback = null : function (: MemberFunctionDefinition) : boolean;
 	var _bootstrapBuilder : _BootstrapBuilder;
 
 	var _enableSourceMap : boolean;
@@ -2871,6 +2883,11 @@ class JavaScriptEmitter implements Emitter {
 		this._output = header + this._output;
 	}
 
+	override function fixClassDefsBeforeAnalysis(classDefs : ClassDefinition[]) : void {
+		assert this._markFunctionAsExportWithArgTypesCallback != null; // should have been set by a call to #setBootstrapMode
+		_Util.markFunctionsAsExportWithArgTypes(classDefs, this._markFunctionAsExportWithArgTypesCallback);
+	}
+
 	override function emit (classDefs : ClassDefinition[]) : void {
 
 		// current impl. of _Minifier.minifyJavaScript does not support transforming source map
@@ -2930,22 +2947,54 @@ class JavaScriptEmitter implements Emitter {
 			this._emitStaticInitializationCode(classDefs[i]);
 	}
 
-	function setBootstrapMode(mode : number, sourceFile : string, executableFor : string) : void {
+	function setBootstrapMode(mode : number, sourceFile : string, executableFor : Nullable.<string>) : void {
+
+		// set entry file
+		this._entrySourceFile = sourceFile;
+
+		// set marker
+		function createMarkFunctionAsExportWithArgTypesCallback(className : string, checkFunc : function (:MemberFunctionDefinition) : boolean) : function (funcDef : MemberFunctionDefinition) : boolean {
+			return function (funcDef : MemberFunctionDefinition) : boolean {
+				var classDef = funcDef.getClassDef();
+				return classDef.getToken() != null
+					&& classDef.getToken().getFilename() == this._entrySourceFile
+					&& classDef.className() == className
+					&& checkFunc(funcDef);
+			};
+		}
 		switch (mode) {
 		case JavaScriptEmitter.BOOTSTRAP_NONE:
-			this._bootstrapBuilder = null;
-			break;
 		case JavaScriptEmitter.BOOTSTRAP_EXECUTABLE:
-			this._bootstrapBuilder = new _ExecutableBootstrapBuilder;
+			this._markFunctionAsExportWithArgTypesCallback = createMarkFunctionAsExportWithArgTypesCallback(
+				"_Main",
+				function (funcDef) {
+					return (funcDef.flags() & ClassDefinition.IS_STATIC) != 0
+						&& funcDef.name() == "main"
+						&& funcDef.getArguments().length == 1
+						&& Util.isArrayOf(funcDef.getArgumentTypes()[0].getClassDef(), Type.stringType);
+				});
 			break;
 		case JavaScriptEmitter.BOOTSTRAP_TEST:
-			this._bootstrapBuilder = new _TestBootstrapBuilder;
+			this._markFunctionAsExportWithArgTypesCallback = createMarkFunctionAsExportWithArgTypesCallback(
+				"_Test",
+				function (funcDef) {
+					return (funcDef.flags() & ClassDefinition.IS_STATIC) == 0
+						&& funcDef.name().match(/^test/)
+						&& funcDef.getArguments().length == 0;
+				});
 			break;
 		default:
 			throw new Error("unexpected bootstrap mode:" + mode as string);
 		}
-		if (this._bootstrapBuilder != null) {
-			this._bootstrapBuilder.init(this, sourceFile, executableFor);
+
+		// set bootstrap builder
+		switch (mode) {
+		case JavaScriptEmitter.BOOTSTRAP_EXECUTABLE:
+			this._bootstrapBuilder = (new _ExecutableBootstrapBuilder).init(this, executableFor);
+			break;
+		case JavaScriptEmitter.BOOTSTRAP_TEST:
+			this._bootstrapBuilder = (new _TestBootstrapBuilder).init(this, executableFor);
+			break;
 		}
 	}
 
@@ -3249,15 +3298,25 @@ class JavaScriptEmitter implements Emitter {
 			this._reduceIndent();
 			this._emit("};\n\n", null);
 		});
-		if (isStatic
-			&& (! this._enableMinifier || (funcDef.getClassDef().className() == "_Main" && funcDef.name() == "main"))) {
-			this._emitHolderOfStatic(funcDef.getClassDef());
-			this._emit(
-				"." + funcDef.name() + this._mangler.mangleFunctionArguments(funcDef.getArgumentTypes())
-				+ " = "
-				+ this._namer.getNameOfStaticFunction(funcDef.getClassDef(), funcDef.name(), funcDef.getArgumentTypes())
-				+ ";\n",
-				null);
+		if (isStatic) {
+			if (! this._enableMinifier || (funcDef.flags() & ClassDefinition.IS_EXPORT_WITH_ARGTYPES) != 0) {
+				this._emitHolderOfStatic(funcDef.getClassDef());
+				this._emit(
+					"." + funcDef.name() + this._mangler.mangleFunctionArguments(funcDef.getArgumentTypes())
+					+ " = "
+					+ this._namer.getNameOfStaticFunction(funcDef.getClassDef(), funcDef.name(), funcDef.getArgumentTypes())
+					+ ";\n",
+					null);
+			}
+		} else {
+			if ((funcDef.flags() & ClassDefinition.IS_EXPORT_WITH_ARGTYPES) != 0
+				&& (this._enableMinifier || (funcDef.flags() & ClassDefinition.IS_EXPORT) != 0)) {
+				this._emit(
+					this._namer.getNameOfClass(funcDef.getClassDef()) + ".prototype." + funcDef.name() + this._mangler.mangleFunctionArguments(funcDef.getArgumentTypes())
+					+ " = "
+					+ this._namer.getNameOfClass(funcDef.getClassDef()) + ".prototype." + this._namer.getNameOfMethod(funcDef.getClassDef(), funcDef.name(), funcDef.getArgumentTypes()),
+					null);
+			}
 		}
 		if (Util.memberIsExported(funcDef.getClassDef(), funcDef.name(), funcDef.getArgumentTypes(), isStatic)) {
 			if (isStatic) {
