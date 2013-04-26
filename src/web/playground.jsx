@@ -198,7 +198,7 @@ class _Main {
 					return;
 				}
 
-				var out = emitter.getOutput("",null,null).replace(/\t/g, "  ");
+				var out = emitter.getOutput().replace(/\t/g, "  ");
 				out += "JSX.require('"+path+"')._Main.main$AS([]);\n";
 
 				var level = getOptimizationLevel();

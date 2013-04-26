@@ -32,7 +32,7 @@ import "./platform.jsx";
 import "./emitter.jsx";
 import "./jsemitter.jsx";
 import "./optimizer.jsx";
-import "./util.jsx";
+import "./analysis.jsx";
 
 class JSXCommand {
 
@@ -102,7 +102,7 @@ class JSXCommand {
 		var outputFile = null : Nullable.<string>;
 		var inputFilename = null : Nullable.<string>;
 		var executable = null : Nullable.<string>;
-		var run = null : Nullable.<string>;
+		var setBootstrapMode = function (sourceFile : string) : void {};
 		var runImmediately = false;
 		var optimizeCommands = new string[];
 		var opt, optarg;
@@ -251,16 +251,22 @@ class JSXCommand {
 					platform.error("unknown executable type (node|web)");
 					return 1;
 				}
+				setBootstrapMode = function (sourceFile) {
+					(emitter as JavaScriptEmitter).setBootstrapMode(JavaScriptEmitter.BOOTSTRAP_EXECUTABLE, sourceFile, executable);
+				};
 				executable = optarg;
-				run = "_Main";
 				break;
 			case "--run":
-				run = "_Main";
+				setBootstrapMode = function (sourceFile) {
+					(emitter as JavaScriptEmitter).setBootstrapMode(JavaScriptEmitter.BOOTSTRAP_EXECUTABLE, sourceFile, executable);
+				};
 				executable = executable ?: "node";
 				runImmediately = true;
 				break;
 			case "--test":
-				run = "_Test";
+				setBootstrapMode = function (sourceFile) {
+					(emitter as JavaScriptEmitter).setBootstrapMode(JavaScriptEmitter.BOOTSTRAP_TEST, sourceFile, executable);
+				};
 				executable = executable ?: "node";
 				runImmediately = true;
 				tasks.push(function () : void {
@@ -349,6 +355,8 @@ class JSXCommand {
 
 		if (emitter == null)
 			emitter = new JavaScriptEmitter(platform);
+		setBootstrapMode(sourceFile);
+
 		compiler.setEmitter(emitter);
 
 		switch (compiler.getMode()) {
@@ -412,7 +420,7 @@ class JSXCommand {
 		if (! result)
 			return 65; // compile error (EX_DATAERR of FreeBSD sysexits(3))
 
-		var output = emitter.getOutput(sourceFile, run, executable);
+		var output = emitter.getOutput();
 
 		if (emitter instanceof JavaScriptEmitter) {
 			if (! runImmediately) { // compile and save

@@ -22,6 +22,7 @@
 
 import "./expression.jsx";
 import "./statement.jsx";
+import "./analysis.jsx";
 import "./classdef.jsx";
 import "./type.jsx";
 import "./platform.jsx";
@@ -88,6 +89,10 @@ class Util {
 				return arg == null ? "null" : arg;
 			}
 		});
+	}
+
+	static function instantiateTemplate (context : AnalysisContext, token : Token, className : string, typeArguments : Type[]) : ClassDefinition {
+		return context.parser.lookupTemplate(context.errors, new TemplateInstantiationRequest(token, className, typeArguments), context.postInstantiationCallback);
 	}
 
 	static function analyzeArgs (context : AnalysisContext, args : Expression[], parentExpr : Expression, expectedTypes : Type[][]) : Type[] {
@@ -596,153 +601,6 @@ class TypedMap.<K,V> {
 			}
 		}
 		return true;
-	}
-
-}
-
-class TemplateInstantiationRequest {
-
-	var _token : Token;
-	var _className : string;
-	var _typeArgs : Type[];
-
-	function constructor (token : Token, className : string, typeArgs : Type[]) {
-		this._token = token;
-		this._className = className;
-		this._typeArgs = typeArgs;
-	}
-
-	function getToken () : Token {
-		return this._token;
-	}
-
-	function getClassName () : string {
-		return this._className;
-	}
-
-	function getTypeArguments () : Type[] {
-		return this._typeArgs;
-	}
-
-}
-
-abstract class CompileIssue {
-
-	var _filename : Nullable.<string>;
-	var _lineNumber : number;
-	var _columnNumber : number;
-	var _message : string;
-	var _size : number;
-
-	function constructor (token : Token, message : string) {
-		if(token != null) {
-			this._filename = token.getFilename();
-			this._lineNumber = token.getLineNumber();
-			this._columnNumber = token.getColumnNumber();
-			// FIXME: deal with visual width
-			this._size = token.getValue().length;
-			this._message = message;
-		}
-		else {
-			this._filename = null;
-			this._lineNumber = 0;
-			this._columnNumber = -1;
-			this._message = message;
-			this._size = 1;
-		}
-	}
-
-	function constructor (filename : string, lineNumber : number, columnNumber : number, message : string) {
-		this._filename = filename;
-		this._lineNumber = lineNumber;
-		this._columnNumber = columnNumber;
-		this._message = message;
-		this._size = 1;
-	}
-
-	function format (platform : Platform) : string {
-		return Util.makeErrorMessage(platform, this.getPrefix() + this._message, this._filename, this._lineNumber, this._columnNumber, this._size);
-	}
-
-	abstract function getPrefix () : string;
-
-}
-
-class CompileError extends CompileIssue {
-
-	var _notes : CompileNote[];
-
-	function constructor (token : Token, message : string) {
-		super(token, message);
-		this._notes = new CompileNote[];
-	}
-
-	function constructor (filename : string, lineNumber : number, columnNumber : number, message : string) {
-		super(filename, lineNumber, columnNumber, message);
-		this._notes = new CompileNote[];
-	}
-
-	function addCompileNote (note : CompileNote) : CompileError {
-		this._notes.push(note);
-		return this;
-	}
-
-	function addCompileNotes (notes : CompileNote[]) : void {
-		notes.forEach( (note) -> {
-			this.addCompileNote(note);
-		});
-	}
-
-	function getCompileNotes () : CompileNote[] {
-		return this._notes;
-	}
-
-	override function getPrefix () : string {
-		return "";
-	}
-
-}
-
-class CompileWarning extends CompileError {
-
-	function constructor (token : Token, message : string) {
-		super(token, message);
-	}
-
-	function constructor (filename : string, lineNumber : number, columnNumber : number, message : string) {
-		super(filename, lineNumber, columnNumber, message);
-	}
-
-	override function getPrefix () : string {
-		return "Warning: ";
-	}
-
-}
-
-class DeprecatedWarning extends CompileWarning {
-
-	function constructor (token : Token, message : string) {
-		super(token, message);
-	}
-
-	function constructor (filename : string, lineNumber : number, columnNumber : number, message : string) {
-		super(filename, lineNumber, columnNumber, message);
-	}
-
-}
-
-class CompileNote extends CompileIssue {
-
-	function constructor (token : Token, message : string) {
-		super(token, message);
-	}
-
-	function constructor (filename : string, lineNumber : number, columnNumber : number, message : string) {
-		super(filename, lineNumber, columnNumber, message);
-	}
-
-	override function getPrefix () : string {
-		return "Note: ";
 	}
 
 }

@@ -22,6 +22,7 @@
 
 import "js.jsx";
 import "./meta.jsx";
+import "./analysis.jsx";
 import "./classdef.jsx";
 import "./type.jsx";
 import "./expression.jsx";
@@ -2568,7 +2569,7 @@ class _SuperExpressionEmitter extends _OperatorExpressionEmitter {
 	}
 
 	override function _emit () : void {
-		var funcType = this._expr.getFunctionType() as ResolvedFunctionType;
+		var funcType = this._expr.getFunctionType();
 		var classDef = funcType.getObjectType().getClassDef();
 		var methodName = this._expr.getName().getValue();
 		var argTypes = funcType.getArgumentTypes();
@@ -2696,9 +2697,75 @@ class _JSEmitterStash extends OptimizerStash {
 	}
 }
 
+abstract class _BootstrapBuilder {
+
+	var _emitter : JavaScriptEmitter;
+	var _entrySourceFile : string;
+	var _executableFor : string;
+
+	function init(emitter : JavaScriptEmitter, entrySourceFile : string, executableFor : string) : void {
+		this._emitter = emitter;
+		this._entrySourceFile = entrySourceFile;
+		this._executableFor = executableFor;
+	}
+
+	function addBootstrap(code : string) : string {
+		code += this._emitter._platform.load(this._emitter._platform.getRoot() + "/src/js/launcher.js");
+
+		var args;
+		switch (this._executableFor) {
+			case "node":
+				args = "process.argv.slice(2)";
+				break;
+			case "commonjs":
+				args = "require('system').args.slice(1)";
+				break;
+			default:
+				args = "[]";
+				break;
+		}
+		var callEntryPoint = Util.format("JSX.%1(%2, %3)",
+				[this._getLauncher(), JSON.stringify(this._entrySourceFile), args]);
+
+		if (this._executableFor == "web") {
+			callEntryPoint = this._wrapOnLoad(callEntryPoint);
+		}
+
+		return code + callEntryPoint + "\n";
+	}
+
+	abstract function _getLauncher() : string;
+
+	function _wrapOnLoad(code : string) : string {
+		var wrapper = this._emitter._platform.load(this._emitter._platform.getRoot() + "/src/js/web-launcher.js");
+		return wrapper.replace(/\/\/--CODE--\/\//, code);
+	}
+
+}
+
+class _ExecutableBootstrapBuilder extends _BootstrapBuilder {
+
+	override function _getLauncher() : string {
+		return "runMain";
+	}
+
+}
+
+class _TestBootstrapBuilder extends _BootstrapBuilder {
+
+	override function _getLauncher() : string {
+		return "runTests";
+	}
+
+}
+
 // the global emitter
 
 class JavaScriptEmitter implements Emitter {
+
+	static const BOOTSTRAP_NONE = 0;
+	static const BOOTSTRAP_EXECUTABLE = 1;
+	static const BOOTSTRAP_TEST = 2;
 
 	var _fileHeader = "var JSX = {};\n" + "(function (JSX) {\n";
 	var _fileFooter =                     "})(JSX);\n";
@@ -2711,6 +2778,7 @@ class JavaScriptEmitter implements Emitter {
 	var _emittingClass : ClassDefinition;
 	var _emittingFunction : MemberFunctionDefinition;
 	var _enableRunTimeTypeCheck : boolean;
+	var _bootstrapBuilder : _BootstrapBuilder;
 
 	var _enableSourceMap : boolean;
 	var _enableProfiler : boolean;
@@ -2860,6 +2928,25 @@ class JavaScriptEmitter implements Emitter {
 		}
 		for (var i = 0; i < classDefs.length; ++i)
 			this._emitStaticInitializationCode(classDefs[i]);
+	}
+
+	function setBootstrapMode(mode : number, sourceFile : string, executableFor : string) : void {
+		switch (mode) {
+		case JavaScriptEmitter.BOOTSTRAP_NONE:
+			this._bootstrapBuilder = null;
+			break;
+		case JavaScriptEmitter.BOOTSTRAP_EXECUTABLE:
+			this._bootstrapBuilder = new _ExecutableBootstrapBuilder;
+			break;
+		case JavaScriptEmitter.BOOTSTRAP_TEST:
+			this._bootstrapBuilder = new _TestBootstrapBuilder;
+			break;
+		default:
+			throw new Error("unexpected bootstrap mode:" + mode as string);
+		}
+		if (this._bootstrapBuilder != null) {
+			this._bootstrapBuilder.init(this, sourceFile, executableFor);
+		}
 	}
 
 	// reuse of optimizer stash
@@ -3035,14 +3122,14 @@ class JavaScriptEmitter implements Emitter {
 		this._emit("};\n\n", null);
 	}
 
-	override function getOutput (sourceFile : string, entryPoint : Nullable.<string>, executableFor : Nullable.<string>) : string {
+	override function getOutput () : string {
 		// do not add any lines before this._output for source-map
 		var output = this._output + "\n";
 		if (this._enableProfiler) {
 			output += this._platform.load(this._platform.getRoot() + "/src/js/profiler.js");
 		}
-		if (entryPoint != null) {
-			output = this._platform.addLauncher(this, this._platform.encodeFilename(sourceFile), output, entryPoint, executableFor);
+		if (this._bootstrapBuilder != null) {
+			output = this._bootstrapBuilder.addBootstrap(output);
 		}
 		output += this._fileFooter;
 		if (this._sourceMapper) {
