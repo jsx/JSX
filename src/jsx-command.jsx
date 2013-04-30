@@ -419,7 +419,7 @@ class JSXCommand {
 		var output = emitter.getOutput();
 
 		if (emitter instanceof JavaScriptEmitter) {
-			if (! runImmediately) { // compile and save
+			if (! runImmediately || outputFile != null) { // compile and save
 
 				platform.save(outputFile, output);
 				if (outputFile != null) {
