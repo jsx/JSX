@@ -238,11 +238,13 @@ class DocumentGenerator {
 ?<div class="classes">
 
 		parser.getTemplateClassDefs().forEach(function (classDef) {
+			if (! this._isPrivate(classDef)) {
 ?<?= this._buildDocOfClass(parser, classDef) ?>
+			}
 		});
 
 		parser.getClassDefs().forEach(function (classDef) {
-			if (! (classDef instanceof InstantiatedClassDefinition)) {
+			if (! (classDef instanceof InstantiatedClassDefinition) && ! this._isPrivate(classDef)) {
 ?<?= this._buildDocOfClass(parser, classDef) ?>
 			}
 		});
@@ -533,6 +535,10 @@ class DocumentGenerator {
 	function _isConstructor (funcDef : MemberFunctionDefinition) : boolean {
 		return funcDef.name() == "constructor"
 			&& (funcDef.flags() & ClassDefinition.IS_STATIC) == 0;
+	}
+
+	function _isPrivate (classDef : ClassDefinition) : boolean {
+		return classDef.className().charAt(0) == "_";
 	}
 
 	function _isPrivate (memberDef : MemberDefinition) : boolean {
