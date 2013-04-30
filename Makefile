@@ -36,6 +36,8 @@ bootstrap-compiler: compiler
 
 test: all test-debug test-optimized test-minify-self
 
+test-all: test test-optimized-minified
+
 test-debug:
 	$(MAKE) test-core
 	$(MAKE) test-misc-core
