@@ -46,7 +46,7 @@ test-optimized:
 	JSX_OPTS="--optimize release --disable-optimize no-log,no-assert" $(MAKE) test-core
 
 test-optimized-minified:
-	JSX_OPTS="--optimize release --disable-optimize no-log,no-assert --minify" $MAKE test-core
+	JSX_OPTS="--optimize release --disable-optimize no-log,no-assert --minify" $(MAKE) test-core
 
 test-core:
 	$(PROVE) --jobs "$(JOBS)" t/run/*.jsx t/compile_error/*.jsx t/lib/*.jsx t/src/*.jsx t/web/*.jsx t/optimize/*.jsx t/complete/*.jsx
@@ -81,6 +81,9 @@ web.jsx:
 
 show-todo:
 	find t -name '*.todo.*' | grep -v '*~'
+
+publish: test-all
+	npm publish
 
 update-assets: update-bootstrap update-codemirror
 

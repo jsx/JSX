@@ -4,9 +4,10 @@
 
 See 3921ce620c213b9a52c4f355b1557258b6dd4ecb (v0.9.17) for example.
 
-## npm publish
+## make publish
 
-Type `npm publish`, which builds JSX compiler with `--release`, tests it,
+Type `make publish`, which builds JSX compiler, tests it,
 makes a dist, and uploads the dist to npmjs.org.
 
-This command creates a tag and pushes the tag to github.
+This command also creates a tag and pushes the tag to github.
+
