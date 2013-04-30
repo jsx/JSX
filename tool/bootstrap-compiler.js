@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// generatedy by JSX compiler 0.9.25 (2013-04-16 17:55:39 +0900; cba55262f57160e029d3de0fbcb4e2fa0a469787)
+// generatedy by JSX compiler 0.9.26 (2013-04-30 19:40:43 +0900; da0b6a5de6e70a09691c4e187e9ba1a6b2a5fe28)
 var JSX = {};
 (function (JSX) {
 /**
@@ -90,6 +90,23 @@ JSX.resetProfileResults = function () {
 	return $__jsx_profiler.resetResults();
 };
 JSX.DEBUG = true;
+/**
+ * class g_StopIteration extends Error
+ * @constructor
+ */
+function g_StopIteration() {
+}
+
+g_StopIteration.prototype = new Error;
+/**
+ * @constructor
+ */
+function g_StopIteration$() {
+	Error.call(this);
+};
+
+g_StopIteration$.prototype = new g_StopIteration;
+
 /**
  * class CompilationServer extends Object
  * @constructor
@@ -611,7 +628,7 @@ Util.format$SAS = function (fmt, args) {
 	var i;
 	if (! (args != null)) {
 		debugger;
-		throw new Error("[src/util.jsx:80:20] assertion failure\n        assert args != null;\n                    ^^\n");
+		throw new Error("[src/util.jsx:81:20] assertion failure\n        assert args != null;\n                    ^^\n");
 	}
 	i = 0;
 	return fmt.replace(/%(\d+|%)/g, (function (m) {
@@ -627,6 +644,19 @@ Util.format$SAS = function (fmt, args) {
 };
 
 var Util$format$SAS = Util.format$SAS;
+
+/**
+ * @param {AnalysisContext} context
+ * @param {Token} token
+ * @param {!string} className
+ * @param {Array.<undefined|Type>} typeArguments
+ * @return {ClassDefinition}
+ */
+Util.instantiateTemplate$LAnalysisContext$LToken$SALType$ = function (context, token, className, typeArguments) {
+	return context.parser.lookupTemplate$ALCompileError$LTemplateInstantiationRequest$F$LParser$LClassDefinition$LClassDefinition$$(context.errors, new TemplateInstantiationRequest$LToken$SALType$(token, className, typeArguments), context.postInstantiationCallback);
+};
+
+var Util$instantiateTemplate$LAnalysisContext$LToken$SALType$ = Util.instantiateTemplate$LAnalysisContext$LToken$SALType$;
 
 /**
  * @param {AnalysisContext} context
@@ -1109,283 +1139,6 @@ Util.makeErrorMessage$LPlatform$SUSNNN = function (platform, message, filename, 
 };
 
 var Util$makeErrorMessage$LPlatform$SUSNNN = Util.makeErrorMessage$LPlatform$SUSNNN;
-
-/**
- * class TemplateInstantiationRequest extends Object
- * @constructor
- */
-function TemplateInstantiationRequest() {
-}
-
-/**
- * @constructor
- * @param {Token} token
- * @param {!string} className
- * @param {Array.<undefined|Type>} typeArgs
- */
-function TemplateInstantiationRequest$LToken$SALType$(token, className, typeArgs) {
-	this._token = token;
-	this._className = className;
-	this._typeArgs = typeArgs;
-};
-
-TemplateInstantiationRequest$LToken$SALType$.prototype = new TemplateInstantiationRequest;
-
-/**
- * @return {Token}
- */
-TemplateInstantiationRequest.prototype.getToken$ = function () {
-	return this._token;
-};
-
-/**
- * @return {!string}
- */
-TemplateInstantiationRequest.prototype.getClassName$ = function () {
-	return this._className;
-};
-
-/**
- * @return {Array.<undefined|Type>}
- */
-TemplateInstantiationRequest.prototype.getTypeArguments$ = function () {
-	return this._typeArgs;
-};
-
-/**
- * class CompileIssue extends Object
- * @constructor
- */
-function CompileIssue() {
-}
-
-/**
- * @constructor
- * @param {Token} token
- * @param {!string} message
- */
-function CompileIssue$LToken$S(token, message) {
-	this._filename = null;
-	this._lineNumber = 0;
-	this._columnNumber = 0;
-	this._message = "";
-	this._size = 0;
-	if (token != null) {
-		this._filename = token.getFilename$();
-		this._lineNumber = token.getLineNumber$();
-		this._columnNumber = token.getColumnNumber$();
-		this._size = token.getValue$().length;
-		this._message = message;
-	} else {
-		this._filename = null;
-		this._lineNumber = 0;
-		this._columnNumber = - 1;
-		this._message = message;
-		this._size = 1;
-	}
-};
-
-CompileIssue$LToken$S.prototype = new CompileIssue;
-
-/**
- * @constructor
- * @param {!string} filename
- * @param {!number} lineNumber
- * @param {!number} columnNumber
- * @param {!string} message
- */
-function CompileIssue$SNNS(filename, lineNumber, columnNumber, message) {
-	this._filename = filename;
-	this._lineNumber = lineNumber;
-	this._columnNumber = columnNumber;
-	this._message = message;
-	this._size = 1;
-};
-
-CompileIssue$SNNS.prototype = new CompileIssue;
-
-/**
- * @param {Platform} platform
- * @return {!string}
- */
-CompileIssue.prototype.format$LPlatform$ = function (platform) {
-	return Util$makeErrorMessage$LPlatform$SUSNNN(platform, this.getPrefix$() + this._message, this._filename, this._lineNumber, this._columnNumber, this._size);
-};
-
-/**
- * class CompileError extends CompileIssue
- * @constructor
- */
-function CompileError() {
-}
-
-CompileError.prototype = new CompileIssue;
-/**
- * @constructor
- * @param {Token} token
- * @param {!string} message
- */
-function CompileError$LToken$S(token, message) {
-	CompileIssue$LToken$S.call(this, token, message);
-	this._notes = [];
-};
-
-CompileError$LToken$S.prototype = new CompileError;
-
-/**
- * @constructor
- * @param {!string} filename
- * @param {!number} lineNumber
- * @param {!number} columnNumber
- * @param {!string} message
- */
-function CompileError$SNNS(filename, lineNumber, columnNumber, message) {
-	CompileIssue$SNNS.call(this, filename, lineNumber, columnNumber, message);
-	this._notes = [];
-};
-
-CompileError$SNNS.prototype = new CompileError;
-
-/**
- * @param {CompileNote} note
- */
-CompileError.prototype.addCompileNote$LCompileNote$ = function (note) {
-	this._notes.push(note);
-};
-
-/**
- * @param {Array.<undefined|CompileNote>} notes
- */
-CompileError.prototype.addCompileNotes$ALCompileNote$ = function (notes) {
-	var $this = this;
-	notes.forEach((function (note) {
-		$this.addCompileNote$LCompileNote$(note);
-	}));
-};
-
-/**
- * @return {Array.<undefined|CompileNote>}
- */
-CompileError.prototype.getCompileNotes$ = function () {
-	return this._notes;
-};
-
-/**
- * @return {!string}
- */
-CompileError.prototype.getPrefix$ = function () {
-	return "";
-};
-
-/**
- * class CompileWarning extends CompileError
- * @constructor
- */
-function CompileWarning() {
-}
-
-CompileWarning.prototype = new CompileError;
-/**
- * @constructor
- * @param {Token} token
- * @param {!string} message
- */
-function CompileWarning$LToken$S(token, message) {
-	CompileError$LToken$S.call(this, token, message);
-};
-
-CompileWarning$LToken$S.prototype = new CompileWarning;
-
-/**
- * @constructor
- * @param {!string} filename
- * @param {!number} lineNumber
- * @param {!number} columnNumber
- * @param {!string} message
- */
-function CompileWarning$SNNS(filename, lineNumber, columnNumber, message) {
-	CompileError$SNNS.call(this, filename, lineNumber, columnNumber, message);
-};
-
-CompileWarning$SNNS.prototype = new CompileWarning;
-
-/**
- * @return {!string}
- */
-CompileWarning.prototype.getPrefix$ = function () {
-	return "Warning: ";
-};
-
-/**
- * class DeprecatedWarning extends CompileWarning
- * @constructor
- */
-function DeprecatedWarning() {
-}
-
-DeprecatedWarning.prototype = new CompileWarning;
-/**
- * @constructor
- * @param {Token} token
- * @param {!string} message
- */
-function DeprecatedWarning$LToken$S(token, message) {
-	CompileWarning$LToken$S.call(this, token, message);
-};
-
-DeprecatedWarning$LToken$S.prototype = new DeprecatedWarning;
-
-/**
- * @constructor
- * @param {!string} filename
- * @param {!number} lineNumber
- * @param {!number} columnNumber
- * @param {!string} message
- */
-function DeprecatedWarning$SNNS(filename, lineNumber, columnNumber, message) {
-	CompileWarning$SNNS.call(this, filename, lineNumber, columnNumber, message);
-};
-
-DeprecatedWarning$SNNS.prototype = new DeprecatedWarning;
-
-/**
- * class CompileNote extends CompileIssue
- * @constructor
- */
-function CompileNote() {
-}
-
-CompileNote.prototype = new CompileIssue;
-/**
- * @constructor
- * @param {Token} token
- * @param {!string} message
- */
-function CompileNote$LToken$S(token, message) {
-	CompileIssue$LToken$S.call(this, token, message);
-};
-
-CompileNote$LToken$S.prototype = new CompileNote;
-
-/**
- * @constructor
- * @param {!string} filename
- * @param {!number} lineNumber
- * @param {!number} columnNumber
- * @param {!string} message
- */
-function CompileNote$SNNS(filename, lineNumber, columnNumber, message) {
-	CompileIssue$SNNS.call(this, filename, lineNumber, columnNumber, message);
-};
-
-CompileNote$SNNS.prototype = new CompileNote;
-
-/**
- * @return {!string}
- */
-CompileNote.prototype.getPrefix$ = function () {
-	return "Note: ";
-};
 
 /**
  * class Cloner$Expression$E extends Object
@@ -4589,7 +4342,7 @@ _InstanceofExpressionEmitter.prototype.emit$N = function (outerOpPrecedence) {
 	expectedType = this._expr.getExpectedType$();
 	if (! (expectedType.getClassDef$() != null)) {
 		debugger;
-		throw new Error("[src/jsemitter.jsx:1167:42] assertion failure\n        assert expectedType.getClassDef() != null;\n                                          ^^\n");
+		throw new Error("[src/jsemitter.jsx:1168:42] assertion failure\n        assert expectedType.getClassDef() != null;\n                                          ^^\n");
 	}
 	if (expectedType.getClassDef$() instanceof InstantiatedClassDefinition && expectedType.getClassDef$().getTemplateClassName$() === "Array") {
 		this.emitWithPrecedence$NNF$V$(outerOpPrecedence, _InstanceofExpressionEmitter._operatorPrecedence, (function () {
@@ -5610,7 +5363,7 @@ _SuperExpressionEmitter$LJavaScriptEmitter$LSuperExpression$.prototype = new _Su
 /**
  */
 _SuperExpressionEmitter.prototype._emit$ = function () {
-	/** @type {ResolvedFunctionType} */
+	/** @type {MemberFunctionType} */
 	var funcType;
 	/** @type {!string} */
 	var className;
@@ -6632,7 +6385,7 @@ JSXCommand.main$LPlatform$AS = function (platform, args) {
 		return 0;
 	}
 	if (! result) {
-		return 1;
+		return 65;
 	}
 	output = emitter.getOutput$SUSUS(sourceFile, run, executable);
 	if (emitter instanceof JavaScriptEmitter) {
@@ -6741,43 +6494,45 @@ function InstantiationContext$ALCompileError$HLType$(errors, typemap) {
 InstantiationContext$ALCompileError$HLType$.prototype = new InstantiationContext;
 
 /**
- * class TemplateDefinition
+ * class TemplateInstantiationRequest extends Object
  * @constructor
  */
-function TemplateDefinition() {
+function TemplateInstantiationRequest() {
 }
 
-TemplateDefinition.prototype.$__jsx_implements_TemplateDefinition = true;
-
 /**
  * @constructor
+ * @param {Token} token
+ * @param {!string} className
+ * @param {Array.<undefined|Type>} typeArgs
  */
-function TemplateDefinition$() {
+function TemplateInstantiationRequest$LToken$SALType$(token, className, typeArgs) {
+	this._token = token;
+	this._className = className;
+	this._typeArgs = typeArgs;
 };
 
-TemplateDefinition$.prototype = new TemplateDefinition;
+TemplateInstantiationRequest$LToken$SALType$.prototype = new TemplateInstantiationRequest;
 
 /**
- * @param {Array.<undefined|CompileError>} errors
- * @param {Token} token
- * @param {Array.<undefined|Token>} formalTypeArgs
- * @param {Array.<undefined|Type>} actualTypeArgs
- * @return {InstantiationContext}
+ * @return {Token}
  */
-TemplateDefinition.prototype.buildInstantiationContext$ALCompileError$LToken$ALToken$ALType$ = function (errors, token, formalTypeArgs, actualTypeArgs) {
-	/** @type {Object.<string, undefined|Type>} */
-	var typemap;
-	/** @type {!number} */
-	var i;
-	if (formalTypeArgs.length !== actualTypeArgs.length) {
-		errors.push(new CompileError$LToken$S(token, "wrong number of template arguments (expected " + (formalTypeArgs.length + "") + ", got " + (actualTypeArgs.length + "")));
-		return null;
-	}
-	typemap = {};
-	for (i = 0; i < formalTypeArgs.length; ++ i) {
-		typemap[formalTypeArgs[i].getValue$()] = actualTypeArgs[i];
-	}
-	return new InstantiationContext$ALCompileError$HLType$(errors, typemap);
+TemplateInstantiationRequest.prototype.getToken$ = function () {
+	return this._token;
+};
+
+/**
+ * @return {!string}
+ */
+TemplateInstantiationRequest.prototype.getClassName$ = function () {
+	return this._className;
+};
+
+/**
+ * @return {Array.<undefined|Type>}
+ */
+TemplateInstantiationRequest.prototype.getTypeArguments$ = function () {
+	return this._typeArgs;
 };
 
 /**
@@ -7275,6 +7030,281 @@ LocalVariableStatuses.prototype._copyFrom$LLocalVariableStatuses$ = function (th
 	for (k in that._statuses) {
 		this._statuses[k] = that._statuses[k];
 	}
+};
+
+/**
+ * class CompileIssue extends Object
+ * @constructor
+ */
+function CompileIssue() {
+}
+
+/**
+ * @constructor
+ * @param {Token} token
+ * @param {!string} message
+ */
+function CompileIssue$LToken$S(token, message) {
+	this._filename = null;
+	this._lineNumber = 0;
+	this._columnNumber = 0;
+	this._message = "";
+	this._size = 0;
+	if (token != null) {
+		this._filename = token.getFilename$();
+		this._lineNumber = token.getLineNumber$();
+		this._columnNumber = token.getColumnNumber$();
+		this._size = token.getValue$().length;
+		this._message = message;
+	} else {
+		this._filename = null;
+		this._lineNumber = 0;
+		this._columnNumber = - 1;
+		this._message = message;
+		this._size = 1;
+	}
+};
+
+CompileIssue$LToken$S.prototype = new CompileIssue;
+
+/**
+ * @constructor
+ * @param {!string} filename
+ * @param {!number} lineNumber
+ * @param {!number} columnNumber
+ * @param {!string} message
+ */
+function CompileIssue$SNNS(filename, lineNumber, columnNumber, message) {
+	this._filename = filename;
+	this._lineNumber = lineNumber;
+	this._columnNumber = columnNumber;
+	this._message = message;
+	this._size = 1;
+};
+
+CompileIssue$SNNS.prototype = new CompileIssue;
+
+/**
+ * @param {Platform} platform
+ * @return {!string}
+ */
+CompileIssue.prototype.format$LPlatform$ = function (platform) {
+	return Util$makeErrorMessage$LPlatform$SUSNNN(platform, this.getPrefix$() + this._message, this._filename, this._lineNumber, this._columnNumber, this._size);
+};
+
+/**
+ * class CompileError extends CompileIssue
+ * @constructor
+ */
+function CompileError() {
+}
+
+CompileError.prototype = new CompileIssue;
+/**
+ * @constructor
+ * @param {Token} token
+ * @param {!string} message
+ */
+function CompileError$LToken$S(token, message) {
+	CompileIssue$LToken$S.call(this, token, message);
+	this._notes = [];
+};
+
+CompileError$LToken$S.prototype = new CompileError;
+
+/**
+ * @constructor
+ * @param {!string} filename
+ * @param {!number} lineNumber
+ * @param {!number} columnNumber
+ * @param {!string} message
+ */
+function CompileError$SNNS(filename, lineNumber, columnNumber, message) {
+	CompileIssue$SNNS.call(this, filename, lineNumber, columnNumber, message);
+	this._notes = [];
+};
+
+CompileError$SNNS.prototype = new CompileError;
+
+/**
+ * @param {CompileNote} note
+ */
+CompileError.prototype.addCompileNote$LCompileNote$ = function (note) {
+	this._notes.push(note);
+};
+
+/**
+ * @param {Array.<undefined|CompileNote>} notes
+ */
+CompileError.prototype.addCompileNotes$ALCompileNote$ = function (notes) {
+	var $this = this;
+	notes.forEach((function (note) {
+		$this.addCompileNote$LCompileNote$(note);
+	}));
+};
+
+/**
+ * @return {Array.<undefined|CompileNote>}
+ */
+CompileError.prototype.getCompileNotes$ = function () {
+	return this._notes;
+};
+
+/**
+ * @return {!string}
+ */
+CompileError.prototype.getPrefix$ = function () {
+	return "";
+};
+
+/**
+ * class CompileWarning extends CompileError
+ * @constructor
+ */
+function CompileWarning() {
+}
+
+CompileWarning.prototype = new CompileError;
+/**
+ * @constructor
+ * @param {Token} token
+ * @param {!string} message
+ */
+function CompileWarning$LToken$S(token, message) {
+	CompileError$LToken$S.call(this, token, message);
+};
+
+CompileWarning$LToken$S.prototype = new CompileWarning;
+
+/**
+ * @constructor
+ * @param {!string} filename
+ * @param {!number} lineNumber
+ * @param {!number} columnNumber
+ * @param {!string} message
+ */
+function CompileWarning$SNNS(filename, lineNumber, columnNumber, message) {
+	CompileError$SNNS.call(this, filename, lineNumber, columnNumber, message);
+};
+
+CompileWarning$SNNS.prototype = new CompileWarning;
+
+/**
+ * @return {!string}
+ */
+CompileWarning.prototype.getPrefix$ = function () {
+	return "Warning: ";
+};
+
+/**
+ * class DeprecatedWarning extends CompileWarning
+ * @constructor
+ */
+function DeprecatedWarning() {
+}
+
+DeprecatedWarning.prototype = new CompileWarning;
+/**
+ * @constructor
+ * @param {Token} token
+ * @param {!string} message
+ */
+function DeprecatedWarning$LToken$S(token, message) {
+	CompileWarning$LToken$S.call(this, token, message);
+};
+
+DeprecatedWarning$LToken$S.prototype = new DeprecatedWarning;
+
+/**
+ * @constructor
+ * @param {!string} filename
+ * @param {!number} lineNumber
+ * @param {!number} columnNumber
+ * @param {!string} message
+ */
+function DeprecatedWarning$SNNS(filename, lineNumber, columnNumber, message) {
+	CompileWarning$SNNS.call(this, filename, lineNumber, columnNumber, message);
+};
+
+DeprecatedWarning$SNNS.prototype = new DeprecatedWarning;
+
+/**
+ * class CompileNote extends CompileIssue
+ * @constructor
+ */
+function CompileNote() {
+}
+
+CompileNote.prototype = new CompileIssue;
+/**
+ * @constructor
+ * @param {Token} token
+ * @param {!string} message
+ */
+function CompileNote$LToken$S(token, message) {
+	CompileIssue$LToken$S.call(this, token, message);
+};
+
+CompileNote$LToken$S.prototype = new CompileNote;
+
+/**
+ * @constructor
+ * @param {!string} filename
+ * @param {!number} lineNumber
+ * @param {!number} columnNumber
+ * @param {!string} message
+ */
+function CompileNote$SNNS(filename, lineNumber, columnNumber, message) {
+	CompileIssue$SNNS.call(this, filename, lineNumber, columnNumber, message);
+};
+
+CompileNote$SNNS.prototype = new CompileNote;
+
+/**
+ * @return {!string}
+ */
+CompileNote.prototype.getPrefix$ = function () {
+	return "Note: ";
+};
+
+/**
+ * class TemplateDefinition
+ * @constructor
+ */
+function TemplateDefinition() {
+}
+
+TemplateDefinition.prototype.$__jsx_implements_TemplateDefinition = true;
+
+/**
+ * @constructor
+ */
+function TemplateDefinition$() {
+};
+
+TemplateDefinition$.prototype = new TemplateDefinition;
+
+/**
+ * @param {Array.<undefined|CompileError>} errors
+ * @param {Token} token
+ * @param {Array.<undefined|Token>} formalTypeArgs
+ * @param {Array.<undefined|Type>} actualTypeArgs
+ * @return {InstantiationContext}
+ */
+TemplateDefinition.prototype.buildInstantiationContext$ALCompileError$LToken$ALToken$ALType$ = function (errors, token, formalTypeArgs, actualTypeArgs) {
+	/** @type {Object.<string, undefined|Type>} */
+	var typemap;
+	/** @type {!number} */
+	var i;
+	if (formalTypeArgs.length !== actualTypeArgs.length) {
+		errors.push(new CompileError$LToken$S(token, "wrong number of template arguments (expected " + (formalTypeArgs.length + "") + ", got " + (actualTypeArgs.length + "") + ")"));
+		return null;
+	}
+	typemap = {};
+	for (i = 0; i < formalTypeArgs.length; ++ i) {
+		typemap[formalTypeArgs[i].getValue$()] = actualTypeArgs[i];
+	}
+	return new InstantiationContext$ALCompileError$HLType$(errors, typemap);
 };
 
 /**
@@ -8329,7 +8359,6 @@ FunctionChoiceType.prototype.asAssignableType$ = function () {
  * @return {ResolvedFunctionType}
  */
 FunctionChoiceType.prototype.deduceByArgumentTypes$LAnalysisContext$LToken$ALType$B = function (context, operatorToken, argTypes, isStatic) {
-	var $this = this;
 	/** @type {Array.<undefined|ResolvedFunctionType>} */
 	var types;
 	/** @type {!number} */
@@ -8340,17 +8369,14 @@ FunctionChoiceType.prototype.deduceByArgumentTypes$LAnalysisContext$LToken$ALTyp
 	var notes;
 	types = this._types;
 	for (i = 0; i < types.length; ++ i) {
-		if (types[i]._deduceByArgumentTypes$ALType$BBF$SV$(argTypes, isStatic, true, (function (msg) {
-		}))) {
+		if (types[i]._deduceByArgumentTypes$LToken$ALType$BBALCompileNote$(types[i].getToken$(), argTypes, isStatic, true, [  ])) {
 			return types[i];
 		}
 	}
 	matched = [];
 	notes = [];
 	for (i = 0; i < types.length; ++ i) {
-		if (types[i]._deduceByArgumentTypes$ALType$BBF$SV$(argTypes, isStatic, false, (function (msg) {
-			notes.push(new CompileNote$LToken$S(types[i].getToken$(), 'candidate function not viable: ' + msg));
-		}))) {
+		if (types[i]._deduceByArgumentTypes$LToken$ALType$BBALCompileNote$(types[i].getToken$(), argTypes, isStatic, false, notes)) {
 			matched.push(types[i]);
 		}
 	}
@@ -8425,20 +8451,6 @@ function ResolvedFunctionType$LToken$LType$ALType$B(token, returnType, argTypes,
 ResolvedFunctionType$LToken$LType$ALType$B.prototype = new ResolvedFunctionType;
 
 /**
- * @return {ResolvedFunctionType}
- */
-ResolvedFunctionType.prototype._clone$ = function () {
-	throw new Error("logic flaw");
-};
-
-/**
- * @return {!string}
- */
-ResolvedFunctionType.prototype._toStringPrefix$ = function () {
-	throw new Error("logic flaw");
-};
-
-/**
  * @param {!boolean} isAssignable
  * @return {ResolvedFunctionType}
  */
@@ -8490,17 +8502,14 @@ ResolvedFunctionType.prototype.getArgumentTypes$ = function () {
  * @return {ResolvedFunctionType}
  */
 ResolvedFunctionType.prototype.deduceByArgumentTypes$LAnalysisContext$LToken$ALType$B = function (context, operatorToken, argTypes, isStatic) {
-	var $this = this;
-	/** @type {!string} */
-	var note;
+	/** @type {Array.<undefined|CompileNote>} */
+	var notes;
 	/** @type {CompileError} */
 	var error;
-	note = '';
-	if (! this._deduceByArgumentTypes$ALType$BBF$SV$(argTypes, isStatic, false, (function (msg) {
-		note = msg;
-	}))) {
-		error = new CompileError$LToken$S(operatorToken, operatorToken.getValue$() === "[" ? "operator [] of type " + argTypes[0].toString() + " is not applicable to " + this.getObjectType$.toString() : "no function with matching arguments");
-		error.addCompileNote$LCompileNote$(new CompileNote$LToken$S(this._token != null ? this._token : operatorToken, 'candidate function not viable: ' + note));
+	notes = [];
+	if (! this._deduceByArgumentTypes$LToken$ALType$BBALCompileNote$(this._token != null ? this._token : operatorToken, argTypes, isStatic, false, notes)) {
+		error = new CompileError$LToken$S(operatorToken, operatorToken.getValue$() === "[" ? "operator [] of type " + argTypes[0].toString() + " is not applicable to " + this.getObjectType$().toString() : "no function with matching arguments");
+		error.addCompileNotes$ALCompileNote$(notes);
 		context.errors.push(error);
 		return null;
 	}
@@ -8508,13 +8517,14 @@ ResolvedFunctionType.prototype.deduceByArgumentTypes$LAnalysisContext$LToken$ALT
 };
 
 /**
+ * @param {Token} token
  * @param {Array.<undefined|Type>} argTypes
  * @param {!boolean} isStatic
  * @param {!boolean} exact
- * @param {*} cb
+ * @param {Array.<undefined|CompileNote>} notes
  * @return {!boolean}
  */
-ResolvedFunctionType.prototype._deduceByArgumentTypes$ALType$BBF$SV$ = function (argTypes, isStatic, exact, cb) {
+ResolvedFunctionType.prototype._deduceByArgumentTypes$LToken$ALType$BBALCompileNote$ = function (token, argTypes, isStatic, exact, notes) {
 	var $this = this;
 	/** @type {*} */
 	var compareArg;
@@ -8533,42 +8543,46 @@ ResolvedFunctionType.prototype._deduceByArgumentTypes$ALType$BBF$SV$ = function 
 		return false;
 	});
 	if (this instanceof StaticFunctionType !== isStatic) {
-		cb('unmatched static flags');
+		if (isStatic) {
+			notes.push(new CompileNote$LToken$S(token, 'candidate function not viable: expected a static function, but got a member function'));
+		} else {
+			notes.push(new CompileNote$LToken$S(token, 'candidate function not viable: expected a member function, but got a static function'));
+		}
 		return false;
 	}
 	if (this._argTypes.length !== 0 && this._argTypes[this._argTypes.length - 1] instanceof VariableLengthArgumentType) {
 		vargType = this._argTypes[this._argTypes.length - 1];
 		if (argTypes.length < this._argTypes.length - 1) {
-			cb('wrong number of arguments');
+			notes.push(new CompileNote$LToken$S(token, 'candidate function not viable: wrong number of arguments'));
 			return false;
 		}
 		for (i = 0; i < this._argTypes.length - 1; ++ i) {
 			if (! compareArg(this._argTypes[i], argTypes[i])) {
-				cb(Util$format$SAS('no known conversion from %1 to %2 for %3 argument.', [ argTypes[i].toString(), this._argTypes[i].toString(), Util$toOrdinal$N(i + 1) ]));
+				notes.push(new CompileNote$LToken$S(token, Util$format$SAS('candidate function not viable: no known conversion from %1 to %2 for %3 argument.', [ argTypes[i].toString(), this._argTypes[i].toString(), Util$toOrdinal$N(i + 1) ])));
 				return false;
 			}
 		}
 		if (argTypes[i] instanceof VariableLengthArgumentType && argTypes.length === this._argTypes.length) {
 			if (! compareArg(this._argTypes[i].getBaseType$(), argTypes[i].getBaseType$())) {
-				cb(Util$format$SAS('no known conversion from %1 to %2 for %3 argument.', [ argTypes[i].getBaseType$().toString(), this._argTypes[i].getBaseType$().toString(), Util$toOrdinal$N(i + 1) ]));
+				notes.push(new CompileNote$LToken$S(token, Util$format$SAS('candidate function not viable: no known conversion from %1 to %2 for %3 argument.', [ argTypes[i].getBaseType$().toString(), this._argTypes[i].getBaseType$().toString(), Util$toOrdinal$N(i + 1) ])));
 				return false;
 			}
 		} else {
 			for (; i < argTypes.length; ++ i) {
 				if (! compareArg(vargType.getBaseType$(), argTypes[i])) {
-					cb(Util$format$SAS('no known conversion from %1 to %2 for %3 argument.', [ argTypes[i].toString(), vargType.getBaseType$().toString(), Util$toOrdinal$N(i + 1) ]));
+					notes.push(new CompileNote$LToken$S(token, Util$format$SAS('candidate function not viable: no known conversion from %1 to %2 for %3 argument.', [ argTypes[i].toString(), vargType.getBaseType$().toString(), Util$toOrdinal$N(i + 1) ])));
 					return false;
 				}
 			}
 		}
 	} else {
 		if (argTypes.length !== this._argTypes.length) {
-			cb(Util$format$SAS('wrong number of arguments (%1 for %2)', [ argTypes.length + "", this._argTypes.length + "" ]));
+			notes.push(new CompileNote$LToken$S(token, Util$format$SAS('candidate function not viable: wrong number of arguments (%1 for %2)', [ argTypes.length + "", this._argTypes.length + "" ])));
 			return false;
 		}
 		for (i = 0; i < argTypes.length; ++ i) {
 			if (! compareArg(this._argTypes[i], argTypes[i])) {
-				cb(Util$format$SAS('no known conversion from %1 to %2 for %3 argument.', [ argTypes[i].toString(), this._argTypes[i].toString(), Util$toOrdinal$N(i + 1) ]));
+				notes.push(new CompileNote$LToken$S(token, Util$format$SAS('candidate function not viable: no known conversion from %1 to %2 for %3 argument.', [ argTypes[i].toString(), this._argTypes[i].toString(), Util$toOrdinal$N(i + 1) ])));
 				return false;
 			}
 		}
@@ -8731,7 +8745,6 @@ StaticFunctionType.prototype._clone$ = function () {
  * @return {!boolean}
  */
 StaticFunctionType.prototype.isConvertibleTo$LType$ = function (type) {
-	var $this = this;
 	type = type.resolveIfNullable$();
 	if (type instanceof VariantType) {
 		return true;
@@ -8742,8 +8755,7 @@ StaticFunctionType.prototype.isConvertibleTo$LType$ = function (type) {
 	if (! this._returnType.equals$LType$(type.getReturnType$())) {
 		return false;
 	}
-	return this._deduceByArgumentTypes$ALType$BBF$SV$(type.getArgumentTypes$(), true, true, (function (msg) {
-	}));
+	return this._deduceByArgumentTypes$LToken$ALType$BBALCompileNote$(type.getToken$(), type.getArgumentTypes$(), true, true, [  ]);
 };
 
 /**
@@ -9502,23 +9514,25 @@ function ParserState() {
  * @param {!number} columnNumber
  * @param {DocComment} docComment
  * @param {!number} tokenLength
+ * @param {!boolean} isGenerator
  * @param {!number} numErrors
  * @param {!number} numClosures
  * @param {!number} numObjectTypesUsed
  * @param {!number} numTemplateInstantiationRequests
  */
-function ParserState$NNLDocComment$NNNNN(lineNumber, columnNumber, docComment, tokenLength, numErrors, numClosures, numObjectTypesUsed, numTemplateInstantiationRequests) {
+function ParserState$NNLDocComment$NBNNNN(lineNumber, columnNumber, docComment, tokenLength, isGenerator, numErrors, numClosures, numObjectTypesUsed, numTemplateInstantiationRequests) {
 	this.lineNumber = lineNumber;
 	this.columnOffset = columnNumber;
 	this.docComment = docComment;
 	this.tokenLength = tokenLength;
+	this.isGenerator = isGenerator;
 	this.numErrors = numErrors;
 	this.numClosures = numClosures;
 	this.numObjectTypesUsed = numObjectTypesUsed;
 	this.numTemplateInstantiationRequests = numTemplateInstantiationRequests;
 };
 
-ParserState$NNLDocComment$NNNNN.prototype = new ParserState;
+ParserState$NNLDocComment$NBNNNN.prototype = new ParserState;
 
 /**
  * class ClassState extends Object
@@ -9568,17 +9582,19 @@ function Scope() {
  * @param {Array.<undefined|ArgumentDeclaration>} args
  * @param {Array.<undefined|Statement>} statements
  * @param {Array.<undefined|MemberFunctionDefinition>} closures
+ * @param {!boolean} isGenerator
  */
-function Scope$LScope$ALLocalVariable$LLocalVariable$ALArgumentDeclaration$ALStatement$ALMemberFunctionDefinition$(prev, locals, funcLocal, args, statements, closures) {
+function Scope$LScope$ALLocalVariable$LLocalVariable$ALArgumentDeclaration$ALStatement$ALMemberFunctionDefinition$B(prev, locals, funcLocal, args, statements, closures, isGenerator) {
 	this.prev = prev;
 	this.locals = locals;
 	this.funcLocal = funcLocal;
 	this.arguments = args;
 	this.statements = statements;
 	this.closures = closures;
+	this.isGenerator = isGenerator;
 };
 
-Scope$LScope$ALLocalVariable$LLocalVariable$ALArgumentDeclaration$ALStatement$ALMemberFunctionDefinition$.prototype = new Scope;
+Scope$LScope$ALLocalVariable$LLocalVariable$ALArgumentDeclaration$ALStatement$ALMemberFunctionDefinition$B.prototype = new Scope;
 
 /**
  * class Parser extends Object
@@ -9605,6 +9621,7 @@ function Parser$LToken$SLCompletionRequest$(sourceToken, filename, completionReq
 	this._templateClassDefs = null;
 	this._classDefs = null;
 	this._imports = null;
+	this._isGenerator = false;
 	this._locals = null;
 	this._statements = null;
 	this._closures = null;
@@ -9656,6 +9673,7 @@ Parser.prototype.parse$SALCompileError$ = function (input, errors) {
 	this._templateClassDefs = [];
 	this._classDefs = [];
 	this._imports = [];
+	this._isGenerator = false;
 	this._locals = null;
 	this._statements = null;
 	this._closures = [];
@@ -9919,12 +9937,13 @@ Parser.prototype._popClassState$ = function () {
  * @param {Array.<undefined|ArgumentDeclaration>} args
  */
 Parser.prototype._pushScope$LLocalVariable$ALArgumentDeclaration$ = function (funcLocal, args) {
-	this._prevScope = new Scope$LScope$ALLocalVariable$LLocalVariable$ALArgumentDeclaration$ALStatement$ALMemberFunctionDefinition$(this._prevScope, this._locals, this._funcLocal, this._arguments, this._statements, this._closures);
+	this._prevScope = new Scope$LScope$ALLocalVariable$LLocalVariable$ALArgumentDeclaration$ALStatement$ALMemberFunctionDefinition$B(this._prevScope, this._locals, this._funcLocal, this._arguments, this._statements, this._closures, this._isGenerator);
 	this._locals = [];
 	this._funcLocal = funcLocal;
 	this._arguments = args;
 	this._statements = [];
 	this._closures = [];
+	this._isGenerator = false;
 };
 
 /**
@@ -9935,6 +9954,7 @@ Parser.prototype._popScope$ = function () {
 	this._arguments = this._prevScope.arguments;
 	this._statements = this._prevScope.statements;
 	this._closures = this._prevScope.closures;
+	this._isGenerator = this._prevScope.isGenerator;
 	this._prevScope = this._prevScope.prev;
 };
 
@@ -9988,7 +10008,7 @@ Parser.prototype._registerLocal$LToken$LType$ = function (identifierToken, type)
  * @return {ParserState}
  */
 Parser.prototype._preserveState$ = function () {
-	return new ParserState$NNLDocComment$NNNNN(this._lineNumber, this._columnOffset, this._docComment, this._tokenLength, this._errors.length, this._closures.length, this._objectTypesUsed.length, this._templateInstantiationRequests.length);
+	return new ParserState$NNLDocComment$NBNNNN(this._lineNumber, this._columnOffset, this._docComment, this._tokenLength, this._isGenerator, this._errors.length, this._closures.length, this._objectTypesUsed.length, this._templateInstantiationRequests.length);
 };
 
 /**
@@ -9999,6 +10019,7 @@ Parser.prototype._restoreState$LParserState$ = function (state) {
 	this._columnOffset = state.columnOffset;
 	this._docComment = state.docComment;
 	this._tokenLength = state.tokenLength;
+	this._isGenerator = state.isGenerator;
 	this._errors.length = state.numErrors;
 	this._closures.splice(state.numClosures, this._closures.length - state.numClosures);
 	this._objectTypesUsed.splice(state.numObjectTypesUsed, this._objectTypesUsed.length - state.numObjectTypesUsed);
@@ -10807,6 +10828,7 @@ Parser.prototype._classDefinition$ = function () {
 		} else {
 			this._templateClassDefs.push(templateClassDef);
 		}
+		templateClassDef.setParser$LParser$(this);
 		return templateClassDef;
 	} else {
 		classDef = new ClassDefinition$LToken$SNLParsedObjectType$ALParsedObjectType$ALMemberDefinition$ALClassDefinition$ALTemplateClassDefinition$ALParsedObjectType$LDocComment$(className, className.getValue$(), this._classFlags, this._extendType, this._implementTypes, members, this._inners, this._templateInners, this._objectTypesUsed, docComment);
@@ -10841,7 +10863,7 @@ Parser.prototype._memberDefinition$ = function () {
 	flags = 0;
 	docComment = null;
 	while (true) {
-		token = this._expect$AS([ "function", "var", "static", "abstract", "override", "final", "const", "native", "__readonly__", "inline", "__pure__", "delete" ]);
+		token = this._expect$AS([ "function", "var", "static", "abstract", "override", "final", "const", "native", "__readonly__", "inline", "__pure__", "delete", "async" ]);
 		if (token == null) {
 			return null;
 		}
@@ -10900,6 +10922,13 @@ Parser.prototype._memberDefinition$ = function () {
 			break;
 		case "delete":
 			newFlag = ClassDefinition.IS_DELETE;
+			break;
+		case "async":
+			if ((this._classFlags & ClassDefinition.IS_NATIVE) === 0) {
+				this._newError$S("functions of a native class cannot have 'async' attibute set");
+				return null;
+			}
+			newFlag = ClassDefinition.IS_ASYNC;
 			break;
 		default:
 			throw new Error("logic flaw");
@@ -11067,10 +11096,14 @@ Parser.prototype._functionDefinition$LToken$NLDocComment$ = function (token, fla
 		this._locals = [];
 		this._statements = [];
 		this._closures = [];
+		this._isGenerator = false;
 		if (name.getValue$() === "constructor") {
 			lastToken = this._initializeBlock$();
 		} else {
 			lastToken = this._block$();
+		}
+		if (this._isGenerator) {
+			flags |= ClassDefinition.IS_GENERATOR;
 		}
 		funcDef = createDefinition(this._locals, this._statements, this._closures, lastToken);
 		this._locals = null;
@@ -11082,7 +11115,6 @@ Parser.prototype._functionDefinition$LToken$NLDocComment$ = function (token, fla
 			this._objectTypesUsed.splice(numObjectTypesUsed, this._objectTypesUsed.length - numObjectTypesUsed);
 		}
 	}
-	return null;
 };
 
 /**
@@ -11560,7 +11592,7 @@ Parser.prototype._statement$ = function () {
 		this._restoreState$LParserState$(state);
 		label = null;
 	}
-	token = this._expectOpt$AS([ "{", "var", ";", "if", "do", "while", "for", "continue", "break", "return", "switch", "throw", "try", "assert", "log", "delete", "debugger", "function", "void" ]);
+	token = this._expectOpt$AS([ "{", "var", ";", "if", "do", "while", "for", "continue", "break", "return", "yield", "switch", "throw", "try", "assert", "log", "delete", "debugger", "function", "void" ]);
 	if (label != null) {
 		if (! (token != null && token.getValue$().match(/^(?:do|while|for|switch)$/) != null)) {
 			this._newError$S("only blocks, iteration statements, and switch statements are allowed after a label");
@@ -11589,6 +11621,8 @@ Parser.prototype._statement$ = function () {
 			return this._breakStatement$LToken$(token);
 		case "return":
 			return this._returnStatement$LToken$(token);
+		case "yield":
+			return this._yieldStatement$LToken$(token);
 		case "switch":
 			return this._switchStatement$LToken$LToken$(token, label);
 		case "throw":
@@ -11712,6 +11746,8 @@ Parser.prototype._functionStatement$LToken$ = function (token) {
 	var funcLocal;
 	/** @type {Token} */
 	var lastToken;
+	/** @type {!number} */
+	var flags;
 	/** @type {MemberFunctionDefinition} */
 	var funcDef;
 	name = this._expectIdentifierOpt$();
@@ -11744,7 +11780,11 @@ Parser.prototype._functionStatement$LToken$ = function (token) {
 		this._popScope$();
 		return false;
 	}
-	funcDef = new MemberFunctionDefinition$LToken$LToken$NLType$ALArgumentDeclaration$ALLocalVariable$ALStatement$ALMemberFunctionDefinition$LToken$LDocComment$(token, name, ClassDefinition.IS_STATIC, returnType, args, this._locals, this._statements, this._closures, lastToken, null);
+	flags = ClassDefinition.IS_STATIC;
+	if (this._isGenerator) {
+		flags |= ClassDefinition.IS_GENERATOR;
+	}
+	funcDef = new MemberFunctionDefinition$LToken$LToken$NLType$ALArgumentDeclaration$ALLocalVariable$ALStatement$ALMemberFunctionDefinition$LToken$LDocComment$(token, name, flags, returnType, args, this._locals, this._statements, this._closures, lastToken, null);
 	this._popScope$();
 	this._closures.push(funcDef);
 	funcDef.setFuncLocal$LLocalVariable$(funcLocal);
@@ -12000,6 +12040,25 @@ Parser.prototype._returnStatement$LToken$ = function (token) {
 	if (this._expect$S(";") == null) {
 		return false;
 	}
+	return true;
+};
+
+/**
+ * @param {Token} token
+ * @return {!boolean}
+ */
+Parser.prototype._yieldStatement$LToken$ = function (token) {
+	/** @type {Expression} */
+	var expr;
+	expr = this._expr$B(false);
+	if (expr == null) {
+		return false;
+	}
+	this._statements.push(new YieldStatement$LToken$LExpression$(token, expr));
+	if (this._expect$S(";") == null) {
+		return false;
+	}
+	this._isGenerator = true;
 	return true;
 };
 
@@ -12889,6 +12948,8 @@ Parser.prototype._lambdaExpr$LToken$ = function (token) {
 Parser.prototype._lambdaBody$LToken$ALArgumentDeclaration$LType$ = function (token, args, returnType) {
 	/** @type {Token} */
 	var openBlock;
+	/** @type {!number} */
+	var flags;
 	/** @type {Expression} */
 	var expr;
 	/** @type {Token} */
@@ -12896,21 +12957,24 @@ Parser.prototype._lambdaBody$LToken$ALArgumentDeclaration$LType$ = function (tok
 	openBlock = this._expectOpt$S("{");
 	this._pushScope$LLocalVariable$ALArgumentDeclaration$(null, args);
 	try {
+		flags = ClassDefinition.IS_STATIC;
 		if (openBlock == null) {
 			expr = this._expr$();
 			this._statements.push(new ReturnStatement$LToken$LExpression$(token, expr));
-			return new MemberFunctionDefinition$LToken$LToken$NLType$ALArgumentDeclaration$ALLocalVariable$ALStatement$ALMemberFunctionDefinition$LToken$LDocComment$(token, null, ClassDefinition.IS_STATIC, returnType, args, this._locals, this._statements, this._closures, null, null);
+			return new MemberFunctionDefinition$LToken$LToken$NLType$ALArgumentDeclaration$ALLocalVariable$ALStatement$ALMemberFunctionDefinition$LToken$LDocComment$(token, null, flags, returnType, args, this._locals, this._statements, this._closures, null, null);
 		} else {
 			lastToken = this._block$();
 			if (lastToken == null) {
 				return null;
 			}
-			return new MemberFunctionDefinition$LToken$LToken$NLType$ALArgumentDeclaration$ALLocalVariable$ALStatement$ALMemberFunctionDefinition$LToken$LDocComment$(token, null, ClassDefinition.IS_STATIC, returnType, args, this._locals, this._statements, this._closures, lastToken, null);
+			if (this._isGenerator) {
+				flags |= ClassDefinition.IS_GENERATOR;
+			}
+			return new MemberFunctionDefinition$LToken$LToken$NLType$ALArgumentDeclaration$ALLocalVariable$ALStatement$ALMemberFunctionDefinition$LToken$LDocComment$(token, null, flags, returnType, args, this._locals, this._statements, this._closures, lastToken, null);
 		}
 	} finally {
 		this._popScope$();
 	}
-	return null;
 };
 
 /**
@@ -12933,6 +12997,8 @@ Parser.prototype._functionExpr$LToken$ = function (token) {
 	var funcLocal;
 	/** @type {Token} */
 	var lastToken;
+	/** @type {!number} */
+	var flags;
 	/** @type {MemberFunctionDefinition} */
 	var funcDef;
 	name = this._expectIdentifierOpt$();
@@ -12971,7 +13037,11 @@ Parser.prototype._functionExpr$LToken$ = function (token) {
 		this._popScope$();
 		return null;
 	}
-	funcDef = new MemberFunctionDefinition$LToken$LToken$NLType$ALArgumentDeclaration$ALLocalVariable$ALStatement$ALMemberFunctionDefinition$LToken$LDocComment$(token, name, ClassDefinition.IS_STATIC, returnType, args, this._locals, this._statements, this._closures, lastToken, null);
+	flags = ClassDefinition.IS_STATIC;
+	if (this._isGenerator) {
+		flags |= ClassDefinition.IS_GENERATOR;
+	}
+	funcDef = new MemberFunctionDefinition$LToken$LToken$NLType$ALArgumentDeclaration$ALLocalVariable$ALStatement$ALMemberFunctionDefinition$LToken$LDocComment$(token, name, flags, returnType, args, this._locals, this._statements, this._closures, lastToken, null);
 	this._popScope$();
 	this._closures.push(funcDef);
 	funcDef.setFuncLocal$LLocalVariable$(funcLocal);
@@ -13549,6 +13619,13 @@ MemberFunctionDefinition.prototype.isAnonymous$ = function () {
 };
 
 /**
+ * @return {!boolean}
+ */
+MemberFunctionDefinition.prototype.isGenerator$ = function () {
+	return (this._flags & ClassDefinition.IS_GENERATOR) !== 0;
+};
+
+/**
  * @return {!string}
  */
 MemberFunctionDefinition.prototype.getNotation$ = function () {
@@ -13779,8 +13856,11 @@ MemberFunctionDefinition.prototype.analyze$LAnalysisContext$ = function (outerCo
 		if (this._returnType == null) {
 			this._returnType = Type.voidType;
 		}
-		if (! this._returnType.equals$LType$(Type.voidType) && context.getTopBlock$().localVariableStatuses.isReachable$()) {
-			context.errors.push(new CompileError$LToken$S(this._lastTokenOfBody, "missing return statement"));
+		if (this.isGenerator$()) {
+		} else {
+			if (! this._returnType.equals$LType$(Type.voidType) && context.getTopBlock$().localVariableStatuses.isReachable$()) {
+				context.errors.push(new CompileError$LToken$S(this._lastTokenOfBody, "missing return statement"));
+			}
 		}
 		if (this._parent == null && this.getNameToken$() != null && this.name$() === "constructor") {
 			this._fixupConstructor$LAnalysisContext$(context);
@@ -13824,6 +13904,10 @@ MemberFunctionDefinition.prototype._fixupConstructor$LAnalysisContext$ = functio
 	var insertStmtAt;
 	success = true;
 	isAlternate = false;
+	if ((this._flags & ClassDefinition.IS_GENERATOR) !== 0) {
+		context.errors.push(new CompileError$LToken$S(this._token, "constructor must not be a generator"));
+		return;
+	}
 	stmtIndex = 0;
 	if (stmtIndex < this._statements.length && this._statements[stmtIndex] instanceof ConstructorInvocationStatement && this._statements[stmtIndex].getConstructingClassDef$() == this._classDef) {
 		isAlternate = true;
@@ -14799,7 +14883,7 @@ ClassDefinition.prototype.getMemberTypeByName$ALCompileError$LToken$SBALType$N =
 											return;
 										}
 									}
-									if (member.getStatements$() != null || mode !== ClassDefinition.GET_MEMBER_MODE_NOT_ABSTRACT) {
+									if (member.getStatements$() != null || mode !== ClassDefinition.GET_MEMBER_MODE_FUNCTION_WITH_BODY) {
 										for (j = 0; j < types.length; ++ j) {
 											if (Util$typesAreEqual$ALType$ALType$(member.getArgumentTypes$(), types[j].getArgumentTypes$())) {
 												break;
@@ -14924,7 +15008,6 @@ ClassDefinition.prototype.createGetTemplateClassCallback$ALCompileError$LTemplat
  * @return {ClassDefinition}
  */
 ClassDefinition.prototype.instantiate$LInstantiationContext$ = function (instantiationContext) {
-	var $this = this;
 	/** @type {InstantiationContext} */
 	var context;
 	/** @type {!boolean} */
@@ -14943,6 +15026,12 @@ ClassDefinition.prototype.instantiate$LInstantiationContext$ = function (instant
 	var templateInners;
 	/** @type {TemplateClassDefinition} */
 	var templateInner;
+	/** @type {ParsedObjectType} */
+	var extendType;
+	/** @type {Type} */
+	var type;
+	/** @type {Array.<undefined|ParsedObjectType>} */
+	var implementTypes;
 	context = new InstantiationContext$ALCompileError$HLType$(instantiationContext.errors, instantiationContext.typemap);
 	succeeded = true;
 	members = [];
@@ -14972,9 +15061,25 @@ ClassDefinition.prototype.instantiate$LInstantiationContext$ = function (instant
 	if (! succeeded) {
 		return null;
 	}
-	return new ClassDefinition$LToken$SNLParsedObjectType$ALParsedObjectType$ALMemberDefinition$ALClassDefinition$ALTemplateClassDefinition$ALParsedObjectType$LDocComment$(this._token, this._className, this._flags, this._extendType != null ? this._extendType.instantiate$LInstantiationContext$(context) : null, this._implementTypes.map((function (t) {
-		return t.instantiate$LInstantiationContext$(context);
-	})), members, inners, templateInners, context.objectTypesUsed, this._docComment);
+	extendType = null;
+	if (this._extendType != null) {
+		type = this._extendType.instantiate$LInstantiationContext$(instantiationContext);
+		if (! (type instanceof ParsedObjectType)) {
+			instantiationContext.errors.push(new CompileError$LToken$S(this._extendType.getToken$(), "non-object type is not extensible"));
+			return null;
+		}
+		extendType = type;
+	}
+	implementTypes = [];
+	for (i = 0; i < this._implementTypes.length; ++ i) {
+		type = this._implementTypes[i].instantiate$LInstantiationContext$(instantiationContext);
+		if (! (type instanceof ParsedObjectType)) {
+			instantiationContext.errors.push(new CompileError$LToken$S(this._implementTypes[i].getToken$(), "non-object type is not extensible"));
+			return null;
+		}
+		implementTypes[i] = type;
+	}
+	return new ClassDefinition$LToken$SNLParsedObjectType$ALParsedObjectType$ALMemberDefinition$ALClassDefinition$ALTemplateClassDefinition$ALParsedObjectType$LDocComment$(this._token, this._className, this._flags, extendType, implementTypes, members, inners, templateInners, context.objectTypesUsed, this._docComment);
 };
 
 /**
@@ -15117,7 +15222,6 @@ ClassDefinition.prototype.analyze$LAnalysisContext$ = function (context) {
 
 /**
  * @param {AnalysisContext} context
- * @return {!boolean}
  */
 ClassDefinition.prototype._analyzeClassDef$LAnalysisContext$ = function (context) {
 	var $this = this;
@@ -15151,11 +15255,11 @@ ClassDefinition.prototype._analyzeClassDef$LAnalysisContext$ = function (context
 		if (this._baseClassDef != null) {
 			if ((this._baseClassDef.flags$() & ClassDefinition.IS_FINAL) !== 0) {
 				context.errors.push(new CompileError$LToken$S(this.getToken$(), "cannot extend final class '" + this._baseClassDef.className$() + "'"));
-				return false;
+				return;
 			}
 			if ((this._baseClassDef.flags$() & (ClassDefinition.IS_INTERFACE | ClassDefinition.IS_MIXIN)) !== 0) {
 				context.errors.push(new CompileError$LToken$S(this.getToken$(), "interfaces (or mixins) should be implemented, not extended"));
-				return false;
+				return;
 			}
 			if (! this._baseClassDef.forEachClassToBase$F$LClassDefinition$B$((function (classDef) {
 				if ($this == classDef) {
@@ -15164,14 +15268,14 @@ ClassDefinition.prototype._analyzeClassDef$LAnalysisContext$ = function (context
 				}
 				return true;
 			}))) {
-				return false;
+				return;
 			}
 		}
 	} else {
 		for (i = 0; i < implementClassDefs.length; ++ i) {
 			if ((implementClassDefs[i].flags$() & (ClassDefinition.IS_INTERFACE | ClassDefinition.IS_MIXIN)) === 0) {
 				context.errors.push(new CompileError$LToken$S(this.getToken$(), "class '" + implementClassDefs[i].className$() + "' can only be extended, not implemented"));
-				return false;
+				return;
 			}
 			if (! implementClassDefs[i].forEachClassToBase$F$LClassDefinition$B$((function (classDef) {
 				if ($this == classDef) {
@@ -15180,7 +15284,7 @@ ClassDefinition.prototype._analyzeClassDef$LAnalysisContext$ = function (context
 				}
 				return true;
 			}))) {
-				return false;
+				return;
 			}
 		}
 	}
@@ -15195,7 +15299,7 @@ ClassDefinition.prototype._analyzeClassDef$LAnalysisContext$ = function (context
 		}
 		return true;
 	}))) {
-		return false;
+		return;
 	}
 	for (i = 0; i < this._members.length; ++ i) {
 		this._assertMemberIsDefinable$LAnalysisContext$LMemberDefinition$LClassDefinition$LToken$(context, this._members[i], this, this._members[i].getToken$());
@@ -15294,7 +15398,6 @@ ClassDefinition.prototype._analyzeClassDef$LAnalysisContext$ = function (context
 			context.errors.push(new CompileError$LToken$S(this.getToken$(), msg));
 		}
 	}
-	return false;
 };
 
 /**
@@ -15769,7 +15872,6 @@ TemplateClassDefinition.prototype.getTypeArguments$ = function () {
  * @return {TemplateClassDefinition}
  */
 TemplateClassDefinition.prototype.instantiate$LInstantiationContext$ = function (instantiationContext) {
-	var $this = this;
 	/** @type {Object.<string, undefined|Type>} */
 	var typemap;
 	/** @type {!string} */
@@ -15792,6 +15894,12 @@ TemplateClassDefinition.prototype.instantiate$LInstantiationContext$ = function 
 	var templateInners;
 	/** @type {TemplateClassDefinition} */
 	var templateInner;
+	/** @type {ParsedObjectType} */
+	var extendType;
+	/** @type {Type} */
+	var type;
+	/** @type {Array.<undefined|ParsedObjectType>} */
+	var implementTypes;
 	typemap = {};
 	for (key in instantiationContext.typemap) {
 		typemap[key] = instantiationContext.typemap[key];
@@ -15828,9 +15936,25 @@ TemplateClassDefinition.prototype.instantiate$LInstantiationContext$ = function 
 	if (! succeeded) {
 		return null;
 	}
-	return new TemplateClassDefinition$LToken$SNALToken$LParsedObjectType$ALParsedObjectType$ALMemberDefinition$ALClassDefinition$ALTemplateClassDefinition$ALParsedObjectType$LDocComment$(this._token, this._className, this._flags, this._typeArgs, this._extendType != null ? this._extendType.instantiate$LInstantiationContext$(context) : null, this._implementTypes.map((function (t) {
-		return t.instantiate$LInstantiationContext$(context);
-	})), members, inners, templateInners, context.objectTypesUsed, this._docComment);
+	extendType = null;
+	if (this._extendType != null) {
+		type = this._extendType.instantiate$LInstantiationContext$(instantiationContext);
+		if (! (type instanceof ParsedObjectType)) {
+			instantiationContext.errors.push(new CompileError$LToken$S(this._extendType.getToken$(), "non-object type is not extensible"));
+			return null;
+		}
+		extendType = type;
+	}
+	implementTypes = [];
+	for (i = 0; i < this._implementTypes.length; ++ i) {
+		type = this._implementTypes[i].instantiate$LInstantiationContext$(instantiationContext);
+		if (! (type instanceof ParsedObjectType)) {
+			instantiationContext.errors.push(new CompileError$LToken$S(this._implementTypes[i].getToken$(), "non-object type is not extensible"));
+			return null;
+		}
+		implementTypes[i] = type;
+	}
+	return new TemplateClassDefinition$LToken$SNALToken$LParsedObjectType$ALParsedObjectType$ALMemberDefinition$ALClassDefinition$ALTemplateClassDefinition$ALParsedObjectType$LDocComment$(this._token, this._className, this._flags, this._typeArgs, extendType, implementTypes, members, inners, templateInners, context.objectTypesUsed, this._docComment);
 };
 
 /**
@@ -15839,7 +15963,6 @@ TemplateClassDefinition.prototype.instantiate$LInstantiationContext$ = function 
  * @return {InstantiatedClassDefinition}
  */
 TemplateClassDefinition.prototype.instantiateTemplateClass$ALCompileError$LTemplateInstantiationRequest$ = function (errors, request) {
-	var $this = this;
 	/** @type {InstantiationContext} */
 	var instantiationContext;
 	/** @type {!boolean} */
@@ -15858,6 +15981,12 @@ TemplateClassDefinition.prototype.instantiateTemplateClass$ALCompileError$LTempl
 	var templateInners;
 	/** @type {TemplateClassDefinition} */
 	var templateInner;
+	/** @type {ParsedObjectType} */
+	var extendType;
+	/** @type {Type} */
+	var type;
+	/** @type {Array.<undefined|ParsedObjectType>} */
+	var implementTypes;
 	/** @type {InstantiatedClassDefinition} */
 	var instantiatedDef;
 	instantiationContext = this.buildInstantiationContext$ALCompileError$LToken$ALToken$ALType$(errors, request.getToken$(), this._typeArgs, request.getTypeArguments$());
@@ -15892,9 +16021,25 @@ TemplateClassDefinition.prototype.instantiateTemplateClass$ALCompileError$LTempl
 	if (! succeeded) {
 		return null;
 	}
-	instantiatedDef = new InstantiatedClassDefinition$LTemplateClassDefinition$ALType$LParsedObjectType$ALParsedObjectType$ALMemberDefinition$ALClassDefinition$ALTemplateClassDefinition$ALParsedObjectType$(this, request.getTypeArguments$(), this._extendType != null ? this._extendType.instantiate$LInstantiationContext$(instantiationContext) : null, this._implementTypes.map((function (t) {
-		return t.instantiate$LInstantiationContext$(instantiationContext);
-	})), members, inners, templateInners, instantiationContext.objectTypesUsed);
+	extendType = null;
+	if (this._extendType != null) {
+		type = this._extendType.instantiate$LInstantiationContext$(instantiationContext);
+		if (! (type instanceof ParsedObjectType)) {
+			instantiationContext.errors.push(new CompileError$LToken$S(this._extendType.getToken$(), "non-object type is not extensible"));
+			return null;
+		}
+		extendType = type;
+	}
+	implementTypes = [];
+	for (i = 0; i < this._implementTypes.length; ++ i) {
+		type = this._implementTypes[i].instantiate$LInstantiationContext$(instantiationContext);
+		if (! (type instanceof ParsedObjectType)) {
+			instantiationContext.errors.push(new CompileError$LToken$S(this._implementTypes[i].getToken$(), "non-object type is not extensible"));
+			return null;
+		}
+		implementTypes[i] = type;
+	}
+	instantiatedDef = new InstantiatedClassDefinition$LTemplateClassDefinition$ALType$LParsedObjectType$ALParsedObjectType$ALMemberDefinition$ALClassDefinition$ALTemplateClassDefinition$ALParsedObjectType$(this, request.getTypeArguments$(), extendType, implementTypes, members, inners, templateInners, instantiationContext.objectTypesUsed);
 	return instantiatedDef;
 };
 
@@ -15942,7 +16087,6 @@ Statement.prototype.analyze$LAnalysisContext$ = function (context) {
 			throw $__jsx_catch_0;
 		}
 	}
-	return false;
 };
 
 /**
@@ -16006,6 +16150,132 @@ Statement.assertIsReachable$LAnalysisContext$LToken$ = function (context, token)
 };
 
 var Statement$assertIsReachable$LAnalysisContext$LToken$ = Statement.assertIsReachable$LAnalysisContext$LToken$;
+
+/**
+ * class LabelStatement extends Statement
+ * @constructor
+ */
+function LabelStatement() {
+}
+
+LabelStatement.prototype = new Statement;
+/**
+ * @constructor
+ * @param {!string} name
+ */
+function LabelStatement$S(name) {
+	Statement$.call(this);
+	this._name = name;
+};
+
+LabelStatement$S.prototype = new LabelStatement;
+
+/**
+ * @return {!string}
+ */
+LabelStatement.prototype.getName$ = function () {
+	return this._name;
+};
+
+/**
+ * @return {Token}
+ */
+LabelStatement.prototype.getToken$ = function () {
+	return null;
+};
+
+/**
+ * @return {Statement}
+ */
+LabelStatement.prototype.clone$ = function () {
+	return new LabelStatement$S(this._name);
+};
+
+/**
+ * @return {*}
+ */
+LabelStatement.prototype.serialize$ = function () {
+	return null;
+};
+
+/**
+ * @param {AnalysisContext} context
+ * @return {!boolean}
+ */
+LabelStatement.prototype.doAnalyze$LAnalysisContext$ = function (context) {
+	return true;
+};
+
+/**
+ * @param {*} cb
+ * @return {!boolean}
+ */
+LabelStatement.prototype.forEachExpression$F$LExpression$F$LExpression$V$B$ = function (cb) {
+	return true;
+};
+
+/**
+ * class GotoStatement extends Statement
+ * @constructor
+ */
+function GotoStatement() {
+}
+
+GotoStatement.prototype = new Statement;
+/**
+ * @constructor
+ * @param {!string} label
+ */
+function GotoStatement$S(label) {
+	Statement$.call(this);
+	this.label = label;
+};
+
+GotoStatement$S.prototype = new GotoStatement;
+
+/**
+ * @return {!string}
+ */
+GotoStatement.prototype.getLabel$ = function () {
+	return this.label;
+};
+
+/**
+ * @return {Token}
+ */
+GotoStatement.prototype.getToken$ = function () {
+	return null;
+};
+
+/**
+ * @return {Statement}
+ */
+GotoStatement.prototype.clone$ = function () {
+	return new GotoStatement$S(this.label);
+};
+
+/**
+ * @return {*}
+ */
+GotoStatement.prototype.serialize$ = function () {
+	return null;
+};
+
+/**
+ * @param {AnalysisContext} context
+ * @return {!boolean}
+ */
+GotoStatement.prototype.doAnalyze$LAnalysisContext$ = function (context) {
+	return true;
+};
+
+/**
+ * @param {*} cb
+ * @return {!boolean}
+ */
+GotoStatement.prototype.forEachExpression$F$LExpression$F$LExpression$V$B$ = function (cb) {
+	return true;
+};
 
 /**
  * class InformationStatement extends Statement
@@ -17922,6 +18192,110 @@ BreakStatement.prototype.forEachExpression$F$LExpression$F$LExpression$V$B$ = fu
 };
 
 /**
+ * class YieldStatement extends Statement
+ * @constructor
+ */
+function YieldStatement() {
+}
+
+YieldStatement.prototype = new Statement;
+/**
+ * @constructor
+ * @param {Token} token
+ * @param {Expression} expr
+ */
+function YieldStatement$LToken$LExpression$(token, expr) {
+	Statement$.call(this);
+	this._token = token;
+	this._expr = expr;
+};
+
+YieldStatement$LToken$LExpression$.prototype = new YieldStatement;
+
+/**
+ * @return {Statement}
+ */
+YieldStatement.prototype.clone$ = function () {
+	return new YieldStatement$LToken$LExpression$(this._token, Cloner$Expression$E$cloneNullable$LExpression$(this._expr));
+};
+
+/**
+ * @return {Token}
+ */
+YieldStatement.prototype.getToken$ = function () {
+	return this._token;
+};
+
+/**
+ * @return {Expression}
+ */
+YieldStatement.prototype.getExpr$ = function () {
+	return this._expr;
+};
+
+/**
+ * @param {Expression} expr
+ */
+YieldStatement.prototype.setExpr$LExpression$ = function (expr) {
+	this._expr = expr;
+};
+
+/**
+ * @return {*}
+ */
+YieldStatement.prototype.serialize$ = function () {
+	return [ "YieldStatement", Serializer$Expression$E$serializeNullable$LExpression$(this._expr) ];
+};
+
+/**
+ * @param {AnalysisContext} context
+ * @return {!boolean}
+ */
+YieldStatement.prototype.doAnalyze$LAnalysisContext$ = function (context) {
+	/** @type {Type} */
+	var returnType;
+	/** @type {Type} */
+	var yieldType;
+	if (! this._analyzeExpr$LAnalysisContext$LExpression$(context, this._expr)) {
+		return true;
+	}
+	if (this._expr.getType$() == null) {
+		return true;
+	}
+	returnType = context.funcDef.getReturnType$();
+	if (returnType == null) {
+		yieldType = this._expr.getType$();
+		context.funcDef.setReturnType$LType$(new ObjectType$LClassDefinition$(Util$instantiateTemplate$LAnalysisContext$LToken$SALType$(context, this._token, "g_Enumerable", [ yieldType ])));
+	} else {
+		if (returnType instanceof ObjectType && returnType.getClassDef$() instanceof InstantiatedClassDefinition && returnType.getClassDef$().getTemplateClassName$() === "g_Enumerable") {
+			yieldType = returnType.getClassDef$().getTypeArguments$()[0];
+		} else {
+			context.errors.push(new CompileError$LToken$S(this._token, "cannot convert 'g_Enumerable.<" + this._expr.getType$().toString() + ">' to return type '" + returnType.toString() + "'"));
+			return false;
+		}
+	}
+	if (! this._expr.getType$().isConvertibleTo$LType$(yieldType)) {
+		context.errors.push(new CompileError$LToken$S(this._token, "cannot convert '" + this._expr.getType$().toString() + "' to yield type '" + yieldType.toString() + "'"));
+		return false;
+	}
+	return true;
+};
+
+/**
+ * @param {*} cb
+ * @return {!boolean}
+ */
+YieldStatement.prototype.forEachExpression$F$LExpression$F$LExpression$V$B$ = function (cb) {
+	var $this = this;
+	if (this._expr != null && ! cb(this._expr, (function (expr) {
+		$this._expr = expr;
+	}))) {
+		return false;
+	}
+	return true;
+};
+
+/**
  * class ReturnStatement extends Statement
  * @constructor
  */
@@ -17986,6 +18360,10 @@ ReturnStatement.prototype.doAnalyze$LAnalysisContext$ = function (context) {
 	var returnType;
 	/** @type {Type} */
 	var exprType;
+	if (context.funcDef.isGenerator$()) {
+		context.errors.push(new CompileError$LToken$S(this._token, "return statement in generator is not allowed"));
+		return true;
+	}
 	returnType = context.funcDef.getReturnType$();
 	if (returnType == null) {
 		if (this._expr != null) {
@@ -18415,7 +18793,7 @@ ConstructorInvocationStatement.prototype.doAnalyze$LAnalysisContext$ = function 
 			context.errors.push(new CompileError$LToken$S(this.getToken$(), "no function with matching arguments"));
 			return true;
 		}
-		ctorType = new ResolvedFunctionType$LToken$LType$ALType$B(this.getConstructingClassDef$().getToken$(), Type.voidType, [], false);
+		ctorType = new MemberFunctionType$LToken$LType$LType$ALType$B(this.getConstructingClassDef$().getToken$(), new ObjectType$LClassDefinition$(this.getConstructingClassDef$()), Type.voidType, [], false);
 	} else {
 		argTypes = Util$analyzeArgs$LAnalysisContext$ALExpression$LExpression$AALType$(context, this._args, null, ctorType.getExpectedTypes$NB(this._args.length, false));
 		if (argTypes == null) {
@@ -18635,19 +19013,6 @@ Expression.getDefaultValueExpressionOf$LType$ = function (type) {
 var Expression$getDefaultValueExpressionOf$LType$ = Expression.getDefaultValueExpressionOf$LType$;
 
 /**
- * @param {AnalysisContext} context
- * @param {Token} token
- * @param {!string} className
- * @param {Array.<undefined|Type>} typeArguments
- * @return {ClassDefinition}
- */
-Expression.instantiateTemplate$LAnalysisContext$LToken$SALType$ = function (context, token, className, typeArguments) {
-	return context.parser.lookupTemplate$ALCompileError$LTemplateInstantiationRequest$F$LParser$LClassDefinition$LClassDefinition$$(context.errors, new TemplateInstantiationRequest$LToken$SALType$(token, className, typeArguments), context.postInstantiationCallback);
-};
-
-var Expression$instantiateTemplate$LAnalysisContext$LToken$SALType$ = Expression.instantiateTemplate$LAnalysisContext$LToken$SALType$;
-
-/**
  * class CommaExpression extends Expression
  * @constructor
  */
@@ -18667,11 +19032,11 @@ function CommaExpression$LToken$LExpression$LExpression$(token, expr1, expr2) {
 	this._expr2 = null;
 	if (! (expr1 != null)) {
 		debugger;
-		throw new Error("[src/expression.jsx:2187:21] assertion failure\n        assert expr1 != null;\n                     ^^\n");
+		throw new Error("[src/expression.jsx:2184:21] assertion failure\n        assert expr1 != null;\n                     ^^\n");
 	}
 	if (! (expr2 != null)) {
 		debugger;
-		throw new Error("[src/expression.jsx:2188:21] assertion failure\n        assert expr2 != null;\n                     ^^\n");
+		throw new Error("[src/expression.jsx:2185:21] assertion failure\n        assert expr2 != null;\n                     ^^\n");
 	}
 	this._expr1 = expr1;
 	this._expr2 = expr2;
@@ -19060,7 +19425,7 @@ MapLiteralExpression.prototype.analyze$LAnalysisContext$LExpression$ = function 
 					elementType = Type.numberType;
 				}
 				elementType = elementType.resolveIfNullable$();
-				this._type = new ObjectType$LClassDefinition$(Expression$instantiateTemplate$LAnalysisContext$LToken$SALType$(context, this._token, "Map", [ elementType ]));
+				this._type = new ObjectType$LClassDefinition$(Util$instantiateTemplate$LAnalysisContext$LToken$SALType$(context, this._token, "Map", [ elementType ]));
 			}
 		}
 	}
@@ -19201,7 +19566,7 @@ ArrayLiteralExpression.prototype.analyze$LAnalysisContext$LExpression$ = functio
 			elementType = Type.numberType;
 		}
 		elementType = elementType.resolveIfNullable$();
-		this._type = new ObjectType$LClassDefinition$(Expression$instantiateTemplate$LAnalysisContext$LToken$SALType$(context, this._token, "Array", [ elementType ]));
+		this._type = new ObjectType$LClassDefinition$(Util$instantiateTemplate$LAnalysisContext$LToken$SALType$(context, this._token, "Array", [ elementType ]));
 	}
 	return succeeded;
 };
@@ -19477,7 +19842,7 @@ SuperExpression.prototype.getArguments$ = function () {
 };
 
 /**
- * @return {FunctionType}
+ * @return {MemberFunctionType}
  */
 SuperExpression.prototype.getFunctionType$ = function () {
 	return this._funcType;
@@ -20472,7 +20837,7 @@ ArrayExpression.prototype._analyzeApplicationOnObject$LAnalysisContext$LType$ = 
 	expr1ClassDef = expr1Type.getClassDef$();
 	if (! (expr1ClassDef)) {
 		debugger;
-		throw new Error("[src/expression.jsx:1476:15] assertion failure\n        assert expr1ClassDef;\n               ^^^^^^^^^^^^^\n");
+		throw new Error("[src/expression.jsx:1473:15] assertion failure\n        assert expr1ClassDef;\n               ^^^^^^^^^^^^^\n");
 	}
 	funcType = expr1ClassDef.getMemberTypeByName$ALCompileError$LToken$SBALType$N(context.errors, this._token, "__native_index_operator__", false, [], ClassDefinition.GET_MEMBER_MODE_ALL);
 	if (funcType == null) {
@@ -22301,7 +22666,7 @@ JavaScriptEmitter.prototype._emitClassMap$ALClassDefinition$ = function (classDe
 			/** @type {!number} */
 			var i;
 			push = (function (suffix) {
-				list.push([ classDef.className$() + suffix, classDef.getOutputClassName$() + suffix ]);
+				list.push([ classDef.classFullName$() + suffix, classDef.getOutputClassName$() + suffix ]);
 			});
 			ctors = $this._findFunctions$LClassDefinition$SB(classDef, "constructor", false);
 			push("");
@@ -22328,7 +22693,7 @@ JavaScriptEmitter.prototype._emitClassMap$ALClassDefinition$ = function (classDe
 		this._emit$SLToken$("{\n", null);
 		this._advanceIndent$();
 		for (i = 0; i < list.length; ++ i) {
-			this._emit$SLToken$(list[i][0] + ": " + list[i][1], null);
+			this._emit$SLToken$("\"" + list[i][0] + "\": " + list[i][1], null);
 			if (i !== list.length - 1) {
 				this._emit$SLToken$(",", null);
 			}
@@ -23211,109 +23576,7 @@ JavaScriptEmitter._initialize$ = function () {
 		return;
 	}
 	JavaScriptEmitter._initialized = true;
-	precedence = [ [ ({ "new": (function (op, precedence) {
-		_NewExpressionEmitter$_setOperatorPrecedence$SN(op, precedence);
-	}) }), ({ "[": (function (op, precedence) {
-		_ArrayExpressionEmitter$_setOperatorPrecedence$SN(op, precedence);
-	}) }), ({ ".": (function (op, precedence) {
-		_PropertyExpressionEmitter$_setOperatorPrecedence$SN(op, precedence);
-	}) }), ({ "(": (function (op, precedence) {
-		_CallExpressionEmitter$_setOperatorPrecedence$SN(op, precedence);
-	}) }), ({ "super": (function (op, precedence) {
-		_SuperExpressionEmitter$_setOperatorPrecedence$SN(op, precedence);
-	}) }), ({ "function": (function (op, precedence) {
-		_FunctionExpressionEmitter$_setOperatorPrecedence$SN(op, precedence);
-	}) }) ], [ ({ "++": (function (op, precedence) {
-		_PostfixExpressionEmitter$_setOperatorPrecedence$SN(op, precedence);
-	}) }), ({ "--": (function (op, precedence) {
-		_PostfixExpressionEmitter$_setOperatorPrecedence$SN(op, precedence);
-	}) }) ], [ ({ "void": (function (op, precedence) {
-		_UnaryExpressionEmitter$_setOperatorPrecedence$SN(op, precedence);
-	}) }), ({ "typeof": (function (op, precedence) {
-		_UnaryExpressionEmitter$_setOperatorPrecedence$SN(op, precedence);
-	}) }), ({ "++": (function (op, precedence) {
-		_UnaryExpressionEmitter$_setOperatorPrecedence$SN(op, precedence);
-	}) }), ({ "--": (function (op, precedence) {
-		_UnaryExpressionEmitter$_setOperatorPrecedence$SN(op, precedence);
-	}) }), ({ "+": (function (op, precedence) {
-		_UnaryExpressionEmitter$_setOperatorPrecedence$SN(op, precedence);
-	}) }), ({ "-": (function (op, precedence) {
-		_UnaryExpressionEmitter$_setOperatorPrecedence$SN(op, precedence);
-	}) }), ({ "~": (function (op, precedence) {
-		_UnaryExpressionEmitter$_setOperatorPrecedence$SN(op, precedence);
-	}) }), ({ "!": (function (op, precedence) {
-		_UnaryExpressionEmitter$_setOperatorPrecedence$SN(op, precedence);
-	}) }) ], [ ({ "*": (function (op, precedence) {
-		_BinaryNumberExpressionEmitter$_setOperatorPrecedence$SN(op, precedence);
-	}) }), ({ "/": (function (op, precedence) {
-		_BinaryNumberExpressionEmitter$_setOperatorPrecedence$SN(op, precedence);
-	}) }), ({ "%": (function (op, precedence) {
-		_BinaryNumberExpressionEmitter$_setOperatorPrecedence$SN(op, precedence);
-	}) }) ], [ ({ "+": (function (op, precedence) {
-		_AdditiveExpressionEmitter$_setOperatorPrecedence$SN(op, precedence);
-	}) }), ({ "-": (function (op, precedence) {
-		_BinaryNumberExpressionEmitter$_setOperatorPrecedence$SN(op, precedence);
-	}) }) ], [ ({ "<<": (function (op, precedence) {
-		_ShiftExpressionEmitter$_setOperatorPrecedence$SN(op, precedence);
-	}) }), ({ ">>": (function (op, precedence) {
-		_ShiftExpressionEmitter$_setOperatorPrecedence$SN(op, precedence);
-	}) }), ({ ">>>": (function (op, precedence) {
-		_ShiftExpressionEmitter$_setOperatorPrecedence$SN(op, precedence);
-	}) }) ], [ ({ "<": (function (op, precedence) {
-		_BinaryNumberExpressionEmitter$_setOperatorPrecedence$SN(op, precedence);
-	}) }), ({ ">": (function (op, precedence) {
-		_BinaryNumberExpressionEmitter$_setOperatorPrecedence$SN(op, precedence);
-	}) }), ({ "<=": (function (op, precedence) {
-		_BinaryNumberExpressionEmitter$_setOperatorPrecedence$SN(op, precedence);
-	}) }), ({ ">=": (function (op, precedence) {
-		_BinaryNumberExpressionEmitter$_setOperatorPrecedence$SN(op, precedence);
-	}) }), ({ "instanceof": (function (op, precedence) {
-		_InstanceofExpressionEmitter$_setOperatorPrecedence$SN(op, precedence);
-	}) }), ({ "in": (function (op, precedence) {
-		_InExpressionEmitter$_setOperatorPrecedence$SN(op, precedence);
-	}) }) ], [ ({ "==": (function (op, precedence) {
-		_EqualityExpressionEmitter$_setOperatorPrecedence$SN(op, precedence);
-	}) }), ({ "!=": (function (op, precedence) {
-		_EqualityExpressionEmitter$_setOperatorPrecedence$SN(op, precedence);
-	}) }) ], [ ({ "&": (function (op, precedence) {
-		_BinaryNumberExpressionEmitter$_setOperatorPrecedence$SN(op, precedence);
-	}) }) ], [ ({ "^": (function (op, precedence) {
-		_BinaryNumberExpressionEmitter$_setOperatorPrecedence$SN(op, precedence);
-	}) }) ], [ ({ "|": (function (op, precedence) {
-		_BinaryNumberExpressionEmitter$_setOperatorPrecedence$SN(op, precedence);
-	}) }) ], [ ({ "&&": (function (op, precedence) {
-		_LogicalExpressionEmitter$_setOperatorPrecedence$SN(op, precedence);
-	}) }) ], [ ({ "||": (function (op, precedence) {
-		_LogicalExpressionEmitter$_setOperatorPrecedence$SN(op, precedence);
-	}) }) ], [ ({ "=": (function (op, precedence) {
-		_AssignmentExpressionEmitter$_setOperatorPrecedence$SN(op, precedence);
-	}) }), ({ "*=": (function (op, precedence) {
-		_AssignmentExpressionEmitter$_setOperatorPrecedence$SN(op, precedence);
-	}) }), ({ "/=": (function (op, precedence) {
-		_AssignmentExpressionEmitter$_setOperatorPrecedence$SN(op, precedence);
-	}) }), ({ "%=": (function (op, precedence) {
-		_AssignmentExpressionEmitter$_setOperatorPrecedence$SN(op, precedence);
-	}) }), ({ "+=": (function (op, precedence) {
-		_AssignmentExpressionEmitter$_setOperatorPrecedence$SN(op, precedence);
-	}) }), ({ "-=": (function (op, precedence) {
-		_AssignmentExpressionEmitter$_setOperatorPrecedence$SN(op, precedence);
-	}) }), ({ "<<=": (function (op, precedence) {
-		_AssignmentExpressionEmitter$_setOperatorPrecedence$SN(op, precedence);
-	}) }), ({ ">>=": (function (op, precedence) {
-		_AssignmentExpressionEmitter$_setOperatorPrecedence$SN(op, precedence);
-	}) }), ({ ">>>=": (function (op, precedence) {
-		_AssignmentExpressionEmitter$_setOperatorPrecedence$SN(op, precedence);
-	}) }), ({ "&=": (function (op, precedence) {
-		_AssignmentExpressionEmitter$_setOperatorPrecedence$SN(op, precedence);
-	}) }), ({ "^=": (function (op, precedence) {
-		_AssignmentExpressionEmitter$_setOperatorPrecedence$SN(op, precedence);
-	}) }), ({ "|=": (function (op, precedence) {
-		_AssignmentExpressionEmitter$_setOperatorPrecedence$SN(op, precedence);
-	}) }) ], [ ({ "?": (function (op, precedence) {
-		_ConditionalExpressionEmitter$_setOperatorPrecedence$SN(op, precedence);
-	}) }) ], [ ({ ",": (function (op, precedence) {
-		_CommaExpressionEmitter$_setOperatorPrecedence$SN(op, precedence);
-	}) }) ] ];
+	precedence = [ [ ({ "new": _NewExpressionEmitter$_setOperatorPrecedence$SN }), ({ "[": _ArrayExpressionEmitter$_setOperatorPrecedence$SN }), ({ ".": _PropertyExpressionEmitter$_setOperatorPrecedence$SN }), ({ "(": _CallExpressionEmitter$_setOperatorPrecedence$SN }), ({ "super": _SuperExpressionEmitter$_setOperatorPrecedence$SN }), ({ "function": _FunctionExpressionEmitter$_setOperatorPrecedence$SN }) ], [ ({ "++": _PostfixExpressionEmitter$_setOperatorPrecedence$SN }), ({ "--": _PostfixExpressionEmitter$_setOperatorPrecedence$SN }) ], [ ({ "void": _UnaryExpressionEmitter$_setOperatorPrecedence$SN }), ({ "typeof": _UnaryExpressionEmitter$_setOperatorPrecedence$SN }), ({ "++": _UnaryExpressionEmitter$_setOperatorPrecedence$SN }), ({ "--": _UnaryExpressionEmitter$_setOperatorPrecedence$SN }), ({ "+": _UnaryExpressionEmitter$_setOperatorPrecedence$SN }), ({ "-": _UnaryExpressionEmitter$_setOperatorPrecedence$SN }), ({ "~": _UnaryExpressionEmitter$_setOperatorPrecedence$SN }), ({ "!": _UnaryExpressionEmitter$_setOperatorPrecedence$SN }) ], [ ({ "*": _BinaryNumberExpressionEmitter$_setOperatorPrecedence$SN }), ({ "/": _BinaryNumberExpressionEmitter$_setOperatorPrecedence$SN }), ({ "%": _BinaryNumberExpressionEmitter$_setOperatorPrecedence$SN }) ], [ ({ "+": _AdditiveExpressionEmitter$_setOperatorPrecedence$SN }), ({ "-": _BinaryNumberExpressionEmitter$_setOperatorPrecedence$SN }) ], [ ({ "<<": _ShiftExpressionEmitter$_setOperatorPrecedence$SN }), ({ ">>": _ShiftExpressionEmitter$_setOperatorPrecedence$SN }), ({ ">>>": _ShiftExpressionEmitter$_setOperatorPrecedence$SN }) ], [ ({ "<": _BinaryNumberExpressionEmitter$_setOperatorPrecedence$SN }), ({ ">": _BinaryNumberExpressionEmitter$_setOperatorPrecedence$SN }), ({ "<=": _BinaryNumberExpressionEmitter$_setOperatorPrecedence$SN }), ({ ">=": _BinaryNumberExpressionEmitter$_setOperatorPrecedence$SN }), ({ "instanceof": _InstanceofExpressionEmitter$_setOperatorPrecedence$SN }), ({ "in": _InExpressionEmitter$_setOperatorPrecedence$SN }) ], [ ({ "==": _EqualityExpressionEmitter$_setOperatorPrecedence$SN }), ({ "!=": _EqualityExpressionEmitter$_setOperatorPrecedence$SN }) ], [ ({ "&": _BinaryNumberExpressionEmitter$_setOperatorPrecedence$SN }) ], [ ({ "^": _BinaryNumberExpressionEmitter$_setOperatorPrecedence$SN }) ], [ ({ "|": _BinaryNumberExpressionEmitter$_setOperatorPrecedence$SN }) ], [ ({ "&&": _LogicalExpressionEmitter$_setOperatorPrecedence$SN }) ], [ ({ "||": _LogicalExpressionEmitter$_setOperatorPrecedence$SN }) ], [ ({ "=": _AssignmentExpressionEmitter$_setOperatorPrecedence$SN }), ({ "*=": _AssignmentExpressionEmitter$_setOperatorPrecedence$SN }), ({ "/=": _AssignmentExpressionEmitter$_setOperatorPrecedence$SN }), ({ "%=": _AssignmentExpressionEmitter$_setOperatorPrecedence$SN }), ({ "+=": _AssignmentExpressionEmitter$_setOperatorPrecedence$SN }), ({ "-=": _AssignmentExpressionEmitter$_setOperatorPrecedence$SN }), ({ "<<=": _AssignmentExpressionEmitter$_setOperatorPrecedence$SN }), ({ ">>=": _AssignmentExpressionEmitter$_setOperatorPrecedence$SN }), ({ ">>>=": _AssignmentExpressionEmitter$_setOperatorPrecedence$SN }), ({ "&=": _AssignmentExpressionEmitter$_setOperatorPrecedence$SN }), ({ "^=": _AssignmentExpressionEmitter$_setOperatorPrecedence$SN }), ({ "|=": _AssignmentExpressionEmitter$_setOperatorPrecedence$SN }) ], [ ({ "?": _ConditionalExpressionEmitter$_setOperatorPrecedence$SN }) ], [ ({ ",": _CommaExpressionEmitter$_setOperatorPrecedence$SN }) ] ];
 	for (i = 0; i < precedence.length; ++ i) {
 		opTypeList = precedence[i];
 		for (j = 0; j < opTypeList.length; ++ j) {
@@ -24539,7 +24802,7 @@ _UnclassifyOptimizationCommand.prototype._getClassesToUnclassify$ = function () 
 			var foundClassDefIndex;
 			if (! (expr != null)) {
 				debugger;
-				throw new Error("[src/optimizer.jsx:932:28] assertion failure\n                assert expr != null;\n                            ^^\n");
+				throw new Error("[src/optimizer.jsx:933:28] assertion failure\n                assert expr != null;\n                            ^^\n");
 			}
 			if (expr instanceof InstanceofExpression) {
 				foundClassDefIndex = candidates.indexOf(expr.getExpectedType$().getClassDef$());
@@ -27462,7 +27725,7 @@ function Compiler$LPlatform$(platform) {
 	this._optimizer = null;
 	this._warningFilters = [  ];
 	this._warningAsError = false;
-	this._parsers = [  ];
+	this._parsers = [];
 	this._fileCache = {};
 	this._searchPaths = [ this._platform.getRoot$() + "/lib/common" ];
 	this.addSourceFile$LToken$S(null, this._platform.getRoot$() + "/lib/built-in.jsx");
@@ -27587,12 +27850,15 @@ Compiler.prototype.findParser$S = function (path) {
  * @return {!boolean}
  */
 Compiler.prototype.compile$ = function () {
+	var $this = this;
 	/** @type {Array.<undefined|CompileError>} */
 	var errors;
 	/** @type {!number} */
 	var i;
 	/** @type {Parser} */
 	var builtins;
+	/** @type {CodeTransformer} */
+	var transformer;
 	errors = [];
 	for (i = 0; i < this._parsers.length; ++ i) {
 		if (! this.parseFile$ALCompileError$LParser$(errors, this._parsers[i])) {
@@ -27614,6 +27880,12 @@ Compiler.prototype.compile$ = function () {
 	NumberType._classDef = builtins.lookup$ALCompileError$LToken$S(errors, null, "Number");
 	StringType._classDef = builtins.lookup$ALCompileError$LToken$S(errors, null, "String");
 	FunctionType._classDef = builtins.lookup$ALCompileError$LToken$S(errors, null, "Function");
+	CodeTransformer.stopIterationType = new ObjectType$LClassDefinition$(builtins.lookup$ALCompileError$LToken$S(errors, null, "g_StopIteration"));
+	for (i = 0; i < builtins._templateClassDefs.length; ++ i) {
+		if (builtins._templateClassDefs[i].className$() === "__jsx_generator") {
+			CodeTransformer.jsxGeneratorClassDef = builtins._templateClassDefs[i];
+		}
+	}
 	if (! this._handleErrors$ALCompileError$(errors)) {
 		return false;
 	}
@@ -27631,6 +27903,15 @@ Compiler.prototype.compile$ = function () {
 	case Compiler.MODE_DOC:
 		return true;
 	}
+	transformer = new CodeTransformer$();
+	this.forEachClassDef$F$LParser$LClassDefinition$B$((function (parser, classDef) {
+		return classDef.forEachMemberFunction$F$LMemberFunctionDefinition$B$((function onFuncDef(funcDef) {
+			if (funcDef.isGenerator$()) {
+				transformer.transformFunctionDefinition$LMemberFunctionDefinition$(funcDef);
+			}
+			return funcDef.forEachClosure$F$LMemberFunctionDefinition$B$(onFuncDef);
+		}));
+	}));
 	this._optimize$();
 	this._generateCode$ALCompileError$(errors);
 	if (! this._handleErrors$ALCompileError$(errors)) {
@@ -27663,7 +27944,7 @@ Compiler.prototype.getAST$ = function () {
 Compiler.prototype.getFileContent$ALCompileError$LToken$S = function (errors, sourceToken, path) {
 	if (! (path !== "")) {
 		debugger;
-		throw new Error("[src/compiler.jsx:185:20] assertion failure\n        assert path != \"\";\n                    ^^\n");
+		throw new Error("[src/compiler.jsx:202:20] assertion failure\n        assert path != \"\";\n                    ^^\n");
 	}
 	if (this._fileCache[path] == null) {
 		try {
@@ -27918,7 +28199,7 @@ Compiler.prototype._generateCode$ALCompileError$ = function (errors) {
 		var i;
 		/** @type {!number} */
 		var j;
-		deps = deps.concat([]);
+		deps = deps.concat([  ]);
 		if (deps.length === 0) {
 			return - 1;
 		}
@@ -27937,7 +28218,7 @@ Compiler.prototype._generateCode$ALCompileError$ = function (errors) {
 	for (i = 0; i < classDefs.length; ) {
 		deps = classDefs[i].implementTypes$().map((function (t) {
 			return t.getClassDef$();
-		})).concat([]);
+		})).concat([  ]);
 		if (classDefs[i].extendType$() != null) {
 			deps.unshift(classDefs[i].extendType$().getClassDef$());
 		}
@@ -27983,10 +28264,8 @@ Compiler.prototype._generateCode$ALCompileError$ = function (errors) {
 		}
 	}
 	for (i = 0; i < classDefs.length; ++ i) {
-		if ((classDefs[i].flags$() & ClassDefinition.IS_NATIVE) === 0) {
-			escapedClassName = classDefs[i].getOutputClassName$().replace(/\.</g, "$$").replace(/>/g, "$E").replace(/[^A-Za-z0-9_]/g, "$");
-			classDefs[i].setOutputClassName$S(escapedClassName);
-		}
+		escapedClassName = classDefs[i].getOutputClassName$().replace(/\.</g, "$$").replace(/>/g, "$E").replace(/[^A-Za-z0-9_]/g, "$");
+		classDefs[i].setOutputClassName$S(escapedClassName);
 	}
 	this._emitter.emit$ALClassDefinition$(classDefs);
 };
@@ -29328,6 +29607,1527 @@ DocumentGenerator.prototype._isPrivate$LMemberDefinition$ = function (memberDef)
 };
 
 /**
+ * class _StatementTransformer extends Object
+ * @constructor
+ */
+function _StatementTransformer() {
+}
+
+/**
+ * @constructor
+ * @param {CodeTransformer} transformer
+ * @param {!string} identifier
+ */
+function _StatementTransformer$LCodeTransformer$S(transformer, identifier) {
+	this._id = 0;
+	this._transformer = transformer;
+	if (_StatementTransformer._statementCountMap[identifier] == null) {
+		_StatementTransformer._statementCountMap[identifier] = 0;
+	}
+	this._id = _StatementTransformer._statementCountMap[identifier]++;
+};
+
+_StatementTransformer$LCodeTransformer$S.prototype = new _StatementTransformer;
+
+/**
+ * @return {!number}
+ */
+_StatementTransformer.prototype.getID$ = function () {
+	return this._id;
+};
+
+/**
+ * class _ConstructorInvocationStatementTransformer extends _StatementTransformer
+ * @constructor
+ */
+function _ConstructorInvocationStatementTransformer() {
+}
+
+_ConstructorInvocationStatementTransformer.prototype = new _StatementTransformer;
+/**
+ * @constructor
+ * @param {CodeTransformer} transformer
+ * @param {ConstructorInvocationStatement} statement
+ */
+function _ConstructorInvocationStatementTransformer$LCodeTransformer$LConstructorInvocationStatement$(transformer, statement) {
+	_StatementTransformer$LCodeTransformer$S.call(this, transformer, "CONSTRUCTOR-INVOCATION");
+	this._statement = statement;
+};
+
+_ConstructorInvocationStatementTransformer$LCodeTransformer$LConstructorInvocationStatement$.prototype = new _ConstructorInvocationStatementTransformer;
+
+/**
+ * @return {Statement}
+ */
+_ConstructorInvocationStatementTransformer.prototype.getStatement$ = function () {
+	return this._statement;
+};
+
+/**
+ * @return {Array.<undefined|Statement>}
+ */
+_ConstructorInvocationStatementTransformer.prototype.replaceControlStructuresWithGotos$ = function () {
+	return [ this._statement ];
+};
+
+/**
+ * class _ExpressionStatementTransformer extends _StatementTransformer
+ * @constructor
+ */
+function _ExpressionStatementTransformer() {
+}
+
+_ExpressionStatementTransformer.prototype = new _StatementTransformer;
+/**
+ * @constructor
+ * @param {CodeTransformer} transformer
+ * @param {ExpressionStatement} statement
+ */
+function _ExpressionStatementTransformer$LCodeTransformer$LExpressionStatement$(transformer, statement) {
+	_StatementTransformer$LCodeTransformer$S.call(this, transformer, "EXPRESSION");
+	this._statement = statement;
+};
+
+_ExpressionStatementTransformer$LCodeTransformer$LExpressionStatement$.prototype = new _ExpressionStatementTransformer;
+
+/**
+ * @return {Statement}
+ */
+_ExpressionStatementTransformer.prototype.getStatement$ = function () {
+	return this._statement;
+};
+
+/**
+ * @return {Array.<undefined|Statement>}
+ */
+_ExpressionStatementTransformer.prototype.replaceControlStructuresWithGotos$ = function () {
+	return [ this._statement ];
+};
+
+/**
+ * class _FunctionStatementTransformer extends _StatementTransformer
+ * @constructor
+ */
+function _FunctionStatementTransformer() {
+}
+
+_FunctionStatementTransformer.prototype = new _StatementTransformer;
+/**
+ * @constructor
+ * @param {CodeTransformer} transformer
+ * @param {FunctionStatement} statement
+ */
+function _FunctionStatementTransformer$LCodeTransformer$LFunctionStatement$(transformer, statement) {
+	_StatementTransformer$LCodeTransformer$S.call(this, transformer, "FUNCTION");
+	this._statement = statement;
+};
+
+_FunctionStatementTransformer$LCodeTransformer$LFunctionStatement$.prototype = new _FunctionStatementTransformer;
+
+/**
+ * @return {Statement}
+ */
+_FunctionStatementTransformer.prototype.getStatement$ = function () {
+	return this._statement;
+};
+
+/**
+ * @return {Array.<undefined|Statement>}
+ */
+_FunctionStatementTransformer.prototype.replaceControlStructuresWithGotos$ = function () {
+	return [ this._statement ];
+};
+
+/**
+ * class _ReturnStatementTransformer extends _StatementTransformer
+ * @constructor
+ */
+function _ReturnStatementTransformer() {
+}
+
+_ReturnStatementTransformer.prototype = new _StatementTransformer;
+/**
+ * @constructor
+ * @param {CodeTransformer} transformer
+ * @param {ReturnStatement} statement
+ */
+function _ReturnStatementTransformer$LCodeTransformer$LReturnStatement$(transformer, statement) {
+	_StatementTransformer$LCodeTransformer$S.call(this, transformer, "RETURN");
+	this._statement = statement;
+};
+
+_ReturnStatementTransformer$LCodeTransformer$LReturnStatement$.prototype = new _ReturnStatementTransformer;
+
+/**
+ * @return {Statement}
+ */
+_ReturnStatementTransformer.prototype.getStatement$ = function () {
+	return this._statement;
+};
+
+/**
+ * @return {Array.<undefined|Statement>}
+ */
+_ReturnStatementTransformer.prototype.replaceControlStructuresWithGotos$ = function () {
+	throw new Error("logic flaw");
+};
+
+/**
+ * class _YieldStatementTransformer extends _StatementTransformer
+ * @constructor
+ */
+function _YieldStatementTransformer() {
+}
+
+_YieldStatementTransformer.prototype = new _StatementTransformer;
+/**
+ * @constructor
+ * @param {CodeTransformer} transformer
+ * @param {YieldStatement} statement
+ */
+function _YieldStatementTransformer$LCodeTransformer$LYieldStatement$(transformer, statement) {
+	_StatementTransformer$LCodeTransformer$S.call(this, transformer, "YIELD");
+	this._index = 0;
+	this._statement = statement;
+};
+
+_YieldStatementTransformer$LCodeTransformer$LYieldStatement$.prototype = new _YieldStatementTransformer;
+
+/**
+ * @return {Statement}
+ */
+_YieldStatementTransformer.prototype.getStatement$ = function () {
+	return this._statement;
+};
+
+/**
+ * @return {Array.<undefined|Statement>}
+ */
+_YieldStatementTransformer.prototype.replaceControlStructuresWithGotos$ = function () {
+	/** @type {Array.<undefined|Statement>} */
+	var statements;
+	/** @type {!string} */
+	var label;
+	statements = [];
+	statements.push(this._statement);
+	label = "$YIELD_" + (this.getID$() + "");
+	statements.push(new GotoStatement$S(label));
+	statements.push(new LabelStatement$S(label));
+	return statements;
+};
+
+/**
+ * class _DeleteStatementTransformer extends _StatementTransformer
+ * @constructor
+ */
+function _DeleteStatementTransformer() {
+}
+
+_DeleteStatementTransformer.prototype = new _StatementTransformer;
+/**
+ * @constructor
+ * @param {CodeTransformer} transformer
+ * @param {DeleteStatement} statement
+ */
+function _DeleteStatementTransformer$LCodeTransformer$LDeleteStatement$(transformer, statement) {
+	_StatementTransformer$LCodeTransformer$S.call(this, transformer, "DELETE");
+	this._statement = statement;
+};
+
+_DeleteStatementTransformer$LCodeTransformer$LDeleteStatement$.prototype = new _DeleteStatementTransformer;
+
+/**
+ * @return {Statement}
+ */
+_DeleteStatementTransformer.prototype.getStatement$ = function () {
+	return this._statement;
+};
+
+/**
+ * @return {Array.<undefined|Statement>}
+ */
+_DeleteStatementTransformer.prototype.replaceControlStructuresWithGotos$ = function () {
+	return [ this._statement ];
+};
+
+/**
+ * class _BreakStatementTransformer extends _StatementTransformer
+ * @constructor
+ */
+function _BreakStatementTransformer() {
+}
+
+_BreakStatementTransformer.prototype = new _StatementTransformer;
+/**
+ * @constructor
+ * @param {CodeTransformer} transformer
+ * @param {BreakStatement} statement
+ */
+function _BreakStatementTransformer$LCodeTransformer$LBreakStatement$(transformer, statement) {
+	_StatementTransformer$LCodeTransformer$S.call(this, transformer, "BREAK");
+	this._statement = statement;
+};
+
+_BreakStatementTransformer$LCodeTransformer$LBreakStatement$.prototype = new _BreakStatementTransformer;
+
+/**
+ * @return {Statement}
+ */
+_BreakStatementTransformer.prototype.getStatement$ = function () {
+	return this._statement;
+};
+
+/**
+ * @return {Array.<undefined|Statement>}
+ */
+_BreakStatementTransformer.prototype.replaceControlStructuresWithGotos$ = function () {
+	/** @type {_LabellableStatementTransformer} */
+	var trans;
+	if (this._statement.getLabel$() != null) {
+		trans = this._transformer.findLabellableStatementTransformerByLabel$S(this._statement.getLabel$().getValue$());
+	} else {
+		trans = this._transformer.getInnermostLabellableStatementTransformer$();
+	}
+	return [ new GotoStatement$S(trans.getBreakingLabel$()) ];
+};
+
+/**
+ * class _ContinueStatementTransformer extends _StatementTransformer
+ * @constructor
+ */
+function _ContinueStatementTransformer() {
+}
+
+_ContinueStatementTransformer.prototype = new _StatementTransformer;
+/**
+ * @constructor
+ * @param {CodeTransformer} transformer
+ * @param {ContinueStatement} statement
+ */
+function _ContinueStatementTransformer$LCodeTransformer$LContinueStatement$(transformer, statement) {
+	_StatementTransformer$LCodeTransformer$S.call(this, transformer, "CONTINUE");
+	this._statement = statement;
+};
+
+_ContinueStatementTransformer$LCodeTransformer$LContinueStatement$.prototype = new _ContinueStatementTransformer;
+
+/**
+ * @return {Statement}
+ */
+_ContinueStatementTransformer.prototype.getStatement$ = function () {
+	return this._statement;
+};
+
+/**
+ * @return {Array.<undefined|Statement>}
+ */
+_ContinueStatementTransformer.prototype.replaceControlStructuresWithGotos$ = function () {
+	/** @type {_LabellableStatementTransformer} */
+	var trans;
+	if (this._statement.getLabel$() != null) {
+		trans = this._transformer.findLabellableStatementTransformerByLabel$S(this._statement.getLabel$().getValue$());
+	} else {
+		trans = this._transformer.getInnermostLabellableStatementTransformer$();
+	}
+	return [ new GotoStatement$S(trans.getContinuingLabel$()) ];
+};
+
+/**
+ * class _LabellableStatementTransformer extends _StatementTransformer
+ * @constructor
+ */
+function _LabellableStatementTransformer() {
+}
+
+_LabellableStatementTransformer.prototype = new _StatementTransformer;
+/**
+ * @constructor
+ * @param {CodeTransformer} transformer
+ * @param {!string} identifier
+ */
+function _LabellableStatementTransformer$LCodeTransformer$S(transformer, identifier) {
+	_StatementTransformer$LCodeTransformer$S.call(this, transformer, identifier);
+};
+
+_LabellableStatementTransformer$LCodeTransformer$S.prototype = new _LabellableStatementTransformer;
+
+/**
+ * class _DoWhileStatementTransformer extends _LabellableStatementTransformer
+ * @constructor
+ */
+function _DoWhileStatementTransformer() {
+}
+
+_DoWhileStatementTransformer.prototype = new _LabellableStatementTransformer;
+/**
+ * @constructor
+ * @param {CodeTransformer} transformer
+ * @param {DoWhileStatement} statement
+ */
+function _DoWhileStatementTransformer$LCodeTransformer$LDoWhileStatement$(transformer, statement) {
+	_LabellableStatementTransformer$LCodeTransformer$S.call(this, transformer, "DO-WHILE");
+	this._index = 0;
+	this._statement = statement;
+};
+
+_DoWhileStatementTransformer$LCodeTransformer$LDoWhileStatement$.prototype = new _DoWhileStatementTransformer;
+
+/**
+ * @return {Statement}
+ */
+_DoWhileStatementTransformer.prototype.getStatement$ = function () {
+	return this._statement;
+};
+
+/**
+ * @return {Array.<undefined|Statement>}
+ */
+_DoWhileStatementTransformer.prototype.replaceControlStructuresWithGotos$ = function () {
+	/** @type {Array.<undefined|Statement>} */
+	var statements;
+	/** @type {!string} */
+	var bodyLabel;
+	/** @type {!string} */
+	var testLabel;
+	/** @type {!string} */
+	var endLabel;
+	statements = [];
+	bodyLabel = "$BODY_DO_WHILE_" + (this.getID$() + "");
+	statements.push(new GotoStatement$S(bodyLabel));
+	statements.push(new LabelStatement$S(bodyLabel));
+	this._transformer.enterLabelledBlock$L_LabellableStatementTransformer$(this);
+	this._transformer.convertAndPushStatements$ALStatement$ALStatement$(this._statement.getStatements$(), statements);
+	this._transformer.leaveLabelledBlock$();
+	testLabel = "$TEST_DO_WHILE_" + (this.getID$() + "");
+	statements.push(new GotoStatement$S(testLabel));
+	statements.push(new LabelStatement$S(testLabel));
+	endLabel = "$END_DO_WHILE_" + (this.getID$() + "");
+	this._transformer.pushConditionalBranch$LExpression$SSALStatement$(this._statement.getExpr$(), bodyLabel, endLabel, statements);
+	statements.push(new LabelStatement$S(endLabel));
+	return statements;
+};
+
+/**
+ * @return {!string}
+ */
+_DoWhileStatementTransformer.prototype.getBreakingLabel$ = function () {
+	return "$END_DO_WHILE_" + (this.getID$() + "");
+};
+
+/**
+ * @return {!string}
+ */
+_DoWhileStatementTransformer.prototype.getContinuingLabel$ = function () {
+	return "$BODY_DO_WHILE_" + (this.getID$() + "");
+};
+
+/**
+ * class _ForInStatementTransformer extends _LabellableStatementTransformer
+ * @constructor
+ */
+function _ForInStatementTransformer() {
+}
+
+_ForInStatementTransformer.prototype = new _LabellableStatementTransformer;
+/**
+ * @constructor
+ * @param {CodeTransformer} transformer
+ * @param {ForInStatement} statement
+ */
+function _ForInStatementTransformer$LCodeTransformer$LForInStatement$(transformer, statement) {
+	_LabellableStatementTransformer$LCodeTransformer$S.call(this, transformer, "FOR-IN");
+	this._statement = statement;
+};
+
+_ForInStatementTransformer$LCodeTransformer$LForInStatement$.prototype = new _ForInStatementTransformer;
+
+/**
+ * @return {Statement}
+ */
+_ForInStatementTransformer.prototype.getStatement$ = function () {
+	return this._statement;
+};
+
+/**
+ * @return {Array.<undefined|Statement>}
+ */
+_ForInStatementTransformer.prototype.replaceControlStructuresWithGotos$ = function () {
+	throw new Error("logic flaw");
+};
+
+/**
+ * @return {!string}
+ */
+_ForInStatementTransformer.prototype.getBreakingLabel$ = function () {
+	throw new Error("logic flaw");
+};
+
+/**
+ * @return {!string}
+ */
+_ForInStatementTransformer.prototype.getContinuingLabel$ = function () {
+	throw new Error("logic flaw");
+};
+
+/**
+ * class _ForStatementTransformer extends _LabellableStatementTransformer
+ * @constructor
+ */
+function _ForStatementTransformer() {
+}
+
+_ForStatementTransformer.prototype = new _LabellableStatementTransformer;
+/**
+ * @constructor
+ * @param {CodeTransformer} transformer
+ * @param {ForStatement} statement
+ */
+function _ForStatementTransformer$LCodeTransformer$LForStatement$(transformer, statement) {
+	_LabellableStatementTransformer$LCodeTransformer$S.call(this, transformer, "FOR");
+	this._index = 0;
+	this._statement = statement;
+};
+
+_ForStatementTransformer$LCodeTransformer$LForStatement$.prototype = new _ForStatementTransformer;
+
+/**
+ * @return {Statement}
+ */
+_ForStatementTransformer.prototype.getStatement$ = function () {
+	return this._statement;
+};
+
+/**
+ * @return {Array.<undefined|Statement>}
+ */
+_ForStatementTransformer.prototype.replaceControlStructuresWithGotos$ = function () {
+	/** @type {Array.<undefined|Statement>} */
+	var statements;
+	/** @type {!string} */
+	var initLabel;
+	/** @type {!string} */
+	var testLabel;
+	/** @type {!string} */
+	var bodyLabel;
+	/** @type {!string} */
+	var endLabel;
+	/** @type {!string} */
+	var postLabel;
+	statements = [];
+	initLabel = "$INIT_FOR_" + (this.getID$() + "");
+	statements.push(new GotoStatement$S(initLabel));
+	statements.push(new LabelStatement$S(initLabel));
+	this._transformer.pushExpressionStatement$LExpression$ALStatement$(this._statement.getInitExpr$(), statements);
+	testLabel = "$TEST_FOR_" + (this.getID$() + "");
+	statements.push(new GotoStatement$S(testLabel));
+	statements.push(new LabelStatement$S(testLabel));
+	bodyLabel = "$BODY_FOR_" + (this.getID$() + "");
+	endLabel = "$END_FOR_" + (this.getID$() + "");
+	this._transformer.pushConditionalBranch$LExpression$SSALStatement$(this._statement.getCondExpr$(), bodyLabel, endLabel, statements);
+	statements.push(new LabelStatement$S(bodyLabel));
+	this._transformer.enterLabelledBlock$L_LabellableStatementTransformer$(this);
+	this._transformer.convertAndPushStatements$ALStatement$ALStatement$(this._statement.getStatements$(), statements);
+	this._transformer.leaveLabelledBlock$();
+	postLabel = "$POST_FOR_" + (this.getID$() + "");
+	statements.push(new GotoStatement$S(postLabel));
+	statements.push(new LabelStatement$S(postLabel));
+	this._transformer.pushExpressionStatement$LExpression$ALStatement$(this._statement.getPostExpr$(), statements);
+	statements.push(new GotoStatement$S(testLabel));
+	statements.push(new LabelStatement$S(endLabel));
+	return statements;
+};
+
+/**
+ * @return {!string}
+ */
+_ForStatementTransformer.prototype.getBreakingLabel$ = function () {
+	return "$END_FOR_" + (this.getID$() + "");
+};
+
+/**
+ * @return {!string}
+ */
+_ForStatementTransformer.prototype.getContinuingLabel$ = function () {
+	return "$POST_FOR_" + (this.getID$() + "");
+};
+
+/**
+ * class _IfStatementTransformer extends _StatementTransformer
+ * @constructor
+ */
+function _IfStatementTransformer() {
+}
+
+_IfStatementTransformer.prototype = new _StatementTransformer;
+/**
+ * @constructor
+ * @param {CodeTransformer} transformer
+ * @param {IfStatement} statement
+ */
+function _IfStatementTransformer$LCodeTransformer$LIfStatement$(transformer, statement) {
+	_StatementTransformer$LCodeTransformer$S.call(this, transformer, "IF");
+	this._statement = statement;
+};
+
+_IfStatementTransformer$LCodeTransformer$LIfStatement$.prototype = new _IfStatementTransformer;
+
+/**
+ * @return {Statement}
+ */
+_IfStatementTransformer.prototype.getStatement$ = function () {
+	return this._statement;
+};
+
+/**
+ * @return {Array.<undefined|Statement>}
+ */
+_IfStatementTransformer.prototype.replaceControlStructuresWithGotos$ = function () {
+	/** @type {Array.<undefined|Statement>} */
+	var statements;
+	/** @type {!string} */
+	var testLabel;
+	/** @type {!string} */
+	var succLabel;
+	/** @type {!string} */
+	var failLabel;
+	/** @type {!string} */
+	var endLabel;
+	statements = [];
+	testLabel = "$TEST_IF_" + (this.getID$() + "");
+	succLabel = "$SUCC_IF_" + (this.getID$() + "");
+	failLabel = "$FAIL_IF_" + (this.getID$() + "");
+	statements.push(new GotoStatement$S(testLabel));
+	statements.push(new LabelStatement$S(testLabel));
+	this._transformer.pushConditionalBranch$LExpression$SSALStatement$(this._statement.getExpr$(), succLabel, failLabel, statements);
+	statements.push(new LabelStatement$S(succLabel));
+	this._transformer.convertAndPushStatements$ALStatement$ALStatement$(this._statement.getOnTrueStatements$(), statements);
+	endLabel = "$END_IF_" + (this.getID$() + "");
+	statements.push(new GotoStatement$S(endLabel));
+	statements.push(new LabelStatement$S(failLabel));
+	this._transformer.convertAndPushStatements$ALStatement$ALStatement$(this._statement.getOnFalseStatements$(), statements);
+	statements.push(new GotoStatement$S(endLabel));
+	statements.push(new LabelStatement$S(endLabel));
+	return statements;
+};
+
+/**
+ * class _SwitchStatementTransformer extends _LabellableStatementTransformer
+ * @constructor
+ */
+function _SwitchStatementTransformer() {
+}
+
+_SwitchStatementTransformer.prototype = new _LabellableStatementTransformer;
+/**
+ * @constructor
+ * @param {CodeTransformer} transformer
+ * @param {SwitchStatement} statement
+ */
+function _SwitchStatementTransformer$LCodeTransformer$LSwitchStatement$(transformer, statement) {
+	_LabellableStatementTransformer$LCodeTransformer$S.call(this, transformer, "SWITCH");
+	this._index = 0;
+	this._statement = statement;
+};
+
+_SwitchStatementTransformer$LCodeTransformer$LSwitchStatement$.prototype = new _SwitchStatementTransformer;
+
+/**
+ * @return {Statement}
+ */
+_SwitchStatementTransformer.prototype.getStatement$ = function () {
+	return this._statement;
+};
+
+/**
+ * @return {Array.<undefined|Statement>}
+ */
+_SwitchStatementTransformer.prototype.replaceControlStructuresWithGotos$ = function () {
+	/** @type {Array.<undefined|Statement>} */
+	var statements;
+	/** @type {!string} */
+	var testLabel;
+	/** @type {!string} */
+	var endLabel;
+	statements = [];
+	testLabel = "$TEST_SWITCH_" + (this.getID$() + "");
+	statements.push(new GotoStatement$S(testLabel));
+	statements.push(new LabelStatement$S(testLabel));
+	this._pushConditionalSwitch$ALStatement$(statements);
+	endLabel = "$END_SWITCH_" + (this.getID$() + "");
+	statements.push(new GotoStatement$S(endLabel));
+	this._pushSwitchBody$ALStatement$(statements);
+	statements.push(new LabelStatement$S(endLabel));
+	return statements;
+};
+
+/**
+ * @param {Array.<undefined|Statement>} output
+ */
+_SwitchStatementTransformer.prototype._pushConditionalSwitch$ALStatement$ = function (output) {
+	/** @type {Array.<undefined|Statement>} */
+	var statements;
+	/** @type {Array.<undefined|Statement>} */
+	var switchCases;
+	/** @type {!number} */
+	var i;
+	/** @type {Statement} */
+	var stmt;
+	/** @type {SwitchStatement} */
+	var condSwitch;
+	statements = this._statement.getStatements$();
+	switchCases = [];
+	for (i = 0; i < statements.length; ++ i) {
+		stmt = statements[i];
+		if (stmt instanceof CaseStatement) {
+			switchCases.push(stmt);
+			switchCases.push(new GotoStatement$S(this._getLabelFromCaseStatement$LCaseStatement$(stmt)));
+			switchCases.push(new ReturnStatement$LToken$LExpression$(new Token$SB("return", false), null));
+		} else {
+			if (stmt instanceof DefaultStatement) {
+				switchCases.push(stmt);
+				switchCases.push(new GotoStatement$S(this._getLabelFromDefaultStatement$()));
+				switchCases.push(new ReturnStatement$LToken$LExpression$(new Token$SB("return", false), null));
+			}
+		}
+	}
+	condSwitch = this._statement.clone$();
+	condSwitch._statements = switchCases;
+	output.push(condSwitch);
+};
+
+/**
+ * @param {Array.<undefined|Statement>} output
+ */
+_SwitchStatementTransformer.prototype._pushSwitchBody$ALStatement$ = function (output) {
+	/** @type {Array.<undefined|Statement>} */
+	var statements;
+	/** @type {!number} */
+	var i;
+	/** @type {Statement} */
+	var stmt;
+	/** @type {!string} */
+	var label;
+	statements = this._statement.getStatements$();
+	this._transformer.enterLabelledBlock$L_LabellableStatementTransformer$(this);
+	for (i = 0; i < statements.length; ++ i) {
+		stmt = statements[i];
+		if (stmt instanceof CaseStatement) {
+			label = this._getLabelFromCaseStatement$LCaseStatement$(stmt);
+			output.push(new GotoStatement$S(label));
+			output.push(new LabelStatement$S(label));
+		} else {
+			if (stmt instanceof DefaultStatement) {
+				label = this._getLabelFromDefaultStatement$();
+				output.push(new GotoStatement$S(label));
+				output.push(new LabelStatement$S(label));
+			} else {
+				this._transformer.convertAndPushStatement$LStatement$ALStatement$(stmt, output);
+			}
+		}
+	}
+	this._transformer.leaveLabelledBlock$();
+};
+
+/**
+ * @param {CaseStatement} caseStmt
+ * @return {!string}
+ */
+_SwitchStatementTransformer.prototype._getLabelFromCaseStatement$LCaseStatement$ = function (caseStmt) {
+	return "$SWITCH_" + (this.getID$() + "") + "_CASE_" + caseStmt.getExpr$().getToken$().getValue$();
+};
+
+/**
+ * @return {!string}
+ */
+_SwitchStatementTransformer.prototype._getLabelFromDefaultStatement$ = function () {
+	return "$SWITCH_" + (this.getID$() + "") + "_DEFAULT";
+};
+
+/**
+ * @return {!string}
+ */
+_SwitchStatementTransformer.prototype.getBreakingLabel$ = function () {
+	return "$END_SWITCH_" + (this.getID$() + "");
+};
+
+/**
+ * @return {!string}
+ */
+_SwitchStatementTransformer.prototype.getContinuingLabel$ = function () {
+	throw new Error("logic flaw");
+};
+
+/**
+ * class _CaseStatementTransformer extends _StatementTransformer
+ * @constructor
+ */
+function _CaseStatementTransformer() {
+}
+
+_CaseStatementTransformer.prototype = new _StatementTransformer;
+/**
+ * @constructor
+ * @param {CodeTransformer} transformer
+ * @param {CaseStatement} statement
+ */
+function _CaseStatementTransformer$LCodeTransformer$LCaseStatement$(transformer, statement) {
+	_StatementTransformer$LCodeTransformer$S.call(this, transformer, "CASE");
+	this._statement = statement;
+};
+
+_CaseStatementTransformer$LCodeTransformer$LCaseStatement$.prototype = new _CaseStatementTransformer;
+
+/**
+ * @return {Statement}
+ */
+_CaseStatementTransformer.prototype.getStatement$ = function () {
+	return this._statement;
+};
+
+/**
+ * @return {Array.<undefined|Statement>}
+ */
+_CaseStatementTransformer.prototype.replaceControlStructuresWithGotos$ = function () {
+	throw new Error("logic flaw");
+};
+
+/**
+ * class _DefaultStatementTransformer extends _StatementTransformer
+ * @constructor
+ */
+function _DefaultStatementTransformer() {
+}
+
+_DefaultStatementTransformer.prototype = new _StatementTransformer;
+/**
+ * @constructor
+ * @param {CodeTransformer} transformer
+ * @param {DefaultStatement} statement
+ */
+function _DefaultStatementTransformer$LCodeTransformer$LDefaultStatement$(transformer, statement) {
+	_StatementTransformer$LCodeTransformer$S.call(this, transformer, "DEFAULT");
+	this._statement = statement;
+};
+
+_DefaultStatementTransformer$LCodeTransformer$LDefaultStatement$.prototype = new _DefaultStatementTransformer;
+
+/**
+ * @return {Statement}
+ */
+_DefaultStatementTransformer.prototype.getStatement$ = function () {
+	return this._statement;
+};
+
+/**
+ * @return {Array.<undefined|Statement>}
+ */
+_DefaultStatementTransformer.prototype.replaceControlStructuresWithGotos$ = function () {
+	throw new Error("logic flaw");
+};
+
+/**
+ * class _WhileStatementTransformer extends _LabellableStatementTransformer
+ * @constructor
+ */
+function _WhileStatementTransformer() {
+}
+
+_WhileStatementTransformer.prototype = new _LabellableStatementTransformer;
+/**
+ * @constructor
+ * @param {CodeTransformer} transformer
+ * @param {WhileStatement} statement
+ */
+function _WhileStatementTransformer$LCodeTransformer$LWhileStatement$(transformer, statement) {
+	_LabellableStatementTransformer$LCodeTransformer$S.call(this, transformer, "WHILE");
+	this._statement = statement;
+};
+
+_WhileStatementTransformer$LCodeTransformer$LWhileStatement$.prototype = new _WhileStatementTransformer;
+
+/**
+ * @return {Statement}
+ */
+_WhileStatementTransformer.prototype.getStatement$ = function () {
+	return this._statement;
+};
+
+/**
+ * @return {Array.<undefined|Statement>}
+ */
+_WhileStatementTransformer.prototype.replaceControlStructuresWithGotos$ = function () {
+	/** @type {Array.<undefined|Statement>} */
+	var statements;
+	/** @type {!string} */
+	var testLabel;
+	/** @type {!string} */
+	var bodyLabel;
+	/** @type {!string} */
+	var endLabel;
+	statements = [];
+	testLabel = "$TEST_WHILE_" + (this.getID$() + "");
+	statements.push(new GotoStatement$S(testLabel));
+	statements.push(new LabelStatement$S(testLabel));
+	bodyLabel = "$BODY_WHILE_" + (this.getID$() + "");
+	endLabel = "$END_WHILE_" + (this.getID$() + "");
+	this._transformer.pushConditionalBranch$LExpression$SSALStatement$(this._statement.getExpr$(), bodyLabel, endLabel, statements);
+	statements.push(new LabelStatement$S(bodyLabel));
+	this._transformer.enterLabelledBlock$L_LabellableStatementTransformer$(this);
+	this._transformer.convertAndPushStatements$ALStatement$ALStatement$(this._statement.getStatements$(), statements);
+	this._transformer.leaveLabelledBlock$();
+	statements.push(new GotoStatement$S(testLabel));
+	statements.push(new LabelStatement$S(endLabel));
+	return statements;
+};
+
+/**
+ * @return {!string}
+ */
+_WhileStatementTransformer.prototype.getBreakingLabel$ = function () {
+	return "$END_WHILE_" + (this.getID$() + "");
+};
+
+/**
+ * @return {!string}
+ */
+_WhileStatementTransformer.prototype.getContinuingLabel$ = function () {
+	return "$TEST_WHILE_" + (this.getID$() + "");
+};
+
+/**
+ * class _TryStatementTransformer extends _StatementTransformer
+ * @constructor
+ */
+function _TryStatementTransformer() {
+}
+
+_TryStatementTransformer.prototype = new _StatementTransformer;
+/**
+ * @constructor
+ * @param {CodeTransformer} transformer
+ * @param {TryStatement} statement
+ */
+function _TryStatementTransformer$LCodeTransformer$LTryStatement$(transformer, statement) {
+	_StatementTransformer$LCodeTransformer$S.call(this, transformer, "TRY");
+	this._statement = statement;
+};
+
+_TryStatementTransformer$LCodeTransformer$LTryStatement$.prototype = new _TryStatementTransformer;
+
+/**
+ * @return {Statement}
+ */
+_TryStatementTransformer.prototype.getStatement$ = function () {
+	return this._statement;
+};
+
+/**
+ * @return {Array.<undefined|Statement>}
+ */
+_TryStatementTransformer.prototype.replaceControlStructuresWithGotos$ = function () {
+	throw new Error("logic flaw");
+};
+
+/**
+ * class _CatchStatementTransformer extends _StatementTransformer
+ * @constructor
+ */
+function _CatchStatementTransformer() {
+}
+
+_CatchStatementTransformer.prototype = new _StatementTransformer;
+/**
+ * @constructor
+ * @param {CodeTransformer} transformer
+ * @param {CatchStatement} statement
+ */
+function _CatchStatementTransformer$LCodeTransformer$LCatchStatement$(transformer, statement) {
+	_StatementTransformer$LCodeTransformer$S.call(this, transformer, "CATCH");
+	this._statement = statement;
+};
+
+_CatchStatementTransformer$LCodeTransformer$LCatchStatement$.prototype = new _CatchStatementTransformer;
+
+/**
+ * @return {Statement}
+ */
+_CatchStatementTransformer.prototype.getStatement$ = function () {
+	return this._statement;
+};
+
+/**
+ * @return {Array.<undefined|Statement>}
+ */
+_CatchStatementTransformer.prototype.replaceControlStructuresWithGotos$ = function () {
+	throw new Error("logic flaw");
+};
+
+/**
+ * class _ThrowStatementTransformer extends _StatementTransformer
+ * @constructor
+ */
+function _ThrowStatementTransformer() {
+}
+
+_ThrowStatementTransformer.prototype = new _StatementTransformer;
+/**
+ * @constructor
+ * @param {CodeTransformer} transformer
+ * @param {ThrowStatement} statement
+ */
+function _ThrowStatementTransformer$LCodeTransformer$LThrowStatement$(transformer, statement) {
+	_StatementTransformer$LCodeTransformer$S.call(this, transformer, "THROW");
+	this._statement = statement;
+};
+
+_ThrowStatementTransformer$LCodeTransformer$LThrowStatement$.prototype = new _ThrowStatementTransformer;
+
+/**
+ * @return {Statement}
+ */
+_ThrowStatementTransformer.prototype.getStatement$ = function () {
+	return this._statement;
+};
+
+/**
+ * @return {Array.<undefined|Statement>}
+ */
+_ThrowStatementTransformer.prototype.replaceControlStructuresWithGotos$ = function () {
+	return [ this._statement ];
+};
+
+/**
+ * class _AssertStatementTransformer extends _StatementTransformer
+ * @constructor
+ */
+function _AssertStatementTransformer() {
+}
+
+_AssertStatementTransformer.prototype = new _StatementTransformer;
+/**
+ * @constructor
+ * @param {CodeTransformer} transformer
+ * @param {AssertStatement} statement
+ */
+function _AssertStatementTransformer$LCodeTransformer$LAssertStatement$(transformer, statement) {
+	_StatementTransformer$LCodeTransformer$S.call(this, transformer, "ASSERT");
+	this._statement = statement;
+};
+
+_AssertStatementTransformer$LCodeTransformer$LAssertStatement$.prototype = new _AssertStatementTransformer;
+
+/**
+ * @return {Statement}
+ */
+_AssertStatementTransformer.prototype.getStatement$ = function () {
+	return this._statement;
+};
+
+/**
+ * @return {Array.<undefined|Statement>}
+ */
+_AssertStatementTransformer.prototype.replaceControlStructuresWithGotos$ = function () {
+	return [ this._statement ];
+};
+
+/**
+ * class _LogStatementTransformer extends _StatementTransformer
+ * @constructor
+ */
+function _LogStatementTransformer() {
+}
+
+_LogStatementTransformer.prototype = new _StatementTransformer;
+/**
+ * @constructor
+ * @param {CodeTransformer} transformer
+ * @param {LogStatement} statement
+ */
+function _LogStatementTransformer$LCodeTransformer$LLogStatement$(transformer, statement) {
+	_StatementTransformer$LCodeTransformer$S.call(this, transformer, "LOG");
+	this._statement = statement;
+};
+
+_LogStatementTransformer$LCodeTransformer$LLogStatement$.prototype = new _LogStatementTransformer;
+
+/**
+ * @return {Statement}
+ */
+_LogStatementTransformer.prototype.getStatement$ = function () {
+	return this._statement;
+};
+
+/**
+ * @return {Array.<undefined|Statement>}
+ */
+_LogStatementTransformer.prototype.replaceControlStructuresWithGotos$ = function () {
+	return [ this._statement ];
+};
+
+/**
+ * class _DebuggerStatementTransformer extends _StatementTransformer
+ * @constructor
+ */
+function _DebuggerStatementTransformer() {
+}
+
+_DebuggerStatementTransformer.prototype = new _StatementTransformer;
+/**
+ * @constructor
+ * @param {CodeTransformer} transformer
+ * @param {DebuggerStatement} statement
+ */
+function _DebuggerStatementTransformer$LCodeTransformer$LDebuggerStatement$(transformer, statement) {
+	_StatementTransformer$LCodeTransformer$S.call(this, transformer, "DEBUGGER");
+	this._statement = statement;
+};
+
+_DebuggerStatementTransformer$LCodeTransformer$LDebuggerStatement$.prototype = new _DebuggerStatementTransformer;
+
+/**
+ * @return {Statement}
+ */
+_DebuggerStatementTransformer.prototype.getStatement$ = function () {
+	return this._statement;
+};
+
+/**
+ * @return {Array.<undefined|Statement>}
+ */
+_DebuggerStatementTransformer.prototype.replaceControlStructuresWithGotos$ = function () {
+	return [ this._statement ];
+};
+
+/**
+ * class CodeTransformer extends Object
+ * @constructor
+ */
+function CodeTransformer() {
+}
+
+/**
+ * @constructor
+ */
+function CodeTransformer$() {
+	this._labelMap = [];
+	this._statementIDs = {};
+};
+
+CodeTransformer$.prototype = new CodeTransformer;
+
+/**
+ * @param {!string} label
+ * @return {_LabellableStatementTransformer}
+ */
+CodeTransformer.prototype.findLabellableStatementTransformerByLabel$S = function (label) {
+	/** @type {!number} */
+	var i;
+	/** @type {_LabellableStatementTransformer} */
+	var trans;
+	for (i = 0; this._labelMap.length; ++ i) {
+		trans = this._labelMap[i];
+		if (trans.getStatement$().getLabel$().getValue$() === label) {
+			return trans;
+		}
+	}
+	throw new Error("fatal error: no corresponding transformer for label \"" + label + "\"");
+};
+
+/**
+ * @return {_LabellableStatementTransformer}
+ */
+CodeTransformer.prototype.getInnermostLabellableStatementTransformer$ = function () {
+	return this._labelMap[this._labelMap.length - 1];
+};
+
+/**
+ * @param {_LabellableStatementTransformer} transformer
+ */
+CodeTransformer.prototype.enterLabelledBlock$L_LabellableStatementTransformer$ = function (transformer) {
+	this._labelMap.push(transformer);
+};
+
+/**
+ */
+CodeTransformer.prototype.leaveLabelledBlock$ = function () {
+	this._labelMap.pop();
+};
+
+/**
+ * @param {Statement} input
+ * @param {Array.<undefined|Statement>} output
+ */
+CodeTransformer.prototype.convertAndPushStatement$LStatement$ALStatement$ = function (input, output) {
+	/** @type {Array.<undefined|Statement>} */
+	var conved;
+	/** @type {!number} */
+	var i;
+	conved = this._getStatementTransformerFor$LStatement$(input).replaceControlStructuresWithGotos$();
+	for (i = 0; i < conved.length; ++ i) {
+		output.push(conved[i]);
+	}
+};
+
+/**
+ * @param {Array.<undefined|Statement>} input
+ * @param {Array.<undefined|Statement>} output
+ */
+CodeTransformer.prototype.convertAndPushStatements$ALStatement$ALStatement$ = function (input, output) {
+	/** @type {!number} */
+	var i;
+	for (i = 0; i < input.length; ++ i) {
+		this.convertAndPushStatement$LStatement$ALStatement$(input[i], output);
+	}
+};
+
+/**
+ * @param {Expression} expr
+ * @param {!string} succLabel
+ * @param {!string} failLabel
+ * @param {Array.<undefined|Statement>} output
+ */
+CodeTransformer.prototype.pushConditionalBranch$LExpression$SSALStatement$ = function (expr, succLabel, failLabel, output) {
+	output.push(new IfStatement$LToken$LExpression$ALStatement$ALStatement$(new Token$SB("if", false), expr, [ new GotoStatement$S(succLabel) ], [ new GotoStatement$S(failLabel) ]));
+};
+
+/**
+ * @param {Expression} expr
+ * @param {Array.<undefined|Statement>} output
+ */
+CodeTransformer.prototype.pushExpressionStatement$LExpression$ALStatement$ = function (expr, output) {
+	output.push(new ExpressionStatement$LExpression$(expr));
+};
+
+/**
+ * @return {Object.<string, undefined|!number>}
+ */
+CodeTransformer.prototype.getStatementIDMap$ = function () {
+	return this._statementIDs;
+};
+
+/**
+ * @param {MemberFunctionDefinition} funcDef
+ */
+CodeTransformer.prototype.transformFunctionDefinition$LMemberFunctionDefinition$ = function (funcDef) {
+	/** @type {NewExpression} */
+	var newExpr;
+	/** @type {!number} */
+	var numBlock;
+	newExpr = new NewExpression$LToken$LType$ALExpression$(new Token$SB("new", false), CodeTransformer.stopIterationType, [  ]);
+	newExpr.analyze$LAnalysisContext$LExpression$(new AnalysisContext$ALCompileError$LParser$F$LParser$LClassDefinition$LClassDefinition$$([  ], null, null), null);
+	funcDef.getStatements$().push(new ThrowStatement$LToken$LExpression$(new Token$SB("throw", false), newExpr));
+	numBlock = this._doCPSConvert$LMemberFunctionDefinition$(funcDef);
+	this._eliminateYields$LMemberFunctionDefinition$N(funcDef, numBlock);
+};
+
+/**
+ * @param {Statement} statement
+ * @return {_StatementTransformer}
+ */
+CodeTransformer.prototype._getStatementTransformerFor$LStatement$ = function (statement) {
+	if (statement instanceof ConstructorInvocationStatement) {
+		return new _ConstructorInvocationStatementTransformer$LCodeTransformer$LConstructorInvocationStatement$(this, statement);
+	} else {
+		if (statement instanceof ExpressionStatement) {
+			return new _ExpressionStatementTransformer$LCodeTransformer$LExpressionStatement$(this, statement);
+		} else {
+			if (statement instanceof FunctionStatement) {
+				return new _FunctionStatementTransformer$LCodeTransformer$LFunctionStatement$(this, statement);
+			} else {
+				if (statement instanceof ReturnStatement) {
+					return new _ReturnStatementTransformer$LCodeTransformer$LReturnStatement$(this, statement);
+				} else {
+					if (statement instanceof YieldStatement) {
+						return new _YieldStatementTransformer$LCodeTransformer$LYieldStatement$(this, statement);
+					} else {
+						if (statement instanceof DeleteStatement) {
+							return new _DeleteStatementTransformer$LCodeTransformer$LDeleteStatement$(this, statement);
+						} else {
+							if (statement instanceof BreakStatement) {
+								return new _BreakStatementTransformer$LCodeTransformer$LBreakStatement$(this, statement);
+							} else {
+								if (statement instanceof ContinueStatement) {
+									return new _ContinueStatementTransformer$LCodeTransformer$LContinueStatement$(this, statement);
+								} else {
+									if (statement instanceof DoWhileStatement) {
+										return new _DoWhileStatementTransformer$LCodeTransformer$LDoWhileStatement$(this, statement);
+									} else {
+										if (statement instanceof ForInStatement) {
+											return new _ForInStatementTransformer$LCodeTransformer$LForInStatement$(this, statement);
+										} else {
+											if (statement instanceof ForStatement) {
+												return new _ForStatementTransformer$LCodeTransformer$LForStatement$(this, statement);
+											} else {
+												if (statement instanceof IfStatement) {
+													return new _IfStatementTransformer$LCodeTransformer$LIfStatement$(this, statement);
+												} else {
+													if (statement instanceof SwitchStatement) {
+														return new _SwitchStatementTransformer$LCodeTransformer$LSwitchStatement$(this, statement);
+													} else {
+														if (statement instanceof CaseStatement) {
+															return new _CaseStatementTransformer$LCodeTransformer$LCaseStatement$(this, statement);
+														} else {
+															if (statement instanceof DefaultStatement) {
+																return new _DefaultStatementTransformer$LCodeTransformer$LDefaultStatement$(this, statement);
+															} else {
+																if (statement instanceof WhileStatement) {
+																	return new _WhileStatementTransformer$LCodeTransformer$LWhileStatement$(this, statement);
+																} else {
+																	if (statement instanceof TryStatement) {
+																		return new _TryStatementTransformer$LCodeTransformer$LTryStatement$(this, statement);
+																	} else {
+																		if (statement instanceof CatchStatement) {
+																			return new _CatchStatementTransformer$LCodeTransformer$LCatchStatement$(this, statement);
+																		} else {
+																			if (statement instanceof ThrowStatement) {
+																				return new _ThrowStatementTransformer$LCodeTransformer$LThrowStatement$(this, statement);
+																			} else {
+																				if (statement instanceof AssertStatement) {
+																					return new _AssertStatementTransformer$LCodeTransformer$LAssertStatement$(this, statement);
+																				} else {
+																					if (statement instanceof LogStatement) {
+																						return new _LogStatementTransformer$LCodeTransformer$LLogStatement$(this, statement);
+																					} else {
+																						if (statement instanceof DebuggerStatement) {
+																							return new _DebuggerStatementTransformer$LCodeTransformer$LDebuggerStatement$(this, statement);
+																						}
+																					}
+																				}
+																			}
+																		}
+																	}
+																}
+															}
+														}
+													}
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	throw new Error("got unexpected type of statement: " + JSON.stringify(statement.serialize$()));
+};
+
+/**
+ * @param {MemberFunctionDefinition} funcDef
+ * @return {!number}
+ */
+CodeTransformer.prototype._doCPSConvert$LMemberFunctionDefinition$ = function (funcDef) {
+	this._replaceControlStructuresWithGotos$LMemberFunctionDefinition$(funcDef);
+	return this._eliminateGotos$LMemberFunctionDefinition$(funcDef);
+};
+
+/**
+ * @param {MemberFunctionDefinition} funcDef
+ */
+CodeTransformer.prototype._replaceControlStructuresWithGotos$LMemberFunctionDefinition$ = function (funcDef) {
+	/** @type {Array.<undefined|Statement>} */
+	var statements;
+	/** @type {!number} */
+	var i;
+	statements = [];
+	for (i = 0; i < funcDef.getStatements$().length; ++ i) {
+		statements = statements.concat(this._getStatementTransformerFor$LStatement$(funcDef.getStatements$()[i]).replaceControlStructuresWithGotos$());
+	}
+	statements.unshift(new GotoStatement$S("$START"), new LabelStatement$S("$START"));
+	statements.push(new GotoStatement$S("$END"), new LabelStatement$S("$END"));
+	funcDef._statements = statements;
+};
+
+/**
+ * @param {MemberFunctionDefinition} funcDef
+ * @return {!number}
+ */
+CodeTransformer.prototype._eliminateGotos$LMemberFunctionDefinition$ = function (funcDef) {
+	/** @type {Array.<undefined|Statement>} */
+	var statements;
+	/** @type {Object.<string, undefined|LocalVariable>} */
+	var labels;
+	/** @type {!number} */
+	var i;
+	/** @type {!string} */
+	var name;
+	/** @type {Statement} */
+	var stmt;
+	/** @type {IfStatement} */
+	var ifStmt;
+	/** @type {!string} */
+	var succLabel;
+	/** @type {!string} */
+	var failLabel;
+	/** @type {SwitchStatement} */
+	var switchStmt;
+	/** @type {!number} */
+	var j;
+	/** @type {Array.<undefined|Statement>} */
+	var entries;
+	/** @type {Array.<undefined|Statement>} */
+	var codeBlocks;
+	/** @type {LabelStatement} */
+	var currentLabel;
+	/** @type {!number} */
+	var numBlock;
+	/** @type {Array.<undefined|Statement>} */
+	var body;
+	/** @type {MemberFunctionDefinition} */
+	var block;
+	statements = funcDef.getStatements$();
+	labels = {};
+	for (i = 0; i < statements.length; ++ i) {
+		if (statements[i] instanceof LabelStatement && labels[statements[i].getName$()] == null) {
+			name = statements[i].getName$();
+			labels[name] = new LocalVariable$LToken$LType$(new Token$SB(name, true), new StaticFunctionType$LToken$LType$ALType$B(null, Type.voidType, [  ], true));
+			funcDef.getLocals$().push(labels[name]);
+		}
+	}
+	for (i = 0; i < statements.length; ++ i) {
+		stmt = statements[i];
+		if (stmt instanceof GotoStatement) {
+			name = stmt.getLabel$();
+			statements[i] = new ExpressionStatement$LExpression$(new CallExpression$LToken$LExpression$ALExpression$(new Token$SB("(", false), new LocalExpression$LToken$LLocalVariable$(null, labels[name]), [  ]));
+		} else {
+			if (stmt instanceof IfStatement) {
+				ifStmt = stmt;
+				succLabel = ifStmt.getOnTrueStatements$()[0].getLabel$();
+				ifStmt.getOnTrueStatements$()[0] = new ExpressionStatement$LExpression$(new CallExpression$LToken$LExpression$ALExpression$(new Token$SB("(", false), new LocalExpression$LToken$LLocalVariable$(null, labels[succLabel]), [  ]));
+				failLabel = ifStmt.getOnFalseStatements$()[0].getLabel$();
+				ifStmt.getOnFalseStatements$()[0] = new ExpressionStatement$LExpression$(new CallExpression$LToken$LExpression$ALExpression$(new Token$SB("(", false), new LocalExpression$LToken$LLocalVariable$(null, labels[failLabel]), [  ]));
+			} else {
+				if (stmt instanceof SwitchStatement) {
+					switchStmt = stmt;
+					for (j = 0; j < switchStmt.getStatements$().length; ++ j) {
+						if (switchStmt.getStatements$()[j] instanceof GotoStatement) {
+							name = switchStmt.getStatements$()[j].getLabel$();
+							switchStmt.getStatements$()[j] = new ExpressionStatement$LExpression$(new CallExpression$LToken$LExpression$ALExpression$(new Token$SB("(", false), new LocalExpression$LToken$LLocalVariable$(null, labels[name]), [  ]));
+						}
+					}
+				}
+			}
+		}
+	}
+	entries = [];
+	for (i = 0; i < statements.length; ++ i) {
+		if (statements[i] instanceof LabelStatement) {
+			break;
+		}
+		entries.push(statements[i]);
+	}
+	codeBlocks = [];
+	currentLabel = null;
+	numBlock = 0;
+	while (i < statements.length) {
+		currentLabel = statements[i];
+		body = [];
+		++ i;
+		for (; i < statements.length; ++ i) {
+			if (statements[i] instanceof LabelStatement) {
+				break;
+			}
+			body.push(statements[i]);
+		}
+		block = new MemberFunctionDefinition$LToken$LToken$NLType$ALArgumentDeclaration$ALLocalVariable$ALStatement$ALMemberFunctionDefinition$LToken$LDocComment$(new Token$SB("function", false), null, ClassDefinition.IS_STATIC, Type.voidType, [  ], [  ], body, [  ], null, null);
+		funcDef.getClosures$().push(block);
+		codeBlocks.push(new ExpressionStatement$LExpression$(new AssignmentExpression$LToken$LExpression$LExpression$(new Token$SB("=", false), new LocalExpression$LToken$LLocalVariable$(null, labels[currentLabel.getName$()]), new FunctionExpression$LToken$LMemberFunctionDefinition$(new Token$SB("function", false), block))));
+		++ numBlock;
+	}
+	funcDef._statements = codeBlocks.concat(entries);
+	return numBlock;
+};
+
+/**
+ * @param {MemberFunctionDefinition} funcDef
+ * @return {!number}
+ */
+CodeTransformer._calcGeneratorNestDepth$LMemberFunctionDefinition$ = function (funcDef) {
+	/** @type {!number} */
+	var depth;
+	/** @type {MemberFunctionDefinition} */
+	var parent;
+	depth = 0;
+	while ((parent = funcDef.getParent$()) != null) {
+		if (parent.isGenerator$()) {
+			depth++;
+		}
+		funcDef = parent;
+	}
+	return depth;
+};
+
+var CodeTransformer$_calcGeneratorNestDepth$LMemberFunctionDefinition$ = CodeTransformer._calcGeneratorNestDepth$LMemberFunctionDefinition$;
+
+/**
+ * @param {MemberFunctionDefinition} funcDef
+ * @param {!number} numBlock
+ */
+CodeTransformer.prototype._eliminateYields$LMemberFunctionDefinition$N = function (funcDef, numBlock) {
+	var $this = this;
+	/** @type {Type} */
+	var yieldType;
+	/** @type {InstantiatedClassDefinition} */
+	var genClassDef;
+	/** @type {*} */
+	var createContext;
+	/** @type {Parser} */
+	var parser;
+	/** @type {ObjectType} */
+	var genType;
+	/** @type {!string} */
+	var genLocalName;
+	/** @type {LocalVariable} */
+	var genLocal;
+	/** @type {NewExpression} */
+	var newExpr;
+	/** @type {Array.<undefined|MemberFunctionDefinition>} */
+	var blocks;
+	/** @type {!number} */
+	var i;
+	/** @type {Array.<undefined|Statement>} */
+	var statements;
+	/** @type {!number} */
+	var j;
+	yieldType = funcDef.getReturnType$().getClassDef$().getTypeArguments$()[0];
+	genClassDef = CodeTransformer.jsxGeneratorClassDef.instantiateTemplateClass$ALCompileError$LTemplateInstantiationRequest$([  ], new TemplateInstantiationRequest$LToken$SALType$(null, "__jsx_generator", [ yieldType ]));
+	createContext = (function (parser) {
+		return new AnalysisContext$ALCompileError$LParser$F$LParser$LClassDefinition$LClassDefinition$$([  ], parser, (function (parser, classDef) {
+			classDef.setAnalysisContextOfVariables$LAnalysisContext$(createContext(parser));
+			classDef.analyze$LAnalysisContext$(createContext(parser));
+			return classDef;
+		}));
+	});
+	parser = CodeTransformer.jsxGeneratorClassDef.getParser$();
+	genClassDef.resolveTypes$LAnalysisContext$(createContext(parser));
+	genClassDef.analyze$LAnalysisContext$(createContext(parser));
+	CodeTransformer.jsxGeneratorClassDef.getParser$()._classDefs.push(genClassDef);
+	genType = new ObjectType$LClassDefinition$(genClassDef);
+	genLocalName = "$generator" + (CodeTransformer$_calcGeneratorNestDepth$LMemberFunctionDefinition$(funcDef) + "");
+	genLocal = new LocalVariable$LToken$LType$(new Token$SB(genLocalName, false), genType);
+	funcDef.getLocals$().push(genLocal);
+	newExpr = new NewExpression$LToken$LType$ALExpression$(new Token$SB("new", false), genType, [  ]);
+	newExpr.analyze$LAnalysisContext$LExpression$(new AnalysisContext$ALCompileError$LParser$F$LParser$LClassDefinition$LClassDefinition$$([  ], null, null), null);
+	funcDef.getStatements$().unshift(new ExpressionStatement$LExpression$(new AssignmentExpression$LToken$LExpression$LExpression$(new Token$SB("=", false), new LocalExpression$LToken$LLocalVariable$(new Token$SB(genLocalName, false), genLocal), newExpr)));
+	blocks = funcDef.getClosures$().slice(funcDef.getClosures$().length - numBlock);
+	for (i = 0; i < blocks.length; ++ i) {
+		statements = blocks[i].getStatements$();
+		for (j = 0; j < statements.length; ++ j) {
+			if (statements[j] instanceof YieldStatement) {
+				statements.splice(j, 2, new ExpressionStatement$LExpression$(new AssignmentExpression$LToken$LExpression$LExpression$(new Token$SB("=", false), new PropertyExpression$LToken$LExpression$LToken$ALType$LType$(new Token$SB(".", false), new LocalExpression$LToken$LLocalVariable$(new Token$SB(genLocalName, false), genLocal), new Token$SB("__value", false), [  ], yieldType), statements[j].getExpr$())), new ExpressionStatement$LExpression$(new AssignmentExpression$LToken$LExpression$LExpression$(new Token$SB("=", false), new PropertyExpression$LToken$LExpression$LToken$ALType$LType$(new Token$SB(".", false), new LocalExpression$LToken$LLocalVariable$(new Token$SB(genLocalName, false), genLocal), new Token$SB("__next", true), [  ], new StaticFunctionType$LToken$LType$ALType$B(null, Type.voidType, [  ], true)), statements[j + 1].getExpr$().getExpr$())));
+				break;
+			}
+		}
+	}
+	statements = funcDef.getStatements$();
+	statements.splice(statements.length - 1, 1, new ExpressionStatement$LExpression$(new AssignmentExpression$LToken$LExpression$LExpression$(new Token$SB("=", false), new PropertyExpression$LToken$LExpression$LToken$ALType$LType$(new Token$SB(".", false), new LocalExpression$LToken$LLocalVariable$(new Token$SB(genLocalName, false), genLocal), new Token$SB("__next", true), [  ], new StaticFunctionType$LToken$LType$ALType$B(null, Type.voidType, [  ], true)), new LocalExpression$LToken$LLocalVariable$(new Token$SB("$START", true), statements[statements.length - 1].getExpr$().getExpr$().getLocal$()))));
+	statements.push(new ReturnStatement$LToken$LExpression$(new Token$SB("return", false), new LocalExpression$LToken$LLocalVariable$(new Token$SB("$generator", false), genLocal)));
+};
+
+/**
  * class _LinkTimeOptimizationCommand$CStash extends OptimizerStash
  * @constructor
  */
@@ -29631,10 +31431,10 @@ _CallExpressionEmitter._operatorPrecedence = 0;
 _SuperExpressionEmitter._operatorPrecedence = 0;
 _NewExpressionEmitter._operatorPrecedence = 0;
 _CommaExpressionEmitter._operatorPrecedence = 0;
-Meta.VERSION_STRING = "0.9.25";
-Meta.VERSION_NUMBER = 0.009025;
-Meta.LAST_COMMIT_HASH = "cba55262f57160e029d3de0fbcb4e2fa0a469787";
-Meta.LAST_COMMIT_DATE = "2013-04-16 17:55:39 +0900";
+Meta.VERSION_STRING = "0.9.26";
+Meta.VERSION_NUMBER = 0.009026;
+Meta.LAST_COMMIT_HASH = "da0b6a5de6e70a09691c4e187e9ba1a6b2a5fe28";
+Meta.LAST_COMMIT_DATE = "2013-04-30 19:40:43 +0900";
 $__jsx_lazy_init(Meta, "IDENTIFIER", function () {
 	return Meta.VERSION_STRING + " (" + Meta.LAST_COMMIT_DATE + "; " + Meta.LAST_COMMIT_HASH + ")";
 });
@@ -29707,7 +31507,7 @@ $__jsx_lazy_init(_Lexer, "keywords", function () {
 	return _Lexer$asMap$AS([ "null", "true", "false", "NaN", "Infinity", "break", "do", "instanceof", "typeof", "case", "else", "new", "var", "catch", "finally", "return", "void", "for", "switch", "while", "function", "this", "if", "throw", "in", "try", "class", "extends", "super", "import", "implements", "static", "__FILE__", "__LINE__", "undefined" ]);
 });
 $__jsx_lazy_init(_Lexer, "reserved", function () {
-	return _Lexer$asMap$AS([ "debugger", "with", "const", "export", "let", "private", "public", "yield", "protected", "extern", "native", "as", "operator" ]);
+	return _Lexer$asMap$AS([ "debugger", "with", "const", "export", "let", "private", "public", "yield", "protected", "extern", "native", "as", "operator", "async" ]);
 });
 MemberVariableDefinition.NOT_ANALYZED = 0;
 MemberVariableDefinition.IS_ANALYZING = 1;
@@ -29726,11 +31526,12 @@ ClassDefinition.IS_READONLY = 512;
 ClassDefinition.IS_INLINE = 1024;
 ClassDefinition.IS_PURE = 2048;
 ClassDefinition.IS_DELETE = 4096;
+ClassDefinition.IS_GENERATOR = 8192;
+ClassDefinition.IS_ASYNC = 16384;
 ClassDefinition.GET_MEMBER_MODE_ALL = 0;
 ClassDefinition.GET_MEMBER_MODE_CLASS_ONLY = 1;
 ClassDefinition.GET_MEMBER_MODE_SUPER = 2;
 ClassDefinition.GET_MEMBER_MODE_FUNCTION_WITH_BODY = 3;
-ClassDefinition.GET_MEMBER_MODE_NOT_ABSTRACT = 4;
 JavaScriptEmitter._initialized = false;
 _LinkTimeOptimizationCommand.IDENTIFIER = "lto";
 _NoAssertCommand.IDENTIFIER = "no-assert";
@@ -29751,534 +31552,603 @@ Compiler.MODE_COMPILE = 0;
 Compiler.MODE_PARSE = 1;
 Compiler.MODE_COMPLETE = 2;
 Compiler.MODE_DOC = 3;
+$__jsx_lazy_init(_StatementTransformer, "_statementCountMap", function () {
+	return {};
+});
+CodeTransformer.stopIterationType = null;
+CodeTransformer.jsxGeneratorClassDef = null;
 var $__jsx_classMap = {
+	"system:lib/built-in.jsx": {
+		"g_StopIteration": g_StopIteration,
+		"g_StopIteration$": g_StopIteration$
+	},
 	"src/jsx-node-front.jsx": {
-		CompilationServer: CompilationServer,
-		CompilationServer$LPlatform$: CompilationServer$LPlatform$,
-		_Main: _Main,
-		_Main$: _Main$,
-		NodePlatform: NodePlatform,
-		NodePlatform$: NodePlatform$,
-		NodePlatform$S: NodePlatform$S,
-		CompilationServerPlatform: CompilationServerPlatform,
-		CompilationServerPlatform$SNLServerRequest$LServerResponse$: CompilationServerPlatform$SNLServerRequest$LServerResponse$
+		"CompilationServer": CompilationServer,
+		"CompilationServer$LPlatform$": CompilationServer$LPlatform$,
+		"_Main": _Main,
+		"_Main$": _Main$,
+		"NodePlatform": NodePlatform,
+		"NodePlatform$": NodePlatform$,
+		"NodePlatform$S": NodePlatform$S,
+		"CompilationServerPlatform": CompilationServerPlatform,
+		"CompilationServerPlatform$SNLServerRequest$LServerResponse$": CompilationServerPlatform$SNLServerRequest$LServerResponse$
 	},
 	"system:lib/js/js.jsx": {
-		js: js,
-		js$: js$
+		"js": js,
+		"js$": js$
 	},
 	"system:lib/js/js/nodejs.jsx": {
-		node: node,
-		node$: node$
+		"node": node,
+		"node$": node$
 	},
 	"system:lib/js/timer.jsx": {
-		Timer: Timer,
-		Timer$: Timer$,
-		TimerHandle: TimerHandle,
-		TimerHandle$: TimerHandle$
+		"Timer": Timer,
+		"Timer$": Timer$,
+		"TimerHandle": TimerHandle,
+		"TimerHandle$": TimerHandle$
 	},
 	"src/util.jsx": {
-		Util: Util,
-		Util$: Util$,
-		TemplateInstantiationRequest: TemplateInstantiationRequest,
-		TemplateInstantiationRequest$LToken$SALType$: TemplateInstantiationRequest$LToken$SALType$,
-		CompileIssue: CompileIssue,
-		CompileIssue$LToken$S: CompileIssue$LToken$S,
-		CompileIssue$SNNS: CompileIssue$SNNS,
-		CompileError: CompileError,
-		CompileError$LToken$S: CompileError$LToken$S,
-		CompileError$SNNS: CompileError$SNNS,
-		CompileWarning: CompileWarning,
-		CompileWarning$LToken$S: CompileWarning$LToken$S,
-		CompileWarning$SNNS: CompileWarning$SNNS,
-		DeprecatedWarning: DeprecatedWarning,
-		DeprecatedWarning$LToken$S: DeprecatedWarning$LToken$S,
-		DeprecatedWarning$SNNS: DeprecatedWarning$SNNS,
-		CompileNote: CompileNote,
-		CompileNote$LToken$S: CompileNote$LToken$S,
-		CompileNote$SNNS: CompileNote$SNNS
+		"Util": Util,
+		"Util$": Util$
 	},
 	"src/jsemitter.jsx": {
-		_TypeAnnotation: _TypeAnnotation,
-		_TypeAnnotation$: _TypeAnnotation$,
-		_StatementEmitter: _StatementEmitter,
-		_StatementEmitter$LJavaScriptEmitter$: _StatementEmitter$LJavaScriptEmitter$,
-		_ConstructorInvocationStatementEmitter: _ConstructorInvocationStatementEmitter,
-		_ConstructorInvocationStatementEmitter$LJavaScriptEmitter$LConstructorInvocationStatement$: _ConstructorInvocationStatementEmitter$LJavaScriptEmitter$LConstructorInvocationStatement$,
-		_ExpressionStatementEmitter: _ExpressionStatementEmitter,
-		_ExpressionStatementEmitter$LJavaScriptEmitter$LExpressionStatement$: _ExpressionStatementEmitter$LJavaScriptEmitter$LExpressionStatement$,
-		_FunctionStatementEmitter: _FunctionStatementEmitter,
-		_FunctionStatementEmitter$LJavaScriptEmitter$LFunctionStatement$: _FunctionStatementEmitter$LJavaScriptEmitter$LFunctionStatement$,
-		_ReturnStatementEmitter: _ReturnStatementEmitter,
-		_ReturnStatementEmitter$LJavaScriptEmitter$LReturnStatement$: _ReturnStatementEmitter$LJavaScriptEmitter$LReturnStatement$,
-		_DeleteStatementEmitter: _DeleteStatementEmitter,
-		_DeleteStatementEmitter$LJavaScriptEmitter$LDeleteStatement$: _DeleteStatementEmitter$LJavaScriptEmitter$LDeleteStatement$,
-		_BreakStatementEmitter: _BreakStatementEmitter,
-		_BreakStatementEmitter$LJavaScriptEmitter$LBreakStatement$: _BreakStatementEmitter$LJavaScriptEmitter$LBreakStatement$,
-		_ContinueStatementEmitter: _ContinueStatementEmitter,
-		_ContinueStatementEmitter$LJavaScriptEmitter$LContinueStatement$: _ContinueStatementEmitter$LJavaScriptEmitter$LContinueStatement$,
-		_DoWhileStatementEmitter: _DoWhileStatementEmitter,
-		_DoWhileStatementEmitter$LJavaScriptEmitter$LDoWhileStatement$: _DoWhileStatementEmitter$LJavaScriptEmitter$LDoWhileStatement$,
-		_ForInStatementEmitter: _ForInStatementEmitter,
-		_ForInStatementEmitter$LJavaScriptEmitter$LForInStatement$: _ForInStatementEmitter$LJavaScriptEmitter$LForInStatement$,
-		_ForStatementEmitter: _ForStatementEmitter,
-		_ForStatementEmitter$LJavaScriptEmitter$LForStatement$: _ForStatementEmitter$LJavaScriptEmitter$LForStatement$,
-		_IfStatementEmitter: _IfStatementEmitter,
-		_IfStatementEmitter$LJavaScriptEmitter$LIfStatement$: _IfStatementEmitter$LJavaScriptEmitter$LIfStatement$,
-		_SwitchStatementEmitter: _SwitchStatementEmitter,
-		_SwitchStatementEmitter$LJavaScriptEmitter$LSwitchStatement$: _SwitchStatementEmitter$LJavaScriptEmitter$LSwitchStatement$,
-		_CaseStatementEmitter: _CaseStatementEmitter,
-		_CaseStatementEmitter$LJavaScriptEmitter$LCaseStatement$: _CaseStatementEmitter$LJavaScriptEmitter$LCaseStatement$,
-		_DefaultStatementEmitter: _DefaultStatementEmitter,
-		_DefaultStatementEmitter$LJavaScriptEmitter$LDefaultStatement$: _DefaultStatementEmitter$LJavaScriptEmitter$LDefaultStatement$,
-		_WhileStatementEmitter: _WhileStatementEmitter,
-		_WhileStatementEmitter$LJavaScriptEmitter$LWhileStatement$: _WhileStatementEmitter$LJavaScriptEmitter$LWhileStatement$,
-		_TryStatementEmitter: _TryStatementEmitter,
-		_TryStatementEmitter$LJavaScriptEmitter$LTryStatement$: _TryStatementEmitter$LJavaScriptEmitter$LTryStatement$,
-		_CatchStatementEmitter: _CatchStatementEmitter,
-		_CatchStatementEmitter$LJavaScriptEmitter$LCatchStatement$: _CatchStatementEmitter$LJavaScriptEmitter$LCatchStatement$,
-		_ThrowStatementEmitter: _ThrowStatementEmitter,
-		_ThrowStatementEmitter$LJavaScriptEmitter$LThrowStatement$: _ThrowStatementEmitter$LJavaScriptEmitter$LThrowStatement$,
-		_AssertStatementEmitter: _AssertStatementEmitter,
-		_AssertStatementEmitter$LJavaScriptEmitter$LAssertStatement$: _AssertStatementEmitter$LJavaScriptEmitter$LAssertStatement$,
-		_LogStatementEmitter: _LogStatementEmitter,
-		_LogStatementEmitter$LJavaScriptEmitter$LLogStatement$: _LogStatementEmitter$LJavaScriptEmitter$LLogStatement$,
-		_DebuggerStatementEmitter: _DebuggerStatementEmitter,
-		_DebuggerStatementEmitter$LJavaScriptEmitter$LDebuggerStatement$: _DebuggerStatementEmitter$LJavaScriptEmitter$LDebuggerStatement$,
-		_ExpressionEmitter: _ExpressionEmitter,
-		_ExpressionEmitter$LJavaScriptEmitter$: _ExpressionEmitter$LJavaScriptEmitter$,
-		_LocalExpressionEmitter: _LocalExpressionEmitter,
-		_LocalExpressionEmitter$LJavaScriptEmitter$LLocalExpression$: _LocalExpressionEmitter$LJavaScriptEmitter$LLocalExpression$,
-		_ClassExpressionEmitter: _ClassExpressionEmitter,
-		_ClassExpressionEmitter$LJavaScriptEmitter$LClassExpression$: _ClassExpressionEmitter$LJavaScriptEmitter$LClassExpression$,
-		_NullExpressionEmitter: _NullExpressionEmitter,
-		_NullExpressionEmitter$LJavaScriptEmitter$LNullExpression$: _NullExpressionEmitter$LJavaScriptEmitter$LNullExpression$,
-		_BooleanLiteralExpressionEmitter: _BooleanLiteralExpressionEmitter,
-		_BooleanLiteralExpressionEmitter$LJavaScriptEmitter$LBooleanLiteralExpression$: _BooleanLiteralExpressionEmitter$LJavaScriptEmitter$LBooleanLiteralExpression$,
-		_IntegerLiteralExpressionEmitter: _IntegerLiteralExpressionEmitter,
-		_IntegerLiteralExpressionEmitter$LJavaScriptEmitter$LIntegerLiteralExpression$: _IntegerLiteralExpressionEmitter$LJavaScriptEmitter$LIntegerLiteralExpression$,
-		_NumberLiteralExpressionEmitter: _NumberLiteralExpressionEmitter,
-		_NumberLiteralExpressionEmitter$LJavaScriptEmitter$LNumberLiteralExpression$: _NumberLiteralExpressionEmitter$LJavaScriptEmitter$LNumberLiteralExpression$,
-		_StringLiteralExpressionEmitter: _StringLiteralExpressionEmitter,
-		_StringLiteralExpressionEmitter$LJavaScriptEmitter$LStringLiteralExpression$: _StringLiteralExpressionEmitter$LJavaScriptEmitter$LStringLiteralExpression$,
-		_RegExpLiteralExpressionEmitter: _RegExpLiteralExpressionEmitter,
-		_RegExpLiteralExpressionEmitter$LJavaScriptEmitter$LRegExpLiteralExpression$: _RegExpLiteralExpressionEmitter$LJavaScriptEmitter$LRegExpLiteralExpression$,
-		_ArrayLiteralExpressionEmitter: _ArrayLiteralExpressionEmitter,
-		_ArrayLiteralExpressionEmitter$LJavaScriptEmitter$LArrayLiteralExpression$: _ArrayLiteralExpressionEmitter$LJavaScriptEmitter$LArrayLiteralExpression$,
-		_MapLiteralExpressionEmitter: _MapLiteralExpressionEmitter,
-		_MapLiteralExpressionEmitter$LJavaScriptEmitter$LMapLiteralExpression$: _MapLiteralExpressionEmitter$LJavaScriptEmitter$LMapLiteralExpression$,
-		_ThisExpressionEmitter: _ThisExpressionEmitter,
-		_ThisExpressionEmitter$LJavaScriptEmitter$LThisExpression$: _ThisExpressionEmitter$LJavaScriptEmitter$LThisExpression$,
-		_AsExpressionEmitter: _AsExpressionEmitter,
-		_AsExpressionEmitter$LJavaScriptEmitter$LAsExpression$: _AsExpressionEmitter$LJavaScriptEmitter$LAsExpression$,
-		_AsNoConvertExpressionEmitter: _AsNoConvertExpressionEmitter,
-		_AsNoConvertExpressionEmitter$LJavaScriptEmitter$LAsNoConvertExpression$: _AsNoConvertExpressionEmitter$LJavaScriptEmitter$LAsNoConvertExpression$,
-		_OperatorExpressionEmitter: _OperatorExpressionEmitter,
-		_OperatorExpressionEmitter$LJavaScriptEmitter$: _OperatorExpressionEmitter$LJavaScriptEmitter$,
-		_UnaryExpressionEmitter: _UnaryExpressionEmitter,
-		_UnaryExpressionEmitter$LJavaScriptEmitter$LUnaryExpression$: _UnaryExpressionEmitter$LJavaScriptEmitter$LUnaryExpression$,
-		_PostfixExpressionEmitter: _PostfixExpressionEmitter,
-		_PostfixExpressionEmitter$LJavaScriptEmitter$LUnaryExpression$: _PostfixExpressionEmitter$LJavaScriptEmitter$LUnaryExpression$,
-		_InstanceofExpressionEmitter: _InstanceofExpressionEmitter,
-		_InstanceofExpressionEmitter$LJavaScriptEmitter$LInstanceofExpression$: _InstanceofExpressionEmitter$LJavaScriptEmitter$LInstanceofExpression$,
-		_PropertyExpressionEmitter: _PropertyExpressionEmitter,
-		_PropertyExpressionEmitter$LJavaScriptEmitter$LPropertyExpression$: _PropertyExpressionEmitter$LJavaScriptEmitter$LPropertyExpression$,
-		_FunctionExpressionEmitter: _FunctionExpressionEmitter,
-		_FunctionExpressionEmitter$LJavaScriptEmitter$LFunctionExpression$: _FunctionExpressionEmitter$LJavaScriptEmitter$LFunctionExpression$,
-		_AdditiveExpressionEmitter: _AdditiveExpressionEmitter,
-		_AdditiveExpressionEmitter$LJavaScriptEmitter$LAdditiveExpression$: _AdditiveExpressionEmitter$LJavaScriptEmitter$LAdditiveExpression$,
-		_AssignmentExpressionEmitter: _AssignmentExpressionEmitter,
-		_AssignmentExpressionEmitter$LJavaScriptEmitter$LAssignmentExpression$: _AssignmentExpressionEmitter$LJavaScriptEmitter$LAssignmentExpression$,
-		_EqualityExpressionEmitter: _EqualityExpressionEmitter,
-		_EqualityExpressionEmitter$LJavaScriptEmitter$LEqualityExpression$: _EqualityExpressionEmitter$LJavaScriptEmitter$LEqualityExpression$,
-		_InExpressionEmitter: _InExpressionEmitter,
-		_InExpressionEmitter$LJavaScriptEmitter$LInExpression$: _InExpressionEmitter$LJavaScriptEmitter$LInExpression$,
-		_LogicalExpressionEmitter: _LogicalExpressionEmitter,
-		_LogicalExpressionEmitter$LJavaScriptEmitter$LLogicalExpression$: _LogicalExpressionEmitter$LJavaScriptEmitter$LLogicalExpression$,
-		_ShiftExpressionEmitter: _ShiftExpressionEmitter,
-		_ShiftExpressionEmitter$LJavaScriptEmitter$LShiftExpression$: _ShiftExpressionEmitter$LJavaScriptEmitter$LShiftExpression$,
-		_BinaryNumberExpressionEmitter: _BinaryNumberExpressionEmitter,
-		_BinaryNumberExpressionEmitter$LJavaScriptEmitter$LBinaryNumberExpression$: _BinaryNumberExpressionEmitter$LJavaScriptEmitter$LBinaryNumberExpression$,
-		_ArrayExpressionEmitter: _ArrayExpressionEmitter,
-		_ArrayExpressionEmitter$LJavaScriptEmitter$LArrayExpression$: _ArrayExpressionEmitter$LJavaScriptEmitter$LArrayExpression$,
-		_ConditionalExpressionEmitter: _ConditionalExpressionEmitter,
-		_ConditionalExpressionEmitter$LJavaScriptEmitter$LConditionalExpression$: _ConditionalExpressionEmitter$LJavaScriptEmitter$LConditionalExpression$,
-		_CallExpressionEmitter: _CallExpressionEmitter,
-		_CallExpressionEmitter$LJavaScriptEmitter$LCallExpression$: _CallExpressionEmitter$LJavaScriptEmitter$LCallExpression$,
-		_SuperExpressionEmitter: _SuperExpressionEmitter,
-		_SuperExpressionEmitter$LJavaScriptEmitter$LSuperExpression$: _SuperExpressionEmitter$LJavaScriptEmitter$LSuperExpression$,
-		_NewExpressionEmitter: _NewExpressionEmitter,
-		_NewExpressionEmitter$LJavaScriptEmitter$LNewExpression$: _NewExpressionEmitter$LJavaScriptEmitter$LNewExpression$,
-		_CommaExpressionEmitter: _CommaExpressionEmitter,
-		_CommaExpressionEmitter$LJavaScriptEmitter$LCommaExpression$: _CommaExpressionEmitter$LJavaScriptEmitter$LCommaExpression$,
-		_JSEmitterStash: _JSEmitterStash,
-		_JSEmitterStash$: _JSEmitterStash$,
-		JavaScriptEmitter: JavaScriptEmitter,
-		JavaScriptEmitter$LPlatform$: JavaScriptEmitter$LPlatform$
+		"_TypeAnnotation": _TypeAnnotation,
+		"_TypeAnnotation$": _TypeAnnotation$,
+		"_StatementEmitter": _StatementEmitter,
+		"_StatementEmitter$LJavaScriptEmitter$": _StatementEmitter$LJavaScriptEmitter$,
+		"_ConstructorInvocationStatementEmitter": _ConstructorInvocationStatementEmitter,
+		"_ConstructorInvocationStatementEmitter$LJavaScriptEmitter$LConstructorInvocationStatement$": _ConstructorInvocationStatementEmitter$LJavaScriptEmitter$LConstructorInvocationStatement$,
+		"_ExpressionStatementEmitter": _ExpressionStatementEmitter,
+		"_ExpressionStatementEmitter$LJavaScriptEmitter$LExpressionStatement$": _ExpressionStatementEmitter$LJavaScriptEmitter$LExpressionStatement$,
+		"_FunctionStatementEmitter": _FunctionStatementEmitter,
+		"_FunctionStatementEmitter$LJavaScriptEmitter$LFunctionStatement$": _FunctionStatementEmitter$LJavaScriptEmitter$LFunctionStatement$,
+		"_ReturnStatementEmitter": _ReturnStatementEmitter,
+		"_ReturnStatementEmitter$LJavaScriptEmitter$LReturnStatement$": _ReturnStatementEmitter$LJavaScriptEmitter$LReturnStatement$,
+		"_DeleteStatementEmitter": _DeleteStatementEmitter,
+		"_DeleteStatementEmitter$LJavaScriptEmitter$LDeleteStatement$": _DeleteStatementEmitter$LJavaScriptEmitter$LDeleteStatement$,
+		"_BreakStatementEmitter": _BreakStatementEmitter,
+		"_BreakStatementEmitter$LJavaScriptEmitter$LBreakStatement$": _BreakStatementEmitter$LJavaScriptEmitter$LBreakStatement$,
+		"_ContinueStatementEmitter": _ContinueStatementEmitter,
+		"_ContinueStatementEmitter$LJavaScriptEmitter$LContinueStatement$": _ContinueStatementEmitter$LJavaScriptEmitter$LContinueStatement$,
+		"_DoWhileStatementEmitter": _DoWhileStatementEmitter,
+		"_DoWhileStatementEmitter$LJavaScriptEmitter$LDoWhileStatement$": _DoWhileStatementEmitter$LJavaScriptEmitter$LDoWhileStatement$,
+		"_ForInStatementEmitter": _ForInStatementEmitter,
+		"_ForInStatementEmitter$LJavaScriptEmitter$LForInStatement$": _ForInStatementEmitter$LJavaScriptEmitter$LForInStatement$,
+		"_ForStatementEmitter": _ForStatementEmitter,
+		"_ForStatementEmitter$LJavaScriptEmitter$LForStatement$": _ForStatementEmitter$LJavaScriptEmitter$LForStatement$,
+		"_IfStatementEmitter": _IfStatementEmitter,
+		"_IfStatementEmitter$LJavaScriptEmitter$LIfStatement$": _IfStatementEmitter$LJavaScriptEmitter$LIfStatement$,
+		"_SwitchStatementEmitter": _SwitchStatementEmitter,
+		"_SwitchStatementEmitter$LJavaScriptEmitter$LSwitchStatement$": _SwitchStatementEmitter$LJavaScriptEmitter$LSwitchStatement$,
+		"_CaseStatementEmitter": _CaseStatementEmitter,
+		"_CaseStatementEmitter$LJavaScriptEmitter$LCaseStatement$": _CaseStatementEmitter$LJavaScriptEmitter$LCaseStatement$,
+		"_DefaultStatementEmitter": _DefaultStatementEmitter,
+		"_DefaultStatementEmitter$LJavaScriptEmitter$LDefaultStatement$": _DefaultStatementEmitter$LJavaScriptEmitter$LDefaultStatement$,
+		"_WhileStatementEmitter": _WhileStatementEmitter,
+		"_WhileStatementEmitter$LJavaScriptEmitter$LWhileStatement$": _WhileStatementEmitter$LJavaScriptEmitter$LWhileStatement$,
+		"_TryStatementEmitter": _TryStatementEmitter,
+		"_TryStatementEmitter$LJavaScriptEmitter$LTryStatement$": _TryStatementEmitter$LJavaScriptEmitter$LTryStatement$,
+		"_CatchStatementEmitter": _CatchStatementEmitter,
+		"_CatchStatementEmitter$LJavaScriptEmitter$LCatchStatement$": _CatchStatementEmitter$LJavaScriptEmitter$LCatchStatement$,
+		"_ThrowStatementEmitter": _ThrowStatementEmitter,
+		"_ThrowStatementEmitter$LJavaScriptEmitter$LThrowStatement$": _ThrowStatementEmitter$LJavaScriptEmitter$LThrowStatement$,
+		"_AssertStatementEmitter": _AssertStatementEmitter,
+		"_AssertStatementEmitter$LJavaScriptEmitter$LAssertStatement$": _AssertStatementEmitter$LJavaScriptEmitter$LAssertStatement$,
+		"_LogStatementEmitter": _LogStatementEmitter,
+		"_LogStatementEmitter$LJavaScriptEmitter$LLogStatement$": _LogStatementEmitter$LJavaScriptEmitter$LLogStatement$,
+		"_DebuggerStatementEmitter": _DebuggerStatementEmitter,
+		"_DebuggerStatementEmitter$LJavaScriptEmitter$LDebuggerStatement$": _DebuggerStatementEmitter$LJavaScriptEmitter$LDebuggerStatement$,
+		"_ExpressionEmitter": _ExpressionEmitter,
+		"_ExpressionEmitter$LJavaScriptEmitter$": _ExpressionEmitter$LJavaScriptEmitter$,
+		"_LocalExpressionEmitter": _LocalExpressionEmitter,
+		"_LocalExpressionEmitter$LJavaScriptEmitter$LLocalExpression$": _LocalExpressionEmitter$LJavaScriptEmitter$LLocalExpression$,
+		"_ClassExpressionEmitter": _ClassExpressionEmitter,
+		"_ClassExpressionEmitter$LJavaScriptEmitter$LClassExpression$": _ClassExpressionEmitter$LJavaScriptEmitter$LClassExpression$,
+		"_NullExpressionEmitter": _NullExpressionEmitter,
+		"_NullExpressionEmitter$LJavaScriptEmitter$LNullExpression$": _NullExpressionEmitter$LJavaScriptEmitter$LNullExpression$,
+		"_BooleanLiteralExpressionEmitter": _BooleanLiteralExpressionEmitter,
+		"_BooleanLiteralExpressionEmitter$LJavaScriptEmitter$LBooleanLiteralExpression$": _BooleanLiteralExpressionEmitter$LJavaScriptEmitter$LBooleanLiteralExpression$,
+		"_IntegerLiteralExpressionEmitter": _IntegerLiteralExpressionEmitter,
+		"_IntegerLiteralExpressionEmitter$LJavaScriptEmitter$LIntegerLiteralExpression$": _IntegerLiteralExpressionEmitter$LJavaScriptEmitter$LIntegerLiteralExpression$,
+		"_NumberLiteralExpressionEmitter": _NumberLiteralExpressionEmitter,
+		"_NumberLiteralExpressionEmitter$LJavaScriptEmitter$LNumberLiteralExpression$": _NumberLiteralExpressionEmitter$LJavaScriptEmitter$LNumberLiteralExpression$,
+		"_StringLiteralExpressionEmitter": _StringLiteralExpressionEmitter,
+		"_StringLiteralExpressionEmitter$LJavaScriptEmitter$LStringLiteralExpression$": _StringLiteralExpressionEmitter$LJavaScriptEmitter$LStringLiteralExpression$,
+		"_RegExpLiteralExpressionEmitter": _RegExpLiteralExpressionEmitter,
+		"_RegExpLiteralExpressionEmitter$LJavaScriptEmitter$LRegExpLiteralExpression$": _RegExpLiteralExpressionEmitter$LJavaScriptEmitter$LRegExpLiteralExpression$,
+		"_ArrayLiteralExpressionEmitter": _ArrayLiteralExpressionEmitter,
+		"_ArrayLiteralExpressionEmitter$LJavaScriptEmitter$LArrayLiteralExpression$": _ArrayLiteralExpressionEmitter$LJavaScriptEmitter$LArrayLiteralExpression$,
+		"_MapLiteralExpressionEmitter": _MapLiteralExpressionEmitter,
+		"_MapLiteralExpressionEmitter$LJavaScriptEmitter$LMapLiteralExpression$": _MapLiteralExpressionEmitter$LJavaScriptEmitter$LMapLiteralExpression$,
+		"_ThisExpressionEmitter": _ThisExpressionEmitter,
+		"_ThisExpressionEmitter$LJavaScriptEmitter$LThisExpression$": _ThisExpressionEmitter$LJavaScriptEmitter$LThisExpression$,
+		"_AsExpressionEmitter": _AsExpressionEmitter,
+		"_AsExpressionEmitter$LJavaScriptEmitter$LAsExpression$": _AsExpressionEmitter$LJavaScriptEmitter$LAsExpression$,
+		"_AsNoConvertExpressionEmitter": _AsNoConvertExpressionEmitter,
+		"_AsNoConvertExpressionEmitter$LJavaScriptEmitter$LAsNoConvertExpression$": _AsNoConvertExpressionEmitter$LJavaScriptEmitter$LAsNoConvertExpression$,
+		"_OperatorExpressionEmitter": _OperatorExpressionEmitter,
+		"_OperatorExpressionEmitter$LJavaScriptEmitter$": _OperatorExpressionEmitter$LJavaScriptEmitter$,
+		"_UnaryExpressionEmitter": _UnaryExpressionEmitter,
+		"_UnaryExpressionEmitter$LJavaScriptEmitter$LUnaryExpression$": _UnaryExpressionEmitter$LJavaScriptEmitter$LUnaryExpression$,
+		"_PostfixExpressionEmitter": _PostfixExpressionEmitter,
+		"_PostfixExpressionEmitter$LJavaScriptEmitter$LUnaryExpression$": _PostfixExpressionEmitter$LJavaScriptEmitter$LUnaryExpression$,
+		"_InstanceofExpressionEmitter": _InstanceofExpressionEmitter,
+		"_InstanceofExpressionEmitter$LJavaScriptEmitter$LInstanceofExpression$": _InstanceofExpressionEmitter$LJavaScriptEmitter$LInstanceofExpression$,
+		"_PropertyExpressionEmitter": _PropertyExpressionEmitter,
+		"_PropertyExpressionEmitter$LJavaScriptEmitter$LPropertyExpression$": _PropertyExpressionEmitter$LJavaScriptEmitter$LPropertyExpression$,
+		"_FunctionExpressionEmitter": _FunctionExpressionEmitter,
+		"_FunctionExpressionEmitter$LJavaScriptEmitter$LFunctionExpression$": _FunctionExpressionEmitter$LJavaScriptEmitter$LFunctionExpression$,
+		"_AdditiveExpressionEmitter": _AdditiveExpressionEmitter,
+		"_AdditiveExpressionEmitter$LJavaScriptEmitter$LAdditiveExpression$": _AdditiveExpressionEmitter$LJavaScriptEmitter$LAdditiveExpression$,
+		"_AssignmentExpressionEmitter": _AssignmentExpressionEmitter,
+		"_AssignmentExpressionEmitter$LJavaScriptEmitter$LAssignmentExpression$": _AssignmentExpressionEmitter$LJavaScriptEmitter$LAssignmentExpression$,
+		"_EqualityExpressionEmitter": _EqualityExpressionEmitter,
+		"_EqualityExpressionEmitter$LJavaScriptEmitter$LEqualityExpression$": _EqualityExpressionEmitter$LJavaScriptEmitter$LEqualityExpression$,
+		"_InExpressionEmitter": _InExpressionEmitter,
+		"_InExpressionEmitter$LJavaScriptEmitter$LInExpression$": _InExpressionEmitter$LJavaScriptEmitter$LInExpression$,
+		"_LogicalExpressionEmitter": _LogicalExpressionEmitter,
+		"_LogicalExpressionEmitter$LJavaScriptEmitter$LLogicalExpression$": _LogicalExpressionEmitter$LJavaScriptEmitter$LLogicalExpression$,
+		"_ShiftExpressionEmitter": _ShiftExpressionEmitter,
+		"_ShiftExpressionEmitter$LJavaScriptEmitter$LShiftExpression$": _ShiftExpressionEmitter$LJavaScriptEmitter$LShiftExpression$,
+		"_BinaryNumberExpressionEmitter": _BinaryNumberExpressionEmitter,
+		"_BinaryNumberExpressionEmitter$LJavaScriptEmitter$LBinaryNumberExpression$": _BinaryNumberExpressionEmitter$LJavaScriptEmitter$LBinaryNumberExpression$,
+		"_ArrayExpressionEmitter": _ArrayExpressionEmitter,
+		"_ArrayExpressionEmitter$LJavaScriptEmitter$LArrayExpression$": _ArrayExpressionEmitter$LJavaScriptEmitter$LArrayExpression$,
+		"_ConditionalExpressionEmitter": _ConditionalExpressionEmitter,
+		"_ConditionalExpressionEmitter$LJavaScriptEmitter$LConditionalExpression$": _ConditionalExpressionEmitter$LJavaScriptEmitter$LConditionalExpression$,
+		"_CallExpressionEmitter": _CallExpressionEmitter,
+		"_CallExpressionEmitter$LJavaScriptEmitter$LCallExpression$": _CallExpressionEmitter$LJavaScriptEmitter$LCallExpression$,
+		"_SuperExpressionEmitter": _SuperExpressionEmitter,
+		"_SuperExpressionEmitter$LJavaScriptEmitter$LSuperExpression$": _SuperExpressionEmitter$LJavaScriptEmitter$LSuperExpression$,
+		"_NewExpressionEmitter": _NewExpressionEmitter,
+		"_NewExpressionEmitter$LJavaScriptEmitter$LNewExpression$": _NewExpressionEmitter$LJavaScriptEmitter$LNewExpression$,
+		"_CommaExpressionEmitter": _CommaExpressionEmitter,
+		"_CommaExpressionEmitter$LJavaScriptEmitter$LCommaExpression$": _CommaExpressionEmitter$LJavaScriptEmitter$LCommaExpression$,
+		"_JSEmitterStash": _JSEmitterStash,
+		"_JSEmitterStash$": _JSEmitterStash$,
+		"JavaScriptEmitter": JavaScriptEmitter,
+		"JavaScriptEmitter$LPlatform$": JavaScriptEmitter$LPlatform$
 	},
 	"src/platform.jsx": {
-		Platform: Platform,
-		Platform$: Platform$
+		"Platform": Platform,
+		"Platform$": Platform$
 	},
 	"src/jsx-command.jsx": {
-		JSXCommand: JSXCommand,
-		JSXCommand$: JSXCommand$
+		"JSXCommand": JSXCommand,
+		"JSXCommand$": JSXCommand$
 	},
 	"src/meta.jsx": {
-		Meta: Meta,
-		Meta$: Meta$
+		"Meta": Meta,
+		"Meta$": Meta$
 	},
 	"src/expression.jsx": {
-		MapLiteralElement: MapLiteralElement,
-		MapLiteralElement$LToken$LExpression$: MapLiteralElement$LToken$LExpression$,
-		Expression: Expression,
-		Expression$LToken$: Expression$LToken$,
-		Expression$LExpression$: Expression$LExpression$,
-		CommaExpression: CommaExpression,
-		CommaExpression$LToken$LExpression$LExpression$: CommaExpression$LToken$LExpression$LExpression$,
-		FunctionExpression: FunctionExpression,
-		FunctionExpression$LToken$LMemberFunctionDefinition$: FunctionExpression$LToken$LMemberFunctionDefinition$,
-		ThisExpression: ThisExpression,
-		ThisExpression$LToken$LClassDefinition$: ThisExpression$LToken$LClassDefinition$,
-		MapLiteralExpression: MapLiteralExpression,
-		MapLiteralExpression$LToken$ALMapLiteralElement$LType$: MapLiteralExpression$LToken$ALMapLiteralElement$LType$,
-		ArrayLiteralExpression: ArrayLiteralExpression,
-		ArrayLiteralExpression$LToken$ALExpression$LType$: ArrayLiteralExpression$LToken$ALExpression$LType$,
-		OperatorExpression: OperatorExpression,
-		OperatorExpression$LToken$: OperatorExpression$LToken$,
-		OperatorExpression$LExpression$: OperatorExpression$LExpression$,
-		NewExpression: NewExpression,
-		NewExpression$LToken$LType$ALExpression$: NewExpression$LToken$LType$ALExpression$,
-		NewExpression$LNewExpression$: NewExpression$LNewExpression$,
-		SuperExpression: SuperExpression,
-		SuperExpression$LToken$LToken$ALExpression$: SuperExpression$LToken$LToken$ALExpression$,
-		SuperExpression$LSuperExpression$: SuperExpression$LSuperExpression$,
-		CallExpression: CallExpression,
-		CallExpression$LToken$LExpression$ALExpression$: CallExpression$LToken$LExpression$ALExpression$,
-		CallExpression$LCallExpression$: CallExpression$LCallExpression$,
-		ConditionalExpression: ConditionalExpression,
-		ConditionalExpression$LToken$LExpression$LExpression$LExpression$: ConditionalExpression$LToken$LExpression$LExpression$LExpression$,
-		ConditionalExpression$LToken$LExpression$LExpression$LExpression$LType$: ConditionalExpression$LToken$LExpression$LExpression$LExpression$LType$,
-		BinaryExpression: BinaryExpression,
-		BinaryExpression$LToken$LExpression$LExpression$: BinaryExpression$LToken$LExpression$LExpression$,
-		ShiftExpression: ShiftExpression,
-		ShiftExpression$LToken$LExpression$LExpression$: ShiftExpression$LToken$LExpression$LExpression$,
-		LogicalExpression: LogicalExpression,
-		LogicalExpression$LToken$LExpression$LExpression$: LogicalExpression$LToken$LExpression$LExpression$,
-		InExpression: InExpression,
-		InExpression$LToken$LExpression$LExpression$: InExpression$LToken$LExpression$LExpression$,
-		EqualityExpression: EqualityExpression,
-		EqualityExpression$LToken$LExpression$LExpression$: EqualityExpression$LToken$LExpression$LExpression$,
-		BinaryNumberExpression: BinaryNumberExpression,
-		BinaryNumberExpression$LToken$LExpression$LExpression$: BinaryNumberExpression$LToken$LExpression$LExpression$,
-		AssignmentExpression: AssignmentExpression,
-		AssignmentExpression$LToken$LExpression$LExpression$: AssignmentExpression$LToken$LExpression$LExpression$,
-		ArrayExpression: ArrayExpression,
-		ArrayExpression$LToken$LExpression$LExpression$: ArrayExpression$LToken$LExpression$LExpression$,
-		AdditiveExpression: AdditiveExpression,
-		AdditiveExpression$LToken$LExpression$LExpression$: AdditiveExpression$LToken$LExpression$LExpression$,
-		UnaryExpression: UnaryExpression,
-		UnaryExpression$LToken$LExpression$: UnaryExpression$LToken$LExpression$,
-		SignExpression: SignExpression,
-		SignExpression$LToken$LExpression$: SignExpression$LToken$LExpression$,
-		TypeofExpression: TypeofExpression,
-		TypeofExpression$LToken$LExpression$: TypeofExpression$LToken$LExpression$,
-		PropertyExpression: PropertyExpression,
-		PropertyExpression$LToken$LExpression$LToken$ALType$: PropertyExpression$LToken$LExpression$LToken$ALType$,
-		PropertyExpression$LToken$LExpression$LToken$ALType$LType$: PropertyExpression$LToken$LExpression$LToken$ALType$LType$,
-		IncrementExpression: IncrementExpression,
-		IncrementExpression$LToken$LExpression$: IncrementExpression$LToken$LExpression$,
-		PreIncrementExpression: PreIncrementExpression,
-		PreIncrementExpression$LToken$LExpression$: PreIncrementExpression$LToken$LExpression$,
-		PostIncrementExpression: PostIncrementExpression,
-		PostIncrementExpression$LToken$LExpression$: PostIncrementExpression$LToken$LExpression$,
-		LogicalNotExpression: LogicalNotExpression,
-		LogicalNotExpression$LToken$LExpression$: LogicalNotExpression$LToken$LExpression$,
-		AsNoConvertExpression: AsNoConvertExpression,
-		AsNoConvertExpression$LToken$LExpression$LType$: AsNoConvertExpression$LToken$LExpression$LType$,
-		AsExpression: AsExpression,
-		AsExpression$LToken$LExpression$LType$: AsExpression$LToken$LExpression$LType$,
-		InstanceofExpression: InstanceofExpression,
-		InstanceofExpression$LToken$LExpression$LType$: InstanceofExpression$LToken$LExpression$LType$,
-		BitwiseNotExpression: BitwiseNotExpression,
-		BitwiseNotExpression$LToken$LExpression$: BitwiseNotExpression$LToken$LExpression$,
-		LeafExpression: LeafExpression,
-		LeafExpression$LToken$: LeafExpression$LToken$,
-		RegExpLiteralExpression: RegExpLiteralExpression,
-		RegExpLiteralExpression$LToken$: RegExpLiteralExpression$LToken$,
-		RegExpLiteralExpression$LToken$LType$: RegExpLiteralExpression$LToken$LType$,
-		StringLiteralExpression: StringLiteralExpression,
-		StringLiteralExpression$LToken$: StringLiteralExpression$LToken$,
-		NumberLiteralExpression: NumberLiteralExpression,
-		NumberLiteralExpression$LToken$: NumberLiteralExpression$LToken$,
-		IntegerLiteralExpression: IntegerLiteralExpression,
-		IntegerLiteralExpression$LToken$: IntegerLiteralExpression$LToken$,
-		BooleanLiteralExpression: BooleanLiteralExpression,
-		BooleanLiteralExpression$LToken$: BooleanLiteralExpression$LToken$,
-		NullExpression: NullExpression,
-		NullExpression$LToken$LType$: NullExpression$LToken$LType$,
-		ClassExpression: ClassExpression,
-		ClassExpression$LToken$LType$: ClassExpression$LToken$LType$,
-		LocalExpression: LocalExpression,
-		LocalExpression$LToken$LLocalVariable$: LocalExpression$LToken$LLocalVariable$
+		"MapLiteralElement": MapLiteralElement,
+		"MapLiteralElement$LToken$LExpression$": MapLiteralElement$LToken$LExpression$,
+		"Expression": Expression,
+		"Expression$LToken$": Expression$LToken$,
+		"Expression$LExpression$": Expression$LExpression$,
+		"CommaExpression": CommaExpression,
+		"CommaExpression$LToken$LExpression$LExpression$": CommaExpression$LToken$LExpression$LExpression$,
+		"FunctionExpression": FunctionExpression,
+		"FunctionExpression$LToken$LMemberFunctionDefinition$": FunctionExpression$LToken$LMemberFunctionDefinition$,
+		"ThisExpression": ThisExpression,
+		"ThisExpression$LToken$LClassDefinition$": ThisExpression$LToken$LClassDefinition$,
+		"MapLiteralExpression": MapLiteralExpression,
+		"MapLiteralExpression$LToken$ALMapLiteralElement$LType$": MapLiteralExpression$LToken$ALMapLiteralElement$LType$,
+		"ArrayLiteralExpression": ArrayLiteralExpression,
+		"ArrayLiteralExpression$LToken$ALExpression$LType$": ArrayLiteralExpression$LToken$ALExpression$LType$,
+		"OperatorExpression": OperatorExpression,
+		"OperatorExpression$LToken$": OperatorExpression$LToken$,
+		"OperatorExpression$LExpression$": OperatorExpression$LExpression$,
+		"NewExpression": NewExpression,
+		"NewExpression$LToken$LType$ALExpression$": NewExpression$LToken$LType$ALExpression$,
+		"NewExpression$LNewExpression$": NewExpression$LNewExpression$,
+		"SuperExpression": SuperExpression,
+		"SuperExpression$LToken$LToken$ALExpression$": SuperExpression$LToken$LToken$ALExpression$,
+		"SuperExpression$LSuperExpression$": SuperExpression$LSuperExpression$,
+		"CallExpression": CallExpression,
+		"CallExpression$LToken$LExpression$ALExpression$": CallExpression$LToken$LExpression$ALExpression$,
+		"CallExpression$LCallExpression$": CallExpression$LCallExpression$,
+		"ConditionalExpression": ConditionalExpression,
+		"ConditionalExpression$LToken$LExpression$LExpression$LExpression$": ConditionalExpression$LToken$LExpression$LExpression$LExpression$,
+		"ConditionalExpression$LToken$LExpression$LExpression$LExpression$LType$": ConditionalExpression$LToken$LExpression$LExpression$LExpression$LType$,
+		"BinaryExpression": BinaryExpression,
+		"BinaryExpression$LToken$LExpression$LExpression$": BinaryExpression$LToken$LExpression$LExpression$,
+		"ShiftExpression": ShiftExpression,
+		"ShiftExpression$LToken$LExpression$LExpression$": ShiftExpression$LToken$LExpression$LExpression$,
+		"LogicalExpression": LogicalExpression,
+		"LogicalExpression$LToken$LExpression$LExpression$": LogicalExpression$LToken$LExpression$LExpression$,
+		"InExpression": InExpression,
+		"InExpression$LToken$LExpression$LExpression$": InExpression$LToken$LExpression$LExpression$,
+		"EqualityExpression": EqualityExpression,
+		"EqualityExpression$LToken$LExpression$LExpression$": EqualityExpression$LToken$LExpression$LExpression$,
+		"BinaryNumberExpression": BinaryNumberExpression,
+		"BinaryNumberExpression$LToken$LExpression$LExpression$": BinaryNumberExpression$LToken$LExpression$LExpression$,
+		"AssignmentExpression": AssignmentExpression,
+		"AssignmentExpression$LToken$LExpression$LExpression$": AssignmentExpression$LToken$LExpression$LExpression$,
+		"ArrayExpression": ArrayExpression,
+		"ArrayExpression$LToken$LExpression$LExpression$": ArrayExpression$LToken$LExpression$LExpression$,
+		"AdditiveExpression": AdditiveExpression,
+		"AdditiveExpression$LToken$LExpression$LExpression$": AdditiveExpression$LToken$LExpression$LExpression$,
+		"UnaryExpression": UnaryExpression,
+		"UnaryExpression$LToken$LExpression$": UnaryExpression$LToken$LExpression$,
+		"SignExpression": SignExpression,
+		"SignExpression$LToken$LExpression$": SignExpression$LToken$LExpression$,
+		"TypeofExpression": TypeofExpression,
+		"TypeofExpression$LToken$LExpression$": TypeofExpression$LToken$LExpression$,
+		"PropertyExpression": PropertyExpression,
+		"PropertyExpression$LToken$LExpression$LToken$ALType$": PropertyExpression$LToken$LExpression$LToken$ALType$,
+		"PropertyExpression$LToken$LExpression$LToken$ALType$LType$": PropertyExpression$LToken$LExpression$LToken$ALType$LType$,
+		"IncrementExpression": IncrementExpression,
+		"IncrementExpression$LToken$LExpression$": IncrementExpression$LToken$LExpression$,
+		"PreIncrementExpression": PreIncrementExpression,
+		"PreIncrementExpression$LToken$LExpression$": PreIncrementExpression$LToken$LExpression$,
+		"PostIncrementExpression": PostIncrementExpression,
+		"PostIncrementExpression$LToken$LExpression$": PostIncrementExpression$LToken$LExpression$,
+		"LogicalNotExpression": LogicalNotExpression,
+		"LogicalNotExpression$LToken$LExpression$": LogicalNotExpression$LToken$LExpression$,
+		"AsNoConvertExpression": AsNoConvertExpression,
+		"AsNoConvertExpression$LToken$LExpression$LType$": AsNoConvertExpression$LToken$LExpression$LType$,
+		"AsExpression": AsExpression,
+		"AsExpression$LToken$LExpression$LType$": AsExpression$LToken$LExpression$LType$,
+		"InstanceofExpression": InstanceofExpression,
+		"InstanceofExpression$LToken$LExpression$LType$": InstanceofExpression$LToken$LExpression$LType$,
+		"BitwiseNotExpression": BitwiseNotExpression,
+		"BitwiseNotExpression$LToken$LExpression$": BitwiseNotExpression$LToken$LExpression$,
+		"LeafExpression": LeafExpression,
+		"LeafExpression$LToken$": LeafExpression$LToken$,
+		"RegExpLiteralExpression": RegExpLiteralExpression,
+		"RegExpLiteralExpression$LToken$": RegExpLiteralExpression$LToken$,
+		"RegExpLiteralExpression$LToken$LType$": RegExpLiteralExpression$LToken$LType$,
+		"StringLiteralExpression": StringLiteralExpression,
+		"StringLiteralExpression$LToken$": StringLiteralExpression$LToken$,
+		"NumberLiteralExpression": NumberLiteralExpression,
+		"NumberLiteralExpression$LToken$": NumberLiteralExpression$LToken$,
+		"IntegerLiteralExpression": IntegerLiteralExpression,
+		"IntegerLiteralExpression$LToken$": IntegerLiteralExpression$LToken$,
+		"BooleanLiteralExpression": BooleanLiteralExpression,
+		"BooleanLiteralExpression$LToken$": BooleanLiteralExpression$LToken$,
+		"NullExpression": NullExpression,
+		"NullExpression$LToken$LType$": NullExpression$LToken$LType$,
+		"ClassExpression": ClassExpression,
+		"ClassExpression$LToken$LType$": ClassExpression$LToken$LType$,
+		"LocalExpression": LocalExpression,
+		"LocalExpression$LToken$LLocalVariable$": LocalExpression$LToken$LLocalVariable$
+	},
+	"src/analysis.jsx": {
+		"InstantiationContext": InstantiationContext,
+		"InstantiationContext$ALCompileError$HLType$": InstantiationContext$ALCompileError$HLType$,
+		"TemplateInstantiationRequest": TemplateInstantiationRequest,
+		"TemplateInstantiationRequest$LToken$SALType$": TemplateInstantiationRequest$LToken$SALType$,
+		"Block": Block,
+		"Block$": Block$,
+		"BlockContext": BlockContext,
+		"BlockContext$LLocalVariableStatuses$LBlock$": BlockContext$LLocalVariableStatuses$LBlock$,
+		"AnalysisContext": AnalysisContext,
+		"AnalysisContext$ALCompileError$LParser$F$LParser$LClassDefinition$LClassDefinition$$": AnalysisContext$ALCompileError$LParser$F$LParser$LClassDefinition$LClassDefinition$$,
+		"LocalVariable": LocalVariable,
+		"LocalVariable$LToken$LType$": LocalVariable$LToken$LType$,
+		"CaughtVariable": CaughtVariable,
+		"CaughtVariable$LToken$LType$": CaughtVariable$LToken$LType$,
+		"ArgumentDeclaration": ArgumentDeclaration,
+		"ArgumentDeclaration$LToken$LType$": ArgumentDeclaration$LToken$LType$,
+		"LocalVariableStatuses": LocalVariableStatuses,
+		"LocalVariableStatuses$LMemberFunctionDefinition$LLocalVariableStatuses$": LocalVariableStatuses$LMemberFunctionDefinition$LLocalVariableStatuses$,
+		"LocalVariableStatuses$LLocalVariableStatuses$": LocalVariableStatuses$LLocalVariableStatuses$,
+		"CompileIssue": CompileIssue,
+		"CompileIssue$LToken$S": CompileIssue$LToken$S,
+		"CompileIssue$SNNS": CompileIssue$SNNS,
+		"CompileError": CompileError,
+		"CompileError$LToken$S": CompileError$LToken$S,
+		"CompileError$SNNS": CompileError$SNNS,
+		"CompileWarning": CompileWarning,
+		"CompileWarning$LToken$S": CompileWarning$LToken$S,
+		"CompileWarning$SNNS": CompileWarning$SNNS,
+		"DeprecatedWarning": DeprecatedWarning,
+		"DeprecatedWarning$LToken$S": DeprecatedWarning$LToken$S,
+		"DeprecatedWarning$SNNS": DeprecatedWarning$SNNS,
+		"CompileNote": CompileNote,
+		"CompileNote$LToken$S": CompileNote$LToken$S,
+		"CompileNote$SNNS": CompileNote$SNNS
 	},
 	"src/classdef.jsx": {
-		InstantiationContext: InstantiationContext,
-		InstantiationContext$ALCompileError$HLType$: InstantiationContext$ALCompileError$HLType$,
-		TemplateDefinition: TemplateDefinition,
-		TemplateDefinition$: TemplateDefinition$,
-		Block: Block,
-		Block$: Block$,
-		BlockContext: BlockContext,
-		BlockContext$LLocalVariableStatuses$LBlock$: BlockContext$LLocalVariableStatuses$LBlock$,
-		AnalysisContext: AnalysisContext,
-		AnalysisContext$ALCompileError$LParser$F$LParser$LClassDefinition$LClassDefinition$$: AnalysisContext$ALCompileError$LParser$F$LParser$LClassDefinition$LClassDefinition$$,
-		LocalVariable: LocalVariable,
-		LocalVariable$LToken$LType$: LocalVariable$LToken$LType$,
-		CaughtVariable: CaughtVariable,
-		CaughtVariable$LToken$LType$: CaughtVariable$LToken$LType$,
-		ArgumentDeclaration: ArgumentDeclaration,
-		ArgumentDeclaration$LToken$LType$: ArgumentDeclaration$LToken$LType$,
-		LocalVariableStatuses: LocalVariableStatuses,
-		LocalVariableStatuses$LMemberFunctionDefinition$LLocalVariableStatuses$: LocalVariableStatuses$LMemberFunctionDefinition$LLocalVariableStatuses$,
-		LocalVariableStatuses$LLocalVariableStatuses$: LocalVariableStatuses$LLocalVariableStatuses$,
-		MemberDefinition: MemberDefinition,
-		MemberDefinition$LToken$LToken$NLDocComment$: MemberDefinition$LToken$LToken$NLDocComment$,
-		MemberFunctionDefinition: MemberFunctionDefinition,
-		MemberFunctionDefinition$LToken$LToken$NLType$ALArgumentDeclaration$ALLocalVariable$ALStatement$ALMemberFunctionDefinition$LToken$LDocComment$: MemberFunctionDefinition$LToken$LToken$NLType$ALArgumentDeclaration$ALLocalVariable$ALStatement$ALMemberFunctionDefinition$LToken$LDocComment$,
-		TemplateFunctionDefinition: TemplateFunctionDefinition,
-		TemplateFunctionDefinition$LToken$LToken$NALToken$LType$ALArgumentDeclaration$ALLocalVariable$ALStatement$ALMemberFunctionDefinition$LToken$LDocComment$: TemplateFunctionDefinition$LToken$LToken$NALToken$LType$ALArgumentDeclaration$ALLocalVariable$ALStatement$ALMemberFunctionDefinition$LToken$LDocComment$,
-		InstantiatedMemberFunctionDefinition: InstantiatedMemberFunctionDefinition,
-		InstantiatedMemberFunctionDefinition$LToken$LToken$NLType$ALArgumentDeclaration$ALLocalVariable$ALStatement$ALMemberFunctionDefinition$LToken$LDocComment$: InstantiatedMemberFunctionDefinition$LToken$LToken$NLType$ALArgumentDeclaration$ALLocalVariable$ALStatement$ALMemberFunctionDefinition$LToken$LDocComment$,
-		MemberVariableDefinition: MemberVariableDefinition,
-		MemberVariableDefinition$LToken$LToken$NLType$LExpression$LDocComment$: MemberVariableDefinition$LToken$LToken$NLType$LExpression$LDocComment$,
-		ClassDefinition: ClassDefinition,
-		ClassDefinition$LToken$SNLParsedObjectType$ALParsedObjectType$ALMemberDefinition$ALClassDefinition$ALTemplateClassDefinition$ALParsedObjectType$LDocComment$: ClassDefinition$LToken$SNLParsedObjectType$ALParsedObjectType$ALMemberDefinition$ALClassDefinition$ALTemplateClassDefinition$ALParsedObjectType$LDocComment$,
-		InstantiatedClassDefinition: InstantiatedClassDefinition,
-		InstantiatedClassDefinition$LTemplateClassDefinition$ALType$LParsedObjectType$ALParsedObjectType$ALMemberDefinition$ALClassDefinition$ALTemplateClassDefinition$ALParsedObjectType$: InstantiatedClassDefinition$LTemplateClassDefinition$ALType$LParsedObjectType$ALParsedObjectType$ALMemberDefinition$ALClassDefinition$ALTemplateClassDefinition$ALParsedObjectType$,
-		TemplateClassDefinition: TemplateClassDefinition,
-		TemplateClassDefinition$LToken$SNALToken$LParsedObjectType$ALParsedObjectType$ALMemberDefinition$ALClassDefinition$ALTemplateClassDefinition$ALParsedObjectType$LDocComment$: TemplateClassDefinition$LToken$SNALToken$LParsedObjectType$ALParsedObjectType$ALMemberDefinition$ALClassDefinition$ALTemplateClassDefinition$ALParsedObjectType$LDocComment$
+		"TemplateDefinition": TemplateDefinition,
+		"TemplateDefinition$": TemplateDefinition$,
+		"MemberDefinition": MemberDefinition,
+		"MemberDefinition$LToken$LToken$NLDocComment$": MemberDefinition$LToken$LToken$NLDocComment$,
+		"MemberFunctionDefinition": MemberFunctionDefinition,
+		"MemberFunctionDefinition$LToken$LToken$NLType$ALArgumentDeclaration$ALLocalVariable$ALStatement$ALMemberFunctionDefinition$LToken$LDocComment$": MemberFunctionDefinition$LToken$LToken$NLType$ALArgumentDeclaration$ALLocalVariable$ALStatement$ALMemberFunctionDefinition$LToken$LDocComment$,
+		"TemplateFunctionDefinition": TemplateFunctionDefinition,
+		"TemplateFunctionDefinition$LToken$LToken$NALToken$LType$ALArgumentDeclaration$ALLocalVariable$ALStatement$ALMemberFunctionDefinition$LToken$LDocComment$": TemplateFunctionDefinition$LToken$LToken$NALToken$LType$ALArgumentDeclaration$ALLocalVariable$ALStatement$ALMemberFunctionDefinition$LToken$LDocComment$,
+		"InstantiatedMemberFunctionDefinition": InstantiatedMemberFunctionDefinition,
+		"InstantiatedMemberFunctionDefinition$LToken$LToken$NLType$ALArgumentDeclaration$ALLocalVariable$ALStatement$ALMemberFunctionDefinition$LToken$LDocComment$": InstantiatedMemberFunctionDefinition$LToken$LToken$NLType$ALArgumentDeclaration$ALLocalVariable$ALStatement$ALMemberFunctionDefinition$LToken$LDocComment$,
+		"MemberVariableDefinition": MemberVariableDefinition,
+		"MemberVariableDefinition$LToken$LToken$NLType$LExpression$LDocComment$": MemberVariableDefinition$LToken$LToken$NLType$LExpression$LDocComment$,
+		"ClassDefinition": ClassDefinition,
+		"ClassDefinition$LToken$SNLParsedObjectType$ALParsedObjectType$ALMemberDefinition$ALClassDefinition$ALTemplateClassDefinition$ALParsedObjectType$LDocComment$": ClassDefinition$LToken$SNLParsedObjectType$ALParsedObjectType$ALMemberDefinition$ALClassDefinition$ALTemplateClassDefinition$ALParsedObjectType$LDocComment$,
+		"InstantiatedClassDefinition": InstantiatedClassDefinition,
+		"InstantiatedClassDefinition$LTemplateClassDefinition$ALType$LParsedObjectType$ALParsedObjectType$ALMemberDefinition$ALClassDefinition$ALTemplateClassDefinition$ALParsedObjectType$": InstantiatedClassDefinition$LTemplateClassDefinition$ALType$LParsedObjectType$ALParsedObjectType$ALMemberDefinition$ALClassDefinition$ALTemplateClassDefinition$ALParsedObjectType$,
+		"TemplateClassDefinition": TemplateClassDefinition,
+		"TemplateClassDefinition$LToken$SNALToken$LParsedObjectType$ALParsedObjectType$ALMemberDefinition$ALClassDefinition$ALTemplateClassDefinition$ALParsedObjectType$LDocComment$": TemplateClassDefinition$LToken$SNALToken$LParsedObjectType$ALParsedObjectType$ALMemberDefinition$ALClassDefinition$ALTemplateClassDefinition$ALParsedObjectType$LDocComment$
 	},
 	"src/type.jsx": {
-		Type: Type,
-		Type$: Type$,
-		VoidType: VoidType,
-		VoidType$: VoidType$,
-		NullType: NullType,
-		NullType$: NullType$,
-		PrimitiveType: PrimitiveType,
-		PrimitiveType$: PrimitiveType$,
-		BooleanType: BooleanType,
-		BooleanType$: BooleanType$,
-		IntegerType: IntegerType,
-		IntegerType$: IntegerType$,
-		NumberType: NumberType,
-		NumberType$: NumberType$,
-		StringType: StringType,
-		StringType$: StringType$,
-		VariantType: VariantType,
-		VariantType$: VariantType$,
-		NullableType: NullableType,
-		NullableType$LType$: NullableType$LType$,
-		VariableLengthArgumentType: VariableLengthArgumentType,
-		VariableLengthArgumentType$LType$: VariableLengthArgumentType$LType$,
-		ObjectType: ObjectType,
-		ObjectType$LClassDefinition$: ObjectType$LClassDefinition$,
-		ParsedObjectType: ParsedObjectType,
-		ParsedObjectType$LQualifiedName$ALType$: ParsedObjectType$LQualifiedName$ALType$,
-		FunctionType: FunctionType,
-		FunctionType$: FunctionType$,
-		FunctionChoiceType: FunctionChoiceType,
-		FunctionChoiceType$ALResolvedFunctionType$: FunctionChoiceType$ALResolvedFunctionType$,
-		ResolvedFunctionType: ResolvedFunctionType,
-		ResolvedFunctionType$LToken$LType$ALType$B: ResolvedFunctionType$LToken$LType$ALType$B,
-		StaticFunctionType: StaticFunctionType,
-		StaticFunctionType$LToken$LType$ALType$B: StaticFunctionType$LToken$LType$ALType$B,
-		MemberFunctionType: MemberFunctionType,
-		MemberFunctionType$LToken$LType$LType$ALType$B: MemberFunctionType$LToken$LType$LType$ALType$B
+		"Type": Type,
+		"Type$": Type$,
+		"VoidType": VoidType,
+		"VoidType$": VoidType$,
+		"NullType": NullType,
+		"NullType$": NullType$,
+		"PrimitiveType": PrimitiveType,
+		"PrimitiveType$": PrimitiveType$,
+		"BooleanType": BooleanType,
+		"BooleanType$": BooleanType$,
+		"IntegerType": IntegerType,
+		"IntegerType$": IntegerType$,
+		"NumberType": NumberType,
+		"NumberType$": NumberType$,
+		"StringType": StringType,
+		"StringType$": StringType$,
+		"VariantType": VariantType,
+		"VariantType$": VariantType$,
+		"NullableType": NullableType,
+		"NullableType$LType$": NullableType$LType$,
+		"VariableLengthArgumentType": VariableLengthArgumentType,
+		"VariableLengthArgumentType$LType$": VariableLengthArgumentType$LType$,
+		"ObjectType": ObjectType,
+		"ObjectType$LClassDefinition$": ObjectType$LClassDefinition$,
+		"ParsedObjectType": ParsedObjectType,
+		"ParsedObjectType$LQualifiedName$ALType$": ParsedObjectType$LQualifiedName$ALType$,
+		"FunctionType": FunctionType,
+		"FunctionType$": FunctionType$,
+		"FunctionChoiceType": FunctionChoiceType,
+		"FunctionChoiceType$ALResolvedFunctionType$": FunctionChoiceType$ALResolvedFunctionType$,
+		"ResolvedFunctionType": ResolvedFunctionType,
+		"ResolvedFunctionType$LToken$LType$ALType$B": ResolvedFunctionType$LToken$LType$ALType$B,
+		"StaticFunctionType": StaticFunctionType,
+		"StaticFunctionType$LToken$LType$ALType$B": StaticFunctionType$LToken$LType$ALType$B,
+		"MemberFunctionType": MemberFunctionType,
+		"MemberFunctionType$LToken$LType$LType$ALType$B": MemberFunctionType$LToken$LType$LType$ALType$B
 	},
 	"src/parser.jsx": {
-		Token: Token,
-		Token$SB: Token$SB,
-		Token$SBUSNN: Token$SBUSNN,
-		_Lexer: _Lexer,
-		_Lexer$: _Lexer$,
-		Import: Import,
-		Import$LParser$: Import$LParser$,
-		Import$LToken$LToken$ALToken$: Import$LToken$LToken$ALToken$,
-		WildcardImport: WildcardImport,
-		WildcardImport$LToken$LToken$ALToken$SS: WildcardImport$LToken$LToken$ALToken$SS,
-		QualifiedName: QualifiedName,
-		QualifiedName$LToken$: QualifiedName$LToken$,
-		QualifiedName$LToken$LImport$: QualifiedName$LToken$LImport$,
-		QualifiedName$LToken$LParsedObjectType$: QualifiedName$LToken$LParsedObjectType$,
-		ParserState: ParserState,
-		ParserState$NNLDocComment$NNNNN: ParserState$NNLDocComment$NNNNN,
-		ClassState: ClassState,
-		ClassState$LClassState$LParsedObjectType$ALToken$LParsedObjectType$ALParsedObjectType$ALParsedObjectType$NALClassDefinition$ALTemplateClassDefinition$: ClassState$LClassState$LParsedObjectType$ALToken$LParsedObjectType$ALParsedObjectType$ALParsedObjectType$NALClassDefinition$ALTemplateClassDefinition$,
-		Scope: Scope,
-		Scope$LScope$ALLocalVariable$LLocalVariable$ALArgumentDeclaration$ALStatement$ALMemberFunctionDefinition$: Scope$LScope$ALLocalVariable$LLocalVariable$ALArgumentDeclaration$ALStatement$ALMemberFunctionDefinition$,
-		Parser: Parser,
-		Parser$LToken$SLCompletionRequest$: Parser$LToken$SLCompletionRequest$
+		"Token": Token,
+		"Token$SB": Token$SB,
+		"Token$SBUSNN": Token$SBUSNN,
+		"_Lexer": _Lexer,
+		"_Lexer$": _Lexer$,
+		"Import": Import,
+		"Import$LParser$": Import$LParser$,
+		"Import$LToken$LToken$ALToken$": Import$LToken$LToken$ALToken$,
+		"WildcardImport": WildcardImport,
+		"WildcardImport$LToken$LToken$ALToken$SS": WildcardImport$LToken$LToken$ALToken$SS,
+		"QualifiedName": QualifiedName,
+		"QualifiedName$LToken$": QualifiedName$LToken$,
+		"QualifiedName$LToken$LImport$": QualifiedName$LToken$LImport$,
+		"QualifiedName$LToken$LParsedObjectType$": QualifiedName$LToken$LParsedObjectType$,
+		"ParserState": ParserState,
+		"ParserState$NNLDocComment$NBNNNN": ParserState$NNLDocComment$NBNNNN,
+		"ClassState": ClassState,
+		"ClassState$LClassState$LParsedObjectType$ALToken$LParsedObjectType$ALParsedObjectType$ALParsedObjectType$NALClassDefinition$ALTemplateClassDefinition$": ClassState$LClassState$LParsedObjectType$ALToken$LParsedObjectType$ALParsedObjectType$ALParsedObjectType$NALClassDefinition$ALTemplateClassDefinition$,
+		"Scope": Scope,
+		"Scope$LScope$ALLocalVariable$LLocalVariable$ALArgumentDeclaration$ALStatement$ALMemberFunctionDefinition$B": Scope$LScope$ALLocalVariable$LLocalVariable$ALArgumentDeclaration$ALStatement$ALMemberFunctionDefinition$B,
+		"Parser": Parser,
+		"Parser$LToken$SLCompletionRequest$": Parser$LToken$SLCompletionRequest$
 	},
 	"src/optimizer.jsx": {
-		OptimizerStash: OptimizerStash,
-		OptimizerStash$: OptimizerStash$,
-		Stashable: Stashable,
-		Stashable$: Stashable$,
-		_Util: _Util,
-		_Util$: _Util$,
-		Optimizer: Optimizer,
-		Optimizer$: Optimizer$,
-		_OptimizeCommand: _OptimizeCommand,
-		_OptimizeCommand$S: _OptimizeCommand$S,
-		_FunctionOptimizeCommand: _FunctionOptimizeCommand,
-		_FunctionOptimizeCommand$S: _FunctionOptimizeCommand$S,
-		_LinkTimeOptimizationCommand: _LinkTimeOptimizationCommand,
-		_LinkTimeOptimizationCommand$: _LinkTimeOptimizationCommand$,
-		_NoAssertCommand: _NoAssertCommand,
-		_NoAssertCommand$: _NoAssertCommand$,
-		_NoLogCommand: _NoLogCommand,
-		_NoLogCommand$: _NoLogCommand$,
-		_DetermineCalleeCommand: _DetermineCalleeCommand,
-		_DetermineCalleeCommand$: _DetermineCalleeCommand$,
-		_StaticizeOptimizeCommand: _StaticizeOptimizeCommand,
-		_StaticizeOptimizeCommand$: _StaticizeOptimizeCommand$,
-		_UnclassifyOptimizationCommand: _UnclassifyOptimizationCommand,
-		_UnclassifyOptimizationCommand$: _UnclassifyOptimizationCommand$,
-		_FoldConstantCommand: _FoldConstantCommand,
-		_FoldConstantCommand$: _FoldConstantCommand$,
-		_DeadCodeEliminationOptimizeCommand: _DeadCodeEliminationOptimizeCommand,
-		_DeadCodeEliminationOptimizeCommand$: _DeadCodeEliminationOptimizeCommand$,
-		_InlineOptimizeCommand: _InlineOptimizeCommand,
-		_InlineOptimizeCommand$: _InlineOptimizeCommand$,
-		_ReturnIfOptimizeCommand: _ReturnIfOptimizeCommand,
-		_ReturnIfOptimizeCommand$: _ReturnIfOptimizeCommand$,
-		_LCSECachedExpression: _LCSECachedExpression,
-		_LCSECachedExpression$LExpression$F$LExpression$V$: _LCSECachedExpression$LExpression$F$LExpression$V$,
-		_LCSEOptimizeCommand: _LCSEOptimizeCommand,
-		_LCSEOptimizeCommand$: _LCSEOptimizeCommand$,
-		_UnboxOptimizeCommand: _UnboxOptimizeCommand,
-		_UnboxOptimizeCommand$: _UnboxOptimizeCommand$,
-		_ArrayLengthOptimizeCommand: _ArrayLengthOptimizeCommand,
-		_ArrayLengthOptimizeCommand$: _ArrayLengthOptimizeCommand$,
-		_NoDebugCommand: _NoDebugCommand,
-		_NoDebugCommand$: _NoDebugCommand$,
-		Stash: _LinkTimeOptimizationCommand$CStash,
-		Stash$: _LinkTimeOptimizationCommand$CStash$,
-		Stash: _DetermineCalleeCommand$CStash,
-		Stash$: _DetermineCalleeCommand$CStash$,
-		Stash$L_DetermineCalleeCommand$CStash$: _DetermineCalleeCommand$CStash$L_DetermineCalleeCommand$CStash$,
-		Stash: _UnclassifyOptimizationCommand$CStash,
-		Stash$: _UnclassifyOptimizationCommand$CStash$,
-		Stash$L_UnclassifyOptimizationCommand$CStash$: _UnclassifyOptimizationCommand$CStash$L_UnclassifyOptimizationCommand$CStash$,
-		Stash: _FoldConstantCommand$CStash,
-		Stash$: _FoldConstantCommand$CStash$,
-		Stash$L_FoldConstantCommand$CStash$: _FoldConstantCommand$CStash$L_FoldConstantCommand$CStash$,
-		Stash: _InlineOptimizeCommand$CStash,
-		Stash$: _InlineOptimizeCommand$CStash$,
-		Stash$L_InlineOptimizeCommand$CStash$: _InlineOptimizeCommand$CStash$L_InlineOptimizeCommand$CStash$,
-		Stash: _UnboxOptimizeCommand$CStash,
-		Stash$: _UnboxOptimizeCommand$CStash$,
-		Stash: _NoDebugCommand$CStash,
-		Stash$: _NoDebugCommand$CStash$
+		"OptimizerStash": OptimizerStash,
+		"OptimizerStash$": OptimizerStash$,
+		"Stashable": Stashable,
+		"Stashable$": Stashable$,
+		"_Util": _Util,
+		"_Util$": _Util$,
+		"Optimizer": Optimizer,
+		"Optimizer$": Optimizer$,
+		"_OptimizeCommand": _OptimizeCommand,
+		"_OptimizeCommand$S": _OptimizeCommand$S,
+		"_FunctionOptimizeCommand": _FunctionOptimizeCommand,
+		"_FunctionOptimizeCommand$S": _FunctionOptimizeCommand$S,
+		"_LinkTimeOptimizationCommand": _LinkTimeOptimizationCommand,
+		"_LinkTimeOptimizationCommand$": _LinkTimeOptimizationCommand$,
+		"_NoAssertCommand": _NoAssertCommand,
+		"_NoAssertCommand$": _NoAssertCommand$,
+		"_NoLogCommand": _NoLogCommand,
+		"_NoLogCommand$": _NoLogCommand$,
+		"_DetermineCalleeCommand": _DetermineCalleeCommand,
+		"_DetermineCalleeCommand$": _DetermineCalleeCommand$,
+		"_StaticizeOptimizeCommand": _StaticizeOptimizeCommand,
+		"_StaticizeOptimizeCommand$": _StaticizeOptimizeCommand$,
+		"_UnclassifyOptimizationCommand": _UnclassifyOptimizationCommand,
+		"_UnclassifyOptimizationCommand$": _UnclassifyOptimizationCommand$,
+		"_FoldConstantCommand": _FoldConstantCommand,
+		"_FoldConstantCommand$": _FoldConstantCommand$,
+		"_DeadCodeEliminationOptimizeCommand": _DeadCodeEliminationOptimizeCommand,
+		"_DeadCodeEliminationOptimizeCommand$": _DeadCodeEliminationOptimizeCommand$,
+		"_InlineOptimizeCommand": _InlineOptimizeCommand,
+		"_InlineOptimizeCommand$": _InlineOptimizeCommand$,
+		"_ReturnIfOptimizeCommand": _ReturnIfOptimizeCommand,
+		"_ReturnIfOptimizeCommand$": _ReturnIfOptimizeCommand$,
+		"_LCSECachedExpression": _LCSECachedExpression,
+		"_LCSECachedExpression$LExpression$F$LExpression$V$": _LCSECachedExpression$LExpression$F$LExpression$V$,
+		"_LCSEOptimizeCommand": _LCSEOptimizeCommand,
+		"_LCSEOptimizeCommand$": _LCSEOptimizeCommand$,
+		"_UnboxOptimizeCommand": _UnboxOptimizeCommand,
+		"_UnboxOptimizeCommand$": _UnboxOptimizeCommand$,
+		"_ArrayLengthOptimizeCommand": _ArrayLengthOptimizeCommand,
+		"_ArrayLengthOptimizeCommand$": _ArrayLengthOptimizeCommand$,
+		"_NoDebugCommand": _NoDebugCommand,
+		"_NoDebugCommand$": _NoDebugCommand$,
+		"_LinkTimeOptimizationCommand.Stash": _LinkTimeOptimizationCommand$CStash,
+		"_LinkTimeOptimizationCommand.Stash$": _LinkTimeOptimizationCommand$CStash$,
+		"_DetermineCalleeCommand.Stash": _DetermineCalleeCommand$CStash,
+		"_DetermineCalleeCommand.Stash$": _DetermineCalleeCommand$CStash$,
+		"_DetermineCalleeCommand.Stash$L_DetermineCalleeCommand$CStash$": _DetermineCalleeCommand$CStash$L_DetermineCalleeCommand$CStash$,
+		"_UnclassifyOptimizationCommand.Stash": _UnclassifyOptimizationCommand$CStash,
+		"_UnclassifyOptimizationCommand.Stash$": _UnclassifyOptimizationCommand$CStash$,
+		"_UnclassifyOptimizationCommand.Stash$L_UnclassifyOptimizationCommand$CStash$": _UnclassifyOptimizationCommand$CStash$L_UnclassifyOptimizationCommand$CStash$,
+		"_FoldConstantCommand.Stash": _FoldConstantCommand$CStash,
+		"_FoldConstantCommand.Stash$": _FoldConstantCommand$CStash$,
+		"_FoldConstantCommand.Stash$L_FoldConstantCommand$CStash$": _FoldConstantCommand$CStash$L_FoldConstantCommand$CStash$,
+		"_InlineOptimizeCommand.Stash": _InlineOptimizeCommand$CStash,
+		"_InlineOptimizeCommand.Stash$": _InlineOptimizeCommand$CStash$,
+		"_InlineOptimizeCommand.Stash$L_InlineOptimizeCommand$CStash$": _InlineOptimizeCommand$CStash$L_InlineOptimizeCommand$CStash$,
+		"_UnboxOptimizeCommand.Stash": _UnboxOptimizeCommand$CStash,
+		"_UnboxOptimizeCommand.Stash$": _UnboxOptimizeCommand$CStash$,
+		"_NoDebugCommand.Stash": _NoDebugCommand$CStash,
+		"_NoDebugCommand.Stash$": _NoDebugCommand$CStash$
 	},
 	"src/statement.jsx": {
-		Statement: Statement,
-		Statement$: Statement$,
-		InformationStatement: InformationStatement,
-		InformationStatement$LToken$: InformationStatement$LToken$,
-		DebuggerStatement: DebuggerStatement,
-		DebuggerStatement$LToken$: DebuggerStatement$LToken$,
-		LogStatement: LogStatement,
-		LogStatement$LToken$ALExpression$: LogStatement$LToken$ALExpression$,
-		AssertStatement: AssertStatement,
-		AssertStatement$LToken$LExpression$: AssertStatement$LToken$LExpression$,
-		ThrowStatement: ThrowStatement,
-		ThrowStatement$LToken$LExpression$: ThrowStatement$LToken$LExpression$,
-		CatchStatement: CatchStatement,
-		CatchStatement$LToken$LCaughtVariable$ALStatement$: CatchStatement$LToken$LCaughtVariable$ALStatement$,
-		TryStatement: TryStatement,
-		TryStatement$LToken$ALStatement$ALCatchStatement$ALStatement$: TryStatement$LToken$ALStatement$ALCatchStatement$ALStatement$,
-		DefaultStatement: DefaultStatement,
-		DefaultStatement$LToken$: DefaultStatement$LToken$,
-		CaseStatement: CaseStatement,
-		CaseStatement$LToken$LExpression$: CaseStatement$LToken$LExpression$,
-		IfStatement: IfStatement,
-		IfStatement$LToken$LExpression$ALStatement$ALStatement$: IfStatement$LToken$LExpression$ALStatement$ALStatement$,
-		LabellableStatement: LabellableStatement,
-		LabellableStatement$LToken$LToken$: LabellableStatement$LToken$LToken$,
-		SwitchStatement: SwitchStatement,
-		SwitchStatement$LToken$LToken$LExpression$ALStatement$: SwitchStatement$LToken$LToken$LExpression$ALStatement$,
-		ContinuableStatement: ContinuableStatement,
-		ContinuableStatement$LToken$LToken$ALStatement$: ContinuableStatement$LToken$LToken$ALStatement$,
-		WhileStatement: WhileStatement,
-		WhileStatement$LToken$LToken$LExpression$ALStatement$: WhileStatement$LToken$LToken$LExpression$ALStatement$,
-		ForStatement: ForStatement,
-		ForStatement$LToken$LToken$LExpression$LExpression$LExpression$ALStatement$: ForStatement$LToken$LToken$LExpression$LExpression$LExpression$ALStatement$,
-		ForInStatement: ForInStatement,
-		ForInStatement$LToken$LToken$LExpression$LExpression$ALStatement$: ForInStatement$LToken$LToken$LExpression$LExpression$ALStatement$,
-		DoWhileStatement: DoWhileStatement,
-		DoWhileStatement$LToken$LToken$LExpression$ALStatement$: DoWhileStatement$LToken$LToken$LExpression$ALStatement$,
-		JumpStatement: JumpStatement,
-		JumpStatement$LToken$LToken$: JumpStatement$LToken$LToken$,
-		ContinueStatement: ContinueStatement,
-		ContinueStatement$LToken$LToken$: ContinueStatement$LToken$LToken$,
-		BreakStatement: BreakStatement,
-		BreakStatement$LToken$LToken$: BreakStatement$LToken$LToken$,
-		ReturnStatement: ReturnStatement,
-		ReturnStatement$LToken$LExpression$: ReturnStatement$LToken$LExpression$,
-		FunctionStatement: FunctionStatement,
-		FunctionStatement$LToken$LMemberFunctionDefinition$: FunctionStatement$LToken$LMemberFunctionDefinition$,
-		UnaryExpressionStatement: UnaryExpressionStatement,
-		UnaryExpressionStatement$LExpression$: UnaryExpressionStatement$LExpression$,
-		DeleteStatement: DeleteStatement,
-		DeleteStatement$LToken$LExpression$: DeleteStatement$LToken$LExpression$,
-		ExpressionStatement: ExpressionStatement,
-		ExpressionStatement$LExpression$: ExpressionStatement$LExpression$,
-		ConstructorInvocationStatement: ConstructorInvocationStatement,
-		ConstructorInvocationStatement$LToken$LType$ALExpression$: ConstructorInvocationStatement$LToken$LType$ALExpression$,
-		ConstructorInvocationStatement$LToken$LType$ALExpression$LFunctionType$: ConstructorInvocationStatement$LToken$LType$ALExpression$LFunctionType$
+		"Statement": Statement,
+		"Statement$": Statement$,
+		"LabelStatement": LabelStatement,
+		"LabelStatement$S": LabelStatement$S,
+		"GotoStatement": GotoStatement,
+		"GotoStatement$S": GotoStatement$S,
+		"InformationStatement": InformationStatement,
+		"InformationStatement$LToken$": InformationStatement$LToken$,
+		"DebuggerStatement": DebuggerStatement,
+		"DebuggerStatement$LToken$": DebuggerStatement$LToken$,
+		"LogStatement": LogStatement,
+		"LogStatement$LToken$ALExpression$": LogStatement$LToken$ALExpression$,
+		"AssertStatement": AssertStatement,
+		"AssertStatement$LToken$LExpression$": AssertStatement$LToken$LExpression$,
+		"ThrowStatement": ThrowStatement,
+		"ThrowStatement$LToken$LExpression$": ThrowStatement$LToken$LExpression$,
+		"CatchStatement": CatchStatement,
+		"CatchStatement$LToken$LCaughtVariable$ALStatement$": CatchStatement$LToken$LCaughtVariable$ALStatement$,
+		"TryStatement": TryStatement,
+		"TryStatement$LToken$ALStatement$ALCatchStatement$ALStatement$": TryStatement$LToken$ALStatement$ALCatchStatement$ALStatement$,
+		"DefaultStatement": DefaultStatement,
+		"DefaultStatement$LToken$": DefaultStatement$LToken$,
+		"CaseStatement": CaseStatement,
+		"CaseStatement$LToken$LExpression$": CaseStatement$LToken$LExpression$,
+		"IfStatement": IfStatement,
+		"IfStatement$LToken$LExpression$ALStatement$ALStatement$": IfStatement$LToken$LExpression$ALStatement$ALStatement$,
+		"LabellableStatement": LabellableStatement,
+		"LabellableStatement$LToken$LToken$": LabellableStatement$LToken$LToken$,
+		"SwitchStatement": SwitchStatement,
+		"SwitchStatement$LToken$LToken$LExpression$ALStatement$": SwitchStatement$LToken$LToken$LExpression$ALStatement$,
+		"ContinuableStatement": ContinuableStatement,
+		"ContinuableStatement$LToken$LToken$ALStatement$": ContinuableStatement$LToken$LToken$ALStatement$,
+		"WhileStatement": WhileStatement,
+		"WhileStatement$LToken$LToken$LExpression$ALStatement$": WhileStatement$LToken$LToken$LExpression$ALStatement$,
+		"ForStatement": ForStatement,
+		"ForStatement$LToken$LToken$LExpression$LExpression$LExpression$ALStatement$": ForStatement$LToken$LToken$LExpression$LExpression$LExpression$ALStatement$,
+		"ForInStatement": ForInStatement,
+		"ForInStatement$LToken$LToken$LExpression$LExpression$ALStatement$": ForInStatement$LToken$LToken$LExpression$LExpression$ALStatement$,
+		"DoWhileStatement": DoWhileStatement,
+		"DoWhileStatement$LToken$LToken$LExpression$ALStatement$": DoWhileStatement$LToken$LToken$LExpression$ALStatement$,
+		"JumpStatement": JumpStatement,
+		"JumpStatement$LToken$LToken$": JumpStatement$LToken$LToken$,
+		"ContinueStatement": ContinueStatement,
+		"ContinueStatement$LToken$LToken$": ContinueStatement$LToken$LToken$,
+		"BreakStatement": BreakStatement,
+		"BreakStatement$LToken$LToken$": BreakStatement$LToken$LToken$,
+		"YieldStatement": YieldStatement,
+		"YieldStatement$LToken$LExpression$": YieldStatement$LToken$LExpression$,
+		"ReturnStatement": ReturnStatement,
+		"ReturnStatement$LToken$LExpression$": ReturnStatement$LToken$LExpression$,
+		"FunctionStatement": FunctionStatement,
+		"FunctionStatement$LToken$LMemberFunctionDefinition$": FunctionStatement$LToken$LMemberFunctionDefinition$,
+		"UnaryExpressionStatement": UnaryExpressionStatement,
+		"UnaryExpressionStatement$LExpression$": UnaryExpressionStatement$LExpression$,
+		"DeleteStatement": DeleteStatement,
+		"DeleteStatement$LToken$LExpression$": DeleteStatement$LToken$LExpression$,
+		"ExpressionStatement": ExpressionStatement,
+		"ExpressionStatement$LExpression$": ExpressionStatement$LExpression$,
+		"ConstructorInvocationStatement": ConstructorInvocationStatement,
+		"ConstructorInvocationStatement$LToken$LType$ALExpression$": ConstructorInvocationStatement$LToken$LType$ALExpression$,
+		"ConstructorInvocationStatement$LToken$LType$ALExpression$LFunctionType$": ConstructorInvocationStatement$LToken$LType$ALExpression$LFunctionType$
 	},
 	"src/emitter.jsx": {
-		Emitter: Emitter,
-		Emitter$: Emitter$
+		"Emitter": Emitter,
+		"Emitter$": Emitter$
 	},
 	"src/jssourcemap.jsx": {
-		SourceMapper: SourceMapper,
-		SourceMapper$SS: SourceMapper$SS
+		"SourceMapper": SourceMapper,
+		"SourceMapper$SS": SourceMapper$SS
 	},
 	"src/compiler.jsx": {
-		Compiler: Compiler,
-		Compiler$LPlatform$: Compiler$LPlatform$
+		"Compiler": Compiler,
+		"Compiler$LPlatform$": Compiler$LPlatform$
 	},
 	"src/completion.jsx": {
-		CompletionRequest: CompletionRequest,
-		CompletionRequest$NN: CompletionRequest$NN,
-		CompletionCandidates: CompletionCandidates,
-		CompletionCandidates$: CompletionCandidates$,
-		KeywordCompletionCandidate: KeywordCompletionCandidate,
-		KeywordCompletionCandidate$S: KeywordCompletionCandidate$S,
-		CompletionCandidatesOfTopLevel: CompletionCandidatesOfTopLevel,
-		CompletionCandidatesOfTopLevel$LParser$F$LClassDefinition$B$: CompletionCandidatesOfTopLevel$LParser$F$LClassDefinition$B$,
-		_CompletionCandidatesWithLocal: _CompletionCandidatesWithLocal,
-		_CompletionCandidatesWithLocal$LParser$: _CompletionCandidatesWithLocal$LParser$,
-		_CompletionCandidatesOfNamespace: _CompletionCandidatesOfNamespace,
-		_CompletionCandidatesOfNamespace$LImport$F$LClassDefinition$B$: _CompletionCandidatesOfNamespace$LImport$F$LClassDefinition$B$,
-		_CompletionCandidatesOfProperty: _CompletionCandidatesOfProperty,
-		_CompletionCandidatesOfProperty$LExpression$: _CompletionCandidatesOfProperty$LExpression$
+		"CompletionRequest": CompletionRequest,
+		"CompletionRequest$NN": CompletionRequest$NN,
+		"CompletionCandidates": CompletionCandidates,
+		"CompletionCandidates$": CompletionCandidates$,
+		"KeywordCompletionCandidate": KeywordCompletionCandidate,
+		"KeywordCompletionCandidate$S": KeywordCompletionCandidate$S,
+		"CompletionCandidatesOfTopLevel": CompletionCandidatesOfTopLevel,
+		"CompletionCandidatesOfTopLevel$LParser$F$LClassDefinition$B$": CompletionCandidatesOfTopLevel$LParser$F$LClassDefinition$B$,
+		"_CompletionCandidatesWithLocal": _CompletionCandidatesWithLocal,
+		"_CompletionCandidatesWithLocal$LParser$": _CompletionCandidatesWithLocal$LParser$,
+		"_CompletionCandidatesOfNamespace": _CompletionCandidatesOfNamespace,
+		"_CompletionCandidatesOfNamespace$LImport$F$LClassDefinition$B$": _CompletionCandidatesOfNamespace$LImport$F$LClassDefinition$B$,
+		"_CompletionCandidatesOfProperty": _CompletionCandidatesOfProperty,
+		"_CompletionCandidatesOfProperty$LExpression$": _CompletionCandidatesOfProperty$LExpression$
 	},
 	"src/doc.jsx": {
-		DocCommentNode: DocCommentNode,
-		DocCommentNode$: DocCommentNode$,
-		DocCommentParameter: DocCommentParameter,
-		DocCommentParameter$LToken$: DocCommentParameter$LToken$,
-		DocCommentTag: DocCommentTag,
-		DocCommentTag$S: DocCommentTag$S,
-		DocComment: DocComment,
-		DocComment$: DocComment$,
-		DocumentGenerator: DocumentGenerator,
-		DocumentGenerator$LCompiler$SS: DocumentGenerator$LCompiler$SS
+		"DocCommentNode": DocCommentNode,
+		"DocCommentNode$": DocCommentNode$,
+		"DocCommentParameter": DocCommentParameter,
+		"DocCommentParameter$LToken$": DocCommentParameter$LToken$,
+		"DocCommentTag": DocCommentTag,
+		"DocCommentTag$S": DocCommentTag$S,
+		"DocComment": DocComment,
+		"DocComment$": DocComment$,
+		"DocumentGenerator": DocumentGenerator,
+		"DocumentGenerator$LCompiler$SS": DocumentGenerator$LCompiler$SS
+	},
+	"src/instruments.jsx": {
+		"_StatementTransformer": _StatementTransformer,
+		"_StatementTransformer$LCodeTransformer$S": _StatementTransformer$LCodeTransformer$S,
+		"_ConstructorInvocationStatementTransformer": _ConstructorInvocationStatementTransformer,
+		"_ConstructorInvocationStatementTransformer$LCodeTransformer$LConstructorInvocationStatement$": _ConstructorInvocationStatementTransformer$LCodeTransformer$LConstructorInvocationStatement$,
+		"_ExpressionStatementTransformer": _ExpressionStatementTransformer,
+		"_ExpressionStatementTransformer$LCodeTransformer$LExpressionStatement$": _ExpressionStatementTransformer$LCodeTransformer$LExpressionStatement$,
+		"_FunctionStatementTransformer": _FunctionStatementTransformer,
+		"_FunctionStatementTransformer$LCodeTransformer$LFunctionStatement$": _FunctionStatementTransformer$LCodeTransformer$LFunctionStatement$,
+		"_ReturnStatementTransformer": _ReturnStatementTransformer,
+		"_ReturnStatementTransformer$LCodeTransformer$LReturnStatement$": _ReturnStatementTransformer$LCodeTransformer$LReturnStatement$,
+		"_YieldStatementTransformer": _YieldStatementTransformer,
+		"_YieldStatementTransformer$LCodeTransformer$LYieldStatement$": _YieldStatementTransformer$LCodeTransformer$LYieldStatement$,
+		"_DeleteStatementTransformer": _DeleteStatementTransformer,
+		"_DeleteStatementTransformer$LCodeTransformer$LDeleteStatement$": _DeleteStatementTransformer$LCodeTransformer$LDeleteStatement$,
+		"_BreakStatementTransformer": _BreakStatementTransformer,
+		"_BreakStatementTransformer$LCodeTransformer$LBreakStatement$": _BreakStatementTransformer$LCodeTransformer$LBreakStatement$,
+		"_ContinueStatementTransformer": _ContinueStatementTransformer,
+		"_ContinueStatementTransformer$LCodeTransformer$LContinueStatement$": _ContinueStatementTransformer$LCodeTransformer$LContinueStatement$,
+		"_LabellableStatementTransformer": _LabellableStatementTransformer,
+		"_LabellableStatementTransformer$LCodeTransformer$S": _LabellableStatementTransformer$LCodeTransformer$S,
+		"_DoWhileStatementTransformer": _DoWhileStatementTransformer,
+		"_DoWhileStatementTransformer$LCodeTransformer$LDoWhileStatement$": _DoWhileStatementTransformer$LCodeTransformer$LDoWhileStatement$,
+		"_ForInStatementTransformer": _ForInStatementTransformer,
+		"_ForInStatementTransformer$LCodeTransformer$LForInStatement$": _ForInStatementTransformer$LCodeTransformer$LForInStatement$,
+		"_ForStatementTransformer": _ForStatementTransformer,
+		"_ForStatementTransformer$LCodeTransformer$LForStatement$": _ForStatementTransformer$LCodeTransformer$LForStatement$,
+		"_IfStatementTransformer": _IfStatementTransformer,
+		"_IfStatementTransformer$LCodeTransformer$LIfStatement$": _IfStatementTransformer$LCodeTransformer$LIfStatement$,
+		"_SwitchStatementTransformer": _SwitchStatementTransformer,
+		"_SwitchStatementTransformer$LCodeTransformer$LSwitchStatement$": _SwitchStatementTransformer$LCodeTransformer$LSwitchStatement$,
+		"_CaseStatementTransformer": _CaseStatementTransformer,
+		"_CaseStatementTransformer$LCodeTransformer$LCaseStatement$": _CaseStatementTransformer$LCodeTransformer$LCaseStatement$,
+		"_DefaultStatementTransformer": _DefaultStatementTransformer,
+		"_DefaultStatementTransformer$LCodeTransformer$LDefaultStatement$": _DefaultStatementTransformer$LCodeTransformer$LDefaultStatement$,
+		"_WhileStatementTransformer": _WhileStatementTransformer,
+		"_WhileStatementTransformer$LCodeTransformer$LWhileStatement$": _WhileStatementTransformer$LCodeTransformer$LWhileStatement$,
+		"_TryStatementTransformer": _TryStatementTransformer,
+		"_TryStatementTransformer$LCodeTransformer$LTryStatement$": _TryStatementTransformer$LCodeTransformer$LTryStatement$,
+		"_CatchStatementTransformer": _CatchStatementTransformer,
+		"_CatchStatementTransformer$LCodeTransformer$LCatchStatement$": _CatchStatementTransformer$LCodeTransformer$LCatchStatement$,
+		"_ThrowStatementTransformer": _ThrowStatementTransformer,
+		"_ThrowStatementTransformer$LCodeTransformer$LThrowStatement$": _ThrowStatementTransformer$LCodeTransformer$LThrowStatement$,
+		"_AssertStatementTransformer": _AssertStatementTransformer,
+		"_AssertStatementTransformer$LCodeTransformer$LAssertStatement$": _AssertStatementTransformer$LCodeTransformer$LAssertStatement$,
+		"_LogStatementTransformer": _LogStatementTransformer,
+		"_LogStatementTransformer$LCodeTransformer$LLogStatement$": _LogStatementTransformer$LCodeTransformer$LLogStatement$,
+		"_DebuggerStatementTransformer": _DebuggerStatementTransformer,
+		"_DebuggerStatementTransformer$LCodeTransformer$LDebuggerStatement$": _DebuggerStatementTransformer$LCodeTransformer$LDebuggerStatement$,
+		"CodeTransformer": CodeTransformer,
+		"CodeTransformer$": CodeTransformer$
 	}
 };
 
