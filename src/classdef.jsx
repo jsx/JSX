@@ -63,6 +63,7 @@ class ClassDefinition implements Stashable {
 	static const IS_PURE = 2048; // constexpr (intended for for native functions)
 	static const IS_DELETE = 4096; // used for disabling the default constructor
 	static const IS_GENERATOR = 8192;
+	static const IS_ASYNC = 16384;
 
 	var _parser		: Parser;
 	var _token		: Token;
