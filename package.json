@@ -35,7 +35,7 @@
     "src": "./src"
   },
   "dependencies": {
-      "source-map": "0.1.22",
+      "source-map": "~ 0.1.22",
       "esprima": "~ 1.0.2",
       "escodegen": "~ 0.0.20",
       "esmangle": "~ 0.0.14"
