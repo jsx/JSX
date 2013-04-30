@@ -64,6 +64,7 @@ class ClassDefinition implements Stashable {
 	static const IS_DELETE = 4096; // used for disabling the default constructor
 	static const IS_GENERATOR = 8192;
 	static const IS_EXPORT = 16384; // no overloading, no minification of method / variable names
+	static const IS_EXPORT_WITH_ARGTYPES = 32768; // used by jsemitter to mark functions that should not be minified
 
 	var _parser		: Parser;
 	var _token		: Token;

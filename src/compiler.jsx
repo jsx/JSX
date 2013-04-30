@@ -159,6 +159,7 @@ class Compiler {
 		this._resolveTypes(errors);
 		if (! this._handleErrors(errors))
 			return false;
+		this._exportEntryPoints();
 		this._analyze(errors);
 		if (! this._handleErrors(errors))
 			return false;
@@ -410,6 +411,35 @@ class Compiler {
 		}
 		// emit
 		this._emitter.emit(classDefs);
+	}
+
+	function _exportEntryPoints() : void {
+		this.forEachClassDef(function (parser, classDef) {
+			switch (classDef.classFullName()) {
+			case "_Main":
+				classDef.forEachMemberFunction(function (funcDef) {
+					if ((funcDef.flags() & ClassDefinition.IS_STATIC) != 0
+						&& funcDef.name() == "main"
+						&& funcDef.getArguments().length == 1
+						&& Util.isArrayOf(funcDef.getArgumentTypes()[0].getClassDef(), Type.stringType)) {
+						funcDef.setFlags(funcDef.flags() | ClassDefinition.IS_EXPORT_WITH_ARGTYPES);
+					}
+					return true;
+				});
+				break;
+			case "_Test":
+				classDef.forEachMemberFunction(function (funcDef) {
+					if ((funcDef.flags() & ClassDefinition.IS_STATIC) == 0
+						&& funcDef.name().match(/^test/)
+						&& funcDef.getArguments().length == 0) {
+						funcDef.setFlags(funcDef.flags() | ClassDefinition.IS_EXPORT_WITH_ARGTYPES);
+					}
+					return true;
+				});
+				break;
+			}
+			return true;
+		});
 	}
 
 	function _handleErrors (errors : CompileError[]) : boolean {
