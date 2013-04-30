@@ -129,6 +129,10 @@ class NodePlatform extends Platform {
 
 	override function makeFileExecutable(file : string, runEnv : string) : void {
 		if (runEnv == "node") {
+			var filePath = this._absPath(file);
+			var contents = node.fs.readFileSync(filePath, "utf-8");
+			contents = "#!/usr/bin/env node\n" + contents;
+			node.fs.writeFileSync(filePath, contents);
 			node.fs.chmodSync(this._absPath(file), "0755");
 		}
 	}

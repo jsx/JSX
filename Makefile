@@ -34,7 +34,7 @@ bootstrap-compiler: compiler
 
 # e.g. make test JOBS=2
 
-test: all test-debug test-optimized
+test: all test-debug test-optimized test-minify-self
 
 test-debug:
 	$(MAKE) test-core
@@ -43,11 +43,18 @@ test-debug:
 test-optimized:
 	JSX_OPTS="--optimize release --disable-optimize no-log,no-assert" $(MAKE) test-core
 
+test-optimized-minified:
+	JSX_OPTS="--optimize release --disable-optimize no-log,no-assert --minify" $MAKE test-core
+
 test-core:
 	$(PROVE) --jobs "$(JOBS)" t/run/*.jsx t/compile_error/*.jsx t/lib/*.jsx t/src/*.jsx t/web/*.jsx t/optimize/*.jsx t/complete/*.jsx
 
 test-misc-core:
 	$(PROVE) --jobs "$(JOBS)" t/*.t
+
+test-minify-self:
+	@echo "running self-compile test with --minify..."
+	bin/jsx --run --minify src/jsx-node-front.jsx --help > /dev/null && echo "ok"
 
 v8bench: compiler
 	cd submodules/v8bench && make

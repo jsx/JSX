@@ -41,13 +41,13 @@ JSX.runTests = function (sourceFile, tests) {
 
 	var testCase = new testClass();
 
-	if (testCase.beforeClass$AS != null)
-		testCase.beforeClass$AS(tests);
+	if (testCase.beforeClass != null)
+		testCase.beforeClass(tests);
 
 	for (var i = 0; i < tests.length; ++i) {
 		(function (method) {
 			if (method in testCase) {
-				testCase.run$SF$V$(method, function() { testCase[method](); });
+				testCase.run(method, function() { testCase[method](); });
 			}
 			else {
 				throw new ReferenceError("No such test method: " + method);
@@ -55,6 +55,6 @@ JSX.runTests = function (sourceFile, tests) {
 		}(tests[i]));
 	}
 
-	if (testCase.afterClass$ != null)
-		testCase.afterClass$();
+	if (testCase.afterClass != null)
+		testCase.afterClass();
 };

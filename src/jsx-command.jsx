@@ -242,10 +242,6 @@ class JSXCommand {
 				case "commonjs": // implies JavaScriptEmitter
 					break;
 				case "node": // implies JavaScriptEmitter
-					tasks.push(function () : void {
-						var shebang =  "#!/usr/bin/env node\n";
-						emitter.addHeader(shebang);
-					});
 					break;
 				default:
 					platform.error("unknown executable type (node|web)");
@@ -280,6 +276,11 @@ class JSXCommand {
 			case "--profile":
 				tasks.push(function () : void {
 					emitter.setEnableProfiler(true);
+				});
+				break;
+			case "--minify":
+				tasks.push(function () {
+					emitter.setEnableMinifier(true);
 				});
 				break;
 			case "--compilation-server":
@@ -388,6 +389,11 @@ class JSXCommand {
 		optimizer = new Optimizer();
 
 		tasks.forEach(function(proc) { proc(); });
+
+		if (emitter.getEnableMinifier() && emitter.getEnableSourceMap()) {
+			platform.error("--minify and --source-map cannot be specified at the same time");
+			return 1;
+		}
 
 		var err = optimizer.setup(optimizeCommands);
 		if (err != null) {

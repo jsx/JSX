@@ -25,6 +25,7 @@ import "./parser.jsx";
 import "./type.jsx";
 import "./platform.jsx";
 import "./statement.jsx";
+import "./optimizer.jsx";
 import "./util.jsx";
 
 class InstantiationContext {
@@ -140,7 +141,7 @@ class AnalysisContext {
 
 }
 
-class LocalVariable {
+class LocalVariable implements Stashable {
 
 	var _name : Token;
 	var _type : Type;
@@ -444,8 +445,9 @@ class CompileError extends CompileIssue {
 		this._notes = new CompileNote[];
 	}
 
-	function addCompileNote (note : CompileNote) : void {
+	function addCompileNote (note : CompileNote) : CompileError {
 		this._notes.push(note);
+		return this;
 	}
 
 	function addCompileNotes (notes : CompileNote[]) : void {

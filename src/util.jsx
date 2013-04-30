@@ -221,6 +221,99 @@ class Util {
 		return found;
 	}
 
+	static function findVariableInClass(classDef : ClassDefinition, name : string, isStatic : boolean) : MemberVariableDefinition {
+		var found = null : MemberVariableDefinition;
+		classDef.forEachMemberVariable(function (def) {
+			if (isStatic == ((def.flags() & ClassDefinition.IS_STATIC) != 0)
+				&& def.name() == name) {
+				found = def;
+				return false;
+			}
+			return true;
+		});
+		return found;
+	}
+
+	static function findMemberInClass(classDef : ClassDefinition, name : string, argTypes : Type[], isStatic : boolean) : MemberDefinition {
+		if (argTypes != null) {
+			return Util.findFunctionInClass(classDef, name, argTypes, isStatic);
+		} else {
+			return Util.findVariableInClass(classDef, name, isStatic);
+		}
+	}
+
+	static function memberRootIsNative(classDef : ClassDefinition, name : string, argTypes : Type[], isStatic : boolean) : boolean {
+		if (isStatic) {
+			// TODO check "_Main.main" for minification
+			return (classDef.flags() & (ClassDefinition.IS_NATIVE | ClassDefinition.IS_FAKE)) != 0;
+		}
+		function rootIsNativeNonStatic(classDef : ClassDefinition, name : string, argTypes : Type[]) : boolean {
+			var found = Util.findMemberInClass(classDef, name, argTypes, false);
+			if (found != null && (found.flags() & ClassDefinition.IS_OVERRIDE) == 0) {
+				// found base def
+				return (classDef.flags() & (ClassDefinition.IS_NATIVE | ClassDefinition.IS_FAKE)) != 0;
+			}
+			if (classDef.extendType() == null) {
+				// no base def found in the "extend" chain, means that the base def exists in Interface / Mixin which are guaranteed to be non-native
+				return false;
+			}
+			return rootIsNativeNonStatic(classDef.extendType().getClassDef(), name, argTypes);
+		}
+		return rootIsNativeNonStatic(classDef, name, argTypes);
+	}
+
+	static function propertyRootIsNative(expr : PropertyExpression) : boolean {
+		var baseExpr = expr.getExpr();
+		return Util.memberRootIsNative(
+			baseExpr.getType().getClassDef(),
+			expr.getIdentifierToken().getValue(),
+			Util.isReferringToFunctionDefinition(expr) ? (expr.getType() as ResolvedFunctionType).getArgumentTypes() : null,
+			baseExpr instanceof ClassExpression);
+	}
+
+	static function memberIsExported(classDef : ClassDefinition, name : string, argTypes : Type[], isStatic : boolean) : boolean {
+		if (isStatic) {
+			var found = Util.findMemberInClass(classDef, name, argTypes, true);
+			return (found.flags() & ClassDefinition.IS_EXPORT) != 0;
+		}
+		function check(classDef : ClassDefinition) : boolean {
+			// check in myself
+			if ((classDef.flags() & ClassDefinition.IS_NATIVE) != 0) {
+				// native classes never "export"
+				return false;
+			}
+			var found = Util.findMemberInClass(classDef, name, argTypes, false);
+			if (found != null && (found.flags() & ClassDefinition.IS_EXPORT) != 0) {
+				return true;
+			}
+			// check in base
+			if (classDef.extendType() != null) {
+				if (check(classDef.extendType().getClassDef())) {
+					return true;
+				}
+			}
+			var isExportedInImpl = false;
+			classDef.implementTypes().forEach(function (implType) {
+				if (check(implType.getClassDef())) {
+					isExportedInImpl = true;
+				}
+			});
+			return isExportedInImpl;
+		}
+		return check(classDef);
+	}
+
+	static function isReferringToFunctionDefinition(expr : PropertyExpression) : boolean {
+		var exprType = expr.getType();
+		if (! (exprType instanceof FunctionType)) {
+			return false;
+		}
+		if (exprType.isAssignable()) {
+			return false;
+		}
+		return true;
+	}
+
 	static const _stringLiteralEncodingMap = {
 		"\0" : "\\0",
 		"\r" : "\\r",
@@ -394,6 +487,20 @@ class Util {
 		sourceLine += Util.repeat("^", size);
 
 		return Util.format("[%1:%2:%3] %4\n%5\n", [filename, lineNumber as string, columnNumber as string, message, sourceLine]);
+	}
+
+	static function isArrayOf(classDef : ClassDefinition, expectedElementType : Type) : boolean {
+		if (! (classDef instanceof InstantiatedClassDefinition)) {
+			return false;
+		}
+		var instantiatedClassDef = classDef as InstantiatedClassDefinition;
+		if (instantiatedClassDef.getTemplateClassName() != "Array") {
+			return false;
+		}
+		if (! instantiatedClassDef.getTypeArguments()[0].equals(expectedElementType)) {
+			return false;
+		}
+		return true;
 	}
 
 }

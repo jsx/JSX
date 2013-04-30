@@ -1,4 +1,16 @@
 /**
+ * extends the class
+ */
+function $__jsx_extend(derivations, base) {
+	var ctor = function () {};
+	ctor.prototype = base.prototype;
+	var proto = new ctor();
+	for (var i in derivations) {
+		derivations[i].prototype = proto;
+	}
+}
+
+/**
  * copies the implementations from source interface to target
  */
 function $__jsx_merge_interface(target, source) {

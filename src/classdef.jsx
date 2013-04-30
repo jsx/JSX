@@ -63,11 +63,12 @@ class ClassDefinition implements Stashable {
 	static const IS_PURE = 2048; // constexpr (intended for for native functions)
 	static const IS_DELETE = 4096; // used for disabling the default constructor
 	static const IS_GENERATOR = 8192;
+	static const IS_EXPORT = 16384; // no overloading, no minification of method / variable names
+	static const IS_EXPORT_WITH_ARGTYPES = 32768; // used by jsemitter to mark functions that should not be minified
 
 	var _parser		: Parser;
 	var _token		: Token;
 	var _className		: string;
-	var _outputClassName	: Nullable.<string>;
 	var _flags		: number;
 	var _extendType		: ParsedObjectType; // null for interfaces, mixins, and Object class only
 	var _implementTypes	: ParsedObjectType[];
@@ -84,7 +85,6 @@ class ClassDefinition implements Stashable {
 		this._parser = null;
 		this._token = token;
 		this._className = className;
-		this._outputClassName = null;
 		this._flags = flags;
 		this._extendType = extendType;
 		this._implementTypes = implementTypes;
@@ -134,14 +134,6 @@ class ClassDefinition implements Stashable {
 
 	function classFullName () : string {
 		return this._outerClassDef != null ? this._outerClassDef.classFullName() + "." + this._className : this.className();
-	}
-
-	function setOutputClassName (name : string) : void {
-		this._outputClassName = name;
-	}
-
-	function getOutputClassName () : string {
-		return this._outputClassName;
 	}
 
 	function flags () : number {
@@ -713,6 +705,33 @@ class ClassDefinition implements Stashable {
 				context.errors.push(new CompileError(this.getToken(), msg));
 			}
 		}
+		// check that there are no conflicting exports (note: conflict names bet. var defs and functions are prohibited anyways)
+		var usedNames = new Map.<MemberDefinition>;
+		this._getMembers([], function (member) {
+			if (! (member instanceof MemberFunctionDefinition)) {
+				return false;
+			}
+			if ((member.flags() & (ClassDefinition.IS_STATIC | ClassDefinition.IS_EXPORT)) != ClassDefinition.IS_EXPORT) {
+				return false;
+			}
+			if (! usedNames.hasOwnProperty(member.name())) {
+				usedNames[member.name()] = member;
+				return false;
+			}
+			var existingDef = usedNames[member.name()];
+			if (existingDef.getType().equals(member.getType())) {
+				return false;
+			}
+			if ((this._flags & ClassDefinition.IS_EXPORT) != 0 && member.name() == "constructor") {
+				var errMsg = "only one constructor is exportable, please mark others using the __noexport__ attribute";
+			} else {
+				errMsg = "methods with __export__ attribute cannot be overloaded";
+			}
+			context.errors.push(
+				new CompileError(member.getToken(), errMsg)
+				.addCompileNote(new CompileNote(usedNames[member.name()].getToken(), "previously defined here")));
+			return false;
+		});
 	}
 
 	function _analyzeMembers (context : AnalysisContext) : void {
@@ -870,25 +889,31 @@ class ClassDefinition implements Stashable {
 		return null;
 	}
 
-	function _getMembers (list : MemberDefinition[], functionOnly : boolean, flagsMask : number, flagsMaskMatch : number) : void {
+	function _getMembers(list : MemberDefinition[], cb : function (member : MemberDefinition) : boolean) : void {
 		// fill in the definitions of base classes
 		if (this._baseClassDef != null)
-			this._baseClassDef._getMembers(list, functionOnly, flagsMask, flagsMaskMatch);
+			this._baseClassDef._getMembers(list, cb);
 		for (var i = 0; i < this._implementTypes.length; ++i)
-			this._implementTypes[i].getClassDef()._getMembers(list, functionOnly, flagsMask, flagsMaskMatch);
+			this._implementTypes[i].getClassDef()._getMembers(list, cb);
 		// fill in the definitions of members
 		for (var i = 0; i < this._members.length; ++i) {
-			if (functionOnly && ! (this._members[i] instanceof MemberFunctionDefinition))
-				continue;
-			if ((this._members[i].flags() & flagsMask) != flagsMaskMatch)
-				continue;
-			for (var j = 0; j < list.length; ++j)
-				if (list[j].name() == this._members[i].name())
-					if ((list[j] instanceof MemberVariableDefinition) || Util.typesAreEqual((list[j] as MemberFunctionDefinition).getArgumentTypes(), (this._members[j] as MemberFunctionDefinition).getArgumentTypes()))
-						break;
-			if (j == list.length)
+			if (cb(this._members[i]))
 				list.push(this._members[i]);
 		}
+	}
+
+	function _getMembers (list : MemberDefinition[], functionOnly : boolean, flagsMask : number, flagsMaskMatch : number) : void {
+		this._getMembers(list, function (member) {
+			if (functionOnly && ! (member instanceof MemberFunctionDefinition))
+				return false;
+			if ((member.flags() & flagsMask) != flagsMaskMatch)
+				return false;
+			for (var j = 0; j < list.length; ++j)
+				if (list[j].name() == member.name())
+					if ((list[j] instanceof MemberVariableDefinition) || Util.typesAreEqual((list[j] as MemberFunctionDefinition).getArgumentTypes(), (member as MemberFunctionDefinition).getArgumentTypes()))
+						return false;
+			return true;
+		});
 	}
 
 	function hasDefaultConstructor () : boolean {

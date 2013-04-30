@@ -96,12 +96,12 @@ class TestCase {
 
 	/* low-level hooks called by src/js/runtests.js */
 
-	function beforeClass(tests : string[]) : void {
+	__export__ function beforeClass(tests : string[]) : void {
 		this._tests = tests;
 		this._say("1.." + this._tests.length as string);
 	}
 
-	function afterClass() : void {
+	__export__ function afterClass() : void {
 		if(this._tasks.length == 0) { // synchronous
 			this.finish();
 		}
@@ -111,7 +111,7 @@ class TestCase {
 		}
 	}
 
-	function run(name : string, testFunction : function():void) : void {
+	__export__ function run(name : string, testFunction : function():void) : void {
 		name = name.replace(/[$].*$/, "");
 
 		var numAsyncTasks = this._tasks.length;
