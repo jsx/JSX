@@ -79,6 +79,8 @@ There are unit tests in `t/` directory. Just type the following command to run t
 
 These test cases are executed by `prove(1)` and dispatched by `t/util/test-runner`, and also requires `phantomjs(1)` and `closure-compiler(1)`.
 
+Note that if you make a pull-requst you should do `make test-all` for complete tests.
+
 NOTE: There are some TODO tests, which should be resolved in a future. `make show-todo` shows such TODOs.
 
 WINDOWS SUPPORT
