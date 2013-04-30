@@ -151,7 +151,8 @@ class _Lexer {
 		"protected",
 
 		// JSX specific reserved words
-		"extern", "native", "as", "operator", "async"
+		"extern", "native", "as", "operator"
+		// , "async"  // contextual
 		]);
 
 	static function makeAlt (patterns : string[]) : string {
