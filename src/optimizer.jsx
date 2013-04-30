@@ -29,18 +29,6 @@ import "./type.jsx";
 import "./util.jsx";
 import "./compiler.jsx";
 
-abstract class OptimizerStash {
-	abstract function clone () : OptimizerStash;
-}
-
-mixin Stashable {
-	var _optimizerStash = new Map.<OptimizerStash>;
-
-	function getOptimizerStash () : Map.<OptimizerStash> {
-		return this._optimizerStash;
-	}
-}
-
 class _Util {
 
 	static function handleSubStatements (cb : function(:Statement[]):boolean, statement : Statement) : boolean {
@@ -336,15 +324,15 @@ abstract class _OptimizeCommand {
 
 	abstract function performOptimization () : void;
 
-	function getStash (stashable : Stashable) : OptimizerStash {
-		var stash = stashable.getOptimizerStash();
+	function getStash (stashable : Stashable) : Stash {
+		var stash = stashable.getStash();
 		if (stash[this._identifier] == null) {
 			stash[this._identifier] = this._createStash();
 		}
 		return stash[this._identifier];
 	}
 
-	function _createStash () : OptimizerStash {
+	function _createStash () : Stash {
 		throw new Error("if you are going to use the stash, you need to override this function");
 	}
 
@@ -412,7 +400,7 @@ abstract class _FunctionOptimizeCommand extends _OptimizeCommand {
 class _LinkTimeOptimizationCommand extends _OptimizeCommand {
 	static const IDENTIFIER = "lto";
 
-	class Stash extends OptimizerStash {
+	class Stash extends Stash {
 
 		var extendedBy : ClassDefinition[];
 
@@ -420,7 +408,7 @@ class _LinkTimeOptimizationCommand extends _OptimizeCommand {
 			this.extendedBy = new ClassDefinition[];
 		}
 
-		override function clone () : OptimizerStash {
+		override function clone () : Stash {
 			throw new Error("not supported");
 		}
 
@@ -430,7 +418,7 @@ class _LinkTimeOptimizationCommand extends _OptimizeCommand {
 		super(_LinkTimeOptimizationCommand.IDENTIFIER);
 	}
 
-	override function _createStash () : OptimizerStash {
+	override function _createStash () : Stash {
 		return new _LinkTimeOptimizationCommand.Stash();
 	}
 
@@ -586,7 +574,7 @@ class _NoLogCommand extends _FunctionOptimizeCommand {
 class _DetermineCalleeCommand extends _FunctionOptimizeCommand {
 	static const IDENTIFIER = "determine-callee";
 
-	class Stash extends OptimizerStash {
+	class Stash extends Stash {
 
 		var callingFuncDef : MemberFunctionDefinition;
 
@@ -598,7 +586,7 @@ class _DetermineCalleeCommand extends _FunctionOptimizeCommand {
 			this.callingFuncDef = that.callingFuncDef;
 		}
 
-		override function clone () : OptimizerStash {
+		override function clone () : Stash {
 			return new _DetermineCalleeCommand.Stash(this);
 		}
 
@@ -608,7 +596,7 @@ class _DetermineCalleeCommand extends _FunctionOptimizeCommand {
 		super(_DetermineCalleeCommand.IDENTIFIER);
 	}
 
-	override function _createStash () : OptimizerStash {
+	override function _createStash () : Stash {
 		return new _DetermineCalleeCommand.Stash();
 	}
 
@@ -694,7 +682,7 @@ class _DetermineCalleeCommand extends _FunctionOptimizeCommand {
 	}
 
 	static function getCallingFuncDef (stashable : Stashable) : MemberFunctionDefinition {
-		var stash = stashable.getOptimizerStash()[_DetermineCalleeCommand.IDENTIFIER] as _DetermineCalleeCommand.Stash;
+		var stash = stashable.getStash()[_DetermineCalleeCommand.IDENTIFIER] as _DetermineCalleeCommand.Stash;
 		if (stash == null)
 			throw new Error("callee not searched");
 		return stash.callingFuncDef;
@@ -841,7 +829,7 @@ class _UnclassifyOptimizationCommand extends _OptimizeCommand {
 		super(_UnclassifyOptimizationCommand.IDENTIFIER);
 	}
 
-	class Stash extends OptimizerStash {
+	class Stash extends Stash {
 
 		var inliner : function(:NewExpression):Expression[];
 
@@ -859,7 +847,7 @@ class _UnclassifyOptimizationCommand extends _OptimizeCommand {
 
 	}
 
-	override function _createStash () : OptimizerStash {
+	override function _createStash () : Stash {
 		return new _UnclassifyOptimizationCommand.Stash();
 	}
 
@@ -1167,7 +1155,7 @@ class _UnclassifyOptimizationCommand extends _OptimizeCommand {
 class _FoldConstantCommand extends _FunctionOptimizeCommand {
 	static const IDENTIFIER = "fold-const";
 
-	class Stash extends OptimizerStash {
+	class Stash extends Stash {
 
 		var isOptimized : boolean;
 
@@ -1179,7 +1167,7 @@ class _FoldConstantCommand extends _FunctionOptimizeCommand {
 			this.isOptimized = that.isOptimized;
 		}
 
-		override function clone () : OptimizerStash {
+		override function clone () : Stash {
 			return new _FoldConstantCommand.Stash(this);
 		}
 
@@ -1189,7 +1177,7 @@ class _FoldConstantCommand extends _FunctionOptimizeCommand {
 		super(_FoldConstantCommand.IDENTIFIER);
 	}
 
-	override function _createStash () : OptimizerStash {
+	override function _createStash () : Stash {
 		return new _FoldConstantCommand.Stash();
 	}
 
@@ -1813,7 +1801,7 @@ class _InlineOptimizeCommand extends _FunctionOptimizeCommand {
 
 	static const INLINE_THRESHOLD = 30; // TODO: make it configurable (--optimize inline=N)
 
-	class Stash extends OptimizerStash {
+	class Stash extends Stash {
 
 		var isOptimized : boolean;
 		var isInlineable : Nullable.<boolean>;
@@ -1828,7 +1816,7 @@ class _InlineOptimizeCommand extends _FunctionOptimizeCommand {
 			this.isInlineable = that.isInlineable;
 		}
 
-		override function clone () : OptimizerStash {
+		override function clone () : Stash {
 			return new _InlineOptimizeCommand.Stash(this);
 		}
 
@@ -1838,7 +1826,7 @@ class _InlineOptimizeCommand extends _FunctionOptimizeCommand {
 		super(_InlineOptimizeCommand.IDENTIFIER);
 	}
 
-	override function _createStash () : OptimizerStash {
+	override function _createStash () : Stash {
 		return new _InlineOptimizeCommand.Stash();
 	}
 
@@ -2674,7 +2662,7 @@ class _LCSEOptimizeCommand extends _FunctionOptimizeCommand {
 class _UnboxOptimizeCommand extends _FunctionOptimizeCommand {
 	static const IDENTIFIER = "unbox";
 
-	class Stash extends OptimizerStash {
+	class Stash extends Stash {
 
 		var canUnbox : Nullable.<boolean>;
 
@@ -2682,7 +2670,7 @@ class _UnboxOptimizeCommand extends _FunctionOptimizeCommand {
 			this.canUnbox = null;
 		}
 
-		override function clone () : OptimizerStash {
+		override function clone () : Stash {
 			var tmp = new _UnboxOptimizeCommand.Stash;
 			tmp.canUnbox = this.canUnbox;
 			return tmp;
@@ -2694,7 +2682,7 @@ class _UnboxOptimizeCommand extends _FunctionOptimizeCommand {
 		super(_UnboxOptimizeCommand.IDENTIFIER);
 	}
 
-	override function _createStash () : OptimizerStash {
+	override function _createStash () : Stash {
 		return new _UnboxOptimizeCommand.Stash();
 	}
 
@@ -3078,10 +3066,10 @@ class _ArrayLengthOptimizeCommand extends _FunctionOptimizeCommand {
 class _NoDebugCommand extends _OptimizeCommand {
 	static const IDENTIFIER = "no-debug";
 
-	class Stash extends OptimizerStash {
+	class Stash extends Stash {
 		var debugValue = true;
 
-		override function clone () : OptimizerStash {
+		override function clone () : Stash {
 			var tmp = new _NoDebugCommand.Stash;
 			tmp.debugValue = this.debugValue;
 			return tmp;

@@ -39,8 +39,8 @@ abstract class Expression implements Stashable {
 
 	function constructor (that : Expression) {
 		this._token = that.getToken();
-		for (var k in that._optimizerStash)
-			this._optimizerStash[k] = that._optimizerStash[k].clone();
+		for (var k in that._stash)
+			this._stash[k] = that._stash[k].clone();
 	}
 
 	abstract function clone () : Expression;

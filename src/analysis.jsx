@@ -141,6 +141,22 @@ class AnalysisContext {
 
 }
 
+// stash to hold meta data used by code transformation, optimization, and emission
+
+abstract class Stash {
+	abstract function clone () : Stash;
+}
+
+mixin Stashable {
+
+	var _stash = new Map.<Stash>;
+
+	function getStash () : Map.<Stash> {
+		return this._stash;
+	}
+
+}
+
 class LocalVariable implements Stashable {
 
 	var _name : Token;

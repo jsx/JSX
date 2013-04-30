@@ -20,9 +20,9 @@
  * IN THE SOFTWARE.
  */
 
+import "./analysis.jsx";
 import "./classdef.jsx";
 import "./platform.jsx";
-import "./optimizer.jsx";
 
 interface Emitter implements Stashable {
 

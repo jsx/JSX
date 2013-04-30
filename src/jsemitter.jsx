@@ -42,25 +42,25 @@ class _Util {
 
 	static const OUTPUTNAME_IDENTIFIER = "emitter.outputname";
 
-	class OutputNameStash extends OptimizerStash {
+	class OutputNameStash extends Stash {
 		var outputName : string;
 		function constructor(outputName : string) {
 			this.outputName = outputName;
 		}
-		override function clone() : OptimizerStash {
+		override function clone() : Stash {
 			throw new Error("not supported");
 		}
 	}
 
 	static function getOutputClassName(classDef : ClassDefinition) : string {
-		return (classDef.getOptimizerStash()[_Util.OUTPUTNAME_IDENTIFIER] as _Util.OutputNameStash).outputName;
+		return (classDef.getStash()[_Util.OUTPUTNAME_IDENTIFIER] as _Util.OutputNameStash).outputName;
 	}
 
 	static function getOutputConstructorName(ctor : MemberFunctionDefinition) : string {
 		if ((ctor.getClassDef().flags() & ClassDefinition.IS_NATIVE) != 0) {
 			return _Util.getNameOfNativeConstructor(ctor.getClassDef());
 		}
-		return (ctor.getOptimizerStash()[_Util.OUTPUTNAME_IDENTIFIER] as _Util.OutputNameStash).outputName;
+		return (ctor.getStash()[_Util.OUTPUTNAME_IDENTIFIER] as _Util.OutputNameStash).outputName;
 	}
 
 	static function getOutputConstructorName(classDef : ClassDefinition, argTypes : Type[]) : string {
@@ -82,7 +82,7 @@ class _Util {
 
 	static function setOutputClassNames(classDefs : ClassDefinition[]) : void {
 		function setOutputName(stashable : Stashable, name : string) : void {
-			stashable.getOptimizerStash()[_Util.OUTPUTNAME_IDENTIFIER] = new _Util.OutputNameStash(name);
+			stashable.getStash()[_Util.OUTPUTNAME_IDENTIFIER] = new _Util.OutputNameStash(name);
 		}
 		function escapeClassNameIfInstantiated(name : string) : string {
 			// escape the instantiated class names (note: template classes are never emitted (since they are all native) but their names are used for mangling of function arguments)
@@ -236,22 +236,22 @@ class _Namer {
 
 	static const IDENTIFIER = "namer";
 
-	class _TryStash extends OptimizerStash {
+	class _TryStash extends Stash {
 		var catchName : string;
 		function constructor(catchName : string) {
 			this.catchName = catchName;
 		}
-		override function clone() : OptimizerStash {
+		override function clone() : Stash {
 			throw new Error("operation not supported");
 		}
 	}
 
-	class _CatchTargetStash extends OptimizerStash {
+	class _CatchTargetStash extends Stash {
 		var tryStmt : TryStatement;
 		function constructor(tryStmt : TryStatement) {
 			this.tryStmt = tryStmt;
 		}
-		override function clone() : OptimizerStash {
+		override function clone() : Stash {
 			throw new Error("operation not supported");
 		}
 	}
@@ -313,10 +313,10 @@ class _Namer {
 	}
 
 	function _enterCatch(tryStmt : TryStatement, cb : function (getCatchName : function () : string) : void, catchName : string) : void {
-		tryStmt.getOptimizerStash()[_Namer.IDENTIFIER] = new _Namer._TryStash(catchName);
+		tryStmt.getStash()[_Namer.IDENTIFIER] = new _Namer._TryStash(catchName);
 		var catchStmts = tryStmt.getCatchStatements();
 		for (var i in catchStmts) {
-			catchStmts[i].getLocal().getOptimizerStash()[_Namer.IDENTIFIER] = new _Namer._CatchTargetStash(tryStmt);
+			catchStmts[i].getLocal().getStash()[_Namer.IDENTIFIER] = new _Namer._CatchTargetStash(tryStmt);
 		}
 		cb(function () { return this._getCatchName(tryStmt); });
 	}
@@ -330,11 +330,11 @@ class _Namer {
 	}
 
 	function _getCatchName(caught : CaughtVariable) : string {
-		return this._getCatchName((caught.getOptimizerStash()[_Namer.IDENTIFIER] as _Namer._CatchTargetStash).tryStmt);
+		return this._getCatchName((caught.getStash()[_Namer.IDENTIFIER] as _Namer._CatchTargetStash).tryStmt);
 	}
 
 	function _getCatchName(tryStmt : TryStatement) : string {
-		return (tryStmt.getOptimizerStash()[_Namer.IDENTIFIER] as _Namer._TryStash).catchName;
+		return (tryStmt.getStash()[_Namer.IDENTIFIER] as _Namer._TryStash).catchName;
 	}
 
 }
@@ -394,26 +394,26 @@ class _Minifier {
 	static const SCOPESTASH_IDENTIFIER = "minifier.scope";
 	static const LOCALSTASH_IDENTIFIER = "minifier.local";
 
-	class _ClassStash extends OptimizerStash {
+	class _ClassStash extends Stash {
 		var staticVariableUseCount = new Map.<number>;
 		var staticVariableConversionTable = new Map.<string>;
-		override function clone() : OptimizerStash {
+		override function clone() : Stash {
 			throw new Error("operation not supported");
 		}
 	}
 
-	class _ScopeStash extends OptimizerStash {
+	class _ScopeStash extends Stash {
 		var usedGlobals = new Map.<boolean>;
 		var usedOuterLocals = new LocalVariable[];
-		override function clone() : OptimizerStash {
+		override function clone() : Stash {
 			throw new Error("operation not supported");
 		}
 	}
 
-	class _LocalStash extends OptimizerStash {
+	class _LocalStash extends Stash {
 		var useCount = 0;
 		var minifiedName : Nullable.<string>;
-		override function clone() : OptimizerStash {
+		override function clone() : Stash {
 			throw new Error("operation not supported");
 		}
 	}
@@ -739,7 +739,7 @@ class _Minifier {
 	}
 
 	static function _getClassStash(classDef : ClassDefinition) : _Minifier._ClassStash {
-		var stash = classDef.getOptimizerStash();
+		var stash = classDef.getStash();
 		if (! stash.hasOwnProperty(_Minifier.CLASSSTASH_IDENTIFIER)) {
 			stash[_Minifier.CLASSSTASH_IDENTIFIER] = new _Minifier._ClassStash();
 		}
@@ -747,7 +747,7 @@ class _Minifier {
 	}
 
 	static function _getScopeStash(stashable : Stashable) : _Minifier._ScopeStash {
-		var stash = stashable.getOptimizerStash();
+		var stash = stashable.getStash();
 		if(! stash.hasOwnProperty(_Minifier.SCOPESTASH_IDENTIFIER)) {
 			stash[_Minifier.SCOPESTASH_IDENTIFIER] = new _Minifier._ScopeStash();
 		}
@@ -755,7 +755,7 @@ class _Minifier {
 	}
 
 	static function _getLocalStash(local : LocalVariable) : _Minifier._LocalStash {
-		var stash = local.getOptimizerStash();
+		var stash = local.getStash();
 		if(! stash.hasOwnProperty(_Minifier.LOCALSTASH_IDENTIFIER)) {
 			stash[_Minifier.LOCALSTASH_IDENTIFIER] = new _Minifier._LocalStash();
 		}
@@ -2600,7 +2600,7 @@ class _NewExpressionEmitter extends _OperatorExpressionEmitter {
 
 	override function emit (outerOpPrecedence : number) : void {
 		function getInliner(funcDef : MemberFunctionDefinition) : function(:NewExpression):Expression[] {
-			var stash = funcDef.getOptimizerStash()["unclassify"];
+			var stash = funcDef.getStash()["unclassify"];
 			return stash ? (stash as _UnclassifyOptimizationCommand.Stash).inliner : null;
 		}
 		var classDef = this._expr.getType().getClassDef();
@@ -2688,7 +2688,7 @@ class _CommaExpressionEmitter extends _ExpressionEmitter {
 
 }
 
-class _JSEmitterStash extends OptimizerStash {
+class _JSEmitterStash extends Stash {
 	var shouldBooleanize = false;
 	var returnsBoolean   = false;
 
@@ -2906,7 +2906,7 @@ class JavaScriptEmitter implements Emitter {
 		this._output += this._fileHeader;
 		this._output += this._platform.load(this._platform.getRoot() + "/src/js/bootstrap.js");
 
-		var stash = (this.getOptimizerStash()[_NoDebugCommand.IDENTIFIER] as _NoDebugCommand.Stash);
+		var stash = (this.getStash()[_NoDebugCommand.IDENTIFIER] as _NoDebugCommand.Stash);
 		this._emit("JSX.DEBUG = "+(stash == null || stash.debugValue ? "true" : "false")+";\n", null);
 	}
 
@@ -2945,9 +2945,8 @@ class JavaScriptEmitter implements Emitter {
 		}
 	}
 
-	// reuse of optimizer stash
 	function getStash (stashable : Stashable) : _JSEmitterStash {
-		var stash = stashable.getOptimizerStash();
+		var stash = stashable.getStash();
 		if (stash["jsemitter"] == null) {
 			stash["jsemitter"] = new _JSEmitterStash;
 		}
