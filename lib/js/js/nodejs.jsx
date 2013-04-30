@@ -278,6 +278,8 @@ native __fake__ class _fs {
 	function readSync(fd : int, buffer : Buffer, offset : int, length : int, position : int) : int;
 	function readFileSync(filename : string) : Buffer;
 	function readFileSync(filename : string, encoding : string) : string;
+	async function readFileAsync(filename : string) : AsyncTask.<Buffer>;
+	async function readFileAsync(filename : string, encoding : string) : AsyncTask.<string>;
 
 	function writeSync(fd : int, buffer : Buffer, offset : int, length : int) : int;
 	function writeSync(fd : int, buffer : Buffer, offset : int, length : int, position : int) : int;
