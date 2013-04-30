@@ -242,10 +242,6 @@ class JSXCommand {
 				case "commonjs": // implies JavaScriptEmitter
 					break;
 				case "node": // implies JavaScriptEmitter
-					tasks.push(function () : void {
-						var shebang =  "#!/usr/bin/env node\n";
-						emitter.addHeader(shebang);
-					});
 					break;
 				default:
 					platform.error("unknown executable type (node|web)");

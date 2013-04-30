@@ -48,6 +48,4 @@ interface Emitter implements Stashable {
 
 	function setEnableMinifier(enable : boolean) : void;
 
-	function addHeader(header : string) : void;
-
 }

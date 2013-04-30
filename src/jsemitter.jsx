@@ -2867,10 +2867,6 @@ class JavaScriptEmitter implements Emitter {
 		this._enableMinifier = enable;
 	}
 
-	override function addHeader (header : string) : void {
-		this._output = header + this._output;
-	}
-
 	override function emit (classDefs : ClassDefinition[]) : void {
 
 		// current impl. of _Minifier.minifyJavaScript does not support transforming source map
