@@ -5,11 +5,15 @@ JOBS:=4
 
 PORT := 2012
 
-all: meta compiler doc web
+all: deps compiler doc web
 
 ## compiler stuff
 
-compiler: src/doc.jsx
+deps:
+	git submodule update --init
+	npm install .
+
+compiler: meta src/doc.jsx
 	rm -f bin/jsx
 	node tool/bootstrap-compiler.js --executable node --output bin/jsx src/jsx-node-front.jsx
 	cp -f "$$PWD/tool/jsx.pl" bin/jsx-with-server
@@ -19,7 +23,6 @@ src/doc.jsx: src/_doc.jsx
 
 meta:
 	if [ -e .git ] ; then \
-		git submodule update --init ; \
 		tool/make-meta package.json src/meta.jsx ; \
 	fi
 
@@ -113,4 +116,4 @@ clean:
 	rm -rf bin/*
 	rm -rf jsx-*.tgz
 
-.PHONY: setup test test-debug test-release test-core test-misc-core web server doc meta
+.PHONY: setup test test-debug test-release test-core test-misc-core web server doc meta instal-deps
