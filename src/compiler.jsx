@@ -422,7 +422,7 @@ class Compiler {
 						&& funcDef.name() == "main"
 						&& funcDef.getArguments().length == 1
 						&& Util.isArrayOf(funcDef.getArgumentTypes()[0].getClassDef(), Type.stringType)) {
-						funcDef.setFlags(funcDef.flags() | ClassDefinition.IS_EXPORT_WITH_ARGTYPES);
+						funcDef.setFlags(funcDef.flags() | ClassDefinition.IS_EXPORT);
 					}
 					return true;
 				});
@@ -432,7 +432,7 @@ class Compiler {
 					if ((funcDef.flags() & ClassDefinition.IS_STATIC) == 0
 						&& funcDef.name().match(/^test/)
 						&& funcDef.getArguments().length == 0) {
-						funcDef.setFlags(funcDef.flags() | ClassDefinition.IS_EXPORT_WITH_ARGTYPES);
+						funcDef.setFlags(funcDef.flags() | ClassDefinition.IS_EXPORT);
 					}
 					return true;
 				});

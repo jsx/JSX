@@ -3246,7 +3246,16 @@ class JavaScriptEmitter implements Emitter {
 			this._emit("};\n\n", null);
 		});
 		if (isStatic) {
-			if (! this._enableMinifier || (funcDef.flags() & ClassDefinition.IS_EXPORT_WITH_ARGTYPES) != 0) {
+			if (Util.memberIsExported(funcDef.getClassDef(), funcDef.name(), funcDef.getArgumentTypes(), true)) {
+				this._emitHolderOfStatic(funcDef.getClassDef());
+				this._emit(
+					"." + funcDef.name()
+					+ " = "
+					+ this._namer.getNameOfStaticFunction(funcDef.getClassDef(), funcDef.name(), funcDef.getArgumentTypes())
+					+ ";\n",
+					null);
+			}
+			if (! this._enableMinifier) {
 				this._emitHolderOfStatic(funcDef.getClassDef());
 				this._emit(
 					"." + funcDef.name() + this._mangler.mangleFunctionArguments(funcDef.getArgumentTypes())
@@ -3256,25 +3265,7 @@ class JavaScriptEmitter implements Emitter {
 					null);
 			}
 		} else {
-			if ((funcDef.flags() & ClassDefinition.IS_EXPORT_WITH_ARGTYPES) != 0
-				&& (this._enableMinifier || (funcDef.flags() & ClassDefinition.IS_EXPORT) != 0)) {
-				this._emit(
-					this._namer.getNameOfClass(funcDef.getClassDef()) + ".prototype." + funcDef.name() + this._mangler.mangleFunctionArguments(funcDef.getArgumentTypes())
-					+ " = "
-					+ this._namer.getNameOfClass(funcDef.getClassDef()) + ".prototype." + this._namer.getNameOfMethod(funcDef.getClassDef(), funcDef.name(), funcDef.getArgumentTypes()),
-					null);
-			}
-		}
-		if (Util.memberIsExported(funcDef.getClassDef(), funcDef.name(), funcDef.getArgumentTypes(), isStatic)) {
-			if (isStatic) {
-				this._emitHolderOfStatic(funcDef.getClassDef());
-				this._emit(
-					"." + funcDef.name()
-					+ " = "
-					+ this._namer.getNameOfStaticFunction(funcDef.getClassDef(), funcDef.name(), funcDef.getArgumentTypes())
-					+ ";\n",
-					null);
-			} else {
+			if (Util.memberIsExported(funcDef.getClassDef(), funcDef.name(), funcDef.getArgumentTypes(), false)) {
 				this._emit(
 					this._namer.getNameOfClass(funcDef.getClassDef()) + ".prototype." + funcDef.name()
 					+ " = "
