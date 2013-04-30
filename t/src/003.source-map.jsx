@@ -13,6 +13,11 @@ class _Test extends TestCase {
 
 	function testWithSourceMapConsumer() : void {
 		if(process.env["JSX_DISABLE_SOURCE_MAP_TEST"]) {
+			this.diag("skip source-map testing because: JSX_DISABLE_SOURCE_MAP_TEST is true");
+			return;
+		}
+		if ((process.env["JSX_OPTS"] ?: "").match(/\bminify\b/)) {
+			this.diag("skip source-map testing because: JSX_OPTS includes --minify");
 			return;
 		}
 
