@@ -28,8 +28,7 @@ doc: compiler
 	find lib -name '*.jsx' | xargs -n 1 -- bin/jsx --mode doc --output doc
 
 bootstrap-compiler: compiler
-	bin/jsx --disable-type-check --executable node --output bin/jsx src/jsx-node-front.jsx # again
-	cp bin/jsx tool/bootstrap-compiler.js
+	bin/jsx --disable-type-check --executable node --output tool/bootstrap-compiler.js src/jsx-node-front.jsx # again
 
 ## test stuff
 
