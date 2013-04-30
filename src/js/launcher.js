@@ -9,11 +9,10 @@ JSX.runMain = function (sourceFile, args) {
 	if (! module._Main) {
 		throw new ReferenceError("entry point _Main not found in " + sourceFile);
 	}
-	var entryPoint = module._Main.main || module._Main.main$AS;
-	if (! entryPoint) {
+	if (! module._Main.main) {
 		throw new ReferenceError("entry point _Main.main(:string[]):void not found in " + sourceFile);
 	}
-	entryPoint(args);
+	module._Main.main(args);
 };
 
 /**
