@@ -57,6 +57,7 @@ class JSXCommand {
 			"  --optimize cmd1,cmd2,...   enables optimization commands\n" +
 			"  --warn type1,type2,...     enables warnings (all, deprecated, none)\n" +
 			"  --disable-type-check       disables run-time type checking\n" +
+			"  --minify                   compresses the target JavaScript code\n" +
 			"  --enable-source-map        enables source map debugging info\n" +
 			"  --complete line:column     shows code completion at line:column\n" +
 			"  --version                  displays the version and compiler identifier and exits\n" +
