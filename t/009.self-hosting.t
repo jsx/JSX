@@ -8,42 +8,59 @@ use Test::More;
 
 plan skip_all => 'JSX_OPTS specified' if $ENV{JSX_OPTS};
 
-plan tests => 15;
+plan tests => 36;
+
+my @opts = (
+    "",
+    "--release",
+    "--minify",
+    "--release --minify",
+);
 
 {
     my $tmpdir = tempdir(CLEANUP => 1, DIR => ".");
+    my @expected_src;
 
-    my $jsx = "$tmpdir/jsx";
-    copy "tool/bootstrap-compiler.js", $jsx; # start
+    # compile 2nd gens, and store the expected source (to be compared with the result of 3rd gens)
+    for (my $gen2 = 0; $gen2 < @opts; $gen2++) {
+        is compile(
+            "bin/jsx",
+            "$tmpdir/gen2-$gen2",
+            $opts[$gen2],
+        ), 0, "create 2nd gen '$opts[$gen2]'";
+        $expected_src[$gen2] = slurp("$tmpdir/gen2-$gen2");
+    }
 
-    my @make_executable_opts = ("--executable", "node", "--output", $jsx, "src/jsx-node-front.jsx");
-
-    is system("node", $jsx, @make_executable_opts), 0,
-        'compile self from bootstrap/jsx-compiler.js';
-
-    is system("node", $jsx, @make_executable_opts), 0,
-        'compile self from the new executable';
-
-    # JavaScript outputs by non-optimized JSX compiler
-    my $src_by_jsx_wo_optim           = `node $jsx src/jsx-node-front.jsx`;
-    my $optimized_src_by_jsx_wo_optim = `node $jsx --release src/jsx-node-front.jsx`;
-
-    foreach my $opts([qw(--release)], [qw(--minify)], [qw(--release --minify)]) {
-        note "with: @{$opts}";
-
-        is system("node", $jsx, @{$opts}, @make_executable_opts), 0,
-            "compile self with @{$opts} release from the new executable";
-        is system("node", $jsx, @{$opts}, @make_executable_opts), 0,
-            "compile self with @{$opts} release from the new executable with --release";
-
-        # JavaScript outputs by optimized and/or minified JSX compiler
-        my $src_by_jsx_w_optim           = `node $jsx src/jsx-node-front.jsx`;
-        my $optimized_src_by_jsx_w_optim = `node $jsx --release src/jsx-node-front.jsx`;
-
-        ok $src_by_jsx_w_optim eq $src_by_jsx_wo_optim ,
-            "outputs between with-optimization and without-optmization";
-        ok $optimized_src_by_jsx_w_optim eq $optimized_src_by_jsx_wo_optim,
-            "optimized outputs between with-optimization and without-optmization";
+    # compile 3rd gens, and check their output
+    for (my $gen2 = 0; $gen2 < @opts; $gen2++) {
+        for (my $gen3 = 0; $gen3 < @opts; $gen3++) {
+            is compile(
+                "$tmpdir/gen2-$gen2",
+                "$tmpdir/gen3.tmp",
+                $opts[$gen3],
+            ), 0, "create 3rd gen '$opts[$gen3]' from 2nd gen '$opts[$gen2]'";
+            ok(
+                $expected_src[$gen3] eq slurp("$tmpdir/gen3.tmp"),
+                "output of 3rd gen is same for '$opts[$gen3]'"
+            );
+        }
     }
 }
 done_testing;
+
+sub compile {
+    my ($bootstrap, $target, @opts) = @_;
+    system(
+        "make",
+        "compiler-core",
+        "BOOTSTRAP_COMPILER=$bootstrap",
+        "COMPILER_TARGET=$target",
+        "COMPILER_COMPILE_OPTS=" . join(" ", @opts, "--executable", "node"),
+    );
+}
+
+sub slurp {
+    my $fn = shift;
+    open my $fh, "<", $fn or die "could not open file:$fn:$!";
+    do { local $/; <$fh> };
+}

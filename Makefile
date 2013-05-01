@@ -1,9 +1,11 @@
-
-PROVE := perl extlib/bin/prove
-
+PROVE:=perl extlib/bin/prove
 JOBS:=4
 
-PORT := 2012
+BOOTSTRAP_COMPILER:=tool/bootstrap-compiler.js
+COMPILER_TARGET:=bin/jsx
+COMPILER_COMPILE_OPTS:=--executable node
+
+PORT:=2012
 
 all: deps compiler doc web
 
@@ -14,9 +16,12 @@ deps:
 	npm install .
 
 compiler: meta src/doc.jsx
-	rm -f bin/jsx
-	node tool/bootstrap-compiler.js --executable node --output bin/jsx src/jsx-node-front.jsx
+	rm -f $(TARGET_COMPILER)
+	$(MAKE) compiler-core
 	cp -f "$$PWD/tool/jsx.pl" bin/jsx-with-server
+
+compiler-core:
+	node $(BOOTSTRAP_COMPILER) $(COMPILER_COMPILE_OPTS) --output $(COMPILER_TARGET) src/jsx-node-front.jsx
 
 src/doc.jsx: src/_doc.jsx
 	submodules/picotemplate/picotemplate.pl $<
@@ -31,13 +36,13 @@ doc: compiler
 	find lib -name '*.jsx' | xargs -n 1 -- bin/jsx --mode doc --output doc
 
 bootstrap-compiler: compiler
-	bin/jsx --disable-type-check --executable node --output tool/bootstrap-compiler.js src/jsx-node-front.jsx # again
+	$(MAKE) compiler-core BOOTSTRAP_COMPILER=bin/jsx COMPILER_TARGET=$(BOOTSTRAP_COMPILER) COMPILER_COMPILE_OPTS="--disable-type-check --executable node" # again
 
 ## test stuff
 
 # e.g. make test JOBS=2
 
-test: all test-debug test-optimized test-minify-self
+test: all test-debug test-optimized
 
 test-all: test test-optimized-minified
 
@@ -56,10 +61,6 @@ test-core:
 
 test-misc-core:
 	$(PROVE) --jobs "$(JOBS)" t/*.t
-
-test-minify-self:
-	@echo "running self-compile test with --minify..."
-	bin/jsx --run --minify src/jsx-node-front.jsx --help > /dev/null && echo "ok"
 
 v8bench: compiler
 	cd submodules/v8bench && make
