@@ -40,7 +40,7 @@ class JSXCommand {
 		return (
 			"JSX compiler version " + Meta.VERSION_STRING + "\n" +
 			"\n" +
-			"Usage: jsx [options] source-files\n" +
+			"Usage: jsx [options] source-file\n" +
 			"\n" +
 			"Options:\n" +
 			"  --add-search-path path     adds a path to library search paths\n" +
