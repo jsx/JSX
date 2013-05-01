@@ -173,7 +173,7 @@ class Optimizer {
 			"no-assert",
 			"no-log",
 			"no-debug",
-			// "staticize", // TODO: do not remove instance methods for JavaScript
+			"staticize",
 			"fold-const",
 			"return-if",
 			"inline",
@@ -699,13 +699,20 @@ class _StaticizeOptimizeCommand extends _OptimizeCommand {
 	}
 
 	override function performOptimization () : void {
+
+		function memberCanBeStaticized(funcDef : MemberFunctionDefinition) : boolean {
+			return (funcDef.flags() & (ClassDefinition.IS_OVERRIDE | ClassDefinition.IS_ABSTRACT | ClassDefinition.IS_FINAL | ClassDefinition.IS_STATIC | ClassDefinition.IS_NATIVE | ClassDefinition.IS_EXPORT)) == ClassDefinition.IS_FINAL
+				&& funcDef.name() != "constructor"
+				&& ! Util.memberIsExported(funcDef.getClassDef(), funcDef.name(), funcDef.getArgumentTypes(), false);
+		}
+
 		this.getCompiler().forEachClassDef(function (parser, classDef) {
 			// skip interfaces and mixins
 			if ((classDef.flags() & (ClassDefinition.IS_INTERFACE | ClassDefinition.IS_MIXIN)) != 0)
 				return true;
 			// convert function definitions (expect constructor) to static
 			classDef.forEachMemberFunction(function onFunction(funcDef : MemberFunctionDefinition) : boolean {
-				if ((funcDef.flags() & (ClassDefinition.IS_OVERRIDE | ClassDefinition.IS_ABSTRACT | ClassDefinition.IS_FINAL | ClassDefinition.IS_STATIC | ClassDefinition.IS_NATIVE)) == ClassDefinition.IS_FINAL && funcDef.name() != "constructor") {
+				if (memberCanBeStaticized(funcDef)) {
 						this.log("rewriting method to static function: " + funcDef.name());
 						this._rewriteFunctionAsStatic(funcDef);
 				}

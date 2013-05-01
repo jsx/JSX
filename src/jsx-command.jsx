@@ -265,13 +265,6 @@ class JSXCommand {
 				};
 				executable = executable ?: "node";
 				runImmediately = true;
-				tasks.push(function () : void {
-					// XXX: temporary hack; to be removed when "export to JS" feature is introduced
-					var idx = optimizeCommands.indexOf("staticize");
-					if (idx != -1) {
-						optimizeCommands.splice(idx, 1);
-					}
-				});
 				break;
 			case "--profile":
 				tasks.push(function () : void {
