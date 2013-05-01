@@ -2771,18 +2771,22 @@ class JavaScriptEmitter implements Emitter {
 	var _fileFooter =                     "})(JSX);\n";
 
 	var _platform : Platform;
+
+	// properties setup by _emitInit
 	var _output : string;
 	var _outputEndsWithReturn : boolean;
 	var _outputFile : Nullable.<string>;
 	var _indent : number;
 	var _emittingClass : ClassDefinition;
 	var _emittingFunction : MemberFunctionDefinition;
-	var _enableRunTimeTypeCheck : boolean;
-	var _bootstrapBuilder : _BootstrapBuilder;
 
+	// modes
 	var _enableSourceMap : boolean;
 	var _enableProfiler : boolean;
 	var _enableMinifier : boolean;
+	var _enableRunTimeTypeCheck = true;
+
+	var _bootstrapBuilder : _BootstrapBuilder;
 	var _sourceMapper : SourceMapper;
 	var _mangler = new _Mangler();
 	var _namer : _Namer;
@@ -2899,7 +2903,6 @@ class JavaScriptEmitter implements Emitter {
 		this._indent = 0;
 		this._emittingClass = null;
 		this._emittingFunction = null;
-		this._enableRunTimeTypeCheck = true;
 
 		// headers
 		this._output += "// generatedy by JSX compiler " + Meta.IDENTIFIER + "\n";
