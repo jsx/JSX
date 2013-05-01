@@ -173,7 +173,7 @@ class Optimizer {
 			"no-assert",
 			"no-log",
 			"no-debug",
-			"staticize",
+			//"staticize", // TODO: #151
 			"fold-const",
 			"return-if",
 			"inline",
