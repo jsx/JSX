@@ -36,7 +36,7 @@ doc: compiler
 	find lib -name '*.jsx' | xargs -n 1 -- bin/jsx --mode doc --output doc
 
 bootstrap-compiler: compiler
-	$(MAKE) compiler-core BOOTSTRAP_COMPILER=bin/jsx COMPILER_TARGET=$(BOOTSTRAP_COMPILER) COMPILER_COMPILE_OPTS="--disable-type-check --executable node" # again
+	$(MAKE) compiler-core BOOTSTRAP_COMPILER=bin/jsx COMPILER_TARGET=$(BOOTSTRAP_COMPILER) COMPILER_COMPILE_OPTS="--disable-type-check --optimize no-assert --executable node" # again
 
 ## test stuff
 
