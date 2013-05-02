@@ -246,13 +246,10 @@ class ClassDefinition implements Stashable {
 		// member defintions
 		for (var i = 0; i < this._members.length; ++i) {
 			this._members[i].setClassDef(this);
-			if (this._members[i] instanceof MemberFunctionDefinition) {
-				function setClassDef(funcDef : MemberFunctionDefinition) : boolean {
-					funcDef.setClassDef(this);
-					return funcDef.forEachClosure(setClassDef);
-				}
-				(this._members[i] as MemberFunctionDefinition).forEachClosure(setClassDef);
-			}
+			this._members[i].forEachClosure(function setClassDef(funcDef) {
+				funcDef.setClassDef(this);
+				return funcDef.forEachClosure(setClassDef);
+			});
 		}
 
 		// member classes
