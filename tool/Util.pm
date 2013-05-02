@@ -5,6 +5,9 @@ use warnings FATAL => qw(uninitialized);
 use Fatal qw(open close);
 
 use File::Basename ();
+use File::Temp;
+use POSIX qw(SEEK_SET);
+
 use lib File::Basename::dirname(__FILE__) . "/../extlib/lib/perl5";
 
 
@@ -36,15 +39,17 @@ sub jsx { # returns (status, stdout, stderr)
 
     require IPC::Open3;
     require Symbol;
-    my($wtr, $rdr, $err) = (Symbol::gensym(), Symbol::gensym(), Symbol::gensym());
-    my $pid = IPC::Open3::open3($wtr, $rdr, $err, "bin/jsx @args");
+    my($wtr, $rdr) = (Symbol::gensym(), Symbol::gensym());
+    my $err = File::Temp::tempfile();
+    my $pid = IPC::Open3::open3($wtr, $rdr, '>&' . fileno $err, "bin/jsx @args");
     close $wtr;
-    local $/;
-    my $stdout = <$rdr>;
-    my $stderr = <$err>;
+    my $stdout = do { local $/; <$rdr> };
     close $rdr;
-    close $err;
     waitpid $pid, 0;
+
+    seek $err, SEEK_SET, 0
+        or die "seek failed:$!";
+    my $stderr = do { local $/; <$err> };
 
     return ($? == 0, $stdout, $stderr, $?);
 }
