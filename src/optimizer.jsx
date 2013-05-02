@@ -379,11 +379,14 @@ abstract class _FunctionOptimizeCommand extends _OptimizeCommand {
 			this.log("finished optimization of " + funcDef.getNotation());
 		}
 		this.getCompiler().forEachClassDef(function (parser, classDef) {
-			classDef.forEachMemberFunction(function (funcDef) {
-				if (funcDef.getStatements() != null) {
-					doit(funcDef);
+			classDef.forEachMember(function (member) {
+				if (member instanceof MemberFunctionDefinition) {
+					var funcDef = member as MemberFunctionDefinition;
+					if (funcDef.getStatements() != null) {
+						doit(funcDef);
+					}
 				}
-				funcDef.forEachClosure(function (funcDef) {
+				member.forEachClosure(function (funcDef) {
 					doit(funcDef);
 					return true;
 				});
