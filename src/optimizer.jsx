@@ -902,7 +902,7 @@ class _UnclassifyOptimizationCommand extends _OptimizeCommand {
 							classDefs);
 					}
 				}
-				return true;
+				return varDef.forEachClosure(onFunction);
 			});
 			return true;
 		});
@@ -949,20 +949,21 @@ class _UnclassifyOptimizationCommand extends _OptimizeCommand {
 				}
 				return expr.forEachExpression(onExpr);
 			}
-			classDef.forEachMemberFunction(function onFunction(funcDef : MemberFunctionDefinition) : boolean {
+			function onFunction(funcDef : MemberFunctionDefinition) : boolean {
 				funcDef.forEachStatement(function onStatement(statement : Statement) : boolean {
 					statement.forEachExpression(onExpr);
 					return statement.forEachStatement(onStatement);
 				});
 				return funcDef.forEachClosure(onFunction);
-			});
+			}
+			classDef.forEachMemberFunction(onFunction);
 			classDef.forEachMemberVariable(function (varDef : MemberVariableDefinition) : boolean {
 				if ((varDef.flags() & ClassDefinition.IS_STATIC) != 0) {
 					if (varDef.getInitialValue() != null) {
 						onExpr(varDef.getInitialValue());
 					}
 				}
-				return true;
+				return varDef.forEachClosure(onFunction);
 			});
 			return true;
 		});
