@@ -677,7 +677,7 @@ class Parser {
 		this._isGenerator = false;
 		this._locals = null;
 		this._statements = null;
-		this._closures = new MemberFunctionDefinition[];
+		this._closures = null;
 		this._classType = null;
 		this._extendType = null;
 		this._implementTypes = null;
@@ -931,7 +931,7 @@ class Parser {
 			// errors
 			this._errors.length,
 			// closures
-			this._closures.length,
+			this._closures != null ? this._closures.length : 0,
 			// objectTypesUsed
 			this._objectTypesUsed.length,
 			// templateInstantiationrequests
@@ -946,7 +946,8 @@ class Parser {
 		this._tokenLength = state.tokenLength;
 		this._isGenerator = state.isGenerator;
 		this._errors.length = state.numErrors;
-		this._closures.splice(state.numClosures, this._closures.length - state.numClosures);
+		if (this._closures != null)
+			this._closures.splice(state.numClosures, this._closures.length - state.numClosures);
 		this._objectTypesUsed.splice(state.numObjectTypesUsed, this._objectTypesUsed.length - state.numObjectTypesUsed);
 		this._templateInstantiationRequests.splice(state.numTemplateInstantiationRequests, this._templateInstantiationRequests.length - state.numTemplateInstantiationRequests);
 	}
@@ -1703,12 +1704,16 @@ class Parser {
 			if ((type = this._typeDeclaration(false)) == null)
 				return null;
 		var initialValue = null : Expression;
+		var closures = new MemberFunctionDefinition[];
 		if (this._expectOpt("=") != null) {
 			if ((flags & ClassDefinition.IS_ABSTRACT) != 0) {
 				this._newError("abstract variable cannot have default value");
 				return null;
 			}
-			if ((initialValue = this._assignExpr(false)) == null)
+			this._closures = closures;
+			initialValue = this._assignExpr(false);
+			this._closures = null;
+			if (initialValue == null)
 				return null;
 		}
 		if (type == null && initialValue == null) {
@@ -1720,7 +1725,7 @@ class Parser {
 		// all non-native, non-template values have initial value
 		if (this._typeArgs.length == 0 && initialValue == null && (this._classFlags & ClassDefinition.IS_NATIVE) == 0)
 			initialValue = Expression.getDefaultValueExpressionOf(type);
-		return new MemberVariableDefinition(token, name, flags, type, initialValue, docComment);
+		return new MemberVariableDefinition(token, name, flags, type, initialValue, closures, docComment);
 	}
 
 	function _functionDefinition (token : Token, flags : number, docComment : DocComment, shouldExport : function (name : string) : boolean) : MemberFunctionDefinition {
@@ -1794,13 +1799,13 @@ class Parser {
 			if ((this._classFlags & (ClassDefinition.IS_INTERFACE | ClassDefinition.IS_DELETE)) != 0) {
 				if (this._expect(";") == null)
 					return null;
-				return createDefinition(null, null, null, null);
+				return createDefinition(null, null, new MemberFunctionDefinition[], null);
 			} else if ((flags & (ClassDefinition.IS_ABSTRACT | ClassDefinition.IS_NATIVE)) != 0) {
 				var endDeclToken = this._expect([ ";", "{" ]);
 				if (endDeclToken == null)
 					return null;
 				if (endDeclToken.getValue() == ";")
-					return createDefinition(null, null, null, null);
+					return createDefinition(null, null, new MemberFunctionDefinition[], null);
 			} else {
 				if (this._expect("{") == null)
 					return null;
@@ -1823,6 +1828,7 @@ class Parser {
 			var funcDef = createDefinition(this._locals, this._statements, this._closures, lastToken);
 			this._locals = null;
 			this._statements = null;
+			this._closures = null;
 			return funcDef;
 		} finally {
 			this._typeArgs.splice(this._typeArgs.length - typeArgs.length, this._typeArgs.length);

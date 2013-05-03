@@ -172,11 +172,16 @@ class Compiler {
 		// transformation
 		var transformer = new CodeTransformer;
 		this.forEachClassDef(function (parser, classDef) {
-			return classDef.forEachMemberFunction(function onFuncDef (funcDef) {
-				if (funcDef.isGenerator()) {
-					transformer.transformFunctionDefinition(funcDef);
+			return classDef.forEachMember(function onMember(member) {
+				if (member instanceof MemberFunctionDefinition) {
+					var funcDef = member as MemberFunctionDefinition;
+					if (funcDef.isGenerator()) {
+						transformer.transformFunctionDefinition(funcDef);
+					}
 				}
-				return funcDef.forEachClosure(onFuncDef);
+				return member.forEachClosure(function (funcDef) {
+					return onMember(funcDef);
+				});
 			});
 		});
 		// optimization

@@ -2915,9 +2915,17 @@ class JavaScriptEmitter implements Emitter {
 
 	function _emitCore(classDefs : ClassDefinition[]) : void {
 		for (var i = 0; i < classDefs.length; ++i) {
-			classDefs[i].forEachMemberFunction(function onFuncDef(funcDef : MemberFunctionDefinition) : boolean {
+			function onFuncDef(funcDef : MemberFunctionDefinition) : boolean {
 				funcDef.forEachClosure(onFuncDef);
 				this._setupBooleanizeFlags(funcDef);
+				return true;
+			};
+			classDefs[i].forEachMemberFunction(onFuncDef);
+			classDefs[i].forEachMemberVariable(function (varDef) {
+				if ((varDef.flags() & ClassDefinition.IS_STATIC) != 0 && varDef.getInitialValue() != null) {
+					// only handle static vars, initializer of non-static properties are compiled into member function defs.
+					this._setupBooleanizeFlags(varDef.getInitialValue());
+				}
 				return true;
 			});
 		}
@@ -2956,7 +2964,8 @@ class JavaScriptEmitter implements Emitter {
 		return stash["jsemitter"] as _JSEmitterStash;
 	}
 
-	function _setupBooleanizeFlags (funcDef : MemberFunctionDefinition) : void {
+	// the function does not take care of function statements / expressions (in other words the caller should use forEachClosure)
+	function _setupBooleanizeFlags (expr : Expression) : void {
 		var exprReturnsBoolean = function (expr : Expression) : boolean {
 			if (expr instanceof LogicalExpression) {
 				return this.getStash(expr).returnsBoolean;
@@ -2964,36 +2973,45 @@ class JavaScriptEmitter implements Emitter {
 				return expr.getType().equals(Type.booleanType);
 			}
 		};
+		var parentExpr = new Expression[]; // [0] is stack top
+		var onExpr = function (expr : Expression) : boolean {
+			// handle children
+			parentExpr.unshift(expr);
+			expr.forEachExpression(onExpr);
+			parentExpr.shift();
+			// check
+			if (expr instanceof LogicalExpression) {
+				var shouldBooleanize = true;
+				var returnsBoolean = false;
+				if (exprReturnsBoolean((expr as LogicalExpression).getFirstExpr()) && exprReturnsBoolean((expr as LogicalExpression).getSecondExpr())) {
+					returnsBoolean = true;
+					shouldBooleanize = false;
+				} else if (parentExpr.length == 0) {
+					// caller should disable the shouldBooleanize flag if necessary
+				} else if (parentExpr[0] instanceof LogicalExpression
+					|| parentExpr[0] instanceof LogicalNotExpression) {
+					shouldBooleanize = false;
+				} else if (parentExpr[0] instanceof ConditionalExpression && (parentExpr[0] as ConditionalExpression).getCondExpr() == expr) {
+					shouldBooleanize = false;
+				}
+				this.getStash(expr).shouldBooleanize = shouldBooleanize;
+				this.getStash(expr).returnsBoolean   = returnsBoolean;
+			}
+			return true;
+		};
+		onExpr(expr);
+	}
+
+	function _setupBooleanizeFlags (funcDef : MemberFunctionDefinition) : void {
 		funcDef.forEachStatement(function onStatement(statement : Statement) : boolean {
-			var parentExpr = new Expression[]; // [0] is stack top
-			statement.forEachExpression(function onExpr(expr : Expression) : boolean {
-				// handle children
-				parentExpr.unshift(expr);
-				expr.forEachExpression(onExpr);
-				parentExpr.shift();
-				// check
-				if (expr instanceof LogicalExpression) {
-					var shouldBooleanize = true;
-					var returnsBoolean = false;
-					if (exprReturnsBoolean((expr as LogicalExpression).getFirstExpr()) && exprReturnsBoolean((expr as LogicalExpression).getSecondExpr())) {
-						returnsBoolean = true;
-						shouldBooleanize = false;
-					} else if (parentExpr.length == 0) {
-						if (statement instanceof ExpressionStatement
-							|| statement instanceof IfStatement
-							|| statement instanceof DoWhileStatement
-							|| statement instanceof WhileStatement
-							|| statement instanceof ForStatement) {
-							shouldBooleanize = false;
-						}
-					} else if (parentExpr[0] instanceof LogicalExpression
-						|| parentExpr[0] instanceof LogicalNotExpression) {
-						shouldBooleanize = false;
-					} else if (parentExpr[0] instanceof ConditionalExpression && (parentExpr[0] as ConditionalExpression).getCondExpr() == expr) {
-						shouldBooleanize = false;
-					}
-					this.getStash(expr).shouldBooleanize = shouldBooleanize;
-					this.getStash(expr).returnsBoolean   = returnsBoolean;
+			statement.forEachExpression(function (expr) {
+				this._setupBooleanizeFlags(expr);
+				if (statement instanceof ExpressionStatement
+					|| statement instanceof IfStatement
+					|| statement instanceof DoWhileStatement
+					|| statement instanceof WhileStatement
+					|| statement instanceof ForStatement) {
+					this.getStash(expr).shouldBooleanize = false;
 				}
 				return true;
 			});
