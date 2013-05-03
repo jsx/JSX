@@ -434,10 +434,10 @@ class _LinkTimeOptimizationCommand extends _OptimizeCommand {
 				(this.getStash(classDef.implementTypes()[i].getClassDef()) as _LinkTimeOptimizationCommand.Stash).extendedBy.push(classDef);
 			return true;
 		});
-		// mark classes / functions that are not derived / overridden as final
+		// mark classes / functions that are not derived / overridden / exported as final
 		this.getCompiler().forEachClassDef(function (parser, classDef) {
 
-			if ((classDef.flags() & (ClassDefinition.IS_INTERFACE | ClassDefinition.IS_MIXIN | ClassDefinition.IS_NATIVE | ClassDefinition.IS_FINAL)) == 0
+			if ((classDef.flags() & (ClassDefinition.IS_INTERFACE | ClassDefinition.IS_MIXIN | ClassDefinition.IS_NATIVE | ClassDefinition.IS_FINAL | ClassDefinition.IS_EXPORT)) == 0
 				&& (this.getStash(classDef) as _LinkTimeOptimizationCommand.Stash).extendedBy.length == 0) {
 
 					// found a class that is not extended, mark it and its functions as final
