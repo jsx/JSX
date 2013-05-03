@@ -2896,14 +2896,19 @@ class _UnboxOptimizeCommand extends _FunctionOptimizeCommand {
 					expr.forEachExpression(onExpr);
 					return true;
 				};
-				var newExpr = this._statementIsConstructingTheLocal(statements[statementIndex], local);
-				if (newExpr != null) {
-					statements.splice(statementIndex, 1);
-					statementIndex = buildConstructingStatements(statements, statementIndex, newExpr);
-				} else {
-					statements[statementIndex].forEachExpression(onExpr);
-					statements[statementIndex].handleStatements(onStatements);
+				if (statements[statementIndex] instanceof FunctionStatement) {
+					onStatements((statements[statementIndex] as FunctionStatement).getFuncDef().getStatements());
 					++statementIndex;
+				} else {
+					var newExpr = this._statementIsConstructingTheLocal(statements[statementIndex], local);
+					if (newExpr != null) {
+						statements.splice(statementIndex, 1);
+						statementIndex = buildConstructingStatements(statements, statementIndex, newExpr);
+					} else {
+						statements[statementIndex].forEachExpression(onExpr);
+						statements[statementIndex].handleStatements(onStatements);
+						++statementIndex;
+					}
 				}
 			}
 			return true;
