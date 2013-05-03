@@ -18,7 +18,7 @@ my @opts = (
 );
 
 {
-    my $tmpdir = tempdir(CLEANUP => 1, DIR => ".");
+    my $tmpdir = tempdir('test.tmp.XXXXXX', CLEANUP => 1, DIR => ".");
     my @expected_src;
 
     # compile 2nd gens, and store the expected source (to be compared with the result of 3rd gens)
