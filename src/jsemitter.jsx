@@ -3084,8 +3084,8 @@ class JavaScriptEmitter implements Emitter {
 				++i;
 		}
 		// start emitting
-		this._emit("var $__jsx_classMap = {\n", null);
-		this._advanceIndent();
+		this._emit("var $__jsx_classMap = {", null);
+		var isFirstEntry = true;
 		while (classDefs.length != 0) {
 			// fetch the first classDef, and others that came from the same file
 			var list = new string[][];
@@ -3094,7 +3094,7 @@ class JavaScriptEmitter implements Emitter {
 				if ((classDef.flags() & ClassDefinition.IS_EXPORT) != 0) {
 					assert ctors.length == 1;
 					list.push([ classDef.classFullName(), this._namer.getNameOfConstructor(classDef, ctors[0].getArgumentTypes()) ]);
-				} else {
+				} else if (! this._enableMinifier || classDef.className() == "_Main" || classDef.className() == "_Test") {
 					var push = function (argTypes : Type[]) : void {
 						list.push([ classDef.classFullName() + this._mangler.mangleFunctionArguments(argTypes), this._namer.getNameOfConstructor(classDef, argTypes) ]);
 					};
@@ -3117,24 +3117,33 @@ class JavaScriptEmitter implements Emitter {
 					++i;
 				}
 			}
-			// emit the map
-			var escapedFilename = JSON.stringify(this._platform.encodeFilename(filename));
-			this._emit(escapedFilename  + ": ", null);
-			this._emit("{\n", null);
-			this._advanceIndent();
-			for (var i = 0; i < list.length; ++i) {
-				this._emit(_Util.encodeObjectLiteralKey(list[i][0]) + ": " + list[i][1], null);
-				if (i != list.length - 1)
-					this._emit(",", null);
-				this._emit("\n", null);
+			if (list.length != 0 || ! this._enableMinifier) {
+				// emit the map
+				if (isFirstEntry) {
+					this._emit("\n", null);
+					this._advanceIndent();
+					isFirstEntry = false;
+				} else {
+					this._emit(",\n", null);
+				}
+				var escapedFilename = JSON.stringify(this._platform.encodeFilename(filename));
+				this._emit(escapedFilename  + ": ", null);
+				this._emit("{\n", null);
+				this._advanceIndent();
+				for (var i = 0; i < list.length; ++i) {
+					this._emit(_Util.encodeObjectLiteralKey(list[i][0]) + ": " + list[i][1], null);
+					if (i != list.length - 1)
+						this._emit(",", null);
+					this._emit("\n", null);
+				}
+				this._reduceIndent();
+				this._emit("}", null);
 			}
-			this._reduceIndent();
-			this._emit("}", null);
-			if (classDefs.length != 0)
-				this._emit(",", null);
-			this._emit("\n", null);
 		}
-		this._reduceIndent();
+		if (! isFirstEntry) {
+			this._emit("\n", null);
+			this._reduceIndent();
+		}
 		this._emit("};\n\n", null);
 	}
 
