@@ -14,7 +14,7 @@ class _Main {
     }
     static function main(args : string[]) : void {
         js.eval("JSX.require('t/run/258.export-funcs.jsx')._Main.say()");
-        js.eval("(new (JSX.require('t/run/258.export-funcs.jsx')._Main$)).say()");
+        js.eval("(new (JSX.require('t/run/258.export-funcs.jsx')._Main)).say()");
     }
 }
 

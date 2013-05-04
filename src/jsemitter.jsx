@@ -122,8 +122,8 @@ class _Util {
 				var ctors = _Util.findFunctions(classDef, "constructor", false);
 				if (ctors.length != 0) {
 					// move exported ctor to the top (so that it would not get mangled)
-					for (var j = 0; i < ctors.length; ++j) {
-						if ((ctors[i].flags() & ClassDefinition.IS_EXPORT) != 0) {
+					for (var j = 0; j < ctors.length; ++j) {
+						if ((ctors[j].flags() & ClassDefinition.IS_EXPORT) != 0) {
 							var exportedCtor = ctors[j];
 							ctors.splice(j, 1);
 							ctors.unshift(exportedCtor);
@@ -3092,13 +3092,25 @@ class JavaScriptEmitter implements Emitter {
 			var pushClass = (function (classDef : ClassDefinition) : void {
 				var ctors = _Util.findFunctions(classDef, "constructor", false);
 				if ((classDef.flags() & ClassDefinition.IS_EXPORT) != 0) {
-					assert ctors.length == 1;
-					list.push([ classDef.classFullName(), this._namer.getNameOfConstructor(classDef, ctors[0].getArgumentTypes()) ]);
-				} else if (! this._enableMinifier || classDef.className() == "_Main" || classDef.className() == "_Test") {
+					var exportedCtor = null : MemberFunctionDefinition;
+					for (var i = 0; i < ctors.length; ++i) {
+						if ((ctors[i].flags() & ClassDefinition.IS_EXPORT) != 0) {
+							assert exportedCtor == null;
+							exportedCtor = ctors[i];
+						}
+					}
+					if (exportedCtor == null) {
+						exportedCtor = ctors[0]; // any ctor will do
+					}
+					list.push([ classDef.classFullName(), this._namer.getNameOfConstructor(classDef, exportedCtor.getArgumentTypes()) ]);
+				}
+				if (! this._enableMinifier) {
+					if ((classDef.flags() & ClassDefinition.IS_EXPORT) == 0) {
+						list.push([ classDef.classFullName(), this._namer.getNameOfClass(classDef) ]);
+					}
 					var push = function (argTypes : Type[]) : void {
 						list.push([ classDef.classFullName() + this._mangler.mangleFunctionArguments(argTypes), this._namer.getNameOfConstructor(classDef, argTypes) ]);
 					};
-					list.push([ classDef.classFullName(), this._namer.getNameOfClass(classDef) ]);
 					if (ctors.length == 0) {
 						push(new Type[]);
 					} else {
@@ -3276,18 +3288,16 @@ class JavaScriptEmitter implements Emitter {
 		});
 		if (isStatic) {
 			if (Util.memberIsExported(funcDef.getClassDef(), funcDef.name(), funcDef.getArgumentTypes(), true)) {
-				this._emitHolderOfStatic(funcDef.getClassDef());
 				this._emit(
-					"." + funcDef.name()
+					this._namer.getNameOfClass(funcDef.getClassDef()) + "." + funcDef.name()
 					+ " = "
 					+ this._namer.getNameOfStaticFunction(funcDef.getClassDef(), funcDef.name(), funcDef.getArgumentTypes())
 					+ ";\n",
 					null);
 			}
 			if (! this._enableMinifier) {
-				this._emitHolderOfStatic(funcDef.getClassDef());
 				this._emit(
-					"." + funcDef.name() + this._mangler.mangleFunctionArguments(funcDef.getArgumentTypes())
+					this._namer.getNameOfClass(funcDef.getClassDef()) + "." + funcDef.name() + this._mangler.mangleFunctionArguments(funcDef.getArgumentTypes())
 					+ " = "
 					+ this._namer.getNameOfStaticFunction(funcDef.getClassDef(), funcDef.name(), funcDef.getArgumentTypes())
 					+ ";\n",
@@ -3373,8 +3383,7 @@ class JavaScriptEmitter implements Emitter {
 				|| initialValue instanceof RegExpLiteralExpression)) {
 			// use deferred initialization
 			this._emit("$__jsx_lazy_init(", variable.getNameToken());
-			this._emitHolderOfStatic(variable.getClassDef());
-			this._emit(", \"" + this._namer.getNameOfStaticVariable(variable.getClassDef(), variable.name()) + "\", function () {\n", variable.getNameToken());
+			this._emit(this._namer.getNameOfClass(variable.getClassDef()) + ", \"" + this._namer.getNameOfStaticVariable(variable.getClassDef(), variable.name()) + "\", function () {\n", variable.getNameToken());
 			this._advanceIndent();
 			this._emit("return ", variable.getNameToken());
 			this._emitRHSOfAssignment(initialValue, variable.getType());
@@ -3382,20 +3391,10 @@ class JavaScriptEmitter implements Emitter {
 			this._reduceIndent();
 			this._emit("});\n", variable.getNameToken());
 		} else {
-			this._emitHolderOfStatic(variable.getClassDef());
-			this._emit("." + this._namer.getNameOfStaticVariable(variable.getClassDef(), variable.name()) + " = ", variable.getNameToken());
+			this._emit(this._namer.getNameOfClass(variable.getClassDef()) + "." + this._namer.getNameOfStaticVariable(variable.getClassDef(), variable.name()) + " = ", variable.getNameToken());
 			this._emitRHSOfAssignment(initialValue, variable.getType());
 			this._emit(";\n", initialValue.getToken());
 		}
-	}
-
-	function _emitHolderOfStatic(classDef : ClassDefinition) : void {
-		if ((classDef.flags() & ClassDefinition.IS_EXPORT) != 0) {
-			var holder = this._namer.getNameOfConstructor(classDef, _Util.findFunctions(classDef, "constructor", false)[0].getArgumentTypes());
-		} else {
-			holder = this._namer.getNameOfClass(classDef);
-		}
-		this._emit(holder, null);
 	}
 
 	function _emitDefaultValueOf (type : Type) : void {

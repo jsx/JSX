@@ -16,7 +16,7 @@ mixin Mixin {
 
 class _Main extends Base implements Mixin {
     static function main(args : string[]) : void {
-        js.eval("(new (JSX.require('t/run/260.export-funcs-in-mixin.jsx')._Main$)).say()");
+        js.eval("(new (JSX.require('t/run/260.export-funcs-in-mixin.jsx')._Main)).say()");
     }
 }
 
