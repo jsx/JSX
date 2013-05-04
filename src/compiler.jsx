@@ -422,6 +422,7 @@ class Compiler {
 		this.forEachClassDef(function (parser, classDef) {
 			switch (classDef.classFullName()) {
 			case "_Main":
+				classDef.setFlags(classDef.flags() | ClassDefinition.IS_EXPORT);
 				classDef.forEachMemberFunction(function (funcDef) {
 					if ((funcDef.flags() & ClassDefinition.IS_STATIC) != 0
 						&& funcDef.name() == "main"
@@ -433,6 +434,7 @@ class Compiler {
 				});
 				break;
 			case "_Test":
+				classDef.setFlags(classDef.flags() | ClassDefinition.IS_EXPORT);
 				classDef.forEachMemberFunction(function (funcDef) {
 					if ((funcDef.flags() & ClassDefinition.IS_STATIC) == 0
 						&& funcDef.name().match(/^test/)

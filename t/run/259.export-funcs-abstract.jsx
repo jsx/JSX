@@ -21,8 +21,8 @@ class _Main extends BaseClass implements BaseInterface {
         log "goodbye";
     }
     static function main(args : string[]) : void {
-        js.eval("(new (JSX.require('t/run/259.export-funcs-abstract.jsx')._Main$)).hello()");
-        js.eval("(new (JSX.require('t/run/259.export-funcs-abstract.jsx')._Main$)).goodbye()");
+        js.eval("(new (JSX.require('t/run/259.export-funcs-abstract.jsx')._Main)).hello()");
+        js.eval("(new (JSX.require('t/run/259.export-funcs-abstract.jsx')._Main)).goodbye()");
     }
 }
 
