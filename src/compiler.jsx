@@ -437,7 +437,7 @@ class Compiler {
 				classDef.setFlags(classDef.flags() | ClassDefinition.IS_EXPORT);
 				classDef.forEachMemberFunction(function (funcDef) {
 					if ((funcDef.flags() & ClassDefinition.IS_STATIC) == 0
-						&& funcDef.name().match(/^test/)
+						&& (funcDef.name().match(/^test/) || funcDef.name() == "constructor")
 						&& funcDef.getArguments().length == 0) {
 						funcDef.setFlags(funcDef.flags() | ClassDefinition.IS_EXPORT);
 					}
