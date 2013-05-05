@@ -80,6 +80,8 @@ class ClassDefinition implements Stashable {
 	var _baseClassDef  : ClassDefinition = null;
 	var _outerClassDef : ClassDefinition = null;
 
+	var _nativeSource : Token = null;
+
 	function constructor (token : Token, className : string, flags : number, extendType : ParsedObjectType, implementTypes : ParsedObjectType[], members : MemberDefinition[], inners : ClassDefinition[], templateInners : TemplateClassDefinition[], objectTypesUsed : ParsedObjectType[], docComment : DocComment) {
 		this._parser = null;
 		this._token = token;
@@ -121,6 +123,14 @@ class ClassDefinition implements Stashable {
 
 	function setParser (parser : Parser) : void {
 		this._parser = parser;
+	}
+
+	function getNativeSource () : Token {
+		return this._nativeSource;
+	}
+
+	function setNativeSource (nativeSource : Token) : void {
+		this._nativeSource = nativeSource;
 	}
 
 	function getToken () : Token {

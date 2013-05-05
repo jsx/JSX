@@ -3060,6 +3060,11 @@ class JavaScriptEmitter implements Emitter {
 			this._emit("var js = { global: function () { return this; }() };\n", null);
 			return;
 		}
+		// bind native object to JSX class
+		if (classDef.getNativeSource() != null) {
+			this._emit("var " + this._namer.getNameOfClass(classDef) + " = " + Util.decodeStringLiteral(classDef.getNativeSource().getValue()) + ";\n", classDef.getNativeSource());
+		}
+
 		if ((classDef.flags() & ClassDefinition.IS_NATIVE) != 0)
 			return;
 		// normal handling
@@ -3084,7 +3089,7 @@ class JavaScriptEmitter implements Emitter {
 				++i;
 		}
 		// start emitting
-		this._emit("var $__jsx_classMap = {", null);
+		this._emit("\n" + "var $__jsx_classMap = {", null);
 		var isFirstEntry = true;
 		while (classDefs.length != 0) {
 			// fetch the first classDef, and others that came from the same file
