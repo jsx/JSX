@@ -1,3 +1,5 @@
+// hint: run `make` if it sticks
+
 import "js/phantom-test-case.jsx";
 import "js/phantom.jsx";
 import "js/web.jsx";
