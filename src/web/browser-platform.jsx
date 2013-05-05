@@ -27,6 +27,9 @@ import "../platform.jsx";
 import "../util.jsx";
 import "../emitter.jsx";
 
+// hack to avoid exceptions on native("require(...)")
+native ("function require(module) { console.error('ignore loading module: ' + module); return {}; }") class require { }
+
 class BrowserPlatform extends Platform {
 
 	static var debug = (dom.window.location.hash == "#debug");

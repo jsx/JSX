@@ -58,7 +58,7 @@ class _Test extends TestCase {
 		});
 
 		// source-map consumer
-		var consumer = SourceMapper.createSourceMapConsumer(mapping);
+		var consumer = new SourceMapConsumer(mapping);
 
 		var pos, orig;
 
