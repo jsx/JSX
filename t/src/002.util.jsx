@@ -81,6 +81,16 @@ class _Test extends TestCase {
 		this.expect(Util.relativePath("/a/b/c", "a/x/d", true), "for abs path").toBe("../x/d");
 	}
 
+	function testDirname() : void {
+		this.expect(Util.dirname("/foo/bar")).toBe("/foo");
+		this.expect(Util.dirname("/foo//bar")).toBe("/foo");
+		this.expect(Util.dirname("foo/bar")).toBe("foo");
+		this.expect(Util.dirname("foo//bar")).toBe("foo");
+
+		this.expect(Util.dirname("t//t")).toBe("t");
+		this.expect(Util.dirname("")).toBe(".");
+	}
+
 	function testToOrdinal() : void {
 		this.expect(Util.toOrdinal(1)).toBe("1st");
 		this.expect(Util.toOrdinal(2)).toBe("2nd");

@@ -452,7 +452,7 @@ class Util {
 	static function dirname(path : string) : string {
 		var parts = Util._resolvedPathParts(path);
 		parts.pop();
-		return parts.join("/");
+		return parts.length != 0 ? parts.join("/") : ".";
 	}
 
 	static function toOrdinal(n : number) : string {
