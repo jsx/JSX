@@ -138,13 +138,12 @@ class NodePlatform extends Platform {
 	}
 
 	override function execute(scriptFile : Nullable.<string>, jsSource : string, args : string[]) : void {
-		var tmpdir = (process.env["TMPDIR"] ?: process.env["TMP"]) ?: "/tmp";
-		var jsFile = Util.format("%1/%2.%3.%4.js", [
-			tmpdir,
+		// to refer module_modules, the temporary dirctory must be in the project directory
+		var jsFile = this._absPath(Util.format(".jsx.%1.%2.%3.js", [
 			node.path.basename(scriptFile ?: "-"),
 			process.pid.toString(),
 			Date.now().toString(16)
-		]);
+		]));
 		node.fs.writeFileSync(jsFile, jsSource);
 		process.on("exit", function(stream) {
 			node.fs.unlinkSync(jsFile);

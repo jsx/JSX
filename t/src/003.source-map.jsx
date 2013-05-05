@@ -30,8 +30,6 @@ class _Test extends TestCase {
 			return -1;
 		}
 
-		module.paths.push(process.cwd() + "/node_modules");
-
 		var platform = new NodePlatform(".");
 
 		var jsxSourceFile = "t/src/source-map/hello.jsx";
