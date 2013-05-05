@@ -1374,6 +1374,7 @@ class Parser {
 		this._templateInners = new TemplateClassDefinition[];
 		// attributes* class
 		this._classFlags = 0;
+		var nativeSource = null : Token;
 		var docComment = null : DocComment;
 		while (true) {
 			var token = this._expect([ "class", "interface", "mixin", "abstract", "final", "native", "__fake__", "__export__" ]);
@@ -1381,9 +1382,11 @@ class Parser {
 				return null;
 			if (this._classFlags == 0)
 				docComment = this._docComment;
-			if (token.getValue() == "class")
+			// "class", "interface", or "mixin"
+			if (token.getValue() == "class") {
 				break;
-			if (token.getValue() == "interface") {
+			}
+			else if (token.getValue() == "interface") {
 				if ((this._classFlags & (ClassDefinition.IS_FINAL | ClassDefinition.IS_NATIVE)) != 0) {
 					this._newError("interface cannot have final or native attribute set");
 					return null;
@@ -1391,7 +1394,7 @@ class Parser {
 				this._classFlags |= ClassDefinition.IS_INTERFACE;
 				break;
 			}
-			if (token.getValue() == "mixin") {
+			else if (token.getValue() == "mixin") {
 				if ((this._classFlags & (ClassDefinition.IS_FINAL | ClassDefinition.IS_NATIVE | ClassDefinition.IS_EXPORT)) != 0) {
 					this._newError("mixin cannot have final, native, or __export__ attribute set");
 					return null;
@@ -1399,6 +1402,7 @@ class Parser {
 				this._classFlags |= ClassDefinition.IS_MIXIN;
 				break;
 			}
+			// class attributes
 			var newFlag = 0;
 			switch (token.getValue()) {
 			case "abstract":
@@ -1408,6 +1412,10 @@ class Parser {
 				newFlag = ClassDefinition.IS_FINAL;
 				break;
 			case "native":
+				if (this._expectOpt("(") != null) { // native("...")
+					nativeSource = this._expectStringLiteral();
+					this._expect(")");
+				}
 				newFlag = ClassDefinition.IS_NATIVE;
 				break;
 			case "__fake__":
@@ -1563,6 +1571,7 @@ class Parser {
 			return null;
 
 		// done
+		var classDef : ClassDefinition;
 		if (this._typeArgs.length != 0) {
 			var templateClassDef = new TemplateClassDefinition(className, className.getValue(), this._classFlags, this._typeArgs, this._extendType, this._implementTypes, members, this._inners, this._templateInners, this._objectTypesUsed, docComment);
 			if (this._outerClass != null) {
@@ -1570,18 +1579,20 @@ class Parser {
 			} else {
 				this._templateClassDefs.push(templateClassDef);
 			}
-			templateClassDef.setParser(this);
-			return templateClassDef;
+			classDef = templateClassDef;
 		} else {
-			var classDef = new ClassDefinition(className, className.getValue(), this._classFlags, this._extendType, this._implementTypes, members, this._inners, this._templateInners, this._objectTypesUsed, docComment);
+			classDef = new ClassDefinition(className, className.getValue(), this._classFlags, this._extendType, this._implementTypes, members, this._inners, this._templateInners, this._objectTypesUsed, docComment);
 			if (this._outerClass != null) {
 				this._outerClass.inners.push(classDef);
 			} else {
 				this._classDefs.push(classDef);
 			}
-			classDef.setParser(this);
-			return classDef;
 		}
+		if (nativeSource != null) {
+			classDef.setNativeSource(nativeSource);
+		}
+		classDef.setParser(this);
+		return classDef;
 	}
 
 	function _memberDefinition () : MemberDefinition {
