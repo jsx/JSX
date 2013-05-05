@@ -6,7 +6,7 @@ import "js.jsx";
 native final class phantom {
   delete function constructor();
 
-  static const version : Version;
+  static __readonly__ var version : Version;
 
   static function exit() : void;
   static function exit(returnValue : int) : void;
@@ -22,10 +22,10 @@ native final class phantom {
 final native("require('system')") class system {
   delete function constructor();
 
-  static var platform : string;
-  static var os : OS;
-  static var env : Map.<string>;
-  static var args : Array.<string>;
+  static __readonly__ var platform : string;
+  static __readonly__ var os : OS;
+  static __readonly__ var env : Map.<string>;
+  static __readonly__ var args : Array.<string>;
 }
 
 /**
