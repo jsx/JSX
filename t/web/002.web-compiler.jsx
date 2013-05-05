@@ -1,7 +1,7 @@
 // hint: run `make` if it sticks
 
-import "js/phantom-test-case.jsx";
-import "js/phantom.jsx";
+import "js/phantomjs/test-case.jsx";
+import "js/phantomjs.jsx";
 import "js/web.jsx";
 
 class _Test extends PhantomTestCase {
