@@ -113,7 +113,7 @@ class NodePlatform extends Platform {
 	}
 
 	override function setWorkingDir (dir : string) : void {
-		this._cwd = Util.resolvePath(dir);
+		this._cwd = this._absPath(dir);
 	}
 
 	override function mkpath (path : string) : void {
