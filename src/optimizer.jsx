@@ -624,6 +624,14 @@ class _StripOptimizeCommand extends _OptimizeCommand {
 				return true;
 			});
 		}
+		// reset stash
+		this.getCompiler().forEachClassDef(function (parser, classDef) {
+			this.resetStash(classDef);
+			return classDef.forEachMember(function (member) {
+				this.resetStash(member);
+				return true;
+			});
+		});
 		// push all exported members
 		forEachTargetClass(function (classDef) {
 			if ((classDef.flags() & ClassDefinition.IS_EXPORT) != 0) {
