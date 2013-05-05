@@ -338,6 +338,11 @@ abstract class _OptimizeCommand {
 		throw new Error("if you are going to use the stash, you need to override this function");
 	}
 
+	function resetStash (stashable : Stashable) : void {
+		var stash = stashable.getStash();
+		stash[this._identifier] = null;
+	}
+
 	function createVar (funcDef : MemberFunctionDefinition, type : Type, baseName : string) : LocalVariable {
 		var locals = funcDef.getLocals();
 		function nameExists (n : string) : boolean {
