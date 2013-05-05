@@ -4,6 +4,8 @@ import "js.jsx";
  * Set of PhantomJSX APIs
  */
 native final class phantom {
+  delete function constructor();
+
   static const version : Version;
 
   static function exit() : void;
@@ -14,46 +16,28 @@ native final class phantom {
 }
 
 
-final class _CommonJS {
-  static function require(name : string) : variant {
-    return js.eval("require(" + JSON.stringify(name) + ")");
-  }
-}
-
 /**
  * PhantomJS System module
  */
-final class system {
-  static const _delegate = _CommonJS.require("system") as __noconvert__ _System;
-  static const platform = system._delegate.platform;
-  static const os       = system._delegate.os;
-  static const env      = system._delegate.env;
-  static const args     = system._delegate.args;
-}
+final native("require('system')") class system {
+  delete function constructor();
 
-final native __fake__ class _System {
-  var platform : string;
-  var os : OS;
-  var env : Map.<string>;
-  var args : Array.<string>;
+  static var platform : string;
+  static var os : OS;
+  static var env : Map.<string>;
+  static var args : Array.<string>;
 }
 
 /**
  * PhantomJS WebPage module
  */
-final class webpage {
-  static const _delegate = _CommonJS.require("webpage") as __noconvert__ _WebPage;
+final native("require('webpage')") class webpage {
+  delete function constructor();
 
-  static function create() : WebPage {
-    return webpage._delegate.create();
-  }
+  static function create() : WebPage;
 }
 
-final native __fake__ class _WebPage {
-  function create() : WebPage;
-}
-
-final native class WebPage {
+final native __fake__ class WebPage {
   var clipRect : Rectangle;
   var content : string;
   var navigationLocked : boolean;
@@ -73,6 +57,8 @@ final native class WebPage {
   function sendEvent(type : string, mouseX : int, mouseY : int) : void;
   function uploadFile(selector : string, filename : string) : void;
 
+  // Event listeners
+
   var onAlert : function(msg : string) : void;
   var onCallback : function(data : variant) : void;
   var onClosing : function(closingPage : WebPage) : void;
@@ -89,91 +75,32 @@ final native class WebPage {
   var onUrlChanged : function(targetUrl : string) : void;
 }
 
-final class fs {
-  static const _delegate = _CommonJS.require("fs") as __noconvert__ _FileSystem;
-  static const separator        = fs._delegate.separator;
-  static const workingDirectory = fs._delegate.workingDirectory;
+final native("require('fs')") class fs {
+  delete function constructor();
 
-  // Query Functions
+  static var separator : string;
+  static var workingDirectory : string;
 
-  static function list(path : string) : Array.<string> {
-    return fs._delegate.list(path);
-  }
+  static function list(path : string) : Array.<string>;
+  static function absolute (path : string) : string;
+  static function exists(path : string) : boolean;
 
-  static function absolute(path : string) : string {
-    return fs._delegate.absolute(path);
-  }
+  static function changeWorkingDirectory(path : string) : void;
+  static function makeDirectory(path : string) : void;
+  static function makeTree(path : string) : void;
+  static function removeDirectory(path : string) : void;
+  static function removeTree(path : string) : void;
+  static function copyTree(source : string, destination : string) : void;
 
-  static function exists(path : string) : boolean {
-    return fs._delegate.exists(path);
-  }
-
-
-  // Directory Functions
-
-  static function changeWorkingDirectory(path : string) : void {
-    fs._delegate.changeWorkingDirectory(path);
-  }
-  static function makeDirectory(path : string) : void {
-    fs._delegate.makeDirectory(path);
-  }
-  static function makeTree(path : string) : void {
-    fs._delegate.makeTree(path);
-  }
-  static function removeDirectory(path : string) : void {
-    fs._delegate.removeDirectory(path);
-  }
-  static function removeTree(path : string) : void {
-    fs._delegate.removeTree(path);
-  }
-  static function copyTree(source : string, destination : string) : void {
-    fs._delegate.copyTree(source, destination);
-  }
-
-  // File Functions
-
-  static function open(path : string, mode : string) : Stream {
-    return fs._delegate.open(path, mode);
-  }
-  static function read(path : string) : string {
-    return fs._delegate.read(path);
-  }
-  static function write(path : string, content : string, mode : string) : void {
-    fs._delegate.write(path, content, mode);
-  }
-  static function write(path : string, content : string) : void {
-    fs._delegate.write(path, content);
-  }
-
-  static function remove(path : string) : void {
-    fs._delegate.remove(path);
-  }
-}
-
-final native __fake__ class _FileSystem {
-  var separator : string;
-  var workingDirectory : string;
-
-  function list(path : string) : Array.<string>;
-  function absolute (path : string) : string;
-  function exists(path : string) : boolean;
-
-  function changeWorkingDirectory(path : string) : void;
-  function makeDirectory(path : string) : void;
-  function makeTree(path : string) : void;
-  function removeDirectory(path : string) : void;
-  function removeTree(path : string) : void;
-  function copyTree(source : string, destination : string) : void;
-
-  function open(path : string, mode : string) : Stream;
-  function read(path : string) : string;
-  function write(path : string, content : string, mode : string) : void;
-  function write(path : string, content : string) : void;
-  function size(path : string) : void;
-  function remove(path : string) : void;
-  function copy(source : string, destination : string) : void;
-  function move(source : string, destination : string) : void;
-  function touch(path : string) : void;
+  static function open(path : string, mode : string) : Stream;
+  static function read(path : string) : string;
+  static function write(path : string, content : string, mode : string) : void;
+  static function write(path : string, content : string) : void;
+  static function size(path : string) : void;
+  static function remove(path : string) : void;
+  static function copy(source : string, destination : string) : void;
+  static function move(source : string, destination : string) : void;
+  static function touch(path : string) : void;
 }
 
 final native __fake__ class Stream {
@@ -188,24 +115,22 @@ final native __fake__ class Stream {
 /**
  * PhantomJS WebServer module
  */
-final class webserver {
-  static const _delegate = _CommonJS.require("webserver") as __noconvert__ _webserver;
+final native("require('webserver')") class webserver {
+  delete function constructor();
 
-  static function create() : WebServer {
-    return webserver._delegate.create();
-  }
+  static function create() : WebServer;
 }
 
-final native __fake__ class _webserver{
-  function create() : WebServer;
-}
+final native __fake__ class WebServer {
+  delete function constructor();
 
-final native class WebServer {
   function listen(port : int,       listener : function(:Request, :Response):void) : void;
   function listen(address : string, listener : function(:Request, :Response):void) : void;
 }
 
 final native __fake__ class Request {
+  delete function constructor();
+
   var method : string;
   var url    : string;
   var httpVersion : string;
@@ -215,6 +140,8 @@ final native __fake__ class Request {
 }
 
 final native __fake__ class Response {
+  delete function constructor();
+
   var headers : Map.<string>;
   var statusCode : int;
 
@@ -223,16 +150,19 @@ final native __fake__ class Response {
   function close() : void;
 }
 
-
 // helper PODs
 
 final native __fake__ class Version {
+  delete function constructor();
+
   var major : int;
   var minor : int;
   var patch : int;
 }
 
 final native __fake__ class OS {
+  delete function constructor();
+
   var architecture : string;
   var name : string;
   var version : string;
