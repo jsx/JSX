@@ -1225,6 +1225,7 @@ class _FoldConstantCommand extends _FunctionOptimizeCommand {
 					if (foldedExpr != null) {
 						foldedExpr = this._toFoldedExpr(foldedExpr, (expr as PropertyExpression).getType());
 						if (foldedExpr != null) {
+							this.log("folding property '" + member.toString() + "' at '" + expr.getToken().getFilename() + ":" + expr.getToken().getLineNumber() as string);
 							replaceCb(foldedExpr);
 						}
 					}
