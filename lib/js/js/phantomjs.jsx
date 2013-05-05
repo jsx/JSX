@@ -1,7 +1,15 @@
+/***
+ * PhantomJS binding for JSX
+ *
+ * Usage: <code>JSX_RUNJS=phantomjs jsx --executable commonjs a.jsx</code>
+ *
+ * @see http://phantomjs.org/
+ */
+
 import "js.jsx";
 
 /**
- * Set of PhantomJSX APIs
+ * Interface to <code>phantom</code>
  */
 native final class phantom {
   delete function constructor();
@@ -75,6 +83,9 @@ final native __fake__ class WebPage {
   var onUrlChanged : function(targetUrl : string) : void;
 }
 
+/**
+ * PhantomJS FileSystem module
+ */
 final native("require('fs')") class fs {
   delete function constructor();
 
