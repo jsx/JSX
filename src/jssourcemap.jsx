@@ -29,11 +29,13 @@ import "js.jsx";
 
 import "./util.jsx";
 
-native __fake__ class _SourceMapGenerator {
+native ("require('source-map').SourceMapGenerator") class SourceMapGenerator {
+	function constructor(options : Map.<string>);
 	function addMapping(mapping : Map.<variant>) : void;
 }
 
-native __fake__ class _SourceMapConsumer {
+native ("require('source-map').SourceMapConsumer") class SourceMapConsumer {
+	function constructor(mapping : variant);
 	function originalPositionFor(generatedPos : variant) : variant;
 }
 
@@ -43,26 +45,16 @@ class SourceMapper {
 	var _rootDir : string;
 	var _outputFile : string;
 	var _copyDestDir : string;
-	var _impl : _SourceMapGenerator;
+	var _impl : SourceMapGenerator;
 
 	// Because the browse will request to get the original source files listed in the source mapping file, we prepare copies of the original source files.
 	var _fileMap = new Map.<string>; // original-to-copy filename mapping
-
-	static function createSourceMapGenerator(args : Map.<string>) : _SourceMapGenerator {
-		return js.eval('new (require("source-map").SourceMapGenerator)('+JSON.stringify(args)+')')
-				as __noconvert__ _SourceMapGenerator;
-	}
-
-	static function createSourceMapConsumer(mapping : variant) : _SourceMapConsumer {
-		return js.eval('new (require("source-map").SourceMapConsumer)('+JSON.stringify(mapping)+')')
-				as __noconvert__ _SourceMapConsumer;
-	}
 
 	function constructor (rootDir : string, outputFile : string) {
 		this._rootDir = rootDir;
 		this._outputFile = Util.resolvePath(outputFile);
 		this._copyDestDir =  this._outputFile + ".mapping.d";
-		this._impl = SourceMapper.createSourceMapGenerator({
+		this._impl = new SourceMapGenerator({
 			file       : Util.basename(this._outputFile),
 			sourceRoot : Util.basename(this._copyDestDir)
 		});

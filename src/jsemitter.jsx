@@ -777,17 +777,9 @@ class _Minifier {
 	}
 
 	static function minifyJavaScript(src : string) : string {
-		// load modules
-		var esprima = js.eval("require('esprima')");
-		var esmangle = js.eval("require('esmangle')");
-		var escodegen = js.eval("require('escodegen')");
-		// parse
-		var ast = js.invoke(esprima, "parse", [ src ] : variant[]);
-		// mangle
-		ast = js.invoke(esmangle, "mangle", [ ast, { destructive: true } : Map.<variant> ] : variant[]);
-		// generate
-		return js.invoke(escodegen, "generate", [
-			ast,
+		var ast = esprima.parse(src);
+		ast = esmangle.mangle(ast, { destructive: true } : Map.<variant>);
+		return escodegen.generate(ast,
 			{
 				format: {
 					renumber: true,
@@ -798,11 +790,23 @@ class _Minifier {
 					parentheses: false
 				} : Map.<variant>,
 				directive: true
-			} : Map.<variant>
-		] : variant[]) as string;
+			} : Map.<variant>);
 	}
 
 }
+
+native("require('esprima')") class esprima {
+	static function parse(src : string) : variant;
+}
+
+native("require('esmangle')") class esmangle {
+	static function mangle(ast : variant, opts : Map.<variant>) : variant;
+}
+
+native("require('escodegen')") class escodegen {
+	static function generate(ast : variant, opts : Map.<variant>) : string;
+}
+
 
 // statement emitter
 
@@ -3060,6 +3064,11 @@ class JavaScriptEmitter implements Emitter {
 			this._emit("var js = { global: function () { return this; }() };\n", null);
 			return;
 		}
+		// bind native object to JSX class
+		if (classDef.getNativeSource() != null) {
+			this._emit("var " + this._namer.getNameOfClass(classDef) + " = " + Util.decodeStringLiteral(classDef.getNativeSource().getValue()) + ";\n", classDef.getNativeSource());
+		}
+
 		if ((classDef.flags() & ClassDefinition.IS_NATIVE) != 0)
 			return;
 		// normal handling
@@ -3084,7 +3093,7 @@ class JavaScriptEmitter implements Emitter {
 				++i;
 		}
 		// start emitting
-		this._emit("var $__jsx_classMap = {", null);
+		this._emit("\n" + "var $__jsx_classMap = {", null);
 		var isFirstEntry = true;
 		while (classDefs.length != 0) {
 			// fetch the first classDef, and others that came from the same file

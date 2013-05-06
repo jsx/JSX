@@ -1,4 +1,4 @@
-import "js/phantom-test-case.jsx";
+import "js/phantomjs/test-case.jsx";
 
 class _Test extends PhantomTestCase {
   function testHello() : void {

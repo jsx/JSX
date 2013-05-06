@@ -1,4 +1,4 @@
-import "./phantom.jsx";
+import "../phantomjs.jsx";
 
 import "test-case.jsx";
 
