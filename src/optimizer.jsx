@@ -753,7 +753,12 @@ class _StripOptimizeCommand extends _OptimizeCommand {
 				var preserve = true;
 				if ((classDefs[i].flags() & ClassDefinition.IS_NATIVE) != 0
 					&& classDefs[i].getNativeSource() != null
-					&& ! (this.getStash(classDefs[i]) as _StripOptimizeCommand._Stash).touched) {
+					&& ! (this.getStash(classDefs[i]) as _StripOptimizeCommand._Stash).touched
+					&& classDefs[i].forEachMember(function (member) {
+						if ((member.flags() & ClassDefinition.IS_STATIC) == 0)
+							return true;
+						return ! (this.getStash(member) as _StripOptimizeCommand._Stash).touched;
+					})) {
 					preserve = false;
 				}
 				if (preserve) {
