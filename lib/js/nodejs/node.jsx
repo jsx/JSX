@@ -33,13 +33,15 @@ import "nodejs/stream.jsx";
  * Module-scoped variables
  * @see http://nodejs.org/docs/latest/api/globals.html
  */
-final native("{ __dirname: __dirname, __filename: __filename, module: module, global: global }")
+final native("{ __dirname: __dirname, __filename: __filename, require: require, module: module, global: global }")
 class node {
 	delete function constructor();
 
 	static __readonly__ var __dirname : string;
 	static __readonly__ var __filename : string;
 	static __readonly__ var global : Map.<variant>;
+
+	static function require(name : string) : variant;
 }
 
 

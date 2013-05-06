@@ -1,4 +1,4 @@
-import "js/nodejs.jsx";
+import "nodejs/node.jsx";
 
 import "test-case.jsx";
 
