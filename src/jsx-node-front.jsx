@@ -24,7 +24,6 @@
  * IN THE SOFTWARE.
  */
 
-import "js.jsx";
 import "nodejs/node.jsx";
 import "nodejs/fs.jsx";
 import "nodejs/http.jsx";

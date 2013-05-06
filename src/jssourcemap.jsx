@@ -25,8 +25,6 @@
  * IN THE SOFTWARE.
  */
 
-import "js.jsx";
-
 import "./util.jsx";
 
 native ("require('source-map').SourceMapGenerator") class SourceMapGenerator {
