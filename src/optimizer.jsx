@@ -2788,6 +2788,9 @@ class _UnboxOptimizeCommand extends _FunctionOptimizeCommand {
 	}
 
 	function _newExpressionCanUnbox (newExpr : Expression) : boolean {
+		if ((newExpr.getType().getClassDef().flags() & ClassDefinition.IS_NATIVE) != 0) {
+			return false;
+		}
 		var ctor = _DetermineCalleeCommand.getCallingFuncDef(newExpr);
 		var stash = this.getStash(ctor) as _UnboxOptimizeCommand.Stash;
 		if (stash.canUnbox != null) {
