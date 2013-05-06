@@ -1124,7 +1124,8 @@ class _UnclassifyOptimizationCommand extends _OptimizeCommand {
 				var calleeExpr = (expr as CallExpression).getExpr();
 				if (calleeExpr instanceof PropertyExpression
 				    && ! ((calleeExpr as PropertyExpression).getExpr() instanceof ClassExpression)
-					&& ! (calleeExpr as PropertyExpression).getType().isAssignable()) {
+					&& ! (calleeExpr as PropertyExpression).getType().isAssignable()
+					&& ! ((calleeExpr as PropertyExpression).getIdentifierToken().getValue() == "toString" && (expr as CallExpression).getArguments().length == 0)) {
 						var propertyExpr = calleeExpr as PropertyExpression;
 						// is a member method call
 						var receiverType = propertyExpr.getExpr().getType().resolveIfNullable();
