@@ -746,6 +746,24 @@ class _StripOptimizeCommand extends _OptimizeCommand {
 			}
 			return true;
 		});
+		// remove unused native classes (with nativeSource)
+		this.getCompiler().getParsers().forEach(function (parser) {
+			var classDefs = parser.getClassDefs();
+			for (var i = 0; i != classDefs.length;) {
+				var preserve = true;
+				if ((classDefs[i].flags() & ClassDefinition.IS_NATIVE) != 0
+					&& classDefs[i].getNativeSource() != null
+					&& ! (this.getStash(classDefs[i]) as _StripOptimizeCommand._Stash).touched) {
+					preserve = false;
+				}
+				if (preserve) {
+					++i;
+				} else {
+					this.log("removing unused native class: " + classDefs[i].className());
+					classDefs.splice(i, 1);
+				}
+			}
+		});
 	}
 
 	function _walkExpression(expr : Expression) : boolean {
