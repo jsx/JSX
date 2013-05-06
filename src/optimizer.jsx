@@ -1124,7 +1124,8 @@ class _UnclassifyOptimizationCommand extends _OptimizeCommand {
 				var calleeExpr = (expr as CallExpression).getExpr();
 				if (calleeExpr instanceof PropertyExpression
 				    && ! ((calleeExpr as PropertyExpression).getExpr() instanceof ClassExpression)
-					&& ! (calleeExpr as PropertyExpression).getType().isAssignable()) {
+					&& ! (calleeExpr as PropertyExpression).getType().isAssignable()
+					&& ! ((calleeExpr as PropertyExpression).getIdentifierToken().getValue() == "toString" && (expr as CallExpression).getArguments().length == 0)) {
 						var propertyExpr = calleeExpr as PropertyExpression;
 						// is a member method call
 						var receiverType = propertyExpr.getExpr().getType().resolveIfNullable();
@@ -2788,6 +2789,9 @@ class _UnboxOptimizeCommand extends _FunctionOptimizeCommand {
 	}
 
 	function _newExpressionCanUnbox (newExpr : Expression) : boolean {
+		if ((newExpr.getType().getClassDef().flags() & ClassDefinition.IS_NATIVE) != 0) {
+			return false;
+		}
 		var ctor = _DetermineCalleeCommand.getCallingFuncDef(newExpr);
 		var stash = this.getStash(ctor) as _UnboxOptimizeCommand.Stash;
 		if (stash.canUnbox != null) {
