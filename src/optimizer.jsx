@@ -632,6 +632,23 @@ class _StripOptimizeCommand extends _OptimizeCommand {
 				return true;
 			});
 		});
+		// all non-final native methods should be preserved in the instantiated classes
+		this.getCompiler().forEachClassDef(function (parser, classDef) {
+			if (! (classDef instanceof TemplateClassDefinition)
+				&& (classDef.flags() & ClassDefinition.IS_NATIVE) != 0) {
+				classDef.forEachMemberFunction(function (funcDef) {
+					if (funcDef.name() == "constructor") {
+						// skip
+					} else if ((funcDef.flags() & ClassDefinition.IS_FINAL) != 0) {
+						// skip
+					} else {
+						this._touchMethod(funcDef.name(), funcDef.getArgumentTypes());
+					}
+					return true;
+				});
+			}
+			return true;
+		});
 		// push all exported members
 		forEachTargetClass(function (classDef) {
 			if ((classDef.flags() & ClassDefinition.IS_EXPORT) != 0) {
