@@ -612,17 +612,14 @@ class _StripOptimizeCommand extends _OptimizeCommand {
 	}
 
 	override function performOptimization() : void {
-		function forEachTargetClass(cb : function (: ClassDefinition) : void) : void {
-			this.getCompiler().forEachClassDef(function (parser, classDef) {
-				if (classDef instanceof TemplateClassDefinition) {
-					// skip
-				} else if ((classDef.flags() & ClassDefinition.IS_NATIVE) != 0) {
-					// skip
-				} else {
-					cb(classDef);
-				}
-				return true;
-			});
+		function isEmittedClass(classDef : ClassDefinition) : boolean {
+			if (classDef instanceof TemplateClassDefinition) {
+				return false;
+			}
+			if ((classDef.flags() & ClassDefinition.IS_NATIVE) != 0) {
+				return false;
+			}
+			return true;
 		}
 		// reset stash
 		this.getCompiler().forEachClassDef(function (parser, classDef) {
@@ -650,25 +647,28 @@ class _StripOptimizeCommand extends _OptimizeCommand {
 			return true;
 		});
 		// push all exported members
-		forEachTargetClass(function (classDef) {
-			if ((classDef.flags() & ClassDefinition.IS_EXPORT) != 0) {
-				this._touchInstance(classDef);
-			}
-			classDef.forEachMember(function (member) {
-				if ((member.flags() & ClassDefinition.IS_EXPORT) != 0) {
-					if ((member.flags() & ClassDefinition.IS_STATIC) != 0) {
-						this._touchStatic(member);
-					} else if (member instanceof MemberFunctionDefinition) {
-						var funcDef = member as MemberFunctionDefinition;
-						if (funcDef.name() == "constructor") {
-							this._touchConstructor(funcDef);
-						} else {
-							this._touchMethod(funcDef.name(), funcDef.getArgumentTypes());
+		this.getCompiler().forEachClassDef(function (parser, classDef) {
+			if (isEmittedClass(classDef)) {
+				if ((classDef.flags() & ClassDefinition.IS_EXPORT) != 0) {
+					this._touchInstance(classDef);
+				}
+				classDef.forEachMember(function (member) {
+					if ((member.flags() & ClassDefinition.IS_EXPORT) != 0) {
+						if ((member.flags() & ClassDefinition.IS_STATIC) != 0) {
+							this._touchStatic(member);
+						} else if (member instanceof MemberFunctionDefinition) {
+							var funcDef = member as MemberFunctionDefinition;
+							if (funcDef.name() == "constructor") {
+								this._touchConstructor(funcDef);
+							} else {
+								this._touchMethod(funcDef.name(), funcDef.getArgumentTypes());
+							}
 						}
 					}
-				}
-				return true;
-			});
+					return true;
+				});
+			}
+			return true;
 		});
 		// check all members
 		while (this._membersToWalk.length != 0) {
@@ -706,41 +706,45 @@ class _StripOptimizeCommand extends _OptimizeCommand {
 			}
 			return true;
 		}
-		forEachTargetClass(function (classDef) {
-			var numConstructors = 0;
-			var members = classDef.members();
-			for (var memberIndex = 0; memberIndex != members.length;) {
-				var member = members[memberIndex];
-				if (memberShouldPreserve(member)) {
-					if (member instanceof MemberFunctionDefinition
-						&& (member.flags() & ClassDefinition.IS_STATIC) == 0
-						&& member.name() == "constructor") {
-						++numConstructors;
+		this.getCompiler().forEachClassDef(function (parser, classDef) {
+			if (isEmittedClass(classDef)) {
+				var numConstructors = 0;
+				var members = classDef.members();
+				for (var memberIndex = 0; memberIndex != members.length;) {
+					var member = members[memberIndex];
+					if (memberShouldPreserve(member)) {
+						if (member instanceof MemberFunctionDefinition
+							&& (member.flags() & ClassDefinition.IS_STATIC) == 0
+							&& member.name() == "constructor") {
+							++numConstructors;
+						}
+						++memberIndex;
+						this.log("preserving used: " + member.getNotation());
+					} else {
+						this.log("removing unused: " + member.getNotation());
+						members.splice(memberIndex, 1);
 					}
-					++memberIndex;
-					this.log("preserving used: " + member.getNotation());
-				} else {
-					this.log("removing unused: " + member.getNotation());
-					members.splice(memberIndex, 1);
+				}
+				if (numConstructors == 0) {
+					// create a fake constructor (should never get called; TODO leave as is, emit "{}" in jsemitter upon facing a class wo. any ctors)
+					// the reason for not deleting the entire class is because it could be referred to by "instanceof"
+					this.log("substituting fake constructor for class: " + classDef.className());
+					var ctor = new MemberFunctionDefinition(
+						null,
+						new Token("constructor", true),
+						ClassDefinition.IS_FINAL | (classDef.flags() & ClassDefinition.IS_EXPORT),
+						Type.voidType,
+						new ArgumentDeclaration[],
+						new LocalVariable[],
+						new Statement[],
+						new MemberFunctionDefinition[],
+						classDef.getToken(), /* FIXME */
+						null);
+					ctor.setClassDef(classDef);
+					members.push(ctor);
 				}
 			}
-			if (numConstructors == 0) {
-				// create a fake constructor
-				this.log("substituting fake constructor for class: " + classDef.className());
-				var ctor = new MemberFunctionDefinition(
-					null,
-					new Token("constructor", true),
-					ClassDefinition.IS_FINAL | (classDef.flags() & ClassDefinition.IS_EXPORT),
-					Type.voidType,
-					new ArgumentDeclaration[],
-					new LocalVariable[],
-					new Statement[],
-					new MemberFunctionDefinition[],
-					classDef.getToken(), /* FIXME */
-					null);
-				ctor.setClassDef(classDef);
-				members.push(ctor);
-			}
+			return true;
 		});
 	}
 
@@ -751,7 +755,7 @@ class _StripOptimizeCommand extends _OptimizeCommand {
 				assert callee != null;
 				this._touchConstructor(callee);
 			} else if (expr instanceof InstanceofExpression) {
-				// TODO
+				// current impl. does not delete a class even if it is not used, see #performOptimization
 			} else if (expr instanceof PropertyExpression) {
 				var propertyExpr = expr as PropertyExpression;
 				var name = propertyExpr.getIdentifierToken().getValue();
