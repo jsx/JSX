@@ -498,7 +498,7 @@ class ClassDefinition implements Stashable {
 			var func = new MemberFunctionDefinition(
 				this._token,
 				new Token("constructor", true),
-				ClassDefinition.IS_FINAL | (this.flags() & ClassDefinition.IS_NATIVE),
+				ClassDefinition.IS_FINAL | (this.flags() & (ClassDefinition.IS_NATIVE | ClassDefinition.IS_EXPORT)),
 				Type.voidType,
 				new ArgumentDeclaration[],
 				isNative ? (null) : new LocalVariable[],
