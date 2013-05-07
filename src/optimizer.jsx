@@ -778,7 +778,15 @@ class _StripOptimizeCommand extends _OptimizeCommand {
 				assert callee != null;
 				this._touchConstructor(callee);
 			} else if (expr instanceof InstanceofExpression) {
-				// current impl. does not delete a class even if it is not used, see #performOptimization
+				this._touchInstance((expr as InstanceofExpression).getExpectedType().getClassDef());
+			} else if (expr instanceof AsExpression) {
+				if (expr.getType() instanceof ObjectType) {
+					this._touchInstance(expr.getType().getClassDef());
+				}
+			} else if (expr instanceof AsNoConvertExpression) {
+				if (expr.getType() instanceof ObjectType) {
+					this._touchInstance(expr.getType().getClassDef());
+				}
 			} else if (expr instanceof PropertyExpression) {
 				var propertyExpr = expr as PropertyExpression;
 				var name = propertyExpr.getIdentifierToken().getValue();
