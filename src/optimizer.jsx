@@ -1163,34 +1163,8 @@ class _StaticizeOptimizeCommand extends _OptimizeCommand {
 	function _cloneFuncDef (funcDef : MemberFunctionDefinition) : MemberFunctionDefinition {
 
 		function cloneFuncDef (funcDef : MemberFunctionDefinition) : MemberFunctionDefinition {
-			var args = funcDef.getArguments().map.<ArgumentDeclaration>((arg) -> {
-				var newArg = arg.clone();
-				(this.getStash(arg) as _StaticizeOptimizeCommand.Stash).altLocal = newArg;
-				return newArg;
-			});
-			var locals = funcDef.getLocals().map.<LocalVariable>((local) -> {
-				var newLocal = new LocalVariable(local.getName(), local.getType());
-				(this.getStash(local) as _StaticizeOptimizeCommand.Stash).altLocal = newLocal;
-				return newLocal;
-			});
-
-			// rewrite locals
-			funcDef.forEachStatement(function onStatement(statement : Statement) : boolean {
-				if (statement instanceof FunctionStatement) {
-					(statement as FunctionStatement).getFuncDef().forEachStatement(onStatement);
-				}
-				return statement.forEachExpression(function onExpr(expr : Expression, replaceCb : function(:Expression):void) : boolean {
-					if (expr instanceof LocalExpression) {
-						var altLocal;
-						if ((altLocal = (this.getStash((expr as LocalExpression).getLocal()) as _StaticizeOptimizeCommand.Stash).altLocal) != null) {
-							(expr as LocalExpression).setLocal(altLocal);
-						}
-					} else if (expr instanceof FunctionExpression) {
-						return (expr as FunctionExpression).getFuncDef().forEachStatement(onStatement);
-					}
-					return expr.forEachExpression(onExpr);
-				}) && statement.forEachStatement(onStatement);
-			});
+			// at this moment, all locals and closures are not cloned yet
+			var statements = Cloner.<Statement>.cloneArray(funcDef.getStatements());
 
 			var closures = funcDef.getClosures().map.<MemberFunctionDefinition>((funcDef) -> {
 				var newFuncDef = cloneFuncDef(funcDef);
@@ -1198,7 +1172,7 @@ class _StaticizeOptimizeCommand extends _OptimizeCommand {
 				return newFuncDef;
 			});
 			// rewrite funcDefs
-			funcDef.forEachStatement(function onStatement(statement : Statement) : boolean {
+			Util.forEachStatement(function onStatement(statement : Statement) : boolean {
 				if (statement instanceof FunctionStatement) {
 					var altFuncDef;
 					if ((altFuncDef = (this.getStash((statement as FunctionStatement).getFuncDef()) as _StaticizeOptimizeCommand.Stash).altFuncDef) != null) {
@@ -1216,7 +1190,36 @@ class _StaticizeOptimizeCommand extends _OptimizeCommand {
 					}
 					return expr.forEachExpression(onExpr);
 				}) && statement.forEachStatement(onStatement);
+			}, statements);
+
+			var args = funcDef.getArguments().map.<ArgumentDeclaration>((arg) -> {
+				var newArg = arg.clone();
+				(this.getStash(arg) as _StaticizeOptimizeCommand.Stash).altLocal = newArg;
+				return newArg;
 			});
+			var locals = funcDef.getLocals().map.<LocalVariable>((local) -> {
+				var newLocal = new LocalVariable(local.getName(), local.getType());
+				(this.getStash(local) as _StaticizeOptimizeCommand.Stash).altLocal = newLocal;
+				return newLocal;
+			});
+
+			// rewrite locals
+			Util.forEachStatement(function onStatement(statement : Statement) : boolean {
+				if (statement instanceof FunctionStatement) {
+					(statement as FunctionStatement).getFuncDef().forEachStatement(onStatement);
+				}
+				return statement.forEachExpression(function onExpr(expr : Expression, replaceCb : function(:Expression):void) : boolean {
+					if (expr instanceof LocalExpression) {
+						var altLocal;
+						if ((altLocal = (this.getStash((expr as LocalExpression).getLocal()) as _StaticizeOptimizeCommand.Stash).altLocal) != null) {
+							(expr as LocalExpression).setLocal(altLocal);
+						}
+					} else if (expr instanceof FunctionExpression) {
+						return (expr as FunctionExpression).getFuncDef().forEachStatement(onStatement);
+					}
+					return expr.forEachExpression(onExpr);
+				}) && statement.forEachStatement(onStatement);
+			}, statements);
 
 			return new MemberFunctionDefinition(
 				funcDef.getToken(),
@@ -1225,7 +1228,7 @@ class _StaticizeOptimizeCommand extends _OptimizeCommand {
 				funcDef.getReturnType(),
 				args,
 				locals,
-				Cloner.<Statement>.cloneArray(funcDef.getStatements()),
+				statements,
 				closures,
 				funcDef._lastTokenOfBody,
 				null
