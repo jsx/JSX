@@ -1,18 +1,22 @@
+/*EXPECTED
+bar
+*/
 /*JSX_OPTS
 --optimize staticize,inline
 */
 class Base {
-	final function foo () : void {
-		this;
+	var _p = "bar";
+	final function foo () : string{
+		return this._p;
 	}
 }
 class Derived extends Base {
-	final function bar () : void {
-		super.foo();
+	final function bar () : string {
+		return super.foo();
 	}
 }
 class _Main {
 	static function main (args : string[]) : void {
-		(new Derived).bar();
+		log new Derived().bar();
 	}
 }
