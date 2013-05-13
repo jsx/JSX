@@ -1046,6 +1046,34 @@ class _StaticizeOptimizeCommand extends _OptimizeCommand {
 		super(_StaticizeOptimizeCommand.IDENTIFIER);
 	}
 
+	class Stash extends Stash {
+
+		var altName : Nullable.<string>;
+		var altLocal : LocalVariable;
+		var altFuncDef : MemberFunctionDefinition;
+
+		function constructor () {
+			this.altName = null;
+			this.altLocal = null;
+			this.altFuncDef = null;
+		}
+
+		function constructor (that : _StaticizeOptimizeCommand.Stash) {
+			this.altName = that.altName;
+			this.altLocal = that.altLocal;
+			this.altFuncDef = that.altFuncDef;
+		}
+
+		override function clone () : _StaticizeOptimizeCommand.Stash {
+			return new _StaticizeOptimizeCommand.Stash(this);
+		}
+
+	}
+
+	override function _createStash () : Stash {
+		return new _StaticizeOptimizeCommand.Stash();
+	}
+
 	override function performOptimization () : void {
 
 		function memberCanBeStaticized(funcDef : MemberFunctionDefinition) : boolean {
@@ -1061,8 +1089,8 @@ class _StaticizeOptimizeCommand extends _OptimizeCommand {
 			// convert function definitions (expect constructor) to static
 			classDef.forEachMemberFunction(function onFunction(funcDef : MemberFunctionDefinition) : boolean {
 				if (memberCanBeStaticized(funcDef)) {
-						this.log("rewriting method to static function: " + funcDef.name());
-						this._rewriteFunctionAsStatic(funcDef);
+					this.log("staticizing method: " + funcDef.name());
+					this._staticizeMethod(funcDef);
 				}
 				return true;
 			});
@@ -1098,12 +1126,27 @@ class _StaticizeOptimizeCommand extends _OptimizeCommand {
 		});
 	}
 
-	function _rewriteFunctionAsStatic (funcDef : MemberFunctionDefinition) : void {
+	function _staticizeMethod (funcDef : MemberFunctionDefinition) : void {
+		var staticFuncDef = this._cloneFuncDef(funcDef);
+
+		// register to the classDef
+		var classDef = funcDef.getClassDef();
+		staticFuncDef.setClassDef(classDef);
+		classDef._members.splice(classDef._members.indexOf(funcDef)+1, 0, staticFuncDef); // insert right after the original function
+
+		// rename
+		var newName = this._findFrechFunctionName(classDef, funcDef.name(), ([ new ObjectType(classDef) ] : Type[]).concat((funcDef.getType() as ResolvedFunctionType).getArgumentTypes()), true);
+		(this.getStash(funcDef) as _StaticizeOptimizeCommand.Stash).altName = newName;
+		staticFuncDef._nameToken = new Token(newName, true);
+
+		// update flags
+		staticFuncDef.setFlags(funcDef.flags() | ClassDefinition.IS_STATIC);
+
 		// first argument should be this
-		var thisArg = new ArgumentDeclaration(new Token("$this", false), new ObjectType(funcDef.getClassDef()));
-		funcDef.getArguments().unshift(thisArg);
+		var thisArg = new ArgumentDeclaration(new Token("$this", false), new ObjectType(classDef));
+		staticFuncDef.getArguments().unshift(thisArg);
 		// rewrite this
-		funcDef.forEachStatement(function onStatement(statement : Statement) : boolean {
+		staticFuncDef.forEachStatement(function onStatement(statement : Statement) : boolean {
 			if (statement instanceof FunctionStatement) {
 				(statement as FunctionStatement).getFuncDef().forEachStatement(onStatement);
 			}
@@ -1116,12 +1159,95 @@ class _StaticizeOptimizeCommand extends _OptimizeCommand {
 				return expr.forEachExpression(onExpr);
 			}) && statement.forEachStatement(onStatement);
 		});
-		// update flags
-		funcDef.setFlags(funcDef.flags() | ClassDefinition.IS_STATIC);
+	}
+
+	function _cloneFuncDef (funcDef : MemberFunctionDefinition) : MemberFunctionDefinition {
+
+		function cloneFuncDef (funcDef : MemberFunctionDefinition) : MemberFunctionDefinition {
+			var args = funcDef.getArguments().map.<ArgumentDeclaration>((arg) -> {
+				var newArg = arg.clone();
+				(this.getStash(arg) as _StaticizeOptimizeCommand.Stash).altLocal = newArg;
+				return newArg;
+			});
+			var locals = funcDef.getLocals().map.<LocalVariable>((local) -> {
+				var newLocal = new LocalVariable(local.getName(), local.getType());
+				(this.getStash(local) as _StaticizeOptimizeCommand.Stash).altLocal = newLocal;
+				return newLocal;
+			});
+
+			// rewrite locals
+			funcDef.forEachStatement(function onStatement(statement : Statement) : boolean {
+				if (statement instanceof FunctionStatement) {
+					(statement as FunctionStatement).getFuncDef().forEachStatement(onStatement);
+				}
+				return statement.forEachExpression(function onExpr(expr : Expression, replaceCb : function(:Expression):void) : boolean {
+					if (expr instanceof LocalExpression) {
+						var altLocal;
+						if ((altLocal = (this.getStash((expr as LocalExpression).getLocal()) as _StaticizeOptimizeCommand.Stash).altLocal) != null) {
+							(expr as LocalExpression).setLocal(altLocal);
+						}
+					} else if (expr instanceof FunctionExpression) {
+						return (expr as FunctionExpression).getFuncDef().forEachStatement(onStatement);
+					}
+					return expr.forEachExpression(onExpr);
+				}) && statement.forEachStatement(onStatement);
+			});
+
+			var closures = funcDef.getClosures().map.<MemberFunctionDefinition>((funcDef) -> {
+				var newFuncDef = cloneFuncDef(funcDef);
+				(this.getStash(funcDef) as _StaticizeOptimizeCommand.Stash).altFuncDef = newFuncDef;
+				return newFuncDef;
+			});
+			// rewrite funcDefs
+			funcDef.forEachStatement(function onStatement(statement : Statement) : boolean {
+				if (statement instanceof FunctionStatement) {
+					var altFuncDef;
+					if ((altFuncDef = (this.getStash((statement as FunctionStatement).getFuncDef()) as _StaticizeOptimizeCommand.Stash).altFuncDef) != null) {
+						(statement as FunctionStatement).setFuncDef(altFuncDef);
+					}
+					return true;
+				}
+				return statement.forEachExpression(function onExpr(expr : Expression, replaceCb : function(:Expression):void) : boolean {
+					if (expr instanceof FunctionExpression) {
+						var altFuncDef;
+						if ((altFuncDef = (this.getStash((expr as FunctionExpression).getFuncDef()) as _StaticizeOptimizeCommand.Stash).altFuncDef) != null) {
+							(expr as FunctionExpression).setFuncDef(altFuncDef);
+						}
+						return true;
+					}
+					return expr.forEachExpression(onExpr);
+				}) && statement.forEachStatement(onStatement);
+			});
+
+			return new MemberFunctionDefinition(
+				funcDef.getToken(),
+				funcDef.getNameToken(),
+				funcDef.flags(),
+				funcDef.getReturnType(),
+				args,
+				locals,
+				Cloner.<Statement>.cloneArray(funcDef.getStatements()),
+				closures,
+				funcDef._lastTokenOfBody,
+				null
+			);
+		}
+		return cloneFuncDef(funcDef);
+	}
+
+	function _findFrechFunctionName (classDef : ClassDefinition, baseName : string, argTypes : Type[], isStatic : boolean) : string {
+		var index = 0;
+		// search for a name which does not conflict with existing function
+		do {
+			var newName = Util.format("%1_%2", [ baseName, index as string ]);
+			++index;
+		} while (Util.findFunctionInClass(classDef, newName, argTypes, isStatic) != null);
+
+		return newName;
 	}
 
 	function _rewriteMethodCallsToStatic (expr : Expression, replaceCb : function(:Expression):void) : void {
-		var onExpr = function (expr : Expression, replaceCb : function(:Expression):void) : boolean {
+		function onExpr(expr : Expression, replaceCb : function(:Expression):void) : boolean {
 			if (expr instanceof CallExpression) {
 				var calleeExpr = (expr as CallExpression).getExpr();
 				if (calleeExpr instanceof PropertyExpression
@@ -1132,9 +1258,10 @@ class _StaticizeOptimizeCommand extends _OptimizeCommand {
 						var receiverType = propertyExpr.getExpr().getType().resolveIfNullable();
 						// skip interfaces and mixins
 						if ((receiverType.getClassDef().flags() & (ClassDefinition.IS_INTERFACE | ClassDefinition.IS_MIXIN)) == 0) {
-							var found = this._findRewrittenFunctionInClass(receiverType, propertyExpr.getIdentifierToken().getValue(), (propertyExpr.getType() as ResolvedFunctionType).getArgumentTypes(), true);
-							var classDef = found.first, funcDef = found.second;
-							if (funcDef != null && (funcDef.flags() & (ClassDefinition.IS_OVERRIDE | ClassDefinition.IS_ABSTRACT | ClassDefinition.IS_FINAL | ClassDefinition.IS_NATIVE)) == ClassDefinition.IS_FINAL && funcDef.name() != "constructor") {
+							var funcDef = this._findFunctionInClassTree(receiverType.getClassDef(), propertyExpr.getIdentifierToken().getValue(), (propertyExpr.getType() as ResolvedFunctionType).getArgumentTypes(), false);
+							// funcDef is staticized
+							var newName;
+							if (funcDef != null && (newName = (this.getStash(funcDef) as _StaticizeOptimizeCommand.Stash).altName) != null) {
 								// found, rewrite
 								onExpr(propertyExpr.getExpr(), function (expr) {
 									propertyExpr.setExpr(expr);
@@ -1145,10 +1272,10 @@ class _StaticizeOptimizeCommand extends _OptimizeCommand {
 										expr.getToken(),
 										new PropertyExpression(
 											propertyExpr.getToken(),
-											new ClassExpression(new Token(classDef.className(), true), new ObjectType(classDef)),
-											propertyExpr.getIdentifierToken(),
+											new ClassExpression(new Token(funcDef.getClassDef().className(), true), new ObjectType(funcDef.getClassDef())),
+											new Token(newName, true),
 											propertyExpr.getTypeArguments(),
-											funcDef.getType() as ResolvedFunctionType),
+											new StaticFunctionType(null, (funcDef.getType() as ResolvedFunctionType).getReturnType(), ([ new ObjectType(funcDef.getClassDef()) ] : Type[]).concat((funcDef.getType() as ResolvedFunctionType).getArgumentTypes()), false)),
 										[ propertyExpr.getExpr() ].concat((expr as CallExpression).getArguments())));
 								return true;
 							}
@@ -1156,28 +1283,25 @@ class _StaticizeOptimizeCommand extends _OptimizeCommand {
 					}
 			}
 			return expr.forEachExpression(onExpr);
-		};
+		}
 		onExpr(expr, replaceCb);
 	}
 
-	function _findRewrittenFunctionInClass (type : Type, funcName : string, beforeArgTypes : Type[], isStatic : boolean) : Pair.<ClassDefinition, MemberFunctionDefinition> {
-		var classDef, funcDef;
-		for (;;) {
-			classDef = type.getClassDef();
-			if (classDef.className() == "Object") {
-				funcDef = Util.findFunctionInClass(classDef, funcName, [ type ].concat(beforeArgTypes), isStatic);
-				break;
+	function _findFunctionInClassTree (classDef : ClassDefinition, name : string, argTypes : Type[], isStatic : boolean) : MemberFunctionDefinition {
+		var funcDef;
+		while (classDef.className() != "Object") {
+			if ((funcDef = Util.findFunctionInClass(classDef, name, argTypes, isStatic)) != null) {
+				return funcDef;
 			}
-			if ((funcDef = Util.findFunctionInClass(classDef, funcName, [ type ].concat(beforeArgTypes), isStatic)) != null)
-				break;
-			type = classDef.extendType();
+			classDef = classDef.extendType().getClassDef();
 		}
-		return new Pair.<ClassDefinition, MemberFunctionDefinition>(classDef, funcDef);
+		return Util.findFunctionInClass(classDef, name, argTypes, isStatic);
 	}
 
 }
 
 class _UnclassifyOptimizationCommand extends _OptimizeCommand {
+
 	static const IDENTIFIER = "unclassify";
 
 	function constructor () {
