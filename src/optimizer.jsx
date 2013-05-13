@@ -1105,14 +1105,14 @@ class _StaticizeOptimizeCommand extends _OptimizeCommand {
 
 				this._rewriteMethodCallsToStatic(varDef.getInitialValue(), function (expr) {
 					varDef.setInitialValue(expr);
-				});
+				}, null);
 				return true;
 			});
 			// rewrite member functions
 			function onFunction (funcDef : MemberFunctionDefinition) : boolean {
 				function onStatement (statement : Statement) : boolean {
 					statement.forEachExpression(function (expr, replaceCb) {
-						this._rewriteMethodCallsToStatic(expr, replaceCb);
+						this._rewriteMethodCallsToStatic(expr, replaceCb, funcDef);
 						return true;
 					});
 					return statement.forEachStatement(onStatement);
@@ -1248,7 +1248,7 @@ class _StaticizeOptimizeCommand extends _OptimizeCommand {
 		return newName;
 	}
 
-	function _rewriteMethodCallsToStatic (expr : Expression, replaceCb : function(:Expression):void) : void {
+	function _rewriteMethodCallsToStatic (expr : Expression, replaceCb : function(:Expression):void, funcDef : MemberFunctionDefinition) : void {
 		function onExpr(expr : Expression, replaceCb : function(:Expression):void) : boolean {
 			if (expr instanceof CallExpression) {
 				var calleeExpr = (expr as CallExpression).getExpr();
@@ -1291,6 +1291,14 @@ class _StaticizeOptimizeCommand extends _OptimizeCommand {
 				if (funcDef != null && (newName = (this.getStash(funcDef) as _StaticizeOptimizeCommand.Stash).altName) != null) {
 					// found, rewrite
 					Util.forEachExpression(onExpr, superExpr.getArguments());
+					var thisVar : Expression;
+					if ((funcDef.flags() & ClassDefinition.IS_STATIC) != 0) {
+						// super expression in static function means that the function has been staticized
+						var thisArg = new ArgumentDeclaration(new Token("$this", false), new ObjectType(funcDef.getClassDef()));
+						thisVar = new LocalExpression(thisArg.getName(), thisArg);
+					} else {
+						thisVar = new ThisExpression(new Token("this", false), funcDef.getClassDef());
+					}
 					replaceCb(
 						new CallExpression(
 							expr.getToken(),
@@ -1300,7 +1308,7 @@ class _StaticizeOptimizeCommand extends _OptimizeCommand {
 								new Token(newName, true),
 								[], // type args
 								new StaticFunctionType(null, (funcDef.getType() as ResolvedFunctionType).getReturnType(), ([ new ObjectType(funcDef.getClassDef()) ] : Type[]).concat((funcDef.getType() as ResolvedFunctionType).getArgumentTypes()), false)),
-							([ new ThisExpression(new Token("this", false), classDef) ] : Expression[]).concat((expr as SuperExpression).getArguments())));
+							[ thisVar ].concat(superExpr.getArguments())));
 					return true;
 				}
 			}
