@@ -1077,9 +1077,8 @@ class _StaticizeOptimizeCommand extends _OptimizeCommand {
 	override function performOptimization () : void {
 
 		function memberCanBeStaticized(funcDef : MemberFunctionDefinition) : boolean {
-			return (funcDef.flags() & (ClassDefinition.IS_OVERRIDE | ClassDefinition.IS_ABSTRACT | ClassDefinition.IS_FINAL | ClassDefinition.IS_STATIC | ClassDefinition.IS_NATIVE | ClassDefinition.IS_EXPORT)) == ClassDefinition.IS_FINAL
-				&& funcDef.name() != "constructor"
-				&& ! Util.memberIsExported(funcDef.getClassDef(), funcDef.name(), funcDef.getArgumentTypes(), false);
+			return (funcDef.flags() & (ClassDefinition.IS_OVERRIDE | ClassDefinition.IS_ABSTRACT | ClassDefinition.IS_FINAL | ClassDefinition.IS_STATIC | ClassDefinition.IS_NATIVE)) == ClassDefinition.IS_FINAL
+				&& funcDef.name() != "constructor";
 		}
 
 		this.getCompiler().forEachClassDef(function (parser, classDef) {

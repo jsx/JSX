@@ -4,12 +4,13 @@ foo
 /*JSX_OPTS
 --optimize staticize
 */
-class _Main {
-	__export__ final function foo () : void {
+import "js.jsx";
+
+__export__ class _Main {
+	final function foo () : void {
 		log 'foo';
 	}
 	static function main(args : string[]) : void {
-		var m = new _Main;
-		m.foo();
+		js.eval("(new (JSX.require('t/optimize/044.staticize-exported-non-virtual.jsx')._Main)).foo()");
 	}
 }
