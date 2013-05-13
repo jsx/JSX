@@ -327,11 +327,11 @@ abstract class _OptimizeCommand {
 	abstract function performOptimization () : void;
 
 	function getStash (stashable : Stashable) : Stash {
-		var stash = stashable.getStash();
-		if (stash[this._identifier] == null) {
-			stash[this._identifier] = this._createStash();
+		var stash = stashable.getStash(this._identifier);
+		if (stash == null) {
+			stash = stashable.setStash(this._identifier, this._createStash());
 		}
-		return stash[this._identifier];
+		return stash;
 	}
 
 	function _createStash () : Stash {
@@ -339,8 +339,7 @@ abstract class _OptimizeCommand {
 	}
 
 	function resetStash (stashable : Stashable) : void {
-		var stash = stashable.getStash();
-		stash[this._identifier] = null;
+		stashable.setStash(this._identifier, null);
 	}
 
 	function createVar (funcDef : MemberFunctionDefinition, type : Type, baseName : string) : LocalVariable {
@@ -1031,7 +1030,7 @@ class _DetermineCalleeCommand extends _FunctionOptimizeCommand {
 	}
 
 	static function getCallingFuncDef (stashable : Stashable) : MemberFunctionDefinition {
-		var stash = stashable.getStash()[_DetermineCalleeCommand.IDENTIFIER] as _DetermineCalleeCommand.Stash;
+		var stash = stashable.getStash(_DetermineCalleeCommand.IDENTIFIER) as _DetermineCalleeCommand.Stash;
 		if (stash == null)
 			throw new Error("callee not searched");
 		return stash.callingFuncDef;

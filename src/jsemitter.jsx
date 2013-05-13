@@ -53,14 +53,14 @@ class _Util {
 	}
 
 	static function getOutputClassName(classDef : ClassDefinition) : string {
-		return (classDef.getStash()[_Util.OUTPUTNAME_IDENTIFIER] as _Util.OutputNameStash).outputName;
+		return (classDef.getStash(_Util.OUTPUTNAME_IDENTIFIER) as _Util.OutputNameStash).outputName;
 	}
 
 	static function getOutputConstructorName(ctor : MemberFunctionDefinition) : string {
 		if ((ctor.getClassDef().flags() & ClassDefinition.IS_NATIVE) != 0) {
 			return _Util.getNameOfNativeConstructor(ctor.getClassDef());
 		}
-		return (ctor.getStash()[_Util.OUTPUTNAME_IDENTIFIER] as _Util.OutputNameStash).outputName;
+		return (ctor.getStash(_Util.OUTPUTNAME_IDENTIFIER) as _Util.OutputNameStash).outputName;
 	}
 
 	static function getOutputConstructorName(classDef : ClassDefinition, argTypes : Type[]) : string {
@@ -82,7 +82,7 @@ class _Util {
 
 	static function setOutputClassNames(classDefs : ClassDefinition[]) : void {
 		function setOutputName(stashable : Stashable, name : string) : void {
-			stashable.getStash()[_Util.OUTPUTNAME_IDENTIFIER] = new _Util.OutputNameStash(name);
+			stashable.setStash(_Util.OUTPUTNAME_IDENTIFIER, new _Util.OutputNameStash(name));
 		}
 		function escapeClassNameIfInstantiated(name : string) : string {
 			// escape the instantiated class names (note: template classes are never emitted (since they are all native) but their names are used for mangling of function arguments)
@@ -313,10 +313,10 @@ class _Namer {
 	}
 
 	function _enterCatch(tryStmt : TryStatement, cb : function (getCatchName : function () : string) : void, catchName : string) : void {
-		tryStmt.getStash()[_Namer.IDENTIFIER] = new _Namer._TryStash(catchName);
+		tryStmt.setStash(_Namer.IDENTIFIER, new _Namer._TryStash(catchName));
 		var catchStmts = tryStmt.getCatchStatements();
 		for (var i in catchStmts) {
-			catchStmts[i].getLocal().getStash()[_Namer.IDENTIFIER] = new _Namer._CatchTargetStash(tryStmt);
+			catchStmts[i].getLocal().setStash(_Namer.IDENTIFIER, new _Namer._CatchTargetStash(tryStmt));
 		}
 		cb(function () { return this._getCatchName(tryStmt); });
 	}
@@ -330,11 +330,11 @@ class _Namer {
 	}
 
 	function _getCatchName(caught : CaughtVariable) : string {
-		return this._getCatchName((caught.getStash()[_Namer.IDENTIFIER] as _Namer._CatchTargetStash).tryStmt);
+		return this._getCatchName((caught.getStash(_Namer.IDENTIFIER) as _Namer._CatchTargetStash).tryStmt);
 	}
 
 	function _getCatchName(tryStmt : TryStatement) : string {
-		return (tryStmt.getStash()[_Namer.IDENTIFIER] as _Namer._TryStash).catchName;
+		return (tryStmt.getStash(_Namer.IDENTIFIER) as _Namer._TryStash).catchName;
 	}
 
 }
@@ -739,27 +739,27 @@ class _Minifier {
 	}
 
 	static function _getClassStash(classDef : ClassDefinition) : _Minifier._ClassStash {
-		var stash = classDef.getStash();
-		if (! stash.hasOwnProperty(_Minifier.CLASSSTASH_IDENTIFIER)) {
-			stash[_Minifier.CLASSSTASH_IDENTIFIER] = new _Minifier._ClassStash();
+		var stash = classDef.getStash(_Minifier.CLASSSTASH_IDENTIFIER);
+		if (stash == null) {
+			stash = classDef.setStash(_Minifier.CLASSSTASH_IDENTIFIER, new _Minifier._ClassStash());
 		}
-		return stash[_Minifier.CLASSSTASH_IDENTIFIER] as _Minifier._ClassStash;
+		return stash as _Minifier._ClassStash;
 	}
 
 	static function _getScopeStash(stashable : Stashable) : _Minifier._ScopeStash {
-		var stash = stashable.getStash();
-		if(! stash.hasOwnProperty(_Minifier.SCOPESTASH_IDENTIFIER)) {
-			stash[_Minifier.SCOPESTASH_IDENTIFIER] = new _Minifier._ScopeStash();
+		var stash = stashable.getStash(_Minifier.SCOPESTASH_IDENTIFIER);
+		if(stash == null) {
+			stash = stashable.setStash(_Minifier.SCOPESTASH_IDENTIFIER, new _Minifier._ScopeStash());
 		}
-		return stash[_Minifier.SCOPESTASH_IDENTIFIER] as _Minifier._ScopeStash;
+		return stash as _Minifier._ScopeStash;
 	}
 
 	static function _getLocalStash(local : LocalVariable) : _Minifier._LocalStash {
-		var stash = local.getStash();
-		if(! stash.hasOwnProperty(_Minifier.LOCALSTASH_IDENTIFIER)) {
-			stash[_Minifier.LOCALSTASH_IDENTIFIER] = new _Minifier._LocalStash();
+		var stash = local.getStash(_Minifier.LOCALSTASH_IDENTIFIER);
+		if(stash == null) {
+			stash = local.setStash(_Minifier.LOCALSTASH_IDENTIFIER, new _Minifier._LocalStash());
 		}
-		return stash[_Minifier.LOCALSTASH_IDENTIFIER] as _Minifier._LocalStash;
+		return stash as _Minifier._LocalStash;
 	}
 
 	static function _incr(useCount : Map.<number>, name : string) : void {
@@ -2604,7 +2604,7 @@ class _NewExpressionEmitter extends _OperatorExpressionEmitter {
 
 	override function emit (outerOpPrecedence : number) : void {
 		function getInliner(funcDef : MemberFunctionDefinition) : function(:NewExpression):Expression[] {
-			var stash = funcDef.getStash()["unclassify"];
+			var stash = funcDef.getStash("unclassify");
 			return stash ? (stash as _UnclassifyOptimizationCommand.Stash).inliner : null;
 		}
 		var classDef = this._expr.getType().getClassDef();
@@ -2913,7 +2913,7 @@ class JavaScriptEmitter implements Emitter {
 		this._output += this._fileHeader;
 		this._output += this._platform.load(this._platform.getRoot() + "/src/js/bootstrap.js");
 
-		var stash = (this.getStash()[_NoDebugCommand.IDENTIFIER] as _NoDebugCommand.Stash);
+		var stash = (this.getStash(_NoDebugCommand.IDENTIFIER) as _NoDebugCommand.Stash);
 		this._emit("JSX.DEBUG = "+(stash == null || stash.debugValue ? "true" : "false")+";\n", null);
 	}
 
@@ -2961,11 +2961,11 @@ class JavaScriptEmitter implements Emitter {
 	}
 
 	function getStash (stashable : Stashable) : _JSEmitterStash {
-		var stash = stashable.getStash();
-		if (stash["jsemitter"] == null) {
-			stash["jsemitter"] = new _JSEmitterStash;
+		var stash = stashable.getStash("jsemitter");
+		if (stash == null) {
+			stash = stashable.setStash("jsemitter", new _JSEmitterStash);
 		}
-		return stash["jsemitter"] as _JSEmitterStash;
+		return stash as _JSEmitterStash;
 	}
 
 	// the function does not take care of function statements / expressions (in other words the caller should use forEachClosure)
