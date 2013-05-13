@@ -1281,6 +1281,26 @@ class _StaticizeOptimizeCommand extends _OptimizeCommand {
 							}
 						}
 					}
+			} else if (expr instanceof SuperExpression) {
+				var superExpr = expr as SuperExpression;
+				var classDef = superExpr.getFunctionType().getObjectType().getClassDef();
+				funcDef = this._findFunctionInClassTree(classDef, superExpr.getName().getValue(), (superExpr.getFunctionType() as ResolvedFunctionType).getArgumentTypes(), false);
+				// funcDef is staticized
+				if (funcDef != null && (newName = (this.getStash(funcDef) as _StaticizeOptimizeCommand.Stash).altName) != null) {
+					// found, rewrite
+					Util.forEachExpression(onExpr, superExpr.getArguments());
+					replaceCb(
+						new CallExpression(
+							expr.getToken(),
+							new PropertyExpression(
+								superExpr.getToken(),
+								new ClassExpression(new Token(funcDef.getClassDef().className(), true), new ObjectType(funcDef.getClassDef())),
+								new Token(newName, true),
+								[], // type args
+								new StaticFunctionType(null, (funcDef.getType() as ResolvedFunctionType).getReturnType(), ([ new ObjectType(funcDef.getClassDef()) ] : Type[]).concat((funcDef.getType() as ResolvedFunctionType).getArgumentTypes()), false)),
+							([ new ThisExpression(new Token("this", false), classDef) ] : Expression[]).concat((expr as SuperExpression).getArguments())));
+					return true;
+				}
 			}
 			return expr.forEachExpression(onExpr);
 		}

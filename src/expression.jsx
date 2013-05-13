@@ -1995,7 +1995,6 @@ class SuperExpression extends OperatorExpression {
 	var _name : Token;
 	var _args : Expression[];
 	var _funcType : MemberFunctionType;
-	var _classDef : ClassDefinition;
 
 	function constructor (token : Token, name : Token, args : Expression[]) {
 		super(token);
@@ -2032,8 +2031,7 @@ class SuperExpression extends OperatorExpression {
 			"SuperExpression",
 			this._token.serialize(),
 			this._name.serialize(),
-			Serializer.<Expression>.serializeArray(this._args),
-			Serializer.<ClassDefinition>.serializeNullable(this._classDef)
+			Serializer.<Expression>.serializeArray(this._args)
 		] : variant[];
 	}
 
