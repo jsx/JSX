@@ -1192,6 +1192,12 @@ class _StaticizeOptimizeCommand extends _OptimizeCommand {
 				}) && statement.forEachStatement(onStatement);
 			}, statements);
 
+			var funcLocal = funcDef.getFuncLocal();
+			if (funcLocal != null) {
+				// clone
+				funcLocal = new LocalVariable(funcLocal.getName(), funcLocal.getType());
+				(this.getStash(funcLocal) as _StaticizeOptimizeCommand.Stash).altLocal = funcLocal;
+			}
 			var args = funcDef.getArguments().map.<ArgumentDeclaration>((arg) -> {
 				var newArg = arg.clone();
 				(this.getStash(arg) as _StaticizeOptimizeCommand.Stash).altLocal = newArg;
@@ -1221,7 +1227,29 @@ class _StaticizeOptimizeCommand extends _OptimizeCommand {
 				}) && statement.forEachStatement(onStatement);
 			}, statements);
 
-			return new MemberFunctionDefinition(
+			// FIXME special hack: catch statement does not clone and rewrite its caught variable
+			Util.forEachStatement(function onStatement(statement : Statement) : boolean {
+				if (statement instanceof CatchStatement) {
+					var caughtVar = (statement as CatchStatement).getLocal().clone();
+					(this.getStash((statement as CatchStatement).getLocal()) as _StaticizeOptimizeCommand.Stash).altLocal = caughtVar;
+					(statement as CatchStatement).setLocal(caughtVar);
+				} else if (statement instanceof FunctionStatement) {
+					(statement as FunctionStatement).getFuncDef().forEachStatement(onStatement);
+				}
+				return statement.forEachExpression(function onExpr(expr : Expression, replaceCb : function(:Expression):void) : boolean {
+					if (expr instanceof LocalExpression) {
+						var altLocal;
+						if ((altLocal = (this.getStash((expr as LocalExpression).getLocal()) as _StaticizeOptimizeCommand.Stash).altLocal) != null) {
+							(expr as LocalExpression).setLocal(altLocal);
+						}
+					} else if (expr instanceof FunctionExpression) {
+						return (expr as FunctionExpression).getFuncDef().forEachStatement(onStatement);
+					}
+					return expr.forEachExpression(onExpr);
+				}) && statement.forEachStatement(onStatement);
+			}, statements);
+
+			var clonedFuncDef = new MemberFunctionDefinition(
 				funcDef.getToken(),
 				funcDef.getNameToken(),
 				funcDef.flags(),
@@ -1233,6 +1261,9 @@ class _StaticizeOptimizeCommand extends _OptimizeCommand {
 				funcDef._lastTokenOfBody,
 				null
 			);
+			clonedFuncDef.setFuncLocal(funcLocal);
+
+			return clonedFuncDef;
 		}
 		return cloneFuncDef(funcDef);
 	}
