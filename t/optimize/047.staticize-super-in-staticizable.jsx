@@ -1,3 +1,5 @@
+/*EXPECTED
+*/
 /*JSX_OPTS
 --optimize staticize,inline
 */
