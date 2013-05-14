@@ -1248,7 +1248,7 @@ class _StaticizeOptimizeCommand extends _OptimizeCommand {
 		return newName;
 	}
 
-	function _rewriteMethodCallsToStatic (expr : Expression, replaceCb : function(:Expression):void, funcDef : MemberFunctionDefinition) : void {
+	function _rewriteMethodCallsToStatic (expr : Expression, replaceCb : function(:Expression):void, rewritingFuncDef : MemberFunctionDefinition) : void {
 		function onExpr(expr : Expression, replaceCb : function(:Expression):void) : boolean {
 			if (expr instanceof CallExpression) {
 				var calleeExpr = (expr as CallExpression).getExpr();
@@ -1292,9 +1292,9 @@ class _StaticizeOptimizeCommand extends _OptimizeCommand {
 					// found, rewrite
 					Util.forEachExpression(onExpr, superExpr.getArguments());
 					var thisVar : Expression;
-					if ((funcDef.flags() & ClassDefinition.IS_STATIC) != 0) {
+					if ((rewritingFuncDef.flags() & ClassDefinition.IS_STATIC) != 0) {
 						// super expression in static function means that the function has been staticized
-						var thisArg = new ArgumentDeclaration(new Token("$this", false), new ObjectType(funcDef.getClassDef()));
+						var thisArg = rewritingFuncDef.getArguments()[0];
 						thisVar = new LocalExpression(thisArg.getName(), thisArg);
 					} else {
 						thisVar = new ThisExpression(new Token("this", false), funcDef.getClassDef());
