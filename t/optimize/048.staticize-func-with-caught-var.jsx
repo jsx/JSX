@@ -15,6 +15,7 @@ class _Main {
 				log e.stack;
 			}
 		}
+		bar();
 	}
 	static function main (args : string[]) : void {
 		(new _Main).foo();
