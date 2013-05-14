@@ -1209,31 +1209,26 @@ class _StaticizeOptimizeCommand extends _OptimizeCommand {
 				return newLocal;
 			});
 
-			// rewrite locals
-			Util.forEachStatement(function onStatement(statement : Statement) : boolean {
-				if (statement instanceof FunctionStatement) {
-					(statement as FunctionStatement).getFuncDef().forEachStatement(onStatement);
-				}
-				return statement.forEachExpression(function onExpr(expr : Expression, replaceCb : function(:Expression):void) : boolean {
-					if (expr instanceof LocalExpression) {
-						var altLocal;
-						if ((altLocal = (this.getStash((expr as LocalExpression).getLocal()) as _StaticizeOptimizeCommand.Stash).altLocal) != null) {
-							(expr as LocalExpression).setLocal(altLocal);
-						}
-					} else if (expr instanceof FunctionExpression) {
-						return (expr as FunctionExpression).getFuncDef().forEachStatement(onStatement);
-					}
-					return expr.forEachExpression(onExpr);
-				}) && statement.forEachStatement(onStatement);
-			}, statements);
-
-			// FIXME special hack: catch statement does not clone and rewrite its caught variable
+			// FIXME special hack: CatchStatement#clone does not clone and rewrite its caught variable
 			Util.forEachStatement(function onStatement(statement : Statement) : boolean {
 				if (statement instanceof CatchStatement) {
 					var caughtVar = (statement as CatchStatement).getLocal().clone();
 					(this.getStash((statement as CatchStatement).getLocal()) as _StaticizeOptimizeCommand.Stash).altLocal = caughtVar;
 					(statement as CatchStatement).setLocal(caughtVar);
 				} else if (statement instanceof FunctionStatement) {
+					(statement as FunctionStatement).getFuncDef().forEachStatement(onStatement);
+				}
+				return statement.forEachExpression(function onExpr(expr, replaceCb) {
+					if (expr instanceof FunctionExpression) {
+						return (expr as FunctionExpression).getFuncDef().forEachStatement(onStatement);
+					}
+					return expr.forEachExpression(onExpr);
+				}) && statement.forEachStatement(onStatement);
+			}, statements);
+
+			// rewrite locals
+			Util.forEachStatement(function onStatement(statement : Statement) : boolean {
+				if (statement instanceof FunctionStatement) {
 					(statement as FunctionStatement).getFuncDef().forEachStatement(onStatement);
 				}
 				return statement.forEachExpression(function onExpr(expr : Expression, replaceCb : function(:Expression):void) : boolean {
