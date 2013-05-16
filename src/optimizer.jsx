@@ -1194,9 +1194,15 @@ class _StaticizeOptimizeCommand extends _OptimizeCommand {
 
 			var funcLocal = funcDef.getFuncLocal();
 			if (funcLocal != null) {
-				// clone
-				funcLocal = new LocalVariable(funcLocal.getName(), funcLocal.getType());
-				(this.getStash(funcLocal) as _StaticizeOptimizeCommand.Stash).altLocal = funcLocal;
+				var newFuncLocal;
+				if ((newFuncLocal = (this.getStash(funcLocal) as _StaticizeOptimizeCommand.Stash).altLocal) != null) { // funcDef is defined as a function statement
+					// ok
+				} else {
+					// clone
+					newFuncLocal = new LocalVariable(funcLocal.getName(), funcLocal.getType());
+					(this.getStash(funcLocal) as _StaticizeOptimizeCommand.Stash).altLocal = newFuncLocal;
+				}
+				funcLocal = newFuncLocal;
 			}
 			var args = funcDef.getArguments().map.<ArgumentDeclaration>((arg) -> {
 				var newArg = arg.clone();
@@ -1204,7 +1210,12 @@ class _StaticizeOptimizeCommand extends _OptimizeCommand {
 				return newArg;
 			});
 			var locals = funcDef.getLocals().map.<LocalVariable>((local) -> {
-				var newLocal = new LocalVariable(local.getName(), local.getType());
+				var newLocal;
+				if ((newLocal = (this.getStash(local) as _StaticizeOptimizeCommand.Stash).altLocal) != null) {
+					// in case local is a name of a function statement and the function statement already cloned
+					return newLocal;
+				}
+				newLocal = new LocalVariable(local.getName(), local.getType());
 				(this.getStash(local) as _StaticizeOptimizeCommand.Stash).altLocal = newLocal;
 				return newLocal;
 			});
