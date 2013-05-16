@@ -1448,7 +1448,7 @@ class CatchStatement extends Statement implements Block {
 
 	override function clone () : Statement {
 		// TODO rewrite the references from _statements to _local
-		return new CatchStatement(this._token, this._local.clone(), Cloner.<Statement>.cloneArray(this._statements));
+		return new CatchStatement(this._token, this._local, Cloner.<Statement>.cloneArray(this._statements));
 	}
 
 	override function getToken () : Token {
