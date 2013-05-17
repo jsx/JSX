@@ -832,7 +832,8 @@ class ClassDefinition implements Stashable {
 				continue;
 			// property with the same name has been found, we can tell yes or no now
 			if (this._members[i] instanceof MemberVariableDefinition) {
-				throw new Error("logic flaw: " + member.getNotation());
+				context.errors.push(new CompileError(member.getNameToken(), "definition of the function conflicts with property '" + this._members[i].getNameToken().getValue() + "'"));
+				return false;
 			}
 			if (! Util.typesAreEqual((this._members[i] as MemberFunctionDefinition).getArgumentTypes(), member.getArgumentTypes()))
 				continue;
