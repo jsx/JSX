@@ -830,9 +830,10 @@ class ClassDefinition implements Stashable {
 		for (var i = 0; i < this._members.length; ++i) {
 			if (this._members[i].name() != member.name())
 				continue;
-			// property with the same name has been found, we can tell yes or no now
 			if (this._members[i] instanceof MemberVariableDefinition) {
-				context.errors.push(new CompileError(member.getNameToken(), "definition of the function conflicts with property '" + this._members[i].getNameToken().getValue() + "'"));
+				var error = new CompileError(member.getNameToken(), "definition of the function conflicts with property '" + this._members[i].getNameToken().getValue() + "'");
+				error.addCompileNote(new CompileNote(this._members[i].getNameToken(), "property with the same name has been found here"));
+				context.errors.push(error);
 				return false;
 			}
 			if (! Util.typesAreEqual((this._members[i] as MemberFunctionDefinition).getArgumentTypes(), member.getArgumentTypes()))
