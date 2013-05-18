@@ -8,7 +8,7 @@ class _Main {
 		var nav : variant = dom.window.navigator;
 		if (!nav["getUserMedia"]) {
 			nav["getUserMedia"] = nav["webkitGetUserMedia"]
-				               || nav["mozGetUserMedia"];
+				               ?: nav["mozGetUserMedia"];
 		}
 
 		// WebRTC video
