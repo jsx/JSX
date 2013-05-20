@@ -1049,19 +1049,13 @@ class _StaticizeOptimizeCommand extends _OptimizeCommand {
 	class Stash extends Stash {
 
 		var altName : Nullable.<string>;
-		var altLocal : LocalVariable;
-		var altFuncDef : MemberFunctionDefinition;
 
 		function constructor () {
 			this.altName = null;
-			this.altLocal = null;
-			this.altFuncDef = null;
 		}
 
 		function constructor (that : _StaticizeOptimizeCommand.Stash) {
 			this.altName = that.altName;
-			this.altLocal = that.altLocal;
-			this.altFuncDef = that.altFuncDef;
 		}
 
 		override function clone () : _StaticizeOptimizeCommand.Stash {
@@ -1160,31 +1154,61 @@ class _StaticizeOptimizeCommand extends _OptimizeCommand {
 		});
 	}
 
+	class _CloneStash extends Stash {
+
+		var newLocal : LocalVariable;
+		var newFuncDef : MemberFunctionDefinition;
+
+		function constructor () {
+			this.newLocal = null;
+			this.newFuncDef = null;
+		}
+
+		function constructor (that : _StaticizeOptimizeCommand._CloneStash) {
+			this.newLocal = that.newLocal;
+			this.newFuncDef = that.newFuncDef;
+		}
+
+		override function clone () : _StaticizeOptimizeCommand._CloneStash {
+			return new _StaticizeOptimizeCommand._CloneStash(this);
+		}
+
+	}
+
 	function _cloneFuncDef (funcDef : MemberFunctionDefinition) : MemberFunctionDefinition {
 
 		function cloneFuncDef (funcDef : MemberFunctionDefinition) : MemberFunctionDefinition {
+
+			function getStash(stashable : Stashable) : _StaticizeOptimizeCommand._CloneStash {
+				var stash = stashable.getStash("CLONE-FUNC-DEF");
+				if (stash == null) {
+					stash = stashable.setStash("CLONE-FUNC-DEF", new _StaticizeOptimizeCommand._CloneStash);
+				}
+				return stash as _StaticizeOptimizeCommand._CloneStash;
+			}
+
 			// at this moment, all locals and closures are not cloned yet
 			var statements = Cloner.<Statement>.cloneArray(funcDef.getStatements());
 
 			var closures = funcDef.getClosures().map.<MemberFunctionDefinition>((funcDef) -> {
 				var newFuncDef = cloneFuncDef(funcDef);
-				(this.getStash(funcDef) as _StaticizeOptimizeCommand.Stash).altFuncDef = newFuncDef;
+				getStash(funcDef).newFuncDef = newFuncDef;
 				return newFuncDef;
 			});
 			// rewrite funcDefs
 			Util.forEachStatement(function onStatement(statement : Statement) : boolean {
 				if (statement instanceof FunctionStatement) {
-					var altFuncDef;
-					if ((altFuncDef = (this.getStash((statement as FunctionStatement).getFuncDef()) as _StaticizeOptimizeCommand.Stash).altFuncDef) != null) {
-						(statement as FunctionStatement).setFuncDef(altFuncDef);
+					var newFuncDef;
+					if ((newFuncDef = getStash((statement as FunctionStatement).getFuncDef()).newFuncDef) != null) {
+						(statement as FunctionStatement).setFuncDef(newFuncDef);
 					}
 					return true;
 				}
 				return statement.forEachExpression(function onExpr(expr : Expression, replaceCb : function(:Expression):void) : boolean {
 					if (expr instanceof FunctionExpression) {
-						var altFuncDef;
-						if ((altFuncDef = (this.getStash((expr as FunctionExpression).getFuncDef()) as _StaticizeOptimizeCommand.Stash).altFuncDef) != null) {
-							(expr as FunctionExpression).setFuncDef(altFuncDef);
+						var newFuncDef;
+						if ((newFuncDef = getStash((expr as FunctionExpression).getFuncDef()).newFuncDef) != null) {
+							(expr as FunctionExpression).setFuncDef(newFuncDef);
 						}
 						return true;
 					}
@@ -1195,28 +1219,28 @@ class _StaticizeOptimizeCommand extends _OptimizeCommand {
 			var funcLocal = funcDef.getFuncLocal();
 			if (funcLocal != null) {
 				var newFuncLocal;
-				if ((newFuncLocal = (this.getStash(funcLocal) as _StaticizeOptimizeCommand.Stash).altLocal) != null) { // funcDef is defined as a function statement
+				if ((newFuncLocal = getStash(funcLocal).newLocal) != null) { // funcDef is defined as a function statement
 					// ok
 				} else {
 					// clone
 					newFuncLocal = new LocalVariable(funcLocal.getName(), funcLocal.getType());
-					(this.getStash(funcLocal) as _StaticizeOptimizeCommand.Stash).altLocal = newFuncLocal;
+					getStash(funcLocal).newLocal = newFuncLocal;
 				}
 				funcLocal = newFuncLocal;
 			}
 			var args = funcDef.getArguments().map.<ArgumentDeclaration>((arg) -> {
 				var newArg = arg.clone();
-				(this.getStash(arg) as _StaticizeOptimizeCommand.Stash).altLocal = newArg;
+				getStash(arg).newLocal = newArg;
 				return newArg;
 			});
 			var locals = funcDef.getLocals().map.<LocalVariable>((local) -> {
 				var newLocal;
-				if ((newLocal = (this.getStash(local) as _StaticizeOptimizeCommand.Stash).altLocal) != null) {
+				if ((newLocal = getStash(local).newLocal) != null) {
 					// in case local is a name of a function statement and the function statement already cloned
 					return newLocal;
 				}
 				newLocal = new LocalVariable(local.getName(), local.getType());
-				(this.getStash(local) as _StaticizeOptimizeCommand.Stash).altLocal = newLocal;
+				getStash(local).newLocal = newLocal;
 				return newLocal;
 			});
 
@@ -1224,7 +1248,7 @@ class _StaticizeOptimizeCommand extends _OptimizeCommand {
 			Util.forEachStatement(function onStatement(statement : Statement) : boolean {
 				if (statement instanceof CatchStatement) {
 					var caughtVar = (statement as CatchStatement).getLocal().clone();
-					(this.getStash((statement as CatchStatement).getLocal()) as _StaticizeOptimizeCommand.Stash).altLocal = caughtVar;
+					getStash((statement as CatchStatement).getLocal()).newLocal = caughtVar;
 					(statement as CatchStatement).setLocal(caughtVar);
 				} else if (statement instanceof FunctionStatement) {
 					(statement as FunctionStatement).getFuncDef().forEachStatement(onStatement);
@@ -1244,9 +1268,9 @@ class _StaticizeOptimizeCommand extends _OptimizeCommand {
 				}
 				return statement.forEachExpression(function onExpr(expr : Expression, replaceCb : function(:Expression):void) : boolean {
 					if (expr instanceof LocalExpression) {
-						var altLocal;
-						if ((altLocal = (this.getStash((expr as LocalExpression).getLocal()) as _StaticizeOptimizeCommand.Stash).altLocal) != null) {
-							(expr as LocalExpression).setLocal(altLocal);
+						var newLocal;
+						if ((newLocal = getStash((expr as LocalExpression).getLocal()).newLocal) != null) {
+							(expr as LocalExpression).setLocal(newLocal);
 						}
 					} else if (expr instanceof FunctionExpression) {
 						return (expr as FunctionExpression).getFuncDef().forEachStatement(onStatement);
