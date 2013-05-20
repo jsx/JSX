@@ -789,7 +789,7 @@ class _StripOptimizeCommand extends _OptimizeCommand {
 			} else if (expr instanceof PropertyExpression) {
 				var propertyExpr = expr as PropertyExpression;
 				var name = propertyExpr.getIdentifierToken().getValue();
-				if (propertyExpr.getExpr() instanceof ClassExpression) {
+				if (propertyExpr.getExpr().isClassSpecifier()) {
 					if (Util.isReferringToFunctionDefinition(propertyExpr)) {
 						var member : MemberDefinition = Util.findFunctionInClass(
 							propertyExpr.getHolderType().getClassDef(),
@@ -977,7 +977,7 @@ class _DetermineCalleeCommand extends _FunctionOptimizeCommand {
 							holderType.getClassDef(),
 							propertyExpr.getIdentifierToken().getValue(),
 							(propertyExpr.getType() as ResolvedFunctionType).getArgumentTypes(),
-							propertyExpr.getExpr() instanceof ClassExpression);
+							propertyExpr.getExpr().isClassSpecifier());
 						this._setCallingFuncDef(expr, callingFuncDef);
 					} else if (calleeExpr instanceof FunctionExpression) {
 						this._setCallingFuncDef(expr, (calleeExpr as FunctionExpression).getFuncDef());
@@ -1290,7 +1290,7 @@ class _StaticizeOptimizeCommand extends _OptimizeCommand {
 			if (expr instanceof CallExpression) {
 				var calleeExpr = (expr as CallExpression).getExpr();
 				if (calleeExpr instanceof PropertyExpression
-				    && ! ((calleeExpr as PropertyExpression).getExpr() instanceof ClassExpression)
+				    && ! ((calleeExpr as PropertyExpression).getExpr().isClassSpecifier())
 					&& ! (calleeExpr as PropertyExpression).getType().isAssignable()) {
 						var propertyExpr = calleeExpr as PropertyExpression;
 						// is a member method call
@@ -1659,7 +1659,7 @@ class _UnclassifyOptimizationCommand extends _OptimizeCommand {
 			if (expr instanceof CallExpression) {
 				var calleeExpr = (expr as CallExpression).getExpr();
 				if (calleeExpr instanceof PropertyExpression
-				    && ! ((calleeExpr as PropertyExpression).getExpr() instanceof ClassExpression)
+				    && ! ((calleeExpr as PropertyExpression).getExpr().isClassSpecifier())
 					&& ! (calleeExpr as PropertyExpression).getType().isAssignable()
 					&& ! ((calleeExpr as PropertyExpression).getIdentifierToken().getValue() == "toString" && (expr as CallExpression).getArguments().length == 0)) {
 						var propertyExpr = calleeExpr as PropertyExpression;
@@ -1749,7 +1749,7 @@ class _FoldConstantCommand extends _FunctionOptimizeCommand {
 
 			// property expression
 			var holderType = (expr as PropertyExpression).getHolderType();
-			if ((expr as PropertyExpression).getExpr() instanceof ClassExpression) {
+			if ((expr as PropertyExpression).getExpr().isClassSpecifier()) {
 				var member = null : MemberVariableDefinition;
 				holderType.getClassDef().forEachMemberVariable(function (m) {
 					if (m instanceof MemberVariableDefinition && (m as MemberVariableDefinition).name() == (expr as PropertyExpression).getIdentifierToken().getValue())
@@ -2239,7 +2239,7 @@ class _DeadCodeEliminationOptimizeCommand extends _FunctionOptimizeCommand {
 			var baseExpr = (expr as PropertyExpression).getExpr();
 			if (baseExpr instanceof LocalExpression
 			    || baseExpr instanceof ThisExpression
-			    || baseExpr instanceof ClassExpression) {
+			    || baseExpr.isClassSpecifier()) {
 				return true;
 			} else {
 				return false;
@@ -2250,7 +2250,7 @@ class _DeadCodeEliminationOptimizeCommand extends _FunctionOptimizeCommand {
 				return (x as LocalExpression).getLocal() == (y as LocalExpression).getLocal();
 			} else if (x instanceof ThisExpression && y instanceof ThisExpression) {
 				return true;
-			} else if (x instanceof ClassExpression && y instanceof ClassExpression) {
+			} else if (x.isClassSpecifier() && y.isClassSpecifier()) {
 				return (x as ClassExpression).getType().equals((y as ClassExpression).getType());
 			}
 			return false;
@@ -2558,7 +2558,7 @@ class _InlineOptimizeCommand extends _FunctionOptimizeCommand {
 			var holderExpr = (lhsExpr as PropertyExpression).getExpr();
 			if (holderExpr instanceof ThisExpression)
 				return true;
-			if (holderExpr instanceof LocalExpression || holderExpr instanceof ClassExpression)
+			if (holderExpr instanceof LocalExpression || holderExpr.isClassSpecifier())
 				return true;
 		} else if (lhsExpr instanceof ArrayExpression) {
 			var arrayExpr = lhsExpr as ArrayExpression;
