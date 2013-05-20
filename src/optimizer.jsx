@@ -787,24 +787,26 @@ class _StripOptimizeCommand extends _OptimizeCommand {
 					this._touchInstance(expr.getType().getClassDef());
 				}
 			} else if (expr instanceof PropertyExpression) {
-				var propertyExpr = expr as PropertyExpression;
-				var name = propertyExpr.getIdentifierToken().getValue();
-				if (propertyExpr.getExpr().isClassSpecifier()) {
-					if (Util.isReferringToFunctionDefinition(propertyExpr)) {
-						var member : MemberDefinition = Util.findFunctionInClass(
-							propertyExpr.getHolderType().getClassDef(),
-							name,
-							(expr.getType() as ResolvedFunctionType).getArgumentTypes(),
-							true);
-						assert member != null;
+				if (! expr.isClassSpecifier()) {
+					var propertyExpr = expr as PropertyExpression;
+					var name = propertyExpr.getIdentifierToken().getValue();
+					if (propertyExpr.getExpr().isClassSpecifier()) {
+						if (Util.isReferringToFunctionDefinition(propertyExpr)) {
+							var member : MemberDefinition = Util.findFunctionInClass(
+								propertyExpr.getHolderType().getClassDef(),
+								name,
+								(expr.getType() as ResolvedFunctionType).getArgumentTypes(),
+								true);
+							assert member != null;
+						} else {
+							member = Util.findVariableInClass(propertyExpr.getHolderType().getClassDef(), name, true);
+							assert member != null;
+						}
+						this._touchStatic(member);
 					} else {
-						member = Util.findVariableInClass(propertyExpr.getHolderType().getClassDef(), name, true);
-						assert member != null;
-					}
-					this._touchStatic(member);
-				} else {
-					if (Util.isReferringToFunctionDefinition(propertyExpr)) {
-						this._touchMethod(name, (expr.getType() as ResolvedFunctionType).getArgumentTypes());
+						if (Util.isReferringToFunctionDefinition(propertyExpr)) {
+							this._touchMethod(name, (expr.getType() as ResolvedFunctionType).getArgumentTypes());
+						}
 					}
 				}
 			} else if (expr instanceof SuperExpression) {
