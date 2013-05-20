@@ -1081,12 +1081,12 @@ class MemberVariableDefinition extends MemberDefinition {
 			try {
 				this._analyzeState = MemberVariableDefinition.IS_ANALYZING;
 				if (this._initialValue != null) {
+					if (! this._initialValue.analyze(this._analysisContext, null))
+						return null;
 					if (this._initialValue.isClassSpecifier()) {
 						this._analysisContext.errors.push(new CompileError(this._initialValue._token, "cannot assign a class"));
 						return null;
 					}
-					if (! this._initialValue.analyze(this._analysisContext, null))
-						return null;
 					var ivType = this._initialValue.getType();
 					if (this._type == null) {
 						if (ivType.equals(Type.nullType)) {
