@@ -190,7 +190,7 @@ class _BreakStatementTransformer extends _StatementTransformer {
 
 	override function replaceControlStructuresWithGotos () : Statement[] {
 		if (this._statement.getLabel() != null) {
-			var trans = this._transformer.findLabellableStatementTransformerByLabel(this._statement.getLabel().getValue());
+			var trans = this._transformer.getStatementTransformerByLabel(this._statement.getLabel().getValue());
 		} else {
 			trans = this._transformer.getInnermostLabellableStatementTransformer();
 		}
@@ -214,7 +214,7 @@ class _ContinueStatementTransformer extends _StatementTransformer {
 
 	override function replaceControlStructuresWithGotos () : Statement[] {
 		if (this._statement.getLabel() != null) {
-			var trans = this._transformer.findLabellableStatementTransformerByLabel(this._statement.getLabel().getValue());
+			var trans = this._transformer.getStatementTransformerByLabel(this._statement.getLabel().getValue());
 		} else {
 			trans = this._transformer.getInnermostLabellableStatementTransformer();
 		}
@@ -797,7 +797,7 @@ class CodeTransformer {
 
 	var _labelMap = new _LabellableStatementTransformer[];
 
-	function findLabellableStatementTransformerByLabel (label : string) : _LabellableStatementTransformer {
+	function getStatementTransformerByLabel (label : string) : _LabellableStatementTransformer {
 		for (var i = 0; this._labelMap.length; ++i) {
 			var trans = this._labelMap[i];
 			if ((trans.getStatement() as LabellableStatement).getLabel().getValue() == label)
@@ -849,7 +849,7 @@ class CodeTransformer {
 		var newExpr = new NewExpression(new Token("new", false), CodeTransformer.stopIterationType, []);
 		newExpr.analyze(new AnalysisContext([], null, null), null);
 		funcDef.getStatements().push(new ThrowStatement(new Token("throw", false), newExpr));
-		var numBlock = this._doCPSConvert(funcDef);
+		var numBlock = this._doCPSTransform(funcDef);
 		this._eliminateYields(funcDef, numBlock);
 	}
 
@@ -975,12 +975,8 @@ class CodeTransformer {
 	// 	throw new Error("got unexpected type of expression: " + (expr != null ? JSON.stringify(expr.serialize()) : expr.toString()));
 	// }
 
-	function _doCPSConvert (funcDef : MemberFunctionDefinition) : number {
-		this._replaceControlStructuresWithGotos(funcDef);
-		return this._eliminateGotos(funcDef);
-	}
-
-	function _replaceControlStructuresWithGotos (funcDef : MemberFunctionDefinition) : void {
+	function _doCPSTransform (funcDef : MemberFunctionDefinition) : number {
+		// replace control structures with goto statements
 		var statements = new Statement[];
 		for (var i = 0; i < funcDef.getStatements().length; ++i) {
 			statements = statements.concat(this._getStatementTransformerFor(funcDef.getStatements()[i]).replaceControlStructuresWithGotos());
@@ -996,6 +992,9 @@ class CodeTransformer {
 			new LabelStatement("$END")
 		);
 		funcDef._statements = statements;
+
+		// replace goto statements with calls of closures
+		return this._eliminateGotos(funcDef);
 	}
 
 	function _eliminateGotos (funcDef : MemberFunctionDefinition) : number {
