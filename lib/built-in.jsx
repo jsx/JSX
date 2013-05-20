@@ -1042,10 +1042,10 @@ interface AsyncTask.<T> {
 native __fake__ class Async {
 
 	// NOTE wasabiz better to allow arrays consisting of tasks of different types?
-	static function waitAny.<T> (task ... : AsyncTask.<T>) : int;
+	static function waitAny.<T> (...taskN : AsyncTask.<T>) : int;
 	static function waitAny.<T> (tasks : Array.<AsyncTask.<T>>) : int;
 
-	static function waitAll.<T> (task ... : AsyncTask.<T>) : void;
+	static function waitAll.<T> (...taskN : AsyncTask.<T>) : void;
 	static function waitAll.<T> (tasks : Array.<AsyncTask.<T>>) : void;
 
 }
