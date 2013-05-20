@@ -28,6 +28,32 @@ import "./parser.jsx";
 import "./type.jsx";
 import "./util.jsx";
 
+abstract class _ExpressionTransformer {
+
+	static var _expressionCountMap = new Map.<number>;
+
+	var _transformer : CodeTransformer;
+	var _id : number;
+
+	function constructor (transformer : CodeTransformer, identifier : string) {
+		this._transformer = transformer;
+
+		if (_ExpressionTransformer._expressionCountMap[identifier] == null) {
+			_ExpressionTransformer._expressionCountMap[identifier] = 0;
+		}
+		this._id = _ExpressionTransformer._expressionCountMap[identifier]++;
+	}
+
+	function getID () : number {
+		return this._id;
+	}
+
+	abstract function getExpression () : Expression;
+
+	abstract function doCPSTransform () : Expression;
+
+}
+
 abstract class _StatementTransformer {
 
 	static var _statementCountMap = new Map.<number>;
@@ -132,7 +158,6 @@ class _ReturnStatementTransformer extends _StatementTransformer {
 
 class _YieldStatementTransformer extends _StatementTransformer {
 
-	var _index : number;
 	var _statement : YieldStatement;
 
 	function constructor (transformer : CodeTransformer, statement : YieldStatement) {
@@ -236,7 +261,6 @@ abstract class _LabellableStatementTransformer extends _StatementTransformer {
 
 class _DoWhileStatementTransformer extends _LabellableStatementTransformer {
 
-	var _index : number;
 	var _statement : DoWhileStatement;
 
 	function constructor (transformer : CodeTransformer, statement : DoWhileStatement) {
@@ -322,7 +346,6 @@ class _ForInStatementTransformer extends _LabellableStatementTransformer {
 
 class _ForStatementTransformer extends _LabellableStatementTransformer {
 
-	var _index : number;
 	var _statement : ForStatement;
 
 	function constructor (transformer : CodeTransformer, statement : ForStatement) {
@@ -454,7 +477,6 @@ class _IfStatementTransformer extends _StatementTransformer {
 
 class _SwitchStatementTransformer extends _LabellableStatementTransformer {
 
-	var _index : number;
 	var _statement : SwitchStatement;
 
 	function constructor (transformer : CodeTransformer, statement : SwitchStatement) {
