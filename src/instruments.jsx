@@ -845,14 +845,6 @@ class CodeTransformer {
 		return this._statementIDs;
 	}
 
-	function transformFunctionDefinition (funcDef : MemberFunctionDefinition) : void {
-		var newExpr = new NewExpression(new Token("new", false), CodeTransformer.stopIterationType, []);
-		newExpr.analyze(new AnalysisContext([], null, null), null);
-		funcDef.getStatements().push(new ThrowStatement(new Token("throw", false), newExpr));
-		var numBlock = this._doCPSTransform(funcDef);
-		this._eliminateYields(funcDef, numBlock);
-	}
-
 	function _getStatementTransformerFor (statement : Statement) : _StatementTransformer {
 		if (statement instanceof ConstructorInvocationStatement)
 			return new _ConstructorInvocationStatementTransformer(this, statement as ConstructorInvocationStatement);
@@ -975,7 +967,11 @@ class CodeTransformer {
 	// 	throw new Error("got unexpected type of expression: " + (expr != null ? JSON.stringify(expr.serialize()) : expr.toString()));
 	// }
 
-	function _doCPSTransform (funcDef : MemberFunctionDefinition) : number {
+	function transformFunctionDefinition (funcDef : MemberFunctionDefinition) : void {
+		this._compileYields(funcDef);
+	}
+
+	function _doCPSTransform (funcDef : MemberFunctionDefinition, postFragmentationCallback : (string, Statement[]) -> void) : void {
 		// replace control structures with goto statements
 		var statements = new Statement[];
 		for (var i = 0; i < funcDef.getStatements().length; ++i) {
@@ -994,10 +990,10 @@ class CodeTransformer {
 		funcDef._statements = statements;
 
 		// replace goto statements with calls of closures
-		return this._eliminateGotos(funcDef);
+		this._eliminateGotos(funcDef, postFragmentationCallback);
 	}
 
-	function _eliminateGotos (funcDef : MemberFunctionDefinition) : number {
+	function _eliminateGotos (funcDef : MemberFunctionDefinition, postFragmentationCallback : (string, Statement[]) -> void) : number {
 		var statements = funcDef.getStatements();
 		// collect labels
 		var labels = new Map.<LocalVariable>;
@@ -1053,6 +1049,7 @@ class CodeTransformer {
 				}
 				body.push(statements[i]);
 			}
+			postFragmentationCallback(currentLabel.getName(), body);
 			var block = new MemberFunctionDefinition(
 						new Token("function", false),
 						null,
@@ -1077,18 +1074,7 @@ class CodeTransformer {
 		return numBlock;
 	}
 
-	static function _calcGeneratorNestDepth (funcDef : MemberFunctionDefinition) : number {
-		var depth = 0;
-		var parent : MemberFunctionDefinition;
-		while ((parent = funcDef.getParent()) != null) {
-			if (parent.isGenerator())
-				depth++;
-			funcDef = parent;
-		}
-		return depth;
-	}
-
-	function _eliminateYields (funcDef : MemberFunctionDefinition, numBlock : number) : void { // FIXME wasabiz nested generator
+	function _compileYields(funcDef : MemberFunctionDefinition) : void { // FIXME wasabiz nested generator
 		var yieldType = (funcDef.getReturnType().getClassDef() as InstantiatedClassDefinition).getTypeArguments()[0];
 
 		// create a generator object
@@ -1109,17 +1095,14 @@ class CodeTransformer {
 		CodeTransformer.jsxGeneratorClassDef.getParser()._classDefs.push(genClassDef);
 		var genType = new ObjectType(genClassDef);
 
-		var genLocalName = "$generator" + CodeTransformer._calcGeneratorNestDepth(funcDef) as string;
+		var genLocalName = "$generator" + CodeTransformer._getGeneratorNestDepth(funcDef) as string;
 		var genLocal = new LocalVariable(new Token(genLocalName, false), genType);
 		funcDef.getLocals().push(genLocal);
 
-		var newExpr = new NewExpression(new Token("new", false), genType, []);
+		// insert epilogue code `throw new StopIteration`
+		var newExpr = new NewExpression(new Token("new", false), CodeTransformer.stopIterationType, []);
 		newExpr.analyze(new AnalysisContext([], null, null), null);
-		funcDef.getStatements().unshift(new ExpressionStatement(
-			new AssignmentExpression(
-				new Token("=", false),
-				new LocalExpression(new Token(genLocalName, false), genLocal),
-				newExpr)));
+		funcDef.getStatements().push(new ThrowStatement(new Token("throw", false), newExpr));
 
 		// replace yield statement
 		/*
@@ -1129,36 +1112,44 @@ class CodeTransformer {
 		  -> $generatorN.__value = expr;
 		     $generatorN.__next = $LABEL;
 		 */
-		var blocks = funcDef.getClosures().slice(funcDef.getClosures().length - numBlock);
-		for (var i = 0; i < blocks.length; ++i) {
-			var statements = blocks[i].getStatements();
-			for (var j = 0; j < statements.length; ++j) {
-				if (statements[j] instanceof YieldStatement) {
-					statements.splice(j, 2,
-						new ExpressionStatement(
-							new AssignmentExpression(
-								new Token("=", false),
-								new PropertyExpression(
-									new Token(".", false),
-									new LocalExpression(new Token(genLocalName, false), genLocal),
-									new Token("__value", false),
-									[],
-									yieldType),
-								(statements[j] as YieldStatement).getExpr())),
-						new ExpressionStatement(
-							new AssignmentExpression(
-								new Token("=", false),
-								new PropertyExpression(
-									new Token(".", false),
-									new LocalExpression(new Token(genLocalName, false), genLocal),
-									new Token("__next", true),
-									[],
-									new StaticFunctionType(null, Type.voidType, [], true)),
-								((statements[j + 1] as ExpressionStatement).getExpr()as CallExpression).getExpr())));
-					break;
-				}
+		this._doCPSTransform(funcDef, function (label : string, statements : Statement[]) : void {
+			if (2 <= statements.length && statements[statements.length - 2] instanceof YieldStatement) {
+				var idx = statements.length - 2;
+				statements.splice(idx, 2,
+					new ExpressionStatement(
+						new AssignmentExpression(
+							new Token("=", false),
+							new PropertyExpression(
+								new Token(".", false),
+								new LocalExpression(new Token(genLocalName, false), genLocal),
+								new Token("__value", false),
+								[],
+								yieldType),
+							(statements[idx] as YieldStatement).getExpr())),
+					new ExpressionStatement(
+						new AssignmentExpression(
+							new Token("=", false),
+							new PropertyExpression(
+								new Token(".", false),
+								new LocalExpression(new Token(genLocalName, false), genLocal),
+								new Token("__next", true),
+								[],
+								new StaticFunctionType(null, Type.voidType, [], true)),
+							((statements[idx + 1] as ExpressionStatement).getExpr()as CallExpression).getExpr())));
 			}
-		}
+		});
+
+		// declare generator object
+		/*
+		  var $generatorN = new __jsx_generator;
+		*/
+		var newExpr = new NewExpression(new Token("new", false), genType, []);
+		newExpr.analyze(new AnalysisContext([], null, null), null);
+		funcDef.getStatements().unshift(new ExpressionStatement(
+			new AssignmentExpression(
+				new Token("=", false),
+				new LocalExpression(new Token(genLocalName, false), genLocal),
+				newExpr)));
 
 		// replace entry point
 		/*
@@ -1166,7 +1157,7 @@ class CodeTransformer {
 
 		  -> $generatorN.__next = $START;
 		 */
-		statements = funcDef.getStatements();
+		var statements = funcDef.getStatements();
 		statements.splice(statements.length - 1, 1,
 			new ExpressionStatement(
 				new AssignmentExpression(
@@ -1186,6 +1177,17 @@ class CodeTransformer {
 			new ReturnStatement(
 				new Token("return", false),
 				new LocalExpression(new Token("$generator", false), genLocal)));
+	}
+
+	static function _getGeneratorNestDepth (funcDef : MemberFunctionDefinition) : number {
+		var depth = 0;
+		var parent : MemberFunctionDefinition;
+		while ((parent = funcDef.getParent()) != null) {
+			if (parent.isGenerator())
+				depth++;
+			funcDef = parent;
+		}
+		return depth;
 	}
 
 }
