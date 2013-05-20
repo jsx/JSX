@@ -509,38 +509,6 @@ class ClassDefinition implements Stashable {
 			func.setClassDef(this);
 			this._members.push(func);
 		}
-		// substitute access to inner class with single ClassExpression
-		this.forEachMemberFunction(function (funcDef) {
-			return funcDef.forEachStatement(function (statement) {
-				return statement.forEachExpression(function onExpr(expr : Expression, replaceCb : (Expression)->void) : boolean {
-					expr.forEachExpression(onExpr);
-					if (expr instanceof PropertyExpression && (expr as PropertyExpression).getExpr() instanceof ClassExpression) {
-						var propExpr = expr as PropertyExpression;
-						var identifierToken = propExpr.getIdentifierToken();
-						var receiverType = (propExpr.getExpr() as ClassExpression).getType() as ParsedObjectType;
-						var receiverClassDef = receiverType.getClassDef();
-						if (receiverClassDef) {
-							receiverClassDef.forEachInnerClass(function (classDef) {
-								if (classDef.className() == identifierToken.getValue()) {
-									var objectType = new ParsedObjectType(
-										new QualifiedName(identifierToken, receiverType),
-										propExpr.getTypeArguments()
-									);
-									objectType.resolveType(context);
-									replaceCb(new ClassExpression(propExpr.getToken(), objectType));
-									return false;
-								}
-								return true;
-							});
-						}
-						else {
-							return true;
-						}
-					}
-					return true;
-				});
-			});
-		});
 	}
 
 	function setAnalysisContextOfVariables (context : AnalysisContext) : void {
@@ -1115,12 +1083,12 @@ class MemberVariableDefinition extends MemberDefinition {
 			try {
 				this._analyzeState = MemberVariableDefinition.IS_ANALYZING;
 				if (this._initialValue != null) {
-					if (this._initialValue instanceof ClassExpression) {
+					if (! this._initialValue.analyze(this._analysisContext, null))
+						return null;
+					if (this._initialValue.isClassSpecifier()) {
 						this._analysisContext.errors.push(new CompileError(this._initialValue._token, "cannot assign a class"));
 						return null;
 					}
-					if (! this._initialValue.analyze(this._analysisContext, null))
-						return null;
 					var ivType = this._initialValue.getType();
 					if (this._type == null) {
 						if (ivType.equals(Type.nullType)) {

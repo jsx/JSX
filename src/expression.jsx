@@ -107,6 +107,10 @@ abstract class Expression implements Stashable {
 		return null;
 	}
 
+	function isClassSpecifier () : boolean {
+		return false;
+	}
+
 	function forEachExpression (cb : function(:Expression):boolean) : boolean {
 		return this.forEachExpression(function(expr : Expression, _ : function(:Expression):void){
 			return cb(expr);
@@ -289,6 +293,10 @@ class ClassExpression extends LeafExpression {
 
 	function setType (type : Type) : void {
 		this._parsedType = type;
+	}
+
+	override function isClassSpecifier () : boolean {
+		return true;
 	}
 
 	override function assertIsAssignable (context : AnalysisContext, token : Token, type : Type) : boolean {
@@ -1156,6 +1164,7 @@ class PropertyExpression extends UnaryExpression {
 	var _identifierToken : Token;
 	var _typeArgs : Type[];
 	var _type : Type;
+	var _isInner : boolean;
 
 	function constructor (operatorToken : Token, expr1 : Expression, identifierToken : Token, typeArgs : Type[]) {
 		this(operatorToken, expr1, identifierToken, typeArgs, null);
@@ -1166,10 +1175,13 @@ class PropertyExpression extends UnaryExpression {
 		this._identifierToken = identifierToken;
 		this._typeArgs = typeArgs;
 		this._type = type != null ? type : null;
+		this._isInner = false;
 	}
 
 	override function clone () : PropertyExpression {
-		return new PropertyExpression(this._token, this._expr.clone(), this._identifierToken, this._typeArgs, this._type);
+		var propExpr = new PropertyExpression(this._token, this._expr.clone(), this._identifierToken, this._typeArgs, this._type);
+		propExpr._isInner = this._isInner;
+		return propExpr;
 	}
 
 	function getIdentifierToken () : Token {
@@ -1211,13 +1223,28 @@ class PropertyExpression extends UnaryExpression {
 			context.errors.push(new CompileError(this._identifierToken, "cannot determine type due to preceding errors"));
 			return false;
 		}
+		// referring to inner class?
+		if (this._expr.isClassSpecifier()) {
+			classDef.forEachInnerClass(function (classDef) {
+				if (classDef.className() == this._identifierToken.getValue()) {
+					var objectType = new ParsedObjectType(new QualifiedName(this._identifierToken, exprType as ParsedObjectType), this._typeArgs);
+					objectType.resolveType(context);
+					this._type = objectType;
+					this._isInner = true;
+					return false;
+				}
+				return true;
+			});
+			if (this._isInner)
+				return true;
+		}
 		this._type = classDef.getMemberTypeByName(
 			context.errors,
 			this._identifierToken,
 			this._identifierToken.getValue(),
-			this._expr instanceof ClassExpression,
+			this._expr.isClassSpecifier(),
 			this._typeArgs,
-			(this._expr instanceof ClassExpression) ? ClassDefinition.GET_MEMBER_MODE_CLASS_ONLY : ClassDefinition.GET_MEMBER_MODE_ALL);
+			this._expr.isClassSpecifier() ? ClassDefinition.GET_MEMBER_MODE_CLASS_ONLY : ClassDefinition.GET_MEMBER_MODE_ALL);
 		if (this._type == null) {
 			context.errors.push(new CompileError(this._identifierToken, "'" + exprType.toString() + "' does not have a property named '" + this._identifierToken.getValue() + "'"));
 			return false;
@@ -1234,6 +1261,10 @@ class PropertyExpression extends UnaryExpression {
 		if (type instanceof PrimitiveType)
 			type = new ObjectType(type.getClassDef());
 		return type;
+	}
+
+	override function isClassSpecifier () : boolean {
+		return this._isInner;
 	}
 
 	override function assertIsAssignable (context : AnalysisContext, token : Token, type : Type) : boolean {
@@ -1533,7 +1564,7 @@ class AssignmentExpression extends BinaryExpression {
 			context.errors.push(new CompileError(this._token, "cannot assign void"));
 			return false;
 		}
-		if (this._expr2 instanceof ClassExpression) {
+		if (this._expr2.isClassSpecifier()) {
 			context.errors.push(new CompileError(this._token, "cannot assign a class"));
 			return false;
 		}
@@ -1955,11 +1986,11 @@ class CallExpression extends OperatorExpression {
 			context, this._args, this,
 			(exprType as FunctionType).getExpectedTypes(
 				this._args.length,
-				! (this._expr instanceof PropertyExpression && ! exprType.isAssignable() && ! ((this._expr as PropertyExpression).getExpr() instanceof ClassExpression))));
+				! (this._expr instanceof PropertyExpression && ! exprType.isAssignable() && ! (this._expr as PropertyExpression).getExpr().isClassSpecifier())));
 		if (argTypes == null)
 			return false;
 		if (this._expr instanceof PropertyExpression && ! exprType.isAssignable()) {
-			var isCallingStatic = (this._expr as PropertyExpression).getExpr() instanceof ClassExpression;
+			var isCallingStatic = (this._expr as PropertyExpression).getExpr().isClassSpecifier();
 			if (! isCallingStatic && (this._expr as PropertyExpression).getIdentifierToken().getValue() == "constructor") {
 				context.errors.push(new CompileError(this._token, "cannot call a constructor other than by using 'new'"));
 				return false;

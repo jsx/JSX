@@ -268,7 +268,7 @@ class Util {
 			baseExpr.getType().getClassDef(),
 			expr.getIdentifierToken().getValue(),
 			Util.isReferringToFunctionDefinition(expr) ? (expr.getType() as ResolvedFunctionType).getArgumentTypes() : null,
-			baseExpr instanceof ClassExpression);
+			baseExpr.isClassSpecifier());
 	}
 
 	static function memberIsExported(classDef : ClassDefinition, name : string, argTypes : Type[], isStatic : boolean) : boolean {
