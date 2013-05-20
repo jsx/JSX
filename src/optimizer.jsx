@@ -1177,15 +1177,18 @@ class _StaticizeOptimizeCommand extends _OptimizeCommand {
 
 	function _cloneFuncDef (funcDef : MemberFunctionDefinition) : MemberFunctionDefinition {
 
-		function cloneFuncDef (funcDef : MemberFunctionDefinition) : MemberFunctionDefinition {
+		var stashesUsed = new _StaticizeOptimizeCommand._CloneStash[];
 
-			function getStash(stashable : Stashable) : _StaticizeOptimizeCommand._CloneStash {
-				var stash = stashable.getStash("CLONE-FUNC-DEF");
-				if (stash == null) {
-					stash = stashable.setStash("CLONE-FUNC-DEF", new _StaticizeOptimizeCommand._CloneStash);
-				}
-				return stash as _StaticizeOptimizeCommand._CloneStash;
+		function getStash(stashable : Stashable) : _StaticizeOptimizeCommand._CloneStash {
+			var stash = stashable.getStash("CLONE-FUNC-DEF");
+			if (stash == null) {
+				stash = stashable.setStash("CLONE-FUNC-DEF", new _StaticizeOptimizeCommand._CloneStash);
 			}
+			stashesUsed.push(stash as _StaticizeOptimizeCommand._CloneStash);
+			return stash as _StaticizeOptimizeCommand._CloneStash;
+		}
+
+		function cloneFuncDef (funcDef : MemberFunctionDefinition) : MemberFunctionDefinition {
 
 			// at this moment, all locals and closures are not cloned yet
 			var statements = Cloner.<Statement>.cloneArray(funcDef.getStatements());
@@ -1295,7 +1298,17 @@ class _StaticizeOptimizeCommand extends _OptimizeCommand {
 
 			return clonedFuncDef;
 		}
-		return cloneFuncDef(funcDef);
+
+		var clonedFuncDef = cloneFuncDef(funcDef);
+
+		// erase stashes of original funcDef
+		for (var i = 0; i < stashesUsed.length; ++i) {
+			var stash = stashesUsed[i];
+			stash.newLocal = null;
+			stash.newFuncDef = null;
+		}
+
+		return clonedFuncDef;
 	}
 
 	function _findFrechFunctionName (classDef : ClassDefinition, baseName : string, argTypes : Type[], isStatic : boolean) : string {
