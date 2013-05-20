@@ -248,7 +248,7 @@ native __fake__ class Stats {
 	function isDirectory() : boolean;
 	function isBlockDevice() : boolean;
 	function isCharacterDevice() : boolean;
-	function isSymbolickLink() : boolean;
+	function isSymbolicLink() : boolean;
 	function isFIFO() : boolean;
 	function isSocket() : boolean;
 }
