@@ -1026,12 +1026,12 @@ class __jsx_generator.<T> implements g_Enumerable.<T> {
  */
 interface AsyncTask.<T> {
 
-	function await () : T;
+	function wait () : T;
 
-	function isDone () : boolean;
+	function isCompleted () : boolean;
 	function getResult () : T;
 
-	function isRaised () : boolean;
+	function isFaulted () : boolean;
 	function getError () : variant;
 
 }
@@ -1042,8 +1042,11 @@ interface AsyncTask.<T> {
 native __fake__ class Async {
 
 	// NOTE wasabiz better to allow arrays consisting of tasks of different types?
-	static function awaitAny.<T> (tasks : Array.<AsyncTask.<T>>) : int;
-	static function awaitAll.<T> (tasks : Array.<AsyncTask.<T>>) : void;
+	static function waitAny.<T> (task ... : AsyncTask.<T>) : int;
+	static function waitAny.<T> (tasks : Array.<AsyncTask.<T>>) : int;
+
+	static function waitAll.<T> (task ... : AsyncTask.<T>) : void;
+	static function waitAll.<T> (tasks : Array.<AsyncTask.<T>>) : void;
 
 }
 
