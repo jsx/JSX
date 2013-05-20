@@ -1229,6 +1229,162 @@ class MemberFunctionDefinition extends MemberDefinition implements Block {
 			this._returnType.toString();
 	}
 
+	class _CloneStash extends Stash {
+
+		var newLocal : LocalVariable;
+		var newFuncDef : MemberFunctionDefinition;
+
+		function constructor () {
+			this.newLocal = null;
+			this.newFuncDef = null;
+		}
+
+		function constructor (that : MemberFunctionDefinition._CloneStash) {
+			this.newLocal = that.newLocal;
+			this.newFuncDef = that.newFuncDef;
+		}
+
+		override function clone () : MemberFunctionDefinition._CloneStash {
+			return new MemberFunctionDefinition._CloneStash(this);
+		}
+
+	}
+
+	function clone () : MemberFunctionDefinition {
+
+		var stashesUsed = new MemberFunctionDefinition._CloneStash[];
+
+		function getStash(stashable : Stashable) : MemberFunctionDefinition._CloneStash {
+			var stash = stashable.getStash("CLONE-FUNC-DEF");
+			if (stash == null) {
+				stash = stashable.setStash("CLONE-FUNC-DEF", new MemberFunctionDefinition._CloneStash);
+			}
+			stashesUsed.push(stash as MemberFunctionDefinition._CloneStash);
+			return stash as MemberFunctionDefinition._CloneStash;
+		}
+
+		function cloneFuncDef (funcDef : MemberFunctionDefinition) : MemberFunctionDefinition {
+
+			// at this moment, all locals and closures are not cloned yet
+			var statements = Cloner.<Statement>.cloneArray(funcDef.getStatements());
+
+			var closures = funcDef.getClosures().map.<MemberFunctionDefinition>((funcDef) -> {
+				var newFuncDef = cloneFuncDef(funcDef);
+				getStash(funcDef).newFuncDef = newFuncDef;
+				return newFuncDef;
+			});
+			// rewrite funcDefs
+			Util.forEachStatement(function onStatement(statement : Statement) : boolean {
+				if (statement instanceof FunctionStatement) {
+					var newFuncDef;
+					if ((newFuncDef = getStash((statement as FunctionStatement).getFuncDef()).newFuncDef) != null) {
+						(statement as FunctionStatement).setFuncDef(newFuncDef);
+					}
+					return true;
+				}
+				return statement.forEachExpression(function onExpr(expr : Expression, replaceCb : function(:Expression):void) : boolean {
+					if (expr instanceof FunctionExpression) {
+						var newFuncDef;
+						if ((newFuncDef = getStash((expr as FunctionExpression).getFuncDef()).newFuncDef) != null) {
+							(expr as FunctionExpression).setFuncDef(newFuncDef);
+						}
+						return true;
+					}
+					return expr.forEachExpression(onExpr);
+				}) && statement.forEachStatement(onStatement);
+			}, statements);
+
+			var funcLocal = funcDef.getFuncLocal();
+			if (funcLocal != null) {
+				var newFuncLocal;
+				if ((newFuncLocal = getStash(funcLocal).newLocal) != null) { // funcDef is defined as a function statement
+					// ok
+				} else {
+					// clone
+					newFuncLocal = new LocalVariable(funcLocal.getName(), funcLocal.getType());
+					getStash(funcLocal).newLocal = newFuncLocal;
+				}
+				funcLocal = newFuncLocal;
+			}
+			var args = funcDef.getArguments().map.<ArgumentDeclaration>((arg) -> {
+				var newArg = arg.clone();
+				getStash(arg).newLocal = newArg;
+				return newArg;
+			});
+			var locals = funcDef.getLocals().map.<LocalVariable>((local) -> {
+				var newLocal;
+				if ((newLocal = getStash(local).newLocal) != null) {
+					// in case local is a name of a function statement and the function statement already cloned
+					return newLocal;
+				}
+				newLocal = new LocalVariable(local.getName(), local.getType());
+				getStash(local).newLocal = newLocal;
+				return newLocal;
+			});
+
+			// FIXME special hack: CatchStatement#clone does not clone and rewrite its caught variable
+			Util.forEachStatement(function onStatement(statement : Statement) : boolean {
+				if (statement instanceof CatchStatement) {
+					var caughtVar = (statement as CatchStatement).getLocal().clone();
+					getStash((statement as CatchStatement).getLocal()).newLocal = caughtVar;
+					(statement as CatchStatement).setLocal(caughtVar);
+				} else if (statement instanceof FunctionStatement) {
+					(statement as FunctionStatement).getFuncDef().forEachStatement(onStatement);
+				}
+				return statement.forEachExpression(function onExpr(expr, replaceCb) {
+					if (expr instanceof FunctionExpression) {
+						return (expr as FunctionExpression).getFuncDef().forEachStatement(onStatement);
+					}
+					return expr.forEachExpression(onExpr);
+				}) && statement.forEachStatement(onStatement);
+			}, statements);
+
+			// rewrite locals
+			Util.forEachStatement(function onStatement(statement : Statement) : boolean {
+				if (statement instanceof FunctionStatement) {
+					(statement as FunctionStatement).getFuncDef().forEachStatement(onStatement);
+				}
+				return statement.forEachExpression(function onExpr(expr : Expression, replaceCb : function(:Expression):void) : boolean {
+					if (expr instanceof LocalExpression) {
+						var newLocal;
+						if ((newLocal = getStash((expr as LocalExpression).getLocal()).newLocal) != null) {
+							(expr as LocalExpression).setLocal(newLocal);
+						}
+					} else if (expr instanceof FunctionExpression) {
+						return (expr as FunctionExpression).getFuncDef().forEachStatement(onStatement);
+					}
+					return expr.forEachExpression(onExpr);
+				}) && statement.forEachStatement(onStatement);
+			}, statements);
+
+			var clonedFuncDef = new MemberFunctionDefinition(
+				funcDef.getToken(),
+				funcDef.getNameToken(),
+				funcDef.flags(),
+				funcDef.getReturnType(),
+				args,
+				locals,
+				statements,
+				closures,
+				funcDef._lastTokenOfBody,
+				null
+			);
+			clonedFuncDef.setFuncLocal(funcLocal);
+
+			return clonedFuncDef;
+		}
+
+		var clonedFuncDef = cloneFuncDef(this);
+
+		// erase stashes of original funcDef
+		for (var i = 0; i < stashesUsed.length; ++i) {
+			var stash = stashesUsed[i];
+			stash.newLocal = null;
+			stash.newFuncDef = null;
+		}
+
+		return clonedFuncDef;
+	}
 
 	override function instantiate (instantiationContext : InstantiationContext) : MemberFunctionDefinition {
 		return this._instantiateCore(
