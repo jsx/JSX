@@ -147,6 +147,14 @@ abstract class _StatementTransformer {
 
 	abstract function replaceControlStructuresWithGotos () : Statement[];
 
+	static function pushConditionalBranch (expr : Expression, succLabel : string, failLabel : string, output : Statement[]) : void {
+		output.push(new IfStatement(new Token("if", false), expr, [ new GotoStatement(succLabel) ] : Statement[], [ new GotoStatement(failLabel) ] : Statement[]));
+	}
+
+	static function pushExpressionStatement (expr : Expression, output : Statement[]) : void {
+		output.push(new ExpressionStatement(expr));
+	}
+
 }
 
 class _ConstructorInvocationStatementTransformer extends _StatementTransformer {
@@ -372,7 +380,7 @@ class _DoWhileStatementTransformer extends _LabellableStatementTransformer {
 		statements.push(new GotoStatement(testLabel));
 		statements.push(new LabelStatement(testLabel));
 		var endLabel = "$END_DO_WHILE_" + this.getID() as string;
-		this._transformer.pushConditionalBranch(this._statement.getExpr(), bodyLabel, endLabel, statements);
+		_StatementTransformer.pushConditionalBranch(this._statement.getExpr(), bodyLabel, endLabel, statements);
 		statements.push(new LabelStatement(endLabel));
 		return statements;
 	}
@@ -456,13 +464,13 @@ class _ForStatementTransformer extends _LabellableStatementTransformer {
 		var initLabel = "$INIT_FOR_" + this.getID() as string;
 		statements.push(new GotoStatement(initLabel));
 		statements.push(new LabelStatement(initLabel));
-		this._transformer.pushExpressionStatement(this._statement.getInitExpr(), statements);
+		_StatementTransformer.pushExpressionStatement(this._statement.getInitExpr(), statements);
 		var testLabel = "$TEST_FOR_" + this.getID() as string;
 		statements.push(new GotoStatement(testLabel));
 		statements.push(new LabelStatement(testLabel));
 		var bodyLabel = "$BODY_FOR_" + this.getID() as string;
 		var endLabel = "$END_FOR_" + this.getID() as string;
-		this._transformer.pushConditionalBranch(this._statement.getCondExpr(), bodyLabel, endLabel, statements);
+		_StatementTransformer.pushConditionalBranch(this._statement.getCondExpr(), bodyLabel, endLabel, statements);
 		statements.push(new LabelStatement(bodyLabel));
 		this._transformer.enterLabelledBlock(this);
 		this._transformer.convertAndPushStatements(this._statement.getStatements(), statements);
@@ -470,7 +478,7 @@ class _ForStatementTransformer extends _LabellableStatementTransformer {
 		var postLabel = "$POST_FOR_" + this.getID() as string;
 		statements.push(new GotoStatement(postLabel));
 		statements.push(new LabelStatement(postLabel));
-		this._transformer.pushExpressionStatement(this._statement.getPostExpr(), statements);
+		_StatementTransformer.pushExpressionStatement(this._statement.getPostExpr(), statements);
 		statements.push(new GotoStatement(testLabel));
 		statements.push(new LabelStatement(endLabel));
 		return statements;
@@ -530,7 +538,7 @@ class _IfStatementTransformer extends _StatementTransformer {
 		var failLabel = "$FAIL_IF_" + this.getID() as string;
 		statements.push(new GotoStatement(testLabel));
 		statements.push(new LabelStatement(testLabel));
-		this._transformer.pushConditionalBranch(this._statement.getExpr(), succLabel, failLabel, statements);
+		_StatementTransformer.pushConditionalBranch(this._statement.getExpr(), succLabel, failLabel, statements);
 		statements.push(new LabelStatement(succLabel));
 		this._transformer.convertAndPushStatements(this._statement.getOnTrueStatements(), statements);
 		var endLabel = "$END_IF_" + this.getID() as string;
@@ -747,7 +755,7 @@ class _WhileStatementTransformer extends _LabellableStatementTransformer {
 		statements.push(new LabelStatement(testLabel));
 		var bodyLabel = "$BODY_WHILE_" + this.getID() as string;
 		var endLabel = "$END_WHILE_" + this.getID() as string;
-		this._transformer.pushConditionalBranch(this._statement.getExpr(), bodyLabel, endLabel, statements);
+		_StatementTransformer.pushConditionalBranch(this._statement.getExpr(), bodyLabel, endLabel, statements);
 		statements.push(new LabelStatement(bodyLabel));
 		this._transformer.enterLabelledBlock(this);
 		this._transformer.convertAndPushStatements(this._statement.getStatements(), statements);
@@ -927,14 +935,6 @@ class CodeTransformer {
 		for (var i = 0; i < input.length; ++i) {
 			this.convertAndPushStatement(input[i], output);
 		}
-	}
-
-	function pushConditionalBranch (expr : Expression, succLabel : string, failLabel : string, output : Statement[]) : void {
-		output.push(new IfStatement(new Token("if", false), expr, [ new GotoStatement(succLabel) ] : Statement[], [ new GotoStatement(failLabel) ] : Statement[]));
-	}
-
-	function pushExpressionStatement (expr : Expression, output : Statement[]) : void {
-		output.push(new ExpressionStatement(expr));
 	}
 
 	var _statementIDs = new Map.<number>;
