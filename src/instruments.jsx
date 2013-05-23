@@ -883,8 +883,15 @@ class _DebuggerStatementTransformer extends _StatementTransformer {
 
 class CodeTransformer {
 
-	static var stopIterationType : ObjectType;
-	static var jsxGeneratorClassDef : TemplateClassDefinition;
+	var _stopIterationType : ObjectType;
+	var _jsxGeneratorClassDef : TemplateClassDefinition;
+
+	function constructor (builtins : Parser) {
+		this._stopIterationType = new ObjectType(builtins.lookup([], null, "g_StopIteration"));
+		for (var i = 0; i < builtins._templateClassDefs.length; ++i)
+			if (builtins._templateClassDefs[i].className() == "__jsx_generator")
+				this._jsxGeneratorClassDef = builtins._templateClassDefs[i];
+	}
 
 	var _labelMap = new _LabellableStatementTransformer[];
 
@@ -1169,29 +1176,13 @@ class CodeTransformer {
 		var yieldType = (funcDef.getReturnType().getClassDef() as InstantiatedClassDefinition).getTypeArguments()[0];
 
 		// create a generator object
-		var genClassDef = CodeTransformer.jsxGeneratorClassDef.instantiateTemplateClass([], new TemplateInstantiationRequest(null, "__jsx_generator", [ yieldType ] : Type[]));
-		var createContext = function (parser : Parser) : AnalysisContext {
-			return new AnalysisContext(
-				[],
-				parser,
-				function (parser : Parser, classDef : ClassDefinition) : ClassDefinition {
-					classDef.setAnalysisContextOfVariables(createContext(parser));
-					classDef.analyze(createContext(parser));
-					return classDef;
-				});
-		};
-		var parser = CodeTransformer.jsxGeneratorClassDef.getParser();
-		genClassDef.resolveTypes(createContext(parser));
-		genClassDef.analyze(createContext(parser));
-		CodeTransformer.jsxGeneratorClassDef.getParser()._classDefs.push(genClassDef);
-		var genType = new ObjectType(genClassDef);
-
+		var genType = this._instantiateGeneratorType(yieldType);
 		var genLocalName = "$generator" + CodeTransformer._getGeneratorNestDepth(funcDef) as string;
 		var genLocal = new LocalVariable(new Token(genLocalName, false), genType);
 		funcDef.getLocals().push(genLocal);
 
 		// insert epilogue code `throw new StopIteration`
-		var newExpr = new NewExpression(new Token("new", false), CodeTransformer.stopIterationType, []);
+		var newExpr = new NewExpression(new Token("new", false), this._stopIterationType, []);
 		newExpr.analyze(new AnalysisContext([], null, null), null);
 		funcDef.getStatements().push(new ThrowStatement(new Token("throw", false), newExpr));
 
@@ -1268,6 +1259,32 @@ class CodeTransformer {
 			new ReturnStatement(
 				new Token("return", false),
 				new LocalExpression(new Token("$generator", false), genLocal)));
+	}
+
+	function _instantiateGeneratorType (yieldType : Type) : Type {
+		// instantiate generator
+		var genClassDef = this._jsxGeneratorClassDef.instantiateTemplateClass(
+			[],	// errors
+			new TemplateInstantiationRequest(null, "__jsx_generator", [ yieldType ] : Type[])
+		);
+		this._jsxGeneratorClassDef.getParser()._classDefs.push(genClassDef);
+
+		// semantic analysis
+		var createContext = function (parser : Parser) : AnalysisContext {
+			return new AnalysisContext(
+				[], // errors
+				parser,
+				function (parser : Parser, classDef : ClassDefinition) : ClassDefinition {
+					classDef.setAnalysisContextOfVariables(createContext(parser));
+					classDef.analyze(createContext(parser));
+					return classDef;
+				});
+		};
+		var parser = this._jsxGeneratorClassDef.getParser();
+		genClassDef.resolveTypes(createContext(parser));
+		genClassDef.analyze(createContext(parser));
+
+		return new ObjectType(genClassDef);
 	}
 
 	static function _getGeneratorNestDepth (funcDef : MemberFunctionDefinition) : number {
