@@ -891,11 +891,11 @@ class _DebuggerStatementTransformer extends _StatementTransformer {
 
 class CodeTransformer {
 
-	var _stopIterationType : ObjectType;
+	var _stopIterationClassDef : ClassDefinition;
 	var _jsxGeneratorClassDef : TemplateClassDefinition;
 
 	function constructor (builtins : Parser) {
-		this._stopIterationType = new ObjectType(builtins.lookup([], null, "g_StopIteration"));
+		this._stopIterationClassDef = builtins.lookup([], null, "g_StopIteration");
 		for (var i = 0; i < builtins._templateClassDefs.length; ++i)
 			if (builtins._templateClassDefs[i].className() == "__jsx_generator")
 				this._jsxGeneratorClassDef = builtins._templateClassDefs[i];
@@ -1182,7 +1182,7 @@ class CodeTransformer {
 		funcDef.getLocals().push(genLocal);
 
 		// insert epilogue code `throw new StopIteration`
-		var newExpr = new NewExpression(new Token("new", false), this._stopIterationType, []);
+		var newExpr = new NewExpression(new Token("new", false), new ObjectType(this._stopIterationClassDef), []);
 		newExpr.analyze(new AnalysisContext([], null, null), null);
 		funcDef.getStatements().push(new ThrowStatement(new Token("throw", false), newExpr));
 
