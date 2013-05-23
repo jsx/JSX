@@ -50,7 +50,76 @@ abstract class _ExpressionTransformer {
 
 	abstract function getExpression () : Expression;
 
-	abstract function doCPSTransform () : Expression;
+	abstract function doCPSTransform (continuation : Expression) : Expression;
+
+}
+
+class _LeafExpressionTransformer {
+
+	var _expr : LeafExpression;
+
+	function constructor (transformer : CodeTransformer, expr : LeafExpression) {
+		super(transformer, "LEAF");
+		this._expr = expr;
+	}
+
+	override function getExpression () : Expression {
+		return this._expr;
+	}
+
+	override function doCPSTransform (continuation : Expression) : Expression {
+		return new CallExpression(
+			this._expr.getToken(),
+			continuation,
+			[ this._expr ] : Expression[]
+		);
+	}
+
+}
+
+class _ThisExpressionTransformer {
+
+	var _expr : ThisExpression;
+
+	function constructor (transformer : CodeTransformer, expr : ThisExpression) {
+		super(transformer, "THIS");
+		this._expr = expr;
+	}
+
+	override function getExpression () : Expression {
+		return this._expr;
+	}
+
+	override function doCPSTransform (continuation : Expression) : Expression {
+		return new CallExpression(
+			this._expr.getToken(),
+			continuation,
+			[ this._expr ] : Expression[]
+		);
+	}
+
+}
+
+class _FunctionExpressionTransformer {
+
+	var _expr : FunctionExpression;
+
+	function constructor (transformer : CodeTransformer, expr : FunctionExpression) {
+		super(transformer, "FUNCTION");
+		this._expr = expr;
+	}
+
+	override function getExpression () : Expression {
+		return this._expr;
+	}
+
+	override function doCPSTransform (continuation : Expression) : Expression {
+		return new CallExpression(
+			this._expr.getToken(),
+			continuation,
+			[ this._expr ] : Expression[]
+		);
+	}
 
 }
 
