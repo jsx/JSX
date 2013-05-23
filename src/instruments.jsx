@@ -294,7 +294,7 @@ class _BreakStatementTransformer extends _StatementTransformer {
 		if (this._statement.getLabel() != null) {
 			var trans = this._transformer.getStatementTransformerByLabel(this._statement.getLabel().getValue());
 		} else {
-			trans = this._transformer.getInnermostLabellableStatementTransformer();
+			trans = this._transformer.getTopLabelledBlock();
 		}
 		return [ new GotoStatement(trans.getBreakingLabel()) ] : Statement[];
 	}
@@ -318,7 +318,7 @@ class _ContinueStatementTransformer extends _StatementTransformer {
 		if (this._statement.getLabel() != null) {
 			var trans = this._transformer.getStatementTransformerByLabel(this._statement.getLabel().getValue());
 		} else {
-			trans = this._transformer.getInnermostLabellableStatementTransformer();
+			trans = this._transformer.getTopLabelledBlock();
 		}
 		return [ new GotoStatement(trans.getContinuingLabel()) ] : Statement[];
 	}
@@ -912,7 +912,7 @@ class CodeTransformer {
 		throw new Error("fatal error: no corresponding transformer for label \"" + label + "\"");
 	}
 
-	function getInnermostLabellableStatementTransformer () : _LabellableStatementTransformer {
+	function getTopLabelledBlock () : _LabellableStatementTransformer {
 		return this._labelMap[this._labelMap.length - 1];
 	}
 
