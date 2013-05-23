@@ -54,7 +54,7 @@ abstract class _ExpressionTransformer {
 
 }
 
-class _LeafExpressionTransformer {
+class _LeafExpressionTransformer extends _ExpressionTransformer {
 
 	var _expr : LeafExpression;
 
@@ -77,7 +77,7 @@ class _LeafExpressionTransformer {
 
 }
 
-class _ThisExpressionTransformer {
+class _ThisExpressionTransformer extends _ExpressionTransformer {
 
 	var _expr : ThisExpression;
 
@@ -100,7 +100,7 @@ class _ThisExpressionTransformer {
 
 }
 
-class _FunctionExpressionTransformer {
+class _FunctionExpressionTransformer extends _ExpressionTransformer {
 
 	var _expr : FunctionExpression;
 
