@@ -404,7 +404,7 @@ class Compiler {
 			var deps = classDefs[i].implementTypes().map.<ClassDefinition>(function (t) { return t.getClassDef(); }).concat([]);
 			if (classDefs[i].extendType() != null)
 				deps.unshift(classDefs[i].extendType().getClassDef());
-			if (classDefs[i].getOuterClassDef() != null)
+			if (classDefs[i].getOuterClassDef() != null && deps.indexOf(classDefs[i].getOuterClassDef()) == -1)
 				deps.unshift(classDefs[i].getOuterClassDef());
 			var maxIndexOfClasses = getMaxIndexOfClasses(deps);
 			if (maxIndexOfClasses > i) {
