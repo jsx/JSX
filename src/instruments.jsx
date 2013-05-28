@@ -50,7 +50,49 @@ abstract class _ExpressionTransformer {
 
 	abstract function getExpression () : Expression;
 
-	abstract function doCPSTransform (continuation : Expression) : Expression;
+	abstract function doCPSTransform (parent : MemberFunctionDefinition, continuation : Expression) : Expression;
+
+	function _createCall1 (proc : Expression, arg : Expression) : CallExpression {
+		return new CallExpression(
+			arg.getToken(),
+			proc,
+			[ arg ] : Expression[]
+		);
+	}
+
+	function _createContinuation (parentFuncDef : MemberFunctionDefinition, arg : ArgumentDeclaration, contBody : Expression) : FunctionExpression {
+
+		var closures = new MemberFunctionDefinition[];
+		contBody.forEachExpression(function (expr) {
+			if (expr instanceof FunctionExpression) {
+				closures.push((expr as FunctionExpression).getFuncDef());
+			}
+			// does not search for funcDefs deeper than the first level
+			return true;
+		});
+
+		for (var i = 0; i < closures.length; ++i) {
+			var j;
+			if ((j = parentFuncDef.getClosures().indexOf(closures[i])) != -1) {
+				parentFuncDef.getClosures().splice(j, 1);
+			}
+		}
+
+		var contFuncDef = new MemberFunctionDefinition(
+			new Token("function", false),
+			null,	// name
+			ClassDefinition.IS_STATIC,
+			Type.voidType,
+			[ arg ],
+			[],	// locals
+			[ new ExpressionStatement(contBody) ] : Statement[],
+			closures,
+			null,
+			null
+		);
+		parentFuncDef.getClosures().push(contFuncDef);
+		return new FunctionExpression(contFuncDef.getToken(), contFuncDef);
+	}
 
 }
 
@@ -67,12 +109,8 @@ class _LeafExpressionTransformer extends _ExpressionTransformer {
 		return this._expr;
 	}
 
-	override function doCPSTransform (continuation : Expression) : Expression {
-		return new CallExpression(
-			this._expr.getToken(),
-			continuation,
-			[ this._expr ] : Expression[]
-		);
+	override function doCPSTransform (parent : MemberFunctionDefinition, continuation : Expression) : Expression {
+		return this._createCall1(continuation, this._expr);
 	}
 
 }
@@ -90,12 +128,8 @@ class _ThisExpressionTransformer extends _ExpressionTransformer {
 		return this._expr;
 	}
 
-	override function doCPSTransform (continuation : Expression) : Expression {
-		return new CallExpression(
-			this._expr.getToken(),
-			continuation,
-			[ this._expr ] : Expression[]
-		);
+	override function doCPSTransform (parent : MemberFunctionDefinition, continuation : Expression) : Expression {
+		return this._createCall1(continuation, this._expr);
 	}
 
 }
@@ -113,12 +147,305 @@ class _FunctionExpressionTransformer extends _ExpressionTransformer {
 		return this._expr;
 	}
 
-	override function doCPSTransform (continuation : Expression) : Expression {
-		return new CallExpression(
-			this._expr.getToken(),
-			continuation,
-			[ this._expr ] : Expression[]
-		);
+	override function doCPSTransform (parent : MemberFunctionDefinition, continuation : Expression) : Expression {
+		return this._createCall1(continuation, this._expr);
+	}
+
+}
+
+abstract class _UnaryExpressionTransformer extends _ExpressionTransformer {
+
+	var _expr : UnaryExpression;
+
+	function constructor (transformer : CodeTransformer, expr : UnaryExpression) {
+		super(transformer, "UNARY");
+		this._expr = expr;
+	}
+
+	override function getExpression () : Expression {
+		return this._expr;
+	}
+
+	override function doCPSTransform (parent : MemberFunctionDefinition, continuation : Expression) : Expression {
+		/*
+		  op(v) | C
+
+		  v | function ($v) { return C(op($v)); }
+		*/
+
+		// create a continuation
+		var arg = this._transformer.createFreshArgumentDeclaration(this._expr.getExpr().getType());
+		var cont = this._createContinuation(parent, arg, this._createCall1(continuation, this._clone(new LocalExpression(this._expr.getToken(), arg))));
+		return this._transformer._getExpressionTransformerFor(this._expr.getExpr()).doCPSTransform(parent, cont);
+	}
+
+	abstract function _clone (arg : LocalExpression) : UnaryExpression;
+
+}
+
+/*
+  a ? b : c | C
+
+  a | function ($v) { return $v ? (b | C) : (c | C) }
+
+  a | function ($v) { var $c = C; return $v ? b | $c : c | $c }
+*/
+
+class _BitwiseNotExpressionTransformer extends _UnaryExpressionTransformer {
+
+	function constructor (transformer : CodeTransformer, expr : BitwiseNotExpression) {
+		super(transformer, expr);
+	}
+
+	override function _clone (arg : LocalExpression) : UnaryExpression {
+		return new BitwiseNotExpression(this._expr.getToken(), arg);
+	}
+
+}
+
+class _InstanceofExpressionTransformer extends _UnaryExpressionTransformer {
+
+	function constructor (transformer : CodeTransformer, expr : InstanceofExpression) {
+		super(transformer, expr);
+	}
+
+	override function _clone (arg : LocalExpression) : UnaryExpression {
+		return new InstanceofExpression(this._expr.getToken(), arg, (this._expr as InstanceofExpression).getExpectedType());
+	}
+
+}
+
+class _AsExpressionTransformer extends _UnaryExpressionTransformer {
+
+	function constructor (transformer : CodeTransformer, expr : AsExpression) {
+		super(transformer, expr);
+	}
+
+	override function _clone (arg : LocalExpression) : UnaryExpression {
+		return new AsExpression(this._expr.getToken(), arg, this._expr.getType());
+	}
+
+}
+
+class _AsNoConvertExpressionTransformer extends _UnaryExpressionTransformer {
+
+	function constructor (transformer : CodeTransformer, expr : AsNoConvertExpression) {
+		super(transformer, expr);
+	}
+
+	override function _clone (arg : LocalExpression) : UnaryExpression {
+		return new AsNoConvertExpression(this._expr.getToken(), arg, this._expr.getType());
+	}
+
+}
+
+class _LogicalNotExpressionTransformer extends _UnaryExpressionTransformer {
+
+	function constructor (transformer : CodeTransformer, expr : LogicalNotExpression) {
+		super(transformer, expr);
+	}
+
+	override function _clone (arg : LocalExpression) : UnaryExpression {
+		return new LogicalNotExpression(this._expr.getToken(), arg);
+	}
+
+}
+
+class _PostIncrementExpressionTransformer extends _UnaryExpressionTransformer {
+
+	function constructor (transformer : CodeTransformer, expr : IncrementExpression) {
+		super(transformer, expr);
+	}
+
+	override function _clone (arg : LocalExpression) : UnaryExpression {
+		return new PostIncrementExpression(this._expr.getToken(), arg);
+	}
+
+}
+
+class _PreIncrementExpressionTransformer extends _UnaryExpressionTransformer {
+
+	function constructor (transformer : CodeTransformer, expr : IncrementExpression) {
+		super(transformer, expr);
+	}
+
+	override function _clone (arg : LocalExpression) : UnaryExpression {
+		return new PreIncrementExpression(this._expr.getToken(), arg);
+	}
+
+}
+
+class _PropertyExpressionTransformer extends _UnaryExpressionTransformer {
+
+	function constructor (transformer : CodeTransformer, expr : PropertyExpression) {
+		super(transformer, expr);
+	}
+
+	override function doCPSTransform (parent : MemberFunctionDefinition, continuation : Expression) : Expression {
+		var type = this._expr.getType();
+		if (type instanceof ResolvedFunctionType && (! (type as ResolvedFunctionType).isAssignable())) {
+			throw new Error("logic flaw");
+		}
+		return super.doCPSTransform(parent, continuation);
+	}
+
+	override function _clone (arg : LocalExpression) : UnaryExpression {
+		return new PropertyExpression(this._expr.getToken(), arg, (this._expr as PropertyExpression).getIdentifierToken(), (this._expr as PropertyExpression).getTypeArguments(), this._expr.getType());
+	}
+
+}
+
+class _TypeofExpressionTransformer extends _UnaryExpressionTransformer {
+
+	function constructor (transformer : CodeTransformer, expr : TypeofExpression) {
+		super(transformer, expr);
+	}
+
+	override function _clone (arg : LocalExpression) : UnaryExpression {
+		return new TypeofExpression(this._expr.getToken(), arg);
+	}
+
+}
+
+class _SignExpressionTransformer extends _UnaryExpressionTransformer {
+
+	function constructor (transformer : CodeTransformer, expr : SignExpression) {
+		super(transformer, expr);
+	}
+
+	override function _clone (arg : LocalExpression) : UnaryExpression {
+		return new SignExpression(this._expr.getToken(), arg);
+	}
+
+}
+
+abstract class _BinaryExpressionTransformer extends _ExpressionTransformer {
+
+	var _expr : BinaryExpression;
+
+	function constructor (transformer : CodeTransformer, expr : BinaryExpression) {
+		super(transformer, "BINARY");
+		this._expr = expr;
+	}
+
+	override function getExpression () : Expression {
+		return this._expr;
+	}
+
+	override function doCPSTransform (parent : MemberFunctionDefinition, continuation : Expression) : Expression {
+		/*
+		  op(E1,E2) | C
+
+		  E1 | function ($1) { return E2 | function ($2) { return C(op($1,$2); }; }
+		                                   ^^^^^^^^^^^^^^^^cont2^^^^^^^^^^^^^^^^
+		       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^cont1^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+		*/
+
+		// create a continuation
+		var arg2 = this._transformer.createFreshArgumentDeclaration(this._expr.getSecondExpr().getType());
+		var arg1 = this._transformer.createFreshArgumentDeclaration(this._expr.getFirstExpr().getType());
+		// FIXME wrong parent
+		var cont2 = this._createContinuation(parent, arg2, this._createCall1(continuation, this._clone(new LocalExpression(this._expr.getToken(), arg1), new LocalExpression(this._expr.getToken(), arg2))));
+		var cont1 = this._createContinuation(parent, arg1, this._transformer._getExpressionTransformerFor(this._expr.getSecondExpr()).doCPSTransform(parent, cont2));
+		return this._transformer._getExpressionTransformerFor(this._expr.getFirstExpr()).doCPSTransform(parent, cont1);
+	}
+
+	abstract function _clone (arg1 : LocalExpression, arg2 : LocalExpression) : BinaryExpression;
+
+}
+
+class _AdditiveExpressionTransformer extends _BinaryExpressionTransformer {
+
+	function constructor (transformer : CodeTransformer, expr : AdditiveExpression) {
+		super(transformer, expr);
+	}
+
+	override function _clone (arg1 : LocalExpression, arg2 : LocalExpression) : BinaryExpression {
+		return new AdditiveExpression(this._expr.getToken(), arg1, arg2);
+	}
+
+}
+
+class _ArrayExpressionTransformer extends _BinaryExpressionTransformer {
+
+	function constructor (transformer : CodeTransformer, expr : ArrayExpression) {
+		super(transformer, expr);
+	}
+
+	override function _clone (arg1 : LocalExpression, arg2 : LocalExpression) : BinaryExpression {
+		return new ArrayExpression(this._expr.getToken(), arg1, arg2);
+	}
+
+}
+
+class _AssignmentExpressionTransformer extends _BinaryExpressionTransformer {
+
+	function constructor (transformer : CodeTransformer, expr : AssignmentExpression) {
+		super(transformer, expr);
+	}
+
+	override function _clone (arg1 : LocalExpression, arg2 : LocalExpression) : BinaryExpression {
+		return new AssignmentExpression(this._expr.getToken(), arg1, arg2);
+	}
+
+}
+
+class _BinaryNumberExpressionTransformer extends _BinaryExpressionTransformer {
+
+	function constructor (transformer : CodeTransformer, expr : BinaryNumberExpression) {
+		super(transformer, expr);
+	}
+
+	override function _clone (arg1 : LocalExpression, arg2 : LocalExpression) : BinaryExpression {
+		return new BinaryNumberExpression(this._expr.getToken(), arg1, arg2);
+	}
+
+}
+
+class _EqualityExpressionTransformer extends _BinaryExpressionTransformer {
+
+	function constructor (transformer : CodeTransformer, expr : EqualityExpression) {
+		super(transformer, expr);
+	}
+
+	override function _clone (arg1 : LocalExpression, arg2 : LocalExpression) : BinaryExpression {
+		return new EqualityExpression(this._expr.getToken(), arg1, arg2);
+	}
+
+}
+
+class _InExpressionTransformer extends _BinaryExpressionTransformer {
+
+	function constructor (transformer : CodeTransformer, expr : InExpression) {
+		super(transformer, expr);
+	}
+
+	override function _clone (arg1 : LocalExpression, arg2 : LocalExpression) : BinaryExpression {
+		return new InExpression(this._expr.getToken(), arg1, arg2);
+	}
+
+}
+
+class _LogicalExpressionTransformer extends _BinaryExpressionTransformer {
+
+	function constructor (transformer : CodeTransformer, expr : LogicalExpression) {
+		super(transformer, expr);
+	}
+
+	override function _clone (arg1 : LocalExpression, arg2 : LocalExpression) : BinaryExpression {
+		return new LogicalExpression(this._expr.getToken(), arg1, arg2);
+	}
+
+}
+
+class _ShiftExpressionTransformer extends _BinaryExpressionTransformer {
+
+	function constructor (transformer : CodeTransformer, expr : ShiftExpression) {
+		super(transformer, expr);
+	}
+
+	override function _clone (arg1 : LocalExpression, arg2 : LocalExpression) : BinaryExpression {
+		return new ShiftExpression(this._expr.getToken(), arg1, arg2);
 	}
 
 }
@@ -943,6 +1270,13 @@ class CodeTransformer {
 		return this._statementIDs;
 	}
 
+	var _numUniqVar = 0;
+
+	function createFreshArgumentDeclaration (type : Type) : ArgumentDeclaration {
+		var id = this._numUniqVar++;
+		return new ArgumentDeclaration(new Token("$a" + id as string, true), type);
+	}
+
 	function _getStatementTransformerFor (statement : Statement) : _StatementTransformer {
 		if (statement instanceof ConstructorInvocationStatement)
 			return new _ConstructorInvocationStatementTransformer(this, statement as ConstructorInvocationStatement);
@@ -991,79 +1325,79 @@ class CodeTransformer {
 		throw new Error("got unexpected type of statement: " + JSON.stringify(statement.serialize()));
 	}
 
-	// function _getExpressionTransformerFor (expr : Expression) : _ExpressionTransformer {
-	// 	if (expr instanceof LocalExpression)
-	// 		return new _LocalExpressionTransformer(this, expr as LocalExpression);
-	// 	else if (expr instanceof ClassExpression)
-	// 		return new _ClassExpressionTransformer(this, expr as ClassExpression);
-	// 	else if (expr instanceof NullExpression)
-	// 		return new _NullExpressionTransformer(this, expr as NullExpression);
-	// 	else if (expr instanceof BooleanLiteralExpression)
-	// 		return new _BooleanLiteralExpressionTransformer(this, expr as BooleanLiteralExpression);
-	// 	else if (expr instanceof IntegerLiteralExpression)
-	// 		return new _IntegerLiteralExpressionTransformer(this, expr as IntegerLiteralExpression);
-	// 	else if (expr instanceof NumberLiteralExpression)
-	// 		return new _NumberLiteralExpressionTransformer(this, expr as NumberLiteralExpression);
-	// 	else if (expr instanceof StringLiteralExpression)
-	// 		return new _StringLiteralExpressionTransformer(this, expr as StringLiteralExpression);
-	// 	else if (expr instanceof RegExpLiteralExpression)
-	// 		return new _RegExpLiteralExpressionTransformer(this, expr as RegExpLiteralExpression);
-	// 	else if (expr instanceof ArrayLiteralExpression)
-	// 		return new _ArrayLiteralExpressionTransformer(this, expr as ArrayLiteralExpression);
-	// 	else if (expr instanceof MapLiteralExpression)
-	// 		return new _MapLiteralExpressionTransformer(this, expr as MapLiteralExpression);
-	// 	else if (expr instanceof ThisExpression)
-	// 		return new _ThisExpressionTransformer(this, expr as ThisExpression);
-	// 	else if (expr instanceof BitwiseNotExpression)
-	// 		return new _UnaryExpressionTransformer(this, expr as BitwiseNotExpression);
-	// 	else if (expr instanceof InstanceofExpression)
-	// 		return new _InstanceofExpressionTransformer(this, expr as InstanceofExpression);
-	// 	else if (expr instanceof AsExpression)
-	// 		return new _AsExpressionTransformer(this, expr as AsExpression);
-	// 	else if (expr instanceof AsNoConvertExpression)
-	// 		return new _AsNoConvertExpressionTransformer(this, expr as AsNoConvertExpression);
-	// 	else if (expr instanceof LogicalNotExpression)
-	// 		return new _UnaryExpressionTransformer(this, expr as LogicalNotExpression);
-	// 	else if (expr instanceof TypeofExpression)
-	// 		return new _UnaryExpressionTransformer(this, expr as TypeofExpression);
-	// 	else if (expr instanceof PostIncrementExpression)
-	// 		return new _PostfixExpressionTransformer(this, expr as PostIncrementExpression);
-	// 	else if (expr instanceof PreIncrementExpression)
-	// 		return new _UnaryExpressionTransformer(this, expr as PreIncrementExpression);
-	// 	else if (expr instanceof PropertyExpression)
-	// 		return new _PropertyExpressionTransformer(this, expr as PropertyExpression);
-	// 	else if (expr instanceof SignExpression)
-	// 		return new _UnaryExpressionTransformer(this, expr as SignExpression);
-	// 	else if (expr instanceof AdditiveExpression)
-	// 		return new _AdditiveExpressionTransformer(this, expr as AdditiveExpression);
-	// 	else if (expr instanceof ArrayExpression)
-	// 		return new _ArrayExpressionTransformer(this, expr as ArrayExpression);
-	// 	else if (expr instanceof AssignmentExpression)
-	// 		return new _AssignmentExpressionTransformer(this, expr as AssignmentExpression);
-	// 	else if (expr instanceof BinaryNumberExpression)
-	// 		return new _BinaryNumberExpressionTransformer(this, expr as BinaryNumberExpression);
-	// 	else if (expr instanceof EqualityExpression)
-	// 		return new _EqualityExpressionTransformer(this, expr as EqualityExpression);
-	// 	else if (expr instanceof InExpression)
-	// 		return new _InExpressionTransformer(this, expr as InExpression);
-	// 	else if (expr instanceof LogicalExpression)
-	// 		return new _LogicalExpressionTransformer(this, expr as LogicalExpression);
-	// 	else if (expr instanceof ShiftExpression)
-	// 		return new _ShiftExpressionTransformer(this, expr as ShiftExpression);
-	// 	else if (expr instanceof ConditionalExpression)
-	// 		return new _ConditionalExpressionTransformer(this, expr as ConditionalExpression);
-	// 	else if (expr instanceof CallExpression)
-	// 		return new _CallExpressionTransformer(this, expr as CallExpression);
-	// 	else if (expr instanceof SuperExpression)
-	// 		return new _SuperExpressionTransformer(this, expr as SuperExpression);
-	// 	else if (expr instanceof NewExpression)
-	// 		return new _NewExpressionTransformer(this, expr as NewExpression);
-	// 	else if (expr instanceof FunctionExpression)
-	// 		return new _FunctionExpressionTransformer(this, expr as FunctionExpression);
-	// 	else if (expr instanceof CommaExpression)
-	// 		return new _CommaExpressionTransformer(this, expr as CommaExpression);
-	// 	throw new Error("got unexpected type of expression: " + (expr != null ? JSON.stringify(expr.serialize()) : expr.toString()));
-	// }
+	function _getExpressionTransformerFor (expr : Expression) : _ExpressionTransformer {
+		if (expr instanceof LocalExpression)
+			return new _LeafExpressionTransformer(this, expr as LocalExpression);
+		// else if (expr instanceof ClassExpression)
+		// 	return new _ClassExpressionTransformer(this, expr as ClassExpression);
+		else if (expr instanceof NullExpression)
+			return new _LeafExpressionTransformer(this, expr as NullExpression);
+		else if (expr instanceof BooleanLiteralExpression)
+			return new _LeafExpressionTransformer(this, expr as BooleanLiteralExpression);
+		else if (expr instanceof IntegerLiteralExpression)
+			return new _LeafExpressionTransformer(this, expr as IntegerLiteralExpression);
+		else if (expr instanceof NumberLiteralExpression)
+			return new _LeafExpressionTransformer(this, expr as NumberLiteralExpression);
+		else if (expr instanceof StringLiteralExpression)
+			return new _LeafExpressionTransformer(this, expr as StringLiteralExpression);
+		else if (expr instanceof RegExpLiteralExpression)
+			return new _LeafExpressionTransformer(this, expr as RegExpLiteralExpression);
+		// else if (expr instanceof ArrayLiteralExpression)
+		// 	return new _ArrayLiteralExpressionTransformer(this, expr as ArrayLiteralExpression);
+		// else if (expr instanceof MapLiteralExpression)
+		// 	return new _MapLiteralExpressionTransformer(this, expr as MapLiteralExpression);
+		else if (expr instanceof ThisExpression)
+			return new _ThisExpressionTransformer(this, expr as ThisExpression);
+		else if (expr instanceof BitwiseNotExpression)
+			return new _BitwiseNotExpressionTransformer(this, expr as BitwiseNotExpression);
+		else if (expr instanceof InstanceofExpression)
+			return new _InstanceofExpressionTransformer(this, expr as InstanceofExpression);
+		else if (expr instanceof AsExpression)
+			return new _AsExpressionTransformer(this, expr as AsExpression);
+		else if (expr instanceof AsNoConvertExpression)
+			return new _AsNoConvertExpressionTransformer(this, expr as AsNoConvertExpression);
+		else if (expr instanceof LogicalNotExpression)
+			return new _LogicalNotExpressionTransformer(this, expr as LogicalNotExpression);
+		else if (expr instanceof TypeofExpression)
+			return new _TypeofExpressionTransformer(this, expr as TypeofExpression);
+		else if (expr instanceof PostIncrementExpression)
+			return new _PostIncrementExpressionTransformer(this, expr as PostIncrementExpression);
+		else if (expr instanceof PreIncrementExpression)
+			return new _PreIncrementExpressionTransformer(this, expr as PreIncrementExpression);
+		else if (expr instanceof PropertyExpression)
+			return new _PropertyExpressionTransformer(this, expr as PropertyExpression);
+		else if (expr instanceof SignExpression)
+			return new _SignExpressionTransformer(this, expr as SignExpression);
+		else if (expr instanceof AdditiveExpression)
+			return new _AdditiveExpressionTransformer(this, expr as AdditiveExpression);
+		else if (expr instanceof ArrayExpression)
+			return new _ArrayExpressionTransformer(this, expr as ArrayExpression);
+		else if (expr instanceof AssignmentExpression)
+			return new _AssignmentExpressionTransformer(this, expr as AssignmentExpression);
+		else if (expr instanceof BinaryNumberExpression)
+			return new _BinaryNumberExpressionTransformer(this, expr as BinaryNumberExpression);
+		else if (expr instanceof EqualityExpression)
+			return new _EqualityExpressionTransformer(this, expr as EqualityExpression);
+		else if (expr instanceof InExpression)
+			return new _InExpressionTransformer(this, expr as InExpression);
+		else if (expr instanceof LogicalExpression)
+			return new _LogicalExpressionTransformer(this, expr as LogicalExpression);
+		else if (expr instanceof ShiftExpression)
+			return new _ShiftExpressionTransformer(this, expr as ShiftExpression);
+		// else if (expr instanceof ConditionalExpression)
+		// 	return new _ConditionalExpressionTransformer(this, expr as ConditionalExpression);
+		// else if (expr instanceof CallExpression)
+		// 	return new _CallExpressionTransformer(this, expr as CallExpression);
+		// else if (expr instanceof SuperExpression)
+		// 	return new _SuperExpressionTransformer(this, expr as SuperExpression);
+		// else if (expr instanceof NewExpression)
+		// 	return new _NewExpressionTransformer(this, expr as NewExpression);
+		else if (expr instanceof FunctionExpression)
+			return new _FunctionExpressionTransformer(this, expr as FunctionExpression);
+		// else if (expr instanceof CommaExpression)
+		// 	return new _CommaExpressionTransformer(this, expr as CommaExpression);
+		throw new Error("got unexpected type of expression: " + (expr != null ? JSON.stringify(expr.serialize()) : expr.toString()));
+	}
 
 	function transformFunctionDefinition (funcDef : MemberFunctionDefinition) : void {
 		this._compileYields(funcDef);
@@ -1150,14 +1484,14 @@ class CodeTransformer {
 			postFragmentationCallback(currentLabel.getName(), body);
 			var block = new MemberFunctionDefinition(
 						new Token("function", false),
-						null,
+						null, // name
 						ClassDefinition.IS_STATIC,
 						Type.voidType,
-						[], // args
-						[], // locals
+						[],   // args
+						[],   // locals
 						body,
-						[], // closures
-						null,
+						[],   // closures
+						null, // last token
 						null
 			);
 			funcDef.getClosures().push(block);
