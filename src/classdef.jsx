@@ -761,10 +761,11 @@ class ClassDefinition implements Stashable {
 					return false;
 			}
 		} else { // function
-			if (this._extendType != null && ! this._extendType.getClassDef()._assertMemberFunctionIsDefinable(context, member as MemberFunctionDefinition, memberClassDef, token, false))
+			var isCheckingInterface = (memberClassDef.flags() & ClassDefinition.IS_INTERFACE) != 0;
+			if (this._extendType != null && ! this._extendType.getClassDef()._assertMemberFunctionIsDefinable(context, member as MemberFunctionDefinition, memberClassDef, token, false, isCheckingInterface))
 				return false;
 			for (var i = 0; i < numImplementsToCheck; ++i) {
-				if (memberClassDef != this._implementTypes[i].getClassDef() && ! this._implementTypes[i].getClassDef()._assertMemberFunctionIsDefinable(context, member as MemberFunctionDefinition, memberClassDef, token, isCheckingSibling))
+				if (memberClassDef != this._implementTypes[i].getClassDef() && ! this._implementTypes[i].getClassDef()._assertMemberFunctionIsDefinable(context, member as MemberFunctionDefinition, memberClassDef, token, isCheckingSibling, isCheckingInterface))
 					return false;
 			}
 		}
@@ -792,7 +793,7 @@ class ClassDefinition implements Stashable {
 		return true;
 	}
 
-	function _assertMemberFunctionIsDefinable (context : AnalysisContext, member : MemberFunctionDefinition, memberClassDef : ClassDefinition, token : Token, reportOverridesAsWell : boolean) : boolean {
+	function _assertMemberFunctionIsDefinable (context : AnalysisContext, member : MemberFunctionDefinition, memberClassDef : ClassDefinition, token : Token, reportOverridesAsWell : boolean, isCheckingInterface : boolean) : boolean {
 		if (member.name() == "constructor")
 			return true;
 		for (var i = 0; i < this._members.length; ++i) {
@@ -806,7 +807,7 @@ class ClassDefinition implements Stashable {
 			}
 			if (! Util.typesAreEqual((this._members[i] as MemberFunctionDefinition).getArgumentTypes(), member.getArgumentTypes()))
 				continue;
-			if ((member.flags() & ClassDefinition.IS_OVERRIDE) == 0) {
+			if ((! isCheckingInterface) && (member.flags() & ClassDefinition.IS_OVERRIDE) == 0) {
 				context.errors.push(new CompileError(member.getNameToken(), "overriding functions must have 'override' attribute set (defined in base class '" + this.className() + "')"));
 				return false;
 			}
@@ -818,10 +819,10 @@ class ClassDefinition implements Stashable {
 			return true;
 		}
 		// delegate to base classes
-		if (this._extendType != null && ! this._extendType.getClassDef()._assertMemberFunctionIsDefinable(context, member, memberClassDef, token, false))
+		if (this._extendType != null && ! this._extendType.getClassDef()._assertMemberFunctionIsDefinable(context, member, memberClassDef, token, false, isCheckingInterface))
 			return false;
 		for (var i = 0; i < this._implementTypes.length; ++i)
-			if (! this._implementTypes[i].getClassDef()._assertMemberFunctionIsDefinable(context, member, memberClassDef, token, false))
+			if (! this._implementTypes[i].getClassDef()._assertMemberFunctionIsDefinable(context, member, memberClassDef, token, false, isCheckingInterface))
 				return false;
 		return true;
 	}
