@@ -1751,9 +1751,13 @@ class _FoldConstantCommand extends _FunctionOptimizeCommand {
 
 		} else if (expr instanceof ConditionalExpression) {
 
-			var condExpr = (expr as ConditionalExpression).getCondExpr();
+			var conditionalExpr = expr as ConditionalExpression;
+			var condExpr = conditionalExpr.getCondExpr();
 			if ((condition = _Util.conditionIsConstant(condExpr)) != null) {
-				replaceCb(condition ? (expr as ConditionalExpression).getIfTrueExpr() : (expr as ConditionalExpression).getIfFalseExpr());
+				var ifTrueExpr = conditionalExpr.getIfTrueExpr() ?: condExpr;
+				var ifFalseExpr = conditionalExpr.getIfFalseExpr();
+
+				replaceCb(condition ? ifTrueExpr : ifFalseExpr);
 			}
 
 		}
