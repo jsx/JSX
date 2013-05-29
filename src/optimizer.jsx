@@ -97,7 +97,7 @@ class _Util {
 		} else if (expr instanceof StringLiteralExpression) {
 			return expr.getToken().getValue().length > 2;
 		} else if (expr instanceof NumberLiteralExpression || expr instanceof IntegerLiteralExpression) {
-			return expr.getToken().getValue() as number != 0;
+			return (expr.getToken().getValue() as number) as boolean;
 		} else if (expr instanceof MapLiteralExpression || expr instanceof ArrayLiteralExpression) {
 			return true;
 		}
