@@ -1737,13 +1737,13 @@ class _FoldConstantCommand extends _FunctionOptimizeCommand {
 			if ((condition = _Util.conditionIsConstant(firstExpr)) != null) {
 				var op = expr.getToken().getValue();
 				if (op == "||" && condition) {
-					replaceCb(firstExpr);
+					replaceCb(new AsExpression(firstExpr.getToken(), firstExpr, Type.booleanType));
 				} else if (op == "||" && (! condition)) {
-					replaceCb(secondExpr);
+					replaceCb(new AsExpression(secondExpr.getToken(), secondExpr, Type.booleanType));
 				} else if (op == "&&" && condition) {
-					replaceCb(secondExpr);
+					replaceCb(new AsExpression(secondExpr.getToken(), secondExpr, Type.booleanType));
 				} else if (op == "&&" && (! condition)) {
-					replaceCb(firstExpr);
+					replaceCb(new AsExpression(firstExpr.getToken(), firstExpr, Type.booleanType));
 				} else {
 					throw new Error("logic flaw");
 				}
