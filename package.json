@@ -1,6 +1,6 @@
 {
   "name":        "jsx",
-  "version":     "0.9.32",
+  "version":     "0.9.33",
   "description": "a faster, safer, easier JavaScript",
   "license" : "MIT",
   "keywords": ["jsx", "compiler", "altjs"],

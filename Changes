@@ -1,5 +1,12 @@
 Revision history for the JSX software development kit
 
+0.9.33 2013-05-29 18:58:00
+    [CHANGES]
+    - improve dce optimizer (#182)
+
+    [BUG FIXES]
+    - Partial fix for #173
+
 0.9.32 2013-05-28 09:22:05
     [BUG FIXES]
     - Fix bugs (#171, #174)
