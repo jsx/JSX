@@ -1507,10 +1507,10 @@ class CodeTransformer {
 	}
 
 	function _compileYields(funcDef : MemberFunctionDefinition) : void { // FIXME wasabiz nested generator
-		var yieldType = (funcDef.getReturnType().getClassDef() as InstantiatedClassDefinition).getTypeArguments()[0];
+		var yieldingType = (funcDef.getReturnType().getClassDef() as InstantiatedClassDefinition).getTypeArguments()[0];
 
 		// create a generator object
-		var genType = this._instantiateGeneratorType(yieldType);
+		var genType = this._instantiateGeneratorType(yieldingType);
 		var genLocalName = "$generator" + CodeTransformer._getGeneratorNestDepth(funcDef) as string;
 		var genLocal = new LocalVariable(new Token(genLocalName, false), genType);
 		funcDef.getLocals().push(genLocal);
@@ -1540,7 +1540,7 @@ class CodeTransformer {
 								new LocalExpression(new Token(genLocalName, false), genLocal),
 								new Token("__value", false),
 								[],
-								yieldType),
+								yieldingType),
 							(statements[idx] as YieldStatement).getExpr())),
 					new ExpressionStatement(
 						new AssignmentExpression(
@@ -1595,11 +1595,11 @@ class CodeTransformer {
 				new LocalExpression(new Token("$generator", false), genLocal)));
 	}
 
-	function _instantiateGeneratorType (yieldType : Type) : Type {
+	function _instantiateGeneratorType (yieldingType : Type) : Type {
 		// instantiate generator
 		var genClassDef = this._jsxGeneratorClassDef.instantiateTemplateClass(
 			[],	// errors
-			new TemplateInstantiationRequest(null, "__jsx_generator", [ yieldType ] : Type[])
+			new TemplateInstantiationRequest(null, "__jsx_generator", [ yieldingType ] : Type[])
 		);
 		this._jsxGeneratorClassDef.getParser()._classDefs.push(genClassDef);
 
