@@ -482,6 +482,19 @@ abstract class _StatementTransformer {
 		output.push(new ExpressionStatement(expr));
 	}
 
+	function _transformAndPush (input : Statement, output : Statement[]) : void {
+		var conved = this._transformer._getStatementTransformerFor(input).replaceControlStructuresWithGotos();
+		for (var i = 0; i < conved.length; ++i) {
+			output.push(conved[i]);
+		}
+	}
+
+	function _transformAndPush (input : Statement[], output : Statement[]) : void {
+		for (var i = 0; i < input.length; ++i) {
+			this._transformAndPush(input[i], output);
+		}
+	}
+
 }
 
 class _ConstructorInvocationStatementTransformer extends _StatementTransformer {
@@ -701,7 +714,7 @@ class _DoWhileStatementTransformer extends _LabellableStatementTransformer {
 		statements.push(new GotoStatement(bodyLabel));
 		statements.push(new LabelStatement(bodyLabel));
 		this._transformer.enterLabelledBlock(this);
-		this._transformer.convertAndPushStatements(this._statement.getStatements(), statements);
+		this._transformAndPush(this._statement.getStatements(), statements);
 		this._transformer.leaveLabelledBlock();
 		var testLabel = "$TEST_DO_WHILE_" + this.getID() as string;
 		statements.push(new GotoStatement(testLabel));
@@ -800,7 +813,7 @@ class _ForStatementTransformer extends _LabellableStatementTransformer {
 		_StatementTransformer.pushConditionalBranch(this._statement.getCondExpr(), bodyLabel, endLabel, statements);
 		statements.push(new LabelStatement(bodyLabel));
 		this._transformer.enterLabelledBlock(this);
-		this._transformer.convertAndPushStatements(this._statement.getStatements(), statements);
+		this._transformAndPush(this._statement.getStatements(), statements);
 		this._transformer.leaveLabelledBlock();
 		var postLabel = "$POST_FOR_" + this.getID() as string;
 		statements.push(new GotoStatement(postLabel));
@@ -867,11 +880,11 @@ class _IfStatementTransformer extends _StatementTransformer {
 		statements.push(new LabelStatement(testLabel));
 		_StatementTransformer.pushConditionalBranch(this._statement.getExpr(), succLabel, failLabel, statements);
 		statements.push(new LabelStatement(succLabel));
-		this._transformer.convertAndPushStatements(this._statement.getOnTrueStatements(), statements);
+		this._transformAndPush(this._statement.getOnTrueStatements(), statements);
 		var endLabel = "$END_IF_" + this.getID() as string;
 		statements.push(new GotoStatement(endLabel));
 		statements.push(new LabelStatement(failLabel));
-		this._transformer.convertAndPushStatements(this._statement.getOnFalseStatements(), statements);
+		this._transformAndPush(this._statement.getOnFalseStatements(), statements);
 		statements.push(new GotoStatement(endLabel));
 		statements.push(new LabelStatement(endLabel));
 		return statements;
@@ -981,7 +994,7 @@ class _SwitchStatementTransformer extends _LabellableStatementTransformer {
 				output.push(new GotoStatement(label));
 				output.push(new LabelStatement(label));
 			} else {
-				this._transformer.convertAndPushStatement(stmt, output);
+				this._transformAndPush(stmt, output);
 			}
 		}
 		this._transformer.leaveLabelledBlock();
@@ -1085,7 +1098,7 @@ class _WhileStatementTransformer extends _LabellableStatementTransformer {
 		_StatementTransformer.pushConditionalBranch(this._statement.getExpr(), bodyLabel, endLabel, statements);
 		statements.push(new LabelStatement(bodyLabel));
 		this._transformer.enterLabelledBlock(this);
-		this._transformer.convertAndPushStatements(this._statement.getStatements(), statements);
+		this._transformAndPush(this._statement.getStatements(), statements);
 		this._transformer.leaveLabelledBlock();
 		statements.push(new GotoStatement(testLabel));
 		statements.push(new LabelStatement(endLabel));
@@ -1249,19 +1262,6 @@ class CodeTransformer {
 
 	function leaveLabelledBlock () : void {
 		this._labelMap.pop();
-	}
-
-	function convertAndPushStatement (input : Statement, output : Statement[]) : void {
-		var conved = this._getStatementTransformerFor(input).replaceControlStructuresWithGotos();
-		for (var i = 0; i < conved.length; ++i) {
-			output.push(conved[i]);
-		}
-	}
-
-	function convertAndPushStatements (input : Statement[], output : Statement[]) : void {
-		for (var i = 0; i < input.length; ++i) {
-			this.convertAndPushStatement(input[i], output);
-		}
 	}
 
 	var _statementIDs = new Map.<number>;
