@@ -472,7 +472,7 @@ abstract class _StatementTransformer {
 
 	abstract function getStatement () : Statement;
 
-	abstract function replaceControlStructuresWithGotos () : Statement[];
+	abstract function _replaceControlStructuresWithGotos () : Statement[];
 
 	static function pushConditionalBranch (expr : Expression, succLabel : string, failLabel : string, output : Statement[]) : void {
 		output.push(new IfStatement(new Token("if", false), expr, [ new GotoStatement(succLabel) ] : Statement[], [ new GotoStatement(failLabel) ] : Statement[]));
@@ -483,7 +483,7 @@ abstract class _StatementTransformer {
 	}
 
 	function _transformAndPush (input : Statement, output : Statement[]) : void {
-		var conved = this._transformer._getStatementTransformerFor(input).replaceControlStructuresWithGotos();
+		var conved = this._transformer._getStatementTransformerFor(input)._replaceControlStructuresWithGotos();
 		for (var i = 0; i < conved.length; ++i) {
 			output.push(conved[i]);
 		}
@@ -510,7 +510,7 @@ class _ConstructorInvocationStatementTransformer extends _StatementTransformer {
 		return this._statement;
 	}
 
-	override function replaceControlStructuresWithGotos () : Statement[] {
+	override function _replaceControlStructuresWithGotos () : Statement[] {
 		return [ this._statement ] : Statement[];
 	}
 
@@ -529,7 +529,7 @@ class _ExpressionStatementTransformer extends _StatementTransformer {
 		return this._statement;
 	}
 
-	override function replaceControlStructuresWithGotos () : Statement[] {
+	override function _replaceControlStructuresWithGotos () : Statement[] {
 		return [ this._statement ] : Statement[];
 	}
 
@@ -548,7 +548,7 @@ class _FunctionStatementTransformer extends _StatementTransformer {
 		return this._statement;
 	}
 
-	override function replaceControlStructuresWithGotos () : Statement[] {
+	override function _replaceControlStructuresWithGotos () : Statement[] {
 		return [ this._statement ] : Statement[];
 	}
 
@@ -567,7 +567,7 @@ class _ReturnStatementTransformer extends _StatementTransformer {
 		return this._statement;
 	}
 
-	override function replaceControlStructuresWithGotos () : Statement[] {
+	override function _replaceControlStructuresWithGotos () : Statement[] {
 		throw new Error("logic flaw");
 	}
 
@@ -586,7 +586,7 @@ class _YieldStatementTransformer extends _StatementTransformer {
 		return this._statement;
 	}
 
-	override function replaceControlStructuresWithGotos () : Statement[] {
+	override function _replaceControlStructuresWithGotos () : Statement[] {
 		var statements = new Statement[];
 		statements.push(this._statement);
 		// split the continuation
@@ -611,7 +611,7 @@ class _DeleteStatementTransformer extends _StatementTransformer {
 		return this._statement;
 	}
 
-	override function replaceControlStructuresWithGotos () : Statement[] {
+	override function _replaceControlStructuresWithGotos () : Statement[] {
 		return [ this._statement ] : Statement[];
 	}
 
@@ -630,7 +630,7 @@ class _BreakStatementTransformer extends _StatementTransformer {
 		return this._statement;
 	}
 
-	override function replaceControlStructuresWithGotos () : Statement[] {
+	override function _replaceControlStructuresWithGotos () : Statement[] {
 		if (this._statement.getLabel() != null) {
 			var trans = this._transformer.getStatementTransformerByLabel(this._statement.getLabel().getValue());
 		} else {
@@ -654,7 +654,7 @@ class _ContinueStatementTransformer extends _StatementTransformer {
 		return this._statement;
 	}
 
-	override function replaceControlStructuresWithGotos () : Statement[] {
+	override function _replaceControlStructuresWithGotos () : Statement[] {
 		if (this._statement.getLabel() != null) {
 			var trans = this._transformer.getStatementTransformerByLabel(this._statement.getLabel().getValue());
 		} else {
@@ -689,7 +689,7 @@ class _DoWhileStatementTransformer extends _LabellableStatementTransformer {
 		return this._statement;
 	}
 
-	override function replaceControlStructuresWithGotos () : Statement[] {
+	override function _replaceControlStructuresWithGotos () : Statement[] {
 		/*
 
 		do {
@@ -748,7 +748,7 @@ class _ForInStatementTransformer extends _LabellableStatementTransformer {
 		return this._statement;
 	}
 
-	override function replaceControlStructuresWithGotos () : Statement[] {
+	override function _replaceControlStructuresWithGotos () : Statement[] {
 		throw new Error("logic flaw");
 	}
 
@@ -774,7 +774,7 @@ class _ForStatementTransformer extends _LabellableStatementTransformer {
 		return this._statement;
 	}
 
-	override function replaceControlStructuresWithGotos () : Statement[] {
+	override function _replaceControlStructuresWithGotos () : Statement[] {
 		/*
 
 		for (init; cond; post) {
@@ -847,7 +847,7 @@ class _IfStatementTransformer extends _StatementTransformer {
 		return this._statement;
 	}
 
-	override function replaceControlStructuresWithGotos () : Statement[] {
+	override function _replaceControlStructuresWithGotos () : Statement[] {
 		/*
 
 		if (test) {
@@ -905,7 +905,7 @@ class _SwitchStatementTransformer extends _LabellableStatementTransformer {
 		return this._statement;
 	}
 
-	override function replaceControlStructuresWithGotos () : Statement[] {
+	override function _replaceControlStructuresWithGotos () : Statement[] {
 		/*
 
 		switch (expr) {
@@ -1031,7 +1031,7 @@ class _CaseStatementTransformer extends _StatementTransformer {
 		return this._statement;
 	}
 
-	override function replaceControlStructuresWithGotos () : Statement[] {
+	override function _replaceControlStructuresWithGotos () : Statement[] {
 		throw new Error("logic flaw");
 	}
 
@@ -1050,7 +1050,7 @@ class _DefaultStatementTransformer extends _StatementTransformer {
 		return this._statement;
 	}
 
-	override function replaceControlStructuresWithGotos () : Statement[] {
+	override function _replaceControlStructuresWithGotos () : Statement[] {
 		throw new Error("logic flaw");
 	}
 
@@ -1069,7 +1069,7 @@ class _WhileStatementTransformer extends _LabellableStatementTransformer {
 		return this._statement;
 	}
 
-	override function replaceControlStructuresWithGotos () : Statement[] {
+	override function _replaceControlStructuresWithGotos () : Statement[] {
 		/*
 
 		while (expr) {
@@ -1128,7 +1128,7 @@ class _TryStatementTransformer extends _StatementTransformer {
 		return this._statement;
 	}
 
-	override function replaceControlStructuresWithGotos () : Statement[] {
+	override function _replaceControlStructuresWithGotos () : Statement[] {
 		throw new Error("logic flaw");
 	}
 
@@ -1147,7 +1147,7 @@ class _CatchStatementTransformer extends _StatementTransformer {
 		return this._statement;
 	}
 
-	override function replaceControlStructuresWithGotos () : Statement[] {
+	override function _replaceControlStructuresWithGotos () : Statement[] {
 		throw new Error("logic flaw");
 	}
 
@@ -1166,7 +1166,7 @@ class _ThrowStatementTransformer extends _StatementTransformer {
 		return this._statement;
 	}
 
-	override function replaceControlStructuresWithGotos () : Statement[] {
+	override function _replaceControlStructuresWithGotos () : Statement[] {
 		return [ this._statement ] : Statement[];
 	}
 
@@ -1185,7 +1185,7 @@ class _AssertStatementTransformer extends _StatementTransformer {
 		return this._statement;
 	}
 
-	override function replaceControlStructuresWithGotos () : Statement[] {
+	override function _replaceControlStructuresWithGotos () : Statement[] {
 		return [ this._statement ] : Statement[];
 	}
 
@@ -1204,7 +1204,7 @@ class _LogStatementTransformer extends _StatementTransformer {
 		return this._statement;
 	}
 
-	override function replaceControlStructuresWithGotos () : Statement[] {
+	override function _replaceControlStructuresWithGotos () : Statement[] {
 		return [ this._statement ] : Statement[];
 	}
 
@@ -1223,7 +1223,7 @@ class _DebuggerStatementTransformer extends _StatementTransformer {
 		return this._statement;
 	}
 
-	override function replaceControlStructuresWithGotos () : Statement[] {
+	override function _replaceControlStructuresWithGotos () : Statement[] {
 		return [ this._statement ] : Statement[];
 	}
 
@@ -1407,7 +1407,7 @@ class CodeTransformer {
 		// replace control structures with goto statements
 		var statements = new Statement[];
 		for (var i = 0; i < funcDef.getStatements().length; ++i) {
-			statements = statements.concat(this._getStatementTransformerFor(funcDef.getStatements()[i]).replaceControlStructuresWithGotos());
+			statements = statements.concat(this._getStatementTransformerFor(funcDef.getStatements()[i])._replaceControlStructuresWithGotos());
 		}
 		// insert prologue code
 		statements.unshift(
