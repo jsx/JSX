@@ -1728,6 +1728,27 @@ class _FoldConstantCommand extends _FunctionOptimizeCommand {
 				replaceCb(new BooleanLiteralExpression(new Token(condition ? "false" : "true", false))); // inverse the result
 			}
 
+		} else if (expr instanceof LogicalExpression) {
+
+			var firstExpr = (expr as LogicalExpression).getFirstExpr();
+			var secondExpr = (expr as LogicalExpression).getSecondExpr();
+
+			var condition;
+			if ((condition = _Util.conditionIsConstant(firstExpr)) != null) {
+				var op = expr.getToken().getValue();
+				if (op == "||" && condition) {
+					replaceCb(firstExpr);
+				} else if (op == "||" && (! condition)) {
+					replaceCb(secondExpr);
+				} else if (op == "&&" && condition) {
+					replaceCb(secondExpr);
+				} else if (op == "&&" && (! condition)) {
+					replaceCb(firstExpr);
+				} else {
+					throw new Error("logic flaw");
+				}
+			}
+
 		}
 
 		return true;
