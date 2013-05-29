@@ -1411,8 +1411,8 @@ class CodeTransformer {
 		}
 		// insert prologue code
 		statements.unshift(
-			new GotoStatement("$START"),
-			new LabelStatement("$START")
+			new GotoStatement("$BEGIN"),
+			new LabelStatement("$BEGIN")
 		);
 		// insert epilogue code
 		statements.push(
@@ -1569,9 +1569,9 @@ class CodeTransformer {
 
 		// replace entry point
 		/*
-		  $START();
+		  $BEGIN();
 
-		  -> $generatorN.__next = $START;
+		  -> $generatorN.__next = $BEGIN;
 		 */
 		var statements = funcDef.getStatements();
 		statements.splice(statements.length - 1, 1,
@@ -1585,7 +1585,7 @@ class CodeTransformer {
 						[],
 						new StaticFunctionType(null, Type.voidType, [], true)),
 					new LocalExpression(
-						new Token("$START", true),
+						new Token("$BEGIN", true),
 						(((statements[statements.length - 1] as ExpressionStatement).getExpr() as CallExpression).getExpr() as LocalExpression).getLocal()))));
 
 		// return the generator
