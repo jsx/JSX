@@ -1403,7 +1403,41 @@ class CodeTransformer {
 		this._compileYields(funcDef);
 	}
 
-	function _doCPSTransform (funcDef : MemberFunctionDefinition, postFragmentationCallback : (string, Statement[]) -> void) : void {
+	function _createIdentityFunction (parent : MemberFunctionDefinition, type : Type) : FunctionExpression {
+		var arg = this.createFreshArgumentDeclaration(type);
+		var identity = new MemberFunctionDefinition(
+			new Token("function", false),
+			null,	// name
+			ClassDefinition.IS_STATIC,
+			type,
+			[ arg ],
+			[],	// locals
+			[ new ExpressionStatement(new LocalExpression(new Token(arg.getName().getValue(), true), arg)) ] : Statement[],
+			[],	// closures
+			null,	// lastToken
+			null
+		);
+		parent.getClosures().push(identity);
+		return new FunctionExpression(identity.getToken(), identity);
+	}
+
+	function doCPSTransform (funcDef : MemberFunctionDefinition) : void {
+		this._doCPSTransform(funcDef, true, function (name, statements) {
+			// do nothing
+		});
+	}
+
+	function _doCPSTransform (funcDef : MemberFunctionDefinition, transformExpr : boolean, postFragmentationCallback : (string, Statement[]) -> void) : void {
+		if (transformExpr) {
+			// transform expressions inside as well
+			for (var i = 0; i < funcDef.getStatements().length; ++i) {
+				var statement = funcDef.getStatements()[i];
+				statement.forEachExpression(function (expr, replaceCb) {
+					replaceCb(this._getExpressionTransformerFor(expr).doCPSTransform(funcDef, this._createIdentityFunction(funcDef, expr.getType())));
+					return true;
+				});
+			}
+		}
 		// replace control structures with goto statements
 		var statements = new Statement[];
 		for (var i = 0; i < funcDef.getStatements().length; ++i) {
@@ -1528,7 +1562,7 @@ class CodeTransformer {
 		  -> $generatorN.__value = expr;
 		     $generatorN.__next = $LABEL;
 		 */
-		this._doCPSTransform(funcDef, function (label : string, statements : Statement[]) : void {
+		this._doCPSTransform(funcDef, false, function (label : string, statements : Statement[]) : void {
 			if (2 <= statements.length && statements[statements.length - 2] instanceof YieldStatement) {
 				var idx = statements.length - 2;
 				statements.splice(idx, 2,
