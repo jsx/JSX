@@ -91,6 +91,19 @@ class _Util {
 		return ! onExpr(expr, null);
 	}
 
+	static function conditionIsConstant (expr : Expression) : Nullable.<boolean> {
+		if (expr instanceof BooleanLiteralExpression) {
+			return expr.getToken().getValue() == "true";
+		} else if (expr instanceof StringLiteralExpression) {
+			return expr.getToken().getValue().length > 2;
+		} else if (expr instanceof NumberLiteralExpression || expr instanceof IntegerLiteralExpression) {
+			return (expr.getToken().getValue() as number) as boolean;
+		} else if (expr instanceof MapLiteralExpression || expr instanceof ArrayLiteralExpression) {
+			return true;
+		}
+		return null;
+	}
+
 	static function optimizeBasicBlock (funcDef : MemberFunctionDefinition, optimizeExpressions : function(:Expression[]):void) : void {
 		function optimizeStatements(statements : Statement[]) : void {
 			var statementIndex = 0;
@@ -1707,6 +1720,46 @@ class _FoldConstantCommand extends _FunctionOptimizeCommand {
 				}
 			}
 
+		} else if (expr instanceof LogicalNotExpression) {
+
+			var innerExpr = (expr as LogicalNotExpression).getExpr();
+			var condition;
+			if ((condition = _Util.conditionIsConstant(innerExpr)) != null) {
+				replaceCb(new BooleanLiteralExpression(new Token(condition ? "false" : "true", false))); // inverse the result
+			}
+
+		} else if (expr instanceof LogicalExpression) {
+
+			firstExpr = (expr as LogicalExpression).getFirstExpr();
+			secondExpr = (expr as LogicalExpression).getSecondExpr();
+
+			var condition;
+			if ((condition = _Util.conditionIsConstant(firstExpr)) != null) {
+				var op = expr.getToken().getValue();
+				if (op == "||" && condition) {
+					replaceCb(new AsExpression(firstExpr.getToken(), firstExpr, Type.booleanType));
+				} else if (op == "||" && (! condition)) {
+					replaceCb(new AsExpression(secondExpr.getToken(), secondExpr, Type.booleanType));
+				} else if (op == "&&" && condition) {
+					replaceCb(new AsExpression(secondExpr.getToken(), secondExpr, Type.booleanType));
+				} else if (op == "&&" && (! condition)) {
+					replaceCb(new AsExpression(firstExpr.getToken(), firstExpr, Type.booleanType));
+				} else {
+					throw new Error("logic flaw");
+				}
+			}
+
+		} else if (expr instanceof ConditionalExpression) {
+
+			var conditionalExpr = expr as ConditionalExpression;
+			var condExpr = conditionalExpr.getCondExpr();
+			if ((condition = _Util.conditionIsConstant(condExpr)) != null) {
+				var ifTrueExpr = conditionalExpr.getIfTrueExpr() ?: condExpr;
+				var ifFalseExpr = conditionalExpr.getIfFalseExpr();
+
+				replaceCb(condition ? ifTrueExpr : ifFalseExpr);
+			}
+
 		}
 
 		return true;
@@ -2184,18 +2237,6 @@ class _DeadCodeEliminationOptimizeCommand extends _FunctionOptimizeCommand {
 	}
 
 	function _eliminateDeadConditions (funcDef : MemberFunctionDefinition, exprs : Expression[]) : void {
-		function conditionIsConstant(expr : Expression) : Nullable.<boolean> {
-			if (expr instanceof BooleanLiteralExpression) {
-				return expr.getToken().getValue() == "true";
-			} else if (expr instanceof StringLiteralExpression) {
-				return expr.getToken().getValue().length > 2;
-			} else if (expr instanceof NumberLiteralExpression || expr instanceof IntegerLiteralExpression) {
-				return expr.getToken().getValue() as number != 0;
-			} else if (expr instanceof MapLiteralExpression || expr instanceof ArrayLiteralExpression) {
-				return true;
-			}
-			return null;
-		}
 		function spliceStatements (dest : Statement[], index : number, src : Statement[]) : void {
 			dest.splice(index, 1);
 			for (var i = 0; i < src.length; ++i) {
@@ -2207,7 +2248,7 @@ class _DeadCodeEliminationOptimizeCommand extends _FunctionOptimizeCommand {
 				var statement = statements[i];
 				if (statement instanceof IfStatement) {
 					var ifStatement = statement as IfStatement;
-					var cond = conditionIsConstant(ifStatement.getExpr());
+					var cond = _Util.conditionIsConstant(ifStatement.getExpr());
 					if (cond == null) {
 						// nothing to do
 					} else if (cond == false && ifStatement.getOnFalseStatements().length == 0) {
