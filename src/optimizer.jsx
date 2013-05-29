@@ -1730,8 +1730,8 @@ class _FoldConstantCommand extends _FunctionOptimizeCommand {
 
 		} else if (expr instanceof LogicalExpression) {
 
-			var firstExpr = (expr as LogicalExpression).getFirstExpr();
-			var secondExpr = (expr as LogicalExpression).getSecondExpr();
+			firstExpr = (expr as LogicalExpression).getFirstExpr();
+			secondExpr = (expr as LogicalExpression).getSecondExpr();
 
 			var condition;
 			if ((condition = _Util.conditionIsConstant(firstExpr)) != null) {
@@ -1747,6 +1747,13 @@ class _FoldConstantCommand extends _FunctionOptimizeCommand {
 				} else {
 					throw new Error("logic flaw");
 				}
+			}
+
+		} else if (expr instanceof ConditionalExpression) {
+
+			var condExpr = (expr as ConditionalExpression).getCondExpr();
+			if ((condition = _Util.conditionIsConstant(condExpr)) != null) {
+				replaceCb(condition ? (expr as ConditionalExpression).getIfTrueExpr() : (expr as ConditionalExpression).getIfFalseExpr());
 			}
 
 		}
