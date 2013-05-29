@@ -103,11 +103,12 @@ class _Util {
 		for (var i = 0; i < classDefs.length; ++i) {
 			var classDef = classDefs[i];
 			if ((classDef.flags() & ClassDefinition.IS_NATIVE) != 0) {
-				// check that the names of native classes do not conflict, and register the ocurrences
 				var className = classDef.className();
-				assert ! countByName[className];
-				setOutputName(classDef, escapeClassNameIfInstantiated(className));
-				countByName[className] = 1;
+				if (! countByName.hasOwnProperty(className)) {
+					// FIXME t/run/264
+					setOutputName(classDef, escapeClassNameIfInstantiated(className));
+					countByName[className] = 1;
+				}
 			}
 		}
 		for (var i = 0; i < classDefs.length; ++i) {
