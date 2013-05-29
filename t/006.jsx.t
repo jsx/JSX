@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 use tool::Util;
-use Test::More tests => 53;
+use Test::More tests => 106;
 
 note "testing jsx(1)";
 
@@ -35,34 +35,38 @@ sub jsx_fail_ok {
     ok  $stderr, "... with    stderr output";
 }
 
-jsx_ok("--version");
-jsx_ok("--version");
-jsx_ok("--help");
+foreach my $jsx(qw(bin/jsx bin/jsx-with-server)) {
+    local $tool::Util::JSX = $jsx;
 
-jsx_fail_ok("--no-such-option");
+    jsx_ok("--version");
+    jsx_ok("--version");
+    jsx_ok("--help");
 
-# the following options require an argument
-jsx_fail_ok("--executable");
-jsx_fail_ok("--add-search-path");
-jsx_fail_ok("--mode");
-jsx_fail_ok("--complete");
-jsx_fail_ok("--target");
+    jsx_fail_ok("--no-such-option");
 
-jsx_fail_ok("--optimize no-such-optimize-command t/006.jsx/hello.jsx");
+    # the following options require an argument
 
-# sanity check
+    jsx_fail_ok("--executable");
+    jsx_fail_ok("--add-search-path");
+    jsx_fail_ok("--mode");
+    jsx_fail_ok("--complete");
+    jsx_fail_ok("--target");
 
-jsx_ok("--run t/006.jsx/hello.jsx", "Hello, world!\n");
-jsx_ok("--run --executable node t/006.jsx/hello.jsx", "Hello, world!\n");
-jsx_ok("--run --release t/006.jsx/hello.jsx", "");
-jsx_ok("--run --working-dir t/ 006.jsx/hello.jsx", "Hello, world!\n");
+    jsx_fail_ok("--optimize no-such-optimize-command t/006.jsx/hello.jsx");
 
-jsx_ok("--run t/006.jsx/dump-args.jsx foo bar",    qq{["foo","bar"]\n});
-jsx_ok("--run t/006.jsx/dump-args.jsx 'foo bar'",  qq{["foo bar"]\n});
-jsx_ok("--run t/006.jsx/dump-args.jsx '/@~_+&=;'", qq{["/@~_+&=;"]\n});
+    # sanity check
 
-# real command
+    jsx_ok("--run t/006.jsx/hello.jsx", "Hello, world!\n");
+    jsx_ok("--run --executable node t/006.jsx/hello.jsx", "Hello, world!\n");
+    jsx_ok("--run --release t/006.jsx/hello.jsx", "");
+    jsx_ok("--run --working-dir t/ 006.jsx/hello.jsx", "Hello, world!\n");
 
-is scalar(`bin/jsx --run --input-filename t/006.jsx/hello.jsx -- - < t/006.jsx/hello.jsx`), "Hello, world!\n", "jsx --run -- - (input from stdin)";
-is $?, 0, "... exited successfully";
+    jsx_ok("--run t/006.jsx/dump-args.jsx foo bar",    qq{["foo","bar"]\n});
+    jsx_ok("--run t/006.jsx/dump-args.jsx 'foo bar'",  qq{["foo bar"]\n});
+    jsx_ok("--run t/006.jsx/dump-args.jsx '/@~_+&=;'", qq{["/@~_+&=;"]\n});
 
+    # real command
+
+    is scalar(`$jsx --run --input-filename t/006.jsx/hello.jsx -- - < t/006.jsx/hello.jsx`), "Hello, world!\n", "jsx --run -- - (input from stdin)";
+    is $?, 0, "... exited successfully";
+}
