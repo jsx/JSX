@@ -1,5 +1,9 @@
 Revision history for the JSX software development kit
 
+0.9.34 2013-05-29 23:20:27
+    [BUG FIXES]
+    - Fix legacy AudioContext methods in web.jsx
+
 0.9.33 2013-05-29 18:58:00
     [CHANGES]
     - improve dce optimizer (#182)
