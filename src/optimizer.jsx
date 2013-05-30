@@ -92,14 +92,31 @@ class _Util {
 	}
 
 	static function conditionIsConstant (expr : Expression) : Nullable.<boolean> {
-		if (expr instanceof BooleanLiteralExpression) {
-			return expr.getToken().getValue() == "true";
-		} else if (expr instanceof StringLiteralExpression) {
-			return expr.getToken().getValue().length > 2;
-		} else if (expr instanceof NumberLiteralExpression || expr instanceof IntegerLiteralExpression) {
-			return (expr.getToken().getValue() as number) as boolean;
-		} else if (expr instanceof MapLiteralExpression || expr instanceof ArrayLiteralExpression) {
-			return true;
+		function leafIsConstant (expr : Expression) : Nullable.<boolean> {
+			if (expr instanceof NullExpression) {
+				return false;
+			} else if (expr instanceof BooleanLiteralExpression) {
+				return expr.getToken().getValue() == "true";
+			} else if (expr instanceof StringLiteralExpression) {
+				return expr.getToken().getValue().length > 2;
+			} else if (expr instanceof NumberLiteralExpression || expr instanceof IntegerLiteralExpression) {
+				return (expr.getToken().getValue() as number) as boolean;
+			} else if (expr instanceof MapLiteralExpression || expr instanceof ArrayLiteralExpression) {
+				return true;
+			}
+			return null;
+		}
+
+		if (expr instanceof LeafExpression) {
+			return leafIsConstant(expr);
+		} else if (expr instanceof AsExpression) {
+			var asExpr = expr as AsExpression;
+			if (asExpr.getType().equals(Type.booleanType)) {
+				return leafIsConstant(asExpr.getExpr());
+			} else {
+				// TODO
+				return null;
+			}
 		}
 		return null;
 	}
