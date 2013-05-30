@@ -451,6 +451,156 @@ class _ShiftExpressionTransformer extends _BinaryExpressionTransformer {
 
 }
 
+class _CallExpressionTransformer {
+
+	var _expr : CallExpression;
+
+	function constructor (transformer : CodeTransformer, expr : CallExpression) {
+		super(transformer, "CALL");
+		this._expr = expr;
+	}
+
+	override function getExpression () : Expression {
+		return this._expr;
+	}
+
+	override function doCPSTransform (parent : MemberFunctionDefinition, continuation : Expression) : Expression {
+
+		// function calls considered primitive operation
+
+		var expr = this._expr.getExpr();
+		if (expr instanceof PropertyExpression && (! expr.getType().isAssignable())) {
+			// method calls;
+			throw new Error("TODO method call is not yet supported");
+		}
+
+		switch (this._expr.getArguments().length) {
+		case 0:
+			return this._transformCall0(parent, continuation);
+		case 1:
+			return this._transformCall1(parent, continuation);
+		default:
+			throw new Error("TODO: function call with more than 3 arguments is not yet supported");
+		}
+
+	}
+
+	function _transformCall1 (parent : MemberFunctionDefinition, continuation : Expression) : Expression {
+		/*
+
+f(a) | C
+
+f | function ($f) { a | funciton ($a) { $C($f($a)); } }
+
+		*/
+
+		var closures = new MemberFunctionDefinition[];
+		contBody.forEachExpression(function (expr) {
+			if (expr instanceof FunctionExpression) {
+				closures.push((expr as FunctionExpression).getFuncDef());
+			}
+			// does not search for funcDefs deeper than the first level
+			return true;
+		});
+
+		// detach closures
+		for (var i = 0; i < closures.length; ++i) {
+			var j;
+			if ((j = parentFuncDef.getClosures().indexOf(closures[i])) != -1) {
+				parentFuncDef.getClosures().splice(j, 1);
+			}
+		}
+
+		// $f
+		var argf = this._transformer.createFreshArgumentDeclaration(this._expr.getExpr().getType());
+		var arga = this._transformer.createFreshArgumentDeclaration(this._expr.getArguments()[0].getType());
+
+		var argfExpr = new LocalExpression(argf.getToken(), argf);
+		var argaExpr = new LocalExpression(arga.getToken(), arga);
+
+		var contFuncDef = new MemberFunctionDefinition(
+			new Token("function", false),
+			null,	// name
+			ClassDefinition.IS_STATIC,
+			Type.voidType,
+			[ argf ],
+			[],	// locals
+			[ new ExpressionStatement(this._createCall1(continuation, new CallExpression(this._expr.getToken(), argfExpr, [ argaExpr ]))) ] : Statement[],
+			closures,
+			null,
+			null
+		);
+		parent.getClosures().push(contFuncDef);
+		var cont0 =  new FunctionExpression(contFuncDef.getToken(), contFuncDef);
+
+		var contFuncDef1 = new MemberFunctionDefinition(
+			new Token("function", false),
+			null,	// name
+			ClassDefinition.IS_STATIC,
+			Type.voidType,
+			[ arga ],
+			[],	// locals
+			[ new ExpressionStatement(argaExpr.doCPSTransform(parent, cont0)) ] : Statement[],
+			closures,
+			null,
+			null
+		);
+		parent.getClosures().push(contFuncDef1);
+		var cont1 = new FunctionExpression(contFuncDef1.getToken(), contFuncDef1);
+		return this._expr.getExpr().doCPSTransform(parent, cont1);
+	}
+
+	function _transformCall0 (parent : MemberFunctionDefinition, continuation : Expression) : Expression {
+		/*
+
+f() | C
+
+f | function ($f) { C($f()); }
+
+		*/
+
+		var closures = new MemberFunctionDefinition[];
+		contBody.forEachExpression(function (expr) {
+			if (expr instanceof FunctionExpression) {
+				closures.push((expr as FunctionExpression).getFuncDef());
+			}
+			// does not search for funcDefs deeper than the first level
+			return true;
+		});
+
+		// detach closures
+		for (var i = 0; i < closures.length; ++i) {
+			var j;
+			if ((j = parentFuncDef.getClosures().indexOf(closures[i])) != -1) {
+				parentFuncDef.getClosures().splice(j, 1);
+			}
+		}
+
+		// $f
+		var arg = this._transformer.createFreshArgumentDeclaration(this._expr.getExpr().getType());
+
+		var contFuncDef = new MemberFunctionDefinition(
+			new Token("function", false),
+			null,	// name
+			ClassDefinition.IS_STATIC,
+			Type.voidType,
+			[ arg ],
+			[],	// locals
+			[ new ExpressionStatement(this._createCall1(continuation, new CallExpression(this._expr.getToken(), new LocalExpression(arg), []))) ] : Statement[],
+			closures,
+			null,
+			null
+		);
+		parent.getClosures().push(contFuncDef);
+		var cont =  new FunctionExpression(contFuncDef.getToken(), contFuncDef);
+		return this._expr.doCPSTransform(parent, cont);
+	}
+
+	function _transformMethodCall () : Expression {
+	}
+
+}
+
 abstract class _StatementTransformer {
 
 	static var _statementCountMap = new Map.<number>;
@@ -1335,7 +1485,8 @@ class CodeTransformer {
 	function _getExpressionTransformerFor (expr : Expression) : _ExpressionTransformer {
 		if (expr instanceof LocalExpression)
 			return new _LeafExpressionTransformer(this, expr as LocalExpression);
-		// else if (expr instanceof ClassExpression)
+		else if (expr instanceof ClassExpression)
+			throw new Error("TODO");
 		// 	return new _ClassExpressionTransformer(this, expr as ClassExpression);
 		else if (expr instanceof NullExpression)
 			return new _LeafExpressionTransformer(this, expr as NullExpression);
@@ -1349,9 +1500,11 @@ class CodeTransformer {
 			return new _LeafExpressionTransformer(this, expr as StringLiteralExpression);
 		else if (expr instanceof RegExpLiteralExpression)
 			return new _LeafExpressionTransformer(this, expr as RegExpLiteralExpression);
-		// else if (expr instanceof ArrayLiteralExpression)
+		else if (expr instanceof ArrayLiteralExpression)
+			throw new Error("TODO");
 		// 	return new _ArrayLiteralExpressionTransformer(this, expr as ArrayLiteralExpression);
-		// else if (expr instanceof MapLiteralExpression)
+		else if (expr instanceof MapLiteralExpression)
+			throw new Error("TODO");
 		// 	return new _MapLiteralExpressionTransformer(this, expr as MapLiteralExpression);
 		else if (expr instanceof ThisExpression)
 			return new _ThisExpressionTransformer(this, expr as ThisExpression);
@@ -1391,22 +1544,27 @@ class CodeTransformer {
 			return new _LogicalExpressionTransformer(this, expr as LogicalExpression);
 		else if (expr instanceof ShiftExpression)
 			return new _ShiftExpressionTransformer(this, expr as ShiftExpression);
-		// else if (expr instanceof ConditionalExpression)
+		else if (expr instanceof ConditionalExpression)
+			throw new Error("TODO");
 		// 	return new _ConditionalExpressionTransformer(this, expr as ConditionalExpression);
-		// else if (expr instanceof CallExpression)
-		// 	return new _CallExpressionTransformer(this, expr as CallExpression);
-		// else if (expr instanceof SuperExpression)
+		else if (expr instanceof CallExpression)
+			return new _CallExpressionTransformer(this, expr as CallExpression);
+		else if (expr instanceof SuperExpression)
+			throw new Error("TODO");
 		// 	return new _SuperExpressionTransformer(this, expr as SuperExpression);
-		// else if (expr instanceof NewExpression)
+		else if (expr instanceof NewExpression)
+			throw new Error("TODO");
 		// 	return new _NewExpressionTransformer(this, expr as NewExpression);
 		else if (expr instanceof FunctionExpression)
 			return new _FunctionExpressionTransformer(this, expr as FunctionExpression);
-		// else if (expr instanceof CommaExpression)
+		else if (expr instanceof CommaExpression)
+			throw new Error("TODO");
 		// 	return new _CommaExpressionTransformer(this, expr as CommaExpression);
 		throw new Error("got unexpected type of expression: " + (expr != null ? JSON.stringify(expr.serialize()) : expr.toString()));
 	}
 
 	function transformFunctionDefinition (funcDef : MemberFunctionDefinition) : void {
+		this._doCPSTransform(funcDef);
 		this._compileYields(funcDef);
 	}
 
@@ -1428,7 +1586,7 @@ class CodeTransformer {
 		return new FunctionExpression(identity.getToken(), identity);
 	}
 
-	function doCPSTransform (funcDef : MemberFunctionDefinition) : void {
+	function _doCPSTransform (funcDef : MemberFunctionDefinition) : void {
 		this._doCPSTransform(funcDef, true, function (name, statements) {
 			// do nothing
 		});
