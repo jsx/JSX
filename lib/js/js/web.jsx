@@ -4153,11 +4153,12 @@ native class AudioContext {
 	function createWaveTable(real : Float32Array, imag : Float32Array) : WaveTable;
 
 	// deprecated
-	function createGainNode() : void;
+	function createGainNode() : GainNode;
 	// deprecated
-	function createDelayNode() : void;
+	function createDelayNode() : DelayNode;
+	function createDelayNode(MaxDelayNode : number/*double*/) : DelayNode;
 	// deprecated
-	function createJavaScriptNode() : void;
+	function createJavaScriptNode() : JavaScriptAudioNode;
 
 } // end of AudioContext
 
@@ -7074,6 +7075,13 @@ native final class webkitIDBRequest extends IDBRequest {
 
 native final class webkitIDBTransaction extends IDBTransaction {
 }
+
+native final class JavaScriptAudioNode {
+
+	var onaudioprocess : function(:Event):void/*EventListener*/;
+	__readonly__ var bufferSize : number/*long*/;
+
+} // end of JavaScriptAudioNode
 
 native final class DeviceOrientationEvent extends Event {
 

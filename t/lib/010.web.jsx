@@ -3152,9 +3152,10 @@ class _Test extends TestCase {
         var f21 : DynamicsCompressorNode = o.createDynamicsCompressor();
         var f22 : OscillatorNode = o.createOscillator();
         var f23 : WaveTable = o.createWaveTable(X.getFloat32Array(), X.getFloat32Array());
-        o.createGainNode();
-        o.createDelayNode();
-        o.createJavaScriptNode();
+        var f24 : GainNode = o.createGainNode();
+        var f25 : DelayNode = o.createDelayNode();
+        var f26 : DelayNode = o.createDelayNode(X.getnumber());
+        var f27 : JavaScriptAudioNode = o.createJavaScriptNode();
     } // AudioContext
 
     function compile_OfflineAudioContext(o : OfflineAudioContext) : void {
@@ -5379,6 +5380,11 @@ class _Test extends TestCase {
     function compile_webkitIDBTransaction(o : webkitIDBTransaction) : void {
     } // webkitIDBTransaction
 
+    function compile_JavaScriptAudioNode(o : JavaScriptAudioNode) : void {
+        var v1 : function(:Event):void/*EventListener*/ = o.onaudioprocess;
+        var v2 : number/*long*/ = o.bufferSize;
+    } // JavaScriptAudioNode
+
     function compile_DeviceOrientationEvent(o : DeviceOrientationEvent) : void {
         var c1 = new DeviceOrientationEvent(X.getstring());
         var c2 = new DeviceOrientationEvent(X.getstring(), X.getDeviceOrientationEventInit());
@@ -5557,6 +5563,7 @@ native class X {
     static function getInt16Array() : Int16Array;
     static function getInt32Array() : Int32Array;
     static function getInt8Array() : Int8Array;
+    static function getJavaScriptAudioNode() : JavaScriptAudioNode;
     static function getKeyboardEventInit() : KeyboardEventInit;
     static function getLocation() : Location;
     static function getMap__variant_() : Map.<variant>;
