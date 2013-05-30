@@ -20,6 +20,7 @@
  * IN THE SOFTWARE.
  */
 
+import "./compiler.jsx";
 import "./analysis.jsx";
 import "./classdef.jsx";
 import "./expression.jsx";
@@ -1234,7 +1235,13 @@ class CodeTransformer {
 	var _stopIterationClassDef : ClassDefinition;
 	var _jsxGeneratorClassDef : TemplateClassDefinition;
 
-	function constructor (builtins : Parser) {
+	function constructor () {
+		this._stopIterationClassDef = null;
+		this._jsxGeneratorClassDef = null;
+	}
+
+	function setup (compiler : Compiler) : void {
+		var builtins = compiler.getBuiltinParsers()[0];
 		this._stopIterationClassDef = builtins.lookup([], null, "g_StopIteration");
 		for (var i = 0; i < builtins._templateClassDefs.length; ++i)
 			if (builtins._templateClassDefs[i].className() == "__jsx_generator")

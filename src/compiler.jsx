@@ -41,6 +41,7 @@ class Compiler {
 
 	var _platform : Platform;
 	var _mode : number;
+	var _transformer : CodeTransformer;
 	var _optimizer : Optimizer;
 	var _warningFilters : Array.<function(:CompileWarning):Nullable.<boolean>>;
 	var _warningAsError : boolean;
@@ -53,6 +54,7 @@ class Compiler {
 	function constructor (platform : Platform) {
 		this._platform = platform;
 		this._mode = Compiler.MODE_COMPILE;
+		this._transformer = null;
 		this._optimizer = null;
 		this._warningFilters = [] : Array.<function(:CompileWarning):Nullable.<boolean>>;
 		this._warningAsError = false;
@@ -89,6 +91,10 @@ class Compiler {
 		this._emitter = emitter;
 	}
 
+	function setTransformer (transformer : CodeTransformer) : void {
+		this._transformer = transformer;
+	}
+
 	function setOptimizer (optimizer : Optimizer) : void {
 		this._optimizer = optimizer;
 	}
@@ -103,6 +109,10 @@ class Compiler {
 
 	function getParsers () : Parser[] {
 		return this._parsers;
+	}
+
+	function getBuiltinParsers () : Parser[] {
+		return this._builtinParsers;
 	}
 
 	function addSourceFile (token : Token, path : string) : Parser {
@@ -165,20 +175,7 @@ class Compiler {
 			return true;
 		}
 		// transformation
-		var transformer = new CodeTransformer(builtins);
-		this.forEachClassDef(function (parser, classDef) {
-			return classDef.forEachMember(function onMember(member) {
-				if (member instanceof MemberFunctionDefinition) {
-					var funcDef = member as MemberFunctionDefinition;
-					if (funcDef.isGenerator()) {
-						transformer.transformFunctionDefinition(funcDef);
-					}
-				}
-				return member.forEachClosure(function (funcDef) {
-					return onMember(funcDef);
-				});
-			});
-		});
+		this._transform();
 		// optimization
 		this._optimize();
 		// TODO peep-hole and dead store optimizations, etc.
@@ -343,6 +340,26 @@ class Compiler {
 		this.forEachClassDef(function (parser : Parser, classDef : ClassDefinition) {
 			classDef.analyzeUnusedVariables();
 			return true;
+		});
+	}
+
+	function _transform () : void {
+		if (this._transformer == null)
+			return;
+		this._transformer.setup(this);
+		// transform all functions
+		this.forEachClassDef(function (parser, classDef) {
+			return classDef.forEachMember(function onMember(member) {
+				if (member instanceof MemberFunctionDefinition) {
+					var funcDef = member as MemberFunctionDefinition;
+					if (funcDef.isGenerator()) {
+						this._transformer.transformFunctionDefinition(funcDef);
+					}
+				}
+				return member.forEachClosure(function (funcDef) {
+					return onMember(funcDef);
+				});
+			});
 		});
 	}
 

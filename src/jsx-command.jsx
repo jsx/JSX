@@ -33,6 +33,7 @@ import "./emitter.jsx";
 import "./jsemitter.jsx";
 import "./optimizer.jsx";
 import "./analysis.jsx";
+import "./instruments.jsx";
 
 class JSXCommand {
 
@@ -403,6 +404,10 @@ class JSXCommand {
 		emitter.setOutputFile(outputFile);
 
 		compiler.setOptimizer(optimizer);
+
+		var transformer = new CodeTransformer();
+
+		compiler.setTransformer(transformer);
 
 		var result = compiler.compile();
 
