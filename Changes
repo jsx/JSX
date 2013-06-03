@@ -1,5 +1,11 @@
 Revision history for the JSX software development kit
 
+0.9.35 2013-06-02 21:13:23
+    [BUG FIXES]
+    - Fix #182 again
+    - Fix types of Array#reduce() and Array#reduceRight() to take the type of
+      a return value
+
 0.9.34 2013-05-29 23:20:27
     [BUG FIXES]
     - Fix legacy AudioContext methods in web.jsx
