@@ -1,5 +1,9 @@
 Revision history for the JSX software development kit
 
+0.9.36 2013-06-04 16:31:00
+    [CHANGES]
+    - accept numbers as 3rd argument of JSON.stringify (#188)
+
 0.9.35 2013-06-02 21:13:23
     [BUG FIXES]
     - Fix #182 again
