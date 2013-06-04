@@ -1037,8 +1037,7 @@ native final class JSON {
 	static function stringify(value : variant) : string;
 	static function stringify(value : variant, replacer : function(key:string,value:variant):variant) : string;
 	static function stringify(value : variant, replacer : function(key:string,value:variant):variant, space : number) : string;
-	static function stringify(value : variant, replacer : Nullable.<function(key:string,value:variant):variant>, space : number) : string;
-	static function stringify(value : variant, replacer : Nullable.<function(key:string,value:variant):variant>, space : string) : string;
+	static function stringify(value : variant, replacer : function(key:string,value:variant):variant, space : string) : string;
 }
 
 /**
