@@ -67,7 +67,7 @@ my @specs = (
         "mediacapture-streams; http://www.w3.org/TR/mediacapture-streams/",
 
         # graphics
-        'typedarray; https://www.khronos.org/registry/typedarray/specs/latest/typedarray.idl',
+	# hand-copied to built-in.jsx, see #189 'typedarray; https://www.khronos.org/registry/typedarray/specs/latest/typedarray.idl',
         '2dcontext; http://www.w3.org/TR/2dcontext/',
         'webgl; https://www.khronos.org/registry/webgl/specs/latest/webgl.idl',
 
