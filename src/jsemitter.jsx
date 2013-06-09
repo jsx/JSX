@@ -2328,7 +2328,7 @@ class _ArrayExpressionEmitter extends _OperatorExpressionEmitter {
 		var emitted = false;
 		if (secondExpr instanceof StringLiteralExpression) {
 			var propertyName = Util.decodeStringLiteral(secondExpr.getToken().getValue());
-			if (propertyName.match(/^[\$_A-Za-z][\$_0-9A-Za-z]*$/) != null) {
+			if (propertyName.match(/^[\$_A-Za-z][\$_0-9A-Za-z]*$/) != null && !Util.isECMA262Reserved(propertyName)) {
 				this._emitter._emit(".", this._expr.getToken());
 				this._emitter._emit(propertyName, secondExpr.getToken());
 				emitted = true;

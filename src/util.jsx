@@ -503,6 +503,34 @@ class Util {
 		return true;
 	}
 
+	static function asSet (array : string[]) : Map.<boolean> {
+		var set = new Map.<boolean>;
+		for (var i = 0; i < array.length; ++i) {
+			set[array[i]] = true;
+		}
+		return set;
+	}
+
+	// ECMA 262 5th 7.6.1 Reserved Words
+	static const _ecma262reserved = Util.asSet([
+		"break", "do", "instanceof", "typeof",
+		"case", "else", "new", "var",
+		"catch", "finally", "return", "void",
+		"continue", "for", "switch", "while",
+		"debugger", "function", "this", "with",
+		"default", "if", "throw",
+		"delete", "in", "try",
+		"class", "enum", "extends", "super",
+		"const", "export", "import",
+		"implements", "let", "private", "public", "yield",
+		"interface", "package", "protected", "static",
+		"null",
+		"true", "false"
+	]);
+
+	static function isECMA262Reserved(word : string) : boolean {
+		return Util._ecma262reserved.hasOwnProperty(word);
+	}
 }
 
 /*
