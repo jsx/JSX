@@ -1660,11 +1660,12 @@ class _FoldConstantCommand extends _FunctionOptimizeCommand {
 		if (expr instanceof PropertyExpression) {
 
 			// property expression
-			var holderType = (expr as PropertyExpression).getHolderType();
-			if ((expr as PropertyExpression).getExpr().isClassSpecifier()) {
+			var propertyExpr = expr as PropertyExpression;
+			var holderType = propertyExpr.getHolderType();
+			if (propertyExpr.getExpr().isClassSpecifier()) {
 				var member = null : MemberVariableDefinition;
 				holderType.getClassDef().forEachMemberVariable(function (m) {
-					if (m instanceof MemberVariableDefinition && (m as MemberVariableDefinition).name() == (expr as PropertyExpression).getIdentifierToken().getValue())
+					if (m instanceof MemberVariableDefinition && (m as MemberVariableDefinition).name() == propertyExpr.getIdentifierToken().getValue())
 						member = m;
 					return member == null;
 				});
@@ -1672,9 +1673,9 @@ class _FoldConstantCommand extends _FunctionOptimizeCommand {
 					this._foldStaticConst(member);
 					var foldedExpr = this._toFoldedExpr(member.getInitialValue(), member.getType());
 					if (foldedExpr != null) {
-						foldedExpr = this._toFoldedExpr(foldedExpr, (expr as PropertyExpression).getType());
+						foldedExpr = this._toFoldedExpr(foldedExpr, propertyExpr.getType());
 						if (foldedExpr != null) {
-							this.log("folding property '" + member.toString() + "' at '" + expr.getToken().getFilename() + ":" + expr.getToken().getLineNumber() as string);
+							this.log("folding property '" + member.toString() + "' at '" + propertyExpr.getToken().getFilename() + ":" + propertyExpr.getToken().getLineNumber() as string);
 							replaceCb(foldedExpr);
 						}
 					}
