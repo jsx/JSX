@@ -718,7 +718,7 @@ class ClassDefinition implements Stashable {
 			} else {
 				// Just sets the initial values; analysis of member variables is performed lazily (and those that where never analyzed will be removed by dead code elimination)
 				var varDef = member as MemberVariableDefinition;
-				if (varDef.getInitialValue() == null) {
+				if (varDef.getInitialValue() == null && (this.flags() & ClassDefinition.IS_NATIVE) != ClassDefinition.IS_NATIVE) {
 					varDef.setInitialValue(Expression.getDefaultValueExpressionOf(varDef.getType()));
 				}
 			}
