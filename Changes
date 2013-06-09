@@ -1,5 +1,12 @@
 Revision history for the JSX software development kit
 
+0.9.38 2013-06-09 00:19:03-0700
+    [BUG FIXES]
+    - Fix a problem in QtScript that `object["word"]` caused compilation errors
+      if the "word" was reserved (#187)
+    - Fix a problem that static const member variables in native class
+      was replaced to `null` by `--optimize fold-const` (#191)
+
 0.9.37 2013-06-07 14:40:00
     [CHANGES]
     - typed-arrays are defined in built-in.jsx (#189)
