@@ -86,7 +86,7 @@ abstract class _ExpressionTransformer {
 			Type.voidType,
 			[ arg ],
 			[],	// locals
-			[ new ExpressionStatement(contBody) ] : Statement[],
+			[ new ReturnStatement(new Token("return", false), contBody) ] : Statement[],
 			closures,
 			null,
 			null
@@ -552,7 +552,7 @@ f | function ($f) { a | funciton ($a) { $C($f($a)); } }
 			Type.voidType,
 			[ arga ],
 			[],	// locals
-			[ new ExpressionStatement(contBody) ] : Statement[],
+			[ new ReturnStatement(new Token("return", false), contBody) ] : Statement[],
 			closures,
 			null,
 			null
@@ -567,7 +567,7 @@ f | function ($f) { a | funciton ($a) { $C($f($a)); } }
 			Type.voidType,
 			[ argf ],
 			[],	// locals
-			[ new ExpressionStatement(this._transformer._getExpressionTransformerFor(argaExpr).doCPSTransform(parent, cont0)) ] : Statement[],
+			[ new ReturnStatement(new Token("return", false), this._transformer._getExpressionTransformerFor(this._expr.getArguments()[0]).doCPSTransform(parent, cont0)) ] : Statement[],
 			closures,
 			null,
 			null
@@ -615,7 +615,7 @@ f | function ($f) { C($f()); }
 			Type.voidType,
 			[ arg ],
 			[],	// locals
-			[ new ExpressionStatement(contBody) ] : Statement[],
+			[ new ReturnStatement(new Token("return", false), contBody) ] : Statement[],
 			closures,
 			null,
 			null
@@ -1596,7 +1596,7 @@ class CodeTransformer {
 			type,
 			[ arg ],
 			[],	// locals
-			[ new ExpressionStatement(new LocalExpression(new Token(arg.getName().getValue(), true), arg)) ] : Statement[],
+			[ new ReturnStatement(new Token("return", false), new LocalExpression(new Token(arg.getName().getValue(), true), arg)) ] : Statement[],
 			[],	// closures
 			null,	// lastToken
 			null
