@@ -306,7 +306,8 @@ class ClassDefinition implements Stashable {
 										return;
 									}
 								}
-								if ((member as MemberFunctionDefinition).getStatements() != null || mode != ClassDefinition.GET_MEMBER_MODE_FUNCTION_WITH_BODY) {
+								if ((member as MemberFunctionDefinition).getStatements() != null || mode != ClassDefinition.GET_MEMBER_MODE_FUNCTION_WITH_BODY
+									|| (member.flags() & (ClassDefinition.IS_NATIVE | ClassDefinition.IS_ABSTRACT)) == ClassDefinition.IS_NATIVE) {
 									for (var j = 0; j < types.length; ++j) {
 										if (Util.typesAreEqual((member as MemberFunctionDefinition).getArgumentTypes(), (types[j] as ResolvedFunctionType).getArgumentTypes())) {
 											break;
