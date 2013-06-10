@@ -192,14 +192,6 @@ abstract class _UnaryExpressionTransformer extends _ExpressionTransformer {
 
 }
 
-/*
-  a ? b : c | C
-
-  a | function ($v) { return $v ? (b | C) : (c | C) }
-
-  a | function ($v) { var $c = C; return $v ? b | $c : c | $c }
-*/
-
 class _BitwiseNotExpressionTransformer extends _UnaryExpressionTransformer {
 
 	function constructor (transformer : CodeTransformer, expr : BitwiseNotExpression) {
@@ -400,7 +392,7 @@ class _AssignmentExpressionTransformer extends _BinaryExpressionTransformer {
 		if (lhsExpr instanceof LocalExpression) {
 			return this._transformLocalAssignment(parent, continuation);
 		} else {
-			throw new Error("unsupported assignment type");
+			throw new Error("TODO unsupported assignment type");
 		}
 	}
 
