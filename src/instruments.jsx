@@ -716,6 +716,59 @@ class _NewExpressionTransformer extends _InvokingExpressionTransformer {
 
 }
 
+class _ArrayLiteralExpressionTransformer extends _InvokingExpressionTransformer {
+
+	var _expr : ArrayLiteralExpression;
+
+	function constructor (transformer : CodeTransformer, expr : ArrayLiteralExpression) {
+		super(transformer, "ARRAY-LITERAL");
+		this._expr = expr;
+	}
+
+	override function getExpression () : Expression {
+		return this._expr;
+	}
+
+	override function doCPSTransform (parent : MemberFunctionDefinition, continuation : Expression) : Expression {
+		return this._transformInvoke(parent, continuation, this._expr.getExprs());
+	}
+
+	override function _constructInvoke (exprs : Expression[]) : Expression {
+		var arrayLiteralExpr = this._expr.clone();
+		arrayLiteralExpr._exprs = exprs;
+		return arrayLiteralExpr;
+	}
+
+}
+
+class _MapLiteralExpressionTransformer extends _InvokingExpressionTransformer {
+
+	var _expr : MapLiteralExpression;
+
+	function constructor (transformer : CodeTransformer, expr : MapLiteralExpression) {
+		super(transformer, "MAP-LITERAL");
+		this._expr = expr;
+	}
+
+	override function getExpression () : Expression {
+		return this._expr;
+	}
+
+	override function doCPSTransform (parent : MemberFunctionDefinition, continuation : Expression) : Expression {
+		return this._transformInvoke(parent, continuation, this._expr.getElements().map.<Expression>((elt) -> elt.getExpr()));
+	}
+
+	override function _constructInvoke (exprs : Expression[]) : Expression {
+		var elts = new MapLiteralElement[];
+		for (var i = 0; i < this._expr.getElements().length; ++i) {
+			var elt = this._expr.getElements()[i];
+			elts[i] = new MapLiteralElement(elt.getKey(), exprs[i]);
+		}
+		return new MapLiteralExpression(this._expr.getToken(), elts, this._expr.getType());
+	}
+
+}
+
 abstract class _StatementTransformer {
 
 	static var _statementCountMap = new Map.<number>;
@@ -1619,10 +1672,10 @@ class CodeTransformer {
 			return new _LeafExpressionTransformer(this, expr as StringLiteralExpression);
 		else if (expr instanceof RegExpLiteralExpression)
 			return new _LeafExpressionTransformer(this, expr as RegExpLiteralExpression);
-		// else if (expr instanceof ArrayLiteralExpression)
-		// 	return new _ArrayLiteralExpressionTransformer(this, expr as ArrayLiteralExpression);
-		// else if (expr instanceof MapLiteralExpression)
-		// 	return new _MapLiteralExpressionTransformer(this, expr as MapLiteralExpression);
+		else if (expr instanceof ArrayLiteralExpression)
+			return new _ArrayLiteralExpressionTransformer(this, expr as ArrayLiteralExpression);
+		else if (expr instanceof MapLiteralExpression)
+			return new _MapLiteralExpressionTransformer(this, expr as MapLiteralExpression);
 		else if (expr instanceof ThisExpression)
 			return new _ThisExpressionTransformer(this, expr as ThisExpression);
 		else if (expr instanceof BitwiseNotExpression)
