@@ -181,6 +181,7 @@ native class Buffer {
 
 	function constructor(size : int);
 	function constructor(array : int[]);
+	function constructor(array : Uint8Array);
 	function constructor(str : string, encoding : string);
 
 	function write(str : string, offset : int, length : int, encoding : string) : int;
