@@ -550,7 +550,7 @@ f | function ($f) { a | funciton ($a) { $C($f($a)); } }
 			null,	// name
 			ClassDefinition.IS_STATIC,
 			Type.voidType,
-			[ argf ],
+			[ arga ],
 			[],	// locals
 			[ new ExpressionStatement(contBody) ] : Statement[],
 			closures,
@@ -565,7 +565,7 @@ f | function ($f) { a | funciton ($a) { $C($f($a)); } }
 			null,	// name
 			ClassDefinition.IS_STATIC,
 			Type.voidType,
-			[ arga ],
+			[ argf ],
 			[],	// locals
 			[ new ExpressionStatement(this._transformer._getExpressionTransformerFor(argaExpr).doCPSTransform(parent, cont0)) ] : Statement[],
 			closures,
