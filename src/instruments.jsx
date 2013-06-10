@@ -638,22 +638,38 @@ class _CallExpressionTransformer extends _InvokingExpressionTransformer {
 		return this._expr;
 	}
 
-	override function doCPSTransform (parent : MemberFunctionDefinition, continuation : Expression) : Expression {
-
-		// function calls considered primitive operation
-
-		var expr = this._expr.getExpr();
-		if (expr instanceof PropertyExpression && (! expr.getType().isAssignable())) {
-			// method calls;
-			throw new Error("TODO method call is not yet supported");
+	function _isMethodCall () : boolean {
+		if (this._expr.getExpr() instanceof PropertyExpression) {
+			var propertyExpr = this._expr.getExpr() as PropertyExpression;
+			if (propertyExpr.getType() instanceof MemberFunctionType) {
+				return true;
+			}
 		}
+		return false;
+	}
 
-		return this._transformInvoke(parent, continuation, [ this._expr.getExpr() ].concat(this._expr.getArguments()));
+	override function doCPSTransform (parent : MemberFunctionDefinition, continuation : Expression) : Expression {
+		// function calls are considered a primitive operation
+		if (this._isMethodCall()) {
+			// method calls
+			var receiver = (this._expr.getExpr() as PropertyExpression).getExpr();
+			return this._transformInvoke(parent, continuation, [ receiver ].concat(this._expr.getArguments()));
+		} else {
+			return this._transformInvoke(parent, continuation, [ this._expr.getExpr() ].concat(this._expr.getArguments()));
+		}
 
 	}
 
 	override function _constructInvoke (exprs : Expression[]) : Expression {
-		return new CallExpression(new Token("(", false), exprs[0], exprs.slice(1));
+		if (this._isMethodCall()) {
+			var propertyExpr = this._expr.getExpr() as PropertyExpression;
+			return new CallExpression(
+				new Token("(", false),
+				new PropertyExpression(propertyExpr.getToken(), exprs[0], propertyExpr.getIdentifierToken(), propertyExpr.getTypeArguments(), propertyExpr.getType()),
+				exprs.slice(1));
+		} else {
+			return new CallExpression(new Token("(", false), exprs[0], exprs.slice(1));
+		}
 	}
 
 }
