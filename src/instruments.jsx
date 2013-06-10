@@ -391,6 +391,8 @@ class _AssignmentExpressionTransformer extends _BinaryExpressionTransformer {
 		var lhsExpr = this._expr.getFirstExpr();
 		if (lhsExpr instanceof LocalExpression) {
 			return this._transformLocalAssignment(parent, continuation);
+		} else if (lhsExpr instanceof PropertyExpression) {
+			return this._transformPropertyAssignment(parent, continuation);
 		} else {
 			throw new Error("TODO unsupported assignment type");
 		}
@@ -408,6 +410,18 @@ class _AssignmentExpressionTransformer extends _BinaryExpressionTransformer {
 		var arg = this._transformer.createFreshArgumentDeclaration(this._expr.getSecondExpr().getType());
 		var cont = this._createContinuation(parent, arg, this._createCall1(continuation, new AssignmentExpression(this._expr.getToken(), this._expr.getFirstExpr(), new LocalExpression(this._expr.getToken(), arg))));
 		return this._transformer._getExpressionTransformerFor(this._expr.getSecondExpr()).doCPSTransform(parent, cont);
+	}
+
+	function _transformPropertyAssignment (parent : MemberFunctionDefinition, continuation : Expression) : Expression {
+		// create a continuation
+		var arg2 = this._transformer.createFreshArgumentDeclaration(this._expr.getSecondExpr().getType());
+		var arg1 = this._transformer.createFreshArgumentDeclaration((this._expr.getFirstExpr() as PropertyExpression).getExpr().getType());
+		var propertyExpr = (this._expr.getFirstExpr() as PropertyExpression).clone();
+		propertyExpr._expr = new LocalExpression(this._expr.getToken(), arg1);
+		// FIXME wrong parent
+		var cont2 = this._createContinuation(parent, arg2, this._createCall1(continuation, new AssignmentExpression(this._expr.getToken(), propertyExpr, new LocalExpression(this._expr.getToken(), arg2))));
+		var cont1 = this._createContinuation(parent, arg1, this._transformer._getExpressionTransformerFor(this._expr.getSecondExpr()).doCPSTransform(parent, cont2));
+		return this._transformer._getExpressionTransformerFor((this._expr.getFirstExpr() as PropertyExpression).getExpr()).doCPSTransform(parent, cont1);
 	}
 
 	override function _clone (arg1 : LocalExpression, arg2 : LocalExpression) : BinaryExpression {
