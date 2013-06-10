@@ -352,6 +352,20 @@ class Compiler {
 			return classDef.forEachMember(function onMember(member) {
 				if (member instanceof MemberFunctionDefinition) {
 					var funcDef = member as MemberFunctionDefinition;
+					if (funcDef.getStatements() != null && funcDef._nameToken != null && funcDef.name() == "foo") {
+						this._transformer._doCPSTransform(funcDef);
+					}
+				}
+				return member.forEachClosure(function (funcDef) {
+					return onMember(funcDef);
+				});
+			});
+		});
+		// transform generators
+		this.forEachClassDef(function (parser, classDef) {
+			return classDef.forEachMember(function onMember(member) {
+				if (member instanceof MemberFunctionDefinition) {
+					var funcDef = member as MemberFunctionDefinition;
 					if (funcDef.isGenerator()) {
 						this._transformer.transformFunctionDefinition(funcDef);
 					}
