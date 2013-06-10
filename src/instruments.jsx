@@ -666,6 +666,56 @@ class _CallExpressionTransformer extends _InvokingExpressionTransformer {
 
 }
 
+class _SuperExpressionTransformer extends _InvokingExpressionTransformer {
+
+	var _expr : SuperExpression;
+
+	function constructor (transformer : CodeTransformer, expr : SuperExpression) {
+		super(transformer, "SUPER");
+		this._expr = expr;
+	}
+
+	override function getExpression () : Expression {
+		return this._expr;
+	}
+
+	override function doCPSTransform (parent : MemberFunctionDefinition, continuation : Expression) : Expression {
+		return this._transformInvoke(parent, continuation, this._expr.getArguments());
+	}
+
+	override function _constructInvoke (exprs : Expression[]) : Expression {
+		var superExpr = new SuperExpression(this._expr);
+		superExpr._args = exprs;
+		return superExpr;
+	}
+
+}
+
+class _NewExpressionTransformer extends _InvokingExpressionTransformer {
+
+	var _expr : NewExpression;
+
+	function constructor (transformer : CodeTransformer, expr : NewExpression) {
+		super(transformer, "NEW");
+		this._expr = expr;
+	}
+
+	override function getExpression () : Expression {
+		return this._expr;
+	}
+
+	override function doCPSTransform (parent : MemberFunctionDefinition, continuation : Expression) : Expression {
+		return this._transformInvoke(parent, continuation, this._expr.getArguments());
+	}
+
+	override function _constructInvoke (exprs : Expression[]) : Expression {
+		var newExpr = new NewExpression(this._expr);
+		newExpr._args = exprs;
+		return newExpr;
+	}
+
+}
+
 abstract class _StatementTransformer {
 
 	static var _statementCountMap = new Map.<number>;
@@ -1615,10 +1665,10 @@ class CodeTransformer {
 			return new _ConditionalExpressionTransformer(this, expr as ConditionalExpression);
 		else if (expr instanceof CallExpression)
 			return new _CallExpressionTransformer(this, expr as CallExpression);
-		// else if (expr instanceof SuperExpression)
-		// 	return new _SuperExpressionTransformer(this, expr as SuperExpression);
-		// else if (expr instanceof NewExpression)
-		// 	return new _NewExpressionTransformer(this, expr as NewExpression);
+		else if (expr instanceof SuperExpression)
+			return new _SuperExpressionTransformer(this, expr as SuperExpression);
+		else if (expr instanceof NewExpression)
+			return new _NewExpressionTransformer(this, expr as NewExpression);
 		else if (expr instanceof FunctionExpression)
 			return new _FunctionExpressionTransformer(this, expr as FunctionExpression);
 		// else if (expr instanceof CommaExpression)
