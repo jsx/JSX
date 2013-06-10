@@ -451,7 +451,7 @@ class _ShiftExpressionTransformer extends _BinaryExpressionTransformer {
 
 }
 
-class _CallExpressionTransformer {
+class _CallExpressionTransformer extends _ExpressionTransformer {
 
 	var _expr : CallExpression;
 
@@ -494,6 +494,15 @@ f | function ($f) { a | funciton ($a) { $C($f($a)); } }
 
 		*/
 
+		// $f
+		var argf = this._transformer.createFreshArgumentDeclaration(this._expr.getExpr().getType());
+		var arga = this._transformer.createFreshArgumentDeclaration(this._expr.getArguments()[0].getType());
+
+		var argfExpr = new LocalExpression(argf.getName(), argf);
+		var argaExpr = new LocalExpression(arga.getName(), arga);
+
+		var contBody = this._createCall1(continuation, new CallExpression(this._expr.getToken(), argfExpr, [ argaExpr ] : Expression[]));
+
 		var closures = new MemberFunctionDefinition[];
 		contBody.forEachExpression(function (expr) {
 			if (expr instanceof FunctionExpression) {
@@ -506,17 +515,10 @@ f | function ($f) { a | funciton ($a) { $C($f($a)); } }
 		// detach closures
 		for (var i = 0; i < closures.length; ++i) {
 			var j;
-			if ((j = parentFuncDef.getClosures().indexOf(closures[i])) != -1) {
-				parentFuncDef.getClosures().splice(j, 1);
+			if ((j = parent.getClosures().indexOf(closures[i])) != -1) {
+				parent.getClosures().splice(j, 1);
 			}
 		}
-
-		// $f
-		var argf = this._transformer.createFreshArgumentDeclaration(this._expr.getExpr().getType());
-		var arga = this._transformer.createFreshArgumentDeclaration(this._expr.getArguments()[0].getType());
-
-		var argfExpr = new LocalExpression(argf.getToken(), argf);
-		var argaExpr = new LocalExpression(arga.getToken(), arga);
 
 		var contFuncDef = new MemberFunctionDefinition(
 			new Token("function", false),
@@ -525,7 +527,7 @@ f | function ($f) { a | funciton ($a) { $C($f($a)); } }
 			Type.voidType,
 			[ argf ],
 			[],	// locals
-			[ new ExpressionStatement(this._createCall1(continuation, new CallExpression(this._expr.getToken(), argfExpr, [ argaExpr ]))) ] : Statement[],
+			[ new ExpressionStatement(contBody) ] : Statement[],
 			closures,
 			null,
 			null
@@ -540,14 +542,14 @@ f | function ($f) { a | funciton ($a) { $C($f($a)); } }
 			Type.voidType,
 			[ arga ],
 			[],	// locals
-			[ new ExpressionStatement(argaExpr.doCPSTransform(parent, cont0)) ] : Statement[],
+			[ new ExpressionStatement(this._transformer._getExpressionTransformerFor(argaExpr).doCPSTransform(parent, cont0)) ] : Statement[],
 			closures,
 			null,
 			null
 		);
 		parent.getClosures().push(contFuncDef1);
 		var cont1 = new FunctionExpression(contFuncDef1.getToken(), contFuncDef1);
-		return this._expr.getExpr().doCPSTransform(parent, cont1);
+		return this._transformer._getExpressionTransformerFor(this._expr.getExpr()).doCPSTransform(parent, cont1);
 	}
 
 	function _transformCall0 (parent : MemberFunctionDefinition, continuation : Expression) : Expression {
@@ -558,6 +560,11 @@ f() | C
 f | function ($f) { C($f()); }
 
 		*/
+
+		// $f
+		var arg = this._transformer.createFreshArgumentDeclaration(this._expr.getExpr().getType());
+
+		var contBody = this._createCall1(continuation, new CallExpression(this._expr.getToken(), new LocalExpression(arg.getName(), arg), []));
 
 		var closures = new MemberFunctionDefinition[];
 		contBody.forEachExpression(function (expr) {
@@ -571,13 +578,10 @@ f | function ($f) { C($f()); }
 		// detach closures
 		for (var i = 0; i < closures.length; ++i) {
 			var j;
-			if ((j = parentFuncDef.getClosures().indexOf(closures[i])) != -1) {
-				parentFuncDef.getClosures().splice(j, 1);
+			if ((j = parent.getClosures().indexOf(closures[i])) != -1) {
+				parent.getClosures().splice(j, 1);
 			}
 		}
-
-		// $f
-		var arg = this._transformer.createFreshArgumentDeclaration(this._expr.getExpr().getType());
 
 		var contFuncDef = new MemberFunctionDefinition(
 			new Token("function", false),
@@ -586,17 +590,14 @@ f | function ($f) { C($f()); }
 			Type.voidType,
 			[ arg ],
 			[],	// locals
-			[ new ExpressionStatement(this._createCall1(continuation, new CallExpression(this._expr.getToken(), new LocalExpression(arg), []))) ] : Statement[],
+			[ new ExpressionStatement(contBody) ] : Statement[],
 			closures,
 			null,
 			null
 		);
 		parent.getClosures().push(contFuncDef);
 		var cont =  new FunctionExpression(contFuncDef.getToken(), contFuncDef);
-		return this._expr.doCPSTransform(parent, cont);
-	}
-
-	function _transformMethodCall () : Expression {
+		return this._transformer._getExpressionTransformerFor(this._expr).doCPSTransform(parent, cont);
 	}
 
 }
