@@ -557,36 +557,15 @@ a | function ($a) { var $C = C; return $a ? b | $C : c | $C; }
 
 }
 
-class _CallExpressionTransformer extends _ExpressionTransformer {
+abstract class _InvokingExpressionTransformer extends _ExpressionTransformer {
 
-	var _expr : CallExpression;
-
-	function constructor (transformer : CodeTransformer, expr : CallExpression) {
-		super(transformer, "CALL");
-		this._expr = expr;
+	function constructor (transformer : CodeTransformer, id : string) {
+		super(transformer, id);
 	}
 
-	override function getExpression () : Expression {
-		return this._expr;
-	}
+	abstract function _constructInvoke (exprs : Expression[]) : Expression;
 
-	override function doCPSTransform (parent : MemberFunctionDefinition, continuation : Expression) : Expression {
-
-		// function calls considered primitive operation
-
-		var expr = this._expr.getExpr();
-		if (expr instanceof PropertyExpression && (! expr.getType().isAssignable())) {
-			// method calls;
-			throw new Error("TODO method call is not yet supported");
-		}
-
-		return this._transformCall(parent, continuation);
-
-	}
-
-	function _transformCall (parent : MemberFunctionDefinition, continuation : Expression) : Expression {
-
-		var exprs = [ this._expr.getExpr() ].concat(this._expr.getArguments());
+	function _transformInvoke (parent : MemberFunctionDefinition, continuation : Expression, exprs : Expression[]) : Expression {
 
 		var newArgs = new ArgumentDeclaration[];
 		for (var i = 0; i < exprs.length; ++i) {
@@ -622,7 +601,7 @@ class _CallExpressionTransformer extends _ExpressionTransformer {
 		var lastBody = new CallExpression(
 			new Token("(", false),
 			continuation,
-			[ new CallExpression(new Token("(", false), new LocalExpression(newArgs[0].getName(), newArgs[0]), newArgs.slice(1).map.<Expression>((arg) -> (new LocalExpression(arg.getName(), arg) as Expression))) ] : Expression[]
+			[ this._constructInvoke(newArgs.map.<Expression>((arg) -> (new LocalExpression(arg.getName(), arg) as Expression))) ]
 		);
 		parentFuncDef.getStatements().push(new ReturnStatement(new Token("return", false), lastBody));
 
@@ -650,6 +629,39 @@ class _CallExpressionTransformer extends _ExpressionTransformer {
 		}
 
 		return firstBody;
+	}
+
+}
+
+class _CallExpressionTransformer extends _InvokingExpressionTransformer {
+
+	var _expr : CallExpression;
+
+	function constructor (transformer : CodeTransformer, expr : CallExpression) {
+		super(transformer, "CALL");
+		this._expr = expr;
+	}
+
+	override function getExpression () : Expression {
+		return this._expr;
+	}
+
+	override function doCPSTransform (parent : MemberFunctionDefinition, continuation : Expression) : Expression {
+
+		// function calls considered primitive operation
+
+		var expr = this._expr.getExpr();
+		if (expr instanceof PropertyExpression && (! expr.getType().isAssignable())) {
+			// method calls;
+			throw new Error("TODO method call is not yet supported");
+		}
+
+		return this._transformInvoke(parent, continuation, [ this._expr.getExpr() ].concat(this._expr.getArguments()));
+
+	}
+
+	override function _constructInvoke (exprs : Expression[]) : Expression {
+		return new CallExpression(new Token("(", false), exprs[0], exprs.slice(1));
 	}
 
 }
