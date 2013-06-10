@@ -61,6 +61,14 @@ abstract class _ExpressionTransformer {
 		);
 	}
 
+	function _createCall2 (proc : Expression, arg : Expression) : CallExpression {
+		return new CallExpression(
+			arg.getToken(),
+			proc,
+			[ arg ] : Expression[]
+		);
+	}
+
 	function _createContinuation (parentFuncDef : MemberFunctionDefinition, arg : ArgumentDeclaration, contBody : Expression) : FunctionExpression {
 
 		var closures = new MemberFunctionDefinition[];
@@ -504,10 +512,96 @@ class _CallExpressionTransformer extends _ExpressionTransformer {
 			return this._transformCall0(parent, continuation);
 		case 1:
 			return this._transformCall1(parent, continuation);
+		case 2:
+			return this._transformCall2(parent, continuation);
 		default:
-			throw new Error("TODO: function call with more than 3 arguments is not yet supported");
+			throw new Error("TODO: function call with more than 2 arguments is not yet supported");
 		}
 
+	}
+
+	function _transformCall2 (parent : MemberFunctionDefinition, continuation : Expression) : Expression {
+		/*
+
+f(a,b) | C
+
+f | function ($f) { a | funciton ($a) { b | function ($b) { $C($f($a,$b)); } } }
+
+		*/
+
+		// $f
+		var argf = this._transformer.createFreshArgumentDeclaration(this._expr.getExpr().getType());
+		var arga = this._transformer.createFreshArgumentDeclaration(this._expr.getArguments()[0].getType());
+		var argb = this._transformer.createFreshArgumentDeclaration(this._expr.getArguments()[1].getType());
+
+		var argfExpr = new LocalExpression(argf.getName(), argf);
+		var argaExpr = new LocalExpression(arga.getName(), arga);
+		var argbExpr = new LocalExpression(argb.getName(), argb);
+
+		var contBody = this._createCall2(continuation, new CallExpression(this._expr.getToken(), argfExpr, [ argaExpr, argbExpr ] : Expression[]));
+
+		var closures = new MemberFunctionDefinition[];
+		contBody.forEachExpression(function (expr) {
+			if (expr instanceof FunctionExpression) {
+				closures.push((expr as FunctionExpression).getFuncDef());
+			}
+			// does not search for funcDefs deeper than the first level
+			return true;
+		});
+
+		// detach closures
+		for (var i = 0; i < closures.length; ++i) {
+			var j;
+			if ((j = parent.getClosures().indexOf(closures[i])) != -1) {
+				parent.getClosures().splice(j, 1);
+			}
+		}
+
+		var contFuncDef = new MemberFunctionDefinition(
+			new Token("function", false),
+			null,	// name
+			ClassDefinition.IS_STATIC,
+			Type.voidType,
+			[ argb ],
+			[],	// locals
+			[ new ReturnStatement(new Token("return", false), contBody) ] : Statement[],
+			closures,
+			null,
+			null
+		);
+		parent.getClosures().push(contFuncDef);
+		var cont0 =  new FunctionExpression(contFuncDef.getToken(), contFuncDef);
+
+		var contFuncDef1 = new MemberFunctionDefinition(
+			new Token("function", false),
+			null,	// name
+			ClassDefinition.IS_STATIC,
+			Type.voidType,
+			[ arga ],
+			[],	// locals
+			[ new ReturnStatement(new Token("return", false), this._transformer._getExpressionTransformerFor(this._expr.getArguments()[1]).doCPSTransform(parent, cont0)) ] : Statement[],
+			closures,
+			null,
+			null
+		);
+		parent.getClosures().push(contFuncDef1);
+		var cont1 = new FunctionExpression(contFuncDef1.getToken(), contFuncDef1);
+
+		var contFuncDef2 = new MemberFunctionDefinition(
+			new Token("function", false),
+			null,	// name
+			ClassDefinition.IS_STATIC,
+			Type.voidType,
+			[ argf ],
+			[],	// locals
+			[ new ReturnStatement(new Token("return", false), this._transformer._getExpressionTransformerFor(this._expr.getArguments()[0]).doCPSTransform(parent, cont1)) ] : Statement[],
+			closures,
+			null,
+			null
+		);
+		parent.getClosures().push(contFuncDef2);
+		var cont2 = new FunctionExpression(contFuncDef2.getToken(), contFuncDef2);
+		return this._transformer._getExpressionTransformerFor(this._expr.getExpr()).doCPSTransform(parent, cont2);
 	}
 
 	function _transformCall1 (parent : MemberFunctionDefinition, continuation : Expression) : Expression {
