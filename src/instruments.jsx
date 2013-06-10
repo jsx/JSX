@@ -1486,8 +1486,7 @@ class CodeTransformer {
 	function _getExpressionTransformerFor (expr : Expression) : _ExpressionTransformer {
 		if (expr instanceof LocalExpression)
 			return new _LeafExpressionTransformer(this, expr as LocalExpression);
-		else if (expr instanceof ClassExpression)
-			throw new Error("TODO");
+		// else if (expr instanceof ClassExpression)
 		// 	return new _ClassExpressionTransformer(this, expr as ClassExpression);
 		else if (expr instanceof NullExpression)
 			return new _LeafExpressionTransformer(this, expr as NullExpression);
@@ -1501,11 +1500,9 @@ class CodeTransformer {
 			return new _LeafExpressionTransformer(this, expr as StringLiteralExpression);
 		else if (expr instanceof RegExpLiteralExpression)
 			return new _LeafExpressionTransformer(this, expr as RegExpLiteralExpression);
-		else if (expr instanceof ArrayLiteralExpression)
-			throw new Error("TODO");
+		// else if (expr instanceof ArrayLiteralExpression)
 		// 	return new _ArrayLiteralExpressionTransformer(this, expr as ArrayLiteralExpression);
-		else if (expr instanceof MapLiteralExpression)
-			throw new Error("TODO");
+		// else if (expr instanceof MapLiteralExpression)
 		// 	return new _MapLiteralExpressionTransformer(this, expr as MapLiteralExpression);
 		else if (expr instanceof ThisExpression)
 			return new _ThisExpressionTransformer(this, expr as ThisExpression);
@@ -1545,21 +1542,17 @@ class CodeTransformer {
 			return new _LogicalExpressionTransformer(this, expr as LogicalExpression);
 		else if (expr instanceof ShiftExpression)
 			return new _ShiftExpressionTransformer(this, expr as ShiftExpression);
-		else if (expr instanceof ConditionalExpression)
-			throw new Error("TODO");
+		// else if (expr instanceof ConditionalExpression)
 		// 	return new _ConditionalExpressionTransformer(this, expr as ConditionalExpression);
 		else if (expr instanceof CallExpression)
 			return new _CallExpressionTransformer(this, expr as CallExpression);
-		else if (expr instanceof SuperExpression)
-			throw new Error("TODO");
+		// else if (expr instanceof SuperExpression)
 		// 	return new _SuperExpressionTransformer(this, expr as SuperExpression);
-		else if (expr instanceof NewExpression)
-			throw new Error("TODO");
+		// else if (expr instanceof NewExpression)
 		// 	return new _NewExpressionTransformer(this, expr as NewExpression);
 		else if (expr instanceof FunctionExpression)
 			return new _FunctionExpressionTransformer(this, expr as FunctionExpression);
-		else if (expr instanceof CommaExpression)
-			throw new Error("TODO");
+		// else if (expr instanceof CommaExpression)
 		// 	return new _CommaExpressionTransformer(this, expr as CommaExpression);
 		throw new Error("got unexpected type of expression: " + (expr != null ? JSON.stringify(expr.serialize()) : expr.toString()));
 	}
