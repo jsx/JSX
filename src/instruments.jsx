@@ -385,8 +385,33 @@ class _AssignmentExpressionTransformer extends _BinaryExpressionTransformer {
 		super(transformer, expr);
 	}
 
+	override function doCPSTransform (parent : MemberFunctionDefinition, continuation : Expression) : Expression {
+		// LHS expr must be of any of type 'local', 'property', and 'array'
+
+		var lhsExpr = this._expr.getFirstExpr();
+		if (lhsExpr instanceof LocalExpression) {
+			return this._transformLocalAssignment(parent, continuation);
+		} else {
+			throw new Error("unsupported assignment type");
+		}
+	}
+
+	function _transformLocalAssignment (parent : MemberFunctionDefinition, continuation : Expression) : Expression {
+		/*
+		  op(local,E) | C
+
+		  E | function ($1) { return C(local = $1); }
+
+		*/
+
+		// create a continuation
+		var arg = this._transformer.createFreshArgumentDeclaration(this._expr.getSecondExpr().getType());
+		var cont = this._createContinuation(parent, arg, this._createCall1(continuation, new AssignmentExpression(this._expr.getToken(), this._expr.getFirstExpr(), new LocalExpression(this._expr.getToken(), arg))));
+		return this._transformer._getExpressionTransformerFor(this._expr.getSecondExpr()).doCPSTransform(parent, cont);
+	}
+
 	override function _clone (arg1 : LocalExpression, arg2 : LocalExpression) : BinaryExpression {
-		return new AssignmentExpression(this._expr.getToken(), arg1, arg2);
+		throw new Error("logic flaw");
 	}
 
 }
