@@ -2935,8 +2935,7 @@ class JavaScriptEmitter implements Emitter {
 			});
 		}
 		for (var i = 0; i < classDefs.length; ++i) {
-			if ((classDefs[i].flags() & ClassDefinition.IS_NATIVE) == 0)
-				this._emitClassDefinition(classDefs[i]);
+			this._emitClassDefinition(classDefs[i]);
 		}
 		for (var i = 0; i < classDefs.length; ++i)
 			this._emitStaticInitializationCode(classDefs[i]);
@@ -3030,6 +3029,14 @@ class JavaScriptEmitter implements Emitter {
 
 
 	function _emitClassDefinition (classDef : ClassDefinition) : void {
+		if ((classDef.flags() & ClassDefinition.IS_NATIVE) != 0) {
+			// bind native object to JSX class
+			if (classDef.getNativeSource() != null) {
+				this._emit("var " + this._namer.getNameOfClass(classDef) + " = " + Util.decodeStringLiteral(classDef.getNativeSource().getValue()) + ";\n", classDef.getNativeSource());
+			}
+			return;
+		}
+
 		this._emittingClass = classDef;
 		try {
 
@@ -3065,11 +3072,6 @@ class JavaScriptEmitter implements Emitter {
 			this._emit("var js = { global: function () { return this; }() };\n", null);
 			return;
 		}
-		// bind native object to JSX class
-		if (classDef.getNativeSource() != null) {
-			this._emit("var " + this._namer.getNameOfClass(classDef) + " = " + Util.decodeStringLiteral(classDef.getNativeSource().getValue()) + ";\n", classDef.getNativeSource());
-		}
-
 		if ((classDef.flags() & ClassDefinition.IS_NATIVE) != 0)
 			return;
 		// normal handling
