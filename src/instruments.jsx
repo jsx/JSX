@@ -529,17 +529,6 @@ f | function ($f) { a | funciton ($a) { b | function ($b) { $C($f($a,$b)); } } }
 
 		*/
 
-		// $f
-		var argf = this._transformer.createFreshArgumentDeclaration(this._expr.getExpr().getType());
-		var arga = this._transformer.createFreshArgumentDeclaration(this._expr.getArguments()[0].getType());
-		var argb = this._transformer.createFreshArgumentDeclaration(this._expr.getArguments()[1].getType());
-
-		var argfExpr = new LocalExpression(argf.getName(), argf);
-		var argaExpr = new LocalExpression(arga.getName(), arga);
-		var argbExpr = new LocalExpression(argb.getName(), argb);
-
-		var contBody = this._createCall2(continuation, new CallExpression(this._expr.getToken(), argfExpr, [ argaExpr, argbExpr ] : Expression[]));
-
 		var closures = new MemberFunctionDefinition[];
 		contBody.forEachExpression(function (expr) {
 			if (expr instanceof FunctionExpression) {
@@ -552,56 +541,42 @@ f | function ($f) { a | funciton ($a) { b | function ($b) { $C($f($a,$b)); } } }
 		// detach closures
 		for (var i = 0; i < closures.length; ++i) {
 			var j;
-			if ((j = parent.getClosures().indexOf(closures[i])) != -1) {
-				parent.getClosures().splice(j, 1);
+			if ((j = parentFuncDef.getClosures().indexOf(closures[i])) != -1) {
+				parentFuncDef.getClosures().splice(j, 1);
 			}
 		}
 
-		var contFuncDef = new MemberFunctionDefinition(
-			new Token("function", false),
-			null,	// name
-			ClassDefinition.IS_STATIC,
-			Type.voidType,
-			[ argb ],
-			[],	// locals
+		// $f
+		var exprf = this._expr.getExpr();
+		var expra = this._expr.getArguments()[0];
+		var exprb = this._expr.getArguments()[1];
+
+		var argf = this._transformer.createFreshArgumentDeclaration(exprf.getType());
+		var arga = this._transformer.createFreshArgumentDeclaration(expra.getType());
+		var argb = this._transformer.createFreshArgumentDeclaration(exprb.getType());
+
+		var argfExpr = new LocalExpression(argf.getName(), argf);
+		var argaExpr = new LocalExpression(arga.getName(), arga);
+		var argbExpr = new LocalExpression(argb.getName(), argb);
+
+		var contf = this._createContinuation(parent, argf, null);
+		var conta = this._createContinuation(contf.getFuncDef(), arga, null);
+		var contb = this._createContinuation(conta.getFuncDef(), argb, null);
+
+		var contBody = this._createCall2(continuation, new CallExpression(this._expr.getToken(), argfExpr, [ argaExpr, argbExpr ] : Expression[]));
+
+		contf.getFuncDef().getStatements().push(new ReturnStatement(new Token("return", false), this._transformer._getExpressionTransformerFor(expra).doCPSTransform(parent, conta)));
+		conta.getFuncDef().getStatements().push(new ReturnStatement(new Token("return", false), this._transformer._getExpressionTransformerFor(exprb).doCPSTransform(parent, contb)));
+
 			[ new ReturnStatement(new Token("return", false), contBody) ] : Statement[],
-			closures,
-			null,
-			null
-		);
-		parent.getClosures().push(contFuncDef);
-		var cont0 =  new FunctionExpression(contFuncDef.getToken(), contFuncDef);
 
-		var contFuncDef1 = new MemberFunctionDefinition(
-			new Token("function", false),
-			null,	// name
-			ClassDefinition.IS_STATIC,
-			Type.voidType,
-			[ arga ],
-			[],	// locals
-			[ new ReturnStatement(new Token("return", false), this._transformer._getExpressionTransformerFor(this._expr.getArguments()[1]).doCPSTransform(parent, cont0)) ] : Statement[],
-			closures,
-			null,
-			null
-		);
-		parent.getClosures().push(contFuncDef1);
-		var cont1 = new FunctionExpression(contFuncDef1.getToken(), contFuncDef1);
+		// change the parent
+		contb.getFuncDef()._closures = closures;
+		for (var i = 0; i < closures.length; ++i) {
+			closures[i].setParent(contb.getFuncDef());
+		}
 
-		var contFuncDef2 = new MemberFunctionDefinition(
-			new Token("function", false),
-			null,	// name
-			ClassDefinition.IS_STATIC,
-			Type.voidType,
-			[ argf ],
-			[],	// locals
-			[ new ReturnStatement(new Token("return", false), this._transformer._getExpressionTransformerFor(this._expr.getArguments()[0]).doCPSTransform(parent, cont1)) ] : Statement[],
-			closures,
-			null,
-			null
-		);
-		parent.getClosures().push(contFuncDef2);
-		var cont2 = new FunctionExpression(contFuncDef2.getToken(), contFuncDef2);
-		return this._transformer._getExpressionTransformerFor(this._expr.getExpr()).doCPSTransform(parent, cont2);
+		return this._transformer._getExpressionTransformerFor(exprf).doCPSTransform(parent, contf);
 	}
 
 	function _transformCall1 (parent : MemberFunctionDefinition, continuation : Expression) : Expression {
