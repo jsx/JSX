@@ -1,5 +1,10 @@
 Revision history for the JSX software development kit
 
+0.9.39 2013-06-10 18:00:00+0900
+    [BUG FIXES]
+    - use of "super.meth()" was causing compile errors if meth() is native
+    - fix runtime error when extending a native class using the experimental "native(...)" annotation
+
 0.9.38 2013-06-09 00:19:03-0700
     [BUG FIXES]
     - Fix a problem in QtScript that `object["word"]` caused compilation errors
