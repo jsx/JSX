@@ -1877,7 +1877,7 @@ class CodeTransformer {
 		this._eliminateGotos(funcDef, postFragmentationCallback);
 
 		if (! Type.voidType.equals(returnType)) {
-			statements.push(new ReturnStatement(new Token("return", false), new LocalExpression(returnLocal.getName(), returnLocal)));
+			funcDef._statements.push(new ReturnStatement(new Token("return", false), new LocalExpression(returnLocal.getName(), returnLocal)));
 			this.leaveFunction();
 		}
 	}
