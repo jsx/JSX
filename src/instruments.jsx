@@ -1790,7 +1790,6 @@ class CodeTransformer {
 	}
 
 	function transformFunctionDefinition (funcDef : MemberFunctionDefinition) : void {
-		this._doCPSTransform(funcDef);
 		this._compileYields(funcDef);
 	}
 
@@ -1813,13 +1812,13 @@ class CodeTransformer {
 	}
 
 	function _doCPSTransform (funcDef : MemberFunctionDefinition) : void {
-		this._doCPSTransform(funcDef, true, function (name, statements) {
+		this._doCPSTransform(funcDef, false, function (name, statements) {
 			// do nothing
 		});
 	}
 
-	function _doCPSTransform (funcDef : MemberFunctionDefinition, transformExpr : boolean, postFragmentationCallback : (string, Statement[]) -> void) : void {
-		if (transformExpr) {
+	function _doCPSTransform (funcDef : MemberFunctionDefinition, transformOnlyStmts : boolean, postFragmentationCallback : (string, Statement[]) -> void) : void {
+		if (! transformOnlyStmts) {
 			// transform expressions inside as well
 			for (var i = 0; i < funcDef.getStatements().length; ++i) {
 				var statement = funcDef.getStatements()[i];
@@ -1950,7 +1949,7 @@ class CodeTransformer {
 		  -> $generatorN.__value = expr;
 		     $generatorN.__next = $LABEL;
 		 */
-		this._doCPSTransform(funcDef, false, function (label : string, statements : Statement[]) : void {
+		this._doCPSTransform(funcDef, true, function (label : string, statements : Statement[]) : void {
 			if (2 <= statements.length && statements[statements.length - 2] instanceof YieldStatement) {
 				var idx = statements.length - 2;
 				statements.splice(idx, 2,
