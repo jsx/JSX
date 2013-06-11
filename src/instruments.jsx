@@ -1649,12 +1649,6 @@ class CodeTransformer {
 		this._labelMap.pop();
 	}
 
-	var _statementIDs = new Map.<number>;
-
-	function getStatementIDMap () : Map.<number> {
-		return this._statementIDs;
-	}
-
 	var _numUniqVar = 0;
 
 	function createFreshArgumentDeclaration (type : Type) : ArgumentDeclaration {
