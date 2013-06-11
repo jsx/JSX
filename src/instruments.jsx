@@ -530,23 +530,6 @@ class _AssignmentExpressionTransformer extends _ExpressionTransformer {
 		}
 	}
 
-	override function _constructOp (exprs : Expression[]) : Expression {
-		var lhsExpr = this._expr.getFirstExpr();
-		if (lhsExpr instanceof LocalExpression) {
-			assert exprs.length == 1;
-
-			return new AssignmentExpression(this._expr.getToken(), this._expr.getFirstExpr(), exprs[0]);
-		} else if (lhsExpr instanceof PropertyExpression) {
-			assert exprs.length == 2;
-
-			var propertyExpr = (this._expr.getFirstExpr() as PropertyExpression).clone();
-			propertyExpr._expr = exprs[0];
-			return new AssignmentExpression(this._expr.getToken(), propertyExpr, exprs[1]);
-		} else {
-			throw new Error("logic flaw");
-		}
-	}
-
 	function _transformLocalAssignment (parent : MemberFunctionDefinition, continuation : Expression) : Expression {
 		/*
 		  op(local,E) | C
@@ -565,6 +548,29 @@ class _AssignmentExpressionTransformer extends _ExpressionTransformer {
 		*/
 
 		return this._transformOp(parent, continuation, [ this._expr.getFirstExpr(), this._expr.getSecondExpr() ]);
+	}
+
+	override function _constructOp (exprs : Expression[]) : Expression {
+		var lhsExpr = this._expr.getFirstExpr();
+		if (lhsExpr instanceof LocalExpression) {
+			assert exprs.length == 1;
+			return this._constructLocalAssignment(exprs[0]);
+		} else if (lhsExpr instanceof PropertyExpression) {
+			assert exprs.length == 2;
+			return this._constructPropertyAssignment(exprs[0], exprs[1]);
+		} else {
+			throw new Error("logic flaw");
+		}
+	}
+
+	function _constructLocalAssignment (expr : Expression) : Expression {
+		return new AssignmentExpression(this._expr.getToken(), this._expr.getFirstExpr(), expr);
+	}
+
+	function _constructPropertyAssignment (expr1 : Expression, expr2 : Expression) : Expression {
+		var propertyExpr = (this._expr.getFirstExpr() as PropertyExpression).clone();
+		propertyExpr._expr = expr1;
+		return new AssignmentExpression(this._expr.getToken(), propertyExpr, expr2);
 	}
 
 }
