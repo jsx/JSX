@@ -53,6 +53,76 @@ abstract class _ExpressionTransformer {
 
 	abstract function doCPSTransform (parent : MemberFunctionDefinition, continuation : Expression) : Expression;
 
+	function _transformOp (parent : MemberFunctionDefinition, continuation : Expression, exprs : Expression[]) : Expression {
+
+		var newArgs = new ArgumentDeclaration[];
+		for (var i = 0; i < exprs.length; ++i) {
+			newArgs.push(this._transformer.createFreshArgumentDeclaration(exprs[i].getType()));
+		}
+
+		var firstBody : Expression = null;
+		var parentFuncDef = parent;
+		for (var i = 0; i < exprs.length; ++i) {
+			var childFuncDef = new MemberFunctionDefinition(
+				new Token("function", false),
+				null, // name
+				ClassDefinition.IS_STATIC,
+				Type.voidType,
+				[ newArgs[i] ],
+				[], // locals
+				[], // statements
+				[], // closures
+				null,
+				null
+			);
+			parentFuncDef.getClosures().push(childFuncDef);
+			var cont = new FunctionExpression(childFuncDef.getToken(), childFuncDef);
+			var body = this._transformer._getExpressionTransformerFor(exprs[i]).doCPSTransform(parentFuncDef, cont);
+			if (i == 0) {
+				firstBody = body;
+			} else {
+				parentFuncDef.getStatements().push(new ReturnStatement(new Token("return", false), body));
+			}
+
+			parentFuncDef = childFuncDef;
+		}
+		var lastBody = new CallExpression(
+			new Token("(", false),
+			continuation,
+			[ this._constructOp(newArgs.map.<Expression>((arg) -> (new LocalExpression(arg.getName(), arg) as Expression))) ]
+		);
+		parentFuncDef.getStatements().push(new ReturnStatement(new Token("return", false), lastBody));
+
+		var closures = new MemberFunctionDefinition[];
+		lastBody.forEachExpression(function (expr) {
+			if (expr instanceof FunctionExpression) {
+				closures.push((expr as FunctionExpression).getFuncDef());
+			}
+			// does not search for funcDefs deeper than the first level
+			return true;
+		});
+
+		// detach closures
+		for (var i = 0; i < closures.length; ++i) {
+			var j;
+			if ((j = parent.getClosures().indexOf(closures[i])) != -1) {
+				parent.getClosures().splice(j, 1);
+			}
+		}
+
+		// change the parent
+		parentFuncDef._closures = closures;
+		for (var i = 0; i < closures.length; ++i) {
+			closures[i].setParent(parentFuncDef);
+		}
+
+		return firstBody;
+	}
+
+	function _constructOp (exprs : Expression[]) : Expression {
+		throw new Error("logic flaw");
+	}
+
 	function _createCall1 (proc : Expression, arg : Expression) : CallExpression {
 		return new CallExpression(
 			arg.getToken(),
@@ -120,6 +190,59 @@ class _LeafExpressionTransformer extends _ExpressionTransformer {
 
 	override function doCPSTransform (parent : MemberFunctionDefinition, continuation : Expression) : Expression {
 		return this._createCall1(continuation, this._expr);
+	}
+
+}
+
+class _ArrayLiteralExpressionTransformer extends _ExpressionTransformer {
+
+	var _expr : ArrayLiteralExpression;
+
+	function constructor (transformer : CodeTransformer, expr : ArrayLiteralExpression) {
+		super(transformer, "ARRAY-LITERAL");
+		this._expr = expr;
+	}
+
+	override function getExpression () : Expression {
+		return this._expr;
+	}
+
+	override function doCPSTransform (parent : MemberFunctionDefinition, continuation : Expression) : Expression {
+		return this._transformOp(parent, continuation, this._expr.getExprs());
+	}
+
+	override function _constructOp (exprs : Expression[]) : Expression {
+		var arrayLiteralExpr = this._expr.clone();
+		arrayLiteralExpr._exprs = exprs;
+		return arrayLiteralExpr;
+	}
+
+}
+
+class _MapLiteralExpressionTransformer extends _ExpressionTransformer {
+
+	var _expr : MapLiteralExpression;
+
+	function constructor (transformer : CodeTransformer, expr : MapLiteralExpression) {
+		super(transformer, "MAP-LITERAL");
+		this._expr = expr;
+	}
+
+	override function getExpression () : Expression {
+		return this._expr;
+	}
+
+	override function doCPSTransform (parent : MemberFunctionDefinition, continuation : Expression) : Expression {
+		return this._transformOp(parent, continuation, this._expr.getElements().map.<Expression>((elt) -> elt.getExpr()));
+	}
+
+	override function _constructOp (exprs : Expression[]) : Expression {
+		var elts = new MapLiteralElement[];
+		for (var i = 0; i < this._expr.getElements().length; ++i) {
+			var elt = this._expr.getElements()[i];
+			elts[i] = new MapLiteralElement(elt.getKey(), exprs[i]);
+		}
+		return new MapLiteralExpression(this._expr.getToken(), elts, this._expr.getType());
 	}
 
 }
@@ -563,83 +686,7 @@ a | function ($a) { var $C = C; return $a ? b | $C : c | $C; }
 
 }
 
-abstract class _InvokingExpressionTransformer extends _ExpressionTransformer {
-
-	function constructor (transformer : CodeTransformer, id : string) {
-		super(transformer, id);
-	}
-
-	abstract function _constructInvoke (exprs : Expression[]) : Expression;
-
-	function _transformInvoke (parent : MemberFunctionDefinition, continuation : Expression, exprs : Expression[]) : Expression {
-
-		var newArgs = new ArgumentDeclaration[];
-		for (var i = 0; i < exprs.length; ++i) {
-			newArgs.push(this._transformer.createFreshArgumentDeclaration(exprs[i].getType()));
-		}
-
-		var firstBody : Expression = null;
-		var parentFuncDef = parent;
-		for (var i = 0; i < exprs.length; ++i) {
-			var childFuncDef = new MemberFunctionDefinition(
-				new Token("function", false),
-				null, // name
-				ClassDefinition.IS_STATIC,
-				Type.voidType,
-				[ newArgs[i] ],
-				[], // locals
-				[], // statements
-				[], // closures
-				null,
-				null
-			);
-			parentFuncDef.getClosures().push(childFuncDef);
-			var cont = new FunctionExpression(childFuncDef.getToken(), childFuncDef);
-			var body = this._transformer._getExpressionTransformerFor(exprs[i]).doCPSTransform(parentFuncDef, cont);
-			if (i == 0) {
-				firstBody = body;
-			} else {
-				parentFuncDef.getStatements().push(new ReturnStatement(new Token("return", false), body));
-			}
-
-			parentFuncDef = childFuncDef;
-		}
-		var lastBody = new CallExpression(
-			new Token("(", false),
-			continuation,
-			[ this._constructInvoke(newArgs.map.<Expression>((arg) -> (new LocalExpression(arg.getName(), arg) as Expression))) ]
-		);
-		parentFuncDef.getStatements().push(new ReturnStatement(new Token("return", false), lastBody));
-
-		var closures = new MemberFunctionDefinition[];
-		lastBody.forEachExpression(function (expr) {
-			if (expr instanceof FunctionExpression) {
-				closures.push((expr as FunctionExpression).getFuncDef());
-			}
-			// does not search for funcDefs deeper than the first level
-			return true;
-		});
-
-		// detach closures
-		for (var i = 0; i < closures.length; ++i) {
-			var j;
-			if ((j = parent.getClosures().indexOf(closures[i])) != -1) {
-				parent.getClosures().splice(j, 1);
-			}
-		}
-
-		// change the parent
-		parentFuncDef._closures = closures;
-		for (var i = 0; i < closures.length; ++i) {
-			closures[i].setParent(parentFuncDef);
-		}
-
-		return firstBody;
-	}
-
-}
-
-class _CallExpressionTransformer extends _InvokingExpressionTransformer {
+class _CallExpressionTransformer extends _ExpressionTransformer {
 
 	var _expr : CallExpression;
 
@@ -667,14 +714,14 @@ class _CallExpressionTransformer extends _InvokingExpressionTransformer {
 		if (this._isMethodCall()) {
 			// method calls
 			var receiver = (this._expr.getExpr() as PropertyExpression).getExpr();
-			return this._transformInvoke(parent, continuation, [ receiver ].concat(this._expr.getArguments()));
+			return this._transformOp(parent, continuation, [ receiver ].concat(this._expr.getArguments()));
 		} else {
-			return this._transformInvoke(parent, continuation, [ this._expr.getExpr() ].concat(this._expr.getArguments()));
+			return this._transformOp(parent, continuation, [ this._expr.getExpr() ].concat(this._expr.getArguments()));
 		}
 
 	}
 
-	override function _constructInvoke (exprs : Expression[]) : Expression {
+	override function _constructOp (exprs : Expression[]) : Expression {
 		if (this._isMethodCall()) {
 			var propertyExpr = this._expr.getExpr() as PropertyExpression;
 			return new CallExpression(
@@ -688,7 +735,7 @@ class _CallExpressionTransformer extends _InvokingExpressionTransformer {
 
 }
 
-class _SuperExpressionTransformer extends _InvokingExpressionTransformer {
+class _SuperExpressionTransformer extends _ExpressionTransformer {
 
 	var _expr : SuperExpression;
 
@@ -702,10 +749,10 @@ class _SuperExpressionTransformer extends _InvokingExpressionTransformer {
 	}
 
 	override function doCPSTransform (parent : MemberFunctionDefinition, continuation : Expression) : Expression {
-		return this._transformInvoke(parent, continuation, this._expr.getArguments());
+		return this._transformOp(parent, continuation, this._expr.getArguments());
 	}
 
-	override function _constructInvoke (exprs : Expression[]) : Expression {
+	override function _constructOp (exprs : Expression[]) : Expression {
 		var superExpr = new SuperExpression(this._expr);
 		superExpr._args = exprs;
 		return superExpr;
@@ -713,7 +760,7 @@ class _SuperExpressionTransformer extends _InvokingExpressionTransformer {
 
 }
 
-class _NewExpressionTransformer extends _InvokingExpressionTransformer {
+class _NewExpressionTransformer extends _ExpressionTransformer {
 
 	var _expr : NewExpression;
 
@@ -727,66 +774,13 @@ class _NewExpressionTransformer extends _InvokingExpressionTransformer {
 	}
 
 	override function doCPSTransform (parent : MemberFunctionDefinition, continuation : Expression) : Expression {
-		return this._transformInvoke(parent, continuation, this._expr.getArguments());
+		return this._transformOp(parent, continuation, this._expr.getArguments());
 	}
 
-	override function _constructInvoke (exprs : Expression[]) : Expression {
+	override function _constructOp (exprs : Expression[]) : Expression {
 		var newExpr = new NewExpression(this._expr);
 		newExpr._args = exprs;
 		return newExpr;
-	}
-
-}
-
-class _ArrayLiteralExpressionTransformer extends _InvokingExpressionTransformer {
-
-	var _expr : ArrayLiteralExpression;
-
-	function constructor (transformer : CodeTransformer, expr : ArrayLiteralExpression) {
-		super(transformer, "ARRAY-LITERAL");
-		this._expr = expr;
-	}
-
-	override function getExpression () : Expression {
-		return this._expr;
-	}
-
-	override function doCPSTransform (parent : MemberFunctionDefinition, continuation : Expression) : Expression {
-		return this._transformInvoke(parent, continuation, this._expr.getExprs());
-	}
-
-	override function _constructInvoke (exprs : Expression[]) : Expression {
-		var arrayLiteralExpr = this._expr.clone();
-		arrayLiteralExpr._exprs = exprs;
-		return arrayLiteralExpr;
-	}
-
-}
-
-class _MapLiteralExpressionTransformer extends _InvokingExpressionTransformer {
-
-	var _expr : MapLiteralExpression;
-
-	function constructor (transformer : CodeTransformer, expr : MapLiteralExpression) {
-		super(transformer, "MAP-LITERAL");
-		this._expr = expr;
-	}
-
-	override function getExpression () : Expression {
-		return this._expr;
-	}
-
-	override function doCPSTransform (parent : MemberFunctionDefinition, continuation : Expression) : Expression {
-		return this._transformInvoke(parent, continuation, this._expr.getElements().map.<Expression>((elt) -> elt.getExpr()));
-	}
-
-	override function _constructInvoke (exprs : Expression[]) : Expression {
-		var elts = new MapLiteralElement[];
-		for (var i = 0; i < this._expr.getElements().length; ++i) {
-			var elt = this._expr.getElements()[i];
-			elts[i] = new MapLiteralElement(elt.getKey(), exprs[i]);
-		}
-		return new MapLiteralExpression(this._expr.getToken(), elts, this._expr.getType());
 	}
 
 }
