@@ -547,7 +547,7 @@ class _AssignmentExpressionTransformer extends _ExpressionTransformer {
 		  E1 | function ($1) { return E2 | function ($2) { return C($1.prop = $2); }; }
 		*/
 
-		return this._transformOp(parent, continuation, [ this._expr.getFirstExpr(), this._expr.getSecondExpr() ]);
+		return this._transformOp(parent, continuation, [ (this._expr.getFirstExpr() as PropertyExpression).getExpr(), this._expr.getSecondExpr() ]);
 	}
 
 	override function _constructOp (exprs : Expression[]) : Expression {
