@@ -1873,13 +1873,13 @@ class CodeTransformer {
 		);
 		funcDef._statements = statements;
 
-		// replace goto statements with calls of closures
-		this._eliminateGotos(funcDef, postFragmentationCallback);
-
 		if (! Type.voidType.equals(returnType)) {
 			funcDef._statements.push(new ReturnStatement(new Token("return", false), new LocalExpression(returnLocal.getName(), returnLocal)));
 			this.leaveFunction();
 		}
+
+		// replace goto statements with calls of closures
+		this._eliminateGotos(funcDef, postFragmentationCallback);
 	}
 
 	function _eliminateGotos (funcDef : MemberFunctionDefinition, postFragmentationCallback : (string, Statement[]) -> void) : void {
@@ -1893,24 +1893,24 @@ class CodeTransformer {
 				funcDef.getLocals().push(labels[name]);
 			}
 		}
-		// replace gotos with function call
+		// replace gotos with function call (and return statement)
 		for (var i = 0; i < statements.length; ++i) {
 			var stmt = statements[i];
 			if (stmt instanceof GotoStatement) {
 				var name = (stmt as GotoStatement).getLabel();
-				statements[i] = new ExpressionStatement(new CallExpression(new Token("(", false), new LocalExpression(null, labels[name]), []));
+				statements[i] = new ReturnStatement(new Token("return", false), new CallExpression(new Token("(", false), new LocalExpression(null, labels[name]), []));
 			} else if (stmt instanceof IfStatement) {
 				var ifStmt = stmt as IfStatement;
 				var succLabel = (ifStmt.getOnTrueStatements()[0] as GotoStatement).getLabel();
-				ifStmt.getOnTrueStatements()[0] = new ExpressionStatement(new CallExpression(new Token("(", false), new LocalExpression(null, labels[succLabel]), []));
+				ifStmt.getOnTrueStatements()[0] = new ReturnStatement(new Token("return", false), new CallExpression(new Token("(", false), new LocalExpression(null, labels[succLabel]), []));
 				var failLabel = (ifStmt.getOnFalseStatements()[0] as GotoStatement).getLabel();
-				ifStmt.getOnFalseStatements()[0] = new ExpressionStatement(new CallExpression(new Token("(", false), new LocalExpression(null, labels[failLabel]), []));
+				ifStmt.getOnFalseStatements()[0] = new ReturnStatement(new Token("return", false), new CallExpression(new Token("(", false), new LocalExpression(null, labels[failLabel]), []));
 			} else if (stmt instanceof SwitchStatement) {
 				var switchStmt = stmt as SwitchStatement;
 				for (var j = 0; j < switchStmt.getStatements().length; ++j) {
 					if (switchStmt.getStatements()[j] instanceof GotoStatement) {
 						name = (switchStmt.getStatements()[j] as GotoStatement).getLabel();
-						switchStmt.getStatements()[j] = new ExpressionStatement(new CallExpression(new Token("(", false), new LocalExpression(null, labels[name]), []));
+						switchStmt.getStatements()[j] = new ReturnStatement(new Token("return", false), new CallExpression(new Token("(", false), new LocalExpression(null, labels[name]), []));
 					}
 				}
 			}
@@ -2005,7 +2005,7 @@ class CodeTransformer {
 								new Token("__next", true),
 								[],
 								new StaticFunctionType(null, Type.voidType, [], true)),
-							((statements[idx + 1] as ExpressionStatement).getExpr()as CallExpression).getExpr())));
+							((statements[idx + 1] as ReturnStatement).getExpr()as CallExpression).getExpr())));
 			}
 		});
 
@@ -2040,7 +2040,7 @@ class CodeTransformer {
 						new StaticFunctionType(null, Type.voidType, [], true)),
 					new LocalExpression(
 						new Token("$BEGIN", true),
-						(((statements[statements.length - 1] as ExpressionStatement).getExpr() as CallExpression).getExpr() as LocalExpression).getLocal()))));
+						(((statements[statements.length - 1] as ReturnStatement).getExpr() as CallExpression).getExpr() as LocalExpression).getLocal()))));
 
 		// return the generator
 		statements.push(
