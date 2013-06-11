@@ -468,16 +468,15 @@ abstract class _BinaryExpressionTransformer extends _ExpressionTransformer {
 		       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^cont1^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 		*/
 
-		// create a continuation
-		var arg2 = this._transformer.createFreshArgumentDeclaration(this._expr.getSecondExpr().getType());
-		var arg1 = this._transformer.createFreshArgumentDeclaration(this._expr.getFirstExpr().getType());
-		// FIXME wrong parent
-		var cont2 = this._createContinuation(parent, arg2, this._createCall1(continuation, this._clone(new LocalExpression(this._expr.getToken(), arg1), new LocalExpression(this._expr.getToken(), arg2))));
-		var cont1 = this._createContinuation(parent, arg1, this._transformer._getExpressionTransformerFor(this._expr.getSecondExpr()).doCPSTransform(parent, cont2));
-		return this._transformer._getExpressionTransformerFor(this._expr.getFirstExpr()).doCPSTransform(parent, cont1);
+		return this._transformOp(parent, continuation, [ this._expr.getFirstExpr(), this._expr.getSecondExpr() ]);
 	}
 
-	abstract function _clone (arg1 : LocalExpression, arg2 : LocalExpression) : BinaryExpression;
+	override function _constructOp (exprs : Expression[]) : Expression {
+		assert exprs.length == 2;
+		return this._clone(exprs[0], exprs[1]);
+	}
+
+	abstract function _clone (arg1 : Expression, arg2 : Expression) : BinaryExpression;
 
 }
 
@@ -487,7 +486,7 @@ class _AdditiveExpressionTransformer extends _BinaryExpressionTransformer {
 		super(transformer, expr);
 	}
 
-	override function _clone (arg1 : LocalExpression, arg2 : LocalExpression) : BinaryExpression {
+	override function _clone (arg1 : Expression, arg2 : Expression) : BinaryExpression {
 		return new AdditiveExpression(this._expr.getToken(), arg1, arg2);
 	}
 
@@ -499,7 +498,7 @@ class _ArrayExpressionTransformer extends _BinaryExpressionTransformer {
 		super(transformer, expr);
 	}
 
-	override function _clone (arg1 : LocalExpression, arg2 : LocalExpression) : BinaryExpression {
+	override function _clone (arg1 : Expression, arg2 : Expression) : BinaryExpression {
 		return new ArrayExpression(this._expr.getToken(), arg1, arg2);
 	}
 
@@ -550,7 +549,7 @@ class _AssignmentExpressionTransformer extends _BinaryExpressionTransformer {
 		return this._transformer._getExpressionTransformerFor((this._expr.getFirstExpr() as PropertyExpression).getExpr()).doCPSTransform(parent, cont1);
 	}
 
-	override function _clone (arg1 : LocalExpression, arg2 : LocalExpression) : BinaryExpression {
+	override function _clone (arg1 : Expression, arg2 : Expression) : BinaryExpression {
 		throw new Error("logic flaw");
 	}
 
@@ -562,7 +561,7 @@ class _BinaryNumberExpressionTransformer extends _BinaryExpressionTransformer {
 		super(transformer, expr);
 	}
 
-	override function _clone (arg1 : LocalExpression, arg2 : LocalExpression) : BinaryExpression {
+	override function _clone (arg1 : Expression, arg2 : Expression) : BinaryExpression {
 		return new BinaryNumberExpression(this._expr.getToken(), arg1, arg2);
 	}
 
@@ -574,7 +573,7 @@ class _EqualityExpressionTransformer extends _BinaryExpressionTransformer {
 		super(transformer, expr);
 	}
 
-	override function _clone (arg1 : LocalExpression, arg2 : LocalExpression) : BinaryExpression {
+	override function _clone (arg1 : Expression, arg2 : Expression) : BinaryExpression {
 		return new EqualityExpression(this._expr.getToken(), arg1, arg2);
 	}
 
@@ -586,7 +585,7 @@ class _InExpressionTransformer extends _BinaryExpressionTransformer {
 		super(transformer, expr);
 	}
 
-	override function _clone (arg1 : LocalExpression, arg2 : LocalExpression) : BinaryExpression {
+	override function _clone (arg1 : Expression, arg2 : Expression) : BinaryExpression {
 		return new InExpression(this._expr.getToken(), arg1, arg2);
 	}
 
@@ -598,7 +597,7 @@ class _LogicalExpressionTransformer extends _BinaryExpressionTransformer {
 		super(transformer, expr);
 	}
 
-	override function _clone (arg1 : LocalExpression, arg2 : LocalExpression) : BinaryExpression {
+	override function _clone (arg1 : Expression, arg2 : Expression) : BinaryExpression {
 		return new LogicalExpression(this._expr.getToken(), arg1, arg2);
 	}
 
@@ -610,7 +609,7 @@ class _ShiftExpressionTransformer extends _BinaryExpressionTransformer {
 		super(transformer, expr);
 	}
 
-	override function _clone (arg1 : LocalExpression, arg2 : LocalExpression) : BinaryExpression {
+	override function _clone (arg1 : Expression, arg2 : Expression) : BinaryExpression {
 		return new ShiftExpression(this._expr.getToken(), arg1, arg2);
 	}
 
