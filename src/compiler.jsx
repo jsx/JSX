@@ -352,13 +352,11 @@ class Compiler {
 			return classDef.forEachMember(function onMember(member) {
 				if (member instanceof MemberFunctionDefinition) {
 					var funcDef = member as MemberFunctionDefinition;
-					if (funcDef.getStatements() != null && funcDef._nameToken != null && funcDef.name() == "foo") {
+					if (funcDef.getStatements() != null) {
 						this._transformer._doCPSTransform(funcDef);
 					}
 				}
-				return member.forEachClosure(function (funcDef) {
-					return onMember(funcDef);
-				});
+				return true;
 			});
 		});
 		// transform generators
