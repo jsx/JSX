@@ -1850,7 +1850,7 @@ class CodeTransformer {
 		this._eliminateGotos(funcDef, postFragmentationCallback);
 	}
 
-	function _eliminateGotos (funcDef : MemberFunctionDefinition, postFragmentationCallback : (string, Statement[]) -> void) : number {
+	function _eliminateGotos (funcDef : MemberFunctionDefinition, postFragmentationCallback : (string, Statement[]) -> void) : void {
 		var statements = funcDef.getStatements();
 		// collect labels
 		var labels = new Map.<LocalVariable>;
@@ -1894,7 +1894,6 @@ class CodeTransformer {
 		// collect code blocks
 		var codeBlocks = new Statement[];
 		var currentLabel : LabelStatement = null;
-		var numBlock = 0;
 		while (i < statements.length) {
 			var currentLabel = statements[i] as LabelStatement;
 			// read the block
@@ -1925,10 +1924,8 @@ class CodeTransformer {
 					new Token("=", false),
 					new LocalExpression(null, labels[currentLabel.getName()]),
 					new FunctionExpression(new Token("function", false), block))));
-			++numBlock;
 		}
 		funcDef._statements = codeBlocks.concat(entries);
-		return numBlock;
 	}
 
 	function _compileYields(funcDef : MemberFunctionDefinition) : void { // FIXME wasabiz nested generator
