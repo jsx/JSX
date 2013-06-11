@@ -947,15 +947,18 @@ class _ReturnStatementTransformer extends _StatementTransformer {
 	}
 
 	override function _replaceControlStructuresWithGotos () : Statement[] {
-		var returnLocal = this._transformer.getTopReturnLocal();
-
 		var statements = new Statement[];
-		statements.push(new ExpressionStatement(
-			new AssignmentExpression(
-				new Token("=", false),
-				new LocalExpression(returnLocal.getName(), returnLocal),
-				this._statement.getExpr())));
+		if (this._statement.getExpr() != null) {
+			var returnLocal = this._transformer.getTopReturnLocal();
+			assert returnLocal != null;
+			statements.push(new ExpressionStatement(
+				new AssignmentExpression(
+					new Token("=", false),
+					new LocalExpression(returnLocal.getName(), returnLocal),
+					this._statement.getExpr())));
+		}
 		statements.push(new GotoStatement("$END"));
+
 		return statements;
 	}
 
