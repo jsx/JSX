@@ -947,7 +947,16 @@ class _ReturnStatementTransformer extends _StatementTransformer {
 	}
 
 	override function _replaceControlStructuresWithGotos () : Statement[] {
-		throw new Error("logic flaw");
+		var returnLocal = this._transformer.getTopReturnLocal();
+
+		var statements = new Statement[];
+		statements.push(new ExpressionStatement(
+			new AssignmentExpression(
+				new Token("=", false),
+				new LocalExpression(returnLocal.getName(), returnLocal),
+				this._statement.getExpr())));
+		statements.push(new GotoStatement("$END"));
+		return statements;
 	}
 
 }
@@ -1649,6 +1658,20 @@ class CodeTransformer {
 		this._labelMap.pop();
 	}
 
+	var _returnLocals = new LocalVariable[];
+
+	function getTopReturnLocal () : LocalVariable {
+		return this._returnLocals[this._returnLocals.length - 1];
+	}
+
+	function enterFunction (returnLocal : LocalVariable) : void {
+		this._returnLocals.push(returnLocal);
+	}
+
+	function leaveFunction () : void {
+		this._returnLocals.pop();
+	}
+
 	var _numUniqVar = 0;
 
 	function createFreshArgumentDeclaration (type : Type) : ArgumentDeclaration {
@@ -1812,6 +1835,8 @@ class CodeTransformer {
 	}
 
 	function _doCPSTransform (funcDef : MemberFunctionDefinition, transformOnlyStmts : boolean, postFragmentationCallback : (string, Statement[]) -> void) : void {
+		var returnLocal : LocalVariable = null;
+
 		if (! transformOnlyStmts) {
 			// transform expressions inside as well
 			for (var i = 0; i < funcDef.getStatements().length; ++i) {
@@ -1822,6 +1847,15 @@ class CodeTransformer {
 				});
 			}
 		}
+
+		var returnType = funcDef.getReturnType();
+		if (! Type.voidType.equals(returnType)) {
+			var returnLocalName = "$return" + CodeTransformer._getFunctionNestDepth(funcDef) as string;
+			returnLocal = new LocalVariable(new Token(returnLocalName, false), returnType);
+			funcDef.getLocals().push(returnLocal);
+			this.enterFunction(returnLocal);
+		}
+
 		// replace control structures with goto statements
 		var statements = new Statement[];
 		for (var i = 0; i < funcDef.getStatements().length; ++i) {
@@ -1841,6 +1875,11 @@ class CodeTransformer {
 
 		// replace goto statements with calls of closures
 		this._eliminateGotos(funcDef, postFragmentationCallback);
+
+		if (! Type.voidType.equals(returnType)) {
+			statements.push(new ReturnStatement(new Token("return", false), new LocalExpression(returnLocal.getName(), returnLocal)));
+			this.leaveFunction();
+		}
 	}
 
 	function _eliminateGotos (funcDef : MemberFunctionDefinition, postFragmentationCallback : (string, Statement[]) -> void) : void {
@@ -2042,6 +2081,16 @@ class CodeTransformer {
 		while ((parent = funcDef.getParent()) != null) {
 			if (parent.isGenerator())
 				depth++;
+			funcDef = parent;
+		}
+		return depth;
+	}
+
+	static function _getFunctionNestDepth (funcDef : MemberFunctionDefinition) : number {
+		var depth = 0;
+		var parent : MemberFunctionDefinition;
+		while ((parent = funcDef.getParent()) != null) {
+			depth++;
 			funcDef = parent;
 		}
 		return depth;
