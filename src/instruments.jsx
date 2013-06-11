@@ -525,8 +525,10 @@ class _AssignmentExpressionTransformer extends _ExpressionTransformer {
 			return this._transformLocalAssignment(parent, continuation);
 		} else if (lhsExpr instanceof PropertyExpression) {
 			return this._transformPropertyAssignment(parent, continuation);
+		} else if (lhsExpr instanceof ArrayExpression) {
+			return this._transformArrayAssignment(parent, continuation);
 		} else {
-			throw new Error("TODO unsupported assignment type");
+			throw new Error("logic flaw");
 		}
 	}
 
@@ -550,6 +552,17 @@ class _AssignmentExpressionTransformer extends _ExpressionTransformer {
 		return this._transformOp(parent, continuation, [ (this._expr.getFirstExpr() as PropertyExpression).getExpr(), this._expr.getSecondExpr() ]);
 	}
 
+	function _transformArrayAssignment (parent : MemberFunctionDefinition, continuation : Expression) : Expression {
+		/*
+		  E1[E2] = E3 | C
+
+		  E1 | function ($1) { return E2 | function ($2) { return E3 | function ($3) { return C($1[$2] = $3); }; }; }
+		*/
+
+		var arrayExpr = this._expr.getFirstExpr() as ArrayExpression;
+		return this._transformOp(parent, continuation, [ arrayExpr.getFirstExpr(), arrayExpr.getSecondExpr(), this._expr.getSecondExpr() ]);
+	}
+
 	override function _constructOp (exprs : Expression[]) : Expression {
 		var lhsExpr = this._expr.getFirstExpr();
 		if (lhsExpr instanceof LocalExpression) {
@@ -558,6 +571,9 @@ class _AssignmentExpressionTransformer extends _ExpressionTransformer {
 		} else if (lhsExpr instanceof PropertyExpression) {
 			assert exprs.length == 2;
 			return this._constructPropertyAssignment(exprs[0], exprs[1]);
+		} else if (lhsExpr instanceof ArrayExpression) {
+			assert exprs.length == 3;
+			return this._constructArrayAssignment(exprs[0], exprs[1], exprs[2]);
 		} else {
 			throw new Error("logic flaw");
 		}
@@ -571,6 +587,12 @@ class _AssignmentExpressionTransformer extends _ExpressionTransformer {
 		var propertyExpr = (this._expr.getFirstExpr() as PropertyExpression).clone();
 		propertyExpr._expr = expr1;
 		return new AssignmentExpression(this._expr.getToken(), propertyExpr, expr2);
+	}
+
+	function _constructArrayAssignment (receiver : Expression, key : Expression, value : Expression) : Expression {
+		var arrayExpr = new ArrayExpression(this._expr.getFirstExpr().getToken(), receiver, key);
+		arrayExpr._type = this._expr.getFirstExpr().getType();
+		return new AssignmentExpression(this._expr.getToken(), arrayExpr, value);
 	}
 
 }
