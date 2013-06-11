@@ -305,13 +305,16 @@ abstract class _UnaryExpressionTransformer extends _ExpressionTransformer {
 		  v | function ($v) { return C(op($v)); }
 		*/
 
-		// create a continuation
-		var arg = this._transformer.createFreshArgumentDeclaration(this._expr.getExpr().getType());
-		var cont = this._createContinuation(parent, arg, this._createCall1(continuation, this._clone(new LocalExpression(this._expr.getToken(), arg))));
-		return this._transformer._getExpressionTransformerFor(this._expr.getExpr()).doCPSTransform(parent, cont);
+		return this._transformOp(parent, continuation, [ this._expr.getExpr() ]);
 	}
 
-	abstract function _clone (arg : LocalExpression) : UnaryExpression;
+	override function _constructOp (exprs : Expression[]) : Expression {
+		assert exprs.length == 1;
+
+		return this._clone(exprs[0]);
+	}
+
+	abstract function _clone (arg : Expression) : UnaryExpression;
 
 }
 
@@ -321,7 +324,7 @@ class _BitwiseNotExpressionTransformer extends _UnaryExpressionTransformer {
 		super(transformer, expr);
 	}
 
-	override function _clone (arg : LocalExpression) : UnaryExpression {
+	override function _clone (arg : Expression) : UnaryExpression {
 		return new BitwiseNotExpression(this._expr.getToken(), arg);
 	}
 
@@ -333,7 +336,7 @@ class _InstanceofExpressionTransformer extends _UnaryExpressionTransformer {
 		super(transformer, expr);
 	}
 
-	override function _clone (arg : LocalExpression) : UnaryExpression {
+	override function _clone (arg : Expression) : UnaryExpression {
 		return new InstanceofExpression(this._expr.getToken(), arg, (this._expr as InstanceofExpression).getExpectedType());
 	}
 
@@ -345,7 +348,7 @@ class _AsExpressionTransformer extends _UnaryExpressionTransformer {
 		super(transformer, expr);
 	}
 
-	override function _clone (arg : LocalExpression) : UnaryExpression {
+	override function _clone (arg : Expression) : UnaryExpression {
 		return new AsExpression(this._expr.getToken(), arg, this._expr.getType());
 	}
 
@@ -357,7 +360,7 @@ class _AsNoConvertExpressionTransformer extends _UnaryExpressionTransformer {
 		super(transformer, expr);
 	}
 
-	override function _clone (arg : LocalExpression) : UnaryExpression {
+	override function _clone (arg : Expression) : UnaryExpression {
 		return new AsNoConvertExpression(this._expr.getToken(), arg, this._expr.getType());
 	}
 
@@ -369,7 +372,7 @@ class _LogicalNotExpressionTransformer extends _UnaryExpressionTransformer {
 		super(transformer, expr);
 	}
 
-	override function _clone (arg : LocalExpression) : UnaryExpression {
+	override function _clone (arg : Expression) : UnaryExpression {
 		return new LogicalNotExpression(this._expr.getToken(), arg);
 	}
 
@@ -381,7 +384,7 @@ class _PostIncrementExpressionTransformer extends _UnaryExpressionTransformer {
 		super(transformer, expr);
 	}
 
-	override function _clone (arg : LocalExpression) : UnaryExpression {
+	override function _clone (arg : Expression) : UnaryExpression {
 		return new PostIncrementExpression(this._expr.getToken(), arg);
 	}
 
@@ -393,7 +396,7 @@ class _PreIncrementExpressionTransformer extends _UnaryExpressionTransformer {
 		super(transformer, expr);
 	}
 
-	override function _clone (arg : LocalExpression) : UnaryExpression {
+	override function _clone (arg : Expression) : UnaryExpression {
 		return new PreIncrementExpression(this._expr.getToken(), arg);
 	}
 
@@ -413,7 +416,7 @@ class _PropertyExpressionTransformer extends _UnaryExpressionTransformer {
 		return super.doCPSTransform(parent, continuation);
 	}
 
-	override function _clone (arg : LocalExpression) : UnaryExpression {
+	override function _clone (arg : Expression) : UnaryExpression {
 		return new PropertyExpression(this._expr.getToken(), arg, (this._expr as PropertyExpression).getIdentifierToken(), (this._expr as PropertyExpression).getTypeArguments(), this._expr.getType());
 	}
 
@@ -425,7 +428,7 @@ class _TypeofExpressionTransformer extends _UnaryExpressionTransformer {
 		super(transformer, expr);
 	}
 
-	override function _clone (arg : LocalExpression) : UnaryExpression {
+	override function _clone (arg : Expression) : UnaryExpression {
 		return new TypeofExpression(this._expr.getToken(), arg);
 	}
 
@@ -437,7 +440,7 @@ class _SignExpressionTransformer extends _UnaryExpressionTransformer {
 		super(transformer, expr);
 	}
 
-	override function _clone (arg : LocalExpression) : UnaryExpression {
+	override function _clone (arg : Expression) : UnaryExpression {
 		return new SignExpression(this._expr.getToken(), arg);
 	}
 
