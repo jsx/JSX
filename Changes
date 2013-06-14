@@ -1,5 +1,12 @@
 Revision history for the JSX software development kit
 
+NEXT
+    [CHANGES]
+    - Changed sourceMappingURL syntax
+      (see http://updates.html5rocks.com/2013/06/sourceMappingURL-and-sourceURL-syntax-changed for details)
+    - Support sourcesContent in source-map to handle multiple source files
+      easier
+
 0.9.40 2013-06-11 03:42:00+0900
     [CHANGES]
     - accept Uint8Array as the argument to the ctor of Buffer of node.js
