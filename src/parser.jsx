@@ -3255,7 +3255,7 @@ class Parser {
 					|| (keyToken = this._expectStringLiteralOpt()) != null) {
 					// ok
 				} else {
-					this._newError("expected identifier, number or string but got '" + token.toString() + "'");
+					this._newError("expected identifier, number or string but got '" + token.getValue() + "'");
 				}
 				// separator
 				if (this._expect(":") == null)
