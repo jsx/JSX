@@ -11,6 +11,22 @@ import "../util/jslexer.jsx";
 
 class _Test extends TestCase {
 
+	function testMakeGeneratedPos() : void {
+		var g = new SourceMapper("dummy root", "dummy file");
+
+		var pos = g.makeGeneratedPos("");
+		this.expect(pos["line"],   "line").toBe(1);
+		this.expect(pos["column"], "column").toBe(0);
+
+		pos = g.makeGeneratedPos("foo\nbar");
+		this.expect(pos["line"],   "line").toBe(2);
+		this.expect(pos["column"], "column").toBe(3);
+
+		pos = g.makeGeneratedPos("foo\nbar\n");
+		this.expect(pos["line"],   "line").toBe(3);
+		this.expect(pos["column"], "column").toBe(0);
+	}
+
 	function testWithSourceMapConsumer() : void {
 		if(process.env["JSX_DISABLE_SOURCE_MAP_TEST"]) {
 			this.diag("skip source-map testing because: JSX_DISABLE_SOURCE_MAP_TEST is true");

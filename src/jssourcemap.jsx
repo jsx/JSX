@@ -47,6 +47,9 @@ class SourceMapper {
 
 	var _sourceFiles = new Map.<boolean>();
 
+	var _outputLength = 0;
+	var _outputLineNumber = 1;
+
 	function constructor (rootDir : string, outputFile : string) {
 		this._rootDir = rootDir;
 		this._outputFile = Util.resolvePath(outputFile);
@@ -55,13 +58,16 @@ class SourceMapper {
 		});
 	}
 
-	function _makeGenPos(output : string) : Map.<number>{
-		var pos = 0;
-		var line = 1;
+	function makeGeneratedPos(output : string) : Map.<number>{
+		var pos  = this._outputLength;
+		var line = this._outputLineNumber;
 		while ( (pos = output.indexOf("\n", pos)) != -1 ) {
 			++pos;
 			++line;
 		}
+
+		this._outputLength = output.length;
+		this._outputLineNumber = line;
 
 		var lastNewLinePos = output.lastIndexOf("\n") + 1;
 		var column = (output.length - lastNewLinePos);
@@ -73,7 +79,7 @@ class SourceMapper {
 
 	function add(output : string, tokenLineNumber : number, tokenColumnNumber : number, tokenValue : Nullable.<string>, tokenFilename : Nullable.<string>) : void {
 
-		var genPos = this._makeGenPos(output);
+		var genPos = this.makeGeneratedPos(output);
 		var origPos = null : Map.<number>;
 
 		if (! Number.isNaN(tokenLineNumber)) {
