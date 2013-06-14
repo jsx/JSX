@@ -55,19 +55,48 @@ class SourceMapper {
 		});
 	}
 
-	function add (generatedPos : Map.<number>, originalPos : Map.<number>, sourceFile : Nullable.<string>, tokenName : Nullable.<string>) : void {
+	function _makeGenPos(output : string) : Map.<number>{
+		var pos = 0;
+		var line = 1;
+		while ( (pos = output.indexOf("\n", pos)) != -1 ) {
+			++pos;
+			++line;
+		}
+
+		var lastNewLinePos = output.lastIndexOf("\n") + 1;
+		var column = (output.length - lastNewLinePos);
+		return {
+			line:   line,
+			column: column
+		};
+	}
+
+	function add(output : string, tokenLineNumber : number, tokenColumnNumber : number, tokenValue : Nullable.<string>, tokenFilename : Nullable.<string>) : void {
+
+		var genPos = this._makeGenPos(output);
+		var origPos = null : Map.<number>;
+
+		if (! Number.isNaN(tokenLineNumber)) {
+			origPos = {
+				line:   tokenLineNumber,
+				column: tokenColumnNumber
+			};
+		}
+
+		var sourceFile = tokenFilename;
 		if (sourceFile != null) {
 			this._sourceFiles[sourceFile] = true;
 			if (sourceFile.indexOf(this._rootDir + "/") == 0) {
 				sourceFile = sourceFile.substring(this._rootDir.length + 1);
 			}
 		}
+
 		this._impl.addMapping({
-			generated: generatedPos,
-			original:  originalPos,
+			generated: genPos,
+			original:  origPos,
 			source:    sourceFile,
-			name:      tokenName
-		} : Map.<variant>);
+			name:      tokenValue
+		});
 	}
 
 	function setSourceContent(sourceFile : string, sourceContent : string) : void {
