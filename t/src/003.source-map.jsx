@@ -70,7 +70,6 @@ class _Test extends TestCase {
 		this.expect(orig['line'], "orig.line").toBe(15);
 		this.expect(orig['column'], "orig.column").toBe(20);
 		this.expect(orig['name'], "orig.name").toBe(null);
-		this.expect(platform.fileExists("t/src/source-map/" + orig['source'] as string), orig['source'] as string + " exists").toBe(true);
 
 		this.note('search for 42');
 		pos = search(source, function (t) { return t.token == '42'; });
@@ -80,7 +79,6 @@ class _Test extends TestCase {
 		this.expect(orig['line'], "orig.line").toBe(7);
 		this.expect(orig['column'], "orig.column").toBe(14);
 		this.expect(orig['name'], "orig.name").toBe(null);
-		this.expect(platform.fileExists("t/src/source-map/" + orig['source'] as string), orig['source'] as string + " exists").toBe(true);
 
 		this.note('search for _Main');
 		pos = search(source, function (t) { return /^_Main\b/.test(t.token); });
@@ -90,7 +88,6 @@ class _Test extends TestCase {
 		this.expect(orig['line'], "orig.line").toBe(6);
 		this.expect(orig['column'], "orig.column").toBe(6);
 		this.expect(orig['name'], "orig.name").toBe("_Main");
-		this.expect(platform.fileExists("t/src/source-map/" + orig['source'] as string), orig['source'] as string + " exists").toBe(true);
 
 		this.note('search for "getFoo"');
 		pos = search(source, function (t) { return /\bgetFoo\b/.test(t.token); });
@@ -100,7 +97,6 @@ class _Test extends TestCase {
 		this.expect(orig['line'], "orig.line").toBe(10);
 		this.expect(orig['column'], "orig.column").toBe(13);
 		this.expect(orig['name'], "orig.name").toBe("getFoo");
-		this.expect(platform.fileExists("t/src/source-map/" + orig['source'] as string), orig['source'] as string + " exists").toBe(true);
 	}
 
 }

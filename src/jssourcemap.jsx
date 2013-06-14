@@ -25,13 +25,12 @@
  * IN THE SOFTWARE.
  */
 
-import "js.jsx";
-
 import "./util.jsx";
 
 native ("require('source-map').SourceMapGenerator") class SourceMapGenerator {
 	function constructor(options : Map.<string>);
 	function addMapping(mapping : Map.<variant>) : void;
+	function setSourceContent(sourceFile : string, sourceContent : string) : void;
 }
 
 native ("require('source-map').SourceMapConsumer") class SourceMapConsumer {
@@ -44,29 +43,23 @@ class SourceMapper {
 
 	var _rootDir : string;
 	var _outputFile : string;
-	var _copyDestDir : string;
 	var _impl : SourceMapGenerator;
 
-	// Because the browse will request to get the original source files listed in the source mapping file, we prepare copies of the original source files.
-	var _fileMap = new Map.<string>; // original-to-copy filename mapping
+	var _sourceFiles = new Map.<boolean>();
 
 	function constructor (rootDir : string, outputFile : string) {
 		this._rootDir = rootDir;
 		this._outputFile = Util.resolvePath(outputFile);
-		this._copyDestDir =  this._outputFile + ".mapping.d";
 		this._impl = new SourceMapGenerator({
-			file       : Util.basename(this._outputFile),
-			sourceRoot : Util.basename(this._copyDestDir)
+			file       : Util.basename(this._outputFile)
 		});
 	}
 
 	function add (generatedPos : Map.<number>, originalPos : Map.<number>, sourceFile : Nullable.<string>, tokenName : Nullable.<string>) : void {
 		if (sourceFile != null) {
+			this._sourceFiles[sourceFile] = true;
 			if (sourceFile.indexOf(this._rootDir + "/") == 0) {
 				sourceFile = sourceFile.substring(this._rootDir.length + 1);
-			}
-			if (! this._fileMap.hasOwnProperty(sourceFile)) {
-				this._fileMap[sourceFile] = this._copyDestDir +"/"+ sourceFile;
 			}
 		}
 		this._impl.addMapping({
@@ -77,12 +70,16 @@ class SourceMapper {
 		} : Map.<variant>);
 	}
 
+	function setSourceContent(sourceFile : string, sourceContent : string) : void {
+		this._impl.setSourceContent(sourceFile, sourceContent);
+	}
+
 	function getSourceMappingFile () : string {
 		return this._outputFile + ".mapping";
 	}
 
-	function getSourceFileMap () : Map.<string> {
-		return this._fileMap;
+	function getSourceFiles() : string[] {
+		return this._sourceFiles.keys();
 	}
 
 	function generate () : string {

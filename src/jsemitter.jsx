@@ -2825,17 +2825,17 @@ class JavaScriptEmitter implements Emitter {
 		var files = new Map.<string>;
 		var sourceMapper = this._sourceMapper;
 		if(sourceMapper != null) {
-			files[sourceMapper.getSourceMappingFile()] = sourceMapper.generate();
-			// copy mapped source files for browsers to get them
-			var fileMap = sourceMapper.getSourceFileMap();
-			for (var filename in fileMap) {
-				var dest = fileMap[filename];
-				// reading the file may failed because it is not resolved.
+			sourceMapper.getSourceFiles().forEach((filename) -> {
 				try {
-					files[dest] = this._platform.load(filename);
+					sourceMapper.setSourceContent(filename, this._platform.load(filename));
 				}
-				catch (e : Error) { }
-			}
+				catch (e : Error) {
+					if (JSX.DEBUG) {
+						this._platform.error("XXX: " + e.toString());
+					}
+				}
+			});
+			files[sourceMapper.getSourceMappingFile()] = sourceMapper.generate();
 		}
 		return files;
 	}
