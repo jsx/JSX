@@ -109,8 +109,8 @@ window.addEventListener('load', function (e) {
 	console.assert(mappingURL, "sourceMappingURL");
 	var mapping = JSON.parse(load(mappingURL));
 
-	var mainFile = mapping.sourceRoot != null ? mapping.sourceRoot + "/" + mapping.sources[0] : mapping.sources[0];
-	var orig = Lexer.tokenize(mainFile, load(mainFile));
+	var mainFile = mapping.sourceRoot != null ? mapping.sourceRoot + "/" + mapping.sources[1] : mapping.sources[1];
+	var orig = Lexer.tokenize(mainFile, mapping.sourcesContent[1] || load(mainFile));
 
 	element(ORIG).innerHTML = asHTML(ORIG, orig);
 	element(GEN).innerHTML  = asHTML(GEN,  gen);
