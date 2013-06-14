@@ -47,6 +47,9 @@ class SourceMapper {
 
 	var _sourceFiles = new Map.<boolean>();
 
+	var _outputLength = 0;
+	var _outputLineNumber = 1;
+
 	function constructor (rootDir : string, outputFile : string) {
 		this._rootDir = rootDir;
 		this._outputFile = Util.resolvePath(outputFile);
@@ -55,19 +58,51 @@ class SourceMapper {
 		});
 	}
 
-	function add (generatedPos : Map.<number>, originalPos : Map.<number>, sourceFile : Nullable.<string>, tokenName : Nullable.<string>) : void {
+	function makeGeneratedPos(output : string) : Map.<number>{
+		var pos  = this._outputLength;
+		var line = this._outputLineNumber;
+		while ( (pos = output.indexOf("\n", pos)) != -1 ) {
+			++pos;
+			++line;
+		}
+
+		this._outputLength = output.length;
+		this._outputLineNumber = line;
+
+		var lastNewLinePos = output.lastIndexOf("\n") + 1;
+		var column = (output.length - lastNewLinePos);
+		return {
+			line:   line,
+			column: column
+		};
+	}
+
+	function add(output : string, tokenLineNumber : number, tokenColumnNumber : number, tokenValue : Nullable.<string>, tokenFilename : Nullable.<string>) : void {
+
+		var genPos = this.makeGeneratedPos(output);
+		var origPos = null : Map.<number>;
+
+		if (! Number.isNaN(tokenLineNumber)) {
+			origPos = {
+				line:   tokenLineNumber,
+				column: tokenColumnNumber
+			};
+		}
+
+		var sourceFile = tokenFilename;
 		if (sourceFile != null) {
 			this._sourceFiles[sourceFile] = true;
 			if (sourceFile.indexOf(this._rootDir + "/") == 0) {
 				sourceFile = sourceFile.substring(this._rootDir.length + 1);
 			}
 		}
+
 		this._impl.addMapping({
-			generated: generatedPos,
-			original:  originalPos,
+			generated: genPos,
+			original:  origPos,
 			source:    sourceFile,
-			name:      tokenName
-		} : Map.<variant>);
+			name:      tokenValue
+		});
 	}
 
 	function setSourceContent(sourceFile : string, sourceContent : string) : void {
