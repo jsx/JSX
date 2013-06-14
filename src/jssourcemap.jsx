@@ -91,6 +91,6 @@ class SourceMapper {
 
 	function magicToken () : string {
 		var sourceMappingFile = Util.basename(this.getSourceMappingFile());
-		return "\n" + "//@ sourceMappingURL=" + sourceMappingFile + "\n";
+		return "\n" + "//# sourceMappingURL=" + sourceMappingFile + "\n";
 	}
 }

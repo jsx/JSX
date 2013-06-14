@@ -100,7 +100,7 @@ window.addEventListener('load', function (e) {
 
 	if(gen[gen.length-1].type === "space") {
 		var m = gen[gen.length-1].token.
-			match(/\@ *sourceMappingURL=([^ \t\r\n]+)/);
+			match(/\# *sourceMappingURL=([^ \t\r\n]+)/);
 		if(!m) {
 			return;
 		}
