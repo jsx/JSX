@@ -80,17 +80,23 @@ class SourceMapper {
 	function add(output : string, tokenLineNumber : number, tokenColumnNumber : number, tokenValue : Nullable.<string>, tokenFilename : Nullable.<string>) : void {
 
 		var genPos = this.makeGeneratedPos(output);
-		var origPos = null : Map.<number>;
 
-		if (! Number.isNaN(tokenLineNumber)) {
+		var origPos : Map.<number>;
+		var sourceFile : Nullable.<string>;
+
+		// see SourceMapGenerator#_validateMapping
+		if (Number.isNaN(tokenLineNumber) || tokenFilename == null) {
+			origPos    = null;
+			sourceFile = null;
+			tokenValue = null;
+		}
+		else {
 			origPos = {
 				line:   tokenLineNumber,
 				column: tokenColumnNumber
 			};
-		}
 
-		var sourceFile = tokenFilename;
-		if (sourceFile != null) {
+			sourceFile = tokenFilename;
 			this._sourceFiles[sourceFile] = true;
 			if (sourceFile.indexOf(this._rootDir + "/") == 0) {
 				sourceFile = sourceFile.substring(this._rootDir.length + 1);
