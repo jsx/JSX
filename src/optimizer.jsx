@@ -1727,16 +1727,7 @@ class _FoldConstantCommand extends _FunctionOptimizeCommand {
 			this._foldNumericBinaryExpression(expr as BinaryExpression, replaceCb);
 
 		} else if (expr instanceof AsExpression) {
-
-			// convert "literal as string"
-			if (expr.getType().equals(Type.stringType)) {
-				var baseExpr = (expr as AsExpression).getExpr();
-				if (baseExpr instanceof BooleanLiteralExpression || baseExpr instanceof NumberLiteralExpression || baseExpr instanceof IntegerLiteralExpression) {
-					replaceCb(
-						new StringLiteralExpression(
-							new Token(Util.encodeStringLiteral(baseExpr.getToken().getValue()), false)));
-				}
-			}
+			this._foldAsExpression(expr as AsExpression, replaceCb);
 
 		} else if (expr instanceof LogicalNotExpression) {
 
@@ -1920,6 +1911,81 @@ class _FoldConstantCommand extends _FunctionOptimizeCommand {
 		return null;
 	}
 
+	function _foldAsExpression(expr : AsExpression, replaceCb : function(:Expression):void) : void {
+		var baseExpr = expr.getExpr();
+		if (expr.getType().equals(Type.stringType)) { // as string
+			if (baseExpr.getType().equals(Type.stringType)) {
+				this.log("folding type cast: string as string");
+				replaceCb(baseExpr);
+			}
+			else if (baseExpr instanceof BooleanLiteralExpression || baseExpr instanceof NumberLiteralExpression || baseExpr instanceof IntegerLiteralExpression) {
+				this.log("folding type cast: primitive literal as string");
+				replaceCb(
+					new StringLiteralExpression(
+						new Token(Util.encodeStringLiteral(baseExpr.getToken().getValue()), false)));
+			}
+		}
+		else if (expr.getType().equals(Type.numberType)) { // as number
+			if (baseExpr.getType().equals(Type.numberType)) {
+				this.log("folding type cast: number as number");
+				replaceCb(baseExpr);
+			}
+			else if (baseExpr instanceof StringLiteralExpression) {
+				this.log("folding type cast: string literal as number");
+				replaceCb(
+					new NumberLiteralExpression(
+						new Token(Util.decodeStringLiteral(baseExpr.getToken().getValue()) as number as string, false)));
+			}
+			else if (baseExpr instanceof IntegerLiteralExpression) {
+				this.log("folding type cast: int literal as number");
+				replaceCb(
+					new NumberLiteralExpression(
+						new Token(baseExpr.getToken().getValue() as number as string, false)));
+			}
+		}
+		else if (expr.getType().equals(Type.integerType)) { // as int
+			if (baseExpr.getType().equals(Type.integerType)) {
+				this.log("folding type cast: int as int");
+				replaceCb(baseExpr);
+			}
+			else if (baseExpr instanceof StringLiteralExpression) {
+				this.log("folding type cast: string literal as int");
+				replaceCb(
+					new IntegerLiteralExpression(
+						new Token(Util.decodeStringLiteral(baseExpr.getToken().getValue()) as int as string, false)));
+			}
+			else if (baseExpr instanceof NumberLiteralExpression) {
+				this.log("folding type cast: number literal as int");
+				replaceCb(
+					new IntegerLiteralExpression(
+						new Token(baseExpr.getToken().getValue() as int as string, false)));
+			}
+		}
+		else if (expr.getType().equals(Type.booleanType)) { // as boolean
+			if (baseExpr.getType().equals(Type.booleanType)) {
+				this.log("folding type cast: boolean as boolean");
+				replaceCb(baseExpr);
+			}
+			else if (baseExpr instanceof StringLiteralExpression) {
+				this.log("folding type cast: string literal as boolean");
+				replaceCb(
+					new BooleanLiteralExpression(
+						new Token(Util.decodeStringLiteral(baseExpr.getToken().getValue()) as boolean as string, false)));
+			}
+			else if (baseExpr instanceof NumberLiteralExpression) {
+				this.log("folding type cast: number literal as boolean");
+				replaceCb(
+					new BooleanLiteralExpression(
+						new Token(baseExpr.getToken().getValue() as number ? "true" : "false", false)));
+			}
+			else if (baseExpr instanceof IntegerLiteralExpression) {
+				this.log("folding type cast: integer literal as boolean");
+				replaceCb(
+					new BooleanLiteralExpression(
+						new Token(baseExpr.getToken().getValue() as int ? "true" : "false", false)));
+			}
+		}
+	}
 }
 
 class _DeadCodeEliminationOptimizeCommand extends _FunctionOptimizeCommand {
