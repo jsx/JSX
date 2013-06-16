@@ -88,7 +88,7 @@ web.jsx:
 
 
 show-todo:
-	find t -name '*.todo.*' | grep -v '*~'
+	find t -name '*.todo.*' | grep -v '~'
 
 publish: test-all
 	$(MAKE) compiler-release
