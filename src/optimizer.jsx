@@ -2133,14 +2133,15 @@ class _DeadCodeEliminationOptimizeCommand extends _FunctionOptimizeCommand {
 		var lastAssignExpr = new Triple.<LocalVariable, AssignmentExpression, function(:Expression):void>[];
 		var onExpr = function (expr : Expression, rewriteCb : function(:Expression):void) : boolean {
 			if (expr instanceof AssignmentExpression) {
-				if ((expr as AssignmentExpression).getToken().getValue() == "="
-					&& (expr as AssignmentExpression).getFirstExpr() instanceof LocalExpression) {
-						onExpr((expr as AssignmentExpression).getSecondExpr(), function (assignExpr : AssignmentExpression) : function(:Expression):void {
+				var assignExpr = expr as AssignmentExpression;
+				if (assignExpr.getToken().getValue() == "="
+					&& assignExpr.getFirstExpr() instanceof LocalExpression) {
+						onExpr(assignExpr.getSecondExpr(), function (assignExpr : AssignmentExpression) : function(:Expression):void {
 							return function (expr) {
 								assignExpr.setSecondExpr(expr);
 							};
-						}((expr as AssignmentExpression)));
-						var lhsLocal = ((expr as AssignmentExpression).getFirstExpr() as LocalExpression).getLocal();
+						}(assignExpr));
+						var lhsLocal = (assignExpr.getFirstExpr() as LocalExpression).getLocal();
 						for (var i = 0; i < lastAssignExpr.length; ++i) {
 							if (lastAssignExpr[i].first == lhsLocal) {
 								break;
