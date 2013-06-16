@@ -1,11 +1,16 @@
 Revision history for the JSX software development kit
 
-NEXT
+0.9.41 2013-06-16 14:49:35-0700
+    [BUG FIXES]
+    - Fix a bug that int type parameters did not work correctly (#196)
+
     [CHANGES]
     - Changed sourceMappingURL syntax
       (see http://updates.html5rocks.com/2013/06/sourceMappingURL-and-sourceURL-syntax-changed for details)
     - Support sourcesContent in source-map to handle multiple source files
       easier
+    - Improve "fold-const" to expand type casts in compile time as much as
+      possible (resolve #182 again)
 
 0.9.40 2013-06-11 03:42:00+0900
     [CHANGES]
