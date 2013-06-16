@@ -3409,19 +3409,6 @@ class JavaScriptEmitter implements Emitter {
 		}
 	}
 
-	function _emitDefaultValueOf (type : Type) : void {
-		if (type.equals(Type.booleanType))
-			this._emit("false", null);
-		else if (type.equals(Type.integerType) || type.equals(Type.numberType))
-			this._emit("0", null);
-		else if (type.equals(Type.stringType))
-			this._emit("\"\"", null);
-		else if (type instanceof NullableType)
-			this._emit("null", null);
-		else
-			this._emit("null", null);
-	}
-
 	function _emitStatements (statements : Statement[]) : void {
 		this._advanceIndent();
 		for (var i = 0; i < statements.length; ++i)
