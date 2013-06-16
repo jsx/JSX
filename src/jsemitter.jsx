@@ -3600,7 +3600,7 @@ class JavaScriptEmitter implements Emitter {
 			}
 			// emit with nullable guard if the formal argument is not nullable
 			if (argType != null && ! Type.nullType.isConvertibleTo(argType)) {
-				this._emitWithNullableGuard(args[i], 0);
+				this._emitRHSOfAssignment(args[i], argType);
 			} else {
 				this._getExpressionEmitterFor(args[i]).emit(0);
 			}
