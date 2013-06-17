@@ -1,5 +1,9 @@
 Revision history for the JSX software development kit
 
+0.9.42 2013-06-16 23:18:31-0700
+    [BUG FIX]
+    - Fix #194: "dce" broke assign statements in logical/conditional exprs
+
 0.9.41 2013-06-16 14:49:35-0700
     [BUG FIXES]
     - Fix a bug that int type parameters did not work correctly (#196)
