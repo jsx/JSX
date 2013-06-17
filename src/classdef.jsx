@@ -752,6 +752,10 @@ class ClassDefinition implements Stashable {
 				// TODO: JSON.stringify(p)
 				exprs.push(prop);
 			}
+			else if (type == Type.variantType) {
+				// p as string (or what can I do?)
+				exprs.push(new AsExpression(new Token("as"), prop, Type.stringType));
+			}
 			else if (type == Type.numberType || type == Type.integerType || type == Type.booleanType) {
 				// p as string
 				exprs.push(new AsExpression(new Token("as"), prop, Type.stringType));
