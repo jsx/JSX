@@ -2221,26 +2221,25 @@ class _DeadCodeEliminationOptimizeCommand extends _FunctionOptimizeCommand {
 		var onExpr = function (expr : Expression, rewriteCb : function(:Expression):void) : boolean {
 			if (expr instanceof AssignmentExpression) {
 				var assignExpr = expr as AssignmentExpression;
-				if (assignExpr.getToken().getValue() == "="
-					&& assignExpr.getFirstExpr() instanceof LocalExpression) {
-						onExpr(assignExpr.getSecondExpr(), function (assignExpr : AssignmentExpression) : function(:Expression):void {
-							return function (expr) {
-								assignExpr.setSecondExpr(expr);
-							};
-						}(assignExpr));
-						var lhsLocal = (assignExpr.getFirstExpr() as LocalExpression).getLocal();
-						for (var i = 0; i < lastAssignExpr.length; ++i) {
-							if (lastAssignExpr[i].first == lhsLocal) {
-								break;
-							}
+				if (assignExpr.getToken().getValue() == "=" && assignExpr.getFirstExpr() instanceof LocalExpression) {
+					onExpr(assignExpr.getSecondExpr(), function (assignExpr : AssignmentExpression) : function(:Expression):void {
+						return function (expr) {
+							assignExpr.setSecondExpr(expr);
+						};
+					}(assignExpr));
+					var lhsLocal = (assignExpr.getFirstExpr() as LocalExpression).getLocal();
+					for (var i = 0; i < lastAssignExpr.length; ++i) {
+						if (lastAssignExpr[i].first == lhsLocal) {
+							break;
 						}
-						if (i != lastAssignExpr.length) {
-							this.log("eliminating dead store to: " + lhsLocal.getName().getValue());
-							lastAssignExpr[i].third(lastAssignExpr[i].second.getSecondExpr());
-						}
-						lastAssignExpr[i] = new Triple.<LocalVariable, AssignmentExpression, function(:Expression):void>(lhsLocal, expr as AssignmentExpression, rewriteCb);
-						return true;
 					}
+					if (i != lastAssignExpr.length) {
+						this.log("eliminating dead store to: " + lhsLocal.getName().getValue());
+						lastAssignExpr[i].third(lastAssignExpr[i].second.getSecondExpr());
+					}
+					lastAssignExpr[i] = new Triple.<LocalVariable, AssignmentExpression, function(:Expression):void>(lhsLocal, expr as AssignmentExpression, rewriteCb);
+					return true;
+				}
 			} else if (expr instanceof LocalExpression) {
 				for (var i = 0; i < lastAssignExpr.length; ++i) {
 					if (lastAssignExpr[i].first == (expr as LocalExpression).getLocal()) {
