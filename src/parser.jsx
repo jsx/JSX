@@ -2556,6 +2556,8 @@ class Parser {
 		var expr = this._expr();
 		if (expr == null)
 			return false;
+		if (this._expect(";") == null)
+			return false;
 		this._statements.push(new ThrowStatement(token, expr));
 		return true;
 	}
