@@ -3,7 +3,7 @@
 _jsx_command_complete()
 {
     local cur prev optimize
-    optimize="lto no-assert no-log fold-const return-if inline dce unbox fold-const lcse dce fold-const array-length unclassify"
+    optimize="lto no-assert no-log no-debug staticize fold-const return-if inline dce unbox fold-const lcse dce fold-const array-length unclassify"
 
     COMPREPLY=()
     cur=${COMP_WORDS[COMP_CWORD]}
@@ -18,6 +18,7 @@ _jsx_command_complete()
         --mode\
         --target\
         --release\
+        --minify\
         --profile\
         --optimize\
         --enable-type-check\

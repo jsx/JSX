@@ -59,6 +59,8 @@ my %skip = (
 
     EventListener => 1,
     WindowTimers => 1, # use JSXTimers instead
+
+    Transferable => 1, # typed-array is moved to built-in.jsx (see #189)
 );
 
 # indicates a class has children classes

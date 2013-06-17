@@ -151,8 +151,12 @@ mixin Stashable {
 
 	var _stash = new Map.<Stash>;
 
-	function getStash () : Map.<Stash> {
-		return this._stash;
+	function setStash (id : string, stash : Stash) : Stash {
+		return this._stash[id] = stash;
+	}
+
+	function getStash (id : string) : Stash {
+		return this._stash[id];
 	}
 
 }

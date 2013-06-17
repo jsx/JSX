@@ -91,6 +91,36 @@ class _Util {
 		return ! onExpr(expr, null);
 	}
 
+	static function conditionIsConstant (expr : Expression) : Nullable.<boolean> {
+		function leafIsConstant (expr : Expression) : Nullable.<boolean> {
+			if (expr instanceof NullExpression) {
+				return false;
+			} else if (expr instanceof BooleanLiteralExpression) {
+				return expr.getToken().getValue() == "true";
+			} else if (expr instanceof StringLiteralExpression) {
+				return expr.getToken().getValue().length > 2;
+			} else if (expr instanceof NumberLiteralExpression || expr instanceof IntegerLiteralExpression) {
+				return (expr.getToken().getValue() as number) as boolean;
+			} else if (expr instanceof MapLiteralExpression || expr instanceof ArrayLiteralExpression) {
+				return true;
+			}
+			return null;
+		}
+
+		if (expr instanceof LeafExpression) {
+			return leafIsConstant(expr);
+		} else if (expr instanceof AsExpression) {
+			var asExpr = expr as AsExpression;
+			if (asExpr.getType().equals(Type.booleanType)) {
+				return leafIsConstant(asExpr.getExpr());
+			} else {
+				// TODO
+				return null;
+			}
+		}
+		return null;
+	}
+
 	static function optimizeBasicBlock (funcDef : MemberFunctionDefinition, optimizeExpressions : function(:Expression[]):void) : void {
 		function optimizeStatements(statements : Statement[]) : void {
 			var statementIndex = 0;
@@ -173,7 +203,7 @@ class Optimizer {
 			"no-assert",
 			"no-log",
 			"no-debug",
-			//"staticize", // TODO: #151
+			"staticize",
 			"fold-const",
 			"return-if",
 			"inline",
@@ -216,6 +246,8 @@ class Optimizer {
 				this._commands.push(new _NoLogCommand());
 			} else if (cmd == "no-debug") {
 				this._commands.push(new _NoDebugCommand());
+			} else if (cmd == "strip") {
+				this._commands.push(new _StripOptimizeCommand());
 			} else if (cmd == "staticize") {
 				this._commands.push(new _StaticizeOptimizeCommand());
 				calleesAreDetermined = false;
@@ -325,15 +357,19 @@ abstract class _OptimizeCommand {
 	abstract function performOptimization () : void;
 
 	function getStash (stashable : Stashable) : Stash {
-		var stash = stashable.getStash();
-		if (stash[this._identifier] == null) {
-			stash[this._identifier] = this._createStash();
+		var stash = stashable.getStash(this._identifier);
+		if (stash == null) {
+			stash = stashable.setStash(this._identifier, this._createStash());
 		}
-		return stash[this._identifier];
+		return stash;
 	}
 
 	function _createStash () : Stash {
 		throw new Error("if you are going to use the stash, you need to override this function");
+	}
+
+	function resetStash (stashable : Stashable) : void {
+		stashable.setStash(this._identifier, null);
 	}
 
 	function createVar (funcDef : MemberFunctionDefinition, type : Type, baseName : string) : LocalVariable {
@@ -514,6 +550,347 @@ class _LinkTimeOptimizationCommand extends _OptimizeCommand {
 
 }
 
+class _StripOptimizeCommand extends _OptimizeCommand {
+	static const IDENTIFIER = "strip";
+
+	class _Stash extends Stash {
+		var touched = false;
+		override function clone() : Stash {
+			throw new Error("not supported");
+		}
+	}
+
+	var _classesInstantiated = new ClassDefinition[];
+	var _methodsAlive = new Map.<Type[][]>;
+	var _membersToWalk = new MemberDefinition[];
+
+	function constructor() {
+		super(_StripOptimizeCommand.IDENTIFIER);
+	}
+
+	override function _createStash() : Stash {
+		return new _StripOptimizeCommand._Stash();
+	}
+
+	function _touchStatic(member : MemberDefinition) : void {
+		assert (member.flags() & ClassDefinition.IS_STATIC) != 0;
+		var stash = this.getStash(member) as _StripOptimizeCommand._Stash;
+		if (stash.touched)
+			return;
+		this.log("touched " + member.getNotation());
+		stash.touched = true;
+		this._membersToWalk.push(member);
+	}
+
+	function _touchInstance(classDef : ClassDefinition) : void {
+		var stash = this.getStash(classDef) as _StripOptimizeCommand._Stash;
+		if (stash.touched)
+			return;
+		this.log("touched " + classDef.className());
+		stash.touched = true;
+		this._classesInstantiated.push(classDef);
+		for (var name in this._methodsAlive) {
+			var listOfArgTypes = this._methodsAlive[name];
+			for (var i = 0; i != listOfArgTypes.length; ++i) {
+				var funcDef = Util.findFunctionInClass(classDef, name, listOfArgTypes[i], false);
+				if (funcDef != null) {
+					this._membersToWalk.push(funcDef);
+				}
+			}
+		}
+		if (classDef.extendType() != null) {
+			this._touchInstance(classDef.extendType().getClassDef());
+		}
+		classDef.implementTypes().forEach(function (implementType) {
+			this._touchInstance(implementType.getClassDef());
+		});
+	}
+
+	function _touchConstructor(funcDef : MemberFunctionDefinition) : void {
+		assert funcDef.name() == "constructor";
+		assert (funcDef.flags() & ClassDefinition.IS_STATIC) == 0;
+		var stash = this.getStash(funcDef) as _StripOptimizeCommand._Stash;
+		if (stash.touched)
+			return;
+		this.log("touched " + funcDef.getNotation());
+		stash.touched = true;
+		this._membersToWalk.push(funcDef);
+		this._touchInstance(funcDef.getClassDef());
+	}
+
+	function _touchMethod(name : string, argTypes : Type[]) : void {
+		if (this._methodsAlive.hasOwnProperty(name)) {
+			var listOfArgTypes = this._methodsAlive[name];
+		} else {
+			listOfArgTypes = this._methodsAlive[name] = new Type[][];
+		}
+		for (var i = 0; i < listOfArgTypes.length; ++i) {
+			if (Util.typesAreEqual(listOfArgTypes[i], argTypes)) {
+				return; // already touched
+			}
+		}
+		// push
+		this.log("touched #" + name);
+		listOfArgTypes.push(argTypes.concat());
+		for (var i = 0; i < this._classesInstantiated.length; ++i) {
+			var funcDef = Util.findFunctionInClass(this._classesInstantiated[i], name, argTypes, false);
+			if (funcDef != null) {
+				this._membersToWalk.push(funcDef);
+			}
+		}
+	}
+
+	override function performOptimization() : void {
+		function isEmittedClass(classDef : ClassDefinition) : boolean {
+			if (classDef instanceof TemplateClassDefinition) {
+				return false;
+			}
+			if ((classDef.flags() & ClassDefinition.IS_NATIVE) != 0) {
+				return false;
+			}
+			return true;
+		}
+		// reset stash
+		this.getCompiler().forEachClassDef(function (parser, classDef) {
+			this.resetStash(classDef);
+			return classDef.forEachMember(function (member) {
+				this.resetStash(member);
+				return true;
+			});
+		});
+		// all non-final native methods should be preserved in the instantiated classes
+		this.getCompiler().forEachClassDef(function (parser, classDef) {
+			if (! (classDef instanceof TemplateClassDefinition)
+				&& (classDef.flags() & ClassDefinition.IS_NATIVE) != 0) {
+				classDef.forEachMemberFunction(function (funcDef) {
+					if (funcDef.name() == "constructor") {
+						// skip
+					} else if ((funcDef.flags() & ClassDefinition.IS_FINAL) != 0) {
+						// skip
+					} else {
+						this._touchMethod(funcDef.name(), funcDef.getArgumentTypes());
+					}
+					return true;
+				});
+			}
+			return true;
+		});
+		// push all exported members
+		this.getCompiler().forEachClassDef(function (parser, classDef) {
+			if (isEmittedClass(classDef)) {
+				if ((classDef.flags() & ClassDefinition.IS_EXPORT) != 0) {
+					this._touchInstance(classDef);
+				}
+				classDef.forEachMember(function (member) {
+					if ((member.flags() & ClassDefinition.IS_EXPORT) != 0) {
+						if ((member.flags() & ClassDefinition.IS_STATIC) != 0) {
+							this._touchStatic(member);
+						} else if (member instanceof MemberFunctionDefinition) {
+							var funcDef = member as MemberFunctionDefinition;
+							if (funcDef.name() == "constructor") {
+								this._touchConstructor(funcDef);
+							} else {
+								this._touchMethod(funcDef.name(), funcDef.getArgumentTypes());
+							}
+						}
+					}
+					return true;
+				});
+			}
+			return true;
+		});
+		// check all members
+		while (this._membersToWalk.length != 0) {
+			var member = this._membersToWalk.shift();
+			this.log("walking " + member.getNotation());
+			if (member instanceof MemberFunctionDefinition) {
+				this._walkFunctionDefinition(member as MemberFunctionDefinition);
+			} else {
+				this._walkVariableDefinition(member as MemberVariableDefinition);
+			}
+		}
+		// remove things that aren't used
+		function memberShouldPreserve(member : MemberDefinition) : boolean {
+			if ((member.flags() & ClassDefinition.IS_EXPORT) != 0) {
+				return true;
+			}
+			var isTouched = (this.getStash(member) as _StripOptimizeCommand._Stash).touched;
+			if ((member.flags() & ClassDefinition.IS_STATIC) != 0) {
+				return isTouched;
+			} else if (member instanceof MemberFunctionDefinition) {
+				if (member.name() == "constructor") {
+					return isTouched;
+				} else {
+					if ((this.getStash(member.getClassDef()) as _StripOptimizeCommand._Stash).touched
+						&& this._methodsAlive.hasOwnProperty(member.name())) {
+						var listOfArgTypes = this._methodsAlive[member.name()];
+						for (var i = 0; i != listOfArgTypes.length; ++i) {
+							if (Util.typesAreEqual(listOfArgTypes[i], (member as MemberFunctionDefinition).getArgumentTypes())) {
+								return true;
+							}
+						}
+					}
+					return false;
+				}
+			}
+			return true;
+		}
+		this.getCompiler().forEachClassDef(function (parser, classDef) {
+			if (isEmittedClass(classDef)) {
+				var numConstructors = 0;
+				var members = classDef.members();
+				for (var memberIndex = 0; memberIndex != members.length;) {
+					var member = members[memberIndex];
+					if (memberShouldPreserve(member)) {
+						if (member instanceof MemberFunctionDefinition
+							&& (member.flags() & ClassDefinition.IS_STATIC) == 0
+							&& member.name() == "constructor") {
+							++numConstructors;
+						}
+						++memberIndex;
+						this.log("preserving used: " + member.getNotation());
+					} else {
+						this.log("removing unused: " + member.getNotation());
+						members.splice(memberIndex, 1);
+					}
+				}
+				if (numConstructors == 0) {
+					// create a fake constructor (should never get called; TODO leave as is, emit "{}" in jsemitter upon facing a class wo. any ctors)
+					// the reason for not deleting the entire class is because it could be referred to by "instanceof"
+					this.log("substituting fake constructor for class: " + classDef.className());
+					var ctor = new MemberFunctionDefinition(
+						null,
+						new Token("constructor", true),
+						ClassDefinition.IS_FINAL | (classDef.flags() & ClassDefinition.IS_EXPORT),
+						Type.voidType,
+						new ArgumentDeclaration[],
+						new LocalVariable[],
+						new Statement[],
+						new MemberFunctionDefinition[],
+						classDef.getToken(), /* FIXME */
+						null);
+					ctor.setClassDef(classDef);
+					members.push(ctor);
+				}
+			}
+			return true;
+		});
+		// remove unused native classes (with nativeSource)
+		this.getCompiler().getParsers().forEach(function (parser) {
+			var classDefs = parser.getClassDefs();
+			for (var i = 0; i != classDefs.length;) {
+				var preserve = true;
+				if ((classDefs[i].flags() & ClassDefinition.IS_NATIVE) != 0
+					&& classDefs[i].getNativeSource() != null
+					&& ! (this.getStash(classDefs[i]) as _StripOptimizeCommand._Stash).touched
+					&& classDefs[i].forEachMember(function (member) {
+						if ((member.flags() & ClassDefinition.IS_STATIC) == 0)
+							return true;
+						return ! (this.getStash(member) as _StripOptimizeCommand._Stash).touched;
+					})) {
+					preserve = false;
+				}
+				if (preserve) {
+					++i;
+				} else {
+					this.log("removing unused native class: " + classDefs[i].className());
+					classDefs.splice(i, 1);
+				}
+			}
+		});
+	}
+
+	function _walkExpression(expr : Expression) : boolean {
+		function onExpr(expr : Expression) : boolean {
+			if (expr instanceof NewExpression) {
+				var callee = Util.findFunctionInClass(expr.getType().getClassDef(), "constructor", (expr as NewExpression).getConstructor().getArgumentTypes(), false);
+				assert callee != null;
+				this._touchConstructor(callee);
+			} else if (expr instanceof InstanceofExpression) {
+				this._touchInstance((expr as InstanceofExpression).getExpectedType().getClassDef());
+			} else if (expr instanceof AsExpression) {
+				if (expr.getType() instanceof ObjectType) {
+					this._touchInstance(expr.getType().getClassDef());
+				}
+			} else if (expr instanceof AsNoConvertExpression) {
+				if (expr.getType() instanceof ObjectType) {
+					this._touchInstance(expr.getType().getClassDef());
+				}
+			} else if (expr instanceof PropertyExpression) {
+				if (! expr.isClassSpecifier()) {
+					var propertyExpr = expr as PropertyExpression;
+					var name = propertyExpr.getIdentifierToken().getValue();
+					if (propertyExpr.getExpr().isClassSpecifier()) {
+						if (Util.isReferringToFunctionDefinition(propertyExpr)) {
+							var member : MemberDefinition = Util.findFunctionInClass(
+								propertyExpr.getHolderType().getClassDef(),
+								name,
+								(expr.getType() as ResolvedFunctionType).getArgumentTypes(),
+								true);
+							assert member != null;
+						} else {
+							member = Util.findVariableInClass(propertyExpr.getHolderType().getClassDef(), name, true);
+							assert member != null;
+						}
+						this._touchStatic(member);
+					} else {
+						if (Util.isReferringToFunctionDefinition(propertyExpr)) {
+							this._touchMethod(name, (expr.getType() as ResolvedFunctionType).getArgumentTypes());
+						}
+					}
+				}
+			} else if (expr instanceof SuperExpression) {
+				var superExpr = expr as SuperExpression;
+				this._touchMethod(superExpr.getName().getValue(), (superExpr.getFunctionType() as ResolvedFunctionType).getArgumentTypes());
+			}
+			return expr.forEachExpression(onExpr);
+		}
+		return onExpr(expr);
+	}
+
+	function _walkStatement(statement : Statement) : boolean {
+		function onStatement(statement : Statement) : boolean {
+			if (statement instanceof ConstructorInvocationStatement) {
+				var ctorStatement = statement as ConstructorInvocationStatement;
+				var callee = Util.findFunctionInClass(
+					ctorStatement.getConstructingClassDef(),
+					"constructor",
+					(ctorStatement.getConstructorType() as ResolvedFunctionType).getArgumentTypes(),
+					false);
+				assert callee != null;
+				this._touchConstructor(callee);
+			}
+			statement.forEachExpression(function (expr) {
+				return this._walkExpression(expr);
+			});
+			return statement.forEachStatement(onStatement);
+		}
+		return onStatement(statement);
+	}
+
+	function _walkFunctionDefinition(funcDef : MemberFunctionDefinition) : boolean {
+		if (funcDef.getStatements() != null) {
+			funcDef.forEachStatement(function onStatement(statement) {
+				return this._walkStatement(statement);
+			});
+		}
+		return funcDef.forEachClosure(function (funcDef) {
+			return this._walkFunctionDefinition(funcDef);
+		});
+	}
+
+	function _walkVariableDefinition(varDef : MemberVariableDefinition) : boolean {
+		var initialValue = varDef.getInitialValue();
+		if (initialValue != null) {
+			this._walkExpression(initialValue);
+		}
+		return varDef.forEachClosure(function (funcDef) {
+			return this._walkFunctionDefinition(funcDef);
+		});
+	}
+
+}
+
 class _NoAssertCommand extends _FunctionOptimizeCommand {
 	static const IDENTIFIER = "no-assert";
 
@@ -632,7 +1009,7 @@ class _DetermineCalleeCommand extends _FunctionOptimizeCommand {
 							holderType.getClassDef(),
 							propertyExpr.getIdentifierToken().getValue(),
 							(propertyExpr.getType() as ResolvedFunctionType).getArgumentTypes(),
-							propertyExpr.getExpr() instanceof ClassExpression);
+							propertyExpr.getExpr().isClassSpecifier());
 						this._setCallingFuncDef(expr, callingFuncDef);
 					} else if (calleeExpr instanceof FunctionExpression) {
 						this._setCallingFuncDef(expr, (calleeExpr as FunctionExpression).getFuncDef());
@@ -685,7 +1062,7 @@ class _DetermineCalleeCommand extends _FunctionOptimizeCommand {
 	}
 
 	static function getCallingFuncDef (stashable : Stashable) : MemberFunctionDefinition {
-		var stash = stashable.getStash()[_DetermineCalleeCommand.IDENTIFIER] as _DetermineCalleeCommand.Stash;
+		var stash = stashable.getStash(_DetermineCalleeCommand.IDENTIFIER) as _DetermineCalleeCommand.Stash;
 		if (stash == null)
 			throw new Error("callee not searched");
 		return stash.callingFuncDef;
@@ -701,12 +1078,33 @@ class _StaticizeOptimizeCommand extends _OptimizeCommand {
 		super(_StaticizeOptimizeCommand.IDENTIFIER);
 	}
 
+	class Stash extends Stash {
+
+		var altName : Nullable.<string>;
+
+		function constructor () {
+			this.altName = null;
+		}
+
+		function constructor (that : _StaticizeOptimizeCommand.Stash) {
+			this.altName = that.altName;
+		}
+
+		override function clone () : _StaticizeOptimizeCommand.Stash {
+			return new _StaticizeOptimizeCommand.Stash(this);
+		}
+
+	}
+
+	override function _createStash () : Stash {
+		return new _StaticizeOptimizeCommand.Stash();
+	}
+
 	override function performOptimization () : void {
 
 		function memberCanBeStaticized(funcDef : MemberFunctionDefinition) : boolean {
-			return (funcDef.flags() & (ClassDefinition.IS_OVERRIDE | ClassDefinition.IS_ABSTRACT | ClassDefinition.IS_FINAL | ClassDefinition.IS_STATIC | ClassDefinition.IS_NATIVE | ClassDefinition.IS_EXPORT)) == ClassDefinition.IS_FINAL
-				&& funcDef.name() != "constructor"
-				&& ! Util.memberIsExported(funcDef.getClassDef(), funcDef.name(), funcDef.getArgumentTypes(), false);
+			return (funcDef.flags() & (ClassDefinition.IS_OVERRIDE | ClassDefinition.IS_ABSTRACT | ClassDefinition.IS_FINAL | ClassDefinition.IS_STATIC | ClassDefinition.IS_NATIVE)) == ClassDefinition.IS_FINAL
+				&& funcDef.name() != "constructor";
 		}
 
 		this.getCompiler().forEachClassDef(function (parser, classDef) {
@@ -716,8 +1114,8 @@ class _StaticizeOptimizeCommand extends _OptimizeCommand {
 			// convert function definitions (expect constructor) to static
 			classDef.forEachMemberFunction(function onFunction(funcDef : MemberFunctionDefinition) : boolean {
 				if (memberCanBeStaticized(funcDef)) {
-						this.log("rewriting method to static function: " + funcDef.name());
-						this._rewriteFunctionAsStatic(funcDef);
+					this.log("staticizing method: " + funcDef.name());
+					this._staticizeMethod(funcDef);
 				}
 				return true;
 			});
@@ -733,14 +1131,14 @@ class _StaticizeOptimizeCommand extends _OptimizeCommand {
 
 				this._rewriteMethodCallsToStatic(varDef.getInitialValue(), function (expr) {
 					varDef.setInitialValue(expr);
-				});
+				}, null);
 				return true;
 			});
 			// rewrite member functions
 			function onFunction (funcDef : MemberFunctionDefinition) : boolean {
 				function onStatement (statement : Statement) : boolean {
 					statement.forEachExpression(function (expr, replaceCb) {
-						this._rewriteMethodCallsToStatic(expr, replaceCb);
+						this._rewriteMethodCallsToStatic(expr, replaceCb, funcDef);
 						return true;
 					});
 					return statement.forEachStatement(onStatement);
@@ -753,12 +1151,27 @@ class _StaticizeOptimizeCommand extends _OptimizeCommand {
 		});
 	}
 
-	function _rewriteFunctionAsStatic (funcDef : MemberFunctionDefinition) : void {
+	function _staticizeMethod (funcDef : MemberFunctionDefinition) : void {
+		var staticFuncDef = funcDef.clone();
+
+		// register to the classDef
+		var classDef = funcDef.getClassDef();
+		staticFuncDef.setClassDef(classDef);
+		classDef._members.splice(classDef._members.indexOf(funcDef)+1, 0, staticFuncDef); // insert right after the original function
+
+		// rename
+		var newName = this._findFrechFunctionName(classDef, funcDef.name(), ([ new ObjectType(classDef) ] : Type[]).concat((funcDef.getType() as ResolvedFunctionType).getArgumentTypes()), true);
+		(this.getStash(funcDef) as _StaticizeOptimizeCommand.Stash).altName = newName;
+		staticFuncDef._nameToken = new Token(newName, true);
+
+		// update flags
+		staticFuncDef.setFlags(funcDef.flags() | ClassDefinition.IS_STATIC);
+
 		// first argument should be this
-		var thisArg = new ArgumentDeclaration(new Token("$this", false), new ObjectType(funcDef.getClassDef()));
-		funcDef.getArguments().unshift(thisArg);
+		var thisArg = new ArgumentDeclaration(new Token("$this", false), new ObjectType(classDef));
+		staticFuncDef.getArguments().unshift(thisArg);
 		// rewrite this
-		funcDef.forEachStatement(function onStatement(statement : Statement) : boolean {
+		staticFuncDef.forEachStatement(function onStatement(statement : Statement) : boolean {
 			if (statement instanceof FunctionStatement) {
 				(statement as FunctionStatement).getFuncDef().forEachStatement(onStatement);
 			}
@@ -771,25 +1184,35 @@ class _StaticizeOptimizeCommand extends _OptimizeCommand {
 				return expr.forEachExpression(onExpr);
 			}) && statement.forEachStatement(onStatement);
 		});
-		// update flags
-		funcDef.setFlags(funcDef.flags() | ClassDefinition.IS_STATIC);
 	}
 
-	function _rewriteMethodCallsToStatic (expr : Expression, replaceCb : function(:Expression):void) : void {
-		var onExpr = function (expr : Expression, replaceCb : function(:Expression):void) : boolean {
+	function _findFrechFunctionName (classDef : ClassDefinition, baseName : string, argTypes : Type[], isStatic : boolean) : string {
+		var index = 0;
+		// search for a name which does not conflict with existing function
+		do {
+			var newName = Util.format("%1_%2", [ baseName, index as string ]);
+			++index;
+		} while (Util.findFunctionInClass(classDef, newName, argTypes, isStatic) != null);
+
+		return newName;
+	}
+
+	function _rewriteMethodCallsToStatic (expr : Expression, replaceCb : function(:Expression):void, rewritingFuncDef : MemberFunctionDefinition) : void {
+		function onExpr(expr : Expression, replaceCb : function(:Expression):void) : boolean {
 			if (expr instanceof CallExpression) {
 				var calleeExpr = (expr as CallExpression).getExpr();
 				if (calleeExpr instanceof PropertyExpression
-				    && ! ((calleeExpr as PropertyExpression).getExpr() instanceof ClassExpression)
+				    && ! ((calleeExpr as PropertyExpression).getExpr().isClassSpecifier())
 					&& ! (calleeExpr as PropertyExpression).getType().isAssignable()) {
 						var propertyExpr = calleeExpr as PropertyExpression;
 						// is a member method call
 						var receiverType = propertyExpr.getExpr().getType().resolveIfNullable();
 						// skip interfaces and mixins
 						if ((receiverType.getClassDef().flags() & (ClassDefinition.IS_INTERFACE | ClassDefinition.IS_MIXIN)) == 0) {
-							var found = this._findRewrittenFunctionInClass(receiverType, propertyExpr.getIdentifierToken().getValue(), (propertyExpr.getType() as ResolvedFunctionType).getArgumentTypes(), true);
-							var classDef = found.first, funcDef = found.second;
-							if (funcDef != null && (funcDef.flags() & (ClassDefinition.IS_OVERRIDE | ClassDefinition.IS_ABSTRACT | ClassDefinition.IS_FINAL | ClassDefinition.IS_NATIVE)) == ClassDefinition.IS_FINAL && funcDef.name() != "constructor") {
+							var funcDef = this._findFunctionInClassTree(receiverType.getClassDef(), propertyExpr.getIdentifierToken().getValue(), (propertyExpr.getType() as ResolvedFunctionType).getArgumentTypes(), false);
+							// funcDef is staticized
+							var newName;
+							if (funcDef != null && (newName = (this.getStash(funcDef) as _StaticizeOptimizeCommand.Stash).altName) != null) {
 								// found, rewrite
 								onExpr(propertyExpr.getExpr(), function (expr) {
 									propertyExpr.setExpr(expr);
@@ -800,39 +1223,64 @@ class _StaticizeOptimizeCommand extends _OptimizeCommand {
 										expr.getToken(),
 										new PropertyExpression(
 											propertyExpr.getToken(),
-											new ClassExpression(new Token(classDef.className(), true), new ObjectType(classDef)),
-											propertyExpr.getIdentifierToken(),
+											new ClassExpression(new Token(funcDef.getClassDef().className(), true), new ObjectType(funcDef.getClassDef())),
+											new Token(newName, true),
 											propertyExpr.getTypeArguments(),
-											funcDef.getType() as ResolvedFunctionType),
+											new StaticFunctionType(null, (funcDef.getType() as ResolvedFunctionType).getReturnType(), ([ new ObjectType(funcDef.getClassDef()) ] : Type[]).concat((funcDef.getType() as ResolvedFunctionType).getArgumentTypes()), false)),
 										[ propertyExpr.getExpr() ].concat((expr as CallExpression).getArguments())));
 								return true;
 							}
 						}
 					}
+			} else if (expr instanceof SuperExpression) {
+				var superExpr = expr as SuperExpression;
+				var classDef = superExpr.getFunctionType().getObjectType().getClassDef();
+				funcDef = this._findFunctionInClassTree(classDef, superExpr.getName().getValue(), (superExpr.getFunctionType() as ResolvedFunctionType).getArgumentTypes(), false);
+				// funcDef is staticized
+				if (funcDef != null && (newName = (this.getStash(funcDef) as _StaticizeOptimizeCommand.Stash).altName) != null) {
+					// found, rewrite
+					Util.forEachExpression(onExpr, superExpr.getArguments());
+					var thisVar : Expression;
+					if ((rewritingFuncDef.flags() & ClassDefinition.IS_STATIC) != 0) {
+						// super expression in static function means that the function has been staticized
+						var thisArg = rewritingFuncDef.getArguments()[0];
+						thisVar = new LocalExpression(thisArg.getName(), thisArg);
+					} else {
+						thisVar = new ThisExpression(new Token("this", false), funcDef.getClassDef());
+					}
+					replaceCb(
+						new CallExpression(
+							expr.getToken(),
+							new PropertyExpression(
+								superExpr.getToken(),
+								new ClassExpression(new Token(funcDef.getClassDef().className(), true), new ObjectType(funcDef.getClassDef())),
+								new Token(newName, true),
+								[], // type args
+								new StaticFunctionType(null, (funcDef.getType() as ResolvedFunctionType).getReturnType(), ([ new ObjectType(funcDef.getClassDef()) ] : Type[]).concat((funcDef.getType() as ResolvedFunctionType).getArgumentTypes()), false)),
+							[ thisVar ].concat(superExpr.getArguments())));
+					return true;
+				}
 			}
 			return expr.forEachExpression(onExpr);
-		};
+		}
 		onExpr(expr, replaceCb);
 	}
 
-	function _findRewrittenFunctionInClass (type : Type, funcName : string, beforeArgTypes : Type[], isStatic : boolean) : Pair.<ClassDefinition, MemberFunctionDefinition> {
-		var classDef, funcDef;
-		for (;;) {
-			classDef = type.getClassDef();
-			if (classDef.className() == "Object") {
-				funcDef = Util.findFunctionInClass(classDef, funcName, [ type ].concat(beforeArgTypes), isStatic);
-				break;
+	function _findFunctionInClassTree (classDef : ClassDefinition, name : string, argTypes : Type[], isStatic : boolean) : MemberFunctionDefinition {
+		var funcDef;
+		while (classDef.className() != "Object") {
+			if ((funcDef = Util.findFunctionInClass(classDef, name, argTypes, isStatic)) != null) {
+				return funcDef;
 			}
-			if ((funcDef = Util.findFunctionInClass(classDef, funcName, [ type ].concat(beforeArgTypes), isStatic)) != null)
-				break;
-			type = classDef.extendType();
+			classDef = classDef.extendType().getClassDef();
 		}
-		return new Pair.<ClassDefinition, MemberFunctionDefinition>(classDef, funcDef);
+		return Util.findFunctionInClass(classDef, name, argTypes, isStatic);
 	}
 
 }
 
 class _UnclassifyOptimizationCommand extends _OptimizeCommand {
+
 	static const IDENTIFIER = "unclassify";
 
 	function constructor () {
@@ -1123,7 +1571,7 @@ class _UnclassifyOptimizationCommand extends _OptimizeCommand {
 			if (expr instanceof CallExpression) {
 				var calleeExpr = (expr as CallExpression).getExpr();
 				if (calleeExpr instanceof PropertyExpression
-				    && ! ((calleeExpr as PropertyExpression).getExpr() instanceof ClassExpression)
+				    && ! ((calleeExpr as PropertyExpression).getExpr().isClassSpecifier())
 					&& ! (calleeExpr as PropertyExpression).getType().isAssignable()
 					&& ! ((calleeExpr as PropertyExpression).getIdentifierToken().getValue() == "toString" && (expr as CallExpression).getArguments().length == 0)) {
 						var propertyExpr = calleeExpr as PropertyExpression;
@@ -1212,11 +1660,12 @@ class _FoldConstantCommand extends _FunctionOptimizeCommand {
 		if (expr instanceof PropertyExpression) {
 
 			// property expression
-			var holderType = (expr as PropertyExpression).getHolderType();
-			if ((expr as PropertyExpression).getExpr() instanceof ClassExpression) {
+			var propertyExpr = expr as PropertyExpression;
+			var holderType = propertyExpr.getHolderType();
+			if (propertyExpr.getExpr().isClassSpecifier()) {
 				var member = null : MemberVariableDefinition;
 				holderType.getClassDef().forEachMemberVariable(function (m) {
-					if (m instanceof MemberVariableDefinition && (m as MemberVariableDefinition).name() == (expr as PropertyExpression).getIdentifierToken().getValue())
+					if (m instanceof MemberVariableDefinition && (m as MemberVariableDefinition).name() == propertyExpr.getIdentifierToken().getValue())
 						member = m;
 					return member == null;
 				});
@@ -1224,9 +1673,9 @@ class _FoldConstantCommand extends _FunctionOptimizeCommand {
 					this._foldStaticConst(member);
 					var foldedExpr = this._toFoldedExpr(member.getInitialValue(), member.getType());
 					if (foldedExpr != null) {
-						foldedExpr = this._toFoldedExpr(foldedExpr, (expr as PropertyExpression).getType());
+						foldedExpr = this._toFoldedExpr(foldedExpr, propertyExpr.getType());
 						if (foldedExpr != null) {
-							this.log("folding property '" + member.toString() + "' at '" + expr.getToken().getFilename() + ":" + expr.getToken().getLineNumber() as string);
+							this.log("folding property '" + member.toString() + "' at '" + propertyExpr.getToken().getFilename() + ":" + propertyExpr.getToken().getLineNumber() as string);
 							replaceCb(foldedExpr);
 						}
 					}
@@ -1278,15 +1727,46 @@ class _FoldConstantCommand extends _FunctionOptimizeCommand {
 			this._foldNumericBinaryExpression(expr as BinaryExpression, replaceCb);
 
 		} else if (expr instanceof AsExpression) {
+			this._foldAsExpression(expr as AsExpression, replaceCb);
 
-			// convert "literal as string"
-			if (expr.getType().equals(Type.stringType)) {
-				var baseExpr = (expr as AsExpression).getExpr();
-				if (baseExpr instanceof BooleanLiteralExpression || baseExpr instanceof NumberLiteralExpression || baseExpr instanceof IntegerLiteralExpression) {
-					replaceCb(
-						new StringLiteralExpression(
-							new Token(Util.encodeStringLiteral(baseExpr.getToken().getValue()), false)));
+		} else if (expr instanceof LogicalNotExpression) {
+
+			var innerExpr = (expr as LogicalNotExpression).getExpr();
+			var condition;
+			if ((condition = _Util.conditionIsConstant(innerExpr)) != null) {
+				replaceCb(new BooleanLiteralExpression(new Token(condition ? "false" : "true", false))); // inverse the result
+			}
+
+		} else if (expr instanceof LogicalExpression) {
+
+			firstExpr = (expr as LogicalExpression).getFirstExpr();
+			secondExpr = (expr as LogicalExpression).getSecondExpr();
+
+			var condition;
+			if ((condition = _Util.conditionIsConstant(firstExpr)) != null) {
+				var op = expr.getToken().getValue();
+				if (op == "||" && condition) {
+					replaceCb(new AsExpression(firstExpr.getToken(), firstExpr, Type.booleanType));
+				} else if (op == "||" && (! condition)) {
+					replaceCb(new AsExpression(secondExpr.getToken(), secondExpr, Type.booleanType));
+				} else if (op == "&&" && condition) {
+					replaceCb(new AsExpression(secondExpr.getToken(), secondExpr, Type.booleanType));
+				} else if (op == "&&" && (! condition)) {
+					replaceCb(new AsExpression(firstExpr.getToken(), firstExpr, Type.booleanType));
+				} else {
+					throw new Error("logic flaw");
 				}
+			}
+
+		} else if (expr instanceof ConditionalExpression) {
+
+			var conditionalExpr = expr as ConditionalExpression;
+			var condExpr = conditionalExpr.getCondExpr();
+			if ((condition = _Util.conditionIsConstant(condExpr)) != null) {
+				var ifTrueExpr = conditionalExpr.getIfTrueExpr() ?: condExpr;
+				var ifFalseExpr = conditionalExpr.getIfFalseExpr();
+
+				replaceCb(condition ? ifTrueExpr : ifFalseExpr);
 			}
 
 		}
@@ -1318,23 +1798,44 @@ class _FoldConstantCommand extends _FunctionOptimizeCommand {
 				return this._foldNumericBinaryExpressionOfConstants(expr, replaceCb);
 			}
 
-		// if either operand is zero, then...
+		// if either operand is zero or one, then...
 		function exprIsZero(expr : Expression) : boolean {
 			return expr instanceof NumberLiteralExpression && expr.getToken().getValue() as number == 0;
 		}
+		function exprIsOne(expr : Expression) : boolean {
+			return expr instanceof NumberLiteralExpression && expr.getToken().getValue() as number == 1;
+		}
 		switch (expr.getToken().getValue()) {
 		case "+":
-			if (exprIsZero(expr.getFirstExpr())) {
+			if (exprIsZero(expr.getFirstExpr())) { // 0 + x -> x
 				replaceCb(expr.getSecondExpr());
 				return true;
-			} else if (exprIsZero(expr.getSecondExpr())) {
+			} else if (exprIsZero(expr.getSecondExpr())) { // x + 0 -> x
 				replaceCb(expr.getFirstExpr());
 				return true;
 			}
 			break;
-		case "-":
-			// TODO should we rewrite "0 - n"?
-			if (exprIsZero(expr.getSecondExpr())) {
+		case "-": // x - 0 -> x
+			if (exprIsZero(expr.getFirstExpr())) { // 0 - x -> -x
+				replaceCb(new SignExpression(new Token("-", false), expr.getSecondExpr()));
+				return true;
+			}
+			else if (exprIsZero(expr.getSecondExpr())) { // x - 0 -> x
+				replaceCb(expr.getFirstExpr());
+				return true;
+			}
+			break;
+		case "*": // x * 1 or 1 * x -> x
+			if (exprIsOne(expr.getFirstExpr())) {
+				replaceCb(expr.getSecondExpr());
+				return true;
+			} else if (exprIsOne(expr.getSecondExpr())) {
+				replaceCb(expr.getFirstExpr());
+				return true;
+			}
+			break;
+		case "/": // x / 1 -> x
+			if (exprIsOne(expr.getSecondExpr())) {
 				replaceCb(expr.getFirstExpr());
 				return true;
 			}
@@ -1431,6 +1932,81 @@ class _FoldConstantCommand extends _FunctionOptimizeCommand {
 		return null;
 	}
 
+	function _foldAsExpression(expr : AsExpression, replaceCb : function(:Expression):void) : void {
+		var baseExpr = expr.getExpr();
+		if (expr.getType().equals(Type.stringType)) { // as string
+			if (baseExpr.getType().equals(Type.stringType)) {
+				this.log("folding type cast: string as string");
+				replaceCb(baseExpr);
+			}
+			else if (baseExpr instanceof BooleanLiteralExpression || baseExpr instanceof NumberLiteralExpression || baseExpr instanceof IntegerLiteralExpression) {
+				this.log("folding type cast: primitive literal as string");
+				replaceCb(
+					new StringLiteralExpression(
+						new Token(Util.encodeStringLiteral(baseExpr.getToken().getValue()), false)));
+			}
+		}
+		else if (expr.getType().equals(Type.numberType)) { // as number
+			if (baseExpr.getType().equals(Type.numberType)) {
+				this.log("folding type cast: number as number");
+				replaceCb(baseExpr);
+			}
+			else if (baseExpr instanceof StringLiteralExpression) {
+				this.log("folding type cast: string literal as number");
+				replaceCb(
+					new NumberLiteralExpression(
+						new Token(Util.decodeStringLiteral(baseExpr.getToken().getValue()) as number as string, false)));
+			}
+			else if (baseExpr instanceof IntegerLiteralExpression) {
+				this.log("folding type cast: int literal as number");
+				replaceCb(
+					new NumberLiteralExpression(
+						new Token(baseExpr.getToken().getValue() as number as string, false)));
+			}
+		}
+		else if (expr.getType().equals(Type.integerType)) { // as int
+			if (baseExpr.getType().equals(Type.integerType)) {
+				this.log("folding type cast: int as int");
+				replaceCb(baseExpr);
+			}
+			else if (baseExpr instanceof StringLiteralExpression) {
+				this.log("folding type cast: string literal as int");
+				replaceCb(
+					new IntegerLiteralExpression(
+						new Token(Util.decodeStringLiteral(baseExpr.getToken().getValue()) as int as string, false)));
+			}
+			else if (baseExpr instanceof NumberLiteralExpression) {
+				this.log("folding type cast: number literal as int");
+				replaceCb(
+					new IntegerLiteralExpression(
+						new Token(baseExpr.getToken().getValue() as int as string, false)));
+			}
+		}
+		else if (expr.getType().equals(Type.booleanType)) { // as boolean
+			if (baseExpr.getType().equals(Type.booleanType)) {
+				this.log("folding type cast: boolean as boolean");
+				replaceCb(baseExpr);
+			}
+			else if (baseExpr instanceof StringLiteralExpression) {
+				this.log("folding type cast: string literal as boolean");
+				replaceCb(
+					new BooleanLiteralExpression(
+						new Token(Util.decodeStringLiteral(baseExpr.getToken().getValue()) as boolean as string, false)));
+			}
+			else if (baseExpr instanceof NumberLiteralExpression) {
+				this.log("folding type cast: number literal as boolean");
+				replaceCb(
+					new BooleanLiteralExpression(
+						new Token(baseExpr.getToken().getValue() as number ? "true" : "false", false)));
+			}
+			else if (baseExpr instanceof IntegerLiteralExpression) {
+				this.log("folding type cast: integer literal as boolean");
+				replaceCb(
+					new BooleanLiteralExpression(
+						new Token(baseExpr.getToken().getValue() as int ? "true" : "false", false)));
+			}
+		}
+	}
 }
 
 class _DeadCodeEliminationOptimizeCommand extends _FunctionOptimizeCommand {
@@ -1644,26 +2220,26 @@ class _DeadCodeEliminationOptimizeCommand extends _FunctionOptimizeCommand {
 		var lastAssignExpr = new Triple.<LocalVariable, AssignmentExpression, function(:Expression):void>[];
 		var onExpr = function (expr : Expression, rewriteCb : function(:Expression):void) : boolean {
 			if (expr instanceof AssignmentExpression) {
-				if ((expr as AssignmentExpression).getToken().getValue() == "="
-					&& (expr as AssignmentExpression).getFirstExpr() instanceof LocalExpression) {
-						onExpr((expr as AssignmentExpression).getSecondExpr(), function (assignExpr : AssignmentExpression) : function(:Expression):void {
-							return function (expr) {
-								assignExpr.setSecondExpr(expr);
-							};
-						}((expr as AssignmentExpression)));
-						var lhsLocal = ((expr as AssignmentExpression).getFirstExpr() as LocalExpression).getLocal();
-						for (var i = 0; i < lastAssignExpr.length; ++i) {
-							if (lastAssignExpr[i].first == lhsLocal) {
-								break;
-							}
+				var assignExpr = expr as AssignmentExpression;
+				if (assignExpr.getToken().getValue() == "=" && assignExpr.getFirstExpr() instanceof LocalExpression) {
+					onExpr(assignExpr.getSecondExpr(), function (assignExpr : AssignmentExpression) : function(:Expression):void {
+						return function (expr) {
+							assignExpr.setSecondExpr(expr);
+						};
+					}(assignExpr));
+					var lhsLocal = (assignExpr.getFirstExpr() as LocalExpression).getLocal();
+					for (var i = 0; i < lastAssignExpr.length; ++i) {
+						if (lastAssignExpr[i].first == lhsLocal) {
+							break;
 						}
-						if (i != lastAssignExpr.length) {
-							this.log("eliminating dead store to: " + lhsLocal.getName().getValue());
-							lastAssignExpr[i].third(lastAssignExpr[i].second.getSecondExpr());
-						}
-						lastAssignExpr[i] = new Triple.<LocalVariable, AssignmentExpression, function(:Expression):void>(lhsLocal, expr as AssignmentExpression, rewriteCb);
-						return true;
 					}
+					if (i != lastAssignExpr.length) {
+						this.log("eliminating dead store to: " + lhsLocal.getName().getValue());
+						lastAssignExpr[i].third(lastAssignExpr[i].second.getSecondExpr());
+					}
+					lastAssignExpr[i] = new Triple.<LocalVariable, AssignmentExpression, function(:Expression):void>(lhsLocal, expr as AssignmentExpression, rewriteCb);
+					return true;
+				}
 			} else if (expr instanceof LocalExpression) {
 				for (var i = 0; i < lastAssignExpr.length; ++i) {
 					if (lastAssignExpr[i].first == (expr as LocalExpression).getLocal()) {
@@ -1689,6 +2265,13 @@ class _DeadCodeEliminationOptimizeCommand extends _FunctionOptimizeCommand {
 				Util.forEachExpression(onExpr, (expr as NewExpression).getArguments());
 				lastAssignExpr.splice(0, lastAssignExpr.length);
 				return true;
+			} else if (expr instanceof LogicalExpression || expr instanceof ConditionalExpression) {
+				expr.forEachExpression(function (expr, rewriteCb) {
+					var result = onExpr(expr, rewriteCb);
+					lastAssignExpr.splice(0, lastAssignExpr.length);
+					return result;
+				});
+				return true;
 			}
 			return expr.forEachExpression(onExpr);
 		};
@@ -1703,7 +2286,7 @@ class _DeadCodeEliminationOptimizeCommand extends _FunctionOptimizeCommand {
 			var baseExpr = (expr as PropertyExpression).getExpr();
 			if (baseExpr instanceof LocalExpression
 			    || baseExpr instanceof ThisExpression
-			    || baseExpr instanceof ClassExpression) {
+			    || baseExpr.isClassSpecifier()) {
 				return true;
 			} else {
 				return false;
@@ -1714,7 +2297,7 @@ class _DeadCodeEliminationOptimizeCommand extends _FunctionOptimizeCommand {
 				return (x as LocalExpression).getLocal() == (y as LocalExpression).getLocal();
 			} else if (x instanceof ThisExpression && y instanceof ThisExpression) {
 				return true;
-			} else if (x instanceof ClassExpression && y instanceof ClassExpression) {
+			} else if (x.isClassSpecifier() && y.isClassSpecifier()) {
 				return (x as ClassExpression).getType().equals((y as ClassExpression).getType());
 			}
 			return false;
@@ -1766,18 +2349,6 @@ class _DeadCodeEliminationOptimizeCommand extends _FunctionOptimizeCommand {
 	}
 
 	function _eliminateDeadConditions (funcDef : MemberFunctionDefinition, exprs : Expression[]) : void {
-		function conditionIsConstant(expr : Expression) : Nullable.<boolean> {
-			if (expr instanceof BooleanLiteralExpression) {
-				return expr.getToken().getValue() == "true";
-			} else if (expr instanceof StringLiteralExpression) {
-				return expr.getToken().getValue().length > 2;
-			} else if (expr instanceof NumberLiteralExpression || expr instanceof IntegerLiteralExpression) {
-				return expr.getToken().getValue() as number != 0;
-			} else if (expr instanceof MapLiteralExpression || expr instanceof ArrayLiteralExpression) {
-				return true;
-			}
-			return null;
-		}
 		function spliceStatements (dest : Statement[], index : number, src : Statement[]) : void {
 			dest.splice(index, 1);
 			for (var i = 0; i < src.length; ++i) {
@@ -1789,7 +2360,7 @@ class _DeadCodeEliminationOptimizeCommand extends _FunctionOptimizeCommand {
 				var statement = statements[i];
 				if (statement instanceof IfStatement) {
 					var ifStatement = statement as IfStatement;
-					var cond = conditionIsConstant(ifStatement.getExpr());
+					var cond = _Util.conditionIsConstant(ifStatement.getExpr());
 					if (cond == null) {
 						// nothing to do
 					} else if (cond == false && ifStatement.getOnFalseStatements().length == 0) {
@@ -1988,28 +2559,27 @@ class _InlineOptimizeCommand extends _FunctionOptimizeCommand {
 			   && this._lhsHasNoSideEffects((expr as AssignmentExpression).getFirstExpr())
 			&& (expr as AssignmentExpression).getSecondExpr() instanceof CallExpression) {
 
-				// inline if the statement is an assignment of a single call expression into a local variable
-				var args = this._getArgsAndThisIfCallExprIsInlineable((expr as AssignmentExpression).getSecondExpr() as CallExpression, false);
-				if (args != null) {
-					stmtIndex = this._expandCallingFunction(funcDef, statements, stmtIndex, _DetermineCalleeCommand.getCallingFuncDef((expr as AssignmentExpression).getSecondExpr() as CallExpression), args);
-					var stmt = statements[stmtIndex - 1];
-					if (stmt instanceof ReturnStatement) {
-						var rhsExpr = (stmt as ReturnStatement).getExpr();
-					} else if (stmt instanceof ExpressionStatement) {
-						rhsExpr = (stmt as ExpressionStatement).getExpr();
-					} else {
-						return false;
-					}
-					var lastExpr = new AssignmentExpression(
-						expr.getToken(),
-						(expr as AssignmentExpression).getFirstExpr(),
-						rhsExpr);
-					statements[stmtIndex - 1] = new ExpressionStatement(lastExpr);
-					cb(stmtIndex);
-					return true;
+			// inline if the statement is an assignment of a single call expression into a local variable
+			var args = this._getArgsAndThisIfCallExprIsInlineable((expr as AssignmentExpression).getSecondExpr() as CallExpression, false);
+			if (args != null) {
+				stmtIndex = this._expandCallingFunction(funcDef, statements, stmtIndex, _DetermineCalleeCommand.getCallingFuncDef((expr as AssignmentExpression).getSecondExpr() as CallExpression), args);
+				var stmt = statements[stmtIndex - 1];
+				if (stmt instanceof ReturnStatement) {
+					var rhsExpr = (stmt as ReturnStatement).getExpr();
+				} else if (stmt instanceof ExpressionStatement) {
+					rhsExpr = (stmt as ExpressionStatement).getExpr();
+				} else {
+					return false;
 				}
-
+				var lastExpr = new AssignmentExpression(
+					expr.getToken(),
+					(expr as AssignmentExpression).getFirstExpr(),
+					rhsExpr);
+				statements[stmtIndex - 1] = new ExpressionStatement(lastExpr);
+				cb(stmtIndex);
+				return true;
 			}
+		}
 
 		return false;
 	}
@@ -2022,7 +2592,7 @@ class _InlineOptimizeCommand extends _FunctionOptimizeCommand {
 			var holderExpr = (lhsExpr as PropertyExpression).getExpr();
 			if (holderExpr instanceof ThisExpression)
 				return true;
-			if (holderExpr instanceof LocalExpression || holderExpr instanceof ClassExpression)
+			if (holderExpr instanceof LocalExpression || holderExpr.isClassSpecifier())
 				return true;
 		} else if (lhsExpr instanceof ArrayExpression) {
 			var arrayExpr = lhsExpr as ArrayExpression;

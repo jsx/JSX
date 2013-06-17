@@ -117,7 +117,7 @@ class _Lexer {
 	static const rxNewline        = /(?:\r\n?|\n)/;
 
 	// blacklists of identifiers
-	static const keywords = _Lexer.asMap([
+	static const keywords = Util.asSet([
 		// literals shared with ECMA 262
 		"null",     "true",     "false",
 		"NaN",      "Infinity",
@@ -141,7 +141,7 @@ class _Lexer {
 		"__FILE__",  "__LINE__",
 		"undefined"
 		]);
-	static const reserved = _Lexer.asMap([
+	static const reserved = Util.asSet([
 		// literals of ECMA 262 but not used by JSX
 		"debugger", "with",
 		// future reserved words of ECMA 262
@@ -160,13 +160,6 @@ class _Lexer {
 
 	static function quoteMeta (pattern : string) : string {
 		return pattern.replace(/([^0-9A-Za-z_])/g, '\\$1');
-	}
-
-	static function asMap (array : string[]) : Map.<boolean> {
-		var hash = new Map.<boolean>;
-		for (var i = 0; i < array.length; ++i)
-			hash[array[i]] = true;
-		return hash;
 	}
 
 	/// compile a regular expression
@@ -3262,7 +3255,7 @@ class Parser {
 					|| (keyToken = this._expectStringLiteralOpt()) != null) {
 					// ok
 				} else {
-					this._newError("expected identifier, number or string but got '" + token.toString() + "'");
+					this._newError("expected identifier, number or string but got '" + token.getValue() + "'");
 				}
 				// separator
 				if (this._expect(":") == null)

@@ -88,6 +88,45 @@ class A {
       "word" : "JSON"
    },
    {
+      "word" : "Transferable"
+   },
+   {
+      "word" : "ArrayBuffer"
+   },
+   {
+      "word" : "ArrayBufferView"
+   },
+   {
+      "word" : "Int8Array"
+   },
+   {
+      "word" : "Uint8Array"
+   },
+   {
+      "word" : "Uint8ClampedArray"
+   },
+   {
+      "word" : "Int16Array"
+   },
+   {
+      "word" : "Uint16Array"
+   },
+   {
+      "word" : "Int32Array"
+   },
+   {
+      "word" : "Uint32Array"
+   },
+   {
+      "word" : "Float32Array"
+   },
+   {
+      "word" : "Float64Array"
+   },
+   {
+      "word" : "DataView"
+   },
+   {
       "word" : "JSX"
    },
    {

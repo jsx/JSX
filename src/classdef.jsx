@@ -306,7 +306,8 @@ class ClassDefinition implements Stashable {
 										return;
 									}
 								}
-								if ((member as MemberFunctionDefinition).getStatements() != null || mode != ClassDefinition.GET_MEMBER_MODE_FUNCTION_WITH_BODY) {
+								if ((member as MemberFunctionDefinition).getStatements() != null || mode != ClassDefinition.GET_MEMBER_MODE_FUNCTION_WITH_BODY
+									|| (member.flags() & (ClassDefinition.IS_NATIVE | ClassDefinition.IS_ABSTRACT)) == ClassDefinition.IS_NATIVE) {
 									for (var j = 0; j < types.length; ++j) {
 										if (Util.typesAreEqual((member as MemberFunctionDefinition).getArgumentTypes(), (types[j] as ResolvedFunctionType).getArgumentTypes())) {
 											break;
@@ -498,7 +499,7 @@ class ClassDefinition implements Stashable {
 			var func = new MemberFunctionDefinition(
 				this._token,
 				new Token("constructor", true),
-				ClassDefinition.IS_FINAL | (this.flags() & ClassDefinition.IS_NATIVE),
+				ClassDefinition.IS_FINAL | (this.flags() & (ClassDefinition.IS_NATIVE | ClassDefinition.IS_EXPORT)),
 				Type.voidType,
 				new ArgumentDeclaration[],
 				isNative ? (null) : new LocalVariable[],
@@ -509,38 +510,6 @@ class ClassDefinition implements Stashable {
 			func.setClassDef(this);
 			this._members.push(func);
 		}
-		// substitute access to inner class with single ClassExpression
-		this.forEachMemberFunction(function (funcDef) {
-			return funcDef.forEachStatement(function (statement) {
-				return statement.forEachExpression(function onExpr(expr : Expression, replaceCb : (Expression)->void) : boolean {
-					expr.forEachExpression(onExpr);
-					if (expr instanceof PropertyExpression && (expr as PropertyExpression).getExpr() instanceof ClassExpression) {
-						var propExpr = expr as PropertyExpression;
-						var identifierToken = propExpr.getIdentifierToken();
-						var receiverType = (propExpr.getExpr() as ClassExpression).getType() as ParsedObjectType;
-						var receiverClassDef = receiverType.getClassDef();
-						if (receiverClassDef) {
-							receiverClassDef.forEachInnerClass(function (classDef) {
-								if (classDef.className() == identifierToken.getValue()) {
-									var objectType = new ParsedObjectType(
-										new QualifiedName(identifierToken, receiverType),
-										propExpr.getTypeArguments()
-									);
-									objectType.resolveType(context);
-									replaceCb(new ClassExpression(propExpr.getToken(), objectType));
-									return false;
-								}
-								return true;
-							});
-						}
-						else {
-							return true;
-						}
-					}
-					return true;
-				});
-			});
-		});
 	}
 
 	function setAnalysisContextOfVariables (context : AnalysisContext) : void {
@@ -750,7 +719,7 @@ class ClassDefinition implements Stashable {
 			} else {
 				// Just sets the initial values; analysis of member variables is performed lazily (and those that where never analyzed will be removed by dead code elimination)
 				var varDef = member as MemberVariableDefinition;
-				if (varDef.getInitialValue() == null) {
+				if (varDef.getInitialValue() == null && (this.flags() & ClassDefinition.IS_NATIVE) != ClassDefinition.IS_NATIVE) {
 					varDef.setInitialValue(Expression.getDefaultValueExpressionOf(varDef.getType()));
 				}
 			}
@@ -793,10 +762,11 @@ class ClassDefinition implements Stashable {
 					return false;
 			}
 		} else { // function
-			if (this._extendType != null && ! this._extendType.getClassDef()._assertMemberFunctionIsDefinable(context, member as MemberFunctionDefinition, memberClassDef, token, false))
+			var isCheckingInterface = (memberClassDef.flags() & ClassDefinition.IS_INTERFACE) != 0;
+			if (this._extendType != null && ! this._extendType.getClassDef()._assertMemberFunctionIsDefinable(context, member as MemberFunctionDefinition, memberClassDef, token, false, isCheckingInterface))
 				return false;
 			for (var i = 0; i < numImplementsToCheck; ++i) {
-				if (memberClassDef != this._implementTypes[i].getClassDef() && ! this._implementTypes[i].getClassDef()._assertMemberFunctionIsDefinable(context, member as MemberFunctionDefinition, memberClassDef, token, isCheckingSibling))
+				if (memberClassDef != this._implementTypes[i].getClassDef() && ! this._implementTypes[i].getClassDef()._assertMemberFunctionIsDefinable(context, member as MemberFunctionDefinition, memberClassDef, token, isCheckingSibling, isCheckingInterface))
 					return false;
 			}
 		}
@@ -824,19 +794,21 @@ class ClassDefinition implements Stashable {
 		return true;
 	}
 
-	function _assertMemberFunctionIsDefinable (context : AnalysisContext, member : MemberFunctionDefinition, memberClassDef : ClassDefinition, token : Token, reportOverridesAsWell : boolean) : boolean {
+	function _assertMemberFunctionIsDefinable (context : AnalysisContext, member : MemberFunctionDefinition, memberClassDef : ClassDefinition, token : Token, reportOverridesAsWell : boolean, isCheckingInterface : boolean) : boolean {
 		if (member.name() == "constructor")
 			return true;
 		for (var i = 0; i < this._members.length; ++i) {
 			if (this._members[i].name() != member.name())
 				continue;
-			// property with the same name has been found, we can tell yes or no now
 			if (this._members[i] instanceof MemberVariableDefinition) {
-				throw new Error("logic flaw: " + member.getNotation());
+				var error = new CompileError(member.getNameToken(), "definition of the function conflicts with property '" + this._members[i].getNameToken().getValue() + "'");
+				error.addCompileNote(new CompileNote(this._members[i].getNameToken(), "property with the same name has been found here"));
+				context.errors.push(error);
+				return false;
 			}
 			if (! Util.typesAreEqual((this._members[i] as MemberFunctionDefinition).getArgumentTypes(), member.getArgumentTypes()))
 				continue;
-			if ((member.flags() & ClassDefinition.IS_OVERRIDE) == 0) {
+			if ((! isCheckingInterface) && (member.flags() & ClassDefinition.IS_OVERRIDE) == 0) {
 				context.errors.push(new CompileError(member.getNameToken(), "overriding functions must have 'override' attribute set (defined in base class '" + this.className() + "')"));
 				return false;
 			}
@@ -848,10 +820,10 @@ class ClassDefinition implements Stashable {
 			return true;
 		}
 		// delegate to base classes
-		if (this._extendType != null && ! this._extendType.getClassDef()._assertMemberFunctionIsDefinable(context, member, memberClassDef, token, false))
+		if (this._extendType != null && ! this._extendType.getClassDef()._assertMemberFunctionIsDefinable(context, member, memberClassDef, token, false, isCheckingInterface))
 			return false;
 		for (var i = 0; i < this._implementTypes.length; ++i)
-			if (! this._implementTypes[i].getClassDef()._assertMemberFunctionIsDefinable(context, member, memberClassDef, token, false))
+			if (! this._implementTypes[i].getClassDef()._assertMemberFunctionIsDefinable(context, member, memberClassDef, token, false, isCheckingInterface))
 				return false;
 		return true;
 	}
@@ -1113,12 +1085,12 @@ class MemberVariableDefinition extends MemberDefinition {
 			try {
 				this._analyzeState = MemberVariableDefinition.IS_ANALYZING;
 				if (this._initialValue != null) {
-					if (this._initialValue instanceof ClassExpression) {
+					if (! this._initialValue.analyze(this._analysisContext, null))
+						return null;
+					if (this._initialValue.isClassSpecifier()) {
 						this._analysisContext.errors.push(new CompileError(this._initialValue._token, "cannot assign a class"));
 						return null;
 					}
-					if (! this._initialValue.analyze(this._analysisContext, null))
-						return null;
 					var ivType = this._initialValue.getType();
 					if (this._type == null) {
 						if (ivType.equals(Type.nullType)) {
@@ -1227,6 +1199,162 @@ class MemberFunctionDefinition extends MemberDefinition implements Block {
 			this._returnType.toString();
 	}
 
+	class _CloneStash extends Stash {
+
+		var newLocal : LocalVariable;
+		var newFuncDef : MemberFunctionDefinition;
+
+		function constructor () {
+			this.newLocal = null;
+			this.newFuncDef = null;
+		}
+
+		function constructor (that : MemberFunctionDefinition._CloneStash) {
+			this.newLocal = that.newLocal;
+			this.newFuncDef = that.newFuncDef;
+		}
+
+		override function clone () : MemberFunctionDefinition._CloneStash {
+			return new MemberFunctionDefinition._CloneStash(this);
+		}
+
+	}
+
+	function clone () : MemberFunctionDefinition {
+
+		var stashesUsed = new MemberFunctionDefinition._CloneStash[];
+
+		function getStash(stashable : Stashable) : MemberFunctionDefinition._CloneStash {
+			var stash = stashable.getStash("CLONE-FUNC-DEF");
+			if (stash == null) {
+				stash = stashable.setStash("CLONE-FUNC-DEF", new MemberFunctionDefinition._CloneStash);
+			}
+			stashesUsed.push(stash as MemberFunctionDefinition._CloneStash);
+			return stash as MemberFunctionDefinition._CloneStash;
+		}
+
+		function cloneFuncDef (funcDef : MemberFunctionDefinition) : MemberFunctionDefinition {
+
+			// at this moment, all locals and closures are not cloned yet
+			var statements = Cloner.<Statement>.cloneArray(funcDef.getStatements());
+
+			var closures = funcDef.getClosures().map.<MemberFunctionDefinition>((funcDef) -> {
+				var newFuncDef = cloneFuncDef(funcDef);
+				getStash(funcDef).newFuncDef = newFuncDef;
+				return newFuncDef;
+			});
+			// rewrite funcDefs
+			Util.forEachStatement(function onStatement(statement : Statement) : boolean {
+				if (statement instanceof FunctionStatement) {
+					var newFuncDef;
+					if ((newFuncDef = getStash((statement as FunctionStatement).getFuncDef()).newFuncDef) != null) {
+						(statement as FunctionStatement).setFuncDef(newFuncDef);
+					}
+					return true;
+				}
+				return statement.forEachExpression(function onExpr(expr : Expression, replaceCb : function(:Expression):void) : boolean {
+					if (expr instanceof FunctionExpression) {
+						var newFuncDef;
+						if ((newFuncDef = getStash((expr as FunctionExpression).getFuncDef()).newFuncDef) != null) {
+							(expr as FunctionExpression).setFuncDef(newFuncDef);
+						}
+						return true;
+					}
+					return expr.forEachExpression(onExpr);
+				}) && statement.forEachStatement(onStatement);
+			}, statements);
+
+			var funcLocal = funcDef.getFuncLocal();
+			if (funcLocal != null) {
+				var newFuncLocal;
+				if ((newFuncLocal = getStash(funcLocal).newLocal) != null) { // funcDef is defined as a function statement
+					// ok
+				} else {
+					// clone
+					newFuncLocal = new LocalVariable(funcLocal.getName(), funcLocal.getType());
+					getStash(funcLocal).newLocal = newFuncLocal;
+				}
+				funcLocal = newFuncLocal;
+			}
+			var args = funcDef.getArguments().map.<ArgumentDeclaration>((arg) -> {
+				var newArg = arg.clone();
+				getStash(arg).newLocal = newArg;
+				return newArg;
+			});
+			var locals = funcDef.getLocals().map.<LocalVariable>((local) -> {
+				var newLocal;
+				if ((newLocal = getStash(local).newLocal) != null) {
+					// in case local is a name of a function statement and the function statement already cloned
+					return newLocal;
+				}
+				newLocal = new LocalVariable(local.getName(), local.getType());
+				getStash(local).newLocal = newLocal;
+				return newLocal;
+			});
+
+			// FIXME special hack: CatchStatement#clone does not clone and rewrite its caught variable
+			Util.forEachStatement(function onStatement(statement : Statement) : boolean {
+				if (statement instanceof CatchStatement) {
+					var caughtVar = (statement as CatchStatement).getLocal().clone();
+					getStash((statement as CatchStatement).getLocal()).newLocal = caughtVar;
+					(statement as CatchStatement).setLocal(caughtVar);
+				} else if (statement instanceof FunctionStatement) {
+					(statement as FunctionStatement).getFuncDef().forEachStatement(onStatement);
+				}
+				return statement.forEachExpression(function onExpr(expr, replaceCb) {
+					if (expr instanceof FunctionExpression) {
+						return (expr as FunctionExpression).getFuncDef().forEachStatement(onStatement);
+					}
+					return expr.forEachExpression(onExpr);
+				}) && statement.forEachStatement(onStatement);
+			}, statements);
+
+			// rewrite locals
+			Util.forEachStatement(function onStatement(statement : Statement) : boolean {
+				if (statement instanceof FunctionStatement) {
+					(statement as FunctionStatement).getFuncDef().forEachStatement(onStatement);
+				}
+				return statement.forEachExpression(function onExpr(expr : Expression, replaceCb : function(:Expression):void) : boolean {
+					if (expr instanceof LocalExpression) {
+						var newLocal;
+						if ((newLocal = getStash((expr as LocalExpression).getLocal()).newLocal) != null) {
+							(expr as LocalExpression).setLocal(newLocal);
+						}
+					} else if (expr instanceof FunctionExpression) {
+						return (expr as FunctionExpression).getFuncDef().forEachStatement(onStatement);
+					}
+					return expr.forEachExpression(onExpr);
+				}) && statement.forEachStatement(onStatement);
+			}, statements);
+
+			var clonedFuncDef = new MemberFunctionDefinition(
+				funcDef.getToken(),
+				funcDef.getNameToken(),
+				funcDef.flags(),
+				funcDef.getReturnType(),
+				args,
+				locals,
+				statements,
+				closures,
+				funcDef._lastTokenOfBody,
+				null
+			);
+			clonedFuncDef.setFuncLocal(funcLocal);
+
+			return clonedFuncDef;
+		}
+
+		var clonedFuncDef = cloneFuncDef(this);
+
+		// erase stashes of original funcDef
+		for (var i = 0; i < stashesUsed.length; ++i) {
+			var stash = stashesUsed[i];
+			stash.newLocal = null;
+			stash.newFuncDef = null;
+		}
+
+		return clonedFuncDef;
+	}
 
 	override function instantiate (instantiationContext : InstantiationContext) : MemberFunctionDefinition {
 		return this._instantiateCore(

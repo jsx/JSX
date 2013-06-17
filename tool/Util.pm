@@ -17,6 +17,8 @@ our @EXPORT = qw(slurp get_section jsx numify_version xsystem);
 use Cwd ();
 $ENV{JSX_HOME} = Cwd::getcwd() . '/.jsx';
 
+our $JSX = "bin/jsx";
+
 sub xsystem { # system() which returns (status code, stdout, stderr)
     my(@args) = @_;
     require IPC::Open3;
@@ -41,7 +43,7 @@ sub jsx { # returns (status, stdout, stderr)
     require Symbol;
     my($wtr, $rdr) = (Symbol::gensym(), Symbol::gensym());
     my $err = File::Temp::tempfile();
-    my $pid = IPC::Open3::open3($wtr, $rdr, '>&' . fileno $err, "bin/jsx @args");
+    my $pid = IPC::Open3::open3($wtr, $rdr, '>&' . fileno $err, "$JSX @args");
     close $wtr;
     my $stdout = do { local $/; <$rdr> };
     close $rdr;

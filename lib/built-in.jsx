@@ -275,26 +275,26 @@ native final class Array.<T> {
 	 *        currentValue (the current element being processed in the array),
 	 *        the currentIndex and the array.
 	 */
-	function reduce(callbackfn : function(previousValue : Nullable.<T>, currentValue : Nullable.<T>) : Nullable.<T>) : Array.<T>;
-	function reduce(callbackfn : function(previousValue : Nullable.<T>, currentValue : Nullable.<T>, currentIndex : number) : Nullable.<T>) : Array.<T>;
-	function reduce(callbackfn : function(previousValue : Nullable.<T>, currentValue : Nullable.<T>, currentIndex : number, array : Array.<T>) : Nullable.<T>) : Array.<T>;
+	function reduce.<U>(callbackfn : function(previousValue : Nullable.<T>, currentValue : Nullable.<T>) : U) : U;
+	function reduce.<U>(callbackfn : function(previousValue : Nullable.<T>, currentValue : Nullable.<T>, currentIndex : number) : U) : U;
+	function reduce.<U>(callbackfn : function(previousValue : Nullable.<T>, currentValue : Nullable.<T>, currentIndex : number, array : Array.<T>) : U) : U;
 	/* with initial value; won't throw exception. */
-	function reduce(callbackfn : function(previousValue : Nullable.<T>, currentValue : Nullable.<T>) : Nullable.<T>, initialValue : T) : Array.<T>;
-	function reduce(callbackfn : function(previousValue : Nullable.<T>, currentValue : Nullable.<T>, currentIndex : number) : Nullable.<T>, initialValue : T) : Array.<T>;
-	function reduce(callbackfn : function(previousValue : Nullable.<T>, currentValue : Nullable.<T>, currentIndex : number, array : Array.<T>) : Nullable.<T>, initialValue : T) : Array.<T>;
+	function reduce.<U>(callbackfn : function(previousValue : Nullable.<T>, currentValue : Nullable.<T>) : U, initialValue : T) : U;
+	function reduce.<U>(callbackfn : function(previousValue : Nullable.<T>, currentValue : Nullable.<T>, currentIndex : number) : U, initialValue : T) : U;
+	function reduce.<U>(callbackfn : function(previousValue : Nullable.<T>, currentValue : Nullable.<T>, currentIndex : number, array : Array.<T>) : U, initialValue : T) : U;
 
 
 	/**
 	 * Apply a function simultaneously against two values of the array
 	 * (from right-to-left) as to reduce it to a single value.
 	 */
-	function reduceRight(callbackfn : function(previousValue : Nullable.<T>, currentValue : Nullable.<T>) : Nullable.<T>) : Array.<T>;
-	function reduceRight(callbackfn : function(previousValue : Nullable.<T>, currentValue : Nullable.<T>, currentIndex : number) : Nullable.<T>) : Array.<T>;
-	function reduceRight(callbackfn : function(previousValue : Nullable.<T>, currentValue : Nullable.<T>, currentIndex : number, array : Array.<T>) : Nullable.<T>) : Array.<T>;
-
-	function reduceRight(callbackfn : function(previousValue : Nullable.<T>, currentValue : Nullable.<T>) : Nullable.<T>, initialValue : T) : Array.<T>;
-	function reduceRight(callbackfn : function(previousValue : Nullable.<T>, currentValue : Nullable.<T>) : Nullable.<T>, initialValue : T, currentIndex : number) : Array.<T>;
-	function reduceRight(callbackfn : function(previousValue : Nullable.<T>, currentValue : Nullable.<T>) : Nullable.<T>, initialValue : T, currentIndex : number, array : Array.<T>) : Array.<T>;
+	function reduceRight.<U>(callbackfn : function(previousValue : Nullable.<T>, currentValue : Nullable.<T>) : U) : U;
+	function reduceRight.<U>(callbackfn : function(previousValue : Nullable.<T>, currentValue : Nullable.<T>, currentIndex : number) : U) : U;
+	function reduceRight.<U>(callbackfn : function(previousValue : Nullable.<T>, currentValue : Nullable.<T>, currentIndex : number, array : Array.<T>) : U) : U;
+	/* with initial value; won't throw exception. */
+	function reduceRight.<U>(callbackfn : function(previousValue : Nullable.<T>, currentValue : Nullable.<T>) : U, initialValue : T) : U;
+	function reduceRight.<U>(callbackfn : function(previousValue : Nullable.<T>, currentValue : Nullable.<T>, currentIndex : number) : U, initialValue : T) : U;
+	function reduceRight.<U>(callbackfn : function(previousValue : Nullable.<T>, currentValue : Nullable.<T>, currentIndex : number, array : Array.<T>) : U, initialValue : T) : U;
 
 	/**
 	 * <p>A positive integer between 0 and a value less than 2<sup>32</sup> that specifies the number of elements in an array.</p>
@@ -1037,8 +1037,347 @@ native final class JSON {
 	static function stringify(value : variant) : string;
 	static function stringify(value : variant, replacer : function(key:string,value:variant):variant) : string;
 	static function stringify(value : variant, replacer : function(key:string,value:variant):variant, space : number) : string;
-
+	static function stringify(value : variant, replacer : function(key:string,value:variant):variant, space : string) : string;
 }
+
+/** @see http://www.w3.org/TR/html5/single-page.html */
+native __fake__ class Transferable {
+}
+
+/** @see https://www.khronos.org/registry/typedarray/specs/latest/typedarray.idl */
+native final class ArrayBuffer extends Transferable {
+
+	function constructor(length : number/*unsigned long*/);
+
+	__readonly__ var byteLength : number/*unsigned long*/;
+	function slice(begin : number/*long*/) : ArrayBuffer;
+	function slice(begin : number/*long*/, end : number/*long*/) : ArrayBuffer;
+
+} // end of ArrayBuffer
+
+/** @see https://www.khronos.org/registry/typedarray/specs/latest/typedarray.idl */
+native __fake__ class ArrayBufferView {
+
+	__readonly__ var buffer : ArrayBuffer;
+	__readonly__ var byteOffset : number/*unsigned long*/;
+	__readonly__ var byteLength : number/*unsigned long*/;
+
+} // end of ArrayBufferView
+
+/** @see https://www.khronos.org/registry/typedarray/specs/latest/typedarray.idl */
+native final class Int8Array extends ArrayBufferView {
+
+	function constructor(length : number/*unsigned long*/);
+	function constructor(array : Int8Array);
+	function constructor(array : number[]/*byte[]*/);
+	function constructor(array : int[]/*byte[]*/);
+	function constructor(buffer : ArrayBuffer);
+	function constructor(buffer : ArrayBuffer, byteOffset : number/*unsigned long*/);
+	function constructor(buffer : ArrayBuffer, byteOffset : number/*unsigned long*/, length : number/*unsigned long*/);
+
+	static __readonly__ var BYTES_PER_ELEMENT : number/*long*/;
+	       __readonly__ var BYTES_PER_ELEMENT : number/*long*/;
+	__readonly__ var length : number/*unsigned long*/;
+	function __native_index_operator__(index : number/*unsigned long*/) : Nullable.<number>/*byte*/;
+	/* getter */
+	function get(index : number/*unsigned long*/) : Nullable.<number>/*byte*/;
+	/* setter */
+	function set(index : number/*unsigned long*/, value : number/*byte*/) : void;
+	function set(array : Int8Array) : void;
+	function set(array : Int8Array, offset : number/*unsigned long*/) : void;
+	function set(array : number[]/*byte[]*/) : void;
+	function set(array : number[]/*byte[]*/, offset : number/*unsigned long*/) : void;
+	function set(array : int[]/*byte[]*/) : void;
+	function set(array : int[]/*byte[]*/, offset : number/*unsigned long*/) : void;
+	function subarray(start : number/*long*/, end : number/*long*/) : Int8Array;
+
+} // end of Int8Array
+
+/** @see https://www.khronos.org/registry/typedarray/specs/latest/typedarray.idl */
+native class Uint8Array extends ArrayBufferView {
+
+	function constructor(length : number/*unsigned long*/);
+	function constructor(array : Uint8Array);
+	function constructor(array : number[]/*octet[]*/);
+	function constructor(array : int[]/*octet[]*/);
+	function constructor(buffer : ArrayBuffer);
+	function constructor(buffer : ArrayBuffer, byteOffset : number/*unsigned long*/);
+	function constructor(buffer : ArrayBuffer, byteOffset : number/*unsigned long*/, length : number/*unsigned long*/);
+
+	static __readonly__ var BYTES_PER_ELEMENT : number/*long*/;
+	       __readonly__ var BYTES_PER_ELEMENT : number/*long*/;
+	__readonly__ var length : number/*unsigned long*/;
+	function __native_index_operator__(index : number/*unsigned long*/) : Nullable.<number>/*octet*/;
+	/* getter */
+	function get(index : number/*unsigned long*/) : Nullable.<number>/*octet*/;
+	/* setter */
+	function set(index : number/*unsigned long*/, value : number/*octet*/) : void;
+	function set(array : Uint8Array) : void;
+	function set(array : Uint8Array, offset : number/*unsigned long*/) : void;
+	function set(array : number[]/*octet[]*/) : void;
+	function set(array : number[]/*octet[]*/, offset : number/*unsigned long*/) : void;
+	function set(array : int[]/*octet[]*/) : void;
+	function set(array : int[]/*octet[]*/, offset : number/*unsigned long*/) : void;
+	function subarray(start : number/*long*/, end : number/*long*/) : Uint8Array;
+
+} // end of Uint8Array
+
+/** @see https://www.khronos.org/registry/typedarray/specs/latest/typedarray.idl */
+native final class Uint8ClampedArray extends Uint8Array {
+
+	function constructor(length : number/*unsigned long*/);
+	function constructor(array : Uint8ClampedArray);
+	function constructor(array : Uint8Array);
+	function constructor(array : number[]/*octet[]*/);
+	function constructor(array : int[]/*octet[]*/);
+	function constructor(buffer : ArrayBuffer);
+	function constructor(buffer : ArrayBuffer, byteOffset : number/*unsigned long*/);
+	function constructor(buffer : ArrayBuffer, byteOffset : number/*unsigned long*/, length : number/*unsigned long*/);
+
+	/* setter */
+	// inherits function set(index : number/*unsigned long*/, value : number/*octet*/) : void;
+	function set(array : Uint8ClampedArray) : void;
+	function set(array : Uint8ClampedArray, offset : number/*unsigned long*/) : void;
+	// inherits function set(array : number[]/*octet[]*/) : void;
+	// inherits function set(array : number[]/*octet[]*/, offset : number/*unsigned long*/) : void;
+	// inherits function set(array : int[]/*octet[]*/) : void;
+	// inherits function set(array : int[]/*octet[]*/, offset : number/*unsigned long*/) : void;
+	override function subarray(start : number/*long*/, end : number/*long*/) : Uint8ClampedArray;
+
+} // end of Uint8ClampedArray
+
+/** @see https://www.khronos.org/registry/typedarray/specs/latest/typedarray.idl */
+native final class Int16Array extends ArrayBufferView {
+
+	function constructor(length : number/*unsigned long*/);
+	function constructor(array : Int16Array);
+	function constructor(array : number[]/*short[]*/);
+	function constructor(array : int[]/*short[]*/);
+	function constructor(buffer : ArrayBuffer);
+	function constructor(buffer : ArrayBuffer, byteOffset : number/*unsigned long*/);
+	function constructor(buffer : ArrayBuffer, byteOffset : number/*unsigned long*/, length : number/*unsigned long*/);
+
+	static __readonly__ var BYTES_PER_ELEMENT : number/*long*/;
+	       __readonly__ var BYTES_PER_ELEMENT : number/*long*/;
+	__readonly__ var length : number/*unsigned long*/;
+	function __native_index_operator__(index : number/*unsigned long*/) : Nullable.<number>/*short*/;
+	/* getter */
+	function get(index : number/*unsigned long*/) : Nullable.<number>/*short*/;
+	/* setter */
+	function set(index : number/*unsigned long*/, value : number/*short*/) : void;
+	function set(array : Int16Array) : void;
+	function set(array : Int16Array, offset : number/*unsigned long*/) : void;
+	function set(array : number[]/*short[]*/) : void;
+	function set(array : number[]/*short[]*/, offset : number/*unsigned long*/) : void;
+	function set(array : int[]/*short[]*/) : void;
+	function set(array : int[]/*short[]*/, offset : number/*unsigned long*/) : void;
+	function subarray(start : number/*long*/, end : number/*long*/) : Int16Array;
+
+} // end of Int16Array
+
+/** @see https://www.khronos.org/registry/typedarray/specs/latest/typedarray.idl */
+native final class Uint16Array extends ArrayBufferView {
+
+	function constructor(length : number/*unsigned long*/);
+	function constructor(array : Uint16Array);
+	function constructor(array : number[]/*unsigned short[]*/);
+	function constructor(array : int[]/*unsigned short[]*/);
+	function constructor(buffer : ArrayBuffer);
+	function constructor(buffer : ArrayBuffer, byteOffset : number/*unsigned long*/);
+	function constructor(buffer : ArrayBuffer, byteOffset : number/*unsigned long*/, length : number/*unsigned long*/);
+
+	static __readonly__ var BYTES_PER_ELEMENT : number/*long*/;
+	       __readonly__ var BYTES_PER_ELEMENT : number/*long*/;
+	__readonly__ var length : number/*unsigned long*/;
+	function __native_index_operator__(index : number/*unsigned long*/) : Nullable.<number>/*unsigned short*/;
+	/* getter */
+	function get(index : number/*unsigned long*/) : Nullable.<number>/*unsigned short*/;
+	/* setter */
+	function set(index : number/*unsigned long*/, value : number/*unsigned short*/) : void;
+	function set(array : Uint16Array) : void;
+	function set(array : Uint16Array, offset : number/*unsigned long*/) : void;
+	function set(array : number[]/*unsigned short[]*/) : void;
+	function set(array : number[]/*unsigned short[]*/, offset : number/*unsigned long*/) : void;
+	function set(array : int[]/*unsigned short[]*/) : void;
+	function set(array : int[]/*unsigned short[]*/, offset : number/*unsigned long*/) : void;
+	function subarray(start : number/*long*/, end : number/*long*/) : Uint16Array;
+
+} // end of Uint16Array
+
+/** @see https://www.khronos.org/registry/typedarray/specs/latest/typedarray.idl */
+native final class Int32Array extends ArrayBufferView {
+
+	function constructor(length : number/*unsigned long*/);
+	function constructor(array : Int32Array);
+	function constructor(array : number[]/*long[]*/);
+	function constructor(array : int[]/*long[]*/);
+	function constructor(buffer : ArrayBuffer);
+	function constructor(buffer : ArrayBuffer, byteOffset : number/*unsigned long*/);
+	function constructor(buffer : ArrayBuffer, byteOffset : number/*unsigned long*/, length : number/*unsigned long*/);
+
+	static __readonly__ var BYTES_PER_ELEMENT : number/*long*/;
+	       __readonly__ var BYTES_PER_ELEMENT : number/*long*/;
+	__readonly__ var length : number/*unsigned long*/;
+	function __native_index_operator__(index : number/*unsigned long*/) : Nullable.<number>/*long*/;
+	/* getter */
+	function get(index : number/*unsigned long*/) : Nullable.<number>/*long*/;
+	/* setter */
+	function set(index : number/*unsigned long*/, value : number/*long*/) : void;
+	function set(array : Int32Array) : void;
+	function set(array : Int32Array, offset : number/*unsigned long*/) : void;
+	function set(array : number[]/*long[]*/) : void;
+	function set(array : number[]/*long[]*/, offset : number/*unsigned long*/) : void;
+	function set(array : int[]/*long[]*/) : void;
+	function set(array : int[]/*long[]*/, offset : number/*unsigned long*/) : void;
+	function subarray(start : number/*long*/, end : number/*long*/) : Int32Array;
+
+} // end of Int32Array
+
+/** @see https://www.khronos.org/registry/typedarray/specs/latest/typedarray.idl */
+native final class Uint32Array extends ArrayBufferView {
+
+	function constructor(length : number/*unsigned long*/);
+	function constructor(array : Uint32Array);
+	function constructor(array : number[]/*unsigned long[]*/);
+	function constructor(array : int[]/*unsigned long[]*/);
+	function constructor(buffer : ArrayBuffer);
+	function constructor(buffer : ArrayBuffer, byteOffset : number/*unsigned long*/);
+	function constructor(buffer : ArrayBuffer, byteOffset : number/*unsigned long*/, length : number/*unsigned long*/);
+
+	static __readonly__ var BYTES_PER_ELEMENT : number/*long*/;
+	       __readonly__ var BYTES_PER_ELEMENT : number/*long*/;
+	__readonly__ var length : number/*unsigned long*/;
+	function __native_index_operator__(index : number/*unsigned long*/) : Nullable.<number>/*unsigned long*/;
+	/* getter */
+	function get(index : number/*unsigned long*/) : Nullable.<number>/*unsigned long*/;
+	/* setter */
+	function set(index : number/*unsigned long*/, value : number/*unsigned long*/) : void;
+	function set(array : Uint32Array) : void;
+	function set(array : Uint32Array, offset : number/*unsigned long*/) : void;
+	function set(array : number[]/*unsigned long[]*/) : void;
+	function set(array : number[]/*unsigned long[]*/, offset : number/*unsigned long*/) : void;
+	function set(array : int[]/*unsigned long[]*/) : void;
+	function set(array : int[]/*unsigned long[]*/, offset : number/*unsigned long*/) : void;
+	function subarray(start : number/*long*/, end : number/*long*/) : Uint32Array;
+
+} // end of Uint32Array
+
+/** @see https://www.khronos.org/registry/typedarray/specs/latest/typedarray.idl */
+native final class Float32Array extends ArrayBufferView {
+
+	function constructor(length : number/*unsigned long*/);
+	function constructor(array : Float32Array);
+	function constructor(array : number[]/*float[]*/);
+	function constructor(array : int[]/*float[]*/);
+	function constructor(buffer : ArrayBuffer);
+	function constructor(buffer : ArrayBuffer, byteOffset : number/*unsigned long*/);
+	function constructor(buffer : ArrayBuffer, byteOffset : number/*unsigned long*/, length : number/*unsigned long*/);
+
+	static __readonly__ var BYTES_PER_ELEMENT : number/*long*/;
+	       __readonly__ var BYTES_PER_ELEMENT : number/*long*/;
+	__readonly__ var length : number/*unsigned long*/;
+	function __native_index_operator__(index : number/*unsigned long*/) : Nullable.<number>/*float*/;
+	/* getter */
+	function get(index : number/*unsigned long*/) : Nullable.<number>/*float*/;
+	/* setter */
+	function set(index : number/*unsigned long*/, value : number/*float*/) : void;
+	function set(array : Float32Array) : void;
+	function set(array : Float32Array, offset : number/*unsigned long*/) : void;
+	function set(array : number[]/*float[]*/) : void;
+	function set(array : number[]/*float[]*/, offset : number/*unsigned long*/) : void;
+	function set(array : int[]/*float[]*/) : void;
+	function set(array : int[]/*float[]*/, offset : number/*unsigned long*/) : void;
+	function subarray(start : number/*long*/, end : number/*long*/) : Float32Array;
+
+} // end of Float32Array
+
+/** @see https://www.khronos.org/registry/typedarray/specs/latest/typedarray.idl */
+native final class Float64Array extends ArrayBufferView {
+
+	function constructor(length : number/*unsigned long*/);
+	function constructor(array : Float64Array);
+	function constructor(array : number[]/*double[]*/);
+	function constructor(array : int[]/*double[]*/);
+	function constructor(buffer : ArrayBuffer);
+	function constructor(buffer : ArrayBuffer, byteOffset : number/*unsigned long*/);
+	function constructor(buffer : ArrayBuffer, byteOffset : number/*unsigned long*/, length : number/*unsigned long*/);
+
+	static __readonly__ var BYTES_PER_ELEMENT : number/*long*/;
+	       __readonly__ var BYTES_PER_ELEMENT : number/*long*/;
+	__readonly__ var length : number/*unsigned long*/;
+	function __native_index_operator__(index : number/*unsigned long*/) : Nullable.<number>/*double*/;
+	/* getter */
+	function get(index : number/*unsigned long*/) : Nullable.<number>/*double*/;
+	/* setter */
+	function set(index : number/*unsigned long*/, value : number/*double*/) : void;
+	function set(array : Float64Array) : void;
+	function set(array : Float64Array, offset : number/*unsigned long*/) : void;
+	function set(array : number[]/*double[]*/) : void;
+	function set(array : number[]/*double[]*/, offset : number/*unsigned long*/) : void;
+	function set(array : int[]/*double[]*/) : void;
+	function set(array : int[]/*double[]*/, offset : number/*unsigned long*/) : void;
+	function subarray(start : number/*long*/, end : number/*long*/) : Float64Array;
+
+} // end of Float64Array
+
+/** @see https://www.khronos.org/registry/typedarray/specs/latest/typedarray.idl */
+native final class DataView extends ArrayBufferView {
+
+	function constructor(buffer : ArrayBuffer);
+	function constructor(buffer : ArrayBuffer, byteOffset : number/*unsigned long*/);
+	function constructor(buffer : ArrayBuffer, byteOffset : number/*unsigned long*/, byteLength : number/*unsigned long*/);
+
+	// Gets the value of the given type at the specified byte offset
+	// from the start of the view. There is no alignment constraint;
+	// multi-byte values may be fetched from any offset.
+	//
+	// For multi-byte values, the optional littleEndian argument
+	// indicates whether a big-endian or little-endian value should be
+	// read. If false or undefined, a big-endian value is read.
+	//
+	// These methods raise an INDEX_SIZE_ERR exception if they would read
+	// beyond the end of the view.
+	function getInt8(byteOffset : number/*unsigned long*/) : number/*byte*/;
+	function getUint8(byteOffset : number/*unsigned long*/) : number/*octet*/;
+	function getInt16(byteOffset : number/*unsigned long*/) : number/*short*/;
+	function getInt16(byteOffset : number/*unsigned long*/, littleEndian : boolean) : number/*short*/;
+	function getUint16(byteOffset : number/*unsigned long*/) : number/*unsigned short*/;
+	function getUint16(byteOffset : number/*unsigned long*/, littleEndian : boolean) : number/*unsigned short*/;
+	function getInt32(byteOffset : number/*unsigned long*/) : number/*long*/;
+	function getInt32(byteOffset : number/*unsigned long*/, littleEndian : boolean) : number/*long*/;
+	function getUint32(byteOffset : number/*unsigned long*/) : number/*unsigned long*/;
+	function getUint32(byteOffset : number/*unsigned long*/, littleEndian : boolean) : number/*unsigned long*/;
+	function getFloat32(byteOffset : number/*unsigned long*/) : number/*float*/;
+	function getFloat32(byteOffset : number/*unsigned long*/, littleEndian : boolean) : number/*float*/;
+	function getFloat64(byteOffset : number/*unsigned long*/) : number/*double*/;
+	function getFloat64(byteOffset : number/*unsigned long*/, littleEndian : boolean) : number/*double*/;
+	// Stores a value of the given type at the specified byte offset
+	// from the start of the view. There is no alignment constraint;
+	// multi-byte values may be stored at any offset.
+	//
+	// For multi-byte values, the optional littleEndian argument
+	// indicates whether the value should be stored in big-endian or
+	// little-endian byte order. If false or undefined, the value is
+	// stored in big-endian byte order.
+	//
+	// These methods throw exceptions if they would write beyond the end
+	// of the view.
+	function setInt8(byteOffset : number/*unsigned long*/, value : number/*byte*/) : void;
+	function setUint8(byteOffset : number/*unsigned long*/, value : number/*octet*/) : void;
+	function setInt16(byteOffset : number/*unsigned long*/, value : number/*short*/) : void;
+	function setInt16(byteOffset : number/*unsigned long*/, value : number/*short*/, littleEndian : boolean) : void;
+	function setUint16(byteOffset : number/*unsigned long*/, value : number/*unsigned short*/) : void;
+	function setUint16(byteOffset : number/*unsigned long*/, value : number/*unsigned short*/, littleEndian : boolean) : void;
+	function setInt32(byteOffset : number/*unsigned long*/, value : number/*long*/) : void;
+	function setInt32(byteOffset : number/*unsigned long*/, value : number/*long*/, littleEndian : boolean) : void;
+	function setUint32(byteOffset : number/*unsigned long*/, value : number/*unsigned long*/) : void;
+	function setUint32(byteOffset : number/*unsigned long*/, value : number/*unsigned long*/, littleEndian : boolean) : void;
+	function setFloat32(byteOffset : number/*unsigned long*/, value : number/*float*/) : void;
+	function setFloat32(byteOffset : number/*unsigned long*/, value : number/*float*/, littleEndian : boolean) : void;
+	function setFloat64(byteOffset : number/*unsigned long*/, value : number/*double*/) : void;
+	function setFloat64(byteOffset : number/*unsigned long*/, value : number/*double*/, littleEndian : boolean) : void;
+
+} // end of DataView
 
 /**
  * Provides static functions to control the behaviour of the JSX runtime.

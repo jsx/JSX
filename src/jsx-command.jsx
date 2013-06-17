@@ -275,6 +275,10 @@ class JSXCommand {
 			case "--minify":
 				tasks.push(function () {
 					emitter.setEnableMinifier(true);
+					if (optimizeCommands.length != 0 && optimizeCommands[0] != "strip")
+						optimizeCommands.unshift("strip");
+					if (optimizeCommands[optimizeCommands.length - 1] != "strip")
+						optimizeCommands.push("strip");
 				});
 				break;
 			case "--compilation-server":

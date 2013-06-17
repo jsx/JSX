@@ -326,7 +326,7 @@ class _CompletionCandidatesOfProperty extends CompletionCandidates {
 		var classDef = type.getClassDef();
 		if (classDef == null)
 			return;
-		var isStatic = this._expr instanceof ClassExpression;
+		var isStatic = this._expr.isClassSpecifier();
 		classDef.forEachClassToBase(function (c) {
 			c.forEachMember(function (member) {
 				if (((member.flags() & ClassDefinition.IS_STATIC) != 0) == isStatic) {

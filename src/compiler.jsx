@@ -372,7 +372,10 @@ class Compiler {
 			if ((classDef.flags() & ClassDefinition.IS_NATIVE) == 0) {
 				return;
 			}
-			if (nativeClassNames.hasOwnProperty(classDef.className())) {
+			if (nativeClassNames.hasOwnProperty(classDef.className())
+				&& ! (classDef instanceof InstantiatedClassDefinition
+					&& nativeClassNames[classDef.className()] instanceof InstantiatedClassDefinition
+					&& (classDef as InstantiatedClassDefinition).getTemplateClass() == (nativeClassNames[classDef.className()] as InstantiatedClassDefinition).getTemplateClass())) {
 				errors.push(
 					new CompileError(classDef.getToken(), "native class with same name is already defined")
 					.addCompileNote(new CompileNote(nativeClassNames[classDef.className()].getToken(), "here")));
@@ -404,7 +407,7 @@ class Compiler {
 			var deps = classDefs[i].implementTypes().map.<ClassDefinition>(function (t) { return t.getClassDef(); }).concat([]);
 			if (classDefs[i].extendType() != null)
 				deps.unshift(classDefs[i].extendType().getClassDef());
-			if (classDefs[i].getOuterClassDef() != null)
+			if (classDefs[i].getOuterClassDef() != null && deps.indexOf(classDefs[i].getOuterClassDef()) == -1)
 				deps.unshift(classDefs[i].getOuterClassDef());
 			var maxIndexOfClasses = getMaxIndexOfClasses(deps);
 			if (maxIndexOfClasses > i) {
@@ -437,7 +440,7 @@ class Compiler {
 				classDef.setFlags(classDef.flags() | ClassDefinition.IS_EXPORT);
 				classDef.forEachMemberFunction(function (funcDef) {
 					if ((funcDef.flags() & ClassDefinition.IS_STATIC) == 0
-						&& funcDef.name().match(/^test/)
+						&& (funcDef.name().match(/^test/) || funcDef.name() == "constructor")
 						&& funcDef.getArguments().length == 0) {
 						funcDef.setFlags(funcDef.flags() | ClassDefinition.IS_EXPORT);
 					}

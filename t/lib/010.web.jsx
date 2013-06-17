@@ -1732,9 +1732,6 @@ class _Test extends TestCase {
         var f1 : Nullable.<string>/*DOMString*/ = o.__native_index_operator__(X.getstring());
     } // DOMStringMap
 
-    function compile_Transferable(o : Transferable) : void {
-    } // Transferable
-
     function compile_HTMLDocument(o : HTMLDocument) : void {
         var v1 : Nullable.<Location> = o.location;
         var v2 : string/*DOMString*/ = o.domain;
@@ -3152,9 +3149,10 @@ class _Test extends TestCase {
         var f21 : DynamicsCompressorNode = o.createDynamicsCompressor();
         var f22 : OscillatorNode = o.createOscillator();
         var f23 : WaveTable = o.createWaveTable(X.getFloat32Array(), X.getFloat32Array());
-        o.createGainNode();
-        o.createDelayNode();
-        o.createJavaScriptNode();
+        var f24 : GainNode = o.createGainNode();
+        var f25 : DelayNode = o.createDelayNode();
+        var f26 : DelayNode = o.createDelayNode(X.getnumber());
+        var f27 : JavaScriptAudioNode = o.createJavaScriptNode();
     } // AudioContext
 
     function compile_OfflineAudioContext(o : OfflineAudioContext) : void {
@@ -4081,256 +4079,6 @@ class _Test extends TestCase {
         var v2 : number/*unsigned short*/ = o.PERMISSION_DENIED;
         var v3 : number/*unsigned short*/ = o.code;
     } // NavigatorUserMediaError
-
-    function compile_ArrayBuffer(o : ArrayBuffer) : void {
-        var c1 = new ArrayBuffer(X.getnumber());
-        var v1 : number/*unsigned long*/ = o.byteLength;
-        var f1 : ArrayBuffer = o.slice(X.getnumber());
-        var f2 : ArrayBuffer = o.slice(X.getnumber(), X.getnumber());
-    } // ArrayBuffer
-
-    function compile_ArrayBufferView(o : ArrayBufferView) : void {
-        var v1 : ArrayBuffer = o.buffer;
-        var v2 : number/*unsigned long*/ = o.byteOffset;
-        var v3 : number/*unsigned long*/ = o.byteLength;
-    } // ArrayBufferView
-
-    function compile_Int8Array(o : Int8Array) : void {
-        var c1 = new Int8Array(X.getnumber());
-        var c2 = new Int8Array(X.getInt8Array());
-        var c3 = new Int8Array(X.getnumber__());
-        var c4 = new Int8Array(X.getint__());
-        var c5 = new Int8Array(X.getArrayBuffer());
-        var c6 = new Int8Array(X.getArrayBuffer(), X.getnumber());
-        var c7 = new Int8Array(X.getArrayBuffer(), X.getnumber(), X.getnumber());
-        var v1 : number/*long*/ = Int8Array.BYTES_PER_ELEMENT;
-        var v2 : number/*long*/ = o.BYTES_PER_ELEMENT;
-        var v3 : number/*unsigned long*/ = o.length;
-        var f1 : Nullable.<number>/*byte*/ = o.__native_index_operator__(X.getnumber());
-        var f2 : Nullable.<number>/*byte*/ = o.get(X.getnumber());
-        o.set(X.getnumber(), X.getnumber());
-        o.set(X.getInt8Array());
-        o.set(X.getInt8Array(), X.getnumber());
-        o.set(X.getnumber__());
-        o.set(X.getnumber__(), X.getnumber());
-        o.set(X.getint__());
-        o.set(X.getint__(), X.getnumber());
-        var f3 : Int8Array = o.subarray(X.getnumber(), X.getnumber());
-    } // Int8Array
-
-    function compile_Uint8Array(o : Uint8Array) : void {
-        var c1 = new Uint8Array(X.getnumber());
-        var c2 = new Uint8Array(X.getUint8Array());
-        var c3 = new Uint8Array(X.getnumber__());
-        var c4 = new Uint8Array(X.getint__());
-        var c5 = new Uint8Array(X.getArrayBuffer());
-        var c6 = new Uint8Array(X.getArrayBuffer(), X.getnumber());
-        var c7 = new Uint8Array(X.getArrayBuffer(), X.getnumber(), X.getnumber());
-        var v1 : number/*long*/ = Uint8Array.BYTES_PER_ELEMENT;
-        var v2 : number/*long*/ = o.BYTES_PER_ELEMENT;
-        var v3 : number/*unsigned long*/ = o.length;
-        var f1 : Nullable.<number>/*octet*/ = o.__native_index_operator__(X.getnumber());
-        var f2 : Nullable.<number>/*octet*/ = o.get(X.getnumber());
-        o.set(X.getnumber(), X.getnumber());
-        o.set(X.getUint8Array());
-        o.set(X.getUint8Array(), X.getnumber());
-        o.set(X.getnumber__());
-        o.set(X.getnumber__(), X.getnumber());
-        o.set(X.getint__());
-        o.set(X.getint__(), X.getnumber());
-        var f3 : Uint8Array = o.subarray(X.getnumber(), X.getnumber());
-    } // Uint8Array
-
-    function compile_Uint8ClampedArray(o : Uint8ClampedArray) : void {
-        var c1 = new Uint8ClampedArray(X.getnumber());
-        var c2 = new Uint8ClampedArray(X.getUint8ClampedArray());
-        var c3 = new Uint8ClampedArray(X.getUint8Array());
-        var c4 = new Uint8ClampedArray(X.getnumber__());
-        var c5 = new Uint8ClampedArray(X.getint__());
-        var c6 = new Uint8ClampedArray(X.getArrayBuffer());
-        var c7 = new Uint8ClampedArray(X.getArrayBuffer(), X.getnumber());
-        var c8 = new Uint8ClampedArray(X.getArrayBuffer(), X.getnumber(), X.getnumber());
-        o.set(X.getnumber(), X.getnumber());
-        o.set(X.getUint8ClampedArray());
-        o.set(X.getUint8ClampedArray(), X.getnumber());
-        o.set(X.getnumber__());
-        o.set(X.getnumber__(), X.getnumber());
-        o.set(X.getint__());
-        o.set(X.getint__(), X.getnumber());
-        var f1 : Uint8ClampedArray = o.subarray(X.getnumber(), X.getnumber());
-    } // Uint8ClampedArray
-
-    function compile_Int16Array(o : Int16Array) : void {
-        var c1 = new Int16Array(X.getnumber());
-        var c2 = new Int16Array(X.getInt16Array());
-        var c3 = new Int16Array(X.getnumber__());
-        var c4 = new Int16Array(X.getint__());
-        var c5 = new Int16Array(X.getArrayBuffer());
-        var c6 = new Int16Array(X.getArrayBuffer(), X.getnumber());
-        var c7 = new Int16Array(X.getArrayBuffer(), X.getnumber(), X.getnumber());
-        var v1 : number/*long*/ = Int16Array.BYTES_PER_ELEMENT;
-        var v2 : number/*long*/ = o.BYTES_PER_ELEMENT;
-        var v3 : number/*unsigned long*/ = o.length;
-        var f1 : Nullable.<number>/*short*/ = o.__native_index_operator__(X.getnumber());
-        var f2 : Nullable.<number>/*short*/ = o.get(X.getnumber());
-        o.set(X.getnumber(), X.getnumber());
-        o.set(X.getInt16Array());
-        o.set(X.getInt16Array(), X.getnumber());
-        o.set(X.getnumber__());
-        o.set(X.getnumber__(), X.getnumber());
-        o.set(X.getint__());
-        o.set(X.getint__(), X.getnumber());
-        var f3 : Int16Array = o.subarray(X.getnumber(), X.getnumber());
-    } // Int16Array
-
-    function compile_Uint16Array(o : Uint16Array) : void {
-        var c1 = new Uint16Array(X.getnumber());
-        var c2 = new Uint16Array(X.getUint16Array());
-        var c3 = new Uint16Array(X.getnumber__());
-        var c4 = new Uint16Array(X.getint__());
-        var c5 = new Uint16Array(X.getArrayBuffer());
-        var c6 = new Uint16Array(X.getArrayBuffer(), X.getnumber());
-        var c7 = new Uint16Array(X.getArrayBuffer(), X.getnumber(), X.getnumber());
-        var v1 : number/*long*/ = Uint16Array.BYTES_PER_ELEMENT;
-        var v2 : number/*long*/ = o.BYTES_PER_ELEMENT;
-        var v3 : number/*unsigned long*/ = o.length;
-        var f1 : Nullable.<number>/*unsigned short*/ = o.__native_index_operator__(X.getnumber());
-        var f2 : Nullable.<number>/*unsigned short*/ = o.get(X.getnumber());
-        o.set(X.getnumber(), X.getnumber());
-        o.set(X.getUint16Array());
-        o.set(X.getUint16Array(), X.getnumber());
-        o.set(X.getnumber__());
-        o.set(X.getnumber__(), X.getnumber());
-        o.set(X.getint__());
-        o.set(X.getint__(), X.getnumber());
-        var f3 : Uint16Array = o.subarray(X.getnumber(), X.getnumber());
-    } // Uint16Array
-
-    function compile_Int32Array(o : Int32Array) : void {
-        var c1 = new Int32Array(X.getnumber());
-        var c2 = new Int32Array(X.getInt32Array());
-        var c3 = new Int32Array(X.getnumber__());
-        var c4 = new Int32Array(X.getint__());
-        var c5 = new Int32Array(X.getArrayBuffer());
-        var c6 = new Int32Array(X.getArrayBuffer(), X.getnumber());
-        var c7 = new Int32Array(X.getArrayBuffer(), X.getnumber(), X.getnumber());
-        var v1 : number/*long*/ = Int32Array.BYTES_PER_ELEMENT;
-        var v2 : number/*long*/ = o.BYTES_PER_ELEMENT;
-        var v3 : number/*unsigned long*/ = o.length;
-        var f1 : Nullable.<number>/*long*/ = o.__native_index_operator__(X.getnumber());
-        var f2 : Nullable.<number>/*long*/ = o.get(X.getnumber());
-        o.set(X.getnumber(), X.getnumber());
-        o.set(X.getInt32Array());
-        o.set(X.getInt32Array(), X.getnumber());
-        o.set(X.getnumber__());
-        o.set(X.getnumber__(), X.getnumber());
-        o.set(X.getint__());
-        o.set(X.getint__(), X.getnumber());
-        var f3 : Int32Array = o.subarray(X.getnumber(), X.getnumber());
-    } // Int32Array
-
-    function compile_Uint32Array(o : Uint32Array) : void {
-        var c1 = new Uint32Array(X.getnumber());
-        var c2 = new Uint32Array(X.getUint32Array());
-        var c3 = new Uint32Array(X.getnumber__());
-        var c4 = new Uint32Array(X.getint__());
-        var c5 = new Uint32Array(X.getArrayBuffer());
-        var c6 = new Uint32Array(X.getArrayBuffer(), X.getnumber());
-        var c7 = new Uint32Array(X.getArrayBuffer(), X.getnumber(), X.getnumber());
-        var v1 : number/*long*/ = Uint32Array.BYTES_PER_ELEMENT;
-        var v2 : number/*long*/ = o.BYTES_PER_ELEMENT;
-        var v3 : number/*unsigned long*/ = o.length;
-        var f1 : Nullable.<number>/*unsigned long*/ = o.__native_index_operator__(X.getnumber());
-        var f2 : Nullable.<number>/*unsigned long*/ = o.get(X.getnumber());
-        o.set(X.getnumber(), X.getnumber());
-        o.set(X.getUint32Array());
-        o.set(X.getUint32Array(), X.getnumber());
-        o.set(X.getnumber__());
-        o.set(X.getnumber__(), X.getnumber());
-        o.set(X.getint__());
-        o.set(X.getint__(), X.getnumber());
-        var f3 : Uint32Array = o.subarray(X.getnumber(), X.getnumber());
-    } // Uint32Array
-
-    function compile_Float32Array(o : Float32Array) : void {
-        var c1 = new Float32Array(X.getnumber());
-        var c2 = new Float32Array(X.getFloat32Array());
-        var c3 = new Float32Array(X.getnumber__());
-        var c4 = new Float32Array(X.getint__());
-        var c5 = new Float32Array(X.getArrayBuffer());
-        var c6 = new Float32Array(X.getArrayBuffer(), X.getnumber());
-        var c7 = new Float32Array(X.getArrayBuffer(), X.getnumber(), X.getnumber());
-        var v1 : number/*long*/ = Float32Array.BYTES_PER_ELEMENT;
-        var v2 : number/*long*/ = o.BYTES_PER_ELEMENT;
-        var v3 : number/*unsigned long*/ = o.length;
-        var f1 : Nullable.<number>/*float*/ = o.__native_index_operator__(X.getnumber());
-        var f2 : Nullable.<number>/*float*/ = o.get(X.getnumber());
-        o.set(X.getnumber(), X.getnumber());
-        o.set(X.getFloat32Array());
-        o.set(X.getFloat32Array(), X.getnumber());
-        o.set(X.getnumber__());
-        o.set(X.getnumber__(), X.getnumber());
-        o.set(X.getint__());
-        o.set(X.getint__(), X.getnumber());
-        var f3 : Float32Array = o.subarray(X.getnumber(), X.getnumber());
-    } // Float32Array
-
-    function compile_Float64Array(o : Float64Array) : void {
-        var c1 = new Float64Array(X.getnumber());
-        var c2 = new Float64Array(X.getFloat64Array());
-        var c3 = new Float64Array(X.getnumber__());
-        var c4 = new Float64Array(X.getint__());
-        var c5 = new Float64Array(X.getArrayBuffer());
-        var c6 = new Float64Array(X.getArrayBuffer(), X.getnumber());
-        var c7 = new Float64Array(X.getArrayBuffer(), X.getnumber(), X.getnumber());
-        var v1 : number/*long*/ = Float64Array.BYTES_PER_ELEMENT;
-        var v2 : number/*long*/ = o.BYTES_PER_ELEMENT;
-        var v3 : number/*unsigned long*/ = o.length;
-        var f1 : Nullable.<number>/*double*/ = o.__native_index_operator__(X.getnumber());
-        var f2 : Nullable.<number>/*double*/ = o.get(X.getnumber());
-        o.set(X.getnumber(), X.getnumber());
-        o.set(X.getFloat64Array());
-        o.set(X.getFloat64Array(), X.getnumber());
-        o.set(X.getnumber__());
-        o.set(X.getnumber__(), X.getnumber());
-        o.set(X.getint__());
-        o.set(X.getint__(), X.getnumber());
-        var f3 : Float64Array = o.subarray(X.getnumber(), X.getnumber());
-    } // Float64Array
-
-    function compile_DataView(o : DataView) : void {
-        var c1 = new DataView(X.getArrayBuffer());
-        var c2 = new DataView(X.getArrayBuffer(), X.getnumber());
-        var c3 = new DataView(X.getArrayBuffer(), X.getnumber(), X.getnumber());
-        var f1 : number/*byte*/ = o.getInt8(X.getnumber());
-        var f2 : number/*octet*/ = o.getUint8(X.getnumber());
-        var f3 : number/*short*/ = o.getInt16(X.getnumber());
-        var f4 : number/*short*/ = o.getInt16(X.getnumber(), X.getboolean());
-        var f5 : number/*unsigned short*/ = o.getUint16(X.getnumber());
-        var f6 : number/*unsigned short*/ = o.getUint16(X.getnumber(), X.getboolean());
-        var f7 : number/*long*/ = o.getInt32(X.getnumber());
-        var f8 : number/*long*/ = o.getInt32(X.getnumber(), X.getboolean());
-        var f9 : number/*unsigned long*/ = o.getUint32(X.getnumber());
-        var f10 : number/*unsigned long*/ = o.getUint32(X.getnumber(), X.getboolean());
-        var f11 : number/*float*/ = o.getFloat32(X.getnumber());
-        var f12 : number/*float*/ = o.getFloat32(X.getnumber(), X.getboolean());
-        var f13 : number/*double*/ = o.getFloat64(X.getnumber());
-        var f14 : number/*double*/ = o.getFloat64(X.getnumber(), X.getboolean());
-        o.setInt8(X.getnumber(), X.getnumber());
-        o.setUint8(X.getnumber(), X.getnumber());
-        o.setInt16(X.getnumber(), X.getnumber());
-        o.setInt16(X.getnumber(), X.getnumber(), X.getboolean());
-        o.setUint16(X.getnumber(), X.getnumber());
-        o.setUint16(X.getnumber(), X.getnumber(), X.getboolean());
-        o.setInt32(X.getnumber(), X.getnumber());
-        o.setInt32(X.getnumber(), X.getnumber(), X.getboolean());
-        o.setUint32(X.getnumber(), X.getnumber());
-        o.setUint32(X.getnumber(), X.getnumber(), X.getboolean());
-        o.setFloat32(X.getnumber(), X.getnumber());
-        o.setFloat32(X.getnumber(), X.getnumber(), X.getboolean());
-        o.setFloat64(X.getnumber(), X.getnumber());
-        o.setFloat64(X.getnumber(), X.getnumber(), X.getboolean());
-    } // DataView
 
     function compile_CanvasRenderingContext2D(o : CanvasRenderingContext2D) : void {
         var v1 : HTMLCanvasElement = o.canvas;
@@ -5379,6 +5127,11 @@ class _Test extends TestCase {
     function compile_webkitIDBTransaction(o : webkitIDBTransaction) : void {
     } // webkitIDBTransaction
 
+    function compile_JavaScriptAudioNode(o : JavaScriptAudioNode) : void {
+        var v1 : function(:Event):void/*EventListener*/ = o.onaudioprocess;
+        var v2 : number/*long*/ = o.bufferSize;
+    } // JavaScriptAudioNode
+
     function compile_DeviceOrientationEvent(o : DeviceOrientationEvent) : void {
         var c1 = new DeviceOrientationEvent(X.getstring());
         var c2 = new DeviceOrientationEvent(X.getstring(), X.getDeviceOrientationEventInit());
@@ -5514,7 +5267,6 @@ native class X {
     static function getFile() : File;
     static function getFileList() : FileList;
     static function getFloat32Array() : Float32Array;
-    static function getFloat64Array() : Float64Array;
     static function getFocusEventInit() : FocusEventInit;
     static function getFormData() : FormData;
     static function getGainNode() : GainNode;
@@ -5554,9 +5306,8 @@ native class X {
     static function getIDBTransactionSync() : IDBTransactionSync;
     static function getIDBVersionChangeEventInit() : IDBVersionChangeEventInit;
     static function getImageData() : ImageData;
-    static function getInt16Array() : Int16Array;
     static function getInt32Array() : Int32Array;
-    static function getInt8Array() : Int8Array;
+    static function getJavaScriptAudioNode() : JavaScriptAudioNode;
     static function getKeyboardEventInit() : KeyboardEventInit;
     static function getLocation() : Location;
     static function getMap__variant_() : Map.<variant>;
@@ -5685,8 +5436,6 @@ native class X {
     static function getTransferable__() : Transferable[];
     static function getTreeWalker() : TreeWalker;
     static function getUIEventInit() : UIEventInit;
-    static function getUint16Array() : Uint16Array;
-    static function getUint32Array() : Uint32Array;
     static function getUint8Array() : Uint8Array;
     static function getUint8ClampedArray() : Uint8ClampedArray;
     static function getValidityState() : ValidityState;

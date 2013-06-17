@@ -52,14 +52,14 @@ class _Util {
 	}
 
 	static function getOutputClassName(classDef : ClassDefinition) : string {
-		return (classDef.getStash()[_Util.OUTPUTNAME_IDENTIFIER] as _Util.OutputNameStash).outputName;
+		return (classDef.getStash(_Util.OUTPUTNAME_IDENTIFIER) as _Util.OutputNameStash).outputName;
 	}
 
 	static function getOutputConstructorName(ctor : MemberFunctionDefinition) : string {
 		if ((ctor.getClassDef().flags() & ClassDefinition.IS_NATIVE) != 0) {
 			return _Util.getNameOfNativeConstructor(ctor.getClassDef());
 		}
-		return (ctor.getStash()[_Util.OUTPUTNAME_IDENTIFIER] as _Util.OutputNameStash).outputName;
+		return (ctor.getStash(_Util.OUTPUTNAME_IDENTIFIER) as _Util.OutputNameStash).outputName;
 	}
 
 	static function getOutputConstructorName(classDef : ClassDefinition, argTypes : Type[]) : string {
@@ -81,7 +81,7 @@ class _Util {
 
 	static function setOutputClassNames(classDefs : ClassDefinition[]) : void {
 		function setOutputName(stashable : Stashable, name : string) : void {
-			stashable.getStash()[_Util.OUTPUTNAME_IDENTIFIER] = new _Util.OutputNameStash(name);
+			stashable.setStash(_Util.OUTPUTNAME_IDENTIFIER, new _Util.OutputNameStash(name));
 		}
 		function escapeClassNameIfInstantiated(name : string) : string {
 			// escape the instantiated class names (note: template classes are never emitted (since they are all native) but their names are used for mangling of function arguments)
@@ -102,11 +102,12 @@ class _Util {
 		for (var i = 0; i < classDefs.length; ++i) {
 			var classDef = classDefs[i];
 			if ((classDef.flags() & ClassDefinition.IS_NATIVE) != 0) {
-				// check that the names of native classes do not conflict, and register the ocurrences
 				var className = classDef.className();
-				assert ! countByName[className];
-				setOutputName(classDef, escapeClassNameIfInstantiated(className));
-				countByName[className] = 1;
+				if (! countByName.hasOwnProperty(className)) {
+					// FIXME t/run/264
+					setOutputName(classDef, escapeClassNameIfInstantiated(className));
+					countByName[className] = 1;
+				}
 			}
 		}
 		for (var i = 0; i < classDefs.length; ++i) {
@@ -312,10 +313,10 @@ class _Namer {
 	}
 
 	function _enterCatch(tryStmt : TryStatement, cb : function (getCatchName : function () : string) : void, catchName : string) : void {
-		tryStmt.getStash()[_Namer.IDENTIFIER] = new _Namer._TryStash(catchName);
+		tryStmt.setStash(_Namer.IDENTIFIER, new _Namer._TryStash(catchName));
 		var catchStmts = tryStmt.getCatchStatements();
 		for (var i in catchStmts) {
-			catchStmts[i].getLocal().getStash()[_Namer.IDENTIFIER] = new _Namer._CatchTargetStash(tryStmt);
+			catchStmts[i].getLocal().setStash(_Namer.IDENTIFIER, new _Namer._CatchTargetStash(tryStmt));
 		}
 		cb(function () { return this._getCatchName(tryStmt); });
 	}
@@ -329,11 +330,11 @@ class _Namer {
 	}
 
 	function _getCatchName(caught : CaughtVariable) : string {
-		return this._getCatchName((caught.getStash()[_Namer.IDENTIFIER] as _Namer._CatchTargetStash).tryStmt);
+		return this._getCatchName((caught.getStash(_Namer.IDENTIFIER) as _Namer._CatchTargetStash).tryStmt);
 	}
 
 	function _getCatchName(tryStmt : TryStatement) : string {
-		return (tryStmt.getStash()[_Namer.IDENTIFIER] as _Namer._TryStash).catchName;
+		return (tryStmt.getStash(_Namer.IDENTIFIER) as _Namer._TryStash).catchName;
 	}
 
 }
@@ -738,27 +739,27 @@ class _Minifier {
 	}
 
 	static function _getClassStash(classDef : ClassDefinition) : _Minifier._ClassStash {
-		var stash = classDef.getStash();
-		if (! stash.hasOwnProperty(_Minifier.CLASSSTASH_IDENTIFIER)) {
-			stash[_Minifier.CLASSSTASH_IDENTIFIER] = new _Minifier._ClassStash();
+		var stash = classDef.getStash(_Minifier.CLASSSTASH_IDENTIFIER);
+		if (stash == null) {
+			stash = classDef.setStash(_Minifier.CLASSSTASH_IDENTIFIER, new _Minifier._ClassStash());
 		}
-		return stash[_Minifier.CLASSSTASH_IDENTIFIER] as _Minifier._ClassStash;
+		return stash as _Minifier._ClassStash;
 	}
 
 	static function _getScopeStash(stashable : Stashable) : _Minifier._ScopeStash {
-		var stash = stashable.getStash();
-		if(! stash.hasOwnProperty(_Minifier.SCOPESTASH_IDENTIFIER)) {
-			stash[_Minifier.SCOPESTASH_IDENTIFIER] = new _Minifier._ScopeStash();
+		var stash = stashable.getStash(_Minifier.SCOPESTASH_IDENTIFIER);
+		if(stash == null) {
+			stash = stashable.setStash(_Minifier.SCOPESTASH_IDENTIFIER, new _Minifier._ScopeStash());
 		}
-		return stash[_Minifier.SCOPESTASH_IDENTIFIER] as _Minifier._ScopeStash;
+		return stash as _Minifier._ScopeStash;
 	}
 
 	static function _getLocalStash(local : LocalVariable) : _Minifier._LocalStash {
-		var stash = local.getStash();
-		if(! stash.hasOwnProperty(_Minifier.LOCALSTASH_IDENTIFIER)) {
-			stash[_Minifier.LOCALSTASH_IDENTIFIER] = new _Minifier._LocalStash();
+		var stash = local.getStash(_Minifier.LOCALSTASH_IDENTIFIER);
+		if(stash == null) {
+			stash = local.setStash(_Minifier.LOCALSTASH_IDENTIFIER, new _Minifier._LocalStash());
 		}
-		return stash[_Minifier.LOCALSTASH_IDENTIFIER] as _Minifier._LocalStash;
+		return stash as _Minifier._LocalStash;
 	}
 
 	static function _incr(useCount : Map.<number>, name : string) : void {
@@ -1926,7 +1927,7 @@ class _PropertyExpressionEmitter extends _UnaryExpressionEmitter {
 		var exprType = expr.getType();
 		var identifierToken = expr.getIdentifierToken();
 		// replace methods to global function (e.g. Number.isNaN to isNaN)
-		if (expr.getExpr() instanceof ClassExpression
+		if (expr.getExpr().isClassSpecifier()
 			&& expr.getExpr().getType().getClassDef() == Type.numberType.getClassDef()) {
 			switch (identifierToken.getValue()) {
 			case "parseInt":
@@ -1937,7 +1938,7 @@ class _PropertyExpressionEmitter extends _UnaryExpressionEmitter {
 				return;
 			}
 		}
-		else if (expr.getExpr() instanceof ClassExpression
+		else if (expr.getExpr().isClassSpecifier()
 			&& expr.getExpr().getType().getClassDef() == Type.stringType.getClassDef()) {
 			switch (identifierToken.getValue()) {
 			case "encodeURIComponent":
@@ -1951,7 +1952,7 @@ class _PropertyExpressionEmitter extends _UnaryExpressionEmitter {
 
 		// emit, depending on the type
 		var classDef = expr.getHolderType().getClassDef();
-		if (expr.getExpr() instanceof ClassExpression) {
+		if (expr.getExpr().isClassSpecifier()) {
 			var name = identifierToken.getValue();
 			if (Util.isReferringToFunctionDefinition(expr)) {
 				name = this._emitter.getNamer().getNameOfStaticFunction(classDef, name, (exprType as ResolvedFunctionType).getArgumentTypes());
@@ -2090,7 +2091,7 @@ class _AssignmentExpressionEmitter extends _OperatorExpressionEmitter {
 				this._emitter._getExpressionEmitterFor(propertyExpr.getExpr()).emit(0);
 				this._emitter._emit(", ", this._expr.getToken());
 				var name : string;
-				if (propertyExpr.getExpr() instanceof ClassExpression) {
+				if (propertyExpr.getExpr().isClassSpecifier()) {
 					var classDef = propertyExpr.getHolderType().getClassDef();
 					name = this._emitter.getNamer().getNameOfClass(classDef) + "." + this._emitter.getNamer().getNameOfStaticVariable(classDef, propertyExpr.getIdentifierToken().getValue());
 				} else {
@@ -2266,20 +2267,6 @@ class _BinaryNumberExpressionEmitter extends _OperatorExpressionEmitter {
 		this._expr = expr;
 	}
 
-	override function emit (outerOpPrecedence : number) : void {
-		// optimize "1 * x" => x
-		if (this._expr.getToken().getValue() == "*") {
-			if (this._emitIfEitherIs(outerOpPrecedence, function (expr1, expr2) {
-				return ((expr1 instanceof IntegerLiteralExpression || expr1 instanceof NumberLiteralExpression) && (expr1.getToken().getValue() as number) == 1)
-					? expr2 : null;
-			})) {
-				return;
-			}
-		}
-		// normal
-		super.emit(outerOpPrecedence);
-	}
-
 	override function _emit () : void {
 		var op = this._expr.getToken().getValue();
 		this._emitter._emitWithNullableGuard(this._expr.getFirstExpr(), _BinaryNumberExpressionEmitter._operatorPrecedence[op]);
@@ -2326,7 +2313,7 @@ class _ArrayExpressionEmitter extends _OperatorExpressionEmitter {
 		var emitted = false;
 		if (secondExpr instanceof StringLiteralExpression) {
 			var propertyName = Util.decodeStringLiteral(secondExpr.getToken().getValue());
-			if (propertyName.match(/^[\$_A-Za-z][\$_0-9A-Za-z]*$/) != null) {
+			if (propertyName.match(/^[\$_A-Za-z][\$_0-9A-Za-z]*$/) != null && !Util.isECMA262Reserved(propertyName)) {
 				this._emitter._emit(".", this._expr.getToken());
 				this._emitter._emit(propertyName, secondExpr.getToken());
 				emitted = true;
@@ -2603,7 +2590,7 @@ class _NewExpressionEmitter extends _OperatorExpressionEmitter {
 
 	override function emit (outerOpPrecedence : number) : void {
 		function getInliner(funcDef : MemberFunctionDefinition) : function(:NewExpression):Expression[] {
-			var stash = funcDef.getStash()["unclassify"];
+			var stash = funcDef.getStash("unclassify");
 			return stash ? (stash as _UnclassifyOptimizationCommand.Stash).inliner : null;
 		}
 		var classDef = this._expr.getType().getClassDef();
@@ -2823,17 +2810,17 @@ class JavaScriptEmitter implements Emitter {
 		var files = new Map.<string>;
 		var sourceMapper = this._sourceMapper;
 		if(sourceMapper != null) {
-			files[sourceMapper.getSourceMappingFile()] = sourceMapper.generate();
-			// copy mapped source files for browsers to get them
-			var fileMap = sourceMapper.getSourceFileMap();
-			for (var filename in fileMap) {
-				var dest = fileMap[filename];
-				// reading the file may failed because it is not resolved.
+			sourceMapper.getSourceFiles().forEach((filename) -> {
 				try {
-					files[dest] = this._platform.load(filename);
+					sourceMapper.setSourceContent(filename, this._platform.load(filename));
 				}
-				catch (e : Error) { }
-			}
+				catch (e : Error) {
+					if (JSX.DEBUG) {
+						this._platform.error("XXX: " + e.toString());
+					}
+				}
+			});
+			files[sourceMapper.getSourceMappingFile()] = sourceMapper.generate();
 		}
 		return files;
 	}
@@ -2912,7 +2899,7 @@ class JavaScriptEmitter implements Emitter {
 		this._output += this._fileHeader;
 		this._output += this._platform.load(this._platform.getRoot() + "/src/js/bootstrap.js");
 
-		var stash = (this.getStash()[_NoDebugCommand.IDENTIFIER] as _NoDebugCommand.Stash);
+		var stash = (this.getStash(_NoDebugCommand.IDENTIFIER) as _NoDebugCommand.Stash);
 		this._emit("JSX.DEBUG = "+(stash == null || stash.debugValue ? "true" : "false")+";\n", null);
 	}
 
@@ -2933,8 +2920,7 @@ class JavaScriptEmitter implements Emitter {
 			});
 		}
 		for (var i = 0; i < classDefs.length; ++i) {
-			if ((classDefs[i].flags() & ClassDefinition.IS_NATIVE) == 0)
-				this._emitClassDefinition(classDefs[i]);
+			this._emitClassDefinition(classDefs[i]);
 		}
 		for (var i = 0; i < classDefs.length; ++i)
 			this._emitStaticInitializationCode(classDefs[i]);
@@ -2960,11 +2946,11 @@ class JavaScriptEmitter implements Emitter {
 	}
 
 	function getStash (stashable : Stashable) : _JSEmitterStash {
-		var stash = stashable.getStash();
-		if (stash["jsemitter"] == null) {
-			stash["jsemitter"] = new _JSEmitterStash;
+		var stash = stashable.getStash("jsemitter");
+		if (stash == null) {
+			stash = stashable.setStash("jsemitter", new _JSEmitterStash);
 		}
-		return stash["jsemitter"] as _JSEmitterStash;
+		return stash as _JSEmitterStash;
 	}
 
 	// the function does not take care of function statements / expressions (in other words the caller should use forEachClosure)
@@ -3028,6 +3014,14 @@ class JavaScriptEmitter implements Emitter {
 
 
 	function _emitClassDefinition (classDef : ClassDefinition) : void {
+		if ((classDef.flags() & ClassDefinition.IS_NATIVE) != 0) {
+			// bind native object to JSX class
+			if (classDef.getNativeSource() != null) {
+				this._emit("var " + this._namer.getNameOfClass(classDef) + " = " + Util.decodeStringLiteral(classDef.getNativeSource().getValue()) + ";\n", classDef.getNativeSource());
+			}
+			return;
+		}
+
 		this._emittingClass = classDef;
 		try {
 
@@ -3063,11 +3057,6 @@ class JavaScriptEmitter implements Emitter {
 			this._emit("var js = { global: function () { return this; }() };\n", null);
 			return;
 		}
-		// bind native object to JSX class
-		if (classDef.getNativeSource() != null) {
-			this._emit("var " + this._namer.getNameOfClass(classDef) + " = " + Util.decodeStringLiteral(classDef.getNativeSource().getValue()) + ";\n", classDef.getNativeSource());
-		}
-
 		if ((classDef.flags() & ClassDefinition.IS_NATIVE) != 0)
 			return;
 		// normal handling
@@ -3405,19 +3394,6 @@ class JavaScriptEmitter implements Emitter {
 		}
 	}
 
-	function _emitDefaultValueOf (type : Type) : void {
-		if (type.equals(Type.booleanType))
-			this._emit("false", null);
-		else if (type.equals(Type.integerType) || type.equals(Type.numberType))
-			this._emit("0", null);
-		else if (type.equals(Type.stringType))
-			this._emit("\"\"", null);
-		else if (type instanceof NullableType)
-			this._emit("null", null);
-		else
-			this._emit("null", null);
-	}
-
 	function _emitStatements (statements : Statement[]) : void {
 		this._advanceIndent();
 		for (var i = 0; i < statements.length; ++i)
@@ -3431,25 +3407,7 @@ class JavaScriptEmitter implements Emitter {
 	}
 
 	function _addSourceMapping(token : Token) : void {
-		var lastNewLinePos = this._output.lastIndexOf("\n") + 1;
-		var genColumn = (this._output.length - lastNewLinePos);
-		var genPos = {
-			line: this._output.match(/^/mg).length,
-			column: genColumn
-		};
-		var tokenValue = null : Nullable.<string>;
-		var origPos = null : Map.<number>;
-		if (! Number.isNaN(token.getLineNumber())) {
-			origPos = {
-				line: token.getLineNumber(),
-				column: token.getColumnNumber()
-			};
-			if (token.isIdentifier()) {
-				tokenValue = token.getValue();
-			}
-		}
-		var filename = token.getFilename();
-		this._sourceMapper.add(genPos, origPos, filename, tokenValue);
+		this._sourceMapper.add(this._output, token.getLineNumber(), token.getColumnNumber(), token.isIdentifier() ? token.getValue() : null, token.getFilename());
 	}
 
 	function _emit (str : string, token : Token) : void {
@@ -3627,7 +3585,7 @@ class JavaScriptEmitter implements Emitter {
 			}
 			// emit with nullable guard if the formal argument is not nullable
 			if (argType != null && ! Type.nullType.isConvertibleTo(argType)) {
-				this._emitWithNullableGuard(args[i], 0);
+				this._emitRHSOfAssignment(args[i], argType);
 			} else {
 				this._getExpressionEmitterFor(args[i]).emit(0);
 			}

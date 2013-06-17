@@ -14,7 +14,7 @@ use constant ROOT => File::Basename::dirname(__FILE__);
 
 my $home = $ENV{JSX_HOME} or die "no JSX_HOME";
 
-my $jsx_compiler = ROOT . "/../bin/jsx-compiler.js";
+my $jsx_compiler = ROOT . "/../bin/jsx";
 
 my $app_jsx = ROOT . "/jsx.pl";
 require $app_jsx; # App::jsx
@@ -39,6 +39,7 @@ sub start {
     );
 
     # wait for running compilation server
+    my $count = 0;
     while (1) {
         Time::HiRes::sleep(0.100);
         my($ok, $stdout, $stderr) = jsx("--version");
@@ -46,6 +47,10 @@ sub start {
             chomp $stdout;
             print "# $stdout\n";
             last;
+        }
+        if (++$count > 5) {
+            die "Cannot run the compilation server.\n",
+                "Run `npm install` first.\n";
         }
     }
 }

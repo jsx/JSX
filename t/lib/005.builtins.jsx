@@ -65,16 +65,16 @@ class _Test extends TestCase {
 		});
 		this.expect(b, "filter").toEqual([ 2, 3, 2 ]);
 
-		var sum = a.reduce(function(p : Nullable.<number>, c : Nullable.<number>) : Nullable.<number> {
+		var sum = a.reduce.<number>(function(p, c) {
 			return p + c;
 		}, 0);
-		this.expect(i, "reduce").toBe(1 + 2 + 3 + 2 + 1);
+		this.expect(sum, "reduce").toBe(1 + 2 + 3 + 2 + 1);
+		this.expect(sum + 1, "reduce() returns a number").toBe(1 + 2 + 3 + 2 + 1 + 1);
 
-
-		sum = a.reduceRight(function(p : Nullable.<number>, c : Nullable.<number>) : Nullable.<number> {
+		sum = a.reduceRight.<number>(function(p,  c)  {
 			return p + c;
 		}, 0);
-		this.expect(i, "reduceRight").toBe(1 + 2 + 3 + 2 + 1);
+		this.expect(sum, "reduceRight").toBe(1 + 2 + 3 + 2 + 1);
 	}
 
 	function testString() : void {
