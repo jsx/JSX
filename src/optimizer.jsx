@@ -1798,23 +1798,44 @@ class _FoldConstantCommand extends _FunctionOptimizeCommand {
 				return this._foldNumericBinaryExpressionOfConstants(expr, replaceCb);
 			}
 
-		// if either operand is zero, then...
+		// if either operand is zero or one, then...
 		function exprIsZero(expr : Expression) : boolean {
 			return expr instanceof NumberLiteralExpression && expr.getToken().getValue() as number == 0;
 		}
+		function exprIsOne(expr : Expression) : boolean {
+			return expr instanceof NumberLiteralExpression && expr.getToken().getValue() as number == 1;
+		}
 		switch (expr.getToken().getValue()) {
 		case "+":
-			if (exprIsZero(expr.getFirstExpr())) {
+			if (exprIsZero(expr.getFirstExpr())) { // 0 + x -> x
 				replaceCb(expr.getSecondExpr());
 				return true;
-			} else if (exprIsZero(expr.getSecondExpr())) {
+			} else if (exprIsZero(expr.getSecondExpr())) { // x + 0 -> x
 				replaceCb(expr.getFirstExpr());
 				return true;
 			}
 			break;
-		case "-":
-			// TODO should we rewrite "0 - n"?
-			if (exprIsZero(expr.getSecondExpr())) {
+		case "-": // x - 0 -> x
+			if (exprIsZero(expr.getFirstExpr())) { // 0 - x -> -x
+				replaceCb(new SignExpression(new Token("-", false), expr.getSecondExpr()));
+				return true;
+			}
+			else if (exprIsZero(expr.getSecondExpr())) { // x - 0 -> x
+				replaceCb(expr.getFirstExpr());
+				return true;
+			}
+			break;
+		case "*": // x * 1 or 1 * x -> x
+			if (exprIsOne(expr.getFirstExpr())) {
+				replaceCb(expr.getSecondExpr());
+				return true;
+			} else if (exprIsOne(expr.getSecondExpr())) {
+				replaceCb(expr.getFirstExpr());
+				return true;
+			}
+			break;
+		case "/": // x / 1 -> x
+			if (exprIsOne(expr.getSecondExpr())) {
 				replaceCb(expr.getFirstExpr());
 				return true;
 			}

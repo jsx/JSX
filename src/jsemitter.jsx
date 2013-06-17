@@ -2268,20 +2268,6 @@ class _BinaryNumberExpressionEmitter extends _OperatorExpressionEmitter {
 		this._expr = expr;
 	}
 
-	override function emit (outerOpPrecedence : number) : void {
-		// optimize "1 * x" => x
-		if (this._expr.getToken().getValue() == "*") {
-			if (this._emitIfEitherIs(outerOpPrecedence, function (expr1, expr2) {
-				return ((expr1 instanceof IntegerLiteralExpression || expr1 instanceof NumberLiteralExpression) && (expr1.getToken().getValue() as number) == 1)
-					? expr2 : null;
-			})) {
-				return;
-			}
-		}
-		// normal
-		super.emit(outerOpPrecedence);
-	}
-
 	override function _emit () : void {
 		var op = this._expr.getToken().getValue();
 		this._emitter._emitWithNullableGuard(this._expr.getFirstExpr(), _BinaryNumberExpressionEmitter._operatorPrecedence[op]);
