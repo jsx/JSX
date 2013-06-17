@@ -2265,6 +2265,14 @@ class _DeadCodeEliminationOptimizeCommand extends _FunctionOptimizeCommand {
 				Util.forEachExpression(onExpr, (expr as NewExpression).getArguments());
 				lastAssignExpr.splice(0, lastAssignExpr.length);
 				return true;
+			} else if (expr instanceof LogicalExpression) {
+				onExpr((expr as LogicalExpression).getSecondExpr(), (function (logicalExpr : LogicalExpression) : function(:Expression) : void {
+					return function (expr) {
+						logicalExpr.setSecondExpr(expr);
+					};
+				}(expr as LogicalExpression)));
+				lastAssignExpr.splice(0, lastAssignExpr.length);
+				return true;
 			}
 			return expr.forEachExpression(onExpr);
 		};
