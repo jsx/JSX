@@ -2553,28 +2553,27 @@ class _InlineOptimizeCommand extends _FunctionOptimizeCommand {
 			   && this._lhsHasNoSideEffects((expr as AssignmentExpression).getFirstExpr())
 			&& (expr as AssignmentExpression).getSecondExpr() instanceof CallExpression) {
 
-				// inline if the statement is an assignment of a single call expression into a local variable
-				var args = this._getArgsAndThisIfCallExprIsInlineable((expr as AssignmentExpression).getSecondExpr() as CallExpression, false);
-				if (args != null) {
-					stmtIndex = this._expandCallingFunction(funcDef, statements, stmtIndex, _DetermineCalleeCommand.getCallingFuncDef((expr as AssignmentExpression).getSecondExpr() as CallExpression), args);
-					var stmt = statements[stmtIndex - 1];
-					if (stmt instanceof ReturnStatement) {
-						var rhsExpr = (stmt as ReturnStatement).getExpr();
-					} else if (stmt instanceof ExpressionStatement) {
-						rhsExpr = (stmt as ExpressionStatement).getExpr();
-					} else {
-						return false;
-					}
-					var lastExpr = new AssignmentExpression(
-						expr.getToken(),
-						(expr as AssignmentExpression).getFirstExpr(),
-						rhsExpr);
-					statements[stmtIndex - 1] = new ExpressionStatement(lastExpr);
-					cb(stmtIndex);
-					return true;
+			// inline if the statement is an assignment of a single call expression into a local variable
+			var args = this._getArgsAndThisIfCallExprIsInlineable((expr as AssignmentExpression).getSecondExpr() as CallExpression, false);
+			if (args != null) {
+				stmtIndex = this._expandCallingFunction(funcDef, statements, stmtIndex, _DetermineCalleeCommand.getCallingFuncDef((expr as AssignmentExpression).getSecondExpr() as CallExpression), args);
+				var stmt = statements[stmtIndex - 1];
+				if (stmt instanceof ReturnStatement) {
+					var rhsExpr = (stmt as ReturnStatement).getExpr();
+				} else if (stmt instanceof ExpressionStatement) {
+					rhsExpr = (stmt as ExpressionStatement).getExpr();
+				} else {
+					return false;
 				}
-
+				var lastExpr = new AssignmentExpression(
+					expr.getToken(),
+					(expr as AssignmentExpression).getFirstExpr(),
+					rhsExpr);
+				statements[stmtIndex - 1] = new ExpressionStatement(lastExpr);
+				cb(stmtIndex);
+				return true;
 			}
+		}
 
 		return false;
 	}
