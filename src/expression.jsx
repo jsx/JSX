@@ -1835,7 +1835,7 @@ class ShiftExpression extends BinaryExpression {
 
 }
 
-// (the only) tertary expression
+// (the only) ternary expression
 
 class ConditionalExpression extends OperatorExpression {
 
