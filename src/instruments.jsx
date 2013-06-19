@@ -529,8 +529,8 @@ class _AssignmentExpressionTransformer extends _ExpressionTransformer {
 		// LHS expr must be of any of type 'local', 'property', and 'array'
 
 		var lhsExpr = this._expr.getFirstExpr();
-		if (lhsExpr instanceof LocalExpression) {
-			return this._transformLocalAssignment(parent, continuation);
+		if (lhsExpr instanceof LocalExpression || (lhsExpr instanceof PropertyExpression && (lhsExpr as PropertyExpression).getExpr() instanceof ClassExpression)) {
+			return this._transformSimpleAssignment(parent, continuation);
 		} else if (lhsExpr instanceof PropertyExpression) {
 			return this._transformPropertyAssignment(parent, continuation);
 		} else if (lhsExpr instanceof ArrayExpression) {
@@ -540,11 +540,11 @@ class _AssignmentExpressionTransformer extends _ExpressionTransformer {
 		}
 	}
 
-	function _transformLocalAssignment (parent : MemberFunctionDefinition, continuation : Expression) : Expression {
+	function _transformSimpleAssignment (parent : MemberFunctionDefinition, continuation : Expression) : Expression {
 		/*
-		  op(local,E) | C
+		  op(local_or_classvar,E) | C
 
-		  E | function ($1) { return C(local = $1); }
+		  E | function ($1) { return C(local_or_classvar = $1); }
 		*/
 
 		return this._transformOp(parent, continuation, [ this._expr.getSecondExpr() ]);
@@ -573,9 +573,9 @@ class _AssignmentExpressionTransformer extends _ExpressionTransformer {
 
 	override function _constructOp (exprs : Expression[]) : Expression {
 		var lhsExpr = this._expr.getFirstExpr();
-		if (lhsExpr instanceof LocalExpression) {
+		if (lhsExpr instanceof LocalExpression || (lhsExpr instanceof PropertyExpression && (lhsExpr as PropertyExpression).getExpr() instanceof ClassExpression)) {
 			assert exprs.length == 1;
-			return this._constructLocalAssignment(exprs[0]);
+			return this._constructSimpleAssignment(exprs[0]);
 		} else if (lhsExpr instanceof PropertyExpression) {
 			assert exprs.length == 2;
 			return this._constructPropertyAssignment(exprs[0], exprs[1]);
@@ -587,7 +587,7 @@ class _AssignmentExpressionTransformer extends _ExpressionTransformer {
 		}
 	}
 
-	function _constructLocalAssignment (expr : Expression) : Expression {
+	function _constructSimpleAssignment (expr : Expression) : Expression {
 		return new AssignmentExpression(this._expr.getToken(), this._expr.getFirstExpr(), expr);
 	}
 
