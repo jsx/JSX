@@ -409,9 +409,13 @@ class _PropertyExpressionTransformer extends _UnaryExpressionTransformer {
 	}
 
 	override function doCPSTransform (parent : MemberFunctionDefinition, continuation : Expression) : Expression {
-		var type = this._expr.getType();
-		if (type instanceof ResolvedFunctionType && (! (type as ResolvedFunctionType).isAssignable())) {
+		// obj.method
+		if (this._expr.getType() instanceof MemberFunctionType) {
 			throw new Error("logic flaw");
+		}
+		// Klass.staticMethod
+		if (this._expr.getExpr() instanceof ClassExpression) {
+			return this._createCall1(continuation, this._expr);
 		}
 		return super.doCPSTransform(parent, continuation);
 	}
