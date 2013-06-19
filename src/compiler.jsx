@@ -360,8 +360,10 @@ class Compiler {
 			return classDef.forEachMember(function onMember(member) {
 				if (member instanceof MemberFunctionDefinition) {
 					var funcDef = member as MemberFunctionDefinition;
-					if (funcDef.getStatements() != null && ! hasForInStatement(funcDef)) {
+					if (funcDef.getStatements() != null && funcDef.name() != "constructor" && ! hasForInStatement(funcDef)) {
+						log "start transforming", funcDef.toString(), "...";
 						this._transformer._doCPSTransform(funcDef);
+						log "finish transforming", funcDef.toString(), "...";
 					}
 				}
 				return true;

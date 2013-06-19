@@ -91,7 +91,11 @@ abstract class _ExpressionTransformer {
 			continuation,
 			[ this._constructOp(newArgs.map.<Expression>((arg) -> (new LocalExpression(arg.getName(), arg) as Expression))) ]
 		);
-		parentFuncDef.getStatements().push(new ReturnStatement(new Token("return", false), lastBody));
+		if (i == 0) {
+			firstBody = lastBody;
+		} else {
+			parentFuncDef.getStatements().push(new ReturnStatement(new Token("return", false), lastBody));
+		}
 
 		var closures = new MemberFunctionDefinition[];
 		lastBody.forEachExpression(function (expr) {
