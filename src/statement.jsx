@@ -1587,7 +1587,7 @@ class AssertStatement extends InformationStatement {
 	}
 
 	override function clone () : Statement {
-		return new AssertStatement(this._token, this._expr.clone(), this._msgExpr.clone());
+		return new AssertStatement(this._token, this._expr.clone(), Cloner.<Expression>.cloneNullable(this._msgExpr));
 	}
 
 	function getExpr () : Expression {
@@ -1625,6 +1625,8 @@ class AssertStatement extends InformationStatement {
 
 	override function forEachExpression (cb : function(:Expression,:function(:Expression):void):boolean) : boolean {
 		if (! cb(this._expr, function (expr) { this._expr = expr; }))
+			return false;
+		if (this._msgExpr != null && ! cb(this._msgExpr, function (expr) { this._msgExpr = expr; }))
 			return false;
 		return true;
 	}
