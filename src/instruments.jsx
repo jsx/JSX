@@ -495,7 +495,9 @@ class _AdditiveExpressionTransformer extends _BinaryExpressionTransformer {
 	}
 
 	override function _clone (arg1 : Expression, arg2 : Expression) : BinaryExpression {
-		return new AdditiveExpression(this._expr.getToken(), arg1, arg2);
+		var ret = new AdditiveExpression(this._expr.getToken(), arg1, arg2);
+		ret._type = (this._expr as AdditiveExpression)._type;
+		return ret;
 	}
 
 }
