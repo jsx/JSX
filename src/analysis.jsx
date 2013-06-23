@@ -25,6 +25,7 @@ import "./parser.jsx";
 import "./type.jsx";
 import "./platform.jsx";
 import "./statement.jsx";
+import "./expression.jsx";
 import "./optimizer.jsx";
 import "./util.jsx";
 
@@ -279,18 +280,28 @@ class CaughtVariable extends LocalVariable {
 }
 
 class ArgumentDeclaration extends LocalVariable {
+	var _defaultValue : Expression = null;
 
 	function constructor (name : Token, type : Type) {
 		super(name, type);
 	}
 
+	function constructor (name : Token, type : Type, defaultValue : Expression) {
+		super(name, type);
+		this._defaultValue = defaultValue;
+	}
+
 	function clone () : ArgumentDeclaration {
-		return new ArgumentDeclaration(this._name, this._type);
+		return new ArgumentDeclaration(this._name, this._type, this._defaultValue);
+	}
+
+	function getDefaultValue() : Expression {
+		return this._defaultValue;
 	}
 
 	override function _instantiate (instantiationContext : InstantiationContext) : ArgumentDeclaration {
 		var type = this._type != null ? this._type.instantiate(instantiationContext) : null;
-		return new ArgumentDeclaration(this._name, type);
+		return new ArgumentDeclaration(this._name, type, this._defaultValue);
 	}
 
 	override function instantiateAndPush (instantiationContext : InstantiationContext) : ArgumentDeclaration {

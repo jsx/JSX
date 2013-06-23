@@ -3306,6 +3306,7 @@ class Parser {
 						return null;
 					}
 				}
+				var defaultValue : Expression = null;
 				if (isVarArg) {
 					// vararg is the last argument
 					if (argType == null && isVarArg)
@@ -3315,8 +3316,12 @@ class Parser {
 						return null;
 					break;
 				}
-				// FIXME KAZUHO support default arguments
-				args.push(new ArgumentDeclaration(argName, argType));
+				else if (this._expectOpt("=") != null)  {
+					if ((defaultValue = this._assignExpr(true)) == null) {
+						return null;
+					}
+				}
+				args.push(new ArgumentDeclaration(argName, argType, defaultValue));
 				token = this._expect([ ")", "," ]);
 				if (token == null)
 					return null;
