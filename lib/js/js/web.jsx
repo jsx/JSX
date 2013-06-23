@@ -2031,7 +2031,7 @@ native final __fake__ class Window extends EventTarget {
 
 	// implements IDBEnvironment
 
-	/** @see http://www.w3.org/TR/2012/WD-IndexedDB-20120524/ */
+	/** @see http://www.w3.org/TR/2013/WD-IndexedDB-20130516/ */
 	__readonly__ var indexedDB : IDBFactory;
 
 	function setTimeout(handler : function():void/*TimerHandler*/) : number/*long*/;
@@ -4809,12 +4809,12 @@ native __fake__ class WorkerUtils extends WindowBase64 {
 
 	// implements IDBEnvironment
 
-	/** @see http://www.w3.org/TR/2012/WD-IndexedDB-20120524/ */
+	/** @see http://www.w3.org/TR/2013/WD-IndexedDB-20130516/ */
 	__readonly__ var indexedDB : IDBFactory;
 
 	// implements IDBEnvironmentSync
 
-	/** @see http://www.w3.org/TR/2012/WD-IndexedDB-20120524/ */
+	/** @see http://www.w3.org/TR/2013/WD-IndexedDB-20130516/ */
 	__readonly__ var indexedDBSync : IDBFactorySync;
 
 } // end of WorkerUtils
@@ -4875,7 +4875,7 @@ native final class EventSource extends EventTarget {
 
 } // end of EventSourceInit
 
-/** @see http://www.w3.org/TR/2012/WD-IndexedDB-20120524/ */
+/** @see http://www.w3.org/TR/2013/WD-IndexedDB-20130516/ */
 native class IDBKeyRange {
 
 	__readonly__ var lower : variant/*any*/;
@@ -4893,7 +4893,7 @@ native class IDBKeyRange {
 
 } // end of IDBKeyRange
 
-/** @see http://www.w3.org/TR/2012/WD-IndexedDB-20120524/ */
+/** @see http://www.w3.org/TR/2013/WD-IndexedDB-20130516/ */
 /* dictionary */ class IDBObjectStoreParameters {
 
 	var keyPath : Nullable.<string>/*DOMString?*/;
@@ -4901,7 +4901,7 @@ native class IDBKeyRange {
 
 } // end of IDBObjectStoreParameters
 
-/** @see http://www.w3.org/TR/2012/WD-IndexedDB-20120524/ */
+/** @see http://www.w3.org/TR/2013/WD-IndexedDB-20130516/ */
 /* dictionary */ class IDBIndexParameters {
 
 	var unique : boolean;
@@ -4909,7 +4909,7 @@ native class IDBKeyRange {
 
 } // end of IDBIndexParameters
 
-/** @see http://www.w3.org/TR/2012/WD-IndexedDB-20120524/ */
+/** @see http://www.w3.org/TR/2013/WD-IndexedDB-20130516/ */
 /* dictionary */ class IDBVersionChangeEventInit extends EventInit {
 
 	var oldVersion : number/*unsigned long long*/;
@@ -4917,7 +4917,7 @@ native class IDBKeyRange {
 
 } // end of IDBVersionChangeEventInit
 
-/** @see http://www.w3.org/TR/2012/WD-IndexedDB-20120524/ */
+/** @see http://www.w3.org/TR/2013/WD-IndexedDB-20130516/ */
 native class IDBRequest extends EventTarget {
 
 	__readonly__ var result : variant/*any*/;
@@ -4930,7 +4930,7 @@ native class IDBRequest extends EventTarget {
 
 } // end of IDBRequest
 
-/** @see http://www.w3.org/TR/2012/WD-IndexedDB-20120524/ */
+/** @see http://www.w3.org/TR/2013/WD-IndexedDB-20130516/ */
 native final class IDBOpenDBRequest extends IDBRequest {
 
 	var onblocked : Nullable.<function(:Event):void>/*Function?*/;
@@ -4938,7 +4938,7 @@ native final class IDBOpenDBRequest extends IDBRequest {
 
 } // end of IDBOpenDBRequest
 
-/** @see http://www.w3.org/TR/2012/WD-IndexedDB-20120524/ */
+/** @see http://www.w3.org/TR/2013/WD-IndexedDB-20130516/ */
 native final class IDBVersionChangeEvent extends Event {
 
 	function constructor(type : string/*DOMString*/);
@@ -4949,14 +4949,14 @@ native final class IDBVersionChangeEvent extends Event {
 
 } // end of IDBVersionChangeEvent
 
-/** @see http://www.w3.org/TR/2012/WD-IndexedDB-20120524/ */
+/** @see http://www.w3.org/TR/2013/WD-IndexedDB-20130516/ */
 native __fake__ class IDBEnvironment {
 
 	__readonly__ var indexedDB : IDBFactory;
 
 } // end of IDBEnvironment
 
-/** @see http://www.w3.org/TR/2012/WD-IndexedDB-20120524/ */
+/** @see http://www.w3.org/TR/2013/WD-IndexedDB-20130516/ */
 native class IDBFactory {
 
 	function open(name : string/*DOMString*/) : IDBOpenDBRequest;
@@ -4966,7 +4966,7 @@ native class IDBFactory {
 
 } // end of IDBFactory
 
-/** @see http://www.w3.org/TR/2012/WD-IndexedDB-20120524/ */
+/** @see http://www.w3.org/TR/2013/WD-IndexedDB-20130516/ */
 native class IDBDatabase extends EventTarget {
 
 	__readonly__ var name : string/*DOMString*/;
@@ -4984,7 +4984,7 @@ native class IDBDatabase extends EventTarget {
 
 } // end of IDBDatabase
 
-/** @see http://www.w3.org/TR/2012/WD-IndexedDB-20120524/ */
+/** @see http://www.w3.org/TR/2013/WD-IndexedDB-20130516/ */
 native class IDBObjectStore {
 
 	__readonly__ var name : string/*DOMString*/;
@@ -5011,7 +5011,7 @@ native class IDBObjectStore {
 
 } // end of IDBObjectStore
 
-/** @see http://www.w3.org/TR/2012/WD-IndexedDB-20120524/ */
+/** @see http://www.w3.org/TR/2013/WD-IndexedDB-20130516/ */
 native class IDBIndex {
 
 	__readonly__ var name : string/*DOMString*/;
@@ -5032,7 +5032,7 @@ native class IDBIndex {
 
 } // end of IDBIndex
 
-/** @see http://www.w3.org/TR/2012/WD-IndexedDB-20120524/ */
+/** @see http://www.w3.org/TR/2013/WD-IndexedDB-20130516/ */
 native class IDBCursor {
 
 	__readonly__ var source : Object;
@@ -5047,14 +5047,14 @@ native class IDBCursor {
 
 } // end of IDBCursor
 
-/** @see http://www.w3.org/TR/2012/WD-IndexedDB-20120524/ */
+/** @see http://www.w3.org/TR/2013/WD-IndexedDB-20130516/ */
 native final class IDBCursorWithValue extends IDBCursor {
 
 	__readonly__ var value : variant/*any*/;
 
 } // end of IDBCursorWithValue
 
-/** @see http://www.w3.org/TR/2012/WD-IndexedDB-20120524/ */
+/** @see http://www.w3.org/TR/2013/WD-IndexedDB-20130516/ */
 native class IDBTransaction extends EventTarget {
 
 	__readonly__ var mode : string/*DOMString*/;
@@ -5068,14 +5068,14 @@ native class IDBTransaction extends EventTarget {
 
 } // end of IDBTransaction
 
-/** @see http://www.w3.org/TR/2012/WD-IndexedDB-20120524/ */
+/** @see http://www.w3.org/TR/2013/WD-IndexedDB-20130516/ */
 native __fake__ class IDBEnvironmentSync {
 
 	__readonly__ var indexedDBSync : IDBFactorySync;
 
 } // end of IDBEnvironmentSync
 
-/** @see http://www.w3.org/TR/2012/WD-IndexedDB-20120524/ */
+/** @see http://www.w3.org/TR/2013/WD-IndexedDB-20130516/ */
 native final class IDBFactorySync {
 
 	function open(name : string/*DOMString*/) : IDBDatabaseSync;
@@ -5087,7 +5087,7 @@ native final class IDBFactorySync {
 
 } // end of IDBFactorySync
 
-/** @see http://www.w3.org/TR/2012/WD-IndexedDB-20120524/ */
+/** @see http://www.w3.org/TR/2013/WD-IndexedDB-20130516/ */
 native final class IDBDatabaseSync {
 
 	__readonly__ var name : string/*DOMString*/;
@@ -5107,7 +5107,7 @@ native final class IDBDatabaseSync {
 
 // alias IDBVersionChangeCallback = function(transaction:IDBTransactionSync,oldVersion:number/*unsigned long long*/):void
 
-/** @see http://www.w3.org/TR/2012/WD-IndexedDB-20120524/ */
+/** @see http://www.w3.org/TR/2013/WD-IndexedDB-20130516/ */
 native final class IDBObjectStoreSync {
 
 	__readonly__ var name : string/*DOMString*/;
@@ -5134,7 +5134,7 @@ native final class IDBObjectStoreSync {
 
 } // end of IDBObjectStoreSync
 
-/** @see http://www.w3.org/TR/2012/WD-IndexedDB-20120524/ */
+/** @see http://www.w3.org/TR/2013/WD-IndexedDB-20130516/ */
 native final class IDBIndexSync {
 
 	__readonly__ var name : string/*DOMString*/;
@@ -5155,7 +5155,7 @@ native final class IDBIndexSync {
 
 } // end of IDBIndexSync
 
-/** @see http://www.w3.org/TR/2012/WD-IndexedDB-20120524/ */
+/** @see http://www.w3.org/TR/2013/WD-IndexedDB-20130516/ */
 native class IDBCursorSync {
 
 	__readonly__ var source : Object;
@@ -5169,14 +5169,14 @@ native class IDBCursorSync {
 
 } // end of IDBCursorSync
 
-/** @see http://www.w3.org/TR/2012/WD-IndexedDB-20120524/ */
+/** @see http://www.w3.org/TR/2013/WD-IndexedDB-20130516/ */
 native final class IDBCursorWithValueSync extends IDBCursorSync {
 
 	var value : variant/*any*/;
 
 } // end of IDBCursorWithValueSync
 
-/** @see http://www.w3.org/TR/2012/WD-IndexedDB-20120524/ */
+/** @see http://www.w3.org/TR/2013/WD-IndexedDB-20130516/ */
 native final class IDBTransactionSync {
 
 	__readonly__ var mode : string/*DOMString*/;
