@@ -237,7 +237,7 @@ foreach my $src(@files) {
         if($arg =~ /^https?:/) {
             my $filename = "$root/spec/$specname";
 
-            if ($refresh and not -e $filename) {
+            if ($refresh or not -e $filename) {
                 info("GET $arg");
                 state $ua = LWP::UserAgent->new();
                 my $res = $ua->mirror($arg, $filename);
