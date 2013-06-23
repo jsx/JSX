@@ -39,6 +39,10 @@ class Token {
 	var _lineNumber : number;
 	var _columnNumber : number;
 
+	function constructor (value : string) {
+		this(value, false, null, NaN, NaN);
+	}
+
 	function constructor (value : string, isIdentifier : boolean) {
 		this(value, isIdentifier, null, NaN, NaN);
 	}

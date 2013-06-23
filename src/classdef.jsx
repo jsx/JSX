@@ -710,9 +710,14 @@ class ClassDefinition implements Stashable {
 	}
 
 	function _analyzeMembers (context : AnalysisContext) : void {
+		var hasToStringMethod = false;
+
 		for (var i = 0; i < this._members.length; ++i) {
 			var member = this._members[i];
 			if (member instanceof MemberFunctionDefinition) {
+				if (member.name() == "toString") {
+					hasToStringMethod = true;
+				}
 				if (! (member instanceof TemplateFunctionDefinition)) {
 					(member as MemberFunctionDefinition).analyze(context);
 				}
@@ -724,6 +729,87 @@ class ClassDefinition implements Stashable {
 				}
 			}
 		}
+
+		if (! hasToStringMethod) {
+			this._generateToStringMethod(context);
+		}
+	}
+
+	function _generateToStringMethod(context : AnalysisContext) : void {
+		function makeString(s : string) : Expression {
+			return new StringLiteralExpression(new Token(Util.encodeStringLiteral(s)));
+		}
+		var exprs = new Expression[];
+		this.forEachMemberVariable(function (member) {
+			if ((member.flags() & ClassDefinition.IS_STATIC) != 0) {
+				return true;
+			}
+			exprs.push(makeString(member.name() + "="));
+
+			var prop = new PropertyExpression(new Token("."), new ThisExpression(new Token("this"), null), new Token(member.name()), []);
+			var type = member.getType();
+			if (type == Type.stringType) {
+				// TODO: JSON.stringify(p)
+				exprs.push(prop);
+			}
+			else if (type == Type.variantType) {
+				// p as string (or what can I do?)
+				exprs.push(new AsExpression(new Token("as"), prop, Type.stringType));
+			}
+			else if (type == Type.numberType || type == Type.integerType || type == Type.booleanType) {
+				// p as string
+				exprs.push(new AsExpression(new Token("as"), prop, Type.stringType));
+			}
+			else {
+				// TODO: deal with Array and Map
+				var isArray = type.getClassDef() instanceof InstantiatedClassDefinition && (type.getClassDef() as InstantiatedClassDefinition).getTemplateClassName() == "Array";
+
+				// p != null ? p.toString() : "null"
+				var condExpr = new EqualityExpression(new Token("!="), prop, new NullExpression(new Token("null"), Type.nullType));
+				var propToString = new PropertyExpression(new Token("."), prop, new Token("toString"), []);
+				var callPropToString = new CallExpression(new Token("("), propToString, []);
+				var nullStr = makeString("null");
+
+				if (isArray) {
+					exprs.push(makeString("["));
+				}
+				exprs.push(new ConditionalExpression(new Token("?"), condExpr, callPropToString, nullStr));
+				if (isArray) {
+					exprs.push(makeString("]"));
+				}
+			}
+
+			exprs.push(makeString(", "));
+			return true;
+		});
+		if (exprs.length != 0) {
+			exprs.pop(); // last ","
+		}
+		exprs.unshift(makeString("{"));
+		exprs.push(makeString("}"));
+
+		// e.g. Foo{bar:42,baz:"foo"}
+		var statements = [
+			new ReturnStatement(new Token("return"), exprs.reduce.<Expression>(function (current, previous) {
+				return new AdditiveExpression(new Token("+"), current, previous);
+			}, makeString(this.classFullName())))
+		] : Statement[];
+
+		var toStringMethod = new MemberFunctionDefinition(
+				null,
+				new Token("toString", true),
+				ClassDefinition.IS_OVERRIDE | ClassDefinition.IS_PURE,
+				Type.stringType,
+				new ArgumentDeclaration[],
+				new LocalVariable[],
+				statements,
+				new MemberFunctionDefinition[],
+				new Token("(generated)", false),
+				null);
+
+		toStringMethod.setClassDef(this);
+		this.members().push(toStringMethod);
+		toStringMethod.analyze(context);
 	}
 
 	function analyzeUnusedVariables () : void {
