@@ -515,7 +515,9 @@ class _ArrayExpressionTransformer extends _BinaryExpressionTransformer {
 	}
 
 	override function _clone (arg1 : Expression, arg2 : Expression) : BinaryExpression {
-		return new ArrayExpression(this._expr.getToken(), arg1, arg2);
+		var aryExpr = new ArrayExpression(this._expr.getToken(), arg1, arg2);
+		aryExpr._type = (this._expr as ArrayExpression)._type;
+		return aryExpr;
 	}
 
 }
