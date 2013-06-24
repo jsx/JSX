@@ -138,12 +138,12 @@ class Compiler {
 		case Compiler.MODE_PARSE:
 			return true;
 		}
+		// fix-up classdefs to start semantic analysis
+		this.normalizeClassDefs(errors);
 		// resolve imports
 		this._resolveImports(errors);
 		if (! this._handleErrors(errors))
 			return false;
-		// generate functions to handle default parameters
-		this._generateWrappersForDefaultParameters(errors);
 		if (! this._handleErrors(errors))
 			return false;
 		// register backing class for primitives
@@ -308,9 +308,9 @@ class Compiler {
 		return true;
 	}
 
-	function _generateWrappersForDefaultParameters (errors : CompileError[]) : void {
+	function normalizeClassDefs (errors : CompileError[]) : void {
 		this.forEachClassDef((parser, classDef) -> {
-			classDef.generateWrappersForDefaultParameters(errors);
+			classDef.normalizeClassDefs(errors);
 			return true;
 		});
 	}

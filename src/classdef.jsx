@@ -460,11 +460,35 @@ class ClassDefinition implements Stashable {
 		);
 	}
 
-	function generateWrappersForDefaultParameters(errors : CompileError[]) : void {
+	function normalizeClassDefs (errors : CompileError[]) : void {
 		this.forEachMemberFunction((funcDef) -> {
 			funcDef.generateWrappersForDefaultParameters(errors);
 			return true;
 		});
+		for (var x = 0; x < this._members.length; ++x) {
+			for (var y = 0; y < x; ++y) {
+				if (this._members[x].name() == this._members[y].name()
+					&& (this._members[x].flags() & ClassDefinition.IS_STATIC) == (this._members[y].flags() & ClassDefinition.IS_STATIC)) {
+					var errorMsg : Nullable.<string> = null;
+					if (this._members[x] instanceof MemberFunctionDefinition && this._members[y] instanceof MemberFunctionDefinition) {
+						if (Util.typesAreEqual((this._members[x] as MemberFunctionDefinition).getArgumentTypes(), (this._members[y] as MemberFunctionDefinition).getArgumentTypes())) {
+							errorMsg = "a " + ((this._members[x].flags() & ClassDefinition.IS_STATIC) != 0 ? "static" : "member")
+								+ " function with same name and arguments is already defined";
+							errorMsg += ":" + x as string + ":" + (this._members[x] as MemberFunctionDefinition).getArgumentTypes().length as string;
+							errorMsg += ":" + y as string + ":" + (this._members[y] as MemberFunctionDefinition).getArgumentTypes().length as string;
+						}
+					} else {
+						errorMsg = "a property with same name already exists (note: only functions may be overloaded)";
+					}
+					if (errorMsg != null) {
+						var error = new CompileError(this._members[x].getNameToken(), errorMsg);
+						error.addCompileNote(new CompileNote(this._members[y].getNameToken(), "conflicting definition found here"));
+						errors.push(error);
+						break;
+					}
+				}
+			}
+		}
 	}
 
 	function resolveTypes (context : AnalysisContext) : void {
@@ -1587,7 +1611,9 @@ class MemberFunctionDefinition extends MemberDefinition implements Block {
 				this.getNameToken(),
 				this.flags() | ClassDefinition.IS_INLINE,
 				this.getReturnType(),
-				argDecls.slice(0, i),
+				argDecls.slice(0, i).map.<ArgumentDeclaration>((argDecl) -> {
+					return new ArgumentDeclaration(argDecl.getName(), argDecl.getType());
+				}),
 				new LocalVariable[],
 				[statement],
 				new MemberFunctionDefinition[],
