@@ -60,6 +60,11 @@ abstract class _ExpressionTransformer {
 			newArgs.push(this._transformer.createFreshArgumentDeclaration(exprs[i].getType()));
 		}
 
+		if (! (continuation.getType() instanceof ResolvedFunctionType)) {
+			throw new Error("logic flaw");
+		}
+		var delimContReturnType = (continuation.getType() as ResolvedFunctionType).getReturnType();
+
 		var firstBody : Expression = null;
 		var parentFuncDef = parent;
 		for (var i = 0; i < exprs.length; ++i) {
@@ -67,7 +72,7 @@ abstract class _ExpressionTransformer {
 				new Token("function", false),
 				null, // name
 				ClassDefinition.IS_STATIC,
-				Type.voidType,
+				delimContReturnType,
 				[ newArgs[i] ],
 				[], // locals
 				[], // statements
@@ -135,26 +140,26 @@ abstract class _ExpressionTransformer {
 		);
 	}
 
-	function _createContinuation (parent : MemberFunctionDefinition, arg : ArgumentDeclaration, contBody : Expression) : FunctionExpression {
+	// function _createContinuation (parent : MemberFunctionDefinition, arg : ArgumentDeclaration, contBody : Expression) : FunctionExpression {
 
-		var closures = new MemberFunctionDefinition[];
-		this._detachClosures(parent, contBody, closures);
+	// 	var closures = new MemberFunctionDefinition[];
+	// 	this._detachClosures(parent, contBody, closures);
 
-		var contFuncDef = new MemberFunctionDefinition(
-			new Token("function", false),
-			null,	// name
-			ClassDefinition.IS_STATIC,
-			Type.voidType,
-			[ arg ],
-			[],	// locals
-			(contBody == null) ? new Statement[] : ([ new ReturnStatement(new Token("return", false), contBody) ] : Statement[]),
-			closures,
-			null,
-			null
-		);
-		parent.getClosures().push(contFuncDef);
-		return new FunctionExpression(contFuncDef.getToken(), contFuncDef);
-	}
+	// 	var contFuncDef = new MemberFunctionDefinition(
+	// 		new Token("function", false),
+	// 		null,	// name
+	// 		ClassDefinition.IS_STATIC,
+	// 		Type.voidType,
+	// 		[ arg ],
+	// 		[],	// locals
+	// 		(contBody == null) ? new Statement[] : ([ new ReturnStatement(new Token("return", false), contBody) ] : Statement[]),
+	// 		closures,
+	// 		null,
+	// 		null
+	// 	);
+	// 	parent.getClosures().push(contFuncDef);
+	// 	return new FunctionExpression(contFuncDef.getToken(), contFuncDef);
+	// }
 
 	function _detachClosures (parent : MemberFunctionDefinition, expr : Expression, closures : MemberFunctionDefinition[]) : void {
 		expr.forEachExpression(function (expr) {
