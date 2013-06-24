@@ -41,6 +41,8 @@ native ("require('source-map').SourceMapConsumer") class SourceMapConsumer {
 
 class SourceMapper {
 
+	static const _sourceMapHeader = "require('source-map-support').install();\n\n";
+
 	var _rootDir : string;
 	var _outputFile : string;
 	var _impl : SourceMapGenerator;
@@ -56,6 +58,14 @@ class SourceMapper {
 		this._impl = new SourceMapGenerator({
 			file       : Util.basename(this._outputFile)
 		});
+
+		var header = SourceMapper._sourceMapHeader;
+		this._outputLength += header.length;
+		this._outputLineNumber += header.split('\n').length - 1;
+	}
+
+	function getSourceMapHeader () : string {
+		return SourceMapper._sourceMapHeader;
 	}
 
 	function makeGeneratedPos(output : string) : Map.<number>{

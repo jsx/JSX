@@ -3158,8 +3158,12 @@ class JavaScriptEmitter implements Emitter {
 	}
 
 	override function getOutput () : string {
-		// do not add any lines before this._output for source-map
-		var output = this._output + "\n";
+		var output = "";
+		// do not add any lines except source-map header before this._output for source-map
+		if (this._sourceMapper) {
+			output += this._sourceMapper.getSourceMapHeader();
+		}
+		output += this._output + "\n";
 		if (this._enableProfiler) {
 			output += this._platform.load(this._platform.getRoot() + "/src/js/profiler.js");
 		}
