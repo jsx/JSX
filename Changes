@@ -1,5 +1,12 @@
 Revision history for the JSX software development kit
 
+0.9.43 2013-06-25 08:35:00+0900
+    [CHANGES]
+    - introduce default parameters (#199)
+
+    [BUG FIXES]
+    - fix error when parsing: "if (...) throw ...;" (not using block) (#192)
+
 0.9.42 2013-06-16 23:18:31-0700
     [BUG FIX]
     - Fix #194: "dce" broke assign statements in logical/conditional exprs
