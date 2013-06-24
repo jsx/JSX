@@ -349,6 +349,8 @@ class JSXCommand {
 
 		if (emitter == null)
 			emitter = new JavaScriptEmitter(platform);
+		emitter.setRunEnv(executable != null ? executable : "");
+
 		setBootstrapMode(sourceFile);
 
 		compiler.setEmitter(emitter);

@@ -41,31 +41,42 @@ native ("require('source-map').SourceMapConsumer") class SourceMapConsumer {
 
 class SourceMapper {
 
-	static const _sourceMapHeader = "require('source-map-support').install();\n\n";
+	static const NODE_SOURCE_MAP_HEADER = "require('source-map-support').install();\n\n";
+	static const WEB_SOURCE_MAP_HEADER = "";
 
 	var _rootDir : string;
 	var _outputFile : string;
 	var _impl : SourceMapGenerator;
+	var _header : string;
 
 	var _sourceFiles = new Map.<boolean>();
 
 	var _outputLength = 0;
 	var _outputLineNumber = 1;
 
-	function constructor (rootDir : string, outputFile : string) {
+	function constructor (rootDir : string, outputFile : string, runenv : string) {
 		this._rootDir = rootDir;
 		this._outputFile = Util.resolvePath(outputFile);
 		this._impl = new SourceMapGenerator({
 			file       : Util.basename(this._outputFile)
 		});
 
-		var header = SourceMapper._sourceMapHeader;
-		this._outputLength += header.length;
-		this._outputLineNumber += header.split('\n').length - 1;
+		switch (runenv) {
+		case "node":
+			this._header = SourceMapper.NODE_SOURCE_MAP_HEADER;
+			break;
+		case "web":
+			this._header = SourceMapper.WEB_SOURCE_MAP_HEADER;
+			break;
+		default:
+			this._header = "";
+		}
+		this._outputLength += this._header.length;
+		this._outputLineNumber += this._header.split('\n').length - 1;
 	}
 
 	function getSourceMapHeader () : string {
-		return SourceMapper._sourceMapHeader;
+		return this._header;
 	}
 
 	function makeGeneratedPos(output : string) : Map.<number>{

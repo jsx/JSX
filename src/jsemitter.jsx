@@ -2762,6 +2762,7 @@ class JavaScriptEmitter implements Emitter {
 	var _fileFooter =                     "})(JSX);\n";
 
 	var _platform : Platform;
+	var _runenv : string;
 
 	// properties setup by _emitInit
 	var _output : string;
@@ -2790,7 +2791,10 @@ class JavaScriptEmitter implements Emitter {
 	function isJsModule(classDef : ClassDefinition) : boolean {
 		return classDef.className() == "js"
 			&& classDef.getToken().getFilename() == Util.resolvePath(this._platform.getRoot() + "/lib/js/js.jsx");
+	}
 
+	override function setRunEnv (runenv : string) : void {
+		this._runenv = runenv;
 	}
 
 	override function getSearchPaths () : string[] {
@@ -2803,7 +2807,7 @@ class JavaScriptEmitter implements Emitter {
 		this._outputFile = Util.resolvePath(name);
 
 		if(this._enableSourceMap) {
-			this._sourceMapper = new SourceMapper(this._platform.getRoot(), name);
+			this._sourceMapper = new SourceMapper(this._platform.getRoot(), name, this._runenv);
 		}
 	}
 
