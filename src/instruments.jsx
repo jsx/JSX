@@ -89,6 +89,7 @@ abstract class _ExpressionTransformer {
 				parentFuncDef.getStatements().push(new ReturnStatement(new Token("return", false), body));
 			}
 
+			childFuncDef.setParent(parentFuncDef);
 			parentFuncDef = childFuncDef;
 		}
 		var lastBody = new CallExpression(
