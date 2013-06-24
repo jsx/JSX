@@ -1495,25 +1495,6 @@ class Parser {
 			}
 			var member = this._memberDefinition();
 			if (member != null) {
-				for (var i = 0; i < members.length; ++i) {
-					if (member.name() == members[i].name()
-						&& (member.flags() & ClassDefinition.IS_STATIC) == (members[i].flags() & ClassDefinition.IS_STATIC)) {
-						if (member instanceof MemberFunctionDefinition && members[i] instanceof MemberFunctionDefinition) {
-							if (Util.typesAreEqual((member as MemberFunctionDefinition).getArgumentTypes(), (members[i] as MemberFunctionDefinition).getArgumentTypes())) {
-								this._errors.push(new CompileError(
-									member.getNameToken(),
-									"a " + ((member.flags() & ClassDefinition.IS_STATIC) != 0 ? "static" : "member")
-									+ " function with same name and arguments is already defined"));
-								success = false;
-								break;
-							}
-						} else {
-							this._errors.push(new CompileError(member.getNameToken(), "a property with same name already exists; only functions may be overloaded"));
-							success = false;
-							break;
-						}
-					}
-				}
 				members.push(member);
 			} else {
 				this._skipStatement();
@@ -3306,6 +3287,7 @@ class Parser {
 						return null;
 					}
 				}
+				var defaultValue : Expression = null;
 				if (isVarArg) {
 					// vararg is the last argument
 					if (argType == null && isVarArg)
@@ -3315,8 +3297,12 @@ class Parser {
 						return null;
 					break;
 				}
-				// FIXME KAZUHO support default arguments
-				args.push(new ArgumentDeclaration(argName, argType));
+				else if (this._expectOpt("=") != null)  {
+					if ((defaultValue = this._assignExpr(true)) == null) {
+						return null;
+					}
+				}
+				args.push(new ArgumentDeclaration(argName, argType, defaultValue));
 				token = this._expect([ ")", "," ]);
 				if (token == null)
 					return null;

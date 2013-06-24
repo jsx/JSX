@@ -460,6 +460,37 @@ class ClassDefinition implements Stashable {
 		);
 	}
 
+	function normalizeClassDefs (errors : CompileError[]) : void {
+		this.forEachMemberFunction((funcDef) -> {
+			funcDef.generateWrappersForDefaultParameters(errors);
+			return true;
+		});
+		for (var x = 0; x < this._members.length; ++x) {
+			for (var y = 0; y < x; ++y) {
+				if (this._members[x].name() == this._members[y].name()
+					&& (this._members[x].flags() & ClassDefinition.IS_STATIC) == (this._members[y].flags() & ClassDefinition.IS_STATIC)) {
+					var errorMsg : Nullable.<string> = null;
+					if (this._members[x] instanceof MemberFunctionDefinition && this._members[y] instanceof MemberFunctionDefinition) {
+						if (Util.typesAreEqual((this._members[x] as MemberFunctionDefinition).getArgumentTypes(), (this._members[y] as MemberFunctionDefinition).getArgumentTypes())) {
+							errorMsg = "a " + ((this._members[x].flags() & ClassDefinition.IS_STATIC) != 0 ? "static" : "member")
+								+ " function with same name and arguments is already defined";
+							errorMsg += ":" + x as string + ":" + (this._members[x] as MemberFunctionDefinition).getArgumentTypes().length as string;
+							errorMsg += ":" + y as string + ":" + (this._members[y] as MemberFunctionDefinition).getArgumentTypes().length as string;
+						}
+					} else {
+						errorMsg = "a property with same name already exists (note: only functions may be overloaded)";
+					}
+					if (errorMsg != null) {
+						var error = new CompileError(this._members[x].getNameToken(), errorMsg);
+						error.addCompileNote(new CompileNote(this._members[y].getNameToken(), "conflicting definition found here"));
+						errors.push(error);
+						break;
+					}
+				}
+			}
+		}
+	}
+
 	function resolveTypes (context : AnalysisContext) : void {
 		// resolve types used
 		for (var i = 0; i < this._objectTypesUsed.length; ++i)
@@ -1537,6 +1568,61 @@ class MemberFunctionDefinition extends MemberDefinition implements Block {
 			this._funcLocal.setTypeForced(this.getType());
 		}
 
+	}
+
+	function generateWrappersForDefaultParameters(errors : CompileError[]) : void {
+		// function f(a, b = x, c = y) makes f(a, b) { f(a, b, y) }, f(a) { f(a, x, y) }
+		this.getArguments().forEach((argDecl, i, argDecls) -> {
+			if (argDecl.getDefaultValue() == null) {
+				return;
+			}
+
+			var classDef = this.getClassDef();
+
+			// generate a wrapper method
+
+			var invocant = (this.flags() & ClassDefinition.IS_STATIC) == 0
+				? new ThisExpression(new Token("this", false), classDef)
+				: new ClassExpression(new Token(classDef.className(), true), new ObjectType(classDef));
+			var methodRef = new PropertyExpression(new Token(".", false), invocant, this.getNameToken(), this.getArgumentTypes());
+			var args = this.getArguments().slice(0, i).map.<Expression>((argDecl) -> {
+				return new LocalExpression(argDecl.getName(), new LocalVariable(argDecl.getName(), argDecl.getType()));
+			});
+			for (var j = i; j < argDecls.length; ++j) {
+				if (argDecls[j].getDefaultValue() == null) {
+					errors.push(new CompileError(argDecls[j-1].getName(), "optional parameter cannot precede required parameters"));
+					return;
+				}
+				args.push(argDecls[j].getDefaultValue().clone());
+			}
+
+			var callExpression = new CallExpression(new Token("(", false), methodRef, args);
+			var statement : Statement;
+
+			if (this.getReturnType() != Type.voidType) {
+				statement = new ReturnStatement(new Token("return", false), callExpression);
+			}
+			else {
+				statement = new ExpressionStatement(callExpression);
+			}
+
+			var wrapper = new MemberFunctionDefinition(
+				this.getToken(),
+				this.getNameToken(),
+				this.flags() | ClassDefinition.IS_INLINE,
+				this.getReturnType(),
+				argDecls.slice(0, i).map.<ArgumentDeclaration>((argDecl) -> {
+					return new ArgumentDeclaration(argDecl.getName(), argDecl.getType());
+				}),
+				new LocalVariable[],
+				[statement],
+				new MemberFunctionDefinition[],
+				this._lastTokenOfBody,
+				null);
+			wrapper.setClassDef(classDef);
+
+			classDef.members().push(wrapper);
+		});
 	}
 
 	function _fixupConstructor (context : AnalysisContext) : void {
