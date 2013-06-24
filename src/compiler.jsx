@@ -142,6 +142,10 @@ class Compiler {
 		this._resolveImports(errors);
 		if (! this._handleErrors(errors))
 			return false;
+		// generate functions to handle default parameters
+		this._generateWrappersForDefaultParameters(errors);
+		if (! this._handleErrors(errors))
+			return false;
 		// register backing class for primitives
 		var builtins = this._builtinParsers[0];
 		BooleanType._classDef = builtins.lookup(errors, null, "Boolean");
@@ -302,6 +306,13 @@ class Compiler {
 			}
 		}
 		return true;
+	}
+
+	function _generateWrappersForDefaultParameters (errors : CompileError[]) : void {
+		this.forEachClassDef((parser, classDef) -> {
+			classDef.generateWrappersForDefaultParameters(errors);
+			return true;
+		});
 	}
 
 	function _resolveImports (errors : CompileError[]) : void {
