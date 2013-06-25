@@ -887,6 +887,30 @@ class _NewExpressionTransformer extends _ExpressionTransformer {
 
 }
 
+class _CommaExpressionTransformer extends _ExpressionTransformer {
+
+	var _expr : CommaExpression;
+
+	function constructor (transformer : CodeTransformer, expr : CommaExpression) {
+		super(transformer, "COMMA");
+		this._expr = expr;
+	}
+
+	override function getExpression () : Expression {
+		return this._expr;
+	}
+
+	override function doCPSTransform (parent : MemberFunctionDefinition, continuation : Expression) : Expression {
+		return this._transformOp(parent, continuation, [ this._expr.getFirstExpr(), this._expr.getSecondExpr() ]);
+	}
+
+	override function _constructOp (exprs : Expression[]) : Expression {
+		assert exprs.length == 2;
+		return new CommaExpression(this._expr.getToken(), exprs[0], exprs[1]);
+	}
+
+}
+
 abstract class _StatementTransformer {
 
 	static var _statementCountMap = new Map.<number>;
@@ -1916,8 +1940,8 @@ class CodeTransformer {
 			return new _NewExpressionTransformer(this, expr as NewExpression);
 		else if (expr instanceof FunctionExpression)
 			return new _FunctionExpressionTransformer(this, expr as FunctionExpression);
-		// else if (expr instanceof CommaExpression)
-		// 	return new _CommaExpressionTransformer(this, expr as CommaExpression);
+		else if (expr instanceof CommaExpression)
+			return new _CommaExpressionTransformer(this, expr as CommaExpression);
 		throw new Error("got unexpected type of expression: " + (expr != null ? JSON.stringify(expr.serialize()) : expr.toString()));
 	}
 
