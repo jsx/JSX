@@ -1580,12 +1580,6 @@ class MemberFunctionDefinition extends MemberDefinition implements Block {
 
 			var classDef = this.getClassDef();
 
-			// generate a wrapper method
-
-			var invocant = (this.flags() & ClassDefinition.IS_STATIC) == 0
-				? new ThisExpression(new Token("this", false), classDef)
-				: new ClassExpression(new Token(classDef.className(), true), new ObjectType(classDef));
-			var methodRef = new PropertyExpression(new Token(".", false), invocant, this.getNameToken(), this.getArgumentTypes());
 			var args = this.getArguments().slice(0, i).map.<Expression>((argDecl) -> {
 				return new LocalExpression(argDecl.getName(), new LocalVariable(argDecl.getName(), argDecl.getType()));
 			});
@@ -1597,14 +1591,26 @@ class MemberFunctionDefinition extends MemberDefinition implements Block {
 				args.push(argDecls[j].getDefaultValue().clone());
 			}
 
-			var callExpression = new CallExpression(new Token("(", false), methodRef, args);
 			var statement : Statement;
 
-			if (this.getReturnType() != Type.voidType) {
-				statement = new ReturnStatement(new Token("return", false), callExpression);
+			if (this.name() == "constructor") {
+				statement = new ConstructorInvocationStatement(new Token("this", false), new ObjectType(classDef), args);
 			}
 			else {
-				statement = new ExpressionStatement(callExpression);
+				var invocant = (this.flags() & ClassDefinition.IS_STATIC) == 0
+					? new ThisExpression(new Token("this", false), classDef)
+					: new ClassExpression(new Token(classDef.className(), true), new ObjectType(classDef));
+
+				var methodRef = new PropertyExpression(new Token(".", false), invocant, this.getNameToken(), this.getArgumentTypes());
+
+				var callExpression = new CallExpression(new Token("(", false), methodRef, args);
+
+				if (this.getReturnType() != Type.voidType) {
+					statement = new ReturnStatement(new Token("return", false), callExpression);
+				}
+				else {
+					statement = new ExpressionStatement(callExpression);
+				}
 			}
 
 			var wrapper = new MemberFunctionDefinition(

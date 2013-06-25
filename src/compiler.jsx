@@ -151,10 +151,10 @@ class Compiler {
 		}
 		// fix-up classdefs to start semantic analysis
 		this.normalizeClassDefs(errors);
-		// resolve imports
-		this._resolveImports(errors);
 		if (! this._handleErrors(errors))
 			return false;
+		// resolve imports
+		this._resolveImports(errors);
 		if (! this._handleErrors(errors))
 			return false;
 		// register backing class for primitives
