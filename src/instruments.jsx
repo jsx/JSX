@@ -90,6 +90,7 @@ abstract class _ExpressionTransformer {
 			}
 
 			childFuncDef.setParent(parentFuncDef);
+			childFuncDef.setClassDef(parentFuncDef.getClassDef());
 			parentFuncDef = childFuncDef;
 		}
 		var lastBody = new CallExpression(
