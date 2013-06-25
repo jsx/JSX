@@ -31,7 +31,7 @@ import "js.jsx";
 
 final class Timer {
 	static function setTimeout(callback : function():void, intervalMS : number) : TimerHandle {
-		return (js.global["setTimeout"] as __noconvert__ function(:function():void,:int) : TimerHandle)(callback, intervalMS);
+		return (js.global["setTimeout"] as __noconvert__ function(:function():void,:number) : TimerHandle)(callback, intervalMS);
 	}
 
 	static function clearTimeout(timer : TimerHandle) : void {
@@ -39,7 +39,7 @@ final class Timer {
 	}
 
 	static function setInterval(callback : function():void, intervalMS : number) : TimerHandle {
-		return (js.global["setInterval"] as __noconvert__ function(:function():void,:int) : TimerHandle)(callback, intervalMS);
+		return (js.global["setInterval"] as __noconvert__ function(:function():void,:number) : TimerHandle)(callback, intervalMS);
 	}
 
 	static function clearInterval(timer : TimerHandle) : void {

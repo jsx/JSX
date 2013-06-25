@@ -29,6 +29,15 @@ class B extends
    },
    {
       "word" : "g_StopIteration"
+   },
+   {
+      "word" : "Transferable"
+   },
+   {
+      "word" : "ArrayBufferView"
+   },
+   {
+      "word" : "Uint8Array"
    }
 ]
 */

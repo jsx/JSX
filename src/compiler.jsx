@@ -149,8 +149,12 @@ class Compiler {
 		case Compiler.MODE_PARSE:
 			return true;
 		}
+		// fix-up classdefs to start semantic analysis
+		this.normalizeClassDefs(errors);
 		// resolve imports
 		this._resolveImports(errors);
+		if (! this._handleErrors(errors))
+			return false;
 		if (! this._handleErrors(errors))
 			return false;
 		// register backing class for primitives
@@ -297,6 +301,13 @@ class Compiler {
 		return true;
 	}
 
+	function normalizeClassDefs (errors : CompileError[]) : void {
+		this.forEachClassDef((parser, classDef) -> {
+			classDef.normalizeClassDefs(errors);
+			return true;
+		});
+	}
+
 	function _resolveImports (errors : CompileError[]) : void {
 		for (var i = 0; i < this._parsers.length; ++i) {
 			// built-in classes become implicit imports
@@ -370,7 +381,10 @@ class Compiler {
 			if ((classDef.flags() & ClassDefinition.IS_NATIVE) == 0) {
 				return;
 			}
-			if (nativeClassNames.hasOwnProperty(classDef.className())) {
+			if (nativeClassNames.hasOwnProperty(classDef.className())
+				&& ! (classDef instanceof InstantiatedClassDefinition
+					&& nativeClassNames[classDef.className()] instanceof InstantiatedClassDefinition
+					&& (classDef as InstantiatedClassDefinition).getTemplateClass() == (nativeClassNames[classDef.className()] as InstantiatedClassDefinition).getTemplateClass())) {
 				errors.push(
 					new CompileError(classDef.getToken(), "native class with same name is already defined")
 					.addCompileNote(new CompileNote(nativeClassNames[classDef.className()].getToken(), "here")));
@@ -402,7 +416,7 @@ class Compiler {
 			var deps = classDefs[i].implementTypes().map.<ClassDefinition>(function (t) { return t.getClassDef(); }).concat([]);
 			if (classDefs[i].extendType() != null)
 				deps.unshift(classDefs[i].extendType().getClassDef());
-			if (classDefs[i].getOuterClassDef() != null)
+			if (classDefs[i].getOuterClassDef() != null && deps.indexOf(classDefs[i].getOuterClassDef()) == -1)
 				deps.unshift(classDefs[i].getOuterClassDef());
 			var maxIndexOfClasses = getMaxIndexOfClasses(deps);
 			if (maxIndexOfClasses > i) {

@@ -59,7 +59,7 @@ my @specs = (
         "workers; http://www.w3.org/TR/workers/",
         "eventsource; http://www.w3.org/TR/eventsource/",
         "url; http://www.w3.org/TR/2012/WD-url-20120524/",
-        "IndexedDB; http://www.w3.org/TR/2012/WD-IndexedDB-20120524/",
+        "IndexedDB; http://www.w3.org/TR/2013/WD-IndexedDB-20130516/",
         "notifications; http://www.w3.org/TR/2012/WD-notifications-20120614/",
 
         "webrtc; http://dev.w3.org/2011/webrtc/editor/webrtc.html",
@@ -67,7 +67,7 @@ my @specs = (
         "mediacapture-streams; http://www.w3.org/TR/mediacapture-streams/",
 
         # graphics
-        'typedarray; https://www.khronos.org/registry/typedarray/specs/latest/typedarray.idl',
+	# hand-copied to built-in.jsx, see #189 'typedarray; https://www.khronos.org/registry/typedarray/specs/latest/typedarray.idl',
         '2dcontext; http://www.w3.org/TR/2dcontext/',
         'webgl; https://www.khronos.org/registry/webgl/specs/latest/webgl.idl',
 

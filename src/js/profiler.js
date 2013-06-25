@@ -68,11 +68,19 @@
 				}
 			}
 		}
-		if (typeof(XMLHttpRequest) == "undefined") {
-			cb(new ReferenceError("XMLHttpRequest is not defined"), null);
-			return;
+		var content = JSON.stringify(Profiler.getResults(), function (k, v) {
+			return typeof(v) === "number" ? Math.round(v) : v;
+		});
+		if (typeof(XMLHttpRequest) !== "undefined") {
+			return this._postResultsXHR(url, content, cb);
 		}
+		if (typeof(require) !== "undefined" && require("http")) {
+			return this._postResultsNode(url, content, cb);
+		}
+		cb(new ReferenceError("XMLHttpRequest is not defined"), null);
+	};
 
+	Profiler._postResultsXHR = function (url, content, cb) {
 		// post target should support gist-style API
 		var xhr = new XMLHttpRequest();
 		xhr.onreadystatechange = function () {
@@ -89,9 +97,33 @@
 		};
 		xhr.open("POST", url, /* async: */true);
 		xhr.setRequestHeader("Content-Type", "application/json");
-		xhr.send(JSON.stringify(Profiler.getResults(), function (k, v) {
-			return typeof(v) === "number" ? Math.round(v) : v;
-		}));
+		xhr.send(content);
+	};
+
+	Profiler._postResultsNode = function (url, content, cb) {
+		var http = require("http");
+		url = require("url").parse(url);
+		var req = http.request({
+			method: "POST",
+			hostname: url.hostname,
+			port: url.port,
+			path: url.path,
+		}, function (res) {
+			res.setEncoding("utf8");
+			var data = "";
+			res.on("data", function (chunk) {
+				data += chunk;
+			});
+			res.on("end", function () {
+				if (res.statusCode == 200 || res.statusCode == 201) {
+					cb(null, res.headers.location || data);
+				} else {
+					cb(new Error("failed to post profiler results, received " + res.statusCode + " response from server"), null);
+				}
+			});
+		});
+		req.write(content);
+		req.end();
 	};
 
 	Profiler.resetResults = function () {

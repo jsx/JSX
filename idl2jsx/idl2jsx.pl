@@ -59,6 +59,8 @@ my %skip = (
 
     EventListener => 1,
     WindowTimers => 1, # use JSXTimers instead
+
+    Transferable => 1, # typed-array is moved to built-in.jsx (see #189)
 );
 
 # indicates a class has children classes
@@ -235,7 +237,7 @@ foreach my $src(@files) {
         if($arg =~ /^https?:/) {
             my $filename = "$root/spec/$specname";
 
-            if ($refresh and not -e $filename) {
+            if ($refresh or not -e $filename) {
                 info("GET $arg");
                 state $ua = LWP::UserAgent->new();
                 my $res = $ua->mirror($arg, $filename);

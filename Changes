@@ -1,8 +1,93 @@
 Revision history for the JSX software development kit
 
+0.9.44 2013-06-25 09:35:00+0900
+    [CHANGES]
+    - assertions with customized messages (#198)
+
+0.9.43 2013-06-25 08:35:00+0900
+    [CHANGES]
+    - introduce default parameters (#199)
+
+    [BUG FIXES]
+    - fix error when parsing: "if (...) throw ...;" (not using block) (#192)
+
+0.9.42 2013-06-16 23:18:31-0700
+    [BUG FIX]
+    - Fix #194: "dce" broke assign statements in logical/conditional exprs
+
+0.9.41 2013-06-16 14:49:35-0700
+    [BUG FIXES]
+    - Fix a bug that int type parameters did not work correctly (#196)
+
+    [CHANGES]
+    - Changed sourceMappingURL syntax
+      (see http://updates.html5rocks.com/2013/06/sourceMappingURL-and-sourceURL-syntax-changed for details)
+    - Support sourcesContent in source-map to handle multiple source files
+      easier
+    - Improve "fold-const" to expand type casts in compile time as much as
+      possible (resolve #182 again)
+
+0.9.40 2013-06-11 03:42:00+0900
+    [CHANGES]
+    - accept Uint8Array as the argument to the ctor of Buffer of node.js
+
+0.9.39 2013-06-10 18:00:00+0900
+    [BUG FIXES]
+    - use of "super.meth()" was causing compile errors if meth() is native
+    - fix runtime error when extending a native class using the experimental "native(...)" annotation
+
+0.9.38 2013-06-09 00:19:03-0700
+    [BUG FIXES]
+    - Fix a problem in QtScript that `object["word"]` caused compilation errors
+      if the "word" was reserved (#187)
+    - Fix a problem that static const member variables in native class
+      was replaced to `null` by `--optimize fold-const` (#191)
+
+0.9.37 2013-06-07 14:40:00
+    [CHANGES]
+    - typed-arrays are defined in built-in.jsx (#189)
+
+0.9.36 2013-06-04 16:31:00
+    [CHANGES]
+    - accept numbers as 3rd argument of JSON.stringify (#188)
+
+0.9.35 2013-06-02 21:13:23
+    [BUG FIXES]
+    - Fix #182 again
+    - Fix types of Array#reduce() and Array#reduceRight() to take the type of
+      a return value
+
+0.9.34 2013-05-29 23:20:27
+    [BUG FIXES]
+    - Fix legacy AudioContext methods in web.jsx
+
+0.9.33 2013-05-29 18:58:00
+    [CHANGES]
+    - improve dce optimizer (#182)
+
+    [BUG FIXES]
+    - Partial fix for #173
+
+0.9.32 2013-05-28 09:22:05
+    [BUG FIXES]
+    - Fix bugs (#171, #174)
+
+0.9.31 2013-05-20 10:04:05
+    [CHANGES]
+    - Installed jsx compiler is now built with --release flag to
+      improve compilation speed
+
+    [BUG FIXES]
+    - Fix a typo in a function at js/nodejs.jsx (#168)
+
+0.9.30 2013-05-17 23:51:39
+    [BUG FIXES]
+    * Fix bugs (#150, #151, #166)
+    * Optimize command "staticize" is enabled again
+
 0.9.29 2013-05-07 14:45:00
     [FEATURES]
-    - Introduce "native('<<javascript expression>>')" attribute to load native classes
+    - Introduce "native('<<javascript expression>>')" attribute to load native classes (EXPERIMENTAL)
     - The minifier strips unused functions / classes.
 
 0.9.28 2013-05-02 00:13:33

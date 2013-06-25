@@ -46,14 +46,22 @@ partial interface AudioBufferSourceNode {
     // deprecated
     void noteOff(double when);
 };
+
 partial interface AudioContext {
     // deprecated
-    void createGainNode();
+    GainNode createGainNode();
     // deprecated
-    void createDelayNode();
+    DelayNode createDelayNode(optional double MaxDelayNode);
     // deprecated
-    void createJavaScriptNode();
+    JavaScriptAudioNode createJavaScriptNode();
 };
+
+// deprecated
+interface JavaScriptAudioNode {
+    attribute EventListener onaudioprocess;
+    readonly attribute long bufferSize;
+};
+
 partial interface OscillatorNode {
     // deprecated
     void noteOn(double when);

@@ -117,7 +117,7 @@ class _Lexer {
 	static const rxNewline        = /(?:\r\n?|\n)/;
 
 	// blacklists of identifiers
-	static const keywords = _Lexer.asMap([
+	static const keywords = Util.asSet([
 		// literals shared with ECMA 262
 		"null",     "true",     "false",
 		"NaN",      "Infinity",
@@ -141,7 +141,7 @@ class _Lexer {
 		"__FILE__",  "__LINE__",
 		"undefined"
 		]);
-	static const reserved = _Lexer.asMap([
+	static const reserved = Util.asSet([
 		// literals of ECMA 262 but not used by JSX
 		"debugger", "with",
 		// future reserved words of ECMA 262
@@ -161,13 +161,6 @@ class _Lexer {
 
 	static function quoteMeta (pattern : string) : string {
 		return pattern.replace(/([^0-9A-Za-z_])/g, '\\$1');
-	}
-
-	static function asMap (array : string[]) : Map.<boolean> {
-		var hash = new Map.<boolean>;
-		for (var i = 0; i < array.length; ++i)
-			hash[array[i]] = true;
-		return hash;
 	}
 
 	/// compile a regular expression
@@ -1503,25 +1496,6 @@ class Parser {
 			}
 			var member = this._memberDefinition();
 			if (member != null) {
-				for (var i = 0; i < members.length; ++i) {
-					if (member.name() == members[i].name()
-						&& (member.flags() & ClassDefinition.IS_STATIC) == (members[i].flags() & ClassDefinition.IS_STATIC)) {
-						if (member instanceof MemberFunctionDefinition && members[i] instanceof MemberFunctionDefinition) {
-							if (Util.typesAreEqual((member as MemberFunctionDefinition).getArgumentTypes(), (members[i] as MemberFunctionDefinition).getArgumentTypes())) {
-								this._errors.push(new CompileError(
-									member.getNameToken(),
-									"a " + ((member.flags() & ClassDefinition.IS_STATIC) != 0 ? "static" : "member")
-									+ " function with same name and arguments is already defined"));
-								success = false;
-								break;
-							}
-						} else {
-							this._errors.push(new CompileError(member.getNameToken(), "a property with same name already exists; only functions may be overloaded"));
-							success = false;
-							break;
-						}
-					}
-				}
 				members.push(member);
 			} else {
 				this._skipStatement();
@@ -2571,6 +2545,8 @@ class Parser {
 		var expr = this._expr();
 		if (expr == null)
 			return false;
+		if (this._expect(";") == null)
+			return false;
 		this._statements.push(new ThrowStatement(token, expr));
 		return true;
 	}
@@ -2624,12 +2600,18 @@ class Parser {
 	}
 
 	function _assertStatement (token : Token) : boolean {
-		var expr = this._expr();
+		var expr = this._assignExpr(false);
 		if (expr == null)
 			return false;
+		var msgExpr : Expression = null;
+		if (this._expectOpt(",") != null) {
+			msgExpr = this._assignExpr(false);
+			if (msgExpr == null)
+				return false;
+		}
 		if (this._expect(";") == null)
 			return false;
-		this._statements.push(new AssertStatement(token, expr));
+		this._statements.push(new AssertStatement(token, expr, msgExpr));
 		return true;
 	}
 
@@ -3270,7 +3252,7 @@ class Parser {
 					|| (keyToken = this._expectStringLiteralOpt()) != null) {
 					// ok
 				} else {
-					this._newError("expected identifier, number or string but got '" + token.toString() + "'");
+					this._newError("expected identifier, number or string but got '" + token.getValue() + "'");
 				}
 				// separator
 				if (this._expect(":") == null)
@@ -3319,6 +3301,7 @@ class Parser {
 						return null;
 					}
 				}
+				var defaultValue : Expression = null;
 				if (isVarArg) {
 					// vararg is the last argument
 					if (argType == null && isVarArg)
@@ -3328,8 +3311,12 @@ class Parser {
 						return null;
 					break;
 				}
-				// FIXME KAZUHO support default arguments
-				args.push(new ArgumentDeclaration(argName, argType));
+				else if (this._expectOpt("=") != null)  {
+					if ((defaultValue = this._assignExpr(true)) == null) {
+						return null;
+					}
+				}
+				args.push(new ArgumentDeclaration(argName, argType, defaultValue));
 				token = this._expect([ ")", "," ]);
 				if (token == null)
 					return null;

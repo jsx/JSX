@@ -1,6 +1,6 @@
 class T {
-  var p : U;
-  function constructor(b : U) {
+  var p : Q;
+  function constructor(b : Q) {
   }
 }
 /*EXPECTED

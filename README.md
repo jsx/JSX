@@ -86,7 +86,7 @@ NOTE: There are some TODO tests, which should be resolved in a future. `make sho
 WINDOWS SUPPORT
 =======================
 
-TBD
+`npm install -g jsx` should work even on Windows.
 
 RESOURCES
 =======================
