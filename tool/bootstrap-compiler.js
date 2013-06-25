@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// generatedy by JSX compiler 0.9.44 (2013-06-24 23:14:39 -0700; 2e7c2cc2f0e9679d87637e03a8413711d6d0f4f6)
+// generatedy by JSX compiler 0.9.44 (2013-06-25 00:38:18 -0700; 82f1e2143c01d40e1b2422ec53bad0f3c4c652af)
 var JSX = {};
 (function (JSX) {
 /**
@@ -12304,19 +12304,17 @@ MemberFunctionDefinition.prototype.generateWrappersForDefaultParameters$ALCompil
 	var $this = this;
 	this.getArguments$().forEach((function (argDecl, i, argDecls) {
 		var classDef;
-		var invocant;
-		var methodRef;
 		var args;
 		var j;
-		var callExpression;
 		var statement;
+		var invocant;
+		var methodRef;
+		var callExpression;
 		var wrapper;
 		if (argDecl.getDefaultValue$() == null) {
 			return;
 		}
 		classDef = $this.getClassDef$();
-		invocant = (($this.flags$() & ClassDefinition.IS_STATIC) === 0 ? new ThisExpression(new Token("this", false), classDef) : new ClassExpression(new Token(classDef.className$(), true), new ObjectType(classDef)));
-		methodRef = new PropertyExpression(new Token(".", false), invocant, $this.getNameToken$(), $this.getArgumentTypes$());
 		args = $this.getArguments$().slice(0, i).map((function (argDecl) {
 			return new LocalExpression(argDecl.getName$(), new LocalVariable(argDecl.getName$(), argDecl.getType$()));
 		}));
@@ -12327,11 +12325,17 @@ MemberFunctionDefinition.prototype.generateWrappersForDefaultParameters$ALCompil
 			}
 			args.push(argDecls[j].getDefaultValue$().clone$());
 		}
-		callExpression = new CallExpression(new Token("(", false), methodRef, args);
-		if ($this.getReturnType$() != Type.voidType) {
-			statement = new ReturnStatement(new Token("return", false), callExpression);
+		if ($this.name$() === "constructor") {
+			statement = new ConstructorInvocationStatement(new Token("this", false), new ObjectType(classDef), args);
 		} else {
-			statement = new ExpressionStatement(callExpression);
+			invocant = (($this.flags$() & ClassDefinition.IS_STATIC) === 0 ? new ThisExpression(new Token("this", false), classDef) : new ClassExpression(new Token(classDef.className$(), true), new ObjectType(classDef)));
+			methodRef = new PropertyExpression(new Token(".", false), invocant, $this.getNameToken$(), $this.getArgumentTypes$());
+			callExpression = new CallExpression(new Token("(", false), methodRef, args);
+			if ($this.getReturnType$() != Type.voidType) {
+				statement = new ReturnStatement(new Token("return", false), callExpression);
+			} else {
+				statement = new ExpressionStatement(callExpression);
+			}
 		}
 		wrapper = new MemberFunctionDefinition($this.getToken$(), $this.getNameToken$(), $this.flags$() | ClassDefinition.IS_INLINE, $this.getReturnType$(), argDecls.slice(0, i).map((function (argDecl) {
 			return new ArgumentDeclaration(argDecl.getName$(), argDecl.getType$());
@@ -24328,8 +24332,8 @@ _NewExpressionEmitter._operatorPrecedence = 0;
 _CommaExpressionEmitter._operatorPrecedence = 0;
 Meta.VERSION_STRING = "0.9.44";
 Meta.VERSION_NUMBER = 0.009044;
-Meta.LAST_COMMIT_HASH = "2e7c2cc2f0e9679d87637e03a8413711d6d0f4f6";
-Meta.LAST_COMMIT_DATE = "2013-06-24 23:14:39 -0700";
+Meta.LAST_COMMIT_HASH = "82f1e2143c01d40e1b2422ec53bad0f3c4c652af";
+Meta.LAST_COMMIT_DATE = "2013-06-25 00:38:18 -0700";
 $__jsx_lazy_init(Meta, "IDENTIFIER", function () {
 	return Meta.VERSION_STRING + " (" + Meta.LAST_COMMIT_DATE + "; " + Meta.LAST_COMMIT_HASH + ")";
 });
