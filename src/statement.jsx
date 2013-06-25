@@ -1578,25 +1578,32 @@ abstract class InformationStatement extends Statement {
 class AssertStatement extends InformationStatement {
 
 	var _expr : Expression;
+	var _msgExpr : Expression;
 
-	function constructor (token : Token, expr : Expression) {
+	function constructor (token : Token, expr : Expression, msgExpr : Expression) {
 		super(token);
 		this._expr = expr;
+		this._msgExpr = msgExpr;
 	}
 
 	override function clone () : Statement {
-		return new AssertStatement(this._token, this._expr.clone());
+		return new AssertStatement(this._token, this._expr.clone(), Cloner.<Expression>.cloneNullable(this._msgExpr));
 	}
 
 	function getExpr () : Expression {
 		return this._expr;
 	}
 
+	function getMessageExpr () : Expression {
+		return this._msgExpr;
+	}
+
 	override function serialize () : variant {
 		return [
 			"AssertStatement",
 			this._token.serialize(),
-			Serializer.<Expression>.serializeNullable(this._expr)
+			Serializer.<Expression>.serializeNullable(this._expr),
+			Serializer.<Expression>.serializeNullable(this._msgExpr)
 		] : variant[];
 	}
 
@@ -1606,11 +1613,20 @@ class AssertStatement extends InformationStatement {
 		var exprType = this._expr.getType();
 		if (exprType.equals(Type.voidType))
 			context.errors.push(new CompileError(this._expr.getToken(), "argument of the assert statement cannot be void"));
+		if (this._msgExpr != null) {
+			if (! this._analyzeExpr(context, this._msgExpr))
+				return true;
+			var msgExprType = this._msgExpr.getType();
+			if (! msgExprType.equals(Type.stringType))
+				context.errors.push(new CompileError(this._msgExpr.getToken(), "message expression of the assert statement must be of string type"));
+		}
 		return true;
 	}
 
 	override function forEachExpression (cb : function(:Expression,:function(:Expression):void):boolean) : boolean {
 		if (! cb(this._expr, function (expr) { this._expr = expr; }))
+			return false;
+		if (this._msgExpr != null && ! cb(this._msgExpr, function (expr) { this._msgExpr = expr; }))
 			return false;
 		return true;
 	}

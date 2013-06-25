@@ -2592,12 +2592,18 @@ class Parser {
 	}
 
 	function _assertStatement (token : Token) : boolean {
-		var expr = this._expr();
+		var expr = this._assignExpr(false);
 		if (expr == null)
 			return false;
+		var msgExpr : Expression = null;
+		if (this._expectOpt(",") != null) {
+			msgExpr = this._assignExpr(false);
+			if (msgExpr == null)
+				return false;
+		}
 		if (this._expect(";") == null)
 			return false;
-		this._statements.push(new AssertStatement(token, expr));
+		this._statements.push(new AssertStatement(token, expr, msgExpr));
 		return true;
 	}
 

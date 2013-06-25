@@ -1268,9 +1268,15 @@ class _AssertStatementEmitter extends _StatementEmitter {
 
 	override function emit () : void {
 		var condExpr = this._statement._expr;
-		this._emitter._emitAssertion(function () {
-			this._emitter._getExpressionEmitterFor(condExpr).emit(0);
-		}, condExpr.getToken(), "assertion failure");
+		if (this._statement._msgExpr != null) {
+			this._emitter._emitAssertionWithMsg(function () {
+				this._emitter._getExpressionEmitterFor(condExpr).emit(0);
+			}, condExpr.getToken(), "assertion failure", this._statement._msgExpr);
+		} else {
+			this._emitter._emitAssertion(function () {
+				this._emitter._getExpressionEmitterFor(condExpr).emit(0);
+			}, condExpr.getToken(), "assertion failure");
+		}
 	}
 
 }
@@ -3603,6 +3609,21 @@ class JavaScriptEmitter implements Emitter {
 		var s = Util.makeErrorMessage(this._platform, message, token.getFilename(), token.getLineNumber(), token.getColumnNumber(), token.getValue().length);
 		var err = Util.format('throw new Error(%1);\n', [Util.encodeStringLiteral(s)]);
 		this._emit(err, token);
+		this._reduceIndent();
+		this._emit("}\n", null);
+	}
+
+	function _emitAssertionWithMsg (emitTestExpr : function():void, token : Token, message : string, msgExpr : Expression) : void {
+		this._emit("if (! (", token);
+		emitTestExpr();
+		this._emit(")) {\n", null);
+		this._advanceIndent();
+		this._emit("debugger;\n", null);
+		// any other better way?
+		var s = Util.makeErrorMessage(this._platform, message + ": {MSG}", token.getFilename(), token.getLineNumber(), token.getColumnNumber(), token.getValue().length).split("{MSG}");
+		this._emit(Util.format('throw new Error(%1 + ', [Util.encodeStringLiteral(s[0])]), token);
+		this._getExpressionEmitterFor(msgExpr).emit(0);
+		this._emit(Util.format(' + %1);\n', [Util.encodeStringLiteral(s[1])]), token);
 		this._reduceIndent();
 		this._emit("}\n", null);
 	}
