@@ -1368,10 +1368,12 @@ class _IfStatementTransformer extends _StatementTransformer {
 class _SwitchStatementTransformer extends _LabellableStatementTransformer {
 
 	var _statement : SwitchStatement;
+	var _escapeMap : Map.<number>;
 
 	function constructor (transformer : CodeTransformer, statement : SwitchStatement) {
 		super(transformer, "SWITCH");
 		this._statement = statement;
+		this._escapeMap = new Map.<number>;
 	}
 
 	override function getStatement () : Statement {
@@ -1474,7 +1476,7 @@ class _SwitchStatementTransformer extends _LabellableStatementTransformer {
 	}
 
 	function _getLabelFromCaseStatement (caseStmt : CaseStatement) : string {
-		return "$SWITCH_" + this.getID() as string + "_CASE_" + caseStmt.getExpr().getToken().getValue();
+		return "$SWITCH_" + this.getID() as string + "_CASE_" + this.escapeCaseExpression(caseStmt.getExpr().getToken().getValue());
 	}
 
 	function _getLabelFromDefaultStatement () : string {
@@ -1487,6 +1489,14 @@ class _SwitchStatementTransformer extends _LabellableStatementTransformer {
 
 	override function getContinuingLabel () : string {
 		throw new Error("logic flaw");
+	}
+
+	function escapeCaseExpression (value : string) : string {
+		if (value in this._escapeMap) {
+			return this._escapeMap[value] as string;
+		}
+		this._escapeMap[value] = this._escapeMap.keys().length;
+		return this._escapeMap[value] as string;
 	}
 
 }
