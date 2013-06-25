@@ -98,12 +98,13 @@ class JSXCommand {
 
 		var tasks = new Array.<() -> void>;
 
-		var optimizer = null : Optimizer;
-		var completionRequest = null : CompletionRequest;
-		var emitter = null : Emitter;
-		var outputFile = null : Nullable.<string>;
-		var inputFilename = null : Nullable.<string>;
-		var executable = null : Nullable.<string>;
+		var optimizer : Optimizer = null;
+		var transformer : CodeTransformer = null;
+		var completionRequest : CompletionRequest = null;
+		var emitter : Emitter = null;
+		var outputFile : Nullable.<string> = null;
+		var inputFilename : Nullable.<string> = null;
+		var executable : Nullable.<string> = null;
 		var setBootstrapMode = function (sourceFile : string) : void {};
 		var runImmediately = false;
 		var optimizeCommands = new string[];
@@ -316,6 +317,13 @@ class JSXCommand {
 							};
 						}(mode));
 						break NEXTOPT;
+					case "cps-transform":
+						tasks.push(function (mode : boolean) : () -> void {
+							return function () {
+								transformer.setForceTransform(mode);
+							};
+						}(mode));
+						break NEXTOPT;
 					default:
 						break;
 					}
@@ -387,6 +395,8 @@ class JSXCommand {
 
 		optimizer = new Optimizer();
 
+		transformer = new CodeTransformer();
+
 		tasks.forEach(function(proc) { proc(); });
 
 		if (emitter.getEnableMinifier() && emitter.getEnableSourceMap()) {
@@ -404,8 +414,6 @@ class JSXCommand {
 		emitter.setOutputFile(outputFile);
 
 		compiler.setOptimizer(optimizer);
-
-		var transformer = new CodeTransformer();
 
 		compiler.setTransformer(transformer);
 

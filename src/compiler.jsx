@@ -345,42 +345,8 @@ class Compiler {
 	}
 
 	function _transform () : void {
-		if (this._transformer == null)
-			return;
-		this._transformer.setup(this);
-		function hasForInStatement (funcDef : MemberFunctionDefinition) : boolean {
-			return ! funcDef.forEachStatement(function onStatement (statement) {
-				if (statement instanceof ForInStatement)
-					return false;
-				return statement.forEachStatement(onStatement);
-			});
-		}
-		// transform all functions
-		this.forEachClassDef(function (parser, classDef) {
-			return classDef.forEachMember(function onMember(member) {
-				if (member instanceof MemberFunctionDefinition) {
-					var funcDef = member as MemberFunctionDefinition;
-					if (funcDef.getStatements() != null && funcDef.name() != "constructor" && ! hasForInStatement(funcDef)) {
-						this._transformer._doCPSTransform(funcDef);
-					}
-				}
-				return true;
-			});
-		});
-		// transform generators
-		this.forEachClassDef(function (parser, classDef) {
-			return classDef.forEachMember(function onMember(member) {
-				if (member instanceof MemberFunctionDefinition) {
-					var funcDef = member as MemberFunctionDefinition;
-					if (funcDef.isGenerator()) {
-						this._transformer.transformFunctionDefinition(funcDef);
-					}
-				}
-				return member.forEachClosure(function (funcDef) {
-					return onMember(funcDef);
-				});
-			});
-		});
+		if (this._transformer != null)
+			this._transformer.setup(this).performTransformation();
 	}
 
 	function _optimize () : void {

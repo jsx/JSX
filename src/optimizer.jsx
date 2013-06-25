@@ -3026,7 +3026,8 @@ class _LCSEOptimizeCommand extends _FunctionOptimizeCommand {
 
 		var getCacheKey = function (expr : Expression) : Nullable.<string> {
 			if (expr instanceof PropertyExpression) {
-                var propertyExpr = expr as PropertyExpression;
+				var propertyExpr = expr as PropertyExpression;
+				this.log(JSON.stringify(propertyExpr.getToken()));
 				var receiverType = propertyExpr.getExpr().getType();
 				if (receiverType instanceof ObjectType && _Util.classIsNative(receiverType.getClassDef())) {
 					return null;
@@ -3089,7 +3090,7 @@ class _LCSEOptimizeCommand extends _FunctionOptimizeCommand {
 		var onExpr = function (expr : Expression, replaceCb : function(:Expression):void) : boolean {
 			// handle special cases first
 			if (expr instanceof AssignmentExpression) {
-                var assignmentExpr =expr as AssignmentExpression;
+				var assignmentExpr =expr as AssignmentExpression;
 				var lhsExpr = assignmentExpr.getFirstExpr();
 				if (lhsExpr instanceof LocalExpression) {
 					onExpr(assignmentExpr.getSecondExpr(), function (expr) {

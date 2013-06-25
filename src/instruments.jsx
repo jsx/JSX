@@ -419,11 +419,11 @@ class _PropertyExpressionTransformer extends _UnaryExpressionTransformer {
 	}
 
 	override function doCPSTransform (parent : MemberFunctionDefinition, continuation : Expression) : Expression {
-		// obj.method
+		// member method
 		if (this._expr.getType() instanceof MemberFunctionType) {
 			throw new Error("logic flaw");
 		}
-		// Klass.staticMethod
+		// static member
 		if (this._expr.getExpr() instanceof ClassExpression) {
 			return this._createCall1(continuation, this._expr);
 		}
@@ -1640,20 +1640,69 @@ class _DebuggerStatementTransformer extends _StatementTransformer {
 
 class CodeTransformer {
 
+	var _forceTransform : boolean;
+	var _compiler : Compiler;
+
 	var _stopIterationClassDef : ClassDefinition;
 	var _jsxGeneratorClassDef : TemplateClassDefinition;
 
 	function constructor () {
+		this._forceTransform = false;
+
 		this._stopIterationClassDef = null;
 		this._jsxGeneratorClassDef = null;
 	}
 
-	function setup (compiler : Compiler) : void {
+	function setup (compiler : Compiler) : CodeTransformer {
+		this._compiler = compiler;
 		var builtins = compiler.getBuiltinParsers()[0];
 		this._stopIterationClassDef = builtins.lookup([], null, "g_StopIteration");
 		for (var i = 0; i < builtins._templateClassDefs.length; ++i)
 			if (builtins._templateClassDefs[i].className() == "__jsx_generator")
 				this._jsxGeneratorClassDef = builtins._templateClassDefs[i];
+		return this;
+	}
+
+	function performTransformation () : void {
+		function hasForInStatement (funcDef : MemberFunctionDefinition) : boolean {
+			return ! funcDef.forEachStatement(function onStatement (statement) {
+				if (statement instanceof ForInStatement)
+					return false;
+				return statement.forEachStatement(onStatement);
+			});
+		}
+		// transform all functions
+		if (this._forceTransform) {
+			this._compiler.forEachClassDef(function (parser, classDef) {
+				return classDef.forEachMember(function onMember(member) {
+					if (member instanceof MemberFunctionDefinition) {
+						var funcDef = member as MemberFunctionDefinition;
+						if (funcDef.getStatements() != null && funcDef.name() != "constructor" && ! hasForInStatement(funcDef)) {
+							this._doCPSTransform(funcDef);
+						}
+					}
+					return true;
+				});
+			});
+		}
+		// transform generators
+		this._compiler.forEachClassDef(function (parser, classDef) {
+			return classDef.forEachMember(function onMember(member) {
+				if (member instanceof MemberFunctionDefinition) {
+					var funcDef = member as MemberFunctionDefinition;
+					if (funcDef.isGenerator()) {
+						this.transformFunctionDefinition(funcDef);
+					}
+				}
+				return member.forEachClosure(function (funcDef) {
+					return onMember(funcDef);
+				});
+			});
+		});
+	}
+
+	function setForceTransform (force : boolean) : void {
+		this._forceTransform = force;
 	}
 
 	var _labelMap = new _LabellableStatementTransformer[];
