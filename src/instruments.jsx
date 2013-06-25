@@ -368,7 +368,65 @@ class _LogicalNotExpressionTransformer extends _UnaryExpressionTransformer {
 
 }
 
-class _PostIncrementExpressionTransformer extends _UnaryExpressionTransformer {
+abstract class _IncrementExpressionTransformer extends _UnaryExpressionTransformer {
+
+	function constructor (transformer : CodeTransformer, expr : IncrementExpression) {
+		super(transformer, expr);
+	}
+
+	override function doCPSTransform (parent : MemberFunctionDefinition, continuation : Expression) : Expression {
+		// expr must be of any of type 'local', 'property', and 'array'
+
+		var expr = this._expr.getExpr();
+		if (expr instanceof LocalExpression || (expr instanceof PropertyExpression && (expr as PropertyExpression).getExpr().isClassSpecifier())) {
+			/*
+			  local_or_classvar++ | C
+
+			  C(local_or_classvar++)
+			*/
+
+			return this._createCall1(continuation, this._expr);
+		} else if (expr instanceof PropertyExpression) {
+			/*
+			  E.prop++ | C
+
+			  E | function ($1) { return C($1.prop++); }
+			*/
+
+			return this._transformOp(parent, continuation, [ (expr as PropertyExpression).getExpr() ]);
+		} else if (expr instanceof ArrayExpression) {
+			/*
+			  E1[E2]++ | C
+
+			  E1 | function ($1) { return E2 | function ($2) { return C($1[$2]++); }; }
+			*/
+			var arrayExpr = expr as ArrayExpression;
+			return this._transformOp(parent, continuation, [ arrayExpr.getFirstExpr(), arrayExpr.getSecondExpr() ]);
+		} else {
+			throw new Error("logic flaw");
+		}
+	}
+
+	override function _constructOp (exprs : Expression[]) : Expression {
+		var expr = this._expr.getExpr();
+		if (expr instanceof PropertyExpression) {
+			assert exprs.length == 1;
+			var propertyExpr = (expr as PropertyExpression).clone();
+			propertyExpr._expr = exprs[0];
+			return this._clone(propertyExpr);
+		} else if (expr instanceof ArrayExpression) {
+			assert exprs.length == 2;
+			var arrayExpr = new ArrayExpression(expr.getToken(), exprs[0], exprs[1]);
+			arrayExpr._type = expr.getType();
+			return this._clone(arrayExpr);
+		} else {
+			throw new Error("logic flaw");
+		}
+	}
+
+}
+
+class _PostIncrementExpressionTransformer extends _IncrementExpressionTransformer {
 
 	function constructor (transformer : CodeTransformer, expr : IncrementExpression) {
 		super(transformer, expr);
@@ -380,7 +438,7 @@ class _PostIncrementExpressionTransformer extends _UnaryExpressionTransformer {
 
 }
 
-class _PreIncrementExpressionTransformer extends _UnaryExpressionTransformer {
+class _PreIncrementExpressionTransformer extends _IncrementExpressionTransformer {
 
 	function constructor (transformer : CodeTransformer, expr : IncrementExpression) {
 		super(transformer, expr);
@@ -534,7 +592,7 @@ class _AssignmentExpressionTransformer extends _ExpressionTransformer {
 
 	function _transformSimpleAssignment (parent : MemberFunctionDefinition, continuation : Expression) : Expression {
 		/*
-		  op(local_or_classvar,E) | C
+		  local_or_classvar = E | C
 
 		  E | function ($1) { return C(local_or_classvar = $1); }
 		*/
