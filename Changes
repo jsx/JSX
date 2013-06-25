@@ -1,5 +1,9 @@
 Revision history for the JSX software development kit
 
+0.9.44 2013-06-25 09:35:00+0900
+    [CHANGES]
+    - assertions with customized messages (#198)
+
 0.9.43 2013-06-25 08:35:00+0900
     [CHANGES]
     - introduce default parameters (#199)
