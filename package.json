@@ -45,7 +45,6 @@
   },
 
   "scripts" : {
-	  "postpublish" : "node tool/bootstrap-compiler.js --run tool/postpublish.jsx",
-	  "preinstall" :  "node tool/bootstrap-compiler.js --run tool/preinstall.jsx"
+	  "postpublish" : "node tool/bootstrap-compiler.js --run tool/postpublish.jsx"
   }
 }
