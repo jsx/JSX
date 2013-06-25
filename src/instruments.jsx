@@ -1884,8 +1884,8 @@ class CodeTransformer {
 	function _getExpressionTransformerFor (expr : Expression) : _ExpressionTransformer {
 		if (expr instanceof LocalExpression)
 			return new _LeafExpressionTransformer(this, expr as LocalExpression);
-		// else if (expr instanceof ClassExpression)
-		// 	return new _ClassExpressionTransformer(this, expr as ClassExpression);
+		else if (expr instanceof ClassExpression)
+			throw new Error("logic flaw");
 		else if (expr instanceof NullExpression)
 			return new _LeafExpressionTransformer(this, expr as NullExpression);
 		else if (expr instanceof BooleanLiteralExpression)
