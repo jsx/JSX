@@ -48,6 +48,7 @@ final class node {
 	static const http          = node.require('http') as __noconvert__ _http;
 	static const https         = node.require('https') as __noconvert__ _https;
 	static const net           = node.require('net') as __noconvert__ _net;
+	static const util          = node.require('util') as __noconvert__ _util;
 }
 
 native __fake__ class EventEmitter {
@@ -464,4 +465,13 @@ native __fake__ class _https {
 
 native __fake__ class _net {
 	// TODO
+}
+
+native __fake__ class _util {
+	function debug(str : string) : void;
+	function puts(...args : variant) : void;
+	function print(...args : variant) : void;
+	function log(str : string) : void;
+	function inspect(object : variant) : string;
+	function inspect(object : variant, options : variant) : string;
 }
