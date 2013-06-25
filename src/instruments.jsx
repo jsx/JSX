@@ -141,27 +141,6 @@ abstract class _ExpressionTransformer {
 		);
 	}
 
-	// function _createContinuation (parent : MemberFunctionDefinition, arg : ArgumentDeclaration, contBody : Expression) : FunctionExpression {
-
-	// 	var closures = new MemberFunctionDefinition[];
-	// 	this._detachClosures(parent, contBody, closures);
-
-	// 	var contFuncDef = new MemberFunctionDefinition(
-	// 		new Token("function", false),
-	// 		null,	// name
-	// 		ClassDefinition.IS_STATIC,
-	// 		Type.voidType,
-	// 		[ arg ],
-	// 		[],	// locals
-	// 		(contBody == null) ? new Statement[] : ([ new ReturnStatement(new Token("return", false), contBody) ] : Statement[]),
-	// 		closures,
-	// 		null,
-	// 		null
-	// 	);
-	// 	parent.getClosures().push(contFuncDef);
-	// 	return new FunctionExpression(contFuncDef.getToken(), contFuncDef);
-	// }
-
 	function _detachClosures (parent : MemberFunctionDefinition, expr : Expression, closures : MemberFunctionDefinition[]) : void {
 		expr.forEachExpression(function (expr) {
 			if (expr instanceof FunctionExpression) {
@@ -431,7 +410,9 @@ class _PropertyExpressionTransformer extends _UnaryExpressionTransformer {
 	}
 
 	override function _clone (arg : Expression) : UnaryExpression {
-		return new PropertyExpression(this._expr.getToken(), arg, (this._expr as PropertyExpression).getIdentifierToken(), (this._expr as PropertyExpression).getTypeArguments(), this._expr.getType());
+		var propExpr = new PropertyExpression(this._expr.getToken(), arg, (this._expr as PropertyExpression).getIdentifierToken(), (this._expr as PropertyExpression).getTypeArguments(), this._expr.getType());
+		propExpr._isInner = (this._expr as PropertyExpression)._isInner;
+		return propExpr;
 	}
 
 }
@@ -1656,10 +1637,15 @@ class CodeTransformer {
 	function setup (compiler : Compiler) : CodeTransformer {
 		this._compiler = compiler;
 		var builtins = compiler.getBuiltinParsers()[0];
+
 		this._stopIterationClassDef = builtins.lookup([], null, "g_StopIteration");
 		for (var i = 0; i < builtins._templateClassDefs.length; ++i)
 			if (builtins._templateClassDefs[i].className() == "__jsx_generator")
 				this._jsxGeneratorClassDef = builtins._templateClassDefs[i];
+
+		assert this._stopIterationClassDef != null;
+		assert this._jsxGeneratorClassDef != null;
+
 		return this;
 	}
 
