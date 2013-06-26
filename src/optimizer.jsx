@@ -1484,14 +1484,8 @@ class _UnclassifyOptimizationCommand extends _OptimizeCommand {
 					// depends on "this" inside constructors
 					return false;
 				} else if (expr instanceof LocalExpression) {
-					var args = funcDef.getArguments();
-					var localVarToFind = (expr as LocalExpression).getLocal();
-					for (var argIndex = 0; argIndex < args.length; ++argIndex) {
-						if (args[argIndex].getName().getValue() == localVarToFind.getName().getValue()) {
-							break;
-						}
-					}
-					if (argIndex == args.length) {
+					var argIndex = funcDef.getArguments().map.<LocalVariable>((i) -> i).indexOf((expr as LocalExpression).getLocal());
+					if (argIndex == -1) {
 						throw new Error("logic flaw; could not find argument: " + (expr as LocalExpression).getLocal().getName().getValue());
 					}
 					if (expectedArgIndex != argIndex) {
