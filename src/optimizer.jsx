@@ -3347,7 +3347,9 @@ class _UnboxOptimizeCommand extends _FunctionOptimizeCommand {
 			}
 			// check the rest
 			if (statement instanceof FunctionStatement) {
-				(statement as FunctionStatement).getFuncDef().forEachStatement(onStatement);
+				if (! (statement as FunctionStatement).getFuncDef().forEachStatement(onStatement)) {
+					return false;
+				}
 			}
 			if (! statement.forEachExpression(onExpr)) {
 				return false;
