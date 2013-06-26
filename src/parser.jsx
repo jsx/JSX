@@ -877,7 +877,7 @@ class Parser {
 	function _registerLocal (identifierToken : Token, type : Type) : LocalVariable {
 		function isEqualTo (local : LocalVariable) : boolean {
 			if (local.getName().getValue() == identifierToken.getValue()) {
-				if (type != null && ! local.getType().equals(type))
+				if (type != null && local.getType() != null && ! local.getType().equals(type))
 					this._newError("conflicting types for variable " + identifierToken.getValue());
 				return true;
 			}
