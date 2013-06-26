@@ -3293,7 +3293,6 @@ class Parser {
 						return null;
 					}
 				}
-				var defaultValue : Expression = null;
 				if (isVarArg) {
 					// vararg is the last argument
 					if (argType == null && isVarArg)
@@ -3303,8 +3302,14 @@ class Parser {
 						return null;
 					break;
 				}
-				else if (this._expectOpt("=") != null)  {
+				var defaultValue : Expression = null;
+				if (this._expectOpt("=") != null)  {
 					if ((defaultValue = this._assignExpr(true)) == null) {
+						return null;
+					}
+				} else {
+					if (args.length != 0 && args[args.length - 1].getDefaultValue() != null) {
+						this._errors.push(new CompileError(argName, "required argument cannot be declared after an optional argument"));
 						return null;
 					}
 				}
