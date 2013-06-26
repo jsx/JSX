@@ -2768,6 +2768,7 @@ class JavaScriptEmitter implements Emitter {
 	var _fileFooter =                     "})(JSX);\n";
 
 	var _platform : Platform;
+	var _runenv : string;
 
 	// properties setup by _emitInit
 	var _output : string;
@@ -2796,7 +2797,10 @@ class JavaScriptEmitter implements Emitter {
 	function isJsModule(classDef : ClassDefinition) : boolean {
 		return classDef.className() == "js"
 			&& classDef.getToken().getFilename() == Util.resolvePath(this._platform.getRoot() + "/lib/js/js.jsx");
+	}
 
+	override function setRunEnv (runenv : string) : void {
+		this._runenv = runenv;
 	}
 
 	override function getSearchPaths () : string[] {
@@ -2809,7 +2813,7 @@ class JavaScriptEmitter implements Emitter {
 		this._outputFile = Util.resolvePath(name);
 
 		if(this._enableSourceMap) {
-			this._sourceMapper = new SourceMapper(this._platform.getRoot(), name);
+			this._sourceMapper = new SourceMapper(this._platform.getRoot(), name, this._runenv);
 		}
 	}
 
@@ -3164,8 +3168,12 @@ class JavaScriptEmitter implements Emitter {
 	}
 
 	override function getOutput () : string {
-		// do not add any lines before this._output for source-map
-		var output = this._output + "\n";
+		var output = "";
+		// do not add any lines except source-map header before this._output for source-map
+		if (this._sourceMapper) {
+			output += this._sourceMapper.getSourceMapHeader();
+		}
+		output += this._output + "\n";
 		if (this._enableProfiler) {
 			output += this._platform.load(this._platform.getRoot() + "/src/js/profiler.js");
 		}
