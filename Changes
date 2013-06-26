@@ -1,5 +1,12 @@
 Revision history for the JSX software development kit
 
+0.9.46 2013-06-26 13:19:14-0700
+    [FEATURES:
+    - Show JSX source code position in stacktrace with --enable-source-map
+      (#201, EXPERIMENTAL)
+    [BUG FIXES]
+    - Fix a crash with double definitions of variables without type (#202)
+
 0.9.45 2013-06-26 12:32:00+0900
     [CHANGES]
     - add "util" to nodejs.jsx
