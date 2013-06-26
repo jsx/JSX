@@ -26,6 +26,8 @@ import "./platform.jsx";
 
 interface Emitter implements Stashable {
 
+	function setRunEnv(runenv : string) : void;
+
 	function getSearchPaths():string[];
 
 	function setOutputFile(filename :Nullable.<string>) :void;
