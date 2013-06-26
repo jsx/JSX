@@ -39,11 +39,7 @@ class Token {
 	var _lineNumber : number;
 	var _columnNumber : number;
 
-	function constructor (value : string, isIdentifier : boolean) {
-		this(value, isIdentifier, null, NaN, NaN);
-	}
-
-	function constructor (value : string, isIdentifier : boolean, filename : Nullable.<string>, lineNumber : number, columnNumber : number) {
+	function constructor (value : string, isIdentifier : boolean = false, filename : Nullable.<string> = null, lineNumber : number = NaN, columnNumber : number = NaN) {
 		this._value = value;
 		this._isIdentifier = isIdentifier;
 		this._filename = filename;
