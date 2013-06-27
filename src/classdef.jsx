@@ -1937,7 +1937,7 @@ class TemplateFunctionDefinition extends MemberFunctionDefinition implements Tem
 				// formal is a type parameter
 				if ((formal as ParsedObjectType).getTypeArguments().length == 0 && typemap.hasOwnProperty((formal as ParsedObjectType).getToken().getValue())) {
 					var expectedType = typemap[(formal as ParsedObjectType).getToken().getValue()];
-					if (expectedType != null) { // already unified
+					if (expectedType != null) { // already unified, check if arg type is the expected one
 						if (exact && ! expectedType.equals(actual)) {
 							// TODO push compile errors
 							return false;
