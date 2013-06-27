@@ -1,7 +1,12 @@
 Revision history for the JSX software development kit
 
+0.9.47 2013-06-26 23:49:41-0700
+    [FEATURES]
+    - Support self-contained source-map; now `jsx --enable-source-map --run`
+      dumps stacktrace with JSX source code positions
+
 0.9.46 2013-06-26 13:19:14-0700
-    [FEATURES:
+    [FEATURES]
     - Show JSX source code position in stacktrace with --enable-source-map
       (#201, EXPERIMENTAL)
     [BUG FIXES]
