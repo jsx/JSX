@@ -155,7 +155,8 @@ class SourceMapper {
 			sourceMappingURL = Util.basename(this.getSourceMappingFile());
 		}
 		else {
-			sourceMappingURL = "data:application/json,base64," + (new Buffer(this.generate(), "utf8").toString("base64"));
+			// uses Data URI scheme
+			sourceMappingURL = "data:application/json;base64," + (new Buffer(this.generate(), "utf8").toString("base64"));
 		}
 		return "\n" + "//# sourceMappingURL=" + sourceMappingURL + "\n";
 	}
