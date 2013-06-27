@@ -1910,7 +1910,7 @@ class TemplateFunctionDefinition extends MemberFunctionDefinition implements Tem
 
 	override function instantiate (instantiationContext : InstantiationContext) : MemberFunctionDefinition {
 		var instantiated = new TemplateFunctionDefinition(
-			this._token, this.getNameToken(), this.flags(), this._typeArgs.concat(new Token[]), this._returnType, this._args.concat(new ArgumentDeclaration[]),
+			this._token, this.getNameToken(), this.flags(), this._typeArgs.concat([]), this._returnType, this._args.concat([]),
 			this._locals, this._statements, this._closures, this._lastTokenOfBody, this._docComment);
 		for (var k in this._resolvedTypemap) {
 			instantiated._resolvedTypemap[k] = this._resolvedTypemap[k];
@@ -1969,7 +1969,7 @@ class TemplateFunctionDefinition extends MemberFunctionDefinition implements Tem
 				}
 				// unify recursively
 				for (var i = 0; i < formalFuncType.getArgumentTypes().length; ++i) {
-					if (! unify(formalFuncType.getArgumentTypes()[i], formalFuncType.getArgumentTypes()[i]))
+					if (! unify(formalFuncType.getArgumentTypes()[i], actualFuncType.getArgumentTypes()[i]))
 						return false;
 				}
 				if (! unify(formalFuncType.getReturnType(), actualFuncType.getReturnType()))
