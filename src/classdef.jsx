@@ -1928,20 +1928,30 @@ class TemplateFunctionDefinition extends MemberFunctionDefinition implements Tem
 		}
 
 		function unify (formal : Type, actual : Type) : boolean {
-			// formal is a type parameter
-			if (formal instanceof ParsedObjectType && typemap.hasOwnProperty((formal as ParsedObjectType).getToken().getValue())) {
-				var resolvedType = typemap[(formal as ParsedObjectType).getToken().getValue()];
-				if (resolvedType != null) {
-					if (exact && ! formal.equals(actual)) {
-						// TODO push compile errors
-						return false;
-					}
-					if (! actual.isConvertibleTo(formal)) {
-						// TODO push compile errors
-						return false;
+			if (formal instanceof ParsedObjectType) {
+				// TODO enclosing types
+
+				// formal is a type parameter
+				if ((formal as ParsedObjectType).getTypeArguments().length == 0 && typemap.hasOwnProperty((formal as ParsedObjectType).getToken().getValue())) {
+					var expectedType = typemap[(formal as ParsedObjectType).getToken().getValue()];
+					if (expectedType != null) { // already unified
+						if (exact && ! expectedType.equals(actual)) {
+							// TODO push compile errors
+							return false;
+						}
+						if (! actual.isConvertibleTo(expectedType)) {
+							// TODO push compile errors
+							return false;
+						}
+					} else {
+						typemap[(formal as ParsedObjectType).getToken().getValue()] = actual;
 					}
 				} else {
-					typemap[(formal as ParsedObjectType).getToken().getValue()] = actual;
+					// TODO support arbitrary parameterized class
+				}
+			} else if (formal instanceof NullableType) {
+				if (! unify((formal as NullableType).getBaseType(), actual)) {
+					return false;
 				}
 			} else if (formal instanceof StaticFunctionType) {
 				if (! (actual instanceof StaticFunctionType)) {
