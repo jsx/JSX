@@ -1915,6 +1915,74 @@ class TemplateFunctionDefinition extends MemberFunctionDefinition implements Tem
 		return instantiated;
 	}
 
+	function instantiateByArgumentTypes (errors : CompileError[], token : Token, actualArgTypes : Type[]) : MemberFunctionDefinition {
+		var typemap = new Map.<Type>;
+		for (var k in this._resolvedTypemap) {
+			typemap[k] = this._resolvedTypemap[k];
+		}
+
+		function unify (formal : Type, actual : Type) : boolean {
+			// formal is a type parameter
+			if (formal instanceof ParsedObjectType && typemap.hasOwnProperty((formal as ParsedObjectType).getToken().getValue())) {
+				var resolvedType = typemap[(formal as ParsedObjectType).getToken().getValue()];
+				if (resolvedType != null) {
+					if (! formal.equals(actual)) {
+						// TODO push compile errors
+						return false;
+					}
+				} else {
+					typemap[(formal as ParsedObjectType).getToken().getValue()] = actual;
+				}
+			} else if (formal instanceof StaticFunctionType) {
+				if (! (actual instanceof StaticFunctionType)) {
+					// TODO push a compile error
+					return false;
+				}
+				var formalFuncType = formal as StaticFunctionType;
+				var actualFuncType = actual as StaticFunctionType;
+				if (formalFuncType.getArgumentTypes().length != actualFuncType.getArgumentTypes().length) {
+					// TODO push a compile error
+					return false;
+				}
+				// unify recursively
+				for (var i = 0; i < formalFuncType.getArgumentTypes().length; ++i) {
+					if (! unify(formalFuncType.getArgumentTypes()[i], formalFuncType.getArgumentTypes()[i]))
+						return false;
+				}
+				if (! unify(formalFuncType.getReturnType(), actualFuncType.getReturnType()))
+					return false;
+			} else {
+				if (! formal.equals(actual)) {
+					// TODO push a compile error
+					return false;
+				}
+			}
+			return true;
+		}
+
+		// infer type parameters from actual arguments
+		var formalArgTypes = this.getArgumentTypes();
+		for (var i = 0; i < formalArgTypes.length; ++i) {
+			if (! unify(formalArgTypes[i], actualArgTypes[i]))
+				break;
+		}
+		if (i != formalArgTypes.length)
+			return null;
+
+		// run instantiation if typemap satisfies all type parameters
+		var typeArgs = new Type[];
+		for (var i = 0; i < this._typeArgs.length; ++i) {
+			if ((typeArgs[i] = typemap[this._typeArgs[i].getValue()]) == null)
+				break;
+		}
+		if (i != this._typeArgs.length) {
+			// TODO push a compile error
+			return null;
+		} else {
+			return this.instantiateTemplateFunction(errors, token, typeArgs);
+		}
+	}
+
 	function instantiateTemplateFunction (errors : CompileError[], token : Token, typeArgs : Type[]) : MemberFunctionDefinition {
 		// return the already-instantiated one, if exists
 		var instantiated : MemberFunctionDefinition = this._instantiatedDefs.get(typeArgs);
