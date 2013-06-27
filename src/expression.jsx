@@ -1553,9 +1553,7 @@ class AssignmentExpression extends BinaryExpression {
 		if (this._expr2 instanceof FunctionExpression)
 			return this._analyzeFunctionExpressionAssignment(context, parentExpr);
 		// special handling for v = {} or v = []
-		if (this._expr2.getType() == null
-			&& (this._expr2 instanceof ArrayLiteralExpression && (this._expr2 as ArrayLiteralExpression).getExprs().length == 0)
-			|| (this._expr2 instanceof MapLiteralExpression && (this._expr2 as MapLiteralExpression).getElements().length == 0))
+		if ((this._expr2 instanceof ArrayLiteralExpression && (this._expr2 as ArrayLiteralExpression).getExprs().length == 0 && this._expr2.getType() == null) || (this._expr2 instanceof MapLiteralExpression && (this._expr2 as MapLiteralExpression).getElements().length == 0 && this._expr2.getType() == null))
 				return this._analyzeEmptyLiteralAssignment(context, parentExpr);
 		// normal handling
 		if (! this._analyze(context))
