@@ -2779,7 +2779,6 @@ class JavaScriptEmitter implements Emitter {
 	var _emittingFunction : MemberFunctionDefinition;
 
 	// modes
-	var _enableSourceMap : boolean;
 	var _enableProfiler : boolean;
 	var _enableMinifier : boolean;
 	var _enableRunTimeTypeCheck = true;
@@ -2811,16 +2810,12 @@ class JavaScriptEmitter implements Emitter {
 		if (name == null) return;
 
 		this._outputFile = Util.resolvePath(name);
-
-		if(this._enableSourceMap) {
-			this._sourceMapper = new SourceMapper(this._platform.getRoot(), name, this._runenv);
-		}
 	}
 
 	override function getSourceMappingFiles() : Map.<string> {
 		var files = new Map.<string>;
 		var sourceMapper = this._sourceMapper;
-		if(sourceMapper != null) {
+		if(sourceMapper != null && this._outputFile != null) {
 			sourceMapper.getSourceFiles().forEach((filename) -> {
 				try {
 					sourceMapper.setSourceContent(filename, this._platform.load(filename));
@@ -2836,10 +2831,6 @@ class JavaScriptEmitter implements Emitter {
 		return files;
 	}
 
-	function setSourceMapper(gen : SourceMapper) : void {
-		this._sourceMapper = gen;
-	}
-
 	function getMangler() : _Mangler {
 		return this._mangler;
 	}
@@ -2853,11 +2844,13 @@ class JavaScriptEmitter implements Emitter {
 	}
 
 	override function getEnableSourceMap() : boolean {
-		return this._enableSourceMap;
+		return this._sourceMapper != null;
 	}
 
 	override function setEnableSourceMap (enable : boolean) : void {
-		this._enableSourceMap = enable;
+		this._sourceMapper = enable
+			? new SourceMapper(this._platform.getRoot(), this._outputFile, this._runenv)
+			: null;
 	}
 
 	override function setEnableProfiler (enable : boolean) : void {
@@ -2875,7 +2868,7 @@ class JavaScriptEmitter implements Emitter {
 	override function emit (classDefs : ClassDefinition[]) : void {
 
 		// current impl. of _Minifier.minifyJavaScript does not support transforming source map
-		assert ! (this._enableMinifier && this._enableSourceMap);
+		assert ! (this._enableMinifier && this._sourceMapper);
 
 		_Util.setOutputClassNames(classDefs);
 
@@ -2900,7 +2893,6 @@ class JavaScriptEmitter implements Emitter {
 	function _emitInit() : void {
 		this._output = "";
 		this._outputEndsWithReturn = true;
-		this._outputFile = null;
 		this._indent = 0;
 		this._emittingClass = null;
 		this._emittingFunction = null;
@@ -3182,7 +3174,7 @@ class JavaScriptEmitter implements Emitter {
 		}
 		output += this._fileFooter;
 		if (this._sourceMapper) {
-			output += this._sourceMapper.magicToken();
+			output += this._sourceMapper.getSourceMapFooter();
 		}
 		if (this._enableMinifier) {
 			output = _Minifier.minifyJavaScript(output);

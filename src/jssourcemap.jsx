@@ -26,6 +26,7 @@
  */
 
 import "./util.jsx";
+import "js/nodejs.jsx"; // for base64 encode
 
 native ("require('source-map').SourceMapGenerator") class SourceMapGenerator {
 	function constructor(options : Map.<string>);
@@ -45,7 +46,7 @@ class SourceMapper {
 	static const WEB_SOURCE_MAP_HEADER = "";
 
 	var _rootDir : string;
-	var _outputFile : string;
+	var _outputFile : Nullable.<string>;
 	var _impl : SourceMapGenerator;
 	var _header : string;
 
@@ -54,11 +55,11 @@ class SourceMapper {
 	var _outputLength = 0;
 	var _outputLineNumber = 1;
 
-	function constructor (rootDir : string, outputFile : string, runenv : string) {
+	function constructor (rootDir : string, outputFile : Nullable.<string>, runenv : string) {
 		this._rootDir = rootDir;
-		this._outputFile = Util.resolvePath(outputFile);
+		this._outputFile = outputFile != null ? Util.resolvePath(outputFile) : null;
 		this._impl = new SourceMapGenerator({
-			file       : Util.basename(this._outputFile)
+			file       : outputFile != null ? Util.basename(this._outputFile) : null
 		});
 
 		switch (runenv) {
@@ -148,8 +149,14 @@ class SourceMapper {
 		return this._impl.toString();
 	}
 
-	function magicToken () : string {
-		var sourceMappingFile = Util.basename(this.getSourceMappingFile());
-		return "\n" + "//# sourceMappingURL=" + sourceMappingFile + "\n";
+	function getSourceMapFooter() : string {
+		var sourceMappingURL;
+		if (this._outputFile != null) {
+			sourceMappingURL = Util.basename(this.getSourceMappingFile());
+		}
+		else {
+			sourceMappingURL = "data:application/json,base64," + (new Buffer(this.generate(), "utf8").toString("base64"));
+		}
+		return "\n" + "//# sourceMappingURL=" + sourceMappingURL + "\n";
 	}
 }
