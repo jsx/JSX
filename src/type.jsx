@@ -913,3 +913,55 @@ class MemberFunctionType extends ResolvedFunctionType {
 
 }
 
+class TemplateFunctionType extends ResolvedFunctionType {
+
+	var _funcDef : TemplateFunctionDefinition;
+
+	function constructor (token : Token, funcDef : TemplateFunctionDefinition) {
+		super(token, funcDef.getReturnType(), funcDef.getArgumentTypes(), false /* isAsssinable */);
+		this._funcDef = funcDef;
+	}
+
+	override function _clone () : TemplateFunctionType {
+		return new TemplateFunctionType(this._token, this._funcDef);
+	}
+
+	override function _toStringPrefix() : string {
+		return 'template ';
+	}
+
+	override function asAssignableType () : Type {
+		throw new Error('logic flaw');
+	}
+
+	override function _deduceByArgumentTypes (token : Token, argTypes : Type[], isStatic : boolean, exact : boolean, notes : CompileNote[]) : ResolvedFunctionType {
+		if (((this._funcDef.flags() & ClassDefinition.IS_STATIC) == ClassDefinition.IS_STATIC) != isStatic) {
+			if (isStatic) {
+				notes.push(new CompileNote(token, 'candidate function not viable: expected a static function, but got a member function'));
+			} else {
+				notes.push(new CompileNote(token, 'candidate function not viable: expected a member function, but got a static function'));
+			}
+			return null;
+		}
+		// TODO vararg function
+		if (argTypes.length != this._argTypes.length) {
+			notes.push(new CompileNote(token, Util.format('candidate function not viable: wrong number of arguments (%1 for %2)',
+				[argTypes.length as string, this._argTypes.length as string])));
+			return null;
+		}
+		var member = this._funcDef.instantiateByArgumentTypes([], token, argTypes, exact); // TODO report compile errors
+		if (member == null) {
+			return null;
+		}
+		return member.getType();
+	}
+
+	override function _getExpectedTypes (expected : Type[][], numberOfArgs : number, isStatic : boolean) : void {
+		// does not support left-to-right type deduction for template function calls
+	}
+
+	override function getObjectType () : Type {
+		throw new Error("logic flaw");
+	}
+
+}

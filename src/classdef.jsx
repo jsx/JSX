@@ -1816,10 +1816,10 @@ class MemberFunctionDefinition extends MemberDefinition implements Block {
 		return null;
 	}
 
-	override function getType () : FunctionType {
+	override function getType () : ResolvedFunctionType {
 		return (this._flags & ClassDefinition.IS_STATIC) != 0
-			? (new StaticFunctionType(this._token, this._returnType, this.getArgumentTypes(), false) as FunctionType)
-			: (new MemberFunctionType(this._token, new ObjectType(this._classDef), this._returnType, this.getArgumentTypes(), false) as FunctionType);
+			? new StaticFunctionType(this._token, this._returnType, this.getArgumentTypes(), false)
+			: new MemberFunctionType(this._token, new ObjectType(this._classDef), this._returnType, this.getArgumentTypes(), false);
 	}
 
 	function deductTypeIfUnknown (context : AnalysisContext, type : ResolvedFunctionType) : boolean {
@@ -1896,6 +1896,10 @@ class TemplateFunctionDefinition extends MemberFunctionDefinition implements Tem
 			return true;
 		});
 		this._resolvedTypemap = new Map.<Type>;
+	}
+
+	override function getType () : TemplateFunctionType {
+		return new TemplateFunctionType(this._token, this);
 	}
 
 	function getTypeArguments () : Token[] {
