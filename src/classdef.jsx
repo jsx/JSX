@@ -1915,7 +1915,7 @@ class TemplateFunctionDefinition extends MemberFunctionDefinition implements Tem
 		return instantiated;
 	}
 
-	function instantiateByArgumentTypes (errors : CompileError[], token : Token, actualArgTypes : Type[]) : MemberFunctionDefinition {
+	function instantiateByArgumentTypes (errors : CompileError[], token : Token, actualArgTypes : Type[], exact : boolean) : MemberFunctionDefinition {
 		var typemap = new Map.<Type>;
 		for (var k in this._resolvedTypemap) {
 			typemap[k] = this._resolvedTypemap[k];
@@ -1926,7 +1926,11 @@ class TemplateFunctionDefinition extends MemberFunctionDefinition implements Tem
 			if (formal instanceof ParsedObjectType && typemap.hasOwnProperty((formal as ParsedObjectType).getToken().getValue())) {
 				var resolvedType = typemap[(formal as ParsedObjectType).getToken().getValue()];
 				if (resolvedType != null) {
-					if (! formal.equals(actual)) {
+					if (exact && ! formal.equals(actual)) {
+						// TODO push compile errors
+						return false;
+					}
+					if (! actual.isConvertibleTo(formal)) {
 						// TODO push compile errors
 						return false;
 					}
@@ -1952,8 +1956,12 @@ class TemplateFunctionDefinition extends MemberFunctionDefinition implements Tem
 				if (! unify(formalFuncType.getReturnType(), actualFuncType.getReturnType()))
 					return false;
 			} else {
-				if (! formal.equals(actual)) {
+				if (exact && ! formal.equals(actual)) {
 					// TODO push a compile error
+					return false;
+				}
+				if (! actual.isConvertibleTo(formal)) {
+					// TODO push compile errors
 					return false;
 				}
 			}
