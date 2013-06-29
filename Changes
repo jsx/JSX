@@ -1,5 +1,11 @@
 Revision history for the JSX software development kit
 
+0.9.48 2013-06-29 14:25:25-0700
+    [BUG FIXES]
+    - Fix a crash when function expressions were used as default parameters
+    - Default parameters were accidentally allowed for non-member functions,
+      which now causes compile errors
+
 0.9.47 2013-06-26 23:49:41-0700
     [FEATURES]
     - Support self-contained source-map; now `jsx --enable-source-map --run`
