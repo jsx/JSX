@@ -2282,19 +2282,11 @@ class Parser {
 			return false;
 
 		var funcLocal = this._registerLocal(name, new StaticFunctionType(token, returnType, args.map.<Type>((arg) -> arg.getType()), false));
-		// parse function block
-		this._pushScope(funcLocal, args);
-		var lastToken = this._block();
-		if (lastToken == null) {
-			this._popScope();
+
+		var funcDef = this._functionBody(token, name, funcLocal, args, returnType, true);
+		if (funcDef == null) {
 			return false;
 		}
-		var flags = ClassDefinition.IS_STATIC;
-		if (this._isGenerator) {
-			flags |= ClassDefinition.IS_GENERATOR;
-		}
-		var funcDef = new MemberFunctionDefinition(token, name, flags, returnType, args, this._locals, this._statements, this._closures, lastToken, null);
-		this._popScope();
 		this._closures.push(funcDef);
 		funcDef.setFuncLocal(funcLocal);
 		this._statements.push(new FunctionStatement(token, funcDef));
@@ -3095,6 +3087,9 @@ class Parser {
 		}
 
 		var funcDef = this._functionBody(token, name, funcLocal, args, returnType, true);
+		if (funcDef == null) {
+			return null;
+		}
 		this._closures.push(funcDef);
 		return new FunctionExpression(token, funcDef);
 	}
