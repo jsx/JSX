@@ -150,6 +150,18 @@ class _Lexer {
 		"extern", "native", "as", "operator"
 		]);
 
+	static const builtInClasses = Util.asSet([
+		// build-in classes
+		"Array", "Boolean", "Date", "Function", "Map", "Math", "Number",
+		"Object", "RegExp", "String", "JSON",
+		"Error", "EvalError", "RangeError", "ReferenceError", "SyntaxError", "TypeError",
+		"JSX",
+		// typed arrays
+		"Transferable", "ArrayBuffer", "Int8Array", "Uint8Array",
+		"Uint8ClampedArray", "Int16Array", "Uint16Array", "Int32Array",
+		"Uint32Array", "Float32Array", "Float64Array", "DataView"
+	]);
+
 	static function makeAlt (patterns : string[]) : string {
 		return "(?: \n" + patterns.join("\n | \n") + "\n)\n";
 	}
@@ -3339,7 +3351,7 @@ class Parser {
 	}
 
 	static function _isReservedClassName (name : string) : boolean {
-		return name.match(/^(Array|Boolean|Date|Function|Map|Number|Object|RegExp|String|Error|EvalError|RangeError|ReferenceError|SyntaxError|TypeError|JSX)$/) != null;
+		return _Lexer.builtInClasses.hasOwnProperty(name);
 	}
 
 }
