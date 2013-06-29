@@ -1741,6 +1741,7 @@ class Parser {
 		this._typeArgs = this._typeArgs.concat(typeArgs);
 		var numObjectTypesUsed = this._objectTypesUsed.length;
 
+		this._pushScope(null, null);
 		try {
 			if (this._expect("(") == null)
 				return null;
@@ -1792,12 +1793,7 @@ class Parser {
 					return null;
 			}
 			// body
-			this._funcLocal = null;
 			this._arguments = args;
-			this._locals = new LocalVariable[];
-			this._statements = new Statement[];
-			this._closures = new MemberFunctionDefinition[];
-			this._isGenerator = false;
 			if (name.getValue() == "constructor")
 				var lastToken = this._initializeBlock();
 			else
@@ -1807,11 +1803,10 @@ class Parser {
 				flags |= ClassDefinition.IS_GENERATOR;
 			}
 			var funcDef = createDefinition(this._locals, this._statements, this._closures, lastToken);
-			this._locals = null;
-			this._statements = null;
-			this._closures = null;
 			return funcDef;
 		} finally {
+			this._popScope();
+
 			this._typeArgs.splice(this._typeArgs.length - typeArgs.length, this._typeArgs.length);
 			if (typeArgs.length != 0) {
 				this._objectTypesUsed.splice(numObjectTypesUsed, this._objectTypesUsed.length - numObjectTypesUsed);
