@@ -3029,24 +3029,24 @@ class Parser {
 		}
 		if (this._expect("->") == null)
 			return null;
-		var funcDef = this._lambdaBody(token, args, returnType);
+		var funcDef = this._lambdaBody(token, null, null, args, returnType, this._expectOpt("{") != null);
 		if (funcDef == null)
 			return null;
 		this._closures.push(funcDef);
 		return new FunctionExpression(token, funcDef);
 	}
 
-	function _lambdaBody (token : Token, args : ArgumentDeclaration[], returnType : Type) : MemberFunctionDefinition {
+	function _lambdaBody(token : Token, name : Token, funcLocal : LocalVariable, args : ArgumentDeclaration[], returnType : Type, withBlock : boolean) : MemberFunctionDefinition {
 		var openBlock = this._expectOpt("{");
-		this._pushScope(null, args);
+		this._pushScope(funcLocal, args);
 		try {
 			// parse lambda body
 			var flags = ClassDefinition.IS_STATIC;
-			if (openBlock == null) {
+			var lastToken : Token;
+			if (! withBlock) {
+				lastToken = null;
 				var expr = this._expr();
 				this._statements.push(new ReturnStatement(token, expr));
-				return new MemberFunctionDefinition(
-					token, null, flags, returnType, args, this._locals, this._statements, this._closures, null, null);
 			} else {
 				var lastToken = this._block();
 				if (lastToken == null)
@@ -3054,9 +3054,13 @@ class Parser {
 				if (this._isGenerator) {
 					flags |= ClassDefinition.IS_GENERATOR;
 				}
-				return new MemberFunctionDefinition(
-					token, null, flags, returnType, args, this._locals, this._statements, this._closures, lastToken, null);
 			}
+			var funcDef = new MemberFunctionDefinition(
+				token, name , flags, returnType, args, this._locals, this._statements, this._closures, lastToken, null);
+			if (funcLocal != null) {
+				funcDef.setFuncLocal(funcLocal);
+			}
+			return funcDef;
 		} finally {
 			this._popScope();
 		}
@@ -3089,21 +3093,9 @@ class Parser {
 		if (name != null) {
 			funcLocal = new LocalVariable(name, type);
 		}
-		// parse function block
-		this._pushScope(funcLocal, args);
-		var lastToken = this._block();
-		if (lastToken == null) {
-			this._popScope();
-			return null;
-		}
-		var flags = ClassDefinition.IS_STATIC;
-		if (this._isGenerator) {
-			flags |= ClassDefinition.IS_GENERATOR;
-		}
-		var funcDef = new MemberFunctionDefinition(token, name, flags, returnType, args, this._locals, this._statements, this._closures, lastToken, null);
-		this._popScope();
+
+		var funcDef = this._lambdaBody(token, name, funcLocal, args, returnType, true);
 		this._closures.push(funcDef);
-		funcDef.setFuncLocal(funcLocal);
 		return new FunctionExpression(token, funcDef);
 	}
 
