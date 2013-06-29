@@ -5,7 +5,6 @@ use warnings FATAL => 'uninitialized';
 
 use tool::Util;
 
-use POSIX qw(:sys_wait_h);
 use Test::More 0.88;
 
 main(@ARGV);
@@ -328,13 +327,20 @@ sub run_web_test {
     }
 
     local $ENV{JSX_RUNJS} = $phantomjs;
-    my($ok, $stdout, $stderr) = jsx("--executable commonjs --test $file");
+
+    local $SIG{ALRM} = sub { die @_ };
+    alarm 60;
+
+    my($ok, $stdout, $stderr) = eval {
+        jsx("--executable commonjs --test $file");
+    };
+    alarm 0; # reset
     if ($ok) {
         print STDOUT $stdout;
     }
     else {
         fail("Cannot run jsx --test $file with $phantomjs $phantomjs_ver");
-        diag $stderr;
+        diag $@, $stderr;
     }
 }
 # vim: set expandtab:
