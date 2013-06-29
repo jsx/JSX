@@ -1746,7 +1746,7 @@ class Parser {
 			if (this._expect("(") == null)
 				return null;
 			// arguments
-			var args = this._functionArgumentsExpr((this._classFlags & ClassDefinition.IS_NATIVE) != 0, true);
+			var args = this._functionArgumentsExpr((this._classFlags & ClassDefinition.IS_NATIVE) != 0, true, true);
 			if (args == null)
 				return null;
 			// return type
@@ -2264,7 +2264,7 @@ class Parser {
 			return false;
 		if (this._expect("(") == null)
 			return false;
-		var args = this._functionArgumentsExpr(false, true);
+		var args = this._functionArgumentsExpr(false, true, false);
 		if (args == null)
 			return false;
 		if (this._expect(":") == null)
@@ -3006,7 +3006,7 @@ class Parser {
 	}
 
 	function _lambdaExpr (token : Token) : Expression {
-		var args = this._functionArgumentsExpr(false, false);
+		var args = this._functionArgumentsExpr(false, false, false);
 		if (args == null)
 			return null;
 		var returnType = null : Type;
@@ -3057,7 +3057,7 @@ class Parser {
 		var name = this._expectIdentifierOpt();
 		if (this._expect("(") == null)
 			return null;
-		var args = this._functionArgumentsExpr(false, false);
+		var args = this._functionArgumentsExpr(false, false, false);
 		if (args == null)
 			return null;
 		if (this._expectOpt(":") != null) {
@@ -3244,7 +3244,7 @@ class Parser {
 		return new MapLiteralExpression(token, elements, type);
 	}
 
-	function _functionArgumentsExpr (allowVarArgs : boolean, requireTypeDeclaration : boolean) : ArgumentDeclaration[] {
+	function _functionArgumentsExpr (allowVarArgs : boolean, requireTypeDeclaration : boolean, allowDefaultValues : boolean) : ArgumentDeclaration[] {
 		var args = new ArgumentDeclaration[];
 		if (this._expectOpt(")") == null) {
 			var token = null : Token;
@@ -3281,8 +3281,13 @@ class Parser {
 					break;
 				}
 				var defaultValue : Expression = null;
-				if (this._expectOpt("=") != null)  {
+				var assignToken = this._expectOpt("=");
+				if (assignToken != null)  {
 					if ((defaultValue = this._assignExpr(true)) == null) {
+						return null;
+					}
+					if (! allowDefaultValues) {
+						this._errors.push(new CompileError(assignToken, "default parameters are only allowed for member functions"));
 						return null;
 					}
 				} else {
