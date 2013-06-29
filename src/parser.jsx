@@ -3029,14 +3029,14 @@ class Parser {
 		}
 		if (this._expect("->") == null)
 			return null;
-		var funcDef = this._lambdaBody(token, null, null, args, returnType, this._expectOpt("{") != null);
+		var funcDef = this._functionBody(token, null, null, args, returnType, this._expectOpt("{") != null);
 		if (funcDef == null)
 			return null;
 		this._closures.push(funcDef);
 		return new FunctionExpression(token, funcDef);
 	}
 
-	function _lambdaBody(token : Token, name : Token, funcLocal : LocalVariable, args : ArgumentDeclaration[], returnType : Type, withBlock : boolean) : MemberFunctionDefinition {
+	function _functionBody(token : Token, name : Token, funcLocal : LocalVariable, args : ArgumentDeclaration[], returnType : Type, withBlock : boolean) : MemberFunctionDefinition {
 		var openBlock = this._expectOpt("{");
 		this._pushScope(funcLocal, args);
 		try {
@@ -3094,7 +3094,7 @@ class Parser {
 			funcLocal = new LocalVariable(name, type);
 		}
 
-		var funcDef = this._lambdaBody(token, name, funcLocal, args, returnType, true);
+		var funcDef = this._functionBody(token, name, funcLocal, args, returnType, true);
 		this._closures.push(funcDef);
 		return new FunctionExpression(token, funcDef);
 	}
