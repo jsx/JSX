@@ -2030,16 +2030,47 @@ class _DeadCodeEliminationOptimizeCommand extends _FunctionOptimizeCommand {
 		var shouldRetry = false;
 		(function onStatements(statements : Statement[]) : boolean {
 			for (var i = 0; i < statements.length;) {
-				if (statements[i] instanceof ExpressionStatement && ! _Util.exprHasSideEffects((statements[i] as ExpressionStatement).getExpr())) {
+				if (statements[i] instanceof ExpressionStatement && ! _Util.exprHasSideEffects((statements[i]as ExpressionStatement).getExpr())) {
 					shouldRetry = true;
 					statements.splice(i, 1);
-				} else {
+				}
+				else {
+					if ((statements[i] instanceof ExpressionStatement)) {
+						this._optimizeExprInVoid((statements[i] as ExpressionStatement).getExpr(), function (expr) {
+							statements[i] = new ExpressionStatement(expr);
+						});
+					}
 					statements[i++].handleStatements(onStatements);
 				}
 			}
 			return true;
 		})(funcDef.getStatements());
 		return shouldRetry;
+	}
+
+	function _optimizeExprInVoid(expr : Expression, replaceCb : function(:Expression) : void) : void {
+		if(expr instanceof ConditionalExpression) {
+			var condExpr = expr as ConditionalExpression;
+			var ifTrueHasSideEffect = _Util.exprHasSideEffects(condExpr.getIfTrueExpr());
+			var ifFalseHasSideEffect = _Util.exprHasSideEffects(condExpr.getIfFalseExpr());
+			if (ifTrueHasSideEffect && ifFalseHasSideEffect) {
+				// nothing to do
+			}
+			else if (ifTrueHasSideEffect && !ifFalseHasSideEffect) {
+				// f() : g() : true; -> f() && g();
+				var condAndIfTrue = new LogicalExpression(new Token("&&"), condExpr.getCondExpr(), condExpr.getIfTrueExpr());
+				replaceCb(condAndIfTrue);
+			}
+			else if (!ifTrueHasSideEffect && ifFalseHasSideEffect) {
+				// f() : true : g(); -> f() || g();
+				var condOrIfFalse= new LogicalExpression(new Token("||"), condExpr.getCondExpr(), condExpr.getIfFalseExpr());
+				replaceCb(condOrIfFalse);
+			}
+			else {
+				// f() ? true : false; -> f();
+				replaceCb(condExpr.getCondExpr());
+			}
+		}
 	}
 
 	function _optimizeFunction (funcDef : MemberFunctionDefinition) : boolean {
@@ -2348,6 +2379,7 @@ class _DeadCodeEliminationOptimizeCommand extends _FunctionOptimizeCommand {
 		Util.forEachExpression(onExpr, exprs);
 	}
 
+	// handle if statements and conditional operators
 	function _eliminateDeadConditions (funcDef : MemberFunctionDefinition, exprs : Expression[]) : void {
 		function spliceStatements (dest : Statement[], index : number, src : Statement[]) : void {
 			dest.splice(index, 1);
