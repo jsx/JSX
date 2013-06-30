@@ -69,20 +69,32 @@ class _Util {
 	}
 
 	static function exprHasSideEffects (expr : Expression) : boolean {
-		// FIXME native array access may have side effects
 		function onExpr (expr : Expression, _ : function(:Expression):void) : boolean {
-			if (expr instanceof FunctionExpression
-			    || expr instanceof NewExpression
+			if (   expr instanceof NewExpression
 			    || expr instanceof AssignmentExpression
 			    || expr instanceof PreIncrementExpression
 			    || expr instanceof PostIncrementExpression
 			    || expr instanceof SuperExpression) {
 				return false;
-			} else if (expr instanceof CallExpression) {
+			}
+			else if (expr instanceof CallExpression) {
 				var callingFuncDef = _DetermineCalleeCommand.getCallingFuncDef(expr);
 				if (callingFuncDef != null && (callingFuncDef.flags() & ClassDefinition.IS_PURE) != 0) {
 					// fall through (check receiver and arguments)
 				} else {
+					return false;
+				}
+			}
+			else if (expr instanceof PropertyExpression) {
+				var type = (expr as PropertyExpression).getExpr().getType();
+				if (type instanceof ObjectType && ((type as ObjectType).getClassDef().flags() & ClassDefinition.IS_NATIVE) != 0 && ! Util.isBuiltInContainer(type)) {
+					return false;
+				}
+			}
+			else if (expr instanceof ArrayExpression) {
+				var type = (expr as ArrayExpression).getFirstExpr().getType();
+
+				if (type instanceof ObjectType && ((type as ObjectType).getClassDef().flags() & ClassDefinition.IS_NATIVE) != 0 && ! Util.isBuiltInContainer(type)) {
 					return false;
 				}
 			}
