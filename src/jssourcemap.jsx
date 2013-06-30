@@ -28,16 +28,16 @@
 import "./util.jsx";
 import "js/nodejs.jsx"; // for base64 encode
 
-native ("require('source-map').SourceMapGenerator") class SourceMapGenerator {
+native class SourceMapGenerator {
 	function constructor(options : Map.<string>);
 	function addMapping(mapping : Map.<variant>) : void;
 	function setSourceContent(sourceFile : string, sourceContent : string) : void;
-}
+} = "require('source-map').SourceMapGenerator";
 
-native ("require('source-map').SourceMapConsumer") class SourceMapConsumer {
+native class SourceMapConsumer {
 	function constructor(mapping : variant);
 	function originalPositionFor(generatedPos : variant) : variant;
-}
+} = "require('source-map').SourceMapConsumer";
 
 
 class SourceMapper {

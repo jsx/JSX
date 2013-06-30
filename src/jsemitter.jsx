@@ -796,17 +796,17 @@ class _Minifier {
 
 }
 
-native("require('esprima')") class esprima {
+native class esprima {
 	static function parse(src : string) : variant;
-}
+} = "require('esprima')";
 
-native("require('esmangle')") class esmangle {
+native class esmangle {
 	static function mangle(ast : variant, opts : Map.<variant>) : variant;
-}
+} = "require('esmangle')";
 
-native("require('escodegen')") class escodegen {
+native class escodegen {
 	static function generate(ast : variant, opts : Map.<variant>) : string;
-}
+} = "require('escodegen')";
 
 
 // statement emitter
