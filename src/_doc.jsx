@@ -306,7 +306,8 @@ class DocumentGenerator {
 
 	function _buildDocOfFunction (parser : Parser, funcDef : MemberFunctionDefinition) : string {
 		var _ = "";
-		var funcName = this._isConstructor(funcDef) ? "new " + funcDef.getClassDef().className() : this._flagsToHTML(funcDef.flags()) + " function " + funcDef.name();
+		var ignoreFlags = (funcDef.getClassDef().flags() & ClassDefinition.IS_FINAL) | ClassDefinition.IS_INLINE;
+		var funcName = this._isConstructor(funcDef) ? "new " + funcDef.getClassDef().className() : this._flagsToHTML(funcDef.flags() & ~ignoreFlags) + " function " + funcDef.name();
 		var args = funcDef.getArguments();
 		var argsHTML = args.map.<string>(function (arg) {
 			return this._escape(arg.getName().getValue()) + " : " + this._typeToHTML(parser, arg.getType());
@@ -465,6 +466,8 @@ class DocumentGenerator {
 			strs.push("static");
 		if ((flags & ClassDefinition.IS_CONST) != 0)
 			strs.push("const");
+		if ((flags & ClassDefinition.IS_READONLY) != 0)
+			strs.push("__readonly__");
 		if ((flags & ClassDefinition.IS_ABSTRACT) != 0)
 			strs.push("abstract");
 		if ((flags & ClassDefinition.IS_FINAL) != 0)
@@ -473,6 +476,10 @@ class DocumentGenerator {
 			strs.push("override");
 		if ((flags & ClassDefinition.IS_INLINE) != 0)
 			strs.push("inline");
+		if ((flags & ClassDefinition.IS_NATIVE) != 0)
+			strs.push("native");
+		if ((flags & ClassDefinition.IS_EXPORT) != 0)
+			strs.push("__export__");
 		return strs.join(" ");
 	}
 
