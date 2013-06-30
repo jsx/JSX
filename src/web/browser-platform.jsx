@@ -28,7 +28,9 @@ import "../util.jsx";
 import "../emitter.jsx";
 
 // hack to avoid exceptions on native("require(...)")
-native ("function require(module) { console.error('ignore loading module: ' + module); return {}; }") class require { }
+native class require {
+	static var dummy : variant;
+} = "function require(module) { console.error('ignore loading module: ' + module); return {}; }";
 
 class BrowserPlatform extends Platform {
 
@@ -38,6 +40,8 @@ class BrowserPlatform extends Platform {
 	var _errors = new string[];
 	var _tree : variant; // path tree
 	var _prefix : string;
+
+	var _dummy = require.dummy;
 
 	function constructor() {
 		this._root = this._rootPath();

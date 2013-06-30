@@ -26,7 +26,7 @@
  * IN THE SOFTWARE.
  */
 
-import "nodejs/node.jsx";
+import "nodejs/global.jsx";
 import "nodejs/events.jsx";
 import "nodejs/stream.jsx";
 

@@ -26,7 +26,7 @@
  */
 
 import "./util.jsx";
-import "js/nodejs.jsx"; // for base64 encode
+import "nodejs/global.jsx"; // for base64 encode
 
 native class SourceMapGenerator {
 	function constructor(options : Map.<string>);
