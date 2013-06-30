@@ -766,6 +766,7 @@ class ClassDefinition implements Stashable {
 	}
 
 	function isConvertibleTo (classDef : ClassDefinition) : boolean {
+		assert classDef != null;
 		if (this == classDef)
 			return true;
 		if (classDef.className() == "Object")

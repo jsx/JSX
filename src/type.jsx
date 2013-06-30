@@ -471,6 +471,9 @@ class ObjectType extends Type {
 		if (this._classDef == null) { // occurs with completion mode
 			return false;
 		}
+		if ((type as ObjectType)._classDef == null) { // occurs with completion mode
+			return false;
+		}
 		return this._classDef.isConvertibleTo((type as ObjectType)._classDef);
 	}
 
