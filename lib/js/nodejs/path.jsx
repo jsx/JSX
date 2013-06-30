@@ -26,7 +26,7 @@
  * IN THE SOFTWARE.
  */
 
-native("require('path')") class path {
+native class path {
 	delete function constructor();
 
 	static function normalize(p : string) : string;
@@ -37,6 +37,8 @@ native("require('path')") class path {
 	static function basename(p : string) : string;
 	static function basename(p : string, ext : string) : string;
 	static function extname(p : string) : string;
+
 	static __readonly__ var sep : string;
-}
+
+} = "require('path')";
 

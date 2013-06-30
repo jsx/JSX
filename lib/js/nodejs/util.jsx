@@ -1,7 +1,7 @@
 /***
- * NodeJS URL module
+ * NodeJS Util Module for JSX
  *
- * @see http://nodejs.org/api/url.html
+ * @see http://nodejs.org/api/util.html
  */
 
 /*
@@ -26,34 +26,16 @@
  * IN THE SOFTWARE.
  */
 
-native class url {
+native class util {
 	delete function constructor();
 
-	static function parse(urlStr : string) : Url;
-	static function format(url : Url) : string;
-	static function format(urlStr : string) : string;
+	static function format(str : string, ...args : variant) : string;
+	static function debug(str : string) : void;
+	static function puts(...args : variant) : void;
+	static function print(...args : variant) : void;
+	static function log(str : string) : void;
+	static function inspect(object : variant) : string;
+	static function inspect(object : variant, options : variant) : string;
 
-	static function resolve(source : Url,    relative : Url)    : string;
-	static function resolve(source : Url,    relative : string) : string;
-	static function resolve(source : string, relative : Url)    : string;
-	static function resolve(source : string, relative : string) : string;
-} = "require('url')";
-
-native class Url {
-	var protocol : Nullable.<string>;
-	var slashes  : Nullable.<boolean>;
-	var auth     : Nullable.<string>;
-	var host     : Nullable.<string>;
-	var port     : Nullable.<string>;
-	var hostname : Nullable.<string>;
-	var hash     : Nullable.<string>;
-	var search   : Nullable.<string>;
-	var query    : Nullable.<string>;
-	var pathname : Nullable.<string>;
-	var path     : Nullable.<string>;
-
-	//function format() : string;
-	//function resolve(relative : string) : Url;
-	//function resolve(relative : Url) : Url;
-} = "require('url').Url";
+} = "require('util')";
 

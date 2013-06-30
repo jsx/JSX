@@ -26,10 +26,10 @@
  * IN THE SOFTWARE.
  */
 
-import "nodejs/node.jsx";
+import "nodejs/global.jsx";
 import "nodejs/events.jsx";
 
-native("require('fs')") class fs {
+native class fs {
 	delete function constructor();
 
 	static function statSync(path : string) : Stats;
@@ -62,9 +62,9 @@ native("require('fs')") class fs {
 
 	static function watch(filename : string, listener : function(event:string,filename:Nullable.<string>):void) : FSWatcher;
 	static function watch(filename : string, options : Map.<variant>, listener : function(event:string,filename:Nullable.<string>):void) : FSWatcher;
-}
+} = "require('fs')";
 
-final native("require('fs').Stats") class Stats {
+final native class Stats {
 	delete function constructor();
 
 	function isFile() : boolean;
@@ -74,7 +74,7 @@ final native("require('fs').Stats") class Stats {
 	function isSymbolickLink() : boolean;
 	function isFIFO() : boolean;
 	function isSocket() : boolean;
-}
+} = "require('fs').Stats";
 
 native __fake__ class FSWatcher extends EventEmitter {
 	delete function constructor();

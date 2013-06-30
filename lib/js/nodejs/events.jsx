@@ -3,7 +3,7 @@
  *
  * @see http://nodejs.org/api/events.html
  */
-native("require('events').EventEmitter") class EventEmitter {
+native class EventEmitter {
 	delete function constructor();
 
 	function on(event : string, listener : function():void) : void;
@@ -21,5 +21,4 @@ native("require('events').EventEmitter") class EventEmitter {
 	function emit(event : string) : void;
 	function emit(event : string, arg0 : variant) : void;
 	function emit(event : string, arg0 : variant, arg1 : variant) : void;
-}
-
+} = "require('events').EventEmitter";

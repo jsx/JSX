@@ -1,7 +1,8 @@
 import "test-case.jsx";
 
-import "nodejs/node.jsx";
+import "nodejs/global.jsx";
 import "nodejs/fs.jsx";
+import "nodejs/util.jsx";
 import "nodejs/path.jsx";
 import "nodejs/url.jsx";
 import "nodejs/http.jsx";

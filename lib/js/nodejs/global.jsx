@@ -33,14 +33,14 @@ import "nodejs/stream.jsx";
  * Module-scoped variables
  * @see http://nodejs.org/docs/latest/api/globals.html
  */
-final native("{ __dirname: __dirname, __filename: __filename, module: module, global: global }")
-class node {
+final native class node {
 	delete function constructor();
 
 	static __readonly__ var __dirname : string;
 	static __readonly__ var __filename : string;
 	static __readonly__ var global : Map.<variant>;
-}
+} = "{ __dirname: __dirname, __filename: __filename, module: module, global: global }";
+
 
 
 /**
@@ -166,63 +166,63 @@ native class module {
  * Fixed-sized binary buffer, built in NodeJS.
  */
 native class Buffer {
-	static function byteLength(str : string, encoding : string) : int;
+	static function byteLength(str : string, encoding : string) : number;
 	static function concat(list : Buffer[]) : Buffer;
-	static function concat(list : Buffer[], totalLength : int) : Buffer;
+	static function concat(list : Buffer[], totalLength : number) : Buffer;
 
-	__readonly__ var length : int;
+	__readonly__ var length : number;
 
-	function constructor(size : int);
-	function constructor(array : int[]);
+	function constructor(size : number);
+	function constructor(array : number[]);
 	function constructor(str : string, encoding : string);
 
-	function write(str : string, offset : int, length : int, encoding : string) : int;
+	function write(str : string, offset : number, length : number, encoding : string) : number;
 
 	function toString(encoding : string) : string;
-	function toString(encoding : string, start : int) : string;
-	function toString(encoding : string, start : int, end : int) : string;
+	function toString(encoding : string, start : number) : string;
+	function toString(encoding : string, start : number, end : number) : string;
 
 	function copy(targetBuffer : Buffer) : void;
-	function copy(targetBuffer : Buffer, targetStart : int) : void;
-	function copy(targetBuffer : Buffer, targetStart : int, sourceStart : int) : void;
-	function copy(targetBuffer : Buffer, targetStart : int, sourceStart : int, sourceEnd : int) : void;
+	function copy(targetBuffer : Buffer, targetStart : number) : void;
+	function copy(targetBuffer : Buffer, targetStart : number, sourceStart : number) : void;
+	function copy(targetBuffer : Buffer, targetStart : number, sourceStart : number, sourceEnd : number) : void;
 
-	function slice(start : int) : Buffer;
-	function slice(start : int , end : int) : Buffer;
+	function slice(start : number) : Buffer;
+	function slice(start : number , end : number) : Buffer;
 
-	function readUInt8(offset : int) : int;
-	function readUInt16LE(offset : int) : int;
-	function readUInt16BE(offset : int) : int;
-	function readUInt32LE(offset : int) : int;
-	function readUInt32BE(offset : int) : int;
-	function readInt8(offset : int) : int;
-	function readInt16LE(offset : int) : int;
-	function readInt16BE(offset : int) : int;
-	function readInt32LE(offset : int) : int;
-	function readInt32BE(offset : int) : int;
-	function readFloatLE(offset : int) : number;
-	function readFloatBE(offset : int) : number;
-	function readDoubleLE(offset : int) : number;
-	function readDoubleBE(offset : int) : number;
+	function readUInt8(offset : number) : number;
+	function readUInt16LE(offset : number) : number;
+	function readUInt16BE(offset : number) : number;
+	function readUInt32LE(offset : number) : number;
+	function readUInt32BE(offset : number) : number;
+	function readInt8(offset : number) : number;
+	function readInt16LE(offset : number) : number;
+	function readInt16BE(offset : number) : number;
+	function readInt32LE(offset : number) : number;
+	function readInt32BE(offset : number) : number;
+	function readFloatLE(offset : number) : number;
+	function readFloatBE(offset : number) : number;
+	function readDoubleLE(offset : number) : number;
+	function readDoubleBE(offset : number) : number;
 
-	function writeUInt8(value : int, offset : int) : void;
-	function writeUInt16LE(value : int, offset : int) : void;
-	function writeUInt16BE(value : int, offset : int) : void;
-	function writeUInt32LE(value : int, offset : int) : void;
-	function writeUInt32BE(value : int, offset : int) : void;
-	function writeInt8(value : int, offset : int) : void;
-	function writeInt16LE(value : int, offset : int) : void;
-	function writeInt16BE(value : int, offset : int) : void;
-	function writeInt32LE(value : int, offset : int) : void;
-	function writeInt32BE(value : int, offset : int) : void;
-	function writeFloatLE(value : number, offset : int) : void;
-	function writeFloatBE(value : number, offset : int) : void;
-	function writeDoubleLE(value : number, offset : int) : void;
-	function writeDoubleBE(value : number, offset : int) : void;
+	function writeUInt8(value : number, offset : number) : void;
+	function writeUInt16LE(value : number, offset : number) : void;
+	function writeUInt16BE(value : number, offset : number) : void;
+	function writeUInt32LE(value : number, offset : number) : void;
+	function writeUInt32BE(value : number, offset : number) : void;
+	function writeInt8(value : number, offset : number) : void;
+	function writeInt16LE(value : number, offset : number) : void;
+	function writeInt16BE(value : number, offset : number) : void;
+	function writeInt32LE(value : number, offset : number) : void;
+	function writeInt32BE(value : number, offset : number) : void;
+	function writeFloatLE(value : number, offset : number) : void;
+	function writeFloatBE(value : number, offset : number) : void;
+	function writeDoubleLE(value : number, offset : number) : void;
+	function writeDoubleBE(value : number, offset : number) : void;
 
-	function fill(value : int) : void;
-	function fill(value : int, offset : int) : void;
-	function fill(value : int, offset : int, end : int) : void;
+	function fill(value : number) : void;
+	function fill(value : number, offset : number) : void;
+	function fill(value : number, offset : number, end : number) : void;
 }
 
 native class querystring {

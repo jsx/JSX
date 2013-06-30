@@ -26,26 +26,25 @@
  * IN THE SOFTWARE.
  */
 
-import "nodejs/node.jsx";
+import "nodejs/global.jsx";
 import "nodejs/events.jsx";
 
-
-native("require('http')") class http {
+native class http {
 	static function createServer(
 		requestListener : function(:IncomingMessage,:ServerResponse):void
 	) : Server;
 
 	static function request(url : string, callback : function(:IncomingMessage):void) : ClientRequest;
 	static function get(url : string, callback : function(:IncomingMessage):void) : ClientRequest;
-}
+} = "require('http')";
 
-native("require('http').Server") class Server extends EventEmitter {
+native class Server extends EventEmitter {
 	function listen(port : int) : void;
 
 	function close() : void;
-}
+} = "require('http').Server";
 
-native("require('http').IncomingMessage") class IncomingMessage extends EventEmitter {
+native class IncomingMessage extends EventEmitter {
 	__readonly__ var method          : string;
 	__readonly__ var url             : string;
 	__readonly__ var headers         : Map.<string>;
@@ -56,9 +55,9 @@ native("require('http').IncomingMessage") class IncomingMessage extends EventEmi
 	__readonly__ var statusCode : int;
 
 	function setEncoding(encoding : string) : void;
-}
+} = "require('http').IncomingMessage";
 
-native("require('http').ServerResponse") class ServerResponse extends EventEmitter {
+native class ServerResponse extends EventEmitter {
 	function writeHead(status : int, headers : Map.<string>) : void;
 	function writeHead(status : int, responsePhrase : string, headers : Map.<string>) : void;
 	function write(content : string, encoding : string) : boolean;
@@ -66,9 +65,9 @@ native("require('http').ServerResponse") class ServerResponse extends EventEmitt
 	function end() : boolean;
 	function end(data : string, encoding : string) : boolean;
 	function end(data : Buffer) : boolean;
-}
+} = "require('http').ServerResponse";
 
-native("require('http').ClientRequest")  class ClientRequest extends EventEmitter {
+native class ClientRequest extends EventEmitter {
 	// TODO
-}
+} = "require('http').ClientRequest";
 

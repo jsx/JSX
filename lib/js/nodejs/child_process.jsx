@@ -31,7 +31,7 @@ import "nodejs/events.jsx";
 import "nodejs/stream.jsx";
 
 
-native("require('child_process')") class child_process {
+native class child_process {
 	delete function constructor();
 
 	/**
@@ -87,7 +87,7 @@ native("require('child_process')") class child_process {
 	static function execFile(file : string, args : string[], callback : (Error, Buffer, Buffer) -> void) : ChildProcess;
 
 	//function fork(modulePath : string, args : string[], options : Map.<variant>) : ChildProcess; // NodeJS specific
-}
+} = "require('child_process')";
 
 /*
  * @see http://nodejs.org/api/child_process.html

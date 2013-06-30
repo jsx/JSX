@@ -26,10 +26,10 @@
  * IN THE SOFTWARE.
  */
 
-import Buffer from "nodejs/node.jsx";
+import Buffer from "nodejs/global.jsx";
 import "nodejs/events.jsx";
 
-native("require('stream')") class Stream extends EventEmitter {
+native class Stream extends EventEmitter {
 	__readonly__ var fd : int;
 	__readonly__ var isTTY : boolean;
 
@@ -37,4 +37,4 @@ native("require('stream')") class Stream extends EventEmitter {
 	function write(buffer : Buffer) : boolean;
 
 	function end() : void;
-}
+} = "require('stream')";
