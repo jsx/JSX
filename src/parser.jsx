@@ -1414,6 +1414,7 @@ class Parser {
 				break;
 			case "native":
 				if (this._expectOpt("(") != null) { // native("...")
+					this._newDeprecatedWarning("use of native(\"...\") is deprecated, use class N { ... } = \"...\"; instead");
 					nativeSource = this._expectStringLiteral();
 					this._expect(")");
 				}
@@ -1506,6 +1507,14 @@ class Parser {
 				members.push(member);
 			} else {
 				this._skipStatement();
+			}
+		}
+
+		// native code definition
+		if (this._expectOpt("=") != null) {
+			nativeSource = this._expectStringLiteral();
+			if (this._expect(";") == null) {
+				return null;
 			}
 		}
 
