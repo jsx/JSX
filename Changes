@@ -1,5 +1,17 @@
 Revision history for the JSX software development kit
 
+0.9.49 2013-06-30 15:14:54-0700
+    [FEATURES]
+    - Introduce new in-line native definition syntax:
+      native class N { ... } = "native code";
+      deprecating the old one:
+      native("native code") class N { ... }
+    - New type inference: type of empty container literals from the lhs expr
+      (#205)
+
+    [BUG FIXES]
+    - Fix #204, a compiler crash
+
 0.9.48 2013-06-29 14:25:25-0700
     [BUG FIXES]
     - Fix a crash when function expressions were used as default parameters
