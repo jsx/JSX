@@ -169,6 +169,10 @@ class _Test extends TestCase {
     this.expect(['/', '\\'].indexOf(path.sep) != -1).toBe(true);
   }
 
+  function testCreateUtil() : void {
+    this.expect(util.format("foo %d", 3)).toBe("foo 3");
+  }
+
   function testCreateHttpServer() : void {
     var httpd = http.createServer((req, res) -> {
       // just a syntax check
