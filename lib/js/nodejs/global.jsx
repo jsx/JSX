@@ -38,11 +38,10 @@ final native class node {
 
 	static __readonly__ var __dirname : string;
 	static __readonly__ var __filename : string;
-	static __readonly__ var global : Map.<variant>;
 
 	static function require(name : string) : variant;
 
-} = "{ __dirname: __dirname, __filename: __filename, module: module, global: global, require: require }";
+} = "{ __dirname: typeof(__dirname) !== 'undefined' ? __dirname : '', __filename: typeof(__filename) !== 'undefined' ? __filename : '', module: typeof(module) !== 'undefined' ? module : null, require: typeof(require) !== 'undefined' ? require : function(name) {} }";
 
 
 
