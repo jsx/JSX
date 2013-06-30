@@ -2049,6 +2049,7 @@ class _DeadCodeEliminationOptimizeCommand extends _FunctionOptimizeCommand {
 	}
 
 	function _optimizeExprInVoid(expr : Expression, replaceCb : function(:Expression) : void) : void {
+		// cond ? iftrue : iffalse; which results in inline expansion
 		if(expr instanceof ConditionalExpression) {
 			var condExpr = expr as ConditionalExpression;
 			var ifTrueHasSideEffect = _Util.exprHasSideEffects(condExpr.getIfTrueExpr());
@@ -2070,6 +2071,10 @@ class _DeadCodeEliminationOptimizeCommand extends _FunctionOptimizeCommand {
 				// f() ? true : false; -> f();
 				replaceCb(condExpr.getCondExpr());
 			}
+		}
+		// ! expr; which results in inline expansion
+		else if (expr instanceof LogicalNotExpression) {
+			replaceCb((expr as LogicalNotExpression).getExpr());
 		}
 	}
 
