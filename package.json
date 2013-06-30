@@ -1,51 +1,59 @@
 {
-  "name":        "jsx",
-  "version":     "0.9.48",
+  "name": "jsx",
+  "version": "0.9.49",
   "description": "a faster, safer, easier JavaScript",
-  "license" : "MIT",
-  "keywords": ["jsx", "compiler", "altjs"],
+  "license": "MIT",
+  "keywords": [
+    "jsx",
+    "compiler",
+    "altjs"
+  ],
   "homepage": "http://jsx.github.io/",
-  "repository" : "git://github.com/jsx/JSX.git",
-  "bugs" : { "url" : "https://github.com/jsx/JSX/issues" },
-  "preferGlobal" : true,
+  "repository": "git://github.com/jsx/JSX.git",
+  "bugs": {
+    "url": "https://github.com/jsx/JSX/issues"
+  },
+  "preferGlobal": true,
   "author": {
-    "name":  "Kazuho Oku",
+    "name": "Kazuho Oku",
     "email": "oku.kazuho@dena.jp"
   },
-  "contributors" : [
-      {
-        "name":  "Goro Fuji (gfx)",
-        "email": "gfuji@cpan.org"
-      },
-      {
-        "name":  "Yuichi Nishiwaki (wasabiz)",
-        "email": "nishiwaki.yuichi@dena.jp"
-      }
+  "contributors": [
+    {
+      "name": "Goro Fuji (gfx)",
+      "email": "gfuji@cpan.org"
+    },
+    {
+      "name": "Yuichi Nishiwaki (wasabiz)",
+      "email": "nishiwaki.yuichi@dena.jp"
+    }
   ],
-  "bin" : {
-      "jsx" : "./bin/jsx",
-      "jsx-with-server" : "./bin/jsx-with-server"
+  "bin": {
+    "jsx": "./bin/jsx",
+    "jsx-with-server": "./bin/jsx-with-server"
   },
   "directories": {
     "bin": "./bin",
     "tool": "./tool",
-    "extlib" : "./extlib",
+    "extlib": "./extlib",
     "web": "./web",
     "lib": "./lib",
     "src": "./src"
   },
   "dependencies": {
-      "source-map": "~ 0.1.22",
-      "esprima": "~ 1.0.2",
-      "escodegen": "~ 0.0.20",
-      "esmangle": "~ 0.0.14",
-      "source-map-support": "~ 0.1.8"
+    "source-map": "~ 0.1.22",
+    "esprima": "~ 1.0.2",
+    "escodegen": "~ 0.0.20",
+    "esmangle": "~ 0.0.14",
+    "source-map-support": "~ 0.1.8"
   },
   "engines": {
     "node": ">= 0.8.0"
   },
-
-  "scripts" : {
-	  "postpublish" : "node tool/bootstrap-compiler.js --run tool/postpublish.jsx"
+  "scripts": {
+    "postpublish": "node tool/bootstrap-compiler.js --run tool/postpublish.jsx"
+  },
+  "devDependencies": {
+    "jshint": "~2.1.4"
   }
 }

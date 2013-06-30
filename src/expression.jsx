@@ -1645,6 +1645,8 @@ class AssignmentExpression extends BinaryExpression {
 	}
 
 	function _analyzeFunctionExpressionAssignment (context : AnalysisContext, parentExpr : Expression) : boolean {
+		assert this._expr2 instanceof FunctionExpression;
+
 		// analyze from left to right to avoid "variable may not be defined" error in case the function calls itself
 		if (! this._expr1.analyze(context, this))
 			return false;
@@ -1655,7 +1657,13 @@ class AssignmentExpression extends BinaryExpression {
 			}
 		}
 		else if (! this._expr1.getType().equals(Type.variantType)) {
-			if (! (this._expr2 as FunctionExpression).deductTypeIfUnknown(context, this._expr1.getType() as ResolvedFunctionType)) {
+			if (this._expr1.getType() instanceof ResolvedFunctionType) {
+				if (! (this._expr2 as FunctionExpression).deductTypeIfUnknown(context, this._expr1.getType() as ResolvedFunctionType)) {
+					return false;
+				}
+			}
+			else {
+				context.errors.push(new CompileError(this._token, Util.format("%1 is not convertible to %2", [this._expr2.getType().toString(), this._expr1.getType().toString()])));
 				return false;
 			}
 		}
