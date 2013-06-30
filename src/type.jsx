@@ -819,13 +819,20 @@ abstract class ResolvedFunctionType extends FunctionType {
 	override function toString () : string {
 		var args = new string[];
 		for (var i = 0; i < this._argTypes.length; ++i) {
-			if (this._argTypes[i] instanceof VariableLengthArgumentType) {
+			if (this._argTypes[i] == null) {
+				// nothing added
+			}
+			else if (this._argTypes[i] instanceof VariableLengthArgumentType) {
 				args[i] = "... : " + (this._argTypes[i] as VariableLengthArgumentType).getBaseType().toString();
 			} else {
 				args[i] = ": " + this._argTypes[i].toString();
 			}
 		}
-		return this._toStringPrefix() + "function (" + args.join(", ") + ") : " + this._returnType.toString();
+		var s = this._toStringPrefix() + "function (" + args.join(", ") + ")";
+		if (this._returnType != null) {
+			s += " : " + this._returnType.toString();
+		}
+		return s;
 	}
 
 	override function getObjectType () : Type {
