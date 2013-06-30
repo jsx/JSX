@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// generatedy by JSX compiler 0.9.46 (2013-06-26 13:21:39 -0700; 042158f45e13d1a49bebd9cdb089fa3d427923f6)
+// generatedy by JSX compiler 0.9.48 (2013-06-29 23:56:26 -0700; 770a4bde8da21f460ffb8620325fcd6ecef14994)
 var JSX = {};
 (function (JSX) {
 /**
@@ -4856,6 +4856,7 @@ function JSXCommand$main$LPlatform$AS(platform, args) {
 		emitter = new JavaScriptEmitter(platform);
 	}
 	emitter.setRunEnv$S((executable != null ? executable : ""));
+	emitter.setOutputFile$US(outputFile);
 	setBootstrapMode(sourceFile);
 	compiler.setEmitter$LEmitter$(emitter);
 	switch (compiler.getMode$()) {
@@ -4898,7 +4899,6 @@ function JSXCommand$main$LPlatform$AS(platform, args) {
 		platform.error$S(err);
 		return 1;
 	}
-	emitter.setOutputFile$US(outputFile);
 	compiler.setOptimizer$LOptimizer$(optimizer);
 	result = compiler.compile$();
 	if (completionRequest != null) {
@@ -8156,6 +8156,9 @@ AssignmentExpression.prototype.analyze$LAnalysisContext$LExpression$ = function 
 	if (this._expr2 instanceof FunctionExpression) {
 		return this._analyzeFunctionExpressionAssignment$LAnalysisContext$LExpression$(context, parentExpr);
 	}
+	if (this._expr2 instanceof ArrayLiteralExpression && this._expr2.getExprs$().length === 0 && this._expr2.getType$() == null || this._expr2 instanceof MapLiteralExpression && this._expr2.getElements$().length === 0 && this._expr2.getType$() == null) {
+		return this._analyzeEmptyLiteralAssignment$LAnalysisContext$LExpression$(context, parentExpr);
+	}
 	if (! this._analyze$LAnalysisContext$(context)) {
 		return false;
 	}
@@ -8220,6 +8223,37 @@ AssignmentExpression.prototype._analyzeFusedAssignment$LAnalysisContext$ = funct
 	}
 	context.errors.push(new CompileError(this._token, "cannot apply operator '" + this._token.getValue$() + "' against '" + this._expr1.getType$().toString() + "' and '" + this._expr2.getType$().toString() + "'"));
 	return false;
+};
+
+
+AssignmentExpression.prototype._analyzeEmptyLiteralAssignment$LAnalysisContext$LExpression$ = function (context, parentExpr) {
+	var classDef;
+	if (! this._expr1.analyze$LAnalysisContext$LExpression$(context, this)) {
+		return false;
+	}
+	if (this._expr1.getType$() == null) {
+		context.errors.push(new CompileError(this._token, "either side of the operator should be fully type-qualified"));
+	}
+	if (this._expr2 instanceof ArrayLiteralExpression) {
+		if (! (this._expr1.getType$() instanceof ObjectType && (classDef = this._expr1.getType$().getClassDef$()) instanceof InstantiatedClassDefinition && classDef.getTemplateClassName$() === "Array")) {
+			context.errors.push(new CompileError(this._token, "cannot deduce the type of [] because left-hand-side expression is not of Array type"));
+			return false;
+		}
+		this._expr2.setType$LType$(this._expr1.getType$());
+	} else {
+		if (! (this._expr1.getType$() instanceof ObjectType && (classDef = this._expr1.getType$().getClassDef$()) instanceof InstantiatedClassDefinition && classDef.getTemplateClassName$() === "Map")) {
+			context.errors.push(new CompileError(this._token, "cannot deduce the type of {} because left-hand-side expression is not of Map type"));
+			return false;
+		}
+		this._expr2.setType$LType$(this._expr1.getType$());
+	}
+	if (! this._expr1.assertIsAssignable$LAnalysisContext$LToken$LType$(context, this._token, this._expr2.getType$())) {
+		return false;
+	}
+	if (! this._expr2.analyze$LAnalysisContext$LExpression$(context, this)) {
+		return false;
+	}
+	return true;
 };
 
 
@@ -9223,7 +9257,6 @@ function JavaScriptEmitter(platform) {
 	this._indent = 0;
 	this._emittingClass = null;
 	this._emittingFunction = null;
-	this._enableSourceMap = false;
 	this._enableProfiler = false;
 	this._enableMinifier = false;
 	this._enableRunTimeTypeCheck = true;
@@ -9258,9 +9291,6 @@ JavaScriptEmitter.prototype.setOutputFile$US = function (name) {
 		return;
 	}
 	this._outputFile = Util$resolvePath$S(name);
-	if (this._enableSourceMap) {
-		this._sourceMapper = new SourceMapper(this._platform.getRoot$(), name, this._runenv);
-	}
 };
 
 
@@ -9270,7 +9300,7 @@ JavaScriptEmitter.prototype.getSourceMappingFiles$ = function () {
 	var sourceMapper;
 	files = {};
 	sourceMapper = this._sourceMapper;
-	if (sourceMapper != null) {
+	if (sourceMapper != null && this._outputFile != null) {
 		sourceMapper.getSourceFiles$().forEach((function (filename) {
 			try {
 				sourceMapper.setSourceContent$SS(filename, $this._platform.load$S(filename));
@@ -9290,11 +9320,6 @@ JavaScriptEmitter.prototype.getSourceMappingFiles$ = function () {
 };
 
 
-JavaScriptEmitter.prototype.setSourceMapper$LSourceMapper$ = function (gen) {
-	this._sourceMapper = gen;
-};
-
-
 JavaScriptEmitter.prototype.getMangler$ = function () {
 	return this._mangler;
 };
@@ -9311,12 +9336,12 @@ JavaScriptEmitter.prototype.setEnableRunTimeTypeCheck$B = function (enable) {
 
 
 JavaScriptEmitter.prototype.getEnableSourceMap$ = function () {
-	return this._enableSourceMap;
+	return this._sourceMapper != null;
 };
 
 
 JavaScriptEmitter.prototype.setEnableSourceMap$B = function (enable) {
-	this._enableSourceMap = enable;
+	this._sourceMapper = (enable ? new SourceMapper(this._platform.getRoot$(), this._outputFile, this._runenv) : null);
 };
 
 
@@ -9359,7 +9384,6 @@ JavaScriptEmitter.prototype._emitInit$ = function () {
 	var stash;
 	this._output = "";
 	this._outputEndsWithReturn = true;
-	this._outputFile = null;
 	this._indent = 0;
 	this._emittingClass = null;
 	this._emittingFunction = null;
@@ -9661,7 +9685,7 @@ JavaScriptEmitter.prototype.getOutput$ = function () {
 	}
 	output += this._fileFooter;
 	if (this._sourceMapper) {
-		output += this._sourceMapper.magicToken$();
+		output += this._sourceMapper.getSourceMapFooter$();
 	}
 	if (this._enableMinifier) {
 		output = _Minifier$minifyJavaScript$S(output);
@@ -13426,6 +13450,9 @@ ObjectType.prototype.isConvertibleTo$LType$ = function (type) {
 	if (this._classDef == null) {
 		return false;
 	}
+	if (type._classDef == null) {
+		return false;
+	}
 	return this._classDef.isConvertibleTo$LClassDefinition$(type._classDef);
 };
 
@@ -15230,6 +15257,7 @@ Parser.prototype._classDefinition$ = function () {
 	var members;
 	var success;
 	var member;
+	var assignToken;
 	var i;
 	var classDef;
 	var templateClassDef;
@@ -15281,6 +15309,7 @@ Parser.prototype._classDefinition$ = function () {
 			break;
 		case "native":
 			if (this._expectOpt$S("(") != null) {
+				this._newDeprecatedWarning$S("use of native(\"...\") is deprecated, use class N { ... } = \"...\"; instead");
 				nativeSource = this._expectStringLiteral$();
 				this._expect$S(")");
 			}
@@ -15360,6 +15389,17 @@ Parser.prototype._classDefinition$ = function () {
 			members.push(member);
 		} else {
 			this._skipStatement$();
+		}
+	}
+	assignToken = this._expectOpt$S("=");
+	if (assignToken != null) {
+		nativeSource = this._expectStringLiteral$();
+		if (this._expect$S(";") == null) {
+			return null;
+		}
+		if ((this._classFlags & ClassDefinition.IS_NATIVE) === 0) {
+			this._errors.push(new CompileError(assignToken, "in-line native definition requires native attribute"));
+			return null;
 		}
 	}
 	if ((this._classFlags & ClassDefinition.IS_NATIVE) === 0 && Parser$_isReservedClassName$S(className.getValue$())) {
@@ -15643,11 +15683,12 @@ Parser.prototype._functionDefinition$LToken$NLDocComment$F$SB$ = function (token
 	}
 	this._typeArgs = this._typeArgs.concat(typeArgs);
 	numObjectTypesUsed = this._objectTypesUsed.length;
+	this._pushScope$LLocalVariable$ALArgumentDeclaration$(null, null);
 	try {
 		if (this._expect$S("(") == null) {
 			return null;
 		}
-		args = this._functionArgumentsExpr$BB((this._classFlags & ClassDefinition.IS_NATIVE) !== 0, true);
+		args = this._functionArgumentsExpr$BBB((this._classFlags & ClassDefinition.IS_NATIVE) !== 0, true, true);
 		if (args == null) {
 			return null;
 		}
@@ -15696,12 +15737,7 @@ Parser.prototype._functionDefinition$LToken$NLDocComment$F$SB$ = function (token
 				}
 			}
 		}
-		this._funcLocal = null;
 		this._arguments = args;
-		this._locals = [];
-		this._statements = [];
-		this._closures = [];
-		this._isGenerator = false;
 		if (name.getValue$() === "constructor") {
 			lastToken = this._initializeBlock$();
 		} else {
@@ -15711,11 +15747,9 @@ Parser.prototype._functionDefinition$LToken$NLDocComment$F$SB$ = function (token
 			flags |= ClassDefinition.IS_GENERATOR;
 		}
 		funcDef = createDefinition(this._locals, this._statements, this._closures, lastToken);
-		this._locals = null;
-		this._statements = null;
-		this._closures = null;
 		return funcDef;
 	} finally {
+		this._popScope$();
 		this._typeArgs.splice(this._typeArgs.length - typeArgs.length, this._typeArgs.length);
 		if (typeArgs.length !== 0) {
 			this._objectTypesUsed.splice(numObjectTypesUsed, this._objectTypesUsed.length - numObjectTypesUsed);
@@ -16256,8 +16290,6 @@ Parser.prototype._functionStatement$LToken$ = function (token) {
 	var args;
 	var returnType;
 	var funcLocal;
-	var lastToken;
-	var flags;
 	var funcDef;
 	name = this._expectIdentifierOpt$();
 	if (name == null) {
@@ -16266,7 +16298,7 @@ Parser.prototype._functionStatement$LToken$ = function (token) {
 	if (this._expect$S("(") == null) {
 		return false;
 	}
-	args = this._functionArgumentsExpr$BB(false, true);
+	args = this._functionArgumentsExpr$BBB(false, true, false);
 	if (args == null) {
 		return false;
 	}
@@ -16283,18 +16315,10 @@ Parser.prototype._functionStatement$LToken$ = function (token) {
 	funcLocal = this._registerLocal$LToken$LType$(name, new StaticFunctionType(token, returnType, args.map((function (arg) {
 		return arg.getType$();
 	})), false));
-	this._pushScope$LLocalVariable$ALArgumentDeclaration$(funcLocal, args);
-	lastToken = this._block$();
-	if (lastToken == null) {
-		this._popScope$();
+	funcDef = this._functionBody$LToken$LToken$LLocalVariable$ALArgumentDeclaration$LType$B(token, name, funcLocal, args, returnType, true);
+	if (funcDef == null) {
 		return false;
 	}
-	flags = ClassDefinition.IS_STATIC;
-	if (this._isGenerator) {
-		flags |= ClassDefinition.IS_GENERATOR;
-	}
-	funcDef = new MemberFunctionDefinition(token, name, flags, returnType, args, this._locals, this._statements, this._closures, lastToken, null);
-	this._popScope$();
 	this._closures.push(funcDef);
 	funcDef.setFuncLocal$LLocalVariable$(funcLocal);
 	this._statements.push(new FunctionStatement(token, funcDef));
@@ -17223,7 +17247,7 @@ Parser.prototype._lambdaExpr$LToken$ = function (token) {
 	var args;
 	var returnType;
 	var funcDef;
-	args = this._functionArgumentsExpr$BB(false, false);
+	args = this._functionArgumentsExpr$BBB(false, false, false);
 	if (args == null) {
 		return null;
 	}
@@ -17236,7 +17260,7 @@ Parser.prototype._lambdaExpr$LToken$ = function (token) {
 	if (this._expect$S("->") == null) {
 		return null;
 	}
-	funcDef = this._lambdaBody$LToken$ALArgumentDeclaration$LType$(token, args, returnType);
+	funcDef = this._functionBody$LToken$LToken$LLocalVariable$ALArgumentDeclaration$LType$B(token, null, null, args, returnType, this._expectOpt$S("{") != null);
 	if (funcDef == null) {
 		return null;
 	}
@@ -17245,19 +17269,20 @@ Parser.prototype._lambdaExpr$LToken$ = function (token) {
 };
 
 
-Parser.prototype._lambdaBody$LToken$ALArgumentDeclaration$LType$ = function (token, args, returnType) {
+Parser.prototype._functionBody$LToken$LToken$LLocalVariable$ALArgumentDeclaration$LType$B = function (token, name, funcLocal, args, returnType, withBlock) {
 	var openBlock;
 	var flags;
-	var expr;
 	var lastToken;
+	var expr;
+	var funcDef;
 	openBlock = this._expectOpt$S("{");
-	this._pushScope$LLocalVariable$ALArgumentDeclaration$(null, args);
+	this._pushScope$LLocalVariable$ALArgumentDeclaration$(funcLocal, args);
 	try {
 		flags = ClassDefinition.IS_STATIC;
-		if (openBlock == null) {
+		if (! withBlock) {
+			lastToken = null;
 			expr = this._expr$();
 			this._statements.push(new ReturnStatement(token, expr));
-			return new MemberFunctionDefinition(token, null, flags, returnType, args, this._locals, this._statements, this._closures, null, null);
 		} else {
 			lastToken = this._block$();
 			if (lastToken == null) {
@@ -17266,8 +17291,12 @@ Parser.prototype._lambdaBody$LToken$ALArgumentDeclaration$LType$ = function (tok
 			if (this._isGenerator) {
 				flags |= ClassDefinition.IS_GENERATOR;
 			}
-			return new MemberFunctionDefinition(token, null, flags, returnType, args, this._locals, this._statements, this._closures, lastToken, null);
 		}
+		funcDef = new MemberFunctionDefinition(token, name, flags, returnType, args, this._locals, this._statements, this._closures, lastToken, null);
+		if (funcLocal != null) {
+			funcDef.setFuncLocal$LLocalVariable$(funcLocal);
+		}
+		return funcDef;
 	} finally {
 		this._popScope$();
 	}
@@ -17282,14 +17311,12 @@ Parser.prototype._functionExpr$LToken$ = function (token) {
 	var type;
 	var argTypes;
 	var funcLocal;
-	var lastToken;
-	var flags;
 	var funcDef;
 	name = this._expectIdentifierOpt$();
 	if (this._expect$S("(") == null) {
 		return null;
 	}
-	args = this._functionArgumentsExpr$BB(false, false);
+	args = this._functionArgumentsExpr$BBB(false, false, false);
 	if (args == null) {
 		return null;
 	}
@@ -17315,20 +17342,11 @@ Parser.prototype._functionExpr$LToken$ = function (token) {
 	if (name != null) {
 		funcLocal = new LocalVariable(name, type);
 	}
-	this._pushScope$LLocalVariable$ALArgumentDeclaration$(funcLocal, args);
-	lastToken = this._block$();
-	if (lastToken == null) {
-		this._popScope$();
+	funcDef = this._functionBody$LToken$LToken$LLocalVariable$ALArgumentDeclaration$LType$B(token, name, funcLocal, args, returnType, true);
+	if (funcDef == null) {
 		return null;
 	}
-	flags = ClassDefinition.IS_STATIC;
-	if (this._isGenerator) {
-		flags |= ClassDefinition.IS_GENERATOR;
-	}
-	funcDef = new MemberFunctionDefinition(token, name, flags, returnType, args, this._locals, this._statements, this._closures, lastToken, null);
-	this._popScope$();
 	this._closures.push(funcDef);
-	funcDef.setFuncLocal$LLocalVariable$(funcLocal);
 	return new FunctionExpression(token, funcDef);
 };
 
@@ -17523,7 +17541,7 @@ Parser.prototype._hashLiteral$LToken$ = function (token) {
 };
 
 
-Parser.prototype._functionArgumentsExpr$BB = function (allowVarArgs, requireTypeDeclaration) {
+Parser.prototype._functionArgumentsExpr$BBB = function (allowVarArgs, requireTypeDeclaration, allowDefaultValues) {
 	var args;
 	var token;
 	var isVarArg;
@@ -17531,6 +17549,7 @@ Parser.prototype._functionArgumentsExpr$BB = function (allowVarArgs, requireType
 	var argType;
 	var i;
 	var defaultValue;
+	var assignToken;
 	args = [];
 	if (this._expectOpt$S(")") == null) {
 		token = null;
@@ -17573,8 +17592,13 @@ Parser.prototype._functionArgumentsExpr$BB = function (allowVarArgs, requireType
 				break;
 			}
 			defaultValue = null;
-			if (this._expectOpt$S("=") != null) {
+			assignToken = this._expectOpt$S("=");
+			if (assignToken != null) {
 				if ((defaultValue = this._assignExpr$B(true)) == null) {
+					return null;
+				}
+				if (! allowDefaultValues) {
+					this._errors.push(new CompileError(assignToken, "default parameters are only allowed for member functions"));
 					return null;
 				}
 			} else {
@@ -17638,7 +17662,7 @@ Parser.prototype._getCompletionCandidatesOfProperty$LExpression$ = function (exp
 
 
 function Parser$_isReservedClassName$S(name) {
-	return name.match(/^(Array|Boolean|Date|Function|Map|Number|Object|RegExp|String|Error|EvalError|RangeError|ReferenceError|SyntaxError|TypeError|JSX)$/) != null;
+	return $__jsx_ObjectHasOwnProperty.call(_Lexer.builtInClasses, name);
 };
 
 Parser._isReservedClassName$S = Parser$_isReservedClassName$S;
@@ -17651,8 +17675,8 @@ function SourceMapper(rootDir, outputFile, runenv) {
 	this._outputLength = 0;
 	this._outputLineNumber = 1;
 	this._rootDir = rootDir;
-	this._outputFile = Util$resolvePath$S(outputFile);
-	this._impl = new SourceMapGenerator(({ file: Util$basename$S(this._outputFile) }));
+	this._outputFile = (outputFile != null ? Util$resolvePath$S(outputFile) : null);
+	this._impl = new SourceMapGenerator(({ file: outputFile != null ? Util$basename$S(this._outputFile) : null }));
 	switch (runenv) {
 	case "node":
 		this._header = SourceMapper.NODE_SOURCE_MAP_HEADER;
@@ -17733,10 +17757,14 @@ SourceMapper.prototype.generate$ = function () {
 };
 
 
-SourceMapper.prototype.magicToken$ = function () {
-	var sourceMappingFile;
-	sourceMappingFile = Util$basename$S(this.getSourceMappingFile$());
-	return "\n" + "//# sourceMappingURL=" + sourceMappingFile + "\n";
+SourceMapper.prototype.getSourceMapFooter$ = function () {
+	var sourceMappingURL;
+	if (this._outputFile != null) {
+		sourceMappingURL = Util$basename$S(this.getSourceMappingFile$());
+	} else {
+		sourceMappingURL = "data:application/json;base64," + new Buffer(this.generate$(), "utf8").toString("base64");
+	}
+	return "\n" + "//# sourceMappingURL=" + sourceMappingURL + "\n";
 };
 
 
@@ -22634,7 +22662,7 @@ DocumentGenerator.prototype._buildDocOfClass$LParser$LClassDefinition$ = functio
 	_ += this._escape$S(classDef.className$()).replace(/\n$/, "");
 	_ += "\">\n";
 	_ += "<h2>";
-	_ += (this._flagsToHTML$N(classDef.flags$()) + " " + this._escape$S(typeName + " " + classDef.className$()) + this._formalTypeArgsToHTML$ALToken$(typeArgs)).replace(/\n$/, "");
+	_ += (this._flagsToHTML$N(classDef.flags$()) + " " + this._escape$S(typeName) + " " + this._name$S(classDef.className$()) + this._formalTypeArgsToHTML$ALToken$(typeArgs)).replace(/\n$/, "");
 	_ += "</h2>\n";
 	_ += this._descriptionToHTML$LDocComment$(classDef.getDocComment$()).replace(/\n$/, "");
 	_ += "\n";
@@ -22645,7 +22673,7 @@ DocumentGenerator.prototype._buildDocOfClass$LParser$LClassDefinition$ = functio
 				_ += "<h3>\n";
 				_ += $this._flagsToHTML$N(varDef.flags$()).replace(/\n$/, "");
 				_ += " var ";
-				_ += varDef.name$().replace(/\n$/, "");
+				_ += $this._name$S(varDef.name$()).replace(/\n$/, "");
 				_ += " : ";
 				_ += $this._typeToHTML$LParser$LType$(parser, varDef.getType$()).replace(/\n$/, "");
 				_ += "\n";
@@ -22681,18 +22709,20 @@ DocumentGenerator.prototype._buildDocOfClass$LParser$LClassDefinition$ = functio
 DocumentGenerator.prototype._buildDocOfFunction$LParser$LMemberFunctionDefinition$ = function (parser, funcDef) {
 	var $this = this;
 	var _;
+	var ignoreFlags;
 	var funcName;
 	var args;
 	var argsHTML;
 	_ = "";
-	funcName = (this._isConstructor$LMemberFunctionDefinition$(funcDef) ? "new " + funcDef.getClassDef$().className$() : this._flagsToHTML$N(funcDef.flags$()) + " function " + funcDef.name$());
+	ignoreFlags = funcDef.getClassDef$().flags$() & (ClassDefinition.IS_FINAL | ClassDefinition.IS_NATIVE) | ClassDefinition.IS_INLINE;
+	funcName = (this._isConstructor$LMemberFunctionDefinition$(funcDef) ? "new " + this._name$S(funcDef.getClassDef$().className$()) : this._flagsToHTML$N(funcDef.flags$() & ~ ignoreFlags) + " function " + this._name$S(funcDef.name$()));
 	args = funcDef.getArguments$();
 	argsHTML = args.map((function (arg) {
 		return $this._escape$S(arg.getName$().getValue$()) + " : " + $this._typeToHTML$LParser$LType$(parser, arg.getType$());
 	})).join(", ");
 	_ += "<div class=\"member function\">\n";
 	_ += "<h3>\n";
-	_ += (this._escape$S(funcName) + this._formalTypeArgsToHTML$ALToken$(funcDef instanceof TemplateFunctionDefinition ? funcDef.getTypeArguments$() : [])).replace(/\n$/, "");
+	_ += (funcName + this._formalTypeArgsToHTML$ALToken$(funcDef instanceof TemplateFunctionDefinition ? funcDef.getTypeArguments$() : [])).replace(/\n$/, "");
 	_ += "(";
 	_ += argsHTML.replace(/\n$/, "");
 	_ += ")\n";
@@ -22880,6 +22910,9 @@ DocumentGenerator.prototype._flagsToHTML$N = function (flags) {
 	if ((flags & ClassDefinition.IS_CONST) !== 0) {
 		strs.push("const");
 	}
+	if ((flags & ClassDefinition.IS_READONLY) !== 0) {
+		strs.push("__readonly__");
+	}
 	if ((flags & ClassDefinition.IS_ABSTRACT) !== 0) {
 		strs.push("abstract");
 	}
@@ -22891,6 +22924,12 @@ DocumentGenerator.prototype._flagsToHTML$N = function (flags) {
 	}
 	if ((flags & ClassDefinition.IS_INLINE) !== 0) {
 		strs.push("inline");
+	}
+	if ((flags & ClassDefinition.IS_NATIVE) !== 0) {
+		strs.push("native");
+	}
+	if ((flags & ClassDefinition.IS_EXPORT) !== 0) {
+		strs.push("__export__");
 	}
 	return strs.join(" ");
 };
@@ -22969,6 +23008,11 @@ DocumentGenerator.prototype._isPrivate$LClassDefinition$ = function (classDef) {
 
 DocumentGenerator.prototype._isPrivate$LMemberDefinition$ = function (memberDef) {
 	return memberDef.name$().charAt(0) === "_";
+};
+
+
+DocumentGenerator.prototype._name$S = function (name) {
+	return "<strong>" + this._escape$S(name) + "</strong>";
 };
 
 
@@ -24381,10 +24425,10 @@ _CallExpressionEmitter._operatorPrecedence = 0;
 _SuperExpressionEmitter._operatorPrecedence = 0;
 _NewExpressionEmitter._operatorPrecedence = 0;
 _CommaExpressionEmitter._operatorPrecedence = 0;
-Meta.VERSION_STRING = "0.9.46";
-Meta.VERSION_NUMBER = 0.009046;
-Meta.LAST_COMMIT_HASH = "042158f45e13d1a49bebd9cdb089fa3d427923f6";
-Meta.LAST_COMMIT_DATE = "2013-06-26 13:21:39 -0700";
+Meta.VERSION_STRING = "0.9.48";
+Meta.VERSION_NUMBER = 0.009048;
+Meta.LAST_COMMIT_HASH = "770a4bde8da21f460ffb8620325fcd6ecef14994";
+Meta.LAST_COMMIT_DATE = "2013-06-29 23:56:26 -0700";
 $__jsx_lazy_init(Meta, "IDENTIFIER", function () {
 	return Meta.VERSION_STRING + " (" + Meta.LAST_COMMIT_DATE + "; " + Meta.LAST_COMMIT_HASH + ")";
 });
@@ -24485,6 +24529,9 @@ $__jsx_lazy_init(_Lexer, "keywords", function () {
 });
 $__jsx_lazy_init(_Lexer, "reserved", function () {
 	return Util$asSet$AS([ "debugger", "with", "const", "export", "let", "private", "public", "yield", "protected", "extern", "native", "as", "operator" ]);
+});
+$__jsx_lazy_init(_Lexer, "builtInClasses", function () {
+	return Util$asSet$AS([ "Array", "Boolean", "Date", "Function", "Map", "Math", "Number", "Object", "RegExp", "String", "JSON", "Error", "EvalError", "RangeError", "ReferenceError", "SyntaxError", "TypeError", "JSX", "Transferable", "ArrayBuffer", "Int8Array", "Uint8Array", "Uint8ClampedArray", "Int16Array", "Uint16Array", "Int32Array", "Uint32Array", "Float32Array", "Float64Array", "DataView" ]);
 });
 SourceMapper.NODE_SOURCE_MAP_HEADER = "require('source-map-support').install();\n\n";
 SourceMapper.WEB_SOURCE_MAP_HEADER = "";
@@ -24994,7 +25041,7 @@ var $__jsx_classMap = {
 	},
 	"src/jssourcemap.jsx": {
 		SourceMapper: SourceMapper,
-		SourceMapper$SSS: SourceMapper
+		SourceMapper$SUSS: SourceMapper
 	},
 	"src/optimizer.jsx": {
 		_Util: _Util$0,
