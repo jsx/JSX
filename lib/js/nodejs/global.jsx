@@ -42,7 +42,7 @@ final native class node {
 
 	static function require(name : string) : variant;
 
-} = "{ __dirname: __dirname, __filename: __filename, module: module, global: global }";
+} = "{ __dirname: __dirname, __filename: __filename, module: module, global: global, require: require }";
 
 
 
