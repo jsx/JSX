@@ -2,9 +2,9 @@
 42
 */
 
-native("{ bar: 42 }") class Foo {
+native class Foo {
 	static const bar : number;
-}
+} = "{ bar: 42 }";
 
 class _Main {
 	static function main (args : string[]) : void {
