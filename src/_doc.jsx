@@ -306,7 +306,7 @@ class DocumentGenerator {
 
 	function _buildDocOfFunction (parser : Parser, funcDef : MemberFunctionDefinition) : string {
 		var _ = "";
-		var ignoreFlags = (funcDef.getClassDef().flags() & ClassDefinition.IS_FINAL) | ClassDefinition.IS_INLINE;
+		var ignoreFlags = (funcDef.getClassDef().flags() & (ClassDefinition.IS_FINAL | ClassDefinition.IS_NATIVE)) | ClassDefinition.IS_INLINE;
 		var funcName = this._isConstructor(funcDef) ? "new " + funcDef.getClassDef().className() : this._flagsToHTML(funcDef.flags() & ~ignoreFlags) + " function " + funcDef.name();
 		var args = funcDef.getArguments();
 		var argsHTML = args.map.<string>(function (arg) {
