@@ -1510,10 +1510,15 @@ class Parser {
 			}
 		}
 
-		// native code definition
-		if (this._expectOpt("=") != null) {
+		// in-line native definition
+		var assignToken = this._expectOpt("=");
+		if (assignToken  != null) {
 			nativeSource = this._expectStringLiteral();
 			if (this._expect(";") == null) {
+				return null;
+			}
+			if ((this._classFlags & ClassDefinition.IS_NATIVE) == 0) {
+				this._errors.push(new CompileError(assignToken, "in-line native definition requires native attribute"));
 				return null;
 			}
 		}
