@@ -266,7 +266,7 @@ class DocumentGenerator {
 		var _ = "";
 
 ?<div class="class" id="class-<?= this._escape(classDef.className()) ?>">
-?<h2><?= this._flagsToHTML(classDef.flags()) + " " + this._escape(typeName + " " + classDef.className()) + this._formalTypeArgsToHTML(typeArgs) ?></h2>
+?<h2><?= this._flagsToHTML(classDef.flags()) + " " + this._escape(typeName) + " " + this._name(classDef.className()) + this._formalTypeArgsToHTML(typeArgs) ?></h2>
 ?<?= this._descriptionToHTML(classDef.getDocComment()) ?>
 
 		if (this._hasPublicProperties(classDef)) {
@@ -274,7 +274,7 @@ class DocumentGenerator {
 				if (! this._isPrivate(varDef)) {
 ?<div class="member property">
 ?<h3>
-?<?= this._flagsToHTML(varDef.flags()) ?> var <?= varDef.name() ?> : <?= this._typeToHTML(parser, varDef.getType()) ?>
+?<?= this._flagsToHTML(varDef.flags()) ?> var <?= this._name(varDef.name()) ?> : <?= this._typeToHTML(parser, varDef.getType()) ?>
 ?</h3>
 ?<?= this._descriptionToHTML(varDef.getDocComment()) ?>
 ?</div>
@@ -307,7 +307,9 @@ class DocumentGenerator {
 	function _buildDocOfFunction (parser : Parser, funcDef : MemberFunctionDefinition) : string {
 		var _ = "";
 		var ignoreFlags = (funcDef.getClassDef().flags() & (ClassDefinition.IS_FINAL | ClassDefinition.IS_NATIVE)) | ClassDefinition.IS_INLINE;
-		var funcName = this._isConstructor(funcDef) ? "new " + funcDef.getClassDef().className() : this._flagsToHTML(funcDef.flags() & ~ignoreFlags) + " function " + funcDef.name();
+		var funcName = this._isConstructor(funcDef)
+			? "new " + this._name(funcDef.getClassDef().className())
+			: this._flagsToHTML(funcDef.flags() & ~ignoreFlags) + " function " + this._name(funcDef.name());
 		var args = funcDef.getArguments();
 		var argsHTML = args.map.<string>(function (arg) {
 			return this._escape(arg.getName().getValue()) + " : " + this._typeToHTML(parser, arg.getType());
@@ -315,7 +317,7 @@ class DocumentGenerator {
 
 ?<div class="member function">
 ?<h3>
-?<?= this._escape(funcName) + this._formalTypeArgsToHTML(funcDef instanceof TemplateFunctionDefinition ? (funcDef as TemplateFunctionDefinition).getTypeArguments() : new Token[]) ?>(<?= argsHTML ?>)
+?<?= funcName + this._formalTypeArgsToHTML(funcDef instanceof TemplateFunctionDefinition ? (funcDef as TemplateFunctionDefinition).getTypeArguments() : new Token[]) ?>(<?= argsHTML ?>)
 		if (! this._isConstructor(funcDef)) {
 ? : <?= this._typeToHTML(parser, funcDef.getReturnType()) ?>
 		}
@@ -552,4 +554,7 @@ class DocumentGenerator {
 		return memberDef.name().charAt(0) == "_";
 	}
 
+	function _name(name : string) : string {
+		return "<strong>" + this._escape(name) + "</strong>";
+	}
 }
