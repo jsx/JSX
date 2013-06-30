@@ -2099,19 +2099,6 @@ class _DeadCodeEliminationOptimizeCommand extends _FunctionOptimizeCommand {
 			this._eliminateDeadStores(funcDef, exprs);
 			this._eliminateDeadConditions(funcDef, exprs);
 		});
-		// remove statements without side-effects
-		(function onStatements(statements : Statement[]) : boolean {
-			for (var i = statements.length - 1; i >= 0; --i) {
-				var statement = statements[i];
-				if (statement instanceof ExpressionStatement) {
-					if (! _Util.exprHasSideEffects((statement as ExpressionStatement).getExpr())) {
-						statements.splice(i, 1);
-					}
-				}
-				statement.handleStatements(onStatements);
-			}
-			return true;
-		})(funcDef.getStatements());
 		// mark the variables that are used (as RHS)
 		var locals = funcDef.getLocals();
 		var localsUsed = new Array.<boolean>(locals.length);
