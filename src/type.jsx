@@ -943,17 +943,22 @@ class TemplateFunctionType extends ResolvedFunctionType {
 			}
 			return null;
 		}
-		// TODO vararg function
-		if (argTypes.length != this._argTypes.length) {
-			notes.push(new CompileNote(token, Util.format('candidate function not viable: wrong number of arguments (%1 for %2)',
-				[argTypes.length as string, this._argTypes.length as string])));
+		if (this._argTypes.length != 0 && this._argTypes[this._argTypes.length - 1] instanceof VariableLengthArgumentType) {
+			// TODO deduce type parameters in template functions by the arguments
+			notes.push(new CompileNote(token, "template functions with variable-length arguments cannot be instantiated by the arguments: please specify the type arguments by hand"));
 			return null;
+		} else {
+			if (argTypes.length != this._argTypes.length) {
+				notes.push(new CompileNote(token, Util.format('candidate function not viable: wrong number of arguments (%1 for %2)',
+					[argTypes.length as string, this._argTypes.length as string])));
+				return null;
+			}
+			var member = this._funcDef.instantiateByArgumentTypes([], token, argTypes, exact); // TODO report compile errors
+			if (member == null) {
+				return null;
+			}
+			return member.getType();
 		}
-		var member = this._funcDef.instantiateByArgumentTypes([], token, argTypes, exact); // TODO report compile errors
-		if (member == null) {
-			return null;
-		}
-		return member.getType();
 	}
 
 	override function _getExpectedTypes (expected : Type[][], numberOfArgs : number, isStatic : boolean) : void {
