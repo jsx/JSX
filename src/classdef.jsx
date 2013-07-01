@@ -1922,6 +1922,7 @@ class TemplateFunctionDefinition extends MemberFunctionDefinition implements Tem
 	}
 
 	function instantiateByArgumentTypes (errors : CompileError[], token : Token, actualArgTypes : Type[], exact : boolean) : MemberFunctionDefinition {
+		// TODOs must be done by when user template functions are introduced: report compile errors, inner classes, parameterized classes
 		var typemap = new Map.<Type>;
 		for (var i = 0; i < this._typeArgs.length; ++i) {
 			typemap[this._typeArgs[i].getValue()] = null;
