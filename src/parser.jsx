@@ -3058,7 +3058,7 @@ class Parser {
 			var lastToken : Token;
 			if (! withBlock) {
 				lastToken = null;
-				var expr = this._expr();
+				var expr = this._assignExpr();
 				this._statements.push(new ReturnStatement(token, expr));
 			} else {
 				var lastToken = this._block();
