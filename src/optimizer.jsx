@@ -806,7 +806,7 @@ class _StripOptimizeCommand extends _OptimizeCommand {
 					++i;
 				} else {
 					this.log("removing unused native class: " + classDefs[i].className());
-					classDefs.splice(i, 1);
+					classDefs[i].setNativeSource(null);
 				}
 			}
 		});
