@@ -1,5 +1,7 @@
 .jsxdoc {
     margin: 0;
+    color: #333;
+    line-height: 1.5em;
 }
 
 .jsxdoc .file {
@@ -9,18 +11,24 @@
 .jsxdoc h1 {
     font-size: 200%;
     margin: 0.5em 0;
+    color: #336;
 }
 
 .jsxdoc h2 {
     font-size: 150%;
     font-weight: normal;
     margin: 0.5em 0;
+    padding: 5px;
+    color: #336;
+    background-color: #cce;
 }
 
 .jsxdoc h3 {
-    font-size: 100%;
+    font-size: 110%;
     font-weight: normal;
-    margin: 0.5em 0;
+    margin: 1.5em 0.5em 0 0;
+    color: #000;
+    border-bottom: dotted 1px #336;
 }
 
 .jsxdoc .class {
@@ -81,3 +89,15 @@
     font-size: smaller;
 }
 
+div#footer {
+    background-color: #ccf;
+}
+
+.jsxdoc a {
+    color: #669;
+    text-decoration: none;
+}
+
+.jsxdoc a:hover {
+    text-decoration: underline;
+}
