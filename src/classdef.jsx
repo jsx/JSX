@@ -767,6 +767,7 @@ class ClassDefinition implements Stashable {
 	}
 
 	function isConvertibleTo (classDef : ClassDefinition) : boolean {
+		assert classDef != null;
 		if (this == classDef)
 			return true;
 		if (classDef.className() == "Object")
@@ -1573,57 +1574,61 @@ class MemberFunctionDefinition extends MemberDefinition implements Block {
 
 	function generateWrappersForDefaultParameters(errors : CompileError[]) : void {
 		// function f(a, b = x, c = y) makes f(a, b) { f(a, b, y) }, f(a) { f(a, x, y) }
-		this.getArguments().forEach((argDecl, i, argDecls) -> {
-			if (argDecl.getDefaultValue() == null) {
-				return;
+
+		// skip arguments wo. default parameters
+		for (var origArgIndex = 0; origArgIndex != this.getArguments().length; ++origArgIndex) {
+			if (this.getArguments()[origArgIndex].getDefaultValue() != null) {
+				break;
 			}
-
-			var classDef = this.getClassDef();
-
-			// generate a wrapper method
-
-			var invocant = (this.flags() & ClassDefinition.IS_STATIC) == 0
-				? new ThisExpression(new Token("this", false), classDef)
-				: new ClassExpression(new Token(classDef.className(), true), new ObjectType(classDef));
-			var methodRef = new PropertyExpression(new Token(".", false), invocant, this.getNameToken(), this.getArgumentTypes());
-			var args = this.getArguments().slice(0, i).map.<Expression>((argDecl) -> {
-				return new LocalExpression(argDecl.getName(), new LocalVariable(argDecl.getName(), argDecl.getType()));
+		}
+		// generate
+		for (; origArgIndex != this.getArguments().length; ++origArgIndex) {
+			// build list of formal args (of the generated function)
+			var formalArgs = this.getArguments().slice(0, origArgIndex).map.<ArgumentDeclaration>((arg) -> {
+				return new ArgumentDeclaration(arg.getName(), arg.getType());
 			});
-			for (var j = i; j < argDecls.length; ++j) {
-				if (argDecls[j].getDefaultValue() == null) {
-					errors.push(new CompileError(argDecls[j-1].getName(), "optional parameter cannot precede required parameters"));
-					return;
-				}
-				args.push(argDecls[j].getDefaultValue().clone());
+			// build functino body
+			var argExprs = formalArgs.map.<Expression>((arg) -> {
+				return new LocalExpression(arg.getName(), arg);
+			});
+			for (var i = origArgIndex; i != this.getArguments().length; ++i) {
+				var defVal = this.getArguments()[i].getDefaultValue();
+				assert defVal != null;
+				argExprs.push(defVal.clone());
 			}
-
-			var callExpression = new CallExpression(new Token("(", false), methodRef, args);
 			var statement : Statement;
-
-			if (this.getReturnType() != Type.voidType) {
-				statement = new ReturnStatement(new Token("return", false), callExpression);
+			if (this.name() == "constructor") {
+				statement = new ConstructorInvocationStatement(new Token("this", false), new ObjectType(this.getClassDef()), argExprs);
 			}
 			else {
-				statement = new ExpressionStatement(callExpression);
+				var invocant = (this.flags() & ClassDefinition.IS_STATIC) == 0
+					? new ThisExpression(new Token("this", false), this.getClassDef())
+					: new ClassExpression(new Token(this.getClassDef().className(), true), new ObjectType(this.getClassDef()));
+				var methodRef = new PropertyExpression(new Token(".", false), invocant, this.getNameToken(), this.getArgumentTypes());
+				var callExpression = new CallExpression(new Token("(", false), methodRef, argExprs);
+				if (this.getReturnType() != Type.voidType) {
+					statement = new ReturnStatement(new Token("return", false), callExpression);
+				}
+				else {
+					statement = new ExpressionStatement(callExpression);
+				}
 			}
-
+			// build function
 			var wrapper = new MemberFunctionDefinition(
 				this.getToken(),
 				this.getNameToken(),
 				this.flags() | ClassDefinition.IS_INLINE,
 				this.getReturnType(),
-				argDecls.slice(0, i).map.<ArgumentDeclaration>((argDecl) -> {
-					return new ArgumentDeclaration(argDecl.getName(), argDecl.getType());
-				}),
+				formalArgs,
 				new LocalVariable[],
 				[statement],
 				new MemberFunctionDefinition[],
 				this._lastTokenOfBody,
 				null);
-			wrapper.setClassDef(classDef);
-
-			classDef.members().push(wrapper);
-		});
+			wrapper.setClassDef(this.getClassDef());
+			// register
+			this.getClassDef().members().push(wrapper);
+		}
 	}
 
 	function _fixupConstructor (context : AnalysisContext) : void {

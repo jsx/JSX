@@ -3,8 +3,9 @@
 /*JSX_OPTS
 --optimize strip
 */
-native("console.log('should never be called')") class Native {
-}
+native class Native {
+} = "console.log('should never be called')";
+
 class _Main {
     static function main(args : string[]) : void {
     }

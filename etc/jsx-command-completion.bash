@@ -46,7 +46,7 @@ _jsx_command_complete()
         COMPREPLY=($( compgen -W "$optimize" -- $cur ))
         ;;
       *)
-        COMPREPLY=($( compgen -W "$JSX_OPTIONS" -- $cur ))
+        COMPREPLY=($( compgen -W "$JSX_OPTIONS" -f -- $cur ))
         ;;
     esac
 

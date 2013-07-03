@@ -1,5 +1,43 @@
 Revision history for the JSX software development kit
 
+0.9.49 2013-06-30 15:14:54-0700
+    [FEATURES]
+    - Introduce new in-line native definition syntax:
+      native class N { ... } = "native code";
+      deprecating the old one:
+      native("native code") class N { ... }
+    - New type inference: type of empty container literals from the lhs expr
+      (#205)
+
+    [BUG FIXES]
+    - Fix #204, a compiler crash
+
+0.9.48 2013-06-29 14:25:25-0700
+    [BUG FIXES]
+    - Fix a crash when function expressions were used as default parameters
+    - Default parameters were accidentally allowed for non-member functions,
+      which now causes compile errors
+
+0.9.47 2013-06-26 23:49:41-0700
+    [FEATURES]
+    - Support self-contained source-map; now `jsx --enable-source-map --run`
+      dumps stacktrace with JSX source code positions
+
+0.9.46 2013-06-26 13:19:14-0700
+    [FEATURES]
+    - Show JSX source code position in stacktrace with --enable-source-map
+      (#201, EXPERIMENTAL)
+    [BUG FIXES]
+    - Fix a crash with double definitions of variables without type (#202)
+
+0.9.45 2013-06-26 12:32:00+0900
+    [CHANGES]
+    - add "util" to nodejs.jsx
+    - support use of default arguments in constructors
+
+    [BUG FIXES]
+    - fix assertion failures in unbox/unclassify optimizers
+
 0.9.44 2013-06-25 09:35:00+0900
     [CHANGES]
     - assertions with customized messages (#198)

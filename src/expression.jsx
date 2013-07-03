@@ -1552,6 +1552,9 @@ class AssignmentExpression extends BinaryExpression {
 		// special handling for v = function () ...
 		if (this._expr2 instanceof FunctionExpression)
 			return this._analyzeFunctionExpressionAssignment(context, parentExpr);
+		// special handling for v = {} or v = []
+		if ((this._expr2 instanceof ArrayLiteralExpression && (this._expr2 as ArrayLiteralExpression).getExprs().length == 0 && this._expr2.getType() == null) || (this._expr2 instanceof MapLiteralExpression && (this._expr2 as MapLiteralExpression).getElements().length == 0 && this._expr2.getType() == null))
+				return this._analyzeEmptyLiteralAssignment(context, parentExpr);
 		// normal handling
 		if (! this._analyze(context))
 			return false;
@@ -1610,7 +1613,40 @@ class AssignmentExpression extends BinaryExpression {
 		return false;
 	}
 
+	function _analyzeEmptyLiteralAssignment (context : AnalysisContext, parentExpr : Expression) : boolean {
+		if (! this._expr1.analyze(context, this))
+			return false;
+		if (this._expr1.getType() == null) {
+			context.errors.push(new CompileError(this._token, "either side of the operator should be fully type-qualified"));
+		}
+		var classDef;
+		if (this._expr2 instanceof ArrayLiteralExpression) {
+			if (! (this._expr1.getType() instanceof ObjectType
+				&& (classDef = this._expr1.getType().getClassDef()) instanceof InstantiatedClassDefinition
+				&& (classDef as InstantiatedClassDefinition).getTemplateClassName() == "Array")) {
+					context.errors.push(new CompileError(this._token, "cannot deduce the type of [] because left-hand-side expression is not of Array type"));
+					return false;
+			}
+			(this._expr2 as ArrayLiteralExpression).setType(this._expr1.getType());
+		} else {	// this._expr1 intanceof MapLiteralExpression
+			if (! (this._expr1.getType() instanceof ObjectType
+				&& (classDef = this._expr1.getType().getClassDef()) instanceof InstantiatedClassDefinition
+				&& (classDef as InstantiatedClassDefinition).getTemplateClassName() == "Map")) {
+					context.errors.push(new CompileError(this._token, "cannot deduce the type of {} because left-hand-side expression is not of Map type"));
+					return false;
+			}
+			(this._expr2 as MapLiteralExpression).setType(this._expr1.getType());
+		}
+		if (! this._expr1.assertIsAssignable(context, this._token, this._expr2.getType()))
+			return false;
+		if (! this._expr2.analyze(context, this))
+			return false;
+		return true;
+	}
+
 	function _analyzeFunctionExpressionAssignment (context : AnalysisContext, parentExpr : Expression) : boolean {
+		assert this._expr2 instanceof FunctionExpression;
+
 		// analyze from left to right to avoid "variable may not be defined" error in case the function calls itself
 		if (! this._expr1.analyze(context, this))
 			return false;
@@ -1621,7 +1657,13 @@ class AssignmentExpression extends BinaryExpression {
 			}
 		}
 		else if (! this._expr1.getType().equals(Type.variantType)) {
-			if (! (this._expr2 as FunctionExpression).deductTypeIfUnknown(context, this._expr1.getType() as ResolvedFunctionType)) {
+			if (this._expr1.getType() instanceof ResolvedFunctionType) {
+				if (! (this._expr2 as FunctionExpression).deductTypeIfUnknown(context, this._expr1.getType() as ResolvedFunctionType)) {
+					return false;
+				}
+			}
+			else {
+				context.errors.push(new CompileError(this._token, Util.format("%1 is not convertible to %2", [this._expr2.getType().toString(), this._expr1.getType().toString()])));
 				return false;
 			}
 		}

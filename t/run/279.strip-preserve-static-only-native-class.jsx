@@ -5,12 +5,12 @@ Ciao!
 /*JSX_OPTS
 --optimize strip
 */
-native("(console.log('Hi!'), console)") class Console {
+native class Console {
     delete function constructor();
     static function log(s : string) : void {
         log s;
     }
-}
+} = "(console.log('Hi!'), console)";
 class _Main {
     static function main(args : string[]) : void {
         Console.log("Ciao!");
