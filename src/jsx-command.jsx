@@ -151,6 +151,12 @@ class JSXCommand {
 					return 1;
 				}
 				break;
+			case "--diagram":
+				if ((optarg = getoptarg()) == null) {
+					return 1;
+				}
+				compiler.setMode(Compiler.MODE_DIAGRAM);
+				break;
 			case "--complete":
 				if ((optarg = getoptarg()) == null) {
 					return 1;
@@ -357,6 +363,18 @@ class JSXCommand {
 		compiler.setEmitter(emitter);
 
 		switch (compiler.getMode()) {
+		case Compiler.MODE_DIAGRAM:
+			if (outputFile == null) {
+				platform.error("--output is mandatory for --diagram");
+				return 1;
+			}
+			if (compiler.compile()) {
+				new DiagramGenerator(compiler, outputFile).buildDiagram();
+				return 0;
+			} else {
+				return 1;
+			}
+			break;
 		case Compiler.MODE_DOC:
 			if (outputFile == null) {
 				platform.error("--output is mandatory for --mode doc");

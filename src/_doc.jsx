@@ -558,3 +558,23 @@ class DocumentGenerator {
 		return "<strong>" + this._escape(name) + "</strong>";
 	}
 }
+
+class DiagramGenerator {
+
+	var _compiler : Compiler;
+	var _outputFile : string;
+
+	function constructor (compiler : Compiler, outputFile : string) {
+		this._compiler = compiler;
+		this._outputFile = outputFile;
+	}
+
+	function buildDiagram () : void {
+		var dot = "digraph jsx {"
+		this._compiler.getParsers().forEach(function (parser) {
+			// todo
+		});
+		dot += "}";
+		platform.save(outputFile, dot);
+	}
+}

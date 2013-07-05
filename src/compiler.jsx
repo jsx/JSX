@@ -168,6 +168,8 @@ class Compiler {
 		if (! this._handleErrors(errors))
 			return false;
 		switch (this._mode) {
+		case Compiler.MODE_DIAGRAM:
+			return true;
 		case Compiler.MODE_COMPLETE:
 			return true;
 		case Compiler.MODE_DOC:
