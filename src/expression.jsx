@@ -1443,17 +1443,31 @@ class AdditiveExpression extends BinaryExpression {
 	override function analyze (context : AnalysisContext, parentExpr : Expression) : boolean {
 		if (! this._analyze(context))
 			return false;
+
+		function typeIsNumber (type : Type) : boolean {
+			return type.isConvertibleTo(Type.numberType) || (type instanceof ObjectType && type.getClassDef() == Type.numberType.getClassDef());
+		}
+		function typeIsString (type : Type) : boolean {
+			return type.equals(Type.stringType) || (type instanceof ObjectType && type.getClassDef() == Type.stringType.getClassDef());
+		}
+
 		var expr1Type = this._expr1.getType().resolveIfNullable();
 		var expr2Type = this._expr2.getType().resolveIfNullable();
-		if ((expr1Type.isConvertibleTo(Type.numberType) || (expr1Type instanceof ObjectType && expr1Type.getClassDef() == Type.numberType.getClassDef()))
-			&& (expr2Type.isConvertibleTo(Type.numberType) || (expr2Type instanceof ObjectType && expr2Type.getClassDef() == Type.numberType.getClassDef()))) {
+		if (typeIsNumber(expr1Type) && typeIsNumber(expr2Type)) {
 			// ok
 			this._type = (expr1Type instanceof NumberType) || (expr2Type instanceof NumberType)
 				? (Type.numberType as Type) : (Type.integerType as Type);
-		} else if ((expr1Type.equals(Type.stringType) || (expr1Type instanceof ObjectType && expr1Type.getClassDef() == Type.stringType.getClassDef()))
-			&& (expr2Type.equals(Type.stringType) || (expr2Type instanceof ObjectType && expr2Type.getClassDef() == Type.stringType.getClassDef()))) {
+		} else if (typeIsString(expr1Type) && typeIsString(expr2Type)) {
 			// ok
 			this._type = expr1Type;
+		} else if ((typeIsString(expr1Type) && typeIsNumber(expr2Type)) || (typeIsNumber(expr1Type) && typeIsString(expr2Type))) {
+			// insert implicit coercion
+			if (typeIsNumber(expr1Type)) {
+				this._expr1 = new AsExpression(new Token("as", false), this._expr1, Type.stringType);
+			} else {
+				this._expr2 = new AsExpression(new Token("as", false), this._expr2, Type.stringType);
+			}
+			this._type = Type.stringType;
 		} else {
 			context.errors.push(new CompileError(this._token, "cannot apply operator '+' to '" + expr1Type.toString() + "' and '" + expr2Type.toString() + "'"));
 			return false;
