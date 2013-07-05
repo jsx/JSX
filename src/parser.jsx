@@ -966,6 +966,10 @@ class Parser {
 		this._errors.push(new DeprecatedWarning(this._filename, this._lineNumber, this._getColumn(), message));
 	}
 
+	function _newExperimentalWarning(feature : Token) : void {
+		this._errors.push(new ExperimentalWarning(feature, feature.getValue()));
+	}
+
 	function _advanceToken () : void {
 		if (this._tokenLength != 0) {
 			this._forwardPos(this._tokenLength);
@@ -2470,6 +2474,7 @@ class Parser {
 	}
 
 	function _yieldStatement (token : Token) : boolean {
+		this._newExperimentalWarning(token);
 		var expr = this._expr(false);
 		if (expr == null)
 			return false;

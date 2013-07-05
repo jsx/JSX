@@ -525,6 +525,19 @@ class DeprecatedWarning extends CompileWarning {
 
 }
 
+class ExperimentalWarning extends CompileWarning {
+
+	function constructor (token : Token, feature: string) {
+		super(token, "'" + feature + "' is experimental");
+	}
+
+	function constructor (filename : string, lineNumber : number, columnNumber : number, feature : string) {
+		super(filename, lineNumber, columnNumber, "'" + feature + "' is experimental");
+	}
+
+}
+
+
 class CompileNote extends CompileIssue {
 
 	function constructor (token : Token, message : string) {
