@@ -116,6 +116,7 @@ class _Util {
 			if ((classDef.flags() & ClassDefinition.IS_NATIVE) == 0) {
 				// decide the className
 				if (classDef.getOuterClassDef() != null)
+					// inner class
 					var className = _Util.getOutputClassName(classDef.getOuterClassDef()) + "$C" + classDef.className();
 				else
 					className = classDef.className();
@@ -139,6 +140,12 @@ class _Util {
 					}
 				} else {
 					setOutputName(classDef, newUniqueName(className));
+				}
+			}
+			else { // native class
+				if (classDef.getOuterClassDef()) {
+					// native inner class
+					setOutputName(classDef, _Util.getOutputClassName(classDef.getOuterClassDef()) + "." + classDef.className());
 				}
 			}
 		}
