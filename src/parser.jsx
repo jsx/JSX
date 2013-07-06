@@ -1375,6 +1375,10 @@ class Parser {
 		this._templateInners = new TemplateClassDefinition[];
 		// attributes* class
 		this._classFlags = 0;
+		if (this._outerClass) {
+			// inherits flags from the outer classe
+			this._classFlags |= this._outerClass.classFlags & (ClassDefinition.IS_NATIVE);
+		}
 		var nativeSource = null : Token;
 		var docComment = null : DocComment;
 		while (true) {
