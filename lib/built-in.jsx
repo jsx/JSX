@@ -678,7 +678,9 @@ native final class Number {
 	/**
 	 * Determines whether a number is <code>NaN</code> or not.
 	 */
-	static __pure__ function isNaN(num :number) : boolean;
+	static __pure__ inline function isNaN(num :number) : boolean {
+		return num != num;
+	}
 
 	/**
 	 * Determines whether a number is finite or not.

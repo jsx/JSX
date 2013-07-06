@@ -111,6 +111,10 @@ class _Test extends TestCase {
 
 	function testNumber() : void {
 		this.expect(new Number(new Number(42)).toString(), "copy constructor").toBe(new Number(42).toString());
+
+		var x = NaN + Math.random();
+		var result = Number.isNaN(x);
+		this.expect(result).toBe(true);
 	}
 
 	function testRegexp() : void {
