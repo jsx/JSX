@@ -53,14 +53,18 @@ class _Util {
 	}
 
 	static function getOutputClassName(classDef : ClassDefinition) : string {
-		return (classDef.getStash(_Util.OUTPUTNAME_IDENTIFIER) as _Util.OutputNameStash).outputName;
+		var stash = classDef.getStash(_Util.OUTPUTNAME_IDENTIFIER) as _Util.OutputNameStash;
+		assert stash != null, classDef.className();
+		return stash.outputName;
 	}
 
 	static function getOutputConstructorName(ctor : MemberFunctionDefinition) : string {
 		if ((ctor.getClassDef().flags() & ClassDefinition.IS_NATIVE) != 0) {
 			return _Util.getNameOfNativeConstructor(ctor.getClassDef());
 		}
-		return (ctor.getStash(_Util.OUTPUTNAME_IDENTIFIER) as _Util.OutputNameStash).outputName;
+		var stash = ctor.getStash(_Util.OUTPUTNAME_IDENTIFIER) as _Util.OutputNameStash;
+		assert stash != null, ctor.getNotation();
+		return stash.outputName;
 	}
 
 	static function getOutputConstructorName(classDef : ClassDefinition, argTypes : Type[]) : string {
@@ -70,6 +74,9 @@ class _Util {
 	}
 
 	static function getNameOfNativeConstructor(classDef : ClassDefinition) : string {
+		if (classDef.getNativeSource() != null) {
+			return _Util.getOutputClassName(classDef);
+		}
 		if (classDef instanceof InstantiatedClassDefinition) {
 			if ((classDef as InstantiatedClassDefinition).getTemplateClassName() == "Map") {
 				return "Object";
@@ -146,6 +153,9 @@ class _Util {
 				if (classDef.getOuterClassDef()) {
 					// native inner class
 					setOutputName(classDef, _Util.getOutputClassName(classDef.getOuterClassDef()) + "." + classDef.className());
+				}
+				else if (classDef.getNativeSource() != null) {
+					setOutputName(classDef, newUniqueName(classDef.className()));
 				}
 			}
 		}
