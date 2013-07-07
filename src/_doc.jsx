@@ -62,6 +62,10 @@ class DocCommentParameter extends DocCommentNode {
 		return this._token.getValue();
 	}
 
+	override function getDescription() : string {
+		var d = super.getDescription();
+		return d.trim();
+	}
 }
 
 class DocCommentTag extends DocCommentNode {
