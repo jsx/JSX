@@ -987,11 +987,15 @@ native class TypeError extends Error {
 
 /**
  * Provides classes and interfaces related to generator.
+ * @private EXPERIMENTAL
  */
 class g_StopIteration extends Error {
 	function constructor() { }
 }
 
+/**
+ * @private EXPERIMENTAL
+ */
 interface g_Enumerable.<T> {
 	function next () : T;
 }
