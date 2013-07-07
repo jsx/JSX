@@ -616,6 +616,9 @@ class _StripOptimizeCommand extends _OptimizeCommand {
 		classDef.implementTypes().forEach(function (implementType) {
 			this._touchInstance(implementType.getClassDef());
 		});
+		if (classDef.getOuterClassDef() != null) {
+			this._touchInstance(classDef.getOuterClassDef());
+		}
 	}
 
 	function _touchConstructor(funcDef : MemberFunctionDefinition) : void {
