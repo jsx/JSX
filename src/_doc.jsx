@@ -263,7 +263,7 @@ class DocumentGenerator {
 		var typeArgs = classDef instanceof TemplateClassDefinition ? (classDef as TemplateClassDefinition).getTypeArguments() : new Token[];
 
 ?<div class="class" id="class-<?= this._escape(classDef.classFullName()) ?>">
-?<h2><?= this._flagsToHTML(classDef.flags()) + " " + this._escape(typeName) + " " + this._name(classDef.classFullName()) + this._formalTypeArgsToHTML(typeArgs) ?></h2>
+?<h2><?= this._flagsToHTML(classDef.flags()) + " " + this._escape(typeName) + " " + this._name(classDef.classFullName()) + this._formalTypeArgsToHTML(typeArgs) + this._inheritance(parser, classDef) ?></h2>
 ?<?= this._descriptionToHTML(classDef.getDocComment()) ?>
 
 		// inner classes
@@ -316,6 +316,24 @@ class DocumentGenerator {
 
 ?</div>
 
+		return _;
+	}
+
+	function _inheritance(parser : Parser, classDef : ClassDefinition) : string {
+		if (classDef.extendType() == null) {
+			return "";
+		}
+		var extendClassDef = classDef.extendType().getClassDef();
+		if (extendClassDef == null || extendClassDef.classFullName() == "Object") {
+			return "";
+		}
+
+		var _  = " extends " + this._classDefToHTML(parser, extendClassDef);
+
+		var implementTypes = classDef.implementTypes();
+		if (implementTypes.length > 0) {
+			_ += " implements " + implementTypes.map.<string>((type) -> this._classDefToHTML(parser, type.getClassDef())).join(", ");
+		}
 		return _;
 	}
 
