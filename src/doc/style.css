@@ -5,11 +5,11 @@
 }
 
 .jsxdoc .file {
-    padding: 1em 50px 1em 50px;
+    padding: 1em 40px 1em 40px;
 }
 
 .jsxdoc h1 {
-    font-size: 200%;
+    font-size: 220%;
     margin: 0.5em 0;
     color: #336;
 }
@@ -24,16 +24,27 @@
 }
 
 .jsxdoc h3 {
-    font-size: 110%;
+    font-size: 120%;
     font-weight: normal;
-    margin: 1.5em 0.5em 0 0;
+    margin: 0.5em 0;
     color: #000;
-    border-bottom: dotted 1px #336;
+    border-bottom: dotted 1px gray;
+}
+
+.jsxdoc pre {
+    padding-left: 1em;
+    padding-right: 1em;
+    background-color: #eee;
+    border: 1px dotted gray;
+}
+
+.jsxdoc code {
+    font-size: 110%;
 }
 
 .jsxdoc .class {
     margin: 0;
-    padding: 1em 50px;
+    padding: 1em 30px;
     border-top: 1px dotted #ccc;
 }
 
@@ -46,8 +57,19 @@
 }
 
 .jsxdoc .description {
-    margin: 0.5em 0 0.5em 4em;
+    margin: 0.5em 0 0.5em 3em;
     text-align: justify;
+}
+
+.jsxdoc .description h2 {
+    font-size: 140%;
+    color: black;
+    background-color: white;
+}
+.jsxdoc .description h3 {
+    font-size: 110%;
+    color: black;
+    background-color: white;
 }
 
 .jsxdoc .arguments {
@@ -90,7 +112,7 @@
 }
 
 div#footer {
-    background-color: #ccf;
+    background-color: #eee;
 }
 
 .jsxdoc a {

@@ -40,14 +40,7 @@ class DocCommentNode {
 	}
 
 	function appendDescription (s : string) : void {
-		s = s.trim();
-		// append
-		if (s != "") {
-			if (this._description != "") {
-				this._description += " ";
-			}
-			this._description += s;
-		}
+		this._description += s;
 	}
 
 }
@@ -364,7 +357,7 @@ class DocumentGenerator {
 		if (docComment != null) {
 			if (docComment.getDescription() != "") {
 ?<div class="description">
-?<?= docComment.getDescription() ?>
+?<?= docComment.getDescription().replace(/\t/g, "  ") ?>
 ?</div>
 			}
 			var seeTags = docComment.getTagsByName("see");
@@ -380,7 +373,7 @@ class DocumentGenerator {
 	}
 
 	function _autoLink (str : string) : string {
-		var uri = /^https?:\/\/[A-Za-z0-9\-\._~:\/?#\[\]@!$&'()*+,;=]+/;
+		var uri = /^https?:\/\/[A-Za-z0-9\-\._~:\/?#\[\]@!$&'()*+,;=]+/g;
 		return str.replace(uri, (matched) -> {
 			return Util.format('<a href="%1">%1</a>', [matched]);
 		});
