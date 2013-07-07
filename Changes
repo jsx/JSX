@@ -1,5 +1,10 @@
 Revision history for the JSX software development kit
 
+0.9.51 2013-07-06 22:03:21-0700
+    [BUG FIXES]
+    - Fix native inner class issues again
+    - Fix a jsxdoc issue that inner classes were not listed
+
 0.9.50 2013-07-06 17:24:47-0700
     [BUG FIXES]
     - Fix #208, #209: issues on in-line native definition
