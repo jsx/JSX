@@ -74,7 +74,7 @@ class _Util {
 	}
 
 	static function getNameOfNativeConstructor(classDef : ClassDefinition) : string {
-		if (classDef.getNativeSource() != null) {
+		if (classDef.getNativeSource() != null || classDef.getOuterClassDef() != null) {
 			return _Util.getOutputClassName(classDef);
 		}
 		if (classDef instanceof InstantiatedClassDefinition) {
@@ -150,9 +150,10 @@ class _Util {
 				}
 			}
 			else { // native class
-				if (classDef.getOuterClassDef()) {
+				if (classDef.getOuterClassDef() != null) {
 					// native inner class
-					setOutputName(classDef, _Util.getOutputClassName(classDef.getOuterClassDef()) + "." + classDef.className());
+					var name = _Util.getOutputClassName(classDef.getOuterClassDef()) + "." + classDef.className();
+					setOutputName(classDef, name);
 				}
 				else if (classDef.getNativeSource() != null) {
 					setOutputName(classDef, newUniqueName(classDef.className()));
@@ -212,7 +213,7 @@ class _Mangler {
 					// fall through
 				}
 			}
-			return "L" + _Util.getOutputClassName(type.getClassDef()) + "$";
+			return "L" + _Util.getOutputClassName(type.getClassDef()).replace(/\./, '$C') + "$";
 		} else if (type instanceof StaticFunctionType)
 			return "F" + this.mangleFunctionArguments((type as StaticFunctionType).getArgumentTypes()) + this.mangleTypeName((type as StaticFunctionType).getReturnType()) + "$";
 		else if (type instanceof MemberFunctionType)
