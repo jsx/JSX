@@ -213,7 +213,7 @@ class _Mangler {
 					// fall through
 				}
 			}
-			return "L" + _Util.getOutputClassName(type.getClassDef()).replace(/\./, '$C') + "$";
+			return "L" + _Util.getOutputClassName(type.getClassDef()).replace(/\./g, '$C') + "$";
 		} else if (type instanceof StaticFunctionType)
 			return "F" + this.mangleFunctionArguments((type as StaticFunctionType).getArgumentTypes()) + this.mangleTypeName((type as StaticFunctionType).getReturnType()) + "$";
 		else if (type instanceof MemberFunctionType)
