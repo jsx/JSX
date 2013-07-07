@@ -557,7 +557,7 @@ class ClassDefinition implements Stashable {
 		} catch (e : Error) {
 			var token = this.getToken();
 			var srcPos = token != null ? Util.format(" at file %1, line %2", [token.getFilename(), token.getLineNumber() as string]) : "";
-			e.message = Util.format("fatal error while analyzing class %1%2\n%3", [this.className(), srcPos, e.message]);
+			e.message = Util.format("fatal error while analyzing class %1%2\n%3", [this.classFullName(), srcPos, e.message]);
 
 			throw e;
 		}
@@ -573,7 +573,7 @@ class ClassDefinition implements Stashable {
 		if ((this.flags() & (ClassDefinition.IS_INTERFACE | ClassDefinition.IS_MIXIN)) == 0) {
 			if (this._baseClassDef != null) {
 				if ((this._baseClassDef.flags() & ClassDefinition.IS_FINAL) != 0) {
-					context.errors.push(new CompileError(this.getToken(), "cannot extend final class '" + this._baseClassDef.className() + "'"));
+					context.errors.push(new CompileError(this.getToken(), "cannot extend final class '" + this._baseClassDef.classFullName() + "'"));
 					return;
 				}
 				if ((this._baseClassDef.flags() & (ClassDefinition.IS_INTERFACE | ClassDefinition.IS_MIXIN)) != 0) {
@@ -593,7 +593,7 @@ class ClassDefinition implements Stashable {
 		} else {
 			for (var i = 0; i < implementClassDefs.length; ++i) {
 				if ((implementClassDefs[i].flags() & (ClassDefinition.IS_INTERFACE | ClassDefinition.IS_MIXIN)) == 0) {
-					context.errors.push(new CompileError(this.getToken(), "class '" + implementClassDefs[i].className() + "' can only be extended, not implemented"));
+					context.errors.push(new CompileError(this.getToken(), "class '" + implementClassDefs[i].classFullName() + "' can only be extended, not implemented"));
 					return;
 				}
 				if (! implementClassDefs[i].forEachClassToBase(function (classDef) {
@@ -612,7 +612,7 @@ class ClassDefinition implements Stashable {
 		if (! this.forEachClassToBase(function (classDef) {
 			if ((classDef.flags() & ClassDefinition.IS_MIXIN) != 0) {
 				if (allMixins.indexOf(classDef) != -1) {
-					context.errors.push(new CompileError(this.getToken(), "mixin '" + classDef.className() + "' is implemented twice"));
+					context.errors.push(new CompileError(this.getToken(), "mixin '" + classDef.classFullName() + "' is implemented twice"));
 					return false;
 				}
 				allMixins.push(classDef);
@@ -809,7 +809,7 @@ class ClassDefinition implements Stashable {
 		for (var i = 0; i < this._members.length; ++i) {
 			if (this._members[i].name() == member.name()) {
 				if ((this._members[i].flags() & ClassDefinition.IS_ABSTRACT) == 0) {
-					context.errors.push(new CompileError(member.getNameToken(), Util.format("cannot define property '%1', the name is already used in class '%2'", [member.getNotation(), this.className()])));
+					context.errors.push(new CompileError(member.getNameToken(), Util.format("cannot define property '%1', the name is already used in class '%2'", [member.getNotation(), this.classFullName()])));
 					return false;
 				}
 				if (! this._members[i].getType().equals(member.getType())) {
@@ -841,11 +841,11 @@ class ClassDefinition implements Stashable {
 			if (! Util.typesAreEqual((this._members[i] as MemberFunctionDefinition).getArgumentTypes(), member.getArgumentTypes()))
 				continue;
 			if ((! isCheckingInterface) && (member.flags() & ClassDefinition.IS_OVERRIDE) == 0) {
-				context.errors.push(new CompileError(member.getNameToken(), "overriding functions must have 'override' attribute set (defined in base class '" + this.className() + "')"));
+				context.errors.push(new CompileError(member.getNameToken(), "overriding functions must have 'override' attribute set (defined in base class '" + this.classFullName() + "')"));
 				return false;
 			}
 			if (reportOverridesAsWell && (this._members[i].flags() & ClassDefinition.IS_OVERRIDE) != 0) {
-				context.errors.push(new CompileError(member.getNameToken(), "definition of the function conflicts with sibling mix-in '" + this.className() + "'"));
+				context.errors.push(new CompileError(member.getNameToken(), "definition of the function conflicts with sibling mix-in '" + this.classFullName() + "'"));
 				return false;
 			}
 			// assertion of function being overridden does not have 'final' attribute is done by assertFunctionIsOverridable
@@ -867,7 +867,7 @@ class ClassDefinition implements Stashable {
 				&& ((this._members[i] as MemberFunctionDefinition).flags() & ClassDefinition.IS_STATIC) == 0
 				&& Util.typesAreEqual((this._members[i] as MemberFunctionDefinition).getArgumentTypes(), overrideDef.getArgumentTypes())) {
 				if ((this._members[i].flags() & ClassDefinition.IS_FINAL) != 0) {
-					context.errors.push(new CompileError(overrideDef.getToken(), "cannot override final function defined in class '" + this.className() + "'"));
+					context.errors.push(new CompileError(overrideDef.getToken(), "cannot override final function defined in class '" + this.classFullName() + "'"));
 					return false;
 				}
 				var overrideReturnType = overrideDef.getReturnType();
@@ -1165,7 +1165,7 @@ class MemberVariableDefinition extends MemberDefinition {
 
 	override function getNotation() : string {
 		var classDef = this.getClassDef();
-		var s = (classDef != null ? classDef.className(): "<<unknown>>");
+		var s = (classDef != null ? classDef.classFullName(): "<<unknown>>");
 		s += (this.flags() & ClassDefinition.IS_STATIC) != 0 ? "." : "#";
 		s += this.name();
 		return s;
@@ -1210,7 +1210,7 @@ class MemberFunctionDefinition extends MemberDefinition implements Block {
 	 */
 	override function getNotation() : string {
 		var classDef = this.getClassDef();
-		var s = (classDef != null ? classDef.className(): "<<unknown>>");
+		var s = (classDef != null ? classDef.classFullName(): "<<unknown>>");
 		s += (this.flags() & ClassDefinition.IS_STATIC) != 0 ? "." : "#";
 		s += this.getNameToken() != null ? this.name() : "$" +  this.getToken().getLineNumber()  as string + "_" + this.getToken().getColumnNumber() as string;
 		s += "(";
