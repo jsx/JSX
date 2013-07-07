@@ -1988,6 +1988,8 @@ class _PropertyExpressionEmitter extends _UnaryExpressionEmitter {
 		} else {
 			var name = identifierToken.getValue();
 			if (Util.isReferringToFunctionDefinition(expr)) {
+				assert exprType instanceof ResolvedFunctionType, exprType.toString();
+				log exprType.toString();
 				name = this._emitter.getNamer().getNameOfMethod(classDef, name, (exprType as ResolvedFunctionType).getArgumentTypes());
 			} else {
 				name = this._emitter.getNamer().getNameOfProperty(classDef, name);
