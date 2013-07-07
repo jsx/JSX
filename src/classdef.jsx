@@ -1623,7 +1623,7 @@ class MemberFunctionDefinition extends MemberDefinition implements Block {
 				[statement],
 				new MemberFunctionDefinition[],
 				this._lastTokenOfBody,
-				null);
+				this._docComment);
 			wrapper.setClassDef(this.getClassDef());
 			// register
 			this.getClassDef().members().push(wrapper);

@@ -16,7 +16,6 @@ deps:
 	npm install .
 
 compiler: meta src/doc.jsx
-	rm -f $(TARGET_COMPILER)
 	$(MAKE) compiler-core
 	cp -f "$$PWD/tool/jsx.pl" bin/jsx-with-server
 

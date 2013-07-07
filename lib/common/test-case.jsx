@@ -410,7 +410,7 @@ class TestCase {
 	}
 
 	/**
-	 * Test Assertion Executor
+	 * Executes Assertion Executor, created by <code>TestCase#expect()</code>
 	 */
 	class Matcher {
 
@@ -418,12 +418,10 @@ class TestCase {
 		var _got  : variant;
 		var _name : Nullable.<string>;
 
-		function constructor(test : TestCase, got : variant) {
-			this._test = test;
-			this._got  = got;
-		}
-
-		function constructor(test : TestCase, got : variant, name : string) {
+		/**
+		 * @private
+		 */
+		function constructor(test : TestCase, got : variant, name : Nullable.<string> = null) {
 			this._test = test;
 			this._got  = got;
 			this._name = name;
@@ -508,6 +506,9 @@ class TestCase {
 
 	}
 
+	/**
+	 * @private
+	 */
 	class Failure extends Error {
 		function constructor(reason : string) {
 			super(reason);
