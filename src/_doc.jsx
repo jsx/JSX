@@ -36,7 +36,7 @@ class DocCommentNode {
 	}
 
 	function getDescription () : string {
-		return this._description;
+		return this._description.replace(/^[\r\n]+/, "").replace(/[\r\n]+$/, "");
 	}
 
 	function appendDescription (s : string) : void {
