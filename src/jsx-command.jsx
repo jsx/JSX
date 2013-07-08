@@ -152,9 +152,6 @@ class JSXCommand {
 				}
 				break;
 			case "--diagram":
-				if ((optarg = getopt()) == null) {
-					return 1;
-				}
 				compiler.setMode(Compiler.MODE_DIAGRAM);
 				break;
 			case "--complete":
