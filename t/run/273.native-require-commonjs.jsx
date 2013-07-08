@@ -5,14 +5,14 @@ Hello, world!
 // issue #152
 
 // with double-quoted
-native("require('string_decoder').StringDecoder") class StringDecoder {
+native class StringDecoder {
 	function constructor(encodingName : string);
-}
+} = "require('string_decoder').StringDecoder";
 
 // with single-quoted
-native('require("util")') class util {
+native class util {
 	static function format(format : string, ...args : variant) : string;
-}
+} = 'require("util")';
 
 class _Main {
 	static function main(args : string[]) : void {

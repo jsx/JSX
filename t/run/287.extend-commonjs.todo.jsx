@@ -2,9 +2,9 @@
 Base
 Derived
 */
-native("require('./t/run/287.extend-commonjs/base.js').Base") class Base {
+native class Base {
     function say() : void;
-}
+} = "require('./t/run/287.extend-commonjs/base.js').Base";
 
 class Derived extends Base {
     override function say() : void {

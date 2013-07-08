@@ -156,5 +156,6 @@ final class Timer {
  * Implementation-defined object which setTimeout() and setInterval() return.
  */
 final class TimerHandle {
+	delete function constructor() { }
 }
 

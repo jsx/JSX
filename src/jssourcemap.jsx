@@ -26,36 +26,58 @@
  */
 
 import "./util.jsx";
+import "js/nodejs.jsx"; // for base64 encode
 
-native ("require('source-map').SourceMapGenerator") class SourceMapGenerator {
+native class SourceMapGenerator {
 	function constructor(options : Map.<string>);
 	function addMapping(mapping : Map.<variant>) : void;
 	function setSourceContent(sourceFile : string, sourceContent : string) : void;
-}
+} = "require('source-map').SourceMapGenerator";
 
-native ("require('source-map').SourceMapConsumer") class SourceMapConsumer {
+native class SourceMapConsumer {
 	function constructor(mapping : variant);
 	function originalPositionFor(generatedPos : variant) : variant;
-}
+} = "require('source-map').SourceMapConsumer";
 
 
 class SourceMapper {
 
+	static const NODE_SOURCE_MAP_HEADER = "require('source-map-support').install();\n\n";
+	static const WEB_SOURCE_MAP_HEADER = "";
+
 	var _rootDir : string;
-	var _outputFile : string;
+	var _outputFile : Nullable.<string>;
 	var _impl : SourceMapGenerator;
+	var _header : string;
 
 	var _sourceFiles = new Map.<boolean>();
 
 	var _outputLength = 0;
 	var _outputLineNumber = 1;
 
-	function constructor (rootDir : string, outputFile : string) {
+	function constructor (rootDir : string, outputFile : Nullable.<string>, runenv : string) {
 		this._rootDir = rootDir;
-		this._outputFile = Util.resolvePath(outputFile);
+		this._outputFile = outputFile != null ? Util.resolvePath(outputFile) : null;
 		this._impl = new SourceMapGenerator({
-			file       : Util.basename(this._outputFile)
+			file       : outputFile != null ? Util.basename(this._outputFile) : null
 		});
+
+		switch (runenv) {
+		case "node":
+			this._header = SourceMapper.NODE_SOURCE_MAP_HEADER;
+			break;
+		case "web":
+			this._header = SourceMapper.WEB_SOURCE_MAP_HEADER;
+			break;
+		default:
+			this._header = "";
+		}
+		this._outputLength += this._header.length;
+		this._outputLineNumber += this._header.split('\n').length - 1;
+	}
+
+	function getSourceMapHeader () : string {
+		return this._header;
 	}
 
 	function makeGeneratedPos(output : string) : Map.<number>{
@@ -127,8 +149,15 @@ class SourceMapper {
 		return this._impl.toString();
 	}
 
-	function magicToken () : string {
-		var sourceMappingFile = Util.basename(this.getSourceMappingFile());
-		return "\n" + "//# sourceMappingURL=" + sourceMappingFile + "\n";
+	function getSourceMapFooter() : string {
+		var sourceMappingURL;
+		if (this._outputFile != null) {
+			sourceMappingURL = Util.basename(this.getSourceMappingFile());
+		}
+		else {
+			// uses Data URI scheme
+			sourceMappingURL = "data:application/json;base64," + (new Buffer(this.generate(), "utf8").toString("base64"));
+		}
+		return "\n" + "//# sourceMappingURL=" + sourceMappingURL + "\n";
 	}
 }

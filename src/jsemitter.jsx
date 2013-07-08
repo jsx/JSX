@@ -796,17 +796,17 @@ class _Minifier {
 
 }
 
-native("require('esprima')") class esprima {
+native class esprima {
 	static function parse(src : string) : variant;
-}
+} = "require('esprima')";
 
-native("require('esmangle')") class esmangle {
+native class esmangle {
 	static function mangle(ast : variant, opts : Map.<variant>) : variant;
-}
+} = "require('esmangle')";
 
-native("require('escodegen')") class escodegen {
+native class escodegen {
 	static function generate(ast : variant, opts : Map.<variant>) : string;
-}
+} = "require('escodegen')";
 
 
 // statement emitter
@@ -2150,12 +2150,18 @@ class _EqualityExpressionEmitter extends _OperatorExpressionEmitter {
 		var op = this._expr.getToken().getValue();
 		var emitOp = op;
 		// NOTE: works for cases where one side is an object and the other is the primitive counterpart
-		if (this._expr.getFirstExpr().getType() instanceof PrimitiveType && this._expr.getSecondExpr().getType() instanceof PrimitiveType) {
+		var lhs = this._expr.getFirstExpr();
+		var rhs = this._expr.getSecondExpr();
+		if (lhs.getType() instanceof PrimitiveType && rhs.getType() instanceof PrimitiveType) {
 			emitOp += "=";
 		}
-		this._emitter._getExpressionEmitterFor(this._expr.getFirstExpr()).emit(_EqualityExpressionEmitter._operatorPrecedence[op] - 1);
+		else if (lhs.getType().resolveIfNullable() instanceof PrimitiveType && lhs.getType().resolveIfNullable().equals(rhs.getType().resolveIfNullable())) {
+			// both are primitive types but either lhs or rhs is nullable
+			emitOp += "=";
+		}
+		this._emitter._getExpressionEmitterFor(lhs).emit(_EqualityExpressionEmitter._operatorPrecedence[op] - 1);
 		this._emitter._emit(" " + emitOp + " ", this._expr.getToken());
-		this._emitter._getExpressionEmitterFor(this._expr.getSecondExpr()).emit(_EqualityExpressionEmitter._operatorPrecedence[op] - 1);
+		this._emitter._getExpressionEmitterFor(rhs).emit(_EqualityExpressionEmitter._operatorPrecedence[op] - 1);
 	}
 
 	override function _getPrecedence () : number {
@@ -2721,7 +2727,7 @@ abstract class _BootstrapBuilder {
 				args = "[]";
 				break;
 		}
-		var callEntryPoint = Util.format("JSX.%1(%2, %3)",
+		var callEntryPoint = Util.format("JSX.%1(%2, %3);",
 				[this._getLauncher(), JSON.stringify(this._emitter._platform.encodeFilename(this._entrySourceFile)), args]);
 
 		if (this._executableFor == "web") {
@@ -2768,6 +2774,7 @@ class JavaScriptEmitter implements Emitter {
 	var _fileFooter =                     "})(JSX);\n";
 
 	var _platform : Platform;
+	var _runenv : string;
 
 	// properties setup by _emitInit
 	var _output : string;
@@ -2778,7 +2785,6 @@ class JavaScriptEmitter implements Emitter {
 	var _emittingFunction : MemberFunctionDefinition;
 
 	// modes
-	var _enableSourceMap : boolean;
 	var _enableProfiler : boolean;
 	var _enableMinifier : boolean;
 	var _enableRunTimeTypeCheck = true;
@@ -2796,7 +2802,10 @@ class JavaScriptEmitter implements Emitter {
 	function isJsModule(classDef : ClassDefinition) : boolean {
 		return classDef.className() == "js"
 			&& classDef.getToken().getFilename() == Util.resolvePath(this._platform.getRoot() + "/lib/js/js.jsx");
+	}
 
+	override function setRunEnv (runenv : string) : void {
+		this._runenv = runenv;
 	}
 
 	override function getSearchPaths () : string[] {
@@ -2807,16 +2816,12 @@ class JavaScriptEmitter implements Emitter {
 		if (name == null) return;
 
 		this._outputFile = Util.resolvePath(name);
-
-		if(this._enableSourceMap) {
-			this._sourceMapper = new SourceMapper(this._platform.getRoot(), name);
-		}
 	}
 
 	override function getSourceMappingFiles() : Map.<string> {
 		var files = new Map.<string>;
 		var sourceMapper = this._sourceMapper;
-		if(sourceMapper != null) {
+		if(sourceMapper != null && this._outputFile != null) {
 			sourceMapper.getSourceFiles().forEach((filename) -> {
 				try {
 					sourceMapper.setSourceContent(filename, this._platform.load(filename));
@@ -2832,10 +2837,6 @@ class JavaScriptEmitter implements Emitter {
 		return files;
 	}
 
-	function setSourceMapper(gen : SourceMapper) : void {
-		this._sourceMapper = gen;
-	}
-
 	function getMangler() : _Mangler {
 		return this._mangler;
 	}
@@ -2849,11 +2850,13 @@ class JavaScriptEmitter implements Emitter {
 	}
 
 	override function getEnableSourceMap() : boolean {
-		return this._enableSourceMap;
+		return this._sourceMapper != null;
 	}
 
 	override function setEnableSourceMap (enable : boolean) : void {
-		this._enableSourceMap = enable;
+		this._sourceMapper = enable
+			? new SourceMapper(this._platform.getRoot(), this._outputFile, this._runenv)
+			: null;
 	}
 
 	override function setEnableProfiler (enable : boolean) : void {
@@ -2871,7 +2874,7 @@ class JavaScriptEmitter implements Emitter {
 	override function emit (classDefs : ClassDefinition[]) : void {
 
 		// current impl. of _Minifier.minifyJavaScript does not support transforming source map
-		assert ! (this._enableMinifier && this._enableSourceMap);
+		assert ! (this._enableMinifier && this._sourceMapper);
 
 		_Util.setOutputClassNames(classDefs);
 
@@ -2896,7 +2899,6 @@ class JavaScriptEmitter implements Emitter {
 	function _emitInit() : void {
 		this._output = "";
 		this._outputEndsWithReturn = true;
-		this._outputFile = null;
 		this._indent = 0;
 		this._emittingClass = null;
 		this._emittingFunction = null;
@@ -3164,8 +3166,12 @@ class JavaScriptEmitter implements Emitter {
 	}
 
 	override function getOutput () : string {
-		// do not add any lines before this._output for source-map
-		var output = this._output + "\n";
+		var output = "";
+		// do not add any lines except source-map header before this._output for source-map
+		if (this._sourceMapper) {
+			output += this._sourceMapper.getSourceMapHeader();
+		}
+		output += this._output + "\n";
 		if (this._enableProfiler) {
 			output += this._platform.load(this._platform.getRoot() + "/src/js/profiler.js");
 		}
@@ -3174,7 +3180,7 @@ class JavaScriptEmitter implements Emitter {
 		}
 		output += this._fileFooter;
 		if (this._sourceMapper) {
-			output += this._sourceMapper.magicToken();
+			output += this._sourceMapper.getSourceMapFooter();
 		}
 		if (this._enableMinifier) {
 			output = _Minifier.minifyJavaScript(output);

@@ -69,20 +69,32 @@ class _Util {
 	}
 
 	static function exprHasSideEffects (expr : Expression) : boolean {
-		// FIXME native array access may have side effects
 		function onExpr (expr : Expression, _ : function(:Expression):void) : boolean {
-			if (expr instanceof FunctionExpression
-			    || expr instanceof NewExpression
+			if (   expr instanceof NewExpression
 			    || expr instanceof AssignmentExpression
 			    || expr instanceof PreIncrementExpression
 			    || expr instanceof PostIncrementExpression
 			    || expr instanceof SuperExpression) {
 				return false;
-			} else if (expr instanceof CallExpression) {
+			}
+			else if (expr instanceof CallExpression) {
 				var callingFuncDef = _DetermineCalleeCommand.getCallingFuncDef(expr);
 				if (callingFuncDef != null && (callingFuncDef.flags() & ClassDefinition.IS_PURE) != 0) {
 					// fall through (check receiver and arguments)
 				} else {
+					return false;
+				}
+			}
+			else if (expr instanceof PropertyExpression) {
+				var type = (expr as PropertyExpression).getExpr().getType();
+				if (type instanceof ObjectType && ((type as ObjectType).getClassDef().flags() & ClassDefinition.IS_NATIVE) != 0 && ! Util.isBuiltInContainer(type)) {
+					return false;
+				}
+			}
+			else if (expr instanceof ArrayExpression) {
+				var type = (expr as ArrayExpression).getFirstExpr().getType();
+
+				if (type instanceof ObjectType && ((type as ObjectType).getClassDef().flags() & ClassDefinition.IS_NATIVE) != 0 && ! Util.isBuiltInContainer(type)) {
 					return false;
 				}
 			}
@@ -2030,16 +2042,52 @@ class _DeadCodeEliminationOptimizeCommand extends _FunctionOptimizeCommand {
 		var shouldRetry = false;
 		(function onStatements(statements : Statement[]) : boolean {
 			for (var i = 0; i < statements.length;) {
-				if (statements[i] instanceof ExpressionStatement && ! _Util.exprHasSideEffects((statements[i] as ExpressionStatement).getExpr())) {
+				if (statements[i] instanceof ExpressionStatement && ! _Util.exprHasSideEffects((statements[i]as ExpressionStatement).getExpr())) {
 					shouldRetry = true;
 					statements.splice(i, 1);
-				} else {
+				}
+				else {
+					if ((statements[i] instanceof ExpressionStatement)) {
+						this._optimizeExprInVoid((statements[i] as ExpressionStatement).getExpr(), function (expr) {
+							statements[i] = new ExpressionStatement(expr);
+						});
+					}
 					statements[i++].handleStatements(onStatements);
 				}
 			}
 			return true;
 		})(funcDef.getStatements());
 		return shouldRetry;
+	}
+
+	function _optimizeExprInVoid(expr : Expression, replaceCb : function(:Expression) : void) : void {
+		// cond ? iftrue : iffalse; which results in inline expansion
+		if(expr instanceof ConditionalExpression) {
+			var condExpr = expr as ConditionalExpression;
+			var ifTrueHasSideEffect = _Util.exprHasSideEffects(condExpr.getIfTrueExpr());
+			var ifFalseHasSideEffect = _Util.exprHasSideEffects(condExpr.getIfFalseExpr());
+			if (ifTrueHasSideEffect && ifFalseHasSideEffect) {
+				// nothing to do
+			}
+			else if (ifTrueHasSideEffect && !ifFalseHasSideEffect) {
+				// f() : g() : true; -> f() && g();
+				var condAndIfTrue = new LogicalExpression(new Token("&&"), condExpr.getCondExpr(), condExpr.getIfTrueExpr());
+				replaceCb(condAndIfTrue);
+			}
+			else if (!ifTrueHasSideEffect && ifFalseHasSideEffect) {
+				// f() : true : g(); -> f() || g();
+				var condOrIfFalse= new LogicalExpression(new Token("||"), condExpr.getCondExpr(), condExpr.getIfFalseExpr());
+				replaceCb(condOrIfFalse);
+			}
+			else {
+				// f() ? true : false; -> f();
+				replaceCb(condExpr.getCondExpr());
+			}
+		}
+		// ! expr; which results in inline expansion
+		else if (expr instanceof LogicalNotExpression) {
+			replaceCb((expr as LogicalNotExpression).getExpr());
+		}
 	}
 
 	function _optimizeFunction (funcDef : MemberFunctionDefinition) : boolean {
@@ -2051,19 +2099,6 @@ class _DeadCodeEliminationOptimizeCommand extends _FunctionOptimizeCommand {
 			this._eliminateDeadStores(funcDef, exprs);
 			this._eliminateDeadConditions(funcDef, exprs);
 		});
-		// remove statements without side-effects
-		(function onStatements(statements : Statement[]) : boolean {
-			for (var i = statements.length - 1; i >= 0; --i) {
-				var statement = statements[i];
-				if (statement instanceof ExpressionStatement) {
-					if (! _Util.exprHasSideEffects((statement as ExpressionStatement).getExpr())) {
-						statements.splice(i, 1);
-					}
-				}
-				statement.handleStatements(onStatements);
-			}
-			return true;
-		})(funcDef.getStatements());
 		// mark the variables that are used (as RHS)
 		var locals = funcDef.getLocals();
 		var localsUsed = new Array.<boolean>(locals.length);
@@ -2348,6 +2383,7 @@ class _DeadCodeEliminationOptimizeCommand extends _FunctionOptimizeCommand {
 		Util.forEachExpression(onExpr, exprs);
 	}
 
+	// handle if statements and conditional operators
 	function _eliminateDeadConditions (funcDef : MemberFunctionDefinition, exprs : Expression[]) : void {
 		function spliceStatements (dest : Statement[], index : number, src : Statement[]) : void {
 			dest.splice(index, 1);
@@ -3342,7 +3378,9 @@ class _UnboxOptimizeCommand extends _FunctionOptimizeCommand {
 			}
 			// check the rest
 			if (statement instanceof FunctionStatement) {
-				(statement as FunctionStatement).getFuncDef().forEachStatement(onStatement);
+				if (! (statement as FunctionStatement).getFuncDef().forEachStatement(onStatement)) {
+					return false;
+				}
 			}
 			if (! statement.forEachExpression(onExpr)) {
 				return false;

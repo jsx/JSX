@@ -31,6 +31,9 @@ class B extends
       "word" : "g_StopIteration"
    },
    {
+      "word" : "Async"
+   },
+   {
       "word" : "Transferable"
    },
    {

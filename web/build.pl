@@ -72,12 +72,14 @@ my $web_root = ROOT;
         process_jsx(
             "$project_root/src/web/playground.jsx",
             "$dest_root/build/playground.jsx.js",
-            "--executable", "web"
+            "--executable", "web",
+            "--release"
         );
         process_jsx(
             "$project_root/src/web/jsx-script-loader.jsx",
             "$dest_root/build/jsx-script-loader.jsx.js",
-            "--executable", "web"
+            "--executable", "web",
+            "--release"
         );
     }
 

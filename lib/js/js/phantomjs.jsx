@@ -6,8 +6,6 @@
  * @see http://phantomjs.org/
  */
 
-import "js.jsx";
-
 /**
  * Interface to <code>phantom</code>
  */
@@ -27,23 +25,23 @@ native final class phantom {
 /**
  * PhantomJS System module
  */
-final native("require('system')") class system {
+final native class system {
   delete function constructor();
 
   static __readonly__ var platform : string;
   static __readonly__ var os : OS;
   static __readonly__ var env : Map.<string>;
   static __readonly__ var args : Array.<string>;
-}
+} = "require('system')";
 
 /**
  * PhantomJS WebPage module
  */
-final native("require('webpage')") class webpage {
+final native class webpage {
   delete function constructor();
 
   static function create() : WebPage;
-}
+} = "require('webpage')";
 
 final native __fake__ class WebPage {
   var clipRect : Rectangle;
@@ -86,7 +84,7 @@ final native __fake__ class WebPage {
 /**
  * PhantomJS FileSystem module
  */
-final native("require('fs')") class fs {
+final native class fs {
   delete function constructor();
 
   static var separator : string;
@@ -112,7 +110,7 @@ final native("require('fs')") class fs {
   static function copy(source : string, destination : string) : void;
   static function move(source : string, destination : string) : void;
   static function touch(path : string) : void;
-}
+} = "require('fs')";
 
 final native __fake__ class Stream {
   function read() : string;
@@ -126,11 +124,11 @@ final native __fake__ class Stream {
 /**
  * PhantomJS WebServer module
  */
-final native("require('webserver')") class webserver {
+final native class webserver {
   delete function constructor();
 
   static function create() : WebServer;
-}
+} = "require('webserver')";
 
 final native __fake__ class WebServer {
   delete function constructor();

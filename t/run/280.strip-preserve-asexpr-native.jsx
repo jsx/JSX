@@ -4,8 +4,9 @@ Hi!
 /*JSX_OPTS
 --optimize strip
 */
-native("(console.log('Hi!'), function () {})") class Native {
-}
+native class Native {
+} = "(console.log('Hi!'), function () {})";
+
 class _Main {
     static function main(args : string[]) : void {
         var a = [ new Object ];

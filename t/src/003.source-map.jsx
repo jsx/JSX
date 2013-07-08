@@ -12,7 +12,7 @@ import "../util/jslexer.jsx";
 class _Test extends TestCase {
 
 	function testMakeGeneratedPos() : void {
-		var g = new SourceMapper("dummy root", "dummy file");
+		var g = new SourceMapper("dummy root", "dummy file", "");
 
 		var pos = g.makeGeneratedPos("");
 		this.expect(pos["line"],   "line").toBe(1);

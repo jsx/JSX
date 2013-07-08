@@ -24,9 +24,6 @@ compiler: meta src/doc.jsx
 compiler-core:
 	node $(BOOTSTRAP_COMPILER) $(COMPILER_COMPILE_OPTS) --output $(COMPILER_TARGET) src/jsx-node-front.jsx
 
-compiler-release:
-	$(MAKE) compiler-core COMPILER_COMPILE_OPTS="--release $(COMPILER_COMPILE_OPTS)"
-
 src/doc.jsx: src/_doc.jsx
 	submodules/picotemplate/picotemplate.pl $<
 
@@ -96,8 +93,8 @@ web.jsx:
 show-todo:
 	find t -name '*.todo.*' | grep -v '~'
 
-publish: test-all
-	$(MAKE) compiler-release
+publish:
+	$(MAKE) test-all COMPILER_COMPILE_OPTS="--release $(COMPILER_COMPILE_OPTS)"
 	npm publish
 
 update-assets: update-bootstrap update-codemirror

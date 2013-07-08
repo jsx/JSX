@@ -91,6 +91,28 @@ class Util {
 		});
 	}
 
+	static const _builtInContainer = Util.asSet([
+		"Array", "Map",
+		"Int8Array", "Uint8Array", "Uint8ClampedArray",
+		"Int16Array", "Uint16Array",
+		"Int32Array", "Uint32Array",
+		"Float32Array", "Float64Array" ]);
+	static function isBuiltInContainer(type : Type) : boolean {
+		if (type instanceof ObjectType) {
+			var classDef = (type as ObjectType).getClassDef();
+			if (classDef instanceof InstantiatedClassDefinition) {
+
+				var className = (classDef as InstantiatedClassDefinition).getTemplateClassName();
+				return Util._builtInContainer.hasOwnProperty(className);
+			}
+			else {
+				className = classDef.className();
+				return Util._builtInContainer.hasOwnProperty(className);
+			}
+		}
+		return false;
+	}
+
 	static function instantiateTemplate (context : AnalysisContext, token : Token, className : string, typeArguments : Type[]) : ClassDefinition {
 		return context.parser.lookupTemplate(context.errors, new TemplateInstantiationRequest(token, className, typeArguments), context.postInstantiationCallback);
 	}

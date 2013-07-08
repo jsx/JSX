@@ -39,11 +39,7 @@ class Token {
 	var _lineNumber : number;
 	var _columnNumber : number;
 
-	function constructor (value : string, isIdentifier : boolean) {
-		this(value, isIdentifier, null, NaN, NaN);
-	}
-
-	function constructor (value : string, isIdentifier : boolean, filename : Nullable.<string>, lineNumber : number, columnNumber : number) {
+	function constructor (value : string, isIdentifier : boolean = false, filename : Nullable.<string> = null, lineNumber : number = NaN, columnNumber : number = NaN) {
 		this._value = value;
 		this._isIdentifier = isIdentifier;
 		this._filename = filename;
@@ -154,6 +150,18 @@ class _Lexer {
 		"extern", "native", "as", "operator"
 		// , "async"  // contextual
 		]);
+
+	static const builtInClasses = Util.asSet([
+		// build-in classes
+		"Array", "Boolean", "Date", "Function", "Map", "Math", "Number",
+		"Object", "RegExp", "String", "JSON",
+		"Error", "EvalError", "RangeError", "ReferenceError", "SyntaxError", "TypeError",
+		"JSX",
+		// typed arrays
+		"Transferable", "ArrayBuffer", "Int8Array", "Uint8Array",
+		"Uint8ClampedArray", "Int16Array", "Uint16Array", "Int32Array",
+		"Uint32Array", "Float32Array", "Float64Array", "DataView"
+	]);
 
 	static function makeAlt (patterns : string[]) : string {
 		return "(?: \n" + patterns.join("\n | \n") + "\n)\n";
@@ -882,7 +890,7 @@ class Parser {
 	function _registerLocal (identifierToken : Token, type : Type) : LocalVariable {
 		function isEqualTo (local : LocalVariable) : boolean {
 			if (local.getName().getValue() == identifierToken.getValue()) {
-				if (type != null && ! local.getType().equals(type))
+				if (type != null && local.getType() != null && ! local.getType().equals(type))
 					this._newError("conflicting types for variable " + identifierToken.getValue());
 				return true;
 			}
@@ -1407,6 +1415,7 @@ class Parser {
 				break;
 			case "native":
 				if (this._expectOpt("(") != null) { // native("...")
+					this._newDeprecatedWarning("use of native(\"...\") is deprecated, use class N { ... } = \"...\"; instead");
 					nativeSource = this._expectStringLiteral();
 					this._expect(")");
 				}
@@ -1499,6 +1508,19 @@ class Parser {
 				members.push(member);
 			} else {
 				this._skipStatement();
+			}
+		}
+
+		// in-line native definition
+		var assignToken = this._expectOpt("=");
+		if (assignToken  != null) {
+			nativeSource = this._expectStringLiteral();
+			if (this._expect(";") == null) {
+				return null;
+			}
+			if ((this._classFlags & ClassDefinition.IS_NATIVE) == 0) {
+				this._errors.push(new CompileError(assignToken, "in-line native definition requires native attribute"));
+				return null;
 			}
 		}
 
@@ -1753,11 +1775,12 @@ class Parser {
 		this._typeArgs = this._typeArgs.concat(typeArgs);
 		var numObjectTypesUsed = this._objectTypesUsed.length;
 
+		this._pushScope(null, null);
 		try {
 			if (this._expect("(") == null)
 				return null;
 			// arguments
-			var args = this._functionArgumentsExpr((this._classFlags & ClassDefinition.IS_NATIVE) != 0, true);
+			var args = this._functionArgumentsExpr((this._classFlags & ClassDefinition.IS_NATIVE) != 0, true, true);
 			if (args == null)
 				return null;
 			// return type
@@ -1804,12 +1827,7 @@ class Parser {
 					return null;
 			}
 			// body
-			this._funcLocal = null;
 			this._arguments = args;
-			this._locals = new LocalVariable[];
-			this._statements = new Statement[];
-			this._closures = new MemberFunctionDefinition[];
-			this._isGenerator = false;
 			if (name.getValue() == "constructor")
 				var lastToken = this._initializeBlock();
 			else
@@ -1819,11 +1837,10 @@ class Parser {
 				flags |= ClassDefinition.IS_GENERATOR;
 			}
 			var funcDef = createDefinition(this._locals, this._statements, this._closures, lastToken);
-			this._locals = null;
-			this._statements = null;
-			this._closures = null;
 			return funcDef;
 		} finally {
+			this._popScope();
+
 			this._typeArgs.splice(this._typeArgs.length - typeArgs.length, this._typeArgs.length);
 			if (typeArgs.length != 0) {
 				this._objectTypesUsed.splice(numObjectTypesUsed, this._objectTypesUsed.length - numObjectTypesUsed);
@@ -2281,7 +2298,7 @@ class Parser {
 			return false;
 		if (this._expect("(") == null)
 			return false;
-		var args = this._functionArgumentsExpr(false, true);
+		var args = this._functionArgumentsExpr(false, true, false);
 		if (args == null)
 			return false;
 		if (this._expect(":") == null)
@@ -2294,19 +2311,11 @@ class Parser {
 			return false;
 
 		var funcLocal = this._registerLocal(name, new StaticFunctionType(token, returnType, args.map.<Type>((arg) -> arg.getType()), false));
-		// parse function block
-		this._pushScope(funcLocal, args);
-		var lastToken = this._block();
-		if (lastToken == null) {
-			this._popScope();
+
+		var funcDef = this._functionBody(token, name, funcLocal, args, returnType, true);
+		if (funcDef == null) {
 			return false;
 		}
-		var flags = ClassDefinition.IS_STATIC;
-		if (this._isGenerator) {
-			flags |= ClassDefinition.IS_GENERATOR;
-		}
-		var funcDef = new MemberFunctionDefinition(token, name, flags, returnType, args, this._locals, this._statements, this._closures, lastToken, null);
-		this._popScope();
 		this._closures.push(funcDef);
 		funcDef.setFuncLocal(funcLocal);
 		this._statements.push(new FunctionStatement(token, funcDef));
@@ -3031,7 +3040,7 @@ class Parser {
 	}
 
 	function _lambdaExpr (token : Token) : Expression {
-		var args = this._functionArgumentsExpr(false, false);
+		var args = this._functionArgumentsExpr(false, false, false);
 		if (args == null)
 			return null;
 		var returnType = null : Type;
@@ -3041,24 +3050,24 @@ class Parser {
 		}
 		if (this._expect("->") == null)
 			return null;
-		var funcDef = this._lambdaBody(token, args, returnType);
+		var funcDef = this._functionBody(token, null, null, args, returnType, this._expectOpt("{") != null);
 		if (funcDef == null)
 			return null;
 		this._closures.push(funcDef);
 		return new FunctionExpression(token, funcDef);
 	}
 
-	function _lambdaBody (token : Token, args : ArgumentDeclaration[], returnType : Type) : MemberFunctionDefinition {
+	function _functionBody(token : Token, name : Token, funcLocal : LocalVariable, args : ArgumentDeclaration[], returnType : Type, withBlock : boolean) : MemberFunctionDefinition {
 		var openBlock = this._expectOpt("{");
-		this._pushScope(null, args);
+		this._pushScope(funcLocal, args);
 		try {
 			// parse lambda body
 			var flags = ClassDefinition.IS_STATIC;
-			if (openBlock == null) {
+			var lastToken : Token;
+			if (! withBlock) {
+				lastToken = null;
 				var expr = this._expr();
 				this._statements.push(new ReturnStatement(token, expr));
-				return new MemberFunctionDefinition(
-					token, null, flags, returnType, args, this._locals, this._statements, this._closures, null, null);
 			} else {
 				var lastToken = this._block();
 				if (lastToken == null)
@@ -3066,9 +3075,13 @@ class Parser {
 				if (this._isGenerator) {
 					flags |= ClassDefinition.IS_GENERATOR;
 				}
-				return new MemberFunctionDefinition(
-					token, null, flags, returnType, args, this._locals, this._statements, this._closures, lastToken, null);
 			}
+			var funcDef = new MemberFunctionDefinition(
+				token, name , flags, returnType, args, this._locals, this._statements, this._closures, lastToken, null);
+			if (funcLocal != null) {
+				funcDef.setFuncLocal(funcLocal);
+			}
+			return funcDef;
 		} finally {
 			this._popScope();
 		}
@@ -3078,7 +3091,7 @@ class Parser {
 		var name = this._expectIdentifierOpt();
 		if (this._expect("(") == null)
 			return null;
-		var args = this._functionArgumentsExpr(false, false);
+		var args = this._functionArgumentsExpr(false, false, false);
 		if (args == null)
 			return null;
 		if (this._expectOpt(":") != null) {
@@ -3101,21 +3114,12 @@ class Parser {
 		if (name != null) {
 			funcLocal = new LocalVariable(name, type);
 		}
-		// parse function block
-		this._pushScope(funcLocal, args);
-		var lastToken = this._block();
-		if (lastToken == null) {
-			this._popScope();
+
+		var funcDef = this._functionBody(token, name, funcLocal, args, returnType, true);
+		if (funcDef == null) {
 			return null;
 		}
-		var flags = ClassDefinition.IS_STATIC;
-		if (this._isGenerator) {
-			flags |= ClassDefinition.IS_GENERATOR;
-		}
-		var funcDef = new MemberFunctionDefinition(token, name, flags, returnType, args, this._locals, this._statements, this._closures, lastToken, null);
-		this._popScope();
 		this._closures.push(funcDef);
-		funcDef.setFuncLocal(funcLocal);
 		return new FunctionExpression(token, funcDef);
 	}
 
@@ -3274,7 +3278,7 @@ class Parser {
 		return new MapLiteralExpression(token, elements, type);
 	}
 
-	function _functionArgumentsExpr (allowVarArgs : boolean, requireTypeDeclaration : boolean) : ArgumentDeclaration[] {
+	function _functionArgumentsExpr (allowVarArgs : boolean, requireTypeDeclaration : boolean, allowDefaultValues : boolean) : ArgumentDeclaration[] {
 		var args = new ArgumentDeclaration[];
 		if (this._expectOpt(")") == null) {
 			var token = null : Token;
@@ -3301,7 +3305,6 @@ class Parser {
 						return null;
 					}
 				}
-				var defaultValue : Expression = null;
 				if (isVarArg) {
 					// vararg is the last argument
 					if (argType == null && isVarArg)
@@ -3311,8 +3314,19 @@ class Parser {
 						return null;
 					break;
 				}
-				else if (this._expectOpt("=") != null)  {
+				var defaultValue : Expression = null;
+				var assignToken = this._expectOpt("=");
+				if (assignToken != null)  {
 					if ((defaultValue = this._assignExpr(true)) == null) {
+						return null;
+					}
+					if (! allowDefaultValues) {
+						this._errors.push(new CompileError(assignToken, "default parameters are only allowed for member functions"));
+						return null;
+					}
+				} else {
+					if (args.length != 0 && args[args.length - 1].getDefaultValue() != null) {
+						this._errors.push(new CompileError(argName, "required argument cannot be declared after an optional argument"));
 						return null;
 					}
 				}
@@ -3359,7 +3373,7 @@ class Parser {
 	}
 
 	static function _isReservedClassName (name : string) : boolean {
-		return name.match(/^(Array|Boolean|Date|Function|Map|Number|Object|RegExp|String|Error|EvalError|RangeError|ReferenceError|SyntaxError|TypeError|JSX)$/) != null;
+		return _Lexer.builtInClasses.hasOwnProperty(name);
 	}
 
 }

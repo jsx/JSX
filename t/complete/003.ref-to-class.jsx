@@ -85,6 +85,9 @@ class A {
       "word" : "g_StopIteration"
    },
    {
+      "word" : "Async"
+   },
+   {
       "word" : "JSON"
    },
    {
@@ -137,6 +140,9 @@ class A {
    },
    {
       "word" : "g_Enumerable"
+   },
+   {
+      "word" : "AsyncTask"
    },
    {
       "word" : "++"
