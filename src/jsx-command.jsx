@@ -152,7 +152,7 @@ class JSXCommand {
 				}
 				break;
 			case "--diagram":
-				if ((optarg = getoptarg()) == null) {
+				if ((optarg = getopt()) == null) {
 					return 1;
 				}
 				compiler.setMode(Compiler.MODE_DIAGRAM);
@@ -374,7 +374,6 @@ class JSXCommand {
 			} else {
 				return 1;
 			}
-			break;
 		case Compiler.MODE_DOC:
 			if (outputFile == null) {
 				platform.error("--output is mandatory for --mode doc");

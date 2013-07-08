@@ -38,6 +38,7 @@ class Compiler {
 	static const MODE_PARSE = 1;
 	static const MODE_COMPLETE = 2;
 	static const MODE_DOC = 3;
+	static const MODE_DIAGRAM = 4;
 
 	var _platform : Platform;
 	var _mode : number;
