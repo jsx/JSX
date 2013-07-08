@@ -573,6 +573,9 @@ class DiagramGenerator {
 		var dot = "digraph jsx {\n";
 		this._compiler.getParsers().forEach(function (parser) {
 			parser.getClassDefs().forEach(function (classDef) {
+				if (classDef instanceof InstantiatedClassDefinition)
+					return;
+
 				if (classDef.extendType() != null) {
 					dot += classDef.className() + " -> " + classDef.extendType().getClassDef().className() + ";\n";
 				}
