@@ -1,5 +1,9 @@
 Revision history for the JSX software development kit
 
+0.9.52 2013-07-08 19:44:00+0900
+    [BUG FIXES]
+    - Fix compile error when default parameters were used for function definitions with doc comments
+
 0.9.51 2013-07-06 22:03:21-0700
     [BUG FIXES]
     - Fix native inner class issues again
