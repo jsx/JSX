@@ -584,7 +584,7 @@ class DocumentGenerator {
 	}
 
 	function _isPrivate (memberDef : MemberDefinition) : boolean {
-		return memberDef.name().charAt(0) == "_" || (memberDef.getDocComment() && memberDef.getDocComment().getTagByName('private'));
+		return memberDef.name().charAt(0) == "_" || (memberDef.getDocComment() && memberDef.getDocComment().getTagByName('private')) || (memberDef.flags() & ClassDefinition.IS_GENERATED) != 0;
 	}
 
 	function _name(name : string) : string {

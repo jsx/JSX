@@ -64,6 +64,7 @@ class ClassDefinition implements Stashable {
 	static const IS_DELETE = 4096; // used for disabling the default constructor
 	static const IS_GENERATOR = 8192;
 	static const IS_EXPORT = 16384; // no overloading, no minification of method / variable names
+	static const IS_GENERATED = 32768;
 
 	var _parser		: Parser;
 	var _token		: Token;
@@ -1504,18 +1505,20 @@ class MemberFunctionDefinition extends MemberDefinition implements Block {
 
 	function analyze (outerContext : AnalysisContext) : void {
 		// validate jsxdoc comments
-		var docComment = this.getDocComment();
-		if (docComment) {
-			var args = this.getArguments();
-			docComment.getParams().forEach(function (docParam : DocCommentParameter, i : number) : void {
-				for(; i < args.length; ++i) {
-					if (args[i].getName().getValue() == docParam.getParamName()) {
-						return;
+		if ((this.flags() & ClassDefinition.IS_GENERATED) == 0) {
+			var docComment = this.getDocComment();
+			if (docComment) {
+				var args = this.getArguments();
+				docComment.getParams().forEach(function (docParam : DocCommentParameter, i : number) : void {
+					for(; i < args.length; ++i) {
+						if (args[i].getName().getValue() == docParam.getParamName()) {
+							return;
+						}
 					}
-				}
-				// invalid @param tag which is not present in the declaration.
-				outerContext.errors.push(new CompileError(docParam.getToken(), 'invalid parameter name "' + docParam.getParamName() + '" for ' + this.name() + "()"));
-			});
+					// invalid @param tag which is not present in the declaration.
+					outerContext.errors.push(new CompileError(docParam.getToken(), 'invalid parameter name "' + docParam.getParamName() + '" for ' + this.name() + "()"));
+				});
+			}
 		}
 
 		// return if is abtract (wo. function body) or is native
@@ -1616,7 +1619,7 @@ class MemberFunctionDefinition extends MemberDefinition implements Block {
 			var wrapper = new MemberFunctionDefinition(
 				this.getToken(),
 				this.getNameToken(),
-				this.flags() | ClassDefinition.IS_INLINE,
+				this.flags() | ClassDefinition.IS_INLINE | ClassDefinition.IS_GENERATED,
 				this.getReturnType(),
 				formalArgs,
 				new LocalVariable[],

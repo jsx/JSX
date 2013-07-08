@@ -26,7 +26,7 @@ class MyClass {
    * Static Method
    * @param args List of Strings
    */
-  static function staticMethod(args : string[]) : void {
+  static function staticMethod(args : string[] = null) : void {
     log "Hello, world!";
   }
 
