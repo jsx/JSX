@@ -577,16 +577,7 @@ class DiagramGenerator {
 					return;
 
 				if (classDef.extendType() != null) {
-					var className = classDef.className();
-					if (className == "node") {
-						className = "_node";
-						dot += "_node [label=\"node\"];\n";
-					}
-					var extendClassName = classDef.extendType().getClassDef().className();
-					if (className == "node") {
-						extendClassName = "_node";
-					}
-					dot += "\t" + className + " -> " + extendClassName + ";\n";
+					dot += "\t\"" + classDef.className() + "\" -> \"" + classDef.extendType().getClassDef().className() + "\";\n";
 				}
 			});
 		});
