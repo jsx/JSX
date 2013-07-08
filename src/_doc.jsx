@@ -570,11 +570,16 @@ class DiagramGenerator {
 	}
 
 	function buildDiagram () : void {
-		var dot = "digraph jsx {"
+		var dot = "digraph jsx {\n";
 		this._compiler.getParsers().forEach(function (parser) {
-			// todo
+			parser.getClassDefs().forEach(function (classDef) {
+				if (classDef.extendType() != null) {
+					dot += classDef.className() + " -> " + classDef.extendType().getClassDef().className() + ";\n";
+				}
+			});
 		});
-		dot += "}";
-		platform.save(outputFile, dot);
+		dot += "}\n";
+		this._compiler.getPlatform().save(this._outputFile, dot);
 	}
+
 }
