@@ -9,23 +9,13 @@ module.exports = function(grunt) {
     watch: {
       jsx: {
         files: ['<%= srcDir %>/*.jsx'],
-        tasks: ['jsx:release']
+        tasks: ['exec:make_compiler']
       },
     },
 
-    jsx: {
-      release: {
-        src: '<%= srcDir %>/jsx-node-front.jsx',
-        dest: '<%= buildDir %>/jsx',
-        add_search_path: [],
-        executable: "node",
-        release: true,
-      },
-      dev: {
-        src: '<%= srcDir %>/jsx-node-front.jsx',
-        dest: '<%= buildDir %>/jsx',
-        add_search_path: [],
-        executable: "node",
+    exec: {
+      make_compiler: {
+        command: "make compiler",
       },
     },
   });
@@ -36,6 +26,6 @@ module.exports = function(grunt) {
     }
   }
 
-  grunt.registerTask('default', ['jsx:dev']);
+  grunt.registerTask('default', ['exec:make_compiler']);
 };
 // vim: set expandtab tabstop=2 shiftwidth=2:
