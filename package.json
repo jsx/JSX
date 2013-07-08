@@ -54,6 +54,9 @@
     "postpublish": "node tool/bootstrap-compiler.js --run tool/postpublish.jsx"
   },
   "devDependencies": {
-    "jshint": "~2.1.4"
+    "jshint": "~2.1.4",
+    "grunt-jsx": "0.0.4",
+    "grunt-contrib-watch": "~0.4.4",
+    "grunt": "~0.4.1"
   }
 }
