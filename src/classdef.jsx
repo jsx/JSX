@@ -1922,7 +1922,7 @@ class TemplateFunctionDefinition extends MemberFunctionDefinition implements Tem
 	}
 
 	function instantiateByArgumentTypes (errors : CompileError[], token : Token, actualArgTypes : Type[], exact : boolean) : MemberFunctionDefinition {
-		// TODOs must be done by when user template functions are introduced: report compile errors, inner classes, parameterized classes
+		// The TODOs must be done by when user template functions are introduced: report compile errors, inner classes, parameterized classes
 		var typemap = new Map.<Type>;
 		for (var i = 0; i < this._typeArgs.length; ++i) {
 			typemap[this._typeArgs[i].getValue()] = null;
@@ -1940,11 +1940,11 @@ class TemplateFunctionDefinition extends MemberFunctionDefinition implements Tem
 					var expectedType = typemap[(formal as ParsedObjectType).getToken().getValue()];
 					if (expectedType != null) { // already unified, check if arg type is the expected one
 						if (exact && ! expectedType.equals(actual)) {
-							// TODO push compile errors
+							// no need to throw a compile error when exact matching
 							return false;
 						}
 						if (! actual.isConvertibleTo(expectedType)) {
-							// TODO push compile errors
+							errors.push(new CompileError(token, "expected " + expectedType.toString() + ", but got " + actual.toString()));
 							return false;
 						}
 					} else {
@@ -1959,13 +1959,13 @@ class TemplateFunctionDefinition extends MemberFunctionDefinition implements Tem
 				}
 			} else if (formal instanceof StaticFunctionType) {
 				if (! (actual instanceof StaticFunctionType)) {
-					// TODO push a compile error
+					errors.push(new CompileError(token, "expected " + formal.toString() + ", but got " + actual.toString()));
 					return false;
 				}
 				var formalFuncType = formal as StaticFunctionType;
 				var actualFuncType = actual as StaticFunctionType;
 				if (formalFuncType.getArgumentTypes().length != actualFuncType.getArgumentTypes().length) {
-					// TODO push a compile error
+					errors.push(new CompileError(token, "expected " + formal.toString() + ", but got " + actual.toString()));
 					return false;
 				}
 				// unify recursively
@@ -1975,13 +1975,13 @@ class TemplateFunctionDefinition extends MemberFunctionDefinition implements Tem
 				}
 				if (! unify(formalFuncType.getReturnType(), actualFuncType.getReturnType()))
 					return false;
-			} else {
+			} else { // formal is a primitive type
 				if (exact && ! formal.equals(actual)) {
-					// TODO push a compile error
+					// no need to throw a compile error when exact matching
 					return false;
 				}
 				if (! actual.isConvertibleTo(formal)) {
-					// TODO push compile errors
+					errors.push(new CompileError(token, "expected " + formal.toString() + ", but got " + actual.toString()));
 					return false;
 				}
 			}
@@ -2004,7 +2004,7 @@ class TemplateFunctionDefinition extends MemberFunctionDefinition implements Tem
 				break;
 		}
 		if (i != this._typeArgs.length) {
-			// TODO push a compile error
+			errors.push(new CompileError(token, "cannot decide type parameters from given argument expressions"));
 			return null;
 		} else {
 			return this.instantiateTemplateFunction(errors, token, typeArgs);
