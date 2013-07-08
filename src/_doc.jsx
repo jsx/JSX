@@ -577,7 +577,7 @@ class DiagramGenerator {
 					return;
 
 				if (classDef.extendType() != null) {
-					dot += "\t\"" + classDef.className() + "\" -> \"" + classDef.extendType().getClassDef().className() + "\";\n";
+					dot += "\t\"" + classDef.extendType().getClassDef().className() + "\" -> \"" + classDef.className() + "\";\n";
 				}
 			});
 		});
