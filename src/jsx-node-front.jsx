@@ -176,6 +176,25 @@ class NodePlatform extends Platform {
 		var port = arg as int;
 		return CompilationServer.start(this, port);
 	}
+
+	function isColorSupported() : boolean {
+		return process.stderr.isTTY;
+	}
+
+	override function error(message : string) : void {
+		if (this.isColorSupported()) {
+			var i = 1; // red
+			message = "\x1b[" + (30 + i) as string + "m" + message + "\x1b[0m";
+		}
+		console.error("%s", message);
+	}
+	override function warn(message : string) : void {
+		if (this.isColorSupported()) {
+			var i = 3; // yellow
+			message = "\x1b[" + (30 + i) as string + "m" + message + "\x1b[0m";
+		}
+		console.warn("%s", message);
+	}
 }
 
 /**
