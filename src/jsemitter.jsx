@@ -78,6 +78,9 @@ class _Util {
 			return _Util.getOutputClassName(classDef);
 		}
 		if (classDef instanceof InstantiatedClassDefinition) {
+			if ((classDef as InstantiatedClassDefinition).getTemplateClass().getNativeSource() != null) {
+				return _Util.getOutputClassName((classDef as InstantiatedClassDefinition).getTemplateClass());
+			}
 			if ((classDef as InstantiatedClassDefinition).getTemplateClassName() == "Map") {
 				return "Object";
 			} else {
@@ -156,7 +159,10 @@ class _Util {
 					setOutputName(classDef, name);
 				}
 				else if (classDef.getNativeSource() != null) {
-					setOutputName(classDef, newUniqueName(classDef.className()));
+					setOutputName(classDef, newUniqueName(classDef.classFullName()));
+				}
+				else {
+					setOutputName(classDef, escapeClassNameIfInstantiated(classDef.classFullName()));
 				}
 			}
 		}
