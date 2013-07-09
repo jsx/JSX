@@ -448,11 +448,19 @@ class ObjectType extends Type {
 	}
 
 	override function equals (x : Type) : boolean {
-		if (this instanceof ParsedObjectType && x instanceof ParsedObjectType
-			&& ((this as ParsedObjectType)._classDef == null || (x as ParsedObjectType)._classDef == null)) {
-			return this.toString() == x.toString();
+		if (! (x instanceof ObjectType)) {
+			return false;
 		}
-		return x instanceof ObjectType && this._classDef == (x as ObjectType)._classDef;
+		var that = x as ObjectType;
+
+		if (this instanceof ParsedObjectType && x instanceof ParsedObjectType
+			&& (this._classDef == null || that._classDef == null)) {
+			// parsed objects have no class definition
+			var a = this as ParsedObjectType;
+			var b = that as ParsedObjectType;
+			return a.getQualifiedName().equals(b.getQualifiedName()) && Util.typesAreEqual(a.getTypeArguments(), b.getTypeArguments());
+		}
+		return this._classDef == that._classDef;
 	}
 
 	function resolveType (context : AnalysisContext) : void {
