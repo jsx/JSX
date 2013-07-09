@@ -8,8 +8,8 @@ JSON::PP::Boolean - dummy module providing JSON::PP::Boolean
 
 =head1 DESCRIPTION
 
-This module exists only to provide overload resolution for Storable and similar modules. See
-L<JSON::PP> for more info about this class.
+This module exists only to provide overload resolution for Storable
+and similar modules. See L<JSON::PP> for more info about this class.
 
 =cut
 
@@ -20,7 +20,8 @@ use strict;
 
 =head1 AUTHOR
 
-This idea is from L<JSON::XS::Boolean> written by Marc Lehmann <schmorp[at]schmorp.de>
+This idea is from L<JSON::XS::Boolean> written by
+Marc Lehmann <schmorp[at]schmorp.de>
 
 =cut
 
