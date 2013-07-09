@@ -177,23 +177,34 @@ class NodePlatform extends Platform {
 		return CompilationServer.start(this, port);
 	}
 
-	function isColorSupported() : boolean {
-		return process.stderr.isTTY;
+	static const COLOR_BLACK  = 30;
+	static const COLOR_RED    = 31;
+	static const COLOR_GREEN  = 32;
+	static const COLOR_YELLOW = 33;
+	static const COLOR_BLUE   = 34;
+
+	static const _isColorSupported = (() : boolean -> {
+		if (process.stdout.isTTY && process.stderr.isTTY) {
+			var term = (process.env["TERM"] ?: "").toLowerCase();
+			return /color/.test(term) || /xterm/.test(term);
+		}
+		return false;
+	}());
+
+	function colorize(colorId : number, message : string) : string {
+		if (NodePlatform._isColorSupported) {
+			return "\x1b[" + colorId as string + "m" + message + "\x1b[0m";
+		}
+		else {
+			return message;
+		}
 	}
 
 	override function error(message : string) : void {
-		if (this.isColorSupported()) {
-			var i = 1; // red
-			message = "\x1b[" + (30 + i) as string + "m" + message + "\x1b[0m";
-		}
-		console.error("%s", message);
+		console.error(this.colorize(NodePlatform.COLOR_RED, message));
 	}
 	override function warn(message : string) : void {
-		if (this.isColorSupported()) {
-			var i = 3; // yellow
-			message = "\x1b[" + (30 + i) as string + "m" + message + "\x1b[0m";
-		}
-		console.warn("%s", message);
+		console.warn(this.colorize(NodePlatform.COLOR_YELLOW, message));
 	}
 }
 
