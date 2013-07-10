@@ -22,6 +22,10 @@ my @modules = qw(
 my $dir= DIR;
 my $cpanm = 'http://cpanmin.us/';
 
+if (not -e "$dir/extlib/bin/cpanm") {
+    system(qq{curl -L $cpanm > "$dir/extlib/bin/cpanm"});
+}
+
 system("$^X $dir/extlib/bin/cpanm --pp --no-man-pages --notest '-L$dir/extlib' @modules") == 0
     or die "Failed to setup!";
 
