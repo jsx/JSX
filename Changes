@@ -1,5 +1,11 @@
 Revision history for the JSX software development kit
 
+0.9.53 2013-07-10 16:33:16-0700
+    [FEATURES]
+    - The compiler colorizes messages for tty
+    - `jsx --test file.jsx` is allowed even if the file has no _Test class
+      to validate the file easily
+
 0.9.52 2013-07-08 19:44:00+0900
     [BUG FIXES]
     - Fix compile error when default parameters were used for function definitions with doc comments
