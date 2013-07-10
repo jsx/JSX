@@ -121,6 +121,8 @@
 					cb(new Error("failed to post profiler results, received " + res.statusCode + " response from server"), null);
 				}
 			});
+		}).on('error', function (e) {
+			cb(e, null);
 		});
 		req.write(content);
 		req.end();
