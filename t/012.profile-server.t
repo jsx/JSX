@@ -33,11 +33,11 @@ ok $url, "returned url";
 my $json = do {
     my($file) = $url =~ /\?(\S+)$/;
 
-    open my $fh, "web/.profile/$file.txt";
+    open my $fh, "web/.profile/$file.json";
     local $/;
     my $s = <$fh>;
     close $fh;
-    unlink "web/.profile/$file.txt";
+    unlink "web/.profile/$file.json";
     $s;
 };
 ok $json, "json file exists";

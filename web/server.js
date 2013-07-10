@@ -135,7 +135,7 @@ function saveProfile(request, response) {
 		}
 		var id = YYYYmmddHHMMSS();
 
-		fs.writeFileSync(profileDir + "/" + id + ".txt", JSON.stringify(json));
+		fs.writeFileSync(profileDir + "/" + id + ".json", JSON.stringify(json));
 		// send response
 		response.writeHead(200, "OK", {
 			"Location" : "http://" + request.headers.host + "/web/profiler.html?" + id,
@@ -144,16 +144,24 @@ function saveProfile(request, response) {
 		response.write("saved profile at http://" + request.headers.host + "/web/profiler.html?" + id);
 		response.end();
 
-		var resultList = fs.readdirSync(profileDir).filter(function (d) {
-			return /^[\d-]+\.txt$/.test(d);
-		}).map(function(d) {
-			return d.replace(/\.txt$/, "");
-		}).sort().reverse();
-		fs.writeFileSync(profileDir + "/results.json",
-				JSON.stringify(resultList));
-
 		console.info("[I] saved profile at http://" + request.headers.host + "/web/profiler.html?" + id);
 	});
+}
+
+function listProfileResults(request, response) {
+	var results = fs.readdirSync("web/.profile").filter(function (file) {
+		return /\d{4}-\d{2}-\d{2}-\d{4}/.test(file);
+	}).map(function (file) {
+		return file.replace(/\.\w+$/, "");
+	}).sort(function (a, b) {
+		return b.localeCompare(a)
+	});
+
+	response.writeHead(200, "OK", {
+		"Content-Type": "application/json"
+	});
+	response.write(JSON.stringify(results), "utf8");
+	response.end();
 }
 
 function main(args) {
@@ -170,8 +178,12 @@ function main(args) {
 			return;
 		}
 
-		if (uri.match(/^\/post-profile\/?$/) != null) {
+		// profiler stuff
+		if (/^\/post-profile\/?$/.test(uri)) {
 			return saveProfile(request, response);
+		}
+		else if (/\/\.profile\/results\.json$/.test(uri)) {
+			return listProfileResults(request, response);
 		}
 
 		var filename = path.join(process.cwd(), uri);
