@@ -82,7 +82,7 @@ class A {
       "word" : "TypeError"
    },
    {
-      "word" : "g_StopIteration"
+      "word" : "StopIteration"
    },
    {
       "word" : "JSON"
@@ -136,7 +136,7 @@ class A {
       "word" : "Array"
    },
    {
-      "word" : "g_Enumerable"
+      "word" : "Enumerable"
    },
    {
       "word" : "++"

@@ -5,7 +5,7 @@
 */
 class _Main {
 	static function main (args : string[]) : void {
-		function makeDouble (seed : number) : g_Enumerable.<number> {
+		function makeDouble (seed : number) : Enumerable.<number> {
 			var t = seed;
 			while (true) {
 				yield t;

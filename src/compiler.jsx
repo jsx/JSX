@@ -153,7 +153,7 @@ class Compiler {
 		StringType._classDef = builtins.lookup(errors, null, "String");
 		FunctionType._classDef = builtins.lookup(errors, null, "Function");
 		// prepare generator stuff
-		CodeTransformer.stopIterationType = new ObjectType(builtins.lookup(errors, null, "g_StopIteration"));
+		CodeTransformer.stopIterationType = new ObjectType(builtins.lookup(errors, null, "StopIteration"));
 		for (var i = 0; i < builtins._templateClassDefs.length; ++i)
 			if (builtins._templateClassDefs[i].className() == "__jsx_generator")
 				CodeTransformer.jsxGeneratorClassDef = builtins._templateClassDefs[i];
