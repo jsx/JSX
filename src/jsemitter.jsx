@@ -53,14 +53,18 @@ class _Util {
 	}
 
 	static function getOutputClassName(classDef : ClassDefinition) : string {
-		return (classDef.getStash(_Util.OUTPUTNAME_IDENTIFIER) as _Util.OutputNameStash).outputName;
+		var stash = classDef.getStash(_Util.OUTPUTNAME_IDENTIFIER) as _Util.OutputNameStash;
+		assert stash != null, classDef.className();
+		return stash.outputName;
 	}
 
 	static function getOutputConstructorName(ctor : MemberFunctionDefinition) : string {
 		if ((ctor.getClassDef().flags() & ClassDefinition.IS_NATIVE) != 0) {
 			return _Util.getNameOfNativeConstructor(ctor.getClassDef());
 		}
-		return (ctor.getStash(_Util.OUTPUTNAME_IDENTIFIER) as _Util.OutputNameStash).outputName;
+		var stash = ctor.getStash(_Util.OUTPUTNAME_IDENTIFIER) as _Util.OutputNameStash;
+		assert stash != null, ctor.getNotation();
+		return stash.outputName;
 	}
 
 	static function getOutputConstructorName(classDef : ClassDefinition, argTypes : Type[]) : string {
@@ -70,6 +74,9 @@ class _Util {
 	}
 
 	static function getNameOfNativeConstructor(classDef : ClassDefinition) : string {
+		if (classDef.getNativeSource() != null || classDef.getOuterClassDef() != null) {
+			return _Util.getOutputClassName(classDef);
+		}
 		if (classDef instanceof InstantiatedClassDefinition) {
 			if ((classDef as InstantiatedClassDefinition).getTemplateClassName() == "Map") {
 				return "Object";
@@ -116,6 +123,7 @@ class _Util {
 			if ((classDef.flags() & ClassDefinition.IS_NATIVE) == 0) {
 				// decide the className
 				if (classDef.getOuterClassDef() != null)
+					// inner class
 					var className = _Util.getOutputClassName(classDef.getOuterClassDef()) + "$C" + classDef.className();
 				else
 					className = classDef.className();
@@ -139,6 +147,16 @@ class _Util {
 					}
 				} else {
 					setOutputName(classDef, newUniqueName(className));
+				}
+			}
+			else { // native class
+				if (classDef.getOuterClassDef() != null) {
+					// native inner class
+					var name = _Util.getOutputClassName(classDef.getOuterClassDef()) + "." + classDef.className();
+					setOutputName(classDef, name);
+				}
+				else if (classDef.getNativeSource() != null) {
+					setOutputName(classDef, newUniqueName(classDef.className()));
 				}
 			}
 		}
@@ -195,7 +213,7 @@ class _Mangler {
 					// fall through
 				}
 			}
-			return "L" + _Util.getOutputClassName(type.getClassDef()) + "$";
+			return "L" + _Util.getOutputClassName(type.getClassDef()).replace(/\./g, '$C') + "$";
 		} else if (type instanceof StaticFunctionType)
 			return "F" + this.mangleFunctionArguments((type as StaticFunctionType).getArgumentTypes()) + this.mangleTypeName((type as StaticFunctionType).getReturnType()) + "$";
 		else if (type instanceof MemberFunctionType)
@@ -1970,6 +1988,7 @@ class _PropertyExpressionEmitter extends _UnaryExpressionEmitter {
 		} else {
 			var name = identifierToken.getValue();
 			if (Util.isReferringToFunctionDefinition(expr)) {
+				assert exprType instanceof ResolvedFunctionType, exprType.toString();
 				name = this._emitter.getNamer().getNameOfMethod(classDef, name, (exprType as ResolvedFunctionType).getArgumentTypes());
 			} else {
 				name = this._emitter.getNamer().getNameOfProperty(classDef, name);

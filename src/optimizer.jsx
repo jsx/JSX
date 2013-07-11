@@ -616,6 +616,9 @@ class _StripOptimizeCommand extends _OptimizeCommand {
 		classDef.implementTypes().forEach(function (implementType) {
 			this._touchInstance(implementType.getClassDef());
 		});
+		if (classDef.getOuterClassDef() != null) {
+			this._touchInstance(classDef.getOuterClassDef());
+		}
 	}
 
 	function _touchConstructor(funcDef : MemberFunctionDefinition) : void {
@@ -829,19 +832,25 @@ class _StripOptimizeCommand extends _OptimizeCommand {
 					this._touchInstance(expr.getType().getClassDef());
 				}
 			} else if (expr instanceof PropertyExpression) {
-				if (! expr.isClassSpecifier()) {
-					var propertyExpr = expr as PropertyExpression;
+				var propertyExpr = expr as PropertyExpression;
+				var holderClassDef = propertyExpr.getHolderType().getClassDef();
+				if (propertyExpr.isClassSpecifier()) {
+					if ((holderClassDef.flags() & ClassDefinition.IS_NATIVE) != 0) {
+						this._touchInstance(holderClassDef);
+					}
+				}
+				else {
 					var name = propertyExpr.getIdentifierToken().getValue();
 					if (propertyExpr.getExpr().isClassSpecifier()) {
 						if (Util.isReferringToFunctionDefinition(propertyExpr)) {
 							var member : MemberDefinition = Util.findFunctionInClass(
-								propertyExpr.getHolderType().getClassDef(),
+								holderClassDef,
 								name,
 								(expr.getType() as ResolvedFunctionType).getArgumentTypes(),
 								true);
 							assert member != null;
 						} else {
-							member = Util.findVariableInClass(propertyExpr.getHolderType().getClassDef(), name, true);
+							member = Util.findVariableInClass(holderClassDef, name, true);
 							assert member != null;
 						}
 						this._touchStatic(member);

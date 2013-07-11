@@ -1,3 +1,5 @@
+!.gitkeep
+
 # temporary files
 
 .jsx
@@ -8,7 +10,7 @@
 CodeMirror-*
 bootstrap/
 tmp/*
-!tmp/.gitkeep
+cpanm
 
 # build products
 

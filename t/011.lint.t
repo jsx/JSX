@@ -32,6 +32,7 @@ my $config =  {
   -W030 => JSON::true,
   -W018 => JSON::true,
   -W004 => JSON::true,
+  -W092 => JSON::true,
 };
 
 {

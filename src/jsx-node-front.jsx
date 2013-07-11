@@ -176,6 +176,36 @@ class NodePlatform extends Platform {
 		var port = arg as int;
 		return CompilationServer.start(this, port);
 	}
+
+	static const COLOR_BLACK  = 30;
+	static const COLOR_RED    = 31;
+	static const COLOR_GREEN  = 32;
+	static const COLOR_YELLOW = 33;
+	static const COLOR_BLUE   = 34;
+
+	static const _isColorSupported = (() : boolean -> {
+		if (process.stdout.isTTY && process.stderr.isTTY) {
+			var term = (process.env["TERM"] ?: "").toLowerCase();
+			return /color/.test(term) || /xterm/.test(term);
+		}
+		return false;
+	}());
+
+	function colorize(colorId : number, message : string) : string {
+		if (NodePlatform._isColorSupported) {
+			return "\x1b[" + colorId as string + "m" + message + "\x1b[0m";
+		}
+		else {
+			return message;
+		}
+	}
+
+	override function error(message : string) : void {
+		console.error(this.colorize(NodePlatform.COLOR_RED, message));
+	}
+	override function warn(message : string) : void {
+		console.warn(this.colorize(NodePlatform.COLOR_YELLOW, message));
+	}
 }
 
 /**

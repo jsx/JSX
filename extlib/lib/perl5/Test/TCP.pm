@@ -2,7 +2,7 @@ package Test::TCP;
 use strict;
 use warnings;
 use 5.00800;
-our $VERSION = '1.21';
+our $VERSION = '2.00';
 use base qw/Exporter/;
 use IO::Socket::INET;
 use Test::SharedFork 0.12;
@@ -23,18 +23,32 @@ sub test_tcp {
     for my $k (qw/client server/) {
         die "missing madatory parameter $k" unless exists $args{$k};
     }
+    my $server_code = delete $args{server};
+    my $port = delete($args{port}) || empty_port();
+
+    my $client_code = delete $args{client};
+
     my $server = Test::TCP->new(
-        code => $args{server},
-        port => $args{port} || empty_port(),
+        code => $server_code,
+        port => $port,
+        %args,
     );
-    $args{client}->($server->port, $server->pid);
+    $client_code->($server->port, $server->pid);
     undef $server; # make sure
 }
 
 sub wait_port {
-    my $port = shift;
+    my ($port, $max_wait);
+    if (@_==3) {
+        # backward compat
+        ($port, (my $sleep), (my $retry)) = @_;
+        $max_wait = $sleep * $retry;
+    }  else {
+        ($port, $max_wait) = @_;
+    }
+    $max_wait ||= 10;
 
-    Net::EmptyPort::wait_port($port, 0.1, 100)
+    Net::EmptyPort::wait_port($port, $max_wait)
         or die "cannot open port: $port";
 }
 
@@ -47,6 +61,7 @@ sub new {
     Carp::croak("missing mandatory parameter 'code'") unless exists $args{code};
     my $self = bless {
         auto_start => 1,
+        max_wait   => 10,
         _my_pid    => $$,
         %args,
     }, $class;
@@ -64,7 +79,7 @@ sub start {
     if ( my $pid = fork() ) {
         # parent.
         $self->{pid} = $pid;
-        Test::TCP::wait_port($self->port);
+        Test::TCP::wait_port($self->port, $self->{max_wait});
         return;
     } elsif ($pid == 0) {
         # child process
@@ -127,6 +142,8 @@ sub DESTROY {
 
 1;
 __END__
+
+=for stopwords OO-ish
 
 =encoding utf8
 
@@ -198,8 +215,10 @@ Functional interface.
             # run server
         },
         # optional
-        port => 8080
+        port => 8080,
+        max_wait => 3, # seconds
     );
+
 
 =item wait_port
 
@@ -232,6 +251,14 @@ Default: true
 The callback function. Argument for callback function is: C<< $code->($pid) >>.
 
 This parameter is required.
+
+=item $args{max_wait} : Number
+
+Will wait for at most C<$max_wait> seconds before checking port.
+
+See also L<Net::EmptyPort>.
+
+I<Default: 10>
 
 =back
 

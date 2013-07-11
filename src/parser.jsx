@@ -1050,6 +1050,7 @@ class Parser {
 		return false;	// dummy
 	}
 
+	// parse jsxdoc comments
 	function _parseDocComment () : DocComment {
 
 		var docComment = new DocComment();
@@ -1057,14 +1058,18 @@ class Parser {
 
 		while (true) {
 			// skip " * ", or return if "*/"
-			this._parseDocCommentAdvanceWhiteSpace();
+			var count = this._parseDocCommentAdvanceWhiteSpace();
 			if (this._getInputByLength(2) == "*/") {
 				this._forwardPos(2);
-				return docComment;
+				break;
 			} else if (this._getInputByLength(1) == "*") {
 				this._forwardPos(1);
 				this._parseDocCommentAdvanceWhiteSpace();
 			}
+			else {
+				this._forwardPos(-count); // to keep indent
+			}
+
 			// fetch tag (and paramName), and setup the target node to push content into
 			var tagMatch = this._getInput().match(/^\@([0-9A-Za-z_]+)[ \t]*/);
 			if (tagMatch != null) {
@@ -1092,13 +1097,13 @@ class Parser {
 			var endAt = this._getInput().indexOf("*/");
 			if (endAt != -1) {
 				if (node != null) {
-					node.appendDescription(this._getInput().substring(0, endAt));
+					node.appendDescription(this._getInput().substring(0, endAt) + "\n");
 				}
 				this._forwardPos(endAt + 2);
-				return docComment;
+				break;
 			}
 			if (node != null) {
-				node.appendDescription(this._getInput());
+				node.appendDescription(this._getInput() + "\n");
 			}
 			if (this._lineNumber == this._lines.length) {
 				this._columnOffset = this._lines[this._lineNumber - 1].length;
@@ -1108,18 +1113,21 @@ class Parser {
 			++this._lineNumber;
 			this._columnOffset = 0;
 		}
-		return null;	// dummy
+		return docComment;
 	}
 
-	function _parseDocCommentAdvanceWhiteSpace () : void {
+	function _parseDocCommentAdvanceWhiteSpace () : number {
+		var count = 0;
 		while (true) {
 			var ch = this._getInputByLength(1);
 			if (ch == " " || ch == "\t") {
 				this._forwardPos(1);
+				count++;
 			} else {
 				break;
 			}
 		}
+		return count;
 	}
 
 	function _isEOF () : boolean {
@@ -1379,6 +1387,10 @@ class Parser {
 		this._templateInners = new TemplateClassDefinition[];
 		// attributes* class
 		this._classFlags = 0;
+		if (this._outerClass) {
+			// inherits flags from the outer classe
+			this._classFlags |= this._outerClass.classFlags & (ClassDefinition.IS_NATIVE);
+		}
 		var nativeSource = null : Token;
 		var docComment = null : DocComment;
 		while (true) {

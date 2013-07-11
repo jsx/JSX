@@ -650,7 +650,9 @@ class FunctionChoiceType extends FunctionType {
 	}
 
 	override function toString () : string {
-		return this._types.length == 1 ? this._types[0].toString() : "<<multiple choices>>";
+		return this._types.length == 1
+			? this._types[0].toString()
+			: "<<multiple choices: "+ this._types.map.<string>((f) -> f.toString()).join(" | ") +">>";
 	}
 
 	override function getObjectType () : Type {

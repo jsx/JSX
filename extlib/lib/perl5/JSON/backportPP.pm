@@ -12,7 +12,8 @@ use Carp ();
 use B ();
 #use Devel::Peek;
 
-$JSON::PP::VERSION = '2.27200';
+use vars qw($VERSION);
+$VERSION = '2.27202';
 
 @JSON::PP::EXPORT = qw(encode_json decode_json from_json to_json);
 
@@ -618,7 +619,7 @@ BEGIN {
     my $utf8_len;       # utf8 byte length
     # FLAGS
     my $utf8;           # must be utf8
-    my $max_depth;      # max nest nubmer of objects and arrays
+    my $max_depth;      # max nest number of objects and arrays
     my $max_size;
     my $relaxed;
     my $cb_object;
@@ -1051,7 +1052,7 @@ BEGIN {
         my $n    = '';
         my $v;
 
-        # According to RFC4627, hex or oct digts are invalid.
+        # According to RFC4627, hex or oct digits are invalid.
         if($ch eq '0'){
             my $peek = substr($text,$at,1);
             my $hex  = $peek =~ /[xX]/; # 0 or 1
@@ -1286,7 +1287,8 @@ BEGIN {
     }
 
     if ($] >= 5.008 and $] < 5.008003) { # join() in 5.8.0 - 5.8.2 is broken.
-        package JSON::PP;
+        package # hide from PAUSE
+          JSON::PP;
         require subs;
         subs->import('join');
         eval q|
@@ -1341,7 +1343,7 @@ BEGIN {
         *JSON::PP::reftype = \&Scalar::Util::reftype;
         *JSON::PP::refaddr = \&Scalar::Util::refaddr;
     }
-    else{ # This code is from Sclar::Util.
+    else{ # This code is from Scalar::Util.
         # warn $@;
         eval 'sub UNIVERSAL::a_sub_not_likely_to_be_here { ref($_[0]) }';
         *JSON::PP::blessed = sub {
@@ -1390,7 +1392,7 @@ BEGIN {
 }
 
 
-# shamely copied and modified from JSON::XS code.
+# shamelessly copied and modified from JSON::XS code.
 
 $JSON::PP::true  = do { bless \(my $dummy = 1), "JSON::backportPP::Boolean" };
 $JSON::PP::false = do { bless \(my $dummy = 0), "JSON::backportPP::Boolean" };
@@ -1416,8 +1418,8 @@ use overload (
 
 ###############################
 
-package
-    JSON::PP::IncrParser;
+package # hide from PAUSE
+  JSON::PP::IncrParser;
 
 use strict;
 
@@ -1428,7 +1430,8 @@ use constant INCR_M_JSON => 3; # outside anything, count nesting
 use constant INCR_M_C0   => 4;
 use constant INCR_M_C1   => 5;
 
-$JSON::PP::IncrParser::VERSION = '1.01';
+use vars qw($VERSION);
+$VERSION = '1.01';
 
 my $unpack_format = $] < 5.006 ? 'C*' : 'U*';
 
@@ -1657,23 +1660,26 @@ JSON::PP is a pure-Perl module and has compatibility to JSON::XS.
 
 This module knows how to handle Unicode (depending on Perl version).
 
-See to L<JSON::XS/A FEW NOTES ON UNICODE AND PERL> and L<UNICODE HANDLING ON PERLS>.
+See to L<JSON::XS/A FEW NOTES ON UNICODE AND PERL> and
+L<UNICODE HANDLING ON PERLS>.
 
 
 =item * round-trip integrity
 
-When you serialise a perl data structure using only data types supported
-by JSON and Perl, the deserialised data structure is identical on the Perl
-level. (e.g. the string "2.0" doesn't suddenly become "2" just because
-it looks like a number). There I<are> minor exceptions to this, read the
-MAPPING section below to learn about those.
+When you serialise a perl data structure using only data types
+supported by JSON and Perl, the deserialised data structure is
+identical on the Perl level. (e.g. the string "2.0" doesn't suddenly
+become "2" just because it looks like a number). There I<are> minor
+exceptions to this, read the MAPPING section below to learn about
+those.
 
 
 =item * strict checking of JSON correctness
 
 There is no guessing, no generating of illegal JSON texts by default,
-and only JSON is accepted as input by default (the latter is a security feature).
-But when some options are set, loose chcking features are available.
+and only JSON is accepted as input by default (the latter is a
+security feature). But when some options are set, loose checking
+features are available.
 
 =back
 
@@ -1731,7 +1737,7 @@ Perl.
 
 =head1 HOW DO I DECODE A DATA FROM OUTER AND ENCODE TO OUTER
 
-This section supposes that your perl vresion is 5.8 or later.
+This section supposes that your perl version is 5.8 or later.
 
 If you know a JSON text from an outer world - a network, a file content, and so on,
 is encoded in UTF-8, you should use C<decode_json> or C<JSON> module object
@@ -1813,7 +1819,7 @@ Basically, check to L<JSON> or L<JSON::XS>.
 
     $json = JSON::PP->new
 
-Rturns a new JSON::PP object that can be used to de/encode JSON
+Returns a new JSON::PP object that can be used to de/encode JSON
 strings.
 
 All boolean flags described below are by default I<disabled>.
@@ -2021,7 +2027,7 @@ as key-value pairs have no inherent ordering in Perl.
 
 This setting has no effect when decoding JSON texts.
 
-If you want your own sorting routine, you can give a code referece
+If you want your own sorting routine, you can give a code reference
 or a subroutine name to C<sort_by>. See to C<JSON::PP OWN METHODS>.
 
 =head2 allow_nonref
@@ -2222,7 +2228,7 @@ is rarely useful.
 See L<JSON::XS/SSECURITY CONSIDERATIONS> for more info on why this is useful.
 
 When a large value (100 or more) was set and it de/encodes a deep nested object/text,
-it may raise a warning 'Deep recursion on subroutin' at the perl runtime phase.
+it may raise a warning 'Deep recursion on subroutine' at the perl runtime phase.
 
 =head2 max_size
 
@@ -2239,7 +2245,7 @@ effect on C<encode> (yet).
 If no argument is given, the limit check will be deactivated (same as when
 C<0> is specified).
 
-See L<JSON::XS/SSECURITY CONSIDERATIONS> for more info on why this is useful.
+See L<JSON::XS/SECURITY CONSIDERATIONS> for more info on why this is useful.
 
 =head2 encode
 
@@ -2290,7 +2296,7 @@ to see if a full JSON object is available, but is much more efficient
 This module will only attempt to parse the JSON text once it is sure it
 has enough text to get a decisive result, using a very simple but
 truly incremental parser. This means that it sometimes won't stop as
-early as the full parser, for example, it doesn't detect parenthese
+early as the full parser, for example, it doesn't detect parenthesis
 mismatches. The only thing it guarantees is that it starts decoding as
 soon as a syntactically valid JSON text has been seen. This means you need
 to set resource limits (e.g. C<max_size>) to ensure the parser will stop
@@ -2321,7 +2327,7 @@ If the method is called in scalar context, then it will try to extract
 exactly I<one> JSON object. If that is successful, it will return this
 object, otherwise it will return C<undef>. If there is a parse error,
 this method will croak just as C<decode> would do (one can then use
-C<incr_skip> to skip the errornous part). This is the most common way of
+C<incr_skip> to skip the erroneous part). This is the most common way of
 using the method.
 
 And finally, in list context, it will try to extract as many objects
@@ -2377,7 +2383,7 @@ unchanged, to skip the text parsed so far and to reset the parse state.
 This completely resets the incremental parser, that is, after this call,
 it will be as if the parser had never parsed anything.
 
-This is useful if you want ot repeatedly parse JSON objects and want to
+This is useful if you want to repeatedly parse JSON objects and want to
 ignore any trailing data, which means you have to reset the parser after
 each successful decode.
 
@@ -2422,7 +2428,7 @@ If C<$enable> is true (or missing), then C<decode> will convert
 the big integer Perl cannot handle as integer into a L<Math::BigInt>
 object and convert a floating number (any) into a L<Math::BigFloat>.
 
-On the contary, C<encode> converts C<Math::BigInt> objects and C<Math::BigFloat>
+On the contrary, C<encode> converts C<Math::BigInt> objects and C<Math::BigFloat>
 objects into JSON numbers with C<allow_blessed> enable.
 
    $json->allow_nonref->allow_blessed->allow_bignum;
@@ -2430,7 +2436,7 @@ objects into JSON numbers with C<allow_blessed> enable.
    print $json->encode($bigfloat);
    # => 2.000000000000000000000000001
 
-See to L<JSON::XS/MAPPING> aboout the normal conversion of JSON number.
+See to L<JSON::XS/MAPPING> about the normal conversion of JSON number.
 
 =head2 loose
 
@@ -2556,7 +2562,7 @@ it as an integer value. If that fails, it will try to represent it as
 a numeric (floating point) value if that is possible without loss of
 precision. Otherwise it will preserve the number as a string value (in
 which case you lose roundtripping ability, as the JSON number will be
-re-encoded toa JSON string).
+re-encoded to a JSON string).
 
 Numbers containing a fractional or exponential part will always be
 represented as numeric (floating point) values, possibly at a loss of
@@ -2566,7 +2572,7 @@ the JSON number will still be re-encoded as a JSON number).
 Note that precision is not accuracy - binary floating point values cannot
 represent most decimal fractions exactly, and when converting from and to
 floating point, C<JSON> only guarantees precision up to but not including
-the leats significant bit.
+the least significant bit.
 
 When C<allow_bignum> is enable, the big integers 
 and the numeric can be optionally converted into L<Math::BigInt> and
@@ -2576,7 +2582,7 @@ L<Math::BigFloat> objects.
 
 These JSON atoms become C<JSON::PP::true> and C<JSON::PP::false>,
 respectively. They are overloaded to act almost exactly like the numbers
-C<1> and C<0>. You can check wether a scalar is a JSON boolean by using
+C<1> and C<0>. You can check whether a scalar is a JSON boolean by using
 the C<JSON::is_bool> function.
 
    print JSON::PP::true . "\n";
@@ -2594,7 +2600,7 @@ C<JSON> will install these missing overloading features to the backend modules.
 
 A JSON null atom becomes C<undef> in Perl.
 
-C<JSON::PP::null> returns C<unddef>.
+C<JSON::PP::null> returns C<undef>.
 
 =back
 
@@ -2614,7 +2620,7 @@ in hash keys (or JSON objects), they will usually be encoded in a
 pseudo-random order that can change between runs of the same program but
 stays generally the same within a single run of a program. C<JSON>
 optionally sort the hash keys (determined by the I<canonical> flag), so
-the same datastructure will serialise to the same JSON text (given same
+the same data structure will serialise to the same JSON text (given same
 settings and version of JSON::XS), but this incurs a runtime overhead
 and is only rarely useful, e.g. when you want to compare some JSON text
 against another for equality.
@@ -2680,7 +2686,7 @@ You can force the type to be a number by numifying it:
 
    my $x = "3"; # some variable containing a string
    $x += 0;     # numify it, ensuring it will be dumped as a number
-   $x *= 1;     # same thing, the choise is yours.
+   $x *= 1;     # same thing, the choice is yours.
 
 You can not currently force the type in other, less obscure, ways.
 
@@ -2712,7 +2718,7 @@ Perl can handle Unicode and the JSON::PP de/encode methods also work properly.
     $json->allow_nonref->encode(chr hex 3042);
     $json->allow_nonref->encode(chr hex 12345);
 
-Reuturns C<"\u3042"> and C<"\ud808\udf45"> respectively.
+Returns C<"\u3042"> and C<"\ud808\udf45"> respectively.
 
     $json->allow_nonref->decode('"\u3042"');
     $json->allow_nonref->decode('"\ud808\udf45"');
@@ -2729,7 +2735,7 @@ Perl can handle Unicode and the JSON::PP de/encode methods also work.
 
 =head2 Perl 5.005
 
-Perl 5.005 is a byte sementics world -- all strings are sequences of bytes.
+Perl 5.005 is a byte semantics world -- all strings are sequences of bytes.
 That means the unicode handling is not available.
 
 In encoding,
@@ -2789,7 +2795,7 @@ Makamaka Hannyaharamitu, E<lt>makamaka[at]cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2007-2011 by Makamaka Hannyaharamitu
+Copyright 2007-2012 by Makamaka Hannyaharamitu
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself. 
