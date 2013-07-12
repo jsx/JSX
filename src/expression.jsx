@@ -657,7 +657,7 @@ class MapLiteralExpression extends Expression {
 				succeeded = false;
 			} else if (this._elements[i].getExpr().getType().equals(Type.voidType)) {
 				 // FIXME the location of the error would be strange; we deseparately need expr.getToken()
-				context.errors.push(new CompileError(this._token, "cannot assign void to a hash"));
+				context.errors.push(new CompileError(this._token, "cannot assign void to a map"));
 				succeeded = false;
 			}
 		}
@@ -669,7 +669,7 @@ class MapLiteralExpression extends Expression {
 		} else if (this._type != null && this._type instanceof ObjectType) {
 			var classDef = this._type.getClassDef();
 			if (! (classDef instanceof InstantiatedClassDefinition && (classDef as InstantiatedClassDefinition).getTemplateClassName() == "Map")) {
-				context.errors.push(new CompileError(this._token, "specified type is not a hash type"));
+				context.errors.push(new CompileError(this._token, "specified type is not a map type"));
 				return false;
 			}
 			var expectedType = (this._type as ParsedObjectType).getTypeArguments()[0];
@@ -687,7 +687,7 @@ class MapLiteralExpression extends Expression {
 		} else {
 			var elementType = Type.calcLeastCommonAncestor(this._elements.map.<Type>((elt) -> { return elt.getExpr().getType(); }), true);
 			if (elementType == null || elementType.equals(Type.nullType)) {
-				context.errors.push(new CompileError(this._token, "could not deduce hash type, please specify"));
+				context.errors.push(new CompileError(this._token, "could not deduce map type, please specify"));
 				return false;
 			}
 			if (elementType.equals(Type.integerType))

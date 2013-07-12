@@ -492,14 +492,14 @@ class DeleteStatement extends UnaryExpressionStatement {
 		if (! this._analyzeExpr(context, this._expr))
 			return true;
 		if (! (this._expr instanceof ArrayExpression)) {
-			context.errors.push(new CompileError(this._token, "only properties of a hash object can be deleted"));
+			context.errors.push(new CompileError(this._token, "only properties of a map object can be deleted"));
 			return true;
 		}
 		var secondExprType = (this._expr as ArrayExpression).getSecondExpr().getType();
 		if (secondExprType == null)
 			return true; // error should have been already reported
 		if (! secondExprType.resolveIfNullable().equals(Type.stringType)) {
-			context.errors.push(new CompileError(this._token, "only properties of a hash object can be deleted"));
+			context.errors.push(new CompileError(this._token, "only properties of a map object can be deleted"));
 			return true;
 		}
 		return true;
