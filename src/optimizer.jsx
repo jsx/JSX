@@ -1850,9 +1850,8 @@ class _FoldConstantCommand extends _FunctionOptimizeCommand {
 				member = m;
 			return member == null;
 		});
-		assert member != null;
 
-		if ((member.flags() & ClassDefinition.IS_PURE) == 0) {
+		if (member != null && (member.flags() & ClassDefinition.IS_PURE) == 0) {
 			return;
 		}
 
