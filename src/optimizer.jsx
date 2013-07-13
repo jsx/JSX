@@ -1676,6 +1676,11 @@ class _FoldConstantCommand extends _FunctionOptimizeCommand {
 
 		// propagate const
 
+		function exprAsNumber(expr : Expression) : number {
+			assert this._isIntegerOrNumberLiteralExpression(expr);
+			return expr.getToken().getValue() as number;
+		}
+
 		if (expr instanceof PropertyExpression) {
 
 			// property expression
@@ -1719,21 +1724,28 @@ class _FoldConstantCommand extends _FunctionOptimizeCommand {
 			default:
 				return false;
 			}
-			this.log("folding operator '" + expr.getToken().getValue() + "' at '" + expr.getToken().getFilename() + ":" + expr.getToken().getLineNumber() as string);
 			var baseExpr = (expr as SignExpression).getExpr();
-			var value = new Token(calculateCb(baseExpr.getToken().getValue() as number) as string);
 			if (baseExpr instanceof IntegerLiteralExpression) {
-				replaceCb(new IntegerLiteralExpression(value));
+				this.log("folding operator (int) '" + expr.getToken().getValue() + "' at '" + expr.getToken().getFilename() + ":" + expr.getToken().getLineNumber() as string);
+				replaceCb(new IntegerLiteralExpression(new Token(
+					calculateCb(exprAsNumber(baseExpr)) as string
+				)));
 			} else if (baseExpr instanceof NumberLiteralExpression) {
-				replaceCb(new NumberLiteralExpression(value));
+				this.log("folding operator (number) '" + expr.getToken().getValue() + "' at '" + expr.getToken().getFilename() + ":" + expr.getToken().getLineNumber() as string);
+				replaceCb(new NumberLiteralExpression(new Token(
+					calculateCb(exprAsNumber(baseExpr)) as string
+				)));
 			}
 
 		} else if (expr instanceof BitwiseNotExpression) {
 			assert expr.getToken().getValue() == "~";
-			this.log("folding operator '" + expr.getToken().getValue() + "' at '" + expr.getToken().getFilename() + ":" + expr.getToken().getLineNumber() as string);
 			var baseExpr = (expr as BitwiseNotExpression).getExpr();
-			var value = new Token((~ baseExpr.getToken().getValue() as number) as string);
-			replaceCb(new IntegerLiteralExpression(value));
+			if (this._isIntegerOrNumberLiteralExpression(baseExpr)) {
+				this.log("folding operator '" + expr.getToken().getValue() + "' at '" + expr.getToken().getFilename() + ":" + expr.getToken().getLineNumber() as string);
+				replaceCb(new IntegerLiteralExpression(new Token(
+					(~ exprAsNumber(baseExpr)) as string
+				)));
+			}
 		} else if (expr instanceof AdditiveExpression) {
 
 			// additive expression
