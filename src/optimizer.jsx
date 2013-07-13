@@ -1999,6 +1999,11 @@ class _FoldConstantCommand extends _FunctionOptimizeCommand {
 		case "|": this._foldNumericBinaryExpressionAsInteger(expr, replaceCb, function (x, y) { return x | y; }); break;
 		case "^": this._foldNumericBinaryExpressionAsInteger(expr, replaceCb, function (x, y) { return x ^ y; }); break;
 
+		// expressions that always return boolean
+		case "<": this._foldNumericBinaryExpressionAsBoolean(expr, replaceCb, function (x, y) { return x < y; }); break;
+		case "<=": this._foldNumericBinaryExpressionAsBoolean(expr, replaceCb, function (x, y) { return x <= y; }); break;
+		case ">": this._foldNumericBinaryExpressionAsBoolean(expr, replaceCb, function (x, y) { return x > y; }); break;
+		case ">=": this._foldNumericBinaryExpressionAsBoolean(expr, replaceCb, function (x, y) { return x >= y; }); break;
 		default:
 			return false;
 		}
@@ -2020,7 +2025,7 @@ class _FoldConstantCommand extends _FunctionOptimizeCommand {
 			" to int: " + value as string);
 		if (value % 1 != 0)
 			throw new Error("value is not an integer");
-		replaceCb(new IntegerLiteralExpression(new Token(value as string, false)));
+		replaceCb(new IntegerLiteralExpression(new Token(value as string)));
 	}
 
 	function _foldNumericBinaryExpressionAsNumber (expr : BinaryExpression, replaceCb : function(:Expression):void, calcCb : function(:number,:number):number) : void {
@@ -2028,7 +2033,15 @@ class _FoldConstantCommand extends _FunctionOptimizeCommand {
 		this.log(
 			"folding operator '" + expr.getToken().getValue() + "' at " + expr.getToken().getFilename() + ":" + expr.getToken().getLineNumber() as string +
 			" to number: " + value as string);
-		replaceCb(new NumberLiteralExpression(new Token(value as string, false)));
+		replaceCb(new NumberLiteralExpression(new Token(value as string)));
+	}
+
+	function _foldNumericBinaryExpressionAsBoolean (expr : BinaryExpression, replaceCb : function(:Expression):void, calcCb : function(:number,:number):boolean) : void {
+		var value = calcCb(expr.getFirstExpr().getToken().getValue() as number, expr.getSecondExpr().getToken().getValue() as number);
+		this.log(
+			"folding operator '" + expr.getToken().getValue() + "' at " + expr.getToken().getFilename() + ":" + expr.getToken().getLineNumber() as string +
+			" to boolean: " + value as string);
+		replaceCb(new BooleanLiteralExpression(new Token(value as string)));
 	}
 
 	function _isIntegerOrNumberLiteralExpression (expr : Expression) : boolean {
