@@ -1686,7 +1686,7 @@ class _FoldConstantCommand extends _FunctionOptimizeCommand {
 			if (propertyExpr.getExpr().isClassSpecifier()) {
 				var member = null : MemberVariableDefinition;
 				holderType.getClassDef().forEachMemberVariable(function (m) {
-					if (m instanceof MemberVariableDefinition && (m as MemberVariableDefinition).name() == propertyExpr.getIdentifierToken().getValue())
+					if (m.name() == propertyExpr.getIdentifierToken().getValue())
 						member = m;
 					return member == null;
 				});
@@ -1801,12 +1801,8 @@ class _FoldConstantCommand extends _FunctionOptimizeCommand {
 
 		}
 		else if (expr instanceof CallExpression) {
-			// fold pure functions
 			var callExpr = expr as CallExpression;
 			if (callExpr.getExpr() instanceof PropertyExpression) {
-				var propertyExpr = callExpr.getExpr() as PropertyExpression;
-				var holderType = propertyExpr.getHolderType();
-
 				var allArgsAreConstants = true;
 				callExpr.getArguments().forEach((expr) -> {
 					if (!(     expr instanceof IntegerLiteralExpression
@@ -1818,55 +1814,93 @@ class _FoldConstantCommand extends _FunctionOptimizeCommand {
 					}
 				});
 
-				function argAsNumber(index : number) : number {
-					assert this._isIntegerOrNumberLiteralExpression(callExpr.getArguments()[index]);
-					return callExpr.getArguments()[index].getToken().getValue() as number;
-				}
-
 				if (allArgsAreConstants) {
-					if (propertyExpr.getExpr().isClassSpecifier() && holderType.getClassDef().classFullName() == "Math") {
-						// fold pure Math functions
-						switch(propertyExpr.getIdentifierToken().getValue()) {
-						case "sqrt":
-							replaceCb(new NumberLiteralExpression(new Token(
-								Math.sqrt(argAsNumber(0)) as string)));
-							break;
-						case "log":
-							replaceCb(new NumberLiteralExpression(new Token(
-								Math.log(argAsNumber(0)) as string)));
-							break;
-						case "pow":
-							replaceCb(new NumberLiteralExpression(new Token(
-								Math.pow(argAsNumber(0), argAsNumber(1)) as string)));
-							break;
-						case "sin":
-							replaceCb(new NumberLiteralExpression(new Token(
-								Math.sin(argAsNumber(0)) as string)));
-							break;
-						case "cos":
-							replaceCb(new NumberLiteralExpression(new Token(
-								Math.cos(argAsNumber(0)) as string)));
-							break;
-						}
-					}
-					else if (propertyExpr.getExpr() instanceof StringLiteralExpression) {
-						// fold pure String functions
-						function argAsNumber(index : number) : number {
-							assert this._isIntegerOrNumberLiteralExpression(callExpr.getArguments()[index]);
-							return callExpr.getArguments()[index].getToken().getValue() as number;
-						}
-						switch(propertyExpr.getIdentifierToken().getValue()) {
-						case "charCodeAt":
-							replaceCb(new NumberLiteralExpression(new Token(
-								Util.decodeStringLiteral(propertyExpr.getExpr().getToken().getValue()).charCodeAt(argAsNumber(0)) as string)));
-							break;
-						}
-					}
+					this._foldCallExpression(callExpr, replaceCb);
 				}
 			}
 		}
 
 		return true;
+	}
+
+	// fold pure native functions
+	function _foldCallExpression (callExpr : CallExpression, replaceCb : function(:Expression):void) : void {
+		assert callExpr.getExpr() instanceof PropertyExpression;
+
+		var propertyExpr = callExpr.getExpr() as PropertyExpression;
+		var holderType = propertyExpr.getHolderType();
+
+		if ((holderType.getClassDef().flags() & ClassDefinition.IS_NATIVE) == 0) {
+			return;
+		}
+
+		function argAsNumber(index : number) : number {
+			assert this._isIntegerOrNumberLiteralExpression(callExpr.getArguments()[index]);
+			return callExpr.getArguments()[index].getToken().getValue() as number;
+		}
+
+		function argAsString(index : number) : string {
+			assert callExpr.getArguments()[index] instanceof StringLiteralExpression;
+			return Util.decodeStringLiteral(callExpr.getArguments()[index].getToken().getValue());
+		}
+
+		var member = null : MemberFunctionDefinition;
+		holderType.getClassDef().forEachMemberFunction(function (m) {
+			if (m.name() == propertyExpr.getIdentifierToken().getValue())
+				member = m;
+			return member == null;
+		});
+		assert member != null;
+
+		if ((member.flags() & ClassDefinition.IS_PURE) == 0) {
+			return;
+		}
+
+		if (propertyExpr.getExpr().isClassSpecifier()) {
+			// class methods
+
+			if (holderType.getClassDef().classFullName() == "Math") {
+				// fold pure Math functions
+				switch(propertyExpr.getIdentifierToken().getValue()) {
+				case "sqrt":
+					this.log("folding " + member.getNotation());
+					replaceCb(new NumberLiteralExpression(new Token(
+						Math.sqrt(argAsNumber(0)) as string)));
+					break;
+				case "log":
+					this.log("folding " + member.getNotation());
+					replaceCb(new NumberLiteralExpression(new Token(
+						Math.log(argAsNumber(0)) as string)));
+					break;
+				case "pow":
+					this.log("folding " + member.getNotation());
+					replaceCb(new NumberLiteralExpression(new Token(
+						Math.pow(argAsNumber(0), argAsNumber(1)) as string)));
+					break;
+				case "sin":
+					this.log("folding " + member.getNotation());
+					replaceCb(new NumberLiteralExpression(new Token(
+						Math.sin(argAsNumber(0)) as string)));
+					break;
+				case "cos":
+					this.log("folding " + member.getNotation());
+					replaceCb(new NumberLiteralExpression(new Token(
+						Math.cos(argAsNumber(0)) as string)));
+					break;
+				}
+			}
+		}
+		else if (propertyExpr.getExpr() instanceof StringLiteralExpression) {
+			// fold pure String functions
+			switch(propertyExpr.getIdentifierToken().getValue()) {
+			case "charCodeAt":
+				this.log("folding " + member.getNotation());
+				var recvStr = Util.decodeStringLiteral(propertyExpr.getExpr().getToken().getValue());
+				replaceCb(new NumberLiteralExpression(new Token(
+					recvStr.charCodeAt(argAsNumber(0)) as string)));
+				break;
+			}
+		}
 	}
 
 	function _foldEqualityExpression (expr : EqualityExpression, replaceCb : function(:Expression):void) : void {
