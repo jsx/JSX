@@ -205,7 +205,7 @@ class Optimizer {
 
 	var _compiler : Compiler;
 	var _commands : _OptimizeCommand[];
-	var _log : string[];
+	var _log : string;
 	var _dumpLogs : boolean;
 	var _enableRunTimeTypeCheck : boolean;
 
@@ -233,7 +233,7 @@ class Optimizer {
 	function constructor () {
 		this._compiler = null;
 		this._commands = new _OptimizeCommand[];
-		this._log = new string[];
+		this._log = "";
 		this._dumpLogs = false;
 		this._enableRunTimeTypeCheck = true;
 	}
@@ -325,24 +325,22 @@ class Optimizer {
 				this.log("finished optimizer: " + this._commands[i]._identifier);
 			} catch (e : Error) {
 				var platform = this._compiler.getPlatform();
-				platform.error("fatal error: optimizer '" + this._commands[i]._identifier + "' died unexpectedly, dumping the logs");
-				this.dumpLogs();
+				platform.error("fatal error: optimizer '" + this._commands[i]._identifier + "' died unexpectedly, dumping the logs" + this.dumpLogs());
 				throw e;
 			}
 		}
-		if (this._dumpLogs)
-			this.dumpLogs();
+		if (this._dumpLogs) {
+			var platform = this._compiler.getPlatform();
+			platform.warn(this.dumpLogs());
+		}
 	}
 
 	function log (message : string) : void {
-		this._log.push(message);
+		this._log += message + "\n";
 	}
 
-	function dumpLogs () : void {
-		var platform = this._compiler.getPlatform();
-		for (var i = 0; i < this._log.length; ++i) {
-			platform.error(this._log[i]);
-		}
+	function dumpLogs () : string {
+		return this._log;
 	}
 
 }
