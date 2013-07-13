@@ -3231,16 +3231,17 @@ class Parser {
 
 	function _arrayLiteral (token : Token) : ArrayLiteralExpression {
 		var exprs = new Expression[];
-		if (this._expectOpt("]") == null) {
-			do {
-				var expr = this._assignExpr();
-				if (expr == null)
+		while (this._expectOpt("]") == null) {
+			var expr = this._assignExpr();
+			if (expr == null)
+				return null;
+			exprs.push(expr);
+			if (this._expectOpt(",") == null) {
+				if (this._expect("]") == null) {
 					return null;
-				exprs.push(expr);
-				token = this._expect([ ",", "]" ]);
-				if (token == null)
-					return null;
-			} while (token.getValue() == ",");
+				}
+				break;
+			}
 		}
 		var type = null : Type;
 		if (this._expectOpt(":") != null)
@@ -3251,29 +3252,32 @@ class Parser {
 
 	function _mapLiteral (token : Token) : MapLiteralExpression {
 		var elements = new MapLiteralElement[];
-		if (this._expectOpt("}") == null) {
-			do {
-				// obtain key
-				var keyToken;
-				if ((keyToken = this._expectIdentifierOpt(null)) != null
-					|| (keyToken = this._expectNumberLiteralOpt()) != null
-					|| (keyToken = this._expectStringLiteralOpt()) != null) {
-					// ok
-				} else {
-					this._newError("expected identifier, number or string but got '" + token.getValue() + "'");
+		while (this._expectOpt("}") == null) {
+			// obtain key
+			var keyToken;
+			if ((keyToken = this._expectIdentifierOpt(null)) != null
+				|| (keyToken = this._expectNumberLiteralOpt()) != null
+				|| (keyToken = this._expectStringLiteralOpt()) != null) {
+				// ok
+			} else {
+				this._newError("expected identifier, number or string");
+				return null;
+			}
+			// separator
+			if (this._expect(":") == null)
+				return null;
+			// obtain value
+			var expr = this._assignExpr();
+			if (expr == null)
+				return null;
+			elements.push(new MapLiteralElement(keyToken, expr));
+			// separator
+			if (this._expectOpt(",") == null) {
+				if (this._expect("}") == null) {
+					return null;
 				}
-				// separator
-				if (this._expect(":") == null)
-					return null;
-				// obtain value
-				var expr = this._assignExpr();
-				if (expr == null)
-					return null;
-				elements.push(new MapLiteralElement(keyToken, expr));
-				// separator
-				if ((token = this._expect([ ",", "}" ])) == null)
-					return null;
-			} while (token.getValue() == ",");
+				break;
+			}
 		}
 		var type = null : Type;
 		if (this._expectOpt(":") != null)
