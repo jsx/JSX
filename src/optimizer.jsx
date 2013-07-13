@@ -1702,6 +1702,15 @@ class _FoldConstantCommand extends _FunctionOptimizeCommand {
 					}
 				}
 			}
+			else { // object property
+				if (propertyExpr.getExpr() instanceof StringLiteralExpression) {
+					if (propertyExpr.getIdentifierToken().getValue() == "length") {
+						replaceCb(new NumberLiteralExpression(new Token(
+							Util.decodeStringLiteral(propertyExpr.getExpr().getToken().getValue()).length as string
+						)));
+					}
+				}
+			}
 
 		} else if (expr instanceof SignExpression) {
 
@@ -1790,6 +1799,71 @@ class _FoldConstantCommand extends _FunctionOptimizeCommand {
 				replaceCb(condition ? ifTrueExpr : ifFalseExpr);
 			}
 
+		}
+		else if (expr instanceof CallExpression) {
+			// fold pure functions
+			var callExpr = expr as CallExpression;
+			if (callExpr.getExpr() instanceof PropertyExpression) {
+				var propertyExpr = callExpr.getExpr() as PropertyExpression;
+				var holderType = propertyExpr.getHolderType();
+
+				var allArgsAreConstants = true;
+				callExpr.getArguments().forEach((expr) -> {
+					if (!(     expr instanceof IntegerLiteralExpression
+							|| expr instanceof NumberLiteralExpression
+							|| expr instanceof BooleanLiteralExpression
+							|| expr instanceof StringLiteralExpression
+						)) {
+						allArgsAreConstants = false;
+					}
+				});
+
+				function argAsNumber(index : number) : number {
+					assert this._isIntegerOrNumberLiteralExpression(callExpr.getArguments()[index]);
+					return callExpr.getArguments()[index].getToken().getValue() as number;
+				}
+
+				if (allArgsAreConstants) {
+					if (propertyExpr.isClassSpecifier() && holderType.getClassDef().classFullName() == "Math") {
+						// fold pure Math functions
+						switch(propertyExpr.getIdentifierToken().getValue()) {
+						case "sqrt":
+							replaceCb(new NumberLiteralExpression(new Token(
+								Math.sqrt(argAsNumber(0)) as string)));
+							break;
+						case "log":
+							replaceCb(new NumberLiteralExpression(new Token(
+								Math.log(argAsNumber(0)) as string)));
+							break;
+						case "pow":
+							replaceCb(new NumberLiteralExpression(new Token(
+								Math.pow(argAsNumber(0), argAsNumber(1)) as string)));
+							break;
+						case "sin":
+							replaceCb(new NumberLiteralExpression(new Token(
+								Math.sin(argAsNumber(0)) as string)));
+							break;
+						case "cos":
+							replaceCb(new NumberLiteralExpression(new Token(
+								Math.cos(argAsNumber(0)) as string)));
+							break;
+						}
+					}
+					else if (propertyExpr.getExpr() instanceof StringLiteralExpression) {
+						// fold pure String functions
+						function argAsNumber(index : number) : number {
+							assert this._isIntegerOrNumberLiteralExpression(callExpr.getArguments()[index]);
+							return callExpr.getArguments()[index].getToken().getValue() as number;
+						}
+						switch(propertyExpr.getIdentifierToken().getValue()) {
+						case "charCodeAt":
+							replaceCb(new NumberLiteralExpression(new Token(
+								Util.decodeStringLiteral(propertyExpr.getExpr().getToken().getValue()).charCodeAt(argAsNumber(0)) as string)));
+							break;
+						}
+					}
+				}
+			}
 		}
 
 		return true;
