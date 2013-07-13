@@ -1824,7 +1824,7 @@ class _FoldConstantCommand extends _FunctionOptimizeCommand {
 				}
 
 				if (allArgsAreConstants) {
-					if (propertyExpr.isClassSpecifier() && holderType.getClassDef().classFullName() == "Math") {
+					if (propertyExpr.getExpr().isClassSpecifier() && holderType.getClassDef().classFullName() == "Math") {
 						// fold pure Math functions
 						switch(propertyExpr.getIdentifierToken().getValue()) {
 						case "sqrt":
