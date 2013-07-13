@@ -1837,11 +1837,6 @@ class _FoldConstantCommand extends _FunctionOptimizeCommand {
 			return callExpr.getArguments()[index].getToken().getValue() as number;
 		}
 
-		function argAsString(index : number) : string {
-			assert callExpr.getArguments()[index] instanceof StringLiteralExpression;
-			return Util.decodeStringLiteral(callExpr.getArguments()[index].getToken().getValue());
-		}
-
 		var member = null : MemberFunctionDefinition;
 		holderType.getClassDef().forEachMemberFunction(function (m) {
 			if (m.name() == propertyExpr.getIdentifierToken().getValue())
