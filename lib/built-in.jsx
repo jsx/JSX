@@ -329,7 +329,7 @@ native final class String {
 	/**
 	 * Returns a string value containing as many characters as the number of arguments.
 	 */
-	static function fromCharCode(...charN : number) : string;
+	static __pure__ function fromCharCode(...charN : number) : string;
 
 	/**
 	 * Returns this string value. (Note that, for a String object, the toString method happens to return the same thing as the valueOf method.)

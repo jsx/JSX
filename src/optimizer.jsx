@@ -1889,6 +1889,19 @@ class _FoldConstantCommand extends _FunctionOptimizeCommand {
 					break;
 				}
 			}
+			if (holderType.getClassDef().classFullName() == "String") {
+				switch(propertyExpr.getIdentifierToken().getValue()) {
+				case "fromCharCode":
+					this.log("folding " + member.getNotation());
+					var s = "";
+					callExpr.getArguments().forEach((arg) -> {
+						s += String.fromCharCode(arg.getToken().getValue() as number);
+					});
+					replaceCb(new StringLiteralExpression(new Token(
+						Util.encodeStringLiteral(s))));
+					break;
+				}
+			}
 		}
 		else if (propertyExpr.getExpr() instanceof StringLiteralExpression) {
 			// fold pure String functions
