@@ -1699,7 +1699,7 @@ class _FoldConstantCommand extends _FunctionOptimizeCommand {
 					if (foldedExpr != null) {
 						foldedExpr = this._toFoldedExpr(foldedExpr, propertyExpr.getType());
 						if (foldedExpr != null) {
-							this.log("folding property '" + member.toString() + "' at '" + propertyExpr.getToken().getFilename() + ":" + propertyExpr.getToken().getLineNumber() as string);
+							this.log("folding property " + member.getNotation() + " at " + propertyExpr.getToken().getFilename() + ":" + propertyExpr.getToken().getLineNumber() as string);
 							replaceCb(foldedExpr);
 						}
 					}
@@ -1726,12 +1726,12 @@ class _FoldConstantCommand extends _FunctionOptimizeCommand {
 			}
 			var baseExpr = (expr as SignExpression).getExpr();
 			if (baseExpr instanceof IntegerLiteralExpression) {
-				this.log("folding operator (int) '" + expr.getToken().getValue() + "' at '" + expr.getToken().getFilename() + ":" + expr.getToken().getLineNumber() as string);
+				this.log("folding operator (number) " + expr.getToken().getNotation());
 				replaceCb(new IntegerLiteralExpression(new Token(
 					calculateCb(exprAsNumber(baseExpr)) as string
 				)));
 			} else if (baseExpr instanceof NumberLiteralExpression) {
-				this.log("folding operator (number) '" + expr.getToken().getValue() + "' at '" + expr.getToken().getFilename() + ":" + expr.getToken().getLineNumber() as string);
+				this.log("folding operator (number) " + expr.getToken().getNotation());
 				replaceCb(new NumberLiteralExpression(new Token(
 					calculateCb(exprAsNumber(baseExpr)) as string
 				)));
@@ -1741,7 +1741,7 @@ class _FoldConstantCommand extends _FunctionOptimizeCommand {
 			assert expr.getToken().getValue() == "~";
 			var baseExpr = (expr as BitwiseNotExpression).getExpr();
 			if (this._isIntegerOrNumberLiteralExpression(baseExpr)) {
-				this.log("folding operator '" + expr.getToken().getValue() + "' at '" + expr.getToken().getFilename() + ":" + expr.getToken().getLineNumber() as string);
+				this.log("folding operator " + expr.getToken().getNotation());
 				replaceCb(new IntegerLiteralExpression(new Token(
 					(~ exprAsNumber(baseExpr)) as string
 				)));
@@ -2039,7 +2039,7 @@ class _FoldConstantCommand extends _FunctionOptimizeCommand {
 	function _foldNumericBinaryExpressionAsInteger (expr : BinaryExpression, replaceCb : function(:Expression):void, calcCb : function(:number,:number):number) : void {
 		var value = calcCb(expr.getFirstExpr().getToken().getValue() as number, expr.getSecondExpr().getToken().getValue() as number);
 		this.log(
-			"folding operator '" + expr.getToken().getValue() + "' at " + expr.getToken().getFilename() + ":" + expr.getToken().getLineNumber() as string +
+			"folding operator " + expr.getToken().getNotation() +
 			" to int: " + value as string);
 		if (value % 1 != 0)
 			throw new Error("value is not an integer");
@@ -2049,7 +2049,7 @@ class _FoldConstantCommand extends _FunctionOptimizeCommand {
 	function _foldNumericBinaryExpressionAsNumber (expr : BinaryExpression, replaceCb : function(:Expression):void, calcCb : function(:number,:number):number) : void {
 		var value = calcCb(expr.getFirstExpr().getToken().getValue() as number, expr.getSecondExpr().getToken().getValue() as number);
 		this.log(
-			"folding operator '" + expr.getToken().getValue() + "' at " + expr.getToken().getFilename() + ":" + expr.getToken().getLineNumber() as string +
+			"folding operator " + expr.getToken().getNotation() +
 			" to number: " + value as string);
 		replaceCb(new NumberLiteralExpression(new Token(value as string)));
 	}
@@ -2057,7 +2057,7 @@ class _FoldConstantCommand extends _FunctionOptimizeCommand {
 	function _foldNumericBinaryExpressionAsBoolean (expr : BinaryExpression, replaceCb : function(:Expression):void, calcCb : function(:number,:number):boolean) : void {
 		var value = calcCb(expr.getFirstExpr().getToken().getValue() as number, expr.getSecondExpr().getToken().getValue() as number);
 		this.log(
-			"folding operator '" + expr.getToken().getValue() + "' at " + expr.getToken().getFilename() + ":" + expr.getToken().getLineNumber() as string +
+			"folding operator " + expr.getToken().getNotation() +
 			" to boolean: " + value as string);
 		replaceCb(new BooleanLiteralExpression(new Token(value as string)));
 	}
@@ -2088,7 +2088,7 @@ class _FoldConstantCommand extends _FunctionOptimizeCommand {
 		} else if (expr instanceof NumberLiteralExpression) {
 			if (type.resolveIfNullable().equals(Type.integerType)) {
 				// cast to integer
-				return new IntegerLiteralExpression(new Token((expr.getToken().getValue() as int).toString(), false));
+				return new IntegerLiteralExpression(new Token((expr.getToken().getValue() as int) as string));
 			}
 			return expr;
 		} else if (expr instanceof StringLiteralExpression) {
@@ -3595,7 +3595,7 @@ class _UnboxOptimizeCommand extends _FunctionOptimizeCommand {
 	}
 
 	function _unboxVariable (funcDef : MemberFunctionDefinition, local : LocalVariable) : void {
-		this.log("unboxing " + local.getName().getValue());
+		this.log("unboxing " + local.getName().getNotation());
 
 		// build map of propetyName => LocalVariable
 		var variableMap = new Map.<LocalVariable>;
@@ -3735,23 +3735,23 @@ class _ArrayLengthOptimizeCommand extends _FunctionOptimizeCommand {
 			&& statement.forEachStatement(function (statement) { return this._lengthIsUnmodifiedInStatement(statement); })) {
 
 			// optimize!
-			this.log(funcDef.getNotation() + " optimizing .length at line " + statement.getToken().getLineNumber() as string);
+			this.log(funcDef.getNotation() + " optimizing " + statement.getToken().getNotation());
 			// create local var for array.length
 			var lengthLocal = this.createVar(funcDef, Type.integerType, arrayLocal.getName().getValue() + "$len");
 			// assign array.length to the local
 			var assignToLocal =  new AssignmentExpression(
-						new Token("=", false),
+						new Token("="),
 						new LocalExpression(new Token(lengthLocal.getName().getValue(), true), lengthLocal),
 						new PropertyExpression(
-							new Token(".", false),
+							new Token("."),
 							new LocalExpression(new Token(arrayLocal.getName().getValue(), true), arrayLocal),
-							new Token("length", true),
+							new Token("length"),
 							new Type[],
 							lengthLocal.getType()));
 			if (statement.getInitExpr() != null) {
 				statement.setInitExpr(
 					new CommaExpression(
-						new Token(",", false),
+						new Token(","),
 						statement.getInitExpr(),
 						assignToLocal));
 			}

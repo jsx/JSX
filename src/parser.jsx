@@ -77,6 +77,11 @@ class Token {
 		] : variant[];
 	}
 
+	// "'x' at filename:linenumber" for debugging purpose
+	function getNotation() : string {
+		return "'" + this._value + "'"
+				+ " at " + this._filename + ":" + this._lineNumber as string;
+	}
 }
 
 class _Lexer {
