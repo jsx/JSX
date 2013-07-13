@@ -1711,7 +1711,6 @@ class _FoldConstantCommand extends _FunctionOptimizeCommand {
 			}
 
 		} else if (expr instanceof SignExpression) {
-
 			// sign expression
 			var calculateCb;
 			switch (expr.getToken().getValue()) {
@@ -1722,12 +1721,19 @@ class _FoldConstantCommand extends _FunctionOptimizeCommand {
 			}
 			this.log("folding operator '" + expr.getToken().getValue() + "' at '" + expr.getToken().getFilename() + ":" + expr.getToken().getLineNumber() as string);
 			var baseExpr = (expr as SignExpression).getExpr();
+			var value = new Token(calculateCb(baseExpr.getToken().getValue() as number) as string);
 			if (baseExpr instanceof IntegerLiteralExpression) {
-				replaceCb(new IntegerLiteralExpression(new Token(calculateCb((baseExpr as IntegerLiteralExpression).getToken().getValue() as number) as string, false)));
+				replaceCb(new IntegerLiteralExpression(value));
 			} else if (baseExpr instanceof NumberLiteralExpression) {
-				replaceCb(new NumberLiteralExpression(new Token(calculateCb((baseExpr as NumberLiteralExpression).getToken().getValue() as number) as string, false)));
+				replaceCb(new NumberLiteralExpression(value));
 			}
 
+		} else if (expr instanceof BitwiseNotExpression) {
+			assert expr.getToken().getValue() == "~";
+			this.log("folding operator '" + expr.getToken().getValue() + "' at '" + expr.getToken().getFilename() + ":" + expr.getToken().getLineNumber() as string);
+			var baseExpr = (expr as BitwiseNotExpression).getExpr();
+			var value = new Token((~ baseExpr.getToken().getValue() as number) as string);
+			replaceCb(new IntegerLiteralExpression(value));
 		} else if (expr instanceof AdditiveExpression) {
 
 			// additive expression
