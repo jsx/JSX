@@ -545,7 +545,6 @@ class Util {
 		return set;
 	}
 
-	// ECMA 262 5th 7.6.1 Reserved Words
 	static const _ecma262reserved = Util.asSet([
 		"break", "do", "instanceof", "typeof",
 		"case", "else", "new", "var",
@@ -562,8 +561,15 @@ class Util {
 		"true", "false"
 	]);
 
+	/**
+	 * @see ECMA 262 5th, 7.6.1 Reserved Words
+	 */
 	static function isECMA262Reserved(word : string) : boolean {
 		return Util._ecma262reserved.hasOwnProperty(word);
+	}
+
+	static function getECMA262ReservedWords() : string[] {
+		return Util._ecma262reserved.keys();
 	}
 }
 

@@ -362,16 +362,10 @@ class _MinifiedNameGenerator {
 
 	static const _MINIFY_CHARS = "$_ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 
-	// every object has eval, so it is listed as a keyword
-	static const KEYWORDS = (
-		"break else new var case finally return void catch for switch while continue function this with default if throw"
-		+ " delete in try do instanceof typeof abstract enum int"
-		+ " boolean export interface byte extends long char final native class float package const goto private debugger implements protected double import public"
-		+ " NaN Infinity undefined eval"
-		).split(/\s+/);
-
+	/// ECMA 262 global objects
 	static const GLOBALS = (
-		"parseInt parseFloat isNaN isFinite decodeURI decodeURIComponent encodeURI encodeURIComponent"
+		"NaN Infinity undefined eval"
+		+ "parseInt parseFloat isNaN isFinite decodeURI decodeURIComponent encodeURI encodeURIComponent"
 		+ " Object Function Array String Boolean Number Date RegExp Error EvalError RangeError ReferenceError SyntaxError TypeError URIError Math"
 		).split(/\s+/);
 
@@ -633,8 +627,7 @@ class _Minifier {
 		this._propertyConversionTable = _Minifier._buildConversionTable(
 			this._propertyUseCount,
 			new _MinifiedNameGenerator(
-				([] : string[]).concat(
-					_MinifiedNameGenerator.KEYWORDS,
+				Util.getECMA262ReservedWords().concat(
 					(function () : string[] {
 						var nativePropertyNames = new Map.<boolean>;
 						this._classDefs.forEach(function (classDef) {
@@ -668,7 +661,7 @@ class _Minifier {
 				var stash = _Minifier._getClassStash(classDef);
 				stash.staticVariableConversionTable = _Minifier._buildConversionTable(
 					stash.staticVariableUseCount,
-					new _MinifiedNameGenerator(_MinifiedNameGenerator.KEYWORDS.concat(exportedStaticVarNames)));
+					new _MinifiedNameGenerator(Util.getECMA262ReservedWords().concat(exportedStaticVarNames)));
 			}
 		});
 	}
@@ -689,8 +682,7 @@ class _Minifier {
 		this._globalConversionTable = _Minifier._buildConversionTable(
 			useCount,
 			new _MinifiedNameGenerator(
-				([] : string[]).concat(
-					_MinifiedNameGenerator.KEYWORDS,
+				Util.getECMA262ReservedWords().concat(
 					_MinifiedNameGenerator.GLOBALS,
 					(function () : string[] {
 						var nativeClassNames = new string[];
@@ -727,7 +719,7 @@ class _Minifier {
 			reserved.push(_Minifier._getLocalStash(scopeStash.usedOuterLocals[i]).minifiedName);
 		}
 		this._log("local minification, preserving: " + reserved.join(","));
-		reserved = reserved.concat(_MinifiedNameGenerator.KEYWORDS);
+		reserved = reserved.concat(Util.getECMA262ReservedWords());
 		// doit
 		var conversionTable = _Minifier._buildConversionTable(useCount, new _MinifiedNameGenerator(reserved));
 		// store the result
