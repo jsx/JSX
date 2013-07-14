@@ -80,7 +80,7 @@ class Token {
 	// "'x' at filename:linenumber" for debugging purpose
 	function getNotation() : string {
 		return "'" + this._value + "'"
-				+ " at " + this._filename + ":" + this._lineNumber as string;
+				+ " at " + (this._filename ?: "<<unknown>>")  + ":" + this._lineNumber as string;
 	}
 }
 
