@@ -359,6 +359,9 @@ class Util {
 		return "\"" + escaped + "\"";
 	}
 
+	/**
+	 * @see ECMA-262 5th, 7.8.4 String Literals
+	 */
 	static function decodeStringLiteral (literal : string) : string {
 		var matched = literal.match(/^([\'\"]).*([\'\"])$/);
 		if (matched == null || matched[1] != matched[2])
