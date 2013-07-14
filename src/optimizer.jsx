@@ -2646,7 +2646,8 @@ class _InlineOptimizeCommand extends _FunctionOptimizeCommand {
 		statement.forEachExpression(function onExpr(expr : Expression, replaceCb : function(:Expression):void) : boolean {
 			expr.forEachExpression(onExpr);
 			if (expr instanceof CallExpression) {
-				var args = this._getArgsAndThisIfCallExprIsInlineable(expr as CallExpression, true);
+				var callExpr = expr as CallExpression;
+				var args = this._getArgsAndThisIfCallExprIsInlineable(callExpr, true);
 				if (args != null) {
 					var callingFuncDef = _DetermineCalleeCommand.getCallingFuncDef(expr);
 					this.log("expanding " + callingFuncDef.getNotation() + " as expression");
@@ -2658,12 +2659,48 @@ class _InlineOptimizeCommand extends _FunctionOptimizeCommand {
 					} else {
 						throw new Error('logic flaw');
 					}
+
+					// setup args (arg0 = arg0expr, arg1 = arg1expr, ...)
+					var setupArgs = null : Expression;
+					for (var i = 0; i < args.length; ++i) {
+						if (args[i] instanceof LeafExpression || args[i] == null) {
+							continue;
+						}
+						var argDecl = callingFuncDef.getArguments()[i];
+						var local = this.createVar(
+								funcDef,
+								args[i].getType(),
+								(callingFuncDef.isAnonymous() ? "$anon" : callingFuncDef.name())
+									+ "$"
+									+ (argDecl != null ? argDecl.getName().getValue() : "this"));
+
+						var assignToLocal = new AssignmentExpression(new Token("="),
+							new LocalExpression(local.getName(), local),
+							args[i]);
+						if (setupArgs == null) {
+							setupArgs = assignToLocal;
+						}
+						else {
+							setupArgs = new CommaExpression(new Token(","),
+								assignToLocal,
+								setupArgs);
+						}
+						args[i] = new LocalExpression(local.getName(), local);
+					}
+
 					var clonedExpr = expr.clone();
 					this._rewriteExpression(
 						clonedExpr,
 						function (expr) { clonedExpr = expr; },
 						args,
 						callingFuncDef);
+
+					if (setupArgs != null) {
+						clonedExpr = new CommaExpression(new Token(","),
+							setupArgs,
+							clonedExpr);
+					}
+
 					replaceCb(clonedExpr);
 				}
 			}
@@ -2809,12 +2846,6 @@ class _InlineOptimizeCommand extends _FunctionOptimizeCommand {
 			if (! (calleeExpr instanceof PropertyExpression))
 				throw new Error("unexpected type of expression");
 			receiverExpr = (calleeExpr as PropertyExpression).getExpr();
-			if (asExpression) {
-				// receiver should not have side effecets
-				if (! (receiverExpr instanceof LocalExpression || receiverExpr instanceof ThisExpression)) {
-					return null;
-				}
-			}
 		}
 		// check that the function may be inlined
 		if (! this._functionIsInlineable(callingFuncDef))
@@ -2857,10 +2888,8 @@ class _InlineOptimizeCommand extends _FunctionOptimizeCommand {
 	function _argsAreInlineable (callingFuncDef : MemberFunctionDefinition, actualArgs : Expression[], asExpression : boolean) : boolean {
 		var formalArgsTypes = callingFuncDef.getArgumentTypes();
 		if (actualArgs.length != formalArgsTypes.length)
-			throw new Error("number of arguments mismatch");
+			throw new Error("logic flow, number of arguments mismatch");
 		for (var i = 0; i < actualArgs.length; ++i) {
-			if (asExpression && ! (actualArgs[i] instanceof LeafExpression))
-				return false;
 			if (! this._argIsInlineable(actualArgs[i].getType(), formalArgsTypes[i]))
 				return false;
 		}
@@ -3061,8 +3090,7 @@ class _InlineOptimizeCommand extends _FunctionOptimizeCommand {
 			if (j == formalArgs.length) {
 				++j; // skip this
 				var locals = calleeFuncDef.getLocals();
-				if (locals.length != argsAndThisAndLocals.length - j)
-					throw new Error("logic flaw");
+				assert locals.length == argsAndThisAndLocals.length - j, locals.length as string + " vs " + (argsAndThisAndLocals.length as string + " - " + j as string) as string + " for " + calleeFuncDef.getNotation();
 				for (var k = 0; k < locals.length; ++k, ++j) {
 					if (locals[k].getName().getValue() == expr.getToken().getValue())
 						break;
@@ -3080,6 +3108,7 @@ class _InlineOptimizeCommand extends _FunctionOptimizeCommand {
 				// closure referring to a local variable of outer scope
 			}
 		} else if (expr instanceof ThisExpression) {
+			assert argsAndThisAndLocals[formalArgs.length] != null;
 			replaceCb(argsAndThisAndLocals[formalArgs.length].clone());
 		}
 		expr.forEachExpression(function (expr, replaceCb) {
