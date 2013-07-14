@@ -2642,6 +2642,58 @@ class _InlineOptimizeCommand extends _FunctionOptimizeCommand {
 		var altered = false;
 		var statement = statements[stmtIndex];
 
+		// expand complicated functions
+		if (statement instanceof ConstructorInvocationStatement) {
+
+			var callingFuncDef = _DetermineCalleeCommand.getCallingFuncDef(statement);
+			this.optimizeFunction(callingFuncDef);
+			if (this._functionIsInlineable(callingFuncDef) && this._argsAreInlineable(callingFuncDef, (statement as ConstructorInvocationStatement).getArguments(), false)) {
+				statements.splice(stmtIndex, 1);
+				this._expandCallingFunction(funcDef, statements, stmtIndex, callingFuncDef, (statement as ConstructorInvocationStatement).getArguments().concat([ new ThisExpression(null, funcDef.getClassDef()) as Expression ]));
+			}
+
+		} else if (statement instanceof ExpressionStatement) {
+
+			if (this._expandStatementExpression(funcDef, statements, stmtIndex, (statement as ExpressionStatement).getExpr(), function (stmtIndex) {
+				statements.splice(stmtIndex, 1);
+			})) {
+				altered = true;
+			}
+
+		} else if (statement instanceof ReturnStatement) {
+
+			if (this._expandStatementExpression(funcDef, statements, stmtIndex, (statement as ReturnStatement).getExpr(), function (stmtIndex) {
+				statements.splice(stmtIndex, 1);
+				statements[stmtIndex - 1] = new ReturnStatement(statement.getToken(),
+					(statements[stmtIndex - 1] instanceof ReturnStatement)
+					? (statements[stmtIndex - 1] as ReturnStatement).getExpr()
+					: (statements[stmtIndex - 1] as ExpressionStatement).getExpr());
+			})) {
+				altered = true;
+			}
+
+		} else if (statement instanceof IfStatement) {
+
+			if (this._expandStatementExpression(funcDef, statements, stmtIndex, (statement as IfStatement).getExpr(), function (stmtIndex) {
+				(statement as IfStatement).setExpr((statements[stmtIndex - 1] instanceof ReturnStatement)
+					? (statements[stmtIndex - 1] as ReturnStatement).getExpr()
+					: (statements[stmtIndex - 1] as ExpressionStatement).getExpr());
+				statements.splice(stmtIndex - 1, 1);
+			})) {
+				altered = true;
+			}
+			if (this._handleSubStatements(funcDef, statement)) {
+				altered = true;
+			}
+
+		} else {
+
+			if (this._handleSubStatements(funcDef, statement)) {
+				altered = true;
+			}
+
+		}
+
 		// expand single-statement functions that return a value
 		statement.forEachExpression(function onExpr(expr : Expression, replaceCb : function(:Expression):void) : boolean {
 			expr.forEachExpression(onExpr);
@@ -2731,58 +2783,6 @@ class _InlineOptimizeCommand extends _FunctionOptimizeCommand {
 			}
 			return true;
 		});
-
-		// expand more complicated functions
-		if (statement instanceof ConstructorInvocationStatement) {
-
-			var callingFuncDef = _DetermineCalleeCommand.getCallingFuncDef(statement);
-			this.optimizeFunction(callingFuncDef);
-			if (this._functionIsInlineable(callingFuncDef) && this._argsAreInlineable(callingFuncDef, (statement as ConstructorInvocationStatement).getArguments(), false)) {
-				statements.splice(stmtIndex, 1);
-				this._expandCallingFunction(funcDef, statements, stmtIndex, callingFuncDef, (statement as ConstructorInvocationStatement).getArguments().concat([ new ThisExpression(null, funcDef.getClassDef()) as Expression ]));
-			}
-
-		} else if (statement instanceof ExpressionStatement) {
-
-			if (this._expandStatementExpression(funcDef, statements, stmtIndex, (statement as ExpressionStatement).getExpr(), function (stmtIndex) {
-				statements.splice(stmtIndex, 1);
-			})) {
-				altered = true;
-			}
-
-		} else if (statement instanceof ReturnStatement) {
-
-			if (this._expandStatementExpression(funcDef, statements, stmtIndex, (statement as ReturnStatement).getExpr(), function (stmtIndex) {
-				statements.splice(stmtIndex, 1);
-				statements[stmtIndex - 1] = new ReturnStatement(statement.getToken(),
-					(statements[stmtIndex - 1] instanceof ReturnStatement)
-					? (statements[stmtIndex - 1] as ReturnStatement).getExpr()
-					: (statements[stmtIndex - 1] as ExpressionStatement).getExpr());
-			})) {
-				altered = true;
-			}
-
-		} else if (statement instanceof IfStatement) {
-
-			if (this._expandStatementExpression(funcDef, statements, stmtIndex, (statement as IfStatement).getExpr(), function (stmtIndex) {
-				(statement as IfStatement).setExpr((statements[stmtIndex - 1] instanceof ReturnStatement)
-					? (statements[stmtIndex - 1] as ReturnStatement).getExpr()
-					: (statements[stmtIndex - 1] as ExpressionStatement).getExpr());
-				statements.splice(stmtIndex - 1, 1);
-			})) {
-				altered = true;
-			}
-			if (this._handleSubStatements(funcDef, statement)) {
-				altered = true;
-			}
-
-		} else {
-
-			if (this._handleSubStatements(funcDef, statement)) {
-				altered = true;
-			}
-
-		}
 
 		return altered;
 	}
@@ -3089,7 +3089,7 @@ class _InlineOptimizeCommand extends _FunctionOptimizeCommand {
 
 	function _createVarForArgOrThis (callerFuncDef : MemberFunctionDefinition, statements : Statement[], stmtIndex : number, expr : Expression, type : Type, baseName : string) : LocalExpression {
 		// just pass through the expressions that do not have side effects
-		if (expr instanceof ThisExpression || expr instanceof LeafExpression) {
+		if (expr instanceof LeafExpression) {
 			return null;
 		}
 		// create a local variable based on the given name
