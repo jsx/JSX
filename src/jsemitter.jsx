@@ -2446,8 +2446,6 @@ class _CallExpressionEmitter extends _OperatorExpressionEmitter {
 			return true;
 		else if (this._emitCallsToMap(calleeExpr as PropertyExpression))
 			return true;
-		else if (this._emitIfMathAbs(calleeExpr as PropertyExpression))
-			return true;
 		return false;
 	}
 
@@ -2530,53 +2528,6 @@ class _CallExpressionEmitter extends _OperatorExpressionEmitter {
 		default:
 			return false;
 		}
-	}
-
-	function _emitIfMathAbs (calleeExpr : PropertyExpression) : boolean {
-		if (! _CallExpressionEmitter._calleeIsMathAbs(calleeExpr))
-			return false;
-		var argExpr = this._expr.getArguments()[0];
-		if (argExpr instanceof LeafExpression) {
-			this._emitter._emit("(", this._expr.getToken());
-			this._emitter._getExpressionEmitterFor(argExpr).emit(0);
-			this._emitter._emit(" >= 0 ? ", this._expr.getToken());
-			this._emitter._getExpressionEmitterFor(argExpr).emit(0);
-			this._emitter._emit(" : - ", this._expr.getToken());
-			this._emitter._getExpressionEmitterFor(argExpr).emit(0);
-			this._emitter._emit(")", this._expr.getToken());
-		} else {
-			this._emitter._emit("(($math_abs_t = ", this._expr.getToken());
-			this._emitter._getExpressionEmitterFor(argExpr).emit(_AssignmentExpressionEmitter._operatorPrecedence["="]);
-			this._emitter._emit(") >= 0 ? $math_abs_t : -$math_abs_t)", this._expr.getToken());
-		}
-		return true;
-	}
-
-	static function _calleeIsMathAbs (calleeExpr : PropertyExpression) : boolean {
-		if (! (calleeExpr.getType() instanceof StaticFunctionType))
-			return false;
-		if (calleeExpr.getIdentifierToken().getValue() != "abs")
-			return false;
-		if (calleeExpr.getExpr().getType().getClassDef().className() != "Math")
-			return false;
-		return true;
-	}
-
-	static function mathAbsUsesTemporary (funcDef : MemberFunctionDefinition) : boolean {
-		return ! funcDef.forEachStatement(function onStatement(statement : Statement) : boolean {
-			if (! statement.forEachExpression(function onExpr(expr : Expression) : boolean {
-				var calleeExpr;
-				if (expr instanceof CallExpression
-					&& (calleeExpr = (expr as CallExpression).getExpr()) instanceof PropertyExpression
-					&& _CallExpressionEmitter._calleeIsMathAbs(calleeExpr as PropertyExpression)
-					&& ! ((expr as CallExpression).getArguments()[0] instanceof LeafExpression))
-					return false;
-				return expr.forEachExpression(onExpr);
-			})) {
-				return false;
-			}
-			return statement.forEachStatement(onStatement);
-		});
 	}
 
 }
@@ -3371,10 +3322,6 @@ class JavaScriptEmitter implements Emitter {
 			// if funDef is NOT in another closure
 			if (funcDef.getClosures().length != 0 && (funcDef.flags() & ClassDefinition.IS_STATIC) == 0)
 				this._emit("var $this = this;\n", null);
-			// emit helper variable for Math.abs
-			if (_CallExpressionEmitter.mathAbsUsesTemporary(funcDef)) {
-				this._emit("var $math_abs_t;\n", null);
-			}
 			// emit local variable declarations
 			var locals = funcDef.getLocals();
 			for (var i = 0; i < locals.length; ++i) {
