@@ -215,7 +215,6 @@ class Optimizer {
 			"no-assert",
 			"no-log",
 			"no-debug",
-			"staticize",
 			"fold-const",
 			"return-if",
 			"inline",
@@ -226,7 +225,8 @@ class Optimizer {
 			"dce",
 			"fold-const",
 			"array-length",
-			"unclassify"
+			"unclassify",
+			"staticize"
 		];
 	}
 
