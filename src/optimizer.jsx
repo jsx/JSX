@@ -1634,6 +1634,8 @@ class _UnclassifyOptimizationCommand extends _OptimizeCommand {
 class _FoldConstantCommand extends _FunctionOptimizeCommand {
 	static const IDENTIFIER = "fold-const";
 
+	static const LONG_STRING_LITERAL = 64;
+
 	class Stash extends Stash {
 
 		var isOptimized : boolean;
@@ -1682,8 +1684,6 @@ class _FoldConstantCommand extends _FunctionOptimizeCommand {
 		}
 
 		if (expr instanceof PropertyExpression) {
-
-			// property expression
 			var propertyExpr = expr as PropertyExpression;
 			var holderType = propertyExpr.getHolderType();
 			if (propertyExpr.getExpr().isClassSpecifier()) {
@@ -1698,7 +1698,7 @@ class _FoldConstantCommand extends _FunctionOptimizeCommand {
 					var foldedExpr = this._toFoldedExpr(member.getInitialValue(), member.getType());
 					if (foldedExpr != null) {
 						foldedExpr = this._toFoldedExpr(foldedExpr, propertyExpr.getType());
-						if (foldedExpr != null) {
+						if (foldedExpr != null && !(foldedExpr instanceof StringLiteralExpression && Util.decodeStringLiteral((foldedExpr as StringLiteralExpression).getToken().getValue()).length > _FoldConstantCommand.LONG_STRING_LITERAL)) {
 							this.log("folding property " + member.getNotation() + " at " + propertyExpr.getToken().getFilename() + ":" + propertyExpr.getToken().getLineNumber() as string);
 							replaceCb(foldedExpr);
 						}
