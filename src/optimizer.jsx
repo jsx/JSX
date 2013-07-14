@@ -2663,15 +2663,19 @@ class _InlineOptimizeCommand extends _FunctionOptimizeCommand {
 					// setup args (arg0 = arg0expr, arg1 = arg1expr, ...)
 					//   for non-leaf expressions used more than once
 					var localUsed = new Map.<number>;
-					expr.forEachExpression((expr) -> {
+					(function onExpr(expr : Expression) : boolean {
 						if (expr instanceof LocalExpression) {
-							localUsed[(expr as LocalExpression).getLocal().getName().getValue()]++;
+							var name = (expr as LocalExpression).getLocal().getName().getValue();
+							localUsed[name] = (localUsed[name] ?: 0) + 1;;
 						}
 						else if (expr instanceof ThisExpression) {
-							localUsed["this"]++;
+							localUsed["this"] = (localUsed["this"] ?: 0) + 1;
+						}
+						else {
+							expr.forEachExpression(onExpr);
 						}
 						return true;
-					});
+					}(expr));
 					var setupArgs = null : Expression;
 					for (var i = 0; i < args.length; ++i) {
 						if (args[i] instanceof LeafExpression || args[i] == null) {
@@ -2682,7 +2686,7 @@ class _InlineOptimizeCommand extends _FunctionOptimizeCommand {
 						var usedCount = i < callingFuncDef.getArguments().length
 							? localUsed[callingFuncDef.getArguments()[i].getName().getValue()]
 							: localUsed["this"];
-						if (usedCount != null &&  usedCount == 1) {
+						if (usedCount == 1) {
 							 // no need to save it to local var
 							continue;
 						}
