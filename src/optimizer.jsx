@@ -2682,7 +2682,7 @@ class _InlineOptimizeCommand extends _FunctionOptimizeCommand {
 						var usedCount = i < callingFuncDef.getArguments().length
 							? localUsed[callingFuncDef.getArguments()[i].getName().getValue()]
 							: localUsed["this"];
-						if (usedCount == null ||  usedCount == 1) {
+						if (usedCount != null &&  usedCount == 1) {
 							 // no need to save it to local var
 							continue;
 						}
