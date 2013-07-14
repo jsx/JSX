@@ -2714,20 +2714,7 @@ class _InlineOptimizeCommand extends _FunctionOptimizeCommand {
 
 					// setup args (arg0 = arg0expr, arg1 = arg1expr, ...)
 					//   for non-leaf expressions used more than once
-					var localUsed = new Map.<number>;
-					(function onExpr(expr : Expression) : boolean {
-						if (expr instanceof LocalExpression) {
-							var name = (expr as LocalExpression).getLocal().getName().getValue();
-							localUsed[name] = (localUsed[name] ?: 0) + 1;;
-						}
-						else if (expr instanceof ThisExpression) {
-							localUsed["this"] = (localUsed["this"] ?: 0) + 1;
-						}
-						else {
-							expr.forEachExpression(onExpr);
-						}
-						return true;
-					}(expr));
+					var argUsed = this._countNumberOfArgsUsed(callingFuncDef);
 					var setupArgs = null : Expression;
 					for (var i = 0; i < args.length; ++i) {
 						if (args[i] instanceof LeafExpression || args[i] == null) {
@@ -2735,10 +2722,10 @@ class _InlineOptimizeCommand extends _FunctionOptimizeCommand {
 						}
 
 						// use the expression as is if it used only once
-						var usedCount = i < callingFuncDef.getArguments().length
-							? localUsed[callingFuncDef.getArguments()[i].getName().getValue()]
-							: localUsed["this"];
-						if (usedCount == 1) {
+						var numberOfUsed = i < callingFuncDef.getArguments().length
+							? argUsed[callingFuncDef.getArguments()[i].getName().getValue()]
+							: argUsed["this"];
+						if (numberOfUsed == 1) {
 							 // no need to save it to local var
 							continue;
 						}
@@ -2786,6 +2773,34 @@ class _InlineOptimizeCommand extends _FunctionOptimizeCommand {
 		});
 
 		return altered;
+	}
+
+	function _countNumberOfArgsUsed(funcDef : MemberFunctionDefinition) : Map.<number> {
+		var formalArgs = new TypedMap.<LocalVariable, boolean>;
+		var map = new Map.<number>;
+
+		funcDef.getArguments().forEach((formalArg) -> {
+			formalArgs.set(formalArg, true);
+			map[formalArg.getName().getValue()] = 0;
+		});
+		map["this"] = 0;
+
+		funcDef.forEachStatement(function onStatement(statement : Statement) : boolean {
+			statement.forEachStatement(onStatement);
+			statement.forEachExpression(function onExpr(expr : Expression) : boolean {
+				expr.forEachExpression(onExpr);
+				if (expr instanceof LocalExpression && formalArgs.has((expr as LocalExpression).getLocal())) {
+					map[(expr as LocalExpression).getLocal().getName().getValue()]++;
+				}
+				else if (expr instanceof ThisExpression) {
+					map["this"]++;
+				}
+				return true;
+			});
+			return true;
+		});
+
+		return map;
 	}
 
 	function _handleSubStatements (funcDef : MemberFunctionDefinition, statement : Statement) : boolean {
