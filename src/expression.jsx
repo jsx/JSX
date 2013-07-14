@@ -713,7 +713,7 @@ class MapLiteralExpression extends Expression {
 
 }
 
-class ThisExpression extends Expression {
+class ThisExpression extends LeafExpression {
 
 	var _classDef : ClassDefinition;
 
