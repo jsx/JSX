@@ -1,5 +1,12 @@
 Revision history for the JSX software development kit
 
+0.9.54 2013-07-13 21:06:35-0700
+    [FEATURES]
+    - Improve optimizer "fold-const"
+      * folds some native pure functions: Math.sqrt(), Math.log(), Math.pow(), Math.sin(), Math.cos(), String.fromCharCode(), String#charCodeAt()
+      * folds more operators: <, <=, >, >=, ~ (bitwise not)
+    - Improve optimizer "inline"
+
 0.9.53 2013-07-10 16:33:16-0700
     [FEATURES]
     - The compiler colorizes messages for tty
