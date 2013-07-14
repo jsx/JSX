@@ -2779,6 +2779,7 @@ class _InlineOptimizeCommand extends _FunctionOptimizeCommand {
 					}
 
 					replaceCb(clonedExpr);
+					altered = true;
 				}
 			}
 			return true;
