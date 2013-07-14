@@ -388,10 +388,19 @@ class Util {
 			case "v": decoded += "\v"; break;
 			case "u":
 				var matched = src.substring(pos).match(/^([0-9A-Fa-f]{4})/);
-				if (matched == null)
+				if (matched == null) {
 					throw new Error("expected four hexdigits after \\u: " + literal);
+				}
 				decoded += String.fromCharCode(Number.parseInt(matched[1], 16));
 				pos += 4;
+				break;
+			case "x":
+				var matched = src.substring(pos).match(/^([0-9A-Fa-f]{2})/);
+				if (matched == null) {
+					throw new Error("expected two hexdigits after \\x: " + literal);
+				}
+				decoded += String.fromCharCode(Number.parseInt(matched[1], 16));
+				pos += 2;
 				break;
 			case "0":
 				if (pos == src.length || src.charAt(pos).match(/[0-9]/) == null)

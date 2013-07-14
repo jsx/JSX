@@ -47,6 +47,9 @@ class _Test extends TestCase {
 		this.expect(Util.decodeStringLiteral("'\\u0041'")).toBe("A");
 		this.expect(Util.decodeStringLiteral("'\\0'")).toBe("\0");
 		this.expect(Util.decodeStringLiteral("'!\\u0041!\\0!\\n!'")).toBe("!A!\0!\n!");
+
+		this.expect(Util.decodeStringLiteral("'\\x61'")).toBe("a");
+		this.expect(Util.decodeStringLiteral("'\\x66\\x6f\\x6f'")).toBe("foo");
 	}
 
 	function testResolvePath() : void {
