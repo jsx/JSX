@@ -2717,6 +2717,7 @@ class _InlineOptimizeCommand extends _FunctionOptimizeCommand {
 					var argUsed = this._countNumberOfArgsUsed(callingFuncDef);
 					var setupArgs = null : Expression;
 					for (var i = 0; i < args.length; ++i) {
+						// if args[i] is a simple enough, use it as is
 						if (args[i] instanceof LeafExpression || args[i] == null) {
 							continue;
 						}
@@ -2725,7 +2726,7 @@ class _InlineOptimizeCommand extends _FunctionOptimizeCommand {
 						var numberOfUsed = i < callingFuncDef.getArguments().length
 							? argUsed[callingFuncDef.getArguments()[i].getName().getValue()]
 							: argUsed["this"];
-						if (numberOfUsed == 1) {
+						if (numberOfUsed == 1 && !_Util.exprHasSideEffects(args[i])) {
 							 // no need to save it to local var
 							continue;
 						}
@@ -2741,6 +2742,7 @@ class _InlineOptimizeCommand extends _FunctionOptimizeCommand {
 						var assignToLocal = new AssignmentExpression(new Token("="),
 							new LocalExpression(local.getName(), local),
 							args[i]);
+
 						if (setupArgs == null) {
 							setupArgs = assignToLocal;
 						}
