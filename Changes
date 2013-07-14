@@ -1,5 +1,11 @@
 Revision history for the JSX software development kit
 
+0.9.55 2013-07-13 22:59:43-0700
+    [BUG FIXES]
+    - "\xHH" style escape in string literals didn't work
+    - Duplicated case values are no longer allowed if they are
+      literals
+
 0.9.54 2013-07-13 21:06:35-0700
     [FEATURES]
     - Improve optimizer "fold-const"
