@@ -2406,7 +2406,7 @@ class _DeadCodeEliminationOptimizeCommand extends _FunctionOptimizeCommand {
 
 	function _eliminateDeadStores (funcDef : MemberFunctionDefinition, exprs : Expression[]) : void {
 		var lastAssignExpr = new Triple.<LocalVariable, AssignmentExpression, function(:Expression):void>[];
-		var onExpr = function (expr : Expression, rewriteCb : function(:Expression):void) : boolean {
+		function onExpr(expr : Expression, rewriteCb : function(:Expression):void) : boolean {
 			if (expr instanceof AssignmentExpression) {
 				var assignExpr = expr as AssignmentExpression;
 				if (assignExpr.getToken().getValue() == "=" && assignExpr.getFirstExpr() instanceof LocalExpression) {
@@ -2462,7 +2462,7 @@ class _DeadCodeEliminationOptimizeCommand extends _FunctionOptimizeCommand {
 				return true;
 			}
 			return expr.forEachExpression(onExpr);
-		};
+		}
 		Util.forEachExpression(onExpr, exprs);
 	}
 
@@ -3043,9 +3043,9 @@ class _InlineOptimizeCommand extends _FunctionOptimizeCommand {
 			? new ExpressionStatement((calleeStatements[i] as ReturnStatement).getExpr().clone()) as Statement
 			: calleeStatements[i].clone();
 			// replace the arguments with actual arguments
-			var onExpr = function onExpr(expr : Expression, replaceCb : function(:Expression):void) : boolean {
+			function onExpr(expr : Expression, replaceCb : function(:Expression):void) : boolean {
 				return this._rewriteExpression(expr, replaceCb, argsAndThisAndLocals, calleeFuncDef);
-			};
+			}
 			statement.forEachExpression(onExpr);
 			statement.forEachStatement(function onStatement(statement : Statement) : boolean {
 				statement.forEachStatement(onStatement);
