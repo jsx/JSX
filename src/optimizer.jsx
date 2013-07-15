@@ -3067,9 +3067,10 @@ class _InlineOptimizeCommand extends _FunctionOptimizeCommand {
 			}
 		}
 		// handle other arguments
+		var argUsed = this._countNumberOfArgsUsed(calleeFuncDef);
 		var formalArgs = calleeFuncDef.getArguments();
 		for (var i = 0; i < formalArgs.length; ++i) {
-			if (argsAndThisAndLocals[i] instanceof FunctionExpression && this._getNumberOfTimesArgIsUsed(calleeFuncDef, formalArgs[i]) <= 1) {
+			if (argsAndThisAndLocals[i] instanceof FunctionExpression && argUsed[formalArgs[i].getName().getValue()] <= 1) {
 				// if the argument is a function expression that is referred only once, directly spill the function into the inlined function
 				// of if it is never referred to, the function expression will disappear
 			} else {
@@ -3087,22 +3088,6 @@ class _InlineOptimizeCommand extends _FunctionOptimizeCommand {
 			argsAndThisAndLocals.push(new LocalExpression(tempVar.getName(), tempVar));
 		}
 		return stmtIndex;
-	}
-
-	function _getNumberOfTimesArgIsUsed (funcDef : MemberFunctionDefinition, local : ArgumentDeclaration) : number {
-		var count = 0;
-		funcDef.forEachStatement(function onStatement(statement : Statement) : boolean {
-			statement.forEachStatement(onStatement);
-			statement.forEachExpression(function onExpr(expr : Expression) : boolean {
-				expr.forEachExpression(onExpr);
-				if (expr instanceof LocalExpression && (expr as LocalExpression).getLocal() == local) {
-					++count;
-				}
-				return true;
-			});
-			return true;
-		});
-		return count;
 	}
 
 	function _createVarForArgOrThis (callerFuncDef : MemberFunctionDefinition, statements : Statement[], stmtIndex : number, expr : Expression, type : Type, baseName : string) : LocalExpression {
