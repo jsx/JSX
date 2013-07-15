@@ -3058,16 +3058,19 @@ class _InlineOptimizeCommand extends _FunctionOptimizeCommand {
 	}
 
 	function _createVars (callerFuncDef : MemberFunctionDefinition, statements : Statement[], stmtIndex : number, calleeFuncDef : MemberFunctionDefinition, argsAndThisAndLocals : Expression[]) : number {
+		var argUsed = this._countNumberOfArgsUsed(calleeFuncDef);
 		// handle "this" first
 		if ((calleeFuncDef.flags() & ClassDefinition.IS_STATIC) == 0) {
-			var tempExpr = this._createVarForArgOrThis(callerFuncDef, statements, stmtIndex, argsAndThisAndLocals[argsAndThisAndLocals.length - 1], new ObjectType(calleeFuncDef.getClassDef()), "this");
-			if (tempExpr != null) {
-				argsAndThisAndLocals[argsAndThisAndLocals.length - 1] = tempExpr;
-				++stmtIndex;
+			var recvExpr = argsAndThisAndLocals[argsAndThisAndLocals.length - 1];
+			if ( ! (recvExpr instanceof LeafExpression) && (_Util.exprHasSideEffects(recvExpr) || argUsed["this"] > 1) ) {
+				var tempExpr = this._createVarForArgOrThis(callerFuncDef, statements, stmtIndex, recvExpr, new ObjectType(calleeFuncDef.getClassDef()), "this");
+				if (tempExpr != null) {
+					argsAndThisAndLocals[argsAndThisAndLocals.length - 1] = tempExpr;
+					++stmtIndex;
+				}
 			}
 		}
 		// handle other arguments
-		var argUsed = this._countNumberOfArgsUsed(calleeFuncDef);
 		var formalArgs = calleeFuncDef.getArguments();
 		for (var i = 0; i < formalArgs.length; ++i) {
 			if (argsAndThisAndLocals[i] instanceof FunctionExpression && argUsed[formalArgs[i].getName().getValue()] <= 1) {
@@ -3101,7 +3104,7 @@ class _InlineOptimizeCommand extends _FunctionOptimizeCommand {
 		statements.splice(stmtIndex, 0,
 			new ExpressionStatement(
 				new AssignmentExpression(
-					new Token("=", false),
+					new Token("="),
 					new LocalExpression(newLocal.getName(), newLocal),
 					expr)));
 		// return an expression referring the the local
