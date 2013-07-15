@@ -2405,7 +2405,7 @@ class _DeadCodeEliminationOptimizeCommand extends _FunctionOptimizeCommand {
 	}
 
 	function _eliminateDeadStores (funcDef : MemberFunctionDefinition, exprs : Expression[]) : void {
-		var lastAssignExpr = new Triple.<LocalVariable, AssignmentExpression, function(:Expression):void>[];
+		var lastAssignExpr = new TypedMap.<LocalVariable, Pair.<AssignmentExpression, function(:Expression):void>>;
 		function onExpr(expr : Expression, rewriteCb : function(:Expression):void) : boolean {
 			if (expr instanceof AssignmentExpression) {
 				var assignExpr = expr as AssignmentExpression;
@@ -2416,25 +2416,16 @@ class _DeadCodeEliminationOptimizeCommand extends _FunctionOptimizeCommand {
 						};
 					}(assignExpr));
 					var lhsLocal = (assignExpr.getFirstExpr() as LocalExpression).getLocal();
-					for (var i = 0; i < lastAssignExpr.length; ++i) {
-						if (lastAssignExpr[i].first == lhsLocal) {
-							break;
-						}
-					}
-					if (i != lastAssignExpr.length) {
+					var lastAssign = lastAssignExpr.get(lhsLocal);
+					if (lastAssign) {
 						this.log("eliminating dead store to: " + lhsLocal.getName().getValue());
-						lastAssignExpr[i].third(lastAssignExpr[i].second.getSecondExpr());
+						lastAssign.second(lastAssign.first.getSecondExpr());
 					}
-					lastAssignExpr[i] = new Triple.<LocalVariable, AssignmentExpression, function(:Expression):void>(lhsLocal, expr as AssignmentExpression, rewriteCb);
+					lastAssignExpr.set(lhsLocal, new Pair.<AssignmentExpression, function(:Expression):void>(assignExpr, rewriteCb));
 					return true;
 				}
 			} else if (expr instanceof LocalExpression) {
-				for (var i = 0; i < lastAssignExpr.length; ++i) {
-					if (lastAssignExpr[i].first == (expr as LocalExpression).getLocal()) {
-						lastAssignExpr.splice(i, 1);
-						break;
-					}
-				}
+				lastAssignExpr.delete((expr as LocalExpression).getLocal());
 			} else if (expr instanceof CallExpression) {
 				onExpr((expr as CallExpression).getExpr(), function (callExpr : CallExpression) : function(:Expression):void {
 					return function (expr) {
@@ -2446,17 +2437,17 @@ class _DeadCodeEliminationOptimizeCommand extends _FunctionOptimizeCommand {
 				if (callingFuncDef != null && (callingFuncDef.flags() & ClassDefinition.IS_PURE) != 0) {
 					// ok
 				} else {
-					lastAssignExpr.splice(0, lastAssignExpr.length);
+					lastAssignExpr.clear();
 				}
 				return true;
 			} else if (expr instanceof NewExpression) {
 				Util.forEachExpression(onExpr, (expr as NewExpression).getArguments());
-				lastAssignExpr.splice(0, lastAssignExpr.length);
+				lastAssignExpr.clear();
 				return true;
 			} else if (expr instanceof LogicalExpression || expr instanceof ConditionalExpression) {
 				expr.forEachExpression(function (expr, rewriteCb) {
 					var result = onExpr(expr, rewriteCb);
-					lastAssignExpr.splice(0, lastAssignExpr.length);
+					lastAssignExpr.clear();
 					return result;
 				});
 				return true;
