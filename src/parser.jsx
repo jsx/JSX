@@ -77,6 +77,11 @@ class Token {
 		] : variant[];
 	}
 
+	// "'x' at filename:linenumber" for debugging purpose
+	function getNotation() : string {
+		return "'" + this._value + "'"
+				+ " at " + (this._filename ?: "<<unknown>>")  + ":" + this._lineNumber as string;
+	}
 }
 
 class _Lexer {
@@ -3185,7 +3190,7 @@ class Parser {
 			case "[":
 				return this._arrayLiteral(token);
 			case "{":
-				return this._hashLiteral(token);
+				return this._mapLiteral(token);
 			case "(":
 				var expr = this._expr(false);
 				if (this._expect(")") == null)
@@ -3249,7 +3254,7 @@ class Parser {
 		return new ArrayLiteralExpression(token, exprs, type);
 	}
 
-	function _hashLiteral (token : Token) : MapLiteralExpression {
+	function _mapLiteral (token : Token) : MapLiteralExpression {
 		var elements = new MapLiteralElement[];
 		if (this._expectOpt("}") == null) {
 			do {

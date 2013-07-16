@@ -1,24 +1,30 @@
+"use strict";
+
+function get(url) {
+  var xhr = new XMLHttpRequest();
+  xhr.open("GET", url, false);
+  xhr.send(null);
+  return xhr.status == 200 ? xhr.responseText : null;
+}
+
 var profileData = (function () {
   var id = location.search.substring(1);
   if (! id)
-    return;
-  var xhr = new XMLHttpRequest();
-  xhr.open("GET", ".profile/" + id + ".txt", false);
-  xhr.send(null);
-  if (xhr.status != 200) {
+    return null;
+
+  var data = get(".profile/" + id + ".json") || get(".profile/" + id + ".txt");
+  if (! data) {
     alert("failed to load profile data from server");
-    return;
+    return null;
   }
-  return JSON.parse(xhr.responseText);
+  return JSON.parse(data);
 }());
 
 // fill profile results
 $(document).ready(function () {
-  var xhr = new XMLHttpRequest();
-  xhr.open("GET", ".profile/results.json", false);
-  xhr.send(null);
+  var resultsData = get(".profile/results.json");
 
-  var results = xhr.status === 200 ? JSON.parse(xhr.responseText) : [];
+  var results = resultsData ? JSON.parse(resultsData) : [];
   var select = $('#result-selector');
   for (var i = 0; i < results.length; i++) {
     var option = $('<option>').html(results[i]).attr({ value: results[i] });
@@ -34,7 +40,7 @@ $(document).ready(function () {
   });
 });
 
-var functions = function () {
+var functions = (function () {
   if (! profileData) {
     return;
   }
@@ -71,7 +77,7 @@ var functions = function () {
     }
   }
   return ret;
-}();
+}());
 
 function createTree(list, entry) {
   list.push({

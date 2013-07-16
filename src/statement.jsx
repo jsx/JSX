@@ -492,14 +492,14 @@ class DeleteStatement extends UnaryExpressionStatement {
 		if (! this._analyzeExpr(context, this._expr))
 			return true;
 		if (! (this._expr instanceof ArrayExpression)) {
-			context.errors.push(new CompileError(this._token, "only properties of a hash object can be deleted"));
+			context.errors.push(new CompileError(this._token, "only properties of a map object can be deleted"));
 			return true;
 		}
 		var secondExprType = (this._expr as ArrayExpression).getSecondExpr().getType();
 		if (secondExprType == null)
 			return true; // error should have been already reported
 		if (! secondExprType.resolveIfNullable().equals(Type.stringType)) {
-			context.errors.push(new CompileError(this._token, "only properties of a hash object can be deleted"));
+			context.errors.push(new CompileError(this._token, "only properties of a map object can be deleted"));
 			return true;
 		}
 		return true;
@@ -1110,12 +1110,38 @@ class SwitchStatement extends LabellableStatement {
 		this._prepareBlockAnalysis(context);
 		try {
 			var hasDefaultLabel = false;
+			var caseMap = new Map.<boolean>;
 			for (var i = 0; i < this._statements.length; ++i) {
 				var statement = this._statements[i];
 				if (! statement.analyze(context))
 					return false;
-				if (statement instanceof DefaultStatement)
+				if (statement instanceof DefaultStatement) {
 					hasDefaultLabel = true;
+				}
+				else if (statement instanceof CaseStatement) {
+					var caseExpr = (statement as CaseStatement).getExpr();
+					if (   caseExpr instanceof IntegerLiteralExpression
+						|| caseExpr instanceof NumberLiteralExpression
+						|| caseExpr instanceof BooleanLiteralExpression ) {
+						if (caseMap.hasOwnProperty(caseExpr.getToken().getValue())) {
+							context.errors.push(new CompileError(caseExpr.getToken(), "duplicate case value " + caseExpr.getToken().getValue()));
+							return false;
+						}
+						else {
+							caseMap[caseExpr.getToken().getValue()] = true;
+						}
+					}
+					else if (caseExpr instanceof StringLiteralExpression) {
+						var caseStr = Util.decodeStringLiteral(caseExpr.getToken().getValue());
+						if (caseMap.hasOwnProperty(caseStr)) {
+							context.errors.push(new CompileError(caseExpr.getToken(), "duplicate case value " + caseExpr.getToken().getValue()));
+							return false;
+						}
+						else {
+							caseMap[caseStr] = true;
+						}
+					}
+				}
 			}
 			if (context.getTopBlock().localVariableStatuses.isReachable())
 				this.registerVariableStatusesOnBreak(context.getTopBlock().localVariableStatuses);
