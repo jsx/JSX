@@ -78,6 +78,9 @@ class _Util {
 			return _Util.getOutputClassName(classDef);
 		}
 		if (classDef instanceof InstantiatedClassDefinition) {
+			if ((classDef as InstantiatedClassDefinition).getTemplateClass().getNativeSource() != null) {
+				return _Util.getOutputClassName((classDef as InstantiatedClassDefinition).getTemplateClass());
+			}
 			if ((classDef as InstantiatedClassDefinition).getTemplateClassName() == "Map") {
 				return "Object";
 			} else {
@@ -91,10 +94,12 @@ class _Util {
 		function setOutputName(stashable : Stashable, name : string) : void {
 			stashable.setStash(_Util.OUTPUTNAME_IDENTIFIER, new _Util.OutputNameStash(name));
 		}
-		function escapeClassNameIfInstantiated(name : string) : string {
-			// escape the instantiated class names (note: template classes are never emitted (since they are all native) but their names are used for mangling of function arguments)
-			return name.replace(/\.</g, "$$").replace(/>/g, "$E").replace(/[^A-Za-z0-9_]/g,"$");
+		function escapeClassName(name : string) : string {
+			return name.replace(/[^A-Za-z0-9_\$]/g, (matched) -> {
+				return "$x" + matched.charCodeAt(0).toString(16).toUpperCase();
+			});
 		}
+
 		var countByName = new Map.<number>;
 		function newUniqueName(className : string) : string {
 			if (countByName[className]) {
@@ -104,7 +109,7 @@ class _Util {
 				name = className;
 				countByName[className] = 1;
 			}
-			return escapeClassNameIfInstantiated(name);
+			return escapeClassName(name);
 		}
 		// rename the classes with conflicting names
 		for (var i = 0; i < classDefs.length; ++i) {
@@ -113,7 +118,7 @@ class _Util {
 				var className = classDef.className();
 				if (! countByName.hasOwnProperty(className)) {
 					// FIXME t/run/264
-					setOutputName(classDef, escapeClassNameIfInstantiated(className));
+					setOutputName(classDef, escapeClassName(className));
 					countByName[className] = 1;
 				}
 			}
@@ -121,12 +126,8 @@ class _Util {
 		for (var i = 0; i < classDefs.length; ++i) {
 			var classDef = classDefs[i];
 			if ((classDef.flags() & ClassDefinition.IS_NATIVE) == 0) {
-				// decide the className
-				if (classDef.getOuterClassDef() != null)
-					// inner class
-					var className = _Util.getOutputClassName(classDef.getOuterClassDef()) + "$C" + classDef.className();
-				else
-					className = classDef.className();
+				var className = classDef.classFullName();
+
 				// list the constructors
 				var ctors = _Util.findFunctions(classDef, "constructor", false);
 				if (ctors.length != 0) {
@@ -152,11 +153,24 @@ class _Util {
 			else { // native class
 				if (classDef.getOuterClassDef() != null) {
 					// native inner class
-					var name = _Util.getOutputClassName(classDef.getOuterClassDef()) + "." + classDef.className();
-					setOutputName(classDef, name);
+					var className = _Util.getOutputClassName(classDef.getOuterClassDef()) + "." + classDef.className();
+					setOutputName(classDef, className);
 				}
 				else if (classDef.getNativeSource() != null) {
-					setOutputName(classDef, newUniqueName(classDef.className()));
+					// with in-line natie definition
+					setOutputName(classDef, newUniqueName(classDef.classFullName()));
+				}
+				else {
+					// with in-line natie definition
+					if (classDef instanceof InstantiatedClassDefinition) {
+						var instantiated = classDef as InstantiatedClassDefinition;
+						var className = instantiated.getTemplateClassName()
+							+ ".<" + newUniqueName(instantiated.getTypeArguments().map.<string>( (type) -> type.toString() ).join(",")) + ">";
+						setOutputName(classDef, escapeClassName(className));
+					}
+					else {
+						setOutputName(classDef, escapeClassName(classDef.classFullName()));
+					}
 				}
 			}
 		}
@@ -213,7 +227,9 @@ class _Mangler {
 					// fall through
 				}
 			}
-			return "L" + _Util.getOutputClassName(type.getClassDef()).replace(/\./g, '$C') + "$";
+			// the name may include "." if the classDef is a native class with
+			// native source.
+			return "L" + _Util.getOutputClassName(type.getClassDef()).replace(/\./g, (c) -> "$x" + c.charCodeAt(0).toString(16).toUpperCase()) + "$";
 		} else if (type instanceof StaticFunctionType)
 			return "F" + this.mangleFunctionArguments((type as StaticFunctionType).getArgumentTypes()) + this.mangleTypeName((type as StaticFunctionType).getReturnType()) + "$";
 		else if (type instanceof MemberFunctionType)

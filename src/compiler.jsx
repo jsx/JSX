@@ -370,8 +370,16 @@ class Compiler {
 	function _generateCode (errors : CompileError[]) : void {
 		// build list of all classDefs
 		var classDefs = new ClassDefinition[];
-		for (var i = 0; i < this._parsers.length; ++i)
+		for (var i = 0; i < this._parsers.length; ++i) {
 			classDefs = classDefs.concat(this._parsers[i].getClassDefs());
+
+			// to emit native classes with in-line native definitions
+			this._parsers[i].getTemplateClassDefs().forEach((templateClassDef) -> {
+				if ((templateClassDef.flags() & ClassDefinition.IS_NATIVE) != 0 && templateClassDef.getNativeSource() != null) {
+					classDefs.push(templateClassDef);
+				}
+			});
+		}
 		for (var i = 0; i < classDefs.length; ++i) {
 			if (classDefs[i].getInnerClasses().length != 0)
 				classDefs = classDefs.concat(classDefs[i].getInnerClasses());
