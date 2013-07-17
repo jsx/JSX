@@ -41,6 +41,9 @@ class InstantiationContext {
 		this.objectTypesUsed = new ParsedObjectType[];
 	}
 
+	function clone() : InstantiationContext {
+		return new InstantiationContext(this.errors, this.typemap);
+	}
 }
 
 class TemplateInstantiationRequest {

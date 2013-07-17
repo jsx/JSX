@@ -397,7 +397,7 @@ class ClassDefinition implements Stashable {
 	}
 
 	function instantiate (instantiationContext : InstantiationContext) : ClassDefinition {
-		var context = new InstantiationContext(instantiationContext.errors, instantiationContext.typemap);
+		var context = instantiationContext.clone();
 
 		// instantiate the members
 		var succeeded = true;
