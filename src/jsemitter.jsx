@@ -153,15 +153,24 @@ class _Util {
 			else { // native class
 				if (classDef.getOuterClassDef() != null) {
 					// native inner class
-					var name = _Util.getOutputClassName(classDef.getOuterClassDef()) + "." + classDef.className();
-					setOutputName(classDef, name);
+					var className = _Util.getOutputClassName(classDef.getOuterClassDef()) + "." + classDef.className();
+					setOutputName(classDef, className);
 				}
 				else if (classDef.getNativeSource() != null) {
 					// with in-line natie definition
 					setOutputName(classDef, newUniqueName(classDef.classFullName()));
 				}
 				else {
-					setOutputName(classDef, escapeClassName(classDef.classFullName()));
+					// with in-line natie definition
+					if (classDef instanceof InstantiatedClassDefinition) {
+						var instantiated = classDef as InstantiatedClassDefinition;
+						var className = instantiated.getTemplateClassName()
+							+ ".<" + newUniqueName(instantiated.getTypeArguments().map.<string>( (type) -> type.toString() ).join(",")) + ">";
+						setOutputName(classDef, escapeClassName(className));
+					}
+					else {
+						setOutputName(classDef, escapeClassName(classDef.classFullName()));
+					}
 				}
 			}
 		}
