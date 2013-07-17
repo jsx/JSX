@@ -126,7 +126,6 @@ class _Util {
 		for (var i = 0; i < classDefs.length; ++i) {
 			var classDef = classDefs[i];
 			if ((classDef.flags() & ClassDefinition.IS_NATIVE) == 0) {
-				// decide the className
 				var className = classDef.classFullName();
 
 				// list the constructors
@@ -158,6 +157,7 @@ class _Util {
 					setOutputName(classDef, name);
 				}
 				else if (classDef.getNativeSource() != null) {
+					// with in-line natie definition
 					setOutputName(classDef, newUniqueName(classDef.classFullName()));
 				}
 				else {
