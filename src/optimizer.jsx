@@ -1184,7 +1184,7 @@ class _StaticizeOptimizeCommand extends _OptimizeCommand {
 		staticFuncDef._nameToken = new Token(newName, true);
 
 		// update flags
-		staticFuncDef.setFlags(funcDef.flags() | ClassDefinition.IS_STATIC);
+		staticFuncDef.setFlags((funcDef.flags() & ~ClassDefinition.IS_EXPORT) | ClassDefinition.IS_STATIC);
 
 		// first argument should be this
 		var thisArg = new ArgumentDeclaration(new Token("$this", false), new ObjectType(classDef));
