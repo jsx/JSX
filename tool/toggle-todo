@@ -1,0 +1,17 @@
+#!/usr/bin/env perl
+use 5.14.0;
+use strict;
+use warnings;
+use Fatal qw(rename);
+
+foreach my $name(@ARGV) {
+    my $newname;
+    if ($name =~ /\.todo\b/) {
+        $newname = ($name =~ s/\.todo\b//r);
+    }
+    else {
+        $newname = ($name =~ s/(\.\w+)$/.todo$1/r);
+    }
+    say "$name => $newname";
+    rename $name => $newname;
+}

@@ -1,4 +1,4 @@
-PROVE:=perl extlib/bin/prove
+PROVE:=perl -Mlib=extlib/lib/perl5 extlib/bin/prove
 JOBS:=4
 
 BOOTSTRAP_COMPILER:=tool/bootstrap-compiler.js
