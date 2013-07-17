@@ -1179,7 +1179,7 @@ class _StaticizeOptimizeCommand extends _OptimizeCommand {
 		classDef._members.splice(classDef._members.indexOf(funcDef)+1, 0, staticFuncDef); // insert right after the original function
 
 		// rename
-		var newName = this._findFrechFunctionName(classDef, funcDef.name(), ([ new ObjectType(classDef) ] : Type[]).concat((funcDef.getType() as ResolvedFunctionType).getArgumentTypes()), true);
+		var newName = this._newStaticFunctionName(classDef, funcDef.name(), ([ new ObjectType(classDef) ] : Type[]).concat((funcDef.getType() as ResolvedFunctionType).getArgumentTypes()), true);
 		(this.getStash(funcDef) as _StaticizeOptimizeCommand.Stash).altName = newName;
 		staticFuncDef._nameToken = new Token(newName, true);
 
@@ -1205,14 +1205,14 @@ class _StaticizeOptimizeCommand extends _OptimizeCommand {
 		});
 	}
 
-	function _findFrechFunctionName (classDef : ClassDefinition, baseName : string, argTypes : Type[], isStatic : boolean) : string {
+	function _newStaticFunctionName (classDef : ClassDefinition, baseName : string, argTypes : Type[], isStatic : boolean) : string {
 		var index = 0;
+		var newName = baseName;
 		// search for a name which does not conflict with existing function
-		do {
+		while (Util.findFunctionInClass(classDef, newName, argTypes, isStatic) != null) {
 			var newName = Util.format("%1_%2", [ baseName, index as string ]);
 			++index;
-		} while (Util.findFunctionInClass(classDef, newName, argTypes, isStatic) != null);
-
+		}
 		return newName;
 	}
 
