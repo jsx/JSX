@@ -165,7 +165,7 @@ class _Util {
 					if (classDef instanceof InstantiatedClassDefinition) {
 						var instantiated = classDef as InstantiatedClassDefinition;
 						var className = instantiated.getTemplateClassName()
-							+ ".<" + newUniqueName(instantiated.getTypeArguments().map.<string>( (type) -> type.toString() ).join(",")) + ">";
+							+ newUniqueName(".<" + instantiated.getTypeArguments().map.<string>( (type) -> type.toString() ).join(",") + ">");
 						setOutputName(classDef, escapeClassName(className));
 					}
 					else {
