@@ -26,7 +26,6 @@ import "./parser.jsx";
 import "./type.jsx";
 import "./util.jsx";
 import "./statement.jsx";
-import "./optimizer.jsx";
 
 
 abstract class Expression implements Stashable {

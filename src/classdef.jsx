@@ -27,7 +27,6 @@ import "./statement.jsx";
 import "./expression.jsx";
 import "./parser.jsx";
 import "./doc.jsx";
-import "./optimizer.jsx";
 
 mixin TemplateDefinition {
 

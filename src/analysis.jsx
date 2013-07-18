@@ -26,7 +26,6 @@ import "./type.jsx";
 import "./platform.jsx";
 import "./statement.jsx";
 import "./expression.jsx";
-import "./optimizer.jsx";
 import "./util.jsx";
 
 class InstantiationContext {
