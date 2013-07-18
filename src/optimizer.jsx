@@ -3277,7 +3277,7 @@ class _LCSECachedExpression {
 }
 
 /**
- * Common Subexpression Elimination
+ * Local Common Subexpression Elimination
  */
 class _LCSEOptimizeCommand extends _FunctionOptimizeCommand {
 	static const IDENTIFIER = "lcse";
