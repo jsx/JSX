@@ -2188,10 +2188,6 @@ class NewExpression extends OperatorExpression {
 		return new NewExpression(this);
 	}
 
-	function getQualifiedName () : QualifiedName {
-		throw new Error("will be removed");
-	}
-
 	function getArguments () : Expression[] {
 		return this._args;
 	}
