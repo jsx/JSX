@@ -39,8 +39,18 @@ class InstantiationContext {
 		this.errors = errors;
 		this.typemap = typemap;
 		this.objectTypesUsed = new ParsedObjectType[];
+
+		for (var key in typemap) {
+			var type = typemap[key];
+			if (type instanceof ObjectType && type.getClassDef() == null) {
+				throw new Error("logic flow, no definition for " + type.toString());
+			}
+		}
 	}
 
+	function clone() : InstantiationContext {
+		return new InstantiationContext(this.errors, this.typemap);
+	}
 }
 
 class TemplateInstantiationRequest {
