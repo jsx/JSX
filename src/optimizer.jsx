@@ -1036,13 +1036,18 @@ class _DetermineCalleeCommand extends _FunctionOptimizeCommand {
 						this._setCallingFuncDef(expr, null);
 					}
 				} else if (expr instanceof NewExpression) {
+					var newExpr = expr as NewExpression;
+					assert newExpr.getType().getClassDef() != null;
+					assert newExpr.getConstructor() != null;
+
 					var callingFuncDef = _DetermineCalleeCommand.findCallingFunctionInClass(
-						(expr as NewExpression).getType().getClassDef(), "constructor", (expr as NewExpression).getConstructor().getArgumentTypes(), false);
+						newExpr.getType().getClassDef(), "constructor", newExpr.getConstructor().getArgumentTypes(), false);
 					if (callingFuncDef == null) {
-						throw new Error("could not find matching constructor for " + (expr as NewExpression).getConstructor().toString());
+						throw new Error("could not find matching constructor for " + newExpr.getConstructor().toString());
 					}
-					this._setCallingFuncDef(expr as NewExpression, callingFuncDef);
+					this._setCallingFuncDef(newExpr, callingFuncDef);
 				}
+
 				if (expr instanceof FunctionExpression) {
 					return (expr as FunctionExpression).getFuncDef().forEachStatement(onStatement);
 				} else {
