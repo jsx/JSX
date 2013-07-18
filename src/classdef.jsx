@@ -1920,6 +1920,7 @@ class TemplateFunctionDefinition extends MemberFunctionDefinition implements Tem
 	}
 
 	function instantiateTemplateFunction (errors : CompileError[], token : Token, typeArgs : Type[]) : MemberFunctionDefinition {
+
 		// return the already-instantiated one, if exists
 		var instantiated : MemberFunctionDefinition = this._instantiatedDefs.get(typeArgs);
 		if (instantiated != null) {

@@ -58,6 +58,16 @@ abstract class Expression implements Stashable {
 				if (srcType != null) {
 					(expr as NewExpression).setType(srcType.instantiate(instantiationContext));
 				}
+			} else if (expr instanceof PropertyExpression) {
+				var propertyExpr = expr as PropertyExpression;
+				var srcType = expr.getType();
+				if (srcType != null) {
+					propertyExpr.setType(srcType.instantiate(instantiationContext));
+				}
+				var srcTypes = propertyExpr.getTypeArguments();
+				if (srcTypes != null) {
+					propertyExpr.setTypeArguments(srcTypes.map.<Type>((type) -> type.instantiate(instantiationContext)));
+				}
 			} else if (expr instanceof ArrayLiteralExpression) {
 				var srcType = expr.getType();
 				if (srcType != null) {
@@ -1192,6 +1202,10 @@ class PropertyExpression extends UnaryExpression {
 		return this._typeArgs;
 	}
 
+	function setTypeArguments (types : Type[]) : void {
+		this._typeArgs = types;
+	}
+
 	override function serialize () : variant {
 		return [
 			"PropertyExpression",
@@ -1254,6 +1268,10 @@ class PropertyExpression extends UnaryExpression {
 
 	override function getType () : Type {
 		return this._type;
+	}
+
+	function setType (type : Type) : void {
+		this._type = type;
 	}
 
 	override function getHolderType () : Type {
