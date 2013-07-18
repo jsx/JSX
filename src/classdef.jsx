@@ -1385,6 +1385,7 @@ class MemberFunctionDefinition extends MemberDefinition implements Block {
 			stash.newFuncDef = null;
 		}
 
+		clonedFuncDef.setClassDef(this.getClassDef());
 		return clonedFuncDef;
 	}
 
