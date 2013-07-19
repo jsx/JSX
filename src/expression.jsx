@@ -26,7 +26,6 @@ import "./parser.jsx";
 import "./type.jsx";
 import "./util.jsx";
 import "./statement.jsx";
-import "./optimizer.jsx";
 
 
 abstract class Expression implements Stashable {
@@ -2187,10 +2186,6 @@ class NewExpression extends OperatorExpression {
 
 	override function clone () : NewExpression {
 		return new NewExpression(this);
-	}
-
-	function getQualifiedName () : QualifiedName {
-		throw new Error("will be removed");
 	}
 
 	function getArguments () : Expression[] {

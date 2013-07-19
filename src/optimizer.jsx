@@ -1178,10 +1178,10 @@ class _StaticizeOptimizeCommand extends _OptimizeCommand {
 	function _staticizeMethod (funcDef : MemberFunctionDefinition) : void {
 		var staticFuncDef = funcDef.clone();
 
+		var classDef = staticFuncDef.getClassDef();
+
 		// register to the classDef
-		var classDef = funcDef.getClassDef();
-		staticFuncDef.setClassDef(classDef);
-		classDef._members.splice(classDef._members.indexOf(funcDef)+1, 0, staticFuncDef); // insert right after the original function
+		classDef.members().splice(classDef.members().indexOf(funcDef)+1, 0, staticFuncDef); // insert right after the original function
 
 		// rename
 		var newName = this._newStaticFunctionName(classDef, funcDef.name(), ([ new ObjectType(classDef) ] : Type[]).concat((funcDef.getType() as ResolvedFunctionType).getArgumentTypes()), true);
@@ -3282,7 +3282,7 @@ class _LCSECachedExpression {
 }
 
 /**
- * Common Subexpression Elimination
+ * Local Common Subexpression Elimination
  */
 class _LCSEOptimizeCommand extends _FunctionOptimizeCommand {
 	static const IDENTIFIER = "lcse";

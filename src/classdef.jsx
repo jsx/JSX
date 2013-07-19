@@ -27,7 +27,6 @@ import "./statement.jsx";
 import "./expression.jsx";
 import "./parser.jsx";
 import "./doc.jsx";
-import "./optimizer.jsx";
 
 mixin TemplateDefinition {
 
@@ -1386,6 +1385,7 @@ class MemberFunctionDefinition extends MemberDefinition implements Block {
 			stash.newFuncDef = null;
 		}
 
+		clonedFuncDef.setClassDef(this.getClassDef());
 		return clonedFuncDef;
 	}
 
