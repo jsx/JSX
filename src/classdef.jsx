@@ -1808,6 +1808,10 @@ class MemberFunctionDefinition extends MemberDefinition implements Block {
 		return this._statements;
 	}
 
+	function setStatements (statements : Statement[]) : void {
+		this._statements = statements;
+	}
+
 	// return an argument or a local variable
 	function getLocal (context : AnalysisContext, name : string) : LocalVariable {
 		// for the current function, check the caught variables

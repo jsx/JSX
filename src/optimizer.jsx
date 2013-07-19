@@ -216,6 +216,7 @@ class Optimizer {
 			"no-log",
 			"no-debug",
 			"fold-const",
+			"tail-rec",
 			"return-if",
 			"inline",
 			"dce",
@@ -283,6 +284,9 @@ class Optimizer {
 				this._commands.push(new _UnboxOptimizeCommand());
 			} else if (cmd == "array-length") {
 				this._commands.push(new _ArrayLengthOptimizeCommand());
+			} else if (cmd == "tail-rec") {
+				determineCallee();
+				this._commands.push(new _TailRecursionOptimizeCommand());
 			} else if (cmd == "dump-logs") {
 				this._dumpLogs = true;
 			} else {
@@ -3938,5 +3942,119 @@ class _NoDebugCommand extends _OptimizeCommand {
 			}
 			return true;
 		});
+	}
+}
+
+
+class _TailRecursionOptimizeCommand extends _FunctionOptimizeCommand {
+	static const IDENTIFIER = "tail-rec";
+
+	class Stash extends Stash {
+		override function clone () : Stash {
+			return new _TailRecursionOptimizeCommand.Stash;
+		}
+	}
+
+	function constructor() {
+		super(_TailRecursionOptimizeCommand.IDENTIFIER);
+	}
+
+	override function _createStash () : _TailRecursionOptimizeCommand.Stash {
+		return new _TailRecursionOptimizeCommand.Stash();
+	}
+
+	function _isTailCall(funcDef : MemberFunctionDefinition, statement : Statement) : boolean {
+		if (statement instanceof ReturnStatement) {
+			var returnStatement = statement as ReturnStatement;
+			if (returnStatement.getExpr() != null && returnStatement.getExpr() instanceof CallExpression)  {
+				return funcDef == _DetermineCalleeCommand.getCallingFuncDef(returnStatement.getExpr());
+			}
+		}
+		return false;
+	}
+
+	override function optimizeFunction(funcDef : MemberFunctionDefinition) : boolean {
+		if ((funcDef.flags() & (ClassDefinition.IS_OVERRIDE | ClassDefinition.IS_ABSTRACT | ClassDefinition.IS_FINAL | ClassDefinition.IS_NATIVE)) != ClassDefinition.IS_FINAL) {
+			return false;
+		}
+
+		funcDef.forEachStatement(function onStatement(statement) {
+			if (this._isTailCall(funcDef, statement)) {
+				this._transformTailCall(funcDef);
+			}
+			return statement.forEachStatement(onStatement);
+		});
+		return true;
+	}
+
+	function _transformTailCall(funcDef : MemberFunctionDefinition) : void {
+		this.log("transform " + funcDef.getNotation());
+
+		// function f(arg1, arg2, arg3) {
+		//   $TAIL_REC: while (true) {
+		//     body;
+		//     // return f(v1, v2, v3);
+		//     (arg1 = v1, arg2 = v2, arg3 = v3)
+		//     continue $TAIL_REC;
+		//   }
+		// }
+
+		var statements = funcDef.getStatements();
+		this._handleStatements(funcDef, statements);
+
+		var body : Statement = new WhileStatement(new Token("while"), new Token("$TAIL_REC"), new BooleanLiteralExpression(new Token("true")), statements);
+		funcDef.setStatements([body]);
+	}
+
+	function _handleStatements(funcDef : MemberFunctionDefinition, statements : Statement[]) : void {
+		for (var i = 0; i < statements.length; ++i) {
+			if (this._isTailCall(funcDef, statements[i])) {
+				this._replaceTailCallStatement(funcDef, statements, i);
+			}
+			else if (statements[i] instanceof SwitchStatement) {
+				var switchStatement = statements[i] as SwitchStatement;
+				this._handleStatements(funcDef, switchStatement.getStatements());
+			}
+			else if (statements[i] instanceof IfStatement) {
+				var ifStatement = statements[i] as IfStatement;
+				this._handleStatements(funcDef, ifStatement.getOnTrueStatements());
+				this._handleStatements(funcDef, ifStatement.getOnFalseStatements());
+			}
+		}
+	}
+
+	function _replaceTailCallStatement(funcDef : MemberFunctionDefinition, statements : Statement[], idx : number) : void {
+		var callExpression = (statements[idx] as ReturnStatement).getExpr() as CallExpression;
+
+		var locals = funcDef.getArguments().map.<LocalVariable>((argDecl) -> {
+			return this.createVar(funcDef, argDecl.getType(), argDecl.getName().getValue());
+		});
+
+		var setupArgs = callExpression.getArguments().reduce.<Expression>((prevExpr, arg, i) -> {
+			var assignToArg = new AssignmentExpression(new Token("="),
+				new LocalExpression(locals[i].getName(), locals[i]),
+				arg
+			);
+			return prevExpr == null
+				? assignToArg
+				: new CommaExpression(new Token(","), prevExpr, assignToArg);
+		}, null);
+
+		var retry = new ContinueStatement(new Token("continue"), new Token("$TAIL_REC"));
+		if (setupArgs == null) {
+			statements.splice(idx, 1, retry);
+		}
+		else {
+			var localsToArgs = locals.reduce.<Expression>((prevExpr, local, i) -> {
+				var assignToArg = new AssignmentExpression(new Token("="),
+					new LocalExpression(funcDef.getArguments()[i].getName(), funcDef.getArguments()[i]),
+					new LocalExpression(local.getName(), local)
+				);
+				return prevExpr == null
+					? assignToArg
+					: new CommaExpression(new Token(","), prevExpr, assignToArg);
+			}, null);
+			statements.splice(idx, 1, new ExpressionStatement(setupArgs), new ExpressionStatement(localsToArgs), retry);
+		}
 	}
 }
