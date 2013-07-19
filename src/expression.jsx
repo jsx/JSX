@@ -1238,18 +1238,16 @@ class PropertyExpression extends UnaryExpression {
 		}
 		// referring to inner class?
 		if (this._expr.isClassSpecifier()) {
-			classDef.forEachInnerClass(function (classDef) {
-				if (classDef.className() == this._identifierToken.getValue()) {
-					var objectType = new ParsedObjectType(new QualifiedName(this._identifierToken, exprType as ParsedObjectType), this._typeArgs);
-					objectType.resolveType(context);
-					this._type = objectType;
-					this._isInner = true;
-					return false;
-				}
+			var innerClassDef = classDef.lookupInnerClass(this._identifierToken.getValue());
+
+			if (innerClassDef) {
+				var objectType = new ParsedObjectType(new QualifiedName(this._identifierToken, exprType as ParsedObjectType), this._typeArgs);
+				objectType.resolveType(context);
+				this._type = objectType;
+				this._isInner = true;
+
 				return true;
-			});
-			if (this._isInner)
-				return true;
+			}
 		}
 		this._type = classDef.getMemberTypeByName(
 			context.errors,
