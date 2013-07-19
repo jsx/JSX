@@ -1257,7 +1257,7 @@ class PropertyExpression extends UnaryExpression {
 			this._typeArgs,
 			this._expr.isClassSpecifier() ? ClassDefinition.GET_MEMBER_MODE_CLASS_ONLY : ClassDefinition.GET_MEMBER_MODE_ALL);
 		if (this._type == null) {
-			context.errors.push(new CompileError(this._identifierToken, "'" + exprType.toString() + "' does not have a property named '" + this._identifierToken.getValue() + "'"));
+			context.errors.push(new CompileError(this._identifierToken, "'" + exprType.toString() + "' does not have a property or inner class named '" + this._identifierToken.getValue() + "'"));
 			return false;
 		}
 		return true;
