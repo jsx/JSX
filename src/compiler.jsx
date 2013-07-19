@@ -204,6 +204,7 @@ class Compiler {
 		var classDefs = new ClassDefinition[];
 		for (var i = 0; i < this._parsers.length; ++i) {
 			classDefs = classDefs.concat(this._parsers[i].getClassDefs());
+			classDefs = classDefs.concat(this._parsers[i].getTemplateClassDefs().map.<ClassDefinition>((classDef) -> classDef));
 		}
 		return ClassDefinition.serialize(classDefs);
 	}

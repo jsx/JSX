@@ -106,7 +106,9 @@ class ClassDefinition implements Stashable {
 			"flags"      : this._flags,
 			"extends"    : Serializer.<ParsedObjectType>.serializeNullable(this._extendType),
 			"implements" : Serializer.<ParsedObjectType>.serializeArray(this._implementTypes),
-			"members"    : Serializer.<MemberDefinition>.serializeArray(this._members)
+			"members"    : Serializer.<MemberDefinition>.serializeArray(this._members),
+			"inners"    : Serializer.<ClassDefinition>.serializeArray(this._inners),
+			"templateInners"    : Serializer.<TemplateClassDefinition>.serializeArray(this._templateInners)
 		} : Map.<variant>;
 	}
 
