@@ -426,6 +426,10 @@ abstract class _FunctionOptimizeCommand extends _OptimizeCommand {
 		}
 		this.getCompiler().forEachClassDef(function (parser, classDef) {
 			classDef.forEachMember(function (member) {
+				if (member instanceof TemplateFunctionDefinition) {
+					return true;
+				}
+
 				if (member instanceof MemberFunctionDefinition) {
 					var funcDef = member as MemberFunctionDefinition;
 					if (funcDef.getStatements() != null) {

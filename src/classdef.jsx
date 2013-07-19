@@ -236,8 +236,19 @@ class ClassDefinition implements Stashable {
 
 	function forEachMemberFunction (cb : function(:MemberFunctionDefinition):boolean) : boolean {
 		for (var i = 0; i < this._members.length; ++i) {
-			if (this._members[i] instanceof MemberFunctionDefinition) {
-				if (! cb(this._members[i] as MemberFunctionDefinition))
+			var member = this._members[i];
+			if (member instanceof MemberFunctionDefinition && !(member instanceof TemplateFunctionDefinition)) {
+				if (! cb(member as MemberFunctionDefinition))
+					return false;
+			}
+		}
+		return true;
+	}
+
+	function forEachTemplateFunction (cb : function(:TemplateFunctionDefinition):boolean) : boolean {
+		for (var i = 0; i < this._members.length; ++i) {
+			if (this._members[i] instanceof TemplateFunctionDefinition) {
+				if (! cb(this._members[i] as TemplateFunctionDefinition))
 					return false;
 			}
 		}
