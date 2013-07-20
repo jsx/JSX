@@ -356,6 +356,13 @@ class Compiler {
 			classDef.analyze(createContext(parser));
 			return true;
 		});
+		// NOTE: template inner classes might not be analyzed in first time,
+		//       so the second time we analyze such a class
+		// see t/run/322
+		this.forEachClassDef(function (parser : Parser, classDef : ClassDefinition) {
+			classDef.analyze(createContext(parser));
+			return true;
+		});
 		// analyze unused variables in every classdef
 		this.forEachClassDef(function (parser : Parser, classDef : ClassDefinition) {
 			classDef.analyzeUnusedVariables();

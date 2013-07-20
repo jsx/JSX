@@ -1239,13 +1239,21 @@ class PropertyExpression extends UnaryExpression {
 		// referring to inner class?
 		if (this._expr.isClassSpecifier()) {
 			var innerClassDef = classDef.lookupInnerClass(this._identifierToken.getValue());
+			if (innerClassDef == null) {
+				classDef.forEachTemplateInnerClass((classDef) -> {
+					if (classDef.className() == this._identifierToken.getValue()) {
+						innerClassDef = classDef;
+						return false;
+					}
+					return true;
+				});
+			}
 
 			if (innerClassDef) {
 				var objectType = new ParsedObjectType(new QualifiedName(this._identifierToken, exprType as ParsedObjectType), this._typeArgs);
 				objectType.resolveType(context);
 				this._type = objectType;
 				this._isInner = true;
-
 				return true;
 			}
 		}
