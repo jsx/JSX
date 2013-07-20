@@ -2584,13 +2584,14 @@ class _NewExpressionEmitter extends _OperatorExpressionEmitter {
 			var stash = funcDef.getStash("unclassify");
 			return stash ? (stash as _UnclassifyOptimizationCommand.Stash).inliner : null;
 		}
+
+		assert this._expr.getConstructor() != null, "logic flow: new " + this._expr.getType().toString(); // didn't call analize()?
+
 		var classDef = this._expr.getType().getClassDef();
 		var ctor = this._expr.getConstructor();
 		var argTypes = ctor.getArgumentTypes();
 		var callingFuncDef = Util.findFunctionInClass(classDef, "constructor", argTypes, false);
-		if (callingFuncDef == null) {
-			throw new Error("logic flaw");
-		}
+		assert callingFuncDef != null, "logic flow for " + this._expr.getType().toString();
 		var inliner = getInliner(callingFuncDef);
 		if (inliner) {
 			this._emitAsObjectLiteral(classDef, inliner(this._expr));
@@ -2892,12 +2893,11 @@ class JavaScriptEmitter implements Emitter {
 
 	function _emitCore(classDefs : ClassDefinition[]) : void {
 		for (var i = 0; i < classDefs.length; ++i) {
-			function onFuncDef(funcDef : MemberFunctionDefinition) : boolean {
+			classDefs[i].forEachMemberFunction(function onFuncDef(funcDef) {
 				funcDef.forEachClosure(onFuncDef);
 				this._setupBooleanizeFlags(funcDef);
 				return true;
-			};
-			classDefs[i].forEachMemberFunction(onFuncDef);
+			});
 			classDefs[i].forEachMemberVariable(function (varDef) {
 				if ((varDef.flags() & ClassDefinition.IS_STATIC) != 0 && varDef.getInitialValue() != null) {
 					// only handle static vars, initializer of non-static properties are compiled into member function defs.
