@@ -82,6 +82,8 @@ class ClassDefinition implements Stashable {
 
 	var _nativeSource : Token = null;
 
+	var _analized = false;
+
 	function constructor (token : Token, className : string, flags : number, extendType : ParsedObjectType, implementTypes : ParsedObjectType[], members : MemberDefinition[], inners : ClassDefinition[], templateInners : TemplateClassDefinition[], objectTypesUsed : ParsedObjectType[], docComment : DocComment) {
 		this._parser = null;
 		this._token = token;
@@ -106,7 +108,9 @@ class ClassDefinition implements Stashable {
 			"flags"      : this._flags,
 			"extends"    : Serializer.<ParsedObjectType>.serializeNullable(this._extendType),
 			"implements" : Serializer.<ParsedObjectType>.serializeArray(this._implementTypes),
-			"members"    : Serializer.<MemberDefinition>.serializeArray(this._members)
+			"members"    : Serializer.<MemberDefinition>.serializeArray(this._members),
+			"inners"    : Serializer.<ClassDefinition>.serializeArray(this._inners),
+			"templateInners"    : Serializer.<TemplateClassDefinition>.serializeArray(this._templateInners)
 		} : Map.<variant>;
 	}
 
@@ -258,6 +262,14 @@ class ClassDefinition implements Stashable {
 	function forEachInnerClass (cb : function(:ClassDefinition):boolean) : boolean {
 		for (var i = 0; i < this._inners.length; ++i) {
 			if (! cb(this._inners[i]))
+				return false;
+		}
+		return true;
+	}
+
+	function forEachTemplateInnerClass (cb : function(:TemplateClassDefinition):boolean) : boolean {
+		for (var i = 0; i < this._templateInners.length; ++i) {
+			if (! cb(this._templateInners[i]))
 				return false;
 		}
 		return true;
@@ -563,6 +575,9 @@ class ClassDefinition implements Stashable {
 	}
 
 	function analyze (context : AnalysisContext) : void {
+		if (this._analized) return;
+		this._analized = true;
+
 		try {
 			this._analyzeClassDef(context);
 		} catch (e : Error) {

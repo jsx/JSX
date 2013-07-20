@@ -204,6 +204,7 @@ class Compiler {
 		var classDefs = new ClassDefinition[];
 		for (var i = 0; i < this._parsers.length; ++i) {
 			classDefs = classDefs.concat(this._parsers[i].getClassDefs());
+			classDefs = classDefs.concat(this._parsers[i].getTemplateClassDefs().map.<ClassDefinition>((classDef) -> classDef));
 		}
 		return ClassDefinition.serialize(classDefs);
 	}
@@ -351,6 +352,13 @@ class Compiler {
 			return true;
 		});
 		// analyze every classdef
+		this.forEachClassDef(function (parser : Parser, classDef : ClassDefinition) {
+			classDef.analyze(createContext(parser));
+			return true;
+		});
+		// NOTE: template inner classes might not be analyzed in first time,
+		//       so the second time we analyze such a class
+		// see t/run/322
 		this.forEachClassDef(function (parser : Parser, classDef : ClassDefinition) {
 			classDef.analyze(createContext(parser));
 			return true;

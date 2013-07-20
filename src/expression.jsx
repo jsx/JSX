@@ -1238,18 +1238,24 @@ class PropertyExpression extends UnaryExpression {
 		}
 		// referring to inner class?
 		if (this._expr.isClassSpecifier()) {
-			classDef.forEachInnerClass(function (classDef) {
-				if (classDef.className() == this._identifierToken.getValue()) {
-					var objectType = new ParsedObjectType(new QualifiedName(this._identifierToken, exprType as ParsedObjectType), this._typeArgs);
-					objectType.resolveType(context);
-					this._type = objectType;
-					this._isInner = true;
-					return false;
-				}
+			var innerClassDef = classDef.lookupInnerClass(this._identifierToken.getValue());
+			if (innerClassDef == null) {
+				classDef.forEachTemplateInnerClass((classDef) -> {
+					if (classDef.className() == this._identifierToken.getValue()) {
+						innerClassDef = classDef;
+						return false;
+					}
+					return true;
+				});
+			}
+
+			if (innerClassDef) {
+				var objectType = new ParsedObjectType(new QualifiedName(this._identifierToken, exprType as ParsedObjectType), this._typeArgs);
+				objectType.resolveType(context);
+				this._type = objectType;
+				this._isInner = true;
 				return true;
-			});
-			if (this._isInner)
-				return true;
+			}
 		}
 		this._type = classDef.getMemberTypeByName(
 			context.errors,
@@ -1259,7 +1265,7 @@ class PropertyExpression extends UnaryExpression {
 			this._typeArgs,
 			this._expr.isClassSpecifier() ? ClassDefinition.GET_MEMBER_MODE_CLASS_ONLY : ClassDefinition.GET_MEMBER_MODE_ALL);
 		if (this._type == null) {
-			context.errors.push(new CompileError(this._identifierToken, "'" + exprType.toString() + "' does not have a property named '" + this._identifierToken.getValue() + "'"));
+			context.errors.push(new CompileError(this._identifierToken, "'" + exprType.toString() + "' does not have a property or inner class named '" + this._identifierToken.getValue() + "'"));
 			return false;
 		}
 		return true;
