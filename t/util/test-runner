@@ -49,11 +49,11 @@ sub main {
     elsif($file =~ m{ /web/ }xms) {
         run_web_test($file);
     }
-    elsif($file =~ m{ /optimize/ }xms) {
-        optimize_and_compare($file, 0);
-    }
     elsif($file =~ m{ /optimize-bench/ }xms) {
         optimize_and_compare($file, 1);
+    }
+    elsif($file =~ m{ /optimize/ }xms) {
+        optimize_and_compare($file, 0);
     }
     elsif($file =~ m{ /complete/ }xms) {
         completion_test($file);
