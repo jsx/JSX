@@ -2629,16 +2629,17 @@ class _InlineOptimizeCommand extends _FunctionOptimizeCommand {
 		return altered;
 	}
 
-	// expr is so simple that it can be expanded directly into the argument expression
-	function _exprIsSimple(expr : Expression) : boolean {
+	// expr is closed in the local scope so that it can be expanded directly into an arbitrary place
+	function _exprIsInLocal(expr : Expression) : boolean {
 		if (expr instanceof LeafExpression) {
 			return true;
 		}
 		else if (expr instanceof LogicalNotExpression || expr instanceof BitwiseNotExpression || expr instanceof SignExpression) {
-			return (expr as UnaryExpression).getExpr() instanceof LeafExpression;
+			return this._exprIsInLocal((expr as UnaryExpression).getExpr());
 		}
 		else if (expr instanceof BinaryNumberExpression) {
-			return (expr as BinaryNumberExpression).getFirstExpr() instanceof LeafExpression && (expr as BinaryNumberExpression).getSecondExpr() instanceof LeafExpression;
+			return this._exprIsInLocal((expr as BinaryNumberExpression).getFirstExpr())
+				&& this._exprIsInLocal((expr as BinaryNumberExpression).getSecondExpr());
 		}
 		else {
 			return false;
@@ -2654,7 +2655,7 @@ class _InlineOptimizeCommand extends _FunctionOptimizeCommand {
 
 			var callingFuncDef = _DetermineCalleeCommand.getCallingFuncDef(statement);
 			this.optimizeFunction(callingFuncDef);
-			if (this._functionIsInlineable(callingFuncDef) && this._argsAreInlineable(callingFuncDef, (statement as ConstructorInvocationStatement).getArguments(), false)) {
+			if (this._functionIsInlineable(callingFuncDef) && this._argsAreInlineable(callingFuncDef, (statement as ConstructorInvocationStatement).getArguments())) {
 				statements.splice(stmtIndex, 1);
 				this._expandCallingFunction(funcDef, statements, stmtIndex, callingFuncDef, (statement as ConstructorInvocationStatement).getArguments().concat([ new ThisExpression(null, funcDef.getClassDef()) as Expression ]));
 			}
@@ -2724,52 +2725,16 @@ class _InlineOptimizeCommand extends _FunctionOptimizeCommand {
 					var argUsed = this._countNumberOfArgsUsed(callingFuncDef);
 					var setupArgs = null : Expression;
 
-					// handle this first
-					var i = callingFuncDef.getArguments().length;
-					if (argsAndThis[i] != null) {
-						if (! this._exprIsSimple(argsAndThis[i])) {
-							var argDecl = callingFuncDef.getArguments()[i];
-							var local = this.createVar(
-									funcDef,
-									argsAndThis[i].getType(),
-									(callingFuncDef.isAnonymous() ? "$anon" : callingFuncDef.name())
-										+ "$this");
-
-							var assignToLocal = new AssignmentExpression(new Token("="),
-								new LocalExpression(local.getName(), local),
-								argsAndThis[i]);
-
-							setupArgs = assignToLocal;
-							argsAndThis[i] = new LocalExpression(local.getName(), local);
+					this._createVarsAndInit(funcDef, callingFuncDef, argsAndThis, (expr) -> {
+						if (setupArgs == null) {
+							setupArgs = expr;
 						}
-					}
-
-					// then, handle arguments
-					for (var i = 0; i < callingFuncDef.getArguments().length; ++i) {
-						if (! this._exprIsSimple(argsAndThis[i])) {
-							var argDecl = callingFuncDef.getArguments()[i];
-							var local = this.createVar(
-									funcDef,
-									argsAndThis[i].getType(),
-									(callingFuncDef.isAnonymous() ? "$anon" : callingFuncDef.name())
-										+ "$"
-										+ argDecl.getName().getValue());
-
-							var assignToLocal = new AssignmentExpression(new Token("="),
-								new LocalExpression(local.getName(), local),
-								argsAndThis[i]);
-
-							if (setupArgs == null) {
-								setupArgs = assignToLocal;
-							}
-							else {
-								setupArgs = new CommaExpression(new Token(","),
-									assignToLocal,
-									setupArgs);
-							}
-							argsAndThis[i] = new LocalExpression(local.getName(), local);
+						else {
+							setupArgs = new CommaExpression(new Token(","),
+								setupArgs,
+								expr);
 						}
-					}
+					});
 
 					var clonedExpr = expr.clone();
 					this._rewriteExpression(
@@ -2928,7 +2893,7 @@ class _InlineOptimizeCommand extends _FunctionOptimizeCommand {
 				return null;
 		}
 		// and the args passed can be inlined (types should match exactly (or emitters may insert additional code))
-		if (! this._argsAreInlineable(callingFuncDef, callExpr.getArguments(), asExpression))
+		if (! this._argsAreInlineable(callingFuncDef, callExpr.getArguments()))
 			return null;
 		// build list of arguments (and this)
 		var argsAndThis = callExpr.getArguments().concat(new Expression[]);
@@ -2945,7 +2910,7 @@ class _InlineOptimizeCommand extends _FunctionOptimizeCommand {
 		return argsAndThis;
 	}
 
-	function _argsAreInlineable (callingFuncDef : MemberFunctionDefinition, actualArgs : Expression[], asExpression : boolean) : boolean {
+	function _argsAreInlineable (callingFuncDef : MemberFunctionDefinition, actualArgs : Expression[]) : boolean {
 		var formalArgsTypes = callingFuncDef.getArgumentTypes();
 		if (actualArgs.length != formalArgsTypes.length)
 			throw new Error("logic flow, number of arguments mismatch");
@@ -3052,7 +3017,11 @@ class _InlineOptimizeCommand extends _FunctionOptimizeCommand {
 		// clone statements of the calling function, while rewriting the identifiers with actual arguments
 		this.log("expanding " + calleeFuncDef.getNotation());
 		var argsAndThisAndLocals = argsAndThis.concat(new Expression[]);
-		stmtIndex = this._createVars(callerFuncDef, statements, stmtIndex, calleeFuncDef, argsAndThisAndLocals);
+		this._createVarsAndInit(callerFuncDef, calleeFuncDef, argsAndThisAndLocals, (expr) -> {
+			// insert a statement that initializes the temporary var
+			statements.splice(stmtIndex++, 0, new ExpressionStatement(expr));
+		});
+
 		var calleeStatements = calleeFuncDef.getStatements();
 		for (var i = 0; i < calleeStatements.length; ++i) {
 			// clone the statement (while rewriting last return statement to an expression statement)
@@ -3074,62 +3043,39 @@ class _InlineOptimizeCommand extends _FunctionOptimizeCommand {
 		return stmtIndex;
 	}
 
-	function _createVars (callerFuncDef : MemberFunctionDefinition, statements : Statement[], stmtIndex : number, calleeFuncDef : MemberFunctionDefinition, argsAndThisAndLocals : Expression[]) : number {
-		// once an actual argument expression has side effects,
-		// they may affect the following expressions
+	function _createVarsAndInit (callerFuncDef : MemberFunctionDefinition, calleeFuncDef : MemberFunctionDefinition, argsAndThisAndLocals : Expression[], initArgExpr : (Expression) -> void) : void {
+		function createVarWithInit(funcDef : MemberFunctionDefinition, type : Type, baseName : string, initExpr : Expression) : LocalExpression {
+			var tempVar = this.createVar(funcDef, type, baseName);
+			initArgExpr(new AssignmentExpression(new Token("="),
+				new LocalExpression(tempVar.getName(), tempVar),
+				initExpr));
+			return new LocalExpression(tempVar.getName(), tempVar);
+		}
+
 		var argUsed = this._countNumberOfArgsUsed(calleeFuncDef);
+
 		// handle "this" first
 		if ((calleeFuncDef.flags() & ClassDefinition.IS_STATIC) == 0) {
-			var recvExpr = argsAndThisAndLocals[argsAndThisAndLocals.length - 1];
-			if (! this._exprIsSimple(recvExpr)) {
-				var tempExpr = this._createVarForArgOrThis(callerFuncDef, statements, stmtIndex, recvExpr, new ObjectType(calleeFuncDef.getClassDef()), "this");
-				if (tempExpr != null) {
-					argsAndThisAndLocals[argsAndThisAndLocals.length - 1] = tempExpr;
-					++stmtIndex;
-				}
+			var thisIdx = argsAndThisAndLocals.length - 1;
+			var recvExpr = argsAndThisAndLocals[thisIdx];
+			if (!( recvExpr instanceof LeafExpression || (this._exprIsInLocal(recvExpr) && argUsed["this"] <= 1) )) {
+				argsAndThisAndLocals[thisIdx] = createVarWithInit(callerFuncDef, new ObjectType(calleeFuncDef.getClassDef()), "this", recvExpr);
 			}
 		}
 		// handle other arguments
 		var formalArgs = calleeFuncDef.getArguments();
 		for (var i = 0; i < formalArgs.length; ++i) {
 			var numberOfUsed = argUsed[formalArgs[i].getName().getValue()];
-			if (argsAndThisAndLocals[i] instanceof FunctionExpression && numberOfUsed <= 1) {
-				// if the argument is a function expression that is referred only once, directly spill the function into the inlined function
-				// of if it is never referred to, the function expression will disappear
-			}
-			else if (! this._exprIsSimple(argsAndThisAndLocals[i])){
-				var tempExpr = this._createVarForArgOrThis(callerFuncDef, statements, stmtIndex, argsAndThisAndLocals[i], formalArgs[i].getType(), formalArgs[i].getName().getValue());
-				if (tempExpr != null) {
-					argsAndThisAndLocals[i] = tempExpr;
-					++stmtIndex;
-				}
+			var argExpr = argsAndThisAndLocals[i];
+			if (!( argExpr instanceof LeafExpression || (this._exprIsInLocal(argExpr) && numberOfUsed <= 1) )) {
+				argsAndThisAndLocals[i] = createVarWithInit(callerFuncDef, formalArgs[i].getType(), formalArgs[i].getName().getValue(), argExpr);
 			}
 		}
 		// handle locals
-		var locals = calleeFuncDef.getLocals();
-		for (var i = 0; i < locals.length; ++i) {
-			var tempVar = this.createVar(callerFuncDef, locals[i].getType(), locals[i].getName().getValue());
+		calleeFuncDef.getLocals().forEach((local) -> {
+			var tempVar = this.createVar(callerFuncDef, local.getType(), local.getName().getValue());
 			argsAndThisAndLocals.push(new LocalExpression(tempVar.getName(), tempVar));
-		}
-		return stmtIndex;
-	}
-
-	function _createVarForArgOrThis (callerFuncDef : MemberFunctionDefinition, statements : Statement[], stmtIndex : number, expr : Expression, type : Type, baseName : string) : LocalExpression {
-		// just pass through the expressions that do not have side effects
-		if (expr instanceof LeafExpression) {
-			return null;
-		}
-		// create a local variable based on the given name
-		var newLocal = this.createVar(callerFuncDef, type, baseName);
-		// insert a statement that initializes the temporary
-		statements.splice(stmtIndex, 0,
-			new ExpressionStatement(
-				new AssignmentExpression(
-					new Token("="),
-					new LocalExpression(newLocal.getName(), newLocal),
-					expr)));
-		// return an expression referring the the local
-		return new LocalExpression(newLocal.getName(), newLocal);
+		});
 	}
 
 	function _rewriteExpression (expr : Expression, replaceCb : function(:Expression):void, argsAndThisAndLocals : Expression[], calleeFuncDef : MemberFunctionDefinition) : boolean {
