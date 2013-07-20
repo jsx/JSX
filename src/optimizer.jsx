@@ -2629,6 +2629,22 @@ class _InlineOptimizeCommand extends _FunctionOptimizeCommand {
 		return altered;
 	}
 
+	// expr is so simple that it can be expanded directly into the argument expression
+	function _exprIsSimple(expr : Expression) : boolean {
+		if (expr instanceof LeafExpression) {
+			return true;
+		}
+		else if (expr instanceof LogicalNotExpression || expr instanceof BitwiseNotExpression || expr instanceof SignExpression) {
+			return (expr as UnaryExpression).getExpr() instanceof LeafExpression;
+		}
+		else if (expr instanceof BinaryNumberExpression) {
+			return (expr as BinaryNumberExpression).getFirstExpr() instanceof LeafExpression && (expr as BinaryNumberExpression).getSecondExpr() instanceof LeafExpression;
+		}
+		else {
+			return false;
+		}
+	}
+
 	function _handleStatement (funcDef : MemberFunctionDefinition, statements : Statement[], stmtIndex : number) : boolean {
 		var altered = false;
 		var statement = statements[stmtIndex];
@@ -2690,8 +2706,8 @@ class _InlineOptimizeCommand extends _FunctionOptimizeCommand {
 			expr.forEachExpression(onExpr);
 			if (expr instanceof CallExpression) {
 				var callExpr = expr as CallExpression;
-				var args = this._getArgsAndThisIfCallExprIsInlineable(callExpr, true);
-				if (args != null) {
+				var argsAndThis = this._getArgsAndThisIfCallExprIsInlineable(callExpr, true);
+				if (argsAndThis != null) {
 					var callingFuncDef = _DetermineCalleeCommand.getCallingFuncDef(expr);
 					this.log("expanding " + callingFuncDef.getNotation() + " as expression");
 					var stmt = callingFuncDef.getStatements()[0];
@@ -2707,49 +2723,59 @@ class _InlineOptimizeCommand extends _FunctionOptimizeCommand {
 					//   for non-leaf expressions used more than once
 					var argUsed = this._countNumberOfArgsUsed(callingFuncDef);
 					var setupArgs = null : Expression;
-					for (var i = 0; i < args.length; ++i) {
-						// if args[i] is a simple enough, use it as is
-						if (args[i] instanceof LeafExpression || args[i] == null) {
-							continue;
-						}
 
-						// use the expression as is if it used only once
-						var numberOfUsed = i < callingFuncDef.getArguments().length
-							? argUsed[callingFuncDef.getArguments()[i].getName().getValue()]
-							: argUsed["this"];
-						if (numberOfUsed == 1 && !_Util.exprHasSideEffects(args[i])) {
-							 // no need to save it to local var
-							continue;
-						}
+					// handle this first
+					var i = callingFuncDef.getArguments().length;
+					if (argsAndThis[i] != null) {
+						if (! this._exprIsSimple(argsAndThis[i])) {
+							var argDecl = callingFuncDef.getArguments()[i];
+							var local = this.createVar(
+									funcDef,
+									argsAndThis[i].getType(),
+									(callingFuncDef.isAnonymous() ? "$anon" : callingFuncDef.name())
+										+ "$this");
 
-						var argDecl = callingFuncDef.getArguments()[i];
-						var local = this.createVar(
-								funcDef,
-								args[i].getType(),
-								(callingFuncDef.isAnonymous() ? "$anon" : callingFuncDef.name())
-									+ "$"
-									+ (argDecl != null ? argDecl.getName().getValue() : "this"));
+							var assignToLocal = new AssignmentExpression(new Token("="),
+								new LocalExpression(local.getName(), local),
+								argsAndThis[i]);
 
-						var assignToLocal = new AssignmentExpression(new Token("="),
-							new LocalExpression(local.getName(), local),
-							args[i]);
-
-						if (setupArgs == null) {
 							setupArgs = assignToLocal;
+							argsAndThis[i] = new LocalExpression(local.getName(), local);
 						}
-						else {
-							setupArgs = new CommaExpression(new Token(","),
-								assignToLocal,
-								setupArgs);
+					}
+
+					// then, handle arguments
+					for (var i = 0; i < callingFuncDef.getArguments().length; ++i) {
+						if (! this._exprIsSimple(argsAndThis[i])) {
+							var argDecl = callingFuncDef.getArguments()[i];
+							var local = this.createVar(
+									funcDef,
+									argsAndThis[i].getType(),
+									(callingFuncDef.isAnonymous() ? "$anon" : callingFuncDef.name())
+										+ "$"
+										+ argDecl.getName().getValue());
+
+							var assignToLocal = new AssignmentExpression(new Token("="),
+								new LocalExpression(local.getName(), local),
+								argsAndThis[i]);
+
+							if (setupArgs == null) {
+								setupArgs = assignToLocal;
+							}
+							else {
+								setupArgs = new CommaExpression(new Token(","),
+									assignToLocal,
+									setupArgs);
+							}
+							argsAndThis[i] = new LocalExpression(local.getName(), local);
 						}
-						args[i] = new LocalExpression(local.getName(), local);
 					}
 
 					var clonedExpr = expr.clone();
 					this._rewriteExpression(
 						clonedExpr,
 						function (expr) { clonedExpr = expr; },
-						args,
+						argsAndThis,
 						callingFuncDef);
 
 					if (setupArgs != null) {
@@ -3049,11 +3075,13 @@ class _InlineOptimizeCommand extends _FunctionOptimizeCommand {
 	}
 
 	function _createVars (callerFuncDef : MemberFunctionDefinition, statements : Statement[], stmtIndex : number, calleeFuncDef : MemberFunctionDefinition, argsAndThisAndLocals : Expression[]) : number {
+		// once an actual argument expression has side effects,
+		// they may affect the following expressions
 		var argUsed = this._countNumberOfArgsUsed(calleeFuncDef);
 		// handle "this" first
 		if ((calleeFuncDef.flags() & ClassDefinition.IS_STATIC) == 0) {
 			var recvExpr = argsAndThisAndLocals[argsAndThisAndLocals.length - 1];
-			if ( ! (recvExpr instanceof LeafExpression) && (_Util.exprHasSideEffects(recvExpr) || argUsed["this"] > 1) ) {
+			if (! this._exprIsSimple(recvExpr)) {
 				var tempExpr = this._createVarForArgOrThis(callerFuncDef, statements, stmtIndex, recvExpr, new ObjectType(calleeFuncDef.getClassDef()), "this");
 				if (tempExpr != null) {
 					argsAndThisAndLocals[argsAndThisAndLocals.length - 1] = tempExpr;
@@ -3064,10 +3092,12 @@ class _InlineOptimizeCommand extends _FunctionOptimizeCommand {
 		// handle other arguments
 		var formalArgs = calleeFuncDef.getArguments();
 		for (var i = 0; i < formalArgs.length; ++i) {
-			if (argsAndThisAndLocals[i] instanceof FunctionExpression && argUsed[formalArgs[i].getName().getValue()] <= 1) {
+			var numberOfUsed = argUsed[formalArgs[i].getName().getValue()];
+			if (argsAndThisAndLocals[i] instanceof FunctionExpression && numberOfUsed <= 1) {
 				// if the argument is a function expression that is referred only once, directly spill the function into the inlined function
 				// of if it is never referred to, the function expression will disappear
-			} else {
+			}
+			else if (! this._exprIsSimple(argsAndThisAndLocals[i])){
 				var tempExpr = this._createVarForArgOrThis(callerFuncDef, statements, stmtIndex, argsAndThisAndLocals[i], formalArgs[i].getType(), formalArgs[i].getName().getValue());
 				if (tempExpr != null) {
 					argsAndThisAndLocals[i] = tempExpr;
