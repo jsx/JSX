@@ -275,13 +275,13 @@ native final class Array.<T> {
 	 *        currentValue (the current element being processed in the array),
 	 *        the currentIndex and the array.
 	 */
-	function reduce.<U>(callbackfn : function(previousValue : Nullable.<T>, currentValue : Nullable.<T>) : U) : U;
-	function reduce.<U>(callbackfn : function(previousValue : Nullable.<T>, currentValue : Nullable.<T>, currentIndex : number) : U) : U;
-	function reduce.<U>(callbackfn : function(previousValue : Nullable.<T>, currentValue : Nullable.<T>, currentIndex : number, array : Array.<T>) : U) : U;
+	function reduce.<U>(callbackfn : function(previousValue : Nullable.<U>, currentValue : Nullable.<T>) : U) : U;
+	function reduce.<U>(callbackfn : function(previousValue : Nullable.<U>, currentValue : Nullable.<T>, currentIndex : number) : U) : U;
+	function reduce.<U>(callbackfn : function(previousValue : Nullable.<U>, currentValue : Nullable.<T>, currentIndex : number, array : Array.<T>) : U) : U;
 	/* with initial value; won't throw exception. */
-	function reduce.<U>(callbackfn : function(previousValue : Nullable.<T>, currentValue : Nullable.<T>) : U, initialValue : T) : U;
-	function reduce.<U>(callbackfn : function(previousValue : Nullable.<T>, currentValue : Nullable.<T>, currentIndex : number) : U, initialValue : T) : U;
-	function reduce.<U>(callbackfn : function(previousValue : Nullable.<T>, currentValue : Nullable.<T>, currentIndex : number, array : Array.<T>) : U, initialValue : T) : U;
+	function reduce.<U>(callbackfn : function(previousValue : Nullable.<U>, currentValue : Nullable.<T>) : U, initialValue : U) : U;
+	function reduce.<U>(callbackfn : function(previousValue : Nullable.<U>, currentValue : Nullable.<T>, currentIndex : number) : U, initialValue : U) : U;
+	function reduce.<U>(callbackfn : function(previousValue : Nullable.<U>, currentValue : Nullable.<T>, currentIndex : number, array : Array.<T>) : U, initialValue : U) : U;
 
 
 	/**
