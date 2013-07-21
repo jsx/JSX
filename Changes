@@ -1,5 +1,10 @@
 Revision history for the JSX software development kit
 
+0.9.57 2013-07-20 17:03:11-0700
+    [BUG FIXES]
+    - Fix another evaluation order issue introduced in 0.9.54
+    - Fix issues on template classes and inner classes
+
 0.9.56 2013-07-14 20:54:30-0700
     [BUG FIXES]
     - Fix an evaluation order issue introduced in 0.9.54
