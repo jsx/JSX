@@ -2947,18 +2947,24 @@ class _InlineOptimizeCommand extends _FunctionOptimizeCommand {
 						|| statement instanceof WhileStatement
 						|| statement instanceof IfStatement
 						|| statement instanceof SwitchStatement)) {
-							// ok
-						} else if (statement instanceof ReturnStatement && statement == funcDef.getStatements()[funcDef.getStatements().length - 1]) {
-							// ok
-						} else {
+						// ok
+					} else if (statement instanceof ReturnStatement && statement == funcDef.getStatements()[funcDef.getStatements().length - 1]) {
+						// ok
+					} else {
+						return false;
+					}
+					if (! statement.forEachExpression(function onExpr(expr : Expression) : boolean {
+						if (expr instanceof FunctionExpression) {
 							return false;
 						}
-					if (! statement.forEachExpression(function onExpr(expr : Expression) : boolean {
-						if (expr instanceof FunctionExpression)
+						else if (expr instanceof SuperExpression) {
 							return false;
-						if (expr instanceof SuperExpression)
+						}
+						else if (expr instanceof CallExpression && _DetermineCalleeCommand.getCallingFuncDef(expr) == funcDef) {
+							// do not expand recursion
 							return false;
-						if (expr instanceof LocalExpression) {
+						}
+						else if (expr instanceof LocalExpression) {
 							if (funcDef.getFuncLocal() != null && funcDef.getFuncLocal() == (expr as LocalExpression).getLocal()) {
 									return false;
 							}
