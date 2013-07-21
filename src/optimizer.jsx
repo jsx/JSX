@@ -2596,15 +2596,13 @@ class _InlineOptimizeCommand extends _FunctionOptimizeCommand {
 
 	override function optimizeFunction (funcDef : MemberFunctionDefinition) : boolean {
 		var stash = this.getStash(funcDef) as _InlineOptimizeCommand.Stash;
-		// use flag, since functions might recurse
+		// we need to the check here since functions might recurse
 		if (stash.isOptimized)
 			return true;
 		stash.isOptimized = true;
 
-		// we need to the check here since functions might recurse
 		if (funcDef.getStatements() == null)
 			return true;
-		this.log("* starting optimization of " + funcDef.getNotation());
 		while (true) {
 			while (true) {
 				if (! this._handleStatements(funcDef, funcDef.getStatements()))
@@ -2614,7 +2612,6 @@ class _InlineOptimizeCommand extends _FunctionOptimizeCommand {
 			if (! (this.setupCommand(new _ReturnIfOptimizeCommand()) as _ReturnIfOptimizeCommand).optimizeFunction(funcDef))
 				break;
 		}
-		this.log("* finished optimization of " + funcDef.getNotation());
 		return true;
 	}
 
