@@ -2698,62 +2698,21 @@ class _InlineOptimizeCommand extends _FunctionOptimizeCommand {
 			}
 
 		} else {
-
 			if (this._handleSubStatements(funcDef, statement)) {
 				altered = true;
 			}
-
 		}
 
-		// expand single-statement functions that return a value
+		// expand single-statement functions as an expression
 		statement.forEachExpression(function onExpr(expr : Expression, replaceCb : function(:Expression):void) : boolean {
 			expr.forEachExpression(onExpr);
 			if (expr instanceof CallExpression) {
 				var callExpr = expr as CallExpression;
 				var argsAndThis = this._getArgsAndThisIfCallExprIsInlineable(callExpr, true);
 				if (argsAndThis != null) {
-					var callingFuncDef = _DetermineCalleeCommand.getCallingFuncDef(expr);
-					this.log("expanding " + callingFuncDef.getNotation() + " as expression");
-					var stmt = callingFuncDef.getStatements()[0];
-					if (stmt instanceof ExpressionStatement) {
-						var expr = (stmt as ExpressionStatement).getExpr();
-					} else if (stmt instanceof ReturnStatement) {
-						expr = (stmt as ReturnStatement).getExpr();
-					} else {
-						throw new Error('logic flaw');
+					if (this._expandCallAsExpression(funcDef, expr, argsAndThis, replaceCb)) {
+						altered = true;
 					}
-
-					// setup args (arg0 = arg0expr, arg1 = arg1expr, ...)
-					//   for non-leaf expressions used more than once
-					var argUsed = this._countNumberOfArgsUsed(callingFuncDef);
-					var setupArgs = null : Expression;
-
-					this._createVarsAndInit(funcDef, callingFuncDef, argsAndThis, (expr) -> {
-						if (setupArgs == null) {
-							setupArgs = expr;
-						}
-						else {
-							setupArgs = new CommaExpression(new Token(","),
-								setupArgs,
-								expr);
-						}
-					});
-
-					var clonedExpr = expr.clone();
-					this._rewriteExpression(
-						clonedExpr,
-						function (expr) { clonedExpr = expr; },
-						argsAndThis,
-						callingFuncDef);
-
-					if (setupArgs != null) {
-						clonedExpr = new CommaExpression(new Token(","),
-							setupArgs,
-							clonedExpr);
-					}
-
-					replaceCb(clonedExpr);
-					altered = true;
 				}
 			}
 			return true;
@@ -3044,6 +3003,52 @@ class _InlineOptimizeCommand extends _FunctionOptimizeCommand {
 			statements.splice(stmtIndex++, 0, statement);
 		}
 		return stmtIndex;
+	}
+
+	function _expandCallAsExpression(funcDef : MemberFunctionDefinition, expr : Expression, argsAndThis : Expression[], replaceCb : (Expression) -> void) : boolean {
+		var callingFuncDef = _DetermineCalleeCommand.getCallingFuncDef(expr);
+		this.log("expanding " + callingFuncDef.getNotation() + " as expression");
+		// TODO: compine expression statements into single statement with CommaExpression
+		var stmt = callingFuncDef.getStatements()[0];
+		if (stmt instanceof ExpressionStatement) {
+			var expr = (stmt as ExpressionStatement).getExpr();
+		} else if (stmt instanceof ReturnStatement) {
+			expr = (stmt as ReturnStatement).getExpr();
+		} else {
+			return false;
+		}
+
+		// setup args (arg0 = arg0expr, arg1 = arg1expr, ...)
+		//   for non-leaf expressions used more than once
+		var argUsed = this._countNumberOfArgsUsed(callingFuncDef);
+		var setupArgs = null : Expression;
+
+		this._createVarsAndInit(funcDef, callingFuncDef, argsAndThis, (expr) -> {
+			if (setupArgs == null) {
+				setupArgs = expr;
+			}
+			else {
+				setupArgs = new CommaExpression(new Token(","),
+					setupArgs,
+					expr);
+			}
+		});
+
+		var clonedExpr = expr.clone();
+		this._rewriteExpression(
+			clonedExpr,
+			function (expr) { clonedExpr = expr; },
+			argsAndThis,
+			callingFuncDef);
+
+		if (setupArgs != null) {
+			clonedExpr = new CommaExpression(new Token(","),
+				setupArgs,
+				clonedExpr);
+		}
+
+		replaceCb(clonedExpr);
+		return true;
 	}
 
 	function _createVarsAndInit (callerFuncDef : MemberFunctionDefinition, calleeFuncDef : MemberFunctionDefinition, argsAndThisAndLocals : Expression[], initArgExpr : (Expression) -> void) : void {
