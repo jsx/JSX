@@ -2935,18 +2935,23 @@ class _InlineOptimizeCommand extends _FunctionOptimizeCommand {
 				}
 				// no return in the middle, no function expression or super invocation expression, and no reference to the funciton itself
 				return funcDef.forEachStatement(function onStatement(statement : Statement) : boolean {
+					// TODO: support all the types of statements
 					if (statement instanceof ExpressionStatement
+						|| statement instanceof BreakStatement
+						|| statement instanceof ContinueStatement
+						|| statement instanceof CaseStatement
+						|| statement instanceof DefaultStatement
+						|| statement instanceof ThrowStatement
 						|| statement instanceof DebuggerStatement
 						|| statement instanceof LogStatement
-						|| statement instanceof AssertStatement) {
-						// ok
-					} else if (requestsInline
-						   && (statement instanceof ForStatement
+						|| statement instanceof AssertStatement
+						|| statement instanceof ForStatement
 						|| statement instanceof ForInStatement
 						|| statement instanceof DoWhileStatement
 						|| statement instanceof WhileStatement
 						|| statement instanceof IfStatement
-						|| statement instanceof SwitchStatement)) {
+						|| statement instanceof SwitchStatement
+						) {
 						// ok
 					} else if (statement instanceof ReturnStatement && statement == funcDef.getStatements()[funcDef.getStatements().length - 1]) {
 						// ok
