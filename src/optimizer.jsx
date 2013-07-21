@@ -2922,7 +2922,7 @@ class _InlineOptimizeCommand extends _FunctionOptimizeCommand {
 	function _functionIsInlineable (funcDef : MemberFunctionDefinition) : boolean {
 		var stash = this.getStash(funcDef) as _InlineOptimizeCommand.Stash;
 		if (stash.isInlineable == null) {
-			stash.isInlineable = function () : boolean {
+			stash.isInlineable = (function () : boolean {
 				// only inline function that are short, has no branches (last statement may be a return)
 				var statements = funcDef.getStatements();
 				if (statements == null)
@@ -2975,7 +2975,7 @@ class _InlineOptimizeCommand extends _FunctionOptimizeCommand {
 					}
 					return statement.forEachStatement(onStatement);
 				});
-			}();
+			}());
 			this.log(funcDef.getNotation() + (stash.isInlineable ? " is" : " is not") + " inlineable");
 		}
 		return stash.isInlineable;
