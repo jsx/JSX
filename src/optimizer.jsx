@@ -2993,9 +2993,17 @@ class _InlineOptimizeCommand extends _FunctionOptimizeCommand {
 		var calleeStatements = calleeFuncDef.getStatements();
 		for (var i = 0; i < calleeStatements.length; ++i) {
 			// clone the statement (while rewriting last return statement to an expression statement)
-			var statement = calleeStatements[i] instanceof ReturnStatement
-			? new ExpressionStatement((calleeStatements[i] as ReturnStatement).getExpr().clone()) as Statement
-			: calleeStatements[i].clone();
+			var statement : Statement;
+			if (calleeStatements[i] instanceof ReturnStatement) {
+				var returnStatement = calleeStatements[i] as ReturnStatement;
+				if (returnStatement.getExpr() == null) {
+					continue;
+				}
+				statement = new ExpressionStatement(returnStatement.getExpr().clone());
+			}
+			else {
+				statement = calleeStatements[i].clone();
+			}
 			// replace the arguments with actual arguments
 			function onExpr(expr : Expression, replaceCb : function(:Expression):void) : boolean {
 				return this._rewriteExpression(expr, replaceCb, argsAndThisAndLocals, calleeFuncDef);
