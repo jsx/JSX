@@ -2563,6 +2563,7 @@ class _DeadCodeEliminationOptimizeCommand extends _FunctionOptimizeCommand {
 class _InlineOptimizeCommand extends _FunctionOptimizeCommand {
 	static const IDENTIFIER = "inline";
 
+	// NOTE: 30-40 looks good according to v8bench
 	static const INLINE_THRESHOLD = 30; // TODO: make it configurable (--optimize inline=N)
 
 	class Stash extends Stash {
