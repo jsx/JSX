@@ -61,7 +61,7 @@ test-misc-core:
 	$(PROVE) --jobs "$(JOBS)" t/*.t t/optimize/*.jsx t/complete/*.jsx
 
 
-test-optimize-bench:
+test-bench:
 	$(PROVE) -v xt/optimize-bench/*.jsx
 
 v8bench: compiler
