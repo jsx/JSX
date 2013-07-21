@@ -2634,6 +2634,9 @@ class _InlineOptimizeCommand extends _FunctionOptimizeCommand {
 		if (expr instanceof LeafExpression) {
 			return true;
 		}
+		else if (expr instanceof FunctionExpression) {
+			return (expr as FunctionExpression).getFuncDef().getLocals().length == 0;
+		}
 		else if (expr instanceof LogicalNotExpression || expr instanceof BitwiseNotExpression || expr instanceof SignExpression) {
 			return this._exprIsInLocal((expr as UnaryExpression).getExpr());
 		}
