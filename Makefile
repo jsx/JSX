@@ -42,13 +42,11 @@ bootstrap-compiler: compiler
 
 # e.g. make test JOBS=2
 
-test: all test-debug test-optimized
+test: all test-debug test-optimized-minified
 
-test-all: test test-optimized-minified
+test-all: test test-optimized
 
-test-debug:
-	$(MAKE) test-core
-	$(MAKE) test-misc-core
+test-debug: test-core test-misc-core
 
 test-optimized:
 	JSX_OPTS="--optimize release --disable-optimize no-log,no-assert" $(MAKE) test-core
@@ -57,16 +55,18 @@ test-optimized-minified:
 	JSX_OPTS="--optimize release --disable-optimize no-log,no-assert --minify" $(MAKE) test-core
 
 test-core:
-	$(PROVE) --jobs "$(JOBS)" t/run/*.jsx t/compile_error/*.jsx t/lib/*.jsx t/src/*.jsx t/web/*.jsx t/optimize/*.jsx t/complete/*.jsx
+	$(PROVE) --jobs "$(JOBS)" t/run/*.jsx t/compile_error/*.jsx t/lib/*.jsx t/src/*.jsx t/web/*.jsx
 
 test-misc-core:
-	$(PROVE) --jobs "$(JOBS)" t/*.t
+	$(PROVE) --jobs "$(JOBS)" t/*.t t/optimize/*.jsx t/complete/*.jsx
+
+
+test-optimize-bench:
+	$(PROVE) -v xt/optimize-bench/*.jsx
 
 v8bench: compiler
 	cd submodules/v8bench && make
 
-optimize-bench:
-	$(PROVE) -v xt/optimize-bench/*.jsx
 
 ## web stuff
 
@@ -87,7 +87,7 @@ show-todo:
 	find t -name '*.todo.*' | grep -v '~'
 
 publish:
-	$(MAKE) test-all COMPILER_COMPILE_OPTS="--release $(COMPILER_COMPILE_OPTS)"
+	time $(MAKE) test-all COMPILER_COMPILE_OPTS="--release $(COMPILER_COMPILE_OPTS)"
 	npm publish
 
 update-assets: update-bootstrap update-codemirror
