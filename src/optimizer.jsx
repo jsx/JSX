@@ -2290,12 +2290,20 @@ class _DeadCodeEliminationOptimizeCommand extends _FunctionOptimizeCommand {
 			// remove assignment to the variable
 			funcDef.forEachStatement(function onStatement(statement : Statement) : boolean {
 				if (statement instanceof FunctionStatement) {
-					(statement as FunctionStatement).getFuncDef().forEachStatement(onStatement);
+					var localFuncDef = (statement as FunctionStatement).getFuncDef();
+					localFuncDef.forEachStatement(onStatement);
+					if (localFuncDef.getFuncLocal() == locals[localIndex]) {
+						this.log("removing definition of " + locals[localIndex].getName().getNotation());
+						funcDef.getClosures().splice(funcDef.getClosures().indexOf(localFuncDef), 1);
+
+						funcDef.getStatements().splice(funcDef.getStatements().indexOf(statement), 1);
+					}
 				}
 				statement.forEachExpression(function onExpr(expr : Expression, replaceCb : function(:Expression):void) : boolean {
 					if (expr instanceof AssignmentExpression
 					    && (expr as AssignmentExpression).getFirstExpr() instanceof LocalExpression
 						&& ((expr as AssignmentExpression).getFirstExpr() as LocalExpression).getLocal() == locals[localIndex]) {
+							this.log("removing assignment to " + locals[localIndex].getName().getNotation());
 							var rhsExpr = (expr as AssignmentExpression).getSecondExpr();
 							replaceCb(rhsExpr);
 							shouldRetry = true;
