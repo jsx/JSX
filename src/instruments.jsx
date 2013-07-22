@@ -1760,6 +1760,8 @@ class CodeTransformer {
 		if (funcDef.getNameToken() != null && funcDef.name() == "constructor")
 			return false;
 		return funcDef.forEachStatement(function onStatement (statement) {
+			if (statement instanceof YieldStatement)
+				return false;
 			if (statement instanceof ForInStatement)
 				return false;
 			if (statement instanceof TryStatement)
