@@ -3,7 +3,7 @@ ok
 */
 class _Main {
 	static function main (args : string[]) : void {
-		function foo () : g_Enumerable.<number> {
+		function foo () : Enumerable.<number> {
 			yield 1;
 			yield 2;
 			yield 3;
@@ -16,7 +16,7 @@ class _Main {
 
 		try {
 			g.next();
-		} catch (e : g_StopIteration) {
+		} catch (e : StopIteration) {
 			log "ok";
 		}
 	}

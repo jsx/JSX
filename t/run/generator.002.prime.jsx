@@ -7,7 +7,7 @@
 */
 class _Main {
 	static function main (args : string[]) : void {
-		function prime () : g_Enumerable.<number> {
+		function prime () : Enumerable.<number> {
 			NEXT:
 			for (var n = 2; true; ++n) {
 				for (var m = 2; m * m <= n; ++m) {

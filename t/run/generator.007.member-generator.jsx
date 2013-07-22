@@ -4,7 +4,7 @@
 3
 */
 class _Main {
-	function foo () : g_Enumerable.<number> {
+	function foo () : Enumerable.<number> {
 		yield 1;
 		yield 2;
 		yield 3;

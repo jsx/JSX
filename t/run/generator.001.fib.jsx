@@ -7,7 +7,7 @@
 */
 class _Main {
 	static function main (args : string[]) : void {
-		function fib () : g_Enumerable.<number> {
+		function fib () : Enumerable.<number> {
 			var a = 0, b = 1;
 			while (true) {
 				var t = a;
