@@ -78,6 +78,9 @@ class _Util {
 			return _Util.getOutputClassName(classDef);
 		}
 		if (classDef instanceof InstantiatedClassDefinition) {
+			if ((classDef as InstantiatedClassDefinition).getTemplateClass().getNativeSource() != null) {
+				return _Util.getOutputClassName((classDef as InstantiatedClassDefinition).getTemplateClass());
+			}
 			if ((classDef as InstantiatedClassDefinition).getTemplateClassName() == "Map") {
 				return "Object";
 			} else {
@@ -91,10 +94,12 @@ class _Util {
 		function setOutputName(stashable : Stashable, name : string) : void {
 			stashable.setStash(_Util.OUTPUTNAME_IDENTIFIER, new _Util.OutputNameStash(name));
 		}
-		function escapeClassNameIfInstantiated(name : string) : string {
-			// escape the instantiated class names (note: template classes are never emitted (since they are all native) but their names are used for mangling of function arguments)
-			return name.replace(/\.</g, "$$").replace(/>/g, "$E").replace(/[^A-Za-z0-9_]/g,"$");
+		function escapeClassName(name : string) : string {
+			return name.replace(/[^A-Za-z0-9_\$]/g, (matched) -> {
+				return "$x" + matched.charCodeAt(0).toString(16).toUpperCase();
+			});
 		}
+
 		var countByName = new Map.<number>;
 		function newUniqueName(className : string) : string {
 			if (countByName[className]) {
@@ -104,7 +109,7 @@ class _Util {
 				name = className;
 				countByName[className] = 1;
 			}
-			return escapeClassNameIfInstantiated(name);
+			return escapeClassName(name);
 		}
 		// rename the classes with conflicting names
 		for (var i = 0; i < classDefs.length; ++i) {
@@ -113,7 +118,7 @@ class _Util {
 				var className = classDef.className();
 				if (! countByName.hasOwnProperty(className)) {
 					// FIXME t/run/264
-					setOutputName(classDef, escapeClassNameIfInstantiated(className));
+					setOutputName(classDef, escapeClassName(className));
 					countByName[className] = 1;
 				}
 			}
@@ -121,12 +126,8 @@ class _Util {
 		for (var i = 0; i < classDefs.length; ++i) {
 			var classDef = classDefs[i];
 			if ((classDef.flags() & ClassDefinition.IS_NATIVE) == 0) {
-				// decide the className
-				if (classDef.getOuterClassDef() != null)
-					// inner class
-					var className = _Util.getOutputClassName(classDef.getOuterClassDef()) + "$C" + classDef.className();
-				else
-					className = classDef.className();
+				var className = classDef.classFullName();
+
 				// list the constructors
 				var ctors = _Util.findFunctions(classDef, "constructor", false);
 				if (ctors.length != 0) {
@@ -152,11 +153,24 @@ class _Util {
 			else { // native class
 				if (classDef.getOuterClassDef() != null) {
 					// native inner class
-					var name = _Util.getOutputClassName(classDef.getOuterClassDef()) + "." + classDef.className();
-					setOutputName(classDef, name);
+					var className = _Util.getOutputClassName(classDef.getOuterClassDef()) + "." + classDef.className();
+					setOutputName(classDef, className);
 				}
 				else if (classDef.getNativeSource() != null) {
-					setOutputName(classDef, newUniqueName(classDef.className()));
+					// with in-line natie definition
+					setOutputName(classDef, newUniqueName(classDef.classFullName()));
+				}
+				else {
+					// with in-line natie definition
+					if (classDef instanceof InstantiatedClassDefinition) {
+						var instantiated = classDef as InstantiatedClassDefinition;
+						var className = instantiated.getTemplateClassName()
+							+ newUniqueName(".<" + instantiated.getTypeArguments().map.<string>( (type) -> type.toString() ).join(",") + ">");
+						setOutputName(classDef, escapeClassName(className));
+					}
+					else {
+						setOutputName(classDef, escapeClassName(classDef.classFullName()));
+					}
 				}
 			}
 		}
@@ -213,7 +227,9 @@ class _Mangler {
 					// fall through
 				}
 			}
-			return "L" + _Util.getOutputClassName(type.getClassDef()).replace(/\./g, '$C') + "$";
+			// the name may include "." if the classDef is a native class with
+			// native source.
+			return "L" + _Util.getOutputClassName(type.getClassDef()).replace(/\./g, (c) -> "$x" + c.charCodeAt(0).toString(16).toUpperCase()) + "$";
 		} else if (type instanceof StaticFunctionType)
 			return "F" + this.mangleFunctionArguments((type as StaticFunctionType).getArgumentTypes()) + this.mangleTypeName((type as StaticFunctionType).getReturnType()) + "$";
 		else if (type instanceof MemberFunctionType)
@@ -362,16 +378,10 @@ class _MinifiedNameGenerator {
 
 	static const _MINIFY_CHARS = "$_ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 
-	// every object has eval, so it is listed as a keyword
-	static const KEYWORDS = (
-		"break else new var case finally return void catch for switch while continue function this with default if throw"
-		+ " delete in try do instanceof typeof abstract enum int"
-		+ " boolean export interface byte extends long char final native class float package const goto private debugger implements protected double import public"
-		+ " NaN Infinity undefined eval"
-		).split(/\s+/);
-
+	/// ECMA 262 global objects
 	static const GLOBALS = (
-		"parseInt parseFloat isNaN isFinite decodeURI decodeURIComponent encodeURI encodeURIComponent"
+		"NaN Infinity undefined eval"
+		+ "parseInt parseFloat isNaN isFinite decodeURI decodeURIComponent encodeURI encodeURIComponent"
 		+ " Object Function Array String Boolean Number Date RegExp Error EvalError RangeError ReferenceError SyntaxError TypeError URIError Math"
 		).split(/\s+/);
 
@@ -633,8 +643,7 @@ class _Minifier {
 		this._propertyConversionTable = _Minifier._buildConversionTable(
 			this._propertyUseCount,
 			new _MinifiedNameGenerator(
-				([] : string[]).concat(
-					_MinifiedNameGenerator.KEYWORDS,
+				Util.getECMA262ReservedWords().concat(
 					(function () : string[] {
 						var nativePropertyNames = new Map.<boolean>;
 						this._classDefs.forEach(function (classDef) {
@@ -668,7 +677,7 @@ class _Minifier {
 				var stash = _Minifier._getClassStash(classDef);
 				stash.staticVariableConversionTable = _Minifier._buildConversionTable(
 					stash.staticVariableUseCount,
-					new _MinifiedNameGenerator(_MinifiedNameGenerator.KEYWORDS.concat(exportedStaticVarNames)));
+					new _MinifiedNameGenerator(Util.getECMA262ReservedWords().concat(exportedStaticVarNames)));
 			}
 		});
 	}
@@ -689,8 +698,7 @@ class _Minifier {
 		this._globalConversionTable = _Minifier._buildConversionTable(
 			useCount,
 			new _MinifiedNameGenerator(
-				([] : string[]).concat(
-					_MinifiedNameGenerator.KEYWORDS,
+				Util.getECMA262ReservedWords().concat(
 					_MinifiedNameGenerator.GLOBALS,
 					(function () : string[] {
 						var nativeClassNames = new string[];
@@ -727,7 +735,7 @@ class _Minifier {
 			reserved.push(_Minifier._getLocalStash(scopeStash.usedOuterLocals[i]).minifiedName);
 		}
 		this._log("local minification, preserving: " + reserved.join(","));
-		reserved = reserved.concat(_MinifiedNameGenerator.KEYWORDS);
+		reserved = reserved.concat(Util.getECMA262ReservedWords());
 		// doit
 		var conversionTable = _Minifier._buildConversionTable(useCount, new _MinifiedNameGenerator(reserved));
 		// store the result
@@ -2446,8 +2454,6 @@ class _CallExpressionEmitter extends _OperatorExpressionEmitter {
 			return true;
 		else if (this._emitCallsToMap(calleeExpr as PropertyExpression))
 			return true;
-		else if (this._emitIfMathAbs(calleeExpr as PropertyExpression))
-			return true;
 		return false;
 	}
 
@@ -2532,53 +2538,6 @@ class _CallExpressionEmitter extends _OperatorExpressionEmitter {
 		}
 	}
 
-	function _emitIfMathAbs (calleeExpr : PropertyExpression) : boolean {
-		if (! _CallExpressionEmitter._calleeIsMathAbs(calleeExpr))
-			return false;
-		var argExpr = this._expr.getArguments()[0];
-		if (argExpr instanceof LeafExpression) {
-			this._emitter._emit("(", this._expr.getToken());
-			this._emitter._getExpressionEmitterFor(argExpr).emit(0);
-			this._emitter._emit(" >= 0 ? ", this._expr.getToken());
-			this._emitter._getExpressionEmitterFor(argExpr).emit(0);
-			this._emitter._emit(" : - ", this._expr.getToken());
-			this._emitter._getExpressionEmitterFor(argExpr).emit(0);
-			this._emitter._emit(")", this._expr.getToken());
-		} else {
-			this._emitter._emit("(($math_abs_t = ", this._expr.getToken());
-			this._emitter._getExpressionEmitterFor(argExpr).emit(_AssignmentExpressionEmitter._operatorPrecedence["="]);
-			this._emitter._emit(") >= 0 ? $math_abs_t : -$math_abs_t)", this._expr.getToken());
-		}
-		return true;
-	}
-
-	static function _calleeIsMathAbs (calleeExpr : PropertyExpression) : boolean {
-		if (! (calleeExpr.getType() instanceof StaticFunctionType))
-			return false;
-		if (calleeExpr.getIdentifierToken().getValue() != "abs")
-			return false;
-		if (calleeExpr.getExpr().getType().getClassDef().className() != "Math")
-			return false;
-		return true;
-	}
-
-	static function mathAbsUsesTemporary (funcDef : MemberFunctionDefinition) : boolean {
-		return ! funcDef.forEachStatement(function onStatement(statement : Statement) : boolean {
-			if (! statement.forEachExpression(function onExpr(expr : Expression) : boolean {
-				var calleeExpr;
-				if (expr instanceof CallExpression
-					&& (calleeExpr = (expr as CallExpression).getExpr()) instanceof PropertyExpression
-					&& _CallExpressionEmitter._calleeIsMathAbs(calleeExpr as PropertyExpression)
-					&& ! ((expr as CallExpression).getArguments()[0] instanceof LeafExpression))
-					return false;
-				return expr.forEachExpression(onExpr);
-			})) {
-				return false;
-			}
-			return statement.forEachStatement(onStatement);
-		});
-	}
-
 }
 
 class _SuperExpressionEmitter extends _OperatorExpressionEmitter {
@@ -2625,13 +2584,14 @@ class _NewExpressionEmitter extends _OperatorExpressionEmitter {
 			var stash = funcDef.getStash("unclassify");
 			return stash ? (stash as _UnclassifyOptimizationCommand.Stash).inliner : null;
 		}
+
+		assert this._expr.getConstructor() != null, "logic flow: new " + this._expr.getType().toString(); // didn't call analize()?
+
 		var classDef = this._expr.getType().getClassDef();
 		var ctor = this._expr.getConstructor();
 		var argTypes = ctor.getArgumentTypes();
 		var callingFuncDef = Util.findFunctionInClass(classDef, "constructor", argTypes, false);
-		if (callingFuncDef == null) {
-			throw new Error("logic flaw");
-		}
+		assert callingFuncDef != null, "logic flow for " + this._expr.getType().toString();
 		var inliner = getInliner(callingFuncDef);
 		if (inliner) {
 			this._emitAsObjectLiteral(classDef, inliner(this._expr));
@@ -2933,12 +2893,11 @@ class JavaScriptEmitter implements Emitter {
 
 	function _emitCore(classDefs : ClassDefinition[]) : void {
 		for (var i = 0; i < classDefs.length; ++i) {
-			function onFuncDef(funcDef : MemberFunctionDefinition) : boolean {
+			classDefs[i].forEachMemberFunction(function onFuncDef(funcDef) {
 				funcDef.forEachClosure(onFuncDef);
 				this._setupBooleanizeFlags(funcDef);
 				return true;
-			};
-			classDefs[i].forEachMemberFunction(onFuncDef);
+			});
 			classDefs[i].forEachMemberVariable(function (varDef) {
 				if ((varDef.flags() & ClassDefinition.IS_STATIC) != 0 && varDef.getInitialValue() != null) {
 					// only handle static vars, initializer of non-static properties are compiled into member function defs.
@@ -3371,10 +3330,6 @@ class JavaScriptEmitter implements Emitter {
 			// if funDef is NOT in another closure
 			if (funcDef.getClosures().length != 0 && (funcDef.flags() & ClassDefinition.IS_STATIC) == 0)
 				this._emit("var $this = this;\n", null);
-			// emit helper variable for Math.abs
-			if (_CallExpressionEmitter.mathAbsUsesTemporary(funcDef)) {
-				this._emit("var $math_abs_t;\n", null);
-			}
 			// emit local variable declarations
 			var locals = funcDef.getLocals();
 			for (var i = 0; i < locals.length; ++i) {

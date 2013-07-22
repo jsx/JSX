@@ -275,13 +275,13 @@ native final class Array.<T> {
 	 *        currentValue (the current element being processed in the array),
 	 *        the currentIndex and the array.
 	 */
-	function reduce.<U>(callbackfn : function(previousValue : Nullable.<T>, currentValue : Nullable.<T>) : U) : U;
-	function reduce.<U>(callbackfn : function(previousValue : Nullable.<T>, currentValue : Nullable.<T>, currentIndex : number) : U) : U;
-	function reduce.<U>(callbackfn : function(previousValue : Nullable.<T>, currentValue : Nullable.<T>, currentIndex : number, array : Array.<T>) : U) : U;
+	function reduce.<U>(callbackfn : function(previousValue : Nullable.<U>, currentValue : Nullable.<T>) : U) : U;
+	function reduce.<U>(callbackfn : function(previousValue : Nullable.<U>, currentValue : Nullable.<T>, currentIndex : number) : U) : U;
+	function reduce.<U>(callbackfn : function(previousValue : Nullable.<U>, currentValue : Nullable.<T>, currentIndex : number, array : Array.<T>) : U) : U;
 	/* with initial value; won't throw exception. */
-	function reduce.<U>(callbackfn : function(previousValue : Nullable.<T>, currentValue : Nullable.<T>) : U, initialValue : T) : U;
-	function reduce.<U>(callbackfn : function(previousValue : Nullable.<T>, currentValue : Nullable.<T>, currentIndex : number) : U, initialValue : T) : U;
-	function reduce.<U>(callbackfn : function(previousValue : Nullable.<T>, currentValue : Nullable.<T>, currentIndex : number, array : Array.<T>) : U, initialValue : T) : U;
+	function reduce.<U>(callbackfn : function(previousValue : Nullable.<U>, currentValue : Nullable.<T>) : U, initialValue : U) : U;
+	function reduce.<U>(callbackfn : function(previousValue : Nullable.<U>, currentValue : Nullable.<T>, currentIndex : number) : U, initialValue : U) : U;
+	function reduce.<U>(callbackfn : function(previousValue : Nullable.<U>, currentValue : Nullable.<T>, currentIndex : number, array : Array.<T>) : U, initialValue : U) : U;
 
 
 	/**
@@ -329,7 +329,7 @@ native final class String {
 	/**
 	 * Returns a string value containing as many characters as the number of arguments.
 	 */
-	static function fromCharCode(...charN : number) : string;
+	static __pure__ function fromCharCode(...charN : number) : string;
 
 	/**
 	 * Returns this string value. (Note that, for a String object, the toString method happens to return the same thing as the valueOf method.)
@@ -344,37 +344,37 @@ native final class String {
 	/**
 	 * Returns a string containing the character at position <code>pos</code> in the string resulting from converting this object to a string. If there is no character at that position, the result is the empty string. The result is a string value, not a String object.
 	 */
-	function charAt(pos : number) : string;
+	__pure__ function charAt(pos : number) : string;
 
 	/**
 	 * Returns a number (a nonnegative integer less than 2<sup>16</sup>) representing the code point value of the character at position pos in the string resulting from converting this object to a string. If there is no character at that position, the result is NaN.
 	 */
-	function charCodeAt(pos : number) : number;
+	__pure__ function charCodeAt(pos : number) : number;
 
 	/**
 	 * When the <code>concat</code> method is called with zero or more arguments <code>string1</code>, <code>string2</code>, etc., it returns a string consisting of the characters of this object followed by the characters of each of string1, string2, etc. The result is a string value, not a String object.
 	 */
-	function concat(...stringN : string) : string;
+	__pure__ function concat(...stringN : string) : string;
 
 	/**
 	 * If searchString appears as a substring of the result of converting this object to a string then the index of the smallest such position is returned; otherwise, -1 is returned.
 	 */
-	function indexOf(searchString : string) : int;
+	__pure__ function indexOf(searchString : string) : int;
 
 	/**
 	 * If searchString appears as a substring of the result of converting this object to a string, at one or more positions that are greater than or equal to position, then the index of the smallest such position is returned; otherwise, -1 is returned.
 	 */
-	function indexOf(searchString : string, position : number) : int;
+	__pure__ function indexOf(searchString : string, position : number) : int;
 
 	/**
 	 * If searchString appears as a substring of the result of converting this object to a string then the index of the greatest such position is returned; otherwise, -1 is returned.
 	 */
-	function lastIndexOf(searchString : string) : int;
+	__pure__ function lastIndexOf(searchString : string) : int;
 
 	/**
 	 * If searchString appears as a substring of the result of converting this object to a string at one or more positions that are smaller than or equal to position, then the index of the greatest such position is returned; otherwise, -1 is returned.
 	 */
-	function lastIndexOf(searchString : string, position : number) : int;
+	__pure__ function lastIndexOf(searchString : string, position : number) : int;
 
 	/**
 	 * Returns a number indicating whether a reference string comes before or after or is the same as the given string in sort order.
@@ -383,7 +383,7 @@ native final class String {
 	 *
 	 * @param that The string against which the referring string is comparing.
 	 */
-	function localeCompare(that : string) : number;
+	__pure__ function localeCompare(that : string) : number;
 
 	/**
 	 * Used to retrieve the matches when matching a string against a regular expression.
@@ -429,7 +429,7 @@ native final class String {
 	 *
 	 * @param start The zero-based index at which to begin extraction.
 	 */
-	function slice(start : number) : string;
+	__pure__ function slice(start : number) : string;
 
 	/**
 	 * Extracts a section of a string and returns a new string.
@@ -437,14 +437,14 @@ native final class String {
 	 * @param start The zero-based index at which to begin extraction.
 	 * @param end The zero-based index at which to end extraction.
 	 */
-	function slice(start : number, end : number) : string;
+	__pure__ function slice(start : number, end : number) : string;
 
 	/**
 	 * Splits a String object into an array of strings by separating the string into substrings.
 	 *
 	 * @param separator Specifies the character sequence to use for separating the string.
 	 */
-	function split(separator : string) : string [];
+	__pure__ function split(separator : string) : string [];
 
 	/**
 	 * Splits a String object into an array of strings by separating the string into substrings.
@@ -452,7 +452,7 @@ native final class String {
 	 * @param separator Specifies the character sequence to use for separating the string.
 	 * @param limit Integer specifying a limit on the number of splits to be found.  The <code>split</code> method still splits on every match of <code>separator</code>, but it truncates the returned array to at most <code>limit</code> elements.
 	 */
-	function split(separator : string, limit : number) : string [];
+	__pure__ function split(separator : string, limit : number) : string [];
 
 	/**
 	 * Splits a String object into an array of strings by separating the string into substrings.
@@ -474,7 +474,7 @@ native final class String {
 	 *
 	 * @param start The zero-based index at which to begin extraction.
 	 */
-	function substring(start : number) : string;
+	__pure__ function substring(start : number) : string;
 
 	/**
 	 * Returns a subset of a <code>string</code> starting at the given offset.
@@ -482,32 +482,32 @@ native final class String {
 	 * @param start The zero-based index at which to begin extraction.
 	 * @param end The zero-based index at which to end extraction.
 	 */
-	function substring(start : number, end : number) : string;
+	__pure__ function substring(start : number, end : number) : string;
 
 	/**
 	 * Returns the calling string value converted to lowercase.
 	 */
-	function toLowerCase() : string;
+	__pure__ function toLowerCase() : string;
 
 	/**
 	 * Returns the calling string value converted to lowercase.
 	 */
-	function toLocaleLowerCase() : string;
+	__pure__ function toLocaleLowerCase() : string;
 
 	/**
 	 * Returns the calling string value converted to uppercase.
 	 */
-	function toUpperCase() : string;
+	__pure__ function toUpperCase() : string;
 
 	/**
 	 * Returns the calling string value converted to uppercase.
 	 */
-	function toLocaleUpperCase() : string;
+	__pure__ function toLocaleUpperCase() : string;
 
 	/**
 	 * Removes whitespace from both ends of the string.
 	 */
-	function trim() : string;
+	__pure__ function trim() : string;
 
 	/**
 	 * The length of a string.
@@ -523,28 +523,28 @@ native final class String {
 	 *
 	 * @param str A component of a URI.
 	 */
-	static function encodeURIComponent(str : string) : string;
+	__pure__ static function encodeURIComponent(str : string) : string;
 
 	/**
 	 * Decodes a Uniform Resource Identifier (URI) component previously created by encodeURIComponent or by a similar routine.
 	 *
 	 * @param encodedURI An encoded component of a Uniform Resource Identifier.
 	 */
-	static function decodeURIComponent(encodedURI : string) : string;
+	__pure__ static function decodeURIComponent(encodedURI : string) : string;
 
 	/**
 	 * Encodes a Uniform Resource Identifier (URI) by replacing each instance of certain characters by one, two, three, or four escape sequences representing the UTF-8 encoding of the character.
 	 *
 	 * @param str A complete Uniform Resource Identifier.
 	 */
-	static function encodeURI(str : string) : string;
+	__pure__ static function encodeURI(str : string) : string;
 
 	/**
 	 * Decodes a Uniform Resource Identifier (URI) previously created by encodeURI or by a similar routine.
 	 *
 	 * @param encodedURI A complete, encoded Uniform Resuorce Identifier.
 	 */
-	static function decodeURI(encodedURI : string) : string;
+	__pure__ static function decodeURI(encodedURI : string) : string;
 
 }
 
@@ -989,19 +989,19 @@ native class TypeError extends Error {
  * Provides classes and interfaces related to generator.
  * @private EXPERIMENTAL
  */
-class g_StopIteration extends Error {
+class StopIteration extends Error {
 	function constructor() { }
 }
 
 /**
  * @private EXPERIMENTAL
  */
-interface g_Enumerable.<T> {
+interface Enumerable.<T> {
 	function next () : T;
 }
 
 // only used by JSX compiler
-class __jsx_generator.<T> implements g_Enumerable.<T> {
+class __jsx_generator.<T> implements Enumerable.<T> {
 
 	var __next : () -> void;
 	var __value : T;
@@ -1015,13 +1015,13 @@ class __jsx_generator.<T> implements g_Enumerable.<T> {
 		if (! this.__end) {
 			try {
 				this.__next();
-			} catch (e : g_StopIteration) {
+			} catch (e : StopIteration) {
 				this.__end = true;
 				throw e;
 			}
 			return this.__value;
 		} else {
-			throw new g_StopIteration;
+			throw new StopIteration;
 		}
 	}
 
@@ -1429,24 +1429,31 @@ native final class JSX {
 
 	/**
 	 * Returns whether or not the profiler is running.
+	 * The profiler is enabled by <code>--profile</code> option.
+	 *
+	 * @ see http://jsx.github.io/doc/profiler.html
 	 */
 	static function profilerIsRunning() : boolean;
 
 	/**
 	 * Returns the profiler results.
+	 *
+	 * @ see http://jsx.github.io/doc/profiler.html
 	 */
 	static function getProfileResults() : variant;
 
 	/**
-	 * <p>Posts the profiler results to the given URL.</p>
+	 * Posts the profiler results to the given URL.
 	 *
-	 * <p>Please refer to <a href="http://jsx.github.io/doc/profiler.html">the profiler document</a> for using the function.</p>
+	 * @ see http://jsx.github.io/doc/profiler.html
 	 */
 	static function postProfileResults(url : string) : void;
 	static function postProfileResults(url : string, cb : function (error:Error, resultUrl:string):void) : void;
 
 	/**
 	 * Resets the collected profiler results.
+	 *
+	 * @ see http://jsx.github.io/doc/profiler.html
 	 */
 	static function resetProfileResults() : void;
 

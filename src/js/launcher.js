@@ -20,6 +20,8 @@ JSX.runMain = function (sourceFile, args) {
  */
 JSX.runTests = function (sourceFile, tests) {
 	var module = JSX.require(sourceFile);
+	if (! module) return;
+
 	var testClass = module._Test;
 
 	if (!testClass) return; // skip if there's no test class

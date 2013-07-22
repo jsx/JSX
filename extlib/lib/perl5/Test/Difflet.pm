@@ -41,7 +41,7 @@ sub _eq_deeply {
     my ($a, $b) = @_;
     local $Data::Dumper::Terse = 1;
     local $Data::Dumper::Indent = 0;
-    local $Data::Dumper::SortKeys = 1;
+    local $Data::Dumper::Sortkeys = 1;
     return Dumper($a) eq Dumper($b);
 }
 

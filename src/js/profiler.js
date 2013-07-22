@@ -1,4 +1,6 @@
 (function () {
+	"use strict";
+
 	var Profiler = $__jsx_profiler;
 
 	var getTime;
@@ -108,6 +110,10 @@
 			hostname: url.hostname,
 			port: url.port,
 			path: url.path,
+			headers: {
+				'Content-Type': 'application/json',
+				'Content-Length': Buffer.byteLength(content, "utf8"),
+			},
 		}, function (res) {
 			res.setEncoding("utf8");
 			var data = "";
@@ -121,8 +127,10 @@
 					cb(new Error("failed to post profiler results, received " + res.statusCode + " response from server"), null);
 				}
 			});
+		}).on('error', function (e) {
+			cb(e, null);
 		});
-		req.write(content);
+		req.write(content, "utf8");
 		req.end();
 	};
 

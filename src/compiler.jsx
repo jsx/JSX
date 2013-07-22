@@ -197,6 +197,7 @@ class Compiler {
 		var classDefs = new ClassDefinition[];
 		for (var i = 0; i < this._parsers.length; ++i) {
 			classDefs = classDefs.concat(this._parsers[i].getClassDefs());
+			classDefs = classDefs.concat(this._parsers[i].getTemplateClassDefs().map.<ClassDefinition>((classDef) -> classDef));
 		}
 		return ClassDefinition.serialize(classDefs);
 	}
@@ -348,6 +349,13 @@ class Compiler {
 			classDef.analyze(createContext(parser));
 			return true;
 		});
+		// NOTE: template inner classes might not be analyzed in first time,
+		//       so the second time we analyze such a class
+		// see t/run/322
+		this.forEachClassDef(function (parser : Parser, classDef : ClassDefinition) {
+			classDef.analyze(createContext(parser));
+			return true;
+		});
 		// analyze unused variables in every classdef
 		this.forEachClassDef(function (parser : Parser, classDef : ClassDefinition) {
 			classDef.analyzeUnusedVariables();
@@ -368,8 +376,16 @@ class Compiler {
 	function _generateCode (errors : CompileError[]) : void {
 		// build list of all classDefs
 		var classDefs = new ClassDefinition[];
-		for (var i = 0; i < this._parsers.length; ++i)
+		for (var i = 0; i < this._parsers.length; ++i) {
 			classDefs = classDefs.concat(this._parsers[i].getClassDefs());
+
+			// to emit native classes with in-line native definitions
+			this._parsers[i].getTemplateClassDefs().forEach((templateClassDef) -> {
+				if ((templateClassDef.flags() & ClassDefinition.IS_NATIVE) != 0 && templateClassDef.getNativeSource() != null) {
+					classDefs.push(templateClassDef);
+				}
+			});
+		}
 		for (var i = 0; i < classDefs.length; ++i) {
 			if (classDefs[i].getInnerClasses().length != 0)
 				classDefs = classDefs.concat(classDefs[i].getInnerClasses());

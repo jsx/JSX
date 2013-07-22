@@ -2,7 +2,7 @@ package Data::Difflet;
 use strict;
 use warnings FATAL => 'recursion';
 use 5.008008;
-our $VERSION = '0.06';
+our $VERSION = '0.08';
 use Term::ANSIColor;
 use Data::Dumper;
 
@@ -161,6 +161,8 @@ __END__
 
 =encoding utf8
 
+=for stopwords difflet diff
+
 =head1 NAME
 
 Data::Difflet - Ultra special pretty cute diff generator Mark II
@@ -199,11 +201,11 @@ See the following image!
 
 =over 4
 
-=item my $difflet = Data::Difflet->new();
+=item C<< my $difflet = Data::Difflet->new(); >>
 
 Create new instance of Data::Difflet object.
 
-=item $difflet->compare($a, $b);
+=item C<< $difflet->compare($a, $b); >>
 
 Compare the two data and get a colorized strings.
 

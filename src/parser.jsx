@@ -77,6 +77,11 @@ class Token {
 		] : variant[];
 	}
 
+	// "'x' at filename:linenumber" for debugging purpose
+	function getNotation() : string {
+		return "'" + this._value + "'"
+				+ " at " + (this._filename ?: "<<unknown>>")  + ":" + this._lineNumber as string;
+	}
 }
 
 class _Lexer {
@@ -965,6 +970,10 @@ class Parser {
 
 	function _newDeprecatedWarning (message : string) : void {
 		this._errors.push(new DeprecatedWarning(this._filename, this._lineNumber, this._getColumn(), message));
+	}
+
+	function _newExperimentalWarning(feature : Token) : void {
+		this._errors.push(new ExperimentalWarning(feature, feature.getValue()));
 	}
 
 	function _advanceToken () : void {
@@ -2490,6 +2499,7 @@ class Parser {
 	}
 
 	function _yieldStatement (token : Token) : boolean {
+		this._newExperimentalWarning(token);
 		var expr = this._expr(false);
 		if (expr == null)
 			return false;
@@ -3193,7 +3203,7 @@ class Parser {
 			case "[":
 				return this._arrayLiteral(token);
 			case "{":
-				return this._hashLiteral(token);
+				return this._mapLiteral(token);
 			case "(":
 				var expr = this._expr(false);
 				if (this._expect(")") == null)
@@ -3257,7 +3267,7 @@ class Parser {
 		return new ArrayLiteralExpression(token, exprs, type);
 	}
 
-	function _hashLiteral (token : Token) : MapLiteralExpression {
+	function _mapLiteral (token : Token) : MapLiteralExpression {
 		var elements = new MapLiteralElement[];
 		if (this._expectOpt("}") == null) {
 			do {

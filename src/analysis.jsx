@@ -26,7 +26,6 @@ import "./type.jsx";
 import "./platform.jsx";
 import "./statement.jsx";
 import "./expression.jsx";
-import "./optimizer.jsx";
 import "./util.jsx";
 
 class InstantiationContext {
@@ -39,8 +38,18 @@ class InstantiationContext {
 		this.errors = errors;
 		this.typemap = typemap;
 		this.objectTypesUsed = new ParsedObjectType[];
+
+		for (var key in typemap) {
+			var type = typemap[key];
+			if (type instanceof ObjectType && type.getClassDef() == null) {
+				throw new Error("logic flow, no definition for " + type.toString());
+			}
+		}
 	}
 
+	function clone() : InstantiationContext {
+		return new InstantiationContext(this.errors, this.typemap);
+	}
 }
 
 class TemplateInstantiationRequest {
@@ -524,6 +533,19 @@ class DeprecatedWarning extends CompileWarning {
 	}
 
 }
+
+class ExperimentalWarning extends CompileWarning {
+
+	function constructor (token : Token, feature: string) {
+		super(token, "'" + feature + "' is experimental");
+	}
+
+	function constructor (filename : string, lineNumber : number, columnNumber : number, feature : string) {
+		super(filename, lineNumber, columnNumber, "'" + feature + "' is experimental");
+	}
+
+}
+
 
 class CompileNote extends CompileIssue {
 

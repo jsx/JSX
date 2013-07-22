@@ -26,7 +26,6 @@ import "./parser.jsx";
 import "./type.jsx";
 import "./util.jsx";
 import "./statement.jsx";
-import "./optimizer.jsx";
 
 
 abstract class Expression implements Stashable {
@@ -57,6 +56,16 @@ abstract class Expression implements Stashable {
 				var srcType = expr.getType();
 				if (srcType != null) {
 					(expr as NewExpression).setType(srcType.instantiate(instantiationContext));
+				}
+			} else if (expr instanceof PropertyExpression) {
+				var propertyExpr = expr as PropertyExpression;
+				var srcType = expr.getType();
+				if (srcType != null) {
+					propertyExpr.setType(srcType.instantiate(instantiationContext));
+				}
+				var srcTypes = propertyExpr.getTypeArguments();
+				if (srcTypes != null) {
+					propertyExpr.setTypeArguments(srcTypes.map.<Type>((type) -> type.instantiate(instantiationContext)));
 				}
 			} else if (expr instanceof ArrayLiteralExpression) {
 				var srcType = expr.getType();
@@ -657,7 +666,7 @@ class MapLiteralExpression extends Expression {
 				succeeded = false;
 			} else if (this._elements[i].getExpr().getType().equals(Type.voidType)) {
 				 // FIXME the location of the error would be strange; we deseparately need expr.getToken()
-				context.errors.push(new CompileError(this._token, "cannot assign void to a hash"));
+				context.errors.push(new CompileError(this._token, "cannot assign void to a map"));
 				succeeded = false;
 			}
 		}
@@ -669,7 +678,7 @@ class MapLiteralExpression extends Expression {
 		} else if (this._type != null && this._type instanceof ObjectType) {
 			var classDef = this._type.getClassDef();
 			if (! (classDef instanceof InstantiatedClassDefinition && (classDef as InstantiatedClassDefinition).getTemplateClassName() == "Map")) {
-				context.errors.push(new CompileError(this._token, "specified type is not a hash type"));
+				context.errors.push(new CompileError(this._token, "specified type is not a map type"));
 				return false;
 			}
 			var expectedType = (this._type as ParsedObjectType).getTypeArguments()[0];
@@ -687,7 +696,7 @@ class MapLiteralExpression extends Expression {
 		} else {
 			var elementType = Type.calcLeastCommonAncestor(this._elements.map.<Type>((elt) -> { return elt.getExpr().getType(); }), true);
 			if (elementType == null || elementType.equals(Type.nullType)) {
-				context.errors.push(new CompileError(this._token, "could not deduce hash type, please specify"));
+				context.errors.push(new CompileError(this._token, "could not deduce map type, please specify"));
 				return false;
 			}
 			if (elementType.equals(Type.integerType))
@@ -713,7 +722,7 @@ class MapLiteralExpression extends Expression {
 
 }
 
-class ThisExpression extends Expression {
+class ThisExpression extends LeafExpression {
 
 	var _classDef : ClassDefinition;
 
@@ -1192,6 +1201,10 @@ class PropertyExpression extends UnaryExpression {
 		return this._typeArgs;
 	}
 
+	function setTypeArguments (types : Type[]) : void {
+		this._typeArgs = types;
+	}
+
 	override function serialize () : variant {
 		return [
 			"PropertyExpression",
@@ -1225,18 +1238,24 @@ class PropertyExpression extends UnaryExpression {
 		}
 		// referring to inner class?
 		if (this._expr.isClassSpecifier()) {
-			classDef.forEachInnerClass(function (classDef) {
-				if (classDef.className() == this._identifierToken.getValue()) {
-					var objectType = new ParsedObjectType(new QualifiedName(this._identifierToken, exprType as ParsedObjectType), this._typeArgs);
-					objectType.resolveType(context);
-					this._type = objectType;
-					this._isInner = true;
-					return false;
-				}
+			var innerClassDef = classDef.lookupInnerClass(this._identifierToken.getValue());
+			if (innerClassDef == null) {
+				classDef.forEachTemplateInnerClass((classDef) -> {
+					if (classDef.className() == this._identifierToken.getValue()) {
+						innerClassDef = classDef;
+						return false;
+					}
+					return true;
+				});
+			}
+
+			if (innerClassDef) {
+				var objectType = new ParsedObjectType(new QualifiedName(this._identifierToken, exprType as ParsedObjectType), this._typeArgs);
+				objectType.resolveType(context);
+				this._type = objectType;
+				this._isInner = true;
 				return true;
-			});
-			if (this._isInner)
-				return true;
+			}
 		}
 		this._type = classDef.getMemberTypeByName(
 			context.errors,
@@ -1246,7 +1265,7 @@ class PropertyExpression extends UnaryExpression {
 			this._typeArgs,
 			this._expr.isClassSpecifier() ? ClassDefinition.GET_MEMBER_MODE_CLASS_ONLY : ClassDefinition.GET_MEMBER_MODE_ALL);
 		if (this._type == null) {
-			context.errors.push(new CompileError(this._identifierToken, "'" + exprType.toString() + "' does not have a property named '" + this._identifierToken.getValue() + "'"));
+			context.errors.push(new CompileError(this._identifierToken, "'" + exprType.toString() + "' does not have a property or inner class named '" + this._identifierToken.getValue() + "'"));
 			return false;
 		}
 		return true;
@@ -1254,6 +1273,10 @@ class PropertyExpression extends UnaryExpression {
 
 	override function getType () : Type {
 		return this._type;
+	}
+
+	function setType (type : Type) : void {
+		this._type = type;
 	}
 
 	override function getHolderType () : Type {
@@ -1443,17 +1466,31 @@ class AdditiveExpression extends BinaryExpression {
 	override function analyze (context : AnalysisContext, parentExpr : Expression) : boolean {
 		if (! this._analyze(context))
 			return false;
+
+		function typeIsNumber (type : Type) : boolean {
+			return type.isConvertibleTo(Type.numberType) || (type instanceof ObjectType && type.getClassDef() == Type.numberType.getClassDef());
+		}
+		function typeIsString (type : Type) : boolean {
+			return type.equals(Type.stringType) || (type instanceof ObjectType && type.getClassDef() == Type.stringType.getClassDef());
+		}
+
 		var expr1Type = this._expr1.getType().resolveIfNullable();
 		var expr2Type = this._expr2.getType().resolveIfNullable();
-		if ((expr1Type.isConvertibleTo(Type.numberType) || (expr1Type instanceof ObjectType && expr1Type.getClassDef() == Type.numberType.getClassDef()))
-			&& (expr2Type.isConvertibleTo(Type.numberType) || (expr2Type instanceof ObjectType && expr2Type.getClassDef() == Type.numberType.getClassDef()))) {
+		if (typeIsNumber(expr1Type) && typeIsNumber(expr2Type)) {
 			// ok
 			this._type = (expr1Type instanceof NumberType) || (expr2Type instanceof NumberType)
 				? (Type.numberType as Type) : (Type.integerType as Type);
-		} else if ((expr1Type.equals(Type.stringType) || (expr1Type instanceof ObjectType && expr1Type.getClassDef() == Type.stringType.getClassDef()))
-			&& (expr2Type.equals(Type.stringType) || (expr2Type instanceof ObjectType && expr2Type.getClassDef() == Type.stringType.getClassDef()))) {
+		} else if (typeIsString(expr1Type) && typeIsString(expr2Type)) {
 			// ok
 			this._type = expr1Type;
+		} else if ((typeIsString(expr1Type) && typeIsNumber(expr2Type)) || (typeIsNumber(expr1Type) && typeIsString(expr2Type))) {
+			// insert implicit coercion
+			if (typeIsNumber(expr1Type)) {
+				this._expr1 = new AsExpression(new Token("as", false), this._expr1, Type.stringType);
+			} else {
+				this._expr2 = new AsExpression(new Token("as", false), this._expr2, Type.stringType);
+			}
+			this._type = Type.stringType;
 		} else {
 			context.errors.push(new CompileError(this._token, "cannot apply operator '+' to '" + expr1Type.toString() + "' and '" + expr2Type.toString() + "'"));
 			return false;
@@ -2169,10 +2206,6 @@ class NewExpression extends OperatorExpression {
 
 	override function clone () : NewExpression {
 		return new NewExpression(this);
-	}
-
-	function getQualifiedName () : QualifiedName {
-		throw new Error("will be removed");
 	}
 
 	function getArguments () : Expression[] {

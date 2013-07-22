@@ -11,6 +11,9 @@ class _Main {
 
 	static function main(args : string[]) : void {
 		var x = -40;
+		// should be expanded into:
+		// var abs$x : number;
+		// log (((abs$x = x - 2), abs$x) >= 0 ? x : -x)
 		log _Main.abs(x - 2);
 	}
 }
