@@ -94,8 +94,8 @@ abstract class _ExpressionTransformer {
 			parentFuncDef = childFuncDef;
 		}
 		var lastBodyArgs = new Expression[];
-		for (var i = 0; i < exprs.length; ++i) {
-			lastBodyArgs.push(new LocalExpression(exprs[i].getToken(), newArgs[i]));
+		for (var j = 0; j < exprs.length; ++j) {
+			lastBodyArgs.push(new LocalExpression(exprs[j].getToken(), newArgs[j]));
 		}
 		var lastBody = new CallExpression(new Token("(", false), continuation, [ this._constructOp(lastBodyArgs) ]);
 		if (i == 0) {
