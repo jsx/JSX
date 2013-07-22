@@ -1277,13 +1277,19 @@ class _ForStatementTransformer extends _LabellableStatementTransformer {
 		var initLabel = "$INIT_FOR_" + this.getID() as string;
 		statements.push(new GotoStatement(initLabel));
 		statements.push(new LabelStatement(initLabel));
-		_StatementTransformer.pushExpressionStatement(this._statement.getInitExpr(), statements);
+		if (this._statement.getInitExpr() != null) {
+			_StatementTransformer.pushExpressionStatement(this._statement.getInitExpr(), statements);
+		}
 		var testLabel = "$TEST_FOR_" + this.getID() as string;
 		statements.push(new GotoStatement(testLabel));
 		statements.push(new LabelStatement(testLabel));
 		var bodyLabel = "$BODY_FOR_" + this.getID() as string;
 		var endLabel = "$END_FOR_" + this.getID() as string;
-		_StatementTransformer.pushConditionalBranch(this._statement.getCondExpr(), bodyLabel, endLabel, statements);
+		if (this._statement.getCondExpr() != null) {
+			_StatementTransformer.pushConditionalBranch(this._statement.getCondExpr(), bodyLabel, endLabel, statements);
+		} else {
+			_StatementTransformer.pushConditionalBranch(new BooleanLiteralExpression(new Token("true", false)), bodyLabel, endLabel, statements);
+		}
 		statements.push(new LabelStatement(bodyLabel));
 		this._transformer.enterLabelledBlock(this);
 		this._transformAndPush(this._statement.getStatements(), statements);
@@ -1291,7 +1297,9 @@ class _ForStatementTransformer extends _LabellableStatementTransformer {
 		var postLabel = "$POST_FOR_" + this.getID() as string;
 		statements.push(new GotoStatement(postLabel));
 		statements.push(new LabelStatement(postLabel));
-		_StatementTransformer.pushExpressionStatement(this._statement.getPostExpr(), statements);
+		if (this._statement.getPostExpr() != null) {
+			_StatementTransformer.pushExpressionStatement(this._statement.getPostExpr(), statements);
+		}
 		statements.push(new GotoStatement(testLabel));
 		statements.push(new LabelStatement(endLabel));
 		return statements;
