@@ -93,11 +93,11 @@ abstract class _ExpressionTransformer {
 			childFuncDef.setClassDef(parentFuncDef.getClassDef());
 			parentFuncDef = childFuncDef;
 		}
-		var lastBody = new CallExpression(
-			new Token("(", false),
-			continuation,
-			[ this._constructOp(newArgs.map.<Expression>((arg) -> (new LocalExpression(arg.getName(), arg) as Expression))) ]
-		);
+		var lastBodyArgs = new Expression[];
+		for (var i = 0; i < exprs.length; ++i) {
+			lastBodyArgs.push(new LocalExpression(exprs[i].getToken(), newArgs[i]));
+		}
+		var lastBody = new CallExpression(new Token("(", false), continuation, [ this._constructOp(lastBodyArgs) ]);
 		if (i == 0) {
 			firstBody = lastBody;
 		} else {
