@@ -1746,21 +1746,28 @@ class CodeTransformer {
 		return this;
 	}
 
+	function _functionIsTransformable (funcDef : MemberFunctionDefinition) : boolean {
+		if (funcDef.getStatements() == null)
+			return false;
+		if (funcDef.name() == "constructor")
+			return false;
+		return funcDef.forEachStatement(function onStatement (statement) {
+			if (statement instanceof ForInStatement)
+				return false;
+			if (statement instanceof TryStatement)
+				return false;
+			return statement.forEachStatement(onStatement);
+		});
+	}
+
 	function performTransformation () : void {
-		function hasForInStatement (funcDef : MemberFunctionDefinition) : boolean {
-			return ! funcDef.forEachStatement(function onStatement (statement) {
-				if (statement instanceof ForInStatement)
-					return false;
-				return statement.forEachStatement(onStatement);
-			});
-		}
 		// transform all functions
 		if (this._forceTransform) {
 			this._compiler.forEachClassDef(function (parser, classDef) {
 				return classDef.forEachMember(function onMember(member) {
 					if (member instanceof MemberFunctionDefinition) {
 						var funcDef = member as MemberFunctionDefinition;
-						if (funcDef.getStatements() != null && funcDef.name() != "constructor" && ! hasForInStatement(funcDef)) {
+						if (this._functionIsTransformable(funcDef)) {
 							this._doCPSTransform(funcDef);
 						}
 					}
