@@ -1757,7 +1757,7 @@ class CodeTransformer {
 	function _functionIsTransformable (funcDef : MemberFunctionDefinition) : boolean {
 		if (funcDef.getStatements() == null)
 			return false;
-		if (funcDef.name() == "constructor")
+		if (funcDef.getNameToken() != null && funcDef.name() == "constructor")
 			return false;
 		return funcDef.forEachStatement(function onStatement (statement) {
 			if (statement instanceof ForInStatement)
@@ -1773,6 +1773,9 @@ class CodeTransformer {
 			// transform all functions
 			this._compiler.forEachClassDef(function (parser, classDef) {
 				return classDef.forEachMember(function onMember(member) {
+					member.forEachClosure(function (funcDef) {
+						return onMember(funcDef);
+					});
 					if (member instanceof MemberFunctionDefinition) {
 						var funcDef = member as MemberFunctionDefinition;
 						if (this._functionIsTransformable(funcDef)) {
@@ -1786,15 +1789,16 @@ class CodeTransformer {
 		// transform generators
 		this._compiler.forEachClassDef(function (parser, classDef) {
 			return classDef.forEachMember(function onMember(member) {
+				member.forEachClosure(function (funcDef) {
+					return onMember(funcDef);
+				});
 				if (member instanceof MemberFunctionDefinition) {
 					var funcDef = member as MemberFunctionDefinition;
 					if (funcDef.isGenerator()) {
 						this.transformGenerator(funcDef);
 					}
 				}
-				return member.forEachClosure(function (funcDef) {
-					return onMember(funcDef);
-				});
+				return true;
 			});
 		});
 	}
