@@ -127,6 +127,8 @@ abstract class _ExpressionTransformer {
 			closures[i].setParent(parentFuncDef);
 		}
 
+		firstBody._token = this.getExpression()._token;
+
 		return firstBody;
 	}
 
