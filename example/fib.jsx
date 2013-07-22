@@ -27,7 +27,6 @@ class Fib {
 
 	static function fib4(n : int) : int {
 		switch (n) {
-		case 0:
 		case 1:
 		case 2:
 			return 1;
@@ -36,10 +35,10 @@ class Fib {
 		}
 	}
 
-	static function fib5(n : int, a : int = 1, b : int = 0) : int {
+	static function fib5(n : int, a : int = 1, b : int = 1) : int {
 		switch (n) {
-		case 0:
 		case 1:
+		case 2:
 			return a;
 		default:
 			return Fib.fib5(n - 1, a + b, a);
