@@ -462,7 +462,7 @@ class _PropertyExpressionTransformer extends _UnaryExpressionTransformer {
 			throw new Error("logic flaw");
 		}
 		// static member
-		if (this._expr.getExpr() instanceof ClassExpression) {
+		if (this._expr.getExpr().isClassSpecifier()) {
 			return this._createCall1(continuation, this._expr);
 		}
 		return super.doCPSTransform(parent, continuation);
@@ -579,7 +579,7 @@ class _AssignmentExpressionTransformer extends _ExpressionTransformer {
 		// LHS expr must be of any of type 'local', 'property', and 'array'
 
 		var lhsExpr = this._expr.getFirstExpr();
-		if (lhsExpr instanceof LocalExpression || (lhsExpr instanceof PropertyExpression && (lhsExpr as PropertyExpression).getExpr() instanceof ClassExpression)) {
+		if (lhsExpr instanceof LocalExpression || (lhsExpr instanceof PropertyExpression && (lhsExpr as PropertyExpression).getExpr().isClassSpecifier())) {
 			return this._transformSimpleAssignment(parent, continuation);
 		} else if (lhsExpr instanceof PropertyExpression) {
 			return this._transformPropertyAssignment(parent, continuation);
@@ -623,7 +623,7 @@ class _AssignmentExpressionTransformer extends _ExpressionTransformer {
 
 	override function _constructOp (exprs : Expression[]) : Expression {
 		var lhsExpr = this._expr.getFirstExpr();
-		if (lhsExpr instanceof LocalExpression || (lhsExpr instanceof PropertyExpression && (lhsExpr as PropertyExpression).getExpr() instanceof ClassExpression)) {
+		if (lhsExpr instanceof LocalExpression || (lhsExpr instanceof PropertyExpression && (lhsExpr as PropertyExpression).getExpr().isClassSpecifier())) {
 			assert exprs.length == 1;
 			return this._constructSimpleAssignment(exprs[0]);
 		} else if (lhsExpr instanceof PropertyExpression) {
