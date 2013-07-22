@@ -3236,10 +3236,12 @@ class Parser {
 			if (expr == null)
 				return null;
 			exprs.push(expr);
-			if (this._expectOpt(",") == null) {
-				if (this._expect("]") == null) {
-					return null;
-				}
+			// separator
+			var separator = this._expect([",", "]"]);
+			if (separator == null) {
+				return null;
+			}
+			else if (separator.getValue() == "]") {
 				break;
 			}
 		}
@@ -3271,11 +3273,13 @@ class Parser {
 			if (expr == null)
 				return null;
 			elements.push(new MapLiteralElement(keyToken, expr));
+
 			// separator
-			if (this._expectOpt(",") == null) {
-				if (this._expect("}") == null) {
-					return null;
-				}
+			var separator = this._expect([",", "}"]);
+			if (separator == null) {
+				return null;
+			}
+			else if (separator.getValue() == "}") {
 				break;
 			}
 		}
