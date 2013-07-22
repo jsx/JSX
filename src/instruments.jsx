@@ -1789,7 +1789,7 @@ class CodeTransformer {
 				if (member instanceof MemberFunctionDefinition) {
 					var funcDef = member as MemberFunctionDefinition;
 					if (funcDef.isGenerator()) {
-						this.transformFunctionDefinition(funcDef);
+						this.transformGenerator(funcDef);
 					}
 				}
 				return member.forEachClosure(function (funcDef) {
@@ -1974,7 +1974,7 @@ class CodeTransformer {
 		throw new Error("got unexpected type of expression: " + (expr != null ? JSON.stringify(expr.serialize()) : expr.toString()));
 	}
 
-	function transformFunctionDefinition (funcDef : MemberFunctionDefinition) : void {
+	function transformGenerator (funcDef : MemberFunctionDefinition) : void {
 		this._compileYields(funcDef);
 	}
 
