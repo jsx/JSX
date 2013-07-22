@@ -1731,10 +1731,14 @@ class CodeTransformer {
 		this._compiler = compiler;
 		var builtins = compiler.getBuiltinParsers()[0];
 
+		// get built-in classes related to generators
 		this._stopIterationClassDef = builtins.lookup([], null, "g_StopIteration");
-		for (var i = 0; i < builtins._templateClassDefs.length; ++i)
-			if (builtins._templateClassDefs[i].className() == "__jsx_generator")
+		for (var i = 0; i < builtins._templateClassDefs.length; ++i) {
+			if (builtins._templateClassDefs[i].className() == "__jsx_generator") {
 				this._jsxGeneratorClassDef = builtins._templateClassDefs[i];
+				break;
+			}
+		}
 
 		assert this._stopIterationClassDef != null;
 		assert this._jsxGeneratorClassDef != null;
