@@ -2555,7 +2555,7 @@ class _SuperExpressionEmitter extends _OperatorExpressionEmitter {
 		var methodName = this._expr.getName().getValue();
 		var argTypes = funcType.getArgumentTypes();
 		var mangledFuncName = this._emitter.getNamer().getNameOfMethod(classDef, methodName, argTypes);
-		this._emitter._emitCallArguments(this._expr.getToken(), this._emitter.getNamer().getNameOfClass(classDef) + ".prototype." + mangledFuncName + ".call(this", this._expr.getArguments(), argTypes);
+		this._emitter._emitCallArguments(this._expr.getToken(), this._emitter.getNamer().getNameOfClass(classDef) + ".prototype." + mangledFuncName + ".call($this", this._expr.getArguments(), argTypes);
 	}
 
 	override function _getPrecedence () : number {
