@@ -28,7 +28,7 @@ import "../util.jsx";
 import "../emitter.jsx";
 
 // hack to avoid exceptions on native("require(...)")
-native ("function require(module) { console.error('ignore loading module: ' + module); return {}; }") class require { }
+native ("(function (exports) { exports.require = function (module) { console.error('ignore loading module: ' + module); return {}; }; }(new Function('return this')()))") class _remove_require { }
 
 class BrowserPlatform extends Platform {
 

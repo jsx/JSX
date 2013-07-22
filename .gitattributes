@@ -1,0 +1,7 @@
+# .gitattributes
+
+*.jsx diff=jsx
+*.jx  diff=jsx
+# and type the following command:
+# git config --global diff.jsx.xfuncname 'function +[a-zA-Z0-9_].*'
+

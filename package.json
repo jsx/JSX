@@ -1,6 +1,6 @@
 {
   "name": "jsx",
-  "version": "0.9.49",
+  "version": "0.9.52",
   "description": "a faster, safer, easier JavaScript",
   "license": "MIT",
   "keywords": [
@@ -54,6 +54,9 @@
     "postpublish": "node tool/bootstrap-compiler.js --run tool/postpublish.jsx"
   },
   "devDependencies": {
-    "jshint": "~2.1.4"
+    "jshint": "~2.1.4",
+    "grunt-contrib-watch": "~0.4.4",
+    "grunt": "~0.4.1",
+    "grunt-exec": "~0.4.2"
   }
 }

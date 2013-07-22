@@ -36,18 +36,11 @@ class DocCommentNode {
 	}
 
 	function getDescription () : string {
-		return this._description;
+		return this._description.replace(/^[\r\n]+/, "").replace(/[\r\n\t ]+$/, "");
 	}
 
 	function appendDescription (s : string) : void {
-		s = s.trim();
-		// append
-		if (s != "") {
-			if (this._description != "") {
-				this._description += " ";
-			}
-			this._description += s;
-		}
+		this._description += s;
 	}
 
 }
@@ -69,6 +62,10 @@ class DocCommentParameter extends DocCommentNode {
 		return this._token.getValue();
 	}
 
+	override function getDescription() : string {
+		var d = super.getDescription();
+		return d.trim();
+	}
 }
 
 class DocCommentTag extends DocCommentNode {
@@ -255,6 +252,8 @@ class DocumentGenerator {
 	}
 
 	function _buildDocOfClass (parser : Parser, classDef : ClassDefinition) : string {
+		var _ = "";
+
 		var typeName = "class";
 		if ((classDef.flags() & ClassDefinition.IS_INTERFACE) != 0) {
 			typeName = "interface";
@@ -263,11 +262,23 @@ class DocumentGenerator {
 		}
 		var typeArgs = classDef instanceof TemplateClassDefinition ? (classDef as TemplateClassDefinition).getTypeArguments() : new Token[];
 
-		var _ = "";
-
-?<div class="class" id="class-<?= this._escape(classDef.className()) ?>">
-?<h2><?= this._flagsToHTML(classDef.flags()) + " " + this._escape(typeName) + " " + this._name(classDef.className()) + this._formalTypeArgsToHTML(typeArgs) ?></h2>
+?<div class="class" id="class-<?= this._escape(classDef.classFullName()) ?>">
+?<h2><?= this._flagsToHTML(classDef.flags()) + " " + this._escape(typeName) + " " + this._name(classDef.classFullName()) + this._formalTypeArgsToHTML(typeArgs) + this._inheritance(parser, classDef) ?></h2>
 ?<?= this._descriptionToHTML(classDef.getDocComment()) ?>
+
+		// inner classes
+		classDef.getTemplateInnerClasses().forEach((classDef) -> {
+			if (! this._isPrivate(classDef)) {
+?<?= this._buildDocOfClass(parser, classDef) ?>
+			}
+		});
+		classDef.getInnerClasses().forEach((classDef) -> {
+			if (! (classDef instanceof InstantiatedClassDefinition) && ! this._isPrivate(classDef)) {
+?<?= this._buildDocOfClass(parser, classDef) ?>
+			}
+		});
+
+		// properties
 
 		if (this._hasPublicProperties(classDef)) {
 			classDef.forEachMemberVariable(function (varDef) {
@@ -283,16 +294,20 @@ class DocumentGenerator {
 			});
 		}
 
+		// constructors
+
 		classDef.forEachMemberFunction(function (funcDef) {
-			if (! (funcDef instanceof InstantiatedMemberFunctionDefinition) && this._isConstructor(funcDef) && (funcDef.flags() & ClassDefinition.IS_DELETE) == 0) {
+			if (! (funcDef instanceof InstantiatedMemberFunctionDefinition) && this._isConstructor(funcDef) && (funcDef.flags() & ClassDefinition.IS_DELETE) == 0 && !this._isPrivate(funcDef)) {
 ?<?= this._buildDocOfFunction(parser, funcDef) ?>
 			}
 			return true;
 		});
 
+		// member functions
+
 		if (this._hasPublicFunctions(classDef)) {
 			classDef.forEachMemberFunction(function (funcDef) {
-				if (! (funcDef instanceof InstantiatedMemberFunctionDefinition || this._isConstructor(funcDef) || this._isPrivate(funcDef))) {
+				if (! (funcDef instanceof InstantiatedMemberFunctionDefinition) && !this._isConstructor(funcDef) && !this._isPrivate(funcDef)) {
 ?<?= this._buildDocOfFunction(parser, funcDef) ?>
 				}
 				return true;
@@ -304,11 +319,29 @@ class DocumentGenerator {
 		return _;
 	}
 
+	function _inheritance(parser : Parser, classDef : ClassDefinition) : string {
+		if (classDef.extendType() == null) {
+			return "";
+		}
+		var extendClassDef = classDef.extendType().getClassDef();
+		if (extendClassDef == null || extendClassDef.classFullName() == "Object") {
+			return "";
+		}
+
+		var _  = " extends " + this._classDefToHTML(parser, extendClassDef);
+
+		var implementTypes = classDef.implementTypes();
+		if (implementTypes.length > 0) {
+			_ += " implements " + implementTypes.map.<string>((type) -> this._classDefToHTML(parser, type.getClassDef())).join(", ");
+		}
+		return _;
+	}
+
 	function _buildDocOfFunction (parser : Parser, funcDef : MemberFunctionDefinition) : string {
 		var _ = "";
 		var ignoreFlags = (funcDef.getClassDef().flags() & (ClassDefinition.IS_FINAL | ClassDefinition.IS_NATIVE)) | ClassDefinition.IS_INLINE;
 		var funcName = this._isConstructor(funcDef)
-			? "new " + this._name(funcDef.getClassDef().className())
+			? "new " + this._name(funcDef.getClassDef().classFullName())
 			: this._flagsToHTML(funcDef.flags() & ~ignoreFlags) + " function " + this._name(funcDef.name());
 		var args = funcDef.getArguments();
 		var argsHTML = args.map.<string>(function (arg) {
@@ -346,7 +379,7 @@ class DocumentGenerator {
 		if (docComment != null) {
 			if (docComment.getDescription() != "") {
 ?<div class="description">
-?<?= docComment.getDescription() ?>
+?<?= docComment.getDescription().replace(/\t/g, "  ") ?>
 ?</div>
 			}
 			var seeTags = docComment.getTagsByName("see");
@@ -362,7 +395,7 @@ class DocumentGenerator {
 	}
 
 	function _autoLink (str : string) : string {
-		var uri = /^https?:\/\/[A-Za-z0-9\-\._~:\/?#\[\]@!$&'()*+,;=]+/;
+		var uri = /^https?:\/\/[A-Za-z0-9\-\._~:\/?#\[\]@!$&'()*+,;=]+/g;
 		return str.replace(uri, (matched) -> {
 			return Util.format('<a href="%1">%1</a>', [matched]);
 		});
@@ -446,16 +479,16 @@ class DocumentGenerator {
 					}
 				}
 			}
-			throw new Error("could not determine the parser to which the class belongs:" + classDef.className());
+			throw new Error("could not determine the parser to which the class belongs:" + classDef.classFullName());
 		};
 		var parserOfClassDef = determineParserOfClassDef();
 		// return text if we cannot linkify the class name
 		if (! this._pathFilter(parserOfClassDef.getPath())) {
-			return this._escape(classDef.className());
+			return this._escape(classDef.classFullName());
 		}
 		// linkify and return
 		var _ = "";
-?<a href="<?= this._escape(parserOfClassDef.getPath()) ?>.html#class-<?= this._escape(classDef.className()) ?>"><?= this._escape(classDef.className()) ?></a>
+?<a href="<?= this._escape(parserOfClassDef.getPath()) ?>.html#class-<?= this._escape(classDef.classFullName()) ?>"><?= this._escape(classDef.classFullName()) ?></a>
 		_ = _.trim();
 		this._classDefToHTMLCache.set(classDef, _);
 		return _;
@@ -547,11 +580,11 @@ class DocumentGenerator {
 	}
 
 	function _isPrivate (classDef : ClassDefinition) : boolean {
-		return classDef.className().charAt(0) == "_";
+		return classDef.className().charAt(0) == "_" || (classDef.getDocComment() && classDef.getDocComment().getTagByName('private'));
 	}
 
 	function _isPrivate (memberDef : MemberDefinition) : boolean {
-		return memberDef.name().charAt(0) == "_";
+		return memberDef.name().charAt(0) == "_" || (memberDef.getDocComment() && memberDef.getDocComment().getTagByName('private')) || (memberDef.flags() & ClassDefinition.IS_GENERATED) != 0;
 	}
 
 	function _name(name : string) : string {

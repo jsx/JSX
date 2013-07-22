@@ -23,11 +23,8 @@
 /***
  * <p>Unit Test Framework for JSX</p>
  *
- * @author DeNA., Co., Ltd.
- * @version 1.0.0
- */
-
-/* SYNOPSIS
+<h2>SYNOPSIS</h2>
+<pre><code class="language-jsx">
 import "test-case.jsx";
 import "timer.jsx";
 
@@ -36,7 +33,7 @@ class _Test extends TestCase {
 	// synchrounous tests
 
 	function testClearTimeout() : void {
-		var id = Timer.setTimeout(function() : void {
+		var id = Timer.setTimeout(() -> {
 			this.fail("setTimeout called after clearTimeout");
 		}, 1);
 		Timer.clearTimeout(id);
@@ -47,10 +44,10 @@ class _Test extends TestCase {
 	// asynchronous tests
 
 	function testSetTimeout() : void {
-		this.async(function(async : AsyncContext) : void {
+		this.async((async) -> {
 			var to = 200;
 			var t0 = Date.now();
-			Timer.setTimeout(function() : void {
+			Timer.setTimeout(() -> {
 				var t1 = Date.now();
 
 				this.expect(t1 - t0, "setTimeout 200 ms.").toBeGE(to - 50);
@@ -59,8 +56,11 @@ class _Test extends TestCase {
 			}, to);
 		}, 1000);
 	}
-}
-*/
+}</code></pre>
+
+ * @author DeNA., Co., Ltd.
+ * @version 1.0.0
+ */
 
 import "timer.jsx";
 import "console.jsx";
@@ -410,7 +410,7 @@ class TestCase {
 	}
 
 	/**
-	 * Test Assertion Executor
+	 * Executes Assertion Executor, created by <code>TestCase#expect()</code>
 	 */
 	class Matcher {
 
@@ -418,12 +418,10 @@ class TestCase {
 		var _got  : variant;
 		var _name : Nullable.<string>;
 
-		function constructor(test : TestCase, got : variant) {
-			this._test = test;
-			this._got  = got;
-		}
-
-		function constructor(test : TestCase, got : variant, name : string) {
+		/**
+		 * @private
+		 */
+		function constructor(test : TestCase, got : variant, name : Nullable.<string> = null) {
 			this._test = test;
 			this._got  = got;
 			this._name = name;
@@ -508,6 +506,9 @@ class TestCase {
 
 	}
 
+	/**
+	 * @private
+	 */
 	class Failure extends Error {
 		function constructor(reason : string) {
 			super(reason);
