@@ -1769,8 +1769,8 @@ class CodeTransformer {
 	}
 
 	function performTransformation () : void {
-		// transform all functions
 		if (this._forceTransform) {
+			// transform all functions
 			this._compiler.forEachClassDef(function (parser, classDef) {
 				return classDef.forEachMember(function onMember(member) {
 					if (member instanceof MemberFunctionDefinition) {
