@@ -750,7 +750,7 @@ a | function ($a) { var $C = C; return $a ? b | $C : c | $C; }
 			new Token("function", false),
 			null,	// name
 			ClassDefinition.IS_STATIC,
-			Type.voidType,
+			this._transformer.getReturnType(),
 			[ argVar ],
 			[ contVar ],
 			[],	// statements
@@ -2010,6 +2010,12 @@ class CodeTransformer {
 		});
 	}
 
+	var _returnType : Type = null;
+
+	function getReturnType () : Type {
+		return this._returnType;
+	}
+
 	function _doCPSTransform (funcDef : MemberFunctionDefinition, transformOnlyStmts : boolean, postFragmentationCallback : (string, Statement[]) -> void) : void {
 		var returnLocal : LocalVariable = null;
 
@@ -2024,10 +2030,10 @@ class CodeTransformer {
 			}
 		}
 
-		var returnType = funcDef.getReturnType();
-		if (! Type.voidType.equals(returnType)) {
+		this._returnType = funcDef.getReturnType();
+		if (! Type.voidType.equals(this._returnType)) {
 			var returnLocalName = "$return" + CodeTransformer._getFunctionNestDepth(funcDef) as string;
-			returnLocal = new LocalVariable(new Token(returnLocalName, false), returnType);
+			returnLocal = new LocalVariable(new Token(returnLocalName, false), this._returnType);
 			funcDef.getLocals().push(returnLocal);
 			this.enterFunction(returnLocal);
 		}
@@ -2049,7 +2055,7 @@ class CodeTransformer {
 		);
 		funcDef._statements = statements;
 
-		if (! Type.voidType.equals(returnType)) {
+		if (! Type.voidType.equals(this._returnType)) {
 			funcDef._statements.push(new ReturnStatement(new Token("return", false), new LocalExpression(returnLocal.getName(), returnLocal)));
 			this.leaveFunction();
 		}
@@ -2118,7 +2124,7 @@ class CodeTransformer {
 						new Token("function", false),
 						null, // name
 						ClassDefinition.IS_STATIC,
-						Type.voidType,
+						this._returnType,
 						[],   // args
 						[],   // locals
 						body,
@@ -2180,7 +2186,7 @@ class CodeTransformer {
 								new LocalExpression(new Token(genLocalName, false), genLocal),
 								new Token("__next", true),
 								[],
-								new StaticFunctionType(null, Type.voidType, [], true)),
+								new StaticFunctionType(null, this._returnType, [], true)),
 							((statements[idx + 1] as ReturnStatement).getExpr()as CallExpression).getExpr())));
 			}
 		});
@@ -2213,7 +2219,7 @@ class CodeTransformer {
 						new LocalExpression(new Token(genLocalName, false), genLocal),
 						new Token("__next", true),
 						[],
-						new StaticFunctionType(null, Type.voidType, [], true)),
+						new StaticFunctionType(null, this._returnType, [], true)),
 					new LocalExpression(
 						new Token("$BEGIN", true),
 						(((statements[statements.length - 1] as ReturnStatement).getExpr() as CallExpression).getExpr() as LocalExpression).getLocal()))));
