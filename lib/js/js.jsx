@@ -48,4 +48,4 @@ final native class js {
 	 */
 	static function eval(jsSource : string) : variant;
 
-} = "(function () { var global = (function () { return this }()); return { global: global, eval: global.eval, invoke: function(invocant, methodName, args) { return invocant[methodName].apply(invocant, args); } }; }())";
+} = "(function () { var global = (function () { return this; }()); return { global: global, eval: global.eval, invoke: function(invocant, methodName, args) { return invocant[methodName].apply(invocant, args); } }; }())";
