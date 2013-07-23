@@ -2723,7 +2723,7 @@ class _InlineOptimizeCommand extends _FunctionOptimizeCommand {
 			expr.forEachExpression(onExpr);
 			if (expr instanceof CallExpression) {
 				var callExpr = expr as CallExpression;
-				var argsAndThis = this._getArgsAndThisIfCallExprIsInlineable(callExpr, true);
+				var argsAndThis = this._getArgsAndThisIfCallExprIsInlineable(callExpr);
 				if (argsAndThis != null) {
 					if (this._expandCallAsExpression(funcDef, expr, argsAndThis, replaceCb)) {
 						altered = true;
@@ -2776,7 +2776,7 @@ class _InlineOptimizeCommand extends _FunctionOptimizeCommand {
 		if (expr instanceof CallExpression) {
 
 			// inline if the entire statement is a single call expression
-			var args = this._getArgsAndThisIfCallExprIsInlineable(expr as CallExpression, false);
+			var args = this._getArgsAndThisIfCallExprIsInlineable(expr as CallExpression);
 			if (args != null) {
 				stmtIndex = this._expandCallingFunction(funcDef, statements, stmtIndex, _DetermineCalleeCommand.getCallingFuncDef(expr), args);
 				cb(stmtIndex);
@@ -2788,7 +2788,7 @@ class _InlineOptimizeCommand extends _FunctionOptimizeCommand {
 			&& (expr as AssignmentExpression).getSecondExpr() instanceof CallExpression) {
 
 			// inline if the statement is an assignment of a single call expression into a local variable
-			var args = this._getArgsAndThisIfCallExprIsInlineable((expr as AssignmentExpression).getSecondExpr() as CallExpression, false);
+			var args = this._getArgsAndThisIfCallExprIsInlineable((expr as AssignmentExpression).getSecondExpr() as CallExpression);
 			if (args != null) {
 				stmtIndex = this._expandCallingFunction(funcDef, statements, stmtIndex, _DetermineCalleeCommand.getCallingFuncDef((expr as AssignmentExpression).getSecondExpr() as CallExpression), args);
 				var stmt = statements[stmtIndex - 1];
@@ -2834,7 +2834,7 @@ class _InlineOptimizeCommand extends _FunctionOptimizeCommand {
 		return false;
 	}
 
-	function _getArgsAndThisIfCallExprIsInlineable (callExpr : CallExpression, asExpression : boolean) : Expression[] {
+	function _getArgsAndThisIfCallExprIsInlineable (callExpr : CallExpression) : Expression[] {
 		// determine the function that will be called
 		var callingFuncDef = _DetermineCalleeCommand.getCallingFuncDef(callExpr);
 		if (callingFuncDef == null)
@@ -2852,23 +2852,6 @@ class _InlineOptimizeCommand extends _FunctionOptimizeCommand {
 		// check that the function may be inlined
 		if (! this._functionIsInlineable(callingFuncDef))
 			return null;
-		// FIXME we could handle statements.length == 0 as well
-		if (asExpression) {
-			if (callingFuncDef.getStatements().length != 1)
-				return null;
-			if (callingFuncDef.getLocals().length != 0)
-				return null;
-			var modifiesArgs = ! Util.forEachStatement(function onStatement(statement : Statement) : boolean {
-				var onExpr = function onExpr(expr : Expression) : boolean {
-					if (expr instanceof AssignmentExpression && (expr as AssignmentExpression).getFirstExpr() instanceof LocalExpression)
-						return false;
-					return expr.forEachExpression(onExpr);
-				};
-				return statement.forEachExpression(onExpr);
-			}, callingFuncDef.getStatements());
-			if (modifiesArgs)
-				return null;
-		}
 		// and the args passed can be inlined (types should match exactly (or emitters may insert additional code))
 		if (! this._argsAreInlineable(callingFuncDef, callExpr.getArguments()))
 			return null;
@@ -3044,7 +3027,23 @@ class _InlineOptimizeCommand extends _FunctionOptimizeCommand {
 
 	function _expandCallAsExpression(funcDef : MemberFunctionDefinition, expr : Expression, argsAndThis : Expression[], replaceCb : (Expression) -> void) : boolean {
 		var callingFuncDef = _DetermineCalleeCommand.getCallingFuncDef(expr);
-		this.log("expanding " + callingFuncDef.getNotation() + " as expression");
+
+		// check if it can be expanded as an expression
+		if (callingFuncDef.getStatements().length != 1)
+			return false;
+		if (callingFuncDef.getLocals().length != 0)
+			return false;
+		var modifiesArgs = ! Util.forEachStatement(function onStatement(statement : Statement) : boolean {
+			var onExpr = function onExpr(expr : Expression) : boolean {
+				if (expr instanceof AssignmentExpression && (expr as AssignmentExpression).getFirstExpr() instanceof LocalExpression)
+					return false;
+				return expr.forEachExpression(onExpr);
+			};
+			return statement.forEachExpression(onExpr);
+		}, callingFuncDef.getStatements());
+		if (modifiesArgs)
+			return false;
+
 		// TODO: compine expression statements into single statement with CommaExpression
 		var stmt = callingFuncDef.getStatements()[0];
 		if (stmt instanceof ExpressionStatement) {
@@ -3054,6 +3053,7 @@ class _InlineOptimizeCommand extends _FunctionOptimizeCommand {
 		} else {
 			return false;
 		}
+		this.log("expanding " + callingFuncDef.getNotation() + " as expression");
 
 		// setup args (arg0 = arg0expr, arg1 = arg1expr, ...)
 		//   for non-leaf expressions used more than once
