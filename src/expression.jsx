@@ -1265,7 +1265,20 @@ class PropertyExpression extends UnaryExpression {
 			this._typeArgs,
 			this._expr.isClassSpecifier() ? ClassDefinition.GET_MEMBER_MODE_CLASS_ONLY : ClassDefinition.GET_MEMBER_MODE_ALL);
 		if (this._type == null) {
-			context.errors.push(new CompileError(this._identifierToken, "'" + exprType.toString() + "' does not have a property or inner class named '" + this._identifierToken.getValue() + "'"));
+			var error = new CompileError(this._identifierToken, "'" + exprType.toString() + "' does not have a property or inner class named '" + this._identifierToken.getValue() + "'");
+			// add candidate members as notes
+			classDef.forEachClassToBase((classDef) -> {
+				return classDef.forEachMember((member) -> {
+					if (Util.ld(member.name(), this._identifierToken.getValue()) < 2) {
+						error.addCompileNote(new CompileNote(member.getNameToken(), "candidates: " + member.getNotation()));
+						if (error.getCompileNotes().length > 3) {
+							return false;
+						}
+					}
+					return true;
+				});
+			});
+			context.errors.push(error);
 			return false;
 		}
 		return true;

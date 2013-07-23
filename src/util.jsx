@@ -91,6 +91,33 @@ class Util {
 		});
 	}
 
+	/**
+	 * Calculates Levenshtein Distance of two strings
+	 */
+	static function ld(a : string, b : string) : number {
+		var m = new number[][];
+
+		for (var i = 0; i <= a.length; ++i) {
+			m[i] = [i];
+		}
+		for (var j = 0; j <= b.length; ++j) {
+			m[0][j] = j;
+		}
+
+		for (var i = 1; i <= a.length; ++i) {
+			for (var j = 1; j <= b.length; ++j) {
+				var diff = a.charCodeAt(i-1) == b.charCodeAt(j-1) ? 0 : 1;
+				m[i][j] = Math.min(
+						m[i - 1][j - 1] + diff,
+						m[i - 1][j    ] + 1,
+						m[i    ][j - 1] + 1
+				);
+			}
+		}
+		var x = m[m.length - 1];
+		return x[x.length - 1];
+	}
+
 	static const _builtInContainer = Util.asSet([
 		"Array", "Map",
 		"Int8Array", "Uint8Array", "Uint8ClampedArray",
