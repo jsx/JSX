@@ -47,4 +47,5 @@ final native class js {
 	 * Evaluates JavaScript source code
 	 */
 	static function eval(jsSource : string) : variant;
-}
+
+} = "(function () { var global = (function () { return this }()); return { global: global, eval: global.eval, invoke: function(invocant, methodName, args) { return invocant[methodName].apply(invocant, args); } }; }())";

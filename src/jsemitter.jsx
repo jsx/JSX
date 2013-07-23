@@ -3039,11 +3039,6 @@ class JavaScriptEmitter implements Emitter {
 	}
 
 	function _emitStaticInitializationCode (classDef : ClassDefinition) : void {
-		// special handling for js.jsx
-		if (this.isJsModule(classDef)) {
-			this._emit("var js = { global: function () { return this; }() };\n", null);
-			return;
-		}
 		if ((classDef.flags() & ClassDefinition.IS_NATIVE) != 0)
 			return;
 		// normal handling
