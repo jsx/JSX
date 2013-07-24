@@ -2337,7 +2337,7 @@ class _DeadCodeEliminationOptimizeCommand extends _FunctionOptimizeCommand {
 		var localsUntouchable = new TypedMap.<LocalVariable,boolean>;
 		var locals = new TypedMap.<LocalVariable,Expression>;
 		// mark the locals that uses op= (cannot be eliminated by the algorithm applied laterwards)
-		var _onExpr = function (expr : Expression) : boolean {
+		Util.forEachExpression(function onExpr(expr : Expression) : boolean {
 			if (expr instanceof AssignmentExpression
 			    && (expr as AssignmentExpression).getToken().getValue() != "="
 				&& (expr as AssignmentExpression).getFirstExpr() instanceof LocalExpression) {
@@ -2350,11 +2350,10 @@ class _DeadCodeEliminationOptimizeCommand extends _FunctionOptimizeCommand {
 					this.log("local variable " + local.getName().getValue() + " cannot be rewritten (has increment)");
 					localsUntouchable.set(local, true);
 				}
-			return expr.forEachExpression(_onExpr);
-		};
-		Util.forEachExpression(_onExpr, exprs);
+			return expr.forEachExpression(onExpr);
+		}, exprs);
 		// rewrite the locals
-		var onExpr = function (expr : Expression, replaceCb : function(:Expression):void) : boolean {
+		Util.forEachExpression(function onExpr(expr : Expression, replaceCb : function(:Expression):void) : boolean {
 			if (expr instanceof AssignmentExpression) {
 				var assignmentExpr = expr as AssignmentExpression;
 				if (assignmentExpr.getFirstExpr() instanceof LocalExpression) {
@@ -2364,13 +2363,13 @@ class _DeadCodeEliminationOptimizeCommand extends _FunctionOptimizeCommand {
 					if (! localsUntouchable.get((assignmentExpr.getFirstExpr() as LocalExpression).getLocal())
 						&& (assignmentExpr.getFirstExpr() as LocalExpression).getType().equals(assignmentExpr.getSecondExpr().getType())) {
 							var lhsLocal = (assignmentExpr.getFirstExpr() as LocalExpression).getLocal();
-							this.log("resetting cache for: " + lhsLocal.getName().getValue());
+							this.log("resetting cache for: " + lhsLocal.getName().getNotation());
 							locals.reversedForEach(function(local, expr) {
 								if (local == lhsLocal) {
 									this.log("  clearing itself");
 									locals.delete(local);
 								} else if (expr instanceof LocalExpression && (expr as LocalExpression).getLocal() == lhsLocal) {
-									this.log("  clearing " + local.getName().getValue());
+									this.log("  clearing " + local.getName().getNotation());
 									locals.delete(local);
 								}
 								return true;
@@ -2380,14 +2379,14 @@ class _DeadCodeEliminationOptimizeCommand extends _FunctionOptimizeCommand {
 								if (rhsExpr instanceof LocalExpression) {
 									var rhsLocal = (rhsExpr as LocalExpression).getLocal();
 									if (lhsLocal != rhsLocal && ! localsUntouchable.get(rhsLocal)) {
-										this.log("  set to: " + rhsLocal.getName().getValue());
+										this.log("  set to: " + rhsLocal.getName().getNotation());
 										locals.set(lhsLocal, rhsExpr);
 									}
 								} else if (rhsExpr instanceof NullExpression
 									   || rhsExpr instanceof NumberLiteralExpression
 									   || rhsExpr instanceof IntegerLiteralExpression
 									   || rhsExpr instanceof StringLiteralExpression) {
-									this.log("  set to: " + rhsExpr.getToken().getValue());
+									this.log("  set to: " + rhsExpr.getToken().getNotation());
 									locals.set(lhsLocal, rhsExpr);
 								}
 							}
@@ -2417,8 +2416,7 @@ class _DeadCodeEliminationOptimizeCommand extends _FunctionOptimizeCommand {
 				return true;
 			}
 			return expr.forEachExpression(onExpr);
-		};
-		Util.forEachExpression(onExpr, exprs);
+		}, exprs);
 	}
 
 	function _eliminateDeadStores (funcDef : MemberFunctionDefinition, exprs : Expression[]) : void {
