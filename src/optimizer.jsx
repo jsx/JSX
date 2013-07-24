@@ -2443,30 +2443,16 @@ class _DeadCodeEliminationOptimizeCommand extends _FunctionOptimizeCommand {
 				}
 			} else if (expr instanceof LocalExpression) {
 				lastAssignExpr.delete((expr as LocalExpression).getLocal());
-			} else if (expr instanceof CallExpression) {
-				onExpr((expr as CallExpression).getExpr(), function (callExpr : CallExpression) : function(:Expression):void {
-					return function (expr) {
-						callExpr.setExpr(expr);
-					};
-				}(expr as CallExpression));
-				Util.forEachExpression(onExpr, (expr as CallExpression).getArguments());
-				var callingFuncDef = _DetermineCalleeCommand.getCallingFuncDef(expr);
-				if (callingFuncDef != null && (callingFuncDef.flags() & ClassDefinition.IS_PURE) != 0) {
-					// ok
-				} else {
-					lastAssignExpr.clear();
-				}
-				return true;
-			} else if (expr instanceof NewExpression) {
-				Util.forEachExpression(onExpr, (expr as NewExpression).getArguments());
-				lastAssignExpr.clear();
-				return true;
 			} else if (expr instanceof LogicalExpression || expr instanceof ConditionalExpression) {
 				expr.forEachExpression(function (expr, rewriteCb) {
 					var result = onExpr(expr, rewriteCb);
 					lastAssignExpr.clear();
 					return result;
 				});
+				return true;
+			} else if (_Util.exprHasSideEffects(expr)) {
+				expr.forEachExpression(onExpr);
+				lastAssignExpr.clear();
 				return true;
 			}
 			return expr.forEachExpression(onExpr);
