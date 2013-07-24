@@ -3025,27 +3025,48 @@ class _InlineOptimizeCommand extends _FunctionOptimizeCommand {
 		return stmtIndex;
 	}
 
-	function _expandCallAsExpression(funcDef : MemberFunctionDefinition, expr : Expression, argsAndThis : Expression[], replaceCb : (Expression) -> void) : boolean {
+	function _expandCallAsExpression(funcDef : MemberFunctionDefinition, expr : Expression, argsAndThisAndLocals : Expression[], replaceCb : (Expression) -> void) : boolean {
 		var callingFuncDef = _DetermineCalleeCommand.getCallingFuncDef(expr);
 
-		// check if it can be expanded as an expression
-		if (callingFuncDef.getStatements().length != 1)
+		var statements = callingFuncDef.getStatements();
+		if (statements.length == 0) {
 			return false;
-		if (callingFuncDef.getLocals().length != 0)
-			return false;
-		var modifiesArgs = ! Util.forEachStatement(function onStatement(statement : Statement) : boolean {
-			var onExpr = function onExpr(expr : Expression) : boolean {
-				if (expr instanceof AssignmentExpression && (expr as AssignmentExpression).getFirstExpr() instanceof LocalExpression)
-					return false;
-				return expr.forEachExpression(onExpr);
-			};
-			return statement.forEachExpression(onExpr);
-		}, callingFuncDef.getStatements());
-		if (modifiesArgs)
-			return false;
+		}
+		else if (statements.length != 1) {
+			statements = statements.concat([]); // clone
 
-		// TODO: compine expression statements into single statement with CommaExpression
-		var stmt = callingFuncDef.getStatements()[0];
+			if (statements[statements.length - 1] instanceof ReturnStatement) {
+				var returnStatement = statements.pop() as ReturnStatement;
+				if (returnStatement.getExpr() == null) {
+					returnStatement = null;
+				}
+			}
+			else {
+				returnStatement = null;
+			}
+			for (var i = 0; i < statements.length; ++i ) {
+				if (!( statements[i] instanceof ExpressionStatement)) {
+					return false;
+				}
+			}
+
+			var singleExpr = statements.reduce.<Expression>((prevExpr, stmt) -> {
+				return prevExpr == null
+					? (stmt as ExpressionStatement).getExpr()
+					: new CommaExpression(new Token(","), prevExpr, (stmt as ExpressionStatement).getExpr());
+			}, null);
+			if (returnStatement) {
+				singleExpr = new CommaExpression(new Token(","),
+						singleExpr,
+						returnStatement.getExpr());
+				statements.splice(0, statements.length, new ReturnStatement(new Token("return"), singleExpr));
+			}
+			else {
+				statements.splice(0, statements.length, new ExpressionStatement(singleExpr));
+			}
+		}
+
+		var stmt = statements[0];
 		if (stmt instanceof ExpressionStatement) {
 			var expr = (stmt as ExpressionStatement).getExpr();
 		} else if (stmt instanceof ReturnStatement) {
@@ -3060,7 +3081,7 @@ class _InlineOptimizeCommand extends _FunctionOptimizeCommand {
 		var argUsed = this._countNumberOfArgsUsed(callingFuncDef);
 		var setupArgs = null : Expression;
 
-		this._createVarsAndInit(funcDef, callingFuncDef, argsAndThis, (expr) -> {
+		this._createVarsAndInit(funcDef, callingFuncDef, argsAndThisAndLocals, (expr) -> {
 			if (setupArgs == null) {
 				setupArgs = expr;
 			}
@@ -3075,7 +3096,7 @@ class _InlineOptimizeCommand extends _FunctionOptimizeCommand {
 		this._rewriteExpression(
 			clonedExpr,
 			function (expr) { clonedExpr = expr; },
-			argsAndThis,
+			argsAndThisAndLocals,
 			callingFuncDef);
 
 		if (setupArgs != null) {
