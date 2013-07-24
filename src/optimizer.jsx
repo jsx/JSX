@@ -2382,10 +2382,7 @@ class _DeadCodeEliminationOptimizeCommand extends _FunctionOptimizeCommand {
 										this.log("  set to: " + rhsLocal.getName().getNotation());
 										locals.set(lhsLocal, rhsExpr);
 									}
-								} else if (rhsExpr instanceof NullExpression
-									   || rhsExpr instanceof NumberLiteralExpression
-									   || rhsExpr instanceof IntegerLiteralExpression
-									   || rhsExpr instanceof StringLiteralExpression) {
+								} else if (rhsExpr instanceof LeafExpression) {
 									this.log("  set to: " + rhsExpr.getToken().getNotation());
 									locals.set(lhsLocal, rhsExpr);
 								}
