@@ -2301,21 +2301,22 @@ class _DeadCodeEliminationOptimizeCommand extends _FunctionOptimizeCommand {
 			statement.forEachExpression(function onExpr(expr : Expression) : boolean {
 				if (expr instanceof AssignmentExpression
 				    && (expr as AssignmentExpression).getFirstExpr() instanceof LocalExpression
-					&& (expr as AssignmentExpression).getFirstExpr().getType().equals((expr as AssignmentExpression).getSecondExpr().getType())) {
-						// skip lhs of assignment to local that has no effect
-						return onExpr((expr as AssignmentExpression).getSecondExpr());
-					} else if (expr instanceof LocalExpression) {
-						for (var i = 0; i < locals.length; ++i) {
-							if (locals[i] == (expr as LocalExpression).getLocal()) {
-								break;
-							}
+					&& (expr as AssignmentExpression).getFirstExpr().getType().equals((expr as AssignmentExpression).getSecondExpr().getType())
+				) {
+					// skip lhs of assignment to local that has no effect
+					return onExpr((expr as AssignmentExpression).getSecondExpr());
+				} else if (expr instanceof LocalExpression) {
+					for (var i = 0; i < locals.length; ++i) {
+						if (locals[i] == (expr as LocalExpression).getLocal()) {
+							break;
 						}
-						if (i != locals.length) {
-							localsUsed[i] = true;
-						}
-					} else if (expr instanceof FunctionExpression) {
-						(expr as FunctionExpression).getFuncDef().forEachStatement(onStatement);
 					}
+					if (i != locals.length) {
+						localsUsed[i] = true;
+					}
+				} else if (expr instanceof FunctionExpression) {
+					(expr as FunctionExpression).getFuncDef().forEachStatement(onStatement);
+				}
 				return expr.forEachExpression(onExpr);
 			});
 			return statement.forEachStatement(onStatement);
@@ -2341,17 +2342,18 @@ class _DeadCodeEliminationOptimizeCommand extends _FunctionOptimizeCommand {
 				statement.forEachExpression(function onExpr(expr : Expression, replaceCb : function(:Expression):void) : boolean {
 					if (expr instanceof AssignmentExpression
 					    && (expr as AssignmentExpression).getFirstExpr() instanceof LocalExpression
-						&& ((expr as AssignmentExpression).getFirstExpr() as LocalExpression).getLocal() == locals[localIndex]) {
-							this.log("removing assignment to " + locals[localIndex].getName().getNotation());
-							var rhsExpr = (expr as AssignmentExpression).getSecondExpr();
-							replaceCb(rhsExpr);
-							shouldRetry = true;
-							return onExpr(rhsExpr, null);
-						} else if (expr instanceof LocalExpression && (expr as LocalExpression).getLocal() == locals[localIndex]) {
-							throw new Error("logic flaw, found a variable going to be removed being used");
-						} else if (expr instanceof FunctionExpression) {
-							(expr as FunctionExpression).getFuncDef().forEachStatement(onStatement);
-						}
+						&& ((expr as AssignmentExpression).getFirstExpr() as LocalExpression).getLocal() == locals[localIndex]
+					) {
+						this.log("removing assignment to " + locals[localIndex].getName().getNotation());
+						var rhsExpr = (expr as AssignmentExpression).getSecondExpr();
+						replaceCb(rhsExpr);
+						shouldRetry = true;
+						return onExpr(rhsExpr, null);
+					} else if (expr instanceof LocalExpression && (expr as LocalExpression).getLocal() == locals[localIndex]) {
+						throw new Error("logic flaw, found a variable going to be removed being used");
+					} else if (expr instanceof FunctionExpression) {
+						(expr as FunctionExpression).getFuncDef().forEachStatement(onStatement);
+					}
 					return expr.forEachExpression(onExpr);
 				});
 				return statement.forEachStatement(onStatement);
@@ -2392,32 +2394,32 @@ class _DeadCodeEliminationOptimizeCommand extends _FunctionOptimizeCommand {
 					});
 					if (! localsUntouchable.get((assignmentExpr.getFirstExpr() as LocalExpression).getLocal())
 						&& (assignmentExpr.getFirstExpr() as LocalExpression).getType().equals(assignmentExpr.getSecondExpr().getType())) {
-							var lhsLocal = (assignmentExpr.getFirstExpr() as LocalExpression).getLocal();
-							this.log("resetting cache for: " + lhsLocal.getName().getNotation());
-							locals.reversedForEach(function(local, expr) {
-								if (local == lhsLocal) {
-									this.log("  clearing itself");
-									locals.delete(local);
-								} else if (expr instanceof LocalExpression && (expr as LocalExpression).getLocal() == lhsLocal) {
-									this.log("  clearing " + local.getName().getNotation());
-									locals.delete(local);
-								}
-								return true;
-							});
-							if (assignmentExpr.getToken().getValue() == "=") {
-								var rhsExpr = assignmentExpr.getSecondExpr();
-								if (rhsExpr instanceof LocalExpression) {
-									var rhsLocal = (rhsExpr as LocalExpression).getLocal();
-									if (lhsLocal != rhsLocal && ! localsUntouchable.get(rhsLocal)) {
-										this.log("  set to: " + rhsLocal.getName().getNotation());
-										locals.set(lhsLocal, rhsExpr);
-									}
-								} else if (rhsExpr instanceof LeafExpression) {
-									this.log("  set to: " + rhsExpr.getToken().getNotation());
+						var lhsLocal = (assignmentExpr.getFirstExpr() as LocalExpression).getLocal();
+						this.log("resetting cache for: " + lhsLocal.getName().getNotation());
+						locals.reversedForEach(function(local, expr) {
+							if (local == lhsLocal) {
+								this.log("  clearing itself");
+								locals.delete(local);
+							} else if (expr instanceof LocalExpression && (expr as LocalExpression).getLocal() == lhsLocal) {
+								this.log("  clearing " + local.getName().getNotation());
+								locals.delete(local);
+							}
+							return true;
+						});
+						if (assignmentExpr.getToken().getValue() == "=") {
+							var rhsExpr = assignmentExpr.getSecondExpr();
+							if (rhsExpr instanceof LocalExpression) {
+								var rhsLocal = (rhsExpr as LocalExpression).getLocal();
+								if (lhsLocal != rhsLocal && ! localsUntouchable.get(rhsLocal)) {
+									this.log("  set to: " + rhsLocal.getName().getNotation());
 									locals.set(lhsLocal, rhsExpr);
 								}
+							} else if (rhsExpr instanceof LeafExpression) {
+								this.log("  set to: " + rhsExpr.getToken().getNotation());
+								locals.set(lhsLocal, rhsExpr);
 							}
 						}
+					}
 					return true;
 				}
 			} else if (expr instanceof LocalExpression) {
@@ -2517,26 +2519,26 @@ class _DeadCodeEliminationOptimizeCommand extends _FunctionOptimizeCommand {
 				if (expr.getToken().getValue() == "="
 					&& isFirstLevelPropertyAccess(firstExpr)
 					&& ! _Util.classIsNative((firstExpr as PropertyExpression).getExpr().getType().getClassDef())) {
-						var propertyName = (firstExpr as PropertyExpression).getIdentifierToken().getValue();
-						onExpr(assignmentExpr.getSecondExpr(), null);
-						if (lastAssignExpr[propertyName]
-								&& lastAssignExpr[propertyName].second != null
-								&& baseExprsAreEqual((firstExpr as PropertyExpression).getExpr(), (lastAssignExpr[propertyName].first.getFirstExpr() as PropertyExpression).getExpr())) {
-							lastAssignExpr[propertyName].second(lastAssignExpr[propertyName].first.getSecondExpr());
-						}
-						lastAssignExpr[propertyName] = new Pair.<AssignmentExpression, function(:Expression):void>(assignmentExpr, rewriteCb);
-						return true;
-					} else if (assignmentExpr.getFirstExpr() instanceof LocalExpression) {
-						onExpr(assignmentExpr.getSecondExpr(), null);
-						for (var k in lastAssignExpr) {
-							var baseExpr = (lastAssignExpr[k].first.getFirstExpr() as PropertyExpression).getExpr();
-							if (baseExpr instanceof LocalExpression
-							    && (baseExpr as LocalExpression).getLocal() == ((expr as AssignmentExpression).getFirstExpr() as LocalExpression).getLocal()) {
-								delete lastAssignExpr[k];
-							}
-						}
-						return true;
+					var propertyName = (firstExpr as PropertyExpression).getIdentifierToken().getValue();
+					onExpr(assignmentExpr.getSecondExpr(), null);
+					if (lastAssignExpr[propertyName]
+							&& lastAssignExpr[propertyName].second != null
+							&& baseExprsAreEqual((firstExpr as PropertyExpression).getExpr(), (lastAssignExpr[propertyName].first.getFirstExpr() as PropertyExpression).getExpr())) {
+						lastAssignExpr[propertyName].second(lastAssignExpr[propertyName].first.getSecondExpr());
 					}
+					lastAssignExpr[propertyName] = new Pair.<AssignmentExpression, function(:Expression):void>(assignmentExpr, rewriteCb);
+					return true;
+				} else if (assignmentExpr.getFirstExpr() instanceof LocalExpression) {
+					onExpr(assignmentExpr.getSecondExpr(), null);
+					for (var k in lastAssignExpr) {
+						var baseExpr = (lastAssignExpr[k].first.getFirstExpr() as PropertyExpression).getExpr();
+						if (baseExpr instanceof LocalExpression
+							&& (baseExpr as LocalExpression).getLocal() == ((expr as AssignmentExpression).getFirstExpr() as LocalExpression).getLocal()) {
+							delete lastAssignExpr[k];
+						}
+					}
+					return true;
+				}
 			} else if (isFirstLevelPropertyAccess(expr)) {
 				var propertyName = (expr as PropertyExpression).getIdentifierToken().getValue();
 				delete lastAssignExpr[propertyName];
