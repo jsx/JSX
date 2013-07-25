@@ -3984,47 +3984,18 @@ class _NoDebugCommand extends _OptimizeCommand {
 class _TailRecursionOptimizeCommand extends _FunctionOptimizeCommand {
 	static const IDENTIFIER = "tail-rec";
 
-	class Stash extends Stash {
-		override function clone () : Stash {
-			return new _TailRecursionOptimizeCommand.Stash;
-		}
-	}
+	static const LABEL = "$TAIL_REC";
 
 	function constructor() {
 		super(_TailRecursionOptimizeCommand.IDENTIFIER);
 	}
 
-	override function _createStash () : _TailRecursionOptimizeCommand.Stash {
-		return new _TailRecursionOptimizeCommand.Stash();
-	}
-
-	function _isTailCall(funcDef : MemberFunctionDefinition, statement : Statement) : boolean {
-		if (statement instanceof ReturnStatement) {
-			var returnStatement = statement as ReturnStatement;
-			if (returnStatement.getExpr() != null && returnStatement.getExpr() instanceof CallExpression)  {
-				return funcDef == _DetermineCalleeCommand.getCallingFuncDef(returnStatement.getExpr());
-			}
-		}
-		return false;
-	}
-
 	override function optimizeFunction(funcDef : MemberFunctionDefinition) : boolean {
-		if ((funcDef.flags() & (ClassDefinition.IS_OVERRIDE | ClassDefinition.IS_ABSTRACT | ClassDefinition.IS_FINAL | ClassDefinition.IS_NATIVE)) != ClassDefinition.IS_FINAL) {
+		if ((funcDef.flags() & (ClassDefinition.IS_OVERRIDE | ClassDefinition.IS_ABSTRACT | ClassDefinition.IS_NATIVE | ClassDefinition.IS_STATIC | ClassDefinition.IS_FINAL)) == 0) {
 			return false;
 		}
-
-		funcDef.forEachStatement(function onStatement(statement) {
-			if (this._isTailCall(funcDef, statement)) {
-				this._transformTailCall(funcDef);
-			}
-			return statement.forEachStatement(onStatement);
-		});
-		return true;
-	}
-
-	function _transformTailCall(funcDef : MemberFunctionDefinition) : void {
-		this.log("transform " + funcDef.getNotation());
-
+		// transform tail recursion into:
+		//
 		// function f(arg1, arg2, arg3) {
 		//   $TAIL_REC: while (true) {
 		//     body;
@@ -4034,28 +4005,38 @@ class _TailRecursionOptimizeCommand extends _FunctionOptimizeCommand {
 		//   }
 		// }
 
+		var altered = false;
 		var statements = funcDef.getStatements();
-		this._handleStatements(funcDef, statements);
+		(function onStatements(statements : Statement[]) : boolean {
+			for (var i = 0; i < statements.length; ++i) {
+				if (this._isTailCall(funcDef, statements[i])) {
+					this._replaceTailCallStatement(funcDef, statements, i);
+					altered = true;
+				}
+				statements[i].handleStatements(onStatements);
+			}
+			return true;
+		}(statements));
 
-		var body : Statement = new WhileStatement(new Token("while"), new Token("$TAIL_REC"), new BooleanLiteralExpression(new Token("true")), statements);
-		funcDef.setStatements([body]);
+		if (altered) {
+			this.log("transform " + funcDef.getNotation());
+			var body : Statement = new WhileStatement(new Token("while"),
+					new Token(_TailRecursionOptimizeCommand.LABEL),
+					new BooleanLiteralExpression(new Token("true")), statements);
+			funcDef.setStatements([body]);
+		}
+		return true;
 	}
 
-	function _handleStatements(funcDef : MemberFunctionDefinition, statements : Statement[]) : void {
-		for (var i = 0; i < statements.length; ++i) {
-			if (this._isTailCall(funcDef, statements[i])) {
-				this._replaceTailCallStatement(funcDef, statements, i);
-			}
-			else if (statements[i] instanceof SwitchStatement) {
-				var switchStatement = statements[i] as SwitchStatement;
-				this._handleStatements(funcDef, switchStatement.getStatements());
-			}
-			else if (statements[i] instanceof IfStatement) {
-				var ifStatement = statements[i] as IfStatement;
-				this._handleStatements(funcDef, ifStatement.getOnTrueStatements());
-				this._handleStatements(funcDef, ifStatement.getOnFalseStatements());
+	function _isTailCall(funcDef : MemberFunctionDefinition, statement : Statement) : boolean {
+		if (statement instanceof ReturnStatement) {
+			var returnStatement = statement as ReturnStatement;
+			if (returnStatement.getExpr() != null && returnStatement.getExpr() instanceof CallExpression)  {
+				//log (_DetermineCalleeCommand.getCallingFuncDef(returnStatement.getExpr()));
+				return funcDef == _DetermineCalleeCommand.getCallingFuncDef(returnStatement.getExpr());
 			}
 		}
+		return false;
 	}
 
 	function _replaceTailCallStatement(funcDef : MemberFunctionDefinition, statements : Statement[], idx : number) : void {
@@ -4075,7 +4056,8 @@ class _TailRecursionOptimizeCommand extends _FunctionOptimizeCommand {
 				: new CommaExpression(new Token(","), prevExpr, assignToArg);
 		}, null);
 
-		var retry = new ContinueStatement(new Token("continue"), new Token("$TAIL_REC"));
+		var retry = new ContinueStatement(new Token("continue"),
+				new Token(_TailRecursionOptimizeCommand.LABEL));
 		if (setupArgs == null) {
 			statements.splice(idx, 1, retry);
 		}
