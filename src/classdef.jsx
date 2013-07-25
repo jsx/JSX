@@ -240,8 +240,19 @@ class ClassDefinition implements Stashable {
 
 	function forEachMemberFunction (cb : function(:MemberFunctionDefinition):boolean) : boolean {
 		for (var i = 0; i < this._members.length; ++i) {
-			if (this._members[i] instanceof MemberFunctionDefinition) {
-				if (! cb(this._members[i] as MemberFunctionDefinition))
+			var member = this._members[i];
+			if (member instanceof MemberFunctionDefinition && !(member instanceof TemplateFunctionDefinition)) {
+				if (! cb(member as MemberFunctionDefinition))
+					return false;
+			}
+		}
+		return true;
+	}
+
+	function forEachTemplateFunction (cb : function(:TemplateFunctionDefinition):boolean) : boolean {
+		for (var i = 0; i < this._members.length; ++i) {
+			if (this._members[i] instanceof TemplateFunctionDefinition) {
+				if (! cb(this._members[i] as TemplateFunctionDefinition))
 					return false;
 			}
 		}
@@ -313,7 +324,8 @@ class ClassDefinition implements Stashable {
 							if (member instanceof InstantiatedMemberFunctionDefinition) {
 								// skip
 							} else {
-								if (member instanceof TemplateFunctionDefinition) {
+								// explicitly passed type parameters. instantiate the member here
+								if (member instanceof TemplateFunctionDefinition && typeArgs.length != 0) {
 									if ((member = (member as TemplateFunctionDefinition).instantiateTemplateFunction(errors, token, typeArgs)) == null) {
 										return;
 									}
@@ -321,6 +333,7 @@ class ClassDefinition implements Stashable {
 								if ((member as MemberFunctionDefinition).getStatements() != null || mode != ClassDefinition.GET_MEMBER_MODE_FUNCTION_WITH_BODY
 									|| (member.flags() & (ClassDefinition.IS_NATIVE | ClassDefinition.IS_ABSTRACT)) == ClassDefinition.IS_NATIVE) {
 									for (var j = 0; j < types.length; ++j) {
+										// FIXME check types of template functions are equal
 										if (Util.typesAreEqual((member as MemberFunctionDefinition).getArgumentTypes(), (types[j] as ResolvedFunctionType).getArgumentTypes())) {
 											break;
 										}
@@ -1839,10 +1852,10 @@ class MemberFunctionDefinition extends MemberDefinition implements Block {
 		return null;
 	}
 
-	override function getType () : FunctionType {
+	override function getType () : ResolvedFunctionType {
 		return (this._flags & ClassDefinition.IS_STATIC) != 0
-			? (new StaticFunctionType(this._token, this._returnType, this.getArgumentTypes(), false) as FunctionType)
-			: (new MemberFunctionType(this._token, new ObjectType(this._classDef), this._returnType, this.getArgumentTypes(), false) as FunctionType);
+			? new StaticFunctionType(this._token, this._returnType, this.getArgumentTypes(), false)
+			: new MemberFunctionType(this._token, new ObjectType(this._classDef), this._returnType, this.getArgumentTypes(), false);
 	}
 
 	function deductTypeIfUnknown (context : AnalysisContext, type : ResolvedFunctionType) : boolean {
@@ -1921,13 +1934,17 @@ class TemplateFunctionDefinition extends MemberFunctionDefinition implements Tem
 		this._resolvedTypemap = new Map.<Type>;
 	}
 
+	override function getType () : TemplateFunctionType {
+		return new TemplateFunctionType(this._token, this);
+	}
+
 	function getTypeArguments () : Token[] {
 		return this._typeArgs;
 	}
 
 	override function instantiate (instantiationContext : InstantiationContext) : MemberFunctionDefinition {
 		var instantiated = new TemplateFunctionDefinition(
-			this._token, this.getNameToken(), this.flags(), this._typeArgs.concat(new Token[]), this._returnType, this._args.concat(new ArgumentDeclaration[]),
+			this._token, this.getNameToken(), this.flags(), this._typeArgs.concat([]), this._returnType, this._args.concat([]),
 			this._locals, this._statements, this._closures, this._lastTokenOfBody, this._docComment);
 		for (var k in this._resolvedTypemap) {
 			instantiated._resolvedTypemap[k] = this._resolvedTypemap[k];
@@ -1936,6 +1953,96 @@ class TemplateFunctionDefinition extends MemberFunctionDefinition implements Tem
 			instantiated._resolvedTypemap[k] = instantiationContext.typemap[k];
 		}
 		return instantiated;
+	}
+
+	function instantiateByArgumentTypes (errors : CompileError[], token : Token, actualArgTypes : Type[], exact : boolean) : MemberFunctionDefinition {
+		// The TODOs must be done by when user template functions are introduced: report compile errors, inner classes, parameterized classes
+		var typemap = new Map.<Type>;
+		for (var i = 0; i < this._typeArgs.length; ++i) {
+			typemap[this._typeArgs[i].getValue()] = null;
+		}
+		for (var k in this._resolvedTypemap) {
+			typemap[k] = this._resolvedTypemap[k];
+		}
+
+		function unify (formal : Type, actual : Type) : boolean {
+			if (formal instanceof ParsedObjectType) {
+				// TODO enclosing types
+
+				// formal is a type parameter
+				if ((formal as ParsedObjectType).getTypeArguments().length == 0 && typemap.hasOwnProperty((formal as ParsedObjectType).getToken().getValue())) {
+					var expectedType = typemap[(formal as ParsedObjectType).getToken().getValue()];
+					if (expectedType != null) { // already unified, check if arg type is the expected one
+						if (exact && ! expectedType.equals(actual)) {
+							// no need to throw a compile error when exact matching
+							return false;
+						}
+						if (! actual.isConvertibleTo(expectedType)) {
+							errors.push(new CompileError(token, "expected " + expectedType.toString() + ", but got " + actual.toString()));
+							return false;
+						}
+					} else {
+						typemap[(formal as ParsedObjectType).getToken().getValue()] = actual;
+					}
+				} else {
+					// TODO support arbitrary parameterized class
+				}
+			} else if (formal instanceof NullableType) {
+				if (! unify((formal as NullableType).getBaseType(), actual)) {
+					return false;
+				}
+			} else if (formal instanceof StaticFunctionType) {
+				if (! (actual instanceof StaticFunctionType)) {
+					errors.push(new CompileError(token, "expected " + formal.toString() + ", but got " + actual.toString()));
+					return false;
+				}
+				var formalFuncType = formal as StaticFunctionType;
+				var actualFuncType = actual as StaticFunctionType;
+				if (formalFuncType.getArgumentTypes().length != actualFuncType.getArgumentTypes().length) {
+					errors.push(new CompileError(token, "expected " + formal.toString() + ", but got " + actual.toString()));
+					return false;
+				}
+				// unify recursively
+				for (var i = 0; i < formalFuncType.getArgumentTypes().length; ++i) {
+					if (! unify(formalFuncType.getArgumentTypes()[i], actualFuncType.getArgumentTypes()[i]))
+						return false;
+				}
+				if (! unify(formalFuncType.getReturnType(), actualFuncType.getReturnType()))
+					return false;
+			} else { // formal is a primitive type
+				if (exact && ! formal.equals(actual)) {
+					// no need to throw a compile error when exact matching
+					return false;
+				}
+				if (! actual.isConvertibleTo(formal)) {
+					errors.push(new CompileError(token, "expected " + formal.toString() + ", but got " + actual.toString()));
+					return false;
+				}
+			}
+			return true;
+		}
+
+		// infer type parameters from actual arguments
+		var formalArgTypes = this.getArgumentTypes();
+		for (var i = 0; i < formalArgTypes.length; ++i) {
+			if (! unify(formalArgTypes[i], actualArgTypes[i]))
+				break;
+		}
+		if (i != formalArgTypes.length)
+			return null;
+
+		// run instantiation if typemap satisfies all type parameters
+		var typeArgs = new Type[];
+		for (var i = 0; i < this._typeArgs.length; ++i) {
+			if ((typeArgs[i] = typemap[this._typeArgs[i].getValue()]) == null)
+				break;
+		}
+		if (i != this._typeArgs.length) {
+			errors.push(new CompileError(token, "cannot decide type parameters from given argument expressions"));
+			return null;
+		} else {
+			return this.instantiateTemplateFunction(errors, token, typeArgs);
+		}
 	}
 
 	function instantiateTemplateFunction (errors : CompileError[], token : Token, typeArgs : Type[]) : MemberFunctionDefinition {

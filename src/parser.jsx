@@ -80,7 +80,7 @@ class Token {
 	// "'x' at filename:linenumber" for debugging purpose
 	function getNotation() : string {
 		return "'" + this._value + "'"
-				+ " at " + (this._filename ?: "<<unknown>>")  + ":" + this._lineNumber as string;
+				+ " at " + (this._filename ?: "<<unknown>>")  + ":" + this._lineNumber as string + ":" + this._columnNumber as string;
 	}
 }
 
@@ -971,6 +971,10 @@ class Parser {
 		this._errors.push(new DeprecatedWarning(this._filename, this._lineNumber, this._getColumn(), message));
 	}
 
+	function _newExperimentalWarning(feature : Token) : void {
+		this._errors.push(new ExperimentalWarning(feature, feature.getValue()));
+	}
+
 	function _advanceToken () : void {
 		if (this._tokenLength != 0) {
 			this._forwardPos(this._tokenLength);
@@ -1777,10 +1781,6 @@ class Parser {
 		if (typeArgs == null) {
 			return null;
 		}
-		if (typeArgs.length != 0 && (this._classFlags & ClassDefinition.IS_NATIVE) == 0) {
-			this._newError("only native classes may have template functions (for the time being)");
-			return null;
-		}
 		this._typeArgs = this._typeArgs.concat(typeArgs);
 		var numObjectTypesUsed = this._objectTypesUsed.length;
 
@@ -2487,6 +2487,7 @@ class Parser {
 	}
 
 	function _yieldStatement (token : Token) : boolean {
+		this._newExperimentalWarning(token);
 		var expr = this._expr(false);
 		if (expr == null)
 			return false;
@@ -3236,16 +3237,19 @@ class Parser {
 
 	function _arrayLiteral (token : Token) : ArrayLiteralExpression {
 		var exprs = new Expression[];
-		if (this._expectOpt("]") == null) {
-			do {
-				var expr = this._assignExpr();
-				if (expr == null)
-					return null;
-				exprs.push(expr);
-				token = this._expect([ ",", "]" ]);
-				if (token == null)
-					return null;
-			} while (token.getValue() == ",");
+		while (this._expectOpt("]") == null) {
+			var expr = this._assignExpr();
+			if (expr == null)
+				return null;
+			exprs.push(expr);
+			// separator
+			var separator = this._expect([",", "]"]);
+			if (separator == null) {
+				return null;
+			}
+			else if (separator.getValue() == "]") {
+				break;
+			}
 		}
 		var type = null : Type;
 		if (this._expectOpt(":") != null)
@@ -3256,29 +3260,34 @@ class Parser {
 
 	function _mapLiteral (token : Token) : MapLiteralExpression {
 		var elements = new MapLiteralElement[];
-		if (this._expectOpt("}") == null) {
-			do {
-				// obtain key
-				var keyToken;
-				if ((keyToken = this._expectIdentifierOpt(null)) != null
-					|| (keyToken = this._expectNumberLiteralOpt()) != null
-					|| (keyToken = this._expectStringLiteralOpt()) != null) {
-					// ok
-				} else {
-					this._newError("expected identifier, number or string but got '" + token.getValue() + "'");
-				}
-				// separator
-				if (this._expect(":") == null)
-					return null;
-				// obtain value
-				var expr = this._assignExpr();
-				if (expr == null)
-					return null;
-				elements.push(new MapLiteralElement(keyToken, expr));
-				// separator
-				if ((token = this._expect([ ",", "}" ])) == null)
-					return null;
-			} while (token.getValue() == ",");
+		while (this._expectOpt("}") == null) {
+			// obtain key
+			var keyToken;
+			if ((keyToken = this._expectIdentifierOpt(null)) != null
+				|| (keyToken = this._expectNumberLiteralOpt()) != null
+				|| (keyToken = this._expectStringLiteralOpt()) != null) {
+				// ok
+			} else {
+				this._newError("expected identifier, number or string");
+				return null;
+			}
+			// separator
+			if (this._expect(":") == null)
+				return null;
+			// obtain value
+			var expr = this._assignExpr();
+			if (expr == null)
+				return null;
+			elements.push(new MapLiteralElement(keyToken, expr));
+
+			// separator
+			var separator = this._expect([",", "}"]);
+			if (separator == null) {
+				return null;
+			}
+			else if (separator.getValue() == "}") {
+				break;
+			}
 		}
 		var type = null : Type;
 		if (this._expectOpt(":") != null)

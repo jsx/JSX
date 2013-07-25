@@ -12,7 +12,7 @@ my @files = glob 't/run/*.jsx';
 plan tests => 4 * scalar @files;
 
 {
-    local $ENV{JSX_HOME} = tempdir(".jsx.mode-parse-XXXXXXXX");
+    local $ENV{JSX_HOME} = tempdir(".jsx.mode-parse-XXXXXXXX", CLEANUP => 1);
 
     require tool::RunCompilationServer;
     require "tool/jsx.pl"; # App::jsx

@@ -11,7 +11,7 @@ c 3
 */
 class _Main {
 	static function main (args : string[]) : void {
-		function g(prefix : string) : g_Enumerable.<string> {
+		function g(prefix : string) : Enumerable.<string> {
 			yield prefix + "1";
 			yield prefix + "2";
 			yield prefix + "3";

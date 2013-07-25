@@ -195,6 +195,9 @@ class _Util {
 		return functions;
 	}
 
+	static function nameIsValidAsProperty(name : string) : boolean {
+		return /^[\$_A-Za-z][\$_0-9A-Za-z]*$/.test(name) && !Util.isECMA262Reserved(name);
+	}
 }
 
 class _Mangler {
@@ -2353,7 +2356,7 @@ class _ArrayExpressionEmitter extends _OperatorExpressionEmitter {
 		var emitted = false;
 		if (secondExpr instanceof StringLiteralExpression) {
 			var propertyName = Util.decodeStringLiteral(secondExpr.getToken().getValue());
-			if (propertyName.match(/^[\$_A-Za-z][\$_0-9A-Za-z]*$/) != null && !Util.isECMA262Reserved(propertyName)) {
+			if (_Util.nameIsValidAsProperty(propertyName)) {
 				this._emitter._emit(".", this._expr.getToken());
 				this._emitter._emit(propertyName, secondExpr.getToken());
 				emitted = true;
@@ -2490,10 +2493,16 @@ class _CallExpressionEmitter extends _OperatorExpressionEmitter {
 		var args = this._expr.getArguments();
 		if (args[2] instanceof ArrayLiteralExpression) {
 			this._emitter._getExpressionEmitterFor(args[0]).emit(_PropertyExpressionEmitter._operatorPrecedence);
-			// FIXME emit as property expression if possible
-			this._emitter._emit("[", calleeExpr.getToken());
-			this._emitter._getExpressionEmitterFor(args[1]).emit(0);
-			this._emitter._emit("]", calleeExpr.getToken());
+			if (args[1] instanceof StringLiteralExpression && _Util.nameIsValidAsProperty(Util.decodeStringLiteral(args[1].getToken().getValue()))) {
+
+				this._emitter._emit(".", calleeExpr.getToken());
+				this._emitter._emit(Util.decodeStringLiteral(args[1].getToken().getValue()), args[1].getToken());
+			}
+			else {
+				this._emitter._emit("[", calleeExpr.getToken());
+				this._emitter._getExpressionEmitterFor(args[1]).emit(0);
+				this._emitter._emit("]", calleeExpr.getToken());
+			}
 			this._emitter._emitCallArguments(this._expr.getToken(), "(", (args[2] as ArrayLiteralExpression).getExprs(), null);
 		} else {
 			this._emitter._emit("(function (o, p, a) { return o[p].apply(o, a); }(", calleeExpr.getToken());
@@ -3039,11 +3048,6 @@ class JavaScriptEmitter implements Emitter {
 	}
 
 	function _emitStaticInitializationCode (classDef : ClassDefinition) : void {
-		// special handling for js.jsx
-		if (this.isJsModule(classDef)) {
-			this._emit("var js = { global: function () { return this; }() };\n", null);
-			return;
-		}
 		if ((classDef.flags() & ClassDefinition.IS_NATIVE) != 0)
 			return;
 		// normal handling

@@ -13,17 +13,17 @@ class Async {
     };
   }
 
-  static function run(coro : () -> g_Enumerable.<(variant)->void>) : void {
+  static function run(coro : () -> Enumerable.<(variant)->void>) : void {
     Async.go(coro());
   }
 
   static function go(v : variant) : void {
-    var g = v as g_Enumerable.<(variant)->void>;
+    var g = v as Enumerable.<(variant)->void>;
     try {
       var cb = g.next();
       cb(g);
     }
-    catch (si : g_StopIteration) {
+    catch (si : StopIteration) {
       return; // nothing
     }
   }
