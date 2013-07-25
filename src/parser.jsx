@@ -891,11 +891,11 @@ class Parser {
 		this._prevScope = this._prevScope.prev;
 	}
 
-	function _registerLocal (identifierToken : Token, type : Type) : LocalVariable {
+	function _registerLocal (identifierToken : Token, type : Type, isFunctionStmt : boolean = false) : LocalVariable {
 		function isEqualTo (local : LocalVariable) : boolean {
 			if (local.getName().getValue() == identifierToken.getValue()) {
-				if (type != null && local.getType() != null && ! local.getType().equals(type))
-					this._newError("conflicting types for variable " + identifierToken.getValue());
+				if ((type != null && local.getType() != null && ! local.getType().equals(type)) || isFunctionStmt)
+					this._newError("conflicting types for variable " + identifierToken.getValue(), identifierToken);
 				return true;
 			}
 			return false;
@@ -965,6 +965,10 @@ class Parser {
 
 	function _newError (message : string) : void {
 		this._errors.push(new CompileError(this._filename, this._lineNumber, this._getColumn(), message));
+	}
+
+	function _newError (message : string, token : Token) : void {
+		this._errors.push(new CompileError(token, message));
 	}
 
 	function _newDeprecatedWarning (message : string) : void {
@@ -2319,7 +2323,7 @@ class Parser {
 		if (this._expect("{") == null)
 			return false;
 
-		var funcLocal = this._registerLocal(name, new StaticFunctionType(token, returnType, args.map.<Type>((arg) -> arg.getType()), false));
+		var funcLocal = this._registerLocal(name, new StaticFunctionType(token, returnType, args.map.<Type>((arg) -> arg.getType()), false), true);
 
 		var funcDef = this._functionBody(token, name, funcLocal, args, returnType, true);
 		if (funcDef == null) {
