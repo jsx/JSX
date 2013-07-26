@@ -4000,7 +4000,8 @@ class _TailRecursionOptimizeCommand extends _FunctionOptimizeCommand {
 		//   $TAIL_REC: while (true) {
 		//     body;
 		//     // return f(v1, v2, v3);
-		//     (arg1 = v1, arg2 = v2, arg3 = v3)
+		//     ($arg1 = v1, $arg2 = v2, $arg3 = v3);
+		//     (arg1 = $arg1, arg2 = $arg2, arg3 = $arg3);
 		//     continue $TAIL_REC;
 		//   }
 		// }
@@ -4032,7 +4033,6 @@ class _TailRecursionOptimizeCommand extends _FunctionOptimizeCommand {
 		if (statement instanceof ReturnStatement) {
 			var returnStatement = statement as ReturnStatement;
 			if (returnStatement.getExpr() != null && returnStatement.getExpr() instanceof CallExpression)  {
-				//log (_DetermineCalleeCommand.getCallingFuncDef(returnStatement.getExpr()));
 				return funcDef == _DetermineCalleeCommand.getCallingFuncDef(returnStatement.getExpr());
 			}
 		}
