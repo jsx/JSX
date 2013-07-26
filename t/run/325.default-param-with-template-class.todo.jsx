@@ -1,4 +1,4 @@
-/*EXPECTE
+/*EXPECTED
 foo
 42
 */
