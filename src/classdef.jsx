@@ -98,6 +98,17 @@ class ClassDefinition implements Stashable {
 		this._docComment = docComment;
 
 		this._resetMembersClassDef();
+
+		if (! (this instanceof TemplateClassDefinition)) {
+			this._generateWrapperFunctions();
+		}
+	}
+
+	function _generateWrapperFunctions() : void {
+		this.forEachMemberFunction((funcDef) -> {
+			funcDef.generateWrappersForDefaultParameters();
+			return true;
+		});
 	}
 
 	function serialize () : variant {
@@ -486,10 +497,6 @@ class ClassDefinition implements Stashable {
 	}
 
 	function normalizeClassDefs (errors : CompileError[]) : void {
-		this.forEachMemberFunction((funcDef) -> {
-			funcDef.generateWrappersForDefaultParameters(errors);
-			return true;
-		});
 		for (var x = 0; x < this._members.length; ++x) {
 			for (var y = 0; y < x; ++y) {
 				if (this._members[x].name() == this._members[y].name()
@@ -1602,8 +1609,20 @@ class MemberFunctionDefinition extends MemberDefinition implements Block {
 
 	}
 
-	function generateWrappersForDefaultParameters(errors : CompileError[]) : void {
+	function generateWrappersForDefaultParameters() : void {
 		// `function f(a, b = x)` makes `f(a) { f(a, x) }`
+
+		function createObjectType(classDef : ClassDefinition) : ObjectType {
+			if (classDef instanceof TemplateClassDefinition) {
+				var typeArgs = (classDef as TemplateClassDefinition).getTypeArguments().map.<Type>((token) -> {
+					return new ParsedObjectType(new QualifiedName(token), new Type[]);
+				});
+				return new ParsedObjectType(new QualifiedName(classDef.getToken()), typeArgs);
+			}
+			else {
+				return new ObjectType(classDef);
+			}
+		}
 
 		// skip arguments wo. default parameters
 		for (var origArgIndex = 0; origArgIndex != this.getArguments().length; ++origArgIndex) {
@@ -1628,12 +1647,13 @@ class MemberFunctionDefinition extends MemberDefinition implements Block {
 			}
 			var statement : Statement;
 			if (this.name() == "constructor") {
-				statement = new ConstructorInvocationStatement(new Token("this", false), new ObjectType(this.getClassDef()), argExprs);
+				statement = new ConstructorInvocationStatement(new Token("this", false), createObjectType(this.getClassDef()), argExprs);
 			}
 			else {
 				var invocant = (this.flags() & ClassDefinition.IS_STATIC) == 0
 					? new ThisExpression(new Token("this", false), this.getClassDef())
-					: new ClassExpression(new Token(this.getClassDef().className(), true), new ObjectType(this.getClassDef()));
+					: new ClassExpression(new Token(this.getClassDef().className(), true), createObjectType(this.getClassDef()));
+
 				var methodRef = new PropertyExpression(new Token(".", false), invocant, this.getNameToken(), this.getArgumentTypes());
 				var callExpression = new CallExpression(new Token("(", false), methodRef, argExprs);
 				if (this.getReturnType() != Type.voidType) {
@@ -2088,7 +2108,8 @@ class TemplateClassDefinition extends ClassDefinition implements TemplateDefinit
 		this._className = className;
 		this._flags = flags;
 		this._typeArgs = typeArgs.concat(new Token[]);
-		this._resetMembersClassDef();
+
+		this._generateWrapperFunctions();
 	}
 
 	override function getToken () : Token {
