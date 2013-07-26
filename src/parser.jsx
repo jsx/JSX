@@ -485,7 +485,7 @@ class QualifiedName {
 				return null;
 			if (typeArguments.length == 0) {
 				if ((classDef = enclosingClassDef.lookupInnerClass(this._token.getValue())) == null) {
-					context.errors.push(new CompileError(this._token, "no class definition for '" + this.toString() + "'"));
+					context.errors.push(new CompileError(this._token, "no class definition or variable for '" + this.toString() + "'"));
 					return null;
 				}
 			} else {
@@ -497,7 +497,7 @@ class QualifiedName {
 		} else {
 			if (typeArguments.length == 0) {
 				if ((classDef = context.parser.lookup(context.errors, this._token, this._token.getValue())) == null) {
-					context.errors.push(new CompileError(this._token, "no class definition for '" + this.toString() + "'"));
+					context.errors.push(new CompileError(this._token, "no class definition or variable for '" + this.toString() + "'"));
 					return null;
 				}
 			} else {
@@ -967,6 +967,10 @@ class Parser {
 		this._errors.push(new CompileError(this._filename, this._lineNumber, this._getColumn(), message));
 	}
 
+	function _newError (message : string, lineNumber : number, columnOffset : number) : void {
+		this._errors.push(new CompileError(this._filename, lineNumber, columnOffset, message));
+	}
+
 	function _newError (message : string, token : Token) : void {
 		this._errors.push(new CompileError(token, message));
 	}
@@ -1204,7 +1208,26 @@ class Parser {
 	function _expect (expected : string[], excludePattern : RegExp) : Token {
 		var token = this._expectOpt(expected, excludePattern);
 		if (token == null) {
-			this._newError("expected keyword: " + expected.join(" "));
+			// move to the point where expect
+			// see t/compile_error/178
+			var lineOffset = this._lineNumber - 1;
+			var columnOffset = this._columnOffset - 1;
+			while (lineOffset >= 0 && columnOffset >= 0) {
+				if (! /[ \t\r\n]/.test(this._lines[lineOffset].charAt(columnOffset) ?: " ")) {
+					break;
+				}
+
+				if (columnOffset != 0) {
+					columnOffset--;
+				}
+				else {
+					do {
+						columnOffset = this._lines[--lineOffset].length - 1;
+					} while (this._lines[lineOffset].length == 0 && lineOffset >= 0);
+				}
+			}
+
+			this._newError("expected keyword: " + expected.join(" "), lineOffset + 1, columnOffset + 1);
 			return null;
 		}
 		return token;
