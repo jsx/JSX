@@ -194,7 +194,34 @@ class _Util {
 	}
 
 	static function nameIsValidAsProperty(name : string) : boolean {
-		return /^[\$_A-Za-z][\$_0-9A-Za-z]*$/.test(name) && !Util.isECMA262Reserved(name);
+		return /^[\$_A-Za-z][\$_0-9A-Za-z]*$/.test(name) && !_Util.isECMA262Reserved(name);
+	}
+
+	static const _ecma262reserved = Util.asSet([
+		"break", "do", "instanceof", "typeof",
+		"case", "else", "new", "var",
+		"catch", "finally", "return", "void",
+		"continue", "for", "switch", "while",
+		"debugger", "function", "this", "with",
+		"default", "if", "throw",
+		"delete", "in", "try",
+		"class", "enum", "extends", "super",
+		"const", "export", "import",
+		"implements", "let", "private", "public", "yield",
+		"interface", "package", "protected", "static",
+		"null",
+		"true", "false"
+	]);
+
+	/**
+	 * @see ECMA 262 5th, 7.6.1 Reserved Words
+	 */
+	static function isECMA262Reserved(word : string) : boolean {
+		return _Util._ecma262reserved.hasOwnProperty(word);
+	}
+
+	static function getECMA262ReservedWords() : string[] {
+		return _Util._ecma262reserved.keys();
 	}
 }
 
@@ -644,7 +671,7 @@ class _Minifier {
 		this._propertyConversionTable = _Minifier._buildConversionTable(
 			this._propertyUseCount,
 			new _MinifiedNameGenerator(
-				Util.getECMA262ReservedWords().concat(
+				_Util.getECMA262ReservedWords().concat(
 					(function () : string[] {
 						var nativePropertyNames = new Map.<boolean>;
 						this._classDefs.forEach(function (classDef) {
@@ -678,7 +705,7 @@ class _Minifier {
 				var stash = _Minifier._getClassStash(classDef);
 				stash.staticVariableConversionTable = _Minifier._buildConversionTable(
 					stash.staticVariableUseCount,
-					new _MinifiedNameGenerator(Util.getECMA262ReservedWords().concat(exportedStaticVarNames)));
+					new _MinifiedNameGenerator(_Util.getECMA262ReservedWords().concat(exportedStaticVarNames)));
 			}
 		});
 	}
@@ -699,7 +726,7 @@ class _Minifier {
 		this._globalConversionTable = _Minifier._buildConversionTable(
 			useCount,
 			new _MinifiedNameGenerator(
-				Util.getECMA262ReservedWords().concat(
+				_Util.getECMA262ReservedWords().concat(
 					_MinifiedNameGenerator.GLOBALS,
 					(function () : string[] {
 						var nativeClassNames = new string[];
@@ -736,7 +763,7 @@ class _Minifier {
 			reserved.push(_Minifier._getLocalStash(scopeStash.usedOuterLocals[i]).minifiedName);
 		}
 		this._log("local minification, preserving: " + reserved.join(","));
-		reserved = reserved.concat(Util.getECMA262ReservedWords());
+		reserved = reserved.concat(_Util.getECMA262ReservedWords());
 		// doit
 		var conversionTable = _Minifier._buildConversionTable(useCount, new _MinifiedNameGenerator(reserved));
 		// store the result
