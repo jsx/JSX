@@ -3991,7 +3991,7 @@ class _TailRecursionOptimizeCommand extends _FunctionOptimizeCommand {
 	}
 
 	override function optimizeFunction(funcDef : MemberFunctionDefinition) : boolean {
-		if ((funcDef.flags() & (ClassDefinition.IS_OVERRIDE | ClassDefinition.IS_ABSTRACT | ClassDefinition.IS_NATIVE | ClassDefinition.IS_STATIC | ClassDefinition.IS_FINAL)) == 0) {
+		if ((funcDef.flags() & (ClassDefinition.IS_OVERRIDE | ClassDefinition.IS_ABSTRACT | ClassDefinition.IS_NATIVE)) != 0 || (funcDef.flags() & (ClassDefinition.IS_STATIC | ClassDefinition.IS_FINAL)) == 0) {
 			return false;
 		}
 		// transform tail recursion into:
