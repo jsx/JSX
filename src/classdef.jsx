@@ -1603,7 +1603,7 @@ class MemberFunctionDefinition extends MemberDefinition implements Block {
 	}
 
 	function generateWrappersForDefaultParameters(errors : CompileError[]) : void {
-		// function f(a, b = x, c = y) makes f(a, b) { f(a, b, y) }, f(a) { f(a, x, y) }
+		// `function f(a, b = x)` makes `f(a) { f(a, x) }`
 
 		// skip arguments wo. default parameters
 		for (var origArgIndex = 0; origArgIndex != this.getArguments().length; ++origArgIndex) {
@@ -1617,7 +1617,7 @@ class MemberFunctionDefinition extends MemberDefinition implements Block {
 			var formalArgs = this.getArguments().slice(0, origArgIndex).map.<ArgumentDeclaration>((arg) -> {
 				return new ArgumentDeclaration(arg.getName(), arg.getType());
 			});
-			// build functino body
+			// build function body
 			var argExprs = formalArgs.map.<Expression>((arg) -> {
 				return new LocalExpression(arg.getName(), arg);
 			});
