@@ -739,7 +739,7 @@ class ThisExpression extends LeafExpression {
 		return [
 			"ThisExpression",
 			this._token.serialize(),
-			Serializer.<ClassDefinition>.serializeNullable(this._classDef)
+			this._classDef != null ? this._classDef.getToken().serialize() : null
 		] : variant[];
 	}
 
