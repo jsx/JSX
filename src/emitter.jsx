@@ -22,7 +22,6 @@
 
 import "./analysis.jsx";
 import "./classdef.jsx";
-import "./platform.jsx";
 
 interface Emitter implements Stashable {
 

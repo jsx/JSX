@@ -20,7 +20,6 @@
  * IN THE SOFTWARE.
  */
 
-import "js.jsx";
 import "./meta.jsx";
 import "./analysis.jsx";
 import "./classdef.jsx";
@@ -30,7 +29,6 @@ import "./statement.jsx";
 import "./emitter.jsx";
 import "./jssourcemap.jsx";
 import "./util.jsx";
-import "./optimizer.jsx";
 import "./parser.jsx";
 import "./platform.jsx";
 import _UnclassifyOptimizationCommand,
