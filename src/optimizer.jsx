@@ -2283,7 +2283,6 @@ class _DeadCodeEliminationOptimizeCommand extends _FunctionOptimizeCommand {
 	}
 
 	function _optimizeFunction (funcDef : MemberFunctionDefinition) : boolean {
-		var shouldRetry = false;
 		// use the assignment source, if possible
 		_Util.optimizeBasicBlock(funcDef, function (exprs : Expression[]) : void {
 			this._eliminateDeadStoresToProperties(funcDef, exprs);
@@ -2291,6 +2290,13 @@ class _DeadCodeEliminationOptimizeCommand extends _FunctionOptimizeCommand {
 			this._eliminateDeadStores(funcDef, exprs);
 			this._eliminateDeadConditions(funcDef, exprs);
 		});
+
+		return this._eliminateUnusedVariables(funcDef);
+	}
+
+	function _eliminateUnusedVariables(funcDef : MemberFunctionDefinition) : boolean {
+		var shouldRetry = false;
+
 		// mark the variables that are used (as RHS)
 		var locals = funcDef.getLocals();
 		var localsUsed = new Array.<boolean>(locals.length);
@@ -2328,43 +2334,48 @@ class _DeadCodeEliminationOptimizeCommand extends _FunctionOptimizeCommand {
 				continue;
 			}
 			// remove assignment to the variable
-			var removed = false;
-			funcDef.forEachStatement(function onStatement(statement : Statement) : boolean {
-				if (statement instanceof FunctionStatement) {
-					var localFuncDef = (statement as FunctionStatement).getFuncDef();
-					localFuncDef.forEachStatement(onStatement);
-					if (localFuncDef.getFuncLocal() == locals[localIndex]) {
-						// FIXME remove local function statements and closures
-						//this.log("removing definition of " + locals[localIndex].getName().getNotation());
-						//funcDef.getClosures().splice(funcDef.getClosures().indexOf(localFuncDef), 1);
+			(function onStatements(statements : Statement[]) : boolean {
+				for (var i = 0; i < statements.length;) {
+					var statement = statements[i];
+					if (statement instanceof FunctionStatement) {
+						var localFuncDef = (statement as FunctionStatement).getFuncDef();
+						onStatements(localFuncDef.getStatements());
+						log [localFuncDef.getFuncLocal(), locals[localIndex]];
+						if (localFuncDef.getFuncLocal() == locals[localIndex]) {
+							this.log("removing definition of " + locals[localIndex].getName().getNotation());
+							funcDef.getClosures().splice(funcDef.getClosures().indexOf(localFuncDef), 1);
+							statements.splice(i, 1);
+						}
+						else {
+							i++;
+						}
+					}
+					else {
+						i++;
+					}
+					statement.forEachExpression(function onExpr(expr, replaceCb) {
+						if (expr instanceof AssignmentExpression
+							&& (expr as AssignmentExpression).getFirstExpr() instanceof LocalExpression
+							&& ((expr as AssignmentExpression).getFirstExpr() as LocalExpression).getLocal() == locals[localIndex]
+						) {
+							this.log("removing assignment to " + locals[localIndex].getName().getNotation());
+							var rhsExpr = (expr as AssignmentExpression).getSecondExpr();
+							replaceCb(rhsExpr);
+							shouldRetry = true;
+							return rhsExpr.forEachExpression(onExpr);
+						} else if (expr instanceof LocalExpression && (expr as LocalExpression).getLocal() == locals[localIndex]) {
+							throw new Error("logic flaw, found a variable going to be removed being used");
+						} else if (expr instanceof FunctionExpression) {
+							onStatements((expr as FunctionExpression).getFuncDef().getStatements());
+						}
+						return expr.forEachExpression(onExpr);
+					});
 
-						//funcDef.getStatements().splice(funcDef.getStatements().indexOf(statement), 1);
-					}
+					_Util.handleSubStatements(onStatements, statement);
 				}
-				statement.forEachExpression(function onExpr(expr : Expression, replaceCb : function(:Expression):void) : boolean {
-					if (expr instanceof AssignmentExpression
-					    && (expr as AssignmentExpression).getFirstExpr() instanceof LocalExpression
-						&& ((expr as AssignmentExpression).getFirstExpr() as LocalExpression).getLocal() == locals[localIndex]
-					) {
-						this.log("removing assignment to " + locals[localIndex].getName().getNotation());
-						var rhsExpr = (expr as AssignmentExpression).getSecondExpr();
-						replaceCb(rhsExpr);
-						shouldRetry = true;
-						removed = true;
-						return onExpr(rhsExpr, null);
-					} else if (expr instanceof LocalExpression && (expr as LocalExpression).getLocal() == locals[localIndex]) {
-						throw new Error("logic flaw, found a variable going to be removed being used");
-					} else if (expr instanceof FunctionExpression) {
-						(expr as FunctionExpression).getFuncDef().forEachStatement(onStatement);
-					}
-					return expr.forEachExpression(onExpr);
-				});
-				return statement.forEachStatement(onStatement);
-			});
-			// remove from locals array
-			if (removed) {
-				locals.splice(localIndex, 1);
-			}
+				return true;
+			}(funcDef.getStatements()));
+			locals.splice(localIndex, 1);
 		}
 		return shouldRetry;
 	}
