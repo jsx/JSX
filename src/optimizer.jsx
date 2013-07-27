@@ -2340,7 +2340,6 @@ class _DeadCodeEliminationOptimizeCommand extends _FunctionOptimizeCommand {
 					if (statement instanceof FunctionStatement) {
 						var localFuncDef = (statement as FunctionStatement).getFuncDef();
 						onStatements(localFuncDef.getStatements());
-						log [localFuncDef.getFuncLocal(), locals[localIndex]];
 						if (localFuncDef.getFuncLocal() == locals[localIndex]) {
 							this.log("removing definition of " + locals[localIndex].getName().getNotation());
 							funcDef.getClosures().splice(funcDef.getClosures().indexOf(localFuncDef), 1);
