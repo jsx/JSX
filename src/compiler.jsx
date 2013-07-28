@@ -403,7 +403,9 @@ class Compiler {
 				&& ! (classDef instanceof InstantiatedClassDefinition
 					&& nativeClassNames[classDef.className()] instanceof InstantiatedClassDefinition
 					&& (classDef as InstantiatedClassDefinition).getTemplateClass() == (nativeClassNames[classDef.className()] as InstantiatedClassDefinition).getTemplateClass())
-				&& classDef.getNativeSource() == null) {
+				&& classDef.getNativeSource() == null
+				&& classDef.getOuterClassDef() == null
+			) {
 				errors.push(
 					new CompileError(classDef.getToken(), "native class with same name is already defined")
 					.addCompileNote(new CompileNote(nativeClassNames[classDef.className()].getToken(), "here")));
