@@ -943,6 +943,11 @@ class InstanceofExpression extends UnaryExpression {
 			context.errors.push(new CompileError(this._token, "operator 'instanceof' is only applicable to an object or a variant"));
 			return false;
 		}
+
+		if (this._expectedType.getClassDef().flags() & ClassDefinition.IS_FAKE) {
+			context.errors.push(new CompileError(this._token, "operator 'instanceof' is not applicable to a fake class " + this._expectedType.toString()));
+			return false;
+		}
 		return true;
 	}
 
