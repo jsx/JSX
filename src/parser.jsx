@@ -1248,16 +1248,17 @@ class Parser {
 		}
 		if (matched == null)
 			return null;
+		this._tokenLength = matched[0].length;
+		var token = new Token(matched[0], true, this._filename, this._lineNumber, this._getColumn());
 		if (_Lexer.keywords.hasOwnProperty(matched[0])) {
-			this._newError("expected an identifier but found a keyword");
+			this._newError("expected an identifier but found a keyword", token);
 			return null;
 		}
 		if (_Lexer.reserved.hasOwnProperty(matched[0])) {
-			this._newError("expected an identifier but found a reserved word");
+			this._newError("expected an identifier but found a reserved word", token);
 			return null;
 		}
-		this._tokenLength = matched[0].length;
-		return new Token(matched[0], true, this._filename, this._lineNumber, this._getColumn());
+		return token;
 	}
 
 	function _expectIdentifier () : Token {
@@ -1929,9 +1930,9 @@ class Parser {
 
 	function _typeDeclaration (allowVoid : boolean) : Type {
 		var token;
-		if (this._expectOpt("void") != null) {
+		if ((token = this._expectOpt("void")) != null) {
 			if (! allowVoid) {
-				this._newError("'void' cannot be used here");
+				this._newError("'void' cannot be used here", token);
 				return null;
 			}
 			return Type.voidType;
