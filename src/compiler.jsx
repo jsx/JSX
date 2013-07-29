@@ -346,7 +346,7 @@ class Compiler {
 					return classDef;
 				});
 		};
-		// set analyzation context of every variable
+		// set analyzation context of every member variable
 		this.forEachClassDef(function (parser : Parser, classDef : ClassDefinition) {
 			classDef.setAnalysisContextOfVariables(createContext(parser));
 			return true;
@@ -363,7 +363,7 @@ class Compiler {
 			classDef.analyze(createContext(parser));
 			return true;
 		});
-		// analyze unused variables in every classdef
+		// analyze unused member variables in every classdef
 		this.forEachClassDef(function (parser : Parser, classDef : ClassDefinition) {
 			classDef.analyzeUnusedVariables();
 			return true;

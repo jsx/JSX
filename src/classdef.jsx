@@ -576,11 +576,10 @@ class ClassDefinition implements Stashable {
 	}
 
 	function setAnalysisContextOfVariables (context : AnalysisContext) : void {
-		for (var i = 0; i < this._members.length; ++i) {
-			var member = this._members[i];
-			if (member instanceof MemberVariableDefinition)
-				(member as MemberVariableDefinition).setAnalysisContext(context);
-		}
+		this.forEachMemberVariable((member) -> {
+			member.setAnalysisContext(context);
+			return true;
+		});
 	}
 
 	function analyze (context : AnalysisContext) : void {
@@ -793,11 +792,10 @@ class ClassDefinition implements Stashable {
 	}
 
 	function analyzeUnusedVariables () : void {
-		for (var i = 0; i < this._members.length; ++i) {
-			var member = this._members[i];
-			if (member instanceof MemberVariableDefinition)
-				(member as MemberVariableDefinition).getType();
-		}
+		this.forEachMemberVariable((member) -> {
+			member.getType();
+			return true;
+		});
 	}
 
 	function isConvertibleTo (classDef : ClassDefinition) : boolean {
