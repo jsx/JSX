@@ -2330,7 +2330,7 @@ class Parser {
 	}
 
 	function _functionStatement (token : Token) : boolean {
-		var name = this._expectIdentifierOpt();
+		var name = this._expectIdentifier();
 		if (name == null)
 			return false;
 		if (this._expect("(") == null)
