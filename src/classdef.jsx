@@ -1251,7 +1251,6 @@ class MemberFunctionDefinition extends MemberDefinition implements Block {
 				return ":" + arg.getType().toString();
 			}).join(",");
 		s += ")";
-		s += ":" + this.getReturnType().toString();
 		return s;
 	}
 
