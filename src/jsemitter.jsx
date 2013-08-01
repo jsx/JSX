@@ -1139,11 +1139,19 @@ class _IfStatementEmitter extends _StatementEmitter {
 		this._emitter._emit(") {\n", null);
 		this._emitter._emitStatements(this._statement.getOnTrueStatements());
 		var ifFalseStatements = this._statement.getOnFalseStatements();
-		if (ifFalseStatements.length != 0) {
-			this._emitter._emit("} else {\n", null);
-			this._emitter._emitStatements(ifFalseStatements);
+
+		if (ifFalseStatements.length == 1 && ifFalseStatements[0] instanceof IfStatement) {
+			this._emitter._emit("} else ", null);
+			this._emitter._emitStatement(ifFalseStatements[0]);
+			ifFalseStatements = (ifFalseStatements[0] as IfStatement).getOnTrueStatements();
 		}
-		this._emitter._emit("}\n", null);
+		else {
+			if (ifFalseStatements.length != 0) {
+				this._emitter._emit("} else {\n", null);
+				this._emitter._emitStatements(ifFalseStatements);
+			}
+			this._emitter._emit("}\n", null);
+		}
 	}
 
 }
