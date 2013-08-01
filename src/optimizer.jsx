@@ -1510,7 +1510,6 @@ class _UnclassifyOptimizationCommand extends _OptimizeCommand {
 		});
 		// only optimize the most simple form, the repetition of "this.foo = argN" that can be arranged to the order of properties (and in the order of arguments)
 		var propertyExprs = new Expression[];
-		var initializePropertyIndex = 0;
 		var expectedArgIndex = 0;
 		var statements = funcDef.getStatements();
 		if (statements.length != propertyNames.length) {
@@ -2328,7 +2327,6 @@ class _DeadCodeEliminationOptimizeCommand extends _FunctionOptimizeCommand {
 			return statement.forEachStatement(onStatement);
 		});
 		// remove locals that are not used
-		var altered = false;
 		for (var localIndex = localsUsed.length - 1; localIndex >= 0; --localIndex) {
 			if (localsUsed[localIndex]) {
 				continue;
@@ -3086,7 +3084,6 @@ class _InlineOptimizeCommand extends _FunctionOptimizeCommand {
 
 		// setup args (arg0 = arg0expr, arg1 = arg1expr, ...)
 		//   for non-leaf expressions used more than once
-		var argUsed = this._countNumberOfArgsUsed(callingFuncDef);
 		var setupArgs = null : Expression;
 
 		this._createVarsAndInit(funcDef, callingFuncDef, argsAndThisAndLocals, (expr) -> {
@@ -3383,6 +3380,7 @@ class _LCSEOptimizeCommand extends _FunctionOptimizeCommand {
 			}
 		};
 
+		/*
 		var clearCacheByPropertyName = function (name : string) : void {
 			this.log("clearing lcse entry for property name: " + name);
 			for (var k in cachedExprs) {
@@ -3403,6 +3401,7 @@ class _LCSEOptimizeCommand extends _FunctionOptimizeCommand {
 				}
 			}
 		};
+		*/
 
 		var clearCache = function () : void {
 			this.log("clearing lcse cache");

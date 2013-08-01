@@ -3072,7 +3072,6 @@ class Parser {
 	}
 
 	function _functionBody(token : Token, name : Token, funcLocal : LocalVariable, args : ArgumentDeclaration[], returnType : Type, withBlock : boolean) : MemberFunctionDefinition {
-		var openBlock = this._expectOpt("{");
 		this._pushScope(funcLocal, args);
 		try {
 			// parse lambda body

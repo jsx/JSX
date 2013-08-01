@@ -79,7 +79,6 @@ class Util {
 	 */
 	static function format (fmt : string, args : string[]) : string {
 		assert args != null;
-		var i = 0;
 		return fmt.replace(/%(\d+|%)/g, function(m) {
 			if (m == "%%") {
 				return "%";
