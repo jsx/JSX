@@ -1337,6 +1337,9 @@ class _StaticizeOptimizeCommand extends _OptimizeCommand {
 
 }
 
+/**
+ * Converts POD objects into Map objects + static methods.
+ */
 class _UnclassifyOptimizationCommand extends _OptimizeCommand {
 
 	static const IDENTIFIER = "unclassify";
@@ -1428,7 +1431,7 @@ class _UnclassifyOptimizationCommand extends _OptimizeCommand {
 				}
 			return true;
 		});
-		// check that the class is not referred to by: instanceof
+		// check that the class is not referred to by `instanceof` and `as`
 		this.getCompiler().forEachClassDef(function (parser : Parser, classDef : ClassDefinition) : boolean {
 			if (candidates.length == 0) {
 				return false;
@@ -3531,7 +3534,11 @@ class _LCSEOptimizeCommand extends _FunctionOptimizeCommand {
 
 }
 
-
+/**
+ * Expands POD objects into local variables
+ * e.g. <code>var p = new Point(10, 20); log p.x; log p.y;</code>
+ * into <code>var p$x = 10, p$y = 20; log p$x; log p$y;</code>
+ */
 class _UnboxOptimizeCommand extends _FunctionOptimizeCommand {
 	static const IDENTIFIER = "unbox";
 
