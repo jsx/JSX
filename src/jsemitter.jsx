@@ -223,6 +223,10 @@ class _Util {
 	static function getECMA262ReservedWords() : string[] {
 		return _Util._ecma262reserved.keys();
 	}
+
+	static function isArrayType(type : Type) : boolean {
+		return type.getClassDef() instanceof InstantiatedClassDefinition && (type.getClassDef() as InstantiatedClassDefinition).getTemplateClassName() == "Array";
+	}
 }
 
 class _Mangler {
@@ -1087,7 +1091,14 @@ class _ForInStatementEmitter extends _StatementEmitter {
 		this._emitter._getExpressionEmitterFor(this._statement.getLHSExpr()).emit(0);
 		this._emitter._emit(" in ", null);
 		this._emitter._getExpressionEmitterFor(this._statement.getListExpr()).emit(0);
-		this._emitter._emit(") {\n", null);
+		this._emitter._emit(") {", null);
+		if (_Util.isArrayType(this._statement.getListExpr().getType())) {
+			// force numify because it's a string
+			this._emitter._emit(" ", null);
+			this._emitter._getExpressionEmitterFor(this._statement.getLHSExpr()).emit(0);
+			this._emitter._emit(" |= 0;", null);
+		}
+		this._emitter._emit("\n", null);
 		this._emitter._emitStatements(this._statement.getStatements());
 		this._emitter._emit("}\n", null);
 	}
@@ -1822,7 +1833,7 @@ class _AsNoConvertExpressionEmitter extends _ExpressionEmitter {
 				var destClassDef = destType.getClassDef();
 				if ((destClassDef.flags() & ClassDefinition.IS_FAKE) != 0) {
 					// skip
-				} else if (destClassDef instanceof InstantiatedClassDefinition && (destClassDef as InstantiatedClassDefinition).getTemplateClassName() == "Array") {
+				} else if (_Util.isArrayType(destType)) {
 					emitWithAssertion(function () {
 						this._emitter._emit("$v == null || $v instanceof Array", this._expr.getToken());
 					}, "detected invalid cast, value is not an Array or null");
@@ -1940,7 +1951,7 @@ class _InstanceofExpressionEmitter extends _ExpressionEmitter {
 	override function emit (outerOpPrecedence : number) : void {
 		var expectedType = this._expr.getExpectedType();
 		assert expectedType.getClassDef() != null;
-		if (expectedType.getClassDef() instanceof InstantiatedClassDefinition && (expectedType.getClassDef() as InstantiatedClassDefinition).getTemplateClassName() == "Array") {
+		if (_Util.isArrayType(expectedType)) {
 			this.emitWithPrecedence(outerOpPrecedence, _InstanceofExpressionEmitter._operatorPrecedence, function () {
 				this._emitter._getExpressionEmitterFor(this._expr.getExpr()).emit(_InstanceofExpressionEmitter._operatorPrecedence);
 				this._emitter._emit(" instanceof Array", this._expr.getToken());
@@ -2637,9 +2648,7 @@ class _NewExpressionEmitter extends _OperatorExpressionEmitter {
 		var inliner = getInliner(callingFuncDef);
 		if (inliner) {
 			this._emitAsObjectLiteral(classDef, inliner(this._expr));
-		} else if (
-			classDef instanceof InstantiatedClassDefinition
-			&& (classDef as InstantiatedClassDefinition).getTemplateClassName() == "Array"
+		} else if (_Util.isArrayType(this._expr.getType())
 			&& argTypes.length == 0) {
 			this._emitter._emit("[]", this._expr.getToken());
 		} else if (
