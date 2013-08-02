@@ -3672,7 +3672,6 @@ class _UnboxOptimizeCommand extends _FunctionOptimizeCommand {
 			}
 			return ctor.forEachStatement(function (statement) {
 				// only allow list of this.X = ...
-				var assigned = new Map.<boolean>;
 				if (! (statement instanceof ExpressionStatement)) {
 					return false;
 				}
@@ -3684,11 +3683,6 @@ class _UnboxOptimizeCommand extends _FunctionOptimizeCommand {
 				if (! (lhsExpr instanceof PropertyExpression && (lhsExpr as PropertyExpression).getExpr() instanceof ThisExpression)) {
 					return false;
 				}
-				var propertyName = (lhsExpr as PropertyExpression).getIdentifierToken().getValue();
-				if (assigned[propertyName]) {
-					return false;
-				}
-				assigned[propertyName] = true;
 				// check rhs
 				return function onExpr(expr : Expression) : boolean {
 					if (expr instanceof ThisExpression) {
