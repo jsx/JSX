@@ -233,11 +233,7 @@ native final class Array.<T> {
 	 *
 	 * @param callbackfn A function to call for each element.
 	 */
-	inline function forEach(callbackfn : function(value : Nullable.<T>) : void) : void {
-		for (var i in this) {
-			callbackfn(this[i]);
-		}
-	}
+	function forEach(callbackfn : function(value : Nullable.<T>) : void) : void;
 	function forEach(callbackfn : function(value : Nullable.<T>, index : number) : void) : void;
 	function forEach(callbackfn : function(value : Nullable.<T>, index : number, array : Array.<T>) : void) : void;
 
