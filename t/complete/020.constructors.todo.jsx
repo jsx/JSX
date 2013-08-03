@@ -9,7 +9,7 @@ class C {
     new Fo
 /*EXPECTED
 [
-  TODO: should includes both Foo(:number, :number) and Foo(:strin[])
+  "TODO: should includes both Foo(:number, :number) and Foo(:strin[])"
 ]
 */
 /*JSX_OPTS
