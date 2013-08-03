@@ -8,7 +8,7 @@ module.exports = function(grunt) {
 
     watch: {
       jsx: {
-        files: ['<%= srcDir %>/*.jsx'],
+        files: ['<%= srcDir %>/*.jsx', '!<%= srcDir %>/meta.jsx'],
         tasks: ['exec:make_compiler']
       },
     },
