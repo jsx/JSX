@@ -874,7 +874,7 @@ class ClassDefinition implements Stashable {
 			if (! Util.typesAreEqual((this._members[i] as MemberFunctionDefinition).getArgumentTypes(), member.getArgumentTypes()))
 				continue;
 			if ((! isCheckingInterface) && (member.flags() & ClassDefinition.IS_OVERRIDE) == 0) {
-				context.errors.push(new CompileError(member.getNameToken(), "overriding functions must have 'override' attribute set (defined in base class '" + this.classFullName() + "')"));
+				context.errors.push(new CompileError(this._members[i].getNameToken(), "overriding functions must have 'override' attribute set (defined in base class '" + this.classFullName() + "')"));
 				return false;
 			}
 			if (reportOverridesAsWell && (this._members[i].flags() & ClassDefinition.IS_OVERRIDE) != 0) {
