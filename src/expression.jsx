@@ -572,8 +572,6 @@ class ArrayLiteralExpression extends Expression {
 				context.errors.push(new CompileError(this._token, "could not deduce array type, please specify"));
 				return false;
 			}
-			if (elementType.equals(Type.integerType))
-				elementType = Type.numberType;
 			elementType = elementType.resolveIfNullable();
 			this._type = new ObjectType(Util.instantiateTemplate(context, this._token, "Array", [ elementType ]));
 		}
