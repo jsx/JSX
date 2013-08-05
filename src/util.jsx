@@ -359,6 +359,9 @@ class Util {
 		return "\"" + escaped + "\"";
 	}
 
+	/**
+	 * @see ECMA-262 5th, 7.8.4 String Literals
+	 */
 	static function decodeStringLiteral (literal : string) : string {
 		var matched = literal.match(/^([\'\"]).*([\'\"])$/);
 		if (matched == null || matched[1] != matched[2])
@@ -388,10 +391,19 @@ class Util {
 			case "v": decoded += "\v"; break;
 			case "u":
 				var matched = src.substring(pos).match(/^([0-9A-Fa-f]{4})/);
-				if (matched == null)
+				if (matched == null) {
 					throw new Error("expected four hexdigits after \\u: " + literal);
+				}
 				decoded += String.fromCharCode(Number.parseInt(matched[1], 16));
 				pos += 4;
+				break;
+			case "x":
+				var matched = src.substring(pos).match(/^([0-9A-Fa-f]{2})/);
+				if (matched == null) {
+					throw new Error("expected two hexdigits after \\x: " + literal);
+				}
+				decoded += String.fromCharCode(Number.parseInt(matched[1], 16));
+				pos += 2;
 				break;
 			case "0":
 				if (pos == src.length || src.charAt(pos).match(/[0-9]/) == null)
@@ -533,26 +545,6 @@ class Util {
 		return set;
 	}
 
-	// ECMA 262 5th 7.6.1 Reserved Words
-	static const _ecma262reserved = Util.asSet([
-		"break", "do", "instanceof", "typeof",
-		"case", "else", "new", "var",
-		"catch", "finally", "return", "void",
-		"continue", "for", "switch", "while",
-		"debugger", "function", "this", "with",
-		"default", "if", "throw",
-		"delete", "in", "try",
-		"class", "enum", "extends", "super",
-		"const", "export", "import",
-		"implements", "let", "private", "public", "yield",
-		"interface", "package", "protected", "static",
-		"null",
-		"true", "false"
-	]);
-
-	static function isECMA262Reserved(word : string) : boolean {
-		return Util._ecma262reserved.hasOwnProperty(word);
-	}
 }
 
 /*

@@ -1,6 +1,6 @@
 /*EXPECTED
 0
-400000000
+9800000000000
 */
 /*JSX_OPTS
 --optimize inline
@@ -11,16 +11,16 @@
 
 final class _Main {
 	var n = 0;
-	function incr() : void {
-		++this.n;
+	function add(value : number) : void {
+		this.n += value;
 	}
 	static function loop(cnt : number) : void {
 		var that = new _Main;
 		log that.n;
 		for (var i = 0; i < 2000; ++i) {
 			for (var j = 0; j < cnt; ++j) {
-				that.incr();
-				that.incr();
+				that.add(j);
+				that.add(-i);
 			}
 		}
 		log that.n;

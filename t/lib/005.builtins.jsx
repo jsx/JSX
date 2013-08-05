@@ -71,6 +71,11 @@ class _Test extends TestCase {
 		this.expect(sum, "reduce").toBe(1 + 2 + 3 + 2 + 1);
 		this.expect(sum + 1, "reduce() returns a number").toBe(1 + 2 + 3 + 2 + 1 + 1);
 
+		var concat = a.reduce.<string>(function(p, c) {
+			return p == "" ? c as string : p + " " + c as string;
+		}, "");
+		this.expect(concat, "reduce").toBe("1 2 3 2 1");
+
 		sum = a.reduceRight.<number>(function(p,  c)  {
 			return p + c;
 		}, 0);

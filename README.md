@@ -35,6 +35,30 @@ Type the following commands and see what happens:
 
 `jsx --help` shows how to to use the jsx command.
 
+INTRODUCTION
+=======================
+
+Here is a fizzbuzz problam, which can be executed by `jsx --run fizzbuzz.jsx`, showing a basic syntax of JSX.
+
+```jsx
+class _Main {
+	static function main(args :string[]) : void {
+		for (var i = 1; i <= 100; ++i) {
+			if (i % 15 == 0)
+				log "FizzBuzz";
+			else if (i % 3 == 0)
+				log "Fizz";
+			else if (i % 5 == 0)
+				log "Buzz";
+			else
+				log i;
+		}
+	}
+}
+```
+
+See [the documantation](http://jsx.github.io/doc.html) for details.
+
 EXAMPLES
 =======================
 
@@ -77,9 +101,9 @@ There are unit tests in `t/` directory. Just type the following command to run t
 
     make test
 
-These test cases are executed by `prove(1)` and dispatched by `t/util/test-runner`, and also requires `phantomjs(1)` and `closure-compiler(1)`.
+These test cases are executed by `prove(1)` and dispatched by `t/util/test-runner`, and also requires `phantomjs(1)`
 
-Note that if you make a pull-requst you should do `make test-all` for complete tests.
+Note that if you make a pull-requst you have to make sure `make test-all` for complete tests.
 
 NOTE: There are some TODO tests, which should be resolved in a future. `make show-todo` shows such TODOs.
 

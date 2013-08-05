@@ -1,4 +1,3 @@
-import "js/web.jsx";
 import "test-case.jsx";
 
 class _Test extends TestCase {
@@ -15,6 +14,12 @@ class _Test extends TestCase {
 		a = new Int8Array(10);
 		this.expect(a.length).toBe(10);
 		this.expect(a[0]).toBe(0);
+
+		a[0] = 20;
+		this.expect(a[0]).toBe(20);
+
+		a[0] = 30 as int;
+		this.expect(a[0]).toBe(30);
 	}
 
 	function test_Uint8Array() : void {
@@ -30,6 +35,12 @@ class _Test extends TestCase {
 		a = new Uint8Array(10);
 		this.expect(a.length).toBe(10);
 		this.expect(a[0]).toBe(0);
+
+		a[0] = 20;
+		this.expect(a[0]).toBe(20);
+
+		a[0] = 30 as int;
+		this.expect(a[0]).toBe(30);
 	}
 
 	function test_Int16Array() : void {
@@ -45,6 +56,12 @@ class _Test extends TestCase {
 		a = new Int16Array(10);
 		this.expect(a.length).toBe(10);
 		this.expect(a[0]).toBe(0);
+
+		a[0] = 20;
+		this.expect(a[0]).toBe(20);
+
+		a[0] = 30 as int;
+		this.expect(a[0]).toBe(30);
 	}
 
 	function test_Uint16Array() : void {
@@ -60,6 +77,12 @@ class _Test extends TestCase {
 		a = new Uint16Array(10);
 		this.expect(a.length).toBe(10);
 		this.expect(a[0]).toBe(0);
+
+		a[0] = 20;
+		this.expect(a[0]).toBe(20);
+
+		a[0] = 30 as int;
+		this.expect(a[0]).toBe(30);
 	}
 
 	function test_Int32Array() : void {
@@ -75,6 +98,12 @@ class _Test extends TestCase {
 		a = new Int32Array(10);
 		this.expect(a.length).toBe(10);
 		this.expect(a[0]).toBe(0);
+
+		a[0] = 20;
+		this.expect(a[0]).toBe(20);
+
+		a[0] = 30 as int;
+		this.expect(a[0]).toBe(30);
 	}
 
 	function test_Uint32Array() : void {
@@ -90,6 +119,12 @@ class _Test extends TestCase {
 		a = new Uint32Array(10);
 		this.expect(a.length).toBe(10);
 		this.expect(a[0]).toBe(0);
+
+		a[0] = 20;
+		this.expect(a[0]).toBe(20);
+
+		a[0] = 30 as int;
+		this.expect(a[0]).toBe(30);
 	}
 
 	function test_Float32Array() : void {
@@ -105,6 +140,12 @@ class _Test extends TestCase {
 		a = new Float32Array(10);
 		this.expect(a.length).toBe(10);
 		this.expect(a[0]).toBe(0);
+
+		a[0] = 20;
+		this.expect(a[0]).toBe(20);
+
+		a[0] = 30 as int;
+		this.expect(a[0]).toBe(30);
 	}
 
 	function test_Float64Array() : void {
@@ -120,6 +161,12 @@ class _Test extends TestCase {
 		a = new Float64Array(10);
 		this.expect(a.length).toBe(10);
 		this.expect(a[0]).toBe(0);
+
+		a[0] = 20;
+		this.expect(a[0]).toBe(20);
+
+		a[0] = 30 as int;
+		this.expect(a[0]).toBe(30);
 	}
 
 	function test_DataView() : void {

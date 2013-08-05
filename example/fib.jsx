@@ -28,11 +28,20 @@ class Fib {
 	static function fib4(n : int) : int {
 		switch (n) {
 		case 1:
-			return 1;
 		case 2:
 			return 1;
 		default:
 			return Fib.fib4(n - 1) + Fib.fib4(n - 2);
+		}
+	}
+
+	static function fib5(n : int, a : int = 1, b : int = 1) : int {
+		switch (n) {
+		case 1:
+		case 2:
+			return a;
+		default:
+			return Fib.fib5(n - 1, a + b, a);
 		}
 	}
 }
@@ -44,6 +53,7 @@ class _Main {
 		log "fib2(" + n as string + ") = " + Fib.fib2(n) as string;
 		log "fib3(" + n as string + ") = " + Fib.fib3(n) as string;
 		log "fib4(" + n as string + ") = " + Fib.fib4(n) as string;
+		log "fib5(" + n as string + ") = " + Fib.fib5(n) as string;
 	}
 }
 

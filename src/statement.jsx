@@ -26,7 +26,6 @@ import "./expression.jsx";
 import "./type.jsx";
 import "./util.jsx";
 import "./parser.jsx";
-import "./optimizer.jsx";
 
 abstract class Statement implements Stashable {
 
@@ -437,15 +436,15 @@ class YieldStatement extends Statement {
 		var returnType = context.funcDef.getReturnType();
 		if (returnType == null) {
 			var yieldType = this._expr.getType();
-			context.funcDef.setReturnType(new ObjectType(Util.instantiateTemplate(context, this._token, "g_Enumerable", [ yieldType ])));
+			context.funcDef.setReturnType(new ObjectType(Util.instantiateTemplate(context, this._token, "Enumerable", [ yieldType ])));
 		} else {
 			if (returnType instanceof ObjectType
 				&& returnType.getClassDef() instanceof InstantiatedClassDefinition
-				&& (returnType.getClassDef() as InstantiatedClassDefinition).getTemplateClassName() == "g_Enumerable") {
+				&& (returnType.getClassDef() as InstantiatedClassDefinition).getTemplateClassName() == "Enumerable") {
 					yieldType = (returnType.getClassDef() as InstantiatedClassDefinition).getTypeArguments()[0];
 			} else {
 				// return type is not an instance of Enumerable. the error will be reported by MemberFuncitonDefinition#analyze.
-				context.errors.push(new CompileError(this._token, "cannot convert 'g_Enumerable.<" + this._expr.getType().toString() + ">' to return type '" + returnType.toString() + "'"));
+				context.errors.push(new CompileError(this._token, "cannot convert 'Enumerable.<" + this._expr.getType().toString() + ">' to return type '" + returnType.toString() + "'"));
 				return false;
 			}
 		}
@@ -492,14 +491,14 @@ class DeleteStatement extends UnaryExpressionStatement {
 		if (! this._analyzeExpr(context, this._expr))
 			return true;
 		if (! (this._expr instanceof ArrayExpression)) {
-			context.errors.push(new CompileError(this._token, "only properties of a hash object can be deleted"));
+			context.errors.push(new CompileError(this._token, "only properties of a map object can be deleted"));
 			return true;
 		}
 		var secondExprType = (this._expr as ArrayExpression).getSecondExpr().getType();
 		if (secondExprType == null)
 			return true; // error should have been already reported
 		if (! secondExprType.resolveIfNullable().equals(Type.stringType)) {
-			context.errors.push(new CompileError(this._token, "only properties of a hash object can be deleted"));
+			context.errors.push(new CompileError(this._token, "only properties of a map object can be deleted"));
 			return true;
 		}
 		return true;
@@ -1110,12 +1109,38 @@ class SwitchStatement extends LabellableStatement {
 		this._prepareBlockAnalysis(context);
 		try {
 			var hasDefaultLabel = false;
+			var caseMap = new Map.<boolean>;
 			for (var i = 0; i < this._statements.length; ++i) {
 				var statement = this._statements[i];
 				if (! statement.analyze(context))
 					return false;
-				if (statement instanceof DefaultStatement)
+				if (statement instanceof DefaultStatement) {
 					hasDefaultLabel = true;
+				}
+				else if (statement instanceof CaseStatement) {
+					var caseExpr = (statement as CaseStatement).getExpr();
+					if (   caseExpr instanceof IntegerLiteralExpression
+						|| caseExpr instanceof NumberLiteralExpression
+						|| caseExpr instanceof BooleanLiteralExpression ) {
+						if (caseMap.hasOwnProperty(caseExpr.getToken().getValue())) {
+							context.errors.push(new CompileError(caseExpr.getToken(), "duplicate case value " + caseExpr.getToken().getValue()));
+							return false;
+						}
+						else {
+							caseMap[caseExpr.getToken().getValue()] = true;
+						}
+					}
+					else if (caseExpr instanceof StringLiteralExpression) {
+						var caseStr = Util.decodeStringLiteral(caseExpr.getToken().getValue());
+						if (caseMap.hasOwnProperty(caseStr)) {
+							context.errors.push(new CompileError(caseExpr.getToken(), "duplicate case value " + caseExpr.getToken().getValue()));
+							return false;
+						}
+						else {
+							caseMap[caseStr] = true;
+						}
+					}
+				}
 			}
 			if (context.getTopBlock().localVariableStatuses.isReachable())
 				this.registerVariableStatusesOnBreak(context.getTopBlock().localVariableStatuses);
