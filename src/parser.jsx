@@ -497,8 +497,10 @@ class QualifiedName {
 		} else {
 			if (typeArguments.length == 0) {
 				if ((classDef = context.parser.lookup(context.errors, this._token, this._token.getValue())) == null) {
-					context.errors.push(new CompileError(this._token, "no class definition or variable for '" + this.toString() + "'"));
-					return null;
+					if ((classDef = context.parser.lookupTemplate(context.errors, new TemplateInstantiationRequest(this._token, this._token.getValue(), typeArguments), function (parser : Parser, classDef : ClassDefinition) : ClassDefinition { return null; })) == null) {
+						context.errors.push(new CompileError(this._token, "no class definition or variable for '" + this.toString() + "'"));
+						return null;
+					}
 				}
 			} else {
 				if ((classDef = context.parser.lookupTemplate(context.errors, new TemplateInstantiationRequest(this._token, this._token.getValue(), typeArguments), function (parser : Parser, classDef : ClassDefinition) : ClassDefinition { return null; })) == null) {
