@@ -3205,7 +3205,7 @@ class _ReturnIfOptimizeCommand extends _FunctionOptimizeCommand {
 	}
 
 	override function optimizeFunction (funcDef : MemberFunctionDefinition) : boolean {
-		if (funcDef.getReturnType().equals(Type.voidType))
+		if (funcDef.getReturnType() == null || funcDef.getReturnType().equals(Type.voidType))
 			return false;
 
 		this._altered = false;

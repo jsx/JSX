@@ -1249,7 +1249,7 @@ class MemberFunctionDefinition extends MemberDefinition implements Block {
 		s += this.getNameToken() != null ? this.name() : "$" +  this.getToken().getLineNumber()  as string + "_" + this.getToken().getColumnNumber() as string;
 		s += "(";
 		s += this._args.map.<string>(function (arg) {
-				return ":" + arg.getType().toString();
+				return ":" + (arg.getType() ? arg.getType().toString() : "null");
 			}).join(",");
 		s += ")";
 		return s;
@@ -1669,7 +1669,7 @@ class MemberFunctionDefinition extends MemberDefinition implements Block {
 					formalArgs,
 					new LocalVariable[],
 					[statement],
-					this.getClosures(),
+					this.getClosures().slice(0),
 					this._lastTokenOfBody,
 					this._docComment);
 			}
