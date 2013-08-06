@@ -1,4 +1,5 @@
 /*EXPECTED
+# simple test
 check()
 true
 true
@@ -7,6 +8,7 @@ true
 true
 1
 0
+# reset and test
 check()
 true
 true
@@ -15,9 +17,11 @@ true
 true
 1
 0
+# check that callees are being reset
 undefined
-0
-0
+# check reset in callee
+true
+true
 1
 undefined
 */
@@ -52,6 +56,7 @@ class _Main {
 			JSX.resetProfileResults();
 		})();
 	}
+
 	static function main(args : string[]) : void {
 		function check() : void {
 			log "check()";
@@ -71,21 +76,21 @@ class _Main {
 			log m["_Main.main(:Array.<string>)"]["_Main.g(:boolean)"]["$count"];
 			log m["_Main.main(:Array.<string>)"]["$count"]; // should be zero, since it has not exitted
 		}
-		// simple test
+		log "# simple test";
 		_Main.g(false);
 		check();
-		// reset and test
+		log "# reset and test";
 		_Main.g(true);
 		check();
-		// check that callees are being reset
+		log "# check that callees are being reset";
 		JSX.resetProfileResults();
 		var m = JSX.getProfileResults();
-		log m["_Main.main(:Array.<string>)"]["_Main.g()"]; // should be undefined
-		// check reset in callee
+		log m["_Main.main(:Array.<string>)"]["_Main.g()"]; // should be undefine
+		log "# check reset in callee";
 		_Main.h();
 		var m = JSX.getProfileResults();
-		log m["_Main.main(:Array.<string>)"]["_Main.h()"]["$exclusive"];
-		log m["_Main.main(:Array.<string>)"]["_Main.h()"]["$inclusive"];
+		log m["_Main.main(:Array.<string>)"]["_Main.h()"]["$exclusive"] as number <= 1;
+		log m["_Main.main(:Array.<string>)"]["_Main.h()"]["$inclusive"] as number <= 1;
 		log m["_Main.main(:Array.<string>)"]["_Main.h()"]["$count"];
 		log m["_Main.main(:Array.<string>)"]["_Main.h()"]["_Main.spendTime()"]; // undefined
 	}
