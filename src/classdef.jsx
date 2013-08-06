@@ -109,6 +109,10 @@ class ClassDefinition implements Stashable {
 			funcDef.generateWrappersForDefaultParameters();
 			return true;
 		});
+		this.forEachTemplateFunction((funcDef) -> {
+			funcDef.generateWrappersForDefaultParameters();
+			return true;
+		});
 	}
 
 	function serialize () : variant {
@@ -1656,17 +1660,22 @@ class MemberFunctionDefinition extends MemberDefinition implements Block {
 				}
 			}
 			// build function
-			var wrapper = new MemberFunctionDefinition(
-				this.getToken(),
-				this.getNameToken(),
-				this.flags() | ClassDefinition.IS_INLINE | ClassDefinition.IS_GENERATED,
-				this.getReturnType(),
-				formalArgs,
-				new LocalVariable[],
-				[statement],
-				this.getClosures(),
-				this._lastTokenOfBody,
-				this._docComment);
+			if (!(this instanceof TemplateFunctionDefinition)) {
+				var wrapper = new MemberFunctionDefinition(
+					this.getToken(),
+					this.getNameToken(),
+					this.flags() | ClassDefinition.IS_INLINE | ClassDefinition.IS_GENERATED,
+					this.getReturnType(),
+					formalArgs,
+					new LocalVariable[],
+					[statement],
+					this.getClosures(),
+					this._lastTokenOfBody,
+					this._docComment);
+			}
+			else {
+				throw new Error("TODO: template function with default parameters in " + this.getNotation() + " is not yet supported");
+			}
 			wrapper.setClassDef(this.getClassDef());
 			// register
 			this.getClassDef().members().push(wrapper);
