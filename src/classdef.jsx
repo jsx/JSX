@@ -1075,19 +1075,16 @@ abstract class MemberDefinition implements Stashable {
 	}
 
 	function _updateLinkFromExpressionToClosuresUponInstantiation(instantiatedExpr : Expression, instantiatedClosures : MemberFunctionDefinition[]) : void {
-		function onExpr(expr : Expression) : boolean {
+		(function onExpr(expr : Expression) : boolean {
 			if (expr instanceof FunctionExpression) {
-				for (var i = 0; i < this._closures.length; ++i) {
-					if (this._closures[i] == (expr as FunctionExpression).getFuncDef())
-						break;
-				}
-				if (i == this._closures.length)
-					throw new Error("logic flaw, cannot find the closure");
-				(expr as FunctionExpression).setFuncDef(instantiatedClosures[i]);
+				var idx = this._closures.indexOf((expr as FunctionExpression).getFuncDef());
+
+				if (idx == -1)
+					throw new Error("logic flaw, cannot find the closure for " + this.getNotation());
+				(expr as FunctionExpression).setFuncDef(instantiatedClosures[idx]);
 			}
 			return expr.forEachExpression(onExpr);
-		}
-		onExpr(instantiatedExpr);
+		})(instantiatedExpr);
 	}
 
 }
@@ -1490,13 +1487,10 @@ class MemberFunctionDefinition extends MemberDefinition implements Block {
 			// update the link from function expressions to closures
 			Util.forEachStatement(function onStatement(statement : Statement) : boolean {
 				if (statement instanceof FunctionStatement) {
-					for (var i = 0; i < this._closures.length; ++i) {
-						if (this._closures[i] == (statement as FunctionStatement).getFuncDef())
-							break;
-					}
-					if (i == this._closures.length)
-						throw new Error("logic flaw, cannot find the closure");
-					(statement as FunctionStatement).setFuncDef(closures[i]);
+					var idx = this._closures.indexOf((statement as FunctionStatement).getFuncDef());
+					if (i == -1)
+						throw new Error("logic flaw, cannot find the closure for " + this.getNotation());
+					(statement as FunctionStatement).setFuncDef(closures[idx]);
 					return true;
 				}
 				statement.forEachExpression(function (expr) {
