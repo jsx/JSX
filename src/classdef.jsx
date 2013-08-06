@@ -1670,7 +1670,7 @@ class MemberFunctionDefinition extends MemberDefinition implements Block {
 				formalArgs,
 				new LocalVariable[],
 				[statement],
-				new MemberFunctionDefinition[],
+				this.getClosures(),
 				this._lastTokenOfBody,
 				this._docComment);
 			wrapper.setClassDef(this.getClassDef());
