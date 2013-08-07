@@ -345,7 +345,7 @@ class LocalVariableStatuses {
 		if (base != null) {
 			// FIXME the analysis of the closures should be delayed to either of: first being used, or return is called, to minimize the appearance of the "not initialized" error
 			for (var k in base._statuses)
-				this._statuses[k] = base._statuses[k] == LocalVariableStatuses.UNSET ? LocalVariableStatuses.MAYBESET : base._statuses[k] as number;
+				this._statuses[k] = base._statuses[k] == LocalVariableStatuses.UNSET ? LocalVariableStatuses.MAYBESET : base._statuses[k];
 		}
 		var args = funcDef.getArguments();
 		for (var i = 0; i < args.length; ++i)
