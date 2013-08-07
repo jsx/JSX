@@ -98,7 +98,7 @@ native class process {
 	static function kill(pid : int) : void;
 	static function kill(pid : int, signal : string) : void;
 
-	static function memoryUsage() : Map.<int>;
+	static function memoryUsage() : _MemoryUsage;
 
 	static function nextTick(callback : function():void) : void;
 
@@ -139,6 +139,12 @@ native __fake__ class _CPUInfo {
 	__readonly__ var model : string;
 	__readonly__ var speed : number;
 	__readonly__ var times : _TimesInfo[];
+}
+
+native __fake__ class _MemoryUsage {
+	__readonly__ var rss : number;
+	__readonly__ var heapTotal : number;
+	__readonly__ var heapUsed : number;
 }
 
 native __fake__ class _TimesInfo {
