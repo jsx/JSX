@@ -230,7 +230,7 @@ sub expect_compile_error {
     require POSIX;
 
     my($ok, $stdout, $stderr, $status) = jsx("$opts $file");
-    ok !$ok, "failed to compile $file";
+    ok !$ok, "failed to compile (jsx $opts $file)";
     ok POSIX::WIFEXITED($status), "exit status should be normal";
     is POSIX::WEXITSTATUS($status), 65, "exit status should be EX_DATAERR";
     # checks below might be covered by the exit status test right above

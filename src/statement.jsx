@@ -654,6 +654,24 @@ abstract class LabellableStatement extends Statement implements Block {
 	}
 
 	function _prepareBlockAnalysis (context : AnalysisContext) : void {
+		if (this._label) {
+			// check if labels conflict
+			for (var i = context.blockStack.length - 1; ! (context.blockStack[i].block instanceof MemberFunctionDefinition); --i) {
+				var statement = context.blockStack[i].block;
+				if (! (statement instanceof LabellableStatement)) {
+					continue;
+				}
+
+				var ls = statement as LabellableStatement;
+				if (ls.getLabel() && ls.getLabel().getValue() == this.getLabel().getValue()) {
+					var error = new CompileError(this.getLabel(), Util.format("label '%1' has already been defined", [this.getLabel().getValue()]));
+					error.addCompileNote(new CompileNote(ls.getLabel(), "defined here"));
+					context.errors.push(error);
+					break;
+				}
+			}
+		}
+
 		context.blockStack.push(new BlockContext(context.getTopBlock().localVariableStatuses.clone(), this));
 		this._lvStatusesOnBreak = context.getTopBlock().localVariableStatuses.clone();
 		this._lvStatusesOnBreak.setIsReachable(false);
