@@ -878,11 +878,14 @@ class ClassDefinition implements Stashable {
 			if (! Util.typesAreEqual((this._members[i] as MemberFunctionDefinition).getArgumentTypes(), member.getArgumentTypes()))
 				continue;
 			if ((! isCheckingInterface) && (member.flags() & ClassDefinition.IS_OVERRIDE) == 0) {
-				context.errors.push(new CompileError(this._members[i].getNameToken(), "overriding functions must have 'override' attribute set (defined in base class '" + this.classFullName() + "')"));
+				var error = new CompileError(member.getNameToken(), "overriding functions must have 'override' attribute set");
+				error.addCompileNote(new CompileNote(this._members[i].getNameToken(), Util.format("defined in base class '%1'", [this.classFullName()])));
+				context.errors.push(error);
 				return false;
 			}
 			if (reportOverridesAsWell && (this._members[i].flags() & ClassDefinition.IS_OVERRIDE) != 0) {
-				context.errors.push(new CompileError(member.getNameToken(), "definition of the function conflicts with sibling mix-in '" + this.classFullName() + "'"));
+				var error = new CompileError(member.getNameToken(), "definition of the function conflicts with sibling mix-in '" + this.classFullName() + "'");
+				context.errors.push(error);
 				return false;
 			}
 			// assertion of function being overridden does not have 'final' attribute is done by assertFunctionIsOverridable
