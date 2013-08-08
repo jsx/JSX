@@ -1,318 +1,357 @@
 <!DOCTYPE html><html lang="en-US-x-Hixie"><head>
-  <meta charset="utf-8">
-  <title>HTML Canvas 2D Context, Level 2 Nightly</title>
+    <meta charset="utf-8">
+    <title>HTML Canvas 2D Context</title>
     <style type="text/css">
 
-   .applies thead th > * { display: block; }
-   .applies thead code { display: block; }
-   .applies tbody th { white-space: nowrap; }
-   .applies td { text-align: center; }
-   .applies .yes { background: yellow; }
+     .applies thead th > * { display: block; }
+     .applies thead code { display: block; }
+     .applies tbody th { white-space: nowrap; }
+     .applies td { text-align: center; }
+     .applies .yes { background: yellow; }
 
-   .matrix, .matrix td { border: hidden; text-align: right; }
-   .matrix { margin-left: 2em; }
+     .matrix, .matrix td { border: hidden; text-align: right; }
+     .matrix { margin-left: 2em; }
 
-   .dice-example { border-collapse: collapse; border-style: hidden solid solid hidden; border-width: thin; margin-left: 3em; }
-   .dice-example caption { width: 30em; font-size: smaller; font-style: italic; padding: 0.75em 0; text-align: left; }
-   .dice-example td, .dice-example th { border: solid thin; width: 1.35em; height: 1.05em; text-align: center; padding: 0; }
+     .dice-example { border-collapse: collapse; border-style: hidden solid solid hidden; border-width: thin; margin-left: 3em; }
+     .dice-example caption { width: 30em; font-size: smaller; font-style: italic; padding: 0.75em 0; text-align: left; }
+     .dice-example td, .dice-example th { border: solid thin; width: 1.35em; height: 1.05em; text-align: center; padding: 0; }
 
-   td.eg { border-width: thin; text-align: center; }
+     td.eg { border-width: thin; text-align: center; }
 
-   #table-example-1 { border: solid thin; border-collapse: collapse; margin-left: 3em; }
-   #table-example-1 * { font-family: "Essays1743", serif; line-height: 1.01em; }
-   #table-example-1 caption { padding-bottom: 0.5em; }
-   #table-example-1 thead, #table-example-1 tbody { border: none; }
-   #table-example-1 th, #table-example-1 td { border: solid thin; }
-   #table-example-1 th { font-weight: normal; }
-   #table-example-1 td { border-style: none solid; vertical-align: top; }
-   #table-example-1 th { padding: 0.5em; vertical-align: middle; text-align: center; }
-   #table-example-1 tbody tr:first-child td { padding-top: 0.5em; }
-   #table-example-1 tbody tr:last-child td { padding-bottom: 1.5em; }
-   #table-example-1 tbody td:first-child { padding-left: 2.5em; padding-right: 0; width: 9em; }
-   #table-example-1 tbody td:first-child::after { content: leader(". "); }
-   #table-example-1 tbody td { padding-left: 2em; padding-right: 2em; }
-   #table-example-1 tbody td:first-child + td { width: 10em; }
-   #table-example-1 tbody td:first-child + td ~ td { width: 2.5em; }
-   #table-example-1 tbody td:first-child + td + td + td ~ td { width: 1.25em; }
+     #table-example-1 { border: solid thin; border-collapse: collapse; margin-left: 3em; }
+     #table-example-1 * { font-family: "Essays1743", serif; line-height: 1.01em; }
+     #table-example-1 caption { padding-bottom: 0.5em; }
+     #table-example-1 thead, #table-example-1 tbody { border: none; }
+     #table-example-1 th, #table-example-1 td { border: solid thin; }
+     #table-example-1 th { font-weight: normal; }
+     #table-example-1 td { border-style: none solid; vertical-align: top; }
+     #table-example-1 th { padding: 0.5em; vertical-align: middle; text-align: center; }
+     #table-example-1 tbody tr:first-child td { padding-top: 0.5em; }
+     #table-example-1 tbody tr:last-child td { padding-bottom: 1.5em; }
+     #table-example-1 tbody td:first-child { padding-left: 2.5em; padding-right: 0; width: 9em; }
+     #table-example-1 tbody td:first-child::after { content: leader(". "); }
+     #table-example-1 tbody td { padding-left: 2em; padding-right: 2em; }
+     #table-example-1 tbody td:first-child + td { width: 10em; }
+     #table-example-1 tbody td:first-child + td ~ td { width: 2.5em; }
+     #table-example-1 tbody td:first-child + td + td + td ~ td { width: 1.25em; }
 
-   .apple-table-examples { border: none; border-collapse: separate; border-spacing: 1.5em 0em; width: 40em; margin-left: 3em; }
-   .apple-table-examples * { font-family: "Times", serif; }
-   .apple-table-examples td, .apple-table-examples th { border: none; white-space: nowrap; padding-top: 0; padding-bottom: 0; }
-   .apple-table-examples tbody th:first-child { border-left: none; width: 100%; }
-   .apple-table-examples thead th:first-child ~ th { font-size: smaller; font-weight: bolder; border-bottom: solid 2px; text-align: center; }
-   .apple-table-examples tbody th::after, .apple-table-examples tfoot th::after { content: leader(". ") }
-   .apple-table-examples tbody th, .apple-table-examples tfoot th { font: inherit; text-align: left; }
-   .apple-table-examples td { text-align: right; vertical-align: top; }
-   .apple-table-examples.e1 tbody tr:last-child td { border-bottom: solid 1px; }
-   .apple-table-examples.e1 tbody + tbody tr:last-child td { border-bottom: double 3px; }
-   .apple-table-examples.e2 th[scope=row] { padding-left: 1em; }
-   .apple-table-examples sup { line-height: 0; }
+     .apple-table-examples { border: none; border-collapse: separate; border-spacing: 1.5em 0em; width: 40em; margin-left: 3em; }
+     .apple-table-examples * { font-family: "Times", serif; }
+     .apple-table-examples td, .apple-table-examples th { border: none; white-space: nowrap; padding-top: 0; padding-bottom: 0; }
+     .apple-table-examples tbody th:first-child { border-left: none; width: 100%; }
+     .apple-table-examples thead th:first-child ~ th { font-size: smaller; font-weight: bolder; border-bottom: solid 2px; text-align: center; }
+     .apple-table-examples tbody th::after, .apple-table-examples tfoot th::after { content: leader(". ") }
+     .apple-table-examples tbody th, .apple-table-examples tfoot th { font: inherit; text-align: left; }
+     .apple-table-examples td { text-align: right; vertical-align: top; }
+     .apple-table-examples.e1 tbody tr:last-child td { border-bottom: solid 1px; }
+     .apple-table-examples.e1 tbody + tbody tr:last-child td { border-bottom: double 3px; }
+     .apple-table-examples.e2 th[scope=row] { padding-left: 1em; }
+     .apple-table-examples sup { line-height: 0; }
 
-   .details-example img { vertical-align: top; }
+     .details-example img { vertical-align: top; }
 
-   #base64-table {
-     white-space: nowrap;
-     font-size: 0.6em;
-     column-width: 6em;
-     column-count: 5;
-     column-gap: 1em;
-     -moz-column-width: 6em;
-     -moz-column-count: 5;
-     -moz-column-gap: 1em;
-     -webkit-column-width: 6em;
-     -webkit-column-count: 5;
-     -webkit-column-gap: 1em;
+     #base64-table {
+       white-space: nowrap;
+       font-size: 0.6em;
+       column-width: 6em;
+       column-count: 5;
+       column-gap: 1em;
+       -moz-column-width: 6em;
+       -moz-column-count: 5;
+       -moz-column-gap: 1em;
+       -webkit-column-width: 6em;
+       -webkit-column-count: 5;
+       -webkit-column-gap: 1em;
+     }
+     #base64-table thead { display: none; }
+     #base64-table * { border: none; }
+     #base64-table tbody td:first-child:after { content: ':'; }
+     #base64-table tbody td:last-child { text-align: right; }
+
+     #named-character-references-table {
+       white-space: nowrap;
+       font-size: 0.6em;
+       column-width: 30em;
+       column-gap: 1em;
+       -moz-column-width: 30em;
+       -moz-column-gap: 1em;
+       -webkit-column-width: 30em;
+       -webkit-column-gap: 1em;
+     }
+     #named-character-references-table > table > tbody > tr > td:first-child + td,
+     #named-character-references-table > table > tbody > tr > td:last-child { text-align: center; }
+     #named-character-references-table > table > tbody > tr > td:last-child:hover > span { position: absolute; top: auto; left: auto; margin-left: 0.5em; line-height: 1.2; font-size: 5em; border: outset; padding: 0.25em 0.5em; background: white; width: 1.25em; height: auto; text-align: center; }
+     #named-character-references-table > table > tbody > tr#entity-CounterClockwiseContourIntegral > td:first-child { font-size: 0.5em; }
+
+     .glyph.control { color: red; }
+
+     @font-face {
+       font-family: 'Essays1743';
+       src: url('fonts/Essays1743.ttf');
+     }
+     @font-face {
+       font-family: 'Essays1743';
+       font-weight: bold;
+       src: url('fonts/Essays1743-Bold.ttf');
+     }
+     @font-face {
+       font-family: 'Essays1743';
+       font-style: italic;
+       src: url('fonts/Essays1743-Italic.ttf');
+     }
+     @font-face {
+       font-family: 'Essays1743';
+       font-style: italic;
+       font-weight: bold;
+       src: url('fonts/Essays1743-BoldItalic.ttf');
+     }
+
+    </style>
+    <style type="text/css">
+       pre { margin-left: 2em; white-space: pre-wrap; }
+       h2 { margin: 3em 0 1em 0; }
+       h3 { margin: 2.5em 0 1em 0; }
+       h4 { margin: 2.5em 0 0.75em 0; }
+       h5, h6 { margin: 2.5em 0 1em; }
+       h1 + h2, h1 + h2 + h2, h1 + p, h1 + p + h2 { margin: 0.75em 0 0.75em; }
+       h2 + h3, h3 + h4, h4 + h5, h5 + h6 { margin-top: 0.5em; }
+       p { margin: 1em 0; }
+       hr:not(.top) { display: block; background: none; border: none; padding: 0; margin: 2em 0; height: auto; }
+       dl, dd { margin-top: 0; margin-bottom: 0; }
+       dt { margin-top: 0.75em; margin-bottom: 0.25em; clear: left; }
+       dt + dt { margin-top: 0; }
+       dd dt { margin-top: 0.25em; margin-bottom: 0; }
+       dd p { margin-top: 0; }
+       dd dl + p { margin-top: 1em; }
+       dd table + p { margin-top: 1em; }
+       p + * > li, dd li { margin: 1em 0; }
+       dt, dfn { font-weight: bold; font-style: normal; }
+       i, em { font-style: italic; }
+       dt dfn { font-style: italic; }
+       pre, code { font-size: inherit; font-family: monospace; font-variant: normal; }
+       pre strong { color: black; font: inherit; font-weight: bold; background: yellow; }
+       pre em { font-weight: bolder; font-style: normal; }
+       @media screen { code { color: #D93B00; } code :link, code :visited { color: inherit; } }
+       var { background-color: #f9f9f9; border: 1px solid #eee; padding: 0 2px; }
+       var sub { vertical-align: bottom; font-size: smaller; position: relative; top: 0.1em; }
+       table { border-collapse: collapse; border-style: hidden hidden none hidden; }
+       table thead, table tbody { border-bottom: solid; }
+       table tbody th:first-child { border-left: solid; }
+       table tbody th { text-align: left; }
+       table td, table th { border-left: solid; border-right: solid; border-bottom: solid thin; vertical-align: top; padding: 0.2em; }
+       blockquote { margin: 0 0 0 2em; border: 0; padding: 0; font-style: italic; }
+
+       .bad, .bad *:not(.XXX) { color: #5F6D7A; border-color: gray; background: transparent; }
+       .matrix, .matrix td { border: none; text-align: right; }
+       .matrix { margin-left: 2em; }
+       .dice-example { border-collapse: collapse; border-style: hidden solid solid hidden; border-width: thin; margin-left: 3em; }
+       .dice-example caption { width: 30em; font-size: smaller; font-style: italic; padding: 0.75em 0; text-align: left; }
+       .dice-example td, .dice-example th { border: solid thin; width: 1.35em; height: 1.05em; text-align: center; padding: 0; }
+
+       .toc dfn, h1 dfn, h2 dfn, h3 dfn, h4 dfn, h5 dfn, h6 dfn { font: inherit; }
+       img.extra, p.overview { float: right; }
+       pre.idl { border: solid thin #d3d3d3; background: #FCFCFC; color: black; padding: 0.5em 1em; position: relative; }
+       pre.idl :link, pre.idl :visited { color: inherit; background: transparent; }
+       pre.idl::before { content: "IDL"; font: bold small sans-serif; padding: 0.5em; background: white; position: absolute; top: 0; margin: -1px 0 0 -4em; width: 1.5em; border: thin solid; border-radius: 0 0 0 0.5em }
+       pre.css { border: solid thin; background: #FFFFEE; color: black; padding: 0.5em 1em; }
+       pre.css:first-line { color: #AAAA50; }
+       dl.domintro {padding: 0.5em 1em; border: none; background:#E9FBE9; border: 1px solid lightgray; }
+       hr + dl.domintro, div.impl + dl.domintro { margin-top: 2.5em; margin-bottom: 1.5em; }
+       dl.domintro dt, dl.domintro dt * { color: black; text-decoration: none; }
+       dl.domintro dd { margin: 0.5em 0 1em 2em; padding: 0; }
+       dl.domintro dd p { margin: 0.5em 0; }
+       dl.domintro:before { display: table; margin: -1em -0.5em -0.5em auto; width: auto; content: 'This definition is non-normative. Implementation requirements are given below this definition.'; color: #606060; border:1px solid lightgray; background: white; padding: 0 0.25em;font-size:.9em;}
+       dl.switch { padding-left: 2em; }
+       dl.switch > dt { text-indent: -1.5em; }
+       dl.switch > dt:before { content: '\21AA'; padding: 0 0.5em 0 0; display: inline-block; width: 1em; text-align: right; line-height: 0.5em; }
+       dl.triple { padding: 0 0 0 1em; }
+       dl.triple dt, dl.triple dd { margin: 0; display: inline }
+       dl.triple dt:after { content: ':'; }
+       dl.triple dd:after { content: '\A'; white-space: pre; }
+       .diff-old { text-decoration: line-through; color: silver; background: transparent; }
+       .diff-chg, .diff-new { text-decoration: underline; color: green; background: transparent; }
+       a .diff-new { border-bottom: 1px blue solid; }
+
+       figure.diagrams { border: double black; background: white; padding: 1em; }
+       figure.diagrams img { display: block; margin: 1em auto; } 
+
+       h2 { page-break-before: always; }
+       h1, h2, h3, h4, h5, h6 { page-break-after: avoid; }
+       h1 + h2, hr + h2.no-toc { page-break-before: auto; }
+
+       p  > span:not([title=""]):not([class="XXX"]):not([class="impl"]):not([class="note"]),
+       li > span:not([title=""]):not([class="XXX"]):not([class="impl"]):not([class="note"]) { border-bottom: solid #9999CC; }
+
+       div.head { margin: 0 0 1em; padding: 1em 0 0 0; }
+       div.head p { margin: 0; }
+       div.head h1 { margin: 0; }
+       div.head .logo { float: right; margin: 0 1em; }
+       div.head .logo img { border: none } /* remove border from top image */
+       div.head dl { margin: 1em 0; }
+       div.head p.copyright, div.head p.alt { font-size: x-small; font-style: oblique; margin: 0; }
+
+       body > .toc > li { margin-top: 1em; margin-bottom: 1em; }
+       body > .toc.brief > li { margin-top: 0.35em; margin-bottom: 0.35em; }
+       body > .toc > li > * { margin-bottom: 0.5em; }
+       body > .toc > li > * > li > * { margin-bottom: 0.25em; }
+       .toc, .toc li { list-style: none; }
+
+       .brief { margin-top: 1em; margin-bottom: 1em; line-height: 1.1; }
+       .brief li { margin: 0; padding: 0; }
+       .brief li p { margin: 0; padding: 0; }
+
+       .category-list { margin-top: -0.75em; margin-bottom: 1em; line-height: 1.5; }
+       .category-list::before { content: '\21D2\A0'; font-size: 1.2em; font-weight: 900; }
+       .category-list li { display: inline; }
+       .category-list li:not(:last-child)::after { content: ', '; }
+       .category-list li > span, .category-list li > a { text-transform: lowercase; }
+       .category-list li * { text-transform: none; } /* don't affect <code> nested in <a> */
+
+       .XXX { color: #E50000; background: white; border: solid red; padding: 0.5em; margin: 1em 0; }
+       .XXX > :first-child { margin-top: 0; }
+       p .XXX { line-height: 3em; }
+       .annotation { border: solid thin black; background: #0C479D; color: white; position: relative; margin: 8px 0 20px 0; }
+       .annotation:before { position: absolute; left: 0; top: 0; width: 100%; height: 100%; margin: 6px -6px -6px 6px; background: #333333; z-index: -1; content: ''; }
+       .annotation :link, .annotation :visited { color: inherit; }
+       .annotation :link:hover, .annotation :visited:hover { background: transparent; }
+       .annotation span { border: none ! important; }
+       .note { border-left-style: solid; border-left-width: 0.25em; background: none repeat scroll 0 0 #E9FBE9; border-color: #52E052; }
+       .warning { color: red; background: transparent; }
+       .warning { font-weight: bolder; font-style: italic; }
+       .note em, .warning em, .note i, .warning i { font-style: normal; }
+       p.note, div.note { padding: 0.5em 2em; }
+       span.note { padding: 0 2em; }
+       .note p:first-child, .warning p:first-child { margin-top: 0; }
+       .note p:last-child, .warning p:last-child { margin-bottom: 0; }
+       .warning:before { font-style: normal; }
+       p.note:before { content: 'Note: '; font-weight: bolder;}
+       p.warning:before { content: '\26A0 Warning! '; }
+
+       .bookkeeping:before { display: block; content: 'Bookkeeping details'; font-weight: bolder; font-style: italic; }
+       .bookkeeping { font-size: 0.8em; margin: 2em 0; }
+       .bookkeeping p { margin: 0.5em 2em; display: list-item; list-style: square; }
+       .bookkeeping dt { margin: 0.5em 2em 0; }
+       .bookkeeping dd { margin: 0 3em 0.5em; }
+
+       h4 { position: relative; z-index: 3; }
+       h4 + .element, h4 + div + .element { margin-top: -2.5em; padding-top: 2em; }
+       .element {
+         background: #F4F4FA;
+         color: black;
+         margin: 0 0 1em 0.15em;
+         padding: 0 1em 0.25em 0.75em;
+         border-left: solid #9999FF 0.25em;
+         position: relative;
+         z-index: 1;
+       }
+       .element:before {
+         position: absolute;
+         z-index: 2;
+         top: 0;
+         left: -1.15em;
+         height: 2em;
+         width: 0.9em;
+         background: #F4F4FA;
+         content: ' ';
+         border-style: none none solid solid;
+         border-color: #9999FF;
+         border-width: 0.25em;
+       }
+
+       .example { display: block; color: #222222; background: #FCFCFC; border-left-style: solid;border-color:#c0c0c0; border-left-width: 0.25em; margin-left: 1em; padding-left: 1em;padding-bottom: 0.5em;}
+       div.example:before { content: 'Code Example: '; font-weight: bolder;}
+       td > .example:only-child { margin: 0 0 0 0.1em; }
+
+       ul.domTree, ul.domTree ul { padding: 0 0 0 1em; margin: 0; }
+       ul.domTree li { padding: 0; margin: 0; list-style: none; position: relative; }
+       ul.domTree li li { list-style: none; }
+       ul.domTree li:first-child::before { position: absolute; top: 0; height: 0.6em; left: -0.75em; width: 0.5em; border-style: none none solid solid; content: ''; border-width: 0.1em; }
+       ul.domTree li:not(:last-child)::after { position: absolute; top: 0; bottom: -0.6em; left: -0.75em; width: 0.5em; border-style: none none solid solid; content: ''; border-width: 0.1em; }
+       ul.domTree span { font-style: italic; font-family: serif; }
+       ul.domTree .t1 code { color: purple; font-weight: bold; }
+       ul.domTree .t2 { font-style: normal; font-family: monospace; }
+       ul.domTree .t2 .name { color: black; font-weight: bold; }
+       ul.domTree .t2 .value { color: blue; font-weight: normal; }
+       ul.domTree .t3 code, .domTree .t4 code, .domTree .t5 code { color: gray; }
+       ul.domTree .t7 code, .domTree .t8 code { color: green; }
+       ul.domTree .t10 code { color: teal; }
+
+       body.dfnEnabled dfn { cursor: pointer; }
+       .dfnPanel {
+         display: inline;
+         position: absolute;
+         z-index: 10;
+         height: auto;
+         width: auto;
+         padding: 0.5em 0.75em;
+         font: small sans-serif, Droid Sans Fallback;
+         background: #DDDDDD;
+         color: black;
+         border: outset 0.2em;
+       }
+       .dfnPanel * { margin: 0; padding: 0; font: inherit; text-indent: 0; }
+       .dfnPanel :link, .dfnPanel :visited { color: black; }
+       .dfnPanel p { font-weight: bolder; }
+       .dfnPanel * + p { margin-top: 0.25em; }
+       .dfnPanel li { list-style-position: inside; }
+
+       #configUI { position: absolute; z-index: 20; top: 10em; right: 1em; width: 11em; font-size: small; }
+       #configUI p { margin: 0.5em 0; padding: 0.3em; background: #EEEEEE; color: black; border: inset thin; }
+       #configUI p label { display: block; }
+       #configUI #updateUI, #configUI .loginUI { text-align: center; }
+       #configUI input[type=button] { display: block; margin: auto; }
+
+       fieldset { margin: 1em; padding: 0.5em 1em; }
+       fieldset > legend + * { margin-top: 0; }
+       fieldset > :last-child { margin-bottom: 0; }
+       fieldset p { margin: 0.5em 0; }
+       header p.subline {color:#005A9C; font: 140% sans-serif;margin: 0.75em 0;}
+       #authorButton {overflow: visible; padding: 0.1em 0.3em; position: fixed; right: 2em; top: 6em; width: auto;}
+
+       @media print {#authorButton { display:none;}}
+
+   .stability {
+     position: fixed;
+     bottom: 0;
+     left: 0; right: 0;
+     margin: 0 auto 0 auto;
+     width: 50%;
+     background: maroon; color: yellow;
+     -webkit-border-radius: 1em 1em 0 0;
+     -moz-border-radius: 1em 1em 0 0;
+     border-radius: 1em 1em 0 0;
+     -moz-box-shadow: 0 0 1em #500;
+     -webkit-box-shadow: 0 0 1em #500;
+     box-shadow: 0 0 1em red;
+     padding: 0.5em 1em;
+     text-align: center;
    }
-   #base64-table thead { display: none; }
-   #base64-table * { border: none; }
-   #base64-table tbody td:first-child:after { content: ':'; }
-   #base64-table tbody td:last-child { text-align: right; }
-
-   #named-character-references-table {
-     white-space: nowrap;
-     font-size: 0.6em;
-     column-width: 30em;
-     column-gap: 1em;
-     -moz-column-width: 30em;
-     -moz-column-gap: 1em;
-     -webkit-column-width: 30em;
-     -webkit-column-gap: 1em;
+   .stability strong {
+     display: block;
    }
-   #named-character-references-table > table > tbody > tr > td:first-child + td,
-   #named-character-references-table > table > tbody > tr > td:last-child { text-align: center; }
-   #named-character-references-table > table > tbody > tr > td:last-child:hover > span { position: absolute; top: auto; left: auto; margin-left: 0.5em; line-height: 1.2; font-size: 5em; border: outset; padding: 0.25em 0.5em; background: white; width: 1.25em; height: auto; text-align: center; }
-   #named-character-references-table > table > tbody > tr#entity-CounterClockwiseContourIntegral > td:first-child { font-size: 0.5em; }
-
-   .glyph.control { color: red; }
-
-   @font-face {
-     font-family: 'Essays1743';
-     src: url('fonts/Essays1743.ttf');
+   .stability input {
+     -moz-appearance: none; -webkit-appearance: none; margin: 0; 
+     border: 0; padding: 0.25em 0.5em; background: transparent; color: black;
+     position: absolute; top: -0.5em; right: 0; font: 1.25em sans-serif; text-align: center;
    }
-   @font-face {
-     font-family: 'Essays1743';
-     font-weight: bold;
-     src: url('fonts/Essays1743-Bold.ttf');
+   .stability input:hover {
+     color: white;
+     text-shadow: 0 0 2px black;
    }
-   @font-face {
-     font-family: 'Essays1743';
-     font-style: italic;
-     src: url('fonts/Essays1743-Italic.ttf');
+   .stability input:active {
+     padding: 0.3em 0.45em 0.2em 0.55em;
    }
-   @font-face {
-     font-family: 'Essays1743';
-     font-style: italic;
-     font-weight: bold;
-     src: url('fonts/Essays1743-BoldItalic.ttf');
+   .stability :link, .stability :visited,
+   .stability :link:hover, .stability :visited:hover {
+     background: transparent;
+     color: white;
    }
 
   </style>
+  <link href="http://www.w3.org/StyleSheets/TR/W3C-CR" rel="stylesheet" type="text/css">
 
-  <link href="data:text/css," id="complete" rel="stylesheet" title="Complete specification">
-<link href="data:text/css,.impl%20{%20display:%20none;%20}%0Ahtml%20{%20border:%20solid%20yellow;%20}%20.domintro:before%20{%20display:%20none;%20}" id="author" rel="alternate stylesheet" title="Author documentation only">
-<link href="data:text/css,.impl%20{%20background:%20%23FFEEEE;%20}%20.domintro:before%20{%20background:%20%23FFEEEE;%20}" id="highlight" rel="alternate stylesheet" title="Highlight implementation requirements">
 
-    <style type="text/css">
-   pre { margin-left: 2em; white-space: pre-wrap; }
-   h2 { margin: 3em 0 1em 0; }
-   h3 { margin: 2.5em 0 1em 0; }
-   h4 { margin: 2.5em 0 0.75em 0; }
-   h5, h6 { margin: 2.5em 0 1em; }
-   h1 + h2, h1 + h2 + h2 { margin: 0.75em 0 0.75em; }
-   h2 + h3, h3 + h4, h4 + h5, h5 + h6 { margin-top: 0.5em; }
-   p { margin: 1em 0; }
-   hr:not(.top) { display: block; background: none; border: none; padding: 0; margin: 2em 0; height: auto; }
-   dl, dd { margin-top: 0; margin-bottom: 0; }
-   dt { margin-top: 0.75em; margin-bottom: 0.25em; clear: left; }
-   dt + dt { margin-top: 0; }
-   dd dt { margin-top: 0.25em; margin-bottom: 0; }
-   dd p { margin-top: 0; }
-   dd dl + p { margin-top: 1em; }
-   dd table + p { margin-top: 1em; }
-   p + * > li, dd li { margin: 1em 0; }
-   dt, dfn { font-weight: bold; font-style: normal; }
-   i, em { font-style: italic; }
-   dt dfn { font-style: italic; }
-   pre, code { font-size: inherit; font-family: monospace; font-variant: normal; }
-   pre strong { color: black; font: inherit; font-weight: bold; background: yellow; }
-   pre em { font-weight: bolder; font-style: normal; }
-   @media screen { code { color: orangered; } code :link, code :visited { color: inherit; } }
-   var sub { vertical-align: bottom; font-size: smaller; position: relative; top: 0.1em; }
-   table { border-collapse: collapse; border-style: hidden hidden none hidden; }
-   table thead, table tbody { border-bottom: solid; }
-   table tbody th:first-child { border-left: solid; }
-   table tbody th { text-align: left; }
-   table td, table th { border-left: solid; border-right: solid; border-bottom: solid thin; vertical-align: top; padding: 0.2em; }
-   blockquote { margin: 0 0 0 2em; border: 0; padding: 0; font-style: italic; }
-
-   .bad, .bad *:not(.XXX) { color: gray; border-color: gray; background: transparent; }
-   .matrix, .matrix td { border: none; text-align: right; }
-   .matrix { margin-left: 2em; }
-   .dice-example { border-collapse: collapse; border-style: hidden solid solid hidden; border-width: thin; margin-left: 3em; }
-   .dice-example caption { width: 30em; font-size: smaller; font-style: italic; padding: 0.75em 0; text-align: left; }
-   .dice-example td, .dice-example th { border: solid thin; width: 1.35em; height: 1.05em; text-align: center; padding: 0; }
-
-   .toc dfn, h1 dfn, h2 dfn, h3 dfn, h4 dfn, h5 dfn, h6 dfn { font: inherit; }
-   img.extra, p.overview { float: right; }
-   pre.idl { border: solid thin; background: #EEEEEE; color: black; padding: 0.5em 1em; position: relative; }
-   pre.idl :link, pre.idl :visited { color: inherit; background: transparent; }
-   pre.idl::before { content: "IDL"; font: bold small sans-serif; padding: 0.5em; background: white; position: absolute; top: 0; margin: -1px 0 0 -4em; width: 1.5em; border: thin solid; border-radius: 0 0 0 0.5em }
-   pre.css { border: solid thin; background: #FFFFEE; color: black; padding: 0.5em 1em; }
-   pre.css:first-line { color: #AAAA50; }
-   dl.domintro { color: green; margin: 2em 0 2em 2em; padding: 0.5em 1em; border: none; background: #DDFFDD; }
-   hr + dl.domintro, div.impl + dl.domintro { margin-top: 2.5em; margin-bottom: 1.5em; }
-   dl.domintro dt, dl.domintro dt * { color: black; text-decoration: none; }
-   dl.domintro dd { margin: 0.5em 0 1em 2em; padding: 0; }
-   dl.domintro dd p { margin: 0.5em 0; }
-   dl.domintro:before { display: table; margin: -1em -0.5em -0.5em auto; width: auto; content: 'This box is non-normative. Implementation requirements are given below this box.'; color: black; font-style: italic; border: solid 2px; background: white; padding: 0 0.25em; }
-   dl.switch { padding-left: 2em; }
-   dl.switch > dt { text-indent: -1.5em; }
-   dl.switch > dt:before { content: '\21AA'; padding: 0 0.5em 0 0; display: inline-block; width: 1em; text-align: right; line-height: 0.5em; }
-   dl.triple { padding: 0 0 0 1em; }
-   dl.triple dt, dl.triple dd { margin: 0; display: inline }
-   dl.triple dt:after { content: ':'; }
-   dl.triple dd:after { content: '\A'; white-space: pre; }
-   .diff-old { text-decoration: line-through; color: silver; background: transparent; }
-   .diff-chg, .diff-new { text-decoration: underline; color: green; background: transparent; }
-   a .diff-new { border-bottom: 1px blue solid; }
-
-   figure.diagrams { border: double black; background: white; padding: 1em; }
-   figure.diagrams img { display: block; margin: 1em auto; } 
-
-   h2 { page-break-before: always; }
-   h1, h2, h3, h4, h5, h6 { page-break-after: avoid; }
-   h1 + h2, hr + h2.no-toc { page-break-before: auto; }
-
-   p  > span:not([title=""]):not([class="XXX"]):not([class="impl"]):not([class="note"]),
-   li > span:not([title=""]):not([class="XXX"]):not([class="impl"]):not([class="note"]) { border-bottom: solid #9999CC; }
-
-   div.head { margin: 0 0 1em; padding: 1em 0 0 0; }
-   div.head p { margin: 0; }
-   div.head h1 { margin: 0; }
-   div.head .logo { float: right; margin: 0 1em; }
-   div.head .logo img { border: none } /* remove border from top image */
-   div.head dl { margin: 1em 0; }
-   div.head p.copyright, div.head p.alt { font-size: x-small; font-style: oblique; margin: 0; }
-
-   body > .toc > li { margin-top: 1em; margin-bottom: 1em; }
-   body > .toc.brief > li { margin-top: 0.35em; margin-bottom: 0.35em; }
-   body > .toc > li > * { margin-bottom: 0.5em; }
-   body > .toc > li > * > li > * { margin-bottom: 0.25em; }
-   .toc, .toc li { list-style: none; }
-
-   .brief { margin-top: 1em; margin-bottom: 1em; line-height: 1.1; }
-   .brief li { margin: 0; padding: 0; }
-   .brief li p { margin: 0; padding: 0; }
-
-   .category-list { margin-top: -0.75em; margin-bottom: 1em; line-height: 1.5; }
-   .category-list::before { content: '\21D2\A0'; font-size: 1.2em; font-weight: 900; }
-   .category-list li { display: inline; }
-   .category-list li:not(:last-child)::after { content: ', '; }
-   .category-list li > span, .category-list li > a { text-transform: lowercase; }
-   .category-list li * { text-transform: none; } /* don't affect <code> nested in <a> */
-
-   .XXX { color: #E50000; background: white; border: solid red; padding: 0.5em; margin: 1em 0; }
-   .XXX > :first-child { margin-top: 0; }
-   p .XXX { line-height: 3em; }
-   .annotation { border: solid thin black; background: #0C479D; color: white; position: relative; margin: 8px 0 20px 0; }
-   .annotation:before { position: absolute; left: 0; top: 0; width: 100%; height: 100%; margin: 6px -6px -6px 6px; background: #333333; z-index: -1; content: ''; }
-   .annotation :link, .annotation :visited { color: inherit; }
-   .annotation :link:hover, .annotation :visited:hover { background: transparent; }
-   .annotation span { border: none ! important; }
-   .note { color: green; background: transparent; font-family: sans-serif; }
-   .warning { color: red; background: transparent; }
-   .note, .warning { font-weight: bolder; font-style: italic; }
-   .note em, .warning em, .note i, .warning i { font-style: normal; }
-   p.note, div.note { padding: 0.5em 2em; }
-   span.note { padding: 0 2em; }
-   .note p:first-child, .warning p:first-child { margin-top: 0; }
-   .note p:last-child, .warning p:last-child { margin-bottom: 0; }
-   .warning:before { font-style: normal; }
-   p.note:before { content: 'Note: '; }
-   p.warning:before { content: '\26A0 Warning! '; }
-
-   .bookkeeping:before { display: block; content: 'Bookkeeping details'; font-weight: bolder; font-style: italic; }
-   .bookkeeping { font-size: 0.8em; margin: 2em 0; }
-   .bookkeeping p { margin: 0.5em 2em; display: list-item; list-style: square; }
-   .bookkeeping dt { margin: 0.5em 2em 0; }
-   .bookkeeping dd { margin: 0 3em 0.5em; }
-
-   h4 { position: relative; z-index: 3; }
-   h4 + .element, h4 + div + .element { margin-top: -2.5em; padding-top: 2em; }
-   .element {
-     background: #EEEEFF;
-     color: black;
-     margin: 0 0 1em 0.15em;
-     padding: 0 1em 0.25em 0.75em;
-     border-left: solid #9999FF 0.25em;
-     position: relative;
-     z-index: 1;
-   }
-   .element:before {
-     position: absolute;
-     z-index: 2;
-     top: 0;
-     left: -1.15em;
-     height: 2em;
-     width: 0.9em;
-     background: #EEEEFF;
-     content: ' ';
-     border-style: none none solid solid;
-     border-color: #9999FF;
-     border-width: 0.25em;
-   }
-
-   .example { display: block; color: #222222; background: #FCFCFC; border-left: double; margin-left: 2em; padding-left: 1em; }
-   td > .example:only-child { margin: 0 0 0 0.1em; }
-
-   ul.domTree, ul.domTree ul { padding: 0 0 0 1em; margin: 0; }
-   ul.domTree li { padding: 0; margin: 0; list-style: none; position: relative; }
-   ul.domTree li li { list-style: none; }
-   ul.domTree li:first-child::before { position: absolute; top: 0; height: 0.6em; left: -0.75em; width: 0.5em; border-style: none none solid solid; content: ''; border-width: 0.1em; }
-   ul.domTree li:not(:last-child)::after { position: absolute; top: 0; bottom: -0.6em; left: -0.75em; width: 0.5em; border-style: none none solid solid; content: ''; border-width: 0.1em; }
-   ul.domTree span { font-style: italic; font-family: serif; }
-   ul.domTree .t1 code { color: purple; font-weight: bold; }
-   ul.domTree .t2 { font-style: normal; font-family: monospace; }
-   ul.domTree .t2 .name { color: black; font-weight: bold; }
-   ul.domTree .t2 .value { color: blue; font-weight: normal; }
-   ul.domTree .t3 code, .domTree .t4 code, .domTree .t5 code { color: gray; }
-   ul.domTree .t7 code, .domTree .t8 code { color: green; }
-   ul.domTree .t10 code { color: teal; }
-
-   body.dfnEnabled dfn { cursor: pointer; }
-   .dfnPanel {
-     display: inline;
-     position: absolute;
-     z-index: 10;
-     height: auto;
-     width: auto;
-     padding: 0.5em 0.75em;
-     font: small sans-serif, Droid Sans Fallback;
-     background: #DDDDDD;
-     color: black;
-     border: outset 0.2em;
-   }
-   .dfnPanel * { margin: 0; padding: 0; font: inherit; text-indent: 0; }
-   .dfnPanel :link, .dfnPanel :visited { color: black; }
-   .dfnPanel p { font-weight: bolder; }
-   .dfnPanel * + p { margin-top: 0.25em; }
-   .dfnPanel li { list-style-position: inside; }
-
-   #configUI { position: absolute; z-index: 20; top: 10em; right: 1em; width: 11em; font-size: small; }
-   #configUI p { margin: 0.5em 0; padding: 0.3em; background: #EEEEEE; color: black; border: inset thin; }
-   #configUI p label { display: block; }
-   #configUI #updateUI, #configUI .loginUI { text-align: center; }
-   #configUI input[type=button] { display: block; margin: auto; }
-
-   fieldset { margin: 1em; padding: 0.5em 1em; }
-   fieldset > legend + * { margin-top: 0; }
-   fieldset > :last-child { margin-bottom: 0; }
-   fieldset p { margin: 0.5em 0; }
-
-  </style>
-  <link href="http://www.w3.org/StyleSheets/TR/W3C-ED" rel="stylesheet" type="text/css">
-
-    <script>
+  <script>
    function getCookie(name) {
      var params = location.search.substr(1).split("&");
      for (var index = 0; index < params.length; index++) {
@@ -331,48 +370,42 @@
      return null;
    }
   </script>
- </head>
+  
+   </head>
  <body>
   <div class="head" id="head">
+<header>
+
    <p><a href="http://www.w3.org/"><img alt="W3C" height="48" src="http://www.w3.org/Icons/w3c_home" width="72"></a></p>
 
-   <h1>HTML Canvas 2D Context, Level 2 Nightly</h1>
-   <h2 class="no-num no-toc" id="generatedID"></h2>
-   <h2 class="no-num no-toc" id="editor's-draft-date-1-january-1970">Editor's Draft 18 December 2012</h2>
-   <dl>
+    <h1>HTML Canvas 2D Context</h1>
+    <h2 class="no-num no-toc" id="generatedID"></h2>
+   <h2 class="no-num no-toc" id="w3c-candidate-recommendation-6-august-2013">W3C Candidate Recommendation 6 August 2013</h2>
+   </header>
+<dl>
+    <dt>This Version:</dt>
+    <dd><a href="http://www.w3.org/TR/2013/CR-2dcontext-20130806/">http://www.w3.org/TR/2013/CR-2dcontext-20130806/</a></dd>
     <dt>Latest Published Version:</dt>
-    <dd><a href="http://www.w3.org/TR/2dcontext2/">http://www.w3.org/TR/2dcontext2/</a></dd>
+    <dd><a href="http://www.w3.org/TR/2dcontext/">http://www.w3.org/TR/2dcontext/</a></dd>
     <dt>Latest Editor's Draft:</dt>
-    <dd><a class="latest-link" href="http://dev.w3.org/html5/2dcontext2/">http://dev.w3.org/html5/2dcontext2/</a></dd>
+    <dd><a class="latest-link" href="http://www.w3.org/html/wg/drafts/2dcontext/html5_canvas_CR/">http://www.w3.org/html/wg/drafts/2dcontext/html5_canvas_CR/</a></dd>
 
-    <dt>Previous Versions:</dt>
-    <dd><a href="http://www.w3.org/TR/2012/WD-2dcontext-20121217/">http://www.w3.org/TR/2012/WD-2dcontext-20121217/</a></dd>
-    <dd><a href="http://www.w3.org/TR/2012/WD-2dcontext-20121025/">http://www.w3.org/TR/2012/WD-2dcontext-20121025/</a></dd>
-    <dd><a href="http://www.w3.org/TR/2012/WD-2dcontext-20120329/">http://www.w3.org/TR/2012/WD-2dcontext-20120329/</a></dd>
-    <dd><a href="http://www.w3.org/TR/2011/WD-2dcontext-20110525/">http://www.w3.org/TR/2011/WD-2dcontext-20110525/</a></dd>
-    <dd><a href="http://www.w3.org/TR/2011/WD-2dcontext-20110405/">http://www.w3.org/TR/2011/WD-2dcontext-20110405/</a></dd>
-    <dd><a href="http://www.w3.org/TR/2011/WD-2dcontext-20110113/">http://www.w3.org/TR/2011/WD-2dcontext-20110113/</a></dd>
-    <dd><a href="http://www.w3.org/TR/2010/WD-2dcontext-20101019/">http://www.w3.org/TR/2010/WD-2dcontext-20101019/</a></dd>
-    <dd><a href="http://www.w3.org/TR/2010/WD-2dcontext-20100624/">http://www.w3.org/TR/2010/WD-2dcontext-20100624/</a></dd>
-    <dd><a href="http://www.w3.org/TR/2010/WD-2dcontext-20100304/">http://www.w3.org/TR/2010/WD-2dcontext-20100304/</a></dd>
-    <dd><a href="http://www.w3.org/TR/2009/WD-html5-20090825/">http://www.w3.org/TR/2009/WD-html5-20090825/</a></dd>
-    <dd><a href="http://www.w3.org/TR/2009/WD-html5-20090423/">http://www.w3.org/TR/2009/WD-html5-20090423/</a></dd>
-    <dd><a href="http://www.w3.org/TR/2009/WD-html5-20090212/">http://www.w3.org/TR/2009/WD-html5-20090212/</a></dd>
-    <dd><a href="http://www.w3.org/TR/2008/WD-html5-20080610/">http://www.w3.org/TR/2008/WD-html5-20080610/</a></dd>
-    <dd><a href="http://www.w3.org/TR/2008/WD-html5-20080122/">http://www.w3.org/TR/2008/WD-html5-20080122/</a></dd>
-    <dt id="editors">Editors:</dt>
-    <dd><a href="mailto:cabanier@adobe.com">Rik Cabanier</a>, Adobe Systems, Inc.</dd>
-    <dd><a href="mailto:eliot.graff@microsoft.com">Eliot Graff</a>, Microsoft Corporation</dd>
-    <dd><a href="mailto:jaymunro@microsoft.com">Jay Munro</a>, Microsoft Corporation</dd>
-    <dd><a href="mailto:wiltzius@google.com">Tom Wiltzius</a>, Google, Inc.</dd>
-   <dt>Previous Editor:</dt>
-    <dd><a href="mailto:ian@hixie.ch">Ian Hickson</a>, Google, Inc.</dd>
+      <dt>Previous Versions:</dt>
+      <dd><a href="http://www.w3.org/TR/2012/CR-2dcontext-20121217/">http://www.w3.org/TR/2012/CR-2dcontext-20121217/</a></dd>
+      <dt id="specification-editors">Editors:</dt>
+      <dd>W3C:</dd>
+      <dd><a href="mailto:cabanier@adobe.com">Rik Cabanier</a>, Adobe Systems, Inc.</dd>
+      <dd><a href="mailto:eliot.graff@microsoft.com">Eliot Graff</a>, Microsoft Corporation</dd>
+      <dd><a href="mailto:jaymunro@microsoft.com">Jay Munro</a>, Microsoft Corporation</dd>
+      <dd><a href="mailto:wiltzius@google.com">Tom Wiltzius</a>, Google, Inc.</dd>
+      <dd>WHATWG:</dd>
+      <dd><a href="mailto:ian@hixie.ch">Ian Hickson</a>, Google, Inc.</dd>
    </dl>
-     <p class="copyright"><a href="http://www.w3.org/Consortium/Legal/ipr-notice#Copyright">Copyright</a>
-   © 2012 <a href="http://www.w3.org/"><abbr title="World Wide
+   <p class="copyright"><a href="http://www.w3.org/Consortium/Legal/ipr-notice#Copyright">Copyright</a>
+   © 2013 <a href="http://www.w3.org/"><abbr title="World Wide
    Web Consortium">W3C</abbr></a><sup>®</sup> (<a href="http://www.csail.mit.edu/"><abbr title="Massachusetts
    Institute of Technology">MIT</abbr></a>, <a href="http://www.ercim.eu/"><abbr title="European Research
-   Consortium for Informatics and Mathematics">ERCIM</abbr></a>, <a href="http://www.keio.ac.jp/">Keio</a>), All Rights Reserved. W3C
+   Consortium for Informatics and Mathematics">ERCIM</abbr></a>, <a href="http://www.keio.ac.jp/">Keio</a>, <a href="http://ev.buaa.edu.cn/">Beihang</a>), All Rights Reserved. W3C
    <a href="http://www.w3.org/Consortium/Legal/ipr-notice#Legal_Disclaimer">liability</a>,
    <a href="http://www.w3.org/Consortium/Legal/ipr-notice#W3C_Trademarks">trademark</a>
    and <a href="http://www.w3.org/Consortium/Legal/copyright-documents">document
@@ -389,39 +422,49 @@
   <p>This specification defines the 2D Context for the HTML
   <code>canvas</code> element. The 2D Context provides
    objects, methods, and properties to draw and manipulate 
-   graphics on a <code>canvas</code> drawing surface.
-</p>
+   graphics on a <code>canvas</code> drawing surface.</p>
 
   <h2 class="no-num no-toc" id="status-of-this-document">Status of This document</h2>
-  
-  <!-- intro boilerplate (required) -->
-
-  <p><em>This section describes the status of this document at the time of its publication. Other documents may supersede this document. A list of current W3C publications and the latest revision of this technical report can be found in the <a href="http://www.w3.org/TR/">W3C technical reports index</a> at http://www.w3.org/TR/.</em></p>
 
 
-  <!-- where to send feedback (required) -->
+    <!-- intro boilerplate (required) -->
 
-  <p>If you wish to make comments regarding this document in a manner
-  that is tracked by the W3C, please submit them via using <a href="http://www.w3.org/Bugs/Public/enter_bug.cgi?product=HTML%20WG">our
-  public bug database</a>. If you cannot do this then you can also e-mail feedback to <a href="mailto:public-html-comments@w3.org">public-html-comments@w3.org</a>
-  (<a href="mailto:public-html-comments-request@w3.org?subject=subscribe">subscribe</a>,
-  <a href="http://lists.w3.org/Archives/Public/public-html-comments/">archives</a>),
-  and arrangements will be made to transpose the comments to our
-  public bug database. All feedback is welcome.</p>
+    <p>
+      <em>This section describes the status of this document at the time of its publication. 
+      Other documents may supersede this document. A list of current W3C publications and the 
+      latest revision of this technical report can be found in the <a href="http://www.w3.org/TR/">W3C 
+      technical reports index</a> at http://www.w3.org/TR/.</em>
+    </p>
 
-  
+    <!-- where to send feedback (required) -->
 
-     <!-- UNDER NO CIRCUMSTANCES IS THE FOLLOWING PARAGRAPH TO BE REMOVED OR EDITED WITHOUT TALKING TO IAN FIRST -->
-   <p class="alt">The bulk of the text of this specification is also
-   available in the WHATWG <a href="http://www.whatwg.org/specs/web-apps/current-work/complete.html#2dcontext">Web Applications 1.0</a> specification, under a license that permits
-   reuse of the specification text.</p>
-   <!-- UNDER NO CIRCUMSTANCES IS THE PRECEDING PARAGRAPH TO BE REMOVED OR EDITED WITHOUT TALKING TO IAN FIRST -->
-  
+    <p>If you wish to make comments regarding this document in a manner
+    that is tracked by the W3C, please submit them via using <a href="http://www.w3.org/Bugs/Public/enter_bug.cgi?product=HTML%20WG">our
+    public bug database</a>. If you cannot do this then you can also e-mail feedback to <a href="mailto:public-html-comments@w3.org">public-html-comments@w3.org</a>
+    (<a href="mailto:public-html-comments-request@w3.org?subject=subscribe">subscribe</a>,
+    <a href="http://lists.w3.org/Archives/Public/public-html-comments/">archives</a>),
+    and arrangements will be made to transpose the comments to our
+    public bug database. All feedback is welcome.</p>
+
+        <p>
+      Work on extending this specification typically proceeds through
+      <a href="http://www.w3.org/html/wg/wiki/ExtensionSpecifications">extension specifications</a>
+      which should be consulted to see what new features are being reviewed.
+    </p>
+               <!-- UNDER NO CIRCUMSTANCES IS THE FOLLOWING PARAGRAPH TO BE REMOVED OR EDITED WITHOUT TALKING TO IAN FIRST -->
+       <p class="alt">The bulk of the text of this specification is also
+       available in the WHATWG <a href="http://www.whatwg.org/specs/web-apps/current-work/complete.html#2dcontext">HTML Living Standard</a>, under a license that permits reuse of the
+       specification text.</p>
+       <!-- UNDER NO CIRCUMSTANCES IS THE PRECEDING PARAGRAPH TO BE REMOVED OR EDITED WITHOUT TALKING TO IAN FIRST -->
+    
   <!-- UNDER NO CIRCUMSTANCES IS THE FOLLOWING PARAGRAPH TO BE REMOVED OR EDITED WITHOUT TALKING TO IAN FIRST -->  
-  <p>The working groups maintains <a href="http://www.w3.org/Bugs/Public/buglist.cgi?query_format=advanced&amp;short_desc_type=allwordssubstr&amp;short_desc=&amp;product=HTML+WG&amp;longdesc_type=allwordssubstr&amp;longdesc=&amp;bug_file_loc_type=allwordssubstr&amp;bug_file_loc=&amp;status_whiteboard_type=allwordssubstr&amp;status_whiteboard=&amp;keywords_type=allwords&amp;keywords=&amp;bug_status=UNCONFIRMED&amp;bug_status=NEW&amp;bug_status=ASSIGNED&amp;bug_status=REOPENED&amp;emailtype1=substring&amp;email1=&amp;emailtype2=substring&amp;email2=&amp;bug_id_type=anyexact&amp;bug_id=&amp;votes=&amp;chfieldfrom=&amp;chfieldto=Now&amp;chfieldvalue=&amp;cmdtype=doit&amp;order=Reuse+same+sort+as+last+time&amp;field0-0-0=noop&amp;type0-0-0=noop&amp;value0-0-0=">a
+  <p>The working groups maintains <a href="https://www.w3.org/Bugs/Public/buglist.cgi?list_id=11235&amp;query_format=advanced&amp;bug_status=NEW&amp;bug_status=ASSIGNED&amp;bug_status=REOPENED&amp;component=HTML5%20spec&amp;product=HTML%20WG">a
   list of all bug reports that the editors have not yet tried to
   address</a> and <a href="http://www.w3.org/html/wg/tracker/products/1">a list of issues
-  for which the chairs have not yet declared a decision</a>. These bugs and
+  for which the chairs have not yet declared a decision</a>.
+  You are very welcome to <a href="https://www.w3.org/Bugs/Public/enter_bug.cgi?product=HTML%20WG&amp;component=HTML5%20spec&amp;priority=P3">file a new bug</a>
+  for any problem you may encounter.
+   These bugs and
   issues apply to multiple HTML-related specifications,
   not just this one.</p>
   <!-- UNDER NO CIRCUMSTANCES IS THE PRECEDING PARAGRAPH TO BE REMOVED OR EDITED WITHOUT TALKING TO IAN FIRST -->
@@ -438,39 +481,57 @@
 
 
   <div id="multipage-common">
+  <!-- stability warning for TR/ page version -->
+  <!-- q.v. http://lists.w3.org/Archives/Public/public-html/2010Oct/0457.html -->
+  <p class="stability" id="wip"><strong>This is a work in
+  progress!</strong> For the latest updates from the HTML WG, possibly
+  including important bug fixes, please look at the <a href="http://www.w3.org/html/wg/drafts/2dcontext/html5_canvas_CR/">editor's draft</a> instead.
+  <input onclick="closeWarning(this.parentNode)" type="button" value="X">
+  </p>
+  <script>
+   function closeWarning(element) {
+     element.parentNode.removeChild(element);
+     var date = new Date();
+     date.setDate(date.getDate()+4);
+     document.cookie = 'hide-obsolescence-warning=1; expires=' + date.toGMTString();
+   }
+   function removeWIP () {
+       document.getElementById('wip').parentNode.removeChild(document.getElementById('wip'));
+   }
+   if (document.documentElement.getAttribute("data-wip") === "false") removeWIP();
+   if (getCookie('hide-obsolescence-warning') == '1') setTimeout(removeWIP, 2000);
+  </script>
   </div>
 
 
-  <p>Publication as a Working Draft does not imply endorsement by the W3C Membership.
+  <p>Publication as a Candidate Recommendation does not imply endorsement by the W3C Membership.
   This is a draft document and may be updated, replaced or obsoleted by other documents at
   any time. It is inappropriate to cite this document as other than work in progress.</p>
 
-
-  <!-- UNDER NO CIRCUMSTANCES IS THE FOLLOWING PARAGRAPH TO BE REMOVED OR EDITED WITHOUT TALKING TO IAN FIRST -->
   <!-- version history or list of changes (required) -->
   <p>The latest stable version of the editor's draft of this
-  specification is always available on <a href="http://dev.w3.org/html5/">the W3C CVS server</a>.
-  There are various ways to follow the change history for this specification:
+  specification is always available on <a href="https://github.com/w3c/html">the W3C HTML git repository</a>.
   </p>
-  <dl>
-   <dt>Browsable version-control record of all changes:</dt>
-   <dd>Github repository (real-time updates): <a href="https://github.com/w3c/html/commits/master">https://github.com/w3c/html/commits/master</a></dd>
-   <dd>CVSWeb interface (hourly updates): <a href="http://dev.w3.org/cvsweb/html5/spec/">http://dev.w3.org/cvsweb/html5/spec/</a></dd>
-   <dt>E-mail notifications of changes:</dt>
-   <dd>HTML-Commits mailing list (commit notifications for dev.w3.org/html5): <a href="http://lists.w3.org/Archives/Public/public-html-commits/latest">http://lists.w3.org/Archives/Public/public-html-commits/latest</a></dd>
-  </dl>
-  <!-- UNDER NO CIRCUMSTANCES IS THE PRECEDING LIST TO BE REMOVED OR EDITED WITHOUT TALKING TO IAN FIRST -->
 
   <!-- status of document, group responsible (required) -->
   <p>The W3C <a href="http://www.w3.org/html/wg/">HTML Working
   Group</a> is the W3C working group responsible for this
   specification's progress along the W3C Recommendation
   track.
-  This specification is the 18 December 2012 Editor's Draft.
+  This specification is the 6 August 2013 Candidate Recommendation.
   </p>
 
+  <p>
+    This document was published by the HTML Working Group as an updated revision to the Candidate
+    Recommendation
+    (<a href="http://www.w3.org/TR/2012/CR-2dcontext-20121217/">http://www.w3.org/TR/2012/CR-2dcontext-20121217/</a>).
+ This document is intended to become a 
+    <abbr title="World Wide Web Consortium">W3C</abbr> Recommendation. 
+    <abbr title="World Wide Web Consortium">W3C</abbr> publishes a Candidate Recommendation to indicate that the document 
+    is believed to be stable and to encourage implementation by the developer community. This Candidate Recommendation is 
+    expected to advance to Proposed Recommendation no earlier than 01 September 2013. All feedback is welcome.
+  </p>
 
-  <!-- UNDER NO CIRCUMSTANCES IS THE PRECEDING PARAGRAPH TO BE REMOVED OR EDITED WITHOUT TALKING TO IAN FIRST -->
   <!-- relationship to other work (required) -->
   <p>Work on this specification is also done at the <a href="http://www.whatwg.org/">WHATWG</a>. The W3C HTML working group
   actively pursues convergence with the WHATWG, as required by the <a href="http://www.w3.org/2007/03/HTML-WG-charter">W3C HTML working
@@ -480,9 +541,8 @@
       <li>Annotated summary with unified diffs: <a href="http://html5.org/tools/web-apps-tracker">http://html5.org/tools/web-apps-tracker</a></li>
       <li>Raw Subversion interface: <code>svn checkout http://svn.whatwg.org/webapps/</code></li>
   </ul>
-  <!-- UNDER NO CIRCUMSTANCES IS THE FOLLOWING PARAGRAPH TO BE REMOVED OR EDITED WITHOUT TALKING TO IAN FIRST -->
 
-  
+
   <!-- UNDER NO CIRCUMSTANCES IS THE PRECEDING PARAGRAPH TO BE REMOVED OR EDITED WITHOUT TALKING TO IAN FIRST -->
   <!-- context and rationale (required) -->
   <!-- (this text is from the RDFa+HTML spec -->
@@ -492,7 +552,21 @@
   this specification.</p>
   <!-- UNDER NO CIRCUMSTANCES IS THE FOLLOWING PARAGRAPH TO BE REMOVED OR EDITED WITHOUT TALKING TO IAN FIRST -->
 
-  
+<div>
+    <p>
+      The following features are <strong>at risk</strong> and may be removed due to lack of
+      implementation.
+    </p>
+    <ul>
+      <li>
+        <a href="#path-objects">Path objects</a>
+      </li>
+      <li>
+        <a href="#hit-regions">Hit regions</a>
+      </li>
+    </ul>
+  </div>
+
 
   <!-- required patent boilerplate -->
   <p>This document was produced by a group operating under the <a href="http://www.w3.org/Consortium/Patent-Policy-20040205/">5
@@ -506,7 +580,7 @@
 
 
   <h2 class="no-num no-toc" id="contents">Table of Contents</h2>
-  
+
 <!--begin-toc-->
 <ol class="toc">
  <li><a href="#conformance-requirements"><span class="secno">1 </span>Conformance requirements</a></li>
@@ -533,7 +607,7 @@
 <!--end-toc-->
   <hr>
 
-  
+
   <h2 id="conformance-requirements"><span class="secno">1 </span>Conformance requirements</h2>
 
   <p>This specification is an HTML specification. All the conformance
@@ -708,7 +782,7 @@ interface <dfn id="canvaspattern">CanvasPattern</dfn> {
 
 interface <dfn id="textmetrics">TextMetrics</dfn> {
   // x-direction
-  readonly attribute double <a href="#dom-textmetrics-width" title="dom-textmetrics-width">width</a>;
+  readonly attribute double <a href="#dom-textmetrics-width-0" title="dom-textmetrics-width">width</a>;
   readonly attribute double <a href="#dom-textmetrics-actualboundingboxleft" title="dom-textmetrics-actualBoundingBoxLeft">actualBoundingBoxLeft</a>;
   readonly attribute double <a href="#dom-textmetrics-actualboundingboxright" title="dom-textmetrics-actualBoundingBoxRight">actualBoundingBoxRight</a>;
 
@@ -1009,7 +1083,7 @@ idea from Mihai:
    <dd>
 
     <p>Sets the current line dash pattern (as used when stroking). The
-    argument is a list of distances for which to alternately have
+    argument is an array of distances for which to alternately have
     the line on and the line off.</p>
 
    </dd>
@@ -1121,9 +1195,10 @@ idea from Mihai:
 
   <ol>
 
-   <li><p>Let <var title="">a</var> be the argument.</p></li>
+   <li><p>Let <var title="">a</var> be a copy of the array provided as
+   the argument.</p></li>
 
-   <li><p>If any value in <var title="">a</var> is not finite (e.g. an Infinity or
+   <li><p>If any value in the array is not finite (e.g. an Infinity or
    a NaN value), or if any value is negative (less than zero), then
    abort these steps (without throwing an exception; user agents could
    show a message on a developer console, though, as that would be
@@ -1138,7 +1213,7 @@ idea from Mihai:
   </ol>
 
   <p>When the <dfn id="dom-context-2d-getlinedash" title="dom-context-2d-getLineDash"><code>getLineDash()</code></dfn>
-  method is invoked, it must return a newly created sequence whose values
+  method is invoked, it must return a newly created array whose values
   are the values of the object's <a href="#dash-list">dash list</a>, in the same
   order.</p>
 
@@ -2063,6 +2138,21 @@ try {
 
    </dd>
 
+    <dt><var title="">context</var> . <code title="dom-context-2d-ellipse"><a href="#dom-context-2d-ellipse">ellipse</a></code>(<var title="">x</var>, <var title="">y</var>, <var title="">radiusX</var>, <var title="">radiusY</var>, <var title="">rotation</var>, <var title="">startAngle</var>, <var title="">endAngle</var>, <var title="">anticlockwise</var>)</dt>
+    <dt><var title="">path</var> . <code title="dom-context-2d-ellipse"><a href="#dom-context-2d-ellipse">ellipse</a></code>(<var title="">x</var>, <var title="">y</var>, <var title="">radiusX</var>, <var title="">radiusY</var>, <var title="">rotation</var>, <var title="">startAngle</var>, <var title="">endAngle</var>, <var title="">anticlockwise</var>)</dt>
+
+   <dd>
+
+    <p>Adds points to the subpath such that the arc described by the
+    circumference of the ellipse described by the arguments, starting
+    at the given start angle and ending at the given end angle, going
+    in the given direction (defaulting to clockwise), is added to the
+    path, connected to the previous point by a straight line.</p>
+
+    <p>Throws an <code>IndexSizeError</code> exception if the given
+    radius is negative.</p>
+
+   </dd>
   </dl>
 
   <div class="impl">
@@ -2221,21 +2311,7 @@ try {
   
   <hr>
   
-    <dt><var title="">context</var> . <code title="dom-context-2d-ellipse"><a href="#dom-context-2d-ellipse">ellipse</a></code>(<var title="">x</var>, <var title="">y</var>, <var title="">radiusX</var>, <var title="">radiusY</var>, <var title="">rotation</var>, <var title="">startAngle</var>, <var title="">endAngle</var>, <var title="">anticlockwise</var>)</dt>
-    <dt><var title="">path</var> . <code title="dom-context-2d-ellipse"><a href="#dom-context-2d-ellipse">ellipse</a></code>(<var title="">x</var>, <var title="">y</var>, <var title="">radiusX</var>, <var title="">radiusY</var>, <var title="">rotation</var>, <var title="">startAngle</var>, <var title="">endAngle</var>, <var title="">anticlockwise</var>)</dt>
-
-   <dd>
-
-    <p>Adds points to the subpath such that the arc described by the
-    circumference of the ellipse described by the arguments, starting
-    at the given start angle and ending at the given end angle, going
-    in the given direction (defaulting to clockwise), is added to the
-    path, connected to the previous point by a straight line.</p>
-
-    <p>Throws an <code>IndexSizeError</code> exception if the given
-    radius is negative.</p>
-
-   </dd>
+   
 
   <p>The <dfn id="dom-context-2d-rect" title="dom-context-2d-rect"><code>rect(<var title="">x</var>, <var title="">y</var>, <var title="">w</var>, <var title="">h</var>)</code></dfn> method must create a new subpath
   containing just the four points (<var title="">x</var>, <var title="">y</var>), (<var title="">x</var>+<var title="">w</var>,
@@ -3203,7 +3279,7 @@ try {
 
    </dd>
 
-   <dt><var title="">metrics</var> . <code title="dom-textmetrics-width"><a href="#dom-textmetrics-width">width</a></code></dt>
+   <dt><var title="">metrics</var> . <code title="dom-textmetrics-width"><a href="#dom-textmetrics-width-0">width</a></code></dt>
    <dt><var title="">metrics</var> . <code title="dom-textmetrics-actualBoundingBoxLeft"><a href="#dom-textmetrics-actualboundingboxleft">actualBoundingBoxLeft</a></code></dt>
    <dt><var title="">metrics</var> . <code title="dom-textmetrics-actualBoundingBoxRight"><a href="#dom-textmetrics-actualboundingboxright">actualBoundingBoxRight</a></code></dt>
    <dt><var title="">metrics</var> . <code title="dom-textmetrics-fontBoundingBoxAscent"><a href="#dom-textmetrics-fontboundingboxascent">fontBoundingBoxAscent</a></code></dt>
@@ -3386,6 +3462,7 @@ HAVE REJIGGED HOW TEXT WORKS IN v5
      be half way between the top and bottom edges of the <em
      class="&#x0058;&#x0058;&#x0058;">inline box</em>.</dd>
 
+	 
     </dl>
 
     <p>Let the horizontal position be half way between the left and
@@ -3427,33 +3504,46 @@ HAVE REJIGGED HOW TEXT WORKS IN v5
 
    </li>
 
+   <li>
+       <p>If the text preparation algorithm used a font that has an <span>origin</span> that is not the same
+	   as the entry script's <span>origin</span> even if "using a font" means just checking if that font has a particular glyph in it before falling back to another font), then set the <i>origin-clean</i> flag to false.
+	   </p>
+   </li>
   </ol>
 
 v6DVT (also check for '- -' bits in the part above) -->
 
   <p>The <dfn id="dom-context-2d-measuretext" title="dom-context-2d-measureText"><code>measureText()</code></dfn>
   method takes one argument, <var title="">text</var>. When the method
-  is invoked, the user agent must replace all the <span title="space
-  character">space characters</span> in <var title="">text</var> with
-  U+0020 SPACE characters, and then must form a hypothetical
-  infinitely-wide CSS line box containing a single inline box
-  containing the text <var title="">text</var>, with all the
-  properties at their initial values except the 'white-space' property
-  of the inline element set to 'pre' and the 'font' property of the
-  inline element set to the current font of the context as given by
-  the <code title="dom-context-2d-font"><a href="#dom-context-2d-font">font</a></code> attribute, and
-  must then create a new <code><a href="#textmetrics">TextMetrics</a></code> object with its
-  <code title="dom-textmetrics-width"><a href="#dom-textmetrics-width">width</a></code> attribute set to
-  the width of that inline box, in CSS pixels.
+  is invoked, the user agent must run the text preparation algorithm, pass
+  a new TextMetrics object with its attributes set as described in the following list. 
+  If doing these measurements requires using a font that has an
+  <span>origin</span> that is not the <span title="same
+  origin">same</span> as that of the <code>Document</code> object that
+  owns the <code>canvas</code> element (even if "using a font" means
+  just checking if that font has a particular glyph in it before
+  falling back to another font), then the method must throw a
+  <code>SecurityError</code> exception.
+  Otherwise, it must return the new <code><a href="#textmetrics">TextMetrics</a></code> object.
+  <a href="#refsCSS">[CSS]</a>
+
+  </p>
+  
+  <dl>
+  <dt><dfn id="dom-textmetrics-width" title="dom-textmetrics-width"><code>width</code></dfn> attribute</dt>
+   
+   <dd>
+   <p>The width of that inline box, in CSS pixels. (The text's advance width.)</p>
+   </dd>
  
-    </p><dt><dfn id="dom-textmetrics-actualboundingboxleft" title="dom-textmetrics-actualBoundingBoxLeft"><code>actualBoundingBoxLeft</code></dfn> attribute</dt>
+    <dt><dfn id="dom-textmetrics-actualboundingboxleft" title="dom-textmetrics-actualBoundingBoxLeft"><code>actualBoundingBoxLeft</code></dfn> attribute</dt>
 
    <dd>
     <p>The distance parallel to the baseline from the alignment point given by the <code title="dom-context-2d-textAlign"><a href="#dom-context-2d-textalign">textAlign</a></code> attribute to the left side of the bounding rectangle of the given text, in CSS pixels; positive numbers indicating a distance going left from the given alignment point.
-    </p><p class="note">The sum of this value and the next (<code title="dom-textmetrics-actualBoundingBoxRight"><a href="#dom-textmetrics-actualboundingboxright">actualBoundingBoxRight</a></code>) can be wider than the width of the inline box (<code title="dom-textmetrics-width"><a href="#dom-textmetrics-width">width</a></code>), in particular with slanted fonts where characters overhang their advance width.</p>
+    </p><p class="note">The sum of this value and the next (<code title="dom-textmetrics-actualBoundingBoxRight"><a href="#dom-textmetrics-actualboundingboxright">actualBoundingBoxRight</a></code>) can be wider than the width of the inline box (<code title="dom-textmetrics-width"><a href="#dom-textmetrics-width-0">width</a></code>), in particular with slanted fonts where characters overhang their advance width.</p>
 
    </dd>
-
+   
    <dt><dfn id="dom-textmetrics-actualboundingboxright" title="dom-textmetrics-actualBoundingBoxRight"><code>actualBoundingBoxRight</code></dfn> attribute</dt>
 
    <dd>
@@ -3501,6 +3591,7 @@ v6DVT (also check for '- -' bits in the part above) -->
    <dt><dfn id="dom-textmetrics-ideographicbaseline" title="dom-textmetrics-ideographicBaseline"><code>ideographicBaseline</code></dfn> attribute</dt>
 
    <dd><p>The distance from the horizontal line indicated by the <code title="dom-context-2d-textBaseline"><a href="#dom-context-2d-textbaseline">textBaseline</a></code> attribute to the ideographic baseline of the line box, in CSS pixels; positive numbers indicating that the given baseline is below the ideographic baseline. (Zero if the given baseline is the ideographic baseline.)</p></dd>
+  </dl>
   
 <!--ADD-TOPIC:Security-->
   If doing these measurements requires using a font that has an
@@ -3513,12 +3604,12 @@ v6DVT (also check for '- -' bits in the part above) -->
 <!--REMOVE-TOPIC:Security-->
   Otherwise, it must return the new <code><a href="#textmetrics">TextMetrics</a></code> object.
   <a href="#refsCSS">[CSS]</a>
-  <!--INSERT FINGERPRINT-->
+  <span class="fingerprint" title="fingerprinting vector"><img alt="(This is a fingerprinting vector.)" height="64" src="images/fingerprint.png" width="46"></span>
   <p></p>
 
   <p>The <code><a href="#textmetrics">TextMetrics</a></code> interface is used for the objects
   returned from <code title="dom-context-2d-measureText"><a href="#dom-context-2d-measuretext">measureText()</a></code>. It has one
-  attribute, <dfn id="dom-textmetrics-width" title="dom-textmetrics-width"><code>width</code></dfn>, which is set
+  attribute, <dfn id="dom-textmetrics-width-0" title="dom-textmetrics-width"><code>width</code></dfn>, which is set
   by the <code title="dom-context-2d-measureText"><a href="#dom-context-2d-measuretext">measureText()</a></code>
   method.</p>
 
@@ -4041,11 +4132,8 @@ v6DVT (also check for '- -' bits in the part above) -->
   invoked, the region of the image specified by the source rectangle
   must be painted on the region of the canvas specified by the
   destination rectangle, after applying the <a href="#transformations" title="dom-context-2d-transformation">current transformation
-  matrix</a> to the destination rectangle. Applying a transformation 
-  matrix, such as scaling, only affects the destination image, and not 
-  the original image.</p>
+  matrix</a> to the points of the destination rectangle.</p>
 
-  
   <p>The original image data of the source image must be used, not the
   image as it is rendered (e.g. <code title="attr-dim-width">width</code> and <code title="attr-dim-height">height</code> attributes on the source
   element have no effect). The image data must be processed in the
@@ -6001,7 +6089,7 @@ function AddCloud(data, x, y) { ... }</pre>
    Relations</a></cite>. IANA.</dd>
 
    <dt id="refsIANAPERMHEADERS">[IANAPERMHEADERS]</dt>
-   <dd><cite><a href="http://www.iana.org/assignments/message-headers/perm-headers.html">Permanent
+   <dd><cite><a href="http://www.iana.org/assignments/message-headers/message-headers.xhtml">Permanent
    Message Header Field Names</a></cite>. IANA.</dd>
 
    <dt id="refsICE">[ICE]</dt>

@@ -192,7 +192,7 @@
    fieldset > :last-child { margin-bottom: 0; }
    fieldset p { margin: 0.5em 0; }
 
-  </style><link href="http://www.w3.org/StyleSheets/TR/W3C-ED" rel="stylesheet" type="text/css"><meta content="noindex" name="robots"><script type="text/javascript">
+  </style><link rel="stylesheet" href="http://www.w3.org/StyleSheets/TR/W3C-ED" type="text/css"><meta content="noindex" name="robots"><script type="text/javascript">
    function getCookie(name) {
      var params = location.search.substr(1).split("&");
      for (var index = 0; index < params.length; index++) {
@@ -212,14 +212,14 @@
    }
   </script><body>
   <div class="head" id="head">
-   <p><a href="http://www.w3.org/"><img alt="W3C" height="48" src="http://www.w3.org/Icons/w3c_home" width="72"></a></p>
+   <p><a href="http://www.w3.org/"><img width="72" src="http://www.w3.org/Icons/w3c_home" alt="W3C" height="48"></a></p>
 
    <h1>Web Storage</h1>
-   <h2 class="no-num no-toc" id="editor-s-draft-4-december-2012">Editor's Draft 4 December 2012</h2>
+   <h2 class="no-num no-toc" id="editor-s-draft-3-august-2013">Editor's Draft 3 August 2013</h2>
    <dl><dt>Latest Published Version:</dt>
     <dd><a href="http://www.w3.org/TR/webstorage/">http://www.w3.org/TR/webstorage/</a></dd>
     <dt>Latest Editor's Draft:</dt>
-    <dd><a class="latest-link" href="http://dev.w3.org/html5/webstorage/">http://dev.w3.org/html5/webstorage/</a></dd>
+    <dd><a href="http://dev.w3.org/html5/webstorage/" class="latest-link">http://dev.w3.org/html5/webstorage/</a></dd>
 
 
     <dt>Previous Versions:</dt>
@@ -278,13 +278,13 @@
 
   <form action="http://www.whatwg.org/specs/web-apps/current-work/file-spam.cgi" method="post">
    <fieldset><legend>Feedback Comments</legend>
-    <input name="id" type="hidden" value="top"><input name="component" type="hidden" value="Web Storage (editor: Ian Hickson)"><input name="response" type="hidden" value="html"><p><label for="feedbackBox">Please enter your feedback, carefully
+    <input value="top" name="id" type="hidden"><input value="Web Storage (editor: Ian Hickson)" name="component" type="hidden"><input value="html" name="response" type="hidden"><p><label for="feedbackBox">Please enter your feedback, carefully
     indicating the title of the section for which you are submitting
     feedback, quoting the text that's wrong today if appropriate. If
     you're suggesting a new feature, it's really important to say
     <em>what</em> the problem you're trying to solve is. That's more
     important than the solution, in fact.</label></p>
-    <p><textarea cols="79" id="feedbackBox" name="text" rows="10"></textarea></p>
+    <p><textarea name="text" rows="10" id="feedbackBox" cols="79"></textarea></p>
     <p class="note">Please don't use section numbers as these tend to
     change rapidly and make your feedback harder to understand.</p>
     <script type="text/javascript">
@@ -306,7 +306,7 @@
       }
     }
     </script><p>
-     <input onclick="return checkFeedbackForm(form)" type="submit" value="Submit feedback"><small>(Note: Your IP address and user agent will be publicly recorded for spam prevention purposes.)</small>
+     <input value="Submit feedback" onclick="return checkFeedbackForm(form)" type="submit"><small>(Note: Your IP address and user agent will be publicly recorded for spam prevention purposes.)</small>
     </p>
    </fieldset></form>
 
@@ -351,13 +351,13 @@
   </dl><p>The W3C <a href="http://www.w3.org/2008/webapps/">Web Applications
   Working Group</a> is the W3C working group responsible for this
   specification's progress along the W3C Recommendation track.
-  This specification is the 4 December 2012 Editor's Draft.
+  This specification is the 3 August 2013 Editor's Draft.
   </p>
 
   
   
   <p>This document was produced by a group operating under the <a href="http://www.w3.org/Consortium/Patent-Policy-20040205/">5
-  February 2004 W3C Patent Policy</a>. W3C maintains a <a href="http://www.w3.org/2004/01/pp-impl/42538/status" rel="disclosure">public list of
+  February 2004 W3C Patent Policy</a>. W3C maintains a <a rel="disclosure" href="http://www.w3.org/2004/01/pp-impl/42538/status">public list of
   any patent disclosures</a> made in connection with the deliverables
   of the group; that page also includes instructions for disclosing a
   patent. An individual who has actual knowledge of a patent which the
@@ -393,9 +393,7 @@
   <ol>
    <li><a href="#the-storage-interface"><span class="secno">4.1 </span>The <code>Storage</code> interface</a></li>
    <li><a href="#the-sessionstorage-attribute"><span class="secno">4.2 </span>The <code title="dom-sessionStorage">sessionStorage</code> attribute</a></li>
-   <li><a href="#the-localstorage-attribute"><span class="secno">4.3 </span>The <code title="dom-localStorage">localStorage</code> attribute</a>
-    <ol>
-     <li><a href="#security-localStorage"><span class="secno">4.3.1 </span>Security</a></ol></li>
+   <li><a href="#the-localstorage-attribute"><span class="secno">4.3 </span>The <code title="dom-localStorage">localStorage</code> attribute</a></li>
    <li><a href="#the-storage-event"><span class="secno">4.4 </span>The <code title="event-storage">storage</code> event</a>
     <ol>
      <li><a href="#event-definition"><span class="secno">4.4.1 </span>Event definition</a></ol></li>
@@ -410,8 +408,8 @@
    <li><a href="#dns-spoofing-attacks"><span class="secno">7.1 </span>DNS spoofing attacks</a></li>
    <li><a href="#cross-directory-attacks"><span class="secno">7.2 </span>Cross-directory attacks</a></li>
    <li><a href="#implementation-risks"><span class="secno">7.3 </span>Implementation risks</a></ol></li>
- <li><a class="no-num" href="#references">References</a></li>
- <li><a class="no-num" href="#acknowledgements">Acknowledgements</a></ol>
+ <li><a href="#references" class="no-num">References</a></li>
+ <li><a href="#acknowledgements" class="no-num">Acknowledgements</a></ol>
 
   <hr><h2 id="introduction"><span class="secno">1 </span>Introduction</h2>
 
@@ -604,81 +602,66 @@
 
   
 
-  <p>Each <code><a href="#storage-0">Storage</a></code> object provides access to a list of
-  key/value pairs, which are sometimes called items. Keys are
-  strings. Any string (including the empty string) is a valid
-  key. Values are similarly strings.</p>
+  <p>Each <code><a href="#storage-0">Storage</a></code> object provides access to a list of key/value pairs, which are
+  sometimes called items. Keys are strings. Any string (including the empty string) is a valid key.
+  Values are similarly strings.</p>
 
-  <p>Each <code><a href="#storage-0">Storage</a></code> object is associated with a list of
-  key/value pairs when it is created, as defined in the sections on
-  the <code title="dom-sessionStorage"><a href="#dom-sessionstorage">sessionStorage</a></code> and <code title="dom-localStorage"><a href="#dom-localstorage">localStorage</a></code> attributes. Multiple
-  separate objects implementing the <code><a href="#storage-0">Storage</a></code> interface can
-  all be associated with the same list of key/value pairs
-  simultaneously.</p>
+  <p>Each <code><a href="#storage-0">Storage</a></code> object is associated with a list of key/value pairs when it is
+  created, as defined in the sections on the <code title="dom-sessionStorage"><a href="#dom-sessionstorage">sessionStorage</a></code>
+  and <code title="dom-localStorage"><a href="#dom-localstorage">localStorage</a></code> attributes. Multiple separate objects
+  implementing the <code><a href="#storage-0">Storage</a></code> interface can all be associated with the same list of
+  key/value pairs simultaneously.</p>
 
-  <p>The <dfn id="dom-storage-length" title="dom-Storage-length"><code>length</code></dfn>
-  attribute must return the number of key/value pairs currently
-  present in the list associated with the object.</p>
+  <p>The <dfn id="dom-storage-length" title="dom-Storage-length"><code>length</code></dfn> attribute must return the number
+  of key/value pairs currently present in the list associated with the object.</p>
 
-  <p>The <dfn id="dom-storage-key" title="dom-Storage-key"><code>key(<var title="">n</var>)</code></dfn> method must return the name of the
-  <var title="">n</var>th key in the list. The order of keys is
-  user-agent defined, but must be consistent within an object so long
-  as the number of keys doesn't change. (Thus, <a href="#dom-storage-setitem" title="dom-Storage-setItem">adding</a> or <a href="#dom-storage-removeitem" title="dom-Storage-removeItem">removing</a> a key may change the
-  order of the keys, but merely changing the value of an existing key
-  must not.)  If <var title="">n</var> is  greater than or equal to the number of key/value pairs
+  <p>The <dfn id="dom-storage-key" title="dom-Storage-key"><code>key(<var title="">n</var>)</code></dfn> method must
+  return the name of the <var title="">n</var>th key in the list. The order of keys is user-agent
+  defined, but must be consistent within an object so long as the number of keys doesn't change.
+  (Thus, <a href="#dom-storage-setitem" title="dom-Storage-setItem">adding</a> or <a href="#dom-storage-removeitem" title="dom-Storage-removeItem">removing</a> a key may change the order of the keys, but merely
+  changing the value of an existing key must not.)  If <var title="">n</var> is
+   greater than or equal to the number of key/value pairs
   in the object, then this method must return null.</p>
 
-  <p>The <span>supported property names</span> on a
-  <code><a href="#storage-0">Storage</a></code> object are the keys of each key/value pair
-  currently present in the list associated with the object.</p>
+  <p>The <span>supported property names</span> on a <code><a href="#storage-0">Storage</a></code> object are the keys of each
+  key/value pair currently present in the list associated with the object, in the order that the
+  keys were last added to the storage area.</p>
 
-  <p>The <dfn id="dom-storage-getitem" title="dom-Storage-getItem"><code>getItem(<var title="">key</var>)</code></dfn> method must return
-  the current value associated with
-  the given <var title="">key</var>. If the given <var title="">key</var> does not exist in the list associated with the
-  object then this method must return null.
-  </p>
+  <p>The <dfn id="dom-storage-getitem" title="dom-Storage-getItem"><code>getItem(<var title="">key</var>)</code></dfn> method
+  must return the current value associated with the given <var title="">key</var>. If the given <var title="">key</var> does not exist in the list associated with the object then this method must
+  return null. </p>
 
-  <p>The <dfn id="dom-storage-setitem" title="dom-Storage-setItem"><code>setItem(<var title="">key</var>, <var title="">value</var>)</code></dfn> method
-  must first check if a key/value pair
-  with the given <var title="">key</var> already exists in the list
-  associated with the object.</p>
+  <p>The <dfn id="dom-storage-setitem" title="dom-Storage-setItem"><code>setItem(<var title="">key</var>, <var title="">value</var>)</code></dfn> method must first check if a key/value pair with the given <var title="">key</var> already exists in the list associated with the object.</p>
 
-  <p>If it does not, then a new key/value pair must be added to the
-  list, with the given <var title="">key</var> and with its value set
-  to <var title="">value</var>.</p>
+  <p>If it does not, then a new key/value pair must be added to the list, with the given <var title="">key</var> and with its value set to <var title="">value</var>.</p>
 
-  <p>If the given <var title="">key</var> <em>does</em> exist in the
-  list, then it must have its value updated to <var title="">value</var>.</p>
+  <p>If the given <var title="">key</var> <em>does</em> exist in the list, and its value is not
+  equal to <var title="">value</var>, then it must have its value updated to <var title="">value</var>. If its previous value <em>is</em> equal to <var title="">value</var>, then
+  the method must do nothing.</p>
 
-  <p>If it couldn't set the new value, the method must throw an
-  <code>QuotaExceededError</code> exception. (Setting could fail if,
-  e.g., the user has disabled storage for the site, or if the quota
-  has been exceeded.)</p>
+  <p>If it couldn't set the new value, the method must throw a <code>QuotaExceededError</code>
+  exception. (Setting could fail if, e.g., the user has disabled storage for the site, or if the
+  quota has been exceeded.)</p>
 
-  <p>The <dfn id="dom-storage-removeitem" title="dom-Storage-removeItem"><code>removeItem(<var title="">key</var>)</code></dfn> method must cause the key/value
-  pair with the given <var title="">key</var> to be removed from the
-  list associated with the object, if it exists. If no item with that
-  key exists, the method must do nothing.</p>
+  <p>The <dfn id="dom-storage-removeitem" title="dom-Storage-removeItem"><code>removeItem(<var title="">key</var>)</code></dfn>
+  method must cause the key/value pair with the given <var title="">key</var> to be removed from the
+  list associated with the object, if it exists. If no item with that key exists, the method must do
+  nothing.</p>
 
-  <p>The <code title="dom-Storage-setItem"><a href="#dom-storage-setitem">setItem()</a></code> and <code title="dom-Storage-removeItem"><a href="#dom-storage-removeitem">removeItem()</a></code> methods must be
-  atomic with respect to failure. In the case of failure, the method
-  does nothing. That is, changes to the data storage area must either
-  be successful, or the data storage area must not be changed at
-  all.</p>
+  <p>The <code title="dom-Storage-setItem"><a href="#dom-storage-setitem">setItem()</a></code> and <code title="dom-Storage-removeItem"><a href="#dom-storage-removeitem">removeItem()</a></code> methods must be atomic with respect to failure.
+  In the case of failure, the method does nothing. That is, changes to the data storage area must
+  either be successful, or the data storage area must not be changed at all.</p>
 
-  <p>The <dfn id="dom-storage-clear" title="dom-Storage-clear"><code>clear()</code></dfn>
-  method must atomically cause the list associated with the object to
-  be emptied of all key/value pairs, if there are any. If there are
-  none, then the method must do nothing.</p>
+  <p>The <dfn id="dom-storage-clear" title="dom-Storage-clear"><code>clear()</code></dfn> method must atomically cause the
+  list associated with the object to be emptied of all key/value pairs, if there are any. If there
+  are none, then the method must do nothing.</p>
 
-  <p class="note">When the <code title="dom-Storage-setItem"><a href="#dom-storage-setitem">setItem()</a></code>, <code title="dom-Storage-removeItem"><a href="#dom-storage-removeitem">removeItem()</a></code>, and <code title="dom-Storage-clear"><a href="#dom-storage-clear">clear()</a></code> methods are invoked, events
-  are fired on other <code>Document</code> objects that can access the
-  newly stored or removed data, as defined in the sections on the
-  <code title="dom-sessionStorage"><a href="#dom-sessionstorage">sessionStorage</a></code> and <code title="dom-localStorage"><a href="#dom-localstorage">localStorage</a></code> attributes.</p> 
+  <p class="note">When the <code title="dom-Storage-setItem"><a href="#dom-storage-setitem">setItem()</a></code>, <code title="dom-Storage-removeItem"><a href="#dom-storage-removeitem">removeItem()</a></code>, and <code title="dom-Storage-clear"><a href="#dom-storage-clear">clear()</a></code> methods are invoked, events are fired on the
+  <code>Window</code> objects of other <code>Document</code>s that can access the newly stored or
+  removed data, as defined in the sections on the <code title="dom-sessionStorage"><a href="#dom-sessionstorage">sessionStorage</a></code> and <code title="dom-localStorage"><a href="#dom-localstorage">localStorage</a></code> attributes.</p> 
 
-  <p class="note">This specification does not require that the above
-  methods wait until the data has been physically written to
-  disk. Only consistency in what different scripts accessing the same
+  <p class="note">This specification does not require that the above methods wait until the data has
+  been physically written to disk. Only consistency in what different scripts accessing the same
   underlying list of key/value pairs see is required.</p>
 
 
@@ -690,74 +673,56 @@ interface <dfn id="windowsessionstorage">WindowSessionStorage</dfn> {
 };
 <span>Window</span> implements <a href="#windowsessionstorage">WindowSessionStorage</a>;</pre>
 
-  <p>The <dfn id="dom-sessionstorage" title="dom-sessionStorage"><code>sessionStorage</code></dfn>
-  attribute represents the set of storage areas specific to the
-  current <span>top-level browsing context</span>.</p>
+  <p>The <dfn id="dom-sessionstorage" title="dom-sessionStorage"><code>sessionStorage</code></dfn> attribute represents the
+  set of storage areas specific to the current <span>top-level browsing context</span>.</p>
 
-  <p>Each <span>top-level browsing context</span> has a unique set of
-  session storage areas, one for each <span>origin</span>.</p>
+  <p>Each <span>top-level browsing context</span> has a unique set of session storage areas, one for
+  each <span>origin</span>.</p>
 
-  <p>User agents should not expire data from a browsing context's
-  session storage areas, but may do so when the user requests that
-  such data be deleted, or when the UA detects that it has limited
-  storage space, or for security reasons. User agents should always
-  avoid deleting data while a script that could access that data is
-  running. When a top-level browsing context is destroyed (and
-  therefore permanently inaccessible to the user) the data stored in
-  its session storage areas can be discarded with it, as the API
-  described in this specification provides no way for that data to
+  <p>User agents should not expire data from a browsing context's session storage areas, but may do
+  so when the user requests that such data be deleted, or when the UA detects that it has limited
+  storage space, or for security reasons. User agents should always avoid deleting data while a
+  script that could access that data is running. When a top-level browsing context is destroyed (and
+  therefore permanently inaccessible to the user) the data stored in its session storage areas can
+  be discarded with it, as the API described in this specification provides no way for that data to
   ever be subsequently retrieved.</p>
 
-  <p class="note">The lifetime of a browsing context can be unrelated
-  to the lifetime of the actual user agent process itself, as the user
-  agent may support resuming sessions after a restart.</p>
+  <p class="note">The lifetime of a browsing context can be unrelated to the lifetime of the actual
+  user agent process itself, as the user agent may support resuming sessions after a restart.</p>
 
-  <p>When a new <code>Document</code> is created in a <span>browsing
-  context</span> which has a <span>top-level browsing context</span>,
-  the user agent must check to see if that <span>top-level browsing
-  context</span> has a session storage area for that document's
-  <span>origin</span>. If it does, then that is the
-  <code>Document</code>'s assigned session storage area. If it does
-  not, a new storage area for that document's <span>origin</span> must
-  be created, and then <em>that</em> is the <code>Document</code>'s
-  assigned session storage area. A <code>Document</code>'s assigned
-  storage area does not change during the lifetime of a
-  <code>Document</code>.</p>
+  <p>When a new <code>Document</code> is created in a <span>browsing context</span> which has a
+  <span>top-level browsing context</span>, the user agent must check to see if that <span>top-level
+  browsing context</span> has a session storage area for that document's <span>origin</span>. If it
+  does, then that is the <code>Document</code>'s assigned session storage area. If it does not, a
+  new storage area for that document's <span>origin</span> must be created, and then <em>that</em>
+  is the <code>Document</code>'s assigned session storage area. A <code>Document</code>'s assigned
+  storage area does not change during the lifetime of a <code>Document</code>.</p>
 
-  <p class="note">In the case of an <code>iframe</code> being moved to
-  another <code>Document</code>, the nested browsing context is
-  destroyed and a new one created.</p>
+  <p class="note">In the case of an <code>iframe</code> being moved to another
+  <code>Document</code>, the nested browsing context is destroyed and a new one created.</p>
 
-  <p>The <code title="dom-sessionStorage"><a href="#dom-sessionstorage">sessionStorage</a></code>
-  attribute must return a <code><a href="#storage-0">Storage</a></code> object associated with
-  the <code>Document</code>'s assigned session storage area, if any,
-  or null if there isn't one. Each <code>Document</code> object must
-  have a separate object for its <code>Window</code>'s <code title="dom-sessionStorage"><a href="#dom-sessionstorage">sessionStorage</a></code> attribute.</p>
+  <p>The <code title="dom-sessionStorage"><a href="#dom-sessionstorage">sessionStorage</a></code> attribute must return a
+  <code><a href="#storage-0">Storage</a></code> object associated with the <code>Document</code>'s assigned session storage
+  area, if any, or null if there isn't one. Each <code>Document</code> object must have a separate
+  object for its <code>Window</code>'s <code title="dom-sessionStorage"><a href="#dom-sessionstorage">sessionStorage</a></code>
+  attribute.</p>
 
-  <p>When a new <span>top-level browsing context</span> is created by
-  cloning an existing <span>browsing context</span>, the new browsing
-  context must start with the same session storage areas as the
-  original, but the two sets must from that point on be considered
-  separate, not affecting each other in any way.</p>
+  <p>When a new <span>top-level browsing context</span> is created by cloning an existing
+  <span>browsing context</span>, the new browsing context must start with the same session storage
+  areas as the original, but the two sets must from that point on be considered separate, not
+  affecting each other in any way.</p>
 
-  <p>When a new <span>top-level browsing context</span> is created by
-  a <span title="concept-script">script</span> in an existing
-  <span>browsing context</span>, or by the user following a link in an
-  existing browsing context, or in some other way related to a
-  specific <code>Document</code>, and the creation is not <span>a
-  new start for session storage</span>, then the session storage area of the
-  <span>origin</span> of that <code>Document</code> must be copied
-  into the new browsing context when it is created. From that point
-  on, however, the two session storage areas must be considered
-  separate, not affecting each other in any way.</p>
+  <p>When a new <span>top-level browsing context</span> is created by a <span title="concept-script">script</span> in an existing <span>browsing context</span>, or by the user
+  following a link in an existing browsing context, or in some other way related to a specific
+  <code>Document</code>, and the creation is not <span>a new start for session storage</span>, then
+  the session storage area of the <span>origin</span> of that <code>Document</code> must be copied
+  into the new browsing context when it is created. From that point on, however, the two session
+  storage areas must be considered separate, not affecting each other in any way.</p>
 
-  <p id="sessionStorageEvent">When the <code title="dom-Storage-setItem"><a href="#dom-storage-setitem">setItem()</a></code>, <code title="dom-Storage-removeItem"><a href="#dom-storage-removeitem">removeItem()</a></code>, and <code title="dom-Storage-clear"><a href="#dom-storage-clear">clear()</a></code> methods are called on a
-  <code><a href="#storage-0">Storage</a></code> object <var title="">x</var> that is associated
-  with a session storage area, if the methods did something, then in
-  every <code>Document</code> object whose <code>Window</code>
-  object's <code title="dom-sessionStorage"><a href="#dom-sessionstorage">sessionStorage</a></code>
-  attribute's <code><a href="#storage-0">Storage</a></code> object is associated with the same
-  storage area, other than <var title="">x</var>, a <code title="event-storage"><a href="#event-storage">storage</a></code> event must be fired, as <a href="#event-storage" title="event-storage">described below</a>.</p>
+  <p id="sessionStorageEvent">When the <code title="dom-Storage-setItem"><a href="#dom-storage-setitem">setItem()</a></code>, <code title="dom-Storage-removeItem"><a href="#dom-storage-removeitem">removeItem()</a></code>, and <code title="dom-Storage-clear"><a href="#dom-storage-clear">clear()</a></code> methods are called on a <code><a href="#storage-0">Storage</a></code> object <var title="">x</var> that is associated with a session storage area, if the methods did not throw an
+  exception or "do nothing" as defined above, then for every <code>Document</code> object whose
+  <code>Window</code> object's <code title="dom-sessionStorage"><a href="#dom-sessionstorage">sessionStorage</a></code> attribute's
+  <code><a href="#storage-0">Storage</a></code> object is associated with the same storage area, other than <var title="">x</var>, <a href="#send-a-storage-notification">send a storage notification</a>.</p>
 
 
   <h3 id="the-localstorage-attribute"><span class="secno">4.3 </span>The <code title="dom-localStorage"><a href="#dom-localstorage">localStorage</a></code> attribute</h3>
@@ -768,120 +733,81 @@ interface <dfn id="windowlocalstorage">WindowLocalStorage</dfn> {
 };
 <span>Window</span> implements <a href="#windowlocalstorage">WindowLocalStorage</a>;</pre>
 
-  <p>The <dfn id="dom-localstorage" title="dom-localStorage"><code>localStorage</code></dfn>
-  object provides a <code><a href="#storage-0">Storage</a></code> object for an
-  <span>origin</span>.
-  <a class="fingerprint" href="#fingerprint"><img alt="(This is a fingerprinting vector.)" src="http://dev.w3.org/html5/spec/images/fingerprint.png"></a>
+  <p>The <dfn id="dom-localstorage" title="dom-localStorage"><code>localStorage</code></dfn> object provides a
+  <code><a href="#storage-0">Storage</a></code> object for an <span>origin</span>.
+  <span class="fingerprint" title="fingerprinting vector"><img src="http://dev.w3.org/html5/spec/images/fingerprint.png" width="46" alt="(This is a fingerprinting vector.)" height="64"></span>
   </p>
 
-  <p>User agents must have a set of local storage areas, one for each
-  <span>origin</span>.</p>
+  <p>User agents must have a set of local storage areas, one for each <span>origin</span>.</p>
 
-  <p>User agents should expire data from the local storage areas only
-  for security reasons or when requested to do so by the user. User
-  agents should always avoid deleting data while a script that could
-  access that data is running.</p>
+  <p>User agents should expire data from the local storage areas only for security reasons or when
+  requested to do so by the user. User agents should always avoid deleting data while a script that
+  could access that data is running.</p>
 
-  <p>When the <code title="dom-localStorage"><a href="#dom-localstorage">localStorage</a></code>
-  attribute is accessed, the user agent must run the following steps,
-  which are known as the <dfn id="storage-object-initialization-steps"><code>Storage</code> object
+  <p>When the <code title="dom-localStorage"><a href="#dom-localstorage">localStorage</a></code> attribute is accessed, the user
+  agent must run the following steps, which are known as the <dfn id="storage-object-initialization-steps"><code>Storage</code> object
   initialization steps</dfn>:</p> 
 
-  <ol><li><p>The user agent may throw a <code>SecurityError</code>
-   exception instead of returning a <code><a href="#storage-0">Storage</a></code> object if the
-   request violates a policy decision (e.g. if the user agent is
-   configured to not allow the page to persist data).</li>
+  <ol><li><p>The user agent may throw a <code>SecurityError</code> exception and abort these steps
+   instead of returning a <code><a href="#storage-0">Storage</a></code> object if the request violates a policy decision
+   (e.g. if the user agent is configured to not allow the page to persist data).</li>
 
-   <li><p>If the <code>Document</code>'s <span>origin</span> is not a
-   scheme/host/port tuple, then throw a <code>SecurityError</code>
-   exception and abort these steps.</li>
+   <li><p>If the <code>Document</code>'s <span>origin</span> is not a scheme/host/port tuple, then
+   throw a <code>SecurityError</code> exception and abort these steps.</li>
 
-   <li><p>Check to see if the user agent has allocated a local storage
-   area for the <span>origin</span> of the <code>Document</code> of
-   the <code>Window</code> object on which the attribute was accessed.
-   If it has not, create a new storage area for that
+   <li><p>Check to see if the user agent has allocated a local storage area for the
+   <span>origin</span> of the <code>Document</code> of the <code>Window</code> object on which the
+   attribute was accessed. If it has not, create a new storage area for that
    <span>origin</span>.</li>
 
-   <li><p>Return the <code><a href="#storage-0">Storage</a></code> object associated with that
-   origin's local storage area. Each <code>Document</code> object must
-   have a separate object for its <code>Window</code>'s <code title="dom-localStorage"><a href="#dom-localstorage">localStorage</a></code> attribute.</p>
+   <li><p>Return the <code><a href="#storage-0">Storage</a></code> object associated with that origin's local storage area.
+   Each <code>Document</code> object must have a separate object for its <code>Window</code>'s <code title="dom-localStorage"><a href="#dom-localstorage">localStorage</a></code> attribute.</p>
 
-  </ol><p id="localStorageEvent">When the <code title="dom-Storage-setItem"><a href="#dom-storage-setitem">setItem()</a></code>, <code title="dom-Storage-removeItem"><a href="#dom-storage-removeitem">removeItem()</a></code>, and <code title="dom-Storage-clear"><a href="#dom-storage-clear">clear()</a></code> methods are called on a
-  <code><a href="#storage-0">Storage</a></code> object <var title="">x</var> that is associated
-  with a local storage area, if the methods did something, then in
-  every <code>Document</code> object whose <code>Window</code>
-  object's <code title="dom-localStorage"><a href="#dom-localstorage">localStorage</a></code>
-  attribute's <code><a href="#storage-0">Storage</a></code> object is associated with the same
-  storage area, other than <var title="">x</var>, a <code title="event-storage"><a href="#event-storage">storage</a></code> event must be fired, as <a href="#event-storage" title="event-storage">described below</a>.</p>
+  </ol><p id="localStorageEvent">When the <code title="dom-Storage-setItem"><a href="#dom-storage-setitem">setItem()</a></code>, <code title="dom-Storage-removeItem"><a href="#dom-storage-removeitem">removeItem()</a></code>, and <code title="dom-Storage-clear"><a href="#dom-storage-clear">clear()</a></code> methods are called on a <code><a href="#storage-0">Storage</a></code> object <var title="">x</var> that is associated with a local storage area, if the methods did not throw an
+  exception or "do nothing" as defined above, then for every <code>Document</code> object whose
+  <code>Window</code> object's <code title="dom-localStorage"><a href="#dom-localstorage">localStorage</a></code> attribute's
+  <code><a href="#storage-0">Storage</a></code> object is associated with the same storage area, other than <var title="">x</var>, <a href="#send-a-storage-notification">send a storage notification</a>.
 
-  <p id="localStorageMutex">Whenever the properties of a <code title="dom-localStorage"><a href="#dom-localstorage">localStorage</a></code> attribute's
-  <code><a href="#storage-0">Storage</a></code> object are to be examined, returned, set, or
-  deleted, whether as part of a direct property access, when checking
-  for the presence of a property, during property enumeration, when
-  determining the number of properties present, or as part of the
-  execution of any of the methods or attributes defined on the
-  <code><a href="#storage-0">Storage</a></code> interface, the user agent must first
-  <span>obtain the storage mutex</span>.</p>
-
-
-
-  <h4 id="security-localStorage"><span class="secno">4.3.1 </span>Security</h4>
-
-  <p>User agents must throw a <code>SecurityError</code> exception whenever any properties of a
-  <code><a href="#storage-0">Storage</a></code> object originally returned by the <code title="dom-localStorage"><a href="#dom-localstorage">localStorage</a></code> attribute are accessed by scripts whose
-  <span>effective script origin</span> is not the <span title="same origin">same</span> as the
-  <span>origin</span> of the <code>Document</code> of the <code>Window</code> object on which the
-  <code title="dom-localStorage"><a href="#dom-localstorage">localStorage</a></code> attribute was accessed.</p>
-
-  <p class="note">This means <code><a href="#storage-0">Storage</a></code> objects are neutered
-  when the <code title="dom-document-domain">document.domain</code>
-  attribute is used.</p>
-
-
+  <p id="localStorageMutex">Whenever the properties of a <code title="dom-localStorage"><a href="#dom-localstorage">localStorage</a></code> attribute's <code><a href="#storage-0">Storage</a></code> object are to be
+  examined, returned, set, or deleted, whether as part of a direct property access, when checking
+  for the presence of a property, during property enumeration, when determining the number of
+  properties present, or as part of the execution of any of the methods or attributes defined on the
+  <code><a href="#storage-0">Storage</a></code> interface, the user agent must first <span>obtain the storage
+  mutex</span>.</p>
 
 
   <h3 id="the-storage-event"><span class="secno">4.4 </span>The <code title="event-storage"><a href="#event-storage">storage</a></code> event</h3>
 
-  <p>The <dfn id="event-storage" title="event-storage"><code>storage</code></dfn> event
-  is fired when a storage area changes, as described in the previous
-  two sections (<a href="#sessionStorageEvent">for session
-  storage</a>, <a href="#localStorageEvent">for local
-  storage</a>).</p>
+  <p>The <dfn id="event-storage" title="event-storage"><code>storage</code></dfn> event is fired on a
+  <code>Document</code>'s <code>Window</code> object when a storage area changes, as described in
+  the previous two sections (<a href="#sessionStorageEvent">for session storage</a>, <a href="#localStorageEvent">for local storage</a>).</p>
 
-  <p>When this happens, the user agent must <span>queue a task</span> to <span title="concept-event-fire">fire</span> a <span title="concept-events-trusted">trusted</span> event
-  with the name <code><a href="#storage-0">storage</a></code>, which does not bubble and is not cancelable, and which uses
-  the <code><a href="#storageevent">StorageEvent</a></code> interface, at each <code>Window</code> object whose
-  <code>Document</code> object has a <code><a href="#storage-0">Storage</a></code> object that is affected.</p>
+  <p>When a user agent is to <dfn id="send-a-storage-notification">send a storage notification</dfn> for a <code>Document</code>, the
+  user agent must <span>queue a task</span> to <span title="concept-event-fire">fire</span> a <span title="concept-events-trusted">trusted</span> event with the name <code><a href="#storage-0">storage</a></code>, which does
+  not bubble and is not cancelable, and which uses the <code><a href="#storageevent">StorageEvent</a></code> interface, at the
+  <code>Document</code> object's <code>Window</code> object.</p>
 
-  <p class="note">This includes <code>Document</code> objects that are
-  not <span>fully active</span>, but events fired on those are ignored
-  by the <span>event loop</span> until the <code>Document</code>
-  becomes <span>fully active</span> again.</p>
+  <p class="note">Such a <code>Document</code> object is not necessarily <span>fully active</span>,
+  but events fired on such objects are ignored by the <span>event loop</span> until the
+  <code>Document</code> becomes <span>fully active</span> again.</p>
 
-  <p>The <span>task source</span> for this task is the <span>DOM
-  manipulation task source</span>.</p>
+  <p>The <span>task source</span> for these tasks is the <span>DOM manipulation task
+  source</span>.</p>
 
-  <p>If the event is being fired due to an invocation of the <code title="dom-Storage-setItem"><a href="#dom-storage-setitem">setItem()</a></code> or <code title="dom-Storage-removeItem"><a href="#dom-storage-removeitem">removeItem()</a></code> methods, the
-  event must have its <code title="dom-StorageEvent-key"><a href="#dom-storageevent-key">key</a></code>
-  attribute initialized to the name of the key in question, its <code title="dom-StorageEvent-oldValue"><a href="#dom-storageevent-oldvalue">oldValue</a></code> attribute initialized to
-  the old value of the key in question, or null if the key is newly
-  added, and its <code title="dom-StorageEvent-newValue"><a href="#dom-storageevent-newvalue">newValue</a></code> attribute initialized to
-  the new value of the key in question, or null if the key was
-  removed.</p>
+  <p>If the event is being fired due to an invocation of the <code title="dom-Storage-setItem"><a href="#dom-storage-setitem">setItem()</a></code> or <code title="dom-Storage-removeItem"><a href="#dom-storage-removeitem">removeItem()</a></code> methods, the event must have its <code title="dom-StorageEvent-key"><a href="#dom-storageevent-key">key</a></code> attribute initialized to the name of the key in question,
+  its <code title="dom-StorageEvent-oldValue"><a href="#dom-storageevent-oldvalue">oldValue</a></code> attribute initialized to the old value
+  of the key in question, or null if the key is newly added, and its <code title="dom-StorageEvent-newValue"><a href="#dom-storageevent-newvalue">newValue</a></code> attribute initialized to the new value of the
+  key in question, or null if the key was removed.</p>
 
-  <p>Otherwise, if the event is being fired due to an invocation of
-  the <code title="dom-Storage-clear"><a href="#dom-storage-clear">clear()</a></code> method, the event
-  must have its <code title="dom-StorageEvent-key"><a href="#dom-storageevent-key">key</a></code>, <code title="dom-StorageEvent-oldValue"><a href="#dom-storageevent-oldvalue">oldValue</a></code>, and <code title="dom-StorageEvent-newValue"><a href="#dom-storageevent-newvalue">newValue</a></code> attributes
-  initialized to null.</p>
+  <p>Otherwise, if the event is being fired due to an invocation of the <code title="dom-Storage-clear"><a href="#dom-storage-clear">clear()</a></code> method, the event must have its <code title="dom-StorageEvent-key"><a href="#dom-storageevent-key">key</a></code>, <code title="dom-StorageEvent-oldValue"><a href="#dom-storageevent-oldvalue">oldValue</a></code>,
+  and <code title="dom-StorageEvent-newValue"><a href="#dom-storageevent-newvalue">newValue</a></code> attributes initialized to null.</p>
 
-  <p>In addition, the event must have its <code title="dom-StorageEvent-url"><a href="#dom-storageevent-url">url</a></code> attribute initialized to
-  <span title="the document's address">the address of the
-  document</span> whose <code><a href="#storage-0">Storage</a></code> object was affected; and
-  its <code title="dom-StorageEvent-storageArea"><a href="#dom-storageevent-storagearea">storageArea</a></code>
-  attribute initialized to the <code><a href="#storage-0">Storage</a></code> object from the
-  <code>Window</code> object of the target <code>Document</code> that
-  represents the same kind of <code><a href="#storage-0">Storage</a></code> area as was
-  affected (i.e. session or local).</p>
+  <p>In addition, the event must have its <code title="dom-StorageEvent-url"><a href="#dom-storageevent-url">url</a></code> attribute
+  initialized to <span title="the document's address">the address of the document</span> whose
+  <code><a href="#storage-0">Storage</a></code> object was affected; and its <code title="dom-StorageEvent-storageArea"><a href="#dom-storageevent-storagearea">storageArea</a></code> attribute initialized to the
+  <code><a href="#storage-0">Storage</a></code> object from the <code>Window</code> object of the target
+  <code>Document</code> that represents the same kind of <code><a href="#storage-0">Storage</a></code> area as was affected
+  (i.e. session or local).</p>
 
 
   <h4 id="event-definition"><span class="secno">4.4.1 </span>Event definition</h4>
@@ -903,65 +829,53 @@ dictionary <dfn id="storageeventinit">StorageEventInit</dfn> : <span>EventInit</
   <a href="#storage-0">Storage</a>? storageArea;
 };</pre>
 
-  <p>The <dfn id="dom-storageevent-key" title="dom-StorageEvent-key"><code>key</code></dfn>
-  attribute must return the value it was initialized to. When the
-  object is created, this attribute must be initialized to null. It
+  <p>The <dfn id="dom-storageevent-key" title="dom-StorageEvent-key"><code>key</code></dfn> attribute must return the value it
+  was initialized to. When the object is created, this attribute must be initialized to null. It
   represents the key being changed.</p>
 
-  <p>The <dfn id="dom-storageevent-oldvalue" title="dom-StorageEvent-oldValue"><code>oldValue</code></dfn>
-  attribute must return the value it was initialized to. When the
-  object is created, this attribute must be initialized to null. It
-  represents the old value of the key being changed.</p>
+  <p>The <dfn id="dom-storageevent-oldvalue" title="dom-StorageEvent-oldValue"><code>oldValue</code></dfn> attribute must return
+  the value it was initialized to. When the object is created, this attribute must be initialized to
+  null. It represents the old value of the key being changed.</p>
 
-  <p>The <dfn id="dom-storageevent-newvalue" title="dom-StorageEvent-newValue"><code>newValue</code></dfn>
-  attribute must return the value it was initialized to. When the
-  object is created, this attribute must be initialized to null. It
-  represents the new value of the key being changed.</p>
+  <p>The <dfn id="dom-storageevent-newvalue" title="dom-StorageEvent-newValue"><code>newValue</code></dfn> attribute must return
+  the value it was initialized to. When the object is created, this attribute must be initialized to
+  null. It represents the new value of the key being changed.</p>
 
-  <p>The <dfn id="dom-storageevent-url" title="dom-StorageEvent-url"><code>url</code></dfn>
-  attribute must return the value it was initialized to. When the
-  object is created, this attribute must be initialized to the empty
-  string. It represents the address of the document whose key
-  changed.</p>
+  <p>The <dfn id="dom-storageevent-url" title="dom-StorageEvent-url"><code>url</code></dfn> attribute must return the value it
+  was initialized to. When the object is created, this attribute must be initialized to the empty
+  string. It represents the address of the document whose key changed.</p>
 
-  <p>The <dfn id="dom-storageevent-storagearea" title="dom-StorageEvent-storageArea"><code>storageArea</code></dfn>
-  attribute must return the value it was initialized to. When the
-  object is created, this attribute must be initialized to null. It
-  represents the <code><a href="#storage-0">Storage</a></code> object that was affected.</p>
+  <p>The <dfn id="dom-storageevent-storagearea" title="dom-StorageEvent-storageArea"><code>storageArea</code></dfn> attribute must
+  return the value it was initialized to. When the object is created, this attribute must be
+  initialized to null. It represents the <code><a href="#storage-0">Storage</a></code> object that was affected.</p>
 
 
 
   <h3 id="threads"><span class="secno">4.5 </span>Threads</h3>
 
-  <p>Because of <a href="#localStorageMutex">the use</a> of the
-  <span>storage mutex</span>, multiple browsing contexts will be able
-  to access the local storage areas simultaneously in such a manner
+  <p>Because of <a href="#localStorageMutex">the use</a> of the <span>storage mutex</span>, multiple
+  browsing contexts will be able to access the local storage areas simultaneously in such a manner
   that scripts cannot detect any concurrent script execution.</p>
 
-  <p>Thus, the <code title="dom-Storage-length"><a href="#dom-storage-length">length</a></code>
-  attribute of a <code><a href="#storage-0">Storage</a></code> object, and the value of the
-  various properties of that object, cannot change while a script is
-  executing, other than in a way that is predictable by the script
-  itself.</p>
+  <p>Thus, the <code title="dom-Storage-length"><a href="#dom-storage-length">length</a></code> attribute of a <code><a href="#storage-0">Storage</a></code>
+  object, and the value of the various properties of that object, cannot change while a script is
+  executing, other than in a way that is predictable by the script itself.</p>
 
 
   <h2 id="disk-space"><span class="secno">5 </span>Disk space</h2>
 
-  <p>User agents should limit the total amount of space allowed for
-  storage areas.</p>
+  <p>User agents should limit the total amount of space allowed for storage areas, because hostile
+  authors could otherwise use this feature to exhaust the user's available disk space.</p>
 
-  <p>User agents should guard against sites storing data under their
-  origin's other affiliated sites, e.g. storing up to the limit in
-  a1.example.com, a2.example.com, a3.example.com, etc, circumventing
-  the main example.com storage limit.</p>
+  <p>User agents should guard against sites storing data under their origin's other affiliated
+  sites, e.g. storing up to the limit in a1.example.com, a2.example.com, a3.example.com, etc,
+  circumventing the main example.com storage limit.</p>
 
-  <p>User agents may prompt the user when quotas are reached, allowing
-  the user to grant a site more space. This enables sites to store
-  many user-created documents on the user's computer, for
+  <p>User agents may prompt the user when quotas are reached, allowing the user to grant a site more
+  space. This enables sites to store many user-created documents on the user's computer, for
   instance.</p>
 
-  <p>User agents should allow users to see how much space each domain
-  is using.</p>
+  <p>User agents should allow users to see how much space each domain is using.</p>
 
   
 
@@ -973,26 +887,21 @@ dictionary <dfn id="storageeventinit">StorageEventInit</dfn> : <span>EventInit</
 
   <h3 id="user-tracking"><span class="secno">6.1 </span>User tracking</h3>
 
-  <p>A third-party advertiser (or any entity capable of getting
-  content distributed to multiple sites) could use a unique identifier
-  stored in its local storage area to track a user across multiple
-  sessions, building a profile of the user's interests to allow for
-  highly targeted advertising. In conjunction with a site that is
-  aware of the user's real identity (for example an e-commerce site
-  that requires authenticated credentials), this could allow
-  oppressive groups to target individuals with greater accuracy than
-  in a world with purely anonymous Web usage.</p>
+  <p>A third-party advertiser (or any entity capable of getting content distributed to multiple
+  sites) could use a unique identifier stored in its local storage area to track a user across
+  multiple sessions, building a profile of the user's interests to allow for highly targeted
+  advertising. In conjunction with a site that is aware of the user's real identity (for example an
+  e-commerce site that requires authenticated credentials), this could allow oppressive groups to
+  target individuals with greater accuracy than in a world with purely anonymous Web usage.</p>
 
-  <p>There are a number of techniques that can be used to mitigate the
-  risk of user tracking:</p>
+  <p>There are a number of techniques that can be used to mitigate the risk of user tracking:</p>
 
   <dl><dt>Blocking third-party storage</dt>
    <dd>
 
-    <p>User agents may restrict access to the <code title="dom-localStorage"><a href="#dom-localstorage">localStorage</a></code> objects to scripts
-    originating at the domain of the top-level document of the
-    <span>browsing context</span>, for instance denying access to the
-    API for pages from other domains running in
+    <p>User agents may restrict access to the <code title="dom-localStorage"><a href="#dom-localstorage">localStorage</a></code>
+    objects to scripts originating at the domain of the top-level document of the <span>browsing
+    context</span>, for instance denying access to the API for pages from other domains running in
     <code>iframe</code>s.</p>
 
    </dd>
@@ -1003,20 +912,17 @@ dictionary <dfn id="storageeventinit">StorageEventInit</dfn> : <span>EventInit</
     <p>User agents may, possibly in a manner configured by the user, automatically delete stored
     data after a period of time.</p>
 
-    <p>For example, a user agent could be configured to treat
-    third-party local storage areas as session-only storage, deleting
-    the data once the user had closed all the <span title="browsing
+    <p>For example, a user agent could be configured to treat third-party local storage areas as
+    session-only storage, deleting the data once the user had closed all the <span title="browsing
     context">browsing contexts</span> that could access it.</p>
 
-    <p>This can restrict the ability of a site to track a user, as the
-    site would then only be able to track the user across multiple
-    sessions when he authenticates with the site itself (e.g. by
+    <p>This can restrict the ability of a site to track a user, as the site would then only be able
+    to track the user across multiple sessions when he authenticates with the site itself (e.g. by
     making a purchase or logging in to a service).</p>
 
-    <p>However, this also reduces the usefulness of the API as a
-    long-term storage mechanism. It can also put the user's data at
-    risk, if the user does not fully understand the implications of
-    data expiration.</p>
+    <p>However, this also reduces the usefulness of the API as a long-term storage mechanism. It can
+    also put the user's data at risk, if the user does not fully understand the implications of data
+    expiration.</p>
 
     
 
@@ -1025,19 +931,15 @@ dictionary <dfn id="storageeventinit">StorageEventInit</dfn> : <span>EventInit</
    <dt>Treating persistent storage as cookies</dt>
    <dd>
 
-    <p>If users attempt to protect their privacy by clearing cookies
-    without also clearing data stored in the local storage area, sites
-    can defeat those attempts by using the two features as redundant
-    backup for each other. User agents should present the interfaces
-    for clearing these in a way that helps users to understand this
-    possibility and enables them to delete data in all persistent
-    storage features simultaneously. <a href="#refsCOOKIES">[COOKIES]</a></p>
+    <p>If users attempt to protect their privacy by clearing cookies without also clearing data
+    stored in the local storage area, sites can defeat those attempts by using the two features as
+    redundant backup for each other. User agents should present the interfaces for clearing these in
+    a way that helps users to understand this possibility and enables them to delete data in all
+    persistent storage features simultaneously. <a href="#refsCOOKIES">[COOKIES]</a></p>
 
    </dd>
 
-   <dt>Site-specific white-listing of access to local storage
-   areas</dt>
-   <dd>
+   <dt>Site-specific white-listing of access to local storage areas</dt> <dd>
 
     <p>User agents may allow sites to access session storage areas in
     an unrestricted manner, but require the user to authorize access
@@ -1048,58 +950,47 @@ dictionary <dfn id="storageeventinit">StorageEventInit</dfn> : <span>EventInit</
    <dt>Origin-tracking of stored data</dt>
    <dd>
 
-    <p>User agents may record the <span title="origin">origins</span>
-    of sites that contained content from third-party origins that
-    caused data to be stored.</p>
+    <p>User agents may record the <span title="origin">origins</span> of sites that contained
+    content from third-party origins that caused data to be stored.</p>
 
-    <p>If this information is then used to present the view of data
-    currently in persistent storage, it would allow the user to make
-    informed decisions about which parts of the persistent storage to
-    prune. Combined with a blacklist ("delete this data and prevent
-    this domain from ever storing data again"), the user can restrict
-    the use of persistent storage to sites that he trusts.</p>
+    <p>If this information is then used to present the view of data currently in persistent storage,
+    it would allow the user to make informed decisions about which parts of the persistent storage
+    to prune. Combined with a blacklist ("delete this data and prevent this domain from ever storing
+    data again"), the user can restrict the use of persistent storage to sites that he trusts.</p>
 
    </dd>
 
    <dt>Shared blacklists</dt>
    <dd>
 
-    <p>User agents may allow users to share their persistent storage
-    domain blacklists.</p>
+    <p>User agents may allow users to share their persistent storage domain blacklists.</p>
 
-    <p>This would allow communities to act together to protect their
-    privacy.</p>
+    <p>This would allow communities to act together to protect their privacy.</p>
 
    </dd>
 
-  </dl><p>While these suggestions prevent trivial use of this API for user
-  tracking, they do not block it altogether. Within a single domain, a
-  site can continue to track the user during a session, and can then
-  pass all this information to the third party along with any
-  identifying information (names, credit card numbers, addresses)
-  obtained by the site. If a third party cooperates with multiple
-  sites to obtain such information, a profile can still be
-  created.</p>
+  </dl><p>While these suggestions prevent trivial use of this API for user tracking, they do not block it
+  altogether. Within a single domain, a site can continue to track the user during a session, and
+  can then pass all this information to the third party along with any identifying information
+  (names, credit card numbers, addresses) obtained by the site. If a third party cooperates with
+  multiple sites to obtain such information, a profile can still be created.</p>
 
-  <p>However, user tracking is to some extent possible even with no
-  cooperation from the user agent whatsoever, for instance by using
-  session identifiers in URLs, a technique already commonly used for
-  innocuous purposes but easily repurposed for user tracking (even
-  retroactively). This information can then be shared with other
-  sites, using visitors' IP addresses and other user-specific data
-  (e.g. user-agent headers and configuration settings) to combine
-  separate sessions into coherent user profiles.</p>
+  <p>However, user tracking is to some extent possible even with no cooperation from the user agent
+  whatsoever, for instance by using session identifiers in URLs, a technique already commonly used
+  for innocuous purposes but easily repurposed for user tracking (even retroactively). This
+  information can then be shared with other sites, using visitors' IP addresses and other
+  user-specific data (e.g. user-agent headers and configuration settings) to combine separate
+  sessions into coherent user profiles.</p>
 
 
   <h3 id="sensitivity-of-data"><span class="secno">6.2 </span>Sensitivity of data</h3>
 
-  <p>User agents should treat persistently stored data as potentially
-  sensitive; it's quite possible for e-mails, calendar appointments,
-  health records, or other confidential documents to be stored in this
-  mechanism.</p>
+  <p>User agents should treat persistently stored data as potentially sensitive; it's quite possible
+  for e-mails, calendar appointments, health records, or other confidential documents to be stored
+  in this mechanism.</p>
 
-  <p>To this end, user agents should ensure that when deleting data,
-  it is promptly deleted from the underlying storage.</p>
+  <p>To this end, user agents should ensure that when deleting data, it is promptly deleted from the
+  underlying storage.</p>
 
 
 
@@ -1107,12 +998,10 @@ dictionary <dfn id="storageeventinit">StorageEventInit</dfn> : <span>EventInit</
 
   <h3 id="dns-spoofing-attacks"><span class="secno">7.1 </span>DNS spoofing attacks</h3>
 
-  <p>Because of the potential for DNS spoofing attacks, one cannot
-  guarantee that a host claiming to be in a certain domain really is
-  from that domain. To mitigate this, pages can use TLS. Pages using
-  TLS can be sure that only the user, software working on behalf of
-  the user, and other pages using TLS that have certificates
-  identifying them as being from the same domain, can access their
+  <p>Because of the potential for DNS spoofing attacks, one cannot guarantee that a host claiming to
+  be in a certain domain really is from that domain. To mitigate this, pages can use TLS. Pages
+  using TLS can be sure that only the user, software working on behalf of the user, and other pages
+  using TLS that have certificates identifying them as being from the same domain, can access their
   storage areas.</p>
 
 
@@ -1123,36 +1012,29 @@ dictionary <dfn id="storageeventinit">StorageEventInit</dfn> : <span>EventInit</
   the access by pathname. Authors on shared hosts are therefore urged to avoid using these features,
   as it would be trivial for other authors to read the data and overwrite it.</p>
 
-  <p class="note">Even if a path-restriction feature was made
-  available, the usual DOM scripting security model would make it
-  trivial to bypass this protection and access the data from any
+  <p class="note">Even if a path-restriction feature was made available, the usual DOM scripting
+  security model would make it trivial to bypass this protection and access the data from any
   path.</p>
 
 
   <h3 id="implementation-risks"><span class="secno">7.3 </span>Implementation risks</h3>
 
-  <p>The two primary risks when implementing these persistent storage
-  features are letting hostile sites read information from other
-  domains, and letting hostile sites write information that is then
-  read from other domains.</p>
+  <p>The two primary risks when implementing these persistent storage features are letting hostile
+  sites read information from other domains, and letting hostile sites write information that is
+  then read from other domains.</p>
 
-  <p>Letting third-party sites read data that is not supposed to be
-  read from their domain causes <em>information leakage</em>, For
-  example, a user's shopping wishlist on one domain could be used by
-  another domain for targeted advertising; or a user's
-  work-in-progress confidential documents stored by a word-processing
-  site could be examined by the site of a competing company.</p>
+  <p>Letting third-party sites read data that is not supposed to be read from their domain causes
+  <em>information leakage</em>, For example, a user's shopping wishlist on one domain could be used
+  by another domain for targeted advertising; or a user's work-in-progress confidential documents
+  stored by a word-processing site could be examined by the site of a competing company.</p>
 
-  <p>Letting third-party sites write data to the persistent storage of
-  other domains can result in <em>information spoofing</em>, which is
-  equally dangerous. For example, a hostile site could add items to a
-  user's wishlist; or a hostile site could set a user's session
-  identifier to a known ID that the hostile site can then use to track
-  the user's actions on the victim site.</p>
+  <p>Letting third-party sites write data to the persistent storage of other domains can result in
+  <em>information spoofing</em>, which is equally dangerous. For example, a hostile site could add
+  items to a user's wishlist; or a hostile site could set a user's session identifier to a known ID
+  that the hostile site can then use to track the user's actions on the victim site.</p>
 
-  <p>Thus, strictly following the <span>origin</span> model described
-  in this specification is important for user security.</p>
-
+  <p>Thus, strictly following the <span>origin</span> model described in this specification is
+  important for user security.</p>
 
 
 
@@ -1175,13 +1057,10 @@ dictionary <dfn id="storageeventinit">StorageEventInit</dfn> : <span>EventInit</
    <dd><cite><a href="http://www.whatwg.org/specs/web-apps/current-work/">HTML</a></cite>, I. Hickson. WHATWG.</dd>
 
    <dt id="refsRFC2119">[RFC2119]</dt>
-   <dd><cite><a href="http://tools.ietf.org/html/rfc2119">Key words for use in
-   RFCs to Indicate Requirement Levels</a></cite>, S. Bradner. IETF.</dd>
+   <dd><cite><a href="http://tools.ietf.org/html/rfc2119">Key words for use in RFCs to Indicate Requirement Levels</a></cite>, S. Bradner. IETF.</dd>
 
    <dt id="refsWEBIDL">[WEBIDL]</dt>
-   
-   <dd><cite><a href="http://dev.w3.org/2006/webapi/WebIDL/">Web
-   IDL</a></cite>, C. McCormack. W3C.</dd>
+   <dd><cite><a href="http://dev.w3.org/2006/webapi/WebIDL/">Web IDL</a></cite>, C. McCormack. W3C.</dd>
 
   </dl><h2 class="no-num" id="acknowledgements">Acknowledgements</h2>
 
