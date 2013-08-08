@@ -63,7 +63,7 @@ abstract class _ExpressionTransformer {
 		if (! (continuation.getType() instanceof ResolvedFunctionType)) {
 			throw new Error("logic flaw");
 		}
-		var delimContReturnType = (continuation.getType() as ResolvedFunctionType).getReturnType();
+		var returnType = (continuation.getType() as ResolvedFunctionType).getReturnType();
 
 		var firstBody : Expression = null;
 		var parentFuncDef = parent;
@@ -72,7 +72,7 @@ abstract class _ExpressionTransformer {
 				new Token("function", false),
 				null, // name
 				ClassDefinition.IS_STATIC,
-				delimContReturnType,
+				returnType,
 				[ newArgs[i] ],
 				[], // locals
 				[], // statements
@@ -115,14 +115,6 @@ abstract class _ExpressionTransformer {
 		throw new Error("logic flaw");
 	}
 
-	function _createCall1 (proc : Expression, arg : Expression) : CallExpression {
-		return new CallExpression(
-			arg.getToken(),
-			proc,
-			[ arg ] : Expression[]
-		);
-	}
-
 	function _rebaseClosures (srcParent : MemberFunctionDefinition, dstParent : MemberFunctionDefinition) : void {
 		var closures = new MemberFunctionDefinition[];
 
@@ -156,6 +148,14 @@ abstract class _ExpressionTransformer {
 			dstParent.getClosures().push(closures[i]);
 			closures[i].setParent(dstParent);
 		}
+	}
+
+	function _createCall1 (proc : Expression, arg : Expression) : CallExpression {
+		return new CallExpression(
+			arg.getToken(),
+			proc,
+			[ arg ] : Expression[]
+		);
 	}
 
 }
@@ -1752,6 +1752,10 @@ class CodeTransformer {
 		return this;
 	}
 
+	function setForceTransform (force : boolean) : void {
+		this._forceTransform = force;
+	}
+
 	function _functionIsTransformable (funcDef : MemberFunctionDefinition) : boolean {
 		if (funcDef.getStatements() == null)
 			return false;
@@ -1770,7 +1774,7 @@ class CodeTransformer {
 
 	function performTransformation () : void {
 		if (this._forceTransform) {
-			// transform all functions
+			// transform functions as many as possible
 			this._compiler.forEachClassDef(function (parser, classDef) {
 				return classDef.forEachMember(function onMember(member) {
 					member.forEachClosure(function (funcDef) {
@@ -1795,7 +1799,7 @@ class CodeTransformer {
 				if (member instanceof MemberFunctionDefinition) {
 					var funcDef = member as MemberFunctionDefinition;
 					if (funcDef.isGenerator()) {
-						this.transformGenerator(funcDef);
+						this._transformGenerator(funcDef);
 					}
 				}
 				return true;
@@ -1803,213 +1807,20 @@ class CodeTransformer {
 		});
 	}
 
-	function setForceTransform (force : boolean) : void {
-		this._forceTransform = force;
-	}
-
-	var _labelMap = new _LabellableStatementTransformer[];
-
-	function getStatementTransformerByLabel (label : string) : _LabellableStatementTransformer {
-		for (var i = 0; this._labelMap.length; ++i) {
-			var trans = this._labelMap[i];
-			if ((trans.getStatement() as LabellableStatement).getLabel().getValue() == label)
-				return trans;
-		}
-		throw new Error("fatal error: no corresponding transformer for label \"" + label + "\"");
-	}
-
-	function getTopLabelledBlock () : _LabellableStatementTransformer {
-		return this._labelMap[this._labelMap.length - 1];
-	}
-
-	function enterLabelledBlock (transformer : _LabellableStatementTransformer) : void {
-		this._labelMap.push(transformer);
-	}
-
-	function leaveLabelledBlock () : void {
-		this._labelMap.pop();
-	}
-
-	var _returnLocals = new LocalVariable[];
-
-	function getTopReturnLocal () : LocalVariable {
-		return this._returnLocals[this._returnLocals.length - 1];
-	}
-
-	function enterFunction (returnLocal : LocalVariable) : void {
-		this._returnLocals.push(returnLocal);
-	}
-
-	function leaveFunction () : void {
-		this._returnLocals.pop();
-	}
-
-	var _numUniqVar = 0;
-
-	function createFreshArgumentDeclaration (type : Type) : ArgumentDeclaration {
-		var id = this._numUniqVar++;
-		return new ArgumentDeclaration(new Token("$a" + id as string, true), type);
-	}
-
-	function createFreshLocalVariable (type : Type) : LocalVariable {
-		var id = this._numUniqVar++;
-		return new LocalVariable(new Token("$a" + id as string, true), type);
-	}
-
-	function _getStatementTransformerFor (statement : Statement) : _StatementTransformer {
-		if (statement instanceof ConstructorInvocationStatement)
-			return new _ConstructorInvocationStatementTransformer(this, statement as ConstructorInvocationStatement);
-		else if (statement instanceof ExpressionStatement)
-			return new _ExpressionStatementTransformer(this, statement as ExpressionStatement);
-		else if (statement instanceof FunctionStatement)
-			return new _FunctionStatementTransformer(this, statement as FunctionStatement);
-		else if (statement instanceof ReturnStatement)
-			return new _ReturnStatementTransformer(this, statement as ReturnStatement);
-		else if (statement instanceof YieldStatement)
-			return new _YieldStatementTransformer(this, statement as YieldStatement);
-		else if (statement instanceof DeleteStatement)
-			return new _DeleteStatementTransformer(this, statement as DeleteStatement);
-		else if (statement instanceof BreakStatement)
-			return new _BreakStatementTransformer(this, statement as BreakStatement);
-		else if (statement instanceof ContinueStatement)
-			return new _ContinueStatementTransformer(this, statement as ContinueStatement);
-		else if (statement instanceof DoWhileStatement)
-			return new _DoWhileStatementTransformer(this, statement as DoWhileStatement);
-		else if (statement instanceof ForInStatement)
-			return new _ForInStatementTransformer(this, statement as ForInStatement);
-		else if (statement instanceof ForStatement)
-			return new _ForStatementTransformer(this, statement as ForStatement);
-		else if (statement instanceof IfStatement)
-			return new _IfStatementTransformer(this, statement as IfStatement);
-		else if (statement instanceof SwitchStatement)
-			return new _SwitchStatementTransformer(this, statement as SwitchStatement);
-		else if (statement instanceof CaseStatement)
-			return new _CaseStatementTransformer(this, statement as CaseStatement);
-		else if (statement instanceof DefaultStatement)
-			return new _DefaultStatementTransformer(this, statement as DefaultStatement);
-		else if (statement instanceof WhileStatement)
-			return new _WhileStatementTransformer(this, statement as WhileStatement);
-		else if (statement instanceof TryStatement)
-			return new _TryStatementTransformer(this, statement as TryStatement);
-		else if (statement instanceof CatchStatement)
-			return new _CatchStatementTransformer(this, statement as CatchStatement);
-		else if (statement instanceof ThrowStatement)
-			return new _ThrowStatementTransformer(this, statement as ThrowStatement);
-		else if (statement instanceof AssertStatement)
-			return new _AssertStatementTransformer(this, statement as AssertStatement);
-		else if (statement instanceof LogStatement)
-			return new _LogStatementTransformer(this, statement as LogStatement);
-		else if (statement instanceof DebuggerStatement)
-			return new _DebuggerStatementTransformer(this, statement as DebuggerStatement);
-		throw new Error("got unexpected type of statement: " + JSON.stringify(statement.serialize()));
-	}
-
-	function _getExpressionTransformerFor (expr : Expression) : _ExpressionTransformer {
-		if (expr instanceof LocalExpression)
-			return new _LeafExpressionTransformer(this, expr as LocalExpression);
-		else if (expr instanceof ClassExpression)
-			throw new Error("logic flaw");
-		else if (expr instanceof NullExpression)
-			return new _LeafExpressionTransformer(this, expr as NullExpression);
-		else if (expr instanceof BooleanLiteralExpression)
-			return new _LeafExpressionTransformer(this, expr as BooleanLiteralExpression);
-		else if (expr instanceof IntegerLiteralExpression)
-			return new _LeafExpressionTransformer(this, expr as IntegerLiteralExpression);
-		else if (expr instanceof NumberLiteralExpression)
-			return new _LeafExpressionTransformer(this, expr as NumberLiteralExpression);
-		else if (expr instanceof StringLiteralExpression)
-			return new _LeafExpressionTransformer(this, expr as StringLiteralExpression);
-		else if (expr instanceof RegExpLiteralExpression)
-			return new _LeafExpressionTransformer(this, expr as RegExpLiteralExpression);
-		else if (expr instanceof ArrayLiteralExpression)
-			return new _ArrayLiteralExpressionTransformer(this, expr as ArrayLiteralExpression);
-		else if (expr instanceof MapLiteralExpression)
-			return new _MapLiteralExpressionTransformer(this, expr as MapLiteralExpression);
-		else if (expr instanceof ThisExpression)
-			return new _ThisExpressionTransformer(this, expr as ThisExpression);
-		else if (expr instanceof BitwiseNotExpression)
-			return new _BitwiseNotExpressionTransformer(this, expr as BitwiseNotExpression);
-		else if (expr instanceof InstanceofExpression)
-			return new _InstanceofExpressionTransformer(this, expr as InstanceofExpression);
-		else if (expr instanceof AsExpression)
-			return new _AsExpressionTransformer(this, expr as AsExpression);
-		else if (expr instanceof AsNoConvertExpression)
-			return new _AsNoConvertExpressionTransformer(this, expr as AsNoConvertExpression);
-		else if (expr instanceof LogicalNotExpression)
-			return new _LogicalNotExpressionTransformer(this, expr as LogicalNotExpression);
-		else if (expr instanceof TypeofExpression)
-			return new _TypeofExpressionTransformer(this, expr as TypeofExpression);
-		else if (expr instanceof PostIncrementExpression)
-			return new _PostIncrementExpressionTransformer(this, expr as PostIncrementExpression);
-		else if (expr instanceof PreIncrementExpression)
-			return new _PreIncrementExpressionTransformer(this, expr as PreIncrementExpression);
-		else if (expr instanceof PropertyExpression)
-			return new _PropertyExpressionTransformer(this, expr as PropertyExpression);
-		else if (expr instanceof SignExpression)
-			return new _SignExpressionTransformer(this, expr as SignExpression);
-		else if (expr instanceof AdditiveExpression)
-			return new _AdditiveExpressionTransformer(this, expr as AdditiveExpression);
-		else if (expr instanceof ArrayExpression)
-			return new _ArrayExpressionTransformer(this, expr as ArrayExpression);
-		else if (expr instanceof AssignmentExpression)
-			return new _AssignmentExpressionTransformer(this, expr as AssignmentExpression);
-		else if (expr instanceof BinaryNumberExpression)
-			return new _BinaryNumberExpressionTransformer(this, expr as BinaryNumberExpression);
-		else if (expr instanceof EqualityExpression)
-			return new _EqualityExpressionTransformer(this, expr as EqualityExpression);
-		else if (expr instanceof InExpression)
-			return new _InExpressionTransformer(this, expr as InExpression);
-		else if (expr instanceof LogicalExpression)
-			return new _LogicalExpressionTransformer(this, expr as LogicalExpression);
-		else if (expr instanceof ShiftExpression)
-			return new _ShiftExpressionTransformer(this, expr as ShiftExpression);
-		else if (expr instanceof ConditionalExpression)
-			return new _ConditionalExpressionTransformer(this, expr as ConditionalExpression);
-		else if (expr instanceof CallExpression)
-			return new _CallExpressionTransformer(this, expr as CallExpression);
-		else if (expr instanceof SuperExpression)
-			return new _SuperExpressionTransformer(this, expr as SuperExpression);
-		else if (expr instanceof NewExpression)
-			return new _NewExpressionTransformer(this, expr as NewExpression);
-		else if (expr instanceof FunctionExpression)
-			return new _FunctionExpressionTransformer(this, expr as FunctionExpression);
-		else if (expr instanceof CommaExpression)
-			return new _CommaExpressionTransformer(this, expr as CommaExpression);
-		throw new Error("got unexpected type of expression: " + (expr != null ? JSON.stringify(expr.serialize()) : expr.toString()));
-	}
-
-	function transformGenerator (funcDef : MemberFunctionDefinition) : void {
+	function _transformGenerator (funcDef : MemberFunctionDefinition) : void {
 		this._compileYields(funcDef);
-	}
-
-	function _createIdentityFunction (parent : MemberFunctionDefinition, type : Type) : FunctionExpression {
-		var arg = this.createFreshArgumentDeclaration(type);
-		var identity = new MemberFunctionDefinition(
-			new Token("function", false),
-			null,	// name
-			ClassDefinition.IS_STATIC,
-			type,
-			[ arg ],
-			[],	// locals
-			[ new ReturnStatement(new Token("return", false), new LocalExpression(new Token(arg.getName().getValue(), true), arg)) ] : Statement[],
-			[],	// closures
-			null,	// lastToken
-			null
-		);
-		parent.getClosures().push(identity);
-		return new FunctionExpression(identity.getToken(), identity);
-	}
-
-	function _doCPSTransform (funcDef : MemberFunctionDefinition) : void {
-		this._doCPSTransform(funcDef, false, function (name, statements) {
-			// do nothing
-		});
 	}
 
 	var _returnType : Type = null;
 
 	function getReturnType () : Type {
 		return this._returnType;
+	}
+
+	function _doCPSTransform (funcDef : MemberFunctionDefinition) : void {
+		this._doCPSTransform(funcDef, false, function (name, statements) {
+			// do nothing
+		});
 	}
 
 	function _doCPSTransform (funcDef : MemberFunctionDefinition, transformOnlyStmts : boolean, postFragmentationCallback : (string, Statement[]) -> void) : void {
@@ -2272,6 +2083,195 @@ class CodeTransformer {
 			funcDef = parent;
 		}
 		return depth;
+	}
+
+	var _labelMap = new _LabellableStatementTransformer[];
+
+	function getStatementTransformerByLabel (label : string) : _LabellableStatementTransformer {
+		for (var i = 0; this._labelMap.length; ++i) {
+			var trans = this._labelMap[i];
+			if ((trans.getStatement() as LabellableStatement).getLabel().getValue() == label)
+				return trans;
+		}
+		throw new Error("fatal error: no corresponding transformer for label \"" + label + "\"");
+	}
+
+	function getTopLabelledBlock () : _LabellableStatementTransformer {
+		return this._labelMap[this._labelMap.length - 1];
+	}
+
+	function enterLabelledBlock (transformer : _LabellableStatementTransformer) : void {
+		this._labelMap.push(transformer);
+	}
+
+	function leaveLabelledBlock () : void {
+		this._labelMap.pop();
+	}
+
+	var _returnLocals = new LocalVariable[];
+
+	function getTopReturnLocal () : LocalVariable {
+		return this._returnLocals[this._returnLocals.length - 1];
+	}
+
+	function enterFunction (returnLocal : LocalVariable) : void {
+		this._returnLocals.push(returnLocal);
+	}
+
+	function leaveFunction () : void {
+		this._returnLocals.pop();
+	}
+
+	var _numUniqVar = 0;
+
+	function createFreshArgumentDeclaration (type : Type) : ArgumentDeclaration {
+		var id = this._numUniqVar++;
+		return new ArgumentDeclaration(new Token("$a" + id as string, true), type);
+	}
+
+	function createFreshLocalVariable (type : Type) : LocalVariable {
+		var id = this._numUniqVar++;
+		return new LocalVariable(new Token("$a" + id as string, true), type);
+	}
+
+	function _getStatementTransformerFor (statement : Statement) : _StatementTransformer {
+		if (statement instanceof ConstructorInvocationStatement)
+			return new _ConstructorInvocationStatementTransformer(this, statement as ConstructorInvocationStatement);
+		else if (statement instanceof ExpressionStatement)
+			return new _ExpressionStatementTransformer(this, statement as ExpressionStatement);
+		else if (statement instanceof FunctionStatement)
+			return new _FunctionStatementTransformer(this, statement as FunctionStatement);
+		else if (statement instanceof ReturnStatement)
+			return new _ReturnStatementTransformer(this, statement as ReturnStatement);
+		else if (statement instanceof YieldStatement)
+			return new _YieldStatementTransformer(this, statement as YieldStatement);
+		else if (statement instanceof DeleteStatement)
+			return new _DeleteStatementTransformer(this, statement as DeleteStatement);
+		else if (statement instanceof BreakStatement)
+			return new _BreakStatementTransformer(this, statement as BreakStatement);
+		else if (statement instanceof ContinueStatement)
+			return new _ContinueStatementTransformer(this, statement as ContinueStatement);
+		else if (statement instanceof DoWhileStatement)
+			return new _DoWhileStatementTransformer(this, statement as DoWhileStatement);
+		else if (statement instanceof ForInStatement)
+			return new _ForInStatementTransformer(this, statement as ForInStatement);
+		else if (statement instanceof ForStatement)
+			return new _ForStatementTransformer(this, statement as ForStatement);
+		else if (statement instanceof IfStatement)
+			return new _IfStatementTransformer(this, statement as IfStatement);
+		else if (statement instanceof SwitchStatement)
+			return new _SwitchStatementTransformer(this, statement as SwitchStatement);
+		else if (statement instanceof CaseStatement)
+			return new _CaseStatementTransformer(this, statement as CaseStatement);
+		else if (statement instanceof DefaultStatement)
+			return new _DefaultStatementTransformer(this, statement as DefaultStatement);
+		else if (statement instanceof WhileStatement)
+			return new _WhileStatementTransformer(this, statement as WhileStatement);
+		else if (statement instanceof TryStatement)
+			return new _TryStatementTransformer(this, statement as TryStatement);
+		else if (statement instanceof CatchStatement)
+			return new _CatchStatementTransformer(this, statement as CatchStatement);
+		else if (statement instanceof ThrowStatement)
+			return new _ThrowStatementTransformer(this, statement as ThrowStatement);
+		else if (statement instanceof AssertStatement)
+			return new _AssertStatementTransformer(this, statement as AssertStatement);
+		else if (statement instanceof LogStatement)
+			return new _LogStatementTransformer(this, statement as LogStatement);
+		else if (statement instanceof DebuggerStatement)
+			return new _DebuggerStatementTransformer(this, statement as DebuggerStatement);
+		throw new Error("got unexpected type of statement: " + JSON.stringify(statement.serialize()));
+	}
+
+	function _getExpressionTransformerFor (expr : Expression) : _ExpressionTransformer {
+		if (expr instanceof LocalExpression)
+			return new _LeafExpressionTransformer(this, expr as LocalExpression);
+		else if (expr instanceof ClassExpression)
+			throw new Error("logic flaw");
+		else if (expr instanceof NullExpression)
+			return new _LeafExpressionTransformer(this, expr as NullExpression);
+		else if (expr instanceof BooleanLiteralExpression)
+			return new _LeafExpressionTransformer(this, expr as BooleanLiteralExpression);
+		else if (expr instanceof IntegerLiteralExpression)
+			return new _LeafExpressionTransformer(this, expr as IntegerLiteralExpression);
+		else if (expr instanceof NumberLiteralExpression)
+			return new _LeafExpressionTransformer(this, expr as NumberLiteralExpression);
+		else if (expr instanceof StringLiteralExpression)
+			return new _LeafExpressionTransformer(this, expr as StringLiteralExpression);
+		else if (expr instanceof RegExpLiteralExpression)
+			return new _LeafExpressionTransformer(this, expr as RegExpLiteralExpression);
+		else if (expr instanceof ArrayLiteralExpression)
+			return new _ArrayLiteralExpressionTransformer(this, expr as ArrayLiteralExpression);
+		else if (expr instanceof MapLiteralExpression)
+			return new _MapLiteralExpressionTransformer(this, expr as MapLiteralExpression);
+		else if (expr instanceof ThisExpression)
+			return new _ThisExpressionTransformer(this, expr as ThisExpression);
+		else if (expr instanceof BitwiseNotExpression)
+			return new _BitwiseNotExpressionTransformer(this, expr as BitwiseNotExpression);
+		else if (expr instanceof InstanceofExpression)
+			return new _InstanceofExpressionTransformer(this, expr as InstanceofExpression);
+		else if (expr instanceof AsExpression)
+			return new _AsExpressionTransformer(this, expr as AsExpression);
+		else if (expr instanceof AsNoConvertExpression)
+			return new _AsNoConvertExpressionTransformer(this, expr as AsNoConvertExpression);
+		else if (expr instanceof LogicalNotExpression)
+			return new _LogicalNotExpressionTransformer(this, expr as LogicalNotExpression);
+		else if (expr instanceof TypeofExpression)
+			return new _TypeofExpressionTransformer(this, expr as TypeofExpression);
+		else if (expr instanceof PostIncrementExpression)
+			return new _PostIncrementExpressionTransformer(this, expr as PostIncrementExpression);
+		else if (expr instanceof PreIncrementExpression)
+			return new _PreIncrementExpressionTransformer(this, expr as PreIncrementExpression);
+		else if (expr instanceof PropertyExpression)
+			return new _PropertyExpressionTransformer(this, expr as PropertyExpression);
+		else if (expr instanceof SignExpression)
+			return new _SignExpressionTransformer(this, expr as SignExpression);
+		else if (expr instanceof AdditiveExpression)
+			return new _AdditiveExpressionTransformer(this, expr as AdditiveExpression);
+		else if (expr instanceof ArrayExpression)
+			return new _ArrayExpressionTransformer(this, expr as ArrayExpression);
+		else if (expr instanceof AssignmentExpression)
+			return new _AssignmentExpressionTransformer(this, expr as AssignmentExpression);
+		else if (expr instanceof BinaryNumberExpression)
+			return new _BinaryNumberExpressionTransformer(this, expr as BinaryNumberExpression);
+		else if (expr instanceof EqualityExpression)
+			return new _EqualityExpressionTransformer(this, expr as EqualityExpression);
+		else if (expr instanceof InExpression)
+			return new _InExpressionTransformer(this, expr as InExpression);
+		else if (expr instanceof LogicalExpression)
+			return new _LogicalExpressionTransformer(this, expr as LogicalExpression);
+		else if (expr instanceof ShiftExpression)
+			return new _ShiftExpressionTransformer(this, expr as ShiftExpression);
+		else if (expr instanceof ConditionalExpression)
+			return new _ConditionalExpressionTransformer(this, expr as ConditionalExpression);
+		else if (expr instanceof CallExpression)
+			return new _CallExpressionTransformer(this, expr as CallExpression);
+		else if (expr instanceof SuperExpression)
+			return new _SuperExpressionTransformer(this, expr as SuperExpression);
+		else if (expr instanceof NewExpression)
+			return new _NewExpressionTransformer(this, expr as NewExpression);
+		else if (expr instanceof FunctionExpression)
+			return new _FunctionExpressionTransformer(this, expr as FunctionExpression);
+		else if (expr instanceof CommaExpression)
+			return new _CommaExpressionTransformer(this, expr as CommaExpression);
+		throw new Error("got unexpected type of expression: " + (expr != null ? JSON.stringify(expr.serialize()) : expr.toString()));
+	}
+
+	function _createIdentityFunction (parent : MemberFunctionDefinition, type : Type) : FunctionExpression {
+		var arg = this.createFreshArgumentDeclaration(type);
+		var identity = new MemberFunctionDefinition(
+			new Token("function", false),
+			null,	// name
+			ClassDefinition.IS_STATIC,
+			type,
+			[ arg ],
+			[],	// locals
+			[ new ReturnStatement(new Token("return", false), new LocalExpression(new Token(arg.getName().getValue(), true), arg)) ] : Statement[],
+			[],	// closures
+			null,	// lastToken
+			null
+		);
+		parent.getClosures().push(identity);
+		return new FunctionExpression(identity.getToken(), identity);
 	}
 
 }
