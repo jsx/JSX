@@ -463,13 +463,16 @@ foreach my $src(@files) {
                     (?<static> \bstatic\b \s+ )?
                     (?<readonly> \breadonly\b \s+)?
                     (?: \battribute\b \s+)?
-                    (?: \[ [^\]]+ \])?
-                    (?<type> $rx_type) \s+ (?<ident> \w+)
+                    (?: \[ [^\]]+ \])? # annotations
+                    (?<type> $rx_type) \s+ (?<ident> \w+) # required
                     (?: \s+ setraises\( [^\)]+ \) )?
-                    [^;\(\)]* ;
+                    [^;\(\)\[\]]* ;
                 }xms) {
-
                 my $id = $+{ident};
+
+                if ($id eq 'attribute') { # something's wrong
+                    die "panic: $member";
+                }
 
                 my $decl = "";
                 if ($+{static}) {

@@ -141,3 +141,6 @@ partial interface NavigatorUserMedia {
 };
 Navigator implements NavigatorUserMedia;
 
+HTMLElement implements ElementCSSInlineStyle;
+SVGELement implements ElementCSSInlineStyle;
+

@@ -410,6 +410,8 @@ native class Document extends Node {
 
 	// implements GlobalEventHandlers
 
+	var oncontextmenu : Nullable.<function(:Event):void>/*EventHandler*/;
+
 	/** @see http://www.w3.org/TR/html5/single-page.html */
 	var onabort : Nullable.<function(:Event):void>/*EventHandler*/;
 	/** @see http://www.w3.org/TR/html5/single-page.html */
@@ -1284,6 +1286,71 @@ native final class XMLSerializer {
 
 } // end of ProgressEventInit
 
+/** @see http://www.w3.org/TR/html5/single-page.html */
+native __fake__ class GlobalEventHandlers {
+
+	var oncontextmenu : Nullable.<function(:Event):void>/*EventHandler*/;
+
+	var onabort : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onblur : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onerror : Nullable.<function(:Event):void>/*OnErrorEventHandler*/;
+	var onfocus : Nullable.<function(:Event):void>/*EventHandler*/;
+	var oncancel : Nullable.<function(:Event):void>/*EventHandler*/;
+	var oncanplay : Nullable.<function(:Event):void>/*EventHandler*/;
+	var oncanplaythrough : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onchange : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onclick : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onclose : Nullable.<function(:Event):void>/*EventHandler*/;
+	var oncuechange : Nullable.<function(:Event):void>/*EventHandler*/;
+	var ondblclick : Nullable.<function(:Event):void>/*EventHandler*/;
+	var ondrag : Nullable.<function(:Event):void>/*EventHandler*/;
+	var ondragend : Nullable.<function(:Event):void>/*EventHandler*/;
+	var ondragenter : Nullable.<function(:Event):void>/*EventHandler*/;
+	var ondragexit : Nullable.<function(:Event):void>/*EventHandler*/;
+	var ondragleave : Nullable.<function(:Event):void>/*EventHandler*/;
+	var ondragover : Nullable.<function(:Event):void>/*EventHandler*/;
+	var ondragstart : Nullable.<function(:Event):void>/*EventHandler*/;
+	var ondrop : Nullable.<function(:Event):void>/*EventHandler*/;
+	var ondurationchange : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onemptied : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onended : Nullable.<function(:Event):void>/*EventHandler*/;
+	var oninput : Nullable.<function(:Event):void>/*EventHandler*/;
+	var oninvalid : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onkeydown : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onkeypress : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onkeyup : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onload : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onloadeddata : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onloadedmetadata : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onloadstart : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onmousedown : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onmouseenter : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onmouseleave : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onmousemove : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onmouseout : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onmouseover : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onmouseup : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onmousewheel : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onpause : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onplay : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onplaying : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onprogress : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onratechange : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onreset : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onscroll : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onseeked : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onseeking : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onselect : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onshow : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onstalled : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onsubmit : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onsuspend : Nullable.<function(:Event):void>/*EventHandler*/;
+	var ontimeupdate : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onvolumechange : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onwaiting : Nullable.<function(:Event):void>/*EventHandler*/;
+
+} // end of GlobalEventHandlers
+
 /** @see http://www.w3.org/TR/XMLHttpRequest/ */
 native __fake__ class XMLHttpRequestEventTarget extends EventTarget {
 
@@ -2034,7 +2101,7 @@ native final class CSSStyleDeclaration {
 } // end of CSSStyleDeclaration
 
 /** @see http://dev.w3.org/csswg/cssom/ */
-native final __fake__ class ElementCSSInlineStyle {
+native __fake__ class ElementCSSInlineStyle {
 
 	__readonly__ var style : CSSStyleDeclaration;
 
@@ -2138,6 +2205,8 @@ native final __fake__ class Window extends EventTarget {
 	function showModalDialog(url : string/*DOMString*/, argument : variant/*any*/) : variant/*any*/;
 
 	// implements GlobalEventHandlers
+
+	var oncontextmenu : Nullable.<function(:Event):void>/*EventHandler*/;
 
 	var onabort : Nullable.<function(:Event):void>/*EventHandler*/;
 	var onblur : Nullable.<function(:Event):void>/*EventHandler*/;
@@ -2349,6 +2418,8 @@ native class HTMLElement extends Element {
 
 	// implements GlobalEventHandlers
 
+	var oncontextmenu : Nullable.<function(:Event):void>/*EventHandler*/;
+
 	var onabort : Nullable.<function(:Event):void>/*EventHandler*/;
 	var onblur : Nullable.<function(:Event):void>/*EventHandler*/;
 	var onerror : Nullable.<function(:Event):void>/*OnErrorEventHandler*/;
@@ -2407,6 +2478,11 @@ native class HTMLElement extends Element {
 	var onvolumechange : Nullable.<function(:Event):void>/*EventHandler*/;
 	var onwaiting : Nullable.<function(:Event):void>/*EventHandler*/;
 
+	// implements ElementCSSInlineStyle
+
+	/** @see http://dev.w3.org/csswg/cssom/ */
+	__readonly__ var style : CSSStyleDeclaration;
+
 } // end of HTMLElement
 
 /** @see http://dev.w3.org/csswg/cssom-view/ */
@@ -2430,6 +2506,93 @@ native final class ClientRect {
 	__readonly__ var height : number/*double*/;
 
 } // end of ClientRect
+
+/** @see http://www.w3.org/TR/2012/WD-url-20120524/ */
+native class URL extends URLUtils {
+
+	/** @see http://url.spec.whatwg.org/ */
+	function constructor(url : string/*DOMString*/);
+	/** @see http://url.spec.whatwg.org/ */
+	function constructor(url : string/*DOMString*/, base : URL);
+	/** @see http://url.spec.whatwg.org/ */
+	function constructor(url : string/*DOMString*/, base : string/*DOMString*/);
+
+
+	/** @see http://www.w3.org/TR/2012/WD-FileAPI-20121025/ */
+	static function createObjectURL(blob : Blob) : string/*DOMString*/;
+	/** @see http://www.w3.org/TR/2012/WD-FileAPI-20121025/ */
+	static function revokeObjectURL(url : string/*DOMString*/) : void;
+
+	// inherits var protocol : string/*DOMString*/;
+	// inherits var username : string/*DOMString*/;
+	// inherits var password : string/*DOMString*/;
+	// inherits var host : string/*DOMString*/;
+	// inherits var hostname : string/*DOMString*/;
+	// inherits var port : string/*DOMString*/;
+	// inherits var pathname : string/*DOMString*/;
+	// inherits var search : string/*DOMString*/;
+	// inherits var hash : string/*DOMString*/;
+	var filename : string/*DOMString*/;
+	// inherits __readonly__ var origin : string/*DOMString*/;
+	function getParameterNames() : string[]/*sequence<DOMString>*/;
+	function getParameterValues(name : string/*DOMString*/) : string[]/*sequence<DOMString>*/;
+	function hasParameter(name : string/*DOMString*/) : boolean;
+	function getParameter(name : string/*DOMString*/) : Nullable.<string>/*DOMString?*/;
+	function setParameter(name : string/*DOMString*/, value : string/*DOMString*/) : void;
+	function addParameter(name : string/*DOMString*/, value : string/*DOMString*/) : void;
+	function removeParameter(name : string/*DOMString*/) : void;
+	function clearParameters() : void;
+	// inherits var href : string/*DOMString*/;
+
+	/** @see http://www.w3.org/TR/mediacapture-streams/ */
+	static function createObjectURL(stream : MediaStream) : string/*DOMString*/;
+
+} // end of URL
+
+/** @see http://url.spec.whatwg.org/ */
+native __fake__ class URLUtils {
+
+	var href : string/*DOMString*/;
+	__readonly__ var origin : string/*DOMString*/;
+	var protocol : string/*DOMString*/;
+	var username : string/*DOMString*/;
+	var password : string/*DOMString*/;
+	var host : string/*DOMString*/;
+	var hostname : string/*DOMString*/;
+	var port : string/*DOMString*/;
+	var pathname : string/*DOMString*/;
+	var search : string/*DOMString*/;
+	var query : Nullable.<URLQuery>;
+	var hash : string/*DOMString*/;
+
+} // end of URLUtils
+
+/** @see http://url.spec.whatwg.org/ */
+native final __fake__ class URLUtilsReadOnly {
+
+	__readonly__ var href : string/*DOMString*/;
+	__readonly__ var protocol : string/*DOMString*/;
+	__readonly__ var host : string/*DOMString*/;
+	__readonly__ var hostname : string/*DOMString*/;
+	__readonly__ var port : string/*DOMString*/;
+	__readonly__ var pathname : string/*DOMString*/;
+	__readonly__ var search : string/*DOMString*/;
+	__readonly__ var hash : string/*DOMString*/;
+
+} // end of URLUtilsReadOnly
+
+/** @see http://url.spec.whatwg.org/ */
+native final class URLQuery {
+
+	function get(name : string/*DOMString*/) : Nullable.<string>/*DOMString?*/;
+	function getAll(name : string/*DOMString*/) : string[]/*sequence<DOMString>*/;
+	function set(name : string/*DOMString*/, value : string/*DOMString*/) : void;
+	function append(name : string/*DOMString*/, value : string/*DOMString*/) : void;
+	function has(name : string/*DOMString*/) : boolean;
+	function delete(name : string/*DOMString*/) : void;
+	__readonly__ var size : number/*unsigned long*/;
+
+} // end of URLQuery
 
 /** @see http://www.w3.org/TR/html5/single-page.html */
 native final class HTMLAllCollection extends HTMLCollection {
@@ -2771,6 +2934,33 @@ native final class HTMLAnchorElement extends HTMLElement {
 	var name : string/*DOMString*/;
 	var rev : string/*DOMString*/;
 	var shape : string/*DOMString*/;
+
+	// implements URLUtils
+
+	/** @see http://url.spec.whatwg.org/ */
+	var href : string/*DOMString*/;
+	/** @see http://url.spec.whatwg.org/ */
+	__readonly__ var origin : string/*DOMString*/;
+	/** @see http://url.spec.whatwg.org/ */
+	var protocol : string/*DOMString*/;
+	/** @see http://url.spec.whatwg.org/ */
+	var username : string/*DOMString*/;
+	/** @see http://url.spec.whatwg.org/ */
+	var password : string/*DOMString*/;
+	/** @see http://url.spec.whatwg.org/ */
+	var host : string/*DOMString*/;
+	/** @see http://url.spec.whatwg.org/ */
+	var hostname : string/*DOMString*/;
+	/** @see http://url.spec.whatwg.org/ */
+	var port : string/*DOMString*/;
+	/** @see http://url.spec.whatwg.org/ */
+	var pathname : string/*DOMString*/;
+	/** @see http://url.spec.whatwg.org/ */
+	var search : string/*DOMString*/;
+	/** @see http://url.spec.whatwg.org/ */
+	var query : Nullable.<URLQuery>;
+	/** @see http://url.spec.whatwg.org/ */
+	var hash : string/*DOMString*/;
 
 } // end of HTMLAnchorElement
 
@@ -3235,6 +3425,33 @@ native final class HTMLAreaElement extends HTMLElement {
 	var type : string/*DOMString*/;
 
 	var noHref : boolean;
+
+	// implements URLUtils
+
+	/** @see http://url.spec.whatwg.org/ */
+	var href : string/*DOMString*/;
+	/** @see http://url.spec.whatwg.org/ */
+	__readonly__ var origin : string/*DOMString*/;
+	/** @see http://url.spec.whatwg.org/ */
+	var protocol : string/*DOMString*/;
+	/** @see http://url.spec.whatwg.org/ */
+	var username : string/*DOMString*/;
+	/** @see http://url.spec.whatwg.org/ */
+	var password : string/*DOMString*/;
+	/** @see http://url.spec.whatwg.org/ */
+	var host : string/*DOMString*/;
+	/** @see http://url.spec.whatwg.org/ */
+	var hostname : string/*DOMString*/;
+	/** @see http://url.spec.whatwg.org/ */
+	var port : string/*DOMString*/;
+	/** @see http://url.spec.whatwg.org/ */
+	var pathname : string/*DOMString*/;
+	/** @see http://url.spec.whatwg.org/ */
+	var search : string/*DOMString*/;
+	/** @see http://url.spec.whatwg.org/ */
+	var query : Nullable.<URLQuery>;
+	/** @see http://url.spec.whatwg.org/ */
+	var hash : string/*DOMString*/;
 
 } // end of HTMLAreaElement
 
@@ -3727,7 +3944,7 @@ native final class History {
 } // end of History
 
 /** @see http://www.w3.org/TR/html5/single-page.html */
-native final class Location {
+native final class Location extends URLUtils {
 
 	function assign(url : string/*DOMString*/) : void;
 	function replace(url : string/*DOMString*/) : void;
@@ -3871,69 +4088,6 @@ native final class ErrorEvent extends Event {
 
 
 } // end of ErrorEventInit
-
-/** @see http://www.w3.org/TR/html5/single-page.html */
-native __fake__ class GlobalEventHandlers {
-
-	var onabort : Nullable.<function(:Event):void>/*EventHandler*/;
-	var onblur : Nullable.<function(:Event):void>/*EventHandler*/;
-	var onerror : Nullable.<function(:Event):void>/*OnErrorEventHandler*/;
-	var onfocus : Nullable.<function(:Event):void>/*EventHandler*/;
-	var oncancel : Nullable.<function(:Event):void>/*EventHandler*/;
-	var oncanplay : Nullable.<function(:Event):void>/*EventHandler*/;
-	var oncanplaythrough : Nullable.<function(:Event):void>/*EventHandler*/;
-	var onchange : Nullable.<function(:Event):void>/*EventHandler*/;
-	var onclick : Nullable.<function(:Event):void>/*EventHandler*/;
-	var onclose : Nullable.<function(:Event):void>/*EventHandler*/;
-	var oncuechange : Nullable.<function(:Event):void>/*EventHandler*/;
-	var ondblclick : Nullable.<function(:Event):void>/*EventHandler*/;
-	var ondrag : Nullable.<function(:Event):void>/*EventHandler*/;
-	var ondragend : Nullable.<function(:Event):void>/*EventHandler*/;
-	var ondragenter : Nullable.<function(:Event):void>/*EventHandler*/;
-	var ondragexit : Nullable.<function(:Event):void>/*EventHandler*/;
-	var ondragleave : Nullable.<function(:Event):void>/*EventHandler*/;
-	var ondragover : Nullable.<function(:Event):void>/*EventHandler*/;
-	var ondragstart : Nullable.<function(:Event):void>/*EventHandler*/;
-	var ondrop : Nullable.<function(:Event):void>/*EventHandler*/;
-	var ondurationchange : Nullable.<function(:Event):void>/*EventHandler*/;
-	var onemptied : Nullable.<function(:Event):void>/*EventHandler*/;
-	var onended : Nullable.<function(:Event):void>/*EventHandler*/;
-	var oninput : Nullable.<function(:Event):void>/*EventHandler*/;
-	var oninvalid : Nullable.<function(:Event):void>/*EventHandler*/;
-	var onkeydown : Nullable.<function(:Event):void>/*EventHandler*/;
-	var onkeypress : Nullable.<function(:Event):void>/*EventHandler*/;
-	var onkeyup : Nullable.<function(:Event):void>/*EventHandler*/;
-	var onload : Nullable.<function(:Event):void>/*EventHandler*/;
-	var onloadeddata : Nullable.<function(:Event):void>/*EventHandler*/;
-	var onloadedmetadata : Nullable.<function(:Event):void>/*EventHandler*/;
-	var onloadstart : Nullable.<function(:Event):void>/*EventHandler*/;
-	var onmousedown : Nullable.<function(:Event):void>/*EventHandler*/;
-	var onmouseenter : Nullable.<function(:Event):void>/*EventHandler*/;
-	var onmouseleave : Nullable.<function(:Event):void>/*EventHandler*/;
-	var onmousemove : Nullable.<function(:Event):void>/*EventHandler*/;
-	var onmouseout : Nullable.<function(:Event):void>/*EventHandler*/;
-	var onmouseover : Nullable.<function(:Event):void>/*EventHandler*/;
-	var onmouseup : Nullable.<function(:Event):void>/*EventHandler*/;
-	var onmousewheel : Nullable.<function(:Event):void>/*EventHandler*/;
-	var onpause : Nullable.<function(:Event):void>/*EventHandler*/;
-	var onplay : Nullable.<function(:Event):void>/*EventHandler*/;
-	var onplaying : Nullable.<function(:Event):void>/*EventHandler*/;
-	var onprogress : Nullable.<function(:Event):void>/*EventHandler*/;
-	var onratechange : Nullable.<function(:Event):void>/*EventHandler*/;
-	var onreset : Nullable.<function(:Event):void>/*EventHandler*/;
-	var onscroll : Nullable.<function(:Event):void>/*EventHandler*/;
-	var onseeked : Nullable.<function(:Event):void>/*EventHandler*/;
-	var onseeking : Nullable.<function(:Event):void>/*EventHandler*/;
-	var onselect : Nullable.<function(:Event):void>/*EventHandler*/;
-	var onshow : Nullable.<function(:Event):void>/*EventHandler*/;
-	var onstalled : Nullable.<function(:Event):void>/*EventHandler*/;
-	var onsubmit : Nullable.<function(:Event):void>/*EventHandler*/;
-	var onsuspend : Nullable.<function(:Event):void>/*EventHandler*/;
-	var ontimeupdate : Nullable.<function(:Event):void>/*EventHandler*/;
-	var onvolumechange : Nullable.<function(:Event):void>/*EventHandler*/;
-	var onwaiting : Nullable.<function(:Event):void>/*EventHandler*/;
-
-} // end of GlobalEventHandlers
 
 /** @see http://www.w3.org/TR/html5/single-page.html */
 native __fake__ class WindowEventHandlers {
@@ -4294,42 +4448,6 @@ native final class FileReaderSync {
 	function readAsDataURL(blob : Blob) : string/*DOMString*/;
 
 } // end of FileReaderSync
-
-/** @see http://www.w3.org/TR/2012/WD-url-20120524/ */
-native class URL {
-
-	/** @see http://www.w3.org/TR/2012/WD-FileAPI-20121025/ */
-	static function createObjectURL(blob : Blob) : string/*DOMString*/;
-	/** @see http://www.w3.org/TR/2012/WD-FileAPI-20121025/ */
-	static function revokeObjectURL(url : string/*DOMString*/) : void;
-	function constructor(url : string/*DOMString*/);
-	function constructor(url : string/*DOMString*/, baseURL : string/*DOMString*/);
-
-	var protocol : string/*DOMString*/;
-	var username : string/*DOMString*/;
-	var password : string/*DOMString*/;
-	var host : string/*DOMString*/;
-	var hostname : string/*DOMString*/;
-	var port : string/*DOMString*/;
-	var pathname : string/*DOMString*/;
-	var search : string/*DOMString*/;
-	var hash : string/*DOMString*/;
-	var filename : string/*DOMString*/;
-	__readonly__ var origin : string/*DOMString*/;
-	function getParameterNames() : string[]/*sequence<DOMString>*/;
-	function getParameterValues(name : string/*DOMString*/) : string[]/*sequence<DOMString>*/;
-	function hasParameter(name : string/*DOMString*/) : boolean;
-	function getParameter(name : string/*DOMString*/) : Nullable.<string>/*DOMString?*/;
-	function setParameter(name : string/*DOMString*/, value : string/*DOMString*/) : void;
-	function addParameter(name : string/*DOMString*/, value : string/*DOMString*/) : void;
-	function removeParameter(name : string/*DOMString*/) : void;
-	function clearParameters() : void;
-	var href : string/*DOMString*/;
-
-	/** @see http://www.w3.org/TR/mediacapture-streams/ */
-	static function createObjectURL(stream : MediaStream) : string/*DOMString*/;
-
-} // end of URL
 
 /** @see http://www.w3.org/TR/2012/WD-webaudio-20121213/ */
 native class AudioContext {
