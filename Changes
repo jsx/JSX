@@ -1,5 +1,17 @@
 Revision history for the JSX software development kit
 
+0.9.60 2013-08-08 22:12:39+0900
+    [BUG FIXES]
+    - Make label name conflict compile errors, rather than runtime erorrs
+      (#127)
+    - Fix issues that error messages sometimes displayed wrong places
+
+    [CHANGES]
+    - Update web.jsx up to the latest HTML5 specs
+
+    [FEATURES]
+    - Add window.orientation (#233)
+
 0.9.59 2013-08-07 07:24:50+0900
     [BUG FIXES]
     - Fix the name conflicts on native inner classes
