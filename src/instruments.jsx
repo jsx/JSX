@@ -53,62 +53,71 @@ abstract class _ExpressionTransformer {
 
 	abstract function doCPSTransform (parent : MemberFunctionDefinition, continuation : Expression) : Expression;
 
-	function _transformOp (parent : MemberFunctionDefinition, continuation : Expression, exprs : Expression[]) : Expression {
-
-		var newArgs = new ArgumentDeclaration[];
-		for (var i = 0; i < exprs.length; ++i) {
-			newArgs.push(this._transformer.createFreshArgumentDeclaration(exprs[i].getType()));
+	function _transformArgs (parent : MemberFunctionDefinition, exprs : Expression[], returnType : Type) : Expression {
+		if (exprs.length == 0) {
+			return this._constructBody([], null, null, null);
 		}
+		else {
+			var newArgs = new ArgumentDeclaration[];
+			for (var i = 0; i < exprs.length; ++i) {
+				newArgs.push(this._transformer.createFreshArgumentDeclaration(exprs[i].getType()));
+			}
+			var newArgLocals = new Expression[];
+			for (var i = 0; i < exprs.length; ++i) {
+				newArgLocals.push(new LocalExpression(exprs[i].getToken(), newArgs[i]));
+			}
 
+			var topExpr = null : Expression;
+			var rootFuncDef = null : MemberFunctionDefinition;
+			var prevFuncDef = parent;
+			for (var i = 0; i < exprs.length; ++i) {
+				var funcDef = this._createAnonymousFunction(prevFuncDef, [ newArgs[i] ], returnType);
+				if (rootFuncDef == null) {
+					rootFuncDef = funcDef;
+				}
+				var cont = new FunctionExpression(funcDef.getToken(), funcDef);
+				var body = this._transformer._getExpressionTransformerFor(exprs[i]).doCPSTransform(prevFuncDef, cont);
+				if (i == 0) {
+					topExpr = body;
+				} else  {
+					prevFuncDef.getStatements().push(new ReturnStatement(new Token("return", false), body));
+				}
+				prevFuncDef = funcDef;
+			}
+
+			assert topExpr != null;
+			assert rootFuncDef != null;
+			assert prevFuncDef != parent;
+
+			// small hack for source map
+			topExpr._token = this.getExpression().getToken();
+
+			return this._constructBody(newArgLocals, topExpr, rootFuncDef, prevFuncDef);
+		}
+	}
+
+	var _continuation : Expression;
+
+	function _constructBody (args : Expression[], topExpr : Expression, topFuncDef : MemberFunctionDefinition, botFuncDef : MemberFunctionDefinition) : Expression {
+		var body = this._createCall1(this._continuation, this._constructOp(args));
+		if (args.length == 0) {
+			return body;
+		}
+		botFuncDef._statements = [ new ReturnStatement(new Token("return", false), body) ] : Statement[];
+		this._rebaseClosures(topFuncDef, botFuncDef);
+		return topExpr;
+	}
+
+	function _transformOp (parent : MemberFunctionDefinition, continuation : Expression, exprs : Expression[]) : Expression {
+		this._continuation = continuation;
+
+		var returnType;
 		if (! (continuation.getType() instanceof ResolvedFunctionType)) {
 			throw new Error("logic flaw");
 		}
-		var returnType = (continuation.getType() as ResolvedFunctionType).getReturnType();
+		returnType = (continuation.getType() as ResolvedFunctionType).getReturnType();
 
-		var firstBody : Expression = null;
-		var parentFuncDef = parent;
-		for (var i = 0; i < exprs.length; ++i) {
-			var childFuncDef = new MemberFunctionDefinition(
-				new Token("function", false),
-				null, // name
-				ClassDefinition.IS_STATIC,
-				returnType,
-				[ newArgs[i] ],
-				[], // locals
-				[], // statements
-				[], // closures
-				null,
-				null
-			);
-			parentFuncDef.getClosures().push(childFuncDef);
-			var cont = new FunctionExpression(childFuncDef.getToken(), childFuncDef);
-			var body = this._transformer._getExpressionTransformerFor(exprs[i]).doCPSTransform(parentFuncDef, cont);
-			if (i == 0) {
-				firstBody = body;
-			} else {
-				parentFuncDef.getStatements().push(new ReturnStatement(new Token("return", false), body));
-			}
-
-			childFuncDef.setParent(parentFuncDef);
-			childFuncDef.setClassDef(parentFuncDef.getClassDef());
-			parentFuncDef = childFuncDef;
-		}
-		var lastBodyArgs = new Expression[];
-		for (var j = 0; j < exprs.length; ++j) {
-			lastBodyArgs.push(new LocalExpression(exprs[j].getToken(), newArgs[j]));
-		}
-		var lastBody = new CallExpression(new Token("(", false), continuation, [ this._constructOp(lastBodyArgs) ]);
-		if (i == 0) {
-			firstBody = lastBody;
-		} else {
-			parentFuncDef.getStatements().push(new ReturnStatement(new Token("return", false), lastBody));
-		}
-
-		this._rebaseClosures(parent, parentFuncDef);
-
-		firstBody._token = this.getExpression()._token;
-
-		return firstBody;
+		return this._transformArgs(parent, exprs, returnType);
 	}
 
 	function _constructOp (exprs : Expression[]) : Expression {
@@ -145,9 +154,31 @@ abstract class _ExpressionTransformer {
 
 		// rebase to expr!
 		for (var i = 0; i < closures.length; ++i) {
-			dstParent.getClosures().push(closures[i]);
-			closures[i].setParent(dstParent);
+			this._linkFunctions(dstParent, closures[i]);
 		}
+	}
+
+	function _linkFunctions (parent : MemberFunctionDefinition, child : MemberFunctionDefinition) : void {
+		parent.getClosures().push(child);
+		child.setParent(parent);
+		child.setClassDef(parent.getClassDef());
+	}
+
+	function _createAnonymousFunction (parent : MemberFunctionDefinition, args : ArgumentDeclaration[], returnType : Type) : MemberFunctionDefinition {
+		var funcDef = new MemberFunctionDefinition(
+			this.getExpression().getToken(),
+			null, // name
+			ClassDefinition.IS_STATIC,
+			returnType,
+			args,
+			[], // locals
+			[], // statements
+			[], // closures
+			null,
+			null
+		);
+		this._linkFunctions(parent, funcDef);
+		return funcDef;
 	}
 
 	function _createCall1 (proc : Expression, arg : Expression) : CallExpression {
