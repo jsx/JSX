@@ -962,6 +962,18 @@ abstract class _StatementTransformer {
 
 	abstract function getStatement () : Statement;
 
+	function replaceControlStructuresWithGotos () : Statement[] {
+		if (! this._transformer._transformOnlyStmts) {
+			var funcDef = this._transformer.getTransformingFuncDef();
+			this.getStatement().forEachExpression(function (expr, replaceCb) {
+				var identity = this._transformer._createIdentityFunction(funcDef, expr.getType());
+				replaceCb(this._transformer._getExpressionTransformerFor(expr).doCPSTransform(funcDef, identity));
+				return true;
+			});
+		}
+		return this._replaceControlStructuresWithGotos();
+	}
+
 	abstract function _replaceControlStructuresWithGotos () : Statement[];
 
 	static function pushConditionalBranch (expr : Expression, succLabel : string, failLabel : string, output : Statement[]) : void {
@@ -973,7 +985,7 @@ abstract class _StatementTransformer {
 	}
 
 	function _transformAndPush (input : Statement, output : Statement[]) : void {
-		var conved = this._transformer._getStatementTransformerFor(input)._replaceControlStructuresWithGotos();
+		var conved = this._transformer._getStatementTransformerFor(input).replaceControlStructuresWithGotos();
 		for (var i = 0; i < conved.length; ++i) {
 			output.push(conved[i]);
 		}
@@ -1113,8 +1125,42 @@ class _DeleteStatementTransformer extends _StatementTransformer {
 		return this._statement;
 	}
 
+	override function replaceControlStructuresWithGotos () : Statement[] {
+		var statement : Statement;
+		if (! this._transformer._transformOnlyStmts) {
+			var funcDef = this._transformer.getTransformingFuncDef();
+			var aryExpr = this._statement.getExpr() as ArrayExpression;
+			var identity = this._transformer._createIdentityFunction(funcDef, aryExpr.getType());
+			statement = new ExpressionStatement(new _DeleteStatementTransformer._Stash(this._transformer, this._statement).doCPSTransform(funcDef, identity));
+		} else {
+			statement = this._statement;
+		}
+		return [ statement ];
+	}
+
 	override function _replaceControlStructuresWithGotos () : Statement[] {
-		return [ this._statement ] : Statement[];
+		throw new Error("logic flaw");
+	}
+
+	class _Stash extends _BinaryExpressionTransformer {
+
+		var _statement : DeleteStatement;
+
+		function constructor (transformer : CodeTransformer, statement : DeleteStatement) {
+			super(transformer, statement.getExpr() as ArrayExpression);
+			this._statement = statement;
+		}
+
+		override function _constructBody (args : Expression[], topExpr : Expression, topFuncDef : MemberFunctionDefinition, botFuncDef : MemberFunctionDefinition) : Expression {
+			botFuncDef._statements = [ new DeleteStatement(this._statement.getToken(), this._constructOp(args)) ] : Statement[];
+			this._rebaseClosures(topFuncDef, botFuncDef);
+			return topExpr;
+		}
+
+		override function _clone (arg1 : Expression, arg2 : Expression) : BinaryExpression {
+			return new ArrayExpression(this._expr.getToken(), arg1, arg2);
+		}
+
 	}
 
 }
@@ -1752,6 +1798,8 @@ class _DebuggerStatementTransformer extends _StatementTransformer {
 class CodeTransformer {
 
 	var _forceTransform : boolean;
+	var _transformOnlyStmts : boolean;
+
 	var _compiler : Compiler;
 
 	var _stopIterationClassDef : ClassDefinition;
@@ -1759,6 +1807,7 @@ class CodeTransformer {
 
 	function constructor () {
 		this._forceTransform = false;
+		this._transformOnlyStmts = true;
 
 		this._stopIterationClassDef = null;
 		this._jsxGeneratorClassDef = null;
@@ -1805,21 +1854,29 @@ class CodeTransformer {
 
 	function performTransformation () : void {
 		if (this._forceTransform) {
-			// transform functions as many as possible
-			this._compiler.forEachClassDef(function (parser, classDef) {
-				return classDef.forEachMember(function onMember(member) {
-					member.forEachClosure(function (funcDef) {
-						return onMember(funcDef);
-					});
-					if (member instanceof MemberFunctionDefinition) {
-						var funcDef = member as MemberFunctionDefinition;
-						if (this._functionIsTransformable(funcDef)) {
-							this._doCPSTransform(funcDef);
+			var transformOnlyStmts = this._transformOnlyStmts;
+			try {
+				// force transform expressions
+				this._transformOnlyStmts = false;
+
+				// transform functions as many as possible
+				this._compiler.forEachClassDef(function (parser, classDef) {
+					return classDef.forEachMember(function onMember(member) {
+						member.forEachClosure(function (funcDef) {
+							return onMember(funcDef);
+						});
+						if (member instanceof MemberFunctionDefinition) {
+							var funcDef = member as MemberFunctionDefinition;
+							if (this._functionIsTransformable(funcDef)) {
+								this._doCPSTransform(funcDef);
+							}
 						}
-					}
-					return true;
+						return true;
+					});
 				});
-			});
+			} finally {
+				this._transformOnlyStmts = transformOnlyStmts;
+			}
 		}
 		// transform generators
 		this._compiler.forEachClassDef(function (parser, classDef) {
@@ -1849,29 +1906,18 @@ class CodeTransformer {
 	}
 
 	function _doCPSTransform (funcDef : MemberFunctionDefinition) : void {
-		this._doCPSTransform(funcDef, false, function (name, statements) {
+		this._doCPSTransform(funcDef, function (name, statements) {
 			// do nothing
 		});
 	}
 
-	function _doCPSTransform (funcDef : MemberFunctionDefinition, transformOnlyStmts : boolean, postFragmentationCallback : (string, Statement[]) -> void) : void {
+	function _doCPSTransform (funcDef : MemberFunctionDefinition, postFragmentationCallback : (string, Statement[]) -> void) : void {
 		this._transformingFuncDef = funcDef;
 
-		if (! transformOnlyStmts) {
-			// transform expressions inside as well
-			for (var i = 0; i < funcDef.getStatements().length; ++i) {
-				var statement = funcDef.getStatements()[i];
-				statement.forEachExpression(function (expr, replaceCb) {
-					replaceCb(this._getExpressionTransformerFor(expr).doCPSTransform(funcDef, this._createIdentityFunction(funcDef, expr.getType())));
-					return true;
-				});
-			}
-		}
-
 		var returnLocal : LocalVariable = null;
-		if (! Type.voidType.equals(this._transformingFuncDef.getReturnType())) {
+		if (! Type.voidType.equals(funcDef.getReturnType())) {
 			var returnLocalName = "$return" + CodeTransformer._getFunctionNestDepth(funcDef) as string;
-			returnLocal = new LocalVariable(new Token(returnLocalName, false), this._transformingFuncDef.getReturnType());
+			returnLocal = new LocalVariable(new Token(returnLocalName, false), funcDef.getReturnType());
 			funcDef.getLocals().push(returnLocal);
 			this.enterFunction(returnLocal);
 		}
@@ -1879,7 +1925,7 @@ class CodeTransformer {
 		// replace control structures with goto statements
 		var statements = new Statement[];
 		for (var i = 0; i < funcDef.getStatements().length; ++i) {
-			statements = statements.concat(this._getStatementTransformerFor(funcDef.getStatements()[i])._replaceControlStructuresWithGotos());
+			statements = statements.concat(this._getStatementTransformerFor(funcDef.getStatements()[i]).replaceControlStructuresWithGotos());
 		}
 		// insert prologue code
 		statements.unshift(
@@ -1893,7 +1939,7 @@ class CodeTransformer {
 		);
 		funcDef._statements = statements;
 
-		if (! Type.voidType.equals(this._transformingFuncDef.getReturnType())) {
+		if (! Type.voidType.equals(funcDef.getReturnType())) {
 			funcDef._statements.push(new ReturnStatement(new Token("return", false), new LocalExpression(returnLocal.getName(), returnLocal)));
 			this.leaveFunction();
 		}
@@ -2002,7 +2048,7 @@ class CodeTransformer {
 		  -> $generatorN.__value = expr;
 		     $generatorN.__next = $LABEL;
 		 */
-		this._doCPSTransform(funcDef, true, function (label : string, statements : Statement[]) : void {
+		this._doCPSTransform(funcDef, function (label : string, statements : Statement[]) : void {
 			if (2 <= statements.length && statements[statements.length - 2] instanceof YieldStatement) {
 				var idx = statements.length - 2;
 				statements.splice(idx, 2,
