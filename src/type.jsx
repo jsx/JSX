@@ -619,9 +619,10 @@ class FunctionChoiceType extends FunctionType {
 		var types = this._types;
 
 		// try an exact match
+		var type : ResolvedFunctionType;
 		for (var i = 0; i < types.length; ++i) {
-			if (types[i]._deduceByArgumentTypes(types[i].getToken(), argTypes, isStatic, true, [])) {
-				return types[i];
+			if ((type = types[i]._deduceByArgumentTypes(types[i].getToken(), argTypes, isStatic, true, [])) != null) {
+				return type;
 			}
 		}
 
@@ -629,8 +630,8 @@ class FunctionChoiceType extends FunctionType {
 		var matched = new ResolvedFunctionType[];
 		var notes = new CompileNote[];
 		for (var i = 0; i < types.length; ++i) {
-			if (types[i]._deduceByArgumentTypes(types[i].getToken(), argTypes, isStatic, false, notes)) {
-				matched.push(types[i]);
+			if ((type = types[i]._deduceByArgumentTypes(types[i].getToken(), argTypes, isStatic, false, notes)) != null) {
+				matched.push(type);
 			}
 		}
 		switch (matched.length) {
@@ -714,7 +715,9 @@ abstract class ResolvedFunctionType extends FunctionType {
 
 	override function deduceByArgumentTypes (context : AnalysisContext, operatorToken : Token, argTypes : Type[], isStatic : boolean) : ResolvedFunctionType {
 		var notes = new CompileNote[];
-		if (! this._deduceByArgumentTypes(this._token != null ? this._token : operatorToken, argTypes, isStatic, false, notes)) {
+
+		var type : ResolvedFunctionType;
+		if ((type = this._deduceByArgumentTypes(this._token != null ? this._token : operatorToken, argTypes, isStatic, false, notes)) == null) {
 			var error = new CompileError(
 					operatorToken,
 					operatorToken.getValue() == "[" ? "operator [] of type " + argTypes[0].toString() + " is not applicable to " + this.getObjectType().toString() : "no function with matching arguments");
@@ -722,10 +725,10 @@ abstract class ResolvedFunctionType extends FunctionType {
 			context.errors.push(error);
 			return null;
 		}
-		return this;
+		return type;
 	}
 
-	function _deduceByArgumentTypes (token : Token, argTypes : Type[], isStatic : boolean, exact : boolean, notes : CompileNote[]) : boolean {
+	function _deduceByArgumentTypes (token : Token, argTypes : Type[], isStatic : boolean, exact : boolean, notes : CompileNote[]) : ResolvedFunctionType {
 		var compareArg = function (formal : Type, actual : Type) : boolean {
 			if (formal.equals(actual))
 				return true;
@@ -739,31 +742,31 @@ abstract class ResolvedFunctionType extends FunctionType {
 			} else {
 				notes.push(new CompileNote(token, 'candidate function not viable: expected a member function, but got a static function'));
 			}
-			return false;
+			return null;
 		}
 		if (this._argTypes.length != 0 && this._argTypes[this._argTypes.length - 1] instanceof VariableLengthArgumentType) {
 			var vargType = this._argTypes[this._argTypes.length - 1] as VariableLengthArgumentType;
 			// a vararg function
 			if (argTypes.length < this._argTypes.length - 1) {
 				notes.push(new CompileNote(token, 'candidate function not viable: wrong number of arguments'));
-				return false;
+				return null;
 			}
 			for (var i = 0; i < this._argTypes.length - 1; ++i) {
 				if (! compareArg(this._argTypes[i], argTypes[i])) {
 					notes.push(new CompileNote(token, Util.format('candidate function not viable: no known conversion from %1 to %2 for %3 argument.', [ argTypes[i].toString(), this._argTypes[i].toString(), Util.toOrdinal(i+1) ])));
-					return false;
+					return null;
 				}
 			}
 			if (argTypes[i] instanceof VariableLengthArgumentType && argTypes.length == this._argTypes.length) {
 				if (! compareArg((this._argTypes[i] as VariableLengthArgumentType).getBaseType(), (argTypes[i] as VariableLengthArgumentType).getBaseType())) {
 					notes.push(new CompileNote(token, Util.format('candidate function not viable: no known conversion from %1 to %2 for %3 argument.', [ (argTypes[i] as VariableLengthArgumentType).getBaseType().toString(), (this._argTypes[i] as VariableLengthArgumentType).getBaseType().toString(), Util.toOrdinal(i+1) ])));
-					return false;
+					return null;
 				}
 			} else {
 				for (; i < argTypes.length; ++i) {
 					if (! compareArg(vargType.getBaseType(), argTypes[i])) {
 						notes.push(new CompileNote(token, Util.format('candidate function not viable: no known conversion from %1 to %2 for %3 argument.', [ argTypes[i].toString(), vargType.getBaseType().toString(), Util.toOrdinal(i+1) ])));
-						return false;
+						return null;
 					}
 				}
 			}
@@ -772,16 +775,16 @@ abstract class ResolvedFunctionType extends FunctionType {
 			if (argTypes.length != this._argTypes.length) {
 				notes.push(new CompileNote(token, Util.format('candidate function not viable: wrong number of arguments (%1 for %2)',
 					[argTypes.length as string, this._argTypes.length as string])));
-				return false;
+				return null;
 			}
 			for (var i = 0; i < argTypes.length; ++i) {
 				if (! compareArg(this._argTypes[i], argTypes[i])) {
 					notes.push(new CompileNote(token, Util.format('candidate function not viable: no known conversion from %1 to %2 for %3 argument.', [ argTypes[i].toString(), this._argTypes[i].toString(), Util.toOrdinal(i+1) ])));
-					return false;
+					return null;
 				}
 			}
 		}
-		return true;
+		return this;
 	}
 
 	override function getExpectedTypes (numberOfArgs : number, isStatic : boolean) : Type[][] {
@@ -886,7 +889,9 @@ class StaticFunctionType extends ResolvedFunctionType {
 			return false;
 		if (! this._returnType.equals((type as StaticFunctionType).getReturnType()))
 			return false;
-		return this._deduceByArgumentTypes((type as ResolvedFunctionType).getToken(), (type as StaticFunctionType).getArgumentTypes(), true, true, []);
+		if (this._deduceByArgumentTypes((type as ResolvedFunctionType).getToken(), (type as StaticFunctionType).getArgumentTypes(), true, true, []) == null)
+			return false;
+		return true;
 	}
 
 	override function _toStringPrefix () : string {
@@ -928,3 +933,60 @@ class MemberFunctionType extends ResolvedFunctionType {
 
 }
 
+class TemplateFunctionType extends ResolvedFunctionType {
+
+	var _funcDef : TemplateFunctionDefinition;
+
+	function constructor (token : Token, funcDef : TemplateFunctionDefinition) {
+		super(token, funcDef.getReturnType(), funcDef.getArgumentTypes(), false /* isAsssinable */);
+		this._funcDef = funcDef;
+	}
+
+	override function _clone () : TemplateFunctionType {
+		return new TemplateFunctionType(this._token, this._funcDef);
+	}
+
+	override function _toStringPrefix() : string {
+		return 'template ';
+	}
+
+	override function asAssignableType () : Type {
+		throw new Error('logic flaw');
+	}
+
+	override function _deduceByArgumentTypes (token : Token, argTypes : Type[], isStatic : boolean, exact : boolean, notes : CompileNote[]) : ResolvedFunctionType {
+		if (((this._funcDef.flags() & ClassDefinition.IS_STATIC) == ClassDefinition.IS_STATIC) != isStatic) {
+			if (isStatic) {
+				notes.push(new CompileNote(token, 'candidate function not viable: expected a static function, but got a member function'));
+			} else {
+				notes.push(new CompileNote(token, 'candidate function not viable: expected a member function, but got a static function'));
+			}
+			return null;
+		}
+		if (this._argTypes.length != 0 && this._argTypes[this._argTypes.length - 1] instanceof VariableLengthArgumentType) {
+			// TODO deduce type parameters in template functions by the arguments
+			notes.push(new CompileNote(token, "template functions with variable-length arguments cannot be instantiated by the arguments: please specify the type arguments by hand"));
+			return null;
+		} else {
+			if (argTypes.length != this._argTypes.length) {
+				notes.push(new CompileNote(token, Util.format('candidate function not viable: wrong number of arguments (%1 for %2)',
+					[argTypes.length as string, this._argTypes.length as string])));
+				return null;
+			}
+			var member = this._funcDef.instantiateByArgumentTypes([], token, argTypes, exact); // TODO report compile errors
+			if (member == null) {
+				return null;
+			}
+			return member.getType();
+		}
+	}
+
+	override function _getExpectedTypes (expected : Type[][], numberOfArgs : number, isStatic : boolean) : void {
+		// does not support left-to-right type deduction for template function calls
+	}
+
+	override function getObjectType () : Type {
+		throw new Error("logic flaw");
+	}
+
+}

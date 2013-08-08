@@ -69,7 +69,7 @@ class _Util {
 	}
 
 	static function exprHasSideEffects (expr : Expression) : boolean {
-		function onExpr (expr : Expression, _ : function(:Expression):void) : boolean {
+		return !(function onExpr (expr : Expression) : boolean {
 			if (   expr instanceof NewExpression
 			    || expr instanceof AssignmentExpression
 			    || expr instanceof PreIncrementExpression
@@ -99,9 +99,39 @@ class _Util {
 				}
 			}
 			return expr.forEachExpression(onExpr);
-		}
-		return ! onExpr(expr, null);
+		}(expr));
 	}
+
+	/**
+	 * expr holds no variable nor side effect so it can be expanded anywhere in any order.
+	 */
+	static function exprIsIndependent(expr : Expression) : boolean {
+		return (function onExpr(expr : Expression) : boolean {
+			if (expr instanceof LocalExpression) {
+				return false;
+			}
+			else if (expr instanceof FunctionExpression) {
+				// not a closure
+				return (expr as FunctionExpression).getFuncDef().getLocals().length == 0;
+			}
+			else if (  expr instanceof LeafExpression
+					|| expr instanceof LogicalNotExpression
+					|| expr instanceof BitwiseNotExpression
+					|| expr instanceof SignExpression
+					|| expr instanceof AdditiveExpression
+					|| expr instanceof EqualityExpression
+					|| expr instanceof ShiftExpression
+				    || expr instanceof MapLiteralExpression
+				    || expr instanceof ArrayLiteralExpression
+			) {
+				return expr.forEachExpression(onExpr);
+			}
+			else {
+				return false;
+			}
+		}(expr));
+	}
+
 
 	static function conditionIsConstant (expr : Expression) : Nullable.<boolean> {
 		function leafIsConstant (expr : Expression) : Nullable.<boolean> {
@@ -1307,6 +1337,9 @@ class _StaticizeOptimizeCommand extends _OptimizeCommand {
 
 }
 
+/**
+ * Converts POD objects into Map objects + static methods.
+ */
 class _UnclassifyOptimizationCommand extends _OptimizeCommand {
 
 	static const IDENTIFIER = "unclassify";
@@ -1398,7 +1431,7 @@ class _UnclassifyOptimizationCommand extends _OptimizeCommand {
 				}
 			return true;
 		});
-		// check that the class is not referred to by: instanceof
+		// check that the class is not referred to by `instanceof` and `as`
 		this.getCompiler().forEachClassDef(function (parser : Parser, classDef : ClassDefinition) : boolean {
 			if (candidates.length == 0) {
 				return false;
@@ -2253,7 +2286,6 @@ class _DeadCodeEliminationOptimizeCommand extends _FunctionOptimizeCommand {
 	}
 
 	function _optimizeFunction (funcDef : MemberFunctionDefinition) : boolean {
-		var shouldRetry = false;
 		// use the assignment source, if possible
 		_Util.optimizeBasicBlock(funcDef, function (exprs : Expression[]) : void {
 			this._eliminateDeadStoresToProperties(funcDef, exprs);
@@ -2261,6 +2293,13 @@ class _DeadCodeEliminationOptimizeCommand extends _FunctionOptimizeCommand {
 			this._eliminateDeadStores(funcDef, exprs);
 			this._eliminateDeadConditions(funcDef, exprs);
 		});
+
+		return this._eliminateUnusedVariables(funcDef);
+	}
+
+	function _eliminateUnusedVariables(funcDef : MemberFunctionDefinition) : boolean {
+		var shouldRetry = false;
+
 		// mark the variables that are used (as RHS)
 		var locals = funcDef.getLocals();
 		var localsUsed = new Array.<boolean>(locals.length);
@@ -2271,21 +2310,22 @@ class _DeadCodeEliminationOptimizeCommand extends _FunctionOptimizeCommand {
 			statement.forEachExpression(function onExpr(expr : Expression) : boolean {
 				if (expr instanceof AssignmentExpression
 				    && (expr as AssignmentExpression).getFirstExpr() instanceof LocalExpression
-					&& (expr as AssignmentExpression).getFirstExpr().getType().equals((expr as AssignmentExpression).getSecondExpr().getType())) {
-						// skip lhs of assignment to local that has no effect
-						return onExpr((expr as AssignmentExpression).getSecondExpr());
-					} else if (expr instanceof LocalExpression) {
-						for (var i = 0; i < locals.length; ++i) {
-							if (locals[i] == (expr as LocalExpression).getLocal()) {
-								break;
-							}
+					&& (expr as AssignmentExpression).getFirstExpr().getType().equals((expr as AssignmentExpression).getSecondExpr().getType())
+				) {
+					// skip lhs of assignment to local that has no effect
+					return onExpr((expr as AssignmentExpression).getSecondExpr());
+				} else if (expr instanceof LocalExpression) {
+					for (var i = 0; i < locals.length; ++i) {
+						if (locals[i] == (expr as LocalExpression).getLocal()) {
+							break;
 						}
-						if (i != locals.length) {
-							localsUsed[i] = true;
-						}
-					} else if (expr instanceof FunctionExpression) {
-						(expr as FunctionExpression).getFuncDef().forEachStatement(onStatement);
 					}
+					if (i != locals.length) {
+						localsUsed[i] = true;
+					}
+				} else if (expr instanceof FunctionExpression) {
+					(expr as FunctionExpression).getFuncDef().forEachStatement(onStatement);
+				}
 				return expr.forEachExpression(onExpr);
 			});
 			return statement.forEachStatement(onStatement);
@@ -2297,36 +2337,46 @@ class _DeadCodeEliminationOptimizeCommand extends _FunctionOptimizeCommand {
 				continue;
 			}
 			// remove assignment to the variable
-			funcDef.forEachStatement(function onStatement(statement : Statement) : boolean {
-				if (statement instanceof FunctionStatement) {
-					var localFuncDef = (statement as FunctionStatement).getFuncDef();
-					localFuncDef.forEachStatement(onStatement);
-					if (localFuncDef.getFuncLocal() == locals[localIndex]) {
-						this.log("removing definition of " + locals[localIndex].getName().getNotation());
-						funcDef.getClosures().splice(funcDef.getClosures().indexOf(localFuncDef), 1);
-
-						funcDef.getStatements().splice(funcDef.getStatements().indexOf(statement), 1);
+			(function onStatements(statements : Statement[]) : boolean {
+				for (var i = 0; i < statements.length;) {
+					var statement = statements[i];
+					if (statement instanceof FunctionStatement) {
+						var localFuncDef = (statement as FunctionStatement).getFuncDef();
+						onStatements(localFuncDef.getStatements());
+						if (localFuncDef.getFuncLocal() == locals[localIndex]) {
+							this.log("removing definition of " + locals[localIndex].getName().getNotation());
+							funcDef.getClosures().splice(funcDef.getClosures().indexOf(localFuncDef), 1);
+							statements.splice(i, 1);
+						}
+						else {
+							i++;
+						}
 					}
-				}
-				statement.forEachExpression(function onExpr(expr : Expression, replaceCb : function(:Expression):void) : boolean {
-					if (expr instanceof AssignmentExpression
-					    && (expr as AssignmentExpression).getFirstExpr() instanceof LocalExpression
-						&& ((expr as AssignmentExpression).getFirstExpr() as LocalExpression).getLocal() == locals[localIndex]) {
+					else {
+						i++;
+					}
+					statement.forEachExpression(function onExpr(expr, replaceCb) {
+						if (expr instanceof AssignmentExpression
+							&& (expr as AssignmentExpression).getFirstExpr() instanceof LocalExpression
+							&& ((expr as AssignmentExpression).getFirstExpr() as LocalExpression).getLocal() == locals[localIndex]
+						) {
 							this.log("removing assignment to " + locals[localIndex].getName().getNotation());
 							var rhsExpr = (expr as AssignmentExpression).getSecondExpr();
 							replaceCb(rhsExpr);
 							shouldRetry = true;
-							return onExpr(rhsExpr, null);
+							return rhsExpr.forEachExpression(onExpr);
 						} else if (expr instanceof LocalExpression && (expr as LocalExpression).getLocal() == locals[localIndex]) {
 							throw new Error("logic flaw, found a variable going to be removed being used");
 						} else if (expr instanceof FunctionExpression) {
-							(expr as FunctionExpression).getFuncDef().forEachStatement(onStatement);
+							onStatements((expr as FunctionExpression).getFuncDef().getStatements());
 						}
-					return expr.forEachExpression(onExpr);
-				});
-				return statement.forEachStatement(onStatement);
-			});
-			// remove from locals array
+						return expr.forEachExpression(onExpr);
+					});
+
+					_Util.handleSubStatements(onStatements, statement);
+				}
+				return true;
+			}(funcDef.getStatements()));
 			locals.splice(localIndex, 1);
 		}
 		return shouldRetry;
@@ -2337,7 +2387,7 @@ class _DeadCodeEliminationOptimizeCommand extends _FunctionOptimizeCommand {
 		var localsUntouchable = new TypedMap.<LocalVariable,boolean>;
 		var locals = new TypedMap.<LocalVariable,Expression>;
 		// mark the locals that uses op= (cannot be eliminated by the algorithm applied laterwards)
-		var _onExpr = function (expr : Expression) : boolean {
+		Util.forEachExpression(function onExpr(expr : Expression) : boolean {
 			if (expr instanceof AssignmentExpression
 			    && (expr as AssignmentExpression).getToken().getValue() != "="
 				&& (expr as AssignmentExpression).getFirstExpr() instanceof LocalExpression) {
@@ -2350,11 +2400,10 @@ class _DeadCodeEliminationOptimizeCommand extends _FunctionOptimizeCommand {
 					this.log("local variable " + local.getName().getValue() + " cannot be rewritten (has increment)");
 					localsUntouchable.set(local, true);
 				}
-			return expr.forEachExpression(_onExpr);
-		};
-		Util.forEachExpression(_onExpr, exprs);
+			return expr.forEachExpression(onExpr);
+		}, exprs);
 		// rewrite the locals
-		var onExpr = function (expr : Expression, replaceCb : function(:Expression):void) : boolean {
+		Util.forEachExpression(function onExpr(expr : Expression, replaceCb : function(:Expression):void) : boolean {
 			if (expr instanceof AssignmentExpression) {
 				var assignmentExpr = expr as AssignmentExpression;
 				if (assignmentExpr.getFirstExpr() instanceof LocalExpression) {
@@ -2363,35 +2412,32 @@ class _DeadCodeEliminationOptimizeCommand extends _FunctionOptimizeCommand {
 					});
 					if (! localsUntouchable.get((assignmentExpr.getFirstExpr() as LocalExpression).getLocal())
 						&& (assignmentExpr.getFirstExpr() as LocalExpression).getType().equals(assignmentExpr.getSecondExpr().getType())) {
-							var lhsLocal = (assignmentExpr.getFirstExpr() as LocalExpression).getLocal();
-							this.log("resetting cache for: " + lhsLocal.getName().getValue());
-							locals.reversedForEach(function(local, expr) {
-								if (local == lhsLocal) {
-									this.log("  clearing itself");
-									locals.delete(local);
-								} else if (expr instanceof LocalExpression && (expr as LocalExpression).getLocal() == lhsLocal) {
-									this.log("  clearing " + local.getName().getValue());
-									locals.delete(local);
-								}
-								return true;
-							});
-							if (assignmentExpr.getToken().getValue() == "=") {
-								var rhsExpr = assignmentExpr.getSecondExpr();
-								if (rhsExpr instanceof LocalExpression) {
-									var rhsLocal = (rhsExpr as LocalExpression).getLocal();
-									if (lhsLocal != rhsLocal && ! localsUntouchable.get(rhsLocal)) {
-										this.log("  set to: " + rhsLocal.getName().getValue());
-										locals.set(lhsLocal, rhsExpr);
-									}
-								} else if (rhsExpr instanceof NullExpression
-									   || rhsExpr instanceof NumberLiteralExpression
-									   || rhsExpr instanceof IntegerLiteralExpression
-									   || rhsExpr instanceof StringLiteralExpression) {
-									this.log("  set to: " + rhsExpr.getToken().getValue());
+						var lhsLocal = (assignmentExpr.getFirstExpr() as LocalExpression).getLocal();
+						this.log("resetting cache for: " + lhsLocal.getName().getNotation());
+						locals.reversedForEach(function(local, expr) {
+							if (local == lhsLocal) {
+								this.log("  clearing itself");
+								locals.delete(local);
+							} else if (expr instanceof LocalExpression && (expr as LocalExpression).getLocal() == lhsLocal) {
+								this.log("  clearing " + local.getName().getNotation());
+								locals.delete(local);
+							}
+							return true;
+						});
+						if (assignmentExpr.getToken().getValue() == "=") {
+							var rhsExpr = assignmentExpr.getSecondExpr();
+							if (rhsExpr instanceof LocalExpression) {
+								var rhsLocal = (rhsExpr as LocalExpression).getLocal();
+								if (lhsLocal != rhsLocal && ! localsUntouchable.get(rhsLocal)) {
+									this.log("  set to: " + rhsLocal.getName().getNotation());
 									locals.set(lhsLocal, rhsExpr);
 								}
+							} else if (rhsExpr instanceof LeafExpression) {
+								this.log("  set to: " + rhsExpr.getToken().getNotation());
+								locals.set(lhsLocal, rhsExpr);
 							}
 						}
+					}
 					return true;
 				}
 			} else if (expr instanceof LocalExpression) {
@@ -2417,8 +2463,7 @@ class _DeadCodeEliminationOptimizeCommand extends _FunctionOptimizeCommand {
 				return true;
 			}
 			return expr.forEachExpression(onExpr);
-		};
-		Util.forEachExpression(onExpr, exprs);
+		}, exprs);
 	}
 
 	function _eliminateDeadStores (funcDef : MemberFunctionDefinition, exprs : Expression[]) : void {
@@ -2443,30 +2488,16 @@ class _DeadCodeEliminationOptimizeCommand extends _FunctionOptimizeCommand {
 				}
 			} else if (expr instanceof LocalExpression) {
 				lastAssignExpr.delete((expr as LocalExpression).getLocal());
-			} else if (expr instanceof CallExpression) {
-				onExpr((expr as CallExpression).getExpr(), function (callExpr : CallExpression) : function(:Expression):void {
-					return function (expr) {
-						callExpr.setExpr(expr);
-					};
-				}(expr as CallExpression));
-				Util.forEachExpression(onExpr, (expr as CallExpression).getArguments());
-				var callingFuncDef = _DetermineCalleeCommand.getCallingFuncDef(expr);
-				if (callingFuncDef != null && (callingFuncDef.flags() & ClassDefinition.IS_PURE) != 0) {
-					// ok
-				} else {
-					lastAssignExpr.clear();
-				}
-				return true;
-			} else if (expr instanceof NewExpression) {
-				Util.forEachExpression(onExpr, (expr as NewExpression).getArguments());
-				lastAssignExpr.clear();
-				return true;
 			} else if (expr instanceof LogicalExpression || expr instanceof ConditionalExpression) {
 				expr.forEachExpression(function (expr, rewriteCb) {
 					var result = onExpr(expr, rewriteCb);
 					lastAssignExpr.clear();
 					return result;
 				});
+				return true;
+			} else if (_Util.exprHasSideEffects(expr)) {
+				expr.forEachExpression(onExpr);
+				lastAssignExpr.clear();
 				return true;
 			}
 			return expr.forEachExpression(onExpr);
@@ -2506,26 +2537,26 @@ class _DeadCodeEliminationOptimizeCommand extends _FunctionOptimizeCommand {
 				if (expr.getToken().getValue() == "="
 					&& isFirstLevelPropertyAccess(firstExpr)
 					&& ! _Util.classIsNative((firstExpr as PropertyExpression).getExpr().getType().getClassDef())) {
-						var propertyName = (firstExpr as PropertyExpression).getIdentifierToken().getValue();
-						onExpr(assignmentExpr.getSecondExpr(), null);
-						if (lastAssignExpr[propertyName]
-								&& lastAssignExpr[propertyName].second != null
-								&& baseExprsAreEqual((firstExpr as PropertyExpression).getExpr(), (lastAssignExpr[propertyName].first.getFirstExpr() as PropertyExpression).getExpr())) {
-							lastAssignExpr[propertyName].second(lastAssignExpr[propertyName].first.getSecondExpr());
-						}
-						lastAssignExpr[propertyName] = new Pair.<AssignmentExpression, function(:Expression):void>(assignmentExpr, rewriteCb);
-						return true;
-					} else if (assignmentExpr.getFirstExpr() instanceof LocalExpression) {
-						onExpr(assignmentExpr.getSecondExpr(), null);
-						for (var k in lastAssignExpr) {
-							var baseExpr = (lastAssignExpr[k].first.getFirstExpr() as PropertyExpression).getExpr();
-							if (baseExpr instanceof LocalExpression
-							    && (baseExpr as LocalExpression).getLocal() == ((expr as AssignmentExpression).getFirstExpr() as LocalExpression).getLocal()) {
-								delete lastAssignExpr[k];
-							}
-						}
-						return true;
+					var propertyName = (firstExpr as PropertyExpression).getIdentifierToken().getValue();
+					onExpr(assignmentExpr.getSecondExpr(), null);
+					if (lastAssignExpr[propertyName]
+							&& lastAssignExpr[propertyName].second != null
+							&& baseExprsAreEqual((firstExpr as PropertyExpression).getExpr(), (lastAssignExpr[propertyName].first.getFirstExpr() as PropertyExpression).getExpr())) {
+						lastAssignExpr[propertyName].second(lastAssignExpr[propertyName].first.getSecondExpr());
 					}
+					lastAssignExpr[propertyName] = new Pair.<AssignmentExpression, function(:Expression):void>(assignmentExpr, rewriteCb);
+					return true;
+				} else if (assignmentExpr.getFirstExpr() instanceof LocalExpression) {
+					onExpr(assignmentExpr.getSecondExpr(), null);
+					for (var k in lastAssignExpr) {
+						var baseExpr = (lastAssignExpr[k].first.getFirstExpr() as PropertyExpression).getExpr();
+						if (baseExpr instanceof LocalExpression
+							&& (baseExpr as LocalExpression).getLocal() == ((expr as AssignmentExpression).getFirstExpr() as LocalExpression).getLocal()) {
+							delete lastAssignExpr[k];
+						}
+					}
+					return true;
+				}
 			} else if (isFirstLevelPropertyAccess(expr)) {
 				var propertyName = (expr as PropertyExpression).getIdentifierToken().getValue();
 				delete lastAssignExpr[propertyName];
@@ -2644,26 +2675,6 @@ class _InlineOptimizeCommand extends _FunctionOptimizeCommand {
 		return altered;
 	}
 
-	// expr is closed in the local scope so that it can be expanded directly into an arbitrary place
-	function _exprIsInLocal(expr : Expression) : boolean {
-		if (expr instanceof LeafExpression) {
-			return true;
-		}
-		else if (expr instanceof FunctionExpression) {
-			return (expr as FunctionExpression).getFuncDef().getLocals().length == 0;
-		}
-		else if (expr instanceof LogicalNotExpression || expr instanceof BitwiseNotExpression || expr instanceof SignExpression) {
-			return this._exprIsInLocal((expr as UnaryExpression).getExpr());
-		}
-		else if (expr instanceof BinaryNumberExpression) {
-			return this._exprIsInLocal((expr as BinaryNumberExpression).getFirstExpr())
-				&& this._exprIsInLocal((expr as BinaryNumberExpression).getSecondExpr());
-		}
-		else {
-			return false;
-		}
-	}
-
 	function _handleStatement (funcDef : MemberFunctionDefinition, statements : Statement[], stmtIndex : number) : boolean {
 		var altered = false;
 		var statement = statements[stmtIndex];
@@ -2723,7 +2734,7 @@ class _InlineOptimizeCommand extends _FunctionOptimizeCommand {
 			expr.forEachExpression(onExpr);
 			if (expr instanceof CallExpression) {
 				var callExpr = expr as CallExpression;
-				var argsAndThis = this._getArgsAndThisIfCallExprIsInlineable(callExpr, true);
+				var argsAndThis = this._getArgsAndThisIfCallExprIsInlineable(callExpr);
 				if (argsAndThis != null) {
 					if (this._expandCallAsExpression(funcDef, expr, argsAndThis, replaceCb)) {
 						altered = true;
@@ -2776,7 +2787,7 @@ class _InlineOptimizeCommand extends _FunctionOptimizeCommand {
 		if (expr instanceof CallExpression) {
 
 			// inline if the entire statement is a single call expression
-			var args = this._getArgsAndThisIfCallExprIsInlineable(expr as CallExpression, false);
+			var args = this._getArgsAndThisIfCallExprIsInlineable(expr as CallExpression);
 			if (args != null) {
 				stmtIndex = this._expandCallingFunction(funcDef, statements, stmtIndex, _DetermineCalleeCommand.getCallingFuncDef(expr), args);
 				cb(stmtIndex);
@@ -2788,7 +2799,7 @@ class _InlineOptimizeCommand extends _FunctionOptimizeCommand {
 			&& (expr as AssignmentExpression).getSecondExpr() instanceof CallExpression) {
 
 			// inline if the statement is an assignment of a single call expression into a local variable
-			var args = this._getArgsAndThisIfCallExprIsInlineable((expr as AssignmentExpression).getSecondExpr() as CallExpression, false);
+			var args = this._getArgsAndThisIfCallExprIsInlineable((expr as AssignmentExpression).getSecondExpr() as CallExpression);
 			if (args != null) {
 				stmtIndex = this._expandCallingFunction(funcDef, statements, stmtIndex, _DetermineCalleeCommand.getCallingFuncDef((expr as AssignmentExpression).getSecondExpr() as CallExpression), args);
 				var stmt = statements[stmtIndex - 1];
@@ -2834,7 +2845,7 @@ class _InlineOptimizeCommand extends _FunctionOptimizeCommand {
 		return false;
 	}
 
-	function _getArgsAndThisIfCallExprIsInlineable (callExpr : CallExpression, asExpression : boolean) : Expression[] {
+	function _getArgsAndThisIfCallExprIsInlineable (callExpr : CallExpression) : Expression[] {
 		// determine the function that will be called
 		var callingFuncDef = _DetermineCalleeCommand.getCallingFuncDef(callExpr);
 		if (callingFuncDef == null)
@@ -2852,23 +2863,6 @@ class _InlineOptimizeCommand extends _FunctionOptimizeCommand {
 		// check that the function may be inlined
 		if (! this._functionIsInlineable(callingFuncDef))
 			return null;
-		// FIXME we could handle statements.length == 0 as well
-		if (asExpression) {
-			if (callingFuncDef.getStatements().length != 1)
-				return null;
-			if (callingFuncDef.getLocals().length != 0)
-				return null;
-			var modifiesArgs = ! Util.forEachStatement(function onStatement(statement : Statement) : boolean {
-				var onExpr = function onExpr(expr : Expression) : boolean {
-					if (expr instanceof AssignmentExpression && (expr as AssignmentExpression).getFirstExpr() instanceof LocalExpression)
-						return false;
-					return expr.forEachExpression(onExpr);
-				};
-				return statement.forEachExpression(onExpr);
-			}, callingFuncDef.getStatements());
-			if (modifiesArgs)
-				return null;
-		}
 		// and the args passed can be inlined (types should match exactly (or emitters may insert additional code))
 		if (! this._argsAreInlineable(callingFuncDef, callExpr.getArguments()))
 			return null;
@@ -3042,11 +3036,48 @@ class _InlineOptimizeCommand extends _FunctionOptimizeCommand {
 		return stmtIndex;
 	}
 
-	function _expandCallAsExpression(funcDef : MemberFunctionDefinition, expr : Expression, argsAndThis : Expression[], replaceCb : (Expression) -> void) : boolean {
+	function _expandCallAsExpression(funcDef : MemberFunctionDefinition, expr : Expression, argsAndThisAndLocals : Expression[], replaceCb : (Expression) -> void) : boolean {
 		var callingFuncDef = _DetermineCalleeCommand.getCallingFuncDef(expr);
-		this.log("expanding " + callingFuncDef.getNotation() + " as expression");
-		// TODO: compine expression statements into single statement with CommaExpression
-		var stmt = callingFuncDef.getStatements()[0];
+
+		var statements = callingFuncDef.getStatements();
+		if (statements.length == 0) {
+			return false;
+		}
+		else if (statements.length != 1) {
+			statements = statements.concat([]); // clone
+
+			if (statements[statements.length - 1] instanceof ReturnStatement) {
+				var returnStatement = statements.pop() as ReturnStatement;
+				if (returnStatement.getExpr() == null) {
+					returnStatement = null;
+				}
+			}
+			else {
+				returnStatement = null;
+			}
+			for (var i = 0; i < statements.length; ++i ) {
+				if (!( statements[i] instanceof ExpressionStatement)) {
+					return false;
+				}
+			}
+
+			var singleExpr = statements.reduce.<Expression>((prevExpr, stmt) -> {
+				return prevExpr == null
+					? (stmt as ExpressionStatement).getExpr()
+					: new CommaExpression(new Token(","), prevExpr, (stmt as ExpressionStatement).getExpr());
+			}, null);
+			if (returnStatement) {
+				singleExpr = new CommaExpression(new Token(","),
+						singleExpr,
+						returnStatement.getExpr());
+				statements.splice(0, statements.length, new ReturnStatement(new Token("return"), singleExpr));
+			}
+			else {
+				statements.splice(0, statements.length, new ExpressionStatement(singleExpr));
+			}
+		}
+
+		var stmt = statements[0];
 		if (stmt instanceof ExpressionStatement) {
 			var expr = (stmt as ExpressionStatement).getExpr();
 		} else if (stmt instanceof ReturnStatement) {
@@ -3054,13 +3085,14 @@ class _InlineOptimizeCommand extends _FunctionOptimizeCommand {
 		} else {
 			return false;
 		}
+		this.log("expanding " + callingFuncDef.getNotation() + " as expression");
 
 		// setup args (arg0 = arg0expr, arg1 = arg1expr, ...)
 		//   for non-leaf expressions used more than once
 		var argUsed = this._countNumberOfArgsUsed(callingFuncDef);
 		var setupArgs = null : Expression;
 
-		this._createVarsAndInit(funcDef, callingFuncDef, argsAndThis, (expr) -> {
+		this._createVarsAndInit(funcDef, callingFuncDef, argsAndThisAndLocals, (expr) -> {
 			if (setupArgs == null) {
 				setupArgs = expr;
 			}
@@ -3075,7 +3107,7 @@ class _InlineOptimizeCommand extends _FunctionOptimizeCommand {
 		this._rewriteExpression(
 			clonedExpr,
 			function (expr) { clonedExpr = expr; },
-			argsAndThis,
+			argsAndThisAndLocals,
 			callingFuncDef);
 
 		if (setupArgs != null) {
@@ -3103,7 +3135,7 @@ class _InlineOptimizeCommand extends _FunctionOptimizeCommand {
 		if ((calleeFuncDef.flags() & ClassDefinition.IS_STATIC) == 0) {
 			var thisIdx = argsAndThisAndLocals.length - 1;
 			var recvExpr = argsAndThisAndLocals[thisIdx];
-			if (!( recvExpr instanceof LeafExpression || (this._exprIsInLocal(recvExpr) && argUsed["this"] <= 1) )) {
+			if (!( recvExpr instanceof LeafExpression || (_Util.exprIsIndependent(recvExpr) && argUsed["this"] <= 1) )) {
 				argsAndThisAndLocals[thisIdx] = createVarWithInit(callerFuncDef, new ObjectType(calleeFuncDef.getClassDef()), "this", recvExpr);
 			}
 		}
@@ -3112,7 +3144,7 @@ class _InlineOptimizeCommand extends _FunctionOptimizeCommand {
 		for (var i = 0; i < formalArgs.length; ++i) {
 			var numberOfUsed = argUsed[formalArgs[i].getName().getValue()];
 			var argExpr = argsAndThisAndLocals[i];
-			if (!( argExpr instanceof LeafExpression || (this._exprIsInLocal(argExpr) && numberOfUsed <= 1) )) {
+			if (!( argExpr instanceof LeafExpression || (_Util.exprIsIndependent(argExpr) && numberOfUsed <= 1) )) {
 				argsAndThisAndLocals[i] = createVarWithInit(callerFuncDef, formalArgs[i].getType(), formalArgs[i].getName().getValue(), argExpr);
 			}
 		}
@@ -3503,7 +3535,11 @@ class _LCSEOptimizeCommand extends _FunctionOptimizeCommand {
 
 }
 
-
+/**
+ * Expands POD objects into local variables
+ * e.g. <code>var p = new Point(10, 20); log p.x; log p.y;</code>
+ * into <code>var p$x = 10, p$y = 20; log p$x; log p$y;</code>
+ */
 class _UnboxOptimizeCommand extends _FunctionOptimizeCommand {
 	static const IDENTIFIER = "unbox";
 
@@ -3637,7 +3673,6 @@ class _UnboxOptimizeCommand extends _FunctionOptimizeCommand {
 			}
 			return ctor.forEachStatement(function (statement) {
 				// only allow list of this.X = ...
-				var assigned = new Map.<boolean>;
 				if (! (statement instanceof ExpressionStatement)) {
 					return false;
 				}
@@ -3649,11 +3684,6 @@ class _UnboxOptimizeCommand extends _FunctionOptimizeCommand {
 				if (! (lhsExpr instanceof PropertyExpression && (lhsExpr as PropertyExpression).getExpr() instanceof ThisExpression)) {
 					return false;
 				}
-				var propertyName = (lhsExpr as PropertyExpression).getIdentifierToken().getValue();
-				if (assigned[propertyName]) {
-					return false;
-				}
-				assigned[propertyName] = true;
 				// check rhs
 				return function onExpr(expr : Expression) : boolean {
 					if (expr instanceof ThisExpression) {

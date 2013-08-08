@@ -1,6 +1,6 @@
 {
   "name": "jsx",
-  "version": "0.9.57",
+  "version": "0.9.58",
   "description": "a faster, safer, easier JavaScript",
   "license": "MIT",
   "keywords": [
@@ -45,7 +45,7 @@
     "esprima": "~ 1.0.2",
     "escodegen": "~ 0.0.20",
     "esmangle": "~ 0.0.14",
-    "source-map-support": "~ 0.1.8"
+    "source-map-support": "~ 0.2.1"
   },
   "engines": {
     "node": ">= 0.8.0"
@@ -54,7 +54,6 @@
     "postpublish": "node tool/bootstrap-compiler.js --run tool/postpublish.jsx"
   },
   "devDependencies": {
-    "jshint": "~2.1.4",
     "grunt-contrib-watch": "~0.4.4",
     "grunt": "~0.4.1",
     "grunt-exec": "~0.4.2"

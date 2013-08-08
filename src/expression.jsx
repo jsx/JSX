@@ -572,8 +572,6 @@ class ArrayLiteralExpression extends Expression {
 				context.errors.push(new CompileError(this._token, "could not deduce array type, please specify"));
 				return false;
 			}
-			if (elementType.equals(Type.integerType))
-				elementType = Type.numberType;
 			elementType = elementType.resolveIfNullable();
 			this._type = new ObjectType(Util.instantiateTemplate(context, this._token, "Array", [ elementType ]));
 		}
@@ -739,7 +737,7 @@ class ThisExpression extends LeafExpression {
 		return [
 			"ThisExpression",
 			this._token.serialize(),
-			Serializer.<ClassDefinition>.serializeNullable(this._classDef)
+			this._classDef != null ? this._classDef.getToken().serialize() : null
 		] : variant[];
 	}
 
@@ -941,6 +939,11 @@ class InstanceofExpression extends UnaryExpression {
 		} else if (exprType.equals(Type.variantType)) {
 		} else {
 			context.errors.push(new CompileError(this._token, "operator 'instanceof' is only applicable to an object or a variant"));
+			return false;
+		}
+
+		if (this._expectedType.getClassDef().flags() & ClassDefinition.IS_FAKE) {
+			context.errors.push(new CompileError(this._token, "operator 'instanceof' is not applicable to a fake class " + this._expectedType.toString()));
 			return false;
 		}
 		return true;

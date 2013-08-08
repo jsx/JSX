@@ -10,6 +10,13 @@ class _Test extends TestCase {
 				"abs",
 				[ -10 ] : Array.<variant>)
 		).toBe(10);
+		var m = "abs";
+		this.expect(
+			js.invoke(
+				js.global["Math"],
+				m,
+				[ -10 ] : Array.<variant>)
+		).toBe(10);
 		var a = [ -10 ] : Array.<variant>;
 		this.expect(
 			js.invoke(

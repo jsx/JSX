@@ -99,6 +99,17 @@ class ClassDefinition implements Stashable {
 		this._docComment = docComment;
 
 		this._resetMembersClassDef();
+
+		if (! (this instanceof TemplateClassDefinition)) {
+			this._generateWrapperFunctions();
+		}
+	}
+
+	function _generateWrapperFunctions() : void {
+		this.forEachMemberFunction((funcDef) -> {
+			funcDef.generateWrappersForDefaultParameters();
+			return true;
+		});
 	}
 
 	function serialize () : variant {
@@ -325,7 +336,8 @@ class ClassDefinition implements Stashable {
 							if (member instanceof InstantiatedMemberFunctionDefinition) {
 								// skip
 							} else {
-								if (member instanceof TemplateFunctionDefinition) {
+								// explicitly passed type parameters. instantiate the member here
+								if (member instanceof TemplateFunctionDefinition && typeArgs.length != 0) {
 									if ((member = (member as TemplateFunctionDefinition).instantiateTemplateFunction(errors, token, typeArgs)) == null) {
 										return;
 									}
@@ -333,6 +345,7 @@ class ClassDefinition implements Stashable {
 								if ((member as MemberFunctionDefinition).getStatements() != null || mode != ClassDefinition.GET_MEMBER_MODE_FUNCTION_WITH_BODY
 									|| (member.flags() & (ClassDefinition.IS_NATIVE | ClassDefinition.IS_ABSTRACT)) == ClassDefinition.IS_NATIVE) {
 									for (var j = 0; j < types.length; ++j) {
+										// FIXME check types of template functions are equal
 										if (Util.typesAreEqual((member as MemberFunctionDefinition).getArgumentTypes(), (types[j] as ResolvedFunctionType).getArgumentTypes())) {
 											break;
 										}
@@ -485,10 +498,6 @@ class ClassDefinition implements Stashable {
 	}
 
 	function normalizeClassDefs (errors : CompileError[]) : void {
-		this.forEachMemberFunction((funcDef) -> {
-			funcDef.generateWrappersForDefaultParameters(errors);
-			return true;
-		});
 		for (var x = 0; x < this._members.length; ++x) {
 			for (var y = 0; y < x; ++y) {
 				if (this._members[x].name() == this._members[y].name()
@@ -568,11 +577,10 @@ class ClassDefinition implements Stashable {
 	}
 
 	function setAnalysisContextOfVariables (context : AnalysisContext) : void {
-		for (var i = 0; i < this._members.length; ++i) {
-			var member = this._members[i];
-			if (member instanceof MemberVariableDefinition)
-				(member as MemberVariableDefinition).setAnalysisContext(context);
-		}
+		this.forEachMemberVariable((member) -> {
+			member.setAnalysisContext(context);
+			return true;
+		});
 	}
 
 	function analyze (context : AnalysisContext) : void {
@@ -785,11 +793,10 @@ class ClassDefinition implements Stashable {
 	}
 
 	function analyzeUnusedVariables () : void {
-		for (var i = 0; i < this._members.length; ++i) {
-			var member = this._members[i];
-			if (member instanceof MemberVariableDefinition)
-				(member as MemberVariableDefinition).getType();
-		}
+		this.forEachMemberVariable((member) -> {
+			member.getType();
+			return true;
+		});
 	}
 
 	function isConvertibleTo (classDef : ClassDefinition) : boolean {
@@ -1192,7 +1199,7 @@ class MemberVariableDefinition extends MemberDefinition {
 
 	override function getNotation() : string {
 		var classDef = this.getClassDef();
-		var s = (classDef != null ? classDef.classFullName(): "<<unknown>>");
+		var s = (classDef != null ? classDef.classFullName(): "<<unknown:"+(this._token.getFilename() ?: "?")+">>");
 		s += (this.flags() & ClassDefinition.IS_STATIC) != 0 ? "." : "#";
 		s += this.name();
 		return s;
@@ -1237,7 +1244,7 @@ class MemberFunctionDefinition extends MemberDefinition implements Block {
 	 */
 	override function getNotation() : string {
 		var classDef = this.getClassDef();
-		var s = (classDef != null ? classDef.classFullName(): "<<unknown>>");
+		var s = (classDef != null ? classDef.classFullName(): "<<unknown:"+(this._token.getFilename() ?: "?")+">>");
 		s += (this.flags() & ClassDefinition.IS_STATIC) != 0 ? "." : "#";
 		s += this.getNameToken() != null ? this.name() : "$" +  this.getToken().getLineNumber()  as string + "_" + this.getToken().getColumnNumber() as string;
 		s += "(";
@@ -1601,8 +1608,20 @@ class MemberFunctionDefinition extends MemberDefinition implements Block {
 
 	}
 
-	function generateWrappersForDefaultParameters(errors : CompileError[]) : void {
-		// function f(a, b = x, c = y) makes f(a, b) { f(a, b, y) }, f(a) { f(a, x, y) }
+	function generateWrappersForDefaultParameters() : void {
+		// `function f(a, b = x)` makes `f(a) { f(a, x) }`
+
+		function createObjectType(classDef : ClassDefinition) : ObjectType {
+			if (classDef instanceof TemplateClassDefinition) {
+				var typeArgs = (classDef as TemplateClassDefinition).getTypeArguments().map.<Type>((token) -> {
+					return new ParsedObjectType(new QualifiedName(token), new Type[]);
+				});
+				return new ParsedObjectType(new QualifiedName(classDef.getToken()), typeArgs);
+			}
+			else {
+				return new ObjectType(classDef);
+			}
+		}
 
 		// skip arguments wo. default parameters
 		for (var origArgIndex = 0; origArgIndex != this.getArguments().length; ++origArgIndex) {
@@ -1616,7 +1635,7 @@ class MemberFunctionDefinition extends MemberDefinition implements Block {
 			var formalArgs = this.getArguments().slice(0, origArgIndex).map.<ArgumentDeclaration>((arg) -> {
 				return new ArgumentDeclaration(arg.getName(), arg.getType());
 			});
-			// build functino body
+			// build function body
 			var argExprs = formalArgs.map.<Expression>((arg) -> {
 				return new LocalExpression(arg.getName(), arg);
 			});
@@ -1627,12 +1646,13 @@ class MemberFunctionDefinition extends MemberDefinition implements Block {
 			}
 			var statement : Statement;
 			if (this.name() == "constructor") {
-				statement = new ConstructorInvocationStatement(new Token("this", false), new ObjectType(this.getClassDef()), argExprs);
+				statement = new ConstructorInvocationStatement(new Token("this", false), createObjectType(this.getClassDef()), argExprs);
 			}
 			else {
 				var invocant = (this.flags() & ClassDefinition.IS_STATIC) == 0
 					? new ThisExpression(new Token("this", false), this.getClassDef())
-					: new ClassExpression(new Token(this.getClassDef().className(), true), new ObjectType(this.getClassDef()));
+					: new ClassExpression(new Token(this.getClassDef().className(), true), createObjectType(this.getClassDef()));
+
 				var methodRef = new PropertyExpression(new Token(".", false), invocant, this.getNameToken(), this.getArgumentTypes());
 				var callExpression = new CallExpression(new Token("(", false), methodRef, argExprs);
 				if (this.getReturnType() != Type.voidType) {
@@ -1847,10 +1867,10 @@ class MemberFunctionDefinition extends MemberDefinition implements Block {
 		return null;
 	}
 
-	override function getType () : FunctionType {
+	override function getType () : ResolvedFunctionType {
 		return (this._flags & ClassDefinition.IS_STATIC) != 0
-			? (new StaticFunctionType(this._token, this._returnType, this.getArgumentTypes(), false) as FunctionType)
-			: (new MemberFunctionType(this._token, new ObjectType(this._classDef), this._returnType, this.getArgumentTypes(), false) as FunctionType);
+			? new StaticFunctionType(this._token, this._returnType, this.getArgumentTypes(), false)
+			: new MemberFunctionType(this._token, new ObjectType(this._classDef), this._returnType, this.getArgumentTypes(), false);
 	}
 
 	function deductTypeIfUnknown (context : AnalysisContext, type : ResolvedFunctionType) : boolean {
@@ -1929,13 +1949,17 @@ class TemplateFunctionDefinition extends MemberFunctionDefinition implements Tem
 		this._resolvedTypemap = new Map.<Type>;
 	}
 
+	override function getType () : TemplateFunctionType {
+		return new TemplateFunctionType(this._token, this);
+	}
+
 	function getTypeArguments () : Token[] {
 		return this._typeArgs;
 	}
 
 	override function instantiate (instantiationContext : InstantiationContext) : MemberFunctionDefinition {
 		var instantiated = new TemplateFunctionDefinition(
-			this._token, this.getNameToken(), this.flags(), this._typeArgs.concat(new Token[]), this._returnType, this._args.concat(new ArgumentDeclaration[]),
+			this._token, this.getNameToken(), this.flags(), this._typeArgs.concat([]), this._returnType, this._args.concat([]),
 			this._locals, this._statements, this._closures, this._lastTokenOfBody, this._docComment);
 		for (var k in this._resolvedTypemap) {
 			instantiated._resolvedTypemap[k] = this._resolvedTypemap[k];
@@ -1944,6 +1968,96 @@ class TemplateFunctionDefinition extends MemberFunctionDefinition implements Tem
 			instantiated._resolvedTypemap[k] = instantiationContext.typemap[k];
 		}
 		return instantiated;
+	}
+
+	function instantiateByArgumentTypes (errors : CompileError[], token : Token, actualArgTypes : Type[], exact : boolean) : MemberFunctionDefinition {
+		// The TODOs must be done by when user template functions are introduced: report compile errors, inner classes, parameterized classes
+		var typemap = new Map.<Type>;
+		for (var i = 0; i < this._typeArgs.length; ++i) {
+			typemap[this._typeArgs[i].getValue()] = null;
+		}
+		for (var k in this._resolvedTypemap) {
+			typemap[k] = this._resolvedTypemap[k];
+		}
+
+		function unify (formal : Type, actual : Type) : boolean {
+			if (formal instanceof ParsedObjectType) {
+				// TODO enclosing types
+
+				// formal is a type parameter
+				if ((formal as ParsedObjectType).getTypeArguments().length == 0 && typemap.hasOwnProperty((formal as ParsedObjectType).getToken().getValue())) {
+					var expectedType = typemap[(formal as ParsedObjectType).getToken().getValue()];
+					if (expectedType != null) { // already unified, check if arg type is the expected one
+						if (exact && ! expectedType.equals(actual)) {
+							// no need to throw a compile error when exact matching
+							return false;
+						}
+						if (! actual.isConvertibleTo(expectedType)) {
+							errors.push(new CompileError(token, "expected " + expectedType.toString() + ", but got " + actual.toString()));
+							return false;
+						}
+					} else {
+						typemap[(formal as ParsedObjectType).getToken().getValue()] = actual;
+					}
+				} else {
+					// TODO support arbitrary parameterized class
+				}
+			} else if (formal instanceof NullableType) {
+				if (! unify((formal as NullableType).getBaseType(), actual)) {
+					return false;
+				}
+			} else if (formal instanceof StaticFunctionType) {
+				if (! (actual instanceof StaticFunctionType)) {
+					errors.push(new CompileError(token, "expected " + formal.toString() + ", but got " + actual.toString()));
+					return false;
+				}
+				var formalFuncType = formal as StaticFunctionType;
+				var actualFuncType = actual as StaticFunctionType;
+				if (formalFuncType.getArgumentTypes().length != actualFuncType.getArgumentTypes().length) {
+					errors.push(new CompileError(token, "expected " + formal.toString() + ", but got " + actual.toString()));
+					return false;
+				}
+				// unify recursively
+				for (var i = 0; i < formalFuncType.getArgumentTypes().length; ++i) {
+					if (! unify(formalFuncType.getArgumentTypes()[i], actualFuncType.getArgumentTypes()[i]))
+						return false;
+				}
+				if (! unify(formalFuncType.getReturnType(), actualFuncType.getReturnType()))
+					return false;
+			} else { // formal is a primitive type
+				if (exact && ! formal.equals(actual)) {
+					// no need to throw a compile error when exact matching
+					return false;
+				}
+				if (! actual.isConvertibleTo(formal)) {
+					errors.push(new CompileError(token, "expected " + formal.toString() + ", but got " + actual.toString()));
+					return false;
+				}
+			}
+			return true;
+		}
+
+		// infer type parameters from actual arguments
+		var formalArgTypes = this.getArgumentTypes();
+		for (var i = 0; i < formalArgTypes.length; ++i) {
+			if (! unify(formalArgTypes[i], actualArgTypes[i]))
+				break;
+		}
+		if (i != formalArgTypes.length)
+			return null;
+
+		// run instantiation if typemap satisfies all type parameters
+		var typeArgs = new Type[];
+		for (var i = 0; i < this._typeArgs.length; ++i) {
+			if ((typeArgs[i] = typemap[this._typeArgs[i].getValue()]) == null)
+				break;
+		}
+		if (i != this._typeArgs.length) {
+			errors.push(new CompileError(token, "cannot decide type parameters from given argument expressions"));
+			return null;
+		} else {
+			return this.instantiateTemplateFunction(errors, token, typeArgs);
+		}
 	}
 
 	function instantiateTemplateFunction (errors : CompileError[], token : Token, typeArgs : Type[]) : MemberFunctionDefinition {
@@ -1993,7 +2107,8 @@ class TemplateClassDefinition extends ClassDefinition implements TemplateDefinit
 		this._className = className;
 		this._flags = flags;
 		this._typeArgs = typeArgs.concat(new Token[]);
-		this._resetMembersClassDef();
+
+		this._generateWrapperFunctions();
 	}
 
 	override function getToken () : Token {
