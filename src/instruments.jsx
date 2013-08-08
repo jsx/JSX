@@ -769,14 +769,20 @@ a | function ($a) { var $C = C; return $a ? b | $C : c | $C; }
 			)
 		);
 
+		var ifTrueExpr = this._expr.getIfTrueExpr();
+		if (ifTrueExpr == null) {
+			ifTrueExpr = new LocalExpression(argVar.getName(), argVar);
+		}
+		var ifFalseExpr = this._expr.getIfFalseExpr();
+
 		// `return $a ? b | $C : c | $C;`
 		var returnStmt = new ReturnStatement(
 			new Token("return", false),
 			new ConditionalExpression(
 				this._expr.getToken(),
 				new LocalExpression(argVar.getName(), argVar),
-				this._transformer._getExpressionTransformerFor(this._expr.getIfTrueExpr()).doCPSTransform(contFuncDef, new LocalExpression(contVar.getName(), contVar)),
-				this._transformer._getExpressionTransformerFor(this._expr.getIfFalseExpr()).doCPSTransform(contFuncDef, new LocalExpression(contVar.getName(), contVar))
+				this._transformer._getExpressionTransformerFor(ifTrueExpr).doCPSTransform(contFuncDef, new LocalExpression(contVar.getName(), contVar)),
+				this._transformer._getExpressionTransformerFor(ifFalseExpr).doCPSTransform(contFuncDef, new LocalExpression(contVar.getName(), contVar))
 			)
 		);
 
