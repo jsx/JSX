@@ -1669,6 +1669,8 @@ class _Test extends TestCase {
         o.clearInterval(X.getnumber());
         o.postMessage(X.getvariant(), X.getstring());
         o.postMessage(X.getvariant(), X.getstring(), X.getTransferable__());
+        var v108 : Nullable.<number>/*int?*/ = o.orientation;
+        var v109 : Nullable.<function(:Event):void>/*EventHandler*/ = o.onorientationchange;
         var f24 : number/*long*/ = o.requestAnimationFrame(X.getfunction_time_number__void());
         o.cancelAnimationFrame(X.getnumber());
         var f25 : number/*long*/ = o.webkitRequestAnimationFrame(X.getfunction_time_number__void());

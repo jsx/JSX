@@ -2242,6 +2242,9 @@ native final __fake__ class Window extends EventTarget {
 
 	function postMessage(message : variant/*any*/, targetOrigin : string/*DOMString*/) : void;
 	function postMessage(message : variant/*any*/, targetOrigin : string/*DOMString*/, transfer : Transferable[]) : void;
+	// for smartphones
+	__readonly__ var orientation : Nullable.<number>/*int?*/;
+	var onorientationchange : Nullable.<function(:Event):void>/*EventHandler*/;
 
 	// implements WindowAnimationTiming
 
