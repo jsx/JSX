@@ -57,6 +57,7 @@ class JSXCommand {
 			"  --optimize cmd1,cmd2,...   enables optimization commands\n" +
 			"  --warn type1,type2,...     enables warnings (all, experimental, deprecated, none)\n" +
 			"  --disable-type-check       disables run-time type checking\n" +
+			"  --enable-release-vars      releases vars in order not to be captured in closures" +
 			"  --minify                   compresses the target JavaScript code\n" +
 			"  --enable-source-map        enables source map debugging info\n" +
 			"  --complete line:column     shows code completion at line:column\n" +
@@ -320,6 +321,13 @@ class JSXCommand {
 						tasks.push(function (mode : boolean) : () -> void {
 							return function () {
 								emitter.setEnableSourceMap(mode);
+							};
+						}(mode));
+						break NEXTOPT;
+					case "release-vars":
+						tasks.push(function (mode : boolean) : () -> void {
+							return function () {
+								(emitter as JavaScriptEmitter).setEnableReleaseVars(mode);
 							};
 						}(mode));
 						break NEXTOPT;

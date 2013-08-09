@@ -49,7 +49,7 @@ test-all: test test-optimized
 test-debug: test-core test-misc-core
 
 test-optimized:
-	JSX_OPTS="--optimize release --disable-optimize no-log,no-assert" $(MAKE) test-core
+	JSX_OPTS="--optimize release --enable-release-vars --disable-optimize no-log,no-assert" $(MAKE) test-core
 
 test-optimized-minified:
 	JSX_OPTS="--optimize release --disable-optimize no-log,no-assert --minify" $(MAKE) test-core
