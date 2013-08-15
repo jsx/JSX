@@ -58,16 +58,6 @@ class _Util {
 		return ret;
 	}
 
-	static function classIsNative (classDef : ClassDefinition) : boolean {
-		return ! classDef.forEachClassToBase(function (classDef) {
-			if (classDef.className() == "Object"
-				|| (classDef.flags() & ClassDefinition.IS_NATIVE) == 0) {
-					return true;
-				}
-			return false;
-		});
-	}
-
 	static function exprHasSideEffects (expr : Expression) : boolean {
 		return !(function onExpr (expr : Expression) : boolean {
 			if (   expr instanceof NewExpression
@@ -87,14 +77,14 @@ class _Util {
 			}
 			else if (expr instanceof PropertyExpression) {
 				var type = (expr as PropertyExpression).getExpr().getType();
-				if (type instanceof ObjectType && ((type as ObjectType).getClassDef().flags() & ClassDefinition.IS_NATIVE) != 0 && ! Util.isBuiltInContainer(type)) {
+				if (!(Util.isBuiltInClass(type) || !Util.isNativeClass(type))) {
 					return false;
 				}
 			}
 			else if (expr instanceof ArrayExpression) {
 				var type = (expr as ArrayExpression).getFirstExpr().getType();
+				if (!(Util.isBuiltInClass(type) || !Util.isNativeClass(type))) {
 
-				if (type instanceof ObjectType && ((type as ObjectType).getClassDef().flags() & ClassDefinition.IS_NATIVE) != 0 && ! Util.isBuiltInContainer(type)) {
 					return false;
 				}
 			}
@@ -2536,7 +2526,7 @@ class _DeadCodeEliminationOptimizeCommand extends _FunctionOptimizeCommand {
 				var firstExpr      = assignmentExpr.getFirstExpr();
 				if (expr.getToken().getValue() == "="
 					&& isFirstLevelPropertyAccess(firstExpr)
-					&& ! _Util.classIsNative((firstExpr as PropertyExpression).getExpr().getType().getClassDef())) {
+					&& ! Util.isNativeClass((firstExpr as PropertyExpression).getExpr().getType())) {
 					var propertyName = (firstExpr as PropertyExpression).getIdentifierToken().getValue();
 					onExpr(assignmentExpr.getSecondExpr(), null);
 					if (lastAssignExpr[propertyName]
@@ -3215,7 +3205,7 @@ class _ReturnIfOptimizeCommand extends _FunctionOptimizeCommand {
 	}
 
 	override function optimizeFunction (funcDef : MemberFunctionDefinition) : boolean {
-		if (funcDef.getReturnType().equals(Type.voidType))
+		if (funcDef.getReturnType() == null || funcDef.getReturnType().equals(Type.voidType))
 			return false;
 
 		this._altered = false;
@@ -3356,7 +3346,7 @@ class _LCSEOptimizeCommand extends _FunctionOptimizeCommand {
 				var propertyExpr = expr as PropertyExpression;
 				this.log(JSON.stringify(propertyExpr.getToken()));
 				var receiverType = propertyExpr.getExpr().getType();
-				if (receiverType instanceof ObjectType && _Util.classIsNative(receiverType.getClassDef())) {
+				if (Util.isNativeClass(receiverType)) {
 					return null;
 				}
 				var base = getCacheKey(propertyExpr.getExpr());
@@ -3588,8 +3578,7 @@ class _UnboxOptimizeCommand extends _FunctionOptimizeCommand {
 		if (! (local.getType() instanceof ObjectType)) {
 			return false;
 		}
-		var classDef = local.getType().getClassDef();
-		if (_Util.classIsNative(classDef)) {
+		if (Util.isNativeClass(local.getType())) {
 			return false;
 		}
 		// determine if the local can be unboxed

@@ -156,18 +156,6 @@ class _Lexer {
 		// , "async"  // contextual
 		]);
 
-	static const builtInClasses = Util.asSet([
-		// build-in classes
-		"Array", "Boolean", "Date", "Function", "Map", "Math", "Number",
-		"Object", "RegExp", "String", "JSON",
-		"Error", "EvalError", "RangeError", "ReferenceError", "SyntaxError", "TypeError",
-		"JSX",
-		// typed arrays
-		"Transferable", "ArrayBuffer", "Int8Array", "Uint8Array",
-		"Uint8ClampedArray", "Int16Array", "Uint16Array", "Int32Array",
-		"Uint32Array", "Float32Array", "Float64Array", "DataView"
-	]);
-
 	static function makeAlt (patterns : string[]) : string {
 		return "(?: \n" + patterns.join("\n | \n") + "\n)\n";
 	}
@@ -498,8 +486,10 @@ class QualifiedName {
 		} else {
 			if (typeArguments.length == 0) {
 				if ((classDef = context.parser.lookup(context.errors, this._token, this._token.getValue())) == null) {
-					context.errors.push(new CompileError(this._token, "no class definition or variable for '" + this.toString() + "'"));
-					return null;
+					if ((classDef = context.parser.lookupTemplate(context.errors, new TemplateInstantiationRequest(this._token, this._token.getValue(), typeArguments), function (parser : Parser, classDef : ClassDefinition) : ClassDefinition { return null; })) == null) {
+						context.errors.push(new CompileError(this._token, "no class definition or variable for '" + this.toString() + "'"));
+						return null;
+					}
 				}
 			} else {
 				if ((classDef = context.parser.lookupTemplate(context.errors, new TemplateInstantiationRequest(this._token, this._token.getValue(), typeArguments), function (parser : Parser, classDef : ClassDefinition) : ClassDefinition { return null; })) == null) {
@@ -1339,7 +1329,7 @@ class Parser {
 		if (this._expect(";") == null)
 			return false;
 		// check conflict
-		if (alias != null && Parser._isReservedClassName(alias.getValue())) {
+		if (alias != null && Util.isBuiltInClass(alias.getValue())) {
 			this._errors.push(new CompileError(alias, "cannot use name of a built-in class as an alias"));
 			return false;
 		}
@@ -1550,7 +1540,7 @@ class Parser {
 		}
 
 		// check name conflicts
-		if ((this._classFlags & ClassDefinition.IS_NATIVE) == 0 && Parser._isReservedClassName(className.getValue())) {
+		if ((this._classFlags & ClassDefinition.IS_NATIVE) == 0 && Util.isBuiltInClass(className.getValue())) {
 			// any better way to check that we are parsing a built-in file?
 			this._errors.push(new CompileError(className, "cannot re-define a built-in class"));
 			success = false;
@@ -3401,10 +3391,5 @@ class Parser {
 	function _getCompletionCandidatesOfProperty (expr : Expression) : _CompletionCandidatesOfProperty {
 		return new _CompletionCandidatesOfProperty(expr);
 	}
-
-	static function _isReservedClassName (name : string) : boolean {
-		return _Lexer.builtInClasses.hasOwnProperty(name);
-	}
-
 }
 

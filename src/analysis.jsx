@@ -205,6 +205,18 @@ class LocalVariable implements Stashable {
 		this._type = type;
 	}
 
+	function _findVarTokenFromFuncDef(context : AnalysisContext) : Token {
+		// the local variable token may refers outer scope, so find the correct
+		// one for error messages
+		var locals = context.funcDef.getLocals();
+		for (var i = 0; i < locals.length; ++i) {
+			if (this.getName().getValue() == locals[i].getName().getValue()) {
+				return locals[i].getName();
+			}
+		}
+		return this.getName(); // fall back to itself
+	}
+
 	function touchVariable (context : AnalysisContext, token : Token, isAssignment : boolean) : boolean {
 		if (isAssignment) {
 			context.getTopBlock().localVariableStatuses.setStatus(this);
@@ -217,10 +229,14 @@ class LocalVariable implements Stashable {
 				// ok
 				break;
 			case LocalVariableStatuses.UNSET:
-				context.errors.push(new CompileError(token, "variable is not initialized"));
+				var error = new CompileError(token, "variable is not initialized");
+				error.addCompileNote(new CompileNote(this._findVarTokenFromFuncDef(context), "declared here"));
+				context.errors.push(error);
 				return false;
 			case LocalVariableStatuses.MAYBESET:
-				context.errors.push(new CompileError(token, "variable may not be initialized"));
+				var error = new CompileError(token, "variable may not be initialized");
+				error.addCompileNote(new CompileNote(this._findVarTokenFromFuncDef(context), "declared here"));
+				context.errors.push(error);
 				return false;
 			default:
 				throw new Error("logic flaw");
@@ -329,7 +345,7 @@ class LocalVariableStatuses {
 		if (base != null) {
 			// FIXME the analysis of the closures should be delayed to either of: first being used, or return is called, to minimize the appearance of the "not initialized" error
 			for (var k in base._statuses)
-				this._statuses[k] = base._statuses[k] == LocalVariableStatuses.UNSET ? LocalVariableStatuses.MAYBESET : base._statuses[k] as number;
+				this._statuses[k] = base._statuses[k] == LocalVariableStatuses.UNSET ? LocalVariableStatuses.MAYBESET : base._statuses[k];
 		}
 		var args = funcDef.getArguments();
 		for (var i = 0; i < args.length; ++i)

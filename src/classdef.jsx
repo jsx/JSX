@@ -110,6 +110,10 @@ class ClassDefinition implements Stashable {
 			funcDef.generateWrappersForDefaultParameters();
 			return true;
 		});
+		this.forEachTemplateFunction((funcDef) -> {
+			funcDef.generateWrappersForDefaultParameters();
+			return true;
+		});
 	}
 
 	function serialize () : variant {
@@ -875,11 +879,14 @@ class ClassDefinition implements Stashable {
 			if (! Util.typesAreEqual((this._members[i] as MemberFunctionDefinition).getArgumentTypes(), member.getArgumentTypes()))
 				continue;
 			if ((! isCheckingInterface) && (member.flags() & ClassDefinition.IS_OVERRIDE) == 0) {
-				context.errors.push(new CompileError(member.getNameToken(), "overriding functions must have 'override' attribute set (defined in base class '" + this.classFullName() + "')"));
+				var error = new CompileError(member.getNameToken(), "overriding functions must have 'override' attribute set");
+				error.addCompileNote(new CompileNote(this._members[i].getNameToken(), Util.format("defined in base class '%1'", [this.classFullName()])));
+				context.errors.push(error);
 				return false;
 			}
 			if (reportOverridesAsWell && (this._members[i].flags() & ClassDefinition.IS_OVERRIDE) != 0) {
-				context.errors.push(new CompileError(member.getNameToken(), "definition of the function conflicts with sibling mix-in '" + this.classFullName() + "'"));
+				var error = new CompileError(member.getNameToken(), "definition of the function conflicts with sibling mix-in '" + this.classFullName() + "'");
+				context.errors.push(error);
 				return false;
 			}
 			// assertion of function being overridden does not have 'final' attribute is done by assertFunctionIsOverridable
@@ -1076,19 +1083,16 @@ abstract class MemberDefinition implements Stashable {
 	}
 
 	function _updateLinkFromExpressionToClosuresUponInstantiation(instantiatedExpr : Expression, instantiatedClosures : MemberFunctionDefinition[]) : void {
-		function onExpr(expr : Expression) : boolean {
+		(function onExpr(expr : Expression) : boolean {
 			if (expr instanceof FunctionExpression) {
-				for (var i = 0; i < this._closures.length; ++i) {
-					if (this._closures[i] == (expr as FunctionExpression).getFuncDef())
-						break;
-				}
-				if (i == this._closures.length)
-					throw new Error("logic flaw, cannot find the closure");
-				(expr as FunctionExpression).setFuncDef(instantiatedClosures[i]);
+				var idx = this._closures.indexOf((expr as FunctionExpression).getFuncDef());
+
+				if (idx == -1)
+					throw new Error("logic flaw, cannot find the closure for " + this.getNotation());
+				(expr as FunctionExpression).setFuncDef(instantiatedClosures[idx]);
 			}
 			return expr.forEachExpression(onExpr);
-		}
-		onExpr(instantiatedExpr);
+		})(instantiatedExpr);
 	}
 
 }
@@ -1249,7 +1253,7 @@ class MemberFunctionDefinition extends MemberDefinition implements Block {
 		s += this.getNameToken() != null ? this.name() : "$" +  this.getToken().getLineNumber()  as string + "_" + this.getToken().getColumnNumber() as string;
 		s += "(";
 		s += this._args.map.<string>(function (arg) {
-				return ":" + arg.getType().toString();
+				return ":" + (arg.getType() ? arg.getType().toString() : "null");
 			}).join(",");
 		s += ")";
 		return s;
@@ -1491,13 +1495,10 @@ class MemberFunctionDefinition extends MemberDefinition implements Block {
 			// update the link from function expressions to closures
 			Util.forEachStatement(function onStatement(statement : Statement) : boolean {
 				if (statement instanceof FunctionStatement) {
-					for (var i = 0; i < this._closures.length; ++i) {
-						if (this._closures[i] == (statement as FunctionStatement).getFuncDef())
-							break;
-					}
-					if (i == this._closures.length)
-						throw new Error("logic flaw, cannot find the closure");
-					(statement as FunctionStatement).setFuncDef(closures[i]);
+					var idx = this._closures.indexOf((statement as FunctionStatement).getFuncDef());
+					if (i == -1)
+						throw new Error("logic flaw, cannot find the closure for " + this.getNotation());
+					(statement as FunctionStatement).setFuncDef(closures[idx]);
 					return true;
 				}
 				statement.forEachExpression(function (expr) {
@@ -1663,17 +1664,22 @@ class MemberFunctionDefinition extends MemberDefinition implements Block {
 				}
 			}
 			// build function
-			var wrapper = new MemberFunctionDefinition(
-				this.getToken(),
-				this.getNameToken(),
-				this.flags() | ClassDefinition.IS_INLINE | ClassDefinition.IS_GENERATED,
-				this.getReturnType(),
-				formalArgs,
-				new LocalVariable[],
-				[statement],
-				new MemberFunctionDefinition[],
-				this._lastTokenOfBody,
-				this._docComment);
+			if (!(this instanceof TemplateFunctionDefinition)) {
+				var wrapper = new MemberFunctionDefinition(
+					this.getToken(),
+					this.getNameToken(),
+					this.flags() | ClassDefinition.IS_INLINE | ClassDefinition.IS_GENERATED,
+					this.getReturnType(),
+					formalArgs,
+					new LocalVariable[],
+					[statement],
+					this.getClosures().slice(0),
+					this._lastTokenOfBody,
+					this._docComment);
+			}
+			else {
+				throw new Error("TODO: template function with default parameters in " + this.getNotation() + " is not yet supported");
+			}
 			wrapper.setClassDef(this.getClassDef());
 			// register
 			this.getClassDef().members().push(wrapper);

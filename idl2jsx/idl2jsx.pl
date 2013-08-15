@@ -298,7 +298,7 @@ foreach my $src(@files) {
 
         if ($+{typedef}) {
             my $new      = $+{new_type};
-            my $existing = $+{existing_type};
+            my $existing = to_jsx_type($+{existing_type});
             info "typedef: $new = $existing";
             WebIDL::TypeMap->alias($existing => $new);
         }
@@ -463,13 +463,16 @@ foreach my $src(@files) {
                     (?<static> \bstatic\b \s+ )?
                     (?<readonly> \breadonly\b \s+)?
                     (?: \battribute\b \s+)?
-                    (?: \[ [^\]]+ \])?
-                    (?<type> $rx_type) \s+ (?<ident> \w+)
+                    (?: \[ [^\]]+ \])? # annotations
+                    (?<type> $rx_type) \s+ (?<ident> \w+) # required
                     (?: \s+ setraises\( [^\)]+ \) )?
-                    [^;\(\)]* ;
+                    [^;\(\)\[\]]* ;
                 }xms) {
-
                 my $id = $+{ident};
+
+                if ($id eq 'attribute') { # something's wrong
+                    die "panic: $member";
+                }
 
                 my $decl = "";
                 if ($+{static}) {
@@ -478,11 +481,9 @@ foreach my $src(@files) {
                 if ($+{readonly}) {
                     $decl = "__readonly__ ";
                 }
-                $decl .= "var ";
+                my $type = to_jsx_type($+{type});
 
-                my $type = to_jsx_type($+{type}, union_to_variant => 1);
-
-                $decl .= "$id : $type;";
+                $decl .= "var $id : $type;";
 
                 $decl_ref->{$id} //= [];
                 push @{$decl_ref->{$id}}, $decl;
@@ -735,8 +736,13 @@ sub to_jsx_type {
 
     $idl_type =~ s/.+://; # remove namespace
 
-    if ($attr{union_to_variant} && $idl_type =~ m{ \b or \b }xms) {
-        return "variant/*$idl_type*/";
+    if ($idl_type =~ m{ \b or \b }xms) {
+        if ($idl_type =~ /(?: byte | short | int | long | float | double | boolean | number | string | DOMString  )/xms) { # looks to include primitive types
+            return "variant/*$idl_type*/";
+        }
+        else {
+            return "Object/*$idl_type*/";
+        }
     }
 
     my $array;
@@ -778,7 +784,7 @@ sub to_jsx_type {
     if($array) {
         $jsx_type .= "[]";
     }
-    if ($nullable && $jsx_type ne 'variant') {
+    if ($nullable && $jsx_type !~ /\b variant \b/xms) {
         $jsx_type = "Nullable.<$jsx_type>";
     }
 
@@ -933,6 +939,9 @@ sub find_member_from_bases {
 sub function_params {
     my($decl) = @_;
 
+    # remove comments
+    $decl =~ s{/\* .*? \*/}{}xmsg;
+
     my($params) = $decl =~ /\( (.*) \)/xms;
 
     # remove names
@@ -955,7 +964,7 @@ sub make_function_type {
     my($ret_type, $params) = @_;
     my $callback_params = join ",", map {
             sprintf '%s:%s',
-                $_->{name}, to_jsx_type($_->{type}, union_to_variant => 1)
+                $_->{name}, to_jsx_type($_->{type})
         } parse_params($params);
 
     return "function($callback_params):" . to_jsx_type($ret_type);

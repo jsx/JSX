@@ -91,6 +91,24 @@ class Util {
 		});
 	}
 
+	static const _builtInClass = Util.asSet([
+		// build-in classes
+		"Array", "Boolean", "Date", "Function", "Map", "Math", "Number",
+		"Object", "RegExp", "String", "JSON",
+		"Error", "EvalError", "RangeError", "ReferenceError", "SyntaxError", "TypeError",
+		"JSX",
+		// typed arrays
+		"Transferable", "ArrayBuffer", "Int8Array", "Uint8Array",
+		"Uint8ClampedArray", "Int16Array", "Uint16Array", "Int32Array",
+		"Uint32Array", "Float32Array", "Float64Array", "DataView"
+	]);
+	static function isBuiltInClass(name : string) : boolean {
+		return Util._builtInClass.hasOwnProperty(name);
+	}
+	static function isBuiltInClass(type : Type) : boolean {
+		return Util._isBuiltInObjectType(type, Util._builtInClass);
+	}
+
 	static const _builtInContainer = Util.asSet([
 		"Array", "Map",
 		"Int8Array", "Uint8Array", "Uint8ClampedArray",
@@ -98,17 +116,30 @@ class Util {
 		"Int32Array", "Uint32Array",
 		"Float32Array", "Float64Array" ]);
 	static function isBuiltInContainer(type : Type) : boolean {
-		if (type instanceof ObjectType) {
-			var classDef = (type as ObjectType).getClassDef();
-			if (classDef instanceof InstantiatedClassDefinition) {
+		return Util._isBuiltInObjectType(type, Util._builtInContainer);
+	}
 
-				var className = (classDef as InstantiatedClassDefinition).getTemplateClassName();
-				return Util._builtInContainer.hasOwnProperty(className);
-			}
-			else {
-				className = classDef.className();
-				return Util._builtInContainer.hasOwnProperty(className);
-			}
+	static function _isBuiltInObjectType(type : Type, classeSet : Map.<boolean>) : boolean {
+		if (type instanceof ObjectType) {
+			var classDef = type.getClassDef();
+			var className = (classDef instanceof InstantiatedClassDefinition)
+				? (classDef as InstantiatedClassDefinition).getTemplateClassName()
+				: classDef.className();
+			return classeSet.hasOwnProperty(className);
+		}
+		return false;
+	}
+
+	static function isNativeClass(type : Type) : boolean {
+		if (type instanceof ObjectType) {
+			var classDef = type.getClassDef();
+			return ! classDef.forEachClassToBase(function (classDef) {
+				if (classDef.className() == "Object"
+					|| (classDef.flags() & ClassDefinition.IS_NATIVE) == 0) {
+						return true;
+					}
+				return false;
+			});
 		}
 		return false;
 	}

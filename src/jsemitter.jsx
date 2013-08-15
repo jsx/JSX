@@ -904,7 +904,11 @@ class _ConstructorInvocationStatementEmitter extends _StatementEmitter {
 		var argTypes = ctorType != null ? ctorType.getArgumentTypes() : new Type[];
 		var ctorName = this._emitter.getNamer().getNameOfConstructor(this._statement.getConstructingClassDef(), argTypes);
 		var token = this._statement.getToken();
-		if (ctorName == "Error" && this._statement.getArguments().length == 1) {
+
+		this._emitter._emitCallArguments(token, ctorName + ".call(this", this._statement.getArguments(), argTypes);
+		this._emitter._emit(";\n", token);
+
+		if (ctorName == "Error") {
 			/*
 				At least v8 does not support "Error.call(this, message)"; it not only does not setup the stacktrace but also does
 				not set the message property.  So we set the message property.
@@ -913,13 +917,21 @@ class _ConstructorInvocationStatementEmitter extends _StatementEmitter {
 
 				FIXME check that doing  "Error.call(this);" does not have any negative effect on other platforms
 			*/
-			this._emitter._emit("Error.call(this);\n", token);
-			this._emitter._emit("this.message = ", token);
-			this._emitter._getExpressionEmitterFor(this._statement.getArguments()[0]).emit(_AssignmentExpressionEmitter._operatorPrecedence["="]);
-			this._emitter._emit(";\n", token);
-		} else {
-			this._emitter._emitCallArguments(token, ctorName + ".call(this", this._statement.getArguments(), argTypes);
-			this._emitter._emit(";\n", token);
+			if (this._statement.getArguments().length == 1) {
+				this._emitter._emit("this.message = ", token);
+				this._emitter._getExpressionEmitterFor(this._statement.getArguments()[0]).emit(_AssignmentExpressionEmitter._operatorPrecedence["="]);
+				this._emitter._emit(";\n", token);
+			}
+
+			// Althought it's not in the standard, the name property is used as the prefix of the error message,
+			// so we set it for convinience.
+			this._emitter._emit("this.name = \"" + this._emitter._emittingFunction.getClassDef().classFullName() + "\";\n", token);
+
+			// V8 has an API to set up stacktrace, so call it for convinience if available.
+			// https://code.google.com/p/v8/wiki/JavaScriptStackTraceApi
+			this._emitter._emit("if (Error.captureStackTrace) Error.captureStackTrace(this, ", null);
+			this._emitter._emit(this._emitter.getNamer().getNameOfClass(this._emitter._emittingFunction.getClassDef()) , null);
+			this._emitter._emit(");\n", null);
 		}
 	}
 

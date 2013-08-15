@@ -1,0 +1,2548 @@
+<!DOCTYPE html><html lang="en-US"><meta charset="utf-8">
+<title>URL Standard</title>
+<link href="http://www.whatwg.org/style/specification" rel="stylesheet">
+<link href="//resources.whatwg.org/logo-url.svg" rel="icon">
+
+<div class="head">
+
+<p><a class="logo" href="//www.whatwg.org/"><img alt="WHATWG" height="100" src="//resources.whatwg.org/logo-url.svg" width="100"></a></p>
+<h1>URL</h1>
+<h2 class="no-num no-toc" id="living-standard-—-last-updated-23-july-2013">Living Standard — Last Updated 23 July 2013</h2>
+
+<dl>
+ <dt>This Version:
+ <dd><a href="//url.spec.whatwg.org/">http://url.spec.whatwg.org/</a>
+
+ <dt>Participate:</dt>
+ <dd>Send feedback to
+  <a href="http://www.whatwg.org/mailing-list">whatwg@whatwg.org</a>
+  (<a href="http://www.whatwg.org/mailing-list#specs">archives</a>) or
+  <a href="https://www.w3.org/Bugs/Public/enter_bug.cgi?product=WHATWG&amp;component=URL">file a bug</a>
+  (<a href="https://www.w3.org/Bugs/Public/buglist.cgi?product=WHATWG&amp;component=URL&amp;resolution=---">open bugs</a>)
+ <dd><a href="http://wiki.whatwg.org/wiki/IRC">IRC: #whatwg on Freenode</a>
+
+ <dt>Version History:
+ <dd><a href="https://github.com/whatwg/url/commits">https://github.com/whatwg/url/commits</a>
+ <dd><a href="https://twitter.com/urlstandard">@urlstandard</a>
+
+ <dt>Editor:
+ <dd class="h-card vcard"><a class="u-url url p-name fn" href="http://annevankesteren.nl/" lang="nl">Anne van Kesteren</a>
+  &lt;<a class="u-email email" href="mailto:annevk@annevk.nl">annevk@annevk.nl</a>&gt;
+</dl>
+
+<script async="" src="//resources.whatwg.org/file-bug.js"></script>
+
+<p class="copyright"><a href="http://creativecommons.org/publicdomain/zero/1.0/" rel="license"><img alt="CC0" src="http://i.creativecommons.org/p/zero/1.0/80x15.png"></a>
+To the extent possible under law, the editors have waived all copyright and
+related or neighboring rights to this work. In addition, as of
+23 July 2013, the editors have made this specification available
+under the
+<a href="http://www.openwebfoundation.org/legal/the-owf-1-0-agreements/owfa-1-0" rel="license">Open Web Foundation Agreement Version 1.0</a>,
+which is available at
+http://www.openwebfoundation.org/legal/the-owf-1-0-agreements/owfa-1-0.
+
+</div>
+
+
+
+<h2 class="no-num no-toc" id="table-of-contents">Table of Contents</h2>
+
+<!--begin-toc-->
+<ol class="toc">
+ <li><a class="no-num" href="#goals">Goals</a></li>
+ <li><a href="#conformance"><span class="secno">1 </span>Conformance</a></li>
+ <li><a href="#terminology"><span class="secno">2 </span>Terminology</a>
+  <ol>
+   <li><a href="#parsers"><span class="secno">2.1 </span>Parsers</a></ol></li>
+ <li><a href="#percent-encoded-bytes"><span class="secno">3 </span>Percent-encoded bytes</a></li>
+ <li><a href="#hosts-and-ip-addresses"><span class="secno">4 </span>Hosts and IP addresses</a>
+  <ol>
+   <li><a href="#host-writing"><span class="secno">4.1 </span>Writing</a></li>
+   <li><a href="#host-parsing"><span class="secno">4.2 </span>Parsing</a></li>
+   <li><a href="#host-serializing"><span class="secno">4.3 </span>Serializing</a></ol></li>
+ <li><a href="#urls"><span class="secno">5 </span>URLs</a>
+  <ol>
+   <li><a href="#writing"><span class="secno">5.1 </span>Writing</a></li>
+   <li><a href="#parsing"><span class="secno">5.2 </span>Parsing</a></li>
+   <li><a href="#serializing"><span class="secno">5.3 </span>Serializing</a></ol></li>
+ <li><a href="#application/x-www-form-urlencoded"><span class="secno">6 </span><code>application/x-www-form-urlencoded</code></a></li>
+ <li><a href="#api"><span class="secno">7 </span>API</a>
+  <ol>
+   <li><a href="#constructors"><span class="secno">7.1 </span>Constructors</a></li>
+   <li><a href="#urlutils-and-urlutilsreadonly-members"><span class="secno">7.2 </span><code>URLUtils</code> and <code>URLUtilsReadOnly</code> members</a></li>
+   <li><a href="#interface-urlquery"><span class="secno">7.3 </span>Interface <code>URLQuery</code></a></ol></li>
+ <li><a class="no-num" href="#references">References</a></li>
+ <li><a class="no-num" href="#acknowledgments">Acknowledgments</a></ol>
+<!--end-toc-->
+
+
+
+<h2 class="no-num" id="goals">Goals</h2>
+
+<p>The URL standard sets out to make URLs fully predictable and
+interoperable. This is the plan:
+
+<ul>
+ <li><p>Align RFC 3986 and RFC 3987 with contemporary implementations and
+ obsolete them in the process. (E.g. spaces, other "illegal" code points,
+ query encoding, equality, canonicalization, are all concepts not entirely
+ shared, or defined.) URL parsing needs to become as solid as HTML parsing.
+ <a class="informative" href="#refsURI">[URI]</a>
+ <a class="informative" href="#refsIRI">[IRI]</a>
+
+ <li><p>Standardize on the term URL. URI and IRI are just confusing. In
+ practice a single algorithm is used for both so keeping them distinct is
+ not helping anyone. URL also easily wins the
+ <a href="http://www.googlefight.com/index.php?word1=url&amp;word2=uri">search result popularity contest</a>.
+
+ <li><p>Define URL's existing JavaScript API in full detail and add
+ enhancements to make it easier to work with. Add a new <a href="#url"><code>URL</code></a>
+ object as well for URL manipulation without usage of HTML elements. (Useful
+ for Web Workers.)
+</ul>
+
+<p class="note">As the editor learns more about the subject matter the goals
+might increase in scope somewhat.
+
+
+
+<h2 id="conformance"><span class="secno">1 </span>Conformance</h2>
+<p>All diagrams, examples, and notes in this specification are
+non-normative, as are all sections explicitly marked non-normative.
+Everything else in this specification is normative.
+
+<p>The key words "MUST", "MUST NOT", "REQUIRED", <!--"SHALL", "SHALL
+NOT",--> "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and
+"OPTIONAL" in the normative parts of this specification are to be
+interpreted as described in RFC2119. For readability, these words do
+not appear in all uppercase letters in this specification.
+<a href="#refsRFC2119">[RFC2119]</a>
+
+
+
+<h2 id="terminology"><span class="secno">2 </span>Terminology</h2>
+
+<p>Some terms used in this specification are defined in the
+Encoding Standard. <a href="#refsENCODING">[ENCODING]</a>
+
+<p>The <dfn id="ascii-digits">ASCII digits</dfn> are code points in the range U+0030 to U+0039.
+
+<p>The <dfn id="ascii-hex-digits">ASCII hex digits</dfn> are <a href="#ascii-digits">ASCII digits</a> or are
+code points in the range U+0041 to U+0046 or in the range U+0061 to U+0066.
+
+<p>The <dfn id="ascii-alpha">ASCII alpha</dfn> are code points in the range U+0041 to U+005A
+or in the range U+0061 to U+007A.
+
+<p>The <dfn id="ascii-alphanumeric">ASCII alphanumeric</dfn> are <a href="#ascii-digits">ASCII digits</a> or
+<a href="#ascii-alpha">ASCII alpha</a>.
+
+
+<p>The <dfn id="domain-label-separators">domain label separators</dfn> are the code points
+U+002E, U+3002, U+FF0E, and U+FF61.
+<!-- IDNA2003/UTS #46; IDNA2008 does not define these -->
+
+<h3 id="parsers"><span class="secno">2.1 </span>Parsers</h3>
+
+<p>The <dfn id="eof-code-point">EOF code point</dfn> is a conceptual code point that signifies the end of a
+string or code point stream.
+
+<p>A <dfn id="parse-error">parse error</dfn> indicates a non-fatal mismatch between input and requirements.
+User agents are encouraged to expose <a href="#parse-error" title="parse error">parse errors</a>
+somehow.
+
+<p>Within a parser algorithm that uses a <var title="">pointer</var> variable, <dfn id="c">c</dfn>
+references the code point the <var title="">pointer</var> variable points to.
+
+<p>Within a string-based parser algorithm that uses a <var title="">pointer</var> variable,
+<dfn id="remaining">remaining</dfn> references the substring after <var title="">pointer</var> in the string
+being processed.
+
+<p class="example">If "<code title="">mailto:example@example</code>" is a string being
+processed and <var title="">pointer</var> points to "<code title="">@</code>",
+<a href="#c">c</a> is "<code title="">@</code>" and <a href="#remaining">remaining</a> is
+"<code title="">example</code>".
+
+
+
+<h2 id="percent-encoded-bytes"><span class="secno">3 </span>Percent-encoded bytes</h2>
+
+<p>A <dfn id="percent-encoded-byte">percent-encoded byte</dfn> is "<code title="">%</code>", followed by
+two <a href="#ascii-hex-digits">ASCII hex digits</a>. Sequences of
+<a href="#percent-encoded-byte" title="percent-encoded byte">percent-encoded bytes</a>, after
+conversion to bytes, should not cause
+<a class="external" data-anolis-spec="encoding" href="http://encoding.spec.whatwg.org/#utf-8-decode">utf-8 decode</a> to emit any
+<a class="external" data-anolis-spec="encoding" href="http://encoding.spec.whatwg.org/#decoder-error" title="decoder error">decoder errors</a>.
+
+<p>To <dfn id="percent-encode">percent encode</dfn> a <var title="">byte</var> into a
+<a href="#percent-encoded-byte">percent-encoded byte</a>, return a string consisting of
+"<code title="">%</code>", followed by a double-digit, uppercase, hexadecimal
+representation of <var title="">byte</var>.
+
+<p>To <dfn id="percent-decode">percent decode</dfn> a <var title="">string</var> using code points in the range
+U+0000 to U+007F into a byte sequence, run these steps:
+
+<ol>
+ <li><p>Let <var title="">pointer</var> be a pointer into
+ <var title="">string</var>, initially zero (pointing to the first code point).
+
+ <li><p>Let <var title="">bytes</var> be an empty byte sequence.
+
+ <li>
+  <p>While <a href="#c">c</a> is not the <a href="#eof-code-point">EOF code point</a>, run
+  these substeps:
+
+  <ol>
+   <li><p>While <a href="#c">c</a> is not "<code title="">%</code>" or the
+   <a href="#eof-code-point">EOF code point</a>, append to <var title="">bytes</var> a byte
+   whose value is <a href="#c">c</a>'s code point and increase
+   <var title="">pointer</var> by one.
+
+   <li><p>If <a href="#c">c</a> is "<code title="">%</code>" and
+   <a href="#remaining">remaining</a> does not start with two
+   <a href="#ascii-hex-digits">ASCII hex digits</a>, append to <var title="">bytes</var> a byte
+   whose value is <a href="#c">c</a>'s code point, increase
+   <var title="">pointer</var> by one.
+
+   <li><p>Otherwise, while <a href="#c">c</a> is "<code title="">%</code>" and
+   <a href="#remaining">remaining</a> starts with two <a href="#ascii-hex-digits">ASCII hex digits</a>,
+   append to <var title="">bytes</var> a byte whose value is
+   <a href="#remaining">remaining</a>'s two leading code points, interpreted as
+   hexadecimal number, and increase <var title="">pointer</var> by three.
+  </ol>
+
+ <li>
+  <p>Return <var title="">bytes</var>.
+</ol>
+
+<!-- the escape sets are minimal as escaping can lead to problems; we might
+     be able to escape more here but only if implementors are willing and
+     there's an upside
+
+     note that query and application/x-www-form-urlencoded use their own
+     local sets -->
+<p>The <dfn id="simple-encode-set">simple encode set</dfn> are all code points less than
+U+0020 (i.e. excluding U+0020) and all code points greater than U+007E.
+
+<p>The <dfn id="default-encode-set">default encode set</dfn> is the
+<a href="#simple-encode-set">simple encode set</a> and code points U+0020,
+'<code title="">"</code>', <!-- 0x22 -->
+"<code title="">#</code>", <!-- 0x23 -->
+"<code title="">&lt;</code>", <!-- 0x3C -->
+"<code title="">&gt;</code>", <!-- 0x3E -->
+"<code title="">?</code>", <!-- 0x3F -->
+and
+"<code title="">`</code>". <!-- 0x60 -->
+
+<p>The <dfn id="password-encode-set">password encode set</dfn> is the
+<a href="#default-encode-set">default encode set</a> and code points
+"<code title="">/</code>", <!-- 0x2F -->
+"<code title="">@</code>", <!-- 0x40 -->
+and
+"<code title="">\</code>". <!-- 0x5C -->
+
+<p>The <dfn id="username-encode-set">username encode set</dfn> is the
+<a href="#password-encode-set">password encode set</a> and code point
+"<code title="">:</code>". <!-- 0x3A -->
+
+<p>To <dfn id="utf-8-percent-encode">utf-8 percent encode</dfn> a <var title="">code point</var>, using
+an <var title="">encode set</var>, run these steps:
+
+<ol>
+ <li><p>If <var title="">code point</var> is not in
+ <var title="">encode set</var>, return <var title="">code point</var>.
+
+ <li><p>Let <var title="">bytes</var> be the result of running
+ <a class="external" data-anolis-spec="encoding" href="http://encoding.spec.whatwg.org/#utf-8-encode">utf-8 encode</a> on
+ <var title="">code point</var>.
+
+ <li><p><a href="#percent-encode">Percent encode</a> each byte in <var title="">bytes</var>, and
+ then return them concatenated, in the same order.
+</ol>
+
+
+
+<h2 id="hosts-and-ip-addresses"><span class="secno">4 </span>Hosts and IP addresses</h2>
+
+<!-- Punycode:
+     http://tools.ietf.org/html/rfc3492
+     http://mothereff.in/punycode -->
+
+<p>A <dfn id="concept-host" title="concept-host">host</dfn> is a string that represents a
+network address, either in the form of a
+<a href="#concept-domain" title="concept-domain">domain</a> or an
+<a href="#concept-ipv6" title="concept-ipv6">IPv6 address</a>.
+
+<p class="note">This is a slightly more generic definition of
+<a href="#concept-host" title="concept-host">host</a> than its traditional meaning for the
+sake of convenience.
+<!-- "convenience's sake" as The Economist would write it is ugly -->
+
+<p>A <dfn id="concept-domain" title="concept-domain">domain</dfn> is an ordered list of one or
+more <dfn id="concept-domain-label" title="concept-domain-label">domain labels</dfn>.
+
+<p>An <dfn id="concept-ipv6" title="concept-ipv6">IPv6 address</dfn> is a 128-bit identifier and
+for the purposes of this specification represented as an ordered list of
+eight <dfn id="concept-ipv6-piece" title="concept-ipv6-piece">16-bit pieces</dfn>.
+<a class="informative" href="#refsIPV6">[IPV6]</a>
+
+
+<h3 id="host-writing"><span class="secno">4.1 </span>Writing</h3>
+
+<p>A <a href="#concept-host" title="concept-host">host</a> must be either a
+<a href="#concept-domain" title="concept-domain">domain</a> or "<code title="">[</code>", followed
+by an <a href="#concept-ipv6" title="concept-ipv6">IPv6 address</a>, followed by
+"<code title="">]</code>".
+
+<p>A <a href="#concept-domain" title="concept-domain">domain</a> is one or more
+<a href="#concept-domain-label" title="concept-domain-label">domain labels</a> separated from each
+other by a
+<a href="#domain-label-separators" title="domain label separators">domain label separator</a>,
+optionally followed by a
+<a href="#domain-label-separators" title="domain label separators">domain label separator</a>.
+
+<p class="note">A trailing
+<a href="#domain-label-separators" title="domain label separators">domain label separator</a>
+signifies an empty <a href="#concept-domain-label" title="concept-domain-label">domain label</a>.
+<!-- if a domain has 4 labels, no trailing dot, and each label consists only
+     of ASCII digits it's IPv4 because the last label of a domain cannot
+     start with an ASCII digit -->
+
+<p class="XXX">A <a href="#concept-domain-label" title="concept-domain-label">domain label</a> is ...
+
+<p>An <a href="#concept-ipv6" title="concept-ipv6">IPv6 address</a> is defined in the
+<a href="http://tools.ietf.org/html/rfc4291#section-2.2">"Text Representation of Addresses" chapter of IP Version 6 Addressing Architecture</a>.
+<a href="#refsIPV6">[IPV6]</a>
+<!-- http://tools.ietf.org/html/rfc5952 updates that RFC, but it seems as
+     far as what developers can do we should be liberal
+
+     XXX should we define the format inline instead just like STD 66? -->
+
+
+<h3 id="host-parsing"><span class="secno">4.2 </span>Parsing</h3>
+
+<p>The <dfn id="concept-host-parser" title="concept-host-parser">host parser</dfn> takes a string
+<var title="">input</var> and then runs these steps:
+
+<ol>
+ <li><p>If <var title="">input</var> is the empty string, return failure.
+ <!-- Otherwise parsing URLs would not be idempotent:
+
+      http://@/example.org/ -> http:///example.org/ -> http://example.org/
+
+      Could potentially move this check to the URL parser if deemed problematic. -->
+
+ <li>
+  <p>If <var title="">input</var> starts with "<code title="">[</code>", run these
+  substeps:
+
+  <ol>
+   <li><p>If <var title="">input</var> does not end with
+   "<code title="">]</code>", <a href="#parse-error">parse error</a>, return failure.
+
+   <li><p>Return the result of
+   <a href="#concept-ipv6-parser" title="concept-ipv6-parser">parsing</a> <var title="">input</var>
+   with its leading "<code title="">[</code>" and trailing
+   "<code title="">]</code>" removed.
+  </ol>
+
+ <li><p>Let <var title="">host</var> be the result of running
+ <a class="external" data-anolis-spec="encoding" href="http://encoding.spec.whatwg.org/#utf-8">utf-8</a>'s
+ <a class="external" data-anolis-spec="encoding" href="http://encoding.spec.whatwg.org/#decoder">decoder</a> on the
+ <a href="#percent-decode" title="percent decode">percent decoding</a> of
+ <var title="">input</var>.
+
+ <li><p class="XXX"><a href="http://wiki.whatwg.org/wiki/URL#IDNA">IDNA hell</a>
+</ol>
+
+<p>The <dfn id="concept-ipv6-parser" title="concept-ipv6-parser">IPv6 parser</dfn> takes a string
+<var title="">input</var> and then runs these steps:
+
+<ol>
+ <li><p>Let <var title="">address</var> be a new
+ <a href="#concept-ipv6" title="concept-ipv6">IPv6 address</a> with its
+ <a href="#concept-ipv6-piece" title="concept-ipv6-piece">16-bit pieces</a> initialized to 0.
+
+ <li><p>Let <var title="">piece pointer</var> be a pointer into
+ <var title="">address</var>'s
+ <a href="#concept-ipv6-piece" title="concept-ipv6-piece">16-bit pieces</a>, initially zero
+ (pointing to the first <a href="#concept-ipv6-piece" title="concept-ipv6-piece">16-bit piece</a>),
+ and let <var title="">piece</var> be the
+ <a href="#concept-ipv6-piece" title="concept-ipv6-piece">16-bit piece</a> it points to.
+
+ <li><p>Let <var title="">compress pointer</var> be another pointer into
+ <var title="">pieces</var>, initially null and pointing to nothing.
+
+ <li><p>Let <var title="">pointer</var> be a pointer into
+ <var title="">input</var>, initially zero (pointing to the first code point).
+
+ <li>
+  <p>If <a href="#c">c</a> is "<code title="">:</code>", run these substeps:
+
+  <ol>
+   <li><p>If <a href="#remaining">remaining</a> does not start with
+   "<code title="">:</code>", <a href="#parse-error">parse error</a>, return failure.
+
+   <li><p>Increase <var title="">pointer</var> by two.
+
+   <li><p>Increase <var title="">piece pointer</var> by one and then set
+   <var title="">compress pointer</var> to <var title="">piece pointer</var>.
+  </ol>
+
+ <li>
+  <p><dfn id="concept-ipv6-parser-main" title="concept-ipv6-parser-main">Main</dfn>:
+  While <a href="#c">c</a> is not the <a href="#eof-code-point">EOF code point</a>, run these
+  substeps:
+
+  <ol>
+   <li><p>If <var title="">piece pointer</var> is eight,
+   <a href="#parse-error">parse error</a>, return failure.
+
+   <li>
+    <p>If <a href="#c">c</a> is "<code title="">:</code>", run these inner
+    substeps:
+
+    <ol>
+     <li><p>If <var title="">compress pointer</var> is not null,
+     <a href="#parse-error">parse error</a>, return failure.
+
+     <li>Increase <var title="">pointer</var> and <var title="">piece pointer</var> by one, set
+     <var title="">compress pointer</var> to <var title="">piece pointer</var>,
+     and then jump to <a href="#concept-ipv6-parser-main" title="concept-ipv6-parser-main">Main</a>.
+    </ol>
+
+   <li><p>Let <var title="">value</var> and <var title="">length</var> be 0.
+
+   <li><p>While <var title="">length</var> is less than 4 and
+   <a href="#c">c</a> is an
+   <a href="#ascii-hex-digits" title="ASCII hex digits">ASCII hex digit</a>, set
+   <var title="">value</var> to
+   <var title="">value</var> × 0x10 + <a href="#c">c</a> interpreted as hexadecimal number,
+   and increase <var title="">pointer</var> and <var title="">length</var> by one.
+
+   <li>
+    <p>Based on <a href="#c">c</a>:
+
+    <dl class="switch">
+     <dt>"<code title="">.</code>"
+     <dd>
+      <p>If <var title="">length</var> is 0, <a href="#parse-error">parse error</a>,
+      return failure.
+      <p>Decrease <var title="">pointer</var> by <var title="">length</var>.
+      <p>Jump to <a href="#concept-ipv6-parser-ipv4" title="concept-ipv6-parser-ipv4">IPv4</a>.
+
+     <dt>"<code title="">:</code>"
+     <dd>
+      <p>Increase <var title="">pointer</var> by one.
+      <p>If <a href="#c">c</a> is the <a href="#eof-code-point">EOF code point</a>,
+      <a href="#parse-error">parse error</a>, return failure.
+
+     <dt>Anything but the <a href="#eof-code-point">EOF code point</a>
+     <dd><p><a href="#parse-error">Parse error</a>, return failure.
+    </dl>
+
+   <li><p>Set <var title="">piece</var> to <var title="">value</var>.
+
+   <li><p>Increase <var title="">piece pointer</var> by one.
+  </ol>
+
+ <li><p>If <a href="#c">c</a> is the <a href="#eof-code-point">EOF code point</a>, jump to
+ <a href="#concept-ipv6-parser-finale" title="concept-ipv6-parser-finale">Finale</a>.
+
+ <li><p><dfn id="concept-ipv6-parser-ipv4" title="concept-ipv6-parser-ipv4">IPv4</dfn>:
+ If <var title="">piece pointer</var> is greater than six,
+ <a href="#parse-error">parse error</a>, return failure.
+
+ <li><p>Let <var title="">dots seen</var> be 0.
+
+ <li>
+  <p>While <a href="#c">c</a> is not the <a href="#eof-code-point">EOF code point</a>, run
+  these substeps:
+
+  <ol>
+   <li><p>Let <var title="">value</var> be 0.
+
+   <li><p>While <a href="#c">c</a> is an
+   <a href="#ascii-digits" title="ASCII digits">ASCII digit</a>, set <var title="">value</var> to
+   <var title="">value</var> × 10 + <a href="#c">c</a> interpreted as decimal number
+   and increase <var title="">pointer</var> by one.
+
+   <li><p>If <var title="">value</var> is greater than 255,
+   <a href="#parse-error">parse error</a>, return failure.
+
+   <li><p>If <var title="">dots seen</var> is less than 3 and
+   <a href="#c">c</a> is not a "<code title="">.</code>",
+   <a href="#parse-error">parse error</a>, return failure.
+
+   <li><p>If <var title="">dots seen</var> is 3 and <a href="#c">c</a> is not
+   the <a href="#eof-code-point">EOF code point</a>,
+   <a href="#parse-error">parse error</a>, return failure.
+
+   <li><p>Set <var title="">piece</var> to
+   <var title="">piece</var> × 0x100 + <var title="">value</var>.
+
+   <li><p>If <var title="">dots seen</var> is 0 or 2, increase
+   <var title="">piece pointer</var> by one.
+
+   <li><p>Increase <var title="">dots seen</var> by one.
+  </ol>
+
+ <li>
+  <p><dfn id="concept-ipv6-parser-finale" title="concept-ipv6-parser-finale">Finale</dfn>:
+  If <var title="">compress pointer</var> is not null, run these substeps:
+
+  <ol>
+   <li><p>Let <var title="">swaps</var> be
+   <var title="">piece pointer</var> − <var title="">compress pointer</var>.
+
+   <li><p>Set <var title="">piece pointer</var> to seven.
+
+   <li><p>While neither <var title="">piece pointer</var> nor
+   <var title="">swaps</var> is zero, swap <var title="">piece</var> with the
+   <a href="#concept-ipv6-piece" title="concept-ipv6-piece">piece</a> at pointer
+   <var title="">compress pointer</var> + <var title="">swaps</var> − 1, and then
+   decrease <var title="">piece pointer</var> and <var title="">swaps</var> by
+   one.
+  </ol>
+
+ <li><p>Otherwise, if <var title="">compress pointer</var> is null and
+ <var title="">piece pointer</var> is not eight, <a href="#parse-error">parse error</a>,
+ return failure.
+
+ <li><p>Return <var title="">address</var>.
+</ol>
+
+
+<h3 id="host-serializing"><span class="secno">4.3 </span>Serializing</h3>
+
+<p>The <dfn id="concept-host-serializer" title="concept-host-serializer">host serializer</dfn> takes a
+<a href="#concept-host" title="concept-host">host</a> <var title="">host</var> and then runs
+these steps:
+
+<ol>
+ <li><p>If <var title="">host</var> is null, return the empty string.
+ <!-- XXX Are we okay with this? -->
+
+ <li><p>If <var title="">host</var> is an
+ <a href="#concept-ipv6" title="concept-ipv6">IPv6 address</a>, return
+ "<code title="">[</code>", followed by the result of running the
+ <a href="#concept-ipv6-serializer" title="concept-ipv6-serializer">IPv6 serializer</a> on <var title="">host</var>,
+ followed by "<code title="">]</code>".
+
+ <li class="XXX"><p>If <var title="">host</var> is a
+ <a href="#concept-domain" title="concept-domain">domain</a> ...
+</ol>
+
+<p>The <dfn id="concept-ipv6-serializer" title="concept-ipv6-serializer">IPv6 serializer</dfn> takes an
+<a href="#concept-ipv6" title="concept-ipv6">IPv6 address</a> <var title="">address</var> and
+then runs these steps:
+
+<ol>
+ <li><p>Let <var title="">output</var> be the empty string.
+
+ <li>
+  <p>Let <var title="">compress pointer</var> be a pointer to the first
+  <a href="#concept-ipv6-piece" title="concept-ipv6-piece">16-bit piece</a> in the first longest
+  sequences of <var title="">address</var>'s
+  <a href="#concept-ipv6-piece" title="concept-ipv6-piece">16-bit pieces</a> that are 0.
+
+  <p class="example">In <code title="">0:f:0:0:f:f:0:0</code> it would point to
+  the second 0.
+
+ <li><p>If there is no sequence of <var title="">address</var>'s
+ <a href="#concept-ipv6-piece" title="concept-ipv6-piece">16-bit pieces</a> that are 0 longer than
+ one, set <var title="">compress pointer</var> to null.
+
+ <li>
+  <p>For each <var title="">piece</var> in <var title="">address</var>'s
+  <a href="#concept-ipv6-piece" title="concept-ipv6-piece">pieces</a>, run these substeps:
+
+  <ol>
+   <li><p>If <var title="">compress pointer</var> points to
+   <var title="">piece</var>, append "<code title="">::</code>" to
+   <var title="">output</var> if <var title="">piece</var> is
+   <var title="">address</var>'s first <a href="#concept-ipv6-piece" title="concept-ipv6-piece">piece</a> and append
+   "<code title="">:</code>" otherwise, and then run these substeps again with all
+   subsequent <a href="#concept-ipv6-piece" title="concept-ipv6-piece">pieces</a> in
+   <var title="">address</var>'s <a href="#concept-ipv6-piece" title="concept-ipv6-piece">pieces</a>
+   that are 0 skipped or go the next step in the overall set of steps if
+   that leaves no <a href="#concept-ipv6-piece" title="concept-ipv6-piece">pieces</a>.
+
+   <li><p>Append <var title="">piece</var>, represented as the shortest
+   possible lowercase hexadecimal number, to <var title="">output</var>.
+
+   <li><p>If <var title="">piece</var> is not
+   <var title="">address</var>'s last <a href="#concept-ipv6-piece" title="concept-ipv6-piece">piece</a>,
+   append "<code title="">:</code>" to <var title="">output</var>.
+  </ol>
+
+ <li><p>Return <var title="">output</var>.
+</ol>
+
+<p class="note">This algorithm requires the recommendation from
+A Recommendation for IPv6 Address Text Representation.
+<a class="informative" href="#refsIPV6TEXT">[IPV6TEXT]</a>
+
+<!-- Safari/Gecko/Opera do not normalize IPv6. Chrome does. This algorithm
+     follows Chrome because we normalize domains too. -->
+
+
+
+<h2 id="urls"><span class="secno">5 </span>URLs</h2>
+
+<!-- History behind URL as term:
+     http://lists.w3.org/Archives/Public/uri/2012Oct/0080.html -->
+
+<p>A <dfn id="concept-url" title="concept-url">URL</dfn> is a string that represents an
+identifier.
+
+<p>A <a href="#concept-url" title="concept-url">URL</a> is either a
+<a href="#concept-relative-url" title="concept-relative-url">relative URL</a> or an
+<a href="#concept-absolute-url" title="concept-absolute-url">absolute URL</a>. Either form can be
+followed by a <a href="#concept-url-fragment" title="concept-url-fragment">fragment</a>.
+
+<p>A <dfn id="concept-relative-url" title="concept-relative-url">relative URL</dfn> is a
+<a href="#concept-url" title="concept-url">URL</a> without a <a href="#concept-url-scheme" title="concept-url-scheme">scheme</a>.
+A <a href="#concept-relative-url" title="concept-relative-url">relative URL</a> must be relative
+to a <a href="#concept-base-url" title="concept-base-url">base URL</a>.
+
+<p>An <dfn id="concept-absolute-url" title="concept-absolute-url">absolute URL</dfn> is a
+<a href="#concept-url" title="concept-url">URL</a> with a <a href="#concept-url-scheme" title="concept-url-scheme">scheme</a>.
+
+<p>A <dfn id="concept-base-url" title="concept-base-url">base URL</dfn> is an
+<a href="#concept-absolute-url" title="concept-absolute-url">absolute URL</a> with a <a href="#relative-scheme">relative scheme</a>.
+
+<p><a href="#concept-url-parser" title="concept-url-parser">Parsing</a> (provided it does not
+return failure) and <a href="#concept-url-serializer" title="concept-url-serializer">serializing</a> a
+<a href="#concept-url" title="concept-url">URL</a> will turn it into an
+<a href="#concept-absolute-url" title="concept-absolute-url">absolute URL</a>. The intermediate form
+is named a <dfn id="concept-parsed-url" title="concept-parsed-url">parsed URL</dfn>. The components a
+<a href="#concept-url" title="concept-url">URL</a> can consist of, and a
+<a href="#concept-parsed-url" title="concept-parsed-url">parsed URL</a> consists of, are
+<dfn id="concept-url-scheme" title="concept-url-scheme">scheme</dfn>,
+<dfn id="concept-url-scheme-data" title="concept-url-scheme-data">scheme data</dfn> (not used if
+<a href="#concept-url-scheme" title="concept-url-scheme">scheme</a> is a <a href="#relative-scheme">relative scheme</a>),
+<dfn id="concept-url-username" title="concept-url-username">username</dfn>,
+<dfn id="concept-url-password" title="concept-url-password">password</dfn>,
+<dfn id="concept-url-host" title="concept-url-host">host</dfn>,
+<dfn id="concept-url-port" title="concept-url-port">port</dfn>,
+<dfn id="concept-url-path" title="concept-url-path">path</dfn>,
+<dfn id="concept-url-query" title="concept-url-query">query</dfn>, and
+<dfn id="concept-url-fragment" title="concept-url-fragment">fragment</dfn>.
+
+<p>A <dfn id="relative-scheme">relative scheme</dfn> is a
+<a href="#concept-url-scheme" title="concept-url-scheme">scheme</a> listed in the first column of
+the following table. A <dfn id="default-port">default port</dfn> is a
+<a href="#relative-scheme">relative scheme</a>'s optional corresponding
+<a href="#concept-url-port" title="concept-url-port">port</a> and is listed in the second column
+on the same row.
+
+<table>
+ <tr><th><a href="#concept-url-scheme" title="concept-url-scheme">scheme</a>
+     <th><a href="#concept-url-port" title="concept-url-port">port</a>
+ <tr><td>"<code title="">ftp</code>"<td>"<code title="">21</code>"
+ <tr><td>"<code title="">file</code>"<td>
+ <tr><td>"<code title="">gopher</code>"<td>"<code title="">70</code>"
+ <tr><td>"<code title="">http</code>"<td>"<code title="">80</code>"
+ <tr><td>"<code title="">https</code>"<td>"<code title="">443</code>"
+ <tr><td>"<code title="">ws</code>"<td>"<code title="">80</code>"
+ <tr><td>"<code title="">wss</code>"<td>"<code title="">443</code>"
+</table>
+
+<!-- The best reason I have for listing "gopher" is Google does it too:
+     https://code.google.com/p/google-url/source/browse/trunk/src/url_canon_stdurl.cc#120
+
+     It seems fine to remain compatible on that front, no need to support it
+     elsewhere though. -->
+
+
+<h3 id="writing"><span class="secno">5.1 </span>Writing</h3>
+
+<!-- http://tantek.com/2011/238/b1/many-ways-slice-url-name-pieces -->
+
+<p>A <a href="#concept-url" title="concept-url">URL</a> must be either a
+<a href="#concept-relative-url" title="concept-relative-url">relative URL</a> or an
+<a href="#concept-absolute-url" title="concept-absolute-url">absolute URL</a>, optionally followed by
+"<code title="">#</code>" and a
+<a href="#concept-url-fragment" title="concept-url-fragment">fragment</a>.
+
+<p>An <a href="#concept-absolute-url" title="concept-absolute-url">absolute URL</a> must be a
+<a href="#concept-url-scheme" title="concept-url-scheme">scheme</a>, followed by
+"<code title="">:</code>", followed by
+<a href="#concept-url-scheme-data" title="concept-url-scheme-data">scheme data</a>, optionally followed
+by "<code title="">?</code>" and a <a href="#concept-url-query" title="concept-url-query">query</a>.
+
+<p>A <a href="#concept-url-scheme" title="concept-url-scheme">scheme</a> must be one
+<a href="#ascii-alpha">ASCII alpha</a>, followed by zero or more of
+<a href="#ascii-alphanumeric">ASCII alphanumeric</a>, "<code title="">+</code>",
+"<code title="">-</code>", and "<code title="">.</code>". A
+<a href="#concept-url-scheme" title="concept-url-scheme">scheme</a> must be registered
+<span class="XXX">...</span>.
+
+<p>The syntax of <a href="#concept-url-scheme-data" title="concept-url-scheme-data">scheme data</a>
+depends on the <a href="#concept-url-scheme" title="concept-url-scheme">scheme</a> and is typically
+defined alongside it. For a <a href="#relative-scheme">relative scheme</a>,
+<a href="#concept-url-scheme-data" title="concept-url-scheme-data">scheme data</a> must be a
+<a href="#concept-scheme-relative-url" title="concept-scheme-relative-url">scheme-relative URL</a>. For
+other <a href="#concept-url-scheme" title="concept-url-scheme">schemes</a>, specifications or
+standards must define <a href="#concept-url-scheme-data" title="concept-url-scheme-data">scheme data</a>
+within the constraints of zero or more <a href="#url-units">URL units</a>.
+
+<p>A <a href="#concept-relative-url" title="concept-relative-url">relative URL</a> must be either a
+<a href="#concept-scheme-relative-url" title="concept-scheme-relative-url">scheme-relative URL</a>, an
+<a href="#concept-absolute-path-relative-url" title="concept-absolute-path-relative-url">absolute-path-relative URL</a>,
+or a <a href="#concept-path-relative-url" title="concept-path-relative-url">path-relative URL</a> that
+does not start with a <a href="#concept-url-scheme" title="concept-url-scheme">scheme</a> and
+"<code title="">:</code>", optionally followed by a "<code title="">?</code>" and
+a <a href="#concept-url-query" title="concept-url-query">query</a>.
+
+<p>A <dfn id="concept-scheme-relative-url" title="concept-scheme-relative-url">scheme-relative URL</dfn> must be
+"<code title="">//</code>", optionally followed by
+<a href="#concept-url-userinfo" title="concept-url-userinfo">userinfo</a> and "<code title="">@</code>",
+followed by a <a href="#concept-host" title="concept-host">host</a>, optionally followed
+by "<code title="">:</code>" and a <a href="#concept-url-port" title="concept-url-port">port</a>,
+optionally followed by an
+<a href="#concept-absolute-path-relative-url" title="concept-absolute-path-relative-url">absolute-path-relative URL</a>.
+
+<p><dfn id="concept-url-userinfo" title="concept-url-userinfo">Userinfo</dfn> must be a
+<a href="#concept-url-username" title="concept-url-username">username</a>, optionally followed by a
+"<code title="">:</code>" and a
+<a href="#concept-url-password" title="concept-url-password">password</a>.
+
+<p>A <a href="#concept-url-username" title="concept-url-username">username</a> must be zero or more
+<a href="#url-units">URL units</a>, excluding "<code title="">/</code>",
+"<code title="">:</code>, "<code title="">?</code>", and "<code title="">@</code>".
+<!-- password without ":" (sorted on ASCII position) -->
+
+<p>A <a href="#concept-url-password" title="concept-url-password">password</a> must be zero or more
+<a href="#url-units">URL units</a>, excluding "<code title="">/</code>",
+"<code title="">?</code>", and "<code title="">@</code>".
+
+<p>A <a href="#concept-url-port" title="concept-url-port">port</a> must be zero or more
+<a href="#ascii-digits">ASCII digits</a>.
+
+<p>An
+<dfn id="concept-absolute-path-relative-url" title="concept-absolute-path-relative-url">absolute-path-relative URL</dfn>
+must be "<code title="">/</code>", followed by a
+<a href="#concept-path-relative-url" title="concept-path-relative-url">path-relative URL</a> that does not
+start with "<code title="">/</code>".
+
+<p>A <dfn id="concept-path-relative-url" title="concept-path-relative-url">path-relative URL</dfn> must be zero or
+more <a href="#path-segment" title="path segment">path segments</a> separated from each
+other by a "<code title="">/</code>".
+
+<p>A <dfn id="path-segment">path segment</dfn> must be zero or more <a href="#url-units">URL units</a>,
+excluding "<code title="">/</code>" and "<code title="">?</code>".
+
+<p>A <a href="#concept-url-query" title="concept-url-query">query</a> must be zero or more
+<a href="#url-units">URL units</a>.
+
+<p>A <a href="#concept-url-fragment" title="concept-url-fragment">fragment</a> must be zero or more
+<a href="#url-units">URL units</a>.
+
+<p>The <dfn id="url-code-points">URL code points</dfn> are <a href="#ascii-alphanumeric">ASCII alphanumeric</a>,
+"<code title="">!</code>",<!-- 0x21, sub-delims -->
+"<code title="">$</code>",<!-- 0x24, sub-delims -->
+"<code title="">&amp;</code>",<!-- 0x26, sub-delims -->
+"<code title="">'</code>",<!-- 0x27, sub-delims -->
+"<code title="">(</code>",<!-- 0x28, sub-delims -->
+"<code title="">)</code>",<!-- 0x29, sub-delims -->
+"<code title="">*</code>",<!-- 0x2A, sub-delims -->
+"<code title="">+</code>",<!-- 0x2B, sub-delims -->
+"<code title="">,</code>",<!-- 0x2C, sub-delims -->
+"<code title="">-</code>",<!-- 0x2D, iunreserved -->
+"<code title="">.</code>",<!-- 0x2E, iunreserved -->
+"<code title="">/</code>",<!-- 0x2F, iquery/ifragment -->
+"<code title="">:</code>",<!-- 0x3A, ipchar -->
+"<code title="">;</code>",<!-- 0x3B, sub-delims -->
+"<code title="">=</code>",<!-- 0x3D, sub-delims -->
+"<code title="">?</code>",<!-- 0x3F, iquery/ifragment -->
+"<code title="">@</code>",<!-- 0x40, ipchar -->
+"<code title="">_</code>",<!-- 0x5F, iunreserved -->
+"<code title="">~</code>",<!-- 0x7E, iunreserved -->
+and code points in the ranges
+U+00A0 to U+D7FF,
+U+E000 to <!--U+F8FF,
+U+F900 to -->U+FDCF,
+U+FDF0 to U+FFEF,
+U+10000 to U+1FFFD,
+U+20000 to U+2FFFD,
+U+30000 to U+3FFFD,
+U+40000 to U+4FFFD,
+U+50000 to U+5FFFD,
+U+60000 to U+6FFFD,
+U+70000 to U+7FFFD,
+U+80000 to U+8FFFD,
+U+90000 to U+9FFFD,
+U+A0000 to U+AFFFD,
+U+B0000 to U+BFFFD,
+U+C0000 to U+CFFFD,
+U+D0000 to U+DFFFD,
+U+E1000 to U+EFFFD,
+U+F0000 to U+FFFFD,
+U+100000 to U+10FFFD.
+<!-- XXX https://www.w3.org/Bugs/Public/show_bug.cgi?id=19743 -->
+
+<p class="note">Code points higher than U+009F will be converted to
+<a href="#percent-encoded-byte" title="percent-encoded byte">percent-encoded bytes</a> by the
+<a href="#concept-url-parser" title="concept-url-parser">URL parser</a>.
+
+<p>The <dfn id="url-units">URL units</dfn> are <a href="#url-code-points">URL code points</a> and
+<a href="#percent-encoded-byte" title="percent-encoded byte">percent-encoded bytes</a>.
+
+
+
+<h3 id="parsing"><span class="secno">5.2 </span>Parsing</h3>
+
+<p>Aside from the components mentioned earlier, a
+<a href="#concept-parsed-url" title="concept-parsed-url">parsed URL</a> also has an associated
+<dfn id="relative-flag">relative flag</dfn>.
+
+<p class="note">The <a href="#relative-flag">relative flag</a> exists as checking if a
+<a href="#concept-parsed-url" title="concept-parsed-url">parsed URL</a>'s
+<a href="#concept-url-scheme" title="concept-url-scheme">scheme</a> is a <a href="#relative-scheme">relative scheme</a> can give
+incorrect results due to the <a href="#dom-url-protocol"><code title="dom-URL-protocol">protocol</code></a> attribute.
+<!-- XXX maybe disallow setting protocol to non-sensical values -->
+
+<p class="XXX">Add the ability to halt on the first conformance error.
+
+<p>The <dfn id="concept-url-parser" title="concept-url-parser">URL parser</dfn> takes a string
+<var title="">input</var>, optionally with a
+<a href="#concept-base-url" title="concept-base-url">base URL</a> <var title="">base</var>,
+optionally with an <a class="external" data-anolis-spec="encoding" href="http://encoding.spec.whatwg.org/#encoding">encoding</a>
+<var title="">encoding override</var>, optionally with an
+<a href="#concept-parsed-url" title="concept-parsed-url">parsed URL</a> <var title="">url</var> and a state override
+<var title="">state override</var>, and then runs these steps:
+
+<p class="note">The <var title="">encoding override</var> argument is a legacy concept only
+relevant for HTML. The <var title="">url</var> and <var title="">state override</var> arguments
+can be used for API manipulation of a <a href="#concept-parsed-url" title="concept-parsed-url">parsed URL</a>.
+<a class="informative" href="#refsHTML">[HTML]</a>
+
+<ol>
+ <li>
+  <p>If <var title="">url</var> is not given:
+
+  <ol>
+   <li><p>Set <var title="">url</var> to a new
+   <a href="#concept-parsed-url" title="concept-parsed-url">parsed URL</a>.
+
+   <li><p>Set <var title="">url</var>'s <a href="#concept-url-scheme" title="concept-url-scheme">scheme</a>,
+   <a href="#concept-url-scheme-data" title="concept-url-scheme-data">scheme data</a>,
+   <a href="#concept-url-username" title="concept-url-username">username</a>, and
+   <a href="#concept-url-port" title="concept-url-port">port</a> to the empty string,
+   <a href="#concept-url-password" title="concept-url-password">password</a>,
+   <a href="#concept-url-host" title="concept-url-host">host</a>,
+   <a href="#concept-url-query" title="concept-url-query">query</a>, and
+   <a href="#concept-url-fragment" title="concept-url-fragment">fragment</a> to null,
+   <a href="#concept-url-path" title="concept-url-path">path</a> to the empty list, and unset its
+   <a href="#relative-flag">relative flag</a>.
+
+   <li><p>Remove any leading and trailing
+   <a class="external" data-anolis-spec="encoding" href="http://encoding.spec.whatwg.org/#ascii-whitespace">ASCII whitespace</a> from
+   <var title="">input</var>.
+  </ol>
+
+ <li><p>Let <var title="">state</var> be <var title="">state override</var>
+ if given, or <a href="#scheme-start-state">scheme start state</a> otherwise.
+
+ <li><p>If <var title="">base</var> is not given, set it to null.
+
+ <li><p>If <var title="">encoding override</var> is not given, set it to
+ <a class="external" data-anolis-spec="encoding" href="http://encoding.spec.whatwg.org/#utf-8">utf-8</a>.
+
+ <li><p>Let <var title="">buffer</var> be the empty string.
+
+ <li><p>Let the <var title="">@ flag</var> and the <var title="">[] flag</var> be
+ unset.
+
+ <li><p>Let <var title="">pointer</var> be a pointer to first code point in
+ <var title="">input</var>.
+
+ <li>
+  <p>Keep running the following state machine by switching on
+  <var title="">state</var>, increasing <var title="">pointer</var> by one after
+  each time it is run, as long as <var title="">pointer</var> does not point
+  past the end of <var title="">input</var>.
+
+  <dl class="switch">
+   <dt><dfn id="scheme-start-state">scheme start state</dfn>
+   <dd>
+    <ol>
+     <li><p>If <a href="#c">c</a> is an <a href="#ascii-alpha">ASCII alpha</a>,
+     append <a href="#c">c</a>, lowercased, to <var title="">buffer</var>, and
+     set <var title="">state</var> to <a href="#scheme-state">scheme state</a>.
+
+     <li><p>Otherwise, if <var title="">state override</var> is not given, set
+     <var title="">state</var> to <a href="#no-scheme-state">no scheme state</a>, and decrease
+     <var title="">pointer</var> by one.
+
+     <li><p>Otherwise, <a href="#parse-error">parse error</a>, terminate this algorithm.
+    </ol>
+
+   <dt><dfn id="scheme-state">scheme state</dfn>
+   <dd>
+    <ol>
+     <li><p>If <a href="#c">c</a> is an <a href="#ascii-alphanumeric">ASCII alphanumeric</a>,
+     "<code title="">+</code>", "<code title="">-</code>", or
+     "<code title="">.</code>", append <a href="#c">c</a>, lowercased, to
+     <var title="">buffer</var>.
+
+     <li>
+      <p>Otherwise, if <a href="#c">c</a> is "<code title="">:</code>", set
+      <var title="">url</var>'s <a href="#concept-url-scheme" title="concept-url-scheme">scheme</a> to
+      <var title="">buffer</var>, <var title="">buffer</var> to the empty string,
+      and then run these substeps:
+
+      <ol>
+       <li><p>If <var title="">state override</var> is given,
+       terminate this algorithm.
+
+       <li><p>If <var title="">url</var>'s
+       <a href="#concept-url-scheme" title="concept-url-scheme">scheme</a> is
+       a <a href="#relative-scheme">relative scheme</a>, set <var title="">url</var>'s
+       <a href="#relative-flag">relative flag</a>.
+
+       <li><p>If <var title="">url</var>'s
+       <a href="#concept-url-scheme" title="concept-url-scheme">scheme</a> is
+       "<code title="">file</code>", set <var title="">state</var> to
+       <a href="#relative-state">relative state</a>.
+
+       <li><p>Otherwise, if <var title="">url</var>'s
+       <a href="#relative-flag">relative flag</a> is set, <var title="">base</var> is not null
+       and <var title="">base</var>'s
+       <a href="#concept-url-scheme" title="concept-url-scheme">scheme</a> is equal to
+       <var title="">url</var>'s <a href="#concept-url-scheme" title="concept-url-scheme">scheme</a>,
+       set <var title="">state</var> to
+       <a href="#relative-or-authority-state">relative or authority state</a>.
+
+       <li><p>Otherwise, if <var title="">url</var>'s
+       <a href="#relative-flag">relative flag</a> is set, set <var title="">state</var> to
+       <a href="#authority-first-slash-state">authority first slash state</a>.
+
+       <li><p>Otherwise, set <var title="">state</var> to
+       <a href="#scheme-data-state">scheme data state</a>.
+      </ol>
+
+     <li><p>Otherwise, if <var title="">state override</var> is not given, set
+     <var title="">buffer</var> to the empty string, <var title="">state</var> to
+     <a href="#no-scheme-state">no scheme state</a>, and start over (from the first code point
+     in <var title="">input</var>).
+
+     <li><p>Otherwise, if <a href="#c">c</a> is the
+     <a href="#eof-code-point">EOF code point</a>, terminate this algorithm.
+     <!-- account for URL.protocol = "test" -->
+
+     <li><p>Otherwise, <a href="#parse-error">parse error</a>, terminate this algorithm.
+    </ol>
+
+   <dt><dfn id="scheme-data-state">scheme data state</dfn>
+   <dd>
+    <ol>
+     <li><p>If <a href="#c">c</a> is "<code title="">?</code>", set
+     <var title="">url</var>'s <a href="#concept-url-query" title="concept-url-query">query</a>
+     to the empty string and <var title="">state</var> to
+     <a href="#query-state">query state</a>.
+
+     <li><p>Otherwise, if <a href="#c">c</a> is "<code title="">#</code>", set
+     <var title="">url</var>'s <a href="#concept-url-fragment" title="concept-url-fragment">fragment</a>
+     to the empty string and <var title="">state</var> to
+     <a href="#fragment-state">fragment state</a>.
+
+     <li>
+      <p>Otherwise, run these substeps:
+
+      <ol>
+       <li><p>If <a href="#c">c</a> is not the <a href="#eof-code-point">EOF code point</a>, not a
+       <a href="#url-code-points" title="URL code points">URL code point</a>, and not
+       "<code title="">%</code>", <a href="#parse-error">parse error</a>.
+
+       <li><p>If <a href="#c">c</a> is "<code title="">%</code>" and <a href="#remaining">remaining</a> does
+       not start with two <a href="#ascii-hex-digits">ASCII hex digits</a>, <a href="#parse-error">parse error</a>.
+
+       <li><p>If <a href="#c">c</a> is none of
+       <a href="#eof-code-point">EOF code point</a>, U+0009, U+000A, and U+000D,
+       <a href="#utf-8-percent-encode">utf-8 percent encode</a> <a href="#c">c</a> using the
+       <a href="#simple-encode-set">simple encode set</a>, and append the result to
+       <var title="">url</var>'s
+       <a href="#concept-url-scheme-data" title="concept-url-scheme-data">scheme data</a>.
+      </ol>
+    </ol>
+
+   <dt><dfn id="no-scheme-state">no scheme state</dfn>
+   <dd>
+    <p>If <var title="">base</var> is null, or <var title="">base</var>'s
+    <a href="#concept-url-scheme" title="concept-url-scheme">scheme</a> is not a
+    <a href="#relative-scheme">relative scheme</a>, <a href="#parse-error">parse error</a>, return failure.
+
+    <p class="note">Due to the <a href="#dom-url-protocol"><code title="dom-URL-protocol">protocol</code></a> attribute's
+    ability to change <var title="">base</var>'s
+    <a href="#concept-url-scheme" title="concept-url-scheme">scheme</a>, <var title="">base</var>'s
+    <a href="#relative-flag">relative flag</a> is not used here.
+
+    <p>Otherwise, set <var title="">state</var> to <a href="#relative-state">relative state</a>,
+    and decrease <var title="">pointer</var> by one.
+
+   <dt><dfn id="relative-or-authority-state">relative or authority state</dfn>
+   <dd>
+    <p>If <a href="#c">c</a> is "<code>/</code>" and
+    <a href="#remaining">remaining</a> starts with "<code>/</code>", set
+    <var title="">state</var> to <a href="#authority-ignore-slashes-state">authority ignore slashes state</a>
+    and increase <var title="">pointer</var> by one.
+
+    <p>Otherwise, <a href="#parse-error">parse error</a>, set <var title="">state</var> to
+    <a href="#relative-state">relative state</a> and decrease <var title="">pointer</var> by
+    one.
+
+   <dt><dfn id="relative-state">relative state</dfn>
+   <dd>
+    <p>Set <var title="">url</var>'s <a href="#relative-flag">relative flag</a>, set
+    <var title="">url</var>'s <a href="#concept-url-scheme" title="concept-url-scheme">scheme</a> to
+    <var title="">base</var>'s <a href="#concept-url-scheme" title="concept-url-scheme">scheme</a> if
+    <var title="">url</var>'s <a href="#concept-url-scheme" title="concept-url-scheme">scheme</a> is not
+    "<code title="">file</code>", and then, based on <a href="#c">c</a>:
+
+    <dl class="switch">
+     <dt><a href="#eof-code-point">EOF code point</a>
+     <dd>
+      <p>Set <var title="">url</var>'s <a href="#concept-url-host" title="concept-url-host">host</a>
+      to <var title="">base</var>'s <a href="#concept-url-host" title="concept-url-host">host</a>,
+      <var title="">url</var>'s <a href="#concept-url-port" title="concept-url-port">port</a> to
+      <var title="">base</var>'s <a href="#concept-url-port" title="concept-url-port">port</a>,
+      <var title="">url</var>'s <a href="#concept-url-path" title="concept-url-path">path</a> to
+      <var title="">base</var>'s <a href="#concept-url-path" title="concept-url-path">path</a>, and
+      <var title="">url</var>'s <a href="#concept-url-query" title="concept-url-query">query</a> to
+      <var title="">base</var>'s <a href="#concept-url-query" title="concept-url-query">query</a>.
+
+     <dt>"<code title="">/</code>"
+     <dt>"<code title="">\</code>"
+     <dd>
+      <ol>
+       <li><p>If <a href="#c">c</a> is "<code title="">\</code>",
+       <a href="#parse-error">parse error</a>.
+       <li><p>Set <var title="">state</var> to
+       <a href="#relative-slash-state">relative slash state</a>.
+      </ol>
+
+     <dt>"<code title="">?</code>"
+     <dd><p>Set
+     <var title="">url</var>'s <a href="#concept-url-host" title="concept-url-host">host</a> to
+     <var title="">base</var>'s <a href="#concept-url-host" title="concept-url-host">host</a>,
+     <var title="">url</var>'s <a href="#concept-url-port" title="concept-url-port">port</a> to
+     <var title="">base</var>'s <a href="#concept-url-port" title="concept-url-port">port</a>,
+     <var title="">url</var>'s <a href="#concept-url-path" title="concept-url-path">path</a> to
+     <var title="">base</var>'s <a href="#concept-url-path" title="concept-url-path">path</a>,
+     <var title="">url</var>'s <a href="#concept-url-query" title="concept-url-query">query</a> to the empty string,
+     and <var title="">state</var> to <a href="#query-state">query state</a>.
+
+     <dt>"<code title="">#</code>"
+     <dd><p>Set
+     <var title="">url</var>'s <a href="#concept-url-host" title="concept-url-host">host</a> to
+     <var title="">base</var>'s <a href="#concept-url-host" title="concept-url-host">host</a>,
+     <var title="">url</var>'s <a href="#concept-url-port" title="concept-url-port">port</a> to
+     <var title="">base</var>'s <a href="#concept-url-port" title="concept-url-port">port</a>,
+     <var title="">url</var>'s <a href="#concept-url-path" title="concept-url-path">path</a> to
+     <var title="">base</var>'s <a href="#concept-url-path" title="concept-url-path">path</a>,
+     <var title="">url</var>'s <a href="#concept-url-query" title="concept-url-query">query</a> to
+     <var title="">base</var>'s <a href="#concept-url-query" title="concept-url-query">query</a>,
+     <var title="">url</var>'s <a href="#concept-url-fragment" title="concept-url-fragment">fragment</a> to the empty string,
+     and <var title="">state</var> to <a href="#fragment-state">fragment state</a>.
+
+     <dt>Otherwise
+     <dd>
+      <ol>
+       <li>
+        <p>If <var title="">url</var>'s <a href="#concept-url-scheme" title="concept-url-scheme">scheme</a> is not
+        "<code title="">file</code>", or <var title="">c</var> is not an
+        <a href="#ascii-alpha">ASCII alpha</a>, or <a href="#remaining">remaining</a> does not start with either
+        "<code title="">:</code>" or "<code title="">|</code>", or <a href="#remaining">remaining</a> does
+        not consist of one code point, or <a href="#remaining">remaining</a>'s second code point is
+        not one of "<code title="">/</code>", "<code title="">\</code>", "<code title="">?</code>",
+        and "<code title="">#</code>", then set
+        <var title="">url</var>'s <a href="#concept-url-host" title="concept-url-host">host</a> to
+        <var title="">base</var>'s <a href="#concept-url-host" title="concept-url-host">host</a>,
+        <var title="">url</var>'s <a href="#concept-url-port" title="concept-url-port">port</a> to
+        <var title="">base</var>'s <a href="#concept-url-port" title="concept-url-port">port</a>,
+        <var title="">url</var>'s <a href="#concept-url-path" title="concept-url-path">path</a> to
+        <var title="">base</var>'s <a href="#concept-url-path" title="concept-url-path">path</a>, and then pop
+        <var title="">url</var>'s <a href="#concept-url-path" title="concept-url-path">path</a>.
+        <!-- base's path cannot be empty so pop does not need a non-empty check -->
+
+        <p class="note">This is a (platform-independent) Windows drive letter quirk.
+        When found at the start of a <code title="">file</code> URL it is treated as an
+        absolute path rather than one relative to
+        <var title="">base</var>'s <a href="#concept-url-path" title="concept-url-path">path</a>.
+
+       <li><p>Set <var title="">state</var> to <a href="#relative-path-state">relative path state</a>,
+       and decrease <var title="">pointer</var> by one.
+      </ol>
+    </dl>
+
+   <dt><dfn id="relative-slash-state">relative slash state</dfn>
+   <dd>
+    <p>If <a href="#c">c</a> is either "<code title="">/</code>" or
+    "<code title="">\</code>", run these steps:
+
+    <ol>
+     <li><p>If <a href="#c">c</a> is "<code title="">\</code>",
+     <a href="#parse-error">parse error</a>.
+
+     <li><p>If <var title="">url</var>'s
+     <a href="#concept-url-scheme" title="concept-url-scheme">scheme</a> is
+     "<code title="">file</code>", set <var title="">state</var> to
+     <a href="#file-host-state">file host state</a>.
+
+     <li><p>Otherwise, set <var title="">state</var> to
+     <a href="#authority-ignore-slashes-state">authority ignore slashes state</a>.
+    </ol>
+
+    <p>Otherwise, run these steps:
+
+    <ol>
+     <li>
+      <p>If <var title="">url</var>'s <a href="#concept-url-scheme" title="concept-url-scheme">scheme</a> is not
+      "<code title="">file</code>", set
+      <var title="">url</var>'s <a href="#concept-url-host" title="concept-url-host">host</a> to
+      <var title="">base</var>'s <a href="#concept-url-host" title="concept-url-host">host</a> and
+      <var title="">url</var>'s <a href="#concept-url-port" title="concept-url-port">port</a> to
+      <var title="">base</var>'s <a href="#concept-url-port" title="concept-url-port">port</a>.
+
+      <pre class="example">file:/example.org/</pre>
+
+     <li><p>Set <var title="">state</var> to <a href="#relative-path-state">relative path state</a>,
+     and decrease <var title="">pointer</var> by one.
+    </ol>
+
+   <dt><dfn id="authority-first-slash-state">authority first slash state</dfn>
+   <dd>
+    <p>If <a href="#c">c</a> is "<code title="">/</code>", set
+    <var title="">state</var> to <a href="#authority-second-slash-state">authority second slash state</a>.
+
+    <p>Otherwise, <a href="#parse-error">parse error</a>, set <var title="">state</var> to
+    <a href="#authority-ignore-slashes-state">authority ignore slashes state</a>, and decrease
+    <var title="">pointer</var> by one.
+
+   <dt><dfn id="authority-second-slash-state">authority second slash state</dfn>
+   <dd>
+    <p>If <a href="#c">c</a> is "<code title="">/</code>", set
+    <var title="">state</var> to <a href="#authority-ignore-slashes-state">authority ignore slashes state</a>.
+
+    <p>Otherwise, <a href="#parse-error">parse error</a>, set <var title="">state</var> to
+    <a href="#authority-ignore-slashes-state">authority ignore slashes state</a>, and decrease
+    <var title="">pointer</var> by one.
+
+   <dt><dfn id="authority-ignore-slashes-state">authority ignore slashes state</dfn>
+   <dd>
+    <p>If <a href="#c">c</a> is neither "<code title="">/</code>" nor
+    "<code title="">\</code>", set <var title="">state</var> to
+    <a href="#authority-state">authority state</a>, and decrease <var title="">pointer</var> by one.
+
+    <p>Otherwise, <a href="#parse-error">parse error</a>.
+
+   <dt><dfn id="authority-state">authority state</dfn>
+   <dd>
+    <ol>
+     <li>
+      <p>If <a href="#c">c</a> is "<code title="">@</code>", run these substeps:
+
+      <ol>
+       <li><p>If the <var title="">@ flag</var> is set,
+       <a href="#parse-error">parse error</a>, prepend "<code title="">%40</code>" to
+       <var title="">buffer</var>.
+
+       <li><p>Set the <var title="">@ flag</var>.
+
+       <li>
+        <p>For each <var title="">code point</var> in <var title="">buffer</var>, run these substeps:
+
+        <ol>
+         <li><p>If <var title="">code point</var> is U+0009, U+000A, or U+000D,
+         <a href="#parse-error">parse error</a>, continue.
+
+         <li><p>If <var title="">code point</var> is not a
+         <a href="#url-code-points" title="URL code points">URL code point</a> and not
+         "<code title="">%</code>", <a href="#parse-error">parse error</a>.
+
+         <li><p>If <var title="">code point</var> is "<code title="">%</code>" and
+         <a href="#remaining">remaining</a> does not start with two
+         <a href="#ascii-hex-digits">ASCII hex digits</a>, <a href="#parse-error">parse error</a>.
+
+         <li><p>If <var title="">code point</var> is "<code title="">:</code>" and
+         <var title="">url</var>'s
+         <a href="#concept-url-password" title="concept-url-password">password</a> is null, set
+         <var title="">url</var>'s <a href="#concept-url-password" title="concept-url-password">password</a>
+         to the empty string and continue.
+
+         <li><p><a href="#utf-8-percent-encode">utf-8 percent encode</a> <var title="">code point</var> using
+         the <a href="#default-encode-set">default encode set</a> and append the result to
+         <var title="">url</var>'s <a href="#concept-url-password" title="concept-url-password">password</a>
+         if <var title="">url</var>'s <a href="#concept-url-password" title="concept-url-password">password</a>
+         is non-null, and to
+         <var title="">url</var>'s <a href="#concept-url-username" title="concept-url-username">username</a>
+         otherwise.
+        </ol>
+       <li><p>Set <var title="">buffer</var> to the empty string.
+      </ol>
+
+     <li><p>Otherwise, if <a href="#c">c</a> is one of <a href="#eof-code-point">EOF code point</a>,
+     "<code title="">/</code>", "<code title="">\</code>", "<code title="">?</code>",
+     and "<code title="">#</code>", decrease <var title="">pointer</var> by the
+     number of code points in <var title="">buffer</var> plus one, set
+     <var title="">buffer</var> to the empty string, and
+     <var title="">state</var> to <a href="#host-state">host state</a>.
+
+     <li><p>Otherwise, append <a href="#c">c</a> to <var title="">buffer</var>.
+    </ol>
+
+   <dt><dfn id="file-host-state">file host state</dfn>
+   <dd>
+    <ol>
+     <li>
+      <p>If <a href="#c">c</a> is one of <a href="#eof-code-point">EOF code point</a>,
+      "<code title="">/</code>", "<code title="">\</code>", "<code title="">?</code>",
+      and "<code title="">#</code>", decrease <var title="">pointer</var> by one,
+      and run these substeps:
+
+      <ol>
+       <li>
+        <p>If <var title="">buffer</var> consists of two code points, of
+        which the first is an <a href="#ascii-alpha">ASCII alpha</a> and the second is
+        either "<code title="">:</code>" or "<code title="">|</code>", set
+        <var title="">state</var> to <a href="#relative-path-state">relative path state</a>.
+
+        <p class="note">This is a (platform-independent) Windows drive letter quirk.
+        <var title="">buffer</var> is not reset here and instead used in the
+        <a href="#relative-path-state">relative path state</a>.
+
+       <li><p>Otherwise, if <var title="">buffer</var> is the empty string, set
+       <var title="">state</var> to <a href="#relative-path-start-state">relative path start state</a>.
+
+       <li>
+        <p>Otherwise, run these steps:
+
+        <ol>
+         <li><p>Let <var title="">host</var> be the result of
+         <a href="#concept-host-parser" title="concept-host-parser">host parsing</a>
+         <var title="">buffer</var>.
+
+         <li><p>If <var title="">host</var> is failure, return failure.
+
+         <li><p>Set
+         <var title="">url</var>'s <a href="#concept-url-host" title="concept-url-host">host</a> to
+         <var title="">host</var>, <var title="">buffer</var> to the empty string,
+         and <var title="">state</var> to <a href="#relative-path-start-state">relative path start state</a>.
+        </ol>
+      </ol>
+
+     <li><p>Otherwise, if <a href="#c">c</a> is U+0009, U+000A, or U+000D,
+     <a href="#parse-error">parse error</a>.
+
+     <li><p>Otherwise, append <a href="#c">c</a> to <var title="">buffer</var>.
+    </ol>
+
+   <dt><dfn id="host-state">host state</dfn>
+   <dt><dfn id="hostname-state">hostname state</dfn>
+   <dd>
+    <ol>
+     <li>
+      <p>If <a href="#c">c</a> is "<code title="">:</code>" and the
+      <var title="">[] flag</var> is unset, run these substeps:
+
+      <ol>
+       <li><p>Let <var title="">host</var> be the result of
+       <a href="#concept-host-parser" title="concept-host-parser">host parsing</a>
+       <var title="">buffer</var>.
+
+       <li><p>If <var title="">host</var> is failure, return failure.
+
+       <li><p>Set <var title="">url</var>'s <a href="#concept-url-host" title="concept-url-host">host</a> to
+       <var title="">host</var>, <var title="">buffer</var> to the empty string,
+       and <var title="">state</var> to <a href="#port-state">port state</a>.
+
+       <li><p>If <var title="">state override</var> is <a href="#hostname-state">hostname state</a>,
+       terminate this algorithm.
+      </ol>
+
+     <li>
+      <p>Otherwise, if <a href="#c">c</a> is the
+      <a href="#eof-code-point">EOF code point</a>, "<code title="">/</code>",
+      "<code title="">\</code>", "<code title="">?</code>", or
+      "<code title="">#</code>", decrease <var title="">pointer</var> by one, and
+      run these substeps:
+
+      <ol>
+       <li><p>Let <var title="">host</var> be the result of
+       <a href="#concept-host-parser" title="concept-host-parser">host parsing</a>
+       <var title="">buffer</var>.
+
+       <li><p>If <var title="">host</var> is failure, return failure.
+
+       <li><p>Set <var title="">url</var>'s <a href="#concept-url-host" title="concept-url-host">host</a> to
+       <var title="">host</var>, <var title="">buffer</var> to the empty string,
+       and <var title="">state</var> to <a href="#relative-path-start-state">relative path start state</a>.
+
+       <li><p>If <var title="">state override</var> is given, terminate this
+       algorithm.
+      </ol>
+
+     <li><p>Otherwise, if <a href="#c">c</a> is U+0009, U+000A, or U+000D,
+     <a href="#parse-error">parse error</a>.
+
+     <li>
+      <p>Otherwise, run these substeps:
+
+      <ol>
+       <li><p>If <a href="#c">c</a> is "<code title="">[</code>", set the
+       <var title="">[] flag</var>.
+
+       <li><p>If <a href="#c">c</a> is "<code title="">]</code>", unset the
+       <var title="">[] flag</var>.
+
+       <li><p>Append <a href="#c">c</a> to <var title="">buffer</var>.
+      </ol>
+    </ol>
+
+   <dt><dfn id="port-state">port state</dfn>
+   <dd>
+    <ol>
+     <li><p>If <a href="#c">c</a> is an <a href="#ascii-digits" title="ASCII digits">ASCII digit</a>,
+     append <a href="#c">c</a> to <var title="">buffer</var>.
+
+     <li>
+      <p>Otherwise, if <a href="#c">c</a> is one of
+      <a href="#eof-code-point">EOF code point</a>, "<code title="">/</code>",
+      "<code title="">\</code>", "<code title="">?</code>", and
+      "<code title="">#</code>", or <var title="">state override</var> is given, run
+      these substeps:
+      <ol>
+       <li>
+        <p>Remove leading U+0030 code points from <var title="">buffer</var>
+        until either the leading code point is not U+0030 or
+        <var title="">buffer</var> is one code point.
+
+        <div class="example"><!-- putting class=example on table has side effects -->
+        <table>
+         <tr><th>Input<th>Output
+         <tr><td>"<code title="">42</code>"<td>"<code title="">42</code>"
+         <tr><td>"<code title="">031</code>"<td>"<code title="">31</code>"
+         <tr><td>"<code title="">080</code>"<td>"<code title="">80</code>"
+         <tr><td>"<code title="">0000</code>"<td>"<code title="">0</code>"
+        </table>
+        </div>
+
+       <li><p>If <var title="">buffer</var> is equal to
+       <var title="">url</var>'s <a href="#concept-url-scheme" title="concept-url-scheme">scheme</a>'s
+       <a href="#default-port">default port</a>, set <var title="">buffer</var> to the empty
+       string.
+
+       <li><p>Set <var title="">url</var>'s
+       <a href="#concept-url-port" title="concept-url-port">port</a> to <var title="">buffer</var>.
+
+       <li><p>If <var title="">state override</var> is given, terminate this
+       algorithm.
+
+       <li><p>Set <var title="">buffer</var> to the empty string,
+       <var title="">state</var> to <a href="#relative-path-start-state">relative path start state</a>, and
+       decrease <var title="">pointer</var> by one.
+      </ol>
+
+     <li><p>Otherwise, if <a href="#c">c</a> is U+0009, U+000A, or U+000D,
+     <a href="#parse-error">parse error</a>.
+
+     <li><p>Otherwise, <a href="#parse-error">parse error</a>, return failure.
+    </ol>
+
+   <dt><dfn id="relative-path-start-state">relative path start state</dfn>
+   <dd>
+    <ol>
+     <li><p>If <a href="#c">c</a> is "<code title="">\</code>",
+     <a href="#parse-error">parse error</a>.
+
+     <li><p>Set <var title="">state</var> to <a href="#relative-path-state">relative path state</a>
+     and if <a href="#c">c</a> is neither "<code title="">/</code>" nor
+     "<code title="">\</code>", decrease <var title="">pointer</var> by one.
+    </ol>
+
+   <dt><dfn id="relative-path-state">relative path state</dfn>
+   <dd>
+    <ol>
+     <li>
+      <p>If either <a href="#c">c</a> is one of
+      <a href="#eof-code-point">EOF code point</a>, "<code title="">/</code>", and
+      "<code title="">\</code>", or <var title="">state override</var> is not given and
+      <a href="#c">c</a> is one of "<code title="">?</code>" and
+      "<code title="">#</code>", run these substeps:
+      <ol>
+       <li><p>If <a href="#c">c</a> is "<code title="">\</code>", <a href="#parse-error">parse error</a>.
+
+       <li>
+        <p>If <var title="">buffer</var>, lowercased, matches any row in the first column of
+        the following table, set <var title="">buffer</var> to the contents of the cell in
+        the second column of the matched row:
+
+        <table>
+         <tr><td>"<code title="">%2e</code>"   <td>"<code title="">.</code>"
+         <tr><td>"<code title="">.%2e</code>"  <td rowspan="3">"<code title="">..</code>"
+         <tr><td>"<code title="">%2e.</code>"
+         <tr><td>"<code title="">%2e%2e</code>"
+        </table>
+
+       <li><p>If <var title="">buffer</var> is "<code title="">..</code>", pop
+       <var title="">url</var>'s <a href="#concept-url-path" title="concept-url-path">path</a>, if non-empty, and
+       then if <a href="#c">c</a> is neither  "<code title="">/</code>" nor
+       "<code title="">\</code>", append the empty string to <var title="">url</var>'s
+       <a href="#concept-url-path" title="concept-url-path">path</a>.
+
+       <li><p>Otherwise, if <var title="">buffer</var> is "<code title="">.</code>" and
+       <a href="#c">c</a> is neither "<code title="">/</code>" nor "<code title="">\</code>",
+       append an empty string to
+       <var title="">url</var>'s <a href="#concept-url-path" title="concept-url-path">path</a>.
+
+       <li>
+        <p>Otherwise, if <var title="">buffer</var> is not
+        "<code title="">.</code>", run these subsubsteps:
+
+        <ol>
+         <li>
+          <p>If <var title="">url</var>'s <a href="#concept-url-scheme" title="concept-url-scheme">scheme</a> is
+          "<code title="">file</code>", <var title="">url</var>'s <a href="#concept-url-path" title="concept-url-path">path</a>
+          is the empty list, <var title="">buffer</var> consists of two
+          code points, of which the first is an <a href="#ascii-alpha">ASCII alpha</a>,
+          and the second is "<code title="">|</code>", replace the second code point in
+          <var title="">buffer</var> with "<code title="">:</code>".
+
+          <p class="note">This is a (platform-independent) Windows drive letter quirk.
+          They are beautiful, no?
+
+         <li><p>Append <var title="">buffer</var> to
+         <var title="">url</var>'s <a href="#concept-url-path" title="concept-url-path">path</a>.
+        </ol>
+
+       <li><p>Set <var title="">buffer</var> to the empty string.
+
+       <li><p>If <a href="#c">c</a> is "<code title="">?</code>", set
+       <var title="">url</var>'s <a href="#concept-url-query" title="concept-url-query">query</a> to the empty string,
+       and <var title="">state</var> to <a href="#query-state">query state</a>.
+
+       <li><p>If <a href="#c">c</a> is "<code title="">#</code>", set
+       <var title="">url</var>'s <a href="#concept-url-fragment" title="concept-url-fragment">fragment</a> to the empty string,
+       and <var title="">state</var> to <a href="#fragment-state">fragment state</a>.
+      </ol>
+
+     <li><p>Otherwise, if <a href="#c">c</a> is U+0009, U+000A, or U+000D,
+     <a href="#parse-error">parse error</a>.
+
+     <li>
+      <p>Otherwise, run these steps:
+
+      <ol>
+       <li><p>If <a href="#c">c</a> is not a
+       <a href="#url-code-points" title="URL code points">URL code point</a> and not "<code title="">%</code>",
+       <a href="#parse-error">parse error</a>.
+
+       <li><p>If <a href="#c">c</a> is "<code title="">%</code>" and <a href="#remaining">remaining</a> does
+       not start with two <a href="#ascii-hex-digits">ASCII hex digits</a>, <a href="#parse-error">parse error</a>.
+
+       <li><p><a href="#utf-8-percent-encode">utf-8 percent encode</a> <a href="#c">c</a> using the
+       <a href="#default-encode-set">default encode set</a>, and append the result to
+       <var title="">buffer</var>.
+      </ol>
+    </ol>
+
+   <dt><dfn id="query-state">query state</dfn>
+   <dd>
+    <ol>
+     <li>
+      <p>If <a href="#c">c</a> is the <a href="#eof-code-point">EOF code point</a> or
+      <var title="">state override</var> is not given and <a href="#c">c</a>
+      is "<code title="">#</code>", run these substeps:
+
+      <ol>
+       <li><p>If <var title="">url</var>'s <a href="#relative-flag">relative flag</a> is set,
+       set <var title="">encoding override</var> to
+       <a class="external" data-anolis-spec="encoding" href="http://encoding.spec.whatwg.org/#utf-8">utf-8</a>.
+       <!-- http://simon.html5.org/test/url/url-encoding.html -->
+
+       <li><p>Set <var title="">buffer</var> to the result of running
+       <var title="">encoding override</var>'s
+       <a class="external" data-anolis-spec="encoding" href="http://encoding.spec.whatwg.org/#encoder">encoder</a> on
+       <var title="">buffer</var>. Whenever the
+       <a class="external" data-anolis-spec="encoding" href="http://encoding.spec.whatwg.org/#encoder">encoder</a> algorithm emits an
+       <a class="external" data-anolis-spec="encoding" href="http://encoding.spec.whatwg.org/#encoder-error">encoder error</a>, emit a 0x3F
+       byte instead and do not terminate the algorithm.
+
+       <li>
+        <p>For each <var title="">byte</var> in <var title="">buffer</var> run
+        these subsubsteps:
+
+        <ol>
+         <li><p>If <var title="">byte</var> is less than 0x21, greater than
+         0x7E, or is one of 0x22, 0x23, 0x3C, 0x3E, and 0x60, append
+         <var title="">byte</var>,
+         <a href="#percent-encode" title="percent encode">percent encoded</a>, to
+         <var title="">url</var>'s <a href="#concept-url-query" title="concept-url-query">query</a>.
+
+         <li><p>Otherwise, append a code point whose value is
+         <var title="">byte</var> to <var title="">url</var>'s
+         <a href="#concept-url-query" title="concept-url-query">query</a>.
+        </ol>
+
+       <li><p>Set <var title="">buffer</var> to the empty string.
+
+       <li><p>If <a href="#c">c</a> is "<code title="">#</code>", set
+       <var title="">url</var>'s
+       <a href="#concept-url-fragment" title="concept-url-fragment">fragment</a> to the empty string,
+       and state to <a href="#fragment-state">fragment state</a>.
+      </ol>
+
+     <li><p>Otherwise, if <a href="#c">c</a> is U+0009, U+000A, or U+000D,
+     <a href="#parse-error">parse error</a>.
+
+     <li>
+      <p>Otherwise, run these substeps:
+
+      <ol>
+       <li><p>If <a href="#c">c</a> is not a
+       <a href="#url-code-points" title="URL code points">URL code point</a> and not "<code title="">%</code>",
+       <a href="#parse-error">parse error</a>.
+
+       <li><p>If <a href="#c">c</a> is "<code title="">%</code>" and <a href="#remaining">remaining</a> does
+       not start with two <a href="#ascii-hex-digits">ASCII hex digits</a>, <a href="#parse-error">parse error</a>.
+
+       <li><p>Append <a href="#c">c</a> to <var title="">buffer</var>.
+      </ol>
+    </ol>
+
+   <dt><dfn id="fragment-state">fragment state</dfn>
+   <dd>
+    <p>Based on <a href="#c">c</a>:
+    <dl class="switch">
+     <dt><a href="#eof-code-point">EOF code point</a>
+     <dd><p>Do nothing.
+
+     <dt>U+0009
+     <dt>U+000A
+     <dt>U+000D
+     <dd><p><a href="#parse-error">Parse error</a>.
+
+     <dt>Otherwise
+     <dd>
+      <ol>
+       <li><p>If <a href="#c">c</a> is not a
+       <a href="#url-code-points" title="URL code points">URL code point</a> and not
+       "<code title="">%</code>", <a href="#parse-error">parse error</a>.
+
+       <li><p>If <a href="#c">c</a> is "<code title="">%</code>" and <a href="#remaining">remaining</a> does
+       not start with two <a href="#ascii-hex-digits">ASCII hex digits</a>, <a href="#parse-error">parse error</a>.
+
+       <li><p><a href="#utf-8-percent-encode">utf-8 percent encode</a> <a href="#c">c</a>
+       using the <a href="#simple-encode-set">simple encode set</a>, and append the result to
+       <var title="">url</var>'s <a href="#concept-url-fragment" title="concept-url-fragment">fragment</a>.
+       <!-- if people complain about percent encoding do not forget that
+            results may differ depending on whether or not a relative scheme
+            is in play -->
+      </ol>
+    </dl>
+  </dl>
+
+ <li><p>Return <var title="">url</var>.
+</ol>
+
+<h3 id="serializing"><span class="secno">5.3 </span>Serializing</h3>
+
+<p>The <dfn id="concept-url-serializer" title="concept-url-serializer">URL serializer</dfn> takes a
+<a href="#concept-parsed-url" title="concept-parsed-url">parsed URL</a> <var title="">url</var>,
+optionally an <i title="">exclude fragment flag</i>, and then runs these steps:
+
+<ol>
+ <li><p>Let <var title="">output</var> be <var title="">url</var>'s
+ <a href="#concept-url-scheme" title="concept-url-scheme">scheme</a> and
+ "<code title="">:</code>" concatenated.
+
+ <li>
+  <p>If <var title="">url</var>'s <a href="#relative-flag">relative flag</a> is set:
+
+  <ol>
+   <li><p>Append "<code title="">//</code>" to <var title="">output</var>.
+
+   <li>
+    <p>If <var title="">url</var>'s
+    <a href="#concept-url-username" title="concept-url-username">username</a> is not the empty string
+    or <var title="">url</var>'s
+    <a href="#concept-url-password" title="concept-url-password">password</a> is non-null, run these
+    substeps:
+
+    <ol>
+     <li><p>Append <var title="">url</var>'s
+     <a href="#concept-url-username" title="concept-url-username">username</a> to
+     <var title="">output</var>.
+
+     <li><p>If <var title="">url</var>'s
+     <a href="#concept-url-password" title="concept-url-password">password</a> is non-null, append
+     "<code title="">:</code>" concatenated with <var title="">url</var>'s
+     <a href="#concept-url-password" title="concept-url-password">password</a> to
+     <var title="">output</var>.
+
+     <li><p>Append "<code title="">@</code>" to <var title="">output</var>.
+    </ol>
+
+   <li><p>Append <var title="">url</var>'s
+   <a href="#concept-url-host" title="concept-url-host">host</a>,
+   <a href="#concept-host-serializer" title="concept-host-serializer">serialized</a>, to
+   <var title="">output</var>.
+
+   <li><p>If <var title="">url</var>'s <a href="#concept-url-port" title="concept-url-port">port</a>
+   is not the empty string, append "<code title="">:</code>" concatenated with
+   <var title="">url</var>'s <a href="#concept-url-port" title="concept-url-port">port</a> to
+   <var title="">output</var>.
+
+   <li><p>Append "<code title="">/</code>" concatenated with the strings in
+   <var title="">url</var>'s <a href="#concept-url-path" title="concept-url-path">path</a>
+   (including empty strings), separated from each other by
+   "<code title="">/</code>" to <var title="">output</var>.
+  </ol>
+
+ <li><p>Otherwise, if <var title="">url</var>'s <a href="#relative-flag">relative flag</a> is
+ unset, append <var title="">url</var>'s
+ <a href="#concept-url-scheme-data" title="concept-url-scheme-data">scheme data</a> to
+ <var title="">output</var>.
+
+ <li><p>If <var title="">url</var>'s <a href="#concept-url-query" title="concept-url-query">query</a> is non-null,
+ append "<code title="">?</code>" concatenated with <var title="">url</var>'s
+ <a href="#concept-url-query" title="concept-url-query">query</a> to <var title="">output</var>.
+
+ <li><p>If the <i title="">exclude fragment flag</i> is unset and
+ <var title="">url</var>'s <a href="#concept-url-fragment" title="concept-url-fragment">fragment</a> is
+ non-null, append  "<code title="">#</code>" concatenated with
+ <var title="">url</var>'s <a href="#concept-url-fragment" title="concept-url-fragment">fragment</a> to
+ <var title="">output</var>.
+
+ <li><p>Return <var title="">output</var>.
+</ol>
+
+
+
+<h2 id="application/x-www-form-urlencoded"><span class="secno">6 </span><code>application/x-www-form-urlencoded</code></h2>
+
+<p>The
+<dfn id="concept-urlencoded-parser" title="concept-urlencoded-parser"><code>application/x-www-form-urlencoded</code> parser</dfn>
+takes a string <var title="">input</var> using code points in the range U+0000 to U+007F,
+optionally with an <a class="external" data-anolis-spec="encoding" href="http://encoding.spec.whatwg.org/#encoding">encoding</a>
+<var title="">encoding override</var>, optionally with a
+<i title="">use "<code>_charset_</code>" flag</i>, and optionally with an
+<i title="">isindex flag</i>, and then runs these steps:
+
+<ol>
+ <li><p>Let <var title="">strings</var> be the result of splitting
+ <var title="">input</var> on "<code title="">&amp;</code>".
+ <!-- XXX define splitting? DOM does not do it -->
+
+ <li><p>If the <i title="">isindex flag</i> is set and the first string in
+ <var title="">strings</var> does not contain a "<code title="">=</code>", prepend
+ "<code title="">=</code>" to the first string in <var title="">strings</var>.
+
+ <li><p>If <var title="">encoding override</var> is not given, set it to
+ <a class="external" data-anolis-spec="encoding" href="http://encoding.spec.whatwg.org/#utf-8">utf-8</a>.
+
+ <li><p>Let <var title="">pairs</var> be an empty list of name-value pairs.
+
+ <li>
+  <p>For each string <var title="">string</var> in <var title="">strings</var>,
+  run these substeps:
+
+  <ol>
+   <li><p>If <var title="">string</var> is the empty string, run these substeps
+   again for the next string.
+
+   <li><p>If string contains a "<code title="">=</code>", then let
+   <var title="">name</var> be the substring of <var title="">string</var> from
+   the start of <var title="">string</var> up to but excluding its first
+   "<code title="">=</code>", and let <var title="">value</var> be the substring
+   from the first code point, if any, after the first "<code title="">=</code>"
+   up to the end of <var title="">string</var>. If "<code title="">=</code>" is
+   the first code point, then <var title="">name</var> will be the empty
+   string. If it is the last, then <var title="">value</var> will be the empty
+   string.
+
+   <li><p>Otherwise, let <var title="">name</var> have the value of
+   <var title="">string</var> and let <var title="">value</var> be the empty
+   string.
+
+   <li><p>Replace any "<code title="">+</code>" in <var title="">name</var> and
+   <var title="">value</var> with U+0020.
+
+   <li><p>If the <i title="">use "<code>_charset_</code>" flag</i> is set,
+   <var title="">name</var> is "<code title="">_charset_</code>", and
+   <a class="external" data-anolis-spec="encoding" href="http://encoding.spec.whatwg.org/#concept-encoding-get" title="concept-encoding-get">get an encoding</a>
+   for <var title="">value</var> does not return failure, unset the
+   <i title="">use "<code>_charset_</code>" flag</i> and set
+   <var title="">encoding override</var> to the result of
+   <a class="external" data-anolis-spec="encoding" href="http://encoding.spec.whatwg.org/#concept-encoding-get" title="concept-encoding-get">getting an encoding</a>
+   for <var title="">value</var>.
+
+   <li><p>Add a pair consisting of <var title="">name</var> and
+   <var title="">value</var> to <var title="">pairs</var>.
+  </ol>
+
+ <li><p>Replace each name-value pair in <var title="">pairs</var> with the
+ result of running <var title="">encoding override</var>'s
+ <a class="external" data-anolis-spec="encoding" href="http://encoding.spec.whatwg.org/#decoder">decoder</a> on the
+ <a href="#percent-decode" title="percent decode">percent decoding</a> of the name-value pair.
+
+ <li><p>Return <var title="">pairs</var>.
+</ol>
+
+<p>The
+<dfn id="concept-urlencoded-byte-serializer" title="concept-urlencoded-byte-serializer"><code>application/x-www-form-urlencoded</code> byte serializer</dfn>
+takes a byte sequence <var title="">input</var>, an
+<var title="">encoding override</var>, and then runs these steps:
+
+<ol>
+ <li><p>Let <var title="">output</var> be the empty string.
+ <li>
+  <p>For each byte in <var title="">input</var>, depending on
+  <var title="">byte</var>:
+
+  <dl>
+   <dt>0x20
+   <dd><p>Append U+002B to <var title="">output</var>.
+
+   <dt>0x2A
+   <dt>0x2D
+   <dt>0x2E
+   <dt>0x30 to 0x39
+   <dt>0x41 to 0x5A
+   <dt>0x5F
+   <dt>0x61 to 0x7A
+   <dd><p>Append a code point whose value is <var title="">byte</var> to
+   <var title="">output</var>.
+
+   <dt>Otherwise
+   <dd><p>Append <var title="">byte</var>,
+   <a href="#percent-encode" title="percent encode">percent encoded</a>, to
+   <var title="">output</var>.
+  </dl>
+ <li><p>Return <var title="">output</var>.
+</ol>
+<!-- The inverse of the above byte set is all bytes
+     less than 0x20,
+     0x21 to 0x29,
+     0x2B,
+     0x2C,
+     0x2F,
+     0x3A to 0x40,
+     0x5B to 0x5E,
+     0x60,
+     bytes greater than 0x7A -->
+
+<p>The
+<dfn id="concept-urlencoded-serializer" title="concept-urlencoded-serializer"><code>application/x-www-form-urlencoded</code> serializer</dfn>
+takes a list of name-value pairs <var title="">pairs</var>, optionally with an
+<a class="external" data-anolis-spec="encoding" href="http://encoding.spec.whatwg.org/#encoding">encoding</a>
+<var title="">encoding override</var>, and then runs these steps:
+
+<ol>
+ <li><p>If <var title="">encoding override</var> is not given, set it to
+ <a class="external" data-anolis-spec="encoding" href="http://encoding.spec.whatwg.org/#utf-8">utf-8</a>.
+
+ <li><p>Let <var title="">output</var> be the empty string.
+
+ <li>
+  <p>For each <var title="">pair</var> in <var title="">pairs</var>, run
+  these substeps:
+
+  <ol>
+   <li><p>Replace <var title="">pair</var>'s name and value with the result of
+   running <var title="">encoding override</var>'s
+   <a class="external" data-anolis-spec="encoding" href="http://encoding.spec.whatwg.org/#encoder">encoder</a> on them, respectively.
+   Whenever the <a class="external" data-anolis-spec="encoding" href="http://encoding.spec.whatwg.org/#encoder">encoder</a> algorithm
+   emits an <a class="external" data-anolis-spec="encoding" href="http://encoding.spec.whatwg.org/#encoder-error">encoder error</a>, emit the
+   result of running <a class="external" data-anolis-spec="encoding" href="http://encoding.spec.whatwg.org/#utf-8-encode">utf-8 encode</a> on
+   U+0026, U+0023, followed by one or more <a href="#ascii-digits">ASCII digits</a>
+   representing the code point that caused the
+   <a class="external" data-anolis-spec="encoding" href="http://encoding.spec.whatwg.org/#encoder-error">encoder error</a> in base ten,
+   followed by U+003B.
+
+   <li><p>Replace <var title="">pair</var>'s name and value with their
+   <a href="#concept-urlencoded-byte-serializer" title="concept-urlencoded-byte-serializer">serialization</a>.
+
+   <li><p>If this is not the first pair, append "<code title="">&amp;</code>" to
+   <var title="">output</var>.
+
+   <li><p>Append <var title="">pair</var>'s name, followed by
+   "<code title="">=</code>", followed by <var title="">pair</var>'s value to
+   <var title="">output</var>.
+  </ol>
+
+ <li>Return <var title="">output</var>.
+</ol>
+
+
+
+<h2 id="api"><span class="secno">7 </span>API</h2>
+
+<!-- XXX https://www.w3.org/Bugs/Public/show_bug.cgi?id=20159 -->
+
+<pre class="idl">[<a href="#dom-url" title="dom-URL">Constructor</a>(DOMString <var title="">url</var>, optional (<a href="#url">URL</a> or DOMString) <var title="">base</var> = "about:blank")]
+interface <dfn id="url">URL</dfn> {
+};
+<a href="#url">URL</a> implements <a href="#urlutils">URLUtils</a>;
+
+[NoInterfaceObject]
+interface <dfn id="urlutils">URLUtils</dfn> {
+  stringifier attribute [EnsureUTF16] DOMString <a href="#dom-url-href" title="dom-URL-href">href</a>;
+  readonly attribute DOMString <a href="#dom-url-origin" title="dom-URL-origin">origin</a>;
+
+           attribute [EnsureUTF16] DOMString <a href="#dom-url-protocol" title="dom-URL-protocol">protocol</a>;
+           attribute [EnsureUTF16] DOMString <a href="#dom-url-username" title="dom-URL-username">username</a>;
+           attribute [EnsureUTF16] DOMString <a href="#dom-url-password" title="dom-URL-password">password</a>;
+           attribute [EnsureUTF16] DOMString <a href="#dom-url-host" title="dom-URL-host">host</a>;
+           attribute [EnsureUTF16] DOMString <a href="#dom-url-hostname" title="dom-URL-hostname">hostname</a>;
+           attribute [EnsureUTF16] DOMString <a href="#dom-url-port" title="dom-URL-port">port</a>;
+           attribute [EnsureUTF16] DOMString <a href="#dom-url-pathname" title="dom-URL-pathname">pathname</a>;
+           attribute [EnsureUTF16] DOMString <a href="#dom-url-search" title="dom-URL-search">search</a>;
+           attribute <a href="#urlquery">URLQuery</a>? <a href="#dom-url-query" title="dom-URL-query">query</a>;
+           attribute [EnsureUTF16] DOMString <a href="#dom-url-hash" title="dom-URL-hash">hash</a>;
+};
+
+[NoInterfaceObject]
+interface <dfn id="urlutilsreadonly">URLUtilsReadOnly</dfn> {
+  stringifier readonly attribute DOMString <a href="#dom-url-href" title="dom-URL-href">href</a>;<!--
+  readonly attribute DOMString <span title=dom-URL-origin>origin</span>;-->
+
+  readonly attribute DOMString <a href="#dom-url-protocol" title="dom-URL-protocol">protocol</a>;<!--
+  readonly attribute DOMString <span title=dom-URL-username>username</span>;
+  readonly attribute DOMString <span title=dom-URL-password>password</span>;-->
+  readonly attribute DOMString <a href="#dom-url-host" title="dom-URL-host">host</a>;
+  readonly attribute DOMString <a href="#dom-url-hostname" title="dom-URL-hostname">hostname</a>;
+  readonly attribute DOMString <a href="#dom-url-port" title="dom-URL-port">port</a>;
+  readonly attribute DOMString <a href="#dom-url-pathname" title="dom-URL-pathname">pathname</a>;
+  readonly attribute DOMString <a href="#dom-url-search" title="dom-URL-search">search</a>;<!--
+  readonly attribute <span>URLQuery</span>? <span title=dom-URL-query>query</span>;-->
+  readonly attribute DOMString <a href="#dom-url-hash" title="dom-URL-hash">hash</a>;
+};</pre>
+
+<p>Except where different objects implementing <a href="#urlutilsreadonly"><code>URLUtilsReadOnly</code></a> are identical
+to objects implementing <a href="#urlutils"><code>URLUtils</code></a>.
+
+<p class="note">Since all members are readonly and certain members from
+<a href="#urlutils"><code>URLUtils</code></a> are not exposed a number of potential optimizations is possible
+compared to objects implementing <a href="#urlutils"><code>URLUtils</code></a>. These are left as an exercise to
+the reader.
+
+<!-- XXX Ideas:
+  boolean isEqual(URL, optional URLEqualOptions options)
+           attribute URLPath segments;
+
+dictionary URLEqualOptions {
+  boolean percentEncoding = false;
+  boolean ignoreHash = false;
+  boolean ignoreDomainDot = false;
+  ...
+};
+
+URLPath would be a subclassed Array? -->
+
+<p>Specifications defining objects implementing <a href="#urlutils"><code>URLUtils</code></a> or
+<a href="#urlutilsreadonly"><code>URLUtilsReadOnly</code></a> must define a
+<dfn id="concept-uu-get-the-base" title="concept-UU-get-the-base">get the base</dfn> algorithm, which must return the
+appropriate <a href="#concept-base-url" title="concept-base-URL">base URL</a> for the object.
+
+<p>Specifications defining objects implementing <a href="#urlutils"><code>URLUtils</code></a> may
+define <dfn id="concept-uu-update" title="concept-UU-update">update steps</dfn> to make it possible for an
+underlying string (such as an
+<a class="external" data-anolis-spec="dom" href="http://dom.spec.whatwg.org/#concept-attribute-value" title="concept-attribute-value">attribute value</a>)
+to be updated. The <a href="#concept-uu-update" title="concept-UU-update">update steps</a> are passed a string
+<var title="">value</var> for this purpose.
+
+<p>An object implementing <a href="#urlutils"><code>URLUtils</code></a> or <a href="#urlutilsreadonly"><code>URLUtilsReadOnly</code></a> has an
+associated <dfn id="concept-uu-input" title="concept-UU-input">input</dfn> (a string),
+<dfn id="concept-uu-query-encoding" title="concept-UU-query-encoding">query encoding</dfn>
+(an <a class="external" data-anolis-spec="encoding" href="http://encoding.spec.whatwg.org/#encoding">encoding</a>),
+<dfn id="concept-uu-query-object" title="concept-UU-query-object">query object</dfn>
+(a <a href="#urlquery"><code>URLQuery</code></a> object or null), and a
+<dfn id="concept-uu-url" title="concept-UU-url">url</dfn> (a
+<a href="#concept-parsed-url" title="concept-parsed-url">parsed URL</a> or null).
+
+Unless stated otherwise, <a href="#concept-uu-query-encoding" title="concept-UU-query-encoding">query encoding</a> is
+<a class="external" data-anolis-spec="encoding" href="http://encoding.spec.whatwg.org/#utf-8">utf-8</a>. The others follow from the
+<a href="#concept-uu-set-the-input" title="concept-UU-set-the-input">set the input</a> algorithm.
+
+<p class="note">The associated
+<a href="#concept-uu-query-encoding" title="concept-UU-query-encoding">query encoding</a> is a legacy
+concept only relevant for HTML.
+<a class="informative" href="#refsHTML">[HTML]</a>
+
+<p>Specifications defining objects implementing <a href="#urlutils"><code>URLUtils</code></a> or
+<a href="#urlutilsreadonly"><code>URLUtilsReadOnly</code></a> must use the
+<a href="#concept-uu-set-the-input" title="concept-UU-set-the-input">set the input</a> algorithms to set
+<a href="#concept-uu-input" title="concept-UU-input">input</a>, <a href="#concept-uu-url" title="concept-UU-url">url</a>, and
+<a href="#concept-uu-query-object" title="concept-UU-query-object">query object</a>. To
+<dfn id="concept-uu-set-the-input" title="concept-UU-set-the-input">set the input</dfn> run these steps:
+
+<ol>
+ <li><p>Set <a href="#concept-uu-url" title="concept-UU-url">url</a> to null.
+
+ <li><p>Set <a href="#concept-uu-input" title="concept-UU-input">input</a> to the given value.
+
+ <li><p>Let <var title="">parsed URL</var> be the result of
+ <a href="#concept-url-parser" title="concept-url-parser">parsing</a>
+ <a href="#concept-uu-input" title="concept-UU-input">input</a> with
+ <a href="#concept-base-url" title="concept-base-url">base URL</a> being the result of running
+ <a href="#concept-uu-get-the-base" title="concept-UU-get-the-base">get the base</a> and
+ <a href="#concept-uu-query-encoding" title="concept-UU-query-encoding">query encoding</a> as
+ <var title="">encoding override</var>.
+
+ <li><p>If <var title="">parsed URL</var> is not failure, set
+ <a href="#concept-uu-url" title="concept-UU-url">url</a> to <var title="">parsed URL</var>.
+
+ <li>
+  <p>If <a href="#concept-uu-url" title="concept-UU-url">url</a> is non-null and its
+  <a href="#relative-flag">relative flag</a> is set, run these substeps:
+
+  <ol>
+   <li><p>If <a href="#concept-uu-query-object" title="concept-UU-query-object">query object</a> is null, set
+   <a href="#concept-uu-query-object" title="concept-UU-query-object">query object</a> to a
+   <a href="#concept-uq-new" title="concept-UQ-new">new <code>URLQuery</code> object</a> using
+   <a href="#concept-uu-url" title="concept-UU-url">url</a>'s <a href="#concept-url-query" title="concept-URL-query">query</a>.
+
+   <li><p>Otherwise, set <a href="#concept-uu-query-object" title="concept-UU-query-object">query object</a>'s
+   associated list of name-value pairs to the result of
+   <a href="#concept-urlencoded-parser" title="concept-urlencoded-parser">parsing</a>
+   <a href="#concept-uu-url" title="concept-UU-url">url</a>'s <a href="#concept-url-query" title="concept-URL-query">query</a>.
+  </ol>
+
+ <li><p>If <a href="#concept-uu-url" title="concept-UU-url">url</a> is null and
+ <a href="#concept-uu-query-object" title="concept-UU-query-object">query object</a> is non-null, empty
+ <a href="#concept-uu-query-object" title="concept-UU-query-object">query object</a>'s associated list of name-value
+ pairs.
+</ol>
+
+<p>To run the <dfn id="pre-update-steps">pre-update steps</dfn> for an object implementing
+<a href="#urlutils"><code>URLUtils</code></a>, optionally given a <var title="">value</var>, run these steps:
+
+<ol>
+ <li><p>If <var title="">value</var> is not given, let <var title="">value</var> be the result
+ of <a href="#concept-url-serializer" title="concept-url-serializer">serializing</a> the associated
+ <a href="#concept-uu-url" title="concept-UU-url">url</a>.
+ <!-- these steps are always invoked with a value if url can be null -->
+
+ <li><p>Run the <a href="#concept-uu-update" title="concept-UU-update">update steps</a> with
+ <var title="">value</var>.
+</ol>
+
+
+<h3 id="constructors"><span class="secno">7.1 </span>Constructors</h3> <!-- "constructor" causes dfn.js to fail -->
+
+<p>The
+<dfn id="dom-url" title="dom-URL"><code>URL(<var title="">url</var>, <var title="">base</var>)</code></dfn>
+constructor must run these steps:
+
+<ol>
+ <li><p>If <var title="">base</var> is a string,
+ <a href="#concept-url-parser" title="concept-url-parser">parse</a> <var title="">base</var> and set
+ <var title="">base</var> to the result of that algorithm.
+
+ <li><p>If <var title="">base</var> is failure,
+ <a class="external" data-anolis-spec="dom" href="http://dom.spec.whatwg.org/#concept-throw" title="concept-throw">throw</a> an
+ "<a href="http://dom.spec.whatwg.org/#syntaxerror"><code class="external" data-anolis-spec="dom">SyntaxError</code></a>" exception.
+
+ <li><p>Let <var title="">result</var> be a new <a href="#url"><code>URL</code></a> object.
+
+ <li><p>Let <var title="">result</var>'s
+ <a href="#concept-uu-get-the-base" title="concept-UU-get-the-base">get the base</a> return <var title="">base</var>.
+
+ <li><p>Run <var title="">result</var>'s
+ <a href="#concept-uu-set-the-input" title="concept-UU-set-the-input">set the input</a> for <var title="">url</var>.
+
+ <li><p>If <var title="">result</var>'s <a href="#concept-uu-url" title="concept-UU-url">url</a> is null,
+ <a class="external" data-anolis-spec="dom" href="http://dom.spec.whatwg.org/#concept-throw" title="concept-throw">throw</a> an
+ "<a href="http://dom.spec.whatwg.org/#syntaxerror"><code class="external" data-anolis-spec="dom">SyntaxError</code></a>" exception.
+
+ <li><p>Return <var title="">result</var>.
+</ol>
+
+<div class="example">
+ <p>To <a href="#concept-url-parser" title="concept-url-parser">parse</a> a <a href="#concept-url" title="concept-url">URL</a>
+ without using a <a href="#concept-base-url" title="concept-base-url">base URL</a>, invoke the constructor with
+ a single argument:
+
+ <pre>var input = "http://example.org/💩",
+    url = new URL(input)
+url.pathname // "/%F0%9F%92%A9"</pre>
+
+ <p>If you rather resolve it against the <a href="#concept-base-url" title="concept-base-url">base URL</a> of a
+ <a class="external" data-anolis-spec="dom" href="http://dom.spec.whatwg.org/#concept-document" title="concept-document">document</a>, use
+ <a href="http://dom.spec.whatwg.org/#dom-node-baseuri"><code class="external" data-anolis-spec="dom" title="dom-Node-baseURI">baseURI</code></a>:
+
+ <pre>var input = "/💩",
+    url = new URL(input, document.baseURI)
+url.href // "http://url.spec.whatwg.org/%F0%9F%92%A9"</pre>
+</div>
+
+
+<h3 id="urlutils-and-urlutilsreadonly-members"><span class="secno">7.2 </span><a href="#urlutils"><code>URLUtils</code></a> and <a href="#urlutilsreadonly"><code>URLUtilsReadOnly</code></a> members</h3>
+
+<p class="note">The <a href="#urlutils"><code>URLUtils</code></a> and <a href="#urlutilsreadonly"><code>URLUtilsReadOnly</code></a> interfaces are
+not exposed on the global object. They are meant to augment other interfaces, such as
+<a href="#url"><code>URL</code></a>.
+
+<p>The <dfn id="dom-url-href" title="dom-URL-href"><code>href</code></dfn> attribute must run
+these steps:
+
+<ol>
+ <li><p>If <a href="#concept-uu-url" title="concept-UU-url">url</a> is null, return
+ <a href="#concept-uu-input" title="concept-UU-input">input</a>.
+
+ <li><p>Return the <a href="#concept-url-serializer" title="concept-url-serializer">serialization</a>
+ of <a href="#concept-uu-url" title="concept-UU-url">url</a>.
+</ol>
+
+<p>Setting the <a href="#dom-url-href"><code title="dom-URL-href">href</code></a> attribute must
+run these steps:
+
+<ol>
+ <li><p>Run the <a href="#concept-uu-set-the-input" title="concept-UU-set-the-input">set the input</a> algorithm for
+ the given value.
+
+ <li><p>Run the <a href="#pre-update-steps">pre-update steps</a> with the given value.
+</ol>
+
+<p class="note">This means that if the <a href="#dom-url-href"><code title="dom-URL-href">href</code></a> attribute is set
+to value that would cause the <a href="#concept-url-parser" title="concept-url-parser">parser</a> to return
+failure, that value is still passed through unchanged. This is one of those unfortunate
+legacy incidents.
+<!--
+  var urlPoop = "http://poop:poop/"
+  <a>.href = urlPoop
+  <a>.getAttribute("href") == urlPoop
+-->
+
+<p>The <dfn id="dom-url-origin" title="dom-URL-origin"><code>origin</code></dfn> attribute must
+run these steps:
+
+<ol>
+ <li><p>If <a href="#concept-uu-url" title="concept-UU-url">url</a> is null, return the empty
+ string.
+
+ <li><p>Return the <a class="external" data-anolis-spec="origin" href="http://tools.ietf.org/html/rfc6454#section-6.1">Unicode serialization</a>
+ of <a href="#concept-uu-url" title="concept-UU-url">url</a>'s
+ <a class="external" data-anolis-spec="origin" href="http://tools.ietf.org/html/rfc6454#section-4">origin</a>.
+ <a href="#refsORIGIN">[ORIGIN]</a>
+</ol>
+
+<p class="note">It returns the Unicode rather than the ASCII serialization for
+compatibility with HTML's <code>MessageEvent</code> feature.
+<a class="informative" href="#refsHTML">[HTML]</a>
+
+<p>The <dfn id="dom-url-protocol" title="dom-URL-protocol"><code>protocol</code></dfn> attribute
+must run these steps:
+
+<ol>
+ <li><p>If <a href="#concept-uu-url" title="concept-UU-url">url</a> is null, return
+ "<code title="">:</code>".
+
+ <li><p>Return <a href="#concept-url-scheme" title="concept-url-scheme">scheme</a> and
+ "<code title="">:</code>" concatenated.
+</ol>
+
+<p>Setting the <a href="#dom-url-protocol"><code title="dom-URL-protocol">protocol</code></a> attribute must
+run these steps:
+
+<ol>
+ <li><p>If <a href="#concept-uu-url" title="concept-UU-url">url</a> is null, terminate
+ these steps.
+
+ <li><p><a href="#concept-url-parser" title="concept-url-parser">Parse</a> the given value and
+ "<code title="">:</code>" concatenated with
+ <a href="#concept-uu-url" title="concept-UU-url">url</a> as <var title="">url</var> and
+ <a href="#scheme-start-state">scheme start state</a> as <var title="">state override</var>.
+
+ <li><p>Run the <a href="#pre-update-steps">pre-update steps</a>.
+</ol>
+
+<p>The <dfn id="dom-url-username" title="dom-URL-username"><code>username</code></dfn> attribute
+must run these steps:
+
+<ol>
+ <li><p>If <a href="#concept-uu-url" title="concept-UU-url">url</a> is null, return the
+ empty string.
+
+ <li><p>Return <a href="#concept-url-username" title="concept-url-username">username</a>.
+</ol>
+
+<p>Setting the <a href="#dom-url-username"><code title="dom-URL-username">username</code></a> attribute must
+run these steps:
+
+<ol>
+ <li><p>If <a href="#concept-uu-url" title="concept-UU-url">url</a> is null, or its
+ <a href="#relative-flag">relative flag</a> is unset, terminate these steps.
+
+ <li><p>Set <a href="#concept-url-username" title="concept-url-username">username</a> to the empty
+ string.
+
+ <li><p>For each code point in the given value,
+ <a href="#utf-8-percent-encode">utf-8 percent encode</a> it using the
+ <a href="#username-encode-set">username encode set</a>, and append the result to
+ <a href="#concept-url-username" title="concept-url-username">username</a>.
+
+ <li><p>Run the <a href="#pre-update-steps">pre-update steps</a>.
+</ol>
+
+<p>The <dfn id="dom-url-password" title="dom-URL-password"><code>password</code></dfn> attribute
+must run these steps:
+
+<ol>
+ <li><p>If <a href="#concept-uu-url" title="concept-UU-url">url</a> is null or its
+ <a href="#concept-url-password" title="concept-url-password">password</a> is null, return the empty
+ string.
+
+ <li><p>Return <a href="#concept-url-password" title="concept-url-password">password</a>.
+</ol>
+
+<p>Setting the <a href="#dom-url-password"><code title="dom-URL-password">password</code></a> attribute must
+run these steps:
+
+<ol>
+ <li><p>If <a href="#concept-uu-url" title="concept-UU-url">url</a> is null, or its
+ <a href="#relative-flag">relative flag</a> is unset, terminate these steps.
+
+ <li><p>If the given value is the empty string, set
+ <a href="#concept-url-password" title="concept-url-password">password</a> to null, run the
+ <a href="#pre-update-steps">pre-update steps</a>, and terminate these steps.
+
+ <li><p>Set <a href="#concept-url-password" title="concept-url-password">password</a> to the empty string.
+
+ <li><p>For each code point in the given value, <a href="#utf-8-percent-encode">utf-8 percent encode</a> it
+ using the <a href="#password-encode-set">password encode set</a>, and append the result to
+ <a href="#concept-url-password" title="concept-url-password">password</a>.
+
+ <li><p>Run the <a href="#pre-update-steps">pre-update steps</a>.
+</ol>
+
+<p>The <dfn id="dom-url-host" title="dom-URL-host"><code>host</code></dfn> attribute must run
+these steps:
+
+<ol>
+ <li><p>If <a href="#concept-uu-url" title="concept-UU-url">url</a> is null, return the
+ empty string.
+
+ <li><p>If <a href="#concept-url-port" title="concept-url-port">port</a> is the empty string,
+ return <a href="#concept-url-host" title="concept-url-host">host</a>,
+ <a href="#concept-host-serializer" title="concept-host-serializer">serialized</a>.
+
+ <li><p>Return <a href="#concept-url-host" title="concept-url-host">host</a>,
+ <a href="#concept-host-serializer" title="concept-host-serializer">serialized</a>,
+ "<code title="">:</code>", and <a href="#concept-url-port" title="concept-url-port">port</a>
+ concatenated.
+</ol>
+
+<p>Setting the <a href="#dom-url-host"><code title="dom-URL-host">host</code></a> attribute must run these
+steps:
+
+<ol>
+ <li><p>If <a href="#concept-uu-url" title="concept-UU-url">url</a> is null, or its
+ <a href="#relative-flag">relative flag</a> is unset, terminate these steps.
+
+ <li><p><a href="#concept-url-parser" title="concept-url-parser">Parse</a> the given value with
+ <a href="#concept-uu-url" title="concept-UU-url">url</a> as <var title="">url</var> and
+ <a href="#host-state">host state</a> as <var title="">state override</var>.
+
+ <li><p>Run the <a href="#pre-update-steps">pre-update steps</a>.
+</ol>
+
+<p>The <dfn id="dom-url-hostname" title="dom-URL-hostname"><code>hostname</code></dfn> attribute
+must run these steps:
+
+<ol>
+ <li><p>If <a href="#concept-uu-url" title="concept-UU-url">url</a> is null, return the
+ empty string.
+
+ <li><p>Return <a href="#concept-url-host" title="concept-url-host">host</a>,
+ <a href="#concept-host-serializer" title="concept-host-serializer">serialized</a>.
+</ol>
+
+<p>Setting the <a href="#dom-url-hostname"><code title="dom-URL-hostname">hostname</code></a> attribute must
+run these steps:
+
+<ol>
+ <li><p>If <a href="#concept-uu-url" title="concept-UU-url">url</a> is null, or its
+ <a href="#relative-flag">relative flag</a> is unset, terminate these steps.
+
+ <li><p><a href="#concept-url-parser" title="concept-url-parser">Parse</a> the given value with
+ <a href="#concept-uu-url" title="concept-UU-url">url</a> as <var title="">url</var> and
+ <a href="#hostname-state">hostname state</a> as <var title="">state override</var>.
+
+ <li><p>Run the <a href="#pre-update-steps">pre-update steps</a>.
+</ol>
+
+<p>The <dfn id="dom-url-port" title="dom-URL-port"><code>port</code></dfn> attribute must run
+these steps:
+
+<ol>
+ <li><p>If <a href="#concept-uu-url" title="concept-UU-url">url</a> is null, return the
+ empty string.
+
+ <li><p>Return <a href="#concept-url-port" title="concept-url-port">port</a>.
+</ol>
+
+<p>Setting the <a href="#dom-url-port"><code title="dom-URL-port">port</code></a> attribute must run these
+steps:
+
+<ol>
+ <li><p>If <a href="#concept-uu-url" title="concept-UU-url">url</a> is null, its
+ <a href="#relative-flag">relative flag</a> is unset, or its
+ <a href="#concept-url-scheme" title="concept-url-scheme">scheme</a> is "<code title="">file</code>",
+ terminate these steps.
+
+ <li><p><a href="#concept-url-parser" title="concept-url-parser">Parse</a> the given value with
+ <a href="#concept-uu-url" title="concept-UU-url">url</a> as <var title="">url</var> and
+ <a href="#port-state">port state</a> as <var title="">state override</var>.
+
+ <li><p>Run the <a href="#pre-update-steps">pre-update steps</a>.
+</ol>
+
+<p>The <dfn id="dom-url-pathname" title="dom-URL-pathname"><code>pathname</code></dfn> attribute
+must run these steps:
+
+<ol>
+ <li><p>If <a href="#concept-uu-url" title="concept-UU-url">url</a> is null, return the
+ empty string.
+
+ <li><p>If the <a href="#relative-flag">relative flag</a> is unset, return
+ <a href="#concept-url-scheme-data" title="concept-url-scheme-data">scheme data</a>.
+
+ <li><p>Return "<code title="">/</code>" concatenated with the strings in
+ <a href="#concept-url-path" title="concept-url-path">path</a> (including empty strings),
+ separated from each other by "<code title="">/</code>".
+</ol>
+
+<p>Setting the <a href="#dom-url-pathname"><code title="dom-URL-pathname">pathname</code></a> attribute must
+run these steps:
+
+<ol>
+ <li><p>If <a href="#concept-uu-url" title="concept-UU-url">url</a> is null, or its
+ <a href="#relative-flag">relative flag</a> is unset, terminate these steps.
+
+ <li><p>Set <a href="#concept-url-path" title="concept-url-path">path</a> to the empty list.
+
+ <li><p><a href="#concept-url-parser" title="concept-url-parser">Parse</a> the given value with
+ <a href="#concept-uu-url" title="concept-UU-url">url</a> as <var title="">url</var> and
+ <a href="#relative-path-start-state">relative path start state</a> as <var title="">state override</var>.
+
+ <li><p>Run the <a href="#pre-update-steps">pre-update steps</a>.
+</ol>
+
+<p>The <dfn id="dom-url-search" title="dom-URL-search"><code>search</code></dfn> attribute must
+run these steps:
+
+<ol>
+ <li><p>If <a href="#concept-uu-url" title="concept-UU-url">url</a> is null, or its
+ <a href="#concept-url-query" title="concept-url-query">query</a> is either null or
+ the empty string, return the empty string.
+
+ <li><p>Return "<code title="">?</code>" concatenated with
+ <a href="#concept-url-query" title="concept-url-query">query</a>.
+</ol>
+
+<p>Setting the <a href="#dom-url-search"><code title="dom-URL-search">search</code></a> attribute must run
+these steps:
+
+<ol>
+ <li><p>If <a href="#concept-uu-url" title="concept-UU-url">url</a> is null, or its
+ <a href="#relative-flag">relative flag</a> is unset, terminate these steps.
+
+ <li><p>If the given value is the empty string, set
+ <a href="#concept-url-query" title="concept-url-query">query</a> to null, set
+ <a href="#concept-uu-query-object" title="concept-UU-query-object">query object</a>'s associated list
+ of name-value pairs to the empty list, run the
+ <a href="#pre-update-steps">pre-update steps</a>, and terminate these steps.
+
+ <li><p>Let <var title="">input</var> be the given value with a single leading
+ "<code title="">?</code>" removed, if any.
+
+ <li><p>Set <a href="#concept-url-query" title="concept-url-query">query</a> to the empty string.
+
+ <li><p><a href="#concept-url-parser" title="concept-url-parser">Parse</a> <var title="">input</var>
+ with <a href="#concept-uu-url" title="concept-UU-url">url</a> as <var title="">url</var>,
+ <a href="#query-state">query state</a> as <var title="">state override</var>, and the
+ associated <a href="#concept-uu-query-encoding" title="concept-UU-query-encoding">query encoding</a> as
+ <var title="">encoding override</var>.
+
+ <li><p>Set <a href="#concept-uu-query-object" title="concept-UU-query-object">query object</a>'s
+ associated list of name-value pairs to the result of
+ <a href="#concept-urlencoded-parser" title="concept-urlencoded-parser">parsing</a>
+ <var title="">input</var>.
+
+ <li><p>Run the <a href="#pre-update-steps">pre-update steps</a>.
+</ol>
+
+<p>The <dfn id="dom-url-query" title="dom-URL-query"><code>query</code></dfn> attribute must
+return the <a href="#concept-uu-query-object" title="concept-UU-query-object">query object</a>.
+
+<p>Setting the <a href="#dom-url-query"><code title="dom-URL-query">query</code></a> attribute must run
+these steps:
+
+<ol>
+ <li><p>Let <var title="">object</var> be the given value.
+
+ <li><p>If <a href="#concept-uu-query-object" title="concept-UU-query-object">query object</a> or
+ <var title="">object</var> is null, terminate these steps.
+
+ <li><p>If <var title="">object</var>'s
+ <a href="#concept-uq-url-object" title="concept-UQ-url-object">url object</a> is not null, set
+ <var title="">object</var> to a
+ <a href="#concept-uq-new" title="concept-UQ-new">new <code>URLQuery</code> object</a> using
+ <var title="">object</var>.
+
+ <li><p>Set <a href="#concept-uu-query-object" title="concept-UU-query-object">query object</a> to
+ <var title="">object</var>.
+
+ <li><p>Run <var title="">object</var>'s
+ <a href="#concept-uq-update" title="concept-UQ-update">update steps</a>.
+</ol>
+
+<p>The <dfn id="dom-url-hash" title="dom-URL-hash"><code>hash</code></dfn> attribute must run
+these steps:
+
+<ol>
+ <li><p>If <a href="#concept-uu-url" title="concept-UU-url">url</a> is null, or its
+ <a href="#concept-url-fragment" title="concept-url-fragment">fragment</a> is either null or
+ the empty string, return the empty string.
+
+ <li><p>Return "<code title="">#</code>" concatenated with
+ <a href="#concept-url-fragment" title="concept-url-fragment">fragment</a>.
+</ol>
+
+<p>Setting the <a href="#dom-url-hash"><code title="dom-URL-hash">hash</code></a> attribute must run these
+steps:
+
+<ol>
+ <li><p>If <a href="#concept-uu-url" title="concept-UU-url">url</a> is null, or its
+ <a href="#concept-url-scheme" title="concept-url-scheme">scheme</a> is
+ "<code title="">javascript</code>", terminate these steps.
+
+ <li><p>If the given value is the empty string, set
+ <a href="#concept-url-fragment" title="concept-url-fragment">fragment</a> to null, run the
+ <a href="#pre-update-steps">pre-update steps</a>, and terminate these steps.
+
+ <li><p>Let <var title="">input</var> be the given value with a single leading
+ "<code title="">#</code>" removed, if any.
+
+ <li><p>Set <a href="#concept-url-fragment" title="concept-url-fragment">fragment</a> to
+ the empty string.
+
+ <li><p><a href="#concept-url-parser" title="concept-url-parser">Parse</a> <var title="">input</var>
+ with <a href="#concept-uu-url" title="concept-UU-url">url</a> as <var title="">url</var> and
+ <a href="#fragment-state">fragment state</a> as <var title="">state override</var>.
+
+ <li><p>Run the <a href="#pre-update-steps">pre-update steps</a>.
+</ol>
+
+
+<h3 id="interface-urlquery"><span class="secno">7.3 </span>Interface <a href="#urlquery"><code>URLQuery</code></a></h3>
+
+<pre class="idl">[<span title="dom-URLQuery">Constructor(optional ([EnsureUTF16] DOMString or <a href="#urlquery">URLQuery</a>) <var title="">init</var> = "")]
+interface <dfn id="urlquery">URLQuery</dfn> {
+  DOMString? <a href="#dom-urlquery-get" title="dom-URLQuery-get">get</a>([EnsureUTF16] DOMString <var title="">name</var>);
+  sequence&lt;DOMString&gt; <a href="#dom-urlquery-getall" title="dom-URLQuery-getAll">getAll</a>([EnsureUTF16] DOMString <var title="">name</var>);
+  void <a href="#dom-urlquery-set" title="dom-URLQuery-set">set</a>([EnsureUTF16] DOMString <var title="">name</var>, [EnsureUTF16] DOMString <var title="">value</var>);
+  void <a href="#dom-urlquery-append" title="dom-URLQuery-append">append</a>([EnsureUTF16] DOMString <var title="">name</var>, [EnsureUTF16] DOMString <var title="">value</var>);
+  boolean <a href="#dom-urlquery-has" title="dom-URLQuery-has">has</a>([EnsureUTF16] DOMString <var title="">name</var>);
+  void <a href="#dom-urlquery-delete" title="dom-URLQuery-delete">delete</a>([EnsureUTF16] DOMString <var title="">name</var>);
+  readonly attribute unsigned long <a href="#dom-urlquery-size" title="dom-URLQuery-size">size</a>;
+};</span></pre>
+
+<p>A <a href="#urlquery"><code>URLQuery</code></a> object has an associated list of name-value
+pairs, which is initially empty.
+
+<p>A <a href="#urlquery"><code>URLQuery</code></a> object has an associated
+<dfn id="concept-uq-url-object" title="concept-UQ-url-object">url object</dfn> which is an object
+implementing <a href="#urlutils"><code>URLUtils</code></a> whose
+<a href="#concept-uu-query-object" title="concept-UU-query-object">query object</a> is the
+<a href="#urlquery"><code>URLQuery</code></a> object, and null if there is no such object.
+
+<p class="note"><a href="#urlquery"><code>URLQuery</code></a> objects always use
+<a class="external" data-anolis-spec="encoding" href="http://encoding.spec.whatwg.org/#utf-8">utf-8</a> as
+<a class="external" data-anolis-spec="encoding" href="http://encoding.spec.whatwg.org/#encoding">encoding</a>, despite the existence of
+concepts such as
+<a href="#concept-uu-query-encoding" title="concept-UU-query-encoding">query encoding</a>. This is to
+encourage developers to migrate towards
+<a class="external" data-anolis-spec="encoding" href="http://encoding.spec.whatwg.org/#utf-8">utf-8</a>, which they really ought to
+have done a long time ago now.
+
+<p>To create a
+<dfn id="concept-uq-new" title="concept-UQ-new">new <code>URLQuery</code> object</dfn>, optionally
+using <var title="">init</var>, run these steps:
+
+<ol>
+ <li><p>Let <var title="">query</var> be a new <a href="#urlquery"><code>URLQuery</code></a> object.
+
+ <li><p>If <var title="">init</var> is the empty string or null, return
+ <var title="">query</var>.
+ <!-- Beware: new URLQuery(null) is equivalent to new URLQuery("null") -->
+
+ <li><p>If <var title="">init</var> is a string,
+ set <var title="">query</var>'s associated list of name-value pairs to the
+ result of <a href="#concept-urlencoded-parser" title="concept-urlencoded-parser">parsing</a>
+ <var title="">input</var>.
+
+ <li><p>If <var title="">init</var> is a <a href="#urlquery"><code>URLQuery</code></a> object, set
+ <var title="">query</var>'s associated list of name-value pairs to a copy of
+ <var title="">init</var> associated list of name-value pairs.
+
+ <li><p>Return <var title="">query</var>.
+</ol>
+
+<p>A <a href="#urlquery"><code>URLQuery</code></a> object's
+<dfn id="concept-uq-update" title="concept-UQ-update">update steps</dfn> are:
+
+<ol>
+ <li><p>If <a href="#concept-uq-url-object" title="concept-UQ-url-object">url object</a> is null,
+ terminate these steps.
+
+ <li><p>Set <a href="#concept-uq-url-object" title="concept-UQ-url-object">url object</a>'s
+ <a href="#concept-uu-url" title="concept-UU-url">url</a>'s
+ <a href="#concept-url-query" title="concept-URL-query">query</a> to the
+ <a href="#concept-urlencoded-serializer" title="concept-urlencoded-serializer">serialization</a> of the
+ <a href="#urlquery"><code>URLQuery</code></a> object's associated list of name-value pairs.
+
+ <li><p>Run <a href="#concept-uq-url-object" title="concept-UQ-url-object">url object</a>'s
+ <a href="#pre-update-steps">pre-update steps</a>.
+</ol>
+
+<p>The
+<dfn id="dom-urlquery" title="dom-URLQuery"><code>URLQuery(<var title="">init</var>)</code></dfn>
+constructor must return a
+<a href="#concept-uq-new" title="concept-UQ-new">new <code>URLQuery</code> object</a> using
+<var title="">init</var> if given.
+
+<p>The
+<dfn id="dom-urlquery-get" title="dom-URLQuery-get"><code>get(<var title="">name</var>)</code></dfn>
+method must return the value of the first name-value pair whose name is
+<var title="">name</var>, and null if there is no such pair.
+
+<p>The
+<dfn id="dom-urlquery-getall" title="dom-URLQuery-getAll"><code>getAll(<var title="">name</var>)</code></dfn>
+method must return the values of all name-value pairs whose name is
+<var title="">name</var>, in list order, and the empty sequence otherwise.
+
+<p>The
+<dfn id="dom-urlquery-set" title="dom-URLQuery-set"><code>set(<var title="">name</var>, <var title="">value</var>)</code></dfn>
+method must run these steps:
+
+<ol>
+ <li><p>If there is a name-value pair whose name is <var title="">name</var>,
+ set the value of the first such name-value pair to <var title="">value</var>.
+
+ <li><p>Otherwise, append a new name-value pair whose name is
+ <var title="">name</var> and value is <var title="">value</var>, to the list of
+ name-value pairs.
+
+ <li><p>Run the <a href="#concept-uq-update" title="concept-UQ-update">update steps</a>.
+</ol>
+
+<p>The
+<dfn id="dom-urlquery-append" title="dom-URLQuery-append"><code>append(<var title="">name</var>, <var title="">value</var>)</code></dfn>
+method must run these steps:
+
+<ol>
+ <li><p>Append a new name-value pair whose name is <var title="">name</var> and
+ value is <var title="">value</var>, to the list of name-value pairs.
+
+ <li><p>Run the <a href="#concept-uq-update" title="concept-UQ-update">update steps</a>.
+</ol>
+
+<p>The
+<dfn id="dom-urlquery-has" title="dom-URLQuery-has"><code>has(<var title="">name</var>)</code></dfn>
+method must return true if there is a name-value pair whose name is
+<var title="">name</var>, and false otherwise.
+
+<p>The
+<dfn id="dom-urlquery-delete" title="dom-URLQuery-delete"><code>delete(<var title="">name</var>)</code></dfn>
+method must run these steps:
+
+<ol>
+ <li><p>Remove all name-value pairs whose name is <var title="">name</var>.
+
+ <li><p>Run the <a href="#concept-uq-update" title="concept-UQ-update">update steps</a>.
+</ol>
+
+<p>The <dfn id="dom-urlquery-size" title="dom-URLQuery-size"><code>size</code></dfn> attribute must
+return the number of name-value pairs.
+
+
+
+<h2 class="no-num" id="references">References</h2>
+<div id="anolis-references"><dl><dt id="refsENCODING">[ENCODING]
+<dd><cite><a href="http://encoding.spec.whatwg.org/">Encoding</a></cite>, Anne van Kesteren. WHATWG.
+
+<dt id="refsHTML">[HTML]
+<dd>(Non-normative) <cite><a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/">HTML</a></cite>, Ian Hickson. WHATWG.
+
+<dt id="refsIPV6">[IPV6]
+<dd><cite><a href="http://tools.ietf.org/html/rfc4291">IP Version 6 Addressing Architecture</a></cite>, R. Hinden and Steve Deering. IETF.
+
+<dt id="refsIPV6TEXT">[IPV6TEXT]
+<dd>(Non-normative) <cite><a href="http://tools.ietf.org/html/rfc5952">A Recommendation for IPv6 Address Text Representation</a></cite>, S. Kawamura and M. Kawashima. IETF.
+
+<dt id="refsIRI">[IRI]
+<dd>(Non-normative) <cite><a href="http://tools.ietf.org/html/rfc3987">Internationalized Resource Identifiers (IRIs)</a></cite>, Martin Dürst and Michel Suignard. IETF.
+
+<dt id="refsORIGIN">[ORIGIN]
+<dd><cite><a href="http://tools.ietf.org/html/rfc6454">The Web Origin Concept</a></cite>, Adam Barth. IETF.
+
+<dt id="refsRFC2119">[RFC2119]
+<dd><cite><a href="http://tools.ietf.org/html/rfc2119">Key words for use in RFCs to Indicate Requirement Levels</a></cite>, Scott Bradner. IETF.
+
+<dt id="refsURI">[URI]
+<dd>(Non-normative) <cite><a href="http://tools.ietf.org/html/rfc3986">Uniform Resource Identifier (URI): Generic Syntax</a></cite>, Tim Berners-Lee, Roy Fielding and Larry Masinter. IETF.
+
+</dl></div>
+
+
+
+<h2 class="no-num" id="acknowledgments">Acknowledgments</h2>
+
+<p>Thanks to
+Adam Barth,
+Alexandre Morgaut,
+Bobby Holley,
+Boris Zbarsky,
+David Sheets,
+Erik Arvidsson,
+Gavin Carothers,
+Geoff Richards,
+Glenn Maynard,
+Henri Sivonen,
+Ian Hickson,
+James Graham,
+James Manger,
+James Ross,
+Marcos Cáceres,
+Martin Dürst,
+Mathias Bynens,
+Michael™ Smith,
+Peter Occil,
+Rodney Rehm,
+Simon Pieters,
+Tab Atkins,
+Tantek Çelik, and
+成瀬ゆい (Yui Naruse)
+for being awesome!
+
+<!-- http://dvcs.w3.org/hg/url/raw-file/feb258fa6ab5/Overview.html -->
+
+<p>While this standard has been written from scratch, special thanks should
+be extended to the editors of the various specifications that previously
+defined what we now call URLs:
+Larry Masinter,
+Martin Dürst,
+Michel Suignard,
+Roy Fielding, and
+Tim Berners-Lee.
+
+<!-- RFC 3986, RFC 3987 -->
+
+
+
+<script id="head" src="http://www.whatwg.org/specs/web-apps/current-work/dfn.js"></script>
