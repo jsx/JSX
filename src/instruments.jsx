@@ -717,14 +717,100 @@ class _InExpressionTransformer extends _BinaryExpressionTransformer {
 
 }
 
-class _LogicalExpressionTransformer extends _BinaryExpressionTransformer {
+class _LogicalExpressionTransformer extends _ExpressionTransformer {
+
+	var _expr : LogicalExpression;
 
 	function constructor (transformer : CodeTransformer, expr : LogicalExpression) {
-		super(transformer, expr);
+		super(transformer, "LOGICAL");
+		this._expr = expr;
 	}
 
-	override function _clone (arg1 : Expression, arg2 : Expression) : BinaryExpression {
-		return new LogicalExpression(this._expr.getToken(), arg1, arg2);
+	override function getExpression () : Expression {
+		return this._expr;
+	}
+
+	override function doCPSTransform (parent : MemberFunctionDefinition, continuation : Expression) : Expression {
+		/*
+
+a && b | C
+
+a | function ($a) { var $C = C; return $a ? (b as boolean) | $C : ($a as boolean) | $C; }
+
+---
+
+a || b | C
+
+a | function ($a) { var $C = C; return $a ? ($a as boolean) | $C : (b as boolean) | $C; }
+
+		*/
+
+		var argVar = this._transformer.createFreshArgumentDeclaration(this._expr.getFirstExpr().getType());
+		var contVar = this._transformer.createFreshLocalVariable(continuation.getType());
+
+		var contFuncDef = new MemberFunctionDefinition(
+			new Token("function", false),
+			null,	// name
+			ClassDefinition.IS_STATIC,
+			this._transformer.getTransformingFuncDef().getReturnType(),
+			[ argVar ],
+			[ contVar ],
+			[],	// statements
+			[],	// closures
+			null,
+			null
+		);
+		parent.getClosures().push(contFuncDef);
+
+		// `var $C = C;`
+		var condStmt = new ExpressionStatement(
+			new AssignmentExpression(
+				new Token("=", false),
+				new LocalExpression(contVar.getName(), contVar),
+				continuation
+			)
+		);
+
+		var ifTrueExpr : Expression;
+		var ifFalseExpr : Expression;
+		if (this._expr.getToken().getValue() == "&&") {
+			ifTrueExpr = this._expr.getSecondExpr();
+			ifFalseExpr = new LocalExpression(argVar.getName(), argVar);
+		} else {	// "||"
+			ifTrueExpr = new LocalExpression(argVar.getName(), argVar);
+			ifFalseExpr = this._expr.getSecondExpr();
+		}
+		// booleanize the results
+		if (ifTrueExpr.getType().resolveIfNullable() instanceof PrimitiveType) {
+			ifTrueExpr = new AsExpression(new Token("as", false), ifTrueExpr, Type.booleanType);
+		} else {
+			// booleanize with double `!` operations because `obj as boolean` is not allowed
+			ifTrueExpr = new LogicalNotExpression(new Token("!", false), new LogicalNotExpression(new Token("!", false), ifTrueExpr));
+		}
+		if (ifFalseExpr.getType().resolveIfNullable() instanceof PrimitiveType) {
+			ifFalseExpr = new AsExpression(new Token("as", false), ifFalseExpr, Type.booleanType);
+		} else {
+			ifFalseExpr = new LogicalNotExpression(new Token("!", false), new LogicalNotExpression(new Token("!", false), ifFalseExpr));
+		}
+
+		// `return $a ? b | $C : c | $C;`
+		var returnStmt = new ReturnStatement(
+			new Token("return", false),
+			new ConditionalExpression(
+				this._expr.getToken(),
+				new LocalExpression(argVar.getName(), argVar),
+				this._transformer._getExpressionTransformerFor(ifTrueExpr).doCPSTransform(contFuncDef, new LocalExpression(contVar.getName(), contVar)),
+				this._transformer._getExpressionTransformerFor(ifFalseExpr).doCPSTransform(contFuncDef, new LocalExpression(contVar.getName(), contVar))
+			)
+		);
+
+		contFuncDef.getStatements().push(condStmt);
+		contFuncDef.getStatements().push(returnStmt);
+
+		this._rebaseClosures(parent, contFuncDef);
+
+		var cont = new FunctionExpression(contFuncDef.getToken(), contFuncDef);
+		return this._transformer._getExpressionTransformerFor(this._expr.getFirstExpr()).doCPSTransform(parent, cont);
 	}
 
 }
