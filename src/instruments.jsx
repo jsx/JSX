@@ -1923,6 +1923,8 @@ class CodeTransformer {
 	}
 
 	function _functionIsTransformable (funcDef : MemberFunctionDefinition) : boolean {
+		if (funcDef instanceof TemplateFunctionDefinition)
+			return false;
 		if (funcDef.getStatements() == null)
 			return false;
 		if (funcDef.getNameToken() != null && funcDef.name() == "constructor")
