@@ -1537,7 +1537,14 @@ class MemberFunctionDefinition extends MemberDefinition implements Block {
 		} : Map.<variant>;
 	}
 
+	var _analyzed = false;
+
 	function analyze (outerContext : AnalysisContext) : void {
+		if (this._analyzed == true) {
+			return;
+		}
+		this._analyzed = true;
+
 		// validate jsxdoc comments
 		if ((this.flags() & ClassDefinition.IS_GENERATED) == 0) {
 			var docComment = this.getDocComment();
@@ -2130,11 +2137,11 @@ class TemplateFunctionDefinition extends MemberFunctionDefinition implements Tem
 			return null;
 		}
 		instantiated.setClassDef(this._classDef);
-		// the instantiated funcDef is queued to the member list, and its analysis is delayed to after all methods analysis complete
 		this._classDef._members.push(instantiated);
 		var analysisContext = new AnalysisContext(errors, this._classDef.getParser(), function (parser, classDef) { throw new Error("not implemented"); });
 		for (var i = 0; i < instantiationContext.objectTypesUsed.length; ++i)
 			instantiationContext.objectTypesUsed[i].resolveType(analysisContext);
+		instantiated.analyze(analysisContext);
 		// register, and return
 		this._instantiatedDefs.set(typeArgs.concat(new Type[]), instantiated);
 		return instantiated;
