@@ -1032,7 +1032,35 @@ class TemplateFunctionType extends ResolvedFunctionType {
 	}
 
 	override function _getExpectedTypes (expected : Util.ArgumentTypeRequest[], numberOfArgs : number, isStatic : boolean) : void {
-		// does not support left-to-right type deduction for template function calls
+		if (((this._funcDef.flags() & ClassDefinition.IS_STATIC) != 0) != isStatic)
+			return;
+		var argTypes = new Type[];
+		if (this._argTypes.length > 0 && numberOfArgs >= this._argTypes.length
+		    && this._argTypes[this._argTypes.length - 1] instanceof VariableLengthArgumentType) {
+			for (var i = 0; i < numberOfArgs; ++i) {
+				if (i < this._argTypes.length - 1) {
+					argTypes[i] = this._argTypes[i];
+				} else {
+					argTypes[i] = (this._argTypes[this._argTypes.length - 1] as VariableLengthArgumentType).getBaseType();
+				}
+			}
+		} else if (this._argTypes.length == numberOfArgs) {
+			argTypes = this._argTypes;
+		} else {
+			// fail
+			return;
+		}
+		var hasCallback = false;
+		var callbackArgTypes = argTypes.map.<Type>(function (argType) {
+			if (argType instanceof StaticFunctionType) { // only functions, but does not duduce types of [] or {}
+				hasCallback = true;
+				return argType;
+			} else {
+				return null;
+			}
+		});
+		if (hasCallback)
+			expected.push(new Util.ArgumentTypeRequest(callbackArgTypes, this._funcDef.getTypeArguments()));
 	}
 
 	override function getObjectType () : Type {

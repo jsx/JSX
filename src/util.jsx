@@ -172,8 +172,8 @@ class Util {
 
 	class ArgumentTypeRequest {
 		var argTypes : Type[];
-		var typeArgs : ParsedObjectType[]; // type parameters
-		function constructor(argTypes : Type[], typeArgs : ParsedObjectType[]) {
+		var typeArgs : Token[];
+		function constructor(argTypes : Type[], typeArgs : Token[]) {
 			this.argTypes = argTypes;
 			this.typeArgs = typeArgs;
 		}
@@ -191,12 +191,35 @@ class Util {
 				var expectedCallbackType = null : StaticFunctionType;
 				for (var j = 0; j < expectedTypes.length; ++j) {
 					if (expectedTypes[j].at(i) != null && expectedTypes[j].at(i) instanceof StaticFunctionType && (expectedTypes[j].at(i) as StaticFunctionType).getArgumentTypes().length == funcDef.getArguments().length) {
-						var callbackType = expectedTypes[j].at(i) as StaticFunctionType;
+						var callbackType = (expectedTypes[j].at(i) as StaticFunctionType)._clone() as StaticFunctionType;
+
+						function typeNotContainsParameter (type : Type) : boolean {
+							for (var k = 0; k < expectedTypes[j].typeArgs.length; ++k) {
+								if (type instanceof ParsedObjectType
+									&& (type as ParsedObjectType).getQualifiedName().getImport() == null
+									&& (type as ParsedObjectType).getQualifiedName().getEnclosingType() == null
+									&& (type as ParsedObjectType).getToken().getValue() == expectedTypes[j].typeArgs[k].getValue())
+									return false;
+							}
+							return type.forEachType(typeNotContainsParameter);
+						}
+
+						// insert nulls to the positions of type parameters
+						for (var k = 0; k < callbackType.getArgumentTypes().length; ++k) {
+							var argType = callbackType.getArgumentTypes()[k];
+							if (! typeNotContainsParameter(argType)) {
+								callbackType.getArgumentTypes()[k] = null;
+							}
+						}
+						if (callbackType.getReturnType() != null && ! typeNotContainsParameter(callbackType.getReturnType())) {
+							callbackType._returnType = null;
+						}
 
 						if (expectedCallbackType == null) {
 							expectedCallbackType = callbackType;
 						} else if (Util.typesAreEqual(expectedCallbackType.getArgumentTypes(), callbackType.getArgumentTypes())
-							&& expectedCallbackType.getReturnType().equals(callbackType.getReturnType())) {
+							&& ((expectedCallbackType.getReturnType() == null && callbackType.getReturnType() == null)
+								|| expectedCallbackType.getReturnType().equals(callbackType.getReturnType()))) {
 							// function signatures are equal
 						} else {
 							break;
