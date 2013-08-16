@@ -104,7 +104,7 @@ abstract class _ExpressionTransformer {
 			return body;
 		}
 		botFuncDef._statements = [ new ReturnStatement(new Token("return", false), body) ] : Statement[];
-		this._rebaseClosures(topFuncDef, botFuncDef);
+		Util.rebaseClosures(topFuncDef, botFuncDef);
 		return topExpr;
 	}
 
@@ -124,47 +124,6 @@ abstract class _ExpressionTransformer {
 		throw new Error("logic flaw");
 	}
 
-	function _rebaseClosures (srcParent : MemberFunctionDefinition, dstParent : MemberFunctionDefinition) : void {
-		var closures = new MemberFunctionDefinition[];
-
-		// find funcDefs in dstParent
-		dstParent.forEachStatement(function (statement) {
-			if (statement instanceof FunctionStatement) {
-				closures.push((statement as FunctionStatement).getFuncDef());
-			}
-			return statement.forEachExpression(function (expr) {
-				if (expr instanceof FunctionExpression) {
-					closures.push((expr as FunctionExpression).getFuncDef());
-				}
-				// does not search for funcDefs deeper than the first level
-				return true;
-			});
-		});
-
-		// rebase!
-		for (var i = 0; i < closures.length; ++i) {
-			this._unlinkFunction(closures[i]);
-			this._linkFunction(closures[i], dstParent);
-		}
-	}
-
-	function _unlinkFunction (funcDef : MemberFunctionDefinition) : void {
-		var oldParent = funcDef.getParent();
-
-		var j;
-		if ((j = oldParent.getClosures().indexOf(funcDef)) != -1) {
-			oldParent.getClosures().splice(j, 1);
-		} else {
-			throw new Error("logic flaw, function graph broken");
-		}
-	}
-
-	function _linkFunction (funcDef : MemberFunctionDefinition, newParent : MemberFunctionDefinition) : void {
-		newParent.getClosures().push(funcDef);
-		funcDef.setParent(newParent);
-		funcDef.setClassDef(newParent.getClassDef());
-	}
-
 	function _createAnonymousFunction (parent : MemberFunctionDefinition, args : ArgumentDeclaration[], returnType : Type) : MemberFunctionDefinition {
 		var funcDef = new MemberFunctionDefinition(
 			this.getExpression().getToken(),
@@ -178,7 +137,7 @@ abstract class _ExpressionTransformer {
 			null,
 			null
 		);
-		this._linkFunction(funcDef, parent);
+		Util.linkFunction(funcDef, parent);
 		return funcDef;
 	}
 
@@ -789,7 +748,7 @@ a | function ($a) { var $C = C; return $a ? ($a as boolean) | $C : (b as boolean
 		contFuncDef.getStatements().push(condStmt);
 		contFuncDef.getStatements().push(returnStmt);
 
-		this._rebaseClosures(parent, contFuncDef);
+		Util.rebaseClosures(parent, contFuncDef);
 
 		var cont = new FunctionExpression(contFuncDef.getToken(), contFuncDef);
 		return this._transformer._getExpressionTransformerFor(this._expr.getFirstExpr()).doCPSTransform(parent, cont);
@@ -877,7 +836,7 @@ a | function ($a) { var $C = C; return $a ? b | $C : c | $C; }
 		contFuncDef.getStatements().push(condStmt);
 		contFuncDef.getStatements().push(returnStmt);
 
-		this._rebaseClosures(parent, contFuncDef);
+		Util.rebaseClosures(parent, contFuncDef);
 
 		var cont = new FunctionExpression(contFuncDef.getToken(), contFuncDef);
 		return this._transformer._getExpressionTransformerFor(this._expr.getCondExpr()).doCPSTransform(parent, cont);
@@ -1221,7 +1180,7 @@ class _DeleteStatementTransformer extends _StatementTransformer {
 
 		override function _constructBody (args : Expression[], topExpr : Expression, topFuncDef : MemberFunctionDefinition, botFuncDef : MemberFunctionDefinition) : Expression {
 			botFuncDef._statements = [ new DeleteStatement(this._statement.getToken(), this._constructOp(args)) ] : Statement[];
-			this._rebaseClosures(topFuncDef, botFuncDef);
+			Util.rebaseClosures(topFuncDef, botFuncDef);
 			return topExpr;
 		}
 

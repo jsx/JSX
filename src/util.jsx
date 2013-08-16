@@ -568,6 +568,49 @@ class Util {
 		return set;
 	}
 
+	static function rebaseClosures (srcParent : MemberFunctionDefinition, dstParent : MemberFunctionDefinition) : void {
+		var closures = new MemberFunctionDefinition[];
+
+		// find funcDefs in dstParent
+		dstParent.forEachStatement(function (statement) {
+			if (statement instanceof FunctionStatement) {
+				closures.push((statement as FunctionStatement).getFuncDef());
+			}
+			return statement.forEachExpression(function (expr) {
+				if (expr instanceof FunctionExpression) {
+					closures.push((expr as FunctionExpression).getFuncDef());
+				}
+				// does not search for funcDefs deeper than the first level
+				return true;
+			});
+		});
+
+		// rebase!
+		for (var i = 0; i < closures.length; ++i) {
+			Util.unlinkFunction(closures[i]);
+			Util.linkFunction(closures[i], dstParent);
+		}
+	}
+
+	static function unlinkFunction (funcDef : MemberFunctionDefinition) : void {
+		var oldParent = funcDef.getParent();
+
+		var j;
+		if ((j = oldParent.getClosures().indexOf(funcDef)) != -1) {
+			oldParent.getClosures().splice(j, 1);
+		} else {
+			throw new Error("logic flaw, function graph broken");
+		}
+
+		funcDef.setParent(null);
+	}
+
+	static function linkFunction (funcDef : MemberFunctionDefinition, newParent : MemberFunctionDefinition) : void {
+		newParent.getClosures().push(funcDef);
+		funcDef.setParent(newParent);
+		funcDef.setClassDef(newParent.getClassDef());
+	}
+
 }
 
 /*
