@@ -593,15 +593,11 @@ class Util {
 		}
 	}
 
-	static function unlinkFunction (funcDef : MemberFunctionDefinition, oldParent : MemberFunctionDefinition = null) : void {
-		if (oldParent == null) {
-			oldParent = funcDef.getParent();
-		}
+	static function unlinkFunction (funcDef : MemberFunctionDefinition, oldParent : MemberFunctionDefinition) : void {
 		var j;
 		if ((j = oldParent.getClosures().indexOf(funcDef)) != -1) {
 			oldParent.getClosures().splice(j, 1);
 		}
-
 		funcDef.setParent(null);
 	}
 

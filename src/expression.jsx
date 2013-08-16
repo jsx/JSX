@@ -50,7 +50,7 @@ abstract class Expression implements Stashable {
 		cloned.forEachExpression (function onExpr (expr) {
 			if (expr instanceof FunctionExpression) {
 				var newFuncDef = (expr as FunctionExpression).getFuncDef().clone();
-				Util.unlinkFunction(newFuncDef);
+				Util.unlinkFunction(newFuncDef, (expr as FunctionExpression).getFuncDef().getParent());
 				Util.linkFunction(newFuncDef, parent);
 				(expr as FunctionExpression).setFuncDef(newFuncDef);
 				return true;
