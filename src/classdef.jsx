@@ -1985,26 +1985,62 @@ class TemplateFunctionDefinition extends MemberFunctionDefinition implements Tem
 		}
 
 		function unify (formal : Type, actual : Type) : boolean {
-			if (formal instanceof ParsedObjectType) {
-				// TODO enclosing types
-
-				// formal is a type parameter
-				if ((formal as ParsedObjectType).getTypeArguments().length == 0 && typemap.hasOwnProperty((formal as ParsedObjectType).getToken().getValue())) {
-					var expectedType = typemap[(formal as ParsedObjectType).getToken().getValue()];
-					if (expectedType != null) { // already unified, check if arg type is the expected one
-						if (exact && ! expectedType.equals(actual)) {
-							// no need to report a compile note when exact matching
-							return false;
-						}
-						if (! actual.isConvertibleTo(expectedType)) {
-							notes.push(new CompileNote(token, "expected " + expectedType.toString() + ", but got " + actual.toString()));
-							return false;
-						}
-					} else {
-						typemap[(formal as ParsedObjectType).getToken().getValue()] = actual;
+			// formal is a type parameter
+			if (formal instanceof ParsedObjectType
+					&& (formal as ParsedObjectType).getTypeArguments().length == 0
+					&& (formal as ParsedObjectType).getQualifiedName().getImport() == null
+					&& (formal as ParsedObjectType).getQualifiedName().getEnclosingType() == null
+					&& typemap.hasOwnProperty((formal as ParsedObjectType).getToken().getValue())) {
+				var expectedType = typemap[(formal as ParsedObjectType).getToken().getValue()];
+				if (expectedType != null) { // already unified, check if arg type is the expected one
+					if (exact && ! expectedType.equals(actual)) {
+						// no need to report a compile note when exact matching
+						return false;
+					}
+					if (! actual.isConvertibleTo(expectedType)) {
+						notes.push(new CompileNote(token, "expected " + expectedType.toString() + ", but got " + actual.toString()));
+						return false;
 					}
 				} else {
-					// TODO support arbitrary parameterized class
+					typemap[(formal as ParsedObjectType).getToken().getValue()] = actual;
+				}
+			} else if (formal instanceof ParsedObjectType) {
+				if (! (actual instanceof ObjectType)) {
+					notes.push(new CompileNote(token, "expected " + formal.toString() + ", but got " + actual.toString()));
+					return false;
+				}
+				// TODO import
+				// TODO enclosing types
+				assert (formal as ParsedObjectType).getQualifiedName().getImport() == null;
+				assert (formal as ParsedObjectType).getQualifiedName().getEnclosingType() == null;
+				var parser = this._classDef.getParser();
+				if ((formal as ParsedObjectType).getTypeArguments().length == 0) {
+					(formal as ParsedObjectType).resolveType(new AnalysisContext(errors, parser, null));
+					if (! actual.isConvertibleTo(formal)) {
+						notes.push(new CompileNote(token, "expected " + formal.toString() + ", but got " + actual.toString()));
+						return false;
+					}
+				} else {
+					var formalClassDef = (formal as ParsedObjectType).getQualifiedName().getTemplateClass(parser);
+					assert (! (actual instanceof ParsedObjectType)) || (actual as ParsedObjectType)._classDef != null;
+					var actualClassDef = (actual as ObjectType).getClassDef();
+					if (formalClassDef == null) {
+						notes.push(new CompileNote(token, "not matching class definition " + formal.toString()));
+						return false;
+					}
+					assert actualClassDef != null;
+					if (! (actualClassDef instanceof InstantiatedClassDefinition && formalClassDef == (actualClassDef as InstantiatedClassDefinition).getTemplateClass())) {
+						notes.push(new CompileNote(token, "expected " + formal.toString() + ", but got " + actual.toString()));
+						return false;
+					}
+					var formalTypeArgs = (formal as ParsedObjectType).getTypeArguments();
+					var actualTypeArgs = (actualClassDef as InstantiatedClassDefinition).getTypeArguments();
+					assert formalTypeArgs.length == actualTypeArgs.length;
+					for (var i = 0; i < formalTypeArgs.length; ++i) {
+						if (! unify(formalTypeArgs[i], actualTypeArgs[i])) {
+							return false;
+						}
+					}
 				}
 			} else if (formal instanceof NullableType) {
 				if (! unify((formal as NullableType).getBaseType(), actual)) {
