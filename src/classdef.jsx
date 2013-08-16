@@ -1688,16 +1688,16 @@ class MemberFunctionDefinition extends MemberDefinition implements Block {
 				throw new Error("TODO: template function with default parameters in " + this.getNotation() + " is not yet supported");
 			}
 			// fix up function links inside defVal
-			defVal.forEachExpression(function onExpr(expr) {
+			Util.forEachExpression(function onExpr(expr) {
 				if (expr instanceof FunctionExpression) {
 					var newFuncDef = (expr as FunctionExpression).getFuncDef().clone();
-					Util.unlinkFunction(newFuncDef);
+					Util.unlinkFunction(newFuncDef, this);
 					Util.linkFunction(newFuncDef, wrapper);
 					(expr as FunctionExpression).setFuncDef(newFuncDef);
 					return true;
 				}
 				return expr.forEachExpression(onExpr);;
-			});
+			}, argExprs);
 			wrapper.setClassDef(this.getClassDef());
 			// register
 			this.getClassDef().members().push(wrapper);
