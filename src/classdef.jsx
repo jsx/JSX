@@ -1994,7 +1994,7 @@ class TemplateFunctionDefinition extends MemberFunctionDefinition implements Tem
 					var expectedType = typemap[(formal as ParsedObjectType).getToken().getValue()];
 					if (expectedType != null) { // already unified, check if arg type is the expected one
 						if (exact && ! expectedType.equals(actual)) {
-							// no need to throw a compile error when exact matching
+							// no need to report a compile note when exact matching
 							return false;
 						}
 						if (! actual.isConvertibleTo(expectedType)) {
@@ -2031,7 +2031,7 @@ class TemplateFunctionDefinition extends MemberFunctionDefinition implements Tem
 					return false;
 			} else { // formal is a primitive type
 				if (exact && ! formal.equals(actual)) {
-					// no need to throw a compile error when exact matching
+					// no need to report a compile note when exact matching
 					return false;
 				}
 				if (! actual.isConvertibleTo(formal)) {
