@@ -1905,22 +1905,26 @@ class MemberFunctionDefinition extends MemberDefinition implements Block {
 			return false;
 		}
 		for (var i = 0; i < this._args.length; ++i) {
-			if (this._args[i].getType() != null) {
-				if (! this._args[i].getType().equals(type.getArgumentTypes()[i])) {
-					context.errors.push(new CompileError(this.getToken(), "detected type conflict for argument '" + this._args[i].getName().getValue() + "' (expected '" + type.getArgumentTypes()[i].toString() + "' but found '" + this._args[i].getType().toString() + "'"));
+			if (type.getArgumentTypes()[i] != null) {
+				if (this._args[i].getType() != null) {
+					if (! this._args[i].getType().equals(type.getArgumentTypes()[i])) {
+						context.errors.push(new CompileError(this.getToken(), "detected type conflict for argument '" + this._args[i].getName().getValue() + "' (expected '" + type.getArgumentTypes()[i].toString() + "' but found '" + this._args[i].getType().toString() + "'"));
+						return false;
+					}
+				} else {
+					this._args[i].setTypeForced(type.getArgumentTypes()[i]);
+				}
+			}
+		}
+		if (type.getReturnType() != null) {
+			if (this._returnType != null) {
+				if (! this._returnType.equals(type.getReturnType())) {
+					context.errors.push(new CompileError(this.getToken(), "detected return type conflict, expected '" + type.getReturnType().toString() + "' but found '" + this._returnType.toString() + "'"));
 					return false;
 				}
 			} else {
-				this._args[i].setTypeForced(type.getArgumentTypes()[i]);
+				this._returnType = type.getReturnType();
 			}
-		}
-		if (this._returnType != null) {
-			if (! this._returnType.equals(type.getReturnType())) {
-				context.errors.push(new CompileError(this.getToken(), "detected return type conflict, expected '" + type.getReturnType().toString() + "' but found '" + this._returnType.toString() + "'"));
-				return false;
-			}
-		} else {
-			this._returnType = type.getReturnType();
 		}
 		if (this._funcLocal != null)
 			this._funcLocal.setTypeForced(this.getType());

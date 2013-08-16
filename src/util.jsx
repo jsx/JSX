@@ -262,9 +262,12 @@ class Util {
 	static function typesAreEqual (x : Type[], y : Type[]) : boolean {
 		if (x.length != y.length)
 			return false;
-		for (var i = 0; i < x.length; ++i)
+		for (var i = 0; i < x.length; ++i) {
+			if (x[i] == null || y[i] == null)
+				continue;
 			if (! x[i].equals(y[i]))
 				return false;
+		}
 		return true;
 	}
 
