@@ -69,6 +69,10 @@ abstract class Type {
 		return this;
 	}
 
+	function forEachType (cb : (Type) -> boolean) : boolean {
+		return true;
+	}
+
 	static function templateTypeToString (parameterizedTypeName : string, typeArgs : Type[]) : string {
 		var s = parameterizedTypeName + ".<";
 		for (var i = 0; i < typeArgs.length; ++i) {
@@ -390,6 +394,12 @@ class NullableType extends Type {
 		return "Nullable.<" + this._baseType.toString() + ">";
 	}
 
+	override function forEachType (cb : (Type) -> boolean) : boolean {
+		if (! cb(this._baseType))
+			return false;
+		return true;
+	}
+
 }
 
 class VariableLengthArgumentType extends Type {
@@ -429,6 +439,12 @@ class VariableLengthArgumentType extends Type {
 
 	override function toString () : string {
 		return "..." + this._baseType.toString();
+	}
+
+	override function forEachType (cb : (Type) -> boolean) : boolean {
+		if (! cb(this._baseType))
+			return false;
+		return true;
 	}
 
 }
@@ -495,6 +511,10 @@ class ObjectType extends Type {
 
 	override function toString () : string {
 		return this._classDef != null ? this._classDef.className() : "(null)";
+	}
+
+	override function forEachType (cb : (Type) -> boolean) : boolean {
+		throw new Error("logic flaw");
 	}
 
 }
@@ -568,6 +588,16 @@ class ParsedObjectType extends ObjectType {
 
 	override function toString () : string {
 		return this._typeArguments.length != 0 ? Type.templateTypeToString(this._qualifiedName.getToken().getValue(), this._typeArguments) : this._qualifiedName.getToken().getValue();
+	}
+
+	override function forEachType (cb : (Type) -> boolean) : boolean {
+		if (this._qualifiedName.getEnclosingType() != null && ! cb(this._qualifiedName.getEnclosingType()))
+			return false;
+		for (var i = 0; i < this._typeArguments.length; ++i) {
+			if (! cb(this._typeArguments[i]))
+				return false;
+		}
+		return true;
 	}
 
 }
@@ -665,6 +695,10 @@ class FunctionChoiceType extends FunctionType {
 	}
 
 	override function getObjectType () : Type {
+		throw new Error("logic flaw");
+	}
+
+	override function forEachType (cb : (Type) -> boolean) : boolean {
 		throw new Error("logic flaw");
 	}
 
@@ -850,6 +884,16 @@ abstract class ResolvedFunctionType extends FunctionType {
 
 	override function getObjectType () : Type {
 		throw new Error("logic flaw");
+	}
+
+	override function forEachType (cb : (Type) -> boolean) : boolean {
+		for (var i = 0; i < this._argTypes.length; ++i) {
+			if (! cb(this._argTypes[i]))
+				return false;
+		}
+		if (! cb(this._returnType))
+			return false;
+		return true;
 	}
 
 }
