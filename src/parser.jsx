@@ -216,9 +216,9 @@ class Import {
 	function serialize () : variant {
 		return [
 			"Import",
-			Serializer.<Token>.serializeNullable(this._filenameToken),
-			Serializer.<Token>.serializeNullable(this._aliasToken),
-			Serializer.<Token>.serializeArray(this._classNames)
+			Util.serializeNullable(this._filenameToken),
+			Util.serializeNullable(this._aliasToken),
+			Util.serializeArray(this._classNames)
 		] : variant[];
 	}
 
@@ -413,8 +413,8 @@ class QualifiedName {
 		return [
 			"QualifiedName",
 			this._token.serialize(),
-			Serializer.<Import>.serializeNullable(this._import),
-			Serializer.<ParsedObjectType>.serializeNullable(this._enclosingType)
+			Util.serializeNullable(this._import),
+			Util.serializeNullable(this._enclosingType)
 		] : variant[];
 	}
 

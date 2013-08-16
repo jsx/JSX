@@ -111,7 +111,7 @@ class ConstructorInvocationStatement extends Statement {
 	}
 
 	override function clone () : Statement {
-		return new ConstructorInvocationStatement(this._token, this._ctorClassType, Cloner.<Expression>.cloneArray(this._args), this._ctorFunctionType);
+		return new ConstructorInvocationStatement(this._token, this._ctorClassType, Util.cloneArray(this._args), this._ctorFunctionType);
 	}
 
 	function instantiate (instantiationContext : InstantiationContext) : Statement {
@@ -121,7 +121,7 @@ class ConstructorInvocationStatement extends Statement {
 		return new ConstructorInvocationStatement(
 			this._token,
 			this._ctorClassType.instantiate(instantiationContext),
-			Cloner.<Expression>.cloneArray(this._args),
+			Util.cloneArray(this._args),
 			null);
 	}
 
@@ -145,7 +145,7 @@ class ConstructorInvocationStatement extends Statement {
 		return [
 			"ConstructorInvocationStatement",
 			this._ctorClassType.serialize(),
-			Serializer.<Expression>.serializeArray(this._args)
+			Util.serializeArray(this._args)
 		] : variant[];
 	}
 
@@ -315,7 +315,7 @@ class ReturnStatement extends Statement {
 	}
 
 	override function clone () : Statement {
-		return new ReturnStatement(this._token, Cloner.<Expression>.cloneNullable(this._expr));
+		return new ReturnStatement(this._token, Util.cloneNullable(this._expr));
 	}
 
 	override function getToken () : Token {
@@ -333,7 +333,7 @@ class ReturnStatement extends Statement {
 	override function serialize () : variant {
 		return [
 			"ReturnStatement",
-			Serializer.<Expression>.serializeNullable(this._expr)
+			Util.serializeNullable(this._expr)
 		] : variant[];
 	}
 
@@ -405,7 +405,7 @@ class YieldStatement extends Statement {
 	}
 
 	override function clone () : Statement {
-		return new YieldStatement(this._token, Cloner.<Expression>.cloneNullable(this._expr));
+		return new YieldStatement(this._token, Util.cloneNullable(this._expr));
 	}
 
 	override function getToken () : Token {
@@ -423,7 +423,7 @@ class YieldStatement extends Statement {
 	override function serialize () : variant {
 		return [
 			"YieldStatement",
-			Serializer.<Expression>.serializeNullable(this._expr)
+			Util.serializeNullable(this._expr)
 		] : variant[];
 	}
 
@@ -533,7 +533,7 @@ abstract class JumpStatement extends Statement {
 		return [
 			this._getName(),
 			this._token.serialize(),
-			Serializer.<Token>.serializeNullable(this._label)
+			Util.serializeNullable(this._label)
 		] : variant[];
 	}
 
@@ -649,7 +649,7 @@ abstract class LabellableStatement extends Statement implements Block {
 
 	function _serialize () : variant[] {
 		return [
-			Serializer.<Token>.serializeNullable(this._label)
+			Util.serializeNullable(this._label)
 		] : variant[];
 	}
 
@@ -768,7 +768,7 @@ class DoWhileStatement extends ContinuableStatement {
 	}
 
 	override function clone () : Statement {
-		return new DoWhileStatement(this._token, this._label, this._expr.clone(), Cloner.<Statement>.cloneArray(this._statements));
+		return new DoWhileStatement(this._token, this._label, this._expr.clone(), Util.cloneArray(this._statements));
 	}
 
 	function getExpr () : Expression {
@@ -780,7 +780,7 @@ class DoWhileStatement extends ContinuableStatement {
 			"DoWhileStatement"
 		] : variant[].concat(this._serialize()).concat([
 			this._expr.serialize(),
-			Serializer.<Statement>.serializeArray(this._statements)
+			Util.serializeArray(this._statements)
 		]);
 	}
 
@@ -825,7 +825,7 @@ class ForInStatement extends ContinuableStatement {
 	}
 
 	override function clone () : Statement {
-		return new ForInStatement(this._token, this._label, this._lhsExpr.clone(), this._listExpr.clone(), Cloner.<Statement>.cloneArray(this._statements));
+		return new ForInStatement(this._token, this._label, this._lhsExpr.clone(), this._listExpr.clone(), Util.cloneArray(this._statements));
 	}
 
 	function getLHSExpr () : Expression {
@@ -846,7 +846,7 @@ class ForInStatement extends ContinuableStatement {
 		] : variant[].concat(this._serialize()).concat([
 			this._lhsExpr.serialize(),
 			this._listExpr.serialize(),
-			Serializer.<Statement>.serializeArray(this._statements)
+			Util.serializeArray(this._statements)
 		]);
 	}
 
@@ -905,7 +905,7 @@ class ForStatement extends ContinuableStatement {
 	}
 
 	override function clone () : Statement {
-		return new ForStatement(this._token, this._label, Cloner.<Expression>.cloneNullable(this._initExpr), Cloner.<Expression>.cloneNullable(this._condExpr), Cloner.<Expression>.cloneNullable(this._postExpr), Cloner.<Statement>.cloneArray(this._statements));
+		return new ForStatement(this._token, this._label, Util.cloneArray(this._statements));
 	}
 
 	function getInitExpr () : Expression {
@@ -932,10 +932,10 @@ class ForStatement extends ContinuableStatement {
 		return [
 			"ForStatement"
 		] : variant[].concat(this._serialize()).concat([
-			Serializer.<Expression>.serializeNullable(this._initExpr),
-			Serializer.<Expression>.serializeNullable(this._condExpr),
-			Serializer.<Expression>.serializeNullable(this._postExpr),
-			Serializer.<Statement>.serializeArray(this._statements)
+			Util.serializeNullable(this._initExpr),
+			Util.serializeNullable(this._condExpr),
+			Util.serializeNullable(this._postExpr),
+			Util.serializeArray(this._statements)
 		]);
 	}
 
@@ -994,7 +994,7 @@ class IfStatement extends Statement implements Block {
 	}
 
 	override function clone () : Statement {
-		return new IfStatement(this._token, this._expr.clone(), Cloner.<Statement>.cloneArray(this._onTrueStatements), Cloner.<Statement>.cloneArray(this._onFalseStatements));
+		return new IfStatement(this._token, this._expr.clone(), Util.cloneArray(this._onFalseStatements));
 	}
 
 	override function getToken () : Token {
@@ -1021,8 +1021,8 @@ class IfStatement extends Statement implements Block {
 		return [
 			"IfStatement",
 			this._expr.serialize(),
-			Serializer.<Statement>.serializeArray(this._onTrueStatements),
-			Serializer.<Statement>.serializeArray(this._onFalseStatements)
+			Util.serializeArray(this._onTrueStatements),
+			Util.serializeArray(this._onFalseStatements)
 		] : variant[];
 	}
 
@@ -1092,7 +1092,7 @@ class SwitchStatement extends LabellableStatement {
 	}
 
 	override function clone () : Statement {
-		return new SwitchStatement(this._token, this._label, this._expr.clone(), Cloner.<Statement>.cloneArray(this._statements));
+		return new SwitchStatement(this._token, this._label, this._expr.clone(), Util.cloneArray(this._statements));
 	}
 
 	function getExpr () : Expression {
@@ -1112,7 +1112,7 @@ class SwitchStatement extends LabellableStatement {
 			"SwitchStatement"
 		] : variant[].concat(this._serialize()).concat([
 			this._expr.serialize(),
-			Serializer.<Statement>.serializeArray(this._statements)
+			Util.serializeArray(this._statements)
 		]);
 	}
 
@@ -1306,7 +1306,7 @@ class WhileStatement extends ContinuableStatement {
 	}
 
 	override function clone () : Statement {
-		return new WhileStatement(this._token, this._label, this._expr.clone(), Cloner.<Statement>.cloneArray(this._statements));
+		return new WhileStatement(this._token, this._label, this._expr.clone(), Util.cloneArray(this._statements));
 	}
 
 	function getExpr () : Expression {
@@ -1322,7 +1322,7 @@ class WhileStatement extends ContinuableStatement {
 			"WhileStatement"
 		] : variant[].concat(this._serialize()).concat([
 			this._expr.serialize(),
-			Serializer.<Statement>.serializeArray(this._statements)
+			Util.serializeArray(this._statements)
 		]);
 	}
 
@@ -1368,7 +1368,7 @@ class TryStatement extends Statement implements Block {
 	}
 
 	override function clone () : Statement {
-		return new TryStatement(this._token, Cloner.<Statement>.cloneArray(this._tryStatements), Cloner.<CatchStatement>.cloneArray(this._catchStatements), Cloner.<Statement>.cloneArray(this._finallyStatements));
+		return new TryStatement(this._token, Util.cloneArray(this._finallyStatements));
 	}
 
 	override function getToken () : Token {
@@ -1390,9 +1390,9 @@ class TryStatement extends Statement implements Block {
 	override function serialize () : variant {
 		return [
 			"TryStatement",
-			Serializer.<Statement>.serializeArray(this._tryStatements),
-			Serializer.<CatchStatement>.serializeArray(this._catchStatements),
-			Serializer.<Statement>.serializeArray(this._finallyStatements)
+			Util.serializeArray(this._tryStatements),
+			Util.serializeArray(this._catchStatements),
+			Util.serializeArray(this._finallyStatements)
 		] : variant[];
 	}
 
@@ -1491,7 +1491,7 @@ class CatchStatement extends Statement implements Block {
 
 	override function clone () : Statement {
 		// TODO rewrite the references from _statements to _local
-		return new CatchStatement(this._token, this._local, Cloner.<Statement>.cloneArray(this._statements));
+		return new CatchStatement(this._token, this._local, Util.cloneArray(this._statements));
 	}
 
 	override function getToken () : Token {
@@ -1516,7 +1516,7 @@ class CatchStatement extends Statement implements Block {
 			"CatchStatement",
 			this._token.serialize(),
 			this._local.serialize(),
-			Serializer.<Statement>.serializeArray(this._statements)
+			Util.serializeArray(this._statements)
 		] : variant[];
 	}
 
@@ -1630,7 +1630,7 @@ class AssertStatement extends InformationStatement {
 	}
 
 	override function clone () : Statement {
-		return new AssertStatement(this._token, this._expr.clone(), Cloner.<Expression>.cloneNullable(this._msgExpr));
+		return new AssertStatement(this._token, this._expr.clone(), Util.cloneNullable(this._msgExpr));
 	}
 
 	function getExpr () : Expression {
@@ -1645,8 +1645,8 @@ class AssertStatement extends InformationStatement {
 		return [
 			"AssertStatement",
 			this._token.serialize(),
-			Serializer.<Expression>.serializeNullable(this._expr),
-			Serializer.<Expression>.serializeNullable(this._msgExpr)
+			Util.serializeNullable(this._expr),
+			Util.serializeNullable(this._msgExpr)
 		] : variant[];
 	}
 
@@ -1686,7 +1686,7 @@ class LogStatement extends InformationStatement {
 	}
 
 	override function clone () : Statement {
-		return new LogStatement(this._token, Cloner.<Expression>.cloneArray(this._exprs));
+		return new LogStatement(this._token, Util.cloneArray(this._exprs));
 	}
 
 	function getExprs () : Expression[] {
@@ -1697,7 +1697,7 @@ class LogStatement extends InformationStatement {
 		return [
 			"LogStatement",
 			this._token.serialize(),
-			Serializer.<Expression>.serializeArray(this._exprs)
+			Util.serializeArray(this._exprs)
 		] : variant[];
 	}
 

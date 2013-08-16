@@ -121,11 +121,11 @@ class ClassDefinition implements Stashable {
 			"token"      : this._token,
 			"name"       : this._className,
 			"flags"      : this._flags,
-			"extends"    : Serializer.<ParsedObjectType>.serializeNullable(this._extendType),
-			"implements" : Serializer.<ParsedObjectType>.serializeArray(this._implementTypes),
-			"members"    : Serializer.<MemberDefinition>.serializeArray(this._members),
-			"inners"    : Serializer.<ClassDefinition>.serializeArray(this._inners),
-			"templateInners"    : Serializer.<TemplateClassDefinition>.serializeArray(this._templateInners)
+			"extends"    : Util.serializeNullable(this._extendType),
+			"implements" : Util.serializeArray(this._implementTypes),
+			"members"    : Util.serializeArray(this._members),
+			"inners"    : Util.serializeArray(this._inners),
+			"templateInners"    : Util.serializeArray(this._templateInners)
 		} : Map.<variant>;
 	}
 
@@ -1136,11 +1136,11 @@ class MemberVariableDefinition extends MemberDefinition {
 
 	override function serialize () : variant {
 		return {
-			"token"      : Serializer.<Token>.serializeNullable(this._token),
-			"nameToken"  : Serializer.<Token>.serializeNullable(this._nameToken),
+			"token"      : Util.serializeNullable(this._token),
+			"nameToken"  : Util.serializeNullable(this._nameToken),
 			"flags"        : this.flags(),
-			"type"         : Serializer.<Type>.serializeNullable(this._type),
-			"initialValue" : Serializer.<Expression>.serializeNullable(this._initialValue)
+			"type"         : Util.serializeNullable(this._type),
+			"initialValue" : Util.serializeNullable(this._initialValue)
 		} : Map.<variant>;
 	}
 
@@ -1305,7 +1305,7 @@ class MemberFunctionDefinition extends MemberDefinition implements Block {
 		function cloneFuncDef (funcDef : MemberFunctionDefinition) : MemberFunctionDefinition {
 
 			// at this moment, all locals and closures are not cloned yet
-			var statements = Cloner.<Statement>.cloneArray(funcDef.getStatements());
+			var statements = Util.cloneArray(funcDef.getStatements());
 
 			var closures = funcDef.getClosures().map.<MemberFunctionDefinition>((funcDef) -> {
 				var newFuncDef = cloneFuncDef(funcDef);
@@ -1527,13 +1527,13 @@ class MemberFunctionDefinition extends MemberDefinition implements Block {
 
 	override function serialize () : variant {
 		return {
-			"token"      : Serializer.<Token>.serializeNullable(this._token),
-			"nameToken"  : Serializer.<Token>.serializeNullable(this._nameToken),
+			"token"      : Util.serializeNullable(this._token),
+			"nameToken"  : Util.serializeNullable(this._nameToken),
 			"flags"      : this.flags(),
-			"returnType" : Serializer.<Type>.serializeNullable(this._returnType),
-			"args"       : Serializer.<ArgumentDeclaration>.serializeArray(this._args),
-			"locals"     : Serializer.<LocalVariable>.serializeArray(this._locals),
-			"statements" : Serializer.<Statement>.serializeArray(this._statements)
+			"returnType" : Util.serializeNullable(this._returnType),
+			"args"       : Util.serializeArray(this._args),
+			"locals"     : Util.serializeArray(this._locals),
+			"statements" : Util.serializeArray(this._statements)
 		} : Map.<variant>;
 	}
 

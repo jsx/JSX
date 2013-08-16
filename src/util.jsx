@@ -28,24 +28,20 @@ import "./type.jsx";
 import "./platform.jsx";
 import Token from "./parser.jsx";
 
-class Cloner.<T> {
+class Util {
 
-	static function cloneArray (a : T[]) : T[] {
+	static function cloneArray.<T> (a : T[]) : T[] {
 		var r = [] : T[];
 		for (var i = 0; i < a.length; ++i)
 			r[i] = a[i].clone() as T;
 		return r;
 	}
 
-	static function cloneNullable (o : T) : T {
+	static function cloneNullable.<T> (o : T) : T {
 		return o == null ? (null) : (o.clone() as T);
 	}
 
-}
-
-class Serializer.<T> {
-
-	static function serializeArray (a : T[]) : variant {
+	static function serializeArray.<T> (a : T[]) : variant {
 		if (a == null)
 			return null;
 		var ret = [] : variant[];
@@ -54,15 +50,11 @@ class Serializer.<T> {
 		return ret;
 	}
 
-	static function serializeNullable (v : T) : variant {
+	static function serializeNullable.<T> (v : T) : variant {
 		if (v == null)
 			return null;
 		return v.serialize();
 	}
-
-}
-
-class Util {
 
 	static function repeat (c : string, n : number) : string {
 		var s = "";
