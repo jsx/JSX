@@ -1881,6 +1881,22 @@ class CodeTransformer {
 		});
 	}
 
+	function _getAllClosures () : MemberFunctionDefinition[] {
+		var closures = new MemberFunctionDefinition[];
+		this._compiler.forEachClassDef(function (parser, classDef) {
+			return classDef.forEachMember(function onMember(member) {
+				member.forEachClosure(function (funcDef) {
+					return onMember(funcDef);
+				});
+				if (member instanceof MemberFunctionDefinition) {
+					closures.push(member as MemberFunctionDefinition);
+				}
+				return true;
+			});
+		});
+		return closures;
+	}
+
 	function performTransformation () : void {
 		if (this._forceTransform) {
 			var transformOnlyStmts = this._transformOnlyStmts;
@@ -1889,38 +1905,20 @@ class CodeTransformer {
 				this._transformOnlyStmts = false;
 
 				// transform functions as many as possible
-				this._compiler.forEachClassDef(function (parser, classDef) {
-					return classDef.forEachMember(function onMember(member) {
-						member.forEachClosure(function (funcDef) {
-							return onMember(funcDef);
-						});
-						if (member instanceof MemberFunctionDefinition) {
-							var funcDef = member as MemberFunctionDefinition;
-							if (this._functionIsTransformable(funcDef)) {
-								this._doCPSTransform(funcDef);
-							}
-						}
-						return true;
-					});
+				this._getAllClosures().forEach((funcDef) -> {
+					if (this._functionIsTransformable(funcDef)) {
+						this._doCPSTransform(funcDef);
+					}
 				});
 			} finally {
 				this._transformOnlyStmts = transformOnlyStmts;
 			}
 		}
 		// transform generators
-		this._compiler.forEachClassDef(function (parser, classDef) {
-			return classDef.forEachMember(function onMember(member) {
-				member.forEachClosure(function (funcDef) {
-					return onMember(funcDef);
-				});
-				if (member instanceof MemberFunctionDefinition) {
-					var funcDef = member as MemberFunctionDefinition;
-					if (funcDef.isGenerator()) {
-						this._transformGenerator(funcDef);
-					}
-				}
-				return true;
-			});
+		this._getAllClosures().forEach((funcDef) -> {
+			if (funcDef.isGenerator()) {
+				this._transformGenerator(funcDef);
+			}
 		});
 	}
 
