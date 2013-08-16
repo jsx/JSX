@@ -1650,7 +1650,7 @@ class MemberFunctionDefinition extends MemberDefinition implements Block {
 			for (var i = origArgIndex; i != this.getArguments().length; ++i) {
 				var defVal = this.getArguments()[i].getDefaultValue();
 				assert defVal != null;
-				argExprs.push(defVal.deepClone(this));
+				argExprs.push(defVal.clone());
 			}
 			var statement : Statement;
 			if (this.name() == "constructor") {
@@ -1687,6 +1687,17 @@ class MemberFunctionDefinition extends MemberDefinition implements Block {
 			else {
 				throw new Error("TODO: template function with default parameters in " + this.getNotation() + " is not yet supported");
 			}
+			// fix up function links inside defVal
+			defVal.forEachExpression(function onExpr(expr) {
+				if (expr instanceof FunctionExpression) {
+					var newFuncDef = (expr as FunctionExpression).getFuncDef().clone();
+					Util.unlinkFunction(newFuncDef);
+					Util.linkFunction(newFuncDef, wrapper);
+					(expr as FunctionExpression).setFuncDef(newFuncDef);
+					return true;
+				}
+				return expr.forEachExpression(onExpr);;
+			});
 			wrapper.setClassDef(this.getClassDef());
 			// register
 			this.getClassDef().members().push(wrapper);
