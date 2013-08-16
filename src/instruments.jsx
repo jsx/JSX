@@ -141,27 +141,28 @@ abstract class _ExpressionTransformer {
 			});
 		});
 
-		// detach closures from srcParent
+		// rebase!
 		for (var i = 0; i < closures.length; ++i) {
-			var j;
-			if ((j = srcParent.getClosures().indexOf(closures[i])) != -1) {
-				srcParent.getClosures().splice(j, 1);
-			}
-			else {
-				throw new Error("logic flaw, wrong parent passed");
-			}
-		}
-
-		// rebase to expr!
-		for (var i = 0; i < closures.length; ++i) {
-			this._linkFunctions(dstParent, closures[i]);
+			this._unlinkFunction(closures[i]);
+			this._linkFunction(closures[i], dstParent);
 		}
 	}
 
-	function _linkFunctions (parent : MemberFunctionDefinition, child : MemberFunctionDefinition) : void {
-		parent.getClosures().push(child);
-		child.setParent(parent);
-		child.setClassDef(parent.getClassDef());
+	function _unlinkFunction (funcDef : MemberFunctionDefinition) : void {
+		var oldParent = funcDef.getParent();
+
+		var j;
+		if ((j = oldParent.getClosures().indexOf(funcDef)) != -1) {
+			oldParent.getClosures().splice(j, 1);
+		} else {
+			throw new Error("logic flaw, function graph broken");
+		}
+	}
+
+	function _linkFunction (funcDef : MemberFunctionDefinition, newParent : MemberFunctionDefinition) : void {
+		newParent.getClosures().push(funcDef);
+		funcDef.setParent(newParent);
+		funcDef.setClassDef(newParent.getClassDef());
 	}
 
 	function _createAnonymousFunction (parent : MemberFunctionDefinition, args : ArgumentDeclaration[], returnType : Type) : MemberFunctionDefinition {
@@ -177,7 +178,7 @@ abstract class _ExpressionTransformer {
 			null,
 			null
 		);
-		this._linkFunctions(parent, funcDef);
+		this._linkFunction(funcDef, parent);
 		return funcDef;
 	}
 
