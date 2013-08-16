@@ -45,6 +45,21 @@ abstract class Expression implements Stashable {
 	abstract function clone () : Expression;
 	abstract function serialize () : variant;
 
+	function deepClone (parent : MemberFunctionDefinition) : Expression {
+		var cloned = this.clone();
+		cloned.forEachExpression (function onExpr (expr) {
+			if (expr instanceof FunctionExpression) {
+				var newFuncDef = (expr as FunctionExpression).getFuncDef().clone();
+				Util.unlinkFunction(newFuncDef);
+				Util.linkFunction(newFuncDef, parent);
+				(expr as FunctionExpression).setFuncDef(newFuncDef);
+				return true;
+			}
+			return expr.forEachExpression(onExpr);
+		});
+		return cloned;
+	}
+
 	function instantiate (instantiationContext : InstantiationContext) : boolean {
 		function onExpr(expr : Expression) : boolean {
 			if (expr instanceof NullExpression) {

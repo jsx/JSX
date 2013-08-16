@@ -1650,7 +1650,7 @@ class MemberFunctionDefinition extends MemberDefinition implements Block {
 			for (var i = origArgIndex; i != this.getArguments().length; ++i) {
 				var defVal = this.getArguments()[i].getDefaultValue();
 				assert defVal != null;
-				argExprs.push(defVal.clone());
+				argExprs.push(defVal.deepClone(this));
 			}
 			var statement : Statement;
 			if (this.name() == "constructor") {
