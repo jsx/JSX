@@ -955,6 +955,8 @@ class TemplateFunctionType extends ResolvedFunctionType {
 	}
 
 	override function _deduceByArgumentTypes (token : Token, argTypes : Type[], isStatic : boolean, exact : boolean, notes : CompileNote[]) : ResolvedFunctionType {
+		var errors = new CompileError[];
+
 		if (((this._funcDef.flags() & ClassDefinition.IS_STATIC) == ClassDefinition.IS_STATIC) != isStatic) {
 			if (isStatic) {
 				notes.push(new CompileNote(token, 'candidate function not viable: expected a static function, but got a member function'));
@@ -973,8 +975,12 @@ class TemplateFunctionType extends ResolvedFunctionType {
 					[argTypes.length as string, this._argTypes.length as string])));
 				return null;
 			}
-			var member = this._funcDef.instantiateByArgumentTypes([], notes, token, argTypes, exact); // TODO: report compile errors
+			var member = this._funcDef.instantiateByArgumentTypes(errors, notes, token, argTypes, exact);
 			if (member == null) {
+				// convert instantiation errors to compile note
+				for (var i = 0; i < errors.length; ++i) {
+					notes.push(new CompileNote(errors[i]._filename, errors[i]._lineNumber, errors[i]._columnNumber, errors[i]._message));
+				}
 				return null;
 			}
 			return member.getType();
