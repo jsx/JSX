@@ -2094,13 +2094,8 @@ class TemplateFunctionDefinition extends MemberFunctionDefinition implements Tem
 			return null;
 		}
 		instantiated.setClassDef(this._classDef);
+		// the instantiated funcDef is queued to the member list, and it is analyzed after all methods analysis complete
 		this._classDef._members.push(instantiated);
-		// analyze
-		var analysisContext = new AnalysisContext(errors, this._classDef.getParser(), function (parser, classDef) { throw new Error("not implemented"); });
-		for (var i = 0; i < instantiationContext.objectTypesUsed.length; ++i)
-			instantiationContext.objectTypesUsed[i].resolveType(analysisContext);
-		instantiated.analyze(analysisContext);
-		// register, and return
 		this._instantiatedDefs.set(typeArgs.concat(new Type[]), instantiated);
 		return instantiated;
 	}
