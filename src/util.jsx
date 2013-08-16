@@ -588,19 +588,18 @@ class Util {
 
 		// rebase!
 		for (var i = 0; i < closures.length; ++i) {
-			Util.unlinkFunction(closures[i]);
+			Util.unlinkFunction(closures[i], srcParent);
 			Util.linkFunction(closures[i], dstParent);
 		}
 	}
 
-	static function unlinkFunction (funcDef : MemberFunctionDefinition) : void {
-		var oldParent = funcDef.getParent();
-
+	static function unlinkFunction (funcDef : MemberFunctionDefinition, oldParent : MemberFunctionDefinition = null) : void {
+		if (oldParent == null) {
+			oldParent = funcDef.getParent();
+		}
 		var j;
 		if ((j = oldParent.getClosures().indexOf(funcDef)) != -1) {
 			oldParent.getClosures().splice(j, 1);
-		} else {
-			throw new Error("logic flaw, function graph broken");
 		}
 
 		funcDef.setParent(null);
