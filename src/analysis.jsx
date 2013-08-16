@@ -180,7 +180,7 @@ class LocalVariable implements Stashable {
 	function serialize () : variant {
 		return [
 			this._name,
-			Serializer.<Type>.serializeNullable(this._type)
+			Util.serializeNullable(this._type)
 		] : variant[];
 	}
 
