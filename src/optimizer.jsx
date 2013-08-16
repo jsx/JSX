@@ -2473,7 +2473,7 @@ class _DeadCodeEliminationOptimizeCommand extends _FunctionOptimizeCommand {
 						this.log("eliminating dead store to: " + lhsLocal.getName().getValue());
 						lastAssign.second(lastAssign.first.getSecondExpr());
 					}
-					lastAssignExpr.set(lhsLocal, new Pair.<AssignmentExpression, function(:Expression):void>(assignExpr, rewriteCb));
+					lastAssignExpr.set(lhsLocal, Util.makePair(assignExpr, rewriteCb));
 					return true;
 				}
 			} else if (expr instanceof LocalExpression) {
@@ -2534,7 +2534,7 @@ class _DeadCodeEliminationOptimizeCommand extends _FunctionOptimizeCommand {
 							&& baseExprsAreEqual((firstExpr as PropertyExpression).getExpr(), (lastAssignExpr[propertyName].first.getFirstExpr() as PropertyExpression).getExpr())) {
 						lastAssignExpr[propertyName].second(lastAssignExpr[propertyName].first.getSecondExpr());
 					}
-					lastAssignExpr[propertyName] = new Pair.<AssignmentExpression, function(:Expression):void>(assignmentExpr, rewriteCb);
+					lastAssignExpr[propertyName] = Util.makePair(assignmentExpr, rewriteCb);
 					return true;
 				} else if (assignmentExpr.getFirstExpr() instanceof LocalExpression) {
 					onExpr(assignmentExpr.getSecondExpr(), null);

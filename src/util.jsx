@@ -56,6 +56,10 @@ class Util {
 		return v.serialize();
 	}
 
+	static function makePair.<F, S>(first : F, second : S) : Pair.<F, S> {
+		return new Pair.<F, S>(first, second);
+	}
+
 	static function repeat (c : string, n : number) : string {
 		var s = "";
 		for(var i = 0; i < n; ++i) {
