@@ -576,12 +576,13 @@ class Util {
 			if (statement instanceof FunctionStatement) {
 				closures.push((statement as FunctionStatement).getFuncDef());
 			}
-			return statement.forEachExpression(function (expr) {
+			return statement.forEachExpression(function onExpr(expr) {
 				if (expr instanceof FunctionExpression) {
 					closures.push((expr as FunctionExpression).getFuncDef());
+					// does not search for funcDefs deeper than the first level
+					return true;
 				}
-				// does not search for funcDefs deeper than the first level
-				return true;
+				return expr.forEachExpression(onExpr);
 			});
 		});
 
