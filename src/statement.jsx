@@ -905,7 +905,7 @@ class ForStatement extends ContinuableStatement {
 	}
 
 	override function clone () : Statement {
-		return new ForStatement(this._token, this._label, Util.cloneArray(this._statements));
+		return new ForStatement(this._token, this._label, Util.cloneNullable(this._initExpr), Util.cloneNullable(this._condExpr), Util.cloneNullable(this._postExpr), Util.cloneArray(this._statements));
 	}
 
 	function getInitExpr () : Expression {
@@ -994,7 +994,7 @@ class IfStatement extends Statement implements Block {
 	}
 
 	override function clone () : Statement {
-		return new IfStatement(this._token, this._expr.clone(), Util.cloneArray(this._onFalseStatements));
+		return new IfStatement(this._token, this._expr.clone(), Util.cloneArray(this._onTrueStatements), Util.cloneArray(this._onFalseStatements));
 	}
 
 	override function getToken () : Token {
@@ -1368,7 +1368,7 @@ class TryStatement extends Statement implements Block {
 	}
 
 	override function clone () : Statement {
-		return new TryStatement(this._token, Util.cloneArray(this._finallyStatements));
+		return new TryStatement(this._token, Util.cloneArray(this._tryStatements), Util.cloneArray(this._catchStatements), Util.cloneArray(this._finallyStatements));
 	}
 
 	override function getToken () : Token {
