@@ -263,25 +263,6 @@ class _MapLiteralExpressionTransformer extends _ExpressionTransformer {
 
 }
 
-class _ThisExpressionTransformer extends _ExpressionTransformer {
-
-	var _expr : ThisExpression;
-
-	function constructor (transformer : CodeTransformer, expr : ThisExpression) {
-		super(transformer, "THIS");
-		this._expr = expr;
-	}
-
-	override function getExpression () : Expression {
-		return this._expr;
-	}
-
-	override function doCPSTransform (parent : MemberFunctionDefinition, continuation : Expression) : Expression {
-		return this._createCall1(continuation, this._expr);
-	}
-
-}
-
 class _FunctionExpressionTransformer extends _ExpressionTransformer {
 
 	var _expr : FunctionExpression;
@@ -2369,7 +2350,7 @@ class CodeTransformer {
 		else if (expr instanceof MapLiteralExpression)
 			return new _MapLiteralExpressionTransformer(this, expr as MapLiteralExpression);
 		else if (expr instanceof ThisExpression)
-			return new _ThisExpressionTransformer(this, expr as ThisExpression);
+			return new _LeafExpressionTransformer(this, expr as ThisExpression);
 		else if (expr instanceof BitwiseNotExpression)
 			return new _BitwiseNotExpressionTransformer(this, expr as BitwiseNotExpression);
 		else if (expr instanceof InstanceofExpression)
