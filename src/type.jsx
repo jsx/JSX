@@ -922,7 +922,7 @@ class StaticFunctionType extends ResolvedFunctionType {
 	}
 
 	override function _clone () : ResolvedFunctionType {
-		return new StaticFunctionType(this._token, this._returnType, this._argTypes, this._isAssignable);
+		return new StaticFunctionType(this._token, this._returnType, this._argTypes.concat([]), this._isAssignable);
 	}
 
 	override function isConvertibleTo (type : Type) : boolean {
@@ -964,7 +964,7 @@ class MemberFunctionType extends ResolvedFunctionType {
 	}
 
 	override function _clone () : MemberFunctionType {
-		return new MemberFunctionType(this._token, this._objectType, this._returnType, this._argTypes, this._isAssignable);
+		return new MemberFunctionType(this._token, this._objectType, this._returnType, this._argTypes.concat([]), this._isAssignable);
 	}
 
 	override function _toStringPrefix () : string {
@@ -982,7 +982,7 @@ class TemplateFunctionType extends ResolvedFunctionType {
 	var _funcDef : TemplateFunctionDefinition;
 
 	function constructor (token : Token, funcDef : TemplateFunctionDefinition) {
-		super(token, funcDef.getReturnType(), funcDef.getArgumentTypes(), false /* isAsssinable */);
+		super(token, funcDef.getReturnType(), funcDef.getArgumentTypes().concat([]), false /* isAsssinable */);
 		this._funcDef = funcDef;
 	}
 
