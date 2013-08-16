@@ -365,7 +365,7 @@ class Compiler {
 
 	function _transform () : void {
 		if (this._transformer != null)
-			this._transformer.setup(this).performTransformation();
+			this._transformer.setup(this, this._emitter).performTransformation();
 	}
 
 	function _optimize () : void {

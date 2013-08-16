@@ -22,6 +22,7 @@
 
 import "./analysis.jsx";
 import "./classdef.jsx";
+import "./expression.jsx";
 
 interface Emitter implements Stashable {
 
@@ -48,5 +49,7 @@ interface Emitter implements Stashable {
 	function getEnableMinifier() : boolean;
 
 	function setEnableMinifier(enable : boolean) : void;
+
+	function isSpecialCall(callExpr : CallExpression) : boolean;
 
 }

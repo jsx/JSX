@@ -2841,9 +2841,57 @@ class JavaScriptEmitter implements Emitter {
 		this._platform = platform;
 	}
 
+	override function isSpecialCall (callExpr : CallExpression) : boolean {
+		var calleeExpr = callExpr.getExpr();
+		if (! (calleeExpr instanceof PropertyExpression))
+			return false;
+		var propExpr = calleeExpr as PropertyExpression;
+		return this._isJsEval(propExpr) || this._isJsInvoke(propExpr) || this._isCallToMap(propExpr);
+	}
+
 	function isJsModule(classDef : ClassDefinition) : boolean {
 		return classDef.className() == "js"
 			&& classDef.getToken().getFilename() == Util.resolvePath(this._platform.getRoot() + "/lib/js/js.jsx");
+	}
+
+	function _isJsEval (calleeExpr : PropertyExpression) : boolean {
+		if (! (calleeExpr.getType() instanceof StaticFunctionType))
+			return false;
+		if (calleeExpr.getIdentifierToken().getValue() != "eval")
+			return false;
+		var classDef = calleeExpr.getExpr().getType().getClassDef();
+		if (! this.isJsModule(classDef))
+			return false;
+		return true;
+	}
+
+	function _isJsInvoke (calleeExpr : PropertyExpression) : boolean {
+		if (! (calleeExpr.getType() instanceof StaticFunctionType))
+			return false;
+		if (calleeExpr.getIdentifierToken().getValue() != "invoke")
+			return false;
+		var classDef = calleeExpr.getExpr().getType().getClassDef();
+		if (! this.isJsModule(classDef))
+			return false;
+		return true;
+	}
+
+	function _isCallToMap (calleeExpr : PropertyExpression) : boolean {
+		if (calleeExpr.getType() instanceof StaticFunctionType)
+			return false;
+		var classDef = calleeExpr.getExpr().getType().getClassDef();
+		if (! (classDef instanceof InstantiatedClassDefinition))
+			return false;
+		if ((classDef as InstantiatedClassDefinition).getTemplateClassName() != "Map")
+			return false;
+		switch (calleeExpr.getIdentifierToken().getValue()) {
+		case "toString":
+		case "hasOwnProperty":
+		case "keys":
+			return true;
+		default:
+			return false;
+		}
 	}
 
 	override function setRunEnv (runenv : string) : void {

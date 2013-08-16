@@ -28,6 +28,7 @@ import "./statement.jsx";
 import "./parser.jsx";
 import "./type.jsx";
 import "./util.jsx";
+import "./emitter.jsx";
 
 abstract class _ExpressionTransformer {
 
@@ -868,11 +869,13 @@ class _CallExpressionTransformer extends _ExpressionTransformer {
 	}
 
 	override function doCPSTransform (parent : MemberFunctionDefinition, continuation : Expression) : Expression {
-		// function calls are considered a primitive operation
+		// method calls considered primitive operation
 		if (this._isMethodCall()) {
 			// method calls
 			var receiver = (this._expr.getExpr() as PropertyExpression).getExpr();
 			return this._transformOp(parent, continuation, [ receiver ].concat(this._expr.getArguments()));
+		} else if (this._transformer.getEmitter().isSpecialCall(this._expr)) {
+			return this._transformOp(parent, continuation, this._expr.getArguments().concat([]));
 		} else {
 			return this._transformOp(parent, continuation, [ this._expr.getExpr() ].concat(this._expr.getArguments()));
 		}
@@ -886,6 +889,8 @@ class _CallExpressionTransformer extends _ExpressionTransformer {
 				new Token("(", false),
 				new PropertyExpression(propertyExpr.getToken(), exprs[0], propertyExpr.getIdentifierToken(), propertyExpr.getTypeArguments(), propertyExpr.getType()),
 				exprs.slice(1));
+		} else if (this._transformer.getEmitter().isSpecialCall(this._expr)) {
+			return new CallExpression(new Token("(", false), this._expr.getExpr(), exprs);
 		} else {
 			return new CallExpression(new Token("(", false), exprs[0], exprs.slice(1));
 		}
@@ -1828,6 +1833,7 @@ class CodeTransformer {
 	var _transformOnlyStmts : boolean;
 
 	var _compiler : Compiler;
+	var _emitter : Emitter;
 
 	var _stopIterationClassDef : ClassDefinition;
 	var _jsxGeneratorClassDef : TemplateClassDefinition;
@@ -1840,8 +1846,9 @@ class CodeTransformer {
 		this._jsxGeneratorClassDef = null;
 	}
 
-	function setup (compiler : Compiler) : CodeTransformer {
+	function setup (compiler : Compiler, emitter : Emitter) : CodeTransformer {
 		this._compiler = compiler;
+		this._emitter = emitter;
 		var builtins = compiler.getBuiltinParsers()[0];
 
 		// get built-in classes related to generators
@@ -1861,6 +1868,10 @@ class CodeTransformer {
 
 	function setForceTransform (force : boolean) : void {
 		this._forceTransform = force;
+	}
+
+	function getEmitter () : Emitter {
+		return this._emitter;
 	}
 
 	function _functionIsTransformable (funcDef : MemberFunctionDefinition) : boolean {
