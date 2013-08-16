@@ -298,6 +298,7 @@ class CaughtVariable extends LocalVariable {
 }
 
 class ArgumentDeclaration extends LocalVariable {
+
 	var _defaultValue : Expression = null;
 
 	function constructor (name : Token, type : Type) {
@@ -310,7 +311,7 @@ class ArgumentDeclaration extends LocalVariable {
 	}
 
 	function clone () : ArgumentDeclaration {
-		return new ArgumentDeclaration(this._name, this._type, this._defaultValue);
+		return new ArgumentDeclaration(this._name, this._type, Util.cloneNullable(this._defaultValue));
 	}
 
 	function getDefaultValue() : Expression {
