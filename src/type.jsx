@@ -973,7 +973,7 @@ class TemplateFunctionType extends ResolvedFunctionType {
 					[argTypes.length as string, this._argTypes.length as string])));
 				return null;
 			}
-			var member = this._funcDef.instantiateByArgumentTypes([], token, argTypes, exact); // TODO report compile errors
+			var member = this._funcDef.instantiateByArgumentTypes([], notes, token, argTypes, exact); // TODO: report compile errors
 			if (member == null) {
 				return null;
 			}
