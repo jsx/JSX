@@ -188,13 +188,15 @@ class Util {
 			if (args[i] instanceof FunctionExpression && ! (args[i] as FunctionExpression).argumentTypesAreIdentified()) {
 				// find the only expected types, by counting the number of arguments
 				var funcDef = (args[i] as FunctionExpression).getFuncDef();
-				var expectedCallbackType = null : Type;
+				var expectedCallbackType = null : StaticFunctionType;
 				for (var j = 0; j < expectedTypes.length; ++j) {
-					if (expectedTypes[j].at(i) != null && expectedTypes[j].at(i) instanceof FunctionType && (expectedTypes[j].at(i) as ResolvedFunctionType).getArgumentTypes().length == funcDef.getArguments().length) {
+					if (expectedTypes[j].at(i) != null && expectedTypes[j].at(i) instanceof StaticFunctionType && (expectedTypes[j].at(i) as StaticFunctionType).getArgumentTypes().length == funcDef.getArguments().length) {
+						var callbackType = expectedTypes[j].at(i) as StaticFunctionType;
+
 						if (expectedCallbackType == null) {
-							expectedCallbackType = expectedTypes[j].at(i);
-						} else if (Util.typesAreEqual((expectedCallbackType as ResolvedFunctionType).getArgumentTypes(), (expectedTypes[j].at(i) as ResolvedFunctionType).getArgumentTypes())
-							&& (expectedCallbackType as ResolvedFunctionType).getReturnType().equals((expectedTypes[j].at(i) as ResolvedFunctionType).getReturnType())) {
+							expectedCallbackType = callbackType;
+						} else if (Util.typesAreEqual(expectedCallbackType.getArgumentTypes(), callbackType.getArgumentTypes())
+							&& expectedCallbackType.getReturnType().equals(callbackType.getReturnType())) {
 							// function signatures are equal
 						} else {
 							break;
@@ -204,7 +206,7 @@ class Util {
 				if (j != expectedTypes.length) {
 					// multiple canditates, skip
 				} else if (expectedCallbackType != null) {
-					if (! (args[i] as FunctionExpression).deductTypeIfUnknown(context, expectedCallbackType as ResolvedFunctionType))
+					if (! (args[i] as FunctionExpression).deductTypeIfUnknown(context, expectedCallbackType))
 						return null;
 				}
 			} else if (args[i] instanceof ArrayLiteralExpression && (args[i] as ArrayLiteralExpression).getExprs().length == 0 && (args[i] as ArrayLiteralExpression).getType() == null) {
