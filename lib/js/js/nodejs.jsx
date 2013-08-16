@@ -294,6 +294,10 @@ native __fake__ class _fs {
 	function writeFileSync(filename : string, data : string) : void;
 	function writeFileSync(filename : string, data : string, encoding : string) : void;
 
+	function appendFileSync(filename : string, data : Buffer) : void;
+	function appendFileSync(filename : string, data : string) : void;
+	function appendFileSync(filename : string, data : string, encoding : string) : void;
+
 	function watch(filename : string, listener : function(event:string,filename:Nullable.<string>):void) : FSWatcher;
 	function watch(filename : string, options : Map.<variant>, listener : function(event:string,filename:Nullable.<string>):void) : FSWatcher;
 }
