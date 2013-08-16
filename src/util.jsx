@@ -170,7 +170,19 @@ class Util {
 		return context.parser.lookupTemplate(context.errors, new TemplateInstantiationRequest(token, className, typeArguments), context.postInstantiationCallback);
 	}
 
-	static function analyzeArgs (context : AnalysisContext, args : Expression[], parentExpr : Expression, expectedTypes : Type[][]) : Type[] {
+	class ArgumentTypeRequest {
+		var argTypes : Type[];
+		var typeArgs : ParsedObjectType[]; // type parameters
+		function constructor(argTypes : Type[], typeArgs : ParsedObjectType[]) {
+			this.argTypes = argTypes;
+			this.typeArgs = typeArgs;
+		}
+		function at(i : int) : Type {
+			return this.argTypes[i];
+		}
+	}
+
+	static function analyzeArgs (context : AnalysisContext, args : Expression[], parentExpr : Expression, expectedTypes : Util.ArgumentTypeRequest[]) : Type[] {
 		var argTypes = [] : Type[];
 		for (var i = 0; i < args.length; ++i) {
 			if (args[i] instanceof FunctionExpression && ! (args[i] as FunctionExpression).argumentTypesAreIdentified()) {
@@ -178,11 +190,11 @@ class Util {
 				var funcDef = (args[i] as FunctionExpression).getFuncDef();
 				var expectedCallbackType = null : Type;
 				for (var j = 0; j < expectedTypes.length; ++j) {
-					if (expectedTypes[j][i] != null && expectedTypes[j][i] instanceof FunctionType && (expectedTypes[j][i] as ResolvedFunctionType).getArgumentTypes().length == funcDef.getArguments().length) {
+					if (expectedTypes[j].at(i) != null && expectedTypes[j].at(i) instanceof FunctionType && (expectedTypes[j].at(i) as ResolvedFunctionType).getArgumentTypes().length == funcDef.getArguments().length) {
 						if (expectedCallbackType == null) {
-							expectedCallbackType = expectedTypes[j][i];
-						} else if (Util.typesAreEqual((expectedCallbackType as ResolvedFunctionType).getArgumentTypes(), (expectedTypes[j][i] as ResolvedFunctionType).getArgumentTypes())
-							&& (expectedCallbackType as ResolvedFunctionType).getReturnType().equals((expectedTypes[j][i] as ResolvedFunctionType).getReturnType())) {
+							expectedCallbackType = expectedTypes[j].at(i);
+						} else if (Util.typesAreEqual((expectedCallbackType as ResolvedFunctionType).getArgumentTypes(), (expectedTypes[j].at(i) as ResolvedFunctionType).getArgumentTypes())
+							&& (expectedCallbackType as ResolvedFunctionType).getReturnType().equals((expectedTypes[j].at(i) as ResolvedFunctionType).getReturnType())) {
 							// function signatures are equal
 						} else {
 							break;
@@ -199,13 +211,13 @@ class Util {
 				var arrayExpr = args[i] as ArrayLiteralExpression;
 				var expectedArrayType = null : Type;
 				for (var j = 0; j < expectedTypes.length; ++j) {
-					if (expectedTypes[j][i] != null
-						&& expectedTypes[j][i] instanceof ObjectType
-						&& expectedTypes[j][i].getClassDef() instanceof InstantiatedClassDefinition
-						&& (expectedTypes[j][i].getClassDef() as InstantiatedClassDefinition).getTemplateClassName() == 'Array') {
+					if (expectedTypes[j].at(i) != null
+						&& expectedTypes[j].at(i) instanceof ObjectType
+						&& expectedTypes[j].at(i).getClassDef() instanceof InstantiatedClassDefinition
+						&& (expectedTypes[j].at(i).getClassDef() as InstantiatedClassDefinition).getTemplateClassName() == 'Array') {
 						if (expectedArrayType == null) {
-							expectedArrayType = expectedTypes[j][i];
-						} else if (expectedArrayType.equals(expectedTypes[j][i])) {
+							expectedArrayType = expectedTypes[j].at(i);
+						} else if (expectedArrayType.equals(expectedTypes[j].at(i))) {
 							// type parameters are equal
 						} else {
 							break;
@@ -221,13 +233,13 @@ class Util {
 				var mapExpr = args[i] as MapLiteralExpression;
 				var expectedMapType = null : Type;
 				for (var j = 0; j < expectedTypes.length; ++j) {
-					if (expectedTypes[j][i] != null
-						&& expectedTypes[j][i] instanceof ObjectType
-						&& expectedTypes[j][i].getClassDef() instanceof InstantiatedClassDefinition
-						&& (expectedTypes[j][i].getClassDef() as InstantiatedClassDefinition).getTemplateClassName() == 'Map') {
+					if (expectedTypes[j].at(i) != null
+						&& expectedTypes[j].at(i) instanceof ObjectType
+						&& expectedTypes[j].at(i).getClassDef() instanceof InstantiatedClassDefinition
+						&& (expectedTypes[j].at(i).getClassDef() as InstantiatedClassDefinition).getTemplateClassName() == 'Map') {
 						if (expectedMapType == null) {
-							expectedMapType = expectedTypes[j][i];
-						} else if (expectedMapType.equals(expectedTypes[j][i])) {
+							expectedMapType = expectedTypes[j].at(i);
+						} else if (expectedMapType.equals(expectedTypes[j].at(i))) {
 							// type parameters are equal
 						} else {
 							break;

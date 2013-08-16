@@ -581,7 +581,7 @@ abstract class FunctionType extends Type {
 	abstract function getObjectType() : Type;
 
 	// used for left to right deduction of callback function types and empty literals
-	abstract function getExpectedTypes (numberOfArgs : number, isStatic : boolean) : Type[][];
+	abstract function getExpectedTypes (numberOfArgs : number, isStatic : boolean) : Util.ArgumentTypeRequest[];
 
 	abstract function deduceByArgumentTypes (context : AnalysisContext, operatorToken : Token, argTypes : Type[], isStatic : boolean) : ResolvedFunctionType;
 
@@ -651,8 +651,8 @@ class FunctionChoiceType extends FunctionType {
 		return null;
 	}
 
-	override function getExpectedTypes (numberOfArgs : number, isStatic : boolean) : Type[][] {
-		var expected = new Type[][];
+	override function getExpectedTypes (numberOfArgs : number, isStatic : boolean) : Util.ArgumentTypeRequest[] {
+		var expected = new Util.ArgumentTypeRequest[];
 		for (var i = 0; i < this._types.length; ++i)
 			this._types[i]._getExpectedTypes(expected, numberOfArgs, isStatic);
 		return expected;
@@ -787,13 +787,13 @@ abstract class ResolvedFunctionType extends FunctionType {
 		return this;
 	}
 
-	override function getExpectedTypes (numberOfArgs : number, isStatic : boolean) : Type[][] {
-		var expected = new Type[][];
+	override function getExpectedTypes (numberOfArgs : number, isStatic : boolean) : Util.ArgumentTypeRequest[] {
+		var expected = new Util.ArgumentTypeRequest[];
 		this._getExpectedTypes(expected, numberOfArgs, isStatic);
 		return expected;
 	}
 
-	function _getExpectedTypes (expected : Type[][], numberOfArgs : number, isStatic : boolean) : void {
+	function _getExpectedTypes (expected : Util.ArgumentTypeRequest[], numberOfArgs : number, isStatic : boolean) : void {
 		if ((this instanceof StaticFunctionType) != isStatic)
 			return;
 		var argTypes = new Type[];
@@ -826,7 +826,7 @@ abstract class ResolvedFunctionType extends FunctionType {
 			}
 		});
 		if (hasCallback)
-			expected.push(callbackArgTypes);
+			expected.push(new Util.ArgumentTypeRequest(callbackArgTypes, []));
 	}
 
 	override function toString () : string {
@@ -966,7 +966,7 @@ class TemplateFunctionType extends ResolvedFunctionType {
 			return null;
 		}
 		if (this._argTypes.length != 0 && this._argTypes[this._argTypes.length - 1] instanceof VariableLengthArgumentType) {
-			// TODO deduce type parameters in template functions by the arguments
+			// TODO
 			notes.push(new CompileNote(token, "template functions with variable-length arguments cannot be instantiated by the arguments: please specify the type arguments by hand"));
 			return null;
 		} else {
@@ -977,7 +977,7 @@ class TemplateFunctionType extends ResolvedFunctionType {
 			}
 			var member = this._funcDef.instantiateByArgumentTypes(errors, notes, token, argTypes, exact);
 			if (member == null) {
-				// convert instantiation errors to compile note
+				// convert instantiation errors to compile notes
 				for (var i = 0; i < errors.length; ++i) {
 					notes.push(new CompileNote(errors[i]._filename, errors[i]._lineNumber, errors[i]._columnNumber, errors[i]._message));
 				}
@@ -987,7 +987,7 @@ class TemplateFunctionType extends ResolvedFunctionType {
 		}
 	}
 
-	override function _getExpectedTypes (expected : Type[][], numberOfArgs : number, isStatic : boolean) : void {
+	override function _getExpectedTypes (expected : Util.ArgumentTypeRequest[], numberOfArgs : number, isStatic : boolean) : void {
 		// does not support left-to-right type deduction for template function calls
 	}
 
