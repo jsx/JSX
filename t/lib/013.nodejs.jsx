@@ -138,6 +138,14 @@ class _Test extends TestCase {
 
     this.expect(st.isDirectory()).toBe(true);
 
+    var tmpFile = dir + '.test.tmp';
+    node.fs.writeFileSync(tmpFile, 'test1\n');
+    node.fs.appendFileSync(tmpFile, 'test2\n');
+    var content = node.fs.readFileSync(tmpFile, 'utf-8');
+    this.expect(content).toBe('test1\ntest2\n');
+    node.fs.unlinkSync(tmpFile);
+    var exists = node.fs.existsSync(tmpFile);
+    this.expect(exists).toBe(false);
   }
 
 
