@@ -135,5 +135,10 @@ class _Test extends TestCase {
 		this.expect(map.has(new Pair.<int,int>(10, 20)), "has after clear").toBe(false);
 		this.expect(map.has(new Pair.<int,int>(20, 20)), "has after clear").toBe(false);
 	}
+
+	function testLD() : void {
+		this.expect(Util.ld("apple", "apple")).toBe(0);
+		this.expect(Util.ld("apple", "play")).toBe(4);
+	}
 }
 
