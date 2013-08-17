@@ -2785,7 +2785,7 @@ class _InlineOptimizeCommand extends _FunctionOptimizeCommand {
 			}
 
 		} else if (expr instanceof AssignmentExpression
-			   && this._lhsHasNoSideEffects((expr as AssignmentExpression).getFirstExpr())
+			   && Util.lhsHasNoSideEffects((expr as AssignmentExpression).getFirstExpr())
 			&& (expr as AssignmentExpression).getSecondExpr() instanceof CallExpression) {
 
 			// inline if the statement is an assignment of a single call expression into a local variable
@@ -2810,28 +2810,6 @@ class _InlineOptimizeCommand extends _FunctionOptimizeCommand {
 			}
 		}
 
-		return false;
-	}
-
-	function _lhsHasNoSideEffects (lhsExpr : Expression) : boolean {
-		// FIXME may have side effects if is a native type (or extends a native type)
-		if (lhsExpr instanceof LocalExpression)
-			return true;
-		if (lhsExpr instanceof PropertyExpression) {
-			var holderExpr = (lhsExpr as PropertyExpression).getExpr();
-			if (holderExpr instanceof ThisExpression)
-				return true;
-			if (holderExpr instanceof LocalExpression || holderExpr.isClassSpecifier())
-				return true;
-		} else if (lhsExpr instanceof ArrayExpression) {
-			var arrayExpr = lhsExpr as ArrayExpression;
-			if (arrayExpr.getFirstExpr() instanceof LocalExpression
-				&& (arrayExpr.getSecondExpr() instanceof NumberLiteralExpression
-					|| arrayExpr.getSecondExpr() instanceof StringLiteralExpression
-					|| arrayExpr.getSecondExpr() instanceof LocalExpression)) {
-						return true;
-			}
-		}
 		return false;
 	}
 
