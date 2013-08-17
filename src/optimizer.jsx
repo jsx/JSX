@@ -2293,33 +2293,17 @@ class _DeadCodeEliminationOptimizeCommand extends _FunctionOptimizeCommand {
 		// mark the variables that are used (as RHS)
 		var locals = funcDef.getLocals();
 		var localsUsed = new Array.<boolean>(locals.length);
-		funcDef.forEachStatement(function onStatement(statement : Statement) : boolean {
-			if (statement instanceof FunctionStatement) {
-				(statement as FunctionStatement).getFuncDef().forEachStatement(onStatement);
-			}
-			statement.forEachExpression(function onExpr(expr : Expression) : boolean {
-				if (expr instanceof AssignmentExpression
-				    && (expr as AssignmentExpression).getFirstExpr() instanceof LocalExpression
-					&& (expr as AssignmentExpression).getFirstExpr().getType().equals((expr as AssignmentExpression).getSecondExpr().getType())
-				) {
-					// skip lhs of assignment to local that has no effect
-					return onExpr((expr as AssignmentExpression).getSecondExpr());
-				} else if (expr instanceof LocalExpression) {
-					for (var i = 0; i < locals.length; ++i) {
-						if (locals[i] == (expr as LocalExpression).getLocal()) {
-							break;
-						}
-					}
-					if (i != locals.length) {
-						localsUsed[i] = true;
-					}
-				} else if (expr instanceof FunctionExpression) {
-					(expr as FunctionExpression).getFuncDef().forEachStatement(onStatement);
+
+		Util.forEachLocalVariableInRHS(funcDef, (_, local) -> {
+			for (var i = 0; i < locals.length; ++i) {
+				if (locals[i] == local) {
+					localsUsed[i] = true;
+					break;
 				}
-				return expr.forEachExpression(onExpr);
-			});
-			return statement.forEachStatement(onStatement);
+			}
+			return true;
 		});
+
 		// remove locals that are not used
 		var altered = false;
 		for (var localIndex = localsUsed.length - 1; localIndex >= 0; --localIndex) {

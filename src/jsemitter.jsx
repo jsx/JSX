@@ -994,6 +994,9 @@ class _ReturnStatementEmitter extends _StatementEmitter {
 
 	override function emit () : void {
 		var expr = this._statement.getExpr();
+
+		this._emitter._releaseVariablesNotUsedInClosures(expr);
+
 		if (expr != null) {
 			this._emitter._emit("return ", null);
 			if (this._emitter._enableProfiler) {
@@ -1012,7 +1015,6 @@ class _ReturnStatementEmitter extends _StatementEmitter {
 			}
 		}
 	}
-
 }
 
 class _DeleteStatementEmitter extends _StatementEmitter {
@@ -2830,6 +2832,7 @@ class JavaScriptEmitter implements Emitter {
 	var _enableProfiler : boolean;
 	var _enableMinifier : boolean;
 	var _enableRunTimeTypeCheck = true;
+	var _enableReleaseVars = false;
 
 	var _bootstrapBuilder : _BootstrapBuilder;
 	var _sourceMapper : SourceMapper;
@@ -2889,6 +2892,10 @@ class JavaScriptEmitter implements Emitter {
 
 	override function setEnableRunTimeTypeCheck (enable : boolean) : void {
 		this._enableRunTimeTypeCheck = enable;
+	}
+
+	function setEnableReleaseVars(enable : boolean) : void {
+		this._enableReleaseVars = enable;
 	}
 
 	override function getEnableSourceMap() : boolean {
@@ -3372,6 +3379,8 @@ class JavaScriptEmitter implements Emitter {
 	}
 
 	function _emitFunctionBody (funcDef : MemberFunctionDefinition) : void {
+		this._markVariablesToRelease(funcDef);
+
 		var prevEmittingFunction = this._emittingFunction;
 		try {
 			this._emittingFunction = funcDef;
@@ -3402,17 +3411,72 @@ class JavaScriptEmitter implements Emitter {
 			var statements = funcDef.getStatements();
 			for (var i = 0; i < statements.length; ++i)
 				this._emitStatement(statements[i]);
-
-			if (this._enableProfiler) {
-				if (statements.length == 0 || ! (statements[statements.length - 1] instanceof ReturnStatement)) {
-					this._emit("$__jsx_profiler.exit();\n", null);
-				}
+			if (! (statements[statements.length - 1] instanceof ReturnStatement)) {
+				this._releaseVariablesNotUsedInClosures(null);
 			}
-
+		   if (this._enableProfiler) {
+			   if (statements.length == 0 || ! (statements[statements.length - 1] instanceof ReturnStatement)) {
+				this._emit("$__jsx_profiler.exit();\n", null);
+			   }
+		   }
 		} finally {
 			this._emittingFunction = prevEmittingFunction;
 		}
 	}
+
+	class _VarUsedStash extends Stash {
+		static const identifier = "_VarUsedStash";
+		var usedInClosure = false;
+
+		override function clone() : JavaScriptEmitter._VarUsedStash {
+			throw new Error("not implemented");
+		}
+	}
+
+	function _getVarUsedStash(local : LocalVariable) : JavaScriptEmitter._VarUsedStash {
+		var stash = local.getStash(JavaScriptEmitter._VarUsedStash.identifier);
+		if (stash == null) {
+			stash = local.setStash(JavaScriptEmitter._VarUsedStash.identifier, new JavaScriptEmitter._VarUsedStash);
+		}
+		return (stash as JavaScriptEmitter._VarUsedStash);
+	}
+
+	function _markVariablesToRelease(funcDef : MemberFunctionDefinition) : void {
+		Util.forEachLocalVariableInRHS(funcDef, (funcDef, local) -> {
+			if (funcDef.getLocals().indexOf(local) == -1) {
+				this._getVarUsedStash(local).usedInClosure = true;
+			}
+			return true;
+		});
+	}
+
+	function _releaseVariablesNotUsedInClosures(returnExpr : Expression) : void {
+		var funcDef = this._emittingFunction;
+		if (funcDef.getClosures().length != 0) {
+			funcDef.getLocals().forEach((local) -> {
+				var usedInReturn = false;
+				if (returnExpr != null) {
+					(function onExpr(expr : Expression) : boolean {
+						if (expr instanceof LocalExpression) {
+							if ((expr as LocalExpression).getLocal() == local) {
+								usedInReturn = true;
+								return false;
+							}
+						}
+						return expr.forEachExpression(onExpr);
+					}(returnExpr));
+				}
+
+				if (this._enableReleaseVars
+						&& ! usedInReturn
+						&& ! this._getVarUsedStash(local).usedInClosure
+						&& ! [Type.booleanType, Type.integerType, Type.numberType].some((t) -> t.equals(local.getType()))) {
+					this._emit(this._namer.getNameOfLocalVariable(local) + " = undefined;\n", null);
+				}
+			});
+		}
+	}
+
 
 	function _emitStaticMemberVariable (variable : MemberVariableDefinition) : void {
 		var initialValue = variable.getInitialValue();

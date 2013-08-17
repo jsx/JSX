@@ -282,6 +282,37 @@ class Util {
 		return true;
 	}
 
+	static function forEachLocalVariableInRHS(funcDef : MemberFunctionDefinition, cb : function(:MemberFunctionDefinition, :LocalVariable) : boolean) : boolean {
+		return funcDef.forEachStatement(function onStatement(statement : Statement) : boolean {
+			if (statement instanceof FunctionStatement) {
+				var prevFuncDef = funcDef;
+				funcDef = (statement as FunctionStatement).getFuncDef();
+				funcDef.forEachStatement(onStatement);
+				funcDef = prevFuncDef;
+			}
+			statement.forEachExpression(function onExpr(expr : Expression) : boolean {
+				if (expr instanceof AssignmentExpression
+				    && (expr as AssignmentExpression).getFirstExpr() instanceof LocalExpression
+					&& (expr as AssignmentExpression).getFirstExpr().getType().equals((expr as AssignmentExpression).getSecondExpr().getType())
+				) {
+					// skip lhs of assignment to local that has no effect
+					return onExpr((expr as AssignmentExpression).getSecondExpr());
+				} else if (expr instanceof LocalExpression) {
+					if (! cb(funcDef, (expr as LocalExpression).getLocal())) {
+						return false;
+					}
+				} else if (expr instanceof FunctionExpression) {
+					var prevFuncDef = funcDef;
+					funcDef = (expr as FunctionExpression).getFuncDef();
+					funcDef.forEachStatement(onStatement);
+					funcDef = prevFuncDef;
+				}
+				return expr.forEachExpression(onExpr);
+			});
+			return statement.forEachStatement(onStatement);
+		});
+	}
+
 	static function findFunctionInClass (classDef : ClassDefinition, funcName : string, argTypes : Type[], isStatic : boolean) : MemberFunctionDefinition {
 		var found = null : MemberFunctionDefinition;
 		classDef.forEachMemberFunction(function (funcDef) {
