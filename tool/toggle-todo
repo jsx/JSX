@@ -6,12 +6,20 @@ use Fatal qw(rename);
 
 foreach my $name(@ARGV) {
     my $newname;
+    my $resolved;
     if ($name =~ /\.todo\b/) {
         $newname = ($name =~ s/\.todo\b//r);
+        $resolved = 1;
     }
     else {
         $newname = ($name =~ s/(\.\w+)$/.todo$1/r);
     }
-    say "$name => $newname";
     rename $name => $newname;
+    if ($resolved) {
+        if (system("prove", $newname) != 0) {
+            rename $newname => $name;
+            next;
+        }
+    }
+    say "$name => $newname";
 }
