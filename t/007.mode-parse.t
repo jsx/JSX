@@ -12,7 +12,7 @@ my @files = glob 't/run/*.jsx';
 plan tests => 4 * scalar @files;
 
 {
-    local $ENV{JSX_HOME} = tempdir(".jsx.mode-parse-XXXXXXXX");
+    local $ENV{JSX_HOME} = tempdir(".jsx.mode-parse-XXXXXXXX", CLEANUP => 1);
 
     require tool::RunCompilationServer;
     require "tool/jsx.pl"; # App::jsx
@@ -28,8 +28,8 @@ plan tests => 4 * scalar @files;
         my $res = App::jsx::request($port, "--mode", "parse", $file);
 
         ok !$res->{invalid_response}, "--mode parse $file";
-        is $res->{statusCode}, 0, "statusCode";
-        is $res->{stderr}, "", "stderr";
-        ok $res->{stdout}, "stdout"
+        is $res->{statusCode}, 0, "statusCode for $file";
+        is $res->{stderr}, "", "stderr for $file";
+        ok $res->{stdout}, "stdout for $file"
     }
 }

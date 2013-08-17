@@ -346,7 +346,7 @@ class Compiler {
 					return classDef;
 				});
 		};
-		// set analyzation context of every variable
+		// set analyzation context of every member variable
 		this.forEachClassDef(function (parser : Parser, classDef : ClassDefinition) {
 			classDef.setAnalysisContextOfVariables(createContext(parser));
 			return true;
@@ -363,7 +363,7 @@ class Compiler {
 			classDef.analyze(createContext(parser));
 			return true;
 		});
-		// analyze unused variables in every classdef
+		// analyze unused member variables in every classdef
 		this.forEachClassDef(function (parser : Parser, classDef : ClassDefinition) {
 			classDef.analyzeUnusedVariables();
 			return true;
@@ -403,7 +403,9 @@ class Compiler {
 				&& ! (classDef instanceof InstantiatedClassDefinition
 					&& nativeClassNames[classDef.className()] instanceof InstantiatedClassDefinition
 					&& (classDef as InstantiatedClassDefinition).getTemplateClass() == (nativeClassNames[classDef.className()] as InstantiatedClassDefinition).getTemplateClass())
-				&& classDef.getNativeSource() == null) {
+				&& classDef.getNativeSource() == null
+				&& classDef.getOuterClassDef() == null
+			) {
 				errors.push(
 					new CompileError(classDef.getToken(), "native class with same name is already defined")
 					.addCompileNote(new CompileNote(nativeClassNames[classDef.className()].getToken(), "here")));

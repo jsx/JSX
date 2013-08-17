@@ -9,7 +9,7 @@ c   x
 c   y
 c   z
 3
-6
+9
 */
 
 class _Main {

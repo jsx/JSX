@@ -46,6 +46,7 @@ my @specs = (
         #"http://www.w3.org/TR/2011/REC-SVG11-20110816/svg.idl",
 
         # HTML5
+        'url-whatwg; http://url.spec.whatwg.org/', # e.g. URLUtils
         'html5; http://www.w3.org/TR/html5/single-page.html',
         'FileAPI; http://www.w3.org/TR/2012/WD-FileAPI-20121025/',
 

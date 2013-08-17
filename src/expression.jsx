@@ -508,7 +508,7 @@ class ArrayLiteralExpression extends Expression {
 	}
 
 	override function clone () : ArrayLiteralExpression {
-		return new ArrayLiteralExpression(this._token, Cloner.<Expression>.cloneArray(this._exprs), this._type);
+		return new ArrayLiteralExpression(this._token, Util.cloneArray(this._exprs), this._type);
 	}
 
 	function getExprs () : Expression[] {
@@ -527,8 +527,8 @@ class ArrayLiteralExpression extends Expression {
 		return [
 			"ArrayLiteralExpression",
 			this._token.serialize(),
-			Serializer.<Expression>.serializeArray(this._exprs),
-			Serializer.<Type>.serializeNullable(this._type)
+			Util.serializeArray(this._exprs),
+			Util.serializeNullable(this._type)
 		] : variant[];
 	}
 
@@ -572,8 +572,6 @@ class ArrayLiteralExpression extends Expression {
 				context.errors.push(new CompileError(this._token, "could not deduce array type, please specify"));
 				return false;
 			}
-			if (elementType.equals(Type.integerType))
-				elementType = Type.numberType;
 			elementType = elementType.resolveIfNullable();
 			this._type = new ObjectType(Util.instantiateTemplate(context, this._token, "Array", [ elementType ]));
 		}
@@ -653,8 +651,8 @@ class MapLiteralExpression extends Expression {
 		return [
 			"MapLiteralExpression",
 			this._token.serialize(),
-			Serializer.<MapLiteralElement>.serializeArray(this._elements),
-			Serializer.<Type>.serializeNullable(this._type)
+			Util.serializeArray(this._elements),
+			Util.serializeNullable(this._type)
 		] : variant[];
 	}
 
@@ -739,7 +737,7 @@ class ThisExpression extends LeafExpression {
 		return [
 			"ThisExpression",
 			this._token.serialize(),
-			Serializer.<ClassDefinition>.serializeNullable(this._classDef)
+			this._classDef != null ? this._classDef.getToken().serialize() : null
 		] : variant[];
 	}
 
@@ -941,6 +939,11 @@ class InstanceofExpression extends UnaryExpression {
 		} else if (exprType.equals(Type.variantType)) {
 		} else {
 			context.errors.push(new CompileError(this._token, "operator 'instanceof' is only applicable to an object or a variant"));
+			return false;
+		}
+
+		if (this._expectedType.getClassDef().flags() & ClassDefinition.IS_FAKE) {
+			context.errors.push(new CompileError(this._token, "operator 'instanceof' is not applicable to a fake class " + this._expectedType.toString()));
 			return false;
 		}
 		return true;
@@ -1210,7 +1213,7 @@ class PropertyExpression extends UnaryExpression {
 			"PropertyExpression",
 			this._expr.serialize(),
 			this._identifierToken.serialize(),
-			Serializer.<Type>.serializeNullable(this._type)
+			Util.serializeNullable(this._type)
 		] : variant[];
 	}
 
@@ -1973,7 +1976,7 @@ class ConditionalExpression extends OperatorExpression {
 			"ConditionalExpression",
 			this._token.serialize(),
 			this._condExpr.serialize(),
-			Serializer.<Expression>.serializeNullable(this._ifTrueExpr),
+			Util.serializeNullable(this._ifTrueExpr),
 			this._ifFalseExpr.serialize()
 		] : variant[];
 	}
@@ -2038,7 +2041,7 @@ class CallExpression extends OperatorExpression {
 		// clone
 		super(that);
 		this._expr = that._expr.clone();
-		this._args = Cloner.<Expression>.cloneArray(that._args);
+		this._args = Util.cloneArray(that._args);
 	}
 
 	override function clone () : CallExpression {
@@ -2062,7 +2065,7 @@ class CallExpression extends OperatorExpression {
 			"CallExpression",
 			this._token.serialize(),
 			this._expr.serialize(),
-			Serializer.<Expression>.serializeArray(this._args)
+			Util.serializeArray(this._args)
 		] : variant[];
 	}
 
@@ -2129,7 +2132,7 @@ class SuperExpression extends OperatorExpression {
 	function constructor (that : SuperExpression) {
 		super(that);
 		this._name = that._name;
-		this._args = Cloner.<Expression>.cloneArray(that._args);
+		this._args = Util.cloneArray(that._args);
 		this._funcType = that._funcType;
 	}
 
@@ -2154,7 +2157,7 @@ class SuperExpression extends OperatorExpression {
 			"SuperExpression",
 			this._token.serialize(),
 			this._name.serialize(),
-			Serializer.<Expression>.serializeArray(this._args)
+			Util.serializeArray(this._args)
 		] : variant[];
 	}
 
@@ -2213,7 +2216,7 @@ class NewExpression extends OperatorExpression {
 	function constructor (that : NewExpression) {
 		super(that);
 		this._type = that._type;
-		this._args = Cloner.<Expression>.cloneArray(that._args);
+		this._args = Util.cloneArray(that._args);
 		this._constructor = that._constructor;
 	}
 
@@ -2230,7 +2233,7 @@ class NewExpression extends OperatorExpression {
 			"NewExpression",
 			this._token.serialize(),
 			this._type.serialize(),
-			Serializer.<Expression>.serializeArray(this._args)
+			Util.serializeArray(this._args)
 		] : variant[];
 	}
 

@@ -80,7 +80,7 @@ class Token {
 	// "'x' at filename:linenumber" for debugging purpose
 	function getNotation() : string {
 		return "'" + this._value + "'"
-				+ " at " + (this._filename ?: "<<unknown>>")  + ":" + this._lineNumber as string;
+				+ " at " + (this._filename ?: "<<unknown>>")  + ":" + this._lineNumber as string + ":" + this._columnNumber as string;
 	}
 }
 
@@ -155,18 +155,6 @@ class _Lexer {
 		"extern", "native", "as", "operator"
 		]);
 
-	static const builtInClasses = Util.asSet([
-		// build-in classes
-		"Array", "Boolean", "Date", "Function", "Map", "Math", "Number",
-		"Object", "RegExp", "String", "JSON",
-		"Error", "EvalError", "RangeError", "ReferenceError", "SyntaxError", "TypeError",
-		"JSX",
-		// typed arrays
-		"Transferable", "ArrayBuffer", "Int8Array", "Uint8Array",
-		"Uint8ClampedArray", "Int16Array", "Uint16Array", "Int32Array",
-		"Uint32Array", "Float32Array", "Float64Array", "DataView"
-	]);
-
 	static function makeAlt (patterns : string[]) : string {
 		return "(?: \n" + patterns.join("\n | \n") + "\n)\n";
 	}
@@ -228,9 +216,9 @@ class Import {
 	function serialize () : variant {
 		return [
 			"Import",
-			Serializer.<Token>.serializeNullable(this._filenameToken),
-			Serializer.<Token>.serializeNullable(this._aliasToken),
-			Serializer.<Token>.serializeArray(this._classNames)
+			Util.serializeNullable(this._filenameToken),
+			Util.serializeNullable(this._aliasToken),
+			Util.serializeArray(this._classNames)
 		] : variant[];
 	}
 
@@ -425,8 +413,8 @@ class QualifiedName {
 		return [
 			"QualifiedName",
 			this._token.serialize(),
-			Serializer.<Import>.serializeNullable(this._import),
-			Serializer.<ParsedObjectType>.serializeNullable(this._enclosingType)
+			Util.serializeNullable(this._import),
+			Util.serializeNullable(this._enclosingType)
 		] : variant[];
 	}
 
@@ -485,7 +473,7 @@ class QualifiedName {
 				return null;
 			if (typeArguments.length == 0) {
 				if ((classDef = enclosingClassDef.lookupInnerClass(this._token.getValue())) == null) {
-					context.errors.push(new CompileError(this._token, "no class definition for '" + this.toString() + "'"));
+					context.errors.push(new CompileError(this._token, "no class definition or variable for '" + this.toString() + "'"));
 					return null;
 				}
 			} else {
@@ -497,8 +485,10 @@ class QualifiedName {
 		} else {
 			if (typeArguments.length == 0) {
 				if ((classDef = context.parser.lookup(context.errors, this._token, this._token.getValue())) == null) {
-					context.errors.push(new CompileError(this._token, "no class definition for '" + this.toString() + "'"));
-					return null;
+					if ((classDef = context.parser.lookupTemplate(context.errors, new TemplateInstantiationRequest(this._token, this._token.getValue(), typeArguments), function (parser : Parser, classDef : ClassDefinition) : ClassDefinition { return null; })) == null) {
+						context.errors.push(new CompileError(this._token, "no class definition or variable for '" + this.toString() + "'"));
+						return null;
+					}
 				}
 			} else {
 				if ((classDef = context.parser.lookupTemplate(context.errors, new TemplateInstantiationRequest(this._token, this._token.getValue(), typeArguments), function (parser : Parser, classDef : ClassDefinition) : ClassDefinition { return null; })) == null) {
@@ -891,11 +881,11 @@ class Parser {
 		this._prevScope = this._prevScope.prev;
 	}
 
-	function _registerLocal (identifierToken : Token, type : Type) : LocalVariable {
+	function _registerLocal (identifierToken : Token, type : Type, isFunctionStmt : boolean = false) : LocalVariable {
 		function isEqualTo (local : LocalVariable) : boolean {
 			if (local.getName().getValue() == identifierToken.getValue()) {
-				if (type != null && local.getType() != null && ! local.getType().equals(type))
-					this._newError("conflicting types for variable " + identifierToken.getValue());
+				if ((type != null && local.getType() != null && ! local.getType().equals(type)) || isFunctionStmt)
+					this._newError("conflicting types for variable " + identifierToken.getValue(), identifierToken);
 				return true;
 			}
 			return false;
@@ -965,6 +955,14 @@ class Parser {
 
 	function _newError (message : string) : void {
 		this._errors.push(new CompileError(this._filename, this._lineNumber, this._getColumn(), message));
+	}
+
+	function _newError (message : string, lineNumber : number, columnOffset : number) : void {
+		this._errors.push(new CompileError(this._filename, lineNumber, columnOffset, message));
+	}
+
+	function _newError (message : string, token : Token) : void {
+		this._errors.push(new CompileError(token, message));
 	}
 
 	function _newDeprecatedWarning (message : string) : void {
@@ -1148,19 +1146,11 @@ class Parser {
 		return true;
 	}
 
-	function _expectOpt (expected : string) : Token {
-		return this._expectOpt([ expected ], null);
-	}
-
-	function _expectOpt (expected : string[]) : Token {
-		return this._expectOpt(expected, null);
-	}
-
-	function _expectOpt (expected : string, excludePattern : RegExp) : Token {
+	function _expectOpt (expected : string, excludePattern : RegExp = null) : Token {
 		return this._expectOpt([ expected ], excludePattern);
 	}
 
-	function _expectOpt (expected : string[], excludePattern : RegExp) : Token {
+	function _expectOpt (expected : string[], excludePattern : RegExp = null) : Token {
 		this._advanceToken();
 		for (var i = 0; i < expected.length; ++i) {
 			if (this._completionRequest != null) {
@@ -1185,32 +1175,39 @@ class Parser {
 		return null;
 	}
 
-	function _expect (expected : string) : Token {
-		return this._expect([ expected ], null);
-	}
-
-	function _expect (expected : string[]) : Token {
-		return this._expect(expected, null);
-	}
-
-	function _expect (expected : string, excludePattern : RegExp) : Token {
+	function _expect (expected : string, excludePattern : RegExp = null) : Token {
 		return this._expect([ expected ], excludePattern);
 	}
 
-	function _expect (expected : string[], excludePattern : RegExp) : Token {
+	function _expect (expected : string[], excludePattern : RegExp = null) : Token {
 		var token = this._expectOpt(expected, excludePattern);
 		if (token == null) {
-			this._newError("expected keyword: " + expected.join(" "));
+			// move to the point where expect
+			// see t/compile_error/178
+			var lineOffset = this._lineNumber - 1;
+			var columnOffset = this._columnOffset - 1;
+			while (lineOffset >= 0 && columnOffset >= 0) {
+				if (! /[ \t\r\n]/.test(this._lines[lineOffset].charAt(columnOffset) ?: " ")) {
+					break;
+				}
+
+				if (columnOffset != 0) {
+					columnOffset--;
+				}
+				else {
+					do {
+						columnOffset = this._lines[--lineOffset].length - 1;
+					} while (this._lines[lineOffset].length == 0 && lineOffset >= 0);
+				}
+			}
+
+			this._newError("expected keyword: " + expected.join(" "), lineOffset + 1, columnOffset + 1);
 			return null;
 		}
 		return token;
 	}
 
-	function _expectIdentifierOpt () : Token {
-		return this._expectIdentifierOpt(null);
-	}
-
-	function _expectIdentifierOpt (completionCb : function(:Parser):CompletionCandidates) : Token {
+	function _expectIdentifierOpt (completionCb : function(:Parser):CompletionCandidates = null) : Token {
 		this._advanceToken();
 		var matched = this._getInput().match(_Lexer.rxIdent);
 		if (completionCb != null && this._completionRequest != null) {
@@ -1221,23 +1218,20 @@ class Parser {
 		}
 		if (matched == null)
 			return null;
+		this._tokenLength = matched[0].length;
+		var token = new Token(matched[0], true, this._filename, this._lineNumber, this._getColumn());
 		if (_Lexer.keywords.hasOwnProperty(matched[0])) {
-			this._newError("expected an identifier but found a keyword");
+			this._newError("expected an identifier but found a keyword", token);
 			return null;
 		}
 		if (_Lexer.reserved.hasOwnProperty(matched[0])) {
-			this._newError("expected an identifier but found a reserved word");
+			this._newError("expected an identifier but found a reserved word", token);
 			return null;
 		}
-		this._tokenLength = matched[0].length;
-		return new Token(matched[0], true, this._filename, this._lineNumber, this._getColumn());
+		return token;
 	}
 
-	function _expectIdentifier () : Token {
-		return this._expectIdentifier(null);
-	}
-
-	function _expectIdentifier (completionCb : function(:Parser):CompletionCandidates) : Token {
+	function _expectIdentifier (completionCb : function(:Parser):CompletionCandidates = null) : Token {
 		var token = this._expectIdentifierOpt(completionCb);
 		if (token != null)
 			return token;
@@ -1310,7 +1304,7 @@ class Parser {
 	function _importStatement (importToken : Token) : boolean {
 		// parse
 		var classes = null : Token[];
-		var token = this._expectIdentifierOpt(null);
+		var token = this._expectIdentifierOpt();
 		if (token != null) {
 			classes = [ token ];
 			while (true) {
@@ -1318,7 +1312,7 @@ class Parser {
 					return false;
 				if (token.getValue() == "from")
 					break;
-				if ((token = this._expectIdentifier(null)) == null)
+				if ((token = this._expectIdentifier()) == null)
 					return false;
 				classes.push(token);
 			}
@@ -1328,13 +1322,13 @@ class Parser {
 			return false;
 		var alias = null : Token;
 		if (this._expectOpt("into") != null) {
-			if ((alias = this._expectIdentifier(null)) == null)
+			if ((alias = this._expectIdentifier()) == null)
 				return false;
 		}
 		if (this._expect(";") == null)
 			return false;
 		// check conflict
-		if (alias != null && Parser._isReservedClassName(alias.getValue())) {
+		if (alias != null && Util.isBuiltInClass(alias.getValue())) {
 			this._errors.push(new CompileError(alias, "cannot use name of a built-in class as an alias"));
 			return false;
 		}
@@ -1456,7 +1450,7 @@ class Parser {
 			}
 			this._classFlags |= newFlag;
 		}
-		var className = this._expectIdentifier(null);
+		var className = this._expectIdentifier();
 		if (className == null)
 			return null;
 		// template
@@ -1545,7 +1539,7 @@ class Parser {
 		}
 
 		// check name conflicts
-		if ((this._classFlags & ClassDefinition.IS_NATIVE) == 0 && Parser._isReservedClassName(className.getValue())) {
+		if ((this._classFlags & ClassDefinition.IS_NATIVE) == 0 && Util.isBuiltInClass(className.getValue())) {
 			// any better way to check that we are parsing a built-in file?
 			this._errors.push(new CompileError(className, "cannot re-define a built-in class"));
 			success = false;
@@ -1722,7 +1716,7 @@ class Parser {
 			this._newError("only native classes may use the __readonly__ attribute");
 			return null;
 		}
-		var name = this._expectIdentifier(null);
+		var name = this._expectIdentifier();
 		if (name == null)
 			return null;
 		if (shouldExport(name.getValue()))
@@ -1758,7 +1752,7 @@ class Parser {
 
 	function _functionDefinition (token : Token, flags : number, docComment : DocComment, shouldExport : function (name : string) : boolean) : MemberFunctionDefinition {
 		// name
-		var name = this._expectIdentifier(null);
+		var name = this._expectIdentifier();
 		if (name == null)
 			return null;
 		if (shouldExport(name.getValue()))
@@ -1866,7 +1860,7 @@ class Parser {
 		}
 		var typeArgs = new Token[];
 		do {
-			var typeArg = this._expectIdentifier(null);
+			var typeArg = this._expectIdentifier();
 			if (typeArg == null)
 				return null;
 			typeArgs.push(typeArg);
@@ -1902,9 +1896,9 @@ class Parser {
 
 	function _typeDeclaration (allowVoid : boolean) : Type {
 		var token;
-		if (this._expectOpt("void") != null) {
+		if ((token = this._expectOpt("void")) != null) {
 			if (! allowVoid) {
-				this._newError("'void' cannot be used here");
+				this._newError("'void' cannot be used here", token);
 				return null;
 			}
 			return Type.voidType;
@@ -2104,7 +2098,7 @@ class Parser {
 
 	function _functionTypeDeclaration (objectType : Type) : Type {
 		// optional function name
-		this._expectIdentifierOpt(null);
+		this._expectIdentifierOpt();
 		// parse args
 		if(this._expect("(") == null)
 			return null;
@@ -2112,7 +2106,7 @@ class Parser {
 		if (this._expectOpt(")") == null) {
 			do {
 				var isVarArg = this._expectOpt("...") != null;
-				this._expectIdentifierOpt(null); // may have identifiers
+				this._expectIdentifierOpt(); // may have identifiers
 				if (this._expect(":") == null)
 					return null;
 				var argType = this._typeDeclaration(false);
@@ -2175,7 +2169,7 @@ class Parser {
 	function _statement () : boolean {
 		// has a label?
 		var state = this._preserveState();
-		var label = this._expectIdentifierOpt(null);
+		var label = this._expectIdentifierOpt();
 		if (label != null && this._expectOpt(":") != null) {
 			// within a label
 		} else {
@@ -2302,7 +2296,7 @@ class Parser {
 	}
 
 	function _functionStatement (token : Token) : boolean {
-		var name = this._expectIdentifierOpt();
+		var name = this._expectIdentifier();
 		if (name == null)
 			return false;
 		if (this._expect("(") == null)
@@ -2319,7 +2313,7 @@ class Parser {
 		if (this._expect("{") == null)
 			return false;
 
-		var funcLocal = this._registerLocal(name, new StaticFunctionType(token, returnType, args.map.<Type>((arg) -> arg.getType()), false));
+		var funcLocal = this._registerLocal(name, new StaticFunctionType(token, returnType, args.map.<Type>((arg) -> arg.getType()), false), true);
 
 		var funcDef = this._functionBody(token, name, funcLocal, args, returnType, true);
 		if (funcDef == null) {
@@ -2457,7 +2451,7 @@ class Parser {
 	}
 
 	function _continueStatement (token : Token) : boolean {
-		var label = this._expectIdentifierOpt(null);
+		var label = this._expectIdentifierOpt();
 		if (this._expect(";") == null)
 			return false;
 		this._statements.push(new ContinueStatement(token, label));
@@ -2465,7 +2459,7 @@ class Parser {
 	}
 
 	function _breakStatement (token : Token) : boolean {
-		var label = this._expectIdentifierOpt(null);
+		var label = this._expectIdentifierOpt();
 		if (this._expect(";") == null)
 			return false;
 		this._statements.push(new BreakStatement(token, label));
@@ -2587,7 +2581,7 @@ class Parser {
 			var catchIdentifier;
 			var catchType;
 			if (this._expect("(") == null
-				|| (catchIdentifier = this._expectIdentifier(null)) == null
+				|| (catchIdentifier = this._expectIdentifier()) == null
 				|| this._expect(":") == null
 				|| (catchType = this._typeDeclaration(false)) == null
 				|| this._expect(")") == null
@@ -2691,7 +2685,7 @@ class Parser {
 	}
 
 	function _variableDeclaration (noIn : boolean) : Expression {
-		var identifier = this._expectIdentifier(null);
+		var identifier = this._expectIdentifier();
 		if (identifier == null)
 			return null;
 		var type = null : Type;
@@ -3263,7 +3257,7 @@ class Parser {
 		while (this._expectOpt("}") == null) {
 			// obtain key
 			var keyToken;
-			if ((keyToken = this._expectIdentifierOpt(null)) != null
+			if ((keyToken = this._expectIdentifierOpt()) != null
 				|| (keyToken = this._expectNumberLiteralOpt()) != null
 				|| (keyToken = this._expectStringLiteralOpt()) != null) {
 				// ok
@@ -3302,7 +3296,7 @@ class Parser {
 			var token = null : Token;
 			do {
 				var isVarArg = allowVarArgs && (this._expectOpt("...") != null);
-				var argName = this._expectIdentifier(null);
+				var argName = this._expectIdentifier();
 				if (argName == null)
 					return null;
 				var argType : Type = null;
@@ -3389,10 +3383,5 @@ class Parser {
 	function _getCompletionCandidatesOfProperty (expr : Expression) : _CompletionCandidatesOfProperty {
 		return new _CompletionCandidatesOfProperty(expr);
 	}
-
-	static function _isReservedClassName (name : string) : boolean {
-		return _Lexer.builtInClasses.hasOwnProperty(name);
-	}
-
 }
 

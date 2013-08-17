@@ -18,3 +18,7 @@ dictionary ProgressEventInit : EventInit {
   unsigned long long total;
 };
 
+partial interface GlobalEventHandlers {
+  attribute EventHandler oncontextmenu;
+};
+

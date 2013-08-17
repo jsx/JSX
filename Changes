@@ -1,5 +1,37 @@
 Revision history for the JSX software development kit
 
+0.9.60 2013-08-08 22:12:39+0900
+    [BUG FIXES]
+    - Make label name conflict compile errors, rather than runtime erorrs
+      (#127)
+    - Fix issues that error messages sometimes displayed wrong places
+
+    [CHANGES]
+    - Update web.jsx up to the latest HTML5 specs
+
+    [FEATURES]
+    - Add window.orientation (#233)
+
+0.9.59 2013-08-07 07:24:50+0900
+    [BUG FIXES]
+    - Fix the name conflicts on native inner classes
+    - Fix the type of for-in iterator for arrays (#115)
+    - Fix the type of array literals of int (#227)
+    - Fix other issues
+
+0.9.58 2013-07-26 16:41:43-0700
+    [FEATURES]
+    - Support type parameter inference in more cases (#203)
+    - Support trailing commas in map and array literals (#215)
+    - Support function templates for pure JSX classes (#217)
+    - Support string + number (#213)
+    - Improve "inline" optimizer to expand more complex functions
+
+    [BUG FIXES]
+    - Fix an issue that default parameters with template classes
+      could not be compiled
+    - Fix a bunch of issues
+
 0.9.57 2013-07-20 17:03:11-0700
     [BUG FIXES]
     - Fix another evaluation order issue introduced in 0.9.54

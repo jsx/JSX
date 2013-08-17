@@ -98,7 +98,7 @@ native class process {
 	static function kill(pid : int) : void;
 	static function kill(pid : int, signal : string) : void;
 
-	static function memoryUsage() : Map.<int>;
+	static function memoryUsage() : _MemoryUsage;
 
 	static function nextTick(callback : function():void) : void;
 
@@ -139,6 +139,12 @@ native __fake__ class _CPUInfo {
 	__readonly__ var model : string;
 	__readonly__ var speed : number;
 	__readonly__ var times : _TimesInfo[];
+}
+
+native __fake__ class _MemoryUsage {
+	__readonly__ var rss : number;
+	__readonly__ var heapTotal : number;
+	__readonly__ var heapUsed : number;
 }
 
 native __fake__ class _TimesInfo {
@@ -287,6 +293,10 @@ native __fake__ class _fs {
 	function writeFileSync(filename : string, data : Buffer) : void;
 	function writeFileSync(filename : string, data : string) : void;
 	function writeFileSync(filename : string, data : string, encoding : string) : void;
+
+	function appendFileSync(filename : string, data : Buffer) : void;
+	function appendFileSync(filename : string, data : string) : void;
+	function appendFileSync(filename : string, data : string, encoding : string) : void;
 
 	function watch(filename : string, listener : function(event:string,filename:Nullable.<string>):void) : FSWatcher;
 	function watch(filename : string, options : Map.<variant>, listener : function(event:string,filename:Nullable.<string>):void) : FSWatcher;

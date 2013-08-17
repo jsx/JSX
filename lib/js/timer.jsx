@@ -67,46 +67,27 @@ final class Timer {
 	static function _getRequestAnimationFrameImpl(useNativeImpl : boolean) : function(callback : function(:number):void) : TimerHandle {
 
 		if (useNativeImpl) {
-			if (js.global["requestAnimationFrame"]) {
-				return function (callback : function(:number):void) : TimerHandle {
-					return (js.global["requestAnimationFrame"] as __noconvert__
-						 function(:function(:number):void) : TimerHandle)(callback);
-				};
+			var prefixes = ["r", "webkitR", "mozR", "oR", "msR"];
+			for (var i = 0; i < prefixes.length; ++i) {
+				var name = prefixes[i] + "equestAnimationFrame";
+				if (js.global[name] instanceof Function) {
+					return function (callback) {
+						return (js.global[name] as __noconvert__
+							 function(:function(:number):void) : TimerHandle)(callback);
+					};
+				}
 			}
-			else if (js.global["webkitRequestAnimationFrame"]) {
-				return function (callback : function(:number):void) : TimerHandle {
-					return (js.global["webkitRequestAnimationFrame"] as __noconvert__
-						 function(:function(:number):void) : TimerHandle)(callback);
-				};
-			}
-			else if (js.global["mozRequestAnimationFrame"]) {
-				return function (callback : function(:number):void) : TimerHandle {
-					return (js.global["mozRequestAnimationFrame"] as __noconvert__
-						 function(:function(:number):void) : TimerHandle)(callback);
-				};
-			}
-			else if (js.global["oRequestAnimationFrame"]) {
-				return function (callback : function(:number):void) : TimerHandle {
-					return (js.global["oRequestAnimationFrame"] as __noconvert__
-						 function(:function(:number):void) : TimerHandle)(callback);
-				};
-			}
-			else if (js.global["msRequestAnimationFrame"]) {
-				return function (callback : function(:number):void) : TimerHandle {
-					return (js.global["msRequestAnimationFrame"] as __noconvert__
-						 function(:function(:number):void) : TimerHandle)(callback);
-				};
-			}
+			// fall through
 		}
 
 		// fallback implemntation
 
 		var lastTime = 0;
-		return function(callback : function(:number):void) : TimerHandle {
+		return function(callback) {
 			var now = Date.now();
 			var timeToCall = Math.max(0, (16 - (now - lastTime)));
 			lastTime = now + timeToCall;
-			return Timer.setTimeout(function() : void {
+			return Timer.setTimeout(function() {
 				callback(now + timeToCall);
 			}, timeToCall);
 		};
@@ -114,42 +95,22 @@ final class Timer {
 
 	static function _getCancelAnimationFrameImpl(useNativeImpl : boolean) : function(:TimerHandle):void {
 		if (useNativeImpl) {
-			if (js.global["cancelAnimationFrame"]) {
-				return function (timer : TimerHandle) : void {
-					(js.global["cancelAnimationFrame"] as __noconvert__
-						 function(:TimerHandle):void)(timer);
-				};
+			var prefixes = ["c", "webkitC", "mozC", "oC", "msC"];
+			for (var i = 0; i < prefixes.length; ++i) {
+				var name = prefixes[i] + "ancelAnimationFrame";
+				if (js.global[name] instanceof Function) {
+					return function (timer) {
+						(js.global[name] as __noconvert__
+							 function(:TimerHandle) : void)(timer);
+					};
+				}
 			}
-			else if (js.global["webkitCancelAnimationFrame"]) {
-				return function (timer : TimerHandle) : void {
-					(js.global["webkitCancelAnimationFrame"] as __noconvert__
-						 function(:TimerHandle):void)(timer);
-				};
-			}
-			else if (js.global["mozCancelAnimationFrame"]) {
-				return function (timer : TimerHandle) : void {
-					(js.global["mozCancelAnimationFrame"] as __noconvert__
-						 function(:TimerHandle):void)(timer);
-				};
-			}
-			else if (js.global["oCancelAnimationFrame"]) {
-				return function (timer : TimerHandle) : void {
-					(js.global["oCancelAnimationFrame"] as __noconvert__
-						 function(:TimerHandle):void)(timer);
-				};
-			}
-			else if (js.global["msCancelAnimationFrame"]) {
-				return function (timer : TimerHandle) : void {
-					(js.global["msCancelAnimationFrame"] as __noconvert__
-						 function(:TimerHandle):void)(timer);
-				};
-			}
+			// fall through
 		}
 
 		// fallback implemntation
 		return Timer.clearTimeout;
 	}
-
 }
 
 /**

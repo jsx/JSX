@@ -120,6 +120,10 @@ dictionary DeviceMotionEventInit : EventInit {
 // mentiond in http://www.w3.org/TR/webmessaging/ but no IDL is provided.
 partial interface Window {
   void postMessage(any message, DOMString targetOrigin, optional sequence<Transferable> transfer);
+
+  // for smartphones
+  readonly attribute int? orientation;
+  attribute EventHandler onorientationchange;
 };
 
 // defined in http://www.w3.org/TR/SVG11/
@@ -136,4 +140,7 @@ partial interface NavigatorUserMedia {
 	void webkitGetUserMedia (MediaStreamConstraints? constraints, NavigatorUserMediaSuccessCallback successCallback, optional NavigatorUserMediaErrorCallback? errorCallback);
 };
 Navigator implements NavigatorUserMedia;
+
+HTMLElement implements ElementCSSInlineStyle;
+SVGELement implements ElementCSSInlineStyle;
 

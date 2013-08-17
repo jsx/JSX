@@ -1,8 +1,8 @@
 
 class _Main {
   static function main (args : string[]) : void {
-    foo: for (;;) {
-      foo: for (;;) {
+    foo: for (;0;) {
+      foo: for (;1;) {
           break foo;
       }
     }

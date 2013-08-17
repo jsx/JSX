@@ -28,24 +28,20 @@ import "./type.jsx";
 import "./platform.jsx";
 import Token from "./parser.jsx";
 
-class Cloner.<T> {
+class Util {
 
-	static function cloneArray (a : T[]) : T[] {
+	static function cloneArray.<T> (a : T[]) : T[] {
 		var r = [] : T[];
 		for (var i = 0; i < a.length; ++i)
 			r[i] = a[i].clone() as T;
 		return r;
 	}
 
-	static function cloneNullable (o : T) : T {
+	static function cloneNullable.<T> (o : T) : T {
 		return o == null ? (null) : (o.clone() as T);
 	}
 
-}
-
-class Serializer.<T> {
-
-	static function serializeArray (a : T[]) : variant {
+	static function serializeArray.<T> (a : T[]) : variant {
 		if (a == null)
 			return null;
 		var ret = [] : variant[];
@@ -54,15 +50,15 @@ class Serializer.<T> {
 		return ret;
 	}
 
-	static function serializeNullable (v : T) : variant {
+	static function serializeNullable.<T> (v : T) : variant {
 		if (v == null)
 			return null;
 		return v.serialize();
 	}
 
-}
-
-class Util {
+	static function makePair.<F, S>(first : F, second : S) : Pair.<F, S> {
+		return new Pair.<F, S>(first, second);
+	}
 
 	static function repeat (c : string, n : number) : string {
 		var s = "";
@@ -115,7 +111,26 @@ class Util {
 			}
 		}
 		var x = m[m.length - 1];
+		assert x != null;
 		return x[x.length - 1];
+	}
+
+	static const _builtInClass = Util.asSet([
+		// build-in classes
+		"Array", "Boolean", "Date", "Function", "Map", "Math", "Number",
+		"Object", "RegExp", "String", "JSON",
+		"Error", "EvalError", "RangeError", "ReferenceError", "SyntaxError", "TypeError",
+		"JSX",
+		// typed arrays
+		"Transferable", "ArrayBuffer", "Int8Array", "Uint8Array",
+		"Uint8ClampedArray", "Int16Array", "Uint16Array", "Int32Array",
+		"Uint32Array", "Float32Array", "Float64Array", "DataView"
+	]);
+	static function isBuiltInClass(name : string) : boolean {
+		return Util._builtInClass.hasOwnProperty(name);
+	}
+	static function isBuiltInClass(type : Type) : boolean {
+		return Util._isBuiltInObjectType(type, Util._builtInClass);
 	}
 
 	static const _builtInContainer = Util.asSet([
@@ -125,16 +140,55 @@ class Util {
 		"Int32Array", "Uint32Array",
 		"Float32Array", "Float64Array" ]);
 	static function isBuiltInContainer(type : Type) : boolean {
-		if (type instanceof ObjectType) {
-			var classDef = (type as ObjectType).getClassDef();
-			if (classDef instanceof InstantiatedClassDefinition) {
+		return Util._isBuiltInObjectType(type, Util._builtInContainer);
+	}
 
-				var className = (classDef as InstantiatedClassDefinition).getTemplateClassName();
-				return Util._builtInContainer.hasOwnProperty(className);
+	static function _isBuiltInObjectType(type : Type, classeSet : Map.<boolean>) : boolean {
+		if (type instanceof ObjectType) {
+			var classDef = type.getClassDef();
+			var className = (classDef instanceof InstantiatedClassDefinition)
+				? (classDef as InstantiatedClassDefinition).getTemplateClassName()
+				: classDef.className();
+			return classeSet.hasOwnProperty(className);
+		}
+		return false;
+	}
+
+	static function isNativeClass(type : Type) : boolean {
+		if (type instanceof ObjectType) {
+			var classDef = type.getClassDef();
+			return ! classDef.forEachClassToBase(function (classDef) {
+				if (classDef.className() == "Object"
+					|| (classDef.flags() & ClassDefinition.IS_NATIVE) == 0) {
+						return true;
+					}
+				return false;
+			});
+		}
+		return false;
+	}
+
+	static function lhsHasNoSideEffects (lhsExpr : Expression) : boolean {
+		if (lhsExpr instanceof LocalExpression)
+			return true;
+		if (lhsExpr instanceof PropertyExpression) {
+			var holderExpr = (lhsExpr as PropertyExpression).getExpr();
+			if (Util.isNativeClass(holderExpr.getType()) && !Util.isBuiltInClass(holderExpr.getType())) {
+				return false;
 			}
-			else {
-				className = classDef.className();
-				return Util._builtInContainer.hasOwnProperty(className);
+			if (holderExpr instanceof ThisExpression
+				|| holderExpr instanceof LocalExpression
+				|| holderExpr.isClassSpecifier()) {
+				return true;
+			}
+		} else if (lhsExpr instanceof ArrayExpression) {
+			var arrayExpr = lhsExpr as ArrayExpression;
+			if (Util.isNativeClass(arrayExpr.getFirstExpr().getType()) && !Util.isBuiltInClass(arrayExpr.getFirstExpr().getType())) {
+				return false;
+			}
+			if (arrayExpr.getFirstExpr() instanceof LocalExpression
+				&& arrayExpr.getSecondExpr() instanceof LeafExpression) {
+				return true;
 			}
 		}
 		return false;
@@ -572,32 +626,6 @@ class Util {
 		return set;
 	}
 
-	static const _ecma262reserved = Util.asSet([
-		"break", "do", "instanceof", "typeof",
-		"case", "else", "new", "var",
-		"catch", "finally", "return", "void",
-		"continue", "for", "switch", "while",
-		"debugger", "function", "this", "with",
-		"default", "if", "throw",
-		"delete", "in", "try",
-		"class", "enum", "extends", "super",
-		"const", "export", "import",
-		"implements", "let", "private", "public", "yield",
-		"interface", "package", "protected", "static",
-		"null",
-		"true", "false"
-	]);
-
-	/**
-	 * @see ECMA 262 5th, 7.6.1 Reserved Words
-	 */
-	static function isECMA262Reserved(word : string) : boolean {
-		return Util._ecma262reserved.hasOwnProperty(word);
-	}
-
-	static function getECMA262ReservedWords() : string[] {
-		return Util._ecma262reserved.keys();
-	}
 }
 
 /*

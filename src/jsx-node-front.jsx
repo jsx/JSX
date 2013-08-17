@@ -452,6 +452,12 @@ class _Main {
 	static function main (args : string[]) : void {
 		var exitCode = JSXCommand.main(new NodePlatform(), NodePlatform.getEnvOpts().concat(args));
 
+		if (JSX.profilerIsRunning()) {
+			Timer.setTimeout(() -> {
+				JSX.postProfileResults("http://localhost:2012/post-profile", (err, result) -> {});
+			}, 0);
+		}
+
 		// NOTE:
 		// nodejs 0.8.0 on Windows doesn't flush stdout buffer before exitting.
 		// use "drain" event for workaround
