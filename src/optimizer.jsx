@@ -252,22 +252,14 @@ class Optimizer {
 	}
 
 	static function getDevelopmentOptimizationCommands() : string[] {
-		return [
-			"lto",
-			"fold-const",
-			"tail-rec",
-			"return-if",
-			"inline",
-			"dce",
-			"unbox",
-			"fold-const",
-			"lcse",
-			"dce",
-			"fold-const",
-			"array-length",
-			"unclassify",
-			"staticize"
+		var disabled = [
+			"no-assert",
+			"no-log",
+			"no-debug"
 		];
+		return Optimizer.getReleaseOptimizationCommands().filter(function (cmd) {
+			return disabled.indexOf(cmd) == -1;
+		});
 	}
 
 	function constructor () {
