@@ -5,9 +5,8 @@
 ok
 */
 class Box {
-	var value : Nullable.<string> = "OK";
+	var value : Nullable.<string> = "ok";
 }
-
 class _Main {
 	static function main (args : string[]) : void {
 
