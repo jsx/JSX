@@ -1,8 +1,12 @@
 Revision history for the JSX software development kit
 
+0.9.61 2013-08-19 07:45:23+0900
+    [BUG FIXES]
+    - Fix an issue on LCSE optimizer
+
 0.9.60 2013-08-08 22:12:39+0900
     [BUG FIXES]
-    - Make label name conflict compile errors, rather than runtime erorrs
+    - Make label name conflict compile errors, rather than runtime errors
       (#127)
     - Fix issues that error messages sometimes displayed wrong places
 
