@@ -3363,8 +3363,15 @@ class Parser {
 				var defaultValue : Expression = null;
 				var assignToken = this._expectOpt("=");
 				if (assignToken != null)  {
-					if ((defaultValue = this._assignExpr(true)) == null) {
-						return null;
+					var state = this._preserveState();
+					try {
+						if ((defaultValue = this._assignExpr(true)) == null) {
+							return null;
+						}
+					} finally {
+						// do not create a between the parent method and the children funcDefs stored in defVal
+						if (this._closures != null)
+							this._closures.splice(state.numClosures, this._closures.length - state.numClosures);
 					}
 					if (! allowDefaultValues) {
 						this._errors.push(new CompileError(assignToken, "default parameters are only allowed for member functions"));
