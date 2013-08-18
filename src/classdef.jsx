@@ -1444,8 +1444,13 @@ class MemberFunctionDefinition extends MemberDefinition implements Block {
 
 		if (this._parent == null) {
 			var classDef = this._classDef;
-			// register to the classDef
-			classDef.members().splice(classDef.members().indexOf(this)+1, 0, clonedFuncDef); // insert right after the original function
+			if (classDef == null) {
+				// an orphan funcDef
+			}
+			else {
+				// register to the classDef
+				classDef.members().splice(classDef.members().indexOf(this)+1, 0, clonedFuncDef); // insert right after the original function
+			}
 		} else {
 			this._parent.getClosures().push(clonedFuncDef);
 			clonedFuncDef.setParent(this._parent);
