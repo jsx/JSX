@@ -1723,7 +1723,7 @@ class MemberFunctionDefinition extends MemberDefinition implements Block {
 			}, argExprs);
 			wrapper.setClassDef(this.getClassDef());
 			// register
-			this.getClassDef().members().push(wrapper);
+			this.getClassDef().members().splice(this.getClassDef().members().indexOf(this)+1, 0, wrapper); // insert right after the original function
 		}
 	}
 
