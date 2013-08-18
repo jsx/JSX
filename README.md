@@ -38,7 +38,7 @@ Type the following commands and see what happens:
 INTRODUCTION
 =======================
 
-Here is a fizzbuzz problam, which can be executed by `jsx --run fizzbuzz.jsx`, showing a basic syntax of JSX.
+Here is a fizzbuzz problem, which can be executed by `jsx --run fizzbuzz.jsx`, showing a basic syntax of JSX.
 
 ```jsx
 class _Main {
@@ -57,7 +57,7 @@ class _Main {
 }
 ```
 
-See [the documantation](http://jsx.github.io/doc.html) for details.
+See [the documentation](http://jsx.github.io/doc.html) for details.
 
 EXAMPLES
 =======================

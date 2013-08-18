@@ -3381,10 +3381,10 @@ class _LCSEOptimizeCommand extends _FunctionOptimizeCommand {
 		};
 
 		// add an expression to cache
-		var onExpr = function (expr : Expression, replaceCb : function(:Expression):void) : boolean {
+		Util.forEachExpression(function onExpr (expr : Expression, replaceCb : function(:Expression):void) : boolean {
 			// handle special cases first
 			if (expr instanceof AssignmentExpression) {
-                var assignmentExpr =expr as AssignmentExpression;
+				var assignmentExpr = expr as AssignmentExpression;
 				var lhsExpr = assignmentExpr.getFirstExpr();
 				if (lhsExpr instanceof LocalExpression) {
 					onExpr(assignmentExpr.getSecondExpr(), function (expr) {
@@ -3430,6 +3430,10 @@ class _LCSEOptimizeCommand extends _FunctionOptimizeCommand {
 				onExpr(conditionalExpr.getCondExpr(), function (expr) {
 					conditionalExpr.setCondExpr(expr);
 				});
+				clearCache();
+				return true;
+			} else if (expr instanceof LogicalExpression) {
+				// give up further optimization
 				clearCache();
 				return true;
 			} else if (expr instanceof FunctionExpression) {
@@ -3496,8 +3500,7 @@ class _LCSEOptimizeCommand extends _FunctionOptimizeCommand {
 			}
 			// recursive
 			return expr.forEachExpression(onExpr);
-		};
-		Util.forEachExpression(onExpr, exprs);
+		}, exprs);
 	}
 
 }
