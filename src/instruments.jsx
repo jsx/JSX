@@ -763,14 +763,16 @@ a | function ($a) { var $C = C; return $a ? ($a as boolean) | $C : (b as boolean
 		}
 
 		// `return $a ? b | $C : c | $C;`
+		var condExpr = new ConditionalExpression(
+			this._expr.getToken(),
+			new LocalExpression(argVar.getName(), argVar),
+			this._transformer._getExpressionTransformerFor(ifTrueExpr).doCPSTransform(contFuncDef, ifTrueCont, returnType),
+			this._transformer._getExpressionTransformerFor(ifFalseExpr).doCPSTransform(contFuncDef, ifFalseCont, returnType)
+		);
+		condExpr._type = returnType;
 		var returnStmt = new ReturnStatement(
 			new Token("return", false),
-			new ConditionalExpression(
-				this._expr.getToken(),
-				new LocalExpression(argVar.getName(), argVar),
-				this._transformer._getExpressionTransformerFor(ifTrueExpr).doCPSTransform(contFuncDef, ifTrueCont, returnType),
-				this._transformer._getExpressionTransformerFor(ifFalseExpr).doCPSTransform(contFuncDef, ifFalseCont, returnType)
-			)
+			condExpr
 		);
 
 		contFuncDef.getStatements().push(returnStmt);
@@ -856,14 +858,16 @@ a | function ($a) { var $C = C; return $a ? b | $C : c | $C; }
 		}
 
 		// `return $a ? b | $C : c | $C;`
+		var condExpr = new ConditionalExpression(
+			this._expr.getToken(),
+			new LocalExpression(argVar.getName(), argVar),
+			this._transformer._getExpressionTransformerFor(ifTrueExpr).doCPSTransform(contFuncDef, ifTrueCont, returnType),
+			this._transformer._getExpressionTransformerFor(ifFalseExpr).doCPSTransform(contFuncDef, ifFalseCont, returnType)
+		);
+		condExpr._type = returnType;
 		var returnStmt = new ReturnStatement(
 			new Token("return", false),
-			new ConditionalExpression(
-				this._expr.getToken(),
-				new LocalExpression(argVar.getName(), argVar),
-				this._transformer._getExpressionTransformerFor(ifTrueExpr).doCPSTransform(contFuncDef, ifTrueCont, returnType),
-				this._transformer._getExpressionTransformerFor(ifFalseExpr).doCPSTransform(contFuncDef, ifFalseCont, returnType)
-			)
+			condExpr
 		);
 
 		contFuncDef.getStatements().push(returnStmt);
