@@ -2204,11 +2204,12 @@ class CodeTransformer {
 
 	function _instantiateGeneratorType (yieldingType : Type) : Type {
 		// instantiate generator
-		var genClassDef = this._jsxGeneratorClassDef.instantiateTemplateClass(
+		var genClassDef = this._jsxGeneratorClassDef.getParser().lookupTemplate(
 			[],	// errors
-			new TemplateInstantiationRequest(null, "__jsx_generator", [ yieldingType ] : Type[])
+			new TemplateInstantiationRequest(null, "__jsx_generator", [ yieldingType ] : Type[]),
+			(parser, classDef) -> null
 		);
-		this._jsxGeneratorClassDef.getParser()._classDefs.push(genClassDef);
+		assert genClassDef != null;
 
 		// semantic analysis
 		var createContext = function (parser : Parser) : AnalysisContext {
