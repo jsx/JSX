@@ -1123,6 +1123,7 @@ class _FunctionStatementTransformer extends _StatementTransformer {
 				new Token("=", false),
 				new LocalExpression(funcDef.getFuncLocal().getName(), funcDef.getFuncLocal()),
 				new FunctionExpression(this._statement.getToken(), funcDef)));
+		funcDef.setFuncLocal(null); // `foo = function foo () { ... }` causes some kind of problems during minification
 		return [ statement ] : Statement[];
 	}
 
