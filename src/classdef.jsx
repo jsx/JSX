@@ -99,7 +99,7 @@ class ClassDefinition implements Stashable {
 
 		this._resetMembersClassDef();
 
-		if (! (this instanceof TemplateClassDefinition)) {
+		if (! (this instanceof TemplateClassDefinition || this instanceof InstantiatedClassDefinition)) {
 			this._generateWrapperFunctions();
 		}
 	}
