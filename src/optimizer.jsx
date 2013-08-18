@@ -251,6 +251,25 @@ class Optimizer {
 		];
 	}
 
+	static function getDevelopmentOptimizationCommands() : string[] {
+		return [
+			"lto",
+			"fold-const",
+			"tail-rec",
+			"return-if",
+			"inline",
+			"dce",
+			"unbox",
+			"fold-const",
+			"lcse",
+			"dce",
+			"fold-const",
+			"array-length",
+			"unclassify",
+			"staticize"
+		];
+	}
+
 	function constructor () {
 		this._compiler = null;
 		this._commands = new _OptimizeCommand[];
