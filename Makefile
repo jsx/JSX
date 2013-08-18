@@ -42,7 +42,7 @@ bootstrap-compiler: compiler
 
 # e.g. make test JOBS=2
 
-test: all test-debug test-optimized-minified
+test: all test-debug test-optimized-minified show-todo
 
 test-all: test test-optimized
 
