@@ -1428,6 +1428,7 @@ class MemberFunctionDefinition extends MemberDefinition implements Block {
 				null
 			);
 			clonedFuncDef.setFuncLocal(funcLocal);
+			clonedFuncDef.setClassDef(this.getClassDef());
 
 			return clonedFuncDef;
 		}
@@ -1441,7 +1442,15 @@ class MemberFunctionDefinition extends MemberDefinition implements Block {
 			stash.newFuncDef = null;
 		}
 
-		clonedFuncDef.setClassDef(this.getClassDef());
+		if (this._parent == null) {
+			var classDef = this._classDef;
+			// register to the classDef
+			classDef.members().splice(classDef.members().indexOf(this)+1, 0, clonedFuncDef); // insert right after the original function
+		} else {
+			this._parent.getClosures().push(clonedFuncDef);
+			clonedFuncDef.setParent(this._parent);
+		}
+
 		return clonedFuncDef;
 	}
 
@@ -1710,6 +1719,9 @@ class MemberFunctionDefinition extends MemberDefinition implements Block {
 			else {
 				throw new Error("TODO: template function with default parameters in " + this.getNotation() + " is not yet supported");
 			}
+			wrapper.setClassDef(this.getClassDef());
+			// register
+			this.getClassDef().members().splice(this.getClassDef().members().indexOf(this)+1, 0, wrapper); // insert right after the original function
 			// fix up function links inside defVal
 			Util.forEachExpression(function onExpr(expr) {
 				if (expr instanceof FunctionExpression) {
@@ -1721,9 +1733,6 @@ class MemberFunctionDefinition extends MemberDefinition implements Block {
 				}
 				return expr.forEachExpression(onExpr);;
 			}, argExprs);
-			wrapper.setClassDef(this.getClassDef());
-			// register
-			this.getClassDef().members().splice(this.getClassDef().members().indexOf(this)+1, 0, wrapper); // insert right after the original function
 		}
 	}
 

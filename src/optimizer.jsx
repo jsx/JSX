@@ -1209,9 +1209,6 @@ class _StaticizeOptimizeCommand extends _OptimizeCommand {
 
 		var classDef = staticFuncDef.getClassDef();
 
-		// register to the classDef
-		classDef.members().splice(classDef.members().indexOf(funcDef)+1, 0, staticFuncDef); // insert right after the original function
-
 		// rename
 		var newName = this._newStaticFunctionName(classDef, funcDef.name(), ([ new ObjectType(classDef) ] : Type[]).concat((funcDef.getType() as ResolvedFunctionType).getArgumentTypes()), true);
 		(this.getStash(funcDef) as _StaticizeOptimizeCommand.Stash).altName = newName;
