@@ -847,9 +847,9 @@ class _Minifier {
 					compact: true,
 					semicolons: false,
 					parentheses: false
-				} : Map.<variant>,
+				},
 				directive: true
-			} : Map.<variant>);
+			});
 	}
 
 }
