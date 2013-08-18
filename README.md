@@ -57,7 +57,7 @@ class _Main {
 }
 ```
 
-See [the documantation](http://jsx.github.io/doc.html) for details.
+See [the documentation](http://jsx.github.io/doc.html) for details.
 
 EXAMPLES
 =======================
