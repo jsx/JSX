@@ -1321,14 +1321,14 @@ class MemberFunctionDefinition extends MemberDefinition implements Block {
 			return stash as MemberFunctionDefinition._CloneStash;
 		}
 
-		function cloneFuncDef (funcDef : MemberFunctionDefinition, parent : MemberFunctionDefinition) : MemberFunctionDefinition {
+		function cloneFuncDef (funcDef : MemberFunctionDefinition) : MemberFunctionDefinition {
 
 			// at this moment, all locals and closures are not cloned yet
 			var statements = Util.cloneArray(funcDef.getStatements());
 
-			var closures = funcDef.getClosures().map.<MemberFunctionDefinition>((closure) -> {
-				var newFuncDef = cloneFuncDef(closure, funcDef);
-				getStash(closure).newFuncDef = newFuncDef;
+			var closures = funcDef.getClosures().map.<MemberFunctionDefinition>((funcDef) -> {
+				var newFuncDef = cloneFuncDef(funcDef);
+				getStash(funcDef).newFuncDef = newFuncDef;
 				return newFuncDef;
 			});
 			// rewrite funcDefs
@@ -1428,16 +1428,11 @@ class MemberFunctionDefinition extends MemberDefinition implements Block {
 				null
 			);
 			clonedFuncDef.setFuncLocal(funcLocal);
-			if (parent != null) {
-				Util.linkFunction(clonedFuncDef, parent);
-			} else {
-				clonedFuncDef.setClassDef(this.getClassDef());
-			}
 
 			return clonedFuncDef;
 		}
 
-		var clonedFuncDef = cloneFuncDef(this, null);
+		var clonedFuncDef = cloneFuncDef(this);
 
 		// erase stashes of original funcDef
 		for (var i = 0; i < stashesUsed.length; ++i) {
