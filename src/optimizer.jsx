@@ -3433,7 +3433,7 @@ class _LCSEOptimizeCommand extends _FunctionOptimizeCommand {
 				clearCache();
 				return true;
 			} else if (expr instanceof LogicalExpression) {
-				// give up optimizing
+				// give up further optimization
 				clearCache();
 				return true;
 			} else if (expr instanceof FunctionExpression) {
