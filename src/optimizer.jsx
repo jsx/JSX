@@ -2676,6 +2676,7 @@ class _InlineOptimizeCommand extends _FunctionOptimizeCommand {
 		if (statement instanceof ConstructorInvocationStatement) {
 
 			var callingFuncDef = _DetermineCalleeCommand.getCallingFuncDef(statement);
+			this.log("optimizing calling constructor " + callingFuncDef.getNotation());
 			this.optimizeFunction(callingFuncDef);
 			if (this._functionIsInlineable(callingFuncDef) && this._argsAreInlineable(callingFuncDef, (statement as ConstructorInvocationStatement).getArguments())) {
 				statements.splice(stmtIndex, 1);
@@ -2724,19 +2725,21 @@ class _InlineOptimizeCommand extends _FunctionOptimizeCommand {
 		}
 
 		// expand single-statement functions as an expression
-		statement.forEachExpression(function onExpr(expr : Expression, replaceCb : function(:Expression):void) : boolean {
-			expr.forEachExpression(onExpr);
-			if (expr instanceof CallExpression) {
-				var callExpr = expr as CallExpression;
-				var argsAndThis = this._getArgsAndThisIfCallExprIsInlineable(callExpr);
-				if (argsAndThis != null) {
-					if (this._expandCallAsExpression(funcDef, expr, argsAndThis, replaceCb)) {
-						altered = true;
+		if (! altered) {
+			statement.forEachExpression(function onExpr(expr : Expression, replaceCb : function(:Expression):void) : boolean {
+				expr.forEachExpression(onExpr);
+				if (expr instanceof CallExpression) {
+					var callExpr = expr as CallExpression;
+					var argsAndThis = this._getArgsAndThisIfCallExprIsInlineable(callExpr);
+					if (argsAndThis != null) {
+						if (this._expandCallAsExpression(funcDef, expr, argsAndThis, replaceCb)) {
+							altered = true;
+						}
 					}
 				}
-			}
-			return true;
-		});
+				return true;
+			});
+		}
 
 		return altered;
 	}
@@ -2823,6 +2826,7 @@ class _InlineOptimizeCommand extends _FunctionOptimizeCommand {
 		if (callingFuncDef == null)
 			return null;
 		// optimize the calling function prior to testing the conditions
+		this.log("optimizing calling function " + callingFuncDef.getNotation());
 		this.optimizeFunction(callingFuncDef);
 		// obtain receiver expression
 		var receiverExpr = null : Expression;
