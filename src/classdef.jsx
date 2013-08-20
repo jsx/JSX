@@ -1613,6 +1613,11 @@ class MemberFunctionDefinition extends MemberDefinition implements Block {
 			this._funcLocal.setTypeForced(this.getType());
 		}
 
+		this.getLocals().forEach((local) -> {
+			if (! local.isUsedAsRHS()) {
+				context.errors.push(new UnusedWarning(local.getName(), "unused variable " + local.getName().getValue()));
+			}
+		});
 	}
 
 	function generateWrappersForDefaultParameters() : void {

@@ -1761,10 +1761,8 @@ class BinaryNumberExpression extends BinaryExpression {
 			context.errors.push(new CompileError(this._token, "cannot apply operator '" + this._token.getValue() + "' to type '" + this._expr1.getType().toString() + "'"));
 			return false;
 		default:
-			var expr1Type = this._expr1.getType().resolveIfNullable();
 			if (! this.assertIsConvertibleTo(context, this._expr1, Type.numberType, true))
 				return false;
-			var expr2Type = this._expr2.getType().resolveIfNullable();
 			if (! this.assertIsConvertibleTo(context, this._expr2, Type.numberType, true))
 				return false;
 			return true;

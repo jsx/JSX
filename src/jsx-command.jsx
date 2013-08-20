@@ -55,7 +55,7 @@ class JSXCommand {
 			"  --release                  disables run-time type checking and enables optimizations (" + Optimizer.getReleaseOptimizationCommands().join(",")  + ")\n" +
 			"  --profile                  enables the profiler (experimental)\n" +
 			"  --optimize cmd1,cmd2,...   enables optimization commands\n" +
-			"  --warn type1,type2,...     enables warnings (all, experimental, deprecated, none)\n" +
+			"  --warn type1,type2,...     enables warnings (all, unused, experimental, deprecated, none)\n" +
 			"  --disable-type-check       disables run-time type checking\n" +
 			"  --minify                   compresses the target JavaScript code\n" +
 			"  --enable-source-map        enables source map debugging info\n" +
@@ -215,6 +215,14 @@ class JSXCommand {
 					case "all":
 						compiler.getWarningFilters().unshift(function (warning : CompileWarning) : Nullable.<boolean> {
 							return true;
+						});
+						break;
+					case "unused":
+						compiler.getWarningFilters().unshift(function (warning : CompileWarning) : Nullable.<boolean> {
+							if (warning instanceof UnusedWarning) {
+								return true;
+							}
+							return null;
 						});
 						break;
 					case "deprecated":
