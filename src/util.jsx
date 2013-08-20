@@ -483,6 +483,7 @@ class Util {
 	 * @see ECMA-262 5th, 7.8.4 String Literals
 	 */
 	static function decodeStringLiteral (literal : string) : string {
+		literal = Util.normalizeHeredoc(literal);
 		var matched = literal.match(/^([\'\"]).*([\'\"])$/);
 		if (matched == null || matched[1] != matched[2])
 			throw new Error("input string is not quoted properly: " + literal);
@@ -535,6 +536,17 @@ class Util {
 		}
 		decoded += src.substring(pos);
 		return decoded;
+	}
+
+	// converts """heredoc""" to an ordinary "string literal"
+	static function normalizeHeredoc(literal : string) : string {
+		if (! literal.match(/^(?:"""|''')/)) {
+			return literal;
+		}
+		var body = literal.substring(3, literal.length - 3);
+		body = body.replace(/\\*['"]/g, function (matched) { return matched.length % 2 == 0 ? matched : matched.replace(/(.)$/, "\\$1"); });
+		body = body.replace(/\n/g, "\\n");
+		return '"' + body + '"';
 	}
 
 	static function _resolvedPathParts(path : string) : string[] {

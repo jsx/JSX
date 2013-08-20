@@ -1539,8 +1539,7 @@ class _StringLiteralExpressionEmitter extends _ExpressionEmitter {
 
 	override function emit (outerOpPrecedence : number) : void {
 		var token = this._expr.getToken();
-		// FIXME escape
-		this._emitter._emit(token.getValue(), token);
+		this._emitter._emit(Util.normalizeHeredoc(token.getValue()), token);
 	}
 
 }
