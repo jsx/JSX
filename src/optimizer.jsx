@@ -236,6 +236,7 @@ class Optimizer {
 			"no-log",
 			"no-debug",
 			"fold-const",
+			"tail-rec",
 			"return-if",
 			"inline",
 			"dce",
@@ -303,6 +304,9 @@ class Optimizer {
 				this._commands.push(new _UnboxOptimizeCommand());
 			} else if (cmd == "array-length") {
 				this._commands.push(new _ArrayLengthOptimizeCommand());
+			} else if (cmd == "tail-rec") {
+				determineCallee();
+				this._commands.push(new _TailRecursionOptimizeCommand());
 			} else if (cmd == "dump-logs") {
 				this._dumpLogs = true;
 			} else {
@@ -3958,5 +3962,101 @@ class _NoDebugCommand extends _OptimizeCommand {
 			}
 			return true;
 		});
+	}
+}
+
+
+class _TailRecursionOptimizeCommand extends _FunctionOptimizeCommand {
+	static const IDENTIFIER = "tail-rec";
+
+	static const LABEL = "$TAIL_REC";
+
+	function constructor() {
+		super(_TailRecursionOptimizeCommand.IDENTIFIER);
+	}
+
+	override function optimizeFunction(funcDef : MemberFunctionDefinition) : boolean {
+		if ((funcDef.flags() & (ClassDefinition.IS_OVERRIDE | ClassDefinition.IS_ABSTRACT | ClassDefinition.IS_NATIVE)) != 0 || (funcDef.flags() & (ClassDefinition.IS_STATIC | ClassDefinition.IS_FINAL)) == 0) {
+			return false;
+		}
+		// transform tail recursion into:
+		//
+		// function f(arg1, arg2, arg3) {
+		//   $TAIL_REC: while (true) {
+		//     body;
+		//     // return f(v1, v2, v3);
+		//     ($arg1 = v1, $arg2 = v2, $arg3 = v3);
+		//     (arg1 = $arg1, arg2 = $arg2, arg3 = $arg3);
+		//     continue $TAIL_REC;
+		//   }
+		// }
+
+		var altered = false;
+		var statements = funcDef.getStatements();
+		(function onStatements(statements : Statement[]) : boolean {
+			for (var i = 0; i < statements.length; ++i) {
+				if (this._isTailCall(funcDef, statements[i])) {
+					this._replaceTailCallStatement(funcDef, statements, i);
+					altered = true;
+				}
+				statements[i].handleStatements(onStatements);
+			}
+			return true;
+		}(statements));
+
+		if (altered) {
+			this.log("transform " + funcDef.getNotation());
+			var body : Statement = new WhileStatement(new Token("while"),
+					new Token(_TailRecursionOptimizeCommand.LABEL),
+					new BooleanLiteralExpression(new Token("true")), statements);
+			funcDef.setStatements([body]);
+		}
+		return true;
+	}
+
+	function _isTailCall(funcDef : MemberFunctionDefinition, statement : Statement) : boolean {
+		if (statement instanceof ReturnStatement) {
+			var returnStatement = statement as ReturnStatement;
+			if (returnStatement.getExpr() != null && returnStatement.getExpr() instanceof CallExpression)  {
+				return funcDef == _DetermineCalleeCommand.getCallingFuncDef(returnStatement.getExpr());
+			}
+		}
+		return false;
+	}
+
+	function _replaceTailCallStatement(funcDef : MemberFunctionDefinition, statements : Statement[], idx : number) : void {
+		var callExpression = (statements[idx] as ReturnStatement).getExpr() as CallExpression;
+
+		var locals = funcDef.getArguments().map.<LocalVariable>((argDecl) -> {
+			return this.createVar(funcDef, argDecl.getType(), argDecl.getName().getValue());
+		});
+
+		var setupArgs = callExpression.getArguments().reduce.<Expression>((prevExpr, arg, i) -> {
+			var assignToArg = new AssignmentExpression(new Token("="),
+				new LocalExpression(locals[i].getName(), locals[i]),
+				arg
+			);
+			return prevExpr == null
+				? assignToArg
+				: new CommaExpression(new Token(","), prevExpr, assignToArg);
+		}, null);
+
+		var retry = new ContinueStatement(new Token("continue"),
+				new Token(_TailRecursionOptimizeCommand.LABEL));
+		if (setupArgs == null) {
+			statements.splice(idx, 1, retry);
+		}
+		else {
+			var localsToArgs = locals.reduce.<Expression>((prevExpr, local, i) -> {
+				var assignToArg = new AssignmentExpression(new Token("="),
+					new LocalExpression(funcDef.getArguments()[i].getName(), funcDef.getArguments()[i]),
+					new LocalExpression(local.getName(), local)
+				);
+				return prevExpr == null
+					? assignToArg
+					: new CommaExpression(new Token(","), prevExpr, assignToArg);
+			}, null);
+			statements.splice(idx, 1, new ExpressionStatement(setupArgs), new ExpressionStatement(localsToArgs), retry);
+		}
 	}
 }
