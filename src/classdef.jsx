@@ -1969,6 +1969,10 @@ class TemplateFunctionDefinition extends MemberFunctionDefinition implements Tem
 		return new TemplateFunctionType(this._token, this);
 	}
 
+	function getResolvedTypemap () : Map.<Type> {
+		return this._resolvedTypemap;
+	}
+
 	function getTypeArguments () : Token[] {
 		return this._typeArgs;
 	}

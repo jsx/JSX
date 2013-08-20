@@ -1045,11 +1045,18 @@ class TemplateFunctionType extends ResolvedFunctionType {
 				}
 			}
 		} else if (this._argTypes.length == numberOfArgs) {
-			argTypes = this._argTypes;
+			argTypes = this._argTypes.concat([]);
 		} else {
 			// fail
 			return;
 		}
+
+		var instantiationContext = new InstantiationContext([], this._funcDef.getResolvedTypemap());
+		for (var i = 0; i < numberOfArgs; ++i) {
+			argTypes[i] = argTypes[i].instantiate(instantiationContext);
+		}
+		assert instantiationContext.errors.length == 0;
+
 		var hasCallback = false;
 		var callbackArgTypes = argTypes.map.<Type>(function (argType) {
 			if (argType instanceof StaticFunctionType) { // only functions, but does not duduce types of [] or {}
