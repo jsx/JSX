@@ -1539,8 +1539,16 @@ class _StringLiteralExpressionEmitter extends _ExpressionEmitter {
 
 	override function emit (outerOpPrecedence : number) : void {
 		var token = this._expr.getToken();
-		// FIXME escape
-		this._emitter._emit(token.getValue(), token);
+		var value = token.getValue();
+		if (value.match(/^(?:"""|''')/)) {
+			var lit = value.substring(3, value.length - 3);
+			lit = lit.replace(/\\*['"]/g, function (matched) { return matched.length % 2 == 0 ? matched : matched.replace(/(.)$/, "\\$1"); });
+			lit = lit.replace(/\n/g, "\\n");
+			this._emitter._emit('"' + lit + '"', token);
+		} else {
+			// FIXME escape
+			this._emitter._emit(value, token);
+		}
 	}
 
 }
