@@ -92,6 +92,12 @@ class _Lexer {
 	static const stringLiteral = _Lexer.makeAlt([_Lexer.singleQuoted, _Lexer.doubleQuoted]);
 	static const regexpLiteral = _Lexer.doubleQuoted.replace(/"/g, "/") + "[mgi]*";
 
+	static const heredocStartDoubleQuoted = '"""';
+	static const heredocStartSingleQuoted = "'''";
+	static const heredocStart = _Lexer.makeAlt([ _Lexer.heredocStartDoubleQuoted, _Lexer.heredocStartSingleQuoted ]);
+	static const heredocEndDoubleQuoted = ' (^|.*?[^\\\\]) (\\\\\\\\)* """ ';
+	static const heredocEndSingleQuoted = " (^|.*?[^\\\\]) (\\\\\\\\)* ''' ";
+
 	// ECMA 262 compatible,
 	// see also ECMA 262 5th (7.8.3) Numeric Literals
 	static const decimalIntegerLiteral = "(?: 0 | [1-9][0-9]* )";
@@ -115,6 +121,9 @@ class _Lexer {
 	static const rxNumberLiteral  = _Lexer.rx("^" + _Lexer.numberLiteral);
 	static const rxIntegerLiteral = _Lexer.rx("^" + _Lexer.integerLiteral);
 	static const rxRegExpLiteral  = _Lexer.rx("^" + _Lexer.regexpLiteral);
+	static const rxHeredocStart   = _Lexer.rx("^" + _Lexer.heredocStart);
+	static const rxHeredocEndDoubleQuoted = _Lexer.rx(_Lexer.heredocEndDoubleQuoted);
+	static const rxHeredocEndSingleQuoted = _Lexer.rx(_Lexer.heredocEndSingleQuoted);
 	static const rxNewline        = /(?:\r\n?|\n)/;
 
 	// blacklists of identifiers
@@ -1241,6 +1250,27 @@ class Parser {
 
 	function _expectStringLiteralOpt () : Token {
 		this._advanceToken();
+		var heredocStartMatch = this._getInput().match(_Lexer.rxHeredocStart);
+		if (heredocStartMatch) {
+			var lineNumber = this._lineNumber;
+			var column = this._getColumn();
+			var value = heredocStartMatch[0];
+			this._forwardPos(value.length);
+			var endRe = value.charAt(0) == '"' ? _Lexer.rxHeredocEndDoubleQuoted : _Lexer.rxHeredocEndSingleQuoted;
+			while (true) {
+				var input = this._getInput();
+				var endMatch = input.match(endRe);
+				if (endMatch) {
+					value += endMatch[0];
+					this._forwardPos(endMatch[0].length);
+					break;
+				}
+				value += input + "\n";
+				this._lineNumber++;
+				this._columnOffset = 0;
+			}
+			return new Token(value, false, this._filename, lineNumber, column);
+		}
 		var matched = this._getInput().match(_Lexer.rxStringLiteral);
 		if (matched == null)
 			return null;
