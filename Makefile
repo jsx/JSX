@@ -3,7 +3,7 @@ JOBS:=4
 
 BOOTSTRAP_COMPILER:=tool/bootstrap-compiler.js
 COMPILER_TARGET:=bin/jsx
-COMPILER_COMPILE_OPTS:=--executable node
+COMPILER_COMPILE_OPTS:=--executable node --warn none
 
 PORT:=2012
 

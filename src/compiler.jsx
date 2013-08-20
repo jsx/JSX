@@ -500,7 +500,9 @@ class Compiler {
 				}
 				if (doWarn != false) {
 					this._platform.warn(warning.format(this.getPlatform()));
-					isFatal = this._warningAsError;
+					if (this._warningAsError) {
+						isFatal = true;
+					}
 				}
 			} else {
 				this._platform.error(error.format(this.getPlatform()));
