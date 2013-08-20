@@ -1252,8 +1252,7 @@ class Parser {
 		this._advanceToken();
 		var heredocStartMatch = this._getInput().match(_Lexer.rxHeredocStart);
 		if (heredocStartMatch) {
-			var lineNumber = this._lineNumber;
-			var column = this._getColumn();
+			var preservedState = this._preserveState();
 			var value = heredocStartMatch[0];
 			this._forwardPos(value.length);
 			var endRe = value.charAt(0) == '"' ? _Lexer.rxHeredocEndDoubleQuoted : _Lexer.rxHeredocEndSingleQuoted;
@@ -1268,8 +1267,14 @@ class Parser {
 				value += input + "\n";
 				this._lineNumber++;
 				this._columnOffset = 0;
+				if (this._lineNumber > this._lines.length) {
+					// EOF
+					this._restoreState(preservedState);
+					this._newError("unterminated multi-line string literal");
+					break;
+				}
 			}
-			return new Token(value, false, this._filename, lineNumber, column);
+			return new Token(value, false, this._filename, preservedState.lineNumber, preservedState.columnOffset);
 		}
 		var matched = this._getInput().match(_Lexer.rxStringLiteral);
 		if (matched == null)
