@@ -95,8 +95,8 @@ class _Lexer {
 	static const heredocStartDoubleQuoted = '"""';
 	static const heredocStartSingleQuoted = "'''";
 	static const heredocStart = _Lexer.makeAlt([ _Lexer.heredocStartDoubleQuoted, _Lexer.heredocStartSingleQuoted ]);
-	static const heredocEndDoubleQuoted = ' (^|.*?[^\\\\]) (\\\\\\\\)* """ ';
-	static const heredocEndSingleQuoted = " (^|.*?[^\\\\]) (\\\\\\\\)* ''' ";
+	static const heredocEndDoubleQuoted = ' (?:^|.*?[^\\\\]) (?:\\\\\\\\)* """ ';
+	static const heredocEndSingleQuoted = " (?:^|.*?[^\\\\]) (?:\\\\\\\\)* ''' ";
 
 	// ECMA 262 compatible,
 	// see also ECMA 262 5th (7.8.3) Numeric Literals
