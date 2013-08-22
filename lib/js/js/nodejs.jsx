@@ -133,7 +133,7 @@ native class os {
 	static function cpus() : _CPUInfo[];
 	static function networkInterfaces() : Map.<_IFInfo[]>;
 	static __readonly__ var EOL : string;
-}
+} = "require('os')";
 
 native __fake__ class _CPUInfo {
 	__readonly__ var model : string;
@@ -155,7 +155,7 @@ native __fake__ class _TimesInfo {
 	__readonly__ var irq  : number;
 }
 
-native class _IFInfo {
+native __fake__ class _IFInfo {
 	__readonly__ var address  : string;
 	__readonly__ var family   : string;
 	__readonly__ var internal : boolean;
@@ -296,7 +296,7 @@ native class querystring {
 	static function parse(query : string, sep : string) : Map.<variant>;
 	static function parse(query : string, sep : string, eq : string) : Map.<variant>;
 	static function parse(query : string, sep : string, eq : string, options : Map.<variant> /* maxKeys = 1000 */) : Map.<variant>;
-}
+} = "require('querystring')";
 
 native __fake__ class Stats {
 	function isFile() : boolean;
@@ -367,7 +367,7 @@ native __fake__ class _path {
 /*
  * @see http://nodejs.org/api/child_process.html
  */
-native class ChildProcess extends EventEmitter {
+native __fake__ class ChildProcess extends EventEmitter {
 	__readonly__ var stdin : WriteStream;
 	__readonly__ var stdout : ReadStream;
 	__readonly__ var stderr : ReadStream;
