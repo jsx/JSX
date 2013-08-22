@@ -51,11 +51,11 @@ final class node {
 	static const util          = node.require('util') as __noconvert__ _util;
 }
 
-native class EventEmitter {
+native __fake__ class EventEmitter {
 	function on(event : string, listener : function():void) : void;
 	function on(event : string, listener : function(:variant):void) : void;
 	function on(event : string, listener : function(:variant,:variant):void) : void;
-} = "require('events').EventEmitter";
+}
 
 /**
  * @see http://nodejs.org/api/process.html
@@ -63,9 +63,9 @@ native class EventEmitter {
 native class process {
 	static var argv : string[];
 
-	static __readonly__ var stdin  : ReadStream;
-	static __readonly__ var stdout : WriteStream;
-	static __readonly__ var stderr : WriteStream;
+	static __readonly__ var stdin  : Stream;
+	static __readonly__ var stdout : Stream;
+	static __readonly__ var stderr : Stream;
 
 	static __readonly__ var execPath : string;
 	static __readonly__ var env : Map.<string>;
@@ -133,7 +133,7 @@ native class os {
 	static function cpus() : _CPUInfo[];
 	static function networkInterfaces() : Map.<_IFInfo[]>;
 	static __readonly__ var EOL : string;
-} = "require('os')";
+}
 
 native __fake__ class _CPUInfo {
 	__readonly__ var model : string;
@@ -155,7 +155,7 @@ native __fake__ class _TimesInfo {
 	__readonly__ var irq  : number;
 }
 
-native __fake__ class _IFInfo {
+native class _IFInfo {
 	__readonly__ var address  : string;
 	__readonly__ var family   : string;
 	__readonly__ var internal : boolean;
@@ -166,61 +166,15 @@ native class module {
 	static __readonly__ var paths : string[];
 }
 
-native class Readable extends EventEmitter {
-	function constructor();
-	function constructor(options : Map.<variant>);
-	function read() : variant; // returns string|Buffer|null or other types if in object mode
-	function read(size : number) : variant;
-	function setEncoding(encoding : string) : void;
-	function resume() : void;
-	function pause() : void;
-	function pipe(destination : Writable) : void;
-	function pipe(destination : Writable, options : Map.<variant>) : void;
-	function unpipe() : void;
-	function unpipe(destination : Writable) : void;
-	function unshift(chunk : variant) : void;
-	function wrap(stream : Readable) : void;
-	function _read(size : number) : void;
-	function push(chunk : variant, encoding : string) : boolean;
-} = "require('stream').Readable";
-
-native class Writable extends EventEmitter {
-	function constructor();
-	function constructor(options : Map.<variant>);
-	function write(chunk : variant) : boolean;
-	function write(chunk : variant, encoding : string) : boolean;
-	function write(chunk : variant, encoding : string, callback : (Error) -> void) : boolean;
-	function end() : void;
-	function end(chunk : variant) : void;
-	function end(chunk : variant, encoding : string) : void;
-	function end(chunk : variant, encoding : string, callback : (Error) -> void) : void;
-	function _write(chunk : variant, encoding : string, callback : (Error) -> void) : boolean;
-} = "require('stream').Writable";
-
-// looking at the implementation, this is the way
-native class Duplex extends Readable {
-	function constructor();
-	function constructor(options : Map.<variant>);
-	// copied from writable
-	function write(chunk : variant) : boolean;
-	function write(chunk : variant, encoding : string) : boolean;
-	function write(chunk : variant, encoding : string, callback : (Error) -> void) : boolean;
-	function end() : void;
-	function end(chunk : variant) : void;
-	function end(chunk : variant, encoding : string) : void;
-	function end(chunk : variant, encoding : string, callback : (Error) -> void) : void;
-	function _write(chunk : variant, encoding : string, callback : (Error) -> void) : boolean;
-} = "require('stream').Duplex";
-
-native class ReadStream extends Readable {
+native class Stream extends EventEmitter {
 	__readonly__ var fd : int;
 	__readonly__ var isTTY : boolean;
-} = "require('tty').ReadStream";
 
-native class WriteStream extends Writable {
-	__readonly__ var fd : int;
-	__readonly__ var isTTY : boolean;
-} = "require('tty').WriteStream";
+	function write(str : string) : boolean;
+	function write(buffer : Buffer) : boolean;
+
+	function end() : void;
+}
 
 /**
  * Fixed-sized binary buffer, built in NodeJS.
@@ -296,7 +250,7 @@ native class querystring {
 	static function parse(query : string, sep : string) : Map.<variant>;
 	static function parse(query : string, sep : string, eq : string) : Map.<variant>;
 	static function parse(query : string, sep : string, eq : string, options : Map.<variant> /* maxKeys = 1000 */) : Map.<variant>;
-} = "require('querystring')";
+}
 
 native __fake__ class Stats {
 	function isFile() : boolean;
@@ -367,10 +321,10 @@ native __fake__ class _path {
 /*
  * @see http://nodejs.org/api/child_process.html
  */
-native __fake__ class ChildProcess extends EventEmitter {
-	__readonly__ var stdin : WriteStream;
-	__readonly__ var stdout : ReadStream;
-	__readonly__ var stderr : ReadStream;
+native class ChildProcess extends EventEmitter {
+	__readonly__ var stdin : Stream;
+	__readonly__ var stdout : Stream;
+	__readonly__ var stderr : Stream;
 
 	__readonly__ var pid : int;
 
