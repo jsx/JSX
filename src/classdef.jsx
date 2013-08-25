@@ -1151,36 +1151,7 @@ class MemberVariableDefinition extends MemberDefinition {
 	override function getType () : Type {
 		switch (this._analyzeState) {
 		case MemberVariableDefinition.NOT_ANALYZED:
-			try {
-				this._analyzeState = MemberVariableDefinition.IS_ANALYZING;
-				if (this._initialValue != null) {
-					if (! this._initialValue.analyze(this._analysisContext, null))
-						return null;
-					if (this._initialValue.isClassSpecifier()) {
-						this._analysisContext.errors.push(new CompileError(this._initialValue._token, "cannot assign a class"));
-						return null;
-					}
-					var ivType = this._initialValue.getType();
-					if (this._type == null) {
-						if (ivType.equals(Type.nullType)) {
-							this._analysisContext.errors.push(new CompileError(this._initialValue.getToken(), "cannot assign null to an unknown type"));
-							return null;
-						}
-						if (ivType.equals(Type.voidType)) {
-							this._analysisContext.errors.push(new CompileError(this._initialValue.getToken(), "cannot assign void"));
-							return null;
-						}
-						this._type = ivType.asAssignableType();
-					} else if (! ivType.isConvertibleTo(this._type)) {
-						this._analysisContext.errors.push(new CompileError(this._nameToken,
-							"the variable is declared as '" + this._type.toString() + "' but initial value is '" + ivType.toString() + "'"));
-					}
-				}
-				this._analyzeState = MemberVariableDefinition.ANALYZE_SUCEEDED;
-			} finally {
-				if (this._analyzeState != MemberVariableDefinition.ANALYZE_SUCEEDED)
-					this._analyzeState = MemberVariableDefinition.ANALYZE_FAILED;
-			}
+			this._lazyAnalyze();
 			break;
 		case MemberVariableDefinition.IS_ANALYZING:
 			this._analysisContext.errors.push(new CompileError(this.getNameToken(),
@@ -1190,6 +1161,39 @@ class MemberVariableDefinition extends MemberDefinition {
 			break;
 		}
 		return this._type;
+	}
+
+	function _lazyAnalyze() : void {
+		try {
+			this._analyzeState = MemberVariableDefinition.IS_ANALYZING;
+			if (this._initialValue != null) {
+				if (! this._initialValue.analyze(this._analysisContext, null))
+					return;
+				if (this._initialValue.isClassSpecifier()) {
+					this._analysisContext.errors.push(new CompileError(this._initialValue._token, "cannot assign a class"));
+					return;
+				}
+				var ivType = this._initialValue.getType();
+				if (this._type == null) {
+					if (ivType.equals(Type.nullType)) {
+						this._analysisContext.errors.push(new CompileError(this._initialValue.getToken(), "cannot assign null to an unknown type"));
+						return;
+					}
+					if (ivType.equals(Type.voidType)) {
+						this._analysisContext.errors.push(new CompileError(this._initialValue.getToken(), "cannot assign void"));
+						return;
+					}
+					this._type = ivType.asAssignableType();
+				} else if (! ivType.isConvertibleTo(this._type)) {
+					this._analysisContext.errors.push(new CompileError(this._nameToken,
+						"the variable is declared as '" + this._type.toString() + "' but initial value is '" + ivType.toString() + "'"));
+				}
+			}
+			this._analyzeState = MemberVariableDefinition.ANALYZE_SUCEEDED;
+		} finally {
+			if (this._analyzeState != MemberVariableDefinition.ANALYZE_SUCEEDED)
+				this._analyzeState = MemberVariableDefinition.ANALYZE_FAILED;
+		}
 	}
 
 	function getInitialValue () : Expression {
