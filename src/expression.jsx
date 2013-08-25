@@ -989,7 +989,11 @@ class AsExpression extends UnaryExpression {
 		// possibly unsafe conversions
 		var exprType = this._expr.getType().resolveIfNullable();
 		var success = false;
-		if (exprType.equals(Type.nullType)) {
+		if (this._type.equals(Type.stringType)) {
+			// ok: any => string
+			success = true;
+		}
+		else if (exprType.equals(Type.nullType)) {
 			if (this._type instanceof ObjectType || this._type instanceof FunctionType) {
 				// ok
 				success = true;
