@@ -514,7 +514,7 @@ class ObjectType extends Type {
 	}
 
 	override function forEachType (cb : (Type) -> boolean) : boolean {
-		throw new Error("logic flaw");
+		return true;
 	}
 
 }
