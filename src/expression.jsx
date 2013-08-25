@@ -1606,8 +1606,19 @@ class AssignmentExpression extends BinaryExpression {
 		if (this._expr2 instanceof FunctionExpression)
 			return this._analyzeFunctionExpressionAssignment(context, parentExpr);
 		// special handling for v = {} or v = []
-		if ((this._expr2 instanceof ArrayLiteralExpression && (this._expr2 as ArrayLiteralExpression).getExprs().length == 0 && this._expr2.getType() == null) || (this._expr2 instanceof MapLiteralExpression && (this._expr2 as MapLiteralExpression).getElements().length == 0 && this._expr2.getType() == null))
-				return this._analyzeEmptyLiteralAssignment(context, parentExpr);
+		if ((this._expr2 instanceof ArrayLiteralExpression && (this._expr2 as ArrayLiteralExpression).getExprs().length == 0 && this._expr2.getType() == null) || (this._expr2 instanceof MapLiteralExpression && (this._expr2 as MapLiteralExpression).getElements().length == 0 && this._expr2.getType() == null)) {
+			if (! this._expr1.analyze(context, this)) {
+				return false;
+			}
+			if (! AssignmentExpression.analyzeEmptyLiteralAssignment(context, this._token, this._expr1.getType(), this._expr2)) {
+				return false;
+			}
+			if (! this._expr1.assertIsAssignable(context, this._token, this._expr2.getType()))
+				return false;
+			if (! this._expr2.analyze(context, this))
+				return false;
+			return true;
+		}
 		// normal handling
 		if (! this._analyze(context))
 			return false;
@@ -1666,34 +1677,30 @@ class AssignmentExpression extends BinaryExpression {
 		return false;
 	}
 
-	function _analyzeEmptyLiteralAssignment (context : AnalysisContext, parentExpr : Expression) : boolean {
-		if (! this._expr1.analyze(context, this))
+	static function analyzeEmptyLiteralAssignment (context : AnalysisContext, token : Token, lhsType : Type, rhs : Expression) : boolean {
+		if (lhsType == null) {
+			context.errors.push(new CompileError(token, "either side of the operator should be fully type-qualified"));
 			return false;
-		if (this._expr1.getType() == null) {
-			context.errors.push(new CompileError(this._token, "either side of the operator should be fully type-qualified"));
 		}
 		var classDef;
-		if (this._expr2 instanceof ArrayLiteralExpression) {
-			if (! (this._expr1.getType() instanceof ObjectType
-				&& (classDef = this._expr1.getType().getClassDef()) instanceof InstantiatedClassDefinition
+		if (rhs instanceof ArrayLiteralExpression) {
+			if (! (lhsType instanceof ObjectType
+				&& (classDef = lhsType.getClassDef()) instanceof InstantiatedClassDefinition
 				&& (classDef as InstantiatedClassDefinition).getTemplateClassName() == "Array")) {
-					context.errors.push(new CompileError(this._token, "cannot deduce the type of [] because left-hand-side expression is not of Array type"));
+					context.errors.push(new CompileError(token, "cannot deduce the type of [] because left-hand-side expression is not of Array type"));
 					return false;
 			}
-			(this._expr2 as ArrayLiteralExpression).setType(this._expr1.getType());
-		} else {	// this._expr1 intanceof MapLiteralExpression
-			if (! (this._expr1.getType() instanceof ObjectType
-				&& (classDef = this._expr1.getType().getClassDef()) instanceof InstantiatedClassDefinition
+			(rhs as ArrayLiteralExpression).setType(lhsType);
+		} else {
+			assert rhs instanceof MapLiteralExpression;
+			if (! (lhsType instanceof ObjectType
+				&& (classDef = lhsType.getClassDef()) instanceof InstantiatedClassDefinition
 				&& (classDef as InstantiatedClassDefinition).getTemplateClassName() == "Map")) {
-					context.errors.push(new CompileError(this._token, "cannot deduce the type of {} because left-hand-side expression is not of Map type"));
+					context.errors.push(new CompileError(token, "cannot deduce the type of {} because left-hand-side expression is not of Map type"));
 					return false;
 			}
-			(this._expr2 as MapLiteralExpression).setType(this._expr1.getType());
+			(rhs as MapLiteralExpression).setType(lhsType);
 		}
-		if (! this._expr1.assertIsAssignable(context, this._token, this._expr2.getType()))
-			return false;
-		if (! this._expr2.analyze(context, this))
-			return false;
 		return true;
 	}
 
@@ -1770,6 +1777,9 @@ class BinaryNumberExpression extends BinaryExpression {
 	}
 
 	override function getType () : Type {
+		assert this._expr1.getType() != null, this._token.getNotation();
+		assert this._expr2.getType() != null, this._token.getNotation();
+
 		switch (this._token.getValue()) {
 		case "+":
 		case "-":
