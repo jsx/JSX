@@ -298,6 +298,7 @@ class Optimizer {
 			} else if (cmd == "return-if") {
 				this._commands.push(new _ReturnIfOptimizeCommand());
 			} else if (cmd == "lcse") {
+				determineCallee();
 				this._commands.push(new _LCSEOptimizeCommand());
 			} else if (cmd == "unbox") {
 				determineCallee();
@@ -3436,9 +3437,11 @@ class _LCSEOptimizeCommand extends _FunctionOptimizeCommand {
 				clearCache();
 				return true;
 			} else if (expr instanceof LogicalExpression) {
-				// give up further optimization
-				clearCache();
-				return true;
+				if (! expr.forEachExpression((expr) -> ! _Util.exprHasSideEffects(expr))) {
+					// give up further optimization
+					clearCache();
+					return true;
+				}
 			} else if (expr instanceof FunctionExpression) {
 				clearCache();
 				return true;
