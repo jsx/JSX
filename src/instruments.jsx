@@ -702,7 +702,7 @@ a | function ($a) { var $C = C; return $a ? ($a as boolean) | $C : (b as boolean
 			null,
 			null
 		);
-		parent.getClosures().push(contFuncDef);
+		Util.linkFunction(contFuncDef, parent);
 
 		// `var $C = C;`
 		var condStmt = new ExpressionStatement(
@@ -806,7 +806,7 @@ a | function ($a) { var $C = C; return $a ? b | $C : c | $C; }
 			null,
 			null
 		);
-		parent.getClosures().push(contFuncDef);
+		Util.linkFunction(contFuncDef, parent);
 
 		// `var $C = C;`
 		var condStmt = new ExpressionStatement(
@@ -2061,7 +2061,7 @@ class CodeTransformer {
 						null, // last token
 						null
 			);
-			funcDef.getClosures().push(block);
+			Util.linkFunction(block, funcDef);
 			codeBlocks.push(new ExpressionStatement(
 				new AssignmentExpression(
 					new Token("=", false),
@@ -2392,7 +2392,7 @@ class CodeTransformer {
 			null,	// lastToken
 			null
 		);
-		parent.getClosures().push(identity);
+		Util.linkFunction(identity, parent);
 		return new FunctionExpression(identity.getToken(), identity);
 	}
 
