@@ -904,8 +904,9 @@ class _ConstructorInvocationStatementEmitter extends _StatementEmitter {
 		var argTypes = ctorType != null ? ctorType.getArgumentTypes() : new Type[];
 		var ctorName = this._emitter.getNamer().getNameOfConstructor(this._statement.getConstructingClassDef(), argTypes);
 		var token = this._statement.getToken();
+		var thisVar = this._emitter._emittingFunction.getParent() != null ?  "$this" : "this";
 
-		this._emitter._emitCallArguments(token, ctorName + ".call(this", this._statement.getArguments(), argTypes);
+		this._emitter._emitCallArguments(token, ctorName + ".call(" + thisVar, this._statement.getArguments(), argTypes);
 		this._emitter._emit(";\n", token);
 
 		if (ctorName == "Error") {
@@ -1618,7 +1619,7 @@ class _ThisExpressionEmitter extends _ExpressionEmitter {
 
 	override function emit (outerOpPrecedence : number) : void {
 		var emittingFunction = this._emitter._emittingFunction;
-		if ((emittingFunction.flags() & ClassDefinition.IS_STATIC) != 0)
+		if (emittingFunction.getParent() != null)
 			this._emitter._emit("$this", this._expr.getToken());
 		else
 			this._emitter._emit("this", this._expr.getToken());
@@ -2619,7 +2620,8 @@ class _SuperExpressionEmitter extends _OperatorExpressionEmitter {
 		var methodName = this._expr.getName().getValue();
 		var argTypes = funcType.getArgumentTypes();
 		var mangledFuncName = this._emitter.getNamer().getNameOfMethod(classDef, methodName, argTypes);
-		this._emitter._emitCallArguments(this._expr.getToken(), this._emitter.getNamer().getNameOfClass(classDef) + ".prototype." + mangledFuncName + ".call($this", this._expr.getArguments(), argTypes);
+		var thisVar = this._emitter._emittingFunction.getParent() != null ? "$this" : "this";
+		this._emitter._emitCallArguments(this._expr.getToken(), this._emitter.getNamer().getNameOfClass(classDef) + ".prototype." + mangledFuncName + ".call(" + thisVar, this._expr.getArguments(), argTypes);
 	}
 
 	override function _getPrecedence () : number {
@@ -3433,7 +3435,7 @@ class JavaScriptEmitter implements Emitter {
 
 			// emit reference to this for closures
 			// if funDef is NOT in another closure
-			if (funcDef.getClosures().length != 0 && (funcDef.flags() & ClassDefinition.IS_STATIC) == 0)
+			if (funcDef.getParent() == null && funcDef.getClosures().length != 0)
 				this._emit("var $this = this;\n", null);
 			// emit local variable declarations
 			var locals = funcDef.getLocals();
