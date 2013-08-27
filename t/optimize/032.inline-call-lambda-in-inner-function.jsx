@@ -1,4 +1,5 @@
 /*EXPECTED
+foo
 */
 
 /*JSX_OPTS
@@ -9,8 +10,9 @@ class _Main {
 	static function main(args : string[]) : void {
 		function f():void {
 			(function():void {
-				"foo".slice(0);
+				log "foo".slice(0);
 			}());
 		}
+		f();
 	}
 }

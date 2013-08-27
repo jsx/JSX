@@ -92,6 +92,12 @@ class _Lexer {
 	static const stringLiteral = _Lexer.makeAlt([_Lexer.singleQuoted, _Lexer.doubleQuoted]);
 	static const regexpLiteral = _Lexer.doubleQuoted.replace(/"/g, "/") + "[mgi]*";
 
+	static const heredocStartDoubleQuoted = '"""';
+	static const heredocStartSingleQuoted = "'''";
+	static const heredocStart = _Lexer.makeAlt([ _Lexer.heredocStartDoubleQuoted, _Lexer.heredocStartSingleQuoted ]);
+	static const heredocEndDoubleQuoted = ' (?:^|.*?[^\\\\]) (?:\\\\\\\\)* """ ';
+	static const heredocEndSingleQuoted = " (?:^|.*?[^\\\\]) (?:\\\\\\\\)* ''' ";
+
 	// ECMA 262 compatible,
 	// see also ECMA 262 5th (7.8.3) Numeric Literals
 	static const decimalIntegerLiteral = "(?: 0 | [1-9][0-9]* )";
@@ -115,6 +121,9 @@ class _Lexer {
 	static const rxNumberLiteral  = _Lexer.rx("^" + _Lexer.numberLiteral);
 	static const rxIntegerLiteral = _Lexer.rx("^" + _Lexer.integerLiteral);
 	static const rxRegExpLiteral  = _Lexer.rx("^" + _Lexer.regexpLiteral);
+	static const rxHeredocStart   = _Lexer.rx("^" + _Lexer.heredocStart);
+	static const rxHeredocEndDoubleQuoted = _Lexer.rx(_Lexer.heredocEndDoubleQuoted);
+	static const rxHeredocEndSingleQuoted = _Lexer.rx(_Lexer.heredocEndSingleQuoted);
 	static const rxNewline        = /(?:\r\n?|\n)/;
 
 	// blacklists of identifiers
@@ -1241,6 +1250,32 @@ class Parser {
 
 	function _expectStringLiteralOpt () : Token {
 		this._advanceToken();
+		var heredocStartMatch = this._getInput().match(_Lexer.rxHeredocStart);
+		if (heredocStartMatch) {
+			var preservedState = this._preserveState();
+			var value = heredocStartMatch[0];
+			this._forwardPos(value.length);
+			var endRe = value.charAt(0) == '"' ? _Lexer.rxHeredocEndDoubleQuoted : _Lexer.rxHeredocEndSingleQuoted;
+			while (true) {
+				var input = this._getInput();
+				var endMatch = input.match(endRe);
+				if (endMatch) {
+					value += endMatch[0];
+					this._forwardPos(endMatch[0].length);
+					break;
+				}
+				value += input + "\n";
+				this._lineNumber++;
+				this._columnOffset = 0;
+				if (this._lineNumber > this._lines.length) {
+					// EOF
+					this._restoreState(preservedState);
+					this._newError("unterminated multi-line string literal");
+					break;
+				}
+			}
+			return new Token(value, false, this._filename, preservedState.lineNumber, preservedState.columnOffset);
+		}
 		var matched = this._getInput().match(_Lexer.rxStringLiteral);
 		if (matched == null)
 			return null;
@@ -3062,7 +3097,6 @@ class Parser {
 	}
 
 	function _functionBody(token : Token, name : Token, funcLocal : LocalVariable, args : ArgumentDeclaration[], returnType : Type, withBlock : boolean) : MemberFunctionDefinition {
-		var openBlock = this._expectOpt("{");
 		this._pushScope(funcLocal, args);
 		try {
 			// parse lambda body

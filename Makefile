@@ -3,7 +3,7 @@ JOBS:=4
 
 BOOTSTRAP_COMPILER:=tool/bootstrap-compiler.js
 COMPILER_TARGET:=bin/jsx
-COMPILER_COMPILE_OPTS:=--executable node
+COMPILER_COMPILE_OPTS:=--executable node --warn none
 
 PORT:=2012
 
@@ -42,7 +42,7 @@ bootstrap-compiler: compiler
 
 # e.g. make test JOBS=2
 
-test: all test-debug test-optimized-minified
+test: all test-debug test-optimized-minified show-todo
 
 test-all: test test-optimized-minified test-transformed-optimized
 

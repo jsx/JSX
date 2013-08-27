@@ -175,7 +175,7 @@ sub optimize_and_compare {
     plan tests => 6 + ($do_bench ? 1 : 0) + scalar(@optimization_flags);
 
     # compile, run, and check (wo. optimization)
-    my($ok, $src, $logs) = jsx($file);
+    my($ok, $src, $logs) = jsx("--warn", "none", $file);
     ok $ok, "compile '$file' (wo. optimization)" or return diag($logs);
     is $logs, '', "... with no logs";
     my ($output, $elapsed) = bench(sub { run_compiled($file, $src) });

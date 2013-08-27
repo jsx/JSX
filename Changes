@@ -1,8 +1,26 @@
 Revision history for the JSX software development kit
 
+0.9.63 2013-08-25 13:37:53+0900
+    [BUG FIXES]
+    - Fix a compiler crash introduced in 0.9.62
+
+0.9.62 2013-08-25 08:33:40+0900
+    [FEATURES]
+    - Support Python-like multi-line string literals ("""...""")
+    - Support "tail-rec" optimization
+    - Support "unused" warnings to detect unused variables
+    - Improve type inference: now `[1, 2, 3].map((item) -> item + 1)` works
+
+    [BUG FIXES]
+    - Fix the signatures of Array#reduce()
+
+0.9.61 2013-08-19 07:45:23+0900
+    [BUG FIXES]
+    - Fix an issue on LCSE optimizer
+
 0.9.60 2013-08-08 22:12:39+0900
     [BUG FIXES]
-    - Make label name conflict compile errors, rather than runtime erorrs
+    - Make label name conflict compile errors, rather than runtime errors
       (#127)
     - Fix issues that error messages sometimes displayed wrong places
 

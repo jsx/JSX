@@ -168,13 +168,13 @@ class LocalVariable implements Stashable {
 
 	var _name : Token;
 	var _type : Type;
-	var _instantiated : LocalVariable[];
+	var _instantiated = new LocalVariable[];
 	var isInstantiated = false;
+	var _isUsedAsRHS = false;
 
 	function constructor (name : Token, type : Type) {
 		this._name = name;
 		this._type = type;
-		this._instantiated = new LocalVariable[];
 	}
 
 	function serialize () : variant {
@@ -190,6 +190,10 @@ class LocalVariable implements Stashable {
 
 	function getType () : Type {
 		return this._type;
+	}
+
+	function isUsedAsRHS() : boolean {
+		return this._isUsedAsRHS;
 	}
 
 	function setType (type : Type) : void {
@@ -226,7 +230,7 @@ class LocalVariable implements Stashable {
 				context.errors.push(new CompileError(token, "the return type of recursive function needs to be explicitly declared"));
 				return false;
 			case LocalVariableStatuses.ISSET:
-				// ok
+				this._isUsedAsRHS = true;
 				break;
 			case LocalVariableStatuses.UNSET:
 				var error = new CompileError(token, "variable is not initialized");
@@ -528,6 +532,18 @@ class CompileWarning extends CompileError {
 
 	override function getPrefix () : string {
 		return "Warning: ";
+	}
+
+}
+
+class UnusedWarning extends CompileWarning {
+
+	function constructor (token : Token, message : string) {
+		super(token, message);
+	}
+
+	function constructor (filename : string, lineNumber : number, columnNumber : number, message : string) {
+		super(filename, lineNumber, columnNumber, message);
 	}
 
 }

@@ -432,12 +432,16 @@ class Compiler {
 			throw new Error("logic flaw, could not find class definition of '" + deps[0].className() + "'");
 		};
 		for (var i = 0; i < classDefs.length;) {
-			var deps = classDefs[i].implementTypes().map.<ClassDefinition>(function (t) { return t.getClassDef(); }).concat([]);
-			if (classDefs[i].extendType() != null)
-				deps.unshift(classDefs[i].extendType().getClassDef());
-			if (classDefs[i].getOuterClassDef() != null && deps.indexOf(classDefs[i].getOuterClassDef()) == -1)
-				deps.unshift(classDefs[i].getOuterClassDef());
-			var maxIndexOfClasses = getMaxIndexOfClasses(deps);
+			if ((classDefs[i].flags() & ClassDefinition.IS_NATIVE) != 0) {
+				var maxIndexOfClasses = -1;
+			} else {
+				var deps = classDefs[i].implementTypes().map.<ClassDefinition>(function (t) { return t.getClassDef(); }).concat([]);
+				if (classDefs[i].extendType() != null)
+					deps.unshift(classDefs[i].extendType().getClassDef());
+				if (classDefs[i].getOuterClassDef() != null && deps.indexOf(classDefs[i].getOuterClassDef()) == -1)
+					deps.unshift(classDefs[i].getOuterClassDef());
+				maxIndexOfClasses = getMaxIndexOfClasses(deps);
+			}
 			if (maxIndexOfClasses > i) {
 				classDefs.splice(maxIndexOfClasses + 1, 0, classDefs[i]);
 				classDefs.splice(i, 1);
@@ -498,7 +502,9 @@ class Compiler {
 				}
 				if (doWarn != false) {
 					this._platform.warn(warning.format(this.getPlatform()));
-					isFatal = this._warningAsError;
+					if (this._warningAsError) {
+						isFatal = true;
+					}
 				}
 			} else {
 				this._platform.error(error.format(this.getPlatform()));

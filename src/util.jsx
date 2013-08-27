@@ -56,6 +56,10 @@ class Util {
 		return v.serialize();
 	}
 
+	static function makePair.<F, S>(first : F, second : S) : Pair.<F, S> {
+		return new Pair.<F, S>(first, second);
+	}
+
 	static function repeat (c : string, n : number) : string {
 		var s = "";
 		for(var i = 0; i < n; ++i) {
@@ -71,7 +75,6 @@ class Util {
 	 */
 	static function format (fmt : string, args : string[]) : string {
 		assert args != null;
-		var i = 0;
 		return fmt.replace(/%(\d+|%)/g, function(m) {
 			if (m == "%%") {
 				return "%";
@@ -81,6 +84,34 @@ class Util {
 				return arg == null ? "null" : arg;
 			}
 		});
+	}
+
+	/**
+	 * Calculates Levenshtein Distance of two strings
+	 */
+	static function ld(a : string, b : string) : number {
+		var m = new number[][];
+
+		for (var i = 0; i <= a.length; ++i) {
+			m[i] = [i];
+		}
+		for (var j = 0; j <= b.length; ++j) {
+			m[0][j] = j;
+		}
+
+		for (var i = 1; i <= a.length; ++i) {
+			for (var j = 1; j <= b.length; ++j) {
+				var diff = a.charCodeAt(i-1) == b.charCodeAt(j-1) ? 0 : 1;
+				m[i][j] = Math.min(
+						m[i - 1][j - 1] + diff,
+						m[i - 1][j    ] + 1,
+						m[i    ][j - 1] + 1
+				);
+			}
+		}
+		var x = m[m.length - 1];
+		assert x != null;
+		return x[x.length - 1];
 	}
 
 	static const _builtInClass = Util.asSet([
@@ -136,23 +167,86 @@ class Util {
 		return false;
 	}
 
+	static function lhsHasNoSideEffects (lhsExpr : Expression) : boolean {
+		if (lhsExpr instanceof LocalExpression)
+			return true;
+		if (lhsExpr instanceof PropertyExpression) {
+			var holderExpr = (lhsExpr as PropertyExpression).getExpr();
+			if (Util.isNativeClass(holderExpr.getType()) && !Util.isBuiltInClass(holderExpr.getType())) {
+				return false;
+			}
+			if (holderExpr instanceof ThisExpression
+				|| holderExpr instanceof LocalExpression
+				|| holderExpr.isClassSpecifier()) {
+				return true;
+			}
+		} else if (lhsExpr instanceof ArrayExpression) {
+			var arrayExpr = lhsExpr as ArrayExpression;
+			if (Util.isNativeClass(arrayExpr.getFirstExpr().getType()) && !Util.isBuiltInClass(arrayExpr.getFirstExpr().getType())) {
+				return false;
+			}
+			if (arrayExpr.getFirstExpr() instanceof LocalExpression
+				&& arrayExpr.getSecondExpr() instanceof LeafExpression) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	static function instantiateTemplate (context : AnalysisContext, token : Token, className : string, typeArguments : Type[]) : ClassDefinition {
 		return context.parser.lookupTemplate(context.errors, new TemplateInstantiationRequest(token, className, typeArguments), context.postInstantiationCallback);
 	}
 
-	static function analyzeArgs (context : AnalysisContext, args : Expression[], parentExpr : Expression, expectedTypes : Type[][]) : Type[] {
+	class ArgumentTypeRequest {
+		var argTypes : Type[];
+		var typeArgs : Token[];
+		function constructor(argTypes : Type[], typeArgs : Token[]) {
+			this.argTypes = argTypes;
+			this.typeArgs = typeArgs;
+		}
+		function at(i : int) : Type {
+			return this.argTypes[i];
+		}
+	}
+
+	static function analyzeArgs (context : AnalysisContext, args : Expression[], parentExpr : Expression, expectedTypes : Util.ArgumentTypeRequest[]) : Type[] {
 		var argTypes = [] : Type[];
 		for (var i = 0; i < args.length; ++i) {
 			if (args[i] instanceof FunctionExpression && ! (args[i] as FunctionExpression).argumentTypesAreIdentified()) {
 				// find the only expected types, by counting the number of arguments
 				var funcDef = (args[i] as FunctionExpression).getFuncDef();
-				var expectedCallbackType = null : Type;
+				var expectedCallbackType = null : StaticFunctionType;
 				for (var j = 0; j < expectedTypes.length; ++j) {
-					if (expectedTypes[j][i] != null && expectedTypes[j][i] instanceof FunctionType && (expectedTypes[j][i] as ResolvedFunctionType).getArgumentTypes().length == funcDef.getArguments().length) {
+					if (expectedTypes[j].at(i) != null && expectedTypes[j].at(i) instanceof StaticFunctionType && (expectedTypes[j].at(i) as StaticFunctionType).getArgumentTypes().length == funcDef.getArguments().length) {
+						var callbackType = (expectedTypes[j].at(i) as StaticFunctionType)._clone() as StaticFunctionType;
+
+						function typeNotContainsParameter (type : Type) : boolean {
+							for (var k = 0; k < expectedTypes[j].typeArgs.length; ++k) {
+								if (type instanceof ParsedObjectType
+									&& (type as ParsedObjectType).getQualifiedName().getImport() == null
+									&& (type as ParsedObjectType).getQualifiedName().getEnclosingType() == null
+									&& (type as ParsedObjectType).getToken().getValue() == expectedTypes[j].typeArgs[k].getValue())
+									return false;
+							}
+							return type.forEachType(typeNotContainsParameter);
+						}
+
+						// insert nulls to the positions of type parameters
+						for (var k = 0; k < callbackType.getArgumentTypes().length; ++k) {
+							var argType = callbackType.getArgumentTypes()[k];
+							if (! typeNotContainsParameter(argType)) {
+								callbackType.getArgumentTypes()[k] = null;
+							}
+						}
+						if (callbackType.getReturnType() != null && ! typeNotContainsParameter(callbackType.getReturnType())) {
+							callbackType._returnType = null;
+						}
+
 						if (expectedCallbackType == null) {
-							expectedCallbackType = expectedTypes[j][i];
-						} else if (Util.typesAreEqual((expectedCallbackType as ResolvedFunctionType).getArgumentTypes(), (expectedTypes[j][i] as ResolvedFunctionType).getArgumentTypes())
-							&& (expectedCallbackType as ResolvedFunctionType).getReturnType().equals((expectedTypes[j][i] as ResolvedFunctionType).getReturnType())) {
+							expectedCallbackType = callbackType;
+						} else if (Util.typesAreEqual(expectedCallbackType.getArgumentTypes(), callbackType.getArgumentTypes())
+							&& ((expectedCallbackType.getReturnType() == null && callbackType.getReturnType() == null)
+								|| expectedCallbackType.getReturnType().equals(callbackType.getReturnType()))) {
 							// function signatures are equal
 						} else {
 							break;
@@ -162,20 +256,20 @@ class Util {
 				if (j != expectedTypes.length) {
 					// multiple canditates, skip
 				} else if (expectedCallbackType != null) {
-					if (! (args[i] as FunctionExpression).deductTypeIfUnknown(context, expectedCallbackType as ResolvedFunctionType))
+					if (! (args[i] as FunctionExpression).deductTypeIfUnknown(context, expectedCallbackType))
 						return null;
 				}
 			} else if (args[i] instanceof ArrayLiteralExpression && (args[i] as ArrayLiteralExpression).getExprs().length == 0 && (args[i] as ArrayLiteralExpression).getType() == null) {
 				var arrayExpr = args[i] as ArrayLiteralExpression;
 				var expectedArrayType = null : Type;
 				for (var j = 0; j < expectedTypes.length; ++j) {
-					if (expectedTypes[j][i] != null
-						&& expectedTypes[j][i] instanceof ObjectType
-						&& expectedTypes[j][i].getClassDef() instanceof InstantiatedClassDefinition
-						&& (expectedTypes[j][i].getClassDef() as InstantiatedClassDefinition).getTemplateClassName() == 'Array') {
+					if (expectedTypes[j].at(i) != null
+						&& expectedTypes[j].at(i) instanceof ObjectType
+						&& expectedTypes[j].at(i).getClassDef() instanceof InstantiatedClassDefinition
+						&& (expectedTypes[j].at(i).getClassDef() as InstantiatedClassDefinition).getTemplateClassName() == 'Array') {
 						if (expectedArrayType == null) {
-							expectedArrayType = expectedTypes[j][i];
-						} else if (expectedArrayType.equals(expectedTypes[j][i])) {
+							expectedArrayType = expectedTypes[j].at(i);
+						} else if (expectedArrayType.equals(expectedTypes[j].at(i))) {
 							// type parameters are equal
 						} else {
 							break;
@@ -191,13 +285,13 @@ class Util {
 				var mapExpr = args[i] as MapLiteralExpression;
 				var expectedMapType = null : Type;
 				for (var j = 0; j < expectedTypes.length; ++j) {
-					if (expectedTypes[j][i] != null
-						&& expectedTypes[j][i] instanceof ObjectType
-						&& expectedTypes[j][i].getClassDef() instanceof InstantiatedClassDefinition
-						&& (expectedTypes[j][i].getClassDef() as InstantiatedClassDefinition).getTemplateClassName() == 'Map') {
+					if (expectedTypes[j].at(i) != null
+						&& expectedTypes[j].at(i) instanceof ObjectType
+						&& expectedTypes[j].at(i).getClassDef() instanceof InstantiatedClassDefinition
+						&& (expectedTypes[j].at(i).getClassDef() as InstantiatedClassDefinition).getTemplateClassName() == 'Map') {
 						if (expectedMapType == null) {
-							expectedMapType = expectedTypes[j][i];
-						} else if (expectedMapType.equals(expectedTypes[j][i])) {
+							expectedMapType = expectedTypes[j].at(i);
+						} else if (expectedMapType.equals(expectedTypes[j].at(i))) {
 							// type parameters are equal
 						} else {
 							break;
@@ -220,9 +314,12 @@ class Util {
 	static function typesAreEqual (x : Type[], y : Type[]) : boolean {
 		if (x.length != y.length)
 			return false;
-		for (var i = 0; i < x.length; ++i)
+		for (var i = 0; i < x.length; ++i) {
+			if (x[i] == null || y[i] == null)
+				continue;
 			if (! x[i].equals(y[i]))
 				return false;
+		}
 		return true;
 	}
 
@@ -386,6 +483,7 @@ class Util {
 	 * @see ECMA-262 5th, 7.8.4 String Literals
 	 */
 	static function decodeStringLiteral (literal : string) : string {
+		literal = Util.normalizeHeredoc(literal);
 		var matched = literal.match(/^([\'\"]).*([\'\"])$/);
 		if (matched == null || matched[1] != matched[2])
 			throw new Error("input string is not quoted properly: " + literal);
@@ -438,6 +536,17 @@ class Util {
 		}
 		decoded += src.substring(pos);
 		return decoded;
+	}
+
+	// converts """heredoc""" to an ordinary "string literal"
+	static function normalizeHeredoc(literal : string) : string {
+		if (! literal.match(/^(?:"""|''')/)) {
+			return literal;
+		}
+		var body = literal.substring(3, literal.length - 3);
+		body = body.replace(/\\*['"]/g, function (matched) { return matched.length % 2 == 0 ? matched : matched.replace(/(.)$/, "\\$1"); });
+		body = body.replace(/\n/g, "\\n");
+		return '"' + body + '"';
 	}
 
 	static function _resolvedPathParts(path : string) : string[] {

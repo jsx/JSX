@@ -1539,8 +1539,7 @@ class _StringLiteralExpressionEmitter extends _ExpressionEmitter {
 
 	override function emit (outerOpPrecedence : number) : void {
 		var token = this._expr.getToken();
-		// FIXME escape
-		this._emitter._emit(token.getValue(), token);
+		this._emitter._emit(Util.normalizeHeredoc(token.getValue()), token);
 	}
 
 }
@@ -2177,7 +2176,7 @@ class _AssignmentExpressionEmitter extends _OperatorExpressionEmitter {
 	function _emitDivAssignToInt (outerOpPrecedence : number) : void {
 		var firstExpr = this._expr.getFirstExpr();
 		var secondExpr = this._expr.getSecondExpr();
-		if (firstExpr instanceof PropertyExpression || firstExpr instanceof ArrayExpression) {
+		if (! Util.lhsHasNoSideEffects(firstExpr)) {
 			this._emitter._emit("$__jsx_div_assign(", this._expr.getToken());
 			if (firstExpr instanceof PropertyExpression) {
 				var propertyExpr = firstExpr as PropertyExpression;
@@ -2186,7 +2185,7 @@ class _AssignmentExpressionEmitter extends _OperatorExpressionEmitter {
 				var name : string;
 				if (propertyExpr.getExpr().isClassSpecifier()) {
 					var classDef = propertyExpr.getHolderType().getClassDef();
-					name = this._emitter.getNamer().getNameOfClass(classDef) + "." + this._emitter.getNamer().getNameOfStaticVariable(classDef, propertyExpr.getIdentifierToken().getValue());
+					name = this._emitter.getNamer().getNameOfStaticVariable(classDef, propertyExpr.getIdentifierToken().getValue());
 				} else {
 					name = this._emitter.getNamer().getNameOfProperty(propertyExpr.getHolderType().getClassDef(), propertyExpr.getIdentifierToken().getValue());
 				}
