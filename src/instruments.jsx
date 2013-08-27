@@ -1083,7 +1083,14 @@ class _FunctionStatementTransformer extends _StatementTransformer {
 	}
 
 	override function _replaceControlStructuresWithGotos () : Statement[] {
-		return [ this._statement ] : Statement[];
+		// convert to a combination of a FunctionExpression and an assignment in order to make the function visible from outside wrapping statement block
+		var funcDef = this._statement.getFuncDef();
+		var statement = new ExpressionStatement(
+			new AssignmentExpression(
+				new Token("=", false),
+				new LocalExpression(funcDef.getFuncLocal().getName(), funcDef.getFuncLocal()),
+				new FunctionExpression(this._statement.getToken(), funcDef)));
+		return [ statement ] : Statement[];
 	}
 
 }
