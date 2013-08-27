@@ -64,7 +64,6 @@ class ClassDefinition implements Stashable {
 	static const IS_GENERATOR = 8192;
 	static const IS_EXPORT = 16384; // no overloading, no minification of method / variable names
 	static const IS_GENERATED = 32768;
-	static const IS_ASYNC = 65536;
 
 	var _parser		: Parser;
 	var _token		: Token;

@@ -31,9 +31,6 @@ class B extends
       "word" : "StopIteration"
    },
    {
-      "word" : "Async"
-   },
-   {
       "word" : "Transferable"
    },
    {

@@ -85,9 +85,6 @@ class A {
       "word" : "StopIteration"
    },
    {
-      "word" : "Async"
-   },
-   {
       "word" : "JSON"
    },
    {
@@ -140,9 +137,6 @@ class A {
    },
    {
       "word" : "Enumerable"
-   },
-   {
-      "word" : "AsyncTask"
    },
    {
       "word" : "++"

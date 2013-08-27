@@ -1023,35 +1023,6 @@ class __jsx_generator.<T> implements Enumerable.<T> {
 
 }
 
-/**
- * Provides an object for working with asynchronous processing.
- */
-interface AsyncTask.<T> {
-
-	function wait () : T;
-
-	function isCompleted () : boolean;
-	function getResult () : T;
-
-	function isFaulted () : boolean;
-	function getError () : variant;
-
-}
-
-/**
- * Provides static functions for asynchronous processing.
- */
-native __fake__ class Async {
-
-	// NOTE wasabiz better to allow arrays consisting of tasks of different types?
-	static function waitAny.<T> (...taskN : AsyncTask.<T>) : int;
-	static function waitAny.<T> (tasks : Array.<AsyncTask.<T>>) : int;
-
-	static function waitAll.<T> (...taskN : AsyncTask.<T>) : void;
-	static function waitAll.<T> (tasks : Array.<AsyncTask.<T>>) : void;
-
-}
-
 // 5.12
 /**
  * <p>Provides static functions to manipulate JSON.</p>

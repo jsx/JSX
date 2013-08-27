@@ -153,7 +153,6 @@ class _Lexer {
 
 		// JSX specific reserved words
 		"extern", "native", "as", "operator"
-		// , "async"  // contextual
 		]);
 
 	static function makeAlt (patterns : string[]) : string {
@@ -1612,7 +1611,7 @@ class Parser {
 		var isNoExport = false;
 		var docComment = null : DocComment;
 		while (true) {
-			var token = this._expect([ "function", "var", "static", "abstract", "override", "final", "const", "native", "__readonly__", "inline", "__pure__", "delete", "__export__", "__noexport__", "async" ]);
+			var token = this._expect([ "function", "var", "static", "abstract", "override", "final", "const", "native", "__readonly__", "inline", "__pure__", "delete", "__export__", "__noexport__" ]);
 			if (token == null)
 				return null;
 			if (flags == 0)
@@ -1683,13 +1682,6 @@ class Parser {
 						return null;
 					}
 					newFlag = ClassDefinition.IS_EXPORT;
-					break;
-				case "async":
-					if ((this._classFlags & ClassDefinition.IS_NATIVE) == 0) {
-						this._newError("functions of a native class cannot have 'async' attibute set");
-						return null;
-					}
-					newFlag = ClassDefinition.IS_ASYNC;
 					break;
 				default:
 					throw new Error("logic flaw");
