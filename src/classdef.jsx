@@ -1261,7 +1261,6 @@ class MemberFunctionDefinition extends MemberDefinition implements Block {
 		return (this._flags & ClassDefinition.IS_GENERATOR) != 0;
 	}
 
-
 	/**
 	 * Returns a simple notation of the function like "Class.classMethod(:string):void" or "Class.instanceMethod(:string):void".
 	 */

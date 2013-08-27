@@ -3435,7 +3435,7 @@ class JavaScriptEmitter implements Emitter {
 
 			// emit reference to this for closures
 			// if funDef is NOT in another closure
-			if (funcDef.getParent() == null && funcDef.getClosures().length != 0)
+			if (funcDef.getParent() == null && (funcDef.flags() & ClassDefinition.IS_STATIC) == 0 && funcDef.getClosures().length != 0)
 				this._emit("var $this = this;\n", null);
 			// emit local variable declarations
 			var locals = funcDef.getLocals();
