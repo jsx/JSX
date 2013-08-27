@@ -3324,7 +3324,6 @@ class _LCSEOptimizeCommand extends _FunctionOptimizeCommand {
 		var getCacheKey = function (expr : Expression) : Nullable.<string> {
 			if (expr instanceof PropertyExpression) {
 				var propertyExpr = expr as PropertyExpression;
-				this.log(JSON.stringify(propertyExpr.getToken()));
 				var receiverType = propertyExpr.getExpr().getType();
 				if (Util.isNativeClass(receiverType)) {
 					return null;
