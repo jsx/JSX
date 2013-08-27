@@ -1490,12 +1490,16 @@ class _IfStatementTransformer extends _StatementTransformer {
 class _SwitchStatementTransformer extends _LabellableStatementTransformer {
 
 	var _statement : SwitchStatement;
-	var _escapeMap : Map.<number>;
 
 	function constructor (transformer : CodeTransformer, statement : SwitchStatement) {
 		super(transformer, "SWITCH");
 		this._statement = statement;
-		this._escapeMap = new Map.<number>;
+		// create and register a stash
+		statement.getStatements().forEach((statement) -> {
+			if (statement instanceof CaseStatement) {
+				statement.setStash(_SwitchStatementTransformer.CaseStash.ID, new _SwitchStatementTransformer.CaseStash); 
+			}
+		});
 	}
 
 	override function getStatement () : Statement {
@@ -1597,8 +1601,20 @@ class _SwitchStatementTransformer extends _LabellableStatementTransformer {
 		this._transformer.leaveLabelledBlock();
 	}
 
+	class CaseStash extends Stash {
+		static const ID = "CASE-ID";
+		static var count = 0;
+		var index : number;
+		function constructor () {
+			this.index = _SwitchStatementTransformer.CaseStash.count++;
+		}
+		override function clone () : Stash {
+			throw new Error("not supported");
+		}
+	}
+
 	function _getLabelFromCaseStatement (caseStmt : CaseStatement) : string {
-		return "$SWITCH_" + this.getID() as string + "_CASE_" + this.escapeCaseExpression(caseStmt.getExpr().getToken().getValue());
+		return "$SWITCH_" + this.getID() as string + "_CASE_" + (caseStmt.getStash(_SwitchStatementTransformer.CaseStash.ID) as _SwitchStatementTransformer.CaseStash).index;
 	}
 
 	function _getLabelFromDefaultStatement () : string {
@@ -1611,14 +1627,6 @@ class _SwitchStatementTransformer extends _LabellableStatementTransformer {
 
 	override function getContinuingLabel () : string {
 		throw new Error("logic flaw");
-	}
-
-	function escapeCaseExpression (value : string) : string {
-		if (value in this._escapeMap) {
-			return this._escapeMap[value] as string;
-		}
-		this._escapeMap[value] = this._escapeMap.keys().length;
-		return this._escapeMap[value] as string;
 	}
 
 }
