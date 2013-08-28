@@ -305,7 +305,12 @@ sub copy_r {
             if(modified($_, $d)) {
                 copy($_, $d);
                 my $st = stat($_);
-                utime $st->atime, $st->mtime, $d;
+                if ($st) {
+                    utime $st->atime, $st->mtime, $d;
+                }
+                else {
+                    warn "failed to stat($_): $!";
+                }
             }
         },
     }, $src;

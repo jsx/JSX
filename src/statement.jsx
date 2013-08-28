@@ -358,8 +358,15 @@ class ReturnStatement extends Statement {
 		} else if (returnType.equals(Type.voidType)) {
 			// handle return(void);
 			if (this._expr != null) {
-				context.errors.push(new CompileError(this._token, "cannot return a value from a void function"));
-				return true;
+				if (! this._analyzeExpr(context, this._expr))
+					return true;
+				var exprType = this._expr.getType();
+				if (exprType == null)
+					return true;
+				if (! exprType.equals(Type.voidType)) {
+					context.errors.push(new CompileError(this._token, "unmatched return type, expected a void expression"));
+					return true;
+				}
 			}
 		} else {
 			// handle return of values

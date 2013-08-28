@@ -1,7 +1,6 @@
 #!perl
 use strict;
 use warnings;
-use File::Temp qw(tempdir);
 use File::Copy qw(copy);
 
 use Test::More;
@@ -18,29 +17,29 @@ my @opts = (
 );
 
 {
-    my $tmpdir = tempdir('test.tmp.XXXXXX', CLEANUP => 1, DIR => ".");
+    my $tmpdir = "tmp";
     my @expected_src;
 
     # compile 2nd gens, and store the expected source (to be compared with the result of 3rd gens)
     for (my $gen2 = 0; $gen2 < @opts; $gen2++) {
         is compile(
             "bin/jsx",
-            "$tmpdir/gen2-$gen2",
+            "$tmpdir/gen2-$gen2.js",
             $opts[$gen2],
         ), 0, "create 2nd gen '$opts[$gen2]'";
-        $expected_src[$gen2] = slurp("$tmpdir/gen2-$gen2");
+        $expected_src[$gen2] = slurp("$tmpdir/gen2-$gen2.js");
     }
 
     # compile 3rd gens, and check their output
     for (my $gen2 = 0; $gen2 < @opts; $gen2++) {
         for (my $gen3 = 0; $gen3 < @opts; $gen3++) {
             is compile(
-                "$tmpdir/gen2-$gen2",
-                "$tmpdir/gen3.tmp",
+                "$tmpdir/gen2-$gen2.js",
+                "$tmpdir/gen3-$gen2.js",
                 $opts[$gen3],
             ), 0, "create 3rd gen '$opts[$gen3]' from 2nd gen '$opts[$gen2]'";
             ok(
-                $expected_src[$gen3] eq slurp("$tmpdir/gen3.tmp"),
+                $expected_src[$gen3] eq slurp("$tmpdir/gen3-$gen2.js"),
                 "output of 3rd gen is same for '$opts[$gen3]'"
             );
         }
