@@ -2972,7 +2972,7 @@ class _InlineOptimizeCommand extends _FunctionOptimizeCommand {
 	function _expandCallingFunction (callerFuncDef : MemberFunctionDefinition, statements : Statement[], stmtIndex : number, calleeFuncDef : MemberFunctionDefinition, argsAndThis : Expression[]) : number {
 		// clone statements of the calling function, while rewriting the identifiers with actual arguments
 		this.log("expanding " + calleeFuncDef.getNotation());
-		var argsAndThisAndLocals = argsAndThis.concat(new Expression[]);
+		var argsAndThisAndLocals = argsAndThis.concat([]);
 		this._createVarsAndInit(callerFuncDef, calleeFuncDef, argsAndThisAndLocals, (expr) -> {
 			// insert a statement that initializes the temporary var
 			statements.splice(stmtIndex++, 0, new ExpressionStatement(expr));
@@ -3128,8 +3128,9 @@ class _InlineOptimizeCommand extends _FunctionOptimizeCommand {
 	function _rewriteExpression (expr : Expression, replaceCb : function(:Expression):void, argsAndThisAndLocals : Expression[], calleeFuncDef : MemberFunctionDefinition) : boolean {
 		var formalArgs = calleeFuncDef.getArguments();
 		if (expr instanceof LocalExpression) {
+			var localExpr = expr as LocalExpression;
 			for (var j = 0; j < formalArgs.length; ++j) {
-				if (formalArgs[j].getName().getValue() == expr.getToken().getValue())
+				if (formalArgs[j].getName().getValue() == localExpr.getLocal().getName().getValue())
 					break;
 			}
 			if (j == formalArgs.length) {
@@ -3137,7 +3138,7 @@ class _InlineOptimizeCommand extends _FunctionOptimizeCommand {
 				var locals = calleeFuncDef.getLocals();
 				assert locals.length == argsAndThisAndLocals.length - j, locals.length as string + " vs " + (argsAndThisAndLocals.length as string + " - " + j as string) as string + " for " + calleeFuncDef.getNotation();
 				for (var k = 0; k < locals.length; ++k, ++j) {
-					if (locals[k].getName().getValue() == expr.getToken().getValue())
+					if (locals[k].getName().getValue() == localExpr.getLocal().getName().getValue())
 						break;
 				}
 			}

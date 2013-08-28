@@ -1268,7 +1268,7 @@ class MemberFunctionDefinition extends MemberDefinition implements Block {
 		var classDef = this.getClassDef();
 		var s = (classDef != null ? classDef.classFullName(): "<<unknown:"+(this._token.getFilename() ?: "?")+">>");
 		s += (this.flags() & ClassDefinition.IS_STATIC) != 0 ? "." : "#";
-		s += this.getNameToken() != null ? this.name() : "$" +  this.getToken().getLineNumber()  as string + "_" + this.getToken().getColumnNumber() as string;
+		s += this.getNameToken() != null ? this.name() : "$" +  this.getToken().getLineNumber() + "_" + this.getToken().getColumnNumber();
 		s += "(";
 		s += this._args.map.<string>(function (arg) {
 				return ":" + (arg.getType() ? arg.getType().toString() : "null");

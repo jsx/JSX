@@ -2210,12 +2210,12 @@ class CodeTransformer {
 
 	function createFreshArgumentDeclaration (type : Type) : ArgumentDeclaration {
 		var id = this._numUniqVar++;
-		return new ArgumentDeclaration(new Token("$a" + id as string, true), type);
+		return new ArgumentDeclaration(new Token("$a" + id, true), type);
 	}
 
 	function createFreshLocalVariable (type : Type) : LocalVariable {
 		var id = this._numUniqVar++;
-		return new LocalVariable(new Token("$a" + id as string, true), type);
+		return new LocalVariable(new Token("$a" + id, true), type);
 	}
 
 	function _getStatementTransformerFor (statement : Statement) : _StatementTransformer {
