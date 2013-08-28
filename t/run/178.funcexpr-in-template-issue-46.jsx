@@ -2,7 +2,7 @@
 0
 1
 2
-false
+true
 */
 mixin Enumerable.<T>  {
   abstract function each(f: (T) -> void): void;
@@ -13,7 +13,7 @@ mixin Enumerable.<T>  {
         result = false;
       }
     });
-    return false;
+    return result;
   }
 }
 class ArrayWrapper.<T> implements Enumerable.<T> {
