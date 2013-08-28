@@ -995,7 +995,7 @@ abstract class _StatementTransformer {
 	abstract function getStatement () : Statement;
 
 	function replaceControlStructuresWithGotos () : Statement[] {
-		if (! this._transformer._transformOnlyStmts) {
+		if (! this._transformer._transformExprs) {
 			var funcDef = this._transformer.getTransformingFuncDef();
 			this.getStatement().forEachExpression(function (expr, replaceCb) {
 				var identity = this._transformer._createIdentityFunction(funcDef, expr.getType());
@@ -1166,7 +1166,7 @@ class _DeleteStatementTransformer extends _StatementTransformer {
 
 	override function replaceControlStructuresWithGotos () : Statement[] {
 		var statement : Statement;
-		if (! this._transformer._transformOnlyStmts) {
+		if (! this._transformer._transformExprs) {
 			var funcDef = this._transformer.getTransformingFuncDef();
 			var aryExpr = this._statement.getExpr() as ArrayExpression;
 			var identity = this._transformer._createIdentityFunction(funcDef, aryExpr.getType());
@@ -1845,7 +1845,7 @@ class _DebuggerStatementTransformer extends _StatementTransformer {
 class CodeTransformer {
 
 	var _forceTransform : boolean;
-	var _transformOnlyStmts : boolean;
+	var _transformExprs : boolean;
 
 	var _compiler : Compiler;
 	var _emitter : Emitter;
@@ -1855,7 +1855,7 @@ class CodeTransformer {
 
 	function constructor () {
 		this._forceTransform = false;
-		this._transformOnlyStmts = true;
+		this._transformExprs = true;
 
 		this._stopIterationClassDef = null;
 		this._jsxGeneratorClassDef = null;
@@ -1925,10 +1925,10 @@ class CodeTransformer {
 
 	function performTransformation () : void {
 		if (this._forceTransform) {
-			var transformOnlyStmts = this._transformOnlyStmts;
+			var transformExprs = this._transformExprs;
 			try {
 				// force transform expressions
-				this._transformOnlyStmts = false;
+				this._transformExprs = false;
 
 				// transform functions as many as possible
 				this._getAllClosures().forEach((funcDef) -> {
@@ -1937,7 +1937,7 @@ class CodeTransformer {
 					}
 				});
 			} finally {
-				this._transformOnlyStmts = transformOnlyStmts;
+				this._transformExprs = transformExprs;
 			}
 		}
 		// transform generators
