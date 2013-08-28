@@ -71,8 +71,9 @@ abstract class _ExpressionTransformer {
 			var topExpr = null : Expression;
 			var rootFuncDef = null : MemberFunctionDefinition;
 			var prevFuncDef = parent;
+
 			for (var i = 0; i < exprs.length; ++i) {
-				var funcDef = this._createAnonymousFunction(prevFuncDef, [ newArgs[i] ], returnType);
+				var funcDef = this._transformer._createAnonymousFunction(prevFuncDef, this.getExpression().getToken(), [ newArgs[i] ], returnType);
 				if (rootFuncDef == null) {
 					rootFuncDef = funcDef;
 				}
@@ -123,23 +124,6 @@ abstract class _ExpressionTransformer {
 
 	function _constructOp (exprs : Expression[]) : Expression {
 		throw new Error("logic flaw");
-	}
-
-	function _createAnonymousFunction (parent : MemberFunctionDefinition, args : ArgumentDeclaration[], returnType : Type) : MemberFunctionDefinition {
-		var funcDef = new MemberFunctionDefinition(
-			this.getExpression().getToken(),
-			null, // name
-			ClassDefinition.IS_STATIC,
-			returnType,
-			args,
-			[], // locals
-			[], // statements
-			[], // closures
-			null,
-			null
-		);
-		Util.linkFunction(funcDef, parent);
-		return funcDef;
 	}
 
 	function _createCall1 (proc : Expression, arg : Expression) : CallExpression {
@@ -210,7 +194,7 @@ class _MapLiteralExpressionTransformer extends _ExpressionTransformer {
 	}
 
 	override function doCPSTransform (parent : MemberFunctionDefinition, continuation : Expression) : Expression {
-		return this._transformOp(parent, continuation, this._expr.getElements().map.<Expression>((elt) -> elt.getExpr()));
+		return this._transformOp(parent, continuation, this._expr.getElements().map((elt) -> elt.getExpr()));
 	}
 
 	override function _constructOp (exprs : Expression[]) : Expression {
@@ -690,19 +674,8 @@ a | function ($a) { var $C = C; return $a ? ($a as boolean) | $C : (b as boolean
 		var argVar = this._transformer.createFreshArgumentDeclaration(this._expr.getFirstExpr().getType());
 		var contVar = this._transformer.createFreshLocalVariable(continuation.getType());
 
-		var contFuncDef = new MemberFunctionDefinition(
-			new Token("function", false),
-			null,	// name
-			ClassDefinition.IS_STATIC,
-			this._transformer.getTransformingFuncDef().getReturnType(),
-			[ argVar ],
-			[ contVar ],
-			[],	// statements
-			[],	// closures
-			null,
-			null
-		);
-		Util.linkFunction(contFuncDef, parent);
+		var contFuncDef = this._transformer._createAnonymousFunction(parent, null, [ argVar ], this._transformer.getTransformingFuncDef().getReturnType());
+		contFuncDef.getLocals().push(contVar);
 
 		// `var $C = C;`
 		var condStmt = new ExpressionStatement(
@@ -794,19 +767,8 @@ a | function ($a) { var $C = C; return $a ? b | $C : c | $C; }
 		var argVar = this._transformer.createFreshArgumentDeclaration(this._expr.getCondExpr().getType());
 		var contVar = this._transformer.createFreshLocalVariable(continuation.getType());
 
-		var contFuncDef = new MemberFunctionDefinition(
-			new Token("function", false),
-			null,	// name
-			ClassDefinition.IS_STATIC,
-			this._transformer.getTransformingFuncDef().getReturnType(),
-			[ argVar ],
-			[ contVar ],
-			[],	// statements
-			[],	// closures
-			null,
-			null
-		);
-		Util.linkFunction(contFuncDef, parent);
+		var contFuncDef = this._transformer._createAnonymousFunction(parent, null, [ argVar ], this._transformer.getTransformingFuncDef().getReturnType());
+		contFuncDef.getLocals().push(contVar);
 
 		// `var $C = C;`
 		var condStmt = new ExpressionStatement(
@@ -2047,6 +2009,7 @@ class CodeTransformer {
 		var currentLabel : LabelStatement = null;
 		while (i < statements.length) {
 			var currentLabel = statements[i] as LabelStatement;
+
 			// read the block
 			var body = new Statement[];
 			++i;
@@ -2057,19 +2020,10 @@ class CodeTransformer {
 				body.push(statements[i]);
 			}
 			postFragmentationCallback(currentLabel.getName(), body);
-			var block = new MemberFunctionDefinition(
-						new Token("function", false),
-						null, // name
-						ClassDefinition.IS_STATIC,
-						this._transformingFuncDef.getReturnType(),
-						[],   // args
-						[],   // locals
-						body,
-						[],   // closures
-						null, // last token
-						null
-			);
-			Util.linkFunction(block, funcDef);
+
+			// create a function block
+			var block = this._createAnonymousFunction(funcDef, null, [], this._transformingFuncDef.getReturnType());
+			block._statements = body;
 			codeBlocks.push(new ExpressionStatement(
 				new AssignmentExpression(
 					new Token("=", false),
@@ -2384,6 +2338,26 @@ class CodeTransformer {
 		else if (expr instanceof CommaExpression)
 			return new _CommaExpressionTransformer(this, expr as CommaExpression);
 		throw new Error("got unexpected type of expression: " + (expr != null ? JSON.stringify(expr.serialize()) : expr.toString()));
+	}
+
+	function _createAnonymousFunction (parent : MemberFunctionDefinition, token : Token /* null for auto-gen */, args : ArgumentDeclaration[], returnType : Type) : MemberFunctionDefinition {
+		if (token == null) {
+			token = new Token("function", false);
+		}
+		var funcDef = new MemberFunctionDefinition(
+			token,
+			null, // name
+			ClassDefinition.IS_STATIC,
+			returnType,
+			args,
+			[], // locals
+			[], // statements
+			[], // closures
+			null,
+			null
+		);
+		Util.linkFunction(funcDef, parent);
+		return funcDef;
 	}
 
 	function _createIdentityFunction (parent : MemberFunctionDefinition, type : Type) : FunctionExpression {
