@@ -58,7 +58,7 @@ test-transformed:
 	JSX_OPTS="--enable-cps-transform" $(MAKE) test-core
 
 test-transformed-optimized:
-	JSX_OPTS="--enable-cps-transform --release --disable-optimize no-log,no-assert" $(MAKE) test-core
+	JSX_OPTS="--enable-cps-transform --optimize release --disable-optimize no-log,no-assert" $(MAKE) test-core
 
 test-core:
 	$(PROVE) --jobs "$(JOBS)" t/run/*.jsx t/compile_error/*.jsx t/lib/*.jsx t/src/*.jsx t/web/*.jsx
