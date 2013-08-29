@@ -70,6 +70,12 @@ abstract class _MultiaryOperatorTransformer extends _ExpressionTransformer {
 		super(transformer, identifier);
 	}
 
+	final override function doCPSTransform (parent : MemberFunctionDefinition, continuation : Expression) : Expression {
+		return this.transformOp(parent, continuation, this.getArgumentExprs());
+	}
+
+	abstract function getArgumentExprs () : Expression[];
+
 	function transformOp (parent : MemberFunctionDefinition, continuation : Expression, exprs : Expression[]) : Expression {
 		if (exprs.length == 0) {
 			return this._createCall1(continuation, this.constructOp([]));
@@ -163,8 +169,8 @@ class _LeafExpressionTransformer extends _MultiaryOperatorTransformer {
 		return this._expr;
 	}
 
-	override function doCPSTransform (parent : MemberFunctionDefinition, continuation : Expression) : Expression {
-		return this.transformOp(parent, continuation, []);
+	override function getArgumentExprs () : Expression[] {
+		return new Expression[];
 	}
 
 	override function constructOp (exprs : Expression[]) : Expression {
@@ -187,8 +193,8 @@ class _ArrayLiteralExpressionTransformer extends _MultiaryOperatorTransformer {
 		return this._expr;
 	}
 
-	override function doCPSTransform (parent : MemberFunctionDefinition, continuation : Expression) : Expression {
-		return this.transformOp(parent, continuation, this._expr.getExprs());
+	override function getArgumentExprs () : Expression[] {
+		return this._expr.getExprs();
 	}
 
 	override function constructOp (exprs : Expression[]) : Expression {
@@ -212,8 +218,8 @@ class _MapLiteralExpressionTransformer extends _MultiaryOperatorTransformer {
 		return this._expr;
 	}
 
-	override function doCPSTransform (parent : MemberFunctionDefinition, continuation : Expression) : Expression {
-		return this.transformOp(parent, continuation, this._expr.getElements().map((elt) -> elt.getExpr()));
+	override function getArgumentExprs () : Expression[] {
+		return this._expr.getElements().map((elt) -> elt.getExpr());
 	}
 
 	override function constructOp (exprs : Expression[]) : Expression {
@@ -240,8 +246,8 @@ class _FunctionExpressionTransformer extends _MultiaryOperatorTransformer {
 		return this._expr;
 	}
 
-	override function doCPSTransform (parent : MemberFunctionDefinition, continuation : Expression) : Expression {
-		return this.transformOp(parent, continuation, []);
+	override function getArgumentExprs () : Expression[] {
+		return new Expression[];
 	}
 
 	override function constructOp (exprs : Expression[]) : Expression {
@@ -264,18 +270,18 @@ abstract class _UnaryExpressionTransformer extends _MultiaryOperatorTransformer 
 		return this._expr;
 	}
 
-	override function doCPSTransform (parent : MemberFunctionDefinition, continuation : Expression) : Expression {
+	override function getArgumentExprs () : Expression[] {
+		return [ this._expr.getExpr() ];
+	}
+
+	override function constructOp (exprs : Expression[]) : Expression {
+		assert exprs.length == 1;
+
 		/*
 		  op(v) | C
 
 		  v | function ($v) { return C(op($v)); }
 		*/
-
-		return this.transformOp(parent, continuation, [ this._expr.getExpr() ]);
-	}
-
-	override function constructOp (exprs : Expression[]) : Expression {
-		assert exprs.length == 1;
 
 		return this._clone(exprs[0]);
 	}
@@ -350,7 +356,7 @@ abstract class _IncrementExpressionTransformer extends _UnaryExpressionTransform
 		super(transformer, expr);
 	}
 
-	override function doCPSTransform (parent : MemberFunctionDefinition, continuation : Expression) : Expression {
+	override function getArgumentExprs () : Expression[] {
 		// expr must be of any of type 'local', 'property', and 'array'
 
 		var expr = this._expr.getExpr();
@@ -361,7 +367,7 @@ abstract class _IncrementExpressionTransformer extends _UnaryExpressionTransform
 			  C(local_or_classvar++)
 			*/
 
-			return this.transformOp(parent, continuation, []);
+			return new Expression[];
 		} else if (expr instanceof PropertyExpression) {
 			/*
 			  E.prop++ | C
@@ -369,7 +375,7 @@ abstract class _IncrementExpressionTransformer extends _UnaryExpressionTransform
 			  E | function ($1) { return C($1.prop++); }
 			*/
 
-			return this.transformOp(parent, continuation, [ (expr as PropertyExpression).getExpr() ]);
+			return [ (expr as PropertyExpression).getExpr() ];
 		} else if (expr instanceof ArrayExpression) {
 			/*
 			  E1[E2]++ | C
@@ -377,7 +383,7 @@ abstract class _IncrementExpressionTransformer extends _UnaryExpressionTransform
 			  E1 | function ($1) { return E2 | function ($2) { return C($1[$2]++); }; }
 			*/
 			var arrayExpr = expr as ArrayExpression;
-			return this.transformOp(parent, continuation, [ arrayExpr.getFirstExpr(), arrayExpr.getSecondExpr() ]);
+			return [ arrayExpr.getFirstExpr(), arrayExpr.getSecondExpr() ];
 		} else {
 			throw new Error("logic flaw");
 		}
@@ -427,28 +433,43 @@ class _PreIncrementExpressionTransformer extends _IncrementExpressionTransformer
 
 }
 
-class _PropertyExpressionTransformer extends _UnaryExpressionTransformer {
+class _PropertyExpressionTransformer extends _MultiaryOperatorTransformer {
+
+	var _expr : PropertyExpression;
 
 	function constructor (transformer : CodeTransformer, expr : PropertyExpression) {
-		super(transformer, expr);
+		super(transformer, "PROPERTY");
+		this._expr = expr;
 	}
 
-	override function doCPSTransform (parent : MemberFunctionDefinition, continuation : Expression) : Expression {
+	override function getExpression () : PropertyExpression {
+		return this._expr;
+	}
+
+	override function getArgumentExprs () : Expression[] {
 		// member method
 		if (this._expr.getType() instanceof MemberFunctionType) {
 			throw new Error("logic flaw");
 		}
 		// static member
 		if (this._expr.getExpr().isClassSpecifier()) {
-			return this._createCall1(continuation, this._expr);
+			return new Expression[];
+		} else {
+			return [ this._expr.getExpr() ];
 		}
-		return super.doCPSTransform(parent, continuation);
 	}
 
-	override function _clone (arg : Expression) : UnaryExpression {
-		var propExpr = new PropertyExpression(this._expr.getToken(), arg, (this._expr as PropertyExpression).getIdentifierToken(), (this._expr as PropertyExpression).getTypeArguments(), this._expr.getType());
-		propExpr._isInner = (this._expr as PropertyExpression)._isInner;
-		return propExpr;
+	override function constructOp (exprs : Expression[]) : Expression {
+		// static member
+		if (this._expr.getExpr().isClassSpecifier()) {
+			assert exprs.length == 0;
+			return this._expr;
+		} else {
+			assert exprs.length == 1;
+			var propExpr = new PropertyExpression(this._expr.getToken(), exprs[0], (this._expr as PropertyExpression).getIdentifierToken(), (this._expr as PropertyExpression).getTypeArguments(), this._expr.getType());
+			propExpr._isInner = (this._expr as PropertyExpression)._isInner;
+			return propExpr;
+		}
 	}
 
 }
@@ -490,7 +511,12 @@ abstract class _BinaryExpressionTransformer extends _MultiaryOperatorTransformer
 		return this._expr;
 	}
 
-	override function doCPSTransform (parent : MemberFunctionDefinition, continuation : Expression) : Expression {
+	override function getArgumentExprs () : Expression[] {
+		return [ this._expr.getFirstExpr(), this._expr.getSecondExpr() ];
+	}
+
+	override function constructOp (exprs : Expression[]) : Expression {
+		assert exprs.length == 2;
 		/*
 		  op(E1,E2) | C
 
@@ -499,11 +525,6 @@ abstract class _BinaryExpressionTransformer extends _MultiaryOperatorTransformer
 		       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^cont1^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 		*/
 
-		return this.transformOp(parent, continuation, [ this._expr.getFirstExpr(), this._expr.getSecondExpr() ]);
-	}
-
-	override function constructOp (exprs : Expression[]) : Expression {
-		assert exprs.length == 2;
 		return this._clone(exprs[0], exprs[1]);
 	}
 
@@ -552,50 +573,35 @@ class _AssignmentExpressionTransformer extends _MultiaryOperatorTransformer {
 		return this._expr;
 	}
 
-	override function doCPSTransform (parent : MemberFunctionDefinition, continuation : Expression) : Expression {
+	override function getArgumentExprs () : Expression[] {
 		// LHS expr must be of any of type 'local', 'property', and 'array'
 
 		var lhsExpr = this._expr.getFirstExpr();
 		if (lhsExpr instanceof LocalExpression || (lhsExpr instanceof PropertyExpression && (lhsExpr as PropertyExpression).getExpr().isClassSpecifier())) {
-			return this._transformSimpleAssignment(parent, continuation);
+			/*
+			  local_or_classvar = E | C
+
+			  E | function ($1) { return C(local_or_classvar = $1); }
+			*/
+			return [ this._expr.getSecondExpr() ];
 		} else if (lhsExpr instanceof PropertyExpression) {
-			return this._transformPropertyAssignment(parent, continuation);
+			/*
+			  E1.prop = E2 | C
+
+			  E1 | function ($1) { return E2 | function ($2) { return C($1.prop = $2); }; }
+			*/
+			return [ (this._expr.getFirstExpr() as PropertyExpression).getExpr(), this._expr.getSecondExpr() ];
 		} else if (lhsExpr instanceof ArrayExpression) {
-			return this._transformArrayAssignment(parent, continuation);
+			/*
+			  E1[E2] = E3 | C
+
+			  E1 | function ($1) { return E2 | function ($2) { return E3 | function ($3) { return C($1[$2] = $3); }; }; }
+			*/
+			var arrayExpr = this._expr.getFirstExpr() as ArrayExpression;
+			return [ arrayExpr.getFirstExpr(), arrayExpr.getSecondExpr(), this._expr.getSecondExpr() ];
 		} else {
 			throw new Error("logic flaw");
 		}
-	}
-
-	function _transformSimpleAssignment (parent : MemberFunctionDefinition, continuation : Expression) : Expression {
-		/*
-		  local_or_classvar = E | C
-
-		  E | function ($1) { return C(local_or_classvar = $1); }
-		*/
-
-		return this.transformOp(parent, continuation, [ this._expr.getSecondExpr() ]);
-	}
-
-	function _transformPropertyAssignment (parent : MemberFunctionDefinition, continuation : Expression) : Expression {
-		/*
-		  E1.prop = E2 | C
-
-		  E1 | function ($1) { return E2 | function ($2) { return C($1.prop = $2); }; }
-		*/
-
-		return this.transformOp(parent, continuation, [ (this._expr.getFirstExpr() as PropertyExpression).getExpr(), this._expr.getSecondExpr() ]);
-	}
-
-	function _transformArrayAssignment (parent : MemberFunctionDefinition, continuation : Expression) : Expression {
-		/*
-		  E1[E2] = E3 | C
-
-		  E1 | function ($1) { return E2 | function ($2) { return E3 | function ($3) { return C($1[$2] = $3); }; }; }
-		*/
-
-		var arrayExpr = this._expr.getFirstExpr() as ArrayExpression;
-		return this.transformOp(parent, continuation, [ arrayExpr.getFirstExpr(), arrayExpr.getSecondExpr(), this._expr.getSecondExpr() ]);
 	}
 
 	override function constructOp (exprs : Expression[]) : Expression {
@@ -855,18 +861,17 @@ class _CallExpressionTransformer extends _MultiaryOperatorTransformer {
 		return false;
 	}
 
-	override function doCPSTransform (parent : MemberFunctionDefinition, continuation : Expression) : Expression {
+	override function getArgumentExprs () : Expression[] {
 		// method calls considered primitive operation
 		if (this._isMethodCall()) {
 			// method calls
 			var receiver = (this._expr.getExpr() as PropertyExpression).getExpr();
-			return this.transformOp(parent, continuation, [ receiver ].concat(this._expr.getArguments()));
+			return [ receiver ].concat(this._expr.getArguments());
 		} else if (this._transformer.getEmitter().isSpecialCall(this._expr)) {
-			return this.transformOp(parent, continuation, this._expr.getArguments().concat([]));
+			return this._expr.getArguments().concat([]);
 		} else {
-			return this.transformOp(parent, continuation, [ this._expr.getExpr() ].concat(this._expr.getArguments()));
+			return [ this._expr.getExpr() ].concat(this._expr.getArguments());
 		}
-
 	}
 
 	override function constructOp (exprs : Expression[]) : Expression {
@@ -898,8 +903,8 @@ class _SuperExpressionTransformer extends _MultiaryOperatorTransformer {
 		return this._expr;
 	}
 
-	override function doCPSTransform (parent : MemberFunctionDefinition, continuation : Expression) : Expression {
-		return this.transformOp(parent, continuation, this._expr.getArguments());
+	override function getArgumentExprs () : Expression[] {
+		return this._expr.getArguments();
 	}
 
 	override function constructOp (exprs : Expression[]) : Expression {
@@ -923,8 +928,8 @@ class _NewExpressionTransformer extends _MultiaryOperatorTransformer {
 		return this._expr;
 	}
 
-	override function doCPSTransform (parent : MemberFunctionDefinition, continuation : Expression) : Expression {
-		return this.transformOp(parent, continuation, this._expr.getArguments());
+	override function getArgumentExprs () : Expression[] {
+		return this._expr.getArguments();
 	}
 
 	override function constructOp (exprs : Expression[]) : Expression {
@@ -948,8 +953,8 @@ class _CommaExpressionTransformer extends _MultiaryOperatorTransformer {
 		return this._expr;
 	}
 
-	override function doCPSTransform (parent : MemberFunctionDefinition, continuation : Expression) : Expression {
-		return this.transformOp(parent, continuation, [ this._expr.getFirstExpr(), this._expr.getSecondExpr() ]);
+	override function getArgumentExprs () : Expression[] {
+		return [ this._expr.getFirstExpr(), this._expr.getSecondExpr() ];
 	}
 
 	override function constructOp (exprs : Expression[]) : Expression {
