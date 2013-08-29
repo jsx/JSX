@@ -54,76 +54,84 @@ abstract class _ExpressionTransformer {
 
 	abstract function doCPSTransform (parent : MemberFunctionDefinition, continuation : Expression) : Expression;
 
-	var _continuation : Expression;
-
 	function transformOp (parent : MemberFunctionDefinition, continuation : Expression, exprs : Expression[]) : Expression {
-		this._continuation = continuation;
-
-		var returnType;
-		if (! (continuation.getType() instanceof ResolvedFunctionType)) {
-			throw new Error("logic flaw");
+		if (exprs.length == 0) {
+			return this._createCall1(continuation, this.constructOp([]));
 		}
-		returnType = (continuation.getType() as ResolvedFunctionType).getReturnType();
+		else {
+			var returnType;
+			if (! (continuation.getType() instanceof ResolvedFunctionType)) {
+				throw new Error("logic flaw");
+			}
+			returnType = (continuation.getType() as ResolvedFunctionType).getReturnType();
 
-		return this._transformArgs(parent, exprs, returnType);
+			// do cps-transformation against operands first; and then construct and inject a new body into the result
+			var result = new Map.<variant>;
+			this._transformArgs(parent, exprs, returnType, result);
+			this._injectBody(
+				result['newArgs'] as Expression[],
+				result['topExpr'] as Expression,
+				result['topFuncDef'] as MemberFunctionDefinition,
+				result['botFuncDef'] as MemberFunctionDefinition,
+				continuation);
+			return result['topExpr'] as Expression;
+		}
 	}
 
 	function constructOp (exprs : Expression[]) : Expression {
 		throw new Error("logic flaw");
 	}
 
-	function _transformArgs (parent : MemberFunctionDefinition, exprs : Expression[], returnType : Type) : Expression {
-		if (exprs.length == 0) {
-			return this._constructBody([], null, null, null);
+	function _transformArgs (parent : MemberFunctionDefinition, exprs : Expression[], returnType : Type, result : Map.<variant>) : void {
+		assert exprs.length > 0;
+
+		var newArgs = new ArgumentDeclaration[];
+		for (var i = 0; i < exprs.length; ++i) {
+			newArgs.push(this._transformer.createFreshArgumentDeclaration(exprs[i].getType()));
 		}
-		else {
-			var newArgs = new ArgumentDeclaration[];
-			for (var i = 0; i < exprs.length; ++i) {
-				newArgs.push(this._transformer.createFreshArgumentDeclaration(exprs[i].getType()));
-			}
-			var newArgLocals = new Expression[];
-			for (var i = 0; i < exprs.length; ++i) {
-				newArgLocals.push(new LocalExpression(exprs[i].getToken(), newArgs[i]));
-			}
-
-			var topExpr = null : Expression;
-			var rootFuncDef = null : MemberFunctionDefinition;
-			var prevFuncDef = parent;
-
-			for (var i = 0; i < exprs.length; ++i) {
-				var funcDef = this._transformer._createAnonymousFunction(prevFuncDef, this.getExpression().getToken(), [ newArgs[i] ], returnType);
-				if (rootFuncDef == null) {
-					rootFuncDef = funcDef;
-				}
-				var cont = new FunctionExpression(funcDef.getToken(), funcDef);
-				var body = this._transformer._getExpressionTransformerFor(exprs[i]).doCPSTransform(prevFuncDef, cont);
-				if (i == 0) {
-					topExpr = body;
-				} else  {
-					prevFuncDef.getStatements().push(new ReturnStatement(new Token("return", false), body));
-				}
-				prevFuncDef = funcDef;
-			}
-
-			assert topExpr != null;
-			assert rootFuncDef != null;
-			assert prevFuncDef != parent;
-
-			// small hack for source map
-			topExpr._token = this.getExpression().getToken();
-
-			return this._constructBody(newArgLocals, topExpr, rootFuncDef, prevFuncDef);
+		var newArgLocals = new Expression[];
+		for (var i = 0; i < exprs.length; ++i) {
+			newArgLocals.push(new LocalExpression(exprs[i].getToken(), newArgs[i]));
 		}
+
+		var topExpr = null : Expression;
+		var rootFuncDef = null : MemberFunctionDefinition;
+		var prevFuncDef = parent;
+
+		for (var i = 0; i < exprs.length; ++i) {
+			var funcDef = this._transformer._createAnonymousFunction(prevFuncDef, this.getExpression().getToken(), [ newArgs[i] ], returnType);
+			if (rootFuncDef == null) {
+				rootFuncDef = funcDef;
+			}
+			var cont = new FunctionExpression(funcDef.getToken(), funcDef);
+			var body = this._transformer._getExpressionTransformerFor(exprs[i]).doCPSTransform(prevFuncDef, cont);
+			if (i == 0) {
+				topExpr = body;
+			} else  {
+				prevFuncDef.getStatements().push(new ReturnStatement(new Token("return", false), body));
+			}
+			prevFuncDef = funcDef;
+		}
+
+		assert topExpr != null;
+		assert rootFuncDef != null;
+		assert prevFuncDef != parent;
+
+		// small hack for source map
+		topExpr._token = this.getExpression().getToken();
+
+		result['newArgs'] = newArgLocals;
+		result['topExpr'] = topExpr;
+		result['topFuncDef'] = rootFuncDef;
+		result['botFuncDef'] = prevFuncDef;
 	}
 
-	function _constructBody (args : Expression[], topExpr : Expression, topFuncDef : MemberFunctionDefinition, botFuncDef : MemberFunctionDefinition) : Expression {
-		var body = this._createCall1(this._continuation, this.constructOp(args));
-		if (args.length == 0) {
-			return body;
-		}
+	function _injectBody (args : Expression[], topExpr : Expression, topFuncDef : MemberFunctionDefinition, botFuncDef : MemberFunctionDefinition, continuation : Expression) : void {
+		assert args.length > 0;
+
+		var body = this._createCall1(continuation, this.constructOp(args));
 		botFuncDef._statements = [ new ReturnStatement(new Token("return", false), body) ] : Statement[];
 		Util.rebaseClosures(topFuncDef, botFuncDef);
-		return topExpr;
 	}
 
 	function _createCall1 (proc : Expression, arg : Expression) : CallExpression {
@@ -1163,10 +1171,9 @@ class _DeleteStatementTransformer extends _StatementTransformer {
 			this._statement = statement;
 		}
 
-		override function _constructBody (args : Expression[], topExpr : Expression, topFuncDef : MemberFunctionDefinition, botFuncDef : MemberFunctionDefinition) : Expression {
+		override function _injectBody (args : Expression[], topExpr : Expression, topFuncDef : MemberFunctionDefinition, botFuncDef : MemberFunctionDefinition, continuation : Expression) : void {
 			botFuncDef._statements = [ new DeleteStatement(this._statement.getToken(), this.constructOp(args)) ] : Statement[];
 			Util.rebaseClosures(topFuncDef, botFuncDef);
-			return topExpr;
 		}
 
 		override function _clone (arg1 : Expression, arg2 : Expression) : BinaryExpression {
