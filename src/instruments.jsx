@@ -79,7 +79,7 @@ abstract class _MultiaryOperatorTransformer extends _ExpressionTransformer {
 			}
 			returnType = (continuation.getType() as ResolvedFunctionType).getReturnType();
 
-			// do cps-transformation against operands first; and then construct and inject a new body into the result
+			// do cps-transformation against operands first; and then construct a new body to inject into the result
 			var result = new Map.<variant>;
 			this._transformArgs(parent, exprs, returnType, result);
 			this._injectBody(
