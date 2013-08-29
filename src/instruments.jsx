@@ -2361,6 +2361,8 @@ class CodeTransformer {
 	}
 
 	function _createIdentityFunction (parent : MemberFunctionDefinition, type : Type) : FunctionExpression {
+		assert ! type.equals(Type.voidType);
+
 		var arg = this.createFreshArgumentDeclaration(type);
 		var identity = new MemberFunctionDefinition(
 			new Token("function", false),
