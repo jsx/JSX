@@ -1687,12 +1687,7 @@ class MemberFunctionDefinition extends MemberDefinition implements Block {
 
 				var methodRef = new PropertyExpression(new Token(".", false), invocant, this.getNameToken(), this.getArgumentTypes());
 				var callExpression = new CallExpression(new Token("(", false), methodRef, argExprs);
-				if (this.getReturnType() != Type.voidType) {
-					statement = new ReturnStatement(new Token("return", false), callExpression);
-				}
-				else {
-					statement = new ExpressionStatement(callExpression);
-				}
+				statement = new ReturnStatement(new Token("return", false), callExpression);
 			}
 			// build function
 			if (!(this instanceof TemplateFunctionDefinition)) {
