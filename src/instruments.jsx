@@ -150,7 +150,12 @@ class _LeafExpressionTransformer extends _ExpressionTransformer {
 	}
 
 	override function doCPSTransform (parent : MemberFunctionDefinition, continuation : Expression) : Expression {
-		return this._createCall1(continuation, this._expr);
+		return this.transformOp(parent, continuation, []);
+	}
+
+	override function constructOp (exprs : Expression[]) : Expression {
+		assert exprs.length == 0;
+		return this._expr;
 	}
 
 }
@@ -222,7 +227,12 @@ class _FunctionExpressionTransformer extends _ExpressionTransformer {
 	}
 
 	override function doCPSTransform (parent : MemberFunctionDefinition, continuation : Expression) : Expression {
-		return this._createCall1(continuation, this._expr);
+		return this.transformOp(parent, continuation, []);
+	}
+
+	override function constructOp (exprs : Expression[]) : Expression {
+		assert exprs.length == 0;
+		return this._expr;
 	}
 
 }
@@ -337,7 +347,7 @@ abstract class _IncrementExpressionTransformer extends _UnaryExpressionTransform
 			  C(local_or_classvar++)
 			*/
 
-			return this._createCall1(continuation, this._expr);
+			return this.transformOp(parent, continuation, []);
 		} else if (expr instanceof PropertyExpression) {
 			/*
 			  E.prop++ | C
@@ -372,7 +382,8 @@ abstract class _IncrementExpressionTransformer extends _UnaryExpressionTransform
 			arrayExpr._type = expr.getType();
 			return this._clone(arrayExpr);
 		} else {
-			throw new Error("logic flaw");
+			assert exprs.length == 0;
+			return this._expr;
 		}
 	}
 
