@@ -1141,12 +1141,23 @@ class _ReturnStatementTransformer extends _StatementTransformer {
 		var statements = new Statement[];
 		if (this._statement.getExpr() != null) {
 			var returnLocal = this._transformer.getTopReturnLocal();
-			assert returnLocal != null;
-			statements.push(new ExpressionStatement(
-				new AssignmentExpression(
-					new Token("=", false),
-					new LocalExpression(returnLocal.getName(), returnLocal),
-					this._statement.getExpr())));
+
+			/* returnLocal should be null when the return statement is declared like this:
+			 *
+			 *     function foo () : void {
+			 *         return bar(); // bar returns void
+			 *     }
+			 */
+			if (returnLocal == null) {
+				statements.push(new ExpressionStatement(this._statement.getExpr()));
+			}
+			else {
+				statements.push(new ExpressionStatement(
+					new AssignmentExpression(
+						new Token("=", false),
+						new LocalExpression(returnLocal.getName(), returnLocal),
+						this._statement.getExpr())));
+			}
 		}
 		statements.push(new GotoStatement("$END"));
 
