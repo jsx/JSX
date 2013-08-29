@@ -54,6 +54,22 @@ abstract class _ExpressionTransformer {
 
 	abstract function doCPSTransform (parent : MemberFunctionDefinition, continuation : Expression) : Expression;
 
+	function _createCall1 (proc : Expression, arg : Expression) : CallExpression {
+		return new CallExpression(
+			arg.getToken(),
+			proc,
+			[ arg ] : Expression[]
+		);
+	}
+
+}
+
+abstract class _MultiaryOperatorTransformer extends _ExpressionTransformer {
+
+	function constructor (transformer : CodeTransformer, identifier : string) {
+		super(transformer, identifier);
+	}
+
 	function transformOp (parent : MemberFunctionDefinition, continuation : Expression, exprs : Expression[]) : Expression {
 		if (exprs.length == 0) {
 			return this._createCall1(continuation, this.constructOp([]));
@@ -78,9 +94,7 @@ abstract class _ExpressionTransformer {
 		}
 	}
 
-	function constructOp (exprs : Expression[]) : Expression {
-		throw new Error("logic flaw");
-	}
+	abstract function constructOp (exprs : Expression[]) : Expression;
 
 	function _transformArgs (parent : MemberFunctionDefinition, exprs : Expression[], returnType : Type, result : Map.<variant>) : void {
 		assert exprs.length > 0;
@@ -134,17 +148,9 @@ abstract class _ExpressionTransformer {
 		Util.rebaseClosures(topFuncDef, botFuncDef);
 	}
 
-	function _createCall1 (proc : Expression, arg : Expression) : CallExpression {
-		return new CallExpression(
-			arg.getToken(),
-			proc,
-			[ arg ] : Expression[]
-		);
-	}
-
 }
 
-class _LeafExpressionTransformer extends _ExpressionTransformer {
+class _LeafExpressionTransformer extends _MultiaryOperatorTransformer {
 
 	var _expr : LeafExpression;
 
@@ -168,7 +174,7 @@ class _LeafExpressionTransformer extends _ExpressionTransformer {
 
 }
 
-class _ArrayLiteralExpressionTransformer extends _ExpressionTransformer {
+class _ArrayLiteralExpressionTransformer extends _MultiaryOperatorTransformer {
 
 	var _expr : ArrayLiteralExpression;
 
@@ -193,7 +199,7 @@ class _ArrayLiteralExpressionTransformer extends _ExpressionTransformer {
 
 }
 
-class _MapLiteralExpressionTransformer extends _ExpressionTransformer {
+class _MapLiteralExpressionTransformer extends _MultiaryOperatorTransformer {
 
 	var _expr : MapLiteralExpression;
 
@@ -221,7 +227,7 @@ class _MapLiteralExpressionTransformer extends _ExpressionTransformer {
 
 }
 
-class _FunctionExpressionTransformer extends _ExpressionTransformer {
+class _FunctionExpressionTransformer extends _MultiaryOperatorTransformer {
 
 	var _expr : FunctionExpression;
 
@@ -245,7 +251,7 @@ class _FunctionExpressionTransformer extends _ExpressionTransformer {
 
 }
 
-abstract class _UnaryExpressionTransformer extends _ExpressionTransformer {
+abstract class _UnaryExpressionTransformer extends _MultiaryOperatorTransformer {
 
 	var _expr : UnaryExpression;
 
@@ -471,7 +477,7 @@ class _SignExpressionTransformer extends _UnaryExpressionTransformer {
 
 }
 
-abstract class _BinaryExpressionTransformer extends _ExpressionTransformer {
+abstract class _BinaryExpressionTransformer extends _MultiaryOperatorTransformer {
 
 	var _expr : BinaryExpression;
 
@@ -533,7 +539,7 @@ class _ArrayExpressionTransformer extends _BinaryExpressionTransformer {
 
 }
 
-class _AssignmentExpressionTransformer extends _ExpressionTransformer {
+class _AssignmentExpressionTransformer extends _MultiaryOperatorTransformer {
 
 	var _expr : AssignmentExpression;
 
@@ -826,7 +832,7 @@ a | function ($a) { var $C = C; return $a ? b | $C : c | $C; }
 
 }
 
-class _CallExpressionTransformer extends _ExpressionTransformer {
+class _CallExpressionTransformer extends _MultiaryOperatorTransformer {
 
 	var _expr : CallExpression;
 
@@ -879,7 +885,7 @@ class _CallExpressionTransformer extends _ExpressionTransformer {
 
 }
 
-class _SuperExpressionTransformer extends _ExpressionTransformer {
+class _SuperExpressionTransformer extends _MultiaryOperatorTransformer {
 
 	var _expr : SuperExpression;
 
@@ -904,7 +910,7 @@ class _SuperExpressionTransformer extends _ExpressionTransformer {
 
 }
 
-class _NewExpressionTransformer extends _ExpressionTransformer {
+class _NewExpressionTransformer extends _MultiaryOperatorTransformer {
 
 	var _expr : NewExpression;
 
@@ -929,7 +935,7 @@ class _NewExpressionTransformer extends _ExpressionTransformer {
 
 }
 
-class _CommaExpressionTransformer extends _ExpressionTransformer {
+class _CommaExpressionTransformer extends _MultiaryOperatorTransformer {
 
 	var _expr : CommaExpression;
 
