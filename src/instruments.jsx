@@ -54,14 +54,6 @@ abstract class _ExpressionTransformer {
 
 	abstract function doCPSTransform (parent : MemberFunctionDefinition, continuation : Expression) : Expression;
 
-	function _createCall1 (proc : Expression, arg : Expression) : CallExpression {
-		return new CallExpression(
-			arg.getToken(),
-			proc,
-			[ arg ] : Expression[]
-		);
-	}
-
 }
 
 abstract class _MultiaryOperatorTransformer extends _ExpressionTransformer {
@@ -78,7 +70,7 @@ abstract class _MultiaryOperatorTransformer extends _ExpressionTransformer {
 
 	function transformOp (parent : MemberFunctionDefinition, continuation : Expression, exprs : Expression[]) : Expression {
 		if (exprs.length == 0) {
-			return this._createCall1(continuation, this.constructOp([]));
+			return this._transformer._createCall1(continuation, this.constructOp([]));
 		}
 		else {
 			var returnType;
@@ -149,7 +141,7 @@ abstract class _MultiaryOperatorTransformer extends _ExpressionTransformer {
 	function _injectBody (args : Expression[], topExpr : Expression, topFuncDef : MemberFunctionDefinition, botFuncDef : MemberFunctionDefinition, continuation : Expression) : void {
 		assert args.length > 0;
 
-		var body = this._createCall1(continuation, this.constructOp(args));
+		var body = this._transformer._createCall1(continuation, this.constructOp(args));
 		botFuncDef._statements = [ new ReturnStatement(new Token("return", false), body) ] : Statement[];
 		Util.rebaseClosures(topFuncDef, botFuncDef);
 	}
@@ -2407,6 +2399,14 @@ class CodeTransformer {
 		);
 		Util.linkFunction(identity, parent);
 		return new FunctionExpression(identity.getToken(), identity);
+	}
+
+	function _createCall1 (proc : Expression, arg : Expression) : CallExpression {
+		return new CallExpression(
+			arg.getToken(),
+			proc,
+			[ arg ] : Expression[]
+		);
 	}
 
 }
