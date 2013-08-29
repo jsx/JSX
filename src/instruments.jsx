@@ -52,7 +52,7 @@ abstract class _ExpressionTransformer {
 
 	abstract function getExpression () : Expression;
 
-	abstract function doCPSTransform (parent : MemberFunctionDefinition, continuation : Expression) : Expression;
+	abstract function doCPSTransform (parent : MemberFunctionDefinition, continuation : Expression, type : Type) : Expression;
 
 }
 
@@ -62,22 +62,25 @@ abstract class _MultiaryOperatorTransformer extends _ExpressionTransformer {
 		super(transformer, identifier);
 	}
 
-	final override function doCPSTransform (parent : MemberFunctionDefinition, continuation : Expression) : Expression {
-		return this.transformOp(parent, continuation, this.getArgumentExprs());
+	final override function doCPSTransform (parent : MemberFunctionDefinition, continuation : Expression, returnType : Type) : Expression {
+		if (continuation != null) {
+			assert continuation.getType() instanceof ResolvedFunctionType;
+			assert (continuation.getType() as ResolvedFunctionType).getReturnType().equals(returnType);
+		}
+		return this.transformOp(parent, continuation, this.getArgumentExprs(), returnType);
 	}
 
 	abstract function getArgumentExprs () : Expression[];
 
-	function transformOp (parent : MemberFunctionDefinition, continuation : Expression, exprs : Expression[]) : Expression {
+	function transformOp (parent : MemberFunctionDefinition, continuation : Expression, exprs : Expression[], returnType : Type) : Expression {
 		if (exprs.length == 0) {
-			return this._transformer._createCall1(continuation, this.constructOp([]));
+			return this._createContinuationCall(continuation, this.constructOp([]));
 		}
 		else {
-			var returnType;
-			if (! (continuation.getType() instanceof ResolvedFunctionType)) {
-				throw new Error("logic flaw");
+			if (continuation != null) {
+				assert continuation.getType() instanceof ResolvedFunctionType;
+				assert (continuation.getType() as ResolvedFunctionType).getReturnType().equals(returnType);
 			}
-			returnType = (continuation.getType() as ResolvedFunctionType).getReturnType();
 
 			// do cps-transformation against operands first; and then construct a new body to inject into the result
 			var result = new Map.<variant>;
@@ -116,7 +119,7 @@ abstract class _MultiaryOperatorTransformer extends _ExpressionTransformer {
 				rootFuncDef = funcDef;
 			}
 			var cont = new FunctionExpression(funcDef.getToken(), funcDef);
-			var body = this._transformer._getExpressionTransformerFor(exprs[i]).doCPSTransform(prevFuncDef, cont);
+			var body = this._transformer._getExpressionTransformerFor(exprs[i]).doCPSTransform(prevFuncDef, cont, returnType);
 			if (i == 0) {
 				topExpr = body;
 			} else  {
@@ -141,9 +144,21 @@ abstract class _MultiaryOperatorTransformer extends _ExpressionTransformer {
 	function _injectBody (args : Expression[], topExpr : Expression, topFuncDef : MemberFunctionDefinition, botFuncDef : MemberFunctionDefinition, continuation : Expression) : void {
 		assert args.length > 0;
 
-		var body = this._transformer._createCall1(continuation, this.constructOp(args));
+		var body = this._createContinuationCall(continuation, this.constructOp(args));
 		botFuncDef._statements = [ new ReturnStatement(new Token("return", false), body) ] : Statement[];
 		Util.rebaseClosures(topFuncDef, botFuncDef);
+	}
+
+	function _createContinuationCall (proc : Expression, arg : Expression) : Expression {
+		if (proc == null) {
+			return arg;
+		} else {
+			return new CallExpression(
+				arg.getToken(),
+				proc,
+				[ arg ] : Expression[]
+			);
+		}
 	}
 
 }
@@ -679,7 +694,7 @@ class _LogicalExpressionTransformer extends _ExpressionTransformer {
 		return this._expr;
 	}
 
-	override function doCPSTransform (parent : MemberFunctionDefinition, continuation : Expression) : Expression {
+	override function doCPSTransform (parent : MemberFunctionDefinition, continuation : Expression, returnType : Type) : Expression {
 		/*
 
 a && b | C
@@ -694,20 +709,29 @@ a | function ($a) { var $C = C; return $a ? ($a as boolean) | $C : (b as boolean
 
 		*/
 
-		var argVar = this._transformer.createFreshArgumentDeclaration(this._expr.getFirstExpr().getType());
-		var contVar = this._transformer.createFreshLocalVariable(continuation.getType());
+		if (continuation != null) {
+			assert continuation.getType() instanceof ResolvedFunctionType;
+			assert (continuation.getType() as ResolvedFunctionType).getReturnType().equals(returnType);
+		}
 
-		var contFuncDef = this._transformer._createAnonymousFunction(parent, null, [ argVar ], this._transformer.getTransformingFuncDef().getReturnType());
-		contFuncDef.getLocals().push(contVar);
+		var argVar = this._transformer.createFreshArgumentDeclaration(this._expr.getFirstExpr().getType());
+		var contFuncDef = this._transformer._createAnonymousFunction(parent, null, [ argVar ], returnType);
 
 		// `var $C = C;`
-		var condStmt = new ExpressionStatement(
-			new AssignmentExpression(
-				new Token("=", false),
-				new LocalExpression(contVar.getName(), contVar),
-				continuation
-			)
-		);
+		var contVar : LocalVariable = null;
+		if (continuation != null) {
+			contVar = this._transformer.createFreshLocalVariable(continuation.getType());
+			contFuncDef.getLocals().push(contVar);
+
+			var condStmt = new ExpressionStatement(
+				new AssignmentExpression(
+					new Token("=", false),
+					new LocalExpression(contVar.getName(), contVar),
+					continuation
+				)
+			);
+			contFuncDef.getStatements().push(condStmt);
+		}
 
 		var ifTrueExpr : Expression;
 		var ifFalseExpr : Expression;
@@ -731,24 +755,30 @@ a | function ($a) { var $C = C; return $a ? ($a as boolean) | $C : (b as boolean
 			ifFalseExpr = new LogicalNotExpression(new Token("!", false), new LogicalNotExpression(new Token("!", false), ifFalseExpr));
 		}
 
+		var ifTrueCont : Expression = null;
+		var ifFalseCont : Expression = null;
+		if (continuation != null) {
+			ifTrueCont = new LocalExpression(contVar.getName(), contVar);
+			ifFalseCont = new LocalExpression(contVar.getName(), contVar);
+		}
+
 		// `return $a ? b | $C : c | $C;`
 		var returnStmt = new ReturnStatement(
 			new Token("return", false),
 			new ConditionalExpression(
 				this._expr.getToken(),
 				new LocalExpression(argVar.getName(), argVar),
-				this._transformer._getExpressionTransformerFor(ifTrueExpr).doCPSTransform(contFuncDef, new LocalExpression(contVar.getName(), contVar)),
-				this._transformer._getExpressionTransformerFor(ifFalseExpr).doCPSTransform(contFuncDef, new LocalExpression(contVar.getName(), contVar))
+				this._transformer._getExpressionTransformerFor(ifTrueExpr).doCPSTransform(contFuncDef, ifTrueCont, returnType),
+				this._transformer._getExpressionTransformerFor(ifFalseExpr).doCPSTransform(contFuncDef, ifFalseCont, returnType)
 			)
 		);
 
-		contFuncDef.getStatements().push(condStmt);
 		contFuncDef.getStatements().push(returnStmt);
 
 		Util.rebaseClosures(parent, contFuncDef);
 
 		var cont = new FunctionExpression(contFuncDef.getToken(), contFuncDef);
-		return this._transformer._getExpressionTransformerFor(this._expr.getFirstExpr()).doCPSTransform(parent, cont);
+		return this._transformer._getExpressionTransformerFor(this._expr.getFirstExpr()).doCPSTransform(parent, cont, returnType);
 	}
 
 }
@@ -778,7 +808,7 @@ class _ConditionalExpressionTransformer extends _ExpressionTransformer {
 		return this._expr;
 	}
 
-	override function doCPSTransform (parent : MemberFunctionDefinition, continuation : Expression) : Expression {
+	override function doCPSTransform (parent : MemberFunctionDefinition, continuation : Expression, returnType : Type) : Expression {
 		/*
 
 a ? b : c | C
@@ -787,20 +817,30 @@ a | function ($a) { var $C = C; return $a ? b | $C : c | $C; }
 
 		*/
 
-		var argVar = this._transformer.createFreshArgumentDeclaration(this._expr.getCondExpr().getType());
-		var contVar = this._transformer.createFreshLocalVariable(continuation.getType());
+		if (continuation != null) {
+			assert continuation.getType() instanceof ResolvedFunctionType;
+			assert (continuation.getType() as ResolvedFunctionType).getReturnType().equals(returnType);
+		}
 
-		var contFuncDef = this._transformer._createAnonymousFunction(parent, null, [ argVar ], this._transformer.getTransformingFuncDef().getReturnType());
-		contFuncDef.getLocals().push(contVar);
+		var argVar = this._transformer.createFreshArgumentDeclaration(this._expr.getCondExpr().getType());
+
+		var contFuncDef = this._transformer._createAnonymousFunction(parent, null, [ argVar ], returnType);
 
 		// `var $C = C;`
-		var condStmt = new ExpressionStatement(
-			new AssignmentExpression(
-				new Token("=", false),
-				new LocalExpression(contVar.getName(), contVar),
-				continuation
-			)
-		);
+		var contVar : LocalVariable = null;
+		if (continuation != null) {
+			contVar = this._transformer.createFreshLocalVariable(continuation.getType());
+			contFuncDef.getLocals().push(contVar);
+
+			var condStmt = new ExpressionStatement(
+				new AssignmentExpression(
+					new Token("=", false),
+					new LocalExpression(contVar.getName(), contVar),
+					continuation
+				)
+			);
+			contFuncDef.getStatements().push(condStmt);
+		}
 
 		var ifTrueExpr = this._expr.getIfTrueExpr();
 		if (ifTrueExpr == null) {
@@ -808,24 +848,30 @@ a | function ($a) { var $C = C; return $a ? b | $C : c | $C; }
 		}
 		var ifFalseExpr = this._expr.getIfFalseExpr();
 
+		var ifTrueCont : Expression = null;
+		var ifFalseCont : Expression = null;
+		if (continuation != null) {
+			ifTrueCont = new LocalExpression(contVar.getName(), contVar);
+			ifFalseCont = new LocalExpression(contVar.getName(), contVar);
+		}
+
 		// `return $a ? b | $C : c | $C;`
 		var returnStmt = new ReturnStatement(
 			new Token("return", false),
 			new ConditionalExpression(
 				this._expr.getToken(),
 				new LocalExpression(argVar.getName(), argVar),
-				this._transformer._getExpressionTransformerFor(ifTrueExpr).doCPSTransform(contFuncDef, new LocalExpression(contVar.getName(), contVar)),
-				this._transformer._getExpressionTransformerFor(ifFalseExpr).doCPSTransform(contFuncDef, new LocalExpression(contVar.getName(), contVar))
+				this._transformer._getExpressionTransformerFor(ifTrueExpr).doCPSTransform(contFuncDef, ifTrueCont, returnType),
+				this._transformer._getExpressionTransformerFor(ifFalseExpr).doCPSTransform(contFuncDef, ifFalseCont, returnType)
 			)
 		);
 
-		contFuncDef.getStatements().push(condStmt);
 		contFuncDef.getStatements().push(returnStmt);
 
 		Util.rebaseClosures(parent, contFuncDef);
 
 		var cont = new FunctionExpression(contFuncDef.getToken(), contFuncDef);
-		return this._transformer._getExpressionTransformerFor(this._expr.getCondExpr()).doCPSTransform(parent, cont);
+		return this._transformer._getExpressionTransformerFor(this._expr.getCondExpr()).doCPSTransform(parent, cont, returnType);
 	}
 
 }
@@ -982,8 +1028,7 @@ abstract class _StatementTransformer {
 		if (! this._transformer._transformExprs) {
 			var funcDef = this._transformer.getTransformingFuncDef();
 			this.getStatement().forEachExpression(function (expr, replaceCb) {
-				var identity = this._transformer._createIdentityFunction(funcDef, expr.getType());
-				replaceCb(this._transformer._getExpressionTransformerFor(expr).doCPSTransform(funcDef, identity));
+				replaceCb(this._transformer._getExpressionTransformerFor(expr).doCPSTransform(funcDef, null, expr.getType()));
 				return true;
 			});
 		}
@@ -1153,8 +1198,7 @@ class _DeleteStatementTransformer extends _StatementTransformer {
 		if (! this._transformer._transformExprs) {
 			var funcDef = this._transformer.getTransformingFuncDef();
 			var aryExpr = this._statement.getExpr() as ArrayExpression;
-			var identity = this._transformer._createIdentityFunction(funcDef, aryExpr.getType());
-			statement = new ExpressionStatement(new _DeleteStatementTransformer._Stash(this._transformer, this._statement).doCPSTransform(funcDef, identity));
+			statement = new ExpressionStatement(new _DeleteStatementTransformer._Stash(this._transformer, this._statement).doCPSTransform(funcDef, null, aryExpr.getType()));
 		} else {
 			statement = this._statement;
 		}
@@ -2399,14 +2443,6 @@ class CodeTransformer {
 		);
 		Util.linkFunction(identity, parent);
 		return new FunctionExpression(identity.getToken(), identity);
-	}
-
-	function _createCall1 (proc : Expression, arg : Expression) : CallExpression {
-		return new CallExpression(
-			arg.getToken(),
-			proc,
-			[ arg ] : Expression[]
-		);
 	}
 
 }
