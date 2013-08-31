@@ -4,7 +4,7 @@
 
 import "console.jsx";
 
-interface AnimalConcept {
+interface Animal {
     function say () : void;
 }
 
@@ -20,25 +20,22 @@ class Dog /* no need to implement AnimalConcept */ {
   }
 }
 
+class _AnimalHolder.<T> implements Animal {
+	var _target : T;
+	function constructor (target : T) {
+		this._target = target;
+	}
+	override function say () : void {
+		this._target.say();
+	}
+}
+
 class Human {
-  class _AnimalHolder.<T> implements AnimalConcept {
-    var _target : T;
-    function constructor (target : T) {
-      this._target = target;
-    }
-    override function say () : void {
-      this._target.say();
-    }
-  }
+  var _animal : Animal;
 
-  var _animal : AnimalConcept;
-
-  function constructor(animal : AnimalConcept) {
-    this._animal = animal;
-  }
-
-  static function make.<Animal> (target : Animal) : Human {
-    return new Human(new Human._AnimalHolder.<Animal>(target));
+  /* A human can hold any kind of object that is capable of `say`ing! */
+  function hold.<T> (animal : T) : void {
+    this._animal = new _AnimalHolder.<T>(animal);
   }
 
   function touch () : void {
@@ -48,14 +45,11 @@ class Human {
 
 class _Main {
   static function main(args : string[]) : void {
-    var duck = new Duck;
-    var dog  = new Dog;
-
-    var human1 = Human.make(duck);
-    human1.touch(); // -> quack!
-
-    var human2 = Human.make(dog);
-    human2.touch(); // -> bow!
+    var human = new Human;
+    human.hold(new Duck);
+    human.touch(); // => quack!
+    human.hold(new Dog);
+    human.touch(); // -> bow!
   }
 }
 
