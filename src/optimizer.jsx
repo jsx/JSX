@@ -3389,8 +3389,8 @@ class _LCSEOptimizeCommand extends _FunctionOptimizeCommand {
 		// add an expression to cache
 		Util.forEachExpression(function onExpr (expr : Expression, replaceCb : function(:Expression):void) : boolean {
 			// handle special cases first
-			if (expr instanceof AssignmentExpression) {
-				var assignmentExpr = expr as AssignmentExpression;
+			if (expr instanceof AssignmentExpression || expr instanceof FusedAssignmentExpression) {
+				var assignmentExpr = expr as BinaryExpression;
 				var lhsExpr = assignmentExpr.getFirstExpr();
 				if (lhsExpr instanceof LocalExpression) {
 					onExpr(assignmentExpr.getSecondExpr(), function (expr) {
