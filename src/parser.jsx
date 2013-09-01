@@ -2774,7 +2774,12 @@ class Parser {
 				var assignExpr = this._assignExpr(noIn);
 				if (assignExpr == null)
 					return null;
-				return new AssignmentExpression(op, lhsExpr, assignExpr);
+				if (op.getValue() == "=") {
+					return new AssignmentExpression(op, lhsExpr, assignExpr);
+				}
+				else {
+					return new FusedAssignmentExpression(op, lhsExpr, assignExpr);
+				}
 			}
 		}
 		// failed to parse as lhs op assignExpr, try condExpr

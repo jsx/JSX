@@ -58,13 +58,18 @@ class _Util {
 		return ret;
 	}
 
+	static function exprIsAssignment(expr : Expression) : boolean {
+		return   expr instanceof AssignmentExpression
+			    || expr instanceof FusedAssignmentExpression
+			    || expr instanceof PreIncrementExpression
+			    || expr instanceof PostIncrementExpression;
+	}
+
 	static function exprHasSideEffects (expr : Expression) : boolean {
 		return !(function onExpr (expr : Expression) : boolean {
-			if (   expr instanceof NewExpression
-			    || expr instanceof AssignmentExpression
-			    || expr instanceof PreIncrementExpression
-			    || expr instanceof PostIncrementExpression
-			    || expr instanceof SuperExpression) {
+			if ( _Util.exprIsAssignment(expr)
+					|| expr instanceof NewExpression
+					|| expr instanceof SuperExpression) {
 				return false;
 			}
 			else if (expr instanceof CallExpression) {
@@ -1526,10 +1531,8 @@ class _UnclassifyOptimizationCommand extends _OptimizeCommand {
 			if (! (lhsExpr instanceof PropertyExpression && (lhsExpr as PropertyExpression).getExpr() instanceof ThisExpression)) {
 				return null;
 			}
-			var onRHSExpr = function (expr : Expression) : boolean {
-				if (expr instanceof AssignmentExpression
-				    || expr instanceof PreIncrementExpression
-				    || expr instanceof PostIncrementExpression) {
+			function onRHSExpr(expr : Expression) : boolean {
+				if (_Util.exprIsAssignment(expr)) {
 					// has side effects
 					return false;
 				} else if (expr instanceof FunctionExpression) {
@@ -2381,11 +2384,10 @@ class _DeadCodeEliminationOptimizeCommand extends _FunctionOptimizeCommand {
 		var locals = new TypedMap.<LocalVariable,Expression>;
 		// mark the locals that uses op= (cannot be eliminated by the algorithm applied laterwards)
 		Util.forEachExpression(function onExpr(expr : Expression) : boolean {
-			if (expr instanceof AssignmentExpression
-			    && (expr as AssignmentExpression).getToken().getValue() != "="
-				&& (expr as AssignmentExpression).getFirstExpr() instanceof LocalExpression) {
-					var local = ((expr as AssignmentExpression).getFirstExpr() as LocalExpression).getLocal();
-					this.log("local variable " + local.getName().getValue() + " cannot be rewritten (has fused op)");
+			if (expr instanceof FusedAssignmentExpression
+				&& (expr as FusedAssignmentExpression).getFirstExpr() instanceof LocalExpression) {
+					var local = ((expr as FusedAssignmentExpression).getFirstExpr() as LocalExpression).getLocal();
+					this.log("local variable " + local.getName().getValue() + " cannot be rewritten (has fused assignment)");
 					localsUntouchable.set(local, true);
 				} else if (expr instanceof IncrementExpression
 					&& (expr as IncrementExpression).getExpr() instanceof LocalExpression) {
@@ -2464,7 +2466,7 @@ class _DeadCodeEliminationOptimizeCommand extends _FunctionOptimizeCommand {
 		function onExpr(expr : Expression, rewriteCb : function(:Expression):void) : boolean {
 			if (expr instanceof AssignmentExpression) {
 				var assignExpr = expr as AssignmentExpression;
-				if (assignExpr.getToken().getValue() == "=" && assignExpr.getFirstExpr() instanceof LocalExpression) {
+				if (assignExpr.getFirstExpr() instanceof LocalExpression) {
 					onExpr(assignExpr.getSecondExpr(), function (assignExpr : AssignmentExpression) : function(:Expression):void {
 						return function (expr) {
 							assignExpr.setSecondExpr(expr);
@@ -2527,8 +2529,7 @@ class _DeadCodeEliminationOptimizeCommand extends _FunctionOptimizeCommand {
 			if (expr instanceof AssignmentExpression) {
 				var assignmentExpr = expr as AssignmentExpression;
 				var firstExpr      = assignmentExpr.getFirstExpr();
-				if (expr.getToken().getValue() == "="
-					&& isFirstLevelPropertyAccess(firstExpr)
+				if (isFirstLevelPropertyAccess(firstExpr)
 					&& ! Util.isNativeClass((firstExpr as PropertyExpression).getExpr().getType())) {
 					var propertyName = (firstExpr as PropertyExpression).getIdentifierToken().getValue();
 					onExpr(assignmentExpr.getSecondExpr(), null);

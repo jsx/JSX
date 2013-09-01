@@ -236,8 +236,7 @@ class LocalExpression extends LeafExpression {
 	override function analyze (context : AnalysisContext, parentExpr : Expression) : boolean {
 		// check that the variable is readable
 		if ((parentExpr instanceof AssignmentExpression
-		     && (parentExpr as AssignmentExpression).getFirstExpr() == this
-			&& (parentExpr as AssignmentExpression).getToken().getValue() == "=")
+		     && (parentExpr as AssignmentExpression).getFirstExpr() == this)
 			|| (parentExpr == null
 				&& context.statement instanceof ForInStatement
 				&& (context.statement as ForInStatement).getLHSExpr() == this)) {
@@ -1622,8 +1621,6 @@ class AssignmentExpression extends BinaryExpression {
 		// normal handling
 		if (! this._analyze(context))
 			return false;
-		if (this._token.getValue() != "=")
-			return this._analyzeFusedAssignment(context);
 		var rhsType = this._expr2.getType();
 		if (rhsType == null)
 			return false;
@@ -1661,20 +1658,6 @@ class AssignmentExpression extends BinaryExpression {
 		if (! this._expr1.assertIsAssignable(context, this._token, rhsType))
 			return false;
 		return true;
-	}
-
-	function _analyzeFusedAssignment (context : AnalysisContext) : boolean {
-		var lhsType = this._expr1.getType().resolveIfNullable();
-		var rhsType = this._expr2.getType().resolveIfNullable();
-		if (! this._expr1.assertIsAssignable(context, this._token, lhsType)) {
-			return false;
-		}
-		if (this._token.getValue() == "+=" && lhsType.equals(Type.stringType) && rhsType.equals(Type.stringType))
-			return true;
-		if (Type.isIntegerOrNumber(lhsType) && Type.isIntegerOrNumber(rhsType))
-			return true;
-		context.errors.push(new CompileError(this._token, "cannot apply operator '" + this._token.getValue() + "' against '" + this._expr1.getType().toString() + "' and '" + this._expr2.getType().toString() + "'"));
-		return false;
 	}
 
 	static function analyzeEmptyLiteralAssignment (context : AnalysisContext, token : Token, lhsType : Type, rhs : Expression) : boolean {
@@ -1732,6 +1715,39 @@ class AssignmentExpression extends BinaryExpression {
 		if (! this._expr2.analyze(context, this))
 			return false;
 		return true;
+	}
+
+	override function getType () : Type {
+		return this._expr1.getType();
+	}
+
+}
+
+class FusedAssignmentExpression extends BinaryExpression {
+
+	function constructor (operatorToken : Token, expr1 : Expression, expr2 : Expression) {
+		super(operatorToken, expr1, expr2);
+	}
+
+	override function clone () : FusedAssignmentExpression {
+		return new FusedAssignmentExpression(this._token, this._expr1.clone(), this._expr2.clone());
+	}
+
+	override function analyze (context : AnalysisContext, parentExpr : Expression) : boolean {
+		if (! this._analyze(context))
+			return false;
+
+		var lhsType = this._expr1.getType().resolveIfNullable();
+		var rhsType = this._expr2.getType().resolveIfNullable();
+		if (! this._expr1.assertIsAssignable(context, this._token, lhsType)) {
+			return false;
+		}
+		if (this._token.getValue() == "+=" && lhsType.equals(Type.stringType) && rhsType.equals(Type.stringType))
+			return true;
+		if (Type.isIntegerOrNumber(lhsType) && Type.isIntegerOrNumber(rhsType))
+			return true;
+		context.errors.push(new CompileError(this._token, "cannot apply operator '" + this._token.getValue() + "' against '" + this._expr1.getType().toString() + "' and '" + this._expr2.getType().toString() + "'"));
+		return false;
 	}
 
 	override function getType () : Type {
