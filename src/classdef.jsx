@@ -1795,7 +1795,6 @@ class MemberFunctionDefinition extends MemberDefinition implements Block {
 					then we should break, since it might have side effects (e.g. the property might be defined as a setter)
 				*/
 				if (expr instanceof AssignmentExpression
-					&& expr.getToken().getValue() == "="
 					&& (lhsExpr = (expr as AssignmentExpression).getFirstExpr()) instanceof PropertyExpression
 					&& (lhsExpr as PropertyExpression).getExpr() instanceof ThisExpression) {
 						initProperties[(lhsExpr as PropertyExpression).getIdentifierToken().getValue()] = false;
