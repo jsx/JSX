@@ -1032,16 +1032,16 @@ class CodeTransformer {
 				}
 			}
 		}
-		// collect entry points
-		var entries = new Statement[];
+		// entry basic block
+		var entry = new Statement[];
 		for (var i = 0; i < statements.length; ++i) {
 			if (statements[i] instanceof LabelStatement) { // until first label
 				break;
 			}
-			entries.push(statements[i]);
+			entry.push(statements[i]);
 		}
-		// collect code blocks
-		var codeBlocks = new Statement[];
+		// remaining basic blocks
+		var basicBlocks = new Statement[];
 		var currentLabel : LabelStatement = null;
 		while (i < statements.length) {
 			var currentLabel = statements[i] as LabelStatement;
@@ -1060,13 +1060,13 @@ class CodeTransformer {
 			// create a function block
 			var block = this._createAnonymousFunction(funcDef, null, [], this._transformingFuncDef.getReturnType());
 			block._statements = body;
-			codeBlocks.push(new ExpressionStatement(
+			basicBlocks.push(new ExpressionStatement(
 				new AssignmentExpression(
 					new Token("=", false),
 					new LocalExpression(null, labels[currentLabel.getName()]),
 					new FunctionExpression(new Token("function", false), block))));
 		}
-		funcDef._statements = codeBlocks.concat(entries);
+		funcDef._statements = basicBlocks.concat(entry);
 	}
 
 	function _compileYields(funcDef : MemberFunctionDefinition) : void { // FIXME wasabiz nested generator
