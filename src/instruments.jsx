@@ -140,7 +140,7 @@ class _ReturnStatementTransformer extends _StatementTransformer {
 
 	override function _replaceControlStructuresWithGotos () : void {
 		if (this._statement.getExpr() != null) {
-			var returnLocal = this._transformer.getTopReturnLocal();
+			var returnLocal = this._transformer._getTopReturnLocal();
 
 			/* returnLocal should be null when the return statement is declared like this:
 			 *
@@ -221,9 +221,9 @@ class _BreakStatementTransformer extends _StatementTransformer {
 	override function _replaceControlStructuresWithGotos () : void {
 		var label;
 		if (this._statement.getLabel() != null) {
-			label = this._transformer.getStatementTransformerByLabel(this._statement.getLabel().getValue()).getBreakingLabel();
+			label = this._transformer._getStatementTransformerByLabel(this._statement.getLabel().getValue()).getBreakingLabel();
 		} else {
-			label = this._transformer.getTopLabelledBlock().getBreakingLabel();
+			label = this._transformer._getTopLabelledBlock().getBreakingLabel();
 		}
 		this._transformer._emit(new GotoStatement(label));
 	}
@@ -246,9 +246,9 @@ class _ContinueStatementTransformer extends _StatementTransformer {
 	override function _replaceControlStructuresWithGotos () : void {
 		var label;
 		if (this._statement.getLabel() != null) {
-			label = this._transformer.getStatementTransformerByLabel(this._statement.getLabel().getValue()).getContinuingLabel();
+			label = this._transformer._getStatementTransformerByLabel(this._statement.getLabel().getValue()).getContinuingLabel();
 		} else {
-			label = this._transformer.getTopLabelledBlock().getContinuingLabel();
+			label = this._transformer._getTopLabelledBlock().getContinuingLabel();
 		}
 		this._transformer._emit(new GotoStatement(label));
 	}
@@ -302,11 +302,11 @@ class _DoWhileStatementTransformer extends _LabellableStatementTransformer {
 		var bodyLabel = "$BODY_DO_WHILE_" + this.getID() as string;
 		this._transformer._emit(new GotoStatement(bodyLabel));
 		this._transformer._emit(new LabelStatement(bodyLabel));
-		this._transformer.enterLabelledBlock(this);
+		this._transformer._enterLabelledBlock(this);
 		this._statement.getStatements().forEach((statement) -> {
 			this._transformer._getStatementTransformerFor(statement).replaceControlStructuresWithGotos();
 		});
-		this._transformer.leaveLabelledBlock();
+		this._transformer._leaveLabelledBlock();
 		var testLabel = "$TEST_DO_WHILE_" + this.getID() as string;
 		this._transformer._emit(new GotoStatement(testLabel));
 		this._transformer._emit(new LabelStatement(testLabel));
@@ -407,11 +407,11 @@ class _ForStatementTransformer extends _LabellableStatementTransformer {
 			this._transformer._emitConditionalBranch(new BooleanLiteralExpression(new Token("true", false)), bodyLabel, endLabel);
 		}
 		this._transformer._emit(new LabelStatement(bodyLabel));
-		this._transformer.enterLabelledBlock(this);
+		this._transformer._enterLabelledBlock(this);
 		this._statement.getStatements().forEach((statement) -> {
 			this._transformer._getStatementTransformerFor(statement).replaceControlStructuresWithGotos();
 		});
-		this._transformer.leaveLabelledBlock();
+		this._transformer._leaveLabelledBlock();
 		var postLabel = "$POST_FOR_" + this.getID() as string;
 		this._transformer._emit(new GotoStatement(postLabel));
 		this._transformer._emit(new LabelStatement(postLabel));
@@ -589,7 +589,7 @@ class _SwitchStatementTransformer extends _LabellableStatementTransformer {
 	function _emitSwitchBodies () : void {
 		var statements = this._statement.getStatements();
 
-		this._transformer.enterLabelledBlock(this);
+		this._transformer._enterLabelledBlock(this);
 		for (var i = 0; i < statements.length; ++i) {
 			var stmt = statements[i];
 			if (stmt instanceof CaseStatement) {
@@ -604,7 +604,7 @@ class _SwitchStatementTransformer extends _LabellableStatementTransformer {
 				this._transformer._getStatementTransformerFor(stmt).replaceControlStructuresWithGotos();
 			}
 		}
-		this._transformer.leaveLabelledBlock();
+		this._transformer._leaveLabelledBlock();
 	}
 
 	class CaseStash extends Stash {
@@ -715,11 +715,11 @@ class _WhileStatementTransformer extends _LabellableStatementTransformer {
 		var endLabel = "$END_WHILE_" + this.getID() as string;
 		this._transformer._emitConditionalBranch(this._statement.getExpr(), bodyLabel, endLabel);
 		this._transformer._emit(new LabelStatement(bodyLabel));
-		this._transformer.enterLabelledBlock(this);
+		this._transformer._enterLabelledBlock(this);
 		this._statement.getStatements().forEach((statement) -> {
 			this._transformer._getStatementTransformerFor(statement).replaceControlStructuresWithGotos();
 		});
-		this._transformer.leaveLabelledBlock();
+		this._transformer._leaveLabelledBlock();
 		this._transformer._emit(new GotoStatement(testLabel));
 		this._transformer._emit(new LabelStatement(endLabel));
 	}
@@ -969,7 +969,7 @@ class CodeTransformer {
 			var returnLocalName = "$return" + CodeTransformer._getFunctionNestDepth(funcDef) as string;
 			returnLocal = new LocalVariable(new Token(returnLocalName, false), funcDef.getReturnType());
 			funcDef.getLocals().push(returnLocal);
-			this.enterFunction(returnLocal);
+			this._enterFunction(returnLocal);
 		}
 
 		// replace control structures with goto statements
@@ -992,7 +992,7 @@ class CodeTransformer {
 
 		if (! Type.voidType.equals(funcDef.getReturnType())) {
 			funcDef._statements.push(new ReturnStatement(new Token("return", false), new LocalExpression(returnLocal.getName(), returnLocal)));
-			this.leaveFunction();
+			this._leaveFunction();
 		}
 
 		// replace goto statements with calls of closures
@@ -1230,7 +1230,7 @@ class CodeTransformer {
 
 	var _labelMap = new _LabellableStatementTransformer[];
 
-	function getStatementTransformerByLabel (label : string) : _LabellableStatementTransformer {
+	function _getStatementTransformerByLabel (label : string) : _LabellableStatementTransformer {
 		for (var i = 0; this._labelMap.length; ++i) {
 			var trans = this._labelMap[i];
 			if ((trans.getStatement() as LabellableStatement).getLabel().getValue() == label)
@@ -1239,40 +1239,40 @@ class CodeTransformer {
 		throw new Error("fatal error: no corresponding transformer for label \"" + label + "\"");
 	}
 
-	function getTopLabelledBlock () : _LabellableStatementTransformer {
+	function _getTopLabelledBlock () : _LabellableStatementTransformer {
 		return this._labelMap[this._labelMap.length - 1];
 	}
 
-	function enterLabelledBlock (transformer : _LabellableStatementTransformer) : void {
+	function _enterLabelledBlock (transformer : _LabellableStatementTransformer) : void {
 		this._labelMap.push(transformer);
 	}
 
-	function leaveLabelledBlock () : void {
+	function _leaveLabelledBlock () : void {
 		this._labelMap.pop();
 	}
 
 	var _returnLocals = new LocalVariable[];
 
-	function getTopReturnLocal () : LocalVariable {
+	function _getTopReturnLocal () : LocalVariable {
 		return this._returnLocals[this._returnLocals.length - 1];
 	}
 
-	function enterFunction (returnLocal : LocalVariable) : void {
+	function _enterFunction (returnLocal : LocalVariable) : void {
 		this._returnLocals.push(returnLocal);
 	}
 
-	function leaveFunction () : void {
+	function _leaveFunction () : void {
 		this._returnLocals.pop();
 	}
 
 	var _numUniqVar = 0;
 
-	function createFreshArgumentDeclaration (type : Type) : ArgumentDeclaration {
+	function _createFreshArgumentDeclaration (type : Type) : ArgumentDeclaration {
 		var id = this._numUniqVar++;
 		return new ArgumentDeclaration(new Token("$a" + id, true), type);
 	}
 
-	function createFreshLocalVariable (type : Type) : LocalVariable {
+	function _createFreshLocalVariable (type : Type) : LocalVariable {
 		var id = this._numUniqVar++;
 		return new LocalVariable(new Token("$a" + id, true), type);
 	}
@@ -1422,7 +1422,7 @@ class CodeTransformer {
 	function _createIdentityFunction (parent : MemberFunctionDefinition, type : Type) : FunctionExpression {
 		assert ! type.equals(Type.voidType);
 
-		var arg = this.createFreshArgumentDeclaration(type);
+		var arg = this._createFreshArgumentDeclaration(type);
 		var identity = new MemberFunctionDefinition(
 			new Token("function", false),
 			null,	// name
