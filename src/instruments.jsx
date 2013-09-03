@@ -52,32 +52,11 @@ abstract class _StatementTransformer {
 
 	abstract function getStatement () : Statement;
 
-	function replaceControlStructuresWithGotos () : Statement[] {
-		return this._replaceControlStructuresWithGotos();
+	function replaceControlStructuresWithGotos () : void {
+		this._replaceControlStructuresWithGotos();
 	}
 
-	abstract function _replaceControlStructuresWithGotos () : Statement[];
-
-	static function pushConditionalBranch (expr : Expression, succLabel : string, failLabel : string, output : Statement[]) : void {
-		output.push(new IfStatement(new Token("if", false), expr, [ new GotoStatement(succLabel) ] : Statement[], [ new GotoStatement(failLabel) ] : Statement[]));
-	}
-
-	static function pushExpressionStatement (expr : Expression, output : Statement[]) : void {
-		output.push(new ExpressionStatement(expr));
-	}
-
-	function _transformAndPush (input : Statement, output : Statement[]) : void {
-		var conved = this._transformer._getStatementTransformerFor(input).replaceControlStructuresWithGotos();
-		for (var i = 0; i < conved.length; ++i) {
-			output.push(conved[i]);
-		}
-	}
-
-	function _transformAndPush (input : Statement[], output : Statement[]) : void {
-		for (var i = 0; i < input.length; ++i) {
-			this._transformAndPush(input[i], output);
-		}
-	}
+	abstract function _replaceControlStructuresWithGotos () : void;
 
 }
 
@@ -94,8 +73,8 @@ class _ConstructorInvocationStatementTransformer extends _StatementTransformer {
 		return this._statement;
 	}
 
-	override function _replaceControlStructuresWithGotos () : Statement[] {
-		return [ this._statement ] : Statement[];
+	override function _replaceControlStructuresWithGotos () : void {
+		this._transformer._emit(this._statement);
 	}
 
 }
@@ -113,8 +92,8 @@ class _ExpressionStatementTransformer extends _StatementTransformer {
 		return this._statement;
 	}
 
-	override function _replaceControlStructuresWithGotos () : Statement[] {
-		return [ this._statement ] : Statement[];
+	override function _replaceControlStructuresWithGotos () : void {
+		this._transformer._emit(this._statement);
 	}
 
 }
@@ -132,7 +111,7 @@ class _FunctionStatementTransformer extends _StatementTransformer {
 		return this._statement;
 	}
 
-	override function _replaceControlStructuresWithGotos () : Statement[] {
+	override function _replaceControlStructuresWithGotos () : void {
 		// convert to a combination of a FunctionExpression and an assignment in order to make the function visible from outside wrapping statement block
 		var funcDef = this._statement.getFuncDef();
 		var statement = new ExpressionStatement(
@@ -141,7 +120,7 @@ class _FunctionStatementTransformer extends _StatementTransformer {
 				new LocalExpression(funcDef.getFuncLocal().getName(), funcDef.getFuncLocal()),
 				new FunctionExpression(this._statement.getToken(), funcDef)));
 		funcDef.setFuncLocal(null); // `foo = function foo () { ... }` causes some kind of problems during minification
-		return [ statement ] : Statement[];
+		this._transformer._emit(statement);
 	}
 
 }
@@ -159,8 +138,7 @@ class _ReturnStatementTransformer extends _StatementTransformer {
 		return this._statement;
 	}
 
-	override function _replaceControlStructuresWithGotos () : Statement[] {
-		var statements = new Statement[];
+	override function _replaceControlStructuresWithGotos () : void {
 		if (this._statement.getExpr() != null) {
 			var returnLocal = this._transformer.getTopReturnLocal();
 
@@ -171,19 +149,16 @@ class _ReturnStatementTransformer extends _StatementTransformer {
 			 *     }
 			 */
 			if (returnLocal == null) {
-				statements.push(new ExpressionStatement(this._statement.getExpr()));
+				this._transformer._emitExpressionStatement(this._statement.getExpr());
 			}
 			else {
-				statements.push(new ExpressionStatement(
-					new AssignmentExpression(
-						new Token("=", false),
-						new LocalExpression(returnLocal.getName(), returnLocal),
-						this._statement.getExpr())));
+				this._transformer._emitExpressionStatement(new AssignmentExpression(
+					new Token("=", false),
+					new LocalExpression(returnLocal.getName(), returnLocal),
+					this._statement.getExpr()));
 			}
 		}
-		statements.push(new GotoStatement("$END"));
-
-		return statements;
+		this._transformer._emit(new GotoStatement("$END"));
 	}
 
 }
@@ -201,14 +176,12 @@ class _YieldStatementTransformer extends _StatementTransformer {
 		return this._statement;
 	}
 
-	override function _replaceControlStructuresWithGotos () : Statement[] {
-		var statements = new Statement[];
-		statements.push(this._statement);
+	override function _replaceControlStructuresWithGotos () : void {
+		this._transformer._emit(this._statement);
 		// split the continuation
 		var label = "$YIELD_" + this.getID() as string;
-		statements.push(new GotoStatement(label));
-		statements.push(new LabelStatement(label));
-		return statements;
+		this._transformer._emit(new GotoStatement(label));
+		this._transformer._emit(new LabelStatement(label));
 	}
 
 }
@@ -226,8 +199,8 @@ class _DeleteStatementTransformer extends _StatementTransformer {
 		return this._statement;
 	}
 
-	override function _replaceControlStructuresWithGotos () : Statement[] {
-		return [ this._statement ] : Statement[];
+	override function _replaceControlStructuresWithGotos () : void {
+		this._transformer._emit(this._statement);
 	}
 
 }
@@ -245,13 +218,14 @@ class _BreakStatementTransformer extends _StatementTransformer {
 		return this._statement;
 	}
 
-	override function _replaceControlStructuresWithGotos () : Statement[] {
+	override function _replaceControlStructuresWithGotos () : void {
+		var label;
 		if (this._statement.getLabel() != null) {
-			var trans = this._transformer.getStatementTransformerByLabel(this._statement.getLabel().getValue());
+			label = this._transformer.getStatementTransformerByLabel(this._statement.getLabel().getValue()).getBreakingLabel();
 		} else {
-			trans = this._transformer.getTopLabelledBlock();
+			label = this._transformer.getTopLabelledBlock().getBreakingLabel();
 		}
-		return [ new GotoStatement(trans.getBreakingLabel()) ] : Statement[];
+		this._transformer._emit(new GotoStatement(label));
 	}
 
 }
@@ -269,13 +243,14 @@ class _ContinueStatementTransformer extends _StatementTransformer {
 		return this._statement;
 	}
 
-	override function _replaceControlStructuresWithGotos () : Statement[] {
+	override function _replaceControlStructuresWithGotos () : void {
+		var label;
 		if (this._statement.getLabel() != null) {
-			var trans = this._transformer.getStatementTransformerByLabel(this._statement.getLabel().getValue());
+			label = this._transformer.getStatementTransformerByLabel(this._statement.getLabel().getValue()).getContinuingLabel();
 		} else {
-			trans = this._transformer.getTopLabelledBlock();
+			label = this._transformer.getTopLabelledBlock().getContinuingLabel();
 		}
-		return [ new GotoStatement(trans.getContinuingLabel()) ] : Statement[];
+		this._transformer._emit(new GotoStatement(label));
 	}
 
 }
@@ -304,7 +279,7 @@ class _DoWhileStatementTransformer extends _LabellableStatementTransformer {
 		return this._statement;
 	}
 
-	override function _replaceControlStructuresWithGotos () : Statement[] {
+	override function _replaceControlStructuresWithGotos () : void {
 		/*
 
 		do {
@@ -324,20 +299,20 @@ class _DoWhileStatementTransformer extends _LabellableStatementTransformer {
 	$END_DO_WHILE_n;
 
 		*/
-		var statements = new Statement[];
 		var bodyLabel = "$BODY_DO_WHILE_" + this.getID() as string;
-		statements.push(new GotoStatement(bodyLabel));
-		statements.push(new LabelStatement(bodyLabel));
+		this._transformer._emit(new GotoStatement(bodyLabel));
+		this._transformer._emit(new LabelStatement(bodyLabel));
 		this._transformer.enterLabelledBlock(this);
-		this._transformAndPush(this._statement.getStatements(), statements);
+		this._statement.getStatements().forEach((statement) -> {
+			this._transformer._getStatementTransformerFor(statement).replaceControlStructuresWithGotos();
+		});
 		this._transformer.leaveLabelledBlock();
 		var testLabel = "$TEST_DO_WHILE_" + this.getID() as string;
-		statements.push(new GotoStatement(testLabel));
-		statements.push(new LabelStatement(testLabel));
+		this._transformer._emit(new GotoStatement(testLabel));
+		this._transformer._emit(new LabelStatement(testLabel));
 		var endLabel = "$END_DO_WHILE_" + this.getID() as string;
-		_StatementTransformer.pushConditionalBranch(this._statement.getExpr(), bodyLabel, endLabel, statements);
-		statements.push(new LabelStatement(endLabel));
-		return statements;
+		this._transformer._emitConditionalBranch(this._statement.getExpr(), bodyLabel, endLabel);
+		this._transformer._emit(new LabelStatement(endLabel));
 	}
 
 	override function getBreakingLabel () : string {
@@ -363,7 +338,7 @@ class _ForInStatementTransformer extends _LabellableStatementTransformer {
 		return this._statement;
 	}
 
-	override function _replaceControlStructuresWithGotos () : Statement[] {
+	override function _replaceControlStructuresWithGotos () : void {
 		throw new Error("logic flaw");
 	}
 
@@ -389,7 +364,7 @@ class _ForStatementTransformer extends _LabellableStatementTransformer {
 		return this._statement;
 	}
 
-	override function _replaceControlStructuresWithGotos () : Statement[] {
+	override function _replaceControlStructuresWithGotos () : void {
 		/*
 
 		for (init; cond; post) {
@@ -415,36 +390,36 @@ class _ForStatementTransformer extends _LabellableStatementTransformer {
 	$END_FOR_n:
 
 		*/
-		var statements = new Statement[];
 		var initLabel = "$INIT_FOR_" + this.getID() as string;
-		statements.push(new GotoStatement(initLabel));
-		statements.push(new LabelStatement(initLabel));
+		this._transformer._emit(new GotoStatement(initLabel));
+		this._transformer._emit(new LabelStatement(initLabel));
 		if (this._statement.getInitExpr() != null) {
-			_StatementTransformer.pushExpressionStatement(this._statement.getInitExpr(), statements);
+			this._transformer._emitExpressionStatement(this._statement.getInitExpr());
 		}
 		var testLabel = "$TEST_FOR_" + this.getID() as string;
-		statements.push(new GotoStatement(testLabel));
-		statements.push(new LabelStatement(testLabel));
+		this._transformer._emit(new GotoStatement(testLabel));
+		this._transformer._emit(new LabelStatement(testLabel));
 		var bodyLabel = "$BODY_FOR_" + this.getID() as string;
 		var endLabel = "$END_FOR_" + this.getID() as string;
 		if (this._statement.getCondExpr() != null) {
-			_StatementTransformer.pushConditionalBranch(this._statement.getCondExpr(), bodyLabel, endLabel, statements);
+			this._transformer._emitConditionalBranch(this._statement.getCondExpr(), bodyLabel, endLabel);
 		} else {
-			_StatementTransformer.pushConditionalBranch(new BooleanLiteralExpression(new Token("true", false)), bodyLabel, endLabel, statements);
+			this._transformer._emitConditionalBranch(new BooleanLiteralExpression(new Token("true", false)), bodyLabel, endLabel);
 		}
-		statements.push(new LabelStatement(bodyLabel));
+		this._transformer._emit(new LabelStatement(bodyLabel));
 		this._transformer.enterLabelledBlock(this);
-		this._transformAndPush(this._statement.getStatements(), statements);
+		this._statement.getStatements().forEach((statement) -> {
+			this._transformer._getStatementTransformerFor(statement).replaceControlStructuresWithGotos();
+		});
 		this._transformer.leaveLabelledBlock();
 		var postLabel = "$POST_FOR_" + this.getID() as string;
-		statements.push(new GotoStatement(postLabel));
-		statements.push(new LabelStatement(postLabel));
+		this._transformer._emit(new GotoStatement(postLabel));
+		this._transformer._emit(new LabelStatement(postLabel));
 		if (this._statement.getPostExpr() != null) {
-			_StatementTransformer.pushExpressionStatement(this._statement.getPostExpr(), statements);
+			this._transformer._emitExpressionStatement(this._statement.getPostExpr());
 		}
-		statements.push(new GotoStatement(testLabel));
-		statements.push(new LabelStatement(endLabel));
-		return statements;
+		this._transformer._emit(new GotoStatement(testLabel));
+		this._transformer._emit(new LabelStatement(endLabel));
 	}
 
 	override function getBreakingLabel () : string {
@@ -470,7 +445,7 @@ class _IfStatementTransformer extends _StatementTransformer {
 		return this._statement;
 	}
 
-	override function _replaceControlStructuresWithGotos () : Statement[] {
+	override function _replaceControlStructuresWithGotos () : void {
 		/*
 
 		if (test) {
@@ -495,22 +470,24 @@ class _IfStatementTransformer extends _StatementTransformer {
 	$END_IF_n;
 
 		*/
-		var statements = new Statement[];
 		var testLabel = "$TEST_IF_" + this.getID() as string;
 		var succLabel = "$SUCC_IF_" + this.getID() as string;
 		var failLabel = "$FAIL_IF_" + this.getID() as string;
-		statements.push(new GotoStatement(testLabel));
-		statements.push(new LabelStatement(testLabel));
-		_StatementTransformer.pushConditionalBranch(this._statement.getExpr(), succLabel, failLabel, statements);
-		statements.push(new LabelStatement(succLabel));
-		this._transformAndPush(this._statement.getOnTrueStatements(), statements);
+		this._transformer._emit(new GotoStatement(testLabel));
+		this._transformer._emit(new LabelStatement(testLabel));
+		this._transformer._emitConditionalBranch(this._statement.getExpr(), succLabel, failLabel);
+		this._transformer._emit(new LabelStatement(succLabel));
+		this._statement.getOnTrueStatements().forEach((statement) -> {
+			this._transformer._getStatementTransformerFor(statement).replaceControlStructuresWithGotos();
+		});
 		var endLabel = "$END_IF_" + this.getID() as string;
-		statements.push(new GotoStatement(endLabel));
-		statements.push(new LabelStatement(failLabel));
-		this._transformAndPush(this._statement.getOnFalseStatements(), statements);
-		statements.push(new GotoStatement(endLabel));
-		statements.push(new LabelStatement(endLabel));
-		return statements;
+		this._transformer._emit(new GotoStatement(endLabel));
+		this._transformer._emit(new LabelStatement(failLabel));
+		this._statement.getOnFalseStatements().forEach((statement) -> {
+			this._transformer._getStatementTransformerFor(statement).replaceControlStructuresWithGotos();
+		});
+		this._transformer._emit(new GotoStatement(endLabel));
+		this._transformer._emit(new LabelStatement(endLabel));
 	}
 
 }
@@ -525,7 +502,7 @@ class _SwitchStatementTransformer extends _LabellableStatementTransformer {
 		// create and register a stash
 		statement.getStatements().forEach((statement) -> {
 			if (statement instanceof CaseStatement) {
-				statement.setStash(_SwitchStatementTransformer.CaseStash.ID, new _SwitchStatementTransformer.CaseStash); 
+				statement.setStash(_SwitchStatementTransformer.CaseStash.ID, new _SwitchStatementTransformer.CaseStash);
 			}
 		});
 	}
@@ -534,7 +511,7 @@ class _SwitchStatementTransformer extends _LabellableStatementTransformer {
 		return this._statement;
 	}
 
-	override function _replaceControlStructuresWithGotos () : Statement[] {
+	override function _replaceControlStructuresWithGotos () : void {
 		/*
 
 		switch (expr) {
@@ -577,19 +554,17 @@ class _SwitchStatementTransformer extends _LabellableStatementTransformer {
 	$END_SWITCH_n;
 
 		 */
-		var statements = new Statement[];
 		var testLabel = "$TEST_SWITCH_" + this.getID() as string;
-		statements.push(new GotoStatement(testLabel));
-		statements.push(new LabelStatement(testLabel));
-		this._pushConditionalSwitch(statements);
+		this._transformer._emit(new GotoStatement(testLabel));
+		this._transformer._emit(new LabelStatement(testLabel));
+		this._emitConditionalSwitch();
 		var endLabel = "$END_SWITCH_" + this.getID() as string;
-		statements.push(new GotoStatement(endLabel));
-		this._pushSwitchBody(statements);
-		statements.push(new LabelStatement(endLabel));
-		return statements;
+		this._transformer._emit(new GotoStatement(endLabel));
+		this._emitSwitchBodies();
+		this._transformer._emit(new LabelStatement(endLabel));
 	}
 
-	function _pushConditionalSwitch (output : Statement[]) : void {
+	function _emitConditionalSwitch () : void {
 		var statements = this._statement.getStatements();
 		var switchCases = new Statement[];
 		for (var i = 0; i < statements.length; ++i) {
@@ -604,26 +579,29 @@ class _SwitchStatementTransformer extends _LabellableStatementTransformer {
 				switchCases.push(new ReturnStatement(new Token("return", false), null));
 			}
 		}
-		var condSwitch = this._statement.clone() as SwitchStatement;
-		condSwitch._statements = switchCases;
-		output.push(condSwitch);
+		this._transformer._emit(new SwitchStatement(
+			this._statement.getToken(),
+			this._statement.getLabel(),
+			this._statement.getExpr(),
+			switchCases));
 	}
 
-	function _pushSwitchBody (output : Statement[]) : void {
+	function _emitSwitchBodies () : void {
 		var statements = this._statement.getStatements();
+
 		this._transformer.enterLabelledBlock(this);
 		for (var i = 0; i < statements.length; ++i) {
 			var stmt = statements[i];
 			if (stmt instanceof CaseStatement) {
 				var label = this._getLabelFromCaseStatement(stmt as CaseStatement);
-				output.push(new GotoStatement(label));
-				output.push(new LabelStatement(label));
+				this._transformer._emit(new GotoStatement(label));
+				this._transformer._emit(new LabelStatement(label));
 			} else if (stmt instanceof DefaultStatement) {
 				label = this._getLabelFromDefaultStatement();
-				output.push(new GotoStatement(label));
-				output.push(new LabelStatement(label));
+				this._transformer._emit(new GotoStatement(label));
+				this._transformer._emit(new LabelStatement(label));
 			} else {
-				this._transformAndPush(stmt, output);
+				this._transformer._getStatementTransformerFor(stmt).replaceControlStructuresWithGotos();
 			}
 		}
 		this._transformer.leaveLabelledBlock();
@@ -672,7 +650,7 @@ class _CaseStatementTransformer extends _StatementTransformer {
 		return this._statement;
 	}
 
-	override function _replaceControlStructuresWithGotos () : Statement[] {
+	override function _replaceControlStructuresWithGotos () : void {
 		throw new Error("logic flaw");
 	}
 
@@ -691,7 +669,7 @@ class _DefaultStatementTransformer extends _StatementTransformer {
 		return this._statement;
 	}
 
-	override function _replaceControlStructuresWithGotos () : Statement[] {
+	override function _replaceControlStructuresWithGotos () : void {
 		throw new Error("logic flaw");
 	}
 
@@ -710,7 +688,7 @@ class _WhileStatementTransformer extends _LabellableStatementTransformer {
 		return this._statement;
 	}
 
-	override function _replaceControlStructuresWithGotos () : Statement[] {
+	override function _replaceControlStructuresWithGotos () : void {
 		/*
 
 		while (expr) {
@@ -730,20 +708,20 @@ class _WhileStatementTransformer extends _LabellableStatementTransformer {
 	$END_WHILE_n;
 
 		 */
-		var statements = new Statement[];
 		var testLabel = "$TEST_WHILE_" + this.getID() as string;
-		statements.push(new GotoStatement(testLabel));
-		statements.push(new LabelStatement(testLabel));
+		this._transformer._emit(new GotoStatement(testLabel));
+		this._transformer._emit(new LabelStatement(testLabel));
 		var bodyLabel = "$BODY_WHILE_" + this.getID() as string;
 		var endLabel = "$END_WHILE_" + this.getID() as string;
-		_StatementTransformer.pushConditionalBranch(this._statement.getExpr(), bodyLabel, endLabel, statements);
-		statements.push(new LabelStatement(bodyLabel));
+		this._transformer._emitConditionalBranch(this._statement.getExpr(), bodyLabel, endLabel);
+		this._transformer._emit(new LabelStatement(bodyLabel));
 		this._transformer.enterLabelledBlock(this);
-		this._transformAndPush(this._statement.getStatements(), statements);
+		this._statement.getStatements().forEach((statement) -> {
+			this._transformer._getStatementTransformerFor(statement).replaceControlStructuresWithGotos();
+		});
 		this._transformer.leaveLabelledBlock();
-		statements.push(new GotoStatement(testLabel));
-		statements.push(new LabelStatement(endLabel));
-		return statements;
+		this._transformer._emit(new GotoStatement(testLabel));
+		this._transformer._emit(new LabelStatement(endLabel));
 	}
 
 	override function getBreakingLabel () : string {
@@ -769,7 +747,7 @@ class _TryStatementTransformer extends _StatementTransformer {
 		return this._statement;
 	}
 
-	override function _replaceControlStructuresWithGotos () : Statement[] {
+	override function _replaceControlStructuresWithGotos () : void {
 		throw new Error("logic flaw");
 	}
 
@@ -788,7 +766,7 @@ class _CatchStatementTransformer extends _StatementTransformer {
 		return this._statement;
 	}
 
-	override function _replaceControlStructuresWithGotos () : Statement[] {
+	override function _replaceControlStructuresWithGotos () : void {
 		throw new Error("logic flaw");
 	}
 
@@ -807,8 +785,8 @@ class _ThrowStatementTransformer extends _StatementTransformer {
 		return this._statement;
 	}
 
-	override function _replaceControlStructuresWithGotos () : Statement[] {
-		return [ this._statement ] : Statement[];
+	override function _replaceControlStructuresWithGotos () : void {
+		this._transformer._emit(this._statement);
 	}
 
 }
@@ -826,8 +804,8 @@ class _AssertStatementTransformer extends _StatementTransformer {
 		return this._statement;
 	}
 
-	override function _replaceControlStructuresWithGotos () : Statement[] {
-		return [ this._statement ] : Statement[];
+	override function _replaceControlStructuresWithGotos () : void {
+		this._transformer._emit(this._statement);
 	}
 
 }
@@ -845,8 +823,8 @@ class _LogStatementTransformer extends _StatementTransformer {
 		return this._statement;
 	}
 
-	override function _replaceControlStructuresWithGotos () : Statement[] {
-		return [ this._statement ] : Statement[];
+	override function _replaceControlStructuresWithGotos () : void {
+		this._transformer._emit(this._statement);
 	}
 
 }
@@ -864,8 +842,8 @@ class _DebuggerStatementTransformer extends _StatementTransformer {
 		return this._statement;
 	}
 
-	override function _replaceControlStructuresWithGotos () : Statement[] {
-		return [ this._statement ] : Statement[];
+	override function _replaceControlStructuresWithGotos () : void {
+		this._transformer._emit(this._statement);
 	}
 
 }
@@ -996,8 +974,9 @@ class CodeTransformer {
 
 		// replace control structures with goto statements
 		var statements = new Statement[];
+		this._setOutputStatements(statements);
 		for (var i = 0; i < funcDef.getStatements().length; ++i) {
-			statements = statements.concat(this._getStatementTransformerFor(funcDef.getStatements()[i]).replaceControlStructuresWithGotos());
+			this._getStatementTransformerFor(funcDef.getStatements()[i]).replaceControlStructuresWithGotos();
 		}
 		// insert prologue code
 		statements.unshift(
@@ -1225,6 +1204,28 @@ class CodeTransformer {
 			funcDef = parent;
 		}
 		return depth;
+	}
+
+	var _outputStatements = null : Statement[];
+
+	function _setOutputStatements (statements : Statement[]) : void {
+		this._outputStatements = statements;
+	}
+
+	function _emit (statement : Statement) : void {
+		this._outputStatements.push(statement);
+	}
+
+	function _emitExpressionStatement (expr : Expression) : void {
+		this._emit(new ExpressionStatement(expr));
+	}
+
+	function _emitConditionalBranch (expr : Expression, succLabel : string, failLabel : string) : void {
+		this._emit(new IfStatement(
+			new Token("if", false),
+			expr,
+			[ new GotoStatement(succLabel) ] : Statement[],
+			[ new GotoStatement(failLabel) ] : Statement[]));
 	}
 
 	var _labelMap = new _LabellableStatementTransformer[];
