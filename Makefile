@@ -44,7 +44,7 @@ bootstrap-compiler: compiler
 
 test: all test-debug test-optimized-minified show-todo
 
-test-all: test test-optimized-minified test-transformed-optimized
+test-all: test test-optimized test-transformed test-transformed-optimized
 
 test-debug: test-core test-misc-core
 
