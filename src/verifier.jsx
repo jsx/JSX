@@ -45,8 +45,12 @@ class Verifier {
 	static function perform(classDefs : ClassDefinition[], platform : Platform = null) : boolean {
 		var verifier = new Verifier;
 
-		var success;
-		if (! (success = verifier.checkTypes(classDefs))) {
+		var success = true;
+		if (success && ! (success = verifier.checkTypes(classDefs))) {
+			if (platform != null)
+				verifier.dumpLogs(platform);
+		}
+		if (success && ! (success = verifier.checkClosureLinks(classDefs))) {
 			if (platform != null)
 				verifier.dumpLogs(platform);
 		}
@@ -70,6 +74,47 @@ class Verifier {
 				}
 				return funcDef.forEachClosure(onFuncDef);
 			})) {
+				break;
+			}
+		}
+		if (i != classDefs.length) {
+			return false;
+		}
+		return true;
+	}
+
+	function checkClosureLinks (classDefs : ClassDefinition[]) : boolean {
+		for (var i = 0; i < classDefs.length; ++i) {
+			function onFuncDef (funcDef : MemberFunctionDefinition, parent : MemberFunctionDefinition) : boolean {
+				if (funcDef.getParent() != parent) {
+					this.log("unmatched parent");
+					return false;
+				}
+				if (funcDef.getClassDef() != classDefs[i]) {
+					this.log("unmatched class definition");
+					return false;
+				}
+				if (parent != null && parent.getClosures().indexOf(funcDef) == -1) {
+					this.log("function definition not registered on the parent");
+					return false;
+				}
+				var statements = funcDef.getStatements();
+				if (statements != null && ! Util.forEachStatement(function onStatement (statement) {
+					if (statement instanceof FunctionStatement) {
+						return onFuncDef((statement as FunctionStatement).getFuncDef(), funcDef);
+					}
+					return statement.forEachExpression(function onExpr (expr) {
+						if (expr instanceof FunctionExpression) {
+							return onFuncDef((expr as FunctionExpression).getFuncDef(), funcDef);
+						}
+						return expr.forEachExpression(onExpr);
+					}) && statement.forEachStatement(onStatement);
+				}, statements)) {
+					return false;
+				}
+				return true;
+			}
+			if (! classDefs[i].forEachMemberFunction((funcDef) -> onFuncDef(funcDef, null))) {
 				break;
 			}
 		}
