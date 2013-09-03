@@ -63,7 +63,7 @@ class Verifier {
 							this.log(Util.format("expression with uninitialized type found (L.%1 C.%2)", [ expr.getToken().getLineNumber() as string, expr.getToken().getColumnNumber() as string ]));
 							return false;
 						}
-						return true;
+						return expr.forEachExpression(onExpr);
 					}) && statement.forEachStatement(onStatement);
 				}, statements)) {
 					return false;
