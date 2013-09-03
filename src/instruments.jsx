@@ -1228,11 +1228,11 @@ class CodeTransformer {
 			[ new GotoStatement(failLabel) ] : Statement[]));
 	}
 
-	var _labelMap = new _LabellableStatementTransformer[];
+	var _labelStack = new _LabellableStatementTransformer[];
 
 	function _getStatementTransformerByLabel (label : string) : _LabellableStatementTransformer {
-		for (var i = 0; this._labelMap.length; ++i) {
-			var trans = this._labelMap[i];
+		for (var i = 0; this._labelStack.length; ++i) {
+			var trans = this._labelStack[i];
 			if ((trans.getStatement() as LabellableStatement).getLabel().getValue() == label)
 				return trans;
 		}
@@ -1240,15 +1240,15 @@ class CodeTransformer {
 	}
 
 	function _getTopLabelledBlock () : _LabellableStatementTransformer {
-		return this._labelMap[this._labelMap.length - 1];
+		return this._labelStack[this._labelStack.length - 1];
 	}
 
 	function _enterLabelledBlock (transformer : _LabellableStatementTransformer) : void {
-		this._labelMap.push(transformer);
+		this._labelStack.push(transformer);
 	}
 
 	function _leaveLabelledBlock () : void {
-		this._labelMap.pop();
+		this._labelStack.pop();
 	}
 
 	var _returnLocals = new LocalVariable[];
