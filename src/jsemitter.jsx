@@ -2157,6 +2157,34 @@ class _AssignmentExpressionEmitter extends _OperatorExpressionEmitter {
 		this._expr = expr;
 	}
 
+	override function _emit () : void {
+		var op = this._expr.getToken().getValue();
+		this._emitter._getExpressionEmitterFor(this._expr.getFirstExpr()).emit(this._getPrecedence());
+		this._emitter._emit(" " + op + " ", this._expr.getToken());
+		this._emitter._emitRHSOfAssignment(this._expr.getSecondExpr(), this._expr.getFirstExpr().getType());
+	}
+
+	override function _getPrecedence () : number {
+		return _AssignmentExpressionEmitter._operatorPrecedence[this._expr.getToken().getValue()];
+	}
+
+	static const _operatorPrecedence = new Map.<number>;
+
+	static function _setOperatorPrecedence (op : string, precedence : number) : void {
+		_AssignmentExpressionEmitter._operatorPrecedence[op] = precedence;
+	}
+
+}
+
+class _FusedAssignmentExpressionEmitter extends _OperatorExpressionEmitter {
+
+	var _expr : FusedAssignmentExpression;
+
+	function constructor (emitter : JavaScriptEmitter, expr : FusedAssignmentExpression) {
+		super(emitter);
+		this._expr = expr;
+	}
+
 	override function emit (outerOpPrecedence : number) : void {
 		if (this._expr.getToken().getValue() == "/="
 			&& this._expr.getFirstExpr().getType().resolveIfNullable().equals(Type.integerType)) {
@@ -2169,7 +2197,7 @@ class _AssignmentExpressionEmitter extends _OperatorExpressionEmitter {
 
 	override function _emit () : void {
 		var op = this._expr.getToken().getValue();
-		this._emitter._getExpressionEmitterFor(this._expr.getFirstExpr()).emit(_AssignmentExpressionEmitter._operatorPrecedence[op]);
+		this._emitter._getExpressionEmitterFor(this._expr.getFirstExpr()).emit(this._getPrecedence());
 		this._emitter._emit(" " + op + " ", this._expr.getToken());
 		this._emitter._emitRHSOfAssignment(this._expr.getSecondExpr(), this._expr.getFirstExpr().getType());
 	}
@@ -2200,6 +2228,7 @@ class _AssignmentExpressionEmitter extends _OperatorExpressionEmitter {
 			this._emitter._emitWithNullableGuard(secondExpr, 0);
 			this._emitter._emit(")", this._expr.getToken());
 		} else {
+			// dealt as l = (l / r) | 0
 			this.emitWithPrecedence(outerOpPrecedence, _AssignmentExpressionEmitter._operatorPrecedence["="], function () {
 				this._emitter._getExpressionEmitterFor(firstExpr).emit(_AssignmentExpressionEmitter._operatorPrecedence["="]);
 				this._emitter._emit(" = (", this._expr.getToken());
@@ -2212,13 +2241,13 @@ class _AssignmentExpressionEmitter extends _OperatorExpressionEmitter {
 	}
 
 	override function _getPrecedence () : number {
-		return _AssignmentExpressionEmitter._operatorPrecedence[this._expr.getToken().getValue()];
+		return _FusedAssignmentExpressionEmitter._operatorPrecedence[this._expr.getToken().getValue()];
 	}
 
 	static const _operatorPrecedence = new Map.<number>;
 
 	static function _setOperatorPrecedence (op : string, precedence : number) : void {
-		_AssignmentExpressionEmitter._operatorPrecedence[op] = precedence;
+		_FusedAssignmentExpressionEmitter._operatorPrecedence[op] = precedence;
 	}
 
 }
@@ -3635,6 +3664,8 @@ class JavaScriptEmitter implements Emitter {
 			return new _ArrayExpressionEmitter(this, expr as ArrayExpression);
 		else if (expr instanceof AssignmentExpression)
 			return new _AssignmentExpressionEmitter(this, expr as AssignmentExpression);
+		else if (expr instanceof FusedAssignmentExpression)
+			return new _FusedAssignmentExpressionEmitter(this, expr as FusedAssignmentExpression);
 		else if (expr instanceof BinaryNumberExpression)
 			return new _BinaryNumberExpressionEmitter(this, expr as BinaryNumberExpression);
 		else if (expr instanceof EqualityExpression)
@@ -3830,17 +3861,17 @@ class JavaScriptEmitter implements Emitter {
 				{ "||":         _LogicalExpressionEmitter._setOperatorPrecedence }
 			], [
 				{ "=":          _AssignmentExpressionEmitter._setOperatorPrecedence },
-				{ "*=":         _AssignmentExpressionEmitter._setOperatorPrecedence },
-				{ "/=":         _AssignmentExpressionEmitter._setOperatorPrecedence },
-				{ "%=":         _AssignmentExpressionEmitter._setOperatorPrecedence },
-				{ "+=":         _AssignmentExpressionEmitter._setOperatorPrecedence },
-				{ "-=":         _AssignmentExpressionEmitter._setOperatorPrecedence },
-				{ "<<=":        _AssignmentExpressionEmitter._setOperatorPrecedence },
-				{ ">>=":        _AssignmentExpressionEmitter._setOperatorPrecedence },
-				{ ">>>=":       _AssignmentExpressionEmitter._setOperatorPrecedence },
-				{ "&=":         _AssignmentExpressionEmitter._setOperatorPrecedence },
-				{ "^=":         _AssignmentExpressionEmitter._setOperatorPrecedence },
-				{ "|=":         _AssignmentExpressionEmitter._setOperatorPrecedence }
+				{ "*=":         _FusedAssignmentExpressionEmitter._setOperatorPrecedence },
+				{ "/=":         _FusedAssignmentExpressionEmitter._setOperatorPrecedence },
+				{ "%=":         _FusedAssignmentExpressionEmitter._setOperatorPrecedence },
+				{ "+=":         _FusedAssignmentExpressionEmitter._setOperatorPrecedence },
+				{ "-=":         _FusedAssignmentExpressionEmitter._setOperatorPrecedence },
+				{ "<<=":        _FusedAssignmentExpressionEmitter._setOperatorPrecedence },
+				{ ">>=":        _FusedAssignmentExpressionEmitter._setOperatorPrecedence },
+				{ ">>>=":       _FusedAssignmentExpressionEmitter._setOperatorPrecedence },
+				{ "&=":         _FusedAssignmentExpressionEmitter._setOperatorPrecedence },
+				{ "^=":         _FusedAssignmentExpressionEmitter._setOperatorPrecedence },
+				{ "|=":         _FusedAssignmentExpressionEmitter._setOperatorPrecedence }
 			], [
 				{ "?":          _ConditionalExpressionEmitter._setOperatorPrecedence }
 			], [
