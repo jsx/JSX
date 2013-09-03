@@ -86,6 +86,9 @@ class Verifier {
 	function checkClosureLinks (classDefs : ClassDefinition[]) : boolean {
 		for (var i = 0; i < classDefs.length; ++i) {
 			function onFuncDef (funcDef : MemberFunctionDefinition, parent : MemberFunctionDefinition) : boolean {
+				if (funcDef instanceof TemplateFunctionDefinition)
+					return true;
+
 				if (funcDef.getParent() != parent) {
 					this.log("unmatched parent");
 					return false;
