@@ -1107,7 +1107,7 @@ abstract class _StatementTransformer {
 	abstract function getStatement () : Statement;
 
 	function replaceControlStructuresWithGotos () : void {
-		if (! this._transformer._transformExprs) {
+		if (this._transformer._transformExprs) {
 			var funcDef = this._transformer.getTransformingFuncDef();
 			this.getStatement().forEachExpression(function (expr, replaceCb) {
 				replaceCb(this._transformer._getExpressionTransformerFor(expr).doCPSTransform(funcDef, null, expr.getType()));
@@ -1261,7 +1261,7 @@ class _DeleteStatementTransformer extends _StatementTransformer {
 	}
 
 	override function replaceControlStructuresWithGotos () : void {
-		if (! this._transformer._transformExprs) {
+		if (this._transformer._transformExprs) {
 			var funcDef = this._transformer.getTransformingFuncDef();
 			var aryExpr = this._statement.getExpr() as ArrayExpression;
 			this._transformer._emitExpressionStatement(new _DeleteStatementTransformer._Stash(this._transformer, this._statement).doCPSTransform(funcDef, null, aryExpr.getType()));
@@ -1952,7 +1952,7 @@ class CodeTransformer {
 
 	function constructor () {
 		this._forceTransform = false;
-		this._transformExprs = true;
+		this._transformExprs = false;
 
 		this._stopIterationClassDef = null;
 		this._jsxGeneratorClassDef = null;
@@ -2025,7 +2025,7 @@ class CodeTransformer {
 			var transformExprs = this._transformExprs;
 			try {
 				// force transform expressions
-				this._transformExprs = false;
+				this._transformExprs = true;
 
 				// transform functions as many as possible
 				this._getAllClosures().forEach((funcDef) -> {
