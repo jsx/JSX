@@ -1939,6 +1939,26 @@ class _DebuggerStatementTransformer extends _StatementTransformer {
 
 }
 
+class BasicBlock {
+
+	var _label : LabelStatement;
+	var _body : Statement[];
+
+	function constructor (label : LabelStatement, body : Statement[]) {
+		this._label = label;
+		this._body = body;
+	}
+
+	function getBody () : Statement[] {
+		return this._body;
+	}
+
+	function getLabel () : LabelStatement {
+		return this._label;
+	}
+
+}
+
 class CodeTransformer {
 
 	var _forceTransform : boolean;
@@ -2056,13 +2076,15 @@ class CodeTransformer {
 	}
 
 	function _doCPSTransform (funcDef : MemberFunctionDefinition) : void {
-		this._doCPSTransform(funcDef, function (name, statements) {
+		this._doCPSTransform(funcDef, function (block) {
 			// do nothing
 		});
 	}
 
-	function _doCPSTransform (funcDef : MemberFunctionDefinition, postFragmentationCallback : (string, Statement[]) -> void) : void {
+	function _doCPSTransform (funcDef : MemberFunctionDefinition, postGotoEliminationCb : (BasicBlock) -> void) : void {
 		this._transformingFuncDef = funcDef;
+
+		var statements = new Statement[];
 
 		var returnLocal : LocalVariable = null;
 		if (! Type.voidType.equals(funcDef.getReturnType())) {
@@ -2073,7 +2095,6 @@ class CodeTransformer {
 		}
 
 		// replace control structures with goto statements
-		var statements = new Statement[];
 		this._setOutputStatements(statements);
 		for (var i = 0; i < funcDef.getStatements().length; ++i) {
 			this._getStatementTransformerFor(funcDef.getStatements()[i]).replaceControlStructuresWithGotos();
@@ -2088,51 +2109,23 @@ class CodeTransformer {
 			new GotoStatement("$L_exit"),
 			new LabelStatement("$L_exit")
 		);
-		funcDef._statements = statements;
 
 		if (! Type.voidType.equals(funcDef.getReturnType())) {
-			funcDef._statements.push(new ReturnStatement(new Token("return", false), new LocalExpression(returnLocal.getName(), returnLocal)));
+			statements.push(new ReturnStatement(new Token("return", false), new LocalExpression(returnLocal.getName(), returnLocal)));
 			this._leaveFunction();
 		}
 
+		// build basic blocks
+		var basicBlocks = this._buildBasicBlocks(statements);
+
 		// replace goto statements with calls of closures
-		this._eliminateGotos(funcDef, postFragmentationCallback);
+		this._eliminateGotos(funcDef, basicBlocks, postGotoEliminationCb);
 	}
 
-	function _eliminateGotos (funcDef : MemberFunctionDefinition, postFragmentationCallback : (string, Statement[]) -> void) : void {
-		var statements = funcDef.getStatements();
-		// collect labels
-		var labels = new Map.<LocalVariable>;
-		for (var i = 0; i < statements.length; ++i) {
-			if (statements[i] instanceof LabelStatement && labels[(statements[i] as LabelStatement).getName()] == null) {
-				var name = (statements[i] as LabelStatement).getName();
-				labels[name] = new LocalVariable(new Token(name, true), new StaticFunctionType(null, Type.voidType, [], true));
-				funcDef.getLocals().push(labels[name]);
-			}
-		}
-		// replace gotos with function call (and return statement)
-		for (var i = 0; i < statements.length; ++i) {
-			var stmt = statements[i];
-			if (stmt instanceof GotoStatement) {
-				var name = (stmt as GotoStatement).getLabel();
-				statements[i] = new ReturnStatement(new Token("return", false), new CallExpression(new Token("(", false), new LocalExpression(null, labels[name]), []));
-			} else if (stmt instanceof IfStatement) {
-				var ifStmt = stmt as IfStatement;
-				var succLabel = (ifStmt.getOnTrueStatements()[0] as GotoStatement).getLabel();
-				ifStmt.getOnTrueStatements()[0] = new ReturnStatement(new Token("return", false), new CallExpression(new Token("(", false), new LocalExpression(null, labels[succLabel]), []));
-				var failLabel = (ifStmt.getOnFalseStatements()[0] as GotoStatement).getLabel();
-				ifStmt.getOnFalseStatements()[0] = new ReturnStatement(new Token("return", false), new CallExpression(new Token("(", false), new LocalExpression(null, labels[failLabel]), []));
-			} else if (stmt instanceof SwitchStatement) {
-				var switchStmt = stmt as SwitchStatement;
-				for (var j = 0; j < switchStmt.getStatements().length; ++j) {
-					if (switchStmt.getStatements()[j] instanceof GotoStatement) {
-						name = (switchStmt.getStatements()[j] as GotoStatement).getLabel();
-						switchStmt.getStatements()[j] = new ReturnStatement(new Token("return", false), new CallExpression(new Token("(", false), new LocalExpression(null, labels[name]), []));
-					}
-				}
-			}
-		}
-		// entry basic block
+	function _buildBasicBlocks (statements : Statement[]) : BasicBlock[] {
+		var basicBlocks = new BasicBlock[];
+
+		// entry block
 		var entry = new Statement[];
 		for (var i = 0; i < statements.length; ++i) {
 			if (statements[i] instanceof LabelStatement) { // until first label
@@ -2140,8 +2133,9 @@ class CodeTransformer {
 			}
 			entry.push(statements[i]);
 		}
+		basicBlocks.push(new BasicBlock(null, entry));
+
 		// remaining basic blocks
-		var basicBlocks = new Statement[];
 		var currentLabel : LabelStatement = null;
 		while (i < statements.length) {
 			var currentLabel = statements[i] as LabelStatement;
@@ -2155,18 +2149,61 @@ class CodeTransformer {
 				}
 				body.push(statements[i]);
 			}
-			postFragmentationCallback(currentLabel.getName(), body);
+			basicBlocks.push(new BasicBlock(currentLabel, body));
+		}
 
+		return basicBlocks;
+	}
+
+	function _eliminateGotos (funcDef : MemberFunctionDefinition, basicBlocks : BasicBlock[], postGotoEliminationCb : (BasicBlock) -> void) : void {
+		// collect labels
+		var labels = new Map.<LocalVariable>;
+		basicBlocks.forEach(function (basicBlock) {
+			if (basicBlock.getLabel() == null) // the entry block
+				return;
+			var name = basicBlock.getLabel().getName();
+			labels[name] = new LocalVariable(new Token(name, true), new StaticFunctionType(null, Type.voidType, [], true));
+			funcDef.getLocals().push(labels[name]);
+		});
+		// replace gotos with a function call (and a return statement)
+		basicBlocks.forEach(function (basicBlock) {
+			var statements = basicBlock.getBody();
+			for (var i = 0; i < statements.length; ++i) {
+				var stmt = statements[i];
+				if (stmt instanceof GotoStatement) {
+					var name = (stmt as GotoStatement).getLabel();
+					statements[i] = new ReturnStatement(new Token("return", false), new CallExpression(new Token("(", false), new LocalExpression(null, labels[name]), []));
+				} else if (stmt instanceof IfStatement) {
+					var ifStmt = stmt as IfStatement;
+					var succLabel = (ifStmt.getOnTrueStatements()[0] as GotoStatement).getLabel();
+					ifStmt.getOnTrueStatements()[0] = new ReturnStatement(new Token("return", false), new CallExpression(new Token("(", false), new LocalExpression(null, labels[succLabel]), []));
+					var failLabel = (ifStmt.getOnFalseStatements()[0] as GotoStatement).getLabel();
+					ifStmt.getOnFalseStatements()[0] = new ReturnStatement(new Token("return", false), new CallExpression(new Token("(", false), new LocalExpression(null, labels[failLabel]), []));
+				} else if (stmt instanceof SwitchStatement) {
+					var switchStmt = stmt as SwitchStatement;
+					for (var j = 0; j < switchStmt.getStatements().length; ++j) {
+						if (switchStmt.getStatements()[j] instanceof GotoStatement) {
+							name = (switchStmt.getStatements()[j] as GotoStatement).getLabel();
+							switchStmt.getStatements()[j] = new ReturnStatement(new Token("return", false), new CallExpression(new Token("(", false), new LocalExpression(null, labels[name]), []));
+						}
+					}
+				}
+			}
+		});
+		basicBlocks.forEach(postGotoEliminationCb);
+		// pack the blocks into closures
+		var statements = new Statement[];
+		for (var i = 1; i < basicBlocks.length; ++i) {
 			// create a function block
 			var block = this._createAnonymousFunction(funcDef, null, [], this._transformingFuncDef.getReturnType());
-			block._statements = body;
-			basicBlocks.push(new ExpressionStatement(
+			block._statements = basicBlocks[i].getBody();
+			statements.push(new ExpressionStatement(
 				new AssignmentExpression(
 					new Token("=", false),
-					new LocalExpression(null, labels[currentLabel.getName()]),
+					new LocalExpression(null, labels[basicBlocks[i].getLabel().getName()]),
 					new FunctionExpression(new Token("function", false), block))));
 		}
-		funcDef._statements = basicBlocks.concat(entry);
+		funcDef._statements = statements.concat(basicBlocks[0].getBody());
 	}
 
 	function _compileYields(funcDef : MemberFunctionDefinition) : void { // FIXME wasabiz nested generator
@@ -2191,7 +2228,8 @@ class CodeTransformer {
 		  -> $generatorN.__value = expr;
 		     $generatorN.__next = $LABEL;
 		 */
-		this._doCPSTransform(funcDef, function (label : string, statements : Statement[]) : void {
+		this._doCPSTransform(funcDef, function (block) : void {
+			var statements = block.getBody();
 			if (2 <= statements.length && statements[statements.length - 2] instanceof YieldStatement) {
 				var idx = statements.length - 2;
 				statements.splice(idx, 2,
