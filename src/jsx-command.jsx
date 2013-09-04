@@ -191,6 +191,8 @@ class JSXCommand {
 				}
 				if (optarg == "release") {
 					optimizeCommands = Optimizer.getReleaseOptimizationCommands();
+				} else if (optarg == "development") {
+					optimizeCommands = Optimizer.getDevelopmentOptimizationCommands();
 				} else {
 					optimizeCommands = optimizeCommands.concat(optarg.split(","));
 				}

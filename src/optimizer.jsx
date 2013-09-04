@@ -256,6 +256,17 @@ class Optimizer {
 		];
 	}
 
+	static function getDevelopmentOptimizationCommands() : string[] {
+		var disabled = [
+			"no-assert",
+			"no-log",
+			"no-debug"
+		];
+		return Optimizer.getReleaseOptimizationCommands().filter(function (cmd) {
+			return disabled.indexOf(cmd) == -1;
+		});
+	}
+
 	function constructor () {
 		this._compiler = null;
 		this._commands = new _OptimizeCommand[];
