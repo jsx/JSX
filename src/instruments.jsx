@@ -2377,13 +2377,15 @@ class CodeTransformer {
 
 	var _labelStack = new _LabellableStatementTransformer[];
 
-	function _getStatementTransformerByLabel (label : string) : _LabellableStatementTransformer {
+	function _getStatementTransformerByLabel (labelName : string) : _LabellableStatementTransformer {
+		var label;
 		for (var i = 0; this._labelStack.length; ++i) {
-			var trans = this._labelStack[i];
-			if ((trans.getStatement() as LabellableStatement).getLabel().getValue() == label)
-				return trans;
+			var transformer = this._labelStack[i];
+			if ((label = (transformer.getStatement() as LabellableStatement).getLabel()) != null
+				&& label.getValue() == labelName)
+					return transformer;
 		}
-		throw new Error("fatal error: no corresponding transformer for label \"" + label + "\"");
+		throw new Error("fatal error: no corresponding transformer for label \"" + labelName + "\"");
 	}
 
 	function _getTopLabelledBlock () : _LabellableStatementTransformer {
