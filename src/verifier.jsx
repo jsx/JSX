@@ -85,6 +85,7 @@ class Verifier {
 
 	function checkClosureLinks (classDefs : ClassDefinition[]) : boolean {
 		for (var i = 0; i < classDefs.length; ++i) {
+
 			function onFuncDef (funcDef : MemberFunctionDefinition, parent : MemberFunctionDefinition) : boolean {
 				if (funcDef instanceof TemplateFunctionDefinition)
 					return true;
@@ -102,12 +103,15 @@ class Verifier {
 					return false;
 				}
 				var statements = funcDef.getStatements();
+				var numClosures = 0;
 				if (statements != null && ! Util.forEachStatement(function onStatement (statement) {
 					if (statement instanceof FunctionStatement) {
+						++numClosures;
 						return onFuncDef((statement as FunctionStatement).getFuncDef(), funcDef);
 					}
 					return statement.forEachExpression(function onExpr (expr) {
 						if (expr instanceof FunctionExpression) {
+							++numClosures;
 							return onFuncDef((expr as FunctionExpression).getFuncDef(), funcDef);
 						}
 						return expr.forEachExpression(onExpr);
@@ -115,8 +119,13 @@ class Verifier {
 				}, statements)) {
 					return false;
 				}
+				if (funcDef.getClosures().length != numClosures) {
+					this.log("orphan function definitions missed to be removed");
+					return false;
+				}
 				return true;
 			}
+
 			if (! classDefs[i].forEachMemberFunction((funcDef) -> onFuncDef(funcDef, null))) {
 				break;
 			}
