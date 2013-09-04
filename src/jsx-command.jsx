@@ -189,11 +189,18 @@ class JSXCommand {
 				if ((optarg = getoptarg()) == null) {
 					return 1;
 				}
-				if (optarg == "release") {
-					optimizeCommands = Optimizer.getReleaseOptimizationCommands();
-				} else {
-					optimizeCommands = optimizeCommands.concat(optarg.split(","));
-				}
+				optarg.split(",").forEach((command) -> {
+					if (command == "release") {
+						optimizeCommands = Optimizer.getReleaseOptimizationCommands();
+					} else if (command.charAt(0) == "-") {
+						command = command.slice(1);
+						optimizeCommands = optimizeCommands.filter((item) -> {
+							return command != item;
+						});
+					} else {
+						optimizeCommands.push(command);
+					}
+				});
 				break;
 			case "--disable-optimize":
 				if ((optarg = getoptarg()) == null) {
