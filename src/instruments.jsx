@@ -2113,6 +2113,8 @@ class CodeTransformer {
 		if (! Type.voidType.equals(funcDef.getReturnType())) {
 			statements.push(new ReturnStatement(new Token("return", false), new LocalExpression(returnLocal.getName(), returnLocal)));
 			this._leaveFunction();
+		} else {
+			statements.push(new ReturnStatement(new Token("return", false), null));
 		}
 
 		// build basic blocks
