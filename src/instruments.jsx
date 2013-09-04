@@ -1663,11 +1663,11 @@ class _SwitchStatementTransformer extends _LabellableStatementTransformer {
 			if (stmt instanceof CaseStatement) {
 				switchCases.push(stmt);
 				switchCases.push(new GotoStatement(this._getLabelFromCaseStatement(stmt as CaseStatement)));
-				switchCases.push(new ReturnStatement(new Token("return", false), null));
+				switchCases.push(new BreakStatement(new Token("break", false), null));
 			} else if (stmt instanceof DefaultStatement) {
 				switchCases.push(stmt);
 				switchCases.push(new GotoStatement(this._getLabelFromDefaultStatement()));
-				switchCases.push(new ReturnStatement(new Token("return", false), null));
+				switchCases.push(new BreakStatement(new Token("break", false), null));
 			}
 		}
 		this._transformer._emit(new SwitchStatement(
