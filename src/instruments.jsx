@@ -2076,12 +2076,13 @@ class CodeTransformer {
 	}
 
 	function _doCPSTransform (funcDef : MemberFunctionDefinition) : void {
-		this._doCPSTransform(funcDef, function (block) {
-			// do nothing
+		this._doCPSTransform(funcDef, function (blocks) {
+			this._eliminateGotosByClosures(funcDef, blocks, function (block) {
+			});
 		});
 	}
 
-	function _doCPSTransform (funcDef : MemberFunctionDefinition, postGotoEliminationCb : (BasicBlock) -> void) : void {
+	function _doCPSTransform (funcDef : MemberFunctionDefinition, eliminateGotos : (BasicBlock[]) -> void) : void {
 		this._transformingFuncDef = funcDef;
 
 		var statements = new Statement[];
@@ -2120,8 +2121,8 @@ class CodeTransformer {
 		// build basic blocks
 		var basicBlocks = this._buildBasicBlocks(statements);
 
-		// replace goto statements with calls of closures
-		this._eliminateGotos(funcDef, basicBlocks, postGotoEliminationCb);
+		// replace goto statements with calls of closures by the strategy depending on 'eliminateGotos'
+		eliminateGotos(basicBlocks);
 	}
 
 	function _buildBasicBlocks (statements : Statement[]) : BasicBlock[] {
@@ -2157,7 +2158,7 @@ class CodeTransformer {
 		return basicBlocks;
 	}
 
-	function _eliminateGotos (funcDef : MemberFunctionDefinition, basicBlocks : BasicBlock[], postGotoEliminationCb : (BasicBlock) -> void) : void {
+	function _eliminateGotosByClosures (funcDef : MemberFunctionDefinition, basicBlocks : BasicBlock[], postGotoEliminationCb : (BasicBlock) -> void) : void {
 		// collect labels
 		var labels = new Map.<LocalVariable>;
 		basicBlocks.forEach(function (basicBlock) {
@@ -2230,32 +2231,10 @@ class CodeTransformer {
 		  -> $generatorN.__value = expr;
 		     $generatorN.__next = $LABEL;
 		 */
-		this._doCPSTransform(funcDef, function (block) : void {
-			var statements = block.getBody();
-			if (2 <= statements.length && statements[statements.length - 2] instanceof YieldStatement) {
-				var idx = statements.length - 2;
-				statements.splice(idx, 2,
-					new ExpressionStatement(
-						new AssignmentExpression(
-							new Token("=", false),
-							new PropertyExpression(
-								new Token(".", false),
-								new LocalExpression(new Token(genLocalName, false), genLocal),
-								new Token("__value", false),
-								[],
-								yieldingType),
-							(statements[idx] as YieldStatement).getExpr())),
-					new ExpressionStatement(
-						new AssignmentExpression(
-							new Token("=", false),
-							new PropertyExpression(
-								new Token(".", false),
-								new LocalExpression(new Token(genLocalName, false), genLocal),
-								new Token("__next", true),
-								[],
-								new StaticFunctionType(null, this._transformingFuncDef.getReturnType(), [], true)),
-							((statements[idx + 1] as ReturnStatement).getExpr()as CallExpression).getExpr())));
-			}
+		this._doCPSTransform(funcDef, function (blocks) : void {
+			this._eliminateGotosByClosures(funcDef, blocks, function (block) {
+				this._replaceYieldsWithContinuationSaves(block, yieldingType, genLocal);
+			});
 		});
 
 		// declare generator object
@@ -2296,6 +2275,34 @@ class CodeTransformer {
 			new ReturnStatement(
 				new Token("return", false),
 				new LocalExpression(new Token("$generator", false), genLocal)));
+	}
+
+	function _replaceYieldsWithContinuationSaves (block : BasicBlock, yieldingType : Type, local : LocalVariable) : void {
+		var statements = block.getBody();
+		if (2 <= statements.length && statements[statements.length - 2] instanceof YieldStatement) {
+			var idx = statements.length - 2;
+			statements.splice(idx, 2,
+				new ExpressionStatement(
+					new AssignmentExpression(
+						new Token("=", false),
+						new PropertyExpression(
+							new Token(".", false),
+							new LocalExpression(new Token(local.getName().getValue(), false), local),
+							new Token("__value", false),
+							[],
+							yieldingType),
+						(statements[idx] as YieldStatement).getExpr())),
+				new ExpressionStatement(
+					new AssignmentExpression(
+						new Token("=", false),
+						new PropertyExpression(
+							new Token(".", false),
+							new LocalExpression(new Token(local.getName().getValue(), false), local),
+							new Token("__next", true),
+							[],
+							new StaticFunctionType(null, this._transformingFuncDef.getReturnType(), [], true)),
+						((statements[idx + 1] as ReturnStatement).getExpr()as CallExpression).getExpr())));
+		}
 	}
 
 	function _instantiateGeneratorType (yieldingType : Type) : Type {
