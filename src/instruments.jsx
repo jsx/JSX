@@ -2077,8 +2077,7 @@ class CodeTransformer {
 
 	function _doCPSTransform (funcDef : MemberFunctionDefinition) : void {
 		this._doCPSTransform(funcDef, function (blocks) {
-			this._eliminateGotosByClosures(funcDef, blocks, function (block) {
-			});
+			this._eliminateGotosByBigSwitch(funcDef, blocks);
 		});
 	}
 
@@ -2156,6 +2155,76 @@ class CodeTransformer {
 		}
 
 		return basicBlocks;
+	}
+
+	function _eliminateGotosByBigSwitch (funcDef : MemberFunctionDefinition, basicBlocks : BasicBlock[]) : void {
+		var state = new LocalVariable(new Token("$state", true), Type.integerType);
+		var statements = new Statement[];
+		statements.push(new ExpressionStatement(new AssignmentExpression(new Token("=", false), new LocalExpression(state.getName(), state), new IntegerLiteralExpression(new Token("0")))));
+		var switchBody = new Statement[];
+		var labels = new Map.<int>;
+		for (var i = 1 /* skip the entry */; i < basicBlocks.length; ++i) {
+			if (basicBlocks[i].getLabel() != null) {
+				labels[basicBlocks[i].getLabel().getName()] = i;
+			}
+		}
+		var dispatcherLabelName = "$dispatch";
+		var usedLabels = new Map.<boolean>;
+		Util.forEachStatement(function onStatement (statement) {
+			if (statement instanceof LabellableStatement && (statement as LabellableStatement).getLabel() != null) {
+				usedLabels[(statement as LabellableStatement).getLabel().getValue()] = true;
+			}
+			return statement.forEachStatement(onStatement);
+		}, funcDef.getStatements());
+		for (var i = 0; usedLabels[dispatcherLabelName + i]; ++i)
+			;
+		dispatcherLabelName += i as string;
+		for (var i = 0; i < basicBlocks.length; ++i) {
+			switchBody.push(new CaseStatement(new Token("case", false), new IntegerLiteralExpression(new Token(i as string))));
+			var blockBody = basicBlocks[i].getBody();
+			for (var j = 0; j < blockBody.length; ++j) {
+				var stmt = blockBody[j];
+				if (stmt instanceof GotoStatement) {
+					var name = (stmt as GotoStatement).getLabel();
+					switchBody.push(new ExpressionStatement(new AssignmentExpression(
+						new Token("=", false),
+						new LocalExpression(new Token(state.getName().getValue(), true), state),
+						new IntegerLiteralExpression(new Token(labels[name] as string)))));
+					switchBody.push(new BreakStatement(new Token("break", false), new Token(dispatcherLabelName, false)));
+				} else if (stmt instanceof IfStatement) {
+					var ifStmt = stmt as IfStatement;
+					var succLabel = (ifStmt.getOnTrueStatements()[0] as GotoStatement).getLabel();
+					ifStmt.getOnTrueStatements()[0] = new ExpressionStatement(new AssignmentExpression(
+						new Token("=", false),
+						new LocalExpression(new Token(state.getName().getValue(), true), state),
+						new IntegerLiteralExpression(new Token(labels[succLabel] as string))));
+					var failLabel = (ifStmt.getOnFalseStatements()[0] as GotoStatement).getLabel();
+					ifStmt.getOnFalseStatements()[0] = new ExpressionStatement(new AssignmentExpression(
+						new Token("=", false),
+						new LocalExpression(new Token(state.getName().getValue(), true), state),
+						new IntegerLiteralExpression(new Token(labels[failLabel] as string))));
+					switchBody.push(ifStmt);
+					switchBody.push(new BreakStatement(new Token("break", false), new Token(dispatcherLabelName, false)));
+				} else if (stmt instanceof SwitchStatement) {
+					var switchStmt = stmt as SwitchStatement;
+					for (var k = 0; k < switchStmt.getStatements().length; ++k) {
+						if (switchStmt.getStatements()[k] instanceof GotoStatement) {
+							name = (switchStmt.getStatements()[k] as GotoStatement).getLabel();
+							switchStmt.getStatements()[k] = new ExpressionStatement(new AssignmentExpression(
+								new Token("=", false),
+								new LocalExpression(new Token(state.getName().getValue(), true), state),
+								new IntegerLiteralExpression(new Token(labels[name] as string))));
+						}
+					}
+					switchBody.push(switchStmt);
+					switchBody.push(new BreakStatement(new Token("break", false), new Token(dispatcherLabelName, false)));
+				} else {
+					switchBody.push(stmt);
+				}
+			}
+		}
+		statements.push(new WhileStatement(new Token("while", false), null, new BooleanLiteralExpression(new Token("true", false)), [ new SwitchStatement(new Token("switch", false), new Token(dispatcherLabelName, false), new LocalExpression(new Token(state.getName().getValue(), true), state), switchBody) ] : Statement[]));
+		funcDef._statements = statements;
 	}
 
 	function _eliminateGotosByClosures (funcDef : MemberFunctionDefinition, basicBlocks : BasicBlock[], postGotoEliminationCb : (BasicBlock) -> void) : void {
