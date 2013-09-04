@@ -174,7 +174,7 @@ class Compiler {
 		this._analyze(errors);
 		if (! this._handleErrors(errors))
 			return false;
-		this._verify();
+		assert this._verify();
 		switch (this._mode) {
 		case Compiler.MODE_COMPLETE:
 			return true;
@@ -185,7 +185,7 @@ class Compiler {
 		this._transform();
 		// optimization
 		this._optimize();
-		this._verify();
+		assert this._verify();
 		// TODO peep-hole and dead store optimizations, etc.
 		this._generateCode(errors);
 		if (! this._handleErrors(errors))
@@ -312,12 +312,15 @@ class Compiler {
 		});
 	}
 
-	function _verify () : void {
+	function _verify () : boolean {
 		for (var i = 0; i < this._parsers.length; ++i) {
 			if (! Verifier.perform(this._parsers[i].getClassDefs(), this._platform))
 				break;
 		}
-		assert i == this._parsers.length, "any of the verifications failed";
+		if (i != this._parsers.length)
+			return false;
+		else
+			return true;
 	}
 
 	function _resolveImports (errors : CompileError[]) : void {
