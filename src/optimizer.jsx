@@ -1299,6 +1299,7 @@ class _StaticizeOptimizeCommand extends _OptimizeCommand {
 					if ((rewritingFuncDef.flags() & ClassDefinition.IS_STATIC) != 0) {
 						// super expression in static function means that the function has been staticized
 						var thisArg = rewritingFuncDef.getArguments()[0];
+						assert thisArg != null, rewritingFuncDef.getNotation();
 						thisVar = new LocalExpression(thisArg.getName(), thisArg);
 					} else {
 						thisVar = new ThisExpression(new Token("this", false), funcDef.getClassDef());
