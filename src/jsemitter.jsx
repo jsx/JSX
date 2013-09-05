@@ -3035,9 +3035,6 @@ class JavaScriptEmitter implements Emitter {
 	function _emitCore(classDefs : ClassDefinition[]) : void {
 		for (var i = 0; i < classDefs.length; ++i) {
 			classDefs[i].forEachMemberFunction(function onFuncDef(funcDef) {
-				if (funcDef.flags() & ClassDefinition.IS_DELETE) {
-					return true;
-				}
 				funcDef.forEachClosure(onFuncDef);
 				this._setupBooleanizeFlags(funcDef);
 				return true;
@@ -3086,16 +3083,15 @@ class JavaScriptEmitter implements Emitter {
 
 	// the function does not take care of function statements / expressions (in other words the caller should use forEachClosure)
 	function _setupBooleanizeFlags (expr : Expression) : void {
-		function exprReturnsBoolean(expr : Expression) : boolean {
+		var exprReturnsBoolean = function (expr : Expression) : boolean {
 			if (expr instanceof LogicalExpression) {
 				return this.getStash(expr).returnsBoolean;
 			} else {
 				return expr.getType().equals(Type.booleanType);
 			}
-		}
+		};
 		var parentExpr = new Expression[]; // [0] is stack top
-		(function onExpr(expr : Expression) : boolean {
-			assert expr;
+		var onExpr = function (expr : Expression) : boolean {
 			// handle children
 			parentExpr.unshift(expr);
 			expr.forEachExpression(onExpr);
@@ -3119,7 +3115,8 @@ class JavaScriptEmitter implements Emitter {
 				this.getStash(expr).returnsBoolean   = returnsBoolean;
 			}
 			return true;
-		}(expr));
+		};
+		onExpr(expr);
 	}
 
 	function _setupBooleanizeFlags (funcDef : MemberFunctionDefinition) : void {
