@@ -3035,6 +3035,9 @@ class JavaScriptEmitter implements Emitter {
 	function _emitCore(classDefs : ClassDefinition[]) : void {
 		for (var i = 0; i < classDefs.length; ++i) {
 			classDefs[i].forEachMemberFunction(function onFuncDef(funcDef) {
+				if (funcDef.flags() & ClassDefinition.IS_DELETE) {
+					return true;
+				}
 				funcDef.forEachClosure(onFuncDef);
 				this._setupBooleanizeFlags(funcDef);
 				return true;
