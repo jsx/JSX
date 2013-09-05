@@ -3086,15 +3086,16 @@ class JavaScriptEmitter implements Emitter {
 
 	// the function does not take care of function statements / expressions (in other words the caller should use forEachClosure)
 	function _setupBooleanizeFlags (expr : Expression) : void {
-		var exprReturnsBoolean = function (expr : Expression) : boolean {
+		function exprReturnsBoolean(expr : Expression) : boolean {
 			if (expr instanceof LogicalExpression) {
 				return this.getStash(expr).returnsBoolean;
 			} else {
 				return expr.getType().equals(Type.booleanType);
 			}
-		};
+		}
 		var parentExpr = new Expression[]; // [0] is stack top
-		var onExpr = function (expr : Expression) : boolean {
+		(function onExpr(expr : Expression) : boolean {
+			assert expr;
 			// handle children
 			parentExpr.unshift(expr);
 			expr.forEachExpression(onExpr);
@@ -3118,8 +3119,7 @@ class JavaScriptEmitter implements Emitter {
 				this.getStash(expr).returnsBoolean   = returnsBoolean;
 			}
 			return true;
-		};
-		onExpr(expr);
+		}(expr));
 	}
 
 	function _setupBooleanizeFlags (funcDef : MemberFunctionDefinition) : void {
