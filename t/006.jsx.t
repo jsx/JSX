@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 use tool::Util;
-use Test::More tests => 106;
+use Test::More tests => 112;
 
 note "testing jsx(1)";
 
@@ -64,6 +64,8 @@ foreach my $jsx(qw(bin/jsx bin/jsx-with-server)) {
     jsx_ok("--run t/006.jsx/dump-args.jsx foo bar",    qq{["foo","bar"]\n});
     jsx_ok("--run t/006.jsx/dump-args.jsx 'foo bar'",  qq{["foo bar"]\n});
     jsx_ok("--run t/006.jsx/dump-args.jsx '/@~_+&=;'", qq{["/@~_+&=;"]\n});
+
+    jsx_ok("--executable raw --run t/006.jsx/dump-args.jsx foo bar", qq{[]\n});
 
     # real command
 
