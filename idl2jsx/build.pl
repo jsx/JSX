@@ -49,6 +49,8 @@ my @specs = (
         'url-whatwg; http://url.spec.whatwg.org/', # e.g. URLUtils
         'html5; http://www.w3.org/TR/html5/single-page.html',
         'FileAPI; http://www.w3.org/TR/2012/WD-FileAPI-20121025/',
+        'FileWriterAPI; http://www.w3.org/TR/2012/WD-file-writer-api-20120417/',
+        'FileSystemAPI; http://www.w3.org/TR/2012/WD-file-system-api-20120417/',
 
         "webaudio; http://www.w3.org/TR/2012/WD-webaudio-20121213/",
         "touch-events; http://www.w3.org/TR/touch-events/",

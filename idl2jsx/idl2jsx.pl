@@ -128,6 +128,15 @@ WebIDL::TypeMap->define(
     # http://www.w3.org/TR/file-system-api/
     'FileCallback' => 'function(:File):void',
 
+    # http://www.w3.org/TR/2012/WD-file-system-api-20120417/
+    'FileSystemCallback' => 'function(filesystem:FileSystem):void',
+    'EntryCallback' => 'function(entry:Entry):void',
+    'EntriesCallback' => 'function(entries:Entry[]):void',
+    'MetadataCallback' => 'function(metadata:Metadata):void',
+    'FileWriterCallback' => 'function(fileWriter:FileWriter):void',
+    'VoidCallback' => 'function():void',
+    'ErrorCallback' => 'function(err:DOMError):void',
+
     # http://www.w3.org/TR/2012/WD-mediacapture-streams-20120628/#dictionary-mediatrackconstraints-members
     # http://datatracker.ietf.org/doc/draft-burnett-rtcweb-constraints-registry/
     'MediaTrackConstraintSet' => 'Map.<variant>',
