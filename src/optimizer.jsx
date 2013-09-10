@@ -2998,7 +2998,7 @@ class _InlineOptimizeCommand extends _FunctionOptimizeCommand {
 			}
 			// replace the arguments with actual arguments
 			function onExpr(expr : Expression, replaceCb : function(:Expression):void) : boolean {
-				return this._rewriteExpression(expr, replaceCb, argsAndThisAndLocals, calleeFuncDef);
+				return this._rewriteExpression(expr, null, replaceCb, argsAndThisAndLocals, calleeFuncDef);
 			}
 			statement.forEachExpression(onExpr);
 			statement.forEachStatement(function onStatement(statement : Statement) : boolean {
@@ -3080,6 +3080,7 @@ class _InlineOptimizeCommand extends _FunctionOptimizeCommand {
 		var clonedExpr = expr.clone();
 		this._rewriteExpression(
 			clonedExpr,
+			null,
 			function (expr) { clonedExpr = expr; },
 			argsAndThisAndLocals,
 			callingFuncDef);
@@ -3129,7 +3130,7 @@ class _InlineOptimizeCommand extends _FunctionOptimizeCommand {
 		});
 	}
 
-	function _rewriteExpression (expr : Expression, replaceCb : function(:Expression):void, argsAndThisAndLocals : Expression[], calleeFuncDef : MemberFunctionDefinition) : boolean {
+	function _rewriteExpression (expr : Expression, parentExpr : Expression, replaceCb : function(:Expression):void, argsAndThisAndLocals : Expression[], calleeFuncDef : MemberFunctionDefinition) : boolean {
 		var formalArgs = calleeFuncDef.getArguments();
 		if (expr instanceof LocalExpression) {
 			var localExpr = expr as LocalExpression;
@@ -3152,6 +3153,18 @@ class _InlineOptimizeCommand extends _FunctionOptimizeCommand {
 					replaceCb(argsAndThisAndLocals[j]);
 					argsAndThisAndLocals[j] = null; // just in case
 				} else {
+					// the condition means expr is an assignee value against an argument declaration in callee function.
+					/*
+					 * function foo (n : number) : void {
+					 *     n = 1;     // n declared here must not be inline-expanded
+					 * }
+					 */
+					if (parentExpr != null
+						&& parentExpr instanceof AssignmentExpression
+						&& (parentExpr as AssignmentExpression).getFirstExpr() == expr
+						&& ! (argsAndThisAndLocals[j] instanceof LocalExpression)) {
+							return true;
+					}
 					replaceCb(argsAndThisAndLocals[j].clone());
 				}
 			} else {
@@ -3161,8 +3174,8 @@ class _InlineOptimizeCommand extends _FunctionOptimizeCommand {
 			assert argsAndThisAndLocals[formalArgs.length] != null;
 			replaceCb(argsAndThisAndLocals[formalArgs.length].clone());
 		}
-		expr.forEachExpression(function (expr, replaceCb) {
-			return this._rewriteExpression(expr, replaceCb, argsAndThisAndLocals, calleeFuncDef);
+		expr.forEachExpression(function (childExpr, replaceCb) {
+			return this._rewriteExpression(childExpr, expr, replaceCb, argsAndThisAndLocals, calleeFuncDef);
 		});
 		return true;
 	}
