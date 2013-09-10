@@ -1,5 +1,9 @@
 Revision history for the JSX software development kit
 
+0.9.65 2013-09-10 22:04:10+0900
+    [BUG FIXES]
+    - Fix an issue in the inline optimizer
+
 0.9.64 2013-09-05 21:39:27+0900
     [FEATURES]
     - Support type inference to member variables with empty array/map
