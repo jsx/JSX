@@ -1850,11 +1850,12 @@ class Parser {
 					: new MemberFunctionDefinition(token, name, flags, returnType, args, locals, statements, closures, lastToken, docComment);
 			}
 			// take care of abstract function
-			if ((this._classFlags & (ClassDefinition.IS_INTERFACE | ClassDefinition.IS_DELETE)) != 0) {
+			if ((this._classFlags & ClassDefinition.IS_INTERFACE) != 0) {
 				if (this._expect(";") == null)
 					return null;
 				return createDefinition(null, null, new MemberFunctionDefinition[], null);
-			} else if ((flags & (ClassDefinition.IS_ABSTRACT | ClassDefinition.IS_NATIVE)) != 0) {
+			} else if ((flags & (ClassDefinition.IS_ABSTRACT | ClassDefinition.IS_NATIVE | ClassDefinition.IS_DELETE)) != 0) {
+				// "delete function constructor() {} is permitted for backwards compatibility
 				var endDeclToken = this._expect([ ";", "{" ]);
 				if (endDeclToken == null)
 					return null;

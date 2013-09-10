@@ -11,7 +11,7 @@ import "js.jsx";
  * Simple interface to Document Object Model
  */
 final class dom {
-	delete function constructor() { }
+	delete function constructor();
 
 	/**
 	 * The top-level Window object.

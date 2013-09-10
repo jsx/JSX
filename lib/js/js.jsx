@@ -27,7 +27,7 @@
  */
 
 final native class js {
-	delete function constructor() { }
+	delete function constructor();
 
 	/**
 	 * The JavaScript global object. You should cast the value to use it in JSX

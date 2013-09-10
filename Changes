@@ -1,5 +1,17 @@
 Revision history for the JSX software development kit
 
+0.9.64 2013-09-05 21:39:27+0900
+    [FEATURES]
+    - Support type inference to member variables with empty array/map
+      (`var a : T[] = []` in class definitions)
+    - Allow to return void functions
+      (`return voidFunction()`)
+    - Allow `delete function constructor()` without function body
+      in non-native classes
+
+    [BUG FIXES]
+    - Fix several compiler crashes
+
 0.9.63 2013-08-25 13:37:53+0900
     [BUG FIXES]
     - Fix a compiler crash introduced in 0.9.62

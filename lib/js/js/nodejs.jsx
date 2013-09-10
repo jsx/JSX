@@ -31,7 +31,7 @@
 import "js.jsx";
 
 final class node {
-	delete function constructor () { }
+	delete function constructor ();
 
 	static function require(source : string) : variant {
 		var src = 'require(' + JSON.stringify(source) + ')';

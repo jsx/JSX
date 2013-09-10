@@ -577,6 +577,15 @@ class ClassDefinition implements Stashable {
 			func.setClassDef(this);
 			this._members.push(func);
 		}
+		// remove the deleted constructor
+		for (var i = 0; i != this._members.length; ++i) {
+			if (this._members[i] instanceof MemberFunctionDefinition
+				&& this._members[i].name() == "constructor"
+				&& (this._members[i].flags() & (ClassDefinition.IS_STATIC | ClassDefinition.IS_DELETE)) == ClassDefinition.IS_DELETE) {
+				this._members.splice(i, 1);
+				break;
+			}
+		}
 	}
 
 	function setAnalysisContextOfVariables (context : AnalysisContext) : void {

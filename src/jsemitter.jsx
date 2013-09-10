@@ -56,19 +56,15 @@ class _Util {
 		return stash.outputName;
 	}
 
-	static function getOutputConstructorName(ctor : MemberFunctionDefinition) : string {
-		if ((ctor.getClassDef().flags() & ClassDefinition.IS_NATIVE) != 0) {
-			return _Util.getNameOfNativeConstructor(ctor.getClassDef());
+	static function getOutputConstructorName(classDef : ClassDefinition, argTypes : Type[]) : string {
+		if ((classDef.flags() & ClassDefinition.IS_NATIVE) != 0) {
+			return _Util.getNameOfNativeConstructor(classDef);
 		}
+		var ctor = Util.findFunctionInClass(classDef, "constructor", argTypes, false);
+		assert ctor, "could not find constructor for class: " + classDef.className();
 		var stash = ctor.getStash(_Util.OUTPUTNAME_IDENTIFIER) as _Util.OutputNameStash;
 		assert stash != null, ctor.getNotation();
 		return stash.outputName;
-	}
-
-	static function getOutputConstructorName(classDef : ClassDefinition, argTypes : Type[]) : string {
-		var ctor = Util.findFunctionInClass(classDef, "constructor", argTypes, false);
-		assert ctor;
-		return _Util.getOutputConstructorName(ctor);
 	}
 
 	static function getNameOfNativeConstructor(classDef : ClassDefinition) : string {
@@ -3212,17 +3208,21 @@ class JavaScriptEmitter implements Emitter {
 			var pushClass = (function (classDef : ClassDefinition) : void {
 				var ctors = _Util.findFunctions(classDef, "constructor", false);
 				if ((classDef.flags() & ClassDefinition.IS_EXPORT) != 0) {
-					var exportedCtor = null : MemberFunctionDefinition;
-					for (var i = 0; i < ctors.length; ++i) {
-						if ((ctors[i].flags() & ClassDefinition.IS_EXPORT) != 0) {
-							assert exportedCtor == null;
-							exportedCtor = ctors[i];
+					if (ctors.length != 0) {
+						var exportedCtor = null : MemberFunctionDefinition;
+						for (var i = 0; i < ctors.length; ++i) {
+							if ((ctors[i].flags() & ClassDefinition.IS_EXPORT) != 0) {
+								assert exportedCtor == null;
+								exportedCtor = ctors[i];
+							}
 						}
+						if (exportedCtor == null) {
+							exportedCtor = ctors[0]; // any ctor will do
+						}
+						list.push([ classDef.classFullName(), this._namer.getNameOfConstructor(classDef, exportedCtor.getArgumentTypes()) ]);
+					} else {
+						list.push([ classDef.classFullName(), this._namer.getNameOfClass(classDef) ]);
 					}
-					if (exportedCtor == null) {
-						exportedCtor = ctors[0]; // any ctor will do
-					}
-					list.push([ classDef.classFullName(), this._namer.getNameOfConstructor(classDef, exportedCtor.getArgumentTypes()) ]);
 				}
 				if (! this._enableMinifier) {
 					if ((classDef.flags() & ClassDefinition.IS_EXPORT) == 0) {
@@ -3231,12 +3231,8 @@ class JavaScriptEmitter implements Emitter {
 					var push = function (argTypes : Type[]) : void {
 						list.push([ classDef.classFullName() + this._mangler.mangleFunctionArguments(argTypes), this._namer.getNameOfConstructor(classDef, argTypes) ]);
 					};
-					if (ctors.length == 0) {
-						push(new Type[]);
-					} else {
-						for (var i = 0; i < ctors.length; ++i)
-							push(ctors[i].getArgumentTypes());
-					}
+					for (var i = 0; i < ctors.length; ++i)
+						push(ctors[i].getArgumentTypes());
 				}
 			});
 			var filename = classDefs[0].getToken().getFilename();
