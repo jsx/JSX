@@ -259,7 +259,7 @@ class Util {
 					if (! (args[i] as FunctionExpression).deductTypeIfUnknown(context, expectedCallbackType))
 						return null;
 				}
-			} else if (args[i] instanceof ArrayLiteralExpression && (args[i] as ArrayLiteralExpression).getExprs().length == 0 && (args[i] as ArrayLiteralExpression).getType() == null) {
+			} else if (args[i] instanceof ArrayLiteralExpression && (args[i] as ArrayLiteralExpression).getType() == null) {
 				var arrayExpr = args[i] as ArrayLiteralExpression;
 				var expectedArrayType = null : Type;
 				for (var j = 0; j < expectedTypes.length; ++j) {
@@ -281,7 +281,7 @@ class Util {
 				} else if (expectedArrayType != null) {
 					arrayExpr.setType(expectedArrayType);
 				}
-			} else if (args[i] instanceof MapLiteralExpression && (args[i] as MapLiteralExpression).getElements().length == 0 && (args[i] as MapLiteralExpression).getType() == null) {
+			} else if (args[i] instanceof MapLiteralExpression && (args[i] as MapLiteralExpression).getType() == null) {
 				var mapExpr = args[i] as MapLiteralExpression;
 				var expectedMapType = null : Type;
 				for (var j = 0; j < expectedTypes.length; ++j) {
