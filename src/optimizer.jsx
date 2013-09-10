@@ -4232,8 +4232,15 @@ class _LambdaLiftingOptimizeCommand extends _OptimizeCommand {
 
 	function _closureIsStatic(funcDef : MemberFunctionDefinition) : boolean {
 		return Util.forEachStatement(function onStatement(statement) {
+			if (statement instanceof FunctionStatement) {
+				var funcDef = (statement as FunctionStatement).getFuncDef();
+				return Util.forEachStatement(onStatement, funcDef.getStatements());
+			}
 			return statement.forEachExpression(function onExpr (expr) {
-				if (expr instanceof ThisExpression) {
+				if (expr instanceof FunctionExpression) {
+					var funcDef = (expr as FunctionExpression).getFuncDef();
+					return Util.forEachStatement(onStatement, funcDef.getStatements());
+				} else if (expr instanceof ThisExpression) {
 					return false;
 				}
 				return expr.forEachExpression(onExpr);
@@ -4317,6 +4324,7 @@ class _LambdaLiftingOptimizeCommand extends _OptimizeCommand {
 						[], // typeArgs
 						localExpr.getType()));
 				}
+				return true;
 			}
 			return expr.forEachExpression(onExpr);
 		}
