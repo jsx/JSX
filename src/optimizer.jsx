@@ -242,6 +242,7 @@ class Optimizer {
 			"no-debug",
 			"fold-const",
 			"tail-rec",
+			"lambda-lifting",
 			"return-if",
 			"inline",
 			"dce",
