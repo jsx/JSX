@@ -106,6 +106,11 @@ class BrowserPlatform extends Platform {
 		return this._findPath(path) != null;
 	}
 
+	override function isFile (path : string) : boolean {
+		var d = this._findPath(path);
+		return (typeof(d) != 'object');
+	}
+
 	override function getFilesInDirectory (path : string) : string[] {
 		var d = this._findPath(path);
 		if(typeof(d) == 'object') {
@@ -215,6 +220,9 @@ class BrowserPlatform extends Platform {
 		throw new Error('not supported');
 	}
 	override function setWorkingDir(dir : string) : void {
+		throw new Error('not supported');
+	}
+	override function getWorkingDir() : string {
 		throw new Error('not supported');
 	}
 }

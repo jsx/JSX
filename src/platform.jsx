@@ -35,6 +35,8 @@ abstract class Platform {
 
 	abstract function fileExists(path : string) : boolean;
 
+	abstract function isFile(path : string) : boolean;
+
 	abstract function getFilesInDirectory(path: string) : string[]; // (throws an exception on error)
 
 	// load a content by name (throws an exception on error)
@@ -61,6 +63,7 @@ abstract class Platform {
 	}
 
 	abstract function setWorkingDir(arg : string) : void;
+	abstract function getWorkingDir() : string;
 	abstract function mkpath (path : string) : void;
 	abstract function save (path : Nullable.<string>, content : string) : void;
 

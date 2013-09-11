@@ -519,14 +519,64 @@ class Compiler {
 		return ! isFatal;
 	}
 
+	function _readJson (srcPath : string) : variant {
+		// read json. If given path doesn't or format was invalid, return null
+		var normalizedPath = Util.resolvePath(srcPath);
+		if (!this._platform.fileExists(normalizedPath))
+		{
+			return null;
+		}
+		var src = this._platform.load(normalizedPath);
+		try {
+			return JSON.parse(src);
+		} catch (e : Error) {
+			this._platform.warn("Cannot parse JSON file 'srcPath'.");
+			return null;
+		}
+	}
+
 	function _resolvePath (srcPath : string, givenPath : string) : string {
 		if (givenPath.match(/^\.{1,2}\//) == null) {
-			var searchPaths = this._searchPaths.concat(this._emitter.getSearchPaths());
+			var searchPaths = this._searchPaths.concat(this._emitter.getSearchPaths(srcPath));
 			for (var i = 0; i < searchPaths.length; ++i) {
 				var path = Util.resolvePath(searchPaths[i] + "/" + givenPath);
-				// check the existence of the file, at the same time filling the cache
-				if (this._platform.fileExists(path))
-					return path;
+				if (this._platform.fileExists(path)) {
+					if (this._platform.isFile(path)) {
+						return path;
+					}
+					// If givenPath is single layer path (no slash) and it points folder,
+					//    check that folder is npm style package or not.
+					var json = this._readJson(path + '/package.json');
+					if (json && json['main']) {
+						var mainScriptPath = Util.resolvePath(path + '/' + json['main'] as string);
+						if (this._platform.fileExists(mainScriptPath))
+						{
+							return mainScriptPath;
+						}
+					}
+					var indexJSXPath = Util.resolvePath(path + "/index.jsx");
+					if (this._platform.fileExists(indexJSXPath)) {
+						return indexJSXPath;
+					}
+				}
+				var slashIndex = givenPath.indexOf('/');
+				if (slashIndex == -1 || slashIndex == (givenPath.length - 1)) {
+					continue;
+				}
+				var json = this._readJson(searchPaths[i] + "/" + givenPath.slice(0, slashIndex) + '/package.json');
+				if (json && json['directories'] && json['directories']['lib'])
+				{
+					var libPath = Util.resolvePath([
+					    searchPaths[i],
+					    givenPath.slice(0, slashIndex),
+					    json['directories']['lib'] as string,
+					    givenPath.slice(slashIndex + 1)
+					].join('/'));
+					if (this._platform.fileExists(libPath))
+					{
+						return libPath;
+					}
+				}
 			}
 		}
 		var lastSlashAt = srcPath.lastIndexOf("/");

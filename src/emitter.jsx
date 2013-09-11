@@ -28,9 +28,9 @@ interface Emitter implements Stashable {
 
 	function setRunEnv(runenv : string) : void;
 
-	function getSearchPaths():string[];
+	function getSearchPaths(srcPath : string):string[];
 
-	function setOutputFile(filename :Nullable.<string>) :void;
+	function setOutputFile(filename : Nullable.<string>) :void;
 
 	function getSourceMappingFiles() : Map.<string>;
 
