@@ -1,0 +1,1419 @@
+<!DOCTYPE html PUBLIC '-//W3C//DTD HTML 4.01 Transitional//EN' 'http://www.w3.org/TR/html4/loose.dtd'>
+<html lang="en" dir="ltr">
+<head>
+    <title>File API: Directories and System</title>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+    
+    
+  <link href="respec.css" rel="stylesheet" type="text/css" charset="utf-8">
+  <link href="http://www.w3.org/StyleSheets/TR/W3C-WD" rel="stylesheet" type="text/css" charset="utf-8"></head>
+  <body style="display: inherit; "><div class="head"><p><a href="http://www.w3.org/"><img width="72" height="48" src="http://www.w3.org/Icons/w3c_home" alt="W3C"></a></p><h1 class="title" id="title">File <acronym title="Application Programming
+      Interface">API</acronym>: Directories and System</h1><h2 id="w3c-working-draft-17-april-2012"><acronym title="World Wide Web Consortium">W3C</acronym> Working Draft 17 April 2012</h2><dl><dt>This version:</dt><dd><a href="http://www.w3.org/TR/2012/WD-file-system-api-20120417/">http://www.w3.org/TR/2012/WD-file-system-api-20120417/</a></dd><dt>Latest published version:</dt><dd><a href="http://www.w3.org/TR/file-system-api/">http://www.w3.org/TR/file-system-api/</a></dd><dt>Latest editor's draft:</dt><dd><a href="http://dev.w3.org/2009/dap/file-system/file-dir-sys.html">http://dev.w3.org/2009/dap/file-system/file-dir-sys.html</a></dd><dt>Previous version:</dt><dd><a href="http://www.w3.org/TR/2011/WD-file-system-api-20110419/">http://www.w3.org/TR/2011/WD-file-system-api-20110419/</a></dd><dt>Editor:</dt><dd><a href="http://www.ofb.net/~uranium/">Eric Uhrhane</a>, <a href="http://www.google.com/">Google</a></dd>
+</dl><p class="copyright"><a href="http://www.w3.org/Consortium/Legal/ipr-notice#Copyright">Copyright</a> © 2012 <a href="http://www.w3.org/"><acronym title="World Wide Web Consortium">W3C</acronym></a><sup>®</sup> (<a href="http://www.csail.mit.edu/"><acronym title="Massachusetts Institute of Technology">MIT</acronym></a>, <a href="http://www.ercim.eu/"><acronym title="European Research Consortium for Informatics and Mathematics">ERCIM</acronym></a>, <a href="http://www.keio.ac.jp/">Keio</a>), All Rights Reserved. <acronym title="World Wide Web Consortium">W3C</acronym> <a href="http://www.w3.org/Consortium/Legal/ipr-notice#Legal_Disclaimer">liability</a>, <a href="http://www.w3.org/Consortium/Legal/ipr-notice#W3C_Trademarks">trademark</a> and <a href="http://www.w3.org/Consortium/Legal/copyright-documents">document use</a> rules apply.</p><hr></div>
+    <div id="abstract" class="introductory section"><h2>Abstract</h2><p>
+      This specification defines an <acronym title="Application Programming
+      Interface">API</acronym> to navigate file system hierarchies, and defines
+      a means by which a <a href="#dfn-user-agent" class="internalDFN">user agent</a> may expose sandboxed sections of a
+      user's local filesystem to web applications.  It builds on
+      [<cite><a class="bibref" rel="biblioentry" href="#bib-FILE-WRITER-ED">FILE-WRITER-ED</a></cite>], which in turn built on [<cite><a class="bibref" rel="biblioentry" href="#bib-FILE-API-ED">FILE-API-ED</a></cite>], each adding a
+      different kind of functionality.
+    </p></div><div id="sotd" class="introductory section"><h2>Status of This Document</h2><p><em>This section describes the status of this document at the time of its publication. Other documents may supersede this document. A list of current <acronym title="World Wide Web Consortium">W3C</acronym> publications and the latest revision of this technical report can be found in the <a href="http://www.w3.org/TR/"><acronym title="World Wide Web Consortium">W3C</acronym> technical reports index</a> at http://www.w3.org/TR/.</em></p><p>This document was published by the <a href="http://www.w3.org/2008/webapps/">WebApps Working Group</a> as a Working Draft. This document is intended to become a <acronym title="World Wide Web Consortium">W3C</acronym> Recommendation. If you wish to make comments regarding this document, please send them to <a href="mailto:public-webapps@w3.org">public-webapps@w3.org</a> (<a href="mailto:public-webapps-request@w3.org?subject=subscribe">subscribe</a>, <a href="http://lists.w3.org/Archives/Public/public-webapps/">archives</a>). All feedback is welcome.</p><p>Publication as a Working Draft does not imply endorsement by the <acronym title="World Wide Web Consortium">W3C</acronym> Membership. This is a draft document and may be updated, replaced or obsoleted by other documents at any time. It is inappropriate to cite this document as other than work in progress.</p><p>This document was produced by a group operating under the <a href="http://www.w3.org/Consortium/Patent-Policy-20040205/">5 February 2004 <acronym title="World Wide Web Consortium">W3C</acronym> Patent Policy</a>. <acronym title="World Wide Web Consortium">W3C</acronym> maintains a <a href="http://www.w3.org/2004/01/pp-impl/42538/status" rel="disclosure">public list of any patent disclosures</a> made in connection with the deliverables of the group; that page also includes instructions for disclosing a patent. An individual who has actual knowledge of a patent which the individual believes contains <a href="http://www.w3.org/Consortium/Patent-Policy-20040205/#def-essential">Essential Claim(s)</a> must disclose the information in accordance with <a href="http://www.w3.org/Consortium/Patent-Policy-20040205/#sec-Disclosure">section 6 of the <acronym title="World Wide Web Consortium">W3C</acronym> Patent Policy</a>.</p></div><div id="toc" class="section"><h2 class="introductory">Table of Contents</h2><ul class="toc"><li class="tocline"><a href="#conformance" class="tocxref"><span class="secno">1. </span>Conformance</a></li><li class="tocline"><a href="#introduction" class="tocxref"><span class="secno">2. </span>Introduction</a><ul class="toc"><li class="tocline"><a href="#use-cases" class="tocxref"><span class="secno">2.1 </span>Use Cases</a></li><li class="tocline"><a href="#examples" class="tocxref"><span class="secno">2.2 </span>Examples</a></li></ul></li><li class="tocline"><a href="#terminology" class="tocxref"><span class="secno">3. </span>Terminology</a></li><li class="tocline"><a href="#data-persistence-and-accessing-the-api" class="tocxref"><span class="secno">4. </span>Data Persistence and accessing the <acronym title="Application Programming
+      Interface">API</acronym></a><ul class="toc"><li class="tocline"><a href="#temporary-vs.-persistent-storage" class="tocxref"><span class="secno">4.1 </span>Temporary vs. Persistent Storage</a></li><li class="tocline"><a href="#restrictions" class="tocxref"><span class="secno">4.2 </span>Restrictions</a></li><li class="tocline"><a href="#security-considerations" class="tocxref"><span class="secno">4.3 </span>Security Considerations</a></li><li class="tocline"><a href="#obtaining-access-to-file-system-entry-points" class="tocxref"><span class="secno">4.4 </span>Obtaining access to file system entry points</a><ul class="toc"><li class="tocline"><a href="#using-localfilesystem" class="tocxref"><span class="secno">4.4.1 </span>Using <code>LocalFileSystem</code></a><ul class="toc"><li class="tocline"><a href="#methods" class="tocxref"><span class="secno">4.4.1.1 </span>Methods</a></li><li class="tocline"><a href="#constants" class="tocxref"><span class="secno">4.4.1.2 </span>Constants</a></li></ul></li><li class="tocline"><a href="#using-localfilesystemsync" class="tocxref"><span class="secno">4.4.2 </span>Using <code>LocalFileSystemSync</code></a><ul class="toc"><li class="tocline"><a href="#methods-1" class="tocxref"><span class="secno">4.4.2.1 </span>Methods</a></li><li class="tocline"><a href="#constants-1" class="tocxref"><span class="secno">4.4.2.2 </span>Constants</a></li></ul></li></ul></li></ul></li><li class="tocline"><a href="#shared-data-types" class="tocxref"><span class="secno">5. </span>Shared data types</a><ul class="toc"><li class="tocline"><a href="#the-metadata-interface" class="tocxref"><span class="secno">5.1 </span>The <code>Metadata</code> interface</a><ul class="toc"><li class="tocline"><a href="#attributes" class="tocxref"><span class="secno">5.1.1 </span>Attributes</a></li></ul></li><li class="tocline"><a href="#the-flags-dictionary" class="tocxref"><span class="secno">5.2 </span>The <code>Flags</code> dictionary</a><ul class="toc"><li class="tocline"><a href="#dictionary-flags-members" class="tocxref"><span class="secno">5.2.1 </span>Dictionary <span class="idlType formerLink idlType"><code>Flags</code></span> Members</a></li><li class="tocline"><a href="#examples-1" class="tocxref"><span class="secno">5.2.2 </span>Examples</a></li></ul></li></ul></li><li class="tocline"><a href="#the-asynchronous-filesystem-interface" class="tocxref"><span class="secno">6. </span>The asynchronous filesystem interface</a><ul class="toc"><li class="tocline"><a href="#the-filesystem-interface" class="tocxref"><span class="secno">6.1 </span>The <code>FileSystem</code> interface</a><ul class="toc"><li class="tocline"><a href="#attributes-1" class="tocxref"><span class="secno">6.1.1 </span>Attributes</a></li></ul></li><li class="tocline"><a href="#the-entry-interface" class="tocxref"><span class="secno">6.2 </span>The <code>Entry</code> interface</a><ul class="toc"><li class="tocline"><a href="#attributes-2" class="tocxref"><span class="secno">6.2.1 </span>Attributes</a></li><li class="tocline"><a href="#methods-2" class="tocxref"><span class="secno">6.2.2 </span>Methods</a></li></ul></li><li class="tocline"><a href="#the-directoryentry-interface" class="tocxref"><span class="secno">6.3 </span>The <code>DirectoryEntry</code> interface</a><ul class="toc"><li class="tocline"><a href="#methods-3" class="tocxref"><span class="secno">6.3.1 </span>Methods</a></li></ul></li><li class="tocline"><a href="#the-directoryreader-interface" class="tocxref"><span class="secno">6.4 </span>The <code>DirectoryReader</code> interface</a><ul class="toc"><li class="tocline"><a href="#methods-4" class="tocxref"><span class="secno">6.4.1 </span>Methods</a></li></ul></li><li class="tocline"><a href="#the-fileentry-interface" class="tocxref"><span class="secno">6.5 </span>The <code>FileEntry</code> interface</a><ul class="toc"><li class="tocline"><a href="#methods-5" class="tocxref"><span class="secno">6.5.1 </span>Methods</a></li></ul></li><li class="tocline"><a href="#callbacks" class="tocxref"><span class="secno">6.6 </span>Callbacks</a><ul class="toc"><li class="tocline"><a href="#the-filesystemcallback-interface" class="tocxref"><span class="secno">6.6.1 </span>The <code>FileSystemCallback</code> interface</a><ul class="toc"><li class="tocline"><a href="#methods-6" class="tocxref"><span class="secno">6.6.1.1 </span>Methods</a></li></ul></li><li class="tocline"><a href="#the-entrycallback-interface" class="tocxref"><span class="secno">6.6.2 </span>The <code>EntryCallback</code> interface</a><ul class="toc"><li class="tocline"><a href="#methods-7" class="tocxref"><span class="secno">6.6.2.1 </span>Methods</a></li></ul></li><li class="tocline"><a href="#the-entriescallback-interface" class="tocxref"><span class="secno">6.6.3 </span>The <code>EntriesCallback</code> interface</a><ul class="toc"><li class="tocline"><a href="#methods-8" class="tocxref"><span class="secno">6.6.3.1 </span>Methods</a></li></ul></li><li class="tocline"><a href="#the-metadatacallback-interface" class="tocxref"><span class="secno">6.6.4 </span>The <code>MetadataCallback</code> interface</a><ul class="toc"><li class="tocline"><a href="#methods-9" class="tocxref"><span class="secno">6.6.4.1 </span>Methods</a></li></ul></li><li class="tocline"><a href="#the-filewritercallback-interface" class="tocxref"><span class="secno">6.6.5 </span>The <code>FileWriterCallback</code> interface</a><ul class="toc"><li class="tocline"><a href="#methods-10" class="tocxref"><span class="secno">6.6.5.1 </span>Methods</a></li></ul></li><li class="tocline"><a href="#the-filecallback-interface" class="tocxref"><span class="secno">6.6.6 </span>The <code>FileCallback</code> interface</a><ul class="toc"><li class="tocline"><a href="#methods-11" class="tocxref"><span class="secno">6.6.6.1 </span>Methods</a></li></ul></li><li class="tocline"><a href="#the-voidcallback-interface" class="tocxref"><span class="secno">6.6.7 </span>The <code>VoidCallback</code> interface</a><ul class="toc"><li class="tocline"><a href="#methods-12" class="tocxref"><span class="secno">6.6.7.1 </span>Methods</a></li></ul></li><li class="tocline"><a href="#the-errorcallback-interface" class="tocxref"><span class="secno">6.6.8 </span>The <code>ErrorCallback</code> interface</a><ul class="toc"><li class="tocline"><a href="#methods-13" class="tocxref"><span class="secno">6.6.8.1 </span>Methods</a></li></ul></li></ul></li></ul></li><li class="tocline"><a href="#the-synchronous-filesystem-interface" class="tocxref"><span class="secno">7. </span>The synchronous filesystem interface</a><ul class="toc"><li class="tocline"><a href="#the-filesystemsync-interface" class="tocxref"><span class="secno">7.1 </span>The <code>FileSystemSync</code> interface</a><ul class="toc"><li class="tocline"><a href="#attributes-3" class="tocxref"><span class="secno">7.1.1 </span>Attributes</a></li></ul></li><li class="tocline"><a href="#the-entrysync-interface" class="tocxref"><span class="secno">7.2 </span>The <code>EntrySync</code> interface</a><ul class="toc"><li class="tocline"><a href="#attributes-4" class="tocxref"><span class="secno">7.2.1 </span>Attributes</a></li><li class="tocline"><a href="#methods-14" class="tocxref"><span class="secno">7.2.2 </span>Methods</a></li></ul></li><li class="tocline"><a href="#the-directoryentrysync-interface" class="tocxref"><span class="secno">7.3 </span>The <code>DirectoryEntrySync</code> interface</a><ul class="toc"><li class="tocline"><a href="#methods-15" class="tocxref"><span class="secno">7.3.1 </span>Methods</a></li></ul></li><li class="tocline"><a href="#the-directoryreadersync-interface" class="tocxref"><span class="secno">7.4 </span>The <code>DirectoryReaderSync</code> interface</a><ul class="toc"><li class="tocline"><a href="#methods-16" class="tocxref"><span class="secno">7.4.1 </span>Methods</a></li></ul></li><li class="tocline"><a href="#the-fileentrysync-interface" class="tocxref"><span class="secno">7.5 </span>The <code>FileEntrySync</code> interface</a><ul class="toc"><li class="tocline"><a href="#methods-17" class="tocxref"><span class="secno">7.5.1 </span>Methods</a></li></ul></li></ul></li><li class="tocline"><a href="#errors-and-exceptions" class="tocxref"><span class="secno">8. </span>Errors and Exceptions</a><ul class="toc"><li class="tocline"><a href="#occurrence" class="tocxref"><span class="secno">8.1 </span>Occurrence</a></li><li class="tocline"><a href="#definitions" class="tocxref"><span class="secno">8.2 </span>Definitions</a></li></ul></li><li class="tocline"><a href="#uniformity-of-interface" class="tocxref"><span class="secno">9. </span>Uniformity of interface</a><ul class="toc"><li class="tocline"><a href="#case-sensitivity" class="tocxref"><span class="secno">9.1 </span>Case-sensitivity</a></li><li class="tocline"><a href="#encoding" class="tocxref"><span class="secno">9.2 </span>Encoding</a></li><li class="tocline"><a href="#naming-restrictions" class="tocxref"><span class="secno">9.3 </span>Naming restrictions</a></li><li class="tocline"><a href="#directories" class="tocxref"><span class="secno">9.4 </span>Directories</a></li></ul></li><li class="tocline"><a href="#acknowledgements" class="tocxref"><span class="secno">A. </span>Acknowledgements</a></li><li class="tocline"><a href="#references" class="tocxref"><span class="secno">B. </span>References</a><ul class="toc"><li class="tocline"><a href="#normative-references" class="tocxref"><span class="secno">B.1 </span>Normative references</a></li><li class="tocline"><a href="#informative-references" class="tocxref"><span class="secno">B.2 </span>Informative references</a></li></ul></li></ul></div>
+    
+    <div id="conformance" class="section"><!--OddPage--><h2><span class="secno">1. </span>Conformance</h2><p>As well as sections marked as non-normative, all authoring guidelines, diagrams, examples, and notes in this specification are non-normative. Everything else in this specification is normative.</p>
+<p>The key words <em class="rfc2119" title="must">must</em>, <em class="rfc2119" title="must not">must not</em>, <em class="rfc2119" title="required">required</em>, <em class="rfc2119" title="should">should</em>, <em class="rfc2119" title="should not">should not</em>, <em class="rfc2119" title="recommended">recommended</em>, <em class="rfc2119" title="may">may</em>, and <em class="rfc2119" title="optional">optional</em> in this specification are to be interpreted as described in [<cite><a class="bibref" rel="biblioentry" href="#bib-RFC2119">RFC2119</a></cite>].</p>
+
+      <p>
+        This specification defines conformance criteria that apply to a single
+        product: a <dfn id="dfn-user-agent">user agent</dfn> that implements the interfaces that it
+        contains.
+      </p>
+    </div>
+    
+    <div class="informative section" id="introduction">
+      <!--OddPage--><h2><span class="secno">2. </span>Introduction</h2><p><em>This section is non-normative.</em></p>
+      <p>
+        This <acronym title="Application Programming
+      Interface">API</acronym> is intended to satisfy client-side-storage use cases not
+        well served by databases.  These are generally applications that involve
+        large binary blobs and/or share data with applications outside of the
+        browser.
+      </p>
+      <p>
+        It is intended to be minimal in extent, but sufficiently powerful that
+        easy-to-use libraries may be built on top of it.
+      </p>
+      <div id="use-cases" class="section">
+        <h3><span class="secno">2.1 </span>Use Cases</h3>
+        <ol>
+          <li>Persistent uploader
+            <ul>
+            <li>When a file or directory is selected for upload, it copies it
+            into a local sandbox and uploads a chunk at a time.</li>
+            <li>It can restart uploads after browser crashes, network
+            interruptions, etc.</li>
+            </ul>
+          </li>
+          <li>Video game or other app with lots of media assets
+            <ul>
+            <li>It downloads one or several large tarballs, and expands them
+            locally into a directory structure.</li>
+            <li>The same download should work on any operating system.</li>
+            <li>It can manage prefetching just the next-to-be-needed assets in
+            the background, so going to the next game level or activating a new
+            feature doesn't require waiting for a download.</li>
+            <li>It uses those assets directly from its local cache, by direct
+            file reads or by handing local URLs to image or video tags, WebGL
+            asset loaders, etc.</li>
+            <li>The files may be of arbitrary binary format.</li>
+            <li>On the server side, a compressed tarball will often be much
+            smaller than a collection of separately-compressed files.  Also, 1
+            tarball instead of 1000 little files will involve fewer seeks, all
+            else being equal.</li>
+            </ul>
+          </li>
+
+          <li>Audio/Photo editor with offline access or local cache for speed
+            <ul>
+            <li>The data blobs are potentially quite large, and are
+            read-write.</li>
+            <li>It may want to do partial writes to files (ovewriting just the
+            ID3/EXIF tags, for example).</li>
+            <li>The ability to organize project files by creating directories
+            would be useful.</li>
+            <li>Edited files should be accessable by client-side applications
+            [iTunes, Picasa].
+            </li></ul>
+          </li>
+
+          <li>Offline video viewer
+            <ul>
+            <li>It downloads large files (&gt;1GB) for later viewing.</li>
+            <li>It needs efficient seek + streaming.</li>
+            <li>It must be able to hand a URL to the video tag.</li>
+            <li>It should enable access to partly-downloaded files e.g.  to let
+            you watch the first episode of the DVD even if your download didn't
+            complete before you got on the plane.</li>
+            <li>It should be able to pull a single episode out of the middle of
+            a download and give just that to the video tag.</li>
+            </ul>
+          </li>
+
+          <li>Offline Web Mail Client
+            <ul>
+            <li>Downloads attachments and stores them locally.</li>
+            <li>Caches user-selected attachments for later upload.</li>
+            <li>Needs to be able to refer to cached attachments and image
+            thumbnails for display and upload.</li>
+            <li>Should be able to trigger the UA's download manager just as if
+            talking to a server.</li>
+            <li>Should be able to upload an email with attachments as a
+            multipart post, rather than sending a file at a time in an XHR.</li>
+            </ul>
+          </li>
+        </ol>
+      </div>
+      <div id="examples" class="section">
+        <h3><span class="secno">2.2 </span>Examples</h3>
+        <pre class="example sh_javascript sh_sourceCode"><span class="sh_comment">// In the DOM or worker context:</span>
+
+<span class="sh_keyword">function</span> <span class="sh_function">useAsyncFS</span><span class="sh_symbol">(</span>fs<span class="sh_symbol">)</span> <span class="sh_cbracket">{</span>
+  <span class="sh_comment">// see getAsText example in [</span><cite><a class="bibref" rel="biblioentry" href="#bib-FILE-API-ED"><span class="sh_comment">FILE-API-ED</span></a></cite><span class="sh_comment">].</span>
+  fs<span class="sh_symbol">.</span>root<span class="sh_symbol">.</span><span class="sh_function">getFile</span><span class="sh_symbol">(</span><span class="sh_string">"already_there.txt"</span><span class="sh_symbol">,</span> <span class="sh_keyword">null</span><span class="sh_symbol">,</span> <span class="sh_keyword">function</span> <span class="sh_symbol">(</span>f<span class="sh_symbol">)</span> <span class="sh_cbracket">{</span>
+    <span class="sh_function">getAsText</span><span class="sh_symbol">(</span>f<span class="sh_symbol">.</span><span class="sh_function">file</span><span class="sh_symbol">());</span>
+  <span class="sh_cbracket">}</span><span class="sh_symbol">);</span>
+
+  <span class="sh_comment">// But now we can also write to the file; see [</span><cite><a class="bibref" rel="biblioentry" href="#bib-FILE-WRITER-ED"><span class="sh_comment">FILE-WRITER-ED</span></a></cite><span class="sh_comment">].</span>
+  fs<span class="sh_symbol">.</span>root<span class="sh_symbol">.</span><span class="sh_function">getFile</span><span class="sh_symbol">(</span><span class="sh_string">"logFile"</span><span class="sh_symbol">,</span> <span class="sh_cbracket">{</span>create<span class="sh_symbol">:</span> <span class="sh_keyword">true</span><span class="sh_cbracket">}</span><span class="sh_symbol">,</span> <span class="sh_keyword">function</span> <span class="sh_symbol">(</span>f<span class="sh_symbol">)</span> <span class="sh_cbracket">{</span>
+    f<span class="sh_symbol">.</span><span class="sh_function">createWriter</span><span class="sh_symbol">(</span>writeDataToLogFile<span class="sh_symbol">);</span>
+  <span class="sh_cbracket">}</span><span class="sh_symbol">);</span>
+<span class="sh_cbracket">}</span>
+<span class="sh_function">requestFileSystem</span><span class="sh_symbol">(</span>TEMPORARY<span class="sh_symbol">,</span> <span class="sh_number">1024</span> <span class="sh_symbol">*</span> <span class="sh_number">1024</span><span class="sh_symbol">,</span> <span class="sh_keyword">function</span><span class="sh_symbol">(</span>fs<span class="sh_symbol">)</span> <span class="sh_cbracket">{</span>
+  <span class="sh_function">useAsyncFS</span><span class="sh_symbol">(</span>fs<span class="sh_symbol">);</span>
+<span class="sh_cbracket">}</span><span class="sh_symbol">);</span>
+
+<span class="sh_comment">// In a worker:</span>
+
+<span class="sh_keyword">var</span> tempFS <span class="sh_symbol">=</span> <span class="sh_function">requestFileSystem</span><span class="sh_symbol">(</span>TEMPORARY<span class="sh_symbol">,</span> <span class="sh_number">1024</span> <span class="sh_symbol">*</span> <span class="sh_number">1024</span><span class="sh_symbol">);</span>
+<span class="sh_keyword">var</span> logFile <span class="sh_symbol">=</span> tempFS<span class="sh_symbol">.</span>root<span class="sh_symbol">.</span><span class="sh_function">getFile</span><span class="sh_symbol">(</span><span class="sh_string">"logFile"</span><span class="sh_symbol">,</span> <span class="sh_cbracket">{</span>create<span class="sh_symbol">:</span> <span class="sh_keyword">true</span><span class="sh_cbracket">}</span><span class="sh_symbol">);</span>
+<span class="sh_keyword">var</span> writer <span class="sh_symbol">=</span> logFile<span class="sh_symbol">.</span><span class="sh_function">createWriter</span><span class="sh_symbol">();</span>
+writer<span class="sh_symbol">.</span><span class="sh_function">seek</span><span class="sh_symbol">(</span>writer<span class="sh_symbol">.</span>length<span class="sh_symbol">);</span>
+<span class="sh_function">writeDataToLogFile</span><span class="sh_symbol">(</span>writer<span class="sh_symbol">);</span></pre>
+      </div>
+    </div>
+    <div id="terminology" class="section">
+      <!--OddPage--><h2><span class="secno">3. </span>Terminology</h2>
+
+      <p></p>
+      The term <dfn id="dfn-throw">throw</dfn> in this specification, as it pertains to
+      exceptions, is used as defined in the DOM4 specification [<cite><a class="bibref" rel="biblioentry" href="#bib-DOM4">DOM4</a></cite>].
+      <p>
+      </p>
+      <dfn id="dfn-domerror">DOMError</dfn> is defined in the DOM4 specification [<cite><a class="bibref" rel="biblioentry" href="#bib-DOM4">DOM4</a></cite>].
+      <p>
+      </p>
+      <dfn id="dfn-file">File</dfn> is defined in the File <acronym title="Application Programming
+      Interface">API</acronym> specification [<cite><a class="bibref" rel="biblioentry" href="#bib-FILE-API-ED">FILE-API-ED</a></cite>].
+      <p>
+      </p>
+      <dfn id="dfn-filewriter">FileWriter</dfn> and <dfn id="dfn-filewritersync">FileWriterSync</dfn> are defined in the
+      FileWriter specification [<cite><a class="bibref" rel="biblioentry" href="#bib-FILE-WRITER-ED">FILE-WRITER-ED</a></cite>].
+      <p>
+    </p></div>
+    <div id="data-persistence-and-accessing-the-api" class="section">
+      <!--OddPage--><h2><span class="secno">4. </span>Data Persistence and accessing the <acronym title="Application Programming
+      Interface">API</acronym></h2>
+      <div class="informative section" id="temporary-vs.-persistent-storage">
+        <h3><span class="secno">4.1 </span>Temporary vs. Persistent Storage</h3><p><em>This section is non-normative.</em></p>
+        <p>
+          An application can request <a href="#dfn-temporary" class="internalDFN">temporary</a> or <a href="#dfn-persistent" class="internalDFN">persistent</a>
+          storage space.  Temporary storage may be easier to get, at the UA's
+          discretion [looser quota restrictions, available without prompting the
+          user], but the data stored there may be deleted at the UA's
+          convenience, e.g. to deal with a shortage of disk space.
+        </p>
+        <p>
+          Conversely, once <a href="#dfn-persistent" class="internalDFN">persistent</a> storage has been granted, data
+          stored there by the application should not be deleted by the UA
+          without user intervention.  The application may of course delete it at
+          will.  The UA should require permission from the user before granting
+          <a href="#dfn-persistent" class="internalDFN">persistent</a> storage space to the application.
+        </p>
+        <p>
+          This <acronym title="Application Programming
+      Interface">API</acronym> specifies the standard origin isolation in a filesystem
+          context, along with persistence of data across invocations.
+          Applications will likely use <a href="#dfn-temporary" class="internalDFN">temporary</a> storage for caching, and
+          if it's still around from a previous session, it is often useful.
+          Persistent data, on the other hand, is useless if you can't access it
+          again the next time you're invoked.  However, even <a href="#dfn-persistent" class="internalDFN">persistent</a>
+          data may be deleted manually by the user [either through the UA or via
+          direct filesystem operations].
+        </p>
+      </div>
+      <div id="restrictions" class="section">
+        <h3><span class="secno">4.2 </span>Restrictions</h3>
+        <a href="#idl-def-FileSystem" class="idlType"><code>FileSystem</code></a> and <a href="#idl-def-FileSystemSync" class="idlType"><code>FileSystemSync</code></a> objects returned by
+        <code>requestFileSystem</code> <em class="rfc2119" title="must">must</em> have the following properties:
+        <ul>
+          <li>The filesystems accessible by any origin <em class="rfc2119" title="must">must</em> be disjoint from
+          those accessible by any other origin.</li>
+          <li>Data stored in a <dfn id="dfn-persistent">persistent</dfn> filesystem <em class="rfc2119" title="should not">should not</em> be
+          deleted by the UA, other than in response to a removal <acronym title="Application Programming
+      Interface">API</acronym> call,
+          without explicit authorization from the user.</li>
+          <li>Data stored in a <dfn id="dfn-temporary">temporary</dfn> filesystem <em class="rfc2119" title="may">may</em> be deleted by
+          the UA at its discretion, without application or user
+          intervention.</li>
+          <li>If
+            <ol>
+              <li> an application in a given origin requests a <a href="#dfn-persistent" class="internalDFN">persistent</a>
+              filesystem on multiple occasions;</li>
+              <li> each request is granted;</li>
+              <li> and data from an earlier request still exists in the first
+              filesystem at the time of a subsequent request.</li>
+            </ol>
+            then the <a href="#idl-def-FileSystem" class="idlType"><code>FileSystem</code></a> or <a href="#idl-def-FileSystemSync" class="idlType"><code>FileSystemSync</code></a> returned from
+            the subsequent request <em class="rfc2119" title="must">must</em> refer to the same underlying filesystem
+            and root directory as the previous request.</li>
+          <li>If
+            <ol>
+              <li> an application in a given origin requests a <a href="#dfn-temporary" class="internalDFN">temporary</a>
+              filesystem on multiple occasions;</li>
+              <li> each request is granted;</li>
+              <li> and data from an earlier request still exists in the first
+              filesystem at the time of a subsequent request.</li>
+            </ol>
+            then the <a href="#idl-def-FileSystem" class="idlType"><code>FileSystem</code></a> or <a href="#idl-def-FileSystemSync" class="idlType"><code>FileSystemSync</code></a> returned from
+            the subsequent request <em class="rfc2119" title="should">should</em> refer to the same underlying
+            filesystem and root directory as the previous request.</li>
+        </ul>
+      </div>
+      <div class="informative section" id="security-considerations">
+        <h3><span class="secno">4.3 </span>Security Considerations</h3><p><em>This section is non-normative.</em></p>
+        <p>
+          Because this <acronym title="Application Programming
+      Interface">API</acronym> may allow untrusted code to read and write parts of a
+          user's hard drive, there are a number of security and privacy issues
+          that must be dealt with.  Risks to the user include:
+          </p><ul>
+            <li>Denial of service by filling a local disk or using up IO
+            bandwidth.  This can be mitigated in part through quota
+            limitations.</li>
+            <li>Theft or erasure of private data.  This is mitigated by limiting
+            the scope of access to the local filesystem to a chroot-like,
+            origin-specific sandbox.</li>
+            <li>Storing malicious executables or illegal data on a user's
+            system.  This is similar to the risk of any download, and similar
+            security precautions apply, but is potentially worse in that:
+              <ul>
+                <li>It may involve multiple files.</li>
+                <li>The files may be in a part of the filesystem that's harder
+                for the user to find than the standard downloads directory.</li>
+                <li>The malicious writes may happen long enough after granting
+                of filesystem access that the user doesn't connect the two
+                events.</li>
+              </ul>
+            This may be mitigated by restricting file creation/rename to
+            non-executable extensions, virtualizing paths [leading to
+            unguessable or non-executable filenames] and by making sure the
+            execute bit is not set on any file created or modified via the <acronym title="Application Programming
+      Interface">API</acronym>.
+            </li>
+          </ul>
+        <p></p>
+        <p>
+          As with any other client-side storage, filesystem access allows for
+          cookie-resurrection attacks.  UAs will likely wish to present the
+          option of clearing it when the user clears any other origin-specific
+          storage, blocking access to it when cookies are blocked, etc.  This is
+          especially important if <a href="#dfn-temporary" class="internalDFN">temporary</a> storage space is permitted by
+          default without explicit user permission.
+        </p>
+      </div>
+      <div id="obtaining-access-to-file-system-entry-points" class="section">
+        <h3><span class="secno">4.4 </span>Obtaining access to file system entry points</h3>
+        <p>
+          There are several ways in which a file system entry point can be
+          obtained. Not all <a>user agents</a> may in fact implement all of
+          them.  However, in order to avoid blocking UI actions while waiting on
+          filesystem IO, we define only an asynchronous interface for Window,
+          and restrict the synchronous <acronym title="Application Programming
+      Interface">API</acronym> to the Worker context defined in
+          [<cite><a class="bibref" rel="biblioentry" href="#bib-WEBWORKERS-ED">WEBWORKERS-ED</a></cite>].
+        </p>
+        <div id="using-localfilesystem" class="section">
+          <h4><span class="secno">4.4.1 </span>Using <code>LocalFileSystem</code></h4>
+          <pre class="idl"><span class="idlImplements"><a>Window</a> implements <a href="#idl-def-LocalFileSystem" class="idlType"><code>LocalFileSystem</code></a>;</span></pre><div class="idlImplementsDesc"><p>All instances of the <code><a>Window</a></code> type are defined to also implement the <a href="#idl-def-LocalFileSystem" class="idlType"><code>LocalFileSystem</code></a> interface.</p></div>
+          <pre class="idl"><span class="idlImplements"><a>WorkerGlobalScope</a> implements <a href="#idl-def-LocalFileSystem" class="idlType"><code>LocalFileSystem</code></a>;</span></pre><div class="idlImplementsDesc"><p>All instances of the <code><a>WorkerGlobalScope</a></code> type are defined to also implement the <a href="#idl-def-LocalFileSystem" class="idlType"><code>LocalFileSystem</code></a> interface.</p></div>
+          <pre class="idl"><span class="idlInterface" id="idl-def-LocalFileSystem">[<span class="extAttr">Supplemental, NoInterfaceObject</span>]
+interface <span class="idlInterfaceID">LocalFileSystem</span> {
+<span class="idlConst">    const <span class="idlConstType"><a>unsigned short</a></span> <span class="idlConstName"><a href="#widl-LocalFileSystem-TEMPORARY">TEMPORARY</a></span> = <span class="idlConstValue">0</span>;</span>
+<span class="idlConst">    const <span class="idlConstType"><a>unsigned short</a></span> <span class="idlConstName"><a href="#widl-LocalFileSystem-PERSISTENT">PERSISTENT</a></span> = <span class="idlConstValue">1</span>;</span>
+<span class="idlMethod">    <span class="idlMethType"><a>void</a></span> <span class="idlMethName"><a href="#widl-LocalFileSystem-requestFileSystem-void-unsigned-short-type-unsigned-long-long-size-FileSystemCallback-successCallback-ErrorCallback-errorCallback">requestFileSystem</a></span> (<span class="idlParam"><span class="idlParamType"><a>unsigned short</a></span> <span class="idlParamName">type</span></span>, <span class="idlParam"><span class="idlParamType"><a>unsigned long long</a></span> <span class="idlParamName">size</span></span>, <span class="idlParam"><span class="idlParamType"><a href="#idl-def-FileSystemCallback" class="idlType"><code>FileSystemCallback</code></a></span> <span class="idlParamName">successCallback</span></span>, <span class="idlParam">optional <span class="idlParamType"><a href="#idl-def-ErrorCallback" class="idlType"><code>ErrorCallback</code></a></span> <span class="idlParamName">errorCallback</span></span>);</span>
+<span class="idlMethod">    <span class="idlMethType"><a>void</a></span> <span class="idlMethName"><a href="#widl-LocalFileSystem-resolveLocalFileSystemURL-void-DOMString-url-EntryCallback-successCallback-ErrorCallback-errorCallback">resolveLocalFileSystemURL</a></span> (<span class="idlParam"><span class="idlParamType"><a>DOMString</a></span> <span class="idlParamName">url</span></span>, <span class="idlParam"><span class="idlParamType"><a href="#idl-def-EntryCallback" class="idlType"><code>EntryCallback</code></a></span> <span class="idlParamName">successCallback</span></span>, <span class="idlParam">optional <span class="idlParamType"><a href="#idl-def-ErrorCallback" class="idlType"><code>ErrorCallback</code></a></span> <span class="idlParamName">errorCallback</span></span>);</span>
+};</span>
+</pre><div id="methods" class="section"><h5><span class="secno">4.4.1.1 </span>Methods</h5><dl class="methods"><dt id="widl-LocalFileSystem-requestFileSystem-void-unsigned-short-type-unsigned-long-long-size-FileSystemCallback-successCallback-ErrorCallback-errorCallback"><code>requestFileSystem</code></dt><dd>
+              <p>
+                Requests a filesystem in which to store application data.
+              </p>
+              <p>
+                If successful, this function <em class="rfc2119" title="must">must</em> give access to an
+                origin-private filesystem, as defined above.
+              </p>
+              
+            <table class="parameters"><tr><th>Parameter</th><th>Type</th><th>Nullable</th><th>Optional</th><th>Description</th></tr><tr><td class="prmName">type</td><td class="prmType"><code><a>unsigned short</a></code></td><td class="prmNullFalse">✘</td><td class="prmOptFalse">✘</td><td class="prmDesc">
+                  Whether the filesystem requested should be <a href="#dfn-persistent" class="internalDFN">persistent</a>,
+                  as defined above.  Use one of <code>TEMPORARY</code> or
+                  <code>PERSISTENT</code>.
+                </td></tr><tr><td class="prmName">size</td><td class="prmType"><code><a>unsigned long long</a></code></td><td class="prmNullFalse">✘</td><td class="prmOptFalse">✘</td><td class="prmDesc">
+                  This is an indicator of how much storage space, in bytes, the
+                  application expects to need.
+                </td></tr><tr><td class="prmName">successCallback</td><td class="prmType"><code><a href="#idl-def-FileSystemCallback" class="idlType"><code>FileSystemCallback</code></a></code></td><td class="prmNullFalse">✘</td><td class="prmOptFalse">✘</td><td class="prmDesc">
+                The callback that is called when the <a href="#dfn-user-agent" class="internalDFN">user agent</a> provides
+                a filesystem.
+                </td></tr><tr><td class="prmName">errorCallback</td><td class="prmType"><code><a href="#idl-def-ErrorCallback" class="idlType"><code>ErrorCallback</code></a></code></td><td class="prmNullFalse">✘</td><td class="prmOptTrue">✔</td><td class="prmDesc">
+                  A callback that is called when errors happen, or when the
+                  request to obtain the filesystem is denied.
+                </td></tr></table><div><em>Return type: </em><code><a>void</a></code></div></dd><dt id="widl-LocalFileSystem-resolveLocalFileSystemURL-void-DOMString-url-EntryCallback-successCallback-ErrorCallback-errorCallback"><code>resolveLocalFileSystemURL</code></dt><dd>
+              <p>
+                Allows the user to look up the Entry for a file or directory
+                referred to by a local URL.
+              </p>
+              
+            <table class="parameters"><tr><th>Parameter</th><th>Type</th><th>Nullable</th><th>Optional</th><th>Description</th></tr><tr><td class="prmName">url</td><td class="prmType"><code><a>DOMString</a></code></td><td class="prmNullFalse">✘</td><td class="prmOptFalse">✘</td><td class="prmDesc">
+                  A URL referring to a local file in a filesystem accessable via
+                  this <acronym title="Application Programming
+      Interface">API</acronym>.
+                </td></tr><tr><td class="prmName">successCallback</td><td class="prmType"><code><a href="#idl-def-EntryCallback" class="idlType"><code>EntryCallback</code></a></code></td><td class="prmNullFalse">✘</td><td class="prmOptFalse">✘</td><td class="prmDesc">
+                  A callback that is called to report the Entry to which the
+                  supplied URL refers.
+                </td></tr><tr><td class="prmName">errorCallback</td><td class="prmType"><code><a href="#idl-def-ErrorCallback" class="idlType"><code>ErrorCallback</code></a></code></td><td class="prmNullFalse">✘</td><td class="prmOptTrue">✔</td><td class="prmDesc">
+                  A callback that is called when errors happen, or when the
+                  request to obtain the Entry is denied.
+                </td></tr></table><div><em>Return type: </em><code><a>void</a></code></div></dd></dl></div><div id="constants" class="section"><h5><span class="secno">4.4.1.2 </span>Constants</h5><dl class="constants"><dt id="widl-LocalFileSystem-PERSISTENT"><code>PERSISTENT</code> of type <span class="idlConstType"><a>unsigned short</a></span></dt><dd>
+              Used for storage that should not be removed by the <a href="#dfn-user-agent" class="internalDFN">user
+              agent</a> without application or user permission.
+            </dd><dt id="widl-LocalFileSystem-TEMPORARY"><code>TEMPORARY</code> of type <span class="idlConstType"><a>unsigned short</a></span></dt><dd>
+              Used for storage with no guarantee of persistence.
+            </dd></dl></div>
+        </div>
+        <div id="using-localfilesystemsync" class="section">
+          <h4><span class="secno">4.4.2 </span>Using <code>LocalFileSystemSync</code></h4>
+          <pre class="idl"><span class="idlImplements"><a>WorkerGlobalScope</a> implements <a href="#idl-def-LocalFileSystemSync" class="idlType"><code>LocalFileSystemSync</code></a>;</span></pre><div class="idlImplementsDesc"><p>All instances of the <code><a>WorkerGlobalScope</a></code> type are defined to also implement the <a href="#idl-def-LocalFileSystemSync" class="idlType"><code>LocalFileSystemSync</code></a> interface.</p></div>
+          <pre class="idl"><span class="idlInterface" id="idl-def-LocalFileSystemSync">[<span class="extAttr">Supplemental, NoInterfaceObject</span>]
+interface <span class="idlInterfaceID">LocalFileSystemSync</span> {
+<span class="idlConst">    const <span class="idlConstType"><a>unsigned short</a></span> <span class="idlConstName"><a href="#widl-LocalFileSystemSync-TEMPORARY">TEMPORARY</a></span> = <span class="idlConstValue">0</span>;</span>
+<span class="idlConst">    const <span class="idlConstType"><a>unsigned short</a></span> <span class="idlConstName"><a href="#widl-LocalFileSystemSync-PERSISTENT">PERSISTENT</a></span> = <span class="idlConstValue">1</span>;</span>
+<span class="idlMethod">    <span class="idlMethType"><a href="#idl-def-FileSystemSync" class="idlType"><code>FileSystemSync</code></a></span> <span class="idlMethName"><a href="#widl-LocalFileSystemSync-requestFileSystemSync-FileSystemSync-unsigned-short-type-unsigned-long-long-size">requestFileSystemSync</a></span> (<span class="idlParam"><span class="idlParamType"><a>unsigned short</a></span> <span class="idlParamName">type</span></span>, <span class="idlParam"><span class="idlParamType"><a>unsigned long long</a></span> <span class="idlParamName">size</span></span>);</span>
+<span class="idlMethod">    <span class="idlMethType"><a href="#idl-def-EntrySync" class="idlType"><code>EntrySync</code></a></span>      <span class="idlMethName"><a href="#widl-LocalFileSystemSync-resolveLocalFileSystemSyncURL-EntrySync-DOMString-url">resolveLocalFileSystemSyncURL</a></span> (<span class="idlParam"><span class="idlParamType"><a>DOMString</a></span> <span class="idlParamName">url</span></span>);</span>
+};</span>
+</pre><div id="methods-1" class="section"><h5><span class="secno">4.4.2.1 </span>Methods</h5><dl class="methods"><dt id="widl-LocalFileSystemSync-requestFileSystemSync-FileSystemSync-unsigned-short-type-unsigned-long-long-size"><code>requestFileSystemSync</code></dt><dd>
+              <p>
+                Requests a filesystem in which to store application data.
+              </p>
+              <p>
+                If successful, this function <em class="rfc2119" title="must">must</em> give access to an
+                origin-private filesystem, as defined above.
+              </p>
+              
+            <table class="parameters"><tr><th>Parameter</th><th>Type</th><th>Nullable</th><th>Optional</th><th>Description</th></tr><tr><td class="prmName">type</td><td class="prmType"><code><a>unsigned short</a></code></td><td class="prmNullFalse">✘</td><td class="prmOptFalse">✘</td><td class="prmDesc">
+                  Whether the filesystem requested should be <a href="#dfn-persistent" class="internalDFN">persistent</a>,
+                  as defined above.  Use one of <code>TEMPORARY</code> or
+                  <code>PERSISTENT</code>.
+                </td></tr><tr><td class="prmName">size</td><td class="prmType"><code><a>unsigned long long</a></code></td><td class="prmNullFalse">✘</td><td class="prmOptFalse">✘</td><td class="prmDesc">
+                  This is an indicator of how much storage space, in bytes, the
+                  application expects to need.
+                </td></tr></table><div><em>Return type: </em><code><a href="#idl-def-FileSystemSync" class="idlType"><code>FileSystemSync</code></a></code></div></dd><dt id="widl-LocalFileSystemSync-resolveLocalFileSystemSyncURL-EntrySync-DOMString-url"><code>resolveLocalFileSystemSyncURL</code></dt><dd>
+              <p>
+                Allows the user to look up the Entry for a file or directory
+                referred to by a local URL.
+              </p>
+              
+            <table class="parameters"><tr><th>Parameter</th><th>Type</th><th>Nullable</th><th>Optional</th><th>Description</th></tr><tr><td class="prmName">url</td><td class="prmType"><code><a>DOMString</a></code></td><td class="prmNullFalse">✘</td><td class="prmOptFalse">✘</td><td class="prmDesc">
+                  A URL referring to a local file in a filesystem accessable via
+                  this <acronym title="Application Programming
+      Interface">API</acronym>.
+                </td></tr></table><div><em>Return type: </em><code><a href="#idl-def-EntrySync" class="idlType"><code>EntrySync</code></a></code></div></dd></dl></div><div id="constants-1" class="section"><h5><span class="secno">4.4.2.2 </span>Constants</h5><dl class="constants"><dt id="widl-LocalFileSystemSync-PERSISTENT"><code>PERSISTENT</code> of type <span class="idlConstType"><a>unsigned short</a></span></dt><dd>
+              Used for storage that should not be removed by the <a href="#dfn-user-agent" class="internalDFN">user
+              agent</a> without application or user permission.
+            </dd><dt id="widl-LocalFileSystemSync-TEMPORARY"><code>TEMPORARY</code> of type <span class="idlConstType"><a>unsigned short</a></span></dt><dd>
+              Used for storage with no guarantee of persistence.
+            </dd></dl></div>
+        </div>
+      </div>
+    </div>
+    
+    <div id="shared-data-types" class="section">
+      <!--OddPage--><h2><span class="secno">5. </span>Shared data types</h2>
+      <div id="the-metadata-interface" class="section">
+        <h3><span class="secno">5.1 </span>The <code>Metadata</code> interface</h3>
+        <p>
+          This interface supplies information about the state of a file or
+          directory.
+        </p>
+        <pre class="idl"><span class="idlInterface" id="idl-def-Metadata">interface <span class="idlInterfaceID">Metadata</span> {
+<span class="idlAttribute">    readonly attribute <span class="idlAttrType"><a>Date</a></span>               <span class="idlAttrName"><a href="#widl-Metadata-modificationTime">modificationTime</a></span>;</span>
+<span class="idlAttribute">    readonly attribute <span class="idlAttrType"><a>unsigned long long</a></span> <span class="idlAttrName"><a href="#widl-Metadata-size">size</a></span>;</span>
+};</span>
+</pre><div id="attributes" class="section"><h4><span class="secno">5.1.1 </span>Attributes</h4><dl class="attributes"><dt id="widl-Metadata-modificationTime"><code>modificationTime</code> of type <span class="idlAttrType"><a>Date</a></span>, readonly</dt><dd>
+            This is the time at which the file or directory was last modified.
+          </dd><dt id="widl-Metadata-size"><code>size</code> of type <span class="idlAttrType"><a>unsigned long long</a></span>, readonly</dt><dd>
+            The size of the file, in bytes.  This <em class="rfc2119" title="must">must</em> return 0 for directories.
+          </dd></dl></div>
+      </div>
+      <div id="the-flags-dictionary" class="section">
+        <h3><span class="secno">5.2 </span>The <code>Flags</code> dictionary</h3>
+        <p>
+          This dictionary is used to supply arguments to methods that look up or
+          create files or directories.
+        </p>
+        <pre class="idl"><span class="idlDictionary" id="idl-def-Flags">dictionary <span class="idlDictionaryID">Flags</span> {
+<span class="idlMember">    <span class="idlMemberType"><a>boolean</a></span> <span class="idlMemberName"><a href="#widl-Flags-create">create</a></span>;</span>
+<span class="idlMember">    <span class="idlMemberType"><a>boolean</a></span> <span class="idlMemberName"><a href="#widl-Flags-exclusive">exclusive</a></span>;</span>
+};</span>
+</pre><div id="dictionary-flags-members" class="section"><h4><span class="secno">5.2.1 </span>Dictionary <a class="idlType" href="#idl-def-Flags"><code>Flags</code></a> Members</h4><dl class="dictionary-members"><dt id="widl-Flags-create"><code>create</code> of type <span class="idlMemberType"><a>boolean</a></span></dt><dd>
+            Used to indicate that the user wants to create a file or directory
+            if it was not previously there.
+          </dd><dt id="widl-Flags-exclusive"><code>exclusive</code> of type <span class="idlMemberType"><a>boolean</a></span></dt><dd>
+            By itself, <code>exclusive</code> <em class="rfc2119" title="must">must</em> have no effect.  Used with
+            <code>create</code>, it <em class="rfc2119" title="must">must</em> cause getFile and getDirectory to
+            fail if the target path already exists.
+          </dd></dl></div>
+        <div class="informative section" id="examples-1">
+          <h4><span class="secno">5.2.2 </span>Examples</h4><p><em>This section is non-normative.</em></p>
+          <pre class="example sh_javascript sh_sourceCode"><span class="sh_comment">// Get the data directory, creating it if it doesn't exist.</span>
+dataDir <span class="sh_symbol">=</span> fsSync<span class="sh_symbol">.</span>root<span class="sh_symbol">.</span><span class="sh_function">getDirectory</span><span class="sh_symbol">(</span><span class="sh_string">"data"</span><span class="sh_symbol">,</span> <span class="sh_cbracket">{</span>create<span class="sh_symbol">:</span> <span class="sh_keyword">true</span><span class="sh_cbracket">}</span><span class="sh_symbol">);</span>
+
+<span class="sh_comment">// Create the lock file, if and only if it doesn't exist.</span>
+<span class="sh_keyword">try</span> <span class="sh_cbracket">{</span>
+  lockFile <span class="sh_symbol">=</span> dataDir<span class="sh_symbol">.</span><span class="sh_function">getFile</span><span class="sh_symbol">(</span><span class="sh_string">"lockfile.txt"</span><span class="sh_symbol">,</span>
+                             <span class="sh_cbracket">{</span>create<span class="sh_symbol">:</span> <span class="sh_keyword">true</span><span class="sh_symbol">,</span> exclusive<span class="sh_symbol">:</span> <span class="sh_keyword">true</span><span class="sh_cbracket">}</span><span class="sh_symbol">);</span>
+<span class="sh_cbracket">}</span> <span class="sh_keyword">catch</span> <span class="sh_symbol">(</span>ex<span class="sh_symbol">)</span> <span class="sh_cbracket">{</span>
+  <span class="sh_comment">// It already exists, or something else went wrong.</span>
+  <span class="sh_symbol">...</span>
+<span class="sh_cbracket">}</span></pre>
+        </div>
+      </div>
+    </div>
+
+    <div id="the-asynchronous-filesystem-interface" class="section">
+      <!--OddPage--><h2><span class="secno">6. </span>The asynchronous filesystem interface</h2>
+      <div id="the-filesystem-interface" class="section">
+        <h3><span class="secno">6.1 </span>The <code>FileSystem</code> interface</h3>
+        <p>
+          This interface represents a file system.
+        </p>
+        <pre class="idl"><span class="idlInterface" id="idl-def-FileSystem">interface <span class="idlInterfaceID">FileSystem</span> {
+<span class="idlAttribute">    readonly attribute <span class="idlAttrType"><a>DOMString</a></span>      <span class="idlAttrName"><a href="#widl-FileSystem-name">name</a></span>;</span>
+<span class="idlAttribute">    readonly attribute <span class="idlAttrType"><a href="#idl-def-DirectoryEntry" class="idlType"><code>DirectoryEntry</code></a></span> <span class="idlAttrName"><a href="#widl-FileSystem-root">root</a></span>;</span>
+};</span>
+</pre><div id="attributes-1" class="section"><h4><span class="secno">6.1.1 </span>Attributes</h4><dl class="attributes"><dt id="widl-FileSystem-name"><code>name</code> of type <span class="idlAttrType"><a>DOMString</a></span>, readonly</dt><dd>
+            This is the name of the file system.  The specifics of naming
+            filesystems is unspecified, but a name <em class="rfc2119" title="must">must</em> be unique across the
+            list of exposed file systems.
+          </dd><dt id="widl-FileSystem-root"><code>root</code> of type <span class="idlAttrType"><a href="#idl-def-DirectoryEntry" class="idlType"><code>DirectoryEntry</code></a></span>, readonly</dt><dd>
+            The root directory of the file system.
+          </dd></dl></div>
+      </div>
+
+      <div id="the-entry-interface" class="section">
+        <h3><span class="secno">6.2 </span>The <code>Entry</code> interface</h3>
+        <p>
+          An abstract interface representing entries in a file system, each of
+          which may be a <a href="#dfn-file" class="internalDFN">File</a> or <a href="#idl-def-DirectoryEntry" class="idlType"><code>DirectoryEntry</code></a>.
+        </p>
+        <pre class="idl"><span class="idlInterface" id="idl-def-Entry">interface <span class="idlInterfaceID">Entry</span> {
+<span class="idlAttribute">    readonly attribute <span class="idlAttrType"><a>boolean</a></span>    <span class="idlAttrName"><a href="#widl-Entry-isFile">isFile</a></span>;</span>
+<span class="idlAttribute">    readonly attribute <span class="idlAttrType"><a>boolean</a></span>    <span class="idlAttrName"><a href="#widl-Entry-isDirectory">isDirectory</a></span>;</span>
+<span class="idlMethod">    <span class="idlMethType"><a>void</a></span>      <span class="idlMethName"><a href="#widl-Entry-getMetadata-void-MetadataCallback-successCallback-ErrorCallback-errorCallback">getMetadata</a></span> (<span class="idlParam"><span class="idlParamType"><a href="#idl-def-MetadataCallback" class="idlType"><code>MetadataCallback</code></a></span> <span class="idlParamName">successCallback</span></span>, <span class="idlParam">optional <span class="idlParamType"><a href="#idl-def-ErrorCallback" class="idlType"><code>ErrorCallback</code></a></span> <span class="idlParamName">errorCallback</span></span>);</span>
+<span class="idlAttribute">    readonly attribute <span class="idlAttrType"><a>DOMString</a></span>  <span class="idlAttrName"><a href="#widl-Entry-name">name</a></span>;</span>
+<span class="idlAttribute">    readonly attribute <span class="idlAttrType"><a>DOMString</a></span>  <span class="idlAttrName"><a href="#widl-Entry-fullPath">fullPath</a></span>;</span>
+<span class="idlAttribute">    readonly attribute <span class="idlAttrType"><a href="#idl-def-FileSystem" class="idlType"><code>FileSystem</code></a></span> <span class="idlAttrName"><a href="#widl-Entry-filesystem">filesystem</a></span>;</span>
+<span class="idlMethod">    <span class="idlMethType"><a>void</a></span>      <span class="idlMethName"><a href="#widl-Entry-moveTo-void-DirectoryEntry-parent-DOMString-newName-EntryCallback-successCallback-ErrorCallback-errorCallback">moveTo</a></span> (<span class="idlParam"><span class="idlParamType"><a href="#idl-def-DirectoryEntry" class="idlType"><code>DirectoryEntry</code></a></span> <span class="idlParamName">parent</span></span>, <span class="idlParam">optional <span class="idlParamType"><a>DOMString</a></span> <span class="idlParamName">newName</span></span>, <span class="idlParam">optional <span class="idlParamType"><a href="#idl-def-EntryCallback" class="idlType"><code>EntryCallback</code></a></span> <span class="idlParamName">successCallback</span></span>, <span class="idlParam">optional <span class="idlParamType"><a href="#idl-def-ErrorCallback" class="idlType"><code>ErrorCallback</code></a></span> <span class="idlParamName">errorCallback</span></span>);</span>
+<span class="idlMethod">    <span class="idlMethType"><a>void</a></span>      <span class="idlMethName"><a href="#widl-Entry-copyTo-void-DirectoryEntry-parent-DOMString-newName-EntryCallback-successCallback-ErrorCallback-errorCallback">copyTo</a></span> (<span class="idlParam"><span class="idlParamType"><a href="#idl-def-DirectoryEntry" class="idlType"><code>DirectoryEntry</code></a></span> <span class="idlParamName">parent</span></span>, <span class="idlParam">optional <span class="idlParamType"><a>DOMString</a></span> <span class="idlParamName">newName</span></span>, <span class="idlParam">optional <span class="idlParamType"><a href="#idl-def-EntryCallback" class="idlType"><code>EntryCallback</code></a></span> <span class="idlParamName">successCallback</span></span>, <span class="idlParam">optional <span class="idlParamType"><a href="#idl-def-ErrorCallback" class="idlType"><code>ErrorCallback</code></a></span> <span class="idlParamName">errorCallback</span></span>);</span>
+<span class="idlMethod">    <span class="idlMethType"><a>DOMString</a></span> <span class="idlMethName"><a href="#widl-Entry-toURL-DOMString">toURL</a></span> ();</span>
+<span class="idlMethod">    <span class="idlMethType"><a>void</a></span>      <span class="idlMethName"><a href="#widl-Entry-remove-void-VoidCallback-successCallback-ErrorCallback-errorCallback">remove</a></span> (<span class="idlParam"><span class="idlParamType"><a href="#idl-def-VoidCallback" class="idlType"><code>VoidCallback</code></a></span> <span class="idlParamName">successCallback</span></span>, <span class="idlParam">optional <span class="idlParamType"><a href="#idl-def-ErrorCallback" class="idlType"><code>ErrorCallback</code></a></span> <span class="idlParamName">errorCallback</span></span>);</span>
+<span class="idlMethod">    <span class="idlMethType"><a>void</a></span>      <span class="idlMethName"><a href="#widl-Entry-getParent-void-EntryCallback-successCallback-ErrorCallback-errorCallback">getParent</a></span> (<span class="idlParam"><span class="idlParamType"><a href="#idl-def-EntryCallback" class="idlType"><code>EntryCallback</code></a></span> <span class="idlParamName">successCallback</span></span>, <span class="idlParam">optional <span class="idlParamType"><a href="#idl-def-ErrorCallback" class="idlType"><code>ErrorCallback</code></a></span> <span class="idlParamName">errorCallback</span></span>);</span>
+};</span>
+</pre><div id="attributes-2" class="section"><h4><span class="secno">6.2.1 </span>Attributes</h4><dl class="attributes"><dt id="widl-Entry-filesystem"><code>filesystem</code> of type <span class="idlAttrType"><a href="#idl-def-FileSystem" class="idlType"><code>FileSystem</code></a></span>, readonly</dt><dd>
+            The file system on which the entry resides.
+          </dd><dt id="widl-Entry-fullPath"><code>fullPath</code> of type <span class="idlAttrType"><a>DOMString</a></span>, readonly</dt><dd>
+            The full <a href="#dfn-absolute-path" class="internalDFN">absolute path</a> from the root to the entry.
+          </dd><dt id="widl-Entry-isDirectory"><code>isDirectory</code> of type <span class="idlAttrType"><a>boolean</a></span>, readonly</dt><dd>
+            Entry is a directory.
+          </dd><dt id="widl-Entry-isFile"><code>isFile</code> of type <span class="idlAttrType"><a>boolean</a></span>, readonly</dt><dd>
+            Entry is a file.
+          </dd><dt id="widl-Entry-name"><code>name</code> of type <span class="idlAttrType"><a>DOMString</a></span>, readonly</dt><dd>
+            The name of the entry, excluding the path leading to it.
+          </dd></dl></div><div id="methods-2" class="section"><h4><span class="secno">6.2.2 </span>Methods</h4><dl class="methods"><dt id="widl-Entry-copyTo-void-DirectoryEntry-parent-DOMString-newName-EntryCallback-successCallback-ErrorCallback-errorCallback"><code>copyTo</code></dt><dd>
+            <p>
+              Copy an entry to a different location on the file system.
+              It is an error to try to:
+              </p><ul>
+                <li>copy a directory inside itself or to any child at any
+                depth;</li>
+                <li>copy an entry into its parent if a name different from its
+                current one isn't provided;</li>
+                <li>copy a file to a path occupied by a directory;</li>
+                <li>copy a directory to a path occupied by a file;</li>
+                <li>copy any element to a path occupied by a directory which is
+                not empty.</li>
+              </ul>
+              A copy of a file on top of an existing file <em class="rfc2119" title="must">must</em> attempt to
+              delete and replace that file.<br>
+              A copy of a directory on top of an existing empty directory <em class="rfc2119" title="must">must</em>
+              attempt to delete and replace that directory.<br>
+              Directory copies are always recursive--that is, they copy all
+              contents of the directory.
+            <p></p>
+            
+          <table class="parameters"><tr><th>Parameter</th><th>Type</th><th>Nullable</th><th>Optional</th><th>Description</th></tr><tr><td class="prmName">parent</td><td class="prmType"><code><a href="#idl-def-DirectoryEntry" class="idlType"><code>DirectoryEntry</code></a></code></td><td class="prmNullFalse">✘</td><td class="prmOptFalse">✘</td><td class="prmDesc">
+                The directory to which to move the entry.
+              </td></tr><tr><td class="prmName">newName</td><td class="prmType"><code><a>DOMString</a></code></td><td class="prmNullFalse">✘</td><td class="prmOptTrue">✔</td><td class="prmDesc">
+                The new name of the entry.  Defaults to the Entry's current name
+                if unspecified.
+              </td></tr><tr><td class="prmName">successCallback</td><td class="prmType"><code><a href="#idl-def-EntryCallback" class="idlType"><code>EntryCallback</code></a></code></td><td class="prmNullFalse">✘</td><td class="prmOptTrue">✔</td><td class="prmDesc">
+                A callback that is called with the Entry for the new object.
+              </td></tr><tr><td class="prmName">errorCallback</td><td class="prmType"><code><a href="#idl-def-ErrorCallback" class="idlType"><code>ErrorCallback</code></a></code></td><td class="prmNullFalse">✘</td><td class="prmOptTrue">✔</td><td class="prmDesc">
+                A callback that is called when errors happen.
+              </td></tr></table><div><em>Return type: </em><code><a>void</a></code></div></dd><dt id="widl-Entry-getMetadata-void-MetadataCallback-successCallback-ErrorCallback-errorCallback"><code>getMetadata</code></dt><dd>
+            <p>
+              Look up metadata about this entry.
+            </p>
+            
+          <table class="parameters"><tr><th>Parameter</th><th>Type</th><th>Nullable</th><th>Optional</th><th>Description</th></tr><tr><td class="prmName">successCallback</td><td class="prmType"><code><a href="#idl-def-MetadataCallback" class="idlType"><code>MetadataCallback</code></a></code></td><td class="prmNullFalse">✘</td><td class="prmOptFalse">✘</td><td class="prmDesc">
+                A callback that is called with the time of the last
+                modification.
+              </td></tr><tr><td class="prmName">errorCallback</td><td class="prmType"><code><a href="#idl-def-ErrorCallback" class="idlType"><code>ErrorCallback</code></a></code></td><td class="prmNullFalse">✘</td><td class="prmOptTrue">✔</td><td class="prmDesc">
+                A callback that is called when errors happen.
+              </td></tr></table><div><em>Return type: </em><code><a>void</a></code></div></dd><dt id="widl-Entry-getParent-void-EntryCallback-successCallback-ErrorCallback-errorCallback"><code>getParent</code></dt><dd>
+            Look up the parent DirectoryEntry containing this Entry.  If this
+            Entry is the root of its filesystem, its parent is itself.
+            
+          <table class="parameters"><tr><th>Parameter</th><th>Type</th><th>Nullable</th><th>Optional</th><th>Description</th></tr><tr><td class="prmName">successCallback</td><td class="prmType"><code><a href="#idl-def-EntryCallback" class="idlType"><code>EntryCallback</code></a></code></td><td class="prmNullFalse">✘</td><td class="prmOptFalse">✘</td><td class="prmDesc">
+                A callback that is called to return the parent Entry.
+              </td></tr><tr><td class="prmName">errorCallback</td><td class="prmType"><code><a href="#idl-def-ErrorCallback" class="idlType"><code>ErrorCallback</code></a></code></td><td class="prmNullFalse">✘</td><td class="prmOptTrue">✔</td><td class="prmDesc">
+                A callback that is called when errors happen.
+              </td></tr></table><div><em>Return type: </em><code><a>void</a></code></div></dd><dt id="widl-Entry-moveTo-void-DirectoryEntry-parent-DOMString-newName-EntryCallback-successCallback-ErrorCallback-errorCallback"><code>moveTo</code></dt><dd>
+            <p>
+              Move an entry to a different location on the file system.
+              It is an error to try to:
+              </p><ul>
+                <li>move a directory inside itself or to any child at any
+                depth;</li>
+                <li>move an entry into its parent if a name different from its
+                current one isn't provided;</li>
+                <li>move a file to a path occupied by a directory;</li>
+                <li>move a directory to a path occupied by a file;</li>
+                <li>move any element to a path occupied by a directory which is
+                not empty.</li>
+              </ul>
+              A move of a file on top of an existing file <em class="rfc2119" title="must">must</em> attempt to
+              delete and replace that file.<br>
+              A move of a directory on top of an existing empty directory <em class="rfc2119" title="must">must</em>
+              attempt to delete and replace that directory.
+            <p></p>
+            
+          <table class="parameters"><tr><th>Parameter</th><th>Type</th><th>Nullable</th><th>Optional</th><th>Description</th></tr><tr><td class="prmName">parent</td><td class="prmType"><code><a href="#idl-def-DirectoryEntry" class="idlType"><code>DirectoryEntry</code></a></code></td><td class="prmNullFalse">✘</td><td class="prmOptFalse">✘</td><td class="prmDesc">
+                The directory to which to move the entry.
+              </td></tr><tr><td class="prmName">newName</td><td class="prmType"><code><a>DOMString</a></code></td><td class="prmNullFalse">✘</td><td class="prmOptTrue">✔</td><td class="prmDesc">
+                The new name of the entry.  Defaults to the Entry's current name
+                if unspecified.
+              </td></tr><tr><td class="prmName">successCallback</td><td class="prmType"><code><a href="#idl-def-EntryCallback" class="idlType"><code>EntryCallback</code></a></code></td><td class="prmNullFalse">✘</td><td class="prmOptTrue">✔</td><td class="prmDesc">
+                A callback that is called with the Entry for the new location.
+              </td></tr><tr><td class="prmName">errorCallback</td><td class="prmType"><code><a href="#idl-def-ErrorCallback" class="idlType"><code>ErrorCallback</code></a></code></td><td class="prmNullFalse">✘</td><td class="prmOptTrue">✔</td><td class="prmDesc">
+                A callback that is called when errors happen.
+              </td></tr></table><div><em>Return type: </em><code><a>void</a></code></div></dd><dt id="widl-Entry-remove-void-VoidCallback-successCallback-ErrorCallback-errorCallback"><code>remove</code></dt><dd>
+            <p>
+              Deletes a file or directory.  It is an error to attempt to delete
+              a directory that is not empty.  It is an error to attempt to
+              delete the root directory of a filesystem.
+            </p>
+            
+          <table class="parameters"><tr><th>Parameter</th><th>Type</th><th>Nullable</th><th>Optional</th><th>Description</th></tr><tr><td class="prmName">successCallback</td><td class="prmType"><code><a href="#idl-def-VoidCallback" class="idlType"><code>VoidCallback</code></a></code></td><td class="prmNullFalse">✘</td><td class="prmOptFalse">✘</td><td class="prmDesc">
+                A callback that is called on success.
+              </td></tr><tr><td class="prmName">errorCallback</td><td class="prmType"><code><a href="#idl-def-ErrorCallback" class="idlType"><code>ErrorCallback</code></a></code></td><td class="prmNullFalse">✘</td><td class="prmOptTrue">✔</td><td class="prmDesc">
+                A callback that is called when errors happen.
+              </td></tr></table><div><em>Return type: </em><code><a>void</a></code></div></dd><dt id="widl-Entry-toURL-DOMString"><code>toURL</code></dt><dd>
+            <p>
+              Returns a URL that can be used to identify this entry.
+              Unlike the URN defined in [<cite><a class="bibref" rel="biblioentry" href="#bib-FILE-API-ED">FILE-API-ED</a></cite>], it has no specific
+              expiration; as it describes a location on disk, it should be valid
+              at least as long as that location exists.
+            </p>
+            <div class="issue">
+              <p>
+              Do we want to spec out the URL format/scheme?  It would be quite
+              nice if these could be edited and manipulated easily, as with
+              normal filesystem paths.
+              </p>
+              <p>
+              How and where can these URLs be used?  Can they be interchangeable
+              with online URLs for the same domain?
+              </p>
+              <p>
+              Proposal currently under discussion:
+              </p><ul>
+                <li>Use a format such as
+                  <code>filesystem:http://example.domain/persistent-or-temporary/path/to/file.html</code>.</li>
+                <li>URLs should be usable for anything that online URLs can be
+                used for, whether they appear in online or filesystem-resident
+                web pages.</li>
+                <li>However, they can only be used by the origin that owns the
+                filesystem.  No other origin can e.g. reference another origin's
+                filesystem in an IMG tag.</li>
+              </ul>
+              <p></p>
+            </div>
+          <div><em>No parameters.</em></div><div><em>Return type: </em><code><a>DOMString</a></code></div></dd></dl></div>
+      </div>
+      
+      <div id="the-directoryentry-interface" class="section">
+        <h3><span class="secno">6.3 </span>The <code>DirectoryEntry</code> interface</h3>
+        <p>
+          This interface represents a directory on a file system.
+        </p>
+        <pre class="idl"><span class="idlInterface" id="idl-def-DirectoryEntry">interface <span class="idlInterfaceID">DirectoryEntry</span> : <span class="idlSuperclass"><a href="#idl-def-Entry" class="idlType"><code>Entry</code></a></span> {
+<span class="idlMethod">    <span class="idlMethType"><a href="#idl-def-DirectoryReader" class="idlType"><code>DirectoryReader</code></a></span> <span class="idlMethName"><a href="#widl-DirectoryEntry-createReader-DirectoryReader">createReader</a></span> ();</span>
+<span class="idlMethod">    <span class="idlMethType"><a>void</a></span>            <span class="idlMethName"><a href="#widl-DirectoryEntry-getFile-void-DOMString-path-Flags-options-EntryCallback-successCallback-ErrorCallback-errorCallback">getFile</a></span> (<span class="idlParam"><span class="idlParamType"><a>DOMString</a></span> <span class="idlParamName">path</span></span>, <span class="idlParam">optional <span class="idlParamType"><a href="#idl-def-Flags" class="idlType"><code>Flags</code></a></span> <span class="idlParamName">options</span></span>, <span class="idlParam">optional <span class="idlParamType"><a href="#idl-def-EntryCallback" class="idlType"><code>EntryCallback</code></a></span> <span class="idlParamName">successCallback</span></span>, <span class="idlParam">optional <span class="idlParamType"><a href="#idl-def-ErrorCallback" class="idlType"><code>ErrorCallback</code></a></span> <span class="idlParamName">errorCallback</span></span>);</span>
+<span class="idlMethod">    <span class="idlMethType"><a>void</a></span>            <span class="idlMethName"><a href="#widl-DirectoryEntry-getDirectory-void-DOMString-path-Flags-options-EntryCallback-successCallback-ErrorCallback-errorCallback">getDirectory</a></span> (<span class="idlParam"><span class="idlParamType"><a>DOMString</a></span> <span class="idlParamName">path</span></span>, <span class="idlParam">optional <span class="idlParamType"><a href="#idl-def-Flags" class="idlType"><code>Flags</code></a></span> <span class="idlParamName">options</span></span>, <span class="idlParam">optional <span class="idlParamType"><a href="#idl-def-EntryCallback" class="idlType"><code>EntryCallback</code></a></span> <span class="idlParamName">successCallback</span></span>, <span class="idlParam">optional <span class="idlParamType"><a href="#idl-def-ErrorCallback" class="idlType"><code>ErrorCallback</code></a></span> <span class="idlParamName">errorCallback</span></span>);</span>
+<span class="idlMethod">    <span class="idlMethType"><a>void</a></span>            <span class="idlMethName"><a href="#widl-DirectoryEntry-removeRecursively-void-VoidCallback-successCallback-ErrorCallback-errorCallback">removeRecursively</a></span> (<span class="idlParam"><span class="idlParamType"><a href="#idl-def-VoidCallback" class="idlType"><code>VoidCallback</code></a></span> <span class="idlParamName">successCallback</span></span>, <span class="idlParam">optional <span class="idlParamType"><a href="#idl-def-ErrorCallback" class="idlType"><code>ErrorCallback</code></a></span> <span class="idlParamName">errorCallback</span></span>);</span>
+};</span>
+</pre><div id="methods-3" class="section"><h4><span class="secno">6.3.1 </span>Methods</h4><dl class="methods"><dt id="widl-DirectoryEntry-createReader-DirectoryReader"><code>createReader</code></dt><dd>
+            <p>
+              Creates a new DirectoryReader to read Entries from this Directory.
+            </p>
+          <div><em>No parameters.</em></div><div><em>Return type: </em><code><a href="#idl-def-DirectoryReader" class="idlType"><code>DirectoryReader</code></a></code></div></dd><dt id="widl-DirectoryEntry-getDirectory-void-DOMString-path-Flags-options-EntryCallback-successCallback-ErrorCallback-errorCallback"><code>getDirectory</code></dt><dd>
+            <p>
+              Creates or looks up a directory.
+            </p>
+            
+          <table class="parameters"><tr><th>Parameter</th><th>Type</th><th>Nullable</th><th>Optional</th><th>Description</th></tr><tr><td class="prmName">path</td><td class="prmType"><code><a>DOMString</a></code></td><td class="prmNullFalse">✘</td><td class="prmOptFalse">✘</td><td class="prmDesc">
+                Either an <a href="#dfn-absolute-path" class="internalDFN">absolute path</a> or a <a href="#dfn-relative-path" class="internalDFN">relative path</a> from
+                this DirectoryEntry to the directory to be looked up or created.
+                It is an error to attempt to create a directory whose immediate
+                parent does not yet exist.
+              </td></tr><tr><td class="prmName">options</td><td class="prmType"><code><a href="#idl-def-Flags" class="idlType"><code>Flags</code></a></code></td><td class="prmNullFalse">✘</td><td class="prmOptTrue">✔</td><td class="prmDesc">
+                <ul>
+                  <li>If <code>create</code> and <code>exclusive</code> are both
+                  true and the path already exists, getDirectory <em class="rfc2119" title="must">must</em> fail.</li>
+                  <li>If <code>create</code> is true, the path doesn't exist,
+                  and no other error occurs, getDirectory <em class="rfc2119" title="must">must</em> create and return
+                  a corresponding DirectoryEntry.</li>
+                  <li>If <code>create</code> is not true and the path doesn't
+                  exist, getDirectory <em class="rfc2119" title="must">must</em> fail.</li>
+                  <li>If <code>create</code> is not true and the path exists,
+                  but is a file, getDirectory <em class="rfc2119" title="must">must</em> fail.</li>
+                  <li>Otherwise, if no other error occurs, getDirectory <em class="rfc2119" title="must">must</em>
+                  return a DirectoryEntry corresponding to path.</li>
+                </ul>
+              </td></tr><tr><td class="prmName">successCallback</td><td class="prmType"><code><a href="#idl-def-EntryCallback" class="idlType"><code>EntryCallback</code></a></code></td><td class="prmNullFalse">✘</td><td class="prmOptTrue">✔</td><td class="prmDesc">
+                A callback that is called to return the DirectoryEntry selected
+                or created.
+              </td></tr><tr><td class="prmName">errorCallback</td><td class="prmType"><code><a href="#idl-def-ErrorCallback" class="idlType"><code>ErrorCallback</code></a></code></td><td class="prmNullFalse">✘</td><td class="prmOptTrue">✔</td><td class="prmDesc">
+                A callback that is called when errors happen.
+              </td></tr></table><div><em>Return type: </em><code><a>void</a></code></div></dd><dt id="widl-DirectoryEntry-getFile-void-DOMString-path-Flags-options-EntryCallback-successCallback-ErrorCallback-errorCallback"><code>getFile</code></dt><dd>
+            <p>
+              Creates or looks up a file.
+            </p>
+            
+          <table class="parameters"><tr><th>Parameter</th><th>Type</th><th>Nullable</th><th>Optional</th><th>Description</th></tr><tr><td class="prmName">path</td><td class="prmType"><code><a>DOMString</a></code></td><td class="prmNullFalse">✘</td><td class="prmOptFalse">✘</td><td class="prmDesc">
+                Either an <a href="#dfn-absolute-path" class="internalDFN">absolute path</a> or a <a href="#dfn-relative-path" class="internalDFN">relative path</a> from
+                this DirectoryEntry to the file to be looked up or created.  It
+                is an error to attempt to create a file whose immediate parent
+                does not yet exist.
+              </td></tr><tr><td class="prmName">options</td><td class="prmType"><code><a href="#idl-def-Flags" class="idlType"><code>Flags</code></a></code></td><td class="prmNullFalse">✘</td><td class="prmOptTrue">✔</td><td class="prmDesc">
+                <ul>
+                  <li>If <code>create</code> and <code>exclusive</code> are both
+                  true, and the path already exists, getFile <em class="rfc2119" title="must">must</em> fail.</li>
+                  <li>If <code>create</code> is true, the path doesn't exist,
+                  and no other error occurs, getFile <em class="rfc2119" title="must">must</em> create it as a
+                  zero-length file and return a corresponding FileEntry.</li>
+                  <li>If <code>create</code> is not true and the path doesn't
+                  exist, getFile <em class="rfc2119" title="must">must</em> fail.</li>
+                  <li>If <code>create</code> is not true and the path exists,
+                  but is a directory, getFile <em class="rfc2119" title="must">must</em> fail.</li>
+                  <li>Otherwise, if no other error occurs, getFile <em class="rfc2119" title="must">must</em>
+                  return a FileEntry corresponding to path.</li>
+                </ul>
+              </td></tr><tr><td class="prmName">successCallback</td><td class="prmType"><code><a href="#idl-def-EntryCallback" class="idlType"><code>EntryCallback</code></a></code></td><td class="prmNullFalse">✘</td><td class="prmOptTrue">✔</td><td class="prmDesc">
+                A callback that is called to return the <a href="#dfn-file" class="internalDFN">File</a> selected or
+                created.
+              </td></tr><tr><td class="prmName">errorCallback</td><td class="prmType"><code><a href="#idl-def-ErrorCallback" class="idlType"><code>ErrorCallback</code></a></code></td><td class="prmNullFalse">✘</td><td class="prmOptTrue">✔</td><td class="prmDesc">
+                A callback that is called when errors happen.
+              </td></tr></table><div><em>Return type: </em><code><a>void</a></code></div></dd><dt id="widl-DirectoryEntry-removeRecursively-void-VoidCallback-successCallback-ErrorCallback-errorCallback"><code>removeRecursively</code></dt><dd>
+            <p>
+              Deletes a directory and all of its contents, if any.  In the event
+              of an error [e.g. trying to delete a directory that contains a
+              file that cannot be removed], some of the contents of the
+              directory <em class="rfc2119" title="may">may</em> be deleted.  It is an error to attempt to delete the
+              root directory of a filesystem.
+            </p>
+            
+          <table class="parameters"><tr><th>Parameter</th><th>Type</th><th>Nullable</th><th>Optional</th><th>Description</th></tr><tr><td class="prmName">successCallback</td><td class="prmType"><code><a href="#idl-def-VoidCallback" class="idlType"><code>VoidCallback</code></a></code></td><td class="prmNullFalse">✘</td><td class="prmOptFalse">✘</td><td class="prmDesc">
+                A callback that is called on success.
+              </td></tr><tr><td class="prmName">errorCallback</td><td class="prmType"><code><a href="#idl-def-ErrorCallback" class="idlType"><code>ErrorCallback</code></a></code></td><td class="prmNullFalse">✘</td><td class="prmOptTrue">✔</td><td class="prmDesc">
+                A callback that is called when errors happen.
+              </td></tr></table><div><em>Return type: </em><code><a>void</a></code></div></dd></dl></div>
+      </div>
+      
+      <div id="the-directoryreader-interface" class="section">
+        <h3><span class="secno">6.4 </span>The <code>DirectoryReader</code> interface</h3>
+        <p>
+          This interface lets a user list files and directories in a directory.
+          If there are no additions to or deletions from a directory between the
+          first and last call to readEntries, and no errors occur, then:
+          </p><ul>
+            <li>A series of calls to readEntries <em class="rfc2119" title="must">must</em> return each entry in the
+            directory exactly once.</li>
+            <li>Once all entries have been returned, the next call to
+            readEntries <em class="rfc2119" title="must">must</em> produce an empty array.</li>
+            <li>If not all entries have been returned, the array produced by
+            readEntries <em class="rfc2119" title="must not">must not</em> be empty.</li>
+            <li>The entries produced by readEntries <em class="rfc2119" title="must not">must not</em> include the
+            directory itself ["."] or its parent [".."].</li>
+          </ul>
+        <p></p>
+        <pre class="idl"><span class="idlInterface" id="idl-def-DirectoryReader">interface <span class="idlInterfaceID">DirectoryReader</span> {
+<span class="idlMethod">    <span class="idlMethType"><a>void</a></span> <span class="idlMethName"><a href="#widl-DirectoryReader-readEntries-void-EntriesCallback-successCallback-ErrorCallback-errorCallback">readEntries</a></span> (<span class="idlParam"><span class="idlParamType"><a href="#idl-def-EntriesCallback" class="idlType"><code>EntriesCallback</code></a></span> <span class="idlParamName">successCallback</span></span>, <span class="idlParam">optional <span class="idlParamType"><a href="#idl-def-ErrorCallback" class="idlType"><code>ErrorCallback</code></a></span> <span class="idlParamName">errorCallback</span></span>);</span>
+};</span>
+</pre><div id="methods-4" class="section"><h4><span class="secno">6.4.1 </span>Methods</h4><dl class="methods"><dt id="widl-DirectoryReader-readEntries-void-EntriesCallback-successCallback-ErrorCallback-errorCallback"><code>readEntries</code></dt><dd>
+            <p>
+              Read the next block of entries from this directory.
+            </p>
+            
+          <table class="parameters"><tr><th>Parameter</th><th>Type</th><th>Nullable</th><th>Optional</th><th>Description</th></tr><tr><td class="prmName">successCallback</td><td class="prmType"><code><a href="#idl-def-EntriesCallback" class="idlType"><code>EntriesCallback</code></a></code></td><td class="prmNullFalse">✘</td><td class="prmOptFalse">✘</td><td class="prmDesc">
+                Called once per successful call to readEntries to deliver the
+                next previously-unreported set of Entries in the associated
+                Directory.  If all Entries have already been returned from
+                previous invocations of readEntries, successCallback <em class="rfc2119" title="must">must</em> be
+                called with a zero-length array as an argument.
+              </td></tr><tr><td class="prmName">errorCallback</td><td class="prmType"><code><a href="#idl-def-ErrorCallback" class="idlType"><code>ErrorCallback</code></a></code></td><td class="prmNullFalse">✘</td><td class="prmOptTrue">✔</td><td class="prmDesc">
+                A callback indicating that there was an error reading from the
+                Directory.
+              </td></tr></table><div><em>Return type: </em><code><a>void</a></code></div></dd></dl></div>
+      </div>
+
+      <div id="the-fileentry-interface" class="section">
+        <h3><span class="secno">6.5 </span>The <code>FileEntry</code> interface</h3>
+        <p>
+          This interface represents a file on a file system.
+        </p>
+        <pre class="idl"><span class="idlInterface" id="idl-def-FileEntry">interface <span class="idlInterfaceID">FileEntry</span> : <span class="idlSuperclass"><a href="#idl-def-Entry" class="idlType"><code>Entry</code></a></span> {
+<span class="idlMethod">    <span class="idlMethType"><a>void</a></span> <span class="idlMethName"><a href="#widl-FileEntry-createWriter-void-FileWriterCallback-successCallback-ErrorCallback-errorCallback">createWriter</a></span> (<span class="idlParam"><span class="idlParamType"><a href="#idl-def-FileWriterCallback" class="idlType"><code>FileWriterCallback</code></a></span> <span class="idlParamName">successCallback</span></span>, <span class="idlParam">optional <span class="idlParamType"><a href="#idl-def-ErrorCallback" class="idlType"><code>ErrorCallback</code></a></span> <span class="idlParamName">errorCallback</span></span>);</span>
+<span class="idlMethod">    <span class="idlMethType"><a>void</a></span> <span class="idlMethName"><a href="#widl-FileEntry-file-void-FileCallback-successCallback-ErrorCallback-errorCallback">file</a></span> (<span class="idlParam"><span class="idlParamType"><a href="#idl-def-FileCallback" class="idlType"><code>FileCallback</code></a></span> <span class="idlParamName">successCallback</span></span>, <span class="idlParam">optional <span class="idlParamType"><a href="#idl-def-ErrorCallback" class="idlType"><code>ErrorCallback</code></a></span> <span class="idlParamName">errorCallback</span></span>);</span>
+};</span>
+</pre><div id="methods-5" class="section"><h4><span class="secno">6.5.1 </span>Methods</h4><dl class="methods"><dt id="widl-FileEntry-createWriter-void-FileWriterCallback-successCallback-ErrorCallback-errorCallback"><code>createWriter</code></dt><dd>
+            <p>
+              Creates a new <a href="#dfn-filewriter" class="internalDFN">FileWriter</a> associated with the file
+              that this <code>FileEntry</code> represents.
+            </p>
+            
+          <table class="parameters"><tr><th>Parameter</th><th>Type</th><th>Nullable</th><th>Optional</th><th>Description</th></tr><tr><td class="prmName">successCallback</td><td class="prmType"><code><a href="#idl-def-FileWriterCallback" class="idlType"><code>FileWriterCallback</code></a></code></td><td class="prmNullFalse">✘</td><td class="prmOptFalse">✘</td><td class="prmDesc">
+                A callback that is called with the new <a href="#dfn-filewriter" class="internalDFN">FileWriter</a>.
+              </td></tr><tr><td class="prmName">errorCallback</td><td class="prmType"><code><a href="#idl-def-ErrorCallback" class="idlType"><code>ErrorCallback</code></a></code></td><td class="prmNullFalse">✘</td><td class="prmOptTrue">✔</td><td class="prmDesc">
+                A callback that is called when errors happen.
+              </td></tr></table><div><em>Return type: </em><code><a>void</a></code></div></dd><dt id="widl-FileEntry-file-void-FileCallback-successCallback-ErrorCallback-errorCallback"><code>file</code></dt><dd>
+            <p>
+              Returns a <a href="#dfn-file" class="internalDFN">File</a> that represents the current state of
+              the file that this <code>FileEntry</code> represents.
+            </p>
+            
+          <table class="parameters"><tr><th>Parameter</th><th>Type</th><th>Nullable</th><th>Optional</th><th>Description</th></tr><tr><td class="prmName">successCallback</td><td class="prmType"><code><a href="#idl-def-FileCallback" class="idlType"><code>FileCallback</code></a></code></td><td class="prmNullFalse">✘</td><td class="prmOptFalse">✘</td><td class="prmDesc">
+                A callback that is called with the <a href="#dfn-file" class="internalDFN">File</a>.
+              </td></tr><tr><td class="prmName">errorCallback</td><td class="prmType"><code><a href="#idl-def-ErrorCallback" class="idlType"><code>ErrorCallback</code></a></code></td><td class="prmNullFalse">✘</td><td class="prmOptTrue">✔</td><td class="prmDesc">
+                A callback that is called when errors happen.
+              </td></tr></table><div><em>Return type: </em><code><a>void</a></code></div></dd></dl></div>
+      </div>
+      
+      <div id="callbacks" class="section">
+        <h3><span class="secno">6.6 </span>Callbacks</h3>
+        <p>
+          Several calls in this <acronym title="Application Programming
+      Interface">API</acronym> are asynchronous, and use callbacks.
+        </p>
+
+        <div id="the-filesystemcallback-interface" class="section">
+          <h4><span class="secno">6.6.1 </span>The <code>FileSystemCallback</code> interface</h4>
+          <p>
+            When <code>requestFileSystem()</code> succeeds, the following
+            callback is made:
+          </p>
+          <pre class="idl"><span class="idlInterface" id="idl-def-FileSystemCallback">[<span class="extAttr">Callback=FunctionOnly</span>]
+interface <span class="idlInterfaceID">FileSystemCallback</span> {
+<span class="idlMethod">    <span class="idlMethType"><a>void</a></span> <span class="idlMethName"><a href="#widl-FileSystemCallback-handleEvent-void-FileSystem-filesystem">handleEvent</a></span> (<span class="idlParam"><span class="idlParamType"><a href="#idl-def-FileSystem" class="idlType"><code>FileSystem</code></a></span> <span class="idlParamName">filesystem</span></span>);</span>
+};</span>
+</pre><div id="methods-6" class="section"><h5><span class="secno">6.6.1.1 </span>Methods</h5><dl class="methods"><dt id="widl-FileSystemCallback-handleEvent-void-FileSystem-filesystem"><code>handleEvent</code></dt><dd>
+              <p>
+                The file system was successfully obtained.
+              </p>
+              
+            <table class="parameters"><tr><th>Parameter</th><th>Type</th><th>Nullable</th><th>Optional</th><th>Description</th></tr><tr><td class="prmName">filesystem</td><td class="prmType"><code><a href="#idl-def-FileSystem" class="idlType"><code>FileSystem</code></a></code></td><td class="prmNullFalse">✘</td><td class="prmOptFalse">✘</td><td class="prmDesc">
+                  The file systems to which the app is granted access.
+                </td></tr></table><div><em>Return type: </em><code><a>void</a></code></div></dd></dl></div>
+        </div>
+
+        <div id="the-entrycallback-interface" class="section">
+          <h4><span class="secno">6.6.2 </span>The <code>EntryCallback</code> interface</h4>
+          <p>
+            This interface is the callback used to look up Entry objects.
+          </p>
+          <pre class="idl"><span class="idlInterface" id="idl-def-EntryCallback">[<span class="extAttr">Callback=FunctionOnly</span>]
+interface <span class="idlInterfaceID">EntryCallback</span> {
+<span class="idlMethod">    <span class="idlMethType"><a>void</a></span> <span class="idlMethName"><a href="#widl-EntryCallback-handleEvent-void-Entry-entry">handleEvent</a></span> (<span class="idlParam"><span class="idlParamType"><a href="#idl-def-Entry" class="idlType"><code>Entry</code></a></span> <span class="idlParamName">entry</span></span>);</span>
+};</span>
+</pre><div id="methods-7" class="section"><h5><span class="secno">6.6.2.1 </span>Methods</h5><dl class="methods"><dt id="widl-EntryCallback-handleEvent-void-Entry-entry"><code>handleEvent</code></dt><dd>
+              Used to supply an Entry as a response to a user query.
+            <table class="parameters"><tr><th>Parameter</th><th>Type</th><th>Nullable</th><th>Optional</th><th>Description</th></tr><tr><td class="prmName">entry</td><td class="prmType"><code><a href="#idl-def-Entry" class="idlType"><code>Entry</code></a></code></td><td class="prmNullFalse">✘</td><td class="prmOptFalse">✘</td><td class="prmDesc"></td></tr></table><div><em>Return type: </em><code><a>void</a></code></div></dd></dl></div>
+        </div>
+
+        <div id="the-entriescallback-interface" class="section">
+          <h4><span class="secno">6.6.3 </span>The <code>EntriesCallback</code> interface</h4>
+          <p>
+            When <code>readEntries()</code> succeeds, the following callback is
+            made.
+          </p>
+          <pre class="idl"><span class="idlInterface" id="idl-def-EntriesCallback">[<span class="extAttr">Callback=FunctionOnly</span>]
+interface <span class="idlInterfaceID">EntriesCallback</span> {
+<span class="idlMethod">    <span class="idlMethType"><a>void</a></span> <span class="idlMethName"><a href="#widl-EntriesCallback-handleEvent-void-EntryArray-entries">handleEvent</a></span> (<span class="idlParam"><span class="idlParamType"><a href="#idl-def-Entry" class="idlType"><code>Entry</code></a>[]</span> <span class="idlParamName">entries</span></span>);</span>
+};</span>
+</pre><div id="methods-8" class="section"><h5><span class="secno">6.6.3.1 </span>Methods</h5><dl class="methods"><dt id="widl-EntriesCallback-handleEvent-void-EntryArray-entries"><code>handleEvent</code></dt><dd>
+              Used to supply an array of Entries as a response to a user query.
+            <table class="parameters"><tr><th>Parameter</th><th>Type</th><th>Nullable</th><th>Optional</th><th>Description</th></tr><tr><td class="prmName">entries</td><td class="prmType"><code><a href="#idl-def-Entry" class="idlType"><code>Entry</code></a>[]</code></td><td class="prmNullFalse">✘</td><td class="prmOptFalse">✘</td><td class="prmDesc"></td></tr></table><div><em>Return type: </em><code><a>void</a></code></div></dd></dl></div>
+        </div>
+
+        <div id="the-metadatacallback-interface" class="section">
+          <h4><span class="secno">6.6.4 </span>The <code>MetadataCallback</code> interface</h4>
+          <p>
+            This interface is the callback used to look up file and directory
+            metadata.
+          </p>
+          <pre class="idl"><span class="idlInterface" id="idl-def-MetadataCallback">[<span class="extAttr">Callback=FunctionOnly</span>]
+interface <span class="idlInterfaceID">MetadataCallback</span> {
+<span class="idlMethod">    <span class="idlMethType"><a>void</a></span> <span class="idlMethName"><a href="#widl-MetadataCallback-handleEvent-void-Metadata-metadata">handleEvent</a></span> (<span class="idlParam"><span class="idlParamType"><a href="#idl-def-Metadata" class="idlType"><code>Metadata</code></a></span> <span class="idlParamName">metadata</span></span>);</span>
+};</span>
+</pre><div id="methods-9" class="section"><h5><span class="secno">6.6.4.1 </span>Methods</h5><dl class="methods"><dt id="widl-MetadataCallback-handleEvent-void-Metadata-metadata"><code>handleEvent</code></dt><dd>
+              <p>
+                Used to supply file or directory metadata as a response to a
+                user query.
+              </p>
+            <table class="parameters"><tr><th>Parameter</th><th>Type</th><th>Nullable</th><th>Optional</th><th>Description</th></tr><tr><td class="prmName">metadata</td><td class="prmType"><code><a href="#idl-def-Metadata" class="idlType"><code>Metadata</code></a></code></td><td class="prmNullFalse">✘</td><td class="prmOptFalse">✘</td><td class="prmDesc"></td></tr></table><div><em>Return type: </em><code><a>void</a></code></div></dd></dl></div>
+        </div>
+
+        <div id="the-filewritercallback-interface" class="section">
+          <h4><span class="secno">6.6.5 </span>The <code>FileWriterCallback</code> interface</h4>
+          <p>
+          This interface is the callback used to create a
+          <a href="#dfn-filewriter" class="internalDFN">FileWriter</a>.
+          </p>
+          <pre class="idl"><span class="idlInterface" id="idl-def-FileWriterCallback">[<span class="extAttr">Callback=FunctionOnly</span>]
+interface <span class="idlInterfaceID">FileWriterCallback</span> {
+<span class="idlMethod">    <span class="idlMethType"><a>void</a></span> <span class="idlMethName"><a href="#widl-FileWriterCallback-handleEvent-void-FileWriter-fileWriter">handleEvent</a></span> (<span class="idlParam"><span class="idlParamType"><a>FileWriter</a></span> <span class="idlParamName">fileWriter</span></span>);</span>
+};</span>
+</pre><div id="methods-10" class="section"><h5><span class="secno">6.6.5.1 </span>Methods</h5><dl class="methods"><dt id="widl-FileWriterCallback-handleEvent-void-FileWriter-fileWriter"><code>handleEvent</code></dt><dd>
+              <p>
+              Used to supply a <a href="#dfn-filewriter" class="internalDFN">FileWriter</a> as a response to a user
+              query.
+              </p>
+            <table class="parameters"><tr><th>Parameter</th><th>Type</th><th>Nullable</th><th>Optional</th><th>Description</th></tr><tr><td class="prmName">fileWriter</td><td class="prmType"><code><a>FileWriter</a></code></td><td class="prmNullFalse">✘</td><td class="prmOptFalse">✘</td><td class="prmDesc"></td></tr></table><div><em>Return type: </em><code><a>void</a></code></div></dd></dl></div>
+        </div>
+
+        <div id="the-filecallback-interface" class="section">
+          <h4><span class="secno">6.6.6 </span>The <code>FileCallback</code> interface</h4>
+          <p>
+          This interface is the callback used to obtain a <a href="#dfn-file" class="internalDFN">File</a>.
+          </p>
+          <pre class="idl"><span class="idlInterface" id="idl-def-FileCallback">[<span class="extAttr">Callback=FunctionOnly</span>]
+interface <span class="idlInterfaceID">FileCallback</span> {
+<span class="idlMethod">    <span class="idlMethType"><a>void</a></span> <span class="idlMethName"><a href="#widl-FileCallback-handleEvent-void-File-file">handleEvent</a></span> (<span class="idlParam"><span class="idlParamType"><a>File</a></span> <span class="idlParamName">file</span></span>);</span>
+};</span>
+</pre><div id="methods-11" class="section"><h5><span class="secno">6.6.6.1 </span>Methods</h5><dl class="methods"><dt id="widl-FileCallback-handleEvent-void-File-file"><code>handleEvent</code></dt><dd>
+              <p>
+              Used to supply a <a href="#dfn-file" class="internalDFN">File</a> as a response to a user query.
+              </p>
+            <table class="parameters"><tr><th>Parameter</th><th>Type</th><th>Nullable</th><th>Optional</th><th>Description</th></tr><tr><td class="prmName">file</td><td class="prmType"><code><a>File</a></code></td><td class="prmNullFalse">✘</td><td class="prmOptFalse">✘</td><td class="prmDesc"></td></tr></table><div><em>Return type: </em><code><a>void</a></code></div></dd></dl></div>
+        </div>
+
+        <div id="the-voidcallback-interface" class="section">
+          <h4><span class="secno">6.6.7 </span>The <code>VoidCallback</code> interface</h4>
+          <p>
+            This interface is the generic callback used to indicate success of
+            an asynchronous method.
+          </p>
+          <pre class="idl"><span class="idlInterface" id="idl-def-VoidCallback">[<span class="extAttr">Callback=FunctionOnly</span>]
+interface <span class="idlInterfaceID">VoidCallback</span> {
+<span class="idlMethod">    <span class="idlMethType"><a>void</a></span> <span class="idlMethName"><a href="#widl-VoidCallback-handleEvent-void">handleEvent</a></span> ();</span>
+};</span>
+</pre><div id="methods-12" class="section"><h5><span class="secno">6.6.7.1 </span>Methods</h5><dl class="methods"><dt id="widl-VoidCallback-handleEvent-void"><code>handleEvent</code></dt><dd>
+            <div><em>No parameters.</em></div><div><em>Return type: </em><code><a>void</a></code></div></dd></dl></div>
+        </div>
+
+        <div id="the-errorcallback-interface" class="section">
+          <h4><span class="secno">6.6.8 </span>The <code>ErrorCallback</code> interface</h4>
+          <p>
+            When an error occurs, the following callback is made:
+          </p>
+          <pre class="idl"><span class="idlInterface" id="idl-def-ErrorCallback">[<span class="extAttr">Callback=FunctionOnly</span>]
+interface <span class="idlInterfaceID">ErrorCallback</span> {
+<span class="idlMethod">    <span class="idlMethType"><a>void</a></span> <span class="idlMethName"><a href="#widl-ErrorCallback-handleEvent-void-DOMError-err">handleEvent</a></span> (<span class="idlParam"><span class="idlParamType"><a>DOMError</a></span> <span class="idlParamName">err</span></span>);</span>
+};</span>
+</pre><div id="methods-13" class="section"><h5><span class="secno">6.6.8.1 </span>Methods</h5><dl class="methods"><dt id="widl-ErrorCallback-handleEvent-void-DOMError-err"><code>handleEvent</code></dt><dd>
+              <p>
+                There was an error with the request. Details are provided by the
+                <code>err</code> parameter.
+              </p>
+              
+            <table class="parameters"><tr><th>Parameter</th><th>Type</th><th>Nullable</th><th>Optional</th><th>Description</th></tr><tr><td class="prmName">err</td><td class="prmType"><code><a>DOMError</a></code></td><td class="prmNullFalse">✘</td><td class="prmOptFalse">✘</td><td class="prmDesc">
+                  The error that was generated.
+                </td></tr></table><div><em>Return type: </em><code><a>void</a></code></div></dd></dl></div>
+        </div>
+      </div>
+    </div>
+    <div id="the-synchronous-filesystem-interface" class="section">
+      <!--OddPage--><h2><span class="secno">7. </span>The synchronous filesystem interface</h2>
+      <div id="the-filesystemsync-interface" class="section">
+        <h3><span class="secno">7.1 </span>The <code>FileSystemSync</code> interface</h3>
+        <p>
+          This interface represents a file system.
+        </p>
+        <pre class="idl"><span class="idlInterface" id="idl-def-FileSystemSync">interface <span class="idlInterfaceID">FileSystemSync</span> {
+<span class="idlAttribute">    readonly attribute <span class="idlAttrType"><a>DOMString</a></span>          <span class="idlAttrName"><a href="#widl-FileSystemSync-name">name</a></span>;</span>
+<span class="idlAttribute">    readonly attribute <span class="idlAttrType"><a href="#idl-def-DirectoryEntrySync" class="idlType"><code>DirectoryEntrySync</code></a></span> <span class="idlAttrName"><a href="#widl-FileSystemSync-root">root</a></span>;</span>
+};</span>
+</pre><div id="attributes-3" class="section"><h4><span class="secno">7.1.1 </span>Attributes</h4><dl class="attributes"><dt id="widl-FileSystemSync-name"><code>name</code> of type <span class="idlAttrType"><a>DOMString</a></span>, readonly</dt><dd>
+            This is the name of the file system.  The specifics of naming
+            filesystems is unspecified, but a name <em class="rfc2119" title="must">must</em> be unique across the
+            list of exposed file systems.
+          </dd><dt id="widl-FileSystemSync-root"><code>root</code> of type <span class="idlAttrType"><a href="#idl-def-DirectoryEntrySync" class="idlType"><code>DirectoryEntrySync</code></a></span>, readonly</dt><dd>
+            The root directory of the file system.
+          </dd></dl></div>
+      </div>
+
+      <div id="the-entrysync-interface" class="section">
+        <h3><span class="secno">7.2 </span>The <code>EntrySync</code> interface</h3>
+        <p>
+          An abstract interface representing entries in a file system, each of
+          which may be a <a href="#idl-def-FileEntrySync" class="idlType"><code>FileEntrySync</code></a> or <a href="#idl-def-DirectoryEntrySync" class="idlType"><code>DirectoryEntrySync</code></a>.
+          </p><div class="issue">
+            Some have requested support for archive files.  I've not required
+            that, but I've left space for it by not ruling out having both
+            isFile and isDirectory be true.  I welcome comments on this
+            approach.
+          </div>
+        <p></p>
+        <pre class="idl"><span class="idlInterface" id="idl-def-EntrySync">interface <span class="idlInterfaceID">EntrySync</span> {
+<span class="idlAttribute">    readonly attribute <span class="idlAttrType"><a>boolean</a></span>        <span class="idlAttrName"><a href="#widl-EntrySync-isFile">isFile</a></span>;</span>
+<span class="idlAttribute">    readonly attribute <span class="idlAttrType"><a>boolean</a></span>        <span class="idlAttrName"><a href="#widl-EntrySync-isDirectory">isDirectory</a></span>;</span>
+<span class="idlMethod">    <span class="idlMethType"><a href="#idl-def-Metadata" class="idlType"><code>Metadata</code></a></span>           <span class="idlMethName"><a href="#widl-EntrySync-getMetadata-Metadata">getMetadata</a></span> ();</span>
+<span class="idlAttribute">    readonly attribute <span class="idlAttrType"><a>DOMString</a></span>      <span class="idlAttrName"><a href="#widl-EntrySync-name">name</a></span>;</span>
+<span class="idlAttribute">    readonly attribute <span class="idlAttrType"><a>DOMString</a></span>      <span class="idlAttrName"><a href="#widl-EntrySync-fullPath">fullPath</a></span>;</span>
+<span class="idlAttribute">    readonly attribute <span class="idlAttrType"><a href="#idl-def-FileSystemSync" class="idlType"><code>FileSystemSync</code></a></span> <span class="idlAttrName"><a href="#widl-EntrySync-filesystem">filesystem</a></span>;</span>
+<span class="idlMethod">    <span class="idlMethType"><a href="#idl-def-EntrySync" class="idlType"><code>EntrySync</code></a></span>          <span class="idlMethName"><a href="#widl-EntrySync-moveTo-EntrySync-DirectoryEntrySync-parent-DOMString-newName">moveTo</a></span> (<span class="idlParam"><span class="idlParamType"><a href="#idl-def-DirectoryEntrySync" class="idlType"><code>DirectoryEntrySync</code></a></span> <span class="idlParamName">parent</span></span>, <span class="idlParam">optional <span class="idlParamType"><a>DOMString</a></span> <span class="idlParamName">newName</span></span>);</span>
+<span class="idlMethod">    <span class="idlMethType"><a href="#idl-def-EntrySync" class="idlType"><code>EntrySync</code></a></span>          <span class="idlMethName"><a href="#widl-EntrySync-copyTo-EntrySync-DirectoryEntrySync-parent-DOMString-newName">copyTo</a></span> (<span class="idlParam"><span class="idlParamType"><a href="#idl-def-DirectoryEntrySync" class="idlType"><code>DirectoryEntrySync</code></a></span> <span class="idlParamName">parent</span></span>, <span class="idlParam">optional <span class="idlParamType"><a>DOMString</a></span> <span class="idlParamName">newName</span></span>);</span>
+<span class="idlMethod">    <span class="idlMethType"><a>DOMString</a></span>          <span class="idlMethName"><a href="#widl-EntrySync-toURL-DOMString">toURL</a></span> ();</span>
+<span class="idlMethod">    <span class="idlMethType"><a>void</a></span>               <span class="idlMethName"><a href="#widl-EntrySync-remove-void">remove</a></span> ();</span>
+<span class="idlMethod">    <span class="idlMethType"><a href="#idl-def-DirectoryEntrySync" class="idlType"><code>DirectoryEntrySync</code></a></span> <span class="idlMethName"><a href="#widl-EntrySync-getParent-DirectoryEntrySync">getParent</a></span> ();</span>
+};</span>
+</pre><div id="attributes-4" class="section"><h4><span class="secno">7.2.1 </span>Attributes</h4><dl class="attributes"><dt id="widl-EntrySync-filesystem"><code>filesystem</code> of type <span class="idlAttrType"><a href="#idl-def-FileSystemSync" class="idlType"><code>FileSystemSync</code></a></span>, readonly</dt><dd>
+            The file system on which the entry resides.
+          </dd><dt id="widl-EntrySync-fullPath"><code>fullPath</code> of type <span class="idlAttrType"><a>DOMString</a></span>, readonly</dt><dd>
+            The full <a href="#dfn-absolute-path" class="internalDFN">absolute path</a> from the root to the entry.
+          </dd><dt id="widl-EntrySync-isDirectory"><code>isDirectory</code> of type <span class="idlAttrType"><a>boolean</a></span>, readonly</dt><dd>
+            EntrySync is a directory.
+          </dd><dt id="widl-EntrySync-isFile"><code>isFile</code> of type <span class="idlAttrType"><a>boolean</a></span>, readonly</dt><dd>
+            EntrySync is a file.
+          </dd><dt id="widl-EntrySync-name"><code>name</code> of type <span class="idlAttrType"><a>DOMString</a></span>, readonly</dt><dd>
+            The name of the entry, excluding the path leading to it.
+          </dd></dl></div><div id="methods-14" class="section"><h4><span class="secno">7.2.2 </span>Methods</h4><dl class="methods"><dt id="widl-EntrySync-copyTo-EntrySync-DirectoryEntrySync-parent-DOMString-newName"><code>copyTo</code></dt><dd>
+            <p>
+              Copy an entry to a different location on the file system.
+              It is an error to try to:
+              </p><ul>
+                <li>copy a directory inside itself or to any child at any
+                depth;</li>
+                <li>copy an entry into its parent if a name different from its
+                current one isn't provided;</li>
+                <li>copy a file to a path occupied by a directory;</li>
+                <li>copy a directory to a path occupied by a file;</li>
+                <li>copy any element to a path occupied by a directory which is
+                not empty.</li>
+              </ul>
+              A copy of a file on top of an existing file <em class="rfc2119" title="must">must</em> attempt to
+              delete and replace that file.<br>
+              A copy of a directory on top of an existing empty directory <em class="rfc2119" title="must">must</em>
+              attempt to delete and replace that directory.<br>
+              Directory copies are always recursive--that is, they copy all
+              contents of the directory.
+            <p></p>
+            
+          <table class="parameters"><tr><th>Parameter</th><th>Type</th><th>Nullable</th><th>Optional</th><th>Description</th></tr><tr><td class="prmName">parent</td><td class="prmType"><code><a href="#idl-def-DirectoryEntrySync" class="idlType"><code>DirectoryEntrySync</code></a></code></td><td class="prmNullFalse">✘</td><td class="prmOptFalse">✘</td><td class="prmDesc">
+                The directory to which to move the entry.
+              </td></tr><tr><td class="prmName">newName</td><td class="prmType"><code><a>DOMString</a></code></td><td class="prmNullFalse">✘</td><td class="prmOptTrue">✔</td><td class="prmDesc">
+                The new name of the entry.  Defaults to the EntrySync's current
+                name if unspecified.
+              </td></tr></table><div><em>Return type: </em><code><a href="#idl-def-EntrySync" class="idlType"><code>EntrySync</code></a></code></div></dd><dt id="widl-EntrySync-getMetadata-Metadata"><code>getMetadata</code></dt><dd>
+            <p>
+              Look up metadata about this entry.
+            </p>
+          <div><em>No parameters.</em></div><div><em>Return type: </em><code><a href="#idl-def-Metadata" class="idlType"><code>Metadata</code></a></code></div></dd><dt id="widl-EntrySync-getParent-DirectoryEntrySync"><code>getParent</code></dt><dd>
+            Look up the parent DirectoryEntrySync containing this Entry.  If
+            this EntrySync is the root of its filesystem, its parent is itself.
+          <div><em>No parameters.</em></div><div><em>Return type: </em><code><a href="#idl-def-DirectoryEntrySync" class="idlType"><code>DirectoryEntrySync</code></a></code></div></dd><dt id="widl-EntrySync-moveTo-EntrySync-DirectoryEntrySync-parent-DOMString-newName"><code>moveTo</code></dt><dd>
+            <p>
+              Move an entry to a different location on the file system.
+              It is an error to try to:
+              </p><ul>
+                <li>move a directory inside itself or to any child at any
+                depth;</li>
+                <li>move an entry into its parent if a name different from its
+                current one isn't provided;</li>
+                <li>move a file to a path occupied by a directory;</li>
+                <li>move a directory to a path occupied by a file;</li>
+                <li>move any element to a path occupied by a directory which is
+                not empty.</li>
+              </ul>
+              A move of a file on top of an existing file <em class="rfc2119" title="must">must</em> attempt to
+              delete and replace that file.
+              A move of a directory on top of an existing empty directory <em class="rfc2119" title="must">must</em>
+              attempt to delete and replace that directory.
+            <p></p>
+            
+          <table class="parameters"><tr><th>Parameter</th><th>Type</th><th>Nullable</th><th>Optional</th><th>Description</th></tr><tr><td class="prmName">parent</td><td class="prmType"><code><a href="#idl-def-DirectoryEntrySync" class="idlType"><code>DirectoryEntrySync</code></a></code></td><td class="prmNullFalse">✘</td><td class="prmOptFalse">✘</td><td class="prmDesc">
+                The directory to which to move the entry.
+              </td></tr><tr><td class="prmName">newName</td><td class="prmType"><code><a>DOMString</a></code></td><td class="prmNullFalse">✘</td><td class="prmOptTrue">✔</td><td class="prmDesc">
+                The new name of the entry.  Defaults to the EntrySync's current
+                name if unspecified.
+              </td></tr></table><div><em>Return type: </em><code><a href="#idl-def-EntrySync" class="idlType"><code>EntrySync</code></a></code></div></dd><dt id="widl-EntrySync-remove-void"><code>remove</code></dt><dd>
+            <p>
+              Deletes a file or directory.  It is an error to attempt to delete
+              a directory that is not empty.  It is an error to attempt to
+              delete the root directory of a filesystem.
+            </p>
+          <div><em>No parameters.</em></div><div><em>Return type: </em><code><a>void</a></code></div></dd><dt id="widl-EntrySync-toURL-DOMString"><code>toURL</code></dt><dd>
+            <p>
+              Returns a URL that can be used to identify this entry.
+              Unlike the URN defined in [<cite><a class="bibref" rel="biblioentry" href="#bib-FILE-API-ED">FILE-API-ED</a></cite>], it has no specific
+              expiration; as it describes a location on disk, it should be valid
+              at least as long as that location exists.
+            </p>
+          <div><em>No parameters.</em></div><div><em>Return type: </em><code><a>DOMString</a></code></div></dd></dl></div>
+      </div>
+      
+      <div id="the-directoryentrysync-interface" class="section">
+        <h3><span class="secno">7.3 </span>The <code>DirectoryEntrySync</code> interface</h3>
+        <p>
+          This interface represents a directory on a file system.
+        </p>
+        <pre class="idl"><span class="idlInterface" id="idl-def-DirectoryEntrySync">interface <span class="idlInterfaceID">DirectoryEntrySync</span> : <span class="idlSuperclass"><a href="#idl-def-EntrySync" class="idlType"><code>EntrySync</code></a></span> {
+<span class="idlMethod">    <span class="idlMethType"><a href="#idl-def-DirectoryReaderSync" class="idlType"><code>DirectoryReaderSync</code></a></span> <span class="idlMethName"><a href="#widl-DirectoryEntrySync-createReader-DirectoryReaderSync">createReader</a></span> ();</span>
+<span class="idlMethod">    <span class="idlMethType"><a href="#idl-def-FileEntrySync" class="idlType"><code>FileEntrySync</code></a></span>       <span class="idlMethName"><a href="#widl-DirectoryEntrySync-getFile-FileEntrySync-DOMString-path-Flags-options">getFile</a></span> (<span class="idlParam"><span class="idlParamType"><a>DOMString</a></span> <span class="idlParamName">path</span></span>, <span class="idlParam">optional <span class="idlParamType"><a href="#idl-def-Flags" class="idlType"><code>Flags</code></a></span> <span class="idlParamName">options</span></span>);</span>
+<span class="idlMethod">    <span class="idlMethType"><a href="#idl-def-DirectoryEntrySync" class="idlType"><code>DirectoryEntrySync</code></a></span>  <span class="idlMethName"><a href="#widl-DirectoryEntrySync-getDirectory-DirectoryEntrySync-DOMString-path-Flags-options">getDirectory</a></span> (<span class="idlParam"><span class="idlParamType"><a>DOMString</a></span> <span class="idlParamName">path</span></span>, <span class="idlParam">optional <span class="idlParamType"><a href="#idl-def-Flags" class="idlType"><code>Flags</code></a></span> <span class="idlParamName">options</span></span>);</span>
+<span class="idlMethod">    <span class="idlMethType"><a>void</a></span>                <span class="idlMethName"><a href="#widl-DirectoryEntrySync-removeRecursively-void">removeRecursively</a></span> ();</span>
+};</span>
+</pre><div id="methods-15" class="section"><h4><span class="secno">7.3.1 </span>Methods</h4><dl class="methods"><dt id="widl-DirectoryEntrySync-createReader-DirectoryReaderSync"><code>createReader</code></dt><dd>
+            <p>
+              Creates a new DirectoryReaderSync to read EntrySyncs from this
+              DirectorySync.
+            </p>
+          <div><em>No parameters.</em></div><div><em>Return type: </em><code><a href="#idl-def-DirectoryReaderSync" class="idlType"><code>DirectoryReaderSync</code></a></code></div></dd><dt id="widl-DirectoryEntrySync-getDirectory-DirectoryEntrySync-DOMString-path-Flags-options"><code>getDirectory</code></dt><dd>
+            <p>
+              Creates or looks up a directory.
+            </p>
+            
+          <table class="parameters"><tr><th>Parameter</th><th>Type</th><th>Nullable</th><th>Optional</th><th>Description</th></tr><tr><td class="prmName">path</td><td class="prmType"><code><a>DOMString</a></code></td><td class="prmNullFalse">✘</td><td class="prmOptFalse">✘</td><td class="prmDesc">
+                Either an <a href="#dfn-absolute-path" class="internalDFN">absolute path</a> or a <a href="#dfn-relative-path" class="internalDFN">relative path</a> from
+                this DirectoryEntrySync to the directory to be looked up or
+                created.  It is an error to attempt to create a directory whose
+                immediate parent does not yet exist.
+              </td></tr><tr><td class="prmName">options</td><td class="prmType"><code><a href="#idl-def-Flags" class="idlType"><code>Flags</code></a></code></td><td class="prmNullFalse">✘</td><td class="prmOptTrue">✔</td><td class="prmDesc">
+                <ul>
+                  <li>If <code>create</code> and <code>exclusive</code> are both
+                  true and the path already exists, getDirectory <em class="rfc2119" title="must">must</em> fail.</li>
+                  <li>If <code>create</code> is true, the path doesn't exist,
+                  and no other error occurs, getDirectory <em class="rfc2119" title="must">must</em> create and return
+                  a corresponding DirectoryEntry.</li>
+                  <li>If <code>create</code> is not true and the path doesn't
+                  exist, getDirectory <em class="rfc2119" title="must">must</em> fail.</li>
+                  <li>If <code>create</code> is not true and the path exists,
+                  but is a file, getDirectory <em class="rfc2119" title="must">must</em> fail.</li>
+                  <li>Otherwise, if no other error occurs, getDirectory <em class="rfc2119" title="must">must</em>
+                  return a DirectoryEntrySync corresponding to path.</li>
+                </ul>
+              </td></tr></table><div><em>Return type: </em><code><a href="#idl-def-DirectoryEntrySync" class="idlType"><code>DirectoryEntrySync</code></a></code></div></dd><dt id="widl-DirectoryEntrySync-getFile-FileEntrySync-DOMString-path-Flags-options"><code>getFile</code></dt><dd>
+            <p>
+              Creates or looks up a file.
+            </p>
+            
+          <table class="parameters"><tr><th>Parameter</th><th>Type</th><th>Nullable</th><th>Optional</th><th>Description</th></tr><tr><td class="prmName">path</td><td class="prmType"><code><a>DOMString</a></code></td><td class="prmNullFalse">✘</td><td class="prmOptFalse">✘</td><td class="prmDesc">
+                Either an <a href="#dfn-absolute-path" class="internalDFN">absolute path</a> or a <a href="#dfn-relative-path" class="internalDFN">relative path</a> from
+                this DirectoryEntrySync to the file to be looked up or created.
+                It is an error to attempt to create a file whose immediate
+                parent does not yet exist.
+              </td></tr><tr><td class="prmName">options</td><td class="prmType"><code><a href="#idl-def-Flags" class="idlType"><code>Flags</code></a></code></td><td class="prmNullFalse">✘</td><td class="prmOptTrue">✔</td><td class="prmDesc">
+                <ul>
+                  <li>If <code>create</code> and <code>exclusive</code> are both
+                  true and the path already exists, getFile <em class="rfc2119" title="must">must</em> fail.</li>
+                  <li>If <code>create</code> is true, the path doesn't exist,
+                  and no other error occurs, getFile <em class="rfc2119" title="must">must</em> create it as a
+                  zero-length file and return a corresponding FileEntry.</li>
+                  <li>If <code>create</code> is not true and the path doesn't
+                  exist, getFile <em class="rfc2119" title="must">must</em> fail.</li>
+                  <li>If <code>create</code> is not true and the path exists,
+                  but is a directory, getFile <em class="rfc2119" title="must">must</em> fail.</li>
+                  <li>Otherwise, if no other error occurs, getFile <em class="rfc2119" title="must">must</em>
+                  return a FileEntrySync corresponding to path.</li>
+                </ul>
+              </td></tr></table><div><em>Return type: </em><code><a href="#idl-def-FileEntrySync" class="idlType"><code>FileEntrySync</code></a></code></div></dd><dt id="widl-DirectoryEntrySync-removeRecursively-void"><code>removeRecursively</code></dt><dd>
+            <p>
+              Deletes a directory and all of its contents, if any.  In the event
+              of an error [e.g. trying to delete a directory that contains a
+              file that cannot be removed], some of the contents of the
+              directory <em class="rfc2119" title="may">may</em> be deleted.  It is an error to attempt to delete the
+              root directory of a filesystem.
+            </p>
+          <div><em>No parameters.</em></div><div><em>Return type: </em><code><a>void</a></code></div></dd></dl></div>
+      </div>
+      
+      <div id="the-directoryreadersync-interface" class="section">
+        <h3><span class="secno">7.4 </span>The <code>DirectoryReaderSync</code> interface</h3>
+        <p>
+          This interface lets a user list files and directories in a directory.
+          If there are no additions to or deletions from a directory between the
+          first and last call to readEntries, and no errors occur, then:
+          </p><ul>
+            <li>A series of calls to readEntries <em class="rfc2119" title="must">must</em> return each entry in the
+            directory exactly once.</li>
+            <li>Once all entries have been returned, the next call to
+            readEntries <em class="rfc2119" title="must">must</em> produce an empty array.</li>
+            <li>If not all entries have been returned, the array produced by
+            readEntries <em class="rfc2119" title="must not">must not</em> be empty.</li>
+            <li>The entries produced by readEntries <em class="rfc2119" title="must not">must not</em> include the
+            directory itself ["."] or its parent [".."].</li>
+          </ul>
+        <p></p>
+        <pre class="idl"><span class="idlInterface" id="idl-def-DirectoryReaderSync">interface <span class="idlInterfaceID">DirectoryReaderSync</span> {
+<span class="idlMethod">    <span class="idlMethType"><a href="#idl-def-EntrySync" class="idlType"><code>EntrySync</code></a>[]</span> <span class="idlMethName"><a href="#widl-DirectoryReaderSync-readEntries-EntrySync">readEntries</a></span> ();</span>
+};</span>
+</pre><div id="methods-16" class="section"><h4><span class="secno">7.4.1 </span>Methods</h4><dl class="methods"><dt id="widl-DirectoryReaderSync-readEntries-EntrySync"><code>readEntries</code></dt><dd>
+            <p>
+              Read the next block of entries from this directory.
+            </p>
+          <div><em>No parameters.</em></div><div><em>Return type: </em><code><a href="#idl-def-EntrySync" class="idlType"><code>EntrySync</code></a>[]</code></div></dd></dl></div>
+      </div>
+
+      <div id="the-fileentrysync-interface" class="section">
+        <h3><span class="secno">7.5 </span>The <code>FileEntrySync</code> interface</h3>
+        <p>
+          This interface represents a file on a file system.
+        </p>
+        <pre class="idl"><span class="idlInterface" id="idl-def-FileEntrySync">interface <span class="idlInterfaceID">FileEntrySync</span> : <span class="idlSuperclass"><a href="#idl-def-EntrySync" class="idlType"><code>EntrySync</code></a></span> {
+<span class="idlMethod">    <span class="idlMethType"><a>FileWriterSync</a></span> <span class="idlMethName"><a href="#widl-FileEntrySync-createWriter-FileWriterSync">createWriter</a></span> ();</span>
+<span class="idlMethod">    <span class="idlMethType"><a>File</a></span>           <span class="idlMethName"><a href="#widl-FileEntrySync-file-File">file</a></span> ();</span>
+};</span>
+</pre><div id="methods-17" class="section"><h4><span class="secno">7.5.1 </span>Methods</h4><dl class="methods"><dt id="widl-FileEntrySync-createWriter-FileWriterSync"><code>createWriter</code></dt><dd>
+            <p>
+            Creates a new <a href="#dfn-filewritersync" class="internalDFN">FileWriterSync</a> associated with the file
+            that this <code>FileEntrySync</code> represents.
+            </p>
+          <div><em>No parameters.</em></div><div><em>Return type: </em><code><a>FileWriterSync</a></code></div></dd><dt id="widl-FileEntrySync-file-File"><code>file</code></dt><dd>
+            <p>
+              Returns a <a href="#dfn-file" class="internalDFN">File</a> that represents the current state of
+              the file that this <code>FileEntrySync</code> represents.
+            </p>
+          <div><em>No parameters.</em></div><div><em>Return type: </em><code><a>File</a></code></div></dd></dl></div>
+      </div>
+    </div>
+    
+    <div id="errors-and-exceptions" class="section">
+      <!--OddPage--><h2><span class="secno">8. </span>Errors and Exceptions</h2>
+      <div class="informative section" id="occurrence">
+        <h3><span class="secno">8.1 </span>Occurrence</h3><p><em>This section is non-normative.</em></p>
+        <p>
+        Error conditions can occur when attempting to write files. The list
+        below of potential error conditions is informative, with links to
+        normative descriptions of errors:
+        </p>
+        <p>
+        An operation on a file may fail due to the file [or a parent directory]
+        having been removed before the operation is attempted.  See
+        <a href="#dfn-notfounderror" class="internalDFN">NotFoundError</a>.
+        </p>
+        <p>
+        An operation on a file may not make sense, e.g. moving a directory into
+        one of its own children.  See <a href="#dfn-invalidmodificationerror" class="internalDFN">InvalidModificationError</a>.
+        </p>
+        <p>
+        An operation on a file may not make sense if the underlying filesystem
+        has had changes made since the reference was obtained.  See
+        <a href="#dfn-typemismatcherror" class="internalDFN">TypeMismatchError</a>, <a href="#dfn-invalidstateerror" class="internalDFN">InvalidStateError</a>.
+        </p>
+        <p>
+        Users may accidentally attempt to create a file where another already
+        exists.  See <a href="#dfn-pathexistserror" class="internalDFN">PathExistsError</a>.
+        </p>
+      </div>
+      <div id="definitions" class="section">
+        <h3><span class="secno">8.2 </span>Definitions</h3>
+        <p>
+        Synchronous methods <em class="rfc2119" title="must">must</em> <a href="#dfn-throw" class="internalDFN">throw</a> an exception of the
+        most appropriate type in the table below if there has been an error with
+        writing.
+        </p>
+        <p>
+        If an error occurs while processing an asynchronous method,
+        the <code>err</code> argument to the <a href="#idl-def-ErrorCallback" class="idlType"><code>ErrorCallback</code></a> <em class="rfc2119" title="must">must</em>
+        be a <a href="#dfn-domerror" class="internalDFN">DOMError</a> object [<cite><a class="bibref" rel="biblioentry" href="#bib-DOM4">DOM4</a></cite>] of the most appropriate
+        type from the table below.
+        </p>
+        <h4 id="error-descriptions">Error Descriptions</h4>
+          <table class="simple"> 
+            <thead> 
+              <tr><th>Name</th><th>Description</th></tr> 
+            </thead> 
+            <tbody> 
+              <tr>
+                <td><dfn id="dfn-encodingerror">EncodingError</dfn></td>
+                <td>
+                  A path or URL supplied to the <acronym title="Application Programming
+      Interface">API</acronym> was malformed.
+                </td>
+              </tr>
+              <tr>
+                <td><dfn id="dfn-invalidmodificationerror">InvalidModificationError</dfn></td>
+                <td>
+                  The modification requested was illegal.  Examples of invalid
+                  modifications include moving a directory into its own child, 
+                  moving a file into its parent directory without changing its
+                  name, or copying a directory to a path occupied by a file.
+                </td>
+              </tr>
+              <tr>
+                <td><dfn id="dfn-invalidstateerror">InvalidStateError</dfn></td>
+                <td>
+                  An operation depended on state cached in an interface object,
+                  but that state that has changed since it was read from disk.
+                  <div class="issue">
+                    Which values will actually go stale?  Modification
+                    time, name, more rarely type.  If an atomic save [replacing
+                    a file with a new one of the same name] happens underneath,
+                    should we even be required to notice?
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td><dfn id="dfn-notfounderror">NotFoundError</dfn></td>
+                <td>
+                  A required file or directory could not be found at the time an
+                  operation was processed.
+                </td>
+              </tr>
+              <tr>
+                <td>NotReadableErr</td>
+                <td>
+                  A required file or directory could be read.
+                </td>
+              </tr>
+              <tr> 
+                <td><dfn id="dfn-nomodificationallowederror">NoModificationAllowedError</dfn></td>
+                <td>
+                  The user attempted to write to a file or directory
+                  which could not be modified due to the state of the underlying
+                  filesystem.
+                </td>
+              </tr>
+              <tr> 
+                <td><dfn id="dfn-pathexistserror">PathExistsError</dfn></td>
+                <td>
+                  The <a href="#dfn-user-agent" class="internalDFN">user agent</a> failed to create a file or directory due
+                  to the existence of a file or directory with the same path.
+                </td>
+              </tr>
+              <tr>
+                <td><dfn id="dfn-quotaexceedederror">QuotaExceededError</dfn></td>
+                <td>
+                  The operation failed because it would cause the application to
+                  exceed its storage quota.
+                </td>
+              </tr>
+              <tr>
+                <td><dfn id="dfn-securityerror">SecurityError</dfn></td>
+                <td>
+                  <ul>
+                    <li>A required file was unsafe for access within a Web
+                    application</li>
+                    <li>Too many calls are being made on filesystem
+                    resources</li>
+                  </ul>
+                  This is a security error code to be used in situations not
+                  covered by any other error codes.
+                </td>
+              </tr>
+              <tr>
+                <td><dfn id="dfn-typemismatcherror">TypeMismatchError</dfn></td>
+                <td>
+                  The user has attempted to look up a file or directory, but the
+                  Entry found is of the wrong type [e.g. is a DirectoryEntry
+                  when the user requested a FileEntry].
+                </td>
+              </tr>
+            </tbody>
+          </table>
+      </div>
+    </div>
+    
+    <div id="uniformity-of-interface" class="section">
+      <!--OddPage--><h2><span class="secno">9. </span>Uniformity of interface</h2>
+      <div class="informative section">
+        <p>
+        In order to make it easy for web app developers to write portable
+        applications that work on all platforms, we enforce certain restrictions
+        and make certain guarantees with respect to paths used in this <acronym title="Application Programming
+      Interface">API</acronym>.
+        </p><p><em>This section is non-normative.</em></p>
+      </div>
+      The implementation <em class="rfc2119" title="must">must</em> refuse to create any file or directory whose name
+      or existence would violate these rules.  The implementation <em class="rfc2119" title="must not">must not</em>
+      accept a noncompliant path where it designates the new name of a file or
+      directory to be moved, copied, or created.
+      <p></p>
+      <div id="case-sensitivity" class="section">
+        <h3><span class="secno">9.1 </span>Case-sensitivity</h3>
+        <p>
+          Paths in this filesystem <em class="rfc2119" title="must">must</em> be case sensitive and case-preserving.
+        </p>
+      </div>
+      <div id="encoding" class="section">
+        <h3><span class="secno">9.2 </span>Encoding</h3>
+        <p>
+          Implementations <em class="rfc2119" title="must">must</em> accept any valid UTF-8 sequence
+          as a path segment, so long as it does not include any characters
+          or sequences restricted below.  When returning paths or path segments,
+          implementations <em class="rfc2119" title="must">must</em> return them in the same normalization in which
+          they were presented.
+        </p>
+      </div>
+      <div id="naming-restrictions" class="section">
+        <h3><span class="secno">9.3 </span>Naming restrictions</h3>
+        <p>File and directory names <em class="rfc2119" title="must not">must not</em> contain either of the following
+        characters:
+          </p><ul>
+            <li>'/' (U+002F)</li>
+            <li>NUL (U+0000)</li>
+          </ul>
+          <div class="issue">
+            <p>
+            There's been discussion on whether backslash '\' (U+005c) should be
+            disallowed or not.  In favor of leaving it in is that it's a legal
+            character on some filesystems, and it seems somewhat arbitrary to
+            remove it.  Opposed is that it may cause confusion, and in at least
+            some cases complicates implementation.
+            </p>
+          </div>
+        <p></p>
+      </div>
+      <div id="directories" class="section">
+        <h3><span class="secno">9.4 </span>Directories</h3>
+        <p>
+        The directory separator is '/' (U+002F).
+        </p>
+        <p>
+        The character '/', when it is the first character in a path, refers to
+        the root directory.
+        </p>
+        <p>
+        All absolute paths begin with '/'; no relative paths begin with '/'.
+        </p>
+        <p>
+        A <dfn id="dfn-relative-path">relative path</dfn> describes how to get from a particular
+        directory to a file or directory.  All methods that accept paths are on
+        <a href="#idl-def-DirectoryEntry" class="idlType"><code>DirectoryEntry</code></a> or <a href="#idl-def-DirectoryEntrySync" class="idlType"><code>DirectoryEntrySync</code></a> objects; the paths,
+        if relative, are interpreted as being relative to the directories
+        represented by these objects.
+        </p>
+        <p>
+        An <dfn id="dfn-absolute-path">absolute path</dfn> is a <a href="#dfn-relative-path" class="internalDFN">relative path</a> from the root
+        directory, prepended with a '/'.
+        </p>
+        <p>
+        '.', when used where it is legal to use a directory name, refers to the
+        currently-referenced directory.  Thus 'foo/./bar' is equivalent to
+        'foo/bar', and './foo' is equivalent to 'foo'.
+        </p>
+        <p>
+        '..', when used where it is legal to use a directory name, refers to the
+        parent of the currently-referenced directory.  Thus, 'foo/..' refers to
+        the directory containing 'foo', and '../foo' refers to an element named
+        'foo' in the parent of the directory on whose DirectoryEntry or
+        DirectoryEntrySync the method receiving the path is being called.
+        </p>
+      </div>
+      <div class="issue">
+        <p>
+          What about path and path segment lengths?  Should we limit them at
+          all?  It's hard to control the true length of a path, due to
+          renames of parent directories, so we really just want to reject the
+          obviously-too-long; they won't often really come up anyway.
+          We should at least provide minimum lengths for paths and segments.
+        </p>
+        <p>
+          Should we limit the number of elements in a directory?
+        </p>
+      </div>
+    </div>
+    <div class="appendix section" id="acknowledgements">
+      <!--OddPage--><h2><span class="secno">A. </span>Acknowledgements</h2>
+      <p>
+        Thanks to Arun Ranganathan for his File <acronym title="Application Programming
+      Interface">API</acronym>, Opera for theirs, and Robin
+        Berjon both for his work on various file APIs and for ReSpec.
+      </p>
+    </div>
+  
+
+<div id="references" class="appendix section"><!--OddPage--><h2><span class="secno">B. </span>References</h2><div id="normative-references" class="section"><h3><span class="secno">B.1 </span>Normative references</h3><dl class="bibliography"><dt id="bib-DOM4">[DOM4]</dt><dd>Anne van Kesteren; Aryeh Gregor; Ms2ger. <a href="http://www.w3.org/TR/2012/WD-dom-20120105/"><cite>DOM4.</cite></a> 5 January 2012. W3C Working Draft. (Work in progress.) URL: <a href="http://www.w3.org/TR/2012/WD-dom-20120105/">http://www.w3.org/TR/2012/WD-dom-20120105/</a> 
+</dd><dt id="bib-FILE-API-ED">[FILE-API-ED]</dt><dd>Arun Ranganathan; Jonas Sicking. <a href="http://dev.w3.org/2006/webapi/FileAPI/"><cite>File API.</cite></a> W3C Editor's Draft. (Work in progress.) URL: <a href="http://dev.w3.org/2006/webapi/FileAPI/">http://dev.w3.org/2006/webapi/FileAPI/</a> 
+</dd><dt id="bib-FILE-WRITER-ED">[FILE-WRITER-ED]</dt><dd>Eric Uhrhane. <a href="http://dev.w3.org/2009/dap/file-system/file-writer.html"><cite>File Writer API.</cite></a> W3C Editor's Draft. (Work in progress.) URL: <a href="http://dev.w3.org/2009/dap/file-system/file-writer.html">http://dev.w3.org/2009/dap/file-system/file-writer.html</a> 
+</dd><dt id="bib-RFC2119">[RFC2119]</dt><dd>S. Bradner. <a href="http://www.ietf.org/rfc/rfc2119.txt"><cite>Key words for use in RFCs to Indicate Requirement Levels.</cite></a> March 1997. Internet RFC 2119.  URL: <a href="http://www.ietf.org/rfc/rfc2119.txt">http://www.ietf.org/rfc/rfc2119.txt</a> 
+</dd><dt id="bib-WEBWORKERS-ED">[WEBWORKERS-ED]</dt><dd>Ian Hickson. <a href="http://dev.w3.org/html5/workers/"><cite>Web Workers.</cite></a> W3C Editor's Draft. (Work in progress.) URL: <a href="http://dev.w3.org/html5/workers/">http://dev.w3.org/html5/workers/</a> 
+</dd></dl></div><div id="informative-references" class="section"><h3><span class="secno">B.2 </span>Informative references</h3><p>No informative references.</p></div></div></body></html>

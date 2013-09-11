@@ -647,11 +647,9 @@ native class Element extends Node {
 	// implements GetStyleUtils
 
 	/** @see http://dev.w3.org/csswg/cssom/ */
-	__readonly__ var specifiedStyle : CSSStyleDeclaration;
+	__readonly__ var cascadedStyle : CSSStyleDeclaration;
 	/** @see http://dev.w3.org/csswg/cssom/ */
-	__readonly__ var defaultStyle : CSSStyleDeclaration;
-	/** @see http://dev.w3.org/csswg/cssom/ */
-	__readonly__ var computedStyle : CSSStyleDeclaration;
+	__readonly__ var rawComputedStyle : CSSStyleDeclaration;
 	/** @see http://dev.w3.org/csswg/cssom/ */
 	__readonly__ var usedStyle : CSSStyleDeclaration;
 
@@ -666,9 +664,9 @@ native class Element extends Node {
 	/** @see http://dev.w3.org/csswg/cssom-view/ */
 	function scrollIntoView(top : boolean, options : ScrollOptions) : void;
 	/** @see http://dev.w3.org/csswg/cssom-view/ */
-	var scrollTop : variant/*(double or ScrollOptions)*/;
+	var scrollTop : variant/*(double or ScrollOptionsVertical)*/;
 	/** @see http://dev.w3.org/csswg/cssom-view/ */
-	var scrollLeft : variant/*(double or ScrollOptions)*/;
+	var scrollLeft : variant/*(double or ScrollOptionsHorizontal)*/;
 	/** @see http://dev.w3.org/csswg/cssom-view/ */
 	__readonly__ var scrollWidth : number/*double*/;
 	/** @see http://dev.w3.org/csswg/cssom-view/ */
@@ -1523,6 +1521,8 @@ native class CSSRule {
 	       __readonly__ var FONT_FACE_RULE : number/*unsigned short*/;
 	static __readonly__ var PAGE_RULE : number/*unsigned short*/;
 	       __readonly__ var PAGE_RULE : number/*unsigned short*/;
+	static __readonly__ var MARGIN_RULE : number/*unsigned short*/;
+	       __readonly__ var MARGIN_RULE : number/*unsigned short*/;
 	static __readonly__ var NAMESPACE_RULE : number/*unsigned short*/;
 	       __readonly__ var NAMESPACE_RULE : number/*unsigned short*/;
 	__readonly__ var type : number/*unsigned short*/;
@@ -1573,12 +1573,20 @@ native final class CSSMediaRule extends CSSGroupingRule {
 } // end of CSSMediaRule
 
 /** @see http://dev.w3.org/csswg/cssom/ */
-native final class CSSPageRule extends CSSRule {
+native final class CSSPageRule extends CSSGroupingRule {
 
 	var selectorText : string/*DOMString*/;
 	__readonly__ var style : CSSStyleDeclaration;
 
 } // end of CSSPageRule
+
+/** @see http://dev.w3.org/csswg/cssom/ */
+native final class CSSMarginRule extends CSSRule {
+
+	__readonly__ var name : string/*DOMString*/;
+	__readonly__ var style : CSSStyleDeclaration;
+
+} // end of CSSMarginRule
 
 /** @see http://dev.w3.org/csswg/cssom/ */
 native final class CSSNamespaceRule extends CSSRule {
@@ -2119,6 +2127,15 @@ native final __fake__ class Window extends EventTarget {
 	function matchMedia(query : string/*DOMString*/) : MediaQueryList;
 	/** @see http://dev.w3.org/csswg/cssom-view/ */
 	__readonly__ var screen : Screen;
+	// browsing context
+	/** @see http://dev.w3.org/csswg/cssom-view/ */
+	function moveTo(x : number/*double*/, y : number/*double*/) : void;
+	/** @see http://dev.w3.org/csswg/cssom-view/ */
+	function moveBy(x : number/*double*/, y : number/*double*/) : void;
+	/** @see http://dev.w3.org/csswg/cssom-view/ */
+	function resizeTo(x : number/*double*/, y : number/*double*/) : void;
+	/** @see http://dev.w3.org/csswg/cssom-view/ */
+	function resizeBy(x : number/*double*/, y : number/*double*/) : void;
 	// viewport
 	/** @see http://dev.w3.org/csswg/cssom-view/ */
 	__readonly__ var innerWidth : number/*double*/;
@@ -2287,6 +2304,25 @@ native final __fake__ class Window extends EventTarget {
 	function btoa(btoa : string/*DOMString*/) : string/*DOMString*/;
 	function atob(atob : string/*DOMString*/) : string/*DOMString*/;
 
+	// implements LocalFileSystem
+
+	/** @see http://www.w3.org/TR/2012/WD-file-system-api-20120417/ */
+	static __readonly__ var TEMPORARY : number/*unsigned short*/;
+	/** @see http://www.w3.org/TR/2012/WD-file-system-api-20120417/ */
+	       __readonly__ var TEMPORARY : number/*unsigned short*/;
+	/** @see http://www.w3.org/TR/2012/WD-file-system-api-20120417/ */
+	static __readonly__ var PERSISTENT : number/*unsigned short*/;
+	/** @see http://www.w3.org/TR/2012/WD-file-system-api-20120417/ */
+	       __readonly__ var PERSISTENT : number/*unsigned short*/;
+	/** @see http://www.w3.org/TR/2012/WD-file-system-api-20120417/ */
+	function requestFileSystem(type : number/*unsigned short*/, size : number/*unsigned long long*/, successCallback : function(filesystem:FileSystem):void/*FileSystemCallback*/) : void;
+	/** @see http://www.w3.org/TR/2012/WD-file-system-api-20120417/ */
+	function requestFileSystem(type : number/*unsigned short*/, size : number/*unsigned long long*/, successCallback : function(filesystem:FileSystem):void/*FileSystemCallback*/, errorCallback : function(err:DOMError):void/*ErrorCallback*/) : void;
+	/** @see http://www.w3.org/TR/2012/WD-file-system-api-20120417/ */
+	function resolveLocalFileSystemURL(url : string/*DOMString*/, successCallback : function(entry:Entry):void/*EntryCallback*/) : void;
+	/** @see http://www.w3.org/TR/2012/WD-file-system-api-20120417/ */
+	function resolveLocalFileSystemURL(url : string/*DOMString*/, successCallback : function(entry:Entry):void/*EntryCallback*/, errorCallback : function(err:DOMError):void/*ErrorCallback*/) : void;
+
 	// implements WindowSessionStorage
 
 	/** @see http://dev.w3.org/html5/webstorage/ */
@@ -2331,9 +2367,8 @@ native final __fake__ class Window extends EventTarget {
 /** @see http://dev.w3.org/csswg/cssom/ */
 native __fake__ class GetStyleUtils {
 
-	__readonly__ var specifiedStyle : CSSStyleDeclaration;
-	__readonly__ var defaultStyle : CSSStyleDeclaration;
-	__readonly__ var computedStyle : CSSStyleDeclaration;
+	__readonly__ var cascadedStyle : CSSStyleDeclaration;
+	__readonly__ var rawComputedStyle : CSSStyleDeclaration;
 	__readonly__ var usedStyle : CSSStyleDeclaration;
 
 } // end of GetStyleUtils
@@ -2345,8 +2380,6 @@ native final class PseudoElement extends GetStyleUtils {
 /** @see http://dev.w3.org/csswg/cssom-view/ */
 /* dictionary */ class ScrollOptions {
 
-	var x : number/*double*/;
-	var y : number/*double*/;
 	var behavior : string/*ScrollBehavior*/;
 
 } // end of ScrollOptions
@@ -2382,11 +2415,25 @@ native final class CaretPosition {
 
 } // end of CaretPosition
 
+/** @see http://dev.w3.org/csswg/cssom-view/ */
+/* dictionary */ class ScrollOptionsHorizontal extends ScrollOptions {
+
+	var x : number/*double*/;
+
+} // end of ScrollOptionsHorizontal
+
+/** @see http://dev.w3.org/csswg/cssom-view/ */
+/* dictionary */ class ScrollOptionsVertical extends ScrollOptions {
+
+	var y : number/*double*/;
+
+} // end of ScrollOptionsVertical
+
 /** @see http://www.w3.org/TR/html5/single-page.html */
 native class HTMLElement extends Element {
 
 	/** @see http://dev.w3.org/csswg/cssom-view/ */
-	__readonly__ var offsetParent : Element;
+	__readonly__ var offsetParent : Nullable.<Element>;
 	/** @see http://dev.w3.org/csswg/cssom-view/ */
 	__readonly__ var offsetTop : number/*double*/;
 	/** @see http://dev.w3.org/csswg/cssom-view/ */
@@ -4448,6 +4495,246 @@ native final class FileReaderSync {
 	function readAsDataURL(blob : Blob) : string/*DOMString*/;
 
 } // end of FileReaderSync
+
+/** @see http://www.w3.org/TR/2012/WD-file-writer-api-20120417/ */
+native final class BlobBuilder {
+
+	function constructor();
+
+	function getBlob() : Blob;
+	function getBlob(contentType : string/*DOMString*/) : Blob;
+	function append(text : string/*DOMString*/) : void;
+	function append(text : string/*DOMString*/, endings : string/*DOMString*/) : void;
+	function append(data : Blob) : void;
+	function append(data : ArrayBuffer) : void;
+
+} // end of BlobBuilder
+
+/** @see http://www.w3.org/TR/2012/WD-file-writer-api-20120417/ */
+native class FileSaver extends EventTarget {
+
+	function constructor(data : Blob);
+
+	function abort() : void;
+	static __readonly__ var INIT : number/*unsigned short*/;
+	       __readonly__ var INIT : number/*unsigned short*/;
+	static __readonly__ var WRITING : number/*unsigned short*/;
+	       __readonly__ var WRITING : number/*unsigned short*/;
+	static __readonly__ var DONE : number/*unsigned short*/;
+	       __readonly__ var DONE : number/*unsigned short*/;
+	__readonly__ var readyState : number/*unsigned short*/;
+	__readonly__ var error : DOMError;
+	var onwritestart : function(:Event):void/*Function*/;
+	var onprogress : function(:Event):void/*Function*/;
+	var onwrite : function(:Event):void/*Function*/;
+	var onabort : function(:Event):void/*Function*/;
+	var onerror : function(:Event):void/*Function*/;
+	var onwriteend : function(:Event):void/*Function*/;
+
+} // end of FileSaver
+
+/** @see http://www.w3.org/TR/2012/WD-file-writer-api-20120417/ */
+native final class FileWriter extends FileSaver {
+
+	__readonly__ var position : number/*unsigned long long*/;
+	__readonly__ var length : number/*unsigned long long*/;
+	function write(data : Blob) : void;
+	function seek(offset : number/*long long*/) : void;
+	function truncate(size : number/*unsigned long long*/) : void;
+
+} // end of FileWriter
+
+/** @see http://www.w3.org/TR/2012/WD-file-writer-api-20120417/ */
+native final class FileWriterSync {
+
+	__readonly__ var position : number/*unsigned long long*/;
+	__readonly__ var length : number/*unsigned long long*/;
+	function write(data : Blob) : void;
+	function seek(offset : number/*long long*/) : void;
+	function truncate(size : number/*unsigned long long*/) : void;
+
+} // end of FileWriterSync
+
+/** @see http://www.w3.org/TR/2012/WD-file-system-api-20120417/ */
+native __fake__ class LocalFileSystem {
+
+	static __readonly__ var TEMPORARY : number/*unsigned short*/;
+	       __readonly__ var TEMPORARY : number/*unsigned short*/;
+	static __readonly__ var PERSISTENT : number/*unsigned short*/;
+	       __readonly__ var PERSISTENT : number/*unsigned short*/;
+	function requestFileSystem(type : number/*unsigned short*/, size : number/*unsigned long long*/, successCallback : function(filesystem:FileSystem):void/*FileSystemCallback*/) : void;
+	function requestFileSystem(type : number/*unsigned short*/, size : number/*unsigned long long*/, successCallback : function(filesystem:FileSystem):void/*FileSystemCallback*/, errorCallback : function(err:DOMError):void/*ErrorCallback*/) : void;
+	function resolveLocalFileSystemURL(url : string/*DOMString*/, successCallback : function(entry:Entry):void/*EntryCallback*/) : void;
+	function resolveLocalFileSystemURL(url : string/*DOMString*/, successCallback : function(entry:Entry):void/*EntryCallback*/, errorCallback : function(err:DOMError):void/*ErrorCallback*/) : void;
+
+} // end of LocalFileSystem
+
+/** @see http://www.w3.org/TR/2012/WD-file-system-api-20120417/ */
+native final __fake__ class LocalFileSystemSync {
+
+	static __readonly__ var TEMPORARY : number/*unsigned short*/;
+	       __readonly__ var TEMPORARY : number/*unsigned short*/;
+	static __readonly__ var PERSISTENT : number/*unsigned short*/;
+	       __readonly__ var PERSISTENT : number/*unsigned short*/;
+	function requestFileSystemSync(type : number/*unsigned short*/, size : number/*unsigned long long*/) : FileSystemSync;
+	function resolveLocalFileSystemSyncURL(url : string/*DOMString*/) : EntrySync;
+
+} // end of LocalFileSystemSync
+
+/** @see http://www.w3.org/TR/2012/WD-file-system-api-20120417/ */
+native final class Metadata {
+
+	__readonly__ var modificationTime : Date;
+	__readonly__ var size : number/*unsigned long long*/;
+
+} // end of Metadata
+
+/** @see http://www.w3.org/TR/2012/WD-file-system-api-20120417/ */
+/* dictionary */ class Flags {
+
+	var create : boolean;
+	var exclusive : boolean;
+
+} // end of Flags
+
+/** @see http://www.w3.org/TR/2012/WD-file-system-api-20120417/ */
+native final class FileSystem {
+
+	__readonly__ var name : string/*DOMString*/;
+	__readonly__ var root : DirectoryEntry;
+
+} // end of FileSystem
+
+/** @see http://www.w3.org/TR/2012/WD-file-system-api-20120417/ */
+native class Entry {
+
+	__readonly__ var isFile : boolean;
+	__readonly__ var isDirectory : boolean;
+	function getMetadata(successCallback : function(metadata:Metadata):void/*MetadataCallback*/) : void;
+	function getMetadata(successCallback : function(metadata:Metadata):void/*MetadataCallback*/, errorCallback : function(err:DOMError):void/*ErrorCallback*/) : void;
+	__readonly__ var name : string/*DOMString*/;
+	__readonly__ var fullPath : string/*DOMString*/;
+	__readonly__ var filesystem : FileSystem;
+	function moveTo(parent : DirectoryEntry) : void;
+	function moveTo(parent : DirectoryEntry, newName : string/*DOMString*/) : void;
+	function moveTo(parent : DirectoryEntry, newName : string/*DOMString*/, successCallback : function(entry:Entry):void/*EntryCallback*/) : void;
+	function moveTo(parent : DirectoryEntry, newName : string/*DOMString*/, successCallback : function(entry:Entry):void/*EntryCallback*/, errorCallback : function(err:DOMError):void/*ErrorCallback*/) : void;
+	function copyTo(parent : DirectoryEntry) : void;
+	function copyTo(parent : DirectoryEntry, newName : string/*DOMString*/) : void;
+	function copyTo(parent : DirectoryEntry, newName : string/*DOMString*/, successCallback : function(entry:Entry):void/*EntryCallback*/) : void;
+	function copyTo(parent : DirectoryEntry, newName : string/*DOMString*/, successCallback : function(entry:Entry):void/*EntryCallback*/, errorCallback : function(err:DOMError):void/*ErrorCallback*/) : void;
+	function toURL() : string/*DOMString*/;
+	function remove(successCallback : function():void/*VoidCallback*/) : void;
+	function remove(successCallback : function():void/*VoidCallback*/, errorCallback : function(err:DOMError):void/*ErrorCallback*/) : void;
+	function getParent(successCallback : function(entry:Entry):void/*EntryCallback*/) : void;
+	function getParent(successCallback : function(entry:Entry):void/*EntryCallback*/, errorCallback : function(err:DOMError):void/*ErrorCallback*/) : void;
+
+} // end of Entry
+
+/** @see http://www.w3.org/TR/2012/WD-file-system-api-20120417/ */
+native final class DirectoryEntry extends Entry {
+
+	function createReader() : DirectoryReader;
+	function getFile(path : string/*DOMString*/) : void;
+	function getFile(path : string/*DOMString*/, options : Flags) : void;
+	function getFile(path : string/*DOMString*/, options : Flags, successCallback : function(entry:Entry):void/*EntryCallback*/) : void;
+	function getFile(path : string/*DOMString*/, options : Flags, successCallback : function(entry:Entry):void/*EntryCallback*/, errorCallback : function(err:DOMError):void/*ErrorCallback*/) : void;
+	function getDirectory(path : string/*DOMString*/) : void;
+	function getDirectory(path : string/*DOMString*/, options : Flags) : void;
+	function getDirectory(path : string/*DOMString*/, options : Flags, successCallback : function(entry:Entry):void/*EntryCallback*/) : void;
+	function getDirectory(path : string/*DOMString*/, options : Flags, successCallback : function(entry:Entry):void/*EntryCallback*/, errorCallback : function(err:DOMError):void/*ErrorCallback*/) : void;
+	function removeRecursively(successCallback : function():void/*VoidCallback*/) : void;
+	function removeRecursively(successCallback : function():void/*VoidCallback*/, errorCallback : function(err:DOMError):void/*ErrorCallback*/) : void;
+
+} // end of DirectoryEntry
+
+/** @see http://www.w3.org/TR/2012/WD-file-system-api-20120417/ */
+native final class DirectoryReader {
+
+	function readEntries(successCallback : function(entries:Entry[]):void/*EntriesCallback*/) : void;
+	function readEntries(successCallback : function(entries:Entry[]):void/*EntriesCallback*/, errorCallback : function(err:DOMError):void/*ErrorCallback*/) : void;
+
+} // end of DirectoryReader
+
+/** @see http://www.w3.org/TR/2012/WD-file-system-api-20120417/ */
+native final class FileEntry extends Entry {
+
+	function createWriter(successCallback : function(fileWriter:FileWriter):void/*FileWriterCallback*/) : void;
+	function createWriter(successCallback : function(fileWriter:FileWriter):void/*FileWriterCallback*/, errorCallback : function(err:DOMError):void/*ErrorCallback*/) : void;
+	function file(successCallback : function(:File):void/*FileCallback*/) : void;
+	function file(successCallback : function(:File):void/*FileCallback*/, errorCallback : function(err:DOMError):void/*ErrorCallback*/) : void;
+
+} // end of FileEntry
+
+// alias FileSystemCallback = function(filesystem:FileSystem):void
+
+// alias EntryCallback = function(entry:Entry):void
+
+// alias EntriesCallback = function(entries:Entry[]):void
+
+// alias MetadataCallback = function(metadata:Metadata):void
+
+// alias FileWriterCallback = function(fileWriter:FileWriter):void
+
+// alias FileCallback = function(file:File):void
+
+// alias VoidCallback = function():void
+
+// alias ErrorCallback = function(err:DOMError):void
+
+/** @see http://www.w3.org/TR/2012/WD-file-system-api-20120417/ */
+native final class FileSystemSync {
+
+	__readonly__ var name : string/*DOMString*/;
+	__readonly__ var root : DirectoryEntrySync;
+
+} // end of FileSystemSync
+
+/** @see http://www.w3.org/TR/2012/WD-file-system-api-20120417/ */
+native class EntrySync {
+
+	__readonly__ var isFile : boolean;
+	__readonly__ var isDirectory : boolean;
+	function getMetadata() : Metadata;
+	__readonly__ var name : string/*DOMString*/;
+	__readonly__ var fullPath : string/*DOMString*/;
+	__readonly__ var filesystem : FileSystemSync;
+	function moveTo(parent : DirectoryEntrySync) : EntrySync;
+	function moveTo(parent : DirectoryEntrySync, newName : string/*DOMString*/) : EntrySync;
+	function copyTo(parent : DirectoryEntrySync) : EntrySync;
+	function copyTo(parent : DirectoryEntrySync, newName : string/*DOMString*/) : EntrySync;
+	function toURL() : string/*DOMString*/;
+	function remove() : void;
+	function getParent() : DirectoryEntrySync;
+
+} // end of EntrySync
+
+/** @see http://www.w3.org/TR/2012/WD-file-system-api-20120417/ */
+native final class DirectoryEntrySync extends EntrySync {
+
+	function createReader() : DirectoryReaderSync;
+	function getFile(path : string/*DOMString*/) : FileEntrySync;
+	function getFile(path : string/*DOMString*/, options : Flags) : FileEntrySync;
+	function getDirectory(path : string/*DOMString*/) : DirectoryEntrySync;
+	function getDirectory(path : string/*DOMString*/, options : Flags) : DirectoryEntrySync;
+	function removeRecursively() : void;
+
+} // end of DirectoryEntrySync
+
+/** @see http://www.w3.org/TR/2012/WD-file-system-api-20120417/ */
+native final class DirectoryReaderSync {
+
+	function readEntries() : EntrySync[];
+
+} // end of DirectoryReaderSync
+
+/** @see http://www.w3.org/TR/2012/WD-file-system-api-20120417/ */
+native final class FileEntrySync extends EntrySync {
+
+	function createWriter() : FileWriterSync;
+	function file() : File;
+
+} // end of FileEntrySync
 
 /** @see http://www.w3.org/TR/2012/WD-webaudio-20121213/ */
 native class AudioContext {

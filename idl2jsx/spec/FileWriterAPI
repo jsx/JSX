@@ -1,0 +1,1036 @@
+<!DOCTYPE html PUBLIC '-//W3C//DTD HTML 4.01 Transitional//EN' 'http://www.w3.org/TR/html4/loose.dtd'>
+<html lang="en" dir="ltr">
+<head>
+    <title>File API: Writer</title>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+    
+    
+  <link href="respec.css" rel="stylesheet" type="text/css" charset="utf-8">
+  <link href="http://www.w3.org/StyleSheets/TR/W3C-WD" rel="stylesheet" type="text/css" charset="utf-8"></head>
+  <body style="display: inherit; "><div class="head"><p><a href="http://www.w3.org/"><img width="72" height="48" src="http://www.w3.org/Icons/w3c_home" alt="W3C"></a></p><h1 class="title" id="title">File <acronym title="Application Programming
+      Interface">API</acronym>: Writer</h1><h2 id="w3c-working-draft-17-april-2012"><acronym title="World Wide Web Consortium">W3C</acronym> Working Draft 17 April 2012</h2><dl><dt>This version:</dt><dd><a href="http://www.w3.org/TR/2012/WD-file-writer-api-20120417/">http://www.w3.org/TR/2012/WD-file-writer-api-20120417/</a></dd><dt>Latest published version:</dt><dd><a href="http://www.w3.org/TR/file-writer-api/">http://www.w3.org/TR/file-writer-api/</a></dd><dt>Latest editor's draft:</dt><dd><a href="http://dev.w3.org/2009/dap/file-system/file-writer.html">http://dev.w3.org/2009/dap/file-system/file-writer.html</a></dd><dt>Previous version:</dt><dd><a href="http://www.w3.org/TR/2011/WD-file-writer-api-20110419/">http://www.w3.org/TR/2011/WD-file-writer-api-20110419/</a></dd><dt>Editor:</dt><dd><a href="http://www.ofb.net/~uranium/">Eric Uhrhane</a>, <a href="http://www.google.com/">Google</a></dd>
+</dl><p class="copyright"><a href="http://www.w3.org/Consortium/Legal/ipr-notice#Copyright">Copyright</a> © 2012 <a href="http://www.w3.org/"><acronym title="World Wide Web Consortium">W3C</acronym></a><sup>®</sup> (<a href="http://www.csail.mit.edu/"><acronym title="Massachusetts Institute of Technology">MIT</acronym></a>, <a href="http://www.ercim.eu/"><acronym title="European Research Consortium for Informatics and Mathematics">ERCIM</acronym></a>, <a href="http://www.keio.ac.jp/">Keio</a>), All Rights Reserved. <acronym title="World Wide Web Consortium">W3C</acronym> <a href="http://www.w3.org/Consortium/Legal/ipr-notice#Legal_Disclaimer">liability</a>, <a href="http://www.w3.org/Consortium/Legal/ipr-notice#W3C_Trademarks">trademark</a> and <a href="http://www.w3.org/Consortium/Legal/copyright-documents">document use</a> rules apply.</p><hr></div>
+    <div id="abstract" class="introductory section"><h2>Abstract</h2>
+      <p>
+      This specification defines an <acronym title="Application Programming
+      Interface">API</acronym> for writing to files from web applications.
+      This <acronym title="Application Programming
+      Interface">API</acronym> is designed to be used in conjunction with, and depends on
+      definitions in, other APIs and elements on the web platform.  Most
+      relevant among these are [<cite><a class="bibref" rel="biblioentry" href="#bib-FILE-API-ED">FILE-API-ED</a></cite>] and [<cite><a class="bibref" rel="biblioentry" href="#bib-WEBWORKERS-ED">WEBWORKERS-ED</a></cite>].
+      </p>
+      <p>
+        This <acronym title="Application Programming
+      Interface">API</acronym> includes:
+        </p><ul>
+          <li> A <a href="#idl-def-BlobBuilder" class="idlType"><code>BlobBuilder</code></a> interface, which enables one to build a
+          <a href="#dfn-blob" class="internalDFN">Blob</a> from a String.
+          </li><li> A <a href="#idl-def-FileSaver" class="idlType"><code>FileSaver</code></a> interface, which provides methods to write a
+          <a href="#dfn-blob" class="internalDFN">Blob</a> to a file, and an event model to monitor the
+          progress of those writes.</li>
+          <li> A <a href="#idl-def-FileWriter" class="idlType"><code>FileWriter</code></a> interface, which expands on FileSaver to add
+          a richer set of output options.</li>
+          <li> A <a href="#idl-def-FileWriterSync" class="idlType"><code>FileWriterSync</code></a> interface, which provides methods to
+          write and modify files synchronously in a Web Worker.</li>
+        </ul>
+      <p></p>
+    </div><div id="sotd" class="introductory section"><h2>Status of This Document</h2><p><em>This section describes the status of this document at the time of its publication. Other documents may supersede this document. A list of current <acronym title="World Wide Web Consortium">W3C</acronym> publications and the latest revision of this technical report can be found in the <a href="http://www.w3.org/TR/"><acronym title="World Wide Web Consortium">W3C</acronym> technical reports index</a> at http://www.w3.org/TR/.</em></p>
+      <p>This document represents the early consensus of the group on
+      the scope and features of the proposed File <acronym title="Application Programming
+      Interface">API</acronym>: Writer. Issues and 
+      editors notes in the document highlight some of
+      the points on which the group is still working and would
+      particularly like to get feedback.</p>
+    <p>This document was published by the <a href="http://www.w3.org/2008/webapps/">WebApps Working Group</a> as a Working Draft. This document is intended to become a <acronym title="World Wide Web Consortium">W3C</acronym> Recommendation. If you wish to make comments regarding this document, please send them to <a href="mailto:public-webapps@w3.org">public-webapps@w3.org</a> (<a href="mailto:public-webapps-request@w3.org?subject=subscribe">subscribe</a>, <a href="http://lists.w3.org/Archives/Public/public-webapps/">archives</a>). All feedback is welcome.</p><p>Publication as a Working Draft does not imply endorsement by the <acronym title="World Wide Web Consortium">W3C</acronym> Membership. This is a draft document and may be updated, replaced or obsoleted by other documents at any time. It is inappropriate to cite this document as other than work in progress.</p><p>This document was produced by a group operating under the <a href="http://www.w3.org/Consortium/Patent-Policy-20040205/">5 February 2004 <acronym title="World Wide Web Consortium">W3C</acronym> Patent Policy</a>. <acronym title="World Wide Web Consortium">W3C</acronym> maintains a <a href="http://www.w3.org/2004/01/pp-impl/42538/status" rel="disclosure">public list of any patent disclosures</a> made in connection with the deliverables of the group; that page also includes instructions for disclosing a patent. An individual who has actual knowledge of a patent which the individual believes contains <a href="http://www.w3.org/Consortium/Patent-Policy-20040205/#def-essential">Essential Claim(s)</a> must disclose the information in accordance with <a href="http://www.w3.org/Consortium/Patent-Policy-20040205/#sec-Disclosure">section 6 of the <acronym title="World Wide Web Consortium">W3C</acronym> Patent Policy</a>.</p></div><div id="toc" class="section"><h2 class="introductory">Table of Contents</h2><ul class="toc"><li class="tocline"><a href="#conformance" class="tocxref"><span class="secno">1. </span>Conformance</a></li><li class="tocline"><a href="#terminology-and-algorithms" class="tocxref"><span class="secno">2. </span>Terminology and Algorithms</a></li><li class="tocline"><a href="#introduction" class="tocxref"><span class="secno">3. </span>Introduction</a><ul class="toc"><li class="tocline"><a href="#examples" class="tocxref"><span class="secno">3.1 </span>Examples</a></li></ul></li><li class="tocline"><a href="#the-blobbuilder-interface" class="tocxref"><span class="secno">4. </span>The <code>BlobBuilder</code> interface</a><ul class="toc"><li class="tocline"><a href="#methods" class="tocxref"><span class="secno">4.1 </span>Methods</a></li><li class="tocline"><a href="#constructor-1" class="tocxref"><span class="secno">4.2 </span>Constructor</a></li></ul></li><li class="tocline"><a href="#the-filesaver-interface" class="tocxref"><span class="secno">5. </span>The <span class="idlType formerLink idlType"><code>FileSaver</code></span> interface</a><ul class="toc"><li class="tocline"><a href="#attributes" class="tocxref"><span class="secno">5.1 </span>Attributes</a></li><li class="tocline"><a href="#methods-1" class="tocxref"><span class="secno">5.2 </span>Methods</a></li><li class="tocline"><a href="#constants" class="tocxref"><span class="secno">5.3 </span>Constants</a></li><li class="tocline"><a href="#the-filesaver-constructor" class="tocxref"><span class="secno">5.4 </span>The FileSaver Constructor</a></li><li class="tocline"><a href="#the-filesaver-task-source" class="tocxref"><span class="secno">5.5 </span>The FileSaver Task Source</a></li><li class="tocline"><a href="#event-handler-attributes" class="tocxref"><span class="secno">5.6 </span>Event Handler Attributes</a></li></ul></li><li class="tocline"><a href="#the-filesaversync-interface" class="tocxref"><span class="secno">6. </span>The <code>FileSaverSync</code> interface</a></li><li class="tocline"><a href="#the-filewriter-interface" class="tocxref"><span class="secno">7. </span>The <span class="idlType formerLink idlType"><code>FileWriter</code></span> interface</a><ul class="toc"><li class="tocline"><a href="#attributes-1" class="tocxref"><span class="secno">7.1 </span>Attributes</a></li><li class="tocline"><a href="#methods-2" class="tocxref"><span class="secno">7.2 </span>Methods</a></li></ul></li><li class="tocline"><a href="#the-filewritersync-interface" class="tocxref"><span class="secno">8. </span>The <code>FileWriterSync</code> interface</a><ul class="toc"><li class="tocline"><a href="#attributes-2" class="tocxref"><span class="secno">8.1 </span>Attributes</a></li><li class="tocline"><a href="#methods-3" class="tocxref"><span class="secno">8.2 </span>Methods</a></li></ul></li><li class="tocline"><a href="#errors-and-exceptions" class="tocxref"><span class="secno">9. </span>Errors and Exceptions</a><ul class="toc"><li class="tocline"><a href="#occurrence" class="tocxref"><span class="secno">9.1 </span>Occurrence</a></li><li class="tocline"><a href="#definitions" class="tocxref"><span class="secno">9.2 </span>Definitions</a></li></ul></li><li class="tocline"><a href="#security-considerations" class="tocxref"><span class="secno">10. </span>Security Considerations</a><ul class="toc"><li class="tocline"><a href="#basic-security-model" class="tocxref"><span class="secno">10.1 </span>Basic Security Model</a></li><li class="tocline"><a href="#write-only-files" class="tocxref"><span class="secno">10.2 </span>Write-Only Files</a></li><li class="tocline"><a href="#quotas" class="tocxref"><span class="secno">10.3 </span>Quotas</a></li><li class="tocline"><a href="#other-standard-techniques" class="tocxref"><span class="secno">10.4 </span>Other Standard Techniques</a></li></ul></li><li class="tocline"><a href="#acknowledgements" class="tocxref"><span class="secno">A. </span>Acknowledgements</a></li><li class="tocline"><a href="#references" class="tocxref"><span class="secno">B. </span>References</a><ul class="toc"><li class="tocline"><a href="#normative-references" class="tocxref"><span class="secno">B.1 </span>Normative references</a></li><li class="tocline"><a href="#informative-references" class="tocxref"><span class="secno">B.2 </span>Informative references</a></li></ul></li></ul></div>
+
+    
+    
+    <div id="conformance" class="section"><!--OddPage--><h2><span class="secno">1. </span>Conformance</h2><p>As well as sections marked as non-normative, all authoring guidelines, diagrams, examples, and notes in this specification are non-normative. Everything else in this specification is normative.</p>
+<p>The key words <em class="rfc2119" title="must">must</em>, <em class="rfc2119" title="must not">must not</em>, <em class="rfc2119" title="required">required</em>, <em class="rfc2119" title="should">should</em>, <em class="rfc2119" title="should not">should not</em>, <em class="rfc2119" title="recommended">recommended</em>, <em class="rfc2119" title="may">may</em>, and <em class="rfc2119" title="optional">optional</em> in this specification are to be interpreted as described in [<cite><a class="bibref" rel="biblioentry" href="#bib-RFC2119">RFC2119</a></cite>].</p>
+
+      <p>
+        This specification defines conformance criteria that apply to a single
+        product: <a href="#dfn-user-agent" class="internalDFN">user agent</a>s that implement the interfaces that it
+        contains.
+      </p>
+
+      <p>
+        Everything in this specification is normative except for examples and
+        sections marked as being informative.
+      </p>
+
+      <p>
+        The keywords <em class="rfc2119" title="must">must</em>, <em class="rfc2119" title="must not">must not</em>, <em class="rfc2119" title="required">required</em>, <em class="rfc2119" title="shall">shall</em>, <em class="rfc2119" title="shall not">shall not</em>, <em class="rfc2119" title="should">should</em>, <em class="rfc2119" title="should
+        not">should
+        not</em>, <em class="rfc2119" title="recommended">recommended</em>, <em class="rfc2119" title="may">may</em>, and <em class="rfc2119" title="optional">optional</em> in this document are to be
+        interpreted as described in <a href="http://www.ietf.org/rfc/rfc2119">Key words for use in RFCs to
+        Indicate Requirement Levels</a> [<cite><a class="bibref" rel="biblioentry" href="#bib-RFC2119">RFC2119</a></cite>].
+      </p>
+
+      <p>
+        The following conformance classes are defined by this specification:
+        </p><dl>
+          <dt><dfn id="dfn-conforming-implementation">conforming implementation</dfn></dt>
+          <dd>
+            <p>
+              A <dfn id="dfn-user-agent">user agent</dfn> is considered to be a conforming
+              implementation if it satisfies all of the must-, required- and
+              shall-level criteria in this specification that apply to
+              implementations.
+            </p>
+          </dd>
+        </dl>
+      <p></p>
+    </div>
+
+    <div id="terminology-and-algorithms" class="section">
+      <!--OddPage--><h2><span class="secno">2. </span>Terminology and Algorithms</h2>
+      <p>
+        The terms and algorithms <dfn id="dfn-event-handler-attributes">event handler attributes</dfn>, <dfn id="dfn-event-handler-event-types">event
+        handler event types</dfn>, <dfn id="dfn-function">Function</dfn>, <dfn id="dfn-task">task</dfn>,
+        <dfn id="dfn-task-queue">task queue</dfn>, <dfn id="dfn-task-source">task source</dfn>, and <dfn id="dfn-queue-a-task">queue a
+        task</dfn> are defined by the HTML 5 specification [<cite><a class="bibref" rel="biblioentry" href="#bib-HTML5">HTML5</a></cite>].
+      </p>
+      <p>
+        When this specification refers to a <dfn id="dfn-write-method">write method</dfn>, it includes
+        both <code>write</code> and <code>truncate</code>.
+      </p>
+      <p>
+        When this specification refers to a <dfn id="dfn-write-algorithm">write algorithm</dfn>, it
+        includes the algorithm invoked by any <a href="#dfn-write-method" class="internalDFN">write method</a> as well as the
+        <a href="#dfn-filesaver-write-algorithm" class="internalDFN">FileSaver write algorithm</a>.
+      </p>
+      <p>
+        When this specification says to <dfn id="dfn-terminate">terminate</dfn> an algorithm the
+        user agent must terminate the algorithm after finishing the step it is
+        on.  Any <a href="#dfn-write-algorithm" class="internalDFN">write algorithm</a> defined in this specification can be
+        terminated by an abort() call.
+      </p>
+      <p>
+        When this specification says to <dfn id="dfn-make-progress-notifications">make progress notifications</dfn>,
+        the following are normative:
+        </p><ul>
+          <li>While the <a href="#dfn-write-method" class="internalDFN">write method</a> is processing, <a href="#dfn-queue-a-task" class="internalDFN">queue a task</a>
+          to <a href="#dfn-fire-a-progress-event" class="internalDFN">fire a progress event</a> called <code>progress</code> at the
+          <a href="#idl-def-FileSaver" class="idlType"><code>FileSaver</code></a> object about every 50ms or for every byte written,
+          whichever is less frequent.</li>
+          <li>At least one event called <code>progress</code>
+          <em class="rfc2119" title="must">must</em> fire before <code>write</code> is fired, and at 100% completion
+          of the write operation; if 100% of the file can written in less than
+          50ms, user agents <em class="rfc2119" title="must">must</em> fire a progress event called
+          <code>progress</code> at completion.</li>
+        </ul>
+      <p></p>
+      <p>
+        When this specification says to <dfn id="dfn-fire-a-progress-event">fire a progress event</dfn> called
+        <code>e</code> (for some <code>ProgressEvent</code> <code>e</code>), the
+        following are normative:
+        </p><ul>
+          <li>The progress event <code>e</code> does not bubble.
+          <code>e.bubbles</code> <em class="rfc2119" title="must">must</em> be false [<cite><a class="bibref" rel="biblioentry" href="#bib-DOM4">DOM4</a></cite>].</li>
+          <li>The progress event <code>e</code> is NOT cancelable.
+          <code>e.cancelable</code> <em class="rfc2119" title="must">must</em> be false [<cite><a class="bibref" rel="biblioentry" href="#bib-DOM4">DOM4</a></cite>].</li>
+          <li>The term "fire an event" is defined in DOM4 [<cite><a class="bibref" rel="biblioentry" href="#bib-DOM4">DOM4</a></cite>].
+          Progress events are defined in Progress Events
+          [<cite><a class="bibref" rel="biblioentry" href="#bib-PROGRESS-EVENTS-ED">PROGRESS-EVENTS-ED</a></cite>].</li>
+        </ul>
+      <p></p>
+      The term <dfn id="dfn-throw">throw</dfn> in this specification, as it pertains to
+      exceptions, is used as defined in the DOM4 specification [<cite><a class="bibref" rel="biblioentry" href="#bib-DOM4">DOM4</a></cite>].
+      <p>
+      </p>
+      <p>
+        The term <dfn id="dfn-blob">Blob</dfn> is defined by the File <acronym title="Application Programming
+      Interface">API</acronym> specification
+        [<cite><a class="bibref" rel="biblioentry" href="#bib-FILE-API-ED">FILE-API-ED</a></cite>].
+      </p>
+      <p>
+        The term <dfn id="dfn-arraybuffer">ArrayBuffer</dfn> is defined by the Typed Arrays
+        specification [<cite><a class="bibref" rel="biblioentry" href="#bib-TYPED-ARRAYS">TYPED-ARRAYS</a></cite>].
+      </p>
+      <p>
+        This specification includes algorithms (steps) as part of the definition
+        of methods. Conforming implementations (referred to as <dfn id="dfn-user-agents">user
+        agents</dfn> from here on) <em class="rfc2119" title="may">may</em> use other algorithms in the
+        implementation of these methods, provided the end result is the same.
+      </p>
+    </div>
+    
+    <div class="informative section" id="introduction">
+      <!--OddPage--><h2><span class="secno">3. </span>Introduction</h2><p><em>This section is non-normative.</em></p>
+      <p>
+        Web applications are currently fairly limited in how they can write to
+        files.  One can present a link for download, but creating and writing
+        files of arbitrary type, or modifying downloaded files on their way to
+        the disk, is difficult or impossible.  This specification defines an
+        <acronym title="Application Programming
+      Interface">API</acronym> through which <a href="#dfn-user-agent" class="internalDFN">user agent</a>s can permit applications to write
+        generated or downloaded files.
+      </p>
+      <p>
+        The [<cite><a class="bibref" rel="biblioentry" href="#bib-FILE-API-ED">FILE-API-ED</a></cite>] defined interfaces for reading files, manipulation
+        of <a>Blobs</a> of data, and errors raised by file accesses.  This
+        specification extends that work with a way to construct <a>Blobs</a> and
+        with synchronous and asynchronous file-writing interfaces.  As with
+        reading, writing files on the main thread should happen asynchronously
+        to avoid blocking UI actions.  Long-running writes provide status
+        information through delivery of <a>progress events</a>.
+      </p>
+      <div id="examples" class="section">
+        <h3><span class="secno">3.1 </span>Examples</h3>
+        <p>
+          Here is a simple function that writes a text file, given a FileWriter:
+        </p>
+        <pre class="example sh_javascript sh_sourceCode"><span class="sh_keyword">function</span> <span class="sh_function">writeFile</span><span class="sh_symbol">(</span>writer<span class="sh_symbol">)</span> <span class="sh_cbracket">{</span>
+  <span class="sh_keyword">function</span> <span class="sh_function">done</span><span class="sh_symbol">(</span>evt<span class="sh_symbol">)</span> <span class="sh_cbracket">{</span>
+    <span class="sh_function">alert</span><span class="sh_symbol">(</span><span class="sh_string">"Write completed."</span><span class="sh_symbol">);</span>
+  <span class="sh_cbracket">}</span>
+  <span class="sh_keyword">function</span> <span class="sh_function">error</span><span class="sh_symbol">(</span>evt<span class="sh_symbol">)</span> <span class="sh_cbracket">{</span>
+    <span class="sh_function">alert</span><span class="sh_symbol">(</span><span class="sh_string">"Write failed:"</span> <span class="sh_symbol">+</span> evt<span class="sh_symbol">);</span>
+  <span class="sh_cbracket">}</span>
+
+  <span class="sh_keyword">var</span> bb <span class="sh_symbol">=</span> <span class="sh_keyword">new</span> <span class="sh_function">BlobBuilder</span><span class="sh_symbol">();</span>
+  bb<span class="sh_symbol">.</span><span class="sh_function">append</span><span class="sh_symbol">(</span><span class="sh_string">"Lorem ipsum"</span><span class="sh_symbol">);</span>
+  writer<span class="sh_symbol">.</span>onwrite <span class="sh_symbol">=</span> done<span class="sh_symbol">;</span>
+  writer<span class="sh_symbol">.</span>onerror <span class="sh_symbol">=</span> error<span class="sh_symbol">;</span>
+  writer<span class="sh_symbol">.</span><span class="sh_function">write</span><span class="sh_symbol">(</span>bb<span class="sh_symbol">.</span><span class="sh_function">getBlob</span><span class="sh_symbol">());</span>
+<span class="sh_cbracket">}</span></pre>
+        <p>
+          Here's an example of obtaining and using a <a href="#idl-def-FileSaver" class="idlType"><code>FileSaver</code></a>:
+        </p>
+        <pre class="example sh_javascript sh_sourceCode"><span class="sh_keyword">var</span> bb <span class="sh_symbol">=</span> <span class="sh_keyword">new</span> <span class="sh_function">BlobBuilder</span><span class="sh_symbol">();</span>
+bb<span class="sh_symbol">.</span><span class="sh_function">append</span><span class="sh_symbol">(</span><span class="sh_string">"Lorem ipsum"</span><span class="sh_symbol">);</span>
+<span class="sh_keyword">var</span> fileSaver <span class="sh_symbol">=</span> window<span class="sh_symbol">.</span><span class="sh_function">saveAs</span><span class="sh_symbol">(</span>bb<span class="sh_symbol">.</span><span class="sh_function">getBlob</span><span class="sh_symbol">(),</span> <span class="sh_string">"test_file"</span><span class="sh_symbol">);</span>
+fileSaver<span class="sh_symbol">.</span>onwriteend <span class="sh_symbol">=</span> myOnWriteEnd<span class="sh_symbol">;</span></pre>
+        <p></p>
+      </div>
+    </div>
+    
+    <div id="the-blobbuilder-interface" class="section">
+      <!--OddPage--><h2><span class="secno">4. </span>The <code>BlobBuilder</code> interface</h2>
+      <p>
+          The BlobBuilder is used to construct <a href="#dfn-blob" class="internalDFN">Blob</a>s.
+      </p>
+      <div class="issue">The BlobBuilder interface is deprecated in favor of the
+      new constructible Blob.  However, at this time implementations
+      generally support BlobBuilder and not constructible Blob.
+      </div>
+      <pre class="idl"><span class="idlInterface" id="idl-def-BlobBuilder">[<span class="extAttr">Constructor</span>]
+interface <span class="idlInterfaceID">BlobBuilder</span> {
+<span class="idlMethod">    <span class="idlMethType"><a>Blob</a></span> <span class="idlMethName"><a href="#widl-BlobBuilder-getBlob-Blob-DOMString-contentType">getBlob</a></span> (<span class="idlParam">optional <span class="idlParamType"><a>DOMString</a></span> <span class="idlParamName">contentType</span></span>);</span>
+<span class="idlMethod">    <span class="idlMethType"><a>void</a></span> <span class="idlMethName"><a href="#widl-BlobBuilder-append-void-DOMString-text-DOMString-endings">append</a></span> (<span class="idlParam"><span class="idlParamType"><a>DOMString</a></span> <span class="idlParamName">text</span></span>, <span class="idlParam">optional <span class="idlParamType"><a>DOMString</a></span> <span class="idlParamName">endings</span></span>);</span>
+<span class="idlMethod">    <span class="idlMethType"><a>void</a></span> <span class="idlMethName"><a href="#widl-BlobBuilder-append-void-Blob-data">append</a></span> (<span class="idlParam"><span class="idlParamType"><a>Blob</a></span> <span class="idlParamName">data</span></span>);</span>
+<span class="idlMethod">    <span class="idlMethType"><a>void</a></span> <span class="idlMethName"><a href="#widl-BlobBuilder-append-void-ArrayBuffer-data">append</a></span> (<span class="idlParam"><span class="idlParamType"><a>ArrayBuffer</a></span> <span class="idlParamName">data</span></span>);</span>
+};</span>
+</pre><div id="methods" class="section"><h3><span class="secno">4.1 </span>Methods</h3><dl class="methods"><dt id="widl-BlobBuilder-append-void-DOMString-text-DOMString-endings"><code>append</code></dt><dd>
+          <p>
+          Appends the supplied text to the current contents of the
+          <code>BlobBuilder</code>, writing it as UTF-8, converting newlines as
+          specified in <code>endings</code>.
+          </p>
+          
+        <table class="parameters"><tr><th>Parameter</th><th>Type</th><th>Nullable</th><th>Optional</th><th>Description</th></tr><tr><td class="prmName">text</td><td class="prmType"><code><a>DOMString</a></code></td><td class="prmNullFalse">✘</td><td class="prmOptFalse">✘</td><td class="prmDesc">
+              The data to write.
+            </td></tr><tr><td class="prmName">endings</td><td class="prmType"><code><a>DOMString</a></code></td><td class="prmNullFalse">✘</td><td class="prmOptTrue">✔</td><td class="prmDesc">
+              <div class="issue">Can we do without endings?  Any choice other
+                than "native" can be implemented by the app author, and
+                most file formats don't care about line endings.  "Native"
+                would be handy for sharing certain types of text files with apps
+                outside the browser [e.g.  Makefiles on a system where make is
+                expecting \n will have issues if they're written with \r\n].  Is
+                it worth it?  Can this be worked around if we don't supply
+                it?</div>
+              <p>
+                This parameter specifies how strings containing <code>\n</code>
+                are to be written out.  If the user does not provide the
+                <code>endings</code> parameter, <a href="#dfn-user-agents" class="internalDFN">user agents</a> <em class="rfc2119" title="must">must</em> act as
+                if the user had specified a value of 'transparent'.  If the user
+                provides the <code>endings</code> parameter, <a href="#dfn-user-agents" class="internalDFN">user agents</a>
+                <em class="rfc2119" title="must">must</em> convert newlines as specified below.  The possible values
+                are:
+              </p>
+              <table class="simple">
+                <tbody><tr><th>Value</th><th>Description</th></tr>
+                <tr>
+                  <td>"transparent"</td>
+                  <td>
+                    Code points from the string <em class="rfc2119" title="must">must</em> remain unchanged.
+                  </td>
+                </tr>
+                <tr>
+                  <td>"native"</td>
+                  <td>
+                    Newlines <em class="rfc2119" title="must">must</em> be transformed to the default line-ending
+                    representation of the underlying host operating system.  For
+                    example, if the underlying OS is Windows, newlines will be
+                    transformed into <code>\r\n</code> pairs as the text is
+                    appended to the state of the BlobBuilder.
+                  </td>
+                </tr>
+              </tbody></table>
+            </td></tr></table><div><em>Return type: </em><code><a>void</a></code></div></dd><dt id="widl-BlobBuilder-append-void-Blob-data"><code>append</code></dt><dd>
+          <p>
+          Appends the supplied <a href="#dfn-blob" class="internalDFN">Blob</a> to the current contents of the
+          <code>BlobBuilder</code>.
+          </p>
+          
+        <table class="parameters"><tr><th>Parameter</th><th>Type</th><th>Nullable</th><th>Optional</th><th>Description</th></tr><tr><td class="prmName">data</td><td class="prmType"><code><a>Blob</a></code></td><td class="prmNullFalse">✘</td><td class="prmOptFalse">✘</td><td class="prmDesc">
+              The data to append.
+            </td></tr></table><div><em>Return type: </em><code><a>void</a></code></div></dd><dt id="widl-BlobBuilder-append-void-ArrayBuffer-data"><code>append</code></dt><dd>
+          <p>
+          Appends the supplied <a href="#dfn-arraybuffer" class="internalDFN">ArrayBuffer</a> to the current contents of the
+          <code>BlobBuilder</code>.
+          </p>
+          
+        <table class="parameters"><tr><th>Parameter</th><th>Type</th><th>Nullable</th><th>Optional</th><th>Description</th></tr><tr><td class="prmName">data</td><td class="prmType"><code><a>ArrayBuffer</a></code></td><td class="prmNullFalse">✘</td><td class="prmOptFalse">✘</td><td class="prmDesc">
+              The data to append.
+            </td></tr></table><div><em>Return type: </em><code><a>void</a></code></div></dd><dt id="widl-BlobBuilder-getBlob-Blob-DOMString-contentType"><code>getBlob</code></dt><dd>
+          <p>
+          Returns the current contents of the <code>BlobBuilder</code> as a
+          <a href="#dfn-blob" class="internalDFN">Blob</a>.
+          </p>
+          
+        <table class="parameters"><tr><th>Parameter</th><th>Type</th><th>Nullable</th><th>Optional</th><th>Description</th></tr><tr><td class="prmName">contentType</td><td class="prmType"><code><a>DOMString</a></code></td><td class="prmNullFalse">✘</td><td class="prmOptTrue">✔</td><td class="prmDesc">
+            Sets the content type of the blob produced.
+            </td></tr></table><div><em>Return type: </em><code><a>Blob</a></code></div></dd></dl></div>
+      <div id="constructor-1" class="section">
+        <h3><span class="secno">4.2 </span>Constructor</h3>
+        <p>
+        When the <a href="#idl-def-BlobBuilder" class="idlType"><code>BlobBuilder</code></a> constructor is invoked, <a href="#dfn-user-agent" class="internalDFN">user agent</a>s
+        <em class="rfc2119" title="must">must</em> return a new <a href="#idl-def-BlobBuilder" class="idlType"><code>BlobBuilder</code></a> object.
+        </p>
+        <p>
+        This constructor <em class="rfc2119" title="must">must</em> be visible when the script's global object is
+        either a Window object or an object implementing the WorkerUtils
+        interface.
+        </p>
+      </div>
+    </div>
+    <div id="the-filesaver-interface" class="section">
+      <!--OddPage--><h2><span class="secno">5. </span>The <a href="#idl-def-FileSaver" class="idlType"><code>FileSaver</code></a> interface</h2>
+      <p>
+        This interface provides methods to monitor the asynchronous writing of
+        blobs to disk using progress events [<cite><a class="bibref" rel="biblioentry" href="#bib-PROGRESS-EVENTS-ED">PROGRESS-EVENTS-ED</a></cite>] and <a href="#dfn-event-handler-attributes" class="internalDFN">event
+        handler attributes</a>.
+      </p>
+      <p>
+        This interface is specified to be used within the context of the global
+        object (Window [<cite><a class="bibref" rel="biblioentry" href="#bib-HTML5">HTML5</a></cite>]) and within Web Workers (WorkerUtils
+        [<cite><a class="bibref" rel="biblioentry" href="#bib-WEBWORKERS-ED">WEBWORKERS-ED</a></cite>]).
+      </p>
+      <pre class="idl"><span class="idlInterface" id="idl-def-FileSaver">[<span class="extAttr">Constructor(Blob data)</span>]
+interface <span class="idlInterfaceID">FileSaver</span> : <span class="idlSuperclass"><a>EventTarget</a></span> {
+<span class="idlMethod">    <span class="idlMethType"><a>void</a></span> <span class="idlMethName"><a href="#widl-FileSaver-abort-void">abort</a></span> ();</span>
+<span class="idlConst">    const <span class="idlConstType"><a>unsigned short</a></span> <span class="idlConstName"><a href="#widl-FileSaver-INIT">INIT</a></span> = <span class="idlConstValue">0</span>;</span>
+<span class="idlConst">    const <span class="idlConstType"><a>unsigned short</a></span> <span class="idlConstName"><a href="#widl-FileSaver-WRITING">WRITING</a></span> = <span class="idlConstValue">1</span>;</span>
+<span class="idlConst">    const <span class="idlConstType"><a>unsigned short</a></span> <span class="idlConstName"><a href="#widl-FileSaver-DONE">DONE</a></span> = <span class="idlConstValue">2</span>;</span>
+<span class="idlAttribute">    readonly attribute <span class="idlAttrType"><a>unsigned short</a></span> <span class="idlAttrName"><a href="#widl-FileSaver-readyState">readyState</a></span>;</span>
+<span class="idlAttribute">    readonly attribute <span class="idlAttrType"><a>DOMError</a></span>       <span class="idlAttrName"><a href="#widl-FileSaver-error">error</a></span>;</span>
+<span class="idlAttribute">    [<span class="extAttr">TreatNonCallableAsNull</span>]
+             attribute <span class="idlAttrType"><a>Function</a></span>       <span class="idlAttrName"><a href="#widl-FileSaver-onwritestart">onwritestart</a></span>;</span>
+<span class="idlAttribute">    [<span class="extAttr">TreatNonCallableAsNull</span>]
+             attribute <span class="idlAttrType"><a>Function</a></span>       <span class="idlAttrName"><a href="#widl-FileSaver-onprogress">onprogress</a></span>;</span>
+<span class="idlAttribute">    [<span class="extAttr">TreatNonCallableAsNull</span>]
+             attribute <span class="idlAttrType"><a>Function</a></span>       <span class="idlAttrName"><a href="#widl-FileSaver-onwrite">onwrite</a></span>;</span>
+<span class="idlAttribute">    [<span class="extAttr">TreatNonCallableAsNull</span>]
+             attribute <span class="idlAttrType"><a>Function</a></span>       <span class="idlAttrName"><a href="#widl-FileSaver-onabort">onabort</a></span>;</span>
+<span class="idlAttribute">    [<span class="extAttr">TreatNonCallableAsNull</span>]
+             attribute <span class="idlAttrType"><a>Function</a></span>       <span class="idlAttrName"><a href="#widl-FileSaver-onerror">onerror</a></span>;</span>
+<span class="idlAttribute">    [<span class="extAttr">TreatNonCallableAsNull</span>]
+             attribute <span class="idlAttrType"><a>Function</a></span>       <span class="idlAttrName"><a href="#widl-FileSaver-onwriteend">onwriteend</a></span>;</span>
+};</span>
+</pre><div id="attributes" class="section"><h3><span class="secno">5.1 </span>Attributes</h3><dl class="attributes"><dt id="widl-FileSaver-error"><code>error</code> of type <span class="idlAttrType"><a>DOMError</a></span>, readonly</dt><dd>
+          <p>
+          The last error that occurred on the <code>FileSaver</code>.
+          </p>
+        </dd><dt id="widl-FileSaver-onabort"><code>onabort</code> of type <span class="idlAttrType"><a>Function</a></span></dt><dd>
+          <p>
+          Handler for abort events.
+          </p>
+        </dd><dt id="widl-FileSaver-onerror"><code>onerror</code> of type <span class="idlAttrType"><a>Function</a></span></dt><dd>
+          <p>
+          Handler for error events.
+          </p>
+        </dd><dt id="widl-FileSaver-onprogress"><code>onprogress</code> of type <span class="idlAttrType"><a>Function</a></span></dt><dd>
+          <p>
+          Handler for progress events.
+          </p>
+        </dd><dt id="widl-FileSaver-onwrite"><code>onwrite</code> of type <span class="idlAttrType"><a>Function</a></span></dt><dd>
+          <p>
+          Handler for write events.
+          </p>
+        </dd><dt id="widl-FileSaver-onwriteend"><code>onwriteend</code> of type <span class="idlAttrType"><a>Function</a></span></dt><dd>
+          <p>
+          Handler for writeend events.
+          </p>
+        </dd><dt id="widl-FileSaver-onwritestart"><code>onwritestart</code> of type <span class="idlAttrType"><a>Function</a></span></dt><dd>
+          <p>
+          Handler for writestart events.
+          </p>
+        </dd><dt id="widl-FileSaver-readyState"><code>readyState</code> of type <span class="idlAttrType"><a>unsigned short</a></span>, readonly</dt><dd>
+          <p>
+            The FileSaver object can be in one of 3 states.  The
+            <code>readyState</code> attribute, on getting, <em class="rfc2119" title="must">must</em> return the
+            current state, which <em class="rfc2119" title="must">must</em> be one of the following values:
+            </p><ul>
+              <li><a>INIT</a></li>
+              <li><a>WRITING</a></li>
+              <li><a>DONE</a></li>
+            </ul>
+          <p></p>
+        </dd></dl></div><div id="methods-1" class="section"><h3><span class="secno">5.2 </span>Methods</h3><dl class="methods"><dt id="widl-FileSaver-abort-void"><code>abort</code></dt><dd>
+          <p>
+            When the <code>abort</code> method is called, <a href="#dfn-user-agent" class="internalDFN">user agent</a>s
+            <em class="rfc2119" title="must">must</em> run the steps below:
+            </p><ol>
+              <li>If <code>readyState == DONE</code> or
+                <code>readyState == INIT</code>, terminate this
+                overall series of steps without doing anything else.</li>
+              <li>Set <code>readyState</code> to <code>DONE</code>.</li>
+              <li>If there are any <a href="#dfn-task" class="internalDFN">task</a>s from the object's FileSaver
+                <a href="#dfn-task-source" class="internalDFN">task source</a> in one of the <a href="#dfn-task-queue" class="internalDFN">task queue</a>s, then remove
+                those <a href="#dfn-task" class="internalDFN">task</a>s.</li>
+              <li><a href="#dfn-terminate" class="internalDFN">Terminate</a> the <a href="#dfn-write-algorithm" class="internalDFN">write algorithm</a> being
+              processed.</li>
+              <li>Set the <code>error</code> attribute to a
+              <code>DOMError</code> object of type "AbortError".</li>
+              <li><a href="#dfn-fire-a-progress-event" class="internalDFN">Fire a progress event</a> called <code>abort</code></li>
+              <li><a href="#dfn-fire-a-progress-event" class="internalDFN">Fire a progress event</a> called <code>writeend</code></li>
+              <li>Terminate this algorithm.</li>
+            </ol>
+          <p></p>
+        <div><em>No parameters.</em></div><div><em>Return type: </em><code><a>void</a></code></div></dd></dl></div><div id="constants" class="section"><h3><span class="secno">5.3 </span>Constants</h3><dl class="constants"><dt id="widl-FileSaver-DONE"><code>DONE</code> of type <span class="idlConstType"><a>unsigned short</a></span></dt><dd>
+        The entire Blob has been written to the file, an error occurred
+        during the write, or the write was aborted using <a>abort()</a>.  The
+        FileSaver is no longer writing the blob.
+        </dd><dt id="widl-FileSaver-INIT"><code>INIT</code> of type <span class="idlConstType"><a>unsigned short</a></span></dt><dd>
+        The object has been constructed, but there is no pending write.
+        </dd><dt id="widl-FileSaver-WRITING"><code>WRITING</code> of type <span class="idlConstType"><a>unsigned short</a></span></dt><dd>
+        The blob is being written.
+        </dd></dl></div>
+      <div id="the-filesaver-constructor" class="section">
+        <h3><span class="secno">5.4 </span>The FileSaver Constructor</h3>
+        <p>
+          The <code>FileSaver(data)</code> constructor takes one argument: the
+          Blob of data to be saved to a file.
+        </p>
+        <p>
+          When the <a href="#idl-def-FileSaver" class="idlType"><code>FileSaver</code></a> constructor is called, the <a href="#dfn-user-agent" class="internalDFN">user agent</a>
+          <em class="rfc2119" title="must">must</em> return a new <a href="#idl-def-FileSaver" class="idlType"><code>FileSaver</code></a> object with <code>readyState</code>
+          set to <code>INIT</code>.
+        </p>
+        <p>
+          This constructor <em class="rfc2119" title="must">must</em> be visible when the script's global object is
+          either a Window object or an object implementing the WorkerUtils
+          interface.
+        </p>
+      </div>
+      <div id="the-filesaver-task-source" class="section">
+        <h3><span class="secno">5.5 </span>The FileSaver Task Source</h3>
+        <!--
+        TODO: Figure out how to do the references properly.  Maybe just use raw
+        links to a reference section, as in the File API spec.
+        -->
+        <p>
+        The <a href="#idl-def-FileSaver" class="idlType"><code>FileSaver</code></a> interface enables asynchronous writes on
+        individual files by dispatching events to event handler methods. Unless
+        stated otherwise, the <a href="#dfn-task-source" class="internalDFN">task source</a> that is used in this
+        specification is the <a href="#idl-def-FileSaver" class="idlType"><code>FileSaver</code></a>. This <a href="#dfn-task-source" class="internalDFN">task source</a> is
+        used for any event <a href="#dfn-task" class="internalDFN">task</a> that is asynchronously dispatched, or for
+        event tasks that are queued for dispatching.
+        </p>
+        <p>
+        After its constructor has returned, a new FileSaver <em class="rfc2119" title="must">must</em> asynchronously
+        execute the following steps.  They are referred to elsewhere as the
+        <dfn id="dfn-filesaver-write-algorithm">FileSaver write algorithm</dfn>.
+        </p>
+        <ol>
+          <li>Set <code>readyState</code> to <code>WRITING</code>.<div class="issue">FileSaver should really set readyState to WRITING before
+          the user gets a handle to it, so that abort works.  But FileWriter
+          shouldn't, so it can't be an enforced part of the inherited
+          interface.  Also, writestart should be tied to the INIT-&gt;WRITING
+          transition, so how would the holder of a FileSaver that wasn't a
+          FileWriter ever see that?</div></li>
+          <li>If an error occurs during file write, proceed to the error steps
+          below.
+              <ol>
+                <li><a href="#dfn-queue-a-task" class="internalDFN">Queue a task</a> that will:
+                  <ol>
+                    <li>Set the <code>error</code> attribute; on getting the
+                    <code>error</code> attribute <em class="rfc2119" title="must">must</em> be a
+                    <code>DOMError</code> object whose type
+                    indicates the kind of error that has occurred.</li>
+                    <li>Set readyState to <code>DONE</code>.</li>
+                    <li><a href="#dfn-fire-a-progress-event" class="internalDFN">Fire a progress event</a> called
+                        <code>error</code>.</li>
+                    <li><a href="#dfn-fire-a-progress-event" class="internalDFN">Fire a progress event</a> called
+                        <code>writeend</code>.</li>
+                  </ol></li>
+                <li>Terminate this overall set of steps.</li>
+              </ol>
+          </li>
+          <li><a href="#dfn-queue-a-task" class="internalDFN">Queue a task</a> to <a href="#dfn-fire-a-progress-event" class="internalDFN">fire a progress event</a> called
+            <code>writestart</code>.</li>
+          <li><a href="#dfn-make-progress-notifications" class="internalDFN">Make progress notifications</a>.</li>
+          <li>On completion of the write, queue a task to:
+            <ol>
+              <li>Set readyState to <code>DONE</code>.</li>
+              <li><a href="#dfn-fire-a-progress-event" class="internalDFN">Fire a progress event</a> called
+                  <code>write</code>.</li>
+              <li><a href="#dfn-fire-a-progress-event" class="internalDFN">Fire a progress event</a> called
+                  <code>writeend</code>.</li>
+              <li>Terminate this overall set of steps.</li>
+            </ol>
+          </li>
+        </ol>
+      </div>
+      <div id="event-handler-attributes" class="section">
+        <h3><span class="secno">5.6 </span>Event Handler Attributes</h3>
+        <p> 
+          The following are the <a href="#dfn-event-handler-attributes" class="internalDFN">event handler attributes</a> (and their
+          corresponding <a href="#dfn-event-handler-event-types" class="internalDFN">event handler event types</a>) that user agents <em class="rfc2119" title="must">must</em>
+          support on <code><a href="#idl-def-FileSaver" class="idlType"><code>FileSaver</code></a></code> as DOM attributes:  
+        </p> 
+        <table class="simple"> 
+          <thead> 
+            <tr> 
+              <th><a>event handler attribute</a></th>
+              <th><a>event handler event type</a></th>
+            </tr>
+          </thead>
+          <tbody> 
+            <tr> 
+             <td><dfn id="dfn-onwritestart"><code>onwritestart</code></dfn></td>
+             <td><code><a>writestart</a></code></td>
+            </tr>
+          </tbody>
+          <tbody> 
+            <tr> 
+             <td><dfn id="dfn-onprogress"><code>onprogress</code></dfn></td>
+             <td><code><a>progress</a></code></td>
+            </tr>
+          </tbody>
+          <tbody> 
+            <tr> 
+             <td><dfn id="dfn-onwrite"><code>onwrite</code></dfn></td>
+             <td><code><a>write</a></code></td>
+            </tr>
+          </tbody>
+          <tbody> 
+            <tr> 
+             <td><dfn id="dfn-onabort"><code>onabort</code></dfn></td>
+             <td><code><a>abort</a></code></td>
+            </tr>
+          </tbody>
+          <tbody> 
+            <tr> 
+             <td><dfn id="dfn-onerror"><code>onerror</code></dfn></td>
+             <td><code><a>error</a></code></td>
+            </tr>
+          </tbody>
+          <tbody> 
+            <tr> 
+             <td><dfn id="dfn-onwriteend"><code>onwriteend</code></dfn></td>
+             <td><code><a>writeend</a></code></td>
+            </tr>
+          </tbody>
+        </table> 
+      </div>
+    </div>
+    <div id="the-filesaversync-interface" class="section">
+      <!--OddPage--><h2><span class="secno">6. </span>The <code>FileSaverSync</code> interface</h2>
+      <div class="issue">
+        <p>
+          It seems like this should have a blocking constructor and no methods
+          or properties, if it's to follow the constructor-based model of the
+          asynchronous interface.  A global method seems like it would be
+          cleaner, though.  Is it important that they match?  If so, the asynch
+          constructor could turn into a method instead.
+        </p>
+        <p>
+          It's been pointed out that a method name like "saveAs" is too short
+          and generic; any global symbol should be longer and more explicit in
+          order to avoid confusion and naming conflicts.
+        </p>
+      </div>
+    </div>
+    <div id="the-filewriter-interface" class="section">
+      <!--OddPage--><h2><span class="secno">7. </span>The <a href="#idl-def-FileWriter" class="idlType"><code>FileWriter</code></a> interface</h2>
+      <p>
+        This interface expands on the <a href="#idl-def-FileSaver" class="idlType"><code>FileSaver</code></a> interface to allow for
+        multiple write actions, rather than just saving a single Blob.
+      </p>
+      <div class="issue">
+        Since this is intended to be used only with the sandboxed filesystem,
+        it could potentially move to the <a href="http://dev.w3.org/2009/dap/file-system/file-dir-sys.html">filesystem
+          spec</a>.
+      </div>
+      <pre class="idl"><span class="idlInterface" id="idl-def-FileWriter">interface <span class="idlInterfaceID">FileWriter</span> : <span class="idlSuperclass"><a href="#idl-def-FileSaver" class="idlType"><code>FileSaver</code></a></span> {
+<span class="idlAttribute">    readonly attribute <span class="idlAttrType"><a>unsigned long long</a></span> <span class="idlAttrName"><a href="#widl-FileWriter-position">position</a></span>;</span>
+<span class="idlAttribute">    readonly attribute <span class="idlAttrType"><a>unsigned long long</a></span> <span class="idlAttrName"><a href="#widl-FileWriter-length">length</a></span>;</span>
+<span class="idlMethod">    <span class="idlMethType"><a>void</a></span> <span class="idlMethName"><a href="#widl-FileWriter-write-void-Blob-data">write</a></span> (<span class="idlParam"><span class="idlParamType"><a>Blob</a></span> <span class="idlParamName">data</span></span>);</span>
+<span class="idlMethod">    <span class="idlMethType"><a>void</a></span> <span class="idlMethName"><a href="#widl-FileWriter-seek-void-long-long-offset">seek</a></span> (<span class="idlParam"><span class="idlParamType"><a>long long</a></span> <span class="idlParamName">offset</span></span>);</span>
+<span class="idlMethod">    <span class="idlMethType"><a>void</a></span> <span class="idlMethName"><a href="#widl-FileWriter-truncate-void-unsigned-long-long-size">truncate</a></span> (<span class="idlParam"><span class="idlParamType"><a>unsigned long long</a></span> <span class="idlParamName">size</span></span>);</span>
+};</span>
+</pre><div id="attributes-1" class="section"><h3><span class="secno">7.1 </span>Attributes</h3><dl class="attributes"><dt id="widl-FileWriter-length"><code>length</code> of type <span class="idlAttrType"><a>unsigned long long</a></span>, readonly</dt><dd>
+          <p>
+          The length of the file.  If the user does not have read access to the
+          file, this <em class="rfc2119" title="must">must</em> be the highest byte offset at which the user has
+          written.
+          </p>
+        </dd><dt id="widl-FileWriter-position"><code>position</code> of type <span class="idlAttrType"><a>unsigned long long</a></span>, readonly</dt><dd>
+          <p>
+          The byte offset at which the next write to the file will occur.
+          This <em class="rfc2119" title="must">must</em> be no greater than <code>length</code>.<br>
+          A newly-created FileWriter <em class="rfc2119" title="must">must</em> have position set to 0.
+          </p>
+        </dd></dl></div><div id="methods-2" class="section"><h3><span class="secno">7.2 </span>Methods</h3><dl class="methods"><dt id="widl-FileWriter-seek-void-long-long-offset"><code>seek</code></dt><dd>
+          <p>
+          Seek sets the file position at which the next write will occur.
+          </p>
+          <p>
+          When the <code>seek</code> method is called, <a href="#dfn-user-agent" class="internalDFN">user agent</a>s <em class="rfc2119" title="must">must</em>
+          run the steps below.
+          </p>
+          <ol>
+            <li> If <code>readyState</code> is <code>WRITING</code>,
+            <a href="#dfn-throw" class="internalDFN">throw</a> an <a href="#dfn-invalidstateerror" class="internalDFN">InvalidStateError</a> and terminate this series
+            of steps.</li>
+            <li> Set <code>position</code> to <code>offset</code>.</li>
+            <li> If <code>position &gt; length</code> then set <code>
+            position</code> to length.</li>
+            <li> If <code>position &lt; 0</code> then set <code>
+            position</code> to <code>position + length</code>.</li>
+            <li> If <code>position &lt; 0</code> then set <code>
+            position</code> to <code>0</code>.</li>
+          </ol>
+          <p></p>
+          
+        <table class="parameters"><tr><th>Parameter</th><th>Type</th><th>Nullable</th><th>Optional</th><th>Description</th></tr><tr><td class="prmName">offset</td><td class="prmType"><code><a>long long</a></code></td><td class="prmNullFalse">✘</td><td class="prmOptFalse">✘</td><td class="prmDesc">
+              <p>
+              If nonnegative, an absolute byte offset into the file.<br>
+              If negative, an offset back from the end of the file.
+              </p>
+            </td></tr></table><div><em>Return type: </em><code><a>void</a></code></div></dd><dt id="widl-FileWriter-truncate-void-unsigned-long-long-size"><code>truncate</code></dt><dd>
+          <p>
+            Changes the length of the file to that specified.  If shortening the
+            file, data beyond the new length <em class="rfc2119" title="must">must</em> be discarded.  If extending
+            the file, the existing data <em class="rfc2119" title="must">must</em> be zero-padded up to the new
+            length.
+          </p>
+          <p>
+            When the <code>truncate</code> method is called, <a href="#dfn-user-agent" class="internalDFN">user agent</a>s
+            <em class="rfc2119" title="must">must</em> run the steps below (unless otherwise indicated).
+          </p>
+          <ol>
+            <li>If <code>readyState</code> is <code>WRITING</code>, <a href="#dfn-throw" class="internalDFN">throw</a>
+            an <a href="#dfn-invalidstateerror" class="internalDFN">InvalidStateError</a> and terminate this series of steps.</li>
+            <li>Set <code>readyState</code> to <code>WRITING</code>.</li>
+            <li>If an error occurs during truncate, proceed to the error steps
+              below.
+                <ol>
+                  <li>Set the <code>error</code> attribute; on getting the
+                  <code>error</code> attribute <em class="rfc2119" title="must">must</em> be a
+                  <code>DOMError</code> object whose type
+                  indicates the kind of error that has occurred.</li>
+                  <li>Set readyState to <code>DONE</code>.</li>
+                  <li><a href="#dfn-fire-a-progress-event" class="internalDFN">Fire a progress event</a> called
+                      <code>error</code>.</li>
+                  <li><a href="#dfn-fire-a-progress-event" class="internalDFN">Fire a progress event</a> called
+                      <code>writeend</code></li>
+                  <li>On getting, the <code>length</code> and
+                    <code>position</code> attributes <em class="rfc2119" title="should">should</em> indicate any
+                    modification to the file.</li>
+                  <li>Terminate this overall set of steps.</li>
+                </ol>
+            </li>
+            <li><a href="#dfn-fire-a-progress-event" class="internalDFN">Fire a progress event</a> called
+              <code>writestart</code>.</li>
+            <li>Return from the truncate method, but continue processing the
+            other steps in this algorithm.</li>
+            <li>Upon successful completion:
+              <ul>
+                <li><code>length</code> <em class="rfc2119" title="must">must</em> be equal to <code>size</code>.</li>
+                <li><code>position</code> <em class="rfc2119" title="must">must</em> be the lesser of
+                  <ul>
+                    <li>its pre-truncate value,</li>
+                    <li><code>size</code>.</li>
+                  </ul>
+                </li>
+                <li>Queue a task to:
+                  <ol>
+                    <li>Set readyState to <code>DONE</code>.</li>
+                    <li><a href="#dfn-fire-a-progress-event" class="internalDFN">Fire a progress event</a> called
+                        <code>write</code></li>
+                    <li><a href="#dfn-fire-a-progress-event" class="internalDFN">Fire a progress event</a> called
+                        <code>writeend</code></li>
+                    <li>Terminate this overall set of steps.</li>
+                  </ol>
+                </li>
+              </ul>
+            </li>
+          </ol>
+          <p></p>
+          
+        <table class="parameters"><tr><th>Parameter</th><th>Type</th><th>Nullable</th><th>Optional</th><th>Description</th></tr><tr><td class="prmName">size</td><td class="prmType"><code><a>unsigned long long</a></code></td><td class="prmNullFalse">✘</td><td class="prmOptFalse">✘</td><td class="prmDesc">
+              The size to which the length of the file is to be adjusted,
+              measured in bytes.
+            </td></tr></table><div><em>Return type: </em><code><a>void</a></code></div></dd><dt id="widl-FileWriter-write-void-Blob-data"><code>write</code></dt><dd>
+          <p>
+            Write the supplied data to the file at <code>position</code>.  When
+            the <code>write</code> method is called, <a href="#dfn-user-agent" class="internalDFN">user agent</a>s <em class="rfc2119" title="must">must</em> run
+            the steps below (unless otherwise indicated).
+            </p><ol>
+              <li>If <code>readyState</code> is <code>WRITING</code>,
+              <a href="#dfn-throw" class="internalDFN">throw</a> an <a href="#dfn-invalidstateerror" class="internalDFN">InvalidStateError</a> and terminate this series
+              of steps.</li>
+              <li>Set <code>readyState</code> to <code>WRITING</code>.</li>
+              <li>If an error occurs during file write, proceed to the error
+              steps below.
+                <ol>
+                  <li>Set the <code>error</code> attribute; on getting the
+                  <code>error</code> attribute <em class="rfc2119" title="must">must</em> be a
+                  <code>DOMError</code> object whose type
+                  indicates the kind of error that has occurred.</li>
+                  <li>Set readyState to <code>DONE</code>.</li>
+                  <li><a href="#dfn-fire-a-progress-event" class="internalDFN">Fire a progress event</a> called
+                      <code>error</code>.</li>
+                  <li><a href="#dfn-fire-a-progress-event" class="internalDFN">Fire a progress event</a> called
+                      <code>writeend</code></li>
+                  <li>On getting, the <code>length</code> and
+                    <code>position</code> attributes <em class="rfc2119" title="should">should</em> indicate any
+                    fractional data successfully written to the file.</li>
+                  <li>Terminate this overall set of steps.</li>
+                </ol>
+              </li>
+              <li><a href="#dfn-fire-a-progress-event" class="internalDFN">Fire a progress event</a> called
+                <code>writestart</code>.</li>
+              <li>Return from the write method, but continue processing
+              the other steps in this algorithm.</li>
+              <li><a href="#dfn-make-progress-notifications" class="internalDFN">Make progress notifications</a>.  On getting, while
+                processing the <code>write</code> method, the
+                <code>length</code> and <code>position</code> attributes <em class="rfc2119" title="must">must</em>
+                indicate the progress made in writing the file as of the last
+                progress notification.
+              </li>
+              <li>
+                Upon successful completion of a write:
+                <ul>
+                  <li><code>position</code> <em class="rfc2119" title="must">must</em> indicate an increase of
+                  <code>data.size</code> over its pre-write state.</li>
+                  <li><code>length</code> <em class="rfc2119" title="must">must</em> be the greater of (the pre-write
+                  <code>length</code>) and (the pre-write <code>position</code>
+                  plus <code>data.size</code>).</li>
+                  <li>Queue a task to:
+                    <ol>
+                      <li>Set readyState to <code>DONE</code>.</li>
+                      <li><a href="#dfn-fire-a-progress-event" class="internalDFN">Fire a progress event</a> called
+                          <code>write</code>.</li>
+                      <li><a href="#dfn-fire-a-progress-event" class="internalDFN">Fire a progress event</a> called
+                          <code>writeend</code>.</li>
+                      <li>Terminate this overall set of steps.</li>
+                    </ol>
+                  </li>
+                </ul>
+              </li>
+            </ol>
+          <p></p>
+          
+        <table class="parameters"><tr><th>Parameter</th><th>Type</th><th>Nullable</th><th>Optional</th><th>Description</th></tr><tr><td class="prmName">data</td><td class="prmType"><code><a>Blob</a></code></td><td class="prmNullFalse">✘</td><td class="prmOptFalse">✘</td><td class="prmDesc">
+              The blob to write.
+            </td></tr></table><div><em>Return type: </em><code><a>void</a></code></div></dd></dl></div>
+    </div>
+    <div id="the-filewritersync-interface" class="section">
+      <!--OddPage--><h2><span class="secno">8. </span>The <code>FileWriterSync</code> interface</h2>
+      <p>
+        This interface lets users write, truncate, and append to files using
+        simple synchronous calls.
+      </p>
+      <p>
+        This interface is specified to be used only within Web Workers
+        (WorkerUtils [<cite><a class="bibref" rel="biblioentry" href="#bib-WEBWORKERS-ED">WEBWORKERS-ED</a></cite>]).
+      </p>
+      <div class="issue">
+        Since this is intended to be used only with the sandboxed filesystem,
+        it could potentially move to the <a href="http://dev.w3.org/2009/dap/file-system/file-dir-sys.html">filesystem
+          spec</a>.
+      </div>
+      <pre class="idl"><span class="idlInterface" id="idl-def-FileWriterSync">interface <span class="idlInterfaceID">FileWriterSync</span> {
+<span class="idlAttribute">    readonly attribute <span class="idlAttrType"><a>unsigned long long</a></span> <span class="idlAttrName"><a href="#widl-FileWriterSync-position">position</a></span>;</span>
+<span class="idlAttribute">    readonly attribute <span class="idlAttrType"><a>unsigned long long</a></span> <span class="idlAttrName"><a href="#widl-FileWriterSync-length">length</a></span>;</span>
+<span class="idlMethod">    <span class="idlMethType"><a>void</a></span> <span class="idlMethName"><a href="#widl-FileWriterSync-write-void-Blob-data">write</a></span> (<span class="idlParam"><span class="idlParamType"><a>Blob</a></span> <span class="idlParamName">data</span></span>);</span>
+<span class="idlMethod">    <span class="idlMethType"><a>void</a></span> <span class="idlMethName"><a href="#widl-FileWriterSync-seek-void-long-long-offset">seek</a></span> (<span class="idlParam"><span class="idlParamType"><a>long long</a></span> <span class="idlParamName">offset</span></span>);</span>
+<span class="idlMethod">    <span class="idlMethType"><a>void</a></span> <span class="idlMethName"><a href="#widl-FileWriterSync-truncate-void-unsigned-long-long-size">truncate</a></span> (<span class="idlParam"><span class="idlParamType"><a>unsigned long long</a></span> <span class="idlParamName">size</span></span>);</span>
+};</span>
+</pre><div id="attributes-2" class="section"><h3><span class="secno">8.1 </span>Attributes</h3><dl class="attributes"><dt id="widl-FileWriterSync-length"><code>length</code> of type <span class="idlAttrType"><a>unsigned long long</a></span>, readonly</dt><dd>
+          <p>
+            The length of the file.  If the user does not have read access to
+            the file, this <em class="rfc2119" title="must">must</em> be the highest byte offset at which the user has
+            written.
+          </p>
+        </dd><dt id="widl-FileWriterSync-position"><code>position</code> of type <span class="idlAttrType"><a>unsigned long long</a></span>, readonly</dt><dd>
+          <p>
+            The byte offset at which the next write to the file will occur.
+            This <em class="rfc2119" title="must">must</em> be no greater than <code>length</code>.
+          </p>
+        </dd></dl></div><div id="methods-3" class="section"><h3><span class="secno">8.2 </span>Methods</h3><dl class="methods"><dt id="widl-FileWriterSync-seek-void-long-long-offset"><code>seek</code></dt><dd>
+          <p>
+          Seek sets the file position at which the next write will occur.
+          </p>
+          
+        <table class="parameters"><tr><th>Parameter</th><th>Type</th><th>Nullable</th><th>Optional</th><th>Description</th></tr><tr><td class="prmName">offset</td><td class="prmType"><code><a>long long</a></code></td><td class="prmNullFalse">✘</td><td class="prmOptFalse">✘</td><td class="prmDesc">
+            An absolute byte offset into the file.  If <code>offset</code>
+            is greater than <code>length</code>, <code>length</code> is used
+            instead.  If <code>offset</code> is less than zero,
+            <code>length</code> is added to it, so that it is treated as an
+            offset back from the end of the file.  If it is still less than
+            zero, zero is used.
+            </td></tr></table><div><em>Return type: </em><code><a>void</a></code></div></dd><dt id="widl-FileWriterSync-truncate-void-unsigned-long-long-size"><code>truncate</code></dt><dd>
+          <p>
+            Changes the length of the file to that specified.  If shortening the
+            file, data beyond the new length <em class="rfc2119" title="must">must</em> be discarded.  If extending
+            the file, the existing data <em class="rfc2119" title="must">must</em> be zero-padded up to the new
+            length.
+          </p>
+          <p>
+            Upon successful completion:
+            </p><ul>
+              <li><code>length</code> <em class="rfc2119" title="must">must</em> be equal to <code>size</code>.</li>
+              <li><code>position</code> <em class="rfc2119" title="must">must</em> be the lesser of
+                <ul>
+                  <li>its pre-truncate value,</li>
+                  <li><code>size</code>.</li>
+                </ul>
+              </li>
+            </ul>
+          <p></p>
+          
+        <table class="parameters"><tr><th>Parameter</th><th>Type</th><th>Nullable</th><th>Optional</th><th>Description</th></tr><tr><td class="prmName">size</td><td class="prmType"><code><a>unsigned long long</a></code></td><td class="prmNullFalse">✘</td><td class="prmOptFalse">✘</td><td class="prmDesc">
+              The size to which the length of the file is to be adjusted,
+              measured in bytes.
+            </td></tr></table><div><em>Return type: </em><code><a>void</a></code></div></dd><dt id="widl-FileWriterSync-write-void-Blob-data"><code>write</code></dt><dd>
+          <p>
+            Write the supplied data to the file at <code>position</code>.
+            Upon completion, <code>position</code> will increase by
+            <code>data.size</code>.
+          </p>
+          
+        <table class="parameters"><tr><th>Parameter</th><th>Type</th><th>Nullable</th><th>Optional</th><th>Description</th></tr><tr><td class="prmName">data</td><td class="prmType"><code><a>Blob</a></code></td><td class="prmNullFalse">✘</td><td class="prmOptFalse">✘</td><td class="prmDesc">
+              The blob to write.
+            </td></tr></table><div><em>Return type: </em><code><a>void</a></code></div></dd></dl></div>
+    </div>
+    <div id="errors-and-exceptions" class="section">
+      <!--OddPage--><h2><span class="secno">9. </span>Errors and Exceptions</h2>
+      <div class="informative section" id="occurrence">
+        <h3><span class="secno">9.1 </span>Occurrence</h3><p><em>This section is non-normative.</em></p>
+        <p>
+        Error conditions can occur when attempting to write files. The list
+        below of potential error conditions is informative, with links to
+        normative descriptions of errors:
+        </p>
+        <p>
+        The directory containing the file being written may not exist at the
+        time an asynchronous or synchronous <a href="#dfn-write-method" class="internalDFN">write method</a> is called. This
+        may be due to it having been moved or deleted after a reference to it
+        was acquired (e.g. concurrent modification with another
+        application).<br>
+        See <a href="#dfn-notfounderror" class="internalDFN">NotFoundError</a>.
+        </p>
+        <p>
+        The file being written may have been removed.  If the file is not there,
+        writing to an offset other than zero is not permitted.<br>
+        See <a href="#dfn-notfounderror" class="internalDFN">NotFoundError</a>.
+        </p>
+        <p>
+        A file may be unwritable. This may be due to permission problems that
+        occur after a reference to a file has been acquired (e.g. concurrent
+        lock with another application).<br>
+        See <a href="#dfn-nomodificationallowederror" class="internalDFN">NoModificationAllowedError</a>.
+        </p>
+        <p>
+        User agents <em class="rfc2119" title="may">may</em> determine that some files are unsafe for use within web
+        applications. Additionally, some file and directory structures may be
+        considered restricted by the underlying filesystem; attempts to write to
+        them may be considered a security violation. See the security
+        considerations.<br>
+        See <a href="#dfn-securityerror" class="internalDFN">SecurityError</a>.
+        </p>
+        <p>
+        A web application may attempt to initiate a write, seek, or truncate via
+        a FileWriter in the <code>WRITING</code> state.<br>
+        See <a href="#dfn-invalidstateerror" class="internalDFN">InvalidStateError</a>.
+        </p>
+        <p>
+        During the writing of a file, the web application may itself wish to
+        <code>abort</code> the call to an asynchronous <a href="#dfn-write-method" class="internalDFN">write
+        method</a>.<br>
+        See <a href="#dfn-aborterror" class="internalDFN">AbortError</a>.
+        </p>
+        <p>
+        A web application may request unsupported line endings.
+        See <a href="#dfn-syntaxerror" class="internalDFN">SyntaxError</a>.
+        </p>
+        <p>
+        As documented in [<cite><a class="bibref" rel="biblioentry" href="#bib-FILE-API-ED">FILE-API-ED</a></cite>], various errors may occur during
+        reading from the Blob that is the source of the data to be written.
+        These include <a href="#dfn-notfounderror" class="internalDFN">NotFoundError</a>, <a href="#dfn-securityerror" class="internalDFN">SecurityError</a>, and
+        <a href="#dfn-notreadableerror" class="internalDFN">NotReadableError</a>.
+      </p></div>
+      <div id="definitions" class="section">
+        <h3><span class="secno">9.2 </span>Definitions</h3>
+        <p>
+        Synchronous <a href="#dfn-write-method" class="internalDFN">write method</a>s <em class="rfc2119" title="must">must</em> <a href="#dfn-throw" class="internalDFN">throw</a> an exception of the
+        most appropriate type in the table below if there has been an error with
+        writing.
+        </p>
+        <p>
+        If an error occurs while processing an asynchronous <a href="#dfn-write-method" class="internalDFN">write method</a>,
+        the <code>error</code> attribute of the <a href="#idl-def-FileSaver" class="idlType"><code>FileSaver</code></a> object <em class="rfc2119" title="must">must</em>
+        return a <code>DOMError</code> object [<cite><a class="bibref" rel="biblioentry" href="#bib-DOM4">DOM4</a></cite>] of the most appropriate
+        type from the table below.  Otherwise it <em class="rfc2119" title="must">must</em> return <code>null</code>.
+        </p>
+        <h4 id="error-descriptions">Error Descriptions</h4>
+          <table class="simple"> 
+            <thead> 
+              <tr><th>Name</th><th>Description</th></tr> 
+            </thead> 
+            <tbody> 
+              <tr>
+                <td><dfn id="dfn-aborterror">AbortError</dfn></td>
+                <td>The read operation was aborted, typically with a call to
+                <a>abort()</a>.
+                </td>
+              </tr>
+              <tr>
+                <td><dfn id="dfn-invalidstateerror">InvalidStateError</dfn></td>
+                <td>An application attempted to initiate a write, truncate, or
+                seek using a <a href="#idl-def-FileWriter" class="idlType"><code>FileWriter</code></a> which is already in the
+                <a>WRITING</a> state.
+                </td>
+              </tr>
+              <tr>
+                <td><dfn id="dfn-notfounderror">NotFoundError</dfn></td>
+                <td>One or more of the following occurred:
+                  <ul>
+                    <li>the directory containing the file to be written could
+                    not be found at the time the write was processed.</li>
+                    <li>the file to be written does not exist at the time the
+                    write was processed, and an <code>offset</code> other than
+                    zero is specified.</li>
+                    <li>the blob that is the source of data to be written could
+                    not be found at the time the write was processed.
+                  </li></ul>
+                </td>
+              </tr>
+              <tr> 
+                <td><dfn id="dfn-nomodificationallowederror">NoModificationAllowedError</dfn></td>
+                <td>The application attempted to write to a file which cannot be
+                modified due to the state of the underlying filesystem.
+                </td>
+              </tr>
+              <tr> 
+                <td><dfn id="dfn-notreadableerror">NotReadableError</dfn></td>
+                <td>The source <a href="#dfn-blob" class="internalDFN">Blob</a> could not be read, typically due to
+                permission problems that occur after the <a href="#dfn-blob" class="internalDFN">Blob</a> reference
+                was acquired.
+                </td>
+              </tr>
+              <tr>
+                <td><dfn id="dfn-quotaexceedederror">QuotaExceededError</dfn></td>
+                <td>
+                  The operation failed because it would have caused the
+                  application to exceed its storage quota.
+                </td>
+              </tr>
+              <tr>
+                <td><dfn id="dfn-securityerror">SecurityError</dfn></td>
+                <td>
+                  One or more of the following occurred:
+                  <ul>
+                    <li> it was determined that certain files are unsafe for
+                    access within a Web application</li>
+                    <li>it was determined that too many write calls are being
+                    made on file resources</li>
+                    <li>it was determined that the file to be written, or the
+                    source data to be read, has changed on disk since the user
+                    selected it</li>
+                  </ul>
+                  This is an error to be used in situations not covered by any
+                  other error.
+                </td>
+              </tr>
+              <tr>
+                <td><dfn id="dfn-syntaxerror">SyntaxError</dfn>
+                </td><td>The application attempted to supply an invalid line ending
+                specifier to the <acronym title="Application Programming
+      Interface">API</acronym>.
+                </td>
+              </tr>
+            </tbody>
+          </table>
+      </div>
+    </div>
+    <div class="informative section" id="security-considerations">
+      <!--OddPage--><h2><span class="secno">10. </span>Security Considerations</h2><p><em>This section is non-normative.</em></p>
+      <div id="basic-security-model" class="section">
+      <h3><span class="secno">10.1 </span>Basic Security Model</h3>
+      <p>
+        Most of the security issues pertaining to writing to a file on the
+        user's drive are the same as those involved in downloading arbitrary
+        files from the Internet. The primary difference [in the case of
+        FileWriter] stems from the fact that the file may be continuously
+        written and re-written, at least until such a time as it is deemed
+        closed by the <a href="#dfn-user-agent" class="internalDFN">user agent</a>. This has an impact on disk quota, IO
+        bandwidth, and on processes that may require analysing the content of
+        the file.
+      </p>
+      </div>
+      <div id="write-only-files" class="section">
+      <h3><span class="secno">10.2 </span>Write-Only Files</h3>
+      <p>
+        When a user grants an application write access to a file, it doesn't
+        necessarily imply that the app should also receive read access to that
+        file or any of that file's metadata [including length].  This
+        specification describes a way in which that information can be kept
+        secret for write-only files.  If the application has obtained a
+        <a href="#idl-def-FileWriter" class="idlType"><code>FileWriter</code></a> through a mechanism that also implies read access,
+        those restrictions may be relaxed.
+      </p>
+      </div>
+      <div id="quotas" class="section">
+      <h3><span class="secno">10.3 </span>Quotas</h3>
+      <p>
+        Where quotas are concerned, <a href="#dfn-user-agent" class="internalDFN">user agent</a>s may wish to monitor the
+        size of the file(s) being written and possibly interrupt the script and
+        warn the user if certain limits of file size, remaining space, or disk
+        bandwidth are reached.
+      </p>
+      </div>
+      <div id="other-standard-techniques" class="section">
+      <h3><span class="secno">10.4 </span>Other Standard Techniques</h3>
+      <p>
+        Other parts of the download protection tool-chain such as flagging files
+        as unsafe to open, refusing to create dangerous file names, and making
+        sure that the mime type of a file matches its extension may naturally
+        be applied.
+      </p>
+      </div>
+    </div>
+    <div class="appendix section" id="acknowledgements">
+      <!--OddPage--><h2><span class="secno">A. </span>Acknowledgements</h2>
+      <p>
+        Thanks to Arun Ranganathan for his File <acronym title="Application Programming
+      Interface">API</acronym>, Opera for theirs, and Robin
+        Berjon both for his work on various file APIs and for <a href="http://dev.w3.org/2009/dap/ReSpec.js/documentation.html">ReSpec</a>.
+      </p>
+    </div>
+  
+
+<div id="references" class="appendix section"><!--OddPage--><h2><span class="secno">B. </span>References</h2><div id="normative-references" class="section"><h3><span class="secno">B.1 </span>Normative references</h3><dl class="bibliography"><dt id="bib-DOM4">[DOM4]</dt><dd>Anne van Kesteren; Aryeh Gregor; Ms2ger. <a href="http://www.w3.org/TR/2012/WD-dom-20120105/"><cite>DOM4.</cite></a> 5 January 2012. W3C Working Draft. (Work in progress.) URL: <a href="http://www.w3.org/TR/2012/WD-dom-20120105/">http://www.w3.org/TR/2012/WD-dom-20120105/</a> 
+</dd><dt id="bib-FILE-API-ED">[FILE-API-ED]</dt><dd>Arun Ranganathan; Jonas Sicking. <a href="http://dev.w3.org/2006/webapi/FileAPI/"><cite>File API.</cite></a> W3C Editor's Draft. (Work in progress.) URL: <a href="http://dev.w3.org/2006/webapi/FileAPI/">http://dev.w3.org/2006/webapi/FileAPI/</a> 
+</dd><dt id="bib-HTML5">[HTML5]</dt><dd>Ian Hickson. <a href="http://www.w3.org/TR/html5"><cite>HTML5.</cite></a> 29 March 2012. W3C Working Draft. (Work in progress.) URL: <a href="http://www.w3.org/TR/html5">http://www.w3.org/TR/html5</a> 
+</dd><dt id="bib-PROGRESS-EVENTS-ED">[PROGRESS-EVENTS-ED]</dt><dd>Anne van Kesteren. <a href="http://dvcs.w3.org/hg/progress/raw-file/tip/Overview.html"><cite>Progress Events 1.0.</cite></a> W3C Editor's Draft. (Work in progress.) URL: <a href="http://dvcs.w3.org/hg/progress/raw-file/tip/Overview.html">http://dvcs.w3.org/hg/progress/raw-file/tip/Overview.html</a> 
+</dd><dt id="bib-RFC2119">[RFC2119]</dt><dd>S. Bradner. <a href="http://www.ietf.org/rfc/rfc2119.txt"><cite>Key words for use in RFCs to Indicate Requirement Levels.</cite></a> March 1997. Internet RFC 2119.  URL: <a href="http://www.ietf.org/rfc/rfc2119.txt">http://www.ietf.org/rfc/rfc2119.txt</a> 
+</dd><dt id="bib-TYPED-ARRAYS">[TYPED-ARRAYS]</dt><dd>David Herman, Kenneth Russell. <a href="https://www.khronos.org/registry/typedarray/specs/latest/"><cite>Typed Arrays</cite></a> Khronos Working Draft. (Work in progress.) URL: <a href="https://www.khronos.org/registry/typedarray/specs/latest/">https://www.khronos.org/registry/typedarray/specs/latest/</a> 
+</dd><dt id="bib-WEBWORKERS-ED">[WEBWORKERS-ED]</dt><dd>Ian Hickson. <a href="http://dev.w3.org/html5/workers/"><cite>Web Workers.</cite></a> W3C Editor's Draft. (Work in progress.) URL: <a href="http://dev.w3.org/html5/workers/">http://dev.w3.org/html5/workers/</a> 
+</dd></dl></div><div id="informative-references" class="section"><h3><span class="secno">B.2 </span>Informative references</h3><p>No informative references.</p></div></div></body></html>

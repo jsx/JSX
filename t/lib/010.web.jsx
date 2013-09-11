@@ -405,23 +405,22 @@ class _Test extends TestCase {
         var v16 : string/*DOMString*/ = o.outerHTML;
         o.insertAdjacentHTML(X.getstring(), X.getstring());
         var f8 : Nullable.<PseudoElement> = o.pseudo(X.getstring());
-        var v17 : CSSStyleDeclaration = o.specifiedStyle;
-        var v18 : CSSStyleDeclaration = o.defaultStyle;
-        var v19 : CSSStyleDeclaration = o.computedStyle;
-        var v20 : CSSStyleDeclaration = o.usedStyle;
+        var v17 : CSSStyleDeclaration = o.cascadedStyle;
+        var v18 : CSSStyleDeclaration = o.rawComputedStyle;
+        var v19 : CSSStyleDeclaration = o.usedStyle;
         var f9 : ClientRectList = o.getClientRects();
         var f10 : ClientRect = o.getBoundingClientRect();
         o.scrollIntoView();
         o.scrollIntoView(X.getboolean());
         o.scrollIntoView(X.getboolean(), X.getScrollOptions());
-        var v21 : variant/*(double or ScrollOptions)*/ = o.scrollTop;
-        var v22 : variant/*(double or ScrollOptions)*/ = o.scrollLeft;
-        var v23 : number/*double*/ = o.scrollWidth;
-        var v24 : number/*double*/ = o.scrollHeight;
-        var v25 : number/*double*/ = o.clientTop;
-        var v26 : number/*double*/ = o.clientLeft;
-        var v27 : number/*double*/ = o.clientWidth;
-        var v28 : number/*double*/ = o.clientHeight;
+        var v20 : variant/*(double or ScrollOptionsVertical)*/ = o.scrollTop;
+        var v21 : variant/*(double or ScrollOptionsHorizontal)*/ = o.scrollLeft;
+        var v22 : number/*double*/ = o.scrollWidth;
+        var v23 : number/*double*/ = o.scrollHeight;
+        var v24 : number/*double*/ = o.clientTop;
+        var v25 : number/*double*/ = o.clientLeft;
+        var v26 : number/*double*/ = o.clientWidth;
+        var v27 : number/*double*/ = o.clientHeight;
         var f11 : Nullable.<Element> = o.querySelector(X.getstring());
         var f12 : NodeList = o.querySelectorAll(X.getstring());
     } // Element
@@ -1028,12 +1027,14 @@ class _Test extends TestCase {
         var v10 : number/*unsigned short*/ = o.FONT_FACE_RULE;
         var v11 : number/*unsigned short*/ = CSSRule.PAGE_RULE;
         var v12 : number/*unsigned short*/ = o.PAGE_RULE;
-        var v13 : number/*unsigned short*/ = CSSRule.NAMESPACE_RULE;
-        var v14 : number/*unsigned short*/ = o.NAMESPACE_RULE;
-        var v15 : number/*unsigned short*/ = o.type;
-        var v16 : string/*DOMString*/ = o.cssText;
-        var v17 : Nullable.<CSSRule> = o.parentRule;
-        var v18 : Nullable.<CSSStyleSheet> = o.parentStyleSheet;
+        var v13 : number/*unsigned short*/ = CSSRule.MARGIN_RULE;
+        var v14 : number/*unsigned short*/ = o.MARGIN_RULE;
+        var v15 : number/*unsigned short*/ = CSSRule.NAMESPACE_RULE;
+        var v16 : number/*unsigned short*/ = o.NAMESPACE_RULE;
+        var v17 : number/*unsigned short*/ = o.type;
+        var v18 : string/*DOMString*/ = o.cssText;
+        var v19 : Nullable.<CSSRule> = o.parentRule;
+        var v20 : Nullable.<CSSStyleSheet> = o.parentStyleSheet;
     } // CSSRule
 
     function compile_CSSStyleRule(o : CSSStyleRule) : void {
@@ -1065,6 +1066,11 @@ class _Test extends TestCase {
         var v1 : string/*DOMString*/ = o.selectorText;
         var v2 : CSSStyleDeclaration = o.style;
     } // CSSPageRule
+
+    function compile_CSSMarginRule(o : CSSMarginRule) : void {
+        var v1 : string/*DOMString*/ = o.name;
+        var v2 : CSSStyleDeclaration = o.style;
+    } // CSSMarginRule
 
     function compile_CSSNamespaceRule(o : CSSNamespaceRule) : void {
         var v1 : string/*DOMString*/ = o.namespaceURI;
@@ -1588,6 +1594,10 @@ class _Test extends TestCase {
         var f2 : CSSStyleDeclaration = o.getComputedStyle(X.getElement(), X.getstring());
         var f3 : MediaQueryList = o.matchMedia(X.getstring());
         var v1 : Screen = o.screen;
+        o.moveTo(X.getnumber(), X.getnumber());
+        o.moveBy(X.getnumber(), X.getnumber());
+        o.resizeTo(X.getnumber(), X.getnumber());
+        o.resizeBy(X.getnumber(), X.getnumber());
         var v2 : number/*double*/ = o.innerWidth;
         var v3 : number/*double*/ = o.innerHeight;
         var v4 : number/*double*/ = o.scrollX;
@@ -1721,9 +1731,17 @@ class _Test extends TestCase {
         var v105 : Nullable.<function(:Event):void>/*EventHandler*/ = o.onunload;
         var f18 : string/*DOMString*/ = o.btoa(X.getstring());
         var f19 : string/*DOMString*/ = o.atob(X.getstring());
-        var v106 : Storage = o.sessionStorage;
-        var v107 : Storage = o.localStorage;
-        var v108 : IDBFactory = o.indexedDB;
+        var v106 : number/*unsigned short*/ = Window.TEMPORARY;
+        var v107 : number/*unsigned short*/ = o.TEMPORARY;
+        var v108 : number/*unsigned short*/ = Window.PERSISTENT;
+        var v109 : number/*unsigned short*/ = o.PERSISTENT;
+        o.requestFileSystem(X.getnumber(), X.getnumber(), X.getfunction_filesystem_FileSystem__void());
+        o.requestFileSystem(X.getnumber(), X.getnumber(), X.getfunction_filesystem_FileSystem__void(), X.getfunction_err_DOMError__void());
+        o.resolveLocalFileSystemURL(X.getstring(), X.getfunction_entry_Entry__void());
+        o.resolveLocalFileSystemURL(X.getstring(), X.getfunction_entry_Entry__void(), X.getfunction_err_DOMError__void());
+        var v110 : Storage = o.sessionStorage;
+        var v111 : Storage = o.localStorage;
+        var v112 : IDBFactory = o.indexedDB;
         var f20 : number/*long*/ = o.setTimeout(X.getfunction___void());
         var f21 : number/*long*/ = o.setTimeout(X.getfunction___void(), X.getnumber());
         o.clearTimeout(X.getnumber());
@@ -1732,8 +1750,8 @@ class _Test extends TestCase {
         o.clearInterval(X.getnumber());
         o.postMessage(X.getvariant(), X.getstring());
         o.postMessage(X.getvariant(), X.getstring(), X.getTransferable__());
-        var v109 : Nullable.<number>/*int?*/ = o.orientation;
-        var v110 : Nullable.<function(:Event):void>/*EventHandler*/ = o.onorientationchange;
+        var v113 : Nullable.<number>/*int?*/ = o.orientation;
+        var v114 : Nullable.<function(:Event):void>/*EventHandler*/ = o.onorientationchange;
         var f24 : number/*long*/ = o.requestAnimationFrame(X.getfunction_time_number__void());
         o.cancelAnimationFrame(X.getnumber());
         var f25 : number/*long*/ = o.webkitRequestAnimationFrame(X.getfunction_time_number__void());
@@ -1743,19 +1761,16 @@ class _Test extends TestCase {
     } // Window
 
     function compile_GetStyleUtils(o : GetStyleUtils) : void {
-        var v1 : CSSStyleDeclaration = o.specifiedStyle;
-        var v2 : CSSStyleDeclaration = o.defaultStyle;
-        var v3 : CSSStyleDeclaration = o.computedStyle;
-        var v4 : CSSStyleDeclaration = o.usedStyle;
+        var v1 : CSSStyleDeclaration = o.cascadedStyle;
+        var v2 : CSSStyleDeclaration = o.rawComputedStyle;
+        var v3 : CSSStyleDeclaration = o.usedStyle;
     } // GetStyleUtils
 
     function compile_PseudoElement(o : PseudoElement) : void {
     } // PseudoElement
 
     function compile_ScrollOptions(o : ScrollOptions) : void {
-        var v1 : number/*double*/ = o.x;
-        var v2 : number/*double*/ = o.y;
-        var v3 : string/*ScrollBehavior*/ = o.behavior;
+        var v1 : string/*ScrollBehavior*/ = o.behavior;
     } // ScrollOptions
 
     function compile_MediaQueryList(o : MediaQueryList) : void {
@@ -1780,8 +1795,16 @@ class _Test extends TestCase {
         var f1 : Nullable.<ClientRect> = o.getClientRect();
     } // CaretPosition
 
+    function compile_ScrollOptionsHorizontal(o : ScrollOptionsHorizontal) : void {
+        var v1 : number/*double*/ = o.x;
+    } // ScrollOptionsHorizontal
+
+    function compile_ScrollOptionsVertical(o : ScrollOptionsVertical) : void {
+        var v1 : number/*double*/ = o.y;
+    } // ScrollOptionsVertical
+
     function compile_HTMLElement(o : HTMLElement) : void {
-        var v1 : Element = o.offsetParent;
+        var v1 : Nullable.<Element> = o.offsetParent;
         var v2 : number/*double*/ = o.offsetTop;
         var v3 : number/*double*/ = o.offsetLeft;
         var v4 : number/*double*/ = o.offsetWidth;
@@ -3283,6 +3306,174 @@ class _Test extends TestCase {
         var f4 : string/*DOMString*/ = o.readAsText(X.getBlob(), X.getstring());
         var f5 : string/*DOMString*/ = o.readAsDataURL(X.getBlob());
     } // FileReaderSync
+
+    function compile_BlobBuilder(o : BlobBuilder) : void {
+        var c1 = new BlobBuilder();
+        var f1 : Blob = o.getBlob();
+        var f2 : Blob = o.getBlob(X.getstring());
+        o.append(X.getstring());
+        o.append(X.getstring(), X.getstring());
+        o.append(X.getBlob());
+        o.append(X.getArrayBuffer());
+    } // BlobBuilder
+
+    function compile_FileSaver(o : FileSaver) : void {
+        var c1 = new FileSaver(X.getBlob());
+        o.abort();
+        var v1 : number/*unsigned short*/ = FileSaver.INIT;
+        var v2 : number/*unsigned short*/ = o.INIT;
+        var v3 : number/*unsigned short*/ = FileSaver.WRITING;
+        var v4 : number/*unsigned short*/ = o.WRITING;
+        var v5 : number/*unsigned short*/ = FileSaver.DONE;
+        var v6 : number/*unsigned short*/ = o.DONE;
+        var v7 : number/*unsigned short*/ = o.readyState;
+        var v8 : DOMError = o.error;
+        var v9 : function(:Event):void/*Function*/ = o.onwritestart;
+        var v10 : function(:Event):void/*Function*/ = o.onprogress;
+        var v11 : function(:Event):void/*Function*/ = o.onwrite;
+        var v12 : function(:Event):void/*Function*/ = o.onabort;
+        var v13 : function(:Event):void/*Function*/ = o.onerror;
+        var v14 : function(:Event):void/*Function*/ = o.onwriteend;
+    } // FileSaver
+
+    function compile_FileWriter(o : FileWriter) : void {
+        var v1 : number/*unsigned long long*/ = o.position;
+        var v2 : number/*unsigned long long*/ = o.length;
+        o.write(X.getBlob());
+        o.seek(X.getnumber());
+        o.truncate(X.getnumber());
+    } // FileWriter
+
+    function compile_FileWriterSync(o : FileWriterSync) : void {
+        var v1 : number/*unsigned long long*/ = o.position;
+        var v2 : number/*unsigned long long*/ = o.length;
+        o.write(X.getBlob());
+        o.seek(X.getnumber());
+        o.truncate(X.getnumber());
+    } // FileWriterSync
+
+    function compile_LocalFileSystem(o : LocalFileSystem) : void {
+        var v1 : number/*unsigned short*/ = LocalFileSystem.TEMPORARY;
+        var v2 : number/*unsigned short*/ = o.TEMPORARY;
+        var v3 : number/*unsigned short*/ = LocalFileSystem.PERSISTENT;
+        var v4 : number/*unsigned short*/ = o.PERSISTENT;
+        o.requestFileSystem(X.getnumber(), X.getnumber(), X.getfunction_filesystem_FileSystem__void());
+        o.requestFileSystem(X.getnumber(), X.getnumber(), X.getfunction_filesystem_FileSystem__void(), X.getfunction_err_DOMError__void());
+        o.resolveLocalFileSystemURL(X.getstring(), X.getfunction_entry_Entry__void());
+        o.resolveLocalFileSystemURL(X.getstring(), X.getfunction_entry_Entry__void(), X.getfunction_err_DOMError__void());
+    } // LocalFileSystem
+
+    function compile_LocalFileSystemSync(o : LocalFileSystemSync) : void {
+        var v1 : number/*unsigned short*/ = LocalFileSystemSync.TEMPORARY;
+        var v2 : number/*unsigned short*/ = o.TEMPORARY;
+        var v3 : number/*unsigned short*/ = LocalFileSystemSync.PERSISTENT;
+        var v4 : number/*unsigned short*/ = o.PERSISTENT;
+        var f1 : FileSystemSync = o.requestFileSystemSync(X.getnumber(), X.getnumber());
+        var f2 : EntrySync = o.resolveLocalFileSystemSyncURL(X.getstring());
+    } // LocalFileSystemSync
+
+    function compile_Metadata(o : Metadata) : void {
+        var v1 : Date = o.modificationTime;
+        var v2 : number/*unsigned long long*/ = o.size;
+    } // Metadata
+
+    function compile_Flags(o : Flags) : void {
+        var v1 : boolean = o.create;
+        var v2 : boolean = o.exclusive;
+    } // Flags
+
+    function compile_FileSystem(o : FileSystem) : void {
+        var v1 : string/*DOMString*/ = o.name;
+        var v2 : DirectoryEntry = o.root;
+    } // FileSystem
+
+    function compile_Entry(o : Entry) : void {
+        var v1 : boolean = o.isFile;
+        var v2 : boolean = o.isDirectory;
+        o.getMetadata(X.getfunction_metadata_Metadata__void());
+        o.getMetadata(X.getfunction_metadata_Metadata__void(), X.getfunction_err_DOMError__void());
+        var v3 : string/*DOMString*/ = o.name;
+        var v4 : string/*DOMString*/ = o.fullPath;
+        var v5 : FileSystem = o.filesystem;
+        o.moveTo(X.getDirectoryEntry());
+        o.moveTo(X.getDirectoryEntry(), X.getstring());
+        o.moveTo(X.getDirectoryEntry(), X.getstring(), X.getfunction_entry_Entry__void());
+        o.moveTo(X.getDirectoryEntry(), X.getstring(), X.getfunction_entry_Entry__void(), X.getfunction_err_DOMError__void());
+        o.copyTo(X.getDirectoryEntry());
+        o.copyTo(X.getDirectoryEntry(), X.getstring());
+        o.copyTo(X.getDirectoryEntry(), X.getstring(), X.getfunction_entry_Entry__void());
+        o.copyTo(X.getDirectoryEntry(), X.getstring(), X.getfunction_entry_Entry__void(), X.getfunction_err_DOMError__void());
+        var f1 : string/*DOMString*/ = o.toURL();
+        o.remove(X.getfunction___void());
+        o.remove(X.getfunction___void(), X.getfunction_err_DOMError__void());
+        o.getParent(X.getfunction_entry_Entry__void());
+        o.getParent(X.getfunction_entry_Entry__void(), X.getfunction_err_DOMError__void());
+    } // Entry
+
+    function compile_DirectoryEntry(o : DirectoryEntry) : void {
+        var f1 : DirectoryReader = o.createReader();
+        o.getFile(X.getstring());
+        o.getFile(X.getstring(), X.getFlags());
+        o.getFile(X.getstring(), X.getFlags(), X.getfunction_entry_Entry__void());
+        o.getFile(X.getstring(), X.getFlags(), X.getfunction_entry_Entry__void(), X.getfunction_err_DOMError__void());
+        o.getDirectory(X.getstring());
+        o.getDirectory(X.getstring(), X.getFlags());
+        o.getDirectory(X.getstring(), X.getFlags(), X.getfunction_entry_Entry__void());
+        o.getDirectory(X.getstring(), X.getFlags(), X.getfunction_entry_Entry__void(), X.getfunction_err_DOMError__void());
+        o.removeRecursively(X.getfunction___void());
+        o.removeRecursively(X.getfunction___void(), X.getfunction_err_DOMError__void());
+    } // DirectoryEntry
+
+    function compile_DirectoryReader(o : DirectoryReader) : void {
+        o.readEntries(X.getfunction_entries_Entry____void());
+        o.readEntries(X.getfunction_entries_Entry____void(), X.getfunction_err_DOMError__void());
+    } // DirectoryReader
+
+    function compile_FileEntry(o : FileEntry) : void {
+        o.createWriter(X.getfunction_fileWriter_FileWriter__void());
+        o.createWriter(X.getfunction_fileWriter_FileWriter__void(), X.getfunction_err_DOMError__void());
+        o.file(X.getfunction__File__void());
+        o.file(X.getfunction__File__void(), X.getfunction_err_DOMError__void());
+    } // FileEntry
+
+    function compile_FileSystemSync(o : FileSystemSync) : void {
+        var v1 : string/*DOMString*/ = o.name;
+        var v2 : DirectoryEntrySync = o.root;
+    } // FileSystemSync
+
+    function compile_EntrySync(o : EntrySync) : void {
+        var v1 : boolean = o.isFile;
+        var v2 : boolean = o.isDirectory;
+        var f1 : Metadata = o.getMetadata();
+        var v3 : string/*DOMString*/ = o.name;
+        var v4 : string/*DOMString*/ = o.fullPath;
+        var v5 : FileSystemSync = o.filesystem;
+        var f2 : EntrySync = o.moveTo(X.getDirectoryEntrySync());
+        var f3 : EntrySync = o.moveTo(X.getDirectoryEntrySync(), X.getstring());
+        var f4 : EntrySync = o.copyTo(X.getDirectoryEntrySync());
+        var f5 : EntrySync = o.copyTo(X.getDirectoryEntrySync(), X.getstring());
+        var f6 : string/*DOMString*/ = o.toURL();
+        o.remove();
+        var f7 : DirectoryEntrySync = o.getParent();
+    } // EntrySync
+
+    function compile_DirectoryEntrySync(o : DirectoryEntrySync) : void {
+        var f1 : DirectoryReaderSync = o.createReader();
+        var f2 : FileEntrySync = o.getFile(X.getstring());
+        var f3 : FileEntrySync = o.getFile(X.getstring(), X.getFlags());
+        var f4 : DirectoryEntrySync = o.getDirectory(X.getstring());
+        var f5 : DirectoryEntrySync = o.getDirectory(X.getstring(), X.getFlags());
+        o.removeRecursively();
+    } // DirectoryEntrySync
+
+    function compile_DirectoryReaderSync(o : DirectoryReaderSync) : void {
+        var f1 : EntrySync[] = o.readEntries();
+    } // DirectoryReaderSync
+
+    function compile_FileEntrySync(o : FileEntrySync) : void {
+        var f1 : FileWriterSync = o.createWriter();
+        var f2 : File = o.file();
+    } // FileEntrySync
 
     function compile_AudioContext(o : AudioContext) : void {
         var c1 = new AudioContext();
@@ -5381,6 +5572,10 @@ native class X {
     static function getDelayNode() : DelayNode;
     static function getDeviceMotionEventInit() : DeviceMotionEventInit;
     static function getDeviceOrientationEventInit() : DeviceOrientationEventInit;
+    static function getDirectoryEntry() : DirectoryEntry;
+    static function getDirectoryEntrySync() : DirectoryEntrySync;
+    static function getDirectoryReader() : DirectoryReader;
+    static function getDirectoryReaderSync() : DirectoryReaderSync;
     static function getDocument() : Document;
     static function getDocumentFragment() : DocumentFragment;
     static function getDocumentType() : DocumentType;
@@ -5389,6 +5584,8 @@ native class X {
     static function getDynamicsCompressorNode() : DynamicsCompressorNode;
     static function getElement() : Element;
     static function getElement__() : Element[];
+    static function getEntrySync() : EntrySync;
+    static function getEntrySync__() : EntrySync[];
     static function getErrorEventInit() : ErrorEventInit;
     static function getEvent() : Event;
     static function getEventInit() : EventInit;
@@ -5396,7 +5593,12 @@ native class X {
     static function getEventTarget() : EventTarget;
     static function getExternal() : External;
     static function getFile() : File;
+    static function getFileEntrySync() : FileEntrySync;
     static function getFileList() : FileList;
+    static function getFileSystem() : FileSystem;
+    static function getFileSystemSync() : FileSystemSync;
+    static function getFileWriterSync() : FileWriterSync;
+    static function getFlags() : Flags;
     static function getFloat32Array() : Float32Array;
     static function getFocusEventInit() : FocusEventInit;
     static function getFormData() : FormData;
@@ -5454,6 +5656,7 @@ native class X {
     static function getMediaStream__() : MediaStream[];
     static function getMessageEventInit() : MessageEventInit;
     static function getMessagePort() : MessagePort;
+    static function getMetadata() : Metadata;
     static function getMouseEvent() : MouseEvent;
     static function getMouseEventInit() : MouseEventInit;
     static function getMutationObserverInit() : MutationObserverInit;
@@ -5587,12 +5790,19 @@ native class X {
     static function getXMLHttpRequestUpload() : XMLHttpRequestUpload;
     static function getboolean() : boolean;
     static function getfunction__Event__void() : function(:Event):void;
+    static function getfunction__File__void() : function(:File):void;
     static function getfunction__IDBTransactionSync__number__void() : function(:IDBTransactionSync,:number):void;
     static function getfunction__IDBTransactionSync__void() : function(:IDBTransactionSync):void;
     static function getfunction__MediaQueryList__void() : function(:MediaQueryList):void;
     static function getfunction___void() : function():void;
     static function getfunction_decodedData_AudioBuffer__void() : function(decodedData:AudioBuffer):void;
+    static function getfunction_entries_Entry____void() : function(entries:Entry[]):void;
+    static function getfunction_entry_Entry__void() : function(entry:Entry):void;
+    static function getfunction_err_DOMError__void() : function(err:DOMError):void;
     static function getfunction_errorInformation_string__void() : function(errorInformation:string):void;
+    static function getfunction_fileWriter_FileWriter__void() : function(fileWriter:FileWriter):void;
+    static function getfunction_filesystem_FileSystem__void() : function(filesystem:FileSystem):void;
+    static function getfunction_metadata_Metadata__void() : function(metadata:Metadata):void;
     static function getfunction_mutations_MutationRecord___observer_MutationObserver__void() : function(mutations:MutationRecord[],observer:MutationObserver):void;
     static function getfunction_permission_string__void() : function(permission:string):void;
     static function getfunction_positionError_PositionError__void() : function(positionError:PositionError):void;
