@@ -882,7 +882,7 @@ class ClassDefinition implements Stashable {
 			}
 			if (! Util.typesAreEqual((this._members[i] as MemberFunctionDefinition).getArgumentTypes(), member.getArgumentTypes()))
 				continue;
-			if ((! isCheckingInterface) && (member.flags() & ClassDefinition.IS_OVERRIDE) == 0) {
+			if ((! isCheckingInterface) && ((member.flags() | this._members[i].flags()) & ClassDefinition.IS_STATIC) == 0 && (member.flags() & ClassDefinition.IS_OVERRIDE) == 0) {
 				var error = new CompileError(member.getNameToken(), "overriding functions must have 'override' attribute set");
 				error.addCompileNote(new CompileNote(this._members[i].getNameToken(), Util.format("defined in base class '%1'", [this.classFullName()])));
 				context.errors.push(error);
