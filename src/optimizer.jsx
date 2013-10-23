@@ -1161,8 +1161,33 @@ class _StaticizeOptimizeCommand extends _OptimizeCommand {
 	override function performOptimization () : void {
 
 		function memberCanBeStaticized(funcDef : MemberFunctionDefinition) : boolean {
-			return (funcDef.flags() & (ClassDefinition.IS_OVERRIDE | ClassDefinition.IS_ABSTRACT | ClassDefinition.IS_FINAL | ClassDefinition.IS_STATIC | ClassDefinition.IS_NATIVE)) == ClassDefinition.IS_FINAL
-				&& funcDef.name() != "constructor";
+			// only allow non-override final methods
+			if ((funcDef.flags() & (ClassDefinition.IS_OVERRIDE | ClassDefinition.IS_ABSTRACT | ClassDefinition.IS_FINAL | ClassDefinition.IS_STATIC | ClassDefinition.IS_NATIVE)) != ClassDefinition.IS_FINAL) {
+				return false;
+			}
+			// and not constructors
+			if (funcDef.name() == "constructor") {
+				return false;
+			}
+			// and not methods using "super"
+			function onStatement(statement : Statement) : boolean {
+				if (statement instanceof FunctionStatement) {
+					return (statement as FunctionStatement).getFuncDef().forEachStatement(onStatement);
+				}
+				return statement.forEachExpression(function onExpression(expr) {
+					if (expr instanceof FunctionExpression) {
+						return (expr as FunctionExpression).getFuncDef().forEachStatement(onStatement);
+					} else if (expr instanceof SuperExpression) {
+						return false;
+					}
+					return expr.forEachExpression(onExpression);
+				}) && statement.forEachStatement(onStatement);
+			}
+			if (! funcDef.forEachStatement(onStatement)) {
+				return false;
+			}
+			// and the rest can be staticized
+			return true;
 		}
 
 		this.getCompiler().forEachClassDef(function (parser, classDef) {
