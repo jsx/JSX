@@ -1,5 +1,12 @@
 Revision history for the JSX software development kit
 
+0.9.67 2013-10-23 12:01:00+0900
+    [FEATURES]
+    - type of array / map literals use as function arguments are deducted
+      from the signature of the callee (#264)
+    [BUG FIXES]
+    - fix misoptimization of "super.meth()" in the "staticize" optimizer
+
 0.9.66 2013-10-13 12:34:32+0900
     [BUG FIXES]
     - Fix #279: member functions could not be defined if
