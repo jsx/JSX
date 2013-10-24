@@ -1,5 +1,11 @@
 Revision history for the JSX software development kit
 
+0.9.68 2013-10-24 16:03:00+0900
+    [BUG FIXES]
+    - fix a bug in minifier that generated corrupt code when closures are
+      nested within the initialization expression of a member variable
+      definition
+
 0.9.67 2013-10-23 12:01:00+0900
     [FEATURES]
     - type of array / map literals use as function arguments are deducted
