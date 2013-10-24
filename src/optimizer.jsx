@@ -642,6 +642,13 @@ class _StripOptimizeCommand extends _OptimizeCommand {
 				}
 			}
 		}
+		// TODO do not emit member variables that are not used
+		classDef.forEachMemberVariable(function (varDef) {
+			if ((varDef.flags() & ClassDefinition.IS_STATIC) == 0) {
+				this._membersToWalk.push(varDef);
+			}
+			return true;
+		});
 		if (classDef.extendType() != null) {
 			this._touchInstance(classDef.extendType().getClassDef());
 		}
@@ -780,6 +787,7 @@ class _StripOptimizeCommand extends _OptimizeCommand {
 					return false;
 				}
 			}
+			// for now, all member variables are preserved, see _touchInstance
 			return true;
 		}
 		this.getCompiler().forEachClassDef(function (parser, classDef) {
