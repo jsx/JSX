@@ -1822,16 +1822,21 @@ class MemberFunctionDefinition extends MemberDefinition implements Block {
 			if (! (this._statements[i] instanceof ExpressionStatement))
 				break;
 			function onExpr(expr : Expression) : boolean {
-				var lhsExpr;
 				/*
 					FIXME if the class is extending a native class and the expression is setting a property of the native class,
 					then we should break, since it might have side effects (e.g. the property might be defined as a setter)
 				*/
-				if (expr instanceof AssignmentExpression
-					&& (lhsExpr = (expr as AssignmentExpression).getFirstExpr()) instanceof PropertyExpression
-					&& (lhsExpr as PropertyExpression).getExpr() instanceof ThisExpression) {
+				if (expr instanceof AssignmentExpression) {
+					var assignExpr = expr as AssignmentExpression;
+					if (! onExpr(assignExpr.getSecondExpr())) {
+						return false;
+					}
+					var lhsExpr = assignExpr.getFirstExpr();
+					if (lhsExpr instanceof PropertyExpression
+						&& (lhsExpr as PropertyExpression).getExpr() instanceof ThisExpression) {
 						initProperties[(lhsExpr as PropertyExpression).getIdentifierToken().getValue()] = false;
 						return true;
+					}
 				} else if (expr instanceof ThisExpression
 					   || expr instanceof FunctionExpression) {
 					return false;
