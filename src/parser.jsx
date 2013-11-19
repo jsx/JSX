@@ -896,6 +896,8 @@ class Parser {
 			if (local.getName().getValue() == identifierToken.getValue()) {
 				if ((type != null && local.getType() != null && ! local.getType().equals(type)) || isFunctionStmt)
 					this._newError("conflicting types for variable " + identifierToken.getValue(), identifierToken);
+				if (local.isConstant() != isConst)
+					this._newError("const attribute conflict for variable " + identifierToken.getValue(), identifierToken);
 				return true;
 			}
 			return false;
