@@ -1721,7 +1721,7 @@ class MemberFunctionDefinition extends MemberDefinition implements Block {
 					formalArgs,
 					new LocalVariable[],
 					[statement],
-					this.getClosures().slice(0),
+					[], // closures
 					this._lastTokenOfBody,
 					this._docComment);
 			}
@@ -1738,6 +1738,7 @@ class MemberFunctionDefinition extends MemberDefinition implements Block {
 					Util.unlinkFunction(newFuncDef, this);
 					Util.linkFunction(newFuncDef, wrapper);
 					(expr as FunctionExpression).setFuncDef(newFuncDef);
+					wrapper.getClosures().push(newFuncDef);
 					return true;
 				}
 				return expr.forEachExpression(onExpr);;
