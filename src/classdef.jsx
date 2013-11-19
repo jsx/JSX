@@ -1729,8 +1729,7 @@ class MemberFunctionDefinition extends MemberDefinition implements Block {
 				throw new Error("TODO: template function with default parameters in " + this.getNotation() + " is not yet supported");
 			}
 			wrapper.setClassDef(this.getClassDef());
-			// register
-			this.getClassDef().members().splice(this.getClassDef().members().indexOf(this)+1, 0, wrapper); // insert right after the original function
+
 			// fix up function links inside defVal
 			Util.forEachExpression(function onExpr(expr) {
 				if (expr instanceof FunctionExpression) {
@@ -1738,11 +1737,13 @@ class MemberFunctionDefinition extends MemberDefinition implements Block {
 					Util.unlinkFunction(newFuncDef, this);
 					Util.linkFunction(newFuncDef, wrapper);
 					(expr as FunctionExpression).setFuncDef(newFuncDef);
-					wrapper.getClosures().push(newFuncDef);
 					return true;
 				}
-				return expr.forEachExpression(onExpr);;
+				return expr.forEachExpression(onExpr);
 			}, argExprs);
+
+			// insert it right after the original function
+			this.getClassDef().members().splice(this.getClassDef().members().indexOf(this)+1, 0, wrapper);
 		}
 	}
 
