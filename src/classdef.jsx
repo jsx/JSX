@@ -1854,12 +1854,27 @@ class MemberFunctionDefinition extends MemberDefinition implements Block {
 		this._classDef.forEachMemberVariable(function (member) {
 			if ((member.flags() & (ClassDefinition.IS_STATIC | ClassDefinition.IS_ABSTRACT)) == 0) {
 				if (initProperties[member.name()]) {
+					var initVal = member.getInitialValue().clone();
+
+					// fix up function links inside initVal
+					Util.forEachExpression(function onExpr(expr) {
+						if (expr instanceof FunctionExpression) {
+							var newFuncDef = (expr as FunctionExpression).getFuncDef().clone();
+							// remove from member list
+							this._classDef.members().splice(this._classDef.members().indexOf(newFuncDef), 1);
+							Util.linkFunction(newFuncDef, this);
+							(expr as FunctionExpression).setFuncDef(newFuncDef);
+							return true;
+						}
+						return expr.forEachExpression(onExpr);
+					}, [ initVal ]);
+
 					var stmt = new ExpressionStatement(
 						new AssignmentExpression(new Token("=", false),
 							new PropertyExpression(new Token(".", false),
 								new ThisExpression(new Token("this", false), this._classDef),
 								member.getNameToken(), new Type[], member.getType()),
-							member.getInitialValue()));
+							initVal));
 					this._statements.splice(insertStmtAt++, 0, stmt);
 				}
 			}
